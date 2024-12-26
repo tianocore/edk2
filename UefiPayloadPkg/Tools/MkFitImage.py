@@ -63,6 +63,7 @@ def BuildFvImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Descript
     Fdt.setprop_str(ParentNode, 'project', 'tianocore')
     Fdt.setprop_str(ParentNode, 'arch',Arch)
     Fdt.setprop_str(ParentNode, 'type', 'firmware')
+    Fdt.setprop_u64(ParentNode, 'load', InfoHeader.LoadAddr + DataOffset - InfoHeader.DataOffset)
     Fdt.setprop_str(ParentNode, 'description', Description)
 
 def BuildTianoImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Description, Arch):
@@ -79,7 +80,7 @@ def BuildTianoImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Descr
     if InfoHeader.DataSize is not None:
        Fdt.setprop_u32(ParentNode, 'data-size', DataSize)
     if InfoHeader.DataOffset is not None:
-        Fdt.setprop_u32(ParentNode, 'data-offset', DataOffset)
+        Fdt.setprop_u32(ParentNode, 'data-offset', DataOffset - InfoHeader.DataOffset)
     if InfoHeader.Producer is not None:
         Fdt.setprop_str(ParentNode, 'producer', InfoHeader.Producer)
     if InfoHeader.Capabilities is not None:
@@ -170,7 +171,7 @@ def MakeFitImage(InfoHeader, Arch):
     #
     return BuildFitImage(Fdt, InfoHeader, Arch)
 
-def ReplaceFv (UplBinary, SectionFvFile, SectionName, Arch):
+def ReplaceFv (UplBinary, SectionFvFile, SectionName, Arch, DataOffset):
     try:
         #
         # Get Original Multi Fv
@@ -198,7 +199,7 @@ def ReplaceFv (UplBinary, SectionFvFile, SectionName, Arch):
         MultiFvList = []
         for Item in LoadablesList:
             ImageNode    = libfdt.fdt_subnode_offset(NewFitHeader, ImagesNode, Item)
-            ImageOffset  = int.from_bytes (libfdt.fdt_getprop (NewFitHeader, ImageNode, 'data-offset')[0], 'big')
+            ImageOffset  = int.from_bytes (libfdt.fdt_getprop (NewFitHeader, ImageNode, 'data-offset')[0], 'big') + DataOffset
             ImageSize    = int.from_bytes (libfdt.fdt_getprop (NewFitHeader, ImageNode, 'data-size')[0], 'big')
             MultiFvList.append ([Item, Dtb[ImageOffset:ImageOffset + ImageSize]])
 
@@ -229,9 +230,9 @@ def ReplaceFv (UplBinary, SectionFvFile, SectionName, Arch):
         else:
             for Index in range (0, len (MultiFvList)):
                 ImageNode    = libfdt.fdt_subnode_offset(NewFitHeader, ImagesNode, MultiFvList[Index][0])
-                ImageOffset  = int.from_bytes (libfdt.fdt_getprop (NewFitHeader, ImageNode, 'data-offset')[0], 'big')
+                ImageOffset  = int.from_bytes (libfdt.fdt_getprop (NewFitHeader, ImageNode, 'data-offset')[0], 'big') + DataOffset
                 if ImageOffset > ReplaceOffset:
-                    libfdt.fdt_setprop_u32(NewFitHeader, ImageNode, 'data-offset', ImageOffset + OffsetDelta)
+                    libfdt.fdt_setprop_u32(NewFitHeader, ImageNode, 'data-offset', ImageOffset + OffsetDelta - DataOffset)
 
         ConfNodes     = libfdt.fdt_subnode_offset(NewFitHeader, 0, 'configurations')
         libfdt.fdt_setprop(NewFitHeader, ConfNodes, 'default', bytes('conf-1', 'utf-8'), len('conf-1') + 1)
@@ -244,7 +245,7 @@ def ReplaceFv (UplBinary, SectionFvFile, SectionName, Arch):
         #
         ImagesNode    = libfdt.fdt_subnode_offset(NewFitHeader, 0, 'images')
         TianoNode     = libfdt.fdt_subnode_offset(NewFitHeader, ImagesNode, 'tianocore')
-        TianoOffset   = int.from_bytes (libfdt.fdt_getprop (NewFitHeader, TianoNode, 'data-offset')[0], 'big')
+        TianoOffset   = int.from_bytes (libfdt.fdt_getprop (NewFitHeader, TianoNode, 'data-offset')[0], 'big') + DataOffset
         TianoSize     = int.from_bytes (libfdt.fdt_getprop (NewFitHeader, TianoNode, 'data-size')[0], 'big')
         TianoBinary   = Dtb[TianoOffset:TianoOffset + TianoSize]
 
@@ -256,7 +257,7 @@ def ReplaceFv (UplBinary, SectionFvFile, SectionName, Arch):
         NewUplBinary[len(NewFitHeader):len(NewFitHeader) + len(TianoBinary)] = TianoBinary
         for Index in range (0, len (MultiFvList)):
             ImageNode   = libfdt.fdt_subnode_offset(NewFitHeader, ImagesNode, MultiFvList[Index][0])
-            ImageOffset = int.from_bytes (libfdt.fdt_getprop (NewFitHeader, ImageNode, 'data-offset')[0], 'big')
+            ImageOffset = int.from_bytes (libfdt.fdt_getprop (NewFitHeader, ImageNode, 'data-offset')[0], 'big') + DataOffset
             ImageSize   = int.from_bytes (libfdt.fdt_getprop (NewFitHeader, ImageNode, 'data-size')[0], 'big')
             NewUplBinary[ImageOffset:ImageOffset + ImageSize] = MultiFvList[Index][1]
             print("Update " + MultiFvList[Index][0] + "\t\t to " + str(hex(ImageOffset)) + "\t ~ " + str(hex(ImageOffset + ImageSize)))

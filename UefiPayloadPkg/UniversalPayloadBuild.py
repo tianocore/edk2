@@ -48,6 +48,9 @@ class UPLD_INFO_HEADER(LittleEndianStructure):
         self.ImageId        = b'UEFI'
         self.ProducerId     = b'INTEL'
 
+# Start of image data in FIT
+DATA_OFFSET = 0x1000
+
 def ValidateSpecRevision (Argument):
     try:
         (MajorStr, MinorStr) = Argument.split('.')
@@ -239,7 +242,7 @@ def BuildUniversalPayload(Args):
         fit_image_info_header.BdsfvPath     = BdsFvOutputDir
         fit_image_info_header.SecfvPath     = SecFvOutputDir
         fit_image_info_header.NetworkfvPath = NetworkFvOutputDir
-        fit_image_info_header.DataOffset    = 0x1000
+        fit_image_info_header.DataOffset    = DATA_OFFSET
         fit_image_info_header.LoadAddr      = Args.LoadAddress
         fit_image_info_header.Project       = 'tianocore'
 
@@ -347,7 +350,7 @@ def main():
             return ElfFv.ReplaceFv (UplBinary, SectionFvFile, '.upld.{}'.format (SectionName))
         else:
             import Tools.MkFitImage as MkFitImage
-            return MkFitImage.ReplaceFv (UplBinary, SectionFvFile, SectionName, Arch)
+            return MkFitImage.ReplaceFv (UplBinary, SectionFvFile, SectionName, Arch, DATA_OFFSET)
 
     if (UniversalPayloadBinary != None):
         for (SectionName, SectionFvFile) in MultiFvList:
