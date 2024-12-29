@@ -246,7 +246,9 @@ PxeBcDestroyIp4Children (
            &Private->PxeBc,
            NULL
            );
-    FreePool (Private->Ip4Nic->DevicePath);
+    if (Private->Ip4Nic->DevicePath != NULL) {
+      FreePool (Private->Ip4Nic->DevicePath);
+    }
 
     if (Private->Snp != NULL) {
       //
@@ -407,7 +409,9 @@ PxeBcDestroyIp6Children (
            &Private->PxeBc,
            NULL
            );
-    FreePool (Private->Ip6Nic->DevicePath);
+    if (Private->Ip6Nic->DevicePath != NULL) {
+      FreePool (Private->Ip6Nic->DevicePath);
+    }
 
     if (Private->Snp != NULL) {
       //
