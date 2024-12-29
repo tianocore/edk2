@@ -297,8 +297,12 @@ BuildFitLoadablesFvHob (
     Data32      = (UINT32 *)(PropertyPtr->Data);
     DataSize    = SwapBytes32 (*Data32);
 
+    DataOffset += 0x1000;
+
     if (AsciiStrCmp (Fvname, "uefi-fv") == 0) {
       *DxeFv = (EFI_FIRMWARE_VOLUME_HEADER *)((UINTN)PayloadBase->Entry + (UINTN)DataOffset);
+      DEBUG ((DEBUG_INFO, "PayloadBase->Entry %x DataOffset %x, DataSize %x FvLength %lx\n",
+              (INT32)PayloadBase->Entry, DataOffset, DataSize, (*DxeFv)->FvLength));
       ASSERT ((*DxeFv)->FvLength == DataSize);
     } else {
       BuildFvHob (((UINTN)PayloadBase->Entry + (UINTN)DataOffset), DataSize);
