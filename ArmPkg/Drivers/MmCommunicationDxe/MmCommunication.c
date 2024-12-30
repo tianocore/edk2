@@ -20,8 +20,7 @@
 
 #include <IndustryStandard/ArmStdSmc.h>
 #include <IndustryStandard/ArmFfaSvc.h>
-
-#include "MmCommunicate.h"
+#include <IndustryStandard/MmCommunicate.h>
 
 //
 // Partition ID if FF-A support is enabled
