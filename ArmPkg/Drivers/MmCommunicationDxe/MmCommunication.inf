@@ -24,7 +24,6 @@
 #
 
 [Sources.AARCH64]
-  MmCommunicate.h
   MmCommunication.c
 
 [Packages]

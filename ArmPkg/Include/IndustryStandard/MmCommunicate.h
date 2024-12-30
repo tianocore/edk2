@@ -1,8 +1,17 @@
 /** @file
+  Header file for Management Mode Interface via SMC.
+  This header file is used in normal world only.
 
-  Copyright (c) 2016-2021, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2016-2024, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
+
+  @par Glossary:
+    - MM - MM Management mode.
+
+  @par Reference(s):
+    -  ARM Management Mode Interface Specification
+    [https://developer.arm.com/documentation/den0060/latest/]
 
 **/
 
