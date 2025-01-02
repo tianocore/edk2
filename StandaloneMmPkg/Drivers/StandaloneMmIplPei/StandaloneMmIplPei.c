@@ -280,6 +280,8 @@ CreatMmHobList (
   UINTN                      BufferSize;
   UINTN                      FoundationHobSize;
   EFI_HOB_MEMORY_ALLOCATION  *MmProfileDataHob;
+  UINTN                      PhitHobSize;
+  VOID                       *HobEnd;
 
   //
   // Get platform HOBs
@@ -336,10 +338,11 @@ CreatMmHobList (
   ASSERT (Status == RETURN_BUFFER_TOO_SMALL);
   ASSERT (FoundationHobSize != 0);
 
+  PhitHobSize = sizeof (EFI_HOB_HANDOFF_INFO_TABLE);
   //
-  // Final result includes platform HOBs, foundation HOBs and a END node.
+  // Final result includes: PHIT HOB, Platform HOBs, Foundation HOBs and an END node.
   //
-  *HobSize = PlatformHobSize + FoundationHobSize + sizeof (EFI_HOB_GENERIC_HEADER);
+  *HobSize = PhitHobSize + PlatformHobSize + FoundationHobSize + sizeof (EFI_HOB_GENERIC_HEADER);
   HobList  = AllocatePages (EFI_SIZE_TO_PAGES (*HobSize));
   ASSERT (HobList != NULL);
   if (HobList == NULL) {
@@ -347,17 +350,23 @@ CreatMmHobList (
     CpuDeadLoop ();
   }
 
+  HobEnd = (UINT8 *)(UINTN)HobList + PhitHobSize + PlatformHobSize + FoundationHobSize;
+  //
+  // Create MmHobHandoffInfoTable
+  //
+  CreateMmHobHandoffInfoTable (HobList, HobEnd);
+
   //
   // Get platform HOBs
   //
-  Status = CreateMmPlatformHob (HobList, &PlatformHobSize);
+  Status = CreateMmPlatformHob ((UINT8 *)HobList + PhitHobSize, &PlatformHobSize);
   ASSERT_EFI_ERROR (Status);
 
   //
   // Get foundation HOBs
   //
   Status = CreateMmFoundationHobList (
-             (UINT8 *)HobList + PlatformHobSize,
+             (UINT8 *)HobList + PhitHobSize + PlatformHobSize,
              &FoundationHobSize,
              HobList,
              PlatformHobSize,
@@ -375,7 +384,7 @@ CreatMmHobList (
   //
   // Create MM HOB list end.
   //
-  MmIplCreateHob ((UINT8 *)HobList + PlatformHobSize + FoundationHobSize, EFI_HOB_TYPE_END_OF_HOB_LIST, sizeof (EFI_HOB_GENERIC_HEADER));
+  MmIplCreateHob (HobEnd, EFI_HOB_TYPE_END_OF_HOB_LIST, sizeof (EFI_HOB_GENERIC_HEADER));
 
   return HobList;
 }
