@@ -19,6 +19,9 @@
 [Sources.AARCH64]
   AArch64/ArmSvc.S
 
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdSxcUse18Registers
+
 [Packages]
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
