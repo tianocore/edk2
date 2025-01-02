@@ -17,6 +17,7 @@
 // Subsystem Device IDs (to be) introduced in VirtIo 1.0
 //
 #define VIRTIO_SUBSYSTEM_GPU_DEVICE  16
+#define VIRTIO_SUBSYSTEM_INPUT       18
 //
 // Subsystem Device IDs from the VirtIo spec at git commit 87fa6b5d8155;
 // <https://github.com/oasis-tcs/virtio-spec/tree/87fa6b5d8155>.
