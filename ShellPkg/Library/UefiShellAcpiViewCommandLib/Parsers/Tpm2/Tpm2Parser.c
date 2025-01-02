@@ -57,6 +57,16 @@ STATIC CONST ACPI_PARSER  Tpm2StartMethodArmSmc[] = {
 };
 
 /**
+  An ACPI_PARSER array describing the Start Method Specific Parameters for Arm FF-A table.
+**/
+STATIC CONST ACPI_PARSER  Tpm2StartMethodArmFFA[] = {
+  { L"Flags",        1, 0, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Attributes",   1, 1, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Partition ID", 2, 2, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Reserved",     8, 4, L"0x%lx", NULL, NULL, NULL, NULL },
+};
+
+/**
   This function parses the ACPI TPM2 table.
   When trace is enabled this function parses the TPM2 table and
   traces the ACPI table fields.
@@ -106,6 +116,17 @@ ParseAcpiTpm2 (
         Ptr + Offset,
         AcpiTableLength - Offset,
         PARSER_PARAMS (Tpm2StartMethodArmSmc)
+        );
+      break;
+
+    case EFI_TPM2_ACPI_TABLE_START_METHOD_COMMAND_RESPONSE_BUFFER_INTERFACE_WITH_FFA:
+      ParseAcpi (
+        TRUE,
+        0,
+        "Start Method Specific Parameters for Arm FF-A",
+        Ptr + Offset,
+        AcpiTableLength - Offset,
+        PARSER_PARAMS (Tpm2StartMethodArmFFA)
         );
       break;
 
