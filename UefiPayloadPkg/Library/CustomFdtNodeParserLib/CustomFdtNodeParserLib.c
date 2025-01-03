@@ -131,14 +131,14 @@ CustomFdtNodeParser (
 
   CHobList = (UINTN)HobList;
 
-  DEBUG ((DEBUG_INFO, "%a() #1 \n", __func__));
+  DEBUG ((DEBUG_INFO, "%a() #1 CHobList %p\n", __func__, CHobList));
 
   //
   // Look for if exists hob list node
   //
   Node = FdtSubnodeOffsetNameLen (FdtBase, 0, "options", (INT32)AsciiStrLen ("options"));
   if (Node > 0) {
-    DEBUG ((DEBUG_INFO, "  Found options node (%08X)", Node));
+    DEBUG ((DEBUG_INFO, "  Found options node (%08X)\n", Node));
     CustomNode = FdtSubnodeOffsetNameLen (FdtBase, Node, "upl-custom", (INT32)AsciiStrLen ("upl-custom"));
     if (CustomNode > 0) {
       DEBUG ((DEBUG_INFO, "  Found upl-custom node (%08X)", CustomNode));
@@ -151,6 +151,9 @@ CustomFdtNodeParser (
         DEBUG ((DEBUG_INFO, "  Not Found hob list node\n"));
         return CHobList;
       }
+    } else {
+      DEBUG ((DEBUG_INFO, "  Not Found hob list node\n"));
+      return CHobList;
     }
   }
 
