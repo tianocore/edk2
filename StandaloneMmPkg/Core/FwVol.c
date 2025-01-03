@@ -11,6 +11,10 @@
 #include <Library/FvLib.h>
 #include <Library/ExtractGuidedSectionLib.h>
 
+#define MAX_MM_FV_COUNT  2
+
+EFI_FIRMWARE_VOLUME_HEADER  *mMmFv[MAX_MM_FV_COUNT];
+
 EFI_STATUS
 MmAddToDriverList (
   IN EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader,
@@ -232,4 +236,80 @@ FreeDstBuffer:
   }
 
   return Status;
+}
+
+/**
+  Dispatch Standalone MM FVs.
+  The FVs will be shadowed into MMRAM, caller is responsible for calling
+  MmFreeShadowedFvs() to free the shadowed MM FVs.
+
+**/
+VOID
+MmDispatchFvs (
+  VOID
+  )
+{
+  UINTN                       Index;
+  EFI_PEI_HOB_POINTERS        FvHob;
+  EFI_FIRMWARE_VOLUME_HEADER  *Fv;
+
+  ZeroMem (mMmFv, sizeof (mMmFv));
+
+  Index     = 0;
+  FvHob.Raw = GetHobList ();
+  while ((FvHob.Raw = GetNextHob (EFI_HOB_TYPE_FV, FvHob.Raw)) != NULL) {
+    if (Index == ARRAY_SIZE (mMmFv)) {
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: The number of FV Hobs exceed the max supported FVs (%d) in StandaloneMmCore\n",
+        __func__,
+        ARRAY_SIZE (mMmFv)
+        ));
+      return;
+    }
+
+    DEBUG ((DEBUG_INFO, "%a: FV[%d] address - 0x%x\n", __func__, Index, FvHob.FirmwareVolume->BaseAddress));
+    DEBUG ((DEBUG_INFO, "%a: FV[%d] size    - 0x%x\n", __func__, Index, FvHob.FirmwareVolume->Length));
+    Fv = AllocatePool (FvHob.FirmwareVolume->Length);
+    if (Fv == NULL) {
+      DEBUG ((DEBUG_ERROR, "Fail to allocate memory for Fv\n"));
+      CpuDeadLoop ();
+      return;
+    }
+
+    CopyMem (
+      (VOID *)Fv,
+      (VOID *)(UINTN)FvHob.FirmwareVolume->BaseAddress,
+      FvHob.FirmwareVolume->Length
+      );
+    MmCoreFfsFindMmDriver (Fv, 0);
+    mMmFv[Index++] = Fv;
+
+    FvHob.Raw = GET_NEXT_HOB (FvHob);
+  }
+
+  if (Index == 0) {
+    DEBUG ((DEBUG_ERROR, "No FV hob is found\n"));
+    return;
+  }
+
+  MmDispatcher ();
+}
+
+/**
+  Free the shadowed MM FVs.
+
+**/
+VOID
+MmFreeShadowedFvs (
+  VOID
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < ARRAY_SIZE (mMmFv); Index++) {
+    if (mMmFv[Index] != NULL) {
+      FreePool (mMmFv[Index]);
+    }
+  }
 }

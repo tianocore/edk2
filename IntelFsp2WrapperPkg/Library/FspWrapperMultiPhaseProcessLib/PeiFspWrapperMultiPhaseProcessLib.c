@@ -17,6 +17,8 @@
 #include <Ppi/Variable.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/FspWrapperPlatformMultiPhaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/HobLib.h>
 
 /**
   Execute 32-bit FSP API entry code.
@@ -156,6 +158,8 @@ FspWrapperVariableRequestHandler (
   EDKII_PEI_VARIABLE_PPI                            *VariablePpi;
   BOOLEAN                                           WriteVariableSupport;
   FSP_MULTI_PHASE_COMPLETE_VARIABLE_REQUEST_PARAMS  CompleteVariableRequestParams;
+  VOID                                              *GuidHob;
+  VOID                                              *HobData;
 
   WriteVariableSupport = TRUE;
   Status               = PeiServicesLocatePpi (
@@ -289,6 +293,16 @@ FspWrapperVariableRequestHandler (
   }
 
   //
+  // Refresh FspHobList pointer stored in HOB.
+  //
+  GuidHob = GetFirstGuidHob (&gFspHobGuid);
+  ASSERT (GuidHob != NULL);
+  if (GuidHob != NULL) {
+    HobData = GET_GUID_HOB_DATA (GuidHob);
+    CopyMem (HobData, FspHobListPtr, sizeof (*FspHobListPtr));
+  }
+
+  //
   // Reset the system if FSP API returned FSP_STATUS_RESET_REQUIRED status
   //
   if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
@@ -321,6 +335,8 @@ FspWrapperMultiPhaseHandler (
   FSP_MULTI_PHASE_GET_NUMBER_OF_PHASES_PARAMS  FspMultiPhaseGetNumber;
   UINT32                                       Index;
   UINT32                                       NumOfPhases;
+  VOID                                         *GuidHob;
+  VOID                                         *HobData;
 
   //
   // Query FSP for the number of phases supported.
@@ -351,6 +367,16 @@ FspWrapperMultiPhaseHandler (
     FspMultiPhaseParams.PhaseIndex         = Index;
     FspMultiPhaseParams.MultiPhaseParamPtr = NULL;
     Status                                 = CallFspMultiPhaseEntry (&FspMultiPhaseParams, FspHobListPtr, ComponentIndex);
+
+    //
+    // Refresh FspHobList pointer stored in HOB.
+    //
+    GuidHob = GetFirstGuidHob (&gFspHobGuid);
+    ASSERT (GuidHob != NULL);
+    if (GuidHob != NULL) {
+      HobData = GET_GUID_HOB_DATA (GuidHob);
+      CopyMem (HobData, FspHobListPtr, sizeof (*FspHobListPtr));
+    }
 
     if (Status == FSP_STATUS_VARIABLE_REQUEST) {
       //

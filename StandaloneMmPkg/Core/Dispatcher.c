@@ -767,11 +767,9 @@ MmDriverDispatchHandler (
   MmiHandlerUnRegister (DispatchHandle);
 
   //
-  // Free shadowed standalone BFV
+  // Free shadowed MM Fvs
   //
-  if (mBfv != NULL) {
-    FreePool (mBfv);
-  }
+  MmFreeShadowedFvs ();
 
   return EFI_SUCCESS;
 }

@@ -230,3 +230,39 @@ CallFspSiliconInit (
 
   return Status;
 }
+
+/**
+  Call FSP API - FspSmmInit.
+
+  @param[in] FspiUpdDataPtr Address pointer to the Smm Init parameters structure.
+
+  @return EFI status returned by FspSmmInit API.
+**/
+EFI_STATUS
+EFIAPI
+CallFspSmmInit (
+  IN VOID  *FspiUpdDataPtr
+  )
+{
+  FSP_INFO_HEADER  *FspHeader;
+  FSP_SMM_INIT     FspSmmInitApi;
+  EFI_STATUS       Status;
+  BOOLEAN          InterruptState;
+
+  FspHeader = (FSP_INFO_HEADER *)FspFindFspHeader (PcdGet32 (PcdFspiBaseAddress));
+  if (FspHeader == NULL) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  FspSmmInitApi  = (FSP_SMM_INIT)((UINTN)FspHeader->ImageBase + FspHeader->FspSmmInitEntryOffset);
+  InterruptState = SaveAndDisableInterrupts ();
+  if ((FspHeader->ImageAttribute & IMAGE_ATTRIBUTE_64BIT_MODE_SUPPORT) == FSP_IA32) {
+    Status = Execute32BitCode ((UINTN)FspSmmInitApi, (UINTN)FspiUpdDataPtr, (UINTN)NULL);
+  } else {
+    Status = Execute64BitCode ((UINTN)FspSmmInitApi, (UINTN)FspiUpdDataPtr, (UINTN)NULL);
+  }
+
+  SetInterruptState (InterruptState);
+
+  return Status;
+}

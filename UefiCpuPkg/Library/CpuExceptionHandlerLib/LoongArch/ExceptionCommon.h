@@ -13,6 +13,7 @@
 #define MAX_DEBUG_MESSAGE_LENGTH  0x100
 
 extern INTN  mExceptionKnownNameNum;
+extern INTN  mInterruptKnownNameNum;
 
 /**
   Get ASCII format string exception name by exception type.
@@ -25,6 +26,19 @@ extern INTN  mExceptionKnownNameNum;
 CONST CHAR8 *
 GetExceptionNameStr (
   IN EFI_EXCEPTION_TYPE  ExceptionType
+  );
+
+/**
+  Get ASCII format string interrupt name by exception type.
+
+  @param InterruptType  Interrupt type.
+
+  @return  ASCII format string interrupt name.
+
+**/
+CONST CHAR8 *
+GetInterruptNameStr (
+  IN EFI_EXCEPTION_TYPE  InterruptType
   );
 
 /**

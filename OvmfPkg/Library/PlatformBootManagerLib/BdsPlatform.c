@@ -15,6 +15,8 @@
 #include <Library/Tcg2PhysicalPresenceLib.h>
 #include <Library/XenPlatformLib.h>
 
+#include <Library/QemuFwCfgSimpleParserLib.h>
+
 //
 // Global data
 //
@@ -82,11 +84,94 @@ InstallDevicePathCallback (
   VOID
   );
 
+/**
+This function checks whether a File exists within the firmware volume.
+
+  @param[in] FilePath  Path of the file.
+
+  @return              TRUE if the file exists within the volume, false
+                       otherwise.
+**/
+BOOLEAN
+FileIsInFv (
+  EFI_DEVICE_PATH_PROTOCOL  *FilePath
+  )
+{
+  UINT32                             AuthenticationStatus;
+  EFI_FV_FILE_ATTRIBUTES             FileAttributes;
+  EFI_DEVICE_PATH_PROTOCOL           *SearchNode;
+  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FvFileNode;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL      *FvProtocol;
+  UINTN                              BufferSize;
+  EFI_FV_FILETYPE                    FoundType;
+  EFI_HANDLE                         FvHandle;
+  EFI_STATUS                         Status;
+
+  //
+  // Locate the Firmware Volume2 protocol instance that is denoted by the
+  // boot option. If this lookup fails (i.e., the boot option references a
+  // firmware volume that doesn't exist), then we'll proceed to delete the
+  // boot option.
+  //
+  SearchNode = FilePath;
+  Status     = gBS->LocateDevicePath (
+                      &gEfiFirmwareVolume2ProtocolGuid,
+                      &SearchNode,
+                      &FvHandle
+                      );
+
+  //
+  // File not Found
+  //
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  //
+  // The firmware volume was found; now let's see if it contains the FvFile
+  // identified by GUID.
+  //
+  Status = gBS->HandleProtocol (
+                  FvHandle,
+                  &gEfiFirmwareVolume2ProtocolGuid,
+                  (VOID **)&FvProtocol
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  FvFileNode = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)NextDevicePathNode (FilePath);
+  //
+  // Buffer==NULL means we request metadata only: BufferSize, FoundType,
+  // FileAttributes.
+  //
+  Status = FvProtocol->ReadFile (
+                         FvProtocol,
+                         &FvFileNode->FvFileName,  // NameGuid
+                         NULL,                     // Buffer
+                         &BufferSize,
+                         &FoundType,
+                         &FileAttributes,
+                         &AuthenticationStatus
+                         );
+
+  //
+  // File not Found
+  //
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  //
+  // The FvFile was found.
+  //
+  return TRUE;
+}
+
 VOID
 PlatformRegisterFvBootOption (
   EFI_GUID  *FileGuid,
   CHAR16    *Description,
-  UINT32    Attributes
+  UINT32    Attributes,
+  BOOLEAN   Enabled
   )
 {
   EFI_STATUS                         Status;
@@ -114,6 +199,15 @@ PlatformRegisterFvBootOption (
                  );
   ASSERT (DevicePath != NULL);
 
+  //
+  // File is not in firmware, so it is going to be deleted anyway by
+  // RemoveStaleFvFileOptions, let's not add it.
+  //
+  if (!FileIsInFv (DevicePath)) {
+    FreePool (DevicePath);
+    return;
+  }
+
   Status = EfiBootManagerInitializeLoadOption (
              &NewOption,
              LoadOptionNumberUnassigned,
@@ -138,8 +232,14 @@ PlatformRegisterFvBootOption (
                   BootOptionCount
                   );
 
-  if (OptionIndex == -1) {
+  if ((OptionIndex == -1) && Enabled) {
     Status = EfiBootManagerAddLoadOptionVariable (&NewOption, MAX_UINTN);
+    ASSERT_EFI_ERROR (Status);
+  } else if ((OptionIndex != -1) && !Enabled) {
+    Status = EfiBootManagerDeleteLoadOptionVariable (
+               BootOptions[OptionIndex].OptionNumber,
+               LoadOptionTypeBoot
+               );
     ASSERT_EFI_ERROR (Status);
   }
 
@@ -176,14 +276,14 @@ RemoveStaleFvFileOptions (
                   );
 
   for (Index = 0; Index < BootOptionCount; ++Index) {
-    EFI_DEVICE_PATH_PROTOCOL  *Node1, *Node2, *SearchNode;
+    EFI_DEVICE_PATH_PROTOCOL  *Node1, *Node2;
     EFI_STATUS                Status;
-    EFI_HANDLE                FvHandle;
 
     //
     // If the device path starts with neither MemoryMapped(...) nor Fv(...),
     // then keep the boot option.
     //
+
     Node1 = BootOptions[Index].FilePath;
     if (!((DevicePathType (Node1) == HARDWARE_DEVICE_PATH) &&
           (DevicePathSubType (Node1) == HW_MEMMAP_DP)) &&
@@ -204,58 +304,9 @@ RemoveStaleFvFileOptions (
       continue;
     }
 
-    //
-    // Locate the Firmware Volume2 protocol instance that is denoted by the
-    // boot option. If this lookup fails (i.e., the boot option references a
-    // firmware volume that doesn't exist), then we'll proceed to delete the
-    // boot option.
-    //
-    SearchNode = Node1;
-    Status     = gBS->LocateDevicePath (
-                        &gEfiFirmwareVolume2ProtocolGuid,
-                        &SearchNode,
-                        &FvHandle
-                        );
-
-    if (!EFI_ERROR (Status)) {
-      //
-      // The firmware volume was found; now let's see if it contains the FvFile
-      // identified by GUID.
-      //
-      EFI_FIRMWARE_VOLUME2_PROTOCOL      *FvProtocol;
-      MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FvFileNode;
-      UINTN                              BufferSize;
-      EFI_FV_FILETYPE                    FoundType;
-      EFI_FV_FILE_ATTRIBUTES             FileAttributes;
-      UINT32                             AuthenticationStatus;
-
-      Status = gBS->HandleProtocol (
-                      FvHandle,
-                      &gEfiFirmwareVolume2ProtocolGuid,
-                      (VOID **)&FvProtocol
-                      );
-      ASSERT_EFI_ERROR (Status);
-
-      FvFileNode = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)Node2;
-      //
-      // Buffer==NULL means we request metadata only: BufferSize, FoundType,
-      // FileAttributes.
-      //
-      Status = FvProtocol->ReadFile (
-                             FvProtocol,
-                             &FvFileNode->FvFileName, // NameGuid
-                             NULL,                    // Buffer
-                             &BufferSize,
-                             &FoundType,
-                             &FileAttributes,
-                             &AuthenticationStatus
-                             );
-      if (!EFI_ERROR (Status)) {
-        //
-        // The FvFile was found. Keep the boot option.
-        //
-        continue;
-      }
+    // If file is in firmware then keep the entry
+    if (FileIsInFv (BootOptions[Index].FilePath)) {
+      continue;
     }
 
     //
@@ -1061,6 +1112,28 @@ PrepareVirtioSerialDevicePath (
 }
 
 EFI_STATUS
+PrepareVirtioKeyboardDevicePath (
+  IN EFI_HANDLE  DeviceHandle
+  )
+{
+  EFI_STATUS                Status;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+
+  DevicePath = NULL;
+  Status     = gBS->HandleProtocol (
+                      DeviceHandle,
+                      &gEfiDevicePathProtocolGuid,
+                      (VOID *)&DevicePath
+                      );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
 VisitAllInstancesOfProtocol (
   IN EFI_GUID                    *Id,
   IN PROTOCOL_INSTANCE_CALLBACK  CallBackFunction,
@@ -1233,6 +1306,12 @@ DetectAndPreparePlatformPciDevicePath (
   {
     DEBUG ((DEBUG_INFO, "Found virtio serial device\n"));
     PrepareVirtioSerialDevicePath (Handle);
+    return EFI_SUCCESS;
+  }
+
+  if ((Pci->Hdr.VendorId == 0x1af4) && (Pci->Hdr.DeviceId == 0x1052)) {
+    DEBUG ((DEBUG_INFO, "Found virtio keyboard device\n"));
+    PrepareVirtioKeyboardDevicePath (Handle);
     return EFI_SUCCESS;
   }
 
@@ -1836,13 +1915,26 @@ PlatformBootManagerAfterConsole (
     EfiBootManagerRefreshAllBootOption ();
   }
 
+  BOOLEAN        ShellEnabled;
+  RETURN_STATUS  RetStatus;
+
+  RetStatus = QemuFwCfgParseBool (
+                "opt/org.tianocore/EFIShellSupport",
+                &ShellEnabled
+                );
+
+  if (RETURN_ERROR (RetStatus)) {
+    ShellEnabled = TRUE;
+  }
+
   //
   // Register UEFI Shell
   //
   PlatformRegisterFvBootOption (
     &gUefiShellFileGuid,
     L"EFI Internal Shell",
-    LOAD_OPTION_ACTIVE
+    LOAD_OPTION_ACTIVE,
+    ShellEnabled
     );
 
   //
@@ -1851,7 +1943,8 @@ PlatformBootManagerAfterConsole (
   PlatformRegisterFvBootOption (
     &gGrubFileGuid,
     L"Grub Bootloader",
-    LOAD_OPTION_ACTIVE
+    LOAD_OPTION_ACTIVE,
+    TRUE
     );
 
   RemoveStaleFvFileOptions ();
