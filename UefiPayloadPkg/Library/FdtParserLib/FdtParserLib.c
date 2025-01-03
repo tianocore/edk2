@@ -656,7 +656,7 @@ ParseSerialPort (
   PropertyPtr = FdtGetProperty (Fdt, SubNode, "compatible", &TempLen);
   TempStr     = (CHAR8 *)(PropertyPtr->Data);
   if (SerialOnIsa) {
-    DEBUG ((DEBUG_INFO, " find serial compatible isa \n"));
+    DEBUG ((DEBUG_INFO, " find serial compatible isa\n"));
     Serial->UseMmio = 0;
     PropertyPtr     = FdtGetProperty (Fdt, SubNode, "reg", &TempLen);
     ASSERT (TempLen > 0);
@@ -665,9 +665,9 @@ ParseSerialPort (
       Attribute            = Fdt32ToCpu (*(Data32 + 0));
       Serial->RegisterBase = Fdt32ToCpu (*(Data32 + 1));
       Serial->UseMmio      = Attribute == 1 ? FALSE : TRUE;
-      DEBUG ((DEBUG_INFO, "\n in espi serial  Property()  %a", TempStr));
-      DEBUG ((DEBUG_INFO, " StartAddress   %016lX\n", Serial->RegisterBase));
-      DEBUG ((DEBUG_INFO, " Attribute      %016lX\n", Attribute));
+      DEBUG ((DEBUG_INFO, "in espi serial  Property()  %a\n", TempStr));
+      DEBUG ((DEBUG_INFO, " StartAddress   %08X\n", Serial->RegisterBase));
+      DEBUG ((DEBUG_INFO, " Attribute      %08X\n", Attribute));
     }
   } else {
     DEBUG ((DEBUG_INFO, " NOT  serial compatible isa \n"));
