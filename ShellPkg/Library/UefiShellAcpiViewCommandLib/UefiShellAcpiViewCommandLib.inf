@@ -57,6 +57,7 @@
   Parsers/Spcr/SpcrParser.c
   Parsers/Srat/SratParser.c
   Parsers/Ssdt/SsdtParser.c
+  Parsers/Tpm2/Tpm2Parser.c
   Parsers/Wsmt/WsmtParser.c
   Parsers/Xsdt/XsdtParser.c
   UefiShellAcpiViewCommandLib.c

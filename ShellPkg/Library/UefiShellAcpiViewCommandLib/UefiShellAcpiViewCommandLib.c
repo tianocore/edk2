@@ -78,6 +78,7 @@ ACPI_TABLE_PARSER  ParserList[] = {
   { EFI_ACPI_6_2_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE,                                        ParseAcpiSpcr },
   { EFI_ACPI_6_2_SYSTEM_RESOURCE_AFFINITY_TABLE_SIGNATURE,                                               ParseAcpiSrat },
   { EFI_ACPI_6_2_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,                                           ParseAcpiSsdt },
+  { EFI_ACPI_6_5_TRUSTED_COMPUTING_PLATFORM_2_TABLE_SIGNATURE,                                           ParseAcpiTpm2 },
   { EFI_ACPI_6_5_WINDOWS_SMM_SECURITY_MITIGATION_TABLE_SIGNATURE,                                        ParseAcpiWsmt },
   { EFI_ACPI_6_2_EXTENDED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,                                            ParseAcpiXsdt }
 };
