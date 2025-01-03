@@ -459,8 +459,7 @@ ParseOptions (
         NodePtr = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + ISubNode + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
         DEBUG ((DEBUG_INFO, "\n      SubNode(%08X)  %a", ISubNode, NodePtr->Name));
 
-        // NB: This is not specced!
-        PropertyPtr = FdtGetProperty (Fdt, ISubNode, "name", &TempLen);
+        PropertyPtr = FdtGetProperty (Fdt, ISubNode, "description", &TempLen);
         if (TempLen <= 0) {
           ASSERT (FALSE);
           continue;
@@ -473,7 +472,7 @@ ParseOptions (
           continue;
         }
         Data64        = (UINT64 *)(PropertyPtr->Data);
-        StartAddress  = Fdt64ToCpu (ReadUnaligned64 (Data64);
+        StartAddress  = Fdt64ToCpu (ReadUnaligned64 (Data64));
         NumberOfBytes = Fdt32ToCpu (*(Data64 + 1));
         DEBUG ((DEBUG_INFO, "\n         Image  %a", TempStr));
         DEBUG ((DEBUG_INFO, "  [0x%X, 0x%X)\n", StartAddress, NumberOfBytes));
@@ -481,7 +480,7 @@ ParseOptions (
         //
         // Patch the first FV or create a new one, as required.
         //
-        if (AsciiStrnCmp (TempStr, "uefi-fv", AsciiStrLen ("uefi-fv")) == 0) {
+        if (AsciiStrStr (TempStr, "UEFI")) {
           FvHob              = GetFirstHob (EFI_HOB_TYPE_FV);
           FvHob->BaseAddress = StartAddress;
           FvHob->Length      = NumberOfBytes;
