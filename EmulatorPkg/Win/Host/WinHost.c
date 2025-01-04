@@ -190,7 +190,7 @@ SecPrint (
 
   va_start (Marker, Format);
 
-  _vsnprintf (Buffer, sizeof (Buffer), Format, Marker);
+  _vsnprintf_s (Buffer, sizeof (Buffer), sizeof (Buffer) - 1, Format, Marker);
 
   va_end (Marker);
 
