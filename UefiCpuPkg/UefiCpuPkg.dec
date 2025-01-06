@@ -53,6 +53,9 @@
   ##  @libraryclass  Provides function to support CcExit processing.
   CcExitLib|Include/Library/CcExitLib.h
 
+  ## @libraryclass  Provides functions for Tdx Measurement processing
+  TdxMeasurementLib|Include/Library/TdxMeasurementLib.h
+
   ##  @libraryclass  Provides function to support AmdSvsm processing.
   AmdSvsmLib|Include/Library/AmdSvsmLib.h
 
