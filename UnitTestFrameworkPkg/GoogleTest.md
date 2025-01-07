@@ -32,6 +32,9 @@ Most of these examples will refer to the `SampleGoogleTestHost` app found in thi
 the examples related to mock functions will refer to the `SecureBootVariableLibGoogleTest` app
 found in the `SecurityPkg`.
 
+There's an instructional video that walks through the creation of a new GoogleTest in UEFI:
+[![Watch the Video Here](https://img.youtube.com/vi/Ufc3P95MqJE/default.jpg)](https://www.youtube.com/watch?v=Ufc3P95MqJE)
+
 ### GoogleTest Requirements - INF
 
 In our INF file, we'll need to bring in the `GoogleTestLib` library. Conveniently, the interface
@@ -62,13 +65,49 @@ to make sure that the module `BASE_NAME` contains the word `Test`...
 
 ### GoogleTest Requirements - DSC
 
-In our DSC fiele, we'll need to bring in the INF file that was just created into the `[Components]`
-section so that the unit tests will be built.
+In our DSC file, we'll need to bring in the INF file that was just created into the `[Components]` section so that the unit tests will be built.
 
 See this example in `UnitTestFrameworkPkgHostTest.dsc`...
 
-```inf
-#include <gtest/gtest.h>
+```dsc
+[Components]
+  UnitTestFrameworkPkg/Test/GoogleTest/Sample/SampleGoogleTest/SampleGoogleTestHost.inf
+```
+Also, based on the type of tests that are being created, the associated DSC include file from the
+UnitTestFrameworkPkg for Host or Target based tests should also be included at the top of the DSC
+file.
+
+```text
+!include UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc
+```
+
+Lastly, in the case that the test build has specific dependent libraries associated with it,
+they should be added in the \<LibraryClasses\> sub-section for the INF file in the
+`[Components]` section of the DSC file. Note that it is within this sub-section where you can
+control whether the design or mock version of a component is linked into the test exectuable.
+
+See this example in `SecurityPkgHostTest.dsc` where the `SecureBootVariableLib` design is
+being tested using mock versions of `UefiRuntimeServicesTableLib`, `PlatformPKProtectionLib`,
+and `UefiLib`...
+
+```text
+[Components]
+  SecurityPkg/Library/SecureBootVariableLib/GoogleTest/SecureBootVariableLibGoogleTest.inf {
+    <LibraryClasses>
+      SecureBootVariableLib|SecurityPkg/Library/SecureBootVariableLib/SecureBootVariableLib.inf
+      UefiRuntimeServicesTableLib|MdePkg/Test/Mock/Library/GoogleTest/MockUefiRuntimeServicesTableLib/MockUefiRuntimeServicesTableLib.inf
+      PlatformPKProtectionLib|SecurityPkg/Test/Mock/Library/GoogleTest/MockPlatformPKProtectionLib/MockPlatformPKProtectionLib.inf
+      UefiLib|MdePkg/Test/Mock/Library/GoogleTest/MockUefiLib/MockUefiLib.inf
+  }
+```
+### GoogleTest Requirements - Source Code
+
+GoogleTest applications are implemented in C++, so make sure that your test file has
+a `.cpp` extension. With that behind us, not to state the obvious, but let's make sure
+we have the following includes before getting too far along in the file...
+
+```cpp
+#include <Library/GoogleTestLib.h>
 extern "C" {
   #include <Uefi.h>
   #include <Library/BaseLib.h>
@@ -107,7 +146,7 @@ extern "C" {
 using namespace testing;
 ```
 
-Now that we've got that squared away, let's look at our 'Main()' routine (or DriverEntryPoint() or whatever).
+Now that we've got that squared away, let's look at our 'Main()' function.
 
 ### GoogleTest Configuration
 
@@ -265,7 +304,7 @@ TEST_F(SetSecureBootModeTest, SetVarError) {
 ```
 
 This code may at first seem more complicated, but you will notice that the code
-with in it is still the same. There is still a `MockUefiRuntimeServicesTableLib`
+within it is still the same. There is still a `MockUefiRuntimeServicesTableLib`
 instantiation, there is still a `SecureBootMode` and `Status` variable defined,
 there is still an `EXPECT_CALL`, and etc. However, the benefit of constructing
 the test this way is that the new `TEST_F()` requires less code than the prior
@@ -687,6 +726,8 @@ declarations as shown in the below table.
 | Global Table (e.g. gRT, gBS, etc.) | gRT->GetVariable | gRT_GetVariable |
 | Protocol | UsbIoProtocol->UsbPortReset | UsbIoProtocol_UsbPortReset |
 
+__Note__ the naming convention for global tables and protocols is currently being discussed. Points of discussion include removing the use of underscores, use of "Efi," and including the use case, e.g. `Protocol` in the mock function name.
+
 Lastly, when creating mock functions, there are two limitations to be
 aware of in gMock that extend into FunctionMockLib.
 
@@ -697,9 +738,17 @@ With those limitations in mind, that completes the mock function
 declarations, and now the mock function definitions for those declarations
 can be created.
 
-### FunctionMockLib Mocks - Definition
 
-The definition of mock functions using the FunctionMockLib macros are done
+### FunctionMockLib Mocks - Definition
+The definition of mock functions using FunctionMockLib is done
+differently for library and non-library function mocks. Library mock
+functions are built using their own separate INF file and other mock
+functions (of a protocol, for example) are built in the source file of each GoogleTest
+that consumes them. This allows for multiple instantiation.
+To minimize repeated code, this is done by creating a macro in the mock header file - detailed later in this section.
+
+#### FunctionMockLib Mocks - Definition for Libraries
+The definition of library mock functions using the FunctionMockLib macros are done
 in source files. The name of the source file is determined by the interface
 (such as a library or a protocol) that is being created for the mock functions.
 The rules for naming the file align with the naming of the file for declarations
@@ -709,7 +758,6 @@ and are shown in the table below.
 | :--- | :--- |
 | Library | Mock\<LibraryName\>Lib.cpp |
 | Global Table (e.g. gRT, gBS, etc.) | Mock\<GlobalTableLibraryName\>Lib.cpp |
-| Protocol | Mock\<ProtocolName\>Protocol.cpp |
 
 The below table shows examples for file names with each of the above cases.
 
@@ -717,14 +765,13 @@ The below table shows examples for file names with each of the above cases.
 | :--- | :--- | :--- |
 | Library | UefiLib | MockUefiLib.cpp |
 | Global Table (e.g. gRT, gBS, etc.) | UefiRuntimeServicesTableLib | MockUefiRuntimeServicesTableLib.cpp |
-| Protocol | EFI_USB_IO_PROTOCOL | MockEfiUsbIoProtocol.cpp |
 
 Once the source file name is known, the file needs to be created in the proper
 location. The location of the source file is aligned with the location for the
 header file. For internal mock functions, the location is simply the same
 GoogleTest directory that contains the INF file that builds the test application.
 For external mock functions, the location is within the `Test` directory under the
-package where the library, global table, or protocol that is being mocked is
+package where the library or global table that is being mocked is
 declared. The exact location depends on the interface type and is shown in the
 below table.
 
@@ -732,7 +779,6 @@ below table.
 | :--- | :--- |
 | Library | \<PackageName\>/Test/Mock/Library/GoogleTest/Mock\<LibraryName\>Lib |
 | Global Table (e.g. gRT, gBS, etc.) | \<PackageName\>/Test/Mock/Library/GoogleTest/Mock\<GlobalTableLibraryName\>Lib |
-| Protocol | \<PackageName\>/Test/Mock/Library/GoogleTest/Mock\<ProtocolName\>Protocol |
 
 The below table shows examples for file locations with each of the above cases.
 
@@ -740,7 +786,6 @@ The below table shows examples for file locations with each of the above cases.
 | :--- | :--- | :--- |
 | Library | UefiLib | MdePkg/Test/Mock/Library/GoogleTest/MockUefiLib/MockUefiLib.cpp |
 | Global Table (e.g. gRT, gBS, etc.) | UefiRuntimeServicesTableLib | MdePkg/Test/Mock/Library/GoogleTest/MockUefiRuntimeServicesTableLib/MockUefiRuntimeServicesTableLib.cpp |
-| Protocol | EFI_USB_IO_PROTOCOL | MdePkg/Test/Mock/Library/GoogleTest/MockEfiUsbIoProtocol/MockEfiUsbIoProtocol.cpp |
 
 Now that the file location is known, the contents can be added to it. At the top
 of the file, the header file containing the mock function declarations is always
@@ -825,6 +870,57 @@ static EFI_RUNTIME_SERVICES localRt = {
 extern "C" {
   EFI_RUNTIME_SERVICES* gRT = &localRt;
 }
+```
+
+#### FunctionMockLib Mocks - Definition for non-Libraries
+The definitions of mock functions for non-libraries, or interfaces that don't have an
+inf associated with them (for example, protocols or PPIs) can be in the same header file
+as the declarations.
+
+Below the struct of mock function declarations, you can use `MOCK_INTERFACE_DEFINITION`
+and `MOCK_FUNCTION_DEFINITION`.
+For example, when creating the definition of the mock for `RngProtocol`,
+the definitions below are made in `MockRng.h`
+
+```cpp
+...
+
+MOCK_INTERFACE_DEFINITION(MockEfiRngProtocol);
+
+MOCK_FUNCTION_DEFINITION(MockEfiRngProtocol, GetInfo, 3, EFIAPI);
+MOCK_FUNCTION_DEFINITION(MockEfiRngProtocol, GetRng, 4, EFIAPI);
+```
+
+To allow multiple instances of the protocol to be made, we create a macro in the same header file following the naming convention: `MOCK_<INTERFACE_NAME>_INSTANCE`.
+
+```cpp
+...
+
+#define MOCK_EFI_RNG_PROTOCOL_INSTANCE(NAME)  \
+  EFI_RNG_PROTOCOL NAME##_INSTANCE = {        \
+    GetInfo,                                  \
+    GetRng };                                 \
+  EFI_RNG_PROTOCOL  *NAME = &NAME##_INSTANCE;
+```
+
+Now in a test source file we can instantiate the protocol
+
+```cpp
+...
+MOCK_EFI_RNG_PROTOCOL_INSTANCE (gRngProtocol)
+
+```
+
+And in our test we can use this pointer to mock an assignment from LocateProtocol
+
+```cpp
+ EXPECT_CALL (BsMock, gBS_LocateProtocol)
+    .WillOnce (
+       DoAll (
+          SetArgPointee<2> (ByRef (gRngProtocol)),
+            Return (EFI_SUCCESS)
+      )
+    );
 ```
 
 That completes the mock function definitions. So now these mock function
