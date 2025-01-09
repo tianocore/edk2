@@ -55,7 +55,7 @@ private:
 
   // no copy assignment allowed
   ParserBlackBox & operator=(ParserBlackBox const &);
-  
+
 protected:
   DLGFileInput *in;
   Lexer *scan;
@@ -65,7 +65,7 @@ protected:
   FILE *file;
   int openByBlackBox;    /* MR21 Don't close what we haven't opened */
 public:
-	
+
   ParserBlackBox(FILE *f)
     : in(0)
     , scan(0)
@@ -77,7 +77,7 @@ public:
   {
     if (f == NULL)
     {
-      cerr << "invalid file pointer\n"; 
+      cerr << "invalid file pointer\n";
     }
     else
     {
@@ -118,7 +118,7 @@ public:
       _parser->init();
     }
   }
-	
+
   ~ParserBlackBox()
   {
     delete in; delete scan; delete pipe; delete _parser; delete tok;
