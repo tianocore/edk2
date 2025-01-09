@@ -1107,6 +1107,8 @@ CoreOpenProtocol (
     return EFI_INVALID_PARAMETER;
   }
 
+  Prot = NULL;
+
   //
   // Lock the protocol database
   //
