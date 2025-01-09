@@ -472,15 +472,15 @@ set_deg(SetWordType *a)
 	   of elements present in the set.  Assumes
 	   that all word bits are used in the set
 	*/
-	register SetWordType *p = a;
-	register SetWordType *endp = &(a[bsetsize]);
-	register int degree = 0;
+	SetWordType *p = a;
+	SetWordType *endp = &(a[bsetsize]);
+	int degree = 0;
 
 	if ( a == NULL ) return 0;
 	while ( p < endp )
 	{
-		register SetWordType t = *p;
-		register SetWordType *b = &(bitmask[0]);
+		SetWordType t = *p;
+		SetWordType *b = &(bitmask[0]);
 		do {
 			if (t & *b) ++degree;
 		} while (++b < &(bitmask[sizeof(SetWordType)*8]));
@@ -493,14 +493,14 @@ set_deg(SetWordType *a)
 void ANTLRParser::
 edecode(SetWordType *a)
 {
-	register SetWordType *p = a;
-	register SetWordType *endp = &(p[bsetsize]);
-	register unsigned e = 0;
+	SetWordType *p = a;
+	SetWordType *endp = &(p[bsetsize]);
+	unsigned e = 0;
 
 	if ( set_deg(a)>1 ) /* MR23 */ printMessage(stderr, " {");
 	do {
-		register SetWordType t = *p;
-		register SetWordType *b = &(bitmask[0]);
+		SetWordType t = *p;
+		SetWordType *b = &(bitmask[0]);
 		do {
 			if ( t & *b ) /* MR23 */ printMessage(stderr, " %s", token_tbl[e]);
 			e++;
