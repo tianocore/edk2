@@ -105,7 +105,7 @@ def CheckEnvVariable():
         EdkLogger.error("build", ATTRIBUTE_NOT_AVAILABLE, "Environment variable not found",
                         ExtraData="WORKSPACE")
 
-    WorkspaceDir = os.path.normcase(os.path.normpath(os.environ["WORKSPACE"]))
+    WorkspaceDir = os.path.normpath(os.environ["WORKSPACE"])
     if not os.path.exists(WorkspaceDir):
         EdkLogger.error("build", FILE_NOT_FOUND, "WORKSPACE doesn't exist", ExtraData=WorkspaceDir)
     elif ' ' in WorkspaceDir:
@@ -124,7 +124,7 @@ def CheckEnvVariable():
                 EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "No space is allowed in PACKAGES_PATH", ExtraData=Path)
 
 
-    os.environ["EDK_TOOLS_PATH"] = os.path.normcase(os.environ["EDK_TOOLS_PATH"])
+    os.environ["EDK_TOOLS_PATH"] = os.path.normpath(os.environ["EDK_TOOLS_PATH"])
 
     # check EDK_TOOLS_PATH
     if "EDK_TOOLS_PATH" not in os.environ:
@@ -817,11 +817,11 @@ class Build():
         EdkLogger.quiet("%-16s = %s" % ("WORKSPACE", os.environ["WORKSPACE"]))
         if "PACKAGES_PATH" in os.environ:
             # WORKSPACE env has been converted before. Print the same path style with WORKSPACE env.
-            EdkLogger.quiet("%-16s = %s" % ("PACKAGES_PATH", os.path.normcase(os.path.normpath(os.environ["PACKAGES_PATH"]))))
+            EdkLogger.quiet("%-16s = %s" % ("PACKAGES_PATH", os.path.normpath(os.environ["PACKAGES_PATH"])))
         EdkLogger.quiet("%-16s = %s" % ("EDK_TOOLS_PATH", os.environ["EDK_TOOLS_PATH"]))
         if "EDK_TOOLS_BIN" in os.environ:
             # Print the same path style with WORKSPACE env.
-            EdkLogger.quiet("%-16s = %s" % ("EDK_TOOLS_BIN", os.path.normcase(os.path.normpath(os.environ["EDK_TOOLS_BIN"]))))
+            EdkLogger.quiet("%-16s = %s" % ("EDK_TOOLS_BIN", os.path.normpath(os.environ["EDK_TOOLS_BIN"])))
         EdkLogger.quiet("%-16s = %s" % ("CONF_PATH", GlobalData.gConfDirectory))
         if "PYTHON3_ENABLE" in os.environ:
             PYTHON3_ENABLE = os.environ["PYTHON3_ENABLE"]
@@ -2685,7 +2685,7 @@ def Main():
 
         if Option.ModuleFile:
             if os.path.isabs (Option.ModuleFile):
-                if os.path.normcase (os.path.normpath(Option.ModuleFile)).find (Workspace) == 0:
+                if os.path.normcase (os.path.normpath(Option.ModuleFile)).find (os.path.normcase(Workspace)) == 0:
                     Option.ModuleFile = NormFile(os.path.normpath(Option.ModuleFile), Workspace)
             Option.ModuleFile = PathClass(Option.ModuleFile, Workspace)
             ErrorCode, ErrorInfo = Option.ModuleFile.Validate(".inf", False)
@@ -2694,13 +2694,13 @@ def Main():
 
         if Option.PlatformFile is not None:
             if os.path.isabs (Option.PlatformFile):
-                if os.path.normcase (os.path.normpath(Option.PlatformFile)).find (Workspace) == 0:
+                if os.path.normcase (os.path.normpath(Option.PlatformFile)).find (os.path.normcase(Workspace)) == 0:
                     Option.PlatformFile = NormFile(os.path.normpath(Option.PlatformFile), Workspace)
             Option.PlatformFile = PathClass(Option.PlatformFile, Workspace)
 
         if Option.FdfFile is not None:
             if os.path.isabs (Option.FdfFile):
-                if os.path.normcase (os.path.normpath(Option.FdfFile)).find (Workspace) == 0:
+                if os.path.normcase (os.path.normpath(Option.FdfFile)).find (os.path.normcase(Workspace)) == 0:
                     Option.FdfFile = NormFile(os.path.normpath(Option.FdfFile), Workspace)
             Option.FdfFile = PathClass(Option.FdfFile, Workspace)
             ErrorCode, ErrorInfo = Option.FdfFile.Validate(".fdf", False)
