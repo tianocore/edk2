@@ -32,10 +32,8 @@
 
 #include "pcctscfg.h"
 
-#include "pccts_stdio.h"
-#include "pccts_stdlib.h"
-
-PCCTS_NAMESPACE_STD
+#include <cstdio>
+#include <cstdlib>
 
 #ifndef PCCTS_NOT_USING_SOR
 #include "PCCTSAST.h"

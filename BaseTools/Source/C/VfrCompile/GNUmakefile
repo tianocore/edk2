@@ -18,9 +18,9 @@ OBJECTS = AParser.o DLexerBase.o ATokenBuffer.o EfiVfrParser.o VfrLexer.o VfrSyn
           VfrFormPkg.o VfrError.o VfrUtilityLib.o VfrCompiler.o
 CLANG:=$(shell $(CC) --version | grep clang)
 ifneq ($(CLANG),)
-VFR_CPPFLAGS = -Wno-deprecated-register -std=c++14 -DPCCTS_USE_NAMESPACE_STD $(CPPFLAGS)
+VFR_CPPFLAGS = -Wno-deprecated-register -std=c++14 $(CPPFLAGS)
 else
-VFR_CPPFLAGS = -DPCCTS_USE_NAMESPACE_STD $(CPPFLAGS)
+VFR_CPPFLAGS = $(CPPFLAGS)
 endif
 # keep BUILD_OPTFLAGS last
 VFR_CXXFLAGS = $(BUILD_OPTFLAGS)
@@ -78,4 +78,3 @@ localClean:
 	BIN_DIR='.' $(MAKE) -C Pccts/antlr clean
 	BIN_DIR='.' $(MAKE) -C Pccts/dlg clean
 	rm -f $(EXTRA_CLEAN_OBJECTS)
-

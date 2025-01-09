@@ -33,10 +33,6 @@
 
 #include "pcctscfg.h"
 
-#include "pccts_stdio.h"
-
-PCCTS_NAMESPACE_STD
-
 // pointer to a reference counted object
 // robust in that an unused ANTLRTokenPtr can point to NULL.
 

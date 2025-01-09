@@ -37,10 +37,8 @@
 
 #include "pcctscfg.h"
 
-#include "pccts_stdio.h"
-#include "pccts_setjmp.h"
-
-PCCTS_NAMESPACE_STD
+#include <cstdio>
+#include <csetjmp>
 
 #include ATOKEN_H
 #include ATOKENBUFFER_H
@@ -187,7 +185,7 @@ private:
 protected:
 	virtual void guess_fail() {                         // MR9 27-Sep-97 make virtual
         traceGuessFail();                               // MR10
-        longjmp(guess_start.state, 1); }                // MR9
+        std::longjmp(guess_start.state, 1); }                // MR9
 	virtual void guess_done(ANTLRParserState *st) {     // MR9 27-Sep-97 make virtual
          restoreState(st); }                            // MR9
 	virtual int guess(ANTLRParserState *);              // MR9 27-Sep-97 make virtual
@@ -228,7 +226,7 @@ public:
 	virtual ~ANTLRParser();
 
 	virtual void init();
-	
+
 	ANTLRTokenType LA(int i)
 	{
 //
@@ -274,7 +272,7 @@ public:
 					 SetWordType *whatFollows);
 	virtual int _match_wdfltsig(ANTLRTokenType tokenWanted,
 					 SetWordType *whatFollows);
-	
+
 	const ANTLRChar * parserTokenName(int tok);			// MR1
 
     int                 traceOptionValueDefault;        // MR11

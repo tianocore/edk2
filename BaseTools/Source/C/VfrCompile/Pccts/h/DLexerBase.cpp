@@ -29,10 +29,10 @@
 
 #include "pcctscfg.h"
 
-#include "pccts_stdio.h"
-#include "pccts_stdlib.h"
+#include <cstdio>
+#include <cstdlib>
 
-PCCTS_NAMESPACE_STD
+using namespace std;
 
 /* I have to put this here due to C++ limitation
  * that you can't have a 'forward' decl for enums.
@@ -83,7 +83,7 @@ DLGLexerBase(DLGInputStream *in,
     this->lexErrCount=0;                        // MR11
 }
 
-// MR19  THM 
+// MR19  THM
 
 void DLGLexerBase::reset()
 {

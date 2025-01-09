@@ -14,9 +14,9 @@
 #ifndef _DLG_STREAM_INPUT_H
 #define _DLG_STREAM_INPUT_H
 
-#include "pccts_istream.h"
+#include <istream>
 
-PCCTS_NAMESPACE_STD
+using namespace std;
 
 #ifndef DLGX_H
 #include "DLexerBase.h"
@@ -38,24 +38,24 @@ template	<
 class DLG_stream_input : public DLGInputStream
 {
 public:
-	
+
 						DLG_stream_input(::std::basic_istream<E,T> * p_input_stream)
 	:	input(p_input_stream)
 	{
 		// nothing to do!
 	};
-	
+
 						DLG_stream_input(const DLG_stream_input & a_recopier)
 	:	input(a_recopier.input)
 	{
 		// nothing to do!
 	};
-	
+
 	virtual				~DLG_stream_input()
 	{
 		this->purge();	// bloody templarized lookup...
 	};
-	
+
 	DLG_stream_input	operator = (const DLG_stream_input & a_affecter)
 	{
 		if (this != &a_affecter)
@@ -65,13 +65,13 @@ public:
 
 		return(*this);
 	};
-	
+
 	virtual int			nextChar()
 	{
 		E	extracted_stuff;
-		
+
 		input->get(extracted_stuff);
-		
+
 		if	(*input)
 		{
 			return(int(extracted_stuff));
@@ -81,13 +81,13 @@ public:
 			return(EOF);
 		}
 	};
-	
+
 protected:
-	
+
 	::std::basic_istream<E,T> *	input;
-	
+
 private:
-	
+
 	void	purge()
 	{
 		// nothing to do!
@@ -95,4 +95,3 @@ private:
 };
 
 #endif /* _DLG_STREAM_INPUT_H */
-

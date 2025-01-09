@@ -31,9 +31,7 @@
 #define DLGX_H
 
 #include "pcctscfg.h"
-#include "pccts_stdio.h"
-
-PCCTS_NAMESPACE_STD
+#include <cstdio>
 
 #include ATOKEN_H
 #include ATOKENSTREAM_H
@@ -71,7 +69,7 @@ public:
 			int c;
 			if ( found_eof ) return EOF;
 			else {
-				c=getc(input);
+				c=std::getc(input);
 				if ( c==EOF ) found_eof = 1;
 				return c;
 			}

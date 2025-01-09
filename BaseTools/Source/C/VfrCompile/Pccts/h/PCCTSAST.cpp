@@ -33,9 +33,9 @@
 #include "pcctscfg.h"
 
 #include "PCCTSAST.h"
-#include "pccts_stdarg.h"
+#include <cstdarg>
 
-PCCTS_NAMESPACE_STD
+using namespace std;
 
 #include <ctype.h>
 
@@ -270,11 +270,11 @@ scanmatch(ScanAST *t, PCCTS_AST **labels[], int *n)
 		/* match what's below if something there and current node is not wildcard */
 		if ( sib->down()!=NULL && sib->type()!=0 )
 		{
-			if ( sib->down()==NULL ) 
+			if ( sib->down()==NULL )
 			{
-				if ( u->down()!=NULL ) 
-					return 0; 
-				else 
+				if ( u->down()!=NULL )
+					return 0;
+				else
 					return 1;
 			}
 			if ( !u->down()->scanmatch(sib->down(), labels, n) ) return 0;

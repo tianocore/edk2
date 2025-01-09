@@ -32,9 +32,7 @@
 
 #include "pcctscfg.h"
 
-#include "pccts_stdlib.h"
-
-PCCTS_NAMESPACE_STD
+#include <cstdlib>
 
 #include ATOKEN_H
 #include ATOKENSTREAM_H

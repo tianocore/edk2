@@ -15,9 +15,7 @@
 
 #include "pcctscfg.h"
 
-#include "pccts_stdio.h"
-
-PCCTS_NAMESPACE_STD
+#include <cstdio>
 
 #include "DLexerBase.h"
 

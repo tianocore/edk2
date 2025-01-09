@@ -24,10 +24,10 @@
 enum ANTLRTokenType {TER_HATES_CPP=0, SO_DO_OTHERS=9999 };
 
 #include "pcctscfg.h"
-#include "pccts_assert.h"
-#include "pccts_string.h"
+#include <cassert>
+#include <cstring>
 
-PCCTS_NAMESPACE_STD
+using namespace std;
 
 #include "BufFileInput.h"
 
@@ -97,4 +97,3 @@ int BufFileInput::lookahead( char* s )
 }
 
 // End of file BufFileInput.cpp
-

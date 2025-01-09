@@ -6,7 +6,7 @@
 #
 !INCLUDE ..\Makefiles\ms.common
 
-CPPFLAGS = $(CPPFLAGS) /WX /D PCCTS_USE_NAMESPACE_STD
+CPPFLAGS = $(CPPFLAGS) /WX
 APPNAME = VfrCompile
 
 LIBS = $(LIB_PATH)\Common.lib

@@ -32,10 +32,8 @@
 
 #include "pcctscfg.h"
 
-#include "pccts_stdio.h"
-#include "pccts_stdlib.h"
-
-PCCTS_NAMESPACE_STD
+#include <cstdio>
+#include <cstdlib>
 
 //class SList;
 
@@ -136,7 +134,7 @@ public:
 
 	void require(int e,const char *err){ if ( !e ) panic(err); } /* MR20 const */
 	virtual void panic(const char *err)     // MR20 const
-		{ /* MR23 */ printMessage(stderr, "PCCTS_AST: %s\n", err); exit(PCCTS_EXIT_FAILURE); }
+  { /* MR23 */ printMessage(stderr, "PCCTS_AST: %s\n", err); std::exit(PCCTS_EXIT_FAILURE); }
 	virtual int printMessage(FILE* pFile, const char* pFormat, ...); // MR23
 };
 

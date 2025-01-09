@@ -38,8 +38,6 @@
 
 #include "pcctscfg.h"
 
-PCCTS_NAMESPACE_STD
-
 #include "ATokPtr.h"
 
 void ANTLRTokenPtr::ref() const

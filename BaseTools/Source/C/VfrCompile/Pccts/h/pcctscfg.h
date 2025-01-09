@@ -52,14 +52,8 @@
 #endif
 #endif
 
-#ifdef PCCTS_USE_NAMESPACE_STD
-#define PCCTS_NAMESPACE_STD     namespace std {}; using namespace std;
-#else
-#define PCCTS_NAMESPACE_STD
-#endif
-
-#include "pccts_stdio.h"
-#include "pccts_stdlib.h"
+#include <cstdio>
+#include <cstdlib>
 
 /* largest file name size */
 
@@ -210,8 +204,8 @@
 
 /* Make sure we have prototypes for all functions under MPW */
 
-#include "pccts_string.h"
-#include "pccts_stdlib.h"
+#include <cstring>
+#include <cstdlib>
 
 /* MR6 2-Jun-97	Fixes false dependency caused by VC++ #include scanner	*/
 /* MR6		   Reported by Brad Schick (schick@interaccess.com)	*/

@@ -29,12 +29,12 @@
 
 #include "pcctscfg.h"
 
-#include "pccts_stdlib.h"
-#include "pccts_stdarg.h"
-#include "pccts_string.h"
-#include "pccts_stdio.h"
+#include <cstdlib>
+#include <cstdarg>
+#include <cstring>
+#include <cstdio>
 
-PCCTS_NAMESPACE_STD
+using namespace std;
 
 /* I have to put this here due to C++ limitation
  * that you can't have a 'forward' decl for enums.
@@ -400,7 +400,7 @@ resynch(SetWordType *wd,SetWordType mask)
    	/* if current token is in resynch set, we've got what we wanted */
 
 /* MR8 */  	if ( wd[LA(1)]&mask || LA(1) == eofToken ) {resynchConsumed=0; return;}
-	
+
    	/* scan until we find something in the resynch set */
 
         	while ( !(wd[LA(1)]&mask) && LA(1) != eofToken ) {consume();}
@@ -419,7 +419,7 @@ resynch(SetWordType *wd,SetWordType mask)
             returns the text, so the text representation of the token
             must be passed explicitly.  I think.
 */
-           
+
 void ANTLRParser::
 syn(_ANTLRTokenPtr /*tok MR23*/, ANTLRChar *egroup, SetWordType *eset,
 	ANTLRTokenType etok, int k)
@@ -432,7 +432,7 @@ syn(_ANTLRTokenPtr /*tok MR23*/, ANTLRChar *egroup, SetWordType *eset,
 
     /* MR23  If the token is not an EOF token, then use the ->getText() value.
 
-             If the token is the EOF token the text returned by ->getText() 
+             If the token is the EOF token the text returned by ->getText()
              may be garbage.  If the text from the token table is "@" use
              "<eof>" instead, because end-users don't know what "@" means.
              If the text is not "@" then use that text, which must have been
@@ -526,7 +526,7 @@ void
 ANTLRParser::FAIL(int k, ...)
 {
 //
-//  MR1 10-Apr-97	
+//  MR1 10-Apr-97
 //
 
     if (zzFAILtext == NULL) zzFAILtext=new char [1000];          // MR9

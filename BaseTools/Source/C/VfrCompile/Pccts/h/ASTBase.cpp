@@ -29,10 +29,10 @@
 
 #include "pcctscfg.h"
 
-#include "pccts_stdio.h"
-#include "pccts_stdarg.h"
+#include <cstdio>
+#include <cstdarg>
 
-PCCTS_NAMESPACE_STD
+using namespace std;
 
 #define ANTLR_SUPPORT_CODE
 
@@ -90,7 +90,7 @@ ASTBase::preorder(void* pData /*= NULL*/ /* MR23 */)
 	while ( tree!= NULL )
 	{
 		if ( tree->_down != NULL ) {
-			tree->preorder_before_action(pData); 		// MR1	
+			tree->preorder_before_action(pData); 		// MR1
 		};
 		tree->preorder_action(pData);
 		if ( tree->_down!=NULL )
@@ -136,7 +136,7 @@ ASTBase::tmake(ASTBase *root, ...)
 	va_start(ap, root);
 
 	if ( root != NULL )
-		if ( root->_down != NULL ) {  
+		if ( root->_down != NULL ) {
             root->reportOverwriteOfDownPointer();  /* MR21 Report problem which almost always an error */
             return NULL;
         }
@@ -162,7 +162,7 @@ ASTBase *
 ASTBase::dup()
 {
 	ASTBase *u, *t=this;
-	
+
 	if ( t == NULL ) return NULL;
 /*
 	u = new ASTBase;
@@ -189,7 +189,7 @@ ASTBase *
 ASTDoublyLinkedBase::dup()
 {
 	ASTDoublyLinkedBase *u, *t=this;
-	
+
 	if ( t == NULL ) return NULL;
 	u = (ASTDoublyLinkedBase *)this->shallowCopy();
 	u->_up = NULL;		/* set by calling invocation */

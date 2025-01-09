@@ -32,12 +32,10 @@
 
 #include "pcctscfg.h"
 
-#include "pccts_string.h"
-#include "pccts_stdio.h"
-#include "pccts_stdlib.h"
-#include "pccts_stdarg.h" // MR23
-
-PCCTS_NAMESPACE_STD
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
+#include <cstdarg> // MR23
 
 // MR9      RJV (JVincent@novell.com) Not needed for variable length strings
 
@@ -85,14 +83,14 @@ public:
 	virtual void panic(const char *msg)             // MR20 const
 		{
 			/* MR23 */ printMessage(stderr, "ANTLRAbstractToken panic: %s\n", msg);
-			exit(PCCTS_EXIT_FAILURE);
+      std::exit(PCCTS_EXIT_FAILURE);
 		}
 
 	virtual int printMessage(FILE* pFile, const char* pFormat, ...) // MR23
 		{
 			va_list marker;
 			va_start( marker, pFormat );
-  			int iRet = vfprintf(pFile, pFormat, marker);
+      int iRet = std::vfprintf(pFile, pFormat, marker);
 			va_end( marker );
 			return iRet;
 		}
@@ -132,8 +130,8 @@ public:
 	{
 		ctor++;
 		refcnt_ = 0;
-		if ( t==1 ) sprintf(object,"tok_EOF");
-		else sprintf(object,"tok_%s",s);
+		if ( t==1 ) std::sprintf(object,"tok_EOF");
+		else std::sprintf(object,"tok_%s",s);
 		/* MR23 */ printMessage(stderr, "ctor %s #%d\n",object,ctor);
 	}
 #endif
@@ -144,7 +142,7 @@ public:
 		{
 			ctor++;
 			refcnt_ = 0;
-			sprintf(object,"tok_blank");
+      std::sprintf(object,"tok_blank");
 			/* MR23 */ printMessage(stderr, "ctor %s #%d\n",object,ctor);
 		}
 	virtual ~ANTLRRefCountToken()
@@ -200,13 +198,13 @@ public:
 	{	if (s != _text) {
           if (_text) delete [] _text;
           if (s != NULL) {
-         	_text = new ANTLRChar[strlen(s)+1];
+            _text = new ANTLRChar[std::strlen(s)+1];
             if (_text == NULL) panic("ANTLRCommonNoRefCountToken::setText new failed");
-            strcpy(_text,s);
+            std::strcpy(_text,s);
     	  } else {
             _text = new ANTLRChar[1];
             if (_text == NULL) panic("ANTLRCommonNoRefCountToken::setText new failed");
-            strcpy(_text,"");
+            std::strcpy(_text,"");
           };
         };
 	}
@@ -265,7 +263,7 @@ public:
 	virtual int getLine() const		{ return _line; }
 	void setLine(int line)	    	{ _line = line; }
 	ANTLRChar *getText() const		{ return _text; }
-    int getLength() const           { return strlen(getText()); }       // MR11
+  int getLength() const           { return std::strlen(getText()); }       // MR11
 
 // MR9 RJV: Added code for variable length strings to setText()
 
@@ -273,13 +271,13 @@ public:
 	{	if (s != _text) {
           if (_text) delete [] _text;
           if (s != NULL) {
-         	_text = new ANTLRChar[strlen(s)+1];
+            _text = new ANTLRChar[std::strlen(s)+1];
             if (_text == NULL) panic("ANTLRCommonToken::setText new failed");
-            strcpy(_text,s);
+            std::strcpy(_text,s);
     	  } else {
             _text = new ANTLRChar[1];
             if (_text == NULL) panic("ANTLRCommonToken::setText new failed");
-            strcpy(_text,"");
+            std::strcpy(_text,"");
           };
         };
 	}
