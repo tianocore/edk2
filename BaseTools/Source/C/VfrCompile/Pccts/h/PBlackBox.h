@@ -33,9 +33,7 @@
 
 #include "pcctscfg.h"
 
-#include "pccts_iostream.h"
-
-PCCTS_NAMESPACE_STD
+#include <iostream>
 
 //  MR20 Added #include for "DLexerBase.h"
 
@@ -67,7 +65,7 @@ protected:
 public:
 
   ParserBlackBox(FILE *f)
-    : in(0)
+  : in(0)
     , scan(0)
     , tok(0)
     , pipe(0)
@@ -101,7 +99,7 @@ public:
     , file(0)
     , openByBlackBox(0)
   {
-    FILE *f = fopen(fname, "r");
+    FILE *f = std::fopen(fname, "r");
     if ( f==NULL ) {
       openByBlackBox = 0;
       std::cerr << "cannot open " << fname << "\n"; return;
@@ -123,7 +121,7 @@ public:
   {
     delete in; delete scan; delete pipe; delete _parser; delete tok;
     if (1 == openByBlackBox) {
-      fclose(file);
+      std::fclose(file);
     }
   }
 
