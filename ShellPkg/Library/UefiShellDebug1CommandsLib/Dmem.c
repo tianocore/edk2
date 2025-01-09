@@ -192,6 +192,8 @@ GetImageExecutionInfo (
 
   ptr = (CHAR8 *)ExecInfoTablePtr + 1;
 
+  Status = EFI_NOT_FOUND;
+
   for (Image = 0; Image < *NumberOfImages; Image++, ptr += InfoPtr->InfoSize) {
     InfoPtr   = (EFI_IMAGE_EXECUTION_INFO *)ptr;
     ImagePath = (CHAR16 *)(InfoPtr + 1);
@@ -287,6 +289,7 @@ DisplayConformanceProfiles (
   UINTN                           Profile;
   EFI_CONFORMANCE_PROFILES_TABLE  *ConfProfTable;
 
+  Status      = EFI_SUCCESS;
   ShellStatus = SHELL_SUCCESS;
 
   if (Address != 0) {
@@ -571,19 +574,19 @@ ShellCommandRunDmem (
             HiiDatabaseExportBufferAddress,
             ConformanceProfileTableAddress
             );
-        }
 
-        if (ShellCommandLineGetFlag (Package, L"-verbose")) {
-          if (ShellStatus == SHELL_SUCCESS) {
-            ShellStatus = DisplayRtProperties (RtPropertiesTableAddress);
-          }
+          if (ShellCommandLineGetFlag (Package, L"-verbose")) {
+            if (ShellStatus == SHELL_SUCCESS) {
+              ShellStatus = DisplayRtProperties (RtPropertiesTableAddress);
+            }
 
-          if (ShellStatus == SHELL_SUCCESS) {
-            ShellStatus = DisplayImageExecutionEntries (ImageExecutionTableAddress);
-          }
+            if (ShellStatus == SHELL_SUCCESS) {
+              ShellStatus = DisplayImageExecutionEntries (ImageExecutionTableAddress);
+            }
 
-          if (ShellStatus == SHELL_SUCCESS) {
-            ShellStatus = DisplayConformanceProfiles (ConformanceProfileTableAddress);
+            if (ShellStatus == SHELL_SUCCESS) {
+              ShellStatus = DisplayConformanceProfiles (ConformanceProfileTableAddress);
+            }
           }
         }
       } else {
