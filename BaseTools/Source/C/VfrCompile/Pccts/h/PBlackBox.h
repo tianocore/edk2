@@ -77,7 +77,7 @@ public:
   {
     if (f == NULL)
     {
-      cerr << "invalid file pointer\n";
+      std::cerr << "invalid file pointer\n";
     }
     else
     {
@@ -104,7 +104,7 @@ public:
     FILE *f = fopen(fname, "r");
     if ( f==NULL ) {
       openByBlackBox = 0;
-      cerr << "cannot open " << fname << "\n"; return;
+      std::cerr << "cannot open " << fname << "\n"; return;
     }
     else {
       openByBlackBox = 1;
