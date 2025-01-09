@@ -172,6 +172,7 @@ INF MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntime
   !endif
 !elseif "AARCH64" IN "$(ARCH)"
   INF ArmPkg/Drivers/CpuDxe/CpuDxe.inf
+  INF UefiCpuPkg/CpuDxeAArch64/CpuDxeAArch64.inf
   INF ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
 

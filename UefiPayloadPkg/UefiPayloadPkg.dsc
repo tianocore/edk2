@@ -632,6 +632,11 @@
   gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x80a0000
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x8080000
 
+  # CpuDxeAArch64 creates mapping for GIC, keep align with ARM GIC settings
+  gUefiCpuAARCH64PkgTokenSpaceGuid.PcdGicDistributorBase|0x8000000
+  gUefiCpuAARCH64PkgTokenSpaceGuid.PcdGicRedistributorsBase|0x80a0000
+  gUefiCpuAARCH64PkgTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x8080000
+
   # Enable NX memory protection for all non-code regions, including OEM and OS
   # reserved ones, with the exception of LoaderData regions, of which OS loaders
   # (i.e., GRUB) may assume that its contents are executable.
@@ -1126,6 +1131,7 @@
   ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
+  UefiCpuPkg/CpuDxeAArch64/CpuDxeAArch64.inf
 
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
