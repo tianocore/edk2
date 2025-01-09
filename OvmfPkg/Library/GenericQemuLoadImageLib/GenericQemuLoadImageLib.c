@@ -301,6 +301,7 @@ QemuLoadKernelImage (
     }
   }
 
+  CommandLine = NULL;
   if (CommandLineSize == 0) {
     KernelLoadedImage->LoadOptionsSize = 0;
   } else {
