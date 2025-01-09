@@ -55,6 +55,13 @@
   # @Prompt Maximum permitted FwVol section nesting depth (exclusive) in MM.
   gStandaloneMmPkgTokenSpaceGuid.PcdFwVolMmMaxEncapsulationDepth|0x10|UINT32|0x00000001
 
+  ## Option to make shadow copy of boot firmware volume while loading drivers.
+  #  This options is useful when the BFV is not located in the Flash area
+  #  but is in the RAM instead and therefore no shadow copy is needed.
+  #   TRUE  - Default. Make a shadow copy of the boot firmware volume.
+  #   FALSE - Disable shadow copy of the boot firmware volume.
+  gStandaloneMmPkgTokenSpaceGuid.PcdShadowBfv|TRUE|BOOLEAN|0x00000003
+
 [PcdsFeatureFlag]
   ## Indicates if restart MM Dispatcher once MM Entry Point is registered.<BR><BR>
   #   TRUE  - Restart MM Dispatcher once MM Entry Point is registered.<BR>
