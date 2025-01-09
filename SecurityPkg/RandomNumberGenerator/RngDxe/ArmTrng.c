@@ -44,6 +44,10 @@ GenerateEntropy (
   UINTN       Index;
   UINTN       MaxBits;
 
+  if ((Length == 0) || (Entropy == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   ZeroMem (Entropy, Length);
 
   RequiredEntropyBits  = (Length << 3);
@@ -67,5 +71,5 @@ GenerateEntropy (
     Index                += (EntropyBits >> 3);
   } // while
 
-  return Status;
+  return EFI_SUCCESS;
 }
