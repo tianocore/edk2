@@ -47,6 +47,8 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution
   gUefiOvmfPkgTokenSpaceGuid.PcdVideoResolutionSource
 
 [Protocols]
