@@ -975,6 +975,22 @@ FatComputeFreeInfo (
   IN FAT_VOLUME  *Volume
   );
 
+/**
+
+  Get the FAT entry value of the volume, which is identified with the Index.
+
+  @param  Volume                - FAT file system volume.
+  @param  Index                 - The index of the FAT entry of the volume.
+
+  @return  The value of the FAT entry.
+
+**/
+UINTN
+FatGetFatEntry (
+  IN FAT_VOLUME  *Volume,
+  IN UINTN       Index
+  );
+
 //
 // Init.c
 //
