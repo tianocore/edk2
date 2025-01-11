@@ -2026,8 +2026,8 @@ DEFINE CLANGDWARF_IA32_X64_DLINK_FLAGS    = DEF(CLANGDWARF_IA32_X64_DLINK_COMMON
 DEFINE CLANGDWARF_IA32_DLINK2_FLAGS       = -Wl,--defsym=PECOFF_HEADER_SIZE=0x220 DEF(CLANGDWARF_DLINK2_FLAGS_COMMON)
 DEFINE CLANGDWARF_X64_DLINK2_FLAGS        = -Wl,--defsym=PECOFF_HEADER_SIZE=0x228 DEF(CLANGDWARF_DLINK2_FLAGS_COMMON)
 
-DEFINE CLANGDWARF_IA32_TARGET             = -target i686-pc-linux-gnu
-DEFINE CLANGDWARF_X64_TARGET              = -target x86_64-pc-linux-gnu
+DEFINE CLANGDWARF_IA32_TARGET             = -target i686-pc-unknown-gnu
+DEFINE CLANGDWARF_X64_TARGET              = -target x86_64-pc-unknown-gnu
 
 DEFINE CLANGDWARF_WARNING_OVERRIDES    = -Wno-parentheses-equality -Wno-empty-body -Wno-unused-const-variable -Wno-varargs -Wno-unknown-warning-option -Wno-unused-but-set-variable -Wno-unused-const-variable -Wno-unaligned-access
 DEFINE CLANGDWARF_ALL_CC_FLAGS         = DEF(GCC48_ALL_CC_FLAGS) DEF(CLANGDWARF_WARNING_OVERRIDES) -fno-stack-protector -mms-bitfields -Wno-address -Wno-shift-negative-value -Wno-unknown-pragmas -Wno-incompatible-library-redeclaration -fno-asynchronous-unwind-tables -mno-sse -mno-mmx -msoft-float -mno-implicit-float  -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -funsigned-char -fno-ms-extensions -Wno-null-dereference
@@ -2107,7 +2107,7 @@ NOOPT_CLANGDWARF_X64_DLINK2_FLAGS     = DEF(CLANGDWARF_X64_DLINK2_FLAGS) -O0 -fu
 ##################
 # CLANGDWARF ARM definitions
 ##################
-DEFINE CLANGDWARF_ARM_TARGET        = -target arm-linux-gnueabi
+DEFINE CLANGDWARF_ARM_TARGET        = -target arm-unknown-gnueabi
 DEFINE CLANGDWARF_ARM_CC_FLAGS      = DEF(GCC_ARM_CC_FLAGS) DEF(CLANGDWARF_ARM_TARGET) DEF(CLANGDWARF_WARNING_OVERRIDES) -mno-movt -fno-stack-protector
 DEFINE CLANGDWARF_ARM_DLINK_FLAGS   = DEF(CLANGDWARF_ARM_TARGET) DEF(GCC_ARM_DLINK_FLAGS)
 
@@ -2151,7 +2151,7 @@ RELEASE_CLANGDWARF_ARM_DLINK_FLAGS  = DEF(CLANGDWARF_ARM_DLINK_FLAGS) -flto -Wl,
 ##################
 # CLANGDWARF AARCH64 definitions
 ##################
-DEFINE CLANGDWARF_AARCH64_TARGET    = -target aarch64-linux-gnu
+DEFINE CLANGDWARF_AARCH64_TARGET    = -target aarch64-unknown-gnu
 DEFINE CLANGDWARF_AARCH64_CC_FLAGS  = DEF(GCC_AARCH64_CC_FLAGS) DEF(CLANGDWARF_AARCH64_TARGET) -mcmodel=small DEF(CLANGDWARF_WARNING_OVERRIDES)
 DEFINE CLANGDWARF_AARCH64_DLINK_FLAGS  = DEF(CLANGDWARF_AARCH64_TARGET) DEF(GCC_AARCH64_DLINK_FLAGS) -z common-page-size=0x1000
 
@@ -2197,7 +2197,7 @@ RELEASE_CLANGDWARF_AARCH64_DLINK_FLAGS = DEF(CLANGDWARF_AARCH64_DLINK_FLAGS) -fl
 ##################
 # CLANGDWARF RISCV64 definitions
 ##################
-DEFINE CLANGDWARF_RISCV64_TARGET    = -target riscv64-linux-gnu
+DEFINE CLANGDWARF_RISCV64_TARGET    = -target riscv64-unknown-gnu
 DEFINE CLANGDWARF_RISCV64_CC_COMMON = DEF(GCC5_RISCV_ALL_CC_FLAGS) DEF(GCC5_RISCV_ALL_CC_FLAGS_WARNING_DISABLE) DEF(GCC5_RISCV_OPENSBI_TYPES) -march=DEF(GCC5_RISCV64_ARCH) -fno-builtin -fno-builtin-memcpy -fno-stack-protector -Wno-address -fno-asynchronous-unwind-tables -fno-unwind-tables -Wno-unused-but-set-variable -fpack-struct=8 -mcmodel=medany -mabi=lp64 -mno-relax
 DEFINE CLANGDWARF_RISCV64_CC_FLAGS  = DEF(CLANGDWARF_RISCV64_CC_COMMON) DEF(CLANGDWARF_RISCV64_TARGET) DEF(CLANGDWARF_WARNING_OVERRIDES)
 DEFINE CLANGDWARF_DLINK2_FLAGS_COMMON     = -Wl,--script=$(EDK_TOOLS_PATH)/Scripts/ClangBase.lds
