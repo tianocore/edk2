@@ -363,6 +363,12 @@
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   CpuPageTableLib|UefiCpuPkg/Library/CpuPageTableLib/CpuPageTableLib.inf
 
+[LibraryClasses.IA32, LibraryClasses.X64]
+  UefiCpuBaseArchSupportLib|UefiCpuPkg/Library/BaseX86Lib/X86LibSupport.inf
+
+[LibraryClasses.AARCH64]
+  UefiCpuBaseArchSupportLib|UefiCpuPkg/Library/BaseArmLib/AArch64/AArch64LibSupport.inf
+
 [LibraryClasses.common.SEC]
   HobLib|UefiPayloadPkg/Library/PayloadEntryHobLib/HobLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
