@@ -48,6 +48,7 @@
   CpuLib
   HobPrintLib
   StackCheckLib
+  UefiCpuBaseArchSupportLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid
