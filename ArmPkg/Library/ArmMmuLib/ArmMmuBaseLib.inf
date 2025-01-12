@@ -42,7 +42,7 @@
   MemoryAllocationLib
 
 [Guids]
-  gArmMmuReplaceLiveTranslationEntryFuncGuid
+  gEfiArmMmuReplaceLiveTranslationEntryFuncGuid
 
 [Pcd.ARM]
   gArmTokenSpaceGuid.PcdNormalMemoryNonshareableOverride
