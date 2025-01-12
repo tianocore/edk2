@@ -55,7 +55,7 @@ ArmMmuPeiLibConstructor (
     ArmReplaceLiveTranslationEntryFunc = ArmReplaceLiveTranslationEntry;
 
     Hob = BuildGuidDataHob (
-            &gArmMmuReplaceLiveTranslationEntryFuncGuid,
+            &gEfiArmMmuReplaceLiveTranslationEntryFuncGuid,
             &ArmReplaceLiveTranslationEntryFunc,
             sizeof ArmReplaceLiveTranslationEntryFunc
             );
