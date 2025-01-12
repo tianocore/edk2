@@ -358,6 +358,10 @@
   #
   ArmLib|Include/Library/ArmLib.h
 
+  ##  @libraryclass  Provides a Mmu interface.
+  #
+  ArmMmuLib|Include/Library/ArmMmuLib.h
+
 [Guids]
   #
   # GUID defined in UEFI2.1/UEFI2.0/EFI1.1
@@ -931,6 +935,9 @@
 
   ## Include/Guid/Cper.h
   gEfiIa32X64ErrorTypeMsCheckGuid    = { 0x48AB7F57, 0xDC34, 0x4f6c, { 0xA7, 0xD3, 0xB0, 0xB5, 0xB0, 0xA7, 0x43, 0x14 }}
+
+[Guids.ARM, Guids.AARCH64]
+  gArmMmuReplaceLiveTranslationEntryFuncGuid = { 0x309BD835, 0xEF7F, 0x834D, {0xA6, 0x37, 0x90, 0xB2, 0x6E, 0x6B, 0xCC, 0x63 } }
 
 [Ppis]
   ## Include/Ppi/MasterBootMode.h
