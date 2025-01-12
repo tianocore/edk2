@@ -50,10 +50,6 @@
   #
   ArmHvcLib|Include/Library/ArmHvcLib.h
 
-  ##  @libraryclass  Provides a Mmu interface.
-  #
-  ArmMmuLib|Include/Library/ArmMmuLib.h
-
   ##  @libraryclass  Provides a Mailbox Transport Layer (MTL) interface
   #   for the System Control and Management Interface (SCMI).
   #
