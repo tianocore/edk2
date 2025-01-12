@@ -1,0 +1,26 @@
+## @file
+#  UefiCpu X86 architectures support library for both Ia32 and X64.
+#
+#  Copyright 2024 Google LLC
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION         = 0x0001001b
+  BASE_NAME           = UefiCpuBaseArchSupportLib
+  FILE_GUID           = aa62a483-1df7-4735-9ddf-53a81988264e
+  MODULE_TYPE         = BASE
+  VERSION_STRING      = 1.0
+  LIBRARY_CLASS       = UefiCpuBaseX86SupportLib
+
+[Sources]
+  X86LibSupport.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib

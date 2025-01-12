@@ -150,6 +150,7 @@
   UefiCpuPkg/CpuIo2Smm/CpuIo2StandaloneMm.inf
   UefiCpuPkg/CpuMpPei/CpuMpPei.inf
   UefiCpuPkg/CpuS3DataDxe/CpuS3DataDxe.inf
+  UefiCpuPkg/Library/BaseX86Lib/X86LibSupport.inf
   UefiCpuPkg/Library/BaseXApicLib/BaseXApicLib.inf
   UefiCpuPkg/Library/BaseXApicX2ApicLib/BaseXApicX2ApicLib.inf
   UefiCpuPkg/Library/CpuCommonFeaturesLib/CpuCommonFeaturesLib.inf
@@ -212,9 +213,11 @@
   UefiCpuPkg/Library/SmmRelocationLib/SmmRelocationLib.inf
   UefiCpuPkg/Library/SmmRelocationLib/AmdSmmRelocationLib.inf
 
+
 [Components.X64]
   UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuStandaloneMm.inf
   UefiCpuPkg/Library/CpuExceptionHandlerLib/UnitTest/DxeCpuExceptionHandlerLibUnitTest.inf
+
 
 [Components.RISCV64]
   UefiCpuPkg/Library/BaseRiscV64CpuExceptionHandlerLib/BaseRiscV64CpuExceptionHandlerLib.inf
@@ -224,6 +227,9 @@
   UefiCpuPkg/CpuTimerDxeRiscV64/CpuTimerDxeRiscV64.inf
   UefiCpuPkg/CpuDxeRiscV64/CpuDxeRiscV64.inf
   UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf
+
+[Components.AARCH64]
+  UefiCpuPkg/Library/BaseArmLib/AArch64/AArch64LibSupport.inf
 
 [Components.LOONGARCH64]
   UefiCpuPkg/Library/CpuMmuLib/CpuMmuLib.inf
