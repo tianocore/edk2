@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/BaseCryptLib.h>
 #include <Library/HobLib.h>
-#include <Library/TdxHelperLib.h>
+#include <Library/TdxMeasurementLib.h>
 
 /**
   Do a hash operation on a data buffer, extend a specific RTMR with the hash result,
@@ -47,7 +47,7 @@ TdxPeiHashLogExtendEvent (
   EFI_STATUS  Status;
   UINT8       Digest[SHA384_DIGEST_SIZE];
 
-  Status = TdxHelperHashAndExtendToRtmr (
+  Status = TdxMeasurementHashAndExtendToRtmr (
              MrIndex - 1,
              HashData,
              (UINTN)HashDataLen,
@@ -56,11 +56,11 @@ TdxPeiHashLogExtendEvent (
              );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: HashAndExtendToRtmr failed with %r\n", __func__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: TdxMeasurementHashAndExtendToRtmr failed with %r\n", __func__, Status));
     return Status;
   }
 
-  Status = TdxHelperBuildTdxMeasurementGuidHob (
+  Status = TdxMeasurementBuildGuidHob (
              MrIndex - 1,
              EventType,
              EventData,
@@ -70,7 +70,7 @@ TdxPeiHashLogExtendEvent (
              );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: BuildTdxMeasurementGuidHob failed with %r\n", __func__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: TdxMeasurementBuildGuidHob failed with %r\n", __func__, Status));
   }
 
   return Status;
@@ -150,7 +150,7 @@ TdMapPcrToMrIndex (
   OUT UINT32        *MrIndex
   )
 {
-  *MrIndex = TdxHelperMapPcrToMrIndex (PCRIndex);
+  *MrIndex = TdxMeasurementMapPcrToMrIndex (PCRIndex);
 
   return EFI_SUCCESS;
 }

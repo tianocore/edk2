@@ -154,55 +154,6 @@ ArmGicSendSgiTo (
     );
 }
 
-/*
- * Acknowledge and return the value of the Interrupt Acknowledge Register
- *
- * InterruptId is returned separately from the register value because in
- * the GICv2 the register value contains the CpuId and InterruptId while
- * in the GICv3 the register value is only the InterruptId.
- *
- * @param GicInterruptInterfaceBase   Base Address of the GIC CPU Interface
- * @param InterruptId                 InterruptId read from the Interrupt
- *                                    Acknowledge Register
- *
- * @retval value returned by the Interrupt Acknowledge Register
- *
- */
-UINTN
-EFIAPI
-ArmGicAcknowledgeInterrupt (
-  IN  UINTN  GicInterruptInterfaceBase,
-  OUT UINTN  *InterruptId
-  )
-{
-  UINTN                  Value;
-  UINTN                  IntId;
-  ARM_GIC_ARCH_REVISION  Revision;
-
-  ASSERT (InterruptId != NULL);
-  Revision = ArmGicGetSupportedArchRevision ();
-  if (Revision == ARM_GIC_ARCH_REVISION_2) {
-    Value = ArmGicV2AcknowledgeInterrupt (GicInterruptInterfaceBase);
-    IntId = Value & ARM_GIC_ICCIAR_ACKINTID;
-  } else if (Revision == ARM_GIC_ARCH_REVISION_3) {
-    Value = ArmGicV3AcknowledgeInterrupt ();
-    IntId = Value;
-  } else {
-    ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
-    // Report Spurious interrupt which is what the above controllers would
-    // return if no interrupt was available
-    Value = 1023;
-  }
-
-  if (InterruptId != NULL) {
-    // InterruptId is required for the caller to know if a valid or spurious
-    // interrupt has been read
-    *InterruptId = IntId;
-  }
-
-  return Value;
-}
-
 VOID
 EFIAPI
 ArmGicEndOfInterrupt (
