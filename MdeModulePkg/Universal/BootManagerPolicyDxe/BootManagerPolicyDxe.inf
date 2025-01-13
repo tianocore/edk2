@@ -47,6 +47,7 @@
 
 [Protocols]
   gEfiManagedNetworkServiceBindingProtocolGuid  ## CONSUMES
+  gEfiBlockIoProtocolGuid                       ## CONSUMES
   gEfiBootManagerPolicyProtocolGuid             ## PRODUCES
 
 [Depex]

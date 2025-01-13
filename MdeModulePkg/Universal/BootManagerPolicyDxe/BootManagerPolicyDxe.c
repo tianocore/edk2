@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Uefi.h>
 #include <Protocol/BootManagerPolicy.h>
 #include <Protocol/ManagedNetwork.h>
+#include <Protocol/BlockIo.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiLib.h>
@@ -19,6 +20,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiBootManagerLib.h>
 
 CHAR16  mNetworkDeviceList[] = L"_NDL";
+CHAR16  mStorageDeviceList[] = L"_SDL";
 
 /**
   Connect all the system drivers to controllers and create the network device list in NV storage.
@@ -28,8 +30,9 @@ CHAR16  mNetworkDeviceList[] = L"_NDL";
 
 **/
 EFI_STATUS
-ConnectAllAndCreateNetworkDeviceList (
-  VOID
+CreateDeviceList (
+  IN EFI_GUID DeviceIdentifierGuid,
+  IN CHAR16   DeviceList
   )
 {
   EFI_STATUS                Status;
@@ -39,9 +42,7 @@ ConnectAllAndCreateNetworkDeviceList (
   EFI_DEVICE_PATH_PROTOCOL  *Devices;
   EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
 
-  EfiBootManagerConnectAll ();
-
-  Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiManagedNetworkServiceBindingProtocolGuid, NULL, &HandleCount, &Handles);
+  Status = gBS->LocateHandleBuffer (ByProtocol, &DeviceIdentifierGuid, NULL, &HandleCount, &Handles);
   if (EFI_ERROR (Status)) {
     Handles     = NULL;
     HandleCount = 0;
@@ -63,14 +64,14 @@ ConnectAllAndCreateNetworkDeviceList (
 
   if (Devices != NULL) {
     Status = gRT->SetVariable (
-                    mNetworkDeviceList,
+                    DeviceList,
                     &gEfiCallerIdGuid,
                     EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
                     GetDevicePathSize (Devices),
                     Devices
                     );
     //
-    // Fails to save the network device list to NV storage is not a fatal error.
+    // Fails to save the device list to NV storage is not a fatal error.
     // Only impact is performance.
     //
     FreePool (Devices);
@@ -80,14 +81,15 @@ ConnectAllAndCreateNetworkDeviceList (
 }
 
 /**
-  Connect the network devices.
+  Connect the specified devices.
 
   @retval EFI_SUCCESS      At least one network device was connected.
   @retval EFI_DEVICE_ERROR Network devices were not connected due to an error.
 **/
 EFI_STATUS
-ConnectNetwork (
-  VOID
+ConnectDeviceList (
+    IN EFI_GUID DeviceIdentifierGuid,
+    IN CHAR16   DeviceList
   )
 {
   EFI_STATUS                Status;
@@ -98,7 +100,7 @@ ConnectNetwork (
   UINTN                     Size;
 
   OneConnected = FALSE;
-  GetVariable2 (mNetworkDeviceList, &gEfiCallerIdGuid, (VOID **)&Devices, NULL);
+  GetVariable2 (DeviceList, &gEfiCallerIdGuid, (VOID **)&Devices, NULL);
   TempDevicePath = Devices;
   while (TempDevicePath != NULL) {
     SingleDevice = GetNextDevicePathInstance (&TempDevicePath, &Size);
@@ -118,9 +120,10 @@ ConnectNetwork (
     return EFI_SUCCESS;
   } else {
     //
-    // Cached network devices list doesn't exist or is NOT valid.
+    // Cached devices list doesn't exist or is NOT valid.
     //
-    return ConnectAllAndCreateNetworkDeviceList ();
+    EfiBootManagerConnectAll ();
+    return CreateDeviceList (DeviceIdentifierGuid, DeviceList);
   }
 }
 
@@ -205,6 +208,13 @@ BootManagerPolicyConnectDevicePath (
   application that called ConnectDeviceClass() may need to use the published
   protocols to establish the network connection. The Boot Manager can optionally
   have a policy to establish a network connection.
+  
+  If Class is EFI_BOOT_MANAGER_POLICY_STORAGE_GUID then the Boot Manager will
+  connect the protocols associated with the discoverable storage devices.
+  These protocols may include EFI_BLOCK_IO_PROTOCOL, EFI_SIMPLE_FILE_SYSTEM_PROTOCOL
+  or other storage protocols relevant to the device. The platform may choose to
+  restrict the connected devices based on its policy. For example, the platform
+  may exclude external peripherals or only include specific, well-known devices.
 
   If Class is EFI_BOOT_MANAGER_POLICY_CONNECT_ALL_GUID then the Boot Manager
   will connect all UEFI drivers using the UEFI Boot Service
@@ -235,7 +245,9 @@ BootManagerPolicyConnectDeviceClass (
   }
 
   if (CompareGuid (Class, &gEfiBootManagerPolicyConnectAllGuid)) {
-    ConnectAllAndCreateNetworkDeviceList ();
+    EfiBootManagerConnectAll ();
+    CreateDeviceList (gEfiManagedNetworkServiceBindingProtocolGuid, mNetworkDeviceList);
+    CreateDeviceList (gEfiBlockIoProtocolGuid, mStorageDeviceList);
     return EFI_SUCCESS;
   }
 
@@ -244,7 +256,11 @@ BootManagerPolicyConnectDeviceClass (
   }
 
   if (CompareGuid (Class, &gEfiBootManagerPolicyNetworkGuid)) {
-    return ConnectNetwork ();
+    return ConnectDeviceList (gEfiManagedNetworkServiceBindingProtocolGuid, mNetworkDeviceList);
+  }
+  
+  if (CompareGuid (Class, &gEfiBootManagerPolicyStorageGuid)) {
+    return ConnectDeviceList (gEfiBlockIoProtocolGuid, mStorageDeviceList);
   }
 
   return EFI_NOT_FOUND;
