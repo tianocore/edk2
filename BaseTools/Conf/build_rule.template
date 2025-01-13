@@ -287,7 +287,8 @@
         $(DEBUG_DIR)(+)$(MODULE_NAME).dll
 
     <Command.MSFT, Command.INTEL>
-        "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK2_FLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
+        "$(DLINK)" /OUT:${dst}.wtemp $(DLINK_FLAGS) $(DLINK2_FLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
+        $(RM) ${dst}.wtemp
         "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
 
     <Command.CLANGPDB>
@@ -312,7 +313,8 @@
         $(DEBUG_DIR)(+)$(MODULE_NAME).dll
 
     <Command.MSFT>
-        "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK2_FLAGS) $(DLINK_XIPFLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
+        "$(DLINK)" /OUT:${dst}.wtemp $(DLINK_FLAGS) $(DLINK2_FLAGS) $(DLINK_XIPFLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
+        $(RM) ${dst}.wtemp
         "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK_XIPFLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
 
     <Command.GCC>
