@@ -140,9 +140,9 @@ VerifyUartParameters (
   }
 
   Percent = DivU64x32 (MultU64x32 (BaudRate, 100), ComputedBaudRate);
-  DEBUG ((DEBUG_INFO, "ClockRate = %d\n", ClockRate));
-  DEBUG ((DEBUG_INFO, "Divisor   = %ld\n", ComputedDivisor));
-  DEBUG ((DEBUG_INFO, "BaudRate/Actual (%ld/%d) = %d%%\n", BaudRate, ComputedBaudRate, Percent));
+  DEBUG ((DEBUG_VERBOSE, "ClockRate = %d\n", ClockRate));
+  DEBUG ((DEBUG_VERBOSE, "Divisor   = %ld\n", ComputedDivisor));
+  DEBUG ((DEBUG_VERBOSE, "BaudRate/Actual (%ld/%d) = %d%%\n", BaudRate, ComputedBaudRate, Percent));
 
   //
   // If the requested BaudRate is not supported:
@@ -188,9 +188,9 @@ VerifyUartParameters (
     return FALSE;
   }
 
-  DEBUG ((DEBUG_INFO, "ClockRate = %d\n", ClockRate));
-  DEBUG ((DEBUG_INFO, "Divisor   = %ld\n", ComputedDivisor));
-  DEBUG ((DEBUG_INFO, "BaudRate/Actual (%ld/%d) = %d%%\n", BaudRate, ComputedBaudRate, Percent));
+  DEBUG ((DEBUG_VERBOSE, "ClockRate = %d\n", ClockRate));
+  DEBUG ((DEBUG_VERBOSE, "Divisor   = %ld\n", ComputedDivisor));
+  DEBUG ((DEBUG_VERBOSE, "BaudRate/Actual (%ld/%d) = %d%%\n", BaudRate, ComputedBaudRate, Percent));
 
   if (ActualBaudRate != NULL) {
     *ActualBaudRate = ComputedBaudRate;
