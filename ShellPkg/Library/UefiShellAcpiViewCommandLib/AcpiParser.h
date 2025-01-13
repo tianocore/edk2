@@ -1169,6 +1169,23 @@ ParseAcpiSsdt (
   );
 
 /**
+  This function parses the ACPI TPM2 table.
+
+  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] Ptr                Pointer to the start of the buffer.
+  @param [in] AcpiTableLength    Length of the ACPI table.
+  @param [in] AcpiTableRevision  Revision of the ACPI table.
+**/
+VOID
+EFIAPI
+ParseAcpiTpm2 (
+  IN BOOLEAN  Trace,
+  IN UINT8    *Ptr,
+  IN UINT32   AcpiTableLength,
+  IN UINT8    AcpiTableRevision
+  );
+
+/**
   This function parses the ACPI WSMT table.
 
   @param [in] Trace              If TRUE, trace the ACPI fields.

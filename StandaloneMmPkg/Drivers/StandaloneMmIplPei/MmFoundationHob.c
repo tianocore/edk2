@@ -823,24 +823,21 @@ IsFvHobExist  (
   )
 {
   EFI_PEI_HOB_POINTERS  Hob;
-  UINTN                 HobLength;
 
   if ((HobList == NULL) || (HobSize == 0)) {
     return FALSE;
   }
 
-  Hob.Raw   = (UINT8 *)HobList;
-  HobLength = GET_HOB_LENGTH (Hob);
   //
   // Parse the HOB list until end of list or matching type is found.
   //
-  while (HobLength <= HobSize) {
+  Hob.Raw = HobList;
+  while ((UINTN)(Hob.Raw - HobList) < HobSize) {
     if (Hob.Header->HobType == EFI_HOB_TYPE_FV) {
       return TRUE;
     }
 
-    Hob.Raw    = GET_NEXT_HOB (Hob);
-    HobLength += GET_HOB_LENGTH (Hob);
+    Hob.Raw = GET_NEXT_HOB (Hob);
   }
 
   return FALSE;
