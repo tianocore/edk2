@@ -1,17 +1,21 @@
 /** @file
   Kvmtool virtual memory map library.
 
-  Copyright (c) 2018 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2018 - 2026, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include <Base.h>
+#include <Uefi.h>
+#include <Pi/PiMultiPhase.h>
+#include <Guid/ArmCcaSecretLocation.h>
 #include <Library/ArmLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
 
 // Number of Virtual Memory Map Descriptors
@@ -95,4 +99,47 @@ ArmVirtGetMemoryMap (
   ASSERT ((Idx + 1) <= MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS);
 
   *VirtualMemoryMap = VirtualMemoryTable;
+}
+
+/**
+  Library constructor for Kvmtool Virt Mem Info Lib.
+
+  @retval  RETURN_SUCCESS             Success
+  @retval  RETURN_OUT_OF_RESOURCES    Out of resources.
+
+**/
+RETURN_STATUS
+EFIAPI
+KvmtoolVirtMemInfoLibConstructor (
+  VOID
+  )
+{
+  VOID                     *Hob;
+  ARM_CCA_SECRET_LOCATION  SecretLocation;
+
+  if (!ArmCcaIsRealm () || (FixedPcdGet64 (PcdReservedMemoryCarveout) == 0)) {
+    // Nothing to do.
+    return RETURN_SUCCESS;
+  }
+
+  // The PcdReservedMemoryCarveout is used to carved out the
+  // Reserved Memory at the end of the system memory during early
+  // startup.
+  // This reserved memory is used to store the CCA secret data.
+  // Create a GUID HOB to transfer the secret location to the DXE phase.
+  SecretLocation.Base = PcdGet64 (PcdSystemMemoryBase) +
+                        PcdGet64 (PcdSystemMemorySize);
+  SecretLocation.Size = FixedPcdGet64 (PcdReservedMemoryCarveout);
+
+  Hob = BuildGuidDataHob (
+          &gArmBootSyncSecretMemoryLocationGuid,
+          &SecretLocation,
+          sizeof (SecretLocation)
+          );
+  if (Hob == NULL) {
+    ASSERT (0);
+    return RETURN_OUT_OF_RESOURCES;
+  }
+
+  return RETURN_SUCCESS;
 }

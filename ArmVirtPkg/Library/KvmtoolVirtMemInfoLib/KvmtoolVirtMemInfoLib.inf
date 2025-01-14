@@ -1,7 +1,7 @@
 ## @file
 #  Kvmtool virtual memory map library.
 #
-#  Copyright (c) 2018, ARM Limited. All rights reserved.
+#  Copyright (c) 2018 - 2025, Arm Limited. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -14,6 +14,7 @@
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmVirtMemInfoLib
+  CONSTRUCTOR                    = KvmtoolVirtMemInfoLibConstructor
 
 [Sources]
   KvmtoolVirtMemInfoLib.c
@@ -30,6 +31,7 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+  HobLib
   MemoryAllocationLib
   PcdLib
 
@@ -40,3 +42,7 @@
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFvSize
+  gArmVirtTokenSpaceGuid.PcdReservedMemoryCarveout
+
+[Guids]
+  gArmBootSyncSecretMemoryLocationGuid
