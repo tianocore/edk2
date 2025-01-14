@@ -60,7 +60,7 @@ struct MockUefiRuntimeServicesTableLib {
     gRT_ConvertPointer,
     (IN     UINTN                      DebugDisposition,
      IN OUT VOID                       **Address)
-  );
+    );
 
   MOCK_FUNCTION_DECLARATION (
     EFI_STATUS,
