@@ -21,6 +21,7 @@
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PrintLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -32,12 +33,12 @@
 // Static data that hosts the fw_cfg blobs and serves file requests.
 //
 typedef struct {
-  CONST CHAR16    Name[8];
+  CHAR16    Name[8];
   struct {
-    FIRMWARE_CONFIG_ITEM CONST    SizeKey;
-    FIRMWARE_CONFIG_ITEM CONST    DataKey;
-    UINT32                        Size;
-  }                             FwCfgItem[2];
+    FIRMWARE_CONFIG_ITEM    SizeKey;
+    FIRMWARE_CONFIG_ITEM    DataKey;
+    UINT32                  Size;
+  }                         FwCfgItem[2];
 } KERNEL_BLOB_ITEMS;
 
 typedef struct KERNEL_BLOB KERNEL_BLOB;
@@ -989,15 +990,23 @@ QemuKernelFetchBlob (
 
   //
   // Read blob size.
+  //   Size != 0      ->  use size as-is
+  //   SizeKey != 0   ->  read size from fw_cfg
+  //   both are 0     ->  unused entry
   //
   for (Size = 0, Idx = 0; Idx < ARRAY_SIZE (BlobItems->FwCfgItem); Idx++) {
-    if (BlobItems->FwCfgItem[Idx].SizeKey == 0) {
+    if ((BlobItems->FwCfgItem[Idx].SizeKey == 0) &&
+        (BlobItems->FwCfgItem[Idx].Size == 0))
+    {
       break;
     }
 
-    QemuFwCfgSelectItem (BlobItems->FwCfgItem[Idx].SizeKey);
-    BlobItems->FwCfgItem[Idx].Size = QemuFwCfgRead32 ();
-    Size                          += BlobItems->FwCfgItem[Idx].Size;
+    if (BlobItems->FwCfgItem[Idx].SizeKey) {
+      QemuFwCfgSelectItem (BlobItems->FwCfgItem[Idx].SizeKey);
+      BlobItems->FwCfgItem[Idx].Size = QemuFwCfgRead32 ();
+    }
+
+    Size += BlobItems->FwCfgItem[Idx].Size;
   }
 
   if (Size == 0) {
@@ -1083,6 +1092,55 @@ QemuKernelVerifyBlob (
   return Status;
 }
 
+STATIC
+EFI_STATUS
+QemuKernelFetchNamedBlobs (
+  VOID
+  )
+{
+  struct {
+    UINT32    FileSize;
+    UINT16    FileSelect;
+    UINT16    Reserved;
+    CHAR8     FileName[QEMU_FW_CFG_FNAME_SIZE];
+  } *DirEntry;
+  KERNEL_BLOB_ITEMS  Items;
+  EFI_STATUS         Status;
+  EFI_STATUS         FetchStatus;
+  UINT32             Count;
+  UINT32             Idx;
+
+  QemuFwCfgSelectItem (QemuFwCfgItemFileDir);
+  Count = SwapBytes32 (QemuFwCfgRead32 ());
+
+  DirEntry = AllocatePool (sizeof (*DirEntry) * Count);
+  QemuFwCfgReadBytes (sizeof (*DirEntry) * Count, DirEntry);
+
+  for (Idx = 0; Idx < Count; ++Idx) {
+    if (AsciiStrnCmp (DirEntry[Idx].FileName, "etc/boot/", 9) != 0) {
+      continue;
+    }
+
+    ZeroMem (&Items, sizeof (Items));
+    UnicodeSPrint (Items.Name, sizeof (Items.Name), L"%a", DirEntry[Idx].FileName + 9);
+    Items.FwCfgItem[0].DataKey = SwapBytes16 (DirEntry[Idx].FileSelect);
+    Items.FwCfgItem[0].Size    = SwapBytes32 (DirEntry[Idx].FileSize);
+
+    FetchStatus = QemuKernelFetchBlob (&Items);
+    Status      = QemuKernelVerifyBlob (
+                    (CHAR16 *)Items.Name,
+                    FetchStatus
+                    );
+    if (EFI_ERROR (Status)) {
+      FreePool (DirEntry);
+      return Status;
+    }
+  }
+
+  FreePool (DirEntry);
+  return EFI_SUCCESS;
+}
+
 //
 // The entry point of the feature.
 //
@@ -1126,10 +1184,24 @@ QemuKernelLoaderFsDxeEntrypoint (
   }
 
   //
-  // Fetch all blobs.
+  // Fetch named blobs.
   //
+  DEBUG ((DEBUG_INFO, "%a: named blobs (etc/boot/*)\n", __func__));
+  Status = QemuKernelFetchNamedBlobs ();
+  if (EFI_ERROR (Status)) {
+    goto FreeBlobs;
+  }
+
+  //
+  // Fetch traditional blobs.
+  //
+  DEBUG ((DEBUG_INFO, "%a: traditional blobs\n", __func__));
   for (BlobIdx = 0; BlobIdx < ARRAY_SIZE (mKernelBlobItems); ++BlobIdx) {
-    BlobItems   = &mKernelBlobItems[BlobIdx];
+    BlobItems = &mKernelBlobItems[BlobIdx];
+    if (FindKernelBlob (BlobItems->Name)) {
+      continue;
+    }
+
     FetchStatus = QemuKernelFetchBlob (BlobItems);
 
     Status = QemuKernelVerifyBlob (
