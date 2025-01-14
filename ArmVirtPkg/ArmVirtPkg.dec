@@ -90,6 +90,9 @@
   # Confidential Computing Secret Entry - Grub EFI Disk Password GUID
   gConfidentialComputingSecretEntryGrubEfiDiskPassword = { 0x736869e5, 0x84f0, 0x4973, { 0x92, 0xec, 0x06, 0x87, 0x9c, 0xe3, 0xda, 0x0b } }
 
+  # Arm CCA Secret Location
+  gArmBootSyncSecretMemoryLocationGuid = { 0xe1872a9e, 0xe9f5, 0x416b, { 0x92, 0x71, 0xbd, 0x4f, 0x21, 0xe0, 0x99, 0xa7 } }
+
 [PcdsFeatureFlag]
   #
   # Feature Flag PCD that defines whether TPM2 support is enabled
