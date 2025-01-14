@@ -699,6 +699,18 @@ ArmHasGicSystemRegisters (
   VOID
   );
 
+/**
+  Check whether the CPU supports the GICv5 system register interface
+
+  @return   Whether GICv5 System Register Interface is supported
+
+**/
+BOOLEAN
+EFIAPI
+ArmHasGicV5SystemRegisters (
+  VOID
+  );
+
 /** Checks if CCIDX is implemented.
 
    @retval TRUE  CCIDX is implemented.
