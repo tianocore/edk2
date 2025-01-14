@@ -311,4 +311,14 @@ ArmGicV3SetPriorityMask (
   IN UINTN  Priority
   );
 
+UINTN
+ArmGicV3GetControlRegister (
+  VOID
+  );
+
+VOID
+ArmGicV3SetControlRegister (
+  IN UINTN  Value
+  );
+
 #endif // ARMGIC_H_
