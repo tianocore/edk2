@@ -130,6 +130,10 @@
 // build for ARMv8.0, we need to define the register here.
 #define ID_AA64MMFR2_EL1  S3_0_C0_C7_2
 
+// The RNDR register is not recognized by older assemblers,
+// so we need to define it here
+#define RNDR  S3_3_C2_C4_0
+
 #define VECTOR_BASE(tbl)          \
   .section .text.##tbl##,"ax";    \
   .align 11;                      \
