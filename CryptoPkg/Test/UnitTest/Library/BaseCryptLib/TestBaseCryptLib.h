@@ -134,4 +134,18 @@ ValidateCryptPrng (
   VOID
   );
 
+/**
+  Initialize the unit test framework, suite, and unit tests for the
+  sample unit tests and run the unit tests.
+
+  @retval  EFI_SUCCESS           All test cases were dispatched.
+  @retval  EFI_OUT_OF_RESOURCES  There are not enough resources available to
+                                 initialize the unit tests.
+**/
+EFI_STATUS
+EFIAPI
+UefiTestMain (
+  VOID
+  );
+
 #endif
