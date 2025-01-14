@@ -349,6 +349,16 @@
   #
   ArmLib|Include/Library/ArmLib.h
 
+  ##  @libraryclass  Provides an interface to initialize a
+  #   Generic Interrupt Controller (GIC).
+  #
+  ArmGicArchLib|Include/Library/ArmGicArchLib.h
+
+  ##  @libraryclass  Provides a Generic Interrupt Controller (GIC)
+  #   configuration interface.
+  #
+  ArmGicLib|Include/Library/ArmGicLib.h
+
 [Guids]
   #
   # GUID defined in UEFI2.1/UEFI2.0/EFI1.1
