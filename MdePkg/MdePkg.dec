@@ -2505,6 +2505,15 @@
   # @Prompt CPU Rng algorithm's GUID.
   gEfiMdePkgTokenSpaceGuid.PcdCpuRngSupportedAlgorithm|{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}|VOID*|0x00000037
 
+[PcdsFixedAtBuild.common.ARM, PcdsFixedAtBuild.common.AArch64, PcdsDynamic.common.ARM, PcdsDynamic.common.AArch64]
+  #
+  # ARM Generic Interrupt Controller
+  #
+  gArmTokenSpaceGuid.PcdGicDistributorBase|0|UINT64|0x0000000C
+  # Base address for the GIC Redistributor region that contains the boot CPU
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0|UINT64|0x0000000E
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0|UINT64|0x0000000D
+
 [PcdsFixedAtBuild.RISCV64, PcdsPatchableInModule.RISCV64]
   #
   # Configurability to override RISC-V CPU Features
