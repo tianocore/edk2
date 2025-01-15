@@ -251,6 +251,13 @@
   gArmTokenSpaceGuid.PcdSystemBiosRelease|0xFFFF|UINT16|0x30000058
   gArmTokenSpaceGuid.PcdEmbeddedControllerFirmwareRelease|0xFFFF|UINT16|0x30000059
 
+  #
+  # For FmpDevicePsaFwuLib.
+  #
+  gArmTokenSpaceGuid.PcdSystemFirmwareFmpLowestSupportedVersion|0x00000000|UINT32|0x30000060
+  gArmTokenSpaceGuid.PcdSystemFirmwareFmpVersion|0x00000000|UINT32|0x30000061
+  gArmTokenSpaceGuid.PcdSystemFirmwareFmpVersionString|""|VOID*|0x30000062
+
 [PcdsFixedAtBuild.common, PcdsDynamic.common]
   # ARM Architectural Timer Interrupt(GIC PPI) numbers
   gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29|UINT32|0x00000035
