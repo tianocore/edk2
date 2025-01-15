@@ -869,13 +869,15 @@ DelegatedEventLoop (
   IN ARM_SVC_ARGS                       *EventCompleteSvcArgs
   )
 {
-  EFI_STATUS    Status;
-  UINT64        Uuid[2];
-  VOID          *CommData;
-  FFA_MSG_INFO  FfaMsgInfo;
-  EFI_GUID      ServiceGuid;
-  SERVICE_TYPE  ServiceType;
-  UINTN         CommBufferAddr;
+  EFI_STATUS              Status;
+  UINT64                  Uuid[2];
+  VOID                    *CommData;
+  EFI_GUID                ServiceGuid;
+  SERVICE_TYPE            ServiceType;
+  UINTN                   CommBufferAddr;
+  ARM_MM_HANDLER_CONTEXT  MmHandlerContext;
+  FFA_MSG_INFO            *FfaMsgInfo;
+  SPM_MM_MSG_INFO         *SpmMmInfo;
 
   CommData = NULL;
 
@@ -894,6 +896,8 @@ DelegatedEventLoop (
     DEBUG ((DEBUG_INFO, "X6 :  0x%x\n", (UINT32)EventCompleteSvcArgs->Arg6));
     DEBUG ((DEBUG_INFO, "X7 :  0x%x\n", (UINT32)EventCompleteSvcArgs->Arg7));
 
+    MmHandlerContext.CommProtocol = CommProtocol;
+
     if (CommProtocol == CommProtocolFfa) {
       /*
        * Register Convention for FF-A
@@ -907,17 +911,18 @@ DelegatedEventLoop (
        *
        *   See Arm Firmware Framework for Arm A-Profile for detail.
        */
-      FfaMsgInfo.SourcePartId = GET_SOURCE_PARTITION_ID (EventCompleteSvcArgs->Arg1);
-      FfaMsgInfo.DestPartId   = GET_DEST_PARTITION_ID (EventCompleteSvcArgs->Arg1);
-      CommData                = &FfaMsgInfo;
+      FfaMsgInfo               = &MmHandlerContext.CtxData.FfaMsgInfo;
+      FfaMsgInfo->SourcePartId = GET_SOURCE_PARTITION_ID (EventCompleteSvcArgs->Arg1);
+      FfaMsgInfo->DestPartId   = GET_DEST_PARTITION_ID (EventCompleteSvcArgs->Arg1);
+      CommData                 = FfaMsgInfo;
 
       if (EventCompleteSvcArgs->Arg0 == ARM_FID_FFA_MSG_SEND_DIRECT_REQ) {
-        FfaMsgInfo.DirectMsgVersion = DirectMsgV1;
-        ServiceType                 = ServiceTypeMmCommunication;
+        FfaMsgInfo->DirectMsgVersion = DirectMsgV1;
+        ServiceType                  = ServiceTypeMmCommunication;
       } else if (EventCompleteSvcArgs->Arg0 == ARM_FID_FFA_MSG_SEND_DIRECT_REQ2) {
-        FfaMsgInfo.DirectMsgVersion = DirectMsgV2;
-        Uuid[0]                     = EventCompleteSvcArgs->Arg2;
-        Uuid[1]                     = EventCompleteSvcArgs->Arg3;
+        FfaMsgInfo->DirectMsgVersion = DirectMsgV2;
+        Uuid[0]                      = EventCompleteSvcArgs->Arg2;
+        Uuid[1]                      = EventCompleteSvcArgs->Arg3;
         ConvertUuidToGuid ((GUID *)Uuid, &ServiceGuid);
         ServiceType = GetServiceType (&ServiceGuid);
       } else {
@@ -930,10 +935,10 @@ DelegatedEventLoop (
         goto ExitHandler;
       }
 
-      FfaMsgInfo.ServiceType = ServiceType;
+      FfaMsgInfo->ServiceType = ServiceType;
 
       if (ServiceType == ServiceTypeMmCommunication) {
-        if (FfaMsgInfo.DirectMsgVersion == DirectMsgV1) {
+        if (FfaMsgInfo->DirectMsgVersion == DirectMsgV1) {
           CommBufferAddr = EventCompleteSvcArgs->Arg3;
         } else {
           CommBufferAddr = EventCompleteSvcArgs->Arg4;
@@ -974,8 +979,11 @@ DelegatedEventLoop (
         goto ExitHandler;
       }
 
-      CommBufferAddr = EventCompleteSvcArgs->Arg1;
-      ServiceType    = ServiceTypeMmCommunication;
+      SpmMmInfo                = &MmHandlerContext.CtxData.SpmMmInfo;
+      ServiceType              = ServiceTypeMmCommunication;
+      CommBufferAddr           = EventCompleteSvcArgs->Arg1;
+      SpmMmInfo->ServiceType   = ServiceType;
+      SpmMmInfo->SecureRequest = IsSecureMmCommBufferAddr (CommBufferAddr);
     }
 
     if (ServiceType == ServiceTypeMmCommunication) {
@@ -990,7 +998,7 @@ DelegatedEventLoop (
       }
     }
 
-    Status = CpuDriverEntryPoint ((UINTN)ServiceType, CommBufferAddr);
+    Status = CpuDriverEntryPoint (&MmHandlerContext, CommBufferAddr);
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
