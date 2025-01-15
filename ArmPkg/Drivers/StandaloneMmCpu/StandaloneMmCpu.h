@@ -36,8 +36,8 @@ extern EFI_MM_CONFIGURATION_PROTOCOL  mMmConfig;
 /**
   The PI Standalone MM entry point for the CPU driver.
 
-  @param  [in] EventId            The event Id.
-  @param  [in] CommBufferAddr     Address of the communication buffer.
+  @param  [in] MmHandlerContext     Arm specific Mm handler context.
+  @param  [in] CommBufferAddr       Address of the communication buffer.
 
   @retval   EFI_SUCCESS             Success.
   @retval   EFI_INVALID_PARAMETER   A parameter was invalid.
@@ -47,8 +47,8 @@ extern EFI_MM_CONFIGURATION_PROTOCOL  mMmConfig;
 **/
 EFI_STATUS
 PiMmStandaloneMmCpuDriverEntry (
-  IN UINTN  EventId,
-  IN UINTN  CommBufferAddr
+  IN CONST ARM_MM_HANDLER_CONTEXT  *MmHandlerContext,
+  IN UINTN                         CommBufferAddr
   );
 
 /**

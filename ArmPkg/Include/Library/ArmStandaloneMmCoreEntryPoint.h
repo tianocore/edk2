@@ -29,6 +29,8 @@
 #include <Library/PeCoffLib.h>
 #include <Library/FvLib.h>
 
+#include <Protocol/PiMmCpuDriverEp.h>
+
 #define CPU_INFO_FLAG_PRIMARY_CPU  0x00000001
 
 /*
