@@ -1370,12 +1370,6 @@ ShellCommandRunDrvCfg (
       FileName = NULL;
     }
 
-    if (FileName == NULL) {
-      ASSERT (FileName != NULL);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    }
-
     if (InFromFile && EFI_ERROR (ShellFileExists (FileName))) {
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_FIND_FAIL), gShellDriver1HiiHandle, L"drvcfg", FileName);
       ShellStatus = SHELL_INVALID_PARAMETER;
