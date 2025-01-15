@@ -5,6 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#include <Guid/ArmCcaSecretLocation.h>
 #include <Guid/CocoSecret.h>
 #include <Guid/ConfidentialComputingSecret.h>
 #include <Guid/VariableFormat.h>
@@ -12,6 +13,8 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DxeServicesTableLib.h>
+#include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -26,10 +29,98 @@
 
 #include "Guest/BootSyncProtocolGuest.h"
 
+/** Add the Secret Memory address range to the memory map.
+
+  @param [in]  ImageHandle     The handle to the image.
+  @param [in]  SecretLocation  The Secret memory location info.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   A parameter is invalid.
+**/
+STATIC
+EFI_STATUS
+MapSecretMemory (
+  IN EFI_HANDLE               ImageHandle,
+  IN ARM_CCA_SECRET_LOCATION  *SecretLocation
+  )
+{
+  EFI_STATUS  Status;
+
+  if (SecretLocation == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = gDS->AddMemorySpace (
+                  EfiGcdMemoryTypeReserved,
+                  SecretLocation->Base,
+                  SecretLocation->Size,
+                  EFI_MEMORY_WB | EFI_MEMORY_XP
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Failed to add memory space. Status = %r\n",
+      Status
+      ));
+    return Status;
+  }
+
+  Status = gDS->AllocateMemorySpace (
+                  EfiGcdAllocateAddress,
+                  EfiGcdMemoryTypeReserved,
+                  0,
+                  SecretLocation->Size,
+                  &SecretLocation->Base,
+                  ImageHandle,
+                  NULL
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Failed to allocate memory space. Status = %r\n",
+      Status
+      ));
+    gDS->RemoveMemorySpace (
+           SecretLocation->Base,
+           SecretLocation->Size
+           );
+    return Status;
+  }
+
+  Status = gDS->SetMemorySpaceAttributes (
+                  SecretLocation->Base,
+                  SecretLocation->Size,
+                  EFI_MEMORY_WB | EFI_MEMORY_XP
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Failed to set memory attributes. Status = %r\n",
+      Status
+      ));
+    gDS->FreeMemorySpace (
+           SecretLocation->Base,
+           SecretLocation->Size
+           );
+    gDS->RemoveMemorySpace (
+           SecretLocation->Base,
+           SecretLocation->Size
+           );
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "Secret memory space mapping Status = %r\n",
+    Status
+    ));
+  return Status;
+}
+
 /**
   Initialise the EFI COCO Secret System Table with the secret data,
   i.e. the disk decryption key received from Boot Sync.
 
+  @param[in]  ImageHandle       Handle to the Image.
   @param[in]  SecretData        Pointer to the secret data.
   @param[in]  SecretDataLen     Length of the secret data.
 
@@ -41,11 +132,13 @@ STATIC
 EFI_STATUS
 EFIAPI
 InitialiseSecretTable (
-  UINT8   *SecretData,
-  UINT32  SecretDataLen
+  IN EFI_HANDLE  ImageHandle,
+  IN UINT8       *SecretData,
+  IN UINT32      SecretDataLen
   )
 {
   EFI_STATUS          Status;
+  RETURN_STATUS       RetStatus;
   UINT8               *Secret;
   UINT8               *SecretTableData;
   UINTN               SecretTableDataLength;
@@ -54,6 +147,8 @@ InitialiseSecretTable (
   COCO_SECRET_ENTRY   *SecretEntry;
 
   CONFIDENTIAL_COMPUTING_SECRET_LOCATION  *SecretTable;
+  ARM_CCA_SECRET_LOCATION                 *SecretLocation;
+  VOID                                    *Hob;
 
   if ((SecretData == NULL) || (SecretDataLen == 0)) {
     return EFI_INVALID_PARAMETER;
@@ -73,13 +168,75 @@ InitialiseSecretTable (
   SecretTableDataLength = sizeof (COCO_SECRET_HEADER) +
                           sizeof (COCO_SECRET_ENTRY) + SecretDataLen + 1;
   SecretTablePages = EFI_SIZE_TO_PAGES (SecretTableDataLength);
-  SecretTableData  = AllocateReservedPages (
-                       SecretTablePages
-                       );
-  if (SecretTableData == NULL) {
+
+  // Get the Arm CCA Secret Location information.
+  Hob = GetFirstGuidHob (&gArmBootSyncSecretMemoryLocationGuid);
+  if (Hob == NULL) {
     ASSERT (0);
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_NOT_FOUND;
+    goto ExitHandler;
   }
+
+  SecretLocation = (ARM_CCA_SECRET_LOCATION *)GET_GUID_HOB_DATA (Hob);
+
+  if ((SecretLocation == NULL) ||
+      (SecretLocation->Base == 0) ||
+      (SecretLocation->Size < EFI_PAGES_TO_SIZE (SecretTablePages)))
+  {
+    ASSERT (0);
+    Status = EFI_INVALID_PARAMETER;
+    goto ExitHandler;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "SecretLocation.Base = 0x%llx\n",
+    SecretLocation->Base
+    ));
+  DEBUG ((
+    DEBUG_INFO,
+    "SecretLocation.Size = 0x%llx\n",
+    SecretLocation->Size
+    ));
+
+  // Ensure that the secret data region is protected RAM.
+  RetStatus = ArmCcaRsiSetIpaState (
+                (UINT64 *)SecretLocation->Base,
+                SecretLocation->Size,
+                RipasRam,
+                ARM_CCA_RIPAS_CHANGE_FLAGS_RSI_NO_CHANGE_DESTROYED
+                );
+  if (RETURN_ERROR (RetStatus)) {
+    ASSERT (0);
+    Status = EFI_ABORTED;
+    goto ExitHandler;
+  }
+
+  Status = MapSecretMemory (ImageHandle, SecretLocation);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto ExitHandler;
+  }
+
+  SecretTableData = (UINT8 *)SecretLocation->Base;
+
+  DEBUG ((
+    DEBUG_INFO,
+    "SecretTableData = 0x%llx\n",
+    SecretTableData
+    ));
+
+  DEBUG ((
+    DEBUG_INFO,
+    "SecretTableDataLength = 0x%llx\n",
+    SecretTableDataLength
+    ));
+
+  DEBUG ((
+    DEBUG_INFO,
+    "SecretTablePages = 0x%llx\n",
+    SecretTablePages
+    ));
 
   // Populate the COCO Secret table.
   ZeroMem (SecretTableData, EFI_PAGES_TO_SIZE (SecretTablePages));
@@ -130,6 +287,10 @@ InitialiseSecretTable (
                 &gConfidentialComputingSecretGuid,
                 SecretTable
                 );
+
+ExitHandler:
+  gBS->FreePool (SecretTable);
+  return Status;
 }
 
 /**
@@ -274,6 +435,8 @@ InitVariableStorage (
 /**
   Perform Arm CCA Boot Sync.
 
+  @param[in]  ImageHandle       Handle to the Image.
+
   @retval EFI_SUCCESS             Success.
   @retval EFI_INVALID_PARAMETER   A parameter was invalid.
   @retval EFI_PROTOCOL_ERROR      A protocol error occured.
@@ -283,7 +446,7 @@ STATIC
 EFI_STATUS
 EFIAPI
 PerformSync (
-  VOID
+  IN EFI_HANDLE  ImageHandle
   )
 {
   EFI_STATUS             Status;
@@ -383,6 +546,7 @@ PerformSync (
     );
 
   Status = InitialiseSecretTable (
+             ImageHandle,
              (UINT8 *)(BsbElement + 1),
              (BsbElement->Header.Length - sizeof (BOOT_SYNC_BSB_ELEMENT))
              );
@@ -450,7 +614,7 @@ ArmCcaBootSyncDxeInitialize (
     return Status;
   }
 
-  Status = PerformSync ();
+  Status = PerformSync (ImageHandle);
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,

@@ -60,6 +60,8 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+  DxeServicesTableLib
+  HobLib
   PcdLib
   RngLib
   MemoryAllocationLib
@@ -80,12 +82,13 @@
   gArmBootSyncNackGuid
   gArmBootSyncRequestOptions
   gArmBootSyncSecretData
+  gArmBootSyncSecretMemoryLocationGuid
   gArmBootSyncVarData
 
   gConfidentialComputingSecretEntryGrubEfiDiskPassword
   gConfidentialComputingSecretGuid
   gConfidentialComputingSecretHeader
-  
+
   gEfiAuthenticatedVariableGuid
   gEfiVariableGuid
 
@@ -103,5 +106,5 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
 
 [Depex]
-  gEfiRealmApertureManagementProtocolGuid
+  gEfiRealmApertureManagementProtocolGuid AND gEfiCpuArchProtocolGuid
 
