@@ -44,8 +44,8 @@
   gEfiCpuArchProtocolGuid         ## CONSUMES ## NOTIFY
 
 [Pcd.common]
-  gArmTokenSpaceGuid.PcdGicDistributorBase
-  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
+  gEfiMdePkgTokenSpaceGuid.PcdGicDistributorBase
+  gEfiMdePkgTokenSpaceGuid.PcdGicInterruptInterfaceBase
 
 [Depex]
   TRUE

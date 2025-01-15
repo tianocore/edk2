@@ -192,9 +192,9 @@
   #
   # ARM General Interrupt Controller
   #
-  gArmTokenSpaceGuid.PcdGicDistributorBase|0x0
-  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x0
-  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x0
+  gEfiMdePkgTokenSpaceGuid.PcdGicDistributorBase|0x0
+  gEfiMdePkgTokenSpaceGuid.PcdGicRedistributorsBase|0x0
+  gEfiMdePkgTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x0
 
   #
   # PCI settings

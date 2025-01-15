@@ -342,14 +342,6 @@
   gArmTokenSpaceGuid.PcdGenericWatchdogEl2IntrNum|93|UINT32|0x00000009
 
   #
-  # ARM Generic Interrupt Controller
-  #
-  gArmTokenSpaceGuid.PcdGicDistributorBase|0|UINT64|0x0000000C
-  # Base address for the GIC Redistributor region that contains the boot CPU
-  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0|UINT64|0x0000000E
-  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0|UINT64|0x0000000D
-
-  #
   # Bases, sizes and translation offsets of IO and MMIO spaces, respectively.
   # Note that "IO" is just another MMIO range that simulates IO space; there
   # are no special instructions to access it.
