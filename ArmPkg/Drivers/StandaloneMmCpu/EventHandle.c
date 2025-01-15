@@ -39,8 +39,8 @@ MmFoundationEntryRegister (
 // maintained in single global variable because StandaloneMm is UP-migratable
 // (which means it cannot run concurrently)
 //
-EFI_MM_COMMUNICATE_HEADER     *gGuidedEventContext   = NULL;
-EFI_MM_COMMUNICATE_HEADER_V3  *gGuidedEventContextV3 = NULL;
+EFI_MM_COMMUNICATE_HEADER            *gGuidedEventContext = NULL;
+STATIC CONST ARM_MM_HANDLER_CONTEXT  *mMmHandlerContext   = NULL;
 
 EFI_MM_CONFIGURATION_PROTOCOL  mMmConfig = {
   0,
@@ -56,8 +56,8 @@ STATIC EFI_MM_ENTRY_POINT  mMmEntryPoint = NULL;
 /**
   The PI Standalone MM entry point for the CPU driver.
 
-  @param  [in] EventId            The event Id.
-  @param  [in] CommBufferAddr     Address of the communication buffer.
+  @param  [in] MmHandlerContext     Arm specific Mm handler context.
+  @param  [in] CommBufferAddr       Address of the communication buffer.
 
   @retval   EFI_SUCCESS             Success.
   @retval   EFI_INVALID_PARAMETER   A parameter was invalid.
@@ -67,20 +67,18 @@ STATIC EFI_MM_ENTRY_POINT  mMmEntryPoint = NULL;
 **/
 EFI_STATUS
 PiMmStandaloneMmCpuDriverEntry (
-  IN UINTN  EventId,
-  IN UINTN  CommBufferAddr
+  IN CONST ARM_MM_HANDLER_CONTEXT  *MmHandlerContext,
+  IN UINTN                         CommBufferAddr
   )
 {
   EFI_MM_ENTRY_CONTEXT  MmEntryPointContext;
   EFI_STATUS            Status;
   UINTN                 CommBufferSize;
 
-  DEBUG ((DEBUG_INFO, "Received event - 0x%x\n", EventId));
-
   Status = EFI_SUCCESS;
 
-  // Perform parameter validation of NsCommBufferAddr
-  if (CommBufferAddr == (UINTN)NULL) {
+  // Perform parameter validation.
+  if ((MmHandlerContext == NULL) || (CommBufferAddr == (UINTN)NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -114,11 +112,12 @@ PiMmStandaloneMmCpuDriverEntry (
 
   if (EFI_ERROR (Status)) {
     gGuidedEventContext = NULL;
-    DEBUG ((DEBUG_ERROR, "Mem alloc failed - 0x%x\n", EventId));
+    DEBUG ((DEBUG_ERROR, "%a: Mem alloc failed\n", __func__));
     return Status;
   }
 
   CopyMem (gGuidedEventContext, (CONST VOID *)CommBufferAddr, CommBufferSize);
+  mMmHandlerContext = MmHandlerContext;
 
   ZeroMem (&MmEntryPointContext, sizeof (EFI_MM_ENTRY_CONTEXT));
 
@@ -141,6 +140,7 @@ PiMmStandaloneMmCpuDriverEntry (
   Status = mMmst->MmFreePool ((VOID *)gGuidedEventContext);
   ASSERT_EFI_ERROR (Status);
   gGuidedEventContext = NULL;
+  mMmHandlerContext   = NULL;
 
   return Status;
 }
@@ -190,7 +190,8 @@ PiMmCpuTpFwRootMmiHandler (
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS                    Status;
+  EFI_MM_COMMUNICATE_HEADER_V3  *GuidedEventContextV3;
 
   ASSERT (Context == NULL);
   ASSERT (CommBuffer == NULL);
@@ -205,20 +206,20 @@ PiMmCpuTpFwRootMmiHandler (
         &gEfiMmCommunicateHeaderV3Guid
         ))
   {
-    gGuidedEventContextV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)gGuidedEventContext;
+    GuidedEventContextV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)gGuidedEventContext;
     DEBUG ((
       DEBUG_INFO,
       "CommBuffer - 0x%x, CommBufferSize - 0x%llx, MessageSize - 0x%llx\n",
-      gGuidedEventContextV3,
-      gGuidedEventContextV3->BufferSize,
-      gGuidedEventContextV3->MessageSize
+      GuidedEventContextV3,
+      GuidedEventContextV3->BufferSize,
+      GuidedEventContextV3->MessageSize
       ));
 
     Status = mMmst->MmiManage (
-                      &gGuidedEventContextV3->MessageGuid,
-                      NULL,
-                      gGuidedEventContextV3->MessageData,
-                      (UINTN *)(&gGuidedEventContextV3->MessageSize)
+                      &GuidedEventContextV3->MessageGuid,
+                      mMmHandlerContext,
+                      GuidedEventContextV3->MessageData,
+                      (UINTN *)(&GuidedEventContextV3->MessageSize)
                       );
   } else {
     DEBUG ((
@@ -227,10 +228,9 @@ PiMmCpuTpFwRootMmiHandler (
       gGuidedEventContext,
       gGuidedEventContext->MessageLength
       ));
-
     Status = mMmst->MmiManage (
                       &gGuidedEventContext->HeaderGuid,
-                      NULL,
+                      mMmHandlerContext,
                       gGuidedEventContext->Data,
                       (UINTN *)(&gGuidedEventContext->MessageLength)
                       );
