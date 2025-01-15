@@ -23,6 +23,7 @@
 #include <WorkArea.h>
 #include <ConfidentialComputingGuestAttr.h>
 #include <Library/TdxHelperLib.h>
+#include <Library/TdxMeasurementLib.h>
 
 #define ALIGNED_2MB_MASK  0x1fffff
 #define MEGABYTE_SHIFT    20
@@ -836,7 +837,7 @@ TdxHelperMeasureTdHob (
     Hob.Raw = GET_NEXT_HOB (Hob);
   }
 
-  Status = TdxHelperHashAndExtendToRtmr (
+  Status = TdxMeasurementHashAndExtendToRtmr (
              0,
              (UINT8 *)TdHob,
              (UINTN)((UINT8 *)Hob.Raw - (UINT8 *)TdHob),
@@ -881,7 +882,7 @@ TdxHelperMeasureCfvImage (
   UINT8           Digest[SHA384_DIGEST_SIZE];
   OVMF_WORK_AREA  *WorkArea;
 
-  Status = TdxHelperHashAndExtendToRtmr (
+  Status = TdxMeasurementHashAndExtendToRtmr (
              0,
              (UINT8 *)(UINTN)PcdGet32 (PcdOvmfFlashNvStorageVariableBase),
              (UINT64)PcdGet32 (PcdCfvRawDataSize),

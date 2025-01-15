@@ -1,0 +1,45 @@
+## @file
+#  TdxMeasurement SEC and PEI instance
+#
+#  This module provides Tdx measurement functions in SEC and PEI phase.
+#  Copyright (c) 2025, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecPeiTdxMeasurementLib
+  FILE_GUID                      = fd565572-5195-4113-9018-113b33939e91
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TdxMeasurementLib|SEC PEIM PEI_CORE
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  SecPeiTdxMeasurement.c
+  TdxMeasurementCommon.c
+
+[Packages]
+  CryptoPkg/CryptoPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseCryptLib
+  DebugLib
+  HobLib
+  PcdLib
+  TdxLib
+
+[Guids]
+  gCcEventEntryHobGuid
