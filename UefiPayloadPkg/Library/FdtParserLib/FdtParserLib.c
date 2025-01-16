@@ -38,7 +38,8 @@ typedef enum {
   FrameBuffer,
   PciRootBridge,
   Options,
-  SerialPort,
+  IsaSerialPort,
+  MmioSerialPort,
   DoNothing
 } FDT_NODE_TYPE;
 
@@ -147,7 +148,9 @@ CheckNodeType (
 {
   DEBUG ((DEBUG_INFO, "\n CheckNodeType  %a   \n", NodeString));
   if (AsciiStrnCmp (NodeString, "serial@", AsciiStrLen ("serial@")) == 0) {
-    return SerialPort;
+    return MmioSerialPort;
+  } else if (AsciiStrnCmp (NodeString, "isa", AsciiStrLen ("isa")) == 0) {
+    return IsaSerialPort;
   } else if (AsciiStrnCmp (NodeString, "reserved-memory", AsciiStrLen ("reserved-memory")) == 0) {
     return ReservedMemory;
   } else if (AsciiStrnCmp (NodeString, "memory@", AsciiStrLen ("memory@")) == 0) {
@@ -883,6 +886,8 @@ ParseDtb (
   UINT8                 *RbSegNumAlreadyAssigned;
   UINT8                 NumberOfRbSegNumAlreadyAssigned;
   UINT32                RootAddressCells;
+  UINT32                IsaAddressCells;
+  INT32                 SSubNode;
 
   Fdt               = FdtBase;
   Depth             = 0;
@@ -997,8 +1002,17 @@ ParseDtb (
     NodeType = CheckNodeType (NodePtr->Name, Depth);
     DEBUG ((DEBUG_INFO, "NodeType :0x%x\n", NodeType));
     switch (NodeType) {
-      case SerialPort:
+      case MmioSerialPort:
         ParseSerialPort (Fdt, Node, RootAddressCells);
+        break;
+      case IsaSerialPort:
+        PropertyPtr = FdtGetProperty (Fdt, Node, "#address-cells", &TempLen);
+        if ((PropertyPtr != NULL) && (TempLen > 0)) {
+          IsaAddressCells = Fdt32ToCpu (*(UINT32 *)PropertyPtr->Data);
+        }
+
+        SSubNode = FdtFirstSubnode (Fdt, Node);
+        ParseSerialPort (Fdt, SSubNode, IsaAddressCells);
         break;
       case ReservedMemory:
         DEBUG ((DEBUG_INFO, "ParseReservedMemory\n"));
