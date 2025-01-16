@@ -21,7 +21,6 @@
   ArmVirtGicArchLib.c
 
 [LibraryClasses]
-  ArmGicLib
   BaseLib
   DebugLib
   PcdLib
