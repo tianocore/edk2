@@ -451,7 +451,7 @@ GicV2DxeInitialize (
   MmioWrite32 (mGicInterruptInterfaceBase + ARM_GIC_ICCPMR, 0xff);
 
   // Enable gic cpu interface
-  ArmGicEnableInterruptInterface (mGicInterruptInterfaceBase);
+  ArmGicV2EnableInterruptInterface (mGicInterruptInterfaceBase);
 
   // Enable gic distributor
   ArmGicEnableDistributor (mGicDistributorBase);
