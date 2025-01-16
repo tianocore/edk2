@@ -87,6 +87,5 @@ SECTIONS {
     *(.dynstr)
     *(.hash .gnu.hash)
     *(.comment)
-    *(COMMON)
   }
 }
