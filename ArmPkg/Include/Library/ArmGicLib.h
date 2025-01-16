@@ -108,6 +108,14 @@
 // Bit Mask for
 #define ARM_GIC_ICCIAR_ACKINTID  0x3FF
 
+//
+// GIC SPI and extended SPI ranges
+//
+#define ARM_GIC_ARCH_SPI_MIN      32
+#define ARM_GIC_ARCH_SPI_MAX      1019
+#define ARM_GIC_ARCH_EXT_SPI_MIN  4096
+#define ARM_GIC_ARCH_EXT_SPI_MAX  5119
+
 // GIC revision 3 specific declarations
 
 #define ICC_SRE_EL2_SRE  (1 << 0)
