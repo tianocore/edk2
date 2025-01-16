@@ -110,24 +110,6 @@
 // Bit Mask for
 #define ARM_GIC_ICCIAR_ACKINTID  0x3FF
 
-UINT32
-EFIAPI
-ArmGicGetInterfaceIdentification (
-  IN  UINTN  GicInterruptInterfaceBase
-  );
-
-VOID
-EFIAPI
-ArmGicDisableDistributor (
-  IN  UINTN  GicDistributorBase
-  );
-
-UINTN
-EFIAPI
-ArmGicGetMaxNumInterrupts (
-  IN  UINTN  GicDistributorBase
-  );
-
 // GIC revision 2 specific declarations
 
 // Interrupts from 1020 to 1023 are considered as special interrupts
