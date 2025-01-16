@@ -290,7 +290,6 @@ QemuKernelBlobTypeToFileInfo (
 
   NameSize     = (StrLen (Name) + 1) * 2;
   FileInfoSize = OFFSET_OF (EFI_FILE_INFO, FileName) + NameSize;
-  ASSERT (FileInfoSize >= sizeof *FileInfo);
 
   OriginalBufferSize = *BufferSize;
   *BufferSize        = FileInfoSize;
