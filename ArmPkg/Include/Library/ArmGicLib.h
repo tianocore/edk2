@@ -110,38 +110,6 @@
 // Bit Mask for
 #define ARM_GIC_ICCIAR_ACKINTID  0x3FF
 
-// GIC revision 2 specific declarations
-
-// Interrupts from 1020 to 1023 are considered as special interrupts
-// (eg: spurious interrupts)
-#define ARM_GIC_IS_SPECIAL_INTERRUPTS(Interrupt) \
-          (((Interrupt) >= 1020) && ((Interrupt) <= 1023))
-
-VOID
-EFIAPI
-ArmGicV2EnableInterruptInterface (
-  IN  UINTN  GicInterruptInterfaceBase
-  );
-
-VOID
-EFIAPI
-ArmGicV2DisableInterruptInterface (
-  IN  UINTN  GicInterruptInterfaceBase
-  );
-
-UINTN
-EFIAPI
-ArmGicV2AcknowledgeInterrupt (
-  IN  UINTN  GicInterruptInterfaceBase
-  );
-
-VOID
-EFIAPI
-ArmGicV2EndOfInterrupt (
-  IN UINTN  GicInterruptInterfaceBase,
-  IN UINTN  Source
-  );
-
 // GIC revision 3 specific declarations
 
 #define ICC_SRE_EL2_SRE  (1 << 0)

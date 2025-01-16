@@ -13,10 +13,6 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmGicLib
 
-[Sources]
-  GicV2/ArmGicV2Lib.c
-  GicV2/ArmGicV2NonSecLib.c
-
 [Sources.ARM]
   GicV3/Arm/ArmGicV3.S     | GCC
 
