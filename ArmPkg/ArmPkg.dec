@@ -36,11 +36,6 @@
   #
   ArmGenericTimerCounterLib|Include/Library/ArmGenericTimerCounterLib.h
 
-  ##  @libraryclass  Provides an interface to initialize a
-  #   Generic Interrupt Controller (GIC).
-  #
-  ArmGicArchLib|Include/Library/ArmGicArchLib.h
-
   ##  @libraryclass  Provides a Generic Interrupt Controller (GIC)
   #   configuration interface.
   #
