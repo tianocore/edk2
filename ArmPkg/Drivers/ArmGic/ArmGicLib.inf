@@ -14,8 +14,6 @@
   LIBRARY_CLASS                  = ArmGicLib
 
 [Sources]
-  ArmGicLib.c
-
   GicV2/ArmGicV2Lib.c
   GicV2/ArmGicV2NonSecLib.c
 
