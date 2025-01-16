@@ -806,6 +806,11 @@ QemuKernelStubFileOpen (
   //
   // Locate the file.
   //
+  if (FileName[0] == '\\') {
+    // also accept absolute paths, i.e. '\kernel' for 'kernel'
+    FileName++;
+  }
+
   Blob = FindKernelBlob (FileName);
 
   if (Blob == NULL) {
