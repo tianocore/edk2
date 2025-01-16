@@ -139,25 +139,6 @@ ArmGicGetMaxNumInterrupts (
 
 VOID
 EFIAPI
-ArmGicEndOfInterrupt (
-  IN  UINTN  GicInterruptInterfaceBase,
-  IN UINTN   Source
-  )
-{
-  ARM_GIC_ARCH_REVISION  Revision;
-
-  Revision = ArmGicGetSupportedArchRevision ();
-  if (Revision == ARM_GIC_ARCH_REVISION_2) {
-    ArmGicV2EndOfInterrupt (GicInterruptInterfaceBase, Source);
-  } else if (Revision == ARM_GIC_ARCH_REVISION_3) {
-    ArmGicV3EndOfInterrupt (Source);
-  } else {
-    ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
-  }
-}
-
-VOID
-EFIAPI
 ArmGicSetInterruptPriority (
   IN UINTN   GicDistributorBase,
   IN UINTN   GicRedistributorBase,

@@ -151,13 +151,6 @@ ArmGicGetMaxNumInterrupts (
   IN  UINTN  GicDistributorBase
   );
 
-VOID
-EFIAPI
-ArmGicEndOfInterrupt (
-  IN  UINTN  GicInterruptInterfaceBase,
-  IN UINTN   Source
-  );
-
 UINTN
 EFIAPI
 ArmGicSetPriorityMask (
