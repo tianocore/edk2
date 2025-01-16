@@ -75,4 +75,22 @@ GicGetDistributorIcfgBaseAndBit (
   OUT UINTN                     *Config1Bit
   );
 
+UINT32
+EFIAPI
+ArmGicGetInterfaceIdentification (
+  IN  UINTN  GicInterruptInterfaceBase
+  );
+
+VOID
+EFIAPI
+ArmGicDisableDistributor (
+  IN  UINTN  GicDistributorBase
+  );
+
+UINTN
+EFIAPI
+ArmGicGetMaxNumInterrupts (
+  IN  UINTN  GicDistributorBase
+  );
+
 #endif // ARM_GIC_DXE_H_
