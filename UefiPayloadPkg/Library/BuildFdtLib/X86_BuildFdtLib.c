@@ -954,7 +954,7 @@ BuildFdtForUplRequired (
     Fit         = (VOID *)(UINTN)PayloadBase->Entry;
     DEBUG ((DEBUG_INFO, "PayloadBase Entry = 0x%08x\n", PayloadBase->Entry));
 
-    Status       = AsciiSPrint (TempStr, sizeof (TempStr), "upl-images@%lX", (UINTN)(Fit));
+    Status       = AsciiSPrint (TempStr, sizeof (TempStr), "upl-image@%lX", (UINTN)(Fit));
     UPLImageNode = FdtAddSubnode (Fdt, ParentNode, TempStr);
 
     Data64 = CpuToFdt64 ((UINTN)Fit);
