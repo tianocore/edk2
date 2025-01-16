@@ -262,43 +262,45 @@ FindNextMemoryNodeReg (
       break;
     }
 
+    DeviceType = fdt_getprop (mDeviceTreeBase, Next, "device_type", &Len);
+    if ((DeviceType == NULL) || (AsciiStrCmp (DeviceType, "memory") != 0)) {
+      continue;
+    }
+
     if (!IsNodeEnabled (Next)) {
       DEBUG ((DEBUG_WARN, "%a: ignoring disabled memory node\n", __func__));
       continue;
     }
 
-    DeviceType = fdt_getprop (mDeviceTreeBase, Next, "device_type", &Len);
-    if ((DeviceType != NULL) && (AsciiStrCmp (DeviceType, "memory") == 0)) {
-      //
-      // Get the 'reg' property of this memory node. For now, we will assume
-      // 8 byte quantities for base and size, respectively.
-      // TODO use #cells root properties instead
-      //
-      Status = GetNodeProperty (This, Next, "reg", Reg, RegSize);
-      if (EFI_ERROR (Status)) {
-        DEBUG ((
-          DEBUG_WARN,
-          "%a: ignoring memory node with no 'reg' property\n",
-          __func__
-          ));
-        continue;
-      }
-
-      if ((*RegSize % 16) != 0) {
-        DEBUG ((
-          DEBUG_WARN,
-          "%a: ignoring memory node with invalid 'reg' property (size == 0x%x)\n",
-          __func__,
-          *RegSize
-          ));
-        continue;
-      }
-
-      *Node         = Next;
-      *AddressCells = 2;
-      *SizeCells    = 2;
-      return EFI_SUCCESS;
+    //
+    // Get the 'reg' property of this memory node. For now, we will assume
+    // 8 byte quantities for base and size, respectively.
+    // TODO use #cells root properties instead
+    //
+    Status = GetNodeProperty (This, Next, "reg", Reg, RegSize);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_WARN,
+        "%a: ignoring memory node with no 'reg' property\n",
+        __func__
+        ));
+      continue;
     }
+
+    if ((*RegSize % 16) != 0) {
+      DEBUG ((
+        DEBUG_WARN,
+        "%a: ignoring memory node with invalid 'reg' property (size == 0x%x)\n",
+        __func__,
+        *RegSize
+        ));
+      continue;
+    }
+
+    *Node         = Next;
+    *AddressCells = 2;
+    *SizeCells    = 2;
+    return EFI_SUCCESS;
   }
 
   return EFI_NOT_FOUND;
