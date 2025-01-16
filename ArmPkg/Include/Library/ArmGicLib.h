@@ -153,15 +153,6 @@ ArmGicGetMaxNumInterrupts (
 
 VOID
 EFIAPI
-ArmGicSendSgiTo (
-  IN  UINTN  GicDistributorBase,
-  IN  UINT8  TargetListFilter,
-  IN  UINT8  CPUTargetList,
-  IN  UINT8  SgiId
-  );
-
-VOID
-EFIAPI
 ArmGicEndOfInterrupt (
   IN  UINTN  GicInterruptInterfaceBase,
   IN UINTN   Source

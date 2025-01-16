@@ -139,23 +139,6 @@ ArmGicGetMaxNumInterrupts (
 
 VOID
 EFIAPI
-ArmGicSendSgiTo (
-  IN  UINTN  GicDistributorBase,
-  IN  UINT8  TargetListFilter,
-  IN  UINT8  CPUTargetList,
-  IN  UINT8  SgiId
-  )
-{
-  MmioWrite32 (
-    GicDistributorBase + ARM_GIC_ICDSGIR,
-    ((TargetListFilter & 0x3) << 24) |
-    ((CPUTargetList & 0xFF) << 16)   |
-    (SgiId & 0xF)
-    );
-}
-
-VOID
-EFIAPI
 ArmGicEndOfInterrupt (
   IN  UINTN  GicInterruptInterfaceBase,
   IN UINTN   Source
