@@ -158,39 +158,6 @@ ArmGicSetPriorityMask (
   IN  INTN   PriorityMask
   );
 
-VOID
-EFIAPI
-ArmGicSetInterruptPriority (
-  IN UINTN   GicDistributorBase,
-  IN UINTN   GicRedistributorBase,
-  IN UINTN   Source,
-  IN UINT32  Priority
-  );
-
-VOID
-EFIAPI
-ArmGicEnableInterrupt (
-  IN UINTN  GicDistributorBase,
-  IN UINTN  GicRedistributorBase,
-  IN UINTN  Source
-  );
-
-VOID
-EFIAPI
-ArmGicDisableInterrupt (
-  IN UINTN  GicDistributorBase,
-  IN UINTN  GicRedistributorBase,
-  IN UINTN  Source
-  );
-
-BOOLEAN
-EFIAPI
-ArmGicIsInterruptEnabled (
-  IN UINTN  GicDistributorBase,
-  IN UINTN  GicRedistributorBase,
-  IN UINTN  Source
-  );
-
 // GIC revision 2 specific declarations
 
 // Interrupts from 1020 to 1023 are considered as special interrupts
