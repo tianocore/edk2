@@ -28,6 +28,73 @@ extern EFI_HARDWARE_INTERRUPT2_PROTOCOL  gHardwareInterrupt2V2Protocol;
 STATIC UINTN  mGicInterruptInterfaceBase;
 STATIC UINTN  mGicDistributorBase;
 
+STATIC
+VOID
+ArmGicEnableInterrupt (
+  IN UINTN  GicDistributorBase,
+  IN UINTN  GicRedistributorBase,
+  IN UINTN  Source
+  )
+{
+  UINT32  RegOffset;
+  UINT8   RegShift;
+
+  // Calculate enable register offset and bit position
+  RegOffset = (UINT32)(Source / 32);
+  RegShift  = (UINT8)(Source % 32);
+
+  // Write set-enable register
+  MmioWrite32 (
+    GicDistributorBase + ARM_GIC_ICDISER + (4 * RegOffset),
+    1 << RegShift
+    );
+}
+
+STATIC
+VOID
+ArmGicDisableInterrupt (
+  IN UINTN  GicDistributorBase,
+  IN UINTN  GicRedistributorBase,
+  IN UINTN  Source
+  )
+{
+  UINT32  RegOffset;
+  UINT8   RegShift;
+
+  // Calculate enable register offset and bit position
+  RegOffset = (UINT32)(Source / 32);
+  RegShift  = (UINT8)(Source % 32);
+
+  // Write clear-enable register
+  MmioWrite32 (
+    GicDistributorBase + ARM_GIC_ICDICER + (4 * RegOffset),
+    1 << RegShift
+    );
+}
+
+STATIC
+BOOLEAN
+ArmGicIsInterruptEnabled (
+  IN UINTN  GicDistributorBase,
+  IN UINTN  GicRedistributorBase,
+  IN UINTN  Source
+  )
+{
+  UINT32  RegOffset;
+  UINT8   RegShift;
+  UINT32  Interrupts;
+
+  // Calculate enable register offset and bit position
+  RegOffset = (UINT32)(Source / 32);
+  RegShift  = (UINT8)(Source % 32);
+
+  Interrupts = MmioRead32 (
+                 GicDistributorBase + ARM_GIC_ICDISER + (4 * RegOffset)
+                 );
+
+  return ((Interrupts & (1 << RegShift)) != 0);
+}
+
 /**
   Enable interrupt source Source.
 
