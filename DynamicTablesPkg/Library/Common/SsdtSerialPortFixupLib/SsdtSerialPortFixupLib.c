@@ -31,7 +31,7 @@
 #include <Protocol/ConfigurationManagerProtocol.h>
 
 #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
-  #include <Library/ArmGicArchLib.h>
+  #include <Library/ArmGicLib.h>
 #endif
 
 /** C array containing the compiled AML template.
