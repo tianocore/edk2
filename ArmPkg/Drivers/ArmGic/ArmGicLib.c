@@ -193,7 +193,6 @@ ArmGicSetInterruptPriority (
 
   Revision = ArmGicGetSupportedArchRevision ();
   if ((Revision == ARM_GIC_ARCH_REVISION_2) ||
-      FeaturePcdGet (PcdArmGicV3WithV2Legacy) ||
       SourceIsSpi (Source))
   {
     MmioAndThenOr32 (
@@ -237,7 +236,6 @@ ArmGicEnableInterrupt (
 
   Revision = ArmGicGetSupportedArchRevision ();
   if ((Revision == ARM_GIC_ARCH_REVISION_2) ||
-      FeaturePcdGet (PcdArmGicV3WithV2Legacy) ||
       SourceIsSpi (Source))
   {
     // Write set-enable register
@@ -282,7 +280,6 @@ ArmGicDisableInterrupt (
 
   Revision = ArmGicGetSupportedArchRevision ();
   if ((Revision == ARM_GIC_ARCH_REVISION_2) ||
-      FeaturePcdGet (PcdArmGicV3WithV2Legacy) ||
       SourceIsSpi (Source))
   {
     // Write clear-enable register
@@ -327,7 +324,6 @@ ArmGicIsInterruptEnabled (
 
   Revision = ArmGicGetSupportedArchRevision ();
   if ((Revision == ARM_GIC_ARCH_REVISION_2) ||
-      FeaturePcdGet (PcdArmGicV3WithV2Legacy) ||
       SourceIsSpi (Source))
   {
     Interrupts = MmioRead32 (

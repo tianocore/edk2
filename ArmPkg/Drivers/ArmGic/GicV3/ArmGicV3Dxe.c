@@ -375,6 +375,7 @@ GicV3DxeInitialize (
   EFI_STATUS  Status;
   UINTN       Index;
   UINT64      MpId;
+  UINT64      CpuTarget;
 
   // Make sure the Interrupt Controller Protocol is not already installed in
   // the system.
@@ -386,9 +387,7 @@ GicV3DxeInitialize (
 
   // We will be driving this GIC in native v3 mode, i.e., with Affinity
   // Routing enabled. So ensure that the ARE bit is set.
-  if (!FeaturePcdGet (PcdArmGicV3WithV2Legacy)) {
-    MmioOr32 (mGicDistributorBase + ARM_GIC_ICDDCR, ARM_GIC_ICDDCR_ARE);
-  }
+  MmioOr32 (mGicDistributorBase + ARM_GIC_ICDDCR, ARM_GIC_ICDDCR_ARE);
 
   for (Index = 0; Index < mGicNumInterrupts; Index++) {
     GicV3DisableInterruptSource (&gHardwareInterruptV3Protocol, Index);
@@ -404,59 +403,31 @@ GicV3DxeInitialize (
 
   // Targets the interrupts to the Primary Cpu
 
-  if (FeaturePcdGet (PcdArmGicV3WithV2Legacy)) {
-    UINT32  CpuTarget;
+  MpId      = ArmReadMpidr ();
+  CpuTarget = MpId &
+              (ARM_CORE_AFF0 | ARM_CORE_AFF1 | ARM_CORE_AFF2 | ARM_CORE_AFF3);
 
-    // Only Primary CPU will run this code. We can identify our GIC CPU ID by
-    // reading the GIC Distributor Target register. The 8 first
-    // GICD_ITARGETSRn are banked to each connected CPU. These 8 registers
-    // hold the CPU targets fields for interrupts 0-31. More Info in the GIC
-    // Specification about "Interrupt Processor Targets Registers"
+  if ((MmioRead32 (
+         mGicDistributorBase + ARM_GIC_ICDDCR
+         ) & ARM_GIC_ICDDCR_DS) != 0)
+  {
+    // If the Disable Security (DS) control bit is set, we are dealing with a
+    // GIC that has only one security state. In this case, let's assume we are
+    // executing in non-secure state (which is appropriate for DXE modules)
+    // and that no other firmware has performed any configuration on the GIC.
+    // This means we need to reconfigure all interrupts to non-secure Group 1
+    // first.
 
-    // Read the first Interrupt Processor Targets Register (that corresponds
-    // to the 4 first SGIs)
-    CpuTarget = MmioRead32 (mGicDistributorBase + ARM_GIC_ICDIPTR);
+    MmioWrite32 (
+      mGicRedistributorsBase + ARM_GICR_CTLR_FRAME_SIZE + ARM_GIC_ICDISR,
+      0xffffffff
+      );
 
-    // The CPU target is a bit field mapping each CPU to a GIC CPU Interface.
-    // This value is 0 when we run on a uniprocessor platform.
-    if (CpuTarget != 0) {
-      // The 8 first Interrupt Processor Targets Registers are read-only
-      for (Index = 8; Index < (mGicNumInterrupts / 4); Index++) {
-        MmioWrite32 (
-          mGicDistributorBase + ARM_GIC_ICDIPTR + (Index * 4),
-          CpuTarget
-          );
-      }
-    }
-  } else {
-    UINT64  CpuTarget;
-
-    MpId      = ArmReadMpidr ();
-    CpuTarget = MpId &
-                (ARM_CORE_AFF0 | ARM_CORE_AFF1 | ARM_CORE_AFF2 | ARM_CORE_AFF3);
-
-    if ((MmioRead32 (
-           mGicDistributorBase + ARM_GIC_ICDDCR
-           ) & ARM_GIC_ICDDCR_DS) != 0)
-    {
-      // If the Disable Security (DS) control bit is set, we are dealing with a
-      // GIC that has only one security state. In this case, let's assume we are
-      // executing in non-secure state (which is appropriate for DXE modules)
-      // and that no other firmware has performed any configuration on the GIC.
-      // This means we need to reconfigure all interrupts to non-secure Group 1
-      // first.
-
+    for (Index = 32; Index < mGicNumInterrupts; Index += 32) {
       MmioWrite32 (
-        mGicRedistributorsBase + ARM_GICR_CTLR_FRAME_SIZE + ARM_GIC_ICDISR,
+        mGicDistributorBase + ARM_GIC_ICDISR + Index / 8,
         0xffffffff
         );
-
-      for (Index = 32; Index < mGicNumInterrupts; Index += 32) {
-        MmioWrite32 (
-          mGicDistributorBase + ARM_GIC_ICDISR + Index / 8,
-          0xffffffff
-          );
-      }
     }
 
     // Route the SPIs to the primary CPU. SPIs start at the INTID 32
