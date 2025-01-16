@@ -135,12 +135,6 @@ ArmGicSetSecureInterrupts (
 
 VOID
 EFIAPI
-ArmGicEnableDistributor (
-  IN  UINTN  GicDistributorBase
-  );
-
-VOID
-EFIAPI
 ArmGicDisableDistributor (
   IN  UINTN  GicDistributorBase
   );
