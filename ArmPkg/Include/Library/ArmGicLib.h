@@ -116,23 +116,6 @@ ArmGicGetInterfaceIdentification (
   IN  UINTN  GicInterruptInterfaceBase
   );
 
-// GIC Secure interfaces
-VOID
-EFIAPI
-ArmGicSetupNonSecure (
-  IN  UINTN  MpId,
-  IN  UINTN  GicDistributorBase,
-  IN  UINTN  GicInterruptInterfaceBase
-  );
-
-VOID
-EFIAPI
-ArmGicSetSecureInterrupts (
-  IN  UINTN  GicDistributorBase,
-  IN  UINTN  *GicSecureInterruptMask,
-  IN  UINTN  GicSecureInterruptMaskSize
-  );
-
 VOID
 EFIAPI
 ArmGicDisableDistributor (
@@ -145,27 +128,12 @@ ArmGicGetMaxNumInterrupts (
   IN  UINTN  GicDistributorBase
   );
 
-UINTN
-EFIAPI
-ArmGicSetPriorityMask (
-  IN  UINTN  GicInterruptInterfaceBase,
-  IN  INTN   PriorityMask
-  );
-
 // GIC revision 2 specific declarations
 
 // Interrupts from 1020 to 1023 are considered as special interrupts
 // (eg: spurious interrupts)
 #define ARM_GIC_IS_SPECIAL_INTERRUPTS(Interrupt) \
           (((Interrupt) >= 1020) && ((Interrupt) <= 1023))
-
-VOID
-EFIAPI
-ArmGicV2SetupNonSecure (
-  IN  UINTN  MpId,
-  IN  UINTN  GicDistributorBase,
-  IN  UINTN  GicInterruptInterfaceBase
-  );
 
 VOID
 EFIAPI
