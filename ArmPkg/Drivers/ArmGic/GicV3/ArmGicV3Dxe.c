@@ -628,6 +628,7 @@ GicV3DxeInitialize (
   UINTN       Index;
   UINT64      MpId;
   UINT64      CpuTarget;
+  UINT64      RegValue;
 
   // Make sure the Interrupt Controller Protocol is not already installed in
   // the system.
@@ -636,6 +637,12 @@ GicV3DxeInitialize (
   mGicDistributorBase    = (UINTN)PcdGet64 (PcdGicDistributorBase);
   mGicRedistributorsBase = PcdGet64 (PcdGicRedistributorsBase);
   mGicNumInterrupts      = ArmGicGetMaxNumInterrupts (mGicDistributorBase);
+
+  RegValue = ArmGicV3GetControlSystemRegisterEnable ();
+  if ((RegValue & ICC_SRE_EL2_SRE) == 0) {
+    ArmGicV3SetControlSystemRegisterEnable (RegValue | ICC_SRE_EL2_SRE);
+    ASSERT ((ArmGicV3GetControlSystemRegisterEnable () & ICC_SRE_EL2_SRE) != 0);
+  }
 
   // We will be driving this GIC in native v3 mode, i.e., with Affinity
   // Routing enabled. So ensure that the ARE bit is set.
