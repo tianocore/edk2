@@ -356,39 +356,3 @@ ArmGicDisableDistributor (
   // Disable Gic Distributor
   MmioWrite32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x0);
 }
-
-VOID
-EFIAPI
-ArmGicEnableInterruptInterface (
-  IN  UINTN  GicInterruptInterfaceBase
-  )
-{
-  ARM_GIC_ARCH_REVISION  Revision;
-
-  Revision = ArmGicGetSupportedArchRevision ();
-  if (Revision == ARM_GIC_ARCH_REVISION_2) {
-    ArmGicV2EnableInterruptInterface (GicInterruptInterfaceBase);
-  } else if (Revision == ARM_GIC_ARCH_REVISION_3) {
-    ArmGicV3EnableInterruptInterface ();
-  } else {
-    ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
-  }
-}
-
-VOID
-EFIAPI
-ArmGicDisableInterruptInterface (
-  IN  UINTN  GicInterruptInterfaceBase
-  )
-{
-  ARM_GIC_ARCH_REVISION  Revision;
-
-  Revision = ArmGicGetSupportedArchRevision ();
-  if (Revision == ARM_GIC_ARCH_REVISION_2) {
-    ArmGicV2DisableInterruptInterface (GicInterruptInterfaceBase);
-  } else if (Revision == ARM_GIC_ARCH_REVISION_3) {
-    ArmGicV3DisableInterruptInterface ();
-  } else {
-    ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
-  }
-}
