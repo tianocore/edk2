@@ -9,8 +9,6 @@
 #ifndef ARMGIC_H_
 #define ARMGIC_H_
 
-#include <Library/ArmGicArchLib.h>
-
 // GIC Distributor
 #define ARM_GIC_ICDDCR   0x000        // Distributor Control Register
 #define ARM_GIC_ICDICTR  0x004        // Interrupt Controller Type Register
