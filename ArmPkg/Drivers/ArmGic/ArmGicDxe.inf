@@ -51,7 +51,6 @@
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicRedistributorsBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
-  gArmTokenSpaceGuid.PcdArmGicV3WithV2Legacy
 
 [Depex]
   TRUE

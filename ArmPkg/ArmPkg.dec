@@ -148,9 +148,6 @@
   # it has been configured by the CPU DXE
   gArmTokenSpaceGuid.PcdDebuggerExceptionSupport|FALSE|BOOLEAN|0x00000032
 
-  # Define if the GICv3 controller should use the GICv2 legacy
-  gArmTokenSpaceGuid.PcdArmGicV3WithV2Legacy|FALSE|BOOLEAN|0x00000042
-
   # Whether to remap all unused memory NX before installing the CPU arch
   # protocol driver. This is needed on platforms that map all DRAM with RWX
   # attributes initially, and can be disabled otherwise.
