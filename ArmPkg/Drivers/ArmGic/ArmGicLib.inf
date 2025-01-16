@@ -23,7 +23,6 @@
   ArmLib
   DebugLib
   IoLib
-  ArmGicArchLib
 
 [Packages]
   ArmPkg/ArmPkg.dec
