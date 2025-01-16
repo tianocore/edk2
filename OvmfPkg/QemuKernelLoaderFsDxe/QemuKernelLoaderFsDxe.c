@@ -33,7 +33,7 @@
 // Static data that hosts the fw_cfg blobs and serves file requests.
 //
 typedef struct {
-  CHAR16    Name[8];
+  CHAR16    Name[48];
   struct {
     FIRMWARE_CONFIG_ITEM    SizeKey;
     FIRMWARE_CONFIG_ITEM    DataKey;
@@ -43,7 +43,7 @@ typedef struct {
 
 typedef struct KERNEL_BLOB KERNEL_BLOB;
 struct KERNEL_BLOB {
-  CHAR16         Name[8];
+  CHAR16         Name[48];
   UINT32         Size;
   UINT8          *Data;
   KERNEL_BLOB    *Next;
