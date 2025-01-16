@@ -463,7 +463,7 @@
   # Whether the EFI memory attributes protocol should be uninstalled before
   # invoking the OS loader. This may be needed to work around problematic
   # builds of shim that use the protocol incorrectly.
-  gUefiOvmfPkgTokenSpaceGuid.PcdUninstallMemAttrProtocol|FALSE|BOOLEAN|0x67
+  gUefiOvmfPkgTokenSpaceGuid.PcdUninstallMemAttrProtocol|TRUE|BOOLEAN|0x67
 
 [PcdsFeatureFlag]
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x1c
