@@ -65,8 +65,6 @@ typedef enum {
 
 extern VOID                         *mHobList;
 UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES  *mPciRootBridgeInfo = NULL;
-INT32                               mNode[0x500]        = { 0 };
-UINT32                              mNodeIndex          = 0;
 UPL_PCI_SEGMENT_INFO_HOB            *mUplPciSegmentInfoHob;
 
 /**
@@ -92,45 +90,6 @@ HobConstructor (
   IN VOID  *EfiFreeMemoryBottom,
   IN VOID  *EfiFreeMemoryTop
   );
-
-/**
-  It will record the memory node initialized.
-
-  @param[in]  Node           memory node is going to parsing.
-**/
-VOID
-RecordMemoryNode (
-  INT32  Node
-  )
-{
-  DEBUG ((DEBUG_INFO, "\n RecordMemoryNode  %x , mNodeIndex :%x  \n", Node, mNodeIndex));
-  mNode[mNodeIndex] = Node;
-  mNodeIndex++;
-}
-
-/**
-  Check the memory node if initialized.
-
-  @param[in]  Node           memory node is going to parsing.
-
-  @return TRUE               memory node was initialized. don't parse it again.
-  @return FALSE              memory node wasn't initialized, go to parse it.
-**/
-BOOLEAN
-CheckMemoryNodeIfInit (
-  INT32  Node
-  )
-{
-  UINT32  i;
-
-  for (i = 0; i < mNodeIndex; i++) {
-    if (mNode[i] == Node) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
-}
 
 /**
   It will check device node from FDT.
@@ -263,8 +222,6 @@ ParseReservedMemory (
       DEBUG ((DEBUG_INFO, "\n         Property  %a", TempStr));
       DEBUG ((DEBUG_INFO, "  %016lX  %016lX\n", StartAddress, NumberOfBytes));
     }
-
-    RecordMemoryNode (SubNode);
 
     if (AsciiStrnCmp (NodePtr->Name, "mmio@", AsciiStrLen ("mmio@")) == 0) {
       DEBUG ((DEBUG_INFO, "  MemoryMappedIO"));
@@ -993,13 +950,19 @@ ParseDtb (
     BuildMemoryAllocationHob (Addr, Size, EfiReservedMemoryType);
   }
 
-  index = RootBridgeCount - 1;
-  Depth = 0;
+  index               = RootBridgeCount - 1;
+  Depth               = 0;
+  ReservedMemoryDepth = 0xFF;
   for (Node = FdtNextNode (Fdt, 0, &Depth); Node >= 0; Node = FdtNextNode (Fdt, Node, &Depth)) {
     NodePtr = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + Node + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
     DEBUG ((DEBUG_INFO, "\n   Node(%08x)  %a   Depth %x", Node, NodePtr->Name, Depth));
 
+    // Ensure we don't parse a child of reserved-memory as main memory block.
     NodeType = CheckNodeType (NodePtr->Name, Depth);
+    if ((ReservedMemoryDepth != 0xFF) && (Depth <= ReservedMemoryDepth)) {
+      ReservedMemoryDepth = 0xFF;
+    }
+
     DEBUG ((DEBUG_INFO, "NodeType :0x%x\n", NodeType));
     switch (NodeType) {
       case MmioSerialPort:
@@ -1017,13 +980,14 @@ ParseDtb (
       case ReservedMemory:
         DEBUG ((DEBUG_INFO, "ParseReservedMemory\n"));
         ParseReservedMemory (Fdt, Node);
+        ReservedMemoryDepth = Depth;
         break;
       case Memory:
         DEBUG ((DEBUG_INFO, "ParseMemory\n"));
-        if (!CheckMemoryNodeIfInit (Node)) {
-          ParseMemory (Fdt, Node);
-        } else {
+        if ((ReservedMemoryDepth != 0xFF) && (Depth > ReservedMemoryDepth)) {
           DEBUG ((DEBUG_INFO, "Memory has initialized\n"));
+        } else {
+          ParseMemory (Fdt, Node);
         }
 
         break;
