@@ -22,6 +22,11 @@ Abstract:
 
 #define ARM_GIC_DEFAULT_PRIORITY  0x80
 
+// Interrupts from 1020 to 1023 are considered as special interrupts
+// (eg: spurious interrupts)
+#define ARM_GIC_IS_SPECIAL_INTERRUPTS(Interrupt) \
+          (((Interrupt) >= 1020) && ((Interrupt) <= 1023))
+
 extern EFI_HARDWARE_INTERRUPT_PROTOCOL   gHardwareInterruptV2Protocol;
 extern EFI_HARDWARE_INTERRUPT2_PROTOCOL  gHardwareInterrupt2V2Protocol;
 
@@ -179,6 +184,27 @@ GicV2GetInterruptSourceState (
   *InterruptState = ArmGicIsInterruptEnabled (mGicDistributorBase, 0, Source);
 
   return EFI_SUCCESS;
+}
+
+STATIC
+UINTN
+ArmGicV2AcknowledgeInterrupt (
+  IN  UINTN  GicInterruptInterfaceBase
+  )
+{
+  // Read the Interrupt Acknowledge Register
+  return MmioRead32 (GicInterruptInterfaceBase + ARM_GIC_ICCIAR);
+}
+
+STATIC
+VOID
+ArmGicV2EndOfInterrupt (
+  IN  UINTN  GicInterruptInterfaceBase,
+  IN UINTN   Source
+  )
+{
+  ASSERT (Source <= MAX_UINT32);
+  MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCEIOR, (UINT32)Source);
 }
 
 /**
@@ -407,6 +433,30 @@ EFI_HARDWARE_INTERRUPT2_PROTOCOL  gHardwareInterrupt2V2Protocol = {
   GicV2GetTriggerType,
   GicV2SetTriggerType
 };
+
+STATIC
+VOID
+ArmGicV2EnableInterruptInterface (
+  IN  UINTN  GicInterruptInterfaceBase
+  )
+{
+  /*
+  * Enable the CPU interface in Non-Secure world
+  * Note: The ICCICR register is banked when Security extensions are implemented
+  */
+  MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCICR, 0x1);
+}
+
+STATIC
+VOID
+ArmGicV2DisableInterruptInterface (
+  IN  UINTN  GicInterruptInterfaceBase
+  )
+{
+  // Disable Gic Interface
+  MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCICR, 0x0);
+  MmioWrite32 (GicInterruptInterfaceBase + ARM_GIC_ICCPMR, 0x0);
+}
 
 /**
   Shutdown our hardware
