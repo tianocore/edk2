@@ -1,5 +1,5 @@
 /** @file
-  ArmGicArchLib library class implementation for DT based virt platforms
+  NULL library class implementation to discover the GIC for DT based virt platforms
 
   Copyright (c) 2015 - 2016, Linaro Ltd. All rights reserved.<BR>
 
@@ -11,7 +11,6 @@
 #include <Uefi.h>
 
 #include <Library/ArmGicLib.h>
-#include <Library/ArmGicArchLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
@@ -19,15 +18,12 @@
 
 #include <Protocol/FdtClient.h>
 
-STATIC ARM_GIC_ARCH_REVISION  mGicArchRevision;
-
 RETURN_STATUS
 EFIAPI
 ArmVirtGicArchLibConstructor (
   VOID
   )
 {
-  UINT32               IccSre;
   FDT_CLIENT_PROTOCOL  *FdtClient;
   CONST UINT64         *Reg;
   UINT32               RegSize;
@@ -105,25 +101,6 @@ ArmVirtGicArchLibConstructor (
         RedistBase
         ));
 
-      //
-      // The default implementation of ArmGicArchLib is responsible for enabling
-      // the system register interface on the GICv3 if one is found. So let's do
-      // the same here.
-      //
-      IccSre = ArmGicV3GetControlSystemRegisterEnable ();
-      if (!(IccSre & ICC_SRE_EL2_SRE)) {
-        ArmGicV3SetControlSystemRegisterEnable (IccSre | ICC_SRE_EL2_SRE);
-        IccSre = ArmGicV3GetControlSystemRegisterEnable ();
-      }
-
-      //
-      // Unlike the default implementation, there is no fall through to GICv2
-      // mode if this GICv3 cannot be driven in native mode due to the fact
-      // that the System Register interface is unavailable.
-      //
-      ASSERT (IccSre & ICC_SRE_EL2_SRE);
-
-      mGicArchRevision = ARM_GIC_ARCH_REVISION_3;
       break;
 
     case 2:
@@ -146,7 +123,6 @@ ArmVirtGicArchLibConstructor (
 
       DEBUG ((DEBUG_INFO, "Found GIC @ 0x%Lx/0x%Lx\n", DistBase, CpuBase));
 
-      mGicArchRevision = ARM_GIC_ARCH_REVISION_2;
       break;
 
     default:
@@ -155,13 +131,4 @@ ArmVirtGicArchLibConstructor (
   }
 
   return RETURN_SUCCESS;
-}
-
-ARM_GIC_ARCH_REVISION
-EFIAPI
-ArmGicGetSupportedArchRevision (
-  VOID
-  )
-{
-  return mGicArchRevision;
 }
