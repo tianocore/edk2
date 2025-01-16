@@ -389,6 +389,15 @@ GicV2SetTriggerType (
   return EFI_SUCCESS;
 }
 
+STATIC
+VOID
+ArmGicEnableDistributor (
+  IN  UINTN  GicDistributorBase
+  )
+{
+  MmioWrite32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x1);
+}
+
 EFI_HARDWARE_INTERRUPT2_PROTOCOL  gHardwareInterrupt2V2Protocol = {
   (HARDWARE_INTERRUPT2_REGISTER)RegisterInterruptSource,
   (HARDWARE_INTERRUPT2_ENABLE)GicV2EnableInterruptSource,

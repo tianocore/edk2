@@ -551,6 +551,22 @@ GicV3SetTriggerType (
   return EFI_SUCCESS;
 }
 
+STATIC
+VOID
+ArmGicEnableDistributor (
+  IN  UINTN  GicDistributorBase
+  )
+{
+  UINT32  GicDistributorCtl;
+
+  GicDistributorCtl = MmioRead32 (GicDistributorBase + ARM_GIC_ICDDCR);
+  if ((GicDistributorCtl & ARM_GIC_ICDDCR_ARE) != 0) {
+    MmioOr32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x2);
+  } else {
+    MmioOr32 (GicDistributorBase + ARM_GIC_ICDDCR, 0x1);
+  }
+}
+
 EFI_HARDWARE_INTERRUPT2_PROTOCOL  gHardwareInterrupt2V3Protocol = {
   (HARDWARE_INTERRUPT2_REGISTER)RegisterInterruptSource,
   (HARDWARE_INTERRUPT2_ENABLE)GicV3EnableInterruptSource,

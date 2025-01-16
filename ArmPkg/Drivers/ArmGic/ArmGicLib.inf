@@ -15,7 +15,6 @@
 
 [Sources]
   ArmGicLib.c
-  ArmGicNonSecLib.c
 
   GicV2/ArmGicV2Lib.c
   GicV2/ArmGicV2NonSecLib.c
