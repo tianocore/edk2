@@ -704,6 +704,11 @@ GicV3DxeInitialize (
   // Set priority mask reg to 0xff to allow all priorities through
   ArmGicV3SetPriorityMask (0xff);
 
+  // Use combined priority drop and deactivate (EOImode == 0)
+  RegValue  = ArmGicV3GetControlRegister ();
+  RegValue &= ~(UINT64)ICC_CTLR_EOImode;
+  ArmGicV3SetControlRegister (RegValue);
+
   // Enable gic cpu interface
   ArmGicV3EnableInterruptInterface ();
 

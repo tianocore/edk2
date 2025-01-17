@@ -139,4 +139,14 @@ ArmGicV3SetPriorityMask (
   IN UINTN  Priority
   );
 
+UINTN
+ArmGicV3GetControlRegister (
+  VOID
+  );
+
+VOID
+ArmGicV3SetControlRegister (
+  IN UINTN  Value
+  );
+
 #endif // ARM_GIC_DXE_H_

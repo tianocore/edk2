@@ -78,3 +78,19 @@ ASM_FUNC(ArmGicV3SetPriorityMask)
 ASM_FUNC(ArmGicV3SetBinaryPointer)
         mcr     p15, 0, r0, c12, c12, 3 //ICC_BPR1
         bx      lr
+
+//UINTN
+//ArmGicV3GetControlRegister(
+//  VOID
+//  );
+ASM_FUNC(ArmGicV3GetControlRegister)
+        mrc     p15, 0, r0, c12, c12, 4 //ICC_CTLR
+        bx      lr
+
+//VOID
+//ArmGicV3SetControlRegister(
+//  IN UINTN          Value
+//  );
+ASM_FUNC(ArmGicV3SetControlRegister)
+        mcr     p15, 0, r0, c12, c12, 4 //ICC_CTLR
+        bx      lr
