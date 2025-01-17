@@ -338,7 +338,7 @@
 
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 
-  ArmPkg/Drivers/ArmGic/ArmGicDxe.inf {
+  ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf {
     <LibraryClasses>
       NULL|ArmVirtPkg/Library/ArmVirtGicArchLib/ArmVirtGicArchLib.inf
   }
