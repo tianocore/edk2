@@ -55,6 +55,7 @@
   PpiListLib
   PeiServicesLib
   FrameBufferBltLib
+  StackCheckLib
 
 [Ppis]
   gEmuThunkPpiGuid

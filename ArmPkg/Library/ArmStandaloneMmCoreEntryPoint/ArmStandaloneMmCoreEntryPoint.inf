@@ -47,6 +47,7 @@
   ArmSvcLib
   ArmTransferListLib
   ArmFfaLib
+  StackCheckLib
 
 [Guids]
   gMpInformationHobGuid

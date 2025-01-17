@@ -340,6 +340,11 @@
   ##  @libraryclass  Provides function to support TDX processing.
   TdxLib|Include/Library/TdxLib.h
 
+[LibraryClasses.X64]
+  ##  @libraryclass  Defines a set of interfaces for the MM core entrypoint. The ARM/AARCH64 version lives in ArmPkg
+  #
+  StandaloneMmCoreEntryPoint|Include/Library/StandaloneMmCoreEntryPoint.h
+
 [LibraryClasses.RISCV64]
   ##  @libraryclass  Provides function to make ecalls to SBI
   BaseRiscVSbiLib|Include/Library/BaseRiscVSbiLib.h

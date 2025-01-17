@@ -323,10 +323,7 @@
     # USER_DEFINED components skip normal NULL lib linking, so we have to link this
     # specially here for the libs that have stack guard enabled
     ##
-    EmulatorPkg/Win/Host/WinHost.inf {
-      <LibraryClasses>
-        NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
-    }
+    EmulatorPkg/Win/Host/WinHost.inf
   !else
     ##
     #  Emulator, OS POSIX application
@@ -334,10 +331,7 @@
     # USER_DEFINED components skip normal NULL lib linking, so we have to link this
     # specially here for the libs that have stack guard enabled
     ##
-    EmulatorPkg/Unix/Host/Host.inf {
-      <LibraryClasses>
-        NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
-    }
+    EmulatorPkg/Unix/Host/Host.inf
   !endif
 !endif
 

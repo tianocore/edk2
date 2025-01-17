@@ -11,6 +11,14 @@
 #
 ##
 
+[Defines]
+!ifndef CUSTOM_STACK_CHECK_LIB
+  # The DSC parser will set any unset macros to 0. Then, below when we check for STATIC or DYNAMIC, even if we couch
+  # that in a !ifdef CUSTOM_STACK_CHECK_LIB, the parser will issue a warning that we are comparing a boolean (0) against
+  # a string, which will always fail. So we set it to a dummy value here.
+  DEFINE CUSTOM_STACK_CHECK_LIB = NONE
+!endif
+
 [LibraryClasses]
   OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
   ArmTrngLib|MdePkg/Library/BaseArmTrngLibNull/BaseArmTrngLibNull.inf
@@ -22,12 +30,33 @@
   MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
   StackCheckFailureHookLib|MdePkg/Library/StackCheckFailureHookLibNull/StackCheckFailureHookLibNull.inf
 
-!ifndef CUSTOM_STACK_CHECK_LIB
+!if $(CUSTOM_STACK_CHECK_LIB) == STATIC
+  # To only use the static stack cookie, we just include the checking functionality.
+  StackCheckLib|MdePkg/Library/StackCheckLib/StackCheckLib.inf
+!elseif $(CUSTOM_STACK_CHECK_LIB) == DYNAMIC
+  StackCheckLib|MdePkg/Library/StackCheckLib/StackCheckLib.inf
+
+  # To use the dynamic stack cookie, we need to include the entry point libraries that will set up the stack cookie.
+  # Typically, PeiCore and PEIMs will not use dynamic stack cookies, so they are not included generally.
+  # If dynamic stack cookies are not enabled, we do not setup the entry points, as the existing behavior was
+  # for a platform to define them.
+  # StandaloneMmCoreEntryPoint is not included here because support dynamic stack cookies is not available for
+  # AARCH64 here. X64 platforms should include the DynamicStackCookieEntryPointLib in their DSC file.
+  DxeCoreEntryPoint|MdePkg/Library/DynamicStackCookieEntryPointLib/DxeCoreEntryPoint.inf
+  StandaloneMmDriverEntryPoint|MdePkg/Library/DynamicStackCookieEntryPointLib/StandaloneMmDriverEntryPoint.inf
+  UefiApplicationEntryPoint|MdePkg/Library/DynamicStackCookieEntryPointLib/UefiApplicationEntryPoint.inf
+  UefiDriverEntryPoint|MdePkg/Library/DynamicStackCookieEntryPointLib/UefiDriverEntryPoint.inf
+
+!else
   # If CUSTOM_STACK_CHECK_LIB is set, MdeLibs.dsc.inc will not link StackCheckLibNull and it is expected that the
   # DSC being built is providing it's own implementation of StackCheckLib.
-  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
-
+  StackCheckLib|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 !endif
+
+[LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE]
+  # Most platforms will not want stack cookie checking for SEC and PEI_CORE because any exceptions there will triple
+  # fault, since no exception handlers are installed yet
+  StackCheckLib|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   #
