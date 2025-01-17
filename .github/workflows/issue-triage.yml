@@ -1,0 +1,57 @@
+# This workflow assists with initial triage of new issues by applying labels
+# based on data provided in the issue.
+#
+# Configuration file that maps issue form input values to labels:
+#   advanced-issue-labeler.yml
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+# For more information, see:
+# https://github.com/stefanbuck/github-issue-parser
+# https://github.com/redhat-plumbers-in-action/advanced-issue-labeler
+
+name: Issue Triage Workflow
+
+on:
+  issues:
+    types: [ opened ]
+
+jobs:
+  triage_issue:
+    name: Triage Issue
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        template: [ bug_report.yml, documentation_request.yml, feature_request.yml ]
+
+    permissions:
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse Issue Form
+        uses: stefanbuck/github-issue-parser@v3
+        id: issue-parser
+        with:
+          issue-body: ${{ github.event.issue.body }}
+          template-path: .github/ISSUE_TEMPLATE/${{ matrix.template }}
+
+      - name: Apply Labels from Triage
+        uses: redhat-plumbers-in-action/advanced-issue-labeler@v3
+        with:
+          issue-form: ${{ steps.issue-parser.outputs.jsonString }}
+          template: ${{ matrix.template }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Assignee
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FIX_OWNER: ${{ steps.issue-parser.outputs.issueparser_fix_owner }}
+        run: |
+          if [[ $FIX_OWNER == "I will fix it" ]] || [[ $FIX_OWNER == "I will make the change" ]] || [[ $FIX_OWNER == "I will implement the feature" ]]
+          then
+            gh issue edit ${{ github.event.issue.html_url }} --add-assignee ${{ github.event.issue.user.login }}
+          fi

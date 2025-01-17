@@ -404,6 +404,10 @@ WinNtWndRegisterKeyNotify (
 
   Private = GRAPHICS_PRIVATE_DATA_FROM_THIS (GraphicsIo);
 
+  if (Private == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   Private->MakeRegisterdKeyCallback    = MakeCallBack;
   Private->BreakRegisterdKeyCallback   = BreakCallBack;
   Private->RegisterdKeyCallbackContext = Context;

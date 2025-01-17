@@ -172,27 +172,6 @@ ArmGicSendSgiTo (
   IN  UINT8  SgiId
   );
 
-/*
- * Acknowledge and return the value of the Interrupt Acknowledge Register
- *
- * InterruptId is returned separately from the register value because in
- * the GICv2 the register value contains the CpuId and InterruptId while
- * in the GICv3 the register value is only the InterruptId.
- *
- * @param GicInterruptInterfaceBase   Base Address of the GIC CPU Interface
- * @param InterruptId                 InterruptId read from the Interrupt
- *                                    Acknowledge Register
- *
- * @retval value returned by the Interrupt Acknowledge Register
- *
- */
-UINTN
-EFIAPI
-ArmGicAcknowledgeInterrupt (
-  IN  UINTN  GicInterruptInterfaceBase,
-  OUT UINTN  *InterruptId
-  );
-
 VOID
 EFIAPI
 ArmGicEndOfInterrupt (
@@ -210,10 +189,10 @@ ArmGicSetPriorityMask (
 VOID
 EFIAPI
 ArmGicSetInterruptPriority (
-  IN UINTN  GicDistributorBase,
-  IN UINTN  GicRedistributorBase,
-  IN UINTN  Source,
-  IN UINTN  Priority
+  IN UINTN   GicDistributorBase,
+  IN UINTN   GicRedistributorBase,
+  IN UINTN   Source,
+  IN UINT32  Priority
   );
 
 VOID

@@ -223,7 +223,7 @@ ACPI_TABLE_GENERATOR  WsmtGenerator = {
   // Minimum supported ACPI Table Revision
   EFI_WSMT_TABLE_REVISION,
   // Creator ID
-  TABLE_GENERATOR_CREATOR_ID_ARM,
+  TABLE_GENERATOR_CREATOR_ID,
   // Creator Revision
   WSMT_GENERATOR_REVISION,
   // Build Table function

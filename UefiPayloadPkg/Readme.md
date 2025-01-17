@@ -2,10 +2,10 @@
 Provide UEFI Universal Payload for different bootloader to generate EFI environment
 
 # Spec
-UniversalPayload URL: https://universalscalablefirmware.github.io/documentation/2_universal_payload.html
-UniversalPayload URL: https://universalpayload.github.io/spec/
-ELF Format URL: https://refspecs.linuxfoundation.org/elf/elf.pdf
-FIT Format URL: https://universalpayload.github.io/spec/chapter2-payload-image-format.html
+- UniversalPayload URL: https://universalscalablefirmware.github.io/documentation/2_universal_payload.html
+- UniversalPayload URL: https://universalpayload.github.io/spec/
+- ELF Format URL: https://refspecs.linuxfoundation.org/elf/elf.pdf
+- FIT Format URL: https://universalpayload.github.io/spec/chapter2-payload-image-format.html
 
 # Uefi UniversalPayload Format
   | Binary Format | HandOffPayload - HOB |
@@ -48,29 +48,19 @@ FIT Format URL: https://universalpayload.github.io/spec/chapter2-payload-image-f
                   +  +-----------------------+
     ```
 
-# Environment
+# Build Environment
   - ELF
     ```
-    Download and install https://github.com/llvm/llvm-project/releases/tag/llvmorg-10.0.1
+    Install GCC compiler on linux and MSVC compiler on windows
+    Install CLANG compiler https://github.com/llvm/llvm-project/releases/tag/llvmorg-10.0.1 on windows and linux
     ```
   - FIT
-    - Windows
-      ```
-      Download and install swig by https://swig.org/ and also set install path into environment variable
-      ```
-      ```powershell
-      Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-      choco install dtc-msys2
-      pip3 install pefile
-      pip3 install pylibfdt
-      ```
-    - Ubuntu
-      ```bash
-      sudo apt install -y u-boot-tools
-      pip3 install pefile
-      pip3 install swig
-      pip3 install pylibfdt
-      ```
+    ```
+    Install GCC compiler on linux and MSVC compiler on windows
+    pip3 install pefile
+    pip3 install pylibfdt
+    ```
+
 # How to build UEFI UniversalPayload
   - Windows
     - edksetup Rebuild
@@ -84,6 +74,24 @@ FIT Format URL: https://universalpayload.github.io/spec/chapter2-payload-image-f
 
   - UniversalPayload.fit
     - python UefiPayloadPkg/UniversalPayloadBuild.py -t <TOOL_CHAIN_TAG> --Fit
+
+# How to dump payload binary data
+  - UniversalPayload.elf
+    - Install elf dump tools https://github.com/llvm/llvm-project/releases/tag/llvmorg-10.0.1
+    - llvm-objdump -h Build/UefiPayloadPkgX64/UniversalPayload.elf
+
+  - UniversalPayload.fit
+    - Install fdtdump tool
+      - Windows
+        ```powershell
+        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+        choco install dtc-msys2
+        ```
+      - Linux
+        ```bash
+        sudo apt install -y u-boot-tools
+        ```
+
     - fdtdump Build/UefiPayloadPkgX64/UniversalPayload.fit
 
 # Edk2boot + UefiUniversalPayload

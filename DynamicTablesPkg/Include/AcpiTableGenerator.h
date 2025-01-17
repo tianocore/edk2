@@ -75,6 +75,9 @@ The Dynamic Tables Framework implements the following ACPI table generators:
             SSDT table describing a Pci Express bus.
   - WSMT  : The WSMT generator collates the WSMT protection flag information
             from the Configuration Manager and builds the WSMT table.
+  - SPMI  : The SPMI generator collects the SPMI interface and
+            optionally SPMI interrupt and deviceid (or uid) information from the
+            Configuration Manager and builds the SPMI table.
 */
 
 /** The ACPI_TABLE_GENERATOR_ID type describes ACPI table generator ID.
@@ -107,6 +110,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdWsmt,                          ///< WSMT Generator
   EStdAcpiTableIdHpet,                          ///< HPET Generator
   EStdAcpiTableIdSsdtHpet,                      ///< SSDT HPET Generator
+  EStdAcpiTableIdSpmi,                          ///< SPMI Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 

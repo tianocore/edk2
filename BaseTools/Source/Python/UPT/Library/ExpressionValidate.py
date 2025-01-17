@@ -66,13 +66,13 @@ class _ExprError(Exception):
 ## _ExprBase
 #
 class _ExprBase:
-    HEX_PATTERN = '[\t\s]*0[xX][a-fA-F0-9]+'
-    INT_PATTERN = '[\t\s]*[0-9]+'
-    MACRO_PATTERN = '[\t\s]*\$\(([A-Z][_A-Z0-9]*)\)'
+    HEX_PATTERN = r'[\t\s]*0[xX][a-fA-F0-9]+'
+    INT_PATTERN = r'[\t\s]*[0-9]+'
+    MACRO_PATTERN = r'[\t\s]*\$\(([A-Z][_A-Z0-9]*)\)'
     PCD_PATTERN = \
-    '[\t\s]*[_a-zA-Z][a-zA-Z0-9_]*[\t\s]*\.[\t\s]*[_a-zA-Z][a-zA-Z0-9_]*'
-    QUOTED_PATTERN = '[\t\s]*L?"[^"]*"'
-    BOOL_PATTERN = '[\t\s]*(true|True|TRUE|false|False|FALSE)'
+    r'[\t\s]*[_a-zA-Z][a-zA-Z0-9_]*[\t\s]*\.[\t\s]*[_a-zA-Z][a-zA-Z0-9_]*'
+    QUOTED_PATTERN = r'[\t\s]*L?"[^"]*"'
+    BOOL_PATTERN = r'[\t\s]*(true|True|TRUE|false|False|FALSE)'
     def __init__(self, Token):
         self.Token = Token
         self.Index = 0
@@ -303,9 +303,9 @@ class _LogicalExpressionParser(_ExprBase):
 ## _ValidRangeExpressionParser
 #
 class _ValidRangeExpressionParser(_ExprBase):
-    INT_RANGE_PATTERN = '[\t\s]*[0-9]+[\t\s]*-[\t\s]*[0-9]+'
+    INT_RANGE_PATTERN = r'[\t\s]*[0-9]+[\t\s]*-[\t\s]*[0-9]+'
     HEX_RANGE_PATTERN = \
-        '[\t\s]*0[xX][a-fA-F0-9]+[\t\s]*-[\t\s]*0[xX][a-fA-F0-9]+'
+        r'[\t\s]*0[xX][a-fA-F0-9]+[\t\s]*-[\t\s]*0[xX][a-fA-F0-9]+'
     def __init__(self, Token):
         _ExprBase.__init__(self, Token)
         self.Parens = 0
@@ -407,7 +407,7 @@ class _ValidRangeExpressionParser(_ExprBase):
 ## _ValidListExpressionParser
 #
 class _ValidListExpressionParser(_ExprBase):
-    VALID_LIST_PATTERN = '(0[xX][0-9a-fA-F]+|[0-9]+)([\t\s]*,[\t\s]*(0[xX][0-9a-fA-F]+|[0-9]+))*'
+    VALID_LIST_PATTERN = r'(0[xX][0-9a-fA-F]+|[0-9]+)([\t\s]*,[\t\s]*(0[xX][0-9a-fA-F]+|[0-9]+))*'
     def __init__(self, Token):
         _ExprBase.__init__(self, Token)
         self.NUM = 1

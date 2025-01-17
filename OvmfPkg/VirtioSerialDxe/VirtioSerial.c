@@ -165,6 +165,7 @@ VirtioSerialRxControl (
         if (Control.Id < MAX_PORTS) {
           VirtioSerialPortSetConsole (Dev, Control.Id);
           Dev->NumConsoles++;
+          VirtioSerialPortSetDeviceOpen (Dev, Control.Id, 1);
         }
 
         break;

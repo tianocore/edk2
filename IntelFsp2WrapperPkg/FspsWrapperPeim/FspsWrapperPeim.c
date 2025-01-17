@@ -421,13 +421,22 @@ FspsWrapperInitDispatchMode (
   EFI_PEI_PPI_DESCRIPTOR                                 *MeasurementExcludedPpiList;
 
   MeasurementExcludedFvPpi = AllocatePool (sizeof (*MeasurementExcludedFvPpi));
-  ASSERT (MeasurementExcludedFvPpi != NULL);
+  if (MeasurementExcludedFvPpi == NULL) {
+    ASSERT (MeasurementExcludedFvPpi != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   MeasurementExcludedFvPpi->Count          = 1;
   MeasurementExcludedFvPpi->Fv[0].FvBase   = PcdGet32 (PcdFspsBaseAddress);
   MeasurementExcludedFvPpi->Fv[0].FvLength = ((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFspsBaseAddress))->FvLength;
 
   MeasurementExcludedPpiList = AllocatePool (sizeof (*MeasurementExcludedPpiList));
-  ASSERT (MeasurementExcludedPpiList != NULL);
+  if (MeasurementExcludedPpiList == NULL) {
+    ASSERT (MeasurementExcludedPpiList != NULL);
+    FreePool (MeasurementExcludedFvPpi);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   MeasurementExcludedPpiList->Flags = EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
   MeasurementExcludedPpiList->Guid  = &gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid;
   MeasurementExcludedPpiList->Ppi   = MeasurementExcludedFvPpi;

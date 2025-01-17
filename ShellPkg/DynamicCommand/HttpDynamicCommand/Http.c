@@ -1815,6 +1815,10 @@ DownloadFile (
                     Context->Uri,
                     StrLen (Context->Uri)
                     );
+    if (DownloadUrl == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ON_EXIT;
+    }
 
     PRINT_HII (STRING_TOKEN (STR_HTTP_DOWNLOADING), DownloadUrl);
 

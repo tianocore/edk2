@@ -67,14 +67,20 @@ ShellCommandRunMode (
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetCount (Package) == 3) {
       Temp = ShellCommandLineGetRawValue (Package, 1);
-      if (!ShellIsHexOrDecimalNumber (Temp, FALSE, FALSE)) {
+      if (Temp == NULL) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mode", Temp);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      } else if (!ShellIsHexOrDecimalNumber (Temp, FALSE, FALSE)) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mode", Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
       }
 
       NewCol = ShellStrToUintn (Temp);
       Temp   = ShellCommandLineGetRawValue (Package, 2);
-      if (!ShellIsHexOrDecimalNumber (Temp, FALSE, FALSE)) {
+      if (Temp == NULL) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mode", Temp);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      } else if (!ShellIsHexOrDecimalNumber (Temp, FALSE, FALSE)) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mode", Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
       }

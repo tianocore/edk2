@@ -68,7 +68,7 @@ PeCoffLoaderGetPeHeader (
   UINTN                     Size;
   UINTN                     ReadSize;
   UINT32                    SectionHeaderOffset;
-  UINT32                    Index;
+  UINTN                     Index;
   UINT32                    HeaderWithoutDataDir;
   CHAR8                     BufferData;
   UINTN                     NumberOfSections;
@@ -1054,7 +1054,7 @@ PeCoffLoaderRelocateImage (
     RelocDir = &Hdr.Te->DataDirectory[0];
   }
 
-  if ((RelocDir != NULL) && (RelocDir->Size > 0)) {
+  if ((RelocDir != NULL) && (RelocDir->Size > 0) && ((RelocDir->Size - 1) < (MAX_UINT32 - RelocDir->VirtualAddress))) {
     RelocBase    = (EFI_IMAGE_BASE_RELOCATION *)PeCoffLoaderImageAddress (ImageContext, RelocDir->VirtualAddress, TeStrippedOffset);
     RelocBaseEnd = (EFI_IMAGE_BASE_RELOCATION *)PeCoffLoaderImageAddress (
                                                   ImageContext,
@@ -1407,7 +1407,7 @@ PeCoffLoaderLoadImage (
       return RETURN_LOAD_ERROR;
     }
 
-    if (Section->SizeOfRawData > 0) {
+    if ((Section->SizeOfRawData > 0) && (Base != NULL)) {
       Status = ImageContext->ImageRead (
                                ImageContext->Handle,
                                Section->PointerToRawData - TeStrippedOffset,
@@ -1424,7 +1424,7 @@ PeCoffLoaderLoadImage (
     // If raw size is less then virtual size, zero fill the remaining
     //
 
-    if (Size < Section->Misc.VirtualSize) {
+    if ((Size < Section->Misc.VirtualSize) && (Base != NULL)) {
       ZeroMem (Base + Size, Section->Misc.VirtualSize - Size);
     }
 

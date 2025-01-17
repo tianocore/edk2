@@ -71,7 +71,11 @@ SetExceptionHandlerData (
   IdtTable = (IA32_IDT_GATE_DESCRIPTOR *)IdtDescriptor.Base;
 
   Exception0StubHeader = AllocatePool (sizeof (*Exception0StubHeader));
-  ASSERT (Exception0StubHeader != NULL);
+  if (Exception0StubHeader == NULL) {
+    ASSERT (Exception0StubHeader != NULL);
+    return;
+  }
+
   CopyMem (
     Exception0StubHeader->ExceptionStubHeader,
     (VOID *)ArchGetIdtHandler (&IdtTable[0]),
@@ -165,10 +169,18 @@ InitializeCpuExceptionHandlers (
   RESERVED_VECTORS_DATA   *ReservedVectors;
 
   ReservedVectors = AllocatePool (sizeof (RESERVED_VECTORS_DATA) * CPU_EXCEPTION_NUM);
-  ASSERT (ReservedVectors != NULL);
+  if (ReservedVectors == NULL) {
+    ASSERT (ReservedVectors != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   ExceptionHandlerData = AllocatePool (sizeof (EXCEPTION_HANDLER_DATA));
-  ASSERT (ExceptionHandlerData != NULL);
+  if (ExceptionHandlerData == NULL) {
+    ASSERT (ExceptionHandlerData != NULL);
+    FreePool (ReservedVectors);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   ExceptionHandlerData->IdtEntryCount            = CPU_EXCEPTION_NUM;
   ExceptionHandlerData->ReservedVectors          = ReservedVectors;
   ExceptionHandlerData->ExternalInterruptHandler = AllocateZeroPool (sizeof (EFI_CPU_INTERRUPT_HANDLER) * ExceptionHandlerData->IdtEntryCount);

@@ -4183,11 +4183,13 @@ exit_handler:
   Creates and optionally adds the following node
    Name(_PSD, Package()
    {
-    NumEntries,  // Integer
-    Revision,    // Integer
-    Domain,      // Integer
-    CoordType,   // Integer
-    NumProc,     // Integer
+    Package () {
+      NumEntries,  // Integer
+      Revision,    // Integer
+      Domain,      // Integer
+      CoordType,   // Integer
+      NumProc,     // Integer
+    }
   })
 
   Cf. ACPI 6.5, s8.4.5.5 _PSD (P-State Dependency)
@@ -4213,9 +4215,13 @@ AmlCreatePsdNode (
 {
   EFI_STATUS              Status;
   AML_OBJECT_NODE_HANDLE  PsdNode;
+  AML_OBJECT_NODE_HANDLE  PsdParentPackage;
   AML_OBJECT_NODE_HANDLE  PsdPackage;
   AML_OBJECT_NODE_HANDLE  IntegerNode;
   UINT32                  NumberOfEntries;
+
+  PsdParentPackage = NULL;
+  PsdPackage       = NULL;
 
   if ((PsdInfo == NULL) ||
       ((ParentNode == NULL) && (NewPsdNode == NULL)))
@@ -4253,15 +4259,21 @@ AmlCreatePsdNode (
 
   // Get the Package object node of the _PSD node,
   // which is the 2nd fixed argument (i.e. index 1).
-  PsdPackage = (AML_OBJECT_NODE_HANDLE)AmlGetFixedArgument (
-                                         PsdNode,
-                                         EAmlParseIndexTerm1
-                                         );
-  if ((PsdPackage == NULL)                                              ||
-      (AmlGetNodeType ((AML_NODE_HANDLE)PsdPackage) != EAmlNodeObject)  ||
-      (!AmlNodeHasOpCode (PsdPackage, AML_PACKAGE_OP, 0)))
+  PsdParentPackage = (AML_OBJECT_NODE_HANDLE)AmlGetFixedArgument (
+                                               PsdNode,
+                                               EAmlParseIndexTerm1
+                                               );
+  if ((PsdParentPackage == NULL)                                              ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)PsdParentPackage) != EAmlNodeObject)  ||
+      (!AmlNodeHasOpCode (PsdParentPackage, AML_PACKAGE_OP, 0)))
   {
     Status = EFI_INVALID_PARAMETER;
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler;
+  }
+
+  Status = AmlCodeGenPackage (&PsdPackage);
+  if (EFI_ERROR (Status)) {
     ASSERT_EFI_ERROR (Status);
     goto error_handler;
   }
@@ -4351,6 +4363,17 @@ AmlCreatePsdNode (
     goto error_handler;
   }
 
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)PsdParentPackage,
+             (AML_NODE_HANDLE)PsdPackage
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler;
+  }
+
+  PsdPackage = NULL; // Prevent double free if error occurs after this point
+
   Status = LinkNode (PsdNode, ParentNode, NewPsdNode);
   if (EFI_ERROR (Status)) {
     ASSERT_EFI_ERROR (Status);
@@ -4360,6 +4383,13 @@ AmlCreatePsdNode (
   return Status;
 
 error_handler:
-  AmlDeleteTree ((AML_NODE_HANDLE)PsdNode);
+  if (PsdPackage != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)PsdPackage);
+  }
+
+  if (PsdParentPackage != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)PsdParentPackage);
+  }
+
   return Status;
 }

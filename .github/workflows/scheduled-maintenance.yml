@@ -1,0 +1,52 @@
+# This workflow performs scheduled maintenance tasks.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+name: Scheduled Maintenance
+
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    # Run every hour - https://crontab.guru/#0_*_*_*_*
+    - cron:  '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  repo_cleanup:
+    runs-on: ubuntu-latest
+
+    permissions:
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Prune Won't Fix Pull Requests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            /repos/${GITHUB_REPOSITORY}/pulls | jq -r '.[]' | jq -rc '.html_url,.labels' | \
+          while read -r html_url ; do
+            read -r labels
+            if [[ $labels == *"state:wont-fix"* ]]; then
+              gh pr close $html_url -c "Closed due to being marked as wont fix" --delete-branch
+            fi
+          done
+
+      - name: Prune Won't Fix Issues
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ env.REPOSITORY_NAME }}
+        run: |
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            /repos/${GITHUB_REPOSITORY}/issues | jq -r '.[]' | jq -rc '.html_url,.labels' | \
+          while read -r html_url ; do
+            read -r labels
+            if [[ $labels == *"state:wont-fix"* ]]; then
+              gh issue close $html_url -c "Closed due to being marked as wont fix" -r "not planned"
+            fi
+          done

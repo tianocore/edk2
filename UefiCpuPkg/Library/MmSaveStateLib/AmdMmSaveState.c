@@ -2,7 +2,7 @@
 Provides services to access SMRAM Save State Map
 
 Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
-Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+Copyright (C) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -10,69 +10,74 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "MmSaveState.h"
 #include <Register/Amd/SmramSaveStateMap.h>
 #include <Library/BaseLib.h>
+#include <Register/Amd/Msr.h>
 
-// EFER register LMA bit
-#define LMA                                        BIT10
-#define EFER_ADDRESS                               0xC0000080ul
 #define AMD_MM_SAVE_STATE_REGISTER_SMMREVID_INDEX  1
 #define AMD_MM_SAVE_STATE_REGISTER_MAX_INDEX       2
 
 // Macro used to simplify the lookup table entries of type CPU_MM_SAVE_STATE_LOOKUP_ENTRY
 #define MM_CPU_OFFSET(Field)  OFFSET_OF (AMD_SMRAM_SAVE_STATE_MAP, Field)
 
+//
 // Lookup table used to retrieve the widths and offsets associated with each
 // supported EFI_MM_SAVE_STATE_REGISTER value
+//
+//  Per AMD64 Architecture Programmer's Manual Volume 2: System
+//  Programming - 10.2.3 SMRAM State-Save Area (Rev 24593), the AMD64
+//  architecture does not use the legacy SMM state-save area format
+//  (Table 10-2) for 32-bit SMRAM Save State Map.
+//
 CONST CPU_MM_SAVE_STATE_LOOKUP_ENTRY  mCpuWidthOffset[] = {
-  { 0, 0, 0,                            0,                                    FALSE },                                        //  Reserved
+  { 0, 0, 0, 0,                                    0,                                    FALSE },  //  Reserved
 
   //
   // Internally defined CPU Save State Registers. Not defined in PI SMM CPU Protocol.
   //
-  { 4, 4, MM_CPU_OFFSET (x86.SMMRevId), MM_CPU_OFFSET (x64.SMMRevId),         0, FALSE},                                      // AMD_MM_SAVE_STATE_REGISTER_SMMREVID_INDEX  = 1
+  { 0, 4, 0, MM_CPU_OFFSET (x64.SMMRevId),         0,                                    FALSE },  // AMD_MM_SAVE_STATE_REGISTER_SMMREVID_INDEX  = 1
 
   //
   // CPU Save State registers defined in PI SMM CPU Protocol.
   //
-  { 4, 8, MM_CPU_OFFSET (x86.GDTBase),  MM_CPU_OFFSET (x64._GDTRBaseLoDword), MM_CPU_OFFSET (x64._GDTRBaseHiDword), FALSE},   //  EFI_MM_SAVE_STATE_REGISTER_GDTBASE  = 4
-  { 0, 8, 0,                            MM_CPU_OFFSET (x64._IDTRBaseLoDword), MM_CPU_OFFSET (x64._IDTRBaseLoDword), FALSE},   //  EFI_MM_SAVE_STATE_REGISTER_IDTBASE  = 5
-  { 0, 8, 0,                            MM_CPU_OFFSET (x64._LDTRBaseLoDword), MM_CPU_OFFSET (x64._LDTRBaseLoDword), FALSE},   //  EFI_MM_SAVE_STATE_REGISTER_LDTBASE  = 6
-  { 0, 2, 0,                            MM_CPU_OFFSET (x64._GDTRLimit),       0, FALSE},                                      //  EFI_MM_SAVE_STATE_REGISTER_GDTLIMIT = 7
-  { 0, 2, 0,                            MM_CPU_OFFSET (x64._IDTRLimit),       0, FALSE},                                      //  EFI_MM_SAVE_STATE_REGISTER_IDTLIMIT = 8
-  { 0, 4, 0,                            MM_CPU_OFFSET (x64._LDTRLimit),       0, FALSE},                                      //  EFI_MM_SAVE_STATE_REGISTER_LDTLIMIT = 9
-  { 0, 0, 0,                            0,                                    0, FALSE},                                      //  EFI_MM_SAVE_STATE_REGISTER_LDTINFO  = 10
-  { 4, 2, MM_CPU_OFFSET (x86._ES),      MM_CPU_OFFSET (x64._ES),              0, FALSE},                                      //  EFI_MM_SAVE_STATE_REGISTER_ES       = 20
-  { 4, 2, MM_CPU_OFFSET (x86._CS),      MM_CPU_OFFSET (x64._CS),              0, FALSE},                                      //  EFI_MM_SAVE_STATE_REGISTER_CS       = 21
-  { 4, 2, MM_CPU_OFFSET (x86._SS),      MM_CPU_OFFSET (x64._SS),              0, FALSE},                                      //  EFI_MM_SAVE_STATE_REGISTER_SS       = 22
-  { 4, 2, MM_CPU_OFFSET (x86._DS),      MM_CPU_OFFSET (x64._DS),              0, FALSE},                                      //  EFI_MM_SAVE_STATE_REGISTER_DS       = 23
-  { 4, 2, MM_CPU_OFFSET (x86._FS),      MM_CPU_OFFSET (x64._FS),              0, FALSE},                                      //  EFI_MM_SAVE_STATE_REGISTER_FS       = 24
-  { 4, 2, MM_CPU_OFFSET (x86._GS),      MM_CPU_OFFSET (x64._GS),              0, FALSE},                                      //  EFI_MM_SAVE_STATE_REGISTER_GS       = 25
-  { 0, 2, 0,                            MM_CPU_OFFSET (x64._LDTR),            0, FALSE},                                      //  EFI_MM_SAVE_STATE_REGISTER_LDTR_SEL = 26
-  { 0, 2, 0,                            MM_CPU_OFFSET (x64._TR),              0, FALSE},                                      //  EFI_MM_SAVE_STATE_REGISTER_TR_SEL   = 27
-  { 4, 8, MM_CPU_OFFSET (x86._DR7),     MM_CPU_OFFSET (x64._DR7),             MM_CPU_OFFSET (x64._DR7)         + 4, FALSE},   //  EFI_MM_SAVE_STATE_REGISTER_DR7      = 28
-  { 4, 8, MM_CPU_OFFSET (x86._DR6),     MM_CPU_OFFSET (x64._DR6),             MM_CPU_OFFSET (x64._DR6)         + 4, FALSE},   //  EFI_MM_SAVE_STATE_REGISTER_DR6      = 29
-  { 0, 8, 0,                            MM_CPU_OFFSET (x64._R8),              MM_CPU_OFFSET (x64._R8)          + 4, TRUE},    //  EFI_MM_SAVE_STATE_REGISTER_R8       = 30
-  { 0, 8, 0,                            MM_CPU_OFFSET (x64._R9),              MM_CPU_OFFSET (x64._R9)          + 4, TRUE},    //  EFI_MM_SAVE_STATE_REGISTER_R9       = 31
-  { 0, 8, 0,                            MM_CPU_OFFSET (x64._R10),             MM_CPU_OFFSET (x64._R10)         + 4, TRUE},    //  EFI_MM_SAVE_STATE_REGISTER_R10      = 32
-  { 0, 8, 0,                            MM_CPU_OFFSET (x64._R11),             MM_CPU_OFFSET (x64._R11)         + 4, TRUE},    //  EFI_MM_SAVE_STATE_REGISTER_R11      = 33
-  { 0, 8, 0,                            MM_CPU_OFFSET (x64._R12),             MM_CPU_OFFSET (x64._R12)         + 4, TRUE},    //  EFI_MM_SAVE_STATE_REGISTER_R12      = 34
-  { 0, 8, 0,                            MM_CPU_OFFSET (x64._R13),             MM_CPU_OFFSET (x64._R13)         + 4, TRUE},    //  EFI_MM_SAVE_STATE_REGISTER_R13      = 35
-  { 0, 8, 0,                            MM_CPU_OFFSET (x64._R14),             MM_CPU_OFFSET (x64._R14)         + 4, TRUE},    //  EFI_MM_SAVE_STATE_REGISTER_R14      = 36
-  { 0, 8, 0,                            MM_CPU_OFFSET (x64._R15),             MM_CPU_OFFSET (x64._R15)         + 4, TRUE},    //  EFI_MM_SAVE_STATE_REGISTER_R15      = 37
-  { 4, 8, MM_CPU_OFFSET (x86._EAX),     MM_CPU_OFFSET (x64._RAX),             MM_CPU_OFFSET (x64._RAX)         + 4, TRUE},    //  EFI_MM_SAVE_STATE_REGISTER_RAX      = 38
-  { 4, 8, MM_CPU_OFFSET (x86._EBX),     MM_CPU_OFFSET (x64._RBX),             MM_CPU_OFFSET (x64._RBX)         + 4, TRUE},    //  EFI_MM_SAVE_STATE_REGISTER_RBX      = 39
-  { 4, 8, MM_CPU_OFFSET (x86._ECX),     MM_CPU_OFFSET (x64._RCX),             MM_CPU_OFFSET (x64._RCX)         + 4, TRUE},    //  EFI_MM_SAVE_STATE_REGISTER_RBX      = 39
-  { 4, 8, MM_CPU_OFFSET (x86._EDX),     MM_CPU_OFFSET (x64._RDX),             MM_CPU_OFFSET (x64._RDX)         + 4, TRUE},    //  EFI_MM_SAVE_STATE_REGISTER_RDX      = 41
-  { 4, 8, MM_CPU_OFFSET (x86._ESP),     MM_CPU_OFFSET (x64._RSP),             MM_CPU_OFFSET (x64._RSP)         + 4, TRUE},    //  EFI_MM_SAVE_STATE_REGISTER_RSP      = 42
-  { 4, 8, MM_CPU_OFFSET (x86._EBP),     MM_CPU_OFFSET (x64._RBP),             MM_CPU_OFFSET (x64._RBP)         + 4, TRUE},    //  EFI_MM_SAVE_STATE_REGISTER_RBP      = 43
-  { 4, 8, MM_CPU_OFFSET (x86._ESI),     MM_CPU_OFFSET (x64._RSI),             MM_CPU_OFFSET (x64._RSI)         + 4, TRUE},    //  EFI_MM_SAVE_STATE_REGISTER_RSI      = 44
-  { 4, 8, MM_CPU_OFFSET (x86._EDI),     MM_CPU_OFFSET (x64._RDI),             MM_CPU_OFFSET (x64._RDI)         + 4, TRUE},    //  EFI_MM_SAVE_STATE_REGISTER_RDI      = 45
-  { 4, 8, MM_CPU_OFFSET (x86._EIP),     MM_CPU_OFFSET (x64._RIP),             MM_CPU_OFFSET (x64._RIP)         + 4, TRUE},    //  EFI_MM_SAVE_STATE_REGISTER_RIP      = 46
+  { 0, 8, 0, MM_CPU_OFFSET (x64._GDTRBaseLoDword), MM_CPU_OFFSET (x64._GDTRBaseHiDword), FALSE },  //  EFI_MM_SAVE_STATE_REGISTER_GDTBASE  = 4
+  { 0, 8, 0, MM_CPU_OFFSET (x64._IDTRBaseLoDword), MM_CPU_OFFSET (x64._IDTRBaseLoDword), FALSE },  //  EFI_MM_SAVE_STATE_REGISTER_IDTBASE  = 5
+  { 0, 8, 0, MM_CPU_OFFSET (x64._LDTRBaseLoDword), MM_CPU_OFFSET (x64._LDTRBaseLoDword), FALSE },  //  EFI_MM_SAVE_STATE_REGISTER_LDTBASE  = 6
+  { 0, 2, 0, MM_CPU_OFFSET (x64._GDTRLimit),       0,                                    FALSE },  //  EFI_MM_SAVE_STATE_REGISTER_GDTLIMIT = 7
+  { 0, 2, 0, MM_CPU_OFFSET (x64._IDTRLimit),       0,                                    FALSE },  //  EFI_MM_SAVE_STATE_REGISTER_IDTLIMIT = 8
+  { 0, 4, 0, MM_CPU_OFFSET (x64._LDTRLimit),       0,                                    FALSE },  //  EFI_MM_SAVE_STATE_REGISTER_LDTLIMIT = 9
+  { 0, 0, 0, 0,                                    0,                                    FALSE },  //  EFI_MM_SAVE_STATE_REGISTER_LDTINFO  = 10
+  { 0, 2, 0, MM_CPU_OFFSET (x64._ES),              0,                                    FALSE },  //  EFI_MM_SAVE_STATE_REGISTER_ES       = 20
+  { 0, 2, 0, MM_CPU_OFFSET (x64._CS),              0,                                    FALSE },  //  EFI_MM_SAVE_STATE_REGISTER_CS       = 21
+  { 0, 2, 0, MM_CPU_OFFSET (x64._SS),              0,                                    FALSE },  //  EFI_MM_SAVE_STATE_REGISTER_SS       = 22
+  { 0, 2, 0, MM_CPU_OFFSET (x64._DS),              0,                                    FALSE },  //  EFI_MM_SAVE_STATE_REGISTER_DS       = 23
+  { 0, 2, 0, MM_CPU_OFFSET (x64._FS),              0,                                    FALSE },  //  EFI_MM_SAVE_STATE_REGISTER_FS       = 24
+  { 0, 2, 0, MM_CPU_OFFSET (x64._GS),              0,                                    FALSE },  //  EFI_MM_SAVE_STATE_REGISTER_GS       = 25
+  { 0, 2, 0, MM_CPU_OFFSET (x64._LDTR),            0,                                    FALSE },  //  EFI_MM_SAVE_STATE_REGISTER_LDTR_SEL = 26
+  { 0, 2, 0, MM_CPU_OFFSET (x64._TR),              0,                                    FALSE },  //  EFI_MM_SAVE_STATE_REGISTER_TR_SEL   = 27
+  { 0, 8, 0, MM_CPU_OFFSET (x64._DR7),             MM_CPU_OFFSET (x64._DR7)         + 4, FALSE },  //  EFI_MM_SAVE_STATE_REGISTER_DR7      = 28
+  { 0, 8, 0, MM_CPU_OFFSET (x64._DR6),             MM_CPU_OFFSET (x64._DR6)         + 4, FALSE },  //  EFI_MM_SAVE_STATE_REGISTER_DR6      = 29
+  { 0, 8, 0, MM_CPU_OFFSET (x64._R8),              MM_CPU_OFFSET (x64._R8)          + 4, TRUE  },  //  EFI_MM_SAVE_STATE_REGISTER_R8       = 30
+  { 0, 8, 0, MM_CPU_OFFSET (x64._R9),              MM_CPU_OFFSET (x64._R9)          + 4, TRUE  },  //  EFI_MM_SAVE_STATE_REGISTER_R9       = 31
+  { 0, 8, 0, MM_CPU_OFFSET (x64._R10),             MM_CPU_OFFSET (x64._R10)         + 4, TRUE  },  //  EFI_MM_SAVE_STATE_REGISTER_R10      = 32
+  { 0, 8, 0, MM_CPU_OFFSET (x64._R11),             MM_CPU_OFFSET (x64._R11)         + 4, TRUE  },  //  EFI_MM_SAVE_STATE_REGISTER_R11      = 33
+  { 0, 8, 0, MM_CPU_OFFSET (x64._R12),             MM_CPU_OFFSET (x64._R12)         + 4, TRUE  },  //  EFI_MM_SAVE_STATE_REGISTER_R12      = 34
+  { 0, 8, 0, MM_CPU_OFFSET (x64._R13),             MM_CPU_OFFSET (x64._R13)         + 4, TRUE  },  //  EFI_MM_SAVE_STATE_REGISTER_R13      = 35
+  { 0, 8, 0, MM_CPU_OFFSET (x64._R14),             MM_CPU_OFFSET (x64._R14)         + 4, TRUE  },  //  EFI_MM_SAVE_STATE_REGISTER_R14      = 36
+  { 0, 8, 0, MM_CPU_OFFSET (x64._R15),             MM_CPU_OFFSET (x64._R15)         + 4, TRUE  },  //  EFI_MM_SAVE_STATE_REGISTER_R15      = 37
+  { 0, 8, 0, MM_CPU_OFFSET (x64._RAX),             MM_CPU_OFFSET (x64._RAX)         + 4, TRUE  },  //  EFI_MM_SAVE_STATE_REGISTER_RAX      = 38
+  { 0, 8, 0, MM_CPU_OFFSET (x64._RBX),             MM_CPU_OFFSET (x64._RBX)         + 4, TRUE  },  //  EFI_MM_SAVE_STATE_REGISTER_RBX      = 39
+  { 0, 8, 0, MM_CPU_OFFSET (x64._RCX),             MM_CPU_OFFSET (x64._RCX)         + 4, TRUE  },  //  EFI_MM_SAVE_STATE_REGISTER_RBX      = 39
+  { 0, 8, 0, MM_CPU_OFFSET (x64._RDX),             MM_CPU_OFFSET (x64._RDX)         + 4, TRUE  },  //  EFI_MM_SAVE_STATE_REGISTER_RDX      = 41
+  { 0, 8, 0, MM_CPU_OFFSET (x64._RSP),             MM_CPU_OFFSET (x64._RSP)         + 4, TRUE  },  //  EFI_MM_SAVE_STATE_REGISTER_RSP      = 42
+  { 0, 8, 0, MM_CPU_OFFSET (x64._RBP),             MM_CPU_OFFSET (x64._RBP)         + 4, TRUE  },  //  EFI_MM_SAVE_STATE_REGISTER_RBP      = 43
+  { 0, 8, 0, MM_CPU_OFFSET (x64._RSI),             MM_CPU_OFFSET (x64._RSI)         + 4, TRUE  },  //  EFI_MM_SAVE_STATE_REGISTER_RSI      = 44
+  { 0, 8, 0, MM_CPU_OFFSET (x64._RDI),             MM_CPU_OFFSET (x64._RDI)         + 4, TRUE  },  //  EFI_MM_SAVE_STATE_REGISTER_RDI      = 45
+  { 0, 8, 0, MM_CPU_OFFSET (x64._RIP),             MM_CPU_OFFSET (x64._RIP)         + 4, TRUE  },  //  EFI_MM_SAVE_STATE_REGISTER_RIP      = 46
 
-  { 4, 8, MM_CPU_OFFSET (x86._EFLAGS),  MM_CPU_OFFSET (x64._RFLAGS),          MM_CPU_OFFSET (x64._RFLAGS)      + 4, TRUE},    //  EFI_MM_SAVE_STATE_REGISTER_RFLAGS   = 51
-  { 4, 8, MM_CPU_OFFSET (x86._CR0),     MM_CPU_OFFSET (x64._CR0),             MM_CPU_OFFSET (x64._CR0)         + 4, FALSE},   //  EFI_MM_SAVE_STATE_REGISTER_CR0      = 52
-  { 4, 8, MM_CPU_OFFSET (x86._CR3),     MM_CPU_OFFSET (x64._CR3),             MM_CPU_OFFSET (x64._CR3)         + 4, FALSE},   //  EFI_MM_SAVE_STATE_REGISTER_CR3      = 53
-  { 0, 8, 0,                            MM_CPU_OFFSET (x64._CR4),             MM_CPU_OFFSET (x64._CR4)         + 4, FALSE},   //  EFI_MM_SAVE_STATE_REGISTER_CR4      = 54
-  { 0, 0, 0,                            0,                                    0     }
+  { 0, 8, 0, MM_CPU_OFFSET (x64._RFLAGS),          MM_CPU_OFFSET (x64._RFLAGS)      + 4, TRUE  },  //  EFI_MM_SAVE_STATE_REGISTER_RFLAGS   = 51
+  { 0, 8, 0, MM_CPU_OFFSET (x64._CR0),             MM_CPU_OFFSET (x64._CR0)         + 4, FALSE },  //  EFI_MM_SAVE_STATE_REGISTER_CR0      = 52
+  { 0, 8, 0, MM_CPU_OFFSET (x64._CR3),             MM_CPU_OFFSET (x64._CR3)         + 4, FALSE },  //  EFI_MM_SAVE_STATE_REGISTER_CR3      = 53
+  { 0, 8, 0, MM_CPU_OFFSET (x64._CR4),             MM_CPU_OFFSET (x64._CR4)         + 4, FALSE },  //  EFI_MM_SAVE_STATE_REGISTER_CR4      = 54
+  { 0, 0, 0, 0,                                    0,                                    FALSE }
 };
 
 /**
@@ -236,53 +241,28 @@ MmSaveStateWriteRegister (
   }
 
   //
-  // Check CPU mode
+  // If 64-bit mode width is zero, then the specified register can not be accessed
   //
-  if (MmSaveStateGetRegisterLma () == EFI_MM_SAVE_STATE_REGISTER_LMA_32BIT) {
-    //
-    // If 32-bit mode width is zero, then the specified register can not be accessed
-    //
-    if (mCpuWidthOffset[RegisterIndex].Width32 == 0) {
-      return EFI_NOT_FOUND;
-    }
+  if (mCpuWidthOffset[RegisterIndex].Width64 == 0) {
+    return EFI_NOT_FOUND;
+  }
 
-    //
-    // If Width is bigger than the 32-bit mode width, then the specified register can not be accessed
-    //
-    if (Width > mCpuWidthOffset[RegisterIndex].Width32) {
-      return EFI_INVALID_PARAMETER;
-    }
+  //
+  // If Width is bigger than the 64-bit mode width, then the specified register can not be accessed
+  //
+  if (Width > mCpuWidthOffset[RegisterIndex].Width64) {
+    return EFI_INVALID_PARAMETER;
+  }
 
+  //
+  // Write lower 32-bits of SMM State register
+  //
+  CopyMem ((UINT8 *)CpuSaveState + mCpuWidthOffset[RegisterIndex].Offset64Lo, Buffer, MIN (4, Width));
+  if (Width >= 4) {
     //
-    // Write SMM State register
+    // Write upper 32-bits of SMM State register
     //
-    ASSERT (CpuSaveState != NULL);
-    CopyMem ((UINT8 *)CpuSaveState + mCpuWidthOffset[RegisterIndex].Offset32, Buffer, Width);
-  } else {
-    //
-    // If 64-bit mode width is zero, then the specified register can not be accessed
-    //
-    if (mCpuWidthOffset[RegisterIndex].Width64 == 0) {
-      return EFI_NOT_FOUND;
-    }
-
-    //
-    // If Width is bigger than the 64-bit mode width, then the specified register can not be accessed
-    //
-    if (Width > mCpuWidthOffset[RegisterIndex].Width64) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    //
-    // Write lower 32-bits of SMM State register
-    //
-    CopyMem ((UINT8 *)CpuSaveState + mCpuWidthOffset[RegisterIndex].Offset64Lo, Buffer, MIN (4, Width));
-    if (Width >= 4) {
-      //
-      // Write upper 32-bits of SMM State register
-      //
-      CopyMem ((UINT8 *)CpuSaveState + mCpuWidthOffset[RegisterIndex].Offset64Hi, (UINT8 *)Buffer + 4, Width - 4);
-    }
+    CopyMem ((UINT8 *)CpuSaveState + mCpuWidthOffset[RegisterIndex].Offset64Hi, (UINT8 *)Buffer + 4, Width - 4);
   }
 
   return EFI_SUCCESS;
@@ -300,10 +280,16 @@ MmSaveStateGetRegisterLma (
 {
   UINT32  LMAValue;
 
-  LMAValue = (UINT32)AsmReadMsr64 (EFER_ADDRESS) & LMA;
+  MSR_IA32_EFER_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_IA32_EFER);
+  LMAValue   = Msr.Bits.LMA;
   if (LMAValue) {
     return EFI_MM_SAVE_STATE_REGISTER_LMA_64BIT;
   }
 
-  return EFI_MM_SAVE_STATE_REGISTER_LMA_32BIT;
+  //
+  // AMD64 processors support EFI_SMM_SAVE_STATE_REGISTER_LMA_64BIT only
+  //
+  return EFI_MM_SAVE_STATE_REGISTER_LMA_64BIT;
 }

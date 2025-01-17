@@ -485,8 +485,8 @@ function to be compiled into the test application and then hooked to during a
 test.
 
 This library is mainly a wrapper around the
-[subhook](https://github.com/Zeex/subhook) header and source files. It is
-important to note that the use of the mock function macros and the creation
+[subhook](https://github.com/tianocore/edk2-subhook) header and source files. It
+is important to note that the use of the mock function macros and the creation
 of mock functions requires no knowledge about the SubhookLib. The SubhookLib
 library is entirely hidden and encapsulated within FunctionMockLib, and it
 is only mentioned here to provide a complete explanation on all the libraries
@@ -1312,7 +1312,7 @@ If you are trying to iterate on a single test, a convenient pattern is to build 
 the following command will build only the SafeIntLib host-based test from the MdePkg...
 
 ```bash
-stuart_ci_build -c .pytool/CISettings.py TOOL_CHAIN_TAG=VS2017 -p MdePkg -t NOOPT BUILDMODULE=MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLib.inf
+stuart_ci_build -c .pytool/CISettings.py TOOL_CHAIN_TAG=VS2022 -p MdePkg -t NOOPT BUILDMODULE=MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLib.inf
 ```
 
 ### Hooking BaseLib
@@ -1337,7 +1337,7 @@ symbolic debugging to be enabled.
 You can run a build by adding the `BLD_*_UNIT_TESTING_DEBUG=TRUE` parameter to enable this build option.
 
 ```bash
-stuart_ci_build -c .pytool/CISettings.py TOOL_CHAIN_TAG=VS2019 -p MdePkg -t NOOPT BLD_*_UNIT_TESTING_DEBUG=TRUE
+stuart_ci_build -c .pytool/CISettings.py TOOL_CHAIN_TAG=VS2022 -p MdePkg -t NOOPT BLD_*_UNIT_TESTING_DEBUG=TRUE
 ```
 
 ## Building and Running Host-Based Tests
@@ -1361,16 +1361,16 @@ After that, the following commands will set up the build and run the host-based 
 
 ```bash
 # Setup repo for building
-# stuart_setup -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC5, VS2019, etc.>
-stuart_setup -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2019
+# stuart_setup -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC5, VS2022, etc.>
+stuart_setup -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2022
 
 # Update all binary dependencies
-# stuart_update -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC5, VS2019, etc.>
-stuart_update -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2019
+# stuart_update -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC5, VS2022, etc.>
+stuart_update -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2022
 
 # Build and run the tests
-# stuart_ci_build -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC5, VS2019, etc.> -t NOOPT [-p <Package Name>]
-stuart_ci_build -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2019 -t NOOPT -p MdePkg
+# stuart_ci_build -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC5, VS2022, etc.> -t NOOPT [-p <Package Name>]
+stuart_ci_build -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2022 -t NOOPT -p MdePkg
 ```
 
 ### Evaluating the Results
@@ -1378,7 +1378,7 @@ stuart_ci_build -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2019 -t NOOPT -p Mde
 In your immediate output, any build failures will be highlighted. You can see these below as "WARNING" and "ERROR" messages.
 
 ```text
-(edk_env) PS C:\_uefi\edk2> stuart_ci_build -c .\.pytool\CISettings.py TOOL_CHAIN_TAG=VS2019 -t NOOPT -p MdePkg
+(edk_env) PS C:\_uefi\edk2> stuart_ci_build -c .\.pytool\CISettings.py TOOL_CHAIN_TAG=VS2022 -t NOOPT -p MdePkg
 
 SECTION - Init SDE
 SECTION - Loading Plugins
@@ -1413,7 +1413,7 @@ ERROR - Error
 If a test fails, you can run it manually to get more details...
 
 ```text
-(edk_env) PS C:\_uefi\edk2> .\Build\MdePkg\HostTest\NOOPT_VS2019\X64\TestBaseSafeIntLibHost.exe
+(edk_env) PS C:\_uefi\edk2> .\Build\MdePkg\HostTest\NOOPT_VS2022\X64\TestBaseSafeIntLibHost.exe
 
 Int Safe Lib Unit Test Application v0.1
 ---------------------------------------------------------
@@ -1446,7 +1446,7 @@ A sample of this output looks like:
 ```xml
 <!--
   Excerpt taken from:
-  Build\MdePkg\HostTest\NOOPT_VS2019\X64\TestBaseSafeIntLibHost.exe.Int Safe Conversions Test Suite.X64.result.xml
+  Build\MdePkg\HostTest\NOOPT_VS2022\X64\TestBaseSafeIntLibHost.exe.Int Safe Conversions Test Suite.X64.result.xml
   -->
 <?xml version="1.0" encoding="UTF-8" ?>
 <testsuites>
@@ -1494,13 +1494,13 @@ OpenCppCoverage windows tool to parse coverage data to cobertura xml format.
   ```bash
   Download and install https://github.com/OpenCppCoverage/OpenCppCoverage/releases
   python -m pip install --upgrade -r ./pip-requirements.txt
-  stuart_ci_build -c .pytool/CISettings.py  -t NOOPT TOOL_CHAIN_TAG=VS2019 -p MdeModulePkg
+  stuart_ci_build -c .pytool/CISettings.py  -t NOOPT TOOL_CHAIN_TAG=VS2022 -p MdeModulePkg
   Open Build/coverage.xml
   ```
 
   - How to see code coverage data on IDE Visual Studio
     ```
-    Open Visual Studio VS2019 or above version
+    Open Visual Studio VS2022 or above version
     Click "Tools" -> "OpenCppCoverage Settings"
     Fill your execute file into "Program to run:"
     Click "Tools" -> "Run OpenCppCoverage"

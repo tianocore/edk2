@@ -8,6 +8,7 @@
 
 #include <Uefi.h>
 #include <Pi/PiMultiPhase.h>
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <libfdt.h>

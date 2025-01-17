@@ -38,6 +38,7 @@
   PeCoffGetEntryPointLib
   RiscVSbiLib
   RiscVMmuLib
+  RiscVFpuLib
   CacheMaintenanceLib
 
 [Sources]

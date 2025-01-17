@@ -189,6 +189,67 @@ RtcWrite (
 }
 
 /**
+  Sets the current local timezone & daylight information.
+
+  @param  TimeZone         Timezone info.
+  @param  Daylight         Daylight info.
+  @param  Global           For global use inside this module.
+
+  @retval EFI_SUCCESS      The operation completed successfully.
+  @retval EFI_DEVICE_ERROR The variable could not be set due due to hardware error.
+
+**/
+EFI_STATUS
+PcRtcSetTimeZone (
+  IN INT16                  TimeZone,
+  IN UINT8                  Daylight,
+  IN PC_RTC_MODULE_GLOBALS  *Global
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      TimerVar;
+
+  ASSERT ((TimeZone == EFI_UNSPECIFIED_TIMEZONE) || ((TimeZone >= -1440) && (TimeZone <= 1440)));
+  ASSERT ((Daylight & (~(EFI_TIME_ADJUST_DAYLIGHT | EFI_TIME_IN_DAYLIGHT))) == 0);
+
+  //
+  // Write timezone and daylight to RTC variable
+  //
+  if ((TimeZone == EFI_UNSPECIFIED_TIMEZONE) && (Daylight == 0)) {
+    Status = EfiSetVariable (
+               mTimeZoneVariableName,
+               &gEfiCallerIdGuid,
+               0,
+               0,
+               NULL
+               );
+    if (Status == EFI_NOT_FOUND) {
+      Status = EFI_SUCCESS;
+    }
+  } else {
+    TimerVar = Daylight;
+    TimerVar = (UINT32)((TimerVar << 16) | (UINT16)(TimeZone));
+    Status   = EfiSetVariable (
+                 mTimeZoneVariableName,
+                 &gEfiCallerIdGuid,
+                 EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+                 sizeof (TimerVar),
+                 &TimerVar
+                 );
+  }
+
+  //
+  // Set the variable that contains the TimeZone and Daylight fields
+  //
+  if (!EFI_ERROR (Status)) {
+    Global->SavedTimeZone = TimeZone;
+    Global->Daylight      = Daylight;
+  }
+
+  return Status;
+}
+
+/**
   Initialize RTC.
 
   @param  Global            For global use inside this module.
@@ -211,6 +272,9 @@ PcRtcInit (
   UINT32          TimerVar;
   BOOLEAN         Enabled;
   BOOLEAN         Pending;
+  BOOLEAN         NeedRtcUpdate;
+
+  NeedRtcUpdate = FALSE;
 
   //
   // Acquire RTC Lock to make access to RTC atomic
@@ -324,21 +388,32 @@ PcRtcInit (
     Time.Nanosecond = 0;
     Time.TimeZone   = EFI_UNSPECIFIED_TIMEZONE;
     Time.Daylight   = 0;
+    NeedRtcUpdate   = TRUE;
   }
 
   //
   // Set RTC configuration after get original time
   // The value of bit AIE should be reserved.
   //
-  RegisterB.Data = FixedPcdGet8 (PcdInitialValueRtcRegisterB) | (RegisterB.Data & BIT5);
-  RtcWrite (RTC_ADDRESS_REGISTER_B, RegisterB.Data);
+  if ((RegisterB.Data | BIT5) != (FixedPcdGet8 (PcdInitialValueRtcRegisterB) | BIT5)) {
+    RegisterB.Data = FixedPcdGet8 (PcdInitialValueRtcRegisterB) | (RegisterB.Data & BIT5);
+    RtcWrite (RTC_ADDRESS_REGISTER_B, RegisterB.Data);
+    NeedRtcUpdate = TRUE;
+  }
 
   //
   // Reset time value according to new RTC configuration
   //
-  Status = PcRtcSetTime (&Time, Global);
-  if (EFI_ERROR (Status)) {
-    return EFI_DEVICE_ERROR;
+  if (NeedRtcUpdate) {
+    Status = PcRtcSetTime (&Time, Global);
+    if (EFI_ERROR (Status)) {
+      return EFI_DEVICE_ERROR;
+    }
+  } else {
+    Status = PcRtcSetTimeZone (Time.TimeZone, Time.Daylight, Global);
+    if (EFI_ERROR (Status)) {
+      return EFI_DEVICE_ERROR;
+    }
   }
 
   //
@@ -561,8 +636,8 @@ PcRtcSetTime (
 {
   EFI_STATUS      Status;
   EFI_TIME        RtcTime;
+  RTC_REGISTER_A  RegisterA;
   RTC_REGISTER_B  RegisterB;
-  UINT32          TimerVar;
 
   if (Time == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -597,31 +672,7 @@ PcRtcSetTime (
     return Status;
   }
 
-  //
-  // Write timezone and daylight to RTC variable
-  //
-  if ((Time->TimeZone == EFI_UNSPECIFIED_TIMEZONE) && (Time->Daylight == 0)) {
-    Status = EfiSetVariable (
-               mTimeZoneVariableName,
-               &gEfiCallerIdGuid,
-               0,
-               0,
-               NULL
-               );
-    if (Status == EFI_NOT_FOUND) {
-      Status = EFI_SUCCESS;
-    }
-  } else {
-    TimerVar = Time->Daylight;
-    TimerVar = (UINT32)((TimerVar << 16) | (UINT16)(Time->TimeZone));
-    Status   = EfiSetVariable (
-                 mTimeZoneVariableName,
-                 &gEfiCallerIdGuid,
-                 EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-                 sizeof (TimerVar),
-                 &TimerVar
-                 );
-  }
+  Status = PcRtcSetTimeZone (Time->TimeZone, Time->Daylight, Global);
 
   if (EFI_ERROR (Status)) {
     if (!EfiAtRuntime ()) {
@@ -638,6 +689,11 @@ PcRtcSetTime (
   RegisterB.Bits.Set = 1;
   RtcWrite (RTC_ADDRESS_REGISTER_B, RegisterB.Data);
 
+  RegisterA.Data = RtcRead (RTC_ADDRESS_REGISTER_A);
+  //
+  // Set Divider in Reset status, RTC stops
+  //
+  RtcWrite (RTC_ADDRESS_REGISTER_A, RegisterA.Data | RTC_DIV_RESET);
   //
   // Store the century value to RTC before converting to BCD format.
   //
@@ -661,17 +717,15 @@ PcRtcSetTime (
   RtcWrite (RTC_ADDRESS_REGISTER_B, RegisterB.Data);
 
   //
+  // Restore Divider status
+  //
+  RtcWrite (RTC_ADDRESS_REGISTER_A, RegisterA.Data);
+  //
   // Release RTC Lock.
   //
   if (!EfiAtRuntime ()) {
     EfiReleaseLock (&Global->RtcLock);
   }
-
-  //
-  // Set the variable that contains the TimeZone and Daylight fields
-  //
-  Global->SavedTimeZone = Time->TimeZone;
-  Global->Daylight      = Time->Daylight;
 
   return EFI_SUCCESS;
 }

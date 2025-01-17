@@ -136,7 +136,11 @@ GetSmiCommandPort (
   Fadt = (EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE *)EfiLocateFirstAcpiTable (
                                                         EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE
                                                         );
-  ASSERT (Fadt != NULL);
+
+  if (Fadt == NULL) {
+    ASSERT (Fadt != NULL);
+    return;
+  }
 
   mSmiCommandPort = Fadt->SmiCmd;
   DEBUG ((DEBUG_INFO, "mSmiCommandPort = %x\n", mSmiCommandPort));

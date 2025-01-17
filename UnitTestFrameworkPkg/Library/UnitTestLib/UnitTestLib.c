@@ -571,9 +571,9 @@ UpdateTestFromSave (
     Test->FailureType = MatchingTest->FailureType;
     AsciiStrnCpyS (
       &Test->FailureMessage[0],
-      UNIT_TEST_TESTFAILUREMSG_LENGTH,
+      UNIT_TEST_MAX_STRING_LENGTH,
       &MatchingTest->FailureMessage[0],
-      UNIT_TEST_TESTFAILUREMSG_LENGTH
+      UNIT_TEST_MAX_STRING_LENGTH
       );
 
     //
@@ -748,7 +748,7 @@ SerializeState (
       //
       TestSaveData->Result      = UnitTest->Result;
       TestSaveData->FailureType = UnitTest->FailureType;
-      AsciiStrnCpyS (&TestSaveData->FailureMessage[0], UNIT_TEST_TESTFAILUREMSG_LENGTH, &UnitTest->FailureMessage[0], UNIT_TEST_TESTFAILUREMSG_LENGTH);
+      AsciiStrnCpyS (&TestSaveData->FailureMessage[0], UNIT_TEST_MAX_STRING_LENGTH, &UnitTest->FailureMessage[0], UNIT_TEST_MAX_STRING_LENGTH);
 
       //
       // If there is a log, save the log.

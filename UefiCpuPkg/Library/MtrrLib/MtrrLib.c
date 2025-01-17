@@ -162,6 +162,13 @@ MtrrLibIsMtrrSupported (
   MSR_IA32_MTRRCAP_REGISTER  MtrrCap;
 
   //
+  // MTRR is not supported in TD-Guest.
+  //
+  if (TdIsEnabled ()) {
+    return FALSE;
+  }
+
+  //
   // Check CPUID(1).EDX[12] for MTRR capability
   //
   AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, NULL, &Edx.Uint32);
@@ -1696,8 +1703,8 @@ MtrrLibCalculateMtrrs (
   }
 
   for (TypeCount = 2; TypeCount <= 3; TypeCount++) {
-    for (Start = 0; Start < VertexCount; Start++) {
-      for (Stop = Start + 2; Stop < VertexCount; Stop++) {
+    for (Start = 0; (UINT32)Start < VertexCount; Start++) {
+      for (Stop = Start + 2; (UINT32)Stop < VertexCount; Stop++) {
         ASSERT (Vertices[Stop].Address > Vertices[Start].Address);
         Length = Vertices[Stop].Address - Vertices[Start].Address;
         if (Length > Vertices[Start].Alignment) {
@@ -2132,13 +2139,13 @@ MtrrLibSetMemoryRanges (
   //
   BiggestScratchSize = 0;
 
-  for (Index = 0; Index < RangeCount;) {
+  for (Index = 0; (UINTN)Index < RangeCount;) {
     Base0 = Ranges[Index].BaseAddress;
 
     //
     // Full step is optimal
     //
-    while (Index < RangeCount) {
+    while ((UINTN)Index < RangeCount) {
       ASSERT (Ranges[Index].BaseAddress == Base0);
       Alignment = MtrrLibBiggestAlignment (Base0, A0);
       while (Base0 + Alignment <= Ranges[Index].BaseAddress + Ranges[Index].Length) {
@@ -2186,7 +2193,7 @@ MtrrLibSetMemoryRanges (
     CompatibleTypes = MtrrLibGetCompatibleTypes (&Ranges[Index], RangeCount - Index);
 
     End = Index; // End points to last one that matches the CompatibleTypes.
-    while (End + 1 < RangeCount) {
+    while ((UINTN)(End + 1) < RangeCount) {
       if (((1 << Ranges[End + 1].Type) & CompatibleTypes) == 0) {
         break;
       }
@@ -2202,7 +2209,7 @@ MtrrLibSetMemoryRanges (
     // Base1 may not in Ranges[End]. Update End to the range Base1 belongs to.
     //
     End = Index;
-    while (End + 1 < RangeCount) {
+    while ((UINTN)(End + 1) < RangeCount) {
       if (Base1 <= Ranges[End + 1].BaseAddress) {
         break;
       }

@@ -84,6 +84,19 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define FAT_FATCACHE_GROUP_MIN_COUNT      1
 #define FAT_FATCACHE_GROUP_MAX_COUNT      16
 
+// For cache block bits, use a UINT64
+typedef UINT64 DIRTY_BLOCKS;
+#define BITS_PER_BYTE         8
+#define DIRTY_BITS_PER_BLOCK  ((sizeof (DIRTY_BLOCKS) * BITS_PER_BYTE))
+
+// largest cache line (64KB) / MinLbaSize (512) = 128 bits
+#define DIRTY_BITS  ((1 << FAT_DATACACHE_PAGE_MAX_ALIGNMENT) / (1 << MIN_BLOCK_ALIGNMENT))
+
+// Number of DIRTY_BLOCKS to hold DIRTY_BITS bits.
+#define DIRTY_BLOCKS_SIZE  (DIRTY_BITS / sizeof (DIRTY_BLOCKS))
+
+STATIC_ASSERT ((((1 << FAT_DATACACHE_PAGE_MAX_ALIGNMENT) / (1 << MIN_BLOCK_ALIGNMENT)) % sizeof (DIRTY_BLOCKS)) == 0, "DIRTY_BLOCKS not a proper size");
+
 //
 // Used in 8.3 generation algorithm
 //
@@ -143,15 +156,17 @@ typedef enum {
 // Disk cache tag
 //
 typedef struct {
-  UINTN      PageNo;
-  UINTN      RealSize;
-  BOOLEAN    Dirty;
+  UINTN           PageNo;
+  UINTN           RealSize;
+  BOOLEAN         Dirty;
+  DIRTY_BLOCKS    DirtyBlocks[DIRTY_BLOCKS_SIZE];
 } CACHE_TAG;
 
 typedef struct {
   UINT64       BaseAddress;
   UINT64       LimitAddress;
   UINT8        *CacheBase;
+  UINT32       BlockSize;
   BOOLEAN      Dirty;
   UINT8        PageAlignment;
   UINTN        GroupMask;

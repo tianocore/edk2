@@ -930,6 +930,11 @@ FileHandleReturnLine (
   Status = FileHandleReadLine (Handle, RetVal, &Size, FALSE, Ascii);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     RetVal = AllocateZeroPool (Size);
+
+    if (RetVal == NULL) {
+      return NULL;
+    }
+
     Status = FileHandleReadLine (Handle, RetVal, &Size, FALSE, Ascii);
   }
 

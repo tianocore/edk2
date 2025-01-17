@@ -51,11 +51,13 @@
   Parsers/Pptt/PpttParser.c
   Parsers/Pptt/PpttParser.h
   Parsers/Ras2/Ras2Parser.c
+  Parsers/Rasf/RasfParser.c
   Parsers/Rsdp/RsdpParser.c
   Parsers/Slit/SlitParser.c
   Parsers/Spcr/SpcrParser.c
   Parsers/Srat/SratParser.c
   Parsers/Ssdt/SsdtParser.c
+  Parsers/Tpm2/Tpm2Parser.c
   Parsers/Wsmt/WsmtParser.c
   Parsers/Xsdt/XsdtParser.c
   UefiShellAcpiViewCommandLib.c

@@ -622,8 +622,15 @@ InitializeExceptionStackSwitchHandlers (
 {
   EXCEPTION_STACK_SWITCH_CONTEXT  *SwitchStackData;
   UINTN                           Index;
+  EFI_STATUS                      Status;
 
-  MpInitLibWhoAmI (&Index);
+  Status = MpInitLibWhoAmI (&Index);
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to get processor number.  The exception stack was not initialized.\n", __func__));
+    return;
+  }
+
   SwitchStackData = (EXCEPTION_STACK_SWITCH_CONTEXT *)Buffer;
 
   //
@@ -654,7 +661,12 @@ InitializeMpExceptionStackSwitchHandlers (
   UINT8                           *Buffer;
 
   SwitchStackData = AllocateZeroPool (mNumberOfProcessors * sizeof (EXCEPTION_STACK_SWITCH_CONTEXT));
-  ASSERT (SwitchStackData != NULL);
+  if (SwitchStackData == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a Failed to allocate buffer for SwitchStackData\n", __func__));
+    ASSERT (SwitchStackData != NULL);
+    return;
+  }
+
   for (Index = 0; Index < mNumberOfProcessors; ++Index) {
     //
     // Because the procedure may runs multiple times, use the status EFI_NOT_STARTED
@@ -682,8 +694,24 @@ InitializeMpExceptionStackSwitchHandlers (
   }
 
   if (BufferSize != 0) {
-    Buffer = AllocateRuntimeZeroPool (BufferSize);
-    ASSERT (Buffer != NULL);
+    // we are allocating the buffer that will hold the new GDT and IDT for the APs. These must be allocated below
+    // 4GB as they are used by protected mode code on the APs when they are started up after this point. If they are
+    // above 4GB, the APs will triple fault because the 32 bit code segment is invalid
+    Buffer = (UINT8 *)(UINTN)(BASE_4GB - 1);
+    Status = gBS->AllocatePages (
+                    AllocateMaxAddress,
+                    EfiRuntimeServicesData,
+                    EFI_SIZE_TO_PAGES (BufferSize),
+                    (EFI_PHYSICAL_ADDRESS *)&Buffer
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Failed to allocate buffer for InitializeExceptionStackSwitchHandlers Status %r\n", Status));
+      ASSERT_EFI_ERROR (Status);
+      goto Exit;
+    }
+
+    ZeroMem (Buffer, BufferSize);
+
     BufferSize = 0;
     for (Index = 0; Index < mNumberOfProcessors; ++Index) {
       if (SwitchStackData[Index].Status == EFI_BUFFER_TOO_SMALL) {
@@ -710,6 +738,7 @@ InitializeMpExceptionStackSwitchHandlers (
     }
   }
 
+Exit:
   FreePool (SwitchStackData);
 }
 
@@ -758,25 +787,28 @@ InitializeMpSupport (
   Status = MpInitLibInitialize ();
   ASSERT_EFI_ERROR (Status);
 
-  MpInitLibGetNumberOfProcessors (&NumberOfProcessors, &NumberOfEnabledProcessors);
-  mNumberOfProcessors = NumberOfProcessors;
-  DEBUG ((DEBUG_INFO, "Detect CPU count: %d\n", mNumberOfProcessors));
-
-  //
-  // Initialize special exception handlers for each logic processor.
-  //
-  InitializeMpExceptionHandlers ();
-
-  //
-  // Update CPU healthy information from Guided HOB
-  //
-  CollectBistDataFromHob ();
-
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &mMpServiceHandle,
-                  &gEfiMpServiceProtocolGuid,
-                  &mMpServicesTemplate,
-                  NULL
-                  );
+  Status = MpInitLibGetNumberOfProcessors (&NumberOfProcessors, &NumberOfEnabledProcessors);
   ASSERT_EFI_ERROR (Status);
+  if (!EFI_ERROR (Status)) {
+    mNumberOfProcessors = NumberOfProcessors;
+    DEBUG ((DEBUG_INFO, "Detect CPU count: %d\n", mNumberOfProcessors));
+
+    //
+    // Initialize special exception handlers for each logic processor.
+    //
+    InitializeMpExceptionHandlers ();
+
+    //
+    // Update CPU healthy information from Guided HOB
+    //
+    CollectBistDataFromHob ();
+
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &mMpServiceHandle,
+                    &gEfiMpServiceProtocolGuid,
+                    &mMpServicesTemplate,
+                    NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
+  }
 }

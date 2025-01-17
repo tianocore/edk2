@@ -520,11 +520,11 @@ SmbiosPrintStructure (
         ShellPrintEx (-1, -1, L"Thread Count 2: %u\n", Struct->Type4->ThreadCount2);
       }
 
-      if (AE_SMBIOS_VERSION (0x3, 0x6) && (Struct->Hdr->Length > 0x2E)) {
+      if (AE_SMBIOS_VERSION (0x3, 0x6) && (Struct->Hdr->Length > 0x30)) {
         ShellPrintEx (-1, -1, L"Thread Enabled: %u\n", Struct->Type4->ThreadEnabled);
       }
 
-      if (AE_SMBIOS_VERSION (0x3, 0x8) && (Struct->Hdr->Length > 0x30)) {
+      if (AE_SMBIOS_VERSION (0x3, 0x8) && (Struct->Hdr->Length > 0x32)) {
         ShellPrintEx (-1, -1, L"Socket Type: %a\n", LibGetSmbiosString (Struct, Struct->Type4->SocketType));
       }
 
@@ -676,7 +676,7 @@ SmbiosPrintStructure (
     {
       UINTN  NumOfDevice;
       NumOfDevice = (Struct->Type10->Hdr.Length - sizeof (SMBIOS_STRUCTURE)) / (2 * sizeof (UINT8));
-      for (Index = 0; Index < NumOfDevice; Index++) {
+      for (Index = 0; (UINTN)Index < NumOfDevice; Index++) {
         ShellPrintEx (-1, -1, (((Struct->Type10->Device[Index].DeviceType) & 0x80) != 0) ? L"Device Enabled\n" : L"Device Disabled\n");
         DisplayOnboardDeviceTypes ((Struct->Type10->Device[Index].DeviceType) & 0x7F, Option);
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_DESC_STRING), gShellDebug1HiiHandle);
@@ -2421,6 +2421,10 @@ DisplayProcessorFamily (
 
     case 0xCF:
       Print (L"Intel Core i9 processor\n");
+      break;
+
+    case 0xD0:
+      Print (L"Intel Xeon D Processor\n");
       break;
 
     case 0xD2:

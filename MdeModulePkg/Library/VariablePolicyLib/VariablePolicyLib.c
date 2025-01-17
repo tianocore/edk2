@@ -918,7 +918,7 @@ GetLockOnVariableStateVariablePolicyInfo (
     LocalLockOnVarStatePolicy = (VARIABLE_LOCK_ON_VAR_STATE_POLICY *)(MatchPolicy + 1);
     CopyMem (VariablePolicy, LocalLockOnVarStatePolicy, sizeof (*LocalLockOnVarStatePolicy));
 
-    if ((VariableLockPolicyVariableNameBufferSize == NULL)) {
+    if (VariableLockPolicyVariableNameBufferSize == NULL) {
       if (VariableLockPolicyVariableName != NULL) {
         return EFI_INVALID_PARAMETER;
       }

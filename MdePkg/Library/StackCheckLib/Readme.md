@@ -102,25 +102,93 @@ update the tools_def file so the `<TARGET>_<TOOLCHAIN>_<ARCH>_CC_FLAGS` includes
 
 edk2 updated the tools_def to add `/GS` to VS2022 and VS2019 IA32/X64 builds and
 `-fstack-protector` to GCC builds. This will cause stack cookie references to be inserted
-throughout the code. Every module should have a `StackCheckLib` instances linked to satisfy
+throughout the code. Every module should have a `StackCheckLib` instance linked to satisfy
 these references. So every module doesn't need to add `StackCheckLib` to the LibraryClasses
 section of the INF file, `StackCheckLib` instances should be linked as NULL in the platform
-DSC fies. The only exception to this is host-based unit tests as they will be compiled with
-the runtime libraries which already contain the stack cookie definitions and will collide
-with `StackCheckLib`.
+DSC files. The only exception to this is MSVC built host-based unit tests as they will be
+compiled with the runtime libraries which already contain the stack cookie definitions
+and will collide with `StackCheckLib`. A `StackCheckLibHostApplication.inf` is linked
+by `UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc` that provides the stack
+cookie functions for GCC HOST_APPLICATIONS but not for MSVC HOST_APPLICATIONS.
 
-SEC and PEI_CORE modules should always use `StackCheckLibNull` and pre-memory modules
+### Default Stack Check Library Configuration
+
+`MdePkg/MdeLibs.dsc.inc` links `StackCheckLibNull` for all types except SEC, HOST_APPLICATION,
+and USER_DEFINED in order to not break existing DSCs. SEC cannot be generically linked to
+because there are some SEC modules which do not link against the standard entry point
+libraries and thus do not get stack cookies inserted by the compiler. USER_DEFINED modules
+are by nature different from other modules, so we do not make any assumptions about their
+state.
+
+As stated above, all HOST_APPLICATIONS will link against a HOST_APPLICATION specific
+implementation provided in `UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc`.
+
+To link the rest of a platform's modules to `StackCheckLibNull`, a platform would needs
+to link it for all SEC and USER_DEFINED modules. If all of the DSC's SEC and USER_DEFINED
+modules link against the entry point libs, it would look like the following:
+
+```inf
+[LibraryClasses.common.SEC, LibraryClasses.common.USER_DEFINED]
+  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+```
+
+If some do not, then the individual SEC/USER_DEFINED modules that do link against
+the entry point libs will need to be linked to `StackCheckLibNull`, such as below.
+This case is identifiable if a DSC is built and the linker complains the stack
+check functions are not found for a module.
+
+```inf
+UefiCpuPkg/SecCore/SecCore.inf {
+    <LibraryClasses>
+      NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+  }
+```
+
+### Custom Stack Check Library Configuration
+
+In order to use a different instance of StackCheckLib than `MdeLibs.dsc.inc` provides, a DSC
+should add the following:
+
+```inf
+[Defines]
+  DEFINE CUSTOM_STACK_CHECK_LIB = TRUE
+```
+
+This will cause `MdeLibs.dsc.inc` to not link `StackCheckLibNull` and rely on a DSC to
+link whichever version(s) of `StackCheckLib` it desires.
+
+It is recommended that SEC and PEI_CORE modules use `StackCheckLibNull` and pre-memory modules
 should use `StackCheckLibStaticInit`. All other modules should use `StackCheckLibDynamicInit`.
+
 Below is an **example** of how to link the `StackCheckLib` instances in the platform DSC file
 but it may need customization based on the platform's requirements:
 
-```text
+```inf
 [LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE]
   NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 
 [LibraryClasses.common.PEIM]
   NULL|MdePkg/Library/StackCheckLib/StackCheckLibStaticInit.inf
 
-[LibraryClasses.common.MM_CORE_STANDALONE, LibraryClasses.common.MM_STANDALONE, LibraryClasses.common.DXE_CORE, LibraryClasses.common.SMM_CORE, LibraryClasses.common.DXE_SMM_DRIVER, LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.DXE_SAL_DRIVER, LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
+[LibraryClasses.common.MM_CORE_STANDALONE, LibraryClasses.common.MM_STANDALONE, LibraryClasses.common.DXE_CORE,
+LibraryClasses.common.SMM_CORE, LibraryClasses.common.DXE_SMM_DRIVER, LibraryClasses.common.DXE_DRIVER,
+LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.DXE_SAL_DRIVER, LibraryClasses.common.UEFI_DRIVER,
+LibraryClasses.common.UEFI_APPLICATION]
   NULL|MdePkg/Library/StackCheckLib/StackCheckLibDynamicInit.inf
 ```
+
+### Disable Stack Check Library
+
+If a platform would like to disable stack cookies (say for debugging purposes),
+they can add the following to their DSC:
+
+```inf
+[BuildOptions]
+  MSVC:*_*_*_CC_FLAGS = /GS-
+  GCC:*_*_*_CC_FLAGS = -fno-stack-protector
+```
+
+The same build options can be put in a module's INF to only disable stack cookies
+for that module.
+
+It is not recommended to disable stack cookie checking in production scenarios.

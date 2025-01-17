@@ -62,6 +62,7 @@
 
 [LibraryClasses.IA32, LibraryClasses.X64]
   AmdSvsmLib
+  SafeIntLib
   CcExitLib
   LocalApicLib
   MicrocodeLib
@@ -87,7 +88,6 @@
   gEdkiiPeiShadowMicrocodePpiGuid        ## SOMETIMES_CONSUMES
 
 [Guids]
-  gEdkiiS3SmmInitDoneGuid
   gEdkiiMicrocodePatchHobGuid
   gGhcbApicIdsGuid                       ## SOMETIMES_CONSUMES
   gEdkiiEndOfS3ResumeGuid

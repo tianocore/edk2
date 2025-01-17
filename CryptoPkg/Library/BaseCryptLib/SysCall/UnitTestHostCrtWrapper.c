@@ -104,4 +104,24 @@ getegid (
   return 0;
 }
 
-int  errno = 0;
+unsigned int
+sleep (
+  unsigned int  seconds
+  )
+{
+  return 0;
+}
+
+int
+gettimeofday (
+  struct timeval   *tv,
+  struct timezone  *tz
+  )
+{
+  tv->tv_sec  = 0;
+  tv->tv_usec = 0;
+  return 0;
+}
+
+int   errno = 0;
+long  timezone;

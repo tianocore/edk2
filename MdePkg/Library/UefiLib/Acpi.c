@@ -220,7 +220,12 @@ LocateAcpiTableInAcpiConfigurationTable (
                                                             NULL,
                                                             NULL
                                                             );
-      Table = LocateAcpiDsdtFromFadt (Fadt);
+
+      if (Fadt != NULL) {
+        Table = LocateAcpiDsdtFromFadt (Fadt);
+      } else {
+        Table = NULL;
+      }
     } else if (Signature == EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE) {
       ASSERT (PreviousTable == NULL);
       //
@@ -234,7 +239,12 @@ LocateAcpiTableInAcpiConfigurationTable (
                                                             NULL,
                                                             NULL
                                                             );
-      Table = LocateAcpiFacsFromFadt (Fadt);
+
+      if (Fadt != NULL) {
+        Table = LocateAcpiFacsFromFadt (Fadt);
+      } else {
+        Table = NULL;
+      }
     } else {
       Table = ScanTableInSDT (
                 Xsdt,
@@ -275,7 +285,12 @@ LocateAcpiTableInAcpiConfigurationTable (
                                                           NULL,
                                                           NULL
                                                           );
-    Table = LocateAcpiDsdtFromFadt (Fadt);
+
+    if (Fadt != NULL) {
+      Table = LocateAcpiDsdtFromFadt (Fadt);
+    } else {
+      Table = NULL;
+    }
   } else if (Signature == EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE) {
     ASSERT (PreviousTable == NULL);
     //
@@ -289,7 +304,12 @@ LocateAcpiTableInAcpiConfigurationTable (
                                                           NULL,
                                                           NULL
                                                           );
-    Table = LocateAcpiFacsFromFadt (Fadt);
+
+    if (Fadt != NULL) {
+      Table = LocateAcpiFacsFromFadt (Fadt);
+    } else {
+      Table = NULL;
+    }
   } else {
     Table = ScanTableInSDT (
               Rsdt,

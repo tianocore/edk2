@@ -4,6 +4,8 @@
   This file is stand alone self consistent set of definitions.
 
   Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -202,7 +204,7 @@ typedef UINTN RETURN_STATUS;
 #define ENCODE_ERROR(a)              ((RETURN_STATUS)(MAX_BIT | (a)))
 
 #define ENCODE_WARNING(a)            ((RETURN_STATUS)(a))
-#define RETURN_ERROR(a)              (((INTN)(RETURN_STATUS)(a)) < 0)
+#define RETURN_ERROR(a)              (((RETURN_STATUS)(a)) >= MAX_BIT)
 
 #define RETURN_SUCCESS               0
 #define RETURN_LOAD_ERROR            ENCODE_ERROR (1)

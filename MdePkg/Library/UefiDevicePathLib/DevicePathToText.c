@@ -1842,7 +1842,11 @@ DevPathToTextUri (
   Uri       = DevPath;
   UriLength = DevicePathNodeLength (Uri) - sizeof (URI_DEVICE_PATH);
   UriStr    = AllocatePool (UriLength + 1);
-  ASSERT (UriStr != NULL);
+
+  if (UriStr == NULL) {
+    ASSERT (UriStr != NULL);
+    return;
+  }
 
   CopyMem (UriStr, Uri->Uri, UriLength);
   UriStr[UriLength] = '\0';
@@ -1878,7 +1882,7 @@ DevPathToTextHardDrive (
     case SIGNATURE_TYPE_MBR:
       UefiDevicePathLibCatPrint (
         Str,
-        L"HD(%d,%s,0x%08x,",
+        L"HD(%d,%s,0x%08x",
         Hd->PartitionNumber,
         L"MBR",
         *((UINT32 *)(&(Hd->Signature[0])))
@@ -1888,7 +1892,7 @@ DevPathToTextHardDrive (
     case SIGNATURE_TYPE_GUID:
       UefiDevicePathLibCatPrint (
         Str,
-        L"HD(%d,%s,%g,",
+        L"HD(%d,%s,%g",
         Hd->PartitionNumber,
         L"GPT",
         (EFI_GUID *)&(Hd->Signature[0])
@@ -1898,14 +1902,18 @@ DevPathToTextHardDrive (
     default:
       UefiDevicePathLibCatPrint (
         Str,
-        L"HD(%d,%d,0,",
+        L"HD(%d,%d,0",
         Hd->PartitionNumber,
         Hd->SignatureType
         );
       break;
   }
 
-  UefiDevicePathLibCatPrint (Str, L"0x%lx,0x%lx)", Hd->PartitionStart, Hd->PartitionSize);
+  if (DisplayOnly) {
+    UefiDevicePathLibCatPrint (Str, L")");
+  } else {
+    UefiDevicePathLibCatPrint (Str, L",0x%lx,0x%lx)", Hd->PartitionStart, Hd->PartitionSize);
+  }
 }
 
 /**

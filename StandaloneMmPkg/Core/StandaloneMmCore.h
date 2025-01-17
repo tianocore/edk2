@@ -982,4 +982,45 @@ MmCoreGetMemoryMap (
   OUT UINT32                    *DescriptorVersion
   );
 
+/**
+  This is the main Dispatcher for MM and it exits when there are no more
+  drivers to run. Drain the mScheduledQueue and load and start a PE
+  image for each driver. Search the mDiscoveredList to see if any driver can
+  be placed on the mScheduledQueue. If no drivers are placed on the
+  mScheduledQueue exit the function.
+
+  @retval EFI_SUCCESS           All of the MM Drivers that could be dispatched
+                                have been run and the MM Entry Point has been
+                                registered.
+  @retval EFI_NOT_READY         The MM Driver that registered the MM Entry Point
+                                was just dispatched.
+  @retval EFI_NOT_FOUND         There are no MM Drivers available to be dispatched.
+  @retval EFI_ALREADY_STARTED   The MM Dispatcher is already running
+
+**/
+EFI_STATUS
+MmDispatcher (
+  VOID
+  );
+
+/**
+  Dispatch Standalone MM FVs.
+  The FVs will be shadowed into MMRAM, caller is responsible for calling
+  MmFreeShadowedFvs() to free the shadowed MM FVs.
+
+**/
+VOID
+MmDispatchFvs (
+  VOID
+  );
+
+/**
+  Free the shadowed MM FVs.
+
+**/
+VOID
+MmFreeShadowedFvs (
+  VOID
+  );
+
 #endif

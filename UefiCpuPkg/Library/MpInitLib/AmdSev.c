@@ -25,7 +25,9 @@ GetProtectedMode16CS (
   IA32_DESCRIPTOR          GdtrDesc;
   IA32_SEGMENT_DESCRIPTOR  *GdtEntry;
   UINTN                    GdtEntryCount;
-  UINT16                   Index;
+  UINTN                    Index;
+  UINT16                   CodeSegmentValue;
+  EFI_STATUS               Status;
 
   Index = (UINT16)-1;
   AsmReadGdtr (&GdtrDesc);
@@ -42,8 +44,19 @@ GetProtectedMode16CS (
     GdtEntry++;
   }
 
-  ASSERT (Index != GdtEntryCount);
-  return Index * 8;
+  Status = SafeUintnToUint16 (Index, &CodeSegmentValue);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return 0;
+  }
+
+  Status = SafeUint16Mult (CodeSegmentValue, 8, &CodeSegmentValue);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return 0;
+  }
+
+  return CodeSegmentValue;
 }
 
 /**
@@ -61,7 +74,9 @@ GetProtectedMode32CS (
   IA32_DESCRIPTOR          GdtrDesc;
   IA32_SEGMENT_DESCRIPTOR  *GdtEntry;
   UINTN                    GdtEntryCount;
-  UINT16                   Index;
+  UINTN                    Index;
+  UINT16                   CodeSegmentValue;
+  EFI_STATUS               Status;
 
   Index = (UINT16)-1;
   AsmReadGdtr (&GdtrDesc);
@@ -79,7 +94,19 @@ GetProtectedMode32CS (
   }
 
   ASSERT (Index != GdtEntryCount);
-  return Index * 8;
+  Status = SafeUintnToUint16 (Index, &CodeSegmentValue);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return 0;
+  }
+
+  Status = SafeUint16Mult (CodeSegmentValue, 8, &CodeSegmentValue);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return 0;
+  }
+
+  return CodeSegmentValue;
 }
 
 /**

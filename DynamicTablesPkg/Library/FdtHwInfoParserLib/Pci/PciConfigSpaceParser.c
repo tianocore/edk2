@@ -13,6 +13,7 @@
 **/
 
 #include "CmObjectDescUtility.h"
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 
 #include "FdtHwInfoParser.h"

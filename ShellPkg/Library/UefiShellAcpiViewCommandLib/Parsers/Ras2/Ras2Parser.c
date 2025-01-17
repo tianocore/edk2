@@ -14,9 +14,6 @@
 #include "AcpiParser.h"
 #include "AcpiView.h"
 
-// Maximum Memory Domain matrix print size.
-#define MAX_MEMORY_DOMAIN_TARGET_PRINT_MATRIX  10
-
 // Local variables
 STATIC CONST UINT16  *Ras2PccDescriptors;
 
@@ -86,7 +83,9 @@ ParseAcpiRas2 (
   IN UINT8    AcpiTableRevision
   )
 {
-  UINT32  Offset;
+  UINT32        Offset;
+  UINT16        Count = 0;
+  CONST CHAR16  *Message;
 
   if (!Trace) {
     return;
@@ -114,5 +113,18 @@ ParseAcpiRas2 (
       sizeof (EFI_ACPI_RAS2_PCC_DESCRIPTOR)
       );
     Offset += sizeof (EFI_ACPI_RAS2_PCC_DESCRIPTOR);
+    Count++;
   } // while
+
+  // Check counts match and print error if not
+  if (Count != *Ras2PccDescriptors) {
+    Message = Count > *Ras2PccDescriptors ? L"many" : L"few";
+    IncrementWarningCount ();
+    Print (
+      L"\nWARNING: Too %s descriptors provided (advertised %d, provided %d)",
+      Message,
+      *Ras2PccDescriptors,
+      Count
+      );
+  }
 }

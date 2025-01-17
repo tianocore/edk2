@@ -57,10 +57,6 @@
 
   Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
 
-# StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
-[LibraryClasses.common.SEC]
-   NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
-
 [LibraryClasses.common.PEIM,LibraryClasses.common.PEI_CORE]
   PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
   PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
@@ -82,7 +78,7 @@
   DevicePathLib|MdePkg/Library/UefiDevicePathLibDevicePathProtocol/UefiDevicePathLibDevicePathProtocol.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
 
-[Components.Ia32]
+[Components.Ia32, Components.X64]
   IntelFsp2WrapperPkg/Library/BaseFspWrapperApiTestLibNull/BaseFspWrapperApiTestLibNull.inf
   IntelFsp2WrapperPkg/Library/SecFspWrapperPlatformSecLibSample/SecFspWrapperPlatformSecLibSample.inf
   IntelFsp2WrapperPkg/Library/PeiFspWrapperHobProcessLibSample/PeiFspWrapperHobProcessLibSample.inf
@@ -91,6 +87,7 @@
 
   IntelFsp2WrapperPkg/FspmWrapperPeim/FspmWrapperPeim.inf
   IntelFsp2WrapperPkg/FspsWrapperPeim/FspsWrapperPeim.inf
+  IntelFsp2WrapperPkg/FspiWrapperPeim/FspiWrapperPeim.inf
 
 [Components.IA32, Components.X64]
   IntelFsp2WrapperPkg/Library/BaseFspWrapperApiLib/BaseFspWrapperApiLib.inf

@@ -11,6 +11,7 @@
 #include <PiPei.h>
 
 #include <Ppi/UfsHostController.h>
+#include <Ppi/UfsHostControllerPlatformPpi.h>
 #include <Ppi/BlockIo.h>
 #include <Ppi/BlockIo2.h>
 #include <Ppi/IoMmu.h>
@@ -26,8 +27,9 @@
 #include <Library/PeiServicesLib.h>
 
 #include <IndustryStandard/Scsi.h>
+#include <IndustryStandard/Ufs.h>
+#include <IndustryStandard/UfsHci.h>
 
-#include "UfsHci.h"
 #include "UfsHcMem.h"
 
 #define UFS_PEIM_HC_SIG  SIGNATURE_32 ('U', 'F', 'S', 'H')
@@ -157,6 +159,33 @@ typedef struct _UFS_DEVICE_MANAGEMENT_REQUEST_PACKET {
 } UFS_DEVICE_MANAGEMENT_REQUEST_PACKET;
 
 /**
+  Read or write specified attribute of a UFS device.
+
+  @param[in]      Private       The pointer to the UFS_PASS_THRU_PRIVATE_DATA data structure.
+  @param[in]      Read          The boolean variable to show r/w direction.
+  @param[in]      AttrId        The ID of Attribute.
+  @param[in]      Index         The Index of Attribute.
+  @param[in]      Selector      The Selector of Attribute.
+  @param[in, out] Attributes    The value of Attribute to be read or written.
+
+  @retval EFI_SUCCESS           The Attribute was read/written successfully.
+  @retval EFI_INVALID_PARAMETER AttrId, Index and Selector are invalid combination to point to a
+                                type of UFS device descriptor.
+  @retval EFI_DEVICE_ERROR      A device error occurred while attempting to r/w the Attribute.
+  @retval EFI_TIMEOUT           A timeout occurred while waiting for the completion of r/w the Attribute.
+
+**/
+EFI_STATUS
+UfsRwAttributes (
+  IN     UFS_PEIM_HC_PRIVATE_DATA  *Private,
+  IN     BOOLEAN                   Read,
+  IN     UINT8                     AttrId,
+  IN     UINT8                     Index,
+  IN     UINT8                     Selector,
+  IN OUT UINT32                    *Attributes
+  );
+
+/**
   Sends a UFS-supported SCSI Request Packet to a UFS device that is attached to the UFS host controller.
 
   @param[in]      Private       The pointer to the UFS_PEIM_HC_PRIVATE_DATA data structure.
@@ -193,7 +222,8 @@ UfsExecScsiCmds (
 **/
 EFI_STATUS
 UfsControllerInit (
-  IN  UFS_PEIM_HC_PRIVATE_DATA  *Private
+  IN  EDKII_UFS_HC_PLATFORM_PPI  *UfsHcPlatformPpi,
+  IN  UFS_PEIM_HC_PRIVATE_DATA   *Private
   );
 
 /**

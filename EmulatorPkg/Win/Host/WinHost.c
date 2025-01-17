@@ -190,7 +190,7 @@ SecPrint (
 
   va_start (Marker, Format);
 
-  _vsnprintf (Buffer, sizeof (Buffer), Format, Marker);
+  _vsnprintf_s (Buffer, sizeof (Buffer), sizeof (Buffer) - 1, Format, Marker);
 
   va_end (Marker);
 
@@ -1131,15 +1131,9 @@ PeCoffLoaderRelocateImageExtraAction (
 
     if ((Library != NULL) && (DllEntryPoint != NULL)) {
       Status = AddModHandle (ImageContext, Library);
-      if (Status == EFI_ALREADY_STARTED) {
+      if ((Status == EFI_SUCCESS) || (Status == EFI_ALREADY_STARTED)) {
         //
-        // If the DLL has already been loaded before, then this instance of the DLL can not be debugged.
-        //
-        ImageContext->PdbPointer = NULL;
-        SecPrint ("WARNING: DLL already loaded.  No source level debug %S.\n\r", DllFileName);
-      } else {
-        //
-        // This DLL is not already loaded, so source level debugging is supported.
+        // This DLL is either not loaded or already started, so source level debugging is supported.
         //
         ImageContext->EntryPoint = (EFI_PHYSICAL_ADDRESS)(UINTN)DllEntryPoint;
         SecPrint ("LoadLibraryEx (\n\r  %S,\n\r  NULL, DONT_RESOLVE_DLL_REFERENCES)\n\r", DllFileName);

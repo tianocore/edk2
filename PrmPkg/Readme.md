@@ -14,9 +14,9 @@ to be leveraged by platform firmware with minimal overhead to integrate PRM func
 `PlatformRtMechanism`. Support for this OperationRegion is planned for the next release of the ACPI specification.
 However, support for `PlatformRtMechanism` is already included in the iASL Compiler/Disassembler for early prototyping
 (i.e. this package). If you would like the default build to work and/or to use PRM handlers that are invoked
-through ACPI, iASL compiler [20200528](https://acpica.org/node/181) or greater must be used. If you are only
-interested in compiling the code and/or using direct call style PRM handlers, you can simply remove
-`PrmSsdtInstallDxe` from `PrmPkg.dsc`.
+through ACPI, iASL compiler [20200528](https://www.intel.com/content/www/us/en/download/774849/774861/acpi-component-architecture-downloads-previous-releases-2020.html)
+or greater must be used. If you are only interested in compiling the code and/or using direct call style PRM
+handlers, you can simply remove `PrmSsdtInstallDxe` from `PrmPkg.dsc`.
 
 The changes in the ACPI Specification include two elements:
 
@@ -97,8 +97,8 @@ the package being built.
 Like a typical EDK II package, the PrmPkg binary build output can be found in the Build directory in the edk2
 workspace. The organization in that directory follows the same layout as other EDK II packages.
 
-For example, that path to PRM module sample binaries for a DEBUG VS2017 X64 build is: \
-``edk2/Build/Prm/DEBUG_VS2017/X64/PrmPkg/Samples``
+For example, that path to PRM module sample binaries for a DEBUG VS2022 X64 build is: \
+``edk2/Build/Prm/DEBUG_VS2022/X64/PrmPkg/Samples``
 
 ## Overview
 

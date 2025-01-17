@@ -147,12 +147,47 @@ LocateMmCoreFv (
   OUT VOID                  **MmCoreImageAddress
   )
 {
-  EFI_STATUS           Status;
-  UINTN                FvIndex;
-  EFI_PEI_FV_HANDLE    VolumeHandle;
-  EFI_PEI_FILE_HANDLE  FileHandle;
-  EFI_PE32_SECTION     *SectionData;
-  EFI_FV_INFO          VolumeInfo;
+  EFI_STATUS               Status;
+  UINTN                    FvIndex;
+  EFI_PEI_FV_HANDLE        VolumeHandle;
+  EFI_PEI_FILE_HANDLE      FileHandle;
+  EFI_PE32_SECTION         *SectionData;
+  EFI_FV_INFO              VolumeInfo;
+  MM_CORE_FV_LOCATION_PPI  *MmCoreFvLocation;
+
+  //
+  // The producer of the MmCoreFvLocation PPI is responsible for ensuring
+  // that it reports the correct Firmware Volume (FV) containing the MmCore.
+  // If the gMmCoreFvLocationPpiGuid is not found, the system will search
+  // all Firmware Volumes (FVs) to locate the FV that contains the MM Core.
+  //
+  Status = PeiServicesLocatePpi (&gMmCoreFvLocationPpiGuid, 0, NULL, (VOID **)&MmCoreFvLocation);
+  if (Status == EFI_SUCCESS) {
+    *MmFvBase  = MmCoreFvLocation->Address;
+    *MmFvSize  = MmCoreFvLocation->Size;
+    FileHandle = NULL;
+    Status     = PeiServicesFfsFindNextFile (EFI_FV_FILETYPE_MM_CORE_STANDALONE, (VOID *)(UINTN)MmCoreFvLocation->Address, &FileHandle);
+    ASSERT_EFI_ERROR (Status);
+    if (Status == EFI_SUCCESS) {
+      ASSERT (FileHandle != NULL);
+      if (FileHandle != NULL) {
+        CopyGuid (MmCoreFileName, &((EFI_FFS_FILE_HEADER *)FileHandle)->Name);
+        //
+        // Search Section
+        //
+        Status = PeiServicesFfsFindSectionData (EFI_SECTION_PE32, FileHandle, MmCoreImageAddress);
+        ASSERT_EFI_ERROR (Status);
+
+        //
+        // Get MM Core section data.
+        //
+        SectionData = (EFI_PE32_SECTION *)((UINT8 *)*MmCoreImageAddress - sizeof (EFI_PE32_SECTION));
+        ASSERT (SectionData->Type == EFI_SECTION_PE32);
+      }
+    }
+
+    return EFI_SUCCESS;
+  }
 
   //
   // Search all FV
@@ -512,14 +547,6 @@ ExecuteMmCoreFromMmram (
   //
   Status = LocateMmCoreFv (&MmFvBase, &MmFvSize, &MmCoreFileName, &ImageContext.Handle);
   ASSERT_EFI_ERROR (Status);
-
-  //
-  // Unblock the MM FV range to be accessible from inside MM
-  //
-  if ((MmFvBase != 0) && (MmFvSize != 0)) {
-    Status = MmUnblockMemoryRequest (MmFvBase, EFI_SIZE_TO_PAGES (MmFvSize));
-    ASSERT_EFI_ERROR (Status);
-  }
 
   //
   // Initialize ImageContext

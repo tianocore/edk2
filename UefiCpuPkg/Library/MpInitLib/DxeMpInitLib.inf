@@ -63,6 +63,7 @@
 
 [LibraryClasses.IA32, LibraryClasses.X64]
   AmdSvsmLib
+  SafeIntLib
   CcExitLib
   LocalApicLib
   MicrocodeLib

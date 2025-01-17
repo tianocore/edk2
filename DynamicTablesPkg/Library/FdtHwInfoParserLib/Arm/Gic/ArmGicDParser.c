@@ -9,6 +9,7 @@
   - linux/Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.yaml
 **/
 
+#include <Library/BaseMemoryLib.h>
 #include "CmObjectDescUtility.h"
 #include "FdtHwInfoParser.h"
 #include "Arm/Gic/ArmGicDispatcher.h"

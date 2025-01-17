@@ -574,6 +574,45 @@ IsEfiVarStoreQuestion (
 
   @return Pointer to the matched variable header or NULL if not found.
 **/
+AUTHENTICATED_VARIABLE_HEADER *
+AuthFindVariableData (
+  IN  VARIABLE_STORE_HEADER  *VariableStorage,
+  IN  EFI_GUID               *VarGuid,
+  IN  UINT32                 VarAttribute,
+  IN  CHAR16                 *VarName
+  )
+{
+  AUTHENTICATED_VARIABLE_HEADER  *VariableHeader;
+  AUTHENTICATED_VARIABLE_HEADER  *VariableEnd;
+
+  VariableEnd    = (AUTHENTICATED_VARIABLE_HEADER *)((UINT8 *)VariableStorage + VariableStorage->Size);
+  VariableHeader = (AUTHENTICATED_VARIABLE_HEADER *)(VariableStorage + 1);
+  VariableHeader = (AUTHENTICATED_VARIABLE_HEADER *)HEADER_ALIGN (VariableHeader);
+  while (VariableHeader < VariableEnd) {
+    if (CompareGuid (&VariableHeader->VendorGuid, VarGuid) &&
+        (VariableHeader->Attributes == VarAttribute) &&
+        (StrCmp (VarName, (CHAR16 *)(VariableHeader + 1)) == 0))
+    {
+      return VariableHeader;
+    }
+
+    VariableHeader = (AUTHENTICATED_VARIABLE_HEADER *)((UINT8 *)VariableHeader + sizeof (AUTHENTICATED_VARIABLE_HEADER) + VariableHeader->NameSize + VariableHeader->DataSize);
+    VariableHeader = (AUTHENTICATED_VARIABLE_HEADER *)HEADER_ALIGN (VariableHeader);
+  }
+
+  return NULL;
+}
+
+/**
+  Find the matched variable from the input variable storage.
+
+  @param[in] VariableStorage Point to the variable storage header.
+  @param[in] VarGuid         A unique identifier for the variable.
+  @param[in] VarAttribute    The attributes bitmask for the variable.
+  @param[in] VarName         A Null-terminated ascii string that is the name of the variable.
+
+  @return Pointer to the matched variable header or NULL if not found.
+**/
 VARIABLE_HEADER *
 FindVariableData (
   IN  VARIABLE_STORE_HEADER  *VariableStorage,
@@ -626,25 +665,27 @@ FindQuestionDefaultSetting (
   IN  BOOLEAN                  BitFieldQuestion
   )
 {
-  VARIABLE_HEADER          *VariableHeader;
-  VARIABLE_STORE_HEADER    *VariableStorage;
-  LIST_ENTRY               *Link;
-  VARSTORAGE_DEFAULT_DATA  *Entry;
-  VARIABLE_STORE_HEADER    *NvStoreBuffer;
-  UINT8                    *DataBuffer;
-  UINT8                    *BufferEnd;
-  BOOLEAN                  IsFound;
-  UINTN                    Index;
-  UINT32                   BufferValue;
-  UINT32                   BitFieldVal;
-  UINTN                    BitOffset;
-  UINTN                    ByteOffset;
-  UINTN                    BitWidth;
-  UINTN                    StartBit;
-  UINTN                    EndBit;
-  PCD_DEFAULT_DATA         *DataHeader;
-  PCD_DEFAULT_INFO         *DefaultInfo;
-  PCD_DATA_DELTA           *DeltaData;
+  AUTHENTICATED_VARIABLE_HEADER  *AuthVariableHeader;
+  VARIABLE_HEADER                *VariableHeader;
+  VARIABLE_STORE_HEADER          *VariableStorage;
+  LIST_ENTRY                     *Link;
+  VARSTORAGE_DEFAULT_DATA        *Entry;
+  VARIABLE_STORE_HEADER          *NvStoreBuffer;
+  UINT8                          *DataBuffer;
+  UINT8                          *BufferEnd;
+  BOOLEAN                        IsFound;
+  UINTN                          Index;
+  UINT32                         BufferValue;
+  UINT32                         BitFieldVal;
+  UINTN                          BitOffset;
+  UINTN                          ByteOffset;
+  UINTN                          BitWidth;
+  UINTN                          StartBit;
+  UINTN                          EndBit;
+  PCD_DEFAULT_DATA               *DataHeader;
+  PCD_DEFAULT_INFO               *DefaultInfo;
+  PCD_DATA_DELTA                 *DeltaData;
+  BOOLEAN                        VarCheck;
 
   if (gSkuId == 0xFFFFFFFFFFFFFFFF) {
     gSkuId = LibPcdGetSku ();
@@ -750,40 +791,81 @@ FindQuestionDefaultSetting (
     return EFI_NOT_FOUND;
   }
 
-  //
-  // Find the question default value from the variable storage
-  //
-  VariableHeader = FindVariableData (VariableStorage, &EfiVarStore->Guid, EfiVarStore->Attributes, (CHAR16 *)EfiVarStore->Name);
-  if (VariableHeader == NULL) {
-    return EFI_NOT_FOUND;
-  }
+  VarCheck = (BOOLEAN)(CompareGuid (&VariableStorage->Signature, &gEfiAuthenticatedVariableGuid));
 
-  StartBit   = 0;
-  EndBit     = 0;
-  ByteOffset = IfrQuestionHdr->VarStoreInfo.VarOffset;
-  if (BitFieldQuestion) {
-    BitOffset  = IfrQuestionHdr->VarStoreInfo.VarOffset;
-    ByteOffset = BitOffset / 8;
-    BitWidth   = Width;
-    StartBit   = BitOffset % 8;
-    EndBit     = StartBit + BitWidth - 1;
-    Width      = EndBit / 8 + 1;
-  }
+  if (VarCheck) {
+    //
+    // Find the question default value from the variable storage
+    //
+    AuthVariableHeader = AuthFindVariableData (VariableStorage, &EfiVarStore->Guid, EfiVarStore->Attributes, (CHAR16 *)EfiVarStore->Name);
+    if (AuthVariableHeader == NULL) {
+      return EFI_NOT_FOUND;
+    }
 
-  if (VariableHeader->DataSize < ByteOffset + Width) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Copy the question value
-  //
-  if (ValueBuffer != NULL) {
+    StartBit   = 0;
+    EndBit     = 0;
+    ByteOffset = IfrQuestionHdr->VarStoreInfo.VarOffset;
     if (BitFieldQuestion) {
-      CopyMem (&BufferValue, (UINT8 *)VariableHeader + sizeof (VARIABLE_HEADER) + VariableHeader->NameSize + ByteOffset, Width);
-      BitFieldVal = BitFieldRead32 (BufferValue, StartBit, EndBit);
-      CopyMem (ValueBuffer, &BitFieldVal, Width);
-    } else {
-      CopyMem (ValueBuffer, (UINT8 *)VariableHeader + sizeof (VARIABLE_HEADER) + VariableHeader->NameSize + IfrQuestionHdr->VarStoreInfo.VarOffset, Width);
+      BitOffset  = IfrQuestionHdr->VarStoreInfo.VarOffset;
+      ByteOffset = BitOffset / 8;
+      BitWidth   = Width;
+      StartBit   = BitOffset % 8;
+      EndBit     = StartBit + BitWidth - 1;
+      Width      = EndBit / 8 + 1;
+    }
+
+    if (AuthVariableHeader->DataSize < ByteOffset + Width) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    //
+    // Copy the question value
+    //
+    if (ValueBuffer != NULL) {
+      if (BitFieldQuestion) {
+        CopyMem (&BufferValue, (UINT8 *)AuthVariableHeader + sizeof (AUTHENTICATED_VARIABLE_HEADER) + AuthVariableHeader->NameSize + ByteOffset, Width);
+        BitFieldVal = BitFieldRead32 (BufferValue, StartBit, EndBit);
+        CopyMem (ValueBuffer, &BitFieldVal, sizeof (UINT32));
+      } else {
+        CopyMem (ValueBuffer, (UINT8 *)AuthVariableHeader + sizeof (AUTHENTICATED_VARIABLE_HEADER) + AuthVariableHeader->NameSize + IfrQuestionHdr->VarStoreInfo.VarOffset, Width);
+      }
+    }
+  } else {
+    //
+    // Find the question default value from the variable storage
+    //
+    VariableHeader = FindVariableData (VariableStorage, &EfiVarStore->Guid, EfiVarStore->Attributes, (CHAR16 *)EfiVarStore->Name);
+    if (VariableHeader == NULL) {
+      return EFI_NOT_FOUND;
+    }
+
+    StartBit   = 0;
+    EndBit     = 0;
+    ByteOffset = IfrQuestionHdr->VarStoreInfo.VarOffset;
+    if (BitFieldQuestion) {
+      BitOffset  = IfrQuestionHdr->VarStoreInfo.VarOffset;
+      ByteOffset = BitOffset / 8;
+      BitWidth   = Width;
+      StartBit   = BitOffset % 8;
+      EndBit     = StartBit + BitWidth - 1;
+      Width      = EndBit / 8 + 1;
+    }
+
+    if (VariableHeader->DataSize < ByteOffset + Width) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    //
+    // Copy the question value
+    //
+    if (ValueBuffer != NULL) {
+      if (BitFieldQuestion) {
+        CopyMem (&BufferValue, (UINT8 *)VariableHeader + sizeof (VARIABLE_HEADER) + VariableHeader->NameSize + ByteOffset, Width);
+        BitFieldVal = BitFieldRead32 (BufferValue, StartBit, EndBit);
+        CopyMem (ValueBuffer, &BitFieldVal, sizeof (UINT32));
+      } else {
+        CopyMem (ValueBuffer, (UINT8 *)VariableHeader + sizeof (VARIABLE_HEADER) + VariableHeader->NameSize + IfrQuestionHdr->VarStoreInfo.VarOffset, Width);
+      }
     }
   }
 

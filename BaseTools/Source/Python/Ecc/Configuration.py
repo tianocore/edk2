@@ -432,7 +432,7 @@ class Configuration(object):
 # test that our dict and out class still match in contents.
 #
 if __name__ == '__main__':
-    myconfig = Configuration("BaseTools\Source\Python\Ecc\config.ini")
+    myconfig = Configuration(r"BaseTools\Source\Python\Ecc\config.ini")
     for each in myconfig.__dict__:
         if each == "Filename":
             continue

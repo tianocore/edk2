@@ -57,6 +57,8 @@
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
+  BaseLib
+  BaseMemoryLib
   DebugLib
   FdtLib
   MemoryAllocationLib

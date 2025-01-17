@@ -91,9 +91,9 @@ class UefiCapsuleHeaderClass (object):
                      Buffer[0:self._StructSize]
                      )
         if HeaderSize < self._StructSize:
-            raise ValueError
+            raise ValueError("HeaderSize of {0} doesn't match _StructSize of {1}".format(HeaderSize, self._StructSize))
         if CapsuleImageSize != len (Buffer):
-            raise ValueError
+            raise ValueError("CapsuleImageSize of {0} doesn't match buffer length of {1}".format(CapsuleImageSize, len(Buffer)))
         self.CapsuleGuid         = uuid.UUID (bytes_le = CapsuleGuid)
         self.HeaderSize          = HeaderSize
         self.OemFlags            = Flags & 0xffff

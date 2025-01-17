@@ -429,7 +429,7 @@ def check_macros_in_directory(directory: PurePath,
 
         files = []
         for file in root_directory.rglob('*'):
-            if file.suffix in extensions:
+            if file.suffix in extensions and not file.is_dir:
                 files.append(Path(file))
 
             # Give an indicator progress is being made

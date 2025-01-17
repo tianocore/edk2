@@ -335,9 +335,11 @@ ShellLevel2StripQuotes (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  for (Walker = *CleanString; Walker != NULL && *Walker != CHAR_NULL; Walker++) {
+  for (Walker = *CleanString; Walker != NULL && *Walker != CHAR_NULL;) {
     if (*Walker == L'\"') {
       CopyMem (Walker, Walker+1, StrSize (Walker) - sizeof (Walker[0]));
+    } else {
+      Walker++;
     }
   }
 
