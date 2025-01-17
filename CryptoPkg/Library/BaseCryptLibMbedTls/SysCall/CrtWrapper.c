@@ -47,6 +47,26 @@ strchr (
   return ScanMem8 (str, AsciiStrSize (str), (char)ch);
 }
 
+char *
+strncpy (
+  char        *strDest,
+  const char  *strSource,
+  size_t      count
+  )
+{
+  UINTN  DestMax = MAX_STRING_SIZE;
+
+  if (count < MAX_STRING_SIZE) {
+    DestMax = count + 1;
+  } else {
+    count = MAX_STRING_SIZE-1;
+  }
+
+  AsciiStrnCpyS (strDest, DestMax, strSource, (UINTN)count);
+
+  return strDest;
+}
+
 /**strcmp function. **/
 int
 strcmp (
