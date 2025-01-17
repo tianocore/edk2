@@ -1,0 +1,158 @@
+/** @file
+  Arm Ffa library code for Dxe Driver
+
+  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+   @par Glossary:
+     - FF-A - Firmware Framework for Arm A-profile
+
+   @par Reference(s):
+     - Arm Firmware Framework for Arm A-Profile [https://developer.arm.com/documentation/den0077/latest]
+
+**/
+
+#include <Uefi.h>
+#include <Pi/PiMultiPhase.h>
+
+#include <Library/ArmLib.h>
+#include <Library/ArmSmcLib.h>
+#include <Library/ArmFfaLib.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
+#include <Library/HobLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/PcdLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+
+#include <IndustryStandard/ArmFfaSvc.h>
+
+#include "ArmFfaCommon.h"
+#include "ArmFfaRxTxMap.h"
+
+STATIC EFI_EVENT  mFfaExitBootServiceEvent;
+
+/**
+  Unmap RX/TX buffer on Exit Boot Service.
+
+  @param [in]   Event      Registered exit boot service event.
+  @param [in]   Context    Additional data.
+
+**/
+STATIC
+VOID
+EFIAPI
+ArmFfaLibExitBootServiceEvent (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  ArmFfaLibRxTxUnmap ();
+}
+
+/**
+  ArmFfaLib Constructor.
+
+  @param [in]   ImageHandle      Image Handle
+  @param [in]   SystemTable      System Table
+
+  @retval EFI_SUCCESS            Success
+  @retval EFI_INVALID_PARAMETER  Invalid alignment of Rx/Tx buffer
+  @retval EFI_OUT_OF_RESOURCES   Out of memory
+  @retval Others                 Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaDxeLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS                 Status;
+  EFI_HOB_GUID_TYPE          *RxTxBufferHob;
+  ARM_FFA_RX_TX_BUFFER_INFO  *BufferInfo;
+
+  Status = ArmFfaLibCommonInit ();
+  if (EFI_ERROR (Status)) {
+    if (Status == EFI_UNSUPPORTED) {
+      /*
+       * EFI_UNSUPPORTED return from ArmFfaLibCommonInit() means
+       * FF-A interface doesn't support.
+       * However, It doesn't make failure of loading driver/library instance
+       * (i.e) ArmPkg's MmCommunication Dxe/PEI Driver uses as well as SpmMm.
+       * So If FF-A is not supported the the MmCommunication Dxe/PEI falls
+       * back to SpmMm.
+       * For this case, return EFI_SUCCESS.
+       */
+      return EFI_SUCCESS;
+    }
+
+    return Status;
+  }
+
+  if (PcdGetBool (PcdFfaExitBootEventRegistered)) {
+    return EFI_SUCCESS;
+  }
+
+  /*
+   * If PEIM uses ArmFfaPeiLib, the Rx/Tx buffers is already mapped in PEI phase.
+   * In this case, get Rx/Tx buffer info from Hob.
+   */
+  RxTxBufferHob = GetFirstGuidHob (&gArmFfaRxTxBufferInfoGuid);
+  if (RxTxBufferHob != NULL) {
+    BufferInfo = GET_GUID_HOB_DATA (RxTxBufferHob);
+    PcdSet64S (PcdFfaTxBuffer, (UINTN)BufferInfo->TxBufferAddr);
+    PcdSet64S (PcdFfaRxBuffer, (UINTN)BufferInfo->RxBufferAddr);
+  } else {
+    Status = ArmFfaLibRxTxMap ();
+
+    /*
+     * When first Dxe instance (library or driver) which uses ArmFfaLib loaded,
+     * It already maps Rx/Tx buffer.
+     * From Next Dxe instance which uses ArmFfaLib it doesn't need to map Rx/Tx
+     * buffer again but it uses the mapped one.
+     * ArmFfaLibRxTxMap() returns EFI_ALREADY_STARTED when the Rx/Tx buffers
+     * already maps.
+     */
+    if ((Status != EFI_SUCCESS) && (Status != EFI_ALREADY_STARTED)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Failed to Map Rx/Tx buffer. Status: %r\n",
+        __func__,
+        Status
+        ));
+      return Status;
+    }
+  }
+
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  ArmFfaLibExitBootServiceEvent,
+                  NULL,
+                  &gEfiEventExitBootServicesGuid,
+                  &mFfaExitBootServiceEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Failed to register ExitBootService event. Status: %r\n",
+      __func__,
+      Status
+      ));
+    goto ErrorHandler;
+  }
+
+  PcdSetBoolS (PcdFfaExitBootEventRegistered, TRUE);
+
+  return EFI_SUCCESS;
+
+ErrorHandler:
+  if (RxTxBufferHob != NULL) {
+    ArmFfaLibRxTxUnmap ();
+  }
+
+  return Status;
+}
