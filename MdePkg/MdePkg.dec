@@ -349,6 +349,20 @@
   #
   ArmLib|Include/Library/ArmLib.h
 
+  ##  @libraryclass  Provides an interface to initialize a
+  #   Generic Interrupt Controller (GIC).
+  #
+  ArmGicArchLib|Include/Library/ArmGicArchLib.h
+
+  ##  @libraryclass  Provides a Generic Interrupt Controller (GIC)
+  #   configuration interface.
+  #
+  ArmGicLib|Include/Library/ArmGicLib.h
+
+  ##  @libraryclass  Provides a Mmu interface.
+  #
+  ArmMmuLib|Include/Library/ArmMmuLib.h
+
 [Guids]
   #
   # GUID defined in UEFI2.1/UEFI2.0/EFI1.1
@@ -915,6 +929,9 @@
 
   ## Include/Guid/Cper.h
   gEfiIa32X64ErrorTypeMsCheckGuid    = { 0x48AB7F57, 0xDC34, 0x4f6c, { 0xA7, 0xD3, 0xB0, 0xB5, 0xB0, 0xA7, 0x43, 0x14 }}
+
+[Guids.ARM, Guids.AARCH64]
+  gArmTokenSpaceGuid       = { 0xBB11ECFE, 0x820F, 0x4968, { 0xBB, 0xA6, 0xF7, 0x6A, 0xFE, 0x30, 0x25, 0x96 } }
 
 [Ppis]
   ## Include/Ppi/MasterBootMode.h
@@ -2487,6 +2504,15 @@
   ## GUID identifying the Rng algorithm implemented by CPU instruction.
   # @Prompt CPU Rng algorithm's GUID.
   gEfiMdePkgTokenSpaceGuid.PcdCpuRngSupportedAlgorithm|{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}|VOID*|0x00000037
+
+[PcdsFixedAtBuild.common.ARM, PcdsFixedAtBuild.common.AArch64, PcdsDynamic.common.ARM, PcdsDynamic.common.AArch64]
+  #
+  # ARM Generic Interrupt Controller
+  #
+  gArmTokenSpaceGuid.PcdGicDistributorBase|0|UINT64|0x0000000C
+  # Base address for the GIC Redistributor region that contains the boot CPU
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0|UINT64|0x0000000E
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0|UINT64|0x0000000D
 
 [PcdsFixedAtBuild.RISCV64, PcdsPatchableInModule.RISCV64]
   #

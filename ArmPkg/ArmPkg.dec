@@ -36,23 +36,9 @@
   #
   ArmGenericTimerCounterLib|Include/Library/ArmGenericTimerCounterLib.h
 
-  ##  @libraryclass  Provides an interface to initialize a
-  #   Generic Interrupt Controller (GIC).
-  #
-  ArmGicArchLib|Include/Library/ArmGicArchLib.h
-
-  ##  @libraryclass  Provides a Generic Interrupt Controller (GIC)
-  #   configuration interface.
-  #
-  ArmGicLib|Include/Library/ArmGicLib.h
-
   ##  @libraryclass  Provides a HyperVisor Call (HVC) interface.
   #
   ArmHvcLib|Include/Library/ArmHvcLib.h
-
-  ##  @libraryclass  Provides a Mmu interface.
-  #
-  ArmMmuLib|Include/Library/ArmMmuLib.h
 
   ##  @libraryclass  Provides a Mailbox Transport Layer (MTL) interface
   #   for the System Control and Management Interface (SCMI).
@@ -106,8 +92,6 @@
   StandaloneMmCoreEntryPoint|Include/Library/ArmStandaloneMmCoreEntryPoint.h
 
 [Guids.common]
-  gArmTokenSpaceGuid       = { 0xBB11ECFE, 0x820F, 0x4968, { 0xBB, 0xA6, 0xF7, 0x6A, 0xFE, 0x30, 0x25, 0x96 } }
-
   ## ARM MPCore table
   # Include/Guid/ArmMpCoreInfo.h
   gArmMpCoreInfoGuid = { 0xa4ee0728, 0xe5d7, 0x4ac5,  {0xb2, 0x1e, 0x65, 0x8e, 0xd8, 0x57, 0xe8, 0x34} }
@@ -352,10 +336,6 @@
   #
   # ARM Generic Interrupt Controller
   #
-  gArmTokenSpaceGuid.PcdGicDistributorBase|0|UINT64|0x0000000C
-  # Base address for the GIC Redistributor region that contains the boot CPU
-  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0|UINT64|0x0000000E
-  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0|UINT64|0x0000000D
   gArmTokenSpaceGuid.PcdGicSgiIntId|0|UINT32|0x00000025
 
   #
