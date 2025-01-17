@@ -22,6 +22,7 @@
 #define ICC_IAR1_EL1            S3_0_C12_C12_0
 #define ICC_PMR_EL1             S3_0_C4_C6_0
 #define ICC_BPR1_EL1            S3_0_C12_C12_3
+#define ICC_CTLR_EL1            S3_0_C12_C12_4
 
 #endif
 
@@ -98,4 +99,20 @@ ASM_FUNC(ArmGicV3SetPriorityMask)
 //  );
 ASM_FUNC(ArmGicV3SetBinaryPointer)
         msr     ICC_BPR1_EL1, x0
+        ret
+
+//UINTN
+//ArmGicV3GetControlRegister(
+//  VOID
+//  );
+ASM_FUNC(ArmGicV3GetControlRegister)
+        mrs     x0, ICC_CTLR_EL1
+        ret
+
+//VOID
+//ArmGicV3SetControlRegister(
+//  IN UINTN          Value
+//  );
+ASM_FUNC(ArmGicV3SetControlRegister)
+        msr     ICC_CTLR_EL1, x0
         ret

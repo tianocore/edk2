@@ -118,7 +118,8 @@
 
 // GIC revision 3 specific declarations
 
-#define ICC_SRE_EL2_SRE  (1 << 0)
+#define ICC_SRE_EL2_SRE   (1 << 0)
+#define ICC_CTLR_EOImode  (1 << 1)
 
 #define ARM_GICD_IROUTER_IRM  BIT31
 
