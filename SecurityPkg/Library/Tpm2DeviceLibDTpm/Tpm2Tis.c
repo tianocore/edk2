@@ -397,7 +397,7 @@ Tpm2TisTpmCommand (
 Exit:
   DEBUG_CODE_BEGIN ();
   DEBUG ((DEBUG_VERBOSE, "Tpm2TisTpmCommand Receive - "));
-  for (Index = 0; Index < TpmOutSize; Index++) {
+  for (Index = 0; Index < *SizeOut; Index++) {
     DEBUG ((DEBUG_VERBOSE, "%02x ", BufferOut[Index]));
   }
 
