@@ -71,6 +71,7 @@ STATIC KERNEL_BLOB_ITEMS  mKernelBlobItems[] = {
 
 STATIC KERNEL_BLOB  *mKernelBlobs;
 STATIC UINT64       mKernelBlobCount;
+STATIC UINT64       mKernelNamedBlobCount;
 STATIC UINT64       mTotalBlobBytes;
 
 //
@@ -1139,6 +1140,8 @@ QemuKernelFetchNamedBlobs (
       FreePool (DirEntry);
       return Status;
     }
+
+    mKernelNamedBlobCount++;
   }
 
   FreePool (DirEntry);
@@ -1218,8 +1221,8 @@ QemuKernelLoaderFsDxeEntrypoint (
   }
 
   Blob = FindKernelBlob (L"kernel");
-  if (Blob == NULL) {
-    DEBUG ((DEBUG_INFO, "%a: no kernel present -> quit\n", __func__));
+  if ((Blob == NULL) && (mKernelNamedBlobCount == 0)) {
+    DEBUG ((DEBUG_INFO, "%a: no kernel and no named blobs present -> quit\n", __func__));
     Status = EFI_NOT_FOUND;
     goto FreeBlobs;
   }
