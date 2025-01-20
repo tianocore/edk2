@@ -7,6 +7,8 @@
 **/
 
 #include <PiPei.h>
+#include <Base.h>
+#include <Library/QemuFwCfgLib.h>
 #include <Library/HobLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -47,6 +49,10 @@ InitializePlatform (
 
   DEBUG ((DEBUG_INFO, "InitializePlatform in Pei-less boot\n"));
   PlatformDebugDumpCmos ();
+
+  if (RETURN_ERROR (QemuFwCfgInitCache (PlatformInfoHob))) {
+    DEBUG ((DEBUG_ERROR, "QemuFwCfgInitCache failed !\n"));
+  }
 
   PlatformInfoHob->DefaultMaxCpuNumber = 64;
   PlatformInfoHob->PcdPciMmio64Size    = 0x800000000;
