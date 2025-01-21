@@ -482,12 +482,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|1280
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|800
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable|FALSE
-  gUefiOvmfPkgTokenSpaceGuid.PcdVideoResolutionSource|0
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0
   gUefiOvmfPkgTokenSpaceGuid.PcdPciIoBase|0x0
   gUefiOvmfPkgTokenSpaceGuid.PcdPciIoSize|0x0
@@ -517,6 +512,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask|0x0
 
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x00
+
+!include OvmfPkg/Include/Dsc/OvmfDisplayPcds.dsc.inc
 
 ################################################################################
 #

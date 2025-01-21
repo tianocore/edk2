@@ -23,7 +23,7 @@
 !include MdePkg/MdeLibs.dsc.inc
 
 [PcdsPatchableInModule]
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x1F
 
 [Components]
   UnitTestFrameworkPkg/Library/UnitTestLib/UnitTestLib.inf

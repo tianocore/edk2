@@ -27,11 +27,18 @@
 ///
 typedef struct {
   UINT32    Signature;
-  VOID      *AllocatedBufffer;
+  VOID      *AllocatedBuffer;
   UINTN     TotalPages;
   VOID      *AlignedBuffer;
   UINTN     AlignedPages;
 } PAGE_HEAD;
+
+#define POOL_HEAD_PRIVATE_SIGNATURE  SIGNATURE_32 ('P', 'O', 'H', 'D')
+
+typedef struct {
+  UINT32    Signature;
+  UINT32    TotalSize;
+} POOL_HEAD;
 
 /**
   Allocates one or more 4KB pages of type EfiBootServicesData.
@@ -165,16 +172,17 @@ AllocateAlignedPages (
   //
   // We need reserve Alignment pages for PAGE_HEAD, as meta data.
   //
-  PageHead.Signature        = PAGE_HEAD_PRIVATE_SIGNATURE;
-  PageHead.TotalPages       = Pages + EFI_SIZE_TO_PAGES (Alignment) * 2;
-  PageHead.AlignedPages     = Pages;
-  PageHead.AllocatedBufffer = malloc (EFI_PAGES_TO_SIZE (PageHead.TotalPages));
-  if (PageHead.AllocatedBufffer == NULL) {
-    return NULL;
-  }
+  PageHead.Signature       = PAGE_HEAD_PRIVATE_SIGNATURE;
+  PageHead.TotalPages      = Pages + EFI_SIZE_TO_PAGES (Alignment) * 2;
+  PageHead.AlignedPages    = Pages;
+  PageHead.AllocatedBuffer = malloc (EFI_PAGES_TO_SIZE (PageHead.TotalPages));
 
-  PageHead.AlignedBuffer = (VOID *)(((UINTN)PageHead.AllocatedBufffer + AlignmentMask) & ~AlignmentMask);
-  if ((UINTN)PageHead.AlignedBuffer - (UINTN)PageHead.AllocatedBufffer < sizeof (PAGE_HEAD)) {
+  ASSERT (PageHead.AllocatedBuffer != NULL);
+
+  DEBUG_CLEAR_MEMORY (PageHead.AllocatedBuffer, EFI_PAGES_TO_SIZE (PageHead.TotalPages));
+
+  PageHead.AlignedBuffer = (VOID *)(((UINTN)PageHead.AllocatedBuffer + AlignmentMask) & ~AlignmentMask);
+  if ((UINTN)PageHead.AlignedBuffer - (UINTN)PageHead.AllocatedBuffer < sizeof (PAGE_HEAD)) {
     PageHead.AlignedBuffer = (VOID *)((UINTN)PageHead.AlignedBuffer + Alignment);
   }
 
@@ -265,21 +273,24 @@ FreeAlignedPages (
   )
 {
   PAGE_HEAD  *PageHeadPtr;
+  VOID       *AllocatedBuffer;
+  UINTN      Length;
 
-  //
-  // NOTE: Partial free is not supported. Just keep it.
-  //
-  PageHeadPtr = (VOID *)((UINTN)Buffer - sizeof (PAGE_HEAD));
-  if (PageHeadPtr->Signature != PAGE_HEAD_PRIVATE_SIGNATURE) {
-    return;
-  }
+  ASSERT (Buffer != NULL);
 
-  if (PageHeadPtr->AlignedPages != Pages) {
-    return;
-  }
+  PageHeadPtr = ((PAGE_HEAD *)Buffer) - 1;
 
-  PageHeadPtr->Signature = 0;
-  free (PageHeadPtr->AllocatedBufffer);
+  ASSERT (PageHeadPtr != NULL);
+  ASSERT (PageHeadPtr->Signature == PAGE_HEAD_PRIVATE_SIGNATURE);
+  ASSERT (PageHeadPtr->AlignedPages == Pages);
+  ASSERT (PageHeadPtr->AllocatedBuffer != NULL);
+
+  AllocatedBuffer = PageHeadPtr->AllocatedBuffer;
+  Length          = EFI_PAGES_TO_SIZE (PageHeadPtr->TotalPages);
+
+  DEBUG_CLEAR_MEMORY (AllocatedBuffer, Length);
+
+  free (AllocatedBuffer);
 }
 
 /**
@@ -293,13 +304,27 @@ FreeAlignedPages (
 
   @return  A pointer to the allocated buffer or NULL if allocation fails.
 
-**/VOID *
+**/
+VOID *
 EFIAPI
 AllocatePool (
   IN UINTN  AllocationSize
   )
 {
-  return malloc (AllocationSize);
+  POOL_HEAD  *PoolHead;
+  UINTN      TotalSize;
+
+  TotalSize = sizeof (POOL_HEAD) + AllocationSize;
+  PoolHead  = malloc (TotalSize);
+  if (PoolHead == NULL) {
+    return NULL;
+  }
+
+  DEBUG_CLEAR_MEMORY (PoolHead, TotalSize);
+  PoolHead->Signature = POOL_HEAD_PRIVATE_SIGNATURE;
+  PoolHead->TotalSize = (UINT32)TotalSize;
+
+  return (VOID *)(PoolHead + 1);
 }
 
 /**
@@ -365,7 +390,7 @@ AllocateZeroPool (
 {
   VOID  *Buffer;
 
-  Buffer = malloc (AllocationSize);
+  Buffer = AllocatePool (AllocationSize);
   if (Buffer == NULL) {
     return NULL;
   }
@@ -444,7 +469,7 @@ AllocateCopyPool (
 {
   VOID  *Memory;
 
-  Memory = malloc (AllocationSize);
+  Memory = AllocatePool (AllocationSize);
   if (Memory == NULL) {
     return NULL;
   }
@@ -538,7 +563,7 @@ ReallocatePool (
 {
   VOID  *NewBuffer;
 
-  NewBuffer = malloc (NewSize);
+  NewBuffer = AllocatePool (NewSize);
   if ((NewBuffer != NULL) && (OldBuffer != NULL)) {
     memcpy (NewBuffer, OldBuffer, MIN (OldSize, NewSize));
   }
@@ -634,5 +659,16 @@ FreePool (
   IN VOID  *Buffer
   )
 {
-  free (Buffer);
+  POOL_HEAD  *PoolHead;
+
+  ASSERT (Buffer != NULL);
+
+  PoolHead = ((POOL_HEAD *)Buffer) - 1;
+
+  ASSERT (PoolHead != NULL);
+  ASSERT (PoolHead->Signature == POOL_HEAD_PRIVATE_SIGNATURE);
+  ASSERT (PoolHead->TotalSize >= sizeof (POOL_HEAD));
+
+  DEBUG_CLEAR_MEMORY (PoolHead, PoolHead->TotalSize);
+  free (PoolHead);
 }
