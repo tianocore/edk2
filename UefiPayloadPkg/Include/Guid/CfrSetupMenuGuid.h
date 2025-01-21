@@ -66,6 +66,10 @@ typedef struct {
    */
 } CFR_ENUM_VALUE;
 
+enum cfr_numeric_option_display_flags {
+  CFR_NUM_OPT_DISPFLAG_HEX  = 1 << 0,
+};
+
 #define CB_TAG_CFR_OPTION_ENUM    0x0003
 #define CB_TAG_CFR_OPTION_NUMBER  0x0004
 #define CB_TAG_CFR_OPTION_BOOL    0x0005
@@ -79,6 +83,10 @@ typedef struct {
   UINT64                      dependency_id;  /* Dependent object ID, or 0 */
   UINT32                      flags;          /* enum cfr_option_flags */
   UINT32                      default_value;
+  UINT32                      min;
+  UINT32                      max;
+  UINT32                      step;
+  UINT32                      display_flags;  /* enum cfr_numeric_option_display_flags */
   /*
    * CFR_VARCHAR_OPT_NAME     opt_name
    * CFR_VARCHAR_UI_NAME      ui_name
