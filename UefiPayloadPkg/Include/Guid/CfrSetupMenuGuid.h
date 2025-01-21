@@ -9,6 +9,8 @@
 #ifndef __CFR_SETUP_MENU_GUID_H__
 #define __CFR_SETUP_MENU_GUID_H__
 
+#define CB_CFR_VERSION 0x00000000
+
 ///
 /// CFR options form GUID
 ///
