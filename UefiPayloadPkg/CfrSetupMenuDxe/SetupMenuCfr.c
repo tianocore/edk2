@@ -438,10 +438,12 @@ CfrProcessNumericOption (
                       HiiDisplayStringId,
                       HiiHelpTextId,
                       QuestionFlags,
-                      EFI_IFR_NUMERIC_SIZE_4 | EFI_IFR_DISPLAY_UINT_DEC,
-                      0x00000000,
-                      0xFFFFFFFF,
-                      0,
+                      EFI_IFR_NUMERIC_SIZE_4 |
+                        ((Option->display_flags & CFR_NUM_OPT_DISPFLAG_HEX) ?
+                        EFI_IFR_DISPLAY_UINT_HEX : EFI_IFR_DISPLAY_UINT_DEC),
+                      Option->min,
+                      Option->max,
+                      Option->step,
                       DefaultOpCodeHandle
                       );
     ASSERT (TempHiiBuffer != NULL);
