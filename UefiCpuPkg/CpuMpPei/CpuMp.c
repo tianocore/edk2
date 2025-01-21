@@ -1,42 +1,26 @@
 /** @file
-  Definitions to install Multiple Processor PPI.
+  EFI_PEI_MP_SERVICES_PPI Implementation code.
 
-  Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2022, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2025, Loongson Technology Corporation Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _CPU_MP_PEI_H_
-#define _CPU_MP_PEI_H_
+#include "CpuMpPei.h"
 
-#include <PiPei.h>
-
-#include <Ppi/MpServices.h>
-#include <Ppi/SecPlatformInformation.h>
-#include <Ppi/SecPlatformInformation2.h>
-#include <Ppi/EndOfPeiPhase.h>
-#include <Ppi/MpServices2.h>
-
-#include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
-#include <Library/HobLib.h>
-#include <Library/LocalApicLib.h>
-#include <Library/PeimEntryPoint.h>
-#include <Library/PeiServicesLib.h>
-#include <Library/ReportStatusCodeLib.h>
-#include <Library/CpuExceptionHandlerLib.h>
-#include <Library/MpInitLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/CpuPageTableLib.h>
-
-#include <Guid/MpInformation2.h>
-
-#include <Register/Cpuid.h>
-
-extern EDKII_PEI_MP_SERVICES2_PPI  mMpServices2Ppi;
-extern EFI_PEI_MP_SERVICES_PPI     mMpServicesPpi;
+//
+// CPU MP PPI to be installed
+//
+EFI_PEI_MP_SERVICES_PPI  mMpServicesPpi = {
+  PeiGetNumberOfProcessors,
+  PeiGetProcessorInfo,
+  PeiStartupAllAPs,
+  PeiStartupThisAP,
+  PeiSwitchBSP,
+  PeiEnableDisableAP,
+  PeiWhoAmI,
+};
 
 /**
   This service retrieves the number of logical processor in the platform
@@ -79,7 +63,17 @@ PeiGetNumberOfProcessors (
   IN  EFI_PEI_MP_SERVICES_PPI  *This,
   OUT UINTN                    *NumberOfProcessors,
   OUT UINTN                    *NumberOfEnabledProcessors
-  );
+  )
+{
+  if ((NumberOfProcessors == NULL) || (NumberOfEnabledProcessors == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  return MpInitLibGetNumberOfProcessors (
+           NumberOfProcessors,
+           NumberOfEnabledProcessors
+           );
+}
 
 /**
   Gets detailed MP-related information on the requested processor at the
@@ -114,7 +108,10 @@ PeiGetProcessorInfo (
   IN  EFI_PEI_MP_SERVICES_PPI    *This,
   IN  UINTN                      ProcessorNumber,
   OUT EFI_PROCESSOR_INFORMATION  *ProcessorInfoBuffer
-  );
+  )
+{
+  return MpInitLibGetProcessorInfo (ProcessorNumber, ProcessorInfoBuffer, NULL);
+}
 
 /**
   This service executes a caller provided function on all enabled APs. APs can
@@ -188,7 +185,17 @@ PeiStartupAllAPs (
   IN  BOOLEAN                  SingleThread,
   IN  UINTN                    TimeoutInMicroSeconds,
   IN  VOID                     *ProcedureArgument      OPTIONAL
-  );
+  )
+{
+  return MpInitLibStartupAllAPs (
+           Procedure,
+           SingleThread,
+           NULL,
+           TimeoutInMicroSeconds,
+           ProcedureArgument,
+           NULL
+           );
+}
 
 /**
   This service lets the caller get one enabled AP to execute a caller-provided
@@ -245,7 +252,17 @@ PeiStartupThisAP (
   IN  UINTN                    ProcessorNumber,
   IN  UINTN                    TimeoutInMicroseconds,
   IN  VOID                     *ProcedureArgument      OPTIONAL
-  );
+  )
+{
+  return MpInitLibStartupThisAP (
+           Procedure,
+           ProcessorNumber,
+           NULL,
+           TimeoutInMicroseconds,
+           ProcedureArgument,
+           NULL
+           );
+}
 
 /**
   This service switches the requested AP to be the BSP from that point onward.
@@ -288,7 +305,10 @@ PeiSwitchBSP (
   IN  EFI_PEI_MP_SERVICES_PPI  *This,
   IN  UINTN                    ProcessorNumber,
   IN  BOOLEAN                  EnableOldBSP
-  );
+  )
+{
+  return MpInitLibSwitchBSP (ProcessorNumber, EnableOldBSP);
+}
 
 /**
   This service lets the caller enable or disable an AP from this point onward.
@@ -337,7 +357,10 @@ PeiEnableDisableAP (
   IN  UINTN                    ProcessorNumber,
   IN  BOOLEAN                  EnableAP,
   IN  UINT32                   *HealthFlag OPTIONAL
-  );
+  )
+{
+  return MpInitLibEnableDisableAP (ProcessorNumber, EnableAP, HealthFlag);
+}
 
 /**
   This return the handle number for the calling processor.  This service may be
@@ -369,89 +392,7 @@ PeiWhoAmI (
   IN  CONST EFI_PEI_SERVICES   **PeiServices,
   IN  EFI_PEI_MP_SERVICES_PPI  *This,
   OUT UINTN                    *ProcessorNumber
-  );
-
-/**
-  Collects BIST data from PPI.
-
-  This function collects BIST data from Sec Platform Information2 PPI
-  or SEC Platform Information PPI.
-
-  @param PeiServices         Pointer to PEI Services Table
-
-**/
-VOID
-CollectBistDataFromPpi (
-  IN CONST EFI_PEI_SERVICES  **PeiServices
-  );
-
-/**
-  Implementation of the PlatformInformation2 service in EFI_SEC_PLATFORM_INFORMATION2_PPI.
-
-  @param  PeiServices                The pointer to the PEI Services Table.
-  @param  StructureSize              The pointer to the variable describing size of the input buffer.
-  @param  PlatformInformationRecord2 The pointer to the EFI_SEC_PLATFORM_INFORMATION_RECORD2.
-
-  @retval EFI_SUCCESS                The data was successfully returned.
-  @retval EFI_BUFFER_TOO_SMALL       The buffer was too small. The current buffer size needed to
-                                     hold the record is returned in StructureSize.
-
-**/
-EFI_STATUS
-EFIAPI
-SecPlatformInformation2 (
-  IN CONST EFI_PEI_SERVICES                 **PeiServices,
-  IN OUT UINT64                             *StructureSize,
-  OUT EFI_SEC_PLATFORM_INFORMATION_RECORD2  *PlatformInformationRecord2
-  );
-
-/**
-  Migrates the Global Descriptor Table (GDT) to permanent memory.
-
-  @retval   EFI_SUCCESS           The GDT was migrated successfully.
-  @retval   EFI_OUT_OF_RESOURCES  The GDT could not be migrated due to lack of available memory.
-
-**/
-EFI_STATUS
-MigrateGdt (
-  VOID
-  );
-
-/**
-  Initializes MP and exceptions handlers.
-
-  @param  PeiServices                The pointer to the PEI Services Table.
-
-  @retval EFI_SUCCESS     MP was successfully initialized.
-  @retval others          Error occurred in MP initialization.
-
-**/
-EFI_STATUS
-InitializeCpuMpWorker (
-  IN CONST EFI_PEI_SERVICES  **PeiServices
-  );
-
-/**
-  Enable/setup stack guard for each processor if PcdCpuStackGuard is set to TRUE.
-
-  Doing this in the memory-discovered callback is to make sure the Stack Guard
-  feature to cover as most PEI code as possible.
-
-  @param[in] PeiServices          General purpose services available to every PEIM.
-  @param[in] NotifyDescriptor     The notification structure this PEIM registered on install.
-  @param[in] Ppi                  The memory discovered PPI.  Not used.
-
-  @retval EFI_SUCCESS             The function completed successfully.
-  @retval others                  There's error in MP initialization.
-**/
-EFI_STATUS
-EFIAPI
-MemoryDiscoveredPpiNotifyCallback (
-  IN EFI_PEI_SERVICES           **PeiServices,
-  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
-  IN VOID                       *Ppi
-  );
-
-extern EFI_PEI_NOTIFY_DESCRIPTOR  mPostMemNotifyList[];
-
-#endif
+  )
+{
+  return MpInitLibWhoAmI (ProcessorNumber);
+}
