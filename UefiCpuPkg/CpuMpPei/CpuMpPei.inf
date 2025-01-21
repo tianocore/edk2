@@ -2,6 +2,7 @@
 #  CPU driver installs CPU PI Multi-processor PPI.
 #
 #  Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2025, Loongson Technology Corporation Limited. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -23,10 +24,11 @@
 
 [Sources]
   CpuMpPei.h
-  CpuMpPei.c
+  CpuMp.c
+  CpuMp2.c
   CpuBist.c
   CpuPaging.c
-  CpuMp2Pei.c
+  CpuMpPei.c
 
 [Packages]
   MdePkg/MdePkg.dec
