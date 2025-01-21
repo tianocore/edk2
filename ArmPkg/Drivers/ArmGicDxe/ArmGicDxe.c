@@ -74,7 +74,14 @@ InterruptDxeInitialize (
 {
   EFI_STATUS  Status;
 
-  if (!GicV3Supported ()) {
+  if (ArmHasGicV5SystemRegisters ()) {
+ #ifdef MDE_CPU_AARCH64
+    // GICv5 is only supported on AArch64
+    Status = GicV5DxeInitialize (ImageHandle, SystemTable);
+ #else
+    Status = EFI_UNSUPPORTED;
+ #endif
+  } else if (!GicV3Supported ()) {
     Status = GicV2DxeInitialize (ImageHandle, SystemTable);
   } else {
     Status = GicV3DxeInitialize (ImageHandle, SystemTable);
