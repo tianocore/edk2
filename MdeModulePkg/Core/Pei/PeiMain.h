@@ -1,7 +1,7 @@
 /** @file
   Definition of Pei Core Structures and Services
 
-Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2025, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -864,10 +864,8 @@ PeiCreateHob (
   @param MemoryBegin     - Start Memory Address.
   @param MemoryLength    - Length of Memory.
 
-  @return EFI_SUCCESS Always success to initialize HOB.
-
 **/
-EFI_STATUS
+VOID
 PeiCoreBuildHobHandoffInfoTable (
   IN EFI_BOOT_MODE         BootMode,
   IN EFI_PHYSICAL_ADDRESS  MemoryBegin,
