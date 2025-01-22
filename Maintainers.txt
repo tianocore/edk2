@@ -645,6 +645,7 @@ M: James Lu <james.lu@intel.com> [jameslu8]
 M: Benjamin Doron <benjamin.doron@9elements.com> [benjamindoron]
 M: Linus Liu <linus.liu@intel.com> [LinusvPelt]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
+M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 S: Maintained
 
 UnitTestFrameworkPkg
