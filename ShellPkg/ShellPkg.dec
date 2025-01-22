@@ -17,6 +17,7 @@
 
 [Includes]
   Include
+  Test/Mock/Include
 
 [LibraryClasses]
   ##  @libraryclass  Provides most Shell APIs. Only available for Shell applications
