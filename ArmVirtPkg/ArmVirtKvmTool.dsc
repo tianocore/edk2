@@ -207,6 +207,8 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdRemovableMediaImageVerificationPolicy|0x04
 !endif
 
+  gArmVirtTokenSpaceGuid.PcdReservedMemoryCarveout|0x10000
+
 [PcdsPatchableInModule.common]
   #
   # This will be overridden in the code
