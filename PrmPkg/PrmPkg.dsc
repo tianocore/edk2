@@ -12,7 +12,7 @@
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/$(PLATFORM_NAME)
-  SUPPORTED_ARCHITECTURES        = IA32|X64|AARCH64
+  SUPPORTED_ARCHITECTURES        = X64|AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -40,7 +40,7 @@
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
 
-[LibraryClasses.IA32, LibraryClasses.X64]
+[LibraryClasses.X64]
   MtrrLib|UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
 
 [LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
@@ -140,9 +140,9 @@
   #
   $(PLATFORM_PACKAGE)/Application/PrmInfo/PrmInfo.inf
 
-[Components.IA32, Components.X64]
+[Components.X64]
   #
-  # PRM Sample Modules for IA32 and X64
+  # PRM Sample Modules for X64
   #
   $(PLATFORM_PACKAGE)/Samples/PrmSampleHardwareAccessModule/PrmSampleHardwareAccessModule.inf
 

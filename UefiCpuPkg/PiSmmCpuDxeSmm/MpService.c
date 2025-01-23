@@ -234,10 +234,9 @@ SmmWaitForApArrival (
 {
   UINT64   Timer;
   UINTN    Index;
-  BOOLEAN  LmceEn;
-  BOOLEAN  LmceSignal;
   UINT32   DelayedCount;
   UINT32   BlockedCount;
+  BOOLEAN  SyncNeeded;
 
   PERF_FUNCTION_BEGIN ();
 
@@ -246,11 +245,9 @@ SmmWaitForApArrival (
 
   ASSERT (SmmCpuSyncGetArrivedCpuCount (mSmmMpSyncData->SyncContext) <= mNumberOfCpus);
 
-  LmceEn     = FALSE;
-  LmceSignal = FALSE;
-  if (mMachineCheckSupported) {
-    LmceEn     = IsLmceOsEnabled ();
-    LmceSignal = IsLmceSignaled ();
+  SyncNeeded = IsCpuSyncAlwaysNeeded ();
+  if (!SyncNeeded) {
+    SyncNeeded = !(mMachineCheckSupported && IsLmceOsEnabled () && IsLmceSignaled ());
   }
 
   //
@@ -268,7 +265,7 @@ SmmWaitForApArrival (
   // Sync with APs 1st timeout
   //
   for (Timer = StartSyncTimer ();
-       !IsSyncTimerTimeout (Timer, mTimeoutTicker) && !(LmceEn && LmceSignal);
+       !IsSyncTimerTimeout (Timer, mTimeoutTicker) && SyncNeeded;
        )
   {
     mSmmMpSyncData->AllApArrivedWithException = AllCpusInSmmExceptBlockedDisabled ();

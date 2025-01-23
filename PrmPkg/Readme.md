@@ -53,11 +53,13 @@ To build `PrmPkg` as a standalone package:
 
 5. Build PrmPkg \
 
-The PrmPkg can be built targetting the IA32/X64 and AArch64 architectures.
+The PrmPkg can be built targeting the X64 and AArch64 architectures. PRM is not supported on IA32 and ARM primarily
+because the OS support for PRM is only in 64 bit OSes. In addition, the MSVC toolchain does not support export tables
+on IA32 with the unique UEFI configuration required.
 
- - IA32/X64
+* X64
 
-   ``build -p PrmPkg/PrmPkg.dsc -a IA32 -a X64``
+   ``build -p PrmPkg/PrmPkg.dsc -a X64``
    > ***Note***: Due to the way PRM modules are compiled with exports, **only building on Visual Studio compiler tool
    chains has been tested**.
 
@@ -68,11 +70,13 @@ The PrmPkg can be built targetting the IA32/X64 and AArch64 architectures.
 > You can add your own PRM modules into the build and check them with the `PrmInfo` UEFI application described
 > later in this document and dump the PRMT table in the OS to check if your PRM module is represented as expected.
 
- - AArch64
+* AArch64
     ``build -p PrmPkg/PrmPkg.dsc -a AARCH64 -t GCC5``
 
    > ***Note***: Only builds with the GCC5 toolchain have been tested.
-   > ***Note***: For builds with the GCC5 toolchain, the PrmModuleExportDescriptor and any other handler entry points symbols, to be listed in the PRMT, must be explicitly preserved by enumerating these in the AARCH64 linker flags. The --require-defined linker flag must be used for each symbol to be preserved.
+   > ***Note***: For builds with the GCC5 toolchain, the PrmModuleExportDescriptor and any other handler entry points
+   symbols, to be listed in the PRMT, must be explicitly preserved by enumerating these in the AARCH64 linker flags.
+   The --require-defined linker flag must be used for each symbol to be preserved.
 
 ### PRM Platform GUID
 
