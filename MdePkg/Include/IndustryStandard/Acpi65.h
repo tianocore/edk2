@@ -4,6 +4,7 @@
   Copyright (c) 2017 - 2022, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2019 - 2024, ARM Ltd. All rights reserved.<BR>
   Copyright (c) 2023, Loongson Technology Corporation Limited. All rights reserved.<BR>
+  Copyright (C) 2025, Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -17,6 +18,25 @@
 // Ensure proper structure formats
 //
 #pragma pack(1)
+
+///
+/// _STA bit definitions ACPI 6.5 s6.3.7
+///
+#define ACPI_AML_STA_DEVICE_STATUS_PRESET       0x1
+#define ACPI_AML_STA_DEVICE_STATUS_ENABLED      0x2
+#define ACPI_AML_STA_DEVICE_STATUS_UI           0x4
+#define ACPI_AML_STA_DEVICE_STATUS_FUNCTIONING  0x8
+#define ACPI_AML_STA_DEVICE_STATUS_BATTERY      0x10
+
+///
+/// _CSD Revision for ACPI 6.5
+///
+#define EFI_ACPI_6_5_AML_CSD_REVISION  0
+
+///
+/// _CSD NumEntries for ACPI 6.5
+///
+#define EFI_ACPI_6_5_AML_CSD_NUM_ENTRIES  6
 
 ///
 /// _PSD Revision for ACPI 6.5

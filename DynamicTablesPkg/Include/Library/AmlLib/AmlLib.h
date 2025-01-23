@@ -2,7 +2,7 @@
   AML Lib.
 
   Copyright (c) 2019 - 2023, Arm Limited. All rights reserved.<BR>
-  Copyright (C) 2023 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (C) 2023 - 2025, Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -1917,6 +1917,194 @@ AmlCreatePsdNode (
   IN  AML_PSD_INFO            *PsdInfo,
   IN  AML_NODE_HANDLE         ParentNode    OPTIONAL,
   OUT AML_OBJECT_NODE_HANDLE  *NewPsdNode   OPTIONAL
+  );
+
+/** Create a _CST node.
+
+  AmlCreateCstNode ("_CST", 0, 1, ParentNode, &CstNode) is
+  equivalent of the following ASL code:
+    Name (_CST, Package (
+                  0   // Count
+                  ))
+
+  This function doesn't define any CST state. As shown above, the count
+  of _CST state is set to 0.
+  The AmlAddCstState () function allows to add CST states.
+
+  Cf ACPI 6.5 specification, s8.4.1.1 _CST (C States)
+
+  @param [in]  CstNameString  The new CST 's object name.
+                              Must be a NULL-terminated ASL NameString
+                              e.g.: "_CST", "DEV0.CSTP", etc.
+                              The input string is copied.
+  @param [in]  ParentNode     If provided, set ParentNode as the parent
+                              of the node created.
+  @param [out] NewCstNode     If success, contains the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCreateCstNode (
+  IN  CONST CHAR8                   *CstNameString,
+  IN        AML_NODE_HANDLE         ParentNode   OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewCstNode   OPTIONAL
+  );
+
+/** Add an _CST state to a CST node created using AmlCreateCstNode.
+
+  AmlAddCstState increments the Count of CST states in the CST node by one,
+  and adds the following package:
+  Package {
+    Register  // Buffer (Resource Descriptor)
+    Type      // Integer (BYTE)
+    Latency   // Integer (WORD)
+    Power     // Integer (DWORD)
+  }
+
+  Cf ACPI 6.5 specification, s8.4.1.1 _CST (C States).
+
+  @param [in]  CstInfo                    CstInfo object
+  @param [in]  CstNode                    Cst node created with the function
+                                          AmlCreateCstNode to which the new CST
+                                          state is appended.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddCstState (
+  IN  AML_CST_INFO            *CstInfo,
+  IN  AML_OBJECT_NODE_HANDLE  CstNode
+  );
+
+/** Create a _CSD node.
+
+  Generates and optionally appends the following node:
+
+  Name (_CSD, Package()
+  {
+    Package () {
+      NumEntries,    // Integer
+      Revision,      // Integer (BYTE)
+      Domain,        // Integer (DWORD)
+      CoordType,     // Integer (DWORD)
+      NumProcessors, // Integer (DWORD)
+      Index          // Integer (DWORD)
+    }
+    Package () {
+      NumEntries,    // Integer
+      Revision,      // Integer (BYTE)
+      Domain,        // Integer (DWORD)
+      CoordType,     // Integer (DWORD)
+      NumProcessors, // Integer (DWORD)
+      Index          // Integer (DWORD)
+    }
+    ...
+  })
+  Cf. ACPI 6.5, s8.4.1.2 _CSD (C-State Dependency).
+
+  @ingroup CodeGenApis
+
+  @param [in]  CsdInfo      CsdInfo object
+  @param [in]  NumEntries   Number of packages to be created.
+  @param [in]  ParentNode   If provided, set ParentNode as the parent
+                            of the node created.
+  @param [out] NewCsdNode   If success and provided, contains the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCreateCsdNode (
+  IN  AML_CSD_INFO            *CsdInfo,
+  IN  UINT32                  NumEntries,
+  IN  AML_NODE_HANDLE         ParentNode    OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewCsdNode   OPTIONAL
+  );
+
+/** Create _PCT node
+
+  Generates and optionally appends the following node:
+  Name (_PCT, Package()
+  {
+    ControlRegister   // Buffer (Resource Descriptor (Register))
+    StatusRegister    // Buffer (Resource Descriptor (Register))
+  })
+
+  Cf. ACPI 6.5, s8.4.5.1 _PCT (Processor Control).
+
+  @ingroup CodeGenApis
+
+  @param [in]  PctInfo      PctInfo object
+  @param [in]  ParentNode   If provided, set ParentNode as the parent
+                            of the node created.
+  @param [out] NewPctNode   If success and provided, contains the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCreatePctNode (
+  IN  AML_PCT_INFO            *PctInfo,
+  IN  AML_NODE_HANDLE         ParentNode    OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewPctNode   OPTIONAL
+  );
+
+/** Create _PSS node
+
+  Generates and optionally appends the following node:
+  Name (_PSS, Package()
+  {
+    Package () {
+      CoreFrequency     // Integer (DWORD)
+      Power             // Integer (DWORD)
+      Latency           // Integer (DWORD)
+      BusMasterLatency  // Integer (DWORD)
+      Control           // Integer (DWORD)
+      Status            // Integer (DWORD)
+    }
+    Package () {
+      CoreFrequency     // Integer (DWORD)
+      Power             // Integer (DWORD)
+      Latency           // Integer (DWORD)
+      BusMasterLatency  // Integer (DWORD)
+      Control           // Integer (DWORD)
+      Status            // Integer (DWORD)
+    }
+    ...
+  })
+
+  Cf. ACPI 6.5, s8.4.5.2 _PSS (Processor Supported Performance States).
+
+  @ingroup CodeGenApis
+
+  @param [in]  PssInfo      Array of PssInfo object
+  @param [in]  NumPackages  Number of packages to be created.
+  @param [in]  ParentNode   If provided, set ParentNode as the parent
+                            of the node created.
+  @param [out] NewPssNode   If success and provided, contains the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+
+**/
+EFI_STATUS
+EFIAPI
+AmlCreatePssNode (
+  IN  AML_PSS_INFO            *PssInfo,
+  IN  UINT32                  NumPackages,
+  IN  AML_NODE_HANDLE         ParentNode    OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewPssNode   OPTIONAL
   );
 
 #endif // AML_LIB_H_

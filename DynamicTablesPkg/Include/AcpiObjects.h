@@ -2,6 +2,7 @@
 
   Copyright (c) 2022, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
   Copyright (c) 2022 - 2023, Arm Limited. All rights reserved.<BR>
+  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -138,6 +139,113 @@ typedef struct AmlPsdInfo {
   /// Number of processors belonging to the Domain.
   UINT32    NumProc;
 } AML_PSD_INFO;
+
+/** A structure that describes a
+    processor power state control package Info.
+
+  Cf. ACPI 6.5, s8.4.1.1 _CST (Processor Power State Control).
+  Package {
+    Register  // Buffer (Resource Descriptor)
+    Type      // Integer (BYTE)
+    Latency   // Integer (WORD)
+    Power     // Integer (DWORD)
+  }
+*/
+typedef struct AmlCstInfo {
+  /// Information about the C-State register.
+  EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE    Register;
+
+  /// Type of C-State, such as c1, c2, c3, etc.
+  UINT8                                     Type;
+
+  /// Worst case latency for entering and exiting the C-State, in milliseconds.
+  UINT16                                    Latency;
+
+  /// C-State power consumption in mW.
+  UINT32                                    Power;
+} AML_CST_INFO;
+
+/** A structure that describes a
+    C-State Dependency (_CSD) Info.
+
+  Cf. ACPI 6.5, s8.4.1.2 _CSD (C-State Dependency).
+  Package {
+    NumEntries    // Integer, updated based on Revision
+    Revision      // Integer (BYTE)
+    Domain        // Integer (DWORD)
+    CoordType     // Integer (DWORD)
+    NumProcessors // Integer (DWORD)
+    Index         // Integer (DWORD)
+  }
+*/
+typedef struct AmlCsdInfo {
+  /// The revision of the C-State dependency table.
+  UINT8     Revision;
+
+  /// The domain ID.
+  UINT32    Domain;
+
+  /// The coordination type.
+  UINT32    CoordType;
+
+  /// The number of processors in the domain.
+  UINT32    NumProcessors;
+
+  /// The index of the C-State entry in _CST.
+  UINT32    Index;
+} AML_CSD_INFO;
+
+/** A structure that describes a
+    Processor Performance control (_PCT) Info.
+
+  Cf. ACPI 6.5, s8.4.5.1 _PCT (Processor Control).
+
+  Package
+  {
+    ControlRegister   // Buffer (Resource Descriptor (Register))
+    StatusRegister    // Buffer (Resource Descriptor (Register))
+  }
+*/
+typedef struct AmlPctInfo {
+  /// The performance control register for the processor.
+  EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE    ControlRegister;
+
+  /// The performance status register for the processor.
+  EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE    StatusRegister;
+} AML_PCT_INFO;
+
+/** A structure that describes a
+    Processor Supported Performance States (_PSS) Info.
+
+  Cf. ACPI 6.5, s8.4.5.2 _PSS (Processor Supported Performance States).
+  Package {
+    CoreFrequency     // Integer (DWORD)
+    Power             // Integer (DWORD)
+    Latency           // Integer (DWORD)
+    BusMasterLatency  // Integer (DWORD)
+    Control           // Integer (DWORD)
+    Status            // Integer (DWORD)
+  }
+*/
+typedef struct AmlPssInfo {
+  /// Processor core frequency in MHz.
+  UINT32    CoreFrequency;
+
+  /// Processor power consumption in mW.
+  UINT32    Power;
+
+  /// Processor latency in microseconds.
+  UINT32    Latency;
+
+  /// Processor bus master latency in microseconds.
+  UINT32    BusMasterLatency;
+
+  /// Value to write to the performance control register (_PCT).
+  UINT32    Control;
+
+  /// Value to compare with the read value performance status register (_PCT).
+  UINT32    Status;
+} AML_PSS_INFO;
 
 #pragma pack()
 
