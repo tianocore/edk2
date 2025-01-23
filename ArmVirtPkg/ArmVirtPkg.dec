@@ -114,3 +114,9 @@
   # Null-terminated string that describes the Application Information used for deriving the Encryption Key
   # @Prompt Application Information for the Encryption Key.
   gArmVirtTokenSpaceGuid.PcdBootSyncAppInfoEncryptionKeyString|""|VOID*|0x00000008
+
+  #
+  # The amount of System Memory to reduce for use as Reserved Memory.
+  # @Prompt Reserved Memory Carveout size.
+  gArmVirtTokenSpaceGuid.PcdReservedMemoryCarveout|0x0|UINT64|0x00000009
+

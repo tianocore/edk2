@@ -67,6 +67,8 @@
 
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
 
+  gArmVirtTokenSpaceGuid.PcdReservedMemoryCarveout
+
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
 
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory
