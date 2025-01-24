@@ -74,22 +74,8 @@
 [LibraryClasses.X64]
   StandaloneMmCoreEntryPoint|StandaloneMmPkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreEntryPoint.inf
 
-[LibraryClasses.AARCH64, LibraryClasses.ARM]
-  ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
-  StandaloneMmCoreEntryPoint|ArmPkg/Library/ArmStandaloneMmCoreEntryPoint/ArmStandaloneMmCoreEntryPoint.inf
-  StandaloneMmMmuLib|ArmPkg/Library/StandaloneMmMmuLib/ArmMmuStandaloneMmLib.inf
-  ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
-  ArmSvcLib|ArmPkg/Library/ArmSvcLib/ArmSvcLib.inf
-  CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
-  PeCoffExtraActionLib|StandaloneMmPkg/Library/StandaloneMmPeCoffExtraActionLib/StandaloneMmPeCoffExtraActionLib.inf
-  ArmTransferListLib|ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
-
 [LibraryClasses.common.MM_CORE_STANDALONE]
   HobLib|StandaloneMmPkg/Library/StandaloneMmCoreHobLib/StandaloneMmCoreHobLib.inf
-  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaStandaloneMmCoreLib.inf
-
-[LibraryClasses.AARCH64.MM_CORE_STANDALONE, LibraryClasses.ARM.MM_CORE_STANDALONE]
-  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaStandaloneMmCoreLib.inf
 
 [LibraryClasses.common.MM_STANDALONE]
   MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
@@ -148,9 +134,6 @@
   StandaloneMmPkg/Library/MmPlatformHobProducerLibNull/MmPlatformHobProducerLibNull.inf
   StandaloneMmPkg/Drivers/MmCommunicationDxe/MmCommunicationDxe.inf
   StandaloneMmPkg/Library/StandaloneMmExtractGuidedSectionLib/StandaloneMmExtractGuidedSectionLib.inf
-
-[Components.AARCH64, Components.ARM]
-  StandaloneMmPkg/Library/StandaloneMmPeCoffExtraActionLib/StandaloneMmPeCoffExtraActionLib.inf
 
 [Components.X64]
   StandaloneMmPkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreEntryPoint.inf
