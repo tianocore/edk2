@@ -279,7 +279,7 @@ QemuKernelBlobTypeToFileInfo (
     // getting file info about the root directory
     //
     DEBUG ((DEBUG_INFO, "%a: file info: directory\n", __func__));
-    Name      = L"\\";
+    Name      = L"";
     FileSize  = mKernelBlobCount;
     Attribute = EFI_FILE_READ_ONLY | EFI_FILE_DIRECTORY;
   } else {
