@@ -505,6 +505,7 @@ MmEntryPoint (
   EFI_MM_COMMUNICATE_HEADER  *CommunicateHeader;
   MM_COMM_BUFFER_STATUS      *CommunicationStatus;
   UINTN                      BufferSize;
+  EFI_HANDLE                 MmHandle;
 
   DEBUG ((DEBUG_INFO, "MmEntryPoint ...\n"));
 
@@ -514,9 +515,22 @@ MmEntryPoint (
   CopyMem (&gMmCoreMmst.MmStartupThisAp, MmEntryContext, sizeof (EFI_MM_ENTRY_CONTEXT));
 
   //
-  // Call platform hook before Mm Dispatch
+  // Install a protocol to notify BeforeMmDispatch.
   //
-  // PlatformHookBeforeMmDispatch ();
+  MmHandle = NULL;
+  Status   = MmInstallProtocolInterface (
+               &MmHandle,
+               &gEfiMmEntryNotifyProtocolGuid,
+               EFI_NATIVE_INTERFACE,
+               NULL
+               );
+  if (!EFI_ERROR (Status)) {
+    MmUninstallProtocolInterface (
+      MmHandle,
+      &gEfiMmEntryNotifyProtocolGuid,
+      NULL
+      );
+  }
 
   //
   // Check to see if this is a Synchronous MMI sent through the MM Communication
@@ -588,6 +602,24 @@ MmEntryPoint (
   // Process Asynchronous MMI sources
   //
   MmiManage (NULL, NULL, NULL, NULL);
+
+  //
+  // Install a protocol to notify AfterMmDispatch.
+  //
+  MmHandle = NULL;
+  Status   = MmInstallProtocolInterface (
+               &MmHandle,
+               &gEfiMmExitNotifyProtocolGuid,
+               EFI_NATIVE_INTERFACE,
+               NULL
+               );
+  if (!EFI_ERROR (Status)) {
+    MmUninstallProtocolInterface (
+      MmHandle,
+      &gEfiMmExitNotifyProtocolGuid,
+      NULL
+      );
+  }
 
   //
   // TBD: Do not use private data structure ?
