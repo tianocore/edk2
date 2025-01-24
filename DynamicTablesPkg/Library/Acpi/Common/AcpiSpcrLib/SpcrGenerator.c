@@ -14,6 +14,7 @@
 #include <IndustryStandard/DebugPort2Table.h>
 #include <IndustryStandard/SerialPortConsoleRedirectionTable.h>
 #include <Library/AcpiLib.h>
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Protocol/AcpiTable.h>
@@ -60,11 +61,11 @@ NOTE: This implementation ignores the possibility that the Serial settings may
   Note: fields marked "{Template}" will be updated dynamically.
 */
 STATIC
-EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE  AcpiSpcr = {
+EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4  AcpiSpcr = {
   ACPI_HEADER (
     EFI_ACPI_6_2_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE,
-    EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE,
-    EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION
+    EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4,
+    EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION_4
     ),
   0, // {Template}: Serial Port Subtype
   {
@@ -89,7 +90,10 @@ EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE  AcpiSpcr = {
   0x00,
   0x00000000,
   0x00,
-  EFI_ACPI_RESERVED_DWORD
+  0, // {Template}: UART Clock Frequency
+  0, // {Template}: Precise Baud Rate
+  sizeof (NAME_STR_SPCR_PORT),
+  OFFSET_OF (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4, NameSpaceString)
 };
 
 #pragma pack()
@@ -204,6 +208,7 @@ BuildSpcrTableEx (
   CM_ARCH_COMMON_SERIAL_PORT_INFO  *SerialPortInfo;
   UINT32                           SerialPortCount;
   EFI_ACPI_DESCRIPTION_HEADER      **TableList;
+  UINT32                           Size;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -280,13 +285,19 @@ BuildSpcrTableEx (
     return Status;
   }
 
+  if (AcpiTableInfo->AcpiTableRevision < EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION_4) {
+    Size = sizeof (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE);
+  } else {
+    Size = sizeof (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4) + sizeof (NAME_STR_SPCR_PORT);
+  }
+
   // Build SPCR table.
   Status = AddAcpiHeader (
              CfgMgrProtocol,
              This,
              (EFI_ACPI_DESCRIPTION_HEADER *)&AcpiSpcr,
              AcpiTableInfo,
-             sizeof (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE)
+             Size
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((
@@ -357,15 +368,28 @@ BuildSpcrTableEx (
         EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_BAUD_RATE_115200;
       break;
     default:
-      Status = EFI_UNSUPPORTED;
-      DEBUG ((
-        DEBUG_ERROR,
-        "ERROR: SPCR: Invalid Baud Rate %ld, Status = %r\n",
-        SerialPortInfo->BaudRate,
-        Status
-        ));
-      goto error_handler;
+      if (AcpiTableInfo->AcpiTableRevision < EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION_4) {
+        Status = EFI_UNSUPPORTED;
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: SPCR: Invalid Baud Rate %ld, Status = %r\n",
+          SerialPortInfo->BaudRate,
+          Status
+          ));
+        goto error_handler;
+      }
+
+      AcpiSpcr.BaudRate        = 0;
+      AcpiSpcr.PreciseBaudRate = (UINT32)SerialPortInfo->BaudRate;
+      break;
   } // switch
+
+  if (AcpiTableInfo->AcpiTableRevision > EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION) {
+    // UartClockFrequency supported on revision 3 and higher
+    AcpiSpcr.UartClockFrequency = SerialPortInfo->Clock;
+
+    AsciiStrCpyS (AcpiSpcr.NameSpaceString, sizeof (NAME_STR_SPCR_PORT), NAME_STR_SPCR_PORT);
+  }
 
   TableList[0] = (EFI_ACPI_DESCRIPTION_HEADER *)&AcpiSpcr;
 
@@ -415,7 +439,7 @@ ACPI_TABLE_GENERATOR  SpcrGenerator = {
   // ACPI Table Signature
   EFI_ACPI_6_3_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE,
   // ACPI Table Revision supported by this Generator
-  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION,
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION_4,
   // Minimum supported ACPI Table Revision
   EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION,
   // Creator ID
