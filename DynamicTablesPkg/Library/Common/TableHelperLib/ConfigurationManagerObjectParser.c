@@ -2,7 +2,7 @@
   Configuration Manager Object parser.
 
   Copyright (c) 2021 - 2023, ARM Limited. All rights reserved.<BR>
-  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
+  Copyright (C) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
   Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -925,6 +925,15 @@ STATIC CONST CM_OBJ_PARSER  CmX64LocalApicNmiInfo[] = {
   { "LocalApicLint",    1, "0x%x", NULL }
 };
 
+/** A parser for EX64ObjFacsInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjFacsInfoParser[] = {
+  { "FirmwareWakingVector",  4, "0x%x",   NULL },
+  { "Flags",                 4, "0x%x",   NULL },
+  { "XFirmwareWakingVector", 8, "0x%llx", NULL },
+  { "OspmFlags",             4, "0x%x",   NULL }
+};
+
 /** A parser for X64 namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  X64NamespaceObjectParser[] = {
@@ -945,6 +954,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  X64NamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EX64ObjIoApicInfo,            CmX64IoApicInfoParser),
   CM_PARSER_ADD_OBJECT (EX64ObjIntrSourceOverrideInfo,CmX64IntrSourceOverrideInfoParser),
   CM_PARSER_ADD_OBJECT (EX64ObjLocalApicX2ApicNmiInfo,CmX64LocalApicNmiInfo),
+  CM_PARSER_ADD_OBJECT (EX64ObjFacsInfo,              CmX64ObjFacsInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EX64ObjMax)
 };
 
