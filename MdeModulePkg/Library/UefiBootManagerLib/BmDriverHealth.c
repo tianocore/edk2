@@ -105,6 +105,79 @@ BmGetControllerName (
 }
 
 /**
+  Return the driver name.
+
+  @param DriverHealthHandle  The handle on which the Driver Health protocol instance is retrieved.
+
+  @return A pointer to the Unicode string to return. This Unicode string is the name of the controller
+          specified by DriverHealthHandle.
+**/
+CHAR16 *
+BmGetDriverName (
+  IN  EFI_HANDLE  DriverHealthHandle
+  )
+{
+  EFI_STATUS                   Status;
+  CHAR16                       *DriverName;
+  CHAR8                        *LanguageVariable;
+  CHAR8                        *BestLanguage;
+  BOOLEAN                      Iso639Language;
+  EFI_COMPONENT_NAME_PROTOCOL  *ComponentName;
+
+  DriverName = NULL;
+
+  //
+  // Locate Component Name (2) protocol on the driver binging handle.
+  //
+  Iso639Language = FALSE;
+  Status         = gBS->HandleProtocol (
+                          DriverHealthHandle,
+                          &gEfiComponentName2ProtocolGuid,
+                          (VOID **)&ComponentName
+                          );
+  if (EFI_ERROR (Status)) {
+    Status = gBS->HandleProtocol (
+                    DriverHealthHandle,
+                    &gEfiComponentNameProtocolGuid,
+                    (VOID **)&ComponentName
+                    );
+    if (!EFI_ERROR (Status)) {
+      Iso639Language = TRUE;
+    }
+  }
+
+  if (!EFI_ERROR (Status)) {
+    GetEfiGlobalVariable2 (Iso639Language ? L"Lang" : L"PlatformLang", (VOID **)&LanguageVariable, NULL);
+    BestLanguage = GetBestLanguage (
+                     ComponentName->SupportedLanguages,
+                     Iso639Language,
+                     (LanguageVariable != NULL) ? LanguageVariable : "",
+                     Iso639Language ? "eng" : "en-US",
+                     NULL
+                     );
+    if (LanguageVariable != NULL) {
+      FreePool (LanguageVariable);
+    }
+
+    Status = ComponentName->GetDriverName (
+                              ComponentName,
+                              BestLanguage,
+                              &DriverName
+                              );
+  }
+
+  if (!EFI_ERROR (Status)) {
+    return AllocateCopyPool (StrSize (DriverName), DriverName);
+  } else {
+    return ConvertDevicePathToText (
+             DevicePathFromHandle (DriverHealthHandle),
+             FALSE,
+             FALSE
+             );
+  }
+}
+
+/**
   Display a set of messages returned by the GetHealthStatus () service of the EFI Driver Health Protocol
 
   @param DriverHealthInfo  Pointer to the Driver Health information entry.
@@ -116,7 +189,8 @@ BmDisplayMessages (
 {
   UINTN       Index;
   EFI_STRING  String;
-  CHAR16      *ControllerName;
+  CHAR16      *ControllerName = NULL;
+  CHAR16      *DriverName     = NULL;
 
   if ((DriverHealthInfo->MessageList == NULL) ||
       (DriverHealthInfo->MessageList[0].HiiHandle == NULL))
@@ -124,14 +198,30 @@ BmDisplayMessages (
     return;
   }
 
-  ControllerName = BmGetControllerName (
-                     DriverHealthInfo->DriverHealthHandle,
-                     DriverHealthInfo->ControllerHandle,
-                     DriverHealthInfo->ChildHandle
-                     );
+  if (DriverHealthInfo->DriverHealthHandle != NULL) {
+    DriverName = BmGetDriverName (DriverHealthInfo->DriverHealthHandle);
+    if (DriverName != NULL) {
+      DEBUG ((DEBUG_INFO, "Driver: %s\n", DriverName));
+      Print (L"Driver: %s\n", DriverName);
+    }
+  }
 
-  DEBUG ((DEBUG_INFO, "Controller: %s\n", ControllerName));
-  Print (L"Controller: %s\n", ControllerName);
+  if (DriverHealthInfo->ControllerHandle != NULL) {
+    ControllerName = BmGetControllerName (
+                       DriverHealthInfo->DriverHealthHandle,
+                       DriverHealthInfo->ControllerHandle,
+                       DriverHealthInfo->ChildHandle
+                       );
+    if (ControllerName != NULL) {
+      DEBUG ((DEBUG_INFO, "Controller: %s\n", ControllerName));
+      Print (L"Controller: %s\n", ControllerName);
+    }
+  }
+
+  if ((DriverName == NULL) && (ControllerName == NULL)) {
+    return;
+  }
+
   for (Index = 0; DriverHealthInfo->MessageList[Index].HiiHandle != NULL; Index++) {
     String = HiiGetString (
                DriverHealthInfo->MessageList[Index].HiiHandle,
@@ -147,6 +237,12 @@ BmDisplayMessages (
 
   if (ControllerName != NULL) {
     FreePool (ControllerName);
+    ControllerName = NULL;
+  }
+
+  if (DriverName != NULL) {
+    FreePool (DriverName);
+    DriverName = NULL;
   }
 }
 
@@ -550,24 +646,58 @@ BmRepairAllControllers (
   EfiBootManagerFreeDriverHealthInfo (DriverHealthInfo, Count);
 
   DEBUG_CODE_BEGIN ();
-  CHAR16  *ControllerName;
+  CHAR16  *ControllerName = NULL;
+  CHAR16  *DriverName     = NULL;
+  CHAR16  String[512];
 
   DriverHealthInfo = EfiBootManagerGetDriverHealthInfo (&Count);
   for (Index = 0; Index < Count; Index++) {
-    ControllerName = BmGetControllerName (
-                       DriverHealthInfo[Index].DriverHealthHandle,
-                       DriverHealthInfo[Index].ControllerHandle,
-                       DriverHealthInfo[Index].ChildHandle
-                       );
+    if (DriverHealthInfo == NULL) {
+      continue;
+    }
+
+    ZeroMem (String, sizeof (String));
+    if (DriverHealthInfo[Index].DriverHealthHandle != NULL) {
+      DriverName = BmGetDriverName (DriverHealthInfo[Index].DriverHealthHandle);
+    }
+
+    if (DriverHealthInfo[Index].ControllerHandle != NULL) {
+      ControllerName = BmGetControllerName (
+                         DriverHealthInfo[Index].DriverHealthHandle,
+                         DriverHealthInfo[Index].ControllerHandle,
+                         DriverHealthInfo[Index].ChildHandle
+                         );
+    }
+
+    if ((DriverName == NULL) && (ControllerName == NULL)) {
+      continue;
+    }
+
+    UnicodeSPrint (
+      String,
+      sizeof (String),
+      L"%s%s%s",
+      DriverName != NULL ? DriverName : L"",
+      (DriverName != NULL && ControllerName != NULL) ? L"    " : L"",
+      ControllerName != NULL ? ControllerName : L""
+      );
+
     DEBUG ((
       DEBUG_INFO,
       "%02d: %s - %s\n",
       Index,
-      ControllerName,
+      String,
       mBmHealthStatusText[DriverHealthInfo[Index].HealthStatus]
       ));
+
     if (ControllerName != NULL) {
       FreePool (ControllerName);
+      ControllerName = NULL;
+    }
+
+    if (DriverName != NULL) {
+      FreePool (DriverName);
+      DriverName = NULL;
     }
   }
 
