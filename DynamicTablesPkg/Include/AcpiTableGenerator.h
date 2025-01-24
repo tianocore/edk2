@@ -2,7 +2,7 @@
 
   Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
-  Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+  Copyright (C) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -78,6 +78,8 @@ The Dynamic Tables Framework implements the following ACPI table generators:
   - SPMI  : The SPMI generator collects the SPMI interface and
             optionally SPMI interrupt and deviceid (or uid) information from the
             Configuration Manager and builds the SPMI table.
+  - FACS  : The FACS generator collates the FACS information from the
+            Configuration Manager and builds the FACS table.
 */
 
 /** The ACPI_TABLE_GENERATOR_ID type describes ACPI table generator ID.
@@ -111,6 +113,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdHpet,                          ///< HPET Generator
   EStdAcpiTableIdSsdtHpet,                      ///< SSDT HPET Generator
   EStdAcpiTableIdSpmi,                          ///< SPMI Generator
+  EStdAcpiTableIdFacs,                          ///< FACS Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 

@@ -2,7 +2,7 @@
 
   Defines the X64 Namespace Object.
 
-  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
+  Copyright (C) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -50,7 +50,8 @@ typedef enum X64ObjectID {
   EX64ObjIoApicInfo,             ///< 14 - IO APIC info
   EX64ObjIntrSourceOverrideInfo, ///< 15 - Interrupt Source Override info
   EX64ObjLocalApicX2ApicNmiInfo, ///< 16 - Local APIC and X2APIC NMI info
-  EX64ObjMax                     ///< 17 - Maximum Object ID
+  EX64ObjFacsInfo,               ///< 17 - FACS info
+  EX64ObjMax                     ///< 18 - Maximum Object ID
 } EX64_OBJECT_ID;
 
 /** A structure that describes the
@@ -264,6 +265,18 @@ typedef struct CmX64LocalApicX2ApicNmiInfo {
   UINT32    AcpiProcessorUid;
   UINT8     LocalApicLint;
 } CM_X64_LOCAL_APIC_X2APIC_NMI_INFO;
+
+/**
+  A structure that describes the FACS information.
+
+  ID: EX64ObjFacsInfo
+*/
+typedef struct CmX64FacsInfo {
+  UINT32    FirmwareWakingVector;
+  UINT32    Flags;
+  UINT64    XFirmwareWakingVector;
+  UINT32    OspmFlags;
+} CM_X64_FACS_INFO;
 
 #pragma pack()
 #endif // X64_NAMESPACE_OBJECTS_H_
