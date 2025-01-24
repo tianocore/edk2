@@ -294,7 +294,11 @@ QemuLoadKernelImage (
 
   Status = GetQemuKernelLoaderBlobSize (Root, L"cmdline", &CommandLineSize);
   if (EFI_ERROR (Status)) {
-    goto CloseRoot;
+    if (Status == EFI_NOT_FOUND) {
+      CommandLineSize = 0;
+    } else {
+      goto CloseRoot;
+    }
   }
 
   if (CommandLineSize == 0) {
@@ -337,7 +341,11 @@ QemuLoadKernelImage (
 
   Status = GetQemuKernelLoaderBlobSize (Root, L"initrd", &InitrdSize);
   if (EFI_ERROR (Status)) {
-    goto FreeCommandLine;
+    if (Status == EFI_NOT_FOUND) {
+      InitrdSize = 0;
+    } else {
+      goto FreeCommandLine;
+    }
   }
 
   if (InitrdSize > 0) {
