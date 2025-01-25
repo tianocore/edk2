@@ -1,7 +1,7 @@
 /** @file
   Support routines for memory allocation routines based on Standalone MM Core internal functions.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2025, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2016 - 2021, ARM Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -17,7 +17,7 @@
 #include <Library/HobLib.h>
 #include "StandaloneMmCoreMemoryAllocationServices.h"
 
-EFI_MM_SYSTEM_TABLE  *gMmst = NULL;
+static EFI_MM_SYSTEM_TABLE  *mMemoryAllocationMmst = NULL;
 
 /**
   Allocates one or more 4KB pages of a certain memory type.
@@ -45,7 +45,7 @@ InternalAllocatePages (
     return NULL;
   }
 
-  Status = gMmst->MmAllocatePages (AllocateAnyPages, MemoryType, Pages, &Memory);
+  Status = mMemoryAllocationMmst->MmAllocatePages (AllocateAnyPages, MemoryType, Pages, &Memory);
   if (EFI_ERROR (Status)) {
     return NULL;
   }
@@ -146,7 +146,7 @@ FreePages (
   EFI_STATUS  Status;
 
   ASSERT (Pages != 0);
-  Status = gMmst->MmFreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)Buffer, Pages);
+  Status = mMemoryAllocationMmst->MmFreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)Buffer, Pages);
   ASSERT_EFI_ERROR (Status);
 }
 
@@ -202,7 +202,7 @@ InternalAllocateAlignedPages (
     //
     ASSERT (RealPages > Pages);
 
-    Status = gMmst->MmAllocatePages (AllocateAnyPages, MemoryType, RealPages, &Memory);
+    Status = mMemoryAllocationMmst->MmAllocatePages (AllocateAnyPages, MemoryType, RealPages, &Memory);
     if (EFI_ERROR (Status)) {
       return NULL;
     }
@@ -213,7 +213,7 @@ InternalAllocateAlignedPages (
       //
       // Free first unaligned page(s).
       //
-      Status = gMmst->MmFreePages (Memory, UnalignedPages);
+      Status = mMemoryAllocationMmst->MmFreePages (Memory, UnalignedPages);
       ASSERT_EFI_ERROR (Status);
     }
 
@@ -223,14 +223,14 @@ InternalAllocateAlignedPages (
       //
       // Free last unaligned page(s).
       //
-      Status = gMmst->MmFreePages (Memory, UnalignedPages);
+      Status = mMemoryAllocationMmst->MmFreePages (Memory, UnalignedPages);
       ASSERT_EFI_ERROR (Status);
     }
   } else {
     //
     // Do not over-allocate pages in this case.
     //
-    Status = gMmst->MmAllocatePages (AllocateAnyPages, MemoryType, Pages, &Memory);
+    Status = mMemoryAllocationMmst->MmAllocatePages (AllocateAnyPages, MemoryType, Pages, &Memory);
     if (EFI_ERROR (Status)) {
       return NULL;
     }
@@ -352,7 +352,7 @@ FreeAlignedPages (
   EFI_STATUS  Status;
 
   ASSERT (Pages != 0);
-  Status = gMmst->MmFreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)Buffer, Pages);
+  Status = mMemoryAllocationMmst->MmFreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)Buffer, Pages);
   ASSERT_EFI_ERROR (Status);
 }
 
@@ -380,7 +380,7 @@ InternalAllocatePool (
 
   Memory = NULL;
 
-  Status = gMmst->MmAllocatePool (MemoryType, AllocationSize, &Memory);
+  Status = mMemoryAllocationMmst->MmAllocatePool (MemoryType, AllocationSize, &Memory);
   if (EFI_ERROR (Status)) {
     Memory = NULL;
   }
@@ -824,7 +824,7 @@ FreePool (
 {
   EFI_STATUS  Status;
 
-  Status = gMmst->MmFreePool (Buffer);
+  Status = mMemoryAllocationMmst->MmFreePool (Buffer);
   ASSERT_EFI_ERROR (Status);
 }
 
@@ -902,6 +902,6 @@ MemoryAllocationLibConstructor (
   MmInitializeMemoryServices ((UINTN)MmramRangeCount, (VOID *)(UINTN)MmramRanges);
 
   // Initialize MM Services Table
-  gMmst = MmSystemTable;
+  mMemoryAllocationMmst = MmSystemTable;
   return EFI_SUCCESS;
 }
