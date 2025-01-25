@@ -42,8 +42,35 @@ typedef struct DirectMsgArgs {
   /// Implementation define argument 3, this will be set to/from x6(v1) or x7(v2)
   UINTN    Arg3;
 
-  /// Implementation define argument 4, this will be set to/from x7(v1) or ignored (v2)
+  /// Implementation define argument 4, this will be set to/from x7(v1) or x8 (v2)
   UINTN    Arg4;
+
+  /// Implementation define argument 5, this will be ignored (v1) or set to/from x9(v2)
+  UINTN    Arg5;
+
+  /// Implementation define argument 6, this will be ignored (v1) or set to/from x10(v2)
+  UINTN    Arg6;
+
+  /// Implementation define argument 7, this will be ignored (v1) or set to/from x11(v2)
+  UINTN    Arg7;
+
+  /// Implementation define argument 8, this will be ignored (v1) or set to/from x12(v2)
+  UINTN    Arg8;
+
+  /// Implementation define argument 9, this will be ignored (v1) or set to/from x13(v2)
+  UINTN    Arg9;
+
+  /// Implementation define argument 10, this will be ignored (v1) or set to/from x14(v2)
+  UINTN    Arg10;
+
+  /// Implementation define argument 11, this will be ignored (v1) or set to/from x15(v2)
+  UINTN    Arg11;
+
+  /// Implementation define argument 12, this will be ignored (v1) or set to/from x16(v2)
+  UINTN    Arg12;
+
+  /// Implementation define argument 13, this will be ignored (v1) or set to/from x17(v2)
+  UINTN    Arg13;
 } DIRECT_MSG_ARGS;
 
 /**
