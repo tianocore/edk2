@@ -25,6 +25,7 @@
 
 #include <IndustryStandard/ArmFfaSvc.h>
 #include <IndustryStandard/ArmFfaPartInfo.h>
+#include <IndustryStandard/ArmStdSmc.h>
 
 #include "ArmFfaCommon.h"
 
@@ -695,14 +696,24 @@ ArmFfaLibMsgSendDirectReq2 (
 
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
-  FfaArgs.Arg0 = ARM_FID_FFA_MSG_SEND_DIRECT_REQ2;
-  FfaArgs.Arg1 = PACK_PARTITION_ID_INFO (gPartId, DestPartId);
-  FfaArgs.Arg2 = Uuid[0];
-  FfaArgs.Arg3 = Uuid[1];
-  FfaArgs.Arg4 = ImpDefArgs->Arg0;
-  FfaArgs.Arg5 = ImpDefArgs->Arg1;
-  FfaArgs.Arg6 = ImpDefArgs->Arg2;
-  FfaArgs.Arg7 = ImpDefArgs->Arg3;
+  FfaArgs.Arg0  = ARM_FID_FFA_MSG_SEND_DIRECT_REQ2;
+  FfaArgs.Arg1  = PACK_PARTITION_ID_INFO (gPartId, DestPartId);
+  FfaArgs.Arg2  = Uuid[0];
+  FfaArgs.Arg3  = Uuid[1];
+  FfaArgs.Arg4  = ImpDefArgs->Arg0;
+  FfaArgs.Arg5  = ImpDefArgs->Arg1;
+  FfaArgs.Arg6  = ImpDefArgs->Arg2;
+  FfaArgs.Arg7  = ImpDefArgs->Arg3;
+  FfaArgs.Arg8  = ImpDefArgs->Arg4;
+  FfaArgs.Arg9  = ImpDefArgs->Arg5;
+  FfaArgs.Arg10 = ImpDefArgs->Arg6;
+  FfaArgs.Arg11 = ImpDefArgs->Arg7;
+  FfaArgs.Arg12 = ImpDefArgs->Arg8;
+  FfaArgs.Arg13 = ImpDefArgs->Arg9;
+  FfaArgs.Arg14 = ImpDefArgs->Arg10;
+  FfaArgs.Arg15 = ImpDefArgs->Arg11;
+  FfaArgs.Arg16 = ImpDefArgs->Arg12;
+  FfaArgs.Arg17 = ImpDefArgs->Arg13;
 
   ArmCallFfa (&FfaArgs);
 
@@ -711,10 +722,20 @@ ArmFfaLibMsgSendDirectReq2 (
     return Status;
   }
 
-  ImpDefArgs->Arg0 = FfaArgs.Arg4;
-  ImpDefArgs->Arg1 = FfaArgs.Arg5;
-  ImpDefArgs->Arg2 = FfaArgs.Arg6;
-  ImpDefArgs->Arg3 = FfaArgs.Arg7;
+  ImpDefArgs->Arg0  = FfaArgs.Arg4;
+  ImpDefArgs->Arg1  = FfaArgs.Arg5;
+  ImpDefArgs->Arg2  = FfaArgs.Arg6;
+  ImpDefArgs->Arg3  = FfaArgs.Arg7;
+  ImpDefArgs->Arg4  = FfaArgs.Arg8;
+  ImpDefArgs->Arg5  = FfaArgs.Arg9;
+  ImpDefArgs->Arg6  = FfaArgs.Arg10;
+  ImpDefArgs->Arg7  = FfaArgs.Arg11;
+  ImpDefArgs->Arg8  = FfaArgs.Arg12;
+  ImpDefArgs->Arg9  = FfaArgs.Arg13;
+  ImpDefArgs->Arg10 = FfaArgs.Arg14;
+  ImpDefArgs->Arg11 = FfaArgs.Arg15;
+  ImpDefArgs->Arg12 = FfaArgs.Arg16;
+  ImpDefArgs->Arg13 = FfaArgs.Arg17;
 
   return EFI_SUCCESS;
 }
@@ -733,11 +754,27 @@ ArmFfaLibCommonInit (
   IN VOID
   )
 {
-  EFI_STATUS  Status;
-  UINT16      CurrentMajorVersion;
-  UINT16      CurrentMinorVersion;
+  EFI_STATUS    Status;
+  UINT16        CurrentMajorVersion;
+  UINT16        CurrentMinorVersion;
+  ARM_FFA_ARGS  FfaArgs;
 
   gFfaSupported = FALSE;
+
+  ZeroMem (&FfaArgs, sizeof (ARM_SMC_ARGS));
+  FfaArgs.Arg0 = SMCCC_VERSION;
+  ArmCallFfa (&FfaArgs);
+  if ((INT32)FfaArgs.Arg0 < 0) {
+    DEBUG ((DEBUG_ERROR, "%a: SMCCC_VERSION not supported\n", __func__));
+    return EFI_UNSUPPORTED;
+  }
+
+  // Cf [1] s2.1.3 'Caller responsibilities',
+  // SMCCC version must be greater or equal than 1.1
+  if ((INT32)FfaArgs.Arg0 < 0x10001) {
+    DEBUG ((DEBUG_ERROR, "%a: SMCCC_VERSION %x < 1.1\n", __func__, (UINT32)FfaArgs.Arg0));
+    return EFI_UNSUPPORTED;
+  }
 
   Status = ArmFfaLibGetVersion (
              ARM_FFA_MAJOR_VERSION,
