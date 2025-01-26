@@ -10,6 +10,7 @@
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.<BR>
 # Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (C) 2025 American Megatrends International, LLC. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -734,6 +735,9 @@
 
   ## Include/Protocol/PlatformBootManager.h
   gEdkiiPlatformBootManagerProtocolGuid = { 0xaa17add4, 0x756c, 0x460d, { 0x94, 0xb8, 0x43, 0x88, 0xd7, 0xfb, 0x3e, 0x59 } }
+
+  ## Include/Protocol/UsbAssociationIo.h
+  gEdkiiUsbInterfaceAssociationProtocolGuid = { 0xf4279fb1, 0xef1e, 0x4346, { 0xab, 0x32, 0x3f, 0xe3, 0x86, 0xee, 0xb4, 0x52 }}
 
 #
 # [Error.gEfiMdeModulePkgTokenSpaceGuid]
