@@ -453,6 +453,28 @@ Returns:
   EMU_THUNK_PPI        *SecEmuThunkPpi;
 
   //
+  // If enabled use the magic page to communicate between modules
+  // This replaces the PI PeiServicesTable pointer mechanism that
+  // deos not work in the emulator. It also allows the removal of
+  // writable globals from SEC, PEI_CORE (libraries), PEIMs
+  //
+  EmuMagicPage = (VOID *)(UINTN)(FixedPcdGet64 (PcdPeiServicesTablePage) & MAX_UINTN);
+  if (EmuMagicPage != NULL) {
+    UINT64  Size;
+    Status = WinNtOpenFile (
+               NULL,
+               SIZE_4KB,
+               0,
+               &EmuMagicPage,
+               &Size
+               );
+    if (EFI_ERROR (Status)) {
+      SecPrint ("ERROR : Could not allocate PeiServicesTablePage @ %p\n\r", EmuMagicPage);
+      return EFI_DEVICE_ERROR;
+    }
+  }
+
+  //
   // Enable the privilege so that RTC driver can successfully run SetTime()
   //
   OpenProcessToken (GetCurrentProcess (), TOKEN_ADJUST_PRIVILEGES|TOKEN_QUERY, &Token);
@@ -573,28 +595,6 @@ Returns:
   if (TemporaryRam == NULL) {
     SecPrint ("ERROR : Can not allocate enough space for SecStack\n\r");
     exit (1);
-  }
-
-  //
-  // If enabled use the magic page to communicate between modules
-  // This replaces the PI PeiServicesTable pointer mechanism that
-  // deos not work in the emulator. It also allows the removal of
-  // writable globals from SEC, PEI_CORE (libraries), PEIMs
-  //
-  EmuMagicPage = (VOID *)(UINTN)(FixedPcdGet64 (PcdPeiServicesTablePage) & MAX_UINTN);
-  if (EmuMagicPage != NULL) {
-    UINT64  Size;
-    Status = WinNtOpenFile (
-               NULL,
-               SIZE_4KB,
-               0,
-               &EmuMagicPage,
-               &Size
-               );
-    if (EFI_ERROR (Status)) {
-      SecPrint ("ERROR : Could not allocate PeiServicesTablePage @ %p\n\r", EmuMagicPage);
-      return EFI_DEVICE_ERROR;
-    }
   }
 
   //
