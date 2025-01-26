@@ -126,6 +126,44 @@ qemu-system-x86_64 -fw_cfg name=opt/org.tianocore/EFIShellSupport,string=no
 ```
 
 
+## Security: opt/org.tianocore/EnableLegacyLoader
+
+OVMF can load linux kernels in two ways:
+
+ * modern: load them as EFI binary, let the linux kernel's EFI stub
+   handle initrd loading, exiting boot services etc.
+ * legacy: load kernel + initrd directly, patch kernel setup header
+   with initrd location, ...
+
+OVMF will try the modern way first, in case of a failure fallback to
+the legacy method.  The legacy loader will not do secure boot
+verification though.  Disabling the legacy loader using this option
+will plug that hole.  It will also break booting prehistoric kernels
+without EFI stub.  If you are using kernels that old secure boot
+support is the least of your problems though ...
+
+The linux kernel is typically signed by the distro secure boot keys
+and is verified by the distro `shim.efi` binary.  qemu release 10.0
+(ETA ~ March 2025) will get support for passing the shim binary
+(additionally to kernel + initrd) to the firmware, so the usual secure
+boot verification can work with direct kernel load too.
+
+For now the legacy loader is enabled by default.  Once the new qemu
+release is available in most linux distros the defaut will be flipped
+to disabled.
+
+Usage (qemu 10.0+):
+
+```
+qemu-system-x86_64 \
+    -shim /boot/efi/EFI/${distro}/shimx64.efi \
+    -kernel /path/to/kernel \
+    -initrd /path/to/initamfs \
+    -append "kernel command line" \
+    -fw_cfg name=opt/org.tianocore/EnableLegacyLoader,string=no
+```
+
+
 ## Platform: opt/org.tianocore/X-Cpuhp-Bugcheck-Override
 
 On some older qemu versions CPU hotplug support was broken.  OVMF

@@ -656,7 +656,7 @@ ProgramVirtualWireMode (
   WriteLocalApicReg (XAPIC_LVT_LINT0_OFFSET, Lint.Uint32);
 
   //
-  // Program the LINT0 vector entry as NMI. Not masked, edge, active high.
+  // Program the LINT1 vector entry as NMI. Not masked, edge, active high.
   //
   Lint.Uint32                = ReadLocalApicReg (XAPIC_LVT_LINT1_OFFSET);
   Lint.Bits.DeliveryMode     = LOCAL_APIC_DELIVERY_MODE_NMI;

@@ -5,8 +5,8 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
-
 #include <Library/ArmLib.h>
+#include <Library/ArmFfaLib.h>
 #include <Library/ArmSmcLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -19,8 +19,14 @@
 #include <Protocol/MmCommunication2.h>
 
 #include <IndustryStandard/ArmStdSmc.h>
+#include <IndustryStandard/ArmFfaSvc.h>
+#include <IndustryStandard/MmCommunicate.h>
 
-#include "MmCommunicate.h"
+//
+// Partition ID if FF-A support is enabled
+//
+STATIC UINT16  mPartId;
+STATIC UINT16  mStMmPartId;
 
 //
 // Address, Length of the pre-allocated buffer for communication with the secure
@@ -35,6 +41,106 @@ STATIC EFI_EVENT  mSetVirtualAddressMapEvent;
 // Handle to install the MM Communication Protocol
 //
 STATIC EFI_HANDLE  mMmCommunicateHandle;
+
+/**
+  Send mm communicate request via FF-A.
+
+  @retval EFI_SUCCESS
+  @retval Others                   Error.
+
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+SendFfaMmCommunicate (
+  IN VOID
+  )
+{
+  EFI_STATUS       Status;
+  DIRECT_MSG_ARGS  CommunicateArgs;
+
+  ZeroMem (&CommunicateArgs, sizeof (DIRECT_MSG_ARGS));
+
+  CommunicateArgs.Arg0 = (UINTN)mNsCommBuffMemRegion.PhysicalBase;
+
+  Status = ArmFfaLibMsgSendDirectReq (
+             mStMmPartId,
+             0,
+             &CommunicateArgs
+             );
+
+  while (Status == EFI_INTERRUPT_PENDING) {
+    // We are assuming vCPU0 of the StMM SP since it is UP.
+    Status = ArmFfaLibRun (mStMmPartId, 0x00);
+  }
+
+  return Status;
+}
+
+/**
+  Convert SmcMmRet value to EFI_STATUS.
+
+  @param[in] SmcMmRet              Mm return code
+
+  @retval EFI_SUCCESS
+  @retval Others                   Error status correspond to SmcMmRet
+
+**/
+STATIC
+EFI_STATUS
+SmcMmRetToEfiStatus (
+  IN UINTN  SmcMmRet
+  )
+{
+  switch ((UINT32)SmcMmRet) {
+    case ARM_SMC_MM_RET_SUCCESS:
+      return EFI_SUCCESS;
+    case ARM_SMC_MM_RET_INVALID_PARAMS:
+      return EFI_INVALID_PARAMETER;
+    case ARM_SMC_MM_RET_DENIED:
+      return EFI_ACCESS_DENIED;
+    case ARM_SMC_MM_RET_NO_MEMORY:
+      return EFI_OUT_OF_RESOURCES;
+    default:
+      return EFI_ACCESS_DENIED;
+  }
+}
+
+/**
+  Send mm communicate request via SPM_MM.
+
+  @retval EFI_SUCCESS
+  @retval Others                   Error.
+
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+SendSpmMmCommunicate (
+  IN VOID
+  )
+{
+  ARM_SMC_ARGS  CommunicateSmcArgs;
+
+  ZeroMem (&CommunicateSmcArgs, sizeof (ARM_SMC_ARGS));
+
+  // SMC Function ID
+  CommunicateSmcArgs.Arg0 = ARM_SMC_ID_MM_COMMUNICATE_AARCH64;
+
+  // Cookie
+  CommunicateSmcArgs.Arg1 = 0;
+
+  // comm_buffer_address (64-bit physical address)
+  CommunicateSmcArgs.Arg2 = (UINTN)mNsCommBuffMemRegion.PhysicalBase;
+
+  // comm_size_address (not used, indicated by setting to zero)
+  CommunicateSmcArgs.Arg3 = 0;
+
+  // Call the Standalone MM environment.
+  ArmCallSmc (&CommunicateSmcArgs);
+
+  return SmcMmRetToEfiStatus (CommunicateSmcArgs.Arg0);
+}
 
 /**
   Communicates with a registered handler.
@@ -76,14 +182,11 @@ MmCommunication2Communicate (
   )
 {
   EFI_MM_COMMUNICATE_HEADER  *CommunicateHeader;
-  ARM_SMC_ARGS               CommunicateSmcArgs;
-  EFI_STATUS                 Status;
   UINTN                      BufferSize;
+  EFI_STATUS                 Status;
 
   Status     = EFI_ACCESS_DENIED;
   BufferSize = 0;
-
-  ZeroMem (&CommunicateSmcArgs, sizeof (ARM_SMC_ARGS));
 
   //
   // Check parameters
@@ -139,60 +242,40 @@ MmCommunication2Communicate (
     return Status;
   }
 
-  // SMC Function ID
-  CommunicateSmcArgs.Arg0 = ARM_SMC_ID_MM_COMMUNICATE_AARCH64;
-
-  // Cookie
-  CommunicateSmcArgs.Arg1 = 0;
-
   // Copy Communication Payload
   CopyMem ((VOID *)mNsCommBuffMemRegion.VirtualBase, CommBufferVirtual, BufferSize);
 
-  // comm_buffer_address (64-bit physical address)
-  CommunicateSmcArgs.Arg2 = (UINTN)mNsCommBuffMemRegion.PhysicalBase;
+  if (IsFfaSupported ()) {
+    Status = SendFfaMmCommunicate ();
+  } else {
+    Status = SendSpmMmCommunicate ();
+  }
 
-  // comm_size_address (not used, indicated by setting to zero)
-  CommunicateSmcArgs.Arg3 = 0;
-
-  // Call the Standalone MM environment.
-  ArmCallSmc (&CommunicateSmcArgs);
-
-  switch (CommunicateSmcArgs.Arg0) {
-    case ARM_SMC_MM_RET_SUCCESS:
-      ZeroMem (CommBufferVirtual, BufferSize);
-      // On successful return, the size of data being returned is inferred from
-      // MessageLength + Header.
-      CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)mNsCommBuffMemRegion.VirtualBase;
-      BufferSize        = CommunicateHeader->MessageLength +
-                          sizeof (CommunicateHeader->HeaderGuid) +
-                          sizeof (CommunicateHeader->MessageLength);
-
+  if (!EFI_ERROR (Status)) {
+    ZeroMem (CommBufferVirtual, BufferSize);
+    // On successful return, the size of data being returned is inferred from
+    // MessageLength + Header.
+    CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)mNsCommBuffMemRegion.VirtualBase;
+    BufferSize        = CommunicateHeader->MessageLength +
+                        sizeof (CommunicateHeader->HeaderGuid) +
+                        sizeof (CommunicateHeader->MessageLength);
+    if (BufferSize > mNsCommBuffMemRegion.Length) {
+      // Something bad has happened, we should have landed in ARM_SMC_MM_RET_NO_MEMORY
+      Status = EFI_BAD_BUFFER_SIZE;
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a Returned buffer exceeds communication buffer limit. Has: 0x%llx vs. max: 0x%llx!\n",
+        __func__,
+        BufferSize,
+        (UINTN)mNsCommBuffMemRegion.Length
+        ));
+    } else {
       CopyMem (
         CommBufferVirtual,
         (VOID *)mNsCommBuffMemRegion.VirtualBase,
         BufferSize
         );
-      Status = EFI_SUCCESS;
-      break;
-
-    case ARM_SMC_MM_RET_INVALID_PARAMS:
-      Status = EFI_INVALID_PARAMETER;
-      break;
-
-    case ARM_SMC_MM_RET_DENIED:
-      Status = EFI_ACCESS_DENIED;
-      break;
-
-    case ARM_SMC_MM_RET_NO_MEMORY:
-      // Unexpected error since the CommSize was checked for zero length
-      // prior to issuing the SMC
-      Status = EFI_OUT_OF_RESOURCES;
-      ASSERT (0);
-      break;
-
-    default:
-      Status = EFI_ACCESS_DENIED;
-      ASSERT (0);
+    }
   }
 
   return Status;
@@ -243,9 +326,15 @@ NotifySetVirtualAddressMap (
   }
 }
 
+/**
+  Check mm communication compatibility when use SPM_MM.
+
+**/
 STATIC
 EFI_STATUS
+EFIAPI
 GetMmCompatibility (
+  VOID
   )
 {
   EFI_STATUS    Status;
@@ -256,6 +345,10 @@ GetMmCompatibility (
   MmVersionArgs.Arg0 = ARM_SMC_ID_MM_VERSION_AARCH32;
 
   ArmCallSmc (&MmVersionArgs);
+
+  if (MmVersionArgs.Arg0 == ARM_SMC_MM_RET_NOT_SUPPORTED) {
+    return EFI_UNSUPPORTED;
+  }
 
   MmVersion = MmVersionArgs.Arg0;
 
@@ -279,6 +372,174 @@ GetMmCompatibility (
       MM_CALLER_MINOR_VER
       ));
     Status = EFI_UNSUPPORTED;
+  }
+
+  return Status;
+}
+
+/**
+  Check mm communication compatibility when use FF-A.
+
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GetFfaCompatibility (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+  UINT16      CurrentMajorVersion;
+  UINT16      CurrentMinorVersion;
+
+  Status = ArmFfaLibGetVersion (
+             ARM_FFA_MAJOR_VERSION,
+             ARM_FFA_MINOR_VERSION,
+             &CurrentMajorVersion,
+             &CurrentMinorVersion
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed to get FF-A version. Status: %r\n", Status));
+    return EFI_UNSUPPORTED;
+  }
+
+  if ((ARM_FFA_MAJOR_VERSION != CurrentMajorVersion) ||
+      (ARM_FFA_MINOR_VERSION > CurrentMinorVersion))
+  {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Incompatible FF-A Versions for MM_COMM.\n" \
+      "Request Version: Major=0x%x, Minor=0x%x.\n" \
+      "Current Version: Major=0x%x, Minor>=0x%x.\n",
+      ARM_FFA_MAJOR_VERSION,
+      ARM_FFA_MINOR_VERSION,
+      CurrentMajorVersion,
+      CurrentMinorVersion
+      ));
+    return EFI_UNSUPPORTED;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "FF-A Version for MM_COMM: Major=0x%x, Minor=0x%x\n",
+    CurrentMajorVersion,
+    CurrentMinorVersion
+    ));
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Initialize communication via FF-A.
+
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+InitializeFfaCommunication (
+  VOID
+  )
+{
+  EFI_STATUS              Status;
+  VOID                    *TxBuffer;
+  UINT64                  TxBufferSize;
+  VOID                    *RxBuffer;
+  UINT64                  RxBufferSize;
+  EFI_FFA_PART_INFO_DESC  *StmmPartInfo;
+  UINT32                  Count;
+  UINT32                  Size;
+
+  Status = ArmFfaLibPartitionIdGet (&mPartId);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Failed to get partition id. Status: %r\n",
+      Status
+      ));
+    return Status;
+  }
+
+  Status = ArmFfaLibGetRxTxBuffers (
+             &TxBuffer,
+             &TxBufferSize,
+             &RxBuffer,
+             &RxBufferSize
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Failed to get Rx/Tx Buffer. Status: %r\n",
+      Status
+      ));
+    return Status;
+  }
+
+  Status = ArmFfaLibPartitionInfoGet (
+             &gEfiMmCommunication2ProtocolGuid,
+             FFA_PART_INFO_FLAG_TYPE_DESC,
+             &Count,
+             &Size
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Failed to get Stmm(%g) partition Info. Status: %r\n",
+      &gEfiMmCommunication2ProtocolGuid,
+      Status
+      ));
+    return Status;
+  }
+
+  if ((Count != 1) || (Size < sizeof (EFI_FFA_PART_INFO_DESC))) {
+    Status = EFI_INVALID_PARAMETER;
+    DEBUG ((
+      DEBUG_ERROR,
+      "Invalid partition Info(%g). Count: %d, Size: %d\n",
+      &gEfiMmCommunication2ProtocolGuid,
+      Count,
+      Size
+      ));
+    goto ErrorHandler;
+  }
+
+  StmmPartInfo = (EFI_FFA_PART_INFO_DESC *)RxBuffer;
+
+  if ((StmmPartInfo->PartitionProps & FFA_PART_PROP_RECV_DIRECT_REQ) == 0x00) {
+    Status = EFI_UNSUPPORTED;
+    DEBUG ((DEBUG_ERROR, "StandaloneMm doesn't receive DIRECT_MSG_REQ...\n"));
+    goto ErrorHandler;
+  }
+
+  mStMmPartId = StmmPartInfo->PartitionId;
+
+ErrorHandler:
+  ArmFfaLibRxRelease (mPartId);
+  return Status;
+}
+
+/**
+ Initialize mm communication.
+
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+InitializeCommunication (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = EFI_UNSUPPORTED;
+
+  if (IsFfaSupported ()) {
+    Status = GetFfaCompatibility ();
+    if (!EFI_ERROR (Status)) {
+      Status = InitializeFfaCommunication ();
+    }
+  } else {
+    Status = GetMmCompatibility ();
+    // No further initialisation required for SpmMM
   }
 
   return Status;
@@ -345,8 +606,8 @@ MmCommunication2Initialize (
   EFI_STATUS  Status;
   UINTN       Index;
 
-  // Check if we can make the MM call
-  Status = GetMmCompatibility ();
+  // Initialize to make mm communication
+  Status = InitializeCommunication ();
   if (EFI_ERROR (Status)) {
     goto ReturnErrorStatus;
   }
