@@ -657,11 +657,12 @@ UnitTestDebugAssert (
 **/
 #if !defined (MDEPKG_NDEBUG)
 #define CR(Record, TYPE, Field, TestSignature)                                              \
+    ((Record == NULL) ? (TYPE *) (_ASSERT (CR has Null Pointer), Record) :                    \
     (DebugAssertEnabled () && (BASE_CR (Record, TYPE, Field)->Signature != TestSignature)) ?  \
     (TYPE *) (_ASSERT (CR has Bad Signature), Record) :                                       \
     (BASE_CR (Record, TYPE, Field)->Signature != TestSignature) ?                             \
     NULL :                                                                                    \
-    BASE_CR (Record, TYPE, Field)
+    BASE_CR (Record, TYPE, Field))
 #else
 #define CR(Record, TYPE, Field, TestSignature)                                              \
     (BASE_CR (Record, TYPE, Field)->Signature != TestSignature) ?                           \
