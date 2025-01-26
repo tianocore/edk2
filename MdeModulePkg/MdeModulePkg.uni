@@ -962,6 +962,9 @@
                                                                                      "If it is set to TRUE that means ACPI Reclaim memory is not available\n"
                                                                                      "For example ACPI Table protocol will use ACPI NVS memory instead of ACPI Reclaim memory"
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMemoryAttributesTableVersion_PROMPT  #language en-US "Exposed Memory Attributes Table version."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMemoryAttributesTableVersion_HELP  #language en-US "Indicates which Memory Attributes Table version exposed to the OS."
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdHiiOsRuntimeSupport_PROMPT  #language en-US "Enable export HII data and configuration to be used in OS runtime."
 
