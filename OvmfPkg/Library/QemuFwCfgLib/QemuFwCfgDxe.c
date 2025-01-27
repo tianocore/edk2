@@ -29,6 +29,8 @@ STATIC BOOLEAN  mQemuFwCfgDmaSupported;
 
 STATIC EDKII_IOMMU_PROTOCOL  *mIoMmuProtocol;
 
+STATIC QEMU_FW_CFG_CACHE_WORK_AREA  mFwCfgCacheWorkArea = { 0 };
+
 /**
   Returns a boolean indicating if the firmware configuration interface
   is available or not.
@@ -495,4 +497,41 @@ InternalQemuFwCfgDmaBytes (
   if (DataMapping != NULL) {
     UnmapFwCfgDmaDataBuffer (DataMapping);
   }
+}
+
+/**
+  Check if the Ovmf work area is built as HobList before invoking Hob services.
+
+  @retval    TRUE   Ovmf work area is not NULL and it is built as HobList.
+  @retval    FALSE   Ovmf work area is NULL or it is not built as HobList.
+**/
+BOOLEAN
+InternalQemuFwCfgCheckOvmfWorkArea (
+  VOID
+  )
+{
+  return TRUE;
+}
+
+/**
+  Get the pointer to the QEMU_FW_CFG_CACHE_WORK_AREA. This data is used as the
+  workarea to record the ongoing fw_cfg item and offset.
+  @retval   QEMU_FW_CFG_CACHE_WORK_AREA  Pointer to the QEMU_FW_CFG_CACHE_WORK_AREA
+  @retval   NULL                QEMU_FW_CFG_CACHE_WORK_AREA doesn't exist
+**/
+QEMU_FW_CFG_CACHE_WORK_AREA *
+InternalQemuFwCfgCacheGetWorkArea (
+  VOID
+  )
+{
+  return &mFwCfgCacheWorkArea;
+}
+
+RETURN_STATUS
+EFIAPI
+QemuFwCfgInitCache (
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  return RETURN_UNSUPPORTED;
 }
