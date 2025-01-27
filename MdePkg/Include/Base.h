@@ -800,12 +800,12 @@ typedef UINTN *BASE_LIST;
   @param  Message     Raised compiler diagnostic message when expression is false.
 
 **/
-#ifdef MDE_CPU_EBC
-#define STATIC_ASSERT(Expression, Message)
-#elif defined (_MSC_EXTENSIONS) || defined (__cplusplus)
+#if defined (__cplusplus)
 #define STATIC_ASSERT  static_assert
-#else
+#elif defined (__GNUC__) || defined (__clang__)
 #define STATIC_ASSERT  _Static_assert
+#elif defined (_MSC_EXTENSIONS)
+#define STATIC_ASSERT  static_assert
 #endif
 
 //

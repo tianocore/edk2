@@ -129,10 +129,7 @@ INF  OvmfPkg/VirtioNetDxe/VirtioNet.inf
 INF  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
 INF  OvmfPkg/VirtioRngDxe/VirtioRng.inf
 
-INF  ShellPkg/Application/Shell/Shell.inf
-INF  ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
-INF  ShellPkg/DynamicCommand/HttpDynamicCommand/HttpDynamicCommand.inf
-INF  OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
+!include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
 
 #
 # Bds
@@ -194,6 +191,7 @@ INF  OvmfPkg/Virtio10Dxe/Virtio10.inf
 #
 # Video support
 #
+INF  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
 INF  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
 INF  OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
 INF  OvmfPkg/PlatformDxe/Platform.inf

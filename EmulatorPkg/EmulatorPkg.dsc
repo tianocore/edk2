@@ -537,15 +537,15 @@
   MSFT:NOOPT_*_*_CC_FLAGS = /Od /Oy-
   GCC:DEBUG_CLANGPDB_*_CC_FLAGS =-O0 -Wno-unused-command-line-argument -Wno-incompatible-pointer-types -Wno-enum-conversion -Wno-incompatible-pointer-types -Wno-sometimes-uninitialized -Wno-constant-conversion -Wno-main-return-type
 
-  MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096 /FILEALIGN:4096 /SUBSYSTEM:CONSOLE
-  MSFT:DEBUG_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
-  MSFT:NOOPT_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
+  MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096 /FILEALIGN:4096
+  MSFT:DEBUG_*_*_DLINK_FLAGS = /BASE:0x10000
+  MSFT:NOOPT_*_*_DLINK_FLAGS = /BASE:0x10000
 
 !if $(WIN_HOST_BUILD) == TRUE
   #
   # CLANGPDB tool chain depends on WIN_HOST_BUILD flag to generate the windows application.
   #
-  GCC:*_CLANGPDB_*_DLINK_FLAGS     = /ALIGN:4096 /FILEALIGN:4096 /SUBSYSTEM:CONSOLE
-  GCC:DEBUG_CLANGPDB_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
-  GCC:NOOPT_CLANGPDB_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
+  GCC:*_CLANGPDB_*_DLINK_FLAGS     = /ALIGN:4096 /FILEALIGN:4096
+  GCC:DEBUG_CLANGPDB_*_DLINK_FLAGS = /BASE:0x10000
+  GCC:NOOPT_CLANGPDB_*_DLINK_FLAGS = /BASE:0x10000
 !endif

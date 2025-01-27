@@ -270,18 +270,36 @@ MmDispatchFvs (
 
     DEBUG ((DEBUG_INFO, "%a: FV[%d] address - 0x%x\n", __func__, Index, FvHob.FirmwareVolume->BaseAddress));
     DEBUG ((DEBUG_INFO, "%a: FV[%d] size    - 0x%x\n", __func__, Index, FvHob.FirmwareVolume->Length));
-    Fv = AllocatePool (FvHob.FirmwareVolume->Length);
-    if (Fv == NULL) {
-      DEBUG ((DEBUG_ERROR, "Fail to allocate memory for Fv\n"));
-      CpuDeadLoop ();
-      return;
+
+    if (FvHob.FirmwareVolume->Length == 0x00) {
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: Skip invalid FV[%d]- 0x%x/0x%x\n",
+        __func__,
+        Index,
+        FvHob.FirmwareVolume->BaseAddress,
+        FvHob.FirmwareVolume->Length
+        ));
+      continue;
     }
 
-    CopyMem (
-      (VOID *)Fv,
-      (VOID *)(UINTN)FvHob.FirmwareVolume->BaseAddress,
-      FvHob.FirmwareVolume->Length
-      );
+    if (!FixedPcdGetBool (PcdShadowBfv)) {
+      Fv = (EFI_FIRMWARE_VOLUME_HEADER *)((UINTN)FvHob.FirmwareVolume->BaseAddress);
+    } else {
+      Fv = AllocatePool (FvHob.FirmwareVolume->Length);
+      if (Fv == NULL) {
+        DEBUG ((DEBUG_ERROR, "Fail to allocate memory for Fv\n"));
+        CpuDeadLoop ();
+        return;
+      }
+
+      CopyMem (
+        (VOID *)Fv,
+        (VOID *)(UINTN)FvHob.FirmwareVolume->BaseAddress,
+        FvHob.FirmwareVolume->Length
+        );
+    }
+
     MmCoreFfsFindMmDriver (Fv, 0);
     mMmFv[Index++] = Fv;
 
@@ -306,6 +324,10 @@ MmFreeShadowedFvs (
   )
 {
   UINTN  Index;
+
+  if (!FixedPcdGetBool (PcdShadowBfv)) {
+    return;
+  }
 
   for (Index = 0; Index < ARRAY_SIZE (mMmFv); Index++) {
     if (mMmFv[Index] != NULL) {

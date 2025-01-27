@@ -2,6 +2,7 @@
   Definitions to install Multiple Processor PPI.
 
   Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2025, Loongson Technology Corporation Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -34,7 +35,8 @@
 
 #include <Register/Cpuid.h>
 
-extern EFI_PEI_PPI_DESCRIPTOR  mPeiCpuMpPpiDesc;
+extern EDKII_PEI_MP_SERVICES2_PPI  mMpServices2Ppi;
+extern EFI_PEI_MP_SERVICES_PPI     mMpServicesPpi;
 
 /**
   This service retrieves the number of logical processor in the platform

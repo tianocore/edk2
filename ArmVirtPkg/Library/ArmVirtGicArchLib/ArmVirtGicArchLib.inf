@@ -14,14 +14,13 @@
   FILE_GUID                      = 87b0dc84-4661-4deb-a789-97977ff636ed
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ArmGicArchLib|DXE_DRIVER UEFI_DRIVER UEFI_APPLICATION
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER UEFI_DRIVER UEFI_APPLICATION
   CONSTRUCTOR                    = ArmVirtGicArchLibConstructor
 
 [Sources]
   ArmVirtGicArchLib.c
 
 [LibraryClasses]
-  ArmGicLib
   BaseLib
   DebugLib
   PcdLib

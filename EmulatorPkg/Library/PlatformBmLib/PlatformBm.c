@@ -401,9 +401,9 @@ PlatformBootManagerAfterConsole (
     case BOOT_WITH_DEFAULT_SETTINGS:
     default:
       PlatformBdsDiagnostics (IGNORE, TRUE);
-      PlatformBdsRegisterStaticBootOptions ();
       PlatformBdsConnectSequence ();
       EfiBootManagerRefreshAllBootOption ();
+      PlatformBdsRegisterStaticBootOptions ();
       EfiBootManagerSortLoadOptionVariable (LoadOptionTypeBoot, (SORT_COMPARE)CompareBootOption);
       break;
   }

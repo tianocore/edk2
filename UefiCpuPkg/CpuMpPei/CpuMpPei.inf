@@ -2,6 +2,7 @@
 #  CPU driver installs CPU PI Multi-processor PPI.
 #
 #  Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2025, Loongson Technology Corporation Limited. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -18,15 +19,21 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = IA32 X64 LOONGARCH64
 #
 
 [Sources]
   CpuMpPei.h
-  CpuMpPei.c
+  CpuMp.c
+  CpuMp2.c
+
+[Sources.Ia32, Sources.X64]
   CpuBist.c
   CpuPaging.c
-  CpuMp2Pei.c
+  CpuMpPei.c
+
+[Sources.LoongArch64]
+  LoongArch64/CpuMpPei.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -37,16 +44,18 @@
   BaseLib
   DebugLib
   HobLib
-  LocalApicLib
   PeimEntryPoint
   PeiServicesLib
   ReportStatusCodeLib
-  CpuExceptionHandlerLib
   MpInitLib
   BaseMemoryLib
   CpuLib
   MemoryAllocationLib
+
+[LibraryClasses.Ia32, LibraryClasses.X64]
+  CpuExceptionHandlerLib
   CpuPageTableLib
+  LocalApicLib
 
 [Guids]
   gEdkiiMigratedFvInfoGuid                                             ## SOMETIMES_CONSUMES     ## HOB

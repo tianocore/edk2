@@ -31,7 +31,7 @@
   MdeModulePkg/MdeModulePkg.dec
   SecurityPkg/SecurityPkg.dec
   CryptoPkg/CryptoPkg.dec
-  OvmfPkg/OvmfPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   MemoryAllocationLib
@@ -50,7 +50,7 @@
   PeCoffLib
   TpmMeasurementLib
   TdxLib
-  TdxHelperLib
+  TdxMeasurementLib
 
 [Guids]
   ## SOMETIMES_CONSUMES     ## Variable:L"SecureBoot"

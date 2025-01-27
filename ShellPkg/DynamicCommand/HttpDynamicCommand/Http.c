@@ -1690,7 +1690,7 @@ GetResponse (
     if (!EFI_ERROR (gRT->GetTime (&EndTime, NULL))) {
       ElapsedSeconds = EfiTimeToEpoch (&EndTime) - EfiTimeToEpoch (&StartTime);
       Print (
-        L",%a%Lus\n",
+        L",%a%Lus",
         ElapsedSeconds ? " " : " < ",
         ElapsedSeconds > 1 ? (UINT64)ElapsedSeconds : 1
         );
