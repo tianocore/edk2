@@ -602,6 +602,12 @@ ASM_PFX(TempRamInitApi):
   CALL_EBP  ASM_PFX(LoadUpdPointerToECX) ; ECX for UPD param
   SAVE_ECX                               ; save UPD param to slot 3 in xmm6
 
+  ;
+  ; Get FspInfoHeader address
+  ;
+  CALL_EDI  ASM_PFX(AsmGetFspInfoHeaderNoStack)
+  mov       esi, eax
+
   mov       edx, ASM_PFX(PcdGet32 (PcdTemporaryRamSize))
   mov       edx, DWORD [edx]
   ;

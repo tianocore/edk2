@@ -464,6 +464,13 @@ ASM_PFX(TempRamInitApi):
 ParamValid:
   SAVE_RCX
 
+  ;
+  ; Get FspInfoHeader address
+  ;
+  CALL_RDI  ASM_PFX(AsmGetFspInfoHeaderNoStack)
+  mov       rsi, rax
+  LOAD_RCX
+
   mov       rdx, ASM_PFX(PcdGet32 (PcdTemporaryRamSize))
   mov       edx, DWORD [rdx]
   ;
