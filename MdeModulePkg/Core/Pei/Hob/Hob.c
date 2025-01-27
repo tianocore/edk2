@@ -1,7 +1,7 @@
 /** @file
   This module provide Hand-Off Block manipulation.
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2025, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -201,10 +201,8 @@ PeiInstallSecHobData (
   @param MemoryBegin     - Start Memory Address.
   @param MemoryLength    - Length of Memory.
 
-  @return EFI_SUCCESS Always success to initialize HOB.
-
 **/
-EFI_STATUS
+VOID
 PeiCoreBuildHobHandoffInfoTable (
   IN EFI_BOOT_MODE         BootMode,
   IN EFI_PHYSICAL_ADDRESS  MemoryBegin,
@@ -232,6 +230,4 @@ PeiCoreBuildHobHandoffInfoTable (
   Hob->EfiFreeMemoryTop    = MemoryBegin + MemoryLength;
   Hob->EfiFreeMemoryBottom = (EFI_PHYSICAL_ADDRESS)(UINTN)(HobEnd + 1);
   Hob->EfiEndOfHobList     = (EFI_PHYSICAL_ADDRESS)(UINTN)HobEnd;
-
-  return EFI_SUCCESS;
 }
