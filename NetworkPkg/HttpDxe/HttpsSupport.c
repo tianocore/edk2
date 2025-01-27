@@ -732,7 +732,6 @@ TlsConfigureSession (
       // the caller. The failure is pushed back to TLS DXE driver if the
       // HTTP communication actually requires certificate.
       //
-      Status = EFI_SUCCESS;
     } else {
       DEBUG ((DEBUG_ERROR, "TLS Certificate Config Error!\n"));
       return Status;
@@ -1250,7 +1249,13 @@ TlsConnectSession (
   // Transmit ClientHello
   //
   PacketOut = NetbufAlloc ((UINT32)BufferOutSize);
-  DataOut   = NetbufAllocSpace (PacketOut, (UINT32)BufferOutSize, NET_BUF_TAIL);
+
+  if (PacketOut == NULL) {
+    FreePool (BufferOut);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  DataOut = NetbufAllocSpace (PacketOut, (UINT32)BufferOutSize, NET_BUF_TAIL);
   if (DataOut == NULL) {
     FreePool (BufferOut);
     return EFI_OUT_OF_RESOURCES;
@@ -1336,7 +1341,13 @@ TlsConnectSession (
       // Transmit the response packet.
       //
       PacketOut = NetbufAlloc ((UINT32)BufferOutSize);
-      DataOut   = NetbufAllocSpace (PacketOut, (UINT32)BufferOutSize, NET_BUF_TAIL);
+
+      if (PacketOut == NULL) {
+        FreePool (BufferOut);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      DataOut = NetbufAllocSpace (PacketOut, (UINT32)BufferOutSize, NET_BUF_TAIL);
       if (DataOut == NULL) {
         FreePool (BufferOut);
         return EFI_OUT_OF_RESOURCES;
@@ -1493,7 +1504,13 @@ TlsCloseSession (
   }
 
   PacketOut = NetbufAlloc ((UINT32)BufferOutSize);
-  DataOut   = NetbufAllocSpace (PacketOut, (UINT32)BufferOutSize, NET_BUF_TAIL);
+
+  if (PacketOut == NULL) {
+    FreePool (BufferOut);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  DataOut = NetbufAllocSpace (PacketOut, (UINT32)BufferOutSize, NET_BUF_TAIL);
   if (DataOut == NULL) {
     FreePool (BufferOut);
     return EFI_OUT_OF_RESOURCES;
@@ -1781,7 +1798,13 @@ HttpsReceive (
 
         if (BufferOutSize != 0) {
           PacketOut = NetbufAlloc ((UINT32)BufferOutSize);
-          DataOut   = NetbufAllocSpace (PacketOut, (UINT32)BufferOutSize, NET_BUF_TAIL);
+
+          if (PacketOut == NULL) {
+            FreePool (BufferOut);
+            return EFI_OUT_OF_RESOURCES;
+          }
+
+          DataOut = NetbufAllocSpace (PacketOut, (UINT32)BufferOutSize, NET_BUF_TAIL);
           if (DataOut == NULL) {
             FreePool (BufferOut);
             return EFI_OUT_OF_RESOURCES;
@@ -1873,7 +1896,13 @@ HttpsReceive (
 
     if (BufferOutSize != 0) {
       PacketOut = NetbufAlloc ((UINT32)BufferOutSize);
-      DataOut   = NetbufAllocSpace (PacketOut, (UINT32)BufferOutSize, NET_BUF_TAIL);
+
+      if (PacketOut == NULL) {
+        FreePool (BufferOut);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      DataOut = NetbufAllocSpace (PacketOut, (UINT32)BufferOutSize, NET_BUF_TAIL);
       if (DataOut == NULL) {
         FreePool (BufferOut);
         return EFI_OUT_OF_RESOURCES;
