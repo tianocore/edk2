@@ -33,25 +33,26 @@ typedef enum {
     in the X64 Namespace
 */
 typedef enum X64ObjectID {
-  EX64ObjReserved,               ///<  0 - Reserved
-  EX64ObjFadtSciInterrupt,       ///<  1 - FADT SCI Interrupt information
-  EX64ObjFadtSciCmdInfo,         ///<  2 - FADT SCI CMD information
-  EX64ObjFadtPmBlockInfo,        ///<  3 - FADT Power management block info
-  EX64ObjFadtGpeBlockInfo,       ///<  4 - FADT GPE block info
-  EX64ObjFadtXpmBlockInfo,       ///<  5 - FADT 64-bit Power Management block info
-  EX64ObjFadtXgpeBlockInfo,      ///<  6 - FADT 64-bit GPE block info
-  EX64ObjFadtSleepBlockInfo,     ///<  7 - FADT Sleep block info
-  EX64ObjFadtResetBlockInfo,     ///<  8 - FADT Reset block info
-  EX64ObjFadtMiscInfo,           ///<  9 - FADT Legacy fields info
-  EX64ObjWsmtFlagsInfo,          ///< 10 - WSMT protection flags info
-  EX64ObjHpetInfo,               ///< 11 - HPET device info
-  EX64ObjMadtInfo,               ///< 12 - MADT info
-  EX64ObjLocalApicX2ApicInfo,    ///< 13 - Local APIC and X2APIC info
-  EX64ObjIoApicInfo,             ///< 14 - IO APIC info
-  EX64ObjIntrSourceOverrideInfo, ///< 15 - Interrupt Source Override info
-  EX64ObjLocalApicX2ApicNmiInfo, ///< 16 - Local APIC and X2APIC NMI info
-  EX64ObjFacsInfo,               ///< 17 - FACS info
-  EX64ObjMax                     ///< 18 - Maximum Object ID
+  EX64ObjReserved,                    ///<  0 - Reserved
+  EX64ObjFadtSciInterrupt,            ///<  1 - FADT SCI Interrupt information
+  EX64ObjFadtSciCmdInfo,              ///<  2 - FADT SCI CMD information
+  EX64ObjFadtPmBlockInfo,             ///<  3 - FADT Power management block info
+  EX64ObjFadtGpeBlockInfo,            ///<  4 - FADT GPE block info
+  EX64ObjFadtXpmBlockInfo,            ///<  5 - FADT 64-bit Power Management block info
+  EX64ObjFadtXgpeBlockInfo,           ///<  6 - FADT 64-bit GPE block info
+  EX64ObjFadtSleepBlockInfo,          ///<  7 - FADT Sleep block info
+  EX64ObjFadtResetBlockInfo,          ///<  8 - FADT Reset block info
+  EX64ObjFadtMiscInfo,                ///<  9 - FADT Legacy fields info
+  EX64ObjWsmtFlagsInfo,               ///< 10 - WSMT protection flags info
+  EX64ObjHpetInfo,                    ///< 11 - HPET device info
+  EX64ObjMadtInfo,                    ///< 12 - MADT info
+  EX64ObjLocalApicX2ApicInfo,         ///< 13 - Local APIC and X2APIC info
+  EX64ObjIoApicInfo,                  ///< 14 - IO APIC info
+  EX64ObjIntrSourceOverrideInfo,      ///< 15 - Interrupt Source Override info
+  EX64ObjLocalApicX2ApicNmiInfo,      ///< 16 - Local APIC and X2APIC NMI info
+  EX64ObjFacsInfo,                    ///< 17 - FACS info
+  EX64ObjLocalApicX2ApicAffinityInfo, ///< 18 - Local APIC and X2APIC Affinity info
+  EX64ObjMax                          ///< 19 - Maximum Object ID
 } EX64_OBJECT_ID;
 
 /** A structure that describes the
@@ -277,6 +278,19 @@ typedef struct CmX64FacsInfo {
   UINT64    XFirmwareWakingVector;
   UINT32    OspmFlags;
 } CM_X64_FACS_INFO;
+
+/**
+  A structure that describes the Local APIC and X2APIC Affinity information.
+
+  ID: EX64ObjLocalApicX2ApicAffinityInfo
+ */
+typedef struct CmX64LocalApicX2ApicAffinityInfo {
+  LOCAL_APIC_MODE    ApicMode;
+  UINT32             ApicId;
+  UINT32             ProximityDomain;
+  UINT32             Flags;
+  UINT32             ClockDomain;
+} CM_X64_LOCAL_APIC_X2APIC_AFFINITY_INFO;
 
 #pragma pack()
 #endif // X64_NAMESPACE_OBJECTS_H_
