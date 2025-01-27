@@ -1305,6 +1305,10 @@ MnpStop (
   MnpDeviceData = MnpServiceData->MnpDeviceData;
   ASSERT (MnpDeviceData->ConfiguredChildrenNumber > 0);
 
+  if (MnpDeviceData->ConfiguredChildrenNumber <= 0) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   //
   // Configure the receive filters.
   //
