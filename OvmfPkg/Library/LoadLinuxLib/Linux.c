@@ -168,7 +168,7 @@ LoadLinuxAllocateKernelPages (
                       );
     Status = gBS->AllocatePages (
                     AllocateAddress,
-                    EfiLoaderData,
+                    EfiLoaderCode,
                     Pages,
                     &KernelAddress
                     );
