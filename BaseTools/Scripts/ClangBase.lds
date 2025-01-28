@@ -20,11 +20,8 @@ SECTIONS {
    */
   . = PECOFF_HEADER_SIZE;
 
-  .entry ALIGN(CONSTANT(COMMONPAGESIZE)) : {
-    KEEP(*(.entry))
-  }
-
   .text : ALIGN(CONSTANT(COMMONPAGESIZE)) {
+    KEEP(*(.entry))
     *(.text .text.* .stub .gnu.linkonce.t.*)
     *(.rodata .rodata.* .gnu.linkonce.r.*)
     *(.got .got.*)
