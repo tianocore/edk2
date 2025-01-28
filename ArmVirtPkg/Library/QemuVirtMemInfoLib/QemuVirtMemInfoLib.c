@@ -18,13 +18,13 @@
 #define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS  5
 
 //
-// mach-virt's core peripherals such as the UART, the GIC and the RTC are
-// all mapped in the 'miscellaneous device I/O' region, which we just map
-// in its entirety rather than device by device. Note that it does not
-// cover any of the NOR flash banks or PCI resource windows.
+// mach-virt's core peripherals such as the UART and the RTC are all mapped in
+// the 'miscellaneous device I/O' region, which we just map in its entirety
+// rather than device by device. Note that it does not cover the GIC, any of
+// the NOR flash banks or PCI resource windows.
 //
-#define MACH_VIRT_PERIPH_BASE  0x08000000
-#define MACH_VIRT_PERIPH_SIZE  SIZE_128MB
+#define MACH_VIRT_PERIPH_BASE  0x09000000
+#define MACH_VIRT_PERIPH_SIZE  SIZE_32MB
 
 /**
   Default library constructor that obtains the memory size from a PCD.
@@ -105,7 +105,7 @@ ArmVirtGetMemoryMap (
     VirtualMemoryTable[0].Length
     ));
 
-  // Memory mapped peripherals (UART, RTC, GIC, virtio-mmio, etc)
+  // Memory mapped peripherals (UART, RTC, virtio-mmio, etc)
   VirtualMemoryTable[1].PhysicalBase = MACH_VIRT_PERIPH_BASE;
   VirtualMemoryTable[1].VirtualBase  = MACH_VIRT_PERIPH_BASE;
   VirtualMemoryTable[1].Length       = MACH_VIRT_PERIPH_SIZE;
