@@ -1056,6 +1056,7 @@ PeCoffLoaderRelocateImage (
     RelocDir = &Hdr.Te->DataDirectory[0];
   }
 
+  RelocBase = RelocBaseEnd = NULL;
   if ((RelocDir != NULL) && (RelocDir->Size > 0)) {
     Status = SafeUint32Add (RelocDir->VirtualAddress, (RelocDir->Size - 1), &EndAddress);
     if (!RETURN_ERROR (Status)) {
@@ -1072,11 +1073,6 @@ PeCoffLoaderRelocateImage (
       DEBUG ((DEBUG_ERROR, "Relocation block is not valid\n"));
       return RETURN_LOAD_ERROR;
     }
-  } else {
-    //
-    // Set base and end to bypass processing below.
-    //
-    RelocBase = RelocBaseEnd = NULL;
   }
 
   RelocBaseOrg = RelocBase;
