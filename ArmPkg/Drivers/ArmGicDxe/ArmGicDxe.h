@@ -23,6 +23,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 extern UINTN                       mGicNumInterrupts;
 extern HARDWARE_INTERRUPT_HANDLER  *gRegisteredInterruptHandlers;
+extern EFI_CPU_ARCH_PROTOCOL       *gCpuArch;
 
 // Common API
 EFI_STATUS

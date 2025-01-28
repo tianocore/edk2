@@ -47,11 +47,11 @@
 [Protocols]
   gHardwareInterruptProtocolGuid  ## PRODUCES
   gHardwareInterrupt2ProtocolGuid ## PRODUCES
-  gEfiCpuArchProtocolGuid         ## CONSUMES ## NOTIFY
+  gEfiCpuArchProtocolGuid         ## CONSUMES
 
 [Pcd.common]
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicRedistributorsBase
 
 [Depex]
-  TRUE
+  gEfiCpuArchProtocolGuid
