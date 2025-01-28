@@ -23,6 +23,8 @@
                                            + ARM_GICR_SGI_VLPI_FRAME_SIZE     \
                                            + ARM_GICR_SGI_RESERVED_FRAME_SIZE)
 
+#define GICD_V3_SIZE  SIZE_64KB
+
 #define ISENABLER_ADDRESS(base, offset)  ((base) +\
           ARM_GICR_CTLR_FRAME_SIZE + ARM_GICR_ISENABLER + 4 * (offset))
 
@@ -62,11 +64,12 @@ GicGetCpuRedistributorBase (
   IN UINTN  GicRedistributorBase
   )
 {
-  UINTN   MpId;
-  UINTN   CpuAffinity;
-  UINTN   Affinity;
-  UINTN   GicCpuRedistributorBase;
-  UINT64  TypeRegister;
+  UINTN       MpId;
+  UINTN       CpuAffinity;
+  UINTN       Affinity;
+  UINTN       GicCpuRedistributorBase;
+  UINT64      TypeRegister;
+  EFI_STATUS  Status;
 
   MpId = ArmReadMpidr ();
   // Define CPU affinity as:
@@ -78,6 +81,24 @@ GicGetCpuRedistributorBase (
   GicCpuRedistributorBase = GicRedistributorBase;
 
   do {
+    Status = gCpuArch->SetMemoryAttributes (
+                         gCpuArch,
+                         GicCpuRedistributorBase,
+                         GIC_V3_REDISTRIBUTOR_GRANULARITY,
+                         EFI_MEMORY_UC | EFI_MEMORY_XP
+                         );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Failed to map GICv3 redistributor MMIO interface at 0x%lx: %r\n",
+        __func__,
+        GicCpuRedistributorBase,
+        Status
+        ));
+      ASSERT_EFI_ERROR (Status);
+      return 0;
+    }
+
     TypeRegister = MmioRead64 (GicCpuRedistributorBase + ARM_GICR_TYPER);
     Affinity     = ARM_GICR_TYPER_GET_AFFINITY (TypeRegister);
     if (Affinity == CpuAffinity) {
@@ -589,7 +610,19 @@ GicV3DxeInitialize (
   // the system.
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gHardwareInterruptProtocolGuid);
 
-  mGicDistributorBase   = (UINTN)PcdGet64 (PcdGicDistributorBase);
+  // Locate the CPU arch protocol - cannot fail because of DEPEX
+  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&gCpuArch);
+  ASSERT_EFI_ERROR (Status);
+
+  mGicDistributorBase = (UINTN)PcdGet64 (PcdGicDistributorBase);
+
+  Status = gCpuArch->SetMemoryAttributes (gCpuArch, mGicDistributorBase, GICD_V3_SIZE, EFI_MEMORY_UC | EFI_MEMORY_XP);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Failed to map GICv3 distributor MMIO interface: %r\n", __func__, Status));
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
   mGicRedistributorBase = GicGetCpuRedistributorBase (PcdGet64 (PcdGicRedistributorsBase));
   mGicNumInterrupts     = ArmGicGetMaxNumInterrupts (mGicDistributorBase);
 

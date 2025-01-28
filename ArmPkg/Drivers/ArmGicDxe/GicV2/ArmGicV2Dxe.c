@@ -22,6 +22,9 @@ Abstract:
 
 #define ARM_GIC_DEFAULT_PRIORITY  0x80
 
+#define GICD_V2_SIZE  SIZE_4KB
+#define GICC_V2_SIZE  SIZE_8KB
+
 // Interrupts from 1020 to 1023 are considered as special interrupts
 // (eg: spurious interrupts)
 #define ARM_GIC_IS_SPECIAL_INTERRUPTS(Interrupt) \
@@ -529,9 +532,28 @@ GicV2DxeInitialize (
   ASSERT (PcdGet64 (PcdGicInterruptInterfaceBase) <= MAX_UINTN);
   ASSERT (PcdGet64 (PcdGicDistributorBase) <= MAX_UINTN);
 
+  // Locate the CPU arch protocol - cannot fail because of DEPEX
+  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&gCpuArch);
+  ASSERT_EFI_ERROR (Status);
+
   mGicInterruptInterfaceBase = (UINTN)PcdGet64 (PcdGicInterruptInterfaceBase);
   mGicDistributorBase        = (UINTN)PcdGet64 (PcdGicDistributorBase);
-  mGicNumInterrupts          = ArmGicGetMaxNumInterrupts (mGicDistributorBase);
+
+  Status = gCpuArch->SetMemoryAttributes (gCpuArch, mGicDistributorBase, GICD_V2_SIZE, EFI_MEMORY_UC | EFI_MEMORY_XP);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Failed to map GICv2 distributor MMIO interface: %r\n", __func__, Status));
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  mGicNumInterrupts = ArmGicGetMaxNumInterrupts (mGicDistributorBase);
+
+  Status = gCpuArch->SetMemoryAttributes (gCpuArch, mGicInterruptInterfaceBase, GICC_V2_SIZE, EFI_MEMORY_UC | EFI_MEMORY_XP);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Failed to map GICv2 CPU MMIO interface: %r\n", __func__, Status));
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
 
   for (Index = 0; Index < mGicNumInterrupts; Index++) {
     GicV2DisableInterruptSource (&gHardwareInterruptV2Protocol, Index);
