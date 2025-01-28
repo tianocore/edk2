@@ -81,7 +81,7 @@
         "IgnoreGuidName": ["ResetVector", "XenResetVector"], # Expected duplication for gEfiFirmwareVolumeTopFileGuid
         "IgnoreGuidValue": [],
         "IgnoreFoldersAndFiles": [],
-        "IgnoreDuplicates": ["gGrubFileGuid=Grub"],
+        "IgnoreDuplicates": ["gGrubFileGuid=Grub", "gUiAppFileGuid=UiApp"],
     },
 
     ## options defined .pytool/Plugin/LibraryClassCheck
