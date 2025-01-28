@@ -111,10 +111,6 @@ InstallAndRegisterInterruptService (
   CONST UINTN  RihArraySize =
     (sizeof (HARDWARE_INTERRUPT_HANDLER) * mGicNumInterrupts);
 
-  // Locate the CPU arch protocol - cannot fail because of DEPEX
-  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&gCpuArch);
-  ASSERT_EFI_ERROR (Status);
-
   // Initialize the array for the Interrupt Handlers
   gRegisteredInterruptHandlers = AllocateZeroPool (RihArraySize);
   if (gRegisteredInterruptHandlers == NULL) {
