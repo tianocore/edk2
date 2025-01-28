@@ -10,6 +10,12 @@
 
 **/
 
+PHDRS {
+  text      PT_LOAD     FLAGS(5);  /* R_X */
+  data      PT_LOAD     FLAGS(6);  /* RW_ */
+  dynamic   PT_DYNAMIC  FLAGS(4);  /* R__ */
+}
+
 SECTIONS {
 
   /*
@@ -35,7 +41,7 @@ SECTIONS {
      * emitted GUIDs here.
      */
     *:AutoGen.obj(.data.g*Guid)
-  }
+  } :text
 
   /*
    * The alignment of the .data section should be less than or equal to the
@@ -46,11 +52,13 @@ SECTIONS {
   .data ALIGN(ALIGNOF(.text)) : ALIGN(CONSTANT(COMMONPAGESIZE)) {
     *(.data .data.* .gnu.linkonce.d.*)
     *(.bss .bss.*)
-  }
+  } :data
 
   .eh_frame ALIGN(CONSTANT(COMMONPAGESIZE)) : {
     KEEP (*(.eh_frame))
   }
+
+  .dynamic : { *(.dynamic) } :data :dynamic
 
   .rela (INFO) : {
     *(.rela .rela.*)
@@ -58,7 +66,7 @@ SECTIONS {
 
   .hii : ALIGN(CONSTANT(COMMONPAGESIZE)) {
     KEEP (*(.hii))
-  }
+  } :data
 
   .got : {
     *(.got)
