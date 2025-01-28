@@ -1845,11 +1845,15 @@ PeCoffLoaderRelocateImageForRuntime (
     }
 
     if ((RelocBase == NULL) || (RelocBaseEnd == NULL) || ((UINTN)RelocBaseEnd < (UINTN)RelocBase)) {
-      DEBUG ((DEBUG_ERROR, "Relocation block is not valid\n"));
+      //
+      // relocation block is not valid, just return
+      //
       return;
     }
   } else {
-    DEBUG ((DEBUG_ERROR, "Cannot find relocations, cannot continue to relocate the image\n"));
+    //
+    // Cannot find relocations, cannot continue to relocate the image, ASSERT for this invalid image.
+    //
     ASSERT (FALSE);
     return;
   }
