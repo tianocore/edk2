@@ -200,7 +200,9 @@ M: Abner Chang <abner.chang@amd.com> [changab]
 EmulatorPkg
 F: EmulatorPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmulatorPkg
+M: Oliver Smith-Denny <osde@microsoft.com> [os-d]
 M: Andrew Fish <afish@apple.com> [ajfish]
+M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 S: Maintained
 
