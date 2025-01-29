@@ -42,6 +42,7 @@ BOOLEAN  mIsFlushingGCD;
                                 from the processor's data cache.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 CpuFlushCpuDataCache (
@@ -77,6 +78,7 @@ CpuFlushCpuDataCache (
   @retval EFI_DEVICE_ERROR      Interrupts could not be enabled on the processor.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 CpuEnableInterrupt (
@@ -97,6 +99,7 @@ CpuEnableInterrupt (
   @retval EFI_DEVICE_ERROR      Interrupts could not be disabled on the processor.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 CpuDisableInterrupt (
@@ -121,6 +124,7 @@ CpuDisableInterrupt (
   @retval EFI_INVALID_PARAMETER State is NULL.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 CpuGetInterruptState (
@@ -152,6 +156,7 @@ CpuGetInterruptState (
   @retval EFI_DEVICE_ERROR      The processor INIT failed.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 CpuInit (
@@ -162,6 +167,7 @@ CpuInit (
   return EFI_UNSUPPORTED;
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 CpuRegisterInterruptHandler (
@@ -173,6 +179,7 @@ CpuRegisterInterruptHandler (
   return RegisterInterruptHandler (InterruptType, InterruptHandler);
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
 CpuGetTimerValue (
@@ -193,6 +200,7 @@ CpuGetTimerValue (
                                 which is implementation-dependent.
 
 **/
+STATIC
 VOID
 EFIAPI
 IdleLoopEventCallback (
@@ -206,7 +214,7 @@ IdleLoopEventCallback (
 //
 // Globals used to initialize the protocol
 //
-EFI_CPU_ARCH_PROTOCOL  mCpu = {
+STATIC EFI_CPU_ARCH_PROTOCOL  mCpu = {
   CpuFlushCpuDataCache,
   CpuEnableInterrupt,
   CpuDisableInterrupt,
