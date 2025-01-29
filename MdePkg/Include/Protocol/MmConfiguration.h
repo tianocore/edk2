@@ -59,5 +59,7 @@ struct _EFI_MM_CONFIGURATION_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiMmConfigurationProtocolGuid;
+extern EFI_GUID  gEfiMmEntryNotifyProtocolGuid;
+extern EFI_GUID  gEfiMmExitNotifyProtocolGuid;
 
 #endif
