@@ -35,8 +35,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - Package: "ArmPkg"
-            ArchList: "IA32,X64"
           - Package: "CryptoPkg"
             ArchList: "IA32"
           - Package: "CryptoPkg"
