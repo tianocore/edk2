@@ -18,32 +18,22 @@ extern "C" {
   #include <Library/BaseLib.h>
   #include <Library/UnitTestLib.h>
 
+  //
+  // If address sanitizer is enabled, then declare the function that is used to
+  // handle custom long jump implementation.
+  //
+ #ifdef __SANITIZE_ADDRESS__
+  void
+  __asan_handle_no_return (
+    );
+
+ #endif
+
   ///
   /// Point to jump buffer used with SetJump()/LongJump() to test if a function
   /// under test generates an expected ASSERT() condition.
   ///
   BASE_LIBRARY_JUMP_BUFFER  *gUnitTestExpectAssertFailureJumpBuffer = NULL;
-
-  /**
-    LongJump wrapper for host-based unit test environments that is declared
-    NORETURN to avoid false positives from address sanitizer.
-
-    @param  JumpBuffer  A pointer to CPU context buffer.
-    @param  Value       The value to return when the SetJump() context is
-                        restored and must be non-zero.
-  **/
-  static
-  VOID
-  NORETURN
-  EFIAPI
-  HostLongJump (
-    IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer,
-    IN      UINTN                     Value
-    )
-  {
-    LongJump (JumpBuffer, Value);
-    UNREACHABLE ();
-  }
 
   /**
     Unit test library replacement for DebugAssert() in DebugLib.
@@ -68,8 +58,18 @@ extern "C" {
 
     if (gUnitTestExpectAssertFailureJumpBuffer != NULL) {
       UT_LOG_INFO ("Detected expected ASSERT: %a(%d): %a\n", FileName, LineNumber, Description);
-      HostLongJump (gUnitTestExpectAssertFailureJumpBuffer, 1);
-      UNREACHABLE ();
+
+      //
+      // If address sanitizer is enabled, then inform sanitizer that a no return
+      // function is being called that will reset to a previous stack frame.
+      // This is required to avoid false positives from the address sanitizer
+      // due to the use of a custom long jump implementation.
+      //
+ #ifdef __SANITIZE_ADDRESS__
+      __asan_handle_no_return ();
+ #endif
+
+      LongJump (gUnitTestExpectAssertFailureJumpBuffer, 1);
     } else {
       if (GetActiveFrameworkHandle () != NULL) {
         AsciiStrCpyS (Message, sizeof (Message), "Detected unexpected ASSERT(");
