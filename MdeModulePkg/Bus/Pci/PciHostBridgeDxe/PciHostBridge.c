@@ -668,6 +668,9 @@ ResourceConflict (
                 sizeof (EFI_ACPI_END_TAG_DESCRIPTOR)
                 );
   ASSERT (Resources != NULL);
+  if (Resources == NULL) {
+    return;
+  }
 
   for (Link = GetFirstNode (&HostBridge->RootBridges), Descriptor = Resources
        ; !IsNull (&HostBridge->RootBridges, Link)

@@ -102,7 +102,7 @@ FtwGetLastWriteRecord (
   //
   // Try to find the last write record "that has not completed"
   //
-  for (Index = 0; Index < FtwWriteHeader->NumberOfWrites; Index += 1) {
+  for (Index = 0; (UINT64)Index < FtwWriteHeader->NumberOfWrites; Index += 1) {
     if (FtwRecord->DestinationComplete != FTW_VALID_STATE) {
       //
       // The last write record is found

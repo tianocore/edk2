@@ -163,7 +163,7 @@ ConvertPpiPointers (
   IN PEI_CORE_INSTANCE           *PrivateData
   )
 {
-  UINT8  Index;
+  UINTN  Index;
 
   //
   // Convert normal PPIs.
@@ -217,7 +217,7 @@ ConvertPpiPointersFv (
   IN  UINTN              FvSize
   )
 {
-  UINT8                             Index;
+  UINTN                             Index;
   UINTN                             Offset;
   BOOLEAN                           OffsetPositive;
   EFI_PEI_FIRMWARE_VOLUME_INFO_PPI  *FvInfoPpi;
@@ -324,16 +324,7 @@ ConvertPpiPointersFv (
 
     Guid = PrivateData->PpiData.PpiList.PpiPtrs[Index].Ppi->Guid;
     for (GuidIndex = 0; GuidIndex < ARRAY_SIZE (GuidCheckList); ++GuidIndex) {
-      //
-      // Don't use CompareGuid function here for performance reasons.
-      // Instead we compare the GUID as INT32 at a time and branch
-      // on the first failed comparison.
-      //
-      if ((((INT32 *)Guid)[0] == ((INT32 *)GuidCheckList[GuidIndex])[0]) &&
-          (((INT32 *)Guid)[1] == ((INT32 *)GuidCheckList[GuidIndex])[1]) &&
-          (((INT32 *)Guid)[2] == ((INT32 *)GuidCheckList[GuidIndex])[2]) &&
-          (((INT32 *)Guid)[3] == ((INT32 *)GuidCheckList[GuidIndex])[3]))
-      {
+      if (CompareGuid (Guid, GuidCheckList[GuidIndex]) == 0) {
         FvInfoPpi = PrivateData->PpiData.PpiList.PpiPtrs[Index].Ppi->Ppi;
         DEBUG ((DEBUG_VERBOSE, "      FvInfo: %p -> ", FvInfoPpi->FvInfo));
         if ((UINTN)FvInfoPpi->FvInfo == OrgFvHandle) {

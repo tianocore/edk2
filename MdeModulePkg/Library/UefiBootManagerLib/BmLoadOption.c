@@ -47,7 +47,11 @@ BmForEachVariable (
 
   NameSize = sizeof (CHAR16);
   Name     = AllocateZeroPool (NameSize);
-  ASSERT (Name != NULL);
+  if (Name == NULL) {
+    ASSERT (Name != NULL);
+    return;
+  }
+
   while (TRUE) {
     NewNameSize = NameSize;
     Status      = gRT->GetNextVariableName (&NewNameSize, Name, &Guid);
@@ -220,7 +224,10 @@ structure.
                  + Option->OptionalDataSize;
 
   Variable = AllocatePool (VariableSize);
-  ASSERT (Variable != NULL);
+  if (Variable == NULL) {
+    ASSERT (Variable != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   Ptr = Variable;
   WriteUnaligned32 ((UINT32 *)Ptr, Option->Attributes);
@@ -282,6 +289,8 @@ structure.
   @param  Position            Position of the new load option to put in the ****Order variable.
 
   @retval EFI_SUCCESS           The boot#### or driver#### have been successfully registered.
+  @retval EFI_NOT_FOUND         The boot option order variable could not be found.
+  @retval EFI_OUT_OF_RESOURCES  Insufficient memory resources to allocate a memory buffer.
   @retval EFI_ALREADY_STARTED   The option number of Option is being used already.
   @retval EFI_STATUS            Return the status of gRT->SetVariable ().
 
@@ -317,7 +326,12 @@ BmAddOptionNumberToOrderVariable (
     Position = MIN (Position, OptionOrderSize / sizeof (UINT16));
 
     NewOptionOrder = AllocatePool (OptionOrderSize + sizeof (UINT16));
-    ASSERT (NewOptionOrder != NULL);
+    if (NewOptionOrder == NULL) {
+      ASSERT (NewOptionOrder != NULL);
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
+    }
+
     if (OptionOrderSize != 0) {
       CopyMem (NewOptionOrder, OptionOrder, Position * sizeof (UINT16));
       CopyMem (&NewOptionOrder[Position + 1], &OptionOrder[Position], OptionOrderSize - Position * sizeof (UINT16));
@@ -335,6 +349,7 @@ BmAddOptionNumberToOrderVariable (
     FreePool (NewOptionOrder);
   }
 
+Exit:
   if (OptionOrder != NULL) {
     FreePool (OptionOrder);
   }
@@ -438,6 +453,9 @@ EfiBootManagerSortLoadOptionVariable (
   UINT16                        *OptionOrder;
 
   LoadOption = EfiBootManagerGetLoadOptions (&LoadOptionCount, OptionType);
+  if (LoadOption == NULL) {
+    return;
+  }
 
   //
   // Insertion sort algorithm
@@ -453,7 +471,11 @@ EfiBootManagerSortLoadOptionVariable (
   // Create new ****Order variable
   //
   OptionOrder = AllocatePool (LoadOptionCount * sizeof (UINT16));
-  ASSERT (OptionOrder != NULL);
+  if (OptionOrder == NULL) {
+    ASSERT (OptionOrder != NULL);
+    return;
+  }
+
   for (Index = 0; Index < LoadOptionCount; Index++) {
     OptionOrder[Index] = (UINT16)LoadOption[Index].OptionNumber;
   }
@@ -1105,7 +1127,10 @@ EfiBootManagerGetLoadOptions (
     *OptionCount = OptionOrderSize / sizeof (UINT16);
 
     Options = AllocatePool (*OptionCount * sizeof (EFI_BOOT_MANAGER_LOAD_OPTION));
-    ASSERT (Options != NULL);
+    if (Options == NULL) {
+      ASSERT (Options != NULL);
+      return NULL;
+    }
 
     OptionIndex = 0;
     for (Index = 0; Index < *OptionCount; Index++) {
@@ -1128,7 +1153,11 @@ EfiBootManagerGetLoadOptions (
 
     if (OptionIndex < *OptionCount) {
       Options = ReallocatePool (*OptionCount * sizeof (EFI_BOOT_MANAGER_LOAD_OPTION), OptionIndex * sizeof (EFI_BOOT_MANAGER_LOAD_OPTION), Options);
-      ASSERT (Options != NULL);
+      if (Options == NULL) {
+        ASSERT (Options != NULL);
+        return NULL;
+      }
+
       *OptionCount = OptionIndex;
     }
   } else if (LoadOptionType == LoadOptionTypePlatformRecovery) {
