@@ -206,8 +206,7 @@ IdleLoopEventCallback (
 //
 // Globals used to initialize the protocol
 //
-EFI_HANDLE             mCpuHandle = NULL;
-EFI_CPU_ARCH_PROTOCOL  mCpu       = {
+EFI_CPU_ARCH_PROTOCOL  mCpu = {
   CpuFlushCpuDataCache,
   CpuEnableInterrupt,
   CpuDisableInterrupt,
@@ -308,6 +307,7 @@ CpuDxeInitialize (
 {
   EFI_STATUS  Status;
   EFI_EVENT   IdleLoopEvent;
+  EFI_HANDLE  CpuHandle;
 
   InitializeExceptions (&mCpu);
 
@@ -327,14 +327,20 @@ CpuDxeInitialize (
     RemapUnusedMemoryNx ();
   }
 
+  CpuHandle = NULL;
+
   Status = gBS->InstallMultipleProtocolInterfaces (
-                  &mCpuHandle,
+                  &CpuHandle,
                   &gEfiCpuArchProtocolGuid,
                   &mCpu,
                   &gEfiMemoryAttributeProtocolGuid,
                   &mMemoryAttribute,
                   NULL
                   );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
 
   //
   // Make sure GCD and MMU settings match. This API calls gDS->SetMemorySpaceAttributes ()
@@ -358,5 +364,5 @@ CpuDxeInitialize (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  return Status;
+  return EFI_SUCCESS;
 }
