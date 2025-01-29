@@ -1108,10 +1108,6 @@ HttpResponseWorker (
     // Search for Status Code.
     //
     StatusCodeStr = HttpHeaders + AsciiStrLen (HTTP_VERSION_STR) + 1;
-    if (StatusCodeStr == NULL) {
-      Status = EFI_NOT_READY;
-      goto Error;
-    }
 
     StatusCode = AsciiStrDecimalToUintn (StatusCodeStr);
 
