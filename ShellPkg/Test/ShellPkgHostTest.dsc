@@ -29,3 +29,4 @@ SKUID_IDENTIFIER        = DEFAULT
   # Build HOST_APPLICATION Libraries With GoogleTest
   #
   ShellPkg/Test/Mock/Library/GoogleTest/MockShellLib/MockShellLib.inf
+  ShellPkg/Test/Mock/Library/GoogleTest/MockShellCommandLib/MockShellCommandLib.inf
