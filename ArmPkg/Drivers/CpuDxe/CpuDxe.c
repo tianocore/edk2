@@ -317,7 +317,7 @@ CpuDxeInitialize (
   EFI_EVENT   IdleLoopEvent;
   EFI_HANDLE  CpuHandle;
 
-  InitializeExceptions (&mCpu);
+  InitializeExceptions ();
 
   InitializeDma (&mCpu);
 
