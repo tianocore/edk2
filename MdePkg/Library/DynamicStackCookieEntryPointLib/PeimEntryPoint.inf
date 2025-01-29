@@ -1,0 +1,43 @@
+## @file
+# Module entry point library for PEIM that dynamically updates the stack cookie.
+#
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeimEntryPointDynamicInit
+  MODULE_UNI_FILE                = Peim/PeimEntryPoint.uni
+  FILE_GUID                      = 0E53AFCB-7FDD-461E-B8CE-6DA9F3F9014C
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PeimEntryPoint|PEIM
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  Peim/PeimEntryPoint.c
+
+[Sources.IA32]
+  IA32/DynamicCookieGcc.nasm  | GCC
+  IA32/DynamicCookieMsvc.nasm | MSFT
+
+[Sources.X64]
+  X64/DynamicCookieGcc.nasm   | GCC
+  X64/DynamicCookieMsvc.nasm  | MSFT
+
+[Sources.AARCH64]
+  AArch64/DynamicCookieGcc.S | GCC
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  StackCheckLib
