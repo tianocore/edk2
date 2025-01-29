@@ -99,7 +99,7 @@ CpuSetMemoryAttributes (
 
 EFI_STATUS
 InitializeExceptions (
-  IN EFI_CPU_ARCH_PROTOCOL  *Cpu
+  VOID
   );
 
 EFI_STATUS
