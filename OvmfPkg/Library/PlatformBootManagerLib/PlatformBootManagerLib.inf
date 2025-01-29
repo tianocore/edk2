@@ -88,3 +88,4 @@
   gRootBridgesConnectedEventGroupGuid
   gUefiShellFileGuid
   gGrubFileGuid
+  gUiAppFileGuid
