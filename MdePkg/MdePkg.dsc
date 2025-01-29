@@ -143,6 +143,12 @@
   MdePkg/Library/StackCheckFailureHookLibNull/StackCheckFailureHookLibNull.inf
   MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
   MdePkg/Library/StackCheckLib/StackCheckLib.inf
+  MdePkg/Library/DynamicStackCookieEntryPointLib/DxeCoreEntryPoint.inf
+  MdePkg/Library/DynamicStackCookieEntryPointLib/PeiCoreEntryPoint.inf
+  MdePkg/Library/DynamicStackCookieEntryPointLib/PeimEntryPoint.inf
+  MdePkg/Library/DynamicStackCookieEntryPointLib/StandaloneMmDriverEntryPoint.inf
+  MdePkg/Library/DynamicStackCookieEntryPointLib/UefiApplicationEntryPoint.inf
+  MdePkg/Library/DynamicStackCookieEntryPointLib/UefiDriverEntryPoint.inf
 
 [Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
   #
@@ -193,6 +199,7 @@
   MdePkg/Library/TraceHubDebugSysTLibNull/TraceHubDebugSysTLibNull.inf
 
 [Components.X64]
+  MdePkg/Library/DynamicStackCookieEntryPointLib/StandaloneMmCoreEntryPoint.inf
   MdePkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreEntryPoint.inf
 
 [Components.EBC]
