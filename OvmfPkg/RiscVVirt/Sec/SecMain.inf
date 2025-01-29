@@ -49,6 +49,7 @@
   MemoryAllocationLib
   HobLib
   SerialPortLib
+  StackCheckLib
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid                # PPI ALWAYS_PRODUCED
