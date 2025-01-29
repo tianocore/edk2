@@ -31,6 +31,7 @@
   DebugLib
   QemuFwCfgSimpleParserLib
   UefiBootServicesTableLib
+  StackCheckLib
 
 [Protocols]
   gEfiLoadedImageProtocolGuid                   ## SOMETIMES_CONSUMES

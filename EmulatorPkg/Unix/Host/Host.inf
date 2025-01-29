@@ -61,6 +61,7 @@
   PpiListLib
   PeiServicesLib
   PeCoffGetEntryPointLib
+  StackCheckLib
 
 [Ppis]
   gEfiPeiStatusCodePpiGuid                      # PPI ALWAYS_PRODUCED

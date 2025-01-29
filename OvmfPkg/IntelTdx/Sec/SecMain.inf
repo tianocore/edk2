@@ -50,6 +50,7 @@
   PeilessStartupLib
   PlatformInitLib
   CcProbeLib
+  StackCheckLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
