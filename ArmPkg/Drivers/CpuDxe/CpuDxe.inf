@@ -69,7 +69,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy
 
 [FeaturePcd.common]
-  gArmTokenSpaceGuid.PcdDebuggerExceptionSupport
   gArmTokenSpaceGuid.PcdRemapUnusedMemoryNx
 
 [Depex]
