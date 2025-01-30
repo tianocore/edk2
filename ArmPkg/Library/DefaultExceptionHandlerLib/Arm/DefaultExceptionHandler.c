@@ -13,7 +13,6 @@
 #include <Library/DebugLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/PrintLib.h>
-#include <Library/ArmDisassemblerLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
@@ -210,9 +209,6 @@ DefaultExceptionHandler (
   UINT32   DfsrStatus;
   UINT32   IfsrStatus;
   BOOLEAN  DfsrWrite;
-  UINT32   PcAdjust;
-
-  PcAdjust = 0;
 
   CharCount = AsciiSPrint (
                 Buffer,
@@ -233,11 +229,7 @@ DefaultExceptionHandler (
   UINT32  ImageBase;
   UINT32  PeCoffSizeOfHeader;
   UINT32  Offset;
-  CHAR8   CpsrStr[CPSR_STRING_SIZE];    // char per bit. Lower 5-bits are mode
-                                        // that is a 3 char string
-  CHAR8   Buffer[80];
-  UINT8   *DisAsm;
-  UINT32  ItBlock;
+  CHAR8   CpsrStr[CPSR_STRING_SIZE];
 
   CpsrString (SystemContext.SystemContextArm->CPSR, CpsrStr);
   DEBUG ((DEBUG_ERROR, "%a\n", CpsrStr));
@@ -256,25 +248,6 @@ DefaultExceptionHandler (
     // get the offset that matches the link map.
     //
     DEBUG ((DEBUG_ERROR, "loaded at 0x%08x (PE/COFF offset) 0x%x (ELF or Mach-O offset) 0x%x", ImageBase, Offset, Offset - PeCoffSizeOfHeader));
-
-    // If we come from an image it is safe to show the instruction. We know it should not fault
-    DisAsm  = (UINT8 *)(UINTN)SystemContext.SystemContextArm->PC;
-    ItBlock = 0;
-    DisassembleInstruction (&DisAsm, (SystemContext.SystemContextArm->CPSR & BIT5) == BIT5, TRUE, &ItBlock, Buffer, sizeof (Buffer));
-    DEBUG ((DEBUG_ERROR, "\n%a", Buffer));
-
-    switch (ExceptionType) {
-      case EXCEPT_ARM_UNDEFINED_INSTRUCTION:
-      case EXCEPT_ARM_SOFTWARE_INTERRUPT:
-      case EXCEPT_ARM_PREFETCH_ABORT:
-      case EXCEPT_ARM_DATA_ABORT:
-        // advance PC past the faulting instruction
-        PcAdjust = (UINTN)DisAsm - SystemContext.SystemContextArm->PC;
-        break;
-
-      default:
-        break;
-    }
   }
 
   DEBUG_CODE_END ();
@@ -312,7 +285,4 @@ DefaultExceptionHandler (
   // Clear the error registers that we have already displayed incase some one wants to keep going
   SystemContext.SystemContextArm->DFSR = 0;
   SystemContext.SystemContextArm->IFSR = 0;
-
-  // If some one is stepping past the exception handler adjust the PC to point to the next instruction
-  SystemContext.SystemContextArm->PC += PcAdjust;
 }
