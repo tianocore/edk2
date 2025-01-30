@@ -2,7 +2,7 @@
   Library that implements the helper functions to parse and pack a Transfer
   List as specified by the A-profile Firmware Handoff Specification.
 
-  Copyright (c) 2022, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2022 - 2025, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -21,7 +21,7 @@
 /**
   Return the first Transfer Entry Node in the Transfer List.
 
-  @param [in]   TransferListHeader     TransferListHeader
+  @param [in]   TransferListHeader     Pointer to the Transfer List Header.
 
   @return Pointer to the Transfer Entry Node if successful otherwise NULL
 
@@ -101,6 +101,60 @@ VOID *
 EFIAPI
 TransferListGetEntryData (
   IN TRANSFER_ENTRY_HEADER  *TransferEntry
+  );
+
+/**
+  Dump the transfer list to the debug output.
+
+  @param [in]   TransferListHeader       Pointer to the Transfer List Header
+
+**/
+VOID
+EFIAPI
+TransferListDump (
+  IN TRANSFER_LIST_HEADER  *TransferListHeader
+  );
+
+/**
+  Verify the checksum of the transfer list.
+
+  @param [in]   TransferListHeader       Pointer to the Transfer List Header
+
+  @retval FALSE      Invalid Checksum
+  @retval TRUE       Valid Checksum
+**/
+BOOLEAN
+EFIAPI
+TransferListVerifyChecksum (
+  IN TRANSFER_LIST_HEADER  *TransferListHeader
+  );
+
+/**
+  Check the header of the Transfer List.
+
+  @param [in]   TransferListHeader       Pointer to the Transfer List Header
+
+  @return TRANSFER_LIST_OPS code indicating the validity of the Transfer List
+**/
+TRANSFER_LIST_OPS
+EFIAPI
+TransferListCheckHeader (
+  IN TRANSFER_LIST_HEADER  *TransferListHeader
+  );
+
+/**
+  Find a Transfer Entry Node in the Transfer List matched with the given tag-id.
+
+  @param [in]   TransferListHeader       Pointer to the Transfer List Header
+  @param [in]   TagId     Tag id
+
+  @return Pointer to the Transfer Entry Node if successful otherwise NULL
+**/
+TRANSFER_ENTRY_HEADER *
+EFIAPI
+TransferListFindEntry (
+  IN TRANSFER_LIST_HEADER  *TransferListHeader,
+  IN UINT16                TagId
   );
 
 #endif // ARM_TRANSFER_LIST_LIB_
