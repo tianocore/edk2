@@ -35,7 +35,6 @@
   PrintLib
   DebugLib
   PeCoffGetEntryPointLib
-  ArmDisassemblerLib
   SerialPortLib
   UefiBootServicesTableLib
 
