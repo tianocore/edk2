@@ -28,10 +28,6 @@
   Include                        # Root include for the package
 
 [LibraryClasses.common]
-  ##  @libraryclass  Convert Arm instructions to a human readable format.
-  #
-  ArmDisassemblerLib|Include/Library/ArmDisassemblerLib.h
-
   ##  @libraryclass  Provides an interface to Arm generic counters.
   #
   ArmGenericTimerCounterLib|Include/Library/ArmGenericTimerCounterLib.h
