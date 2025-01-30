@@ -899,9 +899,20 @@ cleanlib:
                                 break
 
                         if self._AutoGenObject.ToolChainFamily == 'GCC':
-                            RespDict[Key] = Value.replace('\\', '/')
-                        else:
-                            RespDict[Key] = Value
+                            #
+                            # Replace '\' with '/' in the response file.
+                            # Skip content within "" or \"\"
+                            #
+                            ValueList = re.split(r'("|\\"|\s+)', Value)
+                            Skip = False
+                            for i, v in enumerate(ValueList):
+                                if v in ('"', '\\"'):
+                                    Skip = not Skip
+                                elif not Skip:
+                                    ValueList[i] = v.replace('\\', '/')
+                            Value = ''.join(ValueList)
+                        RespDict[Key] = Value
+
                         for Target in BuildTargets:
                             for i, SingleCommand in enumerate(BuildTargets[Target].Commands):
                                 if FlagDict[Flag]['Macro'] in SingleCommand:
