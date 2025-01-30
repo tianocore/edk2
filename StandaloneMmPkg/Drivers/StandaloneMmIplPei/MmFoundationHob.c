@@ -1029,3 +1029,33 @@ CreateMmFoundationHobList (
   *FoundationHobSize = UsedSize;
   return Status;
 }
+
+/**
+
+  Builds a Handoff Information Table HOB.
+
+  @param Hob       - Pointer to handoff information table HOB.
+  @param HobEnd    - End of the HOB list.
+
+**/
+VOID
+CreateMmHobHandoffInfoTable (
+  IN EFI_HOB_HANDOFF_INFO_TABLE  *Hob,
+  IN VOID                        *HobEnd
+  )
+{
+  ASSERT ((Hob != NULL) && (HobEnd != NULL));
+
+  Hob->Header.HobType   = EFI_HOB_TYPE_HANDOFF;
+  Hob->Header.HobLength = (UINT16)sizeof (EFI_HOB_HANDOFF_INFO_TABLE);
+  Hob->Header.Reserved  = 0;
+
+  Hob->Version  = EFI_HOB_HANDOFF_TABLE_VERSION;
+  Hob->BootMode = GetBootModeHob ();
+
+  Hob->EfiMemoryTop        = 0;
+  Hob->EfiMemoryBottom     = 0;
+  Hob->EfiFreeMemoryTop    = 0;
+  Hob->EfiFreeMemoryBottom = 0;
+  Hob->EfiEndOfHobList     = (EFI_PHYSICAL_ADDRESS)(UINTN)HobEnd;
+}

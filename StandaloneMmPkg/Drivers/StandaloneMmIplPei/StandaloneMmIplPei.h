@@ -143,4 +143,18 @@ BuildMmProfileDataHobInPeiHobList (
   VOID
   );
 
+/**
+
+  Builds a Handoff Information Table HOB.
+
+  @param Hob       - Pointer to handoff information table HOB.
+  @param HobEnd    - End of the HOB list.
+
+**/
+VOID
+CreateMmHobHandoffInfoTable (
+  IN EFI_HOB_HANDOFF_INFO_TABLE  *Hob,
+  IN VOID                        *HobEnd
+  );
+
 #endif
