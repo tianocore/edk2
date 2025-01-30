@@ -25,12 +25,12 @@
   BUILD_TARGETS                  = NOOPT|DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = OvmfPkg/AmdSev/AmdSevX64.fdf
-  PREBUILD                       = sh OvmfPkg/AmdSev/Grub/grub.sh
 
   #
   # Defines for default states.  These can be changed on the command line.
   # -D FLAG=VALUE
   #
+  DEFINE SECURE_BOOT_ENABLE      = TRUE
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
 
 !include OvmfPkg/Include/Dsc/OvmfTpmDefines.dsc.inc
@@ -39,6 +39,7 @@
   # Shell can be useful for debugging but should not be enabled for production
   #
   DEFINE BUILD_SHELL             = FALSE
+  DEFINE SD_BOOT_ENABLE          = FALSE
 
   #
   # Device drivers
@@ -189,7 +190,15 @@
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
 
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  PlatformSecureLib|OvmfPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
+  AuthVariableLib|SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
+  SecureBootVariableLib|SecurityPkg/Library/SecureBootVariableLib/SecureBootVariableLib.inf
+  PlatformPKProtectionLib|SecurityPkg/Library/PlatformPKProtectionLibVarPolicy/PlatformPKProtectionLibVarPolicy.inf
+  SecureBootVariableProvisionLib|SecurityPkg/Library/SecureBootVariableProvisionLib/SecureBootVariableProvisionLib.inf
+!else
   AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
+!endif
   VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
   VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
@@ -388,6 +397,10 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol|TRUE
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRequireSelfSignedPk|TRUE
+!endif
 
 [PcdsFixedAtBuild]
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
@@ -609,6 +622,9 @@
 
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf {
     <LibraryClasses>
+!if $(SECURE_BOOT_ENABLE) == TRUE
+      NULL|SecurityPkg/Library/DxeImageVerificationLib/DxeImageVerificationLib.inf
+!endif
 !include OvmfPkg/Include/Dsc/OvmfTpmSecurityStub.dsc.inc
   }
 
@@ -731,10 +747,18 @@
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
   OvmfPkg/AmdSev/SecretDxe/SecretDxe.inf
+!if $(SD_BOOT_ENABLE) == TRUE
+  OvmfPkg/SdBootDxe/SdBoot.inf
+!else
   OvmfPkg/AmdSev/Grub/Grub.inf
+!endif
 
 !include OvmfPkg/Include/Dsc/ShellComponents.dsc.inc
 !include OvmfPkg/Include/Dsc/OvmfRngComponents.dsc.inc
+
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+!endif
 
   OvmfPkg/PlatformDxe/Platform.inf
   OvmfPkg/AmdSevDxe/AmdSevDxe.inf {

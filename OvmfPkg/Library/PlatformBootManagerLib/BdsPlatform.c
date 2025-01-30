@@ -1947,6 +1947,15 @@ PlatformBootManagerAfterConsole (
     TRUE
     );
 
+  //
+  // Register systemd-boot
+  //
+  PlatformRegisterFvBootOption (
+    &gSdBootFileGuid,
+    L"systemd boot",
+    LOAD_OPTION_ACTIVE
+    );
+
   RemoveStaleFvFileOptions ();
   SetBootOrderFromQemu ();
 
