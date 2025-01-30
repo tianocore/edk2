@@ -91,7 +91,7 @@ M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 RISCV64
 F: */RiscV64/
 M: Sunil V L <sunilvl@ventanamicro.com> [vlsunil]
-R: Andrei Warkentin <andrei.warkentin@intel.com> [andreiw]
+R: Andrei Warkentin <andyw@imsa.edu> [andreiw]
 
 LOONGARCH64
 F: */LoongArch64/
@@ -556,7 +556,7 @@ R: Anthony Perard <anthony@xenproject.org> [tperard]
 OvmfPkg: RISC-V Qemu Virt Platform
 F: OvmfPkg/RiscVVirt
 M: Sunil V L <sunilvl@ventanamicro.com> [vlsunil]
-R: Andrei Warkentin <andrei.warkentin@intel.com> [andreiw]
+R: Andrei Warkentin <andyw@imsa.edu> [andreiw]
 
 OvmfPkg: LOONGARCH Qemu Virt Platform
 F: OvmfPkg/LoongArchVirt
