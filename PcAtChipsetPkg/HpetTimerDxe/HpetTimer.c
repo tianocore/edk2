@@ -2,6 +2,8 @@
   Timer Architectural Protocol module using High Precision Event Timer (HPET)
 
   Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -795,11 +797,9 @@ TimerDriverInitialize (
   mHpetGeneralConfiguration.Uint64 = HpetRead (HPET_GENERAL_CONFIGURATION_OFFSET);
 
   //
-  // If Revision is not valid, then ASSERT() and unload the driver because the HPET
+  // If Revision is not valid, then unload the driver because the HPET
   // device is not present.
   //
-  ASSERT (mHpetGeneralCapabilities.Uint64 != 0);
-  ASSERT (mHpetGeneralCapabilities.Uint64 != 0xFFFFFFFFFFFFFFFFULL);
   if ((mHpetGeneralCapabilities.Uint64 == 0) || (mHpetGeneralCapabilities.Uint64 == 0xFFFFFFFFFFFFFFFFULL)) {
     DEBUG ((DEBUG_ERROR, "HPET device is not present.  Unload HPET driver.\n"));
     return EFI_DEVICE_ERROR;
