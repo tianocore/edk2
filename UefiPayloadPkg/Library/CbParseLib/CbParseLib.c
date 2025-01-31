@@ -400,15 +400,6 @@ ParseMemoryInfo (
     MemoryMap.Size = cb_unpack64 (Range->size);
     MemoryMap.Type = (UINT8)Range->type;
     MemoryMap.Flag = 0;
-    DEBUG ((
-      DEBUG_INFO,
-      "%d. %016lx - %016lx [%02x]\n",
-      Index,
-      MemoryMap.Base,
-      MemoryMap.Base + MemoryMap.Size - 1,
-      MemoryMap.Type
-      ));
-
     MemInfoCallback (&MemoryMap, Params);
   }
 
