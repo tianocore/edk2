@@ -1,6 +1,7 @@
 /** @file
 The module to produce Usb Bus PPI.
 
+Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -419,6 +420,7 @@ PeiUsbEnumeration (
   )
 {
   UINT8                 NumOfRootPort;
+  UINT8                 RootPort;
   EFI_STATUS            Status;
   UINT8                 Index;
   EFI_USB_PORT_STATUS   PortStatus;
@@ -449,7 +451,17 @@ PeiUsbEnumeration (
 
   DEBUG ((DEBUG_INFO, "PeiUsbEnumeration: NumOfRootPort: %x\n", NumOfRootPort));
 
-  for (Index = 0; Index < NumOfRootPort; Index++) {
+  //
+  // USB3.x devices initially appear in USB2.0 ports. When the USB2.0 port is reset, the USB3.x device disappears
+  // from the USB2.0 port and appears on the USB3.0 port. The USB3.x device won't be enumerated if the USB2.0 port
+  // number is greater than the USB3.0 port number. Re-enumerate USB to make sure USB3.x devices in this case.
+  //
+  for (Index = 0; Index < (UINT8)(NumOfRootPort * 2); Index++) {
+    //
+    // Configure root port index for the first and second enumerations.
+    //
+    RootPort = (Index < NumOfRootPort) ? Index : (Index - NumOfRootPort);
+
     //
     // First get root port status to detect changes happen
     //
@@ -457,19 +469,19 @@ PeiUsbEnumeration (
       Usb2HcPpi->GetRootHubPortStatus (
                    PeiServices,
                    Usb2HcPpi,
-                   (UINT8)Index,
+                   (UINT8)RootPort,
                    &PortStatus
                    );
     } else {
       UsbHcPpi->GetRootHubPortStatus (
                   PeiServices,
                   UsbHcPpi,
-                  (UINT8)Index,
+                  (UINT8)RootPort,
                   &PortStatus
                   );
     }
 
-    DEBUG ((DEBUG_INFO, "USB Status --- Port: %x ConnectChange[%04x] Status[%04x]\n", Index, PortStatus.PortChangeStatus, PortStatus.PortStatus));
+    DEBUG ((DEBUG_INFO, "USB Status --- Port: %x ConnectChange[%04x] Status[%04x]\n", RootPort, PortStatus.PortChangeStatus, PortStatus.PortStatus));
     //
     // Only handle connection/enable/overcurrent/reset change.
     //
@@ -521,7 +533,7 @@ PeiUsbEnumeration (
             PeiServices,
             PeiUsbDevice->UsbHcPpi,
             PeiUsbDevice->Usb2HcPpi,
-            Index,
+            RootPort,
             0
             );
 
@@ -529,14 +541,14 @@ PeiUsbEnumeration (
             Usb2HcPpi->GetRootHubPortStatus (
                          PeiServices,
                          Usb2HcPpi,
-                         (UINT8)Index,
+                         (UINT8)RootPort,
                          &PortStatus
                          );
           } else {
             UsbHcPpi->GetRootHubPortStatus (
                         PeiServices,
                         UsbHcPpi,
-                        (UINT8)Index,
+                        (UINT8)RootPort,
                         &PortStatus
                         );
           }
@@ -545,14 +557,14 @@ PeiUsbEnumeration (
             Usb2HcPpi->ClearRootHubPortFeature (
                          PeiServices,
                          Usb2HcPpi,
-                         (UINT8)Index,
+                         (UINT8)RootPort,
                          EfiUsbPortResetChange
                          );
           } else {
             UsbHcPpi->ClearRootHubPortFeature (
                         PeiServices,
                         UsbHcPpi,
-                        (UINT8)Index,
+                        (UINT8)RootPort,
                         EfiUsbPortResetChange
                         );
           }
@@ -577,7 +589,7 @@ PeiUsbEnumeration (
         Status = PeiConfigureUsbDevice (
                    PeiServices,
                    PeiUsbDevice,
-                   Index,
+                   RootPort,
                    &CurrentAddress
                    );
 
