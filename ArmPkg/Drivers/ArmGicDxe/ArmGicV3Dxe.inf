@@ -50,8 +50,8 @@
   gEfiCpuArchProtocolGuid         ## CONSUMES
 
 [Pcd.common]
-  gArmTokenSpaceGuid.PcdGicDistributorBase
-  gArmTokenSpaceGuid.PcdGicRedistributorsBase
+  gEfiMdePkgTokenSpaceGuid.PcdGicDistributorBase
+  gEfiMdePkgTokenSpaceGuid.PcdGicRedistributorsBase
 
 [Depex]
   gEfiCpuArchProtocolGuid

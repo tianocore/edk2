@@ -2483,6 +2483,15 @@
   # @Prompt Time-out for a request, internal
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequestRetryInterval|60000|UINT32|0x00000055
 
+[PcdsFixedAtBuild.AARCH64, PcdsFixedAtBuild.ARM, PcdsDynamic.AARCH64, PcdsDynamic.ARM]
+  #
+  # ARM Generic Interrupt Controller
+  #
+  gEfiMdePkgTokenSpaceGuid.PcdGicDistributorBase|0|UINT64|0x00000056
+  # Base address for the GIC Redistributor region that contains the boot CPU
+  gEfiMdePkgTokenSpaceGuid.PcdGicRedistributorsBase|0|UINT64|0x00000057
+  gEfiMdePkgTokenSpaceGuid.PcdGicInterruptInterfaceBase|0|UINT64|0x00000058
+
 [PcdsFixedAtBuild.AARCH64, PcdsPatchableInModule.AARCH64]
   ## GUID identifying the Rng algorithm implemented by CPU instruction.
   # @Prompt CPU Rng algorithm's GUID.

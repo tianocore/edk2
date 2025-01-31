@@ -36,9 +36,9 @@
   gFdtClientProtocolGuid                                ## CONSUMES
 
 [Pcd]
-  gArmTokenSpaceGuid.PcdGicDistributorBase
-  gArmTokenSpaceGuid.PcdGicRedistributorsBase
-  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
+  gEfiMdePkgTokenSpaceGuid.PcdGicDistributorBase
+  gEfiMdePkgTokenSpaceGuid.PcdGicRedistributorsBase
+  gEfiMdePkgTokenSpaceGuid.PcdGicInterruptInterfaceBase
 
 [Depex]
   gFdtClientProtocolGuid
