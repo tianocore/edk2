@@ -235,7 +235,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         if (self.env.GetValue("TARGET_ARCH").upper() == "AARCH64"):
             cmd = "qemu-system-aarch64"
             args = "-M virt"
-            args += " -cpu cortex-a57"                                          # emulate cpu
+            args += " -cpu neoverse-n2"                                         # emulate cpu
         elif(self.env.GetValue("TARGET_ARCH").upper() == "ARM"):
             cmd = "qemu-system-arm"
             args = "-M virt,highmem=off"

@@ -44,6 +44,9 @@
   DebugLib
   CpuExceptionHandlerLib
   DebugAgentLib
+  # CapsuleX64 implements its own _ModuleEntryPoint() and does not link against the standard PEIM entrypoint. As a
+  # result, it must include StackCheckLib to resolve the compiler inserted references to stack cookie functionality
+  StackCheckLib
 
 [Depex]
   FALSE

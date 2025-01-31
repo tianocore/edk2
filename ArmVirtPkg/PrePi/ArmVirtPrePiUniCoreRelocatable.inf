@@ -54,6 +54,7 @@
   PlatformPeiLib
   MemoryInitPeiLib
   CacheMaintenanceLib
+  StackCheckLib
 
 [Guids]
   gArmMpCoreInfoGuid

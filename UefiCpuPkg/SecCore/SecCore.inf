@@ -56,6 +56,7 @@
   PeiServicesTablePointerLib
   HobLib
   CpuPageTableLib
+  StackCheckLib
 
 [Ppis]
   ## SOMETIMES_CONSUMES
