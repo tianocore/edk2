@@ -947,12 +947,7 @@ Switch4Level (
 
      (1) OVMF has been built with PcdUse5LevelPageTable = TRUE, and
      (2) the CPU supports 5-level paging (aka la57), and
-     (3) the CPU supports gigabyte pages, and
-     (4) the VM is not running in SEV mode.
-
-   Condition (4) is a temporary stopgap for BaseMemEncryptSevLib not supporting
-   5-level paging yet.
-
+     (3) the CPU supports gigabyte pages
 
    This function looks at the virtual machine configuration, then decides
    whenever it will continue to use 5-level paging or downgrade to 4-level

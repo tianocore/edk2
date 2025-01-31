@@ -375,9 +375,10 @@ Split2MPageTo4K (
   ASSERT (PageTableEntry != NULL);
 
   //
-  // Fill in 2M page entry.
+  // Fill in 2M page entry. Not a leaf entry so do not include the
+  // encryption mask.
   //
-  *PageEntry2M = (UINT64)(UINTN)PageTableEntry | AddressEncMask | IA32_PG_P | IA32_PG_RW;
+  *PageEntry2M = (UINT64)(UINTN)PageTableEntry | IA32_PG_P | IA32_PG_RW;
 
   PhysicalAddress4K = PhysicalAddress;
   for (IndexOfPageTableEntries = 0; IndexOfPageTableEntries < 512; IndexOfPageTableEntries++, PageTableEntry++, PhysicalAddress4K += SIZE_4KB) {
@@ -457,9 +458,10 @@ Split1GPageTo2M (
   ASSERT (PageDirectoryEntry != NULL);
 
   //
-  // Fill in 1G page entry.
+  // Fill in 1G page entry. Not a leaf entry so do not include the
+  // encryption mask.
   //
-  *PageEntry1G = (UINT64)(UINTN)PageDirectoryEntry | AddressEncMask | IA32_PG_P | IA32_PG_RW;
+  *PageEntry1G = (UINT64)(UINTN)PageDirectoryEntry | IA32_PG_P | IA32_PG_RW;
 
   PhysicalAddress2M = PhysicalAddress;
   for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PhysicalAddress2M += SIZE_2MB) {
@@ -549,8 +551,7 @@ SetPageTablePoolReadOnly (
       //
       // Go to next level of table.
       //
-      PageTable = (UINT64 *)(UINTN)(PageAttr & ~AddressEncMask &
-                                    PAGING_4K_ADDRESS_MASK_64);
+      PageTable = (UINT64 *)(UINTN)(PageAttr & PAGING_4K_ADDRESS_MASK_64);
       continue;
     }
 
@@ -599,9 +600,11 @@ SetPageTablePoolReadOnly (
         PhysicalAddress += LevelSize[Level - 1];
       }
 
-      PageTable[Index] = (UINT64)(UINTN)NewPageTable | AddressEncMask |
-                         IA32_PG_P | IA32_PG_RW;
-      PageTable = NewPageTable;
+      //
+      // Not a leaf entry so do not include the encryption mask.
+      //
+      PageTable[Index] = (UINT64)(UINTN)NewPageTable | IA32_PG_P | IA32_PG_RW;
+      PageTable        = NewPageTable;
     }
   }
 }
@@ -858,9 +861,9 @@ CreateIdentityMappingPageTables (
 
     if (LevelOfPaging == 5) {
       //
-      // Make a PML5 Entry
+      // Make a PML5 Entry. Not a leaf entry so don't include the encryption mask.
       //
-      PageMapLevel5Entry->Uint64         = (UINT64)(UINTN)PageMapLevel4Entry | AddressEncMask;
+      PageMapLevel5Entry->Uint64         = (UINT64)(UINTN)PageMapLevel4Entry;
       PageMapLevel5Entry->Bits.ReadWrite = 1;
       PageMapLevel5Entry->Bits.Present   = 1;
       PageMapLevel5Entry++;
@@ -878,9 +881,9 @@ CreateIdentityMappingPageTables (
       BigPageAddress           += SIZE_4KB;
 
       //
-      // Make a PML4 Entry
+      // Make a PML4 Entry. Not a leaf entry so don't include the encryption mask.
       //
-      PageMapLevel4Entry->Uint64         = (UINT64)(UINTN)PageDirectoryPointerEntry | AddressEncMask;
+      PageMapLevel4Entry->Uint64         = (UINT64)(UINTN)PageDirectoryPointerEntry;
       PageMapLevel4Entry->Bits.ReadWrite = 1;
       PageMapLevel4Entry->Bits.Present   = 1;
 
@@ -913,9 +916,10 @@ CreateIdentityMappingPageTables (
           BigPageAddress    += SIZE_4KB;
 
           //
-          // Fill in a Page Directory Pointer Entries
+          // Fill in a Page Directory Pointer Entries. Not a leaf entry so don't include the
+          // encryption mask.
           //
-          PageDirectoryPointerEntry->Uint64         = (UINT64)(UINTN)PageDirectoryEntry | AddressEncMask;
+          PageDirectoryPointerEntry->Uint64         = (UINT64)(UINTN)PageDirectoryEntry;
           PageDirectoryPointerEntry->Bits.ReadWrite = 1;
           PageDirectoryPointerEntry->Bits.Present   = 1;
 
