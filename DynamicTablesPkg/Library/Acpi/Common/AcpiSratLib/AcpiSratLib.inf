@@ -2,6 +2,7 @@
 #  SRAT Table Generator
 #
 #  Copyright (c) 2019, ARM Limited. All rights reserved.
+#  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -24,7 +25,7 @@
   Arm/ArmSratGenerator.c
 
 [Sources.IA32, Sources.X64]
-  SratGeneratorNull.c
+  X64/X64SratGenerator.c
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
