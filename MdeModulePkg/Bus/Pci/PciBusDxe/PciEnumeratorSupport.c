@@ -2596,7 +2596,9 @@ PciEnumeratorLight (
       //
       // Remove those PCI devices which are rejected when full enumeration
       //
-      RemoveRejectedPciDevices (RootBridgeDev->Handle, RootBridgeDev);
+      if (FixedPcdGetBool (PcdRemoveRejectedDevices)) {
+        RemoveRejectedPciDevices (RootBridgeDev->Handle, RootBridgeDev);
+      }
 
       //
       // Process option rom light

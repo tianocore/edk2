@@ -2286,6 +2286,10 @@
   # @Prompt Conduit to use in ArmFfaLib.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc|TRUE|BOOLEAN|0x10000029
 
+  ## Remove PCI devices that are deemed invalid.
+  # @Prompt The value will determine whether devices are removed or not.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRemoveRejectedDevices|FALSE|BOOLEAN|0x10000030
+
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
   #  Loading Module at Fixed Address feature is enabled.
