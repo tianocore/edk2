@@ -26,6 +26,7 @@ EFI_EVENT  mEfiDevPathEvent;
 VOID       *mEmuVariableEventReg;
 EFI_EVENT  mEmuVariableEvent;
 UINT16     mHostBridgeDevId;
+BOOLEAN    mFirmwareSetupEnabled;
 
 //
 // Table of host IRQs matching PCI IRQs A-D
@@ -83,6 +84,37 @@ VOID
 InstallDevicePathCallback (
   VOID
   );
+
+/**
+  Return the index of the load option in the load option array.
+
+  The function consider two load options are equal when the
+  FilePath are equal.
+
+  @param Key    Pointer to the load option to be found.
+  @param Array  Pointer to the array of load options to be found.
+  @param Count  Number of entries in the Array.
+
+  @retval -1          Key wasn't found in the Array.
+  @retval 0 ~ Count-1 The index of the Key in the Array.
+**/
+INTN
+OvmfFindLoadOption (
+  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION  *Key,
+  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION  *Array,
+  IN UINTN                               Count
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < Count; Index++) {
+    if (CompareMem (Key->FilePath, Array[Index].FilePath, GetDevicePathSize (Key->FilePath)) == 0) {
+      return (INTN)Index;
+    }
+  }
+
+  return -1;
+}
 
 /**
 This function checks whether a File exists within the firmware volume.
@@ -226,7 +258,7 @@ PlatformRegisterFvBootOption (
                   LoadOptionTypeBoot
                   );
 
-  OptionIndex = EfiBootManagerFindLoadOption (
+  OptionIndex = OvmfFindLoadOption (
                   &NewOption,
                   BootOptions,
                   BootOptionCount
@@ -240,6 +272,16 @@ PlatformRegisterFvBootOption (
                BootOptions[OptionIndex].OptionNumber,
                LoadOptionTypeBoot
                );
+    ASSERT_EFI_ERROR (Status);
+  } else if ((OptionIndex != -1) && Enabled && (BootOptions[OptionIndex].Attributes != NewOption.Attributes)) {
+    // Option Found and enabled but with different Attributes!
+    Status = EfiBootManagerDeleteLoadOptionVariable (
+               BootOptions[OptionIndex].OptionNumber,
+               LoadOptionTypeBoot
+               );
+    ASSERT_EFI_ERROR (Status);
+
+    Status = EfiBootManagerAddLoadOptionVariable (&NewOption, MAX_UINTN);
     ASSERT_EFI_ERROR (Status);
   }
 
@@ -576,6 +618,22 @@ PlatformBootManagerBeforeConsole (
     FrontPageTimeout,
     Status
     ));
+
+  Status = QemuFwCfgParseBool (
+             "opt/org.tianocore/FirmwareSetupSupport",
+             &mFirmwareSetupEnabled
+             );
+
+  if (RETURN_ERROR (Status)) {
+    mFirmwareSetupEnabled = TRUE;
+  }
+
+  PlatformRegisterFvBootOption (
+    &gUiAppFileGuid,
+    L"EFI Firmware Setup",
+    LOAD_OPTION_ACTIVE | LOAD_OPTION_CATEGORY_APP,
+    mFirmwareSetupEnabled
+    );
 
   if (!FeaturePcdGet (PcdBootRestrictToFirmware)) {
     PlatformRegisterOptionsAndKeys ();
@@ -1933,7 +1991,7 @@ PlatformBootManagerAfterConsole (
   PlatformRegisterFvBootOption (
     &gUefiShellFileGuid,
     L"EFI Internal Shell",
-    LOAD_OPTION_ACTIVE,
+    LOAD_OPTION_ACTIVE | LOAD_OPTION_CATEGORY_APP,
     ShellEnabled
     );
 
