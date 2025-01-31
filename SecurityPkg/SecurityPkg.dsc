@@ -286,6 +286,7 @@
   #
   # Random Number Generator
   #
+  SecurityPkg/RandomNumberGenerator/RngPei/RngPei.inf
   SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
 
   #
