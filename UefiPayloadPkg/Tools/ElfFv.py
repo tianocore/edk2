@@ -331,23 +331,68 @@ def ModifyPHSegmentOffset64(NewUPLEntry, ElfHeaderOffset, PHSegmentName):
         SHData = SHentry[(i * elf_header.e_shentsize): (i * elf_header.e_shentsize) + elf_header.e_shentsize]
         unpacked_SectionHeader = ElfSectionHeader64.unpack(SHData)
         SHdrs.append(unpacked_SectionHeader)
+
+    # retrieve the .shstrtab section for parsing rest of the sections
+    shstrtab_section = NewUPLEntry[SHdrs[elf_header.e_shstrndx].sh_offset:SHdrs[elf_header.e_shstrndx].sh_offset+SHdrs[elf_header.e_shstrndx].sh_size]
+    shstrtab_strings = shstrtab_section.decode('utf-8', errors='ignore')
     for i in range(elf_header.e_phnum):
         PHData = PHentry[(i * elf_header.e_phentsize): (i * elf_header.e_phentsize) + elf_header.e_phentsize]
         unpacked_ProgramHeader = Elf64_Phdr(PHData)
         PHdrs.append(unpacked_ProgramHeader)
-    if (PHSegmentName == '.text'):
-        PHdrs[0].p_offset = SHdrs[1].sh_offset
-        PHdrs[0].p_paddr = SHdrs[1].sh_addr
-        PHdrs[4].p_offset = SHdrs[1].sh_offset
-        PHdrs[4].p_paddr = SHdrs[1].sh_addr
-    elif (PHSegmentName == '.dynamic'):
-        PHdrs[1].p_offset = SHdrs[2].sh_offset
-        PHdrs[1].p_paddr = SHdrs[2].sh_addr
-        PHdrs[3].p_offset = SHdrs[2].sh_offset
-        PHdrs[3].p_paddr = SHdrs[2].sh_addr
-    elif (PHSegmentName == '.data'):
-        PHdrs[2].p_offset = SHdrs[3].sh_offset
-        PHdrs[2].p_paddr = SHdrs[3].sh_addr
+
+    section_name_found = shstrtab_strings.find(PHSegmentName)
+    section_found = False
+    for i in range(elf_header.e_shnum):
+        if SHdrs[i].sh_name == section_name_found:
+            section_offset_found = SHdrs[i].sh_offset
+            section_addr_found = SHdrs[i].sh_addr
+            section_found = True
+
+    if section_found:
+        # syncup segment and section data
+        # there might be multiple segments pointing to the same offset of text or dymamic segments
+        # the syncup process will align those segments which pointing to the same offset.
+        text_segment_found = False
+        text_segment_offset_found = 0
+        dynamic_segment_found = False
+        dynamic_Segment_offset_found = 0
+        for i in range (elf_header.e_phnum):
+            # text segment type = PT_LOAD(1) and flags has E(1)
+            if PHdrs[i].p_type == 1 and (PHdrs[i].p_flags & 1) == 1:
+                text_segment_found = True
+                text_segment_offset_found = PHdrs[i].p_offset
+            # dynamic segment type = PT_DYNAMIC(2)
+            elif PHdrs[i].p_type == 2:
+                dynamic_segment_found = True
+                dynamic_Segment_offset_found = PHdrs[i].p_offset
+
+        if (PHSegmentName == '.text') and text_segment_found:
+            print ('sync text segment and section:')
+            for i in range (elf_header.e_phnum):
+                if PHdrs[i].p_offset == text_segment_offset_found:
+                    PHdrs[i].p_offset = section_offset_found
+                    PHdrs[i].p_paddr = section_addr_found
+                    print ("PHdrs[%d].p_offset %x" % (i, PHdrs[i].p_offset))
+                    print ("PHdrs[%d].p_paddr %x" % (i, PHdrs[i].p_paddr))
+        elif (PHSegmentName == '.dynamic') and dynamic_segment_found:
+            print ('sync dynamic segment and section:')
+            for i in range (elf_header.e_phnum):
+                if PHdrs[i].p_offset == dynamic_Segment_offset_found:
+                    PHdrs[i].p_offset = section_offset_found
+                    PHdrs[i].p_paddr = section_addr_found
+                    print ("PHdrs[%d].p_offset %x" % (i, PHdrs[i].p_offset))
+                    print ("PHdrs[%d].p_paddr %x" % (i, PHdrs[i].p_paddr))
+        elif (PHSegmentName == '.data'):
+            print ('sync data segment and section:')
+            for i in range (elf_header.e_phnum):
+                # data segment type = PT_LOAD(1) and flags = R(4) + W(2) = 6
+                if PHdrs[i].p_type == 1 and PHdrs[i].p_flags == 6:
+                    if PHdrs[i].p_offset != dynamic_Segment_offset_found:
+                        PHdrs[i].p_offset = section_offset_found
+                        PHdrs[i].p_paddr = section_addr_found
+                        print ("PHdrs[%d].p_offset %x" % (i, PHdrs[i].p_offset))
+                        print ("PHdrs[%d].p_paddr %x" % (i, PHdrs[i].p_paddr))
+
     packed_PHData = b''
     for phdr in PHdrs:
         packed_PHData += phdr.pack()
