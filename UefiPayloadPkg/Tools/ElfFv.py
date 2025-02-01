@@ -338,13 +338,9 @@ def ModifyPHSegmentOffset64(NewUPLEntry, ElfHeaderOffset, PHSegmentName):
     if (PHSegmentName == '.text'):
         PHdrs[0].p_offset = SHdrs[1].sh_offset
         PHdrs[0].p_paddr = SHdrs[1].sh_addr
-        PHdrs[4].p_offset = SHdrs[1].sh_offset
-        PHdrs[4].p_paddr = SHdrs[1].sh_addr
     elif (PHSegmentName == '.dynamic'):
         PHdrs[1].p_offset = SHdrs[2].sh_offset
         PHdrs[1].p_paddr = SHdrs[2].sh_addr
-        PHdrs[3].p_offset = SHdrs[2].sh_offset
-        PHdrs[3].p_paddr = SHdrs[2].sh_addr
     elif (PHSegmentName == '.data'):
         PHdrs[2].p_offset = SHdrs[3].sh_offset
         PHdrs[2].p_paddr = SHdrs[3].sh_addr
