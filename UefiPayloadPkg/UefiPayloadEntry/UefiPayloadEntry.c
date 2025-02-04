@@ -469,7 +469,7 @@ _ModuleEntryPoint (
   Status = LoadDxeCore (&DxeCoreEntryPoint);
   ASSERT_EFI_ERROR (Status);
 
-  DEBUG ((DEBUG_INFO, "DxeCoreEntryPoint = 0x%lx\n", DxeCoreEntryPoint));
+  DEBUG ((DEBUG_INFO, "DxeCoreEntryPoint = 0x%lx for test purpose only\n", DxeCoreEntryPoint));
 
   //
   // Mask off all legacy 8259 interrupt sources
