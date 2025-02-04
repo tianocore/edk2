@@ -2235,7 +2235,7 @@ def CheckDoxygenCommand(FullFileName):
                    """ % (FileTable, DataClass.MODEL_IDENTIFIER_COMMENT, DataClass.MODEL_IDENTIFIER_FUNCTION_HEADER)
     ResultSet = Db.TblFile.Exec(SqlStatement)
     DoxygenCommandList = ['bug', 'todo', 'example', 'file', 'attention', 'param', 'post', 'pre', 'retval',
-                          'return', 'sa', 'since', 'test', 'note', 'par', 'endcode', 'code']
+                          'return', 'sa', 'since', 'test', 'note', 'par', 'endcode', 'code', 'endverbatim', 'verbatim']
     for Result in ResultSet:
         CommentStr = Result[0]
         CommentPartList = CommentStr.split()
