@@ -572,9 +572,11 @@ PrmPkg
 F: PrmPkg/
 M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
+M: Aaron Li <aaron.li@intel.com> [Li-Aaron]
 
 PrmPkg: ACPI related modules
 R: Ankit Sinha <ankit.sinha@intel.com> [ankit13s]
+R: Aaron Li <aaron.li@intel.com> [Li-Aaron]
 
 RedfishPkg: Redfish related modules
 F: RedfishPkg/
