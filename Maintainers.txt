@@ -67,8 +67,10 @@ Tianocore Stewards
 ------------------
 F: *
 M: Andrew Fish <afish@apple.com> [ajfish]
+M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 M: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
+M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 
 Responsible Disclosure, Reporting Security Issues
 -------------------------------------------------
