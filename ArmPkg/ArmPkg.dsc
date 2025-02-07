@@ -155,6 +155,8 @@
   ArmPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   ArmPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   ArmPkg/Library/LinuxBootBootManagerLib/LinuxBootBootManagerLib.inf
+  ArmPkg/Library/ArmStandaloneMmCoreEntryPoint/ArmStandaloneMmCoreEntryPoint.inf
+  ArmPkg/Library/StandaloneMmPeCoffExtraActionLib/StandaloneMmPeCoffExtraActionLib.inf
 
   ArmPkg/Drivers/ArmScmiDxe/ArmScmiDxe.inf
 
@@ -163,11 +165,6 @@
   ArmPkg/Universal/Smbios/OemMiscLibNull/OemMiscLibNull.inf
 
   ArmPkg/Drivers/MmCommunicationPei/MmCommunicationPei.inf
-
-[Components.common.MM_CORE_STANALONE]
-  ArmPkg/Library/ArmStandaloneMmCoreEntryPoint/ArmStandaloneMmCoreEntryPoint.inf
-
-[Components.common.MM_STANDALONE]
   ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
 
 [Components.AARCH64]
