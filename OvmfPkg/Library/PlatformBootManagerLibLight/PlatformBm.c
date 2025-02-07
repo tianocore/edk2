@@ -963,6 +963,7 @@ PlatformBootManagerAfterConsole (
 {
   RETURN_STATUS  Status;
   BOOLEAN        Uninstall;
+  BOOLEAN        ShellEnabled;
 
   //
   // Show the splash screen.
@@ -986,6 +987,15 @@ PlatformBootManagerAfterConsole (
     ));
   if (Uninstall) {
     UninstallEfiMemoryAttributesProtocol ();
+  }
+
+  Status = QemuFwCfgParseBool (
+             "opt/org.tianocore/EFIShellSupport",
+             &ShellEnabled
+             );
+
+  if (RETURN_ERROR (Status)) {
+    ShellEnabled = TRUE;
   }
 
   //
@@ -1020,7 +1030,7 @@ PlatformBootManagerAfterConsole (
     &gUefiShellFileGuid,
     L"EFI Internal Shell",
     LOAD_OPTION_ACTIVE,
-    TRUE
+    ShellEnabled
     );
 
   RemoveStaleFvFileOptions ();
