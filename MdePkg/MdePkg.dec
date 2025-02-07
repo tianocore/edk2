@@ -308,6 +308,10 @@
   #
   StackCheckFailureHookLib|Include/Library/StackCheckFailureHookLib.h
 
+  ##  @libraryclass  Provides stack cookie checking functionality
+  #
+  StackCheckLib|Include/Library/StackCheckLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides services to generate random number.
   #
@@ -339,6 +343,11 @@
 
   ##  @libraryclass  Provides function to support TDX processing.
   TdxLib|Include/Library/TdxLib.h
+
+[LibraryClasses.X64]
+  ##  @libraryclass  Defines a set of interfaces for the MM core entrypoint. The ARM/AARCH64 version lives in ArmPkg
+  #
+  StandaloneMmCoreEntryPoint|Include/Library/StandaloneMmCoreEntryPoint.h
 
 [LibraryClasses.RISCV64]
   ##  @libraryclass  Provides function to make ecalls to SBI
@@ -1085,6 +1094,9 @@
 
   ## Include/Ppi/DelayedDispatch.h
   gEfiPeiDelayedDispatchPpiGuid  = { 0x869c711d, 0x649c, 0x44fe, { 0x8b, 0x9e, 0x2c, 0xbb, 0x29, 0x11, 0xc3, 0xe6 }}
+
+  ## Include/Ppi/Rng.h
+  gEfiRngPpiGuid                 = { 0xeaed0a7e, 0x1a70, 0x4c2b, { 0x85, 0x58, 0x37, 0x17, 0x74, 0x56, 0xd8, 0x06 }}
 
 [Protocols]
   ## Include/Protocol/MemoryAccept.h
