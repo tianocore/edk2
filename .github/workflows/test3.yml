@@ -1,0 +1,58 @@
+name: CI for ArmPkg
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04-arm
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r pip-requirements.txt
+
+      - name: Run License Check
+        run: |
+          python .pytool/Plugin/LicenseCheck.py --ignore-files ''
+
+      - name: Run ECC Check
+        run: |
+          python .pytool/Plugin/EccCheck.py --ignore-files 'Library/ArmSoftFloatLib/berkeley-softfloat-3' 'Library/ArmSoftFloatLib/ArmSoftFloatLib.c' 'Library/CompilerIntrinsicsLib' 'Universal/Smbios/SmbiosMiscDxe'
+
+      - name: Run Compiler Plugin
+        run: |
+          python .pytool/Plugin/CompilerPlugin.py --dsc-path 'ArmPkg.dsc'
+
+      - name: Run Char Encoding Check
+        run: |
+          python .pytool/Plugin/CharEncodingCheck.py --ignore-files ''
+
+      - name: Run Dependency Check
+        run: |
+          python .pytool/Plugin/DependencyCheck.py --acceptable-dependencies 'ArmPlatformPkg/ArmPlatformPkg.dec' 'ArmPkg/ArmPkg.dec' 'EmbeddedPkg/EmbeddedPkg.dec' 'MdeModulePkg/MdeModulePkg.dec' 'MdePkg/MdePkg.dec' 'ShellPkg/ShellPkg.dec' 'StandaloneMmPkg/StandaloneMmPkg.dec'
+
+      - name: Run DSC Complete Check
+        run: |
+          python .pytool/Plugin/DscCompleteCheck.py --dsc-path 'ArmPkg.dsc'
+
+      - name: Run GUID Check
+        run: |
+          python .pytool/Plugin/GuidCheck.py --ignore-guid-name '' --ignore-guid-value '' --ignore-folders-and-files '' --ignore-duplicates ''
+
+      - name: Run Library Class Check
+        run: |
+          python .pytool/Plugin/LibraryClassCheck.py --ignore-header-file ''
+
+      - name: Run Spell Check
+        run: |
+          python .pytool/Plugin/SpellCheck.py --audit-only --extend-words 'api\'s' 'ackintid' 'actlr' 'aeabi' --ignore-standard-paths '*.asm' '*.s' --ignore-files 'Library/ArmSoftFloatLib/berkeley-softfloat-3/**'
