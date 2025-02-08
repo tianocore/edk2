@@ -24,12 +24,9 @@
 
 #include "QemuFwCfgLibInternal.h"
 
-STATIC BOOLEAN  mQemuFwCfgSupported = FALSE;
-STATIC BOOLEAN  mQemuFwCfgDmaSupported;
-
 STATIC EDKII_IOMMU_PROTOCOL  *mIoMmuProtocol;
 
-STATIC QEMU_FW_CFG_CACHE_WORK_AREA  mFwCfgCacheWorkArea = { 0 };
+STATIC QEMU_FW_CFG_WORK_AREA  mQemuFwCfgWorkArea = { 0 };
 
 /**
   Returns a boolean indicating if the firmware configuration interface
@@ -64,8 +61,8 @@ QemuFwCfgInitialize (
   // Enable the access routines while probing to see if it is supported.
   // For probing we always use the IO Port (IoReadFifo8()) access method.
   //
-  mQemuFwCfgSupported    = TRUE;
-  mQemuFwCfgDmaSupported = FALSE;
+  mQemuFwCfgWorkArea.QemuFwCfgSupported    = TRUE;
+  mQemuFwCfgWorkArea.QemuFwCfgDmaSupported = FALSE;
 
   QemuFwCfgSelectItem (QemuFwCfgItemSignature);
   Signature = QemuFwCfgRead32 ();
@@ -78,20 +75,20 @@ QemuFwCfgInitialize (
       )
   {
     DEBUG ((DEBUG_INFO, "QemuFwCfg interface not supported.\n"));
-    mQemuFwCfgSupported = FALSE;
+    mQemuFwCfgWorkArea.QemuFwCfgSupported = FALSE;
     return RETURN_SUCCESS;
   }
 
   if ((Revision & FW_CFG_F_DMA) == 0) {
     DEBUG ((DEBUG_INFO, "QemuFwCfg interface (IO Port) is supported.\n"));
   } else {
-    mQemuFwCfgDmaSupported = TRUE;
+    mQemuFwCfgWorkArea.QemuFwCfgDmaSupported = TRUE;
     DEBUG ((DEBUG_INFO, "QemuFwCfg interface (DMA) is supported.\n"));
   }
 
   CcGuestAttr = PcdGet64 (PcdConfidentialComputingGuestAttr);
-  if (mQemuFwCfgDmaSupported && (CC_GUEST_IS_SEV (CcGuestAttr) ||
-                                 CC_GUEST_IS_TDX (CcGuestAttr)))
+  if (mQemuFwCfgWorkArea.QemuFwCfgDmaSupported && (CC_GUEST_IS_SEV (CcGuestAttr) ||
+                                                   CC_GUEST_IS_TDX (CcGuestAttr)))
   {
     EFI_STATUS  Status;
 
@@ -133,7 +130,7 @@ InternalQemuFwCfgIsAvailable (
   VOID
   )
 {
-  return mQemuFwCfgSupported;
+  return mQemuFwCfgWorkArea.QemuFwCfgSupported;
 }
 
 /**
@@ -148,7 +145,7 @@ InternalQemuFwCfgDmaIsAvailable (
   VOID
   )
 {
-  return mQemuFwCfgDmaSupported;
+  return mQemuFwCfgWorkArea.QemuFwCfgDmaSupported;
 }
 
 /**
@@ -514,17 +511,17 @@ InternalQemuFwCfgCheckOvmfWorkArea (
 }
 
 /**
-  Get the pointer to the QEMU_FW_CFG_CACHE_WORK_AREA. This data is used as the
+  Get the pointer to the QEMU_FW_CFG_WORK_AREA. This data is used as the
   workarea to record the ongoing fw_cfg item and offset.
-  @retval   QEMU_FW_CFG_CACHE_WORK_AREA  Pointer to the QEMU_FW_CFG_CACHE_WORK_AREA
-  @retval   NULL                QEMU_FW_CFG_CACHE_WORK_AREA doesn't exist
+  @retval   QEMU_FW_CFG_WORK_AREA  Pointer to the QEMU_FW_CFG_WORK_AREA
+  @retval   NULL                QEMU_FW_CFG_WORK_AREA doesn't exist
 **/
-QEMU_FW_CFG_CACHE_WORK_AREA *
+QEMU_FW_CFG_WORK_AREA *
 InternalQemuFwCfgCacheGetWorkArea (
   VOID
   )
 {
-  return &mFwCfgCacheWorkArea;
+  return &mQemuFwCfgWorkArea;
 }
 
 RETURN_STATUS
