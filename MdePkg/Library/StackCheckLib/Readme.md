@@ -195,17 +195,12 @@ This will cause `MdeLibs.dsc.inc` to not link `StackCheckLibNull` and instead li
 stack cookie updating versions of `DxeCoreEntryPoint`, `StandaloneMmDriverEntryPoint`,
 `UefiApplicationEntryPoint`, and `UefiDriverEntryPoint`.
 
-Because edk2 does not implement exception handling for `SEC` and `PEI_CORE`, `MdeLibs.dsc.inc`
-uses `StackCheckLibNull` for these phases always. As a result, dynamic stack cookies are also
-not set for `PEI_CORE`. There is no standard `SEC` entrypoint, so it is not supported generically
-to apply dynamic stack cookies there. If a platform wishes to use `StackCheckLib` and dynamic stack
-cookies for these phases, it should override this in its DSC, e.g.:
-
-```inf
-[LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE]
-  StackCheckLib|MdePkg/Library/StackCheckLib/StackCheckLib.inf
-  PeiCoreEntryPoint|MdePkg/Library/DynamicStackCookieEntryPointLib/PeiCoreEntryPoint.inf
-```
+Because edk2 does not implement exception handling for `SEC` and `PEI_CORE`,
+`MdeLibs.dsc.inc` uses `StackCheckLibNull` for these phases always. If a
+platform wishes to use `StackCheckLib` for these phases, it can enable static
+stack cookie checking, as documented in the previous section.  Due to the fact
+that writable global variables are not supported in the `SEC` or `PEI` phases
+of execution, dynamic stack cookie checking is not supported here.
 
 It is recommended that a platform only do this for debugging or if they have implemented
 exception handlers for these phases.
