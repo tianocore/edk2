@@ -135,19 +135,19 @@ InternalQemuFwCfgCacheSkipBytes (
   IN UINT32  Size
   )
 {
-  QEMU_FW_CFG_CACHE_WORK_AREA  *QemuFwCfgCacheWorkArea;
+  QEMU_FW_CFG_WORK_AREA  *QemuFwCfgWorkArea;
 
   if (Size == 0) {
     return;
   }
 
-  QemuFwCfgCacheWorkArea = InternalQemuFwCfgCacheGetWorkArea ();
-  if ((QemuFwCfgCacheWorkArea->Offset + Size) > MAX_UINT32) {
+  QemuFwCfgWorkArea = InternalQemuFwCfgCacheGetWorkArea ();
+  if ((QemuFwCfgWorkArea->Offset + Size) > MAX_UINT32) {
     DEBUG ((DEBUG_ERROR, "%a: Integer overflow with invalid offset size\n", __func__));
     ASSERT (FALSE);
-    QemuFwCfgCacheWorkArea->Offset = MAX_UINT32;
+    QemuFwCfgWorkArea->Offset = MAX_UINT32;
   } else {
-    QemuFwCfgCacheWorkArea->Offset += Size;
+    QemuFwCfgWorkArea->Offset += Size;
   }
 }
 
