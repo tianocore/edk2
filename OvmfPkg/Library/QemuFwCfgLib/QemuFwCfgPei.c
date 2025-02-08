@@ -120,8 +120,8 @@ QemuFwCfgGetPlatformInfo (
 
   if (!PlatformInfoHob->QemuFwCfgChecked) {
     QemuFwCfgProbe (
-      &PlatformInfoHob->QemuFwCfgSupported,
-      &PlatformInfoHob->QemuFwCfgDmaSupported
+      &PlatformInfoHob->QemuFwCfgWorkArea.QemuFwCfgSupported,
+      &PlatformInfoHob->QemuFwCfgWorkArea.QemuFwCfgDmaSupported
       );
     PlatformInfoHob->QemuFwCfgChecked = TRUE;
   }
@@ -154,7 +154,7 @@ InternalQemuFwCfgIsAvailable (
 {
   EFI_HOB_PLATFORM_INFO  *PlatformInfoHob = QemuFwCfgGetPlatformInfo ();
 
-  return PlatformInfoHob->QemuFwCfgSupported;
+  return PlatformInfoHob->QemuFwCfgWorkArea.QemuFwCfgSupported;
 }
 
 /**
@@ -171,7 +171,7 @@ InternalQemuFwCfgDmaIsAvailable (
 {
   EFI_HOB_PLATFORM_INFO  *PlatformInfoHob = QemuFwCfgGetPlatformInfo ();
 
-  return PlatformInfoHob->QemuFwCfgDmaSupported;
+  return PlatformInfoHob->QemuFwCfgWorkArea.QemuFwCfgDmaSupported;
 }
 
 /**
@@ -253,12 +253,12 @@ InternalQemuFwCfgDmaBytes (
 }
 
 /**
-  Get the pointer to the QEMU_FW_CFG_CACHE_WORK_AREA. This data is used as the
+  Get the pointer to the QEMU_FW_CFG_WORK_AREA. This data is used as the
   workarea to record the onging fw_cfg item and offset.
-  @retval   QEMU_FW_CFG_CACHE_WORK_AREA  Pointer to the QEMU_FW_CFG_CACHE_WORK_AREA
-  @retval   NULL                QEMU_FW_CFG_CACHE_WORK_AREA doesn't exist
+  @retval   QEMU_FW_CFG_WORK_AREA  Pointer to the QEMU_FW_CFG_WORK_AREA
+  @retval   NULL                QEMU_FW_CFG_WORK_AREA doesn't exist
 **/
-QEMU_FW_CFG_CACHE_WORK_AREA *
+QEMU_FW_CFG_WORK_AREA *
 InternalQemuFwCfgCacheGetWorkArea (
   VOID
   )
@@ -272,7 +272,7 @@ InternalQemuFwCfgCacheGetWorkArea (
   }
 
   PlatformHobinfo = (EFI_HOB_PLATFORM_INFO *)(VOID *)GET_GUID_HOB_DATA (GuidHob);
-  return &(PlatformHobinfo->QemuFwCfgCacheWorkArea);
+  return &(PlatformHobinfo->QemuFwCfgWorkArea);
 }
 
 /**

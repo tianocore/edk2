@@ -150,12 +150,12 @@ InternalQemuFwCfgCheckOvmfWorkArea (
 }
 
 /**
-  Get the pointer to the QEMU_FW_CFG_CACHE_WORK_AREA. This data is used as the
+  Get the pointer to the QEMU_FW_CFG_WORK_AREA. This data is used as the
   workarea to record the ongoing fw_cfg item and offset.
-  @retval   QEMU_FW_CFG_CACHE_WORK_AREA  Pointer to the QEMU_FW_CFG_CACHE_WORK_AREA
-  @retval   NULL                QEMU_FW_CFG_CACHE_WORK_AREA doesn't exist
+  @retval   QEMU_FW_CFG_WORK_AREA  Pointer to the QEMU_FW_CFG_WORK_AREA
+  @retval   NULL                QEMU_FW_CFG_WORK_AREA doesn't exist
 **/
-QEMU_FW_CFG_CACHE_WORK_AREA *
+QEMU_FW_CFG_WORK_AREA *
 InternalQemuFwCfgCacheGetWorkArea (
   VOID
   )
@@ -173,7 +173,7 @@ InternalQemuFwCfgCacheGetWorkArea (
   }
 
   PlatformHobinfo = (EFI_HOB_PLATFORM_INFO *)(VOID *)GET_GUID_HOB_DATA (GuidHob);
-  return &(PlatformHobinfo->QemuFwCfgCacheWorkArea);
+  return &(PlatformHobinfo->QemuFwCfgWorkArea);
 }
 
 /**
