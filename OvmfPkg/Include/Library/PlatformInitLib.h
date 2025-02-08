@@ -18,57 +18,57 @@ The work area is used to support reading from cache in QemuFwCfgLib.
 It is also used as global variable in Dxe phase.
 */
 typedef struct {
+  BOOLEAN    QemuFwCfgSupported;
+  BOOLEAN    QemuFwCfgDmaSupported;
   UINT16     FwCfgItem;
   UINT32     Offset;
   BOOLEAN    Reading;
-} QEMU_FW_CFG_CACHE_WORK_AREA;
+} QEMU_FW_CFG_WORK_AREA;
 
 typedef struct {
-  EFI_HOB_GUID_TYPE              GuidHeader;
-  UINT16                         HostBridgeDevId;
+  EFI_HOB_GUID_TYPE        GuidHeader;
+  UINT16                   HostBridgeDevId;
 
-  UINT64                         PcdConfidentialComputingGuestAttr;
-  BOOLEAN                        SevEsIsEnabled;
+  UINT64                   PcdConfidentialComputingGuestAttr;
+  BOOLEAN                  SevEsIsEnabled;
 
-  UINT32                         BootMode;
-  BOOLEAN                        S3Supported;
+  UINT32                   BootMode;
+  BOOLEAN                  S3Supported;
 
-  BOOLEAN                        SmmSmramRequire;
-  BOOLEAN                        Q35SmramAtDefaultSmbase;
-  UINT16                         Q35TsegMbytes;
+  BOOLEAN                  SmmSmramRequire;
+  BOOLEAN                  Q35SmramAtDefaultSmbase;
+  UINT16                   Q35TsegMbytes;
 
-  UINT32                         LowMemory;
-  UINT64                         FirstNonAddress;
-  UINT8                          PhysMemAddressWidth;
-  UINT32                         Uc32Base;
-  UINT32                         Uc32Size;
+  UINT32                   LowMemory;
+  UINT64                   FirstNonAddress;
+  UINT8                    PhysMemAddressWidth;
+  UINT32                   Uc32Base;
+  UINT32                   Uc32Size;
 
-  BOOLEAN                        PcdSetNxForStack;
-  UINT64                         PcdTdxSharedBitMask;
+  BOOLEAN                  PcdSetNxForStack;
+  UINT64                   PcdTdxSharedBitMask;
 
-  UINT64                         PcdPciMmio64Base;
-  UINT64                         PcdPciMmio64Size;
-  BOOLEAN                        PcdPciMmio64Override;
-  UINT32                         PcdPciMmio32Base;
-  UINT32                         PcdPciMmio32Size;
-  UINT64                         PcdPciIoBase;
-  UINT64                         PcdPciIoSize;
+  UINT64                   PcdPciMmio64Base;
+  UINT64                   PcdPciMmio64Size;
+  BOOLEAN                  PcdPciMmio64Override;
+  UINT32                   PcdPciMmio32Base;
+  UINT32                   PcdPciMmio32Size;
+  UINT64                   PcdPciIoBase;
+  UINT64                   PcdPciIoSize;
 
-  UINT64                         PcdEmuVariableNvStoreReserved;
-  UINT32                         PcdCpuBootLogicalProcessorNumber;
-  UINT32                         PcdCpuMaxLogicalProcessorNumber;
-  UINT32                         DefaultMaxCpuNumber;
+  UINT64                   PcdEmuVariableNvStoreReserved;
+  UINT32                   PcdCpuBootLogicalProcessorNumber;
+  UINT32                   PcdCpuMaxLogicalProcessorNumber;
+  UINT32                   DefaultMaxCpuNumber;
 
-  UINT32                         S3AcpiReservedMemoryBase;
-  UINT32                         S3AcpiReservedMemorySize;
+  UINT32                   S3AcpiReservedMemoryBase;
+  UINT32                   S3AcpiReservedMemorySize;
 
-  UINT64                         FeatureControlValue;
+  UINT64                   FeatureControlValue;
 
-  BOOLEAN                        QemuFwCfgChecked;
-  BOOLEAN                        QemuFwCfgSupported;
-  BOOLEAN                        QemuFwCfgDmaSupported;
+  BOOLEAN                  QemuFwCfgChecked;
 
-  QEMU_FW_CFG_CACHE_WORK_AREA    QemuFwCfgCacheWorkArea;
+  QEMU_FW_CFG_WORK_AREA    QemuFwCfgWorkArea;
 } EFI_HOB_PLATFORM_INFO;
 #pragma pack()
 

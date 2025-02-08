@@ -57,20 +57,20 @@ InternalQemuFwCfgItemCached (
 }
 
 /**
-  Clear the QEMU_FW_CFG_CACHE_WORK_AREA.
+  Clear the QEMU_FW_CFG_WORK_AREA.
 **/
 VOID
 InternalQemuFwCfgCacheResetWorkArea (
   VOID
   )
 {
-  QEMU_FW_CFG_CACHE_WORK_AREA  *QemuFwCfgCacheWorkArea;
+  QEMU_FW_CFG_WORK_AREA  *QemuFwCfgWorkArea;
 
-  QemuFwCfgCacheWorkArea = InternalQemuFwCfgCacheGetWorkArea ();
-  if (QemuFwCfgCacheWorkArea != NULL) {
-    QemuFwCfgCacheWorkArea->FwCfgItem = 0;
-    QemuFwCfgCacheWorkArea->Offset    = 0;
-    QemuFwCfgCacheWorkArea->Reading   = FALSE;
+  QemuFwCfgWorkArea = InternalQemuFwCfgCacheGetWorkArea ();
+  if (QemuFwCfgWorkArea != NULL) {
+    QemuFwCfgWorkArea->FwCfgItem = 0;
+    QemuFwCfgWorkArea->Offset    = 0;
+    QemuFwCfgWorkArea->Reading   = FALSE;
   }
 }
 
@@ -84,13 +84,13 @@ InternalQemuFwCfgCacheReading (
   VOID
   )
 {
-  BOOLEAN                      Reading;
-  QEMU_FW_CFG_CACHE_WORK_AREA  *QemuFwCfgCacheWorkArea;
+  BOOLEAN                Reading;
+  QEMU_FW_CFG_WORK_AREA  *QemuFwCfgWorkArea;
 
-  Reading                = FALSE;
-  QemuFwCfgCacheWorkArea = InternalQemuFwCfgCacheGetWorkArea ();
-  if (QemuFwCfgCacheWorkArea != NULL) {
-    Reading = QemuFwCfgCacheWorkArea->Reading;
+  Reading           = FALSE;
+  QemuFwCfgWorkArea = InternalQemuFwCfgCacheGetWorkArea ();
+  if (QemuFwCfgWorkArea != NULL) {
+    Reading = QemuFwCfgWorkArea->Reading;
   }
 
   return Reading;
@@ -101,22 +101,22 @@ InternalQemuFwCfgCacheSelectItem (
   IN  FIRMWARE_CONFIG_ITEM  Item
   )
 {
-  QEMU_FW_CFG_CACHE_WORK_AREA  *QemuFwCfgCacheWorkArea;
+  QEMU_FW_CFG_WORK_AREA  *QemuFwCfgWorkArea;
 
   // Walk thru cached fw_items to see if Item is cached.
   if (InternalQemuFwCfgItemCached (Item) == NULL) {
     return FALSE;
   }
 
-  QemuFwCfgCacheWorkArea = InternalQemuFwCfgCacheGetWorkArea ();
-  if (QemuFwCfgCacheWorkArea == NULL) {
+  QemuFwCfgWorkArea = InternalQemuFwCfgCacheGetWorkArea ();
+  if (QemuFwCfgWorkArea == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: Invalid FwCfg Cache Work Area\n", __func__));
     return FALSE;
   }
 
-  QemuFwCfgCacheWorkArea->FwCfgItem = (UINT16)Item;
-  QemuFwCfgCacheWorkArea->Offset    = 0;
-  QemuFwCfgCacheWorkArea->Reading   = TRUE;
+  QemuFwCfgWorkArea->FwCfgItem = (UINT16)Item;
+  QemuFwCfgWorkArea->Offset    = 0;
+  QemuFwCfgWorkArea->Reading   = TRUE;
 
   return TRUE;
 }
@@ -134,43 +134,43 @@ InternalQemuFwCfgCacheReadBytes (
   IN OUT VOID   *Buffer
   )
 {
-  QEMU_FW_CFG_CACHE_WORK_AREA  *QemuFwCfgCacheWorkArea;
-  FW_CFG_CACHED_ITEM           *CachedItem;
-  UINTN                        ReadSize;
+  QEMU_FW_CFG_WORK_AREA  *QemuFwCfgWorkArea;
+  FW_CFG_CACHED_ITEM     *CachedItem;
+  UINTN                  ReadSize;
 
   if (Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  QemuFwCfgCacheWorkArea = InternalQemuFwCfgCacheGetWorkArea ();
-  if (QemuFwCfgCacheWorkArea == NULL) {
+  QemuFwCfgWorkArea = InternalQemuFwCfgCacheGetWorkArea ();
+  if (QemuFwCfgWorkArea == NULL) {
     return RETURN_NOT_FOUND;
   }
 
-  if (!QemuFwCfgCacheWorkArea->Reading) {
+  if (!QemuFwCfgWorkArea->Reading) {
     return RETURN_NOT_READY;
   }
 
-  CachedItem = InternalQemuFwCfgItemCached (QemuFwCfgCacheWorkArea->FwCfgItem);
+  CachedItem = InternalQemuFwCfgItemCached (QemuFwCfgWorkArea->FwCfgItem);
   if (CachedItem == NULL) {
     return RETURN_NOT_FOUND;
   }
 
-  if (QemuFwCfgCacheWorkArea->Offset >= CachedItem->DataSize) {
-    DEBUG ((DEBUG_ERROR, "%a: Invalid Item Offset(0x%x) in FwCfg Cache\n", __func__, QemuFwCfgCacheWorkArea->Offset));
+  if (QemuFwCfgWorkArea->Offset >= CachedItem->DataSize) {
+    DEBUG ((DEBUG_ERROR, "%a: Invalid Item Offset(0x%x) in FwCfg Cache\n", __func__, QemuFwCfgWorkArea->Offset));
     ASSERT (FALSE);
     return RETURN_ABORTED;
   }
 
-  if (CachedItem->DataSize - QemuFwCfgCacheWorkArea->Offset > Size) {
+  if (CachedItem->DataSize - QemuFwCfgWorkArea->Offset > Size) {
     ReadSize = Size;
   } else {
-    ReadSize = CachedItem->DataSize - QemuFwCfgCacheWorkArea->Offset;
+    ReadSize = CachedItem->DataSize - QemuFwCfgWorkArea->Offset;
   }
 
-  CopyMem (Buffer, (UINT8 *)CachedItem + sizeof (FW_CFG_CACHED_ITEM) + QemuFwCfgCacheWorkArea->Offset, ReadSize);
-  QemuFwCfgCacheWorkArea->Offset += (UINT32)ReadSize;
+  CopyMem (Buffer, (UINT8 *)CachedItem + sizeof (FW_CFG_CACHED_ITEM) + QemuFwCfgWorkArea->Offset, ReadSize);
+  QemuFwCfgWorkArea->Offset += (UINT32)ReadSize;
 
-  DEBUG ((DEBUG_VERBOSE, "%a: found Item 0x%x in FwCfg Cache\n", __func__, QemuFwCfgCacheWorkArea->FwCfgItem));
+  DEBUG ((DEBUG_VERBOSE, "%a: found Item 0x%x in FwCfg Cache\n", __func__, QemuFwCfgWorkArea->FwCfgItem));
   return RETURN_SUCCESS;
 }

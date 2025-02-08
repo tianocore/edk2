@@ -240,9 +240,9 @@ InternalQemuFwCfgInitCache (
     return EFI_INVALID_PARAMETER;
   }
 
-  PlatformInfoHob->QemuFwCfgCacheWorkArea.FwCfgItem = INVALID_FW_CFG_ITEM;
-  PlatformInfoHob->QemuFwCfgCacheWorkArea.Offset    = 0;
-  PlatformInfoHob->QemuFwCfgCacheWorkArea.Reading   = FALSE;
+  PlatformInfoHob->QemuFwCfgWorkArea.FwCfgItem = INVALID_FW_CFG_ITEM;
+  PlatformInfoHob->QemuFwCfgWorkArea.Offset    = 0;
+  PlatformInfoHob->QemuFwCfgWorkArea.Reading   = FALSE;
 
   if (!QemuFwCfgIsAvailable ()) {
     return EFI_UNSUPPORTED;
