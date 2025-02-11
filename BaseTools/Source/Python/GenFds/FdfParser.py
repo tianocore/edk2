@@ -266,6 +266,7 @@ class FdfParser:
         self._WipeOffArea = []
         if GenFdsGlobalVariable.WorkSpaceDir == '':
             GenFdsGlobalVariable.WorkSpaceDir = os.getenv("WORKSPACE")
+        self._XipDict = OrderedDict()
 
     ## _SkipWhiteSpace() method
     #
@@ -3911,6 +3912,18 @@ class FdfParser:
                 raise Warning("Auto alignment can only be used in PE32 or TE section ", self.FileName, self.CurrentLineNumber)
             EfiSectionObj.Alignment = self._Token
 
+        if self._IsKeyword("Xip"):
+            if not self._IsToken(TAB_EQUAL_SPLIT):
+                raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
+            if not self._GetNextWord():
+                raise Warning.Expected("Xip value (TRUE/FALSE)", self.FileName, self.CurrentLineNumber)
+            XipValue = self._Token.strip().upper()
+            if XipValue not in {"TRUE", "FALSE"}:
+                raise Warning("Invalid Xip value '%s'" % XipValue, self.FileName, self.CurrentLineNumber)
+            EfiSectionObj.Xip = XipValue
+            if Obj.FvFileType not in self._XipDict:
+                self._XipDict[Obj.FvFileType] = XipValue
+
         if self._IsKeyword('RELOCS_STRIPPED') or self._IsKeyword('RELOCS_RETAINED'):
             if self._SectionCouldHaveRelocFlag(EfiSectionObj.SectionType):
                 if self._Token == 'RELOCS_STRIPPED':
@@ -4528,6 +4541,14 @@ class FdfParser:
     def GetAllIncludedFile (self):
         global AllIncludeFileList
         return AllIncludeFileList
+
+    def AddXipInfoIntoJson(self, XipFile, XipDict):
+        XipDir = os.path.dirname(XipFile)
+        if not os.path.exists(XipDir):
+            os.makedirs(XipDir)
+        with open(XipFile, "w") as f:
+            for key, value in XipDict.items():
+                f.write(f"{key}: {value}\n")
 
 if __name__ == "__main__":
     import sys

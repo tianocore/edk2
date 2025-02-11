@@ -31,6 +31,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <io.h>
 #endif
 #include <assert.h>
+#include <ctype.h>
 
 #include <Guid/FfsSectionAlignmentPadding.h>
 
@@ -131,6 +132,10 @@ BOOLEAN                     mIsLargeFfs = FALSE;
 
 EFI_PHYSICAL_ADDRESS mFvBaseAddress[0x10];
 UINT32               mFvBaseAddressNumber = 0;
+UINTN                ModuleTableCount = 0;
+UINTN                ModuleTypeCount = 0;
+STATIC MODULE_XIP_INFO      ModuleXipList[MAX_MODULES_TYPE];
+STATIC FILE_MODULE_TYPE     FileModuleTable[MAX_NUMBER_OF_FILES_IN_FV];
 
 EFI_STATUS
 ParseFvInf (
@@ -2904,6 +2909,7 @@ Returns:
     //
     // Add the file
     //
+    StoreModuleType(mFvDataInfo.FvFiles[Index]);
     Status = AddFile (&FvImageMemoryFile, &mFvDataInfo, Index, &VtfFileImage, FvMapFile, FvReportFile);
 
     //
@@ -3510,6 +3516,8 @@ Returns:
   UINT32                                FfsHeaderSize;
   UINT32                                CurSecHdrSize;
 
+  CONST CHAR8 *ModuleType;
+  BOOLEAN XipEnabled = FALSE;
   Index              = 0;
   MemoryImagePointer = NULL;
   TEImageHeader      = NULL;
@@ -3533,6 +3541,18 @@ Returns:
     return EFI_SUCCESS;
   }
 
+  ModuleType = GetFileModuleType(FileName);
+  if (FvInfo->ForceRebase == 1) {
+      for (UINTN i = 0; i < ModuleTypeCount; i++) {
+          if (strcmp(ModuleXipList[i].ModuleName, ModuleType) == 0) {
+              XipEnabled = ModuleXipList[i].XipEnabled;
+              break;
+          }
+      }
+      if (!XipEnabled) {
+          return EFI_SUCCESS;
+      }
+  }
 
   XipBase = FvInfo->BaseAddress + XipOffset;
 
@@ -4374,4 +4394,144 @@ Returns:
   VerboseMsg ("The size of the generated capsule image is %u bytes", (unsigned) CapSize);
 
   return EFI_SUCCESS;
+}
+
+EFI_STATUS
+ReadXipFile (
+  IN CONST CHAR8  *FilePath
+  )
+{
+    CHAR8 XipFileName[MAX_LONG_FILE_PATH];
+    FILE  *InputFile;
+    CHAR8 Line[MAX_XIP_LINE_LENGTH];
+    CHAR8 *Colon;
+
+
+    strcpy(XipFileName, FilePath);
+    CHAR8 *LastSlash = strrchr(XipFileName, '\\');
+    if (LastSlash != NULL) {
+        strcpy(LastSlash + 1, "Module_Xip");
+    } else {
+        strcpy(XipFileName, "Module_Xip");
+    }
+
+    InputFile = fopen (LongFilePath (XipFileName), "rb");
+    if (InputFile == NULL) {
+      Warning (NULL, 0, 0001, "Can not open the input file, please check if existed.", XipFileName);
+      return EFI_SUCCESS;
+    }
+
+    while (fgets(Line, sizeof(Line), InputFile)) {
+        Colon = strchr(Line, ':');
+        if (Colon != NULL) {
+            *Colon = '\0';
+            CHAR8 *Module = Line;
+            CHAR8 *Value = Colon + 2;
+
+            Value[strcspn(Value, "\r\n")] = '\0';
+            if (ModuleTypeCount < MAX_MODULES_TYPE) {
+                strncpy(ModuleXipList[ModuleTypeCount].ModuleName, Module, sizeof(ModuleXipList[ModuleTypeCount].ModuleName) - 1);
+                ModuleXipList[ModuleTypeCount].ModuleName[sizeof(ModuleXipList[ModuleTypeCount].ModuleName) - 1] = '\0';
+                if ((_stricmp(Value, "True") == 0) || (_stricmp(Value, "true") == 0)) {
+                    ModuleXipList[ModuleTypeCount].XipEnabled = TRUE;
+                } else {
+                    ModuleXipList[ModuleTypeCount].XipEnabled = FALSE;
+                }
+                ModuleTypeCount++;
+            }
+        }
+    }
+    fclose(InputFile);
+    return EFI_SUCCESS;
+}
+
+
+BOOLEAN
+IsModuleTypeRecorded (
+  IN CONST CHAR8  *FilePath
+  )
+{
+    for (UINTN Index = 0; Index < ModuleTableCount; Index++) {
+        if (strcmp(FileModuleTable[Index].FvFilePath, FilePath) == 0) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+
+VOID
+StoreModuleType (
+  IN CONST CHAR8  *FilePath
+  )
+{
+    CHAR8 ModuleTypePath[MAX_LONG_FILE_PATH];
+    FILE  *ModuleFile;
+    CHAR8 Line[128];
+    CHAR8 *LastSlash;
+
+    memset(ModuleTypePath, 0, sizeof(ModuleTypePath));
+    memset(Line, 0, sizeof(Line));
+
+    strncpy(ModuleTypePath, FilePath, sizeof(ModuleTypePath) - 1);
+    ModuleTypePath[sizeof(ModuleTypePath) - 1] = '\0';
+
+    LastSlash = strrchr(ModuleTypePath, '\\');
+    if (LastSlash == NULL) {
+        LastSlash = strrchr(ModuleTypePath, '/');
+    }
+
+    if (LastSlash != NULL) {
+        *(LastSlash + 1) = '\0';
+        strncat(ModuleTypePath, "Module_Type", sizeof(ModuleTypePath) - strlen(ModuleTypePath) - 1);
+    } else {
+        strncpy(ModuleTypePath, "Module_Type", sizeof(ModuleTypePath) - 1);
+        ModuleTypePath[sizeof(ModuleTypePath) - 1] = '\0';
+    }
+
+    if (IsModuleTypeRecorded(FilePath)) {
+        return;
+    }
+
+    ModuleFile = fopen(ModuleTypePath, "r");
+    if (ModuleFile != NULL) {
+        if (fgets(Line, sizeof(Line), ModuleFile) != NULL) {
+            Line[strcspn(Line, "\r\n")] = '\0';
+            CHAR8 *End = Line + strlen(Line) - 1;
+            while (End > Line && isspace(*End)) {
+                *End = '\0';
+                End--;
+            }
+        }
+        fclose(ModuleFile);
+    }
+    if (strlen(Line) == 0 || !isprint(Line[0])) {
+        strncpy(Line, "UNKNOWN", sizeof(Line) - 1);
+        Line[sizeof(Line) - 1] = '\0';
+        VerboseMsg("Module_Type file invalid or not found at %s. Defaulting to UNKNOWN.", ModuleTypePath);
+    }
+    if (ModuleTableCount < MAX_NUMBER_OF_FILES_IN_FV) {
+        strncpy(FileModuleTable[ModuleTableCount].FvFilePath, FilePath, MAX_LONG_FILE_PATH - 1);
+        FileModuleTable[ModuleTableCount].FvFilePath[MAX_LONG_FILE_PATH - 1] = '\0';
+
+        strncpy(FileModuleTable[ModuleTableCount].ModuleType, Line, sizeof(FileModuleTable[ModuleTableCount].ModuleType) - 1);
+        FileModuleTable[ModuleTableCount].ModuleType[sizeof(FileModuleTable[ModuleTableCount].ModuleType) - 1] = '\0';
+
+        ModuleTableCount++;
+        VerboseMsg("Added ModuleType: %s for FilePath: %.256s", Line, FilePath);
+    }
+}
+
+
+CONST CHAR8 *
+GetFileModuleType (
+  IN CONST CHAR8  *FilePath
+  )
+{
+    for (UINTN Index = 0; Index < ModuleTableCount; Index++) {
+        if (strcmp(FileModuleTable[Index].FvFilePath, FilePath) == 0) {
+          return FileModuleTable[Index].ModuleType;
+        }
+    }
+    return "UNKNOWN";
 }
