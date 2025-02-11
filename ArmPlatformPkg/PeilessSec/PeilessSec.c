@@ -93,6 +93,13 @@ SecMain (
                 __DATE__
                 );
   SerialPortWrite ((UINT8 *)Buffer, CharCount);
+  CharCount = AsciiSPrint (
+                           Buffer,
+                           sizeof (Buffer),
+                           "tl_base_pa from x3:  0x%lx\n\r",
+                           PcdGet64 (PcdTransferListBaseAddress)
+                           );
+  SerialPortWrite ((UINT8 *)Buffer, CharCount);
 
   // Initialize the Debug Agent for Source Level Debugging
   InitializeDebugAgent (DEBUG_AGENT_INIT_POSTMEM_SEC, NULL, NULL);
