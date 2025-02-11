@@ -61,6 +61,7 @@
   HobPrintLib
   CustomFdtNodeParserLib
   PcdLib
+  StackCheckLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid
