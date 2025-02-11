@@ -119,3 +119,6 @@
   gArmPlatformTokenSpaceGuid.PcdPL031RtcPpmAccuracy|300000000|UINT32|0x00000022
 
   gArmPlatformTokenSpaceGuid.PcdWatchdogCount|0x0|UINT32|0x00000033
+
+[PcdsPatchableInModule]
+  gArmPlatformTokenSpaceGuid.PcdTransferListBaseAddress|0x0|UINT64|0x00000046
