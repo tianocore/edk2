@@ -47,6 +47,7 @@
   PeCoffLib
   CpuLib
   HobPrintLib
+  StackCheckLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid
