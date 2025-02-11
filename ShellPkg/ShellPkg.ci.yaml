@@ -35,6 +35,7 @@
             "MdePkg/MdePkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
             "ShellPkg/ShellPkg.dec",
+            "EmbeddedPkg/EmbeddedPkg.dec",
             "NetworkPkg/NetworkPkg.dec"
         ],
         # For host based unit tests
