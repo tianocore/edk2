@@ -226,6 +226,15 @@ ErrorExit:
            This->DriverBindingHandle,
            ControllerHandle
            );
+    
+    if (gDiskIoPrivateDataTemplate.BlockIo2 != NULL) {
+      gBS->CloseProtocol (
+             ControllerHandle,
+             &gEfiBlockIoProtocolGuid,
+             This->DriverBindingHandle,
+             ControllerHandle
+             );
+    }
   }
 
 ErrorExit1:
