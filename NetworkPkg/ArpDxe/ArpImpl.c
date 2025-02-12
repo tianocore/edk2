@@ -1097,6 +1097,7 @@ ArpSendFrame (
   if (Packet == NULL) {
     DEBUG ((DEBUG_ERROR, "ArpSendFrame: Allocate memory for Packet failed.\n"));
     ASSERT (Packet != NULL);
+    goto CLEAN_EXIT;
   }
 
   TmpPtr = Packet;

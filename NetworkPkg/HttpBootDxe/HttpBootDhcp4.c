@@ -664,7 +664,9 @@ HttpBootDhcp4CallBack (
       if (Private->SelectIndex == 0) {
         Status = EFI_ABORTED;
       } else {
-        *NewPacket = &Private->OfferBuffer[Private->SelectIndex - 1].Dhcp4.Packet.Offer;
+        if (NewPacket != NULL) {
+          *NewPacket = &Private->OfferBuffer[Private->SelectIndex - 1].Dhcp4.Packet.Offer;
+        }
       }
 
       break;
