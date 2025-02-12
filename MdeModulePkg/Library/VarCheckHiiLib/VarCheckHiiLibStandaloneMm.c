@@ -57,7 +57,7 @@ VarCheckHiiLibReceiveHiiBinHandler (
   //
   // If input is invalid, stop processing this SMI
   //
-  if ((CommBuffer == NULL) || (CommBufferSize == NULL)) {
+  if ((DispatchHandle == NULL) || (CommBuffer == NULL) || (CommBufferSize == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -75,15 +75,15 @@ VarCheckHiiLibReceiveHiiBinHandler (
   }
 
   CopyMem (mMmReceivedVarCheckHiiBin, CommBuffer, mMmReceivedVarCheckHiiBinSize);
-  if (DispatchHandle != NULL) {
-    Status = gMmst->MmiHandlerUnRegister (DispatchHandle);
-  }
+
+  Status = gMmst->MmiHandlerUnRegister (DispatchHandle);
 
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: Failed to unregister handler - %r!\n", __func__, Status));
-  } else {
-    DEBUG ((DEBUG_INFO, "%a: Handler unregistered successfully.\n", __func__));
+    return Status;
   }
+
+  DEBUG ((DEBUG_INFO, "%a: Handler unregistered successfully.\n", __func__));
 
   return EFI_SUCCESS;
 }
