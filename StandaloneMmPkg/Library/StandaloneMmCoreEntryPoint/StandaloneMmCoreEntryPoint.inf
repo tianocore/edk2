@@ -24,6 +24,7 @@
 [Sources]
   RiscV64/StandaloneMmCoreEntryPoint.c
   RiscV64/EntryPoint.S
+  RiscV64/CreateHobList.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -34,3 +35,6 @@
   BaseLib
   DebugLib
   StackCheckLib
+[Guids]
+  gMpInformationHobGuid
+  gEfiMmPeiMmramMemoryReserveGuid

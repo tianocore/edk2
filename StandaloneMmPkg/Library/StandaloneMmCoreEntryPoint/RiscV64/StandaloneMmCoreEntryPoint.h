@@ -11,6 +11,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define __STANDALONEMMCORE_ENTRY_POINT_H__
 
 #include <Uefi.h>
+#include <Library/PeCoffLib.h>
+#include <Library/FvLib.h>
+
 typedef struct {
   UINT32    ProcessorId;
   UINT32    Package;
@@ -36,7 +39,14 @@ typedef struct {
 } EFI_RISCV_SMM_PAYLOAD_INFO;
 
 #define BOOT_INFO_STACK_BASE_OFFSET  24   // Used in assembly
+#define CPU_INFO_FLAG_PRIMARY_CPU    0x00000001
 STATIC_ASSERT (BOOT_INFO_STACK_BASE_OFFSET == OFFSET_OF (EFI_RISCV_SMM_PAYLOAD_INFO, MmStackBase));
+
+VOID *
+EFIAPI
+CreateHobListFromBootInfo (
+  IN       EFI_RISCV_SMM_PAYLOAD_INFO   *PayloadBootInfo
+  );
 
 /**
   The entry point of Standalone MM Foundation.
