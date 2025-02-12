@@ -55,6 +55,7 @@
   PeCoffLib
   PlatformSupportLib
   CpuLib
+  StackCheckLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid

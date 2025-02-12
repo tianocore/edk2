@@ -51,6 +51,7 @@
   PrintLib
   SerialPortLib
   TimerLib
+  StackCheckLib
 
 [Ppis]
   gArmMpCoreInfoPpiGuid

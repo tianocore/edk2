@@ -71,6 +71,7 @@
       # Generators
       #   Common
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiFadtLib/AcpiFadtLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSratLib/AcpiSratLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSpmiLib/AcpiSpmiLib.inf
       #   X64 specific
       NULL|DynamicTablesPkg/Library/Acpi/X64/AcpiFacsLib/AcpiFacsLib.inf
