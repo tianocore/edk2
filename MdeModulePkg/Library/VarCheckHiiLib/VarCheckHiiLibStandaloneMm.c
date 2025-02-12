@@ -58,7 +58,7 @@ VarCheckHiiLibReceiveHiiBinHandler (
   // If input is invalid, stop processing this SMI
   //
   if ((CommBuffer == NULL) || (CommBufferSize == NULL)) {
-    return EFI_SUCCESS;
+    return EFI_INVALID_PARAMETER;
   }
 
   mMmReceivedVarCheckHiiBinSize = *CommBufferSize;
