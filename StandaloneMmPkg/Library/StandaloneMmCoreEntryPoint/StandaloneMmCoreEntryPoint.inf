@@ -35,6 +35,10 @@
   BaseLib
   DebugLib
   StackCheckLib
+
+[LibraryClasses.RISCV64]
+  RiscVSbiLib
+  CommonRiscvMpxyLib
 [Guids]
   gMpInformationHobGuid
   gEfiMmPeiMmramMemoryReserveGuid
