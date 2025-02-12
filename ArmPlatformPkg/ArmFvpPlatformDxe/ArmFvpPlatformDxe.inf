@@ -1,0 +1,46 @@
+## @file
+#  The ArmFvpPlatformDxe performs the platform specific initialization like:
+#  - It captures the Transfer List HOB and installs the DeviceTree if it's present.
+#
+#  Copyright (c) 2024, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = ArmFvpPlatformDxe
+  FILE_GUID                      = E7B7452E-1B5B-452D-A45E-30E0A23B5B95
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ArmFvpPlatformDxeEntryPoint
+
+[Sources]
+  ArmFvpPlatformDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  ArmPlatformLib
+  ArmTransferListLib
+  FdtLib
+  HobLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+
+[Guids]
+  gTlHobGuid
+  gFdtHobGuid
+  gEdkiiPlatformHasDeviceTreeGuid
+
+[Depex]
+  TRUE
