@@ -55,6 +55,7 @@ READ_LOCK_STATUS   = TRUE
   INF StandaloneMmPkg/Core/StandaloneMmCore.inf
   INF StandaloneMmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
   INF OvmfPkg/VirtNorFlashDxe/VirtNorFlashStandaloneMm.inf
+  INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm.inf
 
 ################################################################################
 #
