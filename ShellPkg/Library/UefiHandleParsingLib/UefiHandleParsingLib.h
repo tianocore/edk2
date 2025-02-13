@@ -63,7 +63,6 @@
 #include <Protocol/ScsiIo.h>
 #include <Protocol/IScsiInitiatorName.h>
 #include <Protocol/UsbIo.h>
-#include <Protocol/UsbHostController.h>
 #include <Protocol/Usb2HostController.h>
 #include <Protocol/DebugSupport.h>
 #include <Protocol/DebugPort.h>
