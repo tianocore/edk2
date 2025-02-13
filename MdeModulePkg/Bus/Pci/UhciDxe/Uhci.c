@@ -1330,8 +1330,7 @@ UhciDriverEntryPoint (
 }
 
 /**
-  Test to see if this driver supports ControllerHandle. Any
-  ControllerHandle that has UsbHcProtocol installed will be supported.
+  Test to see if this driver supports ControllerHandle.
 
   @param  This                 Protocol instance pointer.
   @param  Controller           Handle of device to test.
