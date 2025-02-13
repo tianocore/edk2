@@ -13,7 +13,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Uefi.h>
 
 #include <Protocol/Usb2HostController.h>
-#include <Protocol/UsbHostController.h>
 #include <Protocol/PciIo.h>
 
 #include <Guid/EventGroup.h>
@@ -148,8 +147,7 @@ extern EFI_COMPONENT_NAME_PROTOCOL   gUhciComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gUhciComponentName2;
 
 /**
-  Test to see if this driver supports ControllerHandle. Any
-  ControllerHandle that has UsbHcProtocol installed will be supported.
+  Test to see if this driver supports ControllerHandle.
 
   @param  This                 Protocol instance pointer.
   @param  Controller           Handle of device to test.
