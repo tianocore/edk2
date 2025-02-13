@@ -52,7 +52,6 @@ Abstract:
 #include <Protocol/PciRootBridgeIo.h>
 #include <Protocol/S3SaveState.h>
 #include <Protocol/DxeSmmReadyToLock.h>
-#include <Protocol/LoadedImage.h>
 
 #include <Guid/Acpi.h>
 #include <Guid/SmBios.h>
