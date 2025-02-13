@@ -80,6 +80,7 @@ FatLoadFatEntry (
   @return  The value of the FAT entry.
 
 **/
+STATIC
 UINTN
 FatGetFatEntry (
   IN FAT_VOLUME  *Volume,

@@ -96,6 +96,14 @@ FatAllocateVolume (
   }
 
   //
+  // Initialize cache
+  //
+  Status = FatInitializeDiskCache (Volume);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  //
   // Install our protocol interfaces on the device's handle
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
@@ -229,7 +237,6 @@ FatOpenDevice (
   UINTN                 SectorsPerFat;
   UINT8                 SectorsPerClusterAlignment;
   UINT8                 BlockAlignment;
-  UINTN                 ReservedFatEntry;
 
   //
   // Read the FAT_BOOT_SECTOR BPB info
@@ -416,58 +423,7 @@ FatOpenDevice (
   // We are now defining FAT Type
   //
   Volume->FatType = FatType;
-
-  //
-  // Initialize cache before we use the helper functions that hit the cache
-  //
-  Status = FatInitializeDiskCache (Volume);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Check the reserved FAT entries to ensure they contain valid values
-  //
-  ReservedFatEntry = FatGetFatEntry (Volume, 0);
-  if (Volume->FatEntryBuffer == MAX_UINT32) {
-    return EFI_VOLUME_CORRUPTED;
-  }
-
-  // Reserved FAT entry 0 should contain the BPB_MEDIA byte value in the low 8 bits with all other bits set to 1
-  switch (FatType) {
-    case Fat12:
-      if ((ReservedFatEntry & FAT_CLUSTER_MASK_FAT12) != ((UINTN)FatBs.FatBsb.Media | 0xF00)) {
-        return EFI_VOLUME_CORRUPTED;
-      }
-
-      break;
-
-    case Fat16:
-      if ((ReservedFatEntry & FAT_CLUSTER_MASK_FAT16) != ((UINTN)FatBs.FatBsb.Media | 0xFF00)) {
-        return EFI_VOLUME_CORRUPTED;
-      }
-
-      break;
-
-    case Fat32:
-      // the upper 4 bits of a FAT32 entry are reserved, so are unchecked here
-      if ((ReservedFatEntry & FAT_CLUSTER_MASK_FAT32) != ((UINTN)FatBs.FatBsb.Media | 0x0FFFFF00)) {
-        return EFI_VOLUME_CORRUPTED;
-      }
-
-      break;
-
-    default:
-      return EFI_VOLUME_CORRUPTED;
-  }
-
-  // Reserved FAT entry 1 should contain the end of chain mark. On FAT16 and FAT32, the high 2 bits may be used as
-  // dirty and hardware error bits, so are ignored in this check, but FatGetFatEntry already ignores them to unify the
-  // logic across FAT types
-  ReservedFatEntry = FatGetFatEntry (Volume, 1);
-  if ((Volume->FatEntryBuffer == MAX_UINT32) || !FAT_END_OF_FAT_CHAIN (ReservedFatEntry)) {
-    return EFI_VOLUME_CORRUPTED;
-  }
+  ASSERT (FatType != FatUndefined);
 
   return EFI_SUCCESS;
 }
