@@ -2,6 +2,7 @@
   Produces Simple Text Input Protocol, Simple Text Input Extended Protocol and
   Simple Text Output Protocol upon Serial IO Protocol.
 
+Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -114,7 +115,10 @@ TERMINAL_DEV  mTerminalDevTemplate = {
 TERMINAL_CONSOLE_MODE_DATA  mTerminalConsoleModeData[] = {
   { 80,  25 },
   { 80,  50 },
-  { 100, 31 },
+  { 100, 31 },  //  800 x 600
+  { 128, 40 },  // 1024 x 768
+  { 160, 42 },  // 1280 x 800
+  { 240, 56 },  // 1920 x 1080
   //
   // New modes can be added here.
   //
