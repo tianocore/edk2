@@ -155,6 +155,7 @@
   gArmVirtTokenSpaceGuid.PcdTpm2SupportEnabled|$(TPM2_ENABLE)
 
 !if $(QEMU_PV_VARS) == TRUE
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuVarsRequire|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache|FALSE
 !endif
 
