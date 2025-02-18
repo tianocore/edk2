@@ -976,10 +976,19 @@ typedef union {
   UINT8    Data;
 } PROCESSOR_STATUS_DATA;
 
+#ifdef MDE_CPU_AARCH64
+typedef struct {
+  UINT16    SocId;
+  UINT8     SipId;
+  UINT8     SipBankIndex;
+  UINT32    SocRevision;
+} PROCESSOR_ID_DATA;
+#else
 typedef struct {
   PROCESSOR_SIGNATURE        Signature;
   PROCESSOR_FEATURE_FLAGS    FeatureFlags;
 } PROCESSOR_ID_DATA;
+#endif
 
 ///
 /// Processor Information (Type 4).
