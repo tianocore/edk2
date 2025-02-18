@@ -1173,6 +1173,35 @@ typedef struct {
 } SMBIOS_TABLE_TYPE6;
 
 ///
+/// Cache Information - Configuration.
+///
+typedef struct {
+  UINT16    CacheLevel    : 3;
+  UINT16    CacheSocketed : 1;
+  UINT16    Reserved      : 1;
+  UINT16    Location      : 2;
+  UINT16    Enabled       : 1;
+  UINT16    OperationMode : 2;
+  UINT16    Reserved2     : 6;
+} CACHE_CONFIGURATION_DATA;
+
+///
+/// Cache Information - Size
+///
+typedef struct {
+  UINT16    Size           : 15;
+  UINT16    Granularity64K : 1;
+} CACHE_SIZE;
+
+///
+/// Cache Information - Size 2
+///
+typedef struct {
+  UINT32    Size           : 31;
+  UINT32    Granularity64K : 1;
+} CACHE_SIZE_2;
+
+///
 /// Cache Information - SRAM Type.
 ///
 typedef struct {
@@ -1241,8 +1270,8 @@ typedef struct {
   SMBIOS_STRUCTURE        Hdr;
   SMBIOS_TABLE_STRING     SocketDesignation;
   UINT16                  CacheConfiguration;
-  UINT16                  MaximumCacheSize;
-  UINT16                  InstalledSize;
+  CACHE_SIZE              MaximumCacheSize;
+  CACHE_SIZE              InstalledSize;
   CACHE_SRAM_TYPE_DATA    SupportedSRAMType;
   CACHE_SRAM_TYPE_DATA    CurrentSRAMType;
   UINT8                   CacheSpeed;
@@ -1252,8 +1281,8 @@ typedef struct {
   //
   // Add for smbios 3.1.0
   //
-  UINT32                  MaximumCacheSize2;
-  UINT32                  InstalledSize2;
+  CACHE_SIZE_2            MaximumCacheSize2;
+  CACHE_SIZE_2            InstalledSize2;
 } SMBIOS_TABLE_TYPE7;
 
 ///
