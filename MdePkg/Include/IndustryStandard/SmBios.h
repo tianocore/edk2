@@ -997,10 +997,26 @@ typedef union {
   UINT8    Data;
 } PROCESSOR_STATUS_DATA;
 
+#ifdef MDE_CPU_AARCH64
+// This structure assumes Arm64 SoC ID is supported
+typedef struct {
+  UINT16    SocId;
+  UINT8     SipId;
+  UINT8     SipBankIndex;
+  UINT32    SocRevision;
+} PROCESSOR_ID_DATA;
+#elif defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 typedef struct {
   PROCESSOR_SIGNATURE        Signature;
   PROCESSOR_FEATURE_FLAGS    FeatureFlags;
 } PROCESSOR_ID_DATA;
+#else
+// Please define PROCESSOR_ID_DATA for your architecture
+typedef struct {
+  PROCESSOR_SIGNATURE        Signature;
+  PROCESSOR_FEATURE_FLAGS    FeatureFlags;
+} PROCESSOR_ID_DATA;
+#endif
 
 ///
 /// Processor Information (Type 4).
