@@ -133,7 +133,7 @@ FspGlobalDataInit (
   UINTN  Idx;
 
   //
-  // Set FSP Global Data pointer
+  // Set FSP Global Data pointer when FSP runs in API mode
   //
   SetFspGlobalDataPointer (PeiFspData);
   ZeroMem ((VOID *)PeiFspData, sizeof (FSP_GLOBAL_DATA));
@@ -141,6 +141,7 @@ FspGlobalDataInit (
   PeiFspData->Signature = FSP_GLOBAL_DATA_SIGNATURE;
   PeiFspData->Version   = FSP_GLOBAL_DATA_VERSION;
   PeiFspData->CoreStack = BootLoaderStack;
+  PeiFspData->FspMode   = FSP_IN_API_MODE;
   PeiFspData->PerfIdx   = 2;
   PeiFspData->PerfSig   = FSP_PERFORMANCE_DATA_SIGNATURE;
   //
