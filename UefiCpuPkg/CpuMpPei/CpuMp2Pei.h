@@ -1,12 +1,19 @@
 /** @file
-  EFI_PEI_MP_SERVICES2_PPI Implementation code.
+  Definitions to install Multiple Processor 2 PPI.
 
-  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2025, Loongson Technology Corporation Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "CpuMp2Pei.h"
+#ifndef _CPU_MP2_PEI_H_
+#define _CPU_MP2_PEI_H_
+
+#include "CpuMpPei.h"
+#include <Ppi/MpServices2.h>
+
+extern EFI_PEI_MP_SERVICES2_PPI  mMpServices2Ppi;
 
 /**
   This service retrieves the number of logical processor in the platform
@@ -28,6 +35,8 @@
   is returned in NumberOfProcessors, the number of currently enabled processor
   is returned in NumberOfEnabledProcessors, and EFI_SUCCESS is returned.
 
+  @param[in]  PeiServices         An indirect pointer to the PEI Services Table
+                                  published by the PEI Foundation.
   @param[in]  This                Pointer to this instance of the PPI.
   @param[out] NumberOfProcessors  Pointer to the total number of logical processors in
                                   the system, including the BSP and disabled APs.
@@ -46,17 +55,7 @@ PeiGetNumberOfProcessors2 (
   IN  EFI_PEI_MP_SERVICES2_PPI  *This,
   OUT UINTN                     *NumberOfProcessors,
   OUT UINTN                     *NumberOfEnabledProcessors
-  )
-{
-  if ((NumberOfProcessors == NULL) || (NumberOfEnabledProcessors == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  return MpInitLibGetNumberOfProcessors (
-           NumberOfProcessors,
-           NumberOfEnabledProcessors
-           );
-}
+  );
 
 /**
   Gets detailed MP-related information on the requested processor at the
@@ -71,6 +70,8 @@ PeiGetNumberOfProcessors2 (
   slot numbers is all considered platform-related information and is not provided
   by this service.
 
+  @param[in]  PeiServices         An indirect pointer to the PEI Services Table
+                                  published by the PEI Foundation.
   @param[in]  This                Pointer to this instance of the PPI.
   @param[in]  ProcessorNumber     Pointer to the total number of logical processors in
                                   the system, including the BSP and disabled APs.
@@ -88,10 +89,7 @@ PeiGetProcessorInfo2 (
   IN  EFI_PEI_MP_SERVICES2_PPI   *This,
   IN  UINTN                      ProcessorNumber,
   OUT EFI_PROCESSOR_INFORMATION  *ProcessorInfoBuffer
-  )
-{
-  return MpInitLibGetProcessorInfo (ProcessorNumber, ProcessorInfoBuffer, NULL);
-}
+  );
 
 /**
   This service executes a caller provided function on all enabled APs. APs can
@@ -109,12 +107,12 @@ PeiGetProcessorInfo2 (
 
   If the timeout specified by TimeoutInMicroSeconds expires before all APs return
   from Procedure, then Procedure on the failed APs is terminated. All enabled APs
-  are always available for further calls to EFI_PEI_MP_SERVICES2_PPI.StartupAllAPs()
-  and EFI_PEI_MP_SERVICES2_PPI.StartupThisAP(). If FailedCpuList is not NULL, its
+  are always available for further calls to EFI_PEI_MP_SERVICES_PPI.StartupAllAPs()
+  and EFI_PEI_MP_SERVICES_PPI.StartupThisAP(). If FailedCpuList is not NULL, its
   content points to the list of processor handle numbers in which Procedure was
   terminated.
 
-  Note: It is the responsibility of the consumer of the EFI_PEI_MP_SERVICES2_PPI.StartupAllAPs()
+  Note: It is the responsibility of the consumer of the EFI_PEI_MP_SERVICES_PPI.StartupAllAPs()
   to make sure that the nature of the code that is executed on the BSP and the
   dispatched APs is well controlled. The MP Services Ppi does not guarantee
   that the Procedure function is MP-safe. Hence, the tasks that can be run in
@@ -125,7 +123,9 @@ PeiGetProcessorInfo2 (
   In blocking execution mode, BSP waits until all APs finish or
   TimeoutInMicroSeconds expires.
 
-  @param[in] This                 A pointer to the EFI_PEI_MP_SERVICES2_PPI instance.
+  @param[in] PeiServices          An indirect pointer to the PEI Services Table
+                                  published by the PEI Foundation.
+  @param[in] This                 A pointer to the EFI_PEI_MP_SERVICES_PPI instance.
   @param[in] Procedure            A pointer to the function to be run on enabled APs of
                                   the system.
   @param[in] SingleThread         If TRUE, then all the enabled APs execute the function
@@ -139,8 +139,8 @@ PeiGetProcessorInfo2 (
                                   means infinity. If the timeout expires before all APs
                                   return from Procedure, then Procedure on the failed APs
                                   is terminated. All enabled APs are available for next
-                                  function assigned by EFI_PEI_MP_SERVICES2_PPI.StartupAllAPs()
-                                  or EFI_PEI_MP_SERVICES2_PPI.StartupThisAP(). If the
+                                  function assigned by EFI_PEI_MP_SERVICES_PPI.StartupAllAPs()
+                                  or EFI_PEI_MP_SERVICES_PPI.StartupThisAP(). If the
                                   timeout expires in blocking mode, BSP returns
                                   EFI_TIMEOUT.
   @param[in] ProcedureArgument    The parameter passed into Procedure for all APs.
@@ -162,17 +162,7 @@ PeiStartupAllAPs2 (
   IN  BOOLEAN                   SingleThread,
   IN  UINTN                     TimeoutInMicroSeconds,
   IN  VOID                      *ProcedureArgument      OPTIONAL
-  )
-{
-  return MpInitLibStartupAllAPs (
-           Procedure,
-           SingleThread,
-           NULL,
-           TimeoutInMicroSeconds,
-           ProcedureArgument,
-           NULL
-           );
-}
+  );
 
 /**
   This service lets the caller get one enabled AP to execute a caller-provided
@@ -186,24 +176,26 @@ PeiStartupAllAPs2 (
 
   If the timeout specified by TimeoutInMicroseconds expires before the AP returns
   from Procedure, then execution of Procedure by the AP is terminated. The AP is
-  available for subsequent calls to EFI_PEI_MP_SERVICES2_PPI.StartupAllAPs() and
-  EFI_PEI_MP_SERVICES2_PPI.StartupThisAP().
+  available for subsequent calls to EFI_PEI_MP_SERVICES_PPI.StartupAllAPs() and
+  EFI_PEI_MP_SERVICES_PPI.StartupThisAP().
 
-  @param[in] This                 A pointer to the EFI_PEI_MP_SERVICES2_PPI instance.
+  @param[in] PeiServices          An indirect pointer to the PEI Services Table
+                                  published by the PEI Foundation.
+  @param[in] This                 A pointer to the EFI_PEI_MP_SERVICES_PPI instance.
   @param[in] Procedure            A pointer to the function to be run on enabled APs of
                                   the system.
   @param[in] ProcessorNumber      The handle number of the AP. The range is from 0 to the
                                   total number of logical processors minus 1. The total
                                   number of logical processors can be retrieved by
-                                  EFI_PEI_MP_SERVICES2_PPI.GetNumberOfProcessors().
+                                  EFI_PEI_MP_SERVICES_PPI.GetNumberOfProcessors().
   @param[in] TimeoutInMicroseconds
                                   Indicates the time limit in microseconds for APs to
                                   return from Procedure, for blocking mode only. Zero
                                   means infinity. If the timeout expires before all APs
                                   return from Procedure, then Procedure on the failed APs
                                   is terminated. All enabled APs are available for next
-                                  function assigned by EFI_PEI_MP_SERVICES2_PPI.StartupAllAPs()
-                                  or EFI_PEI_MP_SERVICES2_PPI.StartupThisAP(). If the
+                                  function assigned by EFI_PEI_MP_SERVICES_PPI.StartupAllAPs()
+                                  or EFI_PEI_MP_SERVICES_PPI.StartupThisAP(). If the
                                   timeout expires in blocking mode, BSP returns
                                   EFI_TIMEOUT.
   @param[in] ProcedureArgument    The parameter passed into Procedure for all APs.
@@ -226,17 +218,7 @@ PeiStartupThisAP2 (
   IN  UINTN                     ProcessorNumber,
   IN  UINTN                     TimeoutInMicroseconds,
   IN  VOID                      *ProcedureArgument      OPTIONAL
-  )
-{
-  return MpInitLibStartupThisAP (
-           Procedure,
-           ProcessorNumber,
-           NULL,
-           TimeoutInMicroseconds,
-           ProcedureArgument,
-           NULL
-           );
-}
+  );
 
 /**
   This service switches the requested AP to be the BSP from that point onward.
@@ -251,11 +233,13 @@ PeiStartupThisAP2 (
   If the BSP cannot be switched prior to the return from this service, then
   EFI_UNSUPPORTED must be returned.
 
-  @param[in] This                 A pointer to the EFI_PEI_MP_SERVICES2_PPI instance.
+  @param[in] PeiServices          An indirect pointer to the PEI Services Table
+                                  published by the PEI Foundation.
+  @param[in] This                 A pointer to the EFI_PEI_MP_SERVICES_PPI instance.
   @param[in] ProcessorNumber      The handle number of the AP. The range is from 0 to the
                                   total number of logical processors minus 1. The total
                                   number of logical processors can be retrieved by
-                                  EFI_PEI_MP_SERVICES2_PPI.GetNumberOfProcessors().
+                                  EFI_PEI_MP_SERVICES_PPI.GetNumberOfProcessors().
   @param[in] EnableOldBSP         If TRUE, then the old BSP will be listed as an enabled
                                   AP. Otherwise, it will be disabled.
 
@@ -276,10 +260,7 @@ PeiSwitchBSP2 (
   IN  EFI_PEI_MP_SERVICES2_PPI  *This,
   IN  UINTN                     ProcessorNumber,
   IN  BOOLEAN                   EnableOldBSP
-  )
-{
-  return MpInitLibSwitchBSP (ProcessorNumber, EnableOldBSP);
-}
+  );
 
 /**
   This service lets the caller enable or disable an AP from this point onward.
@@ -295,16 +276,18 @@ PeiSwitchBSP2 (
   If the enable or disable AP operation cannot be completed prior to the return
   from this service, then EFI_UNSUPPORTED must be returned.
 
-  @param[in] This                 A pointer to the EFI_PEI_MP_SERVICES2_PPI instance.
+  @param[in] PeiServices          An indirect pointer to the PEI Services Table
+                                  published by the PEI Foundation.
+  @param[in] This                 A pointer to the EFI_PEI_MP_SERVICES_PPI instance.
   @param[in] ProcessorNumber      The handle number of the AP. The range is from 0 to the
                                   total number of logical processors minus 1. The total
                                   number of logical processors can be retrieved by
-                                  EFI_PEI_MP_SERVICES2_PPI.GetNumberOfProcessors().
+                                  EFI_PEI_MP_SERVICES_PPI.GetNumberOfProcessors().
   @param[in] EnableAP             Specifies the new state for the processor for enabled,
                                   FALSE for disabled.
   @param[in] HealthFlag           If not NULL, a pointer to a value that specifies the
                                   new health status of the AP. This flag corresponds to
-                                  StatusFlag defined in EFI_PEI_MP_SERVICES2_PPI.GetProcessorInfo().
+                                  StatusFlag defined in EFI_PEI_MP_SERVICES_PPI.GetProcessorInfo().
                                   Only the PROCESSOR_HEALTH_STATUS_BIT is used. All other
                                   bits are ignored. If it is NULL, this parameter is
                                   ignored.
@@ -324,11 +307,8 @@ PeiEnableDisableAP2 (
   IN  EFI_PEI_MP_SERVICES2_PPI  *This,
   IN  UINTN                     ProcessorNumber,
   IN  BOOLEAN                   EnableAP,
-  IN  UINT32                    *HealthFlag OPTIONAL
-  )
-{
-  return MpInitLibEnableDisableAP (ProcessorNumber, EnableAP, HealthFlag);
-}
+  IN  UINT32                    *HealthFlag      OPTIONAL
+  );
 
 /**
   This return the handle number for the calling processor.  This service may be
@@ -337,16 +317,18 @@ PeiEnableDisableAP2 (
   This service returns the processor handle number for the calling processor.
   The returned value is in the range from 0 to the total number of logical
   processors minus 1. The total number of logical processors can be retrieved
-  with EFI_PEI_MP_SERVICES2_PPI.GetNumberOfProcessors(). This service may be
+  with EFI_PEI_MP_SERVICES_PPI.GetNumberOfProcessors(). This service may be
   called from the BSP and APs. If ProcessorNumber is NULL, then EFI_INVALID_PARAMETER
   is returned. Otherwise, the current processors handle number is returned in
   ProcessorNumber, and EFI_SUCCESS is returned.
 
-  @param[in]  This                A pointer to the EFI_PEI_MP_SERVICES2_PPI instance.
+  @param[in]  PeiServices         An indirect pointer to the PEI Services Table
+                                  published by the PEI Foundation.
+  @param[in]  This                A pointer to the EFI_PEI_MP_SERVICES_PPI instance.
   @param[out] ProcessorNumber     The handle number of the AP. The range is from 0 to the
                                   total number of logical processors minus 1. The total
                                   number of logical processors can be retrieved by
-                                  EFI_PEI_MP_SERVICES2_PPI.GetNumberOfProcessors().
+                                  EFI_PEI_MP_SERVICES_PPI.GetNumberOfProcessors().
 
   @retval EFI_SUCCESS             The current processor handle number was returned in
                                   ProcessorNumber.
@@ -357,10 +339,7 @@ EFIAPI
 PeiWhoAmI2 (
   IN  EFI_PEI_MP_SERVICES2_PPI  *This,
   OUT UINTN                     *ProcessorNumber
-  )
-{
-  return MpInitLibWhoAmI (ProcessorNumber);
-}
+  );
 
 /**
   This service executes a caller provided function on all enabled CPUs. CPUs can
@@ -392,25 +371,6 @@ PeiStartupAllCPUs2 (
   IN  EFI_AP_PROCEDURE          Procedure,
   IN  UINTN                     TimeoutInMicroSeconds,
   IN  VOID                      *ProcedureArgument      OPTIONAL
-  )
-{
-  return MpInitLibStartupAllCPUs (
-           Procedure,
-           TimeoutInMicroSeconds,
-           ProcedureArgument
-           );
-}
+  );
 
-//
-// CPU MP2 PPI to be installed
-//
-EFI_PEI_MP_SERVICES2_PPI  mMpServices2Ppi = {
-  PeiGetNumberOfProcessors2,
-  PeiGetProcessorInfo2,
-  PeiStartupAllAPs2,
-  PeiStartupThisAP2,
-  PeiSwitchBSP2,
-  PeiEnableDisableAP2,
-  PeiWhoAmI2,
-  PeiStartupAllCPUs2
-};
+#endif
