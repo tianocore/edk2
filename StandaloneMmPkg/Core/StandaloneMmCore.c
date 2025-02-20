@@ -799,10 +799,6 @@ StandaloneMmMain (
 
   DEBUG ((DEBUG_INFO, "MmMain - 0x%x\n", HobStart));
 
-  DEBUG_CODE (
-    PrintHobList (HobStart, NULL);
-    );
-
   //
   // Extract the MMRAM ranges from the MMRAM descriptor HOB
   //
@@ -848,6 +844,10 @@ StandaloneMmMain (
   gHobList = InitializeMmHobList (HobStart, MmramRanges, MmramRangeCount);
 
   ProcessLibraryConstructorList (gHobList, &gMmCoreMmst);
+
+  DEBUG_CODE (
+    PrintHobList (gHobList, NULL);
+    );
 
   //
   // Register notification for EFI_MM_CONFIGURATION_PROTOCOL registration and
