@@ -64,8 +64,8 @@ typedef struct {
 } PROGRAM_CPU_REGISTER_FLAGS;
 
 typedef union {
-  EFI_MP_SERVICES_PROTOCOL      *Protocol;
-  EDKII_PEI_MP_SERVICES2_PPI    *Ppi;
+  EFI_MP_SERVICES_PROTOCOL    *Protocol;
+  EFI_PEI_MP_SERVICES2_PPI    *Ppi;
 } MP_SERVICES;
 
 typedef struct {

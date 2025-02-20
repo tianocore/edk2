@@ -15,12 +15,12 @@
 #include <InternalCpuCacheInfoLib.h>
 
 /**
-  Get EDKII_PEI_MP_SERVICES2_PPI pointer.
+  Get EFI_PEI_MP_SERVICES2_PPI pointer.
 
-  @param[out] MpServices    A pointer to the buffer where EDKII_PEI_MP_SERVICES2_PPI is stored
+  @param[out] MpServices    A pointer to the buffer where EFI_PEI_MP_SERVICES2_PPI is stored
 
-  @retval EFI_SUCCESS       EDKII_PEI_MP_SERVICES2_PPI interface is returned
-  @retval EFI_NOT_FOUND     EDKII_PEI_MP_SERVICES2_PPI interface is not found
+  @retval EFI_SUCCESS       EFI_PEI_MP_SERVICES2_PPI interface is returned
+  @retval EFI_NOT_FOUND     EFI_PEI_MP_SERVICES2_PPI interface is not found
 **/
 EFI_STATUS
 CpuCacheInfoGetMpServices (
@@ -29,7 +29,7 @@ CpuCacheInfoGetMpServices (
 {
   EFI_STATUS  Status;
 
-  Status = PeiServicesLocatePpi (&gEdkiiPeiMpServices2PpiGuid, 0, NULL, (VOID **)&MpServices->Ppi);
+  Status = PeiServicesLocatePpi (&gEfiPeiMpServices2PpiGuid, 0, NULL, (VOID **)&MpServices->Ppi);
   ASSERT_EFI_ERROR (Status);
 
   return Status;

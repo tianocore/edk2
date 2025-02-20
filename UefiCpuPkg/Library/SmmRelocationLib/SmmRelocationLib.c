@@ -166,9 +166,9 @@ SmmInitHandler (
 **/
 VOID
 SmmRelocateBases (
-  IN EDKII_PEI_MP_SERVICES2_PPI  *MpServices2,
-  IN EFI_PHYSICAL_ADDRESS        SmmRelocationStart,
-  IN UINTN                       TileSize
+  IN EFI_PEI_MP_SERVICES2_PPI  *MpServices2,
+  IN EFI_PHYSICAL_ADDRESS      SmmRelocationStart,
+  IN UINTN                     TileSize
   )
 {
   EFI_STATUS                 Status;
@@ -424,7 +424,7 @@ SplitSmramHobForSmmRelocation (
 EFI_STATUS
 EFIAPI
 SmmRelocationInit (
-  IN EDKII_PEI_MP_SERVICES2_PPI  *MpServices2
+  IN EFI_PEI_MP_SERVICES2_PPI  *MpServices2
   )
 {
   EFI_STATUS            Status;

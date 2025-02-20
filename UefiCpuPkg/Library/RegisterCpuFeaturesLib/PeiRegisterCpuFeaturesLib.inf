@@ -45,7 +45,7 @@
   IoLib
 
 [Ppis]
-  gEdkiiPeiMpServices2PpiGuid                                          ## CONSUMES
+  gEfiPeiMpServices2PpiGuid                                            ## CONSUMES
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuS3DataAddress                        ## CONSUMES
@@ -54,4 +54,4 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesSetting                      ## CONSUMES ## PRODUCES
 
 [Depex]
-  gEdkiiPeiMpServices2PpiGuid AND gEdkiiCpuFeaturesSetDoneGuid
+  gEfiPeiMpServices2PpiGuid AND gEdkiiCpuFeaturesSetDoneGuid
