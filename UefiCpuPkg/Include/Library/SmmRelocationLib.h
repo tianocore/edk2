@@ -36,7 +36,7 @@
 EFI_STATUS
 EFIAPI
 SmmRelocationInit (
-  IN EDKII_PEI_MP_SERVICES2_PPI  *MpServices2
+  IN EFI_PEI_MP_SERVICES2_PPI  *MpServices2
   );
 
 #endif
