@@ -1,5 +1,5 @@
 ## @file
-# PEIM that unit tests the EdkiiPeiMpServices2Ppi
+# PEIM that unit tests the EfiPeiMpServices2Ppi
 #
 # Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -8,7 +8,7 @@
 
 [Defines]
   INF_VERSION     = 0x00010005
-  BASE_NAME       = EdkiiPeiMpServices2PpiPeiUnitTest
+  BASE_NAME       = EfiPeiMpServices2PpiPeiUnitTest
   FILE_GUID       = A4914810-4D1E-445E-BD6F-F6821B852B5D
   MODULE_TYPE     = PEIM
   VERSION_STRING  = 1.0
@@ -23,7 +23,7 @@
 [Sources]
   EfiMpServicesUnitTestCommom.c
   EfiMpServicesUnitTestCommom.h
-  EdkiiPeiMpServices2PpiUnitTest.c
+  EfiPeiMpServices2PpiUnitTest.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -40,7 +40,7 @@
   UnitTestLib
 
 [Ppis]
-  gEdkiiPeiMpServices2PpiGuid           ## CONSUMES
+  gEfiPeiMpServices2PpiGuid           ## CONSUMES
 
 [Depex]
-  gEdkiiPeiMpServices2PpiGuid
+  gEfiPeiMpServices2PpiGuid
