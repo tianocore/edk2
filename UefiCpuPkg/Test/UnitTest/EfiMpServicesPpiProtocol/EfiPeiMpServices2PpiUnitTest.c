@@ -1,5 +1,5 @@
 /** @file
-  PEI Module to test APIs defined in EdkiiPeiMpServices2Ppi.
+  PEI Module to test APIs defined in EfiPeiMpServices2Ppi.
 
   Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
 
@@ -11,23 +11,23 @@
 #include <Library/PeiServicesLib.h>
 #include "EfiMpServicesUnitTestCommom.h"
 
-#define UNIT_TEST_NAME     "EdkiiPeiMpServices2Ppi Unit Test"
+#define UNIT_TEST_NAME     "EfiPeiMpServices2Ppi Unit Test"
 #define UNIT_TEST_VERSION  "0.1"
 
 /**
-  Get EDKII_PEI_MP_SERVICES2_PPI pointer.
+  Get EFI_PEI_MP_SERVICES2_PPI pointer.
 
-  @param[out] MpServices    Pointer to the buffer where EDKII_PEI_MP_SERVICES2_PPI is stored.
+  @param[out] MpServices    Pointer to the buffer where EFI_PEI_MP_SERVICES2_PPI is stored.
 
-  @retval EFI_SUCCESS       EDKII_PEI_MP_SERVICES2_PPI interface is returned
-  @retval EFI_NOT_FOUND     EDKII_PEI_MP_SERVICES2_PPI interface is not found
+  @retval EFI_SUCCESS       EFI_PEI_MP_SERVICES2_PPI interface is returned
+  @retval EFI_NOT_FOUND     EFI_PEI_MP_SERVICES2_PPI interface is not found
 **/
 EFI_STATUS
 MpServicesUnitTestGetMpServices (
   OUT MP_SERVICES  *MpServices
   )
 {
-  return PeiServicesLocatePpi (&gEdkiiPeiMpServices2PpiGuid, 0, NULL, (VOID **)&MpServices->Ppi);
+  return PeiServicesLocatePpi (&gEfiPeiMpServices2PpiGuid, 0, NULL, (VOID **)&MpServices->Ppi);
 }
 
 /**
@@ -375,7 +375,7 @@ TestStartupAllCPUs3 (
 }
 
 /**
-  Create test suite and unit tests only for EdkiiPeiMpServices2Ppi.
+  Create test suite and unit tests only for EfiPeiMpServices2Ppi.
 
   @param[in]  Framework     A pointer to the framework that is being persisted.
   @param[in]  Context       A pointer to the private data buffer.
@@ -384,7 +384,7 @@ TestStartupAllCPUs3 (
   @retval     Others        Create test suite and unit tests unsuccessfully.
 **/
 EFI_STATUS
-AddTestCaseOnlyForEdkiiPeiMpServices2Ppi (
+AddTestCaseOnlyForEfiPeiMpServices2Ppi (
   IN  UNIT_TEST_FRAMEWORK_HANDLE  Framework,
   IN  MP_SERVICE_UT_CONTEXT       *Context
   )
@@ -412,7 +412,7 @@ AddTestCaseOnlyForEdkiiPeiMpServices2Ppi (
 
 /**
   Standard PEIM entry point for unit test execution from PEI.
-  Initialize the unit test framework, suite, and unit tests for the EdkiiPeiMpServices2Ppi and run the unit test.
+  Initialize the unit test framework, suite, and unit tests for the EfiPeiMpServices2Ppi and run the unit test.
 
   @param[in]  FileHandle              Handle of the file being invoked.
   @param[in]  PeiServices             Pointer to PEI Services table.
@@ -446,16 +446,16 @@ PeiEntryPoint (
   }
 
   //
-  // Create test suite and unit tests only for EdkiiPeiMpServices2Ppi.
+  // Create test suite and unit tests only for EfiPeiMpServices2Ppi.
   //
-  Status = AddTestCaseOnlyForEdkiiPeiMpServices2Ppi (Framework, &Context);
+  Status = AddTestCaseOnlyForEfiPeiMpServices2Ppi (Framework, &Context);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Failed in AddTestCaseOnlyForEdkiiPeiMpServices2Ppi. Status = %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "Failed in AddTestCaseOnlyForEfiPeiMpServices2Ppi. Status = %r\n", Status));
     goto EXIT;
   }
 
   //
-  // Create test suite and unit tests for both EdkiiPeiMpServices2Ppi and EfiMpServiceProtocol.
+  // Create test suite and unit tests for both EfiPeiMpServices2Ppi and EfiMpServiceProtocol.
   //
   Status = AddCommonTestCase (Framework, &Context);
   if (EFI_ERROR (Status)) {
