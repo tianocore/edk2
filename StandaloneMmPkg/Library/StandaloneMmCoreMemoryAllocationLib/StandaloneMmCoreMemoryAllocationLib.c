@@ -10,14 +10,11 @@
 
 #include <PiMm.h>
 
-#include <Guid/MmramMemoryReserve.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
-#include <Library/HobLib.h>
-#include "StandaloneMmCoreMemoryAllocationServices.h"
 
-static EFI_MM_SYSTEM_TABLE  *mMemoryAllocationMmst = NULL;
+EFI_MM_SYSTEM_TABLE  *mMemoryAllocationMmst = NULL;
 
 /**
   Allocates one or more 4KB pages of a certain memory type.
@@ -826,82 +823,4 @@ FreePool (
 
   Status = mMemoryAllocationMmst->MmFreePool (Buffer);
   ASSERT_EFI_ERROR (Status);
-}
-
-/**
-  The constructor function calls MmInitializeMemoryServices to initialize
-  memory in MMRAM and caches EFI_MM_SYSTEM_TABLE pointer.
-
-  @param  [in]  ImageHandle     The firmware allocated handle for the EFI image.
-  @param  [in]  MmSystemTable   A pointer to the Management mode System Table.
-
-  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
-
-**/
-EFI_STATUS
-EFIAPI
-MemoryAllocationLibConstructor (
-  IN EFI_HANDLE           ImageHandle,
-  IN EFI_MM_SYSTEM_TABLE  *MmSystemTable
-  )
-{
-  VOID                            *HobStart;
-  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHobData;
-  EFI_MMRAM_DESCRIPTOR            *MmramRanges;
-  UINTN                           MmramRangeCount;
-  EFI_HOB_GUID_TYPE               *MmramRangesHob;
-
-  HobStart = GetHobList ();
-  DEBUG ((DEBUG_INFO, "StandaloneMmCoreMemoryAllocationLibConstructor - 0x%x\n", HobStart));
-
-  //
-  // Search for a Hob containing the MMRAM ranges
-  //
-  MmramRangesHob = GetNextGuidHob (&gEfiSmmSmramMemoryGuid, HobStart);
-  if (MmramRangesHob == NULL) {
-    MmramRangesHob = GetNextGuidHob (&gEfiMmPeiMmramMemoryReserveGuid, HobStart);
-    if (MmramRangesHob == NULL) {
-      return EFI_UNSUPPORTED;
-    }
-  }
-
-  MmramRangesHobData = GET_GUID_HOB_DATA (MmramRangesHob);
-  if (MmramRangesHobData == NULL) {
-    return EFI_UNSUPPORTED;
-  }
-
-  MmramRanges = MmramRangesHobData->Descriptor;
-  if (MmramRanges == NULL) {
-    return EFI_UNSUPPORTED;
-  }
-
-  MmramRangeCount = (UINTN)MmramRangesHobData->NumberOfMmReservedRegions;
-  if (MmramRanges == NULL) {
-    return EFI_UNSUPPORTED;
-  }
-
-  {
-    UINTN  Index;
-
-    DEBUG ((DEBUG_INFO, "MmramRangeCount - 0x%x\n", MmramRangeCount));
-    for (Index = 0; Index < MmramRangeCount; Index++) {
-      DEBUG ((
-        DEBUG_INFO,
-        "MmramRanges[%d]: 0x%016lx - 0x%016lx\n",
-        Index,
-        MmramRanges[Index].CpuStart,
-        MmramRanges[Index].PhysicalSize
-        ));
-    }
-  }
-
-  //
-  // Initialize memory service using free MMRAM
-  //
-  DEBUG ((DEBUG_INFO, "MmInitializeMemoryServices\n"));
-  MmInitializeMemoryServices ((UINTN)MmramRangeCount, (VOID *)(UINTN)MmramRanges);
-
-  // Initialize MM Services Table
-  mMemoryAllocationMmst = MmSystemTable;
-  return EFI_SUCCESS;
 }
