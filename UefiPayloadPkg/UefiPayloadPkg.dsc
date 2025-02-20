@@ -22,7 +22,11 @@
   SUPPORTED_ARCHITECTURES             = IA32|X64
   BUILD_TARGETS                       = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER                    = DEFAULT
+!ifdef BUILD_ARCH
   OUTPUT_DIRECTORY                    = Build/UefiPayloadPkg$(BUILD_ARCH)
+!else
+  OUTPUT_DIRECTORY                    = Build/UefiPayloadPkg
+!endif
   FLASH_DEFINITION                    = UefiPayloadPkg/UefiPayloadPkg.fdf
   PCD_DYNAMIC_AS_DYNAMICEX            = TRUE
 
