@@ -169,6 +169,10 @@ IsValidCapsuleHeader (
   IN UINT64              CapsuleSize
   )
 {
+  if (CapsuleHeader == NULL) {
+    return FALSE;
+  }
+
   if (CapsuleHeader->CapsuleImageSize != CapsuleSize) {
     return FALSE;
   }
