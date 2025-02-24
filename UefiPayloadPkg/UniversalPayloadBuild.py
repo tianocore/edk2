@@ -137,6 +137,9 @@ def BuildUniversalPayload(Args):
     elif Args.Arch == 'RISCV64':
         BuildArch      = "RISCV64"
         FitArch        = "RISCV64"
+    elif Args.Arch == 'AARCH64':
+        BuildArch      = "AARCH64"
+        FitArch        = "AARCH64"
     else:
         print("Incorrect arch option provided")
 
@@ -312,7 +315,7 @@ def main():
     parser = argparse.ArgumentParser(description='For building Universal Payload')
     parser.add_argument('-t', '--ToolChain')
     parser.add_argument('-b', '--Target', default='DEBUG')
-    parser.add_argument('-a', '--Arch', choices=['IA32', 'X64', 'RISCV64'], help='Specify the ARCH for payload entry module. Default build X64 image.', default ='X64')
+    parser.add_argument('-a', '--Arch', choices=['IA32', 'X64', 'RISCV64', 'AARCH64'], help='Specify the ARCH for payload entry module. Default build X64 image.', default ='X64')
     parser.add_argument("-D", "--Macro", action="append", default=["UNIVERSAL_PAYLOAD=TRUE"])
     parser.add_argument('-i', '--ImageId', type=str, help='Specify payload ID (16 bytes maximal).', default ='UEFI')
     parser.add_argument('-q', '--Quiet', action='store_true', help='Disable all build messages except FATAL ERRORS.')
