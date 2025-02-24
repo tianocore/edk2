@@ -4,6 +4,7 @@
 # Provides drivers and definitions to create uefi payload for bootloaders.
 #
 # Copyright (c) 2014 - 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2024, Google LLC.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -153,31 +154,52 @@ INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 INF MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
 INF MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
 
-!if $(CRYPTO_PROTOCOL_SUPPORT) == TRUE
-!if $(CRYPTO_DRIVER_EXTERNAL_SUPPORT) == FALSE
-INF CryptoPkg/Driver/CryptoDxe.inf
-!endif
-!endif
-!if $(SECURITY_STUB_ENABLE) == TRUE
-INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
-!endif
-INF UefiCpuPkg/CpuDxe/CpuDxe.inf
+!if "X64" IN "$(ARCH)"
+  INF UefiCpuPkg/CpuDxe/CpuDxe.inf
+  INF MdeModulePkg/Universal/Metronome/Metronome.inf
+  INF PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
 
-!if $(TIMER_SUPPORT) == "HPET"
-INF PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
-!elseif $(TIMER_SUPPORT) == "LAPIC"
-INF OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
+  !if $(CRYPTO_PROTOCOL_SUPPORT) == TRUE
+    !if $(CRYPTO_DRIVER_EXTERNAL_SUPPORT) == FALSE
+      INF CryptoPkg/Driver/CryptoDxe.inf
+    !endif
+  !endif
+
+  !if $(TIMER_SUPPORT) == "HPET"
+    INF PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
+  !elseif $(TIMER_SUPPORT) == "LAPIC"
+    INF OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
+  !endif
+!elseif "AARCH64" IN "$(ARCH)"
+  INF ArmPkg/Drivers/CpuDxe/CpuDxe.inf
+  INF ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf
+  INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
+
+  INF EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
+  INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
+  INF OvmfPkg/PlatformHasAcpiDtDxe/PlatformHasAcpiDtDxe.inf
+  INF UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf
+  INF OvmfPkg/Virtio10Dxe/Virtio10.inf
+  INF OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
+  INF OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
+  INF OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
+
+  INF OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
+  INF OvmfPkg/PlatformDxe/Platform.inf
 !endif
-INF MdeModulePkg/Universal/Metronome/Metronome.inf
-INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+
+!if $(SECURITY_STUB_ENABLE) == TRUE
+  INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+!endif
+
 INF MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
 INF MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
+INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 
 !if $(DISABLE_RESET_SYSTEM) == FALSE
 INF MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
 !endif
-INF PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
 !if $(PERFORMANCE_MEASUREMENT_ENABLE)
   INF MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
 !endif
