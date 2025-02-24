@@ -325,6 +325,9 @@ MnpInstanceDeliverPacket (
   }
 
   ASSERT (Instance->RcvdPacketQueueSize != 0);
+  if (Instance->RcvdPacketQueueSize <= 0) {
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   RxDataWrap = NET_LIST_HEAD (&Instance->RcvdPacketQueue, MNP_RXDATA_WRAP, WrapEntry);
   if (RxDataWrap->Nbuf->RefCnt > 2) {
