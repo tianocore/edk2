@@ -1,7 +1,7 @@
 /** @file
   MM Core Main Entry Point
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2025, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -797,13 +797,7 @@ StandaloneMmMain (
   EFI_MMRAM_DESCRIPTOR            *MmramRanges;
   UINTN                           MmramRangeCount;
 
-  ProcessLibraryConstructorList (HobStart, &gMmCoreMmst);
-
   DEBUG ((DEBUG_INFO, "MmMain - 0x%x\n", HobStart));
-
-  DEBUG_CODE (
-    PrintHobList (HobStart, NULL);
-    );
 
   //
   // Extract the MMRAM ranges from the MMRAM descriptor HOB
@@ -838,15 +832,22 @@ StandaloneMmMain (
   }
 
   //
-  // No need to initialize memory service.
-  // It is done in the constructor of StandaloneMmCoreMemoryAllocationLib(),
-  // so that the library linked with StandaloneMmCore can use AllocatePool() in
-  // the constructor.
+  // Initialize memory service using free MMRAM
   //
+  DEBUG ((DEBUG_INFO, "MmInitializeMemoryServices\n"));
+  MmInitializeMemoryServices (MmramRangeCount, MmramRanges);
+  mMemoryAllocationMmst = &gMmCoreMmst;
+
   //
   // Install HobList
   //
   gHobList = InitializeMmHobList (HobStart, MmramRanges, MmramRangeCount);
+
+  ProcessLibraryConstructorList (gHobList, &gMmCoreMmst);
+
+  DEBUG_CODE (
+    PrintHobList (gHobList, NULL);
+    );
 
   //
   // Register notification for EFI_MM_CONFIGURATION_PROTOCOL registration and
