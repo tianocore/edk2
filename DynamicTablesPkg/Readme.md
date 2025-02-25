@@ -501,6 +501,12 @@ The CM_OBJECT_ID type is used to identify the Configuration Manager
 |  26   | TPM Interface Info                        | |
 |  27   | SPMI Interface Info                       | |
 |  28   | SPMI Interrupt and Device/Uid Info        | |
+|  29   | Processor C-State Control Info            | |
+|  30   | Processor C-State Dependency Info         | |
+|  31   | Processor P-State Control Info            | |
+|  32   | Processor P-State Status Info             | |
+|  33   | Processor P-State Capability Info         | |
+|  34   | _STA Device Status Info                   | |
 |  `*`  | All other values are reserved.            | |
 
 #### Object ID's in the X64 Namespace:
@@ -525,4 +531,5 @@ The CM_OBJECT_ID type is used to identify the Configuration Manager
 |  15   | Interrupt Source Override info            | |
 |  16   | Local APIC and X2APIC NMI info            | |
 |  17   | FACS Information                          | |
+|  18   | Local APIC and X2APIC Affinity info       | |
 |  `*`  | All other values are reserved.            | |
