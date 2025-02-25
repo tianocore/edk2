@@ -134,6 +134,8 @@ steps:
       UPDATE_LOG.txt
       PREVALLOG.txt
       TestSuites.xml
+      **/*.elf
+      **/*.fit
       **/BUILD_TOOLS_REPORT.html
       **/OVERRIDELOG.TXT
       BASETOOLS_BUILD*.*
