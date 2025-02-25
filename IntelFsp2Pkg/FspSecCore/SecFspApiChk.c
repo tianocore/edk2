@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2016 - 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2025, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -9,6 +9,9 @@
 
 /**
   This function check the FSP API calling condition.
+
+  It updates the FSP API index and UPD data pointer in FSP global data
+  when FspSiliconInit and FspSmmInit are called.
 
   @param[in]  ApiIdx           Internal index of the FSP API.
   @param[in]  ApiParam         Parameter of the FSP API.
@@ -23,6 +26,7 @@ FspApiCallingCheck (
 {
   EFI_STATUS       Status;
   FSP_GLOBAL_DATA  *FspData;
+  FSP_INFO_HEADER  *FspInfoHeader;
 
   Status  = EFI_SUCCESS;
   FspData = GetFspGlobalDataPointer ();
@@ -108,11 +112,22 @@ FspApiCallingCheck (
   if (!EFI_ERROR (Status)) {
     if ((ApiIdx != FspMemoryInitApiIndex)) {
       //
-      // For FspMemoryInit, the global data is not valid yet
-      // The API index will be updated by SecCore after the global data
-      // is initialized
+      // Set "API Index" and "UPD Data Pointer" in FSP Global Data for FspSiliconInit and FspSmmInit
+      // For FspMemoryInit: The global data is not valid when code runs here.
+      //                    The 2 fields will be updated by SecCore after the global data is allocated in stack.
       //
       SetFspApiCallingIndex (ApiIdx);
+
+      if (ApiParam == NULL) {
+        FspInfoHeader = (FSP_INFO_HEADER *)AsmGetFspInfoHeader ();
+        ApiParam      = (VOID *)(UINTN)(FspInfoHeader->ImageBase + FspInfoHeader->CfgRegionOffset);
+      }
+
+      if (ApiIdx == FspSiliconInitApiIndex) {
+        SetFspSiliconInitUpdDataPointer (ApiParam);
+      } else if (ApiIdx == FspSmmInitApiIndex) {
+        SetFspSmmInitUpdDataPointer (ApiParam);
+      }
     }
   }
 
