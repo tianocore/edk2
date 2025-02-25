@@ -54,59 +54,71 @@ FitIsHobNeed (
   EFI_PEI_HOB_POINTERS  Hob
   )
 {
-  if (FixedPcdGetBool (PcdHandOffFdtEnable)) {
-    if (Hob.Header->HobType == EFI_HOB_TYPE_HANDOFF) {
+  //
+  // These HOBs are never needed.
+  //
+  if (Hob.Header->HobType == EFI_HOB_TYPE_HANDOFF) {
+    return FALSE;
+  }
+
+  //
+  // If handoff is in HOBs, then those not denied above are needed.
+  //
+  if (!FixedPcdGetBool (PcdHandOffFdtEnable)) {
+    return TRUE;
+  }
+
+  //
+  // This is a filtered allowlist. The pattern is a set of denials, falling back to permission.
+  //
+  if (Hob.Header->HobType == EFI_HOB_TYPE_MEMORY_ALLOCATION) {
+    if (CompareGuid (&Hob.MemoryAllocation->AllocDescriptor.Name, &gUniversalPayloadDeviceTreeGuid)) {
       return FALSE;
     }
 
-    if (Hob.Header->HobType == EFI_HOB_TYPE_MEMORY_ALLOCATION) {
-      if (CompareGuid (&Hob.MemoryAllocation->AllocDescriptor.Name, &gUniversalPayloadDeviceTreeGuid)) {
-        return FALSE;
-      }
-
-      if (CompareGuid (&Hob.MemoryAllocationModule->MemoryAllocationHeader.Name, &gEfiHobMemoryAllocModuleGuid)) {
-        return FALSE;
-      }
-
-      if ((Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiReservedMemoryType) ||
-          (Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiBootServicesCode) ||
-          (Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiBootServicesData) ||
-          (Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiRuntimeServicesCode) ||
-          (Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiRuntimeServicesData) ||
-          (Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiACPIReclaimMemory) ||
-          (Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiACPIMemoryNVS))
-      {
-        return FALSE;
-      }
+    if (CompareGuid (&Hob.MemoryAllocationModule->MemoryAllocationHeader.Name, &gEfiHobMemoryAllocModuleGuid)) {
+      return FALSE;
     }
 
-    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-      if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
-        return FALSE;
-      }
+    if ((Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiReservedMemoryType) ||
+        (Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiBootServicesCode) ||
+        (Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiBootServicesData) ||
+        (Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiRuntimeServicesCode) ||
+        (Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiRuntimeServicesData) ||
+        (Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiACPIReclaimMemory) ||
+        (Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiACPIMemoryNVS))
+    {
+      return FALSE;
     }
 
-    if (Hob.Header->HobType == EFI_HOB_TYPE_GUID_EXTENSION) {
-      if (CompareGuid (&Hob.Guid->Name, &gUniversalPayloadSmbios3TableGuid)) {
-        return FALSE;
-      }
-
-      if (CompareGuid (&Hob.Guid->Name, &gUniversalPayloadSerialPortInfoGuid)) {
-        return FALSE;
-      }
-
-      if (CompareGuid (&Hob.Guid->Name, &gUniversalPayloadAcpiTableGuid)) {
-        return FALSE;
-      }
-
-      if (CompareGuid (&Hob.Guid->Name, &gUniversalPayloadPciRootBridgeInfoGuid)) {
-        return FALSE;
-      }
-    }
+    // Arriving here means that the HOB is needed.
+    return TRUE;
   }
 
-  // Arrive here mean the HOB is need
-  return TRUE;
+  if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+    if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
+      return FALSE;
+    }
+
+    // Arriving here means that the HOB is needed.
+    return TRUE;
+  }
+
+  if (Hob.Header->HobType == EFI_HOB_TYPE_GUID_EXTENSION) {
+    if ((CompareGuid (&Hob.Guid->Name, &gUniversalPayloadSmbios3TableGuid)) ||
+        (CompareGuid (&Hob.Guid->Name, &gUniversalPayloadSerialPortInfoGuid)) ||
+        (CompareGuid (&Hob.Guid->Name, &gUniversalPayloadAcpiTableGuid)) ||
+        (CompareGuid (&Hob.Guid->Name, &gUniversalPayloadPciRootBridgeInfoGuid)))
+    {
+      return FALSE;
+    }
+
+    // Arriving here means that the HOB is needed.
+    return TRUE;
+  }
+
+  // All other HobTypes are denied by default.
+  return FALSE;
 }
 
 /**
@@ -124,9 +136,9 @@ CustomFdtNodeParser (
 {
   INT32                 Node, CustomNode;
   INT32                 TempLen;
+  CONST FDT_PROPERTY    *PropertyPtr;
   UINT64                *Data64;
   UINTN                 CHobList;
-  CONST FDT_PROPERTY    *PropertyPtr;
   EFI_PEI_HOB_POINTERS  Hob;
 
   CHobList = (UINTN)HobList;
@@ -143,10 +155,14 @@ CustomFdtNodeParser (
     if (CustomNode > 0) {
       DEBUG ((DEBUG_INFO, "  Found upl-custom node (%08X)", CustomNode));
       PropertyPtr = FdtGetProperty (FdtBase, CustomNode, "hoblistptr", &TempLen);
-      Data64      = (UINT64 *)(PropertyPtr->Data);
-      CHobList    = (UINTN)Fdt64ToCpu (ReadUnaligned64 (Data64));
-      DEBUG ((DEBUG_INFO, "  Found hob list node (%08X)", CustomNode));
-      DEBUG ((DEBUG_INFO, " -pointer  %016lX\n", CHobList));
+      if (PropertyPtr != NULL) {
+        Data64      = (UINT64 *)(PropertyPtr->Data);
+        CHobList    = (UINTN)Fdt64ToCpu (ReadUnaligned64 (Data64));
+        DEBUG ((DEBUG_INFO, "  Found hob list node (%08X) -pointer  %016lX\n", CustomNode, CHobList));
+      } else {
+        DEBUG ((DEBUG_INFO, "  Not Found hob list node\n"));
+        return CHobList;
+      }
     }
   }
 
