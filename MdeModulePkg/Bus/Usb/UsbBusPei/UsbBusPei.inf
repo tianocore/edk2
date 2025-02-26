@@ -50,11 +50,10 @@
 
 [Ppis]
   gPeiUsbIoPpiGuid                              ## PRODUCES
-  gPeiUsbHostControllerPpiGuid                  ## SOMETIMES_CONSUMES
-  gPeiUsb2HostControllerPpiGuid                 ## SOMETIMES_CONSUMES
+  gPeiUsb2HostControllerPpiGuid                 ## CONSUMES
 
 [Depex]
-  gEfiPeiMemoryDiscoveredPpiGuid AND gPeiUsb2HostControllerPpiGuid OR gPeiUsbHostControllerPpiGuid
+  gEfiPeiMemoryDiscoveredPpiGuid AND gPeiUsb2HostControllerPpiGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   UsbBusPeiExtra.uni

@@ -78,36 +78,20 @@ PeiUsbControlTransfer (
     }
   }
 
-  if (PeiUsbDev->Usb2HcPpi != NULL) {
-    Status = PeiUsbDev->Usb2HcPpi->ControlTransfer (
-                                     PeiServices,
-                                     PeiUsbDev->Usb2HcPpi,
-                                     PeiUsbDev->DeviceAddress,
-                                     PeiUsbDev->DeviceSpeed,
-                                     PeiUsbDev->MaxPacketSize0,
-                                     Request,
-                                     Direction,
-                                     Data,
-                                     &DataLength,
-                                     Timeout,
-                                     &(PeiUsbDev->Translator),
-                                     &TransferResult
-                                     );
-  } else {
-    Status = PeiUsbDev->UsbHcPpi->ControlTransfer (
-                                    PeiServices,
-                                    PeiUsbDev->UsbHcPpi,
-                                    PeiUsbDev->DeviceAddress,
-                                    PeiUsbDev->DeviceSpeed,
-                                    (UINT8)PeiUsbDev->MaxPacketSize0,
-                                    Request,
-                                    Direction,
-                                    Data,
-                                    &DataLength,
-                                    Timeout,
-                                    &TransferResult
-                                    );
-  }
+  Status = PeiUsbDev->Usb2HcPpi->ControlTransfer (
+                                   PeiServices,
+                                   PeiUsbDev->Usb2HcPpi,
+                                   PeiUsbDev->DeviceAddress,
+                                   PeiUsbDev->DeviceSpeed,
+                                   PeiUsbDev->MaxPacketSize0,
+                                   Request,
+                                   Direction,
+                                   Data,
+                                   &DataLength,
+                                   Timeout,
+                                   &(PeiUsbDev->Translator),
+                                   &TransferResult
+                                   );
 
   //
   // Reset the endpoint toggle when endpoint stall is cleared
@@ -200,35 +184,20 @@ PeiUsbBulkTransfer (
 
   OldToggle = DataToggle;
 
-  if (PeiUsbDev->Usb2HcPpi != NULL) {
-    Status = PeiUsbDev->Usb2HcPpi->BulkTransfer (
-                                     PeiServices,
-                                     PeiUsbDev->Usb2HcPpi,
-                                     PeiUsbDev->DeviceAddress,
-                                     DeviceEndpoint,
-                                     PeiUsbDev->DeviceSpeed,
-                                     MaxPacketLength,
-                                     Data2,
-                                     DataLength,
-                                     &DataToggle,
-                                     Timeout,
-                                     &(PeiUsbDev->Translator),
-                                     &TransferResult
-                                     );
-  } else {
-    Status = PeiUsbDev->UsbHcPpi->BulkTransfer (
-                                    PeiServices,
-                                    PeiUsbDev->UsbHcPpi,
-                                    PeiUsbDev->DeviceAddress,
-                                    DeviceEndpoint,
-                                    (UINT8)MaxPacketLength,
-                                    Data,
-                                    DataLength,
-                                    &DataToggle,
-                                    Timeout,
-                                    &TransferResult
-                                    );
-  }
+  Status = PeiUsbDev->Usb2HcPpi->BulkTransfer (
+                                   PeiServices,
+                                   PeiUsbDev->Usb2HcPpi,
+                                   PeiUsbDev->DeviceAddress,
+                                   DeviceEndpoint,
+                                   PeiUsbDev->DeviceSpeed,
+                                   MaxPacketLength,
+                                   Data2,
+                                   DataLength,
+                                   &DataToggle,
+                                   Timeout,
+                                   &(PeiUsbDev->Translator),
+                                   &TransferResult
+                                   );
 
   if (OldToggle != DataToggle) {
     PeiUsbDev->DataToggle = (UINT16)(PeiUsbDev->DataToggle ^ (1 << EndpointIndex));
@@ -332,7 +301,6 @@ PeiUsbPortReset (
 
   ResetRootPort (
     PeiServices,
-    PeiUsbDev->UsbHcPpi,
     PeiUsbDev->Usb2HcPpi,
     PeiUsbDev->DeviceAddress,
     0
