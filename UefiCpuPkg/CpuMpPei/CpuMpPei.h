@@ -35,8 +35,8 @@
 
 #include <Register/Cpuid.h>
 
-extern EDKII_PEI_MP_SERVICES2_PPI  mMpServices2Ppi;
-extern EFI_PEI_MP_SERVICES_PPI     mMpServicesPpi;
+extern EFI_PEI_MP_SERVICES2_PPI  mMpServices2Ppi;
+extern EFI_PEI_MP_SERVICES_PPI   mMpServicesPpi;
 
 /**
   This service retrieves the number of logical processor in the platform

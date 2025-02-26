@@ -1,5 +1,5 @@
 /** @file
-  Common header file for EdkiiPeiMpServices2Ppi and EfiMpServiceProtocol unit test.
+  Common header file for EfiPeiMpServices2Ppi and EfiMpServiceProtocol unit test.
 
   Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
 
@@ -23,8 +23,8 @@
 #define RUN_PROCEDURE_TIMEOUT_VALUE  100000  // microseconds
 
 typedef union {
-  EDKII_PEI_MP_SERVICES2_PPI    *Ppi;
-  EFI_MP_SERVICES_PROTOCOL      *Protocol;
+  EFI_PEI_MP_SERVICES2_PPI    *Ppi;
+  EFI_MP_SERVICES_PROTOCOL    *Protocol;
 } MP_SERVICES;
 
 typedef struct {
@@ -610,7 +610,7 @@ TestSwitchBSP4 (
   );
 
 /**
-  Create test suite and unit tests for both EdkiiPeiMpServices2Ppi and EfiMpServiceProtocol.
+  Create test suite and unit tests for both EfiPeiMpServices2Ppi and EfiMpServiceProtocol.
 
   @param[in]  Framework     A pointer to the framework that is being persisted.
   @param[in]  Context       A pointer to the private data buffer.
