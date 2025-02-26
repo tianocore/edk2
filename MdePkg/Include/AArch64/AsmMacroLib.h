@@ -43,12 +43,12 @@
 #define ASM_FUNC_ALIGN(Name, Align)  \
   _ASM_FUNC_ALIGN(ASM_PFX(Name), .text. ## Name, Align)
 
-#define MOV32(Reg, Val)                   \
-  movz      Reg, (Val) >> 16, lsl #16   ; \
+#define MOV32(Reg, Val)                             \
+  movz      Reg, ((Val) >> 16) & 0xffff, lsl #16  ; \
   movk      Reg, (Val) & 0xffff
 
 #define MOV64(Reg, Val)                             \
-  movz      Reg, (Val) >> 48, lsl #48             ; \
+  movz      Reg, ((Val) >> 48) & 0xffff, lsl #48  ; \
   movk      Reg, ((Val) >> 32) & 0xffff, lsl #32  ; \
   movk      Reg, ((Val) >> 16) & 0xffff, lsl #16  ; \
   movk      Reg, (Val) & 0xffff

@@ -43,7 +43,6 @@ FatGetBpbInfo (
   UINT64                  FatLba;
   UINT64                  RootLba;
   UINT64                  FirstClusterLba;
-  UINT32                  ReservedFatEntries[2];
 
   //
   // Read in the BPB
@@ -166,74 +165,6 @@ FatGetBpbInfo (
     }
 
     Volume->FatType = Volume->MaxCluster < 4085 ? Fat12 : Fat16;
-  }
-
-  //
-  // Read reserved FAT entries which are the first two entries from FatPos
-  //
-  Status = FatReadDisk (
-             PrivateData,
-             Volume->BlockDeviceNo,
-             Volume->FatPos,
-             (Volume->FatType == Fat32) ? sizeof (UINT32) * 2 : sizeof (UINT16) * 2,
-             ReservedFatEntries
-             );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Reserved FAT entry 0 should contain the BPB_MEDIA byte value in the low 8 bits with all other bits set to 1
-  // Reserved FAT entry 1 should contain the end of chain mark. On FAT16 and FAT32, the high 2 bits may be used as
-  // dirty and hardware error bits, so are ignored in this check
-  //
-  switch (Volume->FatType) {
-    case Fat12:
-      // we read two entries and in FAT12, each entry is 12 bits, so we need to shift the first entry by 20 bits to
-      // only read it and not the second entry and beyond
-      if (((ReservedFatEntries[0] >> 20) & FAT_CLUSTER_MASK_FAT12) != ((UINTN)Bpb.Media | 0xF00)) {
-        return EFI_VOLUME_CORRUPTED;
-      }
-
-      // the second entry starts 12 bits in and is 12 bits in length, so we shift by 8 bits to remove the start of the
-      // third entry and then mask to only read the second entry
-      if (!FAT_CLUSTER_END_OF_CHAIN (ReservedFatEntries[0] >> 8)) {
-        return EFI_VOLUME_CORRUPTED;
-      }
-
-      break;
-
-    case Fat16:
-      // in FAT16, each entry is 16 bits, so the first entry is the upper 16 bits of ReservedFatEntries[0]
-      if (((ReservedFatEntries[0] >> 16) & FAT_CLUSTER_MASK_FAT16) != ((UINTN)Bpb.Media | 0xFF00)) {
-        return EFI_VOLUME_CORRUPTED;
-      }
-
-      // the second entry is simply the lower 16 bits of ReservedFatEntries[0], however, we must ignore the upper two
-      // bits. For the purposes of checking if the EOC mark exists, we treat those two bits as 1
-      if (!FAT_CLUSTER_END_OF_CHAIN ((ReservedFatEntries[0] & 0x3FFF) | 0xC000)) {
-        return EFI_VOLUME_CORRUPTED;
-      }
-
-      break;
-
-    case Fat32:
-      // the upper 4 bits of a FAT32 entry are reserved, so are unchecked here
-      // FAT32 has 32 bit entries, so the first entry is ReservedFatEntries[0]
-      if ((ReservedFatEntries[0] & FAT_CLUSTER_MASK_FAT32) != ((UINTN)Bpb.Media | 0x0FFFFF00)) {
-        return EFI_VOLUME_CORRUPTED;
-      }
-
-      // the second entry is simply ReservedFatEntries[1], but we must ignore the upper two bits. For the purposes of
-      // checking if the EOC mark exists, we treat those two bits as 1
-      if (!FAT_CLUSTER_END_OF_CHAIN ((ReservedFatEntries[1] & 0x3FFFFFFF) | 0xC0000000)) {
-        return EFI_VOLUME_CORRUPTED;
-      }
-
-      break;
-
-    default:
-      return EFI_VOLUME_CORRUPTED;
   }
 
   return EFI_SUCCESS;
