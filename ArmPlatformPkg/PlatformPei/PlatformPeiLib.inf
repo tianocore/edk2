@@ -28,6 +28,8 @@
   DebugLib
   HobLib
   ArmPlatformLib
+  ArmTransferListLib
+  FdtLib
 
 [Ppis]
   gEfiPeiMasterBootModePpiGuid                  # PPI ALWAYS_PRODUCED
@@ -40,5 +42,12 @@
   gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmTokenSpaceGuid.PcdFvSize
 
+[PCD]
+  gArmPlatformTokenSpaceGuid.PcdTransferListBaseAddress
+
 [depex]
   TRUE
+
+[Guids]
+  gTlHobGuid
+  gFdtHobGuid
