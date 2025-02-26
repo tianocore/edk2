@@ -2668,3 +2668,80 @@ EfiBootManagerGetNextLoadOptionDevicePath (
 {
   return BmGetNextLoadOptionDevicePath (FilePath, FullPath);
 }
+
+/**
+  Variable policy protocol installation notification.
+
+  @param[in]    Event           The notification event.
+  @param[in]    Context         Pointer to the context registered when the event is created. Not used.
+
+**/
+VOID
+EFIAPI
+OnVariablePolicyNotification (
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
+  )
+{
+  EFI_STATUS                      Status;
+  EDKII_VARIABLE_POLICY_PROTOCOL  *VariablePolicy = NULL;
+
+  Status = gBS->LocateProtocol (&gEdkiiVariablePolicyProtocolGuid, NULL, (VOID **)&VariablePolicy);
+  if (!EFI_ERROR (Status)) {
+    Status = RegisterBasicVariablePolicy (
+               VariablePolicy,
+               &mBmHardDriveBootVariableGuid,
+               L"HDDP",
+               sizeof (EFI_DEVICE_PATH_PROTOCOL),
+               VARIABLE_POLICY_NO_MAX_SIZE,
+               EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+               (UINT32) ~(EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE),
+               VARIABLE_POLICY_TYPE_NO_LOCK
+               );
+
+    // Multiple modules link to UefiBootManagerLib. There are a couple of cases that need to be ignored.
+    // 1. Write Protected.  Write Protected occurs after Ready to Boot.  Some modules, such as the Shell, run
+    //                      after Ready To Boot.
+    // 2. Already Started.  Only the first module to register a variable policy will successfully register
+    //                      a policy. The subsequent modules will get EFI_ALREADY_STARTED.
+    if (EFI_ERROR (Status) && (Status != EFI_ALREADY_STARTED) && (Status != EFI_WRITE_PROTECTED)) {
+      DEBUG ((DEBUG_ERROR, "%a: - Error setting policy for HDDP - Status=%r\n", __func__, Status));
+      ASSERT_EFI_ERROR (Status);
+    }
+
+    if (Event != NULL) {
+      gBS->CloseEvent (Event);
+    }
+  } else {
+    DEBUG ((DEBUG_ERROR, "%a: - Unable to locate variable policy protocol - Status=%r\n", __func__, Status));
+  }
+}
+
+/**
+  Constructor for UefiBootMangerLib.
+
+  @param[in] ImageHandle  The handle of the loaded image.
+  @param[in] SystemTable  System resources and configuration
+
+  @retval EFI_SUCCESS   The constructor set the variable policy if implemented
+  @retval others        The constructor did not succeed and one or more variable policy are not set
+**/
+EFI_STATUS
+EFIAPI
+UefiBootManagerLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  VOID  *Registration;
+
+  EfiCreateProtocolNotifyEvent (
+    &gEdkiiVariablePolicyProtocolGuid,
+    TPL_CALLBACK,
+    OnVariablePolicyNotification,
+    NULL,
+    &Registration
+    );
+
+  return EFI_SUCCESS;
+}
