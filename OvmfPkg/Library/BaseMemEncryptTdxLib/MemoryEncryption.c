@@ -586,6 +586,8 @@ SetOrClearSharedBit (
     return EFI_DEVICE_ERROR;
   }
 
+  Status = EFI_SUCCESS;
+
   //
   // If changing shared to private, must accept-page again
   //
