@@ -1,0 +1,84 @@
+## @file
+# Azure Pipeline build file for building a platform.
+#
+# Platform: UEFIPAYLOADPKG
+# OS: Windows
+# Toolchain: VS2022
+#
+# Copyright (c) Microsoft Corporation.
+# Copyright (c) 2025, Intel Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+trigger:
+  - master
+  - stable/*
+pr:
+  - master
+  - stable/*
+
+variables:
+  - template: ../../../.azurepipelines/templates/defaults.yml
+
+jobs:
+  - job: Platform_CI
+    variables:
+      package: 'UefiPayloadPkg'
+      vm_image: 'windows-2022'
+      should_run: true
+
+    #Use matrix to speed up the build process
+    strategy:
+        matrix:
+          UefiPayloadPkg_ELF_X64_DEBUG:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "X64"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            Run.Flags: "BLD_*_NETWORK_DRIVER_ENABLE=1"
+            Run: $(should_run)
+          UefiPayloadPkg_ELF_X64_RELEASE:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "X64"
+            Build.Flags: "BLD_*_NETWORK_DRIVER_ENABLE=1"
+            Build.Target: "RELEASE"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          UefiPayloadPkg_FIT_X64_DEBUG:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "X64"
+            Build.Flags: "FIT_BUILD=TRUE BLD_*_NETWORK_DRIVER_ENABLE=1"
+            Build.Target: "DEBUG"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          UefiPayloadPkg_FIT_X64_RELEASE:
+            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
+            Build.Arch: "X64"
+            Build.Flags: "FIT_BUILD=TRUE BLD_*_NETWORK_DRIVER_ENABLE=1"
+            Build.Target: "RELEASE"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+
+    workspace:
+      clean: all
+
+    pool:
+      vmImage: $(vm_image)
+
+    steps:
+    - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
+      parameters:
+        tool_chain_tag: VS2022
+        build_pkg: $(package)
+        build_target: $(Build.Target)
+        build_arch: $(Build.Arch)
+        build_file: $(Build.File)
+        build_flags: $(Build.Flags)
+        run_flags: $(Run.Flags)
+        usePythonVersion: ${{ variables.default_python_version }}
+        extra_install_step:
+        - script: pip install pefile
+          displayName: 'Install pip pefile modules'
+        - script: pip install pylibfdt==1.7.2
+          displayName: 'Install pip pylibfdt modules'
+        - powershell: choco install llvm --version=12.0.0 --force; Write-Host "##vso[task.prependpath]C:\Program Files\LLVM\bin"
+          displayName: 'Install clang'
