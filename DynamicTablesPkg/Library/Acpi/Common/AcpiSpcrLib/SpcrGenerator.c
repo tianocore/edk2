@@ -351,6 +351,12 @@ BuildSpcrTableEx (
   AcpiSpcr.GlobalSystemInterrupt = SerialPortInfo->Interrupt;
 
   switch (SerialPortInfo->BaudRate) {
+    case 0:
+      // Baud rate 0 indicates that the OS should rely on the current UART
+      // configuration until the full driver is initialized.
+      AcpiSpcr.BaudRate =
+        EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_BAUD_RATE_AS_IS;
+      break;
     case 9600:
       AcpiSpcr.BaudRate =
         EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_BAUD_RATE_9600;
