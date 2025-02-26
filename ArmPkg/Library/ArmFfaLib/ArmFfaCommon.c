@@ -703,6 +703,18 @@ ArmFfaLibMsgSendDirectReq2 (
   FfaArgs.Arg5 = ImpDefArgs->Arg1;
   FfaArgs.Arg6 = ImpDefArgs->Arg2;
   FfaArgs.Arg7 = ImpDefArgs->Arg3;
+  if (FixedPcdGetBool (PcdSxcUse18Registers)) {
+    FfaArgs.Arg8  = ImpDefArgs->Arg4;
+    FfaArgs.Arg9  = ImpDefArgs->Arg5;
+    FfaArgs.Arg10 = ImpDefArgs->Arg6;
+    FfaArgs.Arg11 = ImpDefArgs->Arg7;
+    FfaArgs.Arg12 = ImpDefArgs->Arg8;
+    FfaArgs.Arg13 = ImpDefArgs->Arg9;
+    FfaArgs.Arg14 = ImpDefArgs->Arg10;
+    FfaArgs.Arg15 = ImpDefArgs->Arg11;
+    FfaArgs.Arg16 = ImpDefArgs->Arg12;
+    FfaArgs.Arg17 = ImpDefArgs->Arg13;
+  }
 
   ArmCallFfa (&FfaArgs);
 
@@ -715,6 +727,18 @@ ArmFfaLibMsgSendDirectReq2 (
   ImpDefArgs->Arg1 = FfaArgs.Arg5;
   ImpDefArgs->Arg2 = FfaArgs.Arg6;
   ImpDefArgs->Arg3 = FfaArgs.Arg7;
+  if (FixedPcdGetBool (PcdSxcUse18Registers)) {
+    ImpDefArgs->Arg4  = FfaArgs.Arg8;
+    ImpDefArgs->Arg5  = FfaArgs.Arg9;
+    ImpDefArgs->Arg6  = FfaArgs.Arg10;
+    ImpDefArgs->Arg7  = FfaArgs.Arg11;
+    ImpDefArgs->Arg8  = FfaArgs.Arg12;
+    ImpDefArgs->Arg9  = FfaArgs.Arg13;
+    ImpDefArgs->Arg10 = FfaArgs.Arg14;
+    ImpDefArgs->Arg11 = FfaArgs.Arg15;
+    ImpDefArgs->Arg12 = FfaArgs.Arg16;
+    ImpDefArgs->Arg13 = FfaArgs.Arg17;
+  }
 
   return EFI_SUCCESS;
 }
