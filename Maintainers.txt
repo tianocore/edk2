@@ -67,8 +67,10 @@ Tianocore Stewards
 ------------------
 F: *
 M: Andrew Fish <afish@apple.com> [ajfish]
+M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 M: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
+M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 
 Responsible Disclosure, Reporting Security Issues
 -------------------------------------------------
@@ -91,7 +93,7 @@ M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 RISCV64
 F: */RiscV64/
 M: Sunil V L <sunilvl@ventanamicro.com> [vlsunil]
-R: Andrei Warkentin <andrei.warkentin@intel.com> [andreiw]
+R: Andrei Warkentin <andyw@imsa.edu> [andreiw]
 
 LOONGARCH64
 F: */LoongArch64/
@@ -200,7 +202,9 @@ M: Abner Chang <abner.chang@amd.com> [changab]
 EmulatorPkg
 F: EmulatorPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmulatorPkg
+M: Oliver Smith-Denny <osde@microsoft.com> [os-d]
 M: Andrew Fish <afish@apple.com> [ajfish]
+M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 S: Maintained
 
@@ -239,7 +243,6 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFsp2WrapperPkg
 M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
 M: Duggapu Chinni B <chinni.b.duggapu@intel.com> [cbduggap]
-M: Chen Gang C <gang.c.chen@intel.com> [chengangc]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 R: Ted Kuo <ted.kuo@intel.com> [tedkuo1]
 R: Ashraf Ali S <ashraf.ali.s@intel.com> [AshrafAliS]
@@ -554,7 +557,7 @@ R: Anthony Perard <anthony@xenproject.org> [tperard]
 OvmfPkg: RISC-V Qemu Virt Platform
 F: OvmfPkg/RiscVVirt
 M: Sunil V L <sunilvl@ventanamicro.com> [vlsunil]
-R: Andrei Warkentin <andrei.warkentin@intel.com> [andreiw]
+R: Andrei Warkentin <andyw@imsa.edu> [andreiw]
 
 OvmfPkg: LOONGARCH Qemu Virt Platform
 F: OvmfPkg/LoongArchVirt
@@ -571,9 +574,11 @@ PrmPkg
 F: PrmPkg/
 M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
+M: Aaron Li <aaron.li@intel.com> [Li-Aaron]
 
 PrmPkg: ACPI related modules
 R: Ankit Sinha <ankit.sinha@intel.com> [ankit13s]
+R: Aaron Li <aaron.li@intel.com> [Li-Aaron]
 
 RedfishPkg: Redfish related modules
 F: RedfishPkg/

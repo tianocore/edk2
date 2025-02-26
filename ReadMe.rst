@@ -61,8 +61,6 @@ OvmfPkg_Ubuntu_GCC5_          | IA32            |op32du|      |op32ru|      |op3
 |                             | IA32 X64 FULL   |op3264fdu|   |op3264fru|   |op3264fru|
 ============================= ================= ============= ============= ==============
 
-|TCBZ_2668|_ - EmulatorPkg Ubuntu GCC5 Segfaults during execution.
-
 |TCBZ_2639|_ - EmulatorPkg Ubuntu GCC5 Segfaults during execution.
 
 `More ArmVirtPkg CI Build Information <ArmVirtPkg/PlatformCI/ReadMe.md>`__
@@ -121,7 +119,6 @@ Resources
    II <https://github.com/tianocore/tianocore.github.io/wiki/Getting-Started-with-EDK-II>`__
 -  `Mailing
    Lists <https://github.com/tianocore/tianocore.github.io/wiki/Mailing-Lists>`__
--  `TianoCore Bugzilla <https://bugzilla.tianocore.org>`__
 -  `How To
    Contribute <https://github.com/tianocore/tianocore.github.io/wiki/How-To-Contribute>`__
 -  `Release
@@ -310,11 +307,8 @@ use.
 
 .. EmulatorPkg
 
-.. |TCBZ_2668| image:: https://img.shields.io/bugzilla/2668?baseUrl=https%3A%2F%2Fbugzilla.tianocore.org
-.. _TCBZ_2668: https://bugzilla.tianocore.org/show_bug.cgi?id=2668
-
-.. |TCBZ_2639| image:: https://img.shields.io/bugzilla/2639?baseUrl=https%3A%2F%2Fbugzilla.tianocore.org
-.. _TCBZ_2639: https://bugzilla.tianocore.org/show_bug.cgi?id=2639
+.. |TCBZ_2639| image:: https://img.shields.io/github/issues/tianocore/edk2?baseUrl=https%3A%2F%2Fgithub.com
+.. _TCBZ_2639: https://github.com/tianocore/edk2/issues/9905
 
 .. _EmulatorPkg_Win_VS2022:  https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=44&branchName=master
 .. _EmulatorPkg_Ubuntu_GCC5: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=43&branchName=master
@@ -349,9 +343,6 @@ use.
 
 .. OvmfPkg
 
-.. |TCBZ_2661| image:: https://img.shields.io/bugzilla/2661?baseUrl=https%3A%2F%2Fbugzilla.tianocore.org
-.. _TCBZ_2661: https://bugzilla.tianocore.org/show_bug.cgi?id=2661
-
 .. _OvmfPkg_Win_VS2022:  https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=50&branchName=master
 .. _OvmfPkg_Ubuntu_GCC5: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=48&branchName=master
 
@@ -381,5 +372,5 @@ use.
 .. |op3264fdu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_FULL_DEBUG
 .. |op3264fr| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_FULL_RELEASE
 .. |op3264fru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_FULL_RELEASE
-.. |op3264fn| replace:: |TCBZ_2661|_
+.. |op3264fn| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_FULL_NOOPT
 .. |op3264fnu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_FULL_NOOPT

@@ -7,12 +7,6 @@
 # alignment must be propagated into the parent FFS/FV through FDF build rules
 # for the relevant module types (i.e. Align=Auto).
 #
-# Note that using this library instance can cause growth to the size of the FV
-# due to the padding added by the build tools to meet the vector alignment
-# requirements and may not be desirable for space-sensitive FVs (uncompressed /
-# XIP components).  The alternative library instance, ArmRelocateExceptionLib
-# should be considered for these applications.
-#
 #  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 #  Copyright (c) 2016 HP Development Company, L.P.
 #
@@ -53,5 +47,3 @@
   MemoryAllocationLib
 
 [Pcd]
-  gArmTokenSpaceGuid.PcdDebuggerExceptionSupport
-  gArmTokenSpaceGuid.PcdCpuVectorBaseAddress

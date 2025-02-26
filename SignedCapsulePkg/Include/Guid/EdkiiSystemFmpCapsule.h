@@ -11,7 +11,7 @@
 #define __EDKII_SYSTEM_FMP_CAPSULE_GUID_H__
 
 /**
-
+  @verbatim
   1. Capsule Layout is below:
   +------------------------------------------+
   |    Capsule Header (OPTIONAL, WFU)        | <== ESRT.FwClass (Optional)
@@ -82,7 +82,7 @@
   NOTE: The [Name?] entry may have different FileGuid.
   Only the one, whose FileGuid matches PcdEdkiiSystemFirmwareFileGuid, takes effect.
   The other entry is ignored.
-
+  @endverbatim
 **/
 
 #define EDKII_SYSTEM_FIRMWARE_IMAGE_DESCRIPTOR_SIGNATURE  SIGNATURE_32('S', 'F', 'I', 'D')
@@ -121,6 +121,7 @@ typedef struct {
 #pragma pack()
 
 /**
+  @verbatim
   System Firmware Image Descriptor is below:
             +----------------------+
             | System Firmware (FV) |
@@ -135,6 +136,7 @@ typedef struct {
             |                      |
             |                      |
             +----------------------+
+  @endverbatim
 **/
 
 extern EFI_GUID  gEdkiiSystemFirmwareImageDescriptorFileGuid;
