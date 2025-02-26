@@ -1510,7 +1510,7 @@ BuildXUefiRedfishStringDatabase (
   UINTN                       TotalStringsAdded;
   UINTN                       NumberPackageStrings;
 
-  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: Building x-UEFI-redfish string database, HII Formset GUID - %g.\n", __func__, FormsetPrivate->Guid));
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: Building x-UEFI-redfish string database, HII Formset GUID - %g.\n", __func__, &FormsetPrivate->Guid));
 
   BufferSize = 0;
   Status     = mRedfishPlatformConfigPrivate->HiiDatabase->ExportPackageLists (
@@ -1656,7 +1656,7 @@ LoadFormset (
   Status                        = GetSupportedSchema (FormsetPrivate->HiiHandle, &FormsetPrivate->SupportedSchema);
   if (EFI_ERROR (Status)) {
     if (!RedfishPlatformConfigFeatureProp (REDFISH_PLATFORM_CONFIG_BUILD_MENU_PATH)) {
-      DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: No x-UEFI-redfish configuration found on the formset - %g\n", __func__, FormsetPrivate->Guid));
+      DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: No x-UEFI-redfish configuration found on the formset - %g\n", __func__, &FormsetPrivate->Guid));
       //
       // If there is no x-UEFI-redfish language in this form-set, we don't add formset
       // since we don't need to build menu path for attribute registry.
@@ -2086,7 +2086,7 @@ ProcessPendingList (
       //
       FormsetPrivate = GetFormsetPrivateByHiiHandle (Target->HiiHandle, FormsetList);
       if (FormsetPrivate != NULL) {
-        DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: formset: %g is removed because driver release HII resource it already\n", __func__, FormsetPrivate->Guid));
+        DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: formset: %g is removed because driver release HII resource it already\n", __func__, &FormsetPrivate->Guid));
         RemoveEntryList (&FormsetPrivate->Link);
         ReleaseFormset (FormsetPrivate);
         FreePool (FormsetPrivate);
