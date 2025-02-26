@@ -267,7 +267,12 @@ UpdateName (
   //
   // Remove the last '-'
   //
-  OffSet--;
+  if (OffSet > 0) {
+    OffSet--;
+  } else {
+    OffSet = 0;
+  }
+
   OffSet += UnicodeSPrint (
               HandleName + OffSet,
               sizeof (HandleName) - OffSet * sizeof (CHAR16),
