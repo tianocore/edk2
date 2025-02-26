@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create a database used by build tool
 #
-# Copyright (c) 2008 - 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2024, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -106,7 +106,7 @@ $(APPFILE): $(APPLICATION)
 '''
 
 PcdGccMakefile = '''
-MAKEROOT ?= $(EDK_TOOLS_PATH)/Source/C
+MAKEROOT ?= $(EDK_TOOLS_PATH)$(SEP)Source$(SEP)C
 LIBS = -lCommon
 '''
 
@@ -2772,7 +2772,7 @@ class DscBuildData(PlatformBuildClassObject):
 
     def GetBuildOptionsValueList(self):
         CC_FLAGS = LinuxCFLAGS
-        if sys.platform == "win32":
+        if sys.platform == "win32" and os.environ.get('CLANG_MAKEFILE_TYPE')!='gnu':
             CC_FLAGS = WindowsCFLAGS
         BuildOptions = OrderedDict()
         for Options in self.BuildOptions:
@@ -2957,13 +2957,17 @@ class DscBuildData(PlatformBuildClassObject):
 
         # start generating makefile
         MakeApp = PcdMakefileHeader
-        if sys.platform == "win32":
-            MakeApp = MakeApp + 'APPFILE = %s\\%s.exe\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s\\%s.obj %s.obj\n' % (self.OutputPath, PcdValueInitName, os.path.join(self.OutputPath, PcdValueCommonName)) + 'INC = '
+        if sys.platform== "win32":
+            if(os.environ.get('CLANG_MAKEFILE_TYPE')!='gnu'):
+                MakeApp = MakeApp + 'APPFILE = %s\\%s.exe\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s\\%s.obj %s.obj\n' % (self.OutputPath, PcdValueInitName, os.path.join(self.OutputPath, PcdValueCommonName)) + 'INC = '
+            else:
+                MakeApp = MakeApp + PcdGccMakefile
+                MakeApp = MakeApp + 'APPFILE = %s\\%s.exe\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s\\%s.o %s.o\n' % (self.OutputPath, PcdValueInitName, os.path.join(self.OutputPath, PcdValueCommonName)) + \
+                'include $(MAKEROOT)\\Makefiles\\app.makefile\n' + 'TOOL_INCLUDE +='
         else:
             MakeApp = MakeApp + PcdGccMakefile
             MakeApp = MakeApp + 'APPFILE = %s/%s\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s/%s.o %s.o\n' % (self.OutputPath, PcdValueInitName, os.path.join(self.OutputPath, PcdValueCommonName)) + \
                       'include $(MAKEROOT)/Makefiles/app.makefile\n' + 'TOOL_INCLUDE +='
-
         IncSearchList = []
         PlatformInc = OrderedDict()
         for Cache in self._Bdb._CACHE_.values():
@@ -3010,9 +3014,12 @@ class DscBuildData(PlatformBuildClassObject):
 
         MakeApp += CC_FLAGS
 
-        if sys.platform == "win32":
-            MakeApp = MakeApp + PcdMakefileEnd
-            MakeApp = MakeApp + AppTarget % ("""\tcopy $(APPLICATION) $(APPFILE) /y """)
+        if sys.platform == 'win32':
+            if(os.environ.get('CLANG_MAKEFILE_TYPE')!='gnu'):
+                MakeApp = MakeApp + PcdMakefileEnd
+                MakeApp = MakeApp + AppTarget % ("""\tcopy $(APPLICATION) $(APPFILE) /y """)
+            else:
+                MakeApp = MakeApp + AppTarget % ("""\tcopy $(APPLICATION).exe $(APPFILE) /y """)
         else:
             MakeApp = MakeApp + AppTarget % ("""\tcp -p $(APPLICATION) $(APPFILE) """)
         MakeApp = MakeApp + '\n'
@@ -3058,7 +3065,11 @@ class DscBuildData(PlatformBuildClassObject):
         #start building the structure pcd value tool
         Messages = ''
         if sys.platform == "win32":
-            MakeCommand = 'nmake -f %s' % (MakeFileName)
+            if (os.environ.get('CLANG_MAKEFILE_TYPE') == 'gnu'):
+                MakeCommand = '{}make -f %s'.format(os.environ.get('CLANG_HOST_BIN')) % (MakeFileName)
+            else:
+                MakeCommand = 'nmake -f %s' % (MakeFileName)
+
             returncode, StdOut, StdErr = DscBuildData.ExecuteCommand (MakeCommand)
             Messages = StdOut
         else:
