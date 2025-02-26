@@ -197,8 +197,14 @@ HttpBootDhcp4ExtractUriInfo (
   EFI_DHCP4_PACKET_OPTION       *Option;
   EFI_STATUS                    Status;
 
+  SelectIndex = 0;
+
   ASSERT (Private != NULL);
   ASSERT (Private->SelectIndex != 0);
+  if (Private->SelectIndex != 0) {
+    SelectIndex = Private->SelectIndex - 1;
+  }
+
   SelectIndex = Private->SelectIndex - 1;
   ASSERT (SelectIndex < HTTP_BOOT_OFFER_MAX_NUM);
 
@@ -341,8 +347,14 @@ HttpBootDhcp6ExtractUriInfo (
   CHAR16                        *HostNameStr;
   EFI_STATUS                    Status;
 
+  SelectIndex = 0;
+
   ASSERT (Private != NULL);
   ASSERT (Private->SelectIndex != 0);
+  if (Private->SelectIndex != 0) {
+    SelectIndex = Private->SelectIndex - 1;
+  }
+
   SelectIndex = Private->SelectIndex - 1;
   ASSERT (SelectIndex < HTTP_BOOT_OFFER_MAX_NUM);
 
@@ -464,7 +476,7 @@ HttpBootDhcp6ExtractUriInfo (
                Private->BootFileUriParser,
                &HostName
                );
-    if (EFI_ERROR (Status)) {
+    if (EFI_ERROR (Status) || (HostName == NULL)) {
       goto Error;
     }
 

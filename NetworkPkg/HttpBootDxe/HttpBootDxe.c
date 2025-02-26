@@ -56,6 +56,9 @@ HttpBootCheckIpv6Support (
   UINTN                             InfoBlockSize;
 
   ASSERT (Private != NULL && Ipv6Support != NULL);
+  if ((Private == NULL) || (Ipv6Support == NULL)) {
+    return EFI_NOT_FOUND;
+  }
 
   //
   // Check whether the UNDI supports IPv6 by NII protocol.
