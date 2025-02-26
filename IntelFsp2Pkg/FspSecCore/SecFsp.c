@@ -174,6 +174,7 @@ FspGlobalDataInit (
   SetFspUpdDataPointer (FspmUpdDataPtr);
   SetFspMemoryInitUpdDataPointer (FspmUpdDataPtr);
   SetFspSiliconInitUpdDataPointer (NULL);
+  SetFspSmmInitUpdDataPointer (NULL);
 
   //
   // Initialize OnSeparateStack value.
