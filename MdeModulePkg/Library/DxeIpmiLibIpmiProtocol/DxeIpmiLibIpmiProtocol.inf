@@ -33,4 +33,7 @@
   DebugLib
 
 [Protocols]
-  gIpmiProtocolGuid      ## SOMETIMES_CONSUMES
+  gIpmiProtocolGuid      ## CONSUMES
+
+[Depex]
+  gIpmiProtocolGuid
