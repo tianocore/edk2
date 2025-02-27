@@ -840,34 +840,34 @@ CreateTopologyFromIntC (
         return Status;
       }
     }
-  }
 
-  if (LocalApicX2ApicInfo[Index].StaToken != CM_NULL_TOKEN) {
-    Status = GetEArchCommonObjStaInfo (
-               CfgMgrProtocol,
-               LocalApicX2ApicInfo[Index].StaToken,
-               &StaInfo,
-               NULL
-               );
-    if (EFI_ERROR (Status)) {
-      ASSERT_EFI_ERROR (Status);
-      return Status;
-    }
+    if (LocalApicX2ApicInfo[Index].StaToken != CM_NULL_TOKEN) {
+      Status = GetEArchCommonObjStaInfo (
+                 CfgMgrProtocol,
+                 LocalApicX2ApicInfo[Index].StaToken,
+                 &StaInfo,
+                 NULL
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
 
-    /// check STA bits
-    if ((StaInfo->DeviceStatus & ~(ACPI_AML_STA_PROC_SUPPORTED)) != 0) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "Unsupported STA bits set for processor %d\n",
-        LocalApicX2ApicInfo[Index].AcpiProcessorUid
-        ));
-      return EFI_UNSUPPORTED;
-    }
+      /// check STA bits
+      if ((StaInfo->DeviceStatus & ~(ACPI_AML_STA_PROC_SUPPORTED)) != 0) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "Unsupported STA bits set for processor %d\n",
+          LocalApicX2ApicInfo[Index].AcpiProcessorUid
+          ));
+        return EFI_UNSUPPORTED;
+      }
 
-    Status = AmlCodeGenMethodRetInteger ("_STA", StaInfo->DeviceStatus, 0, FALSE, 0, CpuNode, NULL);
-    if (EFI_ERROR (Status)) {
-      ASSERT_EFI_ERROR (Status);
-      return Status;
+      Status = AmlCodeGenMethodRetInteger ("_STA", StaInfo->DeviceStatus, 0, FALSE, 0, CpuNode, NULL);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
     }
   }
 
