@@ -84,6 +84,7 @@
   gEfiSmmSmramMemoryGuid
   gEdkiiPiSmmMemoryAttributesTableGuid
   gEfiMmPeiMmramMemoryReserveGuid
+  gEfiStandaloneMmNonSecureBufferGuid
 
 [Pcd]
   gStandaloneMmPkgTokenSpaceGuid.PcdFwVolMmMaxEncapsulationDepth    ##CONSUMES

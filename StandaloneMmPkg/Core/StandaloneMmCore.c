@@ -446,9 +446,12 @@ MmCorePrepareCommunicationBuffer (
   mInternalCommBufferCopy = NULL;
 
   GuidHob = GetFirstGuidHob (&gMmCommBufferHobGuid);
-  ASSERT (GuidHob != NULL);
   if (GuidHob == NULL) {
-    return;
+    GuidHob = GetFirstGuidHob (&gEfiStandaloneMmNonSecureBufferGuid);
+    if (GuidHob == NULL) {
+      ASSERT (GuidHob != NULL);
+      return;
+    }
   }
 
   mMmCommunicationBuffer = (MM_COMM_BUFFER *)GET_GUID_HOB_DATA (GuidHob);
