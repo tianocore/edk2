@@ -32,7 +32,12 @@ steps:
     architecture: "x64"
   condition: ne('${{ parameters.usePythonVersion }}', '')
 
-- script: pip install -r pip-requirements.txt --upgrade
+- bash: |
+    virtualenv ~/venv
+    . ~/venv/bin/activate
+    echo "##vso[task.setvariable variable=VIRTUAL_ENV]${VIRTUAL_ENV}"
+    echo "##vso[task.prependpath]${VIRTUAL_ENV}/bin"
+    pip install -r pip-requirements.txt --upgrade
   displayName: 'Install/Upgrade pip modules'
 
 # Set default
