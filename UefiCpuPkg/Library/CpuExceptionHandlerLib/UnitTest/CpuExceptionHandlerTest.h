@@ -66,8 +66,8 @@ typedef struct {
 } CPU_REGISTER_BUFFER;
 
 typedef union {
-  EDKII_PEI_MP_SERVICES2_PPI    *Ppi;
-  EFI_MP_SERVICES_PROTOCOL      *Protocol;
+  EFI_PEI_MP_SERVICES2_PPI    *Ppi;
+  EFI_MP_SERVICES_PROTOCOL    *Protocol;
 } MP_SERVICES;
 
 typedef struct {
@@ -212,7 +212,7 @@ CompareCpuContext (
   );
 
 /**
-  Get EFI_MP_SERVICES_PROTOCOL/EDKII_PEI_MP_SERVICES2_PPI pointer.
+  Get EFI_MP_SERVICES_PROTOCOL/EFI_PEI_MP_SERVICES2_PPI pointer.
 
   @param[out] MpServices    Pointer to the MP_SERVICES buffer
 
