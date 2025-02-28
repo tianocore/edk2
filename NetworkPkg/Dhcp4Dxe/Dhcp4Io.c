@@ -521,7 +521,10 @@ DhcpChooseOffer (
   DhcpSb->Selected  = Selected;
   DhcpSb->LastOffer = NULL;
   DhcpSb->Para      = NULL;
-  DhcpValidateOptions (Selected, &DhcpSb->Para);
+  Status            = DhcpValidateOptions (Selected, &DhcpSb->Para);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // A bootp offer has been selected, save the lease status,
@@ -1226,7 +1229,9 @@ DhcpSendMessage (
     }
   } else if (Type == DHCP_MSG_DECLINE) {
     ASSERT (SeedHead != NULL);
-    IpAddr = EFI_IP4 (SeedHead->YourAddr);
+    if (SeedHead != NULL) {
+      IpAddr = EFI_IP4 (SeedHead->YourAddr);
+    }
   }
 
   if (IpAddr != 0) {
