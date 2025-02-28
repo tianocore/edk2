@@ -63,19 +63,16 @@ UsbHcGetCapability (
 {
   EFI_STATUS  Status;
 
-  if (UsbBus->Usb2Hc != NULL) {
-    Status = UsbBus->Usb2Hc->GetCapability (
-                               UsbBus->Usb2Hc,
-                               MaxSpeed,
-                               NumOfPort,
-                               Is64BitCapable
-                               );
-  } else {
-    Status = UsbBus->UsbHc->GetRootHubPortNumber (UsbBus->UsbHc, NumOfPort);
-
-    *MaxSpeed       = EFI_USB_SPEED_FULL;
-    *Is64BitCapable = (UINT8)FALSE;
+  if (UsbBus->Usb2Hc == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
+
+  Status = UsbBus->Usb2Hc->GetCapability (
+                             UsbBus->Usb2Hc,
+                             MaxSpeed,
+                             NumOfPort,
+                             Is64BitCapable
+                             );
 
   return Status;
 }
@@ -100,11 +97,11 @@ UsbHcGetRootHubPortStatus (
 {
   EFI_STATUS  Status;
 
-  if (UsbBus->Usb2Hc != NULL) {
-    Status = UsbBus->Usb2Hc->GetRootHubPortStatus (UsbBus->Usb2Hc, PortIndex, PortStatus);
-  } else {
-    Status = UsbBus->UsbHc->GetRootHubPortStatus (UsbBus->UsbHc, PortIndex, PortStatus);
+  if (UsbBus->Usb2Hc == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
+
+  Status = UsbBus->Usb2Hc->GetRootHubPortStatus (UsbBus->Usb2Hc, PortIndex, PortStatus);
 
   return Status;
 }
@@ -129,11 +126,11 @@ UsbHcSetRootHubPortFeature (
 {
   EFI_STATUS  Status;
 
-  if (UsbBus->Usb2Hc != NULL) {
-    Status = UsbBus->Usb2Hc->SetRootHubPortFeature (UsbBus->Usb2Hc, PortIndex, Feature);
-  } else {
-    Status = UsbBus->UsbHc->SetRootHubPortFeature (UsbBus->UsbHc, PortIndex, Feature);
+  if (UsbBus->Usb2Hc == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
+
+  Status = UsbBus->Usb2Hc->SetRootHubPortFeature (UsbBus->Usb2Hc, PortIndex, Feature);
 
   return Status;
 }
@@ -158,11 +155,11 @@ UsbHcClearRootHubPortFeature (
 {
   EFI_STATUS  Status;
 
-  if (UsbBus->Usb2Hc != NULL) {
-    Status = UsbBus->Usb2Hc->ClearRootHubPortFeature (UsbBus->Usb2Hc, PortIndex, Feature);
-  } else {
-    Status = UsbBus->UsbHc->ClearRootHubPortFeature (UsbBus->UsbHc, PortIndex, Feature);
+  if (UsbBus->Usb2Hc == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
+
+  Status = UsbBus->Usb2Hc->ClearRootHubPortFeature (UsbBus->Usb2Hc, PortIndex, Feature);
 
   return Status;
 }
@@ -202,37 +199,24 @@ UsbHcControlTransfer (
   )
 {
   EFI_STATUS  Status;
-  BOOLEAN     IsSlowDevice;
 
-  if (UsbBus->Usb2Hc != NULL) {
-    Status = UsbBus->Usb2Hc->ControlTransfer (
-                               UsbBus->Usb2Hc,
-                               DevAddr,
-                               DevSpeed,
-                               MaxPacket,
-                               Request,
-                               Direction,
-                               Data,
-                               DataLength,
-                               TimeOut,
-                               Translator,
-                               UsbResult
-                               );
-  } else {
-    IsSlowDevice = (BOOLEAN)(EFI_USB_SPEED_LOW == DevSpeed);
-    Status       = UsbBus->UsbHc->ControlTransfer (
-                                    UsbBus->UsbHc,
-                                    DevAddr,
-                                    IsSlowDevice,
-                                    (UINT8)MaxPacket,
-                                    Request,
-                                    Direction,
-                                    Data,
-                                    DataLength,
-                                    TimeOut,
-                                    UsbResult
-                                    );
+  if (UsbBus->Usb2Hc == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
+
+  Status = UsbBus->Usb2Hc->ControlTransfer (
+                             UsbBus->Usb2Hc,
+                             DevAddr,
+                             DevSpeed,
+                             MaxPacket,
+                             Request,
+                             Direction,
+                             Data,
+                             DataLength,
+                             TimeOut,
+                             Translator,
+                             UsbResult
+                             );
 
   return Status;
 }
@@ -277,34 +261,24 @@ UsbHcBulkTransfer (
 {
   EFI_STATUS  Status;
 
-  if (UsbBus->Usb2Hc != NULL) {
-    Status = UsbBus->Usb2Hc->BulkTransfer (
-                               UsbBus->Usb2Hc,
-                               DevAddr,
-                               EpAddr,
-                               DevSpeed,
-                               MaxPacket,
-                               BufferNum,
-                               Data,
-                               DataLength,
-                               DataToggle,
-                               TimeOut,
-                               Translator,
-                               UsbResult
-                               );
-  } else {
-    Status = UsbBus->UsbHc->BulkTransfer (
-                              UsbBus->UsbHc,
-                              DevAddr,
-                              EpAddr,
-                              (UINT8)MaxPacket,
-                              *Data,
-                              DataLength,
-                              DataToggle,
-                              TimeOut,
-                              UsbResult
-                              );
+  if (UsbBus->Usb2Hc == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
+
+  Status = UsbBus->Usb2Hc->BulkTransfer (
+                             UsbBus->Usb2Hc,
+                             DevAddr,
+                             EpAddr,
+                             DevSpeed,
+                             MaxPacket,
+                             BufferNum,
+                             Data,
+                             DataLength,
+                             DataToggle,
+                             TimeOut,
+                             Translator,
+                             UsbResult
+                             );
 
   return Status;
 }
@@ -348,40 +322,25 @@ UsbHcAsyncInterruptTransfer (
   )
 {
   EFI_STATUS  Status;
-  BOOLEAN     IsSlowDevice;
 
-  if (UsbBus->Usb2Hc != NULL) {
-    Status = UsbBus->Usb2Hc->AsyncInterruptTransfer (
-                               UsbBus->Usb2Hc,
-                               DevAddr,
-                               EpAddr,
-                               DevSpeed,
-                               MaxPacket,
-                               IsNewTransfer,
-                               DataToggle,
-                               PollingInterval,
-                               DataLength,
-                               Translator,
-                               Callback,
-                               Context
-                               );
-  } else {
-    IsSlowDevice = (BOOLEAN)(EFI_USB_SPEED_LOW == DevSpeed);
-
-    Status = UsbBus->UsbHc->AsyncInterruptTransfer (
-                              UsbBus->UsbHc,
-                              DevAddr,
-                              EpAddr,
-                              IsSlowDevice,
-                              (UINT8)MaxPacket,
-                              IsNewTransfer,
-                              DataToggle,
-                              PollingInterval,
-                              DataLength,
-                              Callback,
-                              Context
-                              );
+  if (UsbBus->Usb2Hc == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
+
+  Status = UsbBus->Usb2Hc->AsyncInterruptTransfer (
+                             UsbBus->Usb2Hc,
+                             DevAddr,
+                             EpAddr,
+                             DevSpeed,
+                             MaxPacket,
+                             IsNewTransfer,
+                             DataToggle,
+                             PollingInterval,
+                             DataLength,
+                             Translator,
+                             Callback,
+                             Context
+                             );
 
   return Status;
 }
@@ -423,37 +382,24 @@ UsbHcSyncInterruptTransfer (
   )
 {
   EFI_STATUS  Status;
-  BOOLEAN     IsSlowDevice;
 
-  if (UsbBus->Usb2Hc != NULL) {
-    Status = UsbBus->Usb2Hc->SyncInterruptTransfer (
-                               UsbBus->Usb2Hc,
-                               DevAddr,
-                               EpAddr,
-                               DevSpeed,
-                               MaxPacket,
-                               Data,
-                               DataLength,
-                               DataToggle,
-                               TimeOut,
-                               Translator,
-                               UsbResult
-                               );
-  } else {
-    IsSlowDevice = (BOOLEAN)((EFI_USB_SPEED_LOW == DevSpeed) ? TRUE : FALSE);
-    Status       = UsbBus->UsbHc->SyncInterruptTransfer (
-                                    UsbBus->UsbHc,
-                                    DevAddr,
-                                    EpAddr,
-                                    IsSlowDevice,
-                                    (UINT8)MaxPacket,
-                                    Data,
-                                    DataLength,
-                                    DataToggle,
-                                    TimeOut,
-                                    UsbResult
-                                    );
+  if (UsbBus->Usb2Hc == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
+
+  Status = UsbBus->Usb2Hc->SyncInterruptTransfer (
+                             UsbBus->Usb2Hc,
+                             DevAddr,
+                             EpAddr,
+                             DevSpeed,
+                             MaxPacket,
+                             Data,
+                             DataLength,
+                             DataToggle,
+                             TimeOut,
+                             Translator,
+                             UsbResult
+                             );
 
   return Status;
 }
@@ -473,29 +419,21 @@ UsbOpenHostProtoByChild (
   IN EFI_HANDLE  Child
   )
 {
-  EFI_USB_HC_PROTOCOL   *UsbHc;
   EFI_USB2_HC_PROTOCOL  *Usb2Hc;
   EFI_STATUS            Status;
 
-  if (Bus->Usb2Hc != NULL) {
-    Status = gBS->OpenProtocol (
-                    Bus->HostHandle,
-                    &gEfiUsb2HcProtocolGuid,
-                    (VOID **)&Usb2Hc,
-                    mUsbBusDriverBinding.DriverBindingHandle,
-                    Child,
-                    EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
-                    );
-  } else {
-    Status = gBS->OpenProtocol (
-                    Bus->HostHandle,
-                    &gEfiUsbHcProtocolGuid,
-                    (VOID **)&UsbHc,
-                    mUsbBusDriverBinding.DriverBindingHandle,
-                    Child,
-                    EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
-                    );
+  if (Bus->Usb2Hc == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
+
+  Status = gBS->OpenProtocol (
+                  Bus->HostHandle,
+                  &gEfiUsb2HcProtocolGuid,
+                  (VOID **)&Usb2Hc,
+                  mUsbBusDriverBinding.DriverBindingHandle,
+                  Child,
+                  EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+                  );
 
   return Status;
 }
@@ -513,21 +451,16 @@ UsbCloseHostProtoByChild (
   IN EFI_HANDLE  Child
   )
 {
-  if (Bus->Usb2Hc != NULL) {
-    gBS->CloseProtocol (
-           Bus->HostHandle,
-           &gEfiUsb2HcProtocolGuid,
-           mUsbBusDriverBinding.DriverBindingHandle,
-           Child
-           );
-  } else {
-    gBS->CloseProtocol (
-           Bus->HostHandle,
-           &gEfiUsbHcProtocolGuid,
-           mUsbBusDriverBinding.DriverBindingHandle,
-           Child
-           );
+  if (Bus->Usb2Hc == NULL) {
+    return;
   }
+
+  gBS->CloseProtocol (
+         Bus->HostHandle,
+         &gEfiUsb2HcProtocolGuid,
+         mUsbBusDriverBinding.DriverBindingHandle,
+         Child
+         );
 }
 
 /**
