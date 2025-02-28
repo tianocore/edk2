@@ -27,6 +27,7 @@ EFI_EVENT  mEfiDevPathEvent;
 VOID       *mEmuVariableEventReg;
 EFI_EVENT  mEmuVariableEvent;
 UINT16     mHostBridgeDevId;
+BOOLEAN    mFirmwareSetupEnabled;
 
 //
 // Table of host IRQs matching PCI IRQs A-D
@@ -319,6 +320,22 @@ PlatformBootManagerBeforeConsole (
     FrontPageTimeout,
     Status
     ));
+
+  Status = QemuFwCfgParseBool (
+             "opt/org.tianocore/FirmwareSetupSupport",
+             &mFirmwareSetupEnabled
+             );
+
+  if (RETURN_ERROR (Status)) {
+    mFirmwareSetupEnabled = TRUE;
+  }
+
+  PlatformRegisterFvBootOption (
+    &gUiAppFileGuid,
+    L"EFI Firmware Setup",
+    LOAD_OPTION_ACTIVE | LOAD_OPTION_CATEGORY_APP,
+    mFirmwareSetupEnabled
+    );
 
   if (!FeaturePcdGet (PcdBootRestrictToFirmware)) {
     PlatformRegisterOptionsAndKeys ();
@@ -1676,7 +1693,7 @@ PlatformBootManagerAfterConsole (
   PlatformRegisterFvBootOption (
     &gUefiShellFileGuid,
     L"EFI Internal Shell",
-    LOAD_OPTION_ACTIVE,
+    LOAD_OPTION_ACTIVE | LOAD_OPTION_CATEGORY_APP,
     ShellEnabled
     );
 
