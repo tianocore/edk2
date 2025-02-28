@@ -62,6 +62,9 @@
 [Pcd]
   gArmTokenSpaceGuid.PcdStMmStackSize
 
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdSxcUse18Registers
+
 #
 # This configuration fails for CLANGPDB, which does not support PIE in the GCC
 # sense. Such however is required for ARM family StandaloneMmCore
