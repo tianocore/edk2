@@ -1,7 +1,7 @@
 ## @file
 # GNU/Linux makefile for 'VfrCompile' module build.
 #
-# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2024, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
@@ -36,13 +36,20 @@ MAKEROOT ?= ../..
 
 include $(MAKEROOT)/Makefiles/header.makefile
 
-APPLICATION = $(MAKEROOT)/bin/$(APPNAME)
+ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+APPLICATION = $(MAKEROOT)$(SEP)bin$(SEP)$(APPNAME)
+else
+APPLICATION = $(MAKEROOT)$(SEP)bin$(SEP)$(APPNAME)
+endif
 
 .PHONY:all
 all: $(MAKEROOT)/bin $(APPLICATION)
 
 $(APPLICATION): $(OBJECTS)
 	$(LINKER) -o $(APPLICATION) $(VFR_LFLAGS) $(OBJECTS) -L$(MAKEROOT)/libs $(LIBS)
+ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+	copy /Y $(APPLICATION).exe $(BIN_PATH)
+endif
 
 VfrCompiler.o: ../Include/Common/BuildVersion.h
 
@@ -55,10 +62,17 @@ VfrLexer.cpp VfrLexer.h: Pccts/dlg/dlg VfrParser.dlg
 	Pccts/dlg/dlg -C2 -i -CC -cl VfrLexer -o . VfrParser.dlg
 
 Pccts/antlr/antlr:
+ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+	set BIN_DIR='.'&& $(MAKE) -C Pccts/antlr
+else
 	BIN_DIR='.' $(MAKE) -C Pccts/antlr
-
+endif
 Pccts/dlg/dlg:
+ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+	set BIN_DIR='.'&& $(MAKE) -C Pccts/dlg
+else
 	BIN_DIR='.' $(MAKE) -C Pccts/dlg
+endif
 
 ATokenBuffer.o: Pccts/h/ATokenBuffer.cpp
 	$(CXX) -c $(VFR_CPPFLAGS) $(INC) $(VFR_CXXFLAGS) $? -o $@
@@ -75,7 +89,12 @@ VfrSyntax.o: VfrSyntax.cpp
 clean: localClean
 
 localClean:
-	BIN_DIR='.' $(MAKE) -C Pccts/antlr clean
-	BIN_DIR='.' $(MAKE) -C Pccts/dlg clean
+ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+	set BIN_DIR='.'&& $(MAKE) -C Pccts/antlr clean
+	set BIN_DIR='.'&& $(MAKE) -C Pccts/dlg clean
+else
+	BIN_DIR='.'&& $(MAKE) -C Pccts/antlr clean
+	BIN_DIR='.'&& $(MAKE) -C Pccts/dlg clean
+endif
 	rm -f $(EXTRA_CLEAN_OBJECTS)
 

@@ -450,10 +450,15 @@ Returns:
 #define _stricmp strcasecmp
 #define strnicmp strncasecmp
 #define strcmpi strcasecmp
-size_t _filelength(int fd);
 #ifndef __CYGWIN__
 char *strlwr(char *s);
 #endif
+#endif
+
+#ifdef _WIN32
+#include <io.h> // This will include the correct declaration of _filelength for Windows
+#else
+size_t _filelength(int fd); // Only declare this on non-Windows systems
 #endif
 
 //
