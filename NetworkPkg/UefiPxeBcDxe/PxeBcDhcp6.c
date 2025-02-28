@@ -1423,9 +1423,14 @@ PxeBcHandleDhcp6Offer (
   UINT32                    SelectIndex;
   UINT32                    Index;
 
+  SelectIndex = 0;
+
   ASSERT (Private != NULL);
   ASSERT (Private->SelectIndex > 0);
-  SelectIndex = (UINT32)(Private->SelectIndex - 1);
+  if (Private->SelectIndex > 0) {
+    SelectIndex = (UINT32)(Private->SelectIndex - 1);
+  }
+
   ASSERT (SelectIndex < PXEBC_OFFER_MAX_NUM);
   Cache6 = &Private->OfferBuffer[SelectIndex].Dhcp6;
   Status = EFI_SUCCESS;
@@ -2436,7 +2441,7 @@ PxeBcDhcp6Sarr (
       return Status;
     }
 
-    GetMappingTimeOut = TICKS_PER_SECOND * DadXmits.DupAddrDetectTransmits + PXEBC_DAD_ADDITIONAL_DELAY;
+    GetMappingTimeOut = TICKS_PER_SECOND * (UINT64)DadXmits.DupAddrDetectTransmits + PXEBC_DAD_ADDITIONAL_DELAY;
     Status            = gBS->SetTimer (Timer, TimerRelative, GetMappingTimeOut);
     if (EFI_ERROR (Status)) {
       gBS->CloseEvent (Timer);
