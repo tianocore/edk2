@@ -96,6 +96,10 @@
   #
   QemuBootOrderLib|Include/Library/QemuBootOrderLib.h
 
+  ##  @libraryclass Common code PlatformBootManager and PlatformBootManagerLight
+  #
+  PlatformBootManagerCommonLib|Include/Library/PlatformBootManagerCommonLib.h
+
   ##  @libraryclass  Load a kernel image and command line passed to QEMU via
   #                  the command line
   #

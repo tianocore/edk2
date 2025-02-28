@@ -191,6 +191,7 @@
   PlatformBootManagerLib           | OvmfPkg/Library/PlatformBootManagerLibLight/PlatformBootManagerLib.inf
   BootLogoLib                      | MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
   QemuBootOrderLib                 | OvmfPkg/Library/QemuBootOrderLib/QemuBootOrderLib.inf
+  PlatformBootManagerCommonLib     |OvmfPkg/Library/PlatformBootManagerCommonLib/PlatformBootManagerCommonLib.inf
   QemuFwCfgSimpleParserLib         | OvmfPkg/Library/QemuFwCfgSimpleParserLib/QemuFwCfgSimpleParserLib.inf
   QemuLoadImageLib                 | OvmfPkg/Library/GenericQemuLoadImageLib/GenericQemuLoadImageLib.inf
 
