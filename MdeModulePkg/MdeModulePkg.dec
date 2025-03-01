@@ -2278,6 +2278,10 @@
   # @Prompt The value is use for Usb Network rate limiting supported.
   gEfiMdeModulePkgTokenSpaceGuid.PcdUsbNetworkRateLimitingFactor|100|UINT32|0x10000028
 
+  ## Remove PCI devices that are deemed invalid.
+  # @Prompt The value will determine whether devices are removed or not.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRemoveRejectedDevices|FALSE|BOOLEAN|0x10000029
+
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
   #  Loading Module at Fixed Address feature is enabled.
