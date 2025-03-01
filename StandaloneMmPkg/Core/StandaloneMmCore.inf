@@ -35,6 +35,12 @@
   FwVol.c
   MemoryAttributesTable.c
 
+[Sources.AARCH64, Sources.ARM]
+  Aarch64/ComBuffer.c
+
+[Sources.X64]
+  X64/ComBuffer.c
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
@@ -85,10 +91,16 @@
   gEdkiiPiSmmMemoryAttributesTableGuid
   gEfiMmPeiMmramMemoryReserveGuid
 
+[Guids.AARCH64, Guids.ARM]
+  gEfiStandaloneMmNonSecureBufferGuid           ## SOMETIMES_CONSUMES   ## GUID
+
 [Pcd]
   gStandaloneMmPkgTokenSpaceGuid.PcdFwVolMmMaxEncapsulationDepth    ##CONSUMES
   gStandaloneMmPkgTokenSpaceGuid.PcdRestartMmDispatcherOnceMmEntryRegistered    ##CONSUMES
   gStandaloneMmPkgTokenSpaceGuid.PcdShadowBfv    ##CONSUMES
+
+[Pcd.AARCH64, Pcd.ARM]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMmCommBufferPages   ## SOMETIMES_CONSUMES
 
 #
 # This configuration fails for CLANGPDB, which does not support PIE in the GCC

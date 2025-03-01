@@ -1025,4 +1025,12 @@ MmFreeShadowedFvs (
   VOID
   );
 
+/**
+  Prepare communication buffer for MMI.
+**/
+VOID
+MmCorePrepareCommunicationBuffer (
+  VOID
+  );
+
 #endif
