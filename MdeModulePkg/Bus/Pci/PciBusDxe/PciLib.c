@@ -208,9 +208,11 @@ DumpBridgeResource (
   IN PCI_RESOURCE_NODE  *BridgeResource
   )
 {
-  LIST_ENTRY         *Link;
-  PCI_RESOURCE_NODE  *Resource;
-  PCI_BAR            *Bar;
+  LIST_ENTRY                       *Link;
+  PCI_RESOURCE_NODE                *Resource;
+  PCI_BAR                          *Bar;
+  UINT32                           Seg;
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo;
 
   if ((BridgeResource != NULL) && (BridgeResource->Length != 0)) {
     DEBUG ((
@@ -229,15 +231,19 @@ DumpBridgeResource (
       Resource = RESOURCE_NODE_FROM_LINK (Link);
       if (Resource->ResourceUsage == PciResUsageTypical) {
         Bar = Resource->Virtual ? Resource->PciDev->VfPciBar : Resource->PciDev->PciBar;
+        PciRootBridgeIo = Resource->PciDev->PciRootBridgeIo;
+        Seg = PciRootBridgeIo->SegmentNumber;
+
         DEBUG ((
           DEBUG_INFO,
-          "   Base = 0x%lx;\tLength = 0x%lx;\tAlignment = 0x%lx;\tOwner = %s [%02x|%02x|%02x:",
+          "   Base = 0x%lx;\tLength = 0x%lx;\tAlignment = 0x%lx;\tOwner = %s [%04x|%02x|%02x|%02x:",
           Bar[Resource->Bar].BaseAddress,
           Resource->Length,
           Resource->Alignment,
           IS_PCI_BRIDGE (&Resource->PciDev->Pci)     ? L"PPB" :
           IS_CARDBUS_BRIDGE (&Resource->PciDev->Pci) ? L"P2C" :
           L"PCI",
+          Seg,
           Resource->PciDev->BusNumber,
           Resource->PciDev->DeviceNumber,
           Resource->PciDev->FunctionNumber
@@ -324,13 +330,18 @@ DumpResourceMap (
   IN UINTN              ResourceCount
   )
 {
-  EFI_STATUS         Status;
-  LIST_ENTRY         *Link;
-  PCI_IO_DEVICE      *Device;
-  UINTN              Index;
-  CHAR16             *Str;
-  PCI_RESOURCE_NODE  **ChildResources;
-  UINTN              ChildResourceCount;
+  EFI_STATUS                       Status;
+  LIST_ENTRY                       *Link;
+  PCI_IO_DEVICE                    *Device;
+  UINTN                            Index;
+  CHAR16                           *Str;
+  PCI_RESOURCE_NODE                **ChildResources;
+  UINTN                            ChildResourceCount;
+  UINT32                           Seg;
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo;
+
+  PciRootBridgeIo = Bridge->PciRootBridgeIo;
+  Seg = PciRootBridgeIo->SegmentNumber;
 
   DEBUG ((DEBUG_INFO, "PciBus: Resource Map for "));
 
@@ -345,7 +356,8 @@ DumpResourceMap (
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_INFO,
-      "Bridge [%02x|%02x|%02x]\n",
+      "Bridge [%04x|%02x|%02x|%02x]\n",
+      Seg,
       Bridge->BusNumber,
       Bridge->DeviceNumber,
       Bridge->FunctionNumber
@@ -406,11 +418,13 @@ AdjustPciDeviceBarSize (
   IN PCI_IO_DEVICE  *RootBridgeDev
   )
 {
-  PCI_IO_DEVICE  *PciIoDevice;
-  LIST_ENTRY     *CurrentLink;
-  BOOLEAN        Adjusted;
-  UINTN          Offset;
-  UINTN          BarIndex;
+  PCI_IO_DEVICE                    *PciIoDevice;
+  LIST_ENTRY                       *CurrentLink;
+  BOOLEAN                          Adjusted;
+  UINTN                            Offset;
+  UINTN                            BarIndex;
+  UINT32                           Seg;
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo;
 
   Adjusted    = FALSE;
   CurrentLink = RootBridgeDev->ChildList.ForwardLink;
@@ -424,9 +438,12 @@ AdjustPciDeviceBarSize (
       }
     } else {
       if (PciIoDevice->ResizableBarOffset != 0) {
+        PciRootBridgeIo = PciIoDevice->PciRootBridgeIo;
+        Seg = PciRootBridgeIo->SegmentNumber;
         DEBUG ((
           DEBUG_ERROR,
-          "PciBus: [%02x|%02x|%02x] Adjust Pci Device Bar Size\n",
+          "PciBus: [%04x|%02x|%02x|%02x] Adjust Pci Device Bar Size\n",
+          Seg,
           PciIoDevice->BusNumber,
           PciIoDevice->DeviceNumber,
           PciIoDevice->FunctionNumber
