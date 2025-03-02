@@ -13,12 +13,15 @@ SOURCE_SUBDIRS := $(patsubst %,Source/%,$(sort $(LANGUAGES)))
 SUBDIRS := $(SOURCE_SUBDIRS) Tests
 CLEAN_SUBDIRS := $(patsubst %,%-clean,$(sort $(SUBDIRS)))
 
-.PHONY: subdirs $(SUBDIRS)
+.PHONY: subdirs $(SUBDIRS) ninja
 subdirs: $(SUBDIRS)
 $(SUBDIRS):
 	$(MAKE) -C $@
 
 Tests: $(SOURCE_SUBDIRS)
+
+ninja:
+	for dir in $(SUBDIRS); do $(MAKE) -C $$dir ninja || exit 1; done
 
 .PHONY: $(CLEAN_SUBDIRS)
 $(CLEAN_SUBDIRS):

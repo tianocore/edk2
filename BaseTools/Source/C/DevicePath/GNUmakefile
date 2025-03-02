@@ -11,6 +11,8 @@ APPNAME = DevicePath
 
 OBJECTS = DevicePath.o UefiDevicePathLib.o DevicePathFromText.o  DevicePathUtilities.o
 
+NINJA_LIBS_DEPS = Common
+
 include $(MAKEROOT)/Makefiles/app.makefile
 
 GCCVERSION = $(shell $(CC) -dumpversion | awk -F'.' '{print $$1}')
