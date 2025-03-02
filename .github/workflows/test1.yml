@@ -1,0 +1,12 @@
+name: Test arm64 ubuntu-24.04-arm runner hosted by github
+
+on:
+  pull_request:
+
+jobs:
+  hello_world_job_24:
+    runs-on: ubuntu-24.04-arm
+
+    steps:
+      - name: Print Hello World
+        run: echo "Hello, World!"
