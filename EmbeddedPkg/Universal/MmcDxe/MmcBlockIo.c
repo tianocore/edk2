@@ -195,6 +195,13 @@ MmcTransferBlock (
     }
   }
 
+  if (BufferSize > This->Media->BlockSize) {
+    Status = MmcStopTransmission (MmcHost);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_BLKIO, "%a(): MmcStopTransmission Error and Status:%r\n", __func__, Status));
+    }
+  }
+
   // Command 13 - Read status and wait for programming to complete (return to tran)
   Timeout     = MMCI0_TIMEOUT;
   CmdArg      = MmcHostInstance->CardInfo.RCA << 16;
@@ -210,15 +217,6 @@ MmcTransferBlock (
         break;  // Prevents delay once finished
       }
     }
-  }
-
-  if (BufferSize > This->Media->BlockSize) {
-    Status = MmcHost->SendCommand (MmcHost, MMC_CMD12, 0);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_BLKIO, "%a(): Error and Status:%r\n", __func__, Status));
-    }
-
-    MmcHost->ReceiveResponse (MmcHost, MMC_RESPONSE_TYPE_R1b, Response);
   }
 
   Status = MmcNotifyState (MmcHostInstance, MmcTransferState);
