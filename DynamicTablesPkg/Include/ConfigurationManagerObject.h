@@ -140,8 +140,8 @@ typedef struct CmObjDescriptor {
   @retval Returns the Configuration Manager Object ID.
 **/
 #define CREATE_CM_OBJECT_ID(NameSpaceId, ObjectId)                           \
-          ((((NameSpaceId) & NAMESPACE_ID_MASK) << NAMESPACE_ID_BIT_SHIFT) | \
-            ((ObjectId) & OBJECT_ID_MASK))
+          (((((CM_OBJECT_ID)NameSpaceId) & NAMESPACE_ID_MASK) << NAMESPACE_ID_BIT_SHIFT) | \
+            (((CM_OBJECT_ID)ObjectId) & OBJECT_ID_MASK))
 
 /** This macro returns a Configuration Manager Object ID
     in the Standard Object Namespace.
