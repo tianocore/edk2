@@ -216,10 +216,6 @@ SnpUndi32GetStatus (
 
   Snp = EFI_SIMPLE_NETWORK_DEV_FROM_THIS (This);
 
-  if (Snp == NULL) {
-    return EFI_DEVICE_ERROR;
-  }
-
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   switch (Snp->Mode.State) {
