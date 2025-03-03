@@ -13,7 +13,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Uefi.h>
 
 #include <Protocol/Usb2HostController.h>
-#include <Protocol/UsbHostController.h>
 #include <Protocol/UsbIo.h>
 #include <Protocol/DevicePath.h>
 
@@ -243,7 +242,6 @@ struct _USB_BUS {
   EFI_HANDLE                  HostHandle;
   EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
   EFI_USB2_HC_PROTOCOL        *Usb2Hc;
-  EFI_USB_HC_PROTOCOL         *UsbHc;
 
   //
   // Recorded the max supported usb devices.

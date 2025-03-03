@@ -90,7 +90,6 @@
   gEfiExtScsiPassThruProtocolGuid                         ## UNDEFINED
   gEfiIScsiInitiatorNameProtocolGuid                      ## UNDEFINED
   gEfiUsbIoProtocolGuid                                   ## UNDEFINED
-  gEfiUsbHcProtocolGuid                                   ## UNDEFINED
   gEfiUsb2HcProtocolGuid                                  ## UNDEFINED
   gEfiDebugSupportProtocolGuid                            ## UNDEFINED
   gEfiDebugPortProtocolGuid                               ## UNDEFINED
