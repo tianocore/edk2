@@ -1564,6 +1564,11 @@ EvacuateTempRam (
   DEBUG ((DEBUG_VERBOSE, "Beginning evacuation of content in temporary RAM.\n"));
 
   //
+  // By default migrate all FVs and copy raw data
+  //
+  FvMigrationFlags = FLAGS_FV_RAW_DATA_COPY;
+
+  //
   // Migrate PPI Pointers of PEI_CORE from temporary memory to newly loaded PEI_CORE in permanent memory.
   //
   Status = PeiLocatePpi ((CONST EFI_PEI_SERVICES **)&Private->Ps, &gEfiPeiCoreFvLocationPpiGuid, 0, NULL, (VOID **)&PeiCoreFvLocationPpi);
@@ -1617,11 +1622,6 @@ EvacuateTempRam (
           //
           return EFI_SUCCESS;
         }
-
-        //
-        // Migrate all FVs and copy raw data
-        //
-        FvMigrationFlags = FLAGS_FV_RAW_DATA_COPY;
       } else {
         for (Index = 0; Index < MigrationInfo->ToMigrateFvCount; Index++) {
           ToMigrateFvInfo = ((TO_MIGRATE_FV_INFO *)(MigrationInfo + 1)) + Index;

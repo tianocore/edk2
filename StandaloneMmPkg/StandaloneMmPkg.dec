@@ -23,9 +23,6 @@
   ##  @libraryclass  Defines a set of helper methods.
   FvLib|Include/Library/FvLib.h
 
-  ##  @libraryclass  Defines a set of interfaces for the MM core entrypoint.
-  StandaloneMmCoreEntryPoint|Include/Library/StandaloneMmCoreEntryPoint.h
-
   ##  @libraryclass  Defines a set of interfaces that provides services for
   ##                 MM Memory Operation.
   MemLib|Include/Library/StandaloneMmMemLib.h
@@ -46,6 +43,10 @@
 
   gEventMmDispatchGuid                     = { 0x7e6efffa, 0x69b4, 0x4c1b, { 0xa4, 0xc7, 0xaf, 0xf9, 0xc9, 0x24, 0x4f, 0xee }}
 
+[Protocols]
+  gEfiMmEntryNotifyProtocolGuid            = { 0x9bfbcc5f, 0x6435, 0x46d3, { 0xb9, 0xa5, 0x70, 0xfb, 0xa4, 0x71, 0xe1, 0x26 }}
+  gEfiMmExitNotifyProtocolGuid             = { 0x0e265f48, 0x47c0, 0x471f, { 0x9c, 0x83, 0xc6, 0xd6, 0x57, 0x64, 0x21, 0xa4 }}
+
 [Ppis]
   gMmCoreFvLocationPpiGuid                 = { 0x47a00618, 0x237a, 0x4386, { 0x8f, 0xc5, 0x2a, 0x86, 0xd8, 0xac, 0x41, 0x05 }}
 
@@ -54,6 +55,13 @@
   #  in the MM phase. Minimum value is 1. Sections nested more deeply are rejected.
   # @Prompt Maximum permitted FwVol section nesting depth (exclusive) in MM.
   gStandaloneMmPkgTokenSpaceGuid.PcdFwVolMmMaxEncapsulationDepth|0x10|UINT32|0x00000001
+
+  ## Option to make shadow copy of boot firmware volume while loading drivers.
+  #  This options is useful when the BFV is not located in the Flash area
+  #  but is in the RAM instead and therefore no shadow copy is needed.
+  #   TRUE  - Default. Make a shadow copy of the boot firmware volume.
+  #   FALSE - Disable shadow copy of the boot firmware volume.
+  gStandaloneMmPkgTokenSpaceGuid.PcdShadowBfv|TRUE|BOOLEAN|0x00000003
 
 [PcdsFeatureFlag]
   ## Indicates if restart MM Dispatcher once MM Entry Point is registered.<BR><BR>

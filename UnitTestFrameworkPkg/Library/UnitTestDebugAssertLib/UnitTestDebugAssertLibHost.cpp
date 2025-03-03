@@ -18,6 +18,17 @@ extern "C" {
   #include <Library/BaseLib.h>
   #include <Library/UnitTestLib.h>
 
+  //
+  // If address sanitizer is enabled, then declare the function that is used to
+  // handle custom long jump implementation.
+  //
+ #ifdef __SANITIZE_ADDRESS__
+  void
+  __asan_handle_no_return (
+    );
+
+ #endif
+
   ///
   /// Point to jump buffer used with SetJump()/LongJump() to test if a function
   /// under test generates an expected ASSERT() condition.
@@ -47,6 +58,17 @@ extern "C" {
 
     if (gUnitTestExpectAssertFailureJumpBuffer != NULL) {
       UT_LOG_INFO ("Detected expected ASSERT: %a(%d): %a\n", FileName, LineNumber, Description);
+
+      //
+      // If address sanitizer is enabled, then inform sanitizer that a no return
+      // function is being called that will reset to a previous stack frame.
+      // This is required to avoid false positives from the address sanitizer
+      // due to the use of a custom long jump implementation.
+      //
+ #ifdef __SANITIZE_ADDRESS__
+      __asan_handle_no_return ();
+ #endif
+
       LongJump (gUnitTestExpectAssertFailureJumpBuffer, 1);
     } else {
       if (GetActiveFrameworkHandle () != NULL) {

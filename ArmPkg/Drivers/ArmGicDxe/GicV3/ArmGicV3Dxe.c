@@ -23,6 +23,8 @@
                                            + ARM_GICR_SGI_VLPI_FRAME_SIZE     \
                                            + ARM_GICR_SGI_RESERVED_FRAME_SIZE)
 
+#define GICD_V3_SIZE  SIZE_64KB
+
 #define ISENABLER_ADDRESS(base, offset)  ((base) +\
           ARM_GICR_CTLR_FRAME_SIZE + ARM_GICR_ISENABLER + 4 * (offset))
 
@@ -36,7 +38,7 @@ extern EFI_HARDWARE_INTERRUPT_PROTOCOL   gHardwareInterruptV3Protocol;
 extern EFI_HARDWARE_INTERRUPT2_PROTOCOL  gHardwareInterrupt2V3Protocol;
 
 STATIC UINTN  mGicDistributorBase;
-STATIC UINTN  mGicRedistributorsBase;
+STATIC UINTN  mGicRedistributorBase;
 
 /**
  *
@@ -62,11 +64,12 @@ GicGetCpuRedistributorBase (
   IN UINTN  GicRedistributorBase
   )
 {
-  UINTN   MpId;
-  UINTN   CpuAffinity;
-  UINTN   Affinity;
-  UINTN   GicCpuRedistributorBase;
-  UINT64  TypeRegister;
+  UINTN       MpId;
+  UINTN       CpuAffinity;
+  UINTN       Affinity;
+  UINTN       GicCpuRedistributorBase;
+  UINT64      TypeRegister;
+  EFI_STATUS  Status;
 
   MpId = ArmReadMpidr ();
   // Define CPU affinity as:
@@ -78,6 +81,24 @@ GicGetCpuRedistributorBase (
   GicCpuRedistributorBase = GicRedistributorBase;
 
   do {
+    Status = gCpuArch->SetMemoryAttributes (
+                         gCpuArch,
+                         GicCpuRedistributorBase,
+                         GIC_V3_REDISTRIBUTOR_GRANULARITY,
+                         EFI_MEMORY_UC | EFI_MEMORY_XP
+                         );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Failed to map GICv3 redistributor MMIO interface at 0x%lx: %r\n",
+        __func__,
+        GicCpuRedistributorBase,
+        Status
+        ));
+      ASSERT_EFI_ERROR (Status);
+      return 0;
+    }
+
     TypeRegister = MmioRead64 (GicCpuRedistributorBase + ARM_GICR_TYPER);
     Affinity     = ARM_GICR_TYPER_GET_AFFINITY (TypeRegister);
     if (Affinity == CpuAffinity) {
@@ -103,15 +124,12 @@ GicGetCpuRedistributorBase (
 STATIC
 VOID
 ArmGicSetInterruptPriority (
-  IN UINTN   GicDistributorBase,
-  IN UINTN   GicRedistributorBase,
   IN UINTN   Source,
   IN UINT32  Priority
   )
 {
   UINT32  RegOffset;
   UINT8   RegShift;
-  UINTN   GicCpuRedistributorBase;
 
   // Calculate register offset and bit position
   RegOffset = (UINT32)(Source / 4);
@@ -119,20 +137,13 @@ ArmGicSetInterruptPriority (
 
   if (SourceIsSpi (Source)) {
     MmioAndThenOr32 (
-      GicDistributorBase + ARM_GIC_ICDIPR + (4 * RegOffset),
+      mGicDistributorBase + ARM_GIC_ICDIPR + (4 * RegOffset),
       ~(0xff << RegShift),
       Priority << RegShift
       );
   } else {
-    GicCpuRedistributorBase = GicGetCpuRedistributorBase (
-                                GicRedistributorBase
-                                );
-    if (GicCpuRedistributorBase == 0) {
-      return;
-    }
-
     MmioAndThenOr32 (
-      IPRIORITY_ADDRESS (GicCpuRedistributorBase, RegOffset),
+      IPRIORITY_ADDRESS (mGicRedistributorBase, RegOffset),
       ~(0xff << RegShift),
       Priority << RegShift
       );
@@ -142,14 +153,11 @@ ArmGicSetInterruptPriority (
 STATIC
 VOID
 ArmGicEnableInterrupt (
-  IN UINTN  GicDistributorBase,
-  IN UINTN  GicRedistributorBase,
   IN UINTN  Source
   )
 {
   UINT32  RegOffset;
   UINT8   RegShift;
-  UINTN   GicCpuRedistributorBase;
 
   // Calculate enable register offset and bit position
   RegOffset = (UINT32)(Source / 32);
@@ -158,21 +166,13 @@ ArmGicEnableInterrupt (
   if (SourceIsSpi (Source)) {
     // Write set-enable register
     MmioWrite32 (
-      GicDistributorBase + ARM_GIC_ICDISER + (4 * RegOffset),
+      mGicDistributorBase + ARM_GIC_ICDISER + (4 * RegOffset),
       1 << RegShift
       );
   } else {
-    GicCpuRedistributorBase = GicGetCpuRedistributorBase (
-                                GicRedistributorBase
-                                );
-    if (GicCpuRedistributorBase == 0) {
-      ASSERT_EFI_ERROR (EFI_NOT_FOUND);
-      return;
-    }
-
     // Write set-enable register
     MmioWrite32 (
-      ISENABLER_ADDRESS (GicCpuRedistributorBase, RegOffset),
+      ISENABLER_ADDRESS (mGicRedistributorBase, RegOffset),
       1 << RegShift
       );
   }
@@ -181,14 +181,11 @@ ArmGicEnableInterrupt (
 STATIC
 VOID
 ArmGicDisableInterrupt (
-  IN UINTN  GicDistributorBase,
-  IN UINTN  GicRedistributorBase,
   IN UINTN  Source
   )
 {
   UINT32  RegOffset;
   UINT8   RegShift;
-  UINTN   GicCpuRedistributorBase;
 
   // Calculate enable register offset and bit position
   RegOffset = (UINT32)(Source / 32);
@@ -197,20 +194,13 @@ ArmGicDisableInterrupt (
   if (SourceIsSpi (Source)) {
     // Write clear-enable register
     MmioWrite32 (
-      GicDistributorBase + ARM_GIC_ICDICER + (4 * RegOffset),
+      mGicDistributorBase + ARM_GIC_ICDICER + (4 * RegOffset),
       1 << RegShift
       );
   } else {
-    GicCpuRedistributorBase = GicGetCpuRedistributorBase (
-                                GicRedistributorBase
-                                );
-    if (GicCpuRedistributorBase == 0) {
-      return;
-    }
-
     // Write clear-enable register
     MmioWrite32 (
-      ICENABLER_ADDRESS (GicCpuRedistributorBase, RegOffset),
+      ICENABLER_ADDRESS (mGicRedistributorBase, RegOffset),
       1 << RegShift
       );
   }
@@ -219,14 +209,11 @@ ArmGicDisableInterrupt (
 STATIC
 BOOLEAN
 ArmGicIsInterruptEnabled (
-  IN UINTN  GicDistributorBase,
-  IN UINTN  GicRedistributorBase,
   IN UINTN  Source
   )
 {
   UINT32  RegOffset;
   UINT8   RegShift;
-  UINTN   GicCpuRedistributorBase;
   UINT32  Interrupts;
 
   // Calculate enable register offset and bit position
@@ -235,19 +222,12 @@ ArmGicIsInterruptEnabled (
 
   if (SourceIsSpi (Source)) {
     Interrupts = MmioRead32 (
-                   GicDistributorBase + ARM_GIC_ICDISER + (4 * RegOffset)
+                   mGicDistributorBase + ARM_GIC_ICDISER + (4 * RegOffset)
                    );
   } else {
-    GicCpuRedistributorBase = GicGetCpuRedistributorBase (
-                                GicRedistributorBase
-                                );
-    if (GicCpuRedistributorBase == 0) {
-      return 0;
-    }
-
     // Read set-enable register
     Interrupts = MmioRead32 (
-                   ISENABLER_ADDRESS (GicCpuRedistributorBase, RegOffset)
+                   ISENABLER_ADDRESS (mGicRedistributorBase, RegOffset)
                    );
   }
 
@@ -277,7 +257,7 @@ GicV3EnableInterruptSource (
     return EFI_UNSUPPORTED;
   }
 
-  ArmGicEnableInterrupt (mGicDistributorBase, mGicRedistributorsBase, Source);
+  ArmGicEnableInterrupt (Source);
 
   return EFI_SUCCESS;
 }
@@ -305,7 +285,7 @@ GicV3DisableInterruptSource (
     return EFI_UNSUPPORTED;
   }
 
-  ArmGicDisableInterrupt (mGicDistributorBase, mGicRedistributorsBase, Source);
+  ArmGicDisableInterrupt (Source);
 
   return EFI_SUCCESS;
 }
@@ -335,11 +315,7 @@ GicV3GetInterruptSourceState (
     return EFI_UNSUPPORTED;
   }
 
-  *InterruptState = ArmGicIsInterruptEnabled (
-                      mGicDistributorBase,
-                      mGicRedistributorsBase,
-                      Source
-                      );
+  *InterruptState = ArmGicIsInterruptEnabled (Source);
 
   return EFI_SUCCESS;
 }
@@ -634,9 +610,21 @@ GicV3DxeInitialize (
   // the system.
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gHardwareInterruptProtocolGuid);
 
-  mGicDistributorBase    = (UINTN)PcdGet64 (PcdGicDistributorBase);
-  mGicRedistributorsBase = PcdGet64 (PcdGicRedistributorsBase);
-  mGicNumInterrupts      = ArmGicGetMaxNumInterrupts (mGicDistributorBase);
+  // Locate the CPU arch protocol - cannot fail because of DEPEX
+  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&gCpuArch);
+  ASSERT_EFI_ERROR (Status);
+
+  mGicDistributorBase = (UINTN)PcdGet64 (PcdGicDistributorBase);
+
+  Status = gCpuArch->SetMemoryAttributes (gCpuArch, mGicDistributorBase, GICD_V3_SIZE, EFI_MEMORY_UC | EFI_MEMORY_XP);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Failed to map GICv3 distributor MMIO interface: %r\n", __func__, Status));
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  mGicRedistributorBase = GicGetCpuRedistributorBase (PcdGet64 (PcdGicRedistributorsBase));
+  mGicNumInterrupts     = ArmGicGetMaxNumInterrupts (mGicDistributorBase);
 
   RegValue = ArmGicV3GetControlSystemRegisterEnable ();
   if ((RegValue & ICC_SRE_EL2_SRE) == 0) {
@@ -652,12 +640,7 @@ GicV3DxeInitialize (
     GicV3DisableInterruptSource (&gHardwareInterruptV3Protocol, Index);
 
     // Set Priority
-    ArmGicSetInterruptPriority (
-      mGicDistributorBase,
-      mGicRedistributorsBase,
-      Index,
-      ARM_GIC_DEFAULT_PRIORITY
-      );
+    ArmGicSetInterruptPriority (Index, ARM_GIC_DEFAULT_PRIORITY);
   }
 
   // Targets the interrupts to the Primary Cpu
@@ -678,7 +661,7 @@ GicV3DxeInitialize (
     // first.
 
     MmioWrite32 (
-      mGicRedistributorsBase + ARM_GICR_CTLR_FRAME_SIZE + ARM_GIC_ICDISR,
+      mGicRedistributorBase + ARM_GICR_CTLR_FRAME_SIZE + ARM_GIC_ICDISR,
       0xffffffff
       );
 

@@ -55,6 +55,7 @@
   PpiListLib
   PeiServicesLib
   FrameBufferBltLib
+  StackCheckLib
 
 [Ppis]
   gEmuThunkPpiGuid
@@ -86,7 +87,7 @@
   gEmulatorPkgTokenSpaceGuid.PcdEmuNetworkInterface|L"0"
 
 [BuildOptions]
-  MSFT:*_*_*_DLINK_FLAGS            == /out:"$(BIN_DIR)\$(BASE_NAME).exe" /base:0x10000000 /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb"
+  MSFT:*_*_*_DLINK_FLAGS            == /out:"$(BIN_DIR)\$(BASE_NAME).exe" /base:0x10000000 /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb" /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT)
   MSFT:*_*_*_CC_FLAGS                = /nologo /W4 /WX /Gy /c /D UNICODE /Od /Oy- /FIAutoGen.h /EHs-c- /GF /D _CRT_SECURE_NO_WARNINGS /D _CRT_SECURE_NO_DEPRECATE
   MSFT:*_*_*_PP_FLAGS               == /nologo /E /TC /FIAutoGen.h
 

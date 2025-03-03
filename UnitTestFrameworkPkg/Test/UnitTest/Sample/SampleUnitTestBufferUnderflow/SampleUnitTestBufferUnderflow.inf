@@ -1,0 +1,32 @@
+## @file
+# Sample UnitTest built for execution on a Host machine.
+# This test case generates a buffer underflow that is caught by a sanitizer.
+#
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010005
+  BASE_NAME      = SampleUnitTestBufferUnderflow
+  FILE_GUID      = ECA331D2-D794-4798-B145-770A570F3309
+  MODULE_TYPE    = HOST_APPLICATION
+  VERSION_STRING = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SampleUnitTestBufferUnderflow.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UnitTestLib
+  MemoryAllocationLib

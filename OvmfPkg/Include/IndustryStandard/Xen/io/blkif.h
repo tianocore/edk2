@@ -73,13 +73,49 @@
  *      Values:         string
  *
  *      A free formatted string providing sufficient information for the
- *      backend driver to open the backing device.  (e.g. the path to the
- *      file or block device representing the backing store.)
+ *      hotplug script to attach the device and provide a suitable
+ *      handler (ie: a block device) for blkback to use.
+ *
+ * physical-device
+ *      Values:         "MAJOR:MINOR"
+ *      Notes: 11
+ *
+ *      MAJOR and MINOR are the major number and minor number of the
+ *      backing device respectively.
+ *
+ * physical-device-path
+ *      Values:         path string
+ *
+ *      A string that contains the absolute path to the disk image. On
+ *      NetBSD and Linux this is always a block device, while on FreeBSD
+ *      it can be either a block device or a regular file.
  *
  * type
  *      Values:         "file", "phy", "tap"
  *
  *      The type of the backing device/object.
+ *
+ *
+ * direct-io-safe
+ *      Values:         0/1 (boolean)
+ *      Default Value:  0
+ *
+ *      The underlying storage is not affected by the direct IO memory
+ *      lifetime bug.  See:
+ *        https://lists.xen.org/archives/html/xen-devel/2012-12/msg01154.html
+ *
+ *      Therefore this option gives the backend permission to use
+ *      O_DIRECT, notwithstanding that bug.
+ *
+ *      That is, if this option is enabled, use of O_DIRECT is safe,
+ *      in circumstances where we would normally have avoided it as a
+ *      workaround for that bug.  This option is not relevant for all
+ *      backends, and even not necessarily supported for those for
+ *      which it is relevant.  A backend which knows that it is not
+ *      affected by the bug can ignore this option.
+ *
+ *      This option doesn't require a backend to use O_DIRECT, so it
+ *      should not be used to try to control the caching behaviour.
  *
  *--------------------------------- Features ---------------------------------
  *
@@ -159,6 +195,15 @@
  *
  *------------------------- Backend Device Properties -------------------------
  *
+ * discard-enable
+ *      Values:         0/1 (boolean)
+ *      Default Value:  1
+ *
+ *      This optional property, set by the toolstack, instructs the backend
+ *      to offer (or not to offer) discard to the frontend. If the property
+ *      is missing the backend should offer discard if the backing storage
+ *      actually supports it.
+ *
  * discard-alignment
  *      Values:         <UINT32>
  *      Default Value:  0
@@ -193,18 +238,30 @@
  * sector-size
  *      Values:         <UINT32>
  *
- *      The logical sector size, in bytes, of the backend device.
+ *      The logical block size, in bytes, of the underlying storage. This must
+ *      be a power of two with a minimum value of 512.  The sector size should
+ *      only be used for request segment length and alignment.
+ *
+ *      When exposing a device that uses a logical sector size of 4096, the
+ *      only difference xenstore wise will be that 'sector-size' (and possibly
+ *      'physical-sector-size' if supported by the backend) will be 4096, but
+ *      the 'sectors' node will still be calculated using 512 byte units.  The
+ *      sector base units in the ring requests fields will all be 512 byte
+ *      based despite the logical sector size exposed in 'sector-size'.
  *
  * physical-sector-size
  *      Values:         <UINT32>
+ *      Default Value:  <"sector-size">
  *
- *      The physical sector size, in bytes, of the backend device.
+ *      The physical block size, in bytes, of the backend storage. This
+ *      must be an integer multiple of "sector-size".
  *
  * sectors
  *      Values:         <UINT64>
  *
- *      The size of the backend device, expressed in units of its logical
- *      sector size ("sector-size").
+ *      The size of the backend device, expressed in units of 512b.  The
+ *      product of "sectors" * 512 must also be an integer multiple of
+ *      "physical-sector-size", if that node is present.
  *
  *****************************************************************************
  *                            Frontend XenBus Nodes
@@ -260,6 +317,8 @@
  *      The size of the frontend allocated request ring buffer in units of
  *      machine pages.  The value must be a power of 2.
  *
+ *--------------------------------- Features ---------------------------------
+ *
  * feature-persistent
  *      Values:         0/1 (boolean)
  *      Default Value:  0
@@ -280,6 +339,26 @@
  *      grants gets used commonly. This is done in case the backend driver
  *      decides to limit the maximum number of persistently mapped grants
  *      to a value less than RING_SIZE * BLKIF_MAX_SEGMENTS_PER_REQUEST.
+ *
+ * feature-large-sector-size
+ *      Values:         0/1 (boolean)
+ *      Default Value:  0
+ *      Notes:          DEPRECATED, 12
+ *
+ *      A value of "1" indicates that the frontend will correctly supply and
+ *      interpret all sector-based quantities in terms of the "sector-size"
+ *      value supplied in the backend info, whatever that may be set to.
+ *      If this node is not present or its value is "0" then it is assumed
+ *      that the frontend requires that the logical block size is 512 as it
+ *      is hardcoded (which is the case in some frontend implementations).
+ *
+ * trusted
+ *      Values:         0/1 (boolean)
+ *      Default value:  1
+ *
+ *      A value of "0" indicates that the frontend should not trust the
+ *      backend, and should deploy whatever measures available to protect from
+ *      a malicious backend on the other end.
  *
  *------------------------- Virtual Device Properties -------------------------
  *
@@ -337,6 +416,60 @@
  *     than RING_SIZE * BLKIF_MAX_SEGMENTS_PER_REQUEST.
  *(10) The discard-secure property may be present and will be set to 1 if the
  *     backing device supports secure discard.
+ *(11) Only used by Linux and NetBSD.
+ *(12) Possibly only ever implemented by the QEMU Qdisk backend and the Windows
+ *     PV block frontend.  Other backends and frontends supported 'sector-size'
+ *     values greater than 512 before such feature was added.  Frontends should
+ *     not expose this node, neither should backends make any decisions based
+ *     on it being exposed by the frontend.
+ */
+
+/*
+ * Multiple hardware queues/rings:
+ * If supported, the backend will write the key "multi-queue-max-queues" to
+ * the directory for that vbd, and set its value to the maximum supported
+ * number of queues.
+ * Frontends that are aware of this feature and wish to use it can write the
+ * key "multi-queue-num-queues" with the number they wish to use, which must be
+ * greater than zero, and no more than the value reported by the backend in
+ * "multi-queue-max-queues".
+ *
+ * For frontends requesting just one queue, the usual event-channel and
+ * ring-ref keys are written as before, simplifying the backend processing
+ * to avoid distinguishing between a frontend that doesn't understand the
+ * multi-queue feature, and one that does, but requested only one queue.
+ *
+ * Frontends requesting two or more queues must not write the toplevel
+ * event-channel and ring-ref keys, instead writing those keys under sub-keys
+ * having the name "queue-N" where N is the integer ID of the queue/ring for
+ * which those keys belong. Queues are indexed from zero.
+ * For example, a frontend with two queues must write the following set of
+ * queue-related keys:
+ *
+ * /local/domain/1/device/vbd/0/multi-queue-num-queues = "2"
+ * /local/domain/1/device/vbd/0/queue-0 = ""
+ * /local/domain/1/device/vbd/0/queue-0/ring-ref = "<ring-ref#0>"
+ * /local/domain/1/device/vbd/0/queue-0/event-channel = "<evtchn#0>"
+ * /local/domain/1/device/vbd/0/queue-1 = ""
+ * /local/domain/1/device/vbd/0/queue-1/ring-ref = "<ring-ref#1>"
+ * /local/domain/1/device/vbd/0/queue-1/event-channel = "<evtchn#1>"
+ *
+ * It is also possible to use multiple queues/rings together with
+ * feature multi-page ring buffer.
+ * For example, a frontend requests two queues/rings and the size of each ring
+ * buffer is two pages must write the following set of related keys:
+ *
+ * /local/domain/1/device/vbd/0/multi-queue-num-queues = "2"
+ * /local/domain/1/device/vbd/0/ring-page-order = "1"
+ * /local/domain/1/device/vbd/0/queue-0 = ""
+ * /local/domain/1/device/vbd/0/queue-0/ring-ref0 = "<ring-ref#0>"
+ * /local/domain/1/device/vbd/0/queue-0/ring-ref1 = "<ring-ref#1>"
+ * /local/domain/1/device/vbd/0/queue-0/event-channel = "<evtchn#0>"
+ * /local/domain/1/device/vbd/0/queue-1 = ""
+ * /local/domain/1/device/vbd/0/queue-1/ring-ref0 = "<ring-ref#2>"
+ * /local/domain/1/device/vbd/0/queue-1/ring-ref1 = "<ring-ref#3>"
+ * /local/domain/1/device/vbd/0/queue-1/event-channel = "<evtchn#1>"
+ *
  */
 
 /*
@@ -501,12 +634,14 @@
 #define BLKIF_MAX_INDIRECT_PAGES_PER_REQUEST  8
 
 /*
- * NB. first_sect and last_sect in blkif_request_segment, as well as
- * sector_number in blkif_request, are always expressed in 512-byte units.
- * However they must be properly aligned to the real sector size of the
- * physical disk, which is reported in the "physical-sector-size" node in
- * the backend xenbus info. Also the xenbus "sectors" node is expressed in
- * 512-byte units.
+ * NB. 'first_sect' and 'last_sect' in blkif_request_segment are all in units
+ * of 512 bytes, despite the 'sector-size' xenstore node possibly having a
+ * value greater than 512.
+ *
+ * The value in 'first_sect' and 'last_sect' fields must be setup so that the
+ * resulting segment offset and size is aligned to the logical sector size
+ * reported by the 'sector-size' xenstore node, see 'Backend Device Properties'
+ * section.
  */
 struct blkif_request_segment {
   grant_ref_t    gref;       /* reference to I/O buffer frame        */
@@ -517,6 +652,10 @@ struct blkif_request_segment {
 
 /*
  * Starting ring element for any I/O request.
+ *
+ * The 'sector_number' field is in units of 512b, despite the value of the
+ * 'sector-size' xenstore node.  Note however that the offset in
+ * 'sector_number' must be aligned to 'sector-size'.
  */
 #if defined (MDE_CPU_IA32)
 //
@@ -540,6 +679,10 @@ typedef struct blkif_request blkif_request_t;
 /*
  * Cast to this structure when blkif_request.operation == BLKIF_OP_DISCARD
  * sizeof(struct blkif_request_discard) <= sizeof(struct blkif_request)
+ *
+ * The 'sector_number' field is in units of 512b, despite the value of the
+ * 'sector-size' xenstore node.  Note however that the offset in
+ * 'sector_number' must be aligned to 'sector-size'.
  */
 struct blkif_request_discard {
   UINT8             operation;         /* BLKIF_OP_DISCARD                     */
@@ -553,6 +696,11 @@ struct blkif_request_discard {
 
 typedef struct blkif_request_discard blkif_request_discard_t;
 
+/*
+ * The 'sector_number' field is in units of 512b, despite the value of the
+ * 'sector-size' xenstore node.  Note however that the offset in
+ * 'sector_number' must be aligned to 'sector-size'.
+ */
 struct blkif_request_indirect {
   UINT8             operation;     /* BLKIF_OP_INDIRECT                    */
   UINT8             indirect_op;   /* BLKIF_OP_{READ/WRITE}                */

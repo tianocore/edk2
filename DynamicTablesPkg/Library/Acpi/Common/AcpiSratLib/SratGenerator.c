@@ -2,6 +2,8 @@
   SRAT Table Generator
 
   Copyright (c) 2019 - 2020, Arm Limited. All rights reserved.
+  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -140,9 +142,9 @@ AddMemoryAffinity (
     MemAff->ProximityDomain = MemAffInfo->ProximityDomain;
     MemAff->Reserved1       = EFI_ACPI_RESERVED_WORD;
     MemAff->AddressBaseLow  = (UINT32)(MemAffInfo->BaseAddress & MAX_UINT32);
-    MemAff->AddressBaseHigh = (UINT32)(MemAffInfo->BaseAddress >> 32);
+    MemAff->AddressBaseHigh = (UINT32)RShiftU64 (MemAffInfo->BaseAddress, 32);
     MemAff->LengthLow       = (UINT32)(MemAffInfo->Length & MAX_UINT32);
-    MemAff->LengthHigh      = (UINT32)(MemAffInfo->Length >> 32);
+    MemAff->LengthHigh      = (UINT32)RShiftU64 (MemAffInfo->Length, 32);
     MemAff->Reserved2       = EFI_ACPI_RESERVED_DWORD;
     MemAff->Flags           = MemAffInfo->Flags;
     MemAff->Reserved3       = EFI_ACPI_RESERVED_QWORD;

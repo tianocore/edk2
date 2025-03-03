@@ -19,8 +19,10 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PrintLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <Library/QemuFwCfgSimpleParserLib.h>
 #include <Library/QemuLoadImageLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiLib.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/OvmfLoadedX86LinuxKernel.h>
@@ -51,6 +53,25 @@ STATIC CONST KERNEL_VENMEDIA_FILE_DEVPATH  mKernelDevicePath = {
       { sizeof (KERNEL_FILE_DEVPATH)      }
     },
     L"kernel",
+  },  {
+    END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    { sizeof (EFI_DEVICE_PATH_PROTOCOL) }
+  }
+};
+
+STATIC CONST KERNEL_VENMEDIA_FILE_DEVPATH  mShimDevicePath = {
+  {
+    {
+      MEDIA_DEVICE_PATH, MEDIA_VENDOR_DP,
+      { sizeof (VENDOR_DEVICE_PATH)       }
+    },
+    QEMU_KERNEL_LOADER_FS_MEDIA_GUID
+  },  {
+    {
+      MEDIA_DEVICE_PATH, MEDIA_FILEPATH_DP,
+      { sizeof (KERNEL_FILE_DEVPATH)      }
+    },
+    L"shim",
   },  {
     END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE,
     { sizeof (EFI_DEVICE_PATH_PROTOCOL) }
@@ -339,6 +360,7 @@ QemuLoadKernelImage (
   UINTN                      CommandLineSize;
   CHAR8                      *CommandLine;
   UINTN                      InitrdSize;
+  BOOLEAN                    Shim;
 
   //
   // Redundant assignment to work around GCC48/GCC49 limitations.
@@ -351,11 +373,35 @@ QemuLoadKernelImage (
   Status = gBS->LoadImage (
                   FALSE,                    // BootPolicy: exact match required
                   gImageHandle,             // ParentImageHandle
-                  (EFI_DEVICE_PATH_PROTOCOL *)&mKernelDevicePath,
+                  (EFI_DEVICE_PATH_PROTOCOL *)&mShimDevicePath,
                   NULL,                     // SourceBuffer
                   0,                        // SourceSize
                   &KernelImageHandle
                   );
+  if (Status == EFI_SUCCESS) {
+    Shim = TRUE;
+    DEBUG ((DEBUG_INFO, "%a: booting via shim\n", __func__));
+  } else {
+    Shim = FALSE;
+    if (Status == EFI_SECURITY_VIOLATION) {
+      gBS->UnloadImage (KernelImageHandle);
+    }
+
+    if (Status != EFI_NOT_FOUND) {
+      DEBUG ((DEBUG_INFO, "%a: LoadImage(shim): %r\n", __func__, Status));
+      return Status;
+    }
+
+    Status = gBS->LoadImage (
+                    FALSE,                  // BootPolicy: exact match required
+                    gImageHandle,           // ParentImageHandle
+                    (EFI_DEVICE_PATH_PROTOCOL *)&mKernelDevicePath,
+                    NULL,                   // SourceBuffer
+                    0,                      // SourceSize
+                    &KernelImageHandle
+                    );
+  }
+
   switch (Status) {
     case EFI_SUCCESS:
       break;
@@ -377,13 +423,45 @@ QemuLoadKernelImage (
     // Fall through
     //
     case EFI_ACCESS_DENIED:
-    //
-    // We are running with UEFI secure boot enabled, and the image failed to
-    // authenticate. For compatibility reasons, we fall back to the legacy
-    // loader in this case.
-    //
-    // Fall through
-    //
+      //
+      // We are running with UEFI secure boot enabled, and the image failed to
+      // authenticate. For compatibility reasons, we fall back to the legacy
+      // loader in this case (unless disabled via fw_cfg).
+      //
+    {
+      EFI_STATUS  RetStatus;
+      BOOLEAN     Enabled = TRUE;
+
+      AsciiPrint (
+        "OVMF: Secure boot image verification failed.  Consider using the '-shim'\n"
+        "OVMF: command line switch for qemu (available in version 10.0 + newer).\n"
+        "\n"
+        );
+
+      RetStatus = QemuFwCfgParseBool (
+                    "opt/org.tianocore/EnableLegacyLoader",
+                    &Enabled
+                    );
+      if (EFI_ERROR (RetStatus)) {
+        Enabled = TRUE;
+      }
+
+      if (!Enabled) {
+        AsciiPrint (
+          "OVMF: Fallback to insecure legacy linux kernel loader is disabled.\n"
+          "\n"
+          );
+        return EFI_ACCESS_DENIED;
+      } else {
+        AsciiPrint (
+          "OVMF: Using legacy linux kernel loader (insecure and deprecated).\n"
+          "\n"
+          );
+        //
+        // Fall through
+        //
+      }
+    }
     case EFI_UNSUPPORTED:
       //
       // The image is not natively supported or cross-type supported. Let's try
@@ -465,6 +543,13 @@ QemuLoadKernelImage (
     KernelLoadedImage->LoadOptionsSize += sizeof (L" initrd=initrd") - 2;
   }
 
+  if (Shim) {
+    //
+    // Prefix 'kernel ' in UTF-16.
+    //
+    KernelLoadedImage->LoadOptionsSize += sizeof (L"kernel ") - 2;
+  }
+
   if (KernelLoadedImage->LoadOptionsSize == 0) {
     KernelLoadedImage->LoadOptions = NULL;
   } else {
@@ -485,7 +570,8 @@ QemuLoadKernelImage (
     UnicodeSPrintAsciiFormat (
       KernelLoadedImage->LoadOptions,
       KernelLoadedImage->LoadOptionsSize,
-      "%a%a",
+      "%a%a%a",
+      (Shim == FALSE)        ?  "" : "kernel ",
       (CommandLineSize == 0) ?  "" : CommandLine,
       (InitrdSize == 0)      ?  "" : " initrd=initrd"
       );

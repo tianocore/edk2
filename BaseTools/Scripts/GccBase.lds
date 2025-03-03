@@ -1,14 +1,20 @@
 /** @file
 
-  Unified linker script for GCC based builds
+  Unified linker script for GCC and CLANG based builds
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2021, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2015, Linaro Ltd. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
+PHDRS {
+  text      PT_LOAD     FLAGS(5);  /* R_X */
+  data      PT_LOAD     FLAGS(6);  /* RW_ */
+  dynamic   PT_DYNAMIC  FLAGS(4);  /* R__ */
+}
 
 SECTIONS {
 
@@ -21,6 +27,7 @@ SECTIONS {
   . = PECOFF_HEADER_SIZE;
 
   .text : ALIGN(CONSTANT(COMMONPAGESIZE)) {
+    KEEP(*(.entry))
     *(.text .text.* .stub .gnu.linkonce.t.*)
     *(.rodata .rodata.* .gnu.linkonce.r.*)
     *(.got .got.*)
@@ -34,7 +41,7 @@ SECTIONS {
      * emitted GUIDs here.
      */
     *:AutoGen.obj(.data.g*Guid)
-  }
+  } :text
 
   /*
    * The alignment of the .data section should be less than or equal to the
@@ -45,11 +52,13 @@ SECTIONS {
   .data ALIGN(ALIGNOF(.text)) : ALIGN(CONSTANT(COMMONPAGESIZE)) {
     *(.data .data.* .gnu.linkonce.d.*)
     *(.bss .bss.*)
-  }
+  } :data
 
   .eh_frame ALIGN(CONSTANT(COMMONPAGESIZE)) : {
     KEEP (*(.eh_frame))
   }
+
+  .dynamic : { *(.dynamic) } :data :dynamic
 
   .rela (INFO) : {
     *(.rela .rela.*)
@@ -57,7 +66,7 @@ SECTIONS {
 
   .hii : ALIGN(CONSTANT(COMMONPAGESIZE)) {
     KEEP (*(.hii))
-  }
+  } :data
 
   .got : {
     *(.got)
@@ -81,7 +90,6 @@ SECTIONS {
     *(.interp)
     *(.dynsym)
     *(.dynstr)
-    *(.dynamic)
     *(.hash .gnu.hash)
     *(.comment)
   }

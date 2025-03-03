@@ -1,0 +1,29 @@
+## @file
+#  UefiCpu AArch64 architecture support library.
+#
+#  Copyright 2024 Google LLC
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION         = 0x0001001b
+  BASE_NAME           = UefiCpuBaseArchSupportLib
+  FILE_GUID           = 692f5af5-e629-4ead-ade1-db353d59bcb9
+  MODULE_TYPE         = BASE
+  VERSION_STRING      = 1.0
+  LIBRARY_CLASS       = UefiCpuBaseArchSupportLib
+
+[Sources.AARCH64]
+  AArch64/AArch64LibSupport.c
+
+[Sources.IA32, Sources.X64]
+  X86/X86LibSupport.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib

@@ -28,10 +28,6 @@
   Include                        # Root include for the package
 
 [LibraryClasses.common]
-  ##  @libraryclass  Convert Arm instructions to a human readable format.
-  #
-  ArmDisassemblerLib|Include/Library/ArmDisassemblerLib.h
-
   ##  @libraryclass  Provides an interface to Arm generic counters.
   #
   ArmGenericTimerCounterLib|Include/Library/ArmGenericTimerCounterLib.h
@@ -134,15 +130,6 @@
 [PcdsFeatureFlag.common]
   gArmTokenSpaceGuid.PcdCpuDxeProduceDebugSupport|FALSE|BOOLEAN|0x00000001
 
-  # On ARM Architecture with the Security Extension, the address for the
-  # Vector Table can be mapped anywhere in the memory map. It means we can
-  # point the Exception Vector Table to its location in CpuDxe.
-  # By default we copy the Vector Table at  PcdGet64(PcdCpuVectorBaseAddress)
-  gArmTokenSpaceGuid.PcdRelocateVectorTable|TRUE|BOOLEAN|0x00000022
-  # Set this PCD to TRUE if the Exception Vector is changed to add debugger support before
-  # it has been configured by the CPU DXE
-  gArmTokenSpaceGuid.PcdDebuggerExceptionSupport|FALSE|BOOLEAN|0x00000032
-
   # Whether to remap all unused memory NX before installing the CPU arch
   # protocol driver. This is needed on platforms that map all DRAM with RWX
   # attributes initially, and can be disabled otherwise.
@@ -161,7 +148,6 @@
   # Using a FeaturePcd make a '(BOOLEAN) casting for its value which is not understood by the preprocessor.
   gArmTokenSpaceGuid.PcdVFPEnabled|0|UINT32|0x00000024
 
-  gArmTokenSpaceGuid.PcdCpuVectorBaseAddress|0xffff0000|UINT64|0x00000004
   gArmTokenSpaceGuid.PcdCpuResetAddress|0x00000000|UINT32|0x00000005
 
   #

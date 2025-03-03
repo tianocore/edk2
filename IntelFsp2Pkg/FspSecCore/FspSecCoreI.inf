@@ -50,5 +50,6 @@
   FspSwitchStackLib
   FspCommonLib
   FspSecPlatformLib
+  StackCheckLib
 
 
