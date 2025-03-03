@@ -92,6 +92,7 @@
   PlatformBootManagerLib|MdeModulePkg/Library/PlatformBootManagerLibNull/PlatformBootManagerLibNull.inf
   PciHostBridgeLib|MdeModulePkg/Library/PciHostBridgeLibNull/PciHostBridgeLibNull.inf
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+  TdxMeasurementLib|MdeModulePkg/Library/TdxMeasurementLibNull/TdxMeasurementLibNull.inf
   AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
   VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
   FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
@@ -320,6 +321,7 @@
   MdeModulePkg/Library/PlatformBootManagerLibNull/PlatformBootManagerLibNull.inf
   MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
   MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+  MdeModulePkg/Library/TdxMeasurementLibNull/TdxMeasurementLibNull.inf
   MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
   MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
   MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
