@@ -95,6 +95,9 @@
   #
   TpmMeasurementLib|Include/Library/TpmMeasurementLib.h
 
+  ## @libraryclass  Provides functions for Tdx Measurement processing
+  TdxMeasurementLib|Include/Library/TdxMeasurementLib.h
+
   ## @libraryclass  Provides authenticated variable services.
   #
   AuthVariableLib|Include/Library/AuthVariableLib.h
