@@ -221,6 +221,12 @@
   # If PcdMonitorConduitHvc = TRUE, conduit = HVC
   gArmTokenSpaceGuid.PcdMonitorConduitHvc|FALSE|BOOLEAN|0x00000047
 
+  # Whether to use 18 registers for SMC/SVC calls. 0 is to use 8 registers to
+  # be backward compatible with existing legacy SPMC implementations. 1 is to
+  # use 18 registers to support the latest SPMC implementations, such as Hafnium,
+  # which has needs for FF-A v1.2+ capabilities.
+  gArmTokenSpaceGuid.PcdSxcUse18Registers|FALSE|BOOLEAN|0x0000004B
+
 [PcdsFixedAtBuild.common, PcdsPatchableInModule.common]
   gArmTokenSpaceGuid.PcdFdBaseAddress|0|UINT64|0x0000002B
   gArmTokenSpaceGuid.PcdFvBaseAddress|0|UINT64|0x0000002D

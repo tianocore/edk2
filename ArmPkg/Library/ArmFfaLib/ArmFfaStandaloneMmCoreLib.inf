@@ -34,3 +34,6 @@
 
 [Pcd]
   gArmTokenSpaceGuid.PcdFfaLibConduitSmc
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdSxcUse18Registers
