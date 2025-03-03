@@ -175,6 +175,7 @@
   INTEL:RELEASE_*_*_CC_FLAGS     = /D MDEPKG_NDEBUG
   MSFT:RELEASE_*_*_CC_FLAGS      = /D MDEPKG_NDEBUG
 !endif
+  *_*_*_CC_FLAGS                 = $(APPEND_CC_FLAGS)
 
 [BuildOptions.AARCH64]
   GCC:*_*_*_CC_FLAGS         = -mcmodel=tiny -mstrict-align

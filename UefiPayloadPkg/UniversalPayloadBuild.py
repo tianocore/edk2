@@ -164,6 +164,14 @@ def BuildUniversalPayload(Args):
         for MacroItem in Args.Macro:
             Defines += " -D {}".format (MacroItem)
 
+    if (Args.add_cc_flags!= None):
+        CcFlags = " ".join(Args.add_cc_flags)
+
+        # Wrap the CC flags with double quotes since we might have plenty of
+        # specified build options
+        FinalFlags = f'"{CcFlags}"'
+        Defines += " -D APPEND_CC_FLAGS={}".format (FinalFlags)
+
     #
     # Building DXE core and DXE drivers as DXEFV.
     #
@@ -330,6 +338,7 @@ def main():
     parser.add_argument("-f", "--Fit", action='store_true', help='Build UniversalPayload file as UniversalPayload.fit', default=False)
     parser.add_argument('-l', "--LoadAddress", type=int, help='Specify payload load address', default =0x000800000)
     parser.add_argument('-c', '--DscPath', type=str, default="UefiPayloadPkg/UefiPayloadPkg.dsc", help='Path to the DSC file')
+    parser.add_argument('-ac', '--add_cc_flags', action='append', help='Add specified CC compile flags')
 
     args = parser.parse_args()
 
