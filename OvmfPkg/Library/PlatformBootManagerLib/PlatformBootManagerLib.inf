@@ -57,6 +57,7 @@
   Tcg2PhysicalPresenceLib
   XenPlatformLib
   QemuFwCfgSimpleParserLib
+  PlatformBootManagerCommonLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent

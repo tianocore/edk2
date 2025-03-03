@@ -101,7 +101,7 @@
   gEfiDevicePathProtocolGuid                    ## SOMETIMES_CONSUMES
   gEfiBootLogoProtocolGuid                      ## SOMETIMES_CONSUMES
   gEfiSimpleTextInputExProtocolGuid             ## SOMETIMES_CONSUMES
-  gEdkiiVariablePolicyProtocolGuid              ## SOMETIMES_CONSUMES
+  gEdkiiVariablePolicyProtocolGuid              ## SOMETIMES_CONSUMES ## NOTIFY
   gEfiGraphicsOutputProtocolGuid                ## SOMETIMES_CONSUMES
   gEfiUsbIoProtocolGuid                         ## SOMETIMES_CONSUMES
   gEfiNvmExpressPassThruProtocolGuid            ## SOMETIMES_CONSUMES
