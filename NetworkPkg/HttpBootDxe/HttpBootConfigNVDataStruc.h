@@ -27,7 +27,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define FORMID_MAIN_FORM  1
 
-#define KEY_INITIATOR_URI  0x101
+#define KEY_INITIATOR_URI        0x101
+#define KEY_INITIATOR_PROXY_URI  0x102
 
 #define HTTP_BOOT_DEFAULT_DESCRIPTION_STR  L"UEFI HTTP"
 
@@ -37,6 +38,7 @@ typedef struct _HTTP_BOOT_CONFIG_IFR_NVDATA {
   UINT8     Padding;
   CHAR16    Description[DESCRIPTION_STR_MAX_SIZE];
   CHAR16    Uri[URI_STR_MAX_SIZE];
+  CHAR16    ProxyUri[URI_STR_MAX_SIZE];
 } HTTP_BOOT_CONFIG_IFR_NVDATA;
 #pragma pack()
 
