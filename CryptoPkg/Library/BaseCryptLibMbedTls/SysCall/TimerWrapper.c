@@ -191,3 +191,12 @@ gettimeofday (
   tv->tv_usec = 0;
   return 0;
 }
+
+/**sleep function. **/
+unsigned int
+sleep (
+  unsigned int  seconds
+  )
+{
+  return 0;
+}
