@@ -1,0 +1,22 @@
+# @file up-build.yml
+#
+# A workflow that builds UefiPayloadPackage's UPL and upload it's artifacts.
+#
+##
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+name: UPL Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['master']
+
+jobs:
+  build:
+    name: Build UPL
+    uses: ./.github/workflows/BuildPlatform.yml
+    with:
+      runs-on: ubuntu-latest
+    secrets: inherit
