@@ -11,6 +11,7 @@
   and Appendix H, Sub-function Assignments.
 
   Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2025 - Nvidia Corporation.  All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -320,9 +321,9 @@ typedef union {
 
 typedef union {
   struct {
-    UINT8    Length     : 4;
+    UINT8    Length     : 5;
     UINT8    Reserved   : 1;
-    UINT8    StringType : 3;
+    UINT8    StringType : 2;
   } Bits;
   UINT8    Uint8;
 } IPMI_SDR_RECORD_DEV_ID_STR_TYPE_LENGTH;
