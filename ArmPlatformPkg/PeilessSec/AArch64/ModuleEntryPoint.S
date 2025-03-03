@@ -8,6 +8,9 @@
 #include <AsmMacroLib.h>
 
 ASM_FUNC(_ModuleEntryPoint)
+  // Set the TransferList Base Address from register x3
+  adr   x4, PcdGet64 (PcdTransferListBaseAddress)
+  str   x3, [x4]
   // Do early platform specific actions
   bl    ASM_PFX(ArmPlatformPeiBootAction)
 

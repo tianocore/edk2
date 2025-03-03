@@ -2,7 +2,7 @@
   Library that implements the helper functions to parse and pack a Transfer
   List as specified by the A-profile Firmware Handoff Specification.
 
-  Copyright (c) 2022, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2022 - 2025, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -104,6 +104,60 @@ VOID *
 EFIAPI
 TlGetEntryData (
   IN TRANSFER_ENTRY_HEADER  *Te
+  );
+
+/**
+  Dump the transfer list to the debug output.
+
+  @param [in]   Tlh       TransferListHeader
+
+**/
+VOID
+EFIAPI
+TlDump (
+  IN TRANSFER_LIST_HEADER  *Tlh
+  );
+
+/**
+  Verify the checksum of the transfer list.
+
+  @param [in]   Tlh       TransferListHeader
+
+  @retval FALSE      Invalid Checksum
+  @retval TRUE       Valid Checksum
+**/
+BOOLEAN
+EFIAPI
+TlVerifyChecksum (
+  IN TRANSFER_LIST_HEADER  *Tlh
+  );
+
+/**
+  Check the header of the Transfer List.
+
+  @param [in]   Tlh       TransferListHeader
+
+  @return TRANSFER_LIST_OPS code indicating the validity of the Transfer List
+**/
+TRANSFER_LIST_OPS
+EFIAPI
+TlCheckHeader (
+  IN TRANSFER_LIST_HEADER  *Tlh
+  );
+
+/**
+  Find a Transfer Entry Node in the Transfer List matched with the given tag-id.
+
+  @param [in]   Tlh       Pointer to the Transfer List Header
+  @param [in]   TagId     Tag id
+
+  @return Pointer to the Transfer Entry Node if successful otherwise NULL
+**/
+TRANSFER_ENTRY_HEADER *
+EFIAPI
+TlFindEntry (
+  IN TRANSFER_LIST_HEADER  *Tlh,
+  IN UINT16                TagId
   );
 
 #endif // ARM_TRANSFER_LIST_LIB_
