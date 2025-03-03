@@ -32,7 +32,6 @@
   OvmfPkg/OvmfPkg.dec
   SecurityPkg/SecurityPkg.dec
   CryptoPkg/CryptoPkg.dec
-  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   BaseLib
