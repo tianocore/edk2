@@ -31,7 +31,6 @@
   MdeModulePkg/MdeModulePkg.dec
   SecurityPkg/SecurityPkg.dec
   CryptoPkg/CryptoPkg.dec
-  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   MemoryAllocationLib
