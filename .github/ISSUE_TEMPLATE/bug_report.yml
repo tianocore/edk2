@@ -36,15 +36,6 @@ body:
         - label: Tool
         - label: Unit Test
 
-  - type: checkboxes
-    id: code_first
-    attributes:
-      label: Code first?
-      description: |
-        Is this part of a [code first](https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Code-First-Process) change?
-      options:
-        - label: "Yes"
-
   - type: dropdown
     id: packages_impacted
     attributes:
