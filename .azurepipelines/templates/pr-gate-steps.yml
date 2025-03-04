@@ -37,7 +37,7 @@ steps:
     . ~/venv/bin/activate
     echo "##vso[task.setvariable variable=VIRTUAL_ENV]${VIRTUAL_ENV}"
     echo "##vso[task.prependpath]${VIRTUAL_ENV}/bin"
-    pip install -r pip-requirements.txt --upgrade
+    pip install -r pip-requirements.txt --upgrade --ignore-requires-python
   displayName: 'Install/Upgrade pip modules'
 
 # Set default

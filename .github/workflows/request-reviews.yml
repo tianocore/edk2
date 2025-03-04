@@ -60,7 +60,7 @@ jobs:
           cache-dependency-path: '.github/scripts/requirements.txt'
 
       - name: Install PIP Modules
-        run: pip install -r .github/scripts/requirements.txt --upgrade
+        run: pip install -r .github/scripts/requirements.txt --upgrade --ignore-requires-python
 
       - name: Add Reviewers to Pull Request
         env:

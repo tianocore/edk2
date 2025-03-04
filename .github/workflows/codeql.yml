@@ -79,7 +79,7 @@ jobs:
     - name: Install Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
+        python-version: '3.10'
         cache: 'pip'
         cache-dependency-path: 'pip-requirements.txt'
 
@@ -90,7 +90,7 @@ jobs:
         git config --system core.longpaths true
 
     - name: Install/Upgrade pip Modules
-      run: pip install -r pip-requirements.txt --upgrade requests sarif-tools
+      run: pip install -r pip-requirements.txt --upgrade requests sarif-tools --ignore-requires-python
 
     - name: Determine CI Settings File Supported Operations
       id: get_ci_file_operations
