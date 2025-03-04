@@ -148,13 +148,13 @@ GetCommProtocol (
   Validate Boot information when using SpmMm.
   It should use Transfer list according to firmware handoff specification.
 
-  @param  [in]  Arg0          Should be 0x00 because we don't use device tree
-  @param  [in]  Fields        Signature and register convention version
-  @param  [in]  Arg2          Should be 0x00 because we don't use device tree
-  @param  [in]  TlhAddr       Address of transfer list
+  @param  [in]  Arg0                 Should be 0x00 because we don't use device tree
+  @param  [in]  Fields               Signature and register convention version
+  @param  [in]  Arg2                 Should be 0x00 because we don't use device tree
+  @param  [in]  TransferListAddress  Address of transfer list
 
-  @retval EFI_SUCCESS             Valid boot information
-  @retval EFI_INVALID_PARAMETER   Invalid boot information
+  @retval EFI_SUCCESS                Valid boot information
+  @retval EFI_INVALID_PARAMETER      Invalid boot information
 
 **/
 STATIC
@@ -164,7 +164,7 @@ ValidateSpmMmBootInfo (
   IN UINTN   Arg0,
   IN UINT64  Fields,
   IN UINTN   Arg2,
-  IN UINTN   TlhAddr
+  IN UINTN   TransferListAddress
   )
 {
   UINT64  RegVersion;
@@ -180,13 +180,13 @@ ValidateSpmMmBootInfo (
   if ((Fields & TRANSFER_LIST_SIGNATURE_MASK_64) == TRANSFER_LIST_SIGNATURE_64) {
     RegVersion = (Fields >> REGISTER_CONVENTION_VERSION_SHIFT_64) &
                  REGISTER_CONVENTION_VERSION_MASK;
-    if ((RegVersion != 1) || (Arg2 != 0x00) || (TlhAddr == 0x00)) {
+    if ((RegVersion != 1) || (Arg2 != 0x00) || (TransferListAddress == 0x00)) {
       return EFI_INVALID_PARAMETER;
     }
   } else if ((Fields & TRANSFER_LIST_SIGNATURE_MASK_32) == TRANSFER_LIST_SIGNATURE_32) {
     RegVersion = (Fields >> REGISTER_CONVENTION_VERSION_SHIFT_32) &
                  REGISTER_CONVENTION_VERSION_MASK;
-    if ((RegVersion != 1) || (Arg0 != 0x00) || (TlhAddr == 0x00)) {
+    if ((RegVersion != 1) || (Arg0 != 0x00) || (TransferListAddress == 0x00)) {
       return EFI_INVALID_PARAMETER;
     }
   }
@@ -281,7 +281,7 @@ ValidateBootInfo (
 /**
   Get PHIT hob information from firmware handoff transfer list protocol.
 
-  @param[in]      TlhAddr     Transfer list header address
+  @param [in]   TransferListHeader        Pointer to the Transfer List Header.
 
   @retval         NULL                    Failed to get PHIT hob
   @retval         Address                 PHIT hob address
@@ -291,23 +291,23 @@ STATIC
 VOID *
 EFIAPI
 GetPhitHobFromTransferList (
-  IN UINTN  TlhAddr
+  IN UINTN  TransferListAddress
   )
 {
-  TRANSFER_LIST_HEADER   *Tlh;
-  TRANSFER_ENTRY_HEADER  *Te;
+  TRANSFER_LIST_HEADER   *TransferList;
+  TRANSFER_ENTRY_HEADER  *Entry;
   VOID                   *HobStart;
 
-  Tlh = (TRANSFER_LIST_HEADER *)TlhAddr;
+  TransferList = (TRANSFER_LIST_HEADER *)TransferListAddress;
 
-  Te = TlFindFirstEntry (Tlh, TRANSFER_ENTRY_TAG_ID_HOB_LIST);
-  if (Te == NULL) {
+  Entry = TransferListFindFirstEntry (TransferList, TRANSFER_ENTRY_TAG_ID_HOB_LIST);
+  if (Entry == NULL) {
     DEBUG ((DEBUG_ERROR, "Error: No Phit hob is present in transfer list...\n"));
 
     return NULL;
   }
 
-  HobStart = TlGetEntryData (Te);
+  HobStart = TransferListGetEntryData (Entry);
 
   return HobStart;
 }

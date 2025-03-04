@@ -7,11 +7,6 @@
 
   @par Reference(s):
     - https://github.com/FirmwareHandoff/firmware_handoff
-
-  @par Glossary:
-    - TL - Transfer list
-    - TE - Transfer entry
-    - Tlh - Transfer list header
 **/
 
 #include <Base.h>
@@ -22,149 +17,151 @@
 /**
   Return the first Transfer Entry Node in the Transfer List.
 
-  @param [in]   Tlh       TransferListHeader
+  @param [in]   TransferListHeader     TransferListHeader
 
   @return Pointer to the Transfer Entry Node if successful otherwise NULL
 
 **/
 TRANSFER_ENTRY_HEADER *
 EFIAPI
-TlGetFirstEntry (
-  IN TRANSFER_LIST_HEADER  *Tlh
+TransferListGetFirstEntry (
+  IN TRANSFER_LIST_HEADER  *TransferListHeader
   )
 {
-  return TlGetNextEntry (Tlh, NULL);
+  return TransferListGetNextEntry (TransferListHeader, NULL);
 }
 
 /**
   Return the next Transfer Entry Node in the Transfer List from
   last Transfer Entry Node.
 
-  @param [in]   Tlh       TransferListHeader
-  @param [in]   CurrentTe  Pointer to the Current Transfer Entry.
-                           If this is NULL, the first Transfer Entry is returned.
+  @param [in]   TransferListHeader     Pointer to the Transfer List Header.
+  @param [in]   CurrentEntry           Pointer to the Current Transfer Entry.
+                                       If this is NULL, the first Transfer Entry
+                                       is returned.
 
   @return Pointer to the Transfer Entry Node if successful otherwise NULL
 
 **/
 TRANSFER_ENTRY_HEADER *
 EFIAPI
-TlGetNextEntry (
-  IN TRANSFER_LIST_HEADER   *Tlh,
-  IN TRANSFER_ENTRY_HEADER  *CurrentTe
+TransferListGetNextEntry (
+  IN TRANSFER_LIST_HEADER   *TransferListHeader,
+  IN TRANSFER_ENTRY_HEADER  *CurrentEntry
   )
 {
-  TRANSFER_ENTRY_HEADER  *Te;
+  TRANSFER_ENTRY_HEADER  *Entry;
   UINTN                  CurrentAddr;
   UINTN                  EndAddr;
 
-  if (Tlh == NULL) {
+  if (TransferListHeader == NULL) {
     return NULL;
   }
 
-  EndAddr = (UINTN)Tlh + Tlh->UsedSize;
+  EndAddr = (UINTN)TransferListHeader + TransferListHeader->UsedSize;
 
-  if (CurrentTe != NULL) {
-    CurrentAddr = (UINTN)CurrentTe + CurrentTe->HeaderSize + CurrentTe->DataSize;
+  if (CurrentEntry != NULL) {
+    CurrentAddr = (UINTN)CurrentEntry + CurrentEntry->HeaderSize + CurrentEntry->DataSize;
   } else {
-    CurrentAddr = (UINTN)Tlh + Tlh->HeaderSize;
+    CurrentAddr = (UINTN)TransferListHeader + TransferListHeader->HeaderSize;
   }
 
-  CurrentAddr = ALIGN_VALUE (CurrentAddr, (1 << Tlh->Alignment));
+  CurrentAddr = ALIGN_VALUE (CurrentAddr, (1 << TransferListHeader->Alignment));
 
-  Te = (TRANSFER_ENTRY_HEADER *)CurrentAddr;
+  Entry = (TRANSFER_ENTRY_HEADER *)CurrentAddr;
 
   if (((CurrentAddr + sizeof (TRANSFER_LIST_HEADER)) < CurrentAddr) ||
       ((CurrentAddr + sizeof (TRANSFER_ENTRY_HEADER)) > EndAddr) ||
-      ((CurrentAddr + Te->HeaderSize + Te->DataSize) < CurrentAddr) ||
-      ((CurrentAddr + Te->HeaderSize + Te->DataSize) > EndAddr))
+      ((CurrentAddr + Entry->HeaderSize + Entry->DataSize) < CurrentAddr) ||
+      ((CurrentAddr + Entry->HeaderSize + Entry->DataSize) > EndAddr))
   {
     return NULL;
   }
 
-  return Te;
+  return Entry;
 }
 
 /**
   Return the first Transfer Entry Node in the Transfer List
   matched with given tag-id.
 
-  @param [in]   Tlh       TransferListHeader
-  @param [in]   TagId     Tag id
+  @param [in]   TransferListHeader     Pointer to the Transfer List Header.
+  @param [in]   TagId                  Tag id
 
   @return Pointer to the Transfer Entry Node if successful otherwise NULL
 
 **/
 TRANSFER_ENTRY_HEADER *
 EFIAPI
-TlFindFirstEntry (
-  IN TRANSFER_LIST_HEADER  *Tlh,
+TransferListFindFirstEntry (
+  IN TRANSFER_LIST_HEADER  *TransferListHeader,
   IN UINT16                TagId
   )
 {
-  TRANSFER_ENTRY_HEADER  *Te;
+  TRANSFER_ENTRY_HEADER  *Entry;
 
-  Te = TlGetFirstEntry (Tlh);
+  Entry = TransferListGetFirstEntry (TransferListHeader);
 
-  while ((Te != NULL) && ((Te->TagId != TagId) || Te->Reserved0 != 0)) {
-    Te = TlGetNextEntry (Tlh, Te);
+  while ((Entry != NULL) && ((Entry->TagId != TagId) || Entry->Reserved0 != 0)) {
+    Entry = TransferListGetNextEntry (TransferListHeader, Entry);
   }
 
-  return Te;
+  return Entry;
 }
 
 /**
   Return the Next Transfer Entry Node in the Transfer List
   matched with given tag-id from last Transfer Entry Node.
 
-  @param [in]   Tlh        TransferListHeader
-  @param [in]   CurrentTe  Pointer to the Current Transfer Entry.
-                           If this is NULL, the first Transfer Entry is returned.
-  @param [in]   TagId      Tag id
+  @param [in]   TransferListHeader     Pointer to the Transfer List Header.
+  @param [in]   CurrentEntry           Pointer to the Current Transfer Entry.
+                                       If this is NULL, the first Transfer Entry
+                                       is returned.
+  @param [in]   TagId                  Tag id
 
   @return Pointer to the Transfer Entry Node if successful otherwise NULL
 
 **/
 TRANSFER_ENTRY_HEADER *
 EFIAPI
-TlFindNextEntry (
-  IN TRANSFER_LIST_HEADER   *Tlh,
-  IN TRANSFER_ENTRY_HEADER  *CurrentTe,
+TransferListFindNextEntry (
+  IN TRANSFER_LIST_HEADER   *TransferListHeader,
+  IN TRANSFER_ENTRY_HEADER  *CurrentEntry,
   IN UINT16                 TagId
   )
 {
-  TRANSFER_ENTRY_HEADER  *Te;
+  TRANSFER_ENTRY_HEADER  *Entry;
 
-  if (CurrentTe == NULL) {
-    return TlFindFirstEntry (Tlh, TagId);
+  if (CurrentEntry == NULL) {
+    return TransferListFindFirstEntry (TransferListHeader, TagId);
   } else {
-    Te = TlGetNextEntry (Tlh, CurrentTe);
+    Entry = TransferListGetNextEntry (TransferListHeader, CurrentEntry);
   }
 
-  while ((Te != NULL) && ((Te->TagId != TagId) || Te->Reserved0 != 0)) {
-    Te = TlGetNextEntry (Tlh, Te);
+  while ((Entry != NULL) && ((Entry->TagId != TagId) || Entry->Reserved0 != 0)) {
+    Entry = TransferListGetNextEntry (TransferListHeader, Entry);
   }
 
-  return Te;
+  return Entry;
 }
 
 /**
   Return the data in Transfer Entry.
 
-  @param [in]   Te       TransferEntryHeader
+  @param [in]   TransferEntry          Pointer to a Transfer Entry Header
 
   @return Pointer to the Data of Transfer Entry Node if successful otherwise NULL
 
 **/
 VOID *
 EFIAPI
-TlGetEntryData (
-  IN TRANSFER_ENTRY_HEADER  *Te
+TransferListGetEntryData (
+  IN TRANSFER_ENTRY_HEADER  *TransferEntry
   )
 {
-  if ((Te == NULL) || (Te->DataSize == 0)) {
+  if ((TransferEntry == NULL) || (TransferEntry->DataSize == 0)) {
     return NULL;
   }
 
-  return (VOID *)((UINTN)Te + Te->HeaderSize);
+  return (VOID *)((UINTN)TransferEntry + TransferEntry->HeaderSize);
 }
