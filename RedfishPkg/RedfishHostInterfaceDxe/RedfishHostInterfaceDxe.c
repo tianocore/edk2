@@ -7,7 +7,7 @@
   Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
   Copyright (C) 2022 Advanced Micro Devices, Inc. All rights reserved.<BR>
-  Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2023 - 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
   Copyright (c) 2023, Ampere Computing LLC. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -54,6 +54,9 @@ RedfishCreateSmbiosTable42 (
   EFI_SMBIOS_PROTOCOL                *Smbios;
   EFI_SMBIOS_HANDLE                  MemArrayMappedAddrSmbiosHandle;
   EFI_HANDLE                         Handle;
+  CHAR8                              *SerialNumber;
+  UINT8                              SerialNumStrLen;
+  UINT8                              StringCount = 1;
 
   Handle = NULL;
   //
@@ -82,6 +85,18 @@ RedfishCreateSmbiosTable42 (
     DeviceDataLength = DeviceDescriptor->DeviceDescriptor.PciPcieDeviceV2.Length;
   } else {
     DeviceDataLength = DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.Length;
+    SerialNumStrLen  = 0;
+    SerialNumber     = NULL;
+    Status           = RedfishPlatformHostInterfaceUSBSerialNumber (&SerialNumber);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: Fail to get USB virtual serial number, %r.", __func__, Status));
+      DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.SerialNumberStr = 0;
+    } else {
+      if (SerialNumber) {
+        SerialNumStrLen                                                = AsciiStrLen (SerialNumber);
+        DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.SerialNumberStr = StringCount++;
+      }
+    }
   }
 
   //
@@ -167,6 +182,7 @@ RedfishCreateSmbiosTable42 (
                                           + DeviceDataLength
                                           + 1  /// For Protocol Record Count
                                           + CurrentProtocolsDataLength
+                                          + SerialNumStrLen
                                           + 2  /// Double NULL terminator/
                                           );
   if (Type42Record == NULL) {
@@ -207,6 +223,13 @@ RedfishCreateSmbiosTable42 (
     NewProtocolRecords,
     CurrentProtocolsDataLength
     );
+
+  //
+  // Fill in Serial Number string at the end of SMBIOS table 42
+  //
+  if (SerialNumStrLen) {
+    CopyMem (Type42Record->InterfaceTypeSpecificData + DeviceDataLength + 1 + CurrentProtocolsDataLength, SerialNumber, SerialNumStrLen);
+  }
 
   //
   // 5. Add Redfish interface data record to SMBIOS table 42
@@ -257,6 +280,10 @@ ON_EXIT:
 
   if (Type42Record != NULL) {
     FreePool (Type42Record);
+  }
+
+  if (SerialNumber != NULL) {
+    FreePool (SerialNumber);
   }
 
   return Status;

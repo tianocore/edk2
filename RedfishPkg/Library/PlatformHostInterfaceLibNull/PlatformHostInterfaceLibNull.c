@@ -75,3 +75,20 @@ RedfishPlatformHostInterfaceNotification (
 {
   return EFI_UNSUPPORTED;
 }
+
+/**
+  Get USB device serial number.
+
+  @param[out] SerialNumber    Pointer to retrieve complete serial number.
+                              It is the responsibility of the caller to free the allocated
+                              memory for serial number.
+  @retval EFI_SUCCESS         Serial number is returned.
+  @retval Others              Failed to get the serial number
+**/
+EFI_STATUS
+RedfishPlatformHostInterfaceUSBSerialNumber (
+  OUT CHAR8  **SerialNumber
+  )
+{
+  return EFI_UNSUPPORTED;
+}
