@@ -174,8 +174,9 @@ def BuildUniversalPayload(Args):
 
     #
     # Building DXE core and DXE drivers as DXEFV.
+    # In edk2 CI build this step will be done by CI common build step.
     #
-    if Args.BuildEntryOnly == False:
+    if Args.BuildEntryOnly == False and Args.CiBuild == False:
         BuildPayload = "build -p {} -b {} -a {} -t {} -y {} {}".format (DscPath, BuildTarget, BuildArch, ToolChain, PayloadReportPath, Quiet)
         BuildPayload += Pcds
         BuildPayload += Defines
@@ -319,7 +320,7 @@ def BuildUniversalPayload(Args):
     else:
         return MultiFvList, os.path.join(BuildDir, 'UniversalPayload.elf')
 
-def main():
+def InitArgumentParser(LoadDefault):
     parser = argparse.ArgumentParser(description='For building Universal Payload')
     parser.add_argument('-t', '--ToolChain')
     parser.add_argument('-b', '--Target', default='DEBUG')
@@ -339,10 +340,14 @@ def main():
     parser.add_argument('-l', "--LoadAddress", type=int, help='Specify payload load address', default =0x000800000)
     parser.add_argument('-c', '--DscPath', type=str, default="UefiPayloadPkg/UefiPayloadPkg.dsc", help='Path to the DSC file')
     parser.add_argument('-ac', '--add_cc_flags', action='append', help='Add specified CC compile flags')
+    parser.add_argument('-ci','--CiBuild', action='store_true', help='Call from edk2 CI Build Process or not', default=False)
+    if LoadDefault:
+        args, _ = parser.parse_known_args()
+    else:
+        args = parser.parse_args()
+    return args
 
-    args = parser.parse_args()
-
-
+def UniversalPayloadFullBuild(args):
     MultiFvList = []
     UniversalPayloadBinary = args.PreBuildUplBinary
     if (args.SkipBuild == False):
@@ -374,6 +379,12 @@ def main():
                 return status
 
     print ("\nSuccessfully build Universal Payload")
+    return 0
+
+def main():
+
+    args = InitArgumentParser(False)
+    return UniversalPayloadFullBuild(args)
 
 if __name__ == '__main__':
     main()
