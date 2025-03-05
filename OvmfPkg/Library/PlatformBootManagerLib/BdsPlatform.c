@@ -221,6 +221,7 @@ PlatformBootManagerBeforeConsole (
   EFI_STATUS     Status;
   UINT16         FrontPageTimeout;
   RETURN_STATUS  PcdStatus;
+  BOOLEAN        FirmwareSetupEnabled;
 
   DEBUG ((DEBUG_INFO, "PlatformBootManagerBeforeConsole\n"));
   InstallDevicePathCallback ();
@@ -319,6 +320,22 @@ PlatformBootManagerBeforeConsole (
     FrontPageTimeout,
     Status
     ));
+
+  Status = QemuFwCfgParseBool (
+             "opt/org.tianocore/FirmwareSetupSupport",
+             &FirmwareSetupEnabled
+             );
+
+  if (RETURN_ERROR (Status)) {
+    FirmwareSetupEnabled = TRUE;
+  }
+
+  PlatformRegisterFvBootOption (
+    &gUiAppFileGuid,
+    L"EFI Firmware Setup",
+    LOAD_OPTION_ACTIVE | LOAD_OPTION_CATEGORY_APP,
+    FirmwareSetupEnabled
+    );
 
   if (!FeaturePcdGet (PcdBootRestrictToFirmware)) {
     PlatformRegisterOptionsAndKeys ();
@@ -1676,7 +1693,7 @@ PlatformBootManagerAfterConsole (
   PlatformRegisterFvBootOption (
     &gUefiShellFileGuid,
     L"EFI Internal Shell",
-    LOAD_OPTION_ACTIVE,
+    LOAD_OPTION_ACTIVE | LOAD_OPTION_CATEGORY_APP,
     ShellEnabled
     );
 

@@ -110,9 +110,11 @@ ASM_PFX(AsmExecute32BitCode):
     retf
 
 Compatible:
-    ; reload DS/ES/SS to make sure they are correct referred to current GDT
+    ; reload DS/ES/FS/GS/SS to make sure they are correct referred to current GDT
     mov     ds, ax
     mov     es, ax
+    mov     fs, ax
+    mov     gs, ax
     mov     ss, ax
 
     ;
@@ -208,11 +210,13 @@ ReloadCS:
     retf
 .0:
     ;
-    ; Reload original DS/ES/SS
+    ; Reload original DS/ES/FS/GS/SS
     ;
     pop     rcx
     mov     ds, rcx
     mov     es, rcx
+    mov     fs, rcx
+    mov     gs, rcx
     mov     ss, rcx
 
     ;
