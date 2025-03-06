@@ -6,6 +6,7 @@
 Copyright (c) 2011 - 2020, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.<BR>
 Copyright (C) 2022 Advanced Micro Devices, Inc. All rights reserved.<BR>
+Copyright (C) 2025 Qualcomm Technologies, Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -2809,6 +2810,40 @@ XhcDisableSlotCmd64 (
 }
 
 /**
+  Get the bInterval from descriptor and calculate the value to be used to initialize
+  the interval field of the endpoint context.
+
+  Refer to XHCI 1.1 spec section 6.2.3.6, tables 61 & 65
+
+  @param EpType       The endpoint type (only USB_ENDPOINT_ISO or USB_ENDPOINT_INTERRUPT).
+  @param DeviceSpeed  The connected device's speed.
+  @param Interval     The interval value from the descriptor.
+
+  @retval The calculated interval value to be applied to the endpoint context.
+
+**/
+static UINT8
+CalculateInterval (
+  UINT8  EpType,
+  UINT8  DeviceSpeed,
+  UINT8  Interval
+  )
+{
+  if ((EpType == USB_ENDPOINT_ISO) && (DeviceSpeed == EFI_USB_SPEED_FULL)) {
+    ASSERT (Interval >= 1 && Interval <= 16);
+    Interval = Interval + 2;
+  } else if ((EpType == USB_ENDPOINT_INTERRUPT) && ((DeviceSpeed == EFI_USB_SPEED_FULL) || (DeviceSpeed == EFI_USB_SPEED_LOW))) {
+    ASSERT (Interval != 0);
+    Interval = (UINT8)HighBitSet32 ((UINT32)Interval) + 3;
+  } else if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
+    ASSERT (Interval >= 1 && Interval <= 16);
+    Interval = Interval - 1;
+  }
+
+  return Interval;
+}
+
+/**
   Initialize endpoint context in input context.
 
   @param Xhc            The XHCI Instance.
@@ -2838,7 +2873,6 @@ XhcInitializeEndpointContext (
   UINT8                    Dci;
   UINT8                    MaxDci;
   EFI_PHYSICAL_ADDRESS     PhyAddr;
-  UINT8                    Interval;
   TRANSFER_RING            *EndpointTransferRing;
 
   MaxDci = 0;
@@ -2914,19 +2948,7 @@ XhcInitializeEndpointContext (
           InputContext->EP[Dci-1].EPType = ED_ISOCH_OUT;
         }
 
-        //
-        // Get the bInterval from descriptor and init the the interval field of endpoint context.
-        // Refer to XHCI 1.1 spec section 6.2.3.6.
-        //
-        if (DeviceSpeed == EFI_USB_SPEED_FULL) {
-          Interval = EpDesc->Interval;
-          ASSERT (Interval >= 1 && Interval <= 16);
-          InputContext->EP[Dci-1].Interval = Interval + 2;
-        } else if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
-          Interval = EpDesc->Interval;
-          ASSERT (Interval >= 1 && Interval <= 16);
-          InputContext->EP[Dci-1].Interval = Interval - 1;
-        }
+        InputContext->EP[Dci-1].Interval = CalculateInterval (USB_ENDPOINT_ISO, DeviceSpeed, EpDesc->Interval);
 
         //
         // Do not support isochronous transfer now.
@@ -2945,23 +2967,9 @@ XhcInitializeEndpointContext (
 
         InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
         InputContext->EP[Dci-1].MaxESITPayload   = EpDesc->MaxPacketSize;
-        //
-        // Get the bInterval from descriptor and init the the interval field of endpoint context
-        //
-        if ((DeviceSpeed == EFI_USB_SPEED_FULL) || (DeviceSpeed == EFI_USB_SPEED_LOW)) {
-          Interval = EpDesc->Interval;
-          //
-          // Calculate through the bInterval field of Endpoint descriptor.
-          //
-          ASSERT (Interval != 0);
-          InputContext->EP[Dci-1].Interval = (UINT32)HighBitSet32 ((UINT32)Interval) + 3;
-        } else if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
-          Interval = EpDesc->Interval;
-          ASSERT (Interval >= 1 && Interval <= 16);
-          //
-          // Refer to XHCI 1.0 spec section 6.2.3.6, table 61
-          //
-          InputContext->EP[Dci-1].Interval         = Interval - 1;
+        InputContext->EP[Dci-1].Interval         = CalculateInterval (USB_ENDPOINT_INTERRUPT, DeviceSpeed, EpDesc->Interval);
+
+        if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
           InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
           InputContext->EP[Dci-1].MaxESITPayload   = 0x0002;
           InputContext->EP[Dci-1].MaxBurstSize     = 0x0;
@@ -3041,7 +3049,6 @@ XhcInitializeEndpointContext64 (
   UINT8                    Dci;
   UINT8                    MaxDci;
   EFI_PHYSICAL_ADDRESS     PhyAddr;
-  UINT8                    Interval;
   TRANSFER_RING            *EndpointTransferRing;
 
   MaxDci = 0;
@@ -3117,19 +3124,7 @@ XhcInitializeEndpointContext64 (
           InputContext->EP[Dci-1].EPType = ED_ISOCH_OUT;
         }
 
-        //
-        // Get the bInterval from descriptor and init the the interval field of endpoint context.
-        // Refer to XHCI 1.1 spec section 6.2.3.6.
-        //
-        if (DeviceSpeed == EFI_USB_SPEED_FULL) {
-          Interval = EpDesc->Interval;
-          ASSERT (Interval >= 1 && Interval <= 16);
-          InputContext->EP[Dci-1].Interval = Interval + 2;
-        } else if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
-          Interval = EpDesc->Interval;
-          ASSERT (Interval >= 1 && Interval <= 16);
-          InputContext->EP[Dci-1].Interval = Interval - 1;
-        }
+        InputContext->EP[Dci-1].Interval = CalculateInterval (USB_ENDPOINT_ISO, DeviceSpeed, EpDesc->Interval);
 
         //
         // Do not support isochronous transfer now.
@@ -3148,23 +3143,9 @@ XhcInitializeEndpointContext64 (
 
         InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
         InputContext->EP[Dci-1].MaxESITPayload   = EpDesc->MaxPacketSize;
-        //
-        // Get the bInterval from descriptor and init the the interval field of endpoint context
-        //
-        if ((DeviceSpeed == EFI_USB_SPEED_FULL) || (DeviceSpeed == EFI_USB_SPEED_LOW)) {
-          Interval = EpDesc->Interval;
-          //
-          // Calculate through the bInterval field of Endpoint descriptor.
-          //
-          ASSERT (Interval != 0);
-          InputContext->EP[Dci-1].Interval = (UINT32)HighBitSet32 ((UINT32)Interval) + 3;
-        } else if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
-          Interval = EpDesc->Interval;
-          ASSERT (Interval >= 1 && Interval <= 16);
-          //
-          // Refer to XHCI 1.0 spec section 6.2.3.6, table 61
-          //
-          InputContext->EP[Dci-1].Interval         = Interval - 1;
+        InputContext->EP[Dci-1].Interval         = CalculateInterval (USB_ENDPOINT_INTERRUPT, DeviceSpeed, EpDesc->Interval);
+
+        if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
           InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
           InputContext->EP[Dci-1].MaxESITPayload   = 0x0002;
           InputContext->EP[Dci-1].MaxBurstSize     = 0x0;
