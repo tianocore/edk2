@@ -37,3 +37,4 @@
   BaseLib
   CpuLib
   PeCoffLib
+  StackCheckLib
