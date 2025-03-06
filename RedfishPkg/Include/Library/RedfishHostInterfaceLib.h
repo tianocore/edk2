@@ -84,7 +84,7 @@ RedfishPlatformHostInterfaceNotification (
   @retval Others              Failed to get the serial number.
 **/
 EFI_STATUS
-RedfishPlatformHostInterfaceUSBSerialNumber (
+RedfishPlatformHostInterfaceUsbSerialNumber (
   OUT CHAR8  **SerialNumber
   );
 

@@ -56,9 +56,10 @@ RedfishCreateSmbiosTable42 (
   EFI_HANDLE                         Handle;
   CHAR8                              *SerialNumber;
   UINT8                              SerialNumStrLen;
-  UINT8                              StringCount = 1;
+  UINT8                              StringCount;
 
-  Handle = NULL;
+  Handle      = NULL;
+  StringCount = 1;
   //
   // Get platform Redfish host interface device type descriptor data.
   //
@@ -87,14 +88,14 @@ RedfishCreateSmbiosTable42 (
     DeviceDataLength = DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.Length;
     SerialNumStrLen  = 0;
     SerialNumber     = NULL;
-    Status           = RedfishPlatformHostInterfaceUSBSerialNumber (&SerialNumber);
+    Status           = RedfishPlatformHostInterfaceUsbSerialNumber (&SerialNumber);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "%a: Fail to get USB virtual serial number, %r.", __func__, Status));
       DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.SerialNumberStr = 0;
     } else {
-      if (SerialNumber) {
+      if (SerialNumber != NULL) {
         SerialNumStrLen                                                = AsciiStrLen (SerialNumber);
-        DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.SerialNumberStr = StringCount++;
+        DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.SerialNumberStr = StringCount;
       }
     }
   }
