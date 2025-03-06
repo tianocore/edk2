@@ -8,6 +8,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include <CrtLibSupport.h>
+#include <Uefi/UefiBaseType.h>
+#include <Library/RngLib.h>
+#include <Library/SafeIntLib.h>
 
 int  errno = 0;
 
@@ -580,13 +583,97 @@ fopen (
 
 size_t
 fread (
-  void    *b,
-  size_t  c,
-  size_t  i,
-  FILE    *f
+  void    *ptr,
+  size_t  size,
+  size_t  nmemb,
+  FILE    *stream
   )
 {
   return 0;
+}
+
+int
+fputs (
+  const char  *s,
+  FILE        *stream
+  )
+{
+  return -1;
+}
+
+int
+fflush (
+  FILE  *stream
+  )
+{
+  return -1;
+}
+
+int
+ferror (
+  FILE  *stream
+  )
+{
+  return -1;
+}
+
+int
+fseek (
+  FILE  *stream,
+  long  offset,
+  int   whence
+  )
+{
+  return -1;
+}
+
+int
+feof (
+  FILE  *stream
+  )
+{
+  return -1;
+}
+
+int
+ftell (
+  FILE  *stream
+  )
+{
+  return -1;
+}
+
+char *
+fgets (
+  char  *s,
+  int   size,
+  FILE  *stream
+  )
+{
+  return NULL;
+}
+
+char *
+strdup (
+  char  *s
+  )
+{
+  UINTN  Length;
+  VOID   *Buffer;
+
+  if (!s) {
+    return NULL;
+  }
+
+  Length = strlen (s);
+
+  Buffer = malloc (Length);
+  if (Buffer == NULL) {
+    return NULL;
+  }
+
+  strncpy (Buffer, s, Length);
+  return Buffer;
 }
 
 uid_t
