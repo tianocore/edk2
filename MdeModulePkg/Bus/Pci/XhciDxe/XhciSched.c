@@ -2829,6 +2829,8 @@ CalculateInterval (
   UINT8  Interval
   )
 {
+  UINT8  OriginalInterval = Interval;
+
   if ((EpType == USB_ENDPOINT_ISO) && (DeviceSpeed == EFI_USB_SPEED_FULL)) {
     ASSERT (Interval >= 1 && Interval <= 16);
     Interval = Interval + 2;
@@ -2836,8 +2838,26 @@ CalculateInterval (
     ASSERT (Interval != 0);
     Interval = (UINT8)HighBitSet32 ((UINT32)Interval) + 3;
   } else if ((DeviceSpeed == EFI_USB_SPEED_HIGH) || (DeviceSpeed == EFI_USB_SPEED_SUPER)) {
-    ASSERT (Interval >= 1 && Interval <= 16);
-    Interval = Interval - 1;
+    ASSERT (Interval != 0);
+
+    //
+    // Some devices incorrectly report full-speed bInterval values in
+    // their high/super-speed interrupt endpoint descriptors.  Try to
+    // adjust those assuming they were expressed in units of ms with an
+    // upper limit of 128ms.
+    //
+    if (Interval > 16) {
+      Interval = (UINT8)HighBitSet32 ((UINT32)Interval*8);
+
+      DEBUG ((
+        DEBUG_WARN,
+        "EpDesc->Interval (%u) out of range. Adjusted to %u\n",
+        OriginalInterval,
+        Interval
+        ));
+    } else {
+      Interval = Interval - 1;
+    }
   }
 
   return Interval;
