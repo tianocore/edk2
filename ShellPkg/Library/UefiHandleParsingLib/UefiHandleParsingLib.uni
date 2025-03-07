@@ -89,7 +89,6 @@
 
 // USB
 #string STR_USB_IO                #language en-US "USBIO"
-#string STR_USB_HC                #language en-US "USBHostControler"
 #string STR_USB_HC2               #language en-US "USBHostController2"
 
 // Debug
