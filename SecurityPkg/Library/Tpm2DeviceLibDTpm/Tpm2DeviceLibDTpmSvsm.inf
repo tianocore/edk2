@@ -1,0 +1,66 @@
+## @file
+#  Provides SVSM based vTPM and regular TPM 2.0 TIS/PTP functions for DTPM
+#
+#  Spec Compliance Info:
+#    "TCG PC Client Platform TPM Profile(PTP) Specification Family 2.0 Level 00 Revision 00.43"
+#    "TCG PC Client Specific TPM Interface Specification(TIS) Version 1.3"
+#
+#  This library implements TIS (TPM Interface Specification) and
+#  PTP (Platform TPM Profile) functions which is
+#  used for every TPM 2.0 command. Choosing this library means platform uses and
+#  only uses TPM 2.0 DTPM device.
+#
+#  This version of the library additionally supports SVSM based vTPMs for confidential
+#  virtual machines under AMD-SEV SNP.
+#
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.
+# Copyright (c) 2024 Red Hat
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = Tpm2DeviceLibDTpmSvsm
+  MODULE_UNI_FILE                = Tpm2DeviceLibDTpm.uni
+  FILE_GUID                      = EE79D4E4-8538-4FE6-A7EF-4095CB6B38E7
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Tpm2DeviceLib|PEIM DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = Tpm2DeviceLibConstructorSvsm
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  Tpm2Tis.c
+  Tpm2Svsm.c
+  Tpm2PtpSvsmShim.c
+  Tpm2Ptp.c
+  Tpm2DeviceLibDTpmSvsm.c
+  Tpm2DeviceLibDTpmBase.c
+  Tpm2DeviceLibDTpm.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  IoLib
+  TimerLib
+  DebugLib
+  PcdLib
+  AmdSvsmLib
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress            ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdActiveTpmInterfaceType    ## PRODUCES
+  gEfiSecurityPkgTokenSpaceGuid.PcdCRBIdleByPass             ## PRODUCES
+  gEfiSecurityPkgTokenSpaceGuid.PcdSvsmVTpmPresence          ## PRODUCES
+  gEfiSecurityPkgTokenSpaceGuid.PcdSvsmVTpmBufferPtr         ## PRODUCES

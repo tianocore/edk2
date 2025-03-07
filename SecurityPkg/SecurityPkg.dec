@@ -604,6 +604,16 @@
   ## This PCD records LASA field in CC EVENTLOG ACPI table.
   gEfiSecurityPkgTokenSpaceGuid.PcdCcEventlogAcpiTableLasa|0|UINT64|0x00010026
 
+  ## This PCD caches the presence state of a AMD SEV-SNP SVSM-provided vTPM.
+  # 0xFF - Unknown - Probing needed
+  # 0x00 - No - Use regular TPM
+  # 0x01 - Yes - SVSM vTPM present
+  gEfiSecurityPkgTokenSpaceGuid.PcdSvsmVTpmPresence|0xFF|UINT8|0x00020030
+
+  ## This PCD stores the pointer to the communication buffer for a
+  #   AMD SEV-SNP SVSM-provided vTPM.
+  gEfiSecurityPkgTokenSpaceGuid.PcdSvsmVTpmBufferPtr|0|UINT64|0x00020031
+
 [PcdsFeatureFlag]
   ## Indicates if the platform requires PK to be self-signed when setting the PK in setup mode.
   #   TRUE  - Require PK to be self-signed.
