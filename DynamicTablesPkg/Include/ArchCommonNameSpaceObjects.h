@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
-  Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
+  Copyright (c) 2024 - 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
   Copyright (C) 2024 - 2025, Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -18,6 +18,7 @@
 #include <AcpiObjects.h>
 #include <StandardNameSpaceObjects.h>
 
+#include <IndustryStandard/AcpiAml.h>
 #include <IndustryStandard/Tpm2Acpi.h>
 
 /** The EARCH_COMMON_OBJECT_ID enum describes the Object IDs
@@ -59,6 +60,8 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjPssInfo,                        ///< 32 - P-State status (PSS) Info
   EArchCommonObjPpcInfo,                        ///< 33 - P-State control (PPC) Info
   EArchCommonObjStaInfo,                        ///< 34 - _STA (Device Status) Info
+  EArchCommonObjMemoryRangeDescriptor,          ///< 35 - Memory Range Descriptor
+  EArchCommonObjGenericDbg2DeviceInfo,          ///< 36 - Generic DBG2 Device Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -811,6 +814,41 @@ typedef struct CmArchCommonStaInfo {
   /// Device Status
   UINT32    DeviceStatus;
 } CM_ARCH_COMMON_STA_INFO;
+
+/** A structure that describes the
+    Memory Range descriptor.
+
+    ID: EArchCommonObjMemoryRangeDescriptor
+*/
+typedef struct CmArchCommonMemoryRangeDescriptor {
+  /// Base address of Memory Range,
+  UINT64    BaseAddress;
+
+  /// Length of the Memory Range.
+  UINT64    Length;
+} CM_ARCH_COMMON_MEMORY_RANGE_DESCRIPTOR;
+
+/** A structure that describes a generic device to add a DBG2 device node from.
+
+  ID: EArchCommonObjGenericDbg2DeviceInfo,
+*/
+typedef struct CmArchCommonDbg2DeviceInfo {
+  /// Token identifying an array of CM_ARCH_COMMON_MEMORY_RANGE_DESCRIPTOR objects
+  CM_OBJECT_TOKEN    AddressResourceToken;
+
+  /// The DBG2 port type
+  UINT16             PortType;
+
+  /// The DBG2 port subtype
+  UINT16             PortSubtype;
+
+  /// Access Size
+  UINT8              AccessSize;
+
+  /** ASCII Null terminated string that will be appended to \_SB_. for the full path.
+  */
+  CHAR8              ObjectName[AML_NAME_SEG_SIZE + 1];
+} CM_ARCH_COMMON_DBG2_DEVICE_INFO;
 
 #pragma pack()
 

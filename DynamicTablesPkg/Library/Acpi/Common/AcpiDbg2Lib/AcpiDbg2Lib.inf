@@ -40,6 +40,7 @@
 
 [LibraryClasses]
   BaseLib
+  PrintLib
   SsdtSerialPortFixupLib
 
 [FixedPcd]
