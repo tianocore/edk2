@@ -994,7 +994,7 @@ PlatformSetupPagingLevel (
   }
 
   Status = QemuFwCfgParseUint32 (
-             "opt/org.tianocode/PagingLevel",
+             "opt/org.tianocore/PagingLevel",
              FALSE,
              &PagingLevel
              );
