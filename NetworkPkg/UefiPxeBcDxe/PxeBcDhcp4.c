@@ -1025,8 +1025,13 @@ PxeBcHandleDhcp4Offer (
   EFI_PXE_BASE_CODE_MODE    *Mode;
   EFI_DHCP4_PACKET          *Ack;
 
+  SelectIndex = 0;
+
   ASSERT (Private->SelectIndex > 0);
-  SelectIndex = (UINT32)(Private->SelectIndex - 1);
+  if (Private->SelectIndex > 0) {
+    SelectIndex = (UINT32)(Private->SelectIndex - 1);
+  }
+
   ASSERT (SelectIndex < PXEBC_OFFER_MAX_NUM);
   Cache4  = &Private->OfferBuffer[SelectIndex].Dhcp4;
   Options = Cache4->OptList;
@@ -1250,15 +1255,6 @@ PxeBcDhcp4CallBack (
       //
       CopyMem (&Mode->DhcpDiscover.Dhcpv4, &Packet->Dhcp4, Packet->Length);
 
-    case Dhcp4SendRequest:
-      if (Packet->Length > PXEBC_DHCP4_PACKET_MAX_SIZE) {
-        //
-        // If the to be sent packet exceeds the maximum length, abort the DHCP process.
-        //
-        Status = EFI_ABORTED;
-        break;
-      }
-
       if (Mode->SendGUID) {
         //
         // Send the system Guid instead of the MAC address as the hardware address if required.
@@ -1460,6 +1456,10 @@ PxeBcDhcp4Discover (
 
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+
+  if (Token.Packet == NULL) {
+    return EFI_NOT_FOUND;
   }
 
   if (Mode->SendGUID) {
