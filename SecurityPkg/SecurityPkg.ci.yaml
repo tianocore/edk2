@@ -51,6 +51,7 @@
             "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec",
             "SecurityPkg/SecurityPkg.dec",
             "StandaloneMmPkg/StandaloneMmPkg.dec",
+            "UefiCpuPkg/UefiCpuPkg.dec",
             "CryptoPkg/CryptoPkg.dec"
         ],
         # For host based unit tests
