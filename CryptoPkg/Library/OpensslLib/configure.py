@@ -367,7 +367,13 @@ def main():
             openssl_run_make(openssldir, 'distclean')
 
             srclist = libcrypto_sources(cfg, archcc) + libssl_sources(cfg, archcc)
-            sources[archcc] = list(map(lambda x: f'{x} | {cc}', filter(is_asm, srclist)))
+            if arch in ['AARCH64']:
+                sources[archcc] = list(map(lambda x: f'{x} | {cc}', filter(is_asm, srclist)))
+            else:
+                featureflagexp = 'gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm'
+                if cc == 'GCC':
+                    featureflagexp = '!' + featureflagexp
+                sources[archcc] = list(map(lambda x: f'{x} ||||{featureflagexp}', filter(is_asm, srclist)))
             update_MSFT_asm_format(archcc, sources[archcc])
             sources[arch] = list(filter(lambda x: not is_asm(x), srclist))
             defines[arch] = cfg['unified_info']['defines']['libcrypto']

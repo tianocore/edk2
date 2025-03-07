@@ -1,0 +1,47 @@
+## @file
+#  Common code PlatformBootManager and PlatformBootManagerLight.
+#
+#  Copyright (C) 2025, Red Hat, Inc.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformBootManagerCommonLib
+  FILE_GUID                      = B6169BD3-EB70-4E00-B4CB-4C24C2C5235E
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformBootManagerCommonLib|DXE_DRIVER
+
+[Sources]
+PlatformBootManagerCommonLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  QemuFwCfgLib
+  DebugLib
+  MemoryAllocationLib
+  UefiBootManagerLib
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  BaseLib
+  PrintLib
+  DevicePathLib
+  BaseMemoryLib
+  OrderedCollectionLib
+
+[Guids]
+  gEfiGlobalVariableGuid
+  gVirtioMmioTransportGuid
+  gVMMBootOrderGuid
+
+[Protocols]
+  gEfiDevicePathProtocolGuid                            ## CONSUMES
+  gEfiPciRootBridgeIoProtocolGuid                       ## CONSUMES

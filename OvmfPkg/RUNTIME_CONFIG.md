@@ -36,6 +36,16 @@ qemu-system-x86_64 \
 ```
 
 
+## Firmware Config: opt/org.tianocore/FirmwareSetupSupport
+
+As the name suggests, this enables/disables Firmware setup support.  Default:
+enabled.  Usage:
+
+```
+qemu-system-x86_64 -fw_cfg name=opt/org.tianocore/FirmwareSetupSupport,string=no
+```
+
+
 ## TLS: etc/edk2/https/ciphers
 
 Configres the allowed TLS chiper suites.  Using the host's system

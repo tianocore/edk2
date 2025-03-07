@@ -62,7 +62,6 @@
   ## BY_START
   gEfiDevicePathProtocolGuid
   gEfiUsb2HcProtocolGuid                        ## TO_START
-  gEfiUsbHcProtocolGuid                         ## TO_START
 
 # [Event]
 #
