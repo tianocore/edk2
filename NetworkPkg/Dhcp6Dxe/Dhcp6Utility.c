@@ -44,8 +44,8 @@ Dhcp6GenerateClientId (
   // Attempt to get client Id from variable to keep it constant.
   // See details in section-9 of rfc-3315.
   //
-  GetVariable2 (L"ClientId", &gEfiDhcp6ServiceBindingProtocolGuid, (VOID **)&Duid, NULL);
-  if (Duid != NULL) {
+  Status =  GetVariable2 (L"ClientId", &gEfiDhcp6ServiceBindingProtocolGuid, (VOID **)&Duid, NULL);
+  if ((!EFI_ERROR (Status)) && (Duid != NULL)) {
     return Duid;
   }
 
@@ -378,8 +378,12 @@ Dhcp6CalculateLeaseTime (
   UINTN   Index;
 
   ASSERT (IaCb->Ia->IaAddressCount > 0);
+  if (IaCb->Ia->IaAddressCount > 0) {
+    MinLt = (UINT32)(-1);
+  } else {
+    return;
+  }
 
-  MinLt = (UINT32)(-1);
   MaxLt = 0;
 
   //
@@ -474,6 +478,8 @@ Dhcp6DepriveAddress (
   UINTN         Index2;
   BOOLEAN       Found;
 
+  IaCopySize = 0;
+
   if (AddressCount == 0) {
     //
     // It means release all Ia addresses if address count is zero.
@@ -482,6 +488,11 @@ Dhcp6DepriveAddress (
   }
 
   ASSERT (AddressCount != 0);
+  if (AddressCount != 0) {
+    IaCopySize = sizeof (EFI_DHCP6_IA) + (AddressCount - 1) * sizeof (EFI_DHCP6_IA_ADDRESS);
+  } else {
+    return NULL;
+  }
 
   IaCopySize = sizeof (EFI_DHCP6_IA) + (AddressCount - 1) * sizeof (EFI_DHCP6_IA_ADDRESS);
   IaCopy     = AllocateZeroPool (IaCopySize);
@@ -1520,7 +1531,7 @@ Dhcp6GetMappingTimeOut (
     return Status;
   }
 
-  *TimeOut = TICKS_PER_SECOND * DadXmits.DupAddrDetectTransmits + DHCP6_DAD_ADDITIONAL_DELAY;
+  *TimeOut = TICKS_PER_SECOND * (UINTN)DadXmits.DupAddrDetectTransmits + DHCP6_DAD_ADDITIONAL_DELAY;
 
   return EFI_SUCCESS;
 }
