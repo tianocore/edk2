@@ -415,10 +415,16 @@ PxeBcExtractBootFileUrl (
   //
 
   //
-  // Based upon RFC 5970 and UEFI 2.6, bootfile-url format can be
-  // tftp://[SERVER_ADDRESS]/BOOTFILE_NAME or tftp://domain_name/BOOTFILE_NAME
-  // As an example where the BOOTFILE_NAME is the EFI loader and
-  // SERVER_ADDRESS is the ASCII encoding of an IPV6 address.
+  // According to RFC 5970, the Boot File URL option does not restrict the
+  // download protocol, but only requires a valid URL. Although HTTP is
+  // recommended for network booting, the URL may also follow a TFTP-style
+  // format. This function expects URLs of the form:
+  //     protocol://[SERVER_ADDRESS]/BOOTFILE_NAME  or
+  //     protocol://domain_name/BOOTFILE_NAME
+  // where SERVER_ADDRESS is an ASCII-encoded IPv6 address and BOOTFILE_NAME
+  // typically denotes the EFI loader.
+  //
+  // Note: Currently, only the TFTP protocol is implemented.
   //
   PrefixLen = (UINT16)AsciiStrLen (PXEBC_DHCP6_BOOT_FILE_URL_PREFIX);
 
