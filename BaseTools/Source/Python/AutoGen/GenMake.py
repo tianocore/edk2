@@ -179,7 +179,7 @@ class BuildFile(object):
         MakePath = AutoGenObject.BuildOption.get('MAKE', {}).get('PATH')
         if not MakePath:
             MakePath = AutoGenObject.ToolDefinition.get('MAKE', {}).get('PATH')
-        if "nmake" in MakePath:
+        if "nmake" in MakePath and os.environ.get('CLANG_MAKEFILE_TYPE')!='gnu':
             self._FileType = NMAKE_FILETYPE
         else:
             self._FileType = GMAKE_FILETYPE
