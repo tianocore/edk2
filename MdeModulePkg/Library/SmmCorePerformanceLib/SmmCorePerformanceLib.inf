@@ -9,18 +9,19 @@
 #  SMM Performance and PerformanceEx Protocol are installed at the very beginning of SMM phase.
 #
 #  Copyright (c) 2011 - 2023, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation.
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
 [Defines]
-  INF_VERSION                    = 0x00010005
+  INF_VERSION                    = 0x0001001B
   BASE_NAME                      = SmmCorePerformanceLib
   MODULE_UNI_FILE                = SmmCorePerformanceLib.uni
   FILE_GUID                      = 36290D10-0F47-42c1-BBCE-E191C7928DCF
   MODULE_TYPE                    = SMM_CORE
   VERSION_STRING                 = 1.0
-  PI_SPECIFICATION_VERSION       = 0x0001000A
+  PI_SPECIFICATION_VERSION       = 0x00010032
   LIBRARY_CLASS                  = PerformanceLib|SMM_CORE
 
   CONSTRUCTOR                    = SmmCorePerformanceLibConstructor
@@ -32,33 +33,33 @@
 #
 
 [Sources]
-  SmmCorePerformanceLib.c
+  MmCorePerformanceLib.c
   SmmCorePerformanceLibInternal.h
+  SmmCorePerformanceLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
-
 [LibraryClasses]
-  MemoryAllocationLib
-  UefiBootServicesTableLib
-  PcdLib
-  TimerLib
-  BaseMemoryLib
   BaseLib
+  BaseMemoryLib
   DebugLib
-  SynchronizationLib
-  SmmServicesTableLib
-  SmmMemLib
-  UefiLib
-  ReportStatusCodeLib
-  PeCoffGetEntryPointLib
   DxeServicesLib
+  MemoryAllocationLib
+  MmServicesTableLib
+  PcdLib
+  PeCoffGetEntryPointLib
+  SmmMemLib
+  SynchronizationLib
+  TimerLib
+  UefiBootServicesTableLib
+  UefiLib
 
 [Protocols]
   gEfiSmmBase2ProtocolGuid                  ## CONSUMES
-  gEdkiiSmmExitBootServicesProtocolGuid     ## CONSUMES
+  gEdkiiSmmExitBootServicesProtocolGuid     ## CONSUMES ## NOTIFY
+  gEfiLoadedImageProtocolGuid               ## CONSUMES
 
 [Guids]
   ## PRODUCES ## SystemTable
