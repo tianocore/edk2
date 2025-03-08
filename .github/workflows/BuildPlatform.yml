@@ -1,0 +1,113 @@
+# @file BuildPlatform.yml
+#
+# A reusable workflow that builds an EDKII platform and uploads it's artifacts.
+#
+##
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+name: Build Platform
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        required: true
+        description: 'The version of Python to use for the job'
+        type: string
+        default: '3.12'
+      runs-on:
+        required: true
+        description: 'The runner type to use for the job'
+        type: string
+        default: 'ubuntu-latest'
+      build-file:
+        required: true
+        description: 'The path to the stuart build script'
+        type: string
+      tool-chain:
+        required: true
+        description: 'The tool chain to use for the build'
+        type: string
+      target:
+        required: true
+        description: 'The target to build'
+        type: string
+      extra-build-args:
+        required: false
+        description: 'Extra arguments to pass to the build script'
+        type: string
+        default: ''
+      extra-pip-requirements:
+        required: false
+        description: 'Extra pip requirements to install'
+        type: string
+        default: ''
+      extra-setup-cmd:
+        required: false
+        description: 'Extra setup commands to run'
+        type: string
+        default: ''
+      extra-artifact-path:
+        required: false
+        description: 'Extra artifact paths to upload'
+        type: string
+        default: ''
+
+jobs:
+  build:
+    name: Build Platform
+
+    runs-on: ${{ inputs.runs-on }}
+    container:
+      image: ${{ startswith(inputs.runs-on, 'ubuntu') && 'ghcr.io/tianocore/containers/fedora-40-dev:latest' || '' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - run: |
+          git config --global --add safe.directory '*'
+        name: 'Set Safe Directory'
+        if: ${{ startsWith(inputs.runs-on, 'ubuntu') }}
+
+      - name: Set up Python ${{ inputs.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ inputs.python-version }}
+        if: ${{ !startsWith(inputs.runs-on, 'ubuntu') }}
+
+      - run: |
+          pip install --upgrade ${{ inputs.extra-pip-requirements }} -r pip-requirements.txt
+        name: 'Install/Upgrade pip modules'
+
+      - run: ${{ inputs.extra-setup-cmd }}
+        name: 'Extra Setup Commands'
+        if: ${{ inputs.extra-setup-cmd != '' }}
+
+      - run: |
+          stuart_setup -c ${{ inputs.build-file }}
+        name: 'Clone Submodules'
+
+      - run: |
+          stuart_update -c ${{ inputs.build-file }}
+        name: 'Download External Dependencies'
+
+      - run: |
+          python BaseTools/Edk2ToolsBuild.py -t ${{ inputs.tool-chain }}
+        name: 'Build BaseTools'
+
+      - run: |
+          stuart_build -c ${{ inputs.build-file }} TARGET=${{ inputs.target}} TOOL_CHAIN_TAG=${{ inputs.tool-chain }} ${{ inputs.extra-build-args }}
+        name: 'Build Platform'
+
+      - name: Upload Platform Build Logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: Platform Build Logs ${{ inputs.tool-chain }} ${{ inputs.target }} ${{ inputs.extra-build-args }}
+          path: |
+            Build/*.txt
+            BaseTools/BaseToolsBuild/*
+            ${{ inputs.extra-artifact-path }}
+        if: always()
