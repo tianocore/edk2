@@ -26,7 +26,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  UefiCpuPkg/UefiCpuPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   BaseLib
