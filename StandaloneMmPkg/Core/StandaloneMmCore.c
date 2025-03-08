@@ -446,8 +446,9 @@ MmCorePrepareCommunicationBuffer (
   mInternalCommBufferCopy = NULL;
 
   GuidHob = GetFirstGuidHob (&gMmCommBufferHobGuid);
-  ASSERT (GuidHob != NULL);
   if (GuidHob == NULL) {
+    DEBUG ((DEBUG_ERROR, "Failed to find MM Communication Buffer HOB\n"));
+    DEBUG ((DEBUG_ERROR, "Only Root MMI Handlers will be supported!\n"));
     return;
   }
 
