@@ -41,6 +41,9 @@
   gArmTokenSpaceGuid.PcdFfaTxRxPageCount
   gArmTokenSpaceGuid.PcdFfaExitBootEventRegistered
 
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdSxcUse18Registers
+
 [Guids]
   gArmFfaRxTxBufferInfoGuid
   gEfiEventExitBootServicesGuid
