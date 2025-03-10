@@ -2084,6 +2084,12 @@
   # hardware coherency (i.e., no virtualization or cache coherent DMA)
   gEfiMdePkgTokenSpaceGuid.PcdNormalMemoryNonshareableOverride|FALSE|BOOLEAN|0x00000060
 
+[PcdsFeatureFlag.ARM, PcdsFeatureFlag.AARCH64]
+  # Whether to remap all unused memory NX before installing the CPU arch
+  # protocol driver. This is needed on platforms that map all DRAM with RWX
+  # attributes initially, and can be disabled otherwise.
+  gEfiMdePkgTokenSpaceGuid.PcdRemapUnusedMemoryNx|TRUE|BOOLEAN|0x00000061
+
 [PcdsFixedAtBuild]
   ## Status code value for indicating a watchdog timer has expired.
   # EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_TIMER_EXPIRED
