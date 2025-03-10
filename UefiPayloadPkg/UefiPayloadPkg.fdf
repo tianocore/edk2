@@ -171,7 +171,7 @@ INF MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntime
     INF OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
   !endif
 !elseif "AARCH64" IN "$(ARCH)"
-  INF ArmPkg/Drivers/CpuDxe/CpuDxe.inf
+  INF UefiCpuPkg/CpuDxeArm/CpuDxe.inf
   INF ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
 

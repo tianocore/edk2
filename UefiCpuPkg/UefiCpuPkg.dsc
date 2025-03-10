@@ -227,6 +227,7 @@
   UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf
 
 [Components.ARM, Components.AARCH64]
+  UefiCpuPkg/CpuDxeArm/CpuDxe.inf
   UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
 
 [Components.AARCH64]
