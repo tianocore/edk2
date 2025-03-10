@@ -88,7 +88,7 @@
 
 [PcdsFixedAtBuild.common]
 !if $(ARCH) == AARCH64
-  gArmTokenSpaceGuid.PcdVFPEnabled|1
+  gEfiMdePkgTokenSpaceGuid.PcdVFPEnabled|1
 !endif
 
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x4007c000
