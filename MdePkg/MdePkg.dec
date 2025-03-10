@@ -2529,6 +2529,11 @@
   # @Prompt CPU Rng algorithm's GUID.
   gEfiMdePkgTokenSpaceGuid.PcdCpuRngSupportedAlgorithm|{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}|VOID*|0x00000037
 
+[PcdsFixedAtBuild.ARM, PcdsFixedAtBuild.AARCH64]
+  # This PCD should be a FeaturePcd. But we used this PCD as an '#if' in an ASM file.
+  # Using a FeaturePcd make a '(BOOLEAN) casting for its value which is not understood by the preprocessor.
+  gEfiMdePkgTokenSpaceGuid.PcdArmVFPEnabled|0|UINT32|0x00000062
+
 [PcdsFixedAtBuild.RISCV64, PcdsPatchableInModule.RISCV64]
   #
   # Configurability to override RISC-V CPU Features

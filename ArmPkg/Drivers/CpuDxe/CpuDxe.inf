@@ -64,7 +64,7 @@
   gEfiVectorHandoffTableGuid
 
 [Pcd.common]
-  gArmTokenSpaceGuid.PcdVFPEnabled
+  gEfiMdePkgTokenSpaceGuid.PcdArmVFPEnabled
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy
 
 [FeaturePcd.common]

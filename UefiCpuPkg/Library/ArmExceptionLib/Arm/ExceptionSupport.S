@@ -244,7 +244,7 @@ NoAdjustNeeded:
                                     @ R0 is ExceptionType
   mov       R1,SP                   @ R1 is SystemContext
 
-#if (FixedPcdGet32(PcdVFPEnabled))
+#if (FixedPcdGet32(PcdArmVFPEnabled))
   vpush     {d0-d15}                @ save vstm registers in case they are used in optimizations
 #endif
 
@@ -265,7 +265,7 @@ CommonCExceptionHandler (
 
   mov       SP, R4                  @ Restore SP
 
-#if (FixedPcdGet32(PcdVFPEnabled))
+#if (FixedPcdGet32(PcdArmVFPEnabled))
   vpop      {d0-d15}
 #endif
 

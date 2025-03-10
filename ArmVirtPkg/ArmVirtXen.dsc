@@ -79,7 +79,7 @@
 
 [PcdsFixedAtBuild.common]
 !if $(ARCH) == AARCH64
-  gArmTokenSpaceGuid.PcdVFPEnabled|1
+  gEfiMdePkgTokenSpaceGuid.PcdArmVFPEnabled|1
 !endif
 
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000

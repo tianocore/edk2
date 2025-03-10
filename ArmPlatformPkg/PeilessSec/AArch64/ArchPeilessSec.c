@@ -19,7 +19,7 @@ ArchInitialize (
   )
 {
   // Enable Floating Point
-  if (FixedPcdGet32 (PcdVFPEnabled)) {
+  if (FixedPcdGet32 (PcdArmVFPEnabled)) {
     ArmEnableVFP ();
   }
 

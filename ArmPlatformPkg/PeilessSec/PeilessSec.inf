@@ -70,7 +70,7 @@
   gArmTokenSpaceGuid.PcdFdSize
   gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmTokenSpaceGuid.PcdFvSize
-  gArmTokenSpaceGuid.PcdVFPEnabled
+  gEfiMdePkgTokenSpaceGuid.PcdArmVFPEnabled
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
 
 [Pcd]

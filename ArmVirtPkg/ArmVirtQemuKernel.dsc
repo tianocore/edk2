@@ -122,7 +122,7 @@
 
 [PcdsFixedAtBuild.common]
 !if $(ARCH) == AARCH64
-  gArmTokenSpaceGuid.PcdVFPEnabled|1
+  gEfiMdePkgTokenSpaceGuid.PcdArmVFPEnabled|1
 !endif
 
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress|0x00000000
