@@ -40,10 +40,18 @@
 
 [LibraryClasses]
   ArmLib
+  BaseLib
   BaseMemoryLib
   CacheMaintenanceLib
   DebugLib
-  DefaultExceptionHandlerLib
   MemoryAllocationLib
+  PeCoffGetEntryPointLib
+  PrintLib
+  SerialPortLib
+  UefiBootServicesTableLib
+  UefiLib
 
 [Pcd]
+
+[Guids]
+  gEfiDebugImageInfoTableGuid
