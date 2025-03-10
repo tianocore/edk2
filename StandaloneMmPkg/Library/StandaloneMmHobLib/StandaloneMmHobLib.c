@@ -191,6 +191,10 @@ GetNextGuidHob (
     GuidHob.Raw = GET_NEXT_HOB (GuidHob);
   }
 
+  if ((GuidHob.Raw == NULL) && (HobStart == GetHobList ())) {
+    DEBUG ((DEBUG_WARN, "MM: GUIDed HOB [%g] not found in the entire HOB list.\n", Guid));
+  }
+
   return GuidHob.Raw;
 }
 
