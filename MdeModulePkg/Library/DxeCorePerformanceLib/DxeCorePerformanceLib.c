@@ -21,7 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Data for FPDT performance records.
 //
-#define SMM_BOOT_RECORD_COMM_SIZE  (OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data) + sizeof(SMM_BOOT_RECORD_COMMUNICATE))
+#define SMM_BOOT_RECORD_COMM_SIZE  (OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + sizeof(SMM_BOOT_RECORD_COMMUNICATE))
 #define STRING_SIZE                (FPDT_STRING_EVENT_RECORD_NAME_LENGTH * sizeof (CHAR8))
 #define FIRMWARE_RECORD_BUFFER     0x10000
 #define CACHE_HANDLE_GUID_COUNT    0x800
@@ -227,7 +227,7 @@ InternalGetSmmPerfData (
 {
   EFI_STATUS                               Status;
   UINT8                                    *SmmBootRecordCommBuffer;
-  EFI_SMM_COMMUNICATE_HEADER               *SmmCommBufferHeader;
+  EFI_MM_COMMUNICATE_HEADER                *MmCommBufferHeader;
   SMM_BOOT_RECORD_COMMUNICATE              *SmmCommData;
   UINTN                                    CommSize;
   EFI_SMM_COMMUNICATION_PROTOCOL           *Communication;
@@ -277,13 +277,13 @@ InternalGetSmmPerfData (
       //
       if (ReservedMemSize > SMM_BOOT_RECORD_COMM_SIZE) {
         SmmBootRecordCommBuffer = (VOID *)(UINTN)SmmCommMemRegion->PhysicalStart;
-        SmmCommBufferHeader     = (EFI_SMM_COMMUNICATE_HEADER *)SmmBootRecordCommBuffer;
-        SmmCommData             = (SMM_BOOT_RECORD_COMMUNICATE *)SmmCommBufferHeader->Data;
+        MmCommBufferHeader      = (EFI_MM_COMMUNICATE_HEADER *)SmmBootRecordCommBuffer;
+        SmmCommData             = (SMM_BOOT_RECORD_COMMUNICATE *)MmCommBufferHeader->Data;
         ZeroMem ((UINT8 *)SmmCommData, sizeof (SMM_BOOT_RECORD_COMMUNICATE));
 
-        CopyGuid (&SmmCommBufferHeader->HeaderGuid, &gEfiFirmwarePerformanceGuid);
-        SmmCommBufferHeader->MessageLength = sizeof (SMM_BOOT_RECORD_COMMUNICATE);
-        CommSize                           = SMM_BOOT_RECORD_COMM_SIZE;
+        CopyGuid (&MmCommBufferHeader->HeaderGuid, &gEfiFirmwarePerformanceGuid);
+        MmCommBufferHeader->MessageLength = sizeof (SMM_BOOT_RECORD_COMMUNICATE);
+        CommSize                          = SMM_BOOT_RECORD_COMM_SIZE;
 
         //
         // Get the size of boot records.
