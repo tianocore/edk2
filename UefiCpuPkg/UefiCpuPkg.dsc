@@ -228,7 +228,11 @@
   UefiCpuPkg/CpuDxeRiscV64/CpuDxeRiscV64.inf
   UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf
 
+[Components.ARM]
+  UefiCpuPkg/CpuDxeArm/CpuDxe.inf
+
 [Components.AARCH64]
+  UefiCpuPkg/CpuDxeArm/CpuDxe.inf
   UefiCpuPkg/Library/BaseArchSupportLib/BaseArchSupportLib.inf
 
 [Components.ARM, Components.AARCH64]
