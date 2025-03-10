@@ -59,10 +59,6 @@
   #
   ArmMonitorLib|Include/Library/ArmMonitorLib.h
 
-  ##  @libraryclass  Provides a default exception handler.
-  #
-  DefaultExceptionHandlerLib|Include/Library/DefaultExceptionHandlerLib.h
-
   ##  @libraryclass  Provides an interface to query miscellaneous OEM
   #   information.
   #

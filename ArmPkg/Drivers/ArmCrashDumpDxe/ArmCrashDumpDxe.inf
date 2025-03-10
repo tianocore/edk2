@@ -20,10 +20,11 @@
 [Packages]
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
+  CpuExceptionHandlerLib
   DebugLib
-  DefaultExceptionHandlerLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
 

@@ -7,8 +7,8 @@
 **/
 
 #include <PiDxe.h>
+#include <Library/CpuExceptionHandlerLib.h>
 #include <Library/DebugLib.h>
-#include <Library/DefaultExceptionHandlerLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/Cpu.h>
 
@@ -29,6 +29,6 @@ ArmCrashDumpDxeInitialize (
   return mCpu->RegisterInterruptHandler (
                  mCpu,
                  EXCEPT_AARCH64_SYNCHRONOUS_EXCEPTIONS,
-                 &DefaultExceptionHandler
+                 &DumpImageAndCpuContent
                  );
 }

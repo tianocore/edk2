@@ -15,6 +15,7 @@
 #include <Library/ArmLib.h>
 #include <Library/ArmMmuLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/CpuExceptionHandlerLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -23,7 +24,6 @@
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/UefiLib.h>
 #include <Library/CpuLib.h>
-#include <Library/DefaultExceptionHandlerLib.h>
 #include <Library/DebugLib.h>
 
 #include <Guid/DebugImageInfoTable.h>
