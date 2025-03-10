@@ -32,7 +32,6 @@
   DxeServicesTableLib
   HobLib
   MemoryAllocationLib
-  MpInitLib
   PeCoffGetEntryPointLib
   ReportStatusCodeLib
   TimerLib
@@ -42,11 +41,18 @@
 
 [LibraryClasses.IA32, LibraryClasses.X64]
   LocalApicLib
+  MpInitLib
   MtrrLib
 
 [LibraryClasses.LoongArch64]
   CacheMaintenanceLib
   CpuMmuLib
+  MpInitLib
+
+[LibraryClasses.ARM, LibraryClasses.AARCH64]
+  ArmLib
+  ArmMmuLib
+  CacheMaintenanceLib
 
 [Sources.IA32, Sources.X64]
   CpuDxe.c
@@ -73,14 +79,31 @@
   LoongArch64/Exception.c
   LoongArch64/CpuDxe.h
 
+[Sources.ARM, Sources.AARCH64]
+  Arm/CpuDxe.c
+  Arm/CpuDxe.h
+  Arm/CpuMmuCommon.c
+  Arm/Exception.c
+  Arm/MemoryAttribute.c
+
+[Sources.ARM]
+  Arm/MmuArm.c
+
+[Sources.AARCH64]
+  Arm/MmuArm64.c
+
 [Protocols]
   gEfiCpuArchProtocolGuid                       ## PRODUCES
   gEfiMemoryAttributeProtocolGuid               ## PRODUCES
   gEfiMpServiceProtocolGuid                     ## PRODUCES
   gEfiSmmBase2ProtocolGuid                      ## SOMETIMES_CONSUMES
 
+[Protocols.ARM, Protocols.AARCH64]
+  gArmHardwareInterruptProtocolGuid             ## CONSUMES
+
 [Guids]
   gIdleLoopEventGuid                            ## CONSUMES           ## Event
+  gEfiDebugImageInfoTableGuid                   ## CONSUMES
   gEfiVectorHandoffTableGuid                    ## SOMETIMES_CONSUMES ## SystemTable
 
 [Ppis]
@@ -98,6 +121,13 @@
 
 [Pcd.LoongArch64]
   gUefiCpuPkgTokenSpaceGuid.PcdLoongArchExceptionVectorBaseAddress      ## CONSUMES
+
+[Pcd.ARM, Pcd.AARCH64]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy         ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdArmVFPEnabled                             ## CONSUMES
+
+[FeaturePcd.ARM, FeaturePcd.AARCH64]
+  gEfiMdePkgTokenSpaceGuid.PcdRemapUnusedMemoryNx
 
 [Depex]
   TRUE

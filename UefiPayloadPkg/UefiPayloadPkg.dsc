@@ -980,6 +980,7 @@
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
 
   UefiPayloadPkg/BlSupportDxe/BlSupportDxe.inf
+  UefiCpuPkg/CpuDxe/CpuDxe.inf
 
   #
   # SMBIOS Support
@@ -1129,7 +1130,6 @@
 !endif
 
 [Components.X64]
-  UefiCpuPkg/CpuDxe/CpuDxe.inf
 
 !if $(TIMER_SUPPORT) == "HPET"
   PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
@@ -1144,7 +1144,6 @@
 
 [Components.AARCH64]
   ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
-  ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
 
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf

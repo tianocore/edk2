@@ -380,7 +380,7 @@
   #
   # Architectural Protocols
   #
-  ArmPkg/Drivers/CpuDxe/CpuDxe.inf
+  UefiCpuPkg/CpuDxe/CpuDxe.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
     <LibraryClasses>

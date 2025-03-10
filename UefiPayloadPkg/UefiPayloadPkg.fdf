@@ -153,9 +153,9 @@ INF MdeModulePkg/Core/Dxe/DxeMain.inf
 INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 INF MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
 INF MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
+INF UefiCpuPkg/CpuDxe/CpuDxe.inf
 
 !if "X64" IN "$(ARCH)"
-  INF UefiCpuPkg/CpuDxe/CpuDxe.inf
   INF MdeModulePkg/Universal/Metronome/Metronome.inf
   INF PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
 
@@ -171,7 +171,6 @@ INF MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntime
     INF OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
   !endif
 !elseif "AARCH64" IN "$(ARCH)"
-  INF ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   INF ArmPkg/Drivers/ArmGicDxe/ArmGicDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
 

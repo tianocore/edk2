@@ -172,7 +172,7 @@
   #
   # Architectural Protocols
   #
-  ArmPkg/Drivers/CpuDxe/CpuDxe.inf
+  UefiCpuPkg/CpuDxe/CpuDxe.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf

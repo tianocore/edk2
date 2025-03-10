@@ -227,14 +227,12 @@
   UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf
 
 [Components.ARM, Components.AARCH64]
+  UefiCpuPkg/Library/ArmExceptionLib/ArmExceptionLib.inf
   UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
 
 [Components.AARCH64]
   UefiCpuPkg/Library/ArmMmuLib/ArmMmuPeiLib.inf
   UefiCpuPkg/Library/BaseArchSupportLib/BaseArchSupportLib.inf
-
-[Components.ARM, Components.AARCH64]
-  UefiCpuPkg/Library/ArmExceptionLib/ArmExceptionLib.inf
 
 [Components.LOONGARCH64]
   UefiCpuPkg/Library/CpuMmuLib/CpuMmuLib.inf
