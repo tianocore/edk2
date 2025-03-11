@@ -77,6 +77,10 @@
   # Maximum number of Custom DT Generators
   gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxCustomDTGenerators|1|UINT16|0xC0000003
 
+  # Maximum number of Entries in the SMBIOS Handle Map
+  # Note that a larger value may degrade performance.
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxSmbiosHandleMapEntries|255|UINT16|0xC0000004
+
   # Non BSA Compliant 16550 Serial HID
   gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdNonBsaCompliant16550SerialHid|""|VOID*|0x40000008
 

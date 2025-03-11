@@ -1,5 +1,5 @@
 ## @file
-# Module that drives the table generation and installation process.
+#  Module that drives the table generation and installation process.
 #
 #  Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.
 #  Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
@@ -27,6 +27,7 @@
   SmbiosTableDispatcher.c
   SmbiosTableDispatcher.h
   AcpiTableBuilder.c
+  SmbiosTableBuilder.c
 
 [Sources.ARM, Sources.AARCH64]
   Arm/ArmDynamicTableManager.c
@@ -53,7 +54,7 @@
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
   gEfiAcpiSdtProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
-
+  gEfiSmbiosProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
   gEdkiiConfigurationManagerProtocolGuid        # PROTOCOL ALWAYS_CONSUMED
   gEdkiiDynamicTableFactoryProtocolGuid         # PROTOCOL ALWAYS_CONSUMED
 
