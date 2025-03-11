@@ -59,6 +59,8 @@ AmdMemEncryptionAttrCheck (
       return CurrentLevel == CCAttrAmdSevSnp;
     case CCAttrFeatureAmdSevEsDebugVirtualization:
       return !!(CurrentAttr & CCAttrFeatureAmdSevEsDebugVirtualization);
+    case CCAttrFeatureAmdSevSnpAlternateInjection:
+      return !!(CurrentAttr & CCAttrFeatureAmdSevSnpAlternateInjection);
     default:
       return FALSE;
   }
@@ -179,4 +181,19 @@ MemEncryptSevEsDebugVirtualizationIsEnabled (
   )
 {
   return ConfidentialComputingGuestHas (CCAttrFeatureAmdSevEsDebugVirtualization);
+}
+
+/**
+  Returns a boolean to indicate whether Alternate Injection is enabled.
+
+  @retval TRUE           Alternate Injection is enabled
+  @retval FALSE          Alternate Injection is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevSnpAlternateInjectionIsEnabled (
+  VOID
+  )
+{
+  return ConfidentialComputingGuestHas (CCAttrFeatureAmdSevSnpAlternateInjection);
 }

@@ -185,3 +185,21 @@ MemEncryptSevLocateInitialSmramSaveStateMapPages (
 {
   return RETURN_UNSUPPORTED;
 }
+
+/**
+  Returns a boolean to indicate whether Alternate Injection is enabled.
+
+  @retval TRUE           AlternateInjection is enabled
+  @retval FALSE          AlternateInjection is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevSnpAlternateInjectionIsEnabled (
+  VOID
+  )
+{
+  MSR_SEV_STATUS_REGISTER  Msr;
+
+  Msr.Uint32 = InternalMemEncryptSevStatus ();
+  return Msr.Bits.AlternateInjection ? TRUE : FALSE;
+}

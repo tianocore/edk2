@@ -529,6 +529,10 @@ AmdSevInitialize (
     CCGuestAttr |= CCAttrFeatureAmdSevEsDebugVirtualization;
   }
 
+  if (MemEncryptSevSnpAlternateInjectionIsEnabled ()) {
+    CCGuestAttr |= CCAttrFeatureAmdSevSnpAlternateInjection;
+  }
+
   PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCGuestAttr);
 
   ASSERT_RETURN_ERROR (PcdStatus);
