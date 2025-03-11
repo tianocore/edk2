@@ -258,6 +258,15 @@ typedef struct DynamicTableFactoryProtocol {
   EDKII_DYNAMIC_TABLE_FACTORY_GET_METADATA_ROOT
                                                             GetMetadataRoot;
 
+  EDKII_DYNAMIC_TABLE_FACTORY_SMBIOS_TABLE_ADD_HANDLE
+                                                            AddSmbiosHandle;
+
+  EDKII_DYNAMIC_TABLE_FACTORY_SMBIOS_TABLE_GET_HANDLE
+                                                            GetSmbiosHandle;
+
+  EDKII_DYNAMIC_TABLE_FACTORY_SMBIOS_TABLE_GET_HANDLE_EX
+                                                            GetSmbiosHandleEx;
+
   /** Pointer to the data structure that holds the
       list of registered table generators
   */
