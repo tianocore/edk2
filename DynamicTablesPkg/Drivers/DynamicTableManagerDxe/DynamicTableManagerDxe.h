@@ -60,4 +60,21 @@ GetAcpiTablePresenceInfo (
   OUT INT32                     *FadtIndex
   );
 
+/** ACPI table Protocol ready event handler.
+
+  This event notification indicates that the ACPI protocol is ready.
+  Therefore, dispatch the building of the ACPI tables.
+
+  @param  [in]  Event     The Event that is signalled.
+  @param  [in]  Context   The Context information.
+
+  @retval None
+**/
+VOID
+EFIAPI
+AcpiTableProtocolReady (
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
+  );
+
 #endif // DYNAMIC_TABLE_MANAGER_DXE_H_
