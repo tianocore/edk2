@@ -77,4 +77,21 @@ AcpiTableProtocolReady (
   IN  VOID       *Context
   );
 
+/** SMBIOS table Protocol ready event handler.
+
+  This event notification indicates that the SMBIOS protocol is ready.
+  Therefore, dispatch the building of the SMBIOS tables.
+
+  @param  [in]  Event     The Event that is signalled.
+  @param  [in]  Context   The Context information.
+
+  @retval None
+**/
+VOID
+EFIAPI
+SmbiosProtocolReady (
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
+  );
+
 #endif // DYNAMIC_TABLE_MANAGER_DXE_H_
