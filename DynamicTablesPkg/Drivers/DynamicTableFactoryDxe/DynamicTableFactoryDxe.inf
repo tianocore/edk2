@@ -45,6 +45,7 @@
   gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxCustomACPIGenerators
   gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxCustomSMBIOSGenerators
   gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxCustomDTGenerators
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxSmbiosHandleMapEntries
 
 [Protocols]
   gEdkiiDynamicTableFactoryProtocolGuid         # PRODUCES
