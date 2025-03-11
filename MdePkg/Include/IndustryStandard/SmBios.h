@@ -30,6 +30,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SMBIOS_HANDLE_PI_RESERVED  0xFFFE
 
 ///
+/// Reference SMBIOS 3.6, chapter 6.1.2.
+/// Unless otherwise specified, when referring to another structure’s handle, the value
+/// 0FFFFh is used to indicate that the referenced handle is not applicable or does not
+/// exist.
+///
+#define SMBIOS_HANDLE_INVALID  0xFFFF
+
+///
 /// Reference SMBIOS 2.6, chapter 3.1.3.
 /// Each text string is limited to 64 significant characters due to system MIF limitations.
 /// Reference SMBIOS 2.7, chapter 6.1.3.
