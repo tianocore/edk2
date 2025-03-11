@@ -94,7 +94,19 @@ RedfishCreateSmbiosTable42 (
       DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.SerialNumberStr = 0;
     } else {
       if (SerialNumber != NULL) {
-        SerialNumStrLen                                                = AsciiStrLen (SerialNumber);
+        // Check if the string length exceeds UINT8_MAX (255)
+        if (AsciiStrLen (SerialNumber) > UINT8_MAX) {
+          DEBUG ((
+            DEBUG_ERROR,
+            "%a: SerialNumber length (%d) exceeds maximum allowed length for UINT8 (%d)\n",
+            __func__,
+            AsciiStrLen (SerialNumber),
+            UINT8_MAX
+            ));
+          return EFI_BAD_BUFFER_SIZE;
+        }
+
+        SerialNumStrLen                                                = (UINT8)AsciiStrLen (SerialNumber);
         DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.SerialNumberStr = StringCount;
       }
     }
