@@ -267,7 +267,7 @@ F: MdeModulePkg/Universal/DevicePathDxe/
 F: MdeModulePkg/Universal/DriverHealthManagerDxe/
 F: MdeModulePkg/Universal/LoadFileOnFv2/
 F: MdeModulePkg/Universal/SecurityStubDxe/Defer3rdPartyImageLoad.*
-R: Ray Ni <ray.ni@intel.com> [niruiyu]
+R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
 
 MdeModulePkg: Core services (PEI, DXE and Runtime) modules
 F: MdeModulePkg/*Mem*/
@@ -316,7 +316,7 @@ R: Ray Ni <ray.ni@intel.com> [niruiyu]
 
 MdeModulePkg: Disk modules
 F: MdeModulePkg/Universal/Disk/
-R: Ray Ni <ray.ni@intel.com> [niruiyu]
+R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
 
 MdeModulePkg: Firmware Update modules
 F: MdeModulePkg/*Capsule*/
