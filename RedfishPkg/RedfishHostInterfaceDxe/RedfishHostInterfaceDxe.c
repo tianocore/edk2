@@ -24,6 +24,8 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
+#define UINT8_MAX  0xff
+
 static EFI_EVENT  mPlatformHostInterfaceReadylEvent        = NULL;
 static VOID       *mPlatformHostInterfaceReadyRegistration = NULL;
 
