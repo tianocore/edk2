@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Base.h>
 #include <Library/BaseMemoryLib.h>
 
+typedef UINTN   size_t;
+
 #if defined (__clang__) && !defined (__APPLE__)
 
 /* Copies bytes between buffers */
@@ -18,10 +20,10 @@ void *
 __memcpy (
   void          *dest,
   const void    *src,
-  unsigned int  count
+  size_t        count
   )
 {
-  return CopyMem (dest, src, (UINTN)count);
+  return CopyMem (dest, src, count);
 }
 
 __attribute__ ((__alias__ ("__memcpy")))
@@ -38,10 +40,10 @@ void *
 memcpy (
   void          *dest,
   const void    *src,
-  unsigned int  count
+  size_t        count
   )
 {
-  return CopyMem (dest, src, (UINTN)count);
+  return CopyMem (dest, src, count);
 }
 
 #endif
