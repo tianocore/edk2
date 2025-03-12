@@ -1,0 +1,31 @@
+## @file
+# Package for TCG TPM modules.
+#
+# This Package provides softwared-based TPM  libraries using TCG TPM v2.0
+# Reference Library (https://github.com/TrustedComputingGroup/TPM).
+#
+# Copyright (c) 2025, Arm ltd. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = TcgTpmPkg
+  PACKAGE_UNI_FILE               = TcgTpmPkg.uni
+  PACKAGE_GUID                   = d2140d58-d992-11f0-a174-6718da082438
+  PACKAGE_VERSION                = 0.98
+
+[Includes]
+  Include
+
+[Includes.Common.Private]
+
+[LibraryClasses]
+  ##  @libraryclass  Provides platform specific APIs used by TpmLib.
+  #
+  PlatformTpmLib|Include/Library/PlatformTpmLib.h
+
+[LibraryClasses.common.Private]
