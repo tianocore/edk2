@@ -1090,7 +1090,39 @@ PlatformAddressWidthInitialization (
   PlatformAddressWidthFromCpuid (PlatformInfoHob, TRUE);
   if (PlatformInfoHob->PhysMemAddressWidth != 0) {
     // physical address width is known
-    PlatformDynamicMmioWindow (PlatformInfoHob);
+    BOOLEAN               FwCfgPciMmioClassicWindow = FALSE;
+    EFI_STATUS            ClassicWindowStatus;
+
+    ClassicWindowStatus = QemuFwCfgParseBool (
+             "opt/ovmf/X-PciMmioClassicWindow",
+             &FwCfgPciMmioClassicWindow
+             );
+    switch (ClassicWindowStatus) {
+      case EFI_UNSUPPORTED:
+      case EFI_NOT_FOUND:
+        break;
+      case EFI_SUCCESS:
+        if (FwCfgPciMmioClassicWindow > 0) {
+          DEBUG ((DEBUG_INFO, "%a: using classic mmio window (requested in fw_cfg)\n", __func__));
+          break;
+        }
+
+      //
+      // fall through
+      //
+      default:
+        DEBUG ((
+          DEBUG_WARN,
+          "%a: error in X-PciMmioClassicWindow value from fw_cfg\n",
+          __func__
+          ));
+        break;
+    }
+
+    if (!FwCfgPciMmioClassicWindow)
+    {
+      PlatformDynamicMmioWindow (PlatformInfoHob);
+    }
     return;
   }
 
