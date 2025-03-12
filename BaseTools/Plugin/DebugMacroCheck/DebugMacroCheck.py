@@ -577,6 +577,9 @@ def _show_progress(step: int, total: int, suffix: str = '') -> None:
     """
     global _progress_start_time
 
+    if total == 0:
+        return
+
     if step == 0:
         _progress_start_time = timeit.default_timer()
 
