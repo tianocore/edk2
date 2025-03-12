@@ -13,6 +13,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+#include <Base.h>
 #include <Uefi.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -23,8 +24,6 @@
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
-
-#define UINT8_MAX  0xff
 
 static EFI_EVENT  mPlatformHostInterfaceReadylEvent        = NULL;
 static VOID       *mPlatformHostInterfaceReadyRegistration = NULL;
@@ -97,15 +96,15 @@ RedfishCreateSmbiosTable42 (
       DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.SerialNumberStr = 0;
     } else {
       if (SerialNumber != NULL) {
-        // Check if the string length exceeds UINT8_MAX (255)
+        // Check if the string length exceeds MAX_UINT8 (255)
         SerialNumberLength = AsciiStrLen (SerialNumber);
-        if (SerialNumberLength > UINT8_MAX) {
+        if (SerialNumberLength > MAX_UINT8) {
           DEBUG ((
             DEBUG_ERROR,
             "%a: SerialNumber length (%d) exceeds maximum allowed length for UINT8 (%d)\n",
             __func__,
             AsciiStrLen (SerialNumber),
-            UINT8_MAX
+            MAX_UINT8
             ));
           return EFI_BAD_BUFFER_SIZE;
         }
