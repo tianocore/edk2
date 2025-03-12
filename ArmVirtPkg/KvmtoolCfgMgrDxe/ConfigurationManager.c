@@ -106,6 +106,15 @@ EDKII_PLATFORM_REPOSITORY_INFO  mKvmtoolPlatRepositoryInfo = {
       NULL
     },
     //
+    // SSDT Serial Port Table
+    //
+    {
+      EFI_ACPI_6_3_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,
+      0, // Unused
+      CREATE_STD_ACPI_TABLE_GEN_ID (EStdAcpiTableIdSsdtSerialPort),
+      NULL
+    },
+    //
     // PCI MCFG Table
     //
     {
