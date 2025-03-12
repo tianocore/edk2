@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define MM_COMM_BUFFER_HOB_GUID \
   { 0x6c2a2520, 0x0131, 0x4aee, { 0xa7, 0x50, 0xcc, 0x38, 0x4a, 0xac, 0xe8, 0xc6 }}
 
+#pragma pack(1)
 ///
 /// The MM communicate buffer facilitates data sharing between non-MM and MM code.
 /// The MM IPL code allocates a "fixed" runtime type memory as the MM communication buffer,
@@ -57,6 +58,8 @@ typedef struct {
   ///
   UINT64     ReturnBufferSize;
 } MM_COMM_BUFFER_STATUS;
+
+#pragma pack()
 
 extern EFI_GUID  gMmCommBufferHobGuid;
 
