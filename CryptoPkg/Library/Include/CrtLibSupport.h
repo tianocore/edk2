@@ -71,6 +71,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define ULONG_MAX     0xFFFFFFFF      /* Maximum unsigned long value */
 #define CHAR_BIT      8               /* Number of bits in a char */
 #define SIZE_MAX      0xFFFFFFFF      /* Maximum unsigned size_t */
+#define INT16_MAX     0x7FFF          /* Maximum (signed) short value */
+#define UINT16_MAX    0xFFFF          /* Maximum unsigned short value */
 
 #define INT32_MIN   INT_MIN
 #define INT32_MAX   INT_MAX
@@ -430,10 +432,16 @@ strpbrk (
   const char  *accept
   );
 
+void *
+memcpy (
+  void        *dest,
+  const void  *src,
+  size_t      n
+  );
+
 //
 // Macros that directly map functions to BaseLib, BaseMemoryLib, and DebugLib functions
 //
-#define memcpy(dest, source, count)       CopyMem(dest,source,(UINTN)(count))
 #define memset(dest, ch, count)           SetMem(dest,(UINTN)(count),(UINT8)(ch))
 #define memchr(buf, ch, count)            ScanMem8(buf,(UINTN)(count),(UINT8)ch)
 #define memcmp(buf1, buf2, count)         (int)(CompareMem(buf1,buf2,(UINTN)(count)))
