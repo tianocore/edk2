@@ -47,6 +47,10 @@
   #
   HashApiLib|Include/Library/HashApiLib.h
 
+  ##  @libraryclass  Provides platform specific APIs used by TpmLib.
+  #
+  PlatformTpmLib|Include/Library/PlatformTpmLib.h
+
 [LibraryClasses.common.Private]
   ##  @libraryclass  Provides library functions from the openssl project.
   #
