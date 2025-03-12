@@ -10,7 +10,8 @@
     },
     "LicenseCheck": {
         "IgnoreFiles": [
-            # These directories are symbolic link or submodule
+            # These files and directories are copied from TCG TPM v2.0 reference libraries
+            "Library/TpmLib/Include/TpmConfiguration/TpmBuildSwitches.h"
         ]
     },
     "EccCheck": {
@@ -22,6 +23,9 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
+            # These files and directories are related for TCG TPM v2.0 reference libraries
+            "Library/TpmLib/Include/TpmConfiguration/TpmBuildSwitches.h",
+            "Library/TpmLib/TpmLibCompileOptions.h"
         ]
     },
     "CompilerPlugin": {
@@ -70,6 +74,7 @@
     # options defined in .pytool/Plugin/UncrustifyCheck
     "UncrustifyCheck": {
         "IgnoreFiles": [
+            "Library/TpmLib/Include/TpmConfiguration/TpmBuildSwitches.h"
         ]
     }
 }
