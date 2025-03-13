@@ -56,10 +56,12 @@
   gMmCpuSyncConfigHobGuid
   gMmProfileDataHobGuid
   gMmUnblockRegionHobGuid
+  gCommunicateHeaderV3Guid
 
 [Ppis]
   gEfiPeiMmControlPpiGuid
   gEfiPeiMmCommunicationPpiGuid
+  gEfiPeiMmCommunication3PpiGuid
   gEfiEndOfPeiSignalPpiGuid
   gMmCoreFvLocationPpiGuid
 
