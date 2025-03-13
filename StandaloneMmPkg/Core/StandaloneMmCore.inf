@@ -84,6 +84,7 @@
   gEfiSmmSmramMemoryGuid
   gEdkiiPiSmmMemoryAttributesTableGuid
   gEfiMmPeiMmramMemoryReserveGuid
+  gCommunicateHeaderV3Guid    ## CONSUMES   ## GUID # Communicate header
 
 [Pcd]
   gStandaloneMmPkgTokenSpaceGuid.PcdFwVolMmMaxEncapsulationDepth    ##CONSUMES
