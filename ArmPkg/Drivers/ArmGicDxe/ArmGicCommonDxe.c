@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 --*/
 
 #include "ArmGicDxe.h"
+#include "Uefi/UefiBaseType.h"
 
 // Making this global saves a few bytes in image size
 EFI_HANDLE  gHardwareInterruptHandle = NULL;
@@ -14,11 +15,55 @@ EFI_HANDLE  gHardwareInterruptHandle = NULL;
 // Notifications
 EFI_EVENT  EfiExitBootServicesEvent = (EFI_EVENT)NULL;
 
-// Maximum Number of Interrupts
-UINTN  mGicNumInterrupts = 0;
+EFI_CPU_ARCH_PROTOCOL  *gCpuArch;
 
-HARDWARE_INTERRUPT_HANDLER  *gRegisteredInterruptHandlers = NULL;
-EFI_CPU_ARCH_PROTOCOL       *gCpuArch;
+/**
+ *
+ * Return whether the Source interrupt index refers to an extended shared
+ * interrupt.
+ *
+ * @param Source  The source intid to test
+ *
+ * @return True if Source is an extended SPI intid, false otherwise.
+ */
+BOOLEAN
+GicCommonSourceIsExtSpi (
+  IN UINTN  Source
+  )
+{
+  return Source >= ARM_GIC_ARCH_EXT_SPI_MIN && Source <= ARM_GIC_ARCH_EXT_SPI_MAX;
+}
+
+/**
+ * Return whether this is a special interrupt.
+ *
+ * @param Source  The source intid to test
+ *
+ * @return True if Source is a special interrupt intid, false otherwise.
+ */
+BOOLEAN
+GicCommonSourceIsSpecialInterrupt (
+  IN UINTN  Source
+  )
+{
+  return (Source >= 1020) && (Source <= 1023);
+}
+
+/**
+ *
+ * Return whether the Source interrupt index refers to a shared interrupt (SPI)
+ *
+ * @param Source  The source intid to test
+ *
+ * @return True if Source is a SPI intid, false otherwise.
+ */
+BOOLEAN
+GicCommonSourceIsSpi (
+  IN UINTN  Source
+  )
+{
+  return (Source >= ARM_GIC_ARCH_SPI_MIN) && (Source <= ARM_GIC_ARCH_SPI_MAX);
+}
 
 /**
   Calculate GICD_ICFGRn base address and corresponding bit
@@ -32,24 +77,26 @@ EFI_CPU_ARCH_PROTOCOL       *gCpuArch;
   @retval EFI_UNSUPPORTED   Source interrupt is not supported.
 **/
 EFI_STATUS
-GicGetDistributorIcfgBaseAndBit (
+GicCommonGetDistributorIcfgBaseAndBit (
   IN HARDWARE_INTERRUPT_SOURCE  Source,
   OUT UINTN                     *RegAddress,
   OUT UINTN                     *Config1Bit
   )
 {
-  UINTN  RegIndex;
-  UINTN  Field;
+  UINTN                      RegIndex;
+  UINTN                      Field;
+  UINTN                      RegOffset;
+  HARDWARE_INTERRUPT_SOURCE  AdjustedSource;
 
-  if (Source >= mGicNumInterrupts) {
-    ASSERT (Source < mGicNumInterrupts);
-    return EFI_UNSUPPORTED;
-  }
+  // Translate ESPI sources into the SPI range for indexing purposes.
+  AdjustedSource = Source & ~(ARM_GIC_ARCH_EXT_SPI_MIN);
 
-  RegIndex    = Source / ARM_GIC_ICDICFR_F_STRIDE; // NOTE: truncation is significant
-  Field       = Source % ARM_GIC_ICDICFR_F_STRIDE;
+  RegOffset = (GicCommonSourceIsExtSpi (Source)) ? ARM_GIC_ICDICFR_E : ARM_GIC_ICDICFR;
+
+  RegIndex    = AdjustedSource / ARM_GIC_ICDICFR_F_STRIDE; // NOTE: truncation is significant
+  Field       = AdjustedSource % ARM_GIC_ICDICFR_F_STRIDE;
   *RegAddress = (UINTN)PcdGet64 (PcdGicDistributorBase)
-                + ARM_GIC_ICDICFR
+                + RegOffset
                 + (ARM_GIC_ICDICFR_BYTES * RegIndex);
   *Config1Bit = ((Field * ARM_GIC_ICDICFR_F_WIDTH)
                  + ARM_GIC_ICDICFR_F_CONFIG1_BIT);
@@ -60,9 +107,10 @@ GicGetDistributorIcfgBaseAndBit (
 /**
   Register Handler for the specified interrupt source.
 
-  @param This     Instance pointer for this protocol
-  @param Source   Hardware source of the interrupt
-  @param Handler  Callback for interrupt. NULL to unregister
+  @param This        Instance pointer for this protocol
+  @param Source      Hardware source of the interrupt
+  @param Handler     Callback for interrupt. NULL to unregister
+  @param HandlerDest Address of where to store Handler.
 
   @retval EFI_SUCCESS Source was updated to support Handler.
   @retval EFI_DEVICE_ERROR  Hardware could not be programmed.
@@ -70,58 +118,53 @@ GicGetDistributorIcfgBaseAndBit (
 **/
 EFI_STATUS
 EFIAPI
-RegisterInterruptSource (
+GicCommonRegisterInterruptSource (
   IN EFI_HARDWARE_INTERRUPT_PROTOCOL  *This,
   IN HARDWARE_INTERRUPT_SOURCE        Source,
-  IN HARDWARE_INTERRUPT_HANDLER       Handler
+  IN HARDWARE_INTERRUPT_HANDLER       Handler,
+  IN HARDWARE_INTERRUPT_HANDLER       *HandlerDest
   )
 {
-  if (Source >= mGicNumInterrupts) {
-    ASSERT (FALSE);
-    return EFI_UNSUPPORTED;
-  }
+  EFI_STATUS  Status;
 
-  if ((Handler == NULL) && (gRegisteredInterruptHandlers[Source] == NULL)) {
+  if (HandlerDest == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((Handler != NULL) && (gRegisteredInterruptHandlers[Source] != NULL)) {
+  if ((Handler == NULL) && (*HandlerDest == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((Handler != NULL) && (*HandlerDest != NULL)) {
     return EFI_ALREADY_STARTED;
   }
 
-  gRegisteredInterruptHandlers[Source] = Handler;
-
-  // If the interrupt handler is unregistered then disable the interrupt
   if (NULL == Handler) {
-    return This->DisableInterruptSource (This, Source);
+    // Removing the handler - disable the interrupt first.
+    Status       = This->DisableInterruptSource (This, Source);
+    *HandlerDest = Handler;
+    return Status;
   } else {
+    // Registering a handler - set up the handler before enabling.
+    *HandlerDest = Handler;
     return This->EnableInterruptSource (This, Source);
   }
 }
 
 EFI_STATUS
-InstallAndRegisterInterruptService (
+GicCommonInstallAndRegisterInterruptService (
   IN EFI_HARDWARE_INTERRUPT_PROTOCOL   *InterruptProtocol,
   IN EFI_HARDWARE_INTERRUPT2_PROTOCOL  *Interrupt2Protocol,
   IN EFI_CPU_INTERRUPT_HANDLER         InterruptHandler,
   IN EFI_EVENT_NOTIFY                  ExitBootServicesEvent
   )
 {
-  EFI_STATUS   Status;
-  CONST UINTN  RihArraySize =
-    (sizeof (HARDWARE_INTERRUPT_HANDLER) * mGicNumInterrupts);
-
-  // Initialize the array for the Interrupt Handlers
-  gRegisteredInterruptHandlers = AllocateZeroPool (RihArraySize);
-  if (gRegisteredInterruptHandlers == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
+  EFI_STATUS  Status;
 
   // Register to receive interrupts
   Status = gCpuArch->RegisterInterruptHandler (gCpuArch, ARM_ARCH_EXCEPTION_IRQ, InterruptHandler);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: Cpu->RegisterInterruptHandler() - %r\n", __func__, Status));
-    FreePool (gRegisteredInterruptHandlers);
     return Status;
   }
 
