@@ -641,6 +641,7 @@ GetStandardNameSpaceObject (
   EFI_STATUS                      Status;
   EDKII_PLATFORM_REPOSITORY_INFO  *PlatformRepo;
   UINTN                           AcpiTableCount;
+  BOOLEAN                         PciSupportPresent;
   CM_OBJ_DESCRIPTOR               CmObjDesc;
 
   if ((This == NULL) || (CmObject == NULL)) {
@@ -649,8 +650,9 @@ GetStandardNameSpaceObject (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status       = EFI_NOT_FOUND;
-  PlatformRepo = This->PlatRepoInfo;
+  Status            = EFI_NOT_FOUND;
+  PlatformRepo      = This->PlatRepoInfo;
+  PciSupportPresent = TRUE;
 
   switch (GET_CM_OBJECT_ID (CmObjectId)) {
     case EStdObjCfgMgrInfo:
@@ -667,12 +669,12 @@ GetStandardNameSpaceObject (
       AcpiTableCount = ARRAY_SIZE (PlatformRepo->CmAcpiTableList);
 
       //
-      // Get Pci config space information.
+      // Get Pci interrupt map information.
       //
       Status = DynamicPlatRepoGetObject (
                  PlatformRepo->DynamicPlatformRepo,
                  CREATE_CM_ARCH_COMMON_OBJECT_ID (
-                   EArchCommonObjPciConfigSpaceInfo
+                   EArchCommonObjPciInterruptMapInfo
                    ),
                  CM_NULL_TOKEN,
                  &CmObjDesc
@@ -683,31 +685,34 @@ GetStandardNameSpaceObject (
         // present, Kvmtool was launched without the PCIe option.
         // Therefore, reduce the table count by 3.
         //
-        AcpiTableCount -= 3;
+        AcpiTableCount   -= 3;
+        PciSupportPresent = FALSE;
       } else if (EFI_ERROR (Status)) {
         ASSERT_EFI_ERROR (Status);
         return Status;
       }
 
-      //
-      // Get the Gic version.
-      //
-      Status = DynamicPlatRepoGetObject (
-                 PlatformRepo->DynamicPlatformRepo,
-                 CREATE_CM_ARM_OBJECT_ID (EArmObjGicDInfo),
-                 CM_NULL_TOKEN,
-                 &CmObjDesc
-                 );
-      if (EFI_ERROR (Status)) {
-        ASSERT_EFI_ERROR (Status);
-        return Status;
-      }
+      if (PciSupportPresent) {
+        //
+        // Get the Gic version.
+        //
+        Status = DynamicPlatRepoGetObject (
+                   PlatformRepo->DynamicPlatformRepo,
+                   CREATE_CM_ARM_OBJECT_ID (EArmObjGicDInfo),
+                   CM_NULL_TOKEN,
+                   &CmObjDesc
+                   );
+        if (EFI_ERROR (Status)) {
+          ASSERT_EFI_ERROR (Status);
+          return Status;
+        }
 
-      if (((CM_ARM_GICD_INFO *)CmObjDesc.Data)->GicVersion < 3) {
-        //
-        // IORT is only required for GicV3/4
-        //
-        AcpiTableCount -= 1;
+        if (((CM_ARM_GICD_INFO *)CmObjDesc.Data)->GicVersion < 3) {
+          //
+          // IORT is only required for GicV3/4
+          //
+          AcpiTableCount -= 1;
+        }
       }
 
       Status = HandleCmObject (
