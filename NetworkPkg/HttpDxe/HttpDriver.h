@@ -26,6 +26,7 @@
 #include <Library/NetLib.h>
 #include <Library/HttpLib.h>
 #include <Library/DpcLib.h>
+#include <Library/PrintLib.h>
 
 //
 // UEFI Driver Model Protocols
@@ -64,6 +65,7 @@
 // Driver Version
 //
 #define HTTP_DRIVER_VERSION  0xa
+#define URI_STR_MAX_SIZE     255
 
 //
 // Protocol instances
