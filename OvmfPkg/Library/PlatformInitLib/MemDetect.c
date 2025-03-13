@@ -556,7 +556,8 @@ PlatformGetFirstNonAddress (
       break;
     case EFI_SUCCESS:
       if (FwCfgPciMmio64Mb <= 0x1000000) {
-        PlatformInfoHob->PcdPciMmio64Size = LShiftU64 (FwCfgPciMmio64Mb, 20);
+        PlatformInfoHob->PcdPciMmio64Size     = LShiftU64 (FwCfgPciMmio64Mb, 20);
+        PlatformInfoHob->PcdPciMmio64Override = TRUE;
         break;
       }
 
@@ -795,8 +796,10 @@ PlatformDynamicMmioWindow (
   AddrSpace = LShiftU64 (1, PlatformInfoHob->PhysMemAddressWidth);
   MmioSpace = LShiftU64 (1, PlatformInfoHob->PhysMemAddressWidth - 3);
 
-  if ((PlatformInfoHob->PcdPciMmio64Size < MmioSpace) &&
-      (PlatformInfoHob->PcdPciMmio64Base + MmioSpace < AddrSpace))
+  if (PlatformInfoHob->PcdPciMmio64Override) {
+    DEBUG ((DEBUG_INFO, "%a: using fwcfg override for mmio window\n", __func__));
+  } else if ((PlatformInfoHob->PcdPciMmio64Size < MmioSpace) &&
+             (PlatformInfoHob->PcdPciMmio64Base + MmioSpace < AddrSpace))
   {
     DEBUG ((DEBUG_INFO, "%a: using dynamic mmio window\n", __func__));
     DEBUG ((DEBUG_INFO, "%a:   Addr Space 0x%Lx (%Ld GB)\n", __func__, AddrSpace, RShiftU64 (AddrSpace, 30)));

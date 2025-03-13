@@ -37,6 +37,7 @@ typedef struct {
 
   UINT64               PcdPciMmio64Base;
   UINT64               PcdPciMmio64Size;
+  BOOLEAN              PcdPciMmio64Override;
   UINT32               PcdPciMmio32Base;
   UINT32               PcdPciMmio32Size;
   UINT64               PcdPciIoBase;
