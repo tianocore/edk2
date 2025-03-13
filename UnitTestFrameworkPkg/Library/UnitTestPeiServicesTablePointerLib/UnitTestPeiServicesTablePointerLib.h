@@ -430,7 +430,7 @@ UnitTestInstallPeiMemory (
 **/
 EFI_STATUS
 EFIAPI
-UnitTestAllocatePages (
+UnitTestPeiAllocatePages (
   IN CONST EFI_PEI_SERVICES      **PeiServices,
   IN       EFI_MEMORY_TYPE       MemoryType,
   IN       UINTN                 Pages,
@@ -455,7 +455,7 @@ UnitTestAllocatePages (
 **/
 EFI_STATUS
 EFIAPI
-UnitTestAllocatePool (
+UnitTestPeiAllocatePool (
   IN CONST EFI_PEI_SERVICES  **PeiServices,
   IN       UINTN             Size,
   OUT      VOID              **Buffer
@@ -644,7 +644,7 @@ Frees memory pages.
 **/
 EFI_STATUS
 EFIAPI
-UnitTestFreePages (
+UnitTestPeiFreePages (
   IN CONST EFI_PEI_SERVICES  **PeiServices,
   IN EFI_PHYSICAL_ADDRESS    Memory,
   IN UINTN                   Pages
