@@ -502,11 +502,15 @@ MmEntryPoint (
   IN CONST EFI_MM_ENTRY_CONTEXT  *MmEntryContext
   )
 {
-  EFI_STATUS                 Status;
-  EFI_MM_COMMUNICATE_HEADER  *CommunicateHeader;
-  MM_COMM_BUFFER_STATUS      *CommunicationStatus;
-  UINTN                      BufferSize;
-  EFI_HANDLE                 MmHandle;
+  EFI_STATUS                    Status;
+  EFI_MM_COMMUNICATE_HEADER_V3  *CommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER     *LegacyCommunicateHeader;
+  MM_COMM_BUFFER_STATUS         *CommunicationStatus;
+  UINTN                         BufferSize;
+  EFI_HANDLE                    MmHandle;
+  EFI_GUID                      *CommGuid;
+  UINTN                         CommGuidOffset;
+  UINTN                         CommHeaderSize;
 
   DEBUG ((DEBUG_INFO, "MmEntryPoint ...\n"));
 
@@ -543,8 +547,22 @@ MmEntryPoint (
       //
       // Synchronous MMI for MM Core or request from Communicate protocol
       //
-      CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)(UINTN)mMmCommunicationBuffer->PhysicalStart;
-      BufferSize        = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + CommunicateHeader->MessageLength;
+      CommGuid = &((EFI_MM_COMMUNICATE_HEADER_V3 *)(UINTN)mMmCommunicationBuffer->PhysicalStart)->HeaderGuid;
+      //
+      // Check if the signature matches EFI_MM_COMMUNICATE_HEADER_V3 definition
+      //
+      if (CompareGuid (CommGuid, &gEfiMmCommunicateHeaderV3Guid)) {
+        CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER_V3 *)(UINTN)mMmCommunicationBuffer->PhysicalStart;
+        CommGuidOffset    = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER_V3, MessageGuid);
+        CommHeaderSize    = sizeof (EFI_MM_COMMUNICATE_HEADER_V3);
+        BufferSize        = CommunicateHeader->BufferSize;
+      } else {
+        LegacyCommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)(UINTN)mMmCommunicationBuffer->PhysicalStart;
+        CommGuidOffset          = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, HeaderGuid);
+        CommHeaderSize          = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+        BufferSize              = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + LegacyCommunicateHeader->MessageLength;
+      }
+
       if (BufferSize <= EFI_PAGES_TO_SIZE (mMmCommunicationBuffer->NumberOfPages)) {
         //
         // Shadow the data from MM Communication Buffer to internal buffer
@@ -559,16 +577,15 @@ MmEntryPoint (
           EFI_PAGES_TO_SIZE (mMmCommunicationBuffer->NumberOfPages) - BufferSize
           );
 
-        CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)mInternalCommBufferCopy;
-        BufferSize        = CommunicateHeader->MessageLength;
-        Status            = MmiManage (
-                              &CommunicateHeader->HeaderGuid,
-                              NULL,
-                              CommunicateHeader->Data,
-                              &BufferSize
-                              );
+        BufferSize -= CommHeaderSize;
+        Status      = MmiManage (
+                        (EFI_GUID *)((UINT8 *)mInternalCommBufferCopy + CommGuidOffset),
+                        NULL,
+                        (UINT8 *)mInternalCommBufferCopy + CommHeaderSize,
+                        &BufferSize
+                        );
 
-        BufferSize = BufferSize + OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+        BufferSize = BufferSize + CommHeaderSize;
         if (BufferSize <= EFI_PAGES_TO_SIZE (mMmCommunicationBuffer->NumberOfPages)) {
           //
           // Copy the data back to MM Communication Buffer
