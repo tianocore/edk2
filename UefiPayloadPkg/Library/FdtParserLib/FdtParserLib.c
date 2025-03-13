@@ -1000,46 +1000,48 @@ ParseDtb (
     }
   }
 
-  // Post processing: TODO: Need to look into it. Such cross dependency on DT nodes
-  // may not be good idea. Instead have this prop part of RB
-  mPciRootBridgeInfo->ResourceAssigned = (BOOLEAN)PciEnumDone;
+  if ((NULL != mPciRootBridgeInfo) && (NULL != mUplPciSegmentInfoHob)) {
+    // Post processing: TODO: Need to look into it. Such cross dependency on DT nodes
+    // may not be good idea. Instead have this prop part of RB
+    mPciRootBridgeInfo->ResourceAssigned = (BOOLEAN)PciEnumDone;
 
-  //
-  // Assign PCI Segment number after all root bridge info ready
-  //
-  SegmentNumber                   = 0;
-  RbSegNumAlreadyAssigned         = AllocateZeroPool (sizeof (UINT8) * RootBridgeCount);
-  NextPciBaseAddress              = 0;
-  NumberOfRbSegNumAlreadyAssigned = 0;
+    //
+    // Assign PCI Segment number after all root bridge info ready
+    //
+    SegmentNumber                   = 0;
+    RbSegNumAlreadyAssigned         = AllocateZeroPool (sizeof (UINT8) * RootBridgeCount);
+    NextPciBaseAddress              = 0;
+    NumberOfRbSegNumAlreadyAssigned = 0;
 
-  //
-  // Always assign first root bridge segment number as 0
-  //
-  CurrentPciBaseAddress                               = mUplPciSegmentInfoHob->SegmentInfo[0].BaseAddress & ~0xFFFFFFF;
-  NextPciBaseAddress                                  = CurrentPciBaseAddress;
-  mUplPciSegmentInfoHob->SegmentInfo[0].SegmentNumber = SegmentNumber;
-  mPciRootBridgeInfo->RootBridge[0].Segment           = SegmentNumber;
-  RbSegNumAlreadyAssigned[0]                          = 1;
-  NumberOfRbSegNumAlreadyAssigned++;
+    //
+    // Always assign first root bridge segment number as 0
+    //
+    CurrentPciBaseAddress                               = mUplPciSegmentInfoHob->SegmentInfo[0].BaseAddress & ~0xFFFFFFF;
+    NextPciBaseAddress                                  = CurrentPciBaseAddress;
+    mUplPciSegmentInfoHob->SegmentInfo[0].SegmentNumber = SegmentNumber;
+    mPciRootBridgeInfo->RootBridge[0].Segment           = SegmentNumber;
+    RbSegNumAlreadyAssigned[0]                          = 1;
+    NumberOfRbSegNumAlreadyAssigned++;
 
-  while (NumberOfRbSegNumAlreadyAssigned < RootBridgeCount) {
-    for (index = 1; index < RootBridgeCount; index++) {
-      if (RbSegNumAlreadyAssigned[index] == 1) {
-        continue;
+    while (NumberOfRbSegNumAlreadyAssigned < RootBridgeCount) {
+      for (index = 1; index < RootBridgeCount; index++) {
+        if (RbSegNumAlreadyAssigned[index] == 1) {
+          continue;
+        }
+
+        if (CurrentPciBaseAddress == (mUplPciSegmentInfoHob->SegmentInfo[index].BaseAddress & ~0xFFFFFFF)) {
+          mUplPciSegmentInfoHob->SegmentInfo[index].SegmentNumber = SegmentNumber;
+          mPciRootBridgeInfo->RootBridge[index].Segment           = SegmentNumber;
+          RbSegNumAlreadyAssigned[index]                          = 1;
+          NumberOfRbSegNumAlreadyAssigned++;
+        } else if (CurrentPciBaseAddress == NextPciBaseAddress) {
+          NextPciBaseAddress = mUplPciSegmentInfoHob->SegmentInfo[index].BaseAddress & ~0xFFFFFFF;
+        }
       }
 
-      if (CurrentPciBaseAddress == (mUplPciSegmentInfoHob->SegmentInfo[index].BaseAddress & ~0xFFFFFFF)) {
-        mUplPciSegmentInfoHob->SegmentInfo[index].SegmentNumber = SegmentNumber;
-        mPciRootBridgeInfo->RootBridge[index].Segment           = SegmentNumber;
-        RbSegNumAlreadyAssigned[index]                          = 1;
-        NumberOfRbSegNumAlreadyAssigned++;
-      } else if (CurrentPciBaseAddress == NextPciBaseAddress) {
-        NextPciBaseAddress = mUplPciSegmentInfoHob->SegmentInfo[index].BaseAddress & ~0xFFFFFFF;
-      }
+      SegmentNumber++;
+      CurrentPciBaseAddress = NextPciBaseAddress;
     }
-
-    SegmentNumber++;
-    CurrentPciBaseAddress = NextPciBaseAddress;
   }
 
   ((EFI_HOB_HANDOFF_INFO_TABLE *)(mHobList))->BootMode = BootMode;

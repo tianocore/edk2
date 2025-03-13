@@ -75,6 +75,16 @@
   ## Crypto package token space guid.
   gEfiCryptoPkgTokenSpaceGuid      = { 0x6bd7de60, 0x9ef7, 0x4899, { 0x97, 0xd0, 0xab, 0xff, 0xfd, 0xe9, 0x70, 0xf2 } }
 
+[PcdsFeatureFlag.IA32, PcdsFeatureFlag.X64]
+  ## Enable the use of NASM assembly source files when building an optimized
+  #  version of OpensslLib from generated assembly source files for IA32 and X64.
+  #  The generated NASM assembly source files only work with MSFT family of tool
+  #  chains or the CLANGPDB tool chain. All other tool chains must use the GAS
+  #  assembly source files. The default setting is to not use the NASM assembly
+  #  source files.
+  # @Prompt Use NASM assembly source files for optimized version of OpensslLib for IA32/X64
+  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm|FALSE|BOOLEAN|0x00000003
+
 [PcdsFixedAtBuild]
   ## Enable/Disable the families and individual services produced by the
   #  EDK II Crypto Protocols/PPIs.  The default is all services disabled.

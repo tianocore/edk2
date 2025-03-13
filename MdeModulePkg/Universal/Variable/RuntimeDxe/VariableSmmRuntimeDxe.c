@@ -67,8 +67,7 @@ BOOLEAN                         mIsRuntimeCacheEnabled = FALSE;
 EFI_STATUS
 EFIAPI
 VariablePolicySmmDxeMain (
-  IN    EFI_HANDLE        ImageHandle,
-  IN    EFI_SYSTEM_TABLE  *SystemTable
+  IN    EFI_HANDLE  ImageHandle
   );
 
 /**
@@ -1670,6 +1669,7 @@ SmmVariableReady (
   )
 {
   EFI_STATUS         Status;
+  EFI_HANDLE         VariablePolicyHandle;
   EFI_HOB_GUID_TYPE  *GuidHob;
 
   Status = gBS->LocateProtocol (&gEfiSmmVariableProtocolGuid, NULL, (VOID **)&mSmmVariable);
@@ -1720,6 +1720,16 @@ SmmVariableReady (
   gRT->GetNextVariableName = RuntimeServiceGetNextVariableName;
   gRT->SetVariable         = RuntimeServiceSetVariable;
   gRT->QueryVariableInfo   = RuntimeServiceQueryVariableInfo;
+
+  VariablePolicyHandle = (Context != NULL) ? Context : mHandle;
+  if (Context == NULL) {
+    DEBUG ((DEBUG_WARN, "Variable policy protocol was not installed on the variable image handle.\n"));
+  }
+
+  //
+  // Initialize the Variable Policy protocol and engine.
+  //
+  VariablePolicySmmDxeMain (VariablePolicyHandle);
 
   //
   // Install the Variable Architectural Protocol on a new handle.
@@ -1831,7 +1841,7 @@ VariableSmmRuntimeInitialize (
     &gEfiSmmVariableProtocolGuid,
     TPL_CALLBACK,
     SmmVariableReady,
-    NULL,
+    ImageHandle,
     &SmmVariableRegistration
     );
 
@@ -1890,9 +1900,6 @@ VariableSmmRuntimeInitialize (
          &gEfiEventVirtualAddressChangeGuid,
          &mVirtualAddressChangeEvent
          );
-
-  // Initialize the VariablePolicy protocol and engine.
-  VariablePolicySmmDxeMain (ImageHandle, SystemTable);
 
   return EFI_SUCCESS;
 }

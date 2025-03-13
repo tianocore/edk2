@@ -20,13 +20,6 @@ policy:
         - name: 'priority:high'
           keys: ['High']
 
-    # Issue Template - Code First
-    - id: ['code_first']
-      block-list: []
-      label:
-        - name: 'type:code-first'
-          keys: ['Yes']
-
     # Issue Template - Fix Owner Dropdown
     - id: ['fix_owner', 'request_owner']
       block-list: []

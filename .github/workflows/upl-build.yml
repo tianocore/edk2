@@ -1,0 +1,61 @@
+# @file up-build.yml
+#
+# A workflow that builds UefiPayloadPackage's UPL and upload it's artifacts.
+#
+##
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+name: UPL Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['master']
+
+jobs:
+  build_vs2022:
+    strategy:
+      matrix:
+        os: [windows-latest]
+        python-version: ['3.12']
+        tool-chain: ['VS2022']
+        target: ['DEBUG']
+        extra-build-args: ['FIT_BUILD=TRUE', 'FIT_BUILD=FALSE']
+    name: Build UPL VS2022
+    uses: ./.github/workflows/BuildPlatform.yml
+    with:
+      runs-on: ${{ matrix.os }}
+      build-file: 'UefiPayloadPkg/PlatformCI/PlatformBuild.py'
+      python-version: ${{ matrix.python-version }}
+      tool-chain: ${{ matrix.tool-chain }}
+      target: ${{ matrix.target }}
+      extra-build-args: ${{ matrix.extra-build-args }}
+      extra-pip-requirements: 'pefile pylibfdt'
+      extra-artifact-path: |
+        Build/**/*.elf
+        Build/**/*.fit
+    secrets: inherit
+
+  build_gcc:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ['3.12']
+        tool-chain: ['GCC']
+        target: ['DEBUG']
+        extra-build-args: ['FIT_BUILD=TRUE', 'FIT_BUILD=FALSE']
+    name: Build UPL GCC
+    uses: ./.github/workflows/BuildPlatform.yml
+    with:
+      runs-on: ${{ matrix.os }}
+      build-file: 'UefiPayloadPkg/PlatformCI/PlatformBuild.py'
+      python-version: ${{ matrix.python-version }}
+      tool-chain: ${{ matrix.tool-chain }}
+      target: ${{ matrix.target }}
+      extra-build-args: ${{ matrix.extra-build-args }}
+      extra-pip-requirements: 'pefile pylibfdt'
+      extra-setup-cmd: 'sudo dnf install -y llvm clang llvm-libs llvm-devel lldb'
+      extra-artifact-path: |
+        Build/**/*.elf
+        Build/**/*.fit

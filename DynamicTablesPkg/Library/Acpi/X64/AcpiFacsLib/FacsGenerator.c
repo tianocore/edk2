@@ -269,7 +269,7 @@ FacsUpdateTableInfo (
   {
     DEBUG ((
       DEBUG_ERROR,
-      "ERROR: FACS: Invalid Flags. Flags = 0x%x, OSPM Flags = 0x%x.\n",
+      "ERROR: FACS: Invalid Flags. Flags = 0x%x, OSPM Flags = 0x%x.\n"
       "       64-bit wake is not supported but 64-bit wake flag is set.\n",
       FacsInfo->Flags,
       FacsInfo->OspmFlags

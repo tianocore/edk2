@@ -18,8 +18,9 @@
 // types which have an associated type definition
 //
 typedef enum {
-  HardwareInfoTypeUndefined  = 0,
-  HardwareInfoTypeHostBridge = 1,
+  HardwareInfoTypeUndefined      = 0,
+  HardwareInfoTypeHostBridge     = 1,
+  HardwareInfoTypeSvsmVirtioMmio = 0x1000,
 
   HardwareInfoTypeMax
 } HARDWARE_INFO_TYPE;

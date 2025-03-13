@@ -1217,9 +1217,9 @@ GdbScriptRemoveImage (
   FILE  *GdbTempFile;
 
   //
-  // Need to skip .PDB files created from VC++
+  // Need to skip images which dont have pdb area and .PDB files created from VC++
   //
-  if (IsPdbFile (ImageContext->PdbPointer)) {
+  if ((ImageContext->PdbPointer == NULL) || (IsPdbFile (ImageContext->PdbPointer))) {
     return;
   }
 

@@ -50,6 +50,8 @@
 
 #include "StandaloneMmCorePrivateData.h"
 
+extern EFI_MM_SYSTEM_TABLE  *mMemoryAllocationMmst;
+
 //
 // Used to build a table of MMI Handlers that the MM Core registers
 //

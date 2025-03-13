@@ -451,19 +451,25 @@ ASM_PFX(TempRamInitApi):
   ;
   ; Save Input Parameter in YMM10
   ;
+  SAVE_RCX
+  ;
+  ; Get FspInfoHeader address
+  ;
+  CALL_RDI  ASM_PFX(AsmGetFspInfoHeaderNoStack)
+  mov       rsi, rax
+  LOAD_RCX
   cmp       rcx, 0
   jnz       ParamValid
 
   ;
   ; Fall back to default UPD
   ;
-  CALL_RDI  ASM_PFX(AsmGetFspInfoHeaderNoStack)
   xor       rcx, rcx
   mov       ecx,  DWORD [rax + 01Ch]      ; Read FsptImageBaseAddress
   add       ecx,  DWORD [rax + 024h]      ; Get Cfg Region base address = FsptImageBaseAddress + CfgRegionOffset
-ParamValid:
   SAVE_RCX
 
+ParamValid:
   mov       rdx, ASM_PFX(PcdGet32 (PcdTemporaryRamSize))
   mov       edx, DWORD [rdx]
   ;

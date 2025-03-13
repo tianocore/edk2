@@ -1029,6 +1029,7 @@ UefiMain (
     Status = gRT->UpdateCapsule (CapsuleHeaderArray, CapsuleNum, (UINTN)BlockDescriptors);
     if (Status != EFI_SUCCESS) {
       Print (L"CapsuleApp: failed to update capsule - %r\n", Status);
+      goto Done;
     }
   }
 

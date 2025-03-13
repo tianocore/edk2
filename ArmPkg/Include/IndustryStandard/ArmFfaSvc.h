@@ -196,6 +196,8 @@
 #define ARM_FFA_SET_MEM_ATTR_CODE_PERM_X      0
 #define ARM_FFA_SET_MEM_ATTR_CODE_PERM_XN     1
 
+#define ARM_FFA_MEM_PERM_RESERVED_MASK  0xFFFFFFF8
+
 #define ARM_FFA_SET_MEM_ATTR_MAKE_PERM_REQUEST(dataperm, codeperm)  \
     ((((codeperm) & ARM_FFA_SET_MEM_ATTR_CODE_PERM_MASK) <<         \
       ARM_FFA_SET_MEM_ATTR_CODE_PERM_SHIFT) |                       \
@@ -223,5 +225,40 @@
 
 #define IS_FID_FFA_ERROR(fid) \
   (fid == ARM_FID_FFA_ERROR)
+
+/*
+ * macro used in FFA_NOTIFICATION_GET/SET
+ * See FF-A spec sections for FFA_NOTIFICATION_GET and
+ * FFA_NOTIFICATION_SET
+ */
+#define ARM_FFA_NOTIFICATION_FLAG_PER_VCPU  (0x1 << 0)
+
+/** Flag to delay Schedule Receiver Interrupt. */
+#define ARM_FFA_NOTIFICATION_FLAG_DELAY_SRI  (0x1 << 1)
+
+#define ARM_FFA_NOTIFICATION_FLAGS_VCPU_ID(id)  ((id & 0xFFFF) << 16)
+
+#define ARM_FFA_NOTIFICATION_FLAG_BITMAP_SP   (0x1 << 0)
+#define ARM_FFA_NOTIFICATION_FLAG_BITMAP_VM   (0x1 << 1)
+#define ARM_FFA_NOTIFICATION_FLAG_BITMAP_SPM  (0x1 << 2)
+#define ARM_FFA_NOTIFICATION_FLAG_BITMAP_HYP  (0x1 << 3)
+
+/*
+ * macro used in FFA_FEATURES function.
+ * See FF-A spec sections for FFA_FEATURES, Table of
+ * Feature IDs and properties table.
+ */
+
+/** Query interrupt ID of Notification Pending Interrupt. */
+#define ARM_FFA_FEATURE_NPI  0x1U
+
+/** Query interrupt ID of Schedule Receiver Interrupt. */
+#define ARM_FFA_FEATURE_SRI  0x2U
+
+/** Query interrupt ID of the Managed Exit Interrupt. */
+#define ARM_FFA_FEATURE_MEI  0x3U
+
+/** Query notifications features. */
+#define ARM_FFA_FEATURE_NOTIFICATIONS  0x4U
 
 #endif // ARM_FFA_SVC_H_

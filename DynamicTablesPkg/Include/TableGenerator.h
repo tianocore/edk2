@@ -194,9 +194,9 @@ typedef enum TableGeneratorNameSpace {
   @return a TableGeneratorId calculated from the inputs.
 **/
 #define CREATE_TABLE_GEN_ID(TableType, TableNameSpaceId, TableId)      \
-          ((((TableType) << TABLE_TYPE_BIT_SHIFT) & TABLE_TYPE_MASK) | \
-           (((TableNameSpaceId) << TABLE_NAMESPACE_ID_BIT_SHIFT) &     \
-             TABLE_NAMESPACEID_MASK) | ((TableId) & TABLE_ID_MASK))
+          (((((TABLE_GENERATOR_ID)TableType) << TABLE_TYPE_BIT_SHIFT) & TABLE_TYPE_MASK) | \
+           ((((TABLE_GENERATOR_ID)TableNameSpaceId) << TABLE_NAMESPACE_ID_BIT_SHIFT) &     \
+             TABLE_NAMESPACEID_MASK) | (((TABLE_GENERATOR_ID)TableId) & TABLE_ID_MASK))
 
 /** Starting bit position for MAJOR revision
 */

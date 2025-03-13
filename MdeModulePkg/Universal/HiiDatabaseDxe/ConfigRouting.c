@@ -3016,6 +3016,10 @@ ParseIfrData (
           goto Done;
         }
 
+        if (IfrEfiVarStoreTmp == NULL) {
+          break;
+        }
+
         //
         // Set default value base on the DefaultId list get from IFR data.
         //
@@ -3026,11 +3030,6 @@ ParseIfrData (
           if (NvDefaultStoreSize > sizeof (PCD_NV_STORE_DEFAULT_BUFFER_HEADER)) {
             StringData = AllocateZeroPool (VarWidth*2);
             if (StringData == NULL) {
-              Status = EFI_OUT_OF_RESOURCES;
-              goto Done;
-            }
-
-            if (IfrEfiVarStoreTmp == NULL) {
               Status = EFI_OUT_OF_RESOURCES;
               goto Done;
             }

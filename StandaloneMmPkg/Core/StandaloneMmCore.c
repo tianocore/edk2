@@ -1,7 +1,7 @@
 /** @file
   MM Core Main Entry Point
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2025, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -505,6 +505,7 @@ MmEntryPoint (
   EFI_MM_COMMUNICATE_HEADER  *CommunicateHeader;
   MM_COMM_BUFFER_STATUS      *CommunicationStatus;
   UINTN                      BufferSize;
+  EFI_HANDLE                 MmHandle;
 
   DEBUG ((DEBUG_INFO, "MmEntryPoint ...\n"));
 
@@ -514,9 +515,22 @@ MmEntryPoint (
   CopyMem (&gMmCoreMmst.MmStartupThisAp, MmEntryContext, sizeof (EFI_MM_ENTRY_CONTEXT));
 
   //
-  // Call platform hook before Mm Dispatch
+  // Install a protocol to notify BeforeMmDispatch.
   //
-  // PlatformHookBeforeMmDispatch ();
+  MmHandle = NULL;
+  Status   = MmInstallProtocolInterface (
+               &MmHandle,
+               &gEfiMmEntryNotifyProtocolGuid,
+               EFI_NATIVE_INTERFACE,
+               NULL
+               );
+  if (!EFI_ERROR (Status)) {
+    MmUninstallProtocolInterface (
+      MmHandle,
+      &gEfiMmEntryNotifyProtocolGuid,
+      NULL
+      );
+  }
 
   //
   // Check to see if this is a Synchronous MMI sent through the MM Communication
@@ -588,6 +602,24 @@ MmEntryPoint (
   // Process Asynchronous MMI sources
   //
   MmiManage (NULL, NULL, NULL, NULL);
+
+  //
+  // Install a protocol to notify AfterMmDispatch.
+  //
+  MmHandle = NULL;
+  Status   = MmInstallProtocolInterface (
+               &MmHandle,
+               &gEfiMmExitNotifyProtocolGuid,
+               EFI_NATIVE_INTERFACE,
+               NULL
+               );
+  if (!EFI_ERROR (Status)) {
+    MmUninstallProtocolInterface (
+      MmHandle,
+      &gEfiMmExitNotifyProtocolGuid,
+      NULL
+      );
+  }
 
   //
   // TBD: Do not use private data structure ?
@@ -797,13 +829,7 @@ StandaloneMmMain (
   EFI_MMRAM_DESCRIPTOR            *MmramRanges;
   UINTN                           MmramRangeCount;
 
-  ProcessLibraryConstructorList (HobStart, &gMmCoreMmst);
-
   DEBUG ((DEBUG_INFO, "MmMain - 0x%x\n", HobStart));
-
-  DEBUG_CODE (
-    PrintHobList (HobStart, NULL);
-    );
 
   //
   // Extract the MMRAM ranges from the MMRAM descriptor HOB
@@ -838,15 +864,22 @@ StandaloneMmMain (
   }
 
   //
-  // No need to initialize memory service.
-  // It is done in the constructor of StandaloneMmCoreMemoryAllocationLib(),
-  // so that the library linked with StandaloneMmCore can use AllocatePool() in
-  // the constructor.
+  // Initialize memory service using free MMRAM
   //
+  DEBUG ((DEBUG_INFO, "MmInitializeMemoryServices\n"));
+  MmInitializeMemoryServices (MmramRangeCount, MmramRanges);
+  mMemoryAllocationMmst = &gMmCoreMmst;
+
   //
   // Install HobList
   //
   gHobList = InitializeMmHobList (HobStart, MmramRanges, MmramRangeCount);
+
+  ProcessLibraryConstructorList (gHobList, &gMmCoreMmst);
+
+  DEBUG_CODE (
+    PrintHobList (gHobList, NULL);
+    );
 
   //
   // Register notification for EFI_MM_CONFIGURATION_PROTOCOL registration and
