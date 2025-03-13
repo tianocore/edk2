@@ -1361,6 +1361,8 @@
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPcieResizableBarSupport_PROMPT #language en-US "Enable PCIe Resizable BAR Capability Supported"
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid.PcdRemoveRejectedDevices_PROMPT "Don't remove PCI devices due to all read-write bits set."
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPcieResizableBarSupport_HELP #language en-US "Indicates if the PCIe Resizable BAR Capability Supported.<BR><BR>\n"
                                                                                             "TRUE  - PCIe Resizable BAR Capability is supported.<BR>\n"
                                                                                             "FALSE - PCIe Resizable BAR Capability is not supported.<BR>"
