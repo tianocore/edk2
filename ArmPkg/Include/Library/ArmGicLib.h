@@ -14,6 +14,13 @@
 #define ARM_GIC_ICDICTR  0x004        // Interrupt Controller Type Register
 #define ARM_GIC_ICDIIDR  0x008        // Implementer Identification Register
 
+// ICDICTR is also called GICD_TYPER.
+#define ARM_GIC_ICDICTR_EXT_SPI_ENABLED      (1 << 8) // Extended SPI enabled bit.
+#define ARM_GIC_ICDICTR_EXT_SPI_RANGE_SHIFT  (27)     // Extended SPI range position.
+#define ARM_GIC_ICDICTR_EXT_SPI_RANGE_MASK   (0x1F)   // Extended SPI range mask.
+#define ARM_GIC_ICDICTR_GET_EXT_SPI_RANGE(TypeReg) \
+  (((TypeReg) >> ARM_GIC_ICDICTR_EXT_SPI_RANGE_SHIFT) & ARM_GIC_ICDICTR_EXT_SPI_RANGE_MASK)
+
 // Each reg base below repeats for Number of interrupts / 4 (see GIC spec)
 #define ARM_GIC_ICDISR   0x080        // Interrupt Security Registers
 #define ARM_GIC_ICDISER  0x100        // Interrupt Set-Enable Registers
@@ -35,7 +42,8 @@
 #define ARM_GIC_ICDSGIR  0xF00        // Software Generated Interrupt Register
 
 // GICv3 specific registers
-#define ARM_GICD_IROUTER  0x6100       // Interrupt Routing Registers
+#define ARM_GICD_IROUTER    0x6100    // Interrupt Routing Registers
+#define ARM_GICD_IROUTER_E  0x8000    // Interrupt Routing Registers
 
 // GICD_CTLR bits
 #define ARM_GIC_ICDDCR_ARE  (1 << 4)     // Affinity Routing Enable (ARE)
@@ -49,6 +57,16 @@
 #define ARM_GIC_ICDICFR_F_CONFIG1_BIT    1    // Bit number within F field
 #define ARM_GIC_ICDICFR_LEVEL_TRIGGERED  0x0  // Level triggered interrupt
 #define ARM_GIC_ICDICFR_EDGE_TRIGGERED   0x1  // Edge triggered interrupt
+
+// GICD ESPI registers
+//  These registers follow the same bit pattern as the SPI registers.
+#define ARM_GIC_ICDISR_E   0x1000   // Interrupt Security Registers
+#define ARM_GIC_ICDISER_E  0x1200   // Interrupt Set-Enable for ESPI
+#define ARM_GIC_ICDICER_E  0x1400   // Interrupt Clear-Enable Registers
+#define ARM_GIC_ICDSPR_E   0x1600   // Interrupt Set-Pending Registers
+#define ARM_GIC_ICDICPR_E  0x1800   // Interrupt Clear-Pending Registers
+#define ARM_GIC_ICDIPR_E   0x2000   // Interrupt Priority Registers
+#define ARM_GIC_ICDICFR_E  0x3000   // Interrupt Configuration Registers
 
 // GIC Redistributor
 #define ARM_GICR_CTLR_FRAME_SIZE          SIZE_64KB
