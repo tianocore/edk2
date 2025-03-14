@@ -268,12 +268,12 @@ STATIC CONST ACPI_PARSER  SratGicCAffinityParser[] = {
   An ACPI_PARSER array describing the GIC ITS Affinity structure.
 **/
 STATIC CONST ACPI_PARSER  SratGicITSAffinityParser[] = {
-  { L"Type",             1, 0, L"0x%x", NULL, NULL, NULL, NULL },
-  { L"Length",           1, 1, L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Type",             1, 0,  L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Length",           1, 1,  L"0x%x", NULL, NULL, NULL, NULL },
 
-  { L"Proximity Domain", 4, 2, L"0x%x", NULL, NULL, NULL, NULL },
-  { L"Reserved",         2, 6, L"0x%x", NULL, NULL, NULL, NULL },
-  { L"ITS Id",           4, 8, L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Proximity Domain", 4, 2,  L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Reserved",         2, 6,  L"0x%x", NULL, NULL, NULL, NULL },
+  { L"ITS Id",           4, 8,  L"0x%x", NULL, NULL, NULL, NULL }
 };
 
 /**
@@ -342,6 +342,19 @@ STATIC CONST ACPI_PARSER  SratX2ApciAffinityParser[] = {
 };
 
 /**
+  An ACPI_PARSER array describing the GIC IRS Affinity structure.
+**/
+STATIC CONST ACPI_PARSER  SratGicIrsAffinityParser[] = {
+  { L"Type",             1, 0,  L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Length",           1, 1,  L"0x%x", NULL, NULL, NULL, NULL },
+
+  { L"Reserved",         2, 2,  L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Proximity Domain", 4, 4,  L"0x%x", NULL, NULL, NULL, NULL },
+  { L"IRS Id",           4, 8,  L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Reserved",         4, 12, L"0x%x", NULL, NULL, NULL, NULL },
+};
+
+/**
   This function parses the ACPI SRAT table.
   When trace is enabled this function parses the SRAT table and
   traces the ACPI table fields.
@@ -376,10 +389,12 @@ ParseAcpiSrat (
   UINT32  MemoryAffinityIndex;
   UINT32  ApicSapicAffinityIndex;
   UINT32  X2ApicAffinityIndex;
+  UINT32  GicIrsAffinityIndex;
   CHAR8   Buffer[80]; // Used for AsciiName param of ParseAcpi
 
   GicCAffinityIndex             = 0;
   GicITSAffinityIndex           = 0;
+  GicIrsAffinityIndex           = 0;
   GenericInitiatorAffinityIndex = 0;
   MemoryAffinityIndex           = 0;
   ApicSapicAffinityIndex        = 0;
@@ -542,7 +557,24 @@ ParseAcpiSrat (
           );
         break;
 
-      default:
+      case EFI_ACPI_6_7_GIC_IRS_AFFINITY:
+        AsciiSPrint (
+          Buffer,
+          sizeof (Buffer),
+          "GIC IRS Affinity Structure [%d]",
+          GicIrsAffinityIndex++
+          );
+        ParseAcpi (
+          TRUE,
+          2,
+          Buffer,
+          ResourcePtr,
+          *SratRALength,
+          PARSER_PARAMS (SratGicIrsAffinityParser)
+          );
+        break;
+
+     default:
         IncrementErrorCount ();
         Print (L"ERROR: Unknown SRAT Affinity type = 0x%x\n", *SratRAType);
         break;

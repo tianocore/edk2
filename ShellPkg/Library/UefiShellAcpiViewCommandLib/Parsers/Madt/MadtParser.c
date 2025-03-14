@@ -84,7 +84,7 @@ ValidateSpeOverflowInterrupt (
     IncrementErrorCount ();
     Print (
       L"\nERROR: SPE Overflow Interrupt ID of %d is not in the allowed PPI ID "
-      L"ranges of %d-%d or %d-%d (for GICv3.1 or later).",
+      L"ranges of %d-%d or %d-%d (for GICv3.1 - 4).",
       SpeOverflowInterrupt,
       ARM_PPI_ID_MIN,
       ARM_PPI_ID_MAX,
@@ -136,7 +136,7 @@ ValidateTrbeInterrupt (
     IncrementErrorCount ();
     Print (
       L"\nERROR: TRBE Interrupt ID of %d is not in the allowed PPI ID "
-      L"ranges of %d-%d or %d-%d (for GICv3.1 or later).",
+      L"ranges of %d-%d or %d-%d (for GICv3.1 - 4).",
       TrbeInterrupt,
       ARM_PPI_ID_MIN,
       ARM_PPI_ID_MAX,
@@ -238,7 +238,9 @@ STATIC CONST ACPI_PARSER  GicCParser[] = {
   { L"SPE overflow Interrupt",           2, 78, L"0x%x",  NULL,          NULL,
     ValidateSpeOverflowInterrupt, NULL },
   { L"TRBE Interrupt",                   2, 80, L"0x%x",  NULL,          NULL,
-    ValidateTrbeInterrupt, NULL }
+    ValidateTrbeInterrupt, NULL },
+  { L"IAFFID",                           2, 82, L"0x%x",  NULL,          NULL, NULL, NULL },
+  { L"IrsID",                            4, 84, L"0x%x",  NULL,          NULL, NULL, NULL },
 };
 
 /**
@@ -486,6 +488,49 @@ STATIC CONST ACPI_PARSER  LpcPic[] = {
 };
 
 /**
+  An ACPI_PARSER array describing the GIC IRS Interrupt Controller Structure.
+**/
+STATIC CONST ACPI_PARSER  GicIrsParser[] = {
+  { L"Type",                   1, 0,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Length",                 1, 1,  L"%d",    NULL, NULL, NULL, NULL },
+  { L"GIC Version",            1, 2,  L"%d",    NULL, NULL, NULL, NULL },
+  { L"Reserved",               1, 3,  L"0x%x",  NULL, NULL, NULL, NULL },
+
+  { L"GIC IRS ID",             4, 4,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Flags",                  4, 8,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Reserved",               4, 12, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"IRS Config Frame Base",  8, 16, L"0x%lx", NULL, NULL, NULL, NULL },
+  { L"IRS Set LPI Frame Base", 8, 24, L"0x%lx", NULL, NULL, NULL, NULL }
+};
+
+/**
+  An ACPI_PARSER array describing the GIC ITSv5 Interrupt Controller Structure.
+**/
+STATIC CONST ACPI_PARSER  GicItsV5Parser[] = {
+  { L"Type",                  1, 0, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Length",                1, 1, L"%d",    NULL, NULL, NULL, NULL },
+  { L"Flags",                 1, 2, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Reserved",              1, 3, L"0x%x",  NULL, NULL, NULL, NULL },
+
+  { L"GIC ITS ID",            4, 4, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Physical Base Address", 8, 8, L"0x%lx", NULL, NULL, NULL, NULL },
+};
+
+/**
+  An ACPI_PARSER array describing the GIC ITSv5 Translate Frame Structure.
+**/
+STATIC CONST ACPI_PARSER  GicItsV5TranslateFrameParser[] = {
+  { L"Type",                             1, 0,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Length",                           1, 1,  L"%d",    NULL, NULL, NULL, NULL },
+  { L"Reserved",                         2, 2,  L"0x%x",  NULL, NULL, NULL, NULL },
+
+  { L"Linked GIC ITS ID",                4, 4,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"ITS Translate Frame ID",           4, 8,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Reserved",                         4, 12, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"ITS Translate Frame Base Address", 8, 16, L"0x%lx", NULL, NULL, NULL, NULL }
+};
+
+/**
   An ACPI_PARSER array describing the ACPI MADT Table.
 **/
 STATIC CONST ACPI_PARSER  MadtParser[] = {
@@ -517,6 +562,9 @@ STATIC CONST ACPI_PARSER  MadtInterruptControllerHeaderParser[] = {
     - GIC MSI Frame
     - GICR
     - GIC ITS
+    - GIC IRS
+    - GIC ITSv5
+    - GIC ITSv5 translate frame
 
   This function also performs validation of the ACPI table fields.
 
@@ -819,6 +867,45 @@ ParseAcpiMadt (
           InterruptContollerPtr,
           *MadtInterruptControllerLength,
           PARSER_PARAMS (LpcPic)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_7_GIC_IRS:
+      {
+        ParseAcpi (
+          TRUE,
+          2,
+          "GIC IRS",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (GicIrsParser)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_7_GIC_ITSV5:
+      {
+        ParseAcpi (
+          TRUE,
+          2,
+          "GIC ITSv5",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (GicItsV5Parser)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_7_GIC_ITSV5_TRANSLATE_FRAME:
+      {
+        ParseAcpi (
+          TRUE,
+          2,
+          "GIC ITSv5 Translate Frame",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (GicItsV5TranslateFrameParser)
           );
         break;
       }

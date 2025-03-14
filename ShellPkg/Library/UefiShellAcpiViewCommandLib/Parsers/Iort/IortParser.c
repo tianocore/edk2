@@ -163,6 +163,52 @@ ValidateRmrMemDescCount (
 }
 
 /**
+  This function validates the ID Mapping array count for the IWB node.
+
+  @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
+  @param [in] Context Pointer to context specific information e.g. this
+                      could be a pointer to the ACPI table header.
+**/
+STATIC
+VOID
+EFIAPI
+ValidateIwbIdMappingCount (
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
+  )
+{
+  if (*(UINT32 *)Ptr != 1) {
+    IncrementErrorCount ();
+    Print (L"\nERROR: IORT ID Mapping count must be equal to 1.");
+  }
+}
+
+/**
+  This function validates the ID Mapping array offset for the IWB node.
+
+  @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
+  @param [in] Context Pointer to context specific information e.g. this
+                      could be a pointer to the ACPI table header.
+**/
+STATIC
+VOID
+EFIAPI
+ValidateIwbIdArrayReference (
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
+  )
+{
+  if (*(UINT32 *)Ptr == 0) {
+    IncrementErrorCount ();
+    Print (L"\nERROR: IORT ID Mapping offset must non-zero.");
+  }
+}
+
+/**
   Helper Macro for populating the IORT Node header in the ACPI_PARSER array.
 
   @param [out] ValidateIdMappingCount    Optional pointer to a function for
@@ -338,6 +384,18 @@ STATIC CONST ACPI_PARSER  IortNodeRmrMemRangeDescParser[] = {
   { L"Physical Range length", 8, 8,  L"0x%lx", NULL, NULL, ValidatePhysicalRange,
     NULL },
   { L"Reserved",              4, 16, L"0x%x",  NULL, NULL, NULL,                 NULL}
+};
+
+/**
+  An ACPI_PARSER array describing the IORT IWB node.
+**/
+STATIC CONST ACPI_PARSER  IortNodeIwbParser[] = {
+  PARSE_IORT_NODE_HEADER (
+    ValidateIwbIdMappingCount,
+    ValidateIwbIdArrayReference
+    ),
+  { L"Config frame base",       8,    16,  L"0x%lx",    NULL, NULL, NULL, NULL },
+  { L"IWB_index",               2,    24,  L"%d",       NULL, NULL, NULL, NULL },
 };
 
 /**
@@ -787,6 +845,54 @@ DumpIortNodeRmr (
 }
 
 /**
+  This function parses the IORT IWB node.
+
+  @param [in] Ptr            Pointer to the start of the buffer.
+  @param [in] Length         Length of the buffer.
+  @param [in] MappingCount   The ID Mapping count.
+  @param [in] MappingOffset  The offset of the ID Mapping array
+                             from the start of the IORT table.
+**/
+STATIC
+VOID
+DumpIortNodeIwb (
+  IN UINT8   *Ptr,
+  IN UINT16  Length,
+  IN UINT32  MappingCount,
+  IN UINT32  MappingOffset
+  )
+{
+  UINT32  Offset;
+
+  Offset = ParseAcpi (
+             TRUE,
+             2,
+             "IWB Node",
+             Ptr,
+             Length,
+             PARSER_PARAMS (IortNodeIwbParser)
+             );
+
+  // Estimate the Device Name length
+  PrintFieldName (2, L"Device Object Name");
+
+  while ((*(Ptr + Offset) != 0) &&
+         (Offset < Length))
+  {
+    Print (L"%c", *(Ptr + Offset));
+    Offset++;
+  }
+
+  Print (L"\n");
+
+  DumpIortNodeIdMappings (
+    Ptr + MappingOffset,
+    Length - MappingOffset,
+    MappingCount
+    );
+}
+
+/**
   This function parses the ACPI IORT table.
   When trace is enabled this function parses the IORT table and traces the ACPI
   fields.
@@ -799,6 +905,7 @@ DumpIortNodeRmr (
     - SMMUv3
     - PMCG
     - RMR
+    - IWB
 
   This function also performs validation of the ACPI table fields.
 
@@ -964,6 +1071,14 @@ ParseAcpiIort (
         break;
       case EFI_ACPI_IORT_TYPE_RMR:
         DumpIortNodeRmr (
+          NodePtr,
+          *IortNodeLength,
+          *IortIdMappingCount,
+          *IortIdMappingOffset
+          );
+        break;
+      case EFI_ACPI_IORT_TYPE_IWB:
+        DumpIortNodeIwb (
           NodePtr,
           *IortNodeLength,
           *IortIdMappingCount,
