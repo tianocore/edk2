@@ -35,6 +35,13 @@ QemuFwCfgSelectItem (
   )
 {
   DEBUG ((DEBUG_INFO, "Select Item: 0x%x\n", (UINT16)(UINTN)QemuFwCfgItem));
+
+  if (InternalQemuFwCfgCacheSelectItem (QemuFwCfgItem)) {
+    return;
+  } else {
+    InternalQemuFwCfgCacheResetWorkArea ();
+  }
+
   IoWrite16 (FW_CFG_IO_SELECTOR, (UINT16)(UINTN)QemuFwCfgItem);
 }
 
@@ -52,6 +59,11 @@ InternalQemuFwCfgReadBytes (
   IN VOID   *Buffer  OPTIONAL
   )
 {
+  if ( InternalQemuFwCfgCacheReading ()) {
+    InternalQemuFwCfgCacheReadBytes (Size, Buffer);
+    return;
+  }
+
   if (InternalQemuFwCfgDmaIsAvailable () && (Size <= MAX_UINT32)) {
     InternalQemuFwCfgDmaBytes ((UINT32)Size, Buffer, FW_CFG_DMA_CTL_READ);
     return;
@@ -114,6 +126,32 @@ QemuFwCfgWriteBytes (
 }
 
 /**
+  Skip bytes in FwCfg cache info Hob.
+  @param[in] Size  Number of bytes to skip.
+**/
+STATIC
+VOID
+InternalQemuFwCfgCacheSkipBytes (
+  IN UINT32  Size
+  )
+{
+  QEMU_FW_CFG_WORK_AREA  *QemuFwCfgWorkArea;
+
+  if (Size == 0) {
+    return;
+  }
+
+  QemuFwCfgWorkArea = InternalQemuFwCfgCacheGetWorkArea ();
+  if ((QemuFwCfgWorkArea->Offset + Size) > MAX_UINT32) {
+    DEBUG ((DEBUG_ERROR, "%a: Integer overflow with invalid offset size\n", __func__));
+    ASSERT (FALSE);
+    QemuFwCfgWorkArea->Offset = MAX_UINT32;
+  } else {
+    QemuFwCfgWorkArea->Offset += Size;
+  }
+}
+
+/**
   Skip bytes in the firmware configuration item.
 
   Increase the offset of the firmware configuration item without transferring
@@ -132,6 +170,11 @@ QemuFwCfgSkipBytes (
   UINT8  SkipBuffer[256];
 
   if (!InternalQemuFwCfgIsAvailable ()) {
+    return;
+  }
+
+  if ( InternalQemuFwCfgCacheReading () && (Size <= MAX_UINT32)) {
+    InternalQemuFwCfgCacheSkipBytes ((UINT32)Size);
     return;
   }
 
