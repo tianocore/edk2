@@ -1,7 +1,7 @@
 /** @file
   The implementation of iSCSI protocol based on RFC3720.
 
-Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2025, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -2682,6 +2682,7 @@ IScsiOnR2TRcvd (
   EFI_STATUS               Status;
   ISCSI_XFER_CONTEXT       *XferContext;
   UINT8                    *Data;
+  UINT32                   TransferLength;
 
   R2THdr = (ISCSI_READY_TO_TRANSFER *)NetbufGetByte (Pdu, 0, NULL);
   if (R2THdr == NULL) {
@@ -2712,7 +2713,12 @@ IScsiOnR2TRcvd (
   XferContext->Offset            = R2THdr->BufferOffset;
   XferContext->DesiredLength     = R2THdr->DesiredDataTransferLength;
 
-  if (((XferContext->Offset + XferContext->DesiredLength) > Packet->OutTransferLength) ||
+  Status = SafeUint32Add (XferContext->Offset, XferContext->DesiredLength, &TransferLength);
+  if (EFI_ERROR (Status)) {
+    return EFI_PROTOCOL_ERROR;
+  }
+
+  if ((TransferLength > Packet->OutTransferLength) ||
       (XferContext->DesiredLength > Tcb->Conn->Session->MaxBurstLength)
       )
   {
