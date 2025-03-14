@@ -45,7 +45,11 @@ def MakeTheTestSuite(localItems):
 
 def GetBaseToolsPaths():
     if sys.platform in ('win32', 'win64'):
-        return [ os.path.join(BaseToolsDir, 'Bin', sys.platform.title()) ]
+        BaseToolsBinPath=os.path.join(BaseToolsDir, 'Bin', sys.platform.title())
+        if(os.path.exists(BaseToolsBinPath)):
+            return [ BaseToolsBinPath ]
+        elif(os.path.exists(BaseToolsBinPath.replace('Win32','Win64'))):
+            return  [ BaseToolsBinPath.replace('Win32','Win64') ]
     else:
         uname = os.popen('uname -sm').read().strip()
         for char in (' ', '/'):
