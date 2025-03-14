@@ -30,15 +30,24 @@
 #include <Library/AmlLib/AmlLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
-#if defined (MDE_CPU_AARCH64)
-  #include <Library/ArmGicLib.h>
-#endif
-
 /** C array containing the compiled AML template.
     This symbol is defined in the auto generated C file
     containing the AML bytecode array.
 */
 extern CHAR8  ssdtserialporttemplate_aml_code[];
+
+/** Validate the Serial Port Architecture Information.
+
+  @param [in]  SerialPortInfoTable    Table of CM_ARCH_COMMON_SERIAL_PORT_INFO.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+ArchValidateSerialPortInfo (
+  IN  CONST CM_ARCH_COMMON_SERIAL_PORT_INFO  *SerialPortInfo
+  );
 
 /** UART address range length.
 */
@@ -61,6 +70,7 @@ ValidateSerialPortInfo (
 {
   UINT32                                 Index;
   CONST CM_ARCH_COMMON_SERIAL_PORT_INFO  *SerialPortInfo;
+  EFI_STATUS                             Status;
 
   if ((SerialPortInfoTable == NULL)  ||
       (SerialPortCount == 0))
@@ -107,25 +117,10 @@ ValidateSerialPortInfo (
       return EFI_INVALID_PARAMETER;
     }
 
- #if defined (MDE_CPU_AARCH64)
-    // If an interrupt is not wired to the serial port, the Configuration
-    // Manager specifies the interrupt as 0.
-    // Any other value must be within the SPI or extended SPI range.
-    if ((SerialPortInfo->Interrupt != 0) &&
-        !(((SerialPortInfo->Interrupt >= ARM_GIC_ARCH_SPI_MIN) &&
-           (SerialPortInfo->Interrupt <= ARM_GIC_ARCH_SPI_MAX)) ||
-          ((SerialPortInfo->Interrupt >= ARM_GIC_ARCH_EXT_SPI_MIN) &&
-           (SerialPortInfo->Interrupt <= ARM_GIC_ARCH_EXT_SPI_MAX))))
-    {
-      DEBUG ((
-        DEBUG_ERROR,
-        "ERROR: Invalid UART port interrupt ID. Interrupt = %lu\n",
-        SerialPortInfo->Interrupt
-        ));
-      return EFI_INVALID_PARAMETER;
+    Status = ArchValidateSerialPortInfo (SerialPortInfo);
+    if (EFI_ERROR (Status)) {
+      return Status;
     }
-
- #endif
 
     DEBUG ((DEBUG_INFO, "UART Configuration:\n"));
     DEBUG ((
