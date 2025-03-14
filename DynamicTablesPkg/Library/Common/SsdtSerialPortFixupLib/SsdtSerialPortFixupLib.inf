@@ -32,5 +32,8 @@
   AmlLib
   BaseLib
 
+[LibraryClasses.AARCH64]
+  ArmLib
+
 [Pcd]
   gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdNonBsaCompliant16550SerialHid
