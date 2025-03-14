@@ -52,6 +52,12 @@ typedef enum ArmObjectID {
   EArmObjRmr,                                                  ///< 21 - Reserved Memory Range Node
   EArmObjMemoryRangeDescriptor,                                ///< 22 - Memory Range Descriptor
   EArmObjEtInfo,                                               ///< 23 - Embedded Trace Extension/Module Info
+  EArmObjGicIrsInfo,                                           ///< 24 - GIC IRS Info                           // [CODE_FIRST] 11148
+  EArmObjGicIwbInfo,                                           ///< 25 - GIC IWB Info                           // [CODE_FIRST] 11148
+  EArmObjGicItsV5Info,                                         ///< 26 - GIC ITS v5 Info                        // [CODE_FIRST] 11148
+  EArmObjGicItsV5TranslateFrameInfo,                           ///< 27 - GIC ITS v5 Translate Frame Info        // [CODE_FIRST] 11148
+  EArmObjGicIrsAffinity,                                       ///< 28 - GIC IRS Affinity Info                  // [CODE_FIRST] 11148
+  EArmObjGicIwbAffinity,                                       ///< 29 - GIC IWB Affinity Info                  // [CODE_FIRST] 11148
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -202,6 +208,17 @@ typedef struct CmArmGicCInfo {
         CM_ARM_GICC_INFO.ClockDomain
   */
   CM_OBJECT_TOKEN    ClockDomainToken;
+  // [CODE_FIRST] 11148
+
+  /** Optional field: GICv5 Interrupt Controller processor affinity ID.               // [CODE_FIRST] 11148
+      This must be 0 for pre-v5 GIC.                                                  // [CODE_FIRST] 11148
+  */                         // [CODE_FIRST] 11148
+  UINT16             IAffId; // [CODE_FIRST] 11148
+                             // [CODE_FIRST] 11148
+
+  /** Optional field: The ID of the IRS that this processor is connected to.          // [CODE_FIRST] 11148
+  */                        // [CODE_FIRST] 11148
+  UINT32             IrsId; // [CODE_FIRST] 11148
 } CM_ARM_GICC_INFO;
 
 /** A structure that describes the
@@ -618,7 +635,7 @@ typedef struct CmArmPmcgNode {
     ID: EArmObjGicItsIdentifierArray
 */
 typedef struct CmArmGicItsIdentifier {
-  /// The ITS Identifier
+  /// The ITS Identifier or ITS Translate Id (GicV5)      // [CODE_FIRST] 11148
   UINT32    ItsId;
 } CM_ARM_ITS_IDENTIFIER;
 
@@ -747,6 +764,85 @@ typedef struct CmArmEtInfo {
   ARM_ET_TYPE    EtType;
 } CM_ARM_ET_INFO;
 
+typedef struct CmArmGicIrsInfo {
+  // [CODE_FIRST] 11148
+  /// The GIC IRS ID                                                      // [CODE_FIRST] 11148
+  UINT32    GicIrsId;                                                     // [CODE_FIRST] 11148
+  /// Flags                                                               // [CODE_FIRST] 11148
+  UINT32    Flags;                                                        // [CODE_FIRST] 11148
+  /// Base address of the IRS config frame                                // [CODE_FIRST] 11148
+  UINT64    ConfigFrameBase;                                              // [CODE_FIRST] 11148
+  /// Base address of the IRS SET_LPI frame                               // [CODE_FIRST] 11148
+  UINT64    SetLpiFrameBase;                                              // [CODE_FIRST] 11148
+  /// Proximity domain that this IRS belongs to                           // [CODE_FIRST] 11148
+  UINT32    ProximityDomain;                                              // [CODE_FIRST] 11148
+} CM_ARM_GIC_IRS_INFO;                                                    // [CODE_FIRST] 11148
+                                                                          // [CODE_FIRST] 11148
+typedef struct CmArmGicIwbInfo {
+  // [CODE_FIRST] 11148
+  /// An unique token used to identify this object                        // [CODE_FIRST] 11148
+  CM_OBJECT_TOKEN    Token;                                               // [CODE_FIRST] 11148
+                                                                          // [CODE_FIRST] 11148
+  /// The GIC IWB ID                                                      // [CODE_FIRST] 11148
+  UINT32             GicIwbId;                                            // [CODE_FIRST] 11148
+  /// ITSv5 ID of the linked ITS                                          // [CODE_FIRST] 11148
+  UINT32             LinkedItsId;                                         // [CODE_FIRST] 11148
+  /// Base address of the IWB config frame                                // [CODE_FIRST] 11148
+  UINT64             ConfigFrameBase;                                     // [CODE_FIRST] 11148
+  /// Device ID used to signal any interrupt to the connected ITS         // [CODE_FIRST] 11148
+  UINT32             DeviceId;                                            // [CODE_FIRST] 11148
+  /// Base GSIV for this IWB                                              // [CODE_FIRST] 11148
+  UINT32             BaseGsiv;                                            // [CODE_FIRST] 11148
+  /// Number of wires handled by this IWB                                 // [CODE_FIRST] 11148
+  UINT32             NumWires;                                            // [CODE_FIRST] 11148
+  /// Proximity domain that this IWB belongs to                           // [CODE_FIRST] 11148
+  UINT32             ProximityDomain;                                     // [CODE_FIRST] 11148
+
+  /** ASCII Null terminated string with the full path to                  // [CODE_FIRST] 11148
+      the entry in the namespace for this object.                         // [CODE_FIRST] 11148
+  */                              // [CODE_FIRST] 11148
+  CHAR8              *ObjectName; // [CODE_FIRST] 11148
+  /// Reference token for the ID mapping array                            // [CODE_FIRST] 11148
+  CM_OBJECT_TOKEN    IdMappingToken;                                      // [CODE_FIRST] 11148
+                                                                          // [CODE_FIRST] 11148
+  /// Unique identifier for this node.                                    // [CODE_FIRST] 11148
+  UINT32             Identifier;                                          // [CODE_FIRST] 11148
+} CM_ARM_GIC_IWB_INFO;                                                    // [CODE_FIRST] 11148
+                                                                          // [CODE_FIRST] 11148
+typedef struct CmArmGicItsV5Info {
+  // [CODE_FIRST] 11148
+  /// The GIC ITSv5 ID                                                    // [CODE_FIRST] 11148
+  UINT32             GicItsId;                                            // [CODE_FIRST] 11148
+  /// Flags                                                               // [CODE_FIRST] 11148
+  UINT32             Flags;                                               // [CODE_FIRST] 11148
+  /// Base address of the ITS config frame                                // [CODE_FIRST] 11148
+  UINT64             PhysicalBaseAddress;                                 // [CODE_FIRST] 11148
+                                                                          // [CODE_FIRST] 11148
+
+  /** The proximity domain to which the logical processor belongs.        // [CODE_FIRST] 11148
+      This field is used to populate the GIC ITS affinity structure       // [CODE_FIRST] 11148
+      in the SRAT table.                                                  // [CODE_FIRST] 11148
+  */                                  // [CODE_FIRST] 11148
+  UINT32             ProximityDomain; // [CODE_FIRST] 11148
+                                      // [CODE_FIRST] 11148
+
+  /** Optional field: Reference Token to the ProximityDomain this object  // [CODE_FIRST] 11148
+      belongs to. If this field is used, the following field is ignored:  // [CODE_FIRST] 11148
+        CM_ARM_GIC_ITS_INFO.ProximityDomain                               // [CODE_FIRST] 11148
+  */                                       // [CODE_FIRST] 11148
+  CM_OBJECT_TOKEN    ProximityDomainToken; // [CODE_FIRST] 11148
+} CM_ARM_GIC_ITSV5_INFO;                                                  // [CODE_FIRST] 11148
+                                                                          // [CODE_FIRST] 11148
+typedef struct CmArmGicItsV5TranslateFrameInfo {
+  // [CODE_FIRST] 11148
+  /// Linked GIC ITSv5 ID                                                 // [CODE_FIRST] 11148
+  UINT32    LinkedGicItsId;                                               // [CODE_FIRST] 11148
+  /// The GIC ITSv5 translate frame ID                                    // [CODE_FIRST] 11148
+  UINT32    ItsTranslateId;                                               // [CODE_FIRST] 11148
+  /// Base address of the ITS translate frame                             // [CODE_FIRST] 11148
+  UINT64    ItsTranslateFrameBase;                                        // [CODE_FIRST] 11148
+} CM_ARM_GIC_ITSV5_TRANSLATE_FRAME_INFO;                                  // [CODE_FIRST] 11148
+                                                                          // [CODE_FIRST] 11148
 #pragma pack()
 
 #endif // ARM_NAMESPACE_OBJECTS_H_

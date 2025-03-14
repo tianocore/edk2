@@ -42,6 +42,7 @@ Requirements:
   - EArmObjIdMappingArray
   - EArmObjSmmuInterruptArray
   - EArmObjMemoryRangeDescriptor
+  - EArmObjGicIwbInfo                                                          // [CODE_FIRST] 11148
 */
 
 /** This macro expands to a function that retrieves the ITS
@@ -142,6 +143,16 @@ GET_OBJECT_LIST (
   EArmObjSmmuInterruptArray,
   CM_ARM_SMMU_INTERRUPT
   );
+
+/** This macro expands to a function that retrieves the                        // [CODE_FIRST] 11148
+    GIC IWB information from the Configuration Manager.                        // [CODE_FIRST] 11148
+*/// [CODE_FIRST] 11148
+GET_OBJECT_LIST (
+  // [CODE_FIRST] 11148
+  EObjNameSpaceArm,                                                            // [CODE_FIRST] 11148
+  EArmObjGicIwbInfo,                                                           // [CODE_FIRST] 11148
+  CM_ARM_GIC_IWB_INFO                                                          // [CODE_FIRST] 11148
+  );                                                                           // [CODE_FIRST] 11148
 
 /** Returns the size of the ITS Group node.
 
@@ -1996,6 +2007,246 @@ AddRmrNodes (
   return EFI_SUCCESS;
 }
 
+/** Returns the size of the IWB node.                                                         // [CODE_FIRST] 11148
+                                                                                              // [CODE_FIRST] 11148
+    @param [in]  Node    Pointer to IWB node.                                                 // [CODE_FIRST] 11148
+                                                                                              // [CODE_FIRST] 11148
+    @retval Size of the IWB node.                                                             // [CODE_FIRST] 11148
+**/// [CODE_FIRST] 11148
+STATIC                                                                                        // [CODE_FIRST] 11148
+UINT32
+// [CODE_FIRST] 11148
+GetIwbNodeSize (
+  // [CODE_FIRST] 11148
+  IN  CONST CM_ARM_GIC_IWB_INFO  *Node                                                        // [CODE_FIRST] 11148
+  )                                                                                           // [CODE_FIRST] 11148
+{
+  // [CODE_FIRST] 11148
+  ASSERT (Node != NULL);                                                                      // [CODE_FIRST] 11148
+                                                                                              // [CODE_FIRST] 11148
+
+  /* Size of IWB node +                                                                       // [CODE_FIRST] 11148
+     Size of ID mapping array +                                                               // [CODE_FIRST] 11148
+     Size of ASCII string + 'padding to 32-bit word aligned'.                                 // [CODE_FIRST] 11148
+  */                                                                 // [CODE_FIRST] 11148
+  return (UINT32)(sizeof (EFI_ACPI_6_0_IO_REMAPPING_IWB_NODE) +      // [CODE_FIRST] 11148
+                  sizeof (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE) +      // [CODE_FIRST] 11148
+                  ALIGN_VALUE (AsciiStrSize (Node->ObjectName), 4)); // [CODE_FIRST] 11148
+}                                                                                             // [CODE_FIRST] 11148
+
+// [CODE_FIRST] 11148
+
+/** Returns the total size required for the Iwb nodes and                                     // [CODE_FIRST] 11148
+    updates the Node Indexer.                                                                 // [CODE_FIRST] 11148
+                                                                                              // [CODE_FIRST] 11148
+    This function calculates the size required for the node group                             // [CODE_FIRST] 11148
+    and also populates the Node Indexer array with offsets for the                            // [CODE_FIRST] 11148
+    individual nodes.                                                                         // [CODE_FIRST] 11148
+                                                                                              // [CODE_FIRST] 11148
+    @param [in]       NodeStartOffset Offset from the start of the                            // [CODE_FIRST] 11148
+                                      IORT where this node group starts.                      // [CODE_FIRST] 11148
+    @param [in]       NodeList        Pointer to IWB node list.                               // [CODE_FIRST] 11148
+    @param [in]       NodeCount       Count of the IWB nodes.                                 // [CODE_FIRST] 11148
+    @param [in, out]  NodeIndexer     Pointer to the next Node Indexer.                       // [CODE_FIRST] 11148
+                                                                                              // [CODE_FIRST] 11148
+    @retval Total size of the IWB nodes.                                                      // [CODE_FIRST] 11148
+**/// [CODE_FIRST] 11148
+STATIC                                                                                        // [CODE_FIRST] 11148
+UINT64
+// [CODE_FIRST] 11148
+GetSizeofIwbNodes (
+  // [CODE_FIRST] 11148
+  IN      CONST UINT32                              NodeStartOffset,                          // [CODE_FIRST] 11148
+  IN      CONST CM_ARM_GIC_IWB_INFO                 *NodeList,                                // [CODE_FIRST] 11148
+  IN            UINT32                              NodeCount,                                // [CODE_FIRST] 11148
+  IN OUT        IORT_NODE_INDEXER          **CONST  NodeIndexer                               // [CODE_FIRST] 11148
+  )                                                                                           // [CODE_FIRST] 11148
+{
+  // [CODE_FIRST] 11148
+  UINT64  Size;                                                                               // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
+  ASSERT (NodeList != NULL);                                                                  // [CODE_FIRST] 11148
+                                                                                              // [CODE_FIRST] 11148
+  Size = 0;                                                                                   // [CODE_FIRST] 11148
+  while (NodeCount-- != 0) {
+    // [CODE_FIRST] 11148
+    (*NodeIndexer)->Token      = NodeList->Token;                                             // [CODE_FIRST] 11148
+    (*NodeIndexer)->Object     = (VOID *)NodeList;                                            // [CODE_FIRST] 11148
+    (*NodeIndexer)->Offset     = (UINT32)(Size + NodeStartOffset);                            // [CODE_FIRST] 11148
+    (*NodeIndexer)->Identifier = NodeList->Identifier;                                        // [CODE_FIRST] 11148
+    DEBUG ((
+      // [CODE_FIRST] 11148
+      DEBUG_INFO,                                                                             // [CODE_FIRST] 11148
+      "IORT: Node Indexer = %p, Token = %p, Object = %p,"                                     // [CODE_FIRST] 11148
+      " Offset = 0x%x, Identifier = 0x%x\n",                                                  // [CODE_FIRST] 11148
+      *NodeIndexer,                                                                           // [CODE_FIRST] 11148
+      (*NodeIndexer)->Token,                                                                  // [CODE_FIRST] 11148
+      (*NodeIndexer)->Object,                                                                 // [CODE_FIRST] 11148
+      (*NodeIndexer)->Offset,                                                                 // [CODE_FIRST] 11148
+      (*NodeIndexer)->Identifier                                                              // [CODE_FIRST] 11148
+      ));                                                                                     // [CODE_FIRST] 11148
+                                                                                              // [CODE_FIRST] 11148
+    Size += GetIwbNodeSize (NodeList);                                                        // [CODE_FIRST] 11148
+    (*NodeIndexer)++;                                                                         // [CODE_FIRST] 11148
+    NodeList++;                                                                               // [CODE_FIRST] 11148
+  }                                                                                           // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
+  return Size;                                                                                // [CODE_FIRST] 11148
+}                                                                                             // [CODE_FIRST] 11148
+
+// [CODE_FIRST] 11148
+
+/** Update the IWB Node Information.                                                          // [CODE_FIRST] 11148
+                                                                                              // [CODE_FIRST] 11148
+    @param [in]     This             Pointer to the table Generator.                          // [CODE_FIRST] 11148
+    @param [in]     CfgMgrProtocol   Pointer to the Configuration Manager                     // [CODE_FIRST] 11148
+                                     Protocol Interface.                                      // [CODE_FIRST] 11148
+    @param [in]     AcpiTableInfo    Pointer to the ACPI table info structure.                // [CODE_FIRST] 11148
+    @param [in]     Iort             Pointer to IORT table structure.                         // [CODE_FIRST] 11148
+    @param [in]     NodesStartOffset Offset for the start of the IWB Group                    // [CODE_FIRST] 11148
+                                     Nodes.                                                   // [CODE_FIRST] 11148
+    @param [in]     NodeList         Pointer to an array of IWB Group Node                    // [CODE_FIRST] 11148
+                                     Objects.                                                 // [CODE_FIRST] 11148
+    @param [in]     NodeCount        Number of IWB Group Node Objects.                        // [CODE_FIRST] 11148
+                                                                                              // [CODE_FIRST] 11148
+    @retval EFI_SUCCESS           Table generated successfully.                               // [CODE_FIRST] 11148
+    @retval EFI_INVALID_PARAMETER A parameter is invalid.                                     // [CODE_FIRST] 11148
+    @retval EFI_NOT_FOUND         The required object was not found.                          // [CODE_FIRST] 11148
+**/// [CODE_FIRST] 11148
+STATIC                                                                                        // [CODE_FIRST] 11148
+EFI_STATUS
+// [CODE_FIRST] 11148
+AddIwbNodes (
+  // [CODE_FIRST] 11148
+  IN  CONST ACPI_TABLE_GENERATOR                  *CONST  This,                               // [CODE_FIRST] 11148
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,                     // [CODE_FIRST] 11148
+  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,                      // [CODE_FIRST] 11148
+  IN  CONST EFI_ACPI_6_0_IO_REMAPPING_TABLE               *Iort,                              // [CODE_FIRST] 11148
+  IN  CONST UINT32                                        NodesStartOffset,                   // [CODE_FIRST] 11148
+  IN  CONST CM_ARM_GIC_IWB_INFO                           *NodeList,                          // [CODE_FIRST] 11148
+  IN        UINT32                                        NodeCount                           // [CODE_FIRST] 11148
+  )                                                                                           // [CODE_FIRST] 11148
+{
+  // [CODE_FIRST] 11148
+  EFI_STATUS                          Status;                                                 // [CODE_FIRST] 11148
+  EFI_ACPI_6_0_IO_REMAPPING_IWB_NODE  *IwbNode;                                               // [CODE_FIRST] 11148
+  EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE  *IdMapArray;                                            // [CODE_FIRST] 11148
+  UINT64                              NodeLength;                                             // [CODE_FIRST] 11148
+  CHAR8                               *ObjectName;                                            // [CODE_FIRST] 11148
+  UINTN                               ObjectNameLength;                                       // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
+  ASSERT (Iort != NULL);                                                                      // [CODE_FIRST] 11148
+                                                                                              // [CODE_FIRST] 11148
+  IwbNode = (EFI_ACPI_6_0_IO_REMAPPING_IWB_NODE *)((UINT8 *)Iort +                            // [CODE_FIRST] 11148
+                                                   NodesStartOffset);                         // [CODE_FIRST] 11148
+                                                                                              // [CODE_FIRST] 11148
+  while (NodeCount-- != 0) {
+    // [CODE_FIRST] 11148
+    NodeLength = GetIwbNodeSize (NodeList);                                                   // [CODE_FIRST] 11148
+    if (NodeLength > MAX_UINT16) {
+      // [CODE_FIRST] 11148
+      Status = EFI_INVALID_PARAMETER;                                                         // [CODE_FIRST] 11148
+      DEBUG ((
+        // [CODE_FIRST] 11148
+        DEBUG_ERROR,                                                                          // [CODE_FIRST] 11148
+        "ERROR: IORT: IWB Id Array Node length 0x%lx > MAX_UINT16."                           // [CODE_FIRST] 11148
+        " Status = %r\n",                                                                     // [CODE_FIRST] 11148
+        NodeLength,                                                                           // [CODE_FIRST] 11148
+        Status                                                                                // [CODE_FIRST] 11148
+        ));                                                                                   // [CODE_FIRST] 11148
+      return Status;                                                                          // [CODE_FIRST] 11148
+    }                                                                                         // [CODE_FIRST] 11148
+
+    // [CODE_FIRST] 11148
+    // Populate the node header                                                               // [CODE_FIRST] 11148
+    IwbNode->Node.Type          = EFI_ACPI_IORT_TYPE_IWB;                                     // [CODE_FIRST] 11148
+    IwbNode->Node.Length        = (UINT16)NodeLength;                                         // [CODE_FIRST] 11148
+    IwbNode->Node.Revision      = 1;                                                          // [CODE_FIRST] 11148
+    IwbNode->Node.Identifier    = NodeList->Identifier;                                       // [CODE_FIRST] 11148
+    IwbNode->Node.NumIdMappings = 1;                                                          // [CODE_FIRST] 11148
+    IwbNode->Node.IdReference   = NodeLength - sizeof (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE);   // [CODE_FIRST] 11148
+                                                                                              // [CODE_FIRST] 11148
+    // IORT specific data                                                                     // [CODE_FIRST] 11148
+    IwbNode->ConfigFrameBase = NodeList->ConfigFrameBase;                                     // [CODE_FIRST] 11148
+    IwbNode->IwbIndex        = NodeList->GicIwbId;                                            // [CODE_FIRST] 11148
+                                                                                              // [CODE_FIRST] 11148
+    // Copy the object name                                                                   // [CODE_FIRST] 11148
+    ObjectName = (CHAR8 *)((UINT8 *)IwbNode +                                                 // [CODE_FIRST] 11148
+                           sizeof (EFI_ACPI_6_0_IO_REMAPPING_IWB_NODE));                      // [CODE_FIRST] 11148
+    ObjectNameLength = AsciiStrLen (NodeList->ObjectName) + 1;                                // [CODE_FIRST] 11148
+                                                                                              // [CODE_FIRST] 11148
+    Status = AsciiStrCpyS (
+               // [CODE_FIRST] 11148
+               ObjectName,                                                                    // [CODE_FIRST] 11148
+               ObjectNameLength,                                                              // [CODE_FIRST] 11148
+               NodeList->ObjectName                                                           // [CODE_FIRST] 11148
+               );                                                                             // [CODE_FIRST] 11148
+    if (EFI_ERROR (Status)) {
+      // [CODE_FIRST] 11148
+      DEBUG ((
+        // [CODE_FIRST] 11148
+        DEBUG_ERROR,                                                                          // [CODE_FIRST] 11148
+        "ERROR: IORT: Failed to copy Object Name. Status = %r\n",                             // [CODE_FIRST] 11148
+        Status                                                                                // [CODE_FIRST] 11148
+        ));                                                                                   // [CODE_FIRST] 11148
+      return Status;                                                                          // [CODE_FIRST] 11148
+    }                                                                                         // [CODE_FIRST] 11148
+
+    // [CODE_FIRST] 11148
+    if (NodeList->IdMappingToken == CM_NULL_TOKEN) {
+      // [CODE_FIRST] 11148
+      Status = EFI_INVALID_PARAMETER;                                                         // [CODE_FIRST] 11148
+      DEBUG ((
+        // [CODE_FIRST] 11148
+        DEBUG_ERROR,                                                                          // [CODE_FIRST] 11148
+        "ERROR: IORT: Invalid Id Mapping token,"                                              // [CODE_FIRST] 11148
+        " Token = 0x%x, Status =%r\n",                                                        // [CODE_FIRST] 11148
+        NodeList->IdMappingToken,                                                             // [CODE_FIRST] 11148
+        Status                                                                                // [CODE_FIRST] 11148
+        ));                                                                                   // [CODE_FIRST] 11148
+      return Status;                                                                          // [CODE_FIRST] 11148
+    }                                                                                         // [CODE_FIRST] 11148
+
+    // [CODE_FIRST] 11148
+    // Ids for IWB node                                                                       // [CODE_FIRST] 11148
+    IdMapArray = (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE *)((UINT8 *)IwbNode +                    // [CODE_FIRST] 11148
+                                                        IwbNode->Node.IdReference);           // [CODE_FIRST] 11148
+                                                                                              // [CODE_FIRST] 11148
+    Status = AddIdMappingArray (
+               // [CODE_FIRST] 11148
+               This,                                                                          // [CODE_FIRST] 11148
+               CfgMgrProtocol,                                                                // [CODE_FIRST] 11148
+               IdMapArray,                                                                    // [CODE_FIRST] 11148
+               1,                                                                             // [CODE_FIRST] 11148
+               NodeList->IdMappingToken                                                       // [CODE_FIRST] 11148
+               );                                                                             // [CODE_FIRST] 11148
+    if (EFI_ERROR (Status)) {
+      // [CODE_FIRST] 11148
+      DEBUG ((
+        // [CODE_FIRST] 11148
+        DEBUG_ERROR,                                                                          // [CODE_FIRST] 11148
+        "ERROR: IORT: Failed to add Id Mapping Array. Status = %r\n",                         // [CODE_FIRST] 11148
+        Status                                                                                // [CODE_FIRST] 11148
+        ));                                                                                   // [CODE_FIRST] 11148
+      return Status;                                                                          // [CODE_FIRST] 11148
+    }                                                                                         // [CODE_FIRST] 11148
+
+    // [CODE_FIRST] 11148
+    // Next IORT Group Node                                                                   // [CODE_FIRST] 11148
+    IwbNode = (EFI_ACPI_6_0_IO_REMAPPING_IWB_NODE *)((UINT8 *)IwbNode +                       // [CODE_FIRST] 11148
+                                                     IwbNode->Node.Length);                   // [CODE_FIRST] 11148
+    NodeList++;                                                                               // [CODE_FIRST] 11148
+  } // IORT Group Node                                                                        // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
+  return EFI_SUCCESS;                                                                         // [CODE_FIRST] 11148
+}                                                                                             // [CODE_FIRST] 11148
+
+// [CODE_FIRST] 11148
+
 /** Validates that the IORT nodes Identifier are unique.
 
     @param [in]     NodeIndexer      Pointer to the Node Indexer.
@@ -2021,10 +2272,12 @@ ValidateNodeIdentifiers (
       {
         DEBUG ((
           DEBUG_ERROR,
-          "ERROR: IORT: UID %d of Token %p matches with that of Token %p.\n",
+          "ERROR: IORT: UID %d of Token %p matches with that of Token %p. (%u/%u)\n",        // [CODE_FIRST] 11148
           NodeIndexer[IndexI].Identifier,
           NodeIndexer[IndexI].Token,
-          NodeIndexer[IndexJ].Token
+          NodeIndexer[IndexJ].Token,
+          IndexI,
+          IndexJ                                                                             // [CODE_FIRST] 11148
           ));
         return EFI_INVALID_PARAMETER;
       }
@@ -2079,6 +2332,7 @@ BuildIortTable (
   UINT32  SmmuV3NodeCount;
   UINT32  PmcgNodeCount;
   UINT32  RmrNodeCount;
+  UINT32  IwbNodeCount;                                                                      // [CODE_FIRST] 11148
 
   UINT32  ItsGroupOffset;
   UINT32  NamedComponentOffset;
@@ -2087,6 +2341,7 @@ BuildIortTable (
   UINT32  SmmuV3Offset;
   UINT32  PmcgOffset;
   UINT32  RmrOffset;
+  UINT32  IwbOffset;                                                                         // [CODE_FIRST] 11148
 
   CM_ARM_ITS_GROUP_NODE        *ItsGroupNodeList;
   CM_ARM_NAMED_COMPONENT_NODE  *NamedComponentNodeList;
@@ -2095,6 +2350,7 @@ BuildIortTable (
   CM_ARM_SMMUV3_NODE           *SmmuV3NodeList;
   CM_ARM_PMCG_NODE             *PmcgNodeList;
   CM_ARM_RMR_NODE              *RmrNodeList;
+  CM_ARM_GIC_IWB_INFO          *IwbNodeList;                                                 // [CODE_FIRST] 11148
 
   EFI_ACPI_6_0_IO_REMAPPING_TABLE  *Iort;
   IORT_NODE_INDEXER                *NodeIndexer;
@@ -2273,6 +2529,35 @@ BuildIortTable (
     IortNodeCount += RmrNodeCount;
   }
 
+  if (AcpiTableInfo->AcpiTableRevision >=                                                     // [CODE_FIRST] 11148
+      EFI_ACPI_IO_REMAPPING_TABLE_REVISION_07)                                                // [CODE_FIRST] 11148
+  {
+    // [CODE_FIRST] 11148
+    // Get the IWB node info                                                                  // [CODE_FIRST] 11148
+    Status = GetEArmObjGicIwbInfo (
+                               // [CODE_FIRST] 11148
+               CfgMgrProtocol, // [CODE_FIRST] 11148
+               CM_NULL_TOKEN,  // [CODE_FIRST] 11148
+               &IwbNodeList,   // [CODE_FIRST] 11148
+               &IwbNodeCount   // [CODE_FIRST] 11148
+               );              // [CODE_FIRST] 11148
+    if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+      // [CODE_FIRST] 11148
+      DEBUG ((
+        // [CODE_FIRST] 11148
+        DEBUG_ERROR,                                                                          // [CODE_FIRST] 11148
+        "ERROR: IORT: Failed to get IWB Node Info. Status = %r\n",                            // [CODE_FIRST] 11148
+        Status                                                                                // [CODE_FIRST] 11148
+        ));                                                                                   // [CODE_FIRST] 11148
+      goto error_handler;                                                                     // [CODE_FIRST] 11148
+    }                                                                                         // [CODE_FIRST] 11148
+
+    // [CODE_FIRST] 11148
+    // Add the IWB node count                                                                 // [CODE_FIRST] 11148
+    IortNodeCount += IwbNodeCount;                                                            // [CODE_FIRST] 11148
+  }                                                                                           // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
   // Allocate Node Indexer array
   NodeIndexer = (IORT_NODE_INDEXER *)AllocateZeroPool (
                                        (sizeof (IORT_NODE_INDEXER) *
@@ -2516,6 +2801,46 @@ BuildIortTable (
       ));
   }
 
+  // IWB Nodes                                                                                // [CODE_FIRST] 11148
+  if ((AcpiTableInfo->AcpiTableRevision >=                                                    // [CODE_FIRST] 11148
+       EFI_ACPI_IO_REMAPPING_TABLE_REVISION_07) &&                                            // [CODE_FIRST] 11148
+      (IwbNodeCount > 0))                                                                     // [CODE_FIRST] 11148
+  {
+    // [CODE_FIRST] 11148
+    IwbOffset = (UINT32)TableSize;                                                            // [CODE_FIRST] 11148
+    // Size of IWB node list.                                                                 // [CODE_FIRST] 11148
+    NodeSize = GetSizeofIwbNodes (
+                               // [CODE_FIRST] 11148
+                 IwbOffset,    // [CODE_FIRST] 11148
+                 IwbNodeList,  // [CODE_FIRST] 11148
+                 IwbNodeCount, // [CODE_FIRST] 11148
+                 &NodeIndexer  // [CODE_FIRST] 11148
+                 );            // [CODE_FIRST] 11148
+    if (NodeSize > MAX_UINT32) {
+      // [CODE_FIRST] 11148
+      Status = EFI_INVALID_PARAMETER;                                                         // [CODE_FIRST] 11148
+      DEBUG ((
+        // [CODE_FIRST] 11148
+        DEBUG_ERROR,                                                                          // [CODE_FIRST] 11148
+        "ERROR: IORT: Invalid Size of IWB Nodes. Status = %r\n",                              // [CODE_FIRST] 11148
+        Status                                                                                // [CODE_FIRST] 11148
+        ));                                                                                   // [CODE_FIRST] 11148
+      goto error_handler;                                                                     // [CODE_FIRST] 11148
+    }                                                                                         // [CODE_FIRST] 11148
+
+    // [CODE_FIRST] 11148
+    TableSize += NodeSize;                                                                    // [CODE_FIRST] 11148
+                                                                                              // [CODE_FIRST] 11148
+    DEBUG ((
+      // [CODE_FIRST] 11148
+      DEBUG_INFO,                                                                             // [CODE_FIRST] 11148
+      " IwbNodeCount = %d\n IwbOffset = %d\n",                                                // [CODE_FIRST] 11148
+      IwbNodeCount,                                                                           // [CODE_FIRST] 11148
+      IwbOffset                                                                               // [CODE_FIRST] 11148
+      ));                                                                                     // [CODE_FIRST] 11148
+  }                                                                                           // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
   DEBUG ((
     DEBUG_INFO,
     "INFO: IORT:\n" \
@@ -2739,6 +3064,34 @@ BuildIortTable (
     }
   }
 
+  if ((AcpiTableInfo->AcpiTableRevision >=                                                    // [CODE_FIRST] 11148
+       EFI_ACPI_IO_REMAPPING_TABLE_REVISION_07) &&                                            // [CODE_FIRST] 11148
+      (IwbNodeCount > 0))                                                                     // [CODE_FIRST] 11148
+  {
+    // [CODE_FIRST] 11148
+    Status = AddIwbNodes (
+                               // [CODE_FIRST] 11148
+               This,           // [CODE_FIRST] 11148
+               CfgMgrProtocol, // [CODE_FIRST] 11148
+               AcpiTableInfo,  // [CODE_FIRST] 11148
+               Iort,           // [CODE_FIRST] 11148
+               IwbOffset,      // [CODE_FIRST] 11148
+               IwbNodeList,    // [CODE_FIRST] 11148
+               IwbNodeCount    // [CODE_FIRST] 11148
+               );              // [CODE_FIRST] 11148
+    if (EFI_ERROR (Status)) {
+      // [CODE_FIRST] 11148
+      DEBUG ((
+        // [CODE_FIRST] 11148
+        DEBUG_ERROR,                                                                          // [CODE_FIRST] 11148
+        "ERROR: IORT: Failed to add IWB Node. Status = %r\n",                                 // [CODE_FIRST] 11148
+        Status                                                                                // [CODE_FIRST] 11148
+        ));                                                                                   // [CODE_FIRST] 11148
+      goto error_handler;                                                                     // [CODE_FIRST] 11148
+    }                                                                                         // [CODE_FIRST] 11148
+  }                                                                                           // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
   return EFI_SUCCESS;
 
 error_handler:
@@ -2817,9 +3170,9 @@ ACPI_IORT_GENERATOR  IortGenerator = {
     // Generator Description
     L"ACPI.STD.IORT.GENERATOR",
     // ACPI Table Signature
-    EFI_ACPI_6_4_IO_REMAPPING_TABLE_SIGNATURE,
+    EFI_ACPI_6_7_IO_REMAPPING_TABLE_SIGNATURE,                                               // [CODE_FIRST] 11148
     // ACPI Table Revision supported by this Generator
-    EFI_ACPI_IO_REMAPPING_TABLE_REVISION_05,
+    EFI_ACPI_IO_REMAPPING_TABLE_REVISION_07,                                                 // [CODE_FIRST] 11148
     // Minimum supported ACPI Table Revision
     EFI_ACPI_IO_REMAPPING_TABLE_REVISION_00,
     // Creator ID
