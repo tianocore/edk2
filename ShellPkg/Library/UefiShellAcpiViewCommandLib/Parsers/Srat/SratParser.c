@@ -341,6 +341,21 @@ STATIC CONST ACPI_PARSER  SratX2ApciAffinityParser[] = {
   { L"Reserved",         4, 20, L"0x%x", NULL, NULL, NULL, NULL }
 };
 
+/**                                                                                               // [CODE_FIRST] 11148
+  An ACPI_PARSER array describing the GIC IRS Affinity structure.                                 // [CODE_FIRST] 11148
+**/// [CODE_FIRST] 11148
+STATIC CONST ACPI_PARSER  SratGicIrsAffinityParser[] = {
+  // [CODE_FIRST] 11148
+  { L"Type",             1, 0,  L"0x%x", NULL, NULL, NULL, NULL },                                // [CODE_FIRST] 11148
+  { L"Length",           1, 1,  L"0x%x", NULL, NULL, NULL, NULL },                                // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  { L"Reserved",         2, 2,  L"0x%x", NULL, NULL, NULL, NULL },                                // [CODE_FIRST] 11148
+  { L"Proximity Domain", 4, 4,  L"0x%x", NULL, NULL, NULL, NULL },                                // [CODE_FIRST] 11148
+  { L"IRS Id",           4, 8,  L"0x%x", NULL, NULL, NULL, NULL },                                // [CODE_FIRST] 11148
+  { L"Reserved",         4, 12, L"0x%x", NULL, NULL, NULL, NULL },                                // [CODE_FIRST] 11148
+};                                                                                                // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+
 /**
   This function parses the ACPI SRAT table.
   When trace is enabled this function parses the SRAT table and
@@ -376,10 +391,12 @@ ParseAcpiSrat (
   UINT32  MemoryAffinityIndex;
   UINT32  ApicSapicAffinityIndex;
   UINT32  X2ApicAffinityIndex;
-  CHAR8   Buffer[80]; // Used for AsciiName param of ParseAcpi
+  UINT32  GicIrsAffinityIndex; // [CODE_FIRST] 11148
+  CHAR8   Buffer[80];          // Used for AsciiName param of ParseAcpi
 
   GicCAffinityIndex             = 0;
   GicITSAffinityIndex           = 0;
+  GicIrsAffinityIndex           = 0;                                                              // [CODE_FIRST] 11148
   GenericInitiatorAffinityIndex = 0;
   MemoryAffinityIndex           = 0;
   ApicSapicAffinityIndex        = 0;
@@ -542,7 +559,26 @@ ParseAcpiSrat (
           );
         break;
 
-      default:
+      case EFI_ACPI_6_7_GIC_IRS_AFFINITY:                                                         // [CODE_FIRST] 11148
+        AsciiSPrint (
+          // [CODE_FIRST] 11148
+          Buffer,                                                                                 // [CODE_FIRST] 11148
+          sizeof (Buffer),                                                                        // [CODE_FIRST] 11148
+          "GIC IRS Affinity Structure [%d]",                                                      // [CODE_FIRST] 11148
+          GicIrsAffinityIndex++                                                                   // [CODE_FIRST] 11148
+          );                                                                                      // [CODE_FIRST] 11148
+        ParseAcpi (
+          // [CODE_FIRST] 11148
+          TRUE,                                                                                   // [CODE_FIRST] 11148
+          2,                                                                                      // [CODE_FIRST] 11148
+          Buffer,                                                                                 // [CODE_FIRST] 11148
+          ResourcePtr,                                                                            // [CODE_FIRST] 11148
+          *SratRALength,                                                                          // [CODE_FIRST] 11148
+          PARSER_PARAMS (SratGicIrsAffinityParser)                                                // [CODE_FIRST] 11148
+          );                                                                                      // [CODE_FIRST] 11148
+        break;                                                                                    // [CODE_FIRST] 11148
+      // [CODE_FIRST] 11148
+      default:                                                                                    // [CODE_FIRST] 11148
         IncrementErrorCount ();
         Print (L"ERROR: Unknown SRAT Affinity type = 0x%x\n", *SratRAType);
         break;

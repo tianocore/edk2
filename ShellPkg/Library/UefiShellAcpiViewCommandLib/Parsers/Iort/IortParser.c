@@ -162,6 +162,64 @@ ValidateRmrMemDescCount (
   }
 }
 
+/**                                                                                               // [CODE_FIRST] 11148
+  This function validates the ID Mapping array count for the IWB node.                            // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  @param [in] Ptr     Pointer to the start of the field data.                                     // [CODE_FIRST] 11148
+  @param [in] Length  Length of the field.                                                        // [CODE_FIRST] 11148
+  @param [in] Context Pointer to context specific information e.g. this                           // [CODE_FIRST] 11148
+                      could be a pointer to the ACPI table header.                                // [CODE_FIRST] 11148
+**/// [CODE_FIRST] 11148
+STATIC                                                                                            // [CODE_FIRST] 11148
+VOID                                                                                              // [CODE_FIRST] 11148
+EFIAPI
+// [CODE_FIRST] 11148
+ValidateIwbIdMappingCount (
+  // [CODE_FIRST] 11148
+  IN UINT8   *Ptr,                                                                                // [CODE_FIRST] 11148
+  IN UINT32  Length,                                                                              // [CODE_FIRST] 11148
+  IN VOID    *Context                                                                             // [CODE_FIRST] 11148
+  )                                                                                               // [CODE_FIRST] 11148
+{
+  // [CODE_FIRST] 11148
+  if (*(UINT32 *)Ptr != 1) {
+    // [CODE_FIRST] 11148
+    IncrementErrorCount ();                                                                       // [CODE_FIRST] 11148
+    Print (L"\nERROR: IORT ID Mapping count must be equal to 1.");                                // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
+}                                                                                                 // [CODE_FIRST] 11148
+
+// [CODE_FIRST] 11148
+
+/**                                                                                               // [CODE_FIRST] 11148
+  This function validates the ID Mapping array offset for the IWB node.                           // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  @param [in] Ptr     Pointer to the start of the field data.                                     // [CODE_FIRST] 11148
+  @param [in] Length  Length of the field.                                                        // [CODE_FIRST] 11148
+  @param [in] Context Pointer to context specific information e.g. this                           // [CODE_FIRST] 11148
+                      could be a pointer to the ACPI table header.                                // [CODE_FIRST] 11148
+**/// [CODE_FIRST] 11148
+STATIC                                                                                            // [CODE_FIRST] 11148
+VOID                                                                                              // [CODE_FIRST] 11148
+EFIAPI
+// [CODE_FIRST] 11148
+ValidateIwbIdArrayReference (
+  // [CODE_FIRST] 11148
+  IN UINT8   *Ptr,                                                                                // [CODE_FIRST] 11148
+  IN UINT32  Length,                                                                              // [CODE_FIRST] 11148
+  IN VOID    *Context                                                                             // [CODE_FIRST] 11148
+  )                                                                                               // [CODE_FIRST] 11148
+{
+  // [CODE_FIRST] 11148
+  if (*(UINT32 *)Ptr == 0) {
+    // [CODE_FIRST] 11148
+    IncrementErrorCount ();                                                                       // [CODE_FIRST] 11148
+    Print (L"\nERROR: IORT ID Mapping offset must non-zero.");                                    // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
+}                                                                                                 // [CODE_FIRST] 11148
+
+// [CODE_FIRST] 11148
+
 /**
   Helper Macro for populating the IORT Node header in the ACPI_PARSER array.
 
@@ -339,6 +397,21 @@ STATIC CONST ACPI_PARSER  IortNodeRmrMemRangeDescParser[] = {
     NULL },
   { L"Reserved",              4, 16, L"0x%x",  NULL, NULL, NULL,                 NULL}
 };
+
+/**                                                                                               // [CODE_FIRST] 11148
+  An ACPI_PARSER array describing the IORT IWB node.                                              // [CODE_FIRST] 11148
+**/// [CODE_FIRST] 11148
+STATIC CONST ACPI_PARSER  IortNodeIwbParser[] = {
+  // [CODE_FIRST] 11148
+  PARSE_IORT_NODE_HEADER (
+    // [CODE_FIRST] 11148
+    ValidateIwbIdMappingCount,                                                                    // [CODE_FIRST] 11148
+    ValidateIwbIdArrayReference                                                                   // [CODE_FIRST] 11148
+    ),                                                                                            // [CODE_FIRST] 11148
+  { L"Config frame base", 8, 16, L"0x%lx", NULL, NULL, NULL, NULL },                              // [CODE_FIRST] 11148
+  { L"IWB_index",         2, 24, L"%d",    NULL, NULL, NULL, NULL },                              // [CODE_FIRST] 11148
+};                                                                                                // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
 
 /**
   This function parses the IORT Node Id Mapping array.
@@ -786,6 +859,64 @@ DumpIortNodeRmr (
     );
 }
 
+/**                                                                                               // [CODE_FIRST] 11148
+  This function parses the IORT IWB node.                                                         // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  @param [in] Ptr            Pointer to the start of the buffer.                                  // [CODE_FIRST] 11148
+  @param [in] Length         Length of the buffer.                                                // [CODE_FIRST] 11148
+  @param [in] MappingCount   The ID Mapping count.                                                // [CODE_FIRST] 11148
+  @param [in] MappingOffset  The offset of the ID Mapping array                                   // [CODE_FIRST] 11148
+                             from the start of the IORT table.                                    // [CODE_FIRST] 11148
+**/// [CODE_FIRST] 11148
+STATIC                                                                                            // [CODE_FIRST] 11148
+VOID
+// [CODE_FIRST] 11148
+DumpIortNodeIwb (
+  // [CODE_FIRST] 11148
+  IN UINT8   *Ptr,                                                                                // [CODE_FIRST] 11148
+  IN UINT16  Length,                                                                              // [CODE_FIRST] 11148
+  IN UINT32  MappingCount,                                                                        // [CODE_FIRST] 11148
+  IN UINT32  MappingOffset                                                                        // [CODE_FIRST] 11148
+  )                                                                                               // [CODE_FIRST] 11148
+{
+  // [CODE_FIRST] 11148
+  UINT32  Offset;                                                                                 // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
+  Offset = ParseAcpi (
+                                               // [CODE_FIRST] 11148
+             TRUE,                             // [CODE_FIRST] 11148
+             2,                                // [CODE_FIRST] 11148
+             "IWB Node",                       // [CODE_FIRST] 11148
+             Ptr,                              // [CODE_FIRST] 11148
+             Length,                           // [CODE_FIRST] 11148
+             PARSER_PARAMS (IortNodeIwbParser) // [CODE_FIRST] 11148
+             );                                // [CODE_FIRST] 11148
+                                               // [CODE_FIRST] 11148
+  // Estimate the Device Name length                                                              // [CODE_FIRST] 11148
+  PrintFieldName (2, L"Device Object Name");                                                      // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  while ((*(Ptr + Offset) != 0) &&                                                                // [CODE_FIRST] 11148
+         (Offset < Length))                                                                       // [CODE_FIRST] 11148
+  {
+    // [CODE_FIRST] 11148
+    Print (L"%c", *(Ptr + Offset));                                                               // [CODE_FIRST] 11148
+    Offset++;                                                                                     // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
+  Print (L"\n");                                                                                  // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  DumpIortNodeIdMappings (
+    // [CODE_FIRST] 11148
+    Ptr + MappingOffset,                                                                          // [CODE_FIRST] 11148
+    Length - MappingOffset,                                                                       // [CODE_FIRST] 11148
+    MappingCount                                                                                  // [CODE_FIRST] 11148
+    );                                                                                            // [CODE_FIRST] 11148
+}                                                                                                 // [CODE_FIRST] 11148
+
+// [CODE_FIRST] 11148
+
 /**
   This function parses the ACPI IORT table.
   When trace is enabled this function parses the IORT table and traces the ACPI
@@ -799,6 +930,7 @@ DumpIortNodeRmr (
     - SMMUv3
     - PMCG
     - RMR
+    - IWB                                                                                         // [CODE_FIRST] 11148
 
   This function also performs validation of the ACPI table fields.
 
@@ -970,6 +1102,15 @@ ParseAcpiIort (
           *IortIdMappingOffset
           );
         break;
+      case EFI_ACPI_IORT_TYPE_IWB:                                                                // [CODE_FIRST] 11148
+        DumpIortNodeIwb (
+          // [CODE_FIRST] 11148
+          NodePtr,                                                                                // [CODE_FIRST] 11148
+          *IortNodeLength,                                                                        // [CODE_FIRST] 11148
+          *IortIdMappingCount,                                                                    // [CODE_FIRST] 11148
+          *IortIdMappingOffset                                                                    // [CODE_FIRST] 11148
+          );                                                                                      // [CODE_FIRST] 11148
+        break;                                                                                    // [CODE_FIRST] 11148
       default:
         IncrementErrorCount ();
         Print (L"ERROR: Unsupported IORT Node type = %d\n", *IortNodeType);
