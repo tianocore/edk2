@@ -1,0 +1,28 @@
+## @file
+#  Null implemmentation of the ArmCcaLib library.
+#
+#  Copyright (c) 2022 - 2023, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = ArmCcaLib
+  FILE_GUID                      = 9E3F7AAA-10A6-4513-A960-B87F4D7DCFC5
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmCcaLib
+
+[Sources]
+  ArmCcaLibNull.c
+
+
+[Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+

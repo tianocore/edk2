@@ -1,0 +1,27 @@
+## @file
+#  Library that implements a NULL implementation of the ArmCcaInitPeiLib.
+#
+#  Copyright (c) 2022 - 2023, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = ArmCcaInitPeiLib
+  FILE_GUID                      = 60686C60-8433-49EE-9F2C-DDC424A95652
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmCcaInitPeiLib
+
+[Sources]
+  ArmCcaInitPeiLibNull.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
