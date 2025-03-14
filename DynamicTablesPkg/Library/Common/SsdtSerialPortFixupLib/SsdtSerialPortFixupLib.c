@@ -115,7 +115,9 @@ ValidateSerialPortInfo (
         !(((SerialPortInfo->Interrupt >= ARM_GIC_ARCH_SPI_MIN) &&
            (SerialPortInfo->Interrupt <= ARM_GIC_ARCH_SPI_MAX)) ||
           ((SerialPortInfo->Interrupt >= ARM_GIC_ARCH_EXT_SPI_MIN) &&
-           (SerialPortInfo->Interrupt <= ARM_GIC_ARCH_EXT_SPI_MAX))))
+           (SerialPortInfo->Interrupt <= ARM_GIC_ARCH_EXT_SPI_MAX)) ||
+          ((SerialPortInfo->Interrupt >= ARM_GICV5_ARCH_SPI_MIN) &&
+           (SerialPortInfo->Interrupt <= ARM_GICV5_ARCH_SPI_MAX))))
     {
       DEBUG ((
         DEBUG_ERROR,
