@@ -81,8 +81,120 @@ GET_OBJECT_LIST (
   CM_ARM_GIC_ITS_INFO
   );
 
+/** This macro expands to a function that retrieves the GIC
+    IRS Information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArm,
+  EArmObjGicIrsInfo,
+  CM_ARM_GIC_IRS_INFO
+  );
+
+/** This macro expands to a function that retrieves the GIC
+    Interrupt Translation Service v5 Information from the
+    Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArm,
+  EArmObjGicItsV5Info,
+  CM_ARM_GIC_ITSV5_INFO
+  );
+
+/** This macro expands to a function that retrieves the GIC
+    ITS v5 Translate Frame Information from the
+    Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArm,
+  EArmObjGicItsV5TranslateFrameInfo,
+  CM_ARM_GIC_ITSV5_TRANSLATE_FRAME_INFO
+  );
+
+STATIC
+VOID
+AddGICInterruptRoutingService (
+  IN        EFI_ACPI_6_7_GIC_IRS_STRUCTURE  *CONST  GicIrs,
+  IN  CONST CM_ARM_GIC_IRS_INFO             *CONST  GicIrsInfo
+  )
+{
+  ASSERT (GicIrs != NULL);
+  ASSERT (GicIrsInfo != NULL);
+
+  // UINT8 Type
+  GicIrs->Type = EFI_ACPI_6_7_GIC_IRS;
+  // UINT8 Length
+  GicIrs->Length = sizeof (EFI_ACPI_6_7_GIC_IRS_STRUCTURE);
+  // UINT8 GicVersion
+  GicIrs->GicVersion = EFI_ACPI_6_7_GIC_V5;
+  // UINT8 Reserved
+  GicIrs->Reserved = EFI_ACPI_RESERVED_BYTE;
+
+  // UINT32 IrsId
+  GicIrs->IrsId = GicIrsInfo->GicIrsId;
+  // UINT32 Flags
+  GicIrs->Flags = GicIrsInfo->Flags;
+  // UINT32 Reserved2
+  GicIrs->Reserved2 = EFI_ACPI_RESERVED_DWORD;
+  // UINT32 IrsConfigFrameBase
+  GicIrs->IrsConfigFrameBase = GicIrsInfo->ConfigFrameBase;
+  // UINT32 IrsSetLpiFrameBase
+  GicIrs->IrsSetLpiFrameBase = GicIrsInfo->SetLpiFrameBase;
+}
+
+STATIC
+VOID
+AddGICInterruptTranslationServiceV5 (
+  IN        EFI_ACPI_6_7_GIC_ITSV5_STRUCTURE  *CONST  GicItsV5,
+  IN  CONST CM_ARM_GIC_ITSV5_INFO             *CONST  GicItsV5Info
+  )
+{
+  ASSERT (GicItsV5 != NULL);
+  ASSERT (GicItsV5Info != NULL);
+
+  // UINT8 Type
+  GicItsV5->Type = EFI_ACPI_6_7_GIC_ITSV5;
+  // UINT8 Length
+  GicItsV5->Length = sizeof (EFI_ACPI_6_7_GIC_ITSV5_STRUCTURE);
+  // UINT8 Flags
+  GicItsV5->Flags = GicItsV5Info->Flags;
+  // UINT8 Reserved
+  GicItsV5->Reserved = EFI_ACPI_RESERVED_BYTE;
+
+  // UINT32 GicItsId
+  GicItsV5->GicItsId = GicItsV5Info->GicItsId;
+  // UINT64 PhysicalBaseAddress
+  GicItsV5->PhysicalBaseAddress = GicItsV5Info->PhysicalBaseAddress;
+}
+
+STATIC
+VOID
+AddGICInterruptTranslationServiceV5TranslateFrame (
+  IN        EFI_ACPI_6_7_GIC_ITSV5_TRANSLATE_FRAME_STRUCTURE  *CONST  GicItsV5TranslateFrame,
+  IN  CONST CM_ARM_GIC_ITSV5_TRANSLATE_FRAME_INFO             *CONST  GicItsV5TransFrameInfo
+  )
+{
+  ASSERT (GicItsV5TranslateFrame != NULL);
+  ASSERT (GicItsV5TransFrameInfo != NULL);
+
+  // UINT8 Type
+  GicItsV5TranslateFrame->Type = EFI_ACPI_6_7_GIC_ITSV5_TRANSLATE_FRAME;
+  // UINT8 Length
+  GicItsV5TranslateFrame->Length = sizeof (EFI_ACPI_6_7_GIC_ITSV5_TRANSLATE_FRAME_STRUCTURE);
+  // UINT16 Reserved
+  GicItsV5TranslateFrame->Reserved = EFI_ACPI_RESERVED_WORD;
+
+  // UINT32 LinkedGicItsId
+  GicItsV5TranslateFrame->LinkedGicItsId = GicItsV5TransFrameInfo->LinkedGicItsId;
+  // UINT32 ItsTranslateId
+  GicItsV5TranslateFrame->ItsTranslateId = GicItsV5TransFrameInfo->ItsTranslateId;
+  // UINT32 Reserved2
+  GicItsV5TranslateFrame->Reserved2 = EFI_ACPI_RESERVED_DWORD;
+  // UINT32 ItsTranslateFrameBase
+  GicItsV5TranslateFrame->ItsTranslateFrameBase = GicItsV5TransFrameInfo->ItsTranslateFrameBase;
+}
+
 /** This function updates the GIC CPU Interface Information in the
-    EFI_ACPI_6_5_GIC_STRUCTURE structure.
+    EFI_ACPI_6_7_GIC_STRUCTURE structure.
 
   @param [in]  Gicc         Pointer to GIC CPU Interface structure.
   @param [in]  GicCInfo     Pointer to the GIC CPU Interface Information.
@@ -92,7 +204,7 @@ GET_OBJECT_LIST (
 STATIC
 VOID
 AddGICC (
-  IN        EFI_ACPI_6_5_GIC_STRUCTURE  *CONST  Gicc,
+  IN        EFI_ACPI_6_7_GIC_STRUCTURE  *CONST  Gicc,
   IN  CONST CM_ARM_GICC_INFO            *CONST  GicCInfo,
   IN  CONST UINT8                               MadtRev,
   IN  CONST BOOLEAN                             GicRPresent
@@ -102,9 +214,9 @@ AddGICC (
   ASSERT (GicCInfo != NULL);
 
   // UINT8 Type
-  Gicc->Type = EFI_ACPI_6_5_GIC;
+  Gicc->Type = EFI_ACPI_6_7_GIC;
   // UINT8 Length
-  Gicc->Length = sizeof (EFI_ACPI_6_5_GIC_STRUCTURE);
+  Gicc->Length = sizeof (EFI_ACPI_6_7_GIC_STRUCTURE);
   // UINT16 Reserved
   Gicc->Reserved = EFI_ACPI_RESERVED_WORD;
 
@@ -158,6 +270,11 @@ AddGICC (
   // UINT16  TrbeInterrupt
   if (MadtRev > EFI_ACPI_6_4_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION) {
     Gicc->TrbeInterrupt = GicCInfo->TrbeInterrupt;
+  }
+
+  if (MadtRev >= EFI_ACPI_6_6_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION) {
+    Gicc->IAffId = GicCInfo->IAffId;
+    Gicc->IrsId  = GicCInfo->IrsId;
   }
 }
 
@@ -227,7 +344,7 @@ IsAcpiUidEqual (
 STATIC
 EFI_STATUS
 AddGICCList (
-  IN  EFI_ACPI_6_5_GIC_STRUCTURE  *Gicc,
+  IN  EFI_ACPI_6_7_GIC_STRUCTURE  *Gicc,
   IN  CONST CM_ARM_GICC_INFO      *GicCInfo,
   IN        UINT32                GicCCount,
   IN  CONST UINT8                 MadtRev,
@@ -434,6 +551,80 @@ AddGICItsList (
   }
 }
 
+/** Add the GIC Interrupt Routing Service Information
+    to the MADT Table.
+
+  @param [in]  GicIrs       Pointer to GIC IRS structure list.
+  @param [in]  GicIrsInfo   Pointer to the GIC IRS list.
+  @param [in]  GicIrsCount  Count of GIC IRS.
+**/
+STATIC
+VOID
+AddGICIrsList (
+  IN  EFI_ACPI_6_7_GIC_IRS_STRUCTURE  *GicIrs,
+  IN  CONST CM_ARM_GIC_IRS_INFO       *GicIrsInfo,
+  IN        UINT32                    GicIrsCount
+  )
+{
+  ASSERT (GicIrs != NULL);
+  ASSERT (GicIrsInfo != NULL);
+
+  while (GicIrsCount-- != 0) {
+    AddGICInterruptRoutingService (GicIrs++, GicIrsInfo++);
+  }
+}
+
+/** Add the GICv5 Interrupt Translation Service Information
+    to the MADT Table.
+
+  @param [in]  GicItsV5       Pointer to GIC ITSv5 structure list.
+  @param [in]  GicItsV5Info   Pointer to the GIC ITSv5 list.
+  @param [in]  GicItsV5Count  Count of GIC ITSv5.
+**/
+STATIC
+VOID
+AddGICItsV5List (
+  IN  EFI_ACPI_6_7_GIC_ITSV5_STRUCTURE  *GicItsV5,
+  IN  CONST CM_ARM_GIC_ITSV5_INFO       *GicItsV5Info,
+  IN        UINT32                      GicItsV5Count
+  )
+{
+  ASSERT (GicItsV5 != NULL);
+  ASSERT (GicItsV5Info != NULL);
+
+  while (GicItsV5Count-- != 0) {
+    AddGICInterruptTranslationServiceV5 (GicItsV5++, GicItsV5Info++);
+  }
+}
+
+/** Add the GICv5 Interrupt Translation Service Translate Frame Information
+    to the MADT Table.
+
+  @param [in]  GicItsV5TranslateFrame   Pointer to GIC ITSv5 Translate frame
+                                        structure list.
+  @param [in]  GicItsV5TransFrameInfo   Pointer to the GIC ITSv5
+                                        Translate frame list.
+  @param [in]  GicItsV5TransFrameCount  Count of GIC ITSv5.Translate frame.
+**/
+STATIC
+VOID
+AddGICItsV5TranslateFrameList (
+  IN  EFI_ACPI_6_7_GIC_ITSV5_TRANSLATE_FRAME_STRUCTURE  *GicItsV5TranslateFrame,
+  IN  CONST CM_ARM_GIC_ITSV5_TRANSLATE_FRAME_INFO       *GicItsV5TransFrameInfo,
+  IN        UINT32                                      GicItsV5TransFrameCount
+  )
+{
+  ASSERT (GicItsV5TranslateFrame != NULL);
+  ASSERT (GicItsV5TransFrameInfo != NULL);
+
+  while (GicItsV5TransFrameCount-- != 0) {
+    AddGICInterruptTranslationServiceV5TranslateFrame (
+      GicItsV5TranslateFrame++,
+      GicItsV5TransFrameInfo++
+      );
+  }
+}
+
 /** Construct the MADT ACPI table.
 
   This function invokes the Configuration Manager protocol interface
@@ -466,25 +657,34 @@ BuildMadtTable (
   OUT       EFI_ACPI_DESCRIPTION_HEADER          **CONST  Table
   )
 {
-  EFI_STATUS                 Status;
-  UINT32                     TableSize;
-  UINT32                     GicCCount;
-  UINT32                     GicDCount;
-  UINT32                     GicMSICount;
-  UINT32                     GicRedistCount;
-  UINT32                     GicItsCount;
-  CM_ARM_GICC_INFO           *GicCInfo;
-  CM_ARM_GICD_INFO           *GicDInfo;
-  CM_ARM_GIC_MSI_FRAME_INFO  *GicMSIInfo;
-  CM_ARM_GIC_REDIST_INFO     *GicRedistInfo;
-  CM_ARM_GIC_ITS_INFO        *GicItsInfo;
-  UINT32                     GicCOffset;
-  UINT32                     GicDOffset;
-  UINT32                     GicMSIOffset;
-  UINT32                     GicRedistOffset;
-  UINT32                     GicItsOffset;
+  EFI_STATUS                             Status;
+  UINT32                                 TableSize;
+  UINT32                                 GicCCount;
+  UINT32                                 GicDCount;
+  UINT32                                 GicMSICount;
+  UINT32                                 GicRedistCount;
+  UINT32                                 GicItsCount;
+  UINT32                                 GicIrsCount;
+  UINT32                                 GicItsV5Count;
+  UINT32                                 GicItsV5TransFrameCount;
+  CM_ARM_GICC_INFO                       *GicCInfo;
+  CM_ARM_GICD_INFO                       *GicDInfo;
+  CM_ARM_GIC_MSI_FRAME_INFO              *GicMSIInfo;
+  CM_ARM_GIC_REDIST_INFO                 *GicRedistInfo;
+  CM_ARM_GIC_ITS_INFO                    *GicItsInfo;
+  CM_ARM_GIC_IRS_INFO                    *GicIrsInfo;
+  CM_ARM_GIC_ITSV5_INFO                  *GicItsV5Info;
+  CM_ARM_GIC_ITSV5_TRANSLATE_FRAME_INFO  *GicItsV5TransFrameInfo;
+  UINT32                                 GicCOffset;
+  UINT32                                 GicDOffset;
+  UINT32                                 GicMSIOffset;
+  UINT32                                 GicRedistOffset;
+  UINT32                                 GicItsOffset;
+  UINT32                                 GicIrsOffset;
+  UINT32                                 GicItsV5Offset;
+  UINT32                                 GicItsV5TranslateFrameOffset;
 
-  EFI_ACPI_6_5_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER  *Madt;
+  EFI_ACPI_6_7_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER  *Madt;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -616,10 +816,55 @@ BuildMadtTable (
     goto error_handler;
   }
 
-  TableSize = sizeof (EFI_ACPI_6_5_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER);
+  Status = GetEArmObjGicIrsInfo (
+             CfgMgrProtocol,
+             CM_NULL_TOKEN,
+             &GicIrsInfo,
+             &GicIrsCount
+             );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: MADT: Failed to get GIC IRS Info. Status = %r\n",
+      Status
+      ));
+    goto error_handler;
+  }
+
+  Status = GetEArmObjGicItsV5Info (
+             CfgMgrProtocol,
+             CM_NULL_TOKEN,
+             &GicItsV5Info,
+             &GicItsV5Count
+             );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: MADT: Failed to get GIC ITSv5 Info. Status = %r\n",
+      Status
+      ));
+    goto error_handler;
+  }
+
+  Status = GetEArmObjGicItsV5TranslateFrameInfo (
+             CfgMgrProtocol,
+             CM_NULL_TOKEN,
+             &GicItsV5TransFrameInfo,
+             &GicItsV5TransFrameCount
+             );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: MADT: Failed to get GIC ITSv5 Info. Status = %r\n",
+      Status
+      ));
+    goto error_handler;
+  }
+
+  TableSize = sizeof (EFI_ACPI_6_7_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER);
 
   GicCOffset = TableSize;
-  TableSize += (sizeof (EFI_ACPI_6_5_GIC_STRUCTURE) * GicCCount);
+  TableSize += (sizeof (EFI_ACPI_6_7_GIC_STRUCTURE) * GicCCount);
 
   GicDOffset = TableSize;
   TableSize += (sizeof (EFI_ACPI_6_5_GIC_DISTRIBUTOR_STRUCTURE) * GicDCount);
@@ -632,6 +877,15 @@ BuildMadtTable (
 
   GicItsOffset = TableSize;
   TableSize   += (sizeof (EFI_ACPI_6_5_GIC_ITS_STRUCTURE) * GicItsCount);
+
+  GicIrsOffset = TableSize;
+  TableSize   += (sizeof (EFI_ACPI_6_7_GIC_IRS_STRUCTURE) * GicIrsCount);
+
+  GicItsV5Offset = TableSize;
+  TableSize     += (sizeof (EFI_ACPI_6_7_GIC_ITSV5_STRUCTURE) * GicItsV5Count);
+
+  GicItsV5TranslateFrameOffset = TableSize;
+  TableSize                   += (sizeof (EFI_ACPI_6_7_GIC_ITSV5_TRANSLATE_FRAME_STRUCTURE) * GicItsV5TransFrameCount);
 
   // Allocate the Buffer for MADT table
   *Table = (EFI_ACPI_DESCRIPTION_HEADER *)AllocateZeroPool (TableSize);
@@ -647,7 +901,7 @@ BuildMadtTable (
     goto error_handler;
   }
 
-  Madt = (EFI_ACPI_6_5_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER *)*Table;
+  Madt = (EFI_ACPI_6_7_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER *)*Table;
 
   DEBUG ((
     DEBUG_INFO,
@@ -673,7 +927,7 @@ BuildMadtTable (
   }
 
   Status = AddGICCList (
-             (EFI_ACPI_6_5_GIC_STRUCTURE *)((UINT8 *)Madt + GicCOffset),
+             (EFI_ACPI_6_7_GIC_STRUCTURE *)((UINT8 *)Madt + GicCOffset),
              GicCInfo,
              GicCCount,
              Madt->Header.Revision,
@@ -714,6 +968,30 @@ BuildMadtTable (
       (EFI_ACPI_6_5_GIC_ITS_STRUCTURE *)((UINT8 *)Madt + GicItsOffset),
       GicItsInfo,
       GicItsCount
+      );
+  }
+
+  if (GicIrsCount != 0) {
+    AddGICIrsList (
+      (EFI_ACPI_6_7_GIC_IRS_STRUCTURE *)((UINT8 *)Madt + GicIrsOffset),
+      GicIrsInfo,
+      GicIrsCount
+      );
+  }
+
+  if (GicItsV5Count != 0) {
+    AddGICItsV5List (
+      (EFI_ACPI_6_7_GIC_ITSV5_STRUCTURE *)((UINT8 *)Madt + GicItsV5Offset),
+      GicItsV5Info,
+      GicItsV5Count
+      );
+  }
+
+  if (GicItsV5TransFrameCount != 0) {
+    AddGICItsV5TranslateFrameList (
+      (EFI_ACPI_6_7_GIC_ITSV5_TRANSLATE_FRAME_STRUCTURE *)((UINT8 *)Madt + GicItsV5TranslateFrameOffset),
+      GicItsV5TransFrameInfo,
+      GicItsV5TransFrameCount
       );
   }
 
@@ -779,9 +1057,9 @@ ACPI_TABLE_GENERATOR  MadtGenerator = {
   // Generator Description
   L"ACPI.STD.MADT.GENERATOR",
   // ACPI Table Signature
-  EFI_ACPI_6_5_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE,
+  EFI_ACPI_6_7_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE,
   // ACPI Table Revision supported by this Generator
-  EFI_ACPI_6_5_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION,
+  EFI_ACPI_6_7_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION,
   // Minimum supported ACPI Table Revision
   EFI_ACPI_6_2_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION,
   // Creator ID

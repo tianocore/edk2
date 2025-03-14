@@ -52,6 +52,12 @@ typedef enum ArmObjectID {
   EArmObjRmr,                                                  ///< 21 - Reserved Memory Range Node
   EArmObjMemoryRangeDescriptor,                                ///< 22 - Memory Range Descriptor
   EArmObjEtInfo,                                               ///< 23 - Embedded Trace Extension/Module Info
+  EArmObjGicIrsInfo,                                           ///< 24 - GIC IRS Info
+  EArmObjGicIwbInfo,                                           ///< 25 - GIC IWB Info
+  EArmObjGicItsV5Info,                                         ///< 26 - GIC ITS v5 Info
+  EArmObjGicItsV5TranslateFrameInfo,                           ///< 27 - GIC ITS v5 Translate Frame Info
+  EArmObjGicIrsAffinity,                                       ///< 28 - GIC IRS Affinity Info
+  EArmObjGicIwbAffinity,                                       ///< 29 - GIC IWB Affinity Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -202,6 +208,15 @@ typedef struct CmArmGicCInfo {
         CM_ARM_GICC_INFO.ClockDomain
   */
   CM_OBJECT_TOKEN    ClockDomainToken;
+
+  /** Optional field: GICv5 Interrupt Controller processor affinity ID.
+      This must be 0 for pre-v5 GIC.
+  */
+  UINT16    IAffId;
+
+  /** Optional field: The ID of the IRS that this processor is connected to.
+  */
+  UINT32    IrsId;
 } CM_ARM_GICC_INFO;
 
 /** A structure that describes the
@@ -267,7 +282,7 @@ typedef struct CmArmGicRedistInfo {
 } CM_ARM_GIC_REDIST_INFO;
 
 /** A structure that describes the
-    GIC Interrupt Translation Service information for the Platform.
+    GIC Interrup Translation Service information for the Platform.
 
     ID: EArmObjGicItsInfo
 */
@@ -618,7 +633,7 @@ typedef struct CmArmPmcgNode {
     ID: EArmObjGicItsIdentifierArray
 */
 typedef struct CmArmGicItsIdentifier {
-  /// The ITS Identifier
+  /// The ITS Identifier or ITS Translate Id (GicV5)
   UINT32    ItsId;
 } CM_ARM_ITS_IDENTIFIER;
 
@@ -746,6 +761,78 @@ typedef enum ArmEtType {
 typedef struct CmArmEtInfo {
   ARM_ET_TYPE    EtType;
 } CM_ARM_ET_INFO;
+
+typedef struct CmArmGicIrsInfo {
+  /// The GIC IRS ID
+  UINT32    GicIrsId;
+  /// Flags
+  UINT32    Flags;
+  /// Base address of the IRS config frame
+  UINT64    ConfigFrameBase;
+  /// Base address of the IRS SET_LPI frame
+  UINT64    SetLpiFrameBase;
+  /// Proximity domain that this IRS belongs to
+  UINT32    ProximityDomain;
+} CM_ARM_GIC_IRS_INFO;
+
+typedef struct CmArmGicIwbInfo {
+  /// An unique token used to identify this object
+  CM_OBJECT_TOKEN    Token;
+
+  /// The GIC IWB ID
+  UINT32    GicIwbId;
+  /// ITSv5 ID of the linked ITS
+  UINT32    LinkedItsId;
+  /// Base address of the IWB config frame
+  UINT64    ConfigFrameBase;
+  /// Device ID used to signal any interrupt to the connected ITS
+  UINT32    DeviceId;
+  /// Base GSIV for this IWB
+  UINT32    BaseGsiv;
+  /// Number of wires handled by this IWB
+  UINT32    NumWires;
+  /// Proximity domain that this IWB belongs to
+  UINT32    ProximityDomain;
+  /** ASCII Null terminated string with the full path to
+      the entry in the namespace for this object.
+  */
+  CHAR8     *ObjectName;
+  /// Reference token for the ID mapping array
+  CM_OBJECT_TOKEN    IdMappingToken;
+
+  /// Unique identifier for this node.
+  UINT32             Identifier;
+} CM_ARM_GIC_IWB_INFO;
+
+typedef struct CmArmGicItsV5Info {
+  /// The GIC ITSv5 ID
+  UINT32    GicItsId;
+  /// Flags
+  UINT32    Flags;
+  /// Base address of the ITS config frame
+  UINT64    PhysicalBaseAddress;
+
+  /** The proximity domain to which the logical processor belongs.
+      This field is used to populate the GIC ITS affinity structure
+      in the SRAT table.
+  */
+  UINT32             ProximityDomain;
+
+  /** Optional field: Reference Token to the ProximityDomain this object
+      belongs to. If this field is used, the following field is ignored:
+        CM_ARM_GIC_ITS_INFO.ProximityDomain
+  */
+  CM_OBJECT_TOKEN    ProximityDomainToken;
+} CM_ARM_GIC_ITSV5_INFO;
+
+typedef struct CmArmGicItsV5TranslateFrameInfo {
+  /// Linked GIC ITSv5 ID
+  UINT32    LinkedGicItsId;
+  /// The GIC ITSv5 translate frame ID
+  UINT32    ItsTranslateId;
+  /// Base address of the ITS translate frame
+  UINT64    ItsTranslateFrameBase;
+} CM_ARM_GIC_ITSV5_TRANSLATE_FRAME_INFO;
 
 #pragma pack()
 
