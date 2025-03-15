@@ -12,4 +12,6 @@ LIBS = -lCommon
 
 OBJECTS = EfiRom.o
 
+NINJA_LIBS_DEPS = Common
+
 include $(MAKEROOT)/Makefiles/app.makefile
