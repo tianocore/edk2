@@ -338,7 +338,7 @@ FindFileEx (
   FileOffset = (UINT32)((UINT8 *)FfsFileHeader - (UINT8 *)FwVolHeader);
   ASSERT (FileOffset <= 0xFFFFFFFF);
 
-  while (FileOffset < (FvLength - sizeof (EFI_FFS_FILE_HEADER))) {
+  while ((UINTN)FileOffset < (UINTN)(FvLength - sizeof (EFI_FFS_FILE_HEADER))) {
     //
     // Get FileState which is the highest bit of the State
     //
@@ -792,7 +792,7 @@ ProcessSection (
 {
   EFI_STATUS                             Status;
   UINT32                                 SectionLength;
-  UINT32                                 ParsedLength;
+  UINTN                                  ParsedLength;
   EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI  *GuidSectionPpi;
   EFI_PEI_DECOMPRESS_PPI                 *DecompressPpi;
   VOID                                   *PpiOutput;
