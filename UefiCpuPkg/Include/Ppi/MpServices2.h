@@ -1,5 +1,6 @@
 /** @file
   This file declares EDKII Multi-processor service PPI.
+  The header has been moved to MdePkg. This instance is retained for backwards compatibility.
 
   Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent

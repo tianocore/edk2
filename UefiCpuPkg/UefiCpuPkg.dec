@@ -151,6 +151,7 @@
 #
 
 [Ppis]
+  ## This Guid has been moved to MdePkg as gEfiPeiMpServices2PpiGuid. This instance is retained for backwards compatibility.
   gEdkiiPeiMpServices2PpiGuid =    { 0x5cb9cb3d, 0x31a4, 0x480c, { 0x94, 0x98, 0x29, 0xd2, 0x69, 0xba, 0xcf, 0xba}}
 
   ## Include/Ppi/ShadowMicrocode.h

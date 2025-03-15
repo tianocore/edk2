@@ -35,9 +35,9 @@
   PeiServicesTablePointerLib
 
 [Ppis]
-  gEdkiiPeiMpServices2PpiGuid
+  gEfiPeiMpServices2PpiGuid
 
 [Pcd]
 
 [Depex]
-  gEdkiiPeiMpServices2PpiGuid
+  gEfiPeiMpServices2PpiGuid
