@@ -2886,7 +2886,7 @@ ON_CONTINUE:
              0
              );
 ON_EXIT:
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) && (Instance->Config != NULL)) {
     Dhcp6CleanupSession (Instance, Status);
   }
 }
@@ -3302,7 +3302,11 @@ Dhcp6OnTimerTick (
       //
       // Retransmit the last sent packet again.
       //
-      Dhcp6TransmitPacket (Instance, TxCb->TxPacket, TxCb->Elapsed);
+      Status = Dhcp6TransmitPacket (Instance, TxCb->TxPacket, TxCb->Elapsed);
+      if (EFI_ERROR (Status)) {
+        return;
+      }
+
       TxCb->SolicitRetry = FALSE;
       if (TxCb->TxPacket->Dhcp6.Header.MessageType == Dhcp6MsgSolicit) {
         TxCb->SolicitRetry = TRUE;
