@@ -670,13 +670,17 @@ SmmEntryPoint (
   IN CONST EFI_SMM_ENTRY_CONTEXT  *SmmEntryContext
   )
 {
-  EFI_STATUS                  Status;
-  EFI_SMM_COMMUNICATE_HEADER  *CommunicateHeader;
-  BOOLEAN                     InLegacyBoot;
-  BOOLEAN                     IsOverlapped;
-  BOOLEAN                     IsOverUnderflow;
-  VOID                        *CommunicationBuffer;
-  UINTN                       BufferSize;
+  EFI_STATUS                    Status;
+  EFI_MM_COMMUNICATE_HEADER_V3  *CommunicateHeader;
+  EFI_SMM_COMMUNICATE_HEADER    *LegacyCommunicateHeader;
+  BOOLEAN                       InLegacyBoot;
+  BOOLEAN                       IsOverlapped;
+  BOOLEAN                       IsOverUnderflow;
+  VOID                          *CommunicationBuffer;
+  UINTN                         BufferSize;
+  EFI_GUID                      *CommGuid;
+  VOID                          *CommData;
+  UINTN                         CommHeaderSize;
 
   PERF_FUNCTION_BEGIN ();
 
@@ -744,19 +748,34 @@ SmmEntryPoint (
         gSmmCorePrivate->CommunicationBuffer = NULL;
         gSmmCorePrivate->ReturnStatus        = EFI_ACCESS_DENIED;
       } else {
-        CommunicateHeader = (EFI_SMM_COMMUNICATE_HEADER *)CommunicationBuffer;
-        // BufferSize was updated by the SafeUintnSub() call above.
-        Status = SmiManage (
-                   &CommunicateHeader->HeaderGuid,
-                   NULL,
-                   CommunicateHeader->Data,
-                   &BufferSize
-                   );
+        CommGuid = &((EFI_MM_COMMUNICATE_HEADER_V3 *)CommunicationBuffer)->HeaderGuid;
+        //
+        // Check if the signature matches EFI_MM_COMMUNICATE_HEADER_V3 definition
+        //
+        if (CompareGuid (CommGuid, &gCommunicateHeaderV3Guid)) {
+          CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommunicationBuffer;
+          CommGuid          = &CommunicateHeader->MessageGuid;
+          CommData          = CommunicateHeader->MessageData;
+          CommHeaderSize    = sizeof (EFI_MM_COMMUNICATE_HEADER_V3);
+        } else {
+          LegacyCommunicateHeader = (EFI_SMM_COMMUNICATE_HEADER *)CommunicationBuffer;
+          CommGuid                = &LegacyCommunicateHeader->HeaderGuid;
+          CommData                = LegacyCommunicateHeader->Data;
+          CommHeaderSize          = OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
+        }
+
+        BufferSize -= CommHeaderSize;
+        Status      = SmiManage (
+                        CommGuid,
+                        NULL,
+                        CommData,
+                        &BufferSize
+                        );
         //
         // Update CommunicationBuffer, BufferSize and ReturnStatus
         // Communicate service finished, reset the pointer to CommBuffer to NULL
         //
-        gSmmCorePrivate->BufferSize          = BufferSize + OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
+        gSmmCorePrivate->BufferSize          = BufferSize + CommHeaderSize;
         gSmmCorePrivate->CommunicationBuffer = NULL;
         gSmmCorePrivate->ReturnStatus        = (Status == EFI_SUCCESS) ? EFI_SUCCESS : EFI_NOT_FOUND;
       }
