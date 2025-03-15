@@ -370,6 +370,18 @@
   }
 
   #
+  # AMD SEV-SNP SVSM vTPM
+  #
+  SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpmSvsm.inf {
+    <LibraryClasses>
+      AmdSvsmLib|UefiCpuPkg/Library/AmdSvsmLibNull/AmdSvsmLibNull.inf
+  }
+  SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2InstanceLibDTpmSvsm.inf {
+    <LibraryClasses>
+      AmdSvsmLib|UefiCpuPkg/Library/AmdSvsmLibNull/AmdSvsmLibNull.inf
+  }
+
+  #
   # Hash2
   #
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
