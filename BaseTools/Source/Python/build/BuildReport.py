@@ -2388,7 +2388,7 @@ class BuildReport(object):
 
                         # PCD's in module
                         module_report_data["Pcd"] = []
-                        for data_pcd in module.LibraryPcdList:
+                        for data_pcd in module.ModulePcdList + module.LibraryPcdList:
                             module_report_data["Pcd"].append({"Space": data_pcd.TokenSpaceGuidCName,
                                                               "Name": data_pcd.TokenCName,
                                                               "Value": data_pcd.TokenValue,
