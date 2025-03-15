@@ -56,12 +56,13 @@ RedfishCreateSmbiosTable42 (
   EFI_SMBIOS_HANDLE                  MemArrayMappedAddrSmbiosHandle;
   EFI_HANDLE                         Handle;
   CHAR8                              *SerialNumber;
-  UINT8                              SerialNumStrLen;
+  UINTN                              SerialNumStrLen;
   UINT8                              StringCount;
-  UINTN                              SerialNumberLength;
 
-  Handle      = NULL;
-  StringCount = 1;
+  Handle          = NULL;
+  StringCount     = 1;
+  SerialNumStrLen = 0;
+  SerialNumber    = NULL;
   //
   // Get platform Redfish host interface device type descriptor data.
   //
@@ -88,28 +89,13 @@ RedfishCreateSmbiosTable42 (
     DeviceDataLength = DeviceDescriptor->DeviceDescriptor.PciPcieDeviceV2.Length;
   } else {
     DeviceDataLength = DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.Length;
-    SerialNumStrLen  = 0;
-    SerialNumber     = NULL;
     Status           = RedfishPlatformHostInterfaceUsbSerialNumber (&SerialNumber);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "%a: Fail to get USB virtual serial number, %r.", __func__, Status));
       DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.SerialNumberStr = 0;
     } else {
       if (SerialNumber != NULL) {
-        // Check if the string length exceeds MAX_UINT8 (255)
-        SerialNumberLength = AsciiStrLen (SerialNumber);
-        if (SerialNumberLength > MAX_UINT8) {
-          DEBUG ((
-            DEBUG_ERROR,
-            "%a: SerialNumber length (%d) exceeds maximum allowed length for UINT8 (%d)\n",
-            __func__,
-            AsciiStrLen (SerialNumber),
-            MAX_UINT8
-            ));
-          return EFI_BAD_BUFFER_SIZE;
-        }
-
-        SerialNumStrLen                                                = (UINT8)SerialNumberLength;
+        SerialNumStrLen                                                = (UINTN)AsciiStrLen (SerialNumber);
         DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.SerialNumberStr = StringCount;
       }
     }
