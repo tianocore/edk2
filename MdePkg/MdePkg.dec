@@ -358,6 +358,10 @@
   #
   ArmLib|Include/Library/ArmLib.h
 
+  ##  @libraryclass  Provides a Mmu interface.
+  #
+  ArmMmuLib|Include/Library/ArmMmuLib.h
+
 [Guids]
   #
   # GUID defined in UEFI2.1/UEFI2.0/EFI1.1
@@ -2002,6 +2006,9 @@
   ## Include/Protocol/ShellDynamicCommand.h
   gEfiShellDynamicCommandProtocolGuid  = { 0x3c7200e9, 0x005f, 0x4ea4, {0x87, 0xde, 0xa3, 0xdf, 0xac, 0x8a, 0x27, 0xc3 }}
 
+[Protocols.ARM, Protocols.AARCH64]
+  gEfiHardwareInterruptProtocolGuid =  { 0x38121D9B, 0x4F4C, 0x3D40, { 0x90, 0xED, 0x47, 0xCB, 0xE4, 0x18, 0xD2, 0xF9 }}
+
 #
 # [Error.gEfiMdePkgTokenSpaceGuid]
 #   0x80000001 | Invalid value provided.
@@ -2059,6 +2066,12 @@
   #  testing purposes.
   # @Prompt Validate ORDERED_COLLECTION structure
   gEfiMdePkgTokenSpaceGuid.PcdValidateOrderedCollection|FALSE|BOOLEAN|0x0000002a
+
+[PcdsFeatureFlag.ARM, PcdsFeatureFlag.AARCH64]
+  # Whether to remap all unused memory NX before installing the CPU arch
+  # protocol driver. This is needed on platforms that map all DRAM with RWX
+  # attributes initially, and can be disabled otherwise.
+  gEfiMdePkgTokenSpaceGuid.PcdRemapUnusedMemoryNx|TRUE|BOOLEAN|0x00000060
 
 [PcdsFixedAtBuild]
   ## Status code value for indicating a watchdog timer has expired.
@@ -2498,6 +2511,11 @@
   ## GUID identifying the Rng algorithm implemented by CPU instruction.
   # @Prompt CPU Rng algorithm's GUID.
   gEfiMdePkgTokenSpaceGuid.PcdCpuRngSupportedAlgorithm|{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}|VOID*|0x00000037
+
+[PcdsFixedAtBuild.ARM, PcdsFixedAtBuild.AARCH64]
+  # This PCD should be a FeaturePcd. But we used this PCD as an '#if' in an ASM file.
+  # Using a FeaturePcd make a '(BOOLEAN) casting for its value which is not understood by the preprocessor.
+  gEfiMdePkgTokenSpaceGuid.PcdVFPEnabled|0|UINT32|0x00000061
 
 [PcdsFixedAtBuild.RISCV64, PcdsPatchableInModule.RISCV64]
   #

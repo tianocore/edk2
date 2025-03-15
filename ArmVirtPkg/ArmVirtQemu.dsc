@@ -246,7 +246,7 @@
   # point only, for entry point versions >= 3.0.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosEntryPointProvideMethod|0x2
 
-  gArmTokenSpaceGuid.PcdVFPEnabled|1
+  gEfiMdePkgTokenSpaceGuid.PcdVFPEnabled|1
 
 [PcdsDynamicDefault.common]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
@@ -380,7 +380,7 @@
   #
   # Architectural Protocols
   #
-  ArmPkg/Drivers/CpuDxe/CpuDxe.inf
+  UefiCpuPkg/CpuDxeArm/CpuDxe.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
     <LibraryClasses>

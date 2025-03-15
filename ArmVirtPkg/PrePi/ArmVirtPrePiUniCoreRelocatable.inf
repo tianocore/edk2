@@ -65,7 +65,7 @@
 [FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
 
-  gArmTokenSpaceGuid.PcdVFPEnabled
+  gEfiMdePkgTokenSpaceGuid.PcdVFPEnabled
 
   gArmTokenSpaceGuid.PcdFdSize
   gArmTokenSpaceGuid.PcdFvSize

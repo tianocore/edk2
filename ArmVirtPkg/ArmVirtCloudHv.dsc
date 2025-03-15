@@ -88,7 +88,7 @@
 
 [PcdsFixedAtBuild.common]
 !if $(ARCH) == AARCH64
-  gArmTokenSpaceGuid.PcdVFPEnabled|1
+  gEfiMdePkgTokenSpaceGuid.PcdVFPEnabled|1
 !endif
 
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x4007c000
@@ -244,7 +244,7 @@
   #
   # Architectural Protocols
   #
-  ArmPkg/Drivers/CpuDxe/CpuDxe.inf
+  UefiCpuPkg/CpuDxeArm/CpuDxe.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
     <LibraryClasses>

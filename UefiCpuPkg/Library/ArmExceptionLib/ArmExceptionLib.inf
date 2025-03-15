@@ -36,14 +36,21 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  ArmPkg/ArmPkg.dec
 
 [LibraryClasses]
   ArmLib
+  BaseLib
   BaseMemoryLib
   CacheMaintenanceLib
   DebugLib
-  DefaultExceptionHandlerLib
   MemoryAllocationLib
+  PeCoffGetEntryPointLib
+  PrintLib
+  SerialPortLib
+  UefiBootServicesTableLib
+  UefiLib
 
 [Pcd]
+
+[Guids]
+  gEfiDebugImageInfoTableGuid

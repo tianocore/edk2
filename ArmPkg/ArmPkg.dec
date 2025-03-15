@@ -41,10 +41,6 @@
   #
   ArmHvcLib|Include/Library/ArmHvcLib.h
 
-  ##  @libraryclass  Provides a Mmu interface.
-  #
-  ArmMmuLib|Include/Library/ArmMmuLib.h
-
   ##  @libraryclass  Provides a Mailbox Transport Layer (MTL) interface
   #   for the System Control and Management Interface (SCMI).
   #
@@ -62,10 +58,6 @@
   #   default conduit (HVC or SMC).
   #
   ArmMonitorLib|Include/Library/ArmMonitorLib.h
-
-  ##  @libraryclass  Provides a default exception handler.
-  #
-  DefaultExceptionHandlerLib|Include/Library/DefaultExceptionHandlerLib.h
 
   ##  @libraryclass  Provides an interface to query miscellaneous OEM
   #   information.
@@ -130,11 +122,6 @@
 [PcdsFeatureFlag.common]
   gArmTokenSpaceGuid.PcdCpuDxeProduceDebugSupport|FALSE|BOOLEAN|0x00000001
 
-  # Whether to remap all unused memory NX before installing the CPU arch
-  # protocol driver. This is needed on platforms that map all DRAM with RWX
-  # attributes initially, and can be disabled otherwise.
-  gArmTokenSpaceGuid.PcdRemapUnusedMemoryNx|TRUE|BOOLEAN|0x00000048
-
 [PcdsFeatureFlag.ARM]
   # Whether to map normal memory as non-shareable. FALSE is the safe choice, but
   # TRUE may be appropriate to fix performance problems if you don't care about
@@ -143,10 +130,6 @@
 
 [PcdsFixedAtBuild.common]
   gArmTokenSpaceGuid.PcdTrustzoneSupport|FALSE|BOOLEAN|0x00000006
-
-  # This PCD should be a FeaturePcd. But we used this PCD as an '#if' in an ASM file.
-  # Using a FeaturePcd make a '(BOOLEAN) casting for its value which is not understood by the preprocessor.
-  gArmTokenSpaceGuid.PcdVFPEnabled|0|UINT32|0x00000024
 
   gArmTokenSpaceGuid.PcdCpuResetAddress|0x00000000|UINT32|0x00000005
 

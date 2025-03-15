@@ -79,7 +79,7 @@
 
 [PcdsFixedAtBuild.common]
 !if $(ARCH) == AARCH64
-  gArmTokenSpaceGuid.PcdVFPEnabled|1
+  gEfiMdePkgTokenSpaceGuid.PcdVFPEnabled|1
 !endif
 
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
@@ -172,7 +172,7 @@
   #
   # Architectural Protocols
   #
-  ArmPkg/Drivers/CpuDxe/CpuDxe.inf
+  UefiCpuPkg/CpuDxeArm/CpuDxe.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
