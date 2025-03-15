@@ -127,7 +127,7 @@ InstallAndRegisterInterruptService (
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &gHardwareInterruptHandle,
-                  &gHardwareInterruptProtocolGuid,
+                  &gArmHardwareInterruptProtocolGuid,
                   InterruptProtocol,
                   &gHardwareInterrupt2ProtocolGuid,
                   Interrupt2Protocol,

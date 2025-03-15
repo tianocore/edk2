@@ -33,7 +33,6 @@
 
 [Packages]
   ArmPkg/ArmPkg.dec
-  EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
@@ -55,7 +54,7 @@
 [Protocols]
   gEfiCpuArchProtocolGuid
   gEfiMemoryAttributeProtocolGuid
-  gHardwareInterruptProtocolGuid
+  gArmHardwareInterruptProtocolGuid
 
 [Guids]
   gEfiDebugImageInfoTableGuid

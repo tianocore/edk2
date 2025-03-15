@@ -366,7 +366,7 @@ TimerInitialize (
   }
 
   // Find the interrupt controller protocol.  ASSERT if not found.
-  Status = gBS->LocateProtocol (&gHardwareInterruptProtocolGuid, NULL, (VOID **)&gInterrupt);
+  Status = gBS->LocateProtocol (&gArmHardwareInterruptProtocolGuid, NULL, (VOID **)&gInterrupt);
   ASSERT_EFI_ERROR (Status);
 
   // Disable the timer

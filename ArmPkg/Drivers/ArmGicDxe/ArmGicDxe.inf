@@ -49,9 +49,9 @@
   UefiLib
 
 [Protocols]
-  gHardwareInterruptProtocolGuid  ## PRODUCES
-  gHardwareInterrupt2ProtocolGuid ## PRODUCES
-  gEfiCpuArchProtocolGuid         ## CONSUMES
+  gArmHardwareInterruptProtocolGuid  ## PRODUCES
+  gHardwareInterrupt2ProtocolGuid    ## PRODUCES
+  gEfiCpuArchProtocolGuid            ## CONSUMES
 
 [Pcd.common]
   gArmTokenSpaceGuid.PcdGicDistributorBase

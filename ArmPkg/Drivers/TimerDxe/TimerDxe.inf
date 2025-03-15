@@ -41,7 +41,7 @@
 
 [Protocols]
   gEfiTimerArchProtocolGuid
-  gHardwareInterruptProtocolGuid
+  gArmHardwareInterruptProtocolGuid
 
 [Pcd.common]
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod
@@ -51,4 +51,4 @@
   gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum
 
 [Depex]
-  gHardwareInterruptProtocolGuid
+  gArmHardwareInterruptProtocolGuid

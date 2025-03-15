@@ -363,7 +363,7 @@ SP805Initialize (
 
   // Find the interrupt controller protocol.  ASSERT if not found.
   Status = gBS->LocateProtocol (
-                  &gHardwareInterruptProtocolGuid,
+                  &gArmHardwareInterruptProtocolGuid,
                   NULL,
                   (VOID **)&mInterrupt
                   );

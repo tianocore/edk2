@@ -608,7 +608,7 @@ GicV3DxeInitialize (
 
   // Make sure the Interrupt Controller Protocol is not already installed in
   // the system.
-  ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gHardwareInterruptProtocolGuid);
+  ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gArmHardwareInterruptProtocolGuid);
 
   // Locate the CPU arch protocol - cannot fail because of DEPEX
   Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&gCpuArch);

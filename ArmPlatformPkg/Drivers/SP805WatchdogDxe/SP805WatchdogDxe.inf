@@ -22,7 +22,6 @@
 [Packages]
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
-  EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
@@ -39,8 +38,8 @@
   gArmPlatformTokenSpaceGuid.PcdSP805WatchdogInterrupt
 
 [Protocols]
-  gHardwareInterruptProtocolGuid          ## ALWAYS_CONSUMES
+  gArmHardwareInterruptProtocolGuid       ## ALWAYS_CONSUMES
   gEfiWatchdogTimerArchProtocolGuid       ## ALWAYS_PRODUCES
 
 [Depex]
-  gHardwareInterruptProtocolGuid
+  gArmHardwareInterruptProtocolGuid
