@@ -586,6 +586,13 @@ Returns:
     }
   }
 
+  if (InfFileName != NULL) {
+    Status = ReadXipFile (InfFileName);
+    if (EFI_ERROR (Status)) {
+      return STATUS_WARNING;
+    }
+  }
+
   if (DumpCapsule) {
     VerboseMsg ("Dump the capsule header information for the input capsule image %s", InfFileName);
     //
