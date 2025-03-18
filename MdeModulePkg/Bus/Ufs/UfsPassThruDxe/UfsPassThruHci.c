@@ -1808,7 +1808,7 @@ UfsAllocateAlignCommonBuffer (
   if (EFI_ERROR (Status) || (Bytes != EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (Size)))) {
     UfsHc->FreeBuffer (
              UfsHc,
-             EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (Size)),
+             EFI_SIZE_TO_PAGES (Size),
              *CmdDescHost
              );
     *CmdDescHost = NULL;
@@ -1825,7 +1825,7 @@ UfsAllocateAlignCommonBuffer (
              );
     UfsHc->FreeBuffer (
              UfsHc,
-             EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (Size)),
+             EFI_SIZE_TO_PAGES (Size),
              *CmdDescHost
              );
     *CmdDescMapping = NULL;
