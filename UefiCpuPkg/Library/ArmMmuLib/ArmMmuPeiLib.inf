@@ -9,31 +9,22 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = ArmMmuBaseLib
-  FILE_GUID                      = da8f0232-fb14-42f0-922c-63104d2c70bd
-  MODULE_TYPE                    = BASE
+  BASE_NAME                      = ArmMmuPeiLib
+  FILE_GUID                      = b50d8d53-1ad1-44ea-9e69-8c89d4a6d08b
+  MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ArmMmuLib
-
-[Defines.AARCH64]
-  CONSTRUCTOR                    = ArmMmuBaseLibConstructor
+  LIBRARY_CLASS                  = ArmMmuLib|PEIM
+  CONSTRUCTOR                    = ArmMmuPeiLibConstructor
 
 [Sources.AARCH64]
   ArmMmuLibInternal.h
   AArch64/ArmMmuLibCore.c
+  AArch64/ArmMmuPeiLibConstructor.c
   AArch64/ArmMmuLibReplaceEntry.S
 
-[Sources.ARM]
-  ArmMmuLibInternal.h
-  Arm/ArmMmuLibConvert.c
-  Arm/ArmMmuLibCore.c
-  Arm/ArmMmuLibUpdate.c
-  Arm/ArmMmuLibV7Support.S   |GCC
-
 [Packages]
-  ArmPkg/ArmPkg.dec
-  EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   ArmLib
