@@ -31,8 +31,6 @@
   Arm/ArmMmuLibV7Support.S   |GCC
 
 [Packages]
-  ArmPkg/ArmPkg.dec
-  EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
