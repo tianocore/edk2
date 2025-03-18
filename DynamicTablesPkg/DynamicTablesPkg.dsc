@@ -51,6 +51,7 @@
   DynamicTablesPkg/Library/Common/SmbiosStringTableLib/SmbiosStringTableLib.inf
   DynamicTablesPkg/Library/Common/MetadataObjLib/MetadataObjLib.inf
   DynamicTablesPkg/Library/Common/MetadataHandlerLib/MetadataHandlerLib.inf
+  DynamicTablesPkg/Library/Common/Tpm2DeviceTableLib/Tpm2DeviceTableLib.inf
 
 [Components.ARM, Components.AARCH64]
   DynamicTablesPkg/Library/FdtHwInfoParserLib/FdtHwInfoParserLib.inf
