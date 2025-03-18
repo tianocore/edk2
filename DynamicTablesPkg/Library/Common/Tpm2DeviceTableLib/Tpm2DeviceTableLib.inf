@@ -1,0 +1,33 @@
+## @file
+#  Tpm2 Device table generating library
+#
+#  Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = DynamicTpm2DeviceTableLib
+  FILE_GUID      = b09d0390-0400-11f0-a447-cfc17b482322
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = Tpm2DeviceTableLib
+
+[Sources]
+  Tpm2DeviceTableLib.c
+  Tpm2DeviceTableTemplate.asl
+
+[Packages.common]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[Packages.ARM, Packages.AARCH64]
+  ArmPkg/ArmPkg.dec
+
+[LibraryClasses]
+  AcpiHelperLib
+  AmlLib
+  BaseLib
