@@ -1,20 +1,18 @@
 /** @file
-  This library is TPM2 DTPM device lib.
+  This library is a TPM2 DTPM instance, supporting SVSM based vTPMs and regular
+  TPM2s at the same time.
   Choosing this library means platform uses and only uses DTPM device as TPM2 engine.
 
-Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2024 Red Hat
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/DebugLib.h>
 #include <Library/Tpm2DeviceLib.h>
-#include <Library/PcdLib.h>
 
-#include "Tpm2Ptp.h"
 #include "Tpm2DeviceLibDTpm.h"
+#include "Tpm2PtpSvsmShim.h"
 
 /**
   This service enables the sending of commands to the TPM2.
@@ -37,7 +35,7 @@ Tpm2SubmitCommand (
   IN UINT8       *OutputParameterBlock
   )
 {
-  return DTpm2SubmitCommand (
+  return SvsmDTpm2SubmitCommand (
            InputParameterBlockSize,
            InputParameterBlock,
            OutputParameterBlockSize,
@@ -58,7 +56,7 @@ Tpm2RequestUseTpm (
   VOID
   )
 {
-  return DTpm2RequestUseTpm ();
+  return SvsmDTpm2RequestUseTpm ();
 }
 
 /**
@@ -80,15 +78,19 @@ Tpm2RegisterTpm2DeviceLib (
 }
 
 /**
-  The function caches current active TPM interface type.
+  Initialize the library and cache SVSM vTPM presence state and TPM interface type, if applicable.
 
   @retval EFI_SUCCESS   DTPM2.0 instance is registered, or system does not support registering a DTPM2.0 instance
 **/
 EFI_STATUS
 EFIAPI
-Tpm2DeviceLibConstructor (
+Tpm2DeviceLibConstructorSvsm (
   VOID
   )
 {
-  return InternalTpm2DeviceLibDTpmCommonConstructor ();
+  if (TryUseSvsmVTpm ()) {
+    return EFI_SUCCESS;
+  } else {
+    return InternalTpm2DeviceLibDTpmCommonConstructor ();
+  }
 }
