@@ -2078,6 +2078,12 @@
   # @Prompt Validate ORDERED_COLLECTION structure
   gEfiMdePkgTokenSpaceGuid.PcdValidateOrderedCollection|FALSE|BOOLEAN|0x0000002a
 
+[PcdsFeatureFlag.ARM]
+  # Whether to map normal memory as non-shareable. FALSE is the safe choice, but
+  # TRUE may be appropriate to fix performance problems if you don't care about
+  # hardware coherency (i.e., no virtualization or cache coherent DMA)
+  gEfiMdePkgTokenSpaceGuid.PcdNormalMemoryNonshareableOverride|FALSE|BOOLEAN|0x00000060
+
 [PcdsFixedAtBuild]
   ## Status code value for indicating a watchdog timer has expired.
   # EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_TIMER_EXPIRED
