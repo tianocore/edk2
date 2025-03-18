@@ -44,6 +44,3 @@
 
 [Guids]
   gArmMmuReplaceLiveTranslationEntryFuncGuid
-
-[Pcd.ARM]
-  gArmTokenSpaceGuid.PcdNormalMemoryNonshareableOverride
