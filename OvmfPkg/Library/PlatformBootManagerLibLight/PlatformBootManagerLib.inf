@@ -71,6 +71,7 @@
   gEfiGlobalVariableGuid
   gRootBridgesConnectedEventGroupGuid
   gUefiShellFileGuid
+  gUiAppFileGuid
 
 [Protocols]
   gEfiFirmwareVolume2ProtocolGuid

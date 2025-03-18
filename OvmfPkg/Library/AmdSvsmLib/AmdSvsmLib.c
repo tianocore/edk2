@@ -213,8 +213,8 @@ SvsmPvalidate (
   Caa = (SVSM_CAA *)AmdSvsmSnpGetCaa ();
   ZeroMem (Caa->SvsmBuffer, sizeof (Caa->SvsmBuffer));
 
-  Function.Id.Protocol = 0;
-  Function.Id.CallId   = 1;
+  Function.Id.Protocol = SVSM_PROTOCOL_CORE;
+  Function.Id.CallId   = SVSM_CORE_PVALIDATE;
 
   Request    = (SVSM_PVALIDATE_REQUEST *)Caa->SvsmBuffer;
   EntryLimit = ((sizeof (Caa->SvsmBuffer) - sizeof (*Request)) /
@@ -407,17 +407,17 @@ SvsmVmsaRmpAdjust (
 
   SvsmCallData.Caa = (SVSM_CAA *)AmdSvsmSnpGetCaa ();
 
-  Function.Id.Protocol = 0;
+  Function.Id.Protocol = SVSM_PROTOCOL_CORE;
 
   if (SetVmsa) {
-    Function.Id.CallId = 2;
+    Function.Id.CallId = SVSM_CORE_CREATE_VCPU;
 
     SvsmCallData.RaxIn = Function.Uint64;
     SvsmCallData.RcxIn = (UINT64)(UINTN)Vmsa;
     SvsmCallData.RdxIn = (UINT64)(UINTN)Vmsa + SIZE_4KB;
     SvsmCallData.R8In  = ApicId;
   } else {
-    Function.Id.CallId = 3;
+    Function.Id.CallId = SVSM_CORE_DELETE_VCPU;
 
     SvsmCallData.RaxIn = Function.Uint64;
     SvsmCallData.RcxIn = (UINT64)(UINTN)Vmsa;
@@ -497,4 +497,99 @@ AmdSvsmSnpVmsaRmpAdjust (
 {
   return AmdSvsmIsSvsmPresent () ? SvsmVmsaRmpAdjust (Vmsa, ApicId, SetVmsa)
                                 : BaseVmsaRmpAdjust (Vmsa, SetVmsa);
+}
+
+/**
+  Perform a SVSM_VTPM_QUERY operation
+
+  Query the support provided by the SVSM vTPM.
+
+  @param[out] PlatformCommands    It will contain a bitmap indicating the
+                                  supported vTPM platform commands.
+  @param[out] Features            It will contain a bitmap indicating the
+                                  supported vTPM features.
+
+  @retval TRUE                    The query was processed.
+  @retval FALSE                   The query was not processed.
+
+**/
+BOOLEAN
+EFIAPI
+AmdSvsmVtpmQuery (
+  OUT UINT64  *PlatformCommands,
+  OUT UINT64  *Features
+  )
+{
+  SVSM_CALL_DATA  SvsmCallData;
+  SVSM_FUNCTION   Function;
+  UINTN           Ret;
+
+  if (!PlatformCommands && !Features) {
+    return FALSE;
+  }
+
+  if (!AmdSvsmIsSvsmPresent ()) {
+    return FALSE;
+  }
+
+  Function.Id.Protocol = SVSM_PROTOCOL_VTPM;
+  Function.Id.CallId   = SVSM_VTPM_QUERY;
+
+  SvsmCallData.Caa   = (SVSM_CAA *)AmdSvsmSnpGetCaa ();
+  SvsmCallData.RaxIn = Function.Uint64;
+
+  Ret = SvsmMsrProtocol (&SvsmCallData);
+  if (Ret != 0) {
+    return FALSE;
+  }
+
+  if (PlatformCommands) {
+    *PlatformCommands = SvsmCallData.RcxOut;
+  }
+
+  if (Features) {
+    *Features = SvsmCallData.RdxOut;
+  }
+
+  return TRUE;
+}
+
+/**
+  Perform a SVSM_VTPM_CMD operation
+
+  Send the specified vTPM platform command to the SVSM vTPM.
+
+  @param[in, out] Buffer  It should contain the vTPM platform command
+                          request. The respective response will be returned
+                          in the same Buffer, but not all commands specify a
+                          response.
+
+  @retval TRUE            The command was processed.
+  @retval FALSE           The command was not processed.
+
+**/
+BOOLEAN
+EFIAPI
+AmdSvsmVtpmCmd (
+  IN OUT UINT8  *Buffer
+  )
+{
+  SVSM_CALL_DATA  SvsmCallData;
+  SVSM_FUNCTION   Function;
+  UINTN           Ret;
+
+  if (!AmdSvsmIsSvsmPresent ()) {
+    return FALSE;
+  }
+
+  Function.Id.Protocol = SVSM_PROTOCOL_VTPM;
+  Function.Id.CallId   = SVSM_VTPM_CMD;
+
+  SvsmCallData.Caa   = (SVSM_CAA *)AmdSvsmSnpGetCaa ();
+  SvsmCallData.RaxIn = Function.Uint64;
+  SvsmCallData.RcxIn = (UINT64)(UINTN)Buffer;
+
+  Ret = SvsmMsrProtocol (&SvsmCallData);
+
+  return (Ret == 0) ? TRUE : FALSE;
 }

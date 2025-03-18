@@ -7,11 +7,6 @@
 
   @par Reference(s):
     - https://github.com/FirmwareHandoff/firmware_handoff
-
-  @par Glossary:
-    - TL - Transfer list
-    - TE - Transfer entry
-    - HOB - Hand off block.
 **/
 
 #ifndef ARM_TRANSFER_LIST_LIB_
@@ -26,49 +21,50 @@
 /**
   Return the first Transfer Entry Node in the Transfer List.
 
-  @param [in]   Tlh       TransferListHeader
+  @param [in]   TransferListHeader     TransferListHeader
 
   @return Pointer to the Transfer Entry Node if successful otherwise NULL
 
 **/
 TRANSFER_ENTRY_HEADER *
 EFIAPI
-TlGetFirstEntry (
-  IN TRANSFER_LIST_HEADER  *Tlh
+TransferListGetFirstEntry (
+  IN TRANSFER_LIST_HEADER  *TransferListHeader
   );
 
 /**
   Return the next Transfer Entry Node in the Transfer List from
   last Transfer Entry Node.
 
-  @param [in]   Tlh        TransferListHeader
-  @param [in]   CurrentTe  Pointer to the Current Transfer Entry.
-                           If this is NULL, the first Transfer Entry is returned.
-
-  @return Pointer to the next Transfer Entry Node if successful otherwise NULL
-
-**/
-TRANSFER_ENTRY_HEADER *
-EFIAPI
-TlGetNextEntry (
-  IN TRANSFER_LIST_HEADER   *Tlh,
-  IN TRANSFER_ENTRY_HEADER  *CurrentTe
-  );
-
-/**
-  Return the first Transfer Entry Node in the Transfer List
-  matched with given tag-id.
-
-  @param [in]   Tlh       TransferListHeader
-  @param [in]   TagId     Tag id
+  @param [in]   TransferListHeader     Pointer to the Transfer List Header.
+  @param [in]   CurrentEntry           Pointer to the Current Transfer Entry.
+                                       If this is NULL, the first Transfer Entry
+                                       is returned.
 
   @return Pointer to the Transfer Entry Node if successful otherwise NULL
 
 **/
 TRANSFER_ENTRY_HEADER *
 EFIAPI
-TlFindFirstEntry (
-  IN TRANSFER_LIST_HEADER  *Tlh,
+TransferListGetNextEntry (
+  IN TRANSFER_LIST_HEADER   *TransferListHeader,
+  IN TRANSFER_ENTRY_HEADER  *CurrentEntry
+  );
+
+/**
+  Return the first Transfer Entry Node in the Transfer List
+  matched with given tag-id.
+
+  @param [in]   TransferListHeader     Pointer to the Transfer List Header.
+  @param [in]   TagId                  Tag id
+
+  @return Pointer to the Transfer Entry Node if successful otherwise NULL
+
+**/
+TRANSFER_ENTRY_HEADER *
+EFIAPI
+TransferListFindFirstEntry (
+  IN TRANSFER_LIST_HEADER  *TransferListHeader,
   IN UINT16                TagId
   );
 
@@ -76,34 +72,35 @@ TlFindFirstEntry (
   Return the Next Transfer Entry Node in the Transfer List
   matched with given tag-id from last Transfer Entry Node.
 
-  @param [in]   Tlh        TransferListHeader
-  @param [in]   CurrentTe  Pointer to the Current Transfer Entry.
-                           If this is NULL, the first Transfer Entry is returned.
-  @param [in]   TagId      Tag id
+  @param [in]   TransferListHeader     Pointer to the Transfer List Header.
+  @param [in]   CurrentEntry           Pointer to the Current Transfer Entry.
+                                       If this is NULL, the first Transfer Entry
+                                       is returned.
+  @param [in]   TagId                  Tag id
 
   @return Pointer to the Transfer Entry Node if successful otherwise NULL
 
 **/
 TRANSFER_ENTRY_HEADER *
 EFIAPI
-TlFindNextEntry (
-  IN TRANSFER_LIST_HEADER   *Tlh,
-  IN TRANSFER_ENTRY_HEADER  *CurrentTe,
+TransferListFindNextEntry (
+  IN TRANSFER_LIST_HEADER   *TransferListHeader,
+  IN TRANSFER_ENTRY_HEADER  *CurrentEntry,
   IN UINT16                 TagId
   );
 
 /**
   Return the data in Transfer Entry.
 
-   @param [in]   Te       TransferEntryHeader
+  @param [in]   TransferEntry          Pointer to a Transfer Entry Header
 
-   @return Pointer to the Data of Transfer Entry Node if successful otherwise NULL
+  @return Pointer to the Data of Transfer Entry Node if successful otherwise NULL
 
 **/
 VOID *
 EFIAPI
-TlGetEntryData (
-  IN TRANSFER_ENTRY_HEADER  *Te
+TransferListGetEntryData (
+  IN TRANSFER_ENTRY_HEADER  *TransferEntry
   );
 
 #endif // ARM_TRANSFER_LIST_LIB_

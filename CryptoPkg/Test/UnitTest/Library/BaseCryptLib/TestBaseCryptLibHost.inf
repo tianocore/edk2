@@ -21,6 +21,7 @@
 
 [Sources]
   UnitTestMain.c
+  UnitTestMainHost.c
   BaseCryptLibUnitTests.c
   TestBaseCryptLib.h
   HashTests.c
