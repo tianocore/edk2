@@ -37,8 +37,8 @@ EFI_PEI_SERVICES  mPeiServices = {
   UnitTestFfsFindSectionData, // FfsFindSectionData
 
   UnitTestInstallPeiMemory, // InstallPeiMemory
-  UnitTestAllocatePages,    // AllocatePages
-  UnitTestAllocatePool,     // AllocatePool
+  UnitTestPeiAllocatePages, // AllocatePages
+  UnitTestPeiAllocatePool,  // AllocatePool
   (EFI_PEI_COPY_MEM)CopyMem,
   (EFI_PEI_SET_MEM)SetMem,
 
@@ -55,7 +55,7 @@ EFI_PEI_SERVICES  mPeiServices = {
   UnitTestFfsFindSectionData3, // FfsFindSectionData3
   UnitTestFfsGetFileInfo2,     // FfsGetFileInfo2
   UnitTestResetSystem2,        // ResetSystem2
-  UnitTestFreePages,           // FreePages
+  UnitTestPeiFreePages,        // FreePages
 };
 
 PEI_CORE_INSTANCE  mPrivateData;
