@@ -464,6 +464,18 @@
   # @Prompt TPM device address.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0xFED40000|UINT64|0x00010012
 
+  ## This PCD indicates internal TPM base address.<BR><BR>
+  # @Prompt TPM device base address.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInternalBaseAddress|0x10000200000|UINT64|0x0001002A
+
+  ## This PCD indicates TPM max address.<BR><BR>
+  # @Prompt TPM device max address.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmMaxAddress|0xFED44FFF|UINT64|0x00010029
+
+  ## This PCD indicates the size of the TPM CRB region.<BR><BR>
+  # @Prompt TPM device CRB region size.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmCrbRegionSize|0x5000|UINT32|0x0001002C
+
   ## This PCR means the OEM configured number of PCR banks.
   #  0 means dynamic get from supported HASH algorithm
   # @Prompt OEM configured number of PCR banks.
@@ -617,6 +629,11 @@
   ## This PCD stores the pointer to the communication buffer for a
   #   AMD SEV-SNP SVSM-provided vTPM.
   gEfiSecurityPkgTokenSpaceGuid.PcdSvsmVTpmBufferPtr|0|UINT64|0x00020031
+
+  ## This PCD defines the partition ID for TPM Service.
+  # The default value of PcdTpmServiceFfaPartitionId is 0x0, a setting that the
+  # FF-A framework should never assign.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmServiceFfaPartitionId|0|UINT16|0x0001002B
 
 [PcdsFeatureFlag]
   ## Indicates if the platform requires PK to be self-signed when setting the PK in setup mode.
