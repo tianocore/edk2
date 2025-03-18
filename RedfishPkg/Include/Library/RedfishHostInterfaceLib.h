@@ -76,7 +76,7 @@ RedfishPlatformHostInterfaceNotification (
   );
 
 /**
-  Get USB Virtual Serial Number.
+  Get USB Serial Number.
 
   @param[OUT] SerialNumber      Pointer to retrieve complete serial number.
 
@@ -84,7 +84,7 @@ RedfishPlatformHostInterfaceNotification (
   @retval Others              Failed to get the serial number.
 **/
 EFI_STATUS
-RedfishPlatformHostInterfaceUsbSerialNumber (
+RedfishPlatformHostInterfaceSerialNumber (
   OUT CHAR8  **SerialNumber
   );
 
