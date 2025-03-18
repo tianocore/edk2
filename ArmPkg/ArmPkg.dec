@@ -115,12 +115,6 @@
   # attributes initially, and can be disabled otherwise.
   gArmTokenSpaceGuid.PcdRemapUnusedMemoryNx|TRUE|BOOLEAN|0x00000048
 
-[PcdsFeatureFlag.ARM]
-  # Whether to map normal memory as non-shareable. FALSE is the safe choice, but
-  # TRUE may be appropriate to fix performance problems if you don't care about
-  # hardware coherency (i.e., no virtualization or cache coherent DMA)
-  gArmTokenSpaceGuid.PcdNormalMemoryNonshareableOverride|FALSE|BOOLEAN|0x00000043
-
 [PcdsFixedAtBuild.common]
   gArmTokenSpaceGuid.PcdTrustzoneSupport|FALSE|BOOLEAN|0x00000006
 
