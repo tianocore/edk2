@@ -173,6 +173,10 @@ LongModeStart:
     lock xadd  dword [edi], ebx                 ; EBX = ApIndex++
     inc        ebx                              ; EBX is CpuNumber
 
+    ; If running under AMD SEV-SNP and starting with a known ApicId,
+    ; adjust EBX to be the actual CpuNumber
+    OneTimeCall SevSnpGetInitCpuNumber
+
     ; program stack
     mov        edi, esi
     add        edi, MP_CPU_EXCHANGE_INFO_FIELD (StackSize)
