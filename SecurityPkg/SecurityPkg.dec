@@ -170,6 +170,10 @@
   #  Include/Guid/Tcg2PhysicalPresenceData.h
   gEfiTcg2PhysicalPresenceGuid = { 0xaeb9c5c1, 0x94f1, 0x4d02, { 0xbf, 0xd9, 0x46, 0x2, 0xdb, 0x2d, 0x3c, 0x54 }}
 
+  ## GUID used to invoke ACPI functions reside in _DSM control method object for TPM2 to support physical presence.
+  #  Include/Guid/Tcg2PhysicalPresenceData.h
+  gEfiPhysicalPresenceAcpiGuid       = { 0x3DDDFAA6, 0x361B, 0x4eb4, { 0xA4, 0x24, 0x8D, 0x10, 0x08, 0x9D, 0x16, 0x53 }}
+
   ## GUID used for FormSet guid and user profile variable.
   # Include/Guid/UserIdentifyManagerHii.h
   gUserIdentifyManagerGuid           = { 0x3ccd3dd8, 0x8d45, 0x4fed, { 0x96, 0x2d, 0x2b, 0x38, 0xcd, 0x82, 0xb3, 0xc4 }}
