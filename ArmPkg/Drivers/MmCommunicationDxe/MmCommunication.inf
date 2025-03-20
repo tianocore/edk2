@@ -41,6 +41,7 @@
   UefiDriverEntryPoint
 
 [Protocols]
+  gEfiDxeMmReadyToLockProtocolGuid              ## UNDEFINED # SmiHandlerRegister
   gEfiMmCommunication2ProtocolGuid              ## PRODUCES
 
 [Guids]
