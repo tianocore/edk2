@@ -8,6 +8,33 @@
 **/
 
 #include "StatusCodeHandlerMm.h"
+#include <Guid/MmStatusCodeUseSerial.h>
+#include <Library/HobLib.h>
+
+/**
+  Check if the status code is using serial port.
+
+  This function determines whether the status code reporting mechanism
+  is configured to use the serial port.
+
+  @retval TRUE   Status code is using the serial port.
+  @retval FALSE  Status code is not using the serial port.
+**/
+BOOLEAN
+IsStatusCodeUsingSerialPort (
+  VOID
+  )
+{
+  VOID                       *Hob;
+  MM_STATUS_CODE_USE_SERIAL  *StatusCodeUseSerialHob;
+
+  Hob = GetFirstGuidHob (&gMmStatusCodeUseSerialHobGuid);
+  ASSERT (Hob != NULL);
+
+  StatusCodeUseSerialHob = (MM_STATUS_CODE_USE_SERIAL *)GET_GUID_HOB_DATA (Hob);
+
+  return StatusCodeUseSerialHob->StatusCodeUseSerial;
+}
 
 /**
   Entry point of Standalone MM Status Code Driver.

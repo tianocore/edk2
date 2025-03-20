@@ -35,6 +35,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
 
 [LibraryClasses]
   SerialPortLib
@@ -46,16 +47,17 @@
   DebugLib
   MemoryAllocationLib
   BaseMemoryLib
+  HobLib
 
 [Guids]
   gEfiStatusCodeDataTypeStringGuid              ## SOMETIMES_CONSUMES   ## UNDEFINED
   gMemoryStatusCodeRecordGuid                   ## SOMETIMES_PRODUCES   ## UNDEFINED # MmSystemTable
+  gMmStatusCodeUseSerialHobGuid                 ## CONSUMES
 
 [Protocols]
   gEfiMmRscHandlerProtocolGuid                  ## CONSUMES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize |128| gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory   ## SOMETIMES_CONSUMES
 
