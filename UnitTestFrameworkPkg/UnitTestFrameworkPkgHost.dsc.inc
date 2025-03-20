@@ -8,6 +8,9 @@
 
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgCommon.dsc.inc
 
+[Defines]
+  UNIT_TESTING_ADDRESS_SANITIZER_ENABLE = TRUE
+
 [LibraryClasses.common.HOST_APPLICATION]
   BaseLib|MdePkg/Library/BaseLib/UnitTestHostBaseLib.inf
   UnitTestHostBaseLib|MdePkg/Library/BaseLib/UnitTestHostBaseLib.inf
@@ -20,16 +23,25 @@
   UnitTestLib|UnitTestFrameworkPkg/Library/UnitTestLib/UnitTestLibCmocka.inf
   DebugLib|UnitTestFrameworkPkg/Library/Posix/DebugLibPosix/DebugLibPosix.inf
   MemoryAllocationLib|UnitTestFrameworkPkg/Library/Posix/MemoryAllocationLibPosix/MemoryAllocationLibPosix.inf
+  HostMemoryAllocationBelowAddressLib|UnitTestFrameworkPkg/Library/Posix/MemoryAllocationLibPosix/MemoryAllocationLibPosix.inf
   UefiBootServicesTableLib|UnitTestFrameworkPkg/Library/UnitTestUefiBootServicesTableLib/UnitTestUefiBootServicesTableLib.inf
   PeiServicesTablePointerLib|UnitTestFrameworkPkg/Library/UnitTestPeiServicesTablePointerLib/UnitTestPeiServicesTablePointerLib.inf
   NULL|UnitTestFrameworkPkg/Library/UnitTestDebugAssertLib/UnitTestDebugAssertLibHost.inf
   NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNullHostApplication.inf
 
 [BuildOptions]
-  MSFT:*_*_*_CC_FLAGS = /MT
+  MSFT:*_*_*_CC_FLAGS = /MTd
   GCC:*_*_*_CC_FLAGS = -fno-pie
+!if $(UNIT_TESTING_ADDRESS_SANITIZER_ENABLE)
+  #
+  # Enable Address Sanitizer for VS2019, VS2022, and GCC
+  #
+  MSFT:*_VS2019_*_CC_FLAGS = /fsanitize=address
+  MSFT:*_VS2022_*_CC_FLAGS = /fsanitize=address
+  GCC:*_*_*_CC_FLAGS = -fsanitize=address
+!endif
 !ifdef $(UNIT_TESTING_DEBUG)
-  MSFT:*_*_*_CC_FLAGS  = /MTd -D UNIT_TESTING_DEBUG=1
+  MSFT:*_*_*_CC_FLAGS  = -D UNIT_TESTING_DEBUG=1
   GCC:*_*_*_CC_FLAGS   = -D UNIT_TESTING_DEBUG=1
   XCODE:*_*_*_CC_FLAGS = -D UNIT_TESTING_DEBUG=1
 !endif
@@ -41,9 +53,7 @@
   # MSFT
   #
   MSFT:*_*_*_CC_FLAGS               = /EHs
-  MSFT:*_*_*_DLINK_FLAGS            == /out:"$(BIN_DIR)\$(MODULE_NAME_GUID).exe" /pdb:"$(BIN_DIR)\$(MODULE_NAME_GUID).pdb" /IGNORE:4001 /NOLOGO /SUBSYSTEM:CONSOLE /DEBUG /STACK:0x40000,0x40000 /WHOLEARCHIVE
-  MSFT:*_*_IA32_DLINK_FLAGS         = /MACHINE:I386
-  MSFT:*_*_X64_DLINK_FLAGS          = /MACHINE:AMD64
+  MSFT:*_*_*_DLINK_FLAGS            == /nologo /SUBSYSTEM:CONSOLE /DEBUG /out:"$(BIN_DIR)\$(MODULE_NAME_GUID).exe" /pdb:"$(BIN_DIR)\$(MODULE_NAME_GUID).pdb" /WHOLEARCHIVE
 
   MSFT:*_VS2015_IA32_DLINK_FLAGS    = /LIBPATH:"%VS2015_PREFIX%Lib" /LIBPATH:"%VS2015_PREFIX%VC\Lib" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x86"
   MSFT:*_VS2015x86_IA32_DLINK_FLAGS = /LIBPATH:"%VS2015_PREFIX%Lib" /LIBPATH:"%VS2015_PREFIX%VC\Lib" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x86"
@@ -68,6 +78,12 @@
   #
   GCC:*_*_*_DLINK_FLAGS    = -Wl,--whole-archive
   GCC:*_*_*_DLINK2_FLAGS   == -Wl,--no-whole-archive -lgcov -lpthread -lstdc++ -lm
+!if $(UNIT_TESTING_ADDRESS_SANITIZER_ENABLE)
+  #
+  # Enable Address Sanitizer for GCC for HOST_APPLICATION
+  #
+  GCC:*_*_*_DLINK_FLAGS    = -fsanitize=address
+!endif
 
   #
   # Need to do this link via gcc and not ld as the pathing to libraries changes from OS version to OS version

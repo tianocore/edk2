@@ -806,8 +806,6 @@ typedef UINTN *BASE_LIST;
 #define STATIC_ASSERT  _Static_assert
 #elif defined (_MSC_EXTENSIONS)
 #define STATIC_ASSERT  static_assert
-#else
-  #error STATIC_ASSERT() definiton not available
 #endif
 
 //

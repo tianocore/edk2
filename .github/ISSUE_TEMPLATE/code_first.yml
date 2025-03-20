@@ -1,0 +1,122 @@
+# TianoCore edk2 GitHub Code First Template
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+name: </> Code First
+description: Code first tracking issue
+title: "[Code First]: <title>"
+labels: ["type:code-first"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        👋 Only use this issue form for changes following the "code first" process described in [EDK II Code First Process](https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Code-First-Process).
+
+        **Read that document before filing this issue.**
+
+  - type: textarea
+    id: overview
+    attributes:
+      label: Code First Item Overview
+      description: Provide a brief overview of the overall code first change.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: specs_impacted
+    attributes:
+      label: What specification(s) are directly related?
+      description: |
+        *Select all that apply*
+      multiple: true
+      options:
+        - ACPI
+        - Platform Initialization (PI)
+        - UEFI
+        - UEFI PI Distribution Packaging
+        - UEFI Shell
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        **Specification Draft Template**
+
+        For the template below, the title and complete description of the specification changes must be provided in the
+        specification text along with the name and version of the specification the change applies. The `Status` of the
+        specification change always starts in the `Draft` state and is updated based on feedback from the industry
+        standard forums. The contents of the specification text are required to use the
+        [Creative Commons Attribution 4.0 International](https://spdx.org/licenses/CC-BY-4.0.html) license using a
+        `SPDX-License-Identifier` statement.
+
+        - "Required" sections must be completed.
+        - Include a modified template for each specification impacted (if more than one).
+        - Include a copy of the completed template in a markdown file in the code changes.
+          - If more than one template is completed, place each in a separate markdown file.
+
+        ---
+
+        Template text for reference (using the GitHub flavor of markdown):
+
+        ```markdown
+        # Title: [Must be Filled In]
+
+        ## Status: [Status]
+
+        [Status] must be one of the following:
+        - Draft
+        - Submitted to industry standard forum
+        - Accepted by industry standard forum
+        - Accepted by industry standard forum with modifications
+        - Rejected by industry standard forum
+
+        ## Document: [Title and Version]
+
+        Here are some examples of [Title and Version]:
+        - UEFI Specification Version 2.8
+        - ACPI Specification Version 6.3
+        - UEFI Shell Specification Version 2.2
+        - UEFI Platform Initialization Specification Version 1.7
+        - UEFI Platform Initialization Distribution Packaging Specification Version 1.1
+
+        ## License
+
+        SPDX-License-Identifier: CC-BY-4.0
+
+        ## Submitter: [TianoCore Community](https://www.tianocore.org)
+
+        ## Summary of the change
+
+        Required Section
+
+        ## Benefits of the change
+
+        Required Section
+
+        ## Impact of the change
+
+        Required Section
+
+        ## Detailed description of the change [normative updates]
+
+        Required Section
+
+        ## Special Instructions
+
+        Optional Section
+        ```
+
+  - type: textarea
+    id: anything_else
+    attributes:
+      label: Anything else?
+      description: |
+        Links? References? Anything that will give us more context about the code first change.
+
+        Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
+    validations:
+      required: false

@@ -197,3 +197,12 @@ QemuFwCfgFindFile (
 {
   return RETURN_UNSUPPORTED;
 }
+
+RETURN_STATUS
+EFIAPI
+QemuFwCfgInitCache (
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  return RETURN_UNSUPPORTED;
+}

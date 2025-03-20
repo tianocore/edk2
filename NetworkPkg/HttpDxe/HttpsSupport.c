@@ -656,11 +656,17 @@ TlsConfigureSession (
   //
   // TlsConfigData initialization
   //
-  HttpInstance->TlsConfigData.ConnectionEnd       = EfiTlsClient;
-  HttpInstance->TlsConfigData.VerifyMethod        = EFI_TLS_VERIFY_PEER;
-  HttpInstance->TlsConfigData.VerifyHost.Flags    = EFI_TLS_VERIFY_FLAG_NONE;
-  HttpInstance->TlsConfigData.VerifyHost.HostName = HttpInstance->RemoteHost;
-  HttpInstance->TlsConfigData.SessionState        = EfiTlsSessionNotStarted;
+  HttpInstance->TlsConfigData.ConnectionEnd    = EfiTlsClient;
+  HttpInstance->TlsConfigData.VerifyMethod     = EFI_TLS_VERIFY_PEER;
+  HttpInstance->TlsConfigData.VerifyHost.Flags = EFI_TLS_VERIFY_FLAG_NONE;
+  HttpInstance->TlsConfigData.SessionState     = EfiTlsSessionNotStarted;
+
+  if (HttpInstance->ProxyConnected) {
+    ASSERT (HttpInstance->EndPointHostName != NULL);
+    HttpInstance->TlsConfigData.VerifyHost.HostName = HttpInstance->EndPointHostName;
+  } else {
+    HttpInstance->TlsConfigData.VerifyHost.HostName = HttpInstance->RemoteHost;
+  }
 
   //
   // EfiTlsConnectionEnd,
@@ -732,7 +738,6 @@ TlsConfigureSession (
       // the caller. The failure is pushed back to TLS DXE driver if the
       // HTTP communication actually requires certificate.
       //
-      Status = EFI_SUCCESS;
     } else {
       DEBUG ((DEBUG_ERROR, "TLS Certificate Config Error!\n"));
       return Status;
@@ -1250,7 +1255,13 @@ TlsConnectSession (
   // Transmit ClientHello
   //
   PacketOut = NetbufAlloc ((UINT32)BufferOutSize);
-  DataOut   = NetbufAllocSpace (PacketOut, (UINT32)BufferOutSize, NET_BUF_TAIL);
+
+  if (PacketOut == NULL) {
+    FreePool (BufferOut);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  DataOut = NetbufAllocSpace (PacketOut, (UINT32)BufferOutSize, NET_BUF_TAIL);
   if (DataOut == NULL) {
     FreePool (BufferOut);
     return EFI_OUT_OF_RESOURCES;
@@ -1336,7 +1347,13 @@ TlsConnectSession (
       // Transmit the response packet.
       //
       PacketOut = NetbufAlloc ((UINT32)BufferOutSize);
-      DataOut   = NetbufAllocSpace (PacketOut, (UINT32)BufferOutSize, NET_BUF_TAIL);
+
+      if (PacketOut == NULL) {
+        FreePool (BufferOut);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      DataOut = NetbufAllocSpace (PacketOut, (UINT32)BufferOutSize, NET_BUF_TAIL);
       if (DataOut == NULL) {
         FreePool (BufferOut);
         return EFI_OUT_OF_RESOURCES;
@@ -1493,7 +1510,13 @@ TlsCloseSession (
   }
 
   PacketOut = NetbufAlloc ((UINT32)BufferOutSize);
-  DataOut   = NetbufAllocSpace (PacketOut, (UINT32)BufferOutSize, NET_BUF_TAIL);
+
+  if (PacketOut == NULL) {
+    FreePool (BufferOut);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  DataOut = NetbufAllocSpace (PacketOut, (UINT32)BufferOutSize, NET_BUF_TAIL);
   if (DataOut == NULL) {
     FreePool (BufferOut);
     return EFI_OUT_OF_RESOURCES;
@@ -1781,7 +1804,13 @@ HttpsReceive (
 
         if (BufferOutSize != 0) {
           PacketOut = NetbufAlloc ((UINT32)BufferOutSize);
-          DataOut   = NetbufAllocSpace (PacketOut, (UINT32)BufferOutSize, NET_BUF_TAIL);
+
+          if (PacketOut == NULL) {
+            FreePool (BufferOut);
+            return EFI_OUT_OF_RESOURCES;
+          }
+
+          DataOut = NetbufAllocSpace (PacketOut, (UINT32)BufferOutSize, NET_BUF_TAIL);
           if (DataOut == NULL) {
             FreePool (BufferOut);
             return EFI_OUT_OF_RESOURCES;
@@ -1873,7 +1902,13 @@ HttpsReceive (
 
     if (BufferOutSize != 0) {
       PacketOut = NetbufAlloc ((UINT32)BufferOutSize);
-      DataOut   = NetbufAllocSpace (PacketOut, (UINT32)BufferOutSize, NET_BUF_TAIL);
+
+      if (PacketOut == NULL) {
+        FreePool (BufferOut);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      DataOut = NetbufAllocSpace (PacketOut, (UINT32)BufferOutSize, NET_BUF_TAIL);
       if (DataOut == NULL) {
         FreePool (BufferOut);
         return EFI_OUT_OF_RESOURCES;

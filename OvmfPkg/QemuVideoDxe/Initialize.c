@@ -367,7 +367,11 @@ QemuVideoBochsEdid (
   if (PcdGet8 (PcdVideoResolutionSource) == 0) {
     Status = PcdSet32S (PcdVideoHorizontalResolution, *XRes);
     ASSERT_RETURN_ERROR (Status);
+    Status = PcdSet32S (PcdSetupVideoHorizontalResolution, *XRes);
+    ASSERT_RETURN_ERROR (Status);
     Status = PcdSet32S (PcdVideoVerticalResolution, *YRes);
+    ASSERT_RETURN_ERROR (Status);
+    Status = PcdSet32S (PcdSetupVideoVerticalResolution, *YRes);
     ASSERT_RETURN_ERROR (Status);
     Status = PcdSet8S (PcdVideoResolutionSource, 2);
     ASSERT_RETURN_ERROR (Status);

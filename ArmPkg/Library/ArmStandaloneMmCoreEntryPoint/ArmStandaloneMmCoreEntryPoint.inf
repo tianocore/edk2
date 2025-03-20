@@ -1,0 +1,73 @@
+## @file
+# Module entry point library for DXE core.
+#
+# Copyright (c) 2024, Arm Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = ArmStandaloneMmCoreEntryPoint
+  FILE_GUID                      = 16d7b2e4-a025-11ef-8931-6b032fa329a6
+  MODULE_TYPE                    = MM_CORE_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = StandaloneMmCoreEntryPoint|MM_CORE_STANDALONE
+
+#
+#  VALID_ARCHITECTURES           = ARM AARCH64
+#
+
+[Sources]
+  ArmStandaloneMmCoreEntryPoint.c
+  SetPermissions.c
+
+[Sources.AARCH64]
+  AArch64/ModuleEntryPoint.S
+
+[Sources.ARM]
+  Arm/ModuleEntryPoint.S
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  StandaloneMmMmuLib
+  ArmSvcLib
+  ArmTransferListLib
+  ArmFfaLib
+  StackCheckLib
+
+[Guids]
+  gMpInformationHobGuid
+  gEfiMmPeiMmramMemoryReserveGuid
+  gEfiStandaloneMmNonSecureBufferGuid
+  gEfiHobListGuid
+
+[Protocols]
+  gEdkiiPiMmCpuDriverEpProtocolGuid
+  gEfiMmCommunication2ProtocolGuid
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdStMmStackSize
+
+#
+# This configuration fails for CLANGPDB, which does not support PIE in the GCC
+# sense. Such however is required for ARM family StandaloneMmCore
+# self-relocation, and thus the CLANGPDB toolchain is unsupported for ARM and
+# AARCH64 for this module.
+#
+[BuildOptions]
+  GCC:*_*_ARM_CC_FLAGS = -fpie
+  GCC:*_*_AARCH64_CC_FLAGS = -fpie

@@ -852,7 +852,19 @@ ExecutePlatformConfig (
     ASSERT_RETURN_ERROR (PcdStatus);
 
     PcdStatus = PcdSet32S (
+                  PcdSetupVideoHorizontalResolution,
+                  PlatformConfig.HorizontalResolution
+                  );
+    ASSERT_RETURN_ERROR (PcdStatus);
+
+    PcdStatus = PcdSet32S (
                   PcdVideoVerticalResolution,
+                  PlatformConfig.VerticalResolution
+                  );
+    ASSERT_RETURN_ERROR (PcdStatus);
+
+    PcdStatus = PcdSet32S (
+                  PcdSetupVideoVerticalResolution,
                   PlatformConfig.VerticalResolution
                   );
     ASSERT_RETURN_ERROR (PcdStatus);

@@ -25,6 +25,11 @@
   ##
   RegisterCpuFeaturesLib|Include/Library/RegisterCpuFeaturesLib.h
 
+  ##  @libraryclass  Defines some common architecture-level fundamental routines which
+  ##                 are supported at different architectures.
+  ##
+  UefiCpuBaseArchSupportLib|Include/Library/BaseArchLibSupport.h
+
 [LibraryClasses.IA32, LibraryClasses.X64]
   ##  @libraryclass  Provides functions to manage MTRR settings on IA32 and X64 CPUs.
   ##
@@ -52,9 +57,6 @@
 
   ##  @libraryclass  Provides function to support CcExit processing.
   CcExitLib|Include/Library/CcExitLib.h
-
-  ## @libraryclass  Provides functions for Tdx Measurement processing
-  TdxMeasurementLib|Include/Library/TdxMeasurementLib.h
 
   ##  @libraryclass  Provides function to support AmdSvsm processing.
   AmdSvsmLib|Include/Library/AmdSvsmLib.h

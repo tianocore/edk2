@@ -191,6 +191,7 @@ INF  OvmfPkg/Virtio10Dxe/Virtio10.inf
 #
 # Video support
 #
+INF  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
 INF  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
 INF  OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
 INF  OvmfPkg/PlatformDxe/Platform.inf

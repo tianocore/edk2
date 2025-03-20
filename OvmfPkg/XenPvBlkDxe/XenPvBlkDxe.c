@@ -295,14 +295,18 @@ XenPvBlkDxeDriverBindingStart (
     //    MdeModulePkg/Universal/Disk/PartitionDxe/ElTorito.c
     //
     Media->BlockSize = 2048;
-    Media->LastBlock = DivU64x32 (
-                         Dev->MediaInfo.Sectors,
-                         Media->BlockSize / Dev->MediaInfo.SectorSize
-                         ) - 1;
   } else {
     Media->BlockSize = Dev->MediaInfo.SectorSize;
-    Media->LastBlock = Dev->MediaInfo.Sectors - 1;
   }
+
+  //
+  // Sectors is express as 512B unit, size of disk is "Sectors * 512",
+  // independently from SectorSize.
+  //
+  Media->LastBlock = DivU64x32 (
+                       Dev->MediaInfo.Sectors,
+                       Media->BlockSize / 512
+                       ) - 1;
 
   ASSERT (Media->BlockSize % 512 == 0);
   Dev->BlockIo.Media = Media;

@@ -1,0 +1,44 @@
+## @file
+#  TpmMeasurementLib SEC instance
+#
+#  Copyright (c) 2025, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecTpmMeasurementLib
+  FILE_GUID                      = a608aadb-3809-4b7c-9ab9-c42ef79c508e
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TpmMeasurementLib | SEC
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  IntelTdx.c
+  SecTpmMeasurementLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  HobLib
+  PcdLib
+  CcProbeLib
+  TdxMeasurementLib
+  BaseCryptLib
+
+[Guids]
+  gCcEventEntryHobGuid

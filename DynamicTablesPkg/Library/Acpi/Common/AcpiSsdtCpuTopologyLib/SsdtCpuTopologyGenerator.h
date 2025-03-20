@@ -2,6 +2,7 @@
   SSDT Cpu Topology Table Generator.
 
   Copyright (c) 2021 - 2023, Arm Limited. All rights reserved.<BR>
+  Copyright (C) 2025, Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -51,6 +52,17 @@
 #define SB_SCOPE_PREFIX  SB_SCOPE "."
 /// Size of the SB_SCOPE_PREFIX string.
 #define SB_SCOPE_PREFIX_SIZE  sizeof (SB_SCOPE_PREFIX)
+
+/** C-state are stored in the ASL namspace at '\_SB_.CSTS.Cxxx',
+    where xxx represents the C-state index:
+    CSTx  - for C-state indices less than 0xF.
+    CSxx  - for C-state indices between 0xF and 0xFF.
+    Cxxx  - for C-state indices greater than 0xFF.
+*/
+#define CSTS_SCOPE         "CSTS"
+#define CSTS_SCOPE_PREFIX  SB_SCOPE_PREFIX CSTS_SCOPE "."
+/// Size of the CSTS_SCOPE_PREFIX string.
+#define CSTS_SCOPE_PREFIX_SIZE  sizeof (CSTS_SCOPE_PREFIX)
 
 /// HID for a processor device.
 #define ACPI_HID_PROCESSOR_DEVICE  "ACPI0007"
@@ -338,6 +350,50 @@ AddArchAmlCpuInfo (
   IN  CM_OBJECT_TOKEN                                     AcpiIdObjectToken,
   IN  UINT32                                              CpuName,
   OUT  AML_OBJECT_NODE_HANDLE                             *CpuNode
+  );
+
+/** Create and add an _PSD Node to Cpu Node.
+
+  For instance, transform an AML node from:
+  Device (C002)
+  {
+      Name (_UID, 2)
+      Name (_HID, "ACPI0007")
+  }
+
+  To:
+  Device (C002)
+  {
+      Name (_UID, 2)
+      Name (_HID, "ACPI0007")
+      Name (_PSD, Package()
+      {
+        NumEntries,      // Integer
+        Revision,        // Integer
+        Domain,          // Integer
+        CoordType,       // Integer
+        NumProcessors,   // Integer
+      })
+  }
+
+  @param [in]  Generator              The SSDT Cpu Topology generator.
+  @param [in]  CfgMgrProtocol         Pointer to the Configuration Manager
+                                      Protocol Interface.
+  @param [in]  PsdToken               Token to identify the Psd information.
+  @param [in]  Node                   CPU Node to which the _CPC node is
+                                      attached.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+CreateAmlPsdNode (
+  IN  ACPI_CPU_TOPOLOGY_GENERATOR                         *Generator,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN  CM_OBJECT_TOKEN                                     PsdToken,
+  IN  AML_OBJECT_NODE_HANDLE                              *Node
   );
 
 #endif // SSDT_CPU_TOPOLOGY_GENERATOR_H_
