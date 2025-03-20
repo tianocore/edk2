@@ -1027,7 +1027,7 @@ DEFINE GCC5_AARCH64_ASLDLINK_FLAGS   = DEF(GCC49_AARCH64_ASLDLINK_FLAGS) DEF(GCC
 DEFINE GCC5_ASLCC_FLAGS              = DEF(GCC49_ASLCC_FLAGS) -fno-lto
 
 DEFINE GCC5_RISCV_ALL_CC_FLAGS                    = -g -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -include AutoGen.h -fno-common -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings -msmall-data-limit=0
-DEFINE GCC5_RISCV_ALL_DLINK_COMMON                = -nostdlib -Wl,-n,-q,--gc-sections -z common-page-size=0x40
+DEFINE GCC5_RISCV_ALL_DLINK_COMMON                = -nostdlib -Wl,-n,-q,--gc-sections -z common-page-size=0x40 DEF(GCC5_DLINK_WARNING_FLAGS)
 DEFINE GCC5_RISCV_ALL_DLINK_FLAGS                 = DEF(GCC5_RISCV_ALL_DLINK_COMMON) -Wl,--entry,$(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Wl,-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map
 DEFINE GCC5_RISCV_ALL_DLINK2_FLAGS                = -Wl,--defsym=PECOFF_HEADER_SIZE=0x220,--script=$(EDK_TOOLS_PATH)/Scripts/GccBase.lds
 DEFINE GCC5_RISCV_ALL_ASM_FLAGS                   = -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
@@ -1043,9 +1043,9 @@ DEFINE GCC5_RISCV64_DLINK2_FLAGS           = DEF(GCC5_RISCV_ALL_DLINK2_FLAGS)
 DEFINE GCC5_RISCV64_ASM_FLAGS              = DEF(GCC5_RISCV_ALL_ASM_FLAGS) -march=DEF(GCC5_RISCV64_ARCH) -mcmodel=medany -mabi=lp64
 
 DEFINE GCC5_LOONGARCH64_CC_FLAGS           = DEF(GCC_LOONGARCH64_CC_FLAGS) -march=loongarch64 -mno-memcpy -Werror -Wno-maybe-uninitialized -Wno-stringop-overflow -Wno-pointer-to-int-cast -no-pie -fno-stack-protector -mno-explicit-relocs
-DEFINE GCC5_LOONGARCH64_DLINK_FLAGS        = DEF(GCC_LOONGARCH64_DLINK_FLAGS)
+DEFINE GCC5_LOONGARCH64_DLINK_FLAGS        = DEF(GCC_LOONGARCH64_DLINK_FLAGS) DEF(GCC5_DLINK_WARNING_FLAGS)
 DEFINE GCC5_LOONGARCH64_DLINK2_FLAGS       = DEF(GCC_DLINK2_FLAGS_COMMON) -Wl,--defsym=PECOFF_HEADER_SIZE=0x228
-DEFINE GCC5_LOONGARCH64_ASLDLINK_FLAGS     = DEF(GCC_LOONGARCH64_ASLDLINK_FLAGS) DEF(GCC5_LOONGARCH64_DLINK2_FLAGS)
+DEFINE GCC5_LOONGARCH64_ASLDLINK_FLAGS     = DEF(GCC_LOONGARCH64_ASLDLINK_FLAGS) DEF(GCC5_LOONGARCH64_DLINK2_FLAGS) DEF(GCC5_DLINK_WARNING_FLAGS)
 DEFINE GCC5_LOONGARCH64_ASM_FLAGS          = -x assembler-with-cpp -mabi=lp64d -march=loongarch64 -fno-builtin -c -Wall -mno-explicit-relocs
 DEFINE GCC5_LOONGARCH64_PP_FLAGS           = -mabi=lp64d -march=loongarch64 DEF(GCC_PP_FLAGS)
 
