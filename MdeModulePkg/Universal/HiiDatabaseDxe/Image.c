@@ -299,7 +299,7 @@ Output1bitPixel (
       // Padding bits in this byte should be ignored.
       //
       Byte = *(Data + OffsetY + Xpos);
-      for (Index = 0; Index < Image->Width % 8; Index++) {
+      for (Index = 0; (UINT16)Index < (UINT16)(Image->Width % 8); Index++) {
         if ((Byte & (1 << (8 - Index - 1))) != 0) {
           BitMapPtr[Ypos * Image->Width + Xpos * 8 + Index].Raw = PaletteValue[1].Raw;
         } else {

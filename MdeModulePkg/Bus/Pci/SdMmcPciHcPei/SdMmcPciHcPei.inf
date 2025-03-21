@@ -37,6 +37,7 @@
   PeiServicesLib
   MemoryAllocationLib
   PeimEntryPoint
+  SafeIntLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSdMmcPciHostControllerMmioBase   ## CONSUMES
