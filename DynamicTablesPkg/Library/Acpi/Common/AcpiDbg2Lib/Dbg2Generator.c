@@ -2,6 +2,7 @@
   DBG2 Table Generator
 
   Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2024 - 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved. <BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -10,10 +11,13 @@
 
 **/
 
+#include <IndustryStandard/AcpiAml.h>
 #include <IndustryStandard/DebugPort2Table.h>
 #include <Library/AcpiLib.h>
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PrintLib.h>
 #include <Protocol/AcpiTable.h>
 #include <Protocol/SerialIo.h>
 
@@ -35,148 +39,23 @@ Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
   - EArchCommonObjSerialDebugPortInfo
+  - EArchCommonObjDbg2DeviceInfo
 */
 
-#pragma pack(1)
-
-/** The number of debug ports represented by the Table.
-*/
-#define DBG2_NUM_DEBUG_PORTS  1
-
-/** The number of Generic Address Registers
-    presented in the debug device information.
-*/
-#define DBG2_NUMBER_OF_GENERIC_ADDRESS_REGISTERS  1
-
-/** The index for the debug port 0 in the Debug port information list.
-*/
-#define INDEX_DBG_PORT0  0
-
-/** A string representing the name of the debug port 0.
+/** A string representing the name of the serial debug port 0.
 */
 #define NAME_STR_DBG_PORT0  "COM0"
 
-/** A string representing the full path name of the debug port 0.
-*/
-#define NAMESPACE_STR_DBG_PORT0  "\\_SB_.COM0"
+// _SB scope of the AML namespace.
+#define SB_SCOPE  "\\_SB_."
 
-/** An UID representing the debug port 0.
+/** An UID representing the serial debug port 0.
 */
 #define UID_DBG_PORT0  0
 
 /** The length of the namespace string.
 */
-#define DBG2_NAMESPACESTRING_FIELD_SIZE  sizeof (NAMESPACE_STR_DBG_PORT0)
-
-/** The PL011 UART address range length.
-*/
-#define PL011_UART_LENGTH  0x1000
-
-/** A structure that provides the OS with the required information
-    for initializing a debugger connection.
-*/
-typedef struct {
-  /// The debug device information for the platform
-  EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT    Dbg2Device;
-
-  /// The base address register for the serial port
-  EFI_ACPI_6_2_GENERIC_ADDRESS_STRUCTURE           BaseAddressRegister;
-
-  /// The address size
-  UINT32                                           AddressSize;
-
-  /// The debug port name string
-  UINT8                                            NameSpaceString[DBG2_NAMESPACESTRING_FIELD_SIZE];
-} DBG2_DEBUG_DEVICE_INFORMATION;
-
-/** A structure representing the information about the debug port(s)
-    available on the platform.
-*/
-typedef struct {
-  /// The DBG2 table header
-  EFI_ACPI_DEBUG_PORT_2_DESCRIPTION_TABLE    Description;
-
-  /// Debug port information list
-  DBG2_DEBUG_DEVICE_INFORMATION              Dbg2DeviceInfo[DBG2_NUM_DEBUG_PORTS];
-} DBG2_TABLE;
-
-/** A helper macro used for initializing the debug port device
-    information structure.
-
-  @param [in]  SubType      The DBG Port SubType.
-  @param [in]  UartBase     The UART port base address.
-  @param [in]  UartAddrLen  The UART port address range length.
-  @param [in]  UartNameStr  The UART port name string.
-**/
-#define DBG2_DEBUG_PORT_DDI(                                          \
-                                                                      SubType,                                                    \
-                                                                      UartBase,                                                   \
-                                                                      UartAddrLen,                                                \
-                                                                      UartNameStr                                                 \
-                                                                      )  {\
-    {                                                                 \
-  /* UINT8     Revision */                                        \
-      EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT_REVISION,         \
-  /* UINT16    Length */                                          \
-      sizeof (DBG2_DEBUG_DEVICE_INFORMATION),                         \
-  /* UINT8     NumberofGenericAddressRegisters */                 \
-      DBG2_NUMBER_OF_GENERIC_ADDRESS_REGISTERS,                       \
-  /* UINT16    NameSpaceStringLength */                           \
-      DBG2_NAMESPACESTRING_FIELD_SIZE,                                \
-  /* UINT16    NameSpaceStringOffset */                           \
-      OFFSET_OF (DBG2_DEBUG_DEVICE_INFORMATION, NameSpaceString),     \
-  /* UINT16    OemDataLength */                                   \
-      0,                                                              \
-  /* UINT16    OemDataOffset */                                   \
-      0,                                                              \
-  /* UINT16    Port Type */                                       \
-      EFI_ACPI_DBG2_PORT_TYPE_SERIAL,                                 \
-  /* UINT16    Port Subtype */                                    \
-      SubType,                                                        \
-  /* UINT8     Reserved[2] */                                     \
-      {EFI_ACPI_RESERVED_BYTE, EFI_ACPI_RESERVED_BYTE},               \
-  /* UINT16    BaseAddressRegister Offset */                      \
-      OFFSET_OF (DBG2_DEBUG_DEVICE_INFORMATION, BaseAddressRegister), \
-  /* UINT16    AddressSize Offset */                              \
-      OFFSET_OF (DBG2_DEBUG_DEVICE_INFORMATION, AddressSize)          \
-    },                                                                \
-  /* EFI_ACPI_6_2_GENERIC_ADDRESS_STRUCTURE BaseAddressRegister */  \
-    ARM_GAS32 (UartBase),                                             \
-  /* UINT32  AddressSize */                                         \
-    UartAddrLen,                                                      \
-  /* UINT8   NameSpaceString[MAX_DBG2_NAME_LEN] */                  \
-    UartNameStr                                                       \
-  }
-
-/** The DBG2 Table template definition.
-
-  Note: fields marked with "{Template}" will be set dynamically
-*/
-STATIC
-DBG2_TABLE  AcpiDbg2 = {
-  {
-    ACPI_HEADER (
-      EFI_ACPI_6_2_DEBUG_PORT_2_TABLE_SIGNATURE,
-      DBG2_TABLE,
-      EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT_REVISION
-      ),
-    OFFSET_OF (DBG2_TABLE, Dbg2DeviceInfo),
-    DBG2_NUM_DEBUG_PORTS
-  },
-  {
-    /*
-     * Debug port 1
-     */
-    DBG2_DEBUG_PORT_DDI (
-      0,                    // {Template}: Serial Port Subtype
-      0,                    // {Template}: Serial Port Base Address
-      0,                    // {Template}: Serial Port Base Address Size
-      NAMESPACE_STR_DBG_PORT0
-      )
-  }
-};
-
-#pragma pack()
+#define DBG2_NAMESPACESTRING_FIELD_SIZE  (sizeof (SB_SCOPE) + AML_NAME_SEG_SIZE)
 
 /** This macro expands to a function that retrieves the Serial
     debug port information from the Configuration Manager
@@ -187,14 +66,32 @@ GET_OBJECT_LIST (
   CM_ARCH_COMMON_SERIAL_PORT_INFO
   );
 
+/** This macro expands to a function that retrieves the DBG2
+    device information from the Configuration Manager
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArchCommon,
+  EArchCommonObjDbg2DeviceInfo,
+  CM_ARCH_COMMON_DBG2_DEVICE_INFO
+  );
+
+/** This macro expands to a function that retrieves the
+    Memory Range Descriptor Array information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArchCommon,
+  EArchCommonObjMemoryRangeDescriptor,
+  CM_ARCH_COMMON_MEMORY_RANGE_DESCRIPTOR
+  );
+
 /** Initialize the DBG2 UART with the parameters obtained from
     the Configuration Manager.
 
-  @param [in]  SerialPortInfo Pointer to the Serial Port Information.
+@param [in]  SerialPortInfo Pointer to the Serial Port Information.
 
-  @retval EFI_SUCCESS           Success.
-  @retval EFI_INVALID_PARAMETER The parameters for serial port initialization
-                                are invalid.
+@retval EFI_SUCCESS           Success.
+@retval EFI_INVALID_PARAMETER The parameters for serial port initialization
+                              are invalid.
 **/
 STATIC
 EFI_STATUS
@@ -257,6 +154,7 @@ FreeDbg2TableEx (
   )
 {
   EFI_STATUS                   Status;
+  UINTN                        Index;
   EFI_ACPI_DESCRIPTION_HEADER  **TableList;
 
   ASSERT (This != NULL);
@@ -266,8 +164,7 @@ FreeDbg2TableEx (
   ASSERT (AcpiTableInfo->AcpiTableSignature == This->AcpiTableSignature);
 
   if ((Table == NULL)   ||
-      (*Table == NULL)  ||
-      (TableCount != 2))
+      (*Table == NULL))
   {
     DEBUG ((DEBUG_ERROR, "ERROR: DBG2: Invalid Table Pointer\n"));
     return EFI_INVALID_PARAMETER;
@@ -275,22 +172,130 @@ FreeDbg2TableEx (
 
   TableList = *Table;
 
-  if ((TableList[1] == NULL) ||
-      (TableList[1]->Signature !=
-       EFI_ACPI_6_3_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE))
-  {
-    DEBUG ((DEBUG_ERROR, "ERROR: DBG2: Invalid SSDT table pointer.\n"));
-    return EFI_INVALID_PARAMETER;
+  if (TableCount != 0) {
+    FreePool (TableList[0]);
   }
 
-  // Only need to free the SSDT table at index 1. The DBG2 table is static.
-  Status = FreeSsdtSerialPortTable (TableList[1]);
-  ASSERT_EFI_ERROR (Status);
+  for (Index = 1; Index < TableCount; Index++) {
+    if ((TableList[Index] == NULL) ||
+        (TableList[Index]->Signature !=
+         EFI_ACPI_6_3_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE))
+    {
+      DEBUG ((DEBUG_ERROR, "ERROR: DBG2: Invalid SSDT table pointer.\n"));
+      return EFI_INVALID_PARAMETER;
+    }
+
+    // Only need to free the SSDT table at index > 1.
+    Status = FreeSsdtSerialPortTable (TableList[Index]);
+    ASSERT_EFI_ERROR (Status);
+  }
 
   // Free the table list.
   FreePool (*Table);
 
   return Status;
+}
+
+/** Populates the DBG2 device info structure.
+
+  @param [in, out] AcpiDbg2Device     Pointer to the DBG2 ACPI table to add device to.
+                                      Pointer will be updated to point to after the new DBG2 device.
+  @param [in]      DeviceInfo         Pointer to the Device Info structure.
+  @param [in]      MemoryRanges       The memory ranges of the device.
+  @param [in]      MemoryRangesCount  The number of memory ranges in the device.
+
+  @retval EFI_SUCCESS           The structure was populated correctly.
+  @retval EFI_INVALID_PARAMETER The parameters are invalid.
+  @retval EFI_BUFFER_TOO_SMALL  The namespace string is too long.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+PopulateDbg2Device (
+  IN OUT EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT  **AcpiDbg2Device,
+  IN CM_ARCH_COMMON_DBG2_DEVICE_INFO                    *DeviceInfo,
+  IN CM_ARCH_COMMON_MEMORY_RANGE_DESCRIPTOR             *MemoryRanges,
+  IN UINT32                                             MemoryRangesCount
+  )
+{
+  UINTN                                          Index;
+  UINT16                                         Dbg2DeviceSize;
+  EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT  *CurrentDbg2Device;
+  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE         *BaseAddressRegister;
+  UINT32                                         *AddressSize;
+
+  // Parameter validation
+  if ((AcpiDbg2Device == NULL) || (DeviceInfo == NULL) || (MemoryRanges == NULL) || (MemoryRangesCount == 0)) {
+    DEBUG ((DEBUG_ERROR, "ERROR: DBG2: Invalid parameters to PopulateDbg2Device\n"));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Check string length before concatenation
+  if ((DeviceInfo->ObjectName[0] != '\0') &&
+      (AsciiStrLen (SB_SCOPE) + AsciiStrLen (DeviceInfo->ObjectName) >= DBG2_NAMESPACESTRING_FIELD_SIZE))
+  {
+    DEBUG ((DEBUG_ERROR, "ERROR: DBG2: Namespace string too long\n"));
+    return EFI_BUFFER_TOO_SMALL;
+  }
+
+  if (MemoryRangesCount > MAX_UINT8) {
+    DEBUG ((DEBUG_ERROR, "ERROR: DBG2: Too many memory ranges. Count = %u\n", MemoryRangesCount));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Validate all memory ranges
+  for (Index = 0; Index < MemoryRangesCount; Index++) {
+    if (MemoryRanges[Index].BaseAddress == 0) {
+      DEBUG ((DEBUG_ERROR, "ERROR: DBG2: Memory range base address is 0. Index = %u\n", Index));
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if (MemoryRanges[Index].Length > MAX_UINT32) {
+      DEBUG ((DEBUG_ERROR, "ERROR: DBG2: Memory range length too large. Length = %u\n", MemoryRanges[Index].Length));
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+
+  Dbg2DeviceSize = (UINT16)(sizeof (EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT) +
+                            ((sizeof (EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE) + sizeof (UINT32)) * (MemoryRangesCount)) +
+                            (sizeof (CHAR8) * DBG2_NAMESPACESTRING_FIELD_SIZE));
+  CurrentDbg2Device = *AcpiDbg2Device;
+
+  CurrentDbg2Device->Revision                        = EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT_REVISION;
+  CurrentDbg2Device->Length                          = Dbg2DeviceSize;
+  CurrentDbg2Device->NumberofGenericAddressRegisters = (UINT8)MemoryRangesCount;
+  CurrentDbg2Device->NameSpaceStringLength           = DBG2_NAMESPACESTRING_FIELD_SIZE;
+  CurrentDbg2Device->NameSpaceStringOffset           = sizeof (EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT);
+  CurrentDbg2Device->OemDataLength                   = 0;
+  CurrentDbg2Device->OemDataOffset                   = 0;
+  CurrentDbg2Device->PortType                        = DeviceInfo->PortType;
+  CurrentDbg2Device->PortSubtype                     = DeviceInfo->PortSubtype;
+  CurrentDbg2Device->BaseAddressRegisterOffset       = CurrentDbg2Device->NameSpaceStringOffset + DBG2_NAMESPACESTRING_FIELD_SIZE;
+  CurrentDbg2Device->AddressSizeOffset               = CurrentDbg2Device->BaseAddressRegisterOffset +
+                                                       ((UINT16)sizeof (EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE) * ((UINT8)MemoryRangesCount));
+  for (Index = 0; Index < MemoryRangesCount; Index++) {
+    BaseAddressRegister                    = (EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE *)((UINT8 *)CurrentDbg2Device + CurrentDbg2Device->BaseAddressRegisterOffset + (Index * sizeof (EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE)));
+    AddressSize                            = (UINT32 *)((UINT8 *)CurrentDbg2Device + CurrentDbg2Device->AddressSizeOffset + (Index * sizeof (UINT32)));
+    BaseAddressRegister->AddressSpaceId    = EFI_ACPI_6_3_SYSTEM_MEMORY;
+    BaseAddressRegister->RegisterBitWidth  = 32;
+    BaseAddressRegister->RegisterBitOffset = 0;
+    BaseAddressRegister->AccessSize        = DeviceInfo->AccessSize;
+    BaseAddressRegister->Address           = MemoryRanges[Index].BaseAddress;
+    *AddressSize                           = (UINT32)(MemoryRanges[Index].Length);
+  }
+
+  if (DeviceInfo->ObjectName[0] == '\0') {
+    // If device string is empty then use "." as the name per the DBG2 specification.
+    AsciiSPrint ((CHAR8 *)CurrentDbg2Device + CurrentDbg2Device->NameSpaceStringOffset, DBG2_NAMESPACESTRING_FIELD_SIZE, ".");
+  } else {
+    // Construct the namespace string for the device (e.g. \_SB_.COM1)
+    AsciiSPrint ((CHAR8 *)CurrentDbg2Device + CurrentDbg2Device->NameSpaceStringOffset, DBG2_NAMESPACESTRING_FIELD_SIZE, "%a%a", SB_SCOPE, DeviceInfo->ObjectName);
+  }
+
+  // Update the pointer to point to the next device
+  *AcpiDbg2Device = (EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT *)((UINT8 *)CurrentDbg2Device + Dbg2DeviceSize);
+
+  return EFI_SUCCESS;
 }
 
 /** Construct the DBG2 ACPI table and its associated SSDT table.
@@ -329,10 +334,21 @@ BuildDbg2TableEx (
   OUT       UINTN                                  *CONST  TableCount
   )
 {
-  EFI_STATUS                       Status;
-  CM_ARCH_COMMON_SERIAL_PORT_INFO  *SerialPortInfo;
-  UINT32                           SerialPortCount;
-  EFI_ACPI_DESCRIPTION_HEADER      **TableList;
+  EFI_STATUS                                     Status;
+  EFI_ACPI_DEBUG_PORT_2_DESCRIPTION_TABLE        *AcpiDbg2;
+  UINT32                                         AcpiDbg2Len;
+  UINT32                                         Index;
+  CM_ARCH_COMMON_DBG2_DEVICE_INFO                *Dbg2DeviceInfo;
+  UINT32                                         Dbg2DeviceCount;
+  CM_ARCH_COMMON_MEMORY_RANGE_DESCRIPTOR         **Dbg2DevicesMemoryRange;
+  UINT32                                         *Dbg2DevicesMemoryRangeCount;
+  CM_ARCH_COMMON_SERIAL_PORT_INFO                *SerialPortInfo;
+  UINT32                                         SerialPortCount;
+  CM_ARCH_COMMON_DBG2_DEVICE_INFO                SerialPortDeviceInfo;
+  CM_ARCH_COMMON_MEMORY_RANGE_DESCRIPTOR         SerialMemoryRange;
+  EFI_ACPI_DESCRIPTION_HEADER                    **TableList;
+  UINT32                                         TotalDevices;
+  EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT  *CurrentDbg2Device;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -356,7 +372,11 @@ BuildDbg2TableEx (
     return EFI_INVALID_PARAMETER;
   }
 
-  *Table = NULL;
+  *Table                      = NULL;
+  AcpiDbg2                    = NULL;
+  TableList                   = NULL;
+  Dbg2DevicesMemoryRange      = NULL;
+  Dbg2DevicesMemoryRangeCount = NULL;
 
   Status = GetEArchCommonObjSerialDebugPortInfo (
              CfgMgrProtocol,
@@ -364,43 +384,132 @@ BuildDbg2TableEx (
              &SerialPortInfo,
              &SerialPortCount
              );
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
     DEBUG ((
       DEBUG_ERROR,
       "ERROR: DBG2: Failed to get serial port information. Status = %r\n",
       Status
       ));
-    return Status;
+    goto error_handler;
   }
 
-  if (SerialPortCount == 0) {
+  // Only one serial port is supported
+  if (SerialPortCount > 1) {
     DEBUG ((
       DEBUG_ERROR,
-      "ERROR: DBG2: Serial port information not found. Status = %r\n",
-      EFI_NOT_FOUND
-      ));
-    return EFI_NOT_FOUND;
-  }
-
-  // Only use the first DBG2 port information.
-  Status = ValidateSerialPortInfo (SerialPortInfo, 1);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: DBG2: Invalid serial port information. Status = %r\n",
+      "WARNING: DBG2: Too many serial ports to populate. Count = %x\n",
       Status
       ));
-    return Status;
+    SerialPortCount = 1;
+  }
+
+  if (SerialPortCount != 0) {
+    Status = ValidateSerialPortInfo (SerialPortInfo, SerialPortCount);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: DBG2: Invalid serial port information. Status = %r\n",
+        Status
+        ));
+      goto error_handler;
+    }
+  }
+
+  Status = GetEArchCommonObjDbg2DeviceInfo (
+             CfgMgrProtocol,
+             CM_NULL_TOKEN,
+             &Dbg2DeviceInfo,
+             &Dbg2DeviceCount
+             );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: DBG2: Failed to get DBG2 device information. Status = %r\n",
+      Status
+      ));
+    goto error_handler;
+  }
+
+  if (Dbg2DeviceCount != 0) {
+    // Get all the memory ranges for the DBG2 devices
+    Dbg2DevicesMemoryRange = (CM_ARCH_COMMON_MEMORY_RANGE_DESCRIPTOR **)AllocateZeroPool (sizeof (CM_ARCH_COMMON_MEMORY_RANGE_DESCRIPTOR *) * Dbg2DeviceCount);
+    if (Dbg2DevicesMemoryRange == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      DEBUG ((DEBUG_ERROR, "ERROR: DBG2: Failed to allocate memory for Dbg2 devices memory range. Status = %r\n", Status));
+      goto error_handler;
+    }
+
+    Dbg2DevicesMemoryRangeCount = (UINT32 *)AllocateZeroPool (sizeof (UINT32) * Dbg2DeviceCount);
+    if (Dbg2DevicesMemoryRangeCount == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      DEBUG ((DEBUG_ERROR, "ERROR: DBG2: Failed to allocate memory for Dbg2 devices memory range count. Status = %r\n", Status));
+      goto error_handler;
+    }
+
+    for (Index = 0; Index < Dbg2DeviceCount; Index++) {
+      if (Dbg2DeviceInfo[Index].AddressResourceToken != CM_NULL_TOKEN) {
+        Status = GetEArchCommonObjMemoryRangeDescriptor (
+                   CfgMgrProtocol,
+                   Dbg2DeviceInfo[Index].AddressResourceToken,
+                   &Dbg2DevicesMemoryRange[Index],
+                   &Dbg2DevicesMemoryRangeCount[Index]
+                   );
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_ERROR, "ERROR: DBG2: Failed to get memory range descriptor. Status = %r\n", Status));
+          goto error_handler;
+        }
+      } else {
+        Status = EFI_INVALID_PARAMETER;
+        DEBUG ((DEBUG_ERROR, "ERROR: DBG2: Missing address resource token.\n"));
+        goto error_handler;
+      }
+    }
+  }
+
+  TotalDevices = SerialPortCount + Dbg2DeviceCount;
+  if (TotalDevices == 0) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: DBG2: No information found. Status = %r\n",
+      EFI_NOT_FOUND
+      ));
+    Status = EFI_NOT_FOUND;
+    goto error_handler;
   }
 
   // Allocate a table to store pointers to the DBG2 and SSDT tables.
   TableList = (EFI_ACPI_DESCRIPTION_HEADER **)
-              AllocateZeroPool (sizeof (EFI_ACPI_DESCRIPTION_HEADER *) * 2);
+              AllocateZeroPool (sizeof (EFI_ACPI_DESCRIPTION_HEADER *) * (1+SerialPortCount));
   if (TableList == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     DEBUG ((
       DEBUG_ERROR,
       "ERROR: DBG2: Failed to allocate memory for Table List," \
+      " Status = %r\n",
+      Status
+      ));
+    goto error_handler;
+  }
+
+  AcpiDbg2Len = sizeof (EFI_ACPI_DEBUG_PORT_2_DESCRIPTION_TABLE);
+  for (Index = 0; Index < Dbg2DeviceCount; Index++) {
+    AcpiDbg2Len += sizeof (EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT) +
+                   (sizeof (EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE) + sizeof (UINT32)) * Dbg2DevicesMemoryRangeCount[Index] +
+                   (sizeof (CHAR8) * DBG2_NAMESPACESTRING_FIELD_SIZE);
+  }
+
+  if (SerialPortCount > 0) {
+    AcpiDbg2Len += sizeof (EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT) +
+                   (sizeof (EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE) + sizeof (UINT32)) * SerialPortCount +
+                   (sizeof (CHAR8) * DBG2_NAMESPACESTRING_FIELD_SIZE);
+  }
+
+  AcpiDbg2 = (EFI_ACPI_DEBUG_PORT_2_DESCRIPTION_TABLE *)AllocateZeroPool (AcpiDbg2Len);
+  if (AcpiDbg2 == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: DBG2: Failed to allocate memory for Dbg2 table," \
       " Status = %r\n",
       Status
       ));
@@ -410,9 +519,9 @@ BuildDbg2TableEx (
   Status = AddAcpiHeader (
              CfgMgrProtocol,
              This,
-             (EFI_ACPI_DESCRIPTION_HEADER *)&AcpiDbg2,
+             &AcpiDbg2->Header,
              AcpiTableInfo,
-             sizeof (DBG2_TABLE)
+             AcpiDbg2Len
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((
@@ -423,92 +532,150 @@ BuildDbg2TableEx (
     goto error_handler;
   }
 
-  // Update the base address
-  AcpiDbg2.Dbg2DeviceInfo[INDEX_DBG_PORT0].BaseAddressRegister.Address =
-    SerialPortInfo->BaseAddress;
+  AcpiDbg2->OffsetDbgDeviceInfo = sizeof (EFI_ACPI_DEBUG_PORT_2_DESCRIPTION_TABLE);
+  AcpiDbg2->NumberDbgDeviceInfo = TotalDevices;
+  TableList[0]                  = &AcpiDbg2->Header;
 
-  // Set the access size
-  if (SerialPortInfo->AccessSize >= EFI_ACPI_6_3_QWORD) {
-    Status = EFI_INVALID_PARAMETER;
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: DBG2: Access size must be <= 3 (DWORD). Status = %r\n",
-      Status
-      ));
-    goto error_handler;
-  } else if (SerialPortInfo->AccessSize == EFI_ACPI_6_3_UNDEFINED) {
-    // 0 Undefined (legacy reasons)
-    // Default to DWORD access size as the access
-    // size field was introduced at a later date
-    // and some ConfigurationManager implementations
-    // may not be providing this field data
-    AcpiDbg2.Dbg2DeviceInfo[INDEX_DBG_PORT0].BaseAddressRegister.AccessSize =
-      EFI_ACPI_6_3_DWORD;
-  } else {
-    AcpiDbg2.Dbg2DeviceInfo[INDEX_DBG_PORT0].BaseAddressRegister.AccessSize =
-      SerialPortInfo->AccessSize;
-  }
+  CurrentDbg2Device = (EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT *)((UINT8 *)AcpiDbg2 + AcpiDbg2->OffsetDbgDeviceInfo);
 
-  // Update the serial port subtype
-  AcpiDbg2.Dbg2DeviceInfo[INDEX_DBG_PORT0].Dbg2Device.PortSubtype =
-    SerialPortInfo->PortSubtype;
+  for (Index = 0; Index < Dbg2DeviceCount; Index++) {
+    // Validate CurrentDbg2Device is in range of AcpiDbg2
+    if ((CurrentDbg2Device == NULL) || ((UINTN)CurrentDbg2Device > (UINTN)AcpiDbg2 + AcpiDbg2Len)) {
+      Status = EFI_INVALID_PARAMETER;
+      DEBUG ((DEBUG_ERROR, "ERROR: DBG2: CurrentDbg2Device is out of range. Status = %r\n", Status));
+      goto error_handler;
+    }
 
-  if ((SerialPortInfo->PortSubtype ==
-       EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_PL011_UART)           ||
-      (SerialPortInfo->PortSubtype ==
-       EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_SBSA_GENERIC_UART_2X) ||
-      (SerialPortInfo->PortSubtype ==
-       EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_SBSA_GENERIC_UART))
-  {
-    // Setup the PL011 length.
-    AcpiDbg2.Dbg2DeviceInfo[INDEX_DBG_PORT0].AddressSize = PL011_UART_LENGTH;
-
-    // Initialize the serial port
-    Status = SetupDebugUart (SerialPortInfo);
+    Status = PopulateDbg2Device (&CurrentDbg2Device, &Dbg2DeviceInfo[Index], Dbg2DevicesMemoryRange[Index], Dbg2DevicesMemoryRangeCount[Index]);
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: DBG2: Failed to configure debug serial port. Status = %r\n",
+        "ERROR: DBG2: Failed to populate Dbg2 Device. Status = %r\n",
         Status
         ));
       goto error_handler;
     }
-  } else if ((SerialPortInfo->PortSubtype ==
-              EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_16550_WITH_GAS))
-  {
-    AcpiDbg2.Dbg2DeviceInfo[INDEX_DBG_PORT0].AddressSize = SIZE_4KB;
-  } else {
-    // Try to catch other serial ports, but don't return an error.
-    ASSERT (0);
   }
 
-  TableList[0] = (EFI_ACPI_DESCRIPTION_HEADER *)&AcpiDbg2;
-
-  // Build a SSDT table describing the serial port.
-  Status = BuildSsdtSerialPortTable (
-             AcpiTableInfo,
-             SerialPortInfo,
-             NAME_STR_DBG_PORT0,
-             UID_DBG_PORT0,
-             &TableList[1]
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: DBG2: Failed to build associated SSDT table. Status = %r\n",
-      Status
-      ));
-    goto error_handler;
+  // Free these as they are not needed anymore
+  if (Dbg2DevicesMemoryRange != NULL) {
+    FreePool (Dbg2DevicesMemoryRange);
+    Dbg2DevicesMemoryRange = NULL;
   }
 
-  *TableCount = 2;
+  if (Dbg2DevicesMemoryRangeCount != NULL) {
+    FreePool (Dbg2DevicesMemoryRangeCount);
+    Dbg2DevicesMemoryRangeCount = NULL;
+  }
+
+  // Currently only one serial port is supported
+  if (SerialPortCount > 0) {
+    Index                                     = 0; // Always use the first serial port
+    SerialMemoryRange.BaseAddress             = SerialPortInfo[Index].BaseAddress;
+    SerialMemoryRange.Length                  = SerialPortInfo[Index].BaseAddressLength;
+    SerialPortDeviceInfo.AddressResourceToken = CM_NULL_TOKEN;
+    SerialPortDeviceInfo.PortType             = EFI_ACPI_DBG2_PORT_TYPE_SERIAL;
+    SerialPortDeviceInfo.PortSubtype          = SerialPortInfo[Index].PortSubtype;
+    // Set the access size
+    if (SerialPortInfo[Index].AccessSize >= EFI_ACPI_6_3_QWORD) {
+      Status = EFI_INVALID_PARAMETER;
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: DBG2: Access size must be <= 3 (DWORD). Status = %r\n",
+        Status
+        ));
+      goto error_handler;
+    } else if (SerialPortInfo[Index].AccessSize == EFI_ACPI_6_3_UNDEFINED) {
+      // 0 Undefined (legacy reasons)
+      // Default to DWORD access size as the access
+      // size field was introduced at a later date
+      // and some ConfigurationManager implementations
+      // may not be providing this field data
+      SerialPortDeviceInfo.AccessSize = EFI_ACPI_6_3_DWORD;
+    } else {
+      SerialPortDeviceInfo.AccessSize = SerialPortInfo[Index].AccessSize;
+    }
+
+    AsciiSPrint (
+      SerialPortDeviceInfo.ObjectName,
+      sizeof (SerialPortDeviceInfo.ObjectName),
+      NAME_STR_DBG_PORT0
+      );
+
+    // Validate CurrentDbg2Device is in range of AcpiDbg2
+    if ((CurrentDbg2Device == NULL) || ((UINTN)CurrentDbg2Device > (UINTN)AcpiDbg2 + AcpiDbg2Len)) {
+      Status = EFI_INVALID_PARAMETER;
+      DEBUG ((DEBUG_ERROR, "ERROR: DBG2: CurrentDbg2Device is out of range. Status = %r\n", Status));
+      goto error_handler;
+    }
+
+    Status = PopulateDbg2Device (&CurrentDbg2Device, &SerialPortDeviceInfo, &SerialMemoryRange, 1);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: DBG2: Failed to populate Dbg2 Device. Status = %r\n",
+        Status
+        ));
+      goto error_handler;
+    }
+
+    if ((SerialPortInfo[Index].PortSubtype ==
+         EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_PL011_UART)           ||
+        (SerialPortInfo[Index].PortSubtype ==
+         EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_SBSA_GENERIC_UART_2X) ||
+        (SerialPortInfo[Index].PortSubtype ==
+         EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_SBSA_GENERIC_UART))
+    {
+      // Initialize the serial port
+      Status = SetupDebugUart (&SerialPortInfo[Index]);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: DBG2: Failed to configure debug serial port. Status = %r\n",
+          Status
+          ));
+        goto error_handler;
+      }
+    }
+
+    // Build a SSDT table describing the serial port.
+    Status = BuildSsdtSerialPortTable (
+               AcpiTableInfo,
+               &SerialPortInfo[Index],
+               SerialPortDeviceInfo.ObjectName,
+               UID_DBG_PORT0,
+               &TableList[1+Index]
+               );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: DBG2: Failed to build associated SSDT table. Status = %r\n",
+        Status
+        ));
+      goto error_handler;
+    }
+  }
+
+  *TableCount = 1+SerialPortCount;
   *Table      = TableList;
 
   return Status;
 
 error_handler:
+  if (AcpiDbg2 != NULL) {
+    FreePool (AcpiDbg2);
+  }
+
   if (TableList != NULL) {
     FreePool (TableList);
+  }
+
+  if (Dbg2DevicesMemoryRange != NULL) {
+    FreePool (Dbg2DevicesMemoryRange);
+  }
+
+  if (Dbg2DevicesMemoryRangeCount != NULL) {
+    FreePool (Dbg2DevicesMemoryRangeCount);
   }
 
   return Status;
