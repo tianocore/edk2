@@ -18,6 +18,9 @@
 // Local variables
 STATIC ACPI_DESCRIPTION_HEADER_INFO  AcpiHdrInfo;
 
+STATIC UINT16  *NamespaceStringLength;
+STATIC UINT16  *NamespaceStringOffset;
+
 /**
   This function validates the Interrupt Type.
 
@@ -87,31 +90,65 @@ ValidateIrq (
 }
 
 /**
+  This function validates the NameSpace string length.
+
+  @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
+  @param [in] Context Pointer to context specific information e.g. this
+                      could be a pointer to the ACPI table header.
+**/
+STATIC
+VOID
+EFIAPI
+ValidateNameSpaceStrLen (
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
+  )
+{
+  UINT16  NameSpaceStrLen;
+
+  NameSpaceStrLen = *(UINT16 *)Ptr;
+
+  if (NameSpaceStrLen < 2) {
+    IncrementErrorCount ();
+    Print (
+      L"\nERROR: NamespaceString Length = %d. If no Namespace device exists, " \
+      L"NamespaceString[] must contain a period '.'",
+      NameSpaceStrLen
+      );
+  }
+}
+
+/**
   An ACPI_PARSER array describing the ACPI SPCR Table.
 **/
 STATIC CONST ACPI_PARSER  SpcrParser[] = {
   PARSE_ACPI_HEADER (&AcpiHdrInfo),
-  { L"Interface Type",             1,   36, L"%d",       NULL,       NULL, NULL,                  NULL },
-  { L"Reserved",                   3,   37, L"%x %x %x", Dump3Chars, NULL, NULL,                  NULL },
-  { L"Base Address",               12,  40, NULL,        DumpGas,    NULL, NULL,                  NULL },
-  { L"Interrupt Type",             1,   52, L"%d",       NULL,       NULL, ValidateInterruptType, NULL },
-  { L"IRQ",                        1,   53, L"%d",       NULL,       NULL, ValidateIrq,           NULL },
-  { L"Global System Interrupt",    4,   54, L"0x%x",     NULL,       NULL, NULL,                  NULL },
-  { L"Baud Rate",                  1,   58, L"%d",       NULL,       NULL, NULL,                  NULL },
-  { L"Parity",                     1,   59, L"%d",       NULL,       NULL, NULL,                  NULL },
-  { L"Stop Bits",                  1,   60, L"%d",       NULL,       NULL, NULL,                  NULL },
-  { L"Flow Control",               1,   61, L"0x%x",     NULL,       NULL, NULL,                  NULL },
-  { L"Terminal Type",              1,   62, L"%d",       NULL,       NULL, NULL,                  NULL },
-  { L"Reserved",                   1,   63, L"%x",       NULL,       NULL, NULL,                  NULL },
+  { L"Interface Type",             1,   36, L"%d",       NULL,       NULL,                            NULL,                    NULL },
+  { L"Reserved",                   3,   37, L"%x %x %x", Dump3Chars, NULL,                            NULL,                    NULL },
+  { L"Base Address",               12,  40, NULL,        DumpGas,    NULL,                            NULL,                    NULL },
+  { L"Interrupt Type",             1,   52, L"%d",       NULL,       NULL,                            ValidateInterruptType,   NULL },
+  { L"IRQ",                        1,   53, L"%d",       NULL,       NULL,                            ValidateIrq,             NULL },
+  { L"Global System Interrupt",    4,   54, L"0x%x",     NULL,       NULL,                            NULL,                    NULL },
+  { L"Baud Rate",                  1,   58, L"%d",       NULL,       NULL,                            NULL,                    NULL },
+  { L"Parity",                     1,   59, L"%d",       NULL,       NULL,                            NULL,                    NULL },
+  { L"Stop Bits",                  1,   60, L"%d",       NULL,       NULL,                            NULL,                    NULL },
+  { L"Flow Control",               1,   61, L"0x%x",     NULL,       NULL,                            NULL,                    NULL },
+  { L"Terminal Type",              1,   62, L"%d",       NULL,       NULL,                            NULL,                    NULL },
+  { L"Reserved",                   1,   63, L"%x",       NULL,       NULL,                            NULL,                    NULL },
 
-  { L"PCI Device ID",              2,   64, L"0x%x",     NULL,       NULL, NULL,                  NULL },
-  { L"PCI Vendor ID",              2,   66, L"0x%x",     NULL,       NULL, NULL,                  NULL },
-  { L"PCI Bus Number",             1,   68, L"0x%x",     NULL,       NULL, NULL,                  NULL },
-  { L"PCI Device Number",          1,   69, L"0x%x",     NULL,       NULL, NULL,                  NULL },
-  { L"PCI Function Number",        1,   70, L"0x%x",     NULL,       NULL, NULL,                  NULL },
-  { L"PCI Flags",                  4,   71, L"0x%x",     NULL,       NULL, NULL,                  NULL },
-  { L"PCI Segment",                1,   75, L"0x%x",     NULL,       NULL, NULL,                  NULL },
-  { L"Reserved",                   4,   76, L"%x",       NULL,       NULL, NULL,                  NULL }
+  { L"PCI Device ID",              2,   64, L"0x%x",     NULL,       NULL,                            NULL,                    NULL },
+  { L"PCI Vendor ID",              2,   66, L"0x%x",     NULL,       NULL,                            NULL,                    NULL },
+  { L"PCI Bus Number",             1,   68, L"0x%x",     NULL,       NULL,                            NULL,                    NULL },
+  { L"PCI Device Number",          1,   69, L"0x%x",     NULL,       NULL,                            NULL,                    NULL },
+  { L"PCI Function Number",        1,   70, L"0x%x",     NULL,       NULL,                            NULL,                    NULL },
+  { L"PCI Flags",                  4,   71, L"0x%x",     NULL,       NULL,                            NULL,                    NULL },
+  { L"PCI Segment",                1,   75, L"0x%x",     NULL,       NULL,                            NULL,                    NULL },
+  { L"UART Clock Frequency",       4,   76, L"%d",       NULL,       NULL,                            NULL,                    NULL },
+  { L"Precise Baud Rate",          4,   80, L"%d",       NULL,       NULL,                            NULL,                    NULL },
+  { L"Namespace String Length",    2,   84, L"%x",       NULL,       (VOID **)&NamespaceStringLength, ValidateNameSpaceStrLen, NULL },
+  { L"Namespace String Offset",    2,   86, L"%x",       NULL,       (VOID **)&NamespaceStringOffset, NULL,                    NULL }
 };
 
 /**
@@ -135,6 +172,9 @@ ParseAcpiSpcr (
   IN UINT8    AcpiTableRevision
   )
 {
+  UINT16  Index;
+  UINT16  Offset;
+
   if (!Trace) {
     return;
   }
@@ -148,4 +188,29 @@ ParseAcpiSpcr (
     AcpiTableLength,
     PARSER_PARAMS (SpcrParser)
     );
+
+  if (*AcpiHdrInfo.Revision >= EFI_ACPI_4_0_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION) {
+    if ((*NamespaceStringOffset >= AcpiTableLength) ||
+        ((UINT32)(*NamespaceStringOffset + *NamespaceStringLength) > AcpiTableLength))
+    {
+      IncrementErrorCount ();
+      Print (
+        L"ERROR: Invalid Namespace String. AcpiTableLength = %d, NamespaceStringOffset = %d, NamespaceStringLength = %d\n",
+        AcpiTableLength,
+        *NamespaceStringOffset,
+        *NamespaceStringLength
+        );
+      return;
+    }
+
+    Index  = 0;
+    Offset = *NamespaceStringOffset;
+    PrintFieldName (4, L"Namespace String");
+    while ((Index++ < *NamespaceStringLength) &&
+           ((UINT32)Offset < AcpiTableLength))
+    {
+      Print (L"%c", *(Ptr + Offset));
+      Offset++;
+    }
+  }
 }
