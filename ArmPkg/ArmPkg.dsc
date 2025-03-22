@@ -118,6 +118,8 @@
   ArmPkg/Library/SemiHostingSerialPortLib/SemiHostingSerialPortLib.inf
   ArmPkg/Library/SemihostLib/SemihostLib.inf
   ArmPkg/Library/ArmExceptionLib/ArmExceptionLib.inf
+  ArmPkg/Library/Tpm2DeviceLibFfa/Tpm2DeviceLibFfa.inf
+  ArmPkg/Library/Tpm2DeviceLibFfa/Tpm2InstanceLibFfa.inf
 
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   ArmPkg/Drivers/CpuPei/CpuPei.inf
