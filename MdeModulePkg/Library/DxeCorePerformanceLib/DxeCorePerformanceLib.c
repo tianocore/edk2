@@ -320,11 +320,12 @@ InternalGetSmmPerfData (
               // Note: Maximum comm buffer data payload size is ReservedMemSize - SMM_BOOT_RECORD_COMM_SIZE
               BootRecordDataPayloadSize = MIN (
                                             ReservedMemSize - SMM_BOOT_RECORD_COMM_SIZE,
-                                            SmmBootRecordDataSize - SmmBootRecordDataRetrieved - SMM_BOOT_RECORD_COMM_SIZE
+                                            SmmBootRecordDataSize - SmmBootRecordDataRetrieved
                                             );
+              SmmCommData->BootRecordSize = BootRecordDataPayloadSize;
 
               MmCommBufferHeader->MessageLength = sizeof (SMM_BOOT_RECORD_COMMUNICATE) + BootRecordDataPayloadSize;
-              CommSize                          = sizeof (EFI_MM_COMMUNICATE_HEADER) + (UINTN)MmCommBufferHeader->MessageLength;
+              CommSize                          = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + (UINTN)MmCommBufferHeader->MessageLength;
 
               Status = Communication->Communicate (Communication, SmmBootRecordCommBuffer, &CommSize);
               ASSERT_EFI_ERROR (Status);
