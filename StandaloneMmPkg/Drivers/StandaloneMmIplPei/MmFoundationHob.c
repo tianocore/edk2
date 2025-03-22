@@ -13,6 +13,7 @@
 #include <Guid/MmCpuSyncConfig.h>
 #include <Guid/MmProfileData.h>
 #include <Guid/MmUnblockRegion.h>
+#include <Guid/MmStatusCodeUseSerial.h>
 #include <Register/Intel/Cpuid.h>
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -202,6 +203,43 @@ MmIplBuildMmCpuSyncConfigHob (
     MmSyncModeInfoHob->RelaxedApMode = (BOOLEAN)(PcdGet8 (PcdCpuSmmSyncMode) == MmCpuSyncModeRelaxedAp);
     MmSyncModeInfoHob->Timeout       = PcdGet64 (PcdCpuSmmApSyncTimeout);
     MmSyncModeInfoHob->Timeout2      = PcdGet64 (PcdCpuSmmApSyncTimeout2);
+  }
+
+  *HobBufferSize = HobLength;
+}
+
+/**
+  Builds MM Status Code Use Serial HOB.
+
+  This function builds MM Status Code Use Serial HOB.
+  It can only be invoked during PEI phase;
+  If new HOB buffer is NULL, then ASSERT().
+
+  @param[in]       Hob            The pointer of new HOB buffer.
+  @param[in, out]  HobBufferSize  The available size of the HOB buffer when as input.
+                                  The used size of when as output.
+
+**/
+VOID
+MmIplBuildMmStatusCodeUseSerialHob (
+  IN UINT8      *Hob,
+  IN OUT UINTN  *HobBufferSize
+  )
+{
+  EFI_HOB_GUID_TYPE          *GuidHob;
+  MM_STATUS_CODE_USE_SERIAL  *MmStatusCodeUseSerial;
+  UINT16                     HobLength;
+
+  HobLength = ALIGN_VALUE (sizeof (EFI_HOB_GUID_TYPE) + sizeof (MM_STATUS_CODE_USE_SERIAL), 8);
+  if (*HobBufferSize >= HobLength) {
+    ASSERT (Hob != NULL);
+    MmIplCreateHob (Hob, EFI_HOB_TYPE_GUID_EXTENSION, HobLength);
+
+    GuidHob = (EFI_HOB_GUID_TYPE *)Hob;
+    CopyGuid (&GuidHob->Name, &gMmStatusCodeUseSerialHobGuid);
+
+    MmStatusCodeUseSerial                      = (MM_STATUS_CODE_USE_SERIAL *)(GuidHob + 1);
+    MmStatusCodeUseSerial->StatusCodeUseSerial = PcdGetBool (PcdStatusCodeUseSerial);
   }
 
   *HobBufferSize = HobLength;
@@ -955,6 +993,13 @@ CreateMmFoundationHobList (
   //
   HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
   MmIplBuildMmCpuSyncConfigHob (FoundationHobList + UsedSize, &HobLength);
+  UsedSize += HobLength;
+
+  //
+  // Build MM Status Code Use Serial HOB
+  //
+  HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+  MmIplBuildMmStatusCodeUseSerialHob (FoundationHobList + UsedSize, &HobLength);
   UsedSize += HobLength;
 
   //
