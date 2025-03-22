@@ -757,7 +757,7 @@ ArmMmuBaseLibConstructor (
   extern UINT32  ArmReplaceLiveTranslationEntrySize;
   VOID           *Hob;
 
-  Hob = GetFirstGuidHob (&gArmMmuReplaceLiveTranslationEntryFuncGuid);
+  Hob = GetFirstGuidHob (&gEfiArmMmuReplaceLiveTranslationEntryFuncGuid);
   if (Hob != NULL) {
     mReplaceLiveEntryFunc = *(ARM_REPLACE_LIVE_TRANSLATION_ENTRY *)GET_GUID_HOB_DATA (Hob);
   } else {

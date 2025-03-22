@@ -32,8 +32,6 @@
   AArch64/Mmu.c
 
 [Packages]
-  ArmPkg/ArmPkg.dec
-  EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
@@ -45,7 +43,6 @@
   CpuLib
   CpuExceptionHandlerLib
   DebugLib
-  DefaultExceptionHandlerLib
   DxeServicesTableLib
   HobLib
   MemoryAllocationLib
@@ -56,20 +53,19 @@
 [Protocols]
   gEfiCpuArchProtocolGuid
   gEfiMemoryAttributeProtocolGuid
-  gHardwareInterruptProtocolGuid
+  gEfiHardwareInterruptProtocolGuid
 
 [Guids]
   gEfiDebugImageInfoTableGuid
-  gArmMpCoreInfoGuid
   gIdleLoopEventGuid
   gEfiVectorHandoffTableGuid
 
 [Pcd.common]
-  gArmTokenSpaceGuid.PcdVFPEnabled
+  gEfiMdePkgTokenSpaceGuid.PcdVFPEnabled
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy
 
 [FeaturePcd.common]
-  gArmTokenSpaceGuid.PcdRemapUnusedMemoryNx
+  gEfiMdePkgTokenSpaceGuid.PcdRemapUnusedMemoryNx
 
 [Depex]
   TRUE

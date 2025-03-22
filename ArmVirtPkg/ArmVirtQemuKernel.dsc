@@ -54,7 +54,7 @@
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
-  ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
+  ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
 
   # Virtio Support
   VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
@@ -122,7 +122,7 @@
 
 [PcdsFixedAtBuild.common]
 !if $(ARCH) == AARCH64
-  gArmTokenSpaceGuid.PcdVFPEnabled|1
+  gEfiMdePkgTokenSpaceGuid.PcdVFPEnabled|1
 !endif
 
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress|0x00000000
@@ -303,7 +303,7 @@
   #
   # Architectural Protocols
   #
-  ArmPkg/Drivers/CpuDxe/CpuDxe.inf
+  UefiCpuPkg/CpuDxeArm/CpuDxe.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
     <LibraryClasses>
