@@ -61,6 +61,9 @@
 [Sources.X64]
   Rand/CryptRandTsc.c
 
+[Sources.AARCH64]
+  Rand/CryptRand.c
+
 [Packages]
   MdePkg/MdePkg.dec
   CryptoPkg/CryptoPkg.dec
