@@ -1,0 +1,33 @@
+## @file
+#  Instance of RNG (Random Number Generator) Library.
+#
+#  BaseRng Library that uses the stdlib function
+#  rand() to provide random numbers.
+#
+#  Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
+#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = UnitTestHostRngLib
+  MODULE_UNI_FILE                = UnitTestHostRngLib.uni
+  FILE_GUID                      = 6c099959-267f-4a5b-9fa8-b5845e78c796
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RngLib|HOST_APPLICATION
+
+[Sources]
+  UnitTestHostRngLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
