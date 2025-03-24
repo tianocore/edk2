@@ -8,6 +8,10 @@
 
 #pragma once
 
+#include <ProcessorBind.h>
+
+#if defined (MDE_CPU_X64) || defined (MDE_CPU_IA32)
+
 /**
   Prototype of service with no parameters and no return value.
 **/
@@ -575,5 +579,50 @@ typedef struct {
   UNIT_TEST_HOST_BASE_LIB_COMMON    *Common;
   UNIT_TEST_HOST_BASE_LIB_X86       *X86;
 } UNIT_TEST_HOST_BASE_LIB;
+
+#elif defined (MDE_CPU_AARCH64)
+
+/**
+  Prototype of service with no parameters and no return value.
+**/
+typedef
+VOID
+(EFIAPI *UNIT_TEST_HOST_BASE_LIB_VOID)(
+  VOID
+  );
+
+/**
+  Prototype of service that reads and returns a BOOLEAN value.
+
+  @return The value read.
+**/
+typedef
+BOOLEAN
+(EFIAPI *UNIT_TEST_HOST_BASE_LIB_READ_BOOLEAN)(
+  VOID
+  );
+
+///
+/// Common services
+///
+typedef struct {
+  UNIT_TEST_HOST_BASE_LIB_VOID            EnableInterrupts;
+  UNIT_TEST_HOST_BASE_LIB_VOID            DisableInterrupts;
+  UNIT_TEST_HOST_BASE_LIB_VOID            EnableDisableInterrupts;
+  UNIT_TEST_HOST_BASE_LIB_READ_BOOLEAN    GetInterruptState;
+} UNIT_TEST_HOST_BASE_LIB_COMMON;
+
+///
+/// Data structure that contains pointers structures of common services and CPU
+/// architecture specific services.  Support for additional CPU architectures
+/// can be added to the end of this structure.
+///
+typedef struct {
+  UNIT_TEST_HOST_BASE_LIB_COMMON    *Common;
+} UNIT_TEST_HOST_BASE_LIB;
+
+#else
+  #error "Unsupported architecture for HostUnitTest."
+#endif
 
 extern UNIT_TEST_HOST_BASE_LIB  gUnitTestHostBaseLib;
