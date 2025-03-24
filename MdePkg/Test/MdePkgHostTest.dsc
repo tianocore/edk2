@@ -13,7 +13,7 @@
   PLATFORM_VERSION        = 0.1
   DSC_SPECIFICATION       = 0x00010005
   OUTPUT_DIRECTORY        = Build/MdePkg/HostTest
-  SUPPORTED_ARCHITECTURES = IA32|X64
+  SUPPORTED_ARCHITECTURES = IA32|X64|AARCH64
   BUILD_TARGETS           = NOOPT
   SKUID_IDENTIFIER        = DEFAULT
 
@@ -30,8 +30,19 @@
   #
   MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLibHost.inf
   MdePkg/Test/UnitTest/Library/BaseLib/BaseLibUnitTestsHost.inf
-  MdePkg/Test/GoogleTest/Library/BaseSafeIntLib/GoogleTestBaseSafeIntLib.inf
   MdePkg/Test/UnitTest/Library/DevicePathLib/TestDevicePathLibHost.inf
+
+  #
+  # Build HOST_APPLICATION Libraries
+  #
+  MdePkg/Library/BaseLib/UnitTestHostBaseLib.inf
+
+[Components.Ia32, Components.X64]
+  #
+  # Build HOST_APPLICATION that tests the SafeIntLib
+  #
+  MdePkg/Test/GoogleTest/Library/BaseSafeIntLib/GoogleTestBaseSafeIntLib.inf
+
   #
   # BaseLib tests
   #
@@ -40,7 +51,6 @@
   #
   # Build HOST_APPLICATION Libraries
   #
-  MdePkg/Library/BaseLib/UnitTestHostBaseLib.inf
   MdePkg/Test/Mock/Library/GoogleTest/MockUefiLib/MockUefiLib.inf
   MdePkg/Test/Mock/Library/GoogleTest/MockUefiRuntimeServicesTableLib/MockUefiRuntimeServicesTableLib.inf
   MdePkg/Test/Mock/Library/GoogleTest/MockUefiBootServicesTableLib/MockUefiBootServicesTableLib.inf
