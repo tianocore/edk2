@@ -36,9 +36,6 @@
   CpuLib|MdePkg/Library/BaseCpuLibNull/BaseCpuLibNull.inf
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLibNull/BaseCacheMaintenanceLibNull.inf
   CmockaLib|UnitTestFrameworkPkg/Library/CmockaLib/CmockaLib.inf
-  GoogleTestLib|UnitTestFrameworkPkg/Library/GoogleTestLib/GoogleTestLib.inf
-  SubhookLib|UnitTestFrameworkPkg/Library/SubhookLib/SubhookLib.inf
-  FunctionMockLib|UnitTestFrameworkPkg/Library/FunctionMockLib/FunctionMockLib.inf
   UnitTestLib|UnitTestFrameworkPkg/Library/UnitTestLib/UnitTestLibCmocka.inf
   DebugLib|UnitTestFrameworkPkg/Library/Posix/DebugLibPosix/DebugLibPosix.inf
   MemoryAllocationLib|UnitTestFrameworkPkg/Library/Posix/MemoryAllocationLibPosix/MemoryAllocationLibPosix.inf
@@ -124,6 +121,15 @@
     !endif
   !endif
 !endif
+
+[LibraryClasses.Ia32, LibraryClasses.X64]
+  GoogleTestLib|UnitTestFrameworkPkg/Library/GoogleTestLib/GoogleTestLib.inf
+  SubhookLib|UnitTestFrameworkPkg/Library/SubhookLib/SubhookLib.inf
+  FunctionMockLib|UnitTestFrameworkPkg/Library/FunctionMockLib/FunctionMockLib.inf
+  NULL|UnitTestFrameworkPkg/Library/UnitTestDebugAssertLib/UnitTestDebugAssertLibHost.inf
+
+[LibraryClasses.AARCH64]
+  NULL|UnitTestFrameworkPkg/Library/UnitTestDebugAssertLib/UnitTestDebugAssertLib.inf
 
 [BuildOptions]
 !if $(WIN_MINGW32_BUILD)
@@ -264,6 +270,7 @@
 !endif
   GCC:*_*_IA32_DLINK_FLAGS = -m32
   GCC:*_*_X64_DLINK_FLAGS  = -m64
+  GCC:*_*_AARCH64_DLINK_FLAGS  == -o $(BIN_DIR)/$(MODULE_NAME_GUID)
 
 !if $(UNIT_TESTING_ADDRESS_SANITIZER_ENABLE)
   #
