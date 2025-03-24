@@ -130,6 +130,7 @@
 
 [LibraryClasses.AARCH64]
   NULL|UnitTestFrameworkPkg/Library/UnitTestDebugAssertLib/UnitTestDebugAssertLib.inf
+  RngLib|UnitTestFrameworkPkg/Library/UnitTestHostRngLib/UnitTestHostRngLib.inf
 
 [BuildOptions]
 !if $(WIN_MINGW32_BUILD)
