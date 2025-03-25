@@ -42,13 +42,13 @@
   TimerLib
 
 [Protocols]
-  gEdkiiSmmExitBootServicesProtocolGuid         ## CONSUMES ## NOTIFY
   gEfiLoadedImageProtocolGuid                   ## CONSUMES
 
 [Guids]
   gEfiFirmwarePerformanceGuid                   ## SOMETIMES_PRODUCES         # SmiHandlerRegister
   gEdkiiSmmPerformanceMeasurementProtocolGuid   ## PRODUCES                   # Install protocol
   gZeroGuid                                     ## SOMETIMES_CONSUMES ## GUID
+  gEfiEventExitBootServicesGuid                 ## CONSUMES ## NOTIFY
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask        ## CONSUMES
