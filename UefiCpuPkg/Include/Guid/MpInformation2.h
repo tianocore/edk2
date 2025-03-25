@@ -1,13 +1,13 @@
 /** @file
-  EFI MP information protocol provides a lightweight MP_SERVICES_PROTOCOL.
+  MP information HOB to be provided by MP service module.
 
-  MP information protocol only provides static information of MP processor.
+  MP information HOB only provides static information of MP processors.
 
   If SwitchBSP or Enable/DisableAP in MP service is called between the HOB
   production and HOB consumption, EFI_PROCESSOR_INFORMATION.StatusFlag field
   in this HOB may be invalidated.
 
-  Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2023 - 2025, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -16,9 +16,8 @@
 #ifndef MP_INFORMATION2_H_
 #define MP_INFORMATION2_H_
 
+#include <Pi/PiMultiPhase.h>
 #include <Protocol/MpService.h>
-#include <PiPei.h>
-#include <Ppi/SecPlatformInformation.h>
 
 #define MP_INFORMATION2_HOB_REVISION  1
 

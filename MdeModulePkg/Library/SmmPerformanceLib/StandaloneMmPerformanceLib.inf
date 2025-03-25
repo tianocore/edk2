@@ -1,0 +1,48 @@
+## @file
+#  Performance library instance used in Standalone MM phase.
+#
+#  This library instance provides infrastructure for Standalone MM drivers to log performance
+#  data. It consumes the MM PerformanceEx or Performance Protocol to log performance data. If
+#  both MM PerformanceEx and Performance Protocol are not available, it does not log any
+#  performance information.
+#
+#  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = StandaloneMmPerformanceLib
+  MODULE_UNI_FILE                = StandaloneMmPerformanceLib.uni
+  FILE_GUID                      = 7E7415FC-0BFB-47B4-B1C8-66149CC9050C
+  MODULE_TYPE                    = MM_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = PerformanceLib|MM_STANDALONE
+
+  CONSTRUCTOR                    = StandaloneMmPerformanceLibConstructor
+  DESTRUCTOR                     = StandaloneMmPerformanceLibDestructor
+
+[Sources]
+  SmmPerformanceLibInternal.h
+  SmmPerformanceLibInternal.c
+  StandaloneMmPerformanceLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PcdLib
+  MmServicesTableLib
+  DebugLib
+  BaseMemoryLib
+
+[Guids]
+  gEdkiiSmmPerformanceMeasurementProtocolGuid                   ## SOMETIMES_CONSUMES   ## UNDEFINED # Locate protocol
+  gEfiEventExitBootServicesGuid                                 ## CONSUMES
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask    ## CONSUMES
