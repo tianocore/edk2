@@ -90,6 +90,16 @@ def GetDeclaredPcd(Platform, BuildDatabase, Arch, Target, Toolchain, additionalP
 def GetLibraryInstances(Module, Platform, BuildDatabase, Arch, Target, Toolchain):
     return GetModuleLibInstances(Module, Platform, BuildDatabase, Arch, Target, Toolchain,Platform.MetaFile,EdkLogger)
 
+def GenerateDependencyDump(ConsumedByList, M, Level, Visited):
+    if M in Visited:
+        return []
+    Visited.add(M)
+    Indentation = "\t" * Level
+    DependencyDump = [f"{Indentation}consumed by {M}"]
+    for m in ConsumedByList[M]:
+        DependencyDump.extend(GenerateDependencyDump(ConsumedByList, m, Level + 1, Visited))
+    return DependencyDump
+
 def GetModuleLibInstances(Module, Platform, BuildDatabase, Arch, Target, Toolchain, FileName = '', EdkLogger = None):
     if Module.LibInstances:
         return Module.LibInstances
@@ -133,9 +143,11 @@ def GetModuleLibInstances(Module, Platform, BuildDatabase, Arch, Target, Toolcha
                     if LibraryPath is None:
                         if not Module.LibraryClass:
                             EdkLogger.error("build", RESOURCE_NOT_AVAILABLE,
-                                            "Instance of library class [%s] is not found" % LibraryClassName,
+                                            f"Instance of library class [{LibraryClassName}] is not found for"
+                                            f" module [{Module}], [{LibraryClassName}] is:",
                                             File=FileName,
-                                            ExtraData="in [%s] [%s]\n\tconsumed by module [%s]" % (str(M), Arch, str(Module)))
+                                            ExtraData="\n\t".join(GenerateDependencyDump(ConsumedByList, M, 0, set()))
+                                            )
                         else:
                             return []
 
