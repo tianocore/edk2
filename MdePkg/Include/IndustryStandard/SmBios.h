@@ -1,6 +1,7 @@
 /** @file
   Industry Standard Definitions of SMBIOS Table Specification v3.8.0.
 
+Copyright (c) 2024-2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
 Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
 (C) Copyright 2015 - 2019 Hewlett Packard Enterprise Development LP<BR>
@@ -1864,7 +1865,8 @@ typedef enum {
   MemoryFormFactorSodimm          = 0x0D,
   MemoryFormFactorSrimm           = 0x0E,
   MemoryFormFactorFbDimm          = 0x0F,
-  MemoryFormFactorDie             = 0x10
+  MemoryFormFactorDie             = 0x10,
+  MemoryFormFactorCamm            = 0x11
 } MEMORY_FORM_FACTOR;
 
 ///
