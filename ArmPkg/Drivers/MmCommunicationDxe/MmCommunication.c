@@ -14,6 +14,7 @@
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
 #include <Protocol/MmCommunication2.h>
@@ -554,6 +555,34 @@ STATIC EFI_GUID *CONST  mGuidedEventGuid[] = {
 STATIC EFI_EVENT  mGuidedEvent[ARRAY_SIZE (mGuidedEventGuid)];
 
 /**
+  Event notification that is fired when ReadyToLockProtocol is signaled.
+
+  @param  Event                 The Event that is being processed, not used.
+  @param  Context               Event Context, not used.
+
+**/
+VOID
+EFIAPI
+MMReadyToLockProtocolNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  EFI_MM_COMMUNICATE_HEADER  Header;
+  UINTN                      Size;
+
+  //
+  // Use Guid to initialize EFI_SMM_COMMUNICATE_HEADER structure
+  //
+  CopyGuid (&Header.HeaderGuid, &gEfiDxeMmReadyToLockProtocolGuid);
+  Header.MessageLength = 1;
+  Header.Data[0]       = 0;
+
+  Size = sizeof (Header);
+  MmCommunication2Communicate (&mMmCommunication2, &Header, &Header, &Size);
+}
+
+/**
   Event notification that is fired when GUIDed Event Group is signaled.
 
   @param  Event                 The Event that is being processed, not used.
@@ -678,6 +707,15 @@ MmCommunication2Initialize (
                   NULL,
                   &mSetVirtualAddressMapEvent
                   );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = EfiNamedEventListen (
+             &gEfiDxeMmReadyToLockProtocolGuid,
+             TPL_NOTIFY,
+             MMReadyToLockProtocolNotify,
+             NULL,
+             NULL
+             );
   ASSERT_EFI_ERROR (Status);
 
   for (Index = 0; Index < ARRAY_SIZE (mGuidedEventGuid); Index++) {
