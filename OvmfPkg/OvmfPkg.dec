@@ -464,3 +464,6 @@
   #  framebuffer. This might be required on platforms that do not tolerate
   #  misaligned accesses otherwise.
   gUefiOvmfPkgTokenSpaceGuid.PcdRemapFrameBufferWriteCombine|FALSE|BOOLEAN|0x75
+
+  ## This feature flag indicates the firmware build needs the qemu variable service.
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuVarsRequire|FALSE|BOOLEAN|0x77
