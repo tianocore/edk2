@@ -40,10 +40,6 @@
 */
 extern CHAR8  ssdtserialporttemplate_aml_code[];
 
-/** UART address range length.
-*/
-#define MIN_UART_ADDRESS_LENGTH  0x1000U
-
 /** Validate the Serial Port Information.
 
   @param [in]  SerialPortInfoTable    Table of CM_ARCH_COMMON_SERIAL_PORT_INFO.
@@ -74,7 +70,8 @@ ValidateSerialPortInfo (
     ASSERT (SerialPortInfo != NULL);
 
     if ((SerialPortInfo == NULL) ||
-        (SerialPortInfo->BaseAddress == 0))
+        (SerialPortInfo->BaseAddress == 0) ||
+        (SerialPortInfo->BaseAddressLength == 0))
     {
       DEBUG ((
         DEBUG_ERROR,
@@ -322,8 +319,7 @@ FixupCrs (
   Status = AmlUpdateRdQWord (
              QWordRdNode,
              SerialPortInfo->BaseAddress,
-             ((SerialPortInfo->BaseAddressLength < MIN_UART_ADDRESS_LENGTH) ?
-              MIN_UART_ADDRESS_LENGTH : SerialPortInfo->BaseAddressLength)
+             SerialPortInfo->BaseAddressLength
              );
   if (EFI_ERROR (Status)) {
     return Status;
