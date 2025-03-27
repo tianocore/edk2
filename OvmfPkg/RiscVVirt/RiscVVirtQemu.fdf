@@ -61,7 +61,15 @@ APRIORI DXE {
   INF  EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
   INF  UefiCpuPkg/CpuDxeRiscV64/CpuDxeRiscV64.inf
   INF  OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf
+!if $(CAPSULE_ENABLE) == TRUE
+  INF  OvmfPkg/RiscVVirt/SystemFirmwareDescriptor/SystemFirmwareDescriptor.inf
+!endif
 }
+
+!if $(CAPSULE_ENABLE) == TRUE
+  # FMP image decriptor
+INF  RuleOverride=FMP_IMAGE_DESC OvmfPkg/RiscVVirt/SystemFirmwareDescriptor/SystemFirmwareDescriptor.inf
+!endif
 
 #
 # DXE Phase modules
@@ -216,6 +224,16 @@ INF  MdeModulePkg/Logo/LogoDxe.inf
 #
 INF  MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
 
+!if $(CAPSULE_ENABLE) == TRUE
+INF MdeModulePkg/Universal/EsrtFmpDxe/EsrtFmpDxe.inf
+INF SignedCapsulePkg/Universal/SystemFirmwareUpdate/SystemFirmwareReportDxe.inf
+
+FILE FREEFORM = PCD(gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiPkcs7TestPublicKeyFileGuid) {
+     SECTION RAW = BaseTools/Source/Python/Pkcs7Sign/TestRoot.cer
+     SECTION UI = "Pkcs7TestRoot"
+     }
+!endif
+
 ################################################################################
 
 [FV.FVMAIN_COMPACT]
@@ -239,11 +257,84 @@ FvNameGuid         = 27A72E80-3118-4c0c-8673-AA5B4EFA9613
 
 INF OvmfPkg/RiscVVirt/Sec/SecMain.inf
 
+!if $(CAPSULE_ENABLE) == TRUE
+INF  RuleOverride=ACPITABLE OvmfPkg/RiscVVirt/SystemFirmwareDescriptor/SystemFirmwareDescriptorSec.inf
+!endif
+
 FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
    SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
      SECTION FV_IMAGE = DXEFV
    }
  }
+
+!if $(CAPSULE_ENABLE) == TRUE
+[FV.CapsuleDispatchFv]
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+INF SignedCapsulePkg/Universal/SystemFirmwareUpdate/SystemFirmwareUpdateDxe.inf
+
+[FV.SystemFirmwareUpdateCargo]
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+FILE RAW = 67964ea2-6340-4e34-94e5-fe91c81c18c3 { # PcdEdkiiSystemFirmwareFileGuid
+    FULLFW.ROM
+  }
+
+FILE RAW = ce57b167-b0e4-41e8-a897-5f4feb781d40 { # gEdkiiSystemFmpCapsuleDriverFvFileGuid
+    FV = CapsuleDispatchFv
+  }
+
+FILE RAW = 812136D3-4D3A-433A-9418-29BB9BF78F6E { # gEdkiiSystemFmpCapsuleConfigFileGuid
+    OvmfPkg/RiscVVirt/SystemFirmwareUpdateConfig/SystemFirmwareUpdateConfig.ini
+  }
+
+[FmpPayload.FmpPayloadSystemFirmwarePkcs7]
+IMAGE_HEADER_INIT_VERSION = 0x02
+IMAGE_TYPE_ID             = 489123c7-ffe9-4928-831d-25980cacd6e1 # PcdSystemFmpCapsuleImageTypeIdGuid
+IMAGE_INDEX               = 0x1
+HARDWARE_INSTANCE         = 0x0
+MONOTONIC_COUNT           = 0x2
+CERTIFICATE_GUID          = 4AAFD29D-68DF-49EE-8AA9-347D375665A7 # PKCS7
+
+FV = SystemFirmwareUpdateCargo
+
+[Capsule.RiscVVirtFirmwareUpdateCapsuleFmpPkcs7]
+CAPSULE_GUID                = 6dcbd5ed-e82d-4c44-bda1-7194199ad92a # gEfiFmpCapsuleGuid
+CAPSULE_HEADER_SIZE         = 0x20
+CAPSULE_HEADER_INIT_VERSION = 0x1
+
+FMP_PAYLOAD = FmpPayloadSystemFirmwarePkcs7
+!endif
 
 [Rule.Common.SEC]
   FILE SEC = $(NAMED_GUID) RELOCS_STRIPPED FIXED {
@@ -307,7 +398,16 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
 
 [Rule.Common.USER_DEFINED.ACPITABLE]
   FILE FREEFORM = $(NAMED_GUID) {
-    RAW ACPI               |.acpi
-    RAW ASL                |.aml
+    RAW ACPI Optional     |.acpi
+    RAW ASL  Optional     |.aml
     UI        STRING="$(MODULE_NAME)" Optional
+  }
+
+[Rule.Common.DXE_DRIVER.FMP_IMAGE_DESC]
+  FILE DRIVER = $(NAMED_GUID) {
+    RAW BIN                |.acpi
+    DXE_DEPEX DXE_DEPEX Optional  |.depex
+    PE32      PE32    Align=4K   $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI       STRING="$(MODULE_NAME)" Optional
+    VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }

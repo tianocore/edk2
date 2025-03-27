@@ -1,0 +1,30 @@
+## @file
+#  System Firmware descriptor.
+#
+#  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2025, Ventana Micro Systems Inc. All Rights Reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = SystemFirmwareDescriptor
+  FILE_GUID                      = 41a3be2b-7f92-4aac-8623-acee9c27863c
+  MODULE_TYPE                    = USER_DEFINED
+  VERSION_STRING                 = 1.0
+
+[Sources]
+  SystemFirmwareDescriptorTable.aslc
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  SignedCapsulePkg/SignedCapsulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareRevision
+  gEfiSignedCapsulePkgTokenSpaceGuid.PcdLowestSupportedFirmwareVersion
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize

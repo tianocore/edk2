@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="firmware">
+  <id>com.riscv.virt.firmware</id>
+  <name>RiscV Virt</name>
+  <summary>System firmware for the RiscV Virt</summary>
+  <description>
+    Description of System firmware for the RiscV Virt
+  </description>
+  <provides>
+    <firmware type="flashed">489123c7-ffe9-4928-831d-25980cacd6e1</firmware>
+  </provides>
+  <url type="homepage">http://www.tianocore.org</url>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>BSD</project_license>
+  <developer_name>Tianocore</developer_name>
+  <releases>
+    <release version="FMP_CAPSULE_VERSION_DECIMAL" date="FMP_CAPSULE_DATE">
+      <description>
+        Build FW Capsule for RiscV Virt platform.
+      </description>
+    </release>
+  </releases>
+</component>
