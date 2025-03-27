@@ -97,6 +97,7 @@ struc MP_CPU_EXCHANGE_INFO
   .SevSnpIsEnabled               CTYPE_BOOLEAN 1
   .GhcbBase:                     CTYPE_UINTN 1
   .ExtTopoAvail:                 CTYPE_BOOLEAN 1
+  .SevSnpKnownInitApicId:        CTYPE_BOOLEAN 1
 endstruc
 
 MP_CPU_EXCHANGE_INFO_OFFSET equ (Flat32Start - RendezvousFunnelProcStart)

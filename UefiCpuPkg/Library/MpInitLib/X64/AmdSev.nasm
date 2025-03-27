@@ -15,6 +15,57 @@
 
 %define SIZE_4KB    0x1000
 
+;
+; This function will ensure that CpuNumber and ApicId are in sync when using
+; the ApicIds retrieved via the GHCB APIC ID List NAE event to start the APs
+; when the InitFlag is ApInitConfig. If this is not done, the CpuNumber to
+; ApicId relationship may not hold, which would result in the ApicId to VSMA
+; relationship getting out of sync after the first AP boot.
+;
+SevSnpGetInitCpuNumber:
+    ;
+    ; If not an SNP guest, leave EBX (CpuNumber) as is
+    ;
+    lea        edi, [esi + MP_CPU_EXCHANGE_INFO_FIELD (SevSnpIsEnabled)]
+    cmp        byte [edi], 1        ; SevSnpIsEnabled
+    jne        SevSnpGetCpuNumberDone
+
+    ;
+    ; If not starting the AP with a specific ApicId, leave EBX (CpuNumber) as is
+    ;
+    lea        edi, [esi + MP_CPU_EXCHANGE_INFO_FIELD (SevSnpKnownInitApicId)]
+    cmp        byte [edi], 1        ; SevSnpKnownInitApicId
+    jne        SevSnpGetCpuNumberDone
+
+    ;
+    ; Use existing code to retrieve the ApicId. SevEsGetApicId will return to
+    ; the SevSnpGetInitApicId label if SevSnpKnownInitApicId is set.
+    ;
+    jmp        SevEsGetApicId
+
+SevSnpGetInitApicId:
+    ;
+    ; EDX holds the ApicId, get processor number for this AP
+    ;
+    xor        ebx, ebx
+    lea        eax, [esi + MP_CPU_EXCHANGE_INFO_FIELD (CpuInfo)]
+    mov        rdi, [eax]
+
+SevSnpGetNextProcNumber:
+    cmp        dword [rdi + CPU_INFO_IN_HOB.InitialApicId], edx         ; APIC ID match?
+    jz         SevSnpGetCpuNumberDone
+    add        rdi, CPU_INFO_IN_HOB_size
+    inc        ebx
+    jmp        SevSnpGetNextProcNumber
+
+SevSnpGetCpuNumberDone:
+    ;
+    ; If SevSnpKnownInitApicId is set, EBX now holds the CpuNumber for this
+    ; ApicId, which matches how it was started in SevSnpCreateAP(). Otherwise,
+    ; EBX is unchanged and holds the CpuNumber based on the startup order.
+    ;
+    OneTimeCallRet    SevSnpGetInitCpuNumber
+
 RegisterGhcbGpa:
     ;
     ; Register GHCB GPA when SEV-SNP is enabled
@@ -193,7 +244,14 @@ RestoreGhcb:
 
     mov        rdx, rbx
 
-    ; x2APIC ID or APIC ID is in EDX
+    ;
+    ; x2APIC ID or APIC ID is in EDX. If SevSnpKnownInitApicId is set, then
+    ; return to SevSnpGetInitApicId, otherwise return to GetProcessorNumber.
+    ;
+    lea        edi, [esi + MP_CPU_EXCHANGE_INFO_FIELD (SevSnpKnownInitApicId)]
+    cmp        byte [edi], 1        ; SevSnpKnownInitApicId
+    je         SevSnpGetInitApicId
+
     jmp        GetProcessorNumber
 
 SevEsGetApicIdExit:
