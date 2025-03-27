@@ -358,6 +358,10 @@
   #
   ArmLib|Include/Library/ArmLib.h
 
+  ##  @libraryclass  Provides a Mmu interface.
+  #
+  ArmMmuLib|Include/Library/ArmMmuLib.h
+
 [Guids]
   #
   # GUID defined in UEFI2.1/UEFI2.0/EFI1.1
@@ -926,6 +930,9 @@
 
   ## Include/Guid/Cper.h
   gEfiIa32X64ErrorTypeMsCheckGuid    = { 0x48AB7F57, 0xDC34, 0x4f6c, { 0xA7, 0xD3, 0xB0, 0xB5, 0xB0, 0xA7, 0x43, 0x14 }}
+
+[Guids.ARM, Guids.AARCH64]
+  gEfiArmMmuReplaceLiveTranslationEntryFuncGuid = { 0x309BD835, 0xEF7F, 0x834D, {0xA6, 0x37, 0x90, 0xB2, 0x6E, 0x6B, 0xCC, 0x63 } }
 
 [Ppis]
   ## Include/Ppi/MasterBootMode.h
@@ -2002,6 +2009,9 @@
   ## Include/Protocol/ShellDynamicCommand.h
   gEfiShellDynamicCommandProtocolGuid  = { 0x3c7200e9, 0x005f, 0x4ea4, {0x87, 0xde, 0xa3, 0xdf, 0xac, 0x8a, 0x27, 0xc3 }}
 
+[Protocols.ARM, Protocols.AARCH64]
+  gEfiHardwareInterruptProtocolGuid =  { 0x38121D9B, 0x4C4F, 0x3D40, { 0x90, 0xED, 0x47, 0xCB, 0xE4, 0x18, 0xD2, 0xF9 }}
+
 #
 # [Error.gEfiMdePkgTokenSpaceGuid]
 #   0x80000001 | Invalid value provided.
@@ -2059,6 +2069,18 @@
   #  testing purposes.
   # @Prompt Validate ORDERED_COLLECTION structure
   gEfiMdePkgTokenSpaceGuid.PcdValidateOrderedCollection|FALSE|BOOLEAN|0x0000002a
+
+[PcdsFeatureFlag.ARM]
+  # Whether to map normal memory as non-shareable. FALSE is the safe choice, but
+  # TRUE may be appropriate to fix performance problems if you don't care about
+  # hardware coherency (i.e., no virtualization or cache coherent DMA)
+  gEfiMdePkgTokenSpaceGuid.PcdNormalMemoryNonshareableOverride|FALSE|BOOLEAN|0x00000060
+
+[PcdsFeatureFlag.ARM, PcdsFeatureFlag.AARCH64]
+  # Whether to remap all unused memory NX before installing the CPU arch
+  # protocol driver. This is needed on platforms that map all DRAM with RWX
+  # attributes initially, and can be disabled otherwise.
+  gEfiMdePkgTokenSpaceGuid.PcdRemapUnusedMemoryNx|TRUE|BOOLEAN|0x00000061
 
 [PcdsFixedAtBuild]
   ## Status code value for indicating a watchdog timer has expired.
@@ -2498,6 +2520,11 @@
   ## GUID identifying the Rng algorithm implemented by CPU instruction.
   # @Prompt CPU Rng algorithm's GUID.
   gEfiMdePkgTokenSpaceGuid.PcdCpuRngSupportedAlgorithm|{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}|VOID*|0x00000037
+
+[PcdsFixedAtBuild.ARM, PcdsFixedAtBuild.AARCH64]
+  # This PCD should be a FeaturePcd. But we used this PCD as an '#if' in an ASM file.
+  # Using a FeaturePcd make a '(BOOLEAN) casting for its value which is not understood by the preprocessor.
+  gEfiMdePkgTokenSpaceGuid.PcdVFPEnabled|0|UINT32|0x00000062
 
 [PcdsFixedAtBuild.RISCV64, PcdsPatchableInModule.RISCV64]
   #

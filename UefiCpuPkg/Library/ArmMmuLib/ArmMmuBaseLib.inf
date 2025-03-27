@@ -31,8 +31,6 @@
   Arm/ArmMmuLibV7Support.S   |GCC
 
 [Packages]
-  ArmPkg/ArmPkg.dec
-  EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
@@ -42,7 +40,7 @@
   MemoryAllocationLib
 
 [Guids]
-  gArmMmuReplaceLiveTranslationEntryFuncGuid
+  gEfiArmMmuReplaceLiveTranslationEntryFuncGuid
 
 [Pcd.ARM]
-  gArmTokenSpaceGuid.PcdNormalMemoryNonshareableOverride
+  gEfiMdePkgTokenSpaceGuid.PcdNormalMemoryNonshareableOverride
