@@ -77,7 +77,7 @@ GetMpService (
   // Get MP Services2 Ppi
   //
   Status = PeiServicesLocatePpi (
-             &gEdkiiPeiMpServices2PpiGuid,
+             &gEfiPeiMpServices2PpiGuid,
              0,
              NULL,
              (VOID **)&MpService.Ppi
@@ -98,9 +98,9 @@ GetProcessorIndex (
   IN CPU_FEATURES_DATA  *CpuFeaturesData
   )
 {
-  EFI_STATUS                  Status;
-  EDKII_PEI_MP_SERVICES2_PPI  *CpuMp2Ppi;
-  UINTN                       ProcessorIndex;
+  EFI_STATUS                Status;
+  EFI_PEI_MP_SERVICES2_PPI  *CpuMp2Ppi;
+  UINTN                     ProcessorIndex;
 
   CpuMp2Ppi = CpuFeaturesData->MpService.Ppi;
 
@@ -130,9 +130,9 @@ GetProcessorInformation (
   OUT EFI_PROCESSOR_INFORMATION  *ProcessorInfoBuffer
   )
 {
-  EDKII_PEI_MP_SERVICES2_PPI  *CpuMp2Ppi;
-  EFI_STATUS                  Status;
-  CPU_FEATURES_DATA           *CpuFeaturesData;
+  EFI_PEI_MP_SERVICES2_PPI  *CpuMp2Ppi;
+  EFI_STATUS                Status;
+  CPU_FEATURES_DATA         *CpuFeaturesData;
 
   CpuFeaturesData = GetCpuFeaturesData ();
   CpuMp2Ppi       = CpuFeaturesData->MpService.Ppi;
@@ -159,9 +159,9 @@ StartupAllAPsWorker (
   IN  EFI_EVENT         MpEvent
   )
 {
-  EFI_STATUS                  Status;
-  EDKII_PEI_MP_SERVICES2_PPI  *CpuMp2Ppi;
-  CPU_FEATURES_DATA           *CpuFeaturesData;
+  EFI_STATUS                Status;
+  EFI_PEI_MP_SERVICES2_PPI  *CpuMp2Ppi;
+  CPU_FEATURES_DATA         *CpuFeaturesData;
 
   CpuFeaturesData = GetCpuFeaturesData ();
   CpuMp2Ppi       = CpuFeaturesData->MpService.Ppi;
@@ -191,9 +191,9 @@ StartupAllCPUsWorker (
   IN  EFI_AP_PROCEDURE  Procedure
   )
 {
-  EFI_STATUS                  Status;
-  EDKII_PEI_MP_SERVICES2_PPI  *CpuMp2Ppi;
-  CPU_FEATURES_DATA           *CpuFeaturesData;
+  EFI_STATUS                Status;
+  EFI_PEI_MP_SERVICES2_PPI  *CpuMp2Ppi;
+  CPU_FEATURES_DATA         *CpuFeaturesData;
 
   CpuFeaturesData = GetCpuFeaturesData ();
 
@@ -220,9 +220,9 @@ SwitchNewBsp (
   IN  UINTN  ProcessorNumber
   )
 {
-  EFI_STATUS                  Status;
-  EDKII_PEI_MP_SERVICES2_PPI  *CpuMp2Ppi;
-  CPU_FEATURES_DATA           *CpuFeaturesData;
+  EFI_STATUS                Status;
+  EFI_PEI_MP_SERVICES2_PPI  *CpuMp2Ppi;
+  CPU_FEATURES_DATA         *CpuFeaturesData;
 
   CpuFeaturesData = GetCpuFeaturesData ();
   CpuMp2Ppi       = CpuFeaturesData->MpService.Ppi;
@@ -254,9 +254,9 @@ GetNumberOfProcessor (
   OUT UINTN  *NumberOfEnabledProcessors
   )
 {
-  EFI_STATUS                  Status;
-  EDKII_PEI_MP_SERVICES2_PPI  *CpuMp2Ppi;
-  CPU_FEATURES_DATA           *CpuFeaturesData;
+  EFI_STATUS                Status;
+  EFI_PEI_MP_SERVICES2_PPI  *CpuMp2Ppi;
+  CPU_FEATURES_DATA         *CpuFeaturesData;
 
   CpuFeaturesData = GetCpuFeaturesData ();
   CpuMp2Ppi       = CpuFeaturesData->MpService.Ppi;
