@@ -422,6 +422,10 @@
   #
   SecurityPkg/FvReportPei/FvReportPei.inf
 
+[Components.AARCH64]
+  SecurityPkg/Tcg/Tcg2StandaloneMmArm/Tcg2StandaloneMmArm.inf
+  SecurityPkg/Tcg/Tcg2AcpiFfa/Tcg2AcpiFfa.inf
+
 [BuildOptions]
    MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:256
    MSFT:*_*_IA32_DLINK_XIPFLAGS = /ALIGN:256
