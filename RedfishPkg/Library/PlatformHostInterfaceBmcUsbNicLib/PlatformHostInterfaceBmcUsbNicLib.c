@@ -3,6 +3,7 @@
   of USB NIC Device exposed by BMC.
 
   Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.
+  Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -1365,4 +1366,21 @@ RedfishPlatformHostInterfaceNotification (
 
   DEBUG ((DEBUG_ERROR, "%a: Something wrong when look for BMC USB NIC.\n", __func__));
   return Status;
+}
+
+/**
+  Get USB device serial number.
+
+  @param[out] SerialNumber    Pointer to retrieve complete serial number.
+                              It is the responsibility of the caller to free the allocated
+                              memory for serial number.
+  @retval EFI_SUCCESS         Serial number is returned.
+  @retval Others              Failed to get the serial number
+**/
+EFI_STATUS
+RedfishPlatformHostInterfaceSerialNumber (
+  OUT CHAR8  **SerialNumber
+  )
+{
+  return EFI_UNSUPPORTED;
 }
