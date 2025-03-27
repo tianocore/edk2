@@ -216,6 +216,11 @@ INF  MdeModulePkg/Logo/LogoDxe.inf
 #
 INF  MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
 
+!if $(CAPSULE_ENABLE) == TRUE
+INF  MdeModulePkg/Universal/EsrtFmpDxe/EsrtFmpDxe.inf
+INF  FILE_GUID = $(FMP_SYSTEM_DEVICE) FmpDevicePkg/FmpDxe/FmpDxe.inf
+!endif
+
 ################################################################################
 
 [FV.FVMAIN_COMPACT]
