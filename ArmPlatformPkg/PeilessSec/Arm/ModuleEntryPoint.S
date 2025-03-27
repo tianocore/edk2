@@ -13,11 +13,6 @@ ASM_FUNC(_ModuleEntryPoint)
   // Do early platform specific actions
   bl    ASM_PFX(ArmPlatformPeiBootAction)
 
-_SetSVCMode:
-  // Enter SVC mode, Disable FIQ and IRQ
-  mov     r1, #(CPSR_MODE_SVC | CPSR_IRQ | CPSR_FIQ)
-  msr     CPSR_c, r1
-
 // Check if we can install the stack at the top of the System Memory or if we need
 // to install the stacks at the bottom of the Firmware Device (case the FD is located
 // at the top of the DRAM)
