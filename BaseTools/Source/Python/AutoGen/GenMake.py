@@ -348,19 +348,19 @@ all: mbuild
 # Target used when called from platform makefile, which will bypass the build of dependent libraries
 #
 
-pbuild: $(INIT_TARGET) $(BC_TARGET) $(PCH_TARGET) $(CODA_TARGET)
+pbuild: $(INIT_TARGET) $(BC_TARGET) $(PCH_TARGET) $(CODA_TARGET) write_module_type
 
 #
 # ModuleTarget
 #
 
-mbuild: $(INIT_TARGET) $(BC_TARGET) gen_libs $(PCH_TARGET) $(CODA_TARGET)
+mbuild: $(INIT_TARGET) $(BC_TARGET) gen_libs $(PCH_TARGET) $(CODA_TARGET) write_module_type
 
 #
 # Build Target used in multi-thread build mode, which will bypass the init and gen_libs targets
 #
 
-tbuild: $(BC_TARGET) $(PCH_TARGET) $(CODA_TARGET)
+tbuild: $(BC_TARGET) $(PCH_TARGET) $(CODA_TARGET) write_module_type
 
 #
 # Phony target which is used to force executing commands for a target
@@ -394,6 +394,11 @@ strdefs:
 gen_libs:
 \t${BEGIN}@"$(MAKE)" $(MAKE_FLAGS) -f ${dependent_library_build_directory}${separator}${makefile_name}
 \t${END}@cd $(MODULE_BUILD_DIR)
+
+write_module_type:
+\t-@${create_ffs_output_directory}
+\t-@echo $(MODULE_TYPE) > $(FFS_OUTPUT_DIR)${separator}Module_Type
+\t-@echo "MODULE_TYPE has been written to $(FFS_OUTPUT_DIR)\Module_Type"
 
 #
 # Build Flash Device Image
@@ -711,6 +716,7 @@ cleanlib:
             "clean_command"             : self.GetRemoveDirectoryCommand(["$(OUTPUT_DIR)"]),
             "cleanall_command"          : self.GetRemoveDirectoryCommand(["$(DEBUG_DIR)", "$(OUTPUT_DIR)"]),
             "dependent_library_build_directory" : self.LibraryBuildDirectoryList,
+            "create_ffs_output_directory": self.GetCreateDirectoryCommand(["$(FFS_OUTPUT_DIR)"]),
             "library_build_command"     : LibraryMakeCommandList,
             "file_macro"                : FileMacroList,
             "file_build_target"         : self.BuildTargetList,

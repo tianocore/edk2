@@ -182,6 +182,7 @@ class WorkspaceAutoGen(AutoGen):
         if self.FdfFile:
             Fdf = FdfParser(self.FdfFile.Path)
             Fdf.ParseFile()
+            Fdf.AddXipInfoIntoJson(os.path.join(self.Platform.OutputDirectory, self.Platform._Target + "_" + self.Platform._Toolchain, 'FV', 'Module_Xip'), Fdf._XipDict)
             GlobalData.gFdfParser = Fdf
             if Fdf.CurrentFdName and Fdf.CurrentFdName in Fdf.Profile.FdDict:
                 FdDict = Fdf.Profile.FdDict[Fdf.CurrentFdName]
