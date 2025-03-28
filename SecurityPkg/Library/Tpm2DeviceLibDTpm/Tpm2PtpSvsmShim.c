@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/Tpm2DeviceLib.h>
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
+#include <ConfidentialComputingGuestAttr.h>
 #include "Tpm2Ptp.h"
 #include "Tpm2Svsm.h"
 
@@ -26,6 +27,27 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// @}
 
 static BOOLEAN  mUseSvsmVTpm = FALSE;
+
+BOOLEAN
+IsAmdSevSnpActive (
+  )
+{
+  UINT64  CurrentAttr;
+
+  //
+  // Get the current CC attribute.
+  //
+  CurrentAttr = PcdGet64 (PcdConfidentialComputingGuestAttr);
+
+  //
+  // If attr is for the AMD group then check for SNP
+  //
+  if (((RShiftU64 (CurrentAttr, 8)) & 0xff) == 1) {
+    return (CurrentAttr & CCAttrTypeMask) == CCAttrAmdSevSnp;
+  }
+
+  return FALSE;
+}
 
 /**
  Initializes SVSM vTPM if present, or otherwise uses TCG PTP method.
@@ -44,6 +66,10 @@ EFIAPI
 TryUseSvsmVTpm (
   )
 {
+  if (!IsAmdSevSnpActive ()) {
+    return FALSE;
+  }
+
   UINT8  SvsmVTpmPresence = (UINT8)PcdGet8 (PcdSvsmVTpmPresence);
 
   if (SvsmVTpmPresence == SVSM_VTPM_PRESENCE_UNKNOWN) {
