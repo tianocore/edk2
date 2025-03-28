@@ -72,6 +72,7 @@ UsbIoControlTransfer (
   EFI_TPL            OldTpl;
   EFI_STATUS         Status;
   UINTN              RequestedDataLength;
+  UINT8              Index;
 
   if (UsbStatus == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -194,19 +195,35 @@ UsbIoControlTransfer (
   }
 
   //
-  // A new alternative setting is selected for the interface.
-  // No need to reinstall UsbIo in this case because only
-  // underlying communication endpoints are changed. Functionality
-  // should remains the same.
+  // Select a new interface.
+  // Look for requested interface in the current configuration.
   //
   if ((Request->Request     == USB_REQ_SET_INTERFACE) &&
       (Request->RequestType == USB_REQUEST_TYPE (
                                  EfiUsbNoData,
                                  USB_REQ_TYPE_STANDARD,
                                  USB_TARGET_INTERFACE
-                                 )) &&
-      (Request->Index       == UsbIf->IfSetting->Desc.InterfaceNumber))
+                                 )))
   {
+    for (Index = 0; Index < Dev->NumOfInterface; Index++) {
+      UsbIf = Dev->Interfaces[Index];
+      if (Request->Index == UsbIf->IfSetting->Desc.InterfaceNumber) {
+        break;
+      }
+    }
+
+    if (Index == Dev->NumOfInterface) {
+      Status = EFI_NOT_FOUND;
+      DEBUG ((DEBUG_ERROR, "UsbIoControlTransfer: interface 0x%02X is not found\n.", Request->Index));
+      goto ON_EXIT;
+    }
+
+    //
+    // A new alternative setting is selected for the interface.
+    // No need to reinstall UsbIo in this case because only
+    // underlying communication endpoints are changed. Functionality
+    // should remains the same.
+    //
     Status = UsbSelectSetting (UsbIf->IfDesc, (UINT8)Request->Value);
 
     if (!EFI_ERROR (Status)) {
