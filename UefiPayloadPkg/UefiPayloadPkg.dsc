@@ -170,6 +170,12 @@
   #
   HAND_OFF_FDT_ENABLE       = FALSE
 
+  #
+  # Change section alignment from default value in tools_def.txt to RUNTIME_PAGE_ALLOCATION_GRANULARITY
+  # for DXE_DRIVER, DXE_CORE, UEFI_DRIVER and UEFI_APPLICATION.
+  #
+  DEFINE FIX_DRIVERS_ALIGNMENT = FALSE
+
 [BuildOptions]
   *_*_*_CC_FLAGS                 = -D DISABLE_NEW_DEPRECATED_INTERFACES
 !if $(USE_CBMEM_FOR_CONSOLE) == FALSE
@@ -194,6 +200,38 @@
 
 [BuildOptions.AARCH64.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x10000
+
+#
+# Use FV_SECTION_ALIGNMENT for set Image Section Alignment for DXE_DRIVERs, DXE_CORE
+# UEFI_DRIVERs, UEFI_APPLICATION and DXE_SMM_DRIVERs.
+# The alignment is decided per processor type (RUNTIME_PAGE_ALLOCATION_GRANULARITY
+# from ProcessorBind.h). For example for AArch64 RUNTIME_PAGE_ALLOCATION_GRANULARITY
+# is 0x10000, for more another platforms RUNTIME_PAGE_ALLOCATION_GRANULARITY is 0x1000.
+# This setting can significantly increase the size of payload.
+#
+!ifdef FV_SECTION_ALIGNMENT
+  [BuildOptions.common.EDKII.DXE_DRIVER, BuildOptions.common.EDKII.DXE_CORE]
+    GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=$(FV_SECTION_ALIGNMENT)
+    XCODE:*_*_*_DLINK_FLAGS    = -seg1addr 0x1000 -segalign 0x1000
+    XCODE:*_*_*_MTOC_FLAGS     = -align 0x1000
+    CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:4096
+    MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096
+
+  [BuildOptions.common.EDKII.UEFI_DRIVER, BuildOptions.common.EDKII.UEFI_APPLICATION]
+    GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=$(FV_SECTION_ALIGNMENT)
+    XCODE:*_*_*_DLINK_FLAGS    = -seg1addr 0x1000 -segalign 0x1000
+    XCODE:*_*_*_MTOC_FLAGS     = -align 0x1000
+    CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:4096
+    MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096
+
+  [BuildOptions.common.EDKII.DXE_SMM_DRIVER]
+    GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=$(FV_SECTION_ALIGNMENT)
+    XCODE:*_*_*_DLINK_FLAGS    = -seg1addr 0x1000 -segalign 0x1000
+    XCODE:*_*_*_MTOC_FLAGS     = -align 0x1000
+    CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:4096
+    MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096
+!endif
+
 
 ################################################################################
 #
