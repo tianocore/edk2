@@ -58,7 +58,7 @@ EFI_STATUS
 
   This routine must be called at or below TPL_NOTIFY.
 
-  The I2C controller is reset.  The caller must call SetBusFrequench() after
+  The I2C controller is reset.  The caller must call SetBusFrequency() after
   calling Reset().
 
   @param[in]     This       Pointer to an EFI_I2C_MASTER_PROTOCOL structure.
