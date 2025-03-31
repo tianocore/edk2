@@ -3,6 +3,7 @@
   for EDK2 Redfish Feature driver to do HTTP operations.
 
   Copyright (c) 2023-2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -399,7 +400,7 @@ RedfishCreateRedfishService (
 
       Status = Base64Encode (
                  (CONST UINT8 *)BasicAuthString,
-                 BasicAuthStrSize,
+                 AsciiStrLen (BasicAuthString),
                  EncodedAuthString,
                  &EncodedAuthStrSize
                  );
@@ -411,7 +412,7 @@ RedfishCreateRedfishService (
 
         Status = Base64Encode (
                    (CONST UINT8 *)BasicAuthString,
-                   BasicAuthStrSize,
+                   AsciiStrLen (BasicAuthString),
                    EncodedAuthString,
                    &EncodedAuthStrSize
                    );
