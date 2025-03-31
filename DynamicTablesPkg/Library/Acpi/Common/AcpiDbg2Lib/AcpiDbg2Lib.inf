@@ -23,7 +23,7 @@
 [Sources.ARM, Sources.AARCH64]
   Arm/ArmDbg2Generator.c
 
-[Sources.IA32, Sources.X86]
+[Sources.IA32, Sources.X86, Sources.X64]
   Dbg2GeneratorNull.c
 
 [Packages.ARM, Packages.AARCH64]
@@ -40,6 +40,7 @@
 
 [LibraryClasses]
   BaseLib
+  PrintLib
   SsdtSerialPortFixupLib
 
 [FixedPcd]
