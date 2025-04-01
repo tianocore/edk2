@@ -8,6 +8,7 @@
 #
 #  Copyright (c) Microsoft Corporation
 #  Copyright (c) 2022, Arm Limited. All rights reserved.<BR>
+#  Copyright (C) 2025, Advanced Micro Devices, Inc. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -41,5 +42,6 @@
   MSFT:*_*_*_DLINK_FLAGS  = /DLL /SUBSYSTEM:CONSOLE /VERSION:1.0
   MSFT:*_*_*_GENFW_FLAGS = --keepoptionalheader
 
-  GCC:*_*_AARCH64_GENFW_FLAGS = --prm
-  GCC:*_*_AARCH64_DLINK_FLAGS = -Wl,--no-gc-sections -Wl,--require-defined=PrmModuleExportDescriptor -Wl,--require-defined=CheckParamBufferPrmHandler
+  GCC:*_*_*_GENFW_FLAGS = --prm
+  GCC:*_*_*_DLINK_FLAGS = -Wl,--no-gc-sections -Wl,--require-defined=PrmModuleExportDescriptor -Wl,--require-defined=CheckParamBufferPrmHandler
+  GCC:*_*_X64_OBJCOPY_STRIPFLAG = --keep-symbol=PrmModuleExportDescriptor --keep-symbol=CheckParamBufferPrmHandler

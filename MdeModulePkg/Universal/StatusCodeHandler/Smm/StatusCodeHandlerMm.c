@@ -27,7 +27,7 @@ InitializationDispatcherWorker (
   // If enable UseSerial, then initialize serial port.
   // if enable UseRuntimeMemory, then initialize runtime memory status code worker.
   //
-  if (PcdGetBool (PcdStatusCodeUseSerial)) {
+  if (IsStatusCodeUsingSerialPort ()) {
     //
     // Call Serial Port Lib API to initialize serial port.
     //
@@ -68,7 +68,7 @@ StatusCodeHandlerCommonEntry (
   //
   InitializationDispatcherWorker ();
 
-  if (PcdGetBool (PcdStatusCodeUseSerial)) {
+  if (IsStatusCodeUsingSerialPort ()) {
     mRscHandlerProtocol->Register (SerialStatusCodeReportWorker);
   }
 
