@@ -186,6 +186,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Private data types
 //
+typedef struct {
+    CHAR8     ModuleName[64];
+    BOOLEAN   XipEnabled;
+} MODULE_XIP_INFO;
+
+#define MAX_MODULES_TYPE      0x20
+#define MAX_XIP_LINE_LENGTH   0x20
+
+typedef struct {
+    CHAR8 FvFilePath[MAX_LONG_FILE_PATH];
+    CHAR8 ModuleType[64];
+} FILE_MODULE_TYPE;
 //
 // Component information
 //
@@ -397,6 +409,31 @@ Returns:
   EFI_INVALID_PARAMETER   A required parameter was NULL.
 
 --*/
+;
+
+EFI_STATUS
+ReadXipFile (
+  IN CONST CHAR8  *FilePath
+  )
+;
+
+BOOLEAN
+IsModuleTypeRecorded (
+  IN CONST CHAR8  *FilePath
+  )
+;
+
+VOID
+StoreModuleType (
+  IN CONST CHAR8  *FilePath
+  )
+;
+
+
+CONST CHAR8 *
+GetFileModuleType (
+  IN CONST CHAR8  *FilePath
+  )
 ;
 
 #endif
