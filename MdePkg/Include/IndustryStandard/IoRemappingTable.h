@@ -145,7 +145,7 @@ typedef struct {
 } EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE;
 
 ///
-/// Node type 1: root complex node
+/// Node type 2: root complex node
 ///
 typedef struct {
   EFI_ACPI_6_0_IO_REMAPPING_NODE    Node;
@@ -164,7 +164,7 @@ typedef struct {
 } EFI_ACPI_6_0_IO_REMAPPING_RC_NODE;
 
 ///
-/// Node type 2: named component node
+/// Node type 1: named component node
 ///
 typedef struct {
   EFI_ACPI_6_0_IO_REMAPPING_NODE    Node;
