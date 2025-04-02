@@ -59,6 +59,13 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjPssInfo,                        ///< 32 - P-State status (PSS) Info
   EArchCommonObjPpcInfo,                        ///< 33 - P-State control (PPC) Info
   EArchCommonObjStaInfo,                        ///< 34 - _STA (Device Status) Info
+  EArchCommonObjMemoryProxDomainAttrInfo,       ///< 35 - Memory Proximity Attribute Info
+  EArchCommonObjMemoryLatBwInfo,                ///< 36 - Memory Latency and Bandwidth Info
+  EArchCommonObjInitiatorDomainList,            ///< 37 - Memory Initiator Domain List
+  EArchCommonObjTargetDomainList,               ///< 38 - Memory Target Domain List
+  EArchCommonObjRelativeDistanceEntry,          ///< 39 - Memory Relative Distance Entry
+  EArchCommonObjMemoryCacheInfo,                ///< 40 - Memory Cache Info
+  EArchCommonObjSmbiosHandle,                   ///< 41 - Smbios Handles
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -826,6 +833,19 @@ typedef struct CmArchCommonStaInfo {
   /// Device Status
   UINT32    DeviceStatus;
 } CM_ARCH_COMMON_STA_INFO;
+
+/** A structure that describes the Memory Proximity Domain Attribute.
+
+    ID: EArchCommonObjMemoryProxDomainAttrInfo
+*/
+
+typedef struct CmArchCommonMemoryProxDomainAttrInfo {
+  UINT16 Type;
+  UINT16 Flags;
+  UINT32 ProcessorProximityDomain;
+  UINT32 MemoryProximityDomain;
+} CM_ARCH_COMMON_MEMORY_PROX_DOMAIN_ATTR_INFO;
+
 
 /** A structure that describes the Memory Latency Bandwidth Info.
 

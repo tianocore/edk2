@@ -52,10 +52,6 @@ typedef enum ArmObjectID {
   EArmObjRmr,                                                  ///< 21 - Reserved Memory Range Node
   EArmObjMemoryRangeDescriptor,                                ///< 22 - Memory Range Descriptor
   EArmObjEtInfo,                                               ///< 23 - Embedded Trace Extension/Module Info
-  EArmObjMemoryInitTargetInfo,                                 ///< 24 - Memory Initiator and Target Info
-  EArmObjMemoryProxDomainAttrInfo,                             ///< 25 - Memory Proximity Attribute Info
-  EArmObjMemoryLatBwInfo,                                      ///< 26 - Memory Latency and Bandwidth Info
-  EArmObjMemoryCacheInfo,                                      ///< 27 - Memory Cache Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
