@@ -130,8 +130,8 @@ AddMemCacheInfo (
     Proximity Domain Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-                 EObjNameSpaceArm,
-                 EArmObjMemoryInitTargetInfo,
+                 EObjNameSpaceArchCommon,
+                 EArchCommonObjMemoryInitTargetInfo,
                  CM_ARM_MEMORY_INIT_TARGET_INFO
                  );
 
@@ -139,8 +139,8 @@ GET_OBJECT_LIST (
     Proximity Domain Attribute Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-                 EObjNameSpaceArm,
-                 EArmObjMemoryProxDomainAttrInfo,
+                 EObjNameSpaceArchCommon,
+                 EArchCommonObjMemoryProxDomainAttrInfo,
                  CM_ARM_MEMORY_PROX_DOMAIN_ATTR_INFO
                  );
 
@@ -148,8 +148,8 @@ GET_OBJECT_LIST (
     Latency and Bandwidth Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-                 EObjNameSpaceArm,
-                 EArmObjMemoryLatBwInfo,
+                 EObjNameSpaceArchCommon,
+                 EArchCommonObjMemoryLatBwInfo,
                  CM_ARM_MEMORY_LAT_BW_INFO
                  );
 
@@ -157,8 +157,8 @@ GET_OBJECT_LIST (
     Cache Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-                 EObjNameSpaceArm,
-                 EArmObjMemoryCacheInfo,
+                 EObjNameSpaceArchCommon,
+                 EArchCommonObjMemoryCacheInfo,
                  CM_ARM_MEMORY_CACHE_INFO
                  );
 
@@ -263,7 +263,7 @@ BuildHmatTable (
   *Table = NULL;
   EFI_ACPI_6_4_HETEROGENEOUS_MEMORY_ATTRIBUTE_TABLE_HEADER  *Hmat;
 
-  Status = GetEArmObjMemoryInitTargetInfo (
+  Status = GetEArchCommonObjMemoryInitTargetInfo (
                                            CfgMgrProtocol,
                                            CM_NULL_TOKEN,
                                            &MemInitTargetInfo,
@@ -281,7 +281,7 @@ BuildHmatTable (
     goto error_handler;
   }
 
-  Status = GetEArmObjMemoryProxDomainAttrInfo (
+  Status = GetEArchCommonObjMemoryProxDomainAttrInfo (
                                                CfgMgrProtocol,
                                                CM_NULL_TOKEN,
                                                &MemProxDomainAttrInfo,
@@ -311,7 +311,7 @@ BuildHmatTable (
     goto error_handler;
   }
 
-  Status = GetEArmObjMemoryLatBwInfo (
+  Status = GetEArchCommonObjMemoryLatBwInfo (
                                       CfgMgrProtocol,
                                       CM_NULL_TOKEN,
                                       &MemLatBwInfo,
@@ -341,7 +341,7 @@ BuildHmatTable (
     goto error_handler;
   }
 
-  Status = GetEArmObjMemoryCacheInfo (
+  Status = GetEArchCommonObjMemoryCacheInfo (
                                       CfgMgrProtocol,
                                       CM_NULL_TOKEN,
                                       &MemCacheInfo,
