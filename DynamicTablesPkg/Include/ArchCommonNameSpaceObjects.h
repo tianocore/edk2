@@ -163,7 +163,7 @@ typedef struct CmArchCommonObjRef {
 
     ID: EArchCommonWord
 */
-struct CmArchCommonWord {
+typedef struct CmArchCommonWord {
   UINT16 Value;
 } CM_ARCH_COMMON_WORD;
 
