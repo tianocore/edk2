@@ -743,9 +743,8 @@ typedef struct CmArmMemoryInitTargetInfo {
 */
 
 typedef struct CmArmMemoryProxDomainAttrInfo {
-  UINT16 Type;
   UINT16 Flags;
-  UINT32 ProcessorProximityDomain;
+  UINT32 InitiatorProximityDomain;
   UINT32 MemoryProximityDomain;
 } CM_ARM_MEMORY_PROX_DOMAIN_ATTR_INFO;
 
@@ -755,7 +754,6 @@ typedef struct CmArmMemoryProxDomainAttrInfo {
 */
 
 typedef struct CmArmMemoryLatBwInfo {
-  UINT16 Type;
   UINT8  Flags;
   UINT8  DataType;
   UINT8  MinTransferSize;
@@ -773,7 +771,6 @@ typedef struct CmArmMemoryLatBwInfo {
 */
 
 typedef struct CmArmMemoryCacheInfo {
-  UINT16 Type;
   UINT32 MemoryProximityDomain;
   UINT64 MemorySideCacheSize;
   UINT32 CacheAttributes;
