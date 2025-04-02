@@ -1903,9 +1903,8 @@ IScsiBuildKeyValueList (
       Data++;
     }
 
-    if (*Data == '=') {
+    if ((Len > 0) && (*Data == '=')) {
       *Data = '\0';
-
       Data++;
       Len--;
     } else {
@@ -1917,8 +1916,17 @@ IScsiBuildKeyValueList (
 
     InsertTailList (ListHead, &KeyValuePair->List);
 
-    Data += AsciiStrLen (KeyValuePair->Value) + 1;
-    Len  -= (UINT32)AsciiStrLen (KeyValuePair->Value) + 1;
+    while ((Len > 0) && (*Data != '\0')) {
+      Len--;
+      Data++;
+    }
+
+    if ((Len > 0) && (*Data == '\0')) {
+      Data++;
+      Len--;
+    } else {
+      goto ON_ERROR;
+    }
   }
 
   return ListHead;
