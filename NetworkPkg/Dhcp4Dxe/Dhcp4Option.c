@@ -184,6 +184,9 @@ DhcpOptionIsValid (
   }
 
   ASSERT (Unit != 0);
+  if (Unit == 0) {
+    return FALSE;
+  }
 
   //
   // Validate that the option appears in the full units.
