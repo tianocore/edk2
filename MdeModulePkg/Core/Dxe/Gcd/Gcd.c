@@ -94,6 +94,7 @@ GCD_ATTRIBUTE_CONVERSION_ENTRY  mAttributeConversionTable[] = {
   { EFI_RESOURCE_ATTRIBUTE_PERSISTABLE,             EFI_MEMORY_NV,            TRUE  },
   { EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE,           EFI_MEMORY_MORE_RELIABLE, TRUE  },
   { EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE,         EFI_MEMORY_SP,            TRUE  },
+  { EFI_RESOURCE_ATTRIBUTE_HOT_PLUGGABLE,           EFI_MEMORY_HOT_PLUGGABLE, TRUE  },
   { 0,                                              0,                        FALSE }
 };
 
