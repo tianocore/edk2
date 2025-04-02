@@ -194,6 +194,11 @@ typedef struct CmArmGicCInfo {
       i.e. a token referencing a CM_ARCH_COMMON_PSD_INFO object.
   */
   CM_OBJECT_TOKEN    PsdToken;
+
+  /** Optional field: Reference Token for the Initiator Proximity Domain info of this processor.
+      i.e. a token referencing a CM_ARM_INITIATOR_DOMAIN_LIST object.
+  */
+  CM_OBJECT_TOKEN    InitiatorProximityDomainListToken;
 } CM_ARM_GICC_INFO;
 
 /** A structure that describes the
@@ -727,16 +732,6 @@ typedef struct CmArmEtInfo {
   ARM_ET_TYPE    EtType;
 } CM_ARM_ET_INFO;
 
-/** A structure that describes the Memory Initiator and Target number.
-
-    ID: EArmObjMemoryInitTargetInfo
-*/
-
-typedef struct CmArmMemoryInitTargetInfo {
-  UINT32 NumInitiator;
-  UINT32 NumTarget;
-} CM_ARM_MEMORY_INIT_TARGET_INFO;
-
 /** A structure that describes the Memory Proximity Domain Attribute.
 
     ID: EArmObjMemoryProxDomainAttrInfo
@@ -760,10 +755,31 @@ typedef struct CmArmMemoryLatBwInfo {
   UINT32 InitiatorProximityDomainsNumber;
   UINT32 TargetProximityDomainsNumber;
   UINT64 EntryBaseUnit;
-  UINT32 InitiatorProximityDomainList[8];
-  UINT32 TargetProximityDomainList[8];
-  UINT16 RelativeDistanceEntry[64];
 } CM_ARM_MEMORY_LAT_BW_INFO;
+
+/** A structure that describes the Initiator Proximity Domain List Info.
+
+    ID: EArmObjInitiatorDomainList
+*/
+typedef struct CmArmInitiatorProximityDomainList {
+  UINT32 InitiatorProximityDomainList;
+} CM_ARM_INITIATOR_DOMAIN_LIST;
+
+/** A structure that describes the Target Proximity Domain List Info.
+
+    ID: EArmObjTargetDomainList
+*/
+typedef struct CmArmTargetProximityDomainList {
+  UINT32 TargetProximityDomainList;
+} CM_ARM_TARGET_DOMAIN_LIST;
+
+/** A structure that describes the Relative Distance Entry Info.
+
+    ID: EArmObjRelativeDistanceEntry
+*/
+typedef struct CmArmRelativeDistanceEntry
+  UINT16 RelativeDistanceEntry;
+} CM_ARM_RELATIVE_DISTANCE_ENTRY;
 
 /** A structure that describes the Memory Cache Info.
 
@@ -775,8 +791,11 @@ typedef struct CmArmMemoryCacheInfo {
   UINT64 MemorySideCacheSize;
   UINT32 CacheAttributes;
   UINT16 NumSmbiosHandles;
-  UINT16 SmbiosHandles [8];
 } CM_ARM_MEMORY_CACHE_INFO;
+
+typedef struct CmArmSmbioHandles {
+  UINT16 SmbiosHandles;
+} CM_ARM_SMBIOS_HANDLES;
 #pragma pack()
 
 #endif // ARM_NAMESPACE_OBJECTS_H_

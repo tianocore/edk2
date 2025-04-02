@@ -267,6 +267,10 @@ typedef struct CmArchCommonMemoryAffinityInfo {
 
   /// Flags
   UINT32    Flags;
+
+  /// Optional field: Reference Token for target domain list.
+  /// Token identifying a CM_ARM_TARGET_DOMAIN_LIST structure.
+  CM_OBJECT_TOKEN    TargetProximityDomainListToken;
 } CM_ARCH_COMMON_MEMORY_AFFINITY_INFO;
 
 /** A structure that describes the ACPI Device Handle (Type 0) in the
