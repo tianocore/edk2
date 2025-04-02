@@ -7,12 +7,12 @@
 
 **/
 
-#include "CpuMpPei.h"
+#include "CpuMp2Pei.h"
 
 EFI_PEI_PPI_DESCRIPTOR  mPeiCpuMpPpiList[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
-    &gEdkiiPeiMpServices2PpiGuid,
+    &gEfiPeiMpServices2PpiGuid,
     &mMpServices2Ppi
   },
   {
