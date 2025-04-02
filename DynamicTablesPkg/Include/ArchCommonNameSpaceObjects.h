@@ -816,6 +816,66 @@ typedef struct CmArchCommonStaInfo {
   UINT32    DeviceStatus;
 } CM_ARCH_COMMON_STA_INFO;
 
+/** A structure that describes the Memory Latency Bandwidth Info.
+
+    ID: EArchCommonObjMemoryLatBwInfo
+*/
+
+typedef struct CmArchCommonMemoryLatBwInfo {
+  UINT8  Flags;
+  UINT8  DataType;
+  UINT8  MinTransferSize;
+  UINT32 InitiatorProximityDomainsNumber;
+  UINT32 TargetProximityDomainsNumber;
+  UINT64 EntryBaseUnit;
+} CM_ARCH_COMMON_MEMORY_LAT_BW_INFO;
+
+/** A structure that describes the Initiator Proximity Domain List Info.
+
+    ID: EArchCommonObjInitiatorDomainList
+*/
+typedef struct CmArchCommonInitiatorProximityDomainList {
+  UINT32 InitiatorProximityDomainList;
+} CM_ARCH_COMMON_INITIATOR_DOMAIN_LIST;
+
+/** A structure that describes the Target Proximity Domain List Info.
+
+    ID: EArchCommonObjTargetDomainList
+*/
+typedef struct CmArchCommonTargetProximityDomainList {
+  UINT32 TargetProximityDomainList;
+} CM_ARCH_COMMON_TARGET_DOMAIN_LIST;
+
+/** A structure that describes the Relative Distance Entry Info.
+
+    ID: EArchCommonObjRelativeDistanceEntry
+*/
+typedef struct CmArchCommonRelativeDistanceEntry
+  UINT16 RelativeDistanceEntry;
+} CM_ARCH_COMMON_RELATIVE_DISTANCE_ENTRY;
+
+/** A structure that describes Memory Cache Info.
+
+    ID: EArchCommonObjMemoryCacheInfo
+*/
+
+typedef struct CmArchCommonMemoryCacheInfo {
+  UINT32 MemoryProximityDomain;
+  UINT64 MemorySideCacheSize;
+  UINT32 CacheAttributes;
+  UINT16 NumSmbiosHandles;
+} CM_ARCH_COMMON_MEMORY_CACHE_INFO;
+
+/** A structure that describes Smbio Handles.
+
+    ID: EArchCommonObjSmbiosHandle
+*/
+
+typedef struct CmArchCommonSmbioHandles {
+  UINT16 SmbiosHandles;
+} CM_ARCH_COMMON_SMBIOS_HANDLES;
+
+
 #pragma pack()
 
 #endif // ARCH_COMMON_NAMESPACE_OBJECTS_H_
