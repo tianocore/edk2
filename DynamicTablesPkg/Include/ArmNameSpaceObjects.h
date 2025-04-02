@@ -194,11 +194,6 @@ typedef struct CmArmGicCInfo {
       i.e. a token referencing a CM_ARCH_COMMON_PSD_INFO object.
   */
   CM_OBJECT_TOKEN    PsdToken;
-
-  /** Optional field: Reference Token for the Initiator Proximity Domain info of this processor.
-      i.e. a token referencing a CM_ARM_INITIATOR_DOMAIN_LIST object.
-  */
-  CM_OBJECT_TOKEN    InitiatorProximityDomainListToken;
 } CM_ARM_GICC_INFO;
 
 /** A structure that describes the

@@ -145,6 +145,21 @@ typedef struct CmArchCommonObjRef {
   CM_OBJECT_TOKEN    ReferenceToken;
 } CM_ARCH_COMMON_OBJ_REF;
 
+/** A structure that describes a reference to another Configuration Manager
+    object.
+
+    This is useful for creating an array of reference tokens. The framework
+    can then query the configuration manager for these arrays using the
+    object ID EArchCommonObjCmRef.
+
+    This can be used is to represent one-to-many relationships between objects.
+
+    ID: EArchCommonWord
+*/
+struct CmArchCommonWord {
+  UINT16 Value;
+} CM_ARCH_COMMON_WORD;
+
 /** A structure that describes the
     PCI Configuration Space information for the Platform.
 
@@ -267,10 +282,6 @@ typedef struct CmArchCommonMemoryAffinityInfo {
 
   /// Flags
   UINT32    Flags;
-
-  /// Optional field: Reference Token for target domain list.
-  /// Token identifying a CM_ARM_TARGET_DOMAIN_LIST structure.
-  CM_OBJECT_TOKEN    TargetProximityDomainListToken;
 } CM_ARCH_COMMON_MEMORY_AFFINITY_INFO;
 
 /** A structure that describes the ACPI Device Handle (Type 0) in the
@@ -828,6 +839,12 @@ typedef struct CmArchCommonMemoryLatBwInfo {
   UINT32 InitiatorProximityDomainsNumber;
   UINT32 TargetProximityDomainsNumber;
   UINT64 EntryBaseUnit;
+  // Token referencing a CM_ARCH_COMMON_OBJ_REF
+  CM_OBJECT_TOKEN InitiatorProximityDomainList;
+  // Token referencing a CM_ARCH_COMMON_OBJ_REF
+  CM_OBJECT_TOKEN TargetProximityDomainList;
+  // Token referencing a CM_ARCH_COMMON_WORD
+  CM_OBJECT_TOKEN RelativeDistanceEntry;
 } CM_ARCH_COMMON_MEMORY_LAT_BW_INFO;
 
 /** A structure that describes the Initiator Proximity Domain List Info.
@@ -864,6 +881,8 @@ typedef struct CmArchCommonMemoryCacheInfo {
   UINT64 MemorySideCacheSize;
   UINT32 CacheAttributes;
   UINT16 NumSmbiosHandles;
+  // Token referencing a CM_ARCH_COMMON_OBJ_REF
+  CM_OBJECT_TOKEN SmbiosHandles;
 } CM_ARCH_COMMON_MEMORY_CACHE_INFO;
 
 /** A structure that describes Smbio Handles.
