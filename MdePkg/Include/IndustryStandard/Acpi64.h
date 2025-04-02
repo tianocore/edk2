@@ -2235,7 +2235,7 @@ typedef struct {
   EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO_CACHE_ATTRIBUTES    CacheAttributes;
   UINT8                                                                  Reserved2[2];
   UINT16                                                                 NumberOfSmbiosHandles;
-  UINT8                                                                  SmbiosHandles[];
+  UINT16                                                                 SmbiosHandles[];
 } EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO;
 
 ///
