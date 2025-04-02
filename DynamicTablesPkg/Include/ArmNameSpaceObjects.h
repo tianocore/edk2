@@ -52,6 +52,10 @@ typedef enum ArmObjectID {
   EArmObjRmr,                                                  ///< 21 - Reserved Memory Range Node
   EArmObjMemoryRangeDescriptor,                                ///< 22 - Memory Range Descriptor
   EArmObjEtInfo,                                               ///< 23 - Embedded Trace Extension/Module Info
+  EArmObjMemoryInitTargetInfo,                                 ///< 24 - Memory Initiator and Target Info
+  EArmObjMemoryProxDomainAttrInfo,                             ///< 25 - Memory Proximity Attribute Info
+  EArmObjMemoryLatBwInfo,                                      ///< 26 - Memory Latency and Bandwidth Info
+  EArmObjMemoryCacheInfo,                                      ///< 27 - Memory Cache Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -723,6 +727,59 @@ typedef struct CmArmEtInfo {
   ARM_ET_TYPE    EtType;
 } CM_ARM_ET_INFO;
 
+/** A structure that describes the Memory Initiator and Target number.
+
+    ID: EArmObjMemoryInitTargetInfo
+*/
+
+typedef struct CmArmMemoryInitTargetInfo {
+  UINT32 NumInitiator;
+  UINT32 NumTarget;
+} CM_ARM_MEMORY_INIT_TARGET_INFO;
+
+/** A structure that describes the Memory Proximity Domain Attribute.
+
+    ID: EArmObjMemoryProxDomainAttrInfo
+*/
+
+typedef struct CmArmMemoryProxDomainAttrInfo {
+  UINT16 Type;
+  UINT16 Flags;
+  UINT32 ProcessorProximityDomain;
+  UINT32 MemoryProximityDomain;
+} CM_ARM_MEMORY_PROX_DOMAIN_ATTR_INFO;
+
+/** A structure that describes the Memory Latency Bandwidth Info.
+
+    ID: EArmObjMemoryLatBwInfo
+*/
+
+typedef struct CmArmMemoryLatBwInfo {
+  UINT16 Type;
+  UINT8  Flags;
+  UINT8  DataType;
+  UINT8  MinTransferSize;
+  UINT32 InitiatorProximityDomainsNumber;
+  UINT32 TargetProximityDomainsNumber;
+  UINT64 EntryBaseUnit;
+  UINT32 InitiatorProximityDomainList[8];
+  UINT32 TargetProximityDomainList[8];
+  UINT16 RelativeDistanceEntry[64];
+} CM_ARM_MEMORY_LAT_BW_INFO;
+
+/** A structure that describes the Memory Cache Info.
+
+    ID: EArmObjMemoryCacheInfo
+*/
+
+typedef struct CmArmMemoryCacheInfo {
+  UINT16 Type;
+  UINT32 MemoryProximityDomain;
+  UINT64 MemorySideCacheSize;
+  UINT32 CacheAttributes;
+  UINT16 NumSmbiosHandles;
+  UINT16 SmbiosHandles [8];
+} CM_ARM_MEMORY_CACHE_INFO;
 #pragma pack()
 
 #endif // ARM_NAMESPACE_OBJECTS_H_

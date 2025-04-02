@@ -41,6 +41,8 @@ The Dynamic Tables Framework implements the following ACPI table generators:
             is in the way the ACPI Table Data is generated from an AML file.
   - FADT  : The FADT generator collates the required platform information from
             the Configuration Manager and builds the FADT table.
+  - HMAT  : The HMAT generator collates the required platform information from
+            the Configuration Manager and builds the HMAT table.
   - MADT  : The MADT generator collates the GIC information  from the
             Configuration Manager and builds the MADT table.
   - GTDT  : The GTDT generator collates the Timer information from the
@@ -95,6 +97,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdDsdt = EStdAcpiTableIdRaw,     ///< DSDT Generator
   EStdAcpiTableIdSsdt = EStdAcpiTableIdRaw,     ///< SSDT Generator
   EStdAcpiTableIdFadt,                          ///< FADT Generator
+  EStdAcpiTableIdHmat,                          ///< HMAT Generator
   EStdAcpiTableIdMadt,                          ///< MADT Generator
   EStdAcpiTableIdGtdt,                          ///< GTDT Generator
   EStdAcpiTableIdDbg2,                          ///< DBG2 Generator
