@@ -13,7 +13,6 @@
 #include <Protocol/AcpiTable.h>
 #include <Library/BaseMemoryLib.h>
 
-
 // Module specific include files.
 #include <AcpiTableGenerator.h>
 #include <ConfigurationManagerObject.h>
@@ -37,20 +36,20 @@
 STATIC
 VOID
 AddMemProxDomainAttrInfo (
-  IN  EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_PROXIMITY_DOMAIN_ATTRIBUTES           *MemProxDomainAttrInfo,
-  IN  CONST CM_ARM_MEMORY_PROX_DOMAIN_ATTR_INFO                                *CmMemProxDomainAttrInfo,
-  IN  UINT32                                                                   MemProxDomainAttrCount
+  IN  EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_PROXIMITY_DOMAIN_ATTRIBUTES  *MemProxDomainAttrInfo,
+  IN  CONST CM_ARM_MEMORY_PROX_DOMAIN_ATTR_INFO                       *CmMemProxDomainAttrInfo,
+  IN  UINT32                                                          MemProxDomainAttrCount
   )
 {
   ASSERT (MemProxDomainAttrInfo != NULL);
   ASSERT (CmMemProxDomainAttrInfo != NULL);
 
   while (MemProxDomainAttrCount-- != 0) {
-    MemProxDomainAttrInfo->Type = CmMemProxDomainAttrInfo->Type;
-    MemProxDomainAttrInfo->Length = sizeof(EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_PROXIMITY_DOMAIN_ATTRIBUTES);
-    CopyMem(&MemProxDomainAttrInfo->Flags, &CmMemProxDomainAttrInfo->Flags, sizeof(UINT16));
+    MemProxDomainAttrInfo->Type   = CmMemProxDomainAttrInfo->Type;
+    MemProxDomainAttrInfo->Length = sizeof (EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_PROXIMITY_DOMAIN_ATTRIBUTES);
+    CopyMem (&MemProxDomainAttrInfo->Flags, &CmMemProxDomainAttrInfo->Flags, sizeof (UINT16));
     MemProxDomainAttrInfo->InitiatorProximityDomain = CmMemProxDomainAttrInfo->ProcessorProximityDomain;
-    MemProxDomainAttrInfo->MemoryProximityDomain = CmMemProxDomainAttrInfo->MemoryProximityDomain;
+    MemProxDomainAttrInfo->MemoryProximityDomain    = CmMemProxDomainAttrInfo->MemoryProximityDomain;
     MemProxDomainAttrInfo++;
     CmMemProxDomainAttrInfo++;
   }
@@ -77,24 +76,24 @@ AddMemLatBwInfo (
   ASSERT (CmMemLatBwInfo != NULL);
   ASSERT (CmMemInitTargetInfo != NULL);
 
-  MemLatBwInfo->Type = CmMemLatBwInfo->Type;
+  MemLatBwInfo->Type   = CmMemLatBwInfo->Type;
   MemLatBwInfo->Length = MemLatBwInfoLength;
-  CopyMem(&MemLatBwInfo->Flags, &CmMemLatBwInfo->Flags, sizeof(UINT8));
-  MemLatBwInfo->DataType = CmMemLatBwInfo->DataType;
-  MemLatBwInfo->MinTransferSize = CmMemLatBwInfo->MinTransferSize;
+  CopyMem (&MemLatBwInfo->Flags, &CmMemLatBwInfo->Flags, sizeof (UINT8));
+  MemLatBwInfo->DataType                          = CmMemLatBwInfo->DataType;
+  MemLatBwInfo->MinTransferSize                   = CmMemLatBwInfo->MinTransferSize;
   MemLatBwInfo->NumberOfInitiatorProximityDomains = CmMemLatBwInfo->InitiatorProximityDomainsNumber;
-  MemLatBwInfo->NumberOfTargetProximityDomains = CmMemLatBwInfo->TargetProximityDomainsNumber;
-  MemLatBwInfo->EntryBaseUnit = CmMemLatBwInfo->EntryBaseUnit;
+  MemLatBwInfo->NumberOfTargetProximityDomains    = CmMemLatBwInfo->TargetProximityDomainsNumber;
+  MemLatBwInfo->EntryBaseUnit                     = CmMemLatBwInfo->EntryBaseUnit;
 
-  void *MemLatBwInfoLocal = (void*) MemLatBwInfo;
+  void  *MemLatBwInfoLocal = (void *)MemLatBwInfo;
 
-  MemLatBwInfoLocal += sizeof(EFI_ACPI_6_4_HMAT_STRUCTURE_SYSTEM_LOCALITY_LATENCY_AND_BANDWIDTH_INFO);
+  MemLatBwInfoLocal += sizeof (EFI_ACPI_6_4_HMAT_STRUCTURE_SYSTEM_LOCALITY_LATENCY_AND_BANDWIDTH_INFO);
 
-  CopyMem(MemLatBwInfoLocal, CmMemLatBwInfo->InitiatorProximityDomainList, sizeof(UINT32) * CmMemInitTargetInfo->NumInitiator);
-  MemLatBwInfoLocal += sizeof(UINT32) * CmMemInitTargetInfo->NumInitiator;
-  CopyMem(MemLatBwInfoLocal, CmMemLatBwInfo->TargetProximityDomainList, sizeof(UINT32) * CmMemInitTargetInfo->NumTarget);
-  MemLatBwInfoLocal += sizeof(UINT32) * CmMemInitTargetInfo->NumTarget;
-  CopyMem(MemLatBwInfoLocal, CmMemLatBwInfo->RelativeDistanceEntry, sizeof(UINT16) * CmMemInitTargetInfo->NumTarget * CmMemInitTargetInfo->NumInitiator);
+  CopyMem (MemLatBwInfoLocal, CmMemLatBwInfo->InitiatorProximityDomainList, sizeof (UINT32) * CmMemInitTargetInfo->NumInitiator);
+  MemLatBwInfoLocal += sizeof (UINT32) * CmMemInitTargetInfo->NumInitiator;
+  CopyMem (MemLatBwInfoLocal, CmMemLatBwInfo->TargetProximityDomainList, sizeof (UINT32) * CmMemInitTargetInfo->NumTarget);
+  MemLatBwInfoLocal += sizeof (UINT32) * CmMemInitTargetInfo->NumTarget;
+  CopyMem (MemLatBwInfoLocal, CmMemLatBwInfo->RelativeDistanceEntry, sizeof (UINT16) * CmMemInitTargetInfo->NumTarget * CmMemInitTargetInfo->NumInitiator);
 }
 
 /** Add the MemCache Information
@@ -107,63 +106,61 @@ AddMemLatBwInfo (
 STATIC
 VOID
 AddMemCacheInfo (
-  IN  EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO           *MemCacheInfo,
-  IN  CONST CM_ARM_MEMORY_CACHE_INFO                               *CmMemCacheInfo,
-  IN  CONST UINT32                                                 MemCacheLength
+  IN  EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO  *MemCacheInfo,
+  IN  CONST CM_ARM_MEMORY_CACHE_INFO                      *CmMemCacheInfo,
+  IN  CONST UINT32                                        MemCacheLength
   )
 {
   ASSERT (MemCacheInfo != NULL);
   ASSERT (CmMemCacheInfo != NULL);
 
-  MemCacheInfo->Type = CmMemCacheInfo->Type;
-  MemCacheInfo->Length = MemCacheLength;
+  MemCacheInfo->Type                  = CmMemCacheInfo->Type;
+  MemCacheInfo->Length                = MemCacheLength;
   MemCacheInfo->MemoryProximityDomain = CmMemCacheInfo->MemoryProximityDomain;
-  MemCacheInfo->MemorySideCacheSize = CmMemCacheInfo->MemorySideCacheSize;
-  CopyMem(&MemCacheInfo->CacheAttributes, &CmMemCacheInfo->CacheAttributes, sizeof(UINT32));
+  MemCacheInfo->MemorySideCacheSize   = CmMemCacheInfo->MemorySideCacheSize;
+  CopyMem (&MemCacheInfo->CacheAttributes, &CmMemCacheInfo->CacheAttributes, sizeof (UINT32));
   MemCacheInfo->NumberOfSmbiosHandles = CmMemCacheInfo->NumSmbiosHandles;
 
-  void *MemCacheInfoLocal = (void*)MemCacheInfo;
-  MemCacheInfoLocal += sizeof(EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO);
-  CopyMem(MemCacheInfoLocal, CmMemCacheInfo->SmbiosHandles, sizeof(UINT16) * CmMemCacheInfo->NumSmbiosHandles);
+  void  *MemCacheInfoLocal = (void *)MemCacheInfo;
+  MemCacheInfoLocal += sizeof (EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO);
+  CopyMem (MemCacheInfoLocal, CmMemCacheInfo->SmbiosHandles, sizeof (UINT16) * CmMemCacheInfo->NumSmbiosHandles);
 }
 
 /** This macro expands to a function that retrieves the Memory
     Proximity Domain Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjMemoryInitTargetInfo,
-  CM_ARM_MEMORY_INIT_TARGET_INFO
-  );
-
+                 EObjNameSpaceArm,
+                 EArmObjMemoryInitTargetInfo,
+                 CM_ARM_MEMORY_INIT_TARGET_INFO
+                 );
 
 /** This macro expands to a function that retrieves the Memory
     Proximity Domain Attribute Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjMemoryProxDomainAttrInfo,
-  CM_ARM_MEMORY_PROX_DOMAIN_ATTR_INFO
-  );
+                 EObjNameSpaceArm,
+                 EArmObjMemoryProxDomainAttrInfo,
+                 CM_ARM_MEMORY_PROX_DOMAIN_ATTR_INFO
+                 );
 
 /** This macro expands to a function that retrieves the Memory
     Latency and Bandwidth Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjMemoryLatBwInfo,
-  CM_ARM_MEMORY_LAT_BW_INFO
-  );
+                 EObjNameSpaceArm,
+                 EArmObjMemoryLatBwInfo,
+                 CM_ARM_MEMORY_LAT_BW_INFO
+                 );
 
 /** This macro expands to a function that retrieves the Memory
     Cache Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjMemoryCacheInfo,
-  CM_ARM_MEMORY_CACHE_INFO
-  );
-
+                 EObjNameSpaceArm,
+                 EArmObjMemoryCacheInfo,
+                 CM_ARM_MEMORY_CACHE_INFO
+                 );
 
 /** Free any resources allocated for constructing the table.
 
@@ -202,6 +199,7 @@ FreeHmatTable (
     FreePool (*Table);
     *Table = NULL;
   }
+
   return EFI_SUCCESS;
 }
 
@@ -233,27 +231,27 @@ STATIC
 EFI_STATUS
 EFIAPI
 BuildHmatTable (
-  IN  CONST ACPI_TABLE_GENERATOR                           *This,
-  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO             *CONST  AcpiTableInfo,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   *CONST  CfgMgrProtocol,
+  IN  CONST ACPI_TABLE_GENERATOR                            *This,
+  IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO             *CONST   AcpiTableInfo,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   *CONST   CfgMgrProtocol,
   OUT       EFI_ACPI_DESCRIPTION_HEADER            **CONST  Table
   )
 {
-  EFI_STATUS                 Status;
-  UINT32                     TableSize;
-  UINT32                     MemInitTargetCount;
-  UINT32                     MemProxDomainAttrCount;
-  UINT32                     MemLatBwCount;
-  UINT32                     MemCacheCount;
-  UINT32                     MemLatBwInfoLength;
-  UINT32                     MemCacheLength;
-  CM_ARM_MEMORY_INIT_TARGET_INFO                *MemInitTargetInfo;
-  CM_ARM_MEMORY_PROX_DOMAIN_ATTR_INFO           *MemProxDomainAttrInfo;
-  CM_ARM_MEMORY_LAT_BW_INFO           *MemLatBwInfo;
-  CM_ARM_MEMORY_CACHE_INFO            *MemCacheInfo;
-  UINT32                     MemProxDomainAttrOffset;
-  UINT32                     MemLatBwOffset;
-  UINT32                     MemCacheOffset;
+  EFI_STATUS                           Status;
+  UINT32                               TableSize;
+  UINT32                               MemInitTargetCount;
+  UINT32                               MemProxDomainAttrCount;
+  UINT32                               MemLatBwCount;
+  UINT32                               MemCacheCount;
+  UINT32                               MemLatBwInfoLength;
+  UINT32                               MemCacheLength;
+  CM_ARM_MEMORY_INIT_TARGET_INFO       *MemInitTargetInfo;
+  CM_ARM_MEMORY_PROX_DOMAIN_ATTR_INFO  *MemProxDomainAttrInfo;
+  CM_ARM_MEMORY_LAT_BW_INFO            *MemLatBwInfo;
+  CM_ARM_MEMORY_CACHE_INFO             *MemCacheInfo;
+  UINT32                               MemProxDomainAttrOffset;
+  UINT32                               MemLatBwOffset;
+  UINT32                               MemCacheOffset;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -263,97 +261,111 @@ BuildHmatTable (
   ASSERT (AcpiTableInfo->AcpiTableSignature == This->AcpiTableSignature);
 
   *Table = NULL;
-  EFI_ACPI_6_4_HETEROGENEOUS_MEMORY_ATTRIBUTE_TABLE_HEADER *Hmat;
+  EFI_ACPI_6_4_HETEROGENEOUS_MEMORY_ATTRIBUTE_TABLE_HEADER  *Hmat;
 
   Status = GetEArmObjMemoryInitTargetInfo (
-             CfgMgrProtocol,
-             CM_NULL_TOKEN,
-             &MemInitTargetInfo,
-             &MemInitTargetCount
-             );
+                                           CfgMgrProtocol,
+                                           CM_NULL_TOKEN,
+                                           &MemInitTargetInfo,
+                                           &MemInitTargetCount
+                                           );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: HMAT: Failed to get MemInitTarget Info. Status = %r\n",
-      Status
-      ));
+    DEBUG (
+           (
+            DEBUG_ERROR,
+            "ERROR: HMAT: Failed to get MemInitTarget Info. Status = %r\n",
+            Status
+           )
+           );
     goto error_handler;
   }
 
   Status = GetEArmObjMemoryProxDomainAttrInfo (
-             CfgMgrProtocol,
-             CM_NULL_TOKEN,
-             &MemProxDomainAttrInfo,
-             &MemProxDomainAttrCount
-             );
- 
+                                               CfgMgrProtocol,
+                                               CM_NULL_TOKEN,
+                                               &MemProxDomainAttrInfo,
+                                               &MemProxDomainAttrCount
+                                               );
+
   if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: HMAT: Failed to get MemProxDomain Info. Status = %r\n",
-      Status
-      ));
+    DEBUG (
+           (
+            DEBUG_ERROR,
+            "ERROR: HMAT: Failed to get MemProxDomain Info. Status = %r\n",
+            Status
+           )
+           );
     goto error_handler;
   }
 
   if (MemProxDomainAttrCount == 0) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: HMAT: MemProxDomain information not provided.\n"
-      ));
+    DEBUG (
+           (
+            DEBUG_ERROR,
+            "ERROR: HMAT: MemProxDomain information not provided.\n"
+           )
+           );
     ASSERT (MemProxDomainAttrCount != 0);
     Status = EFI_INVALID_PARAMETER;
     goto error_handler;
   }
 
   Status = GetEArmObjMemoryLatBwInfo (
-             CfgMgrProtocol,
-             CM_NULL_TOKEN,
-             &MemLatBwInfo,
-             &MemLatBwCount
-             );
+                                      CfgMgrProtocol,
+                                      CM_NULL_TOKEN,
+                                      &MemLatBwInfo,
+                                      &MemLatBwCount
+                                      );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: HMAT: Failed to get MemLatBwInfo. Status = %r\n",
-      Status
-      ));
+    DEBUG (
+           (
+            DEBUG_ERROR,
+            "ERROR: HMAT: Failed to get MemLatBwInfo. Status = %r\n",
+            Status
+           )
+           );
     goto error_handler;
   }
 
   if (MemLatBwCount == 0) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: HMAT: MemLatBwCount information not provided.\n"
-      ));
+    DEBUG (
+           (
+            DEBUG_ERROR,
+            "ERROR: HMAT: MemLatBwCount information not provided.\n"
+           )
+           );
     ASSERT (MemLatBwCount != 0);
     Status = EFI_INVALID_PARAMETER;
     goto error_handler;
   }
 
   Status = GetEArmObjMemoryCacheInfo (
-             CfgMgrProtocol,
-             CM_NULL_TOKEN,
-             &MemCacheInfo,
-             &MemCacheCount
-             );
+                                      CfgMgrProtocol,
+                                      CM_NULL_TOKEN,
+                                      &MemCacheInfo,
+                                      &MemCacheCount
+                                      );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: HMAT: Failed to get MemoryCache Info. Status = %r\n",
-      Status
-      ));
+    DEBUG (
+           (
+            DEBUG_ERROR,
+            "ERROR: HMAT: Failed to get MemoryCache Info. Status = %r\n",
+            Status
+           )
+           );
     goto error_handler;
   }
 
   if (MemCacheCount == 0) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: HMAT: MemCacheCount information not provided.\n"
-      ));
+    DEBUG (
+           (
+            DEBUG_ERROR,
+            "ERROR: HMAT: MemCacheCount information not provided.\n"
+           )
+           );
     ASSERT (MemCacheCount != 0);
     Status = EFI_INVALID_PARAMETER;
     goto error_handler;
@@ -362,32 +374,34 @@ BuildHmatTable (
   TableSize = sizeof (EFI_ACPI_6_4_HETEROGENEOUS_MEMORY_ATTRIBUTE_TABLE_HEADER);
 
   MemProxDomainAttrOffset = TableSize;
-  TableSize += (sizeof (EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_PROXIMITY_DOMAIN_ATTRIBUTES) * MemProxDomainAttrCount);
+  TableSize              += (sizeof (EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_PROXIMITY_DOMAIN_ATTRIBUTES) * MemProxDomainAttrCount);
 
   MemLatBwOffset = TableSize;
 
-  MemLatBwInfoLength = sizeof(UINT32) * MemInitTargetInfo->NumInitiator +
-                       sizeof(UINT32) * MemInitTargetInfo->NumTarget +
-                       sizeof(UINT16) * MemInitTargetInfo->NumInitiator * MemInitTargetInfo->NumTarget +
+  MemLatBwInfoLength = sizeof (UINT32) * MemInitTargetInfo->NumInitiator +
+                       sizeof (UINT32) * MemInitTargetInfo->NumTarget +
+                       sizeof (UINT16) * MemInitTargetInfo->NumInitiator * MemInitTargetInfo->NumTarget +
                        sizeof (EFI_ACPI_6_4_HMAT_STRUCTURE_SYSTEM_LOCALITY_LATENCY_AND_BANDWIDTH_INFO);
   TableSize += MemLatBwInfoLength * MemLatBwCount;
 
   MemCacheOffset = TableSize;
-  MemCacheLength = sizeof (EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO) + sizeof(UINT16) * MemCacheInfo->NumSmbiosHandles;
-  TableSize += MemCacheLength * MemCacheCount;
+  MemCacheLength = sizeof (EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO) + sizeof (UINT16) * MemCacheInfo->NumSmbiosHandles;
+  TableSize     += MemCacheLength * MemCacheCount;
 
   // Allocate the Buffer for HMAT table
   *Table = (EFI_ACPI_DESCRIPTION_HEADER *)AllocateZeroPool (TableSize);
 
   if (*Table == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: HMAT: Failed to allocate memory for HMAT Table, Size = %d," \
-      " Status = %r\n",
-      TableSize,
-      Status
-      ));
+    DEBUG (
+           (
+            DEBUG_ERROR,
+            "ERROR: HMAT: Failed to allocate memory for HMAT Table, Size = %d," \
+            " Status = %r\n",
+            TableSize,
+            Status
+           )
+           );
     goto error_handler;
   }
 
@@ -395,39 +409,41 @@ BuildHmatTable (
 
   // Build HMAT table.
   Status = AddAcpiHeader (
-             CfgMgrProtocol,
-             This,
-             &Hmat->Header,
-             AcpiTableInfo,
-             TableSize
-             );
+                          CfgMgrProtocol,
+                          This,
+                          &Hmat->Header,
+                          AcpiTableInfo,
+                          TableSize
+                          );
   if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: HMAT: Failed to add ACPI header. Status = %r\n",
-      Status
-      ));
+    DEBUG (
+           (
+            DEBUG_ERROR,
+            "ERROR: HMAT: Failed to add ACPI header. Status = %r\n",
+            Status
+           )
+           );
     goto error_handler;
   }
 
   AddMemProxDomainAttrInfo (
-             (EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_PROXIMITY_DOMAIN_ATTRIBUTES *)((UINT8 *)Hmat + MemProxDomainAttrOffset),
-             MemProxDomainAttrInfo,
-             MemProxDomainAttrCount
-             );
+                            (EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_PROXIMITY_DOMAIN_ATTRIBUTES *)((UINT8 *)Hmat + MemProxDomainAttrOffset),
+                            MemProxDomainAttrInfo,
+                            MemProxDomainAttrCount
+                            );
 
   AddMemLatBwInfo (
-             (EFI_ACPI_6_4_HMAT_STRUCTURE_SYSTEM_LOCALITY_LATENCY_AND_BANDWIDTH_INFO *)((UINT8 *)Hmat + MemLatBwOffset),
-             MemLatBwInfo,
-             MemInitTargetInfo,
-             MemLatBwInfoLength
-             );
+                   (EFI_ACPI_6_4_HMAT_STRUCTURE_SYSTEM_LOCALITY_LATENCY_AND_BANDWIDTH_INFO *)((UINT8 *)Hmat + MemLatBwOffset),
+                   MemLatBwInfo,
+                   MemInitTargetInfo,
+                   MemLatBwInfoLength
+                   );
 
   AddMemCacheInfo (
-             (EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO *)((UINT8 *)Hmat + MemCacheOffset),
-             MemCacheInfo,
-             MemCacheLength
-             );
+                   (EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO *)((UINT8 *)Hmat + MemCacheOffset),
+                   MemCacheInfo,
+                   MemCacheLength
+                   );
 
   return Status;
 

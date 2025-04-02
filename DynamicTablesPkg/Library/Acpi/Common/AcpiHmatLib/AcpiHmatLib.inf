@@ -8,7 +8,7 @@
 
 [Defines]
   INF_VERSION    = 0x00010019
-  BASE_NAME      = AcpiHmatLibArm
+  BASE_NAME      = AcpiHmatLib
   FILE_GUID      = 1724d37a-fb05-4fe6-bb13-c04a46efe0ac
   VERSION_STRING = 1.0
   MODULE_TYPE    = DXE_DRIVER
