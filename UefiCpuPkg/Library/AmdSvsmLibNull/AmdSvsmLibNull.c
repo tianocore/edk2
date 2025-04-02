@@ -106,3 +106,50 @@ AmdSvsmSnpVmsaRmpAdjust (
 {
   return EFI_UNSUPPORTED;
 }
+
+/**
+  Perform a SVSM_VTPM_QUERY operation
+
+  Query the support provided by the SVSM vTPM.
+
+  @param[out] PlatformCommands    It will contain a bitmap indicating the
+                                  supported vTPM platform commands.
+  @param[out] Features            It will contain a bitmap indicating the
+                                  supported vTPM features.
+
+  @retval TRUE                    The query was processed.
+  @retval FALSE                   The query was not processed.
+
+**/
+BOOLEAN
+EFIAPI
+AmdSvsmVtpmQuery (
+  OUT UINT64  *PlatformCommands,
+  OUT UINT64  *Features
+  )
+{
+  return FALSE;
+}
+
+/**
+  Perform a SVSM_VTPM_CMD operation
+
+  Send the specified vTPM platform command to the SVSM vTPM.
+
+  @param[in, out] Buffer  It should contain the vTPM platform command
+                          request. The respective response will be returned
+                          in the same Buffer, but not all commands specify a
+                          response.
+
+  @retval TRUE            The command was processed.
+  @retval FALSE           The command was not processed.
+
+**/
+BOOLEAN
+EFIAPI
+AmdSvsmVtpmCmd (
+  IN OUT UINT8  *Buffer
+  )
+{
+  return FALSE;
+}

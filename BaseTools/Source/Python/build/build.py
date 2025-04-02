@@ -2431,9 +2431,18 @@ class Build():
                         if len(NameValue) == 2 and NameValue[0].strip() == 'EFI_FV_SPACE_SIZE':
                             FreeSizeValue = int(NameValue[1].strip(), 0)
                             if FreeSizeValue < Threshold:
-                                EdkLogger.error("build", FV_FREESIZE_ERROR,
-                                                '%s FV free space %d is not enough to meet with the required spare space %d set by -D FV_SPARE_SPACE_THRESHOLD option.' % (
-                                                    FvName, FreeSizeValue, Threshold))
+                                if FreeSizeValue == 0:
+                                    # A free size of 0 means the FV is exactly 100% full which usually indicates a special
+                                    # FV for a region that contains a fixed size image with special alignment requirements
+                                    # with potentiaily a fixed address. Log a warning for review, but do not generate an
+                                    # error.
+                                    EdkLogger.warn("build", FV_FREESIZE_ERROR,
+                                                    '%s FV free space %d is not enough to meet with the required spare space %d set by -D FV_SPARE_SPACE_THRESHOLD option.' % (
+                                                        FvName, FreeSizeValue, Threshold))
+                                else:
+                                    EdkLogger.error("build", FV_FREESIZE_ERROR,
+                                                    '%s FV free space %d is not enough to meet with the required spare space %d set by -D FV_SPARE_SPACE_THRESHOLD option.' % (
+                                                        FvName, FreeSizeValue, Threshold))
                             break
 
     ## Generate GuidedSectionTools.txt in the FV directories.

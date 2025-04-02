@@ -7,6 +7,9 @@
 **/
 
 #include <PiPei.h>
+#include <Base.h>
+#include <Library/QemuFwCfgLib.h>
+#include <Library/HobLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -46,6 +49,10 @@ InitializePlatform (
 
   DEBUG ((DEBUG_INFO, "InitializePlatform in Pei-less boot\n"));
   PlatformDebugDumpCmos ();
+
+  if (RETURN_ERROR (QemuFwCfgInitCache (PlatformInfoHob))) {
+    DEBUG ((DEBUG_ERROR, "QemuFwCfgInitCache failed !\n"));
+  }
 
   PlatformInfoHob->DefaultMaxCpuNumber = 64;
   PlatformInfoHob->PcdPciMmio64Size    = 0x800000000;
@@ -116,6 +123,21 @@ InitializePlatform (
   return EFI_SUCCESS;
 }
 
+STATIC
+EFI_HOB_PLATFORM_INFO *
+BuildPlatformInfoHob (
+  VOID
+  )
+{
+  EFI_HOB_PLATFORM_INFO  PlatformInfoHob;
+  EFI_HOB_GUID_TYPE      *GuidHob;
+
+  ZeroMem (&PlatformInfoHob, sizeof PlatformInfoHob);
+  BuildGuidDataHob (&gUefiOvmfPkgPlatformInfoGuid, &PlatformInfoHob, sizeof (EFI_HOB_PLATFORM_INFO));
+  GuidHob = GetFirstGuidHob (&gUefiOvmfPkgPlatformInfoGuid);
+  return (EFI_HOB_PLATFORM_INFO *)GET_GUID_HOB_DATA (GuidHob);
+}
+
 /**
  * This function brings up the Tdx guest from SEC phase to DXE phase.
  * PEI phase is skipped because most of the components in PEI phase
@@ -134,7 +156,7 @@ PeilessStartup (
   EFI_SEC_PEI_HAND_OFF        *SecCoreData;
   EFI_FIRMWARE_VOLUME_HEADER  *BootFv;
   EFI_STATUS                  Status;
-  EFI_HOB_PLATFORM_INFO       PlatformInfoHob;
+  EFI_HOB_PLATFORM_INFO       *PlatformInfoHob;
   UINT32                      DxeCodeBase;
   UINT32                      DxeCodeSize;
   TD_RETURN_DATA              TdReturnData;
@@ -144,8 +166,6 @@ PeilessStartup (
   BootFv      = NULL;
   VmmHobList  = NULL;
   SecCoreData = (EFI_SEC_PEI_HAND_OFF *)Context;
-
-  ZeroMem (&PlatformInfoHob, sizeof (PlatformInfoHob));
 
   if (TdIsEnabled ()) {
     VmmHobList = (VOID *)(UINTN)FixedPcdGet32 (PcdOvmfSecGhcbBase);
@@ -184,16 +204,16 @@ PeilessStartup (
     }
   }
 
+  PlatformInfoHob = BuildPlatformInfoHob ();
+
   //
   // Initialize the Platform
   //
-  Status = InitializePlatform (&PlatformInfoHob);
+  Status = InitializePlatform (PlatformInfoHob);
   if (EFI_ERROR (Status)) {
     ASSERT (FALSE);
     CpuDeadLoop ();
   }
-
-  BuildGuidDataHob (&gUefiOvmfPkgPlatformInfoGuid, &PlatformInfoHob, sizeof (EFI_HOB_PLATFORM_INFO));
 
   //
   // SecFV

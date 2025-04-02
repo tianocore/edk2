@@ -1,5 +1,5 @@
 /** @file
-  PTP (Platform TPM Profile) CRB (Command Response Buffer) interface used by dTPM2.0 library.
+  PTP (Platform TPM Profile) CRB (Command Response Buffer) interface used by DTPM2.0 library.
 
 Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
 Copyright (c), Microsoft Corporation.
@@ -21,6 +21,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <IndustryStandard/TpmTis.h>
 
 #include "Tpm2DeviceLibDTpm.h"
+
+#include "Tpm2Ptp.h"
 
 //
 // Execution of the command may take from several seconds to minutes for certain

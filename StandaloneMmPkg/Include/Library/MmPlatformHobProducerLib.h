@@ -30,6 +30,7 @@
   * Single GUIDed (gMmAcpiS3EnableHobGuid) HOB to describe the ACPI S3 enable status.
   * Single GUIDed (gEfiAcpiVariableGuid) HOB to identify the S3 data root region in x86.
   * Single GUIDed (gMmProfileDataHobGuid) HOB to describe the MM profile data region.
+  * Single GUIDed (gMmStatusCodeUseSerialHobGuid) HOB to describe the status code use serial port.
 
   @param[in]      Buffer            The free buffer to be used for HOB creation.
   @param[in, out] BufferSize        The buffer size.
