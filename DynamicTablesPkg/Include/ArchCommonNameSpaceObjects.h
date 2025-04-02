@@ -859,12 +859,12 @@ typedef struct CmArchCommonMemoryLatBwInfo {
   UINT32 InitiatorProximityDomainsNumber;
   UINT32 TargetProximityDomainsNumber;
   UINT64 EntryBaseUnit;
-  // Token referencing a CM_ARCH_COMMON_OBJ_REF
-  CM_OBJECT_TOKEN InitiatorProximityDomainList;
-  // Token referencing a CM_ARCH_COMMON_OBJ_REF
-  CM_OBJECT_TOKEN TargetProximityDomainList;
-  // Token referencing a CM_ARCH_COMMON_WORD
-  CM_OBJECT_TOKEN RelativeDistanceEntry;
+  // Token referencing CM_ARCH_COMMON_INITIATOR_DOMAIN_LIST
+  CM_OBJECT_TOKEN InitiatorProximityDomainListToken;
+  // Token referencing CM_ARCH_COMMON_TARGET_DOMAIN_LIST
+  CM_OBJECT_TOKEN TargetProximityDomainListToken;
+  // Token referencing CM_ARCH_COMMON_RELATIVE_DISTANCE_ENTRY
+  CM_ARCH_COMMON_WORD RelativeDistanceEntryToken;
 } CM_ARCH_COMMON_MEMORY_LAT_BW_INFO;
 
 /** A structure that describes the Initiator Proximity Domain List Info.
@@ -901,8 +901,8 @@ typedef struct CmArchCommonMemoryCacheInfo {
   UINT64 MemorySideCacheSize;
   UINT32 CacheAttributes;
   UINT16 NumSmbiosHandles;
-  // Token referencing a CM_ARCH_COMMON_OBJ_REF
-  CM_OBJECT_TOKEN SmbiosHandles;
+  // Token referencing CM_ARCH_COMMON_SMBIOS_HANDLES
+  CM_ARCH_COMMON_WORD SmbiosHandlesToken;
 } CM_ARCH_COMMON_MEMORY_CACHE_INFO;
 
 /** A structure that describes Smbio Handles.
