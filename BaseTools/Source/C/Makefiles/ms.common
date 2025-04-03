@@ -57,15 +57,6 @@ CFLAGS = $(CFLAGS) /wd4267 /wd4244 /wd4334
 # Note: Disable flexible array member warnings
 CFLAGS = $(CFLAGS) /wd4200
 
-!ELSEIF "$(HOST_ARCH)"=="ARM"
-ARCH_INCLUDE = $(EDK2_PATH)\MdePkg\Include\Arm
-BIN_PATH     = $(BASE_TOOLS_PATH)\Bin\Win32
-LIB_PATH     = $(BASE_TOOLS_PATH)\Lib\Win32
-SYS_BIN_PATH = $(EDK_TOOLS_PATH)\Bin\Win32
-SYS_LIB_PATH = $(EDK_TOOLS_PATH)\Lib\Win32
-# Note: Disable flexible array member warnings
-CFLAGS = $(CFLAGS) /wd4200
-
 !ELSEIF "$(HOST_ARCH)"=="AARCH64"
 ARCH_INCLUDE = $(EDK2_PATH)\MdePkg\Include\AArch64
 BIN_PATH     = $(BASE_TOOLS_PATH)\Bin\Win64
