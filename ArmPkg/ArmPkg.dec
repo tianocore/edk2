@@ -41,10 +41,6 @@
   #
   ArmHvcLib|Include/Library/ArmHvcLib.h
 
-  ##  @libraryclass  Provides a Mmu interface.
-  #
-  ArmMmuLib|Include/Library/ArmMmuLib.h
-
   ##  @libraryclass  Provides a Mailbox Transport Layer (MTL) interface
   #   for the System Control and Management Interface (SCMI).
   #
@@ -62,10 +58,6 @@
   #   default conduit (HVC or SMC).
   #
   ArmMonitorLib|Include/Library/ArmMonitorLib.h
-
-  ##  @libraryclass  Provides a default exception handler.
-  #
-  DefaultExceptionHandlerLib|Include/Library/DefaultExceptionHandlerLib.h
 
   ##  @libraryclass  Provides an interface to query miscellaneous OEM
   #   information.
@@ -103,8 +95,6 @@
   # Include/Guid/ArmMpCoreInfo.h
   gArmMpCoreInfoGuid = { 0xa4ee0728, 0xe5d7, 0x4ac5,  {0xb2, 0x1e, 0x65, 0x8e, 0xd8, 0x57, 0xe8, 0x34} }
 
-  gArmMmuReplaceLiveTranslationEntryFuncGuid = { 0xa8b50ff3, 0x08ec, 0x4dd3, {0xbf, 0x04, 0x28, 0xbf, 0x71, 0x75, 0xc7, 0x4a} }
-
   gArmFfaRxTxBufferInfoGuid = { 0x96fd3d26, 0x6fb1, 0x11ef, { 0x8c, 0x11, 0xf3, 0xc9, 0xc5, 0x02, 0x31, 0xab } }
 
 [Protocols.common]
@@ -130,23 +120,8 @@
 [PcdsFeatureFlag.common]
   gArmTokenSpaceGuid.PcdCpuDxeProduceDebugSupport|FALSE|BOOLEAN|0x00000001
 
-  # Whether to remap all unused memory NX before installing the CPU arch
-  # protocol driver. This is needed on platforms that map all DRAM with RWX
-  # attributes initially, and can be disabled otherwise.
-  gArmTokenSpaceGuid.PcdRemapUnusedMemoryNx|TRUE|BOOLEAN|0x00000048
-
-[PcdsFeatureFlag.ARM]
-  # Whether to map normal memory as non-shareable. FALSE is the safe choice, but
-  # TRUE may be appropriate to fix performance problems if you don't care about
-  # hardware coherency (i.e., no virtualization or cache coherent DMA)
-  gArmTokenSpaceGuid.PcdNormalMemoryNonshareableOverride|FALSE|BOOLEAN|0x00000043
-
 [PcdsFixedAtBuild.common]
   gArmTokenSpaceGuid.PcdTrustzoneSupport|FALSE|BOOLEAN|0x00000006
-
-  # This PCD should be a FeaturePcd. But we used this PCD as an '#if' in an ASM file.
-  # Using a FeaturePcd make a '(BOOLEAN) casting for its value which is not understood by the preprocessor.
-  gArmTokenSpaceGuid.PcdVFPEnabled|0|UINT32|0x00000024
 
   gArmTokenSpaceGuid.PcdCpuResetAddress|0x00000000|UINT32|0x00000005
 

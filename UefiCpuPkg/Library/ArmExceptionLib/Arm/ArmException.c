@@ -1,26 +1,25 @@
 /** @file
-  Default exception handler
-
-  Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2012 - 2021, Arm Ltd. All rights reserved.<BR>
-
-  SPDX-License-Identifier: BSD-2-Clause-Patent
-
+*  Exception handling support specific for ARM
+*
+* Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+* Copyright (c) 2014 - 2021, Arm Limited. All rights reserved.<BR>
+* Copyright (c) 2016 HP Development Company, L.P.<BR>
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
 **/
 
 #include <Uefi.h>
+
+#include <Arm/AArch32.h>
+#include <Guid/DebugImageInfoTable.h>
+#include <Library/ArmLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/PrintLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiLib.h>
-
-#include <Guid/DebugImageInfoTable.h>
-
-#include <Protocol/DebugSupport.h>
-#include <Library/DefaultExceptionHandlerLib.h>
+#include <Protocol/DebugSupport.h> // for MAX_ARM_EXCEPTION
 
 //
 // Maximum number of characters to print to serial (UINT8s) and to console if
@@ -33,6 +32,10 @@
 // is meant to hold the string rendering of the CPSR.
 //
 #define CPSR_STRING_SIZE  32
+
+UINTN                   gMaxExceptionNumber                       = MAX_ARM_EXCEPTION;
+EFI_EXCEPTION_CALLBACK  gExceptionHandlers[MAX_ARM_EXCEPTION + 1] = { 0 };
+PHYSICAL_ADDRESS        gExceptionVectorAlignmentMask             = ARM_VECTOR_TABLE_ALIGNMENT;
 
 typedef struct {
   UINT32    BIT;
@@ -59,6 +62,23 @@ GetImageName (
   OUT UINTN  *ImageBase,
   OUT UINTN  *PeCoffSizeOfHeaders
   );
+
+RETURN_STATUS
+ArchVectorConfig (
+  IN  UINTN  VectorBaseAddress
+  )
+{
+  // if the vector address corresponds to high vectors
+  if (VectorBaseAddress == 0xFFFF0000) {
+    // set SCTLR.V to enable high vectors
+    ArmSetHighVectors ();
+  } else {
+    // Set SCTLR.V to 0 to enable VBAR to be used
+    ArmSetLowVectors ();
+  }
+
+  return RETURN_SUCCESS;
+}
 
 /**
   Convert the Current Program Status Register (CPSR) to a string. The string is
@@ -194,11 +214,9 @@ STATIC CHAR8  *gExceptionTypeString[] = {
 
   @param  ExceptionType    Type of the exception
   @param  SystemContext    Register state at the time of the Exception
-
-
 **/
 VOID
-DefaultExceptionHandler (
+DumpCpuContext (
   IN     EFI_EXCEPTION_TYPE  ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   )
@@ -224,6 +242,40 @@ DefaultExceptionHandler (
   // below.
   UnicodeSPrintAsciiFormat (UnicodeBuffer, MAX_PRINT_CHARS, Buffer);
 
+  DEBUG ((DEBUG_ERROR, "\n  R0 0x%08x   R1 0x%08x   R2 0x%08x   R3 0x%08x\n", SystemContext.SystemContextArm->R0, SystemContext.SystemContextArm->R1, SystemContext.SystemContextArm->R2, SystemContext.SystemContextArm->R3));
+  DEBUG ((DEBUG_ERROR, "  R4 0x%08x   R5 0x%08x   R6 0x%08x   R7 0x%08x\n", SystemContext.SystemContextArm->R4, SystemContext.SystemContextArm->R5, SystemContext.SystemContextArm->R6, SystemContext.SystemContextArm->R7));
+  DEBUG ((DEBUG_ERROR, "  R8 0x%08x   R9 0x%08x  R10 0x%08x  R11 0x%08x\n", SystemContext.SystemContextArm->R8, SystemContext.SystemContextArm->R9, SystemContext.SystemContextArm->R10, SystemContext.SystemContextArm->R11));
+  DEBUG ((DEBUG_ERROR, " R12 0x%08x   SP 0x%08x   LR 0x%08x   PC 0x%08x\n", SystemContext.SystemContextArm->R12, SystemContext.SystemContextArm->SP, SystemContext.SystemContextArm->LR, SystemContext.SystemContextArm->PC));
+  DEBUG ((DEBUG_ERROR, "DFSR 0x%08x DFAR 0x%08x IFSR 0x%08x IFAR 0x%08x\n", SystemContext.SystemContextArm->DFSR, SystemContext.SystemContextArm->DFAR, SystemContext.SystemContextArm->IFSR, SystemContext.SystemContextArm->IFAR));
+
+  // Bit10 is Status[4] Bit3:0 is Status[3:0]
+  DfsrStatus = (SystemContext.SystemContextArm->DFSR & 0xf) | ((SystemContext.SystemContextArm->DFSR >> 6) & 0x10);
+  DfsrWrite  = (SystemContext.SystemContextArm->DFSR & BIT11) != 0;
+  if (DfsrStatus != 0x00) {
+    DEBUG ((DEBUG_ERROR, " %a: %a 0x%08x\n", FaultStatusToString (DfsrStatus), DfsrWrite ? "write to" : "read from", SystemContext.SystemContextArm->DFAR));
+  }
+
+  IfsrStatus = (SystemContext.SystemContextArm->IFSR & 0xf) | ((SystemContext.SystemContextArm->IFSR >> 6) & 0x10);
+  if (IfsrStatus != 0) {
+    DEBUG ((DEBUG_ERROR, " Instruction %a at 0x%08x\n", FaultStatusToString (SystemContext.SystemContextArm->IFSR & 0xf), SystemContext.SystemContextArm->IFAR));
+  }
+
+  DEBUG ((DEBUG_ERROR, "\n"));
+
+  // Attempt to print that we had a synchronous exception to ConOut.  We do
+  // this after the serial logging as ConOut's logging is more complex and we
+  // aren't guaranteed to succeed.
+  if (gST->ConOut != NULL) {
+    gST->ConOut->OutputString (gST->ConOut, UnicodeBuffer);
+  }
+}
+
+STATIC
+VOID
+DumpModuleImageInfo (
+  IN OUT EFI_SYSTEM_CONTEXT  SystemContext
+  )
+{
   DEBUG_CODE_BEGIN ();
   CHAR8   *Pdb;
   UINT32  ImageBase;
@@ -251,32 +303,26 @@ DefaultExceptionHandler (
   }
 
   DEBUG_CODE_END ();
-  DEBUG ((DEBUG_ERROR, "\n  R0 0x%08x   R1 0x%08x   R2 0x%08x   R3 0x%08x\n", SystemContext.SystemContextArm->R0, SystemContext.SystemContextArm->R1, SystemContext.SystemContextArm->R2, SystemContext.SystemContextArm->R3));
-  DEBUG ((DEBUG_ERROR, "  R4 0x%08x   R5 0x%08x   R6 0x%08x   R7 0x%08x\n", SystemContext.SystemContextArm->R4, SystemContext.SystemContextArm->R5, SystemContext.SystemContextArm->R6, SystemContext.SystemContextArm->R7));
-  DEBUG ((DEBUG_ERROR, "  R8 0x%08x   R9 0x%08x  R10 0x%08x  R11 0x%08x\n", SystemContext.SystemContextArm->R8, SystemContext.SystemContextArm->R9, SystemContext.SystemContextArm->R10, SystemContext.SystemContextArm->R11));
-  DEBUG ((DEBUG_ERROR, " R12 0x%08x   SP 0x%08x   LR 0x%08x   PC 0x%08x\n", SystemContext.SystemContextArm->R12, SystemContext.SystemContextArm->SP, SystemContext.SystemContextArm->LR, SystemContext.SystemContextArm->PC));
-  DEBUG ((DEBUG_ERROR, "DFSR 0x%08x DFAR 0x%08x IFSR 0x%08x IFAR 0x%08x\n", SystemContext.SystemContextArm->DFSR, SystemContext.SystemContextArm->DFAR, SystemContext.SystemContextArm->IFSR, SystemContext.SystemContextArm->IFAR));
+}
 
-  // Bit10 is Status[4] Bit3:0 is Status[3:0]
-  DfsrStatus = (SystemContext.SystemContextArm->DFSR & 0xf) | ((SystemContext.SystemContextArm->DFSR >> 6) & 0x10);
-  DfsrWrite  = (SystemContext.SystemContextArm->DFSR & BIT11) != 0;
-  if (DfsrStatus != 0x00) {
-    DEBUG ((DEBUG_ERROR, " %a: %a 0x%08x\n", FaultStatusToString (DfsrStatus), DfsrWrite ? "write to" : "read from", SystemContext.SystemContextArm->DFAR));
-  }
+/**
+  This is the default action to take on an unexpected exception
 
-  IfsrStatus = (SystemContext.SystemContextArm->IFSR & 0xf) | ((SystemContext.SystemContextArm->IFSR >> 6) & 0x10);
-  if (IfsrStatus != 0) {
-    DEBUG ((DEBUG_ERROR, " Instruction %a at 0x%08x\n", FaultStatusToString (SystemContext.SystemContextArm->IFSR & 0xf), SystemContext.SystemContextArm->IFAR));
-  }
+  Since this is exception context don't do anything crazy like try to allocate memory.
 
-  DEBUG ((DEBUG_ERROR, "\n"));
+  @param  ExceptionType    Type of the exception
+  @param  SystemContext    Register state at the time of the Exception
 
-  // Attempt to print that we had a synchronous exception to ConOut.  We do
-  // this after the serial logging as ConOut's logging is more complex and we
-  // aren't guaranteed to succeed.
-  if (gST->ConOut != NULL) {
-    gST->ConOut->OutputString (gST->ConOut, UnicodeBuffer);
-  }
+**/
+VOID
+DumpImageAndCpuContent (
+  IN     EFI_EXCEPTION_TYPE  ExceptionType,
+  IN OUT EFI_SYSTEM_CONTEXT  SystemContext
+  )
+{
+  DumpCpuContext (ExceptionType, SystemContext);
+
+  DumpModuleImageInfo (SystemContext);
 
   ASSERT (FALSE);
 

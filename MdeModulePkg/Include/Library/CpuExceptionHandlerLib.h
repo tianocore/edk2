@@ -99,4 +99,16 @@ DumpCpuContext (
   IN EFI_SYSTEM_CONTEXT  SystemContext
   );
 
+/**
+  Display CPU information.
+
+  @param ExceptionType  Exception type.
+  @param SystemContext  Pointer to EFI_SYSTEM_CONTEXT.
+**/
+VOID
+DumpImageAndCpuContent (
+  IN EFI_EXCEPTION_TYPE  ExceptionType,
+  IN EFI_SYSTEM_CONTEXT  SystemContext
+  );
+
 #endif
