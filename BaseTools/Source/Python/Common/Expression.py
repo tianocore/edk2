@@ -969,8 +969,8 @@ class ValueExpressionEx(ValueExpression):
                                 NewPcdValueList.append(Item)
 
                             AllPcdValueList = []
+                            Size = 0
                             for Item in NewPcdValueList:
-                                Size = 0
                                 ValueStr = ''
                                 TokenSpaceGuidName = ''
                                 if Item.startswith(TAB_GUID) and Item.endswith(')'):
