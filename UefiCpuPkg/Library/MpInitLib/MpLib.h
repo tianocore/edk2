@@ -239,6 +239,7 @@ typedef struct {
   BOOLEAN            SevSnpIsEnabled;
   UINTN              GhcbBase;
   BOOLEAN            ExtTopoAvail;
+  BOOLEAN            SevSnpKnownInitApicId;
 } MP_CPU_EXCHANGE_INFO;
 
 #pragma pack()
