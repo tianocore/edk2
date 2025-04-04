@@ -1,0 +1,70 @@
+## @file
+# A PEIM providing synchronous SMI activations via the
+# EFI_PEI_MM_CONTROL_PPI.
+#
+# We expect the PEI phase to have covered the following:
+# - ensure that the underlying QEMU machine type be Q35
+#   (responsible: QemuQ35Pkg/SmmAccess/SmmAccessPei.inf)
+# - ensure that the ACPI PM IO space be configured
+#   (responsible: QemuQ35Pkg/PlatformPei/PlatformPei.inf)
+#
+# Our own entry point is responsible for confirming the SMI feature and for
+# configuring it.
+#
+# Copyright (C) 2013, 2015, Red Hat, Inc.
+# Copyright (c) Microsoft Corporation.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MmControlPei
+  FILE_GUID                      = A0DBE438-701C-44AF-AB4A-25545B86B565
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = MmControlPeiEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SmiFeatures.h
+  SmiFeatures.c
+  MmControlPei.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib
+  MemEncryptSevLib
+  MemoryAllocationLib
+  PcdLib
+  PciLib
+  QemuFwCfgLib
+  QemuFwCfgS3Lib
+  PeimEntryPoint
+
+[Ppis]
+  gEfiPeiMmControlPpiGuid     ## PRODUCES
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout  ## SOMETIMES_PRODUCES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout2 ## SOMETIMES_PRODUCES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode       ## SOMETIMES_PRODUCES
+
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
+  gUefiOvmfPkgTokenSpaceGuid.PcdStandaloneMmEnable
+
+[Depex]
+  TRUE
