@@ -582,6 +582,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|0
 
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE
+
 [PcdsDynamicHii]
 !include OvmfPkg/Include/Dsc/OvmfTpmPcdsHii.dsc.inc
 

@@ -659,6 +659,8 @@
   # Set ConfidentialComputing defaults
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
 
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE
+
 [PcdsDynamicHii]
 !include OvmfPkg/Include/Dsc/OvmfTpmPcdsHii.dsc.inc
 

@@ -674,6 +674,8 @@
 
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock|1000000000
 
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE
+
 [PcdsDynamicDefault.X64]
 !include NetworkPkg/NetworkDynamicPcds.dsc.inc
 

@@ -365,7 +365,6 @@
 
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId|0|UINT16|0x1b
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE|BOOLEAN|0x21
 
@@ -414,6 +413,9 @@
   # exposed by QEMU
   #
   gUefiOvmfPkgTokenSpaceGuid.PcdForceNoAcpi|0x0|BOOLEAN|0x69
+
+[PcdsFixedAtBuild, PcdsDynamic, PcdsDynamicEx]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   #

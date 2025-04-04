@@ -665,6 +665,8 @@
 
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock|1000000000
 
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE
+
 [PcdsDynamicHii]
 !include OvmfPkg/Include/Dsc/OvmfTpmPcdsHii.dsc.inc
 
