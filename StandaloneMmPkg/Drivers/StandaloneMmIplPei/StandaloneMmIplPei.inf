@@ -65,6 +65,7 @@
   gEfiPeiMmCommunication3PpiGuid
   gEfiEndOfPeiSignalPpiGuid
   gMmCoreFvLocationPpiGuid
+  gEfiPeiMmAccessPpiGuid
 
 [Protocols]
   gEfiMmEndOfPeiProtocol
