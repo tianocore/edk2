@@ -1,0 +1,51 @@
+## @file
+# Null instance of MM Platform HOB Producer Library Class.
+#
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = MmPlatformHobProducerLibOvmf
+  FILE_GUID                      = 011E97D9-2CA9-453D-9652-50C43AE54A4E
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MmPlatformHobProducerLib
+
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  MmPlatformHobProducerLibOvmf.c
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  PcdLib
+  MemoryAllocationLib
+  HobLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Guids]
+  gUefiOvmfPkgPlatformInfoGuid                       ## CONSUMES  ## SystemTable
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
+
+[Depex]
+  gEfiPeiMmAccessPpiGuid
