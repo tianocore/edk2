@@ -48,6 +48,7 @@ The framework currently supports the following table generators for ARM:
 * DSDT - Differentiated system description table. This is essentially
          a RAW table generator.
 * FADT - Fixed ACPI Description Table
+* HMAT - Heterogeneous Memory Attribute Table
 * GTDT - Generic Timer Description Table
 * IORT - IO Remapping Table
 * MADT - Multiple APIC Description Table
