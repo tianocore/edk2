@@ -464,3 +464,7 @@
   #  framebuffer. This might be required on platforms that do not tolerate
   #  misaligned accesses otherwise.
   gUefiOvmfPkgTokenSpaceGuid.PcdRemapFrameBufferWriteCombine|FALSE|BOOLEAN|0x75
+
+  ## Informs modules whether the platform firmware supports Standalone MM.
+  #
+  gUefiOvmfPkgTokenSpaceGuid.PcdStandaloneMmEnable|FALSE|BOOLEAN|0x100065

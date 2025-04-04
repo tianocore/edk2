@@ -69,6 +69,7 @@
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
+  gUefiOvmfPkgTokenSpaceGuid.PcdStandaloneMmEnable
 
 [Depex]
   TRUE
