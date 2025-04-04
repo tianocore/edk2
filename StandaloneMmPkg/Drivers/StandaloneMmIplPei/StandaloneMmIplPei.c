@@ -456,7 +456,9 @@ CreatMmHobList (
                         MmProfileDataHob,
                         Block
                         );
-  FreePages (PlatformHobList, EFI_SIZE_TO_PAGES (PlatformHobSize));
+  if (PlatformHobSize != 0) {
+    FreePages (PlatformHobList, EFI_SIZE_TO_PAGES (PlatformHobSize));
+  }
   ASSERT (Status == RETURN_BUFFER_TOO_SMALL);
   ASSERT (FoundationHobSize != 0);
 
