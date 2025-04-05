@@ -44,8 +44,10 @@
   gEfiEventVirtualAddressChangeGuid
   gEfiEndOfDxeEventGroupGuid
   gEfiEventExitBootServicesGuid
+  gEfiMmCommunicateHeaderV3Guid
 
 [Protocols]
+  gEfiMmCommunication3ProtocolGuid
   gEfiMmCommunication2ProtocolGuid
   gEfiSmmControl2ProtocolGuid
   gEfiMmCommunicationProtocolGuid
