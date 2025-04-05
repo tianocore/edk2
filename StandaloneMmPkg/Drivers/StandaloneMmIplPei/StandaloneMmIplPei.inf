@@ -57,10 +57,12 @@
   gMmProfileDataHobGuid
   gMmUnblockRegionHobGuid
   gMmStatusCodeUseSerialHobGuid
+  gEfiMmCommunicateHeaderV3Guid
 
 [Ppis]
   gEfiPeiMmControlPpiGuid
   gEfiPeiMmCommunicationPpiGuid
+  gEfiPeiMmCommunication3PpiGuid
   gEfiEndOfPeiSignalPpiGuid
   gMmCoreFvLocationPpiGuid
 
