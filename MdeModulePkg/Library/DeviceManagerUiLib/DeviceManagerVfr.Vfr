@@ -28,6 +28,17 @@ formset
     title  = STRING_TOKEN(STR_EDKII_MENU_TITLE);
     subtitle text = STRING_TOKEN(STR_DEVICES_LIST);
 
+    //
+    // Add this invisable text in order to indicate enter Device Manager form.
+    //
+    suppressif TRUE;
+          text
+              help  = STRING_TOKEN(STR_EMPTY_STRING),
+              text  = STRING_TOKEN(STR_EMPTY_STRING),
+              flags = INTERACTIVE,
+              key   = 0x1212;
+    endif;
+
     label LABEL_DEVICES_LIST;
     label LABEL_END;
 
