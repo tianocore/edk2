@@ -80,10 +80,6 @@
   #
   ArmTransferListLib|Include/Library/ArmTransferListLib.h
 
-  ##  @libraryclass  Provides an interface for a Arm FF-A ABI.
-  #
-  ArmFfaLib|Include/Library/ArmFfaLib.h
-
   ##  @libraryclass  Defines a set of interfaces for the MM core entrypoint for
   ##                 AArch64 and ARM.
   StandaloneMmCoreEntryPoint|Include/Library/ArmStandaloneMmCoreEntryPoint.h
