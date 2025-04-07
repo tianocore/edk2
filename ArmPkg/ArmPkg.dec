@@ -50,10 +50,6 @@
   #
   ArmMtlLib|Include/Library/ArmMtlLib.h
 
-  ##  @libraryclass  Provides a SuperVisor Call (SVC) interface.
-  #
-  ArmSvcLib|Include/Library/ArmSvcLib.h
-
   ##  @libraryclass  Provides a Monitor Call interface that will use the
   #   default conduit (HVC or SMC).
   #
