@@ -68,7 +68,7 @@
 
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerPhyCounterLib/ArmGenericTimerPhyCounterLib.inf
-  ArmSvcLib|ArmPkg/Library/ArmSvcLib/ArmSvcLib.inf
+  ArmSvcLib|MdePkg/Library/ArmSvcLib/ArmSvcLib.inf
   ArmSmcLib|MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
   OpteeLib|ArmPkg/Library/OpteeLib/OpteeLib.inf
 
@@ -134,7 +134,6 @@
   ArmPkg/Library/ArmHvcLib/ArmHvcLib.inf
   ArmPkg/Library/ArmHvcLibNull/ArmHvcLibNull.inf
   ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
-  ArmPkg/Library/ArmSvcLib/ArmSvcLib.inf
   ArmPkg/Library/OpteeLib/OpteeLib.inf
   ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
   ArmPkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
