@@ -40,3 +40,18 @@ CVE_2022_36764:
     - Library\DxeTpmMeasureBootLib\DxeTpmMeasureBootLib.c
   links:
     - https://bugzilla.tianocore.org/show_bug.cgi?id=4118
+CVE_2024_38797:
+  commit-titles:
+    - "SecurityPkg: Out of bound read in HashPeImageByType()"
+    - "SecurityPkg: Improving HashPeImageByType () logic"
+    - "SecurityPkg: Improving SecureBootConfigImpl:HashPeImageByType () logic"
+  cve: CVE-2024-38797
+  date_reported: 2024-06-04 12:00 UTC
+  description: Out of bound read in HashPeImageByType()
+  note:
+  files_impacted:
+    - SecurityPkg\Library\DxeImageVerificationLib\DxeImageVerificationLib.c
+    - SecurityPkg\VariableAuthenticated\SecureBootConfigDxe\SecureBootConfigImpl.c
+  links:
+    - https://bugzilla.tianocore.org/show_bug.cgi?id=2214
+    - https://github.com/tianocore/edk2/security/advisories/GHSA-4wjw-6xmf-44xf
