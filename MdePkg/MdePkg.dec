@@ -366,6 +366,10 @@
   #
   ArmSvcLib|Include/Library/ArmSvcLib.h
 
+  ## @libraryclass  Provides an interface to Arm's Firmware Framework for A-profile (FF-A) functions.
+  #
+  ArmFfaLib|Include/Library/ArmFfaLib.h
+
 [Guids]
   #
   # GUID defined in UEFI2.1/UEFI2.0/EFI1.1
