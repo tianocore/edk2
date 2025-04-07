@@ -209,6 +209,7 @@
   MdePkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
   MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
   MdePkg/Library/ArmSmcLibNull/ArmSmcLibNull.inf
+  MdePkg/Library/ArmSvcLib/ArmSvcLib.inf
 
 [Components.RISCV64]
   MdePkg/Library/BaseRiscVSbiLib/BaseRiscVSbiLib.inf

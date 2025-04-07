@@ -20,5 +20,4 @@
   AArch64/ArmSvc.S
 
 [Packages]
-  ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
