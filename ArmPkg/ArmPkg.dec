@@ -50,10 +50,6 @@
   #
   ArmMtlLib|Include/Library/ArmMtlLib.h
 
-  ##  @libraryclass  Provides a System Monitor Call (SMC) interface.
-  #
-  ArmSmcLib|Include/Library/ArmSmcLib.h
-
   ##  @libraryclass  Provides a SuperVisor Call (SVC) interface.
   #
   ArmSvcLib|Include/Library/ArmSvcLib.h
