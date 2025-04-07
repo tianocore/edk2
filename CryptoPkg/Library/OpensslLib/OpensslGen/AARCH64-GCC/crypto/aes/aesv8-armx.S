@@ -3,12 +3,13 @@
 #if __ARM_MAX_ARCH__>=7
 .arch   armv8-a+crypto
 .text
+.section        .rodata
 .align  5
 .Lrcon:
 .long   0x01,0x01,0x01,0x01
 .long   0x0c0f0e0d,0x0c0f0e0d,0x0c0f0e0d,0x0c0f0e0d     // rotate-n-splat
 .long   0x1b,0x1b,0x1b,0x1b
-
+.previous
 .globl  aes_v8_set_encrypt_key
 .type   aes_v8_set_encrypt_key,%function
 .align  5
@@ -31,7 +32,8 @@ aes_v8_set_encrypt_key:
         tst     w1,#0x3f
         b.ne    .Lenc_key_abort
 
-        adr     x3,.Lrcon
+        adrp    x3,.Lrcon
+        add     x3,x3,#:lo12:.Lrcon
         cmp     w1,#192
 
         eor     v0.16b,v0.16b,v0.16b
