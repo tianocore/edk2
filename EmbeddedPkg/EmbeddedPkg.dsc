@@ -124,7 +124,7 @@
   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
-  ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
+  ArmSmcLib|MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
   SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
 
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
