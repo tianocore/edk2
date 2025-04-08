@@ -18,23 +18,6 @@
 #define ARM_FFA_RX_TX_MAP_LIB_H_
 
 /**
- * Guid Hob Data for gArmFfaRxTxBufferInfoGuid Guid Hob.
- */
-typedef struct ArmFfaRxTxBuffersInfo {
-  /// Tx Buffer Address.
-  VOID      *TxBufferAddr;
-
-  /// Tx Buffer Size.
-  UINT64    TxBufferSize;
-
-  /// Rx Buffer Address.
-  VOID      *RxBufferAddr;
-
-  /// Rx Buffer Size.
-  UINT64    RxBufferSize;
-} ARM_FFA_RX_TX_BUFFER_INFO;
-
-/**
   Mapping Rx/Tx buffers.
   This function is only called in ArmFfaLibConstructor because
   Rx/Tx buffer is registered only once per partition.
