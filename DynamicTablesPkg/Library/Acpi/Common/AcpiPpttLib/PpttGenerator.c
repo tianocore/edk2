@@ -24,6 +24,7 @@
 #include <ConfigurationManagerObject.h>
 #include <ConfigurationManagerHelper.h>
 #include <MetadataHelpers.h>
+#include <Library/CmObjHelperLib.h>
 #include <Library/TableHelperLib.h>
 #include <Library/MetadataHandlerLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
@@ -493,6 +494,7 @@ AddProcHierarchyNodes (
   UINT32             Length;
 
   METADATA_OBJ_UID  MetadataUid;
+  BOOLEAN           SsdtCpuTopoPresent;
 
   ASSERT (
     (Generator != NULL) &&
@@ -505,6 +507,8 @@ AddProcHierarchyNodes (
 
   ProcNodeIterator = Generator->ProcHierarchyNodeIndexedList;
   NodeCount        = Generator->ProcHierarchyNodeCount;
+
+  SsdtCpuTopoPresent = CheckAcpiTablePresent (CfgMgrProtocol, EStdAcpiTableIdSsdtCpuTopology);
 
   // Check if every GICC Object is referenced by onlu one Proc Node
   IsAcpiIdObjectTokenDuplicated = FindDuplicateValue (
@@ -618,6 +622,17 @@ AddProcHierarchyNodes (
           "ACPI ID Reference object token was provided. " \
           "AcpiIdObjectToken = %p. RequestorToken = %p. Status = %r\n",
           ProcInfoNode->AcpiIdObjectToken,
+          ProcInfoNode->Token,
+          Status
+          ));
+        return Status;
+      } else if (!SsdtCpuTopoPresent) {
+        Status = EFI_INVALID_PARAMETER;
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: PPTT: The 'ACPI Processor ID valid' flag is for a non-leaf node, " \
+          "but no SSDT CPU TOPOLOGY table will be installed, " \
+          "Token = %p. Status = %r\n",
           ProcInfoNode->Token,
           Status
           ));
