@@ -18,8 +18,4 @@ ArchInitialize (
 {
   // Enable program flow prediction, if supported.
   ArmEnableBranchPrediction ();
-
-  if (FixedPcdGet32 (PcdVFPEnabled)) {
-    ArmEnableVFP ();
-  }
 }
