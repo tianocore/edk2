@@ -2,6 +2,7 @@
   Entrypoint of Opal UEFI Driver and contains all the logic to
   register for new Opal device instances.
 
+Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -2422,157 +2423,9 @@ OpalDriverStopDevice (
 }
 
 /**
-  Get devcie name through the component name protocol.
+  Get device name through the component name protocol.
 
-  @param[in]       AllHandlesBuffer   The handle buffer for current system.
-  @param[in]       NumAllHandles      The number of handles for the handle buffer.
-  @param[in]       Dev                The device which need to get name.
-  @param[in]       UseComp1           Whether use component name or name2 protocol.
-
-  @retval     TRUE        Find the name for this device.
-  @retval     FALSE       Not found the name for this device.
-**/
-BOOLEAN
-OpalDriverGetDeviceNameByProtocol (
-  EFI_HANDLE          *AllHandlesBuffer,
-  UINTN               NumAllHandles,
-  OPAL_DRIVER_DEVICE  *Dev,
-  BOOLEAN             UseComp1
-  )
-{
-  EFI_HANDLE                    *ProtocolHandlesBuffer;
-  UINTN                         NumProtocolHandles;
-  EFI_STATUS                    Status;
-  EFI_COMPONENT_NAME2_PROTOCOL  *Cnp1_2; // efi component name and componentName2 have same layout
-  EFI_GUID                      Protocol;
-  UINTN                         StrLength;
-  EFI_DEVICE_PATH_PROTOCOL      *TmpDevPath;
-  UINTN                         Index1;
-  UINTN                         Index2;
-  EFI_HANDLE                    TmpHandle;
-  CHAR16                        *DevName;
-
-  if ((Dev == NULL) || (AllHandlesBuffer == NULL) || (NumAllHandles == 0)) {
-    return FALSE;
-  }
-
-  Protocol = UseComp1 ? gEfiComponentNameProtocolGuid : gEfiComponentName2ProtocolGuid;
-
-  //
-  // Find all EFI_HANDLES with protocol
-  //
-  Status = gBS->LocateHandleBuffer (
-                  ByProtocol,
-                  &Protocol,
-                  NULL,
-                  &NumProtocolHandles,
-                  &ProtocolHandlesBuffer
-                  );
-  if (EFI_ERROR (Status)) {
-    return FALSE;
-  }
-
-  //
-  // Exit early if no supported devices
-  //
-  if (NumProtocolHandles == 0) {
-    return FALSE;
-  }
-
-  //
-  // Get printable name by iterating through all protocols
-  // using the handle as the child, and iterate through all handles for the controller
-  // exit loop early once found, if not found, then delete device
-  // storage security protocol instances already exist, add them to internal list
-  //
-  Status = EFI_DEVICE_ERROR;
-  for (Index1 = 0; Index1 < NumProtocolHandles; Index1++) {
-    DevName = NULL;
-
-    if (Dev->Name16 != NULL) {
-      return TRUE;
-    }
-
-    TmpHandle = ProtocolHandlesBuffer[Index1];
-
-    Status = gBS->OpenProtocol (
-                    TmpHandle,
-                    &Protocol,
-                    (VOID **)&Cnp1_2,
-                    gImageHandle,
-                    NULL,
-                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                    );
-    if (EFI_ERROR (Status) || (Cnp1_2 == NULL)) {
-      continue;
-    }
-
-    //
-    // Use all handles array as controller handle
-    //
-    for (Index2 = 0; Index2 < NumAllHandles; Index2++) {
-      Status = Cnp1_2->GetControllerName (
-                         Cnp1_2,
-                         AllHandlesBuffer[Index2],
-                         Dev->Handle,
-                         LANGUAGE_ISO_639_2_ENGLISH,
-                         &DevName
-                         );
-      if (EFI_ERROR (Status)) {
-        Status = Cnp1_2->GetControllerName (
-                           Cnp1_2,
-                           AllHandlesBuffer[Index2],
-                           Dev->Handle,
-                           LANGUAGE_RFC_3066_ENGLISH,
-                           &DevName
-                           );
-      }
-
-      if (!EFI_ERROR (Status) && (DevName != NULL)) {
-        StrLength   = StrLen (DevName) + 1;     // Add one for NULL terminator
-        Dev->Name16 = AllocateZeroPool (StrLength * sizeof (CHAR16));
-        ASSERT (Dev->Name16 != NULL);
-        StrCpyS (Dev->Name16, StrLength, DevName);
-        Dev->NameZ = (CHAR8 *)AllocateZeroPool (StrLength);
-        UnicodeStrToAsciiStrS (DevName, Dev->NameZ, StrLength);
-
-        //
-        // Retrieve bridge BDF info and port number or namespace depending on type
-        //
-        TmpDevPath = NULL;
-        Status     = gBS->OpenProtocol (
-                            Dev->Handle,
-                            &gEfiDevicePathProtocolGuid,
-                            (VOID **)&TmpDevPath,
-                            gImageHandle,
-                            NULL,
-                            EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                            );
-        if (!EFI_ERROR (Status)) {
-          Dev->OpalDevicePath = DuplicateDevicePath (TmpDevPath);
-          return TRUE;
-        }
-
-        if (Dev->Name16 != NULL) {
-          FreePool (Dev->Name16);
-          Dev->Name16 = NULL;
-        }
-
-        if (Dev->NameZ != NULL) {
-          FreePool (Dev->NameZ);
-          Dev->NameZ = NULL;
-        }
-      }
-    }
-  }
-
-  return FALSE;
-}
-
-/**
-  Get devcie name through the component name protocol.
-
-  @param[in]       Dev                The device which need to get name.
+  @param[in]  Dev         The device which need to get name.
 
   @retval     TRUE        Find the name for this device.
   @retval     FALSE       Not found the name for this device.
@@ -2582,48 +2435,158 @@ OpalDriverGetDriverDeviceName (
   OPAL_DRIVER_DEVICE  *Dev
   )
 {
-  EFI_HANDLE  *AllHandlesBuffer;
-  UINTN       NumAllHandles;
-  EFI_STATUS  Status;
+  EFI_DEVICE_PATH_PROTOCOL             *TmpDevPath   = NULL;
+  EFI_DEVICE_PATH_PROTOCOL             *TmpDevPath2  = NULL;
+  EFI_DEVICE_PATH_PROTOCOL             *ChildDevNode = NULL;
+  EFI_STATUS                           Status;
+  CHAR16                               *DevName = NULL;
+  EFI_HANDLE                           ParentHandle;
+  EFI_GUID                             **ProtocolGuidArray = NULL;
+  UINTN                                ArrayCount;
+  UINTN                                ProtocolIndex;
+  EFI_OPEN_PROTOCOL_INFORMATION_ENTRY  *OpenInfo = NULL;
+  UINTN                                OpenInfoCount;
+  UINTN                                OpenInfoIndex;
+  EFI_COMPONENT_NAME2_PROTOCOL         *Cnp1_2 = NULL; // EFI component name and componentName2 have same layout
+  UINTN                                StrLength;
 
   if (Dev == NULL) {
-    DEBUG ((DEBUG_ERROR | DEBUG_INIT, "OpalDriverGetDriverDeviceName Exiting, Dev=NULL\n"));
+    DEBUG ((DEBUG_ERROR | DEBUG_INIT, "%a: Exiting on Dev == NULL.\n", __func__));
     return FALSE;
   }
 
   //
-  // Iterate through ComponentName2 handles to get name, if fails, try ComponentName
+  // 1. Find the parent controller device path by deleting the last node of the child device path.
+  // 2. Find the parent controller handle by its device path.
+  // 3. Find the agent handle by checking a protocol that is on the parent handle and is opened by the child handle.
+  // 4. Find the device name from ComponentName2/ComponentName protocols on the agent handle.
   //
   if (Dev->Name16 == NULL) {
-    DEBUG ((DEBUG_ERROR | DEBUG_INIT, "Name is null, update it\n"));
-    //
-    // Find all EFI_HANDLES
-    //
-    Status = gBS->LocateHandleBuffer (
-                    AllHandles,
+    DEBUG ((DEBUG_ERROR | DEBUG_INIT, "%a: Dev->Name is NULL, so updating it.\n", __func__));
+    Status = gBS->OpenProtocol (
+                    Dev->Handle,
+                    &gEfiDevicePathProtocolGuid,
+                    (VOID **)&TmpDevPath,
+                    gImageHandle,
                     NULL,
-                    NULL,
-                    &NumAllHandles,
-                    &AllHandlesBuffer
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
                     );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_INFO, "LocateHandleBuffer for AllHandles failed %r\n", Status));
-      return FALSE;
-    }
+    if (!EFI_ERROR (Status)) {
+      Dev->OpalDevicePath = DuplicateDevicePath (TmpDevPath);
+      TmpDevPath2         = DuplicateDevicePath (TmpDevPath);
+      TmpDevPath          = TmpDevPath2;
+      while (!IsDevicePathEnd (TmpDevPath)) {
+        ChildDevNode = TmpDevPath;
+        TmpDevPath   = NextDevicePathNode (TmpDevPath);
+      }
 
-    //
-    // Try component Name2
-    //
-    if (!OpalDriverGetDeviceNameByProtocol (AllHandlesBuffer, NumAllHandles, Dev, FALSE)) {
-      DEBUG ((DEBUG_ERROR | DEBUG_INIT, "ComponentName2 failed to get device name, try ComponentName\n"));
-      if (!OpalDriverGetDeviceNameByProtocol (AllHandlesBuffer, NumAllHandles, Dev, TRUE)) {
-        DEBUG ((DEBUG_ERROR | DEBUG_INIT, "ComponentName failed to get device name, skip device\n"));
-        return FALSE;
+      //
+      // Remove the last node to get its parent device path
+      //
+      SetDevicePathEndNode (ChildDevNode);
+
+      TmpDevPath   = TmpDevPath2;
+      ParentHandle = NULL;
+      Status       = gBS->LocateDevicePath (&gEfiDevicePathProtocolGuid, &TmpDevPath, &ParentHandle);
+      if (!EFI_ERROR (Status) && (ParentHandle != NULL) && IsDevicePathEnd (TmpDevPath)) {
+        //
+        // Found Parent handle
+        //
+        Status = gBS->ProtocolsPerHandle (
+                        ParentHandle,
+                        &ProtocolGuidArray,
+                        &ArrayCount
+                        );
+        if (!EFI_ERROR (Status)) {
+          for (ProtocolIndex = 0; ProtocolIndex < ArrayCount; ProtocolIndex++) {
+            Status = gBS->OpenProtocolInformation (
+                            ParentHandle,
+                            ProtocolGuidArray[ProtocolIndex],
+                            &OpenInfo,
+                            &OpenInfoCount
+                            );
+            if (!EFI_ERROR (Status)) {
+              for (OpenInfoIndex = 0; OpenInfoIndex < OpenInfoCount; OpenInfoIndex++) {
+                if ((OpenInfo[OpenInfoIndex].ControllerHandle == Dev->Handle) &&
+                    ((OpenInfo[OpenInfoIndex].Attributes & EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER) != 0))
+                {
+                  //
+                  // Found Agent handle
+                  //
+                  Status = gBS->OpenProtocol (
+                                  OpenInfo[OpenInfoIndex].AgentHandle,
+                                  &gEfiComponentName2ProtocolGuid,
+                                  (VOID **)&Cnp1_2,
+                                  gImageHandle,
+                                  NULL,
+                                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                                  );
+                  if (EFI_ERROR (Status)) {
+                    Status = gBS->OpenProtocol (
+                                    OpenInfo[OpenInfoIndex].AgentHandle,
+                                    &gEfiComponentNameProtocolGuid,
+                                    (VOID **)&Cnp1_2,
+                                    gImageHandle,
+                                    NULL,
+                                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                                    );
+                  }
+
+                  if (!EFI_ERROR (Status)) {
+                    Status = Cnp1_2->GetControllerName (
+                                       Cnp1_2,
+                                       ParentHandle,
+                                       Dev->Handle,
+                                       LANGUAGE_ISO_639_2_ENGLISH,
+                                       &DevName
+                                       );
+                    if (EFI_ERROR (Status)) {
+                      Status = Cnp1_2->GetControllerName (
+                                         Cnp1_2,
+                                         ParentHandle,
+                                         Dev->Handle,
+                                         LANGUAGE_RFC_3066_ENGLISH,
+                                         &DevName
+                                         );
+                    }
+
+                    if (!EFI_ERROR (Status) && (DevName != NULL)) {
+                      StrLength   = StrLen (DevName) + 1;
+                      Dev->Name16 = AllocateZeroPool (StrLength * sizeof (CHAR16));
+                      ASSERT (Dev->Name16 != NULL);
+                      StrCpyS (Dev->Name16, StrLength, DevName);
+                      Dev->NameZ = (CHAR8 *)AllocateZeroPool (StrLength);
+                      UnicodeStrToAsciiStrS (DevName, Dev->NameZ, StrLength);
+                      FreePool (OpenInfo);
+                      FreePool (ProtocolGuidArray);
+                      FreePool (TmpDevPath2);
+                      DEBUG ((DEBUG_INFO, " Dev Name: %s\n", DevName));
+                      return TRUE;
+                    }
+                  }
+                }
+              }
+            }
+
+            if (OpenInfo != NULL) {
+              FreePool (OpenInfo);
+              OpenInfo = NULL;
+            }
+          }
+        }
+
+        if (ProtocolGuidArray != NULL) {
+          FreePool (ProtocolGuidArray);
+        }
+      }
+
+      if (TmpDevPath2 != NULL) {
+        FreePool (TmpDevPath2);
       }
     }
   }
 
-  return TRUE;
+  return FALSE;
 }
 
 /**
