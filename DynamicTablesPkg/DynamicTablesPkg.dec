@@ -43,6 +43,9 @@
   ##  @libraryclass  Defines a set of SMBIOS string helper methods.
   SmbiosStringTableLib|Include/Library/SmbiosStringTableLib.h
 
+  ##  @libraryclass  Defines a set of APIs to a handle Metadata around CmObj.
+  MetadataObjLib|Include/Library/MetadataObjLib.h
+
 [LibraryClasses.AARCH64]
   ##  @libraryclass  Defines a set of APIs to populate CmObj using SCMI.
   DynamicTablesScmiInfoLib|Include/Library/DynamicTablesScmiInfoLib.h
