@@ -28,4 +28,5 @@
 
 [LibraryClasses]
   BaseLib
+  CmObjHelperLib
   MetadataHandlerLib
