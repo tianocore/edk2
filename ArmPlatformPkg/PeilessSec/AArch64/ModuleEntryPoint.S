@@ -11,6 +11,10 @@ ASM_FUNC(_ModuleEntryPoint)
   // Do early platform specific actions
   bl    ASM_PFX(ArmPlatformPeiBootAction)
 
+  // Enable Floating Point. This needs to be done before entering C code, which
+  // may use FP/SIMD registers.
+  bl    ArmEnableVFP
+
 // Check if we can install the stack at the top of the System Memory or if we need
 // to install the stacks at the bottom of the Firmware Device (case the FD is located
 // at the top of the DRAM)

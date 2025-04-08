@@ -70,8 +70,10 @@
   gArmTokenSpaceGuid.PcdFdSize
   gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmTokenSpaceGuid.PcdFvSize
-  gArmTokenSpaceGuid.PcdVFPEnabled
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
+
+[FixedPcd.ARM]
+  gArmTokenSpaceGuid.PcdVFPEnabled
 
 [Pcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase

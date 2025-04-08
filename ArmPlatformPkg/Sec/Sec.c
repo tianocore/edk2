@@ -223,11 +223,6 @@ CEntryPoint (
   ASSERT (((UINTN)PeiVectorTable & ARM_VECTOR_TABLE_ALIGNMENT) == 0);
   ArmWriteVBar ((UINTN)PeiVectorTable);
 
-  // Enable Floating Point
-  if (FixedPcdGet32 (PcdVFPEnabled)) {
-    ArmEnableVFP ();
-  }
-
   // Invoke "ProcessLibraryConstructorList" to have all library constructors
   // called.
   ProcessLibraryConstructorList ();

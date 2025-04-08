@@ -11,6 +11,12 @@ ASM_FUNC(_ModuleEntryPoint)
   // Do early platform specific actions
   bl    ASM_PFX(ArmPlatformPeiBootAction)
 
+#if (FixedPcdGet32 (PcdVFPEnabled))
+  // Enable Floating Point. This needs to be done before entering C code, which
+  // may use FP/SIMD registers.
+  bl    ArmEnableVFP
+#endif
+
   // Get the top of the primary stacks (and the base of the secondary stacks)
   MOV32 (r1, FixedPcdGet64(PcdCPUCoresStackBase) + FixedPcdGet32(PcdCPUCorePrimaryStackSize))
 
