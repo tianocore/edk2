@@ -26,9 +26,11 @@
 #include <AcpiTableGenerator.h>
 #include <ConfigurationManagerObject.h>
 #include <ConfigurationManagerHelper.h>
+#include <MetadataHelpers.h>
 #include <Library/AcpiHelperLib.h>
 #include <Library/TableHelperLib.h>
 #include <Library/AmlLib/AmlLib.h>
+#include <Library/MetadataHandlerLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
 #include "SsdtCpuTopologyGenerator.h"
@@ -859,7 +861,7 @@ CreateAmlProcessorContainer (
     return Status;
   }
 
-  // Use the ProcContainerIndex for the _UID value as there is no AcpiProcessorUid
+  // Use the ProcContainerUid for the _UID value as there is no AcpiProcessorUid
   // and EFI_ACPI_6_3_PPTT_PROCESSOR_ID_INVALID is set for non-Cpus.
   Status = AmlCodeGenNameInteger (
              "_UID",
@@ -965,8 +967,6 @@ CheckProcNode (
   @param [in] NodeToken               Token of the CM_ARCH_COMMON_PROC_HIERARCHY_INFO currently handled.
   @param [in] ParentNode              Parent node to attach the created
                                       node to.
-  @param [in,out] ProcContainerIndex  Pointer to the current processor container
-                                      index to be used as UID.
   @param [in]  PackageNodeSeen        A parent of the ProcNode has the physical package flag set.
 
   @retval EFI_SUCCESS             Success.
@@ -981,7 +981,6 @@ CreateAmlCpuTopologyTree (
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
   IN        CM_OBJECT_TOKEN                               NodeToken,
   IN        AML_NODE_HANDLE                               ParentNode,
-  IN OUT    UINT32                                        *ProcContainerIndex,
   IN        BOOLEAN                                       PackageNodeSeen
   )
 {
@@ -993,13 +992,13 @@ CreateAmlCpuTopologyTree (
   UINT32                  Uid;
   UINT16                  Name;
   BOOLEAN                 HasPhysicalPackageBit;
+  METADATA_OBJ_UID        MetadataUid;
 
   ASSERT (Generator != NULL);
   ASSERT (Generator->ProcNodeList != NULL);
   ASSERT (Generator->ProcNodeCount != 0);
   ASSERT (CfgMgrProtocol != NULL);
   ASSERT (ParentNode != NULL);
-  ASSERT (ProcContainerIndex != NULL);
 
   CpuIndex          = 0;
   ProcContainerName = 0;
@@ -1064,7 +1063,24 @@ CreateAmlCpuTopologyTree (
         } else {
           ASSERT ((ProcContainerName & ~MAX_UINT16) == 0);
           Name = (UINT16)ProcContainerName;
-          Uid  = *ProcContainerIndex;
+
+          MetadataUid.EisaId = 0;
+          AsciiStrCpyS (MetadataUid.NameId, METADATA_UID_NAMEID_SIZE, "ACPI0010");
+
+          Status = MetadataHandlerGenerate (
+                     GetMetadataRoot (),
+                     MetadataTypeUid,
+                     (CM_OBJECT_TOKEN)Generator->ProcNodeList[Index].Token,
+                     NULL,
+                     &MetadataUid,
+                     sizeof (METADATA_OBJ_UID)
+                     );
+          if (EFI_ERROR (Status)) {
+            ASSERT_EFI_ERROR (Status);
+            return Status;
+          }
+
+          Uid = MetadataUid.Uid;
         }
 
         Status = CreateAmlProcessorContainer (
@@ -1083,7 +1099,6 @@ CreateAmlCpuTopologyTree (
 
         // Nodes must have a unique name in the ASL namespace.
         // Reset the Cpu index whenever we create a new processor container.
-        (*ProcContainerIndex)++;
         CpuIndex = 0;
 
         // And reset the cluster name whenever there is a package.
@@ -1102,7 +1117,6 @@ CreateAmlCpuTopologyTree (
                    CfgMgrProtocol,
                    Generator->ProcNodeList[Index].Token,
                    ProcContainerNode,
-                   ProcContainerIndex,
                    (PackageNodeSeen || HasPhysicalPackageBit)
                    );
         if (EFI_ERROR (Status)) {
@@ -1138,15 +1152,12 @@ CreateTopologyFromProcHierarchy (
   )
 {
   EFI_STATUS  Status;
-  UINT32      ProcContainerIndex;
 
   ASSERT (Generator != NULL);
   ASSERT (Generator->ProcNodeCount != 0);
   ASSERT (Generator->ProcNodeList != NULL);
   ASSERT (CfgMgrProtocol != NULL);
   ASSERT (ScopeNode != NULL);
-
-  ProcContainerIndex = 0;
 
   Status = TokenTableInitialize (Generator, Generator->ProcNodeCount);
   if (EFI_ERROR (Status)) {
@@ -1159,7 +1170,6 @@ CreateTopologyFromProcHierarchy (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              ScopeNode,
-             &ProcContainerIndex,
              FALSE
              );
   if (EFI_ERROR (Status)) {
