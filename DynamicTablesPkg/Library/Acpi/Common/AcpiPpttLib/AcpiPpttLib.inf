@@ -28,3 +28,4 @@
 
 [LibraryClasses]
   BaseLib
+  MetadataHandlerLib
