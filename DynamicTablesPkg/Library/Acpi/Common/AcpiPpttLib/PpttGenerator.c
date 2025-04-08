@@ -14,6 +14,7 @@
 
 #include <Library/AcpiLib.h>
 #include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Protocol/AcpiTable.h>
@@ -22,7 +23,9 @@
 #include <AcpiTableGenerator.h>
 #include <ConfigurationManagerObject.h>
 #include <ConfigurationManagerHelper.h>
+#include <MetadataHelpers.h>
 #include <Library/TableHelperLib.h>
+#include <Library/MetadataHandlerLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
 #include "PpttGenerator.h"
@@ -489,6 +492,8 @@ AddProcHierarchyNodes (
   UINT32             NodeCount;
   UINT32             Length;
 
+  METADATA_OBJ_UID  MetadataUid;
+
   ASSERT (
     (Generator != NULL) &&
     (CfgMgrProtocol != NULL) &&
@@ -605,17 +610,42 @@ AddProcHierarchyNodes (
       // Default invalid ACPI Processor ID to 0
       ProcStruct->AcpiProcessorId = 0;
     } else if (ProcInfoNode->AcpiIdObjectToken == CM_NULL_TOKEN) {
-      Status = EFI_INVALID_PARAMETER;
-      DEBUG ((
-        DEBUG_ERROR,
-        "ERROR: PPTT: The 'ACPI Processor ID valid' flag is set but no " \
-        "ACPI ID Reference object token was provided. " \
-        "AcpiIdObjectToken = %p. RequestorToken = %p. Status = %r\n",
-        ProcInfoNode->AcpiIdObjectToken,
-        ProcInfoNode->Token,
-        Status
-        ));
-      return Status;
+      if (IS_PROC_NODE_LEAF (ProcInfoNode)) {
+        Status = EFI_INVALID_PARAMETER;
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: PPTT: The 'ACPI Processor ID valid' flag is set but no " \
+          "ACPI ID Reference object token was provided. " \
+          "AcpiIdObjectToken = %p. RequestorToken = %p. Status = %r\n",
+          ProcInfoNode->AcpiIdObjectToken,
+          ProcInfoNode->Token,
+          Status
+          ));
+        return Status;
+      }
+
+      // Node is a ProcContainer with a valid ID
+
+      if (ProcInfoNode->OverrideNameUidEnabled) {
+        ProcStruct->AcpiProcessorId = ProcInfoNode->OverrideUid;
+      } else {
+        MetadataUid.EisaId = 0;
+        AsciiStrCpyS (MetadataUid.NameId, METADATA_UID_NAMEID_SIZE, "ACPI0010");
+        Status = MetadataHandlerGenerate (
+                   GetMetadataRoot (),
+                   MetadataTypeUid,
+                   (CM_OBJECT_TOKEN)ProcInfoNode->Token,
+                   NULL,
+                   &MetadataUid,
+                   sizeof (METADATA_OBJ_UID)
+                   );
+        if (EFI_ERROR (Status)) {
+          ASSERT_EFI_ERROR (Status);
+          return Status;
+        }
+
+        ProcStruct->AcpiProcessorId = MetadataUid.Uid;
+      }
     } else {
       Status = GetEArmObjGicCInfo (
                  CfgMgrProtocol,
