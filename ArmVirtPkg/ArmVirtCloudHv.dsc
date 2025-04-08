@@ -87,10 +87,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
 
 [PcdsFixedAtBuild.common]
-!if $(ARCH) == AARCH64
-  gArmTokenSpaceGuid.PcdVFPEnabled|1
-!endif
-
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x4007c000
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000

@@ -623,8 +623,6 @@
 !endif
 
 [PcdsFixedAtBuild.AARCH64]
-  gArmTokenSpaceGuid.PcdVFPEnabled|1
-
   # System Memory Base -- fixed at 0x4000_0000
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x40000000
 
