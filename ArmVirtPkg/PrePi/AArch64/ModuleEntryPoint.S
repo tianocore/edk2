@@ -20,11 +20,9 @@ ASM_FUNC(_ModuleEntryPoint)
 0:mov   x28, x0             // preserve DTB pointer
   mov   x27, x1             // preserve base of image pointer
 
-#if (FixedPcdGet32 (PcdVFPEnabled))
   // Enable Floating Point. This needs to be done before entering C code, which
   // may use FP/SIMD registers.
   bl    ArmEnableVFP
-#endif
 
   bl    ASM_PFX(DiscoverDramFromDt)
 
