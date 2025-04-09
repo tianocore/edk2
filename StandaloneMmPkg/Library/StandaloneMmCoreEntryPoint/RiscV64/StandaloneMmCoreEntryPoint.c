@@ -26,6 +26,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseRiscVSbiLib.h>
 #include <Library/DxeRiscvMpxy.h>
 
+extern EFI_MM_SYSTEM_TABLE  gMmCoreMmst;
+
 /** RPMI Messages Types */
 enum rpmi_message_type {
   /* Normal request backed with ack */
@@ -275,7 +277,8 @@ VOID
 DelegatedEventLoop (
   IN UINTN                              CpuId,
   IN UINTN                              ChannelId,
-  IN RPMI_SMM_MSG_CMPL_CMD              *CompletionMessage
+  IN RPMI_SMM_MSG_CMPL_CMD              *CompletionMessage,
+  IN EDKII_PI_MM_CPU_DRIVER_ENTRYPOINT  CpuDriverEntryPoint
   )
 {
   EFI_STATUS              Status;
@@ -288,7 +291,7 @@ DelegatedEventLoop (
       DEBUG ((DEBUG_ERROR, "Req Fwd Command Failed"));
     }
 
-    // Add Handling of the incoming service request
+    Status                            = CpuDriverEntryPoint (0, CpuId, 0);
     CompletionMessage->mm_resp.Status = EFI_ERROR (Status) ? RPMI_ERR_FAILED : RPMI_SUCCESS;
 
     Status = SendMMComplete (ChannelId, CompletionMessage);
@@ -311,16 +314,20 @@ CModuleEntryPoint (
   IN VOID    *PayloadInfoAddress
   )
 {
-  EFI_RISCV_SMM_PAYLOAD_INFO  *BootInfo;
-  VOID                        *HobStart;
-  EFI_STATUS                  Status;
-  RPMI_SMM_MSG_CMPL_CMD       *CompletionMessage;
+  EFI_RISCV_SMM_PAYLOAD_INFO          *BootInfo;
+  VOID                                *HobStart;
+  EFI_STATUS                          Status;
+  RPMI_SMM_MSG_CMPL_CMD               *CompletionMessage;
+  EDKII_PI_MM_CPU_DRIVER_ENTRYPOINT   CpuDriverEntryPoint;
+  EDKII_PI_MM_CPU_DRIVER_EP_PROTOCOL  *PiMmCpuDriverEpProtocol;
 
   BootInfo = GetAndPrintBootinformation (PayloadInfoAddress);
   if (BootInfo == NULL) {
     DEBUG ((DEBUG_ERROR, "CModuleEntryPoint: Invalid boot info\n"));
-    return;
+    goto Finish;
   }
+
+  CpuDriverEntryPoint = NULL;
 
   //
   // Create Hoblist based upon boot information passed by privileged software
@@ -332,6 +339,28 @@ CModuleEntryPoint (
   //
   ProcessModuleEntryPointList (HobStart);
 
+  //
+  // Find out cpu driver entry point used in DelegatedEventLoop
+  // to handle MMI request.
+  //
+  Status = gMmCoreMmst.MmLocateProtocol (
+                         &gEdkiiPiMmCpuDriverEpProtocolGuid,
+                         NULL,
+                         (VOID **)&PiMmCpuDriverEpProtocol
+                         );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Could not locate CPU MM handler: Runtime MM service will fail %p\n"
+      ));
+    // If we can not locate driver, we should still resume other flow.
+    goto Finish;
+  }
+
+  CpuDriverEntryPoint = PiMmCpuDriverEpProtocol->PiMmCpuDriverEntryPoint;
+
+  DEBUG ((DEBUG_INFO, "Shared Cpu Driver EP %p\n", CpuDriverEntryPoint));
+
   CompletionMessage = AllocateZeroPool (sizeof (RPMI_SMM_MSG_CMPL_CMD));
   ASSERT (CompletionMessage != NULL);
 
@@ -342,6 +371,7 @@ CModuleEntryPoint (
     CompletionMessage->mm_resp.Status = RPMI_SUCCESS;
   }
 
-  DelegatedEventLoop ((UINTN)CpuId, BootInfo->MpxyChannelId, CompletionMessage);
+Finish:
+  DelegatedEventLoop ((UINTN)CpuId, BootInfo->MpxyChannelId, CompletionMessage, PiMmCpuDriverEpProtocol->PiMmCpuDriverEntryPoint);
   ASSERT (FALSE);
 }
