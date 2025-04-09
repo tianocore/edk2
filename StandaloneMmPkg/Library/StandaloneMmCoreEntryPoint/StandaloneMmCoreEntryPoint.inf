@@ -42,3 +42,6 @@
 [Guids]
   gMpInformationHobGuid
   gEfiMmPeiMmramMemoryReserveGuid
+
+[Protocols.RISCV64]
+  gEdkiiPiMmCpuDriverEpProtocolGuid
