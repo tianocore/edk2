@@ -23,6 +23,12 @@
 #include <Library/SecureBootVariableLib.h>
 #include <Library/PlatformPKProtectionLib.h>
 
+//
+// While EFI_SIGNATURE_LIST on it's own (when set to 0) is a valid signature list
+// it doesn't mean a lot without content.
+//
+#define MINIMUM_VALID_DBX_SIZE  (sizeof(EFI_SIGNATURE_LIST) + sizeof(EFI_SIGNATURE_DATA) - 1)
+
 // This time can be used when deleting variables, as it should be greater than any variable time.
 EFI_TIME  mMaxTimestamp = {
   0xFFFF,     // Year
@@ -816,12 +822,24 @@ SetSecureBootVariablesToDefault (
   // dbx is a good place to start.
   Data     = (UINT8 *)SecureBootPayload->DbxPtr;
   DataSize = SecureBootPayload->DbxSize;
-  Status   = EnrollFromInput (
+  if (DataSize > MINIMUM_VALID_DBX_SIZE) {
+    //
+    // Ensure that that the DataSize meets a minimum allowed size before being set.
+    //
+    DEBUG ((DEBUG_INFO, "%a - Setting Dbx\n", __func__));
+    Status = EnrollFromInput (
                EFI_IMAGE_SECURITY_DATABASE1,
                &gEfiImageSecurityDatabaseGuid,
                DataSize,
                Data
                );
+  } else {
+    //
+    // The DBX is allowed to be empty by default
+    //
+    DEBUG ((DEBUG_INFO, "%a - Skipping Dbx - DataSize(%u)\n", __func__, DataSize));
+    Status = EFI_SUCCESS;
+  }
 
   // If that went well, try the db (make sure to pick the right one!).
   if (!EFI_ERROR (Status)) {
