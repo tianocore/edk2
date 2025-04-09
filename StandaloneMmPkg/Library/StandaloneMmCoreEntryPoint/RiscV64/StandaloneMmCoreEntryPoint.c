@@ -8,8 +8,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <PiMm.h>
 
-#include <StandaloneMmCpu.h>
+#include <Protocol/PiMmCpuDriverEp.h>
 #include <StandaloneMmCoreEntryPoint.h>
+
+extern EFI_MM_SYSTEM_TABLE  gMmCoreMmst;
 
 /**
   Retrieve and print boot information provided by privileged firmware.
@@ -69,7 +71,6 @@ GetAndPrintBootinformation (
 
   @param  [in]  CpuId             The Id assigned to this running CPU
   @param  [in]  PayloadInfoAddress   The address of boot info
-
 **/
 VOID
 EFIAPI
@@ -78,13 +79,20 @@ CModuleEntryPoint (
   IN VOID    *PayloadInfoAddress
   )
 {
-  EFI_RISCV_SMM_PAYLOAD_INFO  *BootInfo;
-  VOID                        *HobStart;
+  EFI_RISCV_SMM_PAYLOAD_INFO          *BootInfo;
+  VOID                                *HobStart;
+  EFI_STATUS                          Status;
+  RPMI_SMM_MSG_CMPL_CMD               *CompletionMessage;
+  EDKII_PI_MM_CPU_DRIVER_ENTRYPOINT   CpuDriverEntryPoint;
+  EDKII_PI_MM_CPU_DRIVER_EP_PROTOCOL  *PiMmCpuDriverEpProtocol;
 
   BootInfo = GetAndPrintBootinformation (PayloadInfoAddress);
   if (BootInfo == NULL) {
+    DEBUG ((DEBUG_ERROR, "CModuleEntryPoint: Invalid boot info\n"));
     return;
   }
+
+  CpuDriverEntryPoint = NULL;
 
   //
   // Create Hoblist based upon boot information passed by privileged software
@@ -95,6 +103,28 @@ CModuleEntryPoint (
   // Call the MM Core entry point
   //
   ProcessModuleEntryPointList (HobStart);
+
+  //
+  // Find out cpu driver entry point used in DelegatedEventLoop
+  // to handle MMI request.
+  //
+  Status = gMmCoreMmst.MmLocateProtocol (
+                         &gEdkiiPiMmCpuDriverEpProtocolGuid,
+                         NULL,
+                         (VOID **)&PiMmCpuDriverEpProtocol
+                         );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Could not locate CPU MM handler: Runtime MM service will fail %p\n"
+      ));
+    // If we can not locate driver, we should still resume other flow.
+    return;
+  }
+
+  CpuDriverEntryPoint = PiMmCpuDriverEpProtocol->PiMmCpuDriverEntryPoint;
+
+  DEBUG ((DEBUG_INFO, "Shared Cpu Driver EP %p\n", CpuDriverEntryPoint));
 
   ASSERT (0);
 }
