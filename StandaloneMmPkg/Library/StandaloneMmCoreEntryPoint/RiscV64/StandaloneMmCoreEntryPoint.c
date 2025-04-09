@@ -86,5 +86,15 @@ CModuleEntryPoint (
     return;
   }
 
+  //
+  // Create Hoblist based upon boot information passed by privileged software
+  //
+  HobStart = CreateHobListFromBootInfo (PayloadBootInfo);
+
+  //
+  // Call the MM Core entry point
+  //
+  ProcessModuleEntryPointList (HobStart);
+
   ASSERT (0);
 }
