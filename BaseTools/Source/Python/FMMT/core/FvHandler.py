@@ -248,8 +248,8 @@ class FvHandler:
             elif len(CompressedData) > len(TargetTree.Data.OriData):
                 New_Pad_Size = GetPadSize(len(CompressedData), SECTION_COMMON_ALIGNMENT)
                 self.Remain_New_Free_Space = len(CompressedData) + New_Pad_Size - len(TargetTree.Data.OriData) - len(TargetTree.Data.PadData)
-                self.ModifyTest(TargetTree, self.Remain_New_Free_Space)
                 self.Status = True
+                self.ModifyTest(TargetTree, self.Remain_New_Free_Space)
 
     def ModifyTest(self, ParTree, Needed_Space: int) -> None:
         # If have needed space, will find if there have free space in parent tree, meanwhile update the node data.
