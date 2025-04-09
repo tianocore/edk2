@@ -2014,8 +2014,8 @@ FindTopMenu (
 /**
   Record the highlight menu and top of screen menu info.
 
-  @param  Highlight               The menu opton which is highlight.
-  @param  TopOfScreen             The menu opton which is at the top of the form.
+  @param  Highlight               The menu option which is highlight.
+  @param  TopOfScreen             The menu option which is at the top of the form.
   @param  SkipValue               The skip line info for the top of screen menu.
 
 **/
@@ -2095,9 +2095,9 @@ UpdateHighlightMenuInfo (
 }
 
 /**
-  Update attribut for this menu.
+  Update attribute for this menu.
 
-  @param  MenuOption               The menu opton which this attribut used to.
+  @param  MenuOption               The menu option which this attribute used to.
   @param  Highlight                Whether this menu will be highlight.
 
 **/
@@ -2130,7 +2130,7 @@ SetDisplayAttribute (
 /**
   Print string for this menu option.
 
-  @param  MenuOption               The menu opton which this attribut used to.
+  @param  MenuOption               The menu option which this attribute used to.
   @param  Col                      The column that this string will be print at.
   @param  Row                      The row that this string will be print at.
   @param  String                   The string which need to print.
@@ -2176,7 +2176,7 @@ DisplayMenuString (
 /**
   Check whether this menu can has option string.
 
-  @param  MenuOption               The menu opton which this attribut used to.
+  @param  MenuOption               The menu option which this attribute used to.
 
   @retval TRUE                     This menu option can have option string.
   @retval FALSE                    This menu option can't have option string.
@@ -2371,7 +2371,7 @@ FxConfirmPopup (
 /**
   Print string for this menu option.
 
-  @param  MenuOption               The menu opton which this attribut used to.
+  @param  MenuOption               The menu option which this attribute used to.
   @param  SkipWidth                The skip width between the left to the start of the prompt.
   @param  BeginCol                 The begin column for one menu.
   @param  SkipLine                 The skip line for this menu.
@@ -2904,9 +2904,9 @@ UiDisplayMenu (
       case CfRefreshHighLight:
 
         //
-        // MenuOption: Last menu option that need to remove hilight
+        // MenuOption: Last menu option that need to remove highlight
         //             MenuOption is set to NULL in Repaint
-        // NewPos:     Current menu option that need to hilight
+        // NewPos:     Current menu option that need to highlight
         //
         ControlFlag = CfUpdateHelpString;
 
@@ -2986,13 +2986,13 @@ UiDisplayMenu (
         }
 
         //
-        // NewLine means only update highlight menu (remove old highlight and highlith
-        // the new one), not need to full repain the form.
+        // NewLine means only update highlight menu (remove old highlight and highlight
+        // the new one), not need to full repaint the form.
         //
         if (Repaint || NewLine) {
           if (IsListEmpty (&gMenuOption)) {
             //
-            // Don't print anything if no mwnu option.
+            // Don't print anything if no menu option.
             //
             StringPtr = GetToken (STRING_TOKEN (EMPTY_STRING), gHiiHandle);
           } else {
