@@ -1158,10 +1158,7 @@
   OvmfPkg/VirtioFsDxe/VirtioFsDxe.inf
 
   # SMBIOS Support
-  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf {
-    <LibraryClasses>
-      NULL|OvmfPkg/Library/SmbiosVersionLib/DetectSmbiosVersionLib.inf
-  }
+  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
 
   # PCI support
   UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf {
