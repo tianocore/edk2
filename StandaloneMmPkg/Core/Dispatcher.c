@@ -49,6 +49,33 @@ typedef struct {
   EFI_FIRMWARE_VOLUME_HEADER    *FwVolHeader;
 } KNOWN_FWVOL;
 
+typedef struct {
+  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH    VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL             End;
+} FV_FILEPATH_DEVICE_PATH;
+
+FV_FILEPATH_DEVICE_PATH  gMmDriverFilePathTemplate = {
+  {
+    {
+      MEDIA_DEVICE_PATH,
+      MEDIA_PIWG_FW_FILE_DP,
+      {
+        (UINT8)(sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH)),
+        (UINT8)(sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH) >> 8)
+      }
+    },
+    { 0 }
+  },
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    {
+      sizeof (EFI_DEVICE_PATH_PROTOCOL),
+      0
+    }
+  }
+};
+
 //
 // Function Prototypes
 //
@@ -201,7 +228,13 @@ MmLoadImage (
   DriverEntry->LoadedImage.ParentHandle = NULL;
   DriverEntry->LoadedImage.SystemTable  = NULL;
   DriverEntry->LoadedImage.DeviceHandle = NULL;
-  DriverEntry->LoadedImage.FilePath     = NULL;
+  DriverEntry->LoadedImage.FilePath     = AllocateCopyPool (sizeof (FV_FILEPATH_DEVICE_PATH), &gMmDriverFilePathTemplate);
+  if (DriverEntry->LoadedImage.FilePath != NULL) {
+    CopyGuid (
+      &((MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)DriverEntry->LoadedImage.FilePath)->FvFileName,
+      &DriverEntry->FileName
+      );
+  }
 
   DriverEntry->LoadedImage.ImageBase     = (VOID *)(UINTN)DriverEntry->ImageBuffer;
   DriverEntry->LoadedImage.ImageSize     = ImageContext->ImageSize;
@@ -432,7 +465,9 @@ MmDispatcher (
       // skip the LoadImage
       //
       if (DriverEntry->ImageHandle == NULL) {
+        PERF_LOAD_IMAGE_BEGIN (NULL);
         Status = MmLoadImage (DriverEntry, &ImageContext);
+        PERF_LOAD_IMAGE_END (DriverEntry->ImageHandle);
 
         //
         // Update the driver state to reflect that it's been loaded
@@ -466,7 +501,9 @@ MmDispatcher (
       // For each MM driver, pass NULL as ImageHandle
       //
       DEBUG ((DEBUG_INFO, "StartImage - 0x%x (Standalone Mode)\n", DriverEntry->ImageEntryPoint));
+      PERF_START_IMAGE_BEGIN (DriverEntry->ImageHandle);
       Status = ((MM_IMAGE_ENTRY_POINT)(UINTN)DriverEntry->ImageEntryPoint)(DriverEntry->ImageHandle, &gMmCoreMmst);
+      PERF_START_IMAGE_END (DriverEntry->ImageHandle);
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_INFO, "StartImage Status - %r\n", Status));
 

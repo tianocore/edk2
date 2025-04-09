@@ -55,6 +55,7 @@
   StandaloneMmCoreEntryPoint
   HobPrintLib
   ImagePropertiesRecordLib
+  PerformanceLib
 
 [Protocols]
   gEfiDxeMmReadyToLockProtocolGuid             ## UNDEFINED # SmiHandlerRegister
