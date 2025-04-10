@@ -85,7 +85,7 @@
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
   ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
   ArmTransferListLib|ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
-  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
+  ArmFfaLib|MdeModulePkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
 
   ArmMtlLib|ArmPkg/Library/ArmMtlNullLib/ArmMtlNullLib.inf
 
@@ -97,7 +97,7 @@
   MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
-  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
+  ArmFfaLib|MdeModulePkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
 
 [LibraryClasses.common.MM_CORE_STANDALONE]
   StandaloneMmCoreEntryPoint|ArmPkg/Library/ArmStandaloneMmCoreEntryPoint/ArmStandaloneMmCoreEntryPoint.inf
@@ -136,10 +136,6 @@
   ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
   ArmPkg/Library/OpteeLib/OpteeLib.inf
   ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
-  ArmPkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
-  ArmPkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
-  ArmPkg/Library/ArmFfaLib/ArmFfaStandaloneMmCoreLib.inf
-  ArmPkg/Library/ArmFfaLib/ArmFfaStandaloneMmLib.inf
 
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 
