@@ -8,6 +8,19 @@
 #include <AsmMacroLib.h>
 
 ASM_FUNC(_ModuleEntryPoint)
+  // Check if register x1 matches the firmware handoff spec
+  MOV64 (x4, 0x14a0fb10b)
+  cmp   x1, x4
+  b.ne  _SetSVCMode          // Branch if x1 is not equal to 0x14a0fb10b (TL signature)
+
+  // Branch if x2 is not equal to 0
+  cbnz  x2, _SetSVCMode
+
+  // Set the TransferList Base Address from register x3
+  adr   x4, PcdGet64(PcdTransferListBaseAddress)
+  str   x3, [x4]
+
+_SetSVCMode:
   // Do early platform specific actions
   bl    ASM_PFX(ArmPlatformPeiBootAction)
 
