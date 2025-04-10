@@ -426,6 +426,7 @@
   SecurityPkg/Tcg/Tcg2StandaloneMmArm/Tcg2StandaloneMmArm.inf
   SecurityPkg/Tcg/Tcg2AcpiFfa/Tcg2AcpiFfa.inf
   SecurityPkg/Library/Tpm2DeviceLibFfa/Tpm2DeviceLibFfa.inf
+  SecurityPkg/Library/Tpm2DeviceLibFfa/Tpm2InstanceLibFfa.inf
 
 [BuildOptions]
    MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:256
