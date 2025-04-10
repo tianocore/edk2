@@ -24,7 +24,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   ArmSmcLib
@@ -35,11 +35,11 @@
   HobLib
 
 [Pcd]
-  gArmTokenSpaceGuid.PcdFfaLibConduitSmc
-  gArmTokenSpaceGuid.PcdFfaTxBuffer
-  gArmTokenSpaceGuid.PcdFfaRxBuffer
-  gArmTokenSpaceGuid.PcdFfaTxRxPageCount
-  gArmTokenSpaceGuid.PcdFfaExitBootEventRegistered
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaTxBuffer
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaRxBuffer
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaTxRxPageCount
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaExitBootEventRegistered
 
 [Guids]
   gArmFfaRxTxBufferInfoGuid

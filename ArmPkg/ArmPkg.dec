@@ -93,8 +93,6 @@
 
   gArmMmuReplaceLiveTranslationEntryFuncGuid = { 0xa8b50ff3, 0x08ec, 0x4dd3, {0xbf, 0x04, 0x28, 0xbf, 0x71, 0x75, 0xc7, 0x4a} }
 
-  gArmFfaRxTxBufferInfoGuid = { 0x96fd3d26, 0x6fb1, 0x11ef, { 0x8c, 0x11, 0xf3, 0xc9, 0xc5, 0x02, 0x31, 0xab } }
-
 [Protocols.common]
   ## Arm System Control and Management Interface(SCMI) Base protocol
   ## ArmPkg/Include/Protocol/ArmScmiBaseProtocol.h
@@ -293,12 +291,6 @@
   gArmTokenSpaceGuid.PcdSystemBiosRelease|0xFFFF|UINT16|0x30000058
   gArmTokenSpaceGuid.PcdEmbeddedControllerFirmwareRelease|0xFFFF|UINT16|0x30000059
 
-  #
-  # Define the conduit to use ArmFfalib.
-  # Default PcdFfaLibConduitSmc == TRUE, conduit = SMC
-  # If PcdFfaLibConduitSvc == FALSE, conduit = SVC
-  gArmTokenSpaceGuid.PcdFfaLibConduitSmc|TRUE|BOOLEAN|0x00000063
-
 [PcdsFixedAtBuild.common, PcdsDynamic.common]
   # ARM Architectural Timer Interrupt(GIC PPI) numbers
   gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29|UINT32|0x00000035
@@ -389,7 +381,3 @@
   # the LinuxBoot payload.
   #
   gArmTokenSpaceGuid.PcdLinuxBootFileGuid|{0x0}|VOID*|0x0000005C
-  gArmTokenSpaceGuid.PcdFfaTxBuffer|0x00|UINT64|0x0000005F
-  gArmTokenSpaceGuid.PcdFfaRxBuffer|0x00|UINT64|0x00000060
-  gArmTokenSpaceGuid.PcdFfaTxRxPageCount|1|UINT64|0x00000061
-  gArmTokenSpaceGuid.PcdFfaExitBootEventRegistered|FALSE|BOOLEAN|0x00000062
