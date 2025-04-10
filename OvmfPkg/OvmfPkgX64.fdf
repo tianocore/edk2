@@ -414,6 +414,13 @@ INF OvmfPkg/Tcg/TdTcg2Dxe/TdTcg2Dxe.inf
 !include OvmfPkg/Include/Fdf/MorLock.fdf.inc
 !include OvmfPkg/Include/Fdf/OvmfRngDxe.fdf.inc
 
+  #
+  # Smbios Measurement support
+  #
+!if $(TPM2_ENABLE) == TRUE || $(CC_MEASUREMENT_ENABLE) == TRUE
+INF MdeModulePkg/Universal/SmbiosMeasurementDxe/SmbiosMeasurementDxe.inf
+!endif
+
 ################################################################################
 
 [FV.FVMAIN_COMPACT]
