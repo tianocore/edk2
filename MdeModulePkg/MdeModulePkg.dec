@@ -494,6 +494,8 @@
   ## Include/Guid/DelayedDispatch.h
   gEfiDelayedDispatchTableGuid = { 0x4b733449, 0x8eff, 0x488c, { 0x92, 0x1a, 0x15, 0x4a, 0xda, 0x25, 0x18, 0x07 }}
 
+  gArmFfaRxTxBufferInfoGuid = { 0x96fd3d26, 0x6fb1, 0x11ef, { 0x8c, 0x11, 0xf3, 0xc9, 0xc5, 0x02, 0x31, 0xab } }
+
 [Ppis]
   ## Include/Ppi/FirmwareVolumeShadowPpi.h
   gEdkiiPeiFirmwareVolumeShadowPpiGuid = { 0x7dfe756c, 0xed8d, 0x4d77, {0x9e, 0xc4, 0x39, 0x9a, 0x8a, 0x81, 0x51, 0x16 } }
@@ -2281,6 +2283,12 @@
   # @Prompt The value is use for Usb Network rate limiting supported.
   gEfiMdeModulePkgTokenSpaceGuid.PcdUsbNetworkRateLimitingFactor|100|UINT32|0x10000028
 
+  ## Define the conduit to use in ArmFfalib.
+  #  Default PcdFfaLibConduitSmc == TRUE, conduit = SMC
+  #  If PcdFfaLibConduitSvc == FALSE, conduit = SVC
+  # @Prompt Conduit to use in ArmFfaLib.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc|TRUE|BOOLEAN|0x10000029
+
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
   #  Loading Module at Fixed Address feature is enabled.
@@ -2358,6 +2366,22 @@
   #  It can't depend on EFI variable service, and can't be DynamicExHii PCD.
   # @Prompt 64bit VPD base address.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress64|0x0|UINT64|0x00030006
+
+  ## This dynamic PCD holds the address of the FFA TX buffer.
+  # @Prompt FFA TX Buffer Address
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaTxBuffer|0x00|UINT64|0x00030009
+
+  ## This dynamic PCD holds the address of the FFA RX buffer.
+  # @Prompt FFA RX Buffer Address
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaRxBuffer|0x00|UINT64|0x0003000A
+
+  ## This dynamic PCD holds the number of pages for the FFA TX/RX buffer.
+  # @Prompt FFA TX/RX Buffer Page Count
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaTxRxPageCount|1|UINT64|0x0003000B
+
+  ## This dynamic PCD holds the information if the FFA exit boot event is registered.
+  # @Prompt FFA Exit Boot Event Registered
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaExitBootEventRegistered|FALSE|BOOLEAN|0x0003000C
 
 [UserExtensions.TianoCore."ExtraFiles"]
   MdeModulePkgExtra.uni

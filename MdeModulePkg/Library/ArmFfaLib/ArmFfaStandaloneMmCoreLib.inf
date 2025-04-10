@@ -23,7 +23,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
-  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   ArmSmcLib
@@ -33,4 +33,4 @@
   DebugLib
 
 [Pcd]
-  gArmTokenSpaceGuid.PcdFfaLibConduitSmc
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc
