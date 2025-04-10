@@ -245,6 +245,10 @@
   ## Include/Guid/Tcg2AcpiCommunicateBuffer.h
   gEdkiiTcg2AcpiCommunicateBufferHobGuid = { 0xcefea14f, 0x9f1a, 0x4774, { 0x8d, 0x18, 0x79, 0x93, 0x8d, 0x48, 0xfe, 0x7d } }
 
+  ## TPM Service over FF-A
+  #  Include/Guid/Tpm2ServiceFfa.h
+  gTpm2ServiceFfaGuid = { 0x17b862a4, 0x1806, 0x4faf, { 0x86, 0xb3, 0x08, 0x9a, 0x58, 0x35, 0x38, 0x61 } }
+
 [Ppis]
   ## The PPI GUID for that TPM physical presence should be locked.
   # Include/Ppi/LockPhysicalPresence.h
