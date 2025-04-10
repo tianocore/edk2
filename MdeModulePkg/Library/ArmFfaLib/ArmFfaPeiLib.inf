@@ -1,7 +1,7 @@
 ## @file
 #  Provides FF-A ABI Library used in PEI Driver.
 #
-#  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2024-2025, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -43,3 +43,6 @@
 
 [Guids]
   gArmFfaRxTxBufferInfoGuid
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid
