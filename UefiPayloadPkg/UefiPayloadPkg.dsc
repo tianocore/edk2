@@ -126,6 +126,7 @@
   #
   # EMU:      UEFI payload with EMU variable
   # SPI:      UEFI payload with SPI NV variable support
+  # SMMSTORE: UEFI payload with coreboot SMM NV variable support
   # NONE:     UEFI payload with no variable modules
   #
   DEFINE VARIABLE_SUPPORT      = EMU
@@ -343,6 +344,9 @@
 
 !if $(VARIABLE_SUPPORT) == "EMU"
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+!elseif $(VARIABLE_SUPPORT) == "SMMSTORE"
+  SmmStoreLib|UefiPayloadPkg/Library/SmmStoreLib/SmmStoreLib.inf
+  TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
 !elseif $(VARIABLE_SUPPORT) == "SPI"
   PlatformSecureLib|SecurityPkg/Library/PlatformSecureLibNull/PlatformSecureLibNull.inf
   TpmMeasurementLib|SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
@@ -559,7 +563,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x10000
 !if $(VARIABLE_SUPPORT) == "EMU"
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable        |TRUE
-!else
+!elseif $(VARIABLE_SUPPORT) == "SPI" || $(VARIABLE_SUPPORT) == "SMMSTORE"
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable        |FALSE
 !endif
 
@@ -758,14 +762,18 @@
 !endif
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0
-!if $(VARIABLE_SUPPORT) == "SPI"
+!if $(VARIABLE_SUPPORT) == "SPI" || $(VARIABLE_SUPPORT) == "SMMSTORE"
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize  |0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize  |0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase  |0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0
 !endif
   # Disable SMM S3 script
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable|FALSE
@@ -1086,6 +1094,14 @@
 
 !if $(VARIABLE_SUPPORT) == "EMU"
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+!elseif $(VARIABLE_SUPPORT) == "SMMSTORE"
+  UefiPayloadPkg/SmmStoreFvb/SmmStoreFvbRuntimeDxe.inf
+  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
+      NULL|EmbeddedPkg/Library/NvVarStoreFormattedLib/NvVarStoreFormattedLib.inf
+  }
 !elseif $(VARIABLE_SUPPORT) == "SPI"
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf {
     <LibraryClasses>
