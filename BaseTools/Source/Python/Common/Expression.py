@@ -1027,6 +1027,8 @@ class ValueExpressionEx(ValueExpression):
 
                             if Size > 0:
                                 PcdValue = '{' + ', '.join(AllPcdValueList) + '}'
+                            else:
+                                raise BadExpression("PCD with value '%s' cannot be used. Please provide a valid value of at least one byte." % (self.PcdValue))
                         else:
                             raise  BadExpression("Type: %s, Value: %s, %s"%(self.PcdType, PcdValue, Value))
 
