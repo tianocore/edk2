@@ -3,7 +3,7 @@
 #
 # Platform: EmulatorPkg
 # OS: Ubuntu
-# Toolchain: GCC5
+# Toolchain: GCC
 #
 # Copyright (c) Microsoft Corporation.
 # Copyright (c) 2020, Intel Corporation. All rights reserved.
