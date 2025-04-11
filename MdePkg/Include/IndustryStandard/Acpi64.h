@@ -2205,6 +2205,10 @@ typedef struct {
   UINT32                                                                          NumberOfTargetProximityDomains;
   UINT8                                                                           Reserved2[4];
   UINT64                                                                          EntryBaseUnit;
+  // UINT32 InitiatorProximityDomainList[];
+  // UINT32 TargetProximityDomainList[];
+  // UINT16 LatencyEntry[][];
+  UINT8                                                                           LatBwInfo[];
 } EFI_ACPI_6_4_HMAT_STRUCTURE_SYSTEM_LOCALITY_LATENCY_AND_BANDWIDTH_INFO;
 
 ///
@@ -2231,6 +2235,7 @@ typedef struct {
   EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO_CACHE_ATTRIBUTES    CacheAttributes;
   UINT8                                                                  Reserved2[2];
   UINT16                                                                 NumberOfSmbiosHandles;
+  UINT16                                                                 SmbiosHandles[];
 } EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO;
 
 ///

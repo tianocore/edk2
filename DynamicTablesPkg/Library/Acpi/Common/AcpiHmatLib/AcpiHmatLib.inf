@@ -1,0 +1,25 @@
+## @file
+#  HMAT Table Generator
+#
+#  Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010019
+  BASE_NAME      = AcpiHmatLib
+  FILE_GUID      = 1724d37a-fb05-4fe6-bb13-c04a46efe0ac
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiHmatLibConstructor
+  DESTRUCTOR     = AcpiHmatLibDestructor
+
+[Sources]
+  HmatGenerator.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
