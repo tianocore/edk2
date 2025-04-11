@@ -20,6 +20,7 @@
 
 Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.
+(c) Copyright 2025 HP Development Company, L.P.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -587,15 +588,10 @@ CheckSignatureListFormat (
       // Try to retrieve the RSA public key from the X.509 certificate.
       // If this operation fails, it's not a valid certificate.
       //
-      RsaContext = RsaNew ();
-      if (RsaContext == NULL) {
-        return EFI_INVALID_PARAMETER;
-      }
-
-      CertData = (EFI_SIGNATURE_DATA *)((UINT8 *)SigList + sizeof (EFI_SIGNATURE_LIST) + SigList->SignatureHeaderSize);
-      CertLen  = SigList->SignatureSize - sizeof (EFI_GUID);
+      CertData   = (EFI_SIGNATURE_DATA *)((UINT8 *)SigList + sizeof (EFI_SIGNATURE_LIST) + SigList->SignatureHeaderSize);
+      CertLen    = SigList->SignatureSize - sizeof (EFI_GUID);
+      RsaContext = NULL;
       if (!RsaGetPublicKeyFromX509 (CertData->SignatureData, CertLen, &RsaContext)) {
-        RsaFree (RsaContext);
         return EFI_INVALID_PARAMETER;
       }
 
