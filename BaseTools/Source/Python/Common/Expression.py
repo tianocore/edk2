@@ -969,8 +969,8 @@ class ValueExpressionEx(ValueExpression):
                                 NewPcdValueList.append(Item)
 
                             AllPcdValueList = []
+                            Size = 0
                             for Item in NewPcdValueList:
-                                Size = 0
                                 ValueStr = ''
                                 TokenSpaceGuidName = ''
                                 if Item.startswith(TAB_GUID) and Item.endswith(')'):
@@ -1027,6 +1027,8 @@ class ValueExpressionEx(ValueExpression):
 
                             if Size > 0:
                                 PcdValue = '{' + ', '.join(AllPcdValueList) + '}'
+                            else:
+                                raise BadExpression("PCD with value '%s' cannot be used. Please provide a valid value of at least one byte." % (self.PcdValue))
                         else:
                             raise  BadExpression("Type: %s, Value: %s, %s"%(self.PcdType, PcdValue, Value))
 
