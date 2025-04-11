@@ -866,3 +866,56 @@ BuildMemoryTypeInformationHob (
 
   BuildGuidDataHob (&gEfiMemoryTypeInformationGuid, &Info, sizeof (Info));
 }
+
+/**
+  Returns the next instance of the memory allocation HOB with the matched GUID from
+  the starting HOB.
+
+  This function searches the first instance of a HOB from the starting HOB pointer.
+  Such HOB should satisfy two conditions:
+  Its HOB type is EFI_HOB_TYPE_MEMORY_ALLOCATION and its GUID Name equals to input Guid.
+  If there does not exist such HOB from the starting HOB pointer, it will return NULL.
+
+  If Guid is NULL, then ASSERT().
+  If HobStart is NULL, then ASSERT().
+
+  @param  Guid          The GUID to match with in the HOB list.
+  @param  HobStart      A pointer to a Guid.
+
+  @return The next instance of the memory allocation HOB with matched GUID from the starting HOB.
+
+**/
+VOID *
+EFIAPI
+GetNextMemoryAllocationGuidHob (
+  IN CONST EFI_GUID  *Guid,
+  IN CONST VOID      *HobStart
+  )
+{
+  ASSERT (FALSE);
+  return NULL;
+}
+
+/**
+  Search the HOB list for the Memory Allocation HOB with a matching base address
+  and set the Name GUID. If there does not exist such Memory Allocation HOB in the
+  HOB list, it will return NULL.
+
+  If Guid is NULL, then ASSERT().
+
+  @param BaseAddress  BaseAddress of Memory Allocation HOB to set Name to Guid.
+  @param Guid         Pointer to the GUID to set in the matching Memory Allocation GUID.
+
+  @return The instance of the tagged Memory Allocation HOB with matched base address.
+
+**/
+VOID *
+EFIAPI
+TagMemoryAllocationHobWithGuid (
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN EFI_GUID              *Guid
+  )
+{
+  ASSERT (FALSE);
+  return NULL;
+}

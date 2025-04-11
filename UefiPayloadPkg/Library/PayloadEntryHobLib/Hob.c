@@ -721,3 +721,101 @@ BuildMemoryAllocationHob (
   //
   ZeroMem (Hob->AllocDescriptor.Reserved, sizeof (Hob->AllocDescriptor.Reserved));
 }
+
+/**
+  Returns the next instance of the memory allocation HOB with the matched GUID from
+  the starting HOB.
+
+  This function searches the first instance of a HOB from the starting HOB pointer.
+  Such HOB should satisfy two conditions:
+  Its HOB type is EFI_HOB_TYPE_MEMORY_ALLOCATION and its GUID Name equals to input Guid.
+  If there does not exist such HOB from the starting HOB pointer, it will return NULL.
+
+  If Guid is NULL, then ASSERT().
+  If HobStart is NULL, then ASSERT().
+
+  @param  Guid          The GUID to match with in the HOB list.
+  @param  HobStart      A pointer to a Guid.
+
+  @return The next instance of the memory allocation HOB with matched GUID from the starting HOB.
+
+**/
+VOID *
+EFIAPI
+GetNextMemoryAllocationGuidHob (
+  IN CONST EFI_GUID  *Guid,
+  IN CONST VOID      *HobStart
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+
+  ASSERT (Guid != NULL);
+  ASSERT (HobStart != NULL);
+
+  Hob.Raw = (UINT8 *)HobStart;
+  while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL) {
+    if (CompareGuid (&Hob.MemoryAllocation->AllocDescriptor.Name, Guid)) {
+      break;
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+
+  return Hob.Raw;
+}
+
+/**
+  Search the HOB list for the Memory Allocation HOB with a matching base address
+  and set the Name GUID. If there does not exist such Memory Allocation HOB in the
+  HOB list, it will return NULL.
+
+  If Guid is NULL, then ASSERT().
+
+  @param BaseAddress  BaseAddress of Memory Allocation HOB to set Name to Guid.
+  @param Guid         Pointer to the GUID to set in the matching Memory Allocation GUID.
+
+  @return The instance of the tagged Memory Allocation HOB with matched base address.
+
+**/
+VOID *
+EFIAPI
+TagMemoryAllocationHobWithGuid (
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN EFI_GUID              *Guid
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+  VOID                  *HobList;
+
+  ASSERT (Guid != NULL);
+
+  HobList = GetHobList ();
+  Hob.Raw = (UINT8 *)HobList;
+  while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL) {
+    if (Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress == BaseAddress) {
+      CopyGuid (&Hob.MemoryAllocation->AllocDescriptor.Name, Guid);
+      break;
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+
+  DEBUG_CODE_BEGIN ();
+  EFI_HOB_MEMORY_ALLOCATION  *MemoryAllocation;
+
+  if (Hob.Raw != NULL) {
+    MemoryAllocation = GET_NEXT_HOB (Hob);
+
+    while ((MemoryAllocation = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, MemoryAllocation)) != NULL) {
+      //
+      // Make sure there is only one Memory Allocation HOB with the matching base address.
+      //
+      ASSERT (MemoryAllocation->AllocDescriptor.MemoryBaseAddress != BaseAddress);
+      MemoryAllocation = GET_NEXT_HOB (MemoryAllocation);
+    }
+  }
+
+  DEBUG_CODE_END ();
+
+  return Hob.Raw;
+}
