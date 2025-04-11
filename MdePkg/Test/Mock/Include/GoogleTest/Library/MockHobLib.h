@@ -145,6 +145,18 @@ struct MockHobLib {
      IN UINT64                Length,
      IN EFI_MEMORY_TYPE       MemoryType)
     );
+  MOCK_FUNCTION_DECLARATION (
+    VOID *,
+    GetNextMemoryAllocationGuidHob,
+    (IN CONST EFI_GUID  *Guid,
+     IN CONST VOID      *HobStart)
+    );
+  MOCK_FUNCTION_DECLARATION (
+    VOID *,
+    TagMemoryAllocationHobWithGuid,
+    (IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+     IN CONST EFI_GUID        *Guid)
+    );
 };
 
 #endif
