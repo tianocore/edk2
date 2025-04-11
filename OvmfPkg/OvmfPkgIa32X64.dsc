@@ -490,6 +490,9 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdRequireSelfSignedPk|TRUE
 !endif
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRequireIommu|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDeferBme|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDisableBmeOnEbs|FALSE
 
 [PcdsFixedAtBuild]
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1
