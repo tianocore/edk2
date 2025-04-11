@@ -23,6 +23,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/Decompress.h>
 #include <Protocol/BusSpecificDriverOverride.h>
 #include <Protocol/IncompatiblePciDeviceSupport.h>
+#include <Protocol/PciDoe.h>
 #include <Protocol/PciOverride.h>
 #include <Protocol/PciEnumerationComplete.h>
 #include <Protocol/IoMmu.h>
@@ -79,6 +80,7 @@ typedef enum {
 #include "PciPowerManagement.h"
 #include "PciHotPlugSupport.h"
 #include "PciLib.h"
+#include "PciDoe.h"
 
 #define VGABASE1   0x3B0
 #define VGALIMIT1  0x3BB
@@ -163,6 +165,7 @@ struct _PCI_IO_DEVICE {
   UINT32                                       Signature;
   EFI_HANDLE                                   Handle;
   EFI_PCI_IO_PROTOCOL                          PciIo;
+  EDKII_PCI_DOE_PROTOCOL                       PciDoe;
   LIST_ENTRY                                   Link;
 
   EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL    PciDriverOverride;
@@ -274,6 +277,9 @@ struct _PCI_IO_DEVICE {
   UINT32                                       SystemPageSize;
   UINT16                                       InitialVFs;
   UINT16                                       ReservedBusNum;
+
+  UINT32                                       DoeCapabilityOffset;
+
   //
   // Per PCI to PCI Bridge spec, I/O window is 4K aligned,
   // but some chipsets support non-standard I/O window alignments less than 4K.
@@ -286,6 +292,9 @@ struct _PCI_IO_DEVICE {
 
 #define PCI_IO_DEVICE_FROM_PCI_IO_THIS(a) \
   CR (a, PCI_IO_DEVICE, PciIo, PCI_IO_DEVICE_SIGNATURE)
+
+#define PCI_IO_DEVICE_FROM_PCI_DOE_THIS(a) \
+  CR (a, PCI_IO_DEVICE, PciDoe, PCI_IO_DEVICE_SIGNATURE)
 
 #define PCI_IO_DEVICE_FROM_PCI_DRIVER_OVERRIDE_THIS(a) \
   CR (a, PCI_IO_DEVICE, PciDriverOverride, PCI_IO_DEVICE_SIGNATURE)
