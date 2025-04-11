@@ -48,7 +48,11 @@ FillWriteBuffer (
   UINT32  Index;
   UINT8   SfdpAddressBytes;
 
-  SfdpAddressBytes = (UINT8)Instance->SfdpBasicFlash->AddressBytes;
+  if (Instance != NULL && Instance->SfdpBasicFlash != NULL) {
+    SfdpAddressBytes = (UINT8)Instance->SfdpBasicFlash->AddressBytes;
+  } else {
+    SfdpAddressBytes = 0;
+  }
 
   // Copy Opcode into Write Buffer
   Instance->SpiTransactionWriteBuffer[0] = Opcode;
