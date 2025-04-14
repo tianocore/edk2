@@ -56,6 +56,139 @@ InternalGetMemEncryptionAddressMask (
   return mAddressEncMask;
 }
 
+STATIC
+VOID *
+EFIAPI
+AllocatePageTableMemory (
+  IN UINTN  Pages
+  );
+
+/**
+  Set one page of page table pool memory to be read-only.
+
+  @param[in] PageTableBase    Base address of page table (CR3).
+  @param[in] Address          Start address of a page to be set as read-only.
+  @param[in] Level4Paging     Level 4 paging flag.
+
+**/
+STATIC
+VOID
+SetPageTablePoolReadOnly (
+  IN  UINTN                 PageTableBase,
+  IN  EFI_PHYSICAL_ADDRESS  Address,
+  IN  BOOLEAN               Level4Paging
+  )
+{
+  UINTN                 Index;
+  UINTN                 EntryIndex;
+  UINT64                AddressEncMask;
+  EFI_PHYSICAL_ADDRESS  PhysicalAddress;
+  UINT64                *PageTable;
+  UINT64                *NewPageTable;
+  UINT64                PageAttr;
+  UINT64                LevelSize[5];
+  UINT64                LevelMask[5];
+  UINTN                 LevelShift[5];
+  UINTN                 Level;
+  UINT64                PoolUnitSize;
+
+  ASSERT (PageTableBase != 0);
+
+  //
+  // Since the page table is always from page table pool, which is always
+  // located at the boundary of PcdPageTablePoolAlignment, we just need to
+  // set the whole pool unit to be read-only.
+  //
+  Address = Address & PAGE_TABLE_POOL_ALIGN_MASK;
+
+  LevelShift[1] = PAGING_L1_ADDRESS_SHIFT;
+  LevelShift[2] = PAGING_L2_ADDRESS_SHIFT;
+  LevelShift[3] = PAGING_L3_ADDRESS_SHIFT;
+  LevelShift[4] = PAGING_L4_ADDRESS_SHIFT;
+
+  LevelMask[1] = PAGING_4K_ADDRESS_MASK_64;
+  LevelMask[2] = PAGING_2M_ADDRESS_MASK_64;
+  LevelMask[3] = PAGING_1G_ADDRESS_MASK_64;
+  LevelMask[4] = PAGING_1G_ADDRESS_MASK_64;
+
+  LevelSize[1] = SIZE_4KB;
+  LevelSize[2] = SIZE_2MB;
+  LevelSize[3] = SIZE_1GB;
+  LevelSize[4] = SIZE_512GB;
+
+  AddressEncMask = InternalGetMemEncryptionAddressMask ();
+  PageTable      = (UINT64 *)(UINTN)PageTableBase;
+  PoolUnitSize   = PAGE_TABLE_POOL_UNIT_SIZE;
+
+  for (Level = (Level4Paging) ? 4 : 3; Level > 0; --Level) {
+    Index  = ((UINTN)RShiftU64 (Address, LevelShift[Level]));
+    Index &= PAGING_PAE_INDEX_MASK;
+
+    PageAttr = PageTable[Index];
+    if ((PageAttr & IA32_PG_PS) == 0) {
+      //
+      // Go to next level of table.
+      //
+      PageTable = (UINT64 *)(UINTN)(PageAttr & ~AddressEncMask &
+                                    PAGING_4K_ADDRESS_MASK_64);
+      continue;
+    }
+
+    if (PoolUnitSize >= LevelSize[Level]) {
+      //
+      // Clear R/W bit if current page granularity is not larger than pool unit
+      // size.
+      //
+      if ((PageAttr & IA32_PG_RW) != 0) {
+        while (PoolUnitSize > 0) {
+          //
+          // PAGE_TABLE_POOL_UNIT_SIZE and PAGE_TABLE_POOL_ALIGNMENT are fit in
+          // one page (2MB). Then we don't need to update attributes for pages
+          // crossing page directory. ASSERT below is for that purpose.
+          //
+          ASSERT (Index < EFI_PAGE_SIZE/sizeof (UINT64));
+
+          PageTable[Index] &= ~(UINT64)IA32_PG_RW;
+          PoolUnitSize     -= LevelSize[Level];
+
+          ++Index;
+        }
+      }
+
+      break;
+    } else {
+      //
+      // The smaller granularity of page must be needed.
+      //
+      ASSERT (Level > 1);
+
+      NewPageTable = AllocatePageTableMemory (1);
+      ASSERT (NewPageTable != NULL);
+
+      PhysicalAddress = PageAttr & LevelMask[Level];
+      for (EntryIndex = 0;
+           EntryIndex < EFI_PAGE_SIZE/sizeof (UINT64);
+           ++EntryIndex)
+      {
+        NewPageTable[EntryIndex] = PhysicalAddress  | AddressEncMask |
+                                   IA32_PG_P | IA32_PG_RW;
+        if (Level > 2) {
+          NewPageTable[EntryIndex] |= IA32_PG_PS;
+        }
+
+        PhysicalAddress += LevelSize[Level - 1];
+      }
+
+      //
+      // AddressEncMask is not set for non-leaf entries because of the way CpuPageTableLib works
+      //
+      PageTable[Index] = (UINT64)(UINTN)NewPageTable |
+                         IA32_PG_P | IA32_PG_RW;
+      PageTable = NewPageTable;
+    }
+  }
+}
+
 /**
   Initialize a buffer pool for page table use only.
 
@@ -242,132 +375,6 @@ Split2MPageTo4K (
   //
   *PageEntry2M = ((UINT64)(UINTN)PageTableEntry1 |
                   IA32_PG_P | IA32_PG_RW);
-}
-
-/**
-  Set one page of page table pool memory to be read-only.
-
-  @param[in] PageTableBase    Base address of page table (CR3).
-  @param[in] Address          Start address of a page to be set as read-only.
-  @param[in] Level4Paging     Level 4 paging flag.
-
-**/
-STATIC
-VOID
-SetPageTablePoolReadOnly (
-  IN  UINTN                 PageTableBase,
-  IN  EFI_PHYSICAL_ADDRESS  Address,
-  IN  BOOLEAN               Level4Paging
-  )
-{
-  UINTN                 Index;
-  UINTN                 EntryIndex;
-  UINT64                AddressEncMask;
-  EFI_PHYSICAL_ADDRESS  PhysicalAddress;
-  UINT64                *PageTable;
-  UINT64                *NewPageTable;
-  UINT64                PageAttr;
-  UINT64                LevelSize[5];
-  UINT64                LevelMask[5];
-  UINTN                 LevelShift[5];
-  UINTN                 Level;
-  UINT64                PoolUnitSize;
-
-  ASSERT (PageTableBase != 0);
-
-  //
-  // Since the page table is always from page table pool, which is always
-  // located at the boundary of PcdPageTablePoolAlignment, we just need to
-  // set the whole pool unit to be read-only.
-  //
-  Address = Address & PAGE_TABLE_POOL_ALIGN_MASK;
-
-  LevelShift[1] = PAGING_L1_ADDRESS_SHIFT;
-  LevelShift[2] = PAGING_L2_ADDRESS_SHIFT;
-  LevelShift[3] = PAGING_L3_ADDRESS_SHIFT;
-  LevelShift[4] = PAGING_L4_ADDRESS_SHIFT;
-
-  LevelMask[1] = PAGING_4K_ADDRESS_MASK_64;
-  LevelMask[2] = PAGING_2M_ADDRESS_MASK_64;
-  LevelMask[3] = PAGING_1G_ADDRESS_MASK_64;
-  LevelMask[4] = PAGING_1G_ADDRESS_MASK_64;
-
-  LevelSize[1] = SIZE_4KB;
-  LevelSize[2] = SIZE_2MB;
-  LevelSize[3] = SIZE_1GB;
-  LevelSize[4] = SIZE_512GB;
-
-  AddressEncMask = InternalGetMemEncryptionAddressMask ();
-  PageTable      = (UINT64 *)(UINTN)PageTableBase;
-  PoolUnitSize   = PAGE_TABLE_POOL_UNIT_SIZE;
-
-  for (Level = (Level4Paging) ? 4 : 3; Level > 0; --Level) {
-    Index  = ((UINTN)RShiftU64 (Address, LevelShift[Level]));
-    Index &= PAGING_PAE_INDEX_MASK;
-
-    PageAttr = PageTable[Index];
-    if ((PageAttr & IA32_PG_PS) == 0) {
-      //
-      // Go to next level of table.
-      //
-      PageTable = (UINT64 *)(UINTN)(PageAttr & ~AddressEncMask &
-                                    PAGING_4K_ADDRESS_MASK_64);
-      continue;
-    }
-
-    if (PoolUnitSize >= LevelSize[Level]) {
-      //
-      // Clear R/W bit if current page granularity is not larger than pool unit
-      // size.
-      //
-      if ((PageAttr & IA32_PG_RW) != 0) {
-        while (PoolUnitSize > 0) {
-          //
-          // PAGE_TABLE_POOL_UNIT_SIZE and PAGE_TABLE_POOL_ALIGNMENT are fit in
-          // one page (2MB). Then we don't need to update attributes for pages
-          // crossing page directory. ASSERT below is for that purpose.
-          //
-          ASSERT (Index < EFI_PAGE_SIZE/sizeof (UINT64));
-
-          PageTable[Index] &= ~(UINT64)IA32_PG_RW;
-          PoolUnitSize     -= LevelSize[Level];
-
-          ++Index;
-        }
-      }
-
-      break;
-    } else {
-      //
-      // The smaller granularity of page must be needed.
-      //
-      ASSERT (Level > 1);
-
-      NewPageTable = AllocatePageTableMemory (1);
-      ASSERT (NewPageTable != NULL);
-
-      PhysicalAddress = PageAttr & LevelMask[Level];
-      for (EntryIndex = 0;
-           EntryIndex < EFI_PAGE_SIZE/sizeof (UINT64);
-           ++EntryIndex)
-      {
-        NewPageTable[EntryIndex] = PhysicalAddress  | AddressEncMask |
-                                   IA32_PG_P | IA32_PG_RW;
-        if (Level > 2) {
-          NewPageTable[EntryIndex] |= IA32_PG_PS;
-        }
-
-        PhysicalAddress += LevelSize[Level - 1];
-      }
-
-      //
-      // AddressEncMask is not set for non-leaf entries because of the way CpuPageTableLib works
-      //
-      PageTable[Index] = (UINT64)(UINTN)NewPageTable |
-                         IA32_PG_P | IA32_PG_RW;
-      PageTable = NewPageTable;
-    }
-  }
 }
 
 /**
