@@ -917,7 +917,7 @@ class ValueExpressionEx(ValueExpression):
                                 TmpList.append('0x%02x' % ((TmpValue >> I * 8) & 0xff))
                             PcdValue = '{' + ', '.join(TmpList) + '}'
                     except:
-                        if PcdValue.strip().startswith('{'):
+                        if PcdValue.strip().startswith('{') and PcdValue.strip().endswith('}'):
                             PcdValueList = SplitPcdValueString(PcdValue.strip()[1:-1])
                             LabelDict = {}
                             NewPcdValueList = []
