@@ -122,16 +122,17 @@ Create4GPageTablesIa32Pae (
 
   for (IndexOfPdpEntries = 0; IndexOfPdpEntries < NumberOfPdpEntriesNeeded; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
     //
-    // Each Directory Pointer entries points to a page of Page Directory entires.
+    // Each Directory Pointer entries points to a page of Page Directory entries.
     // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
     //
     PageDirectoryEntry = (VOID *)PageAddress;
     PageAddress       += SIZE_4KB;
 
     //
-    // Fill in a Page Directory Pointer Entries
+    // Fill in a Page Directory Pointer Entries. Not a leaf entry so do not include the
+    // encryption mask.
     //
-    PageDirectoryPointerEntry->Uint64       = (UINT64)(UINTN)PageDirectoryEntry | AddressEncMask;
+    PageDirectoryPointerEntry->Uint64       = (UINT64)(UINTN)PageDirectoryEntry;
     PageDirectoryPointerEntry->Bits.Present = 1;
 
     for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PhysicalAddress += SIZE_2MB) {
