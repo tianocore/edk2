@@ -246,6 +246,16 @@ InitializePageTablePool (
   mPageTablePool->FreePages = PoolPages - 1;
   mPageTablePool->Offset    = EFI_PAGES_TO_SIZE (1);
 
+  //
+  // Perform the change to readonly after establishing the pool.
+  //
+  while (PoolPages != 0) {
+    SetPageTablePoolReadOnly (AsmReadCr3 (), (EFI_PHYSICAL_ADDRESS)(UINTN)Buffer, TRUE);
+
+    Buffer    += EFI_PAGES_TO_SIZE (PAGE_TABLE_POOL_UNIT_PAGES);
+    PoolPages -= PAGE_TABLE_POOL_UNIT_PAGES;
+  }
+
   return TRUE;
 }
 
@@ -375,54 +385,6 @@ Split2MPageTo4K (
   //
   *PageEntry2M = ((UINT64)(UINTN)PageTableEntry1 |
                   IA32_PG_P | IA32_PG_RW);
-}
-
-/**
-  Prevent the memory pages used for page table from been overwritten.
-
-  @param[in] PageTableBase    Base address of page table (CR3).
-  @param[in] Level4Paging     Level 4 paging flag.
-
-**/
-STATIC
-VOID
-EnablePageTableProtection (
-  IN  UINTN    PageTableBase,
-  IN  BOOLEAN  Level4Paging
-  )
-{
-  PAGE_TABLE_POOL       *HeadPool;
-  PAGE_TABLE_POOL       *Pool;
-  UINT64                PoolSize;
-  EFI_PHYSICAL_ADDRESS  Address;
-
-  if (mPageTablePool == NULL) {
-    return;
-  }
-
-  //
-  // SetPageTablePoolReadOnly might update mPageTablePool. It's safer to
-  // remember original one in advance.
-  //
-  HeadPool = mPageTablePool;
-  Pool     = HeadPool;
-  do {
-    Address  = (EFI_PHYSICAL_ADDRESS)(UINTN)Pool;
-    PoolSize = Pool->Offset + EFI_PAGES_TO_SIZE (Pool->FreePages);
-
-    //
-    // The size of one pool must be multiple of PAGE_TABLE_POOL_UNIT_SIZE,
-    // which is one of page size of the processor (2MB by default). Let's apply
-    // the protection to them one by one.
-    //
-    while (PoolSize > 0) {
-      SetPageTablePoolReadOnly (PageTableBase, Address, Level4Paging);
-      Address  += PAGE_TABLE_POOL_UNIT_SIZE;
-      PoolSize -= PAGE_TABLE_POOL_UNIT_SIZE;
-    }
-
-    Pool = Pool->NextPool;
-  } while (Pool != HeadPool);
 }
 
 /**
@@ -974,14 +936,6 @@ SetMemoryEncDec (
         Length          -= EFI_PAGE_SIZE;
       }
     }
-  }
-
-  //
-  // Protect the page table by marking the memory used for page table to be
-  // read-only.
-  //
-  if (IsWpEnabled) {
-    EnablePageTableProtection ((UINTN)PageMapLevel4Entry, TRUE);
   }
 
   //
