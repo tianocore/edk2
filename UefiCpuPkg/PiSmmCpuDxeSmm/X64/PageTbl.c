@@ -244,7 +244,7 @@ SmmInitPageTable (
     //
     // Set IA32_PG_PMNT bit to mask first 4 PdptEntry.
     //
-    PdptEntry = (UINT64 *)((*Pml4Entry) & ~mAddressEncMask & gPhyMask);
+    PdptEntry = (UINT64 *)((*Pml4Entry) & gPhyMask);
     for (Index = 0; Index < 4; Index++) {
       PdptEntry[Index] |= IA32_PG_PMNT;
     }
@@ -486,7 +486,7 @@ ReclaimPages (
         continue;
       }
 
-      Pdpt        = (UINT64 *)(UINTN)(Pml4[Pml4Index] & ~mAddressEncMask & gPhyMask);
+      Pdpt        = (UINT64 *)(UINTN)(Pml4[Pml4Index] & gPhyMask);
       PML4EIgnore = FALSE;
       for (PdptIndex = 0; PdptIndex < EFI_PAGE_SIZE / sizeof (*Pdpt); PdptIndex++) {
         if (((Pdpt[PdptIndex] & IA32_PG_P) == 0) || ((Pdpt[PdptIndex] & IA32_PG_PMNT) != 0)) {
@@ -509,7 +509,7 @@ ReclaimPages (
           // we will not check PML4 entry more
           //
           PML4EIgnore = TRUE;
-          Pdt         = (UINT64 *)(UINTN)(Pdpt[PdptIndex] & ~mAddressEncMask & gPhyMask);
+          Pdt         = (UINT64 *)(UINTN)(Pdpt[PdptIndex] & gPhyMask);
           PDPTEIgnore = FALSE;
           for (PdtIndex = 0; PdtIndex < EFI_PAGE_SIZE / sizeof (*Pdt); PdtIndex++) {
             if (((Pdt[PdtIndex] & IA32_PG_P) == 0) || ((Pdt[PdtIndex] & IA32_PG_PMNT) != 0)) {
@@ -610,7 +610,7 @@ ReclaimPages (
   //
   // Secondly, insert the page pointed by this entry into page pool and clear this entry
   //
-  InsertTailList (&mPagePool, (LIST_ENTRY *)(UINTN)(*ReleasePageAddress & ~mAddressEncMask & gPhyMask));
+  InsertTailList (&mPagePool, (LIST_ENTRY *)(UINTN)(*ReleasePageAddress & gPhyMask));
   *ReleasePageAddress = 0;
 
   //
@@ -623,7 +623,7 @@ ReclaimPages (
       // If 4 KByte Page Table is released, check the PDPT entry
       //
       Pml4          = (UINT64 *)(UINTN)(Pml5[MinPml5] & gPhyMask);
-      Pdpt          = (UINT64 *)(UINTN)(Pml4[MinPml4] & ~mAddressEncMask & gPhyMask);
+      Pdpt          = (UINT64 *)(UINTN)(Pml4[MinPml4] & gPhyMask);
       SubEntriesNum = GetSubEntriesNum (Pdpt + MinPdpt);
       if ((SubEntriesNum == 0) &&
           ((MinPdpt != PFAddressPdptIndex) || (MinPml4 != PFAddressPml4Index) || (MinPml5 != PFAddressPml5Index)))
@@ -632,7 +632,7 @@ ReclaimPages (
         // Release the empty Page Directory table if there was no more 4 KByte Page Table entry
         // clear the Page directory entry
         //
-        InsertTailList (&mPagePool, (LIST_ENTRY *)(UINTN)(Pdpt[MinPdpt] & ~mAddressEncMask & gPhyMask));
+        InsertTailList (&mPagePool, (LIST_ENTRY *)(UINTN)(Pdpt[MinPdpt] & gPhyMask));
         Pdpt[MinPdpt] = 0;
         //
         // Go on checking the PML4 table
@@ -658,7 +658,7 @@ ReclaimPages (
         // Release the empty PML4 table if there was no more 1G KByte Page Table entry
         // clear the Page directory entry
         //
-        InsertTailList (&mPagePool, (LIST_ENTRY *)(UINTN)(Pml4[MinPml4] & ~mAddressEncMask & gPhyMask));
+        InsertTailList (&mPagePool, (LIST_ENTRY *)(UINTN)(Pml4[MinPml4] & gPhyMask));
         Pml4[MinPml4] = 0;
         MinPdpt       = (UINTN)-1;
         continue;

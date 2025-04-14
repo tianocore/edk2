@@ -740,9 +740,9 @@ RestoreS3PageTables (
       S3NvsPageTableAddress    += SIZE_4KB;
 
       //
-      // Make a PML4 Entry
+      // Make a PML4 Entry. Not a leaf entry so do not include the encryption mask.
       //
-      PageMapLevel4Entry->Uint64         = (UINT64)(UINTN)PageDirectoryPointerEntry | AddressEncMask;
+      PageMapLevel4Entry->Uint64         = (UINT64)(UINTN)PageDirectoryPointerEntry;
       PageMapLevel4Entry->Bits.ReadWrite = 1;
       PageMapLevel4Entry->Bits.Present   = 1;
 
@@ -768,9 +768,10 @@ RestoreS3PageTables (
           S3NvsPageTableAddress += SIZE_4KB;
 
           //
-          // Fill in a Page Directory Pointer Entries
+          // Fill in a Page Directory Pointer Entries. Not a leaf entry so do not include the
+          // encryption mask.
           //
-          PageDirectoryPointerEntry->Uint64         = (UINT64)(UINTN)PageDirectoryEntry | AddressEncMask;
+          PageDirectoryPointerEntry->Uint64         = (UINT64)(UINTN)PageDirectoryEntry;
           PageDirectoryPointerEntry->Bits.ReadWrite = 1;
           PageDirectoryPointerEntry->Bits.Present   = 1;
 

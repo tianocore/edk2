@@ -101,9 +101,10 @@ AcquirePage (
   }
 
   //
-  // Link & Record the current uplink
+  // Link & Record the current uplink. Not a leaf entry so do not include the
+  // encryption mask.
   //
-  *Uplink                     = Address | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
+  *Uplink                     = Address | PAGE_ATTRIBUTE_BITS;
   mPFPageUplink[mPFPageIndex] = Uplink;
 
   mPFPageIndex = (mPFPageIndex + 1) % MAX_PF_PAGE_COUNT;
@@ -313,17 +314,17 @@ RestorePageTableAbove4G (
   if ((!Enable5LevelPaging) || ((PageTable[PTIndex] & IA32_PG_P) != 0)) {
     // PML5E
     if (Enable5LevelPaging) {
-      PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
+      PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & PHYSICAL_ADDRESS_MASK);
     }
 
     PTIndex = BitFieldRead64 (PFAddress, 39, 47);
     if ((PageTable[PTIndex] & IA32_PG_P) != 0) {
       // PML4E
-      PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
+      PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & PHYSICAL_ADDRESS_MASK);
       PTIndex   = BitFieldRead64 (PFAddress, 30, 38);
       if ((PageTable[PTIndex] & IA32_PG_P) != 0) {
         // PDPTE
-        PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
+        PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & PHYSICAL_ADDRESS_MASK);
         PTIndex   = BitFieldRead64 (PFAddress, 21, 29);
         // PD
         if ((PageTable[PTIndex] & IA32_PG_PS) != 0) {
@@ -338,7 +339,7 @@ RestorePageTableAbove4G (
           //
           // 4KB page
           //
-          PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask& PHYSICAL_ADDRESS_MASK);
+          PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & PHYSICAL_ADDRESS_MASK);
           if (PageTable != 0) {
             //
             // When there is a valid entry to map to 4KB page, need not create a new entry to map 2MB.
@@ -379,15 +380,15 @@ RestorePageTableAbove4G (
     // PML5E
     if (Enable5LevelPaging) {
       PTIndex   = BitFieldRead64 (PFAddress, 48, 56);
-      PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
+      PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & PHYSICAL_ADDRESS_MASK);
     }
 
     // PML4E
     PTIndex   = BitFieldRead64 (PFAddress, 39, 47);
-    PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
+    PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & PHYSICAL_ADDRESS_MASK);
     // PDPTE
     PTIndex   = BitFieldRead64 (PFAddress, 30, 38);
-    PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
+    PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & PHYSICAL_ADDRESS_MASK);
     // PD
     PTIndex = BitFieldRead64 (PFAddress, 21, 29);
     Address = PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK;
@@ -398,7 +399,7 @@ RestorePageTableAbove4G (
       AcquirePage (&PageTable[PTIndex]);
 
       // PTE
-      PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
+      PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & PHYSICAL_ADDRESS_MASK);
       for (Index = 0; Index < 512; Index++) {
         PageTable[Index] = Address | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
         if (!IsSmmProfilePFAddressAbove4GValid (Address, &Nx)) {
