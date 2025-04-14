@@ -144,18 +144,22 @@ BITS    32
 ; Argument: upper 32 bits of the leaf page table entries
 ;
 ; We have 6 pages available for the early page tables,
-; we use four of them:
+; we use five of them:
 ;    PT_ADDR(0)      - level 5 directory
 ;    PT_ADDR(0x1000) - level 4 directory
 ;    PT_ADDR(0x2000) - level 2 directory (0 -> 1GB)
 ;    PT_ADDR(0x3000) - level 3 directory
+;    PT_ADDR(0x4000) - level 2 directory (3GB -> 4GB)
 ;
 ; The level 2 directory for the first gigabyte has the same
 ; physical address in both 4-level and 5-level paging mode,
 ; SevClearPageEncMaskForGhcbPage depends on this.
 ;
-; The 1 GB -> 4 GB range is mapped using 1G pages in the
+; The 1 GB -> 3 GB range is mapped using 1G pages in the
 ; level 3 directory.
+;
+; The level 2 directory for the last gigabyte is used for
+; clearing the encryption bit from the APIC address range.
 ;
 %macro CreatePageTables5Level 1
 
@@ -177,21 +181,35 @@ BITS    32
     mov     dword[PT_ADDR (0x300c)], %1
     mov     dword[PT_ADDR (0x3010)], (2 << 30) + PAGE_PDE_LARGEPAGE_ATTR
     mov     dword[PT_ADDR (0x3014)], %1
-    mov     dword[PT_ADDR (0x3018)], (3 << 30) + PAGE_PDE_LARGEPAGE_ATTR
-    mov     dword[PT_ADDR (0x301c)], %1
+    mov     dword[PT_ADDR (0x3018)], PT_ADDR (0x4000) + PAGE_PDE_DIRECTORY_ATTR
+    mov     dword[PT_ADDR (0x301c)], 0
 
     ;
-    ; level 2 (512 * 2MB entries => 1GB)
+    ; level 2 0 -> 1GB (512 * 2MB entries => 1GB)
     ;
     mov     ecx, 0x200
-.pageTableEntriesLoop5Level:
+.pageTableEntriesLoop5Level1Gb:
     mov     eax, ecx
     dec     eax
     shl     eax, 21
     add     eax, PAGE_PDE_LARGEPAGE_ATTR
     mov     dword[ecx * 8 + PT_ADDR (0x2000 - 8)], eax
     mov     dword[(ecx * 8 + PT_ADDR (0x2000 - 8)) + 4], %1
-    loop    .pageTableEntriesLoop5Level
+    loop    .pageTableEntriesLoop5Level1Gb
+
+    ;
+    ; level 2 3GB -> 4GB (512 * 2MB entries => 1GB)
+    ;
+    mov     ecx, 0x200
+.pageTableEntriesLoop5Level3Gb:
+    mov     eax, ecx
+    add     eax, 0x600
+    dec     eax
+    shl     eax, 21
+    add     eax, PAGE_PDE_LARGEPAGE_ATTR
+    mov     dword[ecx * 8 + PT_ADDR (0x4000 - 8)], eax
+    mov     dword[(ecx * 8 + PT_ADDR (0x4000 - 8)) + 4], %1
+    loop    .pageTableEntriesLoop5Level3Gb
 %endmacro
 
 %macro Enable5LevelPaging 0
