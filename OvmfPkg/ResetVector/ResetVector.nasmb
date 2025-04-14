@@ -59,13 +59,14 @@
 %define GHCB_BASE                     (FixedPcdGet32 (PcdOvmfSecGhcbBase))
 %define GHCB_SIZE                     (FixedPcdGet32 (PcdOvmfSecGhcbSize))
 %define SEV_ES_WORK_AREA              (FixedPcdGet32 (PcdSevEsWorkAreaBase))
-%define SEV_ES_WORK_AREA_SIZE         25
+%define SEV_ES_WORK_AREA_SIZE         32
 %define SEV_ES_WORK_AREA_STATUS_MSR   (FixedPcdGet32 (PcdSevEsWorkAreaBase))
 %define SEV_ES_WORK_AREA_RDRAND       (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 8)
 %define SEV_ES_WORK_AREA_ENC_MASK     (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 16)
 %define SEV_ES_WORK_AREA_FLAGS        (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 24)
 %define SEV_ES_WORK_AREA_FLAG_VC      0x01
 %define SEV_ES_WORK_AREA_FLAG_CSFW_NO 0x02
+%define SEV_ES_WORK_AREA_FLAG_5LEVEL  0x04
 %define SEV_ES_VC_TOP_OF_STACK        (FixedPcdGet32 (PcdOvmfSecPeiTempRamBase) + FixedPcdGet32 (PcdOvmfSecPeiTempRamSize))
 %define SEV_SNP_SECRETS_BASE          (FixedPcdGet32 (PcdOvmfSnpSecretsBase))
 %define SEV_SNP_SECRETS_SIZE          (FixedPcdGet32 (PcdOvmfSnpSecretsSize))

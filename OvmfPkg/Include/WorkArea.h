@@ -55,19 +55,21 @@ typedef struct _SEC_SEV_ES_WORK_AREA {
   //   during the SevFeature detection in OvmfPkg/ResetVector/Ia32/AmdSev.asm
   // - BIT1 - CSFW_NO: Indicator that the SEV-SNP cache line evication
   //   mitigation is not needed.
+  // - BIT2 - 5LEVEL: Indicator that 5-level paging is supported.
   //
-  UINT8     Flags;
-  UINT8     Reserved[7];
+  UINT8    Flags;
+  UINT8    Reserved[7];
 
   // Used by SEC to generate Page State Change requests. This should be
   // sized less than an equal to the GHCB shared buffer area to allow a
   // single call to the hypervisor.
   //
-  UINT8     WorkBuffer[1024];
+  UINT8    WorkBuffer[1024];
 } SEC_SEV_ES_WORK_AREA;
 
 #define SEV_ES_WORK_AREA_FLAG_VC       BIT0
 #define SEV_ES_WORK_AREA_FLAG_CSFW_NO  BIT1
+#define SEV_ES_WORK_AREA_FLAG_5LEVEL   BIT2
 
 //
 // The SEV work area definition.
