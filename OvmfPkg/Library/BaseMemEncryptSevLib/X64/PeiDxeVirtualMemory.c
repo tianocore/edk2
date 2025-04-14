@@ -88,6 +88,8 @@ InitializePageTablePool (
   UINT64              MapLength;
   IA32_MAP_ATTRIBUTE  MapAttribute;
   IA32_MAP_ATTRIBUTE  MapMask;
+  IA32_CR4            Cr4;
+  PAGING_MODE         PagingMode;
   UINTN               BufferSize;
   BOOLEAN             Flush;
   RETURN_STATUS       Status;
@@ -134,10 +136,12 @@ InitializePageTablePool (
   MapMask.Uint64         = 0;
   MapMask.Bits.ReadWrite = 1;
 
+  Cr4.UintN  = AsmReadCr4 ();
+  PagingMode = Cr4.Bits.LA57 ? Paging5Level1GB : Paging4Level1GB;
   BufferSize = 0;
   Flush      = FALSE;
 
-  Status = PageTableMap (&PageTable, Paging4Level1GB, NULL, &BufferSize, MapAddress, MapLength, &MapAttribute, &MapMask, &Flush);
+  Status = PageTableMap (&PageTable, PagingMode, NULL, &BufferSize, MapAddress, MapLength, &MapAttribute, &MapMask, &Flush);
   if (Status == RETURN_BUFFER_TOO_SMALL) {
     //
     // Ensure there are enough pages in the pool for the new pagetable pages.
@@ -149,7 +153,7 @@ InitializePageTablePool (
       mPageTablePool->Offset    += BufferSize;
       mPageTablePool->FreePages -= EFI_SIZE_TO_PAGES (BufferSize);
 
-      Status = PageTableMap (&PageTable, Paging4Level1GB, Buffer, &BufferSize, MapAddress, MapLength, &MapAttribute, &MapMask, &Flush);
+      Status = PageTableMap (&PageTable, PagingMode, Buffer, &BufferSize, MapAddress, MapLength, &MapAttribute, &MapMask, &Flush);
     }
   }
 
@@ -290,6 +294,8 @@ InternalMemEncryptSevCreateIdentityMap1G (
   UINT64              MapLength;
   IA32_MAP_ATTRIBUTE  MapAttribute;
   IA32_MAP_ATTRIBUTE  MapMask;
+  IA32_CR4            Cr4;
+  PAGING_MODE         PagingMode;
   VOID                *Buffer;
   UINTN               BufferSize;
   BOOLEAN             Flush;
@@ -347,14 +353,16 @@ InternalMemEncryptSevCreateIdentityMap1G (
   MapAttribute.Bits.ReadWrite = 1;
   MapMask.Uint64              = MAX_UINT64;
 
+  Cr4.UintN  = AsmReadCr4 ();
+  PagingMode = Cr4.Bits.LA57 ? Paging5Level1GB : Paging4Level1GB;
   BufferSize = 0;
   Flush      = FALSE;
 
-  Status = PageTableMap (&PageTable, Paging4Level1GB, NULL, &BufferSize, MapAddress, MapLength, &MapAttribute, &MapMask, &Flush);
+  Status = PageTableMap (&PageTable, PagingMode, NULL, &BufferSize, MapAddress, MapLength, &MapAttribute, &MapMask, &Flush);
   if (Status == RETURN_BUFFER_TOO_SMALL) {
     Buffer = AllocatePageTableMemory (EFI_SIZE_TO_PAGES (BufferSize));
     if (Buffer != NULL) {
-      Status = PageTableMap (&PageTable, Paging4Level1GB, Buffer, &BufferSize, PhysicalAddress, Length, &MapAttribute, &MapMask, &Flush);
+      Status = PageTableMap (&PageTable, PagingMode, Buffer, &BufferSize, PhysicalAddress, Length, &MapAttribute, &MapMask, &Flush);
     }
   }
 
@@ -420,6 +428,8 @@ SetMemoryEncDec (
   UINT64              MapLength;
   IA32_MAP_ATTRIBUTE  MapAttribute;
   IA32_MAP_ATTRIBUTE  MapMask;
+  IA32_CR4            Cr4;
+  PAGING_MODE         PagingMode;
   VOID                *Buffer;
   UINTN               BufferSize;
   BOOLEAN             Flush;
@@ -509,14 +519,16 @@ SetMemoryEncDec (
 
   MapMask.Uint64 = IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS_MASK;
 
+  Cr4.UintN  = AsmReadCr4 ();
+  PagingMode = Cr4.Bits.LA57 ? Paging5Level1GB : Paging4Level1GB;
   BufferSize = 0;
   Flush      = FALSE;
 
-  Status = PageTableMap (&PageTable, Paging4Level1GB, NULL, &BufferSize, MapAddress, MapLength, &MapAttribute, &MapMask, &Flush);
+  Status = PageTableMap (&PageTable, PagingMode, NULL, &BufferSize, MapAddress, MapLength, &MapAttribute, &MapMask, &Flush);
   if (Status == RETURN_BUFFER_TOO_SMALL) {
     Buffer = AllocatePageTableMemory (EFI_SIZE_TO_PAGES (BufferSize));
     if (Buffer != NULL) {
-      Status = PageTableMap (&PageTable, Paging4Level1GB, Buffer, &BufferSize, MapAddress, MapLength, &MapAttribute, &MapMask, &Flush);
+      Status = PageTableMap (&PageTable, PagingMode, Buffer, &BufferSize, MapAddress, MapLength, &MapAttribute, &MapMask, &Flush);
     }
   }
 
