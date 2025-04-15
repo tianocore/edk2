@@ -205,12 +205,6 @@
   LocalApicLib|UefiCpuPkg/Library/BaseXApicX2ApicLib/BaseXApicX2ApicLib.inf
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
 
-  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-!if $(NETWORK_TLS_ENABLE) == TRUE
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
-!else
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
-!endif
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
@@ -233,10 +227,6 @@
   #
 !include NetworkPkg/NetworkLibs.dsc.inc
 
-!if $(NETWORK_TLS_ENABLE) == TRUE
-  TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
-!endif
-
   ShellCEntryLib|ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.inf
   S3BootScriptLib|MdeModulePkg/Library/PiDxeS3BootScriptLib/DxeS3BootScriptLib.inf
   SmbusLib|MdePkg/Library/BaseSmbusLibNull/BaseSmbusLibNull.inf
@@ -246,6 +236,7 @@
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
 
 !include OvmfPkg/Include/Dsc/ShellLibs.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfTlsLibs.dsc.inc
 
 [LibraryClasses.common]
   AmdSvsmLib|OvmfPkg/Library/AmdSvsmLib/AmdSvsmLib.inf
