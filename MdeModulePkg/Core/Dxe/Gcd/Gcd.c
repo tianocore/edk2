@@ -976,7 +976,7 @@ CoreConvertSpace (
       // Set attributes operation
       //
       case GCD_SET_ATTRIBUTES_MEMORY_OPERATION:
-        if (CpuArchAttributes == 0) {
+        if ((CpuArchAttributes == 0) && (Attributes != 0)) {
           //
           // Keep original CPU arch attributes when caller just calls
           // SetMemorySpaceAttributes() with none CPU arch attributes (for example, RUNTIME).
