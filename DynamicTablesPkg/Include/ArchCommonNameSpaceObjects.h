@@ -62,6 +62,8 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjStaInfo,                        ///< 34 - _STA (Device Status) Info
   EArchCommonObjMemoryRangeDescriptor,          ///< 35 - Memory Range Descriptor
   EArchCommonObjGenericDbg2DeviceInfo,          ///< 36 - Generic DBG2 Device Info
+  EArchCommonObjCxlHostBridgeInfo,              ///< 37 - CXL Host Bridge Info
+  EArchCommonObjCxlFixedMemoryWindowInfo,       ///< 38 - CXL Fixed Memory Window Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -849,6 +851,61 @@ typedef struct CmArchCommonDbg2DeviceInfo {
   */
   CHAR8              ObjectName[AML_NAME_SEG_SIZE + 1];
 } CM_ARCH_COMMON_DBG2_DEVICE_INFO;
+
+/** A structure that describes a CXL Host Bridge Structure (Type 0).
+
+  ID: EArchCommonObjCxlHostBridgeInfo
+*/
+
+typedef struct CmArchCommonCxlHostBridgeInfo {
+  /// Token to identify this object.
+  CM_OBJECT_TOKEN    Token;
+
+  /// Unique id to associate with a host bridge instance.
+  UINT32             Uid;
+
+  /// CXL version.
+  UINT32             Version;
+
+  /// Base address of the component registers.
+  UINT64             ComponentRegisterBase;
+} CM_ARCH_COMMON_CXL_HOST_BRIDGE_INFO;
+
+// Maximum interleave ways is defined in the CXL spec section 8.2.4.19.7.
+#define CFMWS_MAX_INTERLEAVE_WAYS  (16)
+
+/** A structure that describes the CXL Fixed Memory Window Structure (Type 1).
+
+    ID: EArchCommonObjCxlFixedMemoryWindowInfo
+*/
+typedef struct CmArchCommonCxlFixedMemoryWindowInfo {
+  /// Base host physical address. Should be 256 MB aligned.
+  UINT64             BaseHostPhysicalAddress;
+
+  /// Size of the window in bytes. Should be 256 MB aligned.
+  UINT64             WindowSizeBytes;
+
+  /// Number of ways the memory region is interleaved.
+  UINT8              NumberOfInterleaveWays;
+
+  /// Interleave arithmetic method.
+  UINT8              InterleaveArithmetic;
+
+  /// Number of consecutive bytes per interleave.
+  UINT32             HostBridgeInterleaveGranularity;
+
+  /// Bit vector of window restriction settings.
+  UINT16             WindowRestrictions;
+
+  /// ID of Quality of Service Throttling Group for this window.
+  UINT16             QtgId;
+
+  /// Host bridge UIDs that are part of the interleave configuration.
+  /// The number of InterleaveTargetTokens is equal to NumberOfInterleaveWays.
+  /// Each array element identifies a CM_ARCH_COMMON_CXL_HOST_BRIDGE_INFO
+  /// structure via token matching.
+  CM_OBJECT_TOKEN    InterleaveTargetTokens[CFMWS_MAX_INTERLEAVE_WAYS];
+} CM_ARCH_COMMON_CXL_FIXED_MEMORY_WINDOW_INFO;
 
 #pragma pack()
 
