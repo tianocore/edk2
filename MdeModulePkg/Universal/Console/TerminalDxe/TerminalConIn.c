@@ -760,7 +760,8 @@ RawFiFoRemoveOneKey (
     return FALSE;
   }
 
-  *Output = TerminalDevice->RawFiFo->Data[Head];
+  *Output                             = TerminalDevice->RawFiFo->Data[Head];
+  TerminalDevice->RawFiFo->Data[Head] = 0;
 
   TerminalDevice->RawFiFo->Head = (UINT8)((Head + 1) % (RAW_FIFO_MAX_NUMBER + 1));
 
@@ -1032,6 +1033,7 @@ EfiKeyFiFoRemoveOneKey (
   }
 
   CopyMem (Output, &TerminalDevice->EfiKeyFiFo->Data[Head], sizeof (EFI_INPUT_KEY));
+  ZeroMem (&TerminalDevice->EfiKeyFiFo->Data[Head], sizeof (EFI_INPUT_KEY));
 
   TerminalDevice->EfiKeyFiFo->Head = (UINT8)((Head + 1) % (FIFO_MAX_NUMBER + 1));
 
@@ -1142,7 +1144,8 @@ UnicodeFiFoRemoveOneKey (
   Head = TerminalDevice->UnicodeFiFo->Head;
   ASSERT (Head < FIFO_MAX_NUMBER + 1);
 
-  *Output = TerminalDevice->UnicodeFiFo->Data[Head];
+  *Output                                 = TerminalDevice->UnicodeFiFo->Data[Head];
+  TerminalDevice->UnicodeFiFo->Data[Head] = 0;
 
   TerminalDevice->UnicodeFiFo->Head = (UINT8)((Head + 1) % (FIFO_MAX_NUMBER + 1));
 }
