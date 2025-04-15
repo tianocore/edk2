@@ -348,6 +348,7 @@ Dequeue (
   }
 
   CopyMem (KeyData, &Queue->Buffer[Queue->Front], sizeof (EFI_KEY_DATA));
+  ZeroMem (&Queue->Buffer[Queue->Front], sizeof (EFI_KEY_DATA));
   Queue->Front = (Queue->Front + 1) % QUEUE_MAX_COUNT;
 
   return EFI_SUCCESS;
