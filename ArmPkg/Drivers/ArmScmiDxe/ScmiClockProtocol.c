@@ -186,7 +186,8 @@ ClockDescribeRates (
 
   UINT32                PayloadLength;
   SCMI_COMMAND          Cmd;
-  UINT32                *MessageParams;
+  UINT32                *MessageParams1;
+  UINT32                *MessageParams2;
   CLOCK_DESCRIBE_RATES  *DescribeRates;
   CLOCK_RATE_DWORD      *Rate;
 
@@ -199,7 +200,7 @@ ClockDescribeRates (
   RequiredArraySize = 0;
   RateIndex         = 0;
 
-  Status = ScmiCommandGetPayload (&MessageParams);
+  Status = ScmiCommandGetPayload (&MessageParams1);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -207,10 +208,11 @@ ClockDescribeRates (
   Cmd.ProtocolId = ScmiProtocolIdClock;
   Cmd.MessageId  = ScmiMessageIdClockDescribeRates;
 
-  *MessageParams++ = ClockId;
+  MessageParams2 = MessageParams1 + 1;
 
   do {
-    *MessageParams = RateIndex;
+    *MessageParams1 = ClockId;
+    *MessageParams2 = RateIndex;
 
     // Set Payload length, note PayloadLength is a IN/OUT parameter.
     PayloadLength = sizeof (ClockId) + sizeof (RateIndex);
