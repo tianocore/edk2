@@ -262,16 +262,22 @@ typedef struct CmArchCommonPciInterruptMapInfo {
 */
 typedef struct CmArchCommonMemoryAffinityInfo {
   /// The proximity domain to which the "range of memory" belongs.
-  UINT32    ProximityDomain;
+  UINT32             ProximityDomain;
 
   /// Base Address
-  UINT64    BaseAddress;
+  UINT64             BaseAddress;
 
   /// Length
-  UINT64    Length;
+  UINT64             Length;
 
   /// Flags
-  UINT32    Flags;
+  UINT32             Flags;
+
+  /** Optional field: Reference Token to the ProximityDomain this object
+      belongs to. If set to CM_NULL_TOKEN, the following field is used:
+        CM_ARCH_COMMON_MEMORY_AFFINITY_INFO.ProximityDomain
+  */
+  CM_OBJECT_TOKEN    ProximityDomainToken;
 } CM_ARCH_COMMON_MEMORY_AFFINITY_INFO;
 
 /** A structure that describes the ACPI Device Handle (Type 0) in the
@@ -322,6 +328,12 @@ typedef struct CmArchCommonGenericInitiatorAffinityInfo {
 
   /// Reference Token for the Device Handle
   CM_OBJECT_TOKEN    DeviceHandleToken;
+
+  /** Optional field: Reference Token to the ProximityDomain this object
+      belongs to. If set to CM_NULL_TOKEN, the following field is used:
+        CM_ARCH_COMMON_GENERIC_INITIATOR_AFFINITY_INFO.ProximityDomain
+  */
+  CM_OBJECT_TOKEN    ProximityDomainToken;
 } CM_ARCH_COMMON_GENERIC_INITIATOR_AFFINITY_INFO;
 
 /** A structure that describes the Lpi information.

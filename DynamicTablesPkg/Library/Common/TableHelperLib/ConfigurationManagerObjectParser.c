@@ -86,6 +86,8 @@ STATIC CONST CM_OBJ_PARSER  CmArmGicCInfoParser[] = {
   { "TRBEInterrupt",                 2,                        "0x%x",   NULL },
   { "EtToken",                       sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
   { "PsdToken",                      sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "ProximityDomainToken",          sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "ClockDomainToken",              sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
 };
 
 /** A parser for EArmObjGicDInfo.
@@ -116,9 +118,10 @@ STATIC CONST CM_OBJ_PARSER  CmArmGicRedistInfoParser[] = {
 /** A parser for EArmObjGicItsInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmGicItsInfoParser[] = {
-  { "GicItsId",            4, "0x%x",   NULL },
-  { "PhysicalBaseAddress", 8, "0x%llx", NULL },
-  { "ProximityDomain",     4, "0x%x",   NULL }
+  { "GicItsId",             4,                        "0x%x",   NULL },
+  { "PhysicalBaseAddress",  8,                        "0x%llx", NULL },
+  { "ProximityDomain",      4,                        "0x%x",   NULL },
+  { "ProximityDomainToken", sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
 };
 
 /** A parser for EArchCommonObjConsolePortInfo,
@@ -283,6 +286,7 @@ STATIC CONST CM_OBJ_PARSER  CmArmSmmuV3NodeParser[] = {
   { "ProximityDomain",      4,                        "0x%x",   NULL },
   { "DeviceIdMappingIndex", 4,                        "0x%x",   NULL },
   { "Identifier",           4,                        "0x%x",   NULL },
+  { "ProximityDomainToken", sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
 };
 
 /** A parser for EArmObjPmcg.
@@ -358,10 +362,11 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonObjRefParser[] = {
 /** A parser for EArchCommonObjMemoryAffinityInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryAffinityInfoParser[] = {
-  { "ProximityDomain", 4, "0x%x",   NULL },
-  { "BaseAddress",     8, "0x%llx", NULL },
-  { "Length",          8, "0x%llx", NULL },
-  { "Flags",           4, "0x%x",   NULL }
+  { "ProximityDomain",      4,                        "0x%x",   NULL },
+  { "BaseAddress",          8,                        "0x%llx", NULL },
+  { "Length",               8,                        "0x%llx", NULL },
+  { "Flags",                4,                        "0x%x",   NULL },
+  { "ProximityDomainToken", sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
 };
 
 /** A parser for EArchCommonObjDeviceHandleAcpi.
@@ -383,10 +388,11 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonDeviceHandlePciParser[] = {
 /** A parser for EArchCommonObjGenericInitiatorAffinityInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonGenericInitiatorAffinityInfoParser[] = {
-  { "ProximityDomain",   4,                        "0x%x", NULL },
-  { "Flags",             4,                        "0x%x", NULL },
-  { "DeviceHandleType",  1,                        "0x%x", NULL },
-  { "DeviceHandleToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL }
+  { "ProximityDomain",      4,                        "0x%x", NULL },
+  { "Flags",                4,                        "0x%x", NULL },
+  { "DeviceHandleType",     1,                        "0x%x", NULL },
+  { "DeviceHandleToken",    sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "ProximityDomainToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
 };
 
 /** A parser for EArmObjCmn600Info.
@@ -1081,11 +1087,13 @@ STATIC CONST CM_OBJ_PARSER  CmX64ObjFacsInfoParser[] = {
 /** A parser for CmX64LocalApicX2ApicAffinityInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmX64LocalApicX2ApicAffinityInfo[] = {
-  { "ApicMode",        sizeof (LOCAL_APIC_MODE), "0x%x", NULL },
-  { "ApicId",          4,                        "0x%x", NULL },
-  { "ProximityDomain", 4,                        "0x%x", NULL },
-  { "Flags",           4,                        "0x%x", NULL },
-  { "ClockDomain",     4,                        "0x%x", NULL }
+  { "ApicMode",             sizeof (LOCAL_APIC_MODE), "0x%x", NULL },
+  { "ApicId",               4,                        "0x%x", NULL },
+  { "ProximityDomain",      4,                        "0x%x", NULL },
+  { "Flags",                4,                        "0x%x", NULL },
+  { "ClockDomain",          4,                        "0x%x", NULL },
+  { "ProximityDomainToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "ClockDomainToken",     sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
 };
 
 /** A parser for X64 namespace objects.
