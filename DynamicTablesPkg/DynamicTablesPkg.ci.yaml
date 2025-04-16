@@ -104,6 +104,7 @@
            "cacheablity",
            "CCIDX",
            "CCSIDR",
+           "cfmws",
            "countof",
            "deviceid",
            "EArch",
