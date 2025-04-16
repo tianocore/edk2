@@ -1,0 +1,29 @@
+## @file
+#  CEDT Table Generator
+#
+#  Copyright (c) 2025 Google Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010019
+  BASE_NAME      = AcpiCedtLib
+  FILE_GUID      = 59F0D17F-AFDC-4F26-820B-E9ADC93859CE
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiCedtLibConstructor
+  DESTRUCTOR     = AcpiCedtLibDestructor
+
+[Sources]
+  CedtGenerator.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  BaseLib
