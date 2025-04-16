@@ -114,11 +114,6 @@ typedef struct {
 #define EFI_NVDIMM_LABEL_FLAGS_LOCAL  0x00000002
 
 ///
-/// When set, the label set is being updated.
-///
-#define EFI_NVDIMM_LABEL_FLAGS_UPDATING  0x00000008
-
-///
 /// When set, the SPALocationCookie in the namespace label is valid and should match the
 /// current value in the NFIT SPA Range Structure.
 ///
