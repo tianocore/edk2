@@ -380,7 +380,7 @@ FdtParentOffset (
 **/
 INT32
 EFIAPI
-FdtNodeOffsetByPropertyValue (
+FdtNodeOffsetByPropValue (
   IN CONST VOID   *Fdt,
   IN INT32        StartOffset,
   IN CONST CHAR8  *PropertyName,
@@ -451,6 +451,31 @@ FdtGetProperty (
   )
 {
   return (FDT_PROPERTY *)fdt_get_property (Fdt, NodeOffset, Name, Length);
+}
+
+/**
+  Returns the value of a given property.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     The offset to the given node.
+  @param[in] Name           The name to the property which need be searched
+  @param[in] Length         The length to the size of the property found.
+
+  @return Pointer to the value of the property.
+          Since the data comes from the FDT blob, it's encoded as big-endian.
+          NULL on error, with error-code stored at Length (if non-NULL).
+
+**/
+CONST VOID *
+EFIAPI
+FdtGetProp (
+  IN CONST VOID   *Fdt,
+  IN INT32        NodeOffset,
+  IN CONST CHAR8  *Name,
+  IN INT32        *Length
+  )
+{
+  return fdt_getprop (Fdt, NodeOffset, Name, Length);
 }
 
 /**
@@ -590,7 +615,7 @@ FdtAddSubnode (
 **/
 INT32
 EFIAPI
-FdtSetProperty (
+FdtSetProp (
   IN VOID         *Fdt,
   IN INT32        NodeOffset,
   IN CONST CHAR8  *Name,
