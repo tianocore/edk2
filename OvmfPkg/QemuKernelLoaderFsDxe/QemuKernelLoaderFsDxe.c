@@ -1019,7 +1019,7 @@ QemuKernelFetchBlob (
   }
 
   Blob = AllocatePool (sizeof (*Blob));
-  if (Blob->Data == NULL) {
+  if (Blob == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
