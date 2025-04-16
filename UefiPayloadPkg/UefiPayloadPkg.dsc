@@ -364,6 +364,8 @@
   SmmRelocationLib|UefiCpuPkg/Library/SmmRelocationLib/SmmRelocationLib.inf
   HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
   BuildFdtLib|UefiPayloadPkg/Library/BuildFdtLib/BuildFdtLib.inf
+  MmSaveStateLib|UefiCpuPkg/Library/MmSaveStateLib/IntelMmSaveStateLib.inf
+  SmmCpuSyncLib|UefiCpuPkg/Library/SmmCpuSyncLib/SmmCpuSyncLib.inf
 
 [LibraryClasses.common]
 !if $(BOOTSPLASH_IMAGE)
