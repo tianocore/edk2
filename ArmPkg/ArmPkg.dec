@@ -144,7 +144,7 @@
   #
   # ARM StanaloneMm Stack size.
   #
-  gArmTokenSpaceGuid.PcdStMmStackSize|0x2000|UINT32|0x0000005D
+  gArmTokenSpaceGuid.PcdStMmStackSize|0x4000|UINT32|0x0000005D
 
   # Use ClusterId + CoreId to identify the PrimaryCore
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask|0xF03|UINT32|0x00000031
