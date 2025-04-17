@@ -314,6 +314,7 @@
     <LibraryClasses>
       # don't use unaligned CopyMem () on the UEFI varstore NOR flash region
       BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+      VirtNorFlashDeviceLib|OvmfPkg/Library/VirtNorFlashDeviceLib/VirtNorFlashDeviceLib.inf
   }
 
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
