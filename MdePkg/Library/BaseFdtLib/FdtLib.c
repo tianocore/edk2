@@ -454,6 +454,30 @@ FdtGetProperty (
 }
 
 /**
+  Returns a property with the given name from the given node.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     The offset to the given node.
+  @param[in] Name           The name to the property which need be searched
+  @param[in] Length         The length to the size of the property found.
+
+  @return The property to the structure of the found property. Since the data
+          come from FDT blob, it's encoding with big-endian.
+
+**/
+FDT_PROPERTY *
+EFIAPI
+FdtGetPropertyW (
+  IN CONST VOID   *Fdt,
+  IN INT32        NodeOffset,
+  IN CONST CHAR8  *Name,
+  IN INT32        *Length
+  )
+{
+  return (FDT_PROPERTY *)fdt_get_property (Fdt, NodeOffset, Name, Length);
+}
+
+/**
   Returns the value of a given property.
 
   @param[in] Fdt            The pointer to FDT blob.
