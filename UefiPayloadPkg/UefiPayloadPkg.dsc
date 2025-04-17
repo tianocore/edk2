@@ -392,7 +392,7 @@
   ArmHvcLib|ArmPkg/Library/ArmHvcLib/ArmHvcLib.inf
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
   ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
-  ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
+  ArmSmcLib|MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
 
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
@@ -623,8 +623,6 @@
 !endif
 
 [PcdsFixedAtBuild.AARCH64]
-  gArmTokenSpaceGuid.PcdVFPEnabled|1
-
   # System Memory Base -- fixed at 0x4000_0000
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x40000000
 

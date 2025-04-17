@@ -47,6 +47,9 @@ typedef struct {
   ///
   BOOLEAN    IsCommBufferValid;
 
+  /// For padding purpose
+  UINT8      Reserved[7];
+
   ///
   /// The return status when returning from MM to non-MM.
   ///
