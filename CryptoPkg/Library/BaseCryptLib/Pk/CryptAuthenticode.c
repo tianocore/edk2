@@ -110,6 +110,10 @@ AuthenticodeVerify (
   //       PKCS#7 ContentInfo here.
   //
   SpcIndirectDataOid = OBJ_get0_data (Pkcs7->d.sign->contents->type);
+  if (SpcIndirectDataOid == NULL) {
+    goto _Exit;
+  }
+
   if ((OBJ_length (Pkcs7->d.sign->contents->type) != sizeof (mSpcIndirectOidValue)) ||
       (CompareMem (
          SpcIndirectDataOid,

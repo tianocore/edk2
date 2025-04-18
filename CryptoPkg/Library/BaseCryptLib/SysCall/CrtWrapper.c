@@ -460,7 +460,10 @@ qsort (
   // Use CRT-style malloc to cover BS and RT memory allocation.
   //
   Buffer = malloc (width);
-  ASSERT (Buffer != NULL);
+  if (Buffer == NULL) {
+    ASSERT (Buffer != NULL);
+    return;
+  }
 
   //
   // Re-use PerformQuickSort() function Implementation in EDKII BaseSortLib.

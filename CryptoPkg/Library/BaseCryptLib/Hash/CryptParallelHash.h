@@ -21,6 +21,9 @@ and related or neighboring rights to the source code in this file.
 http://creativecommons.org/publicdomain/zero/1.0/
 **/
 
+#ifndef CRYPT_PARALLEL_HASH_H_
+#define CRYPT_PARALLEL_HASH_H_
+
 #include "InternalCryptLib.h"
 
 #define KECCAK1600_WIDTH  1600
@@ -225,3 +228,5 @@ EFIAPI
 DispatchBlockToAp (
   VOID
   );
+
+#endif // CRYPT_PARALLEL_HASH_H_

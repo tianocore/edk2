@@ -26,13 +26,18 @@ UefiTestMain (
   UNIT_TEST_FRAMEWORK_HANDLE  Framework;
 
   DEBUG ((DEBUG_INFO, "%a v%a\n", UNIT_TEST_NAME, UNIT_TEST_VERSION));
-  CreateUnitTest (UNIT_TEST_NAME, UNIT_TEST_VERSION, &Framework);
+  Status = CreateUnitTest (UNIT_TEST_NAME, UNIT_TEST_VERSION, &Framework);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed in CreateUnitTestsfor BaseCryptLib Tests!  Status = %r\n", Status));
+    goto Done;
+  }
 
   //
   // Execute the tests.
   //
   Status = RunAllTestSuites (Framework);
 
+Done:
   if (Framework) {
     FreeUnitTestFramework (Framework);
   }
