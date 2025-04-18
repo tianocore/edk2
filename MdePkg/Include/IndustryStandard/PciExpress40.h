@@ -80,9 +80,11 @@ typedef struct {
 ///@}
 
 /// The Designated Vendor Specific Capability definitions
+///
 /// Based on section 7.9.6 of PCI Express Base Specification 4.0.
 ///@{
-#define PCI_EXPRESS_EXTENDED_CAPABILITY_DESIGNATED_VENDOR_SPECIFIC_ID  0x0023
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_DESIGNATED_VENDOR_SPECIFIC_ID    0x0023
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_DESIGNATED_VENDOR_SPECIFIC_VER1  0x1
 
 typedef union {
   struct {
@@ -106,6 +108,129 @@ typedef struct {
   PCI_EXPRESS_DESIGNATED_VENDOR_SPECIFIC_HEADER_2    DesignatedVendorSpecificHeader2;
   UINT8                                              DesignatedVendorSpecific[1];
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_DESIGNATED_VENDOR_SPECIFIC;
+///@}
+
+/// Data Link Feature Extended Capability Structure
+///
+/// Based on section 7.7.4 of PCI Express Base Specification 4.0
+///@{
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_DATA_LINK_FEATURE_ID    0x0025
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_DATA_LINK_FEATURE_VER1  0x1
+
+typedef union {
+  struct {
+    UINT32    Reserved1                : 1;
+    UINT32    ScrambleDisableSupported : 1;
+    UINT32    Reserved2                : 30;
+  } Bits;
+  UINT32    Uint32;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_DATA_LINK_FEATURE_CAPABILITY;
+
+typedef union {
+  struct {
+    UINT32    Reserved1       : 1;
+    UINT32    ScrambleDisable : 1;
+    UINT32    Reserved2       : 30;
+  } Bits;
+  UINT32    Uint32;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_DATA_LINK_FEATURE_CONTROL;
+
+typedef struct {
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER                          Header;
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_DATA_LINK_FEATURE_CAPABILITY    Capability;
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_DATA_LINK_FEATURE_CONTROL       Control;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_DATA_LINK_FEATURE;
+///@}
+
+/// Lane Margining at Receiver Extended Capability Structure
+///
+/// Based on section 7.7.6 of PCI Express Base Specification 4.0
+///@{
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_LANE_MARGINING_AT_RECEIVER_ID    0x0027
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_LANE_MARGINING_AT_RECEIVER_VER1  0x1
+
+typedef union {
+  struct {
+    UINT8    MaxLaneNumber : 5;
+    UINT8    Reserved      : 3;
+  } Bits;
+  UINT8    Uint8;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_LANE_MARGINING_CAPABILITY;
+
+typedef union {
+  struct {
+    UINT8    LaneNumber            : 5;
+    UINT8    RcvErrorCounterSelect : 2;
+    UINT8    LaneMarginStepSelect  : 1;
+  } Bits;
+  UINT8    Uint8;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_LANE_MARGINING_CONTROL;
+
+typedef union {
+  struct {
+    UINT8    MaxLanesReceivingTestPattern : 5;
+    UINT8    Reserved                     : 3;
+  } Bits;
+  UINT8    Uint8;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_LANE_MARGINING_STATUS;
+
+typedef struct {
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER                       Header;
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_LANE_MARGINING_CAPABILITY    Capability;
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_LANE_MARGINING_CONTROL       Control;
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_LANE_MARGINING_STATUS        Status;
+  UINT32                                                         ErrorCounter;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_LANE_MARGINING_AT_RECEIVER;
+///@}
+
+/// Page Request Interface Extended Capability Structure
+///
+/// Based on section 10.5.2 of PCI Express Base Specification 4.0
+///@{
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_PRI_ID    0x0013
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_PRI_VER1  0x1
+
+typedef union {
+  struct {
+    UINT32    PriRequestCapable     : 1;
+    UINT32    PriCompletionCapable  : 1;
+    UINT32    Page256RequestCapable : 1;
+    UINT32    Page512RequestCapable : 1;
+    UINT32    Page1KRequestCapable  : 1;
+    UINT32    Page2KRequestCapable  : 1;
+    UINT32    Page4KRequestCapable  : 1;
+    UINT32    Page8KRequestCapable  : 1;
+    UINT32    Reserved              : 24;
+  } Bits;
+  UINT32    Uint32;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_PRI_CAPABILITY;
+
+typedef union {
+  struct {
+    UINT32    PriEnable : 1;
+    UINT32    PriReset  : 1;
+    UINT32    Reserved  : 30;
+  } Bits;
+  UINT32    Uint32;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_PRI_CONTROL;
+
+typedef union {
+  struct {
+    UINT32    OutstandingPageRequest : 1;
+    UINT32    ResponseFailure        : 1;
+    UINT32    Stopped                : 1;
+    UINT32    PpRqIdParity           : 1;
+    UINT32    Reserved               : 28;
+  } Bits;
+  UINT32    Uint32;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_PRI_STATUS;
+
+typedef struct {
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER            Header;
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_PRI_CAPABILITY    Capability;
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_PRI_CONTROL       Control;
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_PRI_STATUS        Status;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_PRI;
 ///@}
 
 #pragma pack()
