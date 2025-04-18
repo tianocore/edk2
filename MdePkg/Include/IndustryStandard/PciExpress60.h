@@ -116,6 +116,69 @@ typedef union {
   UINT32    Uint32;
 } PCI_REG_PCIE_DEVICE_STATUS3;
 
+typedef struct {
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER    Header;
+  PCI_REG_PCIE_DEVICE_CAPABILITY3             Capabilities;
+  PCI_REG_PCIE_DEVICE_CONTROL3                Control;
+  PCI_REG_PCIE_DEVICE_STATUS3                 Status;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_DEVICE3;
+
+/// Flit Logging Extended Capability Structure
+///
+/// Based on section 7.7.8 of PCI Express Base Specification 6.0
+///@{
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_FLIT_LOGGING_ID    0x0032
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_FLIT_LOGGING_VER1  0x1
+
+typedef struct {
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER    Header;
+  UINT32                                      FlitLoggingCapabilities;
+  UINT32                                      FlitLoggingControl;
+  UINT32                                      FlitLoggingStatus;
+  UINT32                                      FlitMask;
+  UINT32                                      FlitErrorData1;
+  UINT32                                      FlitErrorData2;
+  UINT32                                      FlitErrorData3;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_FLIT_LOGGING;
+///@}
+
+/// Data Object Exchange Extended Capability Structure
+///
+/// Based on section 7.9.24 of PCI Express Base Specification 6.0
+///@{
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_DATA_OBJECT_EXCHANGE_ID    0x002E
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_DATA_OBJECT_EXCHANGE_VER1  0x1
+
+typedef struct {
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER    Header;
+  UINT32                                      DoeCapabilities;
+  UINT16                                      DoeControl;
+  UINT16                                      DoeStatus;
+  UINT32                                      UncorrectableErrorMask;
+  UINT32                                      UncorrectableErrorSeverity;
+  UINT32                                      CorrectableErrorMask;
+  UINT32                                      DoeSendObjectControl;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_DATA_OBJECT_EXCHANGE;
+///@}
+
+/// Integrity Data Encryption Extended Capability Structure
+///
+/// Based on section 7.9.26 of PCI Express Base Specification 6.0
+///@{
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_INTEGRITY_DATA_ENCRYPTION_ID    0x0030
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_INTEGRITY_DATA_ENCRYPTION_VER1  0x1
+
+typedef struct {
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER    Header;
+  UINT32                                      IdeCapabilities;
+  UINT32                                      IdeControl;
+  UINT32                                      IdeStatus;
+  UINT32                                      IdeSendMcCapabilities;
+  UINT32                                      IdeSendMcControl;
+  UINT32                                      IdeSendMcStatus;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_INTEGRITY_DATA_ENCRYPTION;
+///@}
+
 #pragma pack()
 
 #endif

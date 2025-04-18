@@ -436,6 +436,9 @@ typedef struct {
 #define EFI_PCIE_CAPABILITY_ID_SRIOV  0x10
 #define EFI_PCIE_CAPABILITY_ID_MRIOV  0x11
 
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_SRIOV_ID    0x0010
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_SRIOV_VER1  0x1
+
 typedef struct {
   UINT32    CapabilityHeader;
   UINT32    Capability;
@@ -735,6 +738,39 @@ typedef struct {
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_TPH;
 
 #define GET_TPH_TABLE_SIZE(x)  ((x->TphRequesterCapability & 0x7FF0000)>>16) * sizeof(UINT16)
+
+/// Address Translation Services Extended Capability Structure
+///
+/// Based on section 5.1 of PCI Express Address Translation Services Specification 1.1
+///@{
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_ATS_ID    0x000F
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_ATS_VER1  0x1
+
+typedef union {
+  struct {
+    UINT16    InvalidateQueueDepth      : 5;
+    UINT16    Reserved                  : 9;
+    UINT16    GlobalInvalidateSupported : 1;
+    UINT16    Reserved2                 : 1;
+  } Bits;
+  UINT16    Uint16;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_ATS_CAPABILITY;
+
+typedef union {
+  struct {
+    UINT16    EnableATS        : 1;
+    UINT16    GlobalInvalidate : 1;
+    UINT16    Reserved         : 14;
+  } Bits;
+  UINT16    Uint16;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_ATS_CONTROL;
+
+typedef struct {
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER            Header;
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_ATS_CAPABILITY    Capability;
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_ATS_CONTROL       Control;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_ATS;
+///@}
 
 #pragma pack()
 
