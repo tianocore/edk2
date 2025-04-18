@@ -28,6 +28,8 @@
 
 #include <IndustryStandard/ArmFfaSvc.h>
 
+#include <Guid/ArmFfaRxTxBufferInfo.h>
+
 #include "ArmFfaCommon.h"
 #include "ArmFfaRxTxMap.h"
 

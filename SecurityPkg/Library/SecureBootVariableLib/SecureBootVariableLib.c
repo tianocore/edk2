@@ -23,6 +23,21 @@
 #include <Library/SecureBootVariableLib.h>
 #include <Library/PlatformPKProtectionLib.h>
 
+//
+// This is the minimum size of a EFI_SIGNATURE_LIST and data and still be valid.
+//
+// The UEFI specification defines this as:
+//  Each signature list is a list of signatures of one type, identified by SignatureType.
+//  The signature list contains a header and then an array of zero or more signatures in
+//  the format specified by the header. The size of each signature in the signature list
+//  is specified by SignatureSize.
+//
+// This is the size of a signature list with some data in it. Effectively 44 bytes are
+// required to set the DBX. However in reality, the size of a real payload will be larger
+// since this miniumum size does not consider the SIGNATURE_LIST
+//
+#define MINIMUM_VALID_SIGNATURE_LIST  (sizeof(EFI_SIGNATURE_LIST) + sizeof(EFI_SIGNATURE_DATA) - 1)
+
 // This time can be used when deleting variables, as it should be greater than any variable time.
 EFI_TIME  mMaxTimestamp = {
   0xFFFF,     // Year
@@ -816,12 +831,27 @@ SetSecureBootVariablesToDefault (
   // dbx is a good place to start.
   Data     = (UINT8 *)SecureBootPayload->DbxPtr;
   DataSize = SecureBootPayload->DbxSize;
-  Status   = EnrollFromInput (
+  if (DataSize > MINIMUM_VALID_SIGNATURE_LIST) {
+    //
+    // Ensure that that the DataSize meets a minimum allowed size before being set.
+    //
+    DEBUG ((DEBUG_INFO, "%a - Setting Dbx\n", __func__));
+    Status = EnrollFromInput (
                EFI_IMAGE_SECURITY_DATABASE1,
                &gEfiImageSecurityDatabaseGuid,
                DataSize,
                Data
                );
+  } else if ((DataSize == 0) || (DataSize == sizeof (EFI_SIGNATURE_LIST))) {
+    //
+    // The DBX is allowed to be empty by default
+    //
+    DEBUG ((DEBUG_INFO, "%a - Skipping Dbx - DataSize(%u)\n", __func__, DataSize));
+    Status = EFI_SUCCESS;
+  } else {
+    DEBUG ((DEBUG_ERROR, "%a - Invalid Dbx size %u\n", __func__, DataSize));
+    Status = EFI_INVALID_PARAMETER;
+  }
 
   // If that went well, try the db (make sure to pick the right one!).
   if (!EFI_ERROR (Status)) {
