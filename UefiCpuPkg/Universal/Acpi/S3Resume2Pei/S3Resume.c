@@ -1017,7 +1017,7 @@ S3RestoreConfig2 (
   BOOLEAN                        Build4GPageTableOnly;
   BOOLEAN                        InterruptStatus;
   IA32_CR0                       Cr0;
-  EDKII_PEI_MP_SERVICES2_PPI     *MpService2Ppi;
+  EFI_PEI_MP_SERVICES2_PPI       *MpService2Ppi;
   MTRR_SETTINGS                  MtrrTable;
 
   TempAcpiS3Context                 = 0;
@@ -1115,7 +1115,7 @@ S3RestoreConfig2 (
     // Get MP Services2 Ppi to pass it to Smm S3.
     //
     Status = PeiServicesLocatePpi (
-               &gEdkiiPeiMpServices2PpiGuid,
+               &gEfiPeiMpServices2PpiGuid,
                0,
                NULL,
                (VOID **)&MpService2Ppi
