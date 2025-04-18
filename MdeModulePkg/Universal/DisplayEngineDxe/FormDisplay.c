@@ -2164,12 +2164,13 @@ DisplayMenuString (
   // First print the highlight string.
   //
   SetDisplayAttribute (MenuOption, TRUE);
-  Length = PrintStringAt (Col, Row, String);
+  PrintStringAt (Col, Row, String);
 
   //
   // Second, clean the empty after the string.
   //
   SetDisplayAttribute (MenuOption, FALSE);
+  Length = GetStringWidth (String) / 2 - 1;
   PrintStringAtWithWidth (Col + Length, Row, L"", Width - Length);
 }
 
