@@ -997,6 +997,14 @@
   # @Prompt Enable process non-reset capsule image at runtime.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportProcessCapsuleAtRuntime|FALSE|BOOLEAN|0x00010079
 
+  ## Indicates whether PCI I/O Space BARs should be ignored.
+  #  This PCD allows platforms that only support MMIO BARs and not I/O Space BARs to
+  #  ignore I/O Space requests.<BR><BR>
+  #   TRUE  - Ignore BARs requesting I/O Space.<BR>
+  #   FALSE - Do not ignore BARs requesting I/O Space.<BR>
+  # @Prompt Ignore I/O Space BARs
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciIgnoreIoSpaceBars|FALSE|BOOLEAN|0x0001007A
+
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.ARM, PcdsFeatureFlag.AARCH64, PcdsFeatureFlag.LOONGARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom|FALSE|BOOLEAN|0x0001003a
 
