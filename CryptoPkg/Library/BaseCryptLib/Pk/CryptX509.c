@@ -447,6 +447,14 @@ InternalX509GetNIDName (
   }
 
   EntryData = X509_NAME_ENTRY_get_data (Entry);
+  if (EntryData == NULL) {
+    //
+    // Fail to retrieve name entry data
+    //
+    *CommonNameSize = 0;
+    ReturnStatus    = RETURN_NOT_FOUND;
+    goto _Exit;
+  }
 
   Length = ASN1_STRING_to_UTF8 (&UTF8Name, EntryData);
   if (Length < 0) {
@@ -807,6 +815,8 @@ X509GetTBSCert (
   UINT32       ObjClass;
   UINTN        Length;
   UINTN        Inf;
+
+  Asn1Tag = (UINT32)V_ASN1_UNDEF;
 
   //
   // Check input parameters.
