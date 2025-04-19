@@ -580,6 +580,10 @@ BdsFormalizeOSIndicationVariable (
     OsIndicationSupport |= EFI_OS_INDICATIONS_FILE_CAPSULE_DELIVERY_SUPPORTED;
   }
 
+  if (PcdGetBool (PcdCapsuleFmpSupport)) {
+    OsIndicationSupport |= EFI_OS_INDICATIONS_FMP_CAPSULE_SUPPORTED;
+  }
+
   Status = gRT->SetVariable (
                   EFI_OS_INDICATIONS_SUPPORT_VARIABLE_NAME,
                   &gEfiGlobalVariableGuid,
