@@ -9,6 +9,7 @@
 **/
 
 #include <Library/BaseMemoryLib.h>
+#include <Library/FdtLib.h>
 #include "CmObjectDescUtility.h"
 #include "FdtHwInfoParser.h"
 #include "Arm/Gic/ArmGicDispatcher.h"
@@ -76,10 +77,10 @@ GicRIntcNodeParser (
 
   // The "#redistributor-regions" property is optional.
   // It indicates the number of GicR.
-  Data = fdt_getprop (Fdt, GicIntcNode, "#redistributor-regions", &DataSize);
+  Data = FdtGetProp (Fdt, GicIntcNode, "#redistributor-regions", &DataSize);
   if ((Data != NULL) && (DataSize == sizeof (UINT32))) {
     // If available, must be on one cell.
-    RedistReg = fdt32_to_cpu (*(UINT32 *)Data);
+    RedistReg = Fdt32ToCpu (*(UINT32 *)Data);
   } else {
     // The DT Spec says GicR is mandatory so we will
     // always have one.
@@ -124,7 +125,7 @@ GicRIntcNodeParser (
       }
   */
   RegSize = (AddressCells + SizeCells) * sizeof (UINT32);
-  Data    = fdt_getprop (Fdt, GicIntcNode, "reg", &DataSize);
+  Data    = FdtGetProp (Fdt, GicIntcNode, "reg", &DataSize);
   if ((Data == NULL)  ||
       (DataSize < 0)  ||
       ((DataSize % RegSize) != 0))
@@ -140,17 +141,17 @@ GicRIntcNodeParser (
     ZeroMem (&GicRInfo, sizeof (CM_ARM_GIC_REDIST_INFO));
 
     if (AddressCells == 2) {
-      GicRInfo.DiscoveryRangeBaseAddress = fdt64_to_cpu (*(UINT64 *)Data);
+      GicRInfo.DiscoveryRangeBaseAddress = Fdt64ToCpu (*(UINT64 *)Data);
     } else {
-      GicRInfo.DiscoveryRangeBaseAddress = fdt32_to_cpu (*(UINT32 *)Data);
+      GicRInfo.DiscoveryRangeBaseAddress = Fdt32ToCpu (*(UINT32 *)Data);
     }
 
     Data += sizeof (UINT32) * AddressCells;
 
     if (SizeCells == 2) {
-      GicRInfo.DiscoveryRangeLength = (UINT32)fdt64_to_cpu (*(UINT64 *)Data);
+      GicRInfo.DiscoveryRangeLength = (UINT32)Fdt64ToCpu (*(UINT64 *)Data);
     } else {
-      GicRInfo.DiscoveryRangeLength = fdt32_to_cpu (*(UINT32 *)Data);
+      GicRInfo.DiscoveryRangeLength = Fdt32ToCpu (*(UINT32 *)Data);
     }
 
     // Add the CmObj to the Configuration Manager.

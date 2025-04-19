@@ -14,11 +14,10 @@
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/FdtLib.h>
 #include <Library/IoLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/QemuFwCfgLib.h>
-
-#include <libfdt.h>
 
 #include "QemuFwCfgLibMmioInternal.h"
 
@@ -120,7 +119,7 @@ QemuFwCfgInitialize (
   //
   // Make sure we have a valid device tree blob
   //
-  ASSERT (fdt_check_header (DeviceTreeBase) == 0);
+  ASSERT (FdtCheckHeader (DeviceTreeBase) == 0);
 
   //
   // Create resouce memory
@@ -129,7 +128,7 @@ QemuFwCfgInitialize (
   ASSERT (FwCfgResource != NULL);
 
   for (Prev = 0; ; Prev = Node) {
-    Node = fdt_next_node (DeviceTreeBase, Prev, NULL);
+    Node = FdtNextNode (DeviceTreeBase, Prev, NULL);
     if (Node < 0) {
       break;
     }
@@ -137,7 +136,7 @@ QemuFwCfgInitialize (
     //
     // Check for memory node
     //
-    Type = fdt_getprop (DeviceTreeBase, Node, "compatible", &Len);
+    Type = FdtGetProp (DeviceTreeBase, Node, "compatible", &Len);
     if ((Type != NULL) &&
         (AsciiStrnCmp (Type, "qemu,fw-cfg-mmio", Len) == 0))
     {
@@ -145,7 +144,7 @@ QemuFwCfgInitialize (
       // Get the 'reg' property of this node. For now, we will assume
       // two 8 byte quantities for base and size, respectively.
       //
-      Reg = fdt_getprop (DeviceTreeBase, Node, "reg", &Len);
+      Reg = FdtGetProp (DeviceTreeBase, Node, "reg", &Len);
       if ((Reg != 0) && (Len == (2 * sizeof (UINT64)))) {
         FwCfgDataAddress     = SwapBytes64 (Reg[0]);
         FwCfgDataSize        = 8;

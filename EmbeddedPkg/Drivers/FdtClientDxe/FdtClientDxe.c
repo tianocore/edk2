@@ -9,10 +9,10 @@
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/FdtLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/HobLib.h>
-#include <libfdt.h>
 
 #include <Guid/Fdt.h>
 #include <Guid/FdtHob.h>
@@ -38,7 +38,7 @@ GetNodeProperty (
   ASSERT (mDeviceTreeBase != NULL);
   ASSERT (Prop != NULL);
 
-  *Prop = fdt_getprop (mDeviceTreeBase, Node, PropertyName, &Len);
+  *Prop = FdtGetProp (mDeviceTreeBase, Node, PropertyName, &Len);
   if (*Prop == NULL) {
     return EFI_NOT_FOUND;
   }
@@ -65,7 +65,7 @@ SetNodeProperty (
 
   ASSERT (mDeviceTreeBase != NULL);
 
-  Ret = fdt_setprop (mDeviceTreeBase, Node, PropertyName, Prop, PropSize);
+  Ret = FdtSetProp (mDeviceTreeBase, Node, PropertyName, Prop, PropSize);
   if (Ret != 0) {
     return EFI_DEVICE_ERROR;
   }
@@ -87,7 +87,7 @@ IsNodeEnabled (
   // may occur here. If the status property is present, check whether
   // it is set to 'ok' or 'okay', anything else is treated as 'disabled'.
   //
-  NodeStatus = fdt_getprop (mDeviceTreeBase, Node, "status", &Len);
+  NodeStatus = FdtGetProp (mDeviceTreeBase, Node, "status", &Len);
   if (NodeStatus == NULL) {
     return TRUE;
   }
@@ -121,7 +121,7 @@ FindNextCompatibleNode (
   ASSERT (Node != NULL);
 
   for (Prev = PrevNode; ; Prev = Next) {
-    Next = fdt_next_node (mDeviceTreeBase, Prev, NULL);
+    Next = FdtNextNode (mDeviceTreeBase, Prev, NULL);
     if (Next < 0) {
       break;
     }
@@ -130,7 +130,7 @@ FindNextCompatibleNode (
       continue;
     }
 
-    Type = fdt_getprop (mDeviceTreeBase, Next, "compatible", &Len);
+    Type = FdtGetProp (mDeviceTreeBase, Next, "compatible", &Len);
     if (Type == NULL) {
       continue;
     }
@@ -257,12 +257,12 @@ FindNextMemoryNodeReg (
   ASSERT (Node != NULL);
 
   for (Prev = PrevNode; ; Prev = Next) {
-    Next = fdt_next_node (mDeviceTreeBase, Prev, NULL);
+    Next = FdtNextNode (mDeviceTreeBase, Prev, NULL);
     if (Next < 0) {
       break;
     }
 
-    DeviceType = fdt_getprop (mDeviceTreeBase, Next, "device_type", &Len);
+    DeviceType = FdtGetProp (mDeviceTreeBase, Next, "device_type", &Len);
     if ((DeviceType == NULL) || (AsciiStrCmp (DeviceType, "memory") != 0)) {
       continue;
     }
@@ -342,9 +342,9 @@ GetOrInsertChosenNode (
   ASSERT (mDeviceTreeBase != NULL);
   ASSERT (Node != NULL);
 
-  NewNode = fdt_path_offset (mDeviceTreeBase, "/chosen");
+  NewNode = FdtPathOffset (mDeviceTreeBase, "/chosen");
   if (NewNode < 0) {
-    NewNode = fdt_add_subnode (mDeviceTreeBase, 0, "/chosen");
+    NewNode = FdtAddSubnode (mDeviceTreeBase, 0, "/chosen");
   }
 
   if (NewNode < 0) {
@@ -422,7 +422,7 @@ InitializeFdtClientDxe (
 
   DeviceTreeBase = (VOID *)(UINTN)*(UINT64 *)GET_GUID_HOB_DATA (Hob);
 
-  if (fdt_check_header (DeviceTreeBase) != 0) {
+  if (FdtCheckHeader (DeviceTreeBase) != 0) {
     DEBUG ((
       DEBUG_ERROR,
       "%a: No DTB found @ 0x%p\n",

@@ -12,11 +12,11 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
+#include <Library/FdtLib.h>
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/FdtSerialPortAddressLib.h>
-#include <libfdt.h>
 
 #include <Guid/EarlyPL011BaseAddress.h>
 #include <Guid/FdtHob.h>
@@ -59,13 +59,13 @@ PlatformPeim (
 
   Base = (VOID *)(UINTN)PcdGet64 (PcdDeviceTreeInitialBaseAddress);
   ASSERT (Base != NULL);
-  ASSERT (fdt_check_header (Base) == 0);
+  ASSERT (FdtCheckHeader (Base) == 0);
 
-  FdtSize  = fdt_totalsize (Base) + PcdGet32 (PcdDeviceTreeAllocationPadding);
+  FdtSize  = FdtTotalSize (Base) + PcdGet32 (PcdDeviceTreeAllocationPadding);
   FdtPages = EFI_SIZE_TO_PAGES (FdtSize);
   NewBase  = AllocatePages (FdtPages);
   ASSERT (NewBase != NULL);
-  fdt_open_into (Base, NewBase, EFI_PAGES_TO_SIZE (FdtPages));
+  FdtOpenInto (Base, NewBase, EFI_PAGES_TO_SIZE (FdtPages));
 
   FdtHobData = BuildGuidHob (&gFdtHobGuid, sizeof *FdtHobData);
   ASSERT (FdtHobData != NULL);
@@ -132,7 +132,7 @@ PlatformPeim (
   Parent = 0;
 
   for (Prev = Depth = 0; ; Prev = Node) {
-    Node = fdt_next_node (Base, Prev, &Depth);
+    Node = FdtNextNode (Base, Prev, &Depth);
     if (Node < 0) {
       break;
     }
@@ -141,7 +141,7 @@ PlatformPeim (
       Parent = Node;
     }
 
-    Compatible = fdt_getprop (Base, Node, "compatible", &Len);
+    Compatible = FdtGetProp (Base, Node, "compatible", &Len);
 
     //
     // Iterate over the NULL-separated items in the compatible string
@@ -152,12 +152,12 @@ PlatformPeim (
       if (FeaturePcdGet (PcdTpm2SupportEnabled) &&
           (AsciiStrCmp (CompItem, "tcg,tpm-tis-mmio") == 0))
       {
-        RegProp = fdt_getprop (Base, Node, "reg", &Len);
+        RegProp = FdtGetProp (Base, Node, "reg", &Len);
         ASSERT (Len == 8 || Len == 16);
         if (Len == 8) {
-          TpmBase = fdt32_to_cpu (RegProp[0]);
+          TpmBase = Fdt32ToCpu (RegProp[0]);
         } else if (Len == 16) {
-          TpmBase = fdt64_to_cpu (ReadUnaligned64 ((UINT64 *)RegProp));
+          TpmBase = Fdt64ToCpu (ReadUnaligned64 ((UINT64 *)RegProp));
         }
 
         if (Depth > 1) {
@@ -168,7 +168,7 @@ PlatformPeim (
           // tuple, where the child base and the size use the same number of
           // cells as the 'reg' property above, and the parent base uses 2 cells
           //
-          RangesProp = fdt_getprop (Base, Parent, "ranges", &RangesLen);
+          RangesProp = FdtGetProp (Base, Parent, "ranges", &RangesLen);
           ASSERT (RangesProp != NULL);
 
           //
@@ -189,16 +189,16 @@ PlatformPeim (
             }
 
             if (Len == 8) {
-              TpmBase -= fdt32_to_cpu (RangesProp[0]);
+              TpmBase -= Fdt32ToCpu (RangesProp[0]);
             } else {
-              TpmBase -= fdt64_to_cpu (ReadUnaligned64 ((UINT64 *)RangesProp));
+              TpmBase -= Fdt64ToCpu (ReadUnaligned64 ((UINT64 *)RangesProp));
             }
 
             //
             // advance RangesProp to the parent bus address
             //
             RangesProp = (UINT32 *)((UINT8 *)RangesProp + Len / 2);
-            TpmBase   += fdt64_to_cpu (ReadUnaligned64 ((UINT64 *)RangesProp));
+            TpmBase   += Fdt64ToCpu (ReadUnaligned64 ((UINT64 *)RangesProp));
           }
         }
 

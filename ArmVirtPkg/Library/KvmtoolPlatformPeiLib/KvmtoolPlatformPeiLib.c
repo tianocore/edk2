@@ -14,10 +14,10 @@
 
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
+#include <Library/FdtLib.h>
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PeiServicesLib.h>
-#include <libfdt.h>
 
 /** Initialise Platform HOBs
 
@@ -39,12 +39,12 @@ PlatformPeim (
   UINT64  *UartHobData;
 
   Base = (VOID *)(UINTN)PcdGet64 (PcdDeviceTreeInitialBaseAddress);
-  if ((Base == NULL) || (fdt_check_header (Base) != 0)) {
+  if ((Base == NULL) || (FdtCheckHeader (Base) != 0)) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  FdtSize  = fdt_totalsize (Base) + PcdGet32 (PcdDeviceTreeAllocationPadding);
+  FdtSize  = FdtTotalSize (Base) + PcdGet32 (PcdDeviceTreeAllocationPadding);
   FdtPages = EFI_SIZE_TO_PAGES (FdtSize);
   NewBase  = AllocatePages (FdtPages);
   if (NewBase == NULL) {
@@ -52,7 +52,7 @@ PlatformPeim (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  fdt_open_into (Base, NewBase, EFI_PAGES_TO_SIZE (FdtPages));
+  FdtOpenInto (Base, NewBase, EFI_PAGES_TO_SIZE (FdtPages));
 
   FdtHobData = BuildGuidHob (&gFdtHobGuid, sizeof (*FdtHobData));
   if (FdtHobData == NULL) {

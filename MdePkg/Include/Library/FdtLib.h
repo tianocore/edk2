@@ -421,6 +421,24 @@ FdtSubnodeOffsetNameLen (
   );
 
 /**
+  Returns a offset of first node which matches the given name.
+
+  @param[in] Fdt             The pointer to FDT blob.
+  @param[in] ParentOffset    The offset to the node which start find under.
+  @param[in] Name            The name to search the node with the name.
+
+  @return The offset to node offset with given node name.
+
+ **/
+INT32
+EFIAPI
+FdtSubnodeOffset (
+  IN CONST VOID   *Fdt,
+  IN INT32        ParentOffset,
+  IN CONST CHAR8  *Name
+  );
+
+/**
   Returns the number of memory reserve map entries.
 
   @param[in] Fdt             The pointer to FDT blob.
@@ -538,6 +556,49 @@ FdtStringListContains (
 CONST FDT_PROPERTY *
 EFIAPI
 FdtGetProperty (
+  IN CONST VOID   *Fdt,
+  IN INT32        NodeOffset,
+  IN CONST CHAR8  *Name,
+  IN INT32        *Length
+  );
+
+/**
+  Returns a property with the given name from the given node.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     The offset to the given node.
+  @param[in] Name           The name to the property which need be searched
+  @param[in] Length         The length to the size of the property found.
+
+  @return The property to the structure of the found property. Since the data
+          come from FDT blob, it's encoding with big-endian.
+
+**/
+FDT_PROPERTY *
+EFIAPI
+FdtGetPropertyW (
+  IN CONST VOID   *Fdt,
+  IN INT32        NodeOffset,
+  IN CONST CHAR8  *Name,
+  IN INT32        *Length
+  );
+
+/**
+  Returns the value of a given property.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     The offset to the given node.
+  @param[in] Name           The name to the property which need be searched
+  @param[in] Length         The length to the size of the property found.
+
+  @return Pointer to the value of the property.
+          Since the data comes from the FDT blob, it's encoded as big-endian.
+          NULL on error, with error-code stored at Length (if non-NULL).
+
+**/
+CONST VOID *
+EFIAPI
+FdtGetProp (
   IN CONST VOID   *Fdt,
   IN INT32        NodeOffset,
   IN CONST CHAR8  *Name,
@@ -663,7 +724,7 @@ FdtAddSubnode (
 **/
 INT32
 EFIAPI
-FdtSetProperty (
+FdtSetProp (
   IN VOID         *Fdt,
   IN INT32        NodeOffset,
   IN CONST CHAR8  *Name,
