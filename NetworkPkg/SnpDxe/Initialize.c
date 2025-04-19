@@ -128,11 +128,13 @@ PxeInit (
       );
 
     if (Snp->TxRxBuffer != NULL) {
-      Snp->PciIo->FreeBuffer (
-                    Snp->PciIo,
-                    SNP_MEM_PAGES (Snp->TxRxBufferSize),
-                    (VOID *)Snp->TxRxBuffer
-                    );
+      if (Snp->TxRxBufferSize != 0) {
+        Snp->PciIo->FreeBuffer (
+                      Snp->PciIo,
+                      SNP_MEM_PAGES (Snp->TxRxBufferSize),
+                      (VOID *)Snp->TxRxBuffer
+                      );
+      }
     }
 
     Snp->TxRxBuffer = NULL;
@@ -195,11 +197,6 @@ SnpUndi32Initialize (
   Snp = EFI_SIMPLE_NETWORK_DEV_FROM_THIS (This);
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-
-  if (Snp == NULL) {
-    EfiStatus = EFI_INVALID_PARAMETER;
-    goto ON_EXIT;
-  }
 
   switch (Snp->Mode.State) {
     case EfiSimpleNetworkStarted:
