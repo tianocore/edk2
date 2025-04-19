@@ -761,22 +761,24 @@ ArmFfaLibCommonInit (
 
   gFfaSupported = FALSE;
 
-  ZeroMem (&FfaArgs, sizeof (ARM_SMC_ARGS));
-  FfaArgs.Arg0 = SMCCC_VERSION;
-  ArmCallFfa (&FfaArgs);
-  if ((INT32)FfaArgs.Arg0 < 0) {
-    DEBUG ((DEBUG_ERROR, "%a: SMCCC_VERSION not supported\n", __func__));
-    return EFI_UNSUPPORTED;
-  }
+  if (PcdGetBool (PcdFfaLibConduitSmc)) {
+    ZeroMem (&FfaArgs, sizeof (ARM_SMC_ARGS));
+    FfaArgs.Arg0 = SMCCC_VERSION;
+    ArmCallFfa (&FfaArgs);
+    if ((INT32)FfaArgs.Arg0 < 0) {
+      DEBUG ((DEBUG_ERROR, "%a: SMCCC_VERSION not supported\n", __func__));
+      return EFI_UNSUPPORTED;
+    }
 
-  // According to SMCCC Specification v1.6 G BET0
-  // Table F0-1: Changelog: Starting from SMCCC_VERSION v1.2, the interface
-  // - Permits calls to use R4–R7 as return register
-  // - Permits calls to use X4–X17 as return registers
-  // - Permits calls to use X8–X17 as argument registers
-  if ((INT32)FfaArgs.Arg0 < 0x10002) {
-    DEBUG ((DEBUG_ERROR, "%a: SMCCC_VERSION %x < 1.2\n", __func__, (UINT32)FfaArgs.Arg0));
-    return EFI_UNSUPPORTED;
+    // According to SMCCC Specification v1.6 G BET0
+    // Table F0-1: Changelog: Starting from SMCCC_VERSION v1.2, the interface
+    // - Permits calls to use R4–R7 as return register
+    // - Permits calls to use X4–X17 as return registers
+    // - Permits calls to use X8–X17 as argument registers
+    if ((INT32)FfaArgs.Arg0 < 0x10002) {
+      DEBUG ((DEBUG_ERROR, "%a: SMCCC_VERSION %x < 1.2\n", __func__, (UINT32)FfaArgs.Arg0));
+      return EFI_UNSUPPORTED;
+    }
   }
 
   Status = ArmFfaLibGetVersion (
