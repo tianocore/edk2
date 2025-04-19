@@ -110,6 +110,9 @@ PxeBcDestroyIp4Children (
   )
 {
   ASSERT (Private != NULL);
+  if (Private == NULL) {
+    return;
+  }
 
   if (Private->ArpChild != NULL) {
     //
@@ -294,6 +297,9 @@ PxeBcDestroyIp6Children (
   )
 {
   ASSERT (Private != NULL);
+  if (Private == NULL) {
+    return;
+  }
 
   if (Private->Ip6Child != NULL) {
     //
@@ -565,6 +571,10 @@ PxeBcCreateIp4Children (
   EFI_IP4_MODE_DATA            Ip4ModeData;
   PXEBC_PRIVATE_PROTOCOL       *Id;
   EFI_SIMPLE_NETWORK_PROTOCOL  *Snp;
+
+  if (Private == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   if (Private->Ip4Nic != NULL) {
     //
