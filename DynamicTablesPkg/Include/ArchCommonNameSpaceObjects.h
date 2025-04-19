@@ -20,6 +20,11 @@
 
 #include <IndustryStandard/Tpm2Acpi.h>
 
+/**
+  The maximum number of SLIT localities supported by the SLIT table.
+*/
+#define EARCH_COMMON_SLIT_LOCALITY_MAX  16
+
 /** The EARCH_COMMON_OBJECT_ID enum describes the Object IDs
     in the Arch Common Namespace
 */
@@ -59,6 +64,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjPssInfo,                        ///< 32 - P-State status (PSS) Info
   EArchCommonObjPpcInfo,                        ///< 33 - P-State control (PPC) Info
   EArchCommonObjStaInfo,                        ///< 34 - _STA (Device Status) Info
+  EArchCommonObjSlitInfo,                       ///< 35 - SLIT Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -811,6 +817,20 @@ typedef struct CmArchCommonStaInfo {
   /// Device Status
   UINT32    DeviceStatus;
 } CM_ARCH_COMMON_STA_INFO;
+
+/**
+  A structure that describes the SLIT (System Locality Information Table)
+    information.
+
+    ID: EArchCommonObjSlitInfo
+*/
+typedef struct CmArchCommonSlitInfo {
+  /// The number of localities supported by the SLIT table.
+  UINT8    NumberOfSystemLocalities;
+
+  /// The distance between each pair of localities.
+  UINT8    Entity[EARCH_COMMON_SLIT_LOCALITY_MAX * EARCH_COMMON_SLIT_LOCALITY_MAX];
+} CM_ARCH_COMMON_SLIT_INFO;
 
 #pragma pack()
 

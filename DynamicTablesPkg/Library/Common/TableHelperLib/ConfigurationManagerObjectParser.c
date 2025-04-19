@@ -757,6 +757,23 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonStaInfoParser[] = {
   { "DeviceStatus", 4, "0x%x", NULL }
 };
 
+/** A parser for EArchCommonObjSlitInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonSlitInfoParser[] = {
+  {
+    "NumberOfSystemLocalities",
+    1,
+    "0x%x",
+    NULL
+  },
+  {
+    "Entity",
+    (EARCH_COMMON_SLIT_LOCALITY_MAX * EARCH_COMMON_SLIT_LOCALITY_MAX),
+    "0x%x",
+    NULL
+  }
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -795,6 +812,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjPssInfo,                     CmArchCommonPssInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPpcInfo,                     CmArchCommonPpcInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjStaInfo,                     CmArchCommonStaInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSlitInfo,                    CmArchCommonSlitInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
