@@ -108,7 +108,7 @@ SpiBusEntry (
       // Get SpiHc from the SpiHcHandles
       Status = gBS->HandleProtocol (
                       SpiHcHandles[HcIndex],
-                      &gEfiDevicePathProtocolGuid,
+                      &gEfiSpiHcProtocolGuid,
                       (VOID **)&SpiHc
                       );
 
