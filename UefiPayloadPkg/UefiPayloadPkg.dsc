@@ -170,6 +170,12 @@
   #
   HAND_OFF_FDT_ENABLE       = FALSE
 
+  #
+  # Change section alignment from default value in tools_def.txt to RUNTIME_PAGE_ALLOCATION_GRANULARITY
+  # for DXE_DRIVER, DXE_CORE, UEFI_DRIVER and UEFI_APPLICATION.
+  #
+  DEFINE FIX_DRIVERS_ALIGNMENT = FALSE
+
 [BuildOptions]
   *_*_*_CC_FLAGS                 = -D DISABLE_NEW_DEPRECATED_INTERFACES
 !if $(USE_CBMEM_FOR_CONSOLE) == FALSE
@@ -194,6 +200,47 @@
 
 [BuildOptions.AARCH64.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x10000
+
+!if $(FIX_DRIVERS_ALIGNMENT) == TRUE
+  [BuildOptions.common.EDKII.DXE_DRIVER, BuildOptions.common.EDKII.DXE_CORE]
+    GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x1000
+    XCODE:*_*_*_DLINK_FLAGS    = -seg1addr 0x1000 -segalign 0x1000
+    XCODE:*_*_*_MTOC_FLAGS     = -align 0x1000
+    CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:4096
+    MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096
+
+  [BuildOptions.common.EDKII.UEFI_DRIVER, BuildOptions.common.EDKII.UEFI_APPLICATION]
+    GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x1000
+    XCODE:*_*_*_DLINK_FLAGS    = -seg1addr 0x1000 -segalign 0x1000
+    XCODE:*_*_*_MTOC_FLAGS     = -align 0x1000
+    CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:4096
+    MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096
+
+  [BuildOptions.IA32.EDKII.DXE_DRIVER, BuildOptions.X64.EDKII.DXE_DRIVER]
+    GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x1000
+
+  [BuildOptions.IA32.EDKII.DXE_CORE, BuildOptions.X64.EDKII.DXE_CORE]
+    GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x1000
+
+  [BuildOptions.IA32.EDKII.UEFI_DRIVER, BuildOptions.X64.EDKII.UEFI_DRIVER]
+    GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x1000
+
+  [BuildOptions.IA32.EDKII.UEFI_APPLICATION, BuildOptions.X64.EDKII.UEFI_APPLICATION]
+    GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x1000
+
+  [BuildOptions.AARCH64.EDKII.DXE_DRIVER]
+    GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x10000
+
+  [BuildOptions.AARCH64.EDKII.DXE_CORE]
+    GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x10000
+
+  [BuildOptions.AARCH64.EDKII.UEFI_DRIVER]
+    GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x10000
+
+  [BuildOptions.AARCH64.EDKII.UEFI_APPLICATION]
+    GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x10000
+!endif
+
 
 ################################################################################
 #
