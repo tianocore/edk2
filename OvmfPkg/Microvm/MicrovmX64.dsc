@@ -656,6 +656,8 @@
   # Set ConfidentialComputing defaults
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
 
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform.

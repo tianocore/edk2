@@ -517,6 +517,8 @@
 
 !include OvmfPkg/Include/Dsc/OvmfDisplayPcds.dsc.inc
 
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform.

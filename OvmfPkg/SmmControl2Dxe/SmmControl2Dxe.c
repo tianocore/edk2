@@ -202,12 +202,17 @@ SmmControl2DxeEntryPoint (
   //
   SmiEnableVal = IoRead32 (mSmiEnable);
   if ((SmiEnableVal & ICH9_SMI_EN_APMC_EN) != 0) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: this Q35 implementation lacks SMI\n",
-      __func__
-      ));
-    goto FatalError;
+    if (FeaturePcdGet (PcdStandaloneMmEnable) && ((SmiEnableVal & ICH9_SMI_EN_GBL_SMI_EN) == 0)) {
+      //
+      // This platform does seems to have enabled nor support SMI
+      //
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: this Q35 implementation lacks SMI\n",
+        __func__
+        ));
+      goto FatalError;
+    }
   }
 
   //

@@ -533,6 +533,8 @@
 
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock|1000000000
 
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform.
