@@ -33,7 +33,7 @@ TPM2_DEVICE_INTERFACE  mFfaTpm2InternalTpm2Device = {
 **/
 EFI_STATUS
 EFIAPI
-Tpm2DeviceLibFfaConstructor (
+Tpm2InstanceLibFfaConstructor (
   VOID
   )
 {
