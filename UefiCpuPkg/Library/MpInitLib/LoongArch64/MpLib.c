@@ -727,9 +727,12 @@ WakeUpAP (
             LOONGARCH_IOCSR_IPI_SEND,
             (IOCSR_MBUF_SEND_BLOCKING |
              (mProcessorResourceData->ApicId[Index] << IOCSR_MBUF_SEND_CPU_SHIFT) |
-             0x2 // Bit 2
+             0x2 // SMP_CALL_FUNCTION
             )
             );
+
+          MemoryFence ();
+          MicroSecondDelay (100); // Delay 100ms after send IPI.
         }
       }
     } else {
@@ -757,15 +760,18 @@ WakeUpAP (
           *(UINT32 *)CpuData->StartupApSignal = WAKEUP_AP_SIGNAL;
 
           //
-          // Send IPI 4 interrupt to wake up APs.
+          // Send IPI 2 interrupt to wake up APs.
           //
           IoCsrWrite64 (
             LOONGARCH_IOCSR_IPI_SEND,
             (IOCSR_MBUF_SEND_BLOCKING |
              (CpuInfoInHob[Index].ApicId << IOCSR_MBUF_SEND_CPU_SHIFT) |
-             0x2 // Bit 2
+             0x1 // SMP_RESCHEDULE
             )
             );
+
+          MemoryFence ();
+          MicroSecondDelay (100); // Delay 100ms after send IPI.
         }
       }
 
@@ -789,15 +795,18 @@ WakeUpAP (
       *(UINT32 *)CpuData->StartupApSignal = WAKEUP_AP_SIGNAL;
 
       //
-      // Send IPI 4 interrupt to wake up APs.
+      // Send IPI 2 interrupt to wake up APs.
       //
       IoCsrWrite64 (
         LOONGARCH_IOCSR_IPI_SEND,
         (IOCSR_MBUF_SEND_BLOCKING |
          (CpuInfoInHob[ProcessorNumber].ApicId << IOCSR_MBUF_SEND_CPU_SHIFT) |
-         0x2 // Bit 2
+         0x1 // SMP_RESCHEDULE
         )
         );
+
+      MemoryFence ();
+      MicroSecondDelay (100); // Delay 100ms after send IPI.
 
       //
       // Wait specified AP waken up

@@ -250,7 +250,7 @@ ASM_PFX(ExceptionEntryStart):
 
   csrrd   $t0, LOONGARCH_CSR_EUEN
   andi    $t0, $t0, CSR_EUEN_FPEN
-  beqz    $t0, PushRegDone
+  beqz    $t0, EntryConmmonHanlder
 
   fst.d  $fa0, $sp, 0 * RSIZE
   fst.d  $fa1, $sp, 1 * RSIZE
@@ -311,52 +311,6 @@ ASM_PFX(ExceptionEntryStart):
   //
   // Push exception context down
   //
-
-PushRegDone:
-  //
-  // Process IPI only when mailbox3 is NULL and mailbox0 is no-NULL.
-  //
-  li.d      $t0, LOONGARCH_IOCSR_MBUF0
-  iocsrrd.d $a0, $t0
-  beqz      $a0, EntryConmmonHanlder
-
-  li.d      $t0, LOONGARCH_IOCSR_MBUF3
-  iocsrrd.d $t1, $t0
-  bnez      $t1, EntryConmmonHanlder
-
-  csrrd     $t0, LOONGARCH_CSR_ESTAT
-  srli.d    $t0, $t0, 12
-  andi      $t0, $t0, 0x1
-  beqz      $t0, EntryConmmonHanlder
-
-  //
-  // Clean up current processor mailbox 0 and mailbox 3.
-  //
-  li.d      $t0, LOONGARCH_IOCSR_MBUF0
-  iocsrwr.d $zero, $t0
-  li.d      $t0, LOONGARCH_IOCSR_MBUF3
-  iocsrwr.d $zero, $t0
-
-  //
-  // Clear IPI interrupt.
-  //
-  li.d      $t0, LOONGARCH_IOCSR_IPI_STATUS
-  iocsrrd.w $t1, $t0
-  li.d      $t0, LOONGARCH_IOCSR_IPI_CLEAR
-  iocsrwr.w $t1, $t0
-
-  //
-  // Only kernel stage BSP calls IPI without parameters. Clean up the PIE and make sure
-  // global interrupts are turned off for the current processor when jumping to the kernel.
-  //
-  csrwr     $a0, LOONGARCH_CSR_ERA         // Update ERA
-  li.w      $t0, BIT2                      // IE
-  csrxchg   $zero, $t0, LOONGARCH_CSR_PRMD // Clean PIE
-
-  //
-  // Return this exception and jump to kernel using ERA.
-  //
-  ertn
 
 EntryConmmonHanlder:
   addi.d  $sp, $sp, -(GP_REG_CONTEXT_SIZE + CSR_REG_CONTEXT_SIZE)
