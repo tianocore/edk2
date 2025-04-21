@@ -66,6 +66,7 @@
   gEfiVariableWriteArchProtocolGuid             ## PRODUCES
   gEfiVariableArchProtocolGuid                  ## PRODUCES
   gEfiMmCommunication2ProtocolGuid              ## CONSUMES
+  gEfiMmCommunication3ProtocolGuid              ## CONSUMES
   ## CONSUMES
   ## NOTIFY
   ## UNDEFINED # Used to do smm communication
@@ -113,9 +114,10 @@
   gEfiEndOfDxeEventGroupGuid
   gEfiDeviceSignatureDatabaseGuid
   gEdkiiVariableRuntimeCacheInfoHobGuid
+  gEfiMmCommunicateHeaderV3Guid
 
 [Depex]
-  gEfiMmCommunication2ProtocolGuid
+  gEfiMmCommunication2ProtocolGuid OR gEfiMmCommunication3ProtocolGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   VariableSmmRuntimeDxeExtra.uni
