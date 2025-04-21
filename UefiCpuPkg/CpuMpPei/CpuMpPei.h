@@ -16,7 +16,6 @@
 #include <Ppi/SecPlatformInformation.h>
 #include <Ppi/SecPlatformInformation2.h>
 #include <Ppi/EndOfPeiPhase.h>
-#include <Ppi/MpServices2.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -35,8 +34,7 @@
 
 #include <Register/Cpuid.h>
 
-extern EDKII_PEI_MP_SERVICES2_PPI  mMpServices2Ppi;
-extern EFI_PEI_MP_SERVICES_PPI     mMpServicesPpi;
+extern EFI_PEI_MP_SERVICES_PPI  mMpServicesPpi;
 
 /**
   This service retrieves the number of logical processor in the platform

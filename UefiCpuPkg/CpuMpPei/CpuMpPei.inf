@@ -24,6 +24,7 @@
 
 [Sources]
   CpuMpPei.h
+  CpuMp2Pei.h
   CpuMp.c
   CpuMp2.c
 
@@ -70,7 +71,7 @@
   gEfiSecPlatformInformation2PpiGuid
   gEfiVectorHandoffInfoPpiGuid                  ## SOMETIMES_CONSUMES
   gEfiPeiMemoryDiscoveredPpiGuid                ## CONSUMES
-  gEdkiiPeiMpServices2PpiGuid                   ## PRODUCES
+  gEfiPeiMpServices2PpiGuid                     ## PRODUCES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
