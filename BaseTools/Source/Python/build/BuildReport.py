@@ -2379,12 +2379,17 @@ class BuildReport(object):
                         # PPI's in module
                         module_report_data["PPI"] = []
                         for data_ppi in module.PpiList.keys():
-                            module_report_data["PPI"].append({"Name": data_ppi, "Guid": module.PpiList[data_ppi]})
+                            module_report_data["PPI"].append({"Name": data_ppi, "Guid": GuidStructureStringToGuidString(module.PpiList[data_ppi])})
+
+                        # GUID's in module
+                        module_report_data["GUID"] = []
+                        for data_ppi in module.GuidList.keys():
+                            module_report_data["GUID"].append({"Name": data_ppi, "Guid": GuidStructureStringToGuidString(module.GuidList[data_ppi])})
 
                         # Protocol's in module
                         module_report_data["Protocol"] = []
                         for data_protocol in module.ProtocolList.keys():
-                            module_report_data["Protocol"].append({"Name": data_protocol, "Guid": module.ProtocolList[data_protocol]})
+                            module_report_data["Protocol"].append({"Name": data_protocol, "Guid": GuidStructureStringToGuidString(module.ProtocolList[data_protocol])})
 
                         # PCD's in module
                         module_report_data["Pcd"] = []
