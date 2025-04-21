@@ -10,7 +10,12 @@
 #ifndef EXCEPTION_COMMON_H_
 #define EXCEPTION_COMMON_H_
 
+#include <Base.h>
+
 #define MAX_DEBUG_MESSAGE_LENGTH  0x100
+#define SMP_BOOT_CPU              BIT0
+#define SMP_RESCHEDULE            BIT1
+#define SMP_CALL_FUNCTION         BIT2
 
 extern INTN  mExceptionKnownNameNum;
 extern INTN  mInterruptKnownNameNum;
