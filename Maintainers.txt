@@ -605,6 +605,11 @@ F: SecurityPkg/Library/Tpm2DeviceLibDTpm/*Svsm*
 R: Oliver Steffen <osteffen@redhat.com> [osteffenrh]
 R: Tom Lendacky <thomas.lendacky@amd.com> [tlendacky]
 
+SecurityPkg: ARM-FFA related modules
+F: SecurityPkg/*Arm
+F: SecurityPkg/*Ffa
+R: Kun Qin <kun.qin@microsoft.com> [kuqin12]
+
 ShellPkg
 F: ShellPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg

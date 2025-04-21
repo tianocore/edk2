@@ -170,6 +170,10 @@
   #  Include/Guid/Tcg2PhysicalPresenceData.h
   gEfiTcg2PhysicalPresenceGuid = { 0xaeb9c5c1, 0x94f1, 0x4d02, { 0xbf, 0xd9, 0x46, 0x2, 0xdb, 0x2d, 0x3c, 0x54 }}
 
+  ## GUID used to invoke ACPI functions reside in _DSM control method object for TPM2 to support physical presence.
+  #  Include/Guid/Tcg2PhysicalPresenceData.h
+  gEfiPhysicalPresenceAcpiGuid       = { 0x3DDDFAA6, 0x361B, 0x4eb4, { 0xA4, 0x24, 0x8D, 0x10, 0x08, 0x9D, 0x16, 0x53 }}
+
   ## GUID used for FormSet guid and user profile variable.
   # Include/Guid/UserIdentifyManagerHii.h
   gUserIdentifyManagerGuid           = { 0x3ccd3dd8, 0x8d45, 0x4fed, { 0x96, 0x2d, 0x2b, 0x38, 0xcd, 0x82, 0xb3, 0xc4 }}
@@ -240,6 +244,10 @@
 
   ## Include/Guid/Tcg2AcpiCommunicateBuffer.h
   gEdkiiTcg2AcpiCommunicateBufferHobGuid = { 0xcefea14f, 0x9f1a, 0x4774, { 0x8d, 0x18, 0x79, 0x93, 0x8d, 0x48, 0xfe, 0x7d } }
+
+  ## TPM Service over FF-A
+  #  Include/Guid/Tpm2ServiceFfa.h
+  gTpm2ServiceFfaGuid = { 0x17b862a4, 0x1806, 0x4faf, { 0x86, 0xb3, 0x08, 0x9a, 0x58, 0x35, 0x38, 0x61 } }
 
 [Ppis]
   ## The PPI GUID for that TPM physical presence should be locked.
@@ -460,6 +468,18 @@
   # @Prompt TPM device address.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0xFED40000|UINT64|0x00010012
 
+  ## This PCD indicates internal TPM base address.<BR><BR>
+  # @Prompt TPM device base address.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInternalBaseAddress|0x10000200000|UINT64|0x0001002A
+
+  ## This PCD indicates TPM max address.<BR><BR>
+  # @Prompt TPM device max address.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmMaxAddress|0xFED44FFF|UINT64|0x00010029
+
+  ## This PCD indicates the size of the TPM CRB region.<BR><BR>
+  # @Prompt TPM device CRB region size.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmCrbRegionSize|0x5000|UINT32|0x0001002C
+
   ## This PCR means the OEM configured number of PCR banks.
   #  0 means dynamic get from supported HASH algorithm
   # @Prompt OEM configured number of PCR banks.
@@ -613,6 +633,11 @@
   ## This PCD stores the pointer to the communication buffer for a
   #   AMD SEV-SNP SVSM-provided vTPM.
   gEfiSecurityPkgTokenSpaceGuid.PcdSvsmVTpmBufferPtr|0|UINT64|0x00020031
+
+  ## This PCD defines the partition ID for TPM Service.
+  # The default value of PcdTpmServiceFfaPartitionId is 0x0, a setting that the
+  # FF-A framework should never assign.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmServiceFfaPartitionId|0|UINT16|0x0001002B
 
 [PcdsFeatureFlag]
   ## Indicates if the platform requires PK to be self-signed when setting the PK in setup mode.
