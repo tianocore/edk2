@@ -103,9 +103,12 @@ gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableBase|gUefiOvmfPkgTokenSpaceGui
 0x011000|0x00F000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
 
-0x020000|0x0E0000
+0x020000|0x0D0000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvSize
 FV = PEIFV
+
+0x0F0000|0x10000
+gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogSize
 
 0x100000|0xE80000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
@@ -173,6 +176,9 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
 APRIORI PEI {
+!if $(DEBUG_TO_MEM)
+  INF  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
+!endif
   INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 }
 
@@ -183,6 +189,9 @@ INF  MdeModulePkg/Core/Pei/PeiMain.inf
 INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 INF  MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf
 INF  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
+!if $(DEBUG_TO_MEM)
+INF  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
+!endif
 !if $(CC_MEASUREMENT_ENABLE) == TRUE
   INF  OvmfPkg/Tcg/TdTcg2Pei/TdTcg2Pei.inf
 !endif
