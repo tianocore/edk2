@@ -550,12 +550,10 @@ SmmCommunicationCommunicate (
   IN OUT UINTN                             *CommSize OPTIONAL
   )
 {
-  EFI_STATUS                    Status;
-  EFI_SMM_COMMUNICATE_HEADER    *CommunicateHeader;
-  EFI_MM_COMMUNICATE_HEADER_V3  *CommunicateHeaderV3 = NULL;
-  BOOLEAN                       OldInSmm;
-  UINTN                         TempCommSize;
-  UINTN                         CommHeaderSize;
+  EFI_STATUS                  Status;
+  EFI_SMM_COMMUNICATE_HEADER  *CommunicateHeader;
+  BOOLEAN                     OldInSmm;
+  UINTN                       TempCommSize;
 
   //
   // Check parameters
@@ -565,28 +563,17 @@ SmmCommunicationCommunicate (
   }
 
   CommunicateHeader = (EFI_SMM_COMMUNICATE_HEADER *)CommBuffer;
-  if (CompareGuid (&CommunicateHeader->HeaderGuid, &gEfiMmCommunicateHeaderV3Guid)) {
-    CommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommBuffer;
-    if (CommunicateHeaderV3->BufferSize < sizeof (EFI_MM_COMMUNICATE_HEADER_V3) + CommunicateHeaderV3->MessageSize) {
+
+  if (CommSize == NULL) {
+    TempCommSize = OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data) + CommunicateHeader->MessageLength;
+  } else {
+    TempCommSize = *CommSize;
+    //
+    // CommSize must hold HeaderGuid and MessageLength
+    //
+    if (TempCommSize < OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data)) {
       return EFI_INVALID_PARAMETER;
     }
-
-    TempCommSize   = (UINTN)CommunicateHeaderV3->BufferSize;
-    CommHeaderSize = sizeof (EFI_MM_COMMUNICATE_HEADER_V3);
-  } else {
-    if (CommSize == NULL) {
-      TempCommSize = OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data) + CommunicateHeader->MessageLength;
-    } else {
-      TempCommSize = *CommSize;
-      //
-      // CommSize must hold HeaderGuid and MessageLength
-      //
-      if (TempCommSize < OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data)) {
-        return EFI_INVALID_PARAMETER;
-      }
-    }
-
-    CommHeaderSize = OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
   }
 
   //
@@ -643,20 +630,16 @@ SmmCommunicationCommunicate (
   //
   // Before SetVirtualAddressMap(), we are in SMM or SMRAM is open and unlocked, call SmiManage() directly.
   //
-  TempCommSize -= CommHeaderSize;
+  TempCommSize -= OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
   Status        = gSmmCorePrivate->Smst->SmiManage (
                                            &CommunicateHeader->HeaderGuid,
                                            NULL,
                                            CommunicateHeader->Data,
                                            &TempCommSize
                                            );
-  TempCommSize += CommHeaderSize;
+  TempCommSize += OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
   if (CommSize != NULL) {
     *CommSize = TempCommSize;
-  }
-
-  if (CommunicateHeaderV3 != NULL) {
-    CommunicateHeaderV3->BufferSize = TempCommSize;
   }
 
   //
@@ -740,11 +723,98 @@ MmCommunicationMmCommunicate3 (
   IN OUT VOID                              *CommBufferVirtual
   )
 {
-  return SmmCommunicationCommunicate (
-           &mSmmCommunication,
-           CommBufferPhysical,
-           NULL
-           );
+  EFI_STATUS                    Status;
+  EFI_MM_COMMUNICATE_HEADER_V3  *CommunicateHeader;
+  BOOLEAN                       OldInSmm;
+  UINT64                        MinCommSize;
+  UINT64                        TempCommSize;
+
+  //
+  // Check parameters
+  //
+  if ((CommBufferPhysical == NULL) || (CommBufferVirtual == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommBufferVirtual;
+
+  Status = SafeUint64Add (sizeof (EFI_MM_COMMUNICATE_HEADER_V3), CommunicateHeader->MessageSize, &MinCommSize);
+  if (EFI_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // CommSize must hold the entire EFI_MM_COMMUNICATE_HEADER_V3
+  //
+  if (CommunicateHeader->BufferSize < MinCommSize) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // If not already in SMM, then generate a Software SMI
+  //
+  if (!gSmmCorePrivate->InSmm && gSmmCorePrivate->SmmEntryPointRegistered) {
+    //
+    // Put arguments for Software SMI in gSmmCorePrivate
+    //
+    gSmmCorePrivate->CommunicationBuffer = CommBufferPhysical;
+    gSmmCorePrivate->BufferSize          = (UINTN)CommunicateHeader->BufferSize;
+
+    //
+    // Generate Software SMI
+    //
+    Status = mSmmControl2->Trigger (mSmmControl2, NULL, NULL, FALSE, 0);
+    if (EFI_ERROR (Status)) {
+      return EFI_UNSUPPORTED;
+    }
+
+    return gSmmCorePrivate->ReturnStatus;
+  }
+
+  //
+  // If we are in SMM, then the execution mode must be physical, which means that
+  // OS established virtual addresses can not be used.  If SetVirtualAddressMap()
+  // has been called, then a direct invocation of the Software SMI is not allowed,
+  // so return EFI_INVALID_PARAMETER.
+  //
+  if (EfiGoneVirtual ()) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // If we are not in SMM, don't allow call SmiManage() directly when SMRAM is closed or locked.
+  //
+  if ((!gSmmCorePrivate->InSmm) && (!mSmmAccess->OpenState || mSmmAccess->LockState)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Save current InSmm state and set InSmm state to TRUE
+  //
+  OldInSmm               = gSmmCorePrivate->InSmm;
+  gSmmCorePrivate->InSmm = TRUE;
+
+  //
+  // Before SetVirtualAddressMap(), we are in SMM or SMRAM is open and unlocked, call SmiManage() directly.
+  //
+  TempCommSize = CommunicateHeader->BufferSize - sizeof (EFI_MM_COMMUNICATE_HEADER_V3);
+  Status       = gSmmCorePrivate->Smst->SmiManage (
+                                          &CommunicateHeader->MessageGuid,
+                                          NULL,
+                                          CommunicateHeader->MessageData,
+                                          (UINTN *)&TempCommSize
+                                          );
+  TempCommSize += sizeof (EFI_MM_COMMUNICATE_HEADER_V3);
+
+  // Return the size of the buffer
+  CommunicateHeader->BufferSize = TempCommSize;
+
+  //
+  // Restore original InSmm state
+  //
+  gSmmCorePrivate->InSmm = OldInSmm;
+
+  return (Status == EFI_SUCCESS) ? EFI_SUCCESS : EFI_NOT_FOUND;
 }
 
 /**

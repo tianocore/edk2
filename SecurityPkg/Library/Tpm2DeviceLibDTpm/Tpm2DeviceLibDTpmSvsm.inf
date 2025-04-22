@@ -64,3 +64,4 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdCRBIdleByPass             ## PRODUCES
   gEfiSecurityPkgTokenSpaceGuid.PcdSvsmVTpmPresence          ## PRODUCES
   gEfiSecurityPkgTokenSpaceGuid.PcdSvsmVTpmBufferPtr         ## PRODUCES
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr ## CONSUMES

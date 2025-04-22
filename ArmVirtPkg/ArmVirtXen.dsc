@@ -78,10 +78,6 @@
 ################################################################################
 
 [PcdsFixedAtBuild.common]
-!if $(ARCH) == AARCH64
-  gArmTokenSpaceGuid.PcdVFPEnabled|1
-!endif
-
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
 
   # Size of the region used by UEFI in permanent memory (Reserved 64MB)

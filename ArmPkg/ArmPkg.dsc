@@ -68,8 +68,8 @@
 
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerPhyCounterLib/ArmGenericTimerPhyCounterLib.inf
-  ArmSvcLib|ArmPkg/Library/ArmSvcLib/ArmSvcLib.inf
-  ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
+  ArmSvcLib|MdePkg/Library/ArmSvcLib/ArmSvcLib.inf
+  ArmSmcLib|MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
   OpteeLib|ArmPkg/Library/OpteeLib/OpteeLib.inf
 
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
@@ -85,7 +85,7 @@
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
   ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
   ArmTransferListLib|ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
-  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
+  ArmFfaLib|MdeModulePkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
 
   ArmMtlLib|ArmPkg/Library/ArmMtlNullLib/ArmMtlNullLib.inf
 
@@ -97,7 +97,7 @@
   MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
-  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
+  ArmFfaLib|MdeModulePkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
 
 [LibraryClasses.common.MM_CORE_STANDALONE]
   StandaloneMmCoreEntryPoint|ArmPkg/Library/ArmStandaloneMmCoreEntryPoint/ArmStandaloneMmCoreEntryPoint.inf
@@ -134,15 +134,8 @@
   ArmPkg/Library/ArmHvcLib/ArmHvcLib.inf
   ArmPkg/Library/ArmHvcLibNull/ArmHvcLibNull.inf
   ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
-  ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
-  ArmPkg/Library/ArmSmcLibNull/ArmSmcLibNull.inf
-  ArmPkg/Library/ArmSvcLib/ArmSvcLib.inf
   ArmPkg/Library/OpteeLib/OpteeLib.inf
   ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
-  ArmPkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
-  ArmPkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
-  ArmPkg/Library/ArmFfaLib/ArmFfaStandaloneMmCoreLib.inf
-  ArmPkg/Library/ArmFfaLib/ArmFfaStandaloneMmLib.inf
 
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 

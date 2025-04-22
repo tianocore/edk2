@@ -133,10 +133,6 @@
 
   gArmPlatformTokenSpaceGuid.PcdCoreCount|1
 
-!if $(ARCH) == AARCH64
-  gArmTokenSpaceGuid.PcdVFPEnabled|1
-!endif
-
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800

@@ -1047,3 +1047,10 @@
   # TPM support
   #
 !include OvmfPkg/Include/Dsc/OvmfTpmComponentsDxe.dsc.inc
+
+  #
+  # Smbios Measurement support
+  #
+!if $(TPM2_ENABLE) == TRUE || $(CC_MEASUREMENT_ENABLE) == TRUE
+  MdeModulePkg/Universal/SmbiosMeasurementDxe/SmbiosMeasurementDxe.inf
+!endif

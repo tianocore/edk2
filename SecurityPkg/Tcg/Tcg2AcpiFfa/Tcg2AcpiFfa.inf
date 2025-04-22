@@ -1,0 +1,78 @@
+## @file
+#  Provides ACPI methods for TPM 2.0 support
+#
+#  Spec Compliance Info:
+#     "TCG ACPI Specification Version 1.4 Revision 15"
+#     "TCG PC Client Platform Firmware Profile Specification for TPM Family 2.0 Revision 1.04 v14"
+#
+#  This driver implements TPM 2.0 definition block in ACPI table for FF-A over CRB.
+#
+# Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Tcg2AcpiFfa
+  FILE_GUID                      = 11DACB85-F5DC-4717-9DB1-53E7DC725C20
+  MODULE_TYPE                    = DXE_DRIVER
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeTcgAcpiFfa
+
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources]
+  Tcg2AcpiFfa.c
+  Tpm2Ffa.asl
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DebugLib
+  DxeServicesLib
+  TpmMeasurementLib
+  Tpm2CommandLib
+  Tcg2PhysicalPresenceLib
+  PcdLib
+
+[Guids]
+  gEfiTpmDeviceInstanceTpm20DtpmGuid                            ## PRODUCES ## GUID # TPM device identifier
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                                     ## CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId                ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId           ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision          ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId            ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision      ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid                  ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev                 ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer  ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmPlatformClass                 ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdActiveTpmInterfaceType           ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLaml                ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLasa                ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmServiceFfaPartitionId         ## CONSUMES
+
+[FixedPcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress                   ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmMaxAddress                    ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmCrbRegionSize                 ## CONSUMES
+
+[Depex]
+  gEfiAcpiTableProtocolGuid AND
+  gEfiTcg2ProtocolGuid

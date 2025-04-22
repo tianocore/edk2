@@ -696,8 +696,8 @@ RefreshTimeOutProcess (
 /**
   Record the highlight menu and top of screen menu info.
 
-  @param  Highlight               The menu opton which is highlight.
-  @param  TopOfScreen             The menu opton which is at the top of the form.
+  @param  Highlight               The menu option which is highlight.
+  @param  TopOfScreen             The menu option which is at the top of the form.
   @param  SkipValue               The skip line info for the top of screen menu.
 
 **/
