@@ -148,6 +148,13 @@
 #
 
 [Ppis]
+  #
+  # The EDK II PEI MP Services 2 PPI has been replaced by the PEI MP Services 2 PPI
+  # in the MdePkg. The following definition is only present for backwards compatibility
+  # and will be removed in the future.
+  #
+  gEdkiiPeiMpServices2PpiGuid =    { 0x5cb9cb3d, 0x31a4, 0x480c, { 0x94, 0x98, 0x29, 0xd2, 0x69, 0xba, 0xcf, 0xba}}
+
   ## Include/Ppi/ShadowMicrocode.h
   gEdkiiPeiShadowMicrocodePpiGuid = { 0x430f6965, 0x9a69, 0x41c5, { 0x93, 0xed, 0x8b, 0xf0, 0x64, 0x35, 0xc1, 0xc6 }}
 
