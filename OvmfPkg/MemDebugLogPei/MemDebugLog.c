@@ -86,7 +86,7 @@ MemDebugLogMemAvailCB (
   //
   if (!MemDebugLogBufPages) {
     MemDebugLogBufAddr = 0;
-    Status = EFI_SUCCESS;
+    Status             = EFI_SUCCESS;
     goto done;
   }
 
@@ -110,7 +110,7 @@ MemDebugLogMemAvailCB (
              MemDebugLogBufPages,
              &MemDebugLogBufAddr
              );
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: Failed to allocate Memory Debug Log buffer: %r. Logging disabled\n", __func__, Status));
     MemDebugLogBufAddr = 0;
     goto done;
@@ -120,7 +120,7 @@ MemDebugLogMemAvailCB (
   // Init the debug log buffer
   //
   Status = MemDebugLogInitCommon (MemDebugLogBufAddr, (UINT32)EFI_PAGES_TO_SIZE ((UINTN)MemDebugLogBufPages));
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: Failed to init Memory Debug Log buffer: %r. Logging disabled\n", __func__, Status));
     PeiServicesFreePages (MemDebugLogBufAddr, MemDebugLogBufPages);
     MemDebugLogBufAddr = 0;
@@ -131,7 +131,7 @@ MemDebugLogMemAvailCB (
   // Copy over the messages from the Early Debug Log buffer.
   //
   if (FixedPcdGet32 (PcdOvmfEarlyMemDebugLogBase) != 0) {
-    MemDebugLogCopyCommon(MemDebugLogBufAddr, (EFI_PHYSICAL_ADDRESS)(UINTN)FixedPcdGet32 (PcdOvmfEarlyMemDebugLogBase));
+    MemDebugLogCopyCommon (MemDebugLogBufAddr, (EFI_PHYSICAL_ADDRESS)(UINTN)FixedPcdGet32 (PcdOvmfEarlyMemDebugLogBase));
     //
     // Invalidate the Early buffer. This prevents any possible DEBUG()
     // messages from populating until after we create the PPI/HOB below.
@@ -143,7 +143,7 @@ MemDebugLogMemAvailCB (
   // Publish the Mem Debug Log PPI
   //
   Status = PeiServicesInstallPpi (mMemDebugLogPpiList);
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     PeiServicesFreePages (MemDebugLogBufAddr, MemDebugLogBufPages);
     MemDebugLogBufAddr = 0;
   }
@@ -153,7 +153,7 @@ done:
   // Zero the early buffer if we successfully
   // created the main memory log buffer.
   //
-  if (Status == EFI_SUCCESS && FixedPcdGet32 (PcdOvmfEarlyMemDebugLogBase) != 0) {
+  if ((Status == EFI_SUCCESS) && (FixedPcdGet32 (PcdOvmfEarlyMemDebugLogBase) != 0)) {
     ZeroMem (
       (VOID *)(UINTN)FixedPcdGet32 (PcdOvmfEarlyMemDebugLogBase),
       (UINT32)FixedPcdGet32 (PcdOvmfEarlyMemDebugLogSize)
@@ -177,7 +177,7 @@ done:
     // Populate the HOB
     //
     CopyGuid (&GuidHob->Name, &gMemDebugLogHobGuid);
-    HobData = (MEM_DEBUG_LOG_HOB_DATA *)GET_GUID_HOB_DATA (GuidHob);
+    HobData                     = (MEM_DEBUG_LOG_HOB_DATA *)GET_GUID_HOB_DATA (GuidHob);
     HobData->MemDebugLogBufAddr = MemDebugLogBufAddr;
   }
 
@@ -200,7 +200,7 @@ MemDebugLogPpiWrite (
   if (GuidHob == NULL) {
     MemDebugLogBufAddr = 0;
   } else {
-    HobData = (MEM_DEBUG_LOG_HOB_DATA *)GET_GUID_HOB_DATA (GuidHob);
+    HobData            = (MEM_DEBUG_LOG_HOB_DATA *)GET_GUID_HOB_DATA (GuidHob);
     MemDebugLogBufAddr = HobData->MemDebugLogBufAddr;
   }
 
@@ -220,7 +220,7 @@ MemDebugLogEntry (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS              Status;
+  EFI_STATUS  Status;
 
   //
   // Setup callback for memory available notification

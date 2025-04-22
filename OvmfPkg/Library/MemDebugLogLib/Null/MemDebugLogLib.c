@@ -14,10 +14,9 @@ EFI_STATUS
 EFIAPI
 MemDebugLogWrite (
   IN  CHAR8  *Buffer,
-  IN  UINTN   Length
+  IN  UINTN  Length
   )
 {
   // Null Instance - NOP
   return EFI_SUCCESS;
 }
-

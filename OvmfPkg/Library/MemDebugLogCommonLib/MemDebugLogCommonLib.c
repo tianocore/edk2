@@ -13,7 +13,7 @@
 #include <Library/SynchronizationLib.h>
 #include <Library/MemDebugLogCommonLib.h>
 
-#define MEMDEBUGLOG_COPYSIZE    0x200
+#define MEMDEBUGLOG_COPYSIZE  0x200
 
 STATIC
 VOID
@@ -70,28 +70,28 @@ MemDebugLogWriteCommon (
     return EFI_SUCCESS;
   }
 
-  MemDebugLogHdr = (MEM_DEBUG_LOG_HDR_V1 *)(UINTN)MemDebugLogBufAddr;
+  MemDebugLogHdr  = (MEM_DEBUG_LOG_HDR_V1 *)(UINTN)MemDebugLogBufAddr;
   MemDebugLogLock = &(MemDebugLogHdr->MemDebugLogLock);
 
   //
   // Validate the header magic before proceeding
   //
-  if (MemDebugLogHdr->Magic1 != MEM_DEBUG_LOG_MAGIC1 ||
-      MemDebugLogHdr->Magic2 != MEM_DEBUG_LOG_MAGIC2) {
+  if ((MemDebugLogHdr->Magic1 != MEM_DEBUG_LOG_MAGIC1) ||
+      (MemDebugLogHdr->Magic2 != MEM_DEBUG_LOG_MAGIC2))
+  {
     return EFI_NOT_FOUND;
+  }
+
+  if (Length >= MemDebugLogHdr->DebugLogSize) {
+    return EFI_INVALID_PARAMETER;
   }
 
   MemDebugLogLockAcquire (MemDebugLogLock);
 
-  if (Length >= MemDebugLogHdr->DebugLogSize) {
-    MemDebugLogLockRelease (MemDebugLogLock);
-    return EFI_INVALID_PARAMETER;
-  }
-
   BufStart = (CHAR8 *)(UINTN)(MemDebugLogBufAddr + sizeof (MEM_DEBUG_LOG_HDR_V1));
-  BufEnd = (CHAR8 *)(UINTN)(MemDebugLogBufAddr + sizeof (MEM_DEBUG_LOG_HDR_V1) + MemDebugLogHdr->DebugLogSize) - 1;
-  BufHead = BufStart + MemDebugLogHdr->DebugLogHeadOffset;
-  BufTail = BufStart + MemDebugLogHdr->DebugLogTailOffset;
+  BufEnd   = (CHAR8 *)(UINTN)(MemDebugLogBufAddr + sizeof (MEM_DEBUG_LOG_HDR_V1) + MemDebugLogHdr->DebugLogSize) - 1;
+  BufHead  = BufStart + MemDebugLogHdr->DebugLogHeadOffset;
+  BufTail  = BufStart + MemDebugLogHdr->DebugLogTailOffset;
 
   //
   // Maintain a circular (wrap around) log buffer
@@ -108,7 +108,7 @@ MemDebugLogWriteCommon (
     //
     //  There's enough room from tail to end of the buffer
     //
-    CopyMem(BufTail, Buffer, Length);
+    CopyMem (BufTail, Buffer, Length);
     //
     // If we have previously wrapped around, need to keep Head updated
     //
@@ -117,8 +117,9 @@ MemDebugLogWriteCommon (
       //
       // Check if we need to wrap Head
       //
-      if (BufHead > BufEnd)
+      if (BufHead > BufEnd) {
         BufHead = BufStart;
+      }
     }
 
     BufTail += Length;
@@ -137,7 +138,7 @@ MemDebugLogWriteCommon (
     BufTail = BufStart;
     CopyMem (BufTail, (Buffer + BufSpaceLeft), (Length - BufSpaceLeft));
     BufTail += (Length - BufSpaceLeft);
-    BufHead = (BufTail + 1);
+    BufHead  = (BufTail + 1);
 
     MemDebugLogHdr->Truncated = 1;
   }
@@ -168,11 +169,11 @@ MemDebugLogInitCommon (
 
   ZeroMem ((VOID *)(UINTN)MemDebugLogBufAddr, MemDebugLogBufSize);
 
-  MemDebugLogHdr = (MEM_DEBUG_LOG_HDR_V1 *)(UINTN)MemDebugLogBufAddr;
-  MemDebugLogHdr->Magic1 = MEM_DEBUG_LOG_MAGIC1;
-  MemDebugLogHdr->Magic2 = MEM_DEBUG_LOG_MAGIC2;
-  MemDebugLogHdr->Version = 1;
-  MemDebugLogHdr->DebugLogSize = (MemDebugLogBufSize - sizeof (MEM_DEBUG_LOG_HDR_V1));
+  MemDebugLogHdr                     = (MEM_DEBUG_LOG_HDR_V1 *)(UINTN)MemDebugLogBufAddr;
+  MemDebugLogHdr->Magic1             = MEM_DEBUG_LOG_MAGIC1;
+  MemDebugLogHdr->Magic2             = MEM_DEBUG_LOG_MAGIC2;
+  MemDebugLogHdr->Version            = 1;
+  MemDebugLogHdr->DebugLogSize       = (MemDebugLogBufSize - sizeof (MEM_DEBUG_LOG_HDR_V1));
   MemDebugLogHdr->DebugLogHeadOffset = 0;
   MemDebugLogHdr->DebugLogTailOffset = 0;
   MemDebugLogLockInit (&(MemDebugLogHdr->MemDebugLogLock));
@@ -197,17 +198,17 @@ MemDebugLogCopyCommon (
   CHAR8                 *BufEnd;
   CHAR8                 *BufPtr;
 
-  if (MemDebugLogBufSrcAddr == 0 || MemDebugLogBufDestAddr == 0) {
+  if ((MemDebugLogBufSrcAddr == 0) || (MemDebugLogBufDestAddr == 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  MemDebugLogSrcHdr = (MEM_DEBUG_LOG_HDR_V1 *)(UINTN)MemDebugLogBufSrcAddr;
+  MemDebugLogSrcHdr  = (MEM_DEBUG_LOG_HDR_V1 *)(UINTN)MemDebugLogBufSrcAddr;
   MemDebugLogDestHdr = (MEM_DEBUG_LOG_HDR_V1 *)(UINTN)MemDebugLogBufDestAddr;
 
   BufStart = (CHAR8 *)(UINTN)(MemDebugLogBufSrcAddr + sizeof (MEM_DEBUG_LOG_HDR_V1));
-  BufEnd = (CHAR8 *)(UINTN)(MemDebugLogBufSrcAddr + sizeof (MEM_DEBUG_LOG_HDR_V1) + MemDebugLogSrcHdr->DebugLogSize);
-  BufHead = BufStart + MemDebugLogSrcHdr->DebugLogHeadOffset;
-  BufTail = BufStart + MemDebugLogSrcHdr->DebugLogTailOffset;
+  BufEnd   = (CHAR8 *)(UINTN)(MemDebugLogBufSrcAddr + sizeof (MEM_DEBUG_LOG_HDR_V1) + MemDebugLogSrcHdr->DebugLogSize);
+  BufHead  = BufStart + MemDebugLogSrcHdr->DebugLogHeadOffset;
+  BufTail  = BufStart + MemDebugLogSrcHdr->DebugLogTailOffset;
 
   MemDebugLogDestHdr->Truncated = MemDebugLogSrcHdr->Truncated;
 
@@ -275,7 +276,7 @@ MemDebugLogInvalidateCommon (
     return EFI_INVALID_PARAMETER;
   }
 
-  MemDebugLogHdr = (MEM_DEBUG_LOG_HDR_V1 *)(UINTN)MemDebugLogBufAddr;
+  MemDebugLogHdr  = (MEM_DEBUG_LOG_HDR_V1 *)(UINTN)MemDebugLogBufAddr;
   MemDebugLogLock = &(MemDebugLogHdr->MemDebugLogLock);
 
   MemDebugLogLockAcquire (MemDebugLogLock);

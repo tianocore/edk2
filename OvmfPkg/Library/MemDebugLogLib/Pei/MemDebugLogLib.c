@@ -24,14 +24,14 @@ MemDebugLogWrite (
   EFI_STATUS         Status;
 
   MemDebugLogPpi = NULL;
-  Status = PeiServicesLocatePpi (
-             &gMemDebugLogPpiGuid,
-             0,
-             NULL,
-             (VOID **)&MemDebugLogPpi
-             );
+  Status         = PeiServicesLocatePpi (
+                     &gMemDebugLogPpiGuid,
+                     0,
+                     NULL,
+                     (VOID **)&MemDebugLogPpi
+                     );
 
-  if (Status == EFI_SUCCESS && MemDebugLogPpi) {
+  if ((Status == EFI_SUCCESS) && MemDebugLogPpi) {
     //
     // PPI is installed, so use the PPI
     //
@@ -42,10 +42,10 @@ MemDebugLogWrite (
     //
     if (FixedPcdGet32 (PcdOvmfEarlyMemDebugLogBase) != 0x0) {
       Status = MemDebugLogWriteCommon (
-                (EFI_PHYSICAL_ADDRESS)(UINTN)FixedPcdGet32 (PcdOvmfEarlyMemDebugLogBase),
-                Buffer,
-                Length
-                );
+                 (EFI_PHYSICAL_ADDRESS)(UINTN)FixedPcdGet32 (PcdOvmfEarlyMemDebugLogBase),
+                 Buffer,
+                 Length
+                 );
     } else {
       Status = EFI_NOT_FOUND;
     }

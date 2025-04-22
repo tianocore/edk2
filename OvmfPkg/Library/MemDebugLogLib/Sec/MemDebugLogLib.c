@@ -17,14 +17,14 @@ MemDebugLogWrite (
   IN  UINTN  Length
   )
 {
-  EFI_STATUS          Status;
+  EFI_STATUS  Status;
 
   if (FixedPcdGet32 (PcdOvmfEarlyMemDebugLogBase) != 0x0) {
     Status = MemDebugLogWriteCommon (
-              (EFI_PHYSICAL_ADDRESS)(UINTN)FixedPcdGet32 (PcdOvmfEarlyMemDebugLogBase),
-              Buffer,
-              Length
-              );
+               (EFI_PHYSICAL_ADDRESS)(UINTN)FixedPcdGet32 (PcdOvmfEarlyMemDebugLogBase),
+               Buffer,
+               Length
+               );
   } else {
     Status = EFI_NOT_FOUND;
   }
@@ -38,7 +38,6 @@ MemDebugLogLibConstructor (
   VOID
   )
 {
-
   if (FixedPcdGet32 (PcdOvmfEarlyMemDebugLogSize) != 0) {
     MemDebugLogInitCommon (
       (EFI_PHYSICAL_ADDRESS)(UINTN)FixedPcdGet32 (PcdOvmfEarlyMemDebugLogBase),

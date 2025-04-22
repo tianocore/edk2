@@ -50,7 +50,7 @@ MemDebugLogWrite (
       //
       // Populate the Mem Debug Log Buffer from the HOB
       //
-      HobData = (MEM_DEBUG_LOG_HOB_DATA *)GET_GUID_HOB_DATA (GuidHob);
+      HobData             = (MEM_DEBUG_LOG_HOB_DATA *)GET_GUID_HOB_DATA (GuidHob);
       mMemDebugLogBufAddr = HobData->MemDebugLogBufAddr;
     }
 

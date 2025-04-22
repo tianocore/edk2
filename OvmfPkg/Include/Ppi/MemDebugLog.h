@@ -21,9 +21,9 @@ EFI_STATUS
   );
 
 typedef struct {
-  UINT32                        Signature;
-  UINT32                        Version;
-  MEM_DEBUG_LOG_PPI_WRITE       MemDebugLogPpiWrite;
+  UINT32                     Signature;
+  UINT32                     Version;
+  MEM_DEBUG_LOG_PPI_WRITE    MemDebugLogPpiWrite;
 } MEM_DEBUG_LOG_PPI;
 
 extern  EFI_GUID  gMemDebugLogPpiGuid;

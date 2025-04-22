@@ -108,7 +108,7 @@ DebugPrintMarker (
     Length = AsciiBSPrint (Buffer, sizeof (Buffer), Format, BaseListMarker);
   }
 
-  MemDebugLogWrite(Buffer, Length);
+  MemDebugLogWrite (Buffer, Length);
 }
 
 /**
@@ -210,7 +210,7 @@ DebugAssert (
              );
 
   // Send the string to Memory Debug Log
-  MemDebugLogWrite(Buffer, Length);
+  MemDebugLogWrite (Buffer, Length);
 
   //
   // Generate a Breakpoint, DeadLoop, or NOP based on PCD settings

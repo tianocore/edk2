@@ -24,7 +24,7 @@ MemDebugLogWrite (
 {
   EFI_HOB_GUID_TYPE       *GuidHob;
   MEM_DEBUG_LOG_HOB_DATA  *HobData;
-  EFI_STATUS               Status;
+  EFI_STATUS              Status;
 
   //
   // Init debug log buffer addr on first write
@@ -40,7 +40,7 @@ MemDebugLogWrite (
       //
       // Populate the Mem Debug Log Buffer from the HOB
       //
-      HobData = (MEM_DEBUG_LOG_HOB_DATA *)GET_GUID_HOB_DATA (GuidHob);
+      HobData             = (MEM_DEBUG_LOG_HOB_DATA *)GET_GUID_HOB_DATA (GuidHob);
       mMemDebugLogBufAddr = HobData->MemDebugLogBufAddr;
     }
 

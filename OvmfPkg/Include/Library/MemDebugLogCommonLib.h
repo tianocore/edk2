@@ -14,10 +14,10 @@
 //
 // Cap max buffer at 4MB (0x400 4K pages)
 //
-#define MAX_MEM_DEBUG_LOG_PAGES 0x400
+#define MAX_MEM_DEBUG_LOG_PAGES  0x400
 
-#define MEM_DEBUG_LOG_MAGIC1 0x646d656d666d766f  // "ovmfmemd"
-#define MEM_DEBUG_LOG_MAGIC2 0x6367616d67756265  // "ebugmagc"
+#define MEM_DEBUG_LOG_MAGIC1  0x646d656d666d766f  // "ovmfmemd"
+#define MEM_DEBUG_LOG_MAGIC2  0x6367616d67756265  // "ebugmagc"
 
 #pragma pack(1)
 //
@@ -34,36 +34,36 @@ typedef struct {
   // These MUST be the first two fields of the structure.
   // Use a 128 bit Magic to make sure to avoid any possible
   // collision with random data in memory.
-  UINT64               Magic1;
-  UINT64               Magic2;
+  UINT64             Magic1;
+  UINT64             Magic2;
   //
   // Structure version- MUST be third field and set to 1
   //
-  UINT8                Version;
+  UINT8              Version;
   //
   // Debug log size minus header
   //
-  UINT32               DebugLogSize;
+  UINT32             DebugLogSize;
   //
   // Debug log head offset
   //
-  UINT32               DebugLogHeadOffset;
+  UINT32             DebugLogHeadOffset;
   //
   //  Debug log tail offset
   //
-  UINT32               DebugLogTailOffset;
+  UINT32             DebugLogTailOffset;
   //
   // Protect the log from MP access
   //
-  volatile UINT64      MemDebugLogLock;
+  volatile UINT64    MemDebugLogLock;
   //
   // Flag to indicate if the buffer wrapped and was thus truncated.
   //
-  UINT8                Truncated;
+  UINT8              Truncated;
   //
   // Firmware Build Version (PcdFirmwareVersionString)
   //
-  CHAR8                FirmwareVersion[32];
+  CHAR8              FirmwareVersion[32];
 } MEM_DEBUG_LOG_HDR_V1;
 
 //
@@ -116,7 +116,7 @@ EFI_STATUS
 EFIAPI
 MemDebugLogInitCommon (
   IN EFI_PHYSICAL_ADDRESS  MemDebugLogBufAddr,
-  UINT32                   MemDebugLogBufSize;
+  UINT32                   MemDebugLogBufSize
   );
 
 /**
