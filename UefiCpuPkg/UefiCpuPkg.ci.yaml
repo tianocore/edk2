@@ -74,7 +74,7 @@
         "IgnoreGuidName": ["SecCore", "ResetVector"], # Expected duplication for gEfiFirmwareVolumeTopFileGuid
         "IgnoreGuidValue": [],
         "IgnoreFoldersAndFiles": [],
-        "IgnoreDuplicates": []
+        "IgnoreDuplicates": ["gEdkiiPeiMpServices2PpiGuid=gEfiPeiMpServices2PpiGuid"]
     },
     "LibraryClassCheck": {
         "IgnoreHeaderFile": []
