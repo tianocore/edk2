@@ -6,9 +6,9 @@
   drivers to controllers.
 
   The main flow:
-  1. It dynamicly locate all controller device path.
-  2. It dynamicly locate all drivers which support binding protocol.
-  3. It export and dynamicly update two menu to let user select the
+  1. It dynamically locate all controller device path.
+  2. It dynamically locate all drivers which support binding protocol.
+  3. It export and dynamically update two menu to let user select the
      mapping between drivers to controllers.
   4. It save all the mapping info in NV variables which will be consumed
      by platform override protocol driver to publish the platform override protocol.

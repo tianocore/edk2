@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/Tpm2DeviceLib.h>
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
+#include <ConfidentialComputingGuestAttr.h>
 #include "Tpm2Ptp.h"
 #include "Tpm2Svsm.h"
 
@@ -26,6 +27,80 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// @}
 
 static BOOLEAN  mUseSvsmVTpm = FALSE;
+
+/**
+  The function check if the specified Attr is set.
+
+  @param[in]  CurrentAttr   The current attribute.
+  @param[in]  Attr          The attribute to check.
+
+  @retval  TRUE      The specified Attr is set.
+  @retval  FALSE     The specified Attr is not set.
+
+**/
+STATIC
+BOOLEAN
+AmdMemEncryptionAttrCheck (
+  IN  UINT64                             CurrentAttr,
+  IN  CONFIDENTIAL_COMPUTING_GUEST_ATTR  Attr
+  )
+{
+  UINT64  CurrentLevel;
+
+  CurrentLevel = CurrentAttr & CCAttrTypeMask;
+
+  switch (Attr) {
+    case CCAttrAmdSev:
+      //
+      // SEV is automatically enabled if SEV-ES or SEV-SNP is active.
+      //
+      return CurrentLevel >= CCAttrAmdSev;
+    case CCAttrAmdSevEs:
+      //
+      // SEV-ES is automatically enabled if SEV-SNP is active.
+      //
+      return CurrentLevel >= CCAttrAmdSevEs;
+    case CCAttrAmdSevSnp:
+      return CurrentLevel == CCAttrAmdSevSnp;
+    case CCAttrFeatureAmdSevEsDebugVirtualization:
+      return !!(CurrentAttr & CCAttrFeatureAmdSevEsDebugVirtualization);
+    default:
+      return FALSE;
+  }
+}
+
+/**
+  Check if the specified confidential computing attribute is active.
+
+  @param[in]  Attr          The attribute to check.
+
+  @retval TRUE   The specified Attr is active.
+  @retval FALSE  The specified Attr is not active.
+
+**/
+STATIC
+BOOLEAN
+EFIAPI
+ConfidentialComputingGuestHas (
+  IN  CONFIDENTIAL_COMPUTING_GUEST_ATTR  Attr
+  )
+{
+  UINT64  CurrentAttr;
+
+  //
+  // Get the current CC attribute.
+  //
+  CurrentAttr = PcdGet64 (PcdConfidentialComputingGuestAttr);
+
+  //
+  // If attr is for the AMD group then call AMD specific checks.
+  //
+  if (((RShiftU64 (CurrentAttr, 8)) & 0xff) == 1) {
+    return AmdMemEncryptionAttrCheck (CurrentAttr, Attr);
+  }
+
+  return (CurrentAttr == Attr);
+}
 
 /**
  Initializes SVSM vTPM if present, or otherwise uses TCG PTP method.
@@ -44,6 +119,10 @@ EFIAPI
 TryUseSvsmVTpm (
   )
 {
+  if (!ConfidentialComputingGuestHas (CCAttrAmdSevSnp)) {
+    return FALSE;
+  }
+
   UINT8  SvsmVTpmPresence = (UINT8)PcdGet8 (PcdSvsmVTpmPresence);
 
   if (SvsmVTpmPresence == SVSM_VTPM_PRESENCE_UNKNOWN) {

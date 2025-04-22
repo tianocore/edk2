@@ -54,8 +54,8 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize       ## CONSUMES
 
 [Ppis]
-  gEdkiiPeiMpServices2PpiGuid                       ## CONSUMES
+  gEfiPeiMpServices2PpiGuid                         ## CONSUMES
 
 [Depex]
-  gEdkiiPeiMpServices2PpiGuid AND
+  gEfiPeiMpServices2PpiGuid AND
   gEfiPeiMemoryDiscoveredPpiGuid
