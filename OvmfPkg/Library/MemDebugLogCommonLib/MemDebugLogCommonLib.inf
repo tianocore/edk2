@@ -1,0 +1,33 @@
+## @file
+#  MemDebugLogCommon Library
+#
+#  Copyright (C) 2025, Oracle and/or its affiliates.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MemDebugLogCommonLib
+  FILE_GUID                      = 23E15D02-0D51-4EF1-8A56-39A1297D72E0
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MemDebugLogCommonLib
+
+
+[Sources]
+  MemDebugLogCommonLib.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  SynchronizationLib
+
+[Guids]
+
+[FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString ## CONSUMES
