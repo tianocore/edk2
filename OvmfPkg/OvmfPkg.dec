@@ -467,3 +467,7 @@
 
   ## This feature flag indicates the firmware build needs the qemu variable service.
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuVarsRequire|FALSE|BOOLEAN|0x77
+
+  ## Informs modules whether the platform firmware supports Standalone MM.
+  #
+  gUefiOvmfPkgTokenSpaceGuid.PcdStandaloneMmEnable|FALSE|BOOLEAN|0x100065
