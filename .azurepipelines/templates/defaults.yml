@@ -9,4 +9,4 @@
 
 variables:
   default_python_version: "3.12"
-  default_linux_image: "ghcr.io/tianocore/containers/fedora-41-test:4dbfa9e"
+  default_linux_image: "ghcr.io/osteffenrh/edk2-containers/fedora-42-test:d8b6b48"
