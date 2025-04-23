@@ -224,6 +224,11 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             args += " -global driver=cfi.pflash01,property=secure,value=on"
             args += " -drive if=pflash,format=raw,unit=0,file=" + os.path.join(OutputPath_FV, "OVMF_CODE.fd") + ",readonly=on"
             args += " -drive if=pflash,format=raw,unit=1,file=" + os.path.join(OutputPath_FV, "OVMF_VARS.fd")
+            if (self.env.GetBuildValue("STANDALONE_MM_ENABLE") == "1"):
+                # We will not support S3 in standalone MM mode
+                args += " -global ICH9-LPC.disable_s3=1"
+                # Make MMRAM bigger as it will need to hold the FV where the MM core is at
+                args += " -global mch.extended-tseg-mbytes=32"
         else:
             args += " -pflash " + os.path.join(OutputPath_FV, "OVMF.fd")    # path to firmware
 
