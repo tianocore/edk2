@@ -1,0 +1,44 @@
+## @file
+#  Instance of Debug Library for memory debug log.
+#  It uses Print Library to produce formatted output strings.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2012, Red Hat, Inc.<BR>
+#  Copyright (C) 2025, Oracle and/or its affiliates.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformDebugLibMem
+  FILE_GUID                      = AC6E4C66-7804-4FB2-AF3A-FB6E02461544
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DebugLib|SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER SMM_CORE DXE_SMM_DRIVER UEFI_DRIVER UEFI_APPLICATION
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DebugLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  PcdLib
+  PrintLib
+  BaseLib
+  DebugPrintErrorLevelLib
+  MemDebugLogLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue        ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask            ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel    ## CONSUMES
