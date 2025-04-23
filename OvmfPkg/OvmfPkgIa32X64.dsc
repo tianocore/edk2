@@ -251,12 +251,19 @@
   TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
   TdxMailboxLib|OvmfPkg/Library/TdxMailboxLib/TdxMailboxLibNull.inf
   TdxHelperLib|OvmfPkg/IntelTdx/TdxHelperLib/TdxHelperLibNull.inf
+!if $(DEBUG_TO_MEM)
+  MemDebugLogCommonLib|OvmfPkg/Library/MemDebugLogCommonLib/MemDebugLogCommonLib.inf
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/Dxe/MemDebugLogLib.inf
+!endif
 
 [LibraryClasses.common.SEC]
   TimerLib|OvmfPkg/Library/AcpiTimerLib/BaseRomAcpiTimerLib.inf
   QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgSecLib.inf
 !ifdef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+!elseif $(DEBUG_TO_MEM)
+  DebugLib|OvmfPkg/Library/PlatformDebugLibMem/PlatformDebugLibMem.inf
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/Sec/MemDebugLogLib.inf
 !else
   DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformRomDebugLibIoPort.inf
 !endif
@@ -283,6 +290,9 @@
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
 !ifdef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+!elseif $(DEBUG_TO_MEM)
+  DebugLib|OvmfPkg/Library/PlatformDebugLibMem/PlatformDebugLibMem.inf
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/Pei/MemDebugLogLib.inf
 !else
   DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformRomDebugLibIoPort.inf
 !endif
@@ -299,6 +309,9 @@
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
 !ifdef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+!elseif $(DEBUG_TO_MEM)
+  DebugLib|OvmfPkg/Library/PlatformDebugLibMem/PlatformDebugLibMem.inf
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/Pei/MemDebugLogLib.inf
 !else
   DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformRomDebugLibIoPort.inf
 !endif
@@ -324,6 +337,8 @@
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
 !ifdef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+!elseif $(DEBUG_TO_MEM)
+  DebugLib|OvmfPkg/Library/PlatformDebugLibMem/PlatformDebugLibMem.inf
 !else
   DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
@@ -344,6 +359,9 @@
   ReportStatusCodeLib|MdeModulePkg/Library/RuntimeDxeReportStatusCodeLib/RuntimeDxeReportStatusCodeLib.inf
 !ifdef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+!elseif $(DEBUG_TO_MEM)
+  DebugLib|OvmfPkg/Library/PlatformDebugLibMem/PlatformDebugLibMem.inf
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/Runtime/MemDebugLogLib.inf
 !else
   DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
@@ -366,6 +384,8 @@
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
 !ifdef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+!elseif $(DEBUG_TO_MEM)
+  DebugLib|OvmfPkg/Library/PlatformDebugLibMem/PlatformDebugLibMem.inf
 !else
   DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
@@ -383,6 +403,8 @@
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 !ifdef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+!elseif $(DEBUG_TO_MEM)
+  DebugLib|OvmfPkg/Library/PlatformDebugLibMem/PlatformDebugLibMem.inf
 !else
   DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
@@ -414,6 +436,8 @@
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
 !ifdef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+!elseif $(DEBUG_TO_MEM)
+  DebugLib|OvmfPkg/Library/PlatformDebugLibMem/PlatformDebugLibMem.inf
 !else
   DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
@@ -431,6 +455,8 @@
   SmmServicesTableLib|MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
 !ifdef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+!elseif $(DEBUG_TO_MEM)
+  DebugLib|OvmfPkg/Library/PlatformDebugLibMem/PlatformDebugLibMem.inf
 !else
   DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
@@ -455,6 +481,8 @@
   SmmServicesTableLib|MdeModulePkg/Library/PiSmmCoreSmmServicesTableLib/PiSmmCoreSmmServicesTableLib.inf
 !ifdef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+!elseif $(DEBUG_TO_MEM)
+  DebugLib|OvmfPkg/Library/PlatformDebugLibMem/PlatformDebugLibMem.inf
 !else
   DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformDebugLibIoPort.inf
 !endif
@@ -691,6 +719,9 @@
   # PEI Phase modules
   #
   MdeModulePkg/Core/Pei/PeiMain.inf
+!if $(DEBUG_TO_MEM)
+  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
+!endif
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf  {
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
@@ -737,6 +768,9 @@
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf  {
    <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+!if $(DEBUG_TO_MEM)
+      MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/Null/MemDebugLogLib.inf
+!endif
   }
 
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
@@ -814,6 +848,9 @@
     <LibraryClasses>
       DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+!if $(DEBUG_TO_MEM)
+      MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/Null/MemDebugLogLib.inf
+!endif
   }
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
