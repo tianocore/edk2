@@ -43,6 +43,7 @@
   DebugAgentLib
   DebugLib
   HobLib
+  LzmaDecompressLib
   MemoryInitPeiLib
   PerformanceLib
   PlatformPeiLib
