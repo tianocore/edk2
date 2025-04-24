@@ -426,6 +426,12 @@ strcat (
   const char  *strSource
   );
 
+char *
+strpbrk (
+  const char  *s,
+  const char  *accept
+  );
+
 //
 // Macros that directly map functions to BaseLib, BaseMemoryLib, and DebugLib functions
 //
