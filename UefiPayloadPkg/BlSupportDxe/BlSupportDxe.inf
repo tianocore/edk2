@@ -27,6 +27,9 @@
   BlSupportDxe.c
   BlSupportDxe.h
 
+[Sources.IA32, Sources.X64]
+  X86/BlSupport.c
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
