@@ -24,7 +24,10 @@
 #include <AcpiTableGenerator.h>
 #include <ConfigurationManagerObject.h>
 #include <ConfigurationManagerHelper.h>
+#include <MetadataHelpers.h>
+#include <Library/CmObjHelperLib.h>
 #include <Library/TableHelperLib.h>
+#include <Library/MetadataHandlerLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
 #include "SratGenerator.h"
@@ -126,7 +129,9 @@ AddMemoryAffinity (
   IN       UINT32                                               MemAffCount
   )
 {
+  EFI_STATUS                              Status;
   EFI_ACPI_6_3_MEMORY_AFFINITY_STRUCTURE  *MemAff;
+  UINT32                                  ProximityDomain;
 
   ASSERT (Srat != NULL);
   ASSERT (MemAffInfo != NULL);
@@ -139,7 +144,6 @@ AddMemoryAffinity (
 
     MemAff->Type            = EFI_ACPI_6_3_MEMORY_AFFINITY;
     MemAff->Length          = sizeof (EFI_ACPI_6_3_MEMORY_AFFINITY_STRUCTURE);
-    MemAff->ProximityDomain = MemAffInfo->ProximityDomain;
     MemAff->Reserved1       = EFI_ACPI_RESERVED_WORD;
     MemAff->AddressBaseLow  = (UINT32)(MemAffInfo->BaseAddress & MAX_UINT32);
     MemAff->AddressBaseHigh = (UINT32)RShiftU64 (MemAffInfo->BaseAddress, 32);
@@ -148,6 +152,20 @@ AddMemoryAffinity (
     MemAff->Reserved2       = EFI_ACPI_RESERVED_DWORD;
     MemAff->Flags           = MemAffInfo->Flags;
     MemAff->Reserved3       = EFI_ACPI_RESERVED_QWORD;
+
+    Status = GetProximityDomainId (
+               CfgMgrProtocol,
+               MemAffInfo->ProximityDomain,
+               MemAffInfo->ProximityDomainToken,
+               &ProximityDomain
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
+
+    // Needed as the field is not 32-bits aligned.
+    MemAff->ProximityDomain = ProximityDomain;
 
     // Next
     MemAff++;
@@ -206,7 +224,17 @@ AddGenericInitiatorAffinity (
       sizeof (EFI_ACPI_6_3_GENERIC_INITIATOR_AFFINITY_STRUCTURE);
     GenInitAff->Reserved1        = EFI_ACPI_RESERVED_WORD;
     GenInitAff->DeviceHandleType = GenInitAffInfo->DeviceHandleType;
-    GenInitAff->ProximityDomain  = GenInitAffInfo->ProximityDomain;
+
+    Status = GetProximityDomainId (
+               CfgMgrProtocol,
+               GenInitAffInfo->ProximityDomain,
+               GenInitAffInfo->ProximityDomainToken,
+               &GenInitAff->ProximityDomain
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
 
     if (GenInitAffInfo->DeviceHandleToken == CM_NULL_TOKEN) {
       DEBUG ((
