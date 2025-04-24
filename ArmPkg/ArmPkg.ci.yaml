@@ -33,7 +33,7 @@
 
     ## options defined .pytool/Plugin/HostUnitTestCompilerPlugin
     "HostUnitTestCompilerPlugin": {
-        "DscPath": "" # Don't support this test
+        "DscPath": "Test/ArmPkgHostTest.dsc"
     },
 
     ## options defined .pytool/Plugin/CharEncodingCheck
