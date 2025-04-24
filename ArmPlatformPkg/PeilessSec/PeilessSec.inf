@@ -52,6 +52,7 @@
   SerialPortLib
   TimerLib
   StackCheckLib
+  ArmTransferListLib
 
 [Ppis]
   gArmMpCoreInfoPpiGuid
