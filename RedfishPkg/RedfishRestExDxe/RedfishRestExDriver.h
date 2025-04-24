@@ -5,6 +5,7 @@
   (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2023, Ampere Computing LLC. All rights reserved.<BR>
   Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -23,6 +24,7 @@
 #include <Library/HttpIoLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/NetLib.h>
+#include <Library/RedfishPlatformWantedDeviceLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiDriverEntryPoint.h>
