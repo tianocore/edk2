@@ -48,7 +48,7 @@ located [here](https://github.com/tianocore/edk2-pytool-library) and
 [here](https://github.com/tianocore/edk2-pytool-extensions)).
 
 The primary execution flows can be found in the
-`.azurepipelines/Windows-VS2022.yml` and `.azurepipelines/Ubuntu-GCC5.yml`
+`.azurepipelines/Windows-VS.yml` and `.azurepipelines/Ubuntu-GCC.yml`
 files. These YAML files are consumed by the Azure Dev Ops Build Pipeline and
 dictate what server resources should be used, how they should be configured, and
 what processes should be run on them. An overview of this schema can be found

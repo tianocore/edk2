@@ -33,6 +33,10 @@ TestVerifyPkcs5Pbkdf2 (
   UINT8    *OutKey;
 
   OutKey = AllocatePool (KeyLen);
+  if (OutKey == NULL) {
+    UT_LOG_ERROR ("Failed to allocate memory for OutKey.\n");
+    return UNIT_TEST_ERROR_TEST_FAILED;
+  }
 
   //
   // Verify PKCS#5 PBKDF2 Key Derivation Function
