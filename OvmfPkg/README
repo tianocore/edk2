@@ -214,6 +214,47 @@ can be used on Windows.
 
   -global ICH9-LPC.disable_s3=1 \
 
+=== Standalone MM Support ===
+
+Standalone MM (Management Mode) in UEFI is a secure execution environment
+provided by the CPU and related silicon, designed to improve security and
+portability compared to Traditional MM. It operates independently of the DXE
+(Driver Execution Environment) phase, ensuring better isolation and reducing
+vulnerabilities.
+
+Standalone MM leverages the same hardware capabilities as Traditional MM but
+revises the software model to address security challenges. It uses Management
+Mode RAM (MMRAM) for executing drivers and protocols securely, and its
+initialization and runtime phases are distinct from Traditional MM.
+
+Due to the nature of Standalone MM, there are some limitations, requirements and
+considerations when using it in OVMF:
+
+* Standalone MM is only supported in X64 mode and is not available in IA32 mode.
+* The Standalone MM driver must be built with `-D STANDALONE_MM_ENABLE` flag.
+* For X64, Standalone MM does not currently support S3 resume or LockBox
+  functionality. While LockBox functionality could be supported in the future
+  with unblock memory enabled during the DXE phase, S3 resume support is not
+  planned.
+* On OVMF, Standalone MM does not support CPU hotplugging at this time; however,
+  this feature may be enabled in the future.
+* Similar to SMM, Standalone MM requires a pflash-backed variable store.
+* Standalone MM framework copies the entire Firmware Volume (FV) containing the
+  Standalone MM core into MMRAM. As a result, MMRAM must have sufficient
+  capacity to accommodate this operation alongside the runtime-loaded drivers.
+
+* Example QEMU launching command for Standalone MM based Q35 machine type:
+
+  $ qemu-system-x86_64 \
+  -debugcon stdio \
+  -smp 4 -cpu IvyBridge,+rdrand \
+  -machine q35,smm=on --accel tcg,thread=single \
+  -global driver=cfi.pflash01,property=secure,value=on \
+  -drive if=pflash,format=raw,unit=0,file=OVMF_CODE.fd,readonly=on \
+  -drive if=pflash,format=raw,unit=1,file=OVMF_VARS.fd \
+  -global ICH9-LPC.disable_s3=1 \
+  -global mch.extended-tseg-mbytes=32
+
 === Network Support ===
 
 OVMF provides a UEFI network stack by default. Its lowest level driver is the
