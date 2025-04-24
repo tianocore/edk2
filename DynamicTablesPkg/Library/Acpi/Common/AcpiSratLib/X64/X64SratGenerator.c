@@ -224,8 +224,8 @@ AddArchObjects (
       ApicAffinity->Flags                   = CmX2ApicAffinity->Flags;
       ApicAffinity->LocalSapicEid           = 0;
       ApicAffinity->ProximityDomain31To8[0] = (CmX2ApicAffinity->ProximityDomain >> 8) & MAX_UINT8;
-      ApicAffinity->ProximityDomain31To8[0] = (CmX2ApicAffinity->ProximityDomain >> 16) & MAX_UINT8;
-      ApicAffinity->ProximityDomain31To8[0] = (CmX2ApicAffinity->ProximityDomain >> 24) & MAX_UINT8;
+      ApicAffinity->ProximityDomain31To8[1] = (CmX2ApicAffinity->ProximityDomain >> 16) & MAX_UINT8;
+      ApicAffinity->ProximityDomain31To8[2] = (CmX2ApicAffinity->ProximityDomain >> 24) & MAX_UINT8;
       ApicAffinity->ClockDomain             = CmX2ApicAffinity->ClockDomain;
       ApicAffinity++;
       CmX2ApicAffinity++;
