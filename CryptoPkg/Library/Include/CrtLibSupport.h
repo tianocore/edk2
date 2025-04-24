@@ -79,6 +79,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define CHAR_BIT      8               /* Number of bits in a char */
 #define SIZE_MAX      0xFFFFFFFF      /* Maximum unsigned size_t */
 
+#define INT32_MIN   INT_MIN
+#define INT32_MAX   INT_MAX
+#define UINT32_MAX  UINT_MAX
+
 //
 // Address families.
 //
