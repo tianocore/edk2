@@ -142,12 +142,16 @@
             "Library/OpensslLib/OpensslGen/providers/common/der/der_digests_gen.c",
             "Library/OpensslLib/OpensslGen/providers/common/der/der_ecx_gen.c",
             "Library/OpensslLib/OpensslGen/providers/common/der/der_ec_gen.c",
+            "Library/OpensslLib/OpensslGen/providers/common/der/der_ml_dsa_gen.c",
             "Library/OpensslLib/OpensslGen/providers/common/der/der_rsa_gen.c",
+            "Library/OpensslLib/OpensslGen/providers/common/der/der_slh_dsa_gen.c",
             "Library/OpensslLib/OpensslGen/providers/common/der/der_wrap_gen.c",
             "Library/OpensslLib/OpensslGen/providers/common/include/prov/der_digests.h",
             "Library/OpensslLib/OpensslGen/providers/common/include/prov/der_ec.h",
             "Library/OpensslLib/OpensslGen/providers/common/include/prov/der_ecx.h",
+            "Library/OpensslLib/OpensslGen/providers/common/include/prov/der_ml_dsa.h",
             "Library/OpensslLib/OpensslGen/providers/common/include/prov/der_rsa.h",
+            "Library/OpensslLib/OpensslGen/providers/common/include/prov/der_slh_dsa.h",
             "Library/OpensslLib/OpensslGen/providers/common/include/prov/der_wrap.h",
             "Library/OpensslLib/OpensslStub/uefiprov.c"
         ]
