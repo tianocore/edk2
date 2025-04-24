@@ -16,8 +16,8 @@
 
 // Clock rate in two 32bit words.
 typedef struct {
-  UINT32    Low;
-  UINT32    High;
+  volatile UINT32    Low;
+  volatile UINT32    High;
 } CLOCK_RATE_DWORD;
 
 // Format of the returned rate array. Linear or Non-linear,.RatesFlag Bit[12]
