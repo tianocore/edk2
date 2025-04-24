@@ -24,4 +24,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/AcpiBoardInfoGuid.h>
 #include <Guid/GraphicsInfoHob.h>
 
+EFI_STATUS
+EFIAPI
+BlArchAdditionalOps (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  );
+
 #endif
