@@ -22,34 +22,7 @@
 #include <Library/DebugLib.h>
 
 #include "ArmFfaCommon.h"
-
-/**
-  Get mapped Rx/Tx buffers.
-
-  @param [out]   TxBuffer         Address of TxBuffer
-  @param [out]   TxBufferSize     Size of TxBuffer
-  @param [out]   RxBuffer         Address of RxBuffer
-  @param [out]   RxBufferSize     Size of RxBuffer
-
-  @retval EFI_SUCCESS
-  @retval Others             Error.
-
-**/
-EFI_STATUS
-EFIAPI
-ArmFfaLibGetRxTxBuffers (
-  OUT VOID    **TxBuffer,
-  OUT UINT64  *TxBufferSize,
-  OUT VOID    **RxBuffer,
-  OUT UINT64  *RxBufferSize
-  )
-{
-  /*
-   * StandaloneMm doesn't use Rx/Tx buffer.
-   * So, return EFI_UNSUPPORTED.
-   */
-  return EFI_UNSUPPORTED;
-}
+#include "ArmFfaRxTxMap.h"
 
 /**
   ArmFfaLib Constructor.
@@ -82,6 +55,19 @@ ArmFfaStandaloneMmLibConstructor (
   }
 
   if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a failed. Status = %r\n", __func__, Status));
+  }
+
+  Status = ArmFfaLibRxTxMap ();
+  if (Status == EFI_ALREADY_STARTED) {
+    /*
+     * When first Stmm instance (most likely core) which uses ArmFfaLib loaded,
+     * It already maps Rx/Tx buffer.
+     * From Next Stmm instance which uses ArmFfaLib it doesn't need to map Rx/Tx
+     * buffer again but it uses the mapped one.
+     */
+    Status = EFI_SUCCESS;
+  } else if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a failed. Status = %r\n", __func__, Status));
   }
 
