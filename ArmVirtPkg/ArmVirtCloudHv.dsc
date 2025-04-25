@@ -29,7 +29,7 @@
   DEFINE SECURE_BOOT_ENABLE      = FALSE
 
 # This comes before MdeLibs to ensure stack cookie configuration is chosen
-!include ArmVirtPkg/ArmVirt.dsc.inc
+!include ArmVirtPkg/ArmVirtDefines.dsc.inc
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
@@ -59,6 +59,7 @@
   TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLibNull/PeiDxeTpmPlatformHierarchyLib.inf
 
 !include MdePkg/MdeLibs.dsc.inc
+!include ArmVirtPkg/ArmVirt.dsc.inc
 
 [LibraryClasses.common.PEIM]
   ArmVirtMemInfoLib|ArmVirtPkg/Library/CloudHvVirtMemInfoLib/CloudHvVirtMemInfoPeiLib.inf

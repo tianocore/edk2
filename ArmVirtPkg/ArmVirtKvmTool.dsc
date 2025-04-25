@@ -32,13 +32,14 @@
 
 
 # This comes before MdeLibs to ensure stack cookie configuration is chosen
-!include ArmVirtPkg/ArmVirt.dsc.inc
+!include ArmVirtPkg/ArmVirtDefines.dsc.inc
 
 !if $(ARCH) == AARCH64
 !include DynamicTablesPkg/DynamicTables.dsc.inc
 !endif
 
 !include MdePkg/MdeLibs.dsc.inc
+!include ArmVirtPkg/ArmVirt.dsc.inc
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
