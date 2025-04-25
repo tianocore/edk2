@@ -629,13 +629,13 @@ QemuVideoControllerDriverStop (
 }
 
 /**
-  TODO: Add function description
+  Write an 8-bit value to a specified I/O port via PCI I/O pass-through.
 
-  @param  Private TODO: add argument description
-  @param  Address TODO: add argument description
-  @param  Data TODO: add argument description
+  @param  Private    QEMU private data structure
+  @param  Address    The I/O port offset within the pass-through BAR to write to.
+  @param  Data       The 8-bit value to write to the specified port
 
-  TODO: add return values
+  @retval None
 
 **/
 VOID
@@ -656,13 +656,13 @@ outb (
 }
 
 /**
-  TODO: Add function description
+  Write a 16-bit value to a specified I/O port via PCI I/O pass-through.
 
-  @param  Private TODO: add argument description
-  @param  Address TODO: add argument description
-  @param  Data TODO: add argument description
+  @param  Private    QEMU private data structure
+  @param  Address    The I/O port offset within the pass-through BAR to write to.
+  @param  Data       The 16-bit value to write to the specified port.
 
-  TODO: add return values
+  @retval None
 
 **/
 VOID
