@@ -177,20 +177,7 @@ CoreNewDebugImageInfoEntry (
 
   Table = mDebugInfoTableHeader.EfiDebugImageInfoTable;
 
-  if (mDebugInfoTableHeader.TableSize < mMaxTableEntries) {
-    //
-    // We still have empty entires in the Table, find the first empty entry.
-    //
-    Index = 0;
-    while (Table[Index].NormalImage != NULL) {
-      Index++;
-    }
-
-    //
-    // There must be an empty entry in the in the table.
-    //
-    ASSERT (Index < mMaxTableEntries);
-  } else {
+  if (mDebugInfoTableHeader.TableSize >= mMaxTableEntries) {
     //
     //  Table is full, so re-allocate another page for a larger table...
     //
@@ -218,9 +205,11 @@ CoreNewDebugImageInfoEntry (
     // Enlarge the max table entries and set the first empty entry index to
     // be the original max table entries.
     //
-    Index             = mMaxTableEntries;
     mMaxTableEntries += EFI_PAGE_SIZE / EFI_DEBUG_TABLE_ENTRY_SIZE;
   }
+
+  // We always put the next entry at the end of the currently consumed table (i.e. first free entry)
+  Index = mDebugInfoTableHeader.TableSize;
 
   //
   // Allocate data for new entry
@@ -264,11 +253,13 @@ CoreRemoveDebugImageInfoEntry (
   for (Index = 0; Index < mMaxTableEntries; Index++) {
     if ((Table[Index].NormalImage != NULL) && (Table[Index].NormalImage->ImageHandle == ImageHandle)) {
       //
-      // Found a match. Free up the record, then NULL the pointer to indicate the slot
-      // is free.
+      // Found a match. Free up the record, then move the final entry down to this slot; we don't care about the
+      // order of the array
       //
       CoreFreePool (Table[Index].NormalImage);
-      Table[Index].NormalImage = NULL;
+      Table[Index].NormalImage                               = Table[mDebugInfoTableHeader.TableSize - 1].NormalImage;
+      Table[mDebugInfoTableHeader.TableSize - 1].NormalImage = NULL;
+
       //
       // Decrease the number of EFI_DEBUG_IMAGE_INFO elements and set the mDebugInfoTable in modified status.
       //
