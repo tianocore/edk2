@@ -797,52 +797,6 @@ InitializeMiscMmCommunicateBuffer (
 }
 
 /**
-  Convert UUID to EFI_GUID format.
-  for example, If there is EFI_GUID named
-  "378daedc-f06b-4446-8314-40ab933c87a3",
-
-  EFI_GUID is saved in memory like:
-     dc ae 8d 37
-     6b f0 46 44
-     83 14 40 ab
-     93 3c 87 a3
-
-  However, UUID should be saved like:
-     37 8d ae dc
-     f0 6b 44 46
-     83 14 40 ab
-     93 3c 87 a3
-
-  FF-A and other software components (i.e. linux-kernel)
-  uses below format.
-
-  To patch mm-service properly, the passed uuid should be converted to
-  EFI_GUID format.
-
-  @param [in]  Uuid            Uuid
-  @param [out] Guid            EFI_GUID
-
-**/
-STATIC
-VOID
-EFIAPI
-ConvertUuidToEfiGuid (
-  IN  UINT64    *Uuid,
-  OUT EFI_GUID  *Guid
-  )
-{
-  UINT32  *Data32;
-  UINT16  *Data16;
-
-  Data32    = (UINT32 *)Uuid;
-  Data32[0] = SwapBytes32 (Data32[0]);
-  Data16    = (UINT16 *)&Data32[1];
-  Data16[0] = SwapBytes16 (Data16[0]);
-  Data16[1] = SwapBytes16 (Data16[1]);
-  CopyGuid (Guid, (EFI_GUID *)Uuid);
-}
-
-/**
   A loop to delegate events from SPMC.
   DelegatedEventLoop() calls ArmCallSvc() to exit to SPMC.
   When an event is delegated to StandaloneMm the SPMC returns control
@@ -911,7 +865,7 @@ DelegatedEventLoop (
         FfaMsgInfo.DirectMsgVersion = DirectMsgV2;
         Uuid[0]                     = EventCompleteSvcArgs->Arg2;
         Uuid[1]                     = EventCompleteSvcArgs->Arg3;
-        ConvertUuidToEfiGuid (Uuid, &ServiceGuid);
+        ConvertUuidToGuid ((GUID *)Uuid, &ServiceGuid);
         ServiceType = GetServiceType (&ServiceGuid);
       } else {
         Status = EFI_INVALID_PARAMETER;
