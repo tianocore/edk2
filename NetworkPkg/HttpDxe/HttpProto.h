@@ -4,6 +4,7 @@
 Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+(c) Copyright 2025 HP Development Company, L.P.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -38,7 +39,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #define HTTP_TOS_DEAULT           8
 #define HTTP_TTL_DEAULT           255
-#define HTTP_BUFFER_SIZE_DEAULT   0x200000
 #define HTTP_MAX_SYN_BACK_LOG     5
 #define HTTP_CONNECTION_TIMEOUT   60
 #define HTTP_DATA_RETRIES         12

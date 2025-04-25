@@ -4,6 +4,7 @@
 // This package provides network modules that conform to UEFI 2.4 specification.
 //
 // Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
+// (c) Copyright 2025 HP Development Company, L.P.
 //
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
@@ -122,3 +123,10 @@
 
 #string STR_gEfiNetworkPkgTokenSpaceGuid_PcdHttpDnsRetryCount_HELP  #language en-US "This value is used to configure the Retry Count of HTTP DNS if "
                                                                                 "no DNS response received after Retry Interval. The default value set is 0."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdHttpTransferBufferSize_PROMPT  #language en-US "HTTP default transfer buffer size"
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdHttpTransferBufferSize_HELP  #language en-US "This value is used to configure the default transfer buffer size for HTTP."
+                                                                                     "The default value set is 2MB. Larger buffer sizes can improve performance "
+                                                                                     "for high-bandwidth connections. However, smaller buffer size can reduce packet loss "
+                                                                                     "in low-bandwidth scenarios."
