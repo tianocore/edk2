@@ -46,6 +46,9 @@
   ##  @libraryclass  Defines a set of APIs to a handle Metadata around CmObj.
   MetadataObjLib|Include/Library/MetadataObjLib.h
 
+  ##  @libraryclass  Defines a set of APIs to a handle Metadata generation/validation.
+  MetadataHandlerLib|Include/Library/MetadataHandlerLib.h
+
 [LibraryClasses.AARCH64]
   ##  @libraryclass  Defines a set of APIs to populate CmObj using SCMI.
   DynamicTablesScmiInfoLib|Include/Library/DynamicTablesScmiInfoLib.h
