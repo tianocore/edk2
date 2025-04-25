@@ -1,0 +1,29 @@
+## @file
+#  Metadata Handler Library
+#
+#  Copyright (c) 2025, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = MetadataHandlerLib
+  FILE_GUID      = 60E0B01A-94E6-48C6-B21B-F772E58352E9
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = MetadataHandlerLib
+
+[Sources]
+  MetadataHandler.c
+  MetadataHandler.h
+  MetadataProximityDomain.c
+  MetadataUid.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  MetadataObjLib
