@@ -1091,8 +1091,8 @@ HttpConfigureTcp4 (
   IP4_COPY_ADDRESS (&Tcp4AP->RemoteAddress, &HttpInstance->RemoteAddr);
 
   Tcp4Option                      = Tcp4CfgData->ControlOption;
-  Tcp4Option->ReceiveBufferSize   = PcdGet32(PcdHttpTransferBufferSize);
-  Tcp4Option->SendBufferSize      = PcdGet32(PcdHttpTransferBufferSize);
+  Tcp4Option->ReceiveBufferSize   = PcdGet32 (PcdHttpTransferBufferSize);
+  Tcp4Option->SendBufferSize      = PcdGet32 (PcdHttpTransferBufferSize);
   Tcp4Option->MaxSynBackLog       = HTTP_MAX_SYN_BACK_LOG;
   Tcp4Option->ConnectionTimeout   = HTTP_CONNECTION_TIMEOUT;
   Tcp4Option->DataRetries         = HTTP_DATA_RETRIES;
@@ -1175,8 +1175,8 @@ HttpConfigureTcp6 (
   IP6_COPY_ADDRESS (&Tcp6Ap->RemoteAddress, &HttpInstance->RemoteIpv6Addr);
 
   Tcp6Option                      = Tcp6CfgData->ControlOption;
-  Tcp6Option->ReceiveBufferSize   = PcdGet32(PcdHttpTransferBufferSize);
-  Tcp6Option->SendBufferSize      = PcdGet32(PcdHttpTransferBufferSize);
+  Tcp6Option->ReceiveBufferSize   = PcdGet32 (PcdHttpTransferBufferSize);
+  Tcp6Option->SendBufferSize      = PcdGet32 (PcdHttpTransferBufferSize);
   Tcp6Option->MaxSynBackLog       = HTTP_MAX_SYN_BACK_LOG;
   Tcp6Option->ConnectionTimeout   = HTTP_CONNECTION_TIMEOUT;
   Tcp6Option->DataRetries         = HTTP_DATA_RETRIES;
