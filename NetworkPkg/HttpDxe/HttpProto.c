@@ -4,6 +4,7 @@
 Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+(c) Copyright 2025 HP Development Company, L.P.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1090,8 +1091,8 @@ HttpConfigureTcp4 (
   IP4_COPY_ADDRESS (&Tcp4AP->RemoteAddress, &HttpInstance->RemoteAddr);
 
   Tcp4Option                      = Tcp4CfgData->ControlOption;
-  Tcp4Option->ReceiveBufferSize   = HTTP_BUFFER_SIZE_DEAULT;
-  Tcp4Option->SendBufferSize      = HTTP_BUFFER_SIZE_DEAULT;
+  Tcp4Option->ReceiveBufferSize   = PcdGet32 (PcdHttpTransferBufferSize);
+  Tcp4Option->SendBufferSize      = PcdGet32 (PcdHttpTransferBufferSize);
   Tcp4Option->MaxSynBackLog       = HTTP_MAX_SYN_BACK_LOG;
   Tcp4Option->ConnectionTimeout   = HTTP_CONNECTION_TIMEOUT;
   Tcp4Option->DataRetries         = HTTP_DATA_RETRIES;
@@ -1174,8 +1175,8 @@ HttpConfigureTcp6 (
   IP6_COPY_ADDRESS (&Tcp6Ap->RemoteAddress, &HttpInstance->RemoteIpv6Addr);
 
   Tcp6Option                      = Tcp6CfgData->ControlOption;
-  Tcp6Option->ReceiveBufferSize   = HTTP_BUFFER_SIZE_DEAULT;
-  Tcp6Option->SendBufferSize      = HTTP_BUFFER_SIZE_DEAULT;
+  Tcp6Option->ReceiveBufferSize   = PcdGet32 (PcdHttpTransferBufferSize);
+  Tcp6Option->SendBufferSize      = PcdGet32 (PcdHttpTransferBufferSize);
   Tcp6Option->MaxSynBackLog       = HTTP_MAX_SYN_BACK_LOG;
   Tcp6Option->ConnectionTimeout   = HTTP_CONNECTION_TIMEOUT;
   Tcp6Option->DataRetries         = HTTP_DATA_RETRIES;
