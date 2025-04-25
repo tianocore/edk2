@@ -1,7 +1,7 @@
 /*++ @file
 Vfr Syntax
 
-Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2025, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 --*/
@@ -111,6 +111,7 @@ VfrParserStart (
 #token CloseBracket("]")                        "\]"
 
 #token LineDefinition                           "#line\ [0-9]+\ \"~[\"]+\"[\ \t]*\n" << gCVfrErrorHandle.ParseFileScopeRecord (begexpr (), line ()); skip (); newline (); >>
+#token GccLineDefinition                        "#\ [0-9]+\ \"~[\"]+\"[\ \t]*([1234][\ \t]*)*\n" << gCVfrErrorHandle.ParseFileScopeRecord (begexpr (), line ()); skip (); newline (); >>
 #token DevicePath("devicepath")                 "devicepath"
 #token FormSet("formset")                       "formset"
 #token FormSetId("formsetid")                   "formsetid"
