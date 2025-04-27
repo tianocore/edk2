@@ -3,7 +3,7 @@
 
   Copyright (c) 2021 - 2023, ARM Limited. All rights reserved.<BR>
   Copyright (C) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
-  Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
+  Copyright (c) 2024 - 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -757,6 +757,23 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonStaInfoParser[] = {
   { "DeviceStatus", 4, "0x%x", NULL }
 };
 
+/** A parser for EArchCommonObjMemoryRangeDescriptor.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonObjMemoryRangeDescriptor[] = {
+  { "BaseAddress", sizeof (UINT64), "0x%llx", NULL },
+  { "Length",      sizeof (UINT64), "0x%llx", NULL },
+};
+
+/** A parser for EArchCommonObjGenericDbg2DeviceInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonObjDbg2DeviceInfo[] = {
+  { "AddressResourceToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "PortType",             sizeof (UINT16),          "0x%x", NULL        },
+  { "PortSubtype",          sizeof (UINT16),          "0x%x", NULL        },
+  { "AccessSize",           sizeof (UINT8),           "0x%x", NULL        },
+  { "ObjectName",           AML_NAME_SEG_SIZE + 1,    NULL,   PrintString }
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -795,6 +812,8 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjPssInfo,                     CmArchCommonPssInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPpcInfo,                     CmArchCommonPpcInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjStaInfo,                     CmArchCommonStaInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryRangeDescriptor,       CmArchCommonObjMemoryRangeDescriptor),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjGenericDbg2DeviceInfo,       CmArchCommonObjDbg2DeviceInfo),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
