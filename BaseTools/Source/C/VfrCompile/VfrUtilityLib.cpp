@@ -80,6 +80,12 @@ SConfigInfo::SConfigInfo (
     return;
   }
 
+  memset (mValue, 0, mWidth);
+
+  if (mWidth > sizeof(EFI_IFR_TYPE_VALUE)) {
+    mWidth = sizeof(EFI_IFR_TYPE_VALUE);
+  }
+
   switch (Type) {
   case EFI_IFR_TYPE_NUM_SIZE_8 :
     memcpy (mValue, &Value.u8, mWidth);
@@ -2380,7 +2386,7 @@ CVfrDefaultStore::ReRegisterDefaultStoreById (
     }
 
     if (RefName != NULL) {
-      delete pNode->mRefName;
+      delete [] pNode->mRefName;
       pNode->mRefName = new CHAR8[strlen (RefName) + 1];
       if (pNode->mRefName != NULL) {
         strcpy (pNode->mRefName, RefName);
