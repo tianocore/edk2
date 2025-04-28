@@ -18,8 +18,8 @@ Core CI Build Status
 ============================= ================= =============== ===================
  Host Type & Toolchain        Build Status      Test Status     Code Coverage
 ============================= ================= =============== ===================
-Windows_VS2022_               |WindowsCiBuild|  |WindowsCiTest| |WindowsCiCoverage|
-Ubuntu_GCC5_                  |UbuntuCiBuild|   |UbuntuCiTest|  |UbuntuCiCoverage|
+Windows_VS_                   |WindowsCiBuild|  |WindowsCiTest| |WindowsCiCoverage|
+Ubuntu_GCC_                   |UbuntuCiBuild|   |UbuntuCiTest|  |UbuntuCiCoverage|
 ============================= ================= =============== ===================
 
 `More CI Build information <.pytool/Readme.md>`__
@@ -27,38 +27,38 @@ Ubuntu_GCC5_                  |UbuntuCiBuild|   |UbuntuCiTest|  |UbuntuCiCoverag
 Platform CI Build Status
 ------------------------
 
-Microsoft Windows VS2022
+Microsoft Windows Visual Studio (VS)
 ````````````````````````
 
 ============================= ================= ============= ============= ==============
  Toolchain                    CONFIG            DEBUG         RELEASE       NOOPT
 ============================= ================= ============= ============= ==============
-EmulatorPkg_Win_VS2022_       | IA32            |em32d|       |em32r|       |em32n|
+EmulatorPkg_Win_VS_           | IA32            |em32d|       |em32r|       |em32n|
 |                             | X64             |em64d|       |em64r|       |em64n|
 |                             | IA32 FULL       |em32fd|      |em32fr|      |em32fn|
 |                             | X64 FULL        |em64fd|      |em64fr|      |em64fn|
-OvmfPkg_Win_VS2022_           | IA32            |op32d|       |op32r|       |op32n|
+OvmfPkg_Win_VS_               | IA32            |op32d|       |op32r|       |op32n|
 |                             | X64             |op64d|       |op64r|       |op64n|
 |                             | IA32 X64        |op3264d|     |op3264r|     |op3264n|
-|                             | IA32 X64 FULL   |op3264fd|    |op3264fr|    |op3264fn|
+|                             | IA32 X64 FULL   |op3264fd|    |op3264fr|    **N/A**
 ============================= ================= ============= ============= ==============
 
-Ubuntu 18.04 GCC5
+Ubuntu 24.04
 `````````````````
 
 ============================= ================= ============= ============= ==============
  Toolchain                    CONFIG            DEBUG         RELEASE       NOOPT
 ============================= ================= ============= ============= ==============
-ArmVirtPkg_Ubuntu_GCC5_       | AARCH64         |avAArch64du| |avAArch64ru| |avAArch64nu|
+ArmVirtPkg_Ubuntu_GCC_        | AARCH64         |avAArch64du| |avAArch64ru| |avAArch64nu|
 |                             | ARM             |avArmdu|     |avArmru|     |avArmnu|
-EmulatorPkg_Ubuntu_GCC5_      | IA32            |em32du|      |em32ru|      |em32nu|
+EmulatorPkg_Ubuntu_GCC_       | IA32            **N/A**       **N/A**       **N/A**
 |                             | X64             |em64du|      |em64ru|      |em64nu|
-|                             | IA32 FULL       |em32fdu|     |em32fru|     |em32fnu|
+|                             | IA32 FULL       **N/A**       **N/A**       **N/A**
 |                             | X64 FULL        |em64fdu|     |em64fru|     |em64fnu|
-OvmfPkg_Ubuntu_GCC5_          | IA32            |op32du|      |op32ru|      |op32nu|
+OvmfPkg_Ubuntu_GCC_           | IA32            |op32du|      |op32ru|      |op32nu|
 |                             | X64             |op64du|      |op64ru|      |op64nu|
 |                             | IA32 X64        |op3264du|    |op3264ru|    |op3264nu|
-|                             | IA32 X64 FULL   |op3264fdu|   |op3264fru|   |op3264fru|
+|                             | IA32 X64 FULL   |op3264fdu|   |op3264fru|   **N/A**
 ============================= ================= ============= ============= ==============
 
 |TCBZ_2639|_ - EmulatorPkg Ubuntu GCC5 Segfaults during execution.
@@ -284,93 +284,86 @@ use.
 
 .. CoreCI
 
-.. _Windows_VS2022: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=32&branchName=master
-.. |WindowsCiBuild| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/Windows%20VS2022%20CI?branchName=master
-.. |WindowsCiTest| image:: https://img.shields.io/azure-devops/tests/tianocore/edk2-ci/32.svg
+.. _Windows_VS: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=74&branchName=master
+.. |WindowsCiBuild| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FWindows%20VS%20-%20CI?branchName=master
+.. |WindowsCiTest| image:: https://img.shields.io/azure-devops/tests/tianocore/edk2-ci/74.svg
 .. |WindowsCiCoverage| image:: https://img.shields.io/badge/coverage-coming_soon-blue
 
-.. _Ubuntu_GCC5: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=31&branchName=master
-.. |UbuntuCiBuild| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/Ubuntu%20GCC5%20CI?branchName=master
-.. |UbuntuCiTest| image:: https://img.shields.io/azure-devops/tests/tianocore/edk2-ci/31.svg
+.. _Ubuntu_GCC: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=76&branchName=master
+.. |UbuntuCiBuild| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FUbuntu%20GCC%20-%20CI?branchName=master
+.. |UbuntuCiTest| image:: https://img.shields.io/azure-devops/tests/tianocore/edk2-ci/76.svg
 .. |UbuntuCiCoverage| image:: https://img.shields.io/badge/coverage-coming_soon-blue
 
 .. ArmVirtPkg
 
-.. _ArmVirtPkg_Ubuntu_GCC5: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=46&branchName=master
-.. |avAArch64du| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_ArmVirtPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_AARCH64_DEBUG
-.. |avAArch64ru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_ArmVirtPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_AARCH64_RELEASE
-.. |avAArch64nu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_ArmVirtPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_AARCH64_NOOPT
+.. _ArmVirtPkg_Ubuntu_GCC: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=79&branchName=master
+.. |avAArch64du| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FArmVirtPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_AARCH64_DEBUG
+.. |avAArch64ru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FArmVirtPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_AARCH64_RELEASE
+.. |avAArch64nu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FArmVirtPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_AARCH64_NOOPT
 
-.. |avArmdu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_ArmVirtPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_ARM_DEBUG
-.. |avArmru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_ArmVirtPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_ARM_RELEASE
-.. |avArmnu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_ArmVirtPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_ARM_NOOPT
+.. |avArmdu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FArmVirtPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_ARM_DEBUG
+.. |avArmru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FArmVirtPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_ARM_RELEASE
+.. |avArmnu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FArmVirtPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_ARM_NOOPT
 
 .. EmulatorPkg
 
 .. |TCBZ_2639| image:: https://img.shields.io/github/issues/tianocore/edk2?baseUrl=https%3A%2F%2Fgithub.com
 .. _TCBZ_2639: https://github.com/tianocore/edk2/issues/9905
 
-.. _EmulatorPkg_Win_VS2022:  https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=44&branchName=master
-.. _EmulatorPkg_Ubuntu_GCC5: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=43&branchName=master
+.. _EmulatorPkg_Win_VS:  https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=73&branchName=master
+.. _EmulatorPkg_Ubuntu_GCC: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=78&branchName=master
 
-.. |em32d| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_DEBUG
-.. |em32du| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_DEBUG
-.. |em32r| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_RELEASE
-.. |em32ru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_RELEASE
-.. |em32n| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_NOOPT
-.. |em32nu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_NOOPT
+.. |em32d| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_DEBUG
+.. |em32r| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_RELEASE
+.. |em32n| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_NOOPT
 
-.. |em32fd| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_FULL_DEBUG
-.. |em32fdu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_FULL_DEBUG
-.. |em32fr| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_FULL_RELEASE
-.. |em32fru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_FULL_RELEASE
-.. |em32fn| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_FULL_NOOPT
-.. |em32fnu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_FULL_NOOPT
+.. |em32fd| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_FULL_DEBUG
+.. |em32fr| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_FULL_RELEASE
+.. |em32fn| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_FULL_NOOPT
 
-.. |em64d| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_DEBUG
-.. |em64du| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_DEBUG
-.. |em64r| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_RELEASE
-.. |em64ru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_RELEASE
-.. |em64n| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_NOOPT
-.. |em64nu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_NOOPT
+.. |em64d| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_DEBUG
+.. |em64du| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_DEBUG
+.. |em64r| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_RELEASE
+.. |em64ru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_RELEASE
+.. |em64n| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_NOOPT
+.. |em64nu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_NOOPT
 
-.. |em64fd| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_DEBUG
-.. |em64fdu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_DEBUG
-.. |em64fr| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_RELEASE
-.. |em64fru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_RELEASE
-.. |em64fn| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_NOOPT
-.. |em64fnu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_EmulatorPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_NOOPT
+.. |em64fd| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_DEBUG
+.. |em64fdu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_DEBUG
+.. |em64fr| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_RELEASE
+.. |em64fru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_RELEASE
+.. |em64fn| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_NOOPT
+.. |em64fnu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_NOOPT
 
 .. OvmfPkg
 
-.. _OvmfPkg_Win_VS2022:  https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=50&branchName=master
-.. _OvmfPkg_Ubuntu_GCC5: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=48&branchName=master
+.. _OvmfPkg_Win_VS:  https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=72&branchName=master
+.. _OvmfPkg_Ubuntu_GCC: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=77&branchName=master
 
-.. |op32d| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32_DEBUG
-.. |op32du| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32_DEBUG
-.. |op32r| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32_RELEASE
-.. |op32ru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32_RELEASE
-.. |op32n| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32_NOOPT
-.. |op32nu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32_NOOPT
+.. |op32d| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32_DEBUG
+.. |op32du| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32_DEBUG
+.. |op32r| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32_RELEASE
+.. |op32ru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32_RELEASE
+.. |op32n| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32_DEBUG
+.. |op32nu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32_NOOPT
 
-.. |op64d| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_DEBUG
-.. |op64du| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_DEBUG
-.. |op64r| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_RELEASE
-.. |op64ru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_RELEASE
-.. |op64n| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_NOOPT
-.. |op64nu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_NOOPT
+.. |op64d| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_DEBUG
+.. |op64du| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_DEBUG
+.. |op64r| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_RELEASE
+.. |op64ru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_RELEASE
+.. |op64n| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_NOOPT
+.. |op64nu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_NOOPT
 
+.. |op3264d| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_DEBUG
+.. |op3264du| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_DEBUG
+.. |op3264r| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_RELEASE
+.. |op3264ru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_RELEASE
+.. |op3264n| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_NOOPT
+.. |op3264nu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_NOOPT
 
-.. |op3264d| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_DEBUG
-.. |op3264du| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_DEBUG
-.. |op3264r| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_RELEASE
-.. |op3264ru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_RELEASE
-.. |op3264n| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_NOOPT
-.. |op3264nu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_NOOPT
-
-.. |op3264fd| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_FULL_DEBUG
-.. |op3264fdu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_FULL_DEBUG
-.. |op3264fr| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_FULL_RELEASE
-.. |op3264fru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_FULL_RELEASE
-.. |op3264fn| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Windows_VS2022_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_FULL_NOOPT
-.. |op3264fnu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status/PlatformCI_OvmfPkg_Ubuntu_GCC5_CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_FULL_NOOPT
+.. |op3264fd| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_FULL_DEBUG
+.. |op3264fdu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_FULL_DEBUG
+.. |op3264fr| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_FULL_RELEASE
+.. |op3264fru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_FULL_RELEASE
+.. |op3264fn| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_FULL_NOOPT
+.. |op3264fnu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32X64_FULL_NOOPT
