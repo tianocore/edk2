@@ -29,6 +29,7 @@ Module Name:
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/IoLib.h>
+#include <Library/MemDebugLogLib.h>
 #include <Library/MemEncryptSevLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PciLib.h>
@@ -249,6 +250,11 @@ GetPeiMemoryCap (
     ASSERT (PlatformInfoHob->PhysMemAddressWidth <= 40);
     ASSERT (TotalPages <= 0x404);
   }
+
+  //
+  // Add Memory Debug Log Buffer Pages (which can large)
+  //
+  TotalPages += MemDebugLogPages ();
 
   //
   // With 32k stacks and 4096 vcpus this lands at 128 MB (far away
