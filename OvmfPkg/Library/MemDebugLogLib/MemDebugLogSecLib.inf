@@ -1,0 +1,39 @@
+## @file
+#  Instance of MemDebugLog Library for SEC phase
+#
+#  Copyright (C) 2025, Oracle and/or its affiliates.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MemDebugLogLib
+  FILE_GUID                      = 9B3A8F82-CBCE-4E3A-A3E0-DBD7172E9506
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MemDebugLogLib|SEC
+  CONSTRUCTOR                    = MemDebugLogLibConstructor
+
+
+[Sources]
+  MemDebugLogSec.c
+  MemDebugLogCommon.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  SynchronizationLib
+
+[Guids]
+  gMemDebugLogHobGuid
+
+[FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString ## CONSUMES
