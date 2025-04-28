@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
+#include <Library/BaseMemoryLib.h>
 #include "DxeMain.h"
 
 EFI_DEBUG_IMAGE_INFO_TABLE_HEADER  mDebugInfoTableHeader = {
@@ -264,16 +265,23 @@ CoreRemoveDebugImageInfoEntry (
   for (Index = 0; Index < mMaxTableEntries; Index++) {
     if ((Table[Index].NormalImage != NULL) && (Table[Index].NormalImage->ImageHandle == ImageHandle)) {
       //
-      // Found a match. Free up the record, then NULL the pointer to indicate the slot
-      // is free.
+      // Found a match. Free up the table entry.
+      // Move the tail of the table one slot to the front.
       //
       CoreFreePool (Table[Index].NormalImage);
-      Table[Index].NormalImage = NULL;
+      CopyMem (
+        &Table[Index],
+        &Table[Index + 1],
+        (mDebugInfoTableHeader.TableSize - Index - 1) * sizeof (void *)
+        );
       //
-      // Decrease the number of EFI_DEBUG_IMAGE_INFO elements and set the mDebugInfoTable in modified status.
+      // Decrease the number of EFI_DEBUG_IMAGE_INFO elements
+      // Set the freed pointer to NULL.
+      // Set the the modified status in mDebugInfoTable.
       //
       mDebugInfoTableHeader.TableSize--;
-      mDebugInfoTableHeader.UpdateStatus |= EFI_DEBUG_IMAGE_INFO_TABLE_MODIFIED;
+      Table[mDebugInfoTableHeader.TableSize].NormalImage = NULL;
+      mDebugInfoTableHeader.UpdateStatus                |= EFI_DEBUG_IMAGE_INFO_TABLE_MODIFIED;
       break;
     }
   }
