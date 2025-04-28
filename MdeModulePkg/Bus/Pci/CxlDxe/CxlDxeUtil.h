@@ -21,6 +21,18 @@
 UINT64 MinimumOfThreeValues(UINT64 a, UINT64 b, UINT64 c);
 
 /**
+  Returns the number of chunk from firmware file, FW Transfer should take less time, therefore chunk Size is maximum
+
+  @param[in] FileSize                   Size of Firmware file
+  @param[in] MaxPayloadSize             Maximum Payload Size supported by mailbox
+
+  @retval ChunkCount                    Number of Chunks of perticular size
+  @retval ChunkSize                     Chunks size to be transferred
+
+  **/
+void GetChunkCount(int FileSize, int MaxPayloadSize, int *ChunkCount, int *ChunkSize);
+
+/**
   Returns bits value from input value
 
   @param[in] RegisterValue               Input register value from where bits has to extracted

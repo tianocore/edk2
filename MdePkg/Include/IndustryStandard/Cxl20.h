@@ -223,6 +223,8 @@ typedef enum {
 typedef enum {
     CxlMboxOpInvalid = 0x0000,
     CxlMboxOpGetFwInfo = 0x0200,
+    CxlMboxOpTransferFw = 0x0201,
+    CxlMboxOpActivateFw = 0x0202,
     CxlMboxOpMax = 0x10000
 } CXL_OPCODE;
 
