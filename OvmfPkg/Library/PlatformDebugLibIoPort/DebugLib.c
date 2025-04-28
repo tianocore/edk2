@@ -16,6 +16,7 @@
 #include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugPrintErrorLevelLib.h>
+#include <Library/MemDebugLogLib.h>
 #include "DebugLibDetect.h"
 
 //
@@ -114,6 +115,11 @@ DebugPrintMarker (
   // Send the print string to the debug I/O port
   //
   IoWriteFifo8 (PcdGet16 (PcdDebugIoPort), Length, Buffer);
+
+  //
+  // Send string to Memory Debug Log
+  //
+  MemDebugLogWrite(Buffer, Length);
 }
 
 /**
@@ -220,6 +226,11 @@ DebugAssert (
   if (PlatformDebugLibIoPortFound ()) {
     IoWriteFifo8 (PcdGet16 (PcdDebugIoPort), Length, Buffer);
   }
+
+  //
+  // Send the string to Memory Debug Log
+  //
+  MemDebugLogWrite(Buffer, Length);
 
   //
   // Generate a Breakpoint, DeadLoop, or NOP based on PCD settings
