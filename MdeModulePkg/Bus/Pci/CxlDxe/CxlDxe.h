@@ -6,10 +6,14 @@
 #ifndef _EFI_CXLDXE_H_
 #define _EFI_CXLDXE_H_
 
+#include <string.h>
 #include <Protocol/PciIo.h>
 #include <IndustryStandard/Pci.h>
 #include <IndustryStandard/Cxl20.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -19,6 +23,20 @@
 #define CXL_MEMORY_SUB_CLASS                     0x02
 #define CXL_MEMORY_PROGIF                        0x10
 #define CXL_IS_DVSEC(n)                          (((n) & (0xFFFF)) == CXL_PCI_DVSEC_VENDOR_ID)
+#define CXL_CONTROLLER_PRIVATE_DATA_SIGNATURE    SIGNATURE_32 ('C','X','L','X')
+#define CXL_PCI_EXT_CAP_ID(Header)               (Header & 0x0000ffff)
+#define CXL_PCI_EXT_CAP_NEXT(Header)             ((Header >> 20) & 0xfff)
+#define CXL_DEV_CAP_ARRAY_OFFSET                 0x0
+#define CXL_DEV_CAP_ARRAY_CAP_ID                 0
+#define CXL_BIT(nr)                              ((UINT32)1 << nr)
+#define CXL_DEV_MBOX_CTRL_DOORBELL               CXL_BIT(0)
+#define CXL_SZ_1M                                0x00100000
+#define CXL_BITS_PER_LONG                        32
+#define CXL_UL                                   (UINTN)
+
+#define CXL_GENMASK(h, l) \
+  (((~CXL_UL(0)) - (CXL_UL(1) << (l)) + 1) & \
+    (~CXL_UL(0) >> (CXL_BITS_PER_LONG - 1 - (h))))
 
 //
 // CXL Memory Device Register information
@@ -26,8 +44,8 @@
 typedef struct {
   UINT32                RegisterType;
   UINT32                BaseAddressRegister;
-  unsigned long long    RegisterOffset;
-  unsigned long         MailboxRegistersOffset;
+  UINT64                RegisterOffset;
+  UINT32                MailboxRegistersOffset;
 } CXL_REGISTER_MAP;
 
 //
@@ -47,6 +65,11 @@ typedef struct {
   EFI_HANDLE                  DriverBindingHandle;
   EFI_PCI_IO_PROTOCOL         *PciIo;
   EFI_DEVICE_PATH_PROTOCOL    *ParentDevicePath;
+
+  //MailBox Register
+  CXL_REGISTER_MAP            RegisterMap;
+  CXL_MEMDEV_STATE            MemdevState;
+  CXL_MBOX_CMD                MailboxCmd;
 
   //BDF Value
   UINTN                       Seg;
@@ -195,5 +218,14 @@ CxlDriverBindingStop(
   IN  EFI_HANDLE                  *ChildHandleBuffer
   );
 
+/**
+  Issue a command to the device using mailbox registers
+
+  @param[in] Private                  The pointer to the CXL_CONTROLLER_PRIVATE_DATA data structure.
+
+  @retval Status                      Return EFI_SUCCESS on successfully calling CxlDecodeRegblock
+
+**/
+EFI_STATUS CxlPciMboxSend(CXL_CONTROLLER_PRIVATE_DATA *Private);
 #endif // _EFI_CXLDXE_H_
 
