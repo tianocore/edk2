@@ -1868,6 +1868,10 @@ InitializeMpSyncData (
   UINTN  CpuIndex;
 
   if (mSmmMpSyncData != NULL) {
+    if (mSmmMpSyncData->SyncContext != NULL) {
+      SmmCpuSyncContextDeinit (mSmmMpSyncData->SyncContext);
+    }
+
     //
     // mSmmMpSyncDataSize includes one structure of SMM_DISPATCHER_MP_SYNC_DATA, one
     // CpuData array of SMM_CPU_DATA_BLOCK and one CandidateBsp array of BOOLEAN.
@@ -1968,6 +1972,7 @@ InitializeMpServiceData (
   mSmmMpSyncData = (SMM_DISPATCHER_MP_SYNC_DATA *)AllocatePages (EFI_SIZE_TO_PAGES (mSmmMpSyncDataSize));
   ASSERT (mSmmMpSyncData != NULL);
 
+  ZeroMem (mSmmMpSyncData, mSmmMpSyncDataSize);
   RelaxedMode = FALSE;
   GetSmmCpuSyncConfigData (&RelaxedMode, NULL, NULL);
   mCpuSmmSyncMode = RelaxedMode ? MmCpuSyncModeRelaxedAp : MmCpuSyncModeTradition;
