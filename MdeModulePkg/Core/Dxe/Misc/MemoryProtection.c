@@ -196,8 +196,11 @@ SetUefiImageMemoryAttributes (
   UINT64                           FinalAttributes;
   UINT64                           CurrentAddress;
   UINT64                           CurrentLength;
+  UINT64                           ImageEnd;
+  UINT64                           DescEnd;
 
   CurrentAddress = BaseAddress;
+  ImageEnd       = BaseAddress + Length;
 
   // we loop here because we may have multiple memory space descriptors that overlap the requested range
   // this will definitely be the case for unprotecting an image, because that calls this function for the entire image,
@@ -216,11 +219,14 @@ SetUefiImageMemoryAttributes (
       return;
     }
 
-    // ensure that we only change the attributes for the range that we are interested in, not the entire descriptor
-    if (BaseAddress + Length > CurrentAddress + Descriptor.Length) {
-      CurrentLength = Descriptor.Length;
+    DescEnd = Descriptor.BaseAddress + Descriptor.Length;
+
+    // ensure that we only change the attributes for the range that we are interested in, not the entire descriptor, we
+    // may also be in the middle of a descriptor, so ensure our length is not larger than the descriptor length
+    if (ImageEnd > DescEnd) {
+      CurrentLength = DescEnd - CurrentAddress;
     } else {
-      CurrentLength = BaseAddress + Length - CurrentAddress;
+      CurrentLength = ImageEnd - CurrentAddress;
     }
 
     // Preserve the existing caching and virtual attributes, but remove the hardware access bits
@@ -291,10 +297,9 @@ SetUefiImageMemoryAttributes (
       }
     }
 
-    // we have CurrentLength, also, but that is just to handle the final descriptor case where we might take only
-    // part of a descriptor, so we can use Descriptor.Length here to move to the next descriptor, which for the final
-    // descriptor will exit the loop, regardless of whether we truncated or not
-    CurrentAddress += Descriptor.Length;
+    // we may have started in the middle of a descriptor, so we need to move to the beginning of the next descriptor,
+    // or the end of the image, whichever is smaller
+    CurrentAddress += CurrentLength;
   }
 }
 
