@@ -792,7 +792,6 @@ class InfDefSection(InfDefSectionOptionRomInfo):
             ErrorInInf(ST.ERR_INF_PARSER_DEFINE_FROMAT_INVALID%(Name),
                        LineInfo=self.CurrentLine)
             return False
-        return True
 
     def GetSpecification(self):
         return self.Specification
