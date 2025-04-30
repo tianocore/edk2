@@ -15,7 +15,6 @@ import re
 import platform
 
 from Library.DataType import MODULE_LIST
-from Library.DataType import COMPONENT_TYPE_LIST
 from Library.DataType import PCD_USAGE_TYPE_LIST_OF_MODULE
 from Library.DataType import TAB_SPACE_SPLIT
 from Library.StringUtils import GetSplitValueList
