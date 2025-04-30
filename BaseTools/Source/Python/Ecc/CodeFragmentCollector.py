@@ -74,8 +74,6 @@ class CodeFragmentCollector:
         self.CurrentLineNumber = 1
         self.CurrentOffsetWithinLine = 0
         self.TokenReleaceList = []
-        self.__Token = ""
-        self.__SkippedChars = ""
 
     ## __EndOfFile() method
     #
@@ -98,21 +96,6 @@ class CodeFragmentCollector:
         else:
             return False
 
-    ## __EndOfLine() method
-    #
-    #   Judge current buffer pos is at line end
-    #
-    #   @param  self        The object pointer
-    #   @retval True        Current File buffer position is at line end
-    #   @retval False       Current File buffer position is NOT at line end
-    #
-    def __EndOfLine(self):
-        SizeOfCurrentLine = len(self.Profile.FileLinesList[self.CurrentLineNumber - 1])
-        if self.CurrentOffsetWithinLine >= SizeOfCurrentLine - 1:
-            return True
-        else:
-            return False
-
     ## Rewind() method
     #
     #   Reset file data buffer to the initial state
@@ -122,25 +105,6 @@ class CodeFragmentCollector:
     def Rewind(self):
         self.CurrentLineNumber = 1
         self.CurrentOffsetWithinLine = 0
-
-    ## __UndoOneChar() method
-    #
-    #   Go back one char in the file buffer
-    #
-    #   @param  self        The object pointer
-    #   @retval True        Successfully go back one char
-    #   @retval False       Not able to go back one char as file beginning reached
-    #
-    def __UndoOneChar(self):
-
-        if self.CurrentLineNumber == 1 and self.CurrentOffsetWithinLine == 0:
-            return False
-        elif self.CurrentOffsetWithinLine == 0:
-            self.CurrentLineNumber -= 1
-            self.CurrentOffsetWithinLine = len(self.__CurrentLine()) - 1
-        else:
-            self.CurrentOffsetWithinLine -= 1
-        return True
 
     ## __GetOneChar() method
     #
@@ -210,32 +174,6 @@ class CodeFragmentCollector:
     #
     def __CurrentLine(self):
         return self.Profile.FileLinesList[self.CurrentLineNumber - 1]
-
-    ## __InsertComma() method
-    #
-    #   Insert ',' to replace PP
-    #
-    #   @param  self        The object pointer
-    #   @retval List        current line contents
-    #
-    def __InsertComma(self, Line):
-
-
-        if self.Profile.FileLinesList[Line - 1][0] != T_CHAR_HASH:
-            BeforeHashPart = str(self.Profile.FileLinesList[Line - 1]).split(T_CHAR_HASH)[0]
-            if BeforeHashPart.rstrip().endswith(T_CHAR_COMMA) or BeforeHashPart.rstrip().endswith(';'):
-                return
-
-        if Line - 2 >= 0 and str(self.Profile.FileLinesList[Line - 2]).rstrip().endswith(','):
-            return
-
-        if Line - 2 >= 0 and str(self.Profile.FileLinesList[Line - 2]).rstrip().endswith(';'):
-            return
-
-        if str(self.Profile.FileLinesList[Line]).lstrip().startswith(',') or str(self.Profile.FileLinesList[Line]).lstrip().startswith(';'):
-            return
-
-        self.Profile.FileLinesList[Line - 1].insert(self.CurrentOffsetWithinLine, ',')
 
     ## PreprocessFile() method
     #
