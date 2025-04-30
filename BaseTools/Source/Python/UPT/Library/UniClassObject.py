@@ -22,7 +22,6 @@ from Library.StringUtils import GetLineNo
 from Library.Misc import PathClass
 from Library.Misc import GetCharIndexOutStr
 from Library import DataType as DT
-from Library.ParserValidate import CheckUTF16FileHeader
 
 ##
 # Static definitions

@@ -2,7 +2,6 @@
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
-from typing import TextIO
 import sys
 
 
