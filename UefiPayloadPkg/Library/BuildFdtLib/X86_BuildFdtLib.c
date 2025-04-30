@@ -120,10 +120,10 @@ BuildFdtForMemory (
 
         RegTmp[0] = CpuToFdt64 (ResourceHob->PhysicalStart);
         RegTmp[1] = CpuToFdt64 (ResourceHob->ResourceLength);
-        Status    = FdtSetProperty (Fdt, TempNode, "reg", &RegTmp, sizeof (RegTmp));
+        Status    = FdtSetProp (Fdt, TempNode, "reg", &RegTmp, sizeof (RegTmp));
         ASSERT_EFI_ERROR (Status);
 
-        Status = FdtSetProperty (Fdt, TempNode, "device_type", "memory", (UINT32)(AsciiStrLen ("memory")+1));
+        Status = FdtSetProp (Fdt, TempNode, "device_type", "memory", (UINT32)(AsciiStrLen ("memory")+1));
         ASSERT_EFI_ERROR (Status);
       }
     }
@@ -166,8 +166,8 @@ BuildFdtForMemAlloc (
   ASSERT (ParentNode > 0);
 
   Data32 = CpuToFdt32 (2);
-  Status = FdtSetProperty (Fdt, ParentNode, "#address-cells", &Data32, sizeof (UINT32));
-  Status = FdtSetProperty (Fdt, ParentNode, "#size-cells", &Data32, sizeof (UINT32));
+  Status = FdtSetProp (Fdt, ParentNode, "#address-cells", &Data32, sizeof (UINT32));
+  Status = FdtSetProp (Fdt, ParentNode, "#size-cells", &Data32, sizeof (UINT32));
 
   GuidHob     = NULL;
   SmbiosTable = NULL;
@@ -182,9 +182,9 @@ BuildFdtForMemAlloc (
     DEBUG ((DEBUG_INFO, "FdtAddSubnode %x", TempNode));
     RegTmp[0] = CpuToFdt64 (SmbiosTable->SmBiosEntryPoint);
     RegTmp[1] = CpuToFdt64 (SmbiosTable->Header.Length);
-    FdtSetProperty (Fdt, TempNode, "reg", &RegTmp, sizeof (RegTmp));
+    FdtSetProp (Fdt, TempNode, "reg", &RegTmp, sizeof (RegTmp));
     ASSERT_EFI_ERROR (Status);
-    FdtSetProperty (Fdt, TempNode, "compatible", "smbios", (UINT32)(AsciiStrLen ("smbios")+1));
+    FdtSetProp (Fdt, TempNode, "compatible", "smbios", (UINT32)(AsciiStrLen ("smbios")+1));
     ASSERT_EFI_ERROR (Status);
   }
 
@@ -267,7 +267,7 @@ BuildFdtForMemAlloc (
 
       RegTmp[0] = CpuToFdt64 (Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress);
       RegTmp[1] = CpuToFdt64 (Hob.MemoryAllocation->AllocDescriptor.MemoryLength);
-      Status    = FdtSetProperty (Fdt, TempNode, "reg", &RegTmp, sizeof (RegTmp));
+      Status    = FdtSetProp (Fdt, TempNode, "reg", &RegTmp, sizeof (RegTmp));
       ASSERT_EFI_ERROR (Status);
 
       if ((AsciiStrCmp (mMemoryAllocType[AllocMemType], "mmio") == 0)) {
@@ -278,16 +278,16 @@ BuildFdtForMemAlloc (
         DEBUG ((DEBUG_INFO, "find acpi memory hob MemoryBaseAddress:%x , AcpiTable->Rsdp :%x\n", Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress, AcpiTable->Rsdp));
         if (Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress == AcpiTable->Rsdp) {
           DEBUG ((DEBUG_INFO, "keep acpi memory hob  \n"));
-          Status = FdtSetProperty (Fdt, TempNode, "compatible", mMemoryAllocType[AllocMemType], (UINT32)(AsciiStrLen (mMemoryAllocType[AllocMemType])+1));
+          Status = FdtSetProp (Fdt, TempNode, "compatible", mMemoryAllocType[AllocMemType], (UINT32)(AsciiStrLen (mMemoryAllocType[AllocMemType])+1));
           ASSERT_EFI_ERROR (Status);
         } else {
           DEBUG ((DEBUG_INFO, "change acpi memory hob  \n"));
-          Status = FdtSetProperty (Fdt, TempNode, "compatible", mMemoryAllocType[4], (UINT32)(AsciiStrLen (mMemoryAllocType[4])+1));
+          Status = FdtSetProp (Fdt, TempNode, "compatible", mMemoryAllocType[4], (UINT32)(AsciiStrLen (mMemoryAllocType[4])+1));
           ASSERT_EFI_ERROR (Status);
         }
       } else {
         DEBUG ((DEBUG_INFO, "other memory hob  \n"));
-        Status = FdtSetProperty (Fdt, TempNode, "compatible", mMemoryAllocType[AllocMemType], (UINT32)(AsciiStrLen (mMemoryAllocType[AllocMemType])+1));
+        Status = FdtSetProp (Fdt, TempNode, "compatible", mMemoryAllocType[AllocMemType], (UINT32)(AsciiStrLen (mMemoryAllocType[AllocMemType])+1));
         ASSERT_EFI_ERROR (Status);
       }
     }
@@ -329,7 +329,7 @@ BuildFdtForSerial (
   ASSERT (TempNode > 0);
 
   Data32 = CpuToFdt32 (PcdGet32 (PcdSerialBaudRate));
-  Status = FdtSetProperty (Fdt, TempNode, "current-speed", &Data32, sizeof (Data32));
+  Status = FdtSetProp (Fdt, TempNode, "current-speed", &Data32, sizeof (Data32));
   ASSERT_EFI_ERROR (Status);
 
   if (PcdGetBool (PcdSerialUseMmio)) {
@@ -344,14 +344,14 @@ BuildFdtForSerial (
   Data32     = (UINT32)((Data64 & 0x0FFFFFFFF));
   RegData[1] = CpuToFdt32 (Data32);
   RegData[2] = CpuToFdt32 (8);
-  Status     = FdtSetProperty (Fdt, TempNode, "reg", &RegData, sizeof (RegData));
+  Status     = FdtSetProp (Fdt, TempNode, "reg", &RegData, sizeof (RegData));
   ASSERT_EFI_ERROR (Status);
 
   Data32 = CpuToFdt32 (1);
-  Status = FdtSetProperty (Fdt, TempNode, "reg-io-width", &Data32, sizeof (Data32));
+  Status = FdtSetProp (Fdt, TempNode, "reg-io-width", &Data32, sizeof (Data32));
   ASSERT_EFI_ERROR (Status);
 
-  Status = FdtSetProperty (Fdt, TempNode, "compatible", "isa", (UINT32)(AsciiStrLen ("isa")+1));
+  Status = FdtSetProp (Fdt, TempNode, "compatible", "isa", (UINT32)(AsciiStrLen ("isa")+1));
   ASSERT_EFI_ERROR (Status);
 
   return Status;
@@ -404,19 +404,19 @@ BuildFdtForSerialLpss (
     ASSERT (TempNode > 0);
 
     Data32 = CpuToFdt32 (SerialPortInfo->BaudRate);
-    Status = FdtSetProperty (Fdt, TempNode, "current-speed", &Data32, sizeof (Data32));
+    Status = FdtSetProp (Fdt, TempNode, "current-speed", &Data32, sizeof (Data32));
     ASSERT_EFI_ERROR (Status);
 
     RegData[0] = CpuToFdt32 ((UINT32)SerialPortInfo->RegisterBase);
     RegData[1] = CpuToFdt32 (0x80);
-    Status     = FdtSetProperty (Fdt, TempNode, "reg", &RegData, sizeof (RegData));
+    Status     = FdtSetProp (Fdt, TempNode, "reg", &RegData, sizeof (RegData));
     ASSERT_EFI_ERROR (Status);
 
     Data32 = CpuToFdt32 (4);
-    Status = FdtSetProperty (Fdt, TempNode, "reg-io-width", &Data32, sizeof (Data32));
+    Status = FdtSetProp (Fdt, TempNode, "reg-io-width", &Data32, sizeof (Data32));
     ASSERT_EFI_ERROR (Status);
 
-    Status = FdtSetProperty (Fdt, TempNode, "compatible", "ns16550a", (UINT32)(AsciiStrLen ("ns16550a")+1));
+    Status = FdtSetProp (Fdt, TempNode, "compatible", "ns16550a", (UINT32)(AsciiStrLen ("ns16550a")+1));
     ASSERT_EFI_ERROR (Status);
 
     GuidHob = GET_NEXT_HOB (GuidHob);
@@ -633,7 +633,7 @@ BuildFdtForPciRootBridge (
       RegData[20] = CpuToFdt32 (Data32);
       DEBUG ((DEBUG_INFO, "PciRootBridge->Io.base size [20] %x, \n", Data32));
 
-      Status = FdtSetProperty (Fdt, TempNode, "ranges", &RegData, sizeof (RegData));
+      Status = FdtSetProp (Fdt, TempNode, "ranges", &RegData, sizeof (RegData));
       ASSERT_EFI_ERROR (Status);
 
       // non-reloc/non-prefetch/memory, child-addr, parent-addr, length
@@ -653,7 +653,7 @@ BuildFdtForPciRootBridge (
       DMARegData[6] = CpuToFdt32 (1);
       DMARegData[7] = CpuToFdt32 (0);
 
-      Status = FdtSetProperty (Fdt, TempNode, "dma-ranges", &DMARegData, sizeof (DMARegData));
+      Status = FdtSetProp (Fdt, TempNode, "dma-ranges", &DMARegData, sizeof (DMARegData));
       ASSERT_EFI_ERROR (Status);
 
       ASSERT (PciRootBridgeInfo->RootBridge[Index].Bus.Base <= 0xFF);
@@ -662,7 +662,7 @@ BuildFdtForPciRootBridge (
       Reg64Data[0] = CpuToFdt64 (PciExpressBaseAddress + LShiftU64 (PciRootBridgeInfo->RootBridge[Index].Bus.Base, 20));
       Reg64Data[1] = CpuToFdt64 (LShiftU64 (PciRootBridgeInfo->RootBridge[Index].Bus.Limit +1, 20));
 
-      Status = FdtSetProperty (Fdt, TempNode, "reg", &Reg64Data, sizeof (Reg64Data));
+      Status = FdtSetProp (Fdt, TempNode, "reg", &Reg64Data, sizeof (Reg64Data));
       ASSERT_EFI_ERROR (Status);
 
       BusNumber = PciRootBridgeInfo->RootBridge[Index].Bus.Base & 0xFF;
@@ -674,22 +674,22 @@ BuildFdtForPciRootBridge (
       ASSERT (PciRootBridgeInfo->RootBridge[Index].Bus.Base <= 0xFF);
       ASSERT (PciRootBridgeInfo->RootBridge[Index].Bus.Limit <= 0xFF);
 
-      Status = FdtSetProperty (Fdt, TempNode, "bus-range", &RegTmp, sizeof (RegTmp));
+      Status = FdtSetProp (Fdt, TempNode, "bus-range", &RegTmp, sizeof (RegTmp));
       ASSERT_EFI_ERROR (Status);
 
       Data32 = CpuToFdt32 (2);
-      Status = FdtSetProperty (Fdt, TempNode, "#size-cells", &Data32, sizeof (UINT32));
+      Status = FdtSetProp (Fdt, TempNode, "#size-cells", &Data32, sizeof (UINT32));
 
       Reg64Data[0] = CpuToFdt64 (PciExpressBaseAddress + LShiftU64 (PciRootBridgeInfo->RootBridge[Index].Bus.Base, 20));
       Reg64Data[1] = CpuToFdt64 (LShiftU64 (PciRootBridgeInfo->RootBridge[Index].Bus.Limit +1, 20));
 
-      Status = FdtSetProperty (Fdt, TempNode, "reg", &Reg64Data, sizeof (Reg64Data));
+      Status = FdtSetProp (Fdt, TempNode, "reg", &Reg64Data, sizeof (Reg64Data));
       ASSERT_EFI_ERROR (Status);
 
       Data32 = CpuToFdt32 (3);
-      Status = FdtSetProperty (Fdt, TempNode, "#address-cells", &Data32, sizeof (UINT32));
+      Status = FdtSetProp (Fdt, TempNode, "#address-cells", &Data32, sizeof (UINT32));
 
-      Status = FdtSetProperty (Fdt, TempNode, "compatible", "pci-rb", (UINT32)(AsciiStrLen ("pci-rb")+1));
+      Status = FdtSetProp (Fdt, TempNode, "compatible", "pci-rb", (UINT32)(AsciiStrLen ("pci-rb")+1));
       ASSERT_EFI_ERROR (Status);
 
       if (Index == 0) {
@@ -740,19 +740,19 @@ BuildFdtForPciRootBridge (
         }
 
         Data32 = CpuToFdt32 (PciData.Device.SubsystemID);
-        Status = FdtSetProperty (Fdt, GmaNode, "subsystem-id", &Data32, sizeof (UINT32));
+        Status = FdtSetProp (Fdt, GmaNode, "subsystem-id", &Data32, sizeof (UINT32));
 
         Data32 = CpuToFdt32 (PciData.Device.SubsystemVendorID);
-        Status = FdtSetProperty (Fdt, GmaNode, "subsystem-vendor-id", &Data32, sizeof (UINT32));
+        Status = FdtSetProp (Fdt, GmaNode, "subsystem-vendor-id", &Data32, sizeof (UINT32));
 
         Data32 = CpuToFdt32 (PciData.Hdr.RevisionID);
-        Status = FdtSetProperty (Fdt, GmaNode, "revision-id", &Data32, sizeof (UINT32));
+        Status = FdtSetProp (Fdt, GmaNode, "revision-id", &Data32, sizeof (UINT32));
 
         Data32 = CpuToFdt32 (PciData.Hdr.DeviceId);
-        Status = FdtSetProperty (Fdt, GmaNode, "device-id", &Data32, sizeof (UINT32));
+        Status = FdtSetProp (Fdt, GmaNode, "device-id", &Data32, sizeof (UINT32));
 
         Data32 = CpuToFdt32 (PciData.Hdr.VendorId);
-        Status = FdtSetProperty (Fdt, GmaNode, "vendor-id", &Data32, sizeof (UINT32));
+        Status = FdtSetProp (Fdt, GmaNode, "vendor-id", &Data32, sizeof (UINT32));
       }
 
       if (SerialParent != NULL) {
@@ -767,12 +767,12 @@ BuildFdtForPciRootBridge (
             if (SerialParent->IsIsaCompatible) {
               Status   = AsciiSPrint (eSPIStr, sizeof (eSPIStr), "isa@%X,%X", DevBase, FunBase);
               eSPINode = FdtAddSubnode (Fdt, TempNode, eSPIStr);
-              Status   = FdtSetProperty (Fdt, eSPINode, "compatible", "isa", (UINT32)(AsciiStrLen ("isa")+1));
+              Status   = FdtSetProp (Fdt, eSPINode, "compatible", "isa", (UINT32)(AsciiStrLen ("isa")+1));
               ASSERT_EFI_ERROR (Status);
               Data32 = CpuToFdt32 (1);
-              Status = FdtSetProperty (Fdt, eSPINode, "#size-cells", &Data32, sizeof (UINT32));
+              Status = FdtSetProp (Fdt, eSPINode, "#size-cells", &Data32, sizeof (UINT32));
               Data32 = CpuToFdt32 (2);
-              Status = FdtSetProperty (Fdt, eSPINode, "#address-cells", &Data32, sizeof (UINT32));
+              Status = FdtSetProp (Fdt, eSPINode, "#address-cells", &Data32, sizeof (UINT32));
               Status = BuildFdtForSerial (eSPINode, FdtBase);
               ASSERT_EFI_ERROR (Status);
             }
@@ -819,52 +819,52 @@ BuildFdtForFrameBuffer (
     TempNode     = FdtAddSubnode (Fdt, 0, TempStr);
     ASSERT (TempNode > 0);
 
-    Status = FdtSetProperty (Fdt, TempNode, "display", "&gma", (UINT32)(AsciiStrLen ("&gma")+1));
+    Status = FdtSetProp (Fdt, TempNode, "display", "&gma", (UINT32)(AsciiStrLen ("&gma")+1));
     ASSERT_EFI_ERROR (Status);
 
-    Status = FdtSetProperty (Fdt, TempNode, "format", "a8r8g8b8", (UINT32)(AsciiStrLen ("a8r8g8b8")+1));
+    Status = FdtSetProp (Fdt, TempNode, "format", "a8r8g8b8", (UINT32)(AsciiStrLen ("a8r8g8b8")+1));
     ASSERT_EFI_ERROR (Status);
 
     Data32 = CpuToFdt32 (GraphicsInfo->GraphicsMode.VerticalResolution);
-    Status = FdtSetProperty (Fdt, TempNode, "height", &Data32, sizeof (UINT32));
+    Status = FdtSetProp (Fdt, TempNode, "height", &Data32, sizeof (UINT32));
     ASSERT_EFI_ERROR (Status);
 
     Data32 = CpuToFdt32 (GraphicsInfo->GraphicsMode.HorizontalResolution);
-    Status = FdtSetProperty (Fdt, TempNode, "width", &Data32, sizeof (UINT32));
+    Status = FdtSetProp (Fdt, TempNode, "width", &Data32, sizeof (UINT32));
     ASSERT_EFI_ERROR (Status);
 
     RegData[0] = CpuToFdt64 (GraphicsInfo->FrameBufferBase);
     RegData[1] = CpuToFdt64 (GraphicsInfo->FrameBufferSize);
-    Status     = FdtSetProperty (Fdt, TempNode, "reg", &RegData, sizeof (RegData));
+    Status     = FdtSetProp (Fdt, TempNode, "reg", &RegData, sizeof (RegData));
     ASSERT_EFI_ERROR (Status);
 
-    Status = FdtSetProperty (Fdt, TempNode, "compatible", "simple-framebuffer", (UINT32)(AsciiStrLen ("simple-framebuffer")+1));
+    Status = FdtSetProp (Fdt, TempNode, "compatible", "simple-framebuffer", (UINT32)(AsciiStrLen ("simple-framebuffer")+1));
     ASSERT_EFI_ERROR (Status);
   } else {
     Status   = AsciiSPrint (TempStr, sizeof (TempStr), "framebuffer@%lX", 0xB0000000);
     TempNode = FdtAddSubnode (Fdt, 0, TempStr);
     ASSERT (TempNode > 0);
 
-    Status = FdtSetProperty (Fdt, TempNode, "display", "&gma", (UINT32)(AsciiStrLen ("&gma")+1));
+    Status = FdtSetProp (Fdt, TempNode, "display", "&gma", (UINT32)(AsciiStrLen ("&gma")+1));
     ASSERT_EFI_ERROR (Status);
 
-    Status = FdtSetProperty (Fdt, TempNode, "format", "a8r8g8b8", (UINT32)(AsciiStrLen ("a8r8g8b8")+1));
+    Status = FdtSetProp (Fdt, TempNode, "format", "a8r8g8b8", (UINT32)(AsciiStrLen ("a8r8g8b8")+1));
     ASSERT_EFI_ERROR (Status);
 
     Data32 = CpuToFdt32 (1024);
-    Status = FdtSetProperty (Fdt, TempNode, "height", &Data32, sizeof (UINT32));
+    Status = FdtSetProp (Fdt, TempNode, "height", &Data32, sizeof (UINT32));
     ASSERT_EFI_ERROR (Status);
 
     Data32 = CpuToFdt32 (1280);
-    Status = FdtSetProperty (Fdt, TempNode, "width", &Data32, sizeof (UINT32));
+    Status = FdtSetProp (Fdt, TempNode, "width", &Data32, sizeof (UINT32));
     ASSERT_EFI_ERROR (Status);
 
     RegData[0] = CpuToFdt64 (0xB0000000);
     RegData[1] = CpuToFdt64 (0x500000);
-    Status     = FdtSetProperty (Fdt, TempNode, "reg", &RegData, sizeof (RegData));
+    Status     = FdtSetProp (Fdt, TempNode, "reg", &RegData, sizeof (RegData));
     ASSERT_EFI_ERROR (Status);
 
-    Status = FdtSetProperty (Fdt, TempNode, "compatible", "simple-framebuffer", (UINT32)(AsciiStrLen ("simple-framebuffer")+1));
+    Status = FdtSetProp (Fdt, TempNode, "compatible", "simple-framebuffer", (UINT32)(AsciiStrLen ("simple-framebuffer")+1));
     ASSERT_EFI_ERROR (Status);
   }
 
@@ -917,35 +917,35 @@ BuildFdtForUplRequired (
   ASSERT (CpuHob != NULL);
 
   if (mResourceAssigned) {
-    Status = FdtSetProperty (Fdt, UPLParaNode, "pci-enum-done", NULL, 0);
+    Status = FdtSetProp (Fdt, UPLParaNode, "pci-enum-done", NULL, 0);
     ASSERT_EFI_ERROR (Status);
   }
 
   BootMode = GetBootModeHob ();
 
   Data32 = CpuToFdt32 ((UINT32)CpuHob->SizeOfMemorySpace);
-  Status = FdtSetProperty (Fdt, UPLParaNode, "addr-width", &Data32, sizeof (Data32));
+  Status = FdtSetProp (Fdt, UPLParaNode, "addr-width", &Data32, sizeof (Data32));
   ASSERT_EFI_ERROR (Status);
 
   if (BootMode == BOOT_WITH_FULL_CONFIGURATION) {
-    Status = FdtSetProperty (Fdt, UPLParaNode, "boot-mode", "normal", (UINT32)(AsciiStrLen ("normal")+1));
+    Status = FdtSetProp (Fdt, UPLParaNode, "boot-mode", "normal", (UINT32)(AsciiStrLen ("normal")+1));
   } else if (BootMode == BOOT_WITH_MINIMAL_CONFIGURATION) {
-    Status = FdtSetProperty (Fdt, UPLParaNode, "boot-mode", "fast", (UINT32)(AsciiStrLen ("fast")+1));
+    Status = FdtSetProp (Fdt, UPLParaNode, "boot-mode", "fast", (UINT32)(AsciiStrLen ("fast")+1));
   } else if (BootMode == BOOT_WITH_FULL_CONFIGURATION_PLUS_DIAGNOSTICS) {
-    Status = FdtSetProperty (Fdt, UPLParaNode, "boot-mode", "full", (UINT32)(AsciiStrLen ("full")+1));
+    Status = FdtSetProp (Fdt, UPLParaNode, "boot-mode", "full", (UINT32)(AsciiStrLen ("full")+1));
   } else if (BootMode == BOOT_WITH_DEFAULT_SETTINGS) {
-    Status = FdtSetProperty (Fdt, UPLParaNode, "boot-mode", "default", (UINT32)(AsciiStrLen ("default")+1));
+    Status = FdtSetProp (Fdt, UPLParaNode, "boot-mode", "default", (UINT32)(AsciiStrLen ("default")+1));
   } else if (BootMode == BOOT_ON_S4_RESUME) {
-    Status = FdtSetProperty (Fdt, UPLParaNode, "boot-mode", "s4", (UINT32)(AsciiStrLen ("s4")+1));
+    Status = FdtSetProp (Fdt, UPLParaNode, "boot-mode", "s4", (UINT32)(AsciiStrLen ("s4")+1));
   } else if (BootMode == BOOT_ON_S3_RESUME) {
-    Status = FdtSetProperty (Fdt, UPLParaNode, "boot-mode", "s3", (UINT32)(AsciiStrLen ("s3")+1));
+    Status = FdtSetProp (Fdt, UPLParaNode, "boot-mode", "s3", (UINT32)(AsciiStrLen ("s3")+1));
   } else {
-    Status = FdtSetProperty (Fdt, UPLParaNode, "boot-mode", "na", (UINT32)(AsciiStrLen ("na")+1));
+    Status = FdtSetProp (Fdt, UPLParaNode, "boot-mode", "na", (UINT32)(AsciiStrLen ("na")+1));
   }
 
   ASSERT_EFI_ERROR (Status);
 
-  Status = FdtSetProperty (Fdt, UPLParaNode, "compatible", "upl", (UINT32)(AsciiStrLen ("upl")+1));
+  Status = FdtSetProp (Fdt, UPLParaNode, "compatible", "upl", (UINT32)(AsciiStrLen ("upl")+1));
   ASSERT_EFI_ERROR (Status);
 
   GuidHob = GetFirstGuidHob (&gUniversalPayloadBaseGuid);
@@ -958,7 +958,7 @@ BuildFdtForUplRequired (
     UPLImageNode = FdtAddSubnode (Fdt, ParentNode, TempStr);
 
     Data64 = CpuToFdt64 ((UINTN)Fit);
-    Status = FdtSetProperty (FdtBase, UPLImageNode, "addr", &Data64, sizeof (Data64));
+    Status = FdtSetProp (FdtBase, UPLImageNode, "addr", &Data64, sizeof (Data64));
   }
 
   CustomNode = FdtAddSubnode (Fdt, ParentNode, "upl-custom");
@@ -966,7 +966,7 @@ BuildFdtForUplRequired (
 
   HobPtr = GetHobList ();
   Data64 = CpuToFdt64 ((UINT64)(EFI_PHYSICAL_ADDRESS)HobPtr);
-  Status = FdtSetProperty (Fdt, CustomNode, "hoblistptr", &Data64, sizeof (Data64));
+  Status = FdtSetProp (Fdt, CustomNode, "hoblistptr", &Data64, sizeof (Data64));
   ASSERT_EFI_ERROR (Status);
 
   return Status;

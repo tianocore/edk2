@@ -7,9 +7,9 @@
 
 **/
 
-#include <libfdt.h>
 #include <Library/AndroidBootImgLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/FdtLib.h>
 #include <Library/PrintLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -434,7 +434,7 @@ AndroidBootImgLocateFdt (
     return Status;
   }
 
-  Err = fdt_check_header (*FdtBase);
+  Err = FdtCheckHeader (*FdtBase);
   if (Err != 0) {
     DEBUG ((
       DEBUG_ERROR,
@@ -454,9 +454,9 @@ AndroidBootImgGetChosenNode (
 {
   INTN  ChosenNode;
 
-  ChosenNode = fdt_subnode_offset ((CONST VOID *)UpdatedFdtBase, 0, "chosen");
+  ChosenNode = FdtSubnodeOffset ((CONST VOID *)UpdatedFdtBase, 0, "chosen");
   if (ChosenNode < 0) {
-    ChosenNode = fdt_add_subnode ((VOID *)UpdatedFdtBase, 0, "chosen");
+    ChosenNode = FdtAddSubnode ((VOID *)UpdatedFdtBase, 0, "chosen");
     if (ChosenNode < 0) {
       DEBUG ((DEBUG_ERROR, "Fail to find fdt node chosen!\n"));
       return 0;
@@ -474,19 +474,19 @@ AndroidBootImgSetProperty64 (
   IN  UINT64  Val
   )
 {
-  INTN                 Err;
-  struct fdt_property  *Property;
-  int                  Len;
+  INTN                Err;
+  CONST FDT_PROPERTY  *Property;
+  int                 Len;
 
-  Property = fdt_get_property_w (
+  Property = FdtGetPropertyW (
                (VOID *)UpdatedFdtBase,
                ChosenNode,
                PropertyName,
                &Len
                );
   if ((NULL == Property) && (Len == -FDT_ERR_NOTFOUND)) {
-    Val = cpu_to_fdt64 (Val);
-    Err = fdt_appendprop (
+    Val = CpuToFdt64 (Val);
+    Err = FdtAppendProp (
             (VOID *)UpdatedFdtBase,
             ChosenNode,
             PropertyName,
@@ -494,18 +494,18 @@ AndroidBootImgSetProperty64 (
             sizeof (UINT64)
             );
     if (Err) {
-      DEBUG ((DEBUG_ERROR, "fdt_appendprop() fail: %a\n", fdt_strerror (Err)));
+      DEBUG ((DEBUG_ERROR, "FdtAppendProp() fail: %a\n", FdtStrerror (Err)));
       return EFI_INVALID_PARAMETER;
     }
   } else if (Property != NULL) {
-    Err = fdt_setprop_u64 (
+    Err = FdtSetPropU64 (
             (VOID *)UpdatedFdtBase,
             ChosenNode,
             PropertyName,
             Val
             );
     if (Err) {
-      DEBUG ((DEBUG_ERROR, "fdt_setprop_u64() fail: %a\n", fdt_strerror (Err)));
+      DEBUG ((DEBUG_ERROR, "FdtSetpropU64() fail: %a\n", FdtStrerror (Err)));
       return EFI_INVALID_PARAMETER;
     }
   } else {
@@ -528,7 +528,7 @@ AndroidBootImgUpdateFdt (
   EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  UpdatedFdtBase, NewFdtBase;
 
-  NewFdtSize = (UINTN)fdt_totalsize (FdtBase)
+  NewFdtSize = (UINTN)FdtTotalSize (FdtBase)
                + FDT_ADDITIONAL_ENTRIES_SIZE;
   Status = gBS->AllocatePages (
                   AllocateAnyPages,
@@ -546,9 +546,9 @@ AndroidBootImgUpdateFdt (
   }
 
   // Load the Original FDT tree into the new region
-  Err = fdt_open_into (FdtBase, (VOID *)(INTN)UpdatedFdtBase, NewFdtSize);
+  Err = FdtOpenInto (FdtBase, (VOID *)(INTN)UpdatedFdtBase, NewFdtSize);
   if (Err) {
-    DEBUG ((DEBUG_ERROR, "fdt_open_into(): %a\n", fdt_strerror (Err)));
+    DEBUG ((DEBUG_ERROR, "FdtOpenInto(): %a\n", FdtStrerror (Err)));
     Status = EFI_INVALID_PARAMETER;
     goto Fdt_Exit;
   }

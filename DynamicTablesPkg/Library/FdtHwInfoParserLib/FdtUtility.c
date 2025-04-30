@@ -11,6 +11,7 @@
 **/
 
 #include <Library/BaseLib.h>
+#include <Library/FdtLib.h>
 #include <FdtHwInfoParserInclude.h>
 #include "FdtUtility.h"
 
@@ -47,7 +48,7 @@ FdtNodeHasName (
   Length = (UINT32)AsciiStrLen (SearchName);
 
   // Get the address of the node name.
-  NodeName = fdt_offset_ptr (Fdt, Node + FDT_TAGSIZE, Length + 1);
+  NodeName = FdtOffsetPointer (Fdt, Node + FDT_TAGSIZE, Length + 1);
   if (NodeName == NULL) {
     return FALSE;
   }
@@ -110,13 +111,13 @@ FdtNodeIsCompatible (
   CompatibleTable = ((COMPATIBILITY_INFO *)CompatInfo)->CompatTable;
 
   // Get the "compatible" property.
-  Prop = fdt_getprop (Fdt, Node, "compatible", &PropLen);
+  Prop = FdtGetProp (Fdt, Node, "compatible", &PropLen);
   if ((Prop == NULL) || (PropLen < 0)) {
     return FALSE;
   }
 
   for (Index = 0; Index < Count; Index++) {
-    if (fdt_stringlist_contains (
+    if (FdtStringListContains (
           Prop,
           PropLen,
           CompatibleTable[Index].CompatStr
@@ -157,7 +158,7 @@ FdtNodeHasProperty (
     return FALSE;
   }
 
-  Prop = fdt_getprop (Fdt, Node, PropertyName, &Size);
+  Prop = FdtGetProp (Fdt, Node, PropertyName, &Size);
   if ((Prop == NULL) || (Size < 0)) {
     return FALSE;
   }
@@ -218,7 +219,7 @@ FdtGetNextCondNode (
 
   CurrNode = *Node;
   do {
-    CurrNode = fdt_next_node (Fdt, CurrNode, Depth);
+    CurrNode = FdtNextNode (Fdt, CurrNode, Depth);
     if ((CurrNode == -FDT_ERR_NOTFOUND) ||
         (*Depth < 0))
     {
@@ -292,9 +293,9 @@ FdtGetNextCondNodeInBranch (
   // First, check the Node is in the sub-nodes of the branch.
   // This allows to find the relative depth of Node in the branch.
   if (CurrNode != *Node) {
-    for (CurrNode = fdt_next_node (Fdt, CurrNode, &Depth);
+    for (CurrNode = FdtNextNode (Fdt, CurrNode, &Depth);
          (CurrNode >= 0) && (Depth > 0);
-         CurrNode = fdt_next_node (Fdt, CurrNode, &Depth))
+         CurrNode = FdtNextNode (Fdt, CurrNode, &Depth))
     {
       if (CurrNode == *Node) {
         // Node found.
@@ -666,18 +667,18 @@ FdtGetIntcParentNode (
 
   while (TRUE) {
     // Check whether the node has the "interrupt-controller" property.
-    Prop = fdt_getprop (Fdt, Node, "interrupt-controller", &Size);
+    Prop = FdtGetProp (Fdt, Node, "interrupt-controller", &Size);
     if ((Prop != NULL) && (Size >= 0)) {
       // The interrupt-controller has been found.
       *IntcNode = Node;
       return EFI_SUCCESS;
     } else {
       // Check whether the node has the "interrupt-parent" property.
-      PHandle = fdt_getprop (Fdt, Node, "interrupt-parent", &Size);
+      PHandle = FdtGetProp (Fdt, Node, "interrupt-parent", &Size);
       if ((PHandle != NULL) && (Size == sizeof (UINT32))) {
         // The phandle of the interrupt-controller has been found.
         // Search the node having this phandle and return it.
-        Node = fdt_node_offset_by_phandle (Fdt, fdt32_to_cpu (*PHandle));
+        Node = FdtNodeOffsetByPhandle (Fdt, Fdt32ToCpu (*PHandle));
         if (Node < 0) {
           ASSERT (0);
           return EFI_ABORTED;
@@ -697,7 +698,7 @@ FdtGetIntcParentNode (
     }
 
     // Get the parent of the node.
-    Node = fdt_parent_offset (Fdt, Node);
+    Node = FdtParentOffset (Fdt, Node);
     if (Node < 0) {
       // An error occurred.
       ASSERT (0);
@@ -739,14 +740,14 @@ FdtGetInterruptCellsInfo (
     return EFI_INVALID_PARAMETER;
   }
 
-  Data = fdt_getprop (Fdt, IntcNode, "#interrupt-cells", &Size);
+  Data = FdtGetProp (Fdt, IntcNode, "#interrupt-cells", &Size);
   if ((Data == NULL) || (Size != sizeof (UINT32))) {
     // If error or not on one UINT32 cell.
     ASSERT (0);
     return EFI_ABORTED;
   }
 
-  *IntCells = fdt32_to_cpu (*Data);
+  *IntCells = Fdt32ToCpu (*Data);
 
   return EFI_SUCCESS;
 }
@@ -788,7 +789,7 @@ FdtGetAddressInfo (
   }
 
   if (AddressCells != NULL) {
-    *AddressCells = fdt_address_cells (Fdt, Node);
+    *AddressCells = FdtAddressCells (Fdt, Node);
     if (*AddressCells < 0) {
       ASSERT (0);
       return EFI_ABORTED;
@@ -796,7 +797,7 @@ FdtGetAddressInfo (
   }
 
   if (SizeCells != NULL) {
-    *SizeCells = fdt_size_cells (Fdt, Node);
+    *SizeCells = FdtSizeCells (Fdt, Node);
     if (*SizeCells < 0) {
       ASSERT (0);
       return EFI_ABORTED;
@@ -842,7 +843,7 @@ FdtGetParentAddressInfo (
     return EFI_INVALID_PARAMETER;
   }
 
-  Node = fdt_parent_offset (Fdt, Node);
+  Node = FdtParentOffset (Fdt, Node);
   if (Node < 0) {
     // End of the tree, or an error occurred.
     ASSERT (0);
