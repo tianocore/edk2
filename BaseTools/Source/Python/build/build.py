@@ -71,22 +71,6 @@ gSupportedTarget = ['all', 'genc', 'genmake', 'modules', 'libraries', 'fds', 'cl
 TemporaryTablePattern = re.compile(r'^_\d+_\d+_[a-fA-F0-9]+$')
 TmpTableDict = {}
 
-## Check environment PATH variable to make sure the specified tool is found
-#
-#   If the tool is found in the PATH, then True is returned
-#   Otherwise, False is returned
-#
-def IsToolInPath(tool):
-    if 'PATHEXT' in os.environ:
-        extns = os.environ['PATHEXT'].split(os.path.pathsep)
-    else:
-        extns = ('',)
-    for pathDir in os.environ['PATH'].split(os.path.pathsep):
-        for ext in extns:
-            if os.path.exists(os.path.join(pathDir, tool + ext)):
-                return True
-    return False
-
 ## Check environment variables
 #
 #  Check environment variables that must be set for build. Currently they are
@@ -385,26 +369,6 @@ class ModuleMakeUnit(BuildUnit):
         if Target in [None, "", "all"]:
             self.Target = "tbuild"
 
-## The smallest platform unit that can be built by nmake/make command in multi-thread build mode
-#
-# This class is for platform build by nmake/make build system. The "Obj" parameter
-# must provide __str__(), __eq__() and __hash__() methods. Otherwise there could
-# be make units missing build.
-#
-# Currently the "Obj" should be only PlatformAutoGen object.
-#
-class PlatformMakeUnit(BuildUnit):
-    ## The constructor
-    #
-    #   @param  self        The object pointer
-    #   @param  Obj         The PlatformAutoGen object the build is working on
-    #   @param  Target      The build target name, one of gSupportedTarget
-    #
-    def __init__(self, Obj, BuildCommand, Target):
-        Dependency = [ModuleMakeUnit(Lib, BuildCommand, Target) for Lib in self.BuildObject.LibraryAutoGenList]
-        Dependency.extend([ModuleMakeUnit(Mod, BuildCommand,Target) for Mod in self.BuildObject.ModuleAutoGenList])
-        BuildUnit.__init__(self, Obj, BuildCommand, Target, Dependency, Obj.MakeFileDir)
-
 ## The class representing the task of a module build or platform build
 #
 # This class manages the build tasks in multi-thread build mode. Its jobs include
@@ -561,15 +525,6 @@ class BuildTask:
     @staticmethod
     def HasError():
         return BuildTask._ErrorFlag.is_set()
-
-    ## Get error message in running thread
-    #
-    #   Since the main thread cannot catch exceptions in other thread, we have to
-    #   use a static variable to communicate this message to main thread.
-    #
-    @staticmethod
-    def GetErrorMessage():
-        return BuildTask._ErrorMessage
 
     ## Factory method to create a BuildTask object
     #
@@ -803,8 +758,6 @@ class Build():
         self.LoadFixAddress = 0
         self.UniFlag        = BuildOptions.Flag
         self.BuildModules = []
-        self.HashSkipModules = []
-        self.Db_Flag = False
         self.LaunchPrebuildFlag = False
         self.PlatformBuildPath = os.path.join(GlobalData.gConfDirectory, '.cache', '.PlatformBuild')
         if BuildOptions.CommandLength:
@@ -1045,7 +998,6 @@ class Build():
         if 'PREBUILD' in GlobalData.gCommandLineDefines:
             self.Prebuild   = GlobalData.gCommandLineDefines.get('PREBUILD')
         else:
-            self.Db_Flag = True
             Platform = self.Db.MapPlatform(str(self.PlatformFile))
             self.Prebuild = str(Platform.Prebuild)
         if self.Prebuild:
@@ -2494,13 +2446,6 @@ class Build():
                     for guidedSectionTool in guidAttribs:
                         print(' '.join(guidedSectionTool), file=toolsFile)
                     toolsFile.close()
-
-    ## Returns the real path of the tool.
-    #
-    def GetRealPathOfTool (self, tool):
-        if os.path.exists(tool):
-            return os.path.realpath(tool)
-        return tool
 
     ## Launch the module or platform build
     #
