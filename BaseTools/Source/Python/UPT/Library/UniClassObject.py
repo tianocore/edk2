@@ -133,40 +133,6 @@ def ConvertSpecialUnicodes(Uni):
 def GetLanguageCode1766(LangName, File=None):
     return LangName
 
-    length = len(LangName)
-    if length == 2:
-        if LangName.isalpha():
-            for Key in gLANG_CONV_TABLE.keys():
-                if gLANG_CONV_TABLE.get(Key) == LangName.lower():
-                    return Key
-    elif length == 3:
-        if LangName.isalpha() and gLANG_CONV_TABLE.get(LangName.lower()):
-            return LangName
-        else:
-            EdkLogger.Error("Unicode File Parser",
-                             ToolError.FORMAT_INVALID,
-                             "Invalid RFC 1766 language code : %s" % LangName,
-                             File)
-    elif length == 5:
-        if LangName[0:2].isalpha() and LangName[2] == '-':
-            for Key in gLANG_CONV_TABLE.keys():
-                if gLANG_CONV_TABLE.get(Key) == LangName[0:2].lower():
-                    return Key
-    elif length >= 6:
-        if LangName[0:2].isalpha() and LangName[2] == '-':
-            for Key in gLANG_CONV_TABLE.keys():
-                if gLANG_CONV_TABLE.get(Key) == LangName[0:2].lower():
-                    return Key
-        if LangName[0:3].isalpha() and gLANG_CONV_TABLE.get(LangName.lower()) is None and LangName[3] == '-':
-            for Key in gLANG_CONV_TABLE.keys():
-                if Key == LangName[0:3].lower():
-                    return Key
-
-    EdkLogger.Error("Unicode File Parser",
-                             ToolError.FORMAT_INVALID,
-                             "Invalid RFC 4646 language code : %s" % LangName,
-                             File)
-
 ## GetLanguageCode
 #
 # Check the language code read from .UNI file and convert RFC 1766 codes to RFC 4646 codes if appropriate
