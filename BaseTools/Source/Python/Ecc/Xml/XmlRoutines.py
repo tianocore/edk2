@@ -132,37 +132,6 @@ def XmlElement(Dom, String):
     except:
         return ""
 
-
-## Get a single XML element of the current node.
-#
-# Return a single XML element specified by the current root Dom.
-# If the input Dom is not valid, then an empty string is returned.
-#
-# @param  Dom                The root XML DOM object.
-#
-# @revel  Element            An XML element in current root Dom.
-#
-def XmlElementData(Dom):
-    try:
-        return Dom.firstChild.data.strip()
-    except:
-        return ""
-
-
-## Get a list of XML elements using XPath style syntax.
-#
-# Return a list of XML elements from the root Dom specified by XPath String.
-# If the input Dom or String is not valid, then an empty list is returned.
-#
-# @param  Dom                The root XML DOM object.
-# @param  String             A XPath style path.
-#
-# @revel  Elements           A list of XML elements matching XPath style Sting.
-#
-def XmlElementList(Dom, String):
-    return map(XmlElementData, XmlList(Dom, String))
-
-
 ## Get the XML attribute of the current node.
 #
 # Return a single XML attribute named Attribute from the current root Dom.
@@ -176,22 +145,6 @@ def XmlElementList(Dom, String):
 def XmlAttribute(Dom, Attribute):
     try:
         return Dom.getAttribute(Attribute).strip()
-    except:
-        return ''
-
-
-## Get the XML node name of the current node.
-#
-# Return a single XML node name from the current root Dom.
-# If the input Dom is not valid, then an empty string is returned.
-#
-# @param  Dom                The root XML DOM object.
-#
-# @revel  Element            A single XML element matching XPath style Sting.
-#
-def XmlNodeName(Dom):
-    try:
-        return Dom.nodeName.strip()
     except:
         return ''
 
