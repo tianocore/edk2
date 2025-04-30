@@ -1009,9 +1009,6 @@ class Ffs(Image):
     def Pack(self):
         pass
 
-    def SetFreeSpace(self, Size):
-        self.FreeSpace = Size
-
     def _GetGuid(self):
         return gGuidStringFormat % self.Name
 
