@@ -251,7 +251,6 @@ class PlatformAutoGen(AutoGen):
 
         VariableInfo = VariableMgr(self.DscBuildDataObj._GetDefaultStores(), self.DscBuildDataObj.SkuIds)
         VariableInfo.SetVpdRegionMaxSize(VpdRegionSize)
-        VariableInfo.SetVpdRegionOffset(VpdRegionBase)
         Index = 0
         for Pcd in sorted(DynamicPcdSet):
             pcdname = ".".join((Pcd.TokenSpaceGuidCName, Pcd.TokenCName))
@@ -989,11 +988,6 @@ class PlatformAutoGen(AutoGen):
 
     def _BuildOptionWithToolDef(self, ToolDef):
         return self._ExpandBuildOption(self.Platform.BuildOptions, ToolDef=ToolDef)
-
-    ## Return the build options specific for EDK modules in this platform
-    @cached_property
-    def EdkBuildOption(self):
-        return self._ExpandBuildOption(self.Platform.BuildOptions, EDK_NAME)
 
     ## Return the build options specific for EDKII modules in this platform
     @cached_property
