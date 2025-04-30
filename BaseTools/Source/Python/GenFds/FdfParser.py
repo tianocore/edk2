@@ -13,7 +13,6 @@
 from __future__ import print_function
 from __future__ import absolute_import
 from re import compile, DOTALL
-from string import hexdigits
 from uuid import UUID
 
 from Common.BuildToolError import *
