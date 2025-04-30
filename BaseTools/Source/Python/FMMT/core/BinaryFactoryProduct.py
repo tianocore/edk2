@@ -129,7 +129,6 @@ class SectionProduct(BinaryProduct):
             Section_Info.Data = Whole_Data[Rel_Offset+Section_Info.HeaderLength: Rel_Offset+Section_Info.Size]
             Section_Info.DOffset = Section_Offset + Section_Info.HeaderLength + Rel_Whole_Offset
             Section_Info.HOffset = Section_Offset + Rel_Whole_Offset
-            Section_Info.ROffset = Rel_Offset
             if Section_Info.Header.Type == 0:
                 break
             # The final Section in parent Section does not need to add padding, else must be 4-bytes align with parent Section start offset
@@ -173,7 +172,6 @@ class FfsProduct(BinaryProduct):
             Section_Info.Data = Whole_Data[Rel_Offset+Section_Info.HeaderLength: Rel_Offset+Section_Info.Size]
             Section_Info.DOffset = Section_Offset + Section_Info.HeaderLength + Rel_Whole_Offset
             Section_Info.HOffset = Section_Offset + Rel_Whole_Offset
-            Section_Info.ROffset = Rel_Offset
             if Section_Info.Header.Type == 0:
                 break
             # The final Section in Ffs does not need to add padding, else must be 4-bytes align with Ffs start offset
@@ -226,7 +224,6 @@ class FvProduct(BinaryProduct):
                 Ffs_Tree = BIOSTREE(Ffs_Info.Name)
                 Ffs_Info.HOffset = Ffs_Offset + Rel_Whole_Offset
                 Ffs_Info.DOffset = Ffs_Offset + Ffs_Info.Header.HeaderLength + Rel_Whole_Offset
-                Ffs_Info.ROffset = Rel_Offset
                 if Ffs_Info.Name == PADVECTOR:
                     Ffs_Tree.type = FFS_PAD
                     Ffs_Info.Data = Whole_Data[Rel_Offset+Ffs_Info.Header.HeaderLength: Rel_Offset+Ffs_Info.Size]
@@ -361,15 +358,6 @@ class FdProduct(BinaryProduct):
                 Fd_Struct.remove(Fd_Struct[i-tmp_index])
                 tmp_index += 1
         return Fd_Struct
-
-class ElfSectionProduct(BinaryProduct):
-    ## Decompress the compressed section.
-    def ParserData(self, Section_Tree, whole_Data: bytes, Rel_Whole_Offset: int=0) -> None:
-        pass
-    def ParserSectionData(self, Section_Tree, whole_Data: bytes, Rel_Whole_Offset: int=0) -> None:
-        pass
-    def ParserProgramData(self, Section_Tree, whole_Data: bytes, Rel_Whole_Offset: int=0) -> None:
-        pass
 
 class ElfProduct(BinaryProduct):
 
