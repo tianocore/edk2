@@ -78,7 +78,6 @@ class Database(object):
         self.Conn.execute("PRAGMA page_size=8192")
         self.Conn.execute("PRAGMA synchronous=OFF")
         # to avoid non-ascii character conversion error
-        self.Conn.text_factory = str
         self.Cur = self.Conn.cursor()
 
         self.TblDataModel = TableDataModel(self.Cur)
