@@ -495,41 +495,6 @@ def IsAllModuleList(ModuleList):
     else:
         return True
 
-## Dictionary that use comment(GenericComment, TailComment) as value,
-# if a new comment which key already in the dic is inserted, then the
-# comment will be merged.
-# Key is (Statement, SupArch), when TailComment is added, it will ident
-# according to Statement
-#
-class MergeCommentDict(dict):
-    ## []= operator
-    #
-    def __setitem__(self, Key, CommentVal):
-        GenericComment, TailComment = CommentVal
-        if Key in self:
-            OrigVal1, OrigVal2 = dict.__getitem__(self, Key)
-            Statement = Key[0]
-            dict.__setitem__(self, Key, (OrigVal1 + GenericComment, OrigVal2 \
-                                         + len(Statement) * ' ' + TailComment))
-        else:
-            dict.__setitem__(self, Key, (GenericComment, TailComment))
-
-    ## =[] operator
-    #
-    def __getitem__(self, Key):
-        return dict.__getitem__(self, Key)
-
-
-## GenDummyHelpTextObj
-#
-# @retval HelpTxt:   Generated dummy help text object
-#
-def GenDummyHelpTextObj():
-    HelpTxt = TextObject()
-    HelpTxt.SetLang(TAB_LANGUAGE_EN_US)
-    HelpTxt.SetString(' ')
-    return HelpTxt
-
 ## ConvertVersionToDecimal, the minor version should be within 0 - 99
 # <HexVersion>          ::=  "0x" <Major> <Minor>
 # <Major>               ::=  (a-fA-F0-9){4}
