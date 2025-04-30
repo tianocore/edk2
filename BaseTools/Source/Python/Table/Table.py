@@ -77,20 +77,6 @@ class Table(object):
         for Item in self.Cur:
             return Item[0]
 
-    ## Generate ID
-    #
-    # Generate an ID if input ID is -1
-    #
-    # @param ID:   Input ID
-    #
-    # @retval ID:  New generated ID
-    #
-    def GenerateID(self, ID):
-        if ID == -1:
-            self.ID = self.ID + 1
-
-        return self.ID
-
     ## Init the ID of the table
     #
     # Init the ID of the table
