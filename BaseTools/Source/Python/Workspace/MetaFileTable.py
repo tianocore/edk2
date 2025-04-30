@@ -28,7 +28,6 @@ class MetaFileTable():
         self.MetaFile = MetaFile
         self.TableName = ""
         self.DB = DB
-        self._NumpyTab = None
 
         self.CurrentContent = []
         DB.TblFile.append([MetaFile.Name,

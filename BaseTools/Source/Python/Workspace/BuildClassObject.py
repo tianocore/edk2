@@ -145,11 +145,6 @@ class PcdClassObject(object):
             return True
         return False
 
-    def IsSimpleTypeArray(self):
-        if self.IsArray() and self.BaseDatumType in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, "BOOLEAN"]:
-            return True
-        return False
-
     @staticmethod
     def GetPcdMaxSizeWorker(PcdString, MaxSize):
         if PcdString.startswith("{") and PcdString.endswith("}"):
@@ -290,7 +285,6 @@ class StructurePcd(PcdClassObject):
         self.PackageDecs = Packages
         self.DefaultStoreName = [default_store]
         self.DefaultValues = OrderedDict()
-        self.PcdMode = None
         self.SkuOverrideValues = OrderedDict()
         self.StructName = None
         self.PcdDefineLineNo = 0
@@ -334,9 +328,6 @@ class StructurePcd(PcdClassObject):
         self.PcdFiledValueFromDscComponent[ModuleGuid][DimensionAttr][FieldName] =  [Value.strip(), FileName, LineNo]
         return self.PcdFiledValueFromDscComponent[ModuleGuid][DimensionAttr][FieldName]
 
-    def SetPcdMode (self, PcdMode):
-        self.PcdMode = PcdMode
-
     def copy(self, PcdObject):
         self.TokenCName = PcdObject.TokenCName if PcdObject.TokenCName else self.TokenCName
         self.TokenSpaceGuidCName = PcdObject.TokenSpaceGuidCName if PcdObject.TokenSpaceGuidCName else PcdObject.TokenSpaceGuidCName
@@ -365,7 +356,6 @@ class StructurePcd(PcdClassObject):
             self.StructuredPcdIncludeFile = PcdObject.StructuredPcdIncludeFile if PcdObject.StructuredPcdIncludeFile else self.StructuredPcdIncludeFile
             self.PackageDecs = PcdObject.PackageDecs if PcdObject.PackageDecs else self.PackageDecs
             self.DefaultValues = PcdObject.DefaultValues if PcdObject.DefaultValues else self.DefaultValues
-            self.PcdMode = PcdObject.PcdMode if PcdObject.PcdMode else self.PcdMode
             self.DefaultValueFromDec = PcdObject.DefaultValueFromDec if PcdObject.DefaultValueFromDec else self.DefaultValueFromDec
             self.DefaultValueFromDecInfo = PcdObject.DefaultValueFromDecInfo if PcdObject.DefaultValueFromDecInfo else self.DefaultValueFromDecInfo
             self.SkuOverrideValues = PcdObject.SkuOverrideValues if PcdObject.SkuOverrideValues else self.SkuOverrideValues
@@ -383,7 +373,6 @@ class StructurePcd(PcdClassObject):
 
         new_pcd.DefaultValueFromDec = self.DefaultValueFromDec
         new_pcd.DefaultValueFromDecInfo = self.DefaultValueFromDecInfo
-        new_pcd.PcdMode = self.PcdMode
         new_pcd.StructName = self.DatumType
         new_pcd.PcdDefineLineNo = self.PcdDefineLineNo
         new_pcd.PkgPath = self.PkgPath
@@ -586,7 +575,6 @@ class PackageBuildClassObject(BuildData):
 # @var PlatformName:      To store value for PlatformName
 # @var Guid:              To store value for Guid
 # @var Version:           To store value for Version
-# @var DscSpecification:  To store value for DscSpecification
 # @var OutputDirectory:   To store value for OutputDirectory
 # @var FlashDefinition:   To store value for FlashDefinition
 # @var BuildNumber:       To store value for BuildNumber
@@ -609,7 +597,6 @@ class PlatformBuildClassObject(BuildData):
         self.PlatformName            = ''
         self.Guid                    = ''
         self.Version                 = ''
-        self.DscSpecification        = ''
         self.OutputDirectory         = ''
         self.FlashDefinition         = ''
         self.BuildNumber             = ''
