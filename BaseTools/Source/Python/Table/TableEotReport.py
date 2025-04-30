@@ -62,9 +62,3 @@ class TableEotReport(Table):
                      % (self.Table, self.ID, ModuleID, ModuleName, ModuleGuid, SourceFileID, SourceFileFullPath, \
                         ItemName, ItemType, ItemMode, GuidName, GuidMacro, GuidValue, BelongsToFunction, Enabled)
         Table.Insert(self, SqlCommand)
-
-    def GetMaxID(self):
-        SqlCommand = """select max(ID) from %s""" % self.Table
-        self.Cur.execute(SqlCommand)
-        for Item in self.Cur:
-            return Item[0]
