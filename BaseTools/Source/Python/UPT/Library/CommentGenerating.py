@@ -16,7 +16,6 @@ CommentGenerating
 from Library.StringUtils import GetSplitValueList
 from Library.DataType import TAB_SPACE_SPLIT
 from Library.DataType import TAB_INF_GUIDTYPE_VAR
-from Library.DataType import USAGE_ITEM_NOTIFY
 from Library.DataType import ITEM_UNDEFINED
 from Library.DataType import TAB_HEADER_COMMENT
 from Library.DataType import TAB_BINARY_HEADER_COMMENT
