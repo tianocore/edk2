@@ -1536,7 +1536,6 @@ class FdfParser:
 
             if self._IsToken(TAB_VALUE_SPLIT):
                 pcdPair = self._GetNextPcdSettings()
-                Obj.BaseAddressPcd = pcdPair
                 self.Profile.PcdDict[pcdPair] = Obj.BaseAddress
                 self.SetPcdLocalation(pcdPair)
                 FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
@@ -1553,7 +1552,6 @@ class FdfParser:
             Size = self._Token
             if self._IsToken(TAB_VALUE_SPLIT):
                 pcdPair = self._GetNextPcdSettings()
-                Obj.SizePcd = pcdPair
                 self.Profile.PcdDict[pcdPair] = Size
                 self.SetPcdLocalation(pcdPair)
                 FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
@@ -2391,9 +2389,6 @@ class FdfParser:
         if not ffsInf.InfFileName.endswith('.inf'):
             raise Warning.Expected(".inf file path", self.FileName, self.CurrentLineNumber)
 
-        ffsInf.CurrentLineNum = self.CurrentLineNumber
-        ffsInf.CurrentLineContent = self._CurrentLine()
-
         #Replace $(SAPCE) with real space
         ffsInf.InfFileName = ffsInf.InfFileName.replace('$(SPACE)', ' ')
 
@@ -2650,8 +2645,6 @@ class FdfParser:
             self._GetRAWData(FfsFileObj)
 
         else:
-            FfsFileObj.CurrentLineNum = self.CurrentLineNumber
-            FfsFileObj.CurrentLineContent = self._CurrentLine()
             FfsFileObj.FileName = self._Token.replace('$(SPACE)', ' ')
             self._VerifyFile(FfsFileObj.FileName)
 
@@ -3225,8 +3218,6 @@ class FdfParser:
 
             if not self._GetNextToken():
                 raise Warning.Expected("file name", self.FileName, self.CurrentLineNumber)
-
-            CapsuleObj.CreateFile = self._Token
 
         self._GetCapsuleStatements(CapsuleObj)
         self.Profile.CapsuleDict[CapsuleObj.UiCapsuleName] = CapsuleObj
