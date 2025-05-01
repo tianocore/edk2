@@ -323,8 +323,6 @@ Tcg2MeasureGptTable (
     if (!EFI_ERROR (Status)) {
       mTcg2MeasureGptCount++;
     }
-
-    DEBUG ((DEBUG_INFO, "DxeTpm2MeasureBootHandler - Cc MeasureGptTable - %r\n", Status));
   } else if (Tcg2Protocol != NULL) {
     //
     // If Tcg2Protocol is installed, then Measure GPT data with this protocol.
@@ -339,8 +337,6 @@ Tcg2MeasureGptTable (
     if (!EFI_ERROR (Status)) {
       mTcg2MeasureGptCount++;
     }
-
-    DEBUG ((DEBUG_INFO, "DxeTpm2MeasureBootHandler - Tcg2 MeasureGptTable - %r\n", Status));
   }
 
 Exit:
@@ -492,7 +488,6 @@ Tcg2MeasurePeImage (
                            ImageSize,
                            CcEvent
                            );
-    DEBUG ((DEBUG_INFO, "DxeTpm2MeasureBootHandler - Cc MeasurePeImage - %r\n", Status));
   } else if (Tcg2Protocol != NULL) {
     Status = Tcg2Protocol->HashLogExtendEvent (
                              Tcg2Protocol,
@@ -501,7 +496,6 @@ Tcg2MeasurePeImage (
                              ImageSize,
                              Tcg2Event
                              );
-    DEBUG ((DEBUG_INFO, "DxeTpm2MeasureBootHandler - Tcg2 MeasurePeImage - %r\n", Status));
   }
 
   if (Status == EFI_VOLUME_FULL) {
@@ -658,15 +652,6 @@ DxeTpm2MeasureBootHandler (
     DEBUG ((DEBUG_INFO, "None of Tcg2Protocol/CcMeasurementProtocol is installed.\n"));
     return EFI_SUCCESS;
   }
-
-  DEBUG (
-    (
-     DEBUG_INFO,
-     "Tcg2Protocol = %p, CcMeasurementProtocol = %p\n",
-     MeasureBootProtocols.Tcg2Protocol,
-     MeasureBootProtocols.CcProtocol
-    )
-    );
 
   //
   // Copy File Device Path
@@ -853,7 +838,6 @@ DxeTpm2MeasureBootHandler (
                TRUE
                );
     if (ToText != NULL) {
-      DEBUG ((DEBUG_INFO, "The measured image path is %s.\n", ToText));
       FreePool (ToText);
     }
 
@@ -879,8 +863,6 @@ Finish:
   if (OrigDevicePathNode != NULL) {
     FreePool (OrigDevicePathNode);
   }
-
-  DEBUG ((DEBUG_INFO, "DxeTpm2MeasureBootHandler - %r\n", Status));
 
   return Status;
 }
