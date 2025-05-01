@@ -6127,6 +6127,959 @@ PrintInterpretedExtendedCompatibilitySecondary (
 }
 
 /**
+  Function to interpret and print out the ATS structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+PrintInterpretedExtendedCompatibilityAts (
+  IN CONST PCI_EXP_EXT_HDR  *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR  *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_ATS  *Header;
+
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_ATS *)HeaderAddress;
+
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_ATS),
+    gShellDebug1HiiHandle,
+    Header->Capability.Uint16,
+    Header->Control.Uint16
+    );
+
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
+    sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_ATS),
+    (VOID *)(HeaderAddress)
+    );
+
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the SR-IOV structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+PrintInterpretedExtendedCompatibilitySriov (
+  IN CONST PCI_EXP_EXT_HDR  *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR  *HeadersBaseAddress
+  )
+{
+  CONST SR_IOV_CAPABILITY_REGISTER  *Header;
+
+  Header = (SR_IOV_CAPABILITY_REGISTER *)HeaderAddress;
+
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_SRIOV),
+    gShellDebug1HiiHandle,
+    Header->Capability,
+    Header->Control,
+    Header->Status,
+    Header->InitialVFs,
+    Header->TotalVFs,
+    Header->NumVFs,
+    Header->FunctionDependencyLink,
+    Header->FirstVFOffset,
+    Header->VFStride,
+    Header->VFDeviceID,
+    Header->SupportedPageSize,
+    Header->SystemPageSize
+    );
+
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_SRIOV_BARS),
+    gShellDebug1HiiHandle,
+    Header->VFBar[0],
+    Header->VFBar[1],
+    Header->VFBar[2],
+    Header->VFBar[3],
+    Header->VFBar[4],
+    Header->VFBar[5],
+    Header->VFMigrationStateArrayOffset
+    );
+
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
+    sizeof (SR_IOV_CAPABILITY_REGISTER),
+    (VOID *)(HeaderAddress)
+    );
+
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the PRI structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+PrintInterpretedExtendedCompatibilityPri (
+  IN CONST PCI_EXP_EXT_HDR  *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR  *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_PRI  *Header;
+
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_PRI *)HeaderAddress;
+
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_PRI),
+    gShellDebug1HiiHandle,
+    Header->Capability.Uint32,
+    Header->Control.Uint32,
+    Header->Status.Uint32
+    );
+
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
+    sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_PRI),
+    (VOID *)(HeaderAddress)
+    );
+
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the PASID structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+PrintInterpretedExtendedCompatibilityPasid (
+  IN CONST PCI_EXP_EXT_HDR  *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR  *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_PASID  *Header;
+
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_PASID *)HeaderAddress;
+
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_PASID),
+    gShellDebug1HiiHandle,
+    Header->Capability.Uint16,
+    Header->Control.Uint16
+    );
+
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
+    sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_PASID),
+    (VOID *)(HeaderAddress)
+    );
+
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the L1 PM Substates structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+PrintInterpretedExtendedCompatibilityL1PmSubstates (
+  IN CONST PCI_EXP_EXT_HDR  *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR  *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_L1_PM_SUBSTATES  *Header;
+
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_L1_PM_SUBSTATES *)HeaderAddress;
+
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_L1_PM_SUBSTATES),
+    gShellDebug1HiiHandle,
+    Header->Capability.Uint32,
+    Header->Control1.Uint32,
+    Header->Control2.Uint32
+    );
+
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
+    sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_L1_PM_SUBSTATES),
+    (VOID *)(HeaderAddress)
+    );
+
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the Designated Vendor-Specific structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+PrintInterpretedExtendedCompatibilityDesignatedVendorSpecific (
+  IN CONST PCI_EXP_EXT_HDR  *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR  *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_DESIGNATED_VENDOR_SPECIFIC  *Header;
+
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_DESIGNATED_VENDOR_SPECIFIC *)HeaderAddress;
+
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_DESIGNATED_VENDOR_SPECIFIC),
+    gShellDebug1HiiHandle,
+    Header->DesignatedVendorSpecificHeader1.Bits.DvsecVendorId,
+    Header->DesignatedVendorSpecificHeader1.Bits.DvsecRevision,
+    Header->DesignatedVendorSpecificHeader2.Bits.DvsecId,
+    Header->DesignatedVendorSpecificHeader1.Bits.DvsecLength
+    );
+
+  UINT32  NextCapOffset = HeaderAddress->NextCapabilityOffset;
+  UINTN   Size;
+
+  if (NextCapOffset == 0) {
+    // The DVSEC length field plus the PCI Express header
+    Size = sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER) +
+           Header->DesignatedVendorSpecificHeader1.Bits.DvsecLength;
+  } else {
+    Size = NextCapOffset - (((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress) & 0xFFF);
+  }
+
+  // Dump the entire structure including the variable-length vendor specific data
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
+    Size,
+    (VOID *)(HeaderAddress)
+    );
+
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the VF Resizable BAR structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+PrintInterpretedExtendedCompatibilityVfResizableBar (
+  IN CONST PCI_EXP_EXT_HDR  *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR  *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_VF_RESIZABLE_BAR  *Header;
+
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_VF_RESIZABLE_BAR *)HeaderAddress;
+
+  // Calculate how many entries exist
+  UINT32  NextCapOffset = HeaderAddress->NextCapabilityOffset;
+  UINTN   TotalSize;
+  UINTN   HeaderSize = sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER);
+  UINTN   EntrySize  = sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_VF_RESIZABLE_BAR_ENTRY);
+  UINTN   EntryCount;
+
+  if (NextCapOffset == 0) {
+    // The VF Resizable BAR capability has at least one entry by definition
+    EntryCount = 1;
+    TotalSize  = HeaderSize + (EntryCount * EntrySize);
+  } else {
+    // Calculate size based on offset to next capability
+    TotalSize = NextCapOffset - (((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress) & 0xFFF);
+    // Calculate number of entries (usable size divided by entry size)
+    EntryCount = (TotalSize - HeaderSize) / EntrySize;
+    // Ensure we have at least one entry
+    if (EntryCount == 0) {
+      EntryCount = 1;
+    }
+  }
+
+  // Print header
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_VF_RESIZABLE_BAR_HEADER),
+    gShellDebug1HiiHandle
+    );
+
+  // Print each entry
+  for (UINTN Index = 0; Index < EntryCount; Index++) {
+    ShellPrintHiiEx (
+      -1,
+      -1,
+      NULL,
+      STRING_TOKEN (STR_PCI_EXT_CAP_VF_RESIZABLE_BAR_ENTRY),
+      gShellDebug1HiiHandle,
+      Index,
+      Header->Capability[Index].VfResizableBarCapability.Uint32,
+      Header->Capability[Index].VfResizableBarControl.Uint32
+      );
+
+    ShellPrintHiiEx (
+      -1,
+      -1,
+      NULL,
+      STRING_TOKEN (STR_PCI_EXT_CAP_VF_RESIZABLE_BAR_DETAILS),
+      gShellDebug1HiiHandle,
+      Header->Capability[Index].VfResizableBarCapability.Bits.VfBarSizeCapability,
+      Header->Capability[Index].VfResizableBarControl.Bits.VfBarIndex,
+      Header->Capability[Index].VfResizableBarControl.Bits.VfResizableBarNumber,
+      Header->Capability[Index].VfResizableBarControl.Bits.VfBarSize,
+      Header->Capability[Index].VfResizableBarControl.Bits.VfBarSizeCapability
+      );
+  }
+
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
+    HeaderSize + EntryCount * EntrySize,
+    (VOID *)(HeaderAddress)
+    );
+
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the Data Link Feature structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+PrintInterpretedExtendedCompatibilityDataLinkFeature (
+  IN CONST PCI_EXP_EXT_HDR  *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR  *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_DATA_LINK_FEATURE  *Header;
+
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_DATA_LINK_FEATURE *)HeaderAddress;
+
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_DATA_LINK_FEATURE),
+    gShellDebug1HiiHandle,
+    Header->Capability.Uint32,
+    Header->Control.Uint32
+    );
+
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
+    sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_DATA_LINK_FEATURE),
+    (VOID *)(HeaderAddress)
+    );
+
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the Physical Layer 16.0 GT/s structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+PrintInterpretedExtendedCompatibilityPhysicalLayer16 (
+  IN CONST PCI_EXP_EXT_HDR  *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR  *HeadersBaseAddress
+  )
+{
+  // Cast to the proper structure type
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_PHYSICAL_LAYER_16_0  *Header;
+
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_PHYSICAL_LAYER_16_0 *)HeaderAddress;
+
+  // Print the basic capability information
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_PHYSICAL_LAYER_16),
+    gShellDebug1HiiHandle,
+    Header->Capablities.Uint32,
+    Header->Control.Uint32,
+    Header->Status.Uint32
+    );
+
+  // Print detailed status bits
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_PHYSICAL_LAYER_16_STATUS),
+    gShellDebug1HiiHandle,
+    Header->Status.Bits.EqualizationComplete,
+    Header->Status.Bits.EqualizationPhase1Success,
+    Header->Status.Bits.EqualizationPhase2Success,
+    Header->Status.Bits.EqualizationPhase3Success,
+    Header->Status.Bits.LinkEqualizationRequest
+    );
+
+  // Print data parity status registers
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_PHYSICAL_LAYER_16_PARITY),
+    gShellDebug1HiiHandle,
+    Header->LocalDataParityMismatchStatus,
+    Header->FirstRetimerDataParityMismatchStatus,
+    Header->SecondRetimerDataParityMismatchStatus
+    );
+
+  // Calculate the size for DumpHex
+  UINT32  NextCapOffset = HeaderAddress->NextCapabilityOffset;
+  UINTN   Size;
+
+  if (NextCapOffset == 0) {
+    UINTN  SpecMaxLanes = 16;
+
+    Size = PCI_EXPRESS_REG_PHYSICAL_LAYER_16_0_LANE_EQUALIZATION_CONTROL_OFFSET +
+           (SpecMaxLanes * sizeof (PCI_EXPRESS_REG_PHYSICAL_LAYER_16_0_LANE_EQUALIZATION_CONTROL));
+  } else {
+    // Calculate size based on offset to next capability
+    Size = NextCapOffset - (((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress) & 0xFFF);
+  }
+
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
+    Size,
+    (VOID *)(HeaderAddress)
+    );
+
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the Lane Margining at the Receiver structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+PrintInterpretedExtendedCompatibilityLaneMargining (
+  IN CONST PCI_EXP_EXT_HDR  *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR  *HeadersBaseAddress
+  )
+{
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_LANE_MARGINING_AT_RECEIVER  *Header;
+
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_LANE_MARGINING_AT_RECEIVER *)HeaderAddress;
+
+  // Print raw register values
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_LANE_MARGINING),
+    gShellDebug1HiiHandle,
+    Header->Capability.Uint8,
+    Header->Control.Uint8,
+    Header->Status.Uint8,
+    Header->ErrorCounter
+    );
+
+  // Print decoded capability information
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_LANE_MARGINING_CAPABILITY),
+    gShellDebug1HiiHandle,
+    Header->Capability.Bits.MaxLaneNumber
+    );
+
+  // Print decoded control information
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_LANE_MARGINING_CONTROL),
+    gShellDebug1HiiHandle,
+    Header->Control.Bits.LaneNumber,
+    Header->Control.Bits.RcvErrorCounterSelect,
+    Header->Control.Bits.LaneMarginStepSelect
+    );
+
+  // Print decoded status information
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_LANE_MARGINING_STATUS),
+    gShellDebug1HiiHandle,
+    Header->Status.Bits.MaxLanesReceivingTestPattern
+    );
+
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
+    sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_LANE_MARGINING_AT_RECEIVER),
+    (VOID *)(HeaderAddress)
+    );
+
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the Physical Layer 32.0 GT/s structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+PrintInterpretedExtendedCompatibilityPhysicalLayer32 (
+  IN CONST PCI_EXP_EXT_HDR  *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR  *HeadersBaseAddress
+  )
+{
+  // Use the proper structure definition from the header file
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_PHYSICAL_LAYER_32_0  *Header;
+
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_PHYSICAL_LAYER_32_0 *)HeaderAddress;
+
+  // Print the basic capability information
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_PHYSICAL_LAYER_32),
+    gShellDebug1HiiHandle,
+    Header->Capablities.Uint32,
+    Header->Control.Uint32,
+    Header->Status.Uint32
+    );
+
+  // Print capabilities details
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_PHYSICAL_LAYER_32_CAPABILITIES),
+    gShellDebug1HiiHandle,
+    Header->Capablities.Bits.EqualizationByPassToHighestRateSupport,
+    Header->Capablities.Bits.NoEqualizationNeededSupport,
+    Header->Capablities.Bits.ModifiedTSUsageMode0Support,
+    Header->Capablities.Bits.ModifiedTSUsageMode1Support,
+    Header->Capablities.Bits.ModifiedTSUsageMode2Support
+    );
+
+  // Print control details
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_PHYSICAL_LAYER_32_CONTROL),
+    gShellDebug1HiiHandle,
+    Header->Control.Bits.EqualizationByPassToHighestRateDisable,
+    Header->Control.Bits.NoEqualizationNeededDisable,
+    Header->Control.Bits.ModifiedTSUsageModeSelected
+    );
+
+  // Print status details
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_PHYSICAL_LAYER_32_STATUS),
+    gShellDebug1HiiHandle,
+    Header->Status.Bits.EqualizationComplete,
+    Header->Status.Bits.EqualizationPhase1Success,
+    Header->Status.Bits.EqualizationPhase2Success,
+    Header->Status.Bits.EqualizationPhase3Success,
+    Header->Status.Bits.LinkEqualizationRequest,
+    Header->Status.Bits.ModifiedTSRcvd,
+    Header->Status.Bits.RcvdEnhancedLinkControl,
+    Header->Status.Bits.TransmitterPrecodingOn,
+    Header->Status.Bits.TransmitterPrecodeRequest,
+    Header->Status.Bits.NoEqualizationNeededRcvd
+    );
+
+  // Print Modified TS Data
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_PHYSICAL_LAYER_32_TS_DATA),
+    gShellDebug1HiiHandle,
+    Header->RcvdModifiedTs1Data.Uint32,
+    Header->RcvdModifiedTs2Data.Uint32,
+    Header->TransModifiedTs1Data.Uint32,
+    Header->TransModifiedTs2Data.Uint32
+    );
+
+  // Calculate the size for DumpHex
+  UINT32  NextCapOffset = HeaderAddress->NextCapabilityOffset;
+  UINTN   Size;
+
+  if (NextCapOffset == 0) {
+    UINTN  SpecMaxLanes = 16;
+
+    Size = PCI_EXPRESS_REG_PHYSICAL_LAYER_32_0_LANE_EQUALIZATION_CONTROL_OFFSET +
+           (SpecMaxLanes * sizeof (PCI_EXPRESS_REG_PHYSICAL_LAYER_32_0_LANE_EQUALIZATION_CONTROL));
+  } else {
+    // Calculate size based on offset to next capability
+    Size = NextCapOffset - (((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress) & 0xFFF);
+  }
+
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
+    Size,
+    (VOID *)(HeaderAddress)
+    );
+
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the Alternate Protocol structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+PrintInterpretedExtendedCompatibilityAlternateProtocol (
+  IN CONST PCI_EXP_EXT_HDR  *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR  *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_ALTERNATE_PROTOCOL  *Header;
+
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_ALTERNATE_PROTOCOL *)HeaderAddress;
+
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_ALTERNATE_PROTOCOL),
+    gShellDebug1HiiHandle,
+    Header->AltProtocolCapability,
+    Header->AltProtocolStatus,
+    Header->AltProtocolControl
+    );
+
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
+    sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_ALTERNATE_PROTOCOL),
+    (VOID *)(HeaderAddress)
+    );
+
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the Data Object Exchange structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+PrintInterpretedExtendedCompatibilityDataObjectExchange (
+  IN CONST PCI_EXP_EXT_HDR  *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR  *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_DATA_OBJECT_EXCHANGE  *Header;
+
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_DATA_OBJECT_EXCHANGE *)HeaderAddress;
+
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_DATA_OBJECT_EXCHANGE),
+    gShellDebug1HiiHandle,
+    Header->DoeCapabilities,
+    Header->DoeControl,
+    Header->DoeStatus
+    );
+
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
+    sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_DATA_OBJECT_EXCHANGE),
+    (VOID *)(HeaderAddress)
+    );
+
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the Device 3 structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+PrintInterpretedExtendedCompatibilityDevice3 (
+  IN CONST PCI_EXP_EXT_HDR  *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR  *HeadersBaseAddress
+  )
+{
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_DEVICE3  *Header;
+
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_DEVICE3 *)HeaderAddress;
+
+  // Print raw register values
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_DEVICE3),
+    gShellDebug1HiiHandle,
+    Header->Capabilities.Uint32,
+    Header->Control.Uint32,
+    Header->Status.Uint32
+    );
+
+  // Print detailed capability information
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_DEVICE3_CAPABILITY),
+    gShellDebug1HiiHandle,
+    Header->Capabilities.Bits.DmwrRequestRouting,
+    Header->Capabilities.Bits.FourteenBitTagCompleter,
+    Header->Capabilities.Bits.FourteenBitTagRequester,
+    Header->Capabilities.Bits.ReceiverL0p,
+    Header->Capabilities.Bits.PortL0pExitLatencyLatency,
+    Header->Capabilities.Bits.RetimerL0pExit
+    );
+
+  // Print detailed control information
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_DEVICE3_CONTROL),
+    gShellDebug1HiiHandle,
+    Header->Control.Bits.DmwrRequesterEnable,
+    Header->Control.Bits.DmwrEgressBlocking,
+    Header->Control.Bits.FourteenBitTagRequesterEnable,
+    Header->Control.Bits.L0pEnable,
+    Header->Control.Bits.TargetLinkWidth
+    );
+
+  // Print detailed status information
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_DEVICE3_STATUS),
+    gShellDebug1HiiHandle,
+    Header->Status.Bits.InitialLinkWidth,
+    Header->Status.Bits.SegmentCaptured,
+    Header->Status.Bits.RemoteL0pSupported
+    );
+
+  // Calculate the size for DumpHex
+  UINT32  NextCapOffset = HeaderAddress->NextCapabilityOffset;
+  UINTN   Size;
+
+  if (NextCapOffset == 0) {
+    // If this is the last capability, use the fixed size of the structure
+    Size = sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_DEVICE3);
+  } else {
+    // Calculate size based on offset to next capability
+    Size = NextCapOffset - (((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress) & 0xFFF);
+  }
+
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
+    Size,
+    (VOID *)(HeaderAddress)
+    );
+
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the Integrity and Data Encryption structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+PrintInterpretedExtendedCompatibilityIntegrityEncryption (
+  IN CONST PCI_EXP_EXT_HDR  *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR  *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_INTEGRITY_DATA_ENCRYPTION  *Header;
+
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_INTEGRITY_DATA_ENCRYPTION *)HeaderAddress;
+
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_INTEGRITY_ENCRYPTION),
+    gShellDebug1HiiHandle,
+    Header->IdeCapabilities,
+    Header->IdeControl,
+    Header->IdeStatus
+    );
+
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
+    sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_INTEGRITY_DATA_ENCRYPTION),
+    (VOID *)(HeaderAddress)
+    );
+
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the Physical Layer 64.0 GT/s structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+PrintInterpretedExtendedCompatibilityPhysicalLayer64 (
+  IN CONST PCI_EXP_EXT_HDR  *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR  *HeadersBaseAddress
+  )
+{
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_PHYSICAL_LAYER_64_0  *Header;
+
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_PHYSICAL_LAYER_64_0 *)HeaderAddress;
+
+  // Print the basic capability information
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_PHYSICAL_LAYER_64),
+    gShellDebug1HiiHandle,
+    Header->Capablities.Uint32,
+    Header->Control.Uint32,
+    Header->Status.Uint32
+    );
+
+  // Print detailed status bits
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_PHYSICAL_LAYER_64_STATUS),
+    gShellDebug1HiiHandle,
+    Header->Status.Bits.EqualizationComplete,
+    Header->Status.Bits.EqualizationPhase1Success,
+    Header->Status.Bits.EqualizationPhase2Success,
+    Header->Status.Bits.EqualizationPhase3Success,
+    Header->Status.Bits.LinkEqualizationRequest,
+    Header->Status.Bits.TransmitterPrecodingOn,
+    Header->Status.Bits.TransmitterPrecodeRequest,
+    Header->Status.Bits.NoEqualizationNeededRcvd
+    );
+
+  // Calculate the size for DumpHex
+  UINT32  NextCapOffset = HeaderAddress->NextCapabilityOffset;
+  UINTN   Size;
+
+  if (NextCapOffset == 0) {
+    UINTN  SpecMaxLanes = 16;
+
+    Size = PCI_EXPRESS_REG_PHYSICAL_LAYER_64_0_LANE_EQUALIZATION_CONTROL_OFFSET +
+           (SpecMaxLanes * sizeof (PCI_EXPRESS_REG_PHYSICAL_LAYER_64_0_LANE_EQUALIZATION_CONTROL));
+  } else {
+    // Calculate size based on offset to next capability
+    Size = NextCapOffset - (((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress) & 0xFFF);
+  }
+
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
+    Size,
+    (VOID *)(HeaderAddress)
+    );
+
+  return (EFI_SUCCESS);
+}
+
+/**
+  Function to interpret and print out the Flit Logging structure
+
+  @param[in] HeaderAddress        The Address of this capability header.
+  @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+
+  @retval EFI_SUCCESS            The function completed successfully.
+**/
+EFI_STATUS
+PrintInterpretedExtendedCompatibilityFlitLogging (
+  IN CONST PCI_EXP_EXT_HDR  *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR  *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_FLIT_LOGGING  *Header;
+
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_FLIT_LOGGING *)HeaderAddress;
+
+  // Print the Flit Logging capability details
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_FLIT_LOGGING),
+    gShellDebug1HiiHandle,
+    Header->FlitLoggingCapabilities,
+    Header->FlitLoggingControl,
+    Header->FlitLoggingStatus,
+    Header->FlitMask,
+    Header->FlitErrorData1,
+    Header->FlitErrorData2,
+    Header->FlitErrorData3
+    );
+
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
+    sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_FLIT_LOGGING),
+    (VOID *)(HeaderAddress)
+    );
+
+  return EFI_SUCCESS;
+}
+
+/**
   Display Pcie extended capability details
 
   @param[in] HeadersBaseAddress   The address of all the extended capability headers.
@@ -6179,6 +7132,40 @@ PrintPciExtendedCapabilityDetails (
       return PrintInterpretedExtendedCompatibilityTph (HeaderAddress, HeadersBaseAddress);
     case PCI_EXPRESS_EXTENDED_CAPABILITY_SECONDARY_PCIE_ID:
       return PrintInterpretedExtendedCompatibilitySecondary (HeaderAddress, HeadersBaseAddress, PciExpressCapPtr);
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_ATS_ID:
+      return PrintInterpretedExtendedCompatibilityAts (HeaderAddress, HeadersBaseAddress);
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_SRIOV_ID:
+      return PrintInterpretedExtendedCompatibilitySriov (HeaderAddress, HeadersBaseAddress);
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_PRI_ID:
+      return PrintInterpretedExtendedCompatibilityPri (HeaderAddress, HeadersBaseAddress);
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_PASID_ID:
+      return PrintInterpretedExtendedCompatibilityPasid (HeaderAddress, HeadersBaseAddress);
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_L1_PM_SUBSTATES_ID:
+      return PrintInterpretedExtendedCompatibilityL1PmSubstates (HeaderAddress, HeadersBaseAddress);
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_DESIGNATED_VENDOR_SPECIFIC_ID:
+      return PrintInterpretedExtendedCompatibilityDesignatedVendorSpecific (HeaderAddress, HeadersBaseAddress);
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_VF_RESIZABLE_BAR_ID:
+      return PrintInterpretedExtendedCompatibilityVfResizableBar (HeaderAddress, HeadersBaseAddress);
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_DATA_LINK_FEATURE_ID:
+      return PrintInterpretedExtendedCompatibilityDataLinkFeature (HeaderAddress, HeadersBaseAddress);
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_PHYSICAL_LAYER_16_0_ID:
+      return PrintInterpretedExtendedCompatibilityPhysicalLayer16 (HeaderAddress, HeadersBaseAddress);
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_LANE_MARGINING_AT_RECEIVER_ID:
+      return PrintInterpretedExtendedCompatibilityLaneMargining (HeaderAddress, HeadersBaseAddress);
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_PHYSICAL_LAYER_32_0_ID:
+      return PrintInterpretedExtendedCompatibilityPhysicalLayer32 (HeaderAddress, HeadersBaseAddress);
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_ALTERNATE_PROTOCOL_ID:
+      return PrintInterpretedExtendedCompatibilityAlternateProtocol (HeaderAddress, HeadersBaseAddress);
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_DATA_OBJECT_EXCHANGE_ID:
+      return PrintInterpretedExtendedCompatibilityDataObjectExchange (HeaderAddress, HeadersBaseAddress);
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_DEVICE3_ID:
+      return PrintInterpretedExtendedCompatibilityDevice3 (HeaderAddress, HeadersBaseAddress);
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_INTEGRITY_DATA_ENCRYPTION_ID:
+      return PrintInterpretedExtendedCompatibilityIntegrityEncryption (HeaderAddress, HeadersBaseAddress);
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_PHYSICAL_LAYER_64_0_ID:
+      return PrintInterpretedExtendedCompatibilityPhysicalLayer64 (HeaderAddress, HeadersBaseAddress);
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_FLIT_LOGGING_ID:
+      return PrintInterpretedExtendedCompatibilityFlitLogging (HeaderAddress, HeadersBaseAddress);
     default:
       ShellPrintEx (
         -1,

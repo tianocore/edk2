@@ -5,6 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#include <Library/FdtLib.h>
 #include "FdtHwInfoParser.h"
 #include "Arm/BootArch/ArmBootArchParser.h"
 #include "Arm/GenericTimer/ArmGenericTimerParser.h"
@@ -59,7 +60,7 @@ ArchFdtHwInfoMainDispatcher (
   EFI_STATUS  Status;
   UINT32      Index;
 
-  if (fdt_check_header (FdtParserHandle->Fdt) < 0) {
+  if (FdtCheckHeader (FdtParserHandle->Fdt) < 0) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }

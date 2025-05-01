@@ -5,6 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#include <Library/FdtLib.h>
 #include "FdtHwInfoParser.h"
 
 /** Initialise the HwInfoParser.
@@ -40,7 +41,7 @@ HwInfoParserInit (
   if ((ParserHandle == NULL)  ||
       (HwInfoAdd == NULL)     ||
       (HwDataSource == NULL)  ||
-      (fdt_check_header (HwDataSource) < 0))
+      (FdtCheckHeader (HwDataSource) < 0))
   {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
