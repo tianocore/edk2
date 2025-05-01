@@ -340,7 +340,8 @@ RsiSetIpaState (
 
   if ((Size == 0) ||
       (!IsGranuleAligned ((UINT64 *)Size)) ||
-      (!IsGranuleAligned (Address)))
+      (!IsGranuleAligned (Address))        ||
+      ((State != RipasEmpty) && (State != RipasRam)))
   {
     return RETURN_INVALID_PARAMETER;
   }
