@@ -1,0 +1,37 @@
+## @file
+#  Instance of MemDebugLog Library for DXE/Smm
+#
+#  Copyright (C) 2025, Oracle and/or its affiliates.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MemDebugLogLib
+  FILE_GUID                      = 4988621E-8EE8-4D27-862F-EB98BD8F17E6
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MemDebugLogLib|DXE_CORE DXE_DRIVER UEFI_DRIVER UEFI_APPLICATION SMM_CORE DXE_SMM_DRIVER
+
+
+[Sources]
+  MemDebugLogDxe.c
+  MemDebugLogCommon.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  HobLib
+  SynchronizationLib
+
+[Guids]
+  gMemDebugLogHobGuid                      ## CONSUMES
+
+[FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString ## CONSUMES
