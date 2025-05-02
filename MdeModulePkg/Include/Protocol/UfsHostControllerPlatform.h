@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Protocol/UfsHostController.h>
 
-#define EDKII_UFS_HC_PLATFORM_PROTOCOL_VERSION  2
+#define EDKII_UFS_HC_PLATFORM_PROTOCOL_VERSION  3
 
 extern EFI_GUID  gEdkiiUfsHcPlatformProtocolGuid;
 
@@ -129,6 +129,14 @@ struct _EDKII_UFS_HC_PLATFORM_PROTOCOL {
   /// Reference Clock Frequency Ufs Card Attribute that need to be set in this Ufs Host Environment.
   ///
   EDKII_UFS_CARD_REF_CLK_FREQ_ATTRIBUTE     RefClkFreq;
+  ///
+  /// Flag to skip HCE re-enable.
+  ///
+  BOOLEAN                                   SkipHceReenable;
+  ///
+  /// Flag to skip link startup.
+  ///
+  BOOLEAN                                   SkipLinkStartup;
 };
 
 #endif
