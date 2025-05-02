@@ -9,6 +9,7 @@
   - linux/Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.yaml
 **/
 
+#include <Library/FdtLib.h>
 #include "FdtHwInfoParser.h"
 #include "Arm/Gic/ArmGicCParser.h"
 #include "Arm/Gic/ArmGicDispatcher.h"
@@ -131,7 +132,7 @@ ArmGicDispatcher (
   Fdt = FdtParserHandle->Fdt;
 
   // The "cpus" node resides at the root of the DT. Fetch it.
-  CpusNode = fdt_path_offset (Fdt, "/cpus");
+  CpusNode = FdtPathOffset (Fdt, "/cpus");
   if (CpusNode < 0) {
     return EFI_NOT_FOUND;
   }

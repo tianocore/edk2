@@ -18,7 +18,6 @@
   FdtSerialPortAddressLib.c
 
 [Packages]
-  EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
 

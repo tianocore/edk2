@@ -14,6 +14,7 @@
 #include <IndustryStandard/DebugPort2Table.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/FdtLib.h>
 
 #include "CmObjectDescUtility.h"
 #include "FdtHwInfoParser.h"
@@ -129,7 +130,7 @@ SerialPortNodeParser (
     return EFI_ABORTED;
   }
 
-  Data = fdt_getprop (Fdt, SerialPortNode, "reg", &DataSize);
+  Data = FdtGetProp (Fdt, SerialPortNode, "reg", &DataSize);
   if ((Data == NULL) ||
       (DataSize < (INT32)(sizeof (UINT32) *
                           GET_DT_REG_ADDRESS_OFFSET (1, AddressCells, SizeCells)) - 1))
@@ -140,17 +141,17 @@ SerialPortNodeParser (
   }
 
   if (AddressCells == 2) {
-    SerialPortInfo->BaseAddress = fdt64_to_cpu (*(UINT64 *)Data);
+    SerialPortInfo->BaseAddress = Fdt64ToCpu (*(UINT64 *)Data);
   } else {
-    SerialPortInfo->BaseAddress = fdt32_to_cpu (*(UINT32 *)Data);
+    SerialPortInfo->BaseAddress = Fdt32ToCpu (*(UINT32 *)Data);
   }
 
   SizeValue = Data + (sizeof (UINT32) *
                       GET_DT_REG_SIZE_OFFSET (0, AddressCells, SizeCells));
   if (SizeCells == 2) {
-    SerialPortInfo->BaseAddressLength = fdt64_to_cpu (*(UINT64 *)SizeValue);
+    SerialPortInfo->BaseAddressLength = Fdt64ToCpu (*(UINT64 *)SizeValue);
   } else {
-    SerialPortInfo->BaseAddressLength = fdt32_to_cpu (*(UINT32 *)SizeValue);
+    SerialPortInfo->BaseAddressLength = Fdt32ToCpu (*(UINT32 *)SizeValue);
   }
 
   // Get the associated interrupt-controller.
@@ -172,7 +173,7 @@ SerialPortNodeParser (
     return Status;
   }
 
-  Data = fdt_getprop (Fdt, SerialPortNode, "interrupts", &DataSize);
+  Data = FdtGetProp (Fdt, SerialPortNode, "interrupts", &DataSize);
   if ((Data == NULL) || (DataSize != (IntCells * sizeof (UINT32)))) {
     // If error or not 1 interrupt.
     ASSERT (0);
@@ -182,20 +183,20 @@ SerialPortNodeParser (
   SerialPortInfo->Interrupt = FdtGetInterruptId ((CONST UINT32 *)Data);
 
   // Note: clock-frequency is optional for SBSA UART.
-  Data = fdt_getprop (Fdt, SerialPortNode, "clock-frequency", &DataSize);
+  Data = FdtGetProp (Fdt, SerialPortNode, "clock-frequency", &DataSize);
   if (Data != NULL) {
     if (DataSize < sizeof (UINT32)) {
       // If error or not enough space.
       ASSERT (0);
       return EFI_ABORTED;
-    } else if (fdt_node_offset_by_phandle (Fdt, fdt32_to_cpu (*Data)) >= 0) {
+    } else if (FdtNodeOffsetByPhandle (Fdt, Fdt32ToCpu (*Data)) >= 0) {
       // "clock-frequency" can be a "clocks phandle to refer to the clk used".
       // This is not supported.
       ASSERT (0);
       return EFI_UNSUPPORTED;
     }
 
-    SerialPortInfo->Clock = fdt32_to_cpu (*(UINT32 *)Data);
+    SerialPortInfo->Clock = Fdt32ToCpu (*(UINT32 *)Data);
   }
 
   if (FdtNodeIsCompatible (Fdt, SerialPortNode, &Serial16550CompatibleInfo)) {
@@ -208,7 +209,7 @@ SerialPortNodeParser (
          device. There are some systems that require 32-bit accesses to the
          UART.
     */
-    Data = fdt_getprop (Fdt, SerialPortNode, "reg-io-width", &DataSize);
+    Data = FdtGetProp (Fdt, SerialPortNode, "reg-io-width", &DataSize);
     if (Data != NULL) {
       if (DataSize < sizeof (UINT32)) {
         // If error or not enough space.
@@ -216,7 +217,7 @@ SerialPortNodeParser (
         return EFI_ABORTED;
       }
 
-      AccessSize = fdt32_to_cpu (*(UINT32 *)Data);
+      AccessSize = Fdt32ToCpu (*(UINT32 *)Data);
       if (AccessSize > EFI_ACPI_6_3_QWORD) {
         ASSERT (0);
         return EFI_INVALID_PARAMETER;
@@ -281,12 +282,12 @@ GetSerialConsoleNode (
   }
 
   // The "chosen" node resides at the root of the DT. Fetch it.
-  ChosenNode = fdt_path_offset (Fdt, "/chosen");
+  ChosenNode = FdtPathOffset (Fdt, "/chosen");
   if (ChosenNode < 0) {
     return EFI_NOT_FOUND;
   }
 
-  Prop = fdt_getprop (Fdt, ChosenNode, "stdout-path", &PropSize);
+  Prop = FdtGetProp (Fdt, ChosenNode, "stdout-path", &PropSize);
   if ((Prop == NULL) || (PropSize < 0)) {
     return EFI_NOT_FOUND;
   }
@@ -301,17 +302,17 @@ GetSerialConsoleNode (
 
   // Aliases cannot start with a '/', so it must be the actual path.
   if (Prop[0] == '/') {
-    *SerialConsoleNode = fdt_path_offset_namelen (Fdt, Prop, PathLen);
+    *SerialConsoleNode = FdtPathOffsetNameLen (Fdt, Prop, PathLen);
     return EFI_SUCCESS;
   }
 
   // Lookup the alias, as this contains the actual path.
-  Path = fdt_get_alias_namelen (Fdt, Prop, PathLen);
+  Path = FdtGetAliasNameLen (Fdt, Prop, PathLen);
   if (Path == NULL) {
     return EFI_NOT_FOUND;
   }
 
-  *SerialConsoleNode = fdt_path_offset (Fdt, Path);
+  *SerialConsoleNode = FdtPathOffset (Fdt, Path);
   return EFI_SUCCESS;
 }
 
