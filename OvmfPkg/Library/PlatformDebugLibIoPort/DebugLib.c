@@ -16,6 +16,7 @@
 #include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugPrintErrorLevelLib.h>
+#include <Library/MemDebugLogLib.h>
 #include "DebugLibDetect.h"
 
 //
@@ -93,11 +94,9 @@ DebugPrintMarker (
   ASSERT (Format != NULL);
 
   //
-  // Check if the global mask disables this message or the device is inactive
+  // Check if the global mask disables this message
   //
-  if (((ErrorLevel & GetDebugPrintErrorLevel ()) == 0) ||
-      !PlatformDebugLibIoPortFound ())
-  {
+  if ((ErrorLevel & GetDebugPrintErrorLevel ()) == 0) {
     return;
   }
 
@@ -111,9 +110,16 @@ DebugPrintMarker (
   }
 
   //
-  // Send the print string to the debug I/O port
+  // Send the print string to the debug I/O port, if present
   //
-  IoWriteFifo8 (PcdGet16 (PcdDebugIoPort), Length, Buffer);
+  if (PlatformDebugLibIoPortFound ()) {
+    IoWriteFifo8 (PcdGet16 (PcdDebugIoPort), Length, Buffer);
+  }
+
+  //
+  // Send string to Memory Debug Log
+  //
+  MemDebugLogWrite (Buffer, Length);
 }
 
 /**
@@ -220,6 +226,11 @@ DebugAssert (
   if (PlatformDebugLibIoPortFound ()) {
     IoWriteFifo8 (PcdGet16 (PcdDebugIoPort), Length, Buffer);
   }
+
+  //
+  // Send the string to Memory Debug Log
+  //
+  MemDebugLogWrite (Buffer, Length);
 
   //
   // Generate a Breakpoint, DeadLoop, or NOP based on PCD settings
