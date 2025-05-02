@@ -35,11 +35,13 @@
   MemoryAllocationLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
+  UefiLib
 
 [Protocols]
   gEdkiiIoMmuProtocolGuid                     ## SOMETIME_PRODUCES
   gIoMmuAbsentProtocolGuid                    ## SOMETIME_PRODUCES
   gEfiRealmApertureManagementProtocolGuid
+  gEfiResetNotificationProtocolGuid           ## CONSUMES
 
 [Depex]
   gEfiRealmApertureManagementProtocolGuid

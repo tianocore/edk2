@@ -12,6 +12,9 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#include <Library/UefiLib.h>
+#include <Protocol/ResetNotification.h>
+
 #include "ArmCcaIoMmu.h"
 
 /** List of the MAP_INFO structures that have been set up by IoMmuMap() and not
@@ -774,24 +777,14 @@ ArmCcaIoMmuExitBoot (
 }
 
 /**
-  Notification function that is queued after the notification functions of all
-  events in the EFI_EVENT_GROUP_EXIT_BOOT_SERVICES event group. The same memory
-  map restrictions apply.
+  Unmap all currently existing IOMMU mappings.
 
-  This function unmaps all currently existing IOMMU mappings.
-
-  @param[in] Event    Event whose notification function is being invoked. Event
-                      is permitted to request the queueing of this function
-                      only at TPL_CALLBACK task priority level.
-
-  @param[in] Context  Ignored.
 **/
 STATIC
 VOID
 EFIAPI
 ArmCcaIoMmuUnmapAllMappings (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
+  VOID
   )
 {
   LIST_ENTRY  *Node;
@@ -812,6 +805,100 @@ ArmCcaIoMmuUnmapAllMappings (
 }
 
 /**
+  Notification function that is queued after the notification functions of all
+  events in the EFI_EVENT_GROUP_EXIT_BOOT_SERVICES event group. The same memory
+  map restrictions apply.
+
+  @param[in] Event    Event whose notification function is being invoked. Event
+                      is permitted to request the queueing of this function
+                      only at TPL_CALLBACK task priority level.
+
+  @param[in] Context  Ignored.
+**/
+STATIC
+VOID
+EFIAPI
+ArmCcaIoMmuUnmapAllMappingsEvent (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  DEBUG ((
+    DEBUG_INFO,
+    "ArmCcaIoMmu: Unmapping all Mappings on ExitBootServices.\n"
+    ));
+  ArmCcaIoMmuUnmapAllMappings ();
+}
+
+/**
+  This routine is called to unmap all mappings before system reset.
+
+  @param[in]  ResetType    The type of reset to perform.
+  @param[in]  ResetStatus  The status code for the reset.
+  @param[in]  DataSize     The size, in bytes, of ResetData.
+  @param[in]  ResetData    For a ResetType of EfiResetCold, EfiResetWarm, or
+                           EfiResetShutdown the data buffer starts with a Null-
+                           terminated string, optionally followed by additional
+                           binary data. The string is a description that the
+                           caller may use to further indicate the reason for
+                           the system reset. ResetData is only valid if
+                           ResetStatus is something other than EFI_SUCCESS
+                           unless the ResetType is EfiResetPlatformSpecific
+                           where a minimum amount of ResetData is always
+                           required.
+                           For a ResetType of EfiResetPlatformSpecific the data
+                           buffer also starts with a Null-terminated string
+                           that is followed by an EFI_GUID that describes the
+                           specific type of reset to perform.
+**/
+STATIC
+VOID
+EFIAPI
+OnResetEvent (
+  IN EFI_RESET_TYPE  ResetType,
+  IN EFI_STATUS      ResetStatus,
+  IN UINTN           DataSize,
+  IN VOID            *ResetData OPTIONAL
+  )
+{
+  DEBUG ((DEBUG_INFO, "ArmCcaIoMmu: Unmapping all Mappings on Reset.\n"));
+  ArmCcaIoMmuUnmapAllMappings ();
+}
+
+/**
+  Hook the system reset to unmap all mappings.
+
+  @param[in]  Event     Event whose notification function is being invoked
+  @param[in]  Context   Pointer to the notification function's context
+**/
+STATIC
+VOID
+EFIAPI
+OnResetNotificationInstall (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  EFI_STATUS                       Status;
+  EFI_RESET_NOTIFICATION_PROTOCOL  *ResetNotify;
+
+  Status = gBS->LocateProtocol (
+                  &gEfiResetNotificationProtocolGuid,
+                  NULL,
+                  (VOID **)&ResetNotify
+                  );
+  if (!EFI_ERROR (Status)) {
+    Status = ResetNotify->RegisterResetNotify (ResetNotify, OnResetEvent);
+    ASSERT_EFI_ERROR (Status);
+    DEBUG ((
+      DEBUG_INFO,
+      "ArmCcaIoMmu: Hook system reset to unmap all mappings.\n"
+      ));
+    gBS->CloseEvent (Event);
+  }
+}
+
+/**
   Initialize and install the ArmCca IoMmu Protocol.
 
   @return RETURN_SUCCESS if successful, otherwise any other error.
@@ -826,15 +913,16 @@ ArmCcaInstallIoMmuProtocol (
   EFI_EVENT   UnmapAllMappingsEvent;
   EFI_EVENT   ExitBootEvent;
   EFI_HANDLE  Handle;
+  VOID        *Registration;
 
   // Create the "late" event whose notification function will tear down all
   // left-over IOMMU mappings.
   Status = gBS->CreateEvent (
-                  EVT_NOTIFY_SIGNAL,            // Type
-                  TPL_CALLBACK,                 // NotifyTpl
-                  ArmCcaIoMmuUnmapAllMappings,  // NotifyFunction
-                  NULL,                         // NotifyContext
-                  &UnmapAllMappingsEvent        // Event
+                  EVT_NOTIFY_SIGNAL,                  // Type
+                  TPL_CALLBACK,                       // NotifyTpl
+                  ArmCcaIoMmuUnmapAllMappingsEvent,   // NotifyFunction
+                  NULL,                               // NotifyContext
+                  &UnmapAllMappingsEvent              // Event
                   );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -861,6 +949,14 @@ ArmCcaInstallIoMmuProtocol (
                   NULL
                   );
   if (!EFI_ERROR (Status)) {
+    // Hook the system reset to tear down all mappings on reset.
+    EfiCreateProtocolNotifyEvent (
+      &gEfiResetNotificationProtocolGuid,
+      TPL_CALLBACK,
+      OnResetNotificationInstall,
+      NULL,
+      &Registration
+      );
     return Status;
   }
 
