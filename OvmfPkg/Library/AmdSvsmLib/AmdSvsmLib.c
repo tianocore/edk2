@@ -12,6 +12,7 @@
 #include <Library/AmdSvsmLib.h>
 #include <Register/Amd/Msr.h>
 #include <Register/Amd/Svsm.h>
+#include <Library/MemEncryptSevLib.h>
 
 #define PAGES_PER_2MB_ENTRY  512
 
@@ -592,4 +593,19 @@ AmdSvsmVtpmCmd (
   Ret = SvsmMsrProtocol (&SvsmCallData);
 
   return (Ret == 0) ? TRUE : FALSE;
+}
+
+/**
+  Check Alternate Injection enablement.
+  @retval TRUE                 Alternate Injection enabled
+  @retval FALSE                Alternate Injection not enabled
+
+**/
+BOOLEAN
+EFIAPI
+AlternateInjectionEnabled (
+  VOID
+  )
+{
+       return MemEncryptSevSnpAlternateInjectionIsEnabled();
 }

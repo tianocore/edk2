@@ -153,3 +153,18 @@ AmdSvsmVtpmCmd (
 {
   return FALSE;
 }
+
+/**
+  Check Alternate Injection enablement.
+  @retval TRUE                 Alternate Injection enabled
+  @retval FALSE                Alternate Injection not enabled
+
+**/
+BOOLEAN
+EFIAPI
+AlternateInjectionEnabled (
+   VOID
+   )
+{
+   return FALSE;
+}
