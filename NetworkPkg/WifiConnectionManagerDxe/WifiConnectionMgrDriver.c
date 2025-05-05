@@ -260,7 +260,7 @@ WifiMgrDxeDriverBindingStart (
     WiFiProfileSyncProtocol->GetProfile (Nic->ConnectPendingNetwork, Nic->MacAddress);
     if (Nic->ConnectPendingNetwork != NULL) {
       Status = WifiMgrConnectToNetwork (Nic, Nic->ConnectPendingNetwork);
-      if (!EFI_ERROR (Status)) {
+      if (EFI_ERROR (Status)) {
         goto ERROR1;
       }
 
@@ -293,9 +293,18 @@ WifiMgrDxeDriverBindingStart (
       goto ERROR2;
     }
 
-    Status = gBS->SetTimer (Nic->TickTimer, TimerPeriodic, EFI_TIMER_PERIOD_MILLISECONDS (500));
-    if (EFI_ERROR (Status)) {
-      goto ERROR3;
+    //
+    // Connect to profile from last boot if available
+    //
+    if ((Nic->CurrentOperateNetwork != NULL) && Nic->CurrentOperateNetwork->IsAvailable) {
+      Status = gBS->SetTimer (
+                      Nic->TickTimer,
+                      TimerPeriodic,
+                      EFI_TIMER_PERIOD_MILLISECONDS (500)
+                      );
+      if (EFI_ERROR (Status)) {
+        goto ERROR3;
+      }
     }
 
     Nic->ConnectState = WifiMgrDisconnected;
