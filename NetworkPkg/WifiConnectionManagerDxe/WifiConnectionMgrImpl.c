@@ -1489,7 +1489,25 @@ WifiMgrOnTimerTick (
   }
 
   Nic = (WIFI_MGR_DEVICE_DATA *)Context;
+  if (Nic->ConnectPendingNetwork == NULL) {
+    DEBUG ((DEBUG_INFO, "[WiFi Connection Manager] No profile for connection, no scan triggered!\n"));
+    gBS->CloseEvent (Event);
+    return;
+  }
+
+  if (StrLen (Nic->ConnectPendingNetwork->SSId) < SSID_MIN_LEN) {
+    DEBUG ((DEBUG_INFO, "[WiFi Connection Manager] Invalid SSID length for connection, no scan triggered!\n"));
+    gBS->CloseEvent (Event);
+    return;
+  }
+
   NET_CHECK_SIGNATURE (Nic, WIFI_MGR_DEVICE_DATA_SIGNATURE);
+
+  if ((Nic->ConnectState == WifiMgrConnectedToAp) || (Nic->ConnectState == WifiMgrConnectingToAp)) {
+    DEBUG ((DEBUG_INFO, "[WiFi Connection Manager] Already connecting to AP, no scan triggered!\n"));
+    gBS->CloseEvent (Event);
+    return;
+  }
 
   Status = WifiMgrGetLinkState (Nic, &LinkState);
   if (EFI_ERROR (Status)) {
