@@ -362,8 +362,7 @@ InitializeCpu (
   //
   // Initialize FPU
   //
-  Status = RiscVInitializeFpu ();
-  ASSERT_EFI_ERROR (Status);
+  InitializeFloatingPointUnits ();
 
   //
   // Install Boot protocol
