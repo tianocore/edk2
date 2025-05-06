@@ -8,6 +8,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "InternalTlsLib.h"
+#include <openssl/tls1.h>
+#include <openssl/ssl.h>
+#include <ssl/ssl_local.h>
 
 typedef struct {
   //
@@ -550,6 +553,84 @@ TlsSetVerifyHost (
   }
 
   return (ParamStatus == 1) ? EFI_SUCCESS : EFI_ABORTED;
+}
+
+/**
+  Callback function to get the server name.
+
+  @param[in]  SSL
+  @param[in]  INT32
+  @param[in]  Arg
+
+  @retval  INT32
+**/
+static
+INT32
+SslServerNameCallback (
+  SSL    *Ssl,
+  INT32  *Ad,
+  VOID   *Arg
+  )
+{
+  const CHAR8  *HostName = NULL;
+  TLS_EXT_CTX  *TlsCtx   = (TLS_EXT_CTX *)Arg;
+
+  HostName = SSL_get_servername (Ssl, TLSEXT_NAMETYPE_host_name);
+
+  if (SSL_get_servername_type (Ssl) != -1) {
+    TlsCtx->Ack = !SSL_session_reused (Ssl) && HostName != NULL;
+  }
+
+  return SSL_TLSEXT_ERR_OK;
+}
+
+/**
+  Set the specified server name in Server/Client.
+
+  @param[in]  Tls           Pointer to the TLS object.
+  @param[in]  SslCtx        Pointer to the SSL object.
+  @param[in]  HostName      The specified server name to be set.
+
+  @retval  EFI_SUCCESS      The Server Name was set successfully.
+  @retval  EFI_UNSUPPORTED  Failed to set the Server Name.
+**/
+EFI_STATUS
+TlsSetServerName (
+  VOID   *Tls,
+  VOID   *SslCtx,
+  CHAR8  *HostName
+  )
+{
+  SSL_CTX         *Ctx;
+  TLS_CONNECTION  *TlsConn;
+  UINT32          RetVal;
+  TLS_EXT_CTX     *TlsExtCtx = NULL;
+
+  TlsConn = (TLS_CONNECTION *)Tls;
+  Ctx     = (SSL_CTX *)SslCtx;
+
+  TlsExtCtx = AllocateZeroPool (sizeof (TLS_EXT_CTX));
+  if (TlsExtCtx == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  RetVal = SSL_CTX_set_tlsext_servername_callback (Ctx, SslServerNameCallback);
+  if (!RetVal) {
+    return EFI_UNSUPPORTED;
+  }
+
+  RetVal = SSL_CTX_set_tlsext_servername_arg (Ctx, TlsExtCtx);
+  if (!RetVal) {
+    return EFI_UNSUPPORTED;
+  }
+
+  RetVal = SSL_set_tlsext_host_name (TlsConn->Ssl, HostName);
+
+  if (!RetVal) {
+    return EFI_UNSUPPORTED;
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**

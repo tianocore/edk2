@@ -3952,6 +3952,24 @@ EFI_STATUS
   );
 
 /**
+  Set the specified server name in Server/Client.
+
+  @param[in]  Tls           Pointer to the TLS object.
+  @param[in]  SslCtx        Pointer to the SSL object.
+  @param[in]  HostName      The specified server name to be set.
+
+  @retval  EFI_SUCCESS      The Server Name was set successfully.
+  @retval  EFI_UNSUPPORTED  Failed to set the Server Name.
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_CRYPTO_TLS_SET_SERVER_NAME)(
+  IN     VOID            *Tls,
+  IN     VOID            *SslCtx,
+  IN     CHAR8           *HostName
+  );
+
+/**
   Gets the protocol version used by the specified TLS connection.
 
   This function returns the protocol version used by the specified TLS
@@ -5710,6 +5728,7 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_PKCS1V2_DECRYPT                        Pkcs1v2Decrypt;
   EDKII_CRYPTO_RSA_OAEP_ENCRYPT                       RsaOaepEncrypt;
   EDKII_CRYPTO_RSA_OAEP_DECRYPT                       RsaOaepDecrypt;
+  EDKII_CRYPTO_TLS_SET_SERVER_NAME                    TlsSetServerName;
 };
 
 extern GUID  gEdkiiCryptoProtocolGuid;

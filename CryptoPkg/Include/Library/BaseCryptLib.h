@@ -2266,6 +2266,23 @@ RsaOaepDecrypt (
   );
 
 /**
+  Set the specified server name in Server/Client.
+
+  @param[in]  Tls           Pointer to the TLS object.
+  @param[in]  SslCtx        Pointer to the SSL object.
+  @param[in]  HostName      The specified server name to be set.
+
+  @retval  EFI_SUCCESS      The Server Name was set successfully.
+  @retval  EFI_UNSUPPORTED  Failed to set the Server Name.
+**/
+EFI_STATUS
+TlsSetServerName (
+  VOID   *Tls,
+  VOID   *SslCtx,
+  CHAR8  *HostName
+  );
+
+/**
   The 3rd parameter of Pkcs7GetSigners will return all embedded
   X.509 certificate in one given PKCS7 signature. The format is:
   //
