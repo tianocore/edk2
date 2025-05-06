@@ -1,25 +1,12 @@
 /** @file
-The library call to pass the device tree to DXE via HOB.
+  Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2025 Ventana Micro Systems Inc.<BR>
 
-Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
-
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-//
-//// The package level header files this module uses
-////
-#include <PiPei.h>
-
-#include <Library/DebugLib.h>
-#include <Library/FdtLib.h>
-#include <Library/HobLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/BaseRiscVSbiLib.h>
-#include <Library/PcdLib.h>
-#include <Include/Library/PrePiLib.h>
-#include <Guid/FdtHob.h>
+#include "PlatformSecLib.h"
 
 /**
   Build memory map I/O range resource HOB using the
@@ -80,36 +67,27 @@ PopulateIoResources (
 }
 
 /**
-  @retval EFI_SUCCESS            The address of FDT is passed in HOB.
-          EFI_UNSUPPORTED        Can't locate FDT.
+  Perform Platform initialization.
+
+  @param  FdtPointer      The pointer to the device tree.
+
+  @return EFI_SUCCESS     The platform initialized successfully.
+  @retval  Others        - As the error code indicates
+
 **/
 EFI_STATUS
 EFIAPI
-PlatformPeimInitialization (
-  VOID
+PlatformInitialization (
+  VOID  *FdtPointer
   )
 {
-  EFI_RISCV_FIRMWARE_CONTEXT  *FirmwareContext;
-  VOID                        *FdtPointer;
-  VOID                        *Base;
-  VOID                        *NewBase;
-  UINTN                       FdtSize;
-  UINTN                       FdtPages;
-  UINT64                      *FdtHobData;
+  VOID    *Base;
+  VOID    *NewBase;
+  UINTN   FdtSize;
+  UINTN   FdtPages;
+  UINT64  *FdtHobData;
 
-  FirmwareContext = NULL;
-  GetFirmwareContextPointer (&FirmwareContext);
-
-  if (FirmwareContext == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Firmware Context is NULL\n", __func__));
-    return EFI_UNSUPPORTED;
-  }
-
-  FdtPointer = (VOID *)FirmwareContext->FlattenedDeviceTree;
-  if (FdtPointer == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Invalid FDT pointer\n", __func__));
-    return EFI_UNSUPPORTED;
-  }
+  SerialPortInitialize ();
 
   DEBUG ((DEBUG_INFO, "%a: Build FDT HOB - FDT at address: 0x%x \n", __func__, FdtPointer));
   Base = FdtPointer;
@@ -135,8 +113,6 @@ PlatformPeimInitialization (
   }
 
   *FdtHobData = (UINTN)NewBase;
-
-  BuildFvHob (PcdGet32 (PcdOvmfDxeMemFvBase), PcdGet32 (PcdOvmfDxeMemFvSize));
 
   PopulateIoResources (Base, "ns16550a");
   PopulateIoResources (Base, "qemu,fw-cfg-mmio");

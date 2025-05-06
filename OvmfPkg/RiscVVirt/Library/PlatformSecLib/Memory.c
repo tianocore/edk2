@@ -1,41 +1,39 @@
 /** @file
-  Memory Detection for Virtual Machines.
+  Memory Detection for RiscVVirt Machines.
 
   Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
   Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2025 Ventana Micro Systems Inc.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
-Module Name:
-
-  MemDetect.c
-
 **/
 
-//
-// The package level header files this module uses
-//
-#include <PiPei.h>
-
-//
-// The Library classes this module consumes
-//
-#include <Library/BaseMemoryLib.h>
-#include <Library/DebugLib.h>
-#include <Library/FdtLib.h>
-#include <Library/HobLib.h>
-#include <Library/IoLib.h>
-#include <Library/PcdLib.h>
-#include <Library/ResourcePublicationLib.h>
-#include <Library/BaseRiscVSbiLib.h>
-#include <Register/RiscV64/RiscVEncoding.h>
-#include <Library/PrePiLib.h>
-#include <Guid/FdtHob.h>
+#include "PlatformSecLib.h"
 
 VOID
-BuildMemoryTypeInformationHob (
+BuildMemoryTypeHob (
   VOID
-  );
+  )
+{
+  EFI_MEMORY_TYPE_INFORMATION  Info[6];
+
+  Info[0].Type          = EfiACPIReclaimMemory;
+  Info[0].NumberOfPages = PcdGet32 (PcdMemoryTypeEfiACPIReclaimMemory);
+  Info[1].Type          = EfiACPIMemoryNVS;
+  Info[1].NumberOfPages = PcdGet32 (PcdMemoryTypeEfiACPIMemoryNVS);
+  Info[2].Type          = EfiReservedMemoryType;
+  Info[2].NumberOfPages = PcdGet32 (PcdMemoryTypeEfiReservedMemoryType);
+  Info[3].Type          = EfiRuntimeServicesData;
+  Info[3].NumberOfPages = PcdGet32 (PcdMemoryTypeEfiRuntimeServicesData);
+  Info[4].Type          = EfiRuntimeServicesCode;
+  Info[4].NumberOfPages = PcdGet32 (PcdMemoryTypeEfiRuntimeServicesCode);
+  // Terminator for the list
+  Info[5].Type          = EfiMaxMemoryType;
+  Info[5].NumberOfPages = 0;
+
+  BuildGuidDataHob (&gEfiMemoryTypeInformationGuid, &Info, sizeof (Info));
+}
 
 /**
   Create memory range resource HOB using the memory base
@@ -235,37 +233,25 @@ AddReservedMemoryMap (
 }
 
 /**
-  Initialize memory hob based on the DTB information.
+  Perform Memory initialization.
 
-  @return EFI_SUCCESS     The memory hob added successfully.
+  @param  FdtPointer      The pointer to the device tree.
+
+  @return EFI_SUCCESS     The platform initialized successfully.
+  @retval  Others        - As the error code indicates
 
 **/
 EFI_STATUS
-MemoryPeimInitialization (
-  VOID
+EFIAPI
+MemoryInitialization (
+  VOID  *FdtPointer
   )
 {
-  EFI_RISCV_FIRMWARE_CONTEXT  *FirmwareContext;
-  CONST UINT64                *RegProp;
-  CONST CHAR8                 *Type;
-  UINT64                      CurBase, CurSize;
-  INT32                       Node, Prev;
-  INT32                       Len;
-  VOID                        *FdtPointer;
-
-  FirmwareContext = NULL;
-  GetFirmwareContextPointer (&FirmwareContext);
-
-  if (FirmwareContext == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Firmware Context is NULL\n", __func__));
-    return EFI_UNSUPPORTED;
-  }
-
-  FdtPointer = (VOID *)FirmwareContext->FlattenedDeviceTree;
-  if (FdtPointer == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Invalid FDT pointer\n", __func__));
-    return EFI_UNSUPPORTED;
-  }
+  CONST UINT64  *RegProp;
+  CONST CHAR8   *Type;
+  UINT64        CurBase, CurSize;
+  INT32         Node, Prev;
+  INT32         Len;
 
   // Look for the lowest memory node
   for (Prev = 0; ; Prev = Node) {
@@ -311,7 +297,7 @@ MemoryPeimInitialization (
   /* Make sure SEC is booting with bare mode */
   ASSERT ((RiscVGetSupervisorAddressTranslationRegister () & SATP64_MODE) == (SATP_MODE_OFF << SATP64_MODE_SHIFT));
 
-  BuildMemoryTypeInformationHob ();
+  BuildMemoryTypeHob ();
 
   return EFI_SUCCESS;
 }
