@@ -1,7 +1,7 @@
 ## @file
 # This file is used to parse meta files
 #
-# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2025, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2015-2018 Hewlett Packard Enterprise Development LP<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -1388,7 +1388,7 @@ class DscParser(MetaFileParser):
         self._SectionsMacroDict.clear()
         GlobalData.gPlatformDefines = {}
 
-        # Get all macro and PCD which has straitforward value
+        # Get all macro and PCD which has straightforward value
         self.__RetrievePcdValue()
         self._Content = self._RawTable.GetAll()
         self._ContentIndex = 0
@@ -1464,7 +1464,7 @@ class DscParser(MetaFileParser):
                                 self._ValueList[0],
                                 self._ValueList[1],
                                 self._ValueList[2],
-                                S1,
+                                self._Scope[0][0],
                                 S2,
                                 S3,
                                 NewOwner,
@@ -1711,6 +1711,7 @@ class DscParser(MetaFileParser):
 
     def __ProcessComponent(self):
         self._ValueList[0] = ReplaceMacro(self._ValueList[0], self._Macros)
+        self._Scope[0][0] = ReplaceMacro(self._Scope[0][0], self._Macros)
 
     def __ProcessBuildOption(self):
         self._ValueList = [ReplaceMacro(Value, self._Macros, RaiseError=False)
