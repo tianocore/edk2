@@ -62,7 +62,8 @@
   AArch64/CpuSleep.asm    | MSFT
 
 [Sources.RISCV64]
-  RiscV/Cpu.S
+  RiscV/Cpu.S             | GCC
+  RiscV/InitializeFpu.S   | GCC
 
 [Sources.LOONGARCH64]
   LoongArch/CpuFlushTlb.S   | GCC

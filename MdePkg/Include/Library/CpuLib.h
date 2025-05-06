@@ -42,7 +42,7 @@ CpuFlushTlb (
   VOID
   );
 
-#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64) || defined (MDE_CPU_LOONGARCH64)
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64) || defined (MDE_CPU_LOONGARCH64) || defined (MDE_CPU_RISCV64)
 
 /**
   Initialize the CPU floating point units.
