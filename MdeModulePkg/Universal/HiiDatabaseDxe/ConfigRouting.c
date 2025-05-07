@@ -4793,6 +4793,8 @@ RouteConfigRespForEfiVarStore (
     goto Done;
   }
 
+  EfiEventGroupSignal (&gSetupSaveVariableCallBackGuid);
+
 Done:
   if (VarStoreName != NULL) {
     FreePool (VarStoreName);
