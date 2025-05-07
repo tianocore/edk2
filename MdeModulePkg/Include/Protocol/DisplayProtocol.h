@@ -238,7 +238,7 @@ struct _FORM_DISPLAY_ENGINE_FORM {
   //
   LIST_ENTRY                       StatementListOSF;
   //
-  // The input screen dimenstions info.
+  // The input screen dimensions info.
   //
   EFI_SCREEN_DESCRIPTOR            *ScreenDimensions;
   //
