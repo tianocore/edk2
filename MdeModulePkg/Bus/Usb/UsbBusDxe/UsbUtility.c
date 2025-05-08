@@ -850,6 +850,7 @@ UsbBusAddWantedUsbIoDP (
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePathPtr;
 
+  DevicePathPtr = NULL;
   //
   // Check whether remaining device path is valid
   //
@@ -894,9 +895,12 @@ UsbBusAddWantedUsbIoDP (
   }
 
   ASSERT (DevicePathPtr != NULL);
-  Status = AddUsbDPToList (DevicePathPtr, &Bus->WantedUsbIoDPList);
-  ASSERT (!EFI_ERROR (Status));
-  FreePool (DevicePathPtr);
+  if (DevicePathPtr != NULL) {
+    Status = AddUsbDPToList (DevicePathPtr, &Bus->WantedUsbIoDPList);
+    ASSERT (!EFI_ERROR (Status));
+    FreePool (DevicePathPtr);
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -953,7 +957,9 @@ UsbBusIsWantedUsbIO (
   // Create new Usb device path according to the usb part in UsbIo full device path
   //
   DevicePathPtr = GetUsbDPFromFullDP (UsbIf->DevicePath);
-  ASSERT (DevicePathPtr != NULL);
+  if (DevicePathPtr == NULL) {
+    return FALSE;
+  }
 
   DoConvert       = FALSE;
   WantedListIndex = WantedUsbIoDPListPtr->ForwardLink;
