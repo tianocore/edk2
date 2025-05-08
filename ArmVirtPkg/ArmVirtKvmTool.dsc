@@ -30,15 +30,18 @@
 [Defines.AARCH64]
   DEFINE ACPIVIEW_ENABLE         = TRUE
 
-
-# This comes before MdeLibs to ensure stack cookie configuration is chosen
-!include ArmVirtPkg/ArmVirt.dsc.inc
+# This comes at the beginning of includes to pick all relevant defines early on.
+!include ArmVirtPkg/ArmVirtStackCookies.dsc.inc
 
 !if $(ARCH) == AARCH64
 !include DynamicTablesPkg/DynamicTables.dsc.inc
 !endif
 
 !include MdePkg/MdeLibs.dsc.inc
+
+# This comes at the end of includes to pick all relevant components without any
+# unintentional overrides.
+!include ArmVirtPkg/ArmVirt.dsc.inc
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
