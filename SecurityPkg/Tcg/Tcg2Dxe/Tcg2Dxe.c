@@ -802,6 +802,7 @@ Tcg2GetEventLog (
   @retval FALSE  This is NOT a Tcg800155PlatformIdEvent.
 
 **/
+STATIC
 BOOLEAN
 Is800155Event (
   IN      VOID    *NewEventHdr,
@@ -810,19 +811,25 @@ Is800155Event (
   IN      UINT32  NewEventSize
   )
 {
-  if ((((TCG_PCR_EVENT2_HDR *)NewEventHdr)->EventType == EV_NO_ACTION) &&
-      (NewEventSize >= sizeof (TCG_Sp800_155_PlatformId_Event2)) &&
-      ((CompareMem (
-          NewEventData,
-          TCG_Sp800_155_PlatformId_Event2_SIGNATURE,
-          sizeof (TCG_Sp800_155_PlatformId_Event2_SIGNATURE) - 1
-          ) == 0) ||
-       (CompareMem (
-          NewEventData,
-          TCG_Sp800_155_PlatformId_Event3_SIGNATURE,
-          sizeof (TCG_Sp800_155_PlatformId_Event3_SIGNATURE) - 1
-          ) == 0)))
-  {
+  if (((TCG_PCR_EVENT2_HDR *)NewEventHdr)->EventType != EV_NO_ACTION) {
+    return FALSE;
+  }
+
+  if ((NewEventSize >= sizeof (TCG_Sp800_155_PlatformId_Event2)) &&
+      (CompareMem (
+         NewEventData,
+         TCG_Sp800_155_PlatformId_Event2_SIGNATURE,
+         sizeof (TCG_Sp800_155_PlatformId_Event2_SIGNATURE) - 1
+         ) == 0)) {
+    return TRUE;
+  }
+
+  if ((NewEventSize >= sizeof (TCG_Sp800_155_PlatformId_Event3)) &&
+      (CompareMem (
+         NewEventData,
+         TCG_Sp800_155_PlatformId_Event3_SIGNATURE,
+         sizeof (TCG_Sp800_155_PlatformId_Event3_SIGNATURE) - 1
+         ) == 0)) {
     return TRUE;
   }
 
