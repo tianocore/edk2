@@ -437,16 +437,17 @@ GetCurrentKeyboardLayout (
   if (Status == EFI_BUFFER_TOO_SMALL) {
     KeyboardLayout = AllocatePool (Length);
     ASSERT (KeyboardLayout != NULL);
-
-    Status = HiiDatabase->GetKeyboardLayout (
-                            HiiDatabase,
-                            NULL,
-                            &Length,
-                            KeyboardLayout
-                            );
-    if (EFI_ERROR (Status)) {
-      FreePool (KeyboardLayout);
-      KeyboardLayout = NULL;
+    if (KeyboardLayout != NULL) {
+      Status = HiiDatabase->GetKeyboardLayout (
+                              HiiDatabase,
+                              NULL,
+                              &Length,
+                              KeyboardLayout
+                              );
+      if (EFI_ERROR (Status)) {
+        FreePool (KeyboardLayout);
+        KeyboardLayout = NULL;
+      }
     }
   }
 
@@ -683,7 +684,10 @@ SetKeyboardLayoutEvent (
   //
   TableEntry    = GetKeyDescriptor (UsbKeyboardDevice, 0x58);
   KeyDescriptor = GetKeyDescriptor (UsbKeyboardDevice, 0x28);
-  CopyMem (TableEntry, KeyDescriptor, sizeof (EFI_KEY_DESCRIPTOR));
+
+  if ((TableEntry != NULL) && (KeyDescriptor != NULL)) {
+    CopyMem (TableEntry, KeyDescriptor, sizeof (EFI_KEY_DESCRIPTOR));
+  }
 
   FreePool (KeyboardLayout);
 }
