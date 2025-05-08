@@ -316,6 +316,14 @@ SmmWaitForApArrival (
 
       CpuPause ();
     }
+  } else {
+    //
+    // All APs have already entered SMI, so there is no need to send SMI IPIs. Set AllApArrivedWithException to TRUE.
+    // In some cases, the first timeout sync may be skipped, but all APs still arrive. Update AllApArrivedWithException in such scenarios.
+    // Example:
+    // If IsCpuSyncAlwaysNeeded() returns false, LMCE is enabled and triggered, and another SMI source combined with LMCE causes all APs to enter SMI.
+    //
+    mSmmMpSyncData->AllApArrivedWithException = TRUE;
   }
 
   if (!mSmmMpSyncData->AllApArrivedWithException) {
