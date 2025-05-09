@@ -41,7 +41,15 @@ endif
 
 export HOST_ARCH
 
-MAKEROOT = .
+MAKEROOT ?= $(CURDIR)
+export MAKEROOT
+
+NINJA := $(shell which ninja-build 2>/dev/null || which ninja 2>/dev/null)
+NINJAFLAGS =
+ifneq (,$(filter -j%,$(MAKEFLAGS)))
+  NUMJOBS = $(patsubst -j%,%,$(filter -j%,$(MAKEFLAGS)))
+  NINJAFLAGS += -j$(NUMJOBS)
+endif
 
 include Makefiles/header.makefile
 
@@ -84,6 +92,17 @@ $(patsubst %,%-clean,$(sort $(SUBDIRS))):
 
 $(VFRAUTOGEN): VfrCompile/VfrSyntax.g
 	$(MAKE) -C VfrCompile VfrLexer.h
+
+.PHONY: ninja
+ninja:
+	for dir in $(LIBRARIES); do $(MAKE) -C $$dir ninja_lib; done
+	for dir in $(APPLICATIONS); do $(MAKE) -C $$dir ninja_app; done
+	@echo "pool link_pool" > build.ninja
+	@echo "  depth = 10" >> build.ninja
+	@echo "" >> build.ninja
+	for dir in $(LIBRARIES); do echo "subninja $${dir}/build.ninja" >> build.ninja; done
+	for dir in $(APPLICATIONS); do echo "subninja $${dir}/build.ninja" >> build.ninja; done
+	$(NINJA) $(NINJAFLAGS)
 
 clean:  $(patsubst %,%-clean,$(sort $(SUBDIRS)))
 

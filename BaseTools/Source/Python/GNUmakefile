@@ -5,7 +5,9 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
-all:
+all: ninja
+
+ninja:
 
 clean:
 	find . -name '*.pyc' -exec rm '{}' ';'
