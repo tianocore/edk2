@@ -477,6 +477,8 @@ InternalProtocolGetVariablePolicyInfo (
   UINTN                                  BufferSize;
   UINTN                                  VariableNameSize;
 
+  PolicyHeader = NULL;
+
   if ((VariableName == NULL) || (VendorGuid == NULL) || (VariablePolicy == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -609,8 +611,11 @@ InternalProtocolGetVariablePolicyInfo (
 
 Done:
   ReleaseLockOnlyAtBootTime (&mMmCommunicationLock);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
-  return (EFI_ERROR (Status)) ? Status : PolicyHeader->Result;
+  return (PolicyHeader != NULL) ? PolicyHeader->Result : EFI_SUCCESS;
 }
 
 /**
