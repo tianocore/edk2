@@ -13,3 +13,8 @@ INF  OvmfPkg/MptScsiDxe/MptScsiDxe.inf
 !if $(LSI_SCSI_ENABLE) == TRUE
 INF  OvmfPkg/LsiScsiDxe/LsiScsiDxe.inf
 !endif
+!if $(SDCARD_ENABLE) == TRUE
+INF MdeModulePkg/Bus/Pci/SdMmcPciHcDxe/SdMmcPciHcDxe.inf
+INF MdeModulePkg/Bus/Sd/SdDxe/SdDxe.inf
+INF MdeModulePkg/Bus/Sd/EmmcDxe/EmmcDxe.inf
+!endif
