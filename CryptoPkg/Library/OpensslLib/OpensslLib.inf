@@ -289,7 +289,9 @@
   $(OPENSSL_PATH)/crypto/evp/pmeth_check.c
   $(OPENSSL_PATH)/crypto/evp/pmeth_gn.c
   $(OPENSSL_PATH)/crypto/evp/pmeth_lib.c
+  $(OPENSSL_PATH)/crypto/evp/s_lib.c
   $(OPENSSL_PATH)/crypto/evp/signature.c
+  $(OPENSSL_PATH)/crypto/evp/skeymgmt_meth.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_backend.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_dh.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_key_generate.c
@@ -297,6 +299,7 @@
   $(OPENSSL_PATH)/crypto/ffc/ffc_params.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_params_generate.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_params_validate.c
+  $(OPENSSL_PATH)/crypto/hashtable/hashfunc.c
   $(OPENSSL_PATH)/crypto/hashtable/hashtable.c
   $(OPENSSL_PATH)/crypto/hmac/hmac.c
   $(OPENSSL_PATH)/crypto/hpke/hpke.c
@@ -353,6 +356,7 @@
   $(OPENSSL_PATH)/crypto/self_test_core.c
   $(OPENSSL_PATH)/crypto/sleep.c
   $(OPENSSL_PATH)/crypto/sparse_array.c
+  $(OPENSSL_PATH)/crypto/ssl_err.c
   $(OPENSSL_PATH)/crypto/threads_lib.c
   $(OPENSSL_PATH)/crypto/threads_none.c
   $(OPENSSL_PATH)/crypto/threads_pthread.c
@@ -363,6 +367,15 @@
   $(OPENSSL_PATH)/crypto/md5/md5_dgst.c
   $(OPENSSL_PATH)/crypto/md5/md5_one.c
   $(OPENSSL_PATH)/crypto/md5/md5_sha1.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_encoders.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_key.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_key_compress.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_matrix.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_ntt.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_params.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_sample.c
+  $(OPENSSL_PATH)/crypto/ml_dsa/ml_dsa_sign.c
+  $(OPENSSL_PATH)/crypto/ml_kem/ml_kem.c
   $(OPENSSL_PATH)/crypto/modes/cbc128.c
   $(OPENSSL_PATH)/crypto/modes/ccm128.c
   $(OPENSSL_PATH)/crypto/modes/cfb128.c
@@ -443,6 +456,16 @@
   $(OPENSSL_PATH)/crypto/sha/sha256.c
   $(OPENSSL_PATH)/crypto/sha/sha3.c
   $(OPENSSL_PATH)/crypto/sha/sha512.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_adrs.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_dsa.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_dsa_hash_ctx.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_dsa_key.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_fors.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_hash.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_hypertree.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_params.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_wots.c
+  $(OPENSSL_PATH)/crypto/slh_dsa/slh_xmss.c
   $(OPENSSL_PATH)/crypto/sm3/legacy_sm3.c
   $(OPENSSL_PATH)/crypto/sm3/sm3.c
   $(OPENSSL_PATH)/crypto/stack/stack.c
@@ -467,13 +490,17 @@
   $(OPENSSL_PATH)/crypto/x509/t_crl.c
   $(OPENSSL_PATH)/crypto/x509/t_req.c
   $(OPENSSL_PATH)/crypto/x509/t_x509.c
+  $(OPENSSL_PATH)/crypto/x509/v3_aaa.c
   $(OPENSSL_PATH)/crypto/x509/v3_ac_tgt.c
   $(OPENSSL_PATH)/crypto/x509/v3_addr.c
   $(OPENSSL_PATH)/crypto/x509/v3_admis.c
   $(OPENSSL_PATH)/crypto/x509/v3_akeya.c
   $(OPENSSL_PATH)/crypto/x509/v3_akid.c
   $(OPENSSL_PATH)/crypto/x509/v3_asid.c
+  $(OPENSSL_PATH)/crypto/x509/v3_attrdesc.c
+  $(OPENSSL_PATH)/crypto/x509/v3_attrmap.c
   $(OPENSSL_PATH)/crypto/x509/v3_audit_id.c
+  $(OPENSSL_PATH)/crypto/x509/v3_authattid.c
   $(OPENSSL_PATH)/crypto/x509/v3_battcons.c
   $(OPENSSL_PATH)/crypto/x509/v3_bcons.c
   $(OPENSSL_PATH)/crypto/x509/v3_bitst.c
@@ -501,12 +528,14 @@
   $(OPENSSL_PATH)/crypto/x509/v3_pmaps.c
   $(OPENSSL_PATH)/crypto/x509/v3_prn.c
   $(OPENSSL_PATH)/crypto/x509/v3_purp.c
+  $(OPENSSL_PATH)/crypto/x509/v3_rolespec.c
   $(OPENSSL_PATH)/crypto/x509/v3_san.c
   $(OPENSSL_PATH)/crypto/x509/v3_sda.c
   $(OPENSSL_PATH)/crypto/x509/v3_single_use.c
   $(OPENSSL_PATH)/crypto/x509/v3_skid.c
   $(OPENSSL_PATH)/crypto/x509/v3_soa_id.c
   $(OPENSSL_PATH)/crypto/x509/v3_sxnet.c
+  $(OPENSSL_PATH)/crypto/x509/v3_timespec.c
   $(OPENSSL_PATH)/crypto/x509/v3_tlsf.c
   $(OPENSSL_PATH)/crypto/x509/v3_usernotice.c
   $(OPENSSL_PATH)/crypto/x509/v3_utf8.c
@@ -585,6 +614,9 @@
   $(OPENSSL_PATH)/providers/implementations/encode_decode/decode_pvk2key.c
   $(OPENSSL_PATH)/providers/implementations/encode_decode/decode_spki2typespki.c
   $(OPENSSL_PATH)/providers/implementations/encode_decode/endecoder_common.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/ml_common_codecs.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/ml_dsa_codecs.c
+  $(OPENSSL_PATH)/providers/implementations/encode_decode/ml_kem_codecs.c
   $(OPENSSL_PATH)/providers/implementations/exchange/dh_exch.c
   $(OPENSSL_PATH)/providers/implementations/exchange/kdf_exch.c
   $(OPENSSL_PATH)/providers/implementations/kdfs/argon2.c
@@ -600,11 +632,15 @@
   $(OPENSSL_PATH)/providers/implementations/kdfs/sskdf.c
   $(OPENSSL_PATH)/providers/implementations/kdfs/tls1_prf.c
   $(OPENSSL_PATH)/providers/implementations/kdfs/x942kdf.c
+  $(OPENSSL_PATH)/providers/implementations/kem/ml_kem_kem.c
   $(OPENSSL_PATH)/providers/implementations/kem/rsa_kem.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/dh_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/kdf_legacy_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/mac_legacy_kmgmt.c
+  $(OPENSSL_PATH)/providers/implementations/keymgmt/ml_dsa_kmgmt.c
+  $(OPENSSL_PATH)/providers/implementations/keymgmt/ml_kem_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/rsa_kmgmt.c
+  $(OPENSSL_PATH)/providers/implementations/keymgmt/slh_dsa_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/macs/gmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/hmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/kmac_prov.c
@@ -620,10 +656,16 @@
   $(OPENSSL_PATH)/providers/implementations/rands/seeding/rand_unix.c
   $(OPENSSL_PATH)/providers/implementations/rands/seeding/rand_win.c
   $(OPENSSL_PATH)/providers/implementations/signature/mac_legacy_sig.c
+  $(OPENSSL_PATH)/providers/implementations/signature/ml_dsa_sig.c
   $(OPENSSL_PATH)/providers/implementations/signature/rsa_sig.c
+  $(OPENSSL_PATH)/providers/implementations/signature/slh_dsa_sig.c
+  $(OPENSSL_PATH)/providers/implementations/skeymgmt/aes_skmgmt.c
+  $(OPENSSL_PATH)/providers/implementations/skeymgmt/generic.c
   $(OPENSSL_PATH)/ssl/record/methods/ssl3_cbc.c
   $(OPENSSL_GEN_PATH)/crypto/params_idx.c
+  $(OPENSSL_PATH)/providers/common/der/der_ml_dsa_key.c
   $(OPENSSL_PATH)/providers/common/der/der_rsa_key.c
+  $(OPENSSL_PATH)/providers/common/der/der_slh_dsa_key.c
   $(OPENSSL_PATH)/providers/common/provider_ctx.c
   $(OPENSSL_PATH)/providers/common/provider_err.c
   $(OPENSSL_PATH)/providers/implementations/ciphers/ciphercommon.c
@@ -636,7 +678,9 @@
   $(OPENSSL_PATH)/providers/implementations/digests/digestcommon.c
   $(OPENSSL_PATH)/ssl/record/methods/tls_pad.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_digests_gen.c
+  $(OPENSSL_GEN_PATH)/providers/common/der/der_ml_dsa_gen.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_rsa_gen.c
+  $(OPENSSL_GEN_PATH)/providers/common/der/der_slh_dsa_gen.c
   $(OPENSSL_GEN_PATH)/providers/common/der/der_wrap_gen.c
   $(OPENSSL_PATH)/ssl/bio_ssl.c
   $(OPENSSL_PATH)/ssl/d1_lib.c
@@ -652,7 +696,6 @@
   $(OPENSSL_PATH)/ssl/ssl_cert_comp.c
   $(OPENSSL_PATH)/ssl/ssl_ciph.c
   $(OPENSSL_PATH)/ssl/ssl_conf.c
-  $(OPENSSL_PATH)/ssl/ssl_err.c
   $(OPENSSL_PATH)/ssl/ssl_err_legacy.c
   $(OPENSSL_PATH)/ssl/ssl_init.c
   $(OPENSSL_PATH)/ssl/ssl_lib.c
@@ -669,6 +712,8 @@
   $(OPENSSL_PATH)/ssl/tls13_enc.c
   $(OPENSSL_PATH)/ssl/tls_depr.c
   $(OPENSSL_PATH)/ssl/tls_srp.c
+  $(OPENSSL_PATH)/ssl/quic/quic_tls.c
+  $(OPENSSL_PATH)/ssl/quic/quic_tls_api.c
   $(OPENSSL_PATH)/ssl/record/rec_layer_d1.c
   $(OPENSSL_PATH)/ssl/record/rec_layer_s3.c
   $(OPENSSL_PATH)/ssl/record/methods/dtls_meth.c
@@ -727,8 +772,8 @@
   #   C4819: The file contains a character that cannot be represented in the current code page
   #   C4133: incompatible types - from 'ASN1_TYPE *' to 'const ASN1_STRING *' (v3_genn.c(101))
   #
-  MSFT:*_*_IA32_CC_FLAGS   = -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_FLAGS_NOASM) /wd4090 /wd4132 /wd4210 /wd4244 /wd4245 /wd4267 /wd4310 /wd4389 /wd4700 /wd4702 /wd4706 /wd4819 /wd4133 /wd4189
-  MSFT:*_*_X64_CC_FLAGS    = -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_FLAGS_NOASM) /wd4090 /wd4132 /wd4210 /wd4244 /wd4245 /wd4267 /wd4306 /wd4310 /wd4700 /wd4389 /wd4702 /wd4706 /wd4819 /wd4133 /wd4189
+  MSFT:*_*_IA32_CC_FLAGS   = -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_FLAGS_NOASM) /wd4090 /wd4132 /wd4210 /wd4244 /wd4245 /wd4267 /wd4310 /wd4389 /wd4700 /wd4702 /wd4706 /wd4819 /wd4130 /wd4133 /wd4189
+  MSFT:*_*_X64_CC_FLAGS    = -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_FLAGS_NOASM) /wd4090 /wd4132 /wd4210 /wd4244 /wd4245 /wd4267 /wd4306 /wd4310 /wd4700 /wd4389 /wd4702 /wd4706 /wd4819 /wd4130 /wd4133 /wd4189
 
   #
   # Disable following Visual Studio 2015 compiler warnings brought by openssl source,
