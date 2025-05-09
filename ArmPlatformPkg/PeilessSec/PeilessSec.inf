@@ -79,3 +79,4 @@
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
+  gArmPlatformTokenSpaceGuid.PcdTransferListBaseAddress

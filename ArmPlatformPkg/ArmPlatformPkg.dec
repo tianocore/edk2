@@ -119,3 +119,9 @@
   gArmPlatformTokenSpaceGuid.PcdPL031RtcPpmAccuracy|300000000|UINT32|0x00000022
 
   gArmPlatformTokenSpaceGuid.PcdWatchdogCount|0x0|UINT32|0x00000033
+
+[PcdsPatchableInModule]
+  # This Pcd is populated at run-time and is 0 by default.
+  # It is typically updated based on the presence of the TransferList signature.
+  # Platforms must not initialise/override this value in the platform DSC file.
+  gArmPlatformTokenSpaceGuid.PcdTransferListBaseAddress|0x0|UINT64|0x00000046

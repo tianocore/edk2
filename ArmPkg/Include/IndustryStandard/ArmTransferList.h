@@ -2,7 +2,7 @@
   Header file defining a Transfer List and Transfer Entry as specified by the
   A-profile Firmware Handoff Protocol specification.
 
-  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -72,6 +72,16 @@
  *    https://github.com/FirmwareHandoff/firmware_handoff/blob/main/source/transfer_list.rst
  */
 #define TRANSFER_LIST_FL_HAS_CHECKSUM  BIT0
+
+/*
+ * Operation codes indicating the validity of the Transfer List.
+ */
+typedef enum {
+  TRANSFER_LIST_OPS_INVALID,  /* invalid for any operation */
+  TRANSFER_LIST_OPS_ALL,      /* valid for all operations */
+  TRANSFER_LIST_OPS_RO,       /* valid for read only */
+  TRANSFER_LIST_OPS_CUSTOM,   /* abort or switch to special code to interpret */
+} TRANSFER_LIST_OPS;
 
 /*
  * Transfer list starts with the following header.
