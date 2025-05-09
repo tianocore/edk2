@@ -48,9 +48,8 @@ FillWriteBuffer (
   UINT32  Index;
   UINT8   SfdpAddressBytes;
 
-  if ((Instance == NULL) || (WriteBuffer == NULL)) {
+  if ((Instance == NULL)) {
     ASSERT (Instance != NULL);
-    ASSERT (WriteBuffer != NULL);
     return 0;
   }
 
