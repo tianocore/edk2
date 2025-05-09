@@ -1491,6 +1491,13 @@ WifiMgrOnTimerTick (
   Nic = (WIFI_MGR_DEVICE_DATA *)Context;
   NET_CHECK_SIGNATURE (Nic, WIFI_MGR_DEVICE_DATA_SIGNATURE);
 
+  if (Nic->ConnectPendingNetwork == NULL || StrLen (Nic->ConnectPendingNetwork->SSId) < SSID_MIN_LEN || \
+      Nic->ConnectState == WifiMgrConnectedToAp || Nic->ConnectState == WifiMgrConnectingToAp) {
+    DEBUG ((DEBUG_INFO, "[WiFi Connection Manager] Already connected or SSID not valid, no scan triggered!\n"));
+    gBS->CloseEvent (Event);
+    return;
+  }
+
   Status = WifiMgrGetLinkState (Nic, &LinkState);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "[WiFi Connection Manager] Error: Failed to get link state!\n"));
