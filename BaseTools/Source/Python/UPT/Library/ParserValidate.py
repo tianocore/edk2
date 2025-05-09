@@ -15,7 +15,6 @@ import re
 import platform
 
 from Library.DataType import MODULE_LIST
-from Library.DataType import COMPONENT_TYPE_LIST
 from Library.DataType import PCD_USAGE_TYPE_LIST_OF_MODULE
 from Library.DataType import TAB_SPACE_SPLIT
 from Library.StringUtils import GetSplitValueList
@@ -103,43 +102,6 @@ def IsValidInfMoudleType(ModuleType):
         return True
     else:
         return False
-
-## Is Valid Component Type or not
-#
-# @param      ComponentType:  A string contain ComponentType need to be judged.
-#
-def IsValidInfComponentType(ComponentType):
-    if ComponentType.upper() in COMPONENT_TYPE_LIST:
-        return True
-    else:
-        return False
-
-
-## Is valid Tool Family or not
-#
-# @param   ToolFamily:   A string contain Tool Family need to be judged.
-# Family := [A-Z]([a-zA-Z0-9])*
-#
-def IsValidToolFamily(ToolFamily):
-    ReIsValidFamily = re.compile(r"^[A-Z]+[A-Za-z0-9]{0,}$", re.DOTALL)
-    if ReIsValidFamily.match(ToolFamily) is None:
-        return False
-    return True
-
-## Is valid Tool TagName or not
-#
-# The TagName sample is MYTOOLS and VS2005.
-#
-# @param   TagName:   A string contain Tool TagName need to be judged.
-#
-def IsValidToolTagName(TagName):
-    if TagName.strip() == '':
-        return True
-    if TagName.strip() == '*':
-        return True
-    if not IsValidWord(TagName):
-        return False
-    return True
 
 ## Is valid arch or not
 #
@@ -456,37 +418,6 @@ def IsValidHexVersion(Word):
 
     return True
 
-## IsValidBuildNumber
-#
-# Check whether the BUILD_NUMBER is valid.
-# ["BUILD_NUMBER" "=" <Integer>{1,4} <EOL>]
-#
-# @param Word:  The BUILD_NUMBER string need to be checked.
-#
-def IsValidBuildNumber(Word):
-    ReIsValieBuildNumber = re.compile(r"[0-9]{1,4}$", re.DOTALL)
-    if ReIsValieBuildNumber.match(Word) is None:
-        return False
-
-    return True
-
-## IsValidDepex
-#
-# Check whether the Depex is valid.
-#
-# @param Word:  The Depex string need to be checked.
-#
-def IsValidDepex(Word):
-    Index = Word.upper().find("PUSH")
-    if Index > -1:
-        return IsValidCFormatGuid(Word[Index+4:].strip())
-
-    ReIsValidCName = re.compile(r"^[A-Za-z_][0-9A-Za-z_\s\.]*$", re.DOTALL)
-    if ReIsValidCName.match(Word) is None:
-        return False
-
-    return True
-
 ## IsValidNormalizedString
 #
 # Check
@@ -532,25 +463,6 @@ def IsValidIdString(String):
             return True
 
     return False
-
-## IsValidVersionString
-#
-# Check whether the VersionString is valid.
-# <AsciiString>           ::=  [ [<WhiteSpace>]{0,} [<AsciiChars>]{0,} ] {0,}
-# <WhiteSpace>            ::=  {<Tab>} {<Space>}
-# <Tab>                   ::=  0x09
-# <Space>                 ::=  0x20
-# <AsciiChars>            ::=  (0x21 - 0x7E)
-#
-# @param VersionString:  The VersionString need to be checked.
-#
-def IsValidVersionString(VersionString):
-    VersionString = VersionString.strip()
-    for Char in VersionString:
-        if not (Char >= 0x21 and Char <= 0x7E):
-            return False
-
-    return True
 
 ## IsValidPcdValue
 #
@@ -714,14 +626,4 @@ def IsValidUserId(UserId):
             return False
         if Char == '.' and not Quoted:
             return False
-    return True
-
-#
-# Check if a UTF16-LE file has a BOM header
-#
-def CheckUTF16FileHeader(File):
-    FileIn = open(File, 'rb').read(2)
-    if FileIn != b'\xff\xfe':
-        return False
-
     return True
