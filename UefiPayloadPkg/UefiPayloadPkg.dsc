@@ -393,7 +393,7 @@
 [LibraryClasses.AARCH64]
   ArmHvcLib|ArmPkg/Library/ArmHvcLib/ArmHvcLib.inf
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
-  ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
+  ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
   ArmSmcLib|MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
 
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
@@ -1146,7 +1146,7 @@
 [Components.AARCH64]
   ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
-  ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
+  UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
 
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
