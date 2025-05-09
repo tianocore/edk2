@@ -14,7 +14,12 @@
   OvmfPkg/LsiScsiDxe/LsiScsiDxe.inf
 !endif
 !if $(SDCARD_ENABLE) == TRUE
-  MdeModulePkg/Bus/Pci/SdMmcPciHcDxe/SdMmcPciHcDxe.inf
+  MdeModulePkg/Bus/Pci/SdMmcPciHcDxe/SdMmcPciHcDxe.inf {
+    <LibraryClasses>
+      UefiDriverEntryPoint|OvmfPkg/Library/UefiDriverEntryPointFwCfgOverrideLib/UefiDriverEntryPointFwCfgOverrideLib.inf
+    <PcdsFixedAtBuild>
+      gUefiOvmfPkgTokenSpaceGuid.PcdEntryPointOverrideFwCfgVarName|"opt/org.tianocore/SDCardSupport"
+  }
   MdeModulePkg/Bus/Sd/SdDxe/SdDxe.inf
   MdeModulePkg/Bus/Sd/EmmcDxe/EmmcDxe.inf
 !endif
