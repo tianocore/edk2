@@ -226,6 +226,11 @@ DumpImageAndCpuContent (
 /**
   IPI Interrupt Handler.
 
+  Generally, the IPI interrupt uses three vector:
+  SMP_BOOT_CPU       BSP boots AP. The BSP may reside in OS or other non-UEFI environment.
+  SMP_RESCHEDULE     BSP calls AP via UEFI MpInitLib.
+  SMP_CALL_FUNCTION  BSP calls AP to jump specified pointer, which allows with one parameter.
+
   @param InterruptType    The type of interrupt that occurred
   @param SystemContext    A pointer to the system context when the interrupt occurred
 **/
@@ -236,43 +241,74 @@ IpiInterruptHandler (
   IN EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
-  UINTN  ResumeVector;
-  UINTN  Parameter;
+  UINTN  ResumeVector = 0;
+  UINTN  Parameter    = 0;
+  UINTN  IpiStatus    = 0;
+
+  IpiStatus = IoCsrRead32 (LOONGARCH_IOCSR_IPI_STATUS);
 
   //
   // Clear interrupt.
   //
-  IoCsrWrite32 (LOONGARCH_IOCSR_IPI_CLEAR, IoCsrRead32 (LOONGARCH_IOCSR_IPI_STATUS));
+  IoCsrWrite32 (LOONGARCH_IOCSR_IPI_CLEAR, IpiStatus);
 
-  //
-  // Get the resume vector and parameter if populated.
-  //
-  ResumeVector = IoCsrRead64 (LOONGARCH_IOCSR_MBUF0);
-  Parameter    = IoCsrRead64 (LOONGARCH_IOCSR_MBUF3);
+  if ((IpiStatus & SMP_RESCHEDULE) != 0) {
+    MemoryFence ();
+    return;
+  } else {
+    if (((IpiStatus & SMP_BOOT_CPU) != 0) || ((IpiStatus & SMP_CALL_FUNCTION) != 0)) {
+      //
+      // Confirm that the mail box message has arrived.
+      //
+      do {
+        ResumeVector = IoCsrRead32 (LOONGARCH_IOCSR_MBUF0);
+      } while (!ResumeVector);
 
-  //
-  // Clean up current processor mailbox 0 and mailbox 3.
-  //
-  IoCsrWrite64 (LOONGARCH_IOCSR_MBUF0, 0x0);
-  IoCsrWrite64 (LOONGARCH_IOCSR_MBUF3, 0x0);
+      //
+      // Get the resume vector if populated.
+      //
+      ResumeVector = IoCsrRead64 (LOONGARCH_IOCSR_MBUF0);
 
-  //
-  // If mailbox 0 is non-NULL, it means that the BSP or other cores called the IPI to wake
-  // up the current core and let it use the resume vector stored in mailbox 0.
-  //
-  // If both the resume vector and parameter are non-NULL, it means that the IPI was
-  // called in the BIOS.
-  //
-  // The situation where the resume vector is non-NULL and the parameter is NULL has been
-  // processed after the exception entry is pushed onto the stack.
-  //
-  if ((ResumeVector != 0) && (Parameter != 0)) {
+      if ((IpiStatus & SMP_BOOT_CPU) != 0) {
+        SystemContext.SystemContextLoongArch64->PRMD &= ~((UINT64)BIT2); // Clean PIE
+      } else if ((IpiStatus & SMP_CALL_FUNCTION) != 0) {
+        //
+        // Confirm that the mail box message has arrived.
+        //
+        do {
+          Parameter = IoCsrRead32 (LOONGARCH_IOCSR_MBUF3);
+        } while (!Parameter);
+
+        //
+        // Get the parameter if populated.
+        //
+        Parameter = IoCsrRead64 (LOONGARCH_IOCSR_MBUF3);
+
+        //
+        // Set $a0 as APIC ID and $a1 as parameter value.
+        //
+        SystemContext.SystemContextLoongArch64->R4 = CsrRead (LOONGARCH_CSR_CPUID);
+        SystemContext.SystemContextLoongArch64->R5 = Parameter;
+      }
+    } else {
+      InternalPrintMessage (
+        "Core %d: Should never be here, IPI Status = %d.\n",
+        CsrRead (LOONGARCH_CSR_CPUID),
+        IpiStatus
+        );
+      DefaultExceptionHandler (EXCEPT_LOONGARCH_INT, SystemContext);
+    }
+
+    //
+    // Clean up current processor mailbox 0 and mailbox 3.
+    //
+    IoCsrWrite64 (LOONGARCH_IOCSR_MBUF0, 0x0);
+    IoCsrWrite64 (LOONGARCH_IOCSR_MBUF3, 0x0);
+
+    //
+    // Set the ERA to the resume vector sent by caller.
+    //
     SystemContext.SystemContextLoongArch64->ERA = ResumeVector;
-    //
-    // Set $a0 as APIC ID and $a1 as parameter value.
-    //
-    SystemContext.SystemContextLoongArch64->R4 = CsrRead (LOONGARCH_CSR_CPUID);
-    SystemContext.SystemContextLoongArch64->R5 = Parameter;
   }
 
   MemoryFence ();
