@@ -310,7 +310,7 @@ DxePcdSetSku (
   }
 
   SkuIdTable = (SKU_ID *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->SkuIdTableOffset);
-  for (Index = 0; Index < SkuIdTable[0]; Index++) {
+  for (Index = 0; Index < (UINTN)SkuIdTable[0]; Index++) {
     if (SkuId == SkuIdTable[Index + 1]) {
       DEBUG ((DEBUG_INFO, "PcdDxe - SkuId is found in SkuId table.\n"));
       Status = UpdatePcdDatabase (SkuId, TRUE);
