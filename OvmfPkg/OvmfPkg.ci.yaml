@@ -53,7 +53,8 @@
             "UefiCpuPkg/UefiCpuPkg.dec",
             "ShellPkg/ShellPkg.dec",
             "EmbeddedPkg/EmbeddedPkg.dec",
-            "SourceLevelDebugPkg/SourceLevelDebugPkg.dec"
+            "SourceLevelDebugPkg/SourceLevelDebugPkg.dec",
+            "FmpDevicePkg/FmpDevicePkg.dec"
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[
