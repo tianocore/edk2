@@ -9,6 +9,9 @@
 #include <Library/ArmGicLib.h>
 
 #include "ArmGicDxe.h"
+#include "Base.h"
+#include "Protocol/HardwareInterrupt.h"
+#include "Uefi/UefiBaseType.h"
 
 #define ARM_GIC_DEFAULT_PRIORITY  0x80
 
@@ -40,18 +43,9 @@ extern EFI_HARDWARE_INTERRUPT2_PROTOCOL  gHardwareInterrupt2V3Protocol;
 STATIC UINTN  mGicDistributorBase;
 STATIC UINTN  mGicRedistributorBase;
 
-/**
- *
- * Return whether the Source interrupt index refers to a shared interrupt (SPI)
- */
-STATIC
-BOOLEAN
-SourceIsSpi (
-  IN UINTN  Source
-  )
-{
-  return Source >= 32 && Source < 1020;
-}
+STATIC HARDWARE_INTERRUPT_HANDLER  *mRegisteredInterruptHandlers;
+STATIC UINTN                       mGicMaxSpiIntid;
+STATIC UINTN                       mGicMaxExtSpiIntid;
 
 /**
  * Return the base address of the GIC redistributor for the current CPU
@@ -130,24 +124,25 @@ ArmGicSetInterruptPriority (
 {
   UINT32  RegOffset;
   UINT8   RegShift;
+  UINTN   Address;
 
   // Calculate register offset and bit position
-  RegOffset = (UINT32)(Source / 4);
-  RegShift  = (UINT8)((Source % 4) * 8);
+  RegOffset = (UINT32)((Source & ~ARM_GIC_ARCH_EXT_SPI_MIN) / 4);
+  RegShift  = (UINT8)(((Source & ~ARM_GIC_ARCH_EXT_SPI_MIN) % 4) * 8);
 
-  if (SourceIsSpi (Source)) {
-    MmioAndThenOr32 (
-      mGicDistributorBase + ARM_GIC_ICDIPR + (4 * RegOffset),
-      ~(0xff << RegShift),
-      Priority << RegShift
-      );
+  if (GicCommonSourceIsSpi (Source)) {
+    Address = mGicDistributorBase + ARM_GIC_ICDIPR + (4 * RegOffset);
+  } else if (GicCommonSourceIsExtSpi (Source)) {
+    Address = mGicDistributorBase + ARM_GIC_ICDIPR_E + (4 * RegOffset);
   } else {
-    MmioAndThenOr32 (
-      IPRIORITY_ADDRESS (mGicRedistributorBase, RegOffset),
-      ~(0xff << RegShift),
-      Priority << RegShift
-      );
+    Address = IPRIORITY_ADDRESS (mGicRedistributorBase, RegOffset);
   }
+
+  MmioAndThenOr32 (
+    Address,
+    ~(0xff << RegShift),
+    Priority << RegShift
+    );
 }
 
 STATIC
@@ -158,24 +153,25 @@ ArmGicEnableInterrupt (
 {
   UINT32  RegOffset;
   UINT8   RegShift;
+  UINTN   Address;
 
   // Calculate enable register offset and bit position
-  RegOffset = (UINT32)(Source / 32);
-  RegShift  = (UINT8)(Source % 32);
+  RegOffset = (UINT32)((Source & ~ARM_GIC_ARCH_EXT_SPI_MIN) / 32);
+  RegShift  = (UINT8)((Source & ~ARM_GIC_ARCH_EXT_SPI_MIN) % 32);
 
-  if (SourceIsSpi (Source)) {
-    // Write set-enable register
-    MmioWrite32 (
-      mGicDistributorBase + ARM_GIC_ICDISER + (4 * RegOffset),
-      1 << RegShift
-      );
+  if (GicCommonSourceIsSpi (Source)) {
+    Address = mGicDistributorBase + ARM_GIC_ICDISER + (4 * RegOffset);
+  } else if (GicCommonSourceIsExtSpi (Source)) {
+    Address = mGicDistributorBase + ARM_GIC_ICDISER_E + (4 * RegOffset);
   } else {
-    // Write set-enable register
-    MmioWrite32 (
-      ISENABLER_ADDRESS (mGicRedistributorBase, RegOffset),
-      1 << RegShift
-      );
+    Address = ISENABLER_ADDRESS (mGicRedistributorBase, RegOffset);
   }
+
+  // Write set-enable register.
+  MmioWrite32 (
+    Address,
+    1 << RegShift
+    );
 }
 
 STATIC
@@ -186,24 +182,25 @@ ArmGicDisableInterrupt (
 {
   UINT32  RegOffset;
   UINT8   RegShift;
+  UINTN   Address;
 
   // Calculate enable register offset and bit position
-  RegOffset = (UINT32)(Source / 32);
-  RegShift  = (UINT8)(Source % 32);
+  RegOffset = (UINT32)((Source & ~ARM_GIC_ARCH_EXT_SPI_MIN) / 32);
+  RegShift  = (UINT8)((Source & ~ARM_GIC_ARCH_EXT_SPI_MIN) % 32);
 
-  if (SourceIsSpi (Source)) {
-    // Write clear-enable register
-    MmioWrite32 (
-      mGicDistributorBase + ARM_GIC_ICDICER + (4 * RegOffset),
-      1 << RegShift
-      );
+  if (GicCommonSourceIsSpi (Source)) {
+    Address = mGicDistributorBase + ARM_GIC_ICDICER + (4 * RegOffset);
+  } else if (GicCommonSourceIsExtSpi (Source)) {
+    Address = mGicDistributorBase + ARM_GIC_ICDICER_E + (4 * RegOffset);
   } else {
-    // Write clear-enable register
-    MmioWrite32 (
-      ICENABLER_ADDRESS (mGicRedistributorBase, RegOffset),
-      1 << RegShift
-      );
+    Address = ICENABLER_ADDRESS (mGicRedistributorBase, RegOffset);
   }
+
+  // Write clear-enable register
+  MmioWrite32 (
+    Address,
+    1 << RegShift
+    );
 }
 
 STATIC
@@ -215,23 +212,75 @@ ArmGicIsInterruptEnabled (
   UINT32  RegOffset;
   UINT8   RegShift;
   UINT32  Interrupts;
+  UINTN   Address;
 
   // Calculate enable register offset and bit position
-  RegOffset = (UINT32)(Source / 32);
-  RegShift  = (UINT8)(Source % 32);
+  RegOffset = (UINT32)((Source & ~ARM_GIC_ARCH_EXT_SPI_MIN) / 32);
+  RegShift  = (UINT8)((Source & ~ARM_GIC_ARCH_EXT_SPI_MIN) % 32);
 
-  if (SourceIsSpi (Source)) {
-    Interrupts = MmioRead32 (
-                   mGicDistributorBase + ARM_GIC_ICDISER + (4 * RegOffset)
-                   );
+  if (GicCommonSourceIsSpi (Source)) {
+    Address = mGicDistributorBase + ARM_GIC_ICDISER + (4 * RegOffset);
+  } else if (GicCommonSourceIsExtSpi (Source)) {
+    Address = mGicDistributorBase + ARM_GIC_ICDISER_E + (4 * RegOffset);
   } else {
-    // Read set-enable register
-    Interrupts = MmioRead32 (
-                   ISENABLER_ADDRESS (mGicRedistributorBase, RegOffset)
-                   );
+    Address = ISENABLER_ADDRESS (mGicRedistributorBase, RegOffset);
   }
 
+  // Read set-enable register
+  Interrupts = MmioRead32 (Address);
+
   return ((Interrupts & (1 << RegShift)) != 0);
+}
+
+STATIC
+BOOLEAN
+EFIAPI
+GicIsValidSource (
+  IN HARDWARE_INTERRUPT_SOURCE  Source
+  )
+{
+  if (Source <= mGicMaxSpiIntid) {
+    return TRUE;
+  }
+
+  return (Source >= ARM_GIC_ARCH_EXT_SPI_MIN && Source <= mGicMaxExtSpiIntid);
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+GicV3GetValidIntidRanges (
+  IN UINTN   GicDistributorBase,
+  OUT UINTN  *GicMaxSpiIntid,
+  OUT UINTN  *GicMaxExtSpiIntid
+  )
+{
+  UINT32  ExtSpiRange;
+  UINT32  GicTyperReg;
+  UINT32  ItLines;
+
+  if ((GicMaxSpiIntid == NULL) || (GicMaxExtSpiIntid == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Read GIC_TYPER to determine if extended SPI is enabled. If so, get the
+  // maximum extended SPI INTID.
+  GicTyperReg = MmioRead32 (GicDistributorBase + ARM_GIC_ICDICTR);
+  ItLines     = GicTyperReg & 0x1F;
+  if (ItLines == 0x1F) {
+    *GicMaxSpiIntid = 1019;
+  } else {
+    *GicMaxSpiIntid = (32 * (ItLines + 1)) - 1;
+  }
+
+  if (GicTyperReg & ARM_GIC_ICDICTR_EXT_SPI_ENABLED) {
+    ExtSpiRange        = ARM_GIC_ICDICTR_GET_EXT_SPI_RANGE (GicTyperReg);
+    *GicMaxExtSpiIntid = (32 * (ExtSpiRange + 1)) + ARM_GIC_ARCH_EXT_SPI_MIN - 1;
+  } else {
+    *GicMaxExtSpiIntid = 0;
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -252,7 +301,7 @@ GicV3EnableInterruptSource (
   IN HARDWARE_INTERRUPT_SOURCE        Source
   )
 {
-  if (Source >= mGicNumInterrupts) {
+  if (!GicIsValidSource (Source)) {
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
@@ -280,7 +329,7 @@ GicV3DisableInterruptSource (
   IN HARDWARE_INTERRUPT_SOURCE        Source
   )
 {
-  if (Source >= mGicNumInterrupts) {
+  if (!GicIsValidSource (Source)) {
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
@@ -310,7 +359,7 @@ GicV3GetInterruptSourceState (
   IN BOOLEAN                          *InterruptState
   )
 {
-  if (Source >= mGicNumInterrupts) {
+  if (!GicIsValidSource (Source)) {
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
@@ -339,13 +388,41 @@ GicV3EndOfInterrupt (
   IN HARDWARE_INTERRUPT_SOURCE        Source
   )
 {
-  if (Source >= mGicNumInterrupts) {
+  if (!GicIsValidSource (Source)) {
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
   }
 
   ArmGicV3EndOfInterrupt (Source);
   return EFI_SUCCESS;
+}
+
+/**
+  Gets the address of the interrupt callback associated with Source.
+
+  @param  Source    Intid of the interrupt.
+
+  @return Pointer to the associated handler
+          NULL if the source is invalid.
+**/
+STATIC
+HARDWARE_INTERRUPT_HANDLER *
+EFIAPI
+GicV3GetHandlerAddress (
+  IN HARDWARE_INTERRUPT_SOURCE  Source
+  )
+{
+  if (!GicIsValidSource (Source)) {
+    return NULL;
+  }
+
+  if (GicCommonSourceIsExtSpi (Source)) {
+    return &mRegisteredInterruptHandlers[
+                                         Source - ARM_GIC_ARCH_EXT_SPI_MIN + mGicMaxSpiIntid + 1
+    ];
+  }
+
+  return &mRegisteredInterruptHandlers[Source];
 }
 
 /**
@@ -369,30 +446,55 @@ GicV3IrqInterruptHandler (
   )
 {
   UINTN                       GicInterrupt;
-  HARDWARE_INTERRUPT_HANDLER  InterruptHandler;
+  HARDWARE_INTERRUPT_HANDLER  *InterruptHandlerPtr;
 
   GicInterrupt = ArmGicV3AcknowledgeInterrupt ();
 
-  // Special Interrupts (ID1020-ID1023) have an Interrupt ID greater than the
-  // number of interrupt (ie: Spurious interrupt).
-  if ((GicInterrupt & ARM_GIC_ICCIAR_ACKINTID) >= mGicNumInterrupts) {
-    // The special interrupt do not need to be acknowledge
+  if (GicCommonSourceIsSpecialInterrupt (GicInterrupt)) {
+    // The special interrupts do not need to be acknowledged.
     return;
   }
 
-  InterruptHandler = gRegisteredInterruptHandlers[GicInterrupt];
-  if (InterruptHandler != NULL) {
+  InterruptHandlerPtr = GicV3GetHandlerAddress (GicInterrupt);
+  if (InterruptHandlerPtr == NULL) {
+    DEBUG ((DEBUG_ERROR, "Interrupt 0x%x out of expected range\n", GicInterrupt));
+    return;
+  }
+
+  if (*InterruptHandlerPtr != NULL) {
     // Call the registered interrupt handler.
-    InterruptHandler (GicInterrupt, SystemContext);
+    (*InterruptHandlerPtr)(GicInterrupt, SystemContext);
   } else {
     DEBUG ((DEBUG_ERROR, "Spurious GIC interrupt: 0x%x\n", (UINT32)GicInterrupt));
     GicV3EndOfInterrupt (&gHardwareInterruptV3Protocol, GicInterrupt);
   }
 }
 
+EFI_STATUS
+EFIAPI
+GicV3RegisterInterruptSource (
+  IN EFI_HARDWARE_INTERRUPT_PROTOCOL  *This,
+  IN HARDWARE_INTERRUPT_SOURCE        Source,
+  IN HARDWARE_INTERRUPT_HANDLER       Handler
+  )
+{
+  HARDWARE_INTERRUPT_HANDLER  *HandlerDest = GicV3GetHandlerAddress (Source);
+
+  if (HandlerDest == NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
+  return GicCommonRegisterInterruptSource (
+           This,
+           Source,
+           Handler,
+           HandlerDest
+           );
+}
+
 // The protocol instance produced by this driver
 EFI_HARDWARE_INTERRUPT_PROTOCOL  gHardwareInterruptV3Protocol = {
-  RegisterInterruptSource,
+  GicV3RegisterInterruptSource,
   GicV3EnableInterruptSource,
   GicV3DisableInterruptSource,
   GicV3GetInterruptSourceState,
@@ -422,7 +524,11 @@ GicV3GetTriggerType (
   UINTN       Config1Bit;
   EFI_STATUS  Status;
 
-  Status = GicGetDistributorIcfgBaseAndBit (
+  if (!GicIsValidSource (Source)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  Status = GicCommonGetDistributorIcfgBaseAndBit (
              Source,
              &RegAddress,
              &Config1Bit
@@ -478,7 +584,11 @@ GicV3SetTriggerType (
     return EFI_UNSUPPORTED;
   }
 
-  Status = GicGetDistributorIcfgBaseAndBit (
+  if (!GicIsValidSource (Source)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  Status = GicCommonGetDistributorIcfgBaseAndBit (
              Source,
              &RegAddress,
              &Config1Bit
@@ -544,7 +654,7 @@ ArmGicEnableDistributor (
 }
 
 EFI_HARDWARE_INTERRUPT2_PROTOCOL  gHardwareInterrupt2V3Protocol = {
-  (HARDWARE_INTERRUPT2_REGISTER)RegisterInterruptSource,
+  (HARDWARE_INTERRUPT2_REGISTER)GicV3RegisterInterruptSource,
   (HARDWARE_INTERRUPT2_ENABLE)GicV3EnableInterruptSource,
   (HARDWARE_INTERRUPT2_DISABLE)GicV3DisableInterruptSource,
   (HARDWARE_INTERRUPT2_INTERRUPT_STATE)GicV3GetInterruptSourceState,
@@ -571,8 +681,13 @@ GicV3ExitBootServicesEvent (
 {
   UINTN  Index;
 
-  // Acknowledge all pending interrupts
-  for (Index = 0; Index < mGicNumInterrupts; Index++) {
+  // Acknowledge all pending interrupts in SPI range.
+  for (Index = 0; Index <= mGicMaxSpiIntid; Index++) {
+    GicV3DisableInterruptSource (&gHardwareInterruptV3Protocol, Index);
+  }
+
+  // Acknowledge all pending interrupts in extended SPI range.
+  for (Index = ARM_GIC_ARCH_EXT_SPI_MIN; Index <= mGicMaxExtSpiIntid; Index++) {
     GicV3DisableInterruptSource (&gHardwareInterruptV3Protocol, Index);
   }
 
@@ -624,7 +739,6 @@ GicV3DxeInitialize (
   }
 
   mGicRedistributorBase = GicGetCpuRedistributorBase (PcdGet64 (PcdGicRedistributorsBase));
-  mGicNumInterrupts     = ArmGicGetMaxNumInterrupts (mGicDistributorBase);
 
   RegValue = ArmGicV3GetControlSystemRegisterEnable ();
   if ((RegValue & ICC_SRE_EL2_SRE) == 0) {
@@ -632,11 +746,30 @@ GicV3DxeInitialize (
     ASSERT ((ArmGicV3GetControlSystemRegisterEnable () & ICC_SRE_EL2_SRE) != 0);
   }
 
+  Status = GicV3GetValidIntidRanges (
+             mGicDistributorBase,
+             &mGicMaxSpiIntid,
+             &mGicMaxExtSpiIntid
+             );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   // We will be driving this GIC in native v3 mode, i.e., with Affinity
   // Routing enabled. So ensure that the ARE bit is set.
   MmioOr32 (mGicDistributorBase + ARM_GIC_ICDDCR, ARM_GIC_ICDDCR_ARE);
 
-  for (Index = 0; Index < mGicNumInterrupts; Index++) {
+  // Disable all SPI sources.
+  for (Index = 0; Index <= mGicMaxSpiIntid; Index++) {
+    GicV3DisableInterruptSource (&gHardwareInterruptV3Protocol, Index);
+
+    // Set Priority
+    ArmGicSetInterruptPriority (Index, ARM_GIC_DEFAULT_PRIORITY);
+  }
+
+  // Disable all extended SPI sources.
+  for (Index = ARM_GIC_ARCH_EXT_SPI_MIN; Index <= mGicMaxExtSpiIntid; Index++) {
     GicV3DisableInterruptSource (&gHardwareInterruptV3Protocol, Index);
 
     // Set Priority
@@ -665,17 +798,37 @@ GicV3DxeInitialize (
       0xffffffff
       );
 
-    for (Index = 32; Index < mGicNumInterrupts; Index += 32) {
+    // Configure SPI
+    for (Index = 32; Index <= mGicMaxSpiIntid; Index += 32) {
       MmioWrite32 (
         mGicDistributorBase + ARM_GIC_ICDISR + Index / 8,
         0xffffffff
         );
     }
 
+    // Configure extended SPI
+    for (Index = ARM_GIC_ARCH_EXT_SPI_MIN; Index <= mGicMaxExtSpiIntid; Index += 32) {
+      MmioWrite32 (
+        mGicDistributorBase + ARM_GIC_ICDISR_E + (Index - ARM_GIC_ARCH_EXT_SPI_MIN) / 8,
+        0xffffffff
+        );
+    }
+
     // Route the SPIs to the primary CPU. SPIs start at the INTID 32
-    for (Index = 0; Index < (mGicNumInterrupts - 32); Index++) {
+    for (Index = 0; Index < (mGicMaxSpiIntid + 1 - 32); Index++) {
       MmioWrite64 (
         mGicDistributorBase + ARM_GICD_IROUTER + (Index * 8),
+        CpuTarget
+        );
+    }
+
+    // Route the extended SPIs to the primary CPU. extended SPIs start at the INTID 4096
+    for (Index = 0;
+         Index < (mGicMaxExtSpiIntid - ARM_GIC_ARCH_EXT_SPI_MIN + 1);
+         Index++)
+    {
+      MmioWrite64 (
+        mGicDistributorBase + ARM_GICD_IROUTER_E + (Index * 8),
         CpuTarget
         );
     }
@@ -698,12 +851,27 @@ GicV3DxeInitialize (
   // Enable gic distributor
   ArmGicEnableDistributor (mGicDistributorBase);
 
-  Status = InstallAndRegisterInterruptService (
+  // Allocate contiguous handlers for SPI and extended SPI. extended SPI handlers
+  // begin immediately after SPI handlers.
+  mRegisteredInterruptHandlers = AllocateZeroPool (
+                                   sizeof (HARDWARE_INTERRUPT_HANDLER) *
+                                   ((mGicMaxSpiIntid + 1) +
+                                    (mGicMaxExtSpiIntid - ARM_GIC_ARCH_EXT_SPI_MIN + 1))
+                                   );
+  if (mRegisteredInterruptHandlers == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = GicCommonInstallAndRegisterInterruptService (
              &gHardwareInterruptV3Protocol,
              &gHardwareInterrupt2V3Protocol,
              GicV3IrqInterruptHandler,
              GicV3ExitBootServicesEvent
              );
+
+  if (EFI_ERROR (Status)) {
+    FreePool (mRegisteredInterruptHandlers);
+  }
 
   return Status;
 }
