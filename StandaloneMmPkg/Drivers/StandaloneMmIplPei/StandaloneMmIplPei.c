@@ -456,7 +456,10 @@ CreatMmHobList (
                         MmProfileDataHob,
                         Block
                         );
-  FreePages (PlatformHobList, EFI_SIZE_TO_PAGES (PlatformHobSize));
+  if (PlatformHobSize != 0) {
+    FreePages (PlatformHobList, EFI_SIZE_TO_PAGES (PlatformHobSize));
+  }
+
   ASSERT (Status == RETURN_BUFFER_TOO_SMALL);
   ASSERT (FoundationHobSize != 0);
 
@@ -657,7 +660,8 @@ MmIplAllocateMmramPage (
 **/
 EFI_STATUS
 ExecuteMmCoreFromMmram (
-  IN  MM_COMM_BUFFER  *MmCommBuffer
+  IN  MM_COMM_BUFFER         *MmCommBuffer,
+  IN CONST EFI_PEI_SERVICES  **PeiServices
   )
 {
   EFI_STATUS                            Status;
@@ -670,6 +674,10 @@ ExecuteMmCoreFromMmram (
   PE_COFF_LOADER_IMAGE_CONTEXT          ImageContext;
   STANDALONE_MM_FOUNDATION_ENTRY_POINT  Entry;
   EFI_MMRAM_HOB_DESCRIPTOR_BLOCK        *Block;
+  EFI_PEI_MM_ACCESS_PPI                 *SmmAccess;
+  UINTN                                 Size;
+  UINTN                                 Index;
+  UINTN                                 MmramRangeCount;
 
   MmFvBase = 0;
   MmFvSize = 0;
@@ -678,6 +686,43 @@ ExecuteMmCoreFromMmram (
   //
   Status = LocateMmCoreFv (&MmFvBase, &MmFvSize, &MmCoreFileName, &ImageContext.Handle);
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Prepare an MM access PPI for MM RAM.
+  //
+  Status = (*PeiServices)->LocatePpi (
+                             PeiServices,
+                             &gEfiPeiMmAccessPpiGuid,
+                             0,
+                             NULL,
+                             (VOID **)&SmmAccess
+                             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "SMM IPL failed to locate SMM access PPI - %r\n", Status));
+    ASSERT (FALSE);
+    return Status;
+  }
+
+  //
+  // Open all SMRAM ranges
+  //
+  Size   = 0;
+  Status = SmmAccess->GetCapabilities ((EFI_PEI_SERVICES **)PeiServices, SmmAccess, &Size, NULL);
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    // This is not right...
+    ASSERT (FALSE);
+    return EFI_DEVICE_ERROR;
+  }
+
+  MmramRangeCount = Size / sizeof (EFI_MMRAM_DESCRIPTOR);
+  for (Index = 0; Index < MmramRangeCount; Index++) {
+    Status = SmmAccess->Open ((EFI_PEI_SERVICES **)PeiServices, SmmAccess, Index);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "SMM IPL failed to open SMRAM windows index %d - %r\n", Index, Status));
+      ASSERT (FALSE);
+      goto Done;
+    }
+  }
 
   //
   // Initialize ImageContext
@@ -689,7 +734,7 @@ ExecuteMmCoreFromMmram (
   //
   Status = PeCoffLoaderGetImageInfo (&ImageContext);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   PageCount = (UINTN)EFI_SIZE_TO_PAGES ((UINTN)ImageContext.ImageSize + ImageContext.SectionAlignment);
@@ -699,7 +744,8 @@ ExecuteMmCoreFromMmram (
   //
   ImageContext.ImageAddress = MmIplAllocateMmramPage (PageCount, &Block);
   if (ImageContext.ImageAddress == 0) {
-    return EFI_NOT_FOUND;
+    Status = EFI_NOT_FOUND;
+    goto Done;
   }
 
   //
@@ -760,6 +806,44 @@ ExecuteMmCoreFromMmram (
       ASSERT_EFI_ERROR (Status);
       FreePages (MmHobList, EFI_SIZE_TO_PAGES (MmHobSize));
     }
+  }
+
+Done:
+  //
+  // Close all SMRAM ranges
+  //
+  for (Index = 0; Index < MmramRangeCount; Index++) {
+    Status = SmmAccess->Close ((EFI_PEI_SERVICES **)PeiServices, SmmAccess, Index);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "SMM IPL failed to close SMRAM windows index %d - %r\n", Index, Status));
+      ASSERT (FALSE);
+      return Status;
+    }
+
+    //
+    // Print debug message that the SMRAM window is now closed.
+    //
+    DEBUG ((DEBUG_INFO, "MM IPL closed SMRAM window index %d\n", Index));
+  }
+
+  //
+  // Lock the SMRAM (Note: Locking SMRAM may not be supported on all platforms)
+  //
+  for (Index = 0; Index < MmramRangeCount; Index++) {
+    Status = SmmAccess->Lock ((EFI_PEI_SERVICES **)PeiServices, SmmAccess, Index);
+    if (EFI_ERROR (Status)) {
+      //
+      // Print error message that the SMRAM failed to lock...
+      //
+      DEBUG ((DEBUG_ERROR, "MM IPL could not lock MMRAM (Index %d) after executing MM Core %r\n", Index, Status));
+      ASSERT (FALSE);
+      return Status;
+    }
+
+    //
+    // Print debug message that the SMRAM window is now closed.
+    //
+    DEBUG ((DEBUG_INFO, "MM IPL locked SMRAM window index %d\n", Index));
   }
 
   return Status;
@@ -933,7 +1017,7 @@ StandaloneMmIplPeiEntry (
   //
   // Locate and execute Mm Core to dispatch MM drivers.
   //
-  Status = ExecuteMmCoreFromMmram (MmCommBuffer);
+  Status = ExecuteMmCoreFromMmram (MmCommBuffer, PeiServices);
   ASSERT_EFI_ERROR (Status);
 
   //
