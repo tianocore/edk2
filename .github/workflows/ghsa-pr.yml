@@ -1,0 +1,260 @@
+# A simple PR gate workflow that runs on GitHub Security Advisory Pull Requests.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+
+name: "GHSA Pull Request Check"
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  ghsa_pr_checks:
+    if: >
+      github.event.pull_request.base.repo.fork == true &&
+      github.event.pull_request.base.repo.owner.login == 'tianocore' &&
+      startsWith(github.event.pull_request.base.repo.name, 'edk2-ghsa-')
+
+    name: GHSA Pull Request (CI) Checks
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/tianocore/containers/fedora-40-test:c98ff99
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - Package: "CryptoPkg"
+            ArchList: "IA32"
+          - Package: "CryptoPkg"
+            ArchList: "X64"
+          - Package: "CryptoPkg"
+            ArchList: "AARCH64"
+          - Package: "DynamicTablesPkg"
+            ArchList: "AARCH64"
+          - Package: "DynamicTablesPkg"
+            ArchList: "X64"
+          - Package: "FatPkg"
+            ArchList: "AARCH64"
+          - Package: "FatPkg"
+            ArchList: "X64"
+          - Package: "FmpDevicePkg"
+            ArchList: "AARCH64"
+          - Package: "FmpDevicePkg"
+            ArchList: "X64"
+          - Package: "IntelFsp2Pkg"
+            ArchList: "X64"
+          - Package: "IntelFsp2WrapperPkg"
+            ArchList: "X64"
+          - Package: "MdeModulePkg"
+            ArchList: "AARCH64"
+          - Package: "MdeModulePkg"
+            ArchList: "IA32"
+          - Package: "MdeModulePkg"
+            ArchList: "X64"
+          - Package: "MdePkg"
+            ArchList: "AARCH64"
+          - Package: "MdePkg"
+            ArchList: "IA32,X64"
+          - Package: "PcAtChipsetPkg"
+            ArchList: "X64"
+          - Package: "PrmPkg"
+            ArchList: "AARCH64"
+          - Package: "PrmPkg"
+            ArchList: "X64"
+          - Package: "SecurityPkg"
+            ArchList: "AARCH64"
+          - Package: "SecurityPkg"
+            ArchList: "X64"
+          - Package: "ShellPkg"
+            ArchList: "AARCH64"
+          - Package: "ShellPkg"
+            ArchList: "X64"
+          - Package: "SourceLevelDebugPkg"
+            ArchList: "X64"
+          - Package: "StandaloneMmPkg"
+            ArchList: "AARCH64"
+          - Package: "StandaloneMmPkg"
+            ArchList: "x64"
+          - Package: "UefiCpuPkg"
+            ArchList: "X64"
+          - Package: "UnitTestFrameworkPkg"
+            ArchList: "AARCH64"
+          - Package: "UnitTestFrameworkPkg"
+            ArchList: "X64"
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set PATH
+      run: |
+        echo "${HOME}/.local/bin" >> $GITHUB_PATH
+        echo "new PATH=${PATH}"
+
+    - name: Configure Git Safe Directory
+      run: git config --global --add safe.directory $GITHUB_WORKSPACE
+
+    - name: Install/Upgrade pip Modules
+      run: |
+        virtualenv ~/venv
+        . ~/venv/bin/activate
+        echo "##vso[task.setvariable variable=VIRTUAL_ENV]${VIRTUAL_ENV}"
+        echo "##vso[task.prependpath]${VIRTUAL_ENV}/bin"
+        pip install -r pip-requirements.txt --upgrade requests
+
+    - name: Run Patch Check
+      env:
+        BASE_REF: ${{ github.event.pull_request.base.sha }}
+        HEAD_REF: ${{ github.event.pull_request.head.sha }}
+      run: |
+        git fetch origin ${{ github.event.pull_request.base.ref }}:${{ github.event.pull_request.base.ref }}
+        python ./BaseTools/Scripts/PatchCheck.py $BASE_REF..$HEAD_REF
+
+    - name: Determine CI Settings File Supported Operations
+      id: get_ci_file_operations
+      shell: python
+      run: |
+        import importlib
+        import os
+        import sys
+        from pathlib import Path
+        from edk2toolext.invocables.edk2_ci_setup import CiSetupSettingsManager
+        from edk2toolext.invocables.edk2_setup import SetupSettingsManager
+
+        # Find the repo CI Settings file
+        ci_settings_file = list(Path(os.environ['GITHUB_WORKSPACE']).rglob('.pytool/CISettings.py'))
+
+        # Note: At this point, submodules have not been pulled, only one CI Settings file should exist
+        if len(ci_settings_file) != 1 or not ci_settings_file[0].is_file():
+            print("::error title=Workspace Error!::Failed to find CI Settings file!")
+            sys.exit(1)
+
+        ci_settings_file = ci_settings_file[0]
+
+        # Try Finding the Settings class in the file
+        module_name = 'ci_settings'
+
+        spec = importlib.util.spec_from_file_location(module_name, ci_settings_file)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        try:
+            settings = getattr(module, 'Settings')
+        except AttributeError:
+            print("::error title=Workspace Error!::Failed to find Settings class in CI Settings file!")
+            sys.exit(1)
+
+        # Determine Which Operations Are Supported by the Settings Class
+        ci_setup_supported = issubclass(settings, CiSetupSettingsManager)
+        setup_supported = issubclass(settings, SetupSettingsManager)
+
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
+            print(f'ci_setup_supported={str(ci_setup_supported).lower()}', file=fh)
+            print(f'setup_supported={str(setup_supported).lower()}', file=fh)
+
+    - name: Convert Arch to Log Format
+      id: convert_arch_hyphen
+      env:
+        ARCH_LIST: ${{ matrix.ArchList }}
+      shell: python
+      run: |
+        import os
+
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
+            print(f'arch_list={os.environ["ARCH_LIST"].replace(",", "-")}', file=fh)
+
+    - name: Setup
+      if: steps.get_ci_file_operations.outputs.setup_supported == 'true'
+      run: stuart_setup -c .pytool/CISettings.py -t DEBUG -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=GCC5
+
+    - name: Upload Setup Log As An Artifact
+      uses: actions/upload-artifact@v4
+      if: (success() || failure()) && steps.get_ci_file_operations.outputs.setup_supported == 'true'
+      with:
+        name: ${{ matrix.Package }}-${{ steps.convert_arch_hyphen.outputs.arch_list }}-Setup-Log
+        path: |
+          **/SETUPLOG.txt
+          retention-days: 7
+        if-no-files-found: ignore
+
+    - name: CI Setup
+      if: steps.get_ci_file_operations.outputs.ci_setup_supported == 'true'
+      run: stuart_ci_setup -c .pytool/CISettings.py -t DEBUG -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=GCC5
+
+    - name: Upload CI Setup Log As An Artifact
+      uses: actions/upload-artifact@v4
+      if: (success() || failure()) && steps.get_ci_file_operations.outputs.ci_setup_supported == 'true'
+      with:
+        name: ${{ matrix.Package }}-${{ steps.convert_arch_hyphen.outputs.arch_list }}-CI-Setup-Log
+        path: |
+          **/CISETUP.txt
+          retention-days: 7
+        if-no-files-found: ignore
+
+    - name: Update
+      run: stuart_update -c .pytool/CISettings.py -t DEBUG -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=GCC5
+
+    - name: Upload Update Log As An Artifact
+      uses: actions/upload-artifact@v4
+      if: success() || failure()
+      with:
+        name: ${{ matrix.Package }}-${{ steps.convert_arch_hyphen.outputs.arch_list }}-Update-Log
+        path: |
+          **/UPDATE_LOG.txt
+        retention-days: 7
+        if-no-files-found: ignore
+
+    - name: Build Tools From Source
+      run: python BaseTools/Edk2ToolsBuild.py -t GCC5
+
+    - name: CI Build
+      run: stuart_ci_build -c .pytool/CISettings.py -t DEBUG -p ${{ matrix.Package }} -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=GCC5
+
+    - name: Build Cleanup
+      id: build_cleanup
+      shell: python
+      run: |
+        import os
+        import shutil
+        from pathlib import Path
+
+        dirs_to_delete = ['ia32', 'x64', 'arm', 'aarch64']
+
+        def delete_dirs(path: Path):
+            if path.exists() and path.is_dir():
+                if path.name.lower() in dirs_to_delete:
+                    print(f'Removed {str(path)}')
+                    shutil.rmtree(path)
+                    return
+
+                for child_dir in path.iterdir():
+                    delete_dirs(child_dir)
+
+        build_path = Path(os.environ['GITHUB_WORKSPACE'], 'Build')
+        delete_dirs(build_path)
+
+    - name: Upload Build Logs As An Artifact
+      uses: actions/upload-artifact@v4
+      if: success() || failure()
+      with:
+        name: ${{ matrix.Package }}-${{ steps.convert_arch_hyphen.outputs.arch_list }}-Build-Logs
+        path: |
+          **/BUILD_REPORT.TXT
+          **/OVERRIDELOG.TXT
+          **/BUILDLOG_*.md
+          **/BUILDLOG_*.txt
+          **/CI_*.md
+          **/CI_*.txt
+        retention-days: 7
+        if-no-files-found: ignore
