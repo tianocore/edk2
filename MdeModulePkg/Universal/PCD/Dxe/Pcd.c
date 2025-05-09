@@ -284,7 +284,7 @@ DxePcdSetSku (
   )
 {
   SKU_ID      *SkuIdTable;
-  UINTN       Index;
+  UINT64       Index;
   EFI_STATUS  Status;
 
   DEBUG ((DEBUG_INFO, "PcdDxe - SkuId 0x%lx is to be set.\n", (SKU_ID)SkuId));
