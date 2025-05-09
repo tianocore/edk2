@@ -81,8 +81,8 @@ ASM_FUNC(SetStackPermissionFfa)
   // x1 = stmm_stack top
   mov x1, x0
 
-  // x12 = Compute and save the stack base
-  add x12, x1, x2
+  // x29 = Compute and save the stack base
+  add x29, x1, x2
 
   // x2 = Count of pages of stmm_stack
   lsr x2, x2, #EFI_PAGE_SHIFT
@@ -110,7 +110,7 @@ ASM_FUNC(SetStackPermissionFfa)
   cmp x10, #0x00
 
   // Set return value as base address of stack.
-  mov x0, x12
+  mov x0, x29
   b.ne .Lout_set_stack_perm_ffa
   // If failed, set return value as zero.
   mov x0, #0x00
@@ -119,7 +119,7 @@ ASM_FUNC(SetStackPermissionFfa)
   mov x9, xzr
   mov x10, xzr
   mov x11, xzr
-  mov x12, xzr
+  mov x29, xzr
   ret
 
 //
