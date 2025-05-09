@@ -1,0 +1,36 @@
+## @file MockPlatformHookLib.inf
+#  Mock instance of the Platform hook library.
+#
+# Copyright (c) 2023, Intel Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MockPlatformHookLib
+  FILE_GUID                      = B7721E18-FC59-4333-AE5E-B07EE71D6737
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformHookLib
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  MockPlatformHookLib.cpp
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /EHsc
