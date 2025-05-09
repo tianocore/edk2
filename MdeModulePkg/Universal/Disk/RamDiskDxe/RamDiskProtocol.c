@@ -167,7 +167,11 @@ RamDiskPublishNfit (
   ASSERT (Status == EFI_BUFFER_TOO_SMALL);
   do {
     MemoryMap = (EFI_MEMORY_DESCRIPTOR *)AllocatePool (MemoryMapSize);
-    ASSERT (MemoryMap != NULL);
+    if (MemoryMap == NULL) {
+      ASSERT (MemoryMap != NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     Status = gBS->GetMemoryMap (
                     &MemoryMapSize,
                     MemoryMap,
@@ -234,7 +238,7 @@ RamDiskPublishNfit (
     }
   }
 
-  if (!EFI_ERROR (Status)) {
+  if (!EFI_ERROR (Status) && (TableHeader != NULL)) {
     //
     // A NFIT is already in the ACPI table.
     //
