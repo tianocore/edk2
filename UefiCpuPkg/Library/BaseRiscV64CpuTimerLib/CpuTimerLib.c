@@ -12,6 +12,13 @@
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Register/RiscV64/RiscVImpl.h>
+#include <Pi/PiBootMode.h>
+#include <Pi/PiHob.h>
+#include <Library/HobLib.h>
+#include <Library/FdtLib.h>
+
+// Timer base retrieved from DT
+STATIC UINT32  mTimeBase;
 
 /**
   Stalls the CPU for at least the given number of ticks.
@@ -57,7 +64,7 @@ MicroSecondDelay (
     DivU64x32 (
       MultU64x32 (
         MicroSeconds,
-        PcdGet64 (PcdCpuCoreCrystalClockFrequency)
+        mTimeBase
         ),
       1000000u
       )
@@ -85,7 +92,7 @@ NanoSecondDelay (
     DivU64x32 (
       MultU64x32 (
         NanoSeconds,
-        PcdGet64 (PcdCpuCoreCrystalClockFrequency)
+        mTimeBase
         ),
       1000000000u
       )
@@ -152,7 +159,7 @@ GetPerformanceCounterProperties (
     *EndValue = 32 - 1;
   }
 
-  return PcdGet64 (PcdCpuCoreCrystalClockFrequency);
+  return mTimeBase;
 }
 
 /**
@@ -180,13 +187,68 @@ GetTimeInNanoSecond (
   // Time = --------- x 1,000,000,000
   //        Frequency
   //
-  NanoSeconds = MultU64x32 (DivU64x32Remainder (Ticks, PcdGet64 (PcdCpuCoreCrystalClockFrequency), &Remainder), 1000000000u);
+  NanoSeconds = MultU64x32 (DivU64x32Remainder (Ticks, mTimeBase, &Remainder), 1000000000u);
 
   //
   // Frequency < 0x100000000, so Remainder < 0x100000000, then (Remainder * 1,000,000,000)
   // will not overflow 64-bit.
   //
-  NanoSeconds += DivU64x32 (MultU64x32 ((UINT64)Remainder, 1000000000u), PcdGet64 (PcdCpuCoreCrystalClockFrequency));
+  NanoSeconds += DivU64x32 (MultU64x32 ((UINT64)Remainder, 1000000000u), mTimeBase);
 
   return NanoSeconds;
+}
+
+/**
+  Retrieve the CPU time-base frequency from the Device Tree and cache it.
+
+  @retval UINT32  Time-base frequency in Hz.
+**/
+UINT32
+EFIAPI
+GetDTTimerFreq (
+  VOID
+  )
+{
+  if (mTimeBase != 0) {
+    return mTimeBase;
+  }
+
+  //
+  // Locate the FDT HOB and validate header
+  //
+  CONST EFI_HOB_GUID_TYPE  *Hob = GetFirstGuidHob (&gFdtHobGuid);
+
+  ASSERT (Hob != NULL);
+
+  CONST VOID  *DeviceTreeBase =
+    (CONST VOID *)(UINTN)*(CONST UINT64 *)GET_GUID_HOB_DATA (Hob);
+
+  ASSERT (FdtCheckHeader (DeviceTreeBase) == 0);
+
+  //
+  // /cpus node
+  //
+  INT32  Node = FdtSubnodeOffsetNameLen (
+                  DeviceTreeBase,
+                  0,
+                  "cpus",
+                  sizeof ("cpus") - 1
+                  );
+
+  ASSERT (Node >= 0);
+
+  //
+  // timebase-frequency property
+  //
+  INT32               Len;
+  CONST FDT_PROPERTY  *Prop =
+    FdtGetProperty (DeviceTreeBase, Node, "timebase-frequency", &Len);
+
+  ASSERT (Prop != NULL && Len == sizeof (UINT32));
+
+  //
+  // Device-tree cells are big-endian
+  //
+  mTimeBase = SwapBytes32 (*(CONST UINT32 *)Prop->Data);
+  return mTimeBase;
 }
