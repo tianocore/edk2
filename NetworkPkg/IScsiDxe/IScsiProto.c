@@ -1880,6 +1880,8 @@ IScsiBuildKeyValueList (
 {
   LIST_ENTRY            *ListHead;
   ISCSI_KEY_VALUE_PAIR  *KeyValuePair;
+  EFI_STATUS            Status;
+  UINT32                Result;
 
   ListHead = AllocatePool (sizeof (LIST_ENTRY));
   if (ListHead == NULL) {
@@ -1903,9 +1905,14 @@ IScsiBuildKeyValueList (
       Data++;
     }
 
-    if (*Data == '=') {
+    // Here Len must not be zero.
+    // The value of Len is size of data buffer. Actually, Data is make up of strings.
+    // AuthMethod=None\0TargetAlias=LIO Target\0 TargetPortalGroupTag=1\0
+    // (1) Len == 0, *Data != '=' goto ON_ERROR
+    // (2) *Data == '=', Len != 0 normal case.
+    // (3) *Data == '=', Len == 0, Between Data and Len are mismatch, Len isn't all size of data, as error.
+    if ((Len > 0) && (*Data == '=')) {
       *Data = '\0';
-
       Data++;
       Len--;
     } else {
@@ -1915,10 +1922,22 @@ IScsiBuildKeyValueList (
 
     KeyValuePair->Value = Data;
 
-    InsertTailList (ListHead, &KeyValuePair->List);
+    Status = SafeUint32Add ((UINT32)AsciiStrLen (KeyValuePair->Value), 1, &Result);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a Memory Overflow is Detected.\n", __func__));
+      FreePool (KeyValuePair);
+      goto ON_ERROR;
+    }
 
-    Data += AsciiStrLen (KeyValuePair->Value) + 1;
-    Len  -= (UINT32)AsciiStrLen (KeyValuePair->Value) + 1;
+    Status = SafeUint32Sub (Len, Result, &Len);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a Out of bound memory access Detected.\n", __func__));
+      FreePool (KeyValuePair);
+      goto ON_ERROR;
+    }
+
+    InsertTailList (ListHead, &KeyValuePair->List);
+    Data += Result;
   }
 
   return ListHead;
