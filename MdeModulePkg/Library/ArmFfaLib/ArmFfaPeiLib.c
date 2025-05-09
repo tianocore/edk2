@@ -35,6 +35,68 @@
 #include "ArmFfaRxTxMap.h"
 
 /**
+  Notification service to be called when gEfiPeiMemoryDiscoveredPpiGuid is installed.
+  This function change reamp Rx/Tx buffer with permanent memory from
+  temporary Rx/Tx buffer.
+
+  @param  PeiServices                 Indirect reference to the PEI Services Table.
+  @param  NotifyDescriptor            Address of the notification descriptor data structure.
+                                      Type EFI_PEI_NOTIFY_DESCRIPTOR is defined above.
+  @param  Ppi                         Address of the PPI that was installed.
+
+  @retval EFI_STATUS                  This function will install a PPI to PPI database.
+                                      The status code will be the code for (*PeiServices)->InstallPpi.
+
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+PeiServicesMemoryDiscoveredNotifyCallback (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
+  )
+{
+  EFI_STATUS                 Status;
+  EFI_HOB_GUID_TYPE          *RxTxBufferHob;
+  ARM_FFA_RX_TX_BUFFER_INFO  *BufferInfo;
+
+  RxTxBufferHob = GetFirstGuidHob (&gArmFfaRxTxBufferInfoGuid);
+  ASSERT (RxTxBufferHob != NULL);
+  BufferInfo = GET_GUID_HOB_DATA (RxTxBufferHob);
+
+  /*
+   * temporary memory doesn't need to be free...
+   * otherwise PEI memory manager using permanent memory will be confused...
+   */
+  PcdSet64S (PcdFfaTxBuffer, 0x00);
+  PcdSet64S (PcdFfaRxBuffer, 0x00);
+
+  Status = ArmFfaLibRxTxUnmap ();
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = ArmFfaLibRxTxMap ();
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  BufferInfo->TxBufferAddr = (VOID *)(UINTN)PcdGet64 (PcdFfaTxBuffer);
+  BufferInfo->TxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+  BufferInfo->RxBufferAddr = (VOID *)(UINTN)PcdGet64 (PcdFfaRxBuffer);
+  BufferInfo->RxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+
+  return EFI_SUCCESS;
+}
+
+STATIC EFI_PEI_NOTIFY_DESCRIPTOR  mNotifyOnPeiMemoryDiscovered = {
+  (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEfiPeiMemoryDiscoveredPpiGuid,
+  PeiServicesMemoryDiscoveredNotifyCallback
+};
+
+/**
   ArmFfaLib Constructor.
 
   @param [in]   FileHandle        File Handle
@@ -54,6 +116,8 @@ ArmFfaPeiLibConstructor (
   EFI_STATUS                 Status;
   EFI_HOB_GUID_TYPE          *RxTxBufferHob;
   ARM_FFA_RX_TX_BUFFER_INFO  *BufferInfo;
+  VOID                       *Dummy;
+  BOOLEAN                    TempMem;
 
   Status = ArmFfaLibCommonInit ();
   if (EFI_ERROR (Status)) {
@@ -73,6 +137,15 @@ ArmFfaPeiLibConstructor (
 
     return Status;
   }
+
+  Status = (*PeiServices)->LocatePpi (
+                             PeiServices,
+                             &gEfiPeiMemoryDiscoveredPpiGuid,
+                             0,
+                             NULL,
+                             &Dummy
+                             );
+  TempMem = (EFI_ERROR (Status)) ? TRUE : FALSE;
 
   RxTxBufferHob = GetFirstGuidHob (&gArmFfaRxTxBufferInfoGuid);
   if (RxTxBufferHob == NULL) {
@@ -94,6 +167,11 @@ ArmFfaPeiLibConstructor (
     BufferInfo->TxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
     BufferInfo->RxBufferAddr = (VOID *)(UINTN)PcdGet64 (PcdFfaRxBuffer);
     BufferInfo->RxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+
+    if (TempMem) {
+      Status = (*PeiServices)->NotifyPpi (PeiServices, &mNotifyOnPeiMemoryDiscovered);
+      ASSERT_EFI_ERROR (Status);
+    }
   }
 
   return EFI_SUCCESS;
