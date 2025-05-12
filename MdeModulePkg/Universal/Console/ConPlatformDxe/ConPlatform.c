@@ -1096,10 +1096,8 @@ ConPlatformMatchDevicePaths (
   //
   // If performing Delete operation, the NewDevicePath must not be NULL.
   //
-  if (Delete) {
-    if (NewDevicePath == NULL) {
-      return EFI_INVALID_PARAMETER;
-    }
+  if (Delete && (NewDevicePath == NULL)) {
+    return EFI_INVALID_PARAMETER;
   }
 
   TempDevicePath1 = NULL;
@@ -1178,6 +1176,8 @@ ConPlatformUpdateDeviceVariable (
   EFI_DEVICE_PATH_PROTOCOL  *VariableDevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *NewVariableDevicePath;
 
+  Status = EFI_SUCCESS;
+
   VariableDevicePath    = NULL;
   NewVariableDevicePath = NULL;
 
@@ -1187,7 +1187,7 @@ ConPlatformUpdateDeviceVariable (
   // it is the caller's responsibility to free the memory before return.
   //
   VariableDevicePath = ConPlatformGetVariable (VariableName);
-
+  // At this point, VariableDevicePath may be null.  This is expected.
   if (Operation != Delete) {
     //
     // Match specified DevicePath in Console Variable.
