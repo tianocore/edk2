@@ -32,7 +32,7 @@ AmlConstructNodeList (
   @param[in]    Parent               AML parent node list.
   @param[in]    AmlByteEncoding      AML Byte Encoding.
 
-  @return       AML Node.
+  @return       AML Node or NULL if insufficient resources to allocate a buffer
 **/
 EFI_AML_NODE_LIST *
 AmlCreateNode (
@@ -44,7 +44,10 @@ AmlCreateNode (
   EFI_AML_NODE_LIST  *AmlNodeList;
 
   AmlNodeList = AllocatePool (sizeof (*AmlNodeList));
-  ASSERT (AmlNodeList != NULL);
+  if (AmlNodeList == NULL) {
+    ASSERT (AmlNodeList != NULL);
+    return NULL;
+  }
 
   AmlNodeList->Signature = EFI_AML_NODE_LIST_SIGNATURE;
   CopyMem (AmlNodeList->Name, NameSeg, AML_NAME_SEG_SIZE);
@@ -65,7 +68,7 @@ AmlCreateNode (
   @param[in]    AmlParentNodeList    AML parent node list.
   @param[in]    Create               TRUE means to create node if not found.
 
-  @return       AmlChildNode whoes name is same as NameSeg.
+  @return       AmlChildNode whoes name is same as NameSeg or NULL if insufficient resources to allocate a buffer.
 **/
 EFI_AML_NODE_LIST *
 AmlFindNodeInThis (
@@ -108,6 +111,10 @@ AmlFindNodeInThis (
   // Create new node with NULL buffer - it means namespace not be returned.
   //
   AmlNodeList = AmlCreateNode (NameSeg, AmlParentNodeList, NULL);
+  if (AmlNodeList == NULL) {
+    return NULL;
+  }
+
   InsertTailList (&AmlParentNodeList->Children, &AmlNodeList->Link);
 
   return AmlNodeList;
@@ -512,6 +519,7 @@ AmlDumpNodeInfo (
 
   @retval EFI_SUCCESS           Success
   @retval EFI_INVALID_PARAMETER HandleIn does not refer to a valid ACPI object.
+  @retval EFI_OUT_OF_RESOURCES  Could not allocate a required resource.
 **/
 EFI_STATUS
 AmlFindPath (
@@ -538,6 +546,9 @@ AmlFindPath (
   RootNameSeg[0]  = AML_ROOT_CHAR;
   RootNameSeg[1]  = 0;
   AmlRootNodeList = AmlCreateNode (RootNameSeg, NULL, AmlHandle->AmlByteEncoding);
+  if (AmlRootNodeList == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   Status = AmlConstructNodeList (
              AmlHandle,
