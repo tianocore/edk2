@@ -107,7 +107,7 @@
 	***** If I change it to:
 	*****    if ( token!='\0' && token!='}' && token!= ')' ) return -1;
 	*****
-	***** It succeeds, but I'm not sure this is the corrrect approach.
+	***** It succeeds, but I'm not sure this is the correct approach.
 	*****
 	    *g = g1;
 	    return 1;
