@@ -14,7 +14,8 @@
 
 #define INVALID_APIC_ID  0xFFFFFFFF
 
-EFI_GUID  mCpuInitMpLibHobGuid = CPU_INIT_MP_LIB_HOB_GUID;
+EFI_GUID                 mCpuInitMpLibHobGuid    = CPU_INIT_MP_LIB_HOB_GUID;
+PROCESSOR_RESOURCE_DATA  *mProcessorResourceData = NULL;
 
 /**
   Get the Application Processors state.
@@ -223,12 +224,6 @@ CollectProcessorCount (
   IN CPU_MP_DATA  *CpuMpData
   )
 {
-  PROCESSOR_RESOURCE_DATA  *ProcessorResourceData;
-  CPU_INFO_IN_HOB          *CpuInfoInHob;
-  UINTN                    Index;
-
-  ProcessorResourceData = NULL;
-
   //
   // Set the default loop mode for APs.
   //
@@ -240,16 +235,11 @@ CollectProcessorCount (
   // as the first broadcast method to wake up all APs, and all of APs will read NODE0
   // Core0 Mailbox0 in an infinit loop.
   //
-  ProcessorResourceData = GetProcessorResourceDataFromGuidedHob ();
+  mProcessorResourceData = GetProcessorResourceDataFromGuidedHob ();
 
-  if (ProcessorResourceData != NULL) {
+  if (mProcessorResourceData != NULL) {
     CpuMpData->ApLoopMode = ApInHltLoop;
-    CpuMpData->CpuCount   = ProcessorResourceData->NumberOfProcessor;
-    CpuInfoInHob          = (CPU_INFO_IN_HOB *)(UINTN)(CpuMpData->CpuInfoInHob);
-
-    for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
-      CpuInfoInHob[Index].ApicId = ProcessorResourceData->ApicId[Index];
-    }
+    CpuMpData->CpuCount   = mProcessorResourceData->NumberOfProcessor;
   }
 
   //
@@ -380,15 +370,15 @@ ApWakeupFunction (
     //
     InterlockedIncrement ((UINT32 *)&CpuMpData->FinishedCount);
 
-    while (TRUE) {
-      //
-      // Clean per-core mail box registers.
-      //
-      IoCsrWrite64 (LOONGARCH_IOCSR_MBUF0, 0x0);
-      IoCsrWrite64 (LOONGARCH_IOCSR_MBUF1, 0x0);
-      IoCsrWrite64 (LOONGARCH_IOCSR_MBUF2, 0x0);
-      IoCsrWrite64 (LOONGARCH_IOCSR_MBUF3, 0x0);
+    //
+    // Clean per-core mail box registers.
+    //
+    IoCsrWrite64 (LOONGARCH_IOCSR_MBUF0, 0x0);
+    IoCsrWrite64 (LOONGARCH_IOCSR_MBUF1, 0x0);
+    IoCsrWrite64 (LOONGARCH_IOCSR_MBUF2, 0x0);
+    IoCsrWrite64 (LOONGARCH_IOCSR_MBUF3, 0x0);
 
+    while (TRUE) {
       //
       // Enable IPI interrupt and global interrupt
       //
@@ -699,19 +689,19 @@ WakeUpAP (
     DEBUG ((DEBUG_INFO, "%a: func 0x%llx, ExchangeInfo 0x%llx\n", __func__, ApWakeupFunction, (UINTN)ExchangeInfo));
     if (CpuMpData->ApLoopMode == ApInHltLoop) {
       for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
-        if (Index != CpuMpData->BspNumber) {
+        if (mProcessorResourceData->ApicId[Index] != CpuMpData->BspNumber) {
           IoCsrWrite64 (
             LOONGARCH_IOCSR_MBUF_SEND,
             (IOCSR_MBUF_SEND_BLOCKING |
              (IOCSR_MBUF_SEND_BOX_HI (0x3) << IOCSR_MBUF_SEND_BOX_SHIFT) |
-             (CpuInfoInHob[Index].ApicId << IOCSR_MBUF_SEND_CPU_SHIFT) |
+             (mProcessorResourceData->ApicId[Index] << IOCSR_MBUF_SEND_CPU_SHIFT) |
              ((UINTN)(ExchangeInfo) & IOCSR_MBUF_SEND_H32_MASK))
             );
           IoCsrWrite64 (
             LOONGARCH_IOCSR_MBUF_SEND,
             (IOCSR_MBUF_SEND_BLOCKING |
              (IOCSR_MBUF_SEND_BOX_LO (0x3) << IOCSR_MBUF_SEND_BOX_SHIFT) |
-             (CpuInfoInHob[Index].ApicId << IOCSR_MBUF_SEND_CPU_SHIFT) |
+             (mProcessorResourceData->ApicId[Index] << IOCSR_MBUF_SEND_CPU_SHIFT) |
              ((UINTN)ExchangeInfo) << IOCSR_MBUF_SEND_BUF_SHIFT)
             );
 
@@ -719,14 +709,14 @@ WakeUpAP (
             LOONGARCH_IOCSR_MBUF_SEND,
             (IOCSR_MBUF_SEND_BLOCKING |
              (IOCSR_MBUF_SEND_BOX_HI (0x0) << IOCSR_MBUF_SEND_BOX_SHIFT) |
-             (CpuInfoInHob[Index].ApicId << IOCSR_MBUF_SEND_CPU_SHIFT) |
+             (mProcessorResourceData->ApicId[Index] << IOCSR_MBUF_SEND_CPU_SHIFT) |
              ((UINTN)(ApWakeupFunction) & IOCSR_MBUF_SEND_H32_MASK))
             );
           IoCsrWrite64 (
             LOONGARCH_IOCSR_MBUF_SEND,
             (IOCSR_MBUF_SEND_BLOCKING |
              (IOCSR_MBUF_SEND_BOX_LO (0x0) << IOCSR_MBUF_SEND_BOX_SHIFT) |
-             (CpuInfoInHob[Index].ApicId << IOCSR_MBUF_SEND_CPU_SHIFT) |
+             (mProcessorResourceData->ApicId[Index] << IOCSR_MBUF_SEND_CPU_SHIFT) |
              ((UINTN)ApWakeupFunction) << IOCSR_MBUF_SEND_BUF_SHIFT)
             );
 
@@ -736,10 +726,13 @@ WakeUpAP (
           IoCsrWrite64 (
             LOONGARCH_IOCSR_IPI_SEND,
             (IOCSR_MBUF_SEND_BLOCKING |
-             (CpuInfoInHob[Index].ApicId << IOCSR_MBUF_SEND_CPU_SHIFT) |
-             0x2 // Bit 2
+             (mProcessorResourceData->ApicId[Index] << IOCSR_MBUF_SEND_CPU_SHIFT) |
+             0x2 // SMP_CALL_FUNCTION
             )
             );
+
+          MemoryFence ();
+          MicroSecondDelay (100); // Delay 100ms after send IPI.
         }
       }
     } else {
@@ -767,15 +760,18 @@ WakeUpAP (
           *(UINT32 *)CpuData->StartupApSignal = WAKEUP_AP_SIGNAL;
 
           //
-          // Send IPI 4 interrupt to wake up APs.
+          // Send IPI 2 interrupt to wake up APs.
           //
           IoCsrWrite64 (
             LOONGARCH_IOCSR_IPI_SEND,
             (IOCSR_MBUF_SEND_BLOCKING |
              (CpuInfoInHob[Index].ApicId << IOCSR_MBUF_SEND_CPU_SHIFT) |
-             0x2 // Bit 2
+             0x1 // SMP_RESCHEDULE
             )
             );
+
+          MemoryFence ();
+          MicroSecondDelay (100); // Delay 100ms after send IPI.
         }
       }
 
@@ -799,15 +795,18 @@ WakeUpAP (
       *(UINT32 *)CpuData->StartupApSignal = WAKEUP_AP_SIGNAL;
 
       //
-      // Send IPI 4 interrupt to wake up APs.
+      // Send IPI 2 interrupt to wake up APs.
       //
       IoCsrWrite64 (
         LOONGARCH_IOCSR_IPI_SEND,
         (IOCSR_MBUF_SEND_BLOCKING |
          (CpuInfoInHob[ProcessorNumber].ApicId << IOCSR_MBUF_SEND_CPU_SHIFT) |
-         0x2 // Bit 2
+         0x1 // SMP_RESCHEDULE
         )
         );
+
+      MemoryFence ();
+      MicroSecondDelay (100); // Delay 100ms after send IPI.
 
       //
       // Wait specified AP waken up
@@ -1360,7 +1359,7 @@ MpInitLibInitialize (
   //
   // Set BSP basic information
   //
-  InitializeApData (CpuMpData, 0, 0);
+  InitializeApData (CpuMpData, CpuMpData->BspNumber, 0);
 
   //
   // Set up APs wakeup signal buffer and initialization APs ApicId status.
