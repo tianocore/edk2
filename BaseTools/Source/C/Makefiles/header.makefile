@@ -105,6 +105,13 @@ CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
 -fno-delete-null-pointer-checks -Wall -Werror \
 -Wno-deprecated-declarations -Wno-stringop-truncation -Wno-restrict \
 -Wno-unused-result -nostdlib -g
+
+# GCC 15 defaults to C 2023, which is not supported by BaseTools yet.
+GCCVERSION = $(shell $(CC) -dumpversion | awk -F'.' '{print $$1}')
+ifeq ($(shell test $(GCCVERSION) -ge 15 && echo true),true)
+  CFLAGS += -std=gnu17
+endif
+
 endif
 endif
 ifneq ($(CLANG),)

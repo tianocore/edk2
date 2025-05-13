@@ -1738,13 +1738,13 @@ RELEASE_GCC5_LOONGARCH64_CC_FLAGS       = DEF(GCC5_LOONGARCH64_CC_FLAGS) -Wno-un
 *_GCC_IA32_OBJCOPY_FLAGS        =
 *_GCC_IA32_NASM_FLAGS           = -f elf32
 
-  DEBUG_GCC_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -flto
+  DEBUG_GCC_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -flto -std=gnu17
   DEBUG_GCC_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Os -Wl,-m,elf_i386,--oformat=elf32-i386
 
-RELEASE_GCC_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable
+RELEASE_GCC_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable -std=gnu17
 RELEASE_GCC_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Os -Wl,-m,elf_i386,--oformat=elf32-i386
 
-  NOOPT_GCC_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -O0
+  NOOPT_GCC_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -O0 -std=gnu17
   NOOPT_GCC_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -Wl,-m,elf_i386,--oformat=elf32-i386 -O0
 
 ##################
@@ -1770,13 +1770,13 @@ RELEASE_GCC_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Os -Wl,-
 *_GCC_X64_OBJCOPY_FLAGS         =
 *_GCC_X64_NASM_FLAGS            = -f elf64
 
-  DEBUG_GCC_X64_CC_FLAGS        = DEF(GCC5_X64_CC_FLAGS) -flto -DUSING_LTO
+  DEBUG_GCC_X64_CC_FLAGS        = DEF(GCC5_X64_CC_FLAGS) -flto -DUSING_LTO -std=gnu17
   DEBUG_GCC_X64_DLINK_FLAGS     = DEF(GCC5_X64_DLINK_FLAGS) -flto -Os
 
-RELEASE_GCC_X64_CC_FLAGS        = DEF(GCC5_X64_CC_FLAGS) -flto -DUSING_LTO -Wno-unused-but-set-variable -Wno-unused-const-variable
+RELEASE_GCC_X64_CC_FLAGS        = DEF(GCC5_X64_CC_FLAGS) -flto -DUSING_LTO -Wno-unused-but-set-variable -Wno-unused-const-variable -std=gnu17
 RELEASE_GCC_X64_DLINK_FLAGS     = DEF(GCC5_X64_DLINK_FLAGS) -flto -Os
 
-  NOOPT_GCC_X64_CC_FLAGS        = DEF(GCC5_X64_CC_FLAGS) -O0
+  NOOPT_GCC_X64_CC_FLAGS        = DEF(GCC5_X64_CC_FLAGS) -O0 -std=gnu17
   NOOPT_GCC_X64_DLINK_FLAGS     = DEF(GCC5_X64_DLINK_FLAGS) -O0
 
 ##################
@@ -1804,13 +1804,13 @@ RELEASE_GCC_X64_DLINK_FLAGS     = DEF(GCC5_X64_DLINK_FLAGS) -flto -Os
 *_GCC_ARM_VFRPP_FLAGS           = $(PLATFORM_FLAGS) DEF(GCC_VFRPP_FLAGS)
 *_GCC_ARM_CC_XIPFLAGS           = DEF(GCC5_ARM_CC_XIPFLAGS)
 
-  DEBUG_GCC_ARM_CC_FLAGS        = DEF(GCC5_ARM_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable
+  DEBUG_GCC_ARM_CC_FLAGS        = DEF(GCC5_ARM_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable -std=gnu17
   DEBUG_GCC_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm
 
-RELEASE_GCC_ARM_CC_FLAGS        = DEF(GCC5_ARM_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable
+RELEASE_GCC_ARM_CC_FLAGS        = DEF(GCC5_ARM_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable -std=gnu17
 RELEASE_GCC_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm
 
-  NOOPT_GCC_ARM_CC_FLAGS        = DEF(GCC5_ARM_CC_FLAGS) -O0
+  NOOPT_GCC_ARM_CC_FLAGS        = DEF(GCC5_ARM_CC_FLAGS) -O0 -std=gnu17
   NOOPT_GCC_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -O0
 
 ##################
@@ -1838,15 +1838,15 @@ RELEASE_GCC_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKSP
 *_GCC_AARCH64_VFRPP_FLAGS       = $(PLATFORM_FLAGS) DEF(GCC_VFRPP_FLAGS)
 *_GCC_AARCH64_CC_XIPFLAGS       = DEF(GCC5_AARCH64_CC_XIPFLAGS)
 
-  DEBUG_GCC_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable
+  DEBUG_GCC_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable -std=gnu17
   DEBUG_GCC_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wno-lto-type-mismatch
   DEBUG_GCC_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 
-RELEASE_GCC_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable
+RELEASE_GCC_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable -std=gnu17
 RELEASE_GCC_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wno-lto-type-mismatch
 RELEASE_GCC_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 
-  NOOPT_GCC_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -O0
+  NOOPT_GCC_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -O0 -std=gnu17
   NOOPT_GCC_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -O0
   NOOPT_GCC_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20 -O0
 
@@ -1875,7 +1875,7 @@ RELEASE_GCC_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 *_GCC_RISCV64_ASLCC_FLAGS          = DEF(GCC_ASLCC_FLAGS)
 *_GCC_RISCV64_ASLDLINK_FLAGS       = DEF(GCC5_RISCV32_RISCV64_ASLDLINK_FLAGS)
 *_GCC_RISCV64_ASM_FLAGS            = DEF(GCC5_RISCV64_ASM_FLAGS)
-*_GCC_RISCV64_CC_FLAGS             = DEF(GCC5_RISCV64_CC_FLAGS) -save-temps
+*_GCC_RISCV64_CC_FLAGS             = DEF(GCC5_RISCV64_CC_FLAGS) -save-temps -std=gnu17
 *_GCC_RISCV64_DLINK_FLAGS          = DEF(GCC5_RISCV64_DLINK_FLAGS)
 *_GCC_RISCV64_DLINK2_FLAGS         = DEF(GCC5_RISCV64_DLINK2_FLAGS)
 *_GCC_RISCV64_RC_FLAGS             = DEF(GCC_RISCV64_RC_FLAGS)
@@ -1908,8 +1908,8 @@ RELEASE_GCC_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 *_GCC_LOONGARCH64_NASM_FLAGS           = -f elf32
 *_GCC_LOONGARCH64_PP_FLAGS             = DEF(GCC5_LOONGARCH64_PP_FLAGS)
 
-DEBUG_GCC_LOONGARCH64_CC_FLAGS         = DEF(GCC5_LOONGARCH64_CC_FLAGS)
-RELEASE_GCC_LOONGARCH64_CC_FLAGS       = DEF(GCC5_LOONGARCH64_CC_FLAGS) -Wno-unused-but-set-variable -Wno-unused-variable
+DEBUG_GCC_LOONGARCH64_CC_FLAGS         = DEF(GCC5_LOONGARCH64_CC_FLAGS) -std=gnu17
+RELEASE_GCC_LOONGARCH64_CC_FLAGS       = DEF(GCC5_LOONGARCH64_CC_FLAGS) -Wno-unused-but-set-variable -Wno-unused-variable -std=gnu17
 
 ####################################################################################
 #
