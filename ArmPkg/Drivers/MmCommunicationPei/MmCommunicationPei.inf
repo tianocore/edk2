@@ -37,8 +37,12 @@
 [Protocols]
   gEfiMmCommunication2ProtocolGuid
 
+[Guids]
+  gEfiMmCommunicateHeaderV3Guid
+
 [Ppis]
   gEfiPeiMmCommunicationPpiGuid     ## PRODUCES
+  gEfiPeiMmCommunication3PpiGuid    ## PRODUCES
 
 [Depex]
   TRUE
