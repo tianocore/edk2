@@ -12,6 +12,7 @@
 
 #include <Protocol/MmCommunication.h>
 #include <Ppi/MmCommunication.h>
+#include <Ppi/MmCommunication3.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -371,70 +372,92 @@ SendSpmMmCommunicate (
 STATIC
 EFI_STATUS
 EFIAPI
-MmCommunicationPeim (
-  IN CONST EFI_PEI_MM_COMMUNICATION_PPI  *This,
-  IN OUT VOID                            *CommBuffer,
-  IN OUT UINTN                           *CommSize
+MmCommunicationPeimCommon (
+  IN OUT VOID   *CommBuffer,
+  IN OUT UINTN  *CommSize
   )
 {
-  EFI_MM_COMMUNICATE_HEADER  *CommunicateHeader;
-  EFI_MM_COMMUNICATE_HEADER  *TempCommHeader;
-  EFI_STATUS                 Status;
-  UINTN                      BufferSize;
+  EFI_MM_COMMUNICATE_HEADER     *CommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER_V3  *CommunicateHeaderV3;
+  EFI_STATUS                    Status;
+  UINTN                         BufferSize;
+  UINTN                         HeaderSize;
 
   //
   // Check parameters
   //
-  if ((CommBuffer == NULL) || (CommSize == NULL)) {
+  if (CommBuffer == NULL) {
     ASSERT (CommBuffer != NULL);
-    ASSERT (CommSize != NULL);
     return EFI_INVALID_PARAMETER;
   }
 
-  // If the length of the CommBuffer is 0 then return the expected length.
-  // This case can be used by the consumer of this driver to find out the
-  // max size that can be used for allocating CommBuffer.
-  if ((*CommSize == 0) || (*CommSize > (UINTN)PcdGet64 (PcdMmBufferSize))) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a Invalid CommSize value 0x%llx!\n",
-      __func__,
-      *CommSize
-      ));
-    *CommSize = (UINTN)PcdGet64 (PcdMmBufferSize);
-    return EFI_BAD_BUFFER_SIZE;
-  }
+  CommunicateHeader   = (EFI_MM_COMMUNICATE_HEADER *)(UINTN)CommBuffer;
+  CommunicateHeaderV3 = NULL;
+  if (CompareGuid (
+        &CommunicateHeader->HeaderGuid,
+        &gEfiMmCommunicateHeaderV3Guid
+        ))
+  {
+    // This is a v3 header
+    CommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)(UINTN)CommBuffer;
+    HeaderSize          = sizeof (EFI_MM_COMMUNICATE_HEADER_V3);
+    BufferSize          = CommunicateHeaderV3->BufferSize;
+  } else {
+    // This is a v1 header, do some checks
+    if (CommSize == NULL) {
+      // If CommSize is not NULL, then it must be the size of the header
+      // plus the size of the message.
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a CommSize is NULL!\n",
+        __func__
+        ));
+      return EFI_INVALID_PARAMETER;
+    }
 
-  // Given CommBuffer is not NULL here, we use it to test the legitimacy of CommSize.
-  TempCommHeader = (EFI_MM_COMMUNICATE_HEADER *)(UINTN)CommBuffer;
+    // If the length of the CommBuffer is 0 then return the expected length.
+    // This case can be used by the consumer of this driver to find out the
+    // max size that can be used for allocating CommBuffer.
+    if ((*CommSize == 0) || (*CommSize > (UINTN)PcdGet64 (PcdMmBufferSize))) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a Invalid CommSize value 0x%llx!\n",
+        __func__,
+        *CommSize
+        ));
+      *CommSize = (UINTN)PcdGet64 (PcdMmBufferSize);
+      return EFI_BAD_BUFFER_SIZE;
+    }
 
-  // CommBuffer is a mandatory parameter. Hence, Rely on
-  // MessageLength + Header to ascertain the
-  // total size of the communication payload rather than
-  // rely on optional CommSize parameter
-  BufferSize = TempCommHeader->MessageLength +
-               sizeof (TempCommHeader->HeaderGuid) +
-               sizeof (TempCommHeader->MessageLength);
+    HeaderSize =  sizeof (CommunicateHeader->HeaderGuid) +
+                 sizeof (CommunicateHeader->MessageLength);
 
-  //
-  // If CommSize is supplied it must match MessageLength + sizeof (EFI_MM_COMMUNICATE_HEADER);
-  //
-  if (*CommSize != BufferSize) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a Unexpected CommSize value, has: 0x%llx vs. expected: 0x%llx!\n",
-      __func__,
-      *CommSize,
-      BufferSize
-      ));
-    return EFI_INVALID_PARAMETER;
+    // CommBuffer is a mandatory parameter. Hence, Rely on
+    // MessageLength + Header to ascertain the
+    // total size of the communication payload rather than
+    // rely on optional CommSize parameter
+    BufferSize = CommunicateHeader->MessageLength +
+                 sizeof (CommunicateHeader->HeaderGuid) +
+                 sizeof (CommunicateHeader->MessageLength);
+    //
+    // If CommSize is supplied it must match MessageLength + sizeof (EFI_MM_COMMUNICATE_HEADER);
+    //
+    if (*CommSize != BufferSize) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a Unexpected CommSize value, has: 0x%llx vs. expected: 0x%llx!\n",
+        __func__,
+        *CommSize,
+        BufferSize
+        ));
+      return EFI_INVALID_PARAMETER;
+    }
   }
 
   // Now we know that the size is something we can handle, copy it over to the designated comm buffer.
   CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)(UINTN)(PcdGet64 (PcdMmBufferBase));
 
-  CopyMem (CommunicateHeader, CommBuffer, *CommSize);
-
+  CopyMem (CommunicateHeader, CommBuffer, BufferSize);
   if (IsFfaSupported ()) {
     Status = SendFfaMmCommunicate ();
   } else {
@@ -444,9 +467,30 @@ MmCommunicationPeim (
   if (!EFI_ERROR (Status)) {
     // On successful return, the size of data being returned is inferred from
     // MessageLength + Header.
-    BufferSize = CommunicateHeader->MessageLength +
-                 sizeof (CommunicateHeader->HeaderGuid) +
-                 sizeof (CommunicateHeader->MessageLength);
+    if ((CommunicateHeaderV3 != NULL) && !CompareGuid (
+                                            &CommunicateHeader->HeaderGuid,
+                                            &gEfiMmCommunicateHeaderV3Guid
+                                            ))
+    {
+      // Sanity check to make sure we are still using v3
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a Expected v3 header, but got v1 header! %g\n",
+        __func__,
+        &CommunicateHeader->HeaderGuid
+        ));
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if (CommunicateHeaderV3 != NULL) {
+      CommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommunicateHeader;
+      BufferSize          = CommunicateHeaderV3->BufferSize;
+    } else {
+      BufferSize = CommunicateHeader->MessageLength +
+                   sizeof (CommunicateHeader->HeaderGuid) +
+                   sizeof (CommunicateHeader->MessageLength);
+    }
+
     if (BufferSize > (UINTN)PcdGet64 (PcdMmBufferSize)) {
       // Something bad has happened, we should have landed in ARM_SMC_MM_RET_NO_MEMORY
       Status = EFI_BAD_BUFFER_SIZE;
@@ -459,11 +503,78 @@ MmCommunicationPeim (
         ));
     } else {
       CopyMem (CommBuffer, CommunicateHeader, BufferSize);
-      *CommSize = BufferSize;
+      if (CommSize != NULL) {
+        // If CommSize is not NULL, then it must be the size of the header
+        // plus the size of the message.
+        *CommSize = BufferSize;
+      }
     }
   }
 
   return Status;
+}
+
+/**
+  MmCommunicationPeim
+  Communicates with a registered handler.
+  This function provides a service to send and receive messages from a registered UEFI service during PEI.
+
+  @param[in]      This            The EFI_PEI_MM_COMMUNICATION_PPI instance.
+  @param[in, out] CommBuffer      Pointer to the data buffer
+  @param[in, out] CommSize        The size of the data buffer being passed in. On exit, the
+                                  size of data being returned. Zero if the handler does not
+                                  wish to reply with any data.
+
+  @retval EFI_SUCCESS             The message was successfully posted.
+  @retval EFI_INVALID_PARAMETER   CommBuffer or CommSize was NULL, or *CommSize does not
+                                  match MessageLength + sizeof (EFI_MM_COMMUNICATE_HEADER).
+  @retval EFI_BAD_BUFFER_SIZE     The buffer is too large for the MM implementation.
+                                  If this error is returned, the MessageLength field
+                                  in the CommBuffer header or the integer pointed by
+                                  CommSize, are updated to reflect the maximum payload
+                                  size the implementation can accommodate.
+  @retval EFI_ACCESS_DENIED       The CommunicateBuffer parameter or CommSize parameter,
+                                  if not omitted, are in address range that cannot be
+                                  accessed by the MM environment.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+MmCommunicationPeim (
+  IN CONST EFI_PEI_MM_COMMUNICATION_PPI  *This,
+  IN OUT VOID                            *CommBuffer,
+  IN OUT UINTN                           *CommSize
+  )
+{
+  return MmCommunicationPeimCommon (
+           CommBuffer,
+           CommSize
+           );
+}
+
+/**
+  Communicates with a registered handler through MM communicate v3.
+
+  This function provides a service to send and receive messages from a registered UEFI service.
+
+  @param[in] This                The EFI_PEI_MM_COMMUNICATE3 instance.
+  @param[in, out] CommBuffer     A pointer to the buffer to convey into MMRAM.
+
+  @retval EFI_SUCCESS            The message was successfully posted.
+  @retval EFI_INVALID_PARAMETER  The CommBuffer was NULL.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+MmCommunication3Peim (
+  IN CONST EFI_PEI_MM_COMMUNICATION3_PPI  *This,
+  IN OUT VOID                             *CommBuffer
+  )
+{
+  return MmCommunicationPeimCommon (
+           CommBuffer,
+           NULL
+           );
 }
 
 //
@@ -473,10 +584,21 @@ STATIC CONST EFI_PEI_MM_COMMUNICATION_PPI  mPeiMmCommunication = {
   MmCommunicationPeim
 };
 
-STATIC CONST EFI_PEI_PPI_DESCRIPTOR  mPeiMmCommunicationPpi = {
-  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
-  &gEfiPeiMmCommunicationPpiGuid,
-  (VOID *)&mPeiMmCommunication
+STATIC CONST EFI_PEI_MM_COMMUNICATION3_PPI  mPeiMmCommunication3 = {
+  MmCommunication3Peim
+};
+
+STATIC CONST EFI_PEI_PPI_DESCRIPTOR  mPeiMmCommunicationPpis[] = {
+  {
+    (EFI_PEI_PPI_DESCRIPTOR_PPI),
+    &gEfiPeiMmCommunication3PpiGuid,
+    (VOID *)&mPeiMmCommunication3
+  },
+  {
+    (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    &gEfiPeiMmCommunicationPpiGuid,
+    (VOID *)&mPeiMmCommunication
+  }
 };
 
 /**
@@ -514,5 +636,5 @@ MmCommunicationPeiInitialize (
     return Status;
   }
 
-  return PeiServicesInstallPpi (&mPeiMmCommunicationPpi);
+  return PeiServicesInstallPpi (mPeiMmCommunicationPpis);
 }
