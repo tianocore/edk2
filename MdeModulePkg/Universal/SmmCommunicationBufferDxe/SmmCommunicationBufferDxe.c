@@ -63,6 +63,10 @@ SmmCommunicationBufferEntryPoint (
   //
   PiSmmCommunicationRegionTable = AllocateReservedPool (sizeof (EDKII_PI_SMM_COMMUNICATION_REGION_TABLE) + DescriptorSize);
   ASSERT (PiSmmCommunicationRegionTable != NULL);
+  if (PiSmmCommunicationRegionTable == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   ZeroMem (PiSmmCommunicationRegionTable, sizeof (EDKII_PI_SMM_COMMUNICATION_REGION_TABLE) + DescriptorSize);
 
   PiSmmCommunicationRegionTable->Version         = EDKII_PI_SMM_COMMUNICATION_REGION_TABLE_VERSION;
