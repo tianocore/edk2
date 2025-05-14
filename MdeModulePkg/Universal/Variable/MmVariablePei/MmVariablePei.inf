@@ -34,7 +34,11 @@
 
 [Ppis]
   gEfiPeiReadOnlyVariable2PpiGuid         ## PRODUCES
-  gEfiPeiMmCommunicationPpiGuid           ## CONSUMES
+  gEfiPeiMmCommunication3PpiGuid          ## CONSUMES
+  gEfiPeiMmCommunicationPpiGuid           ## SOMETIMES_CONSUMES
+
+[Guids]
+  gEfiMmCommunicateHeaderV3Guid
 
 [Depex]
-  gEfiPeiMmCommunicationPpiGuid
+  gEfiPeiMmCommunicationPpiGuid OR gEfiPeiMmCommunication3PpiGuid
