@@ -22,15 +22,20 @@
 #  QemuX64.c
   QemuHwInfo.c
   QemuMmio.c
+  Svsm.c
 
 [Sources.AARCH64, Sources.RISCV64]
   QemuFdt.c
   QemuMmio.c
+  SvsmNull.c
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   OvmfPkg/OvmfPkg.dec
+
+[Packages.X64]
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [Packages.AARCH64, Packages.RISCV64]
   EmbeddedPkg/EmbeddedPkg.dec
@@ -47,6 +52,7 @@
 [LibraryClasses.X64]
   DxeHardwareInfoLib
   QemuFwCfgLib
+  AmdSvsmLib
 
 [LibraryClasses.AARCH64, LibraryClasses.RISCV64]
   FdtLib

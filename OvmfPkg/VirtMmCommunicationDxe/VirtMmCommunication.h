@@ -50,4 +50,18 @@ VirtMmHwPioTransfer (
   BOOLEAN  ToDevice
   );
 
+/* svsm hooks */
+
+BOOLEAN
+EFIAPI
+VirtMmSvsmProbe (
+  VOID
+  );
+
+EFI_STATUS
+EFIAPI
+VirtMmSvsmComm (
+  VOID
+  );
+
 #endif /* _VIRT_MM_COMM_DXE_H_ */
