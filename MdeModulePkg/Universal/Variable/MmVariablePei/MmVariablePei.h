@@ -23,6 +23,7 @@
 
 #include <Ppi/ReadOnlyVariable2.h>
 #include <Ppi/MmCommunication.h>
+#include <Ppi/MmCommunication3.h>
 
 #include <Protocol/SmmVariable.h>
 #include <Protocol/MmCommunication.h>

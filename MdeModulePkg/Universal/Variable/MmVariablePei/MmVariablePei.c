@@ -66,7 +66,9 @@ PopulateHeaderAndCommunicate (
 {
   EFI_STATUS                       Status;
   EFI_PEI_MM_COMMUNICATION_PPI     *MmCommunicationPpi;
+  EFI_PEI_MM_COMMUNICATION3_PPI    *MmCommunicationPpiV3;
   EFI_MM_COMMUNICATE_HEADER        *MmCommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER_V3     *MmCommunicateHeaderV3;
   SMM_VARIABLE_COMMUNICATE_HEADER  *MmVarCommsHeader;
 
   // Minimal sanity check
@@ -86,30 +88,67 @@ PopulateHeaderAndCommunicate (
     goto Exit;
   }
 
-  Status = PeiServicesLocatePpi (&gEfiPeiMmCommunicationPpiGuid, 0, NULL, (VOID **)&MmCommunicationPpi);
+  MmCommunicationPpiV3 = NULL;
+  MmCommunicationPpi   = NULL;
+
+  Status = PeiServicesLocatePpi (&gEfiPeiMmCommunication3PpiGuid, 0, NULL, (VOID **)&MmCommunicationPpiV3);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Failed to locate PEI MM Communication PPI: %r\n", __func__, Status));
-    goto Exit;
+    DEBUG ((DEBUG_WARN, "%a: Unable to locate PEI MM Communication3 PPI: %r\n", __func__, Status));
+    // Try to locate the older version of the PPI
+    Status = PeiServicesLocatePpi (&gEfiPeiMmCommunicationPpiGuid, 0, NULL, (VOID **)&MmCommunicationPpi);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: Failed to locate PEI MM Communication PPI: %r\n", __func__, Status));
+      goto Exit;
+    }
   }
 
-  // Zero the entire Communication Buffer Header
-  MmCommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)CommunicateBuffer;
+  if (MmCommunicationPpiV3 != NULL) {
+    // Zero the entire Communication Buffer Header
+    MmCommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommunicateBuffer;
 
-  ZeroMem (MmCommunicateHeader, SMM_COMMUNICATE_HEADER_SIZE);
+    ZeroMem (MmCommunicateHeaderV3, SMM_COMMUNICATE_HEADER_SIZE_V3);
 
-  // Use gEfiSmmVariableProtocolGuid to request the MM variable service in Standalone MM
-  CopyMem ((VOID *)&MmCommunicateHeader->HeaderGuid, &gEfiSmmVariableProtocolGuid, sizeof (GUID));
+    // Use gEfiSmmVariableProtocolGuid to request the MM variable service in Standalone MM
+    CopyMem ((VOID *)&MmCommunicateHeaderV3->HeaderGuid, &gEfiMmCommunicateHeaderV3Guid, sizeof (GUID));
+    MmCommunicateHeaderV3->BufferSize = CommunicateBufferSize;
 
-  // Program the MM header size
-  MmCommunicateHeader->MessageLength = CommunicateBufferSize - SMM_COMMUNICATE_HEADER_SIZE;
+    CopyMem ((VOID *)&MmCommunicateHeaderV3->MessageGuid, &gEfiSmmVariableProtocolGuid, sizeof (GUID));
 
-  MmVarCommsHeader = (SMM_VARIABLE_COMMUNICATE_HEADER *)(CommunicateBuffer + SMM_COMMUNICATE_HEADER_SIZE);
+    // Program the MM header size
+    MmCommunicateHeaderV3->MessageSize = CommunicateBufferSize - SMM_COMMUNICATE_HEADER_SIZE_V3;
 
-  // We are only supporting GetVariable and GetNextVariableName
-  MmVarCommsHeader->Function = Function;
+    MmVarCommsHeader = (SMM_VARIABLE_COMMUNICATE_HEADER *)(MmCommunicateHeaderV3->MessageData);
 
-  // Send the MM request using MmCommunicationPei
-  Status = MmCommunicationPpi->Communicate (MmCommunicationPpi, CommunicateBuffer, &CommunicateBufferSize);
+    // We are only supporting GetVariable and GetNextVariableName
+    MmVarCommsHeader->Function = Function;
+
+    // Send the MM request using MmCommunicationPei
+    Status = MmCommunicationPpiV3->Communicate (MmCommunicationPpiV3, CommunicateBuffer);
+  } else if (MmCommunicationPpi != NULL) {
+    // Zero the entire Communication Buffer Header
+    MmCommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)CommunicateBuffer;
+
+    ZeroMem (MmCommunicateHeader, SMM_COMMUNICATE_HEADER_SIZE);
+
+    // Use gEfiSmmVariableProtocolGuid to request the MM variable service in Standalone MM
+    CopyMem ((VOID *)&MmCommunicateHeader->HeaderGuid, &gEfiSmmVariableProtocolGuid, sizeof (GUID));
+
+    // Program the MM header size
+    MmCommunicateHeader->MessageLength = CommunicateBufferSize - SMM_COMMUNICATE_HEADER_SIZE;
+
+    MmVarCommsHeader = (SMM_VARIABLE_COMMUNICATE_HEADER *)(CommunicateBuffer + SMM_COMMUNICATE_HEADER_SIZE);
+
+    // We are only supporting GetVariable and GetNextVariableName
+    MmVarCommsHeader->Function = Function;
+
+    // Send the MM request using MmCommunicationPei
+    Status = MmCommunicationPpi->Communicate (MmCommunicationPpi, CommunicateBuffer, &CommunicateBufferSize);
+  } else {
+    // We should never reach here, but just in case
+    Status = EFI_UNSUPPORTED;
+    DEBUG ((DEBUG_ERROR, "%a: No MM Communication PPI found!\n", __func__));
+  }
+
   if (EFI_ERROR (Status)) {
     // Received an error from MM interface.
     DEBUG ((DEBUG_ERROR, "%a - MM Interface Error: %r\n", __func__, Status));
