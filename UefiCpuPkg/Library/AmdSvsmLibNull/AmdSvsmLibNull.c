@@ -165,3 +165,13 @@ AmdSvsmQueryProtocol (
 {
   return FALSE;
 }
+
+BOOLEAN
+EFIAPI
+AmdSvsmUefiMmRequest (
+  IN  UINT64  BufferAddr,
+  IN  UINT64  BufferSize
+  )
+{
+  return FALSE;
+}
