@@ -102,6 +102,7 @@ typedef union {
 #define SVSM_PROTOCOL_CORE         0
 #define SVSM_PROTOCOL_ATTESTATION  1
 #define SVSM_PROTOCOL_VTPM         2
+#define SVSM_UEFI_MM_PROTOCOL      4
 /// @}
 
 /// SVSM Core Protocol calls
@@ -120,4 +121,9 @@ typedef union {
 /// @{
 #define SVSM_VTPM_QUERY  0
 #define SVSM_VTPM_CMD    1
+/// @}
+
+/// SVSM UEFI MM Protocol calls
+/// @{
+#define SVSM_UEFI_MM_REQUEST  1
 /// @}
