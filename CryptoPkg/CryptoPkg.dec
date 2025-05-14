@@ -111,11 +111,5 @@
   # @ValidList 0x80000001 | 0x00000001, 0x00000002, 0x00000004, 0x00000008, 0x00000010
   gEfiCryptoPkgTokenSpaceGuid.PcdHashApiLibPolicy|0x00000002|UINT32|0x00000001
 
-  ## This PCD indicates the Openssl Tls security level.<BR>
-  #  This PCD value will be passed to SSL_CTX_set_security_level() and SSL_set_security_level()
-  #  to set the security level.<BR>
-  #  If the security level is not set, the default level will be used.<BR>
-  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslTlsSecurityLevel|2|UINT8|0x00000004
-
 [UserExtensions.TianoCore."ExtraFiles"]
   CryptoPkgExtra.uni

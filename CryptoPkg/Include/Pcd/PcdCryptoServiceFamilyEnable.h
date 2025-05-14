@@ -327,6 +327,7 @@ typedef struct {
       UINT8    HostPrivateKeyEx   : 1;
       UINT8    SignatureAlgoList  : 1;
       UINT8    EcCurve            : 1;
+      UINT8    SecurityLevel      : 1;
     } Services;
     UINT32    Family;
   } TlsSet;
