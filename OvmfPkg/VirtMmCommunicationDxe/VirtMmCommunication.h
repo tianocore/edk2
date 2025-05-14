@@ -48,3 +48,17 @@ VirtMmHwPioTransfer (
   UINT32   BufferSize,
   BOOLEAN  ToDevice
   );
+
+/* svsm hooks */
+
+BOOLEAN
+EFIAPI
+VirtMmSvsmProbe (
+  VOID
+  );
+
+EFI_STATUS
+EFIAPI
+VirtMmSvsmComm (
+  VOID
+  );
