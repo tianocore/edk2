@@ -22,8 +22,6 @@
 [Includes]
   Include
   Test/Mock/Include
-
-[Includes.Common.Private]
   DeviceSecurity/SpdmLib/Include
   DeviceSecurity/SpdmLib/libspdm/include
 
