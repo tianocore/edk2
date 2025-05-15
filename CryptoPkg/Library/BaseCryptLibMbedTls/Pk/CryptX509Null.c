@@ -459,11 +459,11 @@ X509GetSignatureAlgorithm (
   @param[in, out] ExtensionDataSize Extension bytes size.
 
   @retval TRUE                     The certificate Extension data retrieved successfully.
+  @retval TRUE                     The Certificate Extension is found, but the oid extension is not found.
   @retval FALSE                    If Cert is NULL.
                                    If ExtensionDataSize is NULL.
                                    If ExtensionData is not NULL and *ExtensionDataSize is 0.
                                    If Certificate is invalid.
-  @retval FALSE                    If no Extension entry match Oid.
   @retval FALSE                    If the ExtensionData is NULL. The required buffer size
                                    is returned in the ExtensionDataSize parameter.
   @retval FALSE                    The operation is not supported.
