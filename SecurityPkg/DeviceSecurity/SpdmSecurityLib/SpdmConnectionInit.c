@@ -418,6 +418,14 @@ CreateSpdmDeviceContext (
     goto Error;
   }
 
+  Data8 = SPDM_ALGORITHMS_OPAQUE_DATA_FORMAT_1;
+  SpdmSetData (SpdmContext, SpdmDataOtherParamsSupport, &Parameter, &Data8, sizeof (Data8));
+  if (LIBSPDM_STATUS_IS_ERROR (SpdmReturn)) {
+    DEBUG ((DEBUG_ERROR, "SpdmSetDataOtherParamsSupport - %p\n", SpdmReturn));
+    ASSERT (FALSE);
+    goto Error;
+  }
+
   SpdmReturn = SpdmInitConnection (SpdmContext, FALSE);
   if (LIBSPDM_STATUS_IS_ERROR (SpdmReturn)) {
     DEBUG ((DEBUG_ERROR, "SpdmInitConnection - %p\n", SpdmReturn));

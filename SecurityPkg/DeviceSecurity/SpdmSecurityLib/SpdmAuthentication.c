@@ -565,7 +565,9 @@ DoDeviceCertificate (
       ZeroMem (CertChain, sizeof (CertChain));
       SpdmReturn = SpdmGetCertificateEx (SpdmContext, NULL, SlotId, &CertChainSize, CertChain, (CONST VOID **)&TrustAnchor, &TrustAnchorSize);
       if (LIBSPDM_STATUS_IS_SUCCESS (SpdmReturn)) {
-        *IsValidCertChain = TRUE;
+        SecurityState->AuthenticationState = EDKII_DEVICE_SECURITY_STATE_SUCCESS;
+        *AuthState                         = TCG_DEVICE_SECURITY_EVENT_DATA_DEVICE_AUTH_STATE_SUCCESS;
+        *IsValidCertChain                  = TRUE;
         break;
       } else if (SpdmReturn == LIBSPDM_STATUS_VERIF_FAIL) {
         *IsValidCertChain                  = FALSE;
