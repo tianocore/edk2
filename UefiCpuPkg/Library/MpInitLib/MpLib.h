@@ -213,18 +213,24 @@ typedef struct {
   UINTN              StackStart;
   UINTN              StackSize;
   UINTN              CFunction;
+  //
+  // NumApsExecuting and ApIndex are used atomically (in the
+  // assembly code). To avoid split-locks, keep them naturally aligned
+  // within the first cacheline to avoid kernel/processor detection
+  // mechanisms and bus locks.
+  //
+  UINTN              NumApsExecuting;
+  UINTN              ApIndex;
   IA32_DESCRIPTOR    GdtrProfile;
   IA32_DESCRIPTOR    IdtrProfile;
   UINTN              BufferStart;
   UINTN              ModeOffset;
-  UINTN              ApIndex;
   UINTN              CodeSegment;
   UINTN              DataSegment;
   UINTN              EnableExecuteDisable;
   UINTN              Cr3;
   UINTN              InitFlag;
   CPU_INFO_IN_HOB    *CpuInfo;
-  UINTN              NumApsExecuting;
   CPU_MP_DATA        *CpuMpData;
   UINTN              InitializeFloatingPointUnitsAddress;
   UINT32             ModeTransitionMemory;
