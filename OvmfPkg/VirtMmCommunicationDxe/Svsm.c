@@ -60,6 +60,7 @@ VirtMmSvsmVirtMap (
   VOID
   )
 {
+  DEBUG ((DEBUG_INFO, "%a: going virtual\n", __func__));
   return EFI_SUCCESS;
 }
 
@@ -69,6 +70,7 @@ VirtMmSvsmComm (
   VOID
   )
 {
+  DEBUG ((DEBUG_INFO, "%a: enter\n", __func__));
   ASSERT (AmdSvsmIsSvsmPresent ());
 
   if (!AmdSvsmUefiMmCall (SVSM_UEFI_MM_REQUEST, 0, 0)) {
@@ -76,5 +78,6 @@ VirtMmSvsmComm (
     return EFI_DEVICE_ERROR;
   }
 
+  DEBUG ((DEBUG_INFO, "%a: ok\n", __func__));
   return EFI_SUCCESS;
 }
