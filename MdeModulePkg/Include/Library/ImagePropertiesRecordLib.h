@@ -193,6 +193,25 @@ DumpImageRecords (
   );
 
 /**
+  Return SectionAlignment from PE/COFF image header.
+
+  @param[in]      ImageBase               Base of the PE image
+  @param[in]      ImageSize               Size of the PE image
+  @param[out]     SectionAlignment        SectionAlignment from PE/COFF image header.
+
+  @retval     EFI_INVALID_PARAMETER   The image located at ImageBase was not a valid PE/COFF image
+  @retval     EFI_SUCCESS
+**/
+EFI_STATUS
+EFIAPI
+GetImageSectionAlignment (
+  IN  CONST   VOID    *ImageBase,
+  IN  CONST   UINT64  ImageSize,
+  OUT         UINT32  *SectionAlignment
+  );
+
+
+/**
   Creates an IMAGE_PROPERTIES_RECORD from a loaded PE image. The PE/COFF header will be found
   and parsed to determine the number of code segments and their base addresses and sizes.
 

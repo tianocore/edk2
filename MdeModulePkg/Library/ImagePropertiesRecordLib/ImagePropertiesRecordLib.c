@@ -992,6 +992,54 @@ FindImageRecord (
 }
 
 /**
+  Return SectionAlignment from PE/COFF image header.
+
+  @param[in]      ImageBase               Base of the PE image
+  @param[in]      ImageSize               Size of the PE image
+  @param[out]     SectionAlignment        SectionAlignment from PE/COFF image header.
+
+  @retval     EFI_INVALID_PARAMETER   The image located at ImageBase was not a valid PE/COFF image
+  @retval     EFI_SUCCESS
+**/
+EFI_STATUS
+EFIAPI
+GetImageSectionAlignment (
+  IN  CONST   VOID    *ImageBase,
+  IN  CONST   UINT64  ImageSize,
+  OUT         UINT32  *SectionAlignment
+  )
+{
+  EFI_IMAGE_DOS_HEADER                  *DosHdr;
+  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION   Hdr;
+  UINT32                                PeCoffHeaderOffset;
+
+  if (ImageBase == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Check PE/COFF image
+  DosHdr             = (EFI_IMAGE_DOS_HEADER *)(UINTN)ImageBase;
+  PeCoffHeaderOffset = 0;
+  if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
+    PeCoffHeaderOffset = DosHdr->e_lfanew;
+  }
+
+  Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINT8 *)(UINTN)ImageBase + PeCoffHeaderOffset);
+  if (Hdr.Pe32->Signature != EFI_IMAGE_NT_SIGNATURE) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Get SectionAlignment
+  if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+    *SectionAlignment = Hdr.Pe32->OptionalHeader.SectionAlignment;
+  } else {
+    *SectionAlignment = Hdr.Pe32Plus->OptionalHeader.SectionAlignment;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Creates an IMAGE_PROPERTIES_RECORD from a loaded PE image. The PE/COFF header will be found
   and parsed to determine the number of code segments and their base addresses and sizes.
 

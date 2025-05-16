@@ -433,6 +433,7 @@ ProtectUefiImage (
   UINT32                   ProtectionPolicy;
   EFI_STATUS               Status;
   UINT32                   RequiredAlignment;
+  UINT32                   SectionAlignment;
 
   DEBUG ((DEBUG_INFO, "ProtectUefiImageCommon - 0x%x\n", LoadedImage));
   DEBUG ((DEBUG_INFO, "  - 0x%016lx - 0x%016lx\n", (EFI_PHYSICAL_ADDRESS)(UINTN)LoadedImage->ImageBase, LoadedImage->ImageSize));
@@ -459,6 +460,22 @@ ProtectUefiImage (
 
   RequiredAlignment = GetMemoryProtectionSectionAlignment (LoadedImage->ImageCodeType);
 
+  Status = GetImageSectionAlignment (LoadedImage->ImageBase, LoadedImage->ImageSize, &SectionAlignment);
+
+  if (EFI_ERROR (Status)) {
+    goto ErrorFinish;
+  }
+
+  if ((SectionAlignment & (RequiredAlignment - 1)) != 0) {
+    DEBUG ((
+      DEBUG_INFO,
+      "Image Section Alignment(0x%x) does not match Required Alignment (0x%x), skipping protection\n",
+      SectionAlignment,
+      RequiredAlignment
+      ));
+    goto ErrorFinish;
+  }
+
   Status = CreateImagePropertiesRecord (
              LoadedImage->ImageBase,
              LoadedImage->ImageSize,
@@ -467,22 +484,7 @@ ProtectUefiImage (
              );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a failed to create image properties record\n", __func__));
-
-    // if we failed to create the image properties record, this may mean that the image is not aligned properly
-    // the GCD will believe that this memory is non-executable, because the NX initialization routine doesn't know what
-    // memory is image memory or not, even though the page table has the correct attributes, so we need to set the
-    // attributes here to RWX so that future updates to the GCD do not apply the NX attributes to this memory in the
-    // page table (as can happen when applying virtual attributes). This may have the side effect of marking other
-    // memory as RWX, since this image may not be page aligned, but that is safe to do, it may just remove some
-    // page protections, but it already has to to execute this image.
-    SetUefiImageMemoryAttributes (
-      (UINT64)(UINTN)LoadedImage->ImageBase & ~EFI_PAGE_MASK,
-      (LoadedImage->ImageSize + EFI_PAGE_MASK) & ~EFI_PAGE_MASK,
-      0
-      );
-    FreePool (ImageRecord);
-    goto Finish;
+    goto ErrorFinish;
   }
 
   //
@@ -495,7 +497,24 @@ ProtectUefiImage (
   //
   InsertTailList (&mProtectedImageRecordList, &ImageRecord->Link);
 
-Finish:
+  return;
+
+ErrorFinish:
+  DEBUG ((DEBUG_ERROR, "%a failed to create image properties record\n", __func__));
+
+  // if we failed to create the image properties record, this may mean that the image is not aligned properly
+  // the GCD will believe that this memory is non-executable, because the NX initialization routine doesn't know what
+  // memory is image memory or not, even though the page table has the correct attributes, so we need to set the
+  // attributes here to RWX so that future updates to the GCD do not apply the NX attributes to this memory in the
+  // page table (as can happen when applying virtual attributes). This may have the side effect of marking other
+  // memory as RWX, since this image may not be page aligned, but that is safe to do, it may just remove some
+  // page protections, but it already has to to execute this image.
+  SetUefiImageMemoryAttributes (
+    (UINT64)(UINTN)LoadedImage->ImageBase & ~EFI_PAGE_MASK,
+    (LoadedImage->ImageSize + EFI_PAGE_MASK) & ~EFI_PAGE_MASK,
+    0
+    );
+  FreePool (ImageRecord);
   return;
 }
 
