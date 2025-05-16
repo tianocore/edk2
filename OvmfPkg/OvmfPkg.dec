@@ -156,6 +156,10 @@
   #
   CpuMmuInitLib|Include/Library/CpuMmuInitLib.h
 
+  ##  @libraryclass  MemDebugLogLib
+  #
+  MemDebugLogLib|Include/Library/MemDebugLogLib.h
+
 [Guids]
   gUefiOvmfPkgTokenSpaceGuid            = {0x93bb96af, 0xb9f2, 0x4eb8, {0x94, 0x62, 0xe0, 0xba, 0x74, 0x56, 0x42, 0x36}}
   gEfiXenInfoGuid                       = {0xd3b46f3b, 0xd441, 0x1244, {0x9a, 0x12, 0x0, 0x12, 0x27, 0x3f, 0xc1, 0x4d}}
@@ -179,6 +183,7 @@
   gQemuFirmwareResourceHobGuid          = {0x3cc47b04, 0x0d3e, 0xaa64, {0x06, 0xa6, 0x4b, 0xdc, 0x9a, 0x2c, 0x61, 0x19}}
   gRtcRegisterBaseAddressHobGuid        = {0x40435d97, 0xeb37, 0x4a4b, {0x7f, 0xad, 0xb7, 0xed, 0x72, 0xa1, 0x43, 0xc5}}
   gOvmfFwCfgInfoHobGuid                 = {0xa291ce0e, 0xdc09, 0x11ee, {0x9e, 0xdb, 0x73, 0x49, 0xd7, 0x92, 0xaf, 0x51}}
+  gMemDebugLogHobGuid                   = {0x95305139, 0xb20f, 0x4723, {0x84, 0x25, 0x62, 0x7c, 0x88, 0x8f, 0xf1, 0x21}}
 
 [Ppis]
   # PPI whose presence in the PPI database signals that the TPM base address
@@ -362,6 +367,19 @@
   ## The base address and size of the initial SVSM Calling Area.
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecSvsmCaaBase|0|UINT32|0x70
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecSvsmCaaSize|0|UINT32|0x71
+
+  ## The base address and size of the early memory debug log used in SEC
+  #  and early PEI phases - i.e. prior to memory being initialized.
+  #  If this is set in the .fdf, the platform is responsible to
+  #  reserve this area from DXE phase overwrites.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogBase|0|UINT32|0x7a
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogSize|0|UINT32|0x7b
+
+  ##
+  # Default size of the memory DEBUG log buffer (in pages).
+  # The buffer is circular. So, if size is exceeded, older
+  # messages will be overwritten by more recent messages.
+  gUefiOvmfPkgTokenSpaceGuid.PcdMemDebugLogPages|32|UINT32|0x7c
 
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
