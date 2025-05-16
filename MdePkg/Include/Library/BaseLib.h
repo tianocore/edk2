@@ -4715,6 +4715,52 @@ BitFieldCountOnes64 (
   IN       UINTN   EndBit
   );
 
+/**
+  Convert GUID to RFC4122 UUID format.
+
+  For example, If there is GUID named
+  "378daedc-f06b-4446-8314-40ab933c87a3",
+
+  GUID is saved in memory like:
+     dc ae 8d 37
+     6b f0 46 44
+     83 14 40 ab
+     93 3c 87 a3
+
+  However, UUID should be saved like:
+     37 8d ae dc
+     f0 6b 44 46
+     83 14 40 ab
+     93 3c 87 a3
+
+  Other software components (i.e. linux-kernel) uses RFC4122 UUID format.
+
+  @param [in] Guid            GUID
+  @param [out] Uuid           Uuid
+
+**/
+VOID
+EFIAPI
+ConvertGuidToUuid (
+  IN   GUID    *Guid,
+  OUT  UINT64  *Uuid
+  );
+
+/**
+  Convert UUID to GUID to RFC4122 UUID format, which is the inverse of
+  ConvertEfiGuidToUuid.
+
+  @param [in] Uuid            Uuid
+  @param [out] Guid           GUID
+
+**/
+VOID
+EFIAPI
+ConvertUuidToGuid (
+  IN   UINT64  *Uuid,
+  OUT  GUID    *Guid
+  );
+
 //
 // Base Library Checksum Functions
 //
