@@ -562,6 +562,10 @@ FvSimpleFileSystemOpen (
       // NewFileNameLength = FileNameLength + 1 + 4 = (Number of non-null character) + (file extension) + (a null character)
       NewFileNameLength     = FileNameLength + 1 + 4;
       FileNameWithExtension = AllocatePool (NewFileNameLength * 2);
+      if (FileNameWithExtension == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+
       StrCpyS (FileNameWithExtension, NewFileNameLength, FileName);
       StrCatS (FileNameWithExtension, NewFileNameLength, L".EFI");
 
