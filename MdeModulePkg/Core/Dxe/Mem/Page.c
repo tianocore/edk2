@@ -1629,11 +1629,94 @@ CoreAllocatePages (
 }
 
 /**
+  Finds the entry that covers the range of memory that is attempting to be freed
+  The entry is used to determine the alignment and memory type of the memory.
+  This function expects to be called with the memory lock held.
+
+  @param[in]    Memory        The base address of the memory
+  @param[inout] NumberOfPages On in, the number of pages to free from the caller, on out the aligned number of pages
+                              to free
+  @param[out]   IsGuarded     A pointer to a boolean that on successful return indicates if the memory is guarded
+  @param[out]   Alignment     A pointer to a UINTN that on successful return indicates the alignment of the memory
+  @param[out]   MemoryType    A pointer to a EFI_MEMORY_TYPE that on successful return indicates the entry's memory
+                              type
+
+  @retval EFI_INVALID_PARAMETER  Invalid parameter
+  @retval EFI_NOT_FOUND          Could not find the entry that covers the range
+  @retval EFI_SUCCESS            Successfully found the entry that covers the range
+
+**/
+EFI_STATUS
+STATIC
+CoreFindEntryToFree (
+  IN EFI_PHYSICAL_ADDRESS  Memory,
+  IN OUT UINTN             *NumberOfPages,
+  OUT BOOLEAN              *IsGuarded,
+  OUT UINTN                *Alignment,
+  OUT EFI_MEMORY_TYPE      *MemoryType
+  )
+{
+  LIST_ENTRY  *Link;
+  MEMORY_MAP  *Entry;
+
+  if ((NumberOfPages == NULL) || (IsGuarded == NULL) || (Alignment == NULL) || (MemoryType == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Find the entry that the covers the range
+  //
+  Entry = NULL;
+  for (Link = gMemoryMap.ForwardLink; Link != &gMemoryMap; Link = Link->ForwardLink) {
+    Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
+    if ((Entry->Start <= Memory) && (Entry->End > Memory)) {
+      break;
+    }
+  }
+
+  if (Link == &gMemoryMap) {
+    return EFI_NOT_FOUND;
+  }
+
+  if (Entry == NULL) {
+    ASSERT (Entry != NULL);
+    return EFI_NOT_FOUND;
+  }
+
+  *Alignment = DEFAULT_PAGE_ALLOCATION_GRANULARITY;
+
+  if ((Entry->Type == EfiReservedMemoryType) ||
+      (Entry->Type == EfiACPIMemoryNVS) ||
+      (Entry->Type == EfiRuntimeServicesCode) ||
+      (Entry->Type == EfiRuntimeServicesData))
+  {
+    *Alignment = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
+  }
+
+  if ((Memory & (*Alignment - 1)) != 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *NumberOfPages += EFI_SIZE_TO_PAGES (*Alignment) - 1;
+  *NumberOfPages &= ~(EFI_SIZE_TO_PAGES (*Alignment) - 1);
+
+  if (MemoryType != NULL) {
+    *MemoryType = Entry->Type;
+  }
+
+  *IsGuarded = IsPageTypeToGuard (Entry->Type, AllocateAnyPages) &&
+               IsMemoryGuarded (Memory);
+
+  return EFI_SUCCESS;
+}
+
+/**
   Frees previous allocated pages.
 
   @param  Memory                 Base address of memory being freed
   @param  NumberOfPages          The number of pages to free
-  @param  MemoryType             Pointer to memory type
+  @param  MemoryType             The memory type of the pages to free
+  @param  IsGuarded              Flag to indicate whether this region is guarded or not
 
   @retval EFI_NOT_FOUND          Could not find the entry that covers the range
   @retval EFI_INVALID_PARAMETER  Address not aligned
@@ -1645,67 +1728,17 @@ EFIAPI
 CoreInternalFreePages (
   IN EFI_PHYSICAL_ADDRESS  Memory,
   IN UINTN                 NumberOfPages,
-  OUT EFI_MEMORY_TYPE      *MemoryType OPTIONAL
+  IN EFI_MEMORY_TYPE       MemoryType,
+  IN BOOLEAN               IsGuarded
   )
 {
   EFI_STATUS  Status;
-  LIST_ENTRY  *Link;
-  MEMORY_MAP  *Entry;
-  UINTN       Alignment;
-  BOOLEAN     IsGuarded;
 
   //
   // Free the range
   //
   CoreAcquireMemoryLock ();
 
-  //
-  // Find the entry that the covers the range
-  //
-  IsGuarded = FALSE;
-  Entry     = NULL;
-  for (Link = gMemoryMap.ForwardLink; Link != &gMemoryMap; Link = Link->ForwardLink) {
-    Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
-    if ((Entry->Start <= Memory) && (Entry->End > Memory)) {
-      break;
-    }
-  }
-
-  if (Link == &gMemoryMap) {
-    Status = EFI_NOT_FOUND;
-    goto Done;
-  }
-
-  if (Entry == NULL) {
-    ASSERT (Entry != NULL);
-    Status = EFI_NOT_FOUND;
-    goto Done;
-  }
-
-  Alignment = DEFAULT_PAGE_ALLOCATION_GRANULARITY;
-
-  if ((Entry->Type == EfiReservedMemoryType) ||
-      (Entry->Type == EfiACPIMemoryNVS) ||
-      (Entry->Type == EfiRuntimeServicesCode) ||
-      (Entry->Type == EfiRuntimeServicesData))
-  {
-    Alignment = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
-  }
-
-  if ((Memory & (Alignment - 1)) != 0) {
-    Status = EFI_INVALID_PARAMETER;
-    goto Done;
-  }
-
-  NumberOfPages += EFI_SIZE_TO_PAGES (Alignment) - 1;
-  NumberOfPages &= ~(EFI_SIZE_TO_PAGES (Alignment) - 1);
-
-  if (MemoryType != NULL) {
-    *MemoryType = Entry->Type;
-  }
-
-  IsGuarded = IsPageTypeToGuard (Entry->Type, AllocateAnyPages) &&
-              IsMemoryGuarded (Memory);
   if (IsGuarded) {
     Status = CoreConvertPagesWithGuard (
                Memory,
@@ -1716,33 +1749,7 @@ CoreInternalFreePages (
     Status = CoreConvertPages (Memory, NumberOfPages, EfiConventionalMemory);
   }
 
-Done:
   CoreReleaseMemoryLock ();
-  return Status;
-}
-
-/**
-  Frees previous allocated pages.
-
-  @param  Memory                 Base address of memory being freed
-  @param  NumberOfPages          The number of pages to free
-
-  @retval EFI_NOT_FOUND          Could not find the entry that covers the range
-  @retval EFI_INVALID_PARAMETER  Address not aligned
-  @return EFI_SUCCESS         -Pages successfully freed.
-
-**/
-EFI_STATUS
-EFIAPI
-CoreFreePages (
-  IN EFI_PHYSICAL_ADDRESS  Memory,
-  IN UINTN                 NumberOfPages
-  )
-{
-  EFI_STATUS       Status;
-  EFI_MEMORY_TYPE  MemoryType;
-
-  Status = CoreInternalFreePages (Memory, NumberOfPages, &MemoryType);
   if (!EFI_ERROR (Status)) {
     GuardFreedPagesChecked (Memory, NumberOfPages);
     CoreUpdateProfile (
@@ -1763,6 +1770,157 @@ CoreFreePages (
   }
 
   return Status;
+}
+
+/**
+  Frees previous allocated pages.
+
+  @param  Memory                 Base address of memory being freed
+  @param  NumberOfPages          The number of pages to free
+
+  @retval EFI_NOT_FOUND          Could not find the entry that covers the range
+  @retval EFI_INVALID_PARAMETER  Address not aligned or NumberOfPages is 0
+  @return EFI_SUCCESS            Pages successfully freed.
+
+**/
+EFI_STATUS
+EFIAPI
+CoreFreePages (
+  IN EFI_PHYSICAL_ADDRESS  Memory,
+  IN UINTN                 NumberOfPages
+  )
+{
+  EFI_STATUS                       Status;
+  EFI_MEMORY_TYPE                  MemoryType;
+  UINTN                            Alignment;
+  BOOLEAN                          IsGuarded;
+  UINTN                            NumberOfPagesAligned;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  Descriptor;
+  UINT64                           CurrentAddress;
+  UINT64                           EndAddress;
+  UINT64                           DescEnd;
+  UINT64                           CurrentLength;
+  EFI_STATUS                       OperationStatus;
+
+  NumberOfPagesAligned = NumberOfPages;
+  OperationStatus      = EFI_SUCCESS;
+
+  if (NumberOfPages == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CoreAcquireMemoryLock ();
+  Status = CoreFindEntryToFree (
+             Memory,
+             &NumberOfPagesAligned,
+             &IsGuarded,
+             &Alignment,
+             &MemoryType
+             );
+
+  // now we drop the lock to avoid deadlocks when debug clearing memory, this is safe to do because even if an
+  // interrupt came in and changed the memory map, it would be a bug if it was for this region (since it is being
+  // freed) and the only reason we took the lock now was to parse the list, which we are done with for now)
+  CoreReleaseMemoryLock ();
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // The free pages code will attempt to zero the freed pages if DebugClearMemory is enabled. However, there is no
+  // guarantee that the memory is writeable, which can cause the core to crash. Furthermore, if DebugClearMemory is
+  // not enabled and NX memory protection is not enabled, we can end up passing pages freed here directly to another
+  // caller in the next allocate pages call, which may not be writeable, which is the expection. So, we need to ensure
+  // the memory is writeable before we attempt to zero it or pass it out. We must do this outside of the memory lock to
+  // avoid deadlocks going through the GCD, which may cause page allocations to occur. It is safe to call the GCD from
+  // here, because the GCD only uses pool backed memory and CoreFreePoolPages() does not call through this path, so we
+  // won't hit a deadlock on the GCD lock. We don't attempt to call this before gCpu is initialized, because before
+  // that point, page attributes can't be set anyway and we may be very early in GCD init and not have the GCD
+  // populated yet.
+  if (gCpu == NULL) {
+    return CoreInternalFreePages (Memory, NumberOfPagesAligned, MemoryType, IsGuarded);
+  }
+
+  CurrentAddress = Memory;
+  EndAddress     = Memory + EFI_PAGES_TO_SIZE (NumberOfPagesAligned);
+  while (CurrentAddress < EndAddress) {
+    Status = CoreGetMemorySpaceDescriptor (
+               CurrentAddress,
+               &Descriptor
+               );
+
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: failed to get memory space descriptor for %llx with %llx pages\n",
+        __func__,
+        Memory,
+        NumberOfPages
+        ));
+      OperationStatus = Status;
+      ASSERT_EFI_ERROR (Status);
+
+      // if we can't get the descriptor, we don't know what base address to try next, so all we can do is try one
+      // page forward
+      CurrentAddress += EFI_PAGE_SIZE;
+      continue;
+    }
+
+    DescEnd = Descriptor.BaseAddress + Descriptor.Length;
+    // ensure that we only change the attributes for the range that we are interested in, not the entire descriptor,
+    // we may also be in the middle of a descriptor, so ensure our length is not larger than the descriptor length
+    if (EndAddress > DescEnd) {
+      CurrentLength = DescEnd - CurrentAddress;
+    } else {
+      CurrentLength = EndAddress - CurrentAddress;
+    }
+
+    // we always set the attributes here, don't check the descriptor attributes, because they may be out of sync
+    // if the attributes were changed with the CPU arch protocol or the memory attribute protocol
+    Status = CoreSetMemorySpaceAttributes (
+               CurrentAddress,
+               CurrentLength,
+               (Descriptor.Attributes & (~(EFI_MEMORY_RO | EFI_MEMORY_RP)))
+               );
+
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: failed to set memory attributes for %llx with %llx pages\n",
+        __func__,
+        Memory,
+        NumberOfPages
+        ));
+      OperationStatus = Status;
+      ASSERT_EFI_ERROR (Status);
+
+      // we can't free this range, so we skip it and move to the next descriptor
+      CurrentAddress += CurrentLength;
+      continue;
+    }
+
+    Status = CoreInternalFreePages (CurrentAddress, EFI_SIZE_TO_PAGES ((UINTN)CurrentLength), MemoryType, IsGuarded);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: failed to free memory for %llx with %llx pages\n",
+        __func__,
+        Memory,
+        NumberOfPages
+        ));
+      OperationStatus = Status;
+      ASSERT_EFI_ERROR (Status);
+
+      // we can't free this range, so we skip it and move to the next descriptor
+      CurrentAddress += CurrentLength;
+      continue;
+    }
+
+    // we may have started in the middle of a descriptor, so we need to move to the beginning of the next descriptor,
+    // or the end of the range, whichever is smaller
+    CurrentAddress += CurrentLength;
+  }
+
+  return OperationStatus;
 }
 
 /**
