@@ -1,6 +1,7 @@
 /** @file MockSmmServicesTableLib.h
   Google Test mocks for SmmServicesTableLib
 
+  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
   Copyright (c) Microsoft Corporation.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
