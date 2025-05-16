@@ -70,4 +70,10 @@ VirtMmSvsmComm (
   VOID
   );
 
+EFI_STATUS
+EFIAPI
+VirtMmSvsmVirtMap (
+  VOID
+  );
+
 #endif /* _VIRT_MM_COMM_DXE_H_ */

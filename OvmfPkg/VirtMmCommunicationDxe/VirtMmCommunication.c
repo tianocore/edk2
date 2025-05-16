@@ -231,16 +231,20 @@ VirtMmNotifySetVirtualAddressMap (
       ));
   }
 
-  if (!mHaveSvsmProtocol) {
+  if (mHaveSvsmProtocol) {
+    Status = VirtMmSvsmVirtMap ();
+  } else {
     Status = VirtMmHwVirtMap ();
-    if (EFI_ERROR (Status)) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "%a: VirtMmHwVirtMap failed. Status: %r\n",
-        __func__,
-        Status
-        ));
-    }
+  }
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: VirtMm%aVirtMap failed. Status: %r\n",
+      __func__,
+      mHaveSvsmProtocol ? "Svsm" : "Hw",
+      Status
+      ));
   }
 }
 

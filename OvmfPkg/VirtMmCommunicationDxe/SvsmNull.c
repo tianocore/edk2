@@ -26,6 +26,15 @@ VirtMmSvsmInit (
 
 EFI_STATUS
 EFIAPI
+VirtMmSvsmVirtMap (
+  VOID
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+EFI_STATUS
+EFIAPI
 VirtMmSvsmComm (
   VOID
   )

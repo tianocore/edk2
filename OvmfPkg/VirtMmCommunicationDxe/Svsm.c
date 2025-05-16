@@ -56,6 +56,15 @@ VirtMmSvsmInit (
 
 EFI_STATUS
 EFIAPI
+VirtMmSvsmVirtMap (
+  VOID
+  )
+{
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+EFIAPI
 VirtMmSvsmComm (
   VOID
   )
