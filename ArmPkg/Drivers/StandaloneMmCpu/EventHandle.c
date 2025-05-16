@@ -39,7 +39,8 @@ MmFoundationEntryRegister (
 // maintained in single global variable because StandaloneMm is UP-migratable
 // (which means it cannot run concurrently)
 //
-EFI_MM_COMMUNICATE_HEADER  *gGuidedEventContext = NULL;
+EFI_MM_COMMUNICATE_HEADER     *gGuidedEventContext   = NULL;
+EFI_MM_COMMUNICATE_HEADER_V3  *gGuidedEventContextV3 = NULL;
 
 EFI_MM_CONFIGURATION_PROTOCOL  mMmConfig = {
   0,
@@ -89,8 +90,19 @@ PiMmStandaloneMmCpuDriverEntry (
   }
 
   // Find out the size of the buffer passed
-  CommBufferSize = ((EFI_MM_COMMUNICATE_HEADER *)CommBufferAddr)->MessageLength +
-                   sizeof (EFI_MM_COMMUNICATE_HEADER);
+  if (CompareGuid (
+        &((EFI_MM_COMMUNICATE_HEADER *)CommBufferAddr)->HeaderGuid,
+        &gEfiMmCommunicateHeaderV3Guid
+        ))
+  {
+    // This is a v3 header
+    CommBufferSize = ((EFI_MM_COMMUNICATE_HEADER_V3 *)CommBufferAddr)->BufferSize;
+  } else {
+    // This is a v1 header
+    // Find out the size of the buffer passed
+    CommBufferSize = ((EFI_MM_COMMUNICATE_HEADER *)CommBufferAddr)->MessageLength +
+                     OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+  }
 
   // Now that the secure world can see the normal world buffer, allocate
   // memory to copy the communication buffer to the secure world.
@@ -188,19 +200,41 @@ PiMmCpuTpFwRootMmiHandler (
     return EFI_NOT_FOUND;
   }
 
-  DEBUG ((
-    DEBUG_INFO,
-    "CommBuffer - 0x%x, CommBufferSize - 0x%x\n",
-    gGuidedEventContext,
-    gGuidedEventContext->MessageLength
-    ));
+  if (CompareGuid (
+        &gGuidedEventContext->HeaderGuid,
+        &gEfiMmCommunicateHeaderV3Guid
+        ))
+  {
+    gGuidedEventContextV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)gGuidedEventContext;
+    DEBUG ((
+      DEBUG_INFO,
+      "CommBuffer - 0x%x, CommBufferSize - 0x%llx, MessageSize - 0x%llx\n",
+      gGuidedEventContextV3,
+      gGuidedEventContextV3->BufferSize,
+      gGuidedEventContextV3->MessageSize
+      ));
 
-  Status = mMmst->MmiManage (
-                    &gGuidedEventContext->HeaderGuid,
-                    NULL,
-                    gGuidedEventContext->Data,
-                    &gGuidedEventContext->MessageLength
-                    );
+    Status = mMmst->MmiManage (
+                      &gGuidedEventContextV3->MessageGuid,
+                      NULL,
+                      gGuidedEventContextV3->MessageData,
+                      (UINTN *)(&gGuidedEventContextV3->MessageSize) // MU_CHANGE: BZ3398 Make MessageLength the same size in EFI_MM_COMMUNICATE_HEADER for both 32 and 64
+                      );
+  } else {
+    DEBUG ((
+      DEBUG_INFO,
+      "CommBuffer - 0x%x, CommBufferSize - 0x%x\n",
+      gGuidedEventContext,
+      gGuidedEventContext->MessageLength
+      ));
+
+    Status = mMmst->MmiManage (
+                      &gGuidedEventContext->HeaderGuid,
+                      NULL,
+                      gGuidedEventContext->Data,
+                      (UINTN *)(&gGuidedEventContext->MessageLength) // MU_CHANGE: BZ3398 Make MessageLength the same size in EFI_MM_COMMUNICATE_HEADER for both 32 and 64
+                      );
+  }
 
   if (Status != EFI_SUCCESS) {
     DEBUG ((DEBUG_WARN, "Unable to manage Guided Event - %d\n", Status));

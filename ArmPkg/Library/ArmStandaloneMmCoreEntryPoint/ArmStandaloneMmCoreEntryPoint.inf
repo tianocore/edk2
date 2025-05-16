@@ -58,6 +58,7 @@
 [Protocols]
   gEdkiiPiMmCpuDriverEpProtocolGuid
   gEfiMmCommunication2ProtocolGuid
+  gEfiMmCommunication3ProtocolGuid
 
 [Pcd]
   gArmTokenSpaceGuid.PcdStMmStackSize

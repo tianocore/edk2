@@ -66,6 +66,7 @@
   gEfiVariableWriteArchProtocolGuid             ## PRODUCES
   gEfiVariableArchProtocolGuid                  ## PRODUCES
   gEfiMmCommunication2ProtocolGuid              ## CONSUMES
+  gEfiMmCommunication3ProtocolGuid              ## CONSUMES
   ## CONSUMES
   ## NOTIFY
   ## UNDEFINED # Used to do smm communication
@@ -113,6 +114,7 @@
   gEfiEndOfDxeEventGroupGuid
   gEfiDeviceSignatureDatabaseGuid
   gEdkiiVariableRuntimeCacheInfoHobGuid
+  gEfiMmCommunicateHeaderV3Guid
 
 [Depex]
   gEfiMmCommunication2ProtocolGuid
