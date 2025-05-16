@@ -208,9 +208,6 @@ class InfParserSectionRoot(object):
         self.InfPpiSection              = None
         self.InfGuidSection             = None
         self.InfDepexSection            = None
-        self.InfPeiDepexSection         = None
-        self.InfDxeDepexSection         = None
-        self.InfSmmDepexSection         = None
         self.InfBinariesSection         = None
         self.InfHeader                  = None
         self.InfSpecialCommentSection   = None

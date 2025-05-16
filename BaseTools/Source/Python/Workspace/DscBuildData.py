@@ -447,16 +447,6 @@ class DscBuildData(PlatformBuildClassObject):
                 EdkLogger.error('build', ATTRIBUTE_NOT_AVAILABLE, "No PLATFORM_VERSION", File=self.MetaFile)
         return self._Version
 
-    ## Retrieve platform description file version
-    @property
-    def DscSpecification(self):
-        if self._DscSpecification is None:
-            if self._Header is None:
-                self._GetHeaderInfo()
-            if self._DscSpecification is None:
-                EdkLogger.error('build', ATTRIBUTE_NOT_AVAILABLE, "No DSC_SPECIFICATION", File=self.MetaFile)
-        return self._DscSpecification
-
     ## Retrieve OUTPUT_DIRECTORY
     @property
     def OutputDirectory(self):
@@ -1250,27 +1240,6 @@ class DscBuildData(PlatformBuildClassObject):
                         if ' ' + Option not in self._BuildOptions[CurKey]:
                             self._BuildOptions[CurKey] += ' ' + Option
         return self._BuildOptions
-    def GetBuildOptionsByPkg(self, Module, ModuleType):
-
-        local_pkg = os.path.split(Module.LocalPkg())[0]
-        if self._ModuleTypeOptions is None:
-            self._ModuleTypeOptions = OrderedDict()
-        if ModuleType not in self._ModuleTypeOptions:
-            options = OrderedDict()
-            self._ModuleTypeOptions[ ModuleType] = options
-            RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, self._Arch]
-            for ToolChainFamily, ToolChain, Option, Dummy1, Dummy2, Dummy3, Dummy4, Dummy5 in RecordList:
-                if Dummy2 not in (TAB_COMMON,local_pkg.upper(),"EDKII"):
-                    continue
-                Type = Dummy3
-                if Type.upper() == ModuleType.upper():
-                    Key = (ToolChainFamily, ToolChain)
-                    if Key not in options or not ToolChain.endswith('_FLAGS') or Option.startswith('='):
-                        options[Key] = Option
-                    else:
-                        if ' ' + Option not in options[Key]:
-                            options[Key] += ' ' + Option
-        return self._ModuleTypeOptions[ModuleType]
     def GetBuildOptionsByModuleType(self, Edk, ModuleType):
         if self._ModuleTypeOptions is None:
             self._ModuleTypeOptions = OrderedDict()
@@ -2061,13 +2030,6 @@ class DscBuildData(PlatformBuildClassObject):
             indicator += "->" + FieldName
         return indicator
 
-    def GetStarNum(self,Pcd):
-        if not Pcd.IsArray():
-            return 1
-        elif Pcd.IsSimpleTypeArray():
-            return len(Pcd.Capacity)
-        else:
-            return len(Pcd.Capacity) + 1
     def GenerateDefaultValueAssignFunction(self, Pcd):
         CApp = "// Default value in Dec \n"
         CApp = CApp + "void Assign_%s_%s_Default_Value(%s *Pcd){\n" % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, Pcd.BaseDatumType)
@@ -3603,20 +3565,6 @@ class DscBuildData(PlatformBuildClassObject):
         list(map(self.FilterSkuSettings, Pcds.values()))
         return Pcds
 
-    ## Add external modules
-    #
-    #   The external modules are mostly those listed in FDF file, which don't
-    # need "build".
-    #
-    #   @param  FilePath    The path of module description file
-    #
-    def AddModule(self, FilePath):
-        FilePath = NormPath(FilePath)
-        if FilePath not in self.Modules:
-            Module = ModuleBuildClassObject()
-            Module.MetaFile = FilePath
-            self.Modules.append(Module)
-
     @property
     def ToolChainFamily(self):
         self._ToolChainFamily = TAB_COMPILER_MSFT
@@ -3637,20 +3585,6 @@ class DscBuildData(PlatformBuildClassObject):
                 else:
                     self._ToolChainFamily = ToolDefinition[TAB_TOD_DEFINES_FAMILY][self._Toolchain]
         return self._ToolChainFamily
-
-    ## Add external PCDs
-    #
-    #   The external PCDs are mostly those listed in FDF file to specify address
-    # or offset information.
-    #
-    #   @param  Name    Name of the PCD
-    #   @param  Guid    Token space guid of the PCD
-    #   @param  Value   Value of the PCD
-    #
-    def AddPcd(self, Name, Guid, Value):
-        if (Name, Guid) not in self.Pcds:
-            self.Pcds[Name, Guid] = PcdClassObject(Name, Guid, '', '', '', '', '', {}, False, None)
-        self.Pcds[Name, Guid].DefaultValue = Value
 
     @property
     def DecPcds(self):
