@@ -194,4 +194,9 @@ SetPcdFlashNvStorageBaseAddresses (
   VOID
   );
 
+VOID
+UpdateQemuFlashVariablesEnable (
+  VOID
+  );
+
 #endif
