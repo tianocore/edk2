@@ -8,6 +8,7 @@
 
   Copyright (c) 2018-2019, NVIDIA CORPORATION. All rights reserved.
   Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (C) 2023, Apple Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -59,6 +60,7 @@ DumpCapabilityReg (
   DEBUG ((DEBUG_INFO, "   SDR50  Support    %a\n", Capability->Sdr50 ? "TRUE" : "FALSE"));
   DEBUG ((DEBUG_INFO, "   SDR104 Support    %a\n", Capability->Sdr104 ? "TRUE" : "FALSE"));
   DEBUG ((DEBUG_INFO, "   DDR50  Support    %a\n", Capability->Ddr50 ? "TRUE" : "FALSE"));
+  DEBUG ((DEBUG_INFO, "   UHS-II Support    %a\n", Capability->UhsII ? "TRUE" : "FALSE"));
   DEBUG ((DEBUG_INFO, "   Driver Type A     %a\n", Capability->DriverTypeA ? "TRUE" : "FALSE"));
   DEBUG ((DEBUG_INFO, "   Driver Type C     %a\n", Capability->DriverTypeC ? "TRUE" : "FALSE"));
   DEBUG ((DEBUG_INFO, "   Driver Type D     %a\n", Capability->DriverTypeD ? "TRUE" : "FALSE"));
@@ -72,6 +74,8 @@ DumpCapabilityReg (
   DEBUG ((DEBUG_INFO, "   SDR50 Tuning      %a\n", Capability->TuningSDR50 ? "TRUE" : "FALSE"));
   DEBUG ((DEBUG_INFO, "   Retuning Mode     Mode %d\n", Capability->RetuningMod + 1));
   DEBUG ((DEBUG_INFO, "   Clock Multiplier  M = %d\n", Capability->ClkMultiplier + 1));
+  DEBUG ((DEBUG_INFO, "   ADMA3 Support     %a\n", Capability->Adma3 ? "TRUE" : "FALSE"));
+  DEBUG ((DEBUG_INFO, "   1.8V VDD2         %a\n", Capability->Vdd2Voltage18 ? "TRUE" : "FALSE"));
   DEBUG ((DEBUG_INFO, "   HS 400            %a\n", Capability->Hs400 ? "TRUE" : "FALSE"));
   return;
 }
