@@ -913,7 +913,7 @@ FindVariableEx (
     }
   }
 
-  if (MaxIndex != NULL) {
+  if ((MaxIndex != NULL) && (VariableHeader != NULL)) {
     //
     // HOB exists but the variable cannot be found in HOB
     // If not found in HOB, then let's start from the MaxIndex we've found.
@@ -1164,7 +1164,7 @@ PeiGetNextVariableName (
   VariableHeader = NULL;
 
   Status = FindVariable (VariableName, VariableGuid, &Variable, &StoreInfo);
-  if ((Variable.CurrPtr == NULL) || (Status != EFI_SUCCESS)) {
+  if ((Status != EFI_SUCCESS) || (Variable.CurrPtr == NULL)) {
     return Status;
   }
 
