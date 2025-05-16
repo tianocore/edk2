@@ -4,7 +4,7 @@
 
   (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2022, AMD Incorporated. All rights reserved.
-  Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2023-2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
   Copyright (c) 2023, Ampere Computing LLC. All rights reserved.<BR>
   Copyright (c) 2023, Mike Maslenkin <mike.maslenkin@gmail.com> <BR>
 
@@ -159,53 +159,19 @@ Tcp4GetSubnetInfo (
   IN EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL  *Instance
   )
 {
-  EFI_STATUS            Status;
-  EFI_TCP4_PROTOCOL     *Tcp4;
-  EFI_TCP4_CONFIG_DATA  Tcp4CfgData;
-  EFI_TCP4_OPTION       Tcp4Option;
-  EFI_IP4_MODE_DATA     IpModedata;
-  UINT8                 SubnetMaskIndex;
-  UINT8                 BitMask;
-  UINT8                 PrefixLength;
-  BOOLEAN               GotPrefixLength;
+  EFI_STATUS         Status;
+  EFI_TCP4_PROTOCOL  *Tcp4;
+  EFI_IP4_MODE_DATA  IpModedata;
+  UINT8              SubnetMaskIndex;
+  UINT8              BitMask;
+  UINT8              PrefixLength;
+  BOOLEAN            GotPrefixLength;
 
   if (Instance == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   Tcp4 = (EFI_TCP4_PROTOCOL *)Instance->NetworkInterfaceProtocolInfo.NetworkProtocolInterface;
-
-  ZeroMem ((VOID *)&Tcp4CfgData, sizeof (EFI_TCP4_CONFIG_DATA));
-  ZeroMem ((VOID *)&Tcp4Option, sizeof (EFI_TCP4_OPTION));
-  // Give a local host IP address just for getting subnet information.
-  Tcp4CfgData.AccessPoint.UseDefaultAddress     = TRUE;
-  Tcp4CfgData.AccessPoint.RemoteAddress.Addr[0] = 127;
-  Tcp4CfgData.AccessPoint.RemoteAddress.Addr[1] = 0;
-  Tcp4CfgData.AccessPoint.RemoteAddress.Addr[2] = 0;
-  Tcp4CfgData.AccessPoint.RemoteAddress.Addr[3] = 1;
-  Tcp4CfgData.AccessPoint.RemotePort            = 80;
-  Tcp4CfgData.AccessPoint.ActiveFlag            = TRUE;
-
-  Tcp4CfgData.ControlOption    = &Tcp4Option;
-  Tcp4Option.ReceiveBufferSize = 65535;
-  Tcp4Option.SendBufferSize    = 65535;
-  Tcp4Option.MaxSynBackLog     = 5;
-  Tcp4Option.ConnectionTimeout = 60;
-  Tcp4Option.DataRetries       = 12;
-  Tcp4Option.FinTimeout        = 2;
-  Tcp4Option.KeepAliveProbes   = 6;
-  Tcp4Option.KeepAliveTime     = 7200;
-  Tcp4Option.KeepAliveInterval = 30;
-  Tcp4Option.EnableNagle       = TRUE;
-  Status                       = Tcp4->Configure (Tcp4, &Tcp4CfgData);
-  if (EFI_ERROR (Status)) {
-    if (Status == EFI_NO_MAPPING) {
-      return EFI_SUCCESS;
-    }
-
-    DEBUG ((DEBUG_ERROR, "%a: Can't get subnet information: %r\n", __func__, Status));
-    return Status;
-  }
 
   Status = Tcp4->GetModeData (Tcp4, NULL, NULL, &IpModedata, NULL, NULL);
   if (EFI_ERROR (Status)) {
@@ -1254,7 +1220,7 @@ NetworkInterfaceGetSubnetInfo (
       DEBUG ((DEBUG_MANAGEABILITY, "%a:MAC address: %s\n", __func__, Instance->StrMacAddr));
       if (CheckIsIpVersion6 (Instance)) {
         if (Instance->SubnetAddrInfoIPv6Number == 0) {
-          DEBUG ((DEBUG_WARN, "%a: There is no Subnet information for IPv6 network interface.\n", __func__));
+          DEBUG ((DEBUG_MANAGEABILITY, "%a: There is no Subnet information for IPv6 network interface.\n", __func__));
           return EFI_NOT_FOUND;
         }
 
