@@ -293,11 +293,6 @@ WifiMgrDxeDriverBindingStart (
       goto ERROR2;
     }
 
-    Status = gBS->SetTimer (Nic->TickTimer, TimerPeriodic, EFI_TIMER_PERIOD_MILLISECONDS (500));
-    if (EFI_ERROR (Status)) {
-      goto ERROR3;
-    }
-
     Nic->ConnectState = WifiMgrDisconnected;
     Nic->ScanState    = WifiMgrScanFinished;
 
@@ -330,10 +325,6 @@ ERROR4:
   RemoveEntryList (&Nic->Link);
   mPrivate->NicCount--;
   gBS->RestoreTPL (OldTpl);
-
-ERROR3:
-
-  gBS->CloseEvent (Nic->TickTimer);
 
 ERROR2:
 
