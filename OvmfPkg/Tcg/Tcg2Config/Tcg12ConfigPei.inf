@@ -37,6 +37,7 @@
   Tpm2DeviceLib
   BaseLib
   Tpm12DeviceLib
+  Tpm2DebugLib
 
 [Guids]
   gEfiTpmDeviceSelectedGuid           ## PRODUCES ## GUID # Used as a PPI GUID
