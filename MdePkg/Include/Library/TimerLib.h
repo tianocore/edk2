@@ -105,4 +105,17 @@ GetTimeInNanoSecond (
   IN      UINT64  Ticks
   );
 
+/**
+  Fetches Timer freq from Device Tree
+
+  @return Timer Frequency value
+
+**/
+
+UINT32
+EFIAPI
+GetDTTimerFreq (
+  VOID
+  );
+
 #endif

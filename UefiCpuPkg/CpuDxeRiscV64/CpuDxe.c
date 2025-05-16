@@ -269,7 +269,7 @@ CpuGetTimerValue (
   if (TimerPeriod != NULL) {
     *TimerPeriod = DivU64x32 (
                      1000000000000000u,
-                     PcdGet64 (PcdCpuCoreCrystalClockFrequency)
+                     GetDTTimerFreq ()
                      );
   }
 
