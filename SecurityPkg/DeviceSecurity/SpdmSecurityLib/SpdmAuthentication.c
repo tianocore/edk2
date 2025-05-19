@@ -136,9 +136,9 @@ ExtendCertificate (
 
   EventLog = NULL;
   ZeroMem (&Parameter, sizeof (Parameter));
-  Parameter.location = SpdmDataLocationConnection;
+  Parameter.location = LIBSPDM_DATA_LOCATION_CONNECTION;
   DataSize           = sizeof (BaseHashAlgo);
-  Status             = SpdmGetData (SpdmContext, SpdmDataBaseHashAlgo, &Parameter, &BaseHashAlgo, &DataSize);
+  Status             = SpdmGetData (SpdmContext, LIBSPDM_DATA_BASE_HASH_ALGO, &Parameter, &BaseHashAlgo, &DataSize);
   ASSERT_EFI_ERROR (Status);
 
   DeviceContextSize = GetDeviceMeasurementContextSize (SpdmDeviceContext);
@@ -520,9 +520,9 @@ DoDeviceCertificate (
   SpdmContext = SpdmDeviceContext->SpdmContext;
 
   ZeroMem (&Parameter, sizeof (Parameter));
-  Parameter.location = SpdmDataLocationConnection;
+  Parameter.location = LIBSPDM_DATA_LOCATION_CONNECTION;
   DataSize           = sizeof (CapabilityFlags);
-  SpdmReturn         = SpdmGetData (SpdmContext, SpdmDataCapabilityFlags, &Parameter, &CapabilityFlags, &DataSize);
+  SpdmReturn         = SpdmGetData (SpdmContext, LIBSPDM_DATA_CAPABILITY_FLAGS, &Parameter, &CapabilityFlags, &DataSize);
   if (LIBSPDM_STATUS_IS_ERROR (SpdmReturn)) {
     SecurityState->AuthenticationState = EDKII_DEVICE_SECURITY_STATE_ERROR_DEVICE_ERROR;
     return EFI_DEVICE_ERROR;
@@ -643,9 +643,9 @@ DoDeviceAuthentication (
   SpdmContext = SpdmDeviceContext->SpdmContext;
 
   ZeroMem (&Parameter, sizeof (Parameter));
-  Parameter.location = SpdmDataLocationConnection;
+  Parameter.location = LIBSPDM_DATA_LOCATION_CONNECTION;
   DataSize           = sizeof (CapabilityFlags);
-  SpdmReturn         = SpdmGetData (SpdmContext, SpdmDataCapabilityFlags, &Parameter, &CapabilityFlags, &DataSize);
+  SpdmReturn         = SpdmGetData (SpdmContext, LIBSPDM_DATA_CAPABILITY_FLAGS, &Parameter, &CapabilityFlags, &DataSize);
   if (LIBSPDM_STATUS_IS_ERROR (SpdmReturn)) {
     SecurityState->AuthenticationState = EDKII_DEVICE_SECURITY_STATE_ERROR_DEVICE_ERROR;
     return EFI_DEVICE_ERROR;
