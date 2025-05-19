@@ -63,6 +63,7 @@ FillWriteBuffer (
   // Copy Opcode into Write Buffer
   Instance->SpiTransactionWriteBuffer[0] = Opcode;
   Index                                  = 1;
+  AddressSize                            = 0;
   if (UseAddress) {
     if (AddressBytesSupported == SPI_ADDR_3BYTE_ONLY) {
       if (SfdpAddressBytes != 0) {
