@@ -60,6 +60,7 @@ VirtMmSvsmVirtMap (
   VOID
   )
 {
+  DEBUG ((DEBUG_INFO, "%a: going virtual\n", __func__));
   return EFI_SUCCESS;
 }
 
@@ -71,6 +72,7 @@ VirtMmSvsmComm (
 {
   ASSERT (AmdSvsmIsSvsmPresent ());
 
+  DEBUG ((DEBUG_INFO, "%a: request ...\n", __func__));
   if (!AmdSvsmUefiMmCall (SVSM_UEFI_MM_REQUEST, 0, 0)) {
     DEBUG ((DEBUG_ERROR, "%a: SVSM_UEFI_MM_REQUEST failed\n", __func__));
     return EFI_DEVICE_ERROR;
