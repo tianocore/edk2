@@ -9,6 +9,7 @@
 **/
 
 #include "MpLib.h"
+#include <Library/DebugLib.h>
 #include <Library/CcExitLib.h>
 #include <Library/AmdSvsmLib.h>
 #include <Register/Amd/SevSnpMsr.h>
@@ -145,6 +146,7 @@ SevSnpCreateSaveArea (
     if (!Pages) {
       return;
     }
+    DEBUG ((DEBUG_ERROR, "%a: ApicId=%d, VMSA/CAA Pages=%p\n", __func__, ApicId, Pages));
 
     //
     // Since page allocation works by allocating downward in the address space,
