@@ -80,12 +80,7 @@ LibGetTime (
   if (EFI_ERROR (Status)) {
     ASSERT (Status != EFI_INVALID_PARAMETER);
     ASSERT (Status != EFI_BUFFER_TOO_SMALL);
-    //
-    // The following is intended to produce a compilation error on build
-    // environments where BUILD_EPOCH can not be set from inline shell.
-    // If you are attempting to use this library on such an environment, please
-    // contact the edk2 mailing list, so we can try to add support for it.
-    //
+
     EpochSeconds = BUILD_EPOCH;
     DEBUG ((
       DEBUG_INFO,
