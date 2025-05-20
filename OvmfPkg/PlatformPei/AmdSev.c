@@ -571,7 +571,7 @@ SevInitializeRam (
     BuildMemoryAllocationHob (
       (EFI_PHYSICAL_ADDRESS)(UINTN)PcdGet32 (PcdOvmfSecSvsmCaaBase),
       (UINT64)(UINTN)PcdGet32 (PcdOvmfSecSvsmCaaSize),
-      EfiRuntimeServicesData
+      EfiReservedMemoryType
       );
   }
 }
