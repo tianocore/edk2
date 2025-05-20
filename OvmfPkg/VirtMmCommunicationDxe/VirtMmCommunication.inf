@@ -39,6 +39,7 @@
   DebugLib
   DxeServicesTableLib
   HobLib
+  IoLib
   MemoryAllocationLib
   UefiDriverEntryPoint
 
