@@ -12,6 +12,8 @@
 
 #include "VirtMmCommunication.h"
 
+static BOOLEAN  mRuntime;
+
 BOOLEAN
 EFIAPI
 VirtMmSvsmProbe (
@@ -23,7 +25,7 @@ VirtMmSvsmProbe (
     return FALSE;
   }
 
-  if (!AmdSvsmUefiMmCall (SVSM_UEFI_MM_QUERY, 0, 0)) {
+  if (!AmdSvsmUefiMmCall (SVSM_UEFI_MM_QUERY, 0, 0, FALSE)) {
     DEBUG ((DEBUG_VERBOSE, "%a: SVSM UEFI MM protocol not supported\n", __func__));
     return FALSE;
   }
@@ -42,11 +44,11 @@ VirtMmSvsmInit (
 
   ASSERT (AmdSvsmIsSvsmPresent ());
 
-  AmdSvsmUefiMmCall (SVSM_UEFI_MM_RESET, 0, 0);
+  AmdSvsmUefiMmCall (SVSM_UEFI_MM_RESET, 0, 0, FALSE);
 
   Rcx = (UINT64)(UINTN)mCommunicateBufferPhys;
   Rdx = MAX_BUFFER_SIZE;
-  if (!AmdSvsmUefiMmCall (SVSM_UEFI_MM_SETUP, Rcx, Rdx)) {
+  if (!AmdSvsmUefiMmCall (SVSM_UEFI_MM_SETUP, Rcx, Rdx, FALSE)) {
     DEBUG ((DEBUG_ERROR, "%a: SVSM_UEFI_MM_SETUP failed\n", __func__));
     return EFI_DEVICE_ERROR;
   }
@@ -61,6 +63,7 @@ VirtMmSvsmVirtMap (
   )
 {
   DEBUG ((DEBUG_INFO, "%a: going virtual\n", __func__));
+  mRuntime = TRUE;
   return EFI_SUCCESS;
 }
 
@@ -73,7 +76,7 @@ VirtMmSvsmComm (
   ASSERT (AmdSvsmIsSvsmPresent ());
 
   DEBUG ((DEBUG_INFO, "%a: request ...\n", __func__));
-  if (!AmdSvsmUefiMmCall (SVSM_UEFI_MM_REQUEST, 0, 0)) {
+  if (!AmdSvsmUefiMmCall (SVSM_UEFI_MM_REQUEST, 0, 0, mRuntime)) {
     DEBUG ((DEBUG_ERROR, "%a: SVSM_UEFI_MM_REQUEST failed\n", __func__));
     return EFI_DEVICE_ERROR;
   }
