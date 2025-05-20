@@ -13,6 +13,7 @@
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = VirtMmCommunication2Initialize
+  VALID_ARCHITECTURES            = X64 AARCH64 RISCV64 LOONGARCH64
 
 [Sources]
   VirtMmCommunication.c
