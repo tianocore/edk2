@@ -4,6 +4,7 @@
 
 **/
 
+#include <PiDxe.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -15,6 +16,7 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 
 #include <Protocol/MmCommunication2.h>
+#include <Protocol/MmCommunication3.h>
 
 #include "VirtMmCommunication.h"
 
@@ -193,6 +195,29 @@ VirtMmCommunication2Communicate (
 STATIC EFI_MM_COMMUNICATION2_PROTOCOL  mMmCommunication2 = {
   VirtMmCommunication2Communicate
 };
+
+EFI_STATUS
+EFIAPI
+VirtMmCommunication3Communicate (
+  IN CONST EFI_MM_COMMUNICATION3_PROTOCOL  *This,
+  IN OUT VOID                              *CommBufferPhysical,
+  IN OUT VOID                              *CommBufferVirtual
+  )
+{
+  EFI_MM_COMMUNICATE_HEADER_V3  *Header  = CommBufferVirtual;
+  UINTN                         HdrSize  = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER_V3, MessageGuid);
+  UINTN                         CommSize = Header->BufferSize - HdrSize;
+  EFI_STATUS                    Status;
+
+  Status = VirtMmCommunication2Communicate (
+             NULL,
+             CommBufferPhysical + HdrSize,
+             CommBufferVirtual + HdrSize,
+             &CommSize
+             );
+
+  return Status;
+}
 
 /**
   Notification callback on SetVirtualAddressMap event.
