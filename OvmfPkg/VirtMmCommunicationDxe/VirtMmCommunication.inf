@@ -13,6 +13,7 @@
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = VirtMmCommunication2Initialize
+  VALID_ARCHITECTURES            = X64 AARCH64
 
 [Sources]
   VirtMmCommunication.c
@@ -22,7 +23,7 @@
   QemuHwInfo.c
   QemuMmio.c
 
-[Sources.AARCH64, Sources.ARM]
+[Sources.AARCH64]
   QemuFdt.c
   QemuMmio.c
 
@@ -31,7 +32,7 @@
   MdeModulePkg/MdeModulePkg.dec
   OvmfPkg/OvmfPkg.dec
 
-[Packages.AARCH64, Packages.ARM]
+[Packages.AARCH64]
   EmbeddedPkg/EmbeddedPkg.dec
 
 [LibraryClasses]
@@ -47,7 +48,7 @@
   DxeHardwareInfoLib
   QemuFwCfgLib
 
-[LibraryClasses.AARCH64, LibraryClasses.ARM]
+[LibraryClasses.AARCH64]
   FdtLib
 
 [FeaturePcd]
@@ -59,7 +60,7 @@
   gEfiMmCommunication2ProtocolGuid              ## PRODUCES
   gEfiSmmVariableProtocolGuid                   ## PRODUCES
 
-[Protocols.AARCH64, Protocols.ARM]
+[Protocols.AARCH64]
   gFdtClientProtocolGuid
 
 [Guids]
@@ -71,5 +72,5 @@
 [Depex]
   gEfiCpuArchProtocolGuid
 
-[Depex.AARCH64, Depex.ARM]
+[Depex.AARCH64]
   gFdtClientProtocolGuid
