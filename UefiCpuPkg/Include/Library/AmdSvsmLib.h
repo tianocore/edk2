@@ -142,9 +142,10 @@ AmdSvsmVtpmCmd (
 BOOLEAN
 EFIAPI
 AmdSvsmUefiMmCall (
-  IN  UINT32  CallId,
-  IN  UINT64  Rcx,
-  IN  UINT64  Rdx
+  IN  UINT32   CallId,
+  IN  UINT64   Rcx,
+  IN  UINT64   Rdx,
+  IN  BOOLEAN  Runtime
   );
 
 #endif
