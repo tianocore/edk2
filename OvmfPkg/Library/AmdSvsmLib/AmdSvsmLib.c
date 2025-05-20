@@ -617,6 +617,14 @@ AmdSvsmUefiMmCall (
     Caa = AmdSvsmSnpGetCaa ();
   }
 
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: runtime %a, caa %lx\n",
+    __func__,
+    Runtime ? "yes" : "no",
+    Caa
+    ));
+
   SvsmCallData.Caa   = (SVSM_CAA *)Caa;
   SvsmCallData.RaxIn = Function.Uint64;
   SvsmCallData.RcxIn = Rcx;
