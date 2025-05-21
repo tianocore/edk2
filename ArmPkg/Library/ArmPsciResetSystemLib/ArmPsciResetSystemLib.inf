@@ -28,5 +28,6 @@
 
 [LibraryClasses]
   ArmMonitorLib
+  BaseMemoryLib
   BaseLib
   DebugLib
