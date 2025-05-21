@@ -147,6 +147,7 @@
   StandaloneMmPkg/Library/SmmLockBoxMmDependency/SmmLockBoxMmDependency.inf
   StandaloneMmPkg/Library/MmPlatformHobProducerLibNull/MmPlatformHobProducerLibNull.inf
   StandaloneMmPkg/Drivers/MmCommunicationDxe/MmCommunicationDxe.inf
+  StandaloneMmPkg/Drivers/MmCommunicationNotifyDxe/MmCommunicationNotifyDxe.inf
   StandaloneMmPkg/Library/StandaloneMmExtractGuidedSectionLib/StandaloneMmExtractGuidedSectionLib.inf
 
 [Components.AARCH64, Components.ARM]
