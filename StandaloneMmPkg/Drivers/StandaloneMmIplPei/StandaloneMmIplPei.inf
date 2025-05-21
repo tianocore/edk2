@@ -58,6 +58,9 @@
   gMmUnblockRegionHobGuid
   gMmStatusCodeUseSerialHobGuid
   gEfiMmCommunicateHeaderV3Guid
+  gEfiEndOfDxeEventGroupGuid
+  gEfiEventReadyToBootGuid
+  gEfiEventExitBootServicesGuid
 
 [Ppis]
   gEfiPeiMmControlPpiGuid
@@ -68,6 +71,9 @@
 
 [Protocols]
   gEfiMmEndOfPeiProtocol
+  gEfiMmEndOfDxeProtocolGuid
+  gEfiMmReadyToLockProtocolGuid
+  gEfiDxeMmReadyToLockProtocolGuid
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMmCommBufferPages

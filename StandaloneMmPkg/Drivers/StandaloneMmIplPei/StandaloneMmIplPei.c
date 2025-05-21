@@ -24,10 +24,32 @@ EFI_PEI_PPI_DESCRIPTOR  mPpiList[] = {
   }
 };
 
-EFI_PEI_NOTIFY_DESCRIPTOR  mNotifyList = {
-  EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
-  &gEfiEndOfPeiSignalPpiGuid,
-  EndOfPeiCallback
+EFI_PEI_NOTIFY_DESCRIPTOR  mNotifyList[] = {
+  {
+    EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
+    &gEfiEndOfPeiSignalPpiGuid,
+    EndOfPeiCallback
+  },
+  {
+    EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
+    &gEfiEndOfDxeEventGroupGuid,
+    MmEndOfDxeCallback
+  },
+  {
+    EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
+    &gEfiMmReadyToLockProtocolGuid,
+    MmReadyToLockCallback
+  },
+  {
+    EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
+    &gEfiEventReadyToBootGuid,
+    MmReadyToBootCallback
+  },
+  {
+    EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
+    &gEfiEventExitBootServicesGuid,
+    MmExitBootServiceCallback
+  }
 };
 
 /**
@@ -766,23 +788,17 @@ ExecuteMmCoreFromMmram (
 }
 
 /**
-  This is the callback function on end of PEI.
+  This function will do a MM communication according to GUID.
 
-  This callback is used for call MmEndOfPeiHandler in standalone MM core.
+  @param   CommuncateGuid    Pointer to MM communicate GUID.
 
-  @param   PeiServices       General purpose services available to every PEIM.
-  @param   NotifyDescriptor  The notification structure this PEIM registered on install.
-  @param   Ppi               Pointer to the PPI data associated with this function.
-
-  @retval  EFI_SUCCESS       Exit boot services successfully.
-  @retval  Other             Exit boot services failed.
+  @retval  EFI_SUCCESS       MM Communicate successfully.
+  @retval  Other             MM Communicate failed.
 **/
 EFI_STATUS
 EFIAPI
-EndOfPeiCallback (
-  IN  EFI_PEI_SERVICES           **PeiServices,
-  IN  EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
-  IN  VOID                       *Ppi
+MmGuidCommunication (
+  IN  EFI_GUID  *CommuncateGuid
   )
 {
   EFI_MM_COMMUNICATE_HEADER  CommunicateHeader;
@@ -792,7 +808,7 @@ EndOfPeiCallback (
   //
   // Use Guid to initialize EFI_MM_COMMUNICATE_HEADER structure
   //
-  CopyGuid (&CommunicateHeader.HeaderGuid, &gEfiMmEndOfPeiProtocol);
+  CopyGuid (&CommunicateHeader.HeaderGuid, CommuncateGuid);
   CommunicateHeader.MessageLength = 1;
   CommunicateHeader.Data[0]       = 0;
 
@@ -804,6 +820,121 @@ EndOfPeiCallback (
   ASSERT_EFI_ERROR (Status);
 
   return Status;
+}
+
+/**
+  This is the callback function on end of PEI.
+
+  This callback is used for call MmEndOfPeiHandler in standalone MM core.
+
+  @param   PeiServices       General purpose services available to every PEIM.
+  @param   NotifyDescriptor  The notification structure this PEIM registered on install.
+  @param   Ppi               Pointer to the PPI data associated with this function.
+
+  @retval  EFI_SUCCESS       MM Communicate successfully.
+  @retval  Other             MM Communicate failed.
+**/
+EFI_STATUS
+EFIAPI
+EndOfPeiCallback (
+  IN  EFI_PEI_SERVICES           **PeiServices,
+  IN  EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN  VOID                       *Ppi
+  )
+{
+  return MmGuidCommunication (&gEfiMmEndOfPeiProtocol);
+}
+
+/**
+  This is the callback function on end of DXE for API mode.
+
+  This callback is used for call MmEndOfDxeHandler in standalone MM core.
+
+  @param   PeiServices       General purpose services available to every PEIM.
+  @param   NotifyDescriptor  The notification structure this PEIM registered on install.
+  @param   Ppi               Pointer to the PPI data associated with this function.
+
+  @retval  EFI_SUCCESS       MM Communicate successfully.
+  @retval  Other             MM Communicate failed.
+**/
+EFI_STATUS
+EFIAPI
+MmEndOfDxeCallback (
+  IN  EFI_PEI_SERVICES           **PeiServices,
+  IN  EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN  VOID                       *Ppi
+  )
+{
+  return MmGuidCommunication (&gEfiEndOfDxeEventGroupGuid);
+}
+
+/**
+  This is the callback function on MM ready to lock for API mode.
+
+  This callback is used for call MmReadyToLockHandler in standalone MM core.
+
+  @param   PeiServices       General purpose services available to every PEIM.
+  @param   NotifyDescriptor  The notification structure this PEIM registered on install.
+  @param   Ppi               Pointer to the PPI data associated with this function.
+
+  @retval  EFI_SUCCESS       MM Communicate successfully.
+  @retval  Other             MM Communicate failed.
+**/
+EFI_STATUS
+EFIAPI
+MmReadyToLockCallback (
+  IN  EFI_PEI_SERVICES           **PeiServices,
+  IN  EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN  VOID                       *Ppi
+  )
+{
+  return MmGuidCommunication (&gEfiDxeMmReadyToLockProtocolGuid);
+}
+
+/**
+  This is the callback function on MM ready to boot for API mode.
+
+  This callback is used for call MmReadyToBootHandler in standalone MM core.
+
+  @param   PeiServices       General purpose services available to every PEIM.
+  @param   NotifyDescriptor  The notification structure this PEIM registered on install.
+  @param   Ppi               Pointer to the PPI data associated with this function.
+
+  @retval  EFI_SUCCESS       MM Communicate successfully.
+  @retval  Other             MM Communicate failed.
+**/
+EFI_STATUS
+EFIAPI
+MmReadyToBootCallback (
+  IN  EFI_PEI_SERVICES           **PeiServices,
+  IN  EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN  VOID                       *Ppi
+  )
+{
+  return MmGuidCommunication (&gEfiEventReadyToBootGuid);
+}
+
+/**
+  This is the callback function on MM exit boot service for API mode.
+
+  This callback is used for call MmExitBootServiceHandler in standalone MM core.
+
+  @param   PeiServices       General purpose services available to every PEIM.
+  @param   NotifyDescriptor  The notification structure this PEIM registered on install.
+  @param   Ppi               Pointer to the PPI data associated with this function.
+
+  @retval  EFI_SUCCESS       MM Communicate successfully.
+  @retval  Other             MM Communicate failed.
+**/
+EFI_STATUS
+EFIAPI
+MmExitBootServiceCallback (
+  IN  EFI_PEI_SERVICES           **PeiServices,
+  IN  EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN  VOID                       *Ppi
+  )
+{
+  return MmGuidCommunication (&gEfiEventExitBootServicesGuid);
 }
 
 /**
@@ -945,7 +1076,7 @@ StandaloneMmIplPeiEntry (
   //
   // Create end of pei callback to call MmEndOfPeiHandler
   //
-  Status = PeiServicesNotifyPpi (&mNotifyList);
+  Status = PeiServicesNotifyPpi (mNotifyList);
   ASSERT_EFI_ERROR (Status);
 
   //
