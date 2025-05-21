@@ -104,6 +104,15 @@
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
 
+[LibraryClasses.common.DXE_DRIVER]
+  UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
+  MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
+  UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
+  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
+  UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
+  UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+
 ################################################################################
 #
 # Pcd Section - list of all EDK II PCD Entries defined by this Platform
@@ -147,6 +156,7 @@
   StandaloneMmPkg/Library/SmmLockBoxMmDependency/SmmLockBoxMmDependency.inf
   StandaloneMmPkg/Library/MmPlatformHobProducerLibNull/MmPlatformHobProducerLibNull.inf
   StandaloneMmPkg/Drivers/MmCommunicationDxe/MmCommunicationDxe.inf
+  StandaloneMmPkg/Drivers/MmCommunicationNotifyDxe/MmCommunicationNotifyDxe.inf
   StandaloneMmPkg/Library/StandaloneMmExtractGuidedSectionLib/StandaloneMmExtractGuidedSectionLib.inf
 
 [Components.AARCH64, Components.ARM]
