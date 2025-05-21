@@ -7,6 +7,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "PiSmmCpuCommon.h"
 
+BOOLEAN  mIsRestrictedMemoryAccess            = TRUE;
+BOOLEAN  mIsRestrictedMemoryAccessInitialized = FALSE;
+
 /**
   Return whether access to non-SMRAM is restricted.
 
@@ -18,5 +21,10 @@ IsRestrictedMemoryAccess (
   VOID
   )
 {
-  return PcdGetBool (PcdCpuSmmRestrictedMemoryAccess);
+  if (!mIsRestrictedMemoryAccessInitialized) {
+    mIsRestrictedMemoryAccess            = PcdGetBool (PcdCpuSmmRestrictedMemoryAccess);
+    mIsRestrictedMemoryAccessInitialized = TRUE;
+  }
+
+  return mIsRestrictedMemoryAccess;
 }
