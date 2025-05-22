@@ -9,7 +9,6 @@
 #include <Library/PrePiHobListPointerLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
-#include <Library/BaseRiscVSbiLib.h>
 
 /**
   Returns the pointer to the HOB list.
@@ -25,17 +24,7 @@ PrePeiGetHobList (
   VOID
   )
 {
-  EFI_RISCV_FIRMWARE_CONTEXT  *FirmwareContext;
-
-  FirmwareContext = NULL;
-  GetFirmwareContextPointer (&FirmwareContext);
-
-  if (FirmwareContext == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Firmware Context is NULL\n", __func__));
-    return NULL;
-  }
-
-  return (VOID *)FirmwareContext->PrePiHobList;
+  return (VOID *)RiscVGetSupervisorScratch ();
 }
 
 /**
@@ -50,16 +39,6 @@ PrePeiSetHobList (
   IN  VOID  *HobList
   )
 {
-  EFI_RISCV_FIRMWARE_CONTEXT  *FirmwareContext;
-
-  FirmwareContext = NULL;
-  GetFirmwareContextPointer (&FirmwareContext);
-
-  if (FirmwareContext == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Firmware Context is NULL\n", __func__));
-    return EFI_NOT_READY;
-  }
-
-  FirmwareContext->PrePiHobList = HobList;
+  RiscVSetSupervisorScratch ((UINTN)HobList);
   return EFI_SUCCESS;
 }
