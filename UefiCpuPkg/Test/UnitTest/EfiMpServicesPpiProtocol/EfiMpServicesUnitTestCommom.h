@@ -191,6 +191,7 @@ MpServicesUnitTestWhoAmI (
   @param[in,out] Buffer   The pointer to private data buffer.
 **/
 VOID
+EFIAPI
 EmptyProcedure (
   IN OUT VOID  *Buffer
   );
@@ -201,6 +202,7 @@ EmptyProcedure (
   @param[in,out] Buffer   The pointer to private data buffer.
 **/
 VOID
+EFIAPI
 StoreCpuNumbers (
   IN OUT VOID  *Buffer
   );

@@ -215,6 +215,7 @@ MpServicesUnitTestStartupAllCPUs (
   @param[in,out] Buffer   The pointer to private data buffer.
 **/
 VOID
+EFIAPI
 ApInfiniteLoopProcedure (
   IN OUT VOID  *Buffer
   )
@@ -245,6 +246,7 @@ ApInfiniteLoopProcedure (
   @param[in,out] Buffer   The pointer to private data buffer.
 **/
 VOID
+EFIAPI
 RunMpServiceStartupAllCPUsOnAp (
   IN OUT VOID  *Buffer
   )
