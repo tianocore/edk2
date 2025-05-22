@@ -21,9 +21,11 @@
 #include <Library/CpuExceptionHandlerLib.h>
 #include <Library/CpuLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Register/RiscV64/RiscVEncoding.h>
+#include <RiscVSecHobData.h>
 
 /**
   Flush CPU data cache. If the instruction cache is fully coherent
