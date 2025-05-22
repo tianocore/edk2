@@ -36,6 +36,9 @@
 [Sources.IA32]
   Ia32/ResetVec.nasmb
 
+[Sources.IA32, Sources.X64]
+  SecTemporaryRamDone.c
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
