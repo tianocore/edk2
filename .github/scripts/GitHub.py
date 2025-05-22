@@ -228,8 +228,8 @@ def add_reviewers_to_pr(
     )
 
     # A user can only be added if they are a collaborator of the repository.
-    repo_collaborators = [c.login.strip() for c in repo_gh.get_collaborators() if c]
-    non_collaborators = [u for u in user_names if u not in repo_collaborators]
+    repo_collaborators = [c.login.strip().lower() for c in repo_gh.get_collaborators() if c]
+    non_collaborators = [u for u in user_names if u.lower() not in repo_collaborators]
 
     excluded_pr_reviewers = [pr_author] + current_pr_reviewers + non_collaborators
     new_pr_reviewers = [u for u in user_names if u not in excluded_pr_reviewers]
