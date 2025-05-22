@@ -8,6 +8,45 @@
 
 #include "SecMain.h"
 
+/**
+  Implementation of the PlatformInformation service in EFI_SEC_PLATFORM_INFORMATION_PPI.
+
+  @param  PeiServices                Pointer to the PEI Services Table.
+  @param  StructureSize              Pointer to the variable describing size of the input buffer.
+  @param  PlatformInformationRecord  Pointer to the EFI_SEC_PLATFORM_INFORMATION_RECORD.
+
+  @retval EFI_SUCCESS                The data was successfully returned.
+  @retval EFI_BUFFER_TOO_SMALL       The buffer was too small.
+
+**/
+EFI_STATUS
+EFIAPI
+SecPlatformInformationBist (
+  IN CONST EFI_PEI_SERVICES                **PeiServices,
+  IN OUT UINT64                            *StructureSize,
+  OUT EFI_SEC_PLATFORM_INFORMATION_RECORD  *PlatformInformationRecord
+  );
+
+/**
+  Implementation of the PlatformInformation2 service in EFI_SEC_PLATFORM_INFORMATION2_PPI.
+
+  @param  PeiServices                The pointer to the PEI Services Table.
+  @param  StructureSize              The pointer to the variable describing size of the input buffer.
+  @param  PlatformInformationRecord2 The pointer to the EFI_SEC_PLATFORM_INFORMATION_RECORD2.
+
+  @retval EFI_SUCCESS                The data was successfully returned.
+  @retval EFI_BUFFER_TOO_SMALL       The buffer was too small. The current buffer size needed to
+                                     hold the record is returned in StructureSize.
+
+**/
+EFI_STATUS
+EFIAPI
+SecPlatformInformation2Bist (
+  IN CONST EFI_PEI_SERVICES                 **PeiServices,
+  IN OUT UINT64                             *StructureSize,
+  OUT EFI_SEC_PLATFORM_INFORMATION_RECORD2  *PlatformInformationRecord2
+  );
+
 EFI_SEC_PLATFORM_INFORMATION_PPI  mSecPlatformInformation = {
   SecPlatformInformationBist
 };

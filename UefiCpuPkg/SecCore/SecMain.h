@@ -33,36 +33,6 @@
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/HobLib.h>
 #include <Library/PeiServicesLib.h>
-#include <Library/CpuPageTableLib.h>
-#include <Register/Intel/Cpuid.h>
-#include <Register/Intel/Msr.h>
-
-#define SEC_IDT_ENTRY_COUNT  34
-
-typedef struct _SEC_IDT_TABLE {
-  //
-  // Reserved 8 bytes preceding IDT to store EFI_PEI_SERVICES**, since IDT base
-  // address should be 8-byte alignment.
-  // Note: For IA32, only the 4 bytes immediately preceding IDT is used to store
-  // EFI_PEI_SERVICES**
-  //
-  UINT64                      PeiService;
-  IA32_IDT_GATE_DESCRIPTOR    IdtTable[SEC_IDT_ENTRY_COUNT];
-} SEC_IDT_TABLE;
-
-/**
-  TemporaryRamDone() disables the use of Temporary RAM. If present, this service is invoked
-  by the PEI Foundation after the EFI_PEI_PERMANANT_MEMORY_INSTALLED_PPI is installed.
-
-  @retval EFI_SUCCESS           Use of Temporary RAM was disabled.
-  @retval EFI_INVALID_PARAMETER Temporary RAM could not be disabled.
-
-**/
-EFI_STATUS
-EFIAPI
-SecTemporaryRamDone (
-  VOID
-  );
 
 /**
   Entry point to the C language phase of SEC. After the SEC assembly
@@ -99,45 +69,6 @@ FindAndReportEntryPoints (
   IN  EFI_FIRMWARE_VOLUME_HEADER  *SecCoreFirmwareVolumePtr,
   IN  EFI_FIRMWARE_VOLUME_HEADER  *PeiCoreFirmwareVolumePtr,
   OUT EFI_PEI_CORE_ENTRY_POINT    *PeiCoreEntryPoint
-  );
-
-/**
-  Implementation of the PlatformInformation service in EFI_SEC_PLATFORM_INFORMATION_PPI.
-
-  @param  PeiServices                Pointer to the PEI Services Table.
-  @param  StructureSize              Pointer to the variable describing size of the input buffer.
-  @param  PlatformInformationRecord  Pointer to the EFI_SEC_PLATFORM_INFORMATION_RECORD.
-
-  @retval EFI_SUCCESS                The data was successfully returned.
-  @retval EFI_BUFFER_TOO_SMALL       The buffer was too small.
-
-**/
-EFI_STATUS
-EFIAPI
-SecPlatformInformationBist (
-  IN CONST EFI_PEI_SERVICES                **PeiServices,
-  IN OUT UINT64                            *StructureSize,
-  OUT EFI_SEC_PLATFORM_INFORMATION_RECORD  *PlatformInformationRecord
-  );
-
-/**
-  Implementation of the PlatformInformation2 service in EFI_SEC_PLATFORM_INFORMATION2_PPI.
-
-  @param  PeiServices                The pointer to the PEI Services Table.
-  @param  StructureSize              The pointer to the variable describing size of the input buffer.
-  @param  PlatformInformationRecord2 The pointer to the EFI_SEC_PLATFORM_INFORMATION_RECORD2.
-
-  @retval EFI_SUCCESS                The data was successfully returned.
-  @retval EFI_BUFFER_TOO_SMALL       The buffer was too small. The current buffer size needed to
-                                     hold the record is returned in StructureSize.
-
-**/
-EFI_STATUS
-EFIAPI
-SecPlatformInformation2Bist (
-  IN CONST EFI_PEI_SERVICES                 **PeiServices,
-  IN OUT UINT64                             *StructureSize,
-  OUT EFI_SEC_PLATFORM_INFORMATION_RECORD2  *PlatformInformationRecord2
   );
 
 /**
