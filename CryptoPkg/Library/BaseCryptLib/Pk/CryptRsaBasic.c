@@ -8,6 +8,7 @@
   4) RsaPkcs1Verify
 
 Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
+(c) Copyright 2025 HP Development Company, L.P.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -95,6 +96,7 @@ RsaSetKey (
   BIGNUM  *BnDp;
   BIGNUM  *BnDq;
   BIGNUM  *BnQInv;
+  BIGNUM  *AllocatedBn[3];
 
   //
   // Check input parameters.
@@ -112,6 +114,9 @@ RsaSetKey (
   BnDq   = NULL;
   BnQInv = NULL;
 
+  AllocatedBn[0] = NULL;
+  AllocatedBn[1] = NULL;
+  AllocatedBn[2] = NULL;
   //
   // Retrieve the components from RSA object.
   //
@@ -133,15 +138,18 @@ RsaSetKey (
     case RsaKeyE:
     case RsaKeyD:
       if (BnN == NULL) {
-        BnN = BN_new ();
+        BnN            = BN_new ();
+        AllocatedBn[0] = BnN;
       }
 
       if (BnE == NULL) {
-        BnE = BN_new ();
+        BnE            = BN_new ();
+        AllocatedBn[1] = BnE;
       }
 
       if (BnD == NULL) {
-        BnD = BN_new ();
+        BnD            = BN_new ();
+        AllocatedBn[2] = BnD;
       }
 
       if ((BnN == NULL) || (BnE == NULL) || (BnD == NULL)) {
@@ -166,6 +174,10 @@ RsaSetKey (
         return FALSE;
       }
 
+      BN_free (AllocatedBn[0]);
+      BN_free (AllocatedBn[1]);
+      BN_clear_free (AllocatedBn[2]);
+
       break;
 
     //
@@ -174,11 +186,13 @@ RsaSetKey (
     case RsaKeyP:
     case RsaKeyQ:
       if (BnP == NULL) {
-        BnP = BN_new ();
+        BnP            = BN_new ();
+        AllocatedBn[0] = BnP;
       }
 
       if (BnQ == NULL) {
-        BnQ = BN_new ();
+        BnQ            = BN_new ();
+        AllocatedBn[1] = BnQ;
       }
 
       if ((BnP == NULL) || (BnQ == NULL)) {
@@ -200,6 +214,9 @@ RsaSetKey (
         return FALSE;
       }
 
+      BN_clear_free (AllocatedBn[0]);
+      BN_clear_free (AllocatedBn[1]);
+
       break;
 
     //
@@ -210,15 +227,18 @@ RsaSetKey (
     case RsaKeyDq:
     case RsaKeyQInv:
       if (BnDp == NULL) {
-        BnDp = BN_new ();
+        BnDp           = BN_new ();
+        AllocatedBn[0] = BnDp;
       }
 
       if (BnDq == NULL) {
-        BnDq = BN_new ();
+        BnDq           = BN_new ();
+        AllocatedBn[1] = BnDq;
       }
 
       if (BnQInv == NULL) {
-        BnQInv = BN_new ();
+        BnQInv         = BN_new ();
+        AllocatedBn[2] = BnQInv;
       }
 
       if ((BnDp == NULL) || (BnDq == NULL) || (BnQInv == NULL)) {
@@ -242,6 +262,10 @@ RsaSetKey (
       if (RSA_set0_crt_params (RsaKey, BN_dup (BnDp), BN_dup (BnDq), BN_dup (BnQInv)) == 0) {
         return FALSE;
       }
+
+      BN_clear_free (AllocatedBn[0]);
+      BN_clear_free (AllocatedBn[1]);
+      BN_clear_free (AllocatedBn[2]);
 
       break;
 
