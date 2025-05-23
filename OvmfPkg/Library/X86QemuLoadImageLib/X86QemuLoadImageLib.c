@@ -538,9 +538,9 @@ QemuLoadKernelImage (
 
   if (InitrdSize > 0) {
     //
-    // Append ' initrd=initrd' in UTF-16.
+    // Prefix ' initrd=initrd' in UTF-16.
     //
-    KernelLoadedImage->LoadOptionsSize += sizeof (L" initrd=initrd") - 2;
+    KernelLoadedImage->LoadOptionsSize += sizeof (L"initrd=initrd ") - 2;
   }
 
   if (Shim) {
@@ -572,8 +572,8 @@ QemuLoadKernelImage (
       KernelLoadedImage->LoadOptionsSize,
       "%a%a%a",
       (Shim == FALSE)        ?  "" : "kernel ",
-      (CommandLineSize == 0) ?  "" : CommandLine,
-      (InitrdSize == 0)      ?  "" : " initrd=initrd"
+      (InitrdSize == 0)      ?  "" : "initrd=initrd ",
+      (CommandLineSize == 0) ?  "" : CommandLine
       );
     DEBUG ((
       DEBUG_INFO,
