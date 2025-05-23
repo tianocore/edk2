@@ -844,7 +844,7 @@ NetIp6IsNetEqual (
   UINT8  Bit;
   UINT8  Mask;
 
-  ASSERT ((Ip1 != NULL) && (Ip2 != NULL) && (PrefixLength < IP6_PREFIX_MAX));
+  ASSERT ((Ip1 != NULL) && (Ip2 != NULL) && (PrefixLength <= IP6_PREFIX_MAX));
 
   if (PrefixLength == 0) {
     return TRUE;
