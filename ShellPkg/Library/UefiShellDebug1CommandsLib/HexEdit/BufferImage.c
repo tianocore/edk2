@@ -142,9 +142,8 @@ HBufferImageBackup (
   VOID
   )
 {
-  HBufferImageBackupVar.MousePosition = HBufferImage.MousePosition;
-
-  HBufferImageBackupVar.BufferPosition = HBufferImage.BufferPosition;
+  CopyMem (&HBufferImageBackupVar.MousePosition, &HBufferImage.MousePosition, sizeof (HBufferImage.MousePosition));
+  CopyMem (&HBufferImageBackupVar.BufferPosition, &HBufferImage.BufferPosition, sizeof (HBufferImage.BufferPosition));
 
   HBufferImageBackupVar.Modified = HBufferImage.Modified;
 
@@ -569,7 +568,7 @@ HBufferImageRestoreMousePosition (
       //
       // backup the old screen attributes
       //
-      Orig                  = HMainEditor.ColorAttributes;
+      CopyMem (&Orig, &HMainEditor.ColorAttributes, sizeof (Orig));
       New.Data              = 0;
       New.Colors.Foreground = Orig.Colors.Background & 0xF;
       New.Colors.Background = Orig.Colors.Foreground & 0x7;
@@ -1955,17 +1954,13 @@ HBufferImageDeleteCharacterFromBuffer (
   // pass deleted buffer out
   //
   if (DeleteBuffer != NULL) {
-    for (Index = 0; Index < Count; Index++) {
-      DeleteBuffer[Index] = BufferPtr[Pos + Index];
-    }
+    CopyMem (&DeleteBuffer[0], &BufferPtr[Pos], Count);
   }
 
   //
   // delete the part from Pos
   //
-  for (Index = Pos; Index < Size - Count; Index++) {
-    BufferPtr[Index] = BufferPtr[Index + Count];
-  }
+  CopyMem (&BufferPtr[Pos], &BufferPtr[Pos + Count], Size - Count - Pos);
 
   Size -= Count;
 
@@ -2069,16 +2064,12 @@ HBufferImageAddCharacterToBuffer (
   //
   // get a place to add
   //
-  for (Index = (INTN)(Size + Count - 1); Index >= (INTN)Pos; Index--) {
-    BufferPtr[Index] = BufferPtr[Index - Count];
-  }
+  CopyMem (&BufferPtr[Pos], &BufferPtr[Pos - Count], Size - Pos + Count);
 
   //
   // add the buffer
   //
-  for (Index = (INTN)0; Index < (INTN)Count; Index++) {
-    BufferPtr[Index + Pos] = AddBuffer[Index];
-  }
+  CopyMem (&BufferPtr[Pos], AddBuffer, Count);
 
   Size += Count;
 
