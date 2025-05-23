@@ -286,6 +286,10 @@ WorkSpaceRefresh (
     return EFI_ABORTED;
   }
 
+  if (!IsValidWorkSpace (FtwDevice->FtwWorkSpaceHeader)) {
+    return EFI_ABORTED;
+  }
+
   //
   // Refresh the FtwLastWriteHeader
   //
