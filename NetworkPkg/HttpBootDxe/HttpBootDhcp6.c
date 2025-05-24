@@ -944,18 +944,27 @@ HttpBootDhcp6Sarr (
   IN HTTP_BOOT_PRIVATE_DATA  *Private
   )
 {
-  EFI_DHCP6_PROTOCOL        *Dhcp6;
-  EFI_DHCP6_CONFIG_DATA     Config;
-  EFI_DHCP6_MODE_DATA       Mode;
-  EFI_DHCP6_RETRANSMISSION  *Retransmit;
-  EFI_DHCP6_PACKET_OPTION   *OptList[HTTP_BOOT_DHCP6_OPTION_MAX_NUM];
-  UINT32                    OptCount;
-  UINT8                     Buffer[HTTP_BOOT_DHCP6_OPTION_MAX_SIZE];
-  EFI_STATUS                Status;
-  UINT32                    Random;
+  EFI_DHCP6_PROTOCOL                        *Dhcp6;
+  EFI_DHCP6_CONFIG_DATA                     Config;
+  EFI_DHCP6_MODE_DATA                       Mode;
+  EFI_DHCP6_RETRANSMISSION                  *Retransmit;
+  EFI_DHCP6_PACKET_OPTION                   *OptList[HTTP_BOOT_DHCP6_OPTION_MAX_NUM];
+  UINT32                                    OptCount;
+  UINT8                                     Buffer[HTTP_BOOT_DHCP6_OPTION_MAX_SIZE];
+  EFI_STATUS                                Status;
+  UINT32                                    Random;
+  EFI_IP6_CONFIG_PROTOCOL                   *Ip6Cfg;
+  EFI_STATUS                                TimerStatus;
+  EFI_EVENT                                 Timer;
+  UINT64                                    GetMappingTimeOut;
+  UINTN                                     DataSize;
+  EFI_IP6_CONFIG_DUP_ADDR_DETECT_TRANSMITS  DadXmits;
 
   Dhcp6 = Private->Dhcp6;
   ASSERT (Dhcp6 != NULL);
+
+  Ip6Cfg = Private->Ip6Config;
+  Timer  = NULL;
 
   //
   // Build options list for the request packet.
@@ -1013,6 +1022,52 @@ HttpBootDhcp6Sarr (
   // Start DHCPv6 S.A.R.R. process to acquire IPv6 address.
   //
   Status = Dhcp6->Start (Dhcp6);
+  if (Status == EFI_NO_MAPPING) {
+    //
+    // IP6 Linklocal address is not available for use, so stop current Dhcp process
+    // and wait for duplicate address detection to finish.
+    //
+    Dhcp6->Stop (Dhcp6);
+
+    //
+    // Get Duplicate Address Detection Transmits count.
+    //
+    DataSize = sizeof (EFI_IP6_CONFIG_DUP_ADDR_DETECT_TRANSMITS);
+    Status   = Ip6Cfg->GetData (
+                         Ip6Cfg,
+                         Ip6ConfigDataTypeDupAddrDetectTransmits,
+                         &DataSize,
+                         &DadXmits
+                         );
+    if (EFI_ERROR (Status)) {
+      Dhcp6->Configure (Dhcp6, NULL);
+      return Status;
+    }
+
+    Status = gBS->CreateEvent (EVT_TIMER, TPL_CALLBACK, NULL, NULL, &Timer);
+    if (EFI_ERROR (Status)) {
+      Dhcp6->Configure (Dhcp6, NULL);
+      return Status;
+    }
+
+    GetMappingTimeOut = TICKS_PER_SECOND * DadXmits.DupAddrDetectTransmits + HTTP_BOOT_DAD_ADDITIONAL_DELAY;
+    Status            = gBS->SetTimer (Timer, TimerRelative, GetMappingTimeOut);
+    if (EFI_ERROR (Status)) {
+      gBS->CloseEvent (Timer);
+      Dhcp6->Configure (Dhcp6, NULL);
+      return Status;
+    }
+
+    do {
+      TimerStatus = gBS->CheckEvent (Timer);
+      if (!EFI_ERROR (TimerStatus)) {
+        Status = Dhcp6->Start (Dhcp6);
+      }
+    } while (TimerStatus == EFI_NOT_READY);
+
+    gBS->CloseEvent (Timer);
+  }
+
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
