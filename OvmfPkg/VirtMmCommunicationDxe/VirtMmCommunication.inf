@@ -57,6 +57,7 @@
 
 [Protocols]
   gEfiMmCommunication2ProtocolGuid              ## PRODUCES
+  gEfiMmCommunication3ProtocolGuid              ## PRODUCES
   gEfiSmmVariableProtocolGuid                   ## PRODUCES
 
 [Protocols.AARCH64, Protocols.ARM]

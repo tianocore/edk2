@@ -66,7 +66,7 @@ PopulateHeaderAndCommunicate (
 {
   EFI_STATUS                       Status;
   EFI_PEI_MM_COMMUNICATION_PPI     *MmCommunicationPpi;
-  EFI_MM_COMMUNICATE_HEADER        *MmCommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER_V3     *MmCommunicateHeader;
   SMM_VARIABLE_COMMUNICATE_HEADER  *MmVarCommsHeader;
 
   // Minimal sanity check
@@ -93,17 +93,20 @@ PopulateHeaderAndCommunicate (
   }
 
   // Zero the entire Communication Buffer Header
-  MmCommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)CommunicateBuffer;
+  MmCommunicateHeader = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommunicateBuffer;
 
   ZeroMem (MmCommunicateHeader, SMM_COMMUNICATE_HEADER_SIZE);
 
   // Use gEfiSmmVariableProtocolGuid to request the MM variable service in Standalone MM
-  CopyMem ((VOID *)&MmCommunicateHeader->HeaderGuid, &gEfiSmmVariableProtocolGuid, sizeof (GUID));
+  CopyMem ((VOID *)&MmCommunicateHeader->HeaderGuid, &gEfiMmCommunicateHeaderV3Guid, sizeof (GUID));
+  MmCommunicateHeader->BufferSize = CommunicateBufferSize;
+
+  CopyMem ((VOID *)&MmCommunicateHeader->MessageGuid, &gEfiSmmVariableProtocolGuid, sizeof (GUID));
 
   // Program the MM header size
-  MmCommunicateHeader->MessageLength = CommunicateBufferSize - SMM_COMMUNICATE_HEADER_SIZE;
+  MmCommunicateHeader->MessageSize = CommunicateBufferSize - SMM_COMMUNICATE_HEADER_SIZE;
 
-  MmVarCommsHeader = (SMM_VARIABLE_COMMUNICATE_HEADER *)(CommunicateBuffer + SMM_COMMUNICATE_HEADER_SIZE);
+  MmVarCommsHeader = (SMM_VARIABLE_COMMUNICATE_HEADER *)(MmCommunicateHeader->MessageData);
 
   // We are only supporting GetVariable and GetNextVariableName
   MmVarCommsHeader->Function = Function;
