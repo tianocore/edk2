@@ -24,7 +24,7 @@
 /**
   Library constructor. This function does nothing, but this library may depend
   on other libraries that do have a non-trivial constructor, which the
-  BaseToools fail to account for if a library has no constructor at all.
+  BaseTools fail to account for if a library has no constructor at all.
  **/
 RETURN_STATUS
 EFIAPI
