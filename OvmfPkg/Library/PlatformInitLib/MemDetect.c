@@ -1504,6 +1504,20 @@ PlatformQemuInitializeRamForS3 (
         );
     }
 
+    if (FixedPcdGet32 (PcdOvmfEarlyMemDebugLogSize) != 0) {
+      //
+      // Reserve the Early Memory Debug Log buffer
+      //
+      // Since this memory range will be used on S3 resume, it must be
+      // reserved as ACPI NVS.
+      //
+      BuildMemoryAllocationHob (
+        (EFI_PHYSICAL_ADDRESS)(UINTN)FixedPcdGet32 (PcdOvmfEarlyMemDebugLogBase),
+        (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfEarlyMemDebugLogSize),
+        PlatformInfoHob->S3Supported ? EfiACPIMemoryNVS : EfiBootServicesData
+        );
+    }
+
  #endif
   }
 }
