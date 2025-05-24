@@ -123,6 +123,8 @@ Resources
    Contribute <https://github.com/tianocore/tianocore.github.io/wiki/How-To-Contribute>`__
 -  `Release
    Planning <https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Release-Planning>`__
+-  `Ask
+   DeepWiki <https://deepwiki.com/tianocore/edk2>`__
 
 Code Contributions
 ------------------
