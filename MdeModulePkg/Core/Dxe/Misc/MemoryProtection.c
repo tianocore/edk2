@@ -467,8 +467,11 @@ ProtectUefiImage (
              );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a failed to create image properties record\n", __func__));
-
+    DEBUG ((
+      DEBUG_WARN,
+      "%a failed to create image properties record, allowed by PROTECT_IF_ALIGNED_ELSE_ALLOW ProtectionPolicy\n",
+      __func__
+      ));
     // if we failed to create the image properties record, this may mean that the image is not aligned properly
     // the GCD will believe that this memory is non-executable, because the NX initialization routine doesn't know what
     // memory is image memory or not, even though the page table has the correct attributes, so we need to set the
