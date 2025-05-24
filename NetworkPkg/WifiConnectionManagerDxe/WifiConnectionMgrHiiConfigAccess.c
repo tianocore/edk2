@@ -1662,6 +1662,11 @@ WifiMgrDxeHiiConfigAccessCallback (
           Private->CurrentNic->HasDisconnectPendingNetwork = TRUE;
         }
 
+        Status = gBS->SetTimer (Private->CurrentNic->TickTimer, TimerPeriodic, EFI_TIMER_PERIOD_MILLISECONDS (500));
+        if (EFI_ERROR (Status)) {
+          gBS->CloseEvent (Private->CurrentNic->TickTimer);
+        }
+
         break;
 
       case KEY_ENROLL_CA_CERT_CONNECT_NETWORK:
@@ -1911,6 +1916,11 @@ WifiMgrDxeHiiConfigAccessCallback (
               NULL
               );
           }
+        }
+
+        Status = gBS->SetTimer (Private->CurrentNic->TickTimer, TimerPeriodic, EFI_TIMER_PERIOD_MILLISECONDS (500));
+        if (EFI_ERROR (Status)) {
+          gBS->CloseEvent (Private->CurrentNic->TickTimer);
         }
 
         break;
