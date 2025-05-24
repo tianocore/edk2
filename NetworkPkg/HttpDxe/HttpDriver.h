@@ -3,6 +3,7 @@
 
   Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+  (c) Copyright 2025 HP Development Company, L.P.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -27,6 +28,7 @@
 #include <Library/HttpLib.h>
 #include <Library/DpcLib.h>
 #include <Library/PrintLib.h>
+#include <Library/PcdLib.h>
 
 //
 // UEFI Driver Model Protocols

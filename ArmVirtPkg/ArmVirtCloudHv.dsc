@@ -28,7 +28,11 @@
   DEFINE TTY_TERMINAL            = FALSE
   DEFINE SECURE_BOOT_ENABLE      = FALSE
 
-# This comes before MdeLibs to ensure stack cookie configuration is chosen
+# This comes at the beginning of includes to pick all relevant defines early on.
+!include ArmVirtPkg/ArmVirtStackCookies.dsc.inc
+
+# This comes at the end of includes to pick all relevant components without any
+# unintentional overrides.
 !include ArmVirtPkg/ArmVirt.dsc.inc
 
 [LibraryClasses.common]
@@ -61,6 +65,7 @@
 !include MdePkg/MdeLibs.dsc.inc
 
 [LibraryClasses.common.PEIM]
+  PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
   ArmVirtMemInfoLib|ArmVirtPkg/Library/CloudHvVirtMemInfoLib/CloudHvVirtMemInfoPeiLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]

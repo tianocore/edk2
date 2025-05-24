@@ -221,6 +221,10 @@ ReserveEmuVariableNvStore (
   EFI_PHYSICAL_ADDRESS  VariableStore;
   RETURN_STATUS         PcdStatus;
 
+  if (FeaturePcdGet (PcdQemuVarsRequire)) {
+    return;
+  }
+
   VariableStore = (EFI_PHYSICAL_ADDRESS)(UINTN)PlatformReserveEmuVariableNvStore ();
   PcdStatus     = PcdSet64S (PcdEmuVariableNvStoreReserved, VariableStore);
 

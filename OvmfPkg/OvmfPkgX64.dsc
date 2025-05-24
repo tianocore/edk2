@@ -31,6 +31,7 @@
   #
   DEFINE SECURE_BOOT_ENABLE      = FALSE
   DEFINE SMM_REQUIRE             = FALSE
+  DEFINE QEMU_PV_VARS            = FALSE
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
   DEFINE CC_MEASUREMENT_ENABLE   = TRUE
 
@@ -375,7 +376,7 @@
   PciLib|OvmfPkg/Library/DxePciLibI440FxQ35/DxePciLibI440FxQ35.inf
   QemuFwCfgS3Lib|OvmfPkg/Library/QemuFwCfgS3Lib/DxeQemuFwCfgS3LibFwCfg.inf
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
-!if $(SMM_REQUIRE) == TRUE
+!if $(SMM_REQUIRE) == TRUE || $(QEMU_PV_VARS) == TRUE
   MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
 !endif
 
@@ -498,6 +499,10 @@
 !if $(SMM_REQUIRE) == TRUE
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire|TRUE
   gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugSupport|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache|FALSE
+!endif
+!if $(QEMU_PV_VARS) == TRUE
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuVarsRequire|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache|FALSE
 !endif
 !if $(SECURE_BOOT_ENABLE) == TRUE
@@ -1016,6 +1021,15 @@
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
 
 !else
+!if $(QEMU_PV_VARS) == TRUE
+
+  #
+  # Variable driver stack (qemu -device uefi-vars)
+  #
+  OvmfPkg/VirtMmCommunicationDxe/VirtMmCommunication.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
+
+!else
 
   #
   # Variable driver stack (non-SMM)
@@ -1030,6 +1044,7 @@
     <LibraryClasses>
       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
   }
+!endif
 !endif
 
   #
