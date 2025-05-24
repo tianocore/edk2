@@ -3317,6 +3317,8 @@ AmdMemEncryptionAttrCheck (
       return CurrentLevel == CCAttrAmdSevSnp;
     case CCAttrFeatureAmdSevEsDebugVirtualization:
       return !!(CurrentAttr & CCAttrFeatureAmdSevEsDebugVirtualization);
+    case CCAttrFeatureAmdSevSnpAlternateInjection:
+      return !!(CurrentAttr & CCAttrFeatureAmdSevSnpAlternateInjection);
     default:
       return FALSE;
   }

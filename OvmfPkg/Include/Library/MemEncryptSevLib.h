@@ -240,4 +240,15 @@ MemEncryptSevSnpPreValidateSystemRam (
   IN UINTN             NumPages
   );
 
+/**
+  Returns a boolean to indicate whether Alternate Injection is enabled.
+
+  @retval TRUE           Alternate Injection is enabled
+  @retval FALSE          Alternate Injection is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevSnpAlternateInjectionIsEnabled (
+  VOID
+  );
 #endif // _MEM_ENCRYPT_SEV_LIB_H_
