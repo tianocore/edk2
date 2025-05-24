@@ -49,6 +49,7 @@
   TimerLib
   DebugLib
   PcdLib
+  Tpm2DebugLib
 
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress            ## CONSUMES

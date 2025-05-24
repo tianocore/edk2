@@ -58,6 +58,7 @@
   Tcg2PhysicalPresenceLib|SecurityPkg/Library/DxeTcg2PhysicalPresenceLib/DxeTcg2PhysicalPresenceLib.inf
   TcgPpVendorLib|SecurityPkg/Library/TcgPpVendorLibNull/TcgPpVendorLibNull.inf
   Tcg2PpVendorLib|SecurityPkg/Library/Tcg2PpVendorLibNull/Tcg2PpVendorLibNull.inf
+  Tpm2DebugLib|SecurityPkg/Library/Tpm2DebugLib/Tpm2DebugLibNull.inf
   RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
   PciLib|MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
   PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
@@ -277,6 +278,10 @@
   SecurityPkg/Library/Tcg2PpVendorLibNull/Tcg2PpVendorLibNull.inf
   SecurityPkg/Library/TcgPpVendorLibNull/TcgPpVendorLibNull.inf
   SecurityPkg/Library/TcgEventLogRecordLib/TcgEventLogRecordLib.inf
+
+  SecurityPkg/Library/Tpm2DebugLib/Tpm2DebugLibSimple.inf
+  SecurityPkg/Library/Tpm2DebugLib/Tpm2DebugLibVerbose.inf
+  SecurityPkg/Library/Tpm2DebugLib/Tpm2DebugLibNull.inf
 
 [Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
   SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf

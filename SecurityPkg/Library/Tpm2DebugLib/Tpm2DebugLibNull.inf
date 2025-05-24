@@ -1,0 +1,30 @@
+## @file Tpm2DebugLibNull.inf
+# This file contains helper functions to do nothing.
+#
+##
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = Tpm2DebugLibNull
+  FILE_GUID           = 97a27b03-286f-4237-a7c3-a09a1b6e6e2d
+  MODULE_TYPE         = BASE
+  VERSION_STRING      = 1.0
+  LIBRARY_CLASS       = Tpm2DebugLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = ALL
+#
+
+[Sources]
+  Tpm2DebugLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
