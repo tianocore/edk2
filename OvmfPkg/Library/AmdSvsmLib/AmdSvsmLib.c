@@ -593,3 +593,43 @@ AmdSvsmVtpmCmd (
 
   return (Ret == 0) ? TRUE : FALSE;
 }
+
+BOOLEAN
+EFIAPI
+AmdSvsmUefiMmCall (
+  IN  UINT32   CallId,
+  IN  UINT64   Rcx,
+  IN  UINT64   Rdx,
+  IN  BOOLEAN  Runtime
+  )
+{
+  SVSM_CALL_DATA  SvsmCallData;
+  SVSM_FUNCTION   Function;
+  UINT64          Caa;
+  UINTN           Ret;
+
+  Function.Id.Protocol = SVSM_UEFI_MM_PROTOCOL;
+  Function.Id.CallId   = CallId;
+
+  if (Runtime) {
+    Caa = AsmReadMsr64 (0xC001F000 /* FIXME: add #define */);
+  } else {
+    Caa = AmdSvsmSnpGetCaa ();
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: runtime %a, caa %lx\n",
+    __func__,
+    Runtime ? "yes" : "no",
+    Caa
+    ));
+
+  SvsmCallData.Caa   = (SVSM_CAA *)Caa;
+  SvsmCallData.RaxIn = Function.Uint64;
+  SvsmCallData.RcxIn = Rcx;
+  SvsmCallData.RdxIn = Rdx;
+
+  Ret = SvsmMsrProtocol (&SvsmCallData);
+  return (Ret == 0) ? TRUE : FALSE;
+}

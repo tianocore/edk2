@@ -555,7 +555,7 @@ SevInitializeRam (
     BuildMemoryAllocationHob (
       (EFI_PHYSICAL_ADDRESS)(UINTN)PcdGet32 (PcdOvmfSnpSecretsBase),
       (UINT64)(UINTN)PcdGet32 (PcdOvmfSnpSecretsSize),
-      EfiReservedMemoryType
+      EfiRuntimeServicesData
       );
     BuildMemoryAllocationHob (
       (EFI_PHYSICAL_ADDRESS)(UINTN)PcdGet32 (PcdOvmfCpuidBase),

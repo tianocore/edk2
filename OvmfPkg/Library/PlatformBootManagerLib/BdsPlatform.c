@@ -1597,6 +1597,49 @@ SaveS3BootScript (
 }
 
 /**
+  Uninstall the EFI memory attribute protocol if it exists.
+**/
+STATIC
+VOID
+UninstallEfiMemoryAttributesProtocol (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
+  UINTN       Size;
+  VOID        *MemoryAttributeProtocol;
+
+  Size   = sizeof (Handle);
+  Status = gBS->LocateHandle (
+                  ByProtocol,
+                  &gEfiMemoryAttributeProtocolGuid,
+                  NULL,
+                  &Size,
+                  &Handle
+                  );
+
+  if (EFI_ERROR (Status)) {
+    ASSERT (Status == EFI_NOT_FOUND);
+    return;
+  }
+
+  Status = gBS->HandleProtocol (
+                  Handle,
+                  &gEfiMemoryAttributeProtocolGuid,
+                  &MemoryAttributeProtocol
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->UninstallProtocolInterface (
+                  Handle,
+                  &gEfiMemoryAttributeProtocolGuid,
+                  MemoryAttributeProtocol
+                  );
+  ASSERT_EFI_ERROR (Status);
+}
+
+/**
   Do the platform specific action after the console is ready
 
   Possible things that can be done in PlatformBootManagerAfterConsole:
@@ -1616,6 +1659,7 @@ PlatformBootManagerAfterConsole (
   )
 {
   EFI_BOOT_MODE  BootMode;
+  BOOLEAN        Uninstall;
 
   DEBUG ((DEBUG_INFO, "PlatformBootManagerAfterConsole\n"));
 
@@ -1659,6 +1703,25 @@ PlatformBootManagerAfterConsole (
   // Write qemu bootorder to efi variables
   //
   StoreQemuBootOrder ();
+
+  //
+  // Work around shim's terminally broken use of the EFI memory attributes
+  // protocol, by uninstalling it if requested on the QEMU command line.
+  //
+  // E.g.,
+  //       -fw_cfg opt/org.tianocore/UninstallMemAttrProtocol,string=y
+  //
+  Uninstall = FixedPcdGetBool (PcdUninstallMemAttrProtocol);
+  QemuFwCfgParseBool ("opt/org.tianocore/UninstallMemAttrProtocol", &Uninstall);
+  DEBUG ((
+    DEBUG_WARN,
+    "%a: %auninstalling EFI memory protocol\n",
+    __func__,
+    Uninstall ? "" : "not "
+    ));
+  if (Uninstall) {
+    UninstallEfiMemoryAttributesProtocol ();
+  }
 
   //
   // Process QEMU's -kernel command line option
