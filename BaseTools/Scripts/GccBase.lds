@@ -5,6 +5,7 @@
   Copyright (c) 2010 - 2021, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2015, Linaro Ltd. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (C) 2025, Microsoft Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -77,6 +78,12 @@ SECTIONS {
     *(.got.plt)
   }
   ASSERT(SIZEOF(.got.plt) == 0 || SIZEOF(.got.plt) == 0xc || SIZEOF(.got.plt) == 0x18, "Unexpected GOT/PLT entries detected!")
+
+  .gcov_info : {
+    PROVIDE (__gcov_info_start = .);
+    KEEP (*(.gcov_info))
+    PROVIDE (__gcov_info_end = .);
+  }
 
   /*
    * Retain the GNU build id but in a non-allocatable section so GenFw
