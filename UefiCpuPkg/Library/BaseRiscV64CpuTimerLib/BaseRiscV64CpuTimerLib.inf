@@ -28,6 +28,8 @@
   BaseLib
   PcdLib
   DebugLib
+  FdtLib
+  HobLib
 
-[Pcd]
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuCoreCrystalClockFrequency  ## CONSUMES
+[Guids]
+  gFdtHobGuid
