@@ -24,7 +24,9 @@
 #include <AcpiTableGenerator.h>
 #include <ConfigurationManagerObject.h>
 #include <ConfigurationManagerHelper.h>
+#include <MetadataHelpers.h>
 #include <Library/TableHelperLib.h>
+#include <Library/MetadataHandlerLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
 #include "SratGenerator.h"
@@ -38,6 +40,7 @@
     - EArchCommonObjGenericInitiatorAffinityInfo (OPTIONAL)
     - EArchCommonObjDeviceHandleAcpi (OPTIONAL)
     - EArchCommonObjDeviceHandlePci (OPTIONAL)
+    - EArchCommonObjProximityDomainInfo (OPTIONAL)
 */
 
 /**
@@ -80,6 +83,16 @@ GET_OBJECT_LIST (
   CM_ARCH_COMMON_DEVICE_HANDLE_PCI
   );
 
+/**
+  This macro expands to a function that retrieves Proximity Domain
+  information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArchCommon,
+  EArchCommonObjProximityDomainInfo,
+  CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO
+  );
+
 /** Return the PCI Device information in BDF format
 
     PCI Bus Number - Max 256 busses (Bits 7:0 of byte 0 of BDF)
@@ -104,6 +117,124 @@ GetBdf (
   return *(UINT16 *)Bdf;
 }
 
+/** Get a Proximity Domain Id.
+
+  Proximity Domain Id are now to be placed in
+  CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO objects rather than in the various
+  CmObj using them. This function handles the logic in the selection
+  of the ProximityDomainId to use.
+
+  Proximity Domain Id should be preferably placed in
+  CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO objects now.
+
+  @param [in]  CfgMgrProtocol   Pointer to the Configuration Manager
+                                Protocol Interface.
+  @param [in]  DefaultDomainId  Default per-CmObj Proximity Domain Id.
+                                The CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO
+                                should be preferably used.
+  @param [in]  Token            Token referencing a
+                                CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO object.
+  @param [out] DomainId         If Success, contains DomainId to use.
+
+  @retval EFI_SUCCESS           Table generated successfully.
+  @retval EFI_INVALID_PARAMETER The table pointer is NULL or invalid.
+**/
+EFI_STATUS
+EFIAPI
+GetProximityDomainId (
+  IN CONST  EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CfgMgrProtocol,
+  IN        UINT32                                DefaultDomainId,
+  IN        CM_OBJECT_TOKEN                       Token,
+  OUT       UINT32                                *DomainId
+  )
+{
+  EFI_STATUS                            Status;
+  CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO  *ProximityDomain;
+  METADATA_OBJ_PROXIMITY_DOMAIN         Metadata;
+
+  if ((CfgMgrProtocol == NULL) ||
+      (DomainId == NULL))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Token != CM_NULL_TOKEN) {
+    Status = GetEArchCommonObjProximityDomainInfo (
+               CfgMgrProtocol,
+               Token,
+               &ProximityDomain,
+               NULL
+               );
+  } else {
+    // If CM_NULL_TOKEN, cannot found any Proximity Domain
+    Status = EFI_NOT_FOUND;
+  }
+
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: SRAT: Failed to get Proximity Domain. Status=%r Token=%llx\n",
+      Status,
+      Token
+      ));
+    return Status;
+  } else if ((Status == EFI_SUCCESS) && (ProximityDomain->GenerateDomainId)) {
+    // A Proximity Domain was found and the Id must be generated.
+    Status = MetadataHandlerGenerate (
+               GetMetadataRoot (),
+               MetadataProximityDomainId,
+               Token,
+               NULL,
+               &Metadata,
+               sizeof (METADATA_OBJ_PROXIMITY_DOMAIN)
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
+
+    *DomainId = Metadata.Id;
+  } else {
+    // A hard-coded DomainId is used.
+
+    if (Status == EFI_NOT_FOUND) {
+      // No ProximityDomain CmObj was found.
+      // Use the default Id.
+      *DomainId = DefaultDomainId;
+
+      DEBUG ((
+        DEBUG_WARN,
+        "SRAT: Proximity Domain Ids should be described using "
+        "the new EArchCommonObjProximityDomainInfo object. "
+        "The field currently used will be deprecated.\n"
+        ));
+    } else if (!ProximityDomain->GenerateDomainId) {
+      // A ProximityDomain CmObj was found, but generation is disabled.
+      // Use the Domain Id.
+      *DomainId   = ProximityDomain->DomainId;
+      Metadata.Id = *DomainId;
+
+      // Add the Domain Id to the Metadata database to check duplicated values.
+      Status = MetadataAdd (
+                 GetMetadataRoot (),
+                 MetadataProximityDomainId,
+                 Token,
+                 &Metadata,
+                 sizeof (METADATA_OBJ_PROXIMITY_DOMAIN)
+                 );
+      if (EFI_ERROR (Status) && (Status != EFI_ALREADY_STARTED)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+    } else {
+      ASSERT_EFI_ERROR (Status);
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
 /** Add the Memory Affinity Structures in the SRAT Table.
 
   @param [in]  CfgMgrProtocol   Pointer to the Configuration Manager
@@ -126,7 +257,9 @@ AddMemoryAffinity (
   IN       UINT32                                               MemAffCount
   )
 {
+  EFI_STATUS                              Status;
   EFI_ACPI_6_3_MEMORY_AFFINITY_STRUCTURE  *MemAff;
+  UINT32                                  ProximityDomain;
 
   ASSERT (Srat != NULL);
   ASSERT (MemAffInfo != NULL);
@@ -139,7 +272,6 @@ AddMemoryAffinity (
 
     MemAff->Type            = EFI_ACPI_6_3_MEMORY_AFFINITY;
     MemAff->Length          = sizeof (EFI_ACPI_6_3_MEMORY_AFFINITY_STRUCTURE);
-    MemAff->ProximityDomain = MemAffInfo->ProximityDomain;
     MemAff->Reserved1       = EFI_ACPI_RESERVED_WORD;
     MemAff->AddressBaseLow  = (UINT32)(MemAffInfo->BaseAddress & MAX_UINT32);
     MemAff->AddressBaseHigh = (UINT32)RShiftU64 (MemAffInfo->BaseAddress, 32);
@@ -148,6 +280,20 @@ AddMemoryAffinity (
     MemAff->Reserved2       = EFI_ACPI_RESERVED_DWORD;
     MemAff->Flags           = MemAffInfo->Flags;
     MemAff->Reserved3       = EFI_ACPI_RESERVED_QWORD;
+
+    Status = GetProximityDomainId (
+               CfgMgrProtocol,
+               MemAffInfo->ProximityDomain,
+               MemAffInfo->ProximityDomainToken,
+               &ProximityDomain
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
+
+    // Needed as the field is not 32-bits aligned.
+    ProximityDomain = MemAff->ProximityDomain;
 
     // Next
     MemAff++;
@@ -206,7 +352,17 @@ AddGenericInitiatorAffinity (
       sizeof (EFI_ACPI_6_3_GENERIC_INITIATOR_AFFINITY_STRUCTURE);
     GenInitAff->Reserved1        = EFI_ACPI_RESERVED_WORD;
     GenInitAff->DeviceHandleType = GenInitAffInfo->DeviceHandleType;
-    GenInitAff->ProximityDomain  = GenInitAffInfo->ProximityDomain;
+
+    Status = GetProximityDomainId (
+               CfgMgrProtocol,
+               GenInitAffInfo->ProximityDomain,
+               GenInitAffInfo->ProximityDomainToken,
+               &GenInitAff->ProximityDomain
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
 
     if (GenInitAffInfo->DeviceHandleToken == CM_NULL_TOKEN) {
       DEBUG ((

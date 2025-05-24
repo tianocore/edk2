@@ -14,6 +14,7 @@
 
 #include <Library/AcpiLib.h>
 #include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Protocol/AcpiTable.h>
@@ -22,7 +23,9 @@
 #include <AcpiTableGenerator.h>
 #include <ConfigurationManagerObject.h>
 #include <ConfigurationManagerHelper.h>
+#include <MetadataHelpers.h>
 #include <Library/TableHelperLib.h>
+#include <Library/MetadataHandlerLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
 #include "PpttGenerator.h"
@@ -77,6 +80,58 @@ GET_OBJECT_LIST (
   EArmObjGicCInfo,
   CM_ARM_GICC_INFO
   );
+
+/**
+  This macro expands to a function that retrieves the ACPI Table list
+  information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceStandard,
+  EStdObjAcpiTableList,
+  CM_STD_OBJ_ACPI_TABLE_INFO
+  );
+
+/** Check if the SSDT CPU topology table will be present.
+
+  @param [in]  CfgMgrProtocol         Pointer to the Configuration Manager
+                                      Protocol Interface.
+
+  @retval TRUE if the SSDT CPU topology table is in the list of ACPI tables to install.
+          FALSE otherwise.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+CheckSsdtCpuTopoTablePresent (
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol
+  )
+{
+  EFI_STATUS                  Status;
+  CM_STD_OBJ_ACPI_TABLE_INFO  *AcpiTableList;
+  UINT32                      AcpiTableListCount;
+  UINT32                      Index;
+
+  Status = GetEStdObjAcpiTableList (
+             CfgMgrProtocol,
+             CM_NULL_TOKEN,
+             &AcpiTableList,
+             &AcpiTableListCount
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return FALSE;
+  }
+
+  for (Index = 0; Index < AcpiTableListCount; Index++) {
+    if (AcpiTableList[Index].TableGeneratorId ==
+        CREATE_STD_ACPI_TABLE_GEN_ID (EStdAcpiTableIdSsdtCpuTopology))
+    {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
 
 /**
   Returns the size of the PPTT Processor Hierarchy Node (Type 0) given a
@@ -489,6 +544,9 @@ AddProcHierarchyNodes (
   UINT32             NodeCount;
   UINT32             Length;
 
+  METADATA_OBJ_UID  MetadataUid;
+  BOOLEAN           SsdtCpuTopoPresent;
+
   ASSERT (
     (Generator != NULL) &&
     (CfgMgrProtocol != NULL) &&
@@ -500,6 +558,8 @@ AddProcHierarchyNodes (
 
   ProcNodeIterator = Generator->ProcHierarchyNodeIndexedList;
   NodeCount        = Generator->ProcHierarchyNodeCount;
+
+  SsdtCpuTopoPresent = CheckSsdtCpuTopoTablePresent (CfgMgrProtocol);
 
   // Check if every GICC Object is referenced by onlu one Proc Node
   IsAcpiIdObjectTokenDuplicated = FindDuplicateValue (
@@ -605,17 +665,53 @@ AddProcHierarchyNodes (
       // Default invalid ACPI Processor ID to 0
       ProcStruct->AcpiProcessorId = 0;
     } else if (ProcInfoNode->AcpiIdObjectToken == CM_NULL_TOKEN) {
-      Status = EFI_INVALID_PARAMETER;
-      DEBUG ((
-        DEBUG_ERROR,
-        "ERROR: PPTT: The 'ACPI Processor ID valid' flag is set but no " \
-        "ACPI ID Reference object token was provided. " \
-        "AcpiIdObjectToken = %p. RequestorToken = %p. Status = %r\n",
-        ProcInfoNode->AcpiIdObjectToken,
-        ProcInfoNode->Token,
-        Status
-        ));
-      return Status;
+      if (IS_PROC_NODE_LEAF (ProcInfoNode)) {
+        Status = EFI_INVALID_PARAMETER;
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: PPTT: The 'ACPI Processor ID valid' flag is set but no " \
+          "ACPI ID Reference object token was provided. " \
+          "AcpiIdObjectToken = %p. RequestorToken = %p. Status = %r\n",
+          ProcInfoNode->AcpiIdObjectToken,
+          ProcInfoNode->Token,
+          Status
+          ));
+        return Status;
+      } else if (!SsdtCpuTopoPresent) {
+        Status = EFI_INVALID_PARAMETER;
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: PPTT: The 'ACPI Processor ID valid' flag is for a non-leaf node, " \
+          "but no SSDT CPU TOPOLOGY table will be installed, " \
+          "Token = %p. Status = %r\n",
+          ProcInfoNode->Token,
+          Status
+          ));
+        return Status;
+      }
+
+      // Node is a ProcContainer with a valid ID
+
+      if (ProcInfoNode->OverrideNameUidEnabled) {
+        ProcStruct->AcpiProcessorId = ProcInfoNode->OverrideUid;
+      } else {
+        MetadataUid.EisaId = 0;
+        CopyMem (&MetadataUid.NameId, "ACPI0010", sizeof ("ACPI0010"));
+        Status = MetadataHandlerGenerate (
+                   GetMetadataRoot (),
+                   MetadataUidId,
+                   (CM_OBJECT_TOKEN)ProcInfoNode,
+                   NULL,
+                   &MetadataUid,
+                   sizeof (METADATA_OBJ_UID)
+                   );
+        if (EFI_ERROR (Status)) {
+          ASSERT (0);
+          return Status;
+        }
+
+        ProcStruct->AcpiProcessorId = MetadataUid.Uid;
+      }
     } else {
       Status = GetEArmObjGicCInfo (
                  CfgMgrProtocol,
