@@ -26,6 +26,9 @@
   Include                        # Root include for the package
 
 [LibraryClasses]
+  ArmCcaInitPeiLib|Include/Library/ArmCcaInitPeiLib.h
+  ArmCcaLib|Include/Library/ArmCcaLib.h
+  ArmCcaRsiLib|Include/Library/ArmCcaRsiLib.h
   ArmVirtMemInfoLib|Include/Library/ArmVirtMemInfoLib.h
 
 [Guids.common]
@@ -33,12 +36,16 @@
   gEarlyPL011BaseAddressGuid       = { 0xB199DEA9, 0xFD5C, 0x4A84, { 0x80, 0x82, 0x2F, 0x41, 0x70, 0x78, 0x03, 0x05 } }
   gEarly16550UartBaseAddressGuid   = { 0xea67ca3e, 0x1f54, 0x436b, { 0x97, 0x88, 0xd4, 0xeb, 0x29, 0xc3, 0x42, 0x67 } }
   gArmVirtSystemMemorySizeGuid     = { 0x504eccb9, 0x1bf0, 0x4420, { 0x86, 0x5d, 0xdc, 0x66, 0x06, 0xd4, 0x13, 0xbf } }
+  gArmCcaIpaWidthGuid              = { 0xbdb66787, 0xfc8a, 0x412e, { 0xa0, 0x9b, 0x84, 0x96, 0x61, 0x81, 0x72, 0xc0 } }
 
 [PcdsFeatureFlag]
   #
   # Feature Flag PCD that defines whether TPM2 support is enabled
   #
   gArmVirtTokenSpaceGuid.PcdTpm2SupportEnabled|FALSE|BOOLEAN|0x00000004
+
+[Protocols]
+  gEfiRealmApertureManagementProtocolGuid = { 0x585c00be, 0xcf7c, 0x4db8, { 0x8a, 0xa2, 0x49, 0xd, 0x67, 0xf5, 0xf6, 0xe6 } }
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ##

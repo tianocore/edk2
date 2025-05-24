@@ -1,0 +1,47 @@
+## @file
+#  Driver provides the IOMMU protcol support for PciHostBridgeIo and others
+#  drivers.
+#
+#  Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
+#  Copyright (c) 2022 - 2023, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = IoMmuDxe
+  FILE_GUID                      = AA6C1A48-A341-439C-950E-CC394FDFE144
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ArmCcaIoMmuDxeEntryPoint
+
+[Sources]
+  ArmCcaIoMmu.c
+  ArmCcaIoMmu.h
+  ArmCcaIoMmuDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEdkiiIoMmuProtocolGuid                     ## SOMETIME_PRODUCES
+  gIoMmuAbsentProtocolGuid                    ## SOMETIME_PRODUCES
+  gEfiRealmApertureManagementProtocolGuid
+  gEfiResetNotificationProtocolGuid           ## CONSUMES
+
+[Depex]
+  gEfiRealmApertureManagementProtocolGuid
