@@ -11,6 +11,7 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <ConfigurationManagerObject.h>
+#include "ArchCommonNameSpaceObjects.h"
 #include "ConfigurationManagerObjectParser.h"
 
 STATIC
@@ -774,6 +775,52 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonObjDbg2DeviceInfo[] = {
   { "ObjectName",           AML_NAME_SEG_SIZE + 1,    NULL,   PrintString }
 };
 
+/** A parser for EArchCommonObjCxlHostBridgeInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonObjCxlHostBridgeInfo[] = {
+  { "Token",                 sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "Uid",                   sizeof (UINT32),          "0x%x",   NULL },
+  { "Version",               sizeof (UINT32),          "0x%x",   NULL },
+  { "ComponentRegisterBase", sizeof (UINT64),          "0x%llx", NULL },
+};
+
+STATIC CONST CM_OBJ_PARSER  CmArchCommonObjInterleaveTargetTokenParser[] = {
+  { "InterleaveTargetToken[0]",  sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "InterleaveTargetToken[1]",  sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "InterleaveTargetToken[2]",  sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "InterleaveTargetToken[3]",  sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "InterleaveTargetToken[4]",  sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "InterleaveTargetToken[5]",  sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "InterleaveTargetToken[6]",  sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "InterleaveTargetToken[7]",  sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "InterleaveTargetToken[8]",  sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "InterleaveTargetToken[9]",  sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "InterleaveTargetToken[10]", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "InterleaveTargetToken[11]", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "InterleaveTargetToken[12]", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "InterleaveTargetToken[13]", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "InterleaveTargetToken[14]", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "InterleaveTargetToken[15]", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+};
+
+/** A parser for EArchCommonObjCxlFixedMemoryWindowInfo
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonObjCxlFixedMemoryWindowInfo[] = {
+  { "BaseHostPhysicalAddress",         sizeof (UINT64), "0x%llx", NULL },
+  { "WindowSizeBytes",                 sizeof (UINT64), "0x%llx", NULL },
+  { "NumberOfInterleaveWays",          sizeof (UINT8),  "%d",     NULL },
+  { "InterleaveArithmetic",            sizeof (UINT8),  "%d",     NULL },
+  { "HostBridgeInterleaveGranularity", sizeof (UINT32), "0x%x",   NULL },
+  { "WindowRestrictions",              sizeof (UINT16), "0x%x",   NULL },
+  { "QtgId",                           sizeof (UINT16), "%d",     NULL },
+  { "InterleaveTargetTokens",
+    sizeof (CM_OBJECT_TOKEN) * CFMWS_MAX_INTERLEAVE_WAYS,
+    NULL,
+    NULL,
+    CmArchCommonObjInterleaveTargetTokenParser,
+    ARRAY_SIZE (CmArchCommonObjInterleaveTargetTokenParser) },
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -814,6 +861,8 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjStaInfo,                     CmArchCommonStaInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryRangeDescriptor,       CmArchCommonObjMemoryRangeDescriptor),
   CM_PARSER_ADD_OBJECT (EArchCommonObjGenericDbg2DeviceInfo,       CmArchCommonObjDbg2DeviceInfo),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjCxlHostBridgeInfo,           CmArchCommonObjCxlHostBridgeInfo),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjCxlFixedMemoryWindowInfo,    CmArchCommonObjCxlFixedMemoryWindowInfo),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
