@@ -9,10 +9,10 @@
      - spmc - Secure Partition Manager Core
      - spmd - Secure Partition Manager Dispatcher
 
-  @par Reference(s):
+     @par Reference(s):
      - Arm Firmware Framework for Arm A-Profile [https://developer.arm.com/documentation/den0077/latest]
 
-**/
+     **/
 
 #ifndef ARM_FFA_RX_TX_MAP_LIB_H_
 #define ARM_FFA_RX_TX_MAP_LIB_H_
