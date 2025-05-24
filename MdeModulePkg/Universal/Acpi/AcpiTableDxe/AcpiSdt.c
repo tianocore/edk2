@@ -336,6 +336,11 @@ SdtRegisterNotify (
   CurrentNotifyList = AllocatePool (sizeof (EFI_ACPI_NOTIFY_LIST));
   ASSERT (CurrentNotifyList != NULL);
 
+  if (CurrentNotifyList == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a Failed to allocate pool\n", __func__));
+    return;
+  }
+
   //
   // Initialize the table contents
   //
@@ -484,6 +489,10 @@ SdtOpenSdtTable (
 
   AmlHandle = AllocatePool (sizeof (*AmlHandle));
   ASSERT (AmlHandle != NULL);
+  if (AmlHandle == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
   AmlHandle->Signature       = EFI_AML_ROOT_HANDLE_SIGNATURE;
   AmlHandle->Buffer          = (VOID *)((UINTN)Table->Table + sizeof (EFI_ACPI_SDT_HEADER));
   AmlHandle->Size            = Table->Table->Length - sizeof (EFI_ACPI_SDT_HEADER);
@@ -560,6 +569,9 @@ SdtOpenEx (
   //
   AmlHandle = AllocatePool (sizeof (*AmlHandle));
   ASSERT (AmlHandle != NULL);
+  if (AmlHandle == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   AmlHandle->Signature       = EFI_AML_HANDLE_SIGNATURE;
   AmlHandle->Buffer          = Buffer;
@@ -928,6 +940,10 @@ SdtDuplicateHandle (
 
   DstAmlHandle = AllocatePool (sizeof (*DstAmlHandle));
   ASSERT (DstAmlHandle != NULL);
+  if (DstAmlHandle == NULL) {
+    return NULL;
+  }
+
   CopyMem (DstAmlHandle, (VOID *)AmlHandle, sizeof (*DstAmlHandle));
 
   return DstAmlHandle;
@@ -967,6 +983,10 @@ SdtFindPathFromRoot (
     // Duplicate RootHandle
     //
     *HandleOut = (EFI_ACPI_HANDLE)SdtDuplicateHandle (AmlHandle);
+    if (*HandleOut == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     return EFI_SUCCESS;
   }
 
