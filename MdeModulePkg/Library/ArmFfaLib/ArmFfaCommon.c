@@ -754,30 +754,11 @@ ArmFfaLibCommonInit (
   IN VOID
   )
 {
-  EFI_STATUS    Status;
-  UINT16        CurrentMajorVersion;
-  UINT16        CurrentMinorVersion;
-  ARM_FFA_ARGS  FfaArgs;
+  EFI_STATUS  Status;
+  UINT16      CurrentMajorVersion;
+  UINT16      CurrentMinorVersion;
 
   gFfaSupported = FALSE;
-
-  ZeroMem (&FfaArgs, sizeof (ARM_SMC_ARGS));
-  FfaArgs.Arg0 = SMCCC_VERSION;
-  ArmCallFfa (&FfaArgs);
-  if ((INT32)FfaArgs.Arg0 < 0) {
-    DEBUG ((DEBUG_ERROR, "%a: SMCCC_VERSION not supported\n", __func__));
-    return EFI_UNSUPPORTED;
-  }
-
-  // According to SMCCC Specification v1.6 G BET0
-  // Table F0-1: Changelog: Starting from SMCCC_VERSION v1.2, the interface
-  // - Permits calls to use R4–R7 as return register
-  // - Permits calls to use X4–X17 as return registers
-  // - Permits calls to use X8–X17 as argument registers
-  if ((INT32)FfaArgs.Arg0 < 0x10002) {
-    DEBUG ((DEBUG_ERROR, "%a: SMCCC_VERSION %x < 1.2\n", __func__, (UINT32)FfaArgs.Arg0));
-    return EFI_UNSUPPORTED;
-  }
 
   Status = ArmFfaLibGetVersion (
              ARM_FFA_MAJOR_VERSION,
@@ -786,6 +767,22 @@ ArmFfaLibCommonInit (
              &CurrentMinorVersion
              );
   if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if ((ARM_FFA_MAJOR_VERSION != CurrentMajorVersion) ||
+      (ARM_FFA_MINOR_VERSION > CurrentMinorVersion))
+  {
+    DEBUG ((
+      DEBUG_INFO,
+      "Incompatible FF-A Versions.\n" \
+      "Request Version: Major=0x%x, Minor=0x%x.\n" \
+      "Current Version: Major=0x%x, Minor>=0x%x.\n",
+      ARM_FFA_MAJOR_VERSION,
+      ARM_FFA_MINOR_VERSION,
+      CurrentMajorVersion,
+      CurrentMinorVersion
+      ));
     return EFI_UNSUPPORTED;
   }
 

@@ -43,6 +43,7 @@
   BaseMemoryLib
   CpuMmuInitLib
   DebugLib
+  FdtLib
   HobLib
   MemoryAllocationLib
   MpInitLib
