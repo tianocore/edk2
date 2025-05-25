@@ -1494,36 +1494,6 @@ class PcdReport(object):
             else:
                 FileWrite(File, '        %-*s = %s' % (self.MaxLen + 4, '.' + Key, Value[0]))
 
-    def StrtoHex(self, value):
-        try:
-            value = hex(int(value))
-            return value
-        except:
-            if value.startswith("L\"") and value.endswith("\""):
-                valuelist = []
-                for ch in value[2:-1]:
-                    valuelist.append(hex(ord(ch)))
-                    valuelist.append('0x00')
-                return valuelist
-            elif value.startswith("\"") and value.endswith("\""):
-                return hex(ord(value[1:-1]))
-            elif value.startswith("{") and value.endswith("}"):
-                valuelist = []
-                if ',' not in value:
-                    return value[1:-1]
-                for ch in value[1:-1].split(','):
-                    ch = ch.strip()
-                    if ch.startswith('0x') or ch.startswith('0X'):
-                        valuelist.append(ch)
-                        continue
-                    try:
-                        valuelist.append(hex(int(ch.strip())))
-                    except:
-                        pass
-                return valuelist
-            else:
-                return value
-
     def IsStructurePcd(self, PcdToken, PcdTokenSpaceGuid):
         if GlobalData.gStructurePcd and (self.Arch in GlobalData.gStructurePcd) and ((PcdToken, PcdTokenSpaceGuid) in GlobalData.gStructurePcd[self.Arch]):
             return True

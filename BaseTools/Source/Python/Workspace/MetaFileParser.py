@@ -158,7 +158,6 @@ class MetaFileParser(object):
         self._Arch = Arch
         self._FileType = FileType
         self.MetaFile = FilePath
-        self._FileDir = self.MetaFile.Dir
         self._Defines = {}
         self._Packages = []
         self._FileLocalMacros = {}
@@ -1183,9 +1182,6 @@ class DscParser(MetaFileParser):
     def _LibraryInstanceParser(self):
         self._ValueList[0] = self._CurrentLine
 
-
-    def _DecodeCODEData(self):
-        pass
     ## PCD sections parser
     #
     #   [PcdsFixedAtBuild]
@@ -1793,8 +1789,6 @@ class DecParser(MetaFileParser):
         self._CurrentStructurePcdName = ""
         self._include_flag = False
         self._package_flag = False
-
-        self._RestofValue = ""
 
     ## Parser starter
     def Start(self):
