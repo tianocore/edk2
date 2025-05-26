@@ -29,7 +29,7 @@ def add_command_line_option(parser: ArgumentParser) -> None:
              "BaseTools/Plugin/CodeQL/Readme.md for more info.")
 
 
-def get_scopes(codeql_enabled: bool) -> Tuple[str]:
+def get_scopes(codeql_enabled: bool) -> Tuple[str, ...]:
     """Returns the active CodeQL scopes for this build.
 
     Args:
