@@ -69,14 +69,17 @@
 //
 // Basic types mapping
 //
-typedef UINTN    size_t;
-typedef INTN     ssize_t;
-typedef INT32    time_t;
-typedef INT32    int32_t;
-typedef UINT32   uint32_t;
-typedef UINT16   uint16_t;
-typedef UINT8    uint8_t;
-typedef BOOLEAN  bool;
+typedef UINTN   size_t;
+typedef INTN    ssize_t;
+typedef INT32   time_t;
+typedef INT32   int32_t;
+typedef UINT32  uint32_t;
+typedef UINT16  uint16_t;
+typedef UINT8   uint8_t;
+// In C23, bool is a built-in type
+#if __STDC_VERSION__ < 202311L
+typedef BOOLEAN bool;
+#endif
 
 #define true   (1 == 1)
 #define false  (1 == 0)
