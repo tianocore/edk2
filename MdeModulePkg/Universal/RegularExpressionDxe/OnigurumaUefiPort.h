@@ -32,6 +32,7 @@
 typedef UINTN   size_t;
 typedef UINT32  uint32_t;
 typedef INTN    intptr_t;
+typedef INT64   ptrdiff_t;
 
 #ifndef offsetof
 #define offsetof  OFFSET_OF
