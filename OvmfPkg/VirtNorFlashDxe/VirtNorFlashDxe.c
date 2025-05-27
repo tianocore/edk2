@@ -148,16 +148,6 @@ NorFlashUnlockAndEraseSingleBlock (
 {
   EFI_STATUS  Status;
   UINTN       Index;
-  EFI_TPL     OriginalTPL;
-
-  if (!EfiAtRuntime ()) {
-    // Raise TPL to TPL_HIGH to stop anyone from interrupting us.
-    OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
-  } else {
-    // This initialization is only to prevent the compiler to complain about the
-    // use of uninitialized variables
-    OriginalTPL = TPL_HIGH_LEVEL;
-  }
 
   Index = 0;
   // The block erase might fail a first time (SW bug ?). Retry it ...
@@ -174,11 +164,6 @@ NorFlashUnlockAndEraseSingleBlock (
 
   if (Index == NOR_FLASH_ERASE_RETRY) {
     DEBUG ((DEBUG_ERROR, "EraseSingleBlock(BlockAddress=0x%08x: Block Locked Error (try to erase %d times)\n", BlockAddress, Index));
-  }
-
-  if (!EfiAtRuntime ()) {
-    // Interruptions can resume.
-    gBS->RestoreTPL (OriginalTPL);
   }
 
   return Status;
@@ -199,7 +184,6 @@ NorFlashWriteFullBlock (
   UINTN       BlockAddress;
   UINTN       BuffersInBlock;
   UINTN       RemainingWords;
-  EFI_TPL     OriginalTPL;
   UINTN       Cnt;
 
   Status = EFI_SUCCESS;
@@ -209,15 +193,6 @@ NorFlashWriteFullBlock (
 
   // Start writing from the first address at the start of the block
   WordAddress = BlockAddress;
-
-  if (!EfiAtRuntime ()) {
-    // Raise TPL to TPL_HIGH to stop anyone from interrupting us.
-    OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
-  } else {
-    // This initialization is only to prevent the compiler to complain about the
-    // use of uninitialized variables
-    OriginalTPL = TPL_HIGH_LEVEL;
-  }
 
   Status = NorFlashUnlockAndEraseSingleBlock (Instance, BlockAddress);
   if (EFI_ERROR (Status)) {
@@ -282,11 +257,6 @@ NorFlashWriteFullBlock (
 EXIT:
   // Put device back into Read Array mode
   SEND_NOR_COMMAND (Instance->DeviceBaseAddress, 0, P30_CMD_READ_ARRAY);
-
-  if (!EfiAtRuntime ()) {
-    // Interruptions can resume.
-    gBS->RestoreTPL (OriginalTPL);
-  }
 
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "NOR FLASH Programming [WriteSingleBlock] failed at address 0x%08x. Exit Status = \"%r\".\n", WordAddress, Status));
