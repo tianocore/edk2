@@ -19,7 +19,7 @@
 #include <Guid/SystemNvDataGuid.h>
 #include <Guid/VariableFormat.h>
 
-#include "VirtNorFlash.h"
+#include "VirtNorFlashDxe.h"
 
 extern UINTN  mFlashNvStorageVariableBase;
 ///
@@ -653,13 +653,30 @@ FvbRead (
 
   // Decide if we are doing full block reads or not.
   if (*NumBytes % BlockSize != 0) {
-    TempStatus = NorFlashRead (Instance, Instance->StartLba + Lba, Offset, *NumBytes, Buffer);
+    TempStatus = NorFlashRead (
+                   Instance->DeviceBaseAddress,
+                   Instance->RegionBaseAddress,
+                   Instance->StartLba + Lba,
+                   Instance->BlockSize,
+                   Instance->Size,
+                   Offset,
+                   *NumBytes,
+                   Buffer
+                   );
     if (EFI_ERROR (TempStatus)) {
       return EFI_DEVICE_ERROR;
     }
   } else {
     // Read NOR Flash data into shadow buffer
-    TempStatus = NorFlashReadBlocks (Instance, Instance->StartLba + Lba, BlockSize, Buffer);
+    TempStatus = NorFlashReadBlocks (
+                   Instance->DeviceBaseAddress,
+                   Instance->RegionBaseAddress,
+                   Instance->StartLba + Lba,
+                   Instance->LastBlock,
+                   Instance->BlockSize,
+                   BlockSize,
+                   Buffer
+                   );
     if (EFI_ERROR (TempStatus)) {
       // Return one of the pre-approved error statuses
       return EFI_DEVICE_ERROR;
@@ -748,7 +765,18 @@ FvbWrite (
     OriginalTPL = TPL_HIGH_LEVEL;
   }
 
-  Status = NorFlashWriteSingleBlock (Instance, Instance->StartLba + Lba, Offset, NumBytes, Buffer);
+  Status = NorFlashWriteSingleBlock (
+             Instance->DeviceBaseAddress,
+             Instance->RegionBaseAddress,
+             Instance->StartLba + Lba,
+             Instance->LastBlock,
+             Instance->BlockSize,
+             Instance->Size,
+             Offset,
+             NumBytes,
+             Buffer,
+             Instance->ShadowBuffer
+             );
 
   if (!EfiAtRuntime ()) {
     // Interruptions can resume.
@@ -893,7 +921,7 @@ FvbEraseBlocks (
         OriginalTPL = TPL_HIGH_LEVEL;
       }
 
-      Status = NorFlashUnlockAndEraseSingleBlock (Instance, BlockAddress);
+      Status = NorFlashUnlockAndEraseSingleBlock (Instance->DeviceBaseAddress, BlockAddress);
       if (!EfiAtRuntime ()) {
         // Interruptions can resume.
         gBS->RestoreTPL (OriginalTPL);

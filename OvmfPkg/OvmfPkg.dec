@@ -120,6 +120,10 @@
   #                  transports.
   VirtioMmioDeviceLib|Include/Library/VirtioMmioDeviceLib.h
 
+  ##  @libraryclass  Provides a Device Nor flash interface.
+  #
+  VirtNorFlashDeviceLib|Include/Library/VirtNorFlashDeviceLib.h
+
   ##  @libraryclass  Provides a Nor flash interface.
   #
   VirtNorFlashPlatformLib|Include/Library/VirtNorFlashPlatformLib.h

@@ -1,4 +1,4 @@
-/** @file  NorFlashDxe.c
+/** @file  VirtNorFlashDxe.c
 
   Copyright (c) 2011 - 2021, Arm Limited. All rights reserved.<BR>
 
@@ -14,7 +14,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 
-#include "VirtNorFlash.h"
+#include "VirtNorFlashDxe.h"
 
 STATIC EFI_EVENT  mNorFlashVirtualAddrChangeEvent;
 
@@ -138,131 +138,35 @@ NorFlashCreateInstance (
 }
 
 /**
- * This function unlock and erase an entire NOR Flash block.
- **/
-EFI_STATUS
-NorFlashUnlockAndEraseSingleBlock (
-  IN NOR_FLASH_INSTANCE  *Instance,
-  IN UINTN               BlockAddress
+  @param[in]    Event   The Event that is being processed
+  @param[in]    Context Event Context
+**/
+VOID
+EFIAPI
+NorFlashVirtualNotifyEvent (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  EFI_STATUS  Status;
-  UINTN       Index;
+  UINTN  Index;
 
-  Index = 0;
-  // The block erase might fail a first time (SW bug ?). Retry it ...
-  do {
-    // Unlock the block if we have to
-    Status = NorFlashUnlockSingleBlockIfNecessary (Instance, BlockAddress);
-    if (EFI_ERROR (Status)) {
-      break;
-    }
+  for (Index = 0; Index < mNorFlashDeviceCount; Index++) {
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->DeviceBaseAddress);
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->RegionBaseAddress);
 
-    Status = NorFlashEraseSingleBlock (Instance, BlockAddress);
-    Index++;
-  } while ((Index < NOR_FLASH_ERASE_RETRY) && (Status == EFI_WRITE_PROTECTED));
+    // Convert Fvb
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->FvbProtocol.EraseBlocks);
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->FvbProtocol.GetAttributes);
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->FvbProtocol.GetBlockSize);
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->FvbProtocol.GetPhysicalAddress);
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->FvbProtocol.Read);
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->FvbProtocol.SetAttributes);
+    EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->FvbProtocol.Write);
 
-  if (Index == NOR_FLASH_ERASE_RETRY) {
-    DEBUG ((DEBUG_ERROR, "EraseSingleBlock(BlockAddress=0x%08x: Block Locked Error (try to erase %d times)\n", BlockAddress, Index));
-  }
-
-  return Status;
-}
-
-EFI_STATUS
-NorFlashWriteFullBlock (
-  IN NOR_FLASH_INSTANCE  *Instance,
-  IN EFI_LBA             Lba,
-  IN UINT32              *DataBuffer,
-  IN UINT32              BlockSizeInWords
-  )
-{
-  EFI_STATUS  Status;
-  UINTN       WordAddress;
-  UINT32      WordIndex;
-  UINTN       BufferIndex;
-  UINTN       BlockAddress;
-  UINTN       BuffersInBlock;
-  UINTN       RemainingWords;
-  UINTN       Cnt;
-
-  Status = EFI_SUCCESS;
-
-  // Get the physical address of the block
-  BlockAddress = GET_NOR_BLOCK_ADDRESS (Instance->RegionBaseAddress, Lba, BlockSizeInWords * 4);
-
-  // Start writing from the first address at the start of the block
-  WordAddress = BlockAddress;
-
-  Status = NorFlashUnlockAndEraseSingleBlock (Instance, BlockAddress);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "WriteSingleBlock: ERROR - Failed to Unlock and Erase the single block at 0x%X\n", BlockAddress));
-    goto EXIT;
-  }
-
-  // To speed up the programming operation, NOR Flash is programmed using the Buffered Programming method.
-
-  // Check that the address starts at a 32-word boundary, i.e. last 7 bits must be zero
-  if ((WordAddress & BOUNDARY_OF_32_WORDS) == 0x00) {
-    // First, break the entire block into buffer-sized chunks.
-    BuffersInBlock = (UINTN)(BlockSizeInWords * 4) / P30_MAX_BUFFER_SIZE_IN_BYTES;
-
-    // Then feed each buffer chunk to the NOR Flash
-    // If a buffer does not contain any data, don't write it.
-    for (BufferIndex = 0;
-         BufferIndex < BuffersInBlock;
-         BufferIndex++, WordAddress += P30_MAX_BUFFER_SIZE_IN_BYTES, DataBuffer += P30_MAX_BUFFER_SIZE_IN_WORDS
-         )
-    {
-      // Check the buffer to see if it contains any data (not set all 1s).
-      for (Cnt = 0; Cnt < P30_MAX_BUFFER_SIZE_IN_WORDS; Cnt++) {
-        if (~DataBuffer[Cnt] != 0 ) {
-          // Some data found, write the buffer.
-          Status = NorFlashWriteBuffer (
-                     Instance,
-                     WordAddress,
-                     P30_MAX_BUFFER_SIZE_IN_BYTES,
-                     DataBuffer
-                     );
-          if (EFI_ERROR (Status)) {
-            goto EXIT;
-          }
-
-          break;
-        }
-      }
-    }
-
-    // Finally, finish off any remaining words that are less than the maximum size of the buffer
-    RemainingWords = BlockSizeInWords % P30_MAX_BUFFER_SIZE_IN_WORDS;
-
-    if (RemainingWords != 0) {
-      Status = NorFlashWriteBuffer (Instance, WordAddress, (RemainingWords * 4), DataBuffer);
-      if (EFI_ERROR (Status)) {
-        goto EXIT;
-      }
-    }
-  } else {
-    // For now, use the single word programming algorithm
-    // It is unlikely that the NOR Flash will exist in an address which falls within a 32 word boundary range,
-    // i.e. which ends in the range 0x......01 - 0x......7F.
-    for (WordIndex = 0; WordIndex < BlockSizeInWords; WordIndex++, DataBuffer++, WordAddress = WordAddress + 4) {
-      Status = NorFlashWriteSingleWord (Instance, WordAddress, *DataBuffer);
-      if (EFI_ERROR (Status)) {
-        goto EXIT;
-      }
+    if (mNorFlashInstances[Index]->ShadowBuffer != NULL) {
+      EfiConvertPointer (0x0, (VOID **)&mNorFlashInstances[Index]->ShadowBuffer);
     }
   }
-
-EXIT:
-  // Put device back into Read Array mode
-  SEND_NOR_COMMAND (Instance->DeviceBaseAddress, 0, P30_CMD_READ_ARRAY);
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "NOR FLASH Programming [WriteSingleBlock] failed at address 0x%08x. Exit Status = \"%r\".\n", WordAddress, Status));
-  }
-
-  return Status;
 }
 
 EFI_STATUS
