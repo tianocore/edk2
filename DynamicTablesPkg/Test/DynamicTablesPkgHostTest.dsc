@@ -32,3 +32,7 @@
     <LibraryClasses>
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiDbg2Lib/AcpiDbg2Lib.inf
   }
+  DynamicTablesPkg/Library/Acpi/Common/AcpiCedtLib/GoogleTest/CedtGeneratorGoogleTest.inf {
+    <LibraryClasses>
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiCedtLib/AcpiCedtLib.inf
+  }
