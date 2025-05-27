@@ -12,12 +12,8 @@
 
 // Setup EL1 while in EL1
 ASM_FUNC(SetupExceptionLevel1)
-   mov  x5, x30                   // Save LR
-
    mov  x0, #CPACR_DEFAULT
-   bl   ASM_PFX(ArmWriteCpacr)    // Enable architectural features
-
-   ret  x5
+   b    ASM_PFX(ArmWriteCpacr)    // Tail call
 
 // Setup EL2 while in EL2
 ASM_FUNC(SetupExceptionLevel2)
