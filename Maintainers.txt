@@ -84,8 +84,12 @@ M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 EDK II Architectures:
 ---------------------
 ARM, AARCH64
-F: */AArch64/
-F: */Arm/
+F: MdeModulePkg/*/AArch64/
+F: MdeModulePkg/*/Arm/
+F: MdePkg/*/AArch64/
+F: MdePkg/*/Arm/
+F: UefiCpuPkg/*/AArch64/
+F: UefiCpuPkg/*/Arm/
 M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
