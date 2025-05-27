@@ -11,10 +11,6 @@
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
 extern "C" {
-  #include <PiPei.h>
-  #include <PiDxe.h>
-  #include <PiSmm.h>
-  #include <PiMm.h>
   #include <Uefi.h>
   #include <Library/HiiLib.h>
 }
