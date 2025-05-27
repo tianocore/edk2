@@ -22,9 +22,6 @@ SKUID_IDENTIFIER        = DEFAULT
 [LibraryClasses.common.HOST_APPLICATION]
 
 [Components]
-#
-# List of Unit test packages
-#
   #
   # Build HOST_APPLICATION Libraries With GoogleTest
   #
