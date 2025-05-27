@@ -204,6 +204,7 @@
   DebugLib                         | MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
   PeiServicesLib                   | MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   VariableFlashInfoLib             | MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
+  VirtNorFlashDeviceLib            | OvmfPkg/Library/VirtNorFlashDeviceLib/VirtNorFlashDeviceLib.inf
   VirtNorFlashPlatformLib          | OvmfPkg/Library/FdtNorFlashQemuLib/FdtNorFlashQemuLib.inf
 
 [LibraryClasses.common.SEC]
