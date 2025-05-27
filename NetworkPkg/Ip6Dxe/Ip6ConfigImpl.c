@@ -989,7 +989,7 @@ Ip6ConfigSetManualAddress (
     for (Index1 = 0; Index1 < NewAddressCount; Index1++, NewAddress++) {
       if (NetIp6IsLinkLocalAddr (&NewAddress->Address)    ||
           !NetIp6IsValidUnicast (&NewAddress->Address)    ||
-          (NewAddress->PrefixLength > 128)
+          (NewAddress->PrefixLength > IP6_PREFIX_MAX)
           )
       {
         //
