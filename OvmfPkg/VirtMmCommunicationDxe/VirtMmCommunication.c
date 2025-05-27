@@ -4,6 +4,7 @@
 
 **/
 
+#include <PiDxe.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -15,12 +16,14 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 
 #include <Protocol/MmCommunication2.h>
+#include <Protocol/MmCommunication3.h>
 
 #include "VirtMmCommunication.h"
 
 VOID                  *mCommunicateBuffer;
 EFI_PHYSICAL_ADDRESS  mCommunicateBufferPhys;
-BOOLEAN               mUsePioTransfer = FALSE;
+BOOLEAN               mHaveSvsmProtocol = FALSE;
+BOOLEAN               mUsePioTransfer   = FALSE;
 
 // Notification event when virtual address map is set.
 STATIC EFI_EVENT  mSetVirtualAddressMapEvent;
@@ -142,7 +145,17 @@ VirtMmCommunication2Communicate (
     return Status;
   }
 
-  if (mUsePioTransfer) {
+  if (mHaveSvsmProtocol) {
+    CopyMem (mCommunicateBuffer, CommBufferVirtual, BufferSize);
+
+    Status = VirtMmSvsmComm ();
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN, "%a: svsm comm error: %r\n", __func__, Status));
+      return Status;
+    }
+
+    CopyMem (CommBufferVirtual, mCommunicateBuffer, BufferSize);
+  } else if (mUsePioTransfer) {
     Status = VirtMmHwPioTransfer (CommBufferVirtual, BufferSize, TRUE);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_WARN, "%a: pio write error: %r\n", __func__, Status));
@@ -183,6 +196,29 @@ STATIC EFI_MM_COMMUNICATION2_PROTOCOL  mMmCommunication2 = {
   VirtMmCommunication2Communicate
 };
 
+EFI_STATUS
+EFIAPI
+VirtMmCommunication3Communicate (
+  IN CONST EFI_MM_COMMUNICATION3_PROTOCOL  *This,
+  IN OUT VOID                              *CommBufferPhysical,
+  IN OUT VOID                              *CommBufferVirtual
+  )
+{
+  EFI_MM_COMMUNICATE_HEADER_V3  *Header  = CommBufferVirtual;
+  UINTN                         HdrSize  = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER_V3, MessageGuid);
+  UINTN                         CommSize = Header->BufferSize - HdrSize;
+  EFI_STATUS                    Status;
+
+  Status = VirtMmCommunication2Communicate (
+             NULL,
+             CommBufferPhysical + HdrSize,
+             CommBufferVirtual + HdrSize,
+             &CommSize
+             );
+
+  return Status;
+}
+
 /**
   Notification callback on SetVirtualAddressMap event.
 
@@ -220,12 +256,18 @@ VirtMmNotifySetVirtualAddressMap (
       ));
   }
 
-  Status = VirtMmHwVirtMap ();
+  if (mHaveSvsmProtocol) {
+    Status = VirtMmSvsmVirtMap ();
+  } else {
+    Status = VirtMmHwVirtMap ();
+  }
+
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "%a: VirtMmHwVirtMap failed. Status: %r\n",
+      "%a: VirtMm%aVirtMap failed. Status: %r\n",
       __func__,
+      mHaveSvsmProtocol ? "Svsm" : "Hw",
       Status
       ));
   }
@@ -309,12 +351,20 @@ VirtMmCommunication2Initialize (
   }
 
   mCommunicateBufferPhys = (EFI_PHYSICAL_ADDRESS)(UINTN)(mCommunicateBuffer);
-  Status                 = VirtMmHwInit ();
+
+  if (VirtMmSvsmProbe ()) {
+    mHaveSvsmProtocol = TRUE;
+    Status            = VirtMmSvsmInit ();
+  } else {
+    Status = VirtMmHwInit ();
+  }
+
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "%a: Failed to init HW: %r\n",
+      "%a: Failed to init %a: %r\n",
       __func__,
+      mHaveSvsmProtocol ? "SVSM" : "HW",
       Status
       ));
     goto FreeBufferPages;
