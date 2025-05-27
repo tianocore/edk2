@@ -734,10 +734,28 @@ FvbWrite (
   )
 {
   NOR_FLASH_INSTANCE  *Instance;
+  EFI_TPL             OriginalTPL;
+  EFI_STATUS          Status;
 
   Instance = INSTANCE_FROM_FVB_THIS (This);
 
-  return NorFlashWriteSingleBlock (Instance, Instance->StartLba + Lba, Offset, NumBytes, Buffer);
+  if (!EfiAtRuntime ()) {
+    // Raise TPL to TPL_HIGH to stop anyone from interrupting us.
+    OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+  } else {
+    // This initialization is only to prevent the compiler to complain about the
+    // use of uninitialized variables
+    OriginalTPL = TPL_HIGH_LEVEL;
+  }
+
+  Status = NorFlashWriteSingleBlock (Instance, Instance->StartLba + Lba, Offset, NumBytes, Buffer);
+
+  if (!EfiAtRuntime ()) {
+    // Interruptions can resume.
+    gBS->RestoreTPL (OriginalTPL);
+  }
+
+  return Status;
 }
 
 /**
@@ -795,6 +813,7 @@ FvbEraseBlocks (
   UINTN               BlockAddress; // Physical address of Lba to erase
   EFI_LBA             StartingLba;  // Lba from which we start erasing
   UINTN               NumOfLba;     // Number of Lba blocks to erase
+  EFI_TPL             OriginalTPL;
   NOR_FLASH_INSTANCE  *Instance;
 
   Instance = INSTANCE_FROM_FVB_THIS (This);
@@ -865,7 +884,21 @@ FvbEraseBlocks (
 
       // Erase it
       DEBUG ((DEBUG_BLKIO, "FvbEraseBlocks: Erasing Lba=%ld @ 0x%08x.\n", Instance->StartLba + StartingLba, BlockAddress));
+      if (!EfiAtRuntime ()) {
+        // Raise TPL to TPL_HIGH to stop anyone from interrupting us.
+        OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+      } else {
+        // This initialization is only to prevent the compiler to complain about the
+        // use of uninitialized variables
+        OriginalTPL = TPL_HIGH_LEVEL;
+      }
+
       Status = NorFlashUnlockAndEraseSingleBlock (Instance, BlockAddress);
+      if (!EfiAtRuntime ()) {
+        // Interruptions can resume.
+        gBS->RestoreTPL (OriginalTPL);
+      }
+
       if (EFI_ERROR (Status)) {
         VA_END (Args);
         Status = EFI_DEVICE_ERROR;
