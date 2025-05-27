@@ -37,14 +37,6 @@ ASM_FUNC(SetupExceptionLevel2)
    mov     x1, #CPACR_DEFAULT
    csel    x0, x0, x1, eq
    msr     cptr_el2, x0           // Enable architectural features
-
-   // Enable Timer access for non-secure EL1 and EL0
-   // The cnthctl_el2 register bits are architecturally
-   // UNKNOWN on reset.
-   // Disable event stream as it is not in use at this stage
-   mov     x0, #(CNTHCTL_EL2_EL1PCTEN | CNTHCTL_EL2_EL1PCEN)
-   msr     cnthctl_el2, x0
-
    ret
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED
