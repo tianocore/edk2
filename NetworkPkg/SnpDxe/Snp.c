@@ -236,6 +236,54 @@ Done:
 }
 
 /**
+  Free the SNP_DRIVER structure and all its sub-structures.
+
+  @param  Snp   Pointer to SNP_DRIVER structure to be freed.
+**/
+VOID
+SimpleNetworkDriverFree (
+  IN SNP_DRIVER  *Snp
+  )
+{
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+
+  if (Snp != NULL) {
+    PciIo = Snp->PciIo;
+    if (PciIo != NULL) {
+      if (Snp->Cpb != NULL) {
+        PciIo->FreeBuffer (
+                 PciIo,
+                 SNP_MEM_PAGES (EFI_PAGE_SIZE),
+                 Snp->Cpb
+                 );
+      }
+
+      if (Snp->Db != NULL) {
+        PciIo->FreeBuffer (
+                 PciIo,
+                 SNP_MEM_PAGES (EFI_PAGE_SIZE),
+                 Snp->Db
+                 );
+      }
+
+      if (Snp->Cdb != NULL) {
+        PciIo->FreeBuffer (
+                 PciIo,
+                 SNP_MEM_PAGES (sizeof (PXE_CDB)),
+                 (VOID *)(UINTN)Snp->Cdb
+                 );
+      }
+    }
+
+    if (Snp->RecycledTxBuf != NULL) {
+      FreePool (Snp->RecycledTxBuf);
+    }
+
+    FreePool (Snp);
+  }
+}
+
+/**
   Start this driver on ControllerHandle. This service is called by the
   EFI boot service ConnectController(). In order to make
   drivers as small as possible, there are a few calling restrictions for
@@ -266,7 +314,6 @@ SimpleNetworkDriverStart (
   EFI_STATUS                                 Status;
   PXE_UNDI                                   *Pxe;
   SNP_DRIVER                                 *Snp;
-  VOID                                       *Address;
   EFI_HANDLE                                 Handle;
   UINT8                                      BarIndex;
   PXE_STATFLAGS                              InitStatFlags;
@@ -339,7 +386,7 @@ SimpleNetworkDriverStart (
 
   if (Calc8BitCksum (Pxe, Pxe->hw.Len) != 0) {
     DEBUG ((DEBUG_NET, "\n!PXE checksum is not correct.\n"));
-    goto NiiError;
+    goto ErrorDeleteSnp;
   }
 
   if ((Pxe->hw.Implementation & PXE_ROMID_IMP_PROMISCUOUS_RX_SUPPORTED) != 0) {
@@ -354,30 +401,18 @@ SimpleNetworkDriverStart (
     //
   } else {
     DEBUG ((DEBUG_NET, "\nUNDI does not have promiscuous or broadcast support."));
-    goto NiiError;
+    goto ErrorDeleteSnp;
   }
 
   //
   // OK, we like this UNDI, and we know snp is not already there on this handle
   // Allocate and initialize a new simple network protocol structure.
   //
-  Status = PciIo->AllocateBuffer (
-                    PciIo,
-                    AllocateAnyPages,
-                    EfiBootServicesData,
-                    SNP_MEM_PAGES (sizeof (SNP_DRIVER)),
-                    &Address,
-                    0
-                    );
-
-  if (Status != EFI_SUCCESS) {
+  Snp = AllocateZeroPool (sizeof (SNP_DRIVER));
+  if (Snp == NULL) {
     DEBUG ((DEBUG_NET, "\nCould not allocate SNP_DRIVER structure.\n"));
-    goto NiiError;
+    goto ErrorDeleteSnp;
   }
-
-  Snp = (SNP_DRIVER *)(UINTN)Address;
-
-  ZeroMem (Snp, sizeof (SNP_DRIVER));
 
   Snp->PciIo     = PciIo;
   Snp->Signature = SNP_DRIVER_SIGNATURE;
@@ -408,7 +443,7 @@ SimpleNetworkDriverStart (
   Snp->RecycledTxBuf = AllocatePool (sizeof (UINT64) * SNP_TX_BUFFER_INCREASEMENT);
   if (Snp->RecycledTxBuf == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
-    goto Error_DeleteSNP;
+    goto ErrorDeleteSnp;
   }
 
   Snp->MaxRecycledTxBuf   = SNP_TX_BUFFER_INCREASEMENT;
@@ -453,18 +488,47 @@ SimpleNetworkDriverStart (
                     PciIo,
                     AllocateAnyPages,
                     EfiBootServicesData,
-                    SNP_MEM_PAGES (4096),
-                    &Address,
+                    SNP_MEM_PAGES (EFI_PAGE_SIZE),
+                    &Snp->Cpb,
                     0
                     );
 
   if (Status != EFI_SUCCESS) {
-    DEBUG ((DEBUG_NET, "\nCould not allocate CPB and DB structures.\n"));
-    goto Error_DeleteSNP;
+    DEBUG ((DEBUG_NET, "\nCould not allocate CPB structure.\n"));
+    goto ErrorDeleteSnp;
   }
 
-  Snp->Cpb = (VOID *)(UINTN)Address;
-  Snp->Db  = (VOID *)((UINTN)Address + 2048);
+  Status = PciIo->AllocateBuffer (
+                    PciIo,
+                    AllocateAnyPages,
+                    EfiBootServicesData,
+                    SNP_MEM_PAGES (EFI_PAGE_SIZE),
+                    &Snp->Db,
+                    0
+                    );
+
+  if (Status != EFI_SUCCESS) {
+    DEBUG ((DEBUG_NET, "\nCould not allocate DB structure.\n"));
+    goto ErrorDeleteSnp;
+  }
+
+  Status = PciIo->AllocateBuffer (
+                    PciIo,
+                    AllocateAnyPages,
+                    EfiBootServicesData,
+                    SNP_MEM_PAGES (sizeof (PXE_CDB)),
+                    (VOID **)&Snp->Cdb,
+                    0
+                    );
+
+  if (Status != EFI_SUCCESS) {
+    DEBUG ((DEBUG_NET, "\nCould not allocate CDB structure.\n"));
+    goto ErrorDeleteSnp;
+  }
+
+  ZeroMem (Snp->Cpb, EFI_PAGE_SIZE);
+  ZeroMem (Snp->Db, EFI_PAGE_SIZE);
+  ZeroMem (Snp->Cdb, sizeof (PXE_CDB));
 
   //
   // Find the correct BAR to do IO.
@@ -487,7 +551,7 @@ SimpleNetworkDriverStart (
     if (Status == EFI_UNSUPPORTED) {
       continue;
     } else if (EFI_ERROR (Status)) {
-      goto Error_DeleteSNP;
+      goto ErrorDeleteSnp;
     }
 
     if ((!FoundMemoryBar) && (BarDesc->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM)) {
@@ -508,37 +572,37 @@ SimpleNetworkDriverStart (
   Status = PxeStart (Snp);
 
   if (Status != EFI_SUCCESS) {
-    goto Error_DeleteSNP;
+    goto ErrorDeleteSnp;
   }
 
-  Snp->Cdb.OpCode  = PXE_OPCODE_GET_INIT_INFO;
-  Snp->Cdb.OpFlags = PXE_OPFLAGS_NOT_USED;
+  Snp->Cdb->OpCode  = PXE_OPCODE_GET_INIT_INFO;
+  Snp->Cdb->OpFlags = PXE_OPFLAGS_NOT_USED;
 
-  Snp->Cdb.CPBsize = PXE_CPBSIZE_NOT_USED;
-  Snp->Cdb.CPBaddr = PXE_DBADDR_NOT_USED;
+  Snp->Cdb->CPBsize = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb->CPBaddr = PXE_DBADDR_NOT_USED;
 
-  Snp->Cdb.DBsize = (UINT16)sizeof (Snp->InitInfo);
-  Snp->Cdb.DBaddr = (UINT64)(UINTN)(&Snp->InitInfo);
+  Snp->Cdb->DBsize = (UINT16)sizeof (Snp->InitInfo);
+  Snp->Cdb->DBaddr = (UINT64)(UINTN)(&Snp->InitInfo);
 
-  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb->StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb->StatFlags = PXE_STATFLAGS_INITIALIZE;
 
-  Snp->Cdb.IFnum   = Snp->IfNum;
-  Snp->Cdb.Control = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb->IFnum   = Snp->IfNum;
+  Snp->Cdb->Control = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   DEBUG ((DEBUG_NET, "\nSnp->undi.get_init_info()  "));
 
-  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)Snp->Cdb);
 
   //
   // Save the INIT Stat Code...
   //
-  InitStatFlags = Snp->Cdb.StatFlags;
+  InitStatFlags = Snp->Cdb->StatFlags;
 
-  if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
-    DEBUG ((DEBUG_NET, "\nSnp->undi.init_info()  %xh:%xh\n", Snp->Cdb.StatFlags, Snp->Cdb.StatCode));
+  if (Snp->Cdb->StatCode != PXE_STATCODE_SUCCESS) {
+    DEBUG ((DEBUG_NET, "\nSnp->undi.init_info()  %xh:%xh\n", Snp->Cdb->StatFlags, Snp->Cdb->StatCode));
     PxeStop (Snp);
-    goto Error_DeleteSNP;
+    goto ErrorDeleteSnp;
   }
 
   //
@@ -623,7 +687,7 @@ SimpleNetworkDriverStart (
 
   if (EFI_ERROR (Status)) {
     PxeStop (Snp);
-    goto Error_DeleteSNP;
+    goto ErrorDeleteSnp;
   }
 
   Status = PxeGetStnAddr (Snp);
@@ -632,7 +696,7 @@ SimpleNetworkDriverStart (
     DEBUG ((DEBUG_ERROR, "\nSnp->undi.get_station_addr() failed.\n"));
     PxeShutdown (Snp);
     PxeStop (Snp);
-    goto Error_DeleteSNP;
+    goto ErrorDeleteSnp;
   }
 
   Snp->Mode.MediaPresent = FALSE;
@@ -663,7 +727,7 @@ SimpleNetworkDriverStart (
                     &Snp->ExitBootServicesEvent
                     );
     if (EFI_ERROR (Status)) {
-      goto Error_DeleteSNP;
+      goto ErrorDeleteSnp;
     }
   }
 
@@ -681,24 +745,9 @@ SimpleNetworkDriverStart (
     return Status;
   }
 
-  PciIo->FreeBuffer (
-           PciIo,
-           SNP_MEM_PAGES (4096),
-           Snp->Cpb
-           );
+ErrorDeleteSnp:
+  SimpleNetworkDriverFree (Snp);
 
-Error_DeleteSNP:
-
-  if (Snp->RecycledTxBuf != NULL) {
-    FreePool (Snp->RecycledTxBuf);
-  }
-
-  PciIo->FreeBuffer (
-           PciIo,
-           SNP_MEM_PAGES (sizeof (SNP_DRIVER)),
-           Snp
-           );
-NiiError:
   gBS->CloseProtocol (
          Controller,
          &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
@@ -753,7 +802,6 @@ SimpleNetworkDriverStop (
   EFI_STATUS                   Status;
   EFI_SIMPLE_NETWORK_PROTOCOL  *SnpProtocol;
   SNP_DRIVER                   *Snp;
-  EFI_PCI_IO_PROTOCOL          *PciIo;
 
   //
   // Get our context back.
@@ -773,54 +821,43 @@ SimpleNetworkDriverStop (
 
   Snp = EFI_SIMPLE_NETWORK_DEV_FROM_THIS (SnpProtocol);
 
-  Status = gBS->UninstallProtocolInterface (
-                  Controller,
-                  &gEfiSimpleNetworkProtocolGuid,
-                  &Snp->Snp
-                  );
+  if (Snp != NULL) {
+    Status = gBS->UninstallProtocolInterface (
+                    Controller,
+                    &gEfiSimpleNetworkProtocolGuid,
+                    &Snp->Snp
+                    );
 
-  if (EFI_ERROR (Status)) {
-    return Status;
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    if (PcdGetBool (PcdSnpCreateExitBootServicesEvent)) {
+      //
+      // Close EXIT_BOOT_SERVICES Event
+      //
+      gBS->CloseEvent (Snp->ExitBootServicesEvent);
+    }
+
+    Status = gBS->CloseProtocol (
+                    Controller,
+                    &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
+                    This->DriverBindingHandle,
+                    Controller
+                    );
+
+    Status = gBS->CloseProtocol (
+                    Controller,
+                    &gEfiDevicePathProtocolGuid,
+                    This->DriverBindingHandle,
+                    Controller
+                    );
+
+    PxeShutdown (Snp);
+    PxeStop (Snp);
+
+    SimpleNetworkDriverFree (Snp);
   }
-
-  if (PcdGetBool (PcdSnpCreateExitBootServicesEvent)) {
-    //
-    // Close EXIT_BOOT_SERVICES Event
-    //
-    gBS->CloseEvent (Snp->ExitBootServicesEvent);
-  }
-
-  Status = gBS->CloseProtocol (
-                  Controller,
-                  &gEfiNetworkInterfaceIdentifierProtocolGuid_31,
-                  This->DriverBindingHandle,
-                  Controller
-                  );
-
-  Status = gBS->CloseProtocol (
-                  Controller,
-                  &gEfiDevicePathProtocolGuid,
-                  This->DriverBindingHandle,
-                  Controller
-                  );
-
-  PxeShutdown (Snp);
-  PxeStop (Snp);
-
-  FreePool (Snp->RecycledTxBuf);
-
-  PciIo = Snp->PciIo;
-  PciIo->FreeBuffer (
-           PciIo,
-           SNP_MEM_PAGES (4096),
-           Snp->Cpb
-           );
-
-  PciIo->FreeBuffer (
-           PciIo,
-           SNP_MEM_PAGES (sizeof (SNP_DRIVER)),
-           Snp
-           );
 
   return Status;
 }

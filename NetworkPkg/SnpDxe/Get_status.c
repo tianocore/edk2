@@ -38,49 +38,54 @@ PxeGetStatus (
   UINT32             Index;
   UINT64             *Tmp;
 
-  Tmp             = NULL;
-  Db              = Snp->Db;
-  Snp->Cdb.OpCode = PXE_OPCODE_GET_STATUS;
+  if (Snp->Cdb == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Snp->Cdb is NULL\n", __func__));
+    return EFI_DEVICE_ERROR;
+  }
 
-  Snp->Cdb.OpFlags = 0;
+  Tmp              = NULL;
+  Db               = Snp->Db;
+  Snp->Cdb->OpCode = PXE_OPCODE_GET_STATUS;
+
+  Snp->Cdb->OpFlags = 0;
 
   if (GetTransmittedBuf) {
-    Snp->Cdb.OpFlags |= PXE_OPFLAGS_GET_TRANSMITTED_BUFFERS;
+    Snp->Cdb->OpFlags |= PXE_OPFLAGS_GET_TRANSMITTED_BUFFERS;
     ZeroMem (Db->TxBuffer, sizeof (Db->TxBuffer));
   }
 
   if (InterruptStatusPtr != NULL) {
-    Snp->Cdb.OpFlags |= PXE_OPFLAGS_GET_INTERRUPT_STATUS;
+    Snp->Cdb->OpFlags |= PXE_OPFLAGS_GET_INTERRUPT_STATUS;
   }
 
   if (Snp->MediaStatusSupported) {
-    Snp->Cdb.OpFlags |= PXE_OPFLAGS_GET_MEDIA_STATUS;
+    Snp->Cdb->OpFlags |= PXE_OPFLAGS_GET_MEDIA_STATUS;
   }
 
-  Snp->Cdb.CPBsize = PXE_CPBSIZE_NOT_USED;
-  Snp->Cdb.CPBaddr = PXE_CPBADDR_NOT_USED;
+  Snp->Cdb->CPBsize = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb->CPBaddr = PXE_CPBADDR_NOT_USED;
 
-  Snp->Cdb.DBsize = (UINT16)sizeof (PXE_DB_GET_STATUS);
-  Snp->Cdb.DBaddr = (UINT64)(UINTN)Db;
+  Snp->Cdb->DBsize = (UINT16)sizeof (PXE_DB_GET_STATUS);
+  Snp->Cdb->DBaddr = (UINT64)(UINTN)Db;
 
-  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum     = Snp->IfNum;
-  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb->StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb->StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb->IFnum     = Snp->IfNum;
+  Snp->Cdb->Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command and check result.
   //
   DEBUG ((DEBUG_NET, "\nSnp->undi.get_status()  "));
 
-  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)Snp->Cdb);
 
-  if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
+  if (Snp->Cdb->StatCode != PXE_STATCODE_SUCCESS) {
     DEBUG (
       (DEBUG_NET,
        "\nSnp->undi.get_status()  %xh:%xh\n",
-       Snp->Cdb.StatFlags,
-       Snp->Cdb.StatCode)
+       Snp->Cdb->StatFlags,
+       Snp->Cdb->StatCode)
       );
 
     return EFI_DEVICE_ERROR;
@@ -90,7 +95,7 @@ PxeGetStatus (
   // report the values back..
   //
   if (InterruptStatusPtr != NULL) {
-    InterruptFlags = (UINT16)(Snp->Cdb.StatFlags & PXE_STATFLAGS_GET_STATUS_INTERRUPT_MASK);
+    InterruptFlags = (UINT16)(Snp->Cdb->StatFlags & PXE_STATFLAGS_GET_STATUS_INTERRUPT_MASK);
 
     *InterruptStatusPtr = 0;
 
@@ -112,7 +117,7 @@ PxeGetStatus (
   }
 
   if (GetTransmittedBuf) {
-    if ((Snp->Cdb.StatFlags & PXE_STATFLAGS_GET_STATUS_NO_TXBUFS_WRITTEN) == 0) {
+    if ((Snp->Cdb->StatFlags & PXE_STATFLAGS_GET_STATUS_NO_TXBUFS_WRITTEN) == 0) {
       //
       // UNDI has written some transmitted buffer addresses into the DB. Store them into Snp->RecycledTxBuf.
       //
@@ -150,7 +155,7 @@ PxeGetStatus (
   //
   if (Snp->MediaStatusSupported) {
     Snp->Snp.Mode->MediaPresent =
-      (BOOLEAN)(((Snp->Cdb.StatFlags & PXE_STATFLAGS_GET_STATUS_NO_MEDIA) != 0) ? FALSE : TRUE);
+      (BOOLEAN)(((Snp->Cdb->StatFlags & PXE_STATFLAGS_GET_STATUS_NO_MEDIA) != 0) ? FALSE : TRUE);
   }
 
   return EFI_SUCCESS;

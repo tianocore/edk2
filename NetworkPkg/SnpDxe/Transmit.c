@@ -38,6 +38,11 @@ PxeFillHeader (
 {
   PXE_CPB_FILL_HEADER_FRAGMENTED  *Cpb;
 
+  if (Snp->Cdb == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Snp->Cdb is NULL\n", __func__));
+    return EFI_DEVICE_ERROR;
+  }
+
   Cpb = Snp->Cpb;
   if (SrcAddr != NULL) {
     CopyMem (
@@ -77,28 +82,28 @@ PxeFillHeader (
 
   Cpb->FragDesc[0].reserved = Cpb->FragDesc[1].reserved = 0;
 
-  Snp->Cdb.OpCode  = PXE_OPCODE_FILL_HEADER;
-  Snp->Cdb.OpFlags = PXE_OPFLAGS_FILL_HEADER_FRAGMENTED;
+  Snp->Cdb->OpCode  = PXE_OPCODE_FILL_HEADER;
+  Snp->Cdb->OpFlags = PXE_OPFLAGS_FILL_HEADER_FRAGMENTED;
 
-  Snp->Cdb.DBsize = PXE_DBSIZE_NOT_USED;
-  Snp->Cdb.DBaddr = PXE_DBADDR_NOT_USED;
+  Snp->Cdb->DBsize = PXE_DBSIZE_NOT_USED;
+  Snp->Cdb->DBaddr = PXE_DBADDR_NOT_USED;
 
-  Snp->Cdb.CPBsize = (UINT16)sizeof (PXE_CPB_FILL_HEADER_FRAGMENTED);
-  Snp->Cdb.CPBaddr = (UINT64)(UINTN)Cpb;
+  Snp->Cdb->CPBsize = (UINT16)sizeof (PXE_CPB_FILL_HEADER_FRAGMENTED);
+  Snp->Cdb->CPBaddr = (UINT64)(UINTN)Cpb;
 
-  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum     = Snp->IfNum;
-  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb->StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb->StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb->IFnum     = Snp->IfNum;
+  Snp->Cdb->Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command and check result.
   //
   DEBUG ((DEBUG_NET, "\nSnp->undi.fill_header()  "));
 
-  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)Snp->Cdb);
 
-  switch (Snp->Cdb.StatCode) {
+  switch (Snp->Cdb->StatCode) {
     case PXE_STATCODE_SUCCESS:
       return EFI_SUCCESS;
 
@@ -106,8 +111,8 @@ PxeFillHeader (
       DEBUG (
         (DEBUG_ERROR,
          "\nSnp->undi.fill_header()  %xh:%xh\n",
-         Snp->Cdb.StatFlags,
-         Snp->Cdb.StatCode)
+         Snp->Cdb->StatFlags,
+         Snp->Cdb->StatCode)
         );
 
       return EFI_INVALID_PARAMETER;
@@ -116,8 +121,8 @@ PxeFillHeader (
       DEBUG (
         (DEBUG_ERROR,
          "\nSnp->undi.fill_header()  %xh:%xh\n",
-         Snp->Cdb.StatFlags,
-         Snp->Cdb.StatCode)
+         Snp->Cdb->StatFlags,
+         Snp->Cdb->StatCode)
         );
 
       return EFI_DEVICE_ERROR;
@@ -145,6 +150,11 @@ PxeTransmit (
   PXE_CPB_TRANSMIT  *Cpb;
   EFI_STATUS        Status;
 
+  if (Snp->Cdb == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Snp->Cdb is NULL\n", __func__));
+    return EFI_DEVICE_ERROR;
+  }
+
   Cpb            = Snp->Cpb;
   Cpb->FrameAddr = (UINT64)(UINTN)Buffer;
   Cpb->DataLen   = (UINT32)BufferSize;
@@ -152,37 +162,37 @@ PxeTransmit (
   Cpb->MediaheaderLen = 0;
   Cpb->reserved       = 0;
 
-  Snp->Cdb.OpFlags = PXE_OPFLAGS_TRANSMIT_WHOLE;
+  Snp->Cdb->OpFlags = PXE_OPFLAGS_TRANSMIT_WHOLE;
 
-  Snp->Cdb.CPBsize = (UINT16)sizeof (PXE_CPB_TRANSMIT);
-  Snp->Cdb.CPBaddr = (UINT64)(UINTN)Cpb;
+  Snp->Cdb->CPBsize = (UINT16)sizeof (PXE_CPB_TRANSMIT);
+  Snp->Cdb->CPBaddr = (UINT64)(UINTN)Cpb;
 
-  Snp->Cdb.OpCode = PXE_OPCODE_TRANSMIT;
-  Snp->Cdb.DBsize = PXE_DBSIZE_NOT_USED;
-  Snp->Cdb.DBaddr = PXE_DBADDR_NOT_USED;
+  Snp->Cdb->OpCode = PXE_OPCODE_TRANSMIT;
+  Snp->Cdb->DBsize = PXE_DBSIZE_NOT_USED;
+  Snp->Cdb->DBaddr = PXE_DBADDR_NOT_USED;
 
-  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum     = Snp->IfNum;
-  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb->StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb->StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb->IFnum     = Snp->IfNum;
+  Snp->Cdb->Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command and check result.
   //
   DEBUG ((DEBUG_NET, "\nSnp->undi.transmit()  "));
-  DEBUG ((DEBUG_NET, "\nSnp->Cdb.OpCode  == %x", Snp->Cdb.OpCode));
-  DEBUG ((DEBUG_NET, "\nSnp->Cdb.CPBaddr == %LX", Snp->Cdb.CPBaddr));
-  DEBUG ((DEBUG_NET, "\nSnp->Cdb.DBaddr  == %LX", Snp->Cdb.DBaddr));
+  DEBUG ((DEBUG_NET, "\nSnp->Cdb->OpCode  == %x", Snp->Cdb->OpCode));
+  DEBUG ((DEBUG_NET, "\nSnp->Cdb->CPBaddr == %LX", Snp->Cdb->CPBaddr));
+  DEBUG ((DEBUG_NET, "\nSnp->Cdb->DBaddr  == %LX", Snp->Cdb->DBaddr));
   DEBUG ((DEBUG_NET, "\nCpb->FrameAddr   == %LX\n", Cpb->FrameAddr));
 
-  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)Snp->Cdb);
 
   DEBUG ((DEBUG_NET, "\nexit Snp->undi.transmit()  "));
 
   //
   // we will unmap the buffers in get_status call, not here
   //
-  switch (Snp->Cdb.StatCode) {
+  switch (Snp->Cdb->StatCode) {
     case PXE_STATCODE_SUCCESS:
       return EFI_SUCCESS;
 
@@ -193,8 +203,8 @@ PxeTransmit (
       DEBUG (
         (DEBUG_NET,
          "\nSnp->undi.transmit()  %xh:%xh\n",
-         Snp->Cdb.StatFlags,
-         Snp->Cdb.StatCode)
+         Snp->Cdb->StatFlags,
+         Snp->Cdb->StatCode)
         );
       break;
 
@@ -202,8 +212,8 @@ PxeTransmit (
       DEBUG (
         (DEBUG_ERROR,
          "\nSnp->undi.transmit()  %xh:%xh\n",
-         Snp->Cdb.StatFlags,
-         Snp->Cdb.StatCode)
+         Snp->Cdb->StatFlags,
+         Snp->Cdb->StatCode)
         );
       Status = EFI_DEVICE_ERROR;
   }

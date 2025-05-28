@@ -35,20 +35,25 @@ PxeIp2Mac (
   PXE_CPB_MCAST_IP_TO_MAC  *Cpb;
   PXE_DB_MCAST_IP_TO_MAC   *Db;
 
-  Cpb              = Snp->Cpb;
-  Db               = Snp->Db;
-  Snp->Cdb.OpCode  = PXE_OPCODE_MCAST_IP_TO_MAC;
-  Snp->Cdb.OpFlags = (UINT16)(IPv6 ? PXE_OPFLAGS_MCAST_IPV6_TO_MAC : PXE_OPFLAGS_MCAST_IPV4_TO_MAC);
-  Snp->Cdb.CPBsize = (UINT16)sizeof (PXE_CPB_MCAST_IP_TO_MAC);
-  Snp->Cdb.DBsize  = (UINT16)sizeof (PXE_DB_MCAST_IP_TO_MAC);
+  if (Snp->Cdb == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Snp->Cdb is NULL\n", __func__));
+    return EFI_DEVICE_ERROR;
+  }
 
-  Snp->Cdb.CPBaddr = (UINT64)(UINTN)Cpb;
-  Snp->Cdb.DBaddr  = (UINT64)(UINTN)Db;
+  Cpb               = Snp->Cpb;
+  Db                = Snp->Db;
+  Snp->Cdb->OpCode  = PXE_OPCODE_MCAST_IP_TO_MAC;
+  Snp->Cdb->OpFlags = (UINT16)(IPv6 ? PXE_OPFLAGS_MCAST_IPV6_TO_MAC : PXE_OPFLAGS_MCAST_IPV4_TO_MAC);
+  Snp->Cdb->CPBsize = (UINT16)sizeof (PXE_CPB_MCAST_IP_TO_MAC);
+  Snp->Cdb->DBsize  = (UINT16)sizeof (PXE_DB_MCAST_IP_TO_MAC);
 
-  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum     = Snp->IfNum;
-  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb->CPBaddr = (UINT64)(UINTN)Cpb;
+  Snp->Cdb->DBaddr  = (UINT64)(UINTN)Db;
+
+  Snp->Cdb->StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb->StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb->IFnum     = Snp->IfNum;
+  Snp->Cdb->Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   CopyMem (&Cpb->IP, IP, sizeof (PXE_IP_ADDR));
 
@@ -57,9 +62,9 @@ PxeIp2Mac (
   //
   DEBUG ((DEBUG_NET, "\nSnp->undi.mcast_ip_to_mac()  "));
 
-  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)Snp->Cdb);
 
-  switch (Snp->Cdb.StatCode) {
+  switch (Snp->Cdb->StatCode) {
     case PXE_STATCODE_SUCCESS:
       break;
 
@@ -70,8 +75,8 @@ PxeIp2Mac (
       DEBUG (
         (DEBUG_NET,
          "\nSnp->undi.mcast_ip_to_mac()  %xh:%xh\n",
-         Snp->Cdb.StatFlags,
-         Snp->Cdb.StatCode)
+         Snp->Cdb->StatFlags,
+         Snp->Cdb->StatCode)
         );
       return EFI_UNSUPPORTED;
 
@@ -83,8 +88,8 @@ PxeIp2Mac (
       DEBUG (
         (DEBUG_NET,
          "\nSnp->undi.mcast_ip_to_mac()  %xh:%xh\n",
-         Snp->Cdb.StatFlags,
-         Snp->Cdb.StatCode)
+         Snp->Cdb->StatFlags,
+         Snp->Cdb->StatCode)
         );
 
       return EFI_DEVICE_ERROR;
