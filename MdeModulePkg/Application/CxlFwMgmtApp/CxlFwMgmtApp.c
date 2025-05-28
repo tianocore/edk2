@@ -58,7 +58,7 @@ ReadFileToBuffer (
     return Status;
   }
 
-  Status = ShellProtocol->GetFileSize (FileHandle, &FileSize);
+  Status = (UINTN)ShellProtocol->GetFileSize (FileHandle, &FileSize);
 
   if (EFI_ERROR (Status)) {
     ShellProtocol->CloseFile (FileHandle);
@@ -417,7 +417,7 @@ GetImage (
   CXL_CONTROLLER_PRIVATE_DATA  *Private = NULL;
 
   Status       = EFI_SUCCESS;
-  ImageIndex   = Slot;
+  ImageIndex   = (UINT8)Slot;
   Image        = NULL;
   Handles      = NULL;
   NumOfHandles = 0;
@@ -654,7 +654,7 @@ SetImage (
 
       Status = Private->FirmwareMgmt.SetImage(
                                        &Private->FirmwareMgmt,
-                                       Slot,
+                                       (UINT8)Slot,
                                        Buffer,
                                        BufferSize,
                                        NULL,
@@ -726,7 +726,7 @@ PrintHelpPage ()
   **/
 BOOLEAN
 IsDigit (
-  char  Character
+  CHAR16  Character
   )
 {
   return (Character >= '0') && (Character <= '9');
