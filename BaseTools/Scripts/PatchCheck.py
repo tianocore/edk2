@@ -485,7 +485,7 @@ class GitDiffCheck:
         lines = [ msg ]
         if self.filename is not None:
             lines.append('File: ' + self.filename)
-        lines.append('Line: ' + line)
+        lines.append('Line ' + str(self.line_num) + ': ' + line)
 
         self.error(*lines)
 
@@ -539,7 +539,7 @@ class GitDiffCheck:
     def format_error(self, err):
         self.format_ok = False
         err = 'Patch format error: ' + err
-        err2 = 'Line: ' + self.lines[self.line_num].rstrip()
+        err2 = 'Line ' + str(self.line_num) + ': ' + self.lines[self.line_num].rstrip()
         self.error(err, err2)
 
     def error(self, *err):
