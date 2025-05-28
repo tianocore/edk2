@@ -44,5 +44,5 @@
 [Guids]
   gArmFfaRxTxBufferInfoGuid
 
-[Depex]
+[Ppis]
   gEfiPeiMemoryDiscoveredPpiGuid
