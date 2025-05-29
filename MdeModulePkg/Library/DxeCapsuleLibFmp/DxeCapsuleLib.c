@@ -304,6 +304,8 @@ ValidateFmpCapsule (
       FmpImageHeaderSize = OFFSET_OF (EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER, UpdateHardwareInstance);
     } else if (ImageHeader->Version == 2) {
       FmpImageHeaderSize = OFFSET_OF (EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER, ImageCapsuleSupport);
+    } else if (ImageHeader->Version == 3) {
+      FmpImageHeaderSize = sizeof (EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER);
     }
 
     if (FmpImageSize < FmpImageHeaderSize) {
