@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #pragma once
 
+#include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/UefiTcgPlatform.h>
 
 #define EFI_CC_MEASUREMENT_PROTOCOL_GUID  \
@@ -317,5 +318,5 @@ typedef struct {
 //
 // Define the signature and revision of CC Measurement EventLog ACPI Table
 //
-#define EFI_CC_EVENTLOG_ACPI_TABLE_SIGNATURE  SIGNATURE_32('C', 'C', 'E', 'L')
+#define EFI_CC_EVENTLOG_ACPI_TABLE_SIGNATURE  EFI_ACPI_6_5_CONFIDENTIAL_COMPUTE_EVENT_LOG_TABLE_SIGNATURE
 #define EFI_CC_EVENTLOG_ACPI_TABLE_REVISION   1
