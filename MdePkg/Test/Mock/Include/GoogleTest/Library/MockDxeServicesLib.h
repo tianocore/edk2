@@ -11,7 +11,7 @@
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
 extern "C" {
-  #include <Uefi.h>
+  #include <PiDxe.h>
   #include <Pi/PiFirmwareFile.h>
 }
 
