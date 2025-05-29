@@ -504,7 +504,7 @@ FdtParentOffset (
 **/
 INT32
 EFIAPI
-FdtNodeOffsetByPropertyValue (
+FdtNodeOffsetByPropValue (
   IN CONST VOID   *Fdt,
   IN INT32        StartOffset,
   IN CONST CHAR8  *PropertyName,
