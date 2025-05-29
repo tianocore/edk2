@@ -10,6 +10,7 @@
   capability.
 
 Copyright (c) 2020 - 2021, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -33,10 +34,11 @@ typedef struct {
 //
 // EFI_CC Type/SubType definition
 //
-#define EFI_CC_TYPE_NONE   0
-#define EFI_CC_TYPE_SEV    1
-#define EFI_CC_TYPE_TDX    2
-#define EFI_CC_TYPE_APTEE  3
+#define EFI_CC_TYPE_NONE    0
+#define EFI_CC_TYPE_SEV     1
+#define EFI_CC_TYPE_TDX     2
+#define EFI_CC_TYPE_APTEE   3
+#define EFI_CC_TYPE_ARMCCA  4
 
 typedef struct {
   UINT8    Type;
