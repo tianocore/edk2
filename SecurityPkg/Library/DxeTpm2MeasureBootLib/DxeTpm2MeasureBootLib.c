@@ -548,7 +548,7 @@ GetMeasureBootProtocols (
     ZeroMem (&CcProtocolCapability, sizeof (CcProtocolCapability));
     CcProtocolCapability.Size = sizeof (CcProtocolCapability);
     Status                    = CcProtocol->GetCapability (CcProtocol, &CcProtocolCapability);
-    if (EFI_ERROR (Status) || (CcProtocolCapability.CcType.Type == EFI_CC_TYPE_NONE)) {
+    if (EFI_ERROR (Status) || (CcProtocolCapability.CcType.Type == EFI_ACPI_6_5_CC_TYPE_NONE)) {
       DEBUG ((DEBUG_ERROR, " CcProtocol->GetCapability returns : %x, %r\n", CcProtocolCapability.CcType.Type, Status));
       CcProtocol = NULL;
     }
