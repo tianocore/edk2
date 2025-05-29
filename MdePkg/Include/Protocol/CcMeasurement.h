@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #pragma once
 
+#include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/UefiTcgPlatform.h>
 
 #define EFI_CC_MEASUREMENT_PROTOCOL_GUID  \
@@ -29,16 +30,18 @@ typedef struct {
   UINT8    Minor;
 } EFI_CC_VERSION;
 
-//
-// EFI_CC Type/SubType definition
-//
-#define EFI_CC_TYPE_NONE   0
-#define EFI_CC_TYPE_SEV    1
-#define EFI_CC_TYPE_TDX    2
-#define EFI_CC_TYPE_APTEE  3
+/**
+  A structure defining the Confidential Computing (CC) type and subtype.
 
+  The Type and Subtype field values must match the definitions in the ACPI
+  specification version 6.5 or later,
+  e.g. the macros EFI_ACPI_6_5_CC_TYPE_* must be used to populate the
+  Type field.
+*/
 typedef struct {
+  /// Confidential Computing (CC) type.
   UINT8    Type;
+  /// Confidential Computing (CC) sub type.
   UINT8    SubType;
 } EFI_CC_TYPE;
 
@@ -298,24 +301,3 @@ typedef struct {
   {0xdd4a4648, 0x2de7, 0x4665, {0x96, 0x4d, 0x21, 0xd9, 0xef, 0x5f, 0xb4, 0x46}}
 
 extern EFI_GUID  gEfiCcFinalEventsTableGuid;
-
-//
-// Define the CC Measure EventLog ACPI Table
-//
-#pragma pack(1)
-
-typedef struct {
-  EFI_ACPI_DESCRIPTION_HEADER    Header;
-  EFI_CC_TYPE                    CcType;
-  UINT16                         Rsvd;
-  UINT64                         Laml;
-  UINT64                         Lasa;
-} EFI_CC_EVENTLOG_ACPI_TABLE;
-
-#pragma pack()
-
-//
-// Define the signature and revision of CC Measurement EventLog ACPI Table
-//
-#define EFI_CC_EVENTLOG_ACPI_TABLE_SIGNATURE  SIGNATURE_32('C', 'C', 'E', 'L')
-#define EFI_CC_EVENTLOG_ACPI_TABLE_REVISION   1
