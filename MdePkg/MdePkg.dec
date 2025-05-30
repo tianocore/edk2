@@ -370,6 +370,10 @@
   #
   ArmFfaLib|Include/Library/ArmFfaLib.h
 
+  ##  @libraryclass  Provides a Mmu interface.
+  #
+  ArmMmuLib|Include/Library/ArmMmuLib.h
+
 [Guids]
   #
   # GUID defined in UEFI2.1/UEFI2.0/EFI1.1
@@ -943,6 +947,9 @@
 
   ## Include/Guid/Cper.h
   gEfiIa32X64ErrorTypeMsCheckGuid    = { 0x48AB7F57, 0xDC34, 0x4f6c, { 0xA7, 0xD3, 0xB0, 0xB5, 0xB0, 0xA7, 0x43, 0x14 }}
+
+[Guids.ARM, Guids.AARCH64]
+  gArmMmuReplaceLiveTranslationEntryFuncGuid = { 0xa8b50ff3, 0x08ec, 0x4dd3, {0xbf, 0x04, 0x28, 0xbf, 0x71, 0x75, 0xc7, 0x4a} }
 
 [Ppis]
   ## Include/Ppi/MasterBootMode.h
@@ -2093,6 +2100,12 @@
   #  testing purposes.
   # @Prompt Validate ORDERED_COLLECTION structure
   gEfiMdePkgTokenSpaceGuid.PcdValidateOrderedCollection|FALSE|BOOLEAN|0x0000002a
+
+[PcdsFeatureFlag.ARM]
+  # Whether to map normal memory as non-shareable. FALSE is the safe choice, but
+  # TRUE may be appropriate to fix performance problems if you don't care about
+  # hardware coherency (i.e., no virtualization or cache coherent DMA)
+  gEfiMdePkgTokenSpaceGuid.PcdNormalMemoryNonshareableOverride|FALSE|BOOLEAN|0x00000060
 
 [PcdsFixedAtBuild]
   ## Status code value for indicating a watchdog timer has expired.
