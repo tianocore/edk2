@@ -264,43 +264,36 @@ MmDispatchFvs (
     if (Index == ARRAY_SIZE (mMmFv)) {
       DEBUG ((
         DEBUG_INFO,
-        "%a: The number of FV Hobs exceed the max supported FVs (%d) in StandaloneMmCore\n",
+        "%a: The number of FV Hobs exceeds the max supported FVs (%d) in StandaloneMmCore\n",
         __func__,
         ARRAY_SIZE (mMmFv)
         ));
       return;
     }
 
-    DEBUG ((DEBUG_INFO, "%a: FV[%d] address - 0x%x\n", __func__, Index, FvHob.FirmwareVolume->BaseAddress));
-    DEBUG ((DEBUG_INFO, "%a: FV[%d] size    - 0x%x\n", __func__, Index, FvHob.FirmwareVolume->Length));
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: FV[%d] address = 0x%x, size = 0x%x\n",
+      __func__,
+      Index,
+      FvHob.FirmwareVolume->BaseAddress,
+      FvHob.FirmwareVolume->Length
+      ));
 
     if (FvHob.FirmwareVolume->Length == 0x00) {
-      DEBUG ((
-        DEBUG_INFO,
-        "%a: Skip invalid FV[%d]- 0x%x/0x%x\n",
-        __func__,
-        Index,
-        FvHob.FirmwareVolume->BaseAddress,
-        FvHob.FirmwareVolume->Length
-        ));
+      DEBUG ((DEBUG_INFO, "%a: Skip zero-length FV.\n", __func__));
       continue;
     }
 
     if (!FixedPcdGetBool (PcdShadowBfv)) {
       Fv = (EFI_FIRMWARE_VOLUME_HEADER *)((UINTN)FvHob.FirmwareVolume->BaseAddress);
     } else {
-      Fv = AllocatePool (FvHob.FirmwareVolume->Length);
+      Fv = AllocateCopyPool (FvHob.FirmwareVolume->Length, (VOID *)(UINTN)FvHob.FirmwareVolume->BaseAddress);
       if (Fv == NULL) {
-        DEBUG ((DEBUG_ERROR, "Fail to allocate memory for Fv\n"));
+        DEBUG ((DEBUG_ERROR, "%a: Fail to allocate MM memory for Fv!\n", __func__));
         CpuDeadLoop ();
         return;
       }
-
-      CopyMem (
-        (VOID *)Fv,
-        (VOID *)(UINTN)FvHob.FirmwareVolume->BaseAddress,
-        FvHob.FirmwareVolume->Length
-        );
     }
 
     MmCoreFfsFindMmDriver (Fv, 0);
@@ -308,7 +301,7 @@ MmDispatchFvs (
   }
 
   if (Index == 0) {
-    DEBUG ((DEBUG_ERROR, "No FV hob is found\n"));
+    DEBUG ((DEBUG_ERROR, "%a: No FV hob is found\n", __func__));
     return;
   }
 
