@@ -48,6 +48,7 @@
   ArmTransferListLib
   ArmFfaLib
   StackCheckLib
+  HobLib
 
 [Guids]
   gMpInformationHobGuid
