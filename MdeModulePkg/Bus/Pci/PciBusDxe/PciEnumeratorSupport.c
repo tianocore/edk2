@@ -1811,6 +1811,15 @@ PciParseBar (
     //
     // Device I/Os
     //
+    if (PcdGetBool (PcdPciIgnoreIoSpaceBars)) {
+      PciIoDevice->PciBar[BarIndex].BarType     = PciBarTypeUnknown;
+      PciIoDevice->PciBar[BarIndex].BaseAddress = 0;
+      PciIoDevice->PciBar[BarIndex].Length      = 0;
+      PciIoDevice->PciBar[BarIndex].Alignment   = 0;
+
+      return Offset + 4;
+    }
+
     Mask = 0xfffffffc;
 
     if ((Value & 0xFFFF0000) != 0) {
