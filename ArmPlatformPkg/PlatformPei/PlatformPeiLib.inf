@@ -43,3 +43,6 @@
 
 [depex]
   TRUE
+
+[Guids]
+  gArmTransferListHobGuid

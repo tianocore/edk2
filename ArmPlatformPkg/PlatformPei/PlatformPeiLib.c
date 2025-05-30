@@ -14,6 +14,7 @@
 #include <Library/PcdLib.h>
 #include <Library/ArmTransferListLib.h>
 #include <Library/DebugLib.h>
+#include <Guid/TransferListHob.h>
 
 UINT64  mTransferListBaseAddr = 0;
 
@@ -23,7 +24,8 @@ PlatformPeim (
   VOID
   )
 {
-  VOID  *TransferListBase;
+  VOID    *TransferListBase;
+  UINT64  *TransferListHobData;
 
   TransferListBase = (VOID *)(UINTN)mTransferListBaseAddr;
   if (TransferListBase != NULL) {
@@ -31,6 +33,15 @@ PlatformPeim (
       DEBUG_CODE_BEGIN ();
       TransferListDump (TransferListBase);
       DEBUG_CODE_END ();
+
+      TransferListHobData = BuildGuidHob (&gArmTransferListHobGuid, sizeof (*TransferListHobData));
+      if (TransferListHobData == NULL) {
+        DEBUG ((DEBUG_ERROR, "%a: TransferList BuildGuidHob failed\n", __func__));
+        ASSERT (0);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      *TransferListHobData = (UINTN)TransferListBase;
     } else {
       DEBUG ((DEBUG_ERROR, "%a: No valid operations possible on TransferList found @ 0x%p\n", __func__, TransferListBase));
     }
