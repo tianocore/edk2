@@ -74,6 +74,7 @@ SecMain (
   UINTN                       StacksSize;
   FIRMWARE_SEC_PERFORMANCE    Performance;
   VOID                        *TransferListBase;
+  UINTN                       *TransferListHobData;
 
   // If ensure the FD is either part of the System Memory or totally outside of the System Memory (XIP)
   ASSERT (
@@ -144,6 +145,11 @@ SecMain (
       DEBUG_CODE_BEGIN ();
       TransferListDump (TransferListBase);
       DEBUG_CODE_END ();
+
+      TransferListHobData = BuildGuidHob (&gArmTransferListHobGuid, sizeof (*TransferListHobData));
+      ASSERT (TransferListHobData != NULL);
+
+      *TransferListHobData = (UINTN)TransferListBase;
     } else {
       DEBUG ((DEBUG_ERROR, "%a: No valid operations possible on TransferList found @ 0x%p\n", __func__, TransferListBase));
     }
