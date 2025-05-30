@@ -25,6 +25,11 @@
   FLASH_DEFINITION               = OvmfPkg/RiscVVirt/RiscVVirtQemu.fdf
 
   #
+  # Option to enable Peiless booting(default)
+  #
+  DEFINE EDK2_SKIP_PEICORE       = TRUE
+
+  #
   # Enable below options may cause build error or may not work on
   # the initial version of RISC-V package
   # Defines for default states.  These can be changed on the command line.
@@ -257,15 +262,36 @@
   #
   # SEC Phase modules
   #
-  OvmfPkg/RiscVVirt/Sec/SecMain.inf {
+!if $(EDK2_SKIP_PEICORE) == TRUE
+  UefiCpuPkg/PeilessSecCore/PeilessSecCore.inf {
     <LibraryClasses>
       ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
-      LzmaDecompressLib|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
-      PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
+      NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
       HobLib|EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf
       PrePiHobListPointerLib|OvmfPkg/RiscVVirt/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
       MemoryAllocationLib|EmbeddedPkg/Library/PrePiMemoryAllocationLib/PrePiMemoryAllocationLib.inf
+      PlatformSecLib|OvmfPkg/RiscVVirt/Library/PlatformSecLib/PlatformSecLib.inf
   }
+!else
+  UefiCpuPkg/SecCore/SecCoreNative.inf {
+    <LibraryClasses>
+      PlatformSecLib|OvmfPkg/RiscVVirt/Library/PlatformSecLib/PlatformSecLib.inf
+  }
+  OvmfPkg/RiscVVirt/PlatformPei/PlatformPeim.inf {
+    <LibraryClasses>
+      PlatformSecLib|OvmfPkg/RiscVVirt/Library/PlatformSecLib/PlatformSecLib.inf
+  }
+  MdeModulePkg/Core/Pei/PeiMain.inf
+  MdeModulePkg/Universal/PCD/Pei/Pcd.inf  {
+    <LibraryClasses>
+      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  }
+  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
+  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
+  }
+!endif
 
   #
   # DXE

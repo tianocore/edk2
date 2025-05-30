@@ -1,0 +1,13 @@
+// /** @file
+// SecCore Localized Strings and Content
+//
+// Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2025 Ventana Micro Systems Inc.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_PROPERTIES_MODULE_NAME
+#language en-US
+"Peiless SEC Core Module"

@@ -30,6 +30,10 @@
   ##
   UefiCpuBaseArchSupportLib|Include/Library/BaseArchLibSupport.h
 
+  ##  @libraryclass  Provides platform specific initialization functions in the SEC phase.
+  ##
+  PlatformSecLib|Include/Library/PlatformSecLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64]
   ##  @libraryclass  Provides functions to manage MTRR settings on IA32 and X64 CPUs.
   ##
@@ -38,10 +42,6 @@
   ##  @libraryclass  Provides functions to manage the Local APIC on IA32 and X64 CPUs.
   ##
   LocalApicLib|Include/Library/LocalApicLib.h
-
-  ##  @libraryclass  Provides platform specific initialization functions in the SEC phase.
-  ##
-  PlatformSecLib|Include/Library/PlatformSecLib.h
 
   ##  @libraryclass  Public include file for the SMM CPU Platform Hook Library.
   ##
@@ -80,8 +80,6 @@
   SmmRelocationLib|Include/Library/SmmRelocationLib.h
 
 [LibraryClasses.RISCV64]
-  ##  @libraryclass  Provides function to initialize the FPU.
-  RiscVFpuLib|Include/Library/BaseRiscVFpuLib.h
   ##  @libraryclass  Provides functions to manage MMU features on RISCV64 CPUs.
   ##
   RiscVMmuLib|Include/Library/BaseRiscVMmuLib.h

@@ -2,6 +2,8 @@
   C functions in SEC
 
   Copyright (c) 2008 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2025 Ventana Micro Systems Inc.<BR>
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -23,17 +25,21 @@ EFI_PEI_PPI_DESCRIPTOR  mPeiSecPlatformInformationPpi[] = {
     &gPeiSecPerformancePpiGuid,
     (VOID *)(UINTN)SecPerformancePpiCallBack
   },
+ #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gEfiTemporaryRamDonePpiGuid,
     &gSecTemporaryRamDonePpi
   },
+ #endif // defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
   {
     (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
     &gEfiSecPlatformInformationPpiGuid,
     &mSecPlatformInformationPpi
   }
 };
+
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 
 /**
   Migrates the Global Descriptor Table (GDT) to permanent memory.
@@ -165,6 +171,8 @@ GetMaxAddress (
 //
 UINT64  mIdtEntryTemplate = 0xffff8e000010ffe4ULL;
 
+#endif // defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+
 /**
   Caller provided function to be invoked at the end of InitializeDebugAgent().
 
@@ -240,10 +248,12 @@ SecStartup (
   IN VOID    *BootFirmwareVolume
   )
 {
+ #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+  IA32_DESCRIPTOR  IdtDescriptor;
+  SEC_IDT_TABLE    IdtTableInStack;
+  UINT32           Index;
+ #endif // defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
   EFI_SEC_PEI_HAND_OFF  SecCoreData;
-  IA32_DESCRIPTOR       IdtDescriptor;
-  SEC_IDT_TABLE         IdtTableInStack;
-  UINT32                Index;
   UINT32                PeiStackSize;
   EFI_STATUS            Status;
 
@@ -282,6 +292,7 @@ SecStartup (
   //
   InitializeFloatingPointUnits ();
 
+ #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
   // |-------------------|---->
   // |IDT Table          |
   // |-------------------|
@@ -307,6 +318,7 @@ SecStartup (
   IdtDescriptor.Limit = (UINT16)(sizeof (IdtTableInStack.IdtTable) - 1);
 
   AsmWriteIdtr (&IdtDescriptor);
+ #endif // defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 
   //
   // Setup the default exception handlers
@@ -382,6 +394,7 @@ SecStartupPhase2 (
   // Perform platform specific initialization before entering PeiCore.
   //
   PpiList = SecPlatformMain (SecCoreData);
+
   //
   // Find Pei Core entry point. It will report SEC and Pei Core debug information if remote debug
   // is enabled.
@@ -520,6 +533,8 @@ SecStartupPhase2 (
   //
   UNREACHABLE ();
 }
+
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 
 /**
   TemporaryRamDone() disables the use of Temporary RAM. If present, this service is invoked
@@ -696,3 +711,5 @@ SecTemporaryRamDone (
 
   return EFI_SUCCESS;
 }
+
+#endif // defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)

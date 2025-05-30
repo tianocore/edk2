@@ -52,8 +52,13 @@
   PeiServicesLib
   PeiServicesTablePointerLib
   HobLib
-  CpuPageTableLib
   StackCheckLib
+
+[LibraryClasses.IA32]
+  CpuPageTableLib
+
+[LibraryClasses.X64]
+  CpuPageTableLib
 
 [Ppis]
   ## SOMETIMES_CONSUMES

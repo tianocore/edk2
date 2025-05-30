@@ -1,0 +1,57 @@
+## @file
+#  SecCore module that implements the Peiless SEC phase.
+#
+#  This is the first module taking control of the platform upon power-on/reset.
+#  The entry point function is _ModuleEntryPoint in PlatformSecLib.
+#  The entry point function will setup flat memory model, enable temporary memory and
+#  call into SecStartup().
+#
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2025 Ventana Micro Systems Inc.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = PeilessSecCore
+  MODULE_UNI_FILE                = PeilessSecCore.uni
+  FILE_GUID                      = 63d137c6-d2c5-4e48-b670-83707783afec
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC RISCV64
+#
+
+[Sources]
+  SecMain.c
+  SecMain.h
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  PrePiLib
+  PlatformSecLib
+  PcdLib
+  DebugAgentLib
+  CpuLib
+  CpuExceptionHandlerLib
+  HobLib
+  StackCheckLib
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdPeiTemporaryRamStackSize  ## CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  PeilessSecCore.uni

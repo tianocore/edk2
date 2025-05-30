@@ -37,6 +37,8 @@
 #include <Register/Intel/Cpuid.h>
 #include <Register/Intel/Msr.h>
 
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+
 #define SEC_IDT_ENTRY_COUNT  34
 
 typedef struct _SEC_IDT_TABLE {
@@ -49,6 +51,7 @@ typedef struct _SEC_IDT_TABLE {
   UINT64                      PeiService;
   IA32_IDT_GATE_DESCRIPTOR    IdtTable[SEC_IDT_ENTRY_COUNT];
 } SEC_IDT_TABLE;
+#endif // defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 
 /**
   TemporaryRamDone() disables the use of Temporary RAM. If present, this service is invoked
