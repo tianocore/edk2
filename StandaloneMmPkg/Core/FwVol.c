@@ -261,16 +261,6 @@ MmDispatchFvs (
         ; FvHob.Raw = GetNextHob (EFI_HOB_TYPE_FV, GET_NEXT_HOB (FvHob))
         )
   {
-    if (Index == ARRAY_SIZE (mMmFv)) {
-      DEBUG ((
-        DEBUG_INFO,
-        "%a: The number of FV Hobs exceeds the max supported FVs (%d) in StandaloneMmCore\n",
-        __func__,
-        ARRAY_SIZE (mMmFv)
-        ));
-      return;
-    }
-
     DEBUG ((
       DEBUG_INFO,
       "%a: FV[%d] address = 0x%x, size = 0x%x\n",
@@ -285,14 +275,25 @@ MmDispatchFvs (
       continue;
     }
 
+    if (Index == ARRAY_SIZE (mMmFv)) {
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: The number of FV Hobs exceeds the max supported FVs (%d) in StandaloneMmCore, skip it.\n",
+        __func__,
+        ARRAY_SIZE (mMmFv)
+        ));
+      continue;
+    }
+
     if (!FixedPcdGetBool (PcdShadowBfv)) {
       Fv = (EFI_FIRMWARE_VOLUME_HEADER *)((UINTN)FvHob.FirmwareVolume->BaseAddress);
     } else {
       Fv = AllocateCopyPool (FvHob.FirmwareVolume->Length, (VOID *)(UINTN)FvHob.FirmwareVolume->BaseAddress);
+      ASSERT (Fv != NULL);
       if (Fv == NULL) {
         DEBUG ((DEBUG_ERROR, "%a: Fail to allocate MM memory for Fv!\n", __func__));
         CpuDeadLoop ();
-        return;
+        continue;
       }
     }
 
