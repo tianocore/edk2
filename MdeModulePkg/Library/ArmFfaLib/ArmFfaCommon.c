@@ -33,49 +33,6 @@ BOOLEAN  gFfaSupported;
 UINT16   gPartId;
 
 /**
-  Convert EFI_GUID to UUID format.
-  for example, If there is EFI_GUID named
-  "378daedc-f06b-4446-8314-40ab933c87a3",
-
-  EFI_GUID is saved in memory like:
-     dc ae 8d 37
-     6b f0 46 44
-     83 14 40 ab
-     93 3c 87 a3
-
-  However, UUID should be saved like:
-     37 8d ae dc
-     f0 6b 44 46
-     83 14 40 ab
-     93 3c 87 a3
-
-  FF-A and other software components (i.e. linux-kernel)
-  uses below format.
-
-  @param [in] Guid            EFI_GUID
-  @param [out] Uuid           Uuid
-
-**/
-STATIC
-VOID
-EFIAPI
-ConvertEfiGuidToUuid (
-  IN   EFI_GUID  *Guid,
-  OUT  UINT64    *Uuid
-  )
-{
-  UINT32  *Data32;
-  UINT16  *Data16;
-
-  CopyGuid ((EFI_GUID *)Uuid, Guid);
-  Data32    = (UINT32 *)Uuid;
-  Data32[0] = SwapBytes32 (Data32[0]);
-  Data16    = (UINT16 *)&Data32[1];
-  Data16[0] = SwapBytes16 (Data16[0]);
-  Data16[1] = SwapBytes16 (Data16[1]);
-}
-
-/**
   Convert EFI_STATUS to FFA return code.
 
   @param [in] Status          edk2 status code.
@@ -525,7 +482,7 @@ ArmFfaLibPartitionInfoGet (
   }
 
   if (ServiceGuid != NULL) {
-    ConvertEfiGuidToUuid (ServiceGuid, Uuid);
+    ConvertGuidToUuid (ServiceGuid, (GUID *)Uuid);
   } else {
     ZeroMem (Uuid, sizeof (Uuid));
   }
@@ -689,7 +646,7 @@ ArmFfaLibMsgSendDirectReq2 (
   }
 
   if (ServiceGuid != NULL) {
-    ConvertEfiGuidToUuid (ServiceGuid, Uuid);
+    ConvertGuidToUuid (ServiceGuid, (GUID *)Uuid);
   } else {
     ZeroMem (Uuid, sizeof (Uuid));
   }
