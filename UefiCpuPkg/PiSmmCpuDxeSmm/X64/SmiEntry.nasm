@@ -113,7 +113,7 @@ ProtFlatMode:
     mov eax, strict dword 0               ; source operand will be patched
 ASM_PFX(gPatchSmiCr3):
     mov     cr3, rax
-    mov     eax, 0x668                   ; as cr4.PGE is not set here, refresh cr3
+    mov     eax, 0x628                   ; as cr4.PGE is not set here, refresh cr3
 
     mov     cl, strict byte 0            ; source operand will be patched
 ASM_PFX(gPatch5LevelPagingNeeded):
@@ -203,6 +203,10 @@ SmiHandlerIdtrAbsAddr:
     mov     gs, eax
     mov     ax, [rbx + DSC_SS]
     mov     ss, eax
+
+    mov     rax, cr4                    ; enable MCE
+    bts     rax, 6
+    mov     cr4, rax
 
     mov     rbx, [rsp + 0x8]             ; rbx <- CpuIndex
 
