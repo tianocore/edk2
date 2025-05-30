@@ -17,7 +17,14 @@
 #include "SmmCorePerformanceLibInternal.h"
 
 #include <Guid/EventGroup.h>
+#include <Library/MmServicesTableLib.h>
 #include <Library/StandaloneMmMemLib.h>
+
+extern SPIN_LOCK  mSmmFpdtLock;
+
+EDKII_PERFORMANCE_MEASUREMENT_PROTOCOL  mPerformanceMeasurementInterface = {
+  CreatePerformanceMeasurement,
+};
 
 /**
   A library internal MM-instance specific implementation to check if a buffer outside MM is valid.
@@ -110,6 +117,60 @@ GetNameFromUiSection (
 }
 
 /**
+  Initializes the MM Core Performance library.
+
+  @retval EFI_SUCCESS     The performance library was initialized successfully.
+  @retval Other           An error occurred during initialization.
+**/
+EFI_STATUS
+EFIAPI
+InitializeStandaloneMmCorePerformanceLib (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
+  EFI_HANDLE  MmiHandle;
+  VOID        *Registration;
+
+  //
+  // Initialize spin lock
+  //
+  InitializeSpinLock (&mSmmFpdtLock);
+  //
+  // Install the protocol interfaces for MM performance library instance.
+  //
+  Handle = NULL;
+  Status = gMmst->MmInstallProtocolInterface (
+                    &Handle,
+                    &gEdkiiSmmPerformanceMeasurementProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    &mPerformanceMeasurementInterface
+                    );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Register MMI handler.
+  //
+  MmiHandle = NULL;
+  Status    = gMmst->MmiHandlerRegister (FpdtSmiHandler, &gEfiFirmwarePerformanceGuid, &MmiHandle);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Register callback function for ExitBootServices event.
+  //
+  Status = gMmst->MmRegisterProtocolNotify (
+                    &gEfiEventExitBootServicesGuid,
+                    SmmCorePerformanceLibExitBootServicesCallback,
+                    &Registration
+                    );
+
+  return Status;
+}
+
+/**
   The constructor function initializes the Standalone MM Core performance library.
 
   It will ASSERT() if one of these operations fails and it will always return EFI_SUCCESS.
@@ -140,7 +201,7 @@ StandaloneMmCorePerformanceLibConstructor (
     return EFI_SUCCESS;
   }
 
-  Status = InitializeMmCorePerformanceLibCommon (&gEfiEventExitBootServicesGuid);
+  Status = InitializeStandaloneMmCorePerformanceLib ();
   ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
