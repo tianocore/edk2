@@ -389,5 +389,10 @@ PiCpuSmmEntry (
                     );
   ASSERT_EFI_ERROR (Status);
 
+  //
+  // Initialize value of mIsRestrictedMemoryAccess
+  //
+  IsRestrictedMemoryAccess ();
+
   return Status;
 }
