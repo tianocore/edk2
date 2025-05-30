@@ -410,25 +410,36 @@ CreatMmHobList (
   //
   PlatformHobSize = 0;
   Status          = CreateMmPlatformHob (NULL, &PlatformHobSize);
-  if (Status == RETURN_BUFFER_TOO_SMALL) {
-    ASSERT (PlatformHobSize != 0);
-    //
-    // Create platform HOBs for MM foundation to get MMIO HOB data.
-    //
-    PlatformHobList = AllocatePages (EFI_SIZE_TO_PAGES (PlatformHobSize));
-    ASSERT (PlatformHobList != NULL);
-    if (PlatformHobList == NULL) {
-      DEBUG ((DEBUG_ERROR, "%a: Out of resource to create platform MM HOBs\n", __func__));
-      CpuDeadLoop ();
-    }
-
-    BufferSize = PlatformHobSize;
-    Status     = CreateMmPlatformHob (PlatformHobList, &PlatformHobSize);
-    ASSERT_EFI_ERROR (Status);
-    ASSERT (BufferSize == PlatformHobSize);
+  if (Status == EFI_SUCCESS) {
+    DEBUG ((DEBUG_INFO, "%a: The size of platform MM HOBs to create is 0\n", __func__));
+    return NULL;
   }
 
+  if (Status != RETURN_BUFFER_TOO_SMALL) {
+    DEBUG ((DEBUG_ERROR, "%a: Unable to determine size of platform MM HOBs to create\n", __func__));
+    ASSERT (Status == RETURN_BUFFER_TOO_SMALL);
+    return NULL;
+  }
+
+  if (PlatformHobSize == 0) {
+    DEBUG ((DEBUG_ERROR, "%a: The size of platform MM HOBs to allocate is 0\n", __func__));
+    ASSERT (PlatformHobSize != 0);
+    return NULL;
+  }
+
+  //
+  // Create platform HOBs for MM foundation to get MMIO HOB data.
+  //
+  PlatformHobList = AllocatePages (EFI_SIZE_TO_PAGES (PlatformHobSize));
+  if (PlatformHobList == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Out of resource to create platform MM HOBs\n", __func__));
+    ASSERT (PlatformHobList != NULL);
+  }
+
+  BufferSize = PlatformHobSize;
+  Status     = CreateMmPlatformHob (PlatformHobList, &PlatformHobSize);
   ASSERT_EFI_ERROR (Status);
+  ASSERT (BufferSize == PlatformHobSize);
 
   //
   // Build memory allocation HOB in PEI HOB list for MM profile data.

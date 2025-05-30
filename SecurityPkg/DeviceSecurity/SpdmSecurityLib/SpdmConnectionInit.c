@@ -338,8 +338,8 @@ CreateSpdmDeviceContext (
         DataSize = DbList->SignatureSize - sizeof (EFI_GUID);
 
         ZeroMem (&Parameter, sizeof (Parameter));
-        Parameter.location = SpdmDataLocationLocal;
-        SpdmReturn         = SpdmSetData (SpdmContext, SpdmDataPeerPublicRootCert, &Parameter, Data, DataSize);
+        Parameter.location = LIBSPDM_DATA_LOCATION_LOCAL;
+        SpdmReturn         = SpdmSetData (SpdmContext, LIBSPDM_DATA_PEER_PUBLIC_ROOT_CERT, &Parameter, Data, DataSize);
         if (LIBSPDM_STATUS_IS_ERROR (SpdmReturn)) {
           if (SpdmReturn == LIBSPDM_STATUS_BUFFER_FULL) {
             Status = RecordConnectionFailureStatus (
@@ -366,22 +366,22 @@ CreateSpdmDeviceContext (
 
   Data8 = 0;
   ZeroMem (&Parameter, sizeof (Parameter));
-  Parameter.location = SpdmDataLocationLocal;
-  SpdmReturn         = SpdmSetData (SpdmContext, SpdmDataCapabilityCTExponent, &Parameter, &Data8, sizeof (Data8));
+  Parameter.location = LIBSPDM_DATA_LOCATION_LOCAL;
+  SpdmReturn         = SpdmSetData (SpdmContext, LIBSPDM_DATA_CAPABILITY_CT_EXPONENT, &Parameter, &Data8, sizeof (Data8));
   if (LIBSPDM_STATUS_IS_ERROR (SpdmReturn)) {
     ASSERT (FALSE);
     goto Error;
   }
 
   Data32     = 0;
-  SpdmReturn = SpdmSetData (SpdmContext, SpdmDataCapabilityFlags, &Parameter, &Data32, sizeof (Data32));
+  SpdmReturn = SpdmSetData (SpdmContext, LIBSPDM_DATA_CAPABILITY_FLAGS, &Parameter, &Data32, sizeof (Data32));
   if (LIBSPDM_STATUS_IS_ERROR (SpdmReturn)) {
     ASSERT (FALSE);
     goto Error;
   }
 
   Data8      = SPDM_MEASUREMENT_SPECIFICATION_DMTF;
-  SpdmReturn = SpdmSetData (SpdmContext, SpdmDataMeasurementSpec, &Parameter, &Data8, sizeof (Data8));
+  SpdmReturn = SpdmSetData (SpdmContext, LIBSPDM_DATA_MEASUREMENT_SPEC, &Parameter, &Data8, sizeof (Data8));
   if (LIBSPDM_STATUS_IS_ERROR (SpdmReturn)) {
     ASSERT (FALSE);
     goto Error;
@@ -398,7 +398,7 @@ CreateSpdmDeviceContext (
              SPDM_ALGORITHMS_BASE_ASYM_ALGO_TPM_ALG_ECDSA_ECC_NIST_P521;
   }
 
-  SpdmReturn = SpdmSetData (SpdmContext, SpdmDataBaseAsymAlgo, &Parameter, &Data32, sizeof (Data32));
+  SpdmReturn = SpdmSetData (SpdmContext, LIBSPDM_DATA_BASE_ASYM_ALGO, &Parameter, &Data32, sizeof (Data32));
   if (LIBSPDM_STATUS_IS_ERROR (SpdmReturn)) {
     ASSERT (FALSE);
     goto Error;
@@ -412,7 +412,7 @@ CreateSpdmDeviceContext (
              SPDM_ALGORITHMS_BASE_HASH_ALGO_TPM_ALG_SHA_512;
   }
 
-  SpdmReturn = SpdmSetData (SpdmContext, SpdmDataBaseHashAlgo, &Parameter, &Data32, sizeof (Data32));
+  SpdmReturn = SpdmSetData (SpdmContext, LIBSPDM_DATA_BASE_HASH_ALGO, &Parameter, &Data32, sizeof (Data32));
   if (LIBSPDM_STATUS_IS_ERROR (SpdmReturn)) {
     ASSERT (FALSE);
     goto Error;
@@ -441,9 +441,9 @@ CreateSpdmDeviceContext (
   }
 
   ZeroMem (&Parameter, sizeof (Parameter));
-  Parameter.location = SpdmDataLocationConnection;
+  Parameter.location = LIBSPDM_DATA_LOCATION_CONNECTION;
   DataSize           = sizeof (Data16);
-  SpdmReturn         = SpdmGetData (SpdmContext, SpdmDataSpdmVersion, &Parameter, &Data16, &DataSize);
+  SpdmReturn         = SpdmGetData (SpdmContext, LIBSPDM_DATA_SPDM_VERSION, &Parameter, &Data16, &DataSize);
   if (LIBSPDM_STATUS_IS_ERROR (SpdmReturn)) {
     DEBUG ((DEBUG_ERROR, "SpdmGetData - %p\n", SpdmReturn));
     goto Error;
