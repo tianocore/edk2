@@ -64,6 +64,12 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjGenericDbg2DeviceInfo,          ///< 36 - Generic DBG2 Device Info
   EArchCommonObjCxlHostBridgeInfo,              ///< 37 - CXL Host Bridge Info
   EArchCommonObjCxlFixedMemoryWindowInfo,       ///< 38 - CXL Fixed Memory Window Info
+  EArchCommonObjProximityDomainInfo,            ///< 39 - Proximity Domain Info
+  EArchCommonObjProximityDomainRelationInfo,    ///< 40 - Proximity Domain Relation Info
+  EArchCommonObjSystemLocalityInfo,             ///< 41 - System Locality Info
+  EArchCommonObjMemoryProximityDomainAttrInfo,  ///< 42 - Memory Proximity Domain Attribute
+  EArchCommonObjMemoryLatBwInfo,                ///< 43 - Memory Latency Bandwidth Info
+  EArchCommonObjMemoryCacheInfo,                ///< 44 - Memory Cache Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -262,16 +268,22 @@ typedef struct CmArchCommonPciInterruptMapInfo {
 */
 typedef struct CmArchCommonMemoryAffinityInfo {
   /// The proximity domain to which the "range of memory" belongs.
-  UINT32    ProximityDomain;
+  UINT32             ProximityDomain;
 
   /// Base Address
-  UINT64    BaseAddress;
+  UINT64             BaseAddress;
 
   /// Length
-  UINT64    Length;
+  UINT64             Length;
 
   /// Flags
-  UINT32    Flags;
+  UINT32             Flags;
+
+  /** Optional field: Reference Token to the ProximityDomain this object
+      belongs to. If set to CM_NULL_TOKEN, the following field is used:
+        CM_ARCH_COMMON_MEMORY_AFFINITY_INFO.ProximityDomain
+  */
+  CM_OBJECT_TOKEN    ProximityDomainToken;
 } CM_ARCH_COMMON_MEMORY_AFFINITY_INFO;
 
 /** A structure that describes the ACPI Device Handle (Type 0) in the
@@ -322,6 +334,12 @@ typedef struct CmArchCommonGenericInitiatorAffinityInfo {
 
   /// Reference Token for the Device Handle
   CM_OBJECT_TOKEN    DeviceHandleToken;
+
+  /** Optional field: Reference Token to the ProximityDomain this object
+      belongs to. If set to CM_NULL_TOKEN, the following field is used:
+        CM_ARCH_COMMON_GENERIC_INITIATOR_AFFINITY_INFO.ProximityDomain
+  */
+  CM_OBJECT_TOKEN    ProximityDomainToken;
 } CM_ARCH_COMMON_GENERIC_INITIATOR_AFFINITY_INFO;
 
 /** A structure that describes the Lpi information.
@@ -906,6 +924,129 @@ typedef struct CmArchCommonCxlFixedMemoryWindowInfo {
   /// structure via token matching.
   CM_OBJECT_TOKEN    InterleaveTargetTokens[CFMWS_MAX_INTERLEAVE_WAYS];
 } CM_ARCH_COMMON_CXL_FIXED_MEMORY_WINDOW_INFO;
+
+/** A structure that describes a proximity domain.
+
+    ID: EArchCommonObjProximityDomainInfo
+*/
+typedef struct CmArchCommonProximityDomainInfo {
+  /// GenerateDomainId
+  /// - TRUE if the DynamicTablesPkg framework should generate DomainId values.
+  /// - FALSE if CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO.DomainId should be used instead.
+  /// If GenerateDomainId is FALSE, user supplied DomainId values should be used.
+  /// Note: It is the user's responsibility to ensure that the DomainId values
+  /// are unique.
+  BOOLEAN    GenerateDomainId;
+
+  /// DomainId.
+  /// Generators will use this DomainId if GenerateDomainId=FALSE.
+  UINT32     DomainId;
+} CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO;
+
+/** A structure that describes a relation between two proximity domains.
+
+    ID: EArchCommonObjProximityDomainRelationInfo
+*/
+typedef struct CmArchCommonProximityDomainRelationInfo {
+  /// First Domain Id Token.
+  /// Token referencing a CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO.
+  ///
+  /// For the HMAT sub-table of type 1 -
+  ///   System Locality Latency and Bandwidth Information Structure
+  /// the First Domain is an Initiator Domain.
+  CM_OBJECT_TOKEN    FirstDomainToken;
+
+  /// Second Domain Id Token.
+  /// Token referencing a CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO.
+  ///
+  /// For the HMAT sub-table of type 1 -
+  ///   System Locality Latency and Bandwidth Information Structure
+  /// the Second Domain is a Target Domain.
+  CM_OBJECT_TOKEN    SecondDomainToken;
+
+  /// Relation.
+  /// The meaning of this field depends on the object referencing this struct.
+  /// This could be a bandwidth, latency, relative distance (SLIT)...
+  UINT64             Relation;
+} CM_ARCH_COMMON_PROXIMITY_DOMAIN_RELATION_INFO;
+
+/** A structure that describes a relation between two proximity domains.
+
+    ID: EArchCommonObjSystemLocalityInfo
+*/
+typedef struct CmArchCommonSystemLocalityInfo {
+  /// Array of relative distances.
+  /// Token identifying an array of CM_ARCH_COMMON_DOMAIN_RELATION.
+  ///
+  /// If a relative distance between two domains is not provided,
+  /// the default value used is:
+  /// - 10 for the distance between a domain and itself, cf. the normalized
+  ///   distance in the spec.
+  /// - 0xFF otherwise, i.e. the domains are unreachable from each other.
+  /// Relative distances must be > 10 for two different domains.
+  CM_OBJECT_TOKEN    RelativeDistanceArray;
+} CM_ARCH_COMMON_SYSTEM_LOCALITY_INFO;
+
+/** A structure that describes the Memory Proximity Domain Attribute.
+
+    ID: EArchCommonObjMemoryProximityDomainAttrInfo
+*/
+typedef struct CmArchCommonMemoryProximityDomainAttrInfo {
+  /// Flags
+  UINT16             Flags;
+
+  /// Token referencing an Initiator Proximity Domain
+  /// I.e. a CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO
+  CM_OBJECT_TOKEN    InitiatorProximityDomain;
+
+  /// Token referencing an Memory Proximity Domain
+  /// I.e. a CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO
+  CM_OBJECT_TOKEN    MemoryProximityDomain;
+} CM_ARCH_COMMON_MEMORY_PROXIMITY_DOMAIN_ATTR_INFO;
+
+/** A structure that describes the Memory Latency Bandwidth Info.
+
+    ID: EArchCommonObjMemoryLatBwInfo
+*/
+typedef struct CmArchCommonMemoryLatBwInfo {
+  /// Flags
+  UINT8              Flags;
+
+  /// Data Type
+  UINT8              DataType;
+
+  /// Minimum Transfer Type
+  UINT8              MinTransferSize;
+
+  /// Entry Base Unit
+  UINT64             EntryBaseUnit;
+
+  /// Token referencing an array of CM_ARCH_COMMON_DOMAIN_RELATION_INFO
+  /// From this array, it is possible to retrieve:
+  /// - the number and Ids of the initiator domains
+  /// - the number and Ids of the target domains
+  /// - the latency/bandwidth between each domain
+  CM_OBJECT_TOKEN    RelativeDistanceArray;
+} CM_ARCH_COMMON_MEMORY_LAT_BW_INFO;
+
+/** A structure that describes the Memory Cache Info.
+
+    ID: EArchCommonObjMemoryCacheInfo
+*/
+typedef struct CmArchCommonMemoryCacheInfo {
+  /// Token referencing a memory proximity domain.
+  CM_OBJECT_TOKEN    MemoryProximityDomain;
+
+  /// Memory side cache size.
+  UINT64             MemorySideCacheSize;
+
+  /// Cache attributes.
+  UINT32             CacheAttributes;
+
+  /// @todo It is not possible to generate Smbios tables yet.
+  /// @todo Referencing Smbios tables is not possible for now,
+  /// @todo but will be in a near future.
+} CM_ARCH_COMMON_MEMORY_CACHE_INFO;
 
 #pragma pack()
 
