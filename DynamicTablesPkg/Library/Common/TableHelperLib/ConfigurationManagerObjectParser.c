@@ -821,6 +821,21 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonObjCxlFixedMemoryWindowInfo[] = {
     ARRAY_SIZE (CmArchCommonObjInterleaveTargetTokenParser) },
 };
 
+/** A parser for EArchCommonObjGenericDeviceInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonGenericDeviceInfoParser[] = {
+  { "Name",                   AML_NAME_SEG_SIZE + 1,    NULL,   PrintString },
+  { "Hid",                    8+1,                      NULL,   PrintString },
+  { "CidValid",               1,                        "%d",   NULL        },
+  { "Cid",                    8+1,                      NULL,   PrintString },
+  { "Uid",                    4,                        "0x%x", NULL        },
+  { "HrvValid",               1,                        "%d",   NULL        },
+  { "Hrv",                    4,                        "0x%x", NULL        },
+  { "Cca",                    1,                        "%d",   NULL        },
+  { "AddressResourceToken",   sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "InterruptResourceToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        }
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -863,6 +878,8 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjGenericDbg2DeviceInfo,       CmArchCommonObjDbg2DeviceInfo),
   CM_PARSER_ADD_OBJECT (EArchCommonObjCxlHostBridgeInfo,           CmArchCommonObjCxlHostBridgeInfo),
   CM_PARSER_ADD_OBJECT (EArchCommonObjCxlFixedMemoryWindowInfo,    CmArchCommonObjCxlFixedMemoryWindowInfo),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjGenericDeviceInfo,           CmArchCommonGenericDeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjGenericInterrupt,            CmArchCommonGenericInterruptParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 

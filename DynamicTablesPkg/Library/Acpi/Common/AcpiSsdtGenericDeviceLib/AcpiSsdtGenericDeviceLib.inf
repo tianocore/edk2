@@ -1,0 +1,32 @@
+## @file
+#  Ssdt Generic Device Generator
+#
+#  Copyright (c) 2020 - 2021, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2024 - 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = SsdtGenericDeviceLib
+  FILE_GUID      = 8dd6b6a6-edaf-45d5-92e5-d7f139274d1e
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiSsdtGenericDeviceLibConstructor
+  DESTRUCTOR     = AcpiSsdtGenericDeviceLibDestructor
+
+[Sources]
+  SsdtGenericDeviceGenerator.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  AcpiHelperLib
+  AmlLib
+  BaseLib
+  TableHelperLib
