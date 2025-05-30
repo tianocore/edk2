@@ -737,6 +737,14 @@ MmCommunicationMmCommunicate3 (
   }
 
   CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommBufferVirtual;
+  if (CompareMem (
+        &CommunicateHeader->HeaderGuid,
+        &gEfiMmCommunicateHeaderV3Guid,
+        sizeof (EFI_GUID)
+        ) != 0)
+  {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = SafeUint64Add (sizeof (EFI_MM_COMMUNICATE_HEADER_V3), CommunicateHeader->MessageSize, &MinCommSize);
   if (EFI_ERROR (Status)) {

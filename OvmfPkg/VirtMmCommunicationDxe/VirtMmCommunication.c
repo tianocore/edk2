@@ -4,6 +4,7 @@
 
 **/
 
+#include <PiDxe.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -15,6 +16,7 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 
 #include <Protocol/MmCommunication2.h>
+#include <Protocol/MmCommunication3.h>
 
 #include "VirtMmCommunication.h"
 
@@ -66,16 +68,18 @@ STATIC EFI_HANDLE  mSmmVariableWriteHandle;
 **/
 EFI_STATUS
 EFIAPI
-VirtMmCommunication2Communicate (
-  IN CONST EFI_MM_COMMUNICATION2_PROTOCOL  *This,
-  IN OUT VOID                              *CommBufferPhysical,
-  IN OUT VOID                              *CommBufferVirtual,
-  IN OUT UINTN                             *CommSize OPTIONAL
+VirtMmCommunicationCommon (
+  IN OUT VOID   *CommBufferPhysical,
+  IN OUT VOID   *CommBufferVirtual,
+  IN OUT UINTN  *CommSize OPTIONAL
   )
 {
-  EFI_MM_COMMUNICATE_HEADER  *CommunicateHeader;
-  EFI_STATUS                 Status;
-  UINTN                      BufferSize;
+  EFI_MM_COMMUNICATE_HEADER     *CommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER_V3  *CommunicateHeaderV3;
+  EFI_STATUS                    Status;
+  UINTN                         BufferSize;
+  UINTN                         *MessageSize;
+  UINTN                         HeaderSize;
 
   //
   // Check parameters
@@ -84,28 +88,42 @@ VirtMmCommunication2Communicate (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status            = EFI_SUCCESS;
-  CommunicateHeader = CommBufferVirtual;
-  // CommBuffer is a mandatory parameter. Hence, Rely on
-  // MessageLength + Header to ascertain the
-  // total size of the communication payload rather than
-  // rely on optional CommSize parameter
-  BufferSize = CommunicateHeader->MessageLength +
-               sizeof (CommunicateHeader->HeaderGuid) +
-               sizeof (CommunicateHeader->MessageLength);
+  Status              = EFI_SUCCESS;
+  CommunicateHeader   = CommBufferVirtual;
+  CommunicateHeaderV3 = NULL;
+  if (CompareGuid (
+        &CommunicateHeader->HeaderGuid,
+        &gEfiMmCommunicateHeaderV3Guid
+        ))
+  {
+    // This is a v3 header
+    CommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)(UINTN)CommBufferVirtual;
+    HeaderSize          = sizeof (EFI_MM_COMMUNICATE_HEADER_V3);
+    BufferSize          = CommunicateHeaderV3->BufferSize;
+    MessageSize         = &CommunicateHeaderV3->MessageSize;
+  } else {
+    HeaderSize = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+    // CommBuffer is a mandatory parameter. Hence, Rely on
+    // MessageLength + Header to ascertain the
+    // total size of the communication payload rather than
+    // rely on optional CommSize parameter
+    BufferSize = CommunicateHeader->MessageLength +
+                 OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+    MessageSize = &CommunicateHeader->MessageLength;
+  }
 
   DEBUG ((
     DEBUG_VERBOSE,
-    "%a: %g msglen %ld, BufferSize %ld, CommSize %ld\n",
+    "%a: %g msglen %ld, BufferSize %ld\n",
     __func__,
     &CommunicateHeader->HeaderGuid,
-    CommunicateHeader->MessageLength,
-    BufferSize,
-    *CommSize
+    *MessageSize,
+    BufferSize
     ));
 
   // If CommSize is not omitted, perform size inspection before proceeding.
   if (CommSize != NULL) {
+    DEBUG ((DEBUG_VERBOSE, "%a: CommSize %ld\n", __func__, *CommSize));
     // This case can be used by the consumer of this driver to find out the
     // max size that can be used for allocating CommBuffer.
     if ((*CommSize == 0) ||
@@ -127,13 +145,11 @@ VirtMmCommunication2Communicate (
   // If the message length is 0 or greater than what can be tolerated by the MM
   // environment then return the expected size.
   //
-  if ((CommunicateHeader->MessageLength == 0) ||
+  if ((*MessageSize == 0) ||
       (BufferSize > MAX_BUFFER_SIZE))
   {
-    CommunicateHeader->MessageLength = MAX_BUFFER_SIZE -
-                                       sizeof (CommunicateHeader->HeaderGuid) -
-                                       sizeof (CommunicateHeader->MessageLength);
-    Status = EFI_BAD_BUFFER_SIZE;
+    *MessageSize = MAX_BUFFER_SIZE - HeaderSize;
+    Status       = EFI_BAD_BUFFER_SIZE;
   }
 
   // MessageLength or CommSize check has failed, return here.
@@ -176,11 +192,97 @@ VirtMmCommunication2Communicate (
   return EFI_SUCCESS;
 }
 
+/**
+  Communicates with a registered handler.
+
+  This function provides a service to send and receive messages from a registered UEFI service.
+
+  @param[in] This                     The EFI_MM_COMMUNICATION_PROTOCOL instance.
+  @param[in, out] CommBufferPhysical  Physical address of the MM communication buffer
+  @param[in, out] CommBufferVirtual   Virtual address of the MM communication buffer
+  @param[in, out] CommSize            The size of the data buffer being passed in. On input,
+                                      when not omitted, the buffer should cover EFI_MM_COMMUNICATE_HEADER
+                                      and the value of MessageLength field. On exit, the size
+                                      of data being returned. Zero if the handler does not
+                                      wish to reply with any data. This parameter is optional
+                                      and may be NULL.
+
+  @retval EFI_SUCCESS            The message was successfully posted.
+  @retval EFI_INVALID_PARAMETER  CommBufferPhysical or CommBufferVirtual was NULL, or
+                                 integer value pointed by CommSize does not cover
+                                 EFI_MM_COMMUNICATE_HEADER and the value of MessageLength
+                                 field.
+  @retval EFI_BAD_BUFFER_SIZE    The buffer is too large for the MM implementation.
+                                 If this error is returned, the MessageLength field
+                                 in the CommBuffer header or the integer pointed by
+                                 CommSize, are updated to reflect the maximum payload
+                                 size the implementation can accommodate.
+  @retval EFI_ACCESS_DENIED      The CommunicateBuffer parameter or CommSize parameter,
+                                 if not omitted, are in address range that cannot be
+                                 accessed by the MM environment.
+
+**/
+EFI_STATUS
+EFIAPI
+VirtMmCommunication2Communicate (
+  IN CONST EFI_MM_COMMUNICATION2_PROTOCOL  *This,
+  IN OUT VOID                              *CommBufferPhysical,
+  IN OUT VOID                              *CommBufferVirtual,
+  IN OUT UINTN                             *CommSize OPTIONAL
+  )
+{
+  return VirtMmCommunicationCommon (
+           CommBufferPhysical,
+           CommBufferVirtual,
+           CommSize
+           );
+}
+
+/**
+  Communicates with a registered handler.
+
+  This function provides a service to send and receive messages from a registered UEFI service.
+
+  @param[in] This                     The EFI_MM_COMMUNICATION3_PROTOCOL instance.
+  @param[in, out] CommBufferPhysical  Physical address of the MM communication buffer, of which content must
+                                      start with EFI_MM_COMMUNICATE_HEADER_V3.
+  @param[in, out] CommBufferVirtual   Virtual address of the MM communication buffer, of which content must
+                                      start with EFI_MM_COMMUNICATE_HEADER_V3.
+
+  @retval EFI_SUCCESS                 The message was successfully posted.
+  @retval EFI_INVALID_PARAMETER       CommBufferPhysical was NULL or CommBufferVirtual was NULL.
+  @retval EFI_BAD_BUFFER_SIZE         The buffer is too large for the MM implementation.
+                                      If this error is returned, the MessageSize field
+                                      in the CommBuffer header, are updated to reflect
+                                      the maximum payload size the implementation can accommodate.
+  @retval EFI_ACCESS_DENIED           The CommunicateBuffer parameter are in address range
+                                      that cannot be accessed by the MM environment.
+
+**/
+EFI_STATUS
+EFIAPI
+VirtMmCommunication3Communicate (
+  IN CONST EFI_MM_COMMUNICATION3_PROTOCOL  *This,
+  IN OUT VOID                              *CommBufferPhysical,
+  IN OUT VOID                              *CommBufferVirtual
+  )
+{
+  return VirtMmCommunicationCommon (
+           CommBufferPhysical,
+           CommBufferVirtual,
+           NULL
+           );
+}
+
 //
 // MM Communication Protocol instance
 //
 STATIC EFI_MM_COMMUNICATION2_PROTOCOL  mMmCommunication2 = {
   VirtMmCommunication2Communicate
+};
+
+STATIC EFI_MM_COMMUNICATION3_PROTOCOL  mMmCommunication3 = {
+  VirtMmCommunication3Communicate
 };
 
 /**
