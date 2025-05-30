@@ -1,7 +1,7 @@
 /** @file
   Configuration Manager Dxe
 
-  Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2024, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -712,6 +712,22 @@ GetStandardNameSpaceObject (
           // IORT is only required for GicV3/4
           //
           AcpiTableCount -= 1;
+        } else {
+          //
+          // Check if we have support for ITS.
+          //
+          Status = DynamicPlatRepoGetObject (
+                     PlatformRepo->DynamicPlatformRepo,
+                     CREATE_CM_ARM_OBJECT_ID (EArmObjGicItsInfo),
+                     CM_NULL_TOKEN,
+                     &CmObjDesc
+                     );
+          if (EFI_ERROR (Status)) {
+            //
+            // IORT is only required for GicV3/4 if ITS is present.
+            //
+            AcpiTableCount -= 1;
+          }
         }
       }
 

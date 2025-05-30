@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Portions copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
+  Portions copyright (c) 2011 - 2023, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -94,4 +94,18 @@ ArmHasEte (
 {
   // The ID_AA64DFR0_EL1.TraceVer field identifies the presence of FEAT_ETE.
   return ((ArmReadIdAA64Dfr0 () & AARCH64_DFR0_TRACEVER) != 0);
+}
+
+/** Checks if RME is implemented.
+
+   @retval TRUE  RME is implemented.
+   @retval FALSE RME is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasRme (
+  VOID
+  )
+{
+  return ((ArmReadIdAA64Pfr0 () & AARCH64_PFR0_RME) != 0);
 }

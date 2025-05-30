@@ -1,6 +1,6 @@
 #/** @file
 #
-#  Copyright (c) 2011-2015, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2011-2023, Arm Limited. All rights reserved.<BR>
 #  Copyright (c) 2015, Linaro Ltd. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -38,6 +38,7 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  ArmCcaInitPeiLib
   BaseLib
   BaseMemoryLib
   DebugLib
