@@ -255,9 +255,12 @@ MmDispatchFvs (
 
   ZeroMem (mMmFv, sizeof (mMmFv));
 
-  Index     = 0;
-  FvHob.Raw = GetHobList ();
-  while ((FvHob.Raw = GetNextHob (EFI_HOB_TYPE_FV, FvHob.Raw)) != NULL) {
+  Index = 0;
+  for ( FvHob.Raw = GetNextHob (EFI_HOB_TYPE_FV, GetHobList ())
+        ; FvHob.Raw != NULL
+        ; FvHob.Raw = GetNextHob (EFI_HOB_TYPE_FV, GET_NEXT_HOB (FvHob))
+        )
+  {
     if (Index == ARRAY_SIZE (mMmFv)) {
       DEBUG ((
         DEBUG_INFO,
@@ -302,8 +305,6 @@ MmDispatchFvs (
 
     MmCoreFfsFindMmDriver (Fv, 0);
     mMmFv[Index++] = Fv;
-
-    FvHob.Raw = GET_NEXT_HOB (FvHob);
   }
 
   if (Index == 0) {
