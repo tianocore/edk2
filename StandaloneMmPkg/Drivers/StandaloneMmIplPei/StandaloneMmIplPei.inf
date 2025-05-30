@@ -65,6 +65,7 @@
   gEfiPeiMmCommunication3PpiGuid
   gEfiEndOfPeiSignalPpiGuid
   gMmCoreFvLocationPpiGuid
+  gEfiPeiMmAccessPpiGuid
 
 [Protocols]
   gEfiMmEndOfPeiProtocol
@@ -83,4 +84,4 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmRestrictedMemoryAccess        ## CONSUMES
 
 [Depex]
-  gEfiPeiMmControlPpiGuid AND gEfiPeiMpServicesPpiGuid
+  gEfiPeiMmControlPpiGuid AND gEfiPeiMpServicesPpiGuid AND gEfiPeiMmAccessPpiGuid

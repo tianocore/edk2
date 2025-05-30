@@ -21,6 +21,7 @@
 #include <Library/PeCoffLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
+#include <Ppi/MmAccess.h>
 #include <Ppi/MmControl.h>
 #include <Ppi/MmCommunication.h>
 #include <Ppi/MmCommunication3.h>
