@@ -64,6 +64,7 @@
   ReportStatusCodeLib
   Tcg2PhysicalPresenceLib
   PeCoffLib
+  Tpm2DebugLib
 
 [Guids]
   ## SOMETIMES_CONSUMES     ## Variable:L"SecureBoot"
