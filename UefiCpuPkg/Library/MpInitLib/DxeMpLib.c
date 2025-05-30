@@ -21,11 +21,12 @@
 
 #define  AP_SAFE_STACK_SIZE  128
 
-CPU_MP_DATA       *mCpuMpData                  = NULL;
-EFI_EVENT         mCheckAllApsEvent            = NULL;
-EFI_EVENT         mMpInitExitBootServicesEvent = NULL;
-EFI_EVENT         mLegacyBootEvent             = NULL;
-volatile BOOLEAN  mStopCheckAllApsStatus       = TRUE;
+CPU_MP_DATA                    *mCpuMpData                  = NULL;
+EFI_EVENT                      mCheckAllApsEvent            = NULL;
+EFI_EVENT                      mMpInitExitBootServicesEvent = NULL;
+EFI_EVENT                      mLegacyBootEvent             = NULL;
+volatile BOOLEAN               mStopCheckAllApsStatus       = TRUE;
+extern RELOCATE_AP_LOOP_ENTRY  mReservedApLoop;
 
 //
 // Begin wakeup buffer allocation below 0x88000
@@ -417,14 +418,11 @@ AllocateApLoopCodeBuffer (
 /**
   Remove Nx protection for the range specific by BaseAddress and Length.
 
-  The PEI implementation uses CpuPageTableLib to change the attribute.
-  The DXE implementation uses gDS to change the attribute.
-
   @param[in] BaseAddress  BaseAddress of the range.
   @param[in] Length       Length of the range.
 **/
 VOID
-RemoveNxprotection (
+RemoveNxProtection (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINTN                 Length
   )
@@ -432,17 +430,58 @@ RemoveNxprotection (
   EFI_STATUS                       Status;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  MemDesc;
 
-  //
-  // TODO: Check EFI_MEMORY_XP bit set or not once it's available in DXE GCD
-  //       service.
-  //
   Status = gDS->GetMemorySpaceDescriptor (BaseAddress, &MemDesc);
   if (!EFI_ERROR (Status)) {
-    gDS->SetMemorySpaceAttributes (
-           BaseAddress,
-           Length,
-           MemDesc.Attributes & (~EFI_MEMORY_XP)
-           );
+    if (((MemDesc.Capabilities & EFI_MEMORY_XP) == EFI_MEMORY_XP) && ((MemDesc.Attributes & EFI_MEMORY_XP) == EFI_MEMORY_XP)) {
+      Status = gDS->SetMemorySpaceAttributes (
+                      BaseAddress,
+                      Length,
+                      MemDesc.Attributes & (~EFI_MEMORY_XP)
+                      );
+
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "%a - Setting Ro on 0x%p returned %r\n", __func__, BaseAddress, Status));
+        ASSERT_EFI_ERROR (Status);
+      }
+    } else {
+      DEBUG ((DEBUG_ERROR, "%a - Memory Address was not found in Memory map! %lp %r\n", __func__, BaseAddress, Status));
+      ASSERT_EFI_ERROR (Status);
+    }
+  }
+}
+
+/**
+  Add ReadOnly protection to the range specified by BaseAddress and Length.
+
+  @param[in] BaseAddress  BaseAddress of the range.
+  @param[in] Length       Length of the range.
+**/
+VOID
+ApplyReadOnlyMemoryProtection (
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN                 Length
+  )
+{
+  EFI_STATUS                       Status;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  MemDesc;
+
+  Status = gDS->GetMemorySpaceDescriptor (BaseAddress, &MemDesc);
+  if (!EFI_ERROR (Status)) {
+    if (((MemDesc.Capabilities & EFI_MEMORY_RO) == EFI_MEMORY_RO) && ((MemDesc.Attributes & EFI_MEMORY_RO) != EFI_MEMORY_RO)) {
+      Status = gDS->SetMemorySpaceAttributes (
+                      BaseAddress,
+                      Length,
+                      MemDesc.Attributes | EFI_MEMORY_RO
+                      );
+
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "%a - Setting Ro on 0x%p returned %r\n", __func__, BaseAddress, Status));
+        ASSERT_EFI_ERROR (Status);
+      }
+    } else {
+      DEBUG ((DEBUG_ERROR, "%a - Memory Address was not found in Memory map! %lp %r\n", __func__, BaseAddress, Status));
+      ASSERT_EFI_ERROR (Status);
+    }
   }
 }
 
@@ -468,6 +507,15 @@ MpInitChangeApLoopCallback (
   CpuMpData->Pm16CodeSegment = GetProtectedMode16CS ();
   CpuMpData->ApLoopMode      = PcdGet8 (PcdCpuApLoopMode);
   mNumberToFinish            = CpuMpData->CpuCount - 1;
+  RemoveNxProtection (
+    (EFI_PHYSICAL_ADDRESS)(UINTN)mReservedApLoop.Data,
+    EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (CpuMpData->AddressMap.RelocateApLoopFuncSizeAmdSev))
+    );
+
+  ApplyReadOnlyMemoryProtection (
+    (EFI_PHYSICAL_ADDRESS)(UINTN)mReservedApLoop.Data,
+    EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (CpuMpData->AddressMap.RelocateApLoopFuncSizeAmdSev))
+    );
   WakeUpAP (CpuMpData, TRUE, 0, RelocateApLoop, NULL, TRUE);
   while (mNumberToFinish > 0) {
     CpuPause ();

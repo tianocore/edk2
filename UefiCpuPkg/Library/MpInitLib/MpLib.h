@@ -986,14 +986,23 @@ AllocateApLoopCodeBuffer (
 /**
   Remove Nx protection for the range specific by BaseAddress and Length.
 
-  The PEI implementation uses CpuPageTableLib to change the attribute.
-  The DXE implementation uses gDS to change the attribute.
-
   @param[in] BaseAddress  BaseAddress of the range.
   @param[in] Length       Length of the range.
 **/
 VOID
-RemoveNxprotection (
+RemoveNxProtection (
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN                 Length
+  );
+
+/**
+Add ReadOnly protection to the range specified by BaseAddress and Length.
+
+@param[in] BaseAddress  BaseAddress of the range.
+@param[in] Length       Length of the range.
+**/
+VOID
+ApplyReadOnlyMemoryProtection (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINTN                 Length
   );
