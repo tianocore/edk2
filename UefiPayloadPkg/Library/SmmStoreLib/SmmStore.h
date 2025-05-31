@@ -1,6 +1,7 @@
 /** @file  SmmStore.h
 
   Copyright (c) 2022, 9elements GmbH<BR>
+  Copyright (c) 2025, 3mdeb Sp. z o.o.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -18,6 +19,9 @@
 #define SMMSTORE_CMD_RAW_READ   5
 #define SMMSTORE_CMD_RAW_WRITE  6
 #define SMMSTORE_CMD_RAW_CLEAR  7
+
+/* Used by capsule updates as a standalone command or modifier to v2 commands */
+#define SMMSTORE_CMD_USE_FULL_FLASH  0x80
 
 /*
  * This allows the payload to store raw data in the flash regions.
