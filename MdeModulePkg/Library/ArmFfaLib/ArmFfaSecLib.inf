@@ -1,0 +1,42 @@
+## @file
+#  Provides FF-A ABI Library used in PeilessSec
+#
+#  Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmFfaSecLib
+  FILE_GUID                      = 7b2c2aa6-3e20-11f0-a8b6-db774bafa249
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmFfaLib|SEC
+  CONSTRUCTOR                    = ArmFfaSecLibConstructor
+
+[Sources]
+  ArmFfaCommon.h
+  ArmFfaCommon.c
+  ArmFfaRxTxMap.h
+  ArmFfaSecRxTxMap.c
+  ArmFfaSecLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  ArmSmcLib
+  ArmSvcLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaTxRxPageCount
+
+[Guids]
+  gArmFfaRxTxBufferInfoGuid
