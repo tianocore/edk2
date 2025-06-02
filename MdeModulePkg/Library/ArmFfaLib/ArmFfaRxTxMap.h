@@ -17,6 +17,8 @@
 #ifndef ARM_FFA_RX_TX_MAP_LIB_H_
 #define ARM_FFA_RX_TX_MAP_LIB_H_
 
+#include <Guid/ArmFfaRxTxBufferInfo.h>
+
 /**
   Mapping Rx/Tx buffers.
   This function is only called in ArmFfaLibConstructor because
@@ -49,6 +51,49 @@ EFI_STATUS
 EFIAPI
 ArmFfaLibRxTxUnmap (
   IN VOID
+  );
+
+/**
+  Update Rx/TX buffer information.
+
+  @param  BufferInfo            Rx/Tx buffer information.
+
+**/
+VOID
+EFIAPI
+UpdateRxTxBufferInfo (
+  OUT ARM_FFA_RX_TX_BUFFER_INFO  *BufferInfo
+  );
+
+/**
+  Find Rx/TX buffer memory allocation hob.
+
+  @param  UseGuid             Find MemoryAllocationHob using Guid.
+
+  @retval MemoryAllocationHob
+  @retval NULL                No memory allocation hob related to Rx/Tx buffer
+
+**/
+EFI_HOB_MEMORY_ALLOCATION *
+EFIAPI
+FindRxTxBufferAllocationHob (
+  IN BOOLEAN  UseGuid
+  );
+
+/**
+  Remap Rx/TX buffer with converted Rx/Tx Buffer address after
+  using permanent memory.
+
+  @param[out] BufferInfo    BufferInfo
+
+  @retval EFI_SUCCESS       Success
+  @retval EFI_NOT_FOUND     No memory allocation hob related to Rx/Tx buffer
+
+**/
+EFI_STATUS
+EFIAPI
+RemapFfaRxTxBuffer (
+  IN OUT ARM_FFA_RX_TX_BUFFER_INFO  *BufferInfo
   );
 
 #endif

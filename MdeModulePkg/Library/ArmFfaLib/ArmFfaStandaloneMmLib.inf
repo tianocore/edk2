@@ -19,9 +19,9 @@
 [Sources]
   ArmFfaCommon.h
   ArmFfaCommon.c
-  ArmFfaStandaloneMmLib.c
   ArmFfaRxTxMap.h
-  ArmFfaRxTxMapStmm.c
+  ArmFfaStandaloneMmRxTxMap.c
+  ArmFfaStandaloneMmLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
