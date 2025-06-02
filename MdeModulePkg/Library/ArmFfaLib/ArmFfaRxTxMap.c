@@ -19,11 +19,14 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
 #include <IndustryStandard/ArmFfaSvc.h>
+
+#include <Guid/ArmFfaRxTxBufferInfo.h>
 
 #include "ArmFfaCommon.h"
 #include "ArmFfaRxTxMap.h"
@@ -267,6 +270,200 @@ ArmFfaLibRxTxUnmap (
 
   PcdSet64S (PcdFfaTxBuffer, 0x00);
   PcdSet64S (PcdFfaRxBuffer, 0x00);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Update Rx/TX buffer information.
+
+  @param  BufferInfo            Rx/Tx buffer information.
+
+**/
+VOID
+EFIAPI
+UpdateRxTxBufferInfo (
+  OUT ARM_FFA_RX_TX_BUFFER_INFO  *BufferInfo
+  )
+{
+  BufferInfo->TxBufferAddr = (VOID *)(UINTN)PcdGet64 (PcdFfaTxBuffer);
+  BufferInfo->TxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+  BufferInfo->RxBufferAddr = (VOID *)(UINTN)PcdGet64 (PcdFfaRxBuffer);
+  BufferInfo->RxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+}
+
+/**
+  Find Rx/TX buffer memory allocation hob.
+
+  @param  UseGuid             Find MemoryAllocationHob using Guid.
+
+  @retval MemoryAllocationHob
+  @retval NULL                No memory allocation hob related to Rx/Tx buffer
+
+**/
+EFI_HOB_MEMORY_ALLOCATION *
+EFIAPI
+FindRxTxBufferAllocationHob (
+  IN BOOLEAN  UseGuid
+  )
+{
+  EFI_PEI_HOB_POINTERS       Hob;
+  EFI_HOB_MEMORY_ALLOCATION  *MemoryAllocationHob;
+  EFI_PHYSICAL_ADDRESS       BufferBase;
+  UINT64                     BufferSize;
+  EFI_PHYSICAL_ADDRESS       MemoryBase;
+  UINT64                     MemorySize;
+
+  BufferBase = (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdFfaTxBuffer);
+  BufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE * 2;
+
+  if (!UseGuid && (BufferBase == 0x00)) {
+    return NULL;
+  }
+
+  MemoryAllocationHob = NULL;
+  Hob.Raw             = GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION);
+
+  while (Hob.Raw != NULL) {
+    if (Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiConventionalMemory) {
+      continue;
+    }
+
+    MemoryBase = Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress;
+    MemorySize = Hob.MemoryAllocation->AllocDescriptor.MemoryLength;
+
+    if ((!UseGuid && (BufferBase >= MemoryBase) &&
+         ((BufferBase + BufferSize) <= (MemoryBase + MemorySize))) ||
+        (UseGuid && CompareGuid (
+                      &gArmFfaRxTxBufferInfoGuid,
+                      &Hob.MemoryAllocation->AllocDescriptor.Name
+                      )))
+    {
+      MemoryAllocationHob = (EFI_HOB_MEMORY_ALLOCATION *)Hob.Raw;
+      break;
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+    Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw);
+  } // while
+
+  return MemoryAllocationHob;
+}
+
+/**
+  Remap Rx/TX buffer with converted Rx/Tx Buffer address after
+  using permanent memory.
+
+  @param[out] BufferInfo    BufferInfo
+
+  @retval EFI_SUCCESS       Success
+  @retval EFI_NOT_FOUND     No memory allocation hob related to Rx/Tx buffer
+
+**/
+EFI_STATUS
+EFIAPI
+RemapFfaRxTxBuffer (
+  OUT ARM_FFA_RX_TX_BUFFER_INFO  *BufferInfo
+  )
+{
+  EFI_STATUS                 Status;
+  ARM_FFA_ARGS               FfaArgs;
+  UINTN                      NewBufferBase;
+  UINTN                      NewTxBuffer;
+  UINTN                      NewRxBuffer;
+  UINTN                      Property1;
+  UINTN                      Property2;
+  UINTN                      MinSizeAndAlign;
+  EFI_HOB_MEMORY_ALLOCATION  *RxTxBufferAllocationHob;
+
+  RxTxBufferAllocationHob = FindRxTxBufferAllocationHob (TRUE);
+  if (RxTxBufferAllocationHob == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  Status = ArmFfaLibGetFeatures (
+             ARM_FID_FFA_RXTX_MAP,
+             FFA_RXTX_MAP_INPUT_PROPERTY_DEFAULT,
+             &Property1,
+             &Property2
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Failed to get RX/TX buffer property... Status: %r\n",
+      __func__,
+      Status
+      ));
+    return Status;
+  }
+
+  MinSizeAndAlign =
+    ((Property1 >>
+      ARM_FFA_BUFFER_MINSIZE_AND_ALIGN_SHIFT) &
+     ARM_FFA_BUFFER_MINSIZE_AND_ALIGN_MASK);
+
+  switch (MinSizeAndAlign) {
+    case ARM_FFA_BUFFER_MINSIZE_AND_ALIGN_4K:
+      MinSizeAndAlign = SIZE_4KB;
+      break;
+    case ARM_FFA_BUFFER_MINSIZE_AND_ALIGN_16K:
+      MinSizeAndAlign = SIZE_16KB;
+      break;
+    case ARM_FFA_BUFFER_MINSIZE_AND_ALIGN_64K:
+      MinSizeAndAlign = SIZE_64KB;
+      break;
+    default:
+      DEBUG ((DEBUG_ERROR, "%a: Invalid MinSizeAndAlign: 0x%x\n", __func__, MinSizeAndAlign));
+      return EFI_UNSUPPORTED;
+  }
+
+  ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
+  FfaArgs.Arg0 = ARM_FID_FFA_RXTX_UNMAP;
+  FfaArgs.Arg1 = (gPartId << ARM_FFA_SOURCE_EP_SHIFT);
+
+  ArmCallFfa (&FfaArgs);
+  Status = FfaArgsToEfiStatus (&FfaArgs);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Failed to unmap Rx/Tx buffer. Status: %r\n", __func__, Status));
+    return Status;
+  }
+
+  PcdSet64S (PcdFfaTxBuffer, 0x00);
+  PcdSet64S (PcdFfaRxBuffer, 0x00);
+
+  NewBufferBase = (UINTN)RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress + BufferInfo->RemapOffset;
+  NewTxBuffer   = NewBufferBase;
+  NewRxBuffer   = NewTxBuffer + (PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE);
+
+  ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
+  FfaArgs.Arg0 = ARM_FID_FFA_RXTX_MAP;
+  FfaArgs.Arg1 = NewTxBuffer;
+  FfaArgs.Arg2 = NewRxBuffer;
+
+  /*
+   * PcdFfaTxRxPageCount sets with count of EFI_PAGE_SIZE granularity
+   * But, PageCounts for Tx/Rx buffer should set with
+   * count of Tx/Rx Buffer's MinSizeAndAlign. granularity.
+   */
+  FfaArgs.Arg3 = PcdGet64 (PcdFfaTxRxPageCount) / EFI_SIZE_TO_PAGES (MinSizeAndAlign);
+
+  ArmCallFfa (&FfaArgs);
+  Status = FfaArgsToEfiStatus (&FfaArgs);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Failed to map with new Rx/Tx buffer. Status: %r\n", __func__, Status));
+    return Status;
+  }
+
+  PcdSet64S (PcdFfaTxBuffer, NewTxBuffer);
+  PcdSet64S (PcdFfaRxBuffer, NewRxBuffer);
+
+  UpdateRxTxBufferInfo (BufferInfo);
+
+  /*
+   * Remap is done. clear to AllocDesciptor.Name
+   * so that unnecessary remap happen again.
+   */
+  ZeroMem (&RxTxBufferAllocationHob->AllocDescriptor.Name, sizeof (EFI_GUID));
 
   return EFI_SUCCESS;
 }
