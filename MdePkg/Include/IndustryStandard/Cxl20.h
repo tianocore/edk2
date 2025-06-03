@@ -217,6 +217,16 @@ typedef enum {
 } CXL_REG_BLOCK_IDENTIFIER;
 
 //
+// CXL Device Command Opcodes.
+// Compute Express Link Specification Revision 2.0 - Chapter 8.2.9
+//
+typedef enum {
+  CxlMboxOpInvalid   = 0x0000,
+  CxlMboxOpGetFwInfo = 0x0200,
+  CxlMboxOpMax       = 0x10000
+} CXL_OPCODE;
+
+//
 // CXL Device Mailbox Registers
 // Compute Express Link Specification Revision 2.0 - Chapter 8.2.8.4
 //
