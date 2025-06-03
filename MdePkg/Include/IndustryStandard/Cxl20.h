@@ -205,6 +205,34 @@ typedef enum {
 } CXL_PCIE_DVSEC_HEADER_ENUM;
 
 //
+// Register Block Identifier - Identifies the type of CXL registers.
+// Compute Express Link Specification Revision 2.0 - Chapter 8.1.9.1
+//
+typedef enum {
+  CxlRbiEmpty = 0,
+  CxlRbiComponent,
+  CxlRbiVirt,
+  CxlRbiMemdev,
+  CxlRbiMax
+} CXL_REG_BLOCK_IDENTIFIER;
+
+//
+// CXL Device Mailbox Registers
+// Compute Express Link Specification Revision 2.0 - Chapter 8.2.8.4
+//
+typedef struct {
+  UINT16    Opcode;
+  VOID      *InputPayload;
+  VOID      *OutputPayload;
+  UINT64    InputSize;
+  UINT64    OutputSize;
+  UINT64    MinimumOutput;
+  UINT32    PollCount;
+  UINT32    PollInterval;
+  UINT16    ReturnCode;
+} CXL_MBOX_CMD;
+
+//
 // Ensure proper structure formats
 //
 #pragma pack(1)
@@ -559,6 +587,35 @@ typedef union {
   } Bits;
   UINT64    Uint64;
 } CXL_MEMORY_DEVICE_STATUS_REGISTER;
+
+//
+// Firmware Update
+// Compute Express Link Specification Revision 2.0 - Chapter 8.2.9.2
+//
+typedef struct {
+  UINT8    NumberOfSlots;
+  UINT8    SlotInfo;
+  UINT8    ActivationCapabilities;
+  UINT8    Reserved[13];
+  CHAR8    SlotOneFwRevision[16];
+  CHAR8    SlotTwoFwRevision[16];
+  CHAR8    SlotThreeFwRevision[16];
+  CHAR8    SlotFourFwRevision[16];
+} CXL_MAILBOX_GET_FW_INFO;
+
+typedef struct {
+  UINT8     Action;
+  UINT8     Slot;
+  UINT8     Reserved[2];
+  UINT32    Offset;
+  UINT8     Reserved2[0x78];
+  UINT8     Data[];
+} CXL_MAILBOX_TRANSFER_FW;
+
+typedef struct {
+  UINT8    Action;
+  UINT8    Slot;
+} CXL_MAILBOX_ACTIVATE_FW;
 
 //
 // CEDT header
