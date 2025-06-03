@@ -19,22 +19,33 @@ Abstract:
 #include <Library/ArmGicLib.h>
 
 #include "ArmGicDxe.h"
+#include "Protocol/HardwareInterrupt.h"
+#include "Uefi/UefiBaseType.h"
 
 #define ARM_GIC_DEFAULT_PRIORITY  0x80
 
 #define GICD_V2_SIZE  SIZE_4KB
 #define GICC_V2_SIZE  SIZE_8KB
 
-// Interrupts from 1020 to 1023 are considered as special interrupts
-// (eg: spurious interrupts)
-#define ARM_GIC_IS_SPECIAL_INTERRUPTS(Interrupt) \
-          (((Interrupt) >= 1020) && ((Interrupt) <= 1023))
-
 extern EFI_HARDWARE_INTERRUPT_PROTOCOL   gHardwareInterruptV2Protocol;
 extern EFI_HARDWARE_INTERRUPT2_PROTOCOL  gHardwareInterrupt2V2Protocol;
 
 STATIC UINTN  mGicInterruptInterfaceBase;
 STATIC UINTN  mGicDistributorBase;
+
+// Maximum Number of Interrupts
+STATIC UINTN                       mGicNumInterrupts;
+STATIC HARDWARE_INTERRUPT_HANDLER  *mRegisteredInterruptHandlers;
+
+STATIC
+BOOLEAN
+EFIAPI
+GicIsValidSource (
+  IN HARDWARE_INTERRUPT_SOURCE  Source
+  )
+{
+  return Source < mGicNumInterrupts;
+}
 
 STATIC
 VOID
@@ -270,7 +281,7 @@ GicV2IrqInterruptHandler (
     return;
   }
 
-  InterruptHandler = gRegisteredInterruptHandlers[GicInterrupt];
+  InterruptHandler = mRegisteredInterruptHandlers[GicInterrupt];
   if (InterruptHandler != NULL) {
     // Call the registered interrupt handler.
     InterruptHandler (GicInterrupt, SystemContext);
@@ -280,9 +291,26 @@ GicV2IrqInterruptHandler (
   }
 }
 
+STATIC
+EFI_STATUS
+EFIAPI
+GicV2RegisterInterruptSource (
+  IN EFI_HARDWARE_INTERRUPT_PROTOCOL  *This,
+  IN HARDWARE_INTERRUPT_SOURCE        Source,
+  IN HARDWARE_INTERRUPT_HANDLER       Handler
+  )
+{
+  return GicCommonRegisterInterruptSource (
+           This,
+           Source,
+           Handler,
+           &mRegisteredInterruptHandlers[Source]
+           );
+}
+
 // The protocol instance produced by this driver
 EFI_HARDWARE_INTERRUPT_PROTOCOL  gHardwareInterruptV2Protocol = {
-  RegisterInterruptSource,
+  GicV2RegisterInterruptSource,
   GicV2EnableInterruptSource,
   GicV2DisableInterruptSource,
   GicV2GetInterruptSourceState,
@@ -312,7 +340,11 @@ GicV2GetTriggerType (
   UINTN       Config1Bit;
   EFI_STATUS  Status;
 
-  Status = GicGetDistributorIcfgBaseAndBit (
+  if (!GicIsValidSource (Source)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  Status = GicCommonGetDistributorIcfgBaseAndBit (
              Source,
              &RegAddress,
              &Config1Bit
@@ -368,7 +400,11 @@ GicV2SetTriggerType (
     return EFI_UNSUPPORTED;
   }
 
-  Status = GicGetDistributorIcfgBaseAndBit (
+  if (!GicIsValidSource (Source)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  Status = GicCommonGetDistributorIcfgBaseAndBit (
              Source,
              &RegAddress,
              &Config1Bit
@@ -428,7 +464,7 @@ ArmGicEnableDistributor (
 }
 
 EFI_HARDWARE_INTERRUPT2_PROTOCOL  gHardwareInterrupt2V2Protocol = {
-  (HARDWARE_INTERRUPT2_REGISTER)RegisterInterruptSource,
+  (HARDWARE_INTERRUPT2_REGISTER)GicV2RegisterInterruptSource,
   (HARDWARE_INTERRUPT2_ENABLE)GicV2EnableInterruptSource,
   (HARDWARE_INTERRUPT2_DISABLE)GicV2DisableInterruptSource,
   (HARDWARE_INTERRUPT2_INTERRUPT_STATE)GicV2GetInterruptSourceState,
@@ -493,7 +529,7 @@ GicV2ExitBootServicesEvent (
     if ((GicInterrupt & ARM_GIC_ICCIAR_ACKINTID) < mGicNumInterrupts) {
       GicV2EndOfInterrupt (&gHardwareInterruptV2Protocol, GicInterrupt);
     }
-  } while (!ARM_GIC_IS_SPECIAL_INTERRUPTS (GicInterrupt));
+  } while (!GicCommonSourceIsSpecialInterrupt (GicInterrupt));
 
   // Disable Gic Interface
   ArmGicV2DisableInterruptInterface (mGicInterruptInterfaceBase);
@@ -604,12 +640,20 @@ GicV2DxeInitialize (
   // Enable gic distributor
   ArmGicEnableDistributor (mGicDistributorBase);
 
-  Status = InstallAndRegisterInterruptService (
+  mRegisteredInterruptHandlers = AllocateZeroPool (mGicNumInterrupts * sizeof (HARDWARE_INTERRUPT_HANDLER));
+  if (mRegisteredInterruptHandlers == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = GicCommonInstallAndRegisterInterruptService (
              &gHardwareInterruptV2Protocol,
              &gHardwareInterrupt2V2Protocol,
              GicV2IrqInterruptHandler,
              GicV2ExitBootServicesEvent
              );
+  if (EFI_ERROR (Status)) {
+    FreePool (mRegisteredInterruptHandlers);
+  }
 
   return Status;
 }

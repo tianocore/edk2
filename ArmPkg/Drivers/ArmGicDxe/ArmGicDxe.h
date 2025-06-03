@@ -21,42 +21,80 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/HardwareInterrupt.h>
 #include <Protocol/HardwareInterrupt2.h>
 
-extern UINTN                       mGicNumInterrupts;
-extern HARDWARE_INTERRUPT_HANDLER  *gRegisteredInterruptHandlers;
-extern EFI_CPU_ARCH_PROTOCOL       *gCpuArch;
+extern EFI_CPU_ARCH_PROTOCOL  *gCpuArch;
 
-// Common API
+// GicV2 API
 EFI_STATUS
-InstallAndRegisterInterruptService (
+GicV2DxeInitialize (
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
+  );
+
+// GicV3 API
+EFI_STATUS
+GicV3DxeInitialize (
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
+  );
+
+// Shared code
+
+EFI_STATUS
+EFIAPI
+GicCommonRegisterInterruptSource (
+  IN EFI_HARDWARE_INTERRUPT_PROTOCOL  *This,
+  IN HARDWARE_INTERRUPT_SOURCE        Source,
+  IN HARDWARE_INTERRUPT_HANDLER       Handler,
+  IN HARDWARE_INTERRUPT_HANDLER       *HandlerDest
+  );
+
+EFI_STATUS
+EFIAPI
+GicCommonInstallAndRegisterInterruptService (
   IN EFI_HARDWARE_INTERRUPT_PROTOCOL   *InterruptProtocol,
   IN EFI_HARDWARE_INTERRUPT2_PROTOCOL  *Interrupt2Protocol,
   IN EFI_CPU_INTERRUPT_HANDLER         InterruptHandler,
   IN EFI_EVENT_NOTIFY                  ExitBootServicesEvent
   );
 
-EFI_STATUS
-EFIAPI
-RegisterInterruptSource (
-  IN EFI_HARDWARE_INTERRUPT_PROTOCOL  *This,
-  IN HARDWARE_INTERRUPT_SOURCE        Source,
-  IN HARDWARE_INTERRUPT_HANDLER       Handler
+/**
+ *
+ * Return whether the Source interrupt index refers to an extended shared
+ * interrupt.
+ *
+ * @param Source  The source intid to test
+ *
+ * @return True if Source is an extended SPI intid, false otherwise.
+ */
+BOOLEAN
+GicCommonSourceIsExtSpi (
+  IN UINTN  Source
   );
 
-// GicV2 API
-EFI_STATUS
-GicV2DxeInitialize (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+/**
+ * Return whether this is a special interrupt.
+ *
+ * @param Source  The source intid to test
+ *
+ * @return True if Source is a special interrupt intid, false otherwise.
+ */
+BOOLEAN
+GicCommonSourceIsSpecialInterrupt (
+  IN UINTN  Source
   );
 
-// GicV3 API
-EFI_STATUS
-GicV3DxeInitialize (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+/**
+ *
+ * Return whether the Source interrupt index refers to a shared interrupt (SPI)
+ *
+ * @param Source  The source intid to test
+ *
+ * @return True if Source is a SPI intid, false otherwise.
+ */
+BOOLEAN
+GicCommonSourceIsSpi (
+  IN UINTN  Source
   );
-
-// Shared code
 
 /**
   Calculate GICD_ICFGRn base address and corresponding bit
@@ -70,7 +108,7 @@ GicV3DxeInitialize (
   @retval EFI_UNSUPPORTED   Source interrupt is not supported.
 **/
 EFI_STATUS
-GicGetDistributorIcfgBaseAndBit (
+GicCommonGetDistributorIcfgBaseAndBit (
   IN HARDWARE_INTERRUPT_SOURCE  Source,
   OUT UINTN                     *RegAddress,
   OUT UINTN                     *Config1Bit
