@@ -31,6 +31,18 @@ typedef struct {
   A valid PCI Segment address should not contain 1's in bits 28..31 and 48..63
 
   @param  A The address to validate.
+            Layout of this address parameter is as follows:
+
+            PCI Register: Bits 0..11
+            PCI Function  Bits 12..14
+            PCI Device  Bits 15..19
+            PCI Bus Bits 20..27
+            Reserved  Bits 28..31.  Must be 0.
+            PCI Segment Bits 32..47
+            Reserved  Bits 48..63.  Must be 0.
+
+            | Reserved (MBZ) | Segment | Reserved (MBZ) |     Bus     | Device | Function | Register |
+            63             48  47    32  31           28 27         20 19    15 14      12 11         0
   @param  M Additional bits to assert to be zero.
 
 **/
