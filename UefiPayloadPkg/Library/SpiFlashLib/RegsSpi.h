@@ -13,7 +13,8 @@
 #define B_SPI_BAR0_MASK                   0x0FFF
 #define R_SPI_BCR                         0xDC          ///< BIOS Control  Register
 #define B_SPI_BCR_SRC                     (BIT3 | BIT2) ///< SPI Read Configuration (SRC)
-#define V_SPI_BCR_SRC_PREF_DIS_CACHE_DIS  0x04          ///< Prefetch Disable, Cache Disable
+#define N_SPI_BCR_SRC                     2             ///< SPI Read Configuration bit position
+#define V_SPI_BCR_SRC_PREF_DIS_CACHE_DIS  0x01          ///< Prefetch Disable, Cache Disable
 #define B_SPI_BCR_SYNC_SS                 BIT8
 #define B_SPI_BCR_BIOSWE                  BIT0         ///< Write Protect Disable (WPD)
 
