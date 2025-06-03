@@ -209,6 +209,7 @@
 
 [Components]
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+  MdeModulePkg/Application/CxlFwMgmtApp/CxlFwMgmtApp.inf
   MdeModulePkg/Application/DumpDynPcd/DumpDynPcd.inf
   MdeModulePkg/Application/MemoryProfileInfo/MemoryProfileInfo.inf
 
