@@ -114,6 +114,97 @@
 #define CEDT_TYPE_CHBS  0x0
 
 //
+// Register Locator DVSEC
+// Compute Express Link Specification Revision 2.0 - Chapter 8.1.9
+//
+#define CXL_PCIE_EXTENDED_CAP_OFFSET             0x100
+#define CXL_PCIE_EXTENDED_NEXT_CAP_OFFSET_SHIFT  20
+#define CXL_PCI_CFG_SPACE_SIZE                   256
+#define CXL_PCI_CFG_SPACE_EXP_SIZE               4096
+#define CXL_PCI_DVSEC_HEADER1                    0x4    /* Designated Vendor-Specific Header1 */
+#define CXL_PCI_DVSEC_HEADER2                    0x8    /* Designated Vendor-Specific Header2 */
+#define CXL_PCI_EXT_CAP_ID_DVSEC                 0x23   /* Designated Vendor-Specific */
+#define CXL_DVSEC_REG_LOCATOR_BLOCK1_OFFSET      0xC
+#define CXL_PCI_DVSEC_VENDOR_ID                  0x1E98
+#define CXL_PCIE_EXTENDED_CAP_NEXT(n)  ((n) >> (CXL_PCIE_EXTENDED_NEXT_CAP_OFFSET_SHIFT))
+
+//
+// Transfer FW
+// Compute Express Link Specification Revision 2.0 - Chapter 8.2.9.2.2
+//
+#define CXL_FW_TRANSFER_ALIGNMENT        128
+#define CXL_FW_TRANSFER_ACTION_FULL      0x0
+#define CXL_FW_TRANSFER_ACTION_INITIATE  0x1
+#define CXL_FW_TRANSFER_ACTION_CONTINUE  0x2
+#define CXL_FW_TRANSFER_ACTION_END       0x3
+#define CXL_FW_TRANSFER_ACTION_ABORT     0x4
+
+//
+// Activate FW
+// Compute Express Link Specification Revision 2.0 - Chapter 8.2.9.2.3
+//
+#define CXL_FW_ACTIVATE_METHOD_ONLINE              0x0
+#define CXL_FW_ACTIVATE_METHOD_ON_NEXT_COLD_RESET  0x1
+
+//
+// Get FW Info
+// Compute Express Link Specification Revision 2.0 - Chapter 8.2.9.2.1
+//
+#define CXL_FW_MAX_SLOTS               5
+#define CXL_FW_IMAGE_DESCRIPTOR_COUNT  5
+
+//
+// Mailbox Registers
+// Compute Express Link Specification Revision 2.0 - Chapter 8.2.8.4
+//
+#define CXL_DEV_MBOX_CAPS_OFFSET           0x00
+#define CXL_DEV_MBOX_CTRL_OFFSET           0x04
+#define CXL_DEV_MBOX_CMD_OFFSET            0x08
+#define CXL_DEV_MBOX_STATUS_OFFSET         0x10
+#define CXL_DEV_MBOX_BG_CMD_STATUS_OFFSET  0x18
+#define CXL_DEV_MBOX_PAYLOAD_OFFSET        0x20
+#define CXL_MAILBOX_TIMEOUT_MS             2000
+
+//
+// Command Return Codes
+// Compute Express Link Specification Revision 2.0 - Chapter 8.2.8.4.5.1
+//
+#define CXL_MBOX_CMD_RC_SUCCESS                        0
+#define CXL_MBOX_CMD_RC_BACKGROUND                     1
+#define CXL_MBOX_CMD_INVALID_INPUT                     2
+#define CXL_MBOX_CMD_UNSUPPORTED                       3
+#define CXL_MBOX_CMD_INTERNAL_ERROR                    4
+#define CXL_MBOX_CMD_RETRY_REQUIRED                    5
+#define CXL_MBOX_CMD_BUSY                              6
+#define CXL_MBOX_CMD_MEDIA_DISABLED                    7
+#define CXL_MBOX_CMD_FW_TRANSFER_IN_PROGRESS           8
+#define CXL_MBOX_CMD_FW_TRANSFER_OUT_OF_ORDER          9
+#define CXL_MBOX_CMD_FW_VERIFICATION_FAILED            10
+#define CXL_MBOX_CMD_INVALID_SLOT                      11
+#define CXL_MBOX_CMD_ACTIVATION_FAILED_FW_ROLLED_BACK  12
+#define CXL_MBOX_CMD_COLD_RESET_REQUIRED               13
+#define CXL_MBOX_CMD_INVALID_HANDLE                    14
+#define CXL_MBOX_CMD_INVALID_PHYSICAL_ADDRESS          15
+#define CXL_MBOX_CMD_INJECT_POISON_LIMIT_REACHED       16
+#define CXL_MBOX_CMD_PERMANENT_MEDIA_FAILURE           17
+#define CXL_MBOX_CMD_ABORTED                           18
+#define CXL_MBOX_CMD_INVALID_SECURITY_STATE            19
+#define CXL_MBOX_CMD_INCORRECT_PASSPHRASE              20
+#define CXL_MBOX_CMD_UNSUPPORTED_MAILBOX               21
+#define CXL_MBOX_CMD_INVALID_PAYLOAD_LENGTH            22
+
+//
+// Register Locator DVSEC
+// Compute Express Link Specification Revision 2.0 - Chapter 8.1.9
+//
+typedef enum {
+  PcieExtCapHeader = 0,
+  PcieDvsecHeader1,
+  PcieDvsecHeader2,
+  PcieDvsecHeaderMax
+} CXL_PCIE_DVSEC_HEADER_ENUM;
+
+//
 // Ensure proper structure formats
 //
 #pragma pack(1)
