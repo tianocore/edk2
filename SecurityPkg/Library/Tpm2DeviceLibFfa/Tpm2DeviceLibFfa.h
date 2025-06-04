@@ -34,6 +34,9 @@
 #ifndef TPM2_DEVICE_LIB_FFA_H_
 #define TPM2_DEVICE_LIB_FFA_H_
 
+#define TPM2_FFA_INTERFACE_TYPE_UNKNOWN  0xFF
+#define TPM2_FFA_PARTITION_ID_INVALID    0x0000
+
 /**
   This function is used to get the TPM interface version.
 
@@ -188,6 +191,22 @@ FfaTpm2RequestUseTpm (
   );
 
 /**
+  This function is used to get the TPM service partition id via FF-A
+
+  @param[out] PartitionId - Supplies the pointer to the TPM service partition id.
+
+  @retval EFI_SUCCESS           The TPM command was successfully sent to the TPM
+                                and the response was copied to the Output buffer.
+  @retval EFI_INVALID_PARAMETER The TPM command buffer is NULL or the TPM command
+                                buffer size is 0.
+  @retval EFI_DEVICE_ERROR      An error occurred in communication with the TPM.
+**/
+EFI_STATUS
+FfaTpm2GetServicePartitionId (
+  OUT UINT16  *PartitionId
+  );
+
+/**
   Dump PTP register information.
 
   @param[in] Register                Pointer to PTP register.
@@ -208,6 +227,37 @@ EFI_STATUS
 EFIAPI
 InternalTpm2DeviceLibFfaConstructor (
   VOID
+  );
+
+/**
+ This function validate TPM interface type for TPM service over FF-A.
+
+ @retval EFI_SUCCESS           TPM interface type is valid.
+
+ @retval EFI_UNSUPPORTED       TPM interface type is invalid.
+
+**/
+EFI_STATUS
+EFIAPI
+ValidateTpmInterfaceType (
+  VOID
+  );
+
+/**
+  This function is used to get the TPM service partition id.
+
+  @param[out] PartitionId - Supplies the pointer to the TPM service partition id.
+
+  @retval EFI_SUCCESS           The TPM command was successfully sent to the TPM
+                                and the response was copied to the Output buffer.
+  @retval EFI_INVALID_PARAMETER The TPM command buffer is NULL or the TPM command
+                                buffer size is 0.
+  @retval EFI_DEVICE_ERROR      An error occurred in communication with the TPM.
+**/
+EFI_STATUS
+EFIAPI
+GetTpmServicePartitionId (
+  OUT UINT16  *PartitionId
   );
 
 #endif /* _TPM2_DEVICE_LIB_SMC_H_ */
