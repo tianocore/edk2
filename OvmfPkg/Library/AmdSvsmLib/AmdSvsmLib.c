@@ -593,3 +593,50 @@ AmdSvsmVtpmCmd (
 
   return (Ret == 0) ? TRUE : FALSE;
 }
+
+BOOLEAN
+EFIAPI
+AmdSvsmQueryProtocol (
+  IN  UINT32  ProtocolId,
+  IN  UINT32  ProtocolVersion,
+  OUT UINT32  *ProtocolMin,
+  OUT UINT32  *ProtocolMax
+  )
+{
+  SVSM_CALL_DATA  SvsmCallData;
+  SVSM_FUNCTION   Function;
+  UINT64          Rcx;
+  UINTN           Ret;
+
+  if (!AmdSvsmIsSvsmPresent ()) {
+    return FALSE;
+  }
+
+  Function.Id.Protocol = SVSM_PROTOCOL_CORE;
+  Function.Id.CallId   = SVSM_CORE_QUERY_PROTOCOL;
+
+  Rcx = ((UINT64)ProtocolId << 32) | ProtocolVersion;
+
+  SvsmCallData.Caa   = (SVSM_CAA *)AmdSvsmSnpGetCaa ();
+  SvsmCallData.RaxIn = Function.Uint64;
+  SvsmCallData.RcxIn = Rcx;
+
+  Ret = SvsmMsrProtocol (&SvsmCallData);
+  if (Ret != 0) {
+    return FALSE;
+  }
+
+  if (SvsmCallData.RcxOut == 0) {
+    return FALSE;
+  }
+
+  if (ProtocolMin) {
+    *ProtocolMin = (UINT32)(SvsmCallData.RcxOut & 0xffffffff);
+  }
+
+  if (ProtocolMax) {
+    *ProtocolMax = (UINT32)(SvsmCallData.RcxOut >> 32);
+  }
+
+  return TRUE;
+}
