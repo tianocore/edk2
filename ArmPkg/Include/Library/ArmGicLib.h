@@ -47,7 +47,7 @@
 
 // Extracts the maximum SPI IntId from TypeReg.
 #define ARM_GIC_ICDICTR_GET_SPI_MAX_INTID(TypeReg) \
-  ARM_GIC_ICDICTR_SPI_RANGE_TO_MAX_INTID(ARM_GIC_ICDICTR_GET_EXT_SPI_RANGE(TypeReg))
+  ARM_GIC_ICDICTR_SPI_RANGE_TO_MAX_INTID(ARM_GIC_ICDICTR_GET_SPI_RANGE(TypeReg))
 
 #define ARM_GIC_ICDICTR_EXT_SPI_ENABLED      (1 << 8) // Extended SPI enabled bit.
 #define ARM_GIC_ICDICTR_EXT_SPI_RANGE_SHIFT  (27)     // Extended SPI range position.
