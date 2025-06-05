@@ -230,7 +230,7 @@ MeasureFvImage (
   }
 
   Status = HashLogExtendEvent (
-             (UINT8 *)FvBase,
+             (UINT8 *)(UINTN)FvBase,
              (UINTN)FvLength,
              &TcgEventHdr,
              EventData
