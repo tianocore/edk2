@@ -50,7 +50,8 @@
             "EmbeddedPkg/EmbeddedPkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
             "MdePkg/MdePkg.dec",
-            "UefiCpuPkg/UefiCpuPkg.dec"
+            "UefiCpuPkg/UefiCpuPkg.dec",
+            "SecurityPkg/SecurityPkg.dec"
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[
