@@ -27,7 +27,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL_REVISION  0x00010000
 
 ///
-/// EFI 1.1 Revision Number defintion.
+/// EFI 1.1 Revision Number definition.
 ///
 #define EFI_PXE_BASE_CODE_CALLBACK_INTERFACE_REVISION  \
         EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL_REVISION
