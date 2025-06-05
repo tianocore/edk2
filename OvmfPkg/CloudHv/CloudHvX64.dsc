@@ -55,9 +55,7 @@
   #
   # Device drivers
   #
-  DEFINE PVSCSI_ENABLE           = FALSE
-  DEFINE MPT_SCSI_ENABLE         = FALSE
-  DEFINE LSI_SCSI_ENABLE         = FALSE
+!include OvmfPkg/Include/Dsc/OvmfOptHwDefines.dsc.inc
 
   #
   # Flash size selection. Setting FD_SIZE_IN_KB on the command line directly to
@@ -780,15 +778,6 @@
   OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
   OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
   OvmfPkg/VirtioRngDxe/VirtioRng.inf
-!if $(PVSCSI_ENABLE) == TRUE
-  OvmfPkg/PvScsiDxe/PvScsiDxe.inf
-!endif
-!if $(MPT_SCSI_ENABLE) == TRUE
-  OvmfPkg/MptScsiDxe/MptScsiDxe.inf
-!endif
-!if $(LSI_SCSI_ENABLE) == TRUE
-  OvmfPkg/LsiScsiDxe/LsiScsiDxe.inf
-!endif
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
@@ -851,6 +840,7 @@
 !include OvmfPkg/Include/Dsc/NetworkComponents.dsc.inc
 
 !include OvmfPkg/Include/Dsc/ShellComponents.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfOptHwComponents.dsc.inc
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
