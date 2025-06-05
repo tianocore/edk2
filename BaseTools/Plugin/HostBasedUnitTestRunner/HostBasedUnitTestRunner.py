@@ -110,6 +110,14 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
                 return 0
 
             for test in testList:
+                #
+                # The gen_code_coverage_msvc() function uses the OpenCppCoverage tool to generate code coverage data,
+                # so unit test execution for the VS20XX toolchain can be skipped in this loop.
+                #
+                if (thebuilder.env.GetValue("CODE_COVERAGE") != "FALSE") and \
+                    (thebuilder.env.GetValue("TOOL_CHAIN_TAG").startswith("VS")):
+                    continue
+
                 # Configure output name if test uses cmocka.
                 shell_env.set_shell_var(
                     'CMOCKA_XML_FILE', test + ".CMOCKA.%g." + arch + ".result.xml")
