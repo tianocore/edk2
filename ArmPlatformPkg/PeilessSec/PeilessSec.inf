@@ -30,6 +30,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
 
 [LibraryClasses]
   ArmLib
@@ -40,6 +41,7 @@
   DebugLib
   HobLib
   MemoryInitPeiLib
+  PeilessSecMeasureLib
   PerformanceLib
   PlatformPeiLib
   PrePiHobListPointerLib

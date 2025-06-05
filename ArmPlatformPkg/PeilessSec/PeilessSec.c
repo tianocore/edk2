@@ -180,6 +180,9 @@ SecMain (
   Status = DecompressFirstFv ();
   ASSERT_EFI_ERROR (Status);
 
+  Status = MeasurePeilessSec ();
+  ASSERT_EFI_ERROR (Status);
+
   // Load the DXE Core and transfer control to it
   Status = LoadDxeCoreFromFv (NULL, 0);
   ASSERT_EFI_ERROR (Status);
