@@ -875,7 +875,7 @@ Uhci2BulkTransfer (
 
   //
   // Link the TDs to bulk queue head. According to the platfore
-  // defintion of UHCI_NO_BW_RECLAMATION, BulkQh is either configured
+  // definition of UHCI_NO_BW_RECLAMATION, BulkQh is either configured
   // to do full speed bandwidth reclamation or not.
   //
   BulkQh = Uhc->BulkQh;
