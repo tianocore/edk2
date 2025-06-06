@@ -224,7 +224,7 @@ FindLargestMmramRange (
   Allocate available MMRAM for MM core image.
 
   @param[in]  Pages                     Page count of MM core image.
-  @param[out] NewBlock                  Pointer of new mmram block HOB.
+  @param[out] NewBlock                  Pointer to new MMRAM blocks.
 
   @return  EFI_PHYSICAL_ADDRESS         Address for MM core image to be loaded in MMRAM.
 **/
@@ -262,8 +262,7 @@ MmIplAllocateMmramPage (
   // 2. Split the largest region and mark the allocated region as ALLOCATED
   //
   FullMmramRangeCount = CurrentBlock->NumberOfMmReservedRegions + 1;
-  NewDescriptorBlock  = (EFI_MMRAM_HOB_DESCRIPTOR_BLOCK *)BuildGuidHob (
-                                                            &gEfiSmmSmramMemoryGuid,
+  NewDescriptorBlock  = (EFI_MMRAM_HOB_DESCRIPTOR_BLOCK *)AllocatePool (
                                                             sizeof (EFI_MMRAM_HOB_DESCRIPTOR_BLOCK) + ((FullMmramRangeCount - 1) * sizeof (EFI_MMRAM_DESCRIPTOR))
                                                             );
   ASSERT (NewDescriptorBlock != NULL);
@@ -293,11 +292,6 @@ MmIplAllocateMmramPage (
   Allocated->PhysicalStart = Largest->PhysicalStart + Largest->PhysicalSize;
   Allocated->RegionState   = Largest->RegionState | EFI_ALLOCATED;
   Allocated->PhysicalSize  = EFI_PAGES_TO_SIZE (Pages);
-
-  //
-  // Scrub old one
-  //
-  ZeroMem (&MmramInfoHob->Name, sizeof (MmramInfoHob->Name));
 
   //
   // New MMRAM descriptor block
@@ -427,6 +421,7 @@ ExecuteMmCoreFromMmram (
       Entry = (MM_FOUNDATION_ENTRY_POINT)(UINTN)ImageContext.EntryPoint;
       Entry (MmHobList);
       FreePages (MmHobList, EFI_SIZE_TO_PAGES (MmHobSize));
+      FreePool (Block);
     }
   }
 
