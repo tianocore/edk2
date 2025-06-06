@@ -21,11 +21,14 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 
 #include <IndustryStandard/ArmFfaSvc.h>
 #include <IndustryStandard/ArmFfaPartInfo.h>
 #include <IndustryStandard/ArmStdSmc.h>
+
+#include <Guid/ArmFfaRxTxBufferInfo.h>
 
 #include "ArmFfaCommon.h"
 
@@ -751,4 +754,62 @@ ArmFfaLibCommonInit (
   gFfaSupported = TRUE;
 
   return EFI_SUCCESS;
+}
+
+/**
+  Get first Rx/Tx Buffer allocation hob.
+  If UseGuid is TRUE, BufferAddr and BufferSize parameters are ignored.
+
+  @param[in]  BufferAddr       Buffer address
+  @param[in]  BufferSize       Buffer Size
+  @param[in]  UseGuid          Get MemoryAllocationHob using Guid
+
+  @retval     NULL             Not found
+  @retval     Other            MemoryAllocationHob related to Rx/Tx buffer
+
+**/
+EFI_HOB_MEMORY_ALLOCATION *
+EFIAPI
+GetRxTxBufferAllocationHob (
+  IN EFI_PHYSICAL_ADDRESS  BufferAddr,
+  IN UINT64                BufferSize,
+  IN BOOLEAN               UseGuid
+  )
+{
+  EFI_PEI_HOB_POINTERS       Hob;
+  EFI_HOB_MEMORY_ALLOCATION  *MemoryAllocationHob;
+  EFI_PHYSICAL_ADDRESS       MemoryBase;
+  UINT64                     MemorySize;
+
+  if (!UseGuid && (BufferAddr == 0x00)) {
+    return NULL;
+  }
+
+  MemoryAllocationHob = NULL;
+  Hob.Raw             = GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION);
+
+  while (Hob.Raw != NULL) {
+    if (Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiConventionalMemory) {
+      continue;
+    }
+
+    MemoryBase = Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress;
+    MemorySize = Hob.MemoryAllocation->AllocDescriptor.MemoryLength;
+
+    if ((!UseGuid && (BufferAddr >= MemoryBase) &&
+         ((BufferAddr + BufferSize) <= (MemoryBase + MemorySize))) ||
+        (UseGuid && CompareGuid (
+                      &gArmFfaRxTxBufferInfoGuid,
+                      &Hob.MemoryAllocation->AllocDescriptor.Name
+                      )))
+    {
+      MemoryAllocationHob = (EFI_HOB_MEMORY_ALLOCATION *)Hob.Raw;
+      break;
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+    Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw);
+  }
+
+  return MemoryAllocationHob;
 }

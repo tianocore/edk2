@@ -83,4 +83,24 @@ ArmFfaLibCommonInit (
   IN VOID
   );
 
+/**
+  Get first Rx/Tx Buffer allocation hob.
+  If UseGuid is TRUE, BufferAddr and BufferSize parameters are ignored.
+
+  @param[in]  BufferAddr       Buffer address
+  @param[in]  BufferSize       Buffer Size
+  @param[in]  UseGuid          Get MemoryAllocationHob using Guid
+
+  @retval     NULL             Not found
+  @retval     Other            MemoryAllocationHob related to Rx/Tx buffer
+
+**/
+EFI_HOB_MEMORY_ALLOCATION *
+EFIAPI
+GetRxTxBufferAllocationHob (
+  IN EFI_PHYSICAL_ADDRESS  BufferAddr,
+  IN UINT64                BufferSize,
+  IN BOOLEAN               UseGuid
+  );
+
 #endif

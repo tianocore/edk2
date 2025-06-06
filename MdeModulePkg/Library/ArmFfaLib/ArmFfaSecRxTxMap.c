@@ -302,47 +302,13 @@ FindRxTxBufferAllocationHob (
   IN BOOLEAN  UseGuid
   )
 {
-  EFI_PEI_HOB_POINTERS       Hob;
-  EFI_HOB_MEMORY_ALLOCATION  *MemoryAllocationHob;
-  EFI_PHYSICAL_ADDRESS       BufferBase;
-  UINT64                     BufferSize;
-  EFI_PHYSICAL_ADDRESS       MemoryBase;
-  UINT64                     MemorySize;
+  EFI_PHYSICAL_ADDRESS  BufferBase;
+  UINT64                BufferSize;
 
   BufferBase = (EFI_PHYSICAL_ADDRESS)((UINTN)mTxBuffer);
   BufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE * 2;
 
-  if (!UseGuid && (BufferBase == 0x00)) {
-    return NULL;
-  }
-
-  MemoryAllocationHob = NULL;
-  Hob.Raw             = GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION);
-
-  while (Hob.Raw != NULL) {
-    if (Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiConventionalMemory) {
-      continue;
-    }
-
-    MemoryBase = Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress;
-    MemorySize = Hob.MemoryAllocation->AllocDescriptor.MemoryLength;
-
-    if ((!UseGuid && (BufferBase >= MemoryBase) &&
-         ((BufferBase + BufferSize) <= (MemoryBase + MemorySize))) ||
-        (UseGuid && CompareGuid (
-                      &gArmFfaRxTxBufferInfoGuid,
-                      &Hob.MemoryAllocation->AllocDescriptor.Name
-                      )))
-    {
-      MemoryAllocationHob = (EFI_HOB_MEMORY_ALLOCATION *)Hob.Raw;
-      break;
-    }
-
-    Hob.Raw = GET_NEXT_HOB (Hob);
-    Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw);
-  }
-
-  return MemoryAllocationHob;
+  return GetRxTxBufferAllocationHob (BufferBase, BufferSize, UseGuid);
 }
 
 /**
