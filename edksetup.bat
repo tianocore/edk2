@@ -1,7 +1,7 @@
 @REM @file
 @REM   Windows batch file to setup a WORKSPACE environment
 @REM
-@REM Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+@REM Copyright (c) 2006 - 2025, Intel Corporation. All rights reserved.<BR>
 @REM (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 @REM SPDX-License-Identifier: BSD-2-Clause-Patent
 @REM
@@ -114,18 +114,6 @@ if not defined NASM_PREFIX (
     @if not exist "C:\nasm\nasm.exe" echo   Attempting to build modules that require NASM will fail.
 )
 
-:check_CLANGPDB
-@REM In Windows, set CLANG_HOST_BIN=n to use nmake command
-@set CLANG_HOST_BIN=n
-if not defined CLANG_BIN (
-    @echo.
-    @echo !!! WARNING !!! CLANG_BIN environment variable is not set
-    @if exist "C:\Program Files\LLVM\bin\clang.exe" (
-        @set "CLANG_BIN=C:\Program Files\LLVM\bin\"
-        @echo   Found LLVM, setting CLANG_BIN environment variable to C:\Program Files\LLVM\bin\
-    )
-)
-
 :check_cygwin
 if defined CYGWIN_HOME (
   if not exist "%CYGWIN_HOME%" (
@@ -146,6 +134,7 @@ if defined CYGWIN_HOME (
 :cygwin_done
 if /I "%1"=="Rebuild" shift
 if /I "%1"=="ForceRebuild" shift
+if /I "%1"=="Mingw-w64" shift
 if /I "%1"=="VS2022" shift
 if /I "%1"=="VS2019" shift
 if /I "%1"=="VS2017" shift
@@ -154,11 +143,12 @@ if "%1"=="" goto end
 
 :Usage
   @echo.
-  @echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [Reconfig] [Rebuild] [ForceRebuild] [VS2019] [VS2017] [VS2015]"
+  @echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [Reconfig] [Rebuild] [ForceRebuild] [Mingw-w64] [VS2022] [VS2019] [VS2017] [VS2015]"
   @echo.
   @echo         Reconfig       Reinstall target.txt, tools_def.txt and build_rule.txt.
   @echo         Rebuild        Perform incremental rebuild of BaseTools binaries.
   @echo         ForceRebuild   Force a full rebuild of BaseTools binaries.
+  @echo         Mingw-w64      Build BaseTools binaries using mingw-w64.
   @echo         VS2015         Set the env for VS2015 build.
   @echo         VS2017         Set the env for VS2017 build.
   @echo         VS2019         Set the env for VS2019 build.

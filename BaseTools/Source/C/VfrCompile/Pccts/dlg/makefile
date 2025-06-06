@@ -114,7 +114,15 @@ PCCTS_H=../h
 #
 #   UNIX
 #
-CLANG:=$(shell $(CC) --version | grep clang)
+ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+  SHELL := cmd.exe
+  SEP := $(shell echo \)
+  RM := del /f /q
+else
+  SEP :=/
+  RM := rm -f
+endif
+CLANG := $(findstring clang,$(shell $(CC) --version))
 ifneq ($(CLANG),)
 CC?=$(CLANG_BIN)clang
 else ifeq ($(origin CC),default)
@@ -162,4 +170,4 @@ lint:
 
 #clean up all the intermediate files
 clean:
-	rm -f $(BIN_DIR)/dlg *.$(OBJ_EXT) core
+	$(RM) $(BIN_DIR)$(SEP)dlg *.$(OBJ_EXT) core

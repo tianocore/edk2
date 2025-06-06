@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create a database used by build tool
 #
-# Copyright (c) 2008 - 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2025, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -38,7 +38,9 @@ from Common.Misc import SaveFileOnChange
 from Workspace.BuildClassObject import PlatformBuildClassObject, StructurePcd, PcdClassObject, ModuleBuildClassObject
 from collections import OrderedDict, defaultdict
 import json
+import os
 import shutil
+import sys
 
 def _IsFieldValueAnArray (Value):
     Value = Value.strip()
@@ -106,9 +108,9 @@ $(APPFILE): $(APPLICATION)
 '''
 
 PcdGccMakefile = '''
-MAKEROOT ?= $(EDK_TOOLS_PATH)/Source/C
+MAKEROOT ?= $(EDK_TOOLS_PATH)%sSource%sC
 LIBS = -lCommon
-'''
+'''%(os.sep, os.sep)
 
 variablePattern = re.compile(r'[\t\s]*0[xX][a-fA-F0-9]+$')
 SkuIdPattern = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_]*$')
@@ -231,6 +233,21 @@ class DscBuildData(PlatformBuildClassObject):
         self._Clear()
         self.WorkspaceDir = os.getenv("WORKSPACE") if os.getenv("WORKSPACE") else ""
         self.DefaultStores = None
+        MingwBaseToolsBuild = None
+        if sys.platform == 'win32':
+            MingwBaseToolsBuild = os.getenv("BASETOOLS_MINGW_BUILD")
+        if MingwBaseToolsBuild is not None:
+            try:
+                MingwBaseToolsBuild = int(MingwBaseToolsBuild)
+            except:
+                pass
+            try:
+                MingwBaseToolsBuild = bool(MingwBaseToolsBuild)
+            except:
+                pass
+        if not isinstance(MingwBaseToolsBuild, bool):
+            MingwBaseToolsBuild = False
+        self._MingwBaseToolsBuild = MingwBaseToolsBuild
         self.SkuIdMgr = SkuClass(self.SkuName, self.SkuIds)
         self.UpdatePcdTypeDict()
     @property
@@ -2772,7 +2789,7 @@ class DscBuildData(PlatformBuildClassObject):
 
     def GetBuildOptionsValueList(self):
         CC_FLAGS = LinuxCFLAGS
-        if sys.platform == "win32":
+        if sys.platform == "win32" and not self._MingwBaseToolsBuild:
             CC_FLAGS = WindowsCFLAGS
         BuildOptions = OrderedDict()
         for Options in self.BuildOptions:
@@ -2957,12 +2974,13 @@ class DscBuildData(PlatformBuildClassObject):
 
         # start generating makefile
         MakeApp = PcdMakefileHeader
-        if sys.platform == "win32":
+        if sys.platform == "win32" and not self._MingwBaseToolsBuild:
             MakeApp = MakeApp + 'APPFILE = %s\\%s.exe\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s\\%s.obj %s.obj\n' % (self.OutputPath, PcdValueInitName, os.path.join(self.OutputPath, PcdValueCommonName)) + 'INC = '
         else:
+            AppSuffix = '.exe' if sys.platform == "win32" else ''
             MakeApp = MakeApp + PcdGccMakefile
-            MakeApp = MakeApp + 'APPFILE = %s/%s\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s/%s.o %s.o\n' % (self.OutputPath, PcdValueInitName, os.path.join(self.OutputPath, PcdValueCommonName)) + \
-                      'include $(MAKEROOT)/Makefiles/app.makefile\n' + 'TOOL_INCLUDE +='
+            MakeApp = MakeApp + 'APPFILE = %s%s%s%s\n' % (self.OutputPath, os.sep, PcdValueInitName, AppSuffix) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s/%s.o %s.o\n' % (self.OutputPath, PcdValueInitName, os.path.join(self.OutputPath, PcdValueCommonName)) + \
+                    'include $(MAKEROOT)/Makefiles/app.makefile\n' + 'TOOL_INCLUDE +='
 
         IncSearchList = []
         PlatformInc = OrderedDict()
@@ -3010,11 +3028,12 @@ class DscBuildData(PlatformBuildClassObject):
 
         MakeApp += CC_FLAGS
 
-        if sys.platform == "win32":
+        if sys.platform == "win32" and not self._MingwBaseToolsBuild:
             MakeApp = MakeApp + PcdMakefileEnd
             MakeApp = MakeApp + AppTarget % ("""\tcopy $(APPLICATION) $(APPFILE) /y """)
         else:
-            MakeApp = MakeApp + AppTarget % ("""\tcp -p $(APPLICATION) $(APPFILE) """)
+            AppSuffix = '.exe' if sys.platform == "win32" else ''
+            MakeApp = MakeApp + AppTarget % ("""\t$(CP) $(APPLICATION)%s $(APPFILE)"""%(AppSuffix))
         MakeApp = MakeApp + '\n'
         IncludeFileFullPaths = []
         for includefile in IncludeFiles:
@@ -3057,12 +3076,21 @@ class DscBuildData(PlatformBuildClassObject):
 
         #start building the structure pcd value tool
         Messages = ''
-        if sys.platform == "win32":
+        if sys.platform == "win32" and not self._MingwBaseToolsBuild:
             MakeCommand = 'nmake -f %s' % (MakeFileName)
             returncode, StdOut, StdErr = DscBuildData.ExecuteCommand (MakeCommand)
             Messages = StdOut
         else:
-            MakeCommand = 'make -f %s' % (MakeFileName)
+            if sys.platform == "win32" and self._MingwBaseToolsBuild:
+                if shutil.which('mingw32-make.exe') is not None:
+                    MakeCommand = 'mingw32-make -f %s' % (MakeFileName)
+                else:
+                    if self._Toolchain in ('CLANGPDB', 'CLANGDWARF') and 'CLANG_HOST_BIN' in os.environ:
+                        MakeCommand = '%smake -f %s' % (os.environ.get('CLANG_HOST_BIN'), MakeFileName)
+                    else:
+                        MakeCommand = 'make -f %s' % (MakeFileName)
+            else:
+                MakeCommand = 'make -f %s' % (MakeFileName)
             returncode, StdOut, StdErr = DscBuildData.ExecuteCommand (MakeCommand)
             Messages = StdErr
 

@@ -159,7 +159,14 @@ PCCTS_H=../h
 #set.$(OBJ_EXT): $(SET)/set.c
 #	$(CC) $(CFLAGS) -c $(OUT_OBJ)set.$(OBJ_EXT) $(SET)/set.c
 
-
+ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+  SHELL := cmd.exe
+  SEP := $(shell echo \)
+  RM := del /f /q
+else
+  SEP :=/
+  RM := rm -f
+endif
 
 #
 #   UNIX  (default)
@@ -213,8 +220,8 @@ set.o : $(SET)/set.c
 
 #clean up all the intermediate files
 clean:
-	rm -f $(BIN_DIR)/antlr *.$(OBJ_EXT) core
+	$(RM) $(BIN_DIR)$(SEP)antlr *.$(OBJ_EXT) core
 
 #remove everything in clean plus the PCCTS files generated
 scrub:
-	rm -f $(PCCTS_GEN) *.$(OBJ_EXT) core
+	$(RM) $(PCCTS_GEN) *.$(OBJ_EXT) core
