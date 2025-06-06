@@ -275,7 +275,7 @@ ReportDispatcher (
   @param  FileHandle  Handle of the file being invoked.
   @param  PeiServices Describes the list of possible PEI Services.
 
-  @retval EFI_SUCESS  The entry point of DXE IPL PEIM executes successfully.
+  @retval EFI_SUCCESS The entry point of DXE IPL PEIM executes successfully.
 
 **/
 EFI_STATUS
