@@ -64,7 +64,7 @@ DisplayPageFrame (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = ScreenDiemensionInfoValidate (FormData);
+  Status = ScreenDimensionInfoValidate (FormData);
   if (EFI_ERROR (Status)) {
     return Status;
   }
