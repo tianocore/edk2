@@ -20,7 +20,7 @@
   @param[in]  InstanceNum   The instance number which can be used as a ID
                             to locate this FwhInstance in other functions.
 
-  @retval     EFI_SUCESS    Installed successfully.
+  @retval     EFI_SUCCESS   Installed successfully.
   @retval     Else          Did not install successfully.
 
 **/
