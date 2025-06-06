@@ -49,4 +49,41 @@ ArmFfaLibCommonInit (
   IN VOID
   );
 
+/**
+  Get first Rx/Tx Buffer allocation hob.
+  If UseGuid is TRUE, BufferAddr and BufferSize parameters are ignored.
+
+  @param[in]  BufferAddr       Buffer address
+  @param[in]  BufferSize       Buffer Size
+  @param[in]  UseGuid          Find MemoryAllocationHob using gArmFfaRxTxBufferInfoGuid.
+
+  @retval     NULL             Not found
+  @retval     Other            MemoryAllocationHob related to Rx/Tx buffer
+
+**/
+EFI_HOB_MEMORY_ALLOCATION *
+EFIAPI
+GetRxTxBufferAllocationHob (
+  IN EFI_PHYSICAL_ADDRESS  BufferAddr,
+  IN UINT64                BufferSize,
+  IN BOOLEAN               UseGuid
+  );
+
+/**
+  Get Rx/Tx buffer MinSizeAndAign and MaxSize
+
+  @param[out] MinSizeAndAlign  Minimum size of Buffer.
+
+  @retval EFI_SUCCESS
+  @retval EFI_UNSUPPORTED          Wrong min size received from SPMC
+  @retval EFI_INVALID_PARAMETER    Wrong buffer size
+  @retval Others                   Failure of ArmFfaLibGetFeatures()
+
+**/
+EFI_STATUS
+EFIAPI
+GetRxTxBufferMinSizeAndAlign (
+  OUT UINTN  *MinSizeAndAlign
+  );
+
 #endif
