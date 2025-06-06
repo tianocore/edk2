@@ -112,10 +112,7 @@ ArmFfaLibRxTxMap (
 {
   EFI_STATUS    Status;
   ARM_FFA_ARGS  FfaArgs;
-  UINTN         Property1;
-  UINTN         Property2;
   UINTN         MinSizeAndAlign;
-  UINTN         MaxSize;
   VOID          *Buffers;
   VOID          *TxBuffer;
   VOID          *RxBuffer;
@@ -131,61 +128,9 @@ ArmFfaLibRxTxMap (
     return EFI_ALREADY_STARTED;
   }
 
-  Status = ArmFfaLibGetFeatures (
-             ARM_FID_FFA_RXTX_MAP,
-             FFA_RXTX_MAP_INPUT_PROPERTY_DEFAULT,
-             &Property1,
-             &Property2
-             );
+  Status = GetRxTxBufferMinSizeAndAlign (&MinSizeAndAlign);
   if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: Failed to get RX/TX buffer property... Status: %r\n",
-      __func__,
-      Status
-      ));
     return Status;
-  }
-
-  ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
-
-  MinSizeAndAlign =
-    ((Property1 >>
-      ARM_FFA_BUFFER_MINSIZE_AND_ALIGN_SHIFT) &
-     ARM_FFA_BUFFER_MINSIZE_AND_ALIGN_MASK);
-
-  switch (MinSizeAndAlign) {
-    case ARM_FFA_BUFFER_MINSIZE_AND_ALIGN_4K:
-      MinSizeAndAlign = SIZE_4KB;
-      break;
-    case ARM_FFA_BUFFER_MINSIZE_AND_ALIGN_16K:
-      MinSizeAndAlign = SIZE_16KB;
-      break;
-    case ARM_FFA_BUFFER_MINSIZE_AND_ALIGN_64K:
-      MinSizeAndAlign = SIZE_64KB;
-      break;
-    default:
-      DEBUG ((DEBUG_ERROR, "%a: Invalid MinSizeAndAlign: 0x%x\n", __func__, MinSizeAndAlign));
-      return EFI_UNSUPPORTED;
-  }
-
-  MaxSize = (Property1 >> ARM_FFA_BUFFER_MAXSIZE_PAGE_COUNT_SHIFT) &
-            ARM_FFA_BUFFER_MAXSIZE_PAGE_COUNT_MASK;
-
-  MaxSize = ((MaxSize == 0) ? MAX_UINTN : (MaxSize * MinSizeAndAlign));
-
-  if ((MinSizeAndAlign > (PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE)) ||
-      (MaxSize < (PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE)))
-  {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: Buffer is too small! MinSize: 0x%x, MaxSize: 0x%x, PageCount: %d\n",
-      __func__,
-      MinSizeAndAlign,
-      MaxSize,
-      PcdGet64 (PcdFfaTxRxPageCount)
-      ));
-    return EFI_INVALID_PARAMETER;
   }
 
   Buffers = AllocateAlignedPages ((PcdGet64 (PcdFfaTxRxPageCount) * 2), MinSizeAndAlign);
@@ -197,6 +142,7 @@ ArmFfaLibRxTxMap (
   TxBuffer   = Buffers;
   RxBuffer   = Buffers + BufferSize;
 
+  ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
   FfaArgs.Arg0 = ARM_FID_FFA_RXTX_MAP;
   FfaArgs.Arg1 = (UINTN)TxBuffer;
   FfaArgs.Arg2 = (UINTN)RxBuffer;
