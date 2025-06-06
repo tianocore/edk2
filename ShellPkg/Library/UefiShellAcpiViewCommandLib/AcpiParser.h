@@ -4,6 +4,7 @@
   Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
   Copyright (c) 2016 - 2024, Arm Limited. All rights reserved.
   Copyright (c) 2022, AMD Incorporated. All rights reserved.
+  Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -1216,6 +1217,25 @@ ParseAcpiWsmt (
 VOID
 EFIAPI
 ParseAcpiXsdt (
+  IN BOOLEAN  Trace,
+  IN UINT8    *Ptr,
+  IN UINT32   AcpiTableLength,
+  IN UINT8    AcpiTableRevision
+  );
+
+/**
+  This function parses the ACPI RSDT table and optionally traces the ACPI table fields.
+
+  This function also performs validation of the RSDT table.
+
+  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] Ptr                Pointer to the start of the buffer.
+  @param [in] AcpiTableLength    Length of the ACPI table.
+  @param [in] AcpiTableRevision  Revision of the ACPI table.
+**/
+VOID
+EFIAPI
+ParseAcpiRsdt (
   IN BOOLEAN  Trace,
   IN UINT8    *Ptr,
   IN UINT32   AcpiTableLength,

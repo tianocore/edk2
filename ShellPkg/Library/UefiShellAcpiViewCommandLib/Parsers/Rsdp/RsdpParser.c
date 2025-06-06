@@ -2,6 +2,7 @@
   RSDP table parser
 
   Copyright (c) 2016 - 2024, Arm Limited. All rights reserved.
+  Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -14,6 +15,7 @@
 
 // Local Variables
 STATIC CONST UINT64  *XsdtAddress;
+STATIC CONST UINT32  *RsdtAddress;
 
 /**
   This function validates the RSDT Address.
@@ -95,16 +97,17 @@ ValidateXsdtAddress (
   An array describing the ACPI RSDP Table.
 **/
 STATIC CONST ACPI_PARSER  RsdpParser[] = {
-  { L"Signature",         8, 0,  NULL,        Dump8Chars, NULL,                  NULL,                NULL },
-  { L"Checksum",          1, 8,  L"0x%x",     NULL,       NULL,                  NULL,                NULL },
-  { L"Oem ID",            6, 9,  NULL,        Dump6Chars, NULL,                  NULL,                NULL },
-  { L"Revision",          1, 15, L"%d",       NULL,       NULL,                  NULL,                NULL },
-  { L"RSDT Address",      4, 16, L"0x%x",     NULL,       NULL,                  ValidateRsdtAddress, NULL },
-  { L"Length",            4, 20, L"%d",       NULL,       NULL,                  NULL,                NULL },
+  { L"Signature",         8, 0,  NULL,        Dump8Chars, NULL,                  NULL, NULL },
+  { L"Checksum",          1, 8,  L"0x%x",     NULL,       NULL,                  NULL, NULL },
+  { L"Oem ID",            6, 9,  NULL,        Dump6Chars, NULL,                  NULL, NULL },
+  { L"Revision",          1, 15, L"%d",       NULL,       NULL,                  NULL, NULL },
+  { L"RSDT Address",      4, 16, L"0x%x",     NULL,       (VOID **)&RsdtAddress,
+    ValidateRsdtAddress, NULL },
+  { L"Length",            4, 20, L"%d",       NULL,       NULL,                  NULL, NULL },
   { L"XSDT Address",      8, 24, L"0x%lx",    NULL,       (VOID **)&XsdtAddress,
     ValidateXsdtAddress, NULL },
-  { L"Extended Checksum", 1, 32, L"0x%x",     NULL,       NULL,                  NULL,                NULL },
-  { L"Reserved",          3, 33, L"%x %x %x", Dump3Chars, NULL,                  NULL,                NULL }
+  { L"Extended Checksum", 1, 32, L"0x%x",     NULL,       NULL,                  NULL, NULL },
+  { L"Reserved",          3, 33, L"%x %x %x", Dump3Chars, NULL,                  NULL, NULL }
 };
 
 /**
@@ -167,4 +170,28 @@ ParseAcpiRsdp (
   }
 
   ProcessAcpiTable ((UINT8 *)(UINTN)(*XsdtAddress));
+
+ #if !defined (MDE_CPU_ARM) && !defined (MDE_CPU_AARCH64)
+  // For Non-ARM platforms, the RSDT table is also processed.
+  // This is to ensure compatibility with ACPI 1.0 operating systems.
+  // The RSDT table is not used on ARM platforms.
+  if (RsdtAddress == NULL) {
+    IncrementErrorCount ();
+    Print (
+      L"ERROR: Insufficient table length. AcpiTableLength = %d." \
+      L"RSDP parsing aborted.\n",
+      AcpiTableLength
+      );
+    return;
+  }
+
+  if ((*RsdtAddress) == 0) {
+    IncrementErrorCount ();
+    Print (L"ERROR: RSDT Pointer is not set. RSDP parsing aborted.\n");
+    return;
+  }
+
+  ProcessAcpiTable ((UINT8 *)(UINTN)(*RsdtAddress));
+
+ #endif
 }

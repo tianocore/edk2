@@ -1,6 +1,7 @@
 // /**
 //
 // Copyright (c) 2016 - 2023, Arm Limited. All rights reserved.<BR>
+// Copyright (c) Microsoft Corporation
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Module Name:
@@ -97,6 +98,7 @@
 "       SRAT  - System Resource Affinity Table\r\n"
 "       SSDT  - Secondary SystemDescription Table\r\n"
 "       XSDT  - Extended System Description Table\r\n"
+"       RSDT  - Root System Description Table\r\n"
 " \r\n"
 ".SH STANDARDS\r\n"
 " \r\n"
