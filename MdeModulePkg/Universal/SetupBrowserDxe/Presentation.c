@@ -1004,7 +1004,7 @@ UpdateStatementStatus (
   @param Action                  The user input action request info.
   @param DefaultId               The user input default Id info.
 
-  @retval EFI_SUCESSS            This function always return successfully for now.
+  @retval EFI_SUCCESS            This function always return successfully for now.
 
 **/
 EFI_STATUS
@@ -1557,7 +1557,7 @@ ProcessQuestionConfig (
 
   @param UserInput               The user input data.
 
-  @retval EFI_SUCESSS            This function always return successfully for now.
+  @retval EFI_SUCCESS            This function always return successfully for now.
 
 **/
 EFI_STATUS
@@ -1687,7 +1687,7 @@ ProcessUserInput (
 
   Display form and wait for user to select one menu option, then return it.
 
-  @retval EFI_SUCESSS            This function always return successfully for now.
+  @retval EFI_SUCCESS            This function always return successfully for now.
 
 **/
 EFI_STATUS

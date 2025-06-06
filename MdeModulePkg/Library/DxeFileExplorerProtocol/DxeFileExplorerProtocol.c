@@ -68,7 +68,7 @@ FileExplorerConstructor (
                            after choose one file.
   @param  File             Return the device path for the last time chosed file.
 
-  @retval EFI_SUCESS             Choose file success.
+  @retval EFI_SUCCESS            Choose file success.
   @retval EFI_INVALID_PARAMETER  Both ChooseHandler and return device path are NULL
                                  One of them must not NULL.
   @retval Other errors           Choose file failed.
