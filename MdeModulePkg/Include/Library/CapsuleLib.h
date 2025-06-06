@@ -24,7 +24,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @param  CapsuleHeader    Pointer to the UEFI capsule image to be checked.
 
-  @retval EFI_SUCESS       Input capsule is supported by firmware.
+  @retval EFI_SUCCESS      Input capsule is supported by firmware.
   @retval EFI_UNSUPPORTED  Input capsule is not supported by the firmware.
 **/
 EFI_STATUS
@@ -41,7 +41,7 @@ SupportCapsuleImage (
 
   @param  CapsuleHeader    Pointer to the UEFI capsule image to be processed.
 
-  @retval EFI_SUCESS       Capsule Image processed successfully.
+  @retval EFI_SUCCESS      Capsule Image processed successfully.
   @retval EFI_UNSUPPORTED  Capsule image is not supported by the firmware.
 **/
 EFI_STATUS
