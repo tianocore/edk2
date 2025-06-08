@@ -17,6 +17,7 @@
 #include <Library/BaseRiscVFpuLib.h>
 #include <Library/BaseRiscVSbiLib.h>
 #include <Library/BaseRiscVMmuLib.h>
+#include <Library/TimerLib.h>
 #include <Library/BaseLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
