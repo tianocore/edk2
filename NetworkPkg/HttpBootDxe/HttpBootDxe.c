@@ -305,6 +305,10 @@ HttpBootIp4DxeDriverBindingSupported (
 {
   EFI_STATUS  Status;
 
+  if (PcdGetBool (PcdIPv4HttpSupport) == FALSE) {
+    return EFI_UNSUPPORTED;
+  }
+
   //
   // Try to open the DHCP4, HTTP4 and Device Path protocol.
   //
@@ -794,6 +798,10 @@ HttpBootIp6DxeDriverBindingSupported (
   )
 {
   EFI_STATUS  Status;
+
+  if (PcdGetBool (PcdIPv6HttpSupport) == FALSE) {
+    return EFI_UNSUPPORTED;
+  }
 
   //
   // Try to open the DHCP6, HTTP and Device Path protocol.
