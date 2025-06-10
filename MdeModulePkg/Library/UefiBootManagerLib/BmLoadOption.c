@@ -437,6 +437,10 @@ EfiBootManagerSortLoadOptionVariable (
 
   LoadOption = EfiBootManagerGetLoadOptions (&LoadOptionCount, OptionType);
 
+  if (LoadOptionCount == 0) {
+    return;
+  }
+
   //
   // Insertion sort algorithm
   //
