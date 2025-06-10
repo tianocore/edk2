@@ -97,7 +97,7 @@ class EmailAddressCheck:
 class CommitMessageCheck:
     """Checks the contents of a git commit message."""
 
-    def __init__(self, subject, message, author_email):
+    def __init__(self, subject, message, author_email, updated_packages):
         self.ok = True
         self.ignore_multi_package = False
 
@@ -561,14 +561,14 @@ class CheckOnePatch:
     patch content.
     """
 
-    def __init__(self, name, patch):
+    def __init__(self, name, patch, updated_packages=None):
         self.patch = patch
         self.find_patch_pieces()
 
         email_check = EmailAddressCheck(self.author_email, 'Author')
         email_ok = email_check.ok
 
-        msg_check = CommitMessageCheck(self.commit_subject, self.commit_msg, self.author_email)
+        msg_check = CommitMessageCheck(self.commit_subject, self.commit_msg, self.author_email, updated_packages)
         msg_ok = msg_check.ok
         self.ignore_multi_package = msg_check.ignore_multi_package
 
@@ -695,7 +695,8 @@ class CheckGitCommits:
             email = self.read_committer_email_address_from_git(commit)
             self.ok &= EmailAddressCheck(email, 'Committer').ok
             patch = self.read_patch_from_git(commit)
-            check_patch = CheckOnePatch(commit, patch)
+            updated_packages = self.get_parent_packages (dec_files, commit, 'ADM')
+            check_patch = CheckOnePatch(commit, patch, updated_packages)
             self.ok &= check_patch.ok
             ignore_multi_package = check_patch.ignore_multi_package
             if PatchCheckConf.ignore_multi_package:
