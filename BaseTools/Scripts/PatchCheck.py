@@ -117,6 +117,7 @@ class CommitMessageCheck:
 
         self.check_contributed_under()
         if not MergifyMerge:
+            self.check_subject(updated_packages)
             self.check_signed_off_by()
             self.check_misc_signatures()
             self.check_overall_format()
@@ -208,6 +209,14 @@ class CommitMessageCheck:
             self.ok &= EmailAddressCheck(s[3], sig).ok
 
         return sigs
+
+    def check_subject(self, updated_packages):
+        if updated_packages:
+            for package in updated_packages:
+                current_package_re = r"(Revert \"|^|, ?)" + re.escape(package) + r"([ ,:\/])"
+                if not re.search(current_package_re, self.subject):
+                    self.error("Subject line not in \"package/component: description\" format!")
+                    return
 
     def check_signed_off_by(self):
         sob='Signed-off-by'
