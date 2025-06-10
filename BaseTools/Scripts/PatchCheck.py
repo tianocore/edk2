@@ -730,7 +730,7 @@ class CheckGitCommits:
             for dec_file in dec_files:
                 if os.path.commonpath([dec_file, file]):
                     dec_found = True
-                    parents.add(dec_file)
+                    parents.add(dec_file.split('/')[0])
             if not dec_found and os.path.dirname (file):
                 # No DEC file found and file is in a subdir
                 # Covers BaseTools, .github, .azurepipelines, .pytool
