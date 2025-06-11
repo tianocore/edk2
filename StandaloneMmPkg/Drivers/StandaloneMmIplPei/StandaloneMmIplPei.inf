@@ -23,6 +23,7 @@
 #
 
 [Sources]
+  StandaloneMmIplCommon.c
   StandaloneMmIplPei.c
   StandaloneMmIplPei.h
   MmFoundationHob.c

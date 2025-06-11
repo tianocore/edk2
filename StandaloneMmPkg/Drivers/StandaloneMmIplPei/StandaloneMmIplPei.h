@@ -15,18 +15,15 @@
 #include <Library/HobLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/PeiServicesLib.h>
 #include <Library/MmUnblockMemoryLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/PcdLib.h>
 #include <Library/PeCoffLib.h>
 #include <Library/CacheMaintenanceLib.h>
-#include <Library/PeiServicesTablePointerLib.h>
 #include <Ppi/MmAccess.h>
-#include <Ppi/MmControl.h>
 #include <Ppi/MmCommunication.h>
 #include <Ppi/MmCommunication3.h>
-#include <Ppi/MmCoreFvLocationPpi.h>
 #include <Protocol/MmCommunication.h>
 #include <Library/MmPlatformHobProducerLib.h>
 
@@ -68,25 +65,6 @@ EFIAPI
 Communicate3 (
   IN CONST EFI_PEI_MM_COMMUNICATION3_PPI  *This,
   IN OUT VOID                             *CommBuffer
-  );
-
-/**
-  This is the callback function on end of PEI.
-
-  This callback is used for call MmEndOfPeiHandler in standalone MM core.
-
-  @param   PeiServices       General purpose services available to every PEIM.
-  @param   NotifyDescriptor  The notification structure this PEIM registered on install.
-  @param   Ppi               Pointer to the PPI data associated with this function.
-  @retval  EFI_SUCCESS       Exit boot services successfully.
-  @retval  Other             Exit boot services failed.
-**/
-EFI_STATUS
-EFIAPI
-EndOfPeiCallback (
-  IN  EFI_PEI_SERVICES           **PeiServices,
-  IN  EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
-  IN  VOID                       *Ppi
   );
 
 /**
@@ -176,6 +154,55 @@ VOID
 CreateMmHobHandoffInfoTable (
   IN EFI_HOB_HANDOFF_INFO_TABLE  *Hob,
   IN VOID                        *HobEnd
+  );
+
+/**
+  Search all the available firmware volumes for MM Core driver.
+
+  @param  MmFvBase             Base address of FV which included MM Core driver.
+  @param  MmFvSize             Size of FV which included MM Core driver.
+  @param  MmCoreFileName       GUID of MM Core.
+  @param  MmCoreImageAddress   MM Core image address.
+
+  @retval EFI_SUCCESS          The specified FFS section was returned.
+  @retval EFI_NOT_FOUND        The specified FFS section could not be found.
+
+**/
+EFI_STATUS
+LocateMmCoreFv (
+  OUT EFI_PHYSICAL_ADDRESS  *MmFvBase,
+  OUT UINTN                 *MmFvSize,
+  OUT EFI_GUID              *MmCoreFileName,
+  OUT VOID                  **MmCoreImageAddress
+  );
+
+/**
+  Load the MM Core image into MMRAM and executes the MM Core from MMRAM.
+
+  @param[in] MmCommBuffer               MM communicate buffer
+
+  @return    EFI_STATUS                 Execute MM core successfully.
+             Other                      Execute MM core failed.
+**/
+EFI_STATUS
+ExecuteMmCoreFromMmram (
+  IN  MM_COMM_BUFFER  *MmCommBuffer
+  );
+
+/**
+  Dispatch StandaloneMm drivers in MM.
+
+  StandaloneMm core will exit when MmEntryPoint was registered in CPU
+  StandaloneMm driver, and issue a software SMI by communicate mode to
+  dispatch other StandaloneMm drivers.
+
+  @retval  EFI_SUCCESS      Dispatch StandaloneMm drivers successfully.
+  @retval  Other            Dispatch StandaloneMm drivers failed.
+
+**/
+EFI_STATUS
+MmIplDispatchMmDrivers (
+  VOID
   );
 
 #endif
