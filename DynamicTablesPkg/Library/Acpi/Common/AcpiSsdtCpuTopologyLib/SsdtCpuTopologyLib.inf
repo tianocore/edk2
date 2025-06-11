@@ -39,3 +39,5 @@
   AcpiHelperLib
   AmlLib
   BaseLib
+  CmObjHelperLib
+  MetadataHandlerLib

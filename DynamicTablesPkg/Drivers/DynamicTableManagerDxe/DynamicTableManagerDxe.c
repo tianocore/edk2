@@ -19,6 +19,7 @@
 #include <ConfigurationManagerHelper.h>
 #include <DeviceTreeTableGenerator.h>
 #include <Library/TableHelperLib.h>
+#include <Library/MetadataHandlerLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 #include <Protocol/DynamicTableFactoryProtocol.h>
 #include <SmbiosTableGenerator.h>
@@ -691,6 +692,7 @@ DynamicTableManagerDxeInitialize (
   EDKII_CONFIGURATION_MANAGER_PROTOCOL   *CfgMgrProtocol;
   CM_STD_OBJ_CONFIGURATION_MANAGER_INFO  *CfgMfrInfo;
   EDKII_DYNAMIC_TABLE_FACTORY_PROTOCOL   *TableFactoryProtocol;
+  METADATA_ROOT_HANDLE                   Root;
 
   // Locate the Dynamic Table Factory
   Status = gBS->LocateProtocol (
@@ -762,7 +764,19 @@ DynamicTableManagerDxeInitialize (
       "ERROR: ACPI Table processing failure. Status = %r\n",
       Status
       ));
+    return Status;
   }
+
+  Root = TableFactoryProtocol->GetMetadataRoot ();
+
+  // Validate the collected Metadata.
+  Status = MetadataHandlerValidate (Root);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  MetadataFreeHandle (Root);
 
   return Status;
 }

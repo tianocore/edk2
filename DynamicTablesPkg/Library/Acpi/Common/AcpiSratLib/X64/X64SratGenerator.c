@@ -23,6 +23,7 @@
 #include <AcpiTableGenerator.h>
 #include <ConfigurationManagerObject.h>
 #include <ConfigurationManagerHelper.h>
+#include <Library/CmObjHelperLib.h>
 #include <Library/TableHelperLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
@@ -184,6 +185,8 @@ AddArchObjects (
   IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat
   )
 {
+  EFI_STATUS                                                  Status;
+  UINT32                                                      ProximityDomain;
   CM_X64_LOCAL_APIC_X2APIC_AFFINITY_INFO                      *CmX2ApicAffinity;
   EFI_ACPI_6_3_PROCESSOR_LOCAL_APIC_SAPIC_AFFINITY_STRUCTURE  *ApicAffinity;
   EFI_ACPI_6_3_PROCESSOR_LOCAL_X2APIC_AFFINITY_STRUCTURE      *X2ApicAffinity;
@@ -196,18 +199,39 @@ AddArchObjects (
                      ((UINT8 *)Srat +
                       mSratSubTable[EX64LocalApicX2ApicAffinityTableType].Offset);
     while (mSratSubTable[EX64LocalApicX2ApicAffinityTableType].Count-- != 0) {
-      X2ApicAffinity->Type            = EFI_ACPI_6_3_PROCESSOR_LOCAL_X2APIC_AFFINITY;
-      X2ApicAffinity->Length          = sizeof (EFI_ACPI_6_3_PROCESSOR_LOCAL_X2APIC_AFFINITY_STRUCTURE);
-      X2ApicAffinity->Reserved1[0]    = EFI_ACPI_RESERVED_BYTE;
-      X2ApicAffinity->Reserved1[1]    = EFI_ACPI_RESERVED_BYTE;
-      X2ApicAffinity->ProximityDomain = CmX2ApicAffinity->ProximityDomain;
-      X2ApicAffinity->X2ApicId        = CmX2ApicAffinity->ApicId;
-      X2ApicAffinity->Flags           = CmX2ApicAffinity->Flags;
-      X2ApicAffinity->ClockDomain     = CmX2ApicAffinity->ClockDomain;
-      X2ApicAffinity->Reserved2[0]    = EFI_ACPI_RESERVED_BYTE;
-      X2ApicAffinity->Reserved2[1]    = EFI_ACPI_RESERVED_BYTE;
-      X2ApicAffinity->Reserved2[2]    = EFI_ACPI_RESERVED_BYTE;
-      X2ApicAffinity->Reserved2[3]    = EFI_ACPI_RESERVED_BYTE;
+      X2ApicAffinity->Type         = EFI_ACPI_6_3_PROCESSOR_LOCAL_X2APIC_AFFINITY;
+      X2ApicAffinity->Length       = sizeof (EFI_ACPI_6_3_PROCESSOR_LOCAL_X2APIC_AFFINITY_STRUCTURE);
+      X2ApicAffinity->Reserved1[0] = EFI_ACPI_RESERVED_BYTE;
+      X2ApicAffinity->Reserved1[1] = EFI_ACPI_RESERVED_BYTE;
+      X2ApicAffinity->X2ApicId     = CmX2ApicAffinity->ApicId;
+      X2ApicAffinity->Flags        = CmX2ApicAffinity->Flags;
+      X2ApicAffinity->Reserved2[0] = EFI_ACPI_RESERVED_BYTE;
+      X2ApicAffinity->Reserved2[1] = EFI_ACPI_RESERVED_BYTE;
+      X2ApicAffinity->Reserved2[2] = EFI_ACPI_RESERVED_BYTE;
+      X2ApicAffinity->Reserved2[3] = EFI_ACPI_RESERVED_BYTE;
+
+      Status = GetProximityDomainId (
+                 CfgMgrProtocol,
+                 CmX2ApicAffinity->ProximityDomain,
+                 CmX2ApicAffinity->ProximityDomainToken,
+                 &X2ApicAffinity->ProximityDomain
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
+      Status = GetProximityDomainId (
+                 CfgMgrProtocol,
+                 CmX2ApicAffinity->ClockDomain,
+                 CmX2ApicAffinity->ClockDomainToken,
+                 &X2ApicAffinity->ClockDomain
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
       X2ApicAffinity++;
       // Next
       CmX2ApicAffinity++;
@@ -217,16 +241,40 @@ AddArchObjects (
                    ((UINT8 *)Srat +
                     mSratSubTable[EX64LocalApicX2ApicAffinityTableType].Offset);
     while (mSratSubTable[EX64LocalApicX2ApicAffinityTableType].Count-- != 0) {
-      ApicAffinity->Type                    = EFI_ACPI_6_3_PROCESSOR_LOCAL_APIC_SAPIC_AFFINITY;
-      ApicAffinity->Length                  = sizeof (EFI_ACPI_6_3_PROCESSOR_LOCAL_APIC_SAPIC_AFFINITY_STRUCTURE);
-      ApicAffinity->ProximityDomain7To0     = (CmX2ApicAffinity->ProximityDomain & MAX_UINT8);
-      ApicAffinity->ApicId                  = CmX2ApicAffinity->ApicId & MAX_UINT8;
-      ApicAffinity->Flags                   = CmX2ApicAffinity->Flags;
-      ApicAffinity->LocalSapicEid           = 0;
-      ApicAffinity->ProximityDomain31To8[0] = (CmX2ApicAffinity->ProximityDomain >> 8) & MAX_UINT8;
-      ApicAffinity->ProximityDomain31To8[0] = (CmX2ApicAffinity->ProximityDomain >> 16) & MAX_UINT8;
-      ApicAffinity->ProximityDomain31To8[0] = (CmX2ApicAffinity->ProximityDomain >> 24) & MAX_UINT8;
-      ApicAffinity->ClockDomain             = CmX2ApicAffinity->ClockDomain;
+      ApicAffinity->Type          = EFI_ACPI_6_3_PROCESSOR_LOCAL_APIC_SAPIC_AFFINITY;
+      ApicAffinity->Length        = sizeof (EFI_ACPI_6_3_PROCESSOR_LOCAL_APIC_SAPIC_AFFINITY_STRUCTURE);
+      ApicAffinity->ApicId        = CmX2ApicAffinity->ApicId & MAX_UINT8;
+      ApicAffinity->Flags         = CmX2ApicAffinity->Flags;
+      ApicAffinity->LocalSapicEid = 0;
+      ApicAffinity->ClockDomain   = CmX2ApicAffinity->ClockDomain;
+
+      Status = GetProximityDomainId (
+                 CfgMgrProtocol,
+                 CmX2ApicAffinity->ProximityDomain,
+                 CmX2ApicAffinity->ProximityDomainToken,
+                 &ProximityDomain
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
+      ApicAffinity->ProximityDomain7To0     = (ProximityDomain & MAX_UINT8);
+      ApicAffinity->ProximityDomain31To8[0] = (ProximityDomain >> 8) & MAX_UINT8;
+      ApicAffinity->ProximityDomain31To8[1] = (ProximityDomain >> 16) & MAX_UINT8;
+      ApicAffinity->ProximityDomain31To8[2] = (ProximityDomain >> 24) & MAX_UINT8;
+
+      Status = GetProximityDomainId (
+                 CfgMgrProtocol,
+                 CmX2ApicAffinity->ClockDomain,
+                 CmX2ApicAffinity->ClockDomainToken,
+                 &ApicAffinity->ClockDomain
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
       ApicAffinity++;
       CmX2ApicAffinity++;
     } // while
