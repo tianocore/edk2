@@ -687,6 +687,11 @@ FindQuestionDefaultSetting (
   PCD_DATA_DELTA                 *DeltaData;
   BOOLEAN                        VarCheck;
 
+  if (EfiVarStore == NULL) {
+    DEBUG ((DEBUG_ERROR, "EfiVarStore is null\n"));
+    return EFI_NOT_FOUND;
+  }
+
   if (gSkuId == 0xFFFFFFFFFFFFFFFF) {
     gSkuId = LibPcdGetSku ();
   }
