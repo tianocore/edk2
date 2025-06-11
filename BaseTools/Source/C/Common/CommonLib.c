@@ -1,7 +1,7 @@
 /** @file
 Common basic Library Functions
 
-Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2025, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -469,6 +469,7 @@ PrintGuidToBuffer (
 
 #ifdef __GNUC__
 
+#ifndef _WIN32
 size_t _filelength(int fd)
 {
   struct stat stat_buf;
@@ -485,6 +486,7 @@ char *strlwr(char *s)
   }
   return p;
 }
+#endif
 #endif
 #endif
 
