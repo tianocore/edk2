@@ -75,7 +75,7 @@
   ##  @libraryclass  Module entry point library for UEFI drivers, DXE Drivers, DXE SMM Driver and DXE Runtime Drivers
   UefiDriverEntryPoint|Include/Library/UefiDriverEntryPoint.h
 
-  ##  @libraryclass  UEFI Decompress Library Functions defintion for UEFI compress algorithm.
+  ##  @libraryclass  UEFI Decompress Library Functions definition for UEFI compress algorithm.
   UefiDecompressLib|Include/Library/UefiDecompressLib.h
 
   ##  @libraryclass  Provides a service to retrieve a pointer to the EFI Boot Services Table.

@@ -43,11 +43,14 @@
 [Components.common]
   DynamicTablesPkg/Library/Common/AcpiHelperLib/AcpiHelperLib.inf
   DynamicTablesPkg/Library/Common/AmlLib/AmlLib.inf
+  DynamicTablesPkg/Library/Common/CmObjHelperLib/CmObjHelperLib.inf
   DynamicTablesPkg/Library/Common/SsdtPcieSupportLib/SsdtPcieSupportLib.inf
   DynamicTablesPkg/Library/Common/SsdtSerialPortFixupLib/SsdtSerialPortFixupLib.inf
   DynamicTablesPkg/Library/Common/TableHelperLib/TableHelperLib.inf
   DynamicTablesPkg/Library/Common/DynamicPlatRepoLib/DynamicPlatRepoLib.inf
   DynamicTablesPkg/Library/Common/SmbiosStringTableLib/SmbiosStringTableLib.inf
+  DynamicTablesPkg/Library/Common/MetadataObjLib/MetadataObjLib.inf
+  DynamicTablesPkg/Library/Common/MetadataHandlerLib/MetadataHandlerLib.inf
 
 [Components.ARM, Components.AARCH64]
   DynamicTablesPkg/Library/FdtHwInfoParserLib/FdtHwInfoParserLib.inf
