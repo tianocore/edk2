@@ -93,7 +93,6 @@
 
 [Pcd]
   gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel           ## CONSUMES
-  gEfiShellPkgTokenSpaceGuid.PcdShellSupportOldProtocols    ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellRequireHiiPlatform     ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellSupportFrameworkHii    ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellPageBreakDefault       ## CONSUMES
