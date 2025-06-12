@@ -479,7 +479,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol|TRUE
 !if $(SMM_REQUIRE) == TRUE
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire|TRUE
