@@ -314,7 +314,6 @@
 #  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory               | TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress        | TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport                   | TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport                   | FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport         | FALSE
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation            | TRUE
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation           | TRUE

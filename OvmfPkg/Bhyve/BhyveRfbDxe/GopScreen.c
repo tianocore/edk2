@@ -13,7 +13,7 @@ Module Name:
 
 Abstract:
 
-  This file produces the graphics abstration of UGA. It is called by
+  This file produces the graphics abstration of GOP. It is called by
   EmuGopDriver.c file which deals with the EFI 1.1 driver model.
   This file just does graphics.
 
@@ -378,7 +378,7 @@ ShutdownGopEvent (
 
 Routine Description:
 
-  This is the UGA screen's callback notification function for exit-boot-services.
+  This is the GOP screen's callback notification function for exit-boot-services.
   All we do here is call EmuGopDestructor().
 
 Arguments:
