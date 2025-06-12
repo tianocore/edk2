@@ -4379,6 +4379,7 @@ ShellFileHandleReadLine (
 {
   EFI_STATUS  Status;
   CHAR16      CharBuffer;
+  UINTN       BufferLength;
   UINTN       CharSize;
   UINTN       CountSoFar;
   UINT64      OriginalFilePosition;
@@ -4455,8 +4456,9 @@ ShellFileHandleReadLine (
     return (EFI_BUFFER_TOO_SMALL);
   }
 
-  while (Buffer[StrLen (Buffer)-1] == L'\r') {
-    Buffer[StrLen (Buffer)-1] = CHAR_NULL;
+  BufferLength = StrLen (Buffer);
+  while ((BufferLength != 0) && (Buffer[--BufferLength] == L'\r')) {
+    Buffer[BufferLength] = CHAR_NULL;
   }
 
   return (Status);
