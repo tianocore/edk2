@@ -128,8 +128,6 @@
   gEfiHiiConfigAccessProtocolGuid                         ## UNDEFINED
   gEfiFormBrowser2ProtocolGuid                            ## UNDEFINED
   gEfiDeviceIoProtocolGuid                                ## UNDEFINED
-  gEfiUgaDrawProtocolGuid                                 ## UNDEFINED
-  gEfiUgaIoProtocolGuid                                   ## UNDEFINED
   gEfiDriverConfigurationProtocolGuid                     ## UNDEFINED
   gEfiDriverConfiguration2ProtocolGuid                    ## UNDEFINED
   gEfiSimpleTextInputExProtocolGuid                       ## UNDEFINED
