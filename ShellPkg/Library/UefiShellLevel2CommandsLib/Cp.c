@@ -252,6 +252,8 @@ CopySingleFile (
           break;
         }
       }
+
+      FreePool (Buffer);
     }
 
     SHELL_FREE_NON_NULL (DestVolumeInfo);
