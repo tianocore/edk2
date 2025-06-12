@@ -104,7 +104,7 @@ RecordFmpCapsuleStatusVariable (
   @param[in]  Completion  A value between 1 and 100 indicating the current
                           completion progress of the firmware update
 
-  @retval EFI_SUCESS             The capsule update progress was updated.
+  @retval EFI_SUCCESS            The capsule update progress was updated.
   @retval EFI_INVALID_PARAMETER  Completion is greater than 100%.
 **/
 EFI_STATUS
@@ -201,7 +201,7 @@ IsValidCapsuleHeader (
   @param[in]   CapsuleHeader        Points to a capsule header.
   @param[out]  EmbeddedDriverCount  The EmbeddedDriverCount in the FMP capsule.
 
-  @retval EFI_SUCESS             Input capsule is a correct FMP capsule.
+  @retval EFI_SUCCESS            Input capsule is a correct FMP capsule.
   @retval EFI_INVALID_PARAMETER  Input capsule is not a correct FMP capsule.
 **/
 EFI_STATUS
@@ -345,7 +345,7 @@ ValidateFmpCapsule (
 
   @param[in]  CapsuleHeader    Points to a capsule header.
 
-  @retval EFI_SUCESS       Input capsule is supported by firmware.
+  @retval EFI_SUCCESS      Input capsule is supported by firmware.
   @retval EFI_UNSUPPORTED  Input capsule is not supported by the firmware.
 **/
 EFI_STATUS
@@ -1198,7 +1198,7 @@ RecordFmpCapsuleStatus (
   @param[in]  CapFileName           Capsule file name.
   @param[out] ResetRequired         Indicates whether reset is required or not.
 
-  @retval EFI_SUCESS            Process Capsule Image successfully.
+  @retval EFI_SUCCESS           Process Capsule Image successfully.
   @retval EFI_UNSUPPORTED       Capsule image is not supported by the firmware.
   @retval EFI_VOLUME_CORRUPTED  FV volume in the capsule is corrupted.
   @retval EFI_OUT_OF_RESOURCES  Not enough memory.
@@ -1496,7 +1496,7 @@ IsFmpCapsule (
 
   @param[in]  CapsuleHeader    Points to a capsule header.
 
-  @retval EFI_SUCESS       Input capsule is supported by firmware.
+  @retval EFI_SUCCESS      Input capsule is supported by firmware.
   @retval EFI_UNSUPPORTED  Input capsule is not supported by the firmware.
   @retval EFI_INVALID_PARAMETER Input capsule layout is not correct
 **/
@@ -1547,7 +1547,7 @@ SupportCapsuleImage (
   @param[in]  CapFileName           Capsule file name.
   @param[out] ResetRequired         Indicates whether reset is required or not.
 
-  @retval EFI_SUCESS            Process Capsule Image successfully.
+  @retval EFI_SUCCESS           Process Capsule Image successfully.
   @retval EFI_UNSUPPORTED       Capsule image is not supported by the firmware.
   @retval EFI_VOLUME_CORRUPTED  FV volume in the capsule is corrupted.
   @retval EFI_OUT_OF_RESOURCES  Not enough memory.
@@ -1610,7 +1610,7 @@ ProcessThisCapsuleImage (
 
   @param[in]  CapsuleHeader         Points to a capsule header.
 
-  @retval EFI_SUCESS            Process Capsule Image successfully.
+  @retval EFI_SUCCESS           Process Capsule Image successfully.
   @retval EFI_UNSUPPORTED       Capsule image is not supported by the firmware.
   @retval EFI_VOLUME_CORRUPTED  FV volume in the capsule is corrupted.
   @retval EFI_OUT_OF_RESOURCES  Not enough memory.

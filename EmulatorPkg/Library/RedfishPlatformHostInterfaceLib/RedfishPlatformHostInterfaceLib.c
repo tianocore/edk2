@@ -350,7 +350,7 @@ DumpRedfishIpProtocolData (
   @param[out] RedfishProtocolData  Pointer to retrieve REDFISH_OVER_IP_PROTOCOL_DATA.
   @param[out] RedfishProtocolDataSize  Size of REDFISH_OVER_IP_PROTOCOL_DATA.
 
-  @retval EFI_SUCESS   REDFISH_OVER_IP_PROTOCOL_DATA is returned successfully.
+  @retval EFI_SUCCESS  REDFISH_OVER_IP_PROTOCOL_DATA is returned successfully.
 **/
 EFI_STATUS
 GetRedfishRecordFromVariable (

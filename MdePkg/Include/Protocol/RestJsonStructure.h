@@ -25,7 +25,7 @@ typedef struct _EFI_REST_JSON_STRUCTURE_PROTOCOL  EFI_REST_JSON_STRUCTURE_PROTOC
 typedef CHAR8                                     *EFI_REST_JSON_RESOURCE_TYPE_DATATYPE;
 
 ///
-/// Structure defintions of resource name space.
+/// Structure definitions of resource name space.
 ///
 /// The fields declared in this structure define the
 /// name and revision of payload delievered throught

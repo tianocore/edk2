@@ -18,3 +18,8 @@
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport|0x01
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport|0x01
 !endif
+#
+# IPv4 and IPv6 HTTP Boot support.
+#
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv4HttpSupport|TRUE
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv6HttpSupport|TRUE

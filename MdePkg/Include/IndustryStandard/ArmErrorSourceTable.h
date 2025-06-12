@@ -161,11 +161,11 @@ typedef struct {
   UINT8     Reserved1[3];
 } EFI_ACPI_AEST_INTERRUPT_STRUCT;
 
-// AEST Interrupt node - interrupt type defintions.
+// AEST Interrupt node - interrupt type definitions.
 #define EFI_ACPI_AEST_INTERRUPT_TYPE_FAULT_HANDLING  0x0
 #define EFI_ACPI_AEST_INTERRUPT_TYPE_ERROR_RECOVERY  0x1
 
-// AEST Interrupt node - interrupt flag defintions.
+// AEST Interrupt node - interrupt flag definitions.
 #define EFI_ACPI_AEST_INTERRUPT_FLAG_TRIGGER_TYPE_EDGE   0
 #define EFI_ACPI_AEST_INTERRUPT_FLAG_TRIGGER_TYPE_LEVEL  BIT0
 
