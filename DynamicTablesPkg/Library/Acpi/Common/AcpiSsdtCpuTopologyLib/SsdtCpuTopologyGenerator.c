@@ -26,9 +26,12 @@
 #include <AcpiTableGenerator.h>
 #include <ConfigurationManagerObject.h>
 #include <ConfigurationManagerHelper.h>
+#include <MetadataHelpers.h>
 #include <Library/AcpiHelperLib.h>
+#include <Library/CmObjHelperLib.h>
 #include <Library/TableHelperLib.h>
 #include <Library/AmlLib/AmlLib.h>
+#include <Library/MetadataHandlerLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
 #include "SsdtCpuTopologyGenerator.h"
@@ -859,7 +862,7 @@ CreateAmlProcessorContainer (
     return Status;
   }
 
-  // Use the ProcContainerIndex for the _UID value as there is no AcpiProcessorUid
+  // Use the ProcContainerUid for the _UID value as there is no AcpiProcessorUid
   // and EFI_ACPI_6_3_PPTT_PROCESSOR_ID_INVALID is set for non-Cpus.
   Status = AmlCodeGenNameInteger (
              "_UID",
@@ -921,11 +924,14 @@ CheckProcNode (
   BOOLEAN          IsLeaf,
   CM_OBJECT_TOKEN  NodeToken,
   CM_OBJECT_TOKEN  ParentNodeToken,
-  BOOLEAN          PackageNodeSeen
+  BOOLEAN          PackageNodeSeen,
+  BOOLEAN          PpttTablePresent
   )
 {
   BOOLEAN  InvalidFlags;
   BOOLEAN  HasPhysicalPackageBit;
+  UINT32   CheckMask;
+  UINT32   ExpectedMask;
 
   HasPhysicalPackageBit = (NodeFlags & EFI_ACPI_6_3_PPTT_PACKAGE_PHYSICAL) ==
                           EFI_ACPI_6_3_PPTT_PACKAGE_PHYSICAL;
@@ -933,13 +939,31 @@ CheckProcNode (
   // Only one Physical Package flag is allowed in the hierarchy
   InvalidFlags = HasPhysicalPackageBit && PackageNodeSeen;
 
-  // Check Leaf specific flags.
+  CheckMask    = 0;
+  ExpectedMask = 0;
+
+  // Leaves must also have the VALID bit set.
   if (IsLeaf) {
-    InvalidFlags |= ((NodeFlags & PPTT_LEAF_MASK) != PPTT_LEAF_MASK);
-    // Must have Physical Package flag somewhere in the hierarchy
-    InvalidFlags |= !(HasPhysicalPackageBit || PackageNodeSeen);
+    ExpectedMask = (PPTT_LEAF_FLAG_MASK | PPTT_VALID_FLAG_MASK);
+    CheckMask    = (PPTT_LEAF_FLAG_MASK | PPTT_VALID_FLAG_MASK);
   } else {
-    InvalidFlags |= ((NodeFlags & PPTT_LEAF_MASK) != 0);
+    if (PpttTablePresent) {
+      // If the PPTT table is present, all proc. container nodes will have
+      // a valid _UID built.
+      ExpectedMask = PPTT_VALID_FLAG_MASK;
+      CheckMask    = (PPTT_LEAF_FLAG_MASK | PPTT_VALID_FLAG_MASK);
+    } else {
+      // If there is no PPTT table, the state of the VALID bit is ignored.
+      ExpectedMask = 0;
+      CheckMask    = PPTT_LEAF_FLAG_MASK;
+    }
+  }
+
+  // Check the flags.
+  InvalidFlags |= (((NodeFlags ^ ExpectedMask) & CheckMask) != 0);
+
+  if (IsLeaf) {
+    InvalidFlags |= !(HasPhysicalPackageBit || PackageNodeSeen);
   }
 
   if (InvalidFlags) {
@@ -965,9 +989,9 @@ CheckProcNode (
   @param [in] NodeToken               Token of the CM_ARCH_COMMON_PROC_HIERARCHY_INFO currently handled.
   @param [in] ParentNode              Parent node to attach the created
                                       node to.
-  @param [in,out] ProcContainerIndex  Pointer to the current processor container
-                                      index to be used as UID.
   @param [in]  PackageNodeSeen        A parent of the ProcNode has the physical package flag set.
+  @param [in]  PpttTablePresent       The PPTT table will be installed.
+
 
   @retval EFI_SUCCESS             Success.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
@@ -981,8 +1005,8 @@ CreateAmlCpuTopologyTree (
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
   IN        CM_OBJECT_TOKEN                               NodeToken,
   IN        AML_NODE_HANDLE                               ParentNode,
-  IN OUT    UINT32                                        *ProcContainerIndex,
-  IN        BOOLEAN                                       PackageNodeSeen
+  IN        BOOLEAN                                       PackageNodeSeen,
+  IN        BOOLEAN                                       PpttTablePresent
   )
 {
   EFI_STATUS              Status;
@@ -993,13 +1017,13 @@ CreateAmlCpuTopologyTree (
   UINT32                  Uid;
   UINT16                  Name;
   BOOLEAN                 HasPhysicalPackageBit;
+  METADATA_OBJ_UID        MetadataUid;
 
   ASSERT (Generator != NULL);
   ASSERT (Generator->ProcNodeList != NULL);
   ASSERT (Generator->ProcNodeCount != 0);
   ASSERT (CfgMgrProtocol != NULL);
   ASSERT (ParentNode != NULL);
-  ASSERT (ProcContainerIndex != NULL);
 
   CpuIndex          = 0;
   ProcContainerName = 0;
@@ -1016,7 +1040,8 @@ CreateAmlCpuTopologyTree (
                    TRUE,
                    Generator->ProcNodeList[Index].Token,
                    NodeToken,
-                   PackageNodeSeen
+                   PackageNodeSeen,
+                   PpttTablePresent
                    );
         if (EFI_ERROR (Status)) {
           ASSERT (0);
@@ -1051,7 +1076,8 @@ CreateAmlCpuTopologyTree (
                    FALSE,
                    Generator->ProcNodeList[Index].Token,
                    NodeToken,
-                   PackageNodeSeen
+                   PackageNodeSeen,
+                   PpttTablePresent
                    );
         if (EFI_ERROR (Status)) {
           ASSERT (0);
@@ -1064,7 +1090,24 @@ CreateAmlCpuTopologyTree (
         } else {
           ASSERT ((ProcContainerName & ~MAX_UINT16) == 0);
           Name = (UINT16)ProcContainerName;
-          Uid  = *ProcContainerIndex;
+
+          MetadataUid.EisaId = 0;
+          AsciiStrCpyS (MetadataUid.NameId, METADATA_UID_NAMEID_SIZE, "ACPI0010");
+
+          Status = MetadataHandlerGenerate (
+                     GetMetadataRoot (),
+                     MetadataTypeUid,
+                     (CM_OBJECT_TOKEN)Generator->ProcNodeList[Index].Token,
+                     NULL,
+                     &MetadataUid,
+                     sizeof (METADATA_OBJ_UID)
+                     );
+          if (EFI_ERROR (Status)) {
+            ASSERT_EFI_ERROR (Status);
+            return Status;
+          }
+
+          Uid = MetadataUid.Uid;
         }
 
         Status = CreateAmlProcessorContainer (
@@ -1083,7 +1126,6 @@ CreateAmlCpuTopologyTree (
 
         // Nodes must have a unique name in the ASL namespace.
         // Reset the Cpu index whenever we create a new processor container.
-        (*ProcContainerIndex)++;
         CpuIndex = 0;
 
         // And reset the cluster name whenever there is a package.
@@ -1102,8 +1144,8 @@ CreateAmlCpuTopologyTree (
                    CfgMgrProtocol,
                    Generator->ProcNodeList[Index].Token,
                    ProcContainerNode,
-                   ProcContainerIndex,
-                   (PackageNodeSeen || HasPhysicalPackageBit)
+                   (PackageNodeSeen || HasPhysicalPackageBit),
+                   PpttTablePresent
                    );
         if (EFI_ERROR (Status)) {
           ASSERT (0);
@@ -1138,15 +1180,12 @@ CreateTopologyFromProcHierarchy (
   )
 {
   EFI_STATUS  Status;
-  UINT32      ProcContainerIndex;
 
   ASSERT (Generator != NULL);
   ASSERT (Generator->ProcNodeCount != 0);
   ASSERT (Generator->ProcNodeList != NULL);
   ASSERT (CfgMgrProtocol != NULL);
   ASSERT (ScopeNode != NULL);
-
-  ProcContainerIndex = 0;
 
   Status = TokenTableInitialize (Generator, Generator->ProcNodeCount);
   if (EFI_ERROR (Status)) {
@@ -1159,8 +1198,8 @@ CreateTopologyFromProcHierarchy (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              ScopeNode,
-             &ProcContainerIndex,
-             FALSE
+             FALSE,
+             CheckAcpiTablePresent (CfgMgrProtocol, EStdAcpiTableIdPptt)
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
