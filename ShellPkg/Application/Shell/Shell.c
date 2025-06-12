@@ -395,11 +395,7 @@ UefiMain (
   //
   // Check PCDs for optional features that are not implemented yet.
   //
-  if (  PcdGetBool (PcdShellSupportOldProtocols)
-     || !FeaturePcdGet (PcdShellRequireHiiPlatform)
-     || FeaturePcdGet (PcdShellSupportFrameworkHii)
-        )
-  {
+  if (!FeaturePcdGet (PcdShellRequireHiiPlatform) || FeaturePcdGet (PcdShellSupportFrameworkHii)) {
     return (EFI_UNSUPPORTED);
   }
 
