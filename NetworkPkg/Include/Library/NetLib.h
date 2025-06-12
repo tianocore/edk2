@@ -2081,7 +2081,8 @@ NetbufQueAppend (
   @param[out]  Dest            The destination of the data to copy to.
 
   @return       The length of the actual copied data, or 0 if the offset
-                specified exceeds the total size of net buffer queue.
+                specified exceeds the total size of net buffer queue, or
+                a NetBuf pointer is NULL.
 
 **/
 UINT32
