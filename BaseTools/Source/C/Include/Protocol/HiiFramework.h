@@ -28,19 +28,6 @@
     0xd7ad636e, 0xb997, 0x459b, {0xbf, 0x3f, 0x88, 0x46, 0x89, 0x79, 0x80, 0xe1} \
   }
 
-// BugBug:
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// If UGA goes away we need to put this some place. I'm not sure where?
-//
-//typedef struct {
-//  UINT8 Blue;
-//  UINT8 Green;
-//  UINT8 Red;
-//  UINT8 Reserved;
-//} EFI_UGA_PIXEL;
-
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//
 
 typedef struct _EFI_HII_PROTOCOL  EFI_HII_PROTOCOL;
 
@@ -576,39 +563,6 @@ EFI_STATUS
   );
 
 /**
-  Translates a glyph into the format required for input to the Universal
-  Graphics Adapter (UGA) Block Transfer (BLT) routines.
-
-  @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
-  @param  GlyphBuffer           A pointer to the buffer that contains glyph data.
-  @param  Foreground            The foreground setting requested to be used for the
-                                generated BltBuffer data.
-  @param  Background            The background setting requested to be used for the
-                                generated BltBuffer data.
-  @param  Count                 The entry in the BltBuffer upon which to act.
-  @param  Width                 The width in bits of the glyph being converted.
-  @param  Height                The height in bits of the glyph being converted
-  @param  BltBuffer             A pointer to the buffer that contains the data that is
-                                ready to be used by the UGA BLT routines.
-
-  @retval EFI_SUCCESS           It worked.
-  @retval EFI_NOT_FOUND         A glyph for a character was not found.
-
-**/
-typedef
-EFI_STATUS
-(EFIAPI *EFI_HII_GLYPH_TO_BLT) (
-  IN     EFI_HII_PROTOCOL             *This,
-  IN     UINT8                        *GlyphBuffer,
-  IN     EFI_GRAPHICS_OUTPUT_BLT_PIXEL Foreground,
-  IN     EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background,
-  IN     UINTN                         Count,
-  IN     UINTN                         Width,
-  IN     UINTN                         Height,
-  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL *BltBuffer
-  );
-
-/**
   Allows a new string to be added to an already existing string package.
 
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
@@ -878,9 +832,6 @@ EFI_STATUS
   @param GetGlyph
   Translates a Unicode character into the corresponding font glyph.
 
-  @param GlyphToBlt
-  Converts a glyph value into a format that is ready for a UGA BLT command.
-
   @param NewString
   Allows a new string to be added to an already existing string package.
 
@@ -924,7 +875,6 @@ struct _EFI_HII_PROTOCOL {
 
   EFI_HII_TEST_STRING         TestString;
   EFI_HII_GET_GLYPH           GetGlyph;
-  EFI_HII_GLYPH_TO_BLT        GlyphToBlt;
 
   EFI_HII_NEW_STRING          NewString;
   EFI_HII_GET_PRI_LANGUAGES   GetPrimaryLanguages;
