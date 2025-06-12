@@ -669,7 +669,7 @@ BOpt_GetDriverOptionNumber (
 
   @param CallbackData The BMM context data.
 
-  @retval EFI_SUCCESS          The functin completes successfully.
+  @retval EFI_SUCCESS          The function completes successfully.
   @retval EFI_OUT_OF_RESOURCES Not enough memory to compete the operation.
   @retval EFI_NOT_FOUND        Fail to get "DriverOrder" variable.
 

@@ -187,7 +187,7 @@ InitCommunicateBuffer (
 
   @param[in]   DataSize               This size of the function header and the data.
 
-  @retval      EFI_SUCCESS            Success is returned from the functin in SMM.
+  @retval      EFI_SUCCESS            Success is returned from the function in SMM.
   @retval      Others                 Failure is returned from the function in SMM.
 
 **/
