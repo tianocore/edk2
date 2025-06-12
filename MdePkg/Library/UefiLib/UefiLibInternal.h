@@ -18,7 +18,6 @@
 #include <Protocol/DriverDiagnostics2.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/GraphicsOutput.h>
-#include <Protocol/UgaDraw.h>
 #include <Protocol/HiiFont.h>
 
 #include <Guid/EventGroup.h>
