@@ -1558,6 +1558,10 @@ WifiMgrDxeHiiConfigAccessCallback (
         // User triggered a scan process.
         //
         Private->CurrentNic->OneTimeScanRequest = TRUE;
+        Status = gBS->SetTimer (Private->CurrentNic->TickTimer, TimerPeriodic, EFI_TIMER_PERIOD_MILLISECONDS (500));
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_ERROR, "[WiFi Connection Manager] Error: Failed to set timer for scan request in key network list!"));
+        }
         break;
 
       case KEY_PASSWORD_CONNECT_NETWORK:
@@ -1664,7 +1668,8 @@ WifiMgrDxeHiiConfigAccessCallback (
 
         Status = gBS->SetTimer (Private->CurrentNic->TickTimer, TimerPeriodic, EFI_TIMER_PERIOD_MILLISECONDS (500));
         if (EFI_ERROR (Status)) {
-          gBS->CloseEvent (Private->CurrentNic->TickTimer);
+          DEBUG ((DEBUG_ERROR, "[WiFi Connection Manager] Error: Failed to set timer for connect request in key connect action!"));
+          gBS->SetTimer (Private->CurrentNic->TickTimer, TimerCancel, 0);
         }
 
         break;
@@ -1920,7 +1925,8 @@ WifiMgrDxeHiiConfigAccessCallback (
 
         Status = gBS->SetTimer (Private->CurrentNic->TickTimer, TimerPeriodic, EFI_TIMER_PERIOD_MILLISECONDS (500));
         if (EFI_ERROR (Status)) {
-          gBS->CloseEvent (Private->CurrentNic->TickTimer);
+          DEBUG ((DEBUG_ERROR, "[WiFi Connection Manager] Error: Failed to set timer for changing request in key connect action!"));
+          gBS->SetTimer (Private->CurrentNic->TickTimer, TimerCancel, 0);
         }
 
         break;
