@@ -10,7 +10,7 @@
 
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
-#include <Library/SmmServicesTableLib.h>
+#include <Library/MmServicesTableLib.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/SmmFirmwareVolumeBlock.h>
 
@@ -35,7 +35,7 @@ InstallProtocolInterfaces (
   //
   FvbHandle = NULL;
   DEBUG ((DEBUG_INFO, "Installing QEMU flash SMM FVB\n"));
-  Status = gSmst->SmmInstallProtocolInterface (
+  Status = gMmst->MmInstallProtocolInterface (
                     &FvbHandle,
                     &gEfiSmmFirmwareVolumeBlockProtocolGuid,
                     EFI_NATIVE_INTERFACE,
@@ -43,7 +43,7 @@ InstallProtocolInterfaces (
                     );
   ASSERT_EFI_ERROR (Status);
 
-  Status = gSmst->SmmInstallProtocolInterface (
+  Status = gMmst->MmInstallProtocolInterface (
                     &FvbHandle,
                     &gEfiDevicePathProtocolGuid,
                     EFI_NATIVE_INTERFACE,
@@ -90,8 +90,27 @@ UpdateQemuFlashVariablesEnable (
   VOID
   )
 {
-  RETURN_STATUS  PcdStatus;
+  //
+  // Do nothing for Standalone MM.
+  //
+}
 
-  PcdStatus = PcdSetBoolS (PcdOvmfFlashVariablesEnable, TRUE);
-  ASSERT_RETURN_ERROR (PcdStatus);
+/**
+  Abstracted entry point for Standalone MM instance.
+  FVB Standalone MM driver entry point.
+
+  @param[in] ImageHandle    A handle for the image that is initializing this
+                            driver
+  @param[in] MmSystemTable  A pointer to the MM system table
+
+  @retval EFI_SUCCESS       Variable service successfully initialized.
+**/
+EFI_STATUS
+EFIAPI
+FvbInitializeStandaloneMm (
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_MM_SYSTEM_TABLE  *MmSystemTable
+  )
+{
+  return FvbInitialize (NULL, NULL);
 }
