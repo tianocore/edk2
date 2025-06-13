@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2025, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -23,6 +23,11 @@ BITS 64
 %define TDVMCALL_EXPOSE_REGS_MASK       0xffc4
 %define TDVMCALL                        0x0
 %define EXIT_REASON_CPUID               0xa
+
+; Defined in ACPI 6.6 section 5.2.12.19 MultiProcessor Wakeup Mailbox Command.
+%define MULTIPROCESSOR_WAKEUP_MAILBOX_COMMAND_NOOP    0
+%define MULTIPROCESSOR_WAKEUP_MAILBOX_COMMAND_WAKEUP  1
+%define MULTIPROCESSOR_WAKEUP_MAILBOX_COMMAND_TEST    2
 
 %macro  tdcall  0
   db  0x66, 0x0f, 0x01, 0xcc
@@ -74,7 +79,7 @@ AsmRelocateApMailBoxLoopStart:
 
 MailBoxLoop:
     ; Spin until command set
-    cmp        dword [rbx + CommandOffset], MpProtectedModeWakeupCommandNoop
+    cmp        dword [rbx + CommandOffset], MULTIPROCESSOR_WAKEUP_MAILBOX_COMMAND_NOOP
     je         MailBoxLoop
     ; Determine if this is a broadcast or directly for my apic-id, if not, ignore
     cmp        dword [rbx + ApicidOffset], MailboxApicidBroadcast
@@ -82,10 +87,10 @@ MailBoxLoop:
     cmp        dword [rbx + ApicidOffset], r8d
     jne        MailBoxLoop
 MailBoxProcessCommand:
-    cmp        dword [rbx + CommandOffset], MpProtectedModeWakeupCommandWakeup
+    cmp        dword [rbx + CommandOffset], MULTIPROCESSOR_WAKEUP_MAILBOX_COMMAND_WAKEUP
     je         MailBoxWakeUp
-    cmp        dword [rbx + CommandOffset], MpProtectedModeWakeupCommandSleep
-    je         MailBoxSleep
+    cmp        dword [rbx + CommandOffset], MULTIPROCESSOR_WAKEUP_MAILBOX_COMMAND_TEST
+    je         MailBoxTest
     ; Don't support this command, so ignore
     jmp        MailBoxLoop
 MailBoxWakeUp:
@@ -94,8 +99,9 @@ MailBoxWakeUp:
     ; the command field back to zero as acknowledgement.
     mov        qword [rbx + CommandOffset], 0
     jmp        rax
-MailBoxSleep:
-    jmp       $
+MailBoxTest:
+    mov        qword [rbx + CommandOffset], 0
+    jmp        MailBoxLoop
 Panic:
     ud2
 BITS 64
