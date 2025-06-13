@@ -149,30 +149,6 @@ class Report(object):
                 </tr>""" % (DepexString)
         self.WriteLn(Content)
 
-    ## GeneratePpi() method
-    #
-    #  Generate PPI information
-    #
-    #  @param self: The object pointer
-    #  @param Name: CName of a GUID
-    #  @param Guid: Value of a GUID
-    #  @param Type: Type of a GUID
-    #
-    def GeneratePpi(self, Name, Guid, Type):
-        self.GeneratePpiProtocol('Ppi', Name, Guid, Type, self.PpiIndex)
-
-    ## GenerateProtocol() method
-    #
-    #  Generate PROTOCOL information
-    #
-    #  @param self: The object pointer
-    #  @param Name: CName of a GUID
-    #  @param Guid: Value of a GUID
-    #  @param Type: Type of a GUID
-    #
-    def GenerateProtocol(self, Name, Guid, Type):
-        self.GeneratePpiProtocol('Protocol', Name, Guid, Type, self.ProtocolIndex)
-
     ## GeneratePpiProtocol() method
     #
     #  Generate PPI/PROTOCOL information
