@@ -22,34 +22,7 @@
 #include <Library/DebugLib.h>
 
 #include "ArmFfaCommon.h"
-
-/**
-  Get mapped Rx/Tx buffers.
-
-  @param [out]   TxBuffer         Address of TxBuffer
-  @param [out]   TxBufferSize     Size of TxBuffer
-  @param [out]   RxBuffer         Address of RxBuffer
-  @param [out]   RxBufferSize     Size of RxBuffer
-
-  @retval EFI_SUCCESS
-  @retval Others             Error.
-
-**/
-EFI_STATUS
-EFIAPI
-ArmFfaLibGetRxTxBuffers (
-  OUT VOID    **TxBuffer,
-  OUT UINT64  *TxBufferSize,
-  OUT VOID    **RxBuffer,
-  OUT UINT64  *RxBufferSize
-  )
-{
-  /*
-   * StandaloneMm doesn't use Rx/Tx buffer.
-   * So, return EFI_UNSUPPORTED.
-   */
-  return EFI_UNSUPPORTED;
-}
+#include "ArmFfaRxTxMap.h"
 
 /**
   ArmFfaLib Constructor.

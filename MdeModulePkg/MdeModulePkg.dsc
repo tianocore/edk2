@@ -535,6 +535,7 @@
   MdeModulePkg/Universal/CapsulePei/CapsuleX64.inf
 
 [Components.ARM, Components.AARCH64]
+  MdeModulePkg/Library/ArmFfaLib/ArmFfaSecLib.inf
   MdeModulePkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
   MdeModulePkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
   MdeModulePkg/Library/ArmFfaLib/ArmFfaStandaloneMmCoreLib.inf

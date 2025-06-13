@@ -19,6 +19,8 @@
 [Sources]
   ArmFfaCommon.h
   ArmFfaCommon.c
+  ArmFfaRxTxMap.h
+  ArmFfaStandaloneMmRxTxMap.c
   ArmFfaStandaloneMmLib.c
 
 [Packages]

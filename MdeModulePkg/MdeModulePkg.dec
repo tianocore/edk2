@@ -1218,6 +1218,10 @@
   # @Prompt Defines the page allocation for the MM communication buffer; default is 128 pages (512KB).
   gEfiMdeModulePkgTokenSpaceGuid.PcdMmCommBufferPages|128|UINT32|0x30001061
 
+  ## This dynamic PCD holds the number of pages for the FFA TX/RX buffer.
+  # @Prompt FFA TX/RX Buffer Page Count
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaTxRxPageCount|1|UINT64|0x30001062
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicates the maximum number of callback function
@@ -2375,10 +2379,6 @@
   ## This dynamic PCD holds the address of the FFA RX buffer.
   # @Prompt FFA RX Buffer Address
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaRxBuffer|0x00|UINT64|0x0003000A
-
-  ## This dynamic PCD holds the number of pages for the FFA TX/RX buffer.
-  # @Prompt FFA TX/RX Buffer Page Count
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaTxRxPageCount|1|UINT64|0x0003000B
 
   ## This dynamic PCD holds the information if the FFA exit boot event is registered.
   # @Prompt FFA Exit Boot Event Registered
