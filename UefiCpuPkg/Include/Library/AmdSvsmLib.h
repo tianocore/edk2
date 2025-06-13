@@ -139,4 +139,20 @@ AmdSvsmVtpmCmd (
   IN OUT UINT8  *Buffer
   );
 
+BOOLEAN
+EFIAPI
+AmdSvsmQueryProtocol (
+  IN  UINT32  ProtocolId,
+  IN  UINT32  ProtocolVersion,
+  OUT UINT32  *ProtocolMin,
+  OUT UINT32  *ProtocolMax
+  );
+
+BOOLEAN
+EFIAPI
+AmdSvsmUefiMmRequest (
+  IN  UINT64  BufferAddr,
+  IN  UINT64  BufferSize
+  );
+
 #endif
