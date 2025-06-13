@@ -33,30 +33,30 @@ PxeNvDataRead (
 {
   PXE_DB_NVDATA  *Db;
 
-  Db              = Snp->Db;
-  Snp->Cdb.OpCode = PXE_OPCODE_NVDATA;
+  Db               = Snp->Db;
+  Snp->Cdb->OpCode = PXE_OPCODE_NVDATA;
 
-  Snp->Cdb.OpFlags = PXE_OPFLAGS_NVDATA_READ;
+  Snp->Cdb->OpFlags = PXE_OPFLAGS_NVDATA_READ;
 
-  Snp->Cdb.CPBsize = PXE_CPBSIZE_NOT_USED;
-  Snp->Cdb.CPBaddr = PXE_CPBADDR_NOT_USED;
+  Snp->Cdb->CPBsize = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb->CPBaddr = PXE_CPBADDR_NOT_USED;
 
-  Snp->Cdb.DBsize = (UINT16)sizeof (PXE_DB_NVDATA);
-  Snp->Cdb.DBaddr = (UINT64)(UINTN)Db;
+  Snp->Cdb->DBsize = (UINT16)sizeof (PXE_DB_NVDATA);
+  Snp->Cdb->DBaddr = (UINT64)(UINTN)Db;
 
-  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum     = Snp->IfNum;
-  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb->StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb->StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb->IFnum     = Snp->IfNum;
+  Snp->Cdb->Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command and check result.
   //
   DEBUG ((DEBUG_NET, "\nsnp->undi.nvdata ()  "));
 
-  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)Snp->Cdb);
 
-  switch (Snp->Cdb.StatCode) {
+  switch (Snp->Cdb->StatCode) {
     case PXE_STATCODE_SUCCESS:
       break;
 
@@ -64,8 +64,8 @@ PxeNvDataRead (
       DEBUG (
         (DEBUG_NET,
          "\nsnp->undi.nvdata()  %xh:%xh\n",
-         Snp->Cdb.StatFlags,
-         Snp->Cdb.StatCode)
+         Snp->Cdb->StatFlags,
+         Snp->Cdb->StatCode)
         );
 
       return EFI_UNSUPPORTED;
@@ -74,8 +74,8 @@ PxeNvDataRead (
       DEBUG (
         (DEBUG_NET,
          "\nsnp->undi.nvdata()  %xh:%xh\n",
-         Snp->Cdb.StatFlags,
-         Snp->Cdb.StatCode)
+         Snp->Cdb->StatFlags,
+         Snp->Cdb->StatCode)
         );
 
       return EFI_DEVICE_ERROR;
