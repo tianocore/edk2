@@ -18,6 +18,7 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 
 #include <Protocol/MmCommunication2.h>
+#include <Protocol/MmCommunication3.h>
 
 #include <IndustryStandard/ArmStdSmc.h>
 #include <IndustryStandard/ArmFfaSvc.h>
@@ -148,6 +149,180 @@ SendSpmMmCommunicate (
 
   This function provides a service to send and receive messages from a registered UEFI service.
 
+  @param[in, out] CommBufferPhysical  Physical address of the MM communication buffer
+  @param[in, out] CommBufferVirtual   Virtual address of the MM communication buffer
+  @param[in, out] CommSize            The size of the data buffer being passed in. On input,
+                                      when not omitted, the buffer should cover EFI_MM_COMMUNICATE_HEADER
+                                      and the value of MessageLength field. On exit, the size
+                                      of data being returned. Zero if the handler does not
+                                      wish to reply with any data. This parameter is optional
+                                      and may be NULL.
+
+  @retval EFI_SUCCESS            The message was successfully posted.
+  @retval EFI_INVALID_PARAMETER  CommBufferPhysical or CommBufferVirtual was NULL, or
+                                 integer value pointed by CommSize does not cover
+                                 EFI_MM_COMMUNICATE_HEADER and the value of MessageLength
+                                 field.
+  @retval EFI_BAD_BUFFER_SIZE    The buffer is too large for the MM implementation.
+                                 If this error is returned, the MessageLength field
+                                 in the CommBuffer header or the integer pointed by
+                                 CommSize, are updated to reflect the maximum payload
+                                 size the implementation can accommodate.
+  @retval EFI_ACCESS_DENIED      The CommunicateBuffer parameter or CommSize parameter,
+                                 if not omitted, are in address range that cannot be
+                                 accessed by the MM environment.
+
+**/
+EFI_STATUS
+EFIAPI
+MmCommunicationCommon (
+  IN OUT VOID   *CommBufferPhysical,
+  IN OUT VOID   *CommBufferVirtual,
+  IN OUT UINTN  *CommSize OPTIONAL
+  )
+{
+  EFI_MM_COMMUNICATE_HEADER     *CommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER_V3  *CommunicateHeaderV3;
+  UINTN                         BufferSize;
+  UINTN                         *MessageSize;
+  UINTN                         HeaderSize;
+  EFI_STATUS                    Status;
+
+  Status     = EFI_ACCESS_DENIED;
+  BufferSize = 0;
+
+  //
+  // Check parameters
+  //
+  if ((CommBufferVirtual == NULL) || (CommBufferPhysical == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status              = EFI_SUCCESS;
+  CommunicateHeader   = CommBufferVirtual;
+  CommunicateHeaderV3 = NULL;
+  // CommBuffer is a mandatory parameter. Hence, Rely on
+  // MessageLength + Header to ascertain the
+  // total size of the communication payload rather than
+  // rely on optional CommSize parameter
+  if (CompareGuid (
+        &CommunicateHeader->HeaderGuid,
+        &gEfiMmCommunicateHeaderV3Guid
+        ))
+  {
+    CommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommBufferVirtual;
+    BufferSize          = CommunicateHeaderV3->BufferSize;
+    MessageSize         = &CommunicateHeaderV3->MessageSize;
+    HeaderSize          = sizeof (EFI_MM_COMMUNICATE_HEADER_V3);
+  } else {
+    BufferSize = CommunicateHeader->MessageLength +
+                 sizeof (CommunicateHeader->HeaderGuid) +
+                 sizeof (CommunicateHeader->MessageLength);
+    MessageSize = &CommunicateHeader->MessageLength;
+    HeaderSize  = sizeof (CommunicateHeader->HeaderGuid) +
+                  sizeof (CommunicateHeader->MessageLength);
+  }
+
+  // If CommSize is not omitted, perform size inspection before proceeding.
+  if (CommSize != NULL) {
+    // This case can be used by the consumer of this driver to find out the
+    // max size that can be used for allocating CommBuffer.
+    if ((*CommSize == 0) ||
+        (*CommSize > mNsCommBuffMemRegion.Length))
+    {
+      *CommSize = mNsCommBuffMemRegion.Length;
+      Status    = EFI_BAD_BUFFER_SIZE;
+    }
+
+    //
+    // CommSize should cover at least MessageLength + sizeof (EFI_MM_COMMUNICATE_HEADER);
+    //
+    if (*CommSize < BufferSize) {
+      Status = EFI_INVALID_PARAMETER;
+    }
+  }
+
+  //
+  // If the message length is 0 or greater than what can be tolerated by the MM
+  // environment then return the expected size.
+  //
+  if ((*MessageSize == 0) ||
+      (BufferSize > mNsCommBuffMemRegion.Length))
+  {
+    *MessageSize = mNsCommBuffMemRegion.Length - HeaderSize;
+    Status       = EFI_BAD_BUFFER_SIZE;
+  }
+
+  // MessageLength or CommSize check has failed, return here.
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // Copy Communication Payload
+  CopyMem ((VOID *)mNsCommBuffMemRegion.VirtualBase, CommBufferVirtual, BufferSize);
+
+  if (IsFfaSupported ()) {
+    Status = SendFfaMmCommunicate ();
+  } else {
+    Status = SendSpmMmCommunicate ();
+  }
+
+  if (!EFI_ERROR (Status)) {
+    ZeroMem (CommBufferVirtual, BufferSize);
+    // On successful return, the size of data being returned is inferred from
+    // MessageLength + Header.
+    CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)mNsCommBuffMemRegion.VirtualBase;
+    if ((CommunicateHeaderV3 != NULL) && !CompareGuid (
+                                            &CommunicateHeader->HeaderGuid,
+                                            &gEfiMmCommunicateHeaderV3Guid
+                                            ))
+    {
+      // Sanity check to make sure we are still using v3
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a Expected v3 header, but got v1 header! %g\n",
+        __func__,
+        &CommunicateHeader->HeaderGuid
+        ));
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if (CommunicateHeaderV3 != NULL) {
+      CommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommunicateHeader;
+      BufferSize          = CommunicateHeaderV3->BufferSize;
+    } else {
+      BufferSize = CommunicateHeader->MessageLength +
+                   sizeof (CommunicateHeader->HeaderGuid) +
+                   sizeof (CommunicateHeader->MessageLength);
+    }
+
+    if (BufferSize > mNsCommBuffMemRegion.Length) {
+      // Something bad has happened, we should have landed in ARM_SMC_MM_RET_NO_MEMORY
+      Status = EFI_BAD_BUFFER_SIZE;
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a Returned buffer exceeds communication buffer limit. Has: 0x%llx vs. max: 0x%llx!\n",
+        __func__,
+        BufferSize,
+        (UINTN)mNsCommBuffMemRegion.Length
+        ));
+    } else {
+      CopyMem (
+        CommBufferVirtual,
+        (VOID *)mNsCommBuffMemRegion.VirtualBase,
+        BufferSize
+        );
+    }
+  }
+
+  return Status;
+}
+
+/**
+  Communicates with a registered handler.
+
+  This function provides a service to send and receive messages from a registered UEFI service.
+
   @param[in] This                     The EFI_MM_COMMUNICATION_PROTOCOL instance.
   @param[in, out] CommBufferPhysical  Physical address of the MM communication buffer
   @param[in, out] CommBufferVirtual   Virtual address of the MM communication buffer
@@ -182,104 +357,26 @@ MmCommunication2Communicate (
   IN OUT UINTN                             *CommSize OPTIONAL
   )
 {
-  EFI_MM_COMMUNICATE_HEADER  *CommunicateHeader;
-  UINTN                      BufferSize;
-  EFI_STATUS                 Status;
+  return MmCommunicationCommon (
+           CommBufferPhysical,
+           CommBufferVirtual,
+           CommSize
+           );
+}
 
-  Status     = EFI_ACCESS_DENIED;
-  BufferSize = 0;
-
-  //
-  // Check parameters
-  //
-  if ((CommBufferVirtual == NULL) || (CommBufferPhysical == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  Status            = EFI_SUCCESS;
-  CommunicateHeader = CommBufferVirtual;
-  // CommBuffer is a mandatory parameter. Hence, Rely on
-  // MessageLength + Header to ascertain the
-  // total size of the communication payload rather than
-  // rely on optional CommSize parameter
-  BufferSize = CommunicateHeader->MessageLength +
-               sizeof (CommunicateHeader->HeaderGuid) +
-               sizeof (CommunicateHeader->MessageLength);
-
-  // If CommSize is not omitted, perform size inspection before proceeding.
-  if (CommSize != NULL) {
-    // This case can be used by the consumer of this driver to find out the
-    // max size that can be used for allocating CommBuffer.
-    if ((*CommSize == 0) ||
-        (*CommSize > mNsCommBuffMemRegion.Length))
-    {
-      *CommSize = mNsCommBuffMemRegion.Length;
-      Status    = EFI_BAD_BUFFER_SIZE;
-    }
-
-    //
-    // CommSize should cover at least MessageLength + sizeof (EFI_MM_COMMUNICATE_HEADER);
-    //
-    if (*CommSize < BufferSize) {
-      Status = EFI_INVALID_PARAMETER;
-    }
-  }
-
-  //
-  // If the message length is 0 or greater than what can be tolerated by the MM
-  // environment then return the expected size.
-  //
-  if ((CommunicateHeader->MessageLength == 0) ||
-      (BufferSize > mNsCommBuffMemRegion.Length))
-  {
-    CommunicateHeader->MessageLength = mNsCommBuffMemRegion.Length -
-                                       sizeof (CommunicateHeader->HeaderGuid) -
-                                       sizeof (CommunicateHeader->MessageLength);
-    Status = EFI_BAD_BUFFER_SIZE;
-  }
-
-  // MessageLength or CommSize check has failed, return here.
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  // Copy Communication Payload
-  CopyMem ((VOID *)mNsCommBuffMemRegion.VirtualBase, CommBufferVirtual, BufferSize);
-
-  if (IsFfaSupported ()) {
-    Status = SendFfaMmCommunicate ();
-  } else {
-    Status = SendSpmMmCommunicate ();
-  }
-
-  if (!EFI_ERROR (Status)) {
-    ZeroMem (CommBufferVirtual, BufferSize);
-    // On successful return, the size of data being returned is inferred from
-    // MessageLength + Header.
-    CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)mNsCommBuffMemRegion.VirtualBase;
-    BufferSize        = CommunicateHeader->MessageLength +
-                        sizeof (CommunicateHeader->HeaderGuid) +
-                        sizeof (CommunicateHeader->MessageLength);
-    if (BufferSize > mNsCommBuffMemRegion.Length) {
-      // Something bad has happened, we should have landed in ARM_SMC_MM_RET_NO_MEMORY
-      Status = EFI_BAD_BUFFER_SIZE;
-      DEBUG ((
-        DEBUG_ERROR,
-        "%a Returned buffer exceeds communication buffer limit. Has: 0x%llx vs. max: 0x%llx!\n",
-        __func__,
-        BufferSize,
-        (UINTN)mNsCommBuffMemRegion.Length
-        ));
-    } else {
-      CopyMem (
-        CommBufferVirtual,
-        (VOID *)mNsCommBuffMemRegion.VirtualBase,
-        BufferSize
-        );
-    }
-  }
-
-  return Status;
+EFI_STATUS
+EFIAPI
+MmCommunication3Communicate (
+  IN CONST EFI_MM_COMMUNICATION3_PROTOCOL  *This,
+  IN OUT VOID                              *CommBufferPhysical,
+  IN OUT VOID                              *CommBufferVirtual
+  )
+{
+  return MmCommunicationCommon (
+           CommBufferPhysical,
+           CommBufferVirtual,
+           NULL
+           );
 }
 
 //
@@ -287,6 +384,13 @@ MmCommunication2Communicate (
 //
 STATIC EFI_MM_COMMUNICATION2_PROTOCOL  mMmCommunication2 = {
   MmCommunication2Communicate
+};
+
+//
+// MM Communication Protocol instance
+//
+STATIC EFI_MM_COMMUNICATION3_PROTOCOL  mMmCommunication3 = {
+  MmCommunication3Communicate
 };
 
 /**
@@ -682,11 +786,13 @@ MmCommunication2Initialize (
   }
 
   // Install the communication protocol
-  Status = gBS->InstallProtocolInterface (
+  Status = gBS->InstallMultipleProtocolInterfaces (
                   &mMmCommunicateHandle,
                   &gEfiMmCommunication2ProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &mMmCommunication2
+                  &mMmCommunication2,
+                  &gEfiMmCommunication3ProtocolGuid,
+                  &mMmCommunication3,
+                  NULL
                   );
   if (EFI_ERROR (Status)) {
     DEBUG ((

@@ -36,6 +36,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/StandaloneMmMmuLib.h>
+#include <Library/SafeIntLib.h>
 #include <Library/PcdLib.h>
 
 #include <IndustryStandard/ArmStdSmc.h>
@@ -45,6 +46,8 @@
 
 #include <Protocol/PiMmCpuDriverEp.h>
 #include <Protocol/MmCommunication.h>
+#include <Protocol/MmCommunication2.h>
+#include <Protocol/MmCommunication3.h>
 
 extern EFI_MM_SYSTEM_TABLE  gMmCoreMmst;
 
@@ -443,7 +446,9 @@ GetServiceType (
   IN EFI_GUID  *ServiceGuid
   )
 {
-  if (CompareGuid (ServiceGuid, &gEfiMmCommunication2ProtocolGuid)) {
+  if (CompareGuid (ServiceGuid, &gEfiMmCommunication2ProtocolGuid) ||
+      CompareGuid (ServiceGuid, &gEfiMmCommunication3ProtocolGuid))
+  {
     return ServiceTypeMmCommunication;
   }
 
@@ -467,10 +472,14 @@ ValidateMmCommBufferAddr (
   IN UINTN  CommBufferAddr
   )
 {
-  UINT64  NsCommBufferEnd;
-  UINT64  SCommBufferEnd;
-  UINT64  CommBufferEnd;
-  UINT64  CommBufferRange;
+  UINT64                        NsCommBufferEnd;
+  UINT64                        SCommBufferEnd;
+  UINT64                        CommBufferEnd;
+  UINT64                        CommBufferRange;
+  UINT64                        BufferSize;
+  UINT64                        BufferEnd;
+  EFI_MM_COMMUNICATE_HEADER_V3  *CommBufferHeaderV3;
+  EFI_STATUS                    Status;
 
   NsCommBufferEnd = mNsCommBuffer->PhysicalStart + mNsCommBuffer->PhysicalSize;
   SCommBufferEnd  = mSCommBuffer->PhysicalStart + mSCommBuffer->PhysicalSize;
@@ -493,11 +502,42 @@ ValidateMmCommBufferAddr (
     return EFI_ACCESS_DENIED;
   }
 
-  // perform bounds check.
-  if (((CommBufferAddr + sizeof (EFI_MM_COMMUNICATE_HEADER) +
-        ((EFI_MM_COMMUNICATE_HEADER *)CommBufferAddr)->MessageLength)) >
-      CommBufferEnd)
+  if (CompareGuid (
+        &((EFI_MM_COMMUNICATE_HEADER *)CommBufferAddr)->HeaderGuid,
+        &gEfiMmCommunicateHeaderV3Guid
+        ))
   {
+    CommBufferHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommBufferAddr;
+    Status             = SafeUint64Add (
+                           CommBufferHeaderV3->MessageSize,
+                           sizeof (EFI_MM_COMMUNICATE_HEADER_V3),
+                           &BufferSize
+                           );
+    if (EFI_ERROR (Status)) {
+      return EFI_ACCESS_DENIED;
+    }
+
+    BufferSize = CommBufferHeaderV3->BufferSize;
+    Status     = SafeUint64Add (
+                   CommBufferAddr,
+                   BufferSize,
+                   &BufferEnd
+                   );
+    if (EFI_ERROR (Status)) {
+      return EFI_ACCESS_DENIED;
+    }
+  } else {
+    BufferSize = ((EFI_MM_COMMUNICATE_HEADER *)CommBufferAddr)->MessageLength +
+                 OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+    Status = SafeUint64Add (
+               CommBufferAddr,
+               BufferSize,
+               &BufferEnd
+               );
+  }
+
+  // perform bounds check.
+  if (BufferEnd > CommBufferEnd) {
     return EFI_ACCESS_DENIED;
   }
 
