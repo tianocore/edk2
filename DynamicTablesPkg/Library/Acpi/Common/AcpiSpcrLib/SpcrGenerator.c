@@ -2,6 +2,7 @@
   SPCR Table Generator
 
   Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.<BR>
+  Copyright (C) 2025, Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -35,6 +36,8 @@ Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
   - EArchCommonObjConsolePortInfo
+  - EArchCommonObjSerialTerminalInterruptInfo (OPTIONAL)
+
 
 NOTE: This implementation ignores the possibility that the Serial settings may
       be modified from the UEFI Shell.  A more complex handler would be needed
@@ -43,6 +46,14 @@ NOTE: This implementation ignores the possibility that the Serial settings may
 */
 
 #pragma pack(1)
+
+/** Valid SPCR interrupt types
+*/
+#define SPCR_VALID_INTERRUPT_TYPES  \
+  (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_8259 | \
+   EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_APIC | \
+   EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_SAPIC | \
+   EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC)
 
 /** A string representing the name of the SPCR port.
 */
@@ -106,6 +117,165 @@ GET_OBJECT_LIST (
   EArchCommonObjConsolePortInfo,
   CM_ARCH_COMMON_SERIAL_PORT_INFO
   )
+
+/** This macro expands to a function that retrieves the Serial
+  Terminal and Interrupt Information from the Configuration Manager.
+  This object is optional.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArchCommon,
+  EArchCommonObjSerialTerminalInterruptInfo,
+  CM_ARCH_COMMON_SERIAL_TERMINAL_INTERRUPT_INFO
+  )
+
+/** Validate the Serial Port Terminal Interrupt Information.
+
+  @param [in]  SerialPortInfo                Pointer to the Serial Port Information.
+  @param [in]  SerialPortCount               Number of Serial Ports.
+  @param [in]  SerialTerminalInterruptInfo   Pointer to the Serial Terminal Interrupt Information.
+  @param [in]  SerialTerminalInterruptCount  Number of Serial Terminal Interrupts.
+
+  @retval EFI_SUCCESS           The information is valid.
+  @retval EFI_INVALID_PARAMETER A parameter is invalid.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+ValidateSerialTerminalInterruptInfo (
+  IN  CM_ARCH_COMMON_SERIAL_PORT_INFO                *SerialPortInfo,
+  IN  UINT32                                         SerialPortCount,
+  IN  CM_ARCH_COMMON_SERIAL_TERMINAL_INTERRUPT_INFO  *SerialTerminalInterruptInfo,
+  IN  UINT32                                         SerialTerminalInterruptCount
+  )
+{
+  UINTN  Index;
+
+  if ((SerialPortInfo == NULL) || (SerialTerminalInterruptInfo == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (SerialPortCount != SerialTerminalInterruptCount) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: SPCR: Serial ports (%d) and terminal interrupts (%d) count mismatch.\n",
+      SerialPortCount,
+      SerialTerminalInterruptCount
+      ));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  for (Index = 0; Index < SerialTerminalInterruptCount; Index++) {
+    if ((SerialTerminalInterruptInfo[Index].TerminalType != EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_TERMINAL_TYPE_VT100) &&
+        (SerialTerminalInterruptInfo[Index].TerminalType != EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_TERMINAL_TYPE_VT100_PLUS) &&
+        (SerialTerminalInterruptInfo[Index].TerminalType != EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_TERMINAL_TYPE_VT_UTF8) &&
+        (SerialTerminalInterruptInfo[Index].TerminalType != EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_TERMINAL_TYPE_ANSI))
+    {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: SPCR: Invalid terminal type %d for serial terminal.\n",
+        SerialTerminalInterruptInfo[Index].TerminalType
+        ));
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if (SerialTerminalInterruptInfo[Index].InterruptType == 0) {
+      /// Poll mode operation.
+      continue;
+    }
+
+    if ((SerialTerminalInterruptInfo[Index].InterruptType &
+         SPCR_VALID_INTERRUPT_TYPES) == 0)
+    {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: SPCR: Invalid interrupt type %d for serial terminal.\n",
+        SerialTerminalInterruptInfo[Index].InterruptType
+        ));
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if ((((SerialTerminalInterruptInfo[Index].InterruptType) &
+          (EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC)) != 0) &&
+        (SerialTerminalInterruptInfo[Index].InterruptType !=
+         EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC))
+    {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: SPCR: %d GIC interrupt type cannot be combined with others.\n",
+        SerialTerminalInterruptInfo[Index].InterruptType
+        ));
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if ((SerialTerminalInterruptInfo[Index].InterruptType &
+         EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_APIC) != 0)
+    {
+      if ((SerialTerminalInterruptInfo[Index].InterruptType &
+           ~(EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_8259 |
+             EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_APIC)) != 0)
+      {
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: SPCR: %d Invalid APIC interrupt type.\n",
+          SerialTerminalInterruptInfo[Index].InterruptType
+          ));
+        return EFI_INVALID_PARAMETER;
+      }
+    }
+
+    if ((SerialTerminalInterruptInfo[Index].InterruptType &
+         EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_SAPIC) != 0)
+    {
+      if ((SerialTerminalInterruptInfo[Index].InterruptType &
+           ~(EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_8259 | \
+             EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_SAPIC)) != 0)
+      {
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: SPCR: %d Invalid SAPIC interrupt type.\n",
+          SerialTerminalInterruptInfo[Index].InterruptType
+          ));
+        return EFI_INVALID_PARAMETER;
+      }
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/** Update the SPCR table with the terminal interrupt type and terminal information.
+
+  @param [in, out] SpcrTable                   Pointer to the SPCR table.
+  @param [in]      SerialTerminalInterruptInfo Pointer to the Serial Terminal Interrupt Information.
+  @param [in]      SerialPortInfo              Pointer to the Serial Port Information.
+
+  @retval EFI_SUCCESS           The information was updated successfully.
+  @retval EFI_INVALID_PARAMETER A parameter is invalid.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+UpdateTerminalInterruptTypeInfo (
+  IN OUT EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4  *SpcrTable,
+  IN     CM_ARCH_COMMON_SERIAL_TERMINAL_INTERRUPT_INFO     *SerialTerminalInterruptInfo,
+  IN     CM_ARCH_COMMON_SERIAL_PORT_INFO                   *SerialPortInfo
+  )
+{
+  if ((SpcrTable == NULL) || (SerialTerminalInterruptInfo == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  SpcrTable->InterruptType = SerialTerminalInterruptInfo->InterruptType;
+  SpcrTable->TerminalType  = SerialTerminalInterruptInfo->TerminalType;
+
+  if ((SerialTerminalInterruptInfo->InterruptType &
+       EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_8259) != 0)
+  {
+    SpcrTable->Irq = SpcrTable->GlobalSystemInterrupt;
+  }
+
+  return EFI_SUCCESS;
+}
 
 /** Free any resources allocated for constructing the tables.
 
@@ -210,6 +380,9 @@ BuildSpcrTableEx (
   EFI_ACPI_DESCRIPTION_HEADER      **TableList;
   UINT32                           Size;
 
+  CM_ARCH_COMMON_SERIAL_TERMINAL_INTERRUPT_INFO  *SerialTerminalInterruptInfo;
+  UINT32                                         SerialTerminalInterruptCount;
+
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
   ASSERT (CfgMgrProtocol != NULL);
@@ -256,6 +429,39 @@ BuildSpcrTableEx (
       EFI_NOT_FOUND
       ));
     return EFI_NOT_FOUND;
+  }
+
+  SerialTerminalInterruptInfo  = NULL;
+  SerialTerminalInterruptCount = 0;
+  Status                       = GetEArchCommonObjSerialTerminalInterruptInfo (
+                                   CfgMgrProtocol,
+                                   CM_NULL_TOKEN,
+                                   &SerialTerminalInterruptInfo,
+                                   &SerialTerminalInterruptCount
+                                   );
+
+  if (!EFI_ERROR (Status)) {
+    Status = ValidateSerialTerminalInterruptInfo (
+               SerialPortInfo,
+               SerialPortCount,
+               SerialTerminalInterruptInfo,
+               SerialTerminalInterruptCount
+               );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: SPCR: Invalid serial terminal interrupt information. Status = %r\n",
+        Status
+        ));
+      return Status;
+    }
+  } else {
+    DEBUG ((
+      DEBUG_VERBOSE,
+      "SPCR: Continue with default interrupt type (0x%x) and terminal type (0x%x).\n",
+      EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC,
+      EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_TERMINAL_TYPE_ANSI
+      ));
   }
 
   // Validate the SerialPort info. Only one SPCR port can be described.
@@ -395,6 +601,34 @@ BuildSpcrTableEx (
     AcpiSpcr.UartClockFrequency = SerialPortInfo->Clock;
 
     AsciiStrCpyS (AcpiSpcr.NameSpaceString, sizeof (NAME_STR_SPCR_PORT), NAME_STR_SPCR_PORT);
+  }
+
+  if (SerialPortInfo->PortSubtype == EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_FULL_16550) {
+    /// Legacy IO port
+    if ((SerialPortInfo->AccessSize == EFI_ACPI_6_3_UNDEFINED) ||
+        (SerialPortInfo->AccessSize == EFI_ACPI_6_3_BYTE))
+    {
+      AcpiSpcr.BaseAddress.AddressSpaceId    = EFI_ACPI_6_3_SYSTEM_IO;
+      AcpiSpcr.BaseAddress.RegisterBitWidth  = 8;
+      AcpiSpcr.BaseAddress.RegisterBitOffset = 0;
+      AcpiSpcr.BaseAddress.AccessSize        = SerialPortInfo->AccessSize;
+    }
+  }
+
+  if (SerialTerminalInterruptCount != 0) {
+    Status = UpdateTerminalInterruptTypeInfo (
+               &AcpiSpcr,
+               SerialTerminalInterruptInfo,
+               SerialPortInfo
+               );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: SPCR: Failed to update interrupt terminal type info. Status = %r\n",
+        Status
+        ));
+      goto error_handler;
+    }
   }
 
   TableList[0] = (EFI_ACPI_DESCRIPTION_HEADER *)&AcpiSpcr;
