@@ -56,9 +56,19 @@
   !error "NETWORK_SNP_ENABLE is IA32/X64/EBC only"
 !endif
 
+  #
+  # UPDATE/RECOVERY definition
+  #
+  DEFINE CAPSULE_ENABLE          = FALSE
+  DEFINE FMP_SYSTEM_DEVICE       = BCBACAC2-1D1D-4C14-89A3-5E27496B702D
 
 !include MdePkg/MdeLibs.dsc.inc
 !include NetworkPkg/Network.dsc.inc
+
+!if $(CAPSULE_ENABLE) == TRUE
+  POSTBUILD                      = python OvmfPkg/RiscVVirt/Feature/Capsule/GenerateCapsule/GenCapsule.py
+!include OvmfPkg/RiscVVirt/RiscVVirtSystemFW.dsc.inc
+!endif
 
 [BuildOptions]
   GCC:RELEASE_*_*_CC_FLAGS       = -DMDEPKG_NDEBUG
@@ -90,6 +100,7 @@
   QemuLoadImageLib|OvmfPkg/Library/GenericQemuLoadImageLib/GenericQemuLoadImageLib.inf
 
   TimerLib|UefiCpuPkg/Library/BaseRiscV64CpuTimerLib/BaseRiscV64CpuTimerLib.inf
+  VirtNorFlashDeviceLib|OvmfPkg/Library/VirtNorFlashDeviceLib/VirtNorFlashDeviceLib.inf
   VirtNorFlashPlatformLib|OvmfPkg/RiscVVirt/Library/VirtNorFlashPlatformLib/VirtNorFlashDeviceTreeLib.inf
 
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
@@ -118,6 +129,18 @@
   TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLibNull/PeiDxeTpmPlatformHierarchyLib.inf
 !endif
 
+!if $(CAPSULE_ENABLE) == TRUE
+  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeCapsuleLib.inf
+  BmpSupportLib|MdeModulePkg/Library/BaseBmpSupportLib/BaseBmpSupportLib.inf
+  SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+  FmpAuthenticationLib|SecurityPkg/Library/FmpAuthenticationLibPkcs7/FmpAuthenticationLibPkcs7.inf
+  DisplayUpdateProgressLib|MdeModulePkg/Library/DisplayUpdateProgressLibText/DisplayUpdateProgressLibText.inf
+  RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
+!endif
+
 [LibraryClasses.common.DXE_DRIVER]
   AcpiPlatformLib|OvmfPkg/Library/AcpiPlatformLib/DxeAcpiPlatformLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
@@ -130,6 +153,11 @@
 [LibraryClasses.common.UEFI_DRIVER]
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   PciExpressLib|OvmfPkg/Library/BaseCachingPciExpressLib/BaseCachingPciExpressLib.inf
+
+[LibraryClasses.common.DXE_RUNTIME_DRIVER]
+!if $(CAPSULE_ENABLE) == TRUE
+  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
+!endif
 
 ################################################################################
 #
@@ -228,6 +256,10 @@
   # make this PCD patchable instead of dynamic when TPM support is not enabled
   # this permits setting the PCD in unreachable code without pulling in dynamic PCD support
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x0
+!endif
+
+!if $(CAPSULE_ENABLE) == TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSystemFmpCapsuleImageTypeIdGuid|{GUID("$(FMP_SYSTEM_DEVICE)")}|VOID*|0x10
 !endif
 
 [PcdsDynamicHii]
@@ -490,3 +522,11 @@
     <LibraryClasses>
       NULL|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   }
+
+!if $(CAPSULE_ENABLE) == TRUE
+  MdeModulePkg/Universal/EsrtFmpDxe/EsrtFmpDxe.inf
+  MdeModulePkg/Application/CapsuleApp/CapsuleApp.inf {
+    <LibraryClasses>
+      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  }
+!endif
