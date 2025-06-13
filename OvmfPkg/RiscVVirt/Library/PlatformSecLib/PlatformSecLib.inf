@@ -1,0 +1,61 @@
+## @file
+#  Library functions for PlatformSecLib.
+#
+#  Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2025, Ventana Micro Systems Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = PlatformSecLib
+  FILE_GUID                      = dddcaa5e-26e4-4922-9bcc-50e1a1bd0aac
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformSecLib
+
+[Sources]
+  Cpu.c
+  Memory.c
+  Platform.c
+  PlatformSecLib.c
+  SecEntry.S
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  CpuExceptionHandlerLib
+  CpuLib
+  DebugLib
+  FdtLib
+  RiscVSbiLib
+  HobLib
+  StackCheckLib
+  PcdLib
+  PrePiLib
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData
+  gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode
+
+[Ppis]
+  gEfiSecHobDataPpiGuid
+
+[Guids]
+  gFdtHobGuid
+  gEfiMemoryTypeInformationGuid

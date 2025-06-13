@@ -33,6 +33,9 @@
   FindPeiCore.c
   SecBist.c
 
+[Sources.IA32, Sources.X64]
+  SecTemporaryRamDone.c
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
@@ -52,8 +55,10 @@
   PeiServicesLib
   PeiServicesTablePointerLib
   HobLib
-  CpuPageTableLib
   StackCheckLib
+
+[LibraryClasses.IA32, LibraryClasses.X64]
+  CpuPageTableLib
 
 [Ppis]
   ## SOMETIMES_CONSUMES

@@ -37,19 +37,6 @@
 #include <Register/Intel/Cpuid.h>
 #include <Register/Intel/Msr.h>
 
-#define SEC_IDT_ENTRY_COUNT  34
-
-typedef struct _SEC_IDT_TABLE {
-  //
-  // Reserved 8 bytes preceding IDT to store EFI_PEI_SERVICES**, since IDT base
-  // address should be 8-byte alignment.
-  // Note: For IA32, only the 4 bytes immediately preceding IDT is used to store
-  // EFI_PEI_SERVICES**
-  //
-  UINT64                      PeiService;
-  IA32_IDT_GATE_DESCRIPTOR    IdtTable[SEC_IDT_ENTRY_COUNT];
-} SEC_IDT_TABLE;
-
 /**
   TemporaryRamDone() disables the use of Temporary RAM. If present, this service is invoked
   by the PEI Foundation after the EFI_PEI_PERMANANT_MEMORY_INSTALLED_PPI is installed.
