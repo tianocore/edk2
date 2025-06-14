@@ -370,6 +370,10 @@
   #
   ArmFfaLib|Include/Library/ArmFfaLib.h
 
+  ##  @libraryclass  Provides a Mmu interface.
+  #
+  ArmMmuLib|Include/Library/ArmMmuLib.h
+
 [Guids]
   #
   # GUID defined in UEFI2.1/UEFI2.0/EFI1.1
