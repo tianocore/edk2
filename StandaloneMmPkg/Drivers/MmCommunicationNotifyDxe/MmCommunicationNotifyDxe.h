@@ -22,41 +22,32 @@
 #include <Library/ReportStatusCodeLib.h>
 
 #include <Protocol/SmmControl2.h>
-#include <Protocol/MmCommunication3.h>
 #include <Protocol/MmCommunication2.h>
 #include <Protocol/MmCommunication.h>
+#include <Protocol/DxeMmReadyToLock.h>
 #include <Protocol/SmmAccess2.h>
 
 #include <Guid/MmCommBuffer.h>
+#include <Guid/EventGroup.h>
 
-/**
-  Communicates with a registered handler.
+typedef enum {
+  EventNotify,
+  ProtocolNotify,
+  EndNotify,
+} NOTIFICATION_TYPE;
 
-  This function provides a service to send and receive messages from a registered UEFI service.
-
-  @param[in] This                     The EFI_MM_COMMUNICATION3_PROTOCOL instance.
-  @param[in, out] CommBufferPhysical  Physical address of the MM communication buffer, of which content must
-                                      start with EFI_MM_COMMUNICATE_HEADER_V3.
-  @param[in, out] CommBufferVirtual   Virtual address of the MM communication buffer, of which content must
-                                      start with EFI_MM_COMMUNICATE_HEADER_V3.
-
-  @retval EFI_SUCCESS                 The message was successfully posted.
-  @retval EFI_INVALID_PARAMETER       CommBufferPhysical was NULL or CommBufferVirtual was NULL.
-  @retval EFI_BAD_BUFFER_SIZE         The buffer is too large for the MM implementation.
-                                      If this error is returned, the MessageSize field
-                                      in the CommBuffer header, are updated to reflect
-                                      the maximum payload size the implementation can accommodate.
-  @retval EFI_ACCESS_DENIED           The CommunicateBuffer parameter are in address range
-                                      that cannot be accessed by the MM environment.
-
-**/
-EFI_STATUS
-EFIAPI
-MmCommunicate3 (
-  IN CONST EFI_MM_COMMUNICATION3_PROTOCOL  *This,
-  IN OUT VOID                              *CommBufferPhysical,
-  IN OUT VOID                              *CommBufferVirtual
-  );
+//
+// Data structure used to declare a table of protocol notifications and event
+// notifications required by the Standalone Mm environment
+//
+typedef struct {
+  NOTIFICATION_TYPE    NotificationType;
+  BOOLEAN              CloseOnLock;
+  EFI_GUID             *Guid;
+  EFI_EVENT_NOTIFY     NotifyFunction;
+  VOID                 *NotifyContext;
+  EFI_EVENT            Event;
+} MM_EVENT_NOTIFICATION;
 
 /**
   Communicates with a registered handler.
@@ -120,6 +111,49 @@ MmCommunicate (
   IN CONST EFI_MM_COMMUNICATION_PROTOCOL  *This,
   IN OUT VOID                             *CommBufferPhysical,
   IN OUT UINTN                            *CommSize OPTIONAL
+  );
+
+/**
+  Event notification that is fired every time a DxeSmmReadyToLock protocol is added
+  or if gEfiEventReadyToBootGuid is signaled.
+
+  @param  Event                 The Event that is being processed, not used.
+  @param  Context               Event Context, not used.
+
+**/
+VOID
+EFIAPI
+MmReadyToLockEventNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  );
+
+/**
+  Event notification that is fired when GUIDed Event Group is signaled.
+
+  @param  Event                 The Event that is being processed, not used.
+  @param  Context               Event Context, not used.
+
+**/
+VOID
+EFIAPI
+MmGuidedEventNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  );
+
+/**
+  Event notification that is fired when EndOfDxe Event Group is signaled.
+
+  @param  Event                 The Event that is being processed, not used.
+  @param  Context               Event Context, not used.
+
+**/
+VOID
+EFIAPI
+MmEndOfDxeEventNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 /**
