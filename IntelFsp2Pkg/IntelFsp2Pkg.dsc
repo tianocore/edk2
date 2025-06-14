@@ -33,6 +33,7 @@
   SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
   DebugDeviceLib|IntelFsp2Pkg/Library/BaseDebugDeviceLibNull/BaseDebugDeviceLibNull.inf
+  Tpm2DebugLib|SecurityPkg/Library/Tpm2DebugLib/Tpm2DebugLibNull.inf
 
   # FSP override
   DebugLib|IntelFsp2Pkg/Library/BaseFspDebugLibSerialPort/BaseFspDebugLibSerialPort.inf

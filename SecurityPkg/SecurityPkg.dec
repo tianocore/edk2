@@ -50,6 +50,11 @@
   #
   Tpm2DeviceLib|Include/Library/Tpm2DeviceLib.h
 
+  ##  @libraryclass  This library contains helper functions to perform a detailed debugging of
+  ##  TPM transactions
+  #
+  Tpm2DebugLib|Include/Library/Tpm2DebugLib.h
+
   ##  @libraryclass  Provides interfaces for other modules to send TPM 1.2 command.
   #
   Tpm12CommandLib|Include/Library/Tpm12CommandLib.h

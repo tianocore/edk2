@@ -48,3 +48,4 @@
   BaseMemoryLib
   DebugLib
   Tpm2DeviceLib
+  Tpm2DebugLib
