@@ -381,7 +381,6 @@
   MtrrLib|UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
   LocalApicLib|UefiCpuPkg/Library/BaseXApicX2ApicLib/BaseXApicX2ApicLib.inf
   MicrocodeLib|UefiCpuPkg/Library/MicrocodeLib/MicrocodeLib.inf
-  IoApicLib|PcAtChipsetPkg/Library/BaseIoApicLib/BaseIoApicLib.inf
 !if $(CPU_TIMER_LIB_ENABLE) == TRUE && $(UNIVERSAL_PAYLOAD) == TRUE
   TimerLib|UefiCpuPkg/Library/CpuTimerLib/BaseCpuTimerLib.inf
 !else
@@ -460,7 +459,6 @@
 !if $(SOURCE_DEBUG_ENABLE)
   DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/DxeDebugAgentLib.inf
 !endif
-  CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
 !if $(PERFORMANCE_MEASUREMENT_ENABLE)
   PerformanceLib|MdeModulePkg/Library/DxeCorePerformanceLib/DxeCorePerformanceLib.inf
 !endif
@@ -472,12 +470,10 @@
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
 
 [LibraryClasses.X64.DXE_DRIVER]
-  CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
 !if $(SOURCE_DEBUG_ENABLE)
   DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/DxeDebugAgentLib.inf
 !endif
-  CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
 !if $(PERFORMANCE_MEASUREMENT_ENABLE)
   PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
@@ -554,8 +550,10 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdHiiOsRuntimeSupport|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom|FALSE
 
-[PcdsFeatureFlag.X64]
+[PcdsFeatureFlag.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE
+
+[PcdsFeatureFlag.X64]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmEnableBspElection|FALSE
 
 [PcdsFixedAtBuild]
@@ -615,7 +613,6 @@
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.TlsGet.Family                            | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
 !endif
 !endif
-
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   # Override the default values from SecurityPkg to ensure images from all sources are verified in secure boot
@@ -677,6 +674,8 @@
 !if $(NETWORK_DRIVER_ENABLE) == TRUE
   gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections|TRUE
 !endif
+
+[PcdsPatchableInModule.X64, PcdsPatchableInModule.IA32]
   gUefiPayloadPkgTokenSpaceGuid.SizeOfIoSpace|16
   gUefiPayloadPkgTokenSpaceGuid.PcdFDTPageSize|8
   #
