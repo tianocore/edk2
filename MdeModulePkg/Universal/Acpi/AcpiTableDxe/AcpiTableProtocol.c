@@ -538,6 +538,9 @@ AddTableToList (
   //
   CurrentTableList = AllocatePool (sizeof (EFI_ACPI_TABLE_LIST));
   ASSERT (CurrentTableList);
+  if (CurrentTableList == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   //
   // Determine table type and size
@@ -1273,7 +1276,7 @@ RemoveTableFromRsdt (
     //
     // Check if we have found the corresponding entry in both RSDT and XSDT
     //
-    if (((Rsdt == NULL) || (*CurrentRsdtEntry == (UINT32)(UINTN)Table->Table)) &&
+    if (((Rsdt == NULL) || ((CurrentRsdtEntry != NULL) && (*CurrentRsdtEntry == (UINT32)(UINTN)Table->Table))) &&
         ((Xsdt == NULL) || (CurrentTablePointer64 == (UINT64)(UINTN)Table->Table))
         )
     {
