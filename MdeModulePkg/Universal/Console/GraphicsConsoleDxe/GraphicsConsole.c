@@ -283,7 +283,10 @@ InitializeGraphicsConsoleTextMode (
   // Reserve 2 modes for 80x25, 80x50 of graphics console.
   //
   NewModeBuffer = AllocateZeroPool (sizeof (GRAPHICS_CONSOLE_MODE_DATA) * (Count + 2));
-  ASSERT (NewModeBuffer != NULL);
+  if (NewModeBuffer == NULL) {
+    ASSERT (NewModeBuffer != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   //
   // Mode 0 and mode 1 is for 80x25, 80x50 according to UEFI spec.
@@ -463,7 +466,7 @@ GraphicsConsoleControllerDriverStart (
       //
       MaxMode = Private->GraphicsOutput->Mode->MaxMode;
 
-      for (ModeIndex = 0; ModeIndex < MaxMode; ModeIndex++) {
+      for (ModeIndex = 0; (UINTN)ModeIndex < MaxMode; ModeIndex++) {
         Status = Private->GraphicsOutput->QueryMode (
                                             Private->GraphicsOutput,
                                             ModeIndex,
@@ -2084,7 +2087,10 @@ RegisterFontPackage (
 
   PackageLength = sizeof (EFI_HII_SIMPLE_FONT_PACKAGE_HDR) + mNarrowFontSize + 4;
   Package       = AllocateZeroPool (PackageLength);
-  ASSERT (Package != NULL);
+  if (Package == NULL) {
+    ASSERT (Package != NULL);
+    return;
+  }
 
   WriteUnaligned32 ((UINT32 *)Package, PackageLength);
   SimplifiedFont                       = (EFI_HII_SIMPLE_FONT_PACKAGE_HDR *)(Package + 4);
