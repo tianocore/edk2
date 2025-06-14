@@ -1549,39 +1549,40 @@ AutoUpdateLangVariable (
         // Get the corresponding ISO639 language tag according to RFC4646 language tag.
         //
         BestLang = GetLangFromSupportedLangCodes (mVariableModuleGlobal->LangCodes, Index, TRUE);
+        if (BestLang != NULL) {
+          //
+          // Check the variable space for both Lang and PlatformLang variable.
+          //
+          VariableEntry[0].VariableSize = ISO_639_2_ENTRY_SIZE + 1;
+          VariableEntry[0].Guid         = &gEfiGlobalVariableGuid;
+          VariableEntry[0].Name         = EFI_LANG_VARIABLE_NAME;
 
-        //
-        // Check the variable space for both Lang and PlatformLang variable.
-        //
-        VariableEntry[0].VariableSize = ISO_639_2_ENTRY_SIZE + 1;
-        VariableEntry[0].Guid         = &gEfiGlobalVariableGuid;
-        VariableEntry[0].Name         = EFI_LANG_VARIABLE_NAME;
+          VariableEntry[1].VariableSize = AsciiStrSize (BestPlatformLang);
+          VariableEntry[1].Guid         = &gEfiGlobalVariableGuid;
+          VariableEntry[1].Name         = EFI_PLATFORM_LANG_VARIABLE_NAME;
+          if (!CheckRemainingSpaceForConsistency (VARIABLE_ATTRIBUTE_NV_BS_RT, &VariableEntry[0], &VariableEntry[1], NULL)) {
+            //
+            // No enough variable space to set both Lang and PlatformLang successfully.
+            //
+            Status = EFI_OUT_OF_RESOURCES;
+          } else {
+            //
+            // Successfully convert PlatformLang to Lang, and set the BestLang value into Lang variable simultaneously.
+            //
+            FindVariable (EFI_LANG_VARIABLE_NAME, &gEfiGlobalVariableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
 
-        VariableEntry[1].VariableSize = AsciiStrSize (BestPlatformLang);
-        VariableEntry[1].Guid         = &gEfiGlobalVariableGuid;
-        VariableEntry[1].Name         = EFI_PLATFORM_LANG_VARIABLE_NAME;
-        if (!CheckRemainingSpaceForConsistency (VARIABLE_ATTRIBUTE_NV_BS_RT, &VariableEntry[0], &VariableEntry[1], NULL)) {
-          //
-          // No enough variable space to set both Lang and PlatformLang successfully.
-          //
-          Status = EFI_OUT_OF_RESOURCES;
-        } else {
-          //
-          // Successfully convert PlatformLang to Lang, and set the BestLang value into Lang variable simultaneously.
-          //
-          FindVariable (EFI_LANG_VARIABLE_NAME, &gEfiGlobalVariableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
-
-          Status = UpdateVariable (
-                     EFI_LANG_VARIABLE_NAME,
-                     &gEfiGlobalVariableGuid,
-                     BestLang,
-                     ISO_639_2_ENTRY_SIZE + 1,
-                     Attributes,
-                     0,
-                     0,
-                     &Variable,
-                     NULL
-                     );
+            Status = UpdateVariable (
+                       EFI_LANG_VARIABLE_NAME,
+                       &gEfiGlobalVariableGuid,
+                       BestLang,
+                       ISO_639_2_ENTRY_SIZE + 1,
+                       Attributes,
+                       0,
+                       0,
+                       &Variable,
+                       NULL
+                       );
+          }
         }
 
         DEBUG ((DEBUG_INFO, "Variable Driver Auto Update PlatformLang, PlatformLang:%a, Lang:%a Status: %r\n", BestPlatformLang, BestLang, Status));
@@ -1606,39 +1607,40 @@ AutoUpdateLangVariable (
         // Get the corresponding RFC4646 language tag according to ISO639 language tag.
         //
         BestPlatformLang = GetLangFromSupportedLangCodes (mVariableModuleGlobal->PlatformLangCodes, Index, FALSE);
+        if (BestPlatformLang != NULL) {
+          //
+          // Check the variable space for both PlatformLang and Lang variable.
+          //
+          VariableEntry[0].VariableSize = AsciiStrSize (BestPlatformLang);
+          VariableEntry[0].Guid         = &gEfiGlobalVariableGuid;
+          VariableEntry[0].Name         = EFI_PLATFORM_LANG_VARIABLE_NAME;
 
-        //
-        // Check the variable space for both PlatformLang and Lang variable.
-        //
-        VariableEntry[0].VariableSize = AsciiStrSize (BestPlatformLang);
-        VariableEntry[0].Guid         = &gEfiGlobalVariableGuid;
-        VariableEntry[0].Name         = EFI_PLATFORM_LANG_VARIABLE_NAME;
+          VariableEntry[1].VariableSize = ISO_639_2_ENTRY_SIZE + 1;
+          VariableEntry[1].Guid         = &gEfiGlobalVariableGuid;
+          VariableEntry[1].Name         = EFI_LANG_VARIABLE_NAME;
+          if (!CheckRemainingSpaceForConsistency (VARIABLE_ATTRIBUTE_NV_BS_RT, &VariableEntry[0], &VariableEntry[1], NULL)) {
+            //
+            // No enough variable space to set both PlatformLang and Lang successfully.
+            //
+            Status = EFI_OUT_OF_RESOURCES;
+          } else {
+            //
+            // Successfully convert Lang to PlatformLang, and set the BestPlatformLang value into PlatformLang variable simultaneously.
+            //
+            FindVariable (EFI_PLATFORM_LANG_VARIABLE_NAME, &gEfiGlobalVariableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
 
-        VariableEntry[1].VariableSize = ISO_639_2_ENTRY_SIZE + 1;
-        VariableEntry[1].Guid         = &gEfiGlobalVariableGuid;
-        VariableEntry[1].Name         = EFI_LANG_VARIABLE_NAME;
-        if (!CheckRemainingSpaceForConsistency (VARIABLE_ATTRIBUTE_NV_BS_RT, &VariableEntry[0], &VariableEntry[1], NULL)) {
-          //
-          // No enough variable space to set both PlatformLang and Lang successfully.
-          //
-          Status = EFI_OUT_OF_RESOURCES;
-        } else {
-          //
-          // Successfully convert Lang to PlatformLang, and set the BestPlatformLang value into PlatformLang variable simultaneously.
-          //
-          FindVariable (EFI_PLATFORM_LANG_VARIABLE_NAME, &gEfiGlobalVariableGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
-
-          Status = UpdateVariable (
-                     EFI_PLATFORM_LANG_VARIABLE_NAME,
-                     &gEfiGlobalVariableGuid,
-                     BestPlatformLang,
-                     AsciiStrSize (BestPlatformLang),
-                     Attributes,
-                     0,
-                     0,
-                     &Variable,
-                     NULL
-                     );
+            Status = UpdateVariable (
+                       EFI_PLATFORM_LANG_VARIABLE_NAME,
+                       &gEfiGlobalVariableGuid,
+                       BestPlatformLang,
+                       AsciiStrSize (BestPlatformLang),
+                       Attributes,
+                       0,
+                       0,
+                       &Variable,
+                       NULL
+                       );
+          }
         }
 
         DEBUG ((DEBUG_INFO, "Variable Driver Auto Update Lang, Lang:%a, PlatformLang:%a Status: %r\n", BestLang, BestPlatformLang, Status));
