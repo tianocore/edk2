@@ -960,7 +960,7 @@ GetApResetVectorSize (
   )
 {
   if (SizeBelow1Mb != NULL) {
-    *SizeBelow1Mb = AddressMap->ModeTransitionOffset + sizeof (MP_CPU_EXCHANGE_INFO);
+    *SizeBelow1Mb = ALIGN_VALUE (AddressMap->ModeTransitionOffset, sizeof (UINTN)) + sizeof (MP_CPU_EXCHANGE_INFO);
   }
 
   if (SizeAbove1Mb != NULL) {
@@ -1092,7 +1092,7 @@ BackupAndPrepareWakeupBuffer (
   CopyMem (
     (VOID *)CpuMpData->WakeupBuffer,
     (VOID *)CpuMpData->AddressMap.RendezvousFunnelAddress,
-    CpuMpData->BackupBufferSize - sizeof (MP_CPU_EXCHANGE_INFO)
+    CpuMpData->AddressMap.ModeTransitionOffset
     );
 }
 
@@ -1126,17 +1126,22 @@ AllocateResetVectorBelow1Mb (
   UINTN  ApResetStackSize;
 
   if (CpuMpData->WakeupBuffer == (UINTN)-1) {
-    CpuMpData->WakeupBuffer      = GetWakeupBuffer (CpuMpData->BackupBufferSize);
+    CpuMpData->WakeupBuffer = GetWakeupBuffer (CpuMpData->BackupBufferSize);
+    //
+    // Align MpCpuExchangeInfo to avoid split-lock violations.
+    //
     CpuMpData->MpCpuExchangeInfo = (MP_CPU_EXCHANGE_INFO *)(UINTN)
-                                   (CpuMpData->WakeupBuffer + CpuMpData->BackupBufferSize - sizeof (MP_CPU_EXCHANGE_INFO));
+                                   (CpuMpData->WakeupBuffer +
+                                    ALIGN_VALUE (CpuMpData->AddressMap.ModeTransitionOffset, sizeof (UINTN)));
     DEBUG ((
       DEBUG_INFO,
       "AP Vector: 16-bit = %p/%x, ExchangeInfo = %p/%x\n",
       CpuMpData->WakeupBuffer,
-      CpuMpData->BackupBufferSize - sizeof (MP_CPU_EXCHANGE_INFO),
+      CpuMpData->AddressMap.ModeTransitionOffset,
       CpuMpData->MpCpuExchangeInfo,
       sizeof (MP_CPU_EXCHANGE_INFO)
       ));
+
     //
     // The AP reset stack is only used by SEV-ES guests. Do not allocate it
     // if SEV-ES is not enabled. An SEV-SNP guest is also considered

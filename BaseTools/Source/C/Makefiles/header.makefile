@@ -5,48 +5,117 @@
 # HOST_ARCH = ia32 or IA32 for IA32 build
 # HOST_ARCH = Arm or ARM for ARM build
 #
-# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2025, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 
+# Set SEP to the platform specific path seperator
+ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+  SHELL := cmd.exe
+  SEP:=$(shell echo \)
+else
+  SEP:=/
+endif
+
 EDK2_PATH ?= $(MAKEROOT)/../../..
+ifndef PYTHON_COMMAND
+  ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+    #
+    # Try using the Python Launcher for Windows to find an interperter.
+    #
+    CHECK_PY := $(shell where py.exe || echo NotFound)
+    ifeq ($(CHECK_PY),NotFound)
+      #
+      # PYTHON_HOME is the old method of specifying a Python interperter on Windows.
+      # Check if an interperter can be found using PYTHON_HOME.
+      #
+      ifdef PYTHON_HOME
+        ifndef (,$(wildcard $(PYTHON_HOME)$(SEP)python.exe)) # Make sure the file exists
+          PYTHON_COMMAND := $(PYTHON_HOME)$(SEP)python.exe
+        else
+          $(error Unable to find a Python interperter, if one is installed, set the PYTHON_COMMAND environment variable!)
+        endif
+      endif
+    else
+      PYTHON_COMMAND := $(shell py -3 -c "import sys; print(sys.executable)")
+      ifdef (,$(wildcard $(PYTHON_COMMAND))) # Make sure the file exists
+        $(error Unable to find a Python interperter, if one is installed, set the PYTHON_COMMAND environment variable!)
+      endif
+    endif
+    undefine CHECK_PY
+  else # UNIX
+    PYTHON_COMMAND := $(shell /usr/bin/env python3 -c "import sys; print(sys.executable)")
+    ifdef (,$(wildcard $(PYTHON_COMMAND))) # Make sure the file exists
+      PYTHON_COMMAND := $(shell /usr/bin/env python -c "import sys; print(sys.executable)")
+      ifdef (,$(wildcard $(PYTHON_COMMAND))) # Make sure the file exists
+        undefine PYTHON_COMMAND
+      endif
+    endif
+    ifndef PYTHON_COMMAND
+      $(error Unable to find a Python interpreter, if one is installed, set the PYTHON_COMMAND environment variable!)
+    endif
+  endif
+  export PYTHON_COMMAND
+endif
+
+# GnuMakeUtils.py is able to handle forward slashes in file paths on Windows systems
+GNU_MAKE_UTILS_PY := $(PYTHON_COMMAND) $(MAKEROOT)$(SEP)Makefiles$(SEP)GnuMakeUtils.py
+CP := $(GNU_MAKE_UTILS_PY) cp
+MV := $(GNU_MAKE_UTILS_PY) mv
+RM := $(GNU_MAKE_UTILS_PY) rm
+MD := $(GNU_MAKE_UTILS_PY) md
+RD := $(GNU_MAKE_UTILS_PY) rd
 
 ifndef HOST_ARCH
   #
-  # If HOST_ARCH is not defined, then we use 'uname -m' to attempt
+  # If HOST_ARCH is not defined, then we use 'GnuMakeUtils.py' to attempt
   # try to figure out the appropriate HOST_ARCH.
   #
-  uname_m = $(shell uname -m)
-  $(info Attempting to detect HOST_ARCH from 'uname -m': $(uname_m))
-  ifneq (,$(strip $(filter $(uname_m), x86_64 amd64)))
-    HOST_ARCH=X64
+  GET_GNU_HOST_ARCH_PY:=$(MAKEROOT)$(SEP)Makefiles$(SEP)GnuMakeUtils.py get_host_arch
+  ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+    HOST_ARCH:=$(shell if defined PYTHON_COMMAND $(PYTHON_COMMAND) $(GET_GNU_HOST_ARCH_PY))
+  else
+    HOST_ARCH:=$(shell if command -v $(PYTHON_COMMAND) >/dev/null 1; then $(PYTHON_COMMAND) $(GET_GNU_HOST_ARCH_PY); else python $(GET_GNU_HOST_ARCH_PY); fi)
   endif
-  ifeq ($(patsubst i%86,IA32,$(uname_m)),IA32)
-    HOST_ARCH=IA32
+  ifeq ($(HOST_ARCH),)
+    $(info HOST_ARCH detection failed.)
+    undefine HOST_ARCH
   endif
-  ifneq (,$(findstring aarch64,$(uname_m)))
-    HOST_ARCH=AARCH64
-  else ifneq (,$(findstring arm64,$(uname_m)))
-    HOST_ARCH=AARCH64
-  else ifneq (,$(findstring arm,$(uname_m)))
-    HOST_ARCH=ARM
+  ifeq ($(HOST_ARCH),Unknown)
+    $(info HOST_ARCH detection failed.)
+    undefine HOST_ARCH
   endif
-  ifneq (,$(findstring riscv64,$(uname_m)))
-    HOST_ARCH=RISCV64
-  endif
-  ifneq (,$(findstring loongarch64,$(uname_m)))
-    HOST_ARCH=LOONGARCH64
-  endif
-  ifndef HOST_ARCH
-    $(info Could not detected HOST_ARCH from uname results)
-    $(error HOST_ARCH is not defined!)
-  endif
-  $(info Detected HOST_ARCH of $(HOST_ARCH) using uname.)
+endif
+ifndef HOST_ARCH
+  $(error HOST_ARCH is not defined!)
 endif
 
-CYGWIN:=$(findstring CYGWIN, $(shell uname -s))
-LINUX:=$(findstring Linux, $(shell uname -s))
-DARWIN:=$(findstring Darwin, $(shell uname -s))
-CLANG:=$(shell $(CC) --version | grep clang)
+#Set up BaseTools binary path for Windows builds
+ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+  ifndef BIN_PATH
+    BIN_PATH_BASE=$(MAKEROOT)/../../Bin
+    ifeq ($(HOST_ARCH),X64)
+      BIN_PATH=$(BIN_PATH_BASE)/Win64
+    else
+      ifeq ($(HOST_ARCH),AARCH64)
+        BIN_PATH=$(BIN_PATH_BASE)/Win64
+      else
+        BIN_PATH=$(BIN_PATH_BASE)/Win32
+      endif
+    endif
+  endif
+endif
+
+ifneq ($(findstring cmd,$(SHELL)),cmd)
+  CYGWIN:=$(findstring CYGWIN, $(shell uname -s))
+  LINUX:=$(findstring Linux, $(shell uname -s))
+  DARWIN:=$(findstring Darwin, $(shell uname -s))
+else
+  #Don't use uname on Windows
+  CYGWIN:=
+  LINUX:=
+  DARWIN:=
+endif
+CLANG := $(findstring clang,$(shell $(CC) --version))
 ifneq ($(CLANG),)
 CC ?= $(CLANG_BIN)clang
 CXX ?= $(CLANG_BIN)clang++
@@ -141,7 +210,10 @@ LDFLAGS += $(EXTRA_LDFLAGS)
 all:
 
 $(MAKEROOT)/libs:
-	mkdir $(MAKEROOT)/libs
+	$(MD) $(MAKEROOT)/libs
 
 $(MAKEROOT)/bin:
-	mkdir $(MAKEROOT)/bin
+	$(MD) $(MAKEROOT)/bin
+ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+	$(MD) $(BIN_PATH)
+endif

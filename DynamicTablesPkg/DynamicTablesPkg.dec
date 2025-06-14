@@ -25,6 +25,9 @@
   ##  @libraryclass  Defines a set of APIs for Dynamic AML generation.
   AmlLib|Include/Library/AmlLib/AmlLib.h
 
+  ## @libraryclass  Defines a set of APIs to help CmObj handling.
+  CmObjHelperLib|Include/Library/CmObjHelperLib.h
+
   ##  @libraryclass  Defines a set of APIs to handle dynamically created CmObj.
   DynamicPlatRepoLib|Include/Library/DynamicPlatRepoLib.h
 
@@ -42,6 +45,12 @@
 
   ##  @libraryclass  Defines a set of SMBIOS string helper methods.
   SmbiosStringTableLib|Include/Library/SmbiosStringTableLib.h
+
+  ##  @libraryclass  Defines a set of APIs to a handle Metadata around CmObj.
+  MetadataObjLib|Include/Library/MetadataObjLib.h
+
+  ##  @libraryclass  Defines a set of APIs to a handle Metadata generation/validation.
+  MetadataHandlerLib|Include/Library/MetadataHandlerLib.h
 
 [LibraryClasses.AARCH64]
   ##  @libraryclass  Defines a set of APIs to populate CmObj using SCMI.

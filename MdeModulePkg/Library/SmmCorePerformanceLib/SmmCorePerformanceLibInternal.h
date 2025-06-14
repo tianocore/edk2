@@ -24,7 +24,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/MmServicesTableLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/PerformanceLib.h>
@@ -44,6 +43,57 @@ extern BOOLEAN  mPerformanceMeasurementEnabled;
 //
 // Library internal function declarations
 //
+
+/**
+  Communication service SMI Handler entry.
+
+  This SMI handler provides services for report MM boot records.
+
+  Caution: This function may receive untrusted input.
+  Communicate buffer and buffer size are external input, so this function will do basic validation.
+
+  @param[in]     DispatchHandle  The unique handle assigned to this handler by SmiHandlerRegister().
+  @param[in]     RegisterContext Points to an optional handler context which was specified when the
+                                 handler was registered.
+  @param[in, out] CommBuffer     A pointer to a collection of data in memory that will
+                                 be conveyed from a non-MM environment into an MM environment.
+  @param[in, out] CommBufferSize The size of the CommBuffer.
+
+  @retval EFI_SUCCESS                         The interrupt was handled and quiesced. No other handlers
+                                              should still be called.
+  @retval EFI_WARN_INTERRUPT_SOURCE_QUIESCED  The interrupt has been quiesced but other handlers should
+                                              still be called.
+  @retval EFI_WARN_INTERRUPT_SOURCE_PENDING   The interrupt is still pending and other handlers should still
+                                              be called.
+  @retval EFI_INTERRUPT_PENDING               The interrupt could not be quiesced.
+
+**/
+EFI_STATUS
+EFIAPI
+FpdtSmiHandler (
+  IN     EFI_HANDLE  DispatchHandle,
+  IN     CONST VOID  *RegisterContext,
+  IN OUT VOID        *CommBuffer,
+  IN OUT UINTN       *CommBufferSize
+  );
+
+/**
+  This is the Event call back function is triggered in SMM to notify the Library
+  the system is entering runtime phase.
+
+  @param[in] Protocol   Points to the protocol's unique identifier
+  @param[in] Interface  Points to the interface instance
+  @param[in] Handle     The handle on which the interface was installed
+
+  @retval EFI_SUCCESS SmmAtRuntimeCallBack runs successfully
+ **/
+EFI_STATUS
+EFIAPI
+SmmCorePerformanceLibExitBootServicesCallback (
+  IN CONST EFI_GUID  *Protocol,
+  IN VOID            *Interface,
+  IN EFI_HANDLE      Handle
+  );
 
 /**
   Return a pointer to the loaded image protocol for the given handle.

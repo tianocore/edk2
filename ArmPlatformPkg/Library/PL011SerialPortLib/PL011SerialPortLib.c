@@ -34,6 +34,8 @@ SerialPortInitialize (
   EFI_PARITY_TYPE     Parity;
   UINT8               DataBits;
   EFI_STOP_BITS_TYPE  StopBits;
+  EFI_STATUS          Status;
+  UINT8               Scratch;
 
   BaudRate         = FixedPcdGet64 (PcdUartDefaultBaudRate);
   ReceiveFifoDepth = 0;         // Use default FIFO depth
@@ -41,15 +43,25 @@ SerialPortInitialize (
   DataBits         = FixedPcdGet8 (PcdUartDefaultDataBits);
   StopBits         = (EFI_STOP_BITS_TYPE)FixedPcdGet8 (PcdUartDefaultStopBits);
 
-  return PL011UartInitializePort (
-           (UINTN)PcdGet64 (PcdSerialRegisterBase),
-           PL011UartClockGetFreq (),
-           &BaudRate,
-           &ReceiveFifoDepth,
-           &Parity,
-           &DataBits,
-           &StopBits
-           );
+  Status = PL011UartInitializePort (
+             (UINTN)PcdGet64 (PcdSerialRegisterBase),
+             PL011UartClockGetFreq (),
+             &BaudRate,
+             &ReceiveFifoDepth,
+             &Parity,
+             &DataBits,
+             &StopBits
+             );
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  while (SerialPortPoll ()) {
+    SerialPortRead (&Scratch, sizeof (Scratch));
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**

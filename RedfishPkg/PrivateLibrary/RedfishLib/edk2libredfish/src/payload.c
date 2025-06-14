@@ -525,7 +525,7 @@ getOpResult (
   }
 
   stringProp = prop->json;
-  jsonType   = JsonGetType (prop->json);
+  jsonType   = (json_type)JsonGetType (prop->json);
   switch (jsonType) {
     case JSON_OBJECT:
       stringProp = json_object_get (prop->json, propName);

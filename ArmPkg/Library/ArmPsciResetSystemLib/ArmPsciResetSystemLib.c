@@ -24,7 +24,7 @@
 /**
   Library constructor. This function does nothing, but this library may depend
   on other libraries that do have a non-trivial constructor, which the
-  BaseToools fail to account for if a library has no constructor at all.
+  BaseTools fail to account for if a library has no constructor at all.
  **/
 RETURN_STATUS
 EFIAPI
@@ -71,13 +71,16 @@ ResetWarm (
 {
   ARM_MONITOR_ARGS  Args;
 
-  Args.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_RESET2_AARCH64;
+  Args.Arg0 = ARM_SMC_ID_PSCI_FEATURES;
+  Args.Arg1 = ARM_SMC_ID_PSCI_SYSTEM_RESET2_AARCH64;
 
   // Is SYSTEM_RESET2 supported?
   ArmMonitorCall (&Args);
   if (Args.Arg0 == ARM_SMC_PSCI_RET_SUCCESS) {
     // Send PSCI SYSTEM_RESET2 command
     Args.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_RESET2_AARCH64;
+    Args.Arg1 = 0; // Reset type
+    // cookie does not matter with reset type 0
 
     ArmMonitorCall (&Args);
   } else {

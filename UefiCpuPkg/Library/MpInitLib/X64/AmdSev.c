@@ -271,17 +271,26 @@ SevSnpCreateAP (
   IN INTN         ProcessorNumber
   )
 {
-  CPU_INFO_IN_HOB    *CpuInfoInHob;
-  CPU_AP_DATA        *CpuData;
-  UINTN              Index;
-  UINTN              MaxIndex;
-  UINT32             ApicId;
-  EFI_HOB_GUID_TYPE  *GuidHob;
-  GHCB_APIC_IDS      *GhcbApicIds;
+  CPU_INFO_IN_HOB                *CpuInfoInHob;
+  CPU_AP_DATA                    *CpuData;
+  UINTN                          Index;
+  UINTN                          MaxIndex;
+  UINT32                         ApicId;
+  EFI_HOB_GUID_TYPE              *GuidHob;
+  GHCB_APIC_IDS                  *GhcbApicIds;
+  volatile MP_CPU_EXCHANGE_INFO  *ExchangeInfo;
 
   ASSERT (CpuMpData->MpCpuExchangeInfo->BufferStart < 0x100000);
 
+  ExchangeInfo = CpuMpData->MpCpuExchangeInfo;
   CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
+
+  //
+  // Set to FALSE by default. This is only set to TRUE when the InitFlag
+  // is equal to ApInitConfig and the GHCB APIC ID List NAE event has
+  // been called.
+  //
+  ExchangeInfo->SevSnpKnownInitApicId = FALSE;
 
   if (ProcessorNumber < 0) {
     if (CpuMpData->InitFlag == ApInitConfig) {
@@ -294,6 +303,14 @@ SevSnpCreateAP (
       GuidHob     = GetFirstGuidHob (&gGhcbApicIdsGuid);
       GhcbApicIds = (GHCB_APIC_IDS *)(*(UINTN *)GET_GUID_HOB_DATA (GuidHob));
       MaxIndex    = MIN (GhcbApicIds->NumEntries, PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+
+      //
+      // Set to TRUE so that ApicId and SEV-SNP SaveArea stay in sync. When
+      // the InitFlag is ApInitConfig, the random order of AP initialization
+      // can end up with an Index / ApicId mismatch (see X64/AmdSev.nasm).
+      //
+      ExchangeInfo->SevSnpKnownInitApicId = TRUE;
+      DEBUG ((DEBUG_INFO, "SEV-SNP: Using known initial APIC IDs\n"));
     } else {
       //
       // APs have been previously started.
@@ -307,6 +324,13 @@ SevSnpCreateAP (
 
         if (CpuMpData->InitFlag == ApInitConfig) {
           ApicId = GhcbApicIds->ApicIds[Index];
+
+          //
+          // Set the ApicId values so that the proper AP data structure
+          // can be found during boot.
+          //
+          CpuInfoInHob[Index].InitialApicId = ApicId;
+          CpuInfoInHob[Index].ApicId        = ApicId;
 
           //
           // For the first boot, use the BSP register information.

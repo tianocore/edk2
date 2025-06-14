@@ -1104,6 +1104,27 @@ CopyDigestListToBuffer (
   );
 
 /**
+  Copy a buffer into a TPML_DIGEST_VALUES structure.
+
+  @param[in]     Buffer             Buffer to hold TPML_DIGEST_VALUES compact binary.
+  @param[in]     BufferSize         Size of Buffer.
+  @param[out]    DigestList         TPML_DIGEST_VALUES.
+
+  @retval EFI_SUCCESS               Buffer was succesfully copied to DigestList.
+  @retval EFI_BAD_BUFFER_SIZE       A bad buffer size passed to the function.
+  @retval EFI_INVALID_PARAMETER     An invalid parameter passed to the function: NULL pointer or
+                                    BufferSize bigger than TPML_DIGEST_VALUES.
+
+**/
+EFI_STATUS
+EFIAPI
+CopyBufferToDigestList (
+  IN CONST  VOID                *Buffer,
+  IN        UINTN               BufferSize,
+  OUT       TPML_DIGEST_VALUES  *DigestList
+  );
+
+/**
   Get TPML_DIGEST_VALUES data size.
 
   @param[in]     DigestList    TPML_DIGEST_VALUES data.
@@ -1114,6 +1135,19 @@ UINT32
 EFIAPI
 GetDigestListSize (
   IN TPML_DIGEST_VALUES  *DigestList
+  );
+
+/**
+  Get the total digest size from a hash algorithm mask.
+
+  @param[in]     HashAlgorithmMask.
+
+  @return Digest size in bytes.
+**/
+UINT32
+EFIAPI
+GetDigestListSizeFromHashAlgorithmMask (
+  IN UINT32  HashAlgorithmMask
   );
 
 /**

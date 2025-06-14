@@ -859,7 +859,7 @@ EFI_STATUS
 #define PEI_SERVICES_SIGNATURE  0x5652455320494550ULL
 ///
 /// Specification inconsistency here:
-/// In the PI1.0 specification, there is a typo error in PEI_SERVICES_REVISION. In the specification the defintion is
+/// In the PI1.0 specification, there is a typo error in PEI_SERVICES_REVISION. In the specification the definition is
 /// #define ((PEI_SPECIFICATION_MAJOR_REVISION<<16) |(PEI_SPECIFICATION_MINOR_REVISION))
 /// and it should be as follows:
 ///

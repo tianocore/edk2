@@ -33,49 +33,6 @@ BOOLEAN  gFfaSupported;
 UINT16   gPartId;
 
 /**
-  Convert EFI_GUID to UUID format.
-  for example, If there is EFI_GUID named
-  "378daedc-f06b-4446-8314-40ab933c87a3",
-
-  EFI_GUID is saved in memory like:
-     dc ae 8d 37
-     6b f0 46 44
-     83 14 40 ab
-     93 3c 87 a3
-
-  However, UUID should be saved like:
-     37 8d ae dc
-     f0 6b 44 46
-     83 14 40 ab
-     93 3c 87 a3
-
-  FF-A and other software components (i.e. linux-kernel)
-  uses below format.
-
-  @param [in] Guid            EFI_GUID
-  @param [out] Uuid           Uuid
-
-**/
-STATIC
-VOID
-EFIAPI
-ConvertEfiGuidToUuid (
-  IN   EFI_GUID  *Guid,
-  OUT  UINT64    *Uuid
-  )
-{
-  UINT32  *Data32;
-  UINT16  *Data16;
-
-  CopyGuid ((EFI_GUID *)Uuid, Guid);
-  Data32    = (UINT32 *)Uuid;
-  Data32[0] = SwapBytes32 (Data32[0]);
-  Data16    = (UINT16 *)&Data32[1];
-  Data16[0] = SwapBytes16 (Data16[0]);
-  Data16[1] = SwapBytes16 (Data16[1]);
-}
-
-/**
   Convert EFI_STATUS to FFA return code.
 
   @param [in] Status          edk2 status code.
@@ -525,7 +482,7 @@ ArmFfaLibPartitionInfoGet (
   }
 
   if (ServiceGuid != NULL) {
-    ConvertEfiGuidToUuid (ServiceGuid, Uuid);
+    ConvertGuidToUuid (ServiceGuid, (GUID *)Uuid);
   } else {
     ZeroMem (Uuid, sizeof (Uuid));
   }
@@ -689,7 +646,7 @@ ArmFfaLibMsgSendDirectReq2 (
   }
 
   if (ServiceGuid != NULL) {
-    ConvertEfiGuidToUuid (ServiceGuid, Uuid);
+    ConvertGuidToUuid (ServiceGuid, (GUID *)Uuid);
   } else {
     ZeroMem (Uuid, sizeof (Uuid));
   }
@@ -754,30 +711,11 @@ ArmFfaLibCommonInit (
   IN VOID
   )
 {
-  EFI_STATUS    Status;
-  UINT16        CurrentMajorVersion;
-  UINT16        CurrentMinorVersion;
-  ARM_FFA_ARGS  FfaArgs;
+  EFI_STATUS  Status;
+  UINT16      CurrentMajorVersion;
+  UINT16      CurrentMinorVersion;
 
   gFfaSupported = FALSE;
-
-  ZeroMem (&FfaArgs, sizeof (ARM_SMC_ARGS));
-  FfaArgs.Arg0 = SMCCC_VERSION;
-  ArmCallFfa (&FfaArgs);
-  if ((INT32)FfaArgs.Arg0 < 0) {
-    DEBUG ((DEBUG_ERROR, "%a: SMCCC_VERSION not supported\n", __func__));
-    return EFI_UNSUPPORTED;
-  }
-
-  // According to SMCCC Specification v1.6 G BET0
-  // Table F0-1: Changelog: Starting from SMCCC_VERSION v1.2, the interface
-  // - Permits calls to use R4–R7 as return register
-  // - Permits calls to use X4–X17 as return registers
-  // - Permits calls to use X8–X17 as argument registers
-  if ((INT32)FfaArgs.Arg0 < 0x10002) {
-    DEBUG ((DEBUG_ERROR, "%a: SMCCC_VERSION %x < 1.2\n", __func__, (UINT32)FfaArgs.Arg0));
-    return EFI_UNSUPPORTED;
-  }
 
   Status = ArmFfaLibGetVersion (
              ARM_FFA_MAJOR_VERSION,
@@ -786,6 +724,22 @@ ArmFfaLibCommonInit (
              &CurrentMinorVersion
              );
   if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if ((ARM_FFA_MAJOR_VERSION != CurrentMajorVersion) ||
+      (ARM_FFA_MINOR_VERSION > CurrentMinorVersion))
+  {
+    DEBUG ((
+      DEBUG_INFO,
+      "Incompatible FF-A Versions.\n" \
+      "Request Version: Major=0x%x, Minor=0x%x.\n" \
+      "Current Version: Major=0x%x, Minor>=0x%x.\n",
+      ARM_FFA_MAJOR_VERSION,
+      ARM_FFA_MINOR_VERSION,
+      CurrentMajorVersion,
+      CurrentMinorVersion
+      ));
     return EFI_UNSUPPORTED;
   }
 

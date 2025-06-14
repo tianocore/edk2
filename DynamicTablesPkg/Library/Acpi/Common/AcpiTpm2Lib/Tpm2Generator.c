@@ -33,6 +33,7 @@
 
 #define  START_METHOD_ACPI_PARAM_SIZE_MIN      4
 #define  START_METHOD_CRB_WITH_SMC_PARAM_SIZE  12
+#define  START_METHOD_CRB_WITH_FFA_PARM_SIZE   12
 
 /**
   ARM standard TPM2 Generator
@@ -102,7 +103,12 @@ AcpiTpm2CheckStartMethodParameters (
       }
 
       break;
+    case EFI_TPM2_ACPI_TABLE_START_METHOD_COMMAND_RESPONSE_BUFFER_INTERFACE_WITH_FFA:
+      if (TpmInfo->StartMethodParametersSize != START_METHOD_CRB_WITH_FFA_PARM_SIZE) {
+        return EFI_INVALID_PARAMETER;
+      }
 
+      break;
     case EFI_TPM2_ACPI_TABLE_START_METHOD_TIS:
     case EFI_TPM2_ACPI_TABLE_START_METHOD_COMMAND_RESPONSE_BUFFER_INTERFACE:
     case EFI_TPM2_ACPI_TABLE_START_METHOD_COMMAND_RESPONSE_BUFFER_INTERFACE_WITH_ACPI:
@@ -155,6 +161,7 @@ BuildTpm2Table (
   EFI_TPM2_ACPI_TABLE                 *Tpm2;
   UINT32                              *Laml;
   UINT64                              *Lasa;
+  UINT32                              MaxParameterSize;
 
   *Table = NULL;
 
@@ -179,6 +186,12 @@ BuildTpm2Table (
       This->AcpiTableRevision
       ));
     return EFI_INVALID_PARAMETER;
+  }
+
+  if (AcpiTableInfo->AcpiTableRevision == EFI_TPM2_ACPI_TABLE_REVISION_5) {
+    MaxParameterSize = EFI_TPM2_ACPI_TABLE_START_METHOD_SPECIFIC_PARAMETERS_MAX_SIZE_REVISION_5;
+  } else {
+    MaxParameterSize = EFI_TPM2_ACPI_TABLE_START_METHOD_SPECIFIC_PARAMETERS_MAX_SIZE_REVISION_4;
   }
 
   Status = GetEArchCommonObjTpm2InterfaceInfo (
@@ -216,7 +229,7 @@ BuildTpm2Table (
   } else {
     // If LAML and LASA are present, then StartMethodParameters field would get
     // max size regardless of StartMethod value
-    TableSize += EFI_TPM2_ACPI_TABLE_START_METHOD_SPECIFIC_PARAMETERS_MAX_SIZE_REVISION_4;
+    TableSize += MaxParameterSize;
     TableSize += sizeof (TpmInfo->Laml) + sizeof (TpmInfo->Lasa);
   }
 
@@ -262,8 +275,7 @@ BuildTpm2Table (
     );
 
   if (TpmInfo->Laml > 0) {
-    Laml = (UINT32 *)((UINT8 *)Tpm2 + sizeof (EFI_TPM2_ACPI_TABLE) +
-                      EFI_TPM2_ACPI_TABLE_START_METHOD_SPECIFIC_PARAMETERS_MAX_SIZE_REVISION_4);
+    Laml  = (UINT32 *)((UINT8 *)Tpm2 + sizeof (EFI_TPM2_ACPI_TABLE) + MaxParameterSize);
     Lasa  = (UINT64 *)((UINT8 *)Laml + sizeof (TpmInfo->Laml));
     *Laml = TpmInfo->Laml;
     *Lasa = TpmInfo->Lasa;
@@ -337,7 +349,7 @@ ACPI_TABLE_GENERATOR  Tpm2Generator = {
   // ACPI Table Signature
   EFI_ACPI_6_4_TRUSTED_COMPUTING_PLATFORM_2_TABLE_SIGNATURE,
   // ACPI Table Revision supported by this Generator
-  EFI_TPM2_ACPI_TABLE_REVISION_4,
+  EFI_TPM2_ACPI_TABLE_REVISION_5,
   // Minimum supported ACPI Table Revision
   EFI_TPM2_ACPI_TABLE_REVISION_4,
   // Creator ID

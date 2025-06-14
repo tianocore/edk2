@@ -255,30 +255,32 @@ MmDispatchFvs (
 
   ZeroMem (mMmFv, sizeof (mMmFv));
 
-  Index     = 0;
-  FvHob.Raw = GetHobList ();
-  while ((FvHob.Raw = GetNextHob (EFI_HOB_TYPE_FV, FvHob.Raw)) != NULL) {
+  Index = 0;
+  for ( FvHob.Raw = GetNextHob (EFI_HOB_TYPE_FV, GetHobList ())
+        ; FvHob.Raw != NULL
+        ; FvHob.Raw = GetNextHob (EFI_HOB_TYPE_FV, GET_NEXT_HOB (FvHob))
+        )
+  {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: FV[%d] address = 0x%x, size = 0x%x\n",
+      __func__,
+      Index,
+      FvHob.FirmwareVolume->BaseAddress,
+      FvHob.FirmwareVolume->Length
+      ));
+
+    if (FvHob.FirmwareVolume->Length == 0x00) {
+      DEBUG ((DEBUG_INFO, "%a: Skip zero-length FV.\n", __func__));
+      continue;
+    }
+
     if (Index == ARRAY_SIZE (mMmFv)) {
       DEBUG ((
         DEBUG_INFO,
-        "%a: The number of FV Hobs exceed the max supported FVs (%d) in StandaloneMmCore\n",
+        "%a: The number of FV Hobs exceeds the max supported FVs (%d) in StandaloneMmCore, skip it.\n",
         __func__,
         ARRAY_SIZE (mMmFv)
-        ));
-      return;
-    }
-
-    DEBUG ((DEBUG_INFO, "%a: FV[%d] address - 0x%x\n", __func__, Index, FvHob.FirmwareVolume->BaseAddress));
-    DEBUG ((DEBUG_INFO, "%a: FV[%d] size    - 0x%x\n", __func__, Index, FvHob.FirmwareVolume->Length));
-
-    if (FvHob.FirmwareVolume->Length == 0x00) {
-      DEBUG ((
-        DEBUG_INFO,
-        "%a: Skip invalid FV[%d]- 0x%x/0x%x\n",
-        __func__,
-        Index,
-        FvHob.FirmwareVolume->BaseAddress,
-        FvHob.FirmwareVolume->Length
         ));
       continue;
     }
@@ -286,28 +288,21 @@ MmDispatchFvs (
     if (!FixedPcdGetBool (PcdShadowBfv)) {
       Fv = (EFI_FIRMWARE_VOLUME_HEADER *)((UINTN)FvHob.FirmwareVolume->BaseAddress);
     } else {
-      Fv = AllocatePool (FvHob.FirmwareVolume->Length);
+      Fv = AllocateCopyPool (FvHob.FirmwareVolume->Length, (VOID *)(UINTN)FvHob.FirmwareVolume->BaseAddress);
+      ASSERT (Fv != NULL);
       if (Fv == NULL) {
-        DEBUG ((DEBUG_ERROR, "Fail to allocate memory for Fv\n"));
+        DEBUG ((DEBUG_ERROR, "%a: Fail to allocate MM memory for Fv!\n", __func__));
         CpuDeadLoop ();
-        return;
+        continue;
       }
-
-      CopyMem (
-        (VOID *)Fv,
-        (VOID *)(UINTN)FvHob.FirmwareVolume->BaseAddress,
-        FvHob.FirmwareVolume->Length
-        );
     }
 
     MmCoreFfsFindMmDriver (Fv, 0);
     mMmFv[Index++] = Fv;
-
-    FvHob.Raw = GET_NEXT_HOB (FvHob);
   }
 
   if (Index == 0) {
-    DEBUG ((DEBUG_ERROR, "No FV hob is found\n"));
+    DEBUG ((DEBUG_ERROR, "%a: No FV hob is found\n", __func__));
     return;
   }
 
