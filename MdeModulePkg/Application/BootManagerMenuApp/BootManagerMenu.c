@@ -1096,69 +1096,71 @@ BootManagerMenuEntry (
   // Initialize Boot menu data
   //
   Status = InitializeBootMenuData (BootOption, BootOptionCount, &BootMenuData);
-  //
-  // According to boot menu data to draw boot popup menu
-  //
-  DrawBootPopupMenu (&BootMenuData);
+  if (!EFI_ERROR (Status)) {
+    //
+    // According to boot menu data to draw boot popup menu
+    //
+    DrawBootPopupMenu (&BootMenuData);
 
-  //
-  // check user input to determine want to re-draw or boot from user selected item
-  //
-  ExitApplication = FALSE;
-  while (!ExitApplication) {
-    gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &Index);
-    Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-    if (!EFI_ERROR (Status)) {
-      switch (Key.UnicodeChar) {
-        case CHAR_NULL:
-          switch (Key.ScanCode) {
-            case SCAN_UP:
-              SelectItem = BootMenuData.SelectItem == 0 ? BootMenuData.ItemCount - 1 : BootMenuData.SelectItem - 1;
-              BootMenuSelectItem (SelectItem, &BootMenuData);
-              break;
+    //
+    // check user input to determine want to re-draw or boot from user selected item
+    //
+    ExitApplication = FALSE;
+    while (!ExitApplication) {
+      gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &Index);
+      Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+      if (!EFI_ERROR (Status)) {
+        switch (Key.UnicodeChar) {
+          case CHAR_NULL:
+            switch (Key.ScanCode) {
+              case SCAN_UP:
+                SelectItem = BootMenuData.SelectItem == 0 ? BootMenuData.ItemCount - 1 : BootMenuData.SelectItem - 1;
+                BootMenuSelectItem (SelectItem, &BootMenuData);
+                break;
 
-            case SCAN_DOWN:
-              SelectItem = BootMenuData.SelectItem == BootMenuData.ItemCount - 1 ? 0 : BootMenuData.SelectItem + 1;
-              BootMenuSelectItem (SelectItem, &BootMenuData);
-              break;
+              case SCAN_DOWN:
+                SelectItem = BootMenuData.SelectItem == BootMenuData.ItemCount - 1 ? 0 : BootMenuData.SelectItem + 1;
+                BootMenuSelectItem (SelectItem, &BootMenuData);
+                break;
 
-            case SCAN_ESC:
-              gST->ConOut->ClearScreen (gST->ConOut);
-              ExitApplication = TRUE;
-              //
-              // Set boot resolution for normal boot
-              //
-              BdsSetConsoleMode (FALSE);
-              break;
+              case SCAN_ESC:
+                gST->ConOut->ClearScreen (gST->ConOut);
+                ExitApplication = TRUE;
+                //
+                // Set boot resolution for normal boot
+                //
+                BdsSetConsoleMode (FALSE);
+                break;
 
-            default:
-              break;
-          }
+              default:
+                break;
+            }
 
-          break;
+            break;
 
-        case CHAR_CARRIAGE_RETURN:
-          gST->ConOut->ClearScreen (gST->ConOut);
-          //
-          // Set boot resolution for normal boot
-          //
-          BdsSetConsoleMode (FALSE);
-          BootFromSelectOption (BootOption, BootOptionCount, BootMenuData.SelectItem);
-          //
-          // Back to boot manager menu again, set back to setup resolution
-          //
-          BdsSetConsoleMode (TRUE);
-          DrawBootPopupMenu (&BootMenuData);
-          break;
+          case CHAR_CARRIAGE_RETURN:
+            gST->ConOut->ClearScreen (gST->ConOut);
+            //
+            // Set boot resolution for normal boot
+            //
+            BdsSetConsoleMode (FALSE);
+            BootFromSelectOption (BootOption, BootOptionCount, BootMenuData.SelectItem);
+            //
+            // Back to boot manager menu again, set back to setup resolution
+            //
+            BdsSetConsoleMode (TRUE);
+            DrawBootPopupMenu (&BootMenuData);
+            break;
 
-        default:
-          break;
+          default:
+            break;
+        }
       }
     }
-  }
 
-  EfiBootManagerFreeLoadOptions (BootOption, BootOptionCount);
-  FreePool (BootMenuData.PtrTokens);
+    EfiBootManagerFreeLoadOptions (BootOption, BootOptionCount);
+    FreePool (BootMenuData.PtrTokens);
+  }
 
   HiiRemovePackages (gStringPackHandle);
 
