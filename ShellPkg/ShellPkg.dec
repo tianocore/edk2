@@ -109,10 +109,6 @@
   gEfiShellPkgTokenSpaceGuid.PcdShellMaxHistoryCommandCount|0x0020|UINT16|0x00000014
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
-  ## This flag is used to control the protocols produced by the shell
-  #  If TRUE the shell will produce EFI_SHELL_ENVIRONMENT2 and EFI_SHELL_INTERFACE
-  gEfiShellPkgTokenSpaceGuid.PcdShellSupportOldProtocols|FALSE|BOOLEAN|0x00000002
-
   ## this flag determines whether Page Break (-b) defaults to on or off in the shell
   gEfiShellPkgTokenSpaceGuid.PcdShellPageBreakDefault|FALSE|BOOLEAN|0x00000006
 
