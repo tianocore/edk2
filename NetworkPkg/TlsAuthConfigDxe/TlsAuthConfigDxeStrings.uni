@@ -1,5 +1,5 @@
 /** @file
-  String definitions for Tls Authentication Configuration form.
+  String definitions for TLS Authentication Configuration form.
 
 Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -8,8 +8,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #langdef en-US "English"
 
-#string STR_TLS_AUTH_CONFIG_TITLE                    #language en-US "Tls Auth Configuration"
-#string STR_TLS_AUTH_CONFIG_HELP                     #language en-US "Press <Enter> to select Tls Auth Configuration."
+#string STR_TLS_AUTH_CONFIG_TITLE                    #language en-US "TLS Auth Configuration"
+#string STR_TLS_AUTH_CONFIG_HELP                     #language en-US "Press <Enter> to select TLS Auth Configuration."
 
 #string STR_TLS_AUTH_CONFIG_SERVER_CA              #language en-US "Server CA Configuration"
 #string STR_TLS_AUTH_CONFIG_SERVER_CA_HELP         #language en-US "Press <Enter> to configure Server CA."
