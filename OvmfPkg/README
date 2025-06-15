@@ -288,7 +288,7 @@ and encrypted connection.
   connections will be accepted.
 
 * By default, there is no trusted certificate. The user has to import the
-  certificates either manually with "Tls Auth Configuration" utility in the
+  certificates either manually with "TLS Auth Configuration" utility in the
   firmware UI or through the fw_cfg entry, etc/edk2/https/cacerts.
 
   -fw_cfg name=etc/edk2/https/cacerts,file=<certdb>
