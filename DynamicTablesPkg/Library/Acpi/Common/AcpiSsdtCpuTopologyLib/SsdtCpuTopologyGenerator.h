@@ -41,9 +41,11 @@
           (EFI_ACPI_6_3_PPTT_PROCESSOR_ID_INVALID << 1) |                     \
           (EFI_ACPI_6_3_PPTT_NODE_IS_NOT_LEAF << 3))
 
-// Leaf nodes specific mask.
-#define PPTT_LEAF_MASK  ((EFI_ACPI_6_3_PPTT_PROCESSOR_ID_VALID << 1) |        \
-                         (EFI_ACPI_6_3_PPTT_NODE_IS_LEAF << 3))
+// Mask for the VALID flag.
+#define PPTT_VALID_FLAG_MASK  (EFI_ACPI_6_3_PPTT_PROCESSOR_ID_VALID << 1)
+
+// Mask for the LEAF flag.
+#define PPTT_LEAF_FLAG_MASK  (EFI_ACPI_6_3_PPTT_NODE_IS_LEAF << 3)
 
 /** LPI states are stored in the ASL namespace at '\_SB_.Lxxx',
     with xxx being the node index of the LPI state.

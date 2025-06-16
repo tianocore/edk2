@@ -2,6 +2,7 @@
   BrotliCompress Compress/Decompress tool (BrotliCompress)
 
   Copyright (c) 2020, ByoSoft Corporation. All rights reserved.<BR>
+  Copyright (c) 2025, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -52,12 +53,14 @@ static FILE* ms_fopen(const char* FileName, const char* Mode) {
   return Result;
 }
 
+#if !defined(__MINGW32__)
 static int ms_open(const char* FileName, int Oflag, int Pmode) {
   int Result;
   Result = -1;
   _sopen_s(&Result, FileName, Oflag | O_BINARY, _SH_DENYNO, Pmode);
   return Result;
 }
+#endif
 #endif  /* WIN32 */
 
 

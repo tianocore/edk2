@@ -3,7 +3,7 @@
 # Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
-# In *inux environment, the build tools's source is required and need to be compiled
+# In Unix-like environment, the build tools's source is required and need to be compiled
 # firstly, please reference https://github.com/tianocore/tianocore.github.io/wiki/SourceForge-to-Github-Quick-Start
 # to get how to setup build tool.
 #
