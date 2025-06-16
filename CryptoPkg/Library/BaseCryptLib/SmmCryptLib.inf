@@ -94,6 +94,7 @@
   PrintLib
   MmServicesTableLib
   SynchronizationLib
+  RngLib
 
 #
 # Remove these [BuildOptions] after this library is cleaned up

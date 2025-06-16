@@ -9,11 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "InternalCryptLib.h"
 #include <openssl/rand.h>
 #include <openssl/evp.h>
-
-//
-// Default seed for UEFI Crypto Library
-//
-CONST UINT8  DefaultSeed[] = "UEFI Crypto Library default seed";
+#include <Library/RngLib.h>
 
 /**
   Sets up the seed value for the pseudorandom number generator.
@@ -38,6 +34,8 @@ RandomSeed (
   IN  UINTN         SeedSize
   )
 {
+  UINT32  RandomNumber;
+
   if (SeedSize > INT_MAX) {
     return FALSE;
   }
@@ -49,7 +47,11 @@ RandomSeed (
   if (Seed != NULL) {
     RAND_seed (Seed, (UINT32)SeedSize);
   } else {
-    RAND_seed (DefaultSeed, sizeof (DefaultSeed));
+    if (!GetRandomNumber32 (&RandomNumber)) {
+      return FALSE;
+    }
+
+    RAND_seed (&RandomNumber, sizeof (RandomNumber));
   }
 
   if (RAND_status () == 1) {
