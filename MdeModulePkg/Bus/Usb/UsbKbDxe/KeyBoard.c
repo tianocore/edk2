@@ -1840,7 +1840,7 @@ Dequeue (
   }
 
   CopyMem (Item, Queue->Buffer[Queue->Head], ItemSize);
-
+  ZeroMem (Queue->Buffer[Queue->Head], ItemSize);
   //
   // Adjust the head pointer of the FIFO keyboard buffer.
   //
