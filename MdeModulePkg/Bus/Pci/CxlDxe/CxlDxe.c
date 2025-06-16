@@ -5,6 +5,7 @@
   supports Get Fw Info
   Sending/Receiving FMP commands
   Set Fw Image, Activate Fw image
+  SetPkgInfo, GetPkgInfo, CheckImg
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -244,7 +245,7 @@ CxlMemGetFwInfo (
   Private->MemdevState.FwState.FwRevisionSlot2 = AllocateZeroPool (CXL_FW_REVISION_LENGTH_IN_BYTES + 1);
   Private->MemdevState.FwState.FwRevisionSlot3 = AllocateZeroPool (CXL_FW_REVISION_LENGTH_IN_BYTES + 1);
   Private->MemdevState.FwState.FwRevisionSlot4 = AllocateZeroPool (CXL_FW_REVISION_LENGTH_IN_BYTES + 1);
-  if ((Private->MemdevState.FwState.FwRevisionSlot1 == NULL)
+  if (  (Private->MemdevState.FwState.FwRevisionSlot1 == NULL)
      || (Private->MemdevState.FwState.FwRevisionSlot2 == NULL)
      || (Private->MemdevState.FwState.FwRevisionSlot3 == NULL)
      || (Private->MemdevState.FwState.FwRevisionSlot4 == NULL))
@@ -1562,18 +1563,18 @@ CxlDriverBindingStart (
 EXIT:
 
   gBS->CloseProtocol (
-                      Controller,
-                      &gEfiPciIoProtocolGuid,
-                      This->DriverBindingHandle,
-                      Controller
-                      );
+         Controller,
+         &gEfiPciIoProtocolGuid,
+         This->DriverBindingHandle,
+         Controller
+         );
 
   gBS->CloseProtocol (
-                      Controller,
-                      &gEfiDevicePathProtocolGuid,
-                      This->DriverBindingHandle,
-                      Controller
-                      );
+         Controller,
+         &gEfiDevicePathProtocolGuid,
+         This->DriverBindingHandle,
+         Controller
+         );
 
   DEBUG ((EFI_D_INFO, "[%a]: [CXL-%08X] Completed status = %r\n", __func__, Controller, Status));
   return Status;

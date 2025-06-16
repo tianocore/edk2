@@ -238,6 +238,146 @@ CxlFirmwareMgmtSetImage (
   return Status;
 }
 
+/**
+  Checks if the firmware image is valid for the device.
+
+  This function allows firmware update application to validate the firmware image without
+  invoking the SetImage() first.
+
+  @param[in]  This               A pointer to the EFI_FIRMWARE_MANAGEMENT_PROTOCOL instance.
+  @param[in]  ImageIndex         A unique number identifying the firmware image(s) within the device.
+                                 The number is between 1 and DescriptorCount.
+  @param[in]  Image              Points to the new image.
+  @param[in]  ImageSize          Size of the new image in bytes.
+  @param[out] ImageUpdatable     Indicates if the new image is valid for update. It also provides,
+                                 if available, additional information if the image is invalid.
+
+  @retval EFI_UNSUPPORTED        The operation is not supported.
+
+**/
+EFI_STATUS
+EFIAPI
+CxlFirmwareMgmtCheckImage (
+  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *This,
+  IN  UINT8                             ImageIndex,
+  IN  CONST VOID                        *Image,
+  IN  UINTN                             ImageSize,
+  OUT UINT32                            *ImageUpdatable
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+/**
+  Returns information about the firmware package.
+
+  This function returns package information.
+
+  @param[in]  This                     A pointer to the EFI_FIRMWARE_MANAGEMENT_PROTOCOL instance.
+  @param[out] PackageVersion           A version number that represents all the firmware images in the device.
+                                       The format is vendor specific and new version must have a greater value
+                                       than the old version. If PackageVersion is not supported, the value is
+                                       0xFFFFFFFF. A value of 0xFFFFFFFE indicates that package version
+                                       comparison is to be performed using PackageVersionName. A value of
+                                       0xFFFFFFFD indicates that package version update is in progress.
+  @param[out] PackageVersionName       A pointer to a pointer to a null-terminated string representing
+                                       the package version name. The buffer is allocated by this function with
+                                       AllocatePool(), and it is the caller's responsibility to free it with a
+                                       call to FreePool().
+  @param[out] PackageVersionNameMaxLen The maximum length of package version name if device supports update of
+                                       package version name. A value of 0 indicates the device does not support
+                                       update of package version name. Length is the number of Unicode characters,
+                                       including the terminating null character.
+  @param[out] AttributesSupported      Package attributes that are supported by this device. See 'Package Attribute
+                                       Definitions' for possible returned values of this parameter. A value of 1
+                                       indicates the attribute is supported and the current setting value is
+                                       indicated in AttributesSetting. A value of 0 indicates the attribute is not
+                                       supported and the current setting value in AttributesSetting is meaningless.
+  @param[out] AttributesSetting        Package attributes. See 'Package Attribute Definitions' for possible returned
+                                       values of this parameter
+
+  @retval EFI_SUCCESS                  The package information was successfully returned.
+  @retval EFI_UNSUPPORTED              The operation is not supported.
+
+**/
+EFI_STATUS
+EFIAPI
+CxlFirmwareMgmtGetPackageInfo (
+  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *This,
+  OUT UINT32                            *PackageVersion,
+  OUT CHAR16                            **PackageVersionName,
+  OUT UINT32                            *PackageVersionNameMaxLen,
+  OUT UINT64                            *AttributesSupported,
+  OUT UINT64                            *AttributesSetting
+  )
+{
+  DEBUG ((EFI_D_INFO, "CxlFirmwareMgmtGetPackageInfo: Entering CxlFirmwareMgmtGetPackageInfo...\n"));
+  CXL_CONTROLLER_PRIVATE_DATA  *Private;
+
+  Private = CXL_CONTROLLER_PRIVATE_FROM_FIRMWARE_MGMT (This);
+
+  if (Private->PackageVersionName != NULL) {
+    StrCpyS (*PackageVersionName, CXL_STRING_BUFFER_WIDTH, Private->PackageVersionName);
+  }
+
+  *PackageVersion      = Private->PackageVersion;
+  *AttributesSupported = Private->SlotInfo.FwImageDescriptor[0].AttributesSupported;
+  *AttributesSetting   = Private->SlotInfo.FwImageDescriptor[0].AttributesSetting;
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Updates information about the firmware package.
+
+  This function updates package information.
+  This function returns EFI_UNSUPPORTED if the package information is not updatable.
+  VendorCode enables vendor to implement vendor-specific package information update policy.
+  Null if the caller did not specify this policy or use the default policy.
+
+  @param[in]  This               A pointer to the EFI_FIRMWARE_MANAGEMENT_PROTOCOL instance.
+  @param[in]  Image              Points to the authentication image.
+                                 Null if authentication is not required.
+  @param[in]  ImageSize          Size of the authentication image in bytes.
+                                 0 if authentication is not required.
+  @param[in]  VendorCode         This enables vendor to implement vendor-specific firmware
+                                 image update policy.
+                                 Null indicates the caller did not specify this policy or use
+                                 the default policy.
+  @param[in]  PackageVersion     The new package version.
+  @param[in]  PackageVersionName A pointer to the new null-terminated Unicode string representing
+                                 the package version name.
+                                 The string length is equal to or less than the value returned in
+                                 PackageVersionNameMaxLen.
+
+  @retval EFI_SUCCESS            The device was successfully updated with the new package
+                                 information.
+  @retval EFI_INVALID_PARAMETER  The PackageVersionName length is longer than the value
+                                 returned in PackageVersionNameMaxLen.
+  @retval EFI_UNSUPPORTED        The operation is not supported.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
+
+**/
+EFI_STATUS
+EFIAPI
+CxlFirmwareMgmtSetPackageInfo (
+  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *This,
+  IN  CONST VOID                        *Image,
+  IN  UINTN                             ImageSize,
+  IN  CONST VOID                        *VendorCode,
+  IN  UINT32                            PackageVersion,
+  IN  CONST CHAR16                      *PackageVersionName
+  )
+{
+  DEBUG ((EFI_D_INFO, "CxlFirmwareMgmtSetPackageInfo: Entering CxlFirmwareMgmtSetPackageInfo...\n"));
+  CXL_CONTROLLER_PRIVATE_DATA  *Private;
+
+  Private = CXL_CONTROLLER_PRIVATE_FROM_FIRMWARE_MGMT (This);
+  StrCpyS (Private->PackageVersionName, CXL_STRING_BUFFER_WIDTH, PackageVersionName);
+  Private->PackageVersion = PackageVersion;
+  return EFI_SUCCESS;
+}
+
 //
 // Template of the private context structure for the Firmware Management Protocol instance
 //
@@ -245,6 +385,9 @@ GLOBAL_REMOVE_IF_UNREFERENCED
 EFI_FIRMWARE_MANAGEMENT_PROTOCOL  gCxlFirmwareManagement = {
   CxlFirmwareMgmtGetImageInfo,
   CxlFirmwareMgmtGetImage,
-  CxlFirmwareMgmtSetImage
+  CxlFirmwareMgmtSetImage,
+  CxlFirmwareMgmtCheckImage,
+  CxlFirmwareMgmtGetPackageInfo,
+  CxlFirmwareMgmtSetPackageInfo
 };
 

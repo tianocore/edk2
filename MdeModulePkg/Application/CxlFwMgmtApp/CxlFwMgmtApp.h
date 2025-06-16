@@ -36,6 +36,7 @@
 #define CXL_FW_IMAGE_DESCRIPTOR_COUNT          5
 #define CXL_FW_MAX_SLOTS                       5
 #define CXL_STRING_BUFFER_WIDTH                256
+#define CXL_PACKAGE_VERSION_NAME_APP           L"CXL Firmware Package Name Application"
 #define CXL_FW_SIZE                            32768   /* 32 mb */
 #define CXL_FW_REVISION_LENGTH_IN_BYTES        16
 
@@ -54,7 +55,10 @@ typedef enum {
   OpTypeListDevice,
   OpTypeFmpGetImgInfo,
   OpTypeGetImage,
+  OpTypeSetPkgInfo,
   OpTypeFmpSetImg,
+  OpTypeFmpCheckImg,
+  OpTypeFmpGetPkgInfo,
   OpTypeFmpMax
 } CXL_FMP_OPERATION_TYPE;
 
