@@ -187,5 +187,4 @@ PciUefiMemWriteNBits (
   UINT32                       Size
   );
 
-#endif // _EFI_CXLDXE_H_
-
+#endif // _EFI_CXLDXE_UTILS_H_

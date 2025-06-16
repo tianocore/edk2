@@ -92,7 +92,7 @@ GetFieldValues (
 {
   UINT32  Position = StartingBit - EndingBit + 1;     // Num of bits
 
-  RegisterValue = RegisterValue >> EndingBit;         // Right shift to make P2 position as 0 bit position
+  // RegisterValue = RegisterValue >> EndingBit;         // Right shift to make P2 position as 0 bit position
   UINT64  Mask             = (1 << Position) - 1;     // Crate mask
   UINT64  LastPositionBits = RegisterValue & Mask;
 
@@ -428,4 +428,3 @@ PciUefiMemWriteNBits (
 
   return Status;
 }
-
