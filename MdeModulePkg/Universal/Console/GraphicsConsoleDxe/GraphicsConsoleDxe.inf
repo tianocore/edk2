@@ -2,7 +2,7 @@
 #  Console support on graphic devices.
 #
 #  This driver will install Simple Text Output protocol by consuming Graphices Output
-#  protocol or UGA Draw protocol on graphic devices.
+#  protocol on graphic devices.
 #
 #  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -53,14 +53,10 @@
   gEfiDevicePathProtocolGuid                    ## TO_START
   gEfiSimpleTextOutProtocolGuid                 ## BY_START
   gEfiGraphicsOutputProtocolGuid                ## TO_START
-  gEfiUgaDrawProtocolGuid                       ## TO_START
   gEfiHiiFontProtocolGuid                       ## TO_START
   ## TO_START
   ## NOTIFY
   gEfiHiiDatabaseProtocolGuid
-
-[FeaturePcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport ## CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution ## SOMETIMES_CONSUMES
