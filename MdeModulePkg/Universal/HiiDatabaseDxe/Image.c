@@ -1407,7 +1407,7 @@ HiiDrawImage (
     //
     if ((Flags & EFI_HII_DIRECT_TO_SCREEN) == EFI_HII_DIRECT_TO_SCREEN) {
       //
-      // Caller should make sure the current UGA console is grarphic mode.
+      // Caller should make sure the current console is grarphic mode.
       //
 
       //
