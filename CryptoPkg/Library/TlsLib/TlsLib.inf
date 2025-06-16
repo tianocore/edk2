@@ -42,3 +42,7 @@
   MemoryAllocationLib
   OpensslLib
   SafeIntLib
+
+[Pcd]
+  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslTlsSecurityLevel    ## CONSUMES
+
