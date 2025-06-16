@@ -7,6 +7,7 @@
 #define _EFI_CXLDXE_H_
 
 #include <Protocol/PciIo.h>
+#include <Protocol/FirmwareManagement.h>
 #include <IndustryStandard/Pci.h>
 #include <IndustryStandard/Cxl20.h>
 #include <Library/BaseLib.h>
@@ -32,14 +33,30 @@
 #define CXL_DEV_CAP_ARRAY_OFFSET  0x0
 #define CXL_DEV_CAP_ARRAY_CAP_ID  0
 #define CXL_BIT(nr)  ((UINT32)1 << nr)
-#define CXL_DEV_MBOX_CTRL_DOORBELL  CXL_BIT(0)
-#define CXL_SZ_1M                   0x00100000
-#define CXL_BITS_PER_LONG           32
-#define CXL_UL                      (UINTN)
+#define CXL_DEV_MBOX_CTRL_DOORBELL       CXL_BIT(0)
+#define CXL_SZ_1M                        0x00100000
+#define CXL_STRING_BUFFER_WIDTH          256
+#define CXL_FW_IMAGE_ID                  1
+#define CXL_FW_VERSION                   1
+#define CXL_PACKAGE_VERSION_FFFFFFFE     0xFFFFFFFE
+#define CXL_FIRMWARE_IMAGE_ID_NAME       L"CXL Firmware Version 1.0"
+#define CXL_PACKAGE_VERSION_NAME         L"CXL Firmware Package Version Name UEFI Driver"
+#define CXL_FW_SIZE                      32768            /* 32 mb */
+#define CXL_BITS_PER_LONG                32
+#define CXL_UL                           (UINTN)
+#define CXL_QEMU                         1
+#define CXL_FW_REVISION_LENGTH_IN_BYTES  16
 
 #define CXL_GENMASK(h, l) \
   (((~CXL_UL(0)) - (CXL_UL(1) << (l)) + 1) & \
     (~CXL_UL(0) >> (CXL_BITS_PER_LONG - 1 - (h))))
+
+#define CXL_CONTROLLER_PRIVATE_FROM_FIRMWARE_MGMT(a) \
+  CR (a, \
+      CXL_CONTROLLER_PRIVATE_DATA, \
+      FirmwareMgmt, \
+      CXL_CONTROLLER_PRIVATE_DATA_SIGNATURE \
+      )
 
 //
 // CXL Memory Device Register information
@@ -52,34 +69,73 @@ typedef struct {
 } CXL_REGISTER_MAP;
 
 //
+// CXL Memory Device Firmware slot information
+//
+typedef struct {
+  UINT8                            NumberOfSlots;
+  UINTN                            ImageFileSize[CXL_FW_MAX_SLOTS];
+  CHAR16                           *ImageFileBuffer[CXL_FW_MAX_SLOTS];
+  BOOLEAN                          IsSetImageDone[CXL_FW_MAX_SLOTS];
+  CHAR16                           *FirmwareVersion[CXL_FW_MAX_SLOTS];
+  EFI_FIRMWARE_IMAGE_DESCRIPTOR    FwImageDescriptor[CXL_FW_IMAGE_DESCRIPTOR_COUNT];
+} CXL_SLOT_INFO;
+
+//
+// CXL Memory Device Firmware state
+//
+typedef struct {
+  UINT32     State;
+  BOOLEAN    OneShot;
+  UINT8      NumberOfSlots;
+  UINT8      CurrentSlot;
+  UINT8      NextSlot;
+  UINT8      FwActivationCap;
+  CHAR16     *FwRevisionSlot1;
+  CHAR16     *FwRevisionSlot2;
+  CHAR16     *FwRevisionSlot3;
+  CHAR16     *FwRevisionSlot4;
+} CXL_FW_STATE;
+
+//
 // CXL Memory Device Registers state
 //
 typedef struct {
-  UINT32    PayloadSize;
+  UINT32          PayloadSize;
+  CXL_FW_STATE    FwState;
 } CXL_MEMDEV_STATE;
 
 //
 // CXL device private data structure
 //
 typedef struct {
-  UINT32                      Signature;
-  EFI_HANDLE                  ControllerHandle;
-  EFI_HANDLE                  ImageHandle;
-  EFI_HANDLE                  DriverBindingHandle;
-  EFI_PCI_IO_PROTOCOL         *PciIo;
-  EFI_DEVICE_PATH_PROTOCOL    *ParentDevicePath;
+  UINT32                              Signature;
+  EFI_HANDLE                          ControllerHandle;
+  EFI_HANDLE                          ImageHandle;
+  EFI_HANDLE                          DriverBindingHandle;
+  EFI_PCI_IO_PROTOCOL                 *PciIo;
+  EFI_DEVICE_PATH_PROTOCOL            *ParentDevicePath;
 
   // MailBox Register
-  CXL_REGISTER_MAP            RegisterMap;
-  CXL_MEMDEV_STATE            MemdevState;
-  CXL_MBOX_CMD                MailboxCmd;
+  CXL_REGISTER_MAP                    RegisterMap;
+  CXL_MEMDEV_STATE                    MemdevState;
+  CXL_MBOX_CMD                        MailboxCmd;
+
+  // Image Info
+  CXL_SLOT_INFO                       SlotInfo;
 
   // BDF Value
-  UINTN                       Seg;
-  UINTN                       Bus;
-  UINTN                       Device;
-  UINTN                       Function;
+  UINTN                               Seg;
+  UINTN                               Bus;
+  UINTN                               Device;
+  UINTN                               Function;
+  UINT32                              PackageVersion;
+  CHAR16                              *PackageVersionName;
+
+  // Produced protocols
+  EFI_FIRMWARE_MANAGEMENT_PROTOCOL    FirmwareMgmt;
 } CXL_CONTROLLER_PRIVATE_DATA;
+
+extern EFI_FIRMWARE_MANAGEMENT_PROTOCOL  gCxlFirmwareManagement;
 
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
@@ -344,6 +400,20 @@ CxlDriverBindingStop (
   IN EFI_HANDLE                   Controller,
   IN  UINTN                       NumberOfChildren,
   IN  EFI_HANDLE                  *ChildHandleBuffer
+  );
+
+/**
+  Retrieve information about the device FW (Opcode 0200h)
+
+  @param  Private                The pointer to the CXL_CONTROLLER_PRIVATE_DATA data structure.
+
+  @retval Status                 Possible Command Return Codes Success, Unsupported, Internal Error,
+                                 Retry Required, Invalid Payload Length
+
+**/
+EFI_STATUS
+CxlMemGetFwInfo (
+  CXL_CONTROLLER_PRIVATE_DATA  *Private
   );
 
 /**

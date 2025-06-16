@@ -55,6 +55,50 @@ GetFieldValues (
 }
 
 /**
+  Initialize Firmware Image Descriptor with default values, which were to be updated in later function calls
+
+  @param  Private                The pointer to the CXL_CONTROLLER_PRIVATE_DATA data structure.
+
+  @retval void                   No value is returned
+
+  **/
+void
+InitializeFwImageDescriptor (
+  CXL_CONTROLLER_PRIVATE_DATA  *Private
+  )
+{
+  for (UINT8 Index = 0; Index < Private->SlotInfo.NumberOfSlots; Index++) {
+    Private->SlotInfo.FwImageDescriptor[Index].ImageIndex  = Index;   /* This should start from 1 */
+    Private->SlotInfo.FwImageDescriptor[Index].ImageId     = CXL_FW_IMAGE_ID;
+    Private->SlotInfo.FwImageDescriptor[Index].ImageIdName = CXL_FIRMWARE_IMAGE_ID_NAME;
+    Private->SlotInfo.FwImageDescriptor[Index].Version     = CXL_FW_VERSION;
+
+    if (Private->SlotInfo.FirmwareVersion[Index][0] != '\0') {
+      Private->SlotInfo.FwImageDescriptor[Index].VersionName = AllocateZeroPool (CXL_FW_REVISION_LENGTH_IN_BYTES);
+      if (Private->SlotInfo.FwImageDescriptor[Index].VersionName == NULL) {
+        DEBUG ((EFI_D_ERROR, "InitializeFwImageDescriptor: AllocateZeroPool failed!\n"));
+        return;
+      }
+
+      StrnCpyS (
+        Private->SlotInfo.FwImageDescriptor[Index].VersionName,
+        CXL_FW_REVISION_LENGTH_IN_BYTES + 1,
+        Private->SlotInfo.FirmwareVersion[Index],
+        StrLen (Private->SlotInfo.FirmwareVersion[Index])
+        );
+    }
+
+    Private->SlotInfo.FwImageDescriptor[Index].Size                        = Private->SlotInfo.ImageFileSize[Index];
+    Private->SlotInfo.FwImageDescriptor[Index].AttributesSupported         = 1;
+    Private->SlotInfo.FwImageDescriptor[Index].AttributesSetting           = IMAGE_ATTRIBUTE_IMAGE_UPDATABLE | IMAGE_ATTRIBUTE_RESET_REQUIRED;
+    Private->SlotInfo.FwImageDescriptor[Index].Compatibilities             = IMAGE_COMPATIBILITY_CHECK_SUPPORTED;
+    Private->SlotInfo.FwImageDescriptor[Index].LowestSupportedImageVersion = 0;
+    Private->SlotInfo.FwImageDescriptor[Index].LastAttemptVersion          = 0;
+    Private->SlotInfo.FwImageDescriptor[Index].LastAttemptStatus           = EFI_SUCCESS;
+  }
+}
+
+/**
   Reads EFI PCI i/o protocol values
 
   @param  Private                The pointer to the CXL_CONTROLLER_PRIVATE_DATA data structure.

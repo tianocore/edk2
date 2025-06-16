@@ -43,6 +43,19 @@ GetFieldValues (
   );
 
 /**
+  Initialize Firmware Image Descriptor with default values, which were to be updated in later function calls
+
+  @param  Private                The pointer to the CXL_CONTROLLER_PRIVATE_DATA data structure.
+
+  @retval void                   No value is returned
+
+  **/
+void
+InitializeFwImageDescriptor (
+  CXL_CONTROLLER_PRIVATE_DATA  *Private
+  );
+
+/**
   Reads EFI PCI i/o protocol values
 
   @param  Private                The pointer to the CXL_CONTROLLER_PRIVATE_DATA data structure.
