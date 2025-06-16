@@ -417,6 +417,40 @@ CxlMemGetFwInfo (
   );
 
 /**
+  Transfer all or part of a FW package from the caller to the device (Opcode 0201h)
+
+  @param  Private                The pointer to the CXL_CONTROLLER_PRIVATE_DATA data structure.
+
+  @retval Status                 Possible Command Return Codes Success, Unsupported, Internal Error,
+                                 Retry Required, Invalid Payload Length
+
+**/
+EFI_STATUS
+CxlMemTransferFw (
+  CXL_CONTROLLER_PRIVATE_DATA  *Private,
+  UINT8                        NextSlot,
+  const UINT8                  *Data,
+  UINT32                       Offset,
+  UINT32                       Size,
+  UINT32                       *Written
+  );
+
+/**
+  Activate FW command make a FW previously stored on the device with the Transfer FW command as active FW
+  (Opcode 0202h)
+
+  @param  Private                The pointer to the CXL_CONTROLLER_PRIVATE_DATA data structure.
+
+  @retval Status                 Possible Command Return Codes Success, Unsupported, Internal Error,
+                                 Retry Required, Invalid Payload Length
+
+**/
+EFI_STATUS
+CxlMemActivateFw (
+  CXL_CONTROLLER_PRIVATE_DATA  *Private
+  );
+
+/**
   Issue a command to the device using mailbox registers
 
   @param[in] Private                  The pointer to the CXL_CONTROLLER_PRIVATE_DATA data structure.

@@ -52,6 +52,9 @@
 typedef enum {
   OpTypeDisplayHelp,
   OpTypeListDevice,
+  OpTypeFmpGetImgInfo,
+  OpTypeGetImage,
+  OpTypeFmpSetImg,
   OpTypeFmpMax
 } CXL_FMP_OPERATION_TYPE;
 

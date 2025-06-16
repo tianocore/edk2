@@ -4,6 +4,7 @@
   uefi driver name is added
   supports Get Fw Info
   Sending/Receiving FMP commands
+  Set Fw Image, Activate Fw image
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -286,6 +287,217 @@ CxlMemGetFwInfo (
   DEBUG ((EFI_D_INFO, "CxlMemGetFwInfo: FW Version Slot 4 = %a\n", Private->MemdevState.FwState.FwRevisionSlot4));
 
   Status = EFI_SUCCESS;
+  return Status;
+}
+
+/**
+  Activate FW command make a FW previously stored on the device with the Transfer FW command as active FW
+  (Opcode 0202h)
+
+  @param  Private                The pointer to the CXL_CONTROLLER_PRIVATE_DATA data structure.
+
+  @retval Status                 Possible Command Return Codes Success, Unsupported, Internal Error,
+                                 Retry Required, Invalid Payload Length
+
+**/
+EFI_STATUS
+CxlMemActivateFw (
+  CXL_CONTROLLER_PRIVATE_DATA  *Private
+  )
+{
+  DEBUG ((EFI_D_INFO, "CxlMemActivateFw: UEFI Driver Activate FW (Opcode 0202h) get called!\n"));
+
+  EFI_STATUS               Status;
+  CXL_MAILBOX_ACTIVATE_FW  ActivateFw;
+
+  UINT8  Slot = Private->MemdevState.FwState.NextSlot;
+
+  if ((Slot == 0) || (Slot > Private->MemdevState.FwState.NumberOfSlots)) {
+    DEBUG ((EFI_D_ERROR, "[CxlMemActivateFw] Error, Slot = %d, num of slots = %d \n", Slot, Private->MemdevState.FwState.NumberOfSlots));
+    Status = EFI_INVALID_PARAMETER;
+    return Status;
+  }
+
+  /* Only offline activation supported for now */
+  ActivateFw.Action = CXL_FW_ACTIVATE_METHOD_ON_NEXT_COLD_RESET;
+  ActivateFw.Slot   = Slot;
+
+  Private->MailboxCmd = (CXL_MBOX_CMD) {
+    .Opcode       = CxlMboxOpActivateFw,
+    .InputSize    = sizeof (ActivateFw),
+    .InputPayload = &ActivateFw,
+  };
+
+  Status = CxlSendCmd (Private);
+  if (Status != EFI_SUCCESS) {
+    DEBUG ((EFI_D_ERROR, "CxlMemActivateFw: Error CxlSendCmd\n"));
+    return Status;
+  }
+
+  Status = EFI_SUCCESS;
+  return Status;
+}
+
+/**
+  Transfer all or part of a FW package from the caller to the device (Opcode 0201h)
+
+  @param  Private                The pointer to the CXL_CONTROLLER_PRIVATE_DATA data structure.
+
+  @retval Status                 Possible Command Return Codes Success, Unsupported, Internal Error,
+                                 Retry Required, Invalid Payload Length
+**/
+EFI_STATUS
+CxlMemTransferFw (
+  CXL_CONTROLLER_PRIVATE_DATA  *Private,
+  UINT8                        NextSlot,
+  const UINT8                  *Data,
+  UINT32                       Offset,
+  UINT32                       Size,
+  UINT32                       *Written
+  )
+{
+  DEBUG ((EFI_D_INFO, "CxlMemTransferFw: UEFI Driver Transfer FW (Opcode 0201h) get called!\n"));
+
+  EFI_STATUS               Status;
+  CXL_MAILBOX_TRANSFER_FW  *TransferFw;
+  UINT32                   CurrentSize;
+  UINT32                   Remaining;
+  size_t                   InputSize;
+  UINT32                   ChunkCount;
+  UINT32                   ChunkSize;
+  BOOLEAN                  IsLastChunk;
+
+  *Written    = 0;
+  CurrentSize = 0;
+  Remaining   = 0;
+  InputSize   = 0;
+  ChunkCount  = 0;
+  ChunkSize   = 0;
+  IsLastChunk = FALSE;
+
+  /* Offset has to be aligned to 128B */
+  if (!IS_ALIGNED (Offset, CXL_FW_TRANSFER_ALIGNMENT)) {
+    DEBUG ((EFI_D_ERROR, "[CxlMemTransferFw] Error, misaligned Offset for FW TransferFw slice (%u) \n", Offset));
+    Status = EFI_LOAD_ERROR;
+    return Status;
+  }
+
+  Private->MemdevState.FwState.OneShot = ((sizeof (*TransferFw) + Size) < (Private->MemdevState.PayloadSize));
+
+  /*
+   * Pick TransferFw Size based on MemdevState.PayloadSize @Size must bw 128-byte
+   * aligned, ->PayloadSize is a power of 2 starting at 256 bytes, and
+   * sizeof(*TransferFw) is 128.  These constraints imply that @CurrentSize
+   * will always be 128b aligned.
+   * sizeof(size_t) = 8
+   */
+
+  // CurrentSize = minimumOfTwoSizes(Size, Private->MemdevState.PayloadSize - sizeof(*TransferFw));
+  CurrentSize = MIN (Size, Private->MemdevState.PayloadSize - sizeof (*TransferFw));
+  Remaining   = Size;
+  InputSize   = (sizeof (*TransferFw) + (sizeof (UINT8) * CurrentSize));
+
+  Private->MemdevState.FwState.NextSlot = NextSlot;
+
+  TransferFw = (CXL_MAILBOX_TRANSFER_FW *)AllocatePool (InputSize);
+  if (!TransferFw) {
+    DEBUG ((EFI_D_ERROR, "CxlMemTransferFw: Error in AllocatePool\n"));
+    Status = EFI_LOAD_ERROR;
+    return Status;
+  }
+
+  if (Private->MemdevState.FwState.OneShot) {
+    TransferFw->Offset = (Offset / CXL_FW_TRANSFER_ALIGNMENT);
+    CopyMem (TransferFw->Data, Data + Offset, CurrentSize);
+
+    TransferFw->Action = CXL_FW_TRANSFER_ACTION_FULL;
+    TransferFw->Slot   = Private->MemdevState.FwState.NextSlot;
+
+    ZeroMem (&Private->MailboxCmd, sizeof (CXL_MBOX_CMD));
+    Private->MailboxCmd = (CXL_MBOX_CMD) {
+      .Opcode       = CxlMboxOpTransferFw,
+      .InputSize    = InputSize,
+      .InputPayload = TransferFw,
+      .PollInterval = 1000,
+      .PollCount    = 30,
+    };
+
+    Status = CxlSendCmd (Private);
+    if (Status != EFI_SUCCESS) {
+      DEBUG ((EFI_D_ERROR, "CxlMemTransferFw: Error returned from func CxlSendCmd()\n"));
+      goto OUT_FREE;
+    }
+  } else {
+    GetChunkCount (Size, CurrentSize, &ChunkCount, &ChunkSize);
+    for (UINT32 Index = 0; Index < ChunkCount; Index++) {
+      if (Offset == 0) {
+        TransferFw->Action = CXL_FW_TRANSFER_ACTION_INITIATE;
+      } else if (Remaining < ChunkSize) {
+        IsLastChunk        = TRUE;
+        TransferFw->Action = CXL_FW_TRANSFER_ACTION_END;
+      } else {
+        TransferFw->Action = CXL_FW_TRANSFER_ACTION_CONTINUE;
+      }
+
+      TransferFw->Slot = Private->MemdevState.FwState.NextSlot;
+
+      // This is done as Offset is multiplied by CXL_FW_TRANSFER_ALIGNMENT in Qemu or hw
+      TransferFw->Offset = (Offset / CXL_FW_TRANSFER_ALIGNMENT);
+      CopyMem (TransferFw->Data, Data + Offset, CurrentSize);
+
+      ZeroMem (&Private->MailboxCmd, sizeof (CXL_MBOX_CMD));
+      Private->MailboxCmd = (CXL_MBOX_CMD) {
+        .Opcode       = CxlMboxOpTransferFw,
+        .InputSize    = InputSize,
+        .InputPayload = TransferFw,
+        .PollInterval = 1000,
+        .PollCount    = 30,
+      };
+
+      Status = CxlSendCmd (Private);
+      if (Status != EFI_SUCCESS) {
+        DEBUG ((EFI_D_ERROR, "CxlMemTransferFw: Error returned from func CxlSendCmd()\n"));
+        goto OUT_FREE;
+      }
+
+      if (IsLastChunk == TRUE) {
+        Offset    = 0;
+        Remaining = 0;
+        break;
+      }
+
+      Offset    = Offset + ChunkSize;
+      Remaining = Remaining - ChunkSize;
+      if (CXL_QEMU) {
+        gBS->Stall (1000000);
+      }
+    }
+  }
+
+  DEBUG ((EFI_D_INFO, "[CxlMemTransferFw] Transfer Fw completed on Slot = %d\n", Private->MemdevState.FwState.NextSlot));
+  *Written = CurrentSize;
+
+  /* Activate FW if OneShot or if the last slice was Written */
+  if (Private->MemdevState.FwState.OneShot || (Remaining == 0)) {
+    DEBUG ((EFI_D_INFO, "[CxlMemTransferFw] Activating firmware on Slot: %d\n", Private->MemdevState.FwState.NextSlot));
+    if (CXL_QEMU) {
+      gBS->Stall (10000000);
+    }
+
+    Status = CxlMemActivateFw (Private);
+    if (Status != EFI_SUCCESS) {
+      goto OUT_FREE;
+    }
+  }
+
+  Status = EFI_SUCCESS;
+
+OUT_FREE:
+
+  if (TransferFw) {
+    FreePool (TransferFw);
+  }
+
   return Status;
 }
 

@@ -1,5 +1,7 @@
 /** @file
   Firmware Management Protocol - supports Get Fw Info, Sending/Receiving FMP commands
+  supports Set Fw Image, Activate Fw image
+  SetPkgInfo, GetPkgInfo, CheckImg
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -83,11 +85,166 @@ CxlFirmwareMgmtGetImageInfo (
   return EFI_SUCCESS;
 }
 
+/**
+  Retrieves a copy of the current firmware image of the device.
+
+  This function allows a copy of the current firmware image to be created and saved.
+  The saved copy could later been used, for example, in firmware image recovery or rollback.
+
+  @param[in]      This           A pointer to the EFI_FIRMWARE_MANAGEMENT_PROTOCOL instance.
+  @param[in]      ImageIndex     A unique number identifying the firmware image(s) within the device.
+                                 The number is between 1 and DescriptorCount.
+  @param[in, out] Image          Points to the buffer where the current image is copied to.
+  @param[in, out] ImageSize      On entry, points to the size of the buffer pointed to by Image, in bytes.
+                                 On return, points to the length of the image, in bytes.
+
+  @retval EFI_SUCCESS            The device was successfully updated with the new image.
+  @retval EFI_BUFFER_TOO_SMALL   The buffer specified by ImageSize is too small to hold the
+                                 image. The current buffer size needed to hold the image is returned
+                                 in ImageSize.
+  @retval EFI_INVALID_PARAMETER  The Image was NULL.
+  @retval EFI_NOT_FOUND          The current image is not copied to the buffer.
+  @retval EFI_UNSUPPORTED        The operation is not supported.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
+
+**/
+EFI_STATUS
+EFIAPI
+CxlFirmwareMgmtGetImage (
+  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *This,
+  IN  UINT8                             ImageIndex,
+  IN  OUT  VOID                         *Image,
+  IN  OUT  UINTN                        *ImageSize
+  )
+{
+  EFI_STATUS                   Status   = EFI_SUCCESS;
+  CXL_CONTROLLER_PRIVATE_DATA  *Private = NULL;
+
+  Private = CXL_CONTROLLER_PRIVATE_FROM_FIRMWARE_MGMT (This);
+  if ((ImageIndex > Private->SlotInfo.NumberOfSlots) || (Private->SlotInfo.IsSetImageDone[ImageIndex] != TRUE)) {
+    DEBUG (
+      (EFI_D_ERROR, "[%a]: ImageIndex = %d, NumberOfSlots = %d, IsSetImageDone = %d \n",
+       __func__, ImageIndex, Private->SlotInfo.NumberOfSlots, Private->SlotInfo.IsSetImageDone[ImageIndex])
+      );
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Private->SlotInfo.ImageFileSize[ImageIndex] > *ImageSize) {
+    *ImageSize = Private->SlotInfo.ImageFileSize[ImageIndex];
+    return EFI_BUFFER_TOO_SMALL;
+  }
+
+  if (Image != NULL) {
+    CopyMem (Image, Private->SlotInfo.ImageFileBuffer[ImageIndex], sizeof (*ImageSize));
+  } else {
+    *ImageSize = Private->SlotInfo.ImageFileSize[ImageIndex];
+    return EFI_BUFFER_TOO_SMALL;
+  }
+
+  return Status;
+}
+
+/**
+  Updates the firmware image of the device.
+
+  This function updates the hardware with the new firmware image.
+  This function returns EFI_UNSUPPORTED if the firmware image is not updatable.
+  If the firmware image is updatable, the function should perform the following minimal validations
+  before proceeding to do the firmware image update.
+  - Validate the image authentication if image has attribute
+    IMAGE_ATTRIBUTE_AUTHENTICATION_REQUIRED. The function returns
+    EFI_SECURITY_VIOLATION if the validation fails.
+  - Validate the image is a supported image for this device. The function returns EFI_ABORTED if
+    the image is unsupported. The function can optionally provide more detailed information on
+    why the image is not a supported image.
+  - Validate the data from VendorCode if not null. Image validation must be performed before
+    VendorCode data validation. VendorCode data is ignored or considered invalid if image
+    validation failed. The function returns EFI_ABORTED if the data is invalid.
+
+  VendorCode enables vendor to implement vendor-specific firmware image update policy. Null if
+  the caller did not specify the policy or use the default policy. As an example, vendor can implement
+  a policy to allow an option to force a firmware image update when the abort reason is due to the new
+  firmware image version is older than the current firmware image version or bad image checksum.
+  Sensitive operations such as those wiping the entire firmware image and render the device to be
+  non-functional should be encoded in the image itself rather than passed with the VendorCode.
+  AbortReason enables vendor to have the option to provide a more detailed description of the abort
+  reason to the caller.
+
+  @param[in]  This               A pointer to the EFI_FIRMWARE_MANAGEMENT_PROTOCOL instance.
+  @param[in]  ImageIndex         A unique number identifying the firmware image(s) within the device.
+                                 The number is between 1 and DescriptorCount.
+  @param[in]  Image              Points to the new image.
+  @param[in]  ImageSize          Size of the new image in bytes.
+  @param[in]  VendorCode         This enables vendor to implement vendor-specific firmware image update policy.
+                                 Null indicates the caller did not specify the policy or use the default policy.
+  @param[in]  Progress           A function used by the driver to report the progress of the firmware update.
+  @param[out] AbortReason        A pointer to a pointer to a null-terminated string providing more
+                                 details for the aborted operation. The buffer is allocated by this function
+                                 with AllocatePool(), and it is the caller's responsibility to free it with a
+                                 call to FreePool().
+
+  @retval EFI_SUCCESS            The device was successfully updated with the new image.
+  @retval EFI_ABORTED            The operation is aborted.
+  @retval EFI_INVALID_PARAMETER  The Image was NULL.
+  @retval EFI_UNSUPPORTED        The operation is not supported.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
+
+**/
+EFI_STATUS
+EFIAPI
+CxlFirmwareMgmtSetImage (
+  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL               *This,
+  IN  UINT8                                          ImageIndex,
+  IN  CONST VOID                                     *Image,
+  IN  UINTN                                          ImageSize,
+  IN  CONST VOID                                     *VendorCode,
+  IN  EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  Progress,
+  OUT CHAR16                                         **AbortReason
+  )
+{
+  EFI_STATUS                   Status;
+  CXL_CONTROLLER_PRIVATE_DATA  *Private = NULL;
+  UINT32                       Written;
+
+  Private = CXL_CONTROLLER_PRIVATE_FROM_FIRMWARE_MGMT (This);
+  if (ImageIndex > Private->SlotInfo.NumberOfSlots) {
+    DEBUG (
+      (EFI_D_ERROR, "CxlFirmwareMgmtSetImage: ImageIndex = %d is greater then Total slots = %d \n",
+       ImageIndex, Private->SlotInfo.NumberOfSlots)
+      );
+    Status = EFI_INVALID_PARAMETER;
+    return Status;
+  }
+
+  Status = CxlMemTransferFw (Private, ImageIndex, Image, 0, (UINT32)ImageSize, &Written);
+
+  if (Status != EFI_SUCCESS) {
+    DEBUG ((EFI_D_ERROR, "CxlFirmwareMgmtSetImage: UEFI Driver Transfer FW (Opcode 0201h) Failed!\n"));
+    return Status;
+  }
+
+  Private->SlotInfo.ImageFileBuffer[ImageIndex] = AllocateZeroPool (ImageSize);
+  if (Private->SlotInfo.ImageFileBuffer[ImageIndex] == NULL) {
+    DEBUG ((EFI_D_ERROR, "CxlFirmwareMgmtSetImage: AllocateZeroPool failed!\n"));
+    Status = EFI_OUT_OF_RESOURCES;
+    return Status;
+  }
+
+  Private->SlotInfo.ImageFileSize[ImageIndex] = ImageSize;
+  CopyMem (Private->SlotInfo.ImageFileBuffer[ImageIndex], Image, sizeof (ImageSize));
+  Private->SlotInfo.IsSetImageDone[ImageIndex] = TRUE;
+
+  DEBUG ((EFI_D_INFO, "[CxlFirmwareMgmtSetImage] SetImage returns...%r\n", Status));
+  return Status;
+}
+
 //
 // Template of the private context structure for the Firmware Management Protocol instance
 //
 GLOBAL_REMOVE_IF_UNREFERENCED
 EFI_FIRMWARE_MANAGEMENT_PROTOCOL  gCxlFirmwareManagement = {
   CxlFirmwareMgmtGetImageInfo,
+  CxlFirmwareMgmtGetImage,
+  CxlFirmwareMgmtSetImage
 };
 

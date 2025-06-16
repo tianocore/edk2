@@ -29,6 +29,51 @@ MinimumOfThreeValues (
 }
 
 /**
+  Returns the number of chunk from firmware file, FW Transfer should take less time, therefore chunk Size is maximum
+
+  @param[in] FileSize                   Size of Firmware file
+  @param[in] MaxPayloadSize             Maximum Payload Size supported by mailbox
+
+  @retval ChunkCount                    Number of Chunks of perticular size
+  @retval ChunkSize                     Chunks size to be transferred
+
+  **/
+void
+GetChunkCount (
+  UINT32  FileSize,
+  UINT32  MaxPayloadSize,
+  UINT32  *ChunkCount,
+  UINT32  *ChunkSize
+  )
+{
+  /*******************************************************************************
+  *   FW Transfer should take less time, so we made chunk Size maximum
+  *   else chunk Size can be CXL_FW_TRANSFER_ALIGNMENT
+  ********************************************************************************/
+
+  UINT32  Count;
+  UINT32  Size;
+
+  Count = 0;
+  Size  = 0;
+
+  if (MaxPayloadSize % CXL_FW_TRANSFER_ALIGNMENT == 0) {
+    Size = MaxPayloadSize;
+  } else {
+    Size = (MaxPayloadSize - (MaxPayloadSize % CXL_FW_TRANSFER_ALIGNMENT));
+  }
+
+  Count = (FileSize / Size);
+  if (FileSize % Size) {
+    // Add 1 to Count for remaining chunk
+    Count = Count + 1;
+  }
+
+  *ChunkCount = Count;
+  *ChunkSize  = Size;
+}
+
+/**
   Returns bits value from input value
 
   @param[in] RegisterValue               Input register value from where bits has to extracted
