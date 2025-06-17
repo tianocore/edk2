@@ -39,6 +39,7 @@ extern USB_MASS_TRANSPORT  mUsbBotTransport;
 // Usb Bot wait device reset complete, set by experience
 //
 #define USB_BOT_RESET_DEVICE_STALL  (100 * USB_MASS_1_MILLISECOND)
+#define USB_BOT_CLR_STALL_EP_STALL  (10 * USB_MASS_1_MILLISECOND)
 
 //
 // Usb Bot transport timeout, set by experience

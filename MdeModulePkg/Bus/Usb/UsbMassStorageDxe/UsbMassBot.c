@@ -507,6 +507,14 @@ UsbBotResetDevice (
   UsbClearEndpointStall (UsbBot->UsbIo, UsbBot->BulkInEndpoint->EndpointAddress);
   UsbClearEndpointStall (UsbBot->UsbIo, UsbBot->BulkOutEndpoint->EndpointAddress);
 
+  //
+  //         Device fw issue.
+  //         There are no delay requirement from UsbMassBulk spec and USB spec.
+  //         DW316 need delay for UsbClearEndpointStall and there might be other devices also need this delay,
+  //         so adding the delay as common W/A
+  //
+  gBS->Stall (USB_BOT_CLR_STALL_EP_STALL);
+
   return Status;
 }
 
