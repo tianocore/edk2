@@ -1558,6 +1558,11 @@ WifiMgrDxeHiiConfigAccessCallback (
         // User triggered a scan process.
         //
         Private->CurrentNic->OneTimeScanRequest = TRUE;
+        Status                                  = WifiMgrStartScan (Private->CurrentNic);
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_WARN, "[WiFi Connection Manager] Error: Failed in start scan for network list with status %r", Status));
+        }
+
         break;
 
       case KEY_PASSWORD_CONNECT_NETWORK:
@@ -1664,7 +1669,8 @@ WifiMgrDxeHiiConfigAccessCallback (
 
         Status = gBS->SetTimer (Private->CurrentNic->TickTimer, TimerPeriodic, EFI_TIMER_PERIOD_MILLISECONDS (500));
         if (EFI_ERROR (Status)) {
-          gBS->CloseEvent (Private->CurrentNic->TickTimer);
+          DEBUG ((DEBUG_WARN, "[WiFi Connection Manager] Error: Failed to set timer for connect action!"));
+          gBS->SetTimer (Private->CurrentNic->TickTimer, TimerCancel, 0);
         }
 
         break;
@@ -1920,7 +1926,8 @@ WifiMgrDxeHiiConfigAccessCallback (
 
         Status = gBS->SetTimer (Private->CurrentNic->TickTimer, TimerPeriodic, EFI_TIMER_PERIOD_MILLISECONDS (500));
         if (EFI_ERROR (Status)) {
-          gBS->CloseEvent (Private->CurrentNic->TickTimer);
+          DEBUG ((DEBUG_WARN, "[WiFi Connection Manager] Error: Failed to set timer for changing action!"));
+          gBS->SetTimer (Private->CurrentNic->TickTimer, TimerCancel, 0);
         }
 
         break;
