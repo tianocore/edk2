@@ -218,6 +218,7 @@ UsbBootExecCmd (
       Transport->Reset (UsbMass->Context, TRUE);
       return EFI_DEVICE_ERROR;
     }
+
     if (Status == EFI_DEVICE_ERROR) {
       Transport->Reset (UsbMass->Context, TRUE);
       return EFI_DEVICE_ERROR;
