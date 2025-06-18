@@ -1559,6 +1559,11 @@ WifiMgrDxeHiiConfigAccessCallback (
         // User triggered a scan process.
         //
         Private->CurrentNic->OneTimeScanRequest = TRUE;
+        Status                                  = WifiMgrStartScan (Private->CurrentNic);
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_WARN, "[WiFi Connection Manager] Error: Failed in start scan for network list with status %r", Status));
+        }
+
         break;
 
       case KEY_PASSWORD_CONNECT_NETWORK:
