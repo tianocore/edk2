@@ -57,6 +57,7 @@
             "Library/MbedTlsLib/Include/mbedtls/mbedtls_config.h",
             "Library/BaseCryptLibMbedTls/SysCall",
             # Tcg TPM2 reference library
+            "Library/TpmLib/TPM",
             "Library/TpmLib/TpmBuildSwitches.h",
             "Library/TpmLib/TpmLibCompileOptions.h"
         ]

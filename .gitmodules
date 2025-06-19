@@ -35,3 +35,7 @@
 [submodule "SecurityPkg/DeviceSecurity/SpdmLib/libspdm"]
 	path = SecurityPkg/DeviceSecurity/SpdmLib/libspdm
 	url = https://github.com/DMTF/libspdm.git
+[submodule "CryptoPkg/Library/TpmLib/TPM"]
+	path = CryptoPkg/Library/TpmLib/TPM
+	url = https://github.com/TrustedComputingGroup/TPM.git
+	branch = main
