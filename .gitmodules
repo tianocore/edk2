@@ -35,3 +35,6 @@
 [submodule "SecurityPkg/DeviceSecurity/SpdmLib/libspdm"]
 	path = SecurityPkg/DeviceSecurity/SpdmLib/libspdm
 	url = https://github.com/DMTF/libspdm.git
+[submodule "TcgTpmPkg/Library/TpmLib/TPM"]
+	path = TcgTpmPkg/Library/TpmLib/TPM
+	url = https://github.com/TrustedComputingGroup/TPM
