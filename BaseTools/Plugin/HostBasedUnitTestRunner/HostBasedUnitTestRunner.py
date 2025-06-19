@@ -174,21 +174,21 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
         logging.info(f"Got lcov version {lcov_version_major}")
 
         # Generate base code coverage for all source files
-        ret = RunCmd("lcov", f"--no-external --capture --initial --directory {buildOutputBase} --output-file {buildOutputBase}/cov-base.info --rc lcov_branch_coverage=1")
+        # `--ignore-errors mismatch` needed to make lcov v2.0+/gcov work.
+        lcov_error_settings = "--ignore-errors mismatch" if lcov_version_major >= 2 else ""
+        ret = RunCmd("lcov", f"--no-external --capture --initial --directory {buildOutputBase} --output-file {buildOutputBase}/cov-base.info --rc lcov_branch_coverage=1 {lcov_error_settings}")
         if ret != 0:
             logging.error("UnitTest Coverage: Failed to build initial coverage data.")
             return 1
 
         # Coverage data for tested files only
-        # `--ignore-errors mismatch` needed to make lcov v2.0+/gcov work.
-        lcov_error_settings = "--ignore-errors mismatch" if lcov_version_major >= 2 else ""
         ret = RunCmd("lcov", f"--capture --directory {buildOutputBase}/ --output-file {buildOutputBase}/coverage-test.info --rc lcov_branch_coverage=1 {lcov_error_settings}")
         if ret != 0:
             logging.error("UnitTest Coverage: Failed to build coverage data for tested files.")
             return 1
 
         # Aggregate all coverage data
-        ret = RunCmd("lcov", f"--add-tracefile {buildOutputBase}/cov-base.info --add-tracefile {buildOutputBase}/coverage-test.info --output-file {buildOutputBase}/total-coverage.info --rc lcov_branch_coverage=1")
+        ret = RunCmd("lcov", f"--add-tracefile {buildOutputBase}/cov-base.info --add-tracefile {buildOutputBase}/coverage-test.info --output-file {buildOutputBase}/total-coverage.info --rc lcov_branch_coverage=1 {lcov_error_settings}")
         if ret != 0:
             logging.error("UnitTest Coverage: Failed to aggregate coverage data.")
             return 1
@@ -211,7 +211,7 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
         coverageFile = ""
         for testCoverage in testCoverageList:
             coverageFile += " --add-tracefile " + testCoverage
-        ret = RunCmd("lcov", f"{coverageFile} --output-file {workspace}/Build/all-coverage.info --rc lcov_branch_coverage=1")
+        ret = RunCmd("lcov", f"{coverageFile} --output-file {workspace}/Build/all-coverage.info --rc lcov_branch_coverage=1 {lcov_error_settings}")
         if ret != 0:
             logging.error("UnitTest Coverage: Failed generate all coverage file.")
             return 1
