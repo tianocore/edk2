@@ -58,8 +58,9 @@
             "Library/BaseCryptLibMbedTls/SysCall",
             # Tcg TPM2 reference library
             "Library/TpmLib/TPM",
-            "Library/TpmLib/TpmBuildSwitches.h",
-            "Library/TpmLib/TpmLibCompileOptions.h"
+            "Library/TpmLib/Include",
+            "Library/TpmLib/TpmLibCompileOptions.h",
+            "Library/TpmLib/TpmPlatformFunctions.c"
         ]
     },
     "CompilerPlugin": {
