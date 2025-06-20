@@ -741,7 +741,7 @@
  *             See dhm.h for more details.
  *
  */
-#define MBEDTLS_KEY_EXCHANGE_DHE_PSK_ENABLED
+// #define MBEDTLS_KEY_EXCHANGE_DHE_PSK_ENABLED
 
 /**
  * \def MBEDTLS_KEY_EXCHANGE_ECDHE_PSK_ENABLED
@@ -839,7 +839,7 @@
  *             See dhm.h for more details.
  *
  */
-#define MBEDTLS_KEY_EXCHANGE_DHE_RSA_ENABLED
+// #define MBEDTLS_KEY_EXCHANGE_DHE_RSA_ENABLED
 
 /**
  * \def MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED
@@ -1482,7 +1482,7 @@
  *          configuration of this extension).
  *
  */
-#define MBEDTLS_SSL_RENEGOTIATION
+// #define MBEDTLS_SSL_RENEGOTIATION
 
 /**
  * \def MBEDTLS_SSL_MAX_FRAGMENT_LENGTH
@@ -1706,7 +1706,7 @@
  *
  * Comment this to disable anti-replay in DTLS.
  */
-// #define MBEDTLS_SSL_DTLS_ANTI_REPLAY
+#define MBEDTLS_SSL_DTLS_ANTI_REPLAY
 
 /**
  * \def MBEDTLS_SSL_DTLS_HELLO_VERIFY
@@ -1724,7 +1724,7 @@
  *
  * Comment this to disable support for HelloVerifyRequest.
  */
-// #define MBEDTLS_SSL_DTLS_HELLO_VERIFY
+#define MBEDTLS_SSL_DTLS_HELLO_VERIFY
 
 /**
  * \def MBEDTLS_SSL_DTLS_SRTP
@@ -2398,7 +2398,7 @@
  *             See dhm.h for more details.
  *
  */
-#define MBEDTLS_DHM_C
+// #define MBEDTLS_DHM_C
 
 /**
  * \def MBEDTLS_ECDH_C
