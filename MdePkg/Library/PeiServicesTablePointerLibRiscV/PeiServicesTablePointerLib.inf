@@ -1,0 +1,33 @@
+## @file
+# Instance of PEI Services Table Pointer Library using global variable for the table pointer.
+#
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2025, Ventana Micro Systems Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = PeiServicesTablePointerLib
+  MODULE_UNI_FILE                = PeiServicesTablePointerLib.uni
+  FILE_GUID                      = 3b5bccaa-366f-42d1-93b1-64dd7ecb9fa7
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PeiServicesTablePointerLib|PEIM PEI_CORE SEC
+
+#
+#  VALID_ARCHITECTURES           = RISCV64
+#
+
+[Sources]
+  PeiServicesTablePointer.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
