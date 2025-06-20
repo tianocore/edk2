@@ -613,10 +613,11 @@ PeiAllocatePages (
 
   //
   // Check to see if on correct boundary for the memory type.
-  // If not aligned, make the allocation aligned.
+  // If not aligned, make the allocation aligned and that we are not trying to allocate page 0, which is used for
+  // null detection.
   //
   Padding = *(FreeMemoryTop) & (Granularity - 1);
-  if ((UINTN)(*FreeMemoryTop - *FreeMemoryBottom) < Padding) {
+  if (((UINTN)(*FreeMemoryTop - *FreeMemoryBottom) < Padding) || (*(FreeMemoryTop) - Padding == 0)) {
     DEBUG ((DEBUG_ERROR, "AllocatePages failed: Out of space after padding.\n"));
     return EFI_OUT_OF_RESOURCES;
   }
