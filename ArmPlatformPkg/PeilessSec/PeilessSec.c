@@ -53,13 +53,15 @@ GetPlatformPpi (
   @param[in]  UefiMemoryBase  Start of the PI/UEFI memory region
   @param[in]  StackBase      Start of the stack
   @param[in]  StartTimeStamp  Timer value at start of execution
+  @param[in]  TransferListBaseAddr  Base address of the Transfer List
 **/
 STATIC
 VOID
 SecMain (
   IN  UINTN   UefiMemoryBase,
   IN  UINTN   StackBase,
-  IN  UINT64  StartTimeStamp
+  IN  UINT64  StartTimeStamp,
+  IN  UINTN   TransferListBaseAddr
   )
 {
   EFI_HOB_HANDOFF_INFO_TABLE  *HobList;
@@ -71,6 +73,8 @@ SecMain (
   UINTN                       CharCount;
   UINTN                       StacksSize;
   FIRMWARE_SEC_PERFORMANCE    Performance;
+  VOID                        *TransferListBase;
+  UINTN                       *TransferListHobData;
 
   // If ensure the FD is either part of the System Memory or totally outside of the System Memory (XIP)
   ASSERT (
@@ -134,6 +138,25 @@ SecMain (
     }
   }
 
+  // Dump the Transfer List
+  TransferListBase = (VOID *)TransferListBaseAddr;
+  if (TransferListBase != NULL) {
+    if (TransferListCheckHeader (TransferListBase) != TRANSFER_LIST_OPS_INVALID) {
+      DEBUG_CODE_BEGIN ();
+      TransferListDump (TransferListBase);
+      DEBUG_CODE_END ();
+
+      TransferListHobData = BuildGuidHob (&gArmTransferListHobGuid, sizeof (*TransferListHobData));
+      ASSERT (TransferListHobData != NULL);
+
+      *TransferListHobData = (UINTN)TransferListBase;
+    } else {
+      DEBUG ((DEBUG_ERROR, "%a: No valid operations possible on TransferList found @ 0x%p\n", __func__, TransferListBase));
+    }
+  } else {
+    DEBUG ((DEBUG_INFO, "%a: No TransferList found, continuing boot\n", __func__));
+  }
+
   // Store timer value logged at the beginning of firmware image execution
   Performance.ResetEnd = GetTimeInNanoSecond (StartTimeStamp);
 
@@ -167,11 +190,13 @@ SecMain (
 
   @param[in]  UefiMemoryBase  Start of the PI/UEFI memory region
   @param[in]  StackBase       Start of the stack
+  @param[in]  TransferListBaseAddr  Base address of the Transfer List
 **/
 VOID
 CEntryPoint (
   IN  UINTN  UefiMemoryBase,
-  IN  UINTN  StackBase
+  IN  UINTN  StackBase,
+  IN  UINTN  TransferListBaseAddr
   )
 {
   UINT64  StartTimeStamp;
@@ -198,7 +223,7 @@ CEntryPoint (
     FixedPcdGet32 (PcdSystemMemoryUefiRegionSize)
     );
 
-  SecMain (UefiMemoryBase, StackBase, StartTimeStamp);
+  SecMain (UefiMemoryBase, StackBase, StartTimeStamp, TransferListBaseAddr);
 
   // DXE Core should always load and never return
   ASSERT (FALSE);
