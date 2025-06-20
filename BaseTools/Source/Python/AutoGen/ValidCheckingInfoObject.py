@@ -225,10 +225,8 @@ class VAR_CHECK_PCD_VALID_OBJ(object):
         self.data = set()
         try:
             self.StorageWidth = MAX_SIZE_TYPE[self.PcdDataType]
-            self.ValidData = True
         except:
             self.StorageWidth = 0
-            self.ValidData = False
 
     def __eq__(self, validObj):
         return validObj and self.VarOffset == validObj.VarOffset
