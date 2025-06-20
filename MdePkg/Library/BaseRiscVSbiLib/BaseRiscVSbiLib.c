@@ -115,6 +115,21 @@ TranslateError (
     case SBI_ERR_ALREADY_AVAILABLE:
       return EFI_ALREADY_STARTED;
       break;
+    case SBI_ERR_NO_SHMEM:
+      return EFI_OUT_OF_RESOURCES;
+      break;
+    case SBI_ERR_INVALID_STATE:
+      return EFI_ABORTED;
+      break;
+    case SBI_ERR_BAD_RANGE:
+      return EFI_NOT_FOUND;
+      break;
+    case SBI_ERR_NOT_IMPLEMENTED:
+      return EFI_UNSUPPORTED;
+      break;
+    case SBI_ERR_TIMEOUT:
+      return EFI_TIMEOUT;
+      break;
     default:
       //
       // Reaches here only if SBI has defined a new error type
@@ -227,4 +242,29 @@ SetFirmwareContextPointer (
   )
 {
   SetFirmwareContext (FirmwareContextPtr);
+}
+
+/**
+  Probe support for an extension in OpenSBI
+
+  Check if the extension is supported by SBI
+
+  @param    Extension   Extension ID to be probed
+**/
+EFI_STATUS
+EFIAPI
+SbiProbeExtension (
+  IN UINTN  Extension
+  )
+{
+  SBI_RET  Ret;
+
+  Ret = SbiCall (
+          SBI_EXT_BASE,
+          SBI_EXT_BASE_PROBE_EXT,
+          1,
+          Extension
+          );
+
+  return TranslateError (Ret.Error);
 }
