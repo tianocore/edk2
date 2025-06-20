@@ -284,7 +284,7 @@ DxePcdSetSku (
   )
 {
   SKU_ID      *SkuIdTable;
-  UINTN       Index;
+  UINT64      Index;
   EFI_STATUS  Status;
 
   DEBUG ((DEBUG_INFO, "PcdDxe - SkuId 0x%lx is to be set.\n", (SKU_ID)SkuId));
@@ -1245,7 +1245,10 @@ GetDistinctTokenSpace (
   BOOLEAN   Match;
 
   DistinctTokenSpace = AllocateZeroPool (*ExMapTableSize * sizeof (EFI_GUID *));
-  ASSERT (DistinctTokenSpace != NULL);
+  if (DistinctTokenSpace == NULL) {
+    ASSERT (DistinctTokenSpace != NULL);
+    return NULL;
+  }
 
   TsIdx                     = 0;
   OldGuidIndex              = ExMapTable[0].ExGuidIndex;
@@ -1329,6 +1332,11 @@ DxePcdGetNextTokenSpace (
                                  (DYNAMICEX_MAPPING *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->ExMapTableOffset),
                                  (EFI_GUID *)((UINT8 *)mPcdDatabase.PeiDb + mPcdDatabase.PeiDb->GuidTableOffset)
                                  );
+
+      if (PeiTokenSpaceTable == NULL) {
+        return EFI_NOT_FOUND;
+      }
+
       CopyMem (TmpTokenSpaceBuffer, PeiTokenSpaceTable, sizeof (EFI_GUID *) * PeiTokenSpaceTableSize);
       TmpTokenSpaceBufferCount = PeiTokenSpaceTableSize;
       FreePool (PeiTokenSpaceTable);
@@ -1341,6 +1349,9 @@ DxePcdGetNextTokenSpace (
                                  (DYNAMICEX_MAPPING *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->ExMapTableOffset),
                                  (EFI_GUID *)((UINT8 *)mPcdDatabase.DxeDb + mPcdDatabase.DxeDb->GuidTableOffset)
                                  );
+      if (DxeTokenSpaceTable == NULL) {
+        return EFI_NOT_FOUND;
+      }
 
       //
       // Make sure EFI_GUID in DxeTokenSpaceTable does not exist in PeiTokenSpaceTable
