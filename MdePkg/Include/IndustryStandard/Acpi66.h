@@ -885,6 +885,8 @@ typedef struct {
 #define EFI_ACPI_6_6_GICC_AFFINITY                        0x03
 #define EFI_ACPI_6_6_GIC_ITS_AFFINITY                     0x04
 #define EFI_ACPI_6_6_GENERIC_INITIATOR_AFFINITY           0x05
+#define EFI_ACPI_6_6_GENERIC_PORT_AFFINITY                0x06
+#define EFI_ACPI_6_6_RINTC_AFFINITY                       0x07
 
 ///
 /// Processor Local APIC/SAPIC Affinity Structure Definition
@@ -970,6 +972,19 @@ typedef struct {
   UINT8     Reserved[2];
   UINT32    ItsId;
 } EFI_ACPI_6_6_GIC_ITS_AFFINITY_STRUCTURE;
+
+///
+/// RINTC Affinity Structure Definition
+///
+typedef struct {
+  UINT8     Type;
+  UINT8     Length;
+  UINT16    Reserved;
+  UINT32    ProximityDomain;
+  UINT32    AcpiProcessorUid;
+  UINT32    Flags;
+  UINT32    ClockDomain;
+} EFI_ACPI_6_6_RINTC_AFFINITY_STRUCTURE;
 
 //
 // Generic Initiator Affinity Structure Device Handle Types
