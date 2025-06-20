@@ -84,6 +84,7 @@
   HobLib|EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf
   MemoryAllocationLib|EmbeddedPkg/Library/PrePiMemoryAllocationLib/PrePiMemoryAllocationLib.inf
   PrePiHobListPointerLib|ArmPlatformPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
+  HashLib|ArmPlatformPkg/Library/HashLibPeilessSecLib/HashLibTpm2PeilessSecLib.inf
 
 [LibraryClasses.AARCH64.MM_STANDALONE]
   HobLib|StandaloneMmPkg/Library/StandaloneMmHobLib/StandaloneMmHobLib.inf
@@ -106,6 +107,7 @@
   ArmPlatformPkg/Library/PL031RealTimeClockLib/PL031RealTimeClockLib.inf
   ArmPlatformPkg/Library/PL111Lcd/PL111Lcd.inf
   ArmPlatformPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
+  ArmPlatformPkg/Library/HashLibPeilessSecLib/HashLibTpm2PeilessSecLib.inf
 
   ArmPlatformPkg/MemoryInitPei/MemoryInitPeiLib.inf
   ArmPlatformPkg/MemoryInitPei/MemoryInitPeim.inf
