@@ -14,16 +14,22 @@
  */
 typedef struct ArmFfaRxTxBuffersInfo {
   /// Tx Buffer Address.
-  VOID      *TxBufferAddr;
+  VOID       *TxBufferAddr;
 
   /// Tx Buffer Size.
-  UINT64    TxBufferSize;
+  UINT64     TxBufferSize;
 
   /// Rx Buffer Address.
-  VOID      *RxBufferAddr;
+  VOID       *RxBufferAddr;
 
   /// Rx Buffer Size.
-  UINT64    RxBufferSize;
+  UINT64     RxBufferSize;
+
+  /// Rx/Tx buffer should be remapped to permanent memory.
+  BOOLEAN    RemapRequired;
+
+  /// Rx/Tx buffer offset from its allocation base.
+  UINTN      RemapOffset;
 } ARM_FFA_RX_TX_BUFFER_INFO;
 
 extern EFI_GUID  gArmFfaRxTxBufferInfoGuid;
