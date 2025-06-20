@@ -57,6 +57,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
                                          // significantly impact boot performance
 #define DEBUG_MANAGEABILITY  0x00800000  // Detailed debug and payload manageability messages
                                          // related to modules such as Redfish, IPMI, MCTP etc.
+#define DEBUG_TPM    0x01000000          // TCG and TPM related debug messages
 #define DEBUG_ERROR  0x80000000          // Error
 
 //
