@@ -6,8 +6,6 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
 #include <Library/GoogleTestLib.h>
 
 extern "C" {
