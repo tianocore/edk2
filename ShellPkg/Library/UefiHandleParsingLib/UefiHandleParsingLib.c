@@ -2307,8 +2307,6 @@ STATIC CONST GUID_INFO_BLOCK  mGuidStringList[] = {
   { STRING_TOKEN (STR_SHELL_ENV2),          &gEfiShellEnvironment2Guid,                        NULL                                             },
   { STRING_TOKEN (STR_SHELL_ENV),           &gEfiShellEnvironment2Guid,                        NULL                                             },
   { STRING_TOKEN (STR_DEVICE_IO),           &gEfiDeviceIoProtocolGuid,                         NULL                                             },
-  { STRING_TOKEN (STR_UGA_DRAW),            &gEfiUgaDrawProtocolGuid,                          NULL                                             },
-  { STRING_TOKEN (STR_UGA_IO),              &gEfiUgaIoProtocolGuid,                            NULL                                             },
   { STRING_TOKEN (STR_ESP),                 &gEfiPartTypeSystemPartGuid,                       NULL                                             },
   { STRING_TOKEN (STR_GPT_NBR),             &gEfiPartTypeLegacyMbrGuid,                        NULL                                             },
   { STRING_TOKEN (STR_DRIVER_CONFIG),       &gEfiDriverConfigurationProtocolGuid,              NULL                                             },

@@ -12,7 +12,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Uefi.h>
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/GraphicsOutput.h>
-#include <Protocol/UgaDraw.h>
 #include <Protocol/DevicePath.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiDriverEntryPoint.h>
@@ -59,7 +58,6 @@ typedef struct {
 typedef struct {
   UINTN                              Signature;
   EFI_GRAPHICS_OUTPUT_PROTOCOL       *GraphicsOutput;
-  EFI_UGA_DRAW_PROTOCOL              *UgaDraw;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    SimpleTextOutput;
   EFI_SIMPLE_TEXT_OUTPUT_MODE        SimpleTextOutputMode;
   GRAPHICS_CONSOLE_MODE_DATA         *ModeData;
@@ -417,9 +415,8 @@ GraphicsConsoleConOutEnableCursor (
 /**
   Test to see if Graphics Console could be supported on the Controller.
 
-  Graphics Console could be supported if Graphics Output Protocol or UGADraw
-  Protocol exists on the Controller. (UGA Draw Protocol could be skipped
-  if PcdUgaConsumeSupport is set to FALSE.)
+  Graphics Console could be supported if Graphics Output Protocol
+  exists on the Controller.
 
   @param  This                Protocol instance pointer.
   @param  Controller          Handle of device to test.
@@ -439,9 +436,8 @@ GraphicsConsoleControllerDriverSupported (
   );
 
 /**
-  Start this driver on Controller by opening Graphics Output protocol or
-  UGA Draw protocol, and installing Simple Text Out protocol on Controller.
-  (UGA Draw protocol could be skipped if PcdUgaConsumeSupport is set to FALSE.)
+  Start this driver on Controller by opening Graphics Output protocol
+  and installing Simple Text Out protocol on Controller.
 
   @param  This                 Protocol instance pointer.
   @param  Controller           Handle of device to bind driver to
@@ -462,9 +458,7 @@ GraphicsConsoleControllerDriverStart (
 
 /**
   Stop this driver on Controller by removing Simple Text Out protocol
-  and closing the Graphics Output Protocol or UGA Draw protocol on Controller.
-  (UGA Draw protocol could be skipped if PcdUgaConsumeSupport is set to FALSE.)
-
+  and closing the Graphics Output Protocol on Controller.
 
   @param  This              Protocol instance pointer.
   @param  Controller        Handle of device to stop driver on
@@ -526,8 +520,7 @@ GetTextColors (
   @param  Count                 The count of Unicode string.
 
   @retval EFI_OUT_OF_RESOURCES  If no memory resource to use.
-  @retval EFI_UNSUPPORTED       If no Graphics Output protocol and UGA Draw
-                                protocol exist.
+  @retval EFI_UNSUPPORTED       If no Graphics Output protocol exist.
   @retval EFI_SUCCESS           Drawing Unicode string implemented successfully.
 
 **/
