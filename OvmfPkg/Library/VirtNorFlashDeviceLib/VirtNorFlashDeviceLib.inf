@@ -1,0 +1,30 @@
+#/** @file
+#
+#  This library enables low-level access to Virt Flash devices
+#
+#  Copyright (c) 2011 - 2021, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = VirtNorFlashDeviceLib
+  FILE_GUID                      = 3f8c8c4b-5b92-4e71-ae73-9f7d2f1e33d4
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = VirtNorFlashDeviceLib
+
+[Sources.common]
+  VirtNorFlashDeviceLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  IoLib
