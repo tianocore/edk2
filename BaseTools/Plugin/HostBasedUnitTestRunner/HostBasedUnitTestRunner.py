@@ -106,36 +106,48 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
                 return 0
 
             for test in testList:
-                # Configure output name if test uses cmocka.
-                shell_env.set_shell_var(
-                    'CMOCKA_XML_FILE', test + ".CMOCKA.%g." + arch + ".result.xml")
-                # Configure output name if test uses gtest.
-                shell_env.set_shell_var(
-                    'GTEST_OUTPUT', "xml:" + test + ".GTEST." + arch + ".result.xml")
+                #
+                # The unit test execution will follow below rule (table).
+                #
+                # ________________________________________________________________
+                # | CODE_COVERAGE   | TOOL_CHAIN_TAG  | Where Unit Tests Run      |
+                # ________________________________________________________________
+                # | FALSE           | GCC5            | do_post_build() loop      |
+                # | FALSE           | VSxxxx          | do_post_build() loop      |
+                # | TRUE            | GCC5            | do_post_build() loop      |
+                # | TRUE            | VSxxxx          | gen_code_coverage_msvc()  |
+                # |_________________|_________________|___________________________|
+                #
+                if (thebuilder.env.GetValue("CODE_COVERAGE") == "FALSE") or (thebuilder.env.GetValue("TOOL_CHAIN_TAG") == "GCC5"):
+                    # Configure output name if test uses cmocka.
+                    shell_env.set_shell_var(
+                        'CMOCKA_XML_FILE', test + ".CMOCKA.%g." + arch + ".result.xml")
+                    # Configure output name if test uses gtest.
+                    shell_env.set_shell_var(
+                        'GTEST_OUTPUT', "xml:" + test + ".GTEST." + arch + ".result.xml")
 
-                # Run the test.
-                ret = RunCmd('"' + test + '"', "", workingdir=cp)
-                if ret != 0:
-                    logging.error("UnitTest Execution Error: " +
-                                  os.path.basename(test))
-                    failure_count += 1
-                else:
-                    logging.info("UnitTest Completed: " +
-                                 os.path.basename(test))
-                    file_match_pattern = test + ".*." + arch + ".result.xml"
-                    xml_results_list = glob.glob(file_match_pattern)
-                    for xml_result_file in xml_results_list:
-                        root = xml.etree.ElementTree.parse(
-                            xml_result_file).getroot()
-                        for suite in root:
-                            for case in suite:
-                                for result in case:
-                                    if result.tag == 'failure':
-                                        logging.warning(
-                                            "%s Test Failed" % os.path.basename(test))
-                                        logging.warning(
-                                            "  %s - %s" % (case.attrib['name'], result.text))
-                                        failure_count += 1
+                    ret = RunCmd('"' + test + '"', "", workingdir=cp)
+                    if ret != 0:
+                        logging.error("UnitTest Execution Error: " +
+                                      os.path.basename(test))
+                        failure_count += 1
+                    else:
+                        logging.info("UnitTest Completed: " +
+                                     os.path.basename(test))
+                        file_match_pattern = test + ".*." + arch + ".result.xml"
+                        xml_results_list = glob.glob(file_match_pattern)
+                        for xml_result_file in xml_results_list:
+                            root = xml.etree.ElementTree.parse(
+                                xml_result_file).getroot()
+                            for suite in root:
+                                for case in suite:
+                                    for result in case:
+                                        if result.tag == 'failure':
+                                            logging.warning(
+                                                "%s Test Failed" % os.path.basename(test))
+                                            logging.warning(
+                                                "  %s - %s" % (case.attrib['name'], result.text))
+                                            failure_count += 1
 
             if thebuilder.env.GetValue("CODE_COVERAGE") != "FALSE":
                 if thebuilder.env.GetValue("TOOL_CHAIN_TAG") == "GCC5":
