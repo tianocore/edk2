@@ -153,3 +153,25 @@ AmdSvsmVtpmCmd (
 {
   return FALSE;
 }
+
+BOOLEAN
+EFIAPI
+AmdSvsmQueryProtocol (
+  IN  UINT32  ProtocolId,
+  IN  UINT32  ProtocolVersion,
+  OUT UINT32  *ProtocolMin,
+  OUT UINT32  *ProtocolMax
+  )
+{
+  return FALSE;
+}
+
+BOOLEAN
+EFIAPI
+AmdSvsmUefiMmRequest (
+  IN  UINT64  BufferAddr,
+  IN  UINT64  BufferSize
+  )
+{
+  return FALSE;
+}
