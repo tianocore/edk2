@@ -43,11 +43,13 @@
 [Protocols]
   gEfiDxeMmReadyToLockProtocolGuid              ## UNDEFINED # SmiHandlerRegister
   gEfiMmCommunication2ProtocolGuid              ## PRODUCES
+  gEfiMmCommunication3ProtocolGuid              ## PRODUCES
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid
   gEfiEventExitBootServicesGuid
   gEfiEventReadyToBootGuid
+  gEfiMmCommunicateHeaderV3Guid
 
 [Pcd.common]
   gArmTokenSpaceGuid.PcdMmBufferBase

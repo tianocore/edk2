@@ -22,6 +22,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/VariableWrite.h>
 #include <Protocol/Variable.h>
 #include <Protocol/MmCommunication2.h>
+#include <Protocol/MmCommunication3.h>
 #include <Protocol/SmmVariable.h>
 #include <Protocol/VariableLock.h>
 #include <Protocol/VarCheck.h>
@@ -48,6 +49,7 @@ EFI_HANDLE                      mHandle                    = NULL;
 EFI_SMM_VARIABLE_PROTOCOL       *mSmmVariable              = NULL;
 EFI_EVENT                       mVirtualAddressChangeEvent = NULL;
 EFI_MM_COMMUNICATION2_PROTOCOL  *mMmCommunication2         = NULL;
+EFI_MM_COMMUNICATION3_PROTOCOL  *mMmCommunication3         = NULL;
 UINT8                           *mVariableBuffer           = NULL;
 UINT8                           *mVariableBufferPhysical   = NULL;
 VARIABLE_INFO_ENTRY             *mVariableInfo             = NULL;
@@ -163,17 +165,33 @@ InitCommunicateBuffer (
   )
 {
   EFI_MM_COMMUNICATE_HEADER        *SmmCommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER_V3     *SmmCommunicateHeaderV3;
   SMM_VARIABLE_COMMUNICATE_HEADER  *SmmVariableFunctionHeader;
 
-  if (DataSize + SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE > mVariableBufferSize) {
-    return EFI_INVALID_PARAMETER;
+  ZeroMem (mVariableBuffer, mVariableBufferSize);
+  if (mMmCommunication3 != NULL) {
+    if (DataSize + SMM_COMMUNICATE_HEADER_SIZE_V3 + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE > mVariableBufferSize) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    SmmCommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)mVariableBuffer;
+    CopyGuid (&SmmCommunicateHeaderV3->HeaderGuid, &gEfiMmCommunicateHeaderV3Guid);
+    SmmCommunicateHeaderV3->BufferSize = mVariableBufferSize;
+    CopyGuid (&SmmCommunicateHeaderV3->MessageGuid, &gEfiSmmVariableProtocolGuid);
+    SmmCommunicateHeaderV3->MessageSize = DataSize + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE;
+    SmmVariableFunctionHeader           = (SMM_VARIABLE_COMMUNICATE_HEADER *)SmmCommunicateHeaderV3->MessageData;
+  } else {
+    // Use v1 communication header, if v3 protocol is not available.
+    if (DataSize + SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE > mVariableBufferSize) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    SmmCommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)mVariableBuffer;
+    CopyGuid (&SmmCommunicateHeader->HeaderGuid, &gEfiSmmVariableProtocolGuid);
+    SmmCommunicateHeader->MessageLength = DataSize + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE;
+    SmmVariableFunctionHeader           = (SMM_VARIABLE_COMMUNICATE_HEADER *)SmmCommunicateHeader->Data;
   }
 
-  SmmCommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)mVariableBuffer;
-  CopyGuid (&SmmCommunicateHeader->HeaderGuid, &gEfiSmmVariableProtocolGuid);
-  SmmCommunicateHeader->MessageLength = DataSize + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE;
-
-  SmmVariableFunctionHeader           = (SMM_VARIABLE_COMMUNICATE_HEADER *)SmmCommunicateHeader->Data;
   SmmVariableFunctionHeader->Function = Function;
   if (DataPtr != NULL) {
     *DataPtr = SmmVariableFunctionHeader->Data;
@@ -199,20 +217,38 @@ SendCommunicateBuffer (
   EFI_STATUS                       Status;
   UINTN                            CommSize;
   EFI_MM_COMMUNICATE_HEADER        *SmmCommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER_V3     *SmmCommunicateHeaderV3;
   SMM_VARIABLE_COMMUNICATE_HEADER  *SmmVariableFunctionHeader;
 
-  CommSize = DataSize + SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE;
-  Status   = mMmCommunication2->Communicate (
-                                  mMmCommunication2,
+  if (mMmCommunication3 != NULL) {
+    Status = mMmCommunication3->Communicate (
+                                  mMmCommunication3,
                                   mVariableBufferPhysical,
-                                  mVariableBuffer,
-                                  &CommSize
+                                  mVariableBuffer
                                   );
-  ASSERT_EFI_ERROR (Status);
+    ASSERT_EFI_ERROR (Status);
 
-  SmmCommunicateHeader      = (EFI_MM_COMMUNICATE_HEADER *)mVariableBuffer;
-  SmmVariableFunctionHeader = (SMM_VARIABLE_COMMUNICATE_HEADER *)SmmCommunicateHeader->Data;
-  return SmmVariableFunctionHeader->ReturnStatus;
+    SmmCommunicateHeaderV3    = (EFI_MM_COMMUNICATE_HEADER_V3 *)mVariableBuffer;
+    SmmVariableFunctionHeader = (SMM_VARIABLE_COMMUNICATE_HEADER *)SmmCommunicateHeaderV3->MessageData;
+
+    Status = SmmVariableFunctionHeader->ReturnStatus;
+  } else {
+    CommSize = DataSize + SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE;
+    Status   = mMmCommunication2->Communicate (
+                                    mMmCommunication2,
+                                    mVariableBufferPhysical,
+                                    mVariableBuffer,
+                                    &CommSize
+                                    );
+    ASSERT_EFI_ERROR (Status);
+
+    SmmCommunicateHeader      = (EFI_MM_COMMUNICATE_HEADER *)mVariableBuffer;
+    SmmVariableFunctionHeader = (SMM_VARIABLE_COMMUNICATE_HEADER *)SmmCommunicateHeader->Data;
+
+    Status = SmmVariableFunctionHeader->ReturnStatus;
+  }
+
+  return Status;
 }
 
 /**
@@ -1342,7 +1378,12 @@ VariableAddressChangeEvent (
   )
 {
   EfiConvertPointer (0x0, (VOID **)&mVariableBuffer);
-  EfiConvertPointer (0x0, (VOID **)&mMmCommunication2);
+  if (mMmCommunication3 != NULL) {
+    EfiConvertPointer (0x0, (VOID **)&mMmCommunication3);
+  } else {
+    EfiConvertPointer (0x0, (VOID **)&mMmCommunication2);
+  }
+
   EfiConvertPointer (EFI_OPTIONAL_PTR, (VOID **)&mVariableRtCacheInfo.CacheInfoFlagBuffer);
   EfiConvertPointer (EFI_OPTIONAL_PTR, (VOID **)&mVariableRtCacheInfo.RuntimeHobCacheBuffer);
   EfiConvertPointer (EFI_OPTIONAL_PTR, (VOID **)&mVariableRtCacheInfo.RuntimeNvCacheBuffer);
@@ -1367,6 +1408,7 @@ GetVariablePayloadSize (
   EFI_STATUS                                 Status;
   SMM_VARIABLE_COMMUNICATE_GET_PAYLOAD_SIZE  *SmmGetPayloadSize;
   EFI_MM_COMMUNICATE_HEADER                  *SmmCommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER_V3               *SmmCommunicateHeaderV3;
   SMM_VARIABLE_COMMUNICATE_HEADER            *SmmVariableFunctionHeader;
   UINTN                                      CommSize;
   UINT8                                      *CommBuffer;
@@ -1384,26 +1426,52 @@ GetVariablePayloadSize (
   // Init the communicate buffer. The buffer data size is:
   // SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_GET_PAYLOAD_SIZE);
   //
-  CommSize   = SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_GET_PAYLOAD_SIZE);
-  CommBuffer = AllocateZeroPool (CommSize);
-  if (CommBuffer == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Done;
+
+  if (mMmCommunication3 != NULL) {
+    CommSize   = SMM_COMMUNICATE_HEADER_SIZE_V3 + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_GET_PAYLOAD_SIZE);
+    CommBuffer = AllocateZeroPool (CommSize);
+    if (CommBuffer == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Done;
+    }
+
+    SmmCommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommBuffer;
+    CopyGuid (&SmmCommunicateHeaderV3->HeaderGuid, &gEfiMmCommunicateHeaderV3Guid);
+    SmmCommunicateHeaderV3->BufferSize = CommSize;
+    CopyGuid (&SmmCommunicateHeaderV3->MessageGuid, &gEfiSmmVariableProtocolGuid);
+    SmmCommunicateHeaderV3->MessageSize = SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_GET_PAYLOAD_SIZE);
+    SmmVariableFunctionHeader           = (SMM_VARIABLE_COMMUNICATE_HEADER *)SmmCommunicateHeaderV3->MessageData;
+
+    SmmVariableFunctionHeader->Function = SMM_VARIABLE_FUNCTION_GET_PAYLOAD_SIZE;
+    SmmGetPayloadSize                   = (SMM_VARIABLE_COMMUNICATE_GET_PAYLOAD_SIZE *)SmmVariableFunctionHeader->Data;
+
+    //
+    // Send data to SMM.
+    //
+    Status = mMmCommunication3->Communicate (mMmCommunication3, CommBuffer, CommBuffer);
+    ASSERT_EFI_ERROR (Status);
+  } else {
+    CommSize   = SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_GET_PAYLOAD_SIZE);
+    CommBuffer = AllocateZeroPool (CommSize);
+    if (CommBuffer == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Done;
+    }
+
+    SmmCommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)CommBuffer;
+    CopyGuid (&SmmCommunicateHeader->HeaderGuid, &gEfiSmmVariableProtocolGuid);
+    SmmCommunicateHeader->MessageLength = SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_GET_PAYLOAD_SIZE);
+    SmmVariableFunctionHeader           = (SMM_VARIABLE_COMMUNICATE_HEADER *)SmmCommunicateHeader->Data;
+
+    SmmVariableFunctionHeader->Function = SMM_VARIABLE_FUNCTION_GET_PAYLOAD_SIZE;
+    SmmGetPayloadSize                   = (SMM_VARIABLE_COMMUNICATE_GET_PAYLOAD_SIZE *)SmmVariableFunctionHeader->Data;
+
+    //
+    // Send data to SMM.
+    //
+    Status = mMmCommunication2->Communicate (mMmCommunication2, CommBuffer, CommBuffer, &CommSize);
+    ASSERT_EFI_ERROR (Status);
   }
-
-  SmmCommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)CommBuffer;
-  CopyGuid (&SmmCommunicateHeader->HeaderGuid, &gEfiSmmVariableProtocolGuid);
-  SmmCommunicateHeader->MessageLength = SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_GET_PAYLOAD_SIZE);
-
-  SmmVariableFunctionHeader           = (SMM_VARIABLE_COMMUNICATE_HEADER *)SmmCommunicateHeader->Data;
-  SmmVariableFunctionHeader->Function = SMM_VARIABLE_FUNCTION_GET_PAYLOAD_SIZE;
-  SmmGetPayloadSize                   = (SMM_VARIABLE_COMMUNICATE_GET_PAYLOAD_SIZE *)SmmVariableFunctionHeader->Data;
-
-  //
-  // Send data to SMM.
-  //
-  Status = mMmCommunication2->Communicate (mMmCommunication2, CommBuffer, CommBuffer, &CommSize);
-  ASSERT_EFI_ERROR (Status);
 
   Status = SmmVariableFunctionHeader->ReturnStatus;
   if (EFI_ERROR (Status)) {
@@ -1449,6 +1517,7 @@ GetRuntimeCacheInfo (
   EFI_STATUS                                       Status;
   SMM_VARIABLE_COMMUNICATE_GET_RUNTIME_CACHE_INFO  *SmmGetRuntimeCacheInfo;
   EFI_MM_COMMUNICATE_HEADER                        *SmmCommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER_V3                     *SmmCommunicateHeaderV3;
   SMM_VARIABLE_COMMUNICATE_HEADER                  *SmmVariableFunctionHeader;
   UINTN                                            CommSize;
   UINT8                                            *CommBuffer;
@@ -1466,22 +1535,44 @@ GetRuntimeCacheInfo (
 
   AcquireLockOnlyAtBootTime (&mVariableServicesLock);
 
-  CommSize = SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_GET_RUNTIME_CACHE_INFO);
-  ZeroMem (CommBuffer, CommSize);
+  if (mMmCommunication3 != NULL) {
+    CommSize = SMM_COMMUNICATE_HEADER_SIZE_V3 + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_GET_RUNTIME_CACHE_INFO);
+    ZeroMem (CommBuffer, CommSize);
 
-  SmmCommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)CommBuffer;
-  CopyGuid (&SmmCommunicateHeader->HeaderGuid, &gEfiSmmVariableProtocolGuid);
-  SmmCommunicateHeader->MessageLength = SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_GET_RUNTIME_CACHE_INFO);
+    SmmCommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommBuffer;
+    CopyGuid (&SmmCommunicateHeaderV3->HeaderGuid, &gEfiMmCommunicateHeaderV3Guid);
+    SmmCommunicateHeaderV3->BufferSize = mVariableBufferSize;
+    CopyGuid (&SmmCommunicateHeaderV3->MessageGuid, &gEfiSmmVariableProtocolGuid);
+    SmmCommunicateHeaderV3->MessageSize = SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_GET_RUNTIME_CACHE_INFO);
 
-  SmmVariableFunctionHeader           = (SMM_VARIABLE_COMMUNICATE_HEADER *)SmmCommunicateHeader->Data;
-  SmmVariableFunctionHeader->Function = SMM_VARIABLE_FUNCTION_GET_RUNTIME_CACHE_INFO;
-  SmmGetRuntimeCacheInfo              = (SMM_VARIABLE_COMMUNICATE_GET_RUNTIME_CACHE_INFO *)SmmVariableFunctionHeader->Data;
+    SmmVariableFunctionHeader           = (SMM_VARIABLE_COMMUNICATE_HEADER *)SmmCommunicateHeaderV3->MessageData;
+    SmmVariableFunctionHeader->Function = SMM_VARIABLE_FUNCTION_GET_RUNTIME_CACHE_INFO;
+    SmmGetRuntimeCacheInfo              = (SMM_VARIABLE_COMMUNICATE_GET_RUNTIME_CACHE_INFO *)SmmVariableFunctionHeader->Data;
 
-  //
-  // Send data to SMM.
-  //
-  Status = mMmCommunication2->Communicate (mMmCommunication2, CommBuffer, CommBuffer, &CommSize);
-  ASSERT_EFI_ERROR (Status);
+    //
+    // Send data to SMM.
+    //
+    Status = mMmCommunication3->Communicate (mMmCommunication3, CommBuffer, CommBuffer);
+    ASSERT_EFI_ERROR (Status);
+  } else {
+    CommSize = SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_GET_RUNTIME_CACHE_INFO);
+    ZeroMem (CommBuffer, CommSize);
+
+    SmmCommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)CommBuffer;
+    CopyGuid (&SmmCommunicateHeader->HeaderGuid, &gEfiSmmVariableProtocolGuid);
+    SmmCommunicateHeader->MessageLength = SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_GET_RUNTIME_CACHE_INFO);
+
+    SmmVariableFunctionHeader           = (SMM_VARIABLE_COMMUNICATE_HEADER *)SmmCommunicateHeader->Data;
+    SmmVariableFunctionHeader->Function = SMM_VARIABLE_FUNCTION_GET_RUNTIME_CACHE_INFO;
+    SmmGetRuntimeCacheInfo              = (SMM_VARIABLE_COMMUNICATE_GET_RUNTIME_CACHE_INFO *)SmmVariableFunctionHeader->Data;
+
+    //
+    // Send data to SMM.
+    //
+    Status = mMmCommunication2->Communicate (mMmCommunication2, CommBuffer, CommBuffer, &CommSize);
+    ASSERT_EFI_ERROR (Status);
+  }
+
   if (CommSize <= SMM_VARIABLE_COMMUNICATE_HEADER_SIZE) {
     Status = EFI_BAD_BUFFER_SIZE;
     goto Done;
@@ -1599,6 +1690,7 @@ SendRuntimeVariableCacheContextToSmm (
   EFI_STATUS                                               Status;
   SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT  *SmmRuntimeVarCacheContext;
   EFI_MM_COMMUNICATE_HEADER                                *SmmCommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER_V3                             *SmmCommunicateHeaderV3;
   SMM_VARIABLE_COMMUNICATE_HEADER                          *SmmVariableFunctionHeader;
   UINTN                                                    CommSize;
   UINT8                                                    *CommBuffer;
@@ -1612,33 +1704,66 @@ SendRuntimeVariableCacheContextToSmm (
 
   AcquireLockOnlyAtBootTime (&mVariableServicesLock);
 
-  //
-  // Init the communicate buffer. The buffer data size is:
-  // SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT);
-  //
-  CommSize = SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT);
-  ZeroMem (CommBuffer, CommSize);
+  if (mMmCommunication3 != NULL) {
+    //
+    // Init the communicate buffer. The buffer data size is:
+    // SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT);
+    //
+    CommSize = SMM_COMMUNICATE_HEADER_SIZE_V3 + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT);
+    ZeroMem (CommBuffer, CommSize);
 
-  SmmCommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)CommBuffer;
-  CopyGuid (&SmmCommunicateHeader->HeaderGuid, &gEfiSmmVariableProtocolGuid);
-  SmmCommunicateHeader->MessageLength = SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT);
+    SmmCommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommBuffer;
+    CopyGuid (&SmmCommunicateHeaderV3->HeaderGuid, &gEfiMmCommunicateHeaderV3Guid);
+    SmmCommunicateHeaderV3->BufferSize = mVariableBufferSize;
+    CopyGuid (&SmmCommunicateHeaderV3->MessageGuid, &gEfiSmmVariableProtocolGuid);
+    SmmCommunicateHeaderV3->MessageSize = SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT);
 
-  SmmVariableFunctionHeader           = (SMM_VARIABLE_COMMUNICATE_HEADER *)SmmCommunicateHeader->Data;
-  SmmVariableFunctionHeader->Function = SMM_VARIABLE_FUNCTION_INIT_RUNTIME_VARIABLE_CACHE_CONTEXT;
-  SmmRuntimeVarCacheContext           = (SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT *)SmmVariableFunctionHeader->Data;
+    SmmVariableFunctionHeader           = (SMM_VARIABLE_COMMUNICATE_HEADER *)SmmCommunicateHeaderV3->MessageData;
+    SmmVariableFunctionHeader->Function = SMM_VARIABLE_FUNCTION_INIT_RUNTIME_VARIABLE_CACHE_CONTEXT;
+    SmmRuntimeVarCacheContext           = (SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT *)SmmVariableFunctionHeader->Data;
 
-  SmmRuntimeVarCacheContext->RuntimeHobCache      = (VARIABLE_STORE_HEADER *)(UINTN)mVariableRtCacheInfo.RuntimeHobCacheBuffer;
-  SmmRuntimeVarCacheContext->RuntimeVolatileCache = (VARIABLE_STORE_HEADER *)(UINTN)mVariableRtCacheInfo.RuntimeVolatileCacheBuffer;
-  SmmRuntimeVarCacheContext->RuntimeNvCache       = (VARIABLE_STORE_HEADER *)(UINTN)mVariableRtCacheInfo.RuntimeNvCacheBuffer;
-  SmmRuntimeVarCacheContext->PendingUpdate        = &((CACHE_INFO_FLAG *)(UINTN)mVariableRtCacheInfo.CacheInfoFlagBuffer)->PendingUpdate;
-  SmmRuntimeVarCacheContext->ReadLock             = &((CACHE_INFO_FLAG *)(UINTN)mVariableRtCacheInfo.CacheInfoFlagBuffer)->ReadLock;
-  SmmRuntimeVarCacheContext->HobFlushComplete     = &((CACHE_INFO_FLAG *)(UINTN)mVariableRtCacheInfo.CacheInfoFlagBuffer)->HobFlushComplete;
+    SmmRuntimeVarCacheContext->RuntimeHobCache      = (VARIABLE_STORE_HEADER *)(UINTN)mVariableRtCacheInfo.RuntimeHobCacheBuffer;
+    SmmRuntimeVarCacheContext->RuntimeVolatileCache = (VARIABLE_STORE_HEADER *)(UINTN)mVariableRtCacheInfo.RuntimeVolatileCacheBuffer;
+    SmmRuntimeVarCacheContext->RuntimeNvCache       = (VARIABLE_STORE_HEADER *)(UINTN)mVariableRtCacheInfo.RuntimeNvCacheBuffer;
+    SmmRuntimeVarCacheContext->PendingUpdate        = &((CACHE_INFO_FLAG *)(UINTN)mVariableRtCacheInfo.CacheInfoFlagBuffer)->PendingUpdate;
+    SmmRuntimeVarCacheContext->ReadLock             = &((CACHE_INFO_FLAG *)(UINTN)mVariableRtCacheInfo.CacheInfoFlagBuffer)->ReadLock;
+    SmmRuntimeVarCacheContext->HobFlushComplete     = &((CACHE_INFO_FLAG *)(UINTN)mVariableRtCacheInfo.CacheInfoFlagBuffer)->HobFlushComplete;
 
-  //
-  // Send data to SMM.
-  //
-  Status = mMmCommunication2->Communicate (mMmCommunication2, CommBuffer, CommBuffer, &CommSize);
-  ASSERT_EFI_ERROR (Status);
+    //
+    // Send data to SMM.
+    //
+    Status = mMmCommunication3->Communicate (mMmCommunication3, CommBuffer, CommBuffer);
+    ASSERT_EFI_ERROR (Status);
+  } else {
+    //
+    // Init the communicate buffer. The buffer data size is:
+    // SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT);
+    //
+    CommSize = SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT);
+    ZeroMem (CommBuffer, CommSize);
+
+    SmmCommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)CommBuffer;
+    CopyGuid (&SmmCommunicateHeader->HeaderGuid, &gEfiSmmVariableProtocolGuid);
+    SmmCommunicateHeader->MessageLength = SMM_VARIABLE_COMMUNICATE_HEADER_SIZE + sizeof (SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT);
+
+    SmmVariableFunctionHeader           = (SMM_VARIABLE_COMMUNICATE_HEADER *)SmmCommunicateHeader->Data;
+    SmmVariableFunctionHeader->Function = SMM_VARIABLE_FUNCTION_INIT_RUNTIME_VARIABLE_CACHE_CONTEXT;
+    SmmRuntimeVarCacheContext           = (SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT *)SmmVariableFunctionHeader->Data;
+
+    SmmRuntimeVarCacheContext->RuntimeHobCache      = (VARIABLE_STORE_HEADER *)(UINTN)mVariableRtCacheInfo.RuntimeHobCacheBuffer;
+    SmmRuntimeVarCacheContext->RuntimeVolatileCache = (VARIABLE_STORE_HEADER *)(UINTN)mVariableRtCacheInfo.RuntimeVolatileCacheBuffer;
+    SmmRuntimeVarCacheContext->RuntimeNvCache       = (VARIABLE_STORE_HEADER *)(UINTN)mVariableRtCacheInfo.RuntimeNvCacheBuffer;
+    SmmRuntimeVarCacheContext->PendingUpdate        = &((CACHE_INFO_FLAG *)(UINTN)mVariableRtCacheInfo.CacheInfoFlagBuffer)->PendingUpdate;
+    SmmRuntimeVarCacheContext->ReadLock             = &((CACHE_INFO_FLAG *)(UINTN)mVariableRtCacheInfo.CacheInfoFlagBuffer)->ReadLock;
+    SmmRuntimeVarCacheContext->HobFlushComplete     = &((CACHE_INFO_FLAG *)(UINTN)mVariableRtCacheInfo.CacheInfoFlagBuffer)->HobFlushComplete;
+
+    //
+    // Send data to SMM.
+    //
+    Status = mMmCommunication2->Communicate (mMmCommunication2, CommBuffer, CommBuffer, &CommSize);
+    ASSERT_EFI_ERROR (Status);
+  }
+
   if (CommSize <= SMM_VARIABLE_COMMUNICATE_HEADER_SIZE) {
     Status = EFI_BAD_BUFFER_SIZE;
     goto Done;
@@ -1677,7 +1802,12 @@ SmmVariableReady (
     return;
   }
 
-  Status = gBS->LocateProtocol (&gEfiMmCommunication2ProtocolGuid, NULL, (VOID **)&mMmCommunication2);
+  Status = gBS->LocateProtocol (&gEfiMmCommunication3ProtocolGuid, NULL, (VOID **)&mMmCommunication3);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_WARN, "Unable to locate MM communication v3 (%r). Falling back to v2\n", Status));
+    Status = gBS->LocateProtocol (&gEfiMmCommunication2ProtocolGuid, NULL, (VOID **)&mMmCommunication2);
+  }
+
   ASSERT_EFI_ERROR (Status);
 
   //
