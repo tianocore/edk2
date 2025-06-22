@@ -1,0 +1,79 @@
+## @file
+# Unit test suite for the DxeImageVerificationLib using Google Test
+#
+# Copyright (c) 2025, Yandex. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeImageVerificationLibGoogleTest
+  FILE_GUID                      = 18723239-55AA-4814-9B7A-874BAF719A65
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  DxeImageVerificationLibGoogleTest.cpp
+  ../../../../MdePkg/Test/Mock/Library/GoogleTest/Protocol/MockRng.cpp
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  DxeImageVerificationLib
+  GoogleTestLib
+  BaseCryptLib
+  DebugLib
+
+[Guids]
+  ## SOMETIMES_CONSUMES   ## Variable:L"SecureBoot"
+  gEfiGlobalVariableGuid
+
+  ## SOMETIMES_CONSUMES   ## Variable:L"DB"
+  ## SOMETIMES_CONSUMES   ## Variable:L"DBX"
+  ## SOMETIMES_CONSUMES   ## Variable:L"DBT"
+  ## PRODUCES             ## SystemTable
+  ## CONSUMES             ## SystemTable
+  gEfiImageSecurityDatabaseGuid
+
+  ## SOMETIMES_CONSUMES   ## GUID       # Unique ID for the type of the signature.
+  ## SOMETIMES_PRODUCES   ## GUID       # Unique ID for the type of the signature.
+  gEfiCertSha1Guid
+
+  ## SOMETIMES_CONSUMES   ## GUID       # Unique ID for the type of the signature.
+  ## SOMETIMES_PRODUCES   ## GUID       # Unique ID for the type of the signature.
+  gEfiCertSha256Guid
+
+  ## SOMETIMES_CONSUMES   ## GUID       # Unique ID for the type of the signature.
+  ## SOMETIMES_PRODUCES   ## GUID       # Unique ID for the type of the signature.
+  gEfiCertSha384Guid
+
+  ## SOMETIMES_CONSUMES   ## GUID       # Unique ID for the type of the signature.
+  ## SOMETIMES_PRODUCES   ## GUID       # Unique ID for the type of the signature.
+  gEfiCertSha512Guid
+
+  gEfiCertX509Guid                      ## SOMETIMES_CONSUMES    ## GUID     # Unique ID for the type of the signature.
+  gEfiCertX509Sha256Guid                ## SOMETIMES_CONSUMES    ## GUID     # Unique ID for the type of the signature.
+  gEfiCertX509Sha384Guid                ## SOMETIMES_CONSUMES    ## GUID     # Unique ID for the type of the signature.
+  gEfiCertX509Sha512Guid                ## SOMETIMES_CONSUMES    ## GUID     # Unique ID for the type of the signature.
+  gEfiCertPkcs7Guid                     ## SOMETIMES_CONSUMES    ## GUID     # Unique ID for the type of the certificate.
+
+[Protocols]
+  gEfiFirmwareVolume2ProtocolGuid       ## SOMETIMES_CONSUMES
+  gEfiBlockIoProtocolGuid               ## SOMETIMES_CONSUMES
+  gEfiSimpleFileSystemProtocolGuid      ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy          ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdRemovableMediaImageVerificationPolicy     ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdFixedMediaImageVerificationPolicy         ## SOMETIMES_CONSUMES
