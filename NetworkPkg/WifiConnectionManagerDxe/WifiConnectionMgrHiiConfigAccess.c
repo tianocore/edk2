@@ -1664,7 +1664,8 @@ WifiMgrDxeHiiConfigAccessCallback (
 
         Status = gBS->SetTimer (Private->CurrentNic->TickTimer, TimerPeriodic, EFI_TIMER_PERIOD_MILLISECONDS (500));
         if (EFI_ERROR (Status)) {
-          gBS->CloseEvent (Private->CurrentNic->TickTimer);
+          DEBUG ((DEBUG_WARN, "[WiFi Connection Manager] Error: Failed to set timer for connect action!"));
+          gBS->SetTimer (Private->CurrentNic->TickTimer, TimerCancel, 0);
         }
 
         break;
@@ -1920,7 +1921,8 @@ WifiMgrDxeHiiConfigAccessCallback (
 
         Status = gBS->SetTimer (Private->CurrentNic->TickTimer, TimerPeriodic, EFI_TIMER_PERIOD_MILLISECONDS (500));
         if (EFI_ERROR (Status)) {
-          gBS->CloseEvent (Private->CurrentNic->TickTimer);
+          DEBUG ((DEBUG_WARN, "[WiFi Connection Manager] Error: Failed to set timer for connect action!"));
+          gBS->SetTimer (Private->CurrentNic->TickTimer, TimerCancel, 0);
         }
 
         break;
