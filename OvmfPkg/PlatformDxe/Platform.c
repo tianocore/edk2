@@ -13,6 +13,8 @@
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/HiiLib.h>
+#include <Library/HobLib.h>
+#include <Library/MemDebugLogLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PrintLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -944,6 +946,28 @@ GopInstalled (
 }
 
 /**
+  If a memory debug log buffer is present, register the buffer location as
+  config table so the OS can find and show it.
+**/
+VOID
+EFIAPI
+MemDebugLogInstallTable (
+  VOID
+  )
+{
+  EFI_HOB_GUID_TYPE       *GuidHob;
+  MEM_DEBUG_LOG_HOB_DATA  *HobData;
+  VOID                    *LogBuffer;
+
+  GuidHob = GetFirstGuidHob (&gMemDebugLogHobGuid);
+  if (GuidHob != NULL) {
+    HobData   = (MEM_DEBUG_LOG_HOB_DATA *)GET_GUID_HOB_DATA (GuidHob);
+    LogBuffer = (VOID *)(UINTN)HobData->MemDebugLogBufAddr;
+    gBS->InstallConfigurationTable (&gMemDebugLogHobGuid, LogBuffer);
+  }
+}
+
+/**
   Entry point for this driver.
 
   @param[in] ImageHandle  Image handle of this driver.
@@ -1029,6 +1053,8 @@ PlatformInit (
   //
   Status = gBS->SignalEvent (mGopEvent);
   ASSERT_EFI_ERROR (Status);
+
+  MemDebugLogInstallTable ();
 
   return EFI_SUCCESS;
 
