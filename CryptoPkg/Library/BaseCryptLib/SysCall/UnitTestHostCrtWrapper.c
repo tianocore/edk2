@@ -14,10 +14,23 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 
 /* Convert character to lowercase */
+#ifdef _MSC_VER
+//
+// Workaround for building NOOPT on Windows systems. Due to disabled
+// optimization, the MSVC compiler cannot hide this function
+// implementation from the linker.
+//
+int
+tolower_noos (
+  int  c
+  )
+  #pragma comment(linker, "/alternatename:tolower=tolower_noos")
+#else
 int
 tolower (
   int  c
   )
+#endif
 {
   if (('A' <= (c)) && ((c) <= 'Z')) {
     return (c - ('A' - 'a'));
