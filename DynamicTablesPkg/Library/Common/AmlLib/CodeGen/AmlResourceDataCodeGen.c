@@ -1778,3 +1778,204 @@ AmlCodeGenRdIrq (
 
   return LinkRdNode (RdNode, NameOpNode, NewRdNode);
 }
+
+/** Code generation for the UART Serial Bus Connection Resource Descriptor.
+
+  The Resource Data effectively created is a UART Serial Bus Connection
+  Resource Descriptor Resource Data.
+  Cf ACPI 6.5:
+   - s19.6.143 UARTSerialBusV2
+     (UART Serial Bus Connection Resource Descriptor Version 2 Macro)
+   - s6.4.3.8.2.3 UART Serial Bus Connection Resource Descriptor
+
+  The created resource data node can be:
+   - appended to the list of resource data elements of the NameOpNode.
+     In such case NameOpNode must be defined by a the "Name ()" ASL statement
+     and initially contain a "ResourceTemplate ()".
+   - returned through the NewRdNode parameter.
+
+  @param [in] IsResourceConsumer          ResourceUsage parameter.
+  @param [in] IsSlaveMode                 Indicates whether the uart operates in slave mode.
+  @param [in] IsBigEndian                 Indicates whether the bit transfer is big-endian.
+  @param [in] BitsPerByte                 Indicates the number of bits per byte.
+  @param [in] StopBits                    Specifies the stop bits format used.
+  @param [in] FlowControl                 Specifies the flow control protocol used.
+  @param [in] BaudRate                    Specifies the baud rate.
+  @param [in] RxFifo                      Number of bytes in the receiver FIFO.
+  @param [in] TxFifo                      Number of bytes in the transmitter FIFO.
+  @param [in] Parity                      Specifies the parity format used.
+  @param [in] IsSerialLinesEnabled        Specifies which serial lines are enabled.
+  @param [in] VendorDefinedData           VendorDefinedData parameter.
+  @param [in] VendorDefinedDataLength     VendorDefinedDataLength parameter.
+  @param [in] ResourceSource              Name of source resource used.
+  @param [in] ResourceSourceLength        Resource Source Length.
+  @param [in] NameOpNode                  NameOpNode object node defining a named object.
+                                          If provided, append the new resource data
+                                          node to the list of resource data elements
+                                          of this node.
+  @param [out] NewRdNode                  If provided and success,
+                                          contain the created node.
+
+  @retval EFI_SUCCESS           The function completed successfully.
+  @retval EFI_INVALID_PARAMETER Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES  Could not allocate memory.
+  @retval various               Other errors as indicated.
+
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenRdUartSerialBus (
+  IN  BOOLEAN                 IsResourceConsumer,
+  IN  BOOLEAN                 IsSlaveMode,
+  IN  BOOLEAN                 IsBigEndian,
+  IN  UINT8                   BitsPerByte,
+  IN  UINT8                   StopBits,
+  IN  UINT8                   FlowControl,
+  IN  UINT32                  BaudRate,
+  IN  UINT16                  RxFifo,
+  IN  UINT16                  TxFifo,
+  IN  UINT8                   Parity,
+  IN  BOOLEAN                 IsSerialLinesEnabled,
+  IN  UINT8                   *VendorDefinedData OPTIONAL,
+  IN  UINT16                  VendorDefinedDataLength,
+  IN  CHAR8                   *ResourceSource,
+  IN  UINT16                  ResourceSourceLength,
+  IN  AML_OBJECT_NODE_HANDLE  NameOpNode OPTIONAL,
+  OUT AML_DATA_NODE_HANDLE    *NewRdNode OPTIONAL
+  )
+{
+  AML_DATA_NODE  *RdNode;
+  EFI_STATUS     Status;
+  UINT16         UartDescBuffLength;
+  UINT8          *UartDescBuff;
+  UINT8          BitsPerByteMask;
+
+  EFI_ACPI_SERIAL_BUS_RESOURCE_UART_DESCRIPTOR  UartDesc;
+
+  if ((NameOpNode == NULL) && (NewRdNode == NULL)) {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (((VendorDefinedData == NULL) && (VendorDefinedDataLength > 0)) ||
+      ((VendorDefinedData != NULL) && (VendorDefinedDataLength == 0)))
+  {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((ResourceSource == NULL) || (ResourceSourceLength <= 0)) {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (StopBits > EFI_ACPI_5_0_SERIAL_BUS_RESOURCE_UART_DESCRIPTOR_TSF_STOP_BIT_2) {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (FlowControl > EFI_ACPI_5_0_SERIAL_BUS_RESOURCE_UART_DESCRIPTOR_TSF_FC_XON_XOFF) {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Parity > EFI_ACPI_5_0_SERIAL_BUS_RESOURCE_UART_DESCRIPTOR_PARITY_SPACE) {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  switch (BitsPerByte) {
+    case 5:
+      BitsPerByteMask = EFI_ACPI_5_0_SERIAL_BUS_RESOURCE_UART_DESCRIPTOR_TSF_5_BITS_PER_BYTE;
+      break;
+    case 6:
+      BitsPerByteMask = EFI_ACPI_5_0_SERIAL_BUS_RESOURCE_UART_DESCRIPTOR_TSF_6_BITS_PER_BYTE;
+      break;
+    case 7:
+      BitsPerByteMask = EFI_ACPI_5_0_SERIAL_BUS_RESOURCE_UART_DESCRIPTOR_TSF_7_BITS_PER_BYTE;
+      break;
+    case 8:
+      BitsPerByteMask = EFI_ACPI_5_0_SERIAL_BUS_RESOURCE_UART_DESCRIPTOR_TSF_8_BITS_PER_BYTE;
+      break;
+    case 9:
+      BitsPerByteMask = EFI_ACPI_5_0_SERIAL_BUS_RESOURCE_UART_DESCRIPTOR_TSF_9_BITS_PER_BYTE;
+      break;
+    default:
+      ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+      return EFI_INVALID_PARAMETER;
+  }
+
+  UartDesc.Header.Header.Bits.Type = ACPI_LARGE_ITEM_FLAG;
+  UartDesc.Header.Header.Bits.Name = ACPI_LARGE_GENERIC_SERIAL_BUS_CONNECTION_DESCRIPTOR_NAME;
+  UartDesc.RevisionId              = EFI_ACPI_5_0_SERIAL_BUS_RESOURCE_UART_DESCRIPTOR_REVISION_ID;
+  UartDesc.ResourceSourceIndex     = 0;
+  UartDesc.SerialBusType           = EFI_ACPI_SERIAL_BUS_RESOURCE_TYPE_UART;
+  UartDesc.GeneralFlags            = (IsResourceConsumer ? BIT1 : 0) |
+                                     (IsSlaveMode ? BIT0 : 0);
+  UartDesc.TypeSpecificFlags = (IsBigEndian ? BIT7 : 0) |
+                               (BitsPerByteMask << 4) |
+                               (StopBits << 2)        |
+                               (FlowControl);
+  UartDesc.TypeSpecificRevisionId = EFI_ACPI_5_0_SERIAL_BUS_RESOURCE_UART_DESCRIPTOR_REVISION_ID;
+  /// TypeDataLength is the length of the data following the TypeDataLength,
+  /// up to the Additional vendor supplied data (not included).
+  UartDesc.TypeDataLength = sizeof (UartDesc.DefaultBaudRate) +
+                            sizeof (UartDesc.RxFIFO) +
+                            sizeof (UartDesc.TxFIFO) +
+                            sizeof (UartDesc.Parity) +
+                            sizeof (UartDesc.SerialLinesEnabled) +
+                            VendorDefinedDataLength;
+  UartDesc.DefaultBaudRate    = BaudRate;
+  UartDesc.RxFIFO             = RxFifo;
+  UartDesc.TxFIFO             = TxFifo;
+  UartDesc.Parity             = Parity;
+  UartDesc.SerialLinesEnabled = IsSerialLinesEnabled;
+
+  UartDescBuffLength = sizeof (EFI_ACPI_SERIAL_BUS_RESOURCE_UART_DESCRIPTOR) +
+                       VendorDefinedDataLength +
+                       ResourceSourceLength;
+
+  UartDesc.Header.Length = UartDescBuffLength - sizeof (ACPI_LARGE_RESOURCE_HEADER);
+
+  UartDescBuff = AllocateZeroPool (UartDescBuffLength);
+  if (UartDescBuff == NULL) {
+    ASSERT_EFI_ERROR (EFI_OUT_OF_RESOURCES);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  CopyMem (
+    UartDescBuff,
+    &UartDesc,
+    sizeof (EFI_ACPI_SERIAL_BUS_RESOURCE_UART_DESCRIPTOR)
+    );
+
+  if (VendorDefinedData != NULL) {
+    CopyMem (
+      UartDescBuff + sizeof (EFI_ACPI_SERIAL_BUS_RESOURCE_UART_DESCRIPTOR),
+      VendorDefinedData,
+      VendorDefinedDataLength
+      );
+  }
+
+  CopyMem (
+    UartDescBuff +
+    sizeof (EFI_ACPI_SERIAL_BUS_RESOURCE_UART_DESCRIPTOR) +
+    VendorDefinedDataLength,
+    ResourceSource,
+    ResourceSourceLength
+    );
+
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeResourceData,
+             UartDescBuff,
+             UartDescBuffLength,
+             &RdNode
+             );
+  FreePool (UartDescBuff);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  return LinkRdNode (RdNode, NameOpNode, NewRdNode);
+}
