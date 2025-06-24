@@ -2,7 +2,7 @@
   AML Resource Data Code Generation.
 
   Copyright (c) 2020 - 2021, Arm Limited. All rights reserved.<BR>
-  Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -1669,4 +1669,112 @@ error_handler:
   }
 
   return Status;
+}
+
+/** Code generation for the IRQ Descriptor.
+
+  The Resource Data effectively created is an IRQ Resource
+  Data. Cf ACPI 6.5 specification:
+   - s6.4.2.1 "IRQ Descriptor"
+   - s19.6.66 "IRQ (Interrupt Resource Descriptor Macro)"
+
+
+  The created resource data node can be:
+   - appended to the list of resource data elements of the NameOpNode.
+     In such case NameOpNode must be defined by a the "Name ()" ASL statement
+     and initially contain a "ResourceTemplate ()".
+   - returned through the NewRdNode parameter.
+
+  @param  [in]  IsEdgeTriggered The interrupt is edge triggered or
+                                level triggered.
+  @param  [in]  IsActiveLow     The interrupt is active-high or active-low.
+  @param  [in]  IsShared        The interrupt can be shared with other
+                                devices or not (Exclusive).
+  @param  [in]  IrqList         List of IRQ numbers. Must be non-NULL.
+  @param  [in]  IrqCount        Number of IRQs in IrqList. Must be > 0 and <= 16.
+  @param  [in]  NameOpNode      NameOp object node defining a named object.
+                                If provided, append the new resource data node
+                                to the list of resource data elements of this node.
+  @param  [out] NewRdNode       If provided and success, contain the created node.
+
+  @retval EFI_SUCCESS           The function completed successfully.
+  @retval EFI_INVALID_PARAMETER Invalid parameter.
+  @retval various               Other errors as indicated.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenRdIrq (
+  IN  BOOLEAN                 IsEdgeTriggered,
+  IN  BOOLEAN                 IsActiveLow,
+  IN  BOOLEAN                 IsShared,
+  IN  UINT8                   *IrqList,
+  IN  UINT8                   IrqCount,
+  IN  AML_OBJECT_NODE_HANDLE  NameOpNode  OPTIONAL,
+  OUT AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
+  )
+{
+  AML_DATA_NODE            *RdNode;
+  EFI_ACPI_IRQ_DESCRIPTOR  IrqDesc;
+  EFI_STATUS               Status;
+  UINT8                    Index;
+  UINT16                   Mask;
+
+  if ((NameOpNode == NULL) && (NewRdNode == NULL)) {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((IsEdgeTriggered && !IsActiveLow) ||
+      (!IsEdgeTriggered && IsActiveLow))
+  {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((IrqList == NULL) || (IrqCount == 0) || (IrqCount > 16)) {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Mask = 0;
+  for (Index = 0; Index < IrqCount; Index++) {
+    if (IrqList[Index] > 16) {
+      ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if ((Mask & (1 << IrqList[Index])) != 0) {
+      ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+      return EFI_INVALID_PARAMETER;
+    }
+
+    Mask |= (1 << IrqList[Index]);
+  }
+
+  if (Mask == 0) {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  IrqDesc.Header.Bits.Type   = ACPI_SMALL_ITEM_FLAG;
+  IrqDesc.Header.Bits.Name   = ACPI_SMALL_IRQ_DESCRIPTOR_NAME;
+  IrqDesc.Header.Bits.Length = sizeof (EFI_ACPI_IRQ_DESCRIPTOR) -
+                               sizeof (ACPI_SMALL_RESOURCE_HEADER);
+  IrqDesc.Mask        = Mask;
+  IrqDesc.Information = (IsEdgeTriggered ? BIT0 : 0) |
+                        (IsActiveLow ? BIT3 : 0)    |
+                        (IsShared ? BIT4 : 0);
+
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeResourceData,
+             (UINT8 *)&IrqDesc,
+             sizeof (EFI_ACPI_IRQ_DESCRIPTOR),
+             &RdNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  return LinkRdNode (RdNode, NameOpNode, NewRdNode);
 }
