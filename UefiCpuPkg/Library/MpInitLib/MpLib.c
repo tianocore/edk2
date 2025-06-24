@@ -2,7 +2,7 @@
   CPU MP Initialize Library common functions.
 
   Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2020 - 2024, AMD Inc. All rights reserved.<BR>
+  Copyright (c) 2020 - 2025, AMD Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -1660,11 +1660,20 @@ ResetProcessorToIdleState (
   CPU_MP_DATA  *CpuMpData;
 
   CpuMpData = GetCpuMpData ();
-
-  CpuMpData->WakeUpByInitSipiSipi = TRUE;
   if (CpuMpData == NULL) {
     DEBUG ((DEBUG_ERROR, "[%a] - Failed to get CpuMpData.  Aborting the AP reset to idle.\n", __func__));
     return;
+  }
+
+  CpuMpData->WakeUpByInitSipiSipi = TRUE;
+
+  //
+  // "CpuMpData->WakeUpByInitSipiSipi = TRUE" requires that the AP must be in Halt loop.
+  // If AP loop mode is not Halt loop, make sure that the AP is in the known non-executable state.
+  //
+  if ((CpuMpData->InitFlag == ApInitDone) && (CpuMpData->ApLoopMode != ApInHltLoop)) {
+    SendInitIpi (((CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob)[ProcessorNumber].ApicId);
+    MicroSecondDelay (PcdGet32 (PcdCpuInitIpiDelayInMicroSeconds));
   }
 
   WakeUpAP (CpuMpData, FALSE, ProcessorNumber, NULL, NULL, TRUE);
