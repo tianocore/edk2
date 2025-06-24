@@ -561,11 +561,6 @@ BSPHandler (
       // Wait for all APs to complete their MTRR programming
       //
       SmmCpuSyncWaitForAPs (mSmmMpSyncData->SyncContext, ApCount, CpuIndex); /// #5: Wait APs
-
-      //
-      // Notify all APs to continue
-      //
-      ReleaseAllAPs (); /// #6: Signal APs
     }
   }
 
@@ -573,11 +568,6 @@ BSPHandler (
   // Perform SMM CPU Platform Hook before executing MMI Handler
   //
   SmmCpuPlatformHookBeforeMmiHandler ();
-
-  //
-  // Wait for all APs of arrival at this point
-  //
-  SmmCpuSyncWaitForAPs (mSmmMpSyncData->SyncContext, ApCount, CpuIndex); /// #7: Wait APs
 
   //
   // The BUSY lock is initialized to Acquired state
@@ -640,18 +630,18 @@ BSPHandler (
   // Notify all APs to exit
   //
   *mSmmMpSyncData->InsideSmm = FALSE;
-  ReleaseAllAPs (); /// #8: Signal APs
+  ReleaseAllAPs (); /// #6: Signal APs
 
   if (SmmCpuFeaturesNeedConfigureMtrrs ()) {
     //
     // Wait for all APs the readiness to program MTRRs
     //
-    SmmCpuSyncWaitForAPs (mSmmMpSyncData->SyncContext, ApCount, CpuIndex); /// #9: Wait APs
+    SmmCpuSyncWaitForAPs (mSmmMpSyncData->SyncContext, ApCount, CpuIndex); /// #7: Wait APs
 
     //
     // Signal APs to restore MTRRs
     //
-    ReleaseAllAPs (); /// #10: Signal APs
+    ReleaseAllAPs (); /// #8: Signal APs
 
     //
     // Restore OS MTRRs
@@ -664,12 +654,12 @@ BSPHandler (
     //
     // Wait for all APs to complete their pending tasks including MTRR programming if needed.
     //
-    SmmCpuSyncWaitForAPs (mSmmMpSyncData->SyncContext, ApCount, CpuIndex); /// #11: Wait APs
+    SmmCpuSyncWaitForAPs (mSmmMpSyncData->SyncContext, ApCount, CpuIndex); /// #9: Wait APs
 
     //
     // Signal APs to Reset states/semaphore for this processor
     //
-    ReleaseAllAPs (); /// #12: Signal APs
+    ReleaseAllAPs (); /// #10: Signal APs
   }
 
   if (mSmmDebugAgentSupport) {
@@ -694,7 +684,7 @@ BSPHandler (
   // Gather APs to exit SMM synchronously. Note the Present flag is cleared by now but
   // WaitForAllAps does not depend on the Present flag.
   //
-  SmmCpuSyncWaitForAPs (mSmmMpSyncData->SyncContext, ApCount, CpuIndex); /// #13: Wait APs
+  SmmCpuSyncWaitForAPs (mSmmMpSyncData->SyncContext, ApCount, CpuIndex); /// #11: Wait APs
 
   //
   // At this point, all APs should have exited from APHandler().
@@ -855,11 +845,6 @@ APHandler (
     // Signal BSP the completion of this AP
     //
     SmmCpuSyncReleaseBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex); /// #5: Signal BSP
-
-    //
-    // Wait for BSP's signal to continue
-    //
-    SmmCpuSyncWaitForBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex); /// #6: Wait BSP
   }
 
   //
@@ -867,16 +852,11 @@ APHandler (
   //
   SmmCpuPlatformHookBeforeMmiHandler ();
 
-  //
-  // Notify BSP of arrival at this point
-  //
-  SmmCpuSyncReleaseBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex); /// #7: Signal BSP
-
   while (TRUE) {
     //
     // Wait for something to happen
     //
-    SmmCpuSyncWaitForBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex); /// #8: Wait BSP
+    SmmCpuSyncWaitForBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex); /// #6: Wait BSP
 
     //
     // Check if BSP wants to exit SMM
@@ -916,12 +896,12 @@ APHandler (
     //
     // Notify BSP the readiness of this AP to program MTRRs
     //
-    SmmCpuSyncReleaseBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex); /// #9: Signal BSP
+    SmmCpuSyncReleaseBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex); /// #7: Signal BSP
 
     //
     // Wait for the signal from BSP to program MTRRs
     //
-    SmmCpuSyncWaitForBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex); /// #10: Wait BSP
+    SmmCpuSyncWaitForBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex); /// #8: Wait BSP
 
     //
     // Restore OS MTRRs
@@ -934,12 +914,12 @@ APHandler (
     //
     // Notify BSP the readiness of this AP to Reset states/semaphore for this processor
     //
-    SmmCpuSyncReleaseBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex); /// #11: Signal BSP
+    SmmCpuSyncReleaseBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex); /// #9: Signal BSP
 
     //
     // Wait for the signal from BSP to Reset states/semaphore for this processor
     //
-    SmmCpuSyncWaitForBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex); /// #12: Wait BSP
+    SmmCpuSyncWaitForBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex); /// #10: Wait BSP
   }
 
   //
@@ -950,7 +930,7 @@ APHandler (
   //
   // Notify BSP the readiness of this AP to exit SMM
   //
-  SmmCpuSyncReleaseBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex); /// #13: Signal BSP
+  SmmCpuSyncReleaseBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex); /// #11: Signal BSP
 }
 
 /**
