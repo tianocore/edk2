@@ -1489,6 +1489,7 @@ WifiMgrDxeHiiConfigAccessCallback (
   } else if (Action == EFI_BROWSER_ACTION_FORM_CLOSE) {
     switch (QuestionId) {
       case KEY_EAP_ENROLL_CERT_FROM_FILE:
+      case KEY_EAP_ENROLL_PRIVATE_KEY_FROM_FILE:
       case KEY_REFRESH_NETWORK_LIST:
 
         if (Private->CurrentNic->UserSelectedProfile == NULL) {
