@@ -1096,6 +1096,7 @@ PciScanBus (
   UINT16                             Register;
   UINTN                              HpIndex;
   PCI_IO_DEVICE                      *PciDevice;
+  EFI_PCI_IO_PROTOCOL                *PciDeviceIo;
   EFI_EVENT                          Event;
   EFI_HPC_STATE                      State;
   UINT64                             PciAddress;
@@ -1293,9 +1294,22 @@ PciScanBus (
           }
         }
 
-        Status = PciAllocateBusNumber (Bridge, *SubBusNumber, 1, SubBusNumber);
-        if (EFI_ERROR (Status)) {
-          return Status;
+        PciDeviceIo = &PciDevice->PciIo;
+        Status      = PciDeviceIo->Pci.Read (
+                                         PciDeviceIo,
+                                         EfiPciIoWidthUint8,
+                                         PCI_BRIDGE_SECONDARY_BUS_REGISTER_OFFSET,
+                                         1,
+                                         &SecondBus
+                                         );
+
+        if (!EFI_ERROR (Status) && (SecondBus != 0)) {
+          *SubBusNumber = SecondBus;
+        } else {
+          Status = PciAllocateBusNumber (Bridge, *SubBusNumber, 1, SubBusNumber);
+          if (EFI_ERROR (Status)) {
+            return Status;
+          }
         }
 
         SecondBus = *SubBusNumber;
