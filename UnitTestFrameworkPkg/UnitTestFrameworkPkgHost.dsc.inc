@@ -32,6 +32,7 @@
 [BuildOptions]
   MSFT:*_*_*_CC_FLAGS = /MTd
   GCC:*_*_*_CC_FLAGS = -fno-pie
+  GCC:*_*_*_ASLCC_FLAGS = -fpie
 !if $(UNIT_TESTING_ADDRESS_SANITIZER_ENABLE)
   #
   # Enable Address Sanitizer for VS2019, VS2022, and GCC
