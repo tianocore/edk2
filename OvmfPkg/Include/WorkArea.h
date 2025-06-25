@@ -12,6 +12,7 @@
 
 #include <ConfidentialComputingGuestAttr.h>
 #include <IndustryStandard/Tpm20.h>
+#include <Library/BaseLib.h>
 
 //
 // Confidential computing work area header definition. Any change
@@ -85,6 +86,11 @@ typedef struct _TDX_MEASUREMENTS_DATA {
   UINT8     CfvImgHashValue[SHA384_DIGEST_SIZE];
 } TDX_MEASUREMENTS_DATA;
 
+#define MAILBOX_GDT_SIZE  (sizeof(IA32_SEGMENT_DESCRIPTOR) * 5)
+typedef struct _MAILBOX_GDT {
+  IA32_DESCRIPTOR    Gdtr;
+  UINT8              Data[MAILBOX_GDT_SIZE];
+} MAILBOX_GDT;
 //
 // The TDX work area definition
 //
@@ -98,6 +104,7 @@ typedef struct _SEC_TDX_WORK_AREA {
 typedef struct _TDX_WORK_AREA {
   CONFIDENTIAL_COMPUTING_WORK_AREA_HEADER    Header;
   SEC_TDX_WORK_AREA                          SecTdxWorkArea;
+  MAILBOX_GDT                                MailboxGdt;
 } TDX_WORK_AREA;
 
 //

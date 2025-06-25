@@ -70,6 +70,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjMemoryProximityDomainAttrInfo,  ///< 42 - Memory Proximity Domain Attribute
   EArchCommonObjMemoryLatBwInfo,                ///< 43 - Memory Latency Bandwidth Info
   EArchCommonObjMemoryCacheInfo,                ///< 44 - Memory Cache Info
+  EArchCommonObjSpcrInfo,                       ///< 45 - Serial Terminal and Interrupt Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1047,6 +1048,20 @@ typedef struct CmArchCommonMemoryCacheInfo {
   /// @todo Referencing Smbios tables is not possible for now,
   /// @todo but will be in a near future.
 } CM_ARCH_COMMON_MEMORY_CACHE_INFO;
+
+/** A structure that describes the Serial Terminal and Interrupt Information.
+
+  This structure provides details about the interrupt type and terminal type
+  associated with a console device, used for the SPCR Table.
+
+  ID: EArchCommonObjSpcrInfo
+*/
+typedef struct CmArchCommonObjSpcrInfo {
+  /// Specifies the type of interrupt used by the console device.
+  UINT8    InterruptType;
+  /// Specifies the terminal type used by the console device.
+  UINT8    TerminalType;
+} CM_ARCH_COMMON_SPCR_INFO;
 
 #pragma pack()
 
