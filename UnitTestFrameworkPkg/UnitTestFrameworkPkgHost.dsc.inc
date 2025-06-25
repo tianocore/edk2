@@ -71,6 +71,7 @@
   #
   # GCC
   #
+  GCC:*_*_*_CC_FLAGS       =  -Wno-write-strings
   GCC:*_*_IA32_DLINK_FLAGS == -o $(BIN_DIR)/$(MODULE_NAME_GUID) -m32 -no-pie
   GCC:*_*_X64_DLINK_FLAGS  == -o $(BIN_DIR)/$(MODULE_NAME_GUID) -m64 -no-pie
   #
