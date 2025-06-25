@@ -2,18 +2,23 @@
   RISC-V Exception Handler library implementation.
 
   Copyright (c) 2016 - 2022, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <PiPei.h>
+#include <Uefi.h>
 #include <Library/CpuExceptionHandlerLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/PrintLib.h>
+#include <Library/PeCoffGetEntryPointLib.h>
+#include <Library/UefiLib.h>
 #include <Register/RiscV64/RiscVEncoding.h>
+#include <Guid/DebugImageInfoTable.h>
 #include "CpuExceptionHandlerLib.h"
 
 //
@@ -60,6 +65,85 @@ STATIC CONST CHAR8  *mIrqNameStr[EXCEPT_RISCV_MAX_IRQS + 1] = {
   "EXCEPT_RISCV_IRQ_4",
   "EXCEPT_RISCV_IRQ_TIMER_FROM_SMODE",
 };
+
+STATIC BOOLEAN  mRecursiveException;
+
+/**
+  Use the EFI Debug Image Table to lookup the FaultAddress and find which PE/COFF image
+  it came from. As long as the PE/COFF image contains a debug directory entry a
+  string can be returned. For ELF and Mach-O images the string points to the Mach-O or ELF
+  image. Microsoft tools contain a pointer to the PDB file that contains the debug information.
+
+  @param  FaultAddress         Address to find PE/COFF image for.
+  @param  ImageBase            Return load address of found image
+  @param  PeCoffSizeOfHeaders  Return the size of the PE/COFF header for the image that was found
+
+  @retval NULL                 FaultAddress not in a loaded PE/COFF image.
+  @retval                      Path and file name of PE/COFF image.
+
+**/
+STATIC
+CHAR8 *
+GetImageName (
+  IN  UINTN  FaultAddress,
+  OUT UINTN  *ImageBase,
+  OUT UINTN  *PeCoffSizeOfHeaders
+  )
+{
+  EFI_STATUS                         Status;
+  EFI_DEBUG_IMAGE_INFO_TABLE_HEADER  *DebugTableHeader;
+  EFI_DEBUG_IMAGE_INFO               *DebugTable;
+  UINTN                              Entry;
+  CHAR8                              *Address;
+
+  Status = EfiGetSystemConfigurationTable (&gEfiDebugImageInfoTableGuid, (VOID **)&DebugTableHeader);
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  DebugTable = DebugTableHeader->EfiDebugImageInfoTable;
+  if (DebugTable == NULL) {
+    return NULL;
+  }
+
+  Address = (CHAR8 *)(UINTN)FaultAddress;
+  for (Entry = 0; Entry < DebugTableHeader->TableSize; Entry++, DebugTable++) {
+    if (DebugTable->NormalImage != NULL) {
+      if ((DebugTable->NormalImage->ImageInfoType == EFI_DEBUG_IMAGE_INFO_TYPE_NORMAL) &&
+          (DebugTable->NormalImage->LoadedImageProtocolInstance != NULL))
+      {
+        if ((Address >= (CHAR8 *)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase) &&
+            (Address <= ((CHAR8 *)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase + DebugTable->NormalImage->LoadedImageProtocolInstance->ImageSize)))
+        {
+          *ImageBase           = (UINTN)DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase;
+          *PeCoffSizeOfHeaders = PeCoffGetSizeOfHeaders ((VOID *)(UINTN)*ImageBase);
+          return PeCoffLoaderGetPdbPointer (DebugTable->NormalImage->LoadedImageProtocolInstance->ImageBase);
+        }
+      }
+    }
+  }
+
+  return NULL;
+}
+
+STATIC
+CONST CHAR8 *
+BaseName (
+  IN  CONST CHAR8  *FullName
+  )
+{
+  CONST CHAR8  *Str;
+
+  Str = FullName + AsciiStrLen (FullName);
+
+  while (--Str > FullName) {
+    if ((*Str == '/') || (*Str == '\\')) {
+      return Str + 1;
+    }
+  }
+
+  return Str;
+}
 
 /**
   Prints a message to the serial port.
@@ -122,6 +206,133 @@ GetExceptionNameStr (
 }
 
 /**
+  Helper for displaying a backtrace.
+
+  @param Regs       Pointer to SMODE_TRAP_REGISTERS.
+  @param FirstPdb   Pointer to the first symbol file used.
+  @param ListImage  If true, only show the full path to symbol file, else
+                    show the PC value and its decoded components.
+**/
+STATIC
+VOID
+DumpCpuBacktraceHelper (
+  IN  SMODE_TRAP_REGISTERS  *Regs,
+  IN  CHAR8                 *FirstPdb,
+  IN  BOOLEAN               ListImage
+  )
+{
+  UINTN    ImageBase;
+  UINTN    PeCoffSizeOfHeader;
+  BOOLEAN  IsLeaf;
+  UINTN    RootFp;
+  UINTN    RootRa;
+  UINTN    Fp;
+  UINTN    Ra;
+  UINTN    Idx;
+  CHAR8    *Pdb;
+  CHAR8    *PrevPdb;
+
+  RootRa = Regs->ra;
+  RootFp = Regs->s0;
+
+  Idx     = 0;
+  IsLeaf  = TRUE;
+  Fp      = RootFp;
+  Ra      = RootRa;
+  PrevPdb = FirstPdb;
+  while (Fp != 0) {
+    Pdb = GetImageName (Ra, &ImageBase, &PeCoffSizeOfHeader);
+    if (Pdb != NULL) {
+      if (Pdb != PrevPdb) {
+        Idx++;
+        if (ListImage) {
+          DEBUG ((DEBUG_ERROR, "[% 2d] %a\n", Idx, Pdb));
+        }
+
+        PrevPdb = Pdb;
+      }
+
+      if (!ListImage) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "PC 0x%012lx (0x%012lx+0x%08x) [% 2d] %a\n",
+          Ra,
+          ImageBase,
+          Ra - ImageBase,
+          Idx,
+          BaseName (Pdb)
+          ));
+      }
+    } else if (!ListImage) {
+      DEBUG ((DEBUG_ERROR, "PC 0x%012lx\n", Ra));
+    }
+
+    /*
+     * After the prologue, the frame pointer register s0 will point
+     * to the Canonical Frame Address or CFA, which is the stack
+     * pointer value on entry to the current procedure. The previous
+     * frame pointer and return address pair will reside just prior
+     * to the current stack address held in s0. This puts the return
+     * address at s0 - XLEN/8, and the previous frame pointer at
+     * s0 - 2 * XLEN/8.
+     */
+    Fp -= sizeof (UINTN) * 2;
+    Ra  = *(UINTN *)(Fp + sizeof (UINTN));
+    Fp  = *(UINTN *)(Fp);
+    if (IsLeaf) {
+      if (Ra != RootRa) {
+        /* We hit function where ra is not saved on the stack */
+        Fp = Ra;
+        Ra = RootRa;
+      }
+
+      IsLeaf = FALSE;
+    }
+  }
+}
+
+/**
+  Display a backtrace.
+
+  @param SystemContext  Pointer to EFI_SYSTEM_CONTEXT.
+**/
+STATIC
+VOID
+EFIAPI
+DumpCpuBacktrace (
+  IN EFI_SYSTEM_CONTEXT  SystemContext
+  )
+{
+  SMODE_TRAP_REGISTERS  *Regs;
+  CHAR8                 *Pdb;
+  UINTN                 ImageBase;
+  UINTN                 PeCoffSizeOfHeader;
+
+  Regs = (SMODE_TRAP_REGISTERS *)SystemContext.SystemContextRiscV64;
+  Pdb  = GetImageName (Regs->sepc, &ImageBase, &PeCoffSizeOfHeader);
+  if (Pdb != NULL) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "PC 0x%012lx (0x%012lx+0x%08x) [ 0] %a\n",
+      Regs->sepc,
+      ImageBase,
+      Regs->sepc - ImageBase,
+      BaseName (Pdb)
+      ));
+  } else {
+    DEBUG ((DEBUG_ERROR, "PC 0x%012lx\n", Regs->sepc));
+  }
+
+  DumpCpuBacktraceHelper (Regs, Pdb, FALSE);
+
+  if (Pdb != NULL) {
+    DEBUG ((DEBUG_ERROR, "\n[ 0] %a\n", Pdb));
+  }
+
+  DumpCpuBacktraceHelper (Regs, Pdb, TRUE);
+}
+
+/**
   Display CPU information. This can be called by 3rd-party handlers
   set by RegisterCpuInterruptHandler.
 
@@ -140,6 +351,14 @@ DumpCpuContext (
 
   Printed = 0;
   Regs    = (SMODE_TRAP_REGISTERS *)SystemContext.SystemContextRiscV64;
+
+  if (mRecursiveException) {
+    InternalPrintMessage ("\nRecursive exception occurred while dumping the CPU state\n");
+
+    CpuDeadLoop ();
+  }
+
+  mRecursiveException = TRUE;
 
   InternalPrintMessage (
     "!!!! RISCV64 Exception Type - %016x(%a) !!!!\n",
@@ -171,7 +390,11 @@ DumpCpuContext (
   #undef REG
   #undef REGS
 
+  DumpCpuBacktrace (SystemContext);
+
   DEBUG_CODE_END ();
+
+  mRecursiveException = FALSE;
 }
 
 /**
