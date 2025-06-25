@@ -734,7 +734,7 @@ SmmEntryPoint (
       // Check for over or underflows
       //
       if (!SmmIsBufferOutsideSmmValid ((UINTN)CommunicationBuffer, BufferSize) ||
-          IsOverlapped || (BufferSize < sizeof (EFI_SMM_COMMUNICATE_HEADER)))
+          IsOverlapped || (BufferSize < OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data)))
       {
         //
         // If CommunicationBuffer is not in valid address scope,
