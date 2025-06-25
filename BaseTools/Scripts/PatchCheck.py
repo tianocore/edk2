@@ -97,7 +97,7 @@ class EmailAddressCheck:
 class CommitMessageCheck:
     """Checks the contents of a git commit message."""
 
-    def __init__(self, subject, message, author_email):
+    def __init__(self, subject, message, author_email, updated_packages):
         self.ok = True
         self.ignore_multi_package = False
 
@@ -117,6 +117,7 @@ class CommitMessageCheck:
 
         self.check_contributed_under()
         if not MergifyMerge:
+            self.check_subject(updated_packages)
             self.check_signed_off_by()
             self.check_misc_signatures()
             self.check_overall_format()
@@ -208,6 +209,14 @@ class CommitMessageCheck:
             self.ok &= EmailAddressCheck(s[3], sig).ok
 
         return sigs
+
+    def check_subject(self, updated_packages):
+        if updated_packages:
+            for package in updated_packages:
+                current_package_re = r"(Revert \"|^|, ?)" + re.escape(package) + r"([ ,:\/])"
+                if not re.search(current_package_re, self.subject):
+                    self.error("Subject line not in \"package/component: description\" format!")
+                    return
 
     def check_signed_off_by(self):
         sob='Signed-off-by'
@@ -561,14 +570,14 @@ class CheckOnePatch:
     patch content.
     """
 
-    def __init__(self, name, patch):
+    def __init__(self, name, patch, updated_packages=None):
         self.patch = patch
         self.find_patch_pieces()
 
         email_check = EmailAddressCheck(self.author_email, 'Author')
         email_ok = email_check.ok
 
-        msg_check = CommitMessageCheck(self.commit_subject, self.commit_msg, self.author_email)
+        msg_check = CommitMessageCheck(self.commit_subject, self.commit_msg, self.author_email, updated_packages)
         msg_ok = msg_check.ok
         self.ignore_multi_package = msg_check.ignore_multi_package
 
@@ -695,7 +704,8 @@ class CheckGitCommits:
             email = self.read_committer_email_address_from_git(commit)
             self.ok &= EmailAddressCheck(email, 'Committer').ok
             patch = self.read_patch_from_git(commit)
-            check_patch = CheckOnePatch(commit, patch)
+            updated_packages = self.get_parent_packages (dec_files, commit, 'ADM')
+            check_patch = CheckOnePatch(commit, patch, updated_packages)
             self.ok &= check_patch.ok
             ignore_multi_package = check_patch.ignore_multi_package
             if PatchCheckConf.ignore_multi_package:
@@ -730,7 +740,7 @@ class CheckGitCommits:
             for dec_file in dec_files:
                 if os.path.commonpath([dec_file, file]):
                     dec_found = True
-                    parents.add(dec_file)
+                    parents.add(dec_file.split('/')[0])
             if not dec_found and os.path.dirname (file):
                 # No DEC file found and file is in a subdir
                 # Covers BaseTools, .github, .azurepipelines, .pytool
