@@ -106,7 +106,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/SimplePointer.h>
 #include <Protocol/SimpleTextIn.h>
 #include <Protocol/SimpleTextInEx.h>
-#include <Protocol/UgaDraw.h>
 #include <Protocol/SimpleFileSystem.h>
 
 #include <Protocol/EmuThunk.h>
