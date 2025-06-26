@@ -67,6 +67,7 @@
   DynamicTablesPkg/Library/Acpi/X64/AcpiMadtLib/AcpiMadtLib.inf
   DynamicTablesPkg/Library/Acpi/X64/AcpiSsdtHpetLib/AcpiSsdtHpetLib.inf
   DynamicTablesPkg/Library/Acpi/X64/AcpiWsmtLib/AcpiWsmtLib.inf
+  DynamicTablesPkg/Library/Acpi/X64/SsdtSerialPortFixupLib/SsdtSerialPortFixupLib.inf
 
   #
   # Dynamic Table Factory Dxe
