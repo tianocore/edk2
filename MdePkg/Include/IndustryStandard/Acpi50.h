@@ -132,6 +132,8 @@ typedef PACKED struct {
   UINT16                        DeviceSelection;
 } EFI_ACPI_SERIAL_BUS_RESOURCE_SPI_DESCRIPTOR;
 
+#define EFI_ACPI_SERIAL_BUS_RESOURCE_UART_DESCRIPTOR_REVISION  0x01
+
 ///
 /// Serial Bus Resource Descriptor (UART)
 ///
