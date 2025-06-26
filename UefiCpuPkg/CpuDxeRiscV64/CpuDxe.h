@@ -12,15 +12,17 @@
 
 #include <PiDxe.h>
 
+#include <Guid/RiscVSecHobData.h>
 #include <Protocol/Cpu.h>
 #include <Protocol/RiscVBootProtocol.h>
-#include <Library/BaseRiscVFpuLib.h>
 #include <Library/BaseRiscVSbiLib.h>
 #include <Library/BaseRiscVMmuLib.h>
 #include <Library/BaseLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
+#include <Library/CpuLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Register/RiscV64/RiscVEncoding.h>
