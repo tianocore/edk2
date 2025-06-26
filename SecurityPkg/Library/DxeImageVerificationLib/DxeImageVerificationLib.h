@@ -10,6 +10,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __IMAGEVERIFICATIONLIB_H__
 #define __IMAGEVERIFICATIONLIB_H__
 
+#include <PiPei.h>
+#include <PiDxe.h>
+
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
