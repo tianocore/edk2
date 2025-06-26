@@ -7,11 +7,14 @@
 //
 // ------------------------------------------------------------------------------
 
-#if defined (_M_ARM64)
-typedef unsigned __int64 size_t;
-#else
-typedef unsigned __int32 size_t;
-#endif
+//
+// Starting from VS2019, the compiler recognizes memmove() as an intrinsic function,
+// so we need to use _MSC_VER to control the following logic.
+//
+
+#if defined (_MSC_VER) && (_MSC_VER >= 1920)
+
+typedef UINTN size_t;
 
 void *
 memmove (
@@ -49,3 +52,5 @@ memmove (
 
   return dest;
 }
+
+#endif
