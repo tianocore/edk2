@@ -12,6 +12,7 @@
 #include <Library/AmdSvsmLib.h>
 #include <Register/Amd/Msr.h>
 #include <Register/Amd/Svsm.h>
+#include <Register/Amd/SvsmMsr.h>
 
 #define PAGES_PER_2MB_ENTRY  512
 
@@ -591,5 +592,75 @@ AmdSvsmVtpmCmd (
 
   Ret = SvsmMsrProtocol (&SvsmCallData);
 
+  return (Ret == 0) ? TRUE : FALSE;
+}
+
+BOOLEAN
+EFIAPI
+AmdSvsmQueryProtocol (
+  IN  UINT32  ProtocolId,
+  IN  UINT32  ProtocolVersion,
+  OUT UINT32  *ProtocolMin,
+  OUT UINT32  *ProtocolMax
+  )
+{
+  SVSM_CALL_DATA  SvsmCallData;
+  SVSM_FUNCTION   Function;
+  UINT64          Rcx;
+  UINTN           Ret;
+
+  Function.Id.Protocol = SVSM_PROTOCOL_CORE;
+  Function.Id.CallId   = SVSM_CORE_QUERY_PROTOCOL;
+
+  Rcx = ((UINT64)ProtocolId << 32) | ProtocolVersion;
+
+  SvsmCallData.Caa   = (SVSM_CAA *)AmdSvsmSnpGetCaa ();
+  SvsmCallData.RaxIn = Function.Uint64;
+  SvsmCallData.RcxIn = Rcx;
+
+  Ret = SvsmMsrProtocol (&SvsmCallData);
+  if (Ret != 0) {
+    return FALSE;
+  }
+
+  if (SvsmCallData.RcxOut == 0) {
+    return FALSE;
+  }
+
+  if (ProtocolMin) {
+    *ProtocolMin = (UINT32)(SvsmCallData.RcxOut & 0xffffffff);
+  }
+
+  if (ProtocolMax) {
+    *ProtocolMax = (UINT32)(SvsmCallData.RcxOut >> 32);
+  }
+
+  return TRUE;
+}
+
+BOOLEAN
+EFIAPI
+AmdSvsmUefiMmRequest (
+  IN  UINT64  BufferAddr,
+  IN  UINT64  BufferSize
+  )
+{
+  SVSM_CALL_DATA  SvsmCallData;
+  SVSM_FUNCTION   Function;
+  UINT64          Caa;
+  UINTN           Ret;
+
+  Function.Id.Protocol = SVSM_UEFI_MM_PROTOCOL;
+  Function.Id.CallId   = SVSM_UEFI_MM_REQUEST;
+
+  // this works at runtime too
+  Caa = AsmReadMsr64 (MSR_SVSM_CAA);
+
+  SvsmCallData.Caa   = (SVSM_CAA *)Caa;
+  SvsmCallData.RaxIn = Function.Uint64;
+  SvsmCallData.RcxIn = BufferAddr;
+  SvsmCallData.RdxIn = BufferSize;
+
+  Ret = SvsmMsrProtocol (&SvsmCallData);
   return (Ret == 0) ? TRUE : FALSE;
 }
