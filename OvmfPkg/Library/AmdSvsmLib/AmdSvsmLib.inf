@@ -32,6 +32,8 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+  MemEncryptSevLib
+
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsBase

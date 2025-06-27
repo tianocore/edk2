@@ -32,6 +32,8 @@
 #include <Register/Intel/ArchitecturalMsr.h>
 #include <Register/Intel/Cpuid.h>
 #include "AmdSev.h"
+#include <Library/AmdSvsmLib.h>
+#include <Library/MemEncryptSevLib.h>
 
 #define SEC_IDT_ENTRY_COUNT  34
 
@@ -974,6 +976,13 @@ SecCoreStartupWithStack (
   //
   IoWrite8 (0x21, 0xff);
   IoWrite8 (0xA1, 0xff);
+
+  // Enable X2APIC mode if Alternate Injection is enabled.
+  if (AmdSvsmIsSvsmPresent()) {
+       if (AlternateInjectionEnabled()){
+           SetApicMode (LOCAL_APIC_MODE_X2APIC);
+       }
+  }
 
   //
   // Initialize Local APIC Timer hardware and disable Local APIC Timer
