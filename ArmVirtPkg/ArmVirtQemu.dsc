@@ -139,6 +139,10 @@
   GCC:*_*_AARCH64_PP_FLAGS = -DCAVIUM_ERRATUM_27456
 !endif
 
+  GCC:*_GCC_*_DLINK_XIPFLAGS = -z common-page-size=0x1000
+  GCC:*_CLANGDWARF_*_DLINK_XIPFLAGS = -z common-page-size=0x1000
+  CLANGPDB:*_*_*_DLINK_XIPFLAGS = /ALIGN:0x1000
+
 !include NetworkPkg/NetworkBuildOptions.dsc.inc
 
 ################################################################################
