@@ -645,7 +645,7 @@
   OpensslStub/ossl_store.c
   OpensslStub/rand_pool.c
   OpensslStub/SslNull.c
-  OpensslStub/EcSm2Null.c
+  #OpensslStub/EcSm2Null.c
   OpensslStub/uefiprov.c
   OpensslStub/EncoderNull.c
   OpensslStub/Pkcs12Null.c
