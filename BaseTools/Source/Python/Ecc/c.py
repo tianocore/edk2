@@ -49,9 +49,6 @@ def GetTypedefFuncPointerPattern():
 def GetDB():
     return EccGlobalData.gDb
 
-def GetConfig():
-    return EccGlobalData.gConfig
-
 def PrintErrorMsg(ErrorType, Msg, TableName, ItemId):
     Msg = Msg.replace('\n', '').replace('\r', '')
     MsgPartList = Msg.split()
@@ -480,18 +477,6 @@ def GetFunctionList():
         FuncObjList.append(FuncObj)
 
     return FuncObjList
-
-def GetFileModificationTimeFromDB(FullFileName):
-    TimeValue = 0.0
-    Db = GetDB()
-    SqlStatement = """ select TimeStamp
-                       from File
-                       where FullPath = \'%s\'
-                   """ % (FullFileName)
-    ResultSet = Db.TblFile.Exec(SqlStatement)
-    for Result in ResultSet:
-        TimeValue = Result[0]
-    return TimeValue
 
 def CollectSourceCodeDataIntoDB(RootDir):
     FileObjList = []

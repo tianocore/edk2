@@ -139,17 +139,4 @@ class FD(FDClassObject):
         GenFdsGlobalVariable.ImageBinDict[self.FdUiName.upper() + 'fd'] = FdFileName
         return FdFileName
 
-    ## generate flash map file
-    #
-    #   @param  self        The object pointer
-    #
-    def GenFlashMap (self):
-        pass
-
-
-
-
-
-
-
 

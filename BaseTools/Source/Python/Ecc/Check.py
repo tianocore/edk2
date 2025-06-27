@@ -1501,7 +1501,6 @@ def FindPara(FilePath, Para, CallingLine):
         if Line.startswith('%s = ' % Para):
             Line = Line.strip()
             return Line
-            break
 
     return ''
 
