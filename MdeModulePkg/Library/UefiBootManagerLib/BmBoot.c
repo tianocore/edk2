@@ -1903,6 +1903,7 @@ EfiBootManagerBoot (
   UINTN                      FileSize;
   EFI_BOOT_LOGO_PROTOCOL     *BootLogo;
   EFI_EVENT                  LegacyBootEvent;
+  UINTN                      ReportStatusCodeData[2];
 
   if (BootOption == NULL) {
     return;
@@ -1997,10 +1998,23 @@ EfiBootManagerBoot (
     FilePath = NULL;
     EfiBootManagerConnectDevicePath (BootOption->FilePath, NULL);
     FileBuffer = BmGetNextLoadOptionBuffer (LoadOptionTypeBoot, BootOption->FilePath, &FilePath, &FileSize);
+
     if (FileBuffer != NULL) {
       RamDiskDevicePath = BmGetRamDiskDevicePath (FilePath);
 
-      REPORT_STATUS_CODE (EFI_PROGRESS_CODE, PcdGet32 (PcdProgressCodeOsLoaderLoad));
+      ReportStatusCodeData[0] = (FilePath != NULL) ? (UINTN)FilePath : (UINTN)(BootOption->FilePath);
+      ReportStatusCodeData[1] = OptionNumber;
+
+      REPORT_STATUS_CODE_EX (
+        EFI_PROGRESS_CODE,
+        PcdGet32 (PcdProgressCodeOsLoaderLoad),
+        0,
+        NULL,
+        NULL,
+        ReportStatusCodeData,
+        sizeof (ReportStatusCodeData)
+        );
+
       Status = gBS->LoadImage (
                       TRUE,
                       gImageHandle,
@@ -2041,7 +2055,19 @@ EfiBootManagerBoot (
       //
       // Report Status Code with the failure status to indicate that the failure to load boot option
       //
-      BmReportLoadFailure (EFI_SW_DXE_BS_EC_BOOT_OPTION_LOAD_ERROR, Status);
+      ReportStatusCodeData[0] = (FilePath != NULL) ? (UINTN)FilePath : (UINTN)(BootOption->FilePath);
+      ReportStatusCodeData[1] = Status;
+
+      REPORT_STATUS_CODE_EX (
+        EFI_ERROR_CODE | EFI_ERROR_MINOR,
+        (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_EC_BOOT_OPTION_LOAD_ERROR),
+        0,
+        NULL,
+        NULL,
+        ReportStatusCodeData,
+        sizeof (ReportStatusCodeData)
+        );
+
       BootOption->Status = Status;
       return;
     }
@@ -2125,6 +2151,8 @@ EfiBootManagerBoot (
     // Report Status Code with the failure status to indicate that boot failure
     //
     BmReportLoadFailure (EFI_SW_DXE_BS_EC_BOOT_OPTION_FAILED, Status);
+  } else {
+    REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_PC_BOOT_OPTION_COMPLETE));
   }
 
   PERF_END_EX (gImageHandle, "BdsAttempt", NULL, 0, (UINT32)OptionNumber);
