@@ -783,7 +783,7 @@ XhcResetEndpointForSoftRetry (
   EVT_TRB_COMMAND_COMPLETION  *EvtTrb;
   CMD_TRB_RESET_ENDPOINT      CmdTrbResetED;
 
-  DEBUG ((DEBUG_INFO, "[%a] Slot = 0x%x, Dci = 0x%x\n", __FUNCTION__, SlotId, Dci));
+  DEBUG ((DEBUG_INFO, "[%a] Slot = 0x%x, Dci = 0x%x\n", __func__, SlotId, Dci));
   //
   // Send stop endpoint command to transit Endpoint from running to stop state
   //
@@ -800,7 +800,7 @@ XhcResetEndpointForSoftRetry (
                              (TRB_TEMPLATE **)(UINTN)&EvtTrb
                              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "[%a] Reset Endpoint Failed, Status = %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "[%a] Reset Endpoint Failed, Status = %r\n", __func__, Status));
   }
 
   return Status;
@@ -832,14 +832,14 @@ XhcRecoverHaltedEndpointForSoftRetry (
 {
   EFI_STATUS  Status;
 
-  DEBUG ((DEBUG_INFO, "[%a] Recovery Halted Slot = %x,Dci = %x\n", __FUNCTION__, SlotId, Dci));
+  DEBUG ((DEBUG_INFO, "[%a] Recovery Halted Slot = %x,Dci = %x\n", __func__, SlotId, Dci));
   Status = EFI_SUCCESS;
   //
   // 1) Send Reset endpoint command to transit from halt to stop state
   //
   Status = XhcResetEndpointForSoftRetry (Xhc, SlotId, Dci);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "[%a]: Reset Endpoint Failed, Status = %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "[%a]: Reset Endpoint Failed, Status = %r\n", __func__, Status));
     return Status;
   }
 
@@ -866,7 +866,7 @@ IsUrbNeedSoftRetry (
      && (Urb->Result & EDKII_USB_ERR_TRANSACTION)
      && (((EVT_TRB_TRANSFER *)(Urb->EvtTrb))->Completecode == TRB_COMPLETION_USB_TRANSACTION_ERROR))
   {
-    DEBUG ((DEBUG_INFO, "[%a]: CompleteCode is TRB_COMPLETION_USB_TRANSACTION_ERROR\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "[%a]: CompleteCode is TRB_COMPLETION_USB_TRANSACTION_ERROR\n", __func__));
     if (SlotId == 0) {
       NeedSoftRetry = TRUE;
     } else if (  (EPType != ED_ISOCH_IN)
@@ -1625,10 +1625,10 @@ XhcExecTransfer (
       // XHCI spec 4.6.8.1 - Software can do Soft Retry for Usb Transaction Error
       //
       if (IsUrbNeedSoftRetry (Xhc, SlotId, Dci, Urb, EPType)) {
-        DEBUG ((DEBUG_INFO, "[%a] IsUrbNeedSoftRetry = TRUE, SoftRetries = %d\n", __FUNCTION__, SoftRetries));
+        DEBUG ((DEBUG_INFO, "[%a] IsUrbNeedSoftRetry = TRUE, SoftRetries = %d\n", __func__, SoftRetries));
         if (SoftRetries-- > 0) {
           RecoverEpStatus = XhcRecoverHaltedEndpointForSoftRetry (Xhc, SlotId, Dci);
-          DEBUG ((DEBUG_ERROR, "[%a] XhcRecoverHaltedEndpointForSoftRetry Status = %r!\n", __FUNCTION__, RecoverEpStatus));
+          DEBUG ((DEBUG_ERROR, "[%a] XhcRecoverHaltedEndpointForSoftRetry Status = %r!\n", __func__, RecoverEpStatus));
           if (!EFI_ERROR (RecoverEpStatus)) {
             Urb->Result   = EFI_USB_NOERROR;
             Urb->Finished = FALSE;
@@ -1646,7 +1646,7 @@ XhcExecTransfer (
         // Here means that BIOS did the Soft Retry but not worked and it seems to have another error occurred.
         // Transfer is not finished so that break here immediately.
         //
-        DEBUG ((DEBUG_INFO, "[%a] SoftRetries == 0, return EDKII_USB_ERR_TRANSACTION\n", __FUNCTION__));
+        DEBUG ((DEBUG_INFO, "[%a] SoftRetries == 0, return EDKII_USB_ERR_TRANSACTION\n", __func__));
         Urb->Result  |= EDKII_USB_ERR_TRANSACTION;
         Urb->Finished =  TRUE;
         break;
@@ -1654,7 +1654,7 @@ XhcExecTransfer (
         //
         // Here means that this Urb back to normal transaction so reset the SoftRetry.
         //
-        DEBUG ((DEBUG_INFO, "[%a] Urb->EvtTrb != NULL, Urb->Result == EFI_USB_NOERROR\n", __FUNCTION__));
+        DEBUG ((DEBUG_INFO, "[%a] Urb->EvtTrb != NULL, Urb->Result == EFI_USB_NOERROR\n", __func__));
         SoftRetries = SOFT_RETRY_COUNT;
       } else {
         //
