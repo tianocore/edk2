@@ -79,6 +79,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define TRB_COMPLETION_STOPPED_LENGTH_INVALID  27
 
 //
+// Table 56 EP state of XHCI rev 1.0
+//
+typedef enum {
+  EP_DISABLED = 0,
+  EP_RUNNING,
+  EP_HALTED,
+  EP_STOPPED,
+  EP_ERROR = 4
+} XHCI_EP_STATE;
+
+//
 // USB Transfer Results Internal Definition
 // Based on XHCI spec 4.8.3, software should do the reset endpoint while USB Transaction occur.
 // Add the error code for USB Transaction error since UEFI spec don't have the related definition.
@@ -200,6 +211,9 @@ typedef struct _URB {
   BOOLEAN                            Finished;
 
   TRB_TEMPLATE                       *EvtTrb;
+
+  // Short packet counter
+  UINTN                              ShortPacketOccurence;
 } URB;
 
 //
