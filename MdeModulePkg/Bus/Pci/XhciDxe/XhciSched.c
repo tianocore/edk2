@@ -783,7 +783,7 @@ XhcResetEndpointForSoftRetry (
   EVT_TRB_COMMAND_COMPLETION  *EvtTrb;
   CMD_TRB_RESET_ENDPOINT      CmdTrbResetED;
 
-  DEBUG ((EFI_D_INFO, "[%a] Slot = 0x%x, Dci = 0x%x\n", __FUNCTION__, SlotId, Dci));
+  DEBUG ((DEBUG_INFO, "[%a] Slot = 0x%x, Dci = 0x%x\n", __FUNCTION__, SlotId, Dci));
   //
   // Send stop endpoint command to transit Endpoint from running to stop state
   //
@@ -800,7 +800,7 @@ XhcResetEndpointForSoftRetry (
                              (TRB_TEMPLATE **)(UINTN)&EvtTrb
                              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "[%a] Reset Endpoint Failed, Status = %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "[%a] Reset Endpoint Failed, Status = %r\n", __FUNCTION__, Status));
   }
 
   return Status;
@@ -832,14 +832,14 @@ XhcRecoverHaltedEndpointForSoftRetry (
 {
   EFI_STATUS  Status;
 
-  DEBUG ((EFI_D_INFO, "[%a] Recovery Halted Slot = %x,Dci = %x\n", __FUNCTION__, SlotId, Dci));
+  DEBUG ((DEBUG_INFO, "[%a] Recovery Halted Slot = %x,Dci = %x\n", __FUNCTION__, SlotId, Dci));
   Status = EFI_SUCCESS;
   //
   // 1) Send Reset endpoint command to transit from halt to stop state
   //
   Status = XhcResetEndpointForSoftRetry (Xhc, SlotId, Dci);
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Reset Endpoint Failed, Status = %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "[%a]: Reset Endpoint Failed, Status = %r\n", __FUNCTION__, Status));
     return Status;
   }
 

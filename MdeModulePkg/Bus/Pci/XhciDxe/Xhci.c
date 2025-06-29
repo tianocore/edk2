@@ -1928,11 +1928,18 @@ XhcExitBootService (
   )
 
 {
-  USB_XHCI_INSTANCE    *Xhc;
-  EFI_PCI_IO_PROTOCOL  *PciIo;
+  USB_XHCI_INSTANCE  *Xhc;
 
-  Xhc   = (USB_XHCI_INSTANCE *)Context;
+  // WHCK FIX: Usb Debug test need to prevent the attribute cleared.
+ #if 0
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+ #endif
+
+  Xhc = (USB_XHCI_INSTANCE *)Context;
+  // WHCK FIX: Usb Debug test need to prevent the attribute cleared.
+ #if 0
   PciIo = Xhc->PciIo;
+ #endif
 
   //
   // Stop AsyncRequest Polling timer then stop the XHCI driver
