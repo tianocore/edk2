@@ -99,7 +99,7 @@ ArmFfaSecLibConstructor (
 
   UpdateRxTxBufferInfo (BufferInfo);
   BufferInfo->RemapOffset =
-    (UINTN)((EFI_PHYSICAL_ADDRESS)((UINTN)BufferInfo->TxBufferAddr) -
+    (UINTN)(BufferInfo->TxBufferAddr -
             RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress);
   BufferInfo->RemapRequired = TRUE;
 
