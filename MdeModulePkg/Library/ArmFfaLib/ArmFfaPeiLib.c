@@ -169,7 +169,7 @@ ArmFfaPeiLibConstructor (
       RxTxBufferAllocationHob = FindRxTxBufferAllocationHob (FALSE);
       ASSERT (RxTxBufferAllocationHob != NULL);
       BufferInfo->RemapOffset =
-        (UINTN)((EFI_PHYSICAL_ADDRESS)((UINTN)BufferInfo->TxBufferAddr) -
+        (UINTN)(BufferInfo->TxBufferAddr -
                 RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress);
 
       CopyGuid (
