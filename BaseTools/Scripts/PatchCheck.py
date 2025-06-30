@@ -269,10 +269,15 @@ class CommitMessageCheck:
             # subject line to 92 characters
             #
             maxlength = 92
+        elif lines[0].find(':') > 55:
+            #
+            # If we need to enumerate lots of packages, ensure to leave room for
+            # a very short description at the end (after the ':').
+            #
+            maxlength = lines[0].find(':') + 20
         else:
             #
-            # If CVE-xxxx-xxxxx is not present in subject line, then limit
-            # length of subject line to 75 characters
+            # Otherwise, limit the length of subject line to 75 characters
             #
             maxlength = 75
 
