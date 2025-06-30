@@ -230,9 +230,9 @@ UpdateRxTxBufferInfo (
   OUT ARM_FFA_RX_TX_BUFFER_INFO  *BufferInfo
   )
 {
-  BufferInfo->TxBufferAddr = (VOID *)(UINTN)PcdGet64 (PcdFfaTxBuffer);
+  BufferInfo->TxBufferAddr = PcdGet64 (PcdFfaTxBuffer);
   BufferInfo->TxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
-  BufferInfo->RxBufferAddr = (VOID *)(UINTN)PcdGet64 (PcdFfaRxBuffer);
+  BufferInfo->RxBufferAddr = PcdGet64 (PcdFfaRxBuffer);
   BufferInfo->RxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
 }
 
