@@ -411,24 +411,35 @@ CreatMmHobList (
   PlatformHobSize = 0;
   Status          = CreateMmPlatformHob (NULL, &PlatformHobSize);
   if (Status == RETURN_BUFFER_TOO_SMALL) {
-    ASSERT (PlatformHobSize != 0);
+    if (PlatformHobSize == 0) {
+      DEBUG ((DEBUG_ERROR, "%a: PlatformHobSize is zero, cannot create MM HOBs\n", __func__));
+      ASSERT (PlatformHobSize != 0);
+      return NULL;
+    }
+
     //
     // Create platform HOBs for MM foundation to get MMIO HOB data.
     //
     PlatformHobList = AllocatePages (EFI_SIZE_TO_PAGES (PlatformHobSize));
-    ASSERT (PlatformHobList != NULL);
     if (PlatformHobList == NULL) {
       DEBUG ((DEBUG_ERROR, "%a: Out of resource to create platform MM HOBs\n", __func__));
-      CpuDeadLoop ();
+      ASSERT (PlatformHobList != NULL);
+      return NULL;
     }
 
     BufferSize = PlatformHobSize;
     Status     = CreateMmPlatformHob (PlatformHobList, &PlatformHobSize);
-    ASSERT_EFI_ERROR (Status);
-    ASSERT (BufferSize == PlatformHobSize);
+    if (BufferSize != PlatformHobSize) {
+      DEBUG ((DEBUG_ERROR, "%a: CreateMmPlatformHob returned unexpected size (%d != %d)\n", __func__, BufferSize, PlatformHobSize));
+      FreePages (PlatformHobList, EFI_SIZE_TO_PAGES (PlatformHobSize));
+      return NULL;
+    }
   }
 
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: CreateMmPlatformHob failed (%r)\n", __func__, Status));
+    return NULL;
+  }
 
   //
   // Build memory allocation HOB in PEI HOB list for MM profile data.
@@ -456,7 +467,10 @@ CreatMmHobList (
                         MmProfileDataHob,
                         Block
                         );
-  FreePages (PlatformHobList, EFI_SIZE_TO_PAGES (PlatformHobSize));
+  if (PlatformHobSize != 0) {
+    FreePages (PlatformHobList, EFI_SIZE_TO_PAGES (PlatformHobSize));
+  }
+
   ASSERT (Status == RETURN_BUFFER_TOO_SMALL);
   ASSERT (FoundationHobSize != 0);
 
@@ -670,6 +684,10 @@ ExecuteMmCoreFromMmram (
   PE_COFF_LOADER_IMAGE_CONTEXT          ImageContext;
   STANDALONE_MM_FOUNDATION_ENTRY_POINT  Entry;
   EFI_MMRAM_HOB_DESCRIPTOR_BLOCK        *Block;
+  EFI_PEI_MM_ACCESS_PPI                 *MmAccess;
+  UINTN                                 Size;
+  UINTN                                 Index;
+  UINTN                                 MmramRangeCount;
 
   MmFvBase = 0;
   MmFvSize = 0;
@@ -678,6 +696,40 @@ ExecuteMmCoreFromMmram (
   //
   Status = LocateMmCoreFv (&MmFvBase, &MmFvSize, &MmCoreFileName, &ImageContext.Handle);
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Prepare an MM access PPI for MM RAM.
+  //
+  MmAccess        = NULL;
+  MmramRangeCount = 0;
+  Status          = PeiServicesLocatePpi (
+                      &gEfiPeiMmAccessPpiGuid,
+                      0,
+                      NULL,
+                      (VOID **)&MmAccess
+                      );
+  if (!EFI_ERROR (Status)) {
+    //
+    // Open all MMRAM ranges, if MmAccess is available.
+    //
+    Size   = 0;
+    Status = MmAccess->GetCapabilities ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), MmAccess, &Size, NULL);
+    if (Status != EFI_BUFFER_TOO_SMALL) {
+      // This is not right...
+      ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+      return EFI_DEVICE_ERROR;
+    }
+
+    MmramRangeCount = Size / sizeof (EFI_MMRAM_DESCRIPTOR);
+    for (Index = 0; Index < MmramRangeCount; Index++) {
+      Status = MmAccess->Open ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), MmAccess, Index);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "MM IPL failed to open MMRAM windows index %d - %r\n", Index, Status));
+        ASSERT_EFI_ERROR (Status);
+        goto Done;
+      }
+    }
+  }
 
   //
   // Initialize ImageContext
@@ -689,7 +741,7 @@ ExecuteMmCoreFromMmram (
   //
   Status = PeCoffLoaderGetImageInfo (&ImageContext);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   PageCount = (UINTN)EFI_SIZE_TO_PAGES ((UINTN)ImageContext.ImageSize + ImageContext.SectionAlignment);
@@ -699,7 +751,8 @@ ExecuteMmCoreFromMmram (
   //
   ImageContext.ImageAddress = MmIplAllocateMmramPage (PageCount, &Block);
   if (ImageContext.ImageAddress == 0) {
-    return EFI_NOT_FOUND;
+    Status = EFI_NOT_FOUND;
+    goto Done;
   }
 
   //
@@ -759,6 +812,44 @@ ExecuteMmCoreFromMmram (
       Status = Entry (MmHobList);
       ASSERT_EFI_ERROR (Status);
       FreePages (MmHobList, EFI_SIZE_TO_PAGES (MmHobSize));
+    }
+  }
+
+Done:
+  if (MmAccess != NULL) {
+    //
+    // Close all MMRAM ranges, if MmAccess is available.
+    //
+    for (Index = 0; Index < MmramRangeCount; Index++) {
+      Status = MmAccess->Close ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), MmAccess, Index);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "MM IPL failed to close MMRAM windows index %d - %r\n", Index, Status));
+        ASSERT (FALSE);
+        return Status;
+      }
+
+      //
+      // Print debug message that the MMRAM window is now closed.
+      //
+      DEBUG ((DEBUG_INFO, "MM IPL closed MMRAM window index %d\n", Index));
+
+      //
+      // Lock the MMRAM (Note: Locking MMRAM may not be supported on all platforms)
+      //
+      Status = MmAccess->Lock ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), MmAccess, Index);
+      if (EFI_ERROR (Status)) {
+        //
+        // Print error message that the MMRAM failed to lock...
+        //
+        DEBUG ((DEBUG_ERROR, "MM IPL could not lock MMRAM (Index %d) after executing MM Core %r\n", Index, Status));
+        ASSERT (FALSE);
+        return Status;
+      }
+
+      //
+      // Print debug message that the MMRAM window is now closed.
+      //
+      DEBUG ((DEBUG_INFO, "MM IPL locked MMRAM window index %d\n", Index));
     }
   }
 

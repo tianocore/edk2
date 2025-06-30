@@ -447,6 +447,14 @@ InternalX509GetNIDName (
   }
 
   EntryData = X509_NAME_ENTRY_get_data (Entry);
+  if (EntryData == NULL) {
+    //
+    // Fail to retrieve name entry data
+    //
+    *CommonNameSize = 0;
+    ReturnStatus    = RETURN_NOT_FOUND;
+    goto _Exit;
+  }
 
   Length = ASN1_STRING_to_UTF8 (&UTF8Name, EntryData);
   if (Length < 0) {
@@ -807,6 +815,8 @@ X509GetTBSCert (
   UINT32       ObjClass;
   UINTN        Length;
   UINTN        Inf;
+
+  Asn1Tag = (UINT32)V_ASN1_UNDEF;
 
   //
   // Check input parameters.
@@ -1260,11 +1270,11 @@ _Exit:
   @param[in, out] ExtensionDataSize Extension bytes size.
 
   @retval TRUE                     The certificate Extension data retrieved successfully.
+  @retval TRUE                     The Certificate Extension is found, but the oid extension is not found.
   @retval FALSE                    If Cert is NULL.
                                    If ExtensionDataSize is NULL.
                                    If ExtensionData is not NULL and *ExtensionDataSize is 0.
                                    If Certificate is invalid.
-  @retval FALSE                    If no Extension entry match Oid.
   @retval FALSE                    If the ExtensionData is NULL. The required buffer size
                                    is returned in the ExtensionDataSize parameter.
   @retval FALSE                    The operation is not supported.
@@ -1370,6 +1380,8 @@ X509GetExtensionData (
 
     *ExtensionDataSize = OctLength;
   } else {
+    /* the cert extension is found, but the oid extension is not found; */
+    Status             = TRUE;
     *ExtensionDataSize = 0;
   }
 

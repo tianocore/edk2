@@ -1624,8 +1624,6 @@ InternalShellExecuteDevicePath (
     Status = gBS->InstallProtocolInterface (&NewHandle, &gEfiShellParametersProtocolGuid, EFI_NATIVE_INTERFACE, &ShellParamsProtocol);
     ASSERT_EFI_ERROR (Status);
 
-    /// @todo initialize and install ShellInterface protocol on the new image for compatibility if - PcdGetBool(PcdShellSupportOldProtocols)
-
     //
     // now start the image and if the caller wanted the return code pass it to them...
     //
@@ -3887,11 +3885,6 @@ CreatePopulateInstallShellProtocol (
                     EFI_NATIVE_INTERFACE,
                     (VOID *)(&mShellProtocol)
                     );
-  }
-
-  if (PcdGetBool (PcdShellSupportOldProtocols)) {
-    /// @todo support ShellEnvironment2
-    /// @todo do we need to support ShellEnvironment (not ShellEnvironment2) also?
   }
 
   if (!EFI_ERROR (Status)) {

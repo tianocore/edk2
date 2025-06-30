@@ -396,7 +396,7 @@ BOpt_GetBootOptions (
 
   @param CallbackData The BMM context data.
 
-  @return EFI_SUCESS The functin completes successfully.
+  @return EFI_SUCCESS          The function completes successfully.
   @retval EFI_OUT_OF_RESOURCES Not enough memory to compete the operation.
 
 

@@ -9,10 +9,10 @@
 #include <PiPei.h>
 
 #include <Base.h>
-#include <libfdt.h>
 #include <Library/ArmLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/FdtLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 
@@ -68,7 +68,7 @@ CloudHvVirtMemInfoPeiLibConstructor (
   //
   // Make sure we have a valid device tree blob
   //
-  if (fdt_check_header (DeviceTreeBase) != 0) {
+  if (FdtCheckHeader (DeviceTreeBase) != 0) {
     return EFI_NOT_FOUND;
   }
 
@@ -76,7 +76,7 @@ CloudHvVirtMemInfoPeiLibConstructor (
   // Look for the lowest memory node
   //
   for (Prev = 0; ; Prev = Node) {
-    Node = fdt_next_node (DeviceTreeBase, Prev, NULL);
+    Node = FdtNextNode (DeviceTreeBase, Prev, NULL);
     if (Node < 0) {
       break;
     }
@@ -84,16 +84,16 @@ CloudHvVirtMemInfoPeiLibConstructor (
     //
     // Check for memory node
     //
-    Type = fdt_getprop (DeviceTreeBase, Node, "device_type", &Len);
+    Type = FdtGetProp (DeviceTreeBase, Node, "device_type", &Len);
     if ((Type != 0) && (AsciiStrnCmp (Type, "memory", Len) == 0)) {
       //
       // Get the 'reg' property of this node. For now, we will assume
       // two 8 byte quantities for base and size, respectively.
       //
-      RegProp = fdt_getprop (DeviceTreeBase, Node, "reg", &Len);
+      RegProp = FdtGetProp (DeviceTreeBase, Node, "reg", &Len);
       if ((RegProp != 0) && (Len == (2 * sizeof (UINT64)))) {
-        CurBase = fdt64_to_cpu (ReadUnaligned64 (RegProp));
-        CurSize = fdt64_to_cpu (ReadUnaligned64 (RegProp + 1));
+        CurBase = Fdt64ToCpu (ReadUnaligned64 (RegProp));
+        CurSize = Fdt64ToCpu (ReadUnaligned64 (RegProp + 1));
 
         DEBUG ((
           DEBUG_INFO,

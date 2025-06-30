@@ -9,10 +9,57 @@
 #ifndef ARMGIC_H_
 #define ARMGIC_H_
 
+//
+// GIC SPI and extended SPI ranges
+//
+#define ARM_GIC_ARCH_SPI_MIN      32
+#define ARM_GIC_ARCH_SPI_MAX      1019
+#define ARM_GIC_ARCH_EXT_SPI_MIN  4096
+#define ARM_GIC_ARCH_EXT_SPI_MAX  5119
+
 // GIC Distributor
 #define ARM_GIC_ICDDCR   0x000        // Distributor Control Register
 #define ARM_GIC_ICDICTR  0x004        // Interrupt Controller Type Register
 #define ARM_GIC_ICDIIDR  0x008        // Implementer Identification Register
+
+// ICDICTR is also called GICD_TYPER.
+
+// Intids per LSB for EXT_SPI_RANGE and ITLINES.
+#define ARM_GIC_ICDICTR_INTID_RANGE_RESOLUTION  (32)
+
+// Converts an register range of IntIds to the maximum IntId using Base as an
+// offset.
+#define ARM_GIC_ICDICTR_INTID_RANGE_TO_MAX_INTID(Range, Base) \
+  (ARM_GIC_ICDICTR_INTID_RANGE_RESOLUTION * ((Range) + 1) - 1 + (Base))
+
+#define ARM_GIC_ICDICTR_ITLINES_MASK   (0x1F)
+#define ARM_GIC_ICDICTR_ITLINES_SHIFT  (0)
+
+// Gets the range for SPI IntIds from TypeReg.
+#define ARM_GIC_ICDICTR_GET_SPI_RANGE(TypeReg) \
+  (((TypeReg) >> ARM_GIC_ICDICTR_ITLINES_SHIFT) & ARM_GIC_ICDICTR_ITLINES_MASK)
+
+// Converts a range of SPI IntIds to the maximum SPI IntId.
+#define ARM_GIC_ICDICTR_SPI_RANGE_TO_MAX_INTID(SpiRange) \
+  (((SpiRange) == ARM_GIC_ICDICTR_ITLINES_MASK)          \
+       ? ARM_GIC_ARCH_SPI_MAX                   \
+       : ARM_GIC_ICDICTR_INTID_RANGE_TO_MAX_INTID(SpiRange, 0))
+
+// Extracts the maximum SPI IntId from TypeReg.
+#define ARM_GIC_ICDICTR_GET_SPI_MAX_INTID(TypeReg) \
+  ARM_GIC_ICDICTR_SPI_RANGE_TO_MAX_INTID(ARM_GIC_ICDICTR_GET_SPI_RANGE(TypeReg))
+
+#define ARM_GIC_ICDICTR_EXT_SPI_ENABLED      (1 << 8) // Extended SPI enabled bit.
+#define ARM_GIC_ICDICTR_EXT_SPI_RANGE_SHIFT  (27)     // Extended SPI range position.
+#define ARM_GIC_ICDICTR_EXT_SPI_RANGE_MASK   (0x1F)   // Extended SPI range mask.
+#define ARM_GIC_ICDICTR_GET_EXT_SPI_RANGE(TypeReg)      \
+  (((TypeReg) >> ARM_GIC_ICDICTR_EXT_SPI_RANGE_SHIFT) & \
+   ARM_GIC_ICDICTR_EXT_SPI_RANGE_MASK)
+
+// Extracts the maximum EXT SPI IntId from TypeReg.
+#define ARM_GIC_ICDICTR_GET_EXT_SPI_MAX_INTID(TypeReg) \
+  ARM_GIC_ICDICTR_INTID_RANGE_TO_MAX_INTID(            \
+      ARM_GIC_ICDICTR_GET_EXT_SPI_RANGE(TypeReg), ARM_GIC_ARCH_EXT_SPI_MIN)
 
 // Each reg base below repeats for Number of interrupts / 4 (see GIC spec)
 #define ARM_GIC_ICDISR   0x080        // Interrupt Security Registers
@@ -35,7 +82,8 @@
 #define ARM_GIC_ICDSGIR  0xF00        // Software Generated Interrupt Register
 
 // GICv3 specific registers
-#define ARM_GICD_IROUTER  0x6100       // Interrupt Routing Registers
+#define ARM_GICD_IROUTER    0x6100    // Interrupt Routing Registers
+#define ARM_GICD_IROUTER_E  0x8000    // Interrupt Routing Registers
 
 // GICD_CTLR bits
 #define ARM_GIC_ICDDCR_ARE  (1 << 4)     // Affinity Routing Enable (ARE)
@@ -49,6 +97,16 @@
 #define ARM_GIC_ICDICFR_F_CONFIG1_BIT    1    // Bit number within F field
 #define ARM_GIC_ICDICFR_LEVEL_TRIGGERED  0x0  // Level triggered interrupt
 #define ARM_GIC_ICDICFR_EDGE_TRIGGERED   0x1  // Edge triggered interrupt
+
+// GICD ESPI registers
+//  These registers follow the same bit pattern as the SPI registers.
+#define ARM_GIC_ICDISR_E   0x1000   // Interrupt Security Registers
+#define ARM_GIC_ICDISER_E  0x1200   // Interrupt Set-Enable for ESPI
+#define ARM_GIC_ICDICER_E  0x1400   // Interrupt Clear-Enable Registers
+#define ARM_GIC_ICDSPR_E   0x1600   // Interrupt Set-Pending Registers
+#define ARM_GIC_ICDICPR_E  0x1800   // Interrupt Clear-Pending Registers
+#define ARM_GIC_ICDIPR_E   0x2000   // Interrupt Priority Registers
+#define ARM_GIC_ICDICFR_E  0x3000   // Interrupt Configuration Registers
 
 // GIC Redistributor
 #define ARM_GICR_CTLR_FRAME_SIZE          SIZE_64KB
@@ -107,14 +165,6 @@
 
 // Bit Mask for
 #define ARM_GIC_ICCIAR_ACKINTID  0x3FF
-
-//
-// GIC SPI and extended SPI ranges
-//
-#define ARM_GIC_ARCH_SPI_MIN      32
-#define ARM_GIC_ARCH_SPI_MAX      1019
-#define ARM_GIC_ARCH_EXT_SPI_MIN  4096
-#define ARM_GIC_ARCH_EXT_SPI_MAX  5119
 
 // GIC revision 3 specific declarations
 

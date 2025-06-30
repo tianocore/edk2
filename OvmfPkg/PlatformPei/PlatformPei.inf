@@ -72,6 +72,7 @@
   PlatformInitLib
   SmmRelocationLib
   TdxHelperLib
+  MemDebugLogLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
@@ -143,12 +144,13 @@
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuVarsRequire
 
 [Ppis]
   gEfiPeiMasterBootModePpiGuid
   gEfiPeiMpServicesPpiGuid
   gEfiPeiReadOnlyVariable2PpiGuid
-  gEdkiiPeiMpServices2PpiGuid
+  gEfiPeiMpServices2PpiGuid
 
 [Depex]
   TRUE

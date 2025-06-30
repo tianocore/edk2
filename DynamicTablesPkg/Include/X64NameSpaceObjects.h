@@ -333,6 +333,18 @@ typedef struct CmX64LocalApicX2ApicAffinityInfo {
   UINT32             ProximityDomain;
   UINT32             Flags;
   UINT32             ClockDomain;
+
+  /** Optional field: Reference Token to the ProximityDomain this object
+      belongs to. If set to CM_NULL_TOKEN, the following field is used:
+        CM_X64_LOCAL_APIC_X2APIC_AFFINITY_INFO.ProximityDomain
+  */
+  CM_OBJECT_TOKEN    ProximityDomainToken;
+
+  /** Optional field: Reference Token to the ProximityDomain this object
+      belongs to. If set to CM_NULL_TOKEN, the following field is used:
+        CM_X64_LOCAL_APIC_X2APIC_AFFINITY_INFO.ClockDomain
+  */
+  CM_OBJECT_TOKEN    ClockDomainToken;
 } CM_X64_LOCAL_APIC_X2APIC_AFFINITY_INFO;
 
 #pragma pack()

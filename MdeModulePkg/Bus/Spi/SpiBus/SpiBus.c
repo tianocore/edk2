@@ -329,8 +329,17 @@ Transaction (
              ((SpiChip->SpiHc->Attributes & HC_SUPPORTS_WRITE_THEN_READ_OPERATIONS) != HC_SUPPORTS_WRITE_THEN_READ_OPERATIONS))
   {
     // Convert to full duplex transaction
-    DummyReadBuffer                    = AllocateZeroPool (WriteBytes);
-    DummyWriteBuffer                   = AllocateZeroPool (ReadBytes);
+    DummyReadBuffer = AllocateZeroPool (WriteBytes);
+    if (DummyReadBuffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    DummyWriteBuffer = AllocateZeroPool (ReadBytes);
+    if (DummyWriteBuffer == NULL) {
+      FreePool (DummyReadBuffer);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     SpiChip->BusTransaction.ReadBuffer = DummyReadBuffer;
     SpiChip->BusTransaction.ReadBytes  = WriteBytes;
 

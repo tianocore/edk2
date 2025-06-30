@@ -874,7 +874,7 @@ DriverHealthManagerUpdateForm (
 }
 
 /**
-  Called when the form is closing to remove the dynamicly added string from the HII package list.
+  Called when the form is closing to remove the dynamically added string from the HII package list.
 **/
 VOID
 DriverHealthManagerCleanDynamicString (

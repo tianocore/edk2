@@ -423,7 +423,7 @@ WinNtWndBlt (
     return (EFI_STATUS)RStatus;
   }
 
-  if (BltOperation != EfiBltVideoToBltBuffer) {
+  if (BltOperation != EfiUgaVideoToBltBuffer) {
     //
     // Mark the area we just blted as Invalid so WM_PAINT will update.
     //

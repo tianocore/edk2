@@ -1,7 +1,7 @@
 ## @file
 # GNU/Linux makefile for 'DevicePath' module build.
 #
-# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2017 - 2025, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ARCH ?= IA32
@@ -13,8 +13,13 @@ OBJECTS = DevicePath.o UefiDevicePathLib.o DevicePathFromText.o  DevicePathUtili
 
 include $(MAKEROOT)/Makefiles/app.makefile
 
-GCCVERSION = $(shell $(CC) -dumpversion | awk -F'.' '{print $$1}')
-CLANG := $(shell $(CC) --version | grep clang)
+ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+GCCVERSION := $(shell for /f "tokens=1 delims=." %%a in ("$(shell $(CC) -dumpversion)") do echo %%a)
+else
+GCCVERSION := $(shell $(CC) -dumpversion | awk -F'.' '{print $$1}')
+endif
+CLANG := $(findstring clang,$(shell $(CC) --version))
+
 ifneq ("$(GCCVERSION)", "5")
 ifeq ($(CLANG),)
 ifneq ($(DARWIN),Darwin)

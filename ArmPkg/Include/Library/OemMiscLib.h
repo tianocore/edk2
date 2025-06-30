@@ -86,7 +86,7 @@ OemGetCpuFreq (
 
   @param ProcessorIndex  Index of the processor to get the information for.
   @param ProcessorStatus Processor status.
-  @param ProcessorCharacteristics Processor characteritics.
+  @param ProcessorCharacteristics Processor characteristics.
   @param MiscProcessorData        Miscellaneous processor information.
 
   @return  TRUE on success, FALSE on failure.

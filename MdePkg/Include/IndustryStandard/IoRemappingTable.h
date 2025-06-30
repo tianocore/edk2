@@ -3,6 +3,7 @@
 
   Copyright (c) 2017, Linaro Limited. All rights reserved.<BR>
   Copyright (c) 2018 - 2022, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -10,7 +11,9 @@
   - IO Remapping Table, Platform Design Document, Revision E.d, Feb 2022
     (https://developer.arm.com/documentation/den0049/)
   - IO Remapping Table, Platform Design Document, Revision E.e, Sept 2022
-      (https://developer.arm.com/documentation/den0049/)
+    (https://developer.arm.com/documentation/den0049/)
+  - IO Remapping Table, Platform Design Document, Revision E.f, April 2024
+    (https://developer.arm.com/documentation/den0049/)
 
   @par Glossary:
   - Ref  : Reference
@@ -80,7 +83,10 @@
 #define EFI_ACPI_IORT_ROOT_COMPLEX_PASID_FWD_SUPPORTED    BIT2
 
 #define EFI_ACPI_IORT_ROOT_COMPLEX_PASID_UNSUPPORTED  0x0
-#define EFI_ACPI_IORT_ROOT_COMPLEX_PASID_SUPPORTED    BIT1
+#define EFI_ACPI_IORT_ROOT_COMPLEX_PASID_SUPPORTED    BIT0
+
+#define EFI_ACPI_IORT_ROOT_COMPLEX_PASID_MIN_CAPABILITY  0x00
+#define EFI_ACPI_IORT_ROOT_COMPLEX_PASID_MAX_CAPABILITY  0x14
 
 #define EFI_ACPI_IORT_RMR_REMAP_NOT_PERMITTED  0x0
 #define EFI_ACPI_IORT_RMR_REMAP_PERMITTED      BIT0

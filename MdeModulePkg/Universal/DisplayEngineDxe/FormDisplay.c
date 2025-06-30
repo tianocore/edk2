@@ -2164,12 +2164,13 @@ DisplayMenuString (
   // First print the highlight string.
   //
   SetDisplayAttribute (MenuOption, TRUE);
-  Length = PrintStringAt (Col, Row, String);
+  PrintStringAt (Col, Row, String);
 
   //
   // Second, clean the empty after the string.
   //
   SetDisplayAttribute (MenuOption, FALSE);
+  Length = GetStringWidth (String) / 2 - 1;
   PrintStringAtWithWidth (Col + Length, Row, L"", Width - Length);
 }
 
@@ -2379,7 +2380,7 @@ FxConfirmPopup (
   @param  Highlight                Whether this menu will be highlight.
   @param  UpdateCol                Whether need to update the column info for Date/Time.
 
-  @retval EFI_SUCESSS              Process the user selection success.
+  @retval EFI_SUCCESS              Process the user selection success.
 
 **/
 EFI_STATUS
@@ -2626,7 +2627,7 @@ DisplayOneMenu (
 
   @param  FormData               The current form data info.
 
-  @retval EFI_SUCESSS            Process the user selection success.
+  @retval EFI_SUCCESS            Process the user selection success.
   @retval EFI_NOT_FOUND          Process option string for orderedlist/Oneof fail.
 
 **/

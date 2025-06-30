@@ -1773,7 +1773,7 @@ FindSymbolStr (
   Get line number and offset from this line in code file.
 
   @param  Line            - Line buffer in code file
-  @param  Offset          - Offset to functin entry
+  @param  Offset          - Offset to function entry
 
   @return Line number
 
@@ -1867,7 +1867,7 @@ typedef enum {
   Get line number from this code file.
 
   @param  Entry           - Symbol entry
-  @param  FuncOffset      - Offset to functin entry
+  @param  FuncOffset      - Offset to function entry
   @param  SearchType      - Search type for the code
 
   @return Line number
@@ -2045,7 +2045,7 @@ EdbGetSourceStrFromCodeByLine (
   Get source string from this code file.
 
   @param  Entry           - Symbol entry
-  @param  FuncOffset      - Offset to functin entry
+  @param  FuncOffset      - Offset to function entry
   @param  FuncEnd         - Function end
 
   @retval Funtion start

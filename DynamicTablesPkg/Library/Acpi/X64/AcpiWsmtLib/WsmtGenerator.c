@@ -5,7 +5,7 @@
   The WSMT table is used to specify the security mitigation
   that are enabled in the Windows OS.
 
-  Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+  Copyright (c) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -181,7 +181,7 @@ BuildWsmtTable (
              This,
              (EFI_ACPI_DESCRIPTION_HEADER *)&AcpiWsmt,
              AcpiTableInfo,
-             sizeof (EFI_ACPI_6_5_FIXED_ACPI_DESCRIPTION_TABLE)
+             sizeof (EFI_ACPI_WSMT_TABLE)
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((

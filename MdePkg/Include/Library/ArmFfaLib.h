@@ -23,6 +23,30 @@
 
 #include <Library/ArmSmcLib.h>
 
+/**
+ * Arguments to call FF-A request via SMC/SVC.
+ */
+typedef struct ArmFfaArgs {
+  UINTN    Arg0;
+  UINTN    Arg1;
+  UINTN    Arg2;
+  UINTN    Arg3;
+  UINTN    Arg4;
+  UINTN    Arg5;
+  UINTN    Arg6;
+  UINTN    Arg7;
+  UINTN    Arg8;
+  UINTN    Arg9;
+  UINTN    Arg10;
+  UINTN    Arg11;
+  UINTN    Arg12;
+  UINTN    Arg13;
+  UINTN    Arg14;
+  UINTN    Arg15;
+  UINTN    Arg16;
+  UINTN    Arg17;
+} ARM_FFA_ARGS;
+
 #define FFA_RXTX_MAP_INPUT_PROPERTY_DEFAULT  0x00
 
 /** Implementation define arguments used in
@@ -72,6 +96,18 @@ typedef struct DirectMsgArgs {
   /// Implementation define argument 13, this will be set to/from x17(v2)
   UINTN    Arg13;
 } DIRECT_MSG_ARGS;
+
+/**
+  Trigger FF-A ABI call according to PcdFfaLibConduitSmc.
+
+  @param [in, out]  FfaArgs        Ffa arguments
+
+**/
+VOID
+EFIAPI
+ArmCallFfa (
+  IN OUT ARM_FFA_ARGS  *FfaArgs
+  );
 
 /**
   Convert EFI_STATUS to FFA return code.

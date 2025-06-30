@@ -701,6 +701,7 @@ MsrExit (
   MSR_SVSM_CAA_REGISTER  Msr;
   UINT64                 ExitInfo1;
   UINT64                 Status;
+  UINT32                 EcxIn;
 
   ExitInfo1 = 0;
 
@@ -708,7 +709,8 @@ MsrExit (
   // The SVSM CAA MSR is a software implemented MSR and not supported
   // by the hardware, handle it directly.
   //
-  if (Regs->Rax == MSR_SVSM_CAA) {
+  EcxIn = (UINT32)(UINTN)Regs->Rcx;
+  if (EcxIn == MSR_SVSM_CAA) {
     // Writes to the SVSM CAA MSR are ignored
     if (*(InstructionData->OpCodes + 1) == 0x30) {
       return 0;

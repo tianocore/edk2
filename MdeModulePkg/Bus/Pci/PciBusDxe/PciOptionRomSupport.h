@@ -91,7 +91,7 @@ GetOpRomInfo (
   @param RomBase   Base address of Option Rom.
 
   @retval EFI_OUT_OF_RESOURCES No enough memory to hold image.
-  @retval EFI_SUCESS           Successfully loaded Option Rom.
+  @retval EFI_SUCCESS          Successfully loaded Option Rom.
 
 **/
 EFI_STATUS

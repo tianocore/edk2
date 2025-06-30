@@ -197,7 +197,7 @@
   UefiCpuPkg/Library/SmmCpuRendezvousLib/SmmCpuRendezvousLib.inf
   UefiCpuPkg/Library/CpuPageTableLib/CpuPageTableLib.inf
   UefiCpuPkg/Library/CpuExceptionHandlerLib/UnitTest/PeiCpuExceptionHandlerLibUnitTest.inf
-  UefiCpuPkg/Test/UnitTest/EfiMpServicesPpiProtocol/EdkiiPeiMpServices2PpiPeiUnitTest.inf
+  UefiCpuPkg/Test/UnitTest/EfiMpServicesPpiProtocol/EfiPeiMpServices2PpiPeiUnitTest.inf
   UefiCpuPkg/Test/UnitTest/EfiMpServicesPpiProtocol/EfiMpServiceProtocolDxeUnitTest.inf
   UefiCpuPkg/Test/UnitTest/EfiMpServicesPpiProtocol/EfiMpServiceProtocolDynamicCmdUnitTest.inf {
     <LibraryClasses>

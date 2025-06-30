@@ -36,6 +36,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/StandaloneMmMmuLib.h>
+#include <Library/SafeIntLib.h>
 #include <Library/PcdLib.h>
 
 #include <IndustryStandard/ArmStdSmc.h>
@@ -45,6 +46,8 @@
 
 #include <Protocol/PiMmCpuDriverEp.h>
 #include <Protocol/MmCommunication.h>
+#include <Protocol/MmCommunication2.h>
+#include <Protocol/MmCommunication3.h>
 
 extern EFI_MM_SYSTEM_TABLE  gMmCoreMmst;
 
@@ -443,7 +446,9 @@ GetServiceType (
   IN EFI_GUID  *ServiceGuid
   )
 {
-  if (CompareGuid (ServiceGuid, &gEfiMmCommunication2ProtocolGuid)) {
+  if (CompareGuid (ServiceGuid, &gEfiMmCommunication2ProtocolGuid) ||
+      CompareGuid (ServiceGuid, &gEfiMmCommunication3ProtocolGuid))
+  {
     return ServiceTypeMmCommunication;
   }
 
@@ -467,10 +472,14 @@ ValidateMmCommBufferAddr (
   IN UINTN  CommBufferAddr
   )
 {
-  UINT64  NsCommBufferEnd;
-  UINT64  SCommBufferEnd;
-  UINT64  CommBufferEnd;
-  UINT64  CommBufferRange;
+  UINT64                        NsCommBufferEnd;
+  UINT64                        SCommBufferEnd;
+  UINT64                        CommBufferEnd;
+  UINT64                        CommBufferRange;
+  UINT64                        BufferSize;
+  UINT64                        BufferEnd;
+  EFI_MM_COMMUNICATE_HEADER_V3  *CommBufferHeaderV3;
+  EFI_STATUS                    Status;
 
   NsCommBufferEnd = mNsCommBuffer->PhysicalStart + mNsCommBuffer->PhysicalSize;
   SCommBufferEnd  = mSCommBuffer->PhysicalStart + mSCommBuffer->PhysicalSize;
@@ -493,11 +502,36 @@ ValidateMmCommBufferAddr (
     return EFI_ACCESS_DENIED;
   }
 
-  // perform bounds check.
-  if (((CommBufferAddr + sizeof (EFI_MM_COMMUNICATE_HEADER) +
-        ((EFI_MM_COMMUNICATE_HEADER *)CommBufferAddr)->MessageLength)) >
-      CommBufferEnd)
+  if (CompareGuid (
+        &((EFI_MM_COMMUNICATE_HEADER *)CommBufferAddr)->HeaderGuid,
+        &gEfiMmCommunicateHeaderV3Guid
+        ))
   {
+    CommBufferHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommBufferAddr;
+    Status             = SafeUint64Add (
+                           CommBufferHeaderV3->MessageSize,
+                           sizeof (EFI_MM_COMMUNICATE_HEADER_V3),
+                           &BufferSize
+                           );
+    if (EFI_ERROR (Status)) {
+      return EFI_ACCESS_DENIED;
+    }
+  } else {
+    BufferSize = ((EFI_MM_COMMUNICATE_HEADER *)CommBufferAddr)->MessageLength +
+                 OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+  }
+
+  Status = SafeUint64Add (
+             CommBufferAddr,
+             BufferSize,
+             &BufferEnd
+             );
+  if (EFI_ERROR (Status)) {
+    return EFI_ACCESS_DENIED;
+  }
+
+  // perform bounds check.
+  if (BufferEnd > CommBufferEnd) {
     return EFI_ACCESS_DENIED;
   }
 
@@ -797,52 +831,6 @@ InitializeMiscMmCommunicateBuffer (
 }
 
 /**
-  Convert UUID to EFI_GUID format.
-  for example, If there is EFI_GUID named
-  "378daedc-f06b-4446-8314-40ab933c87a3",
-
-  EFI_GUID is saved in memory like:
-     dc ae 8d 37
-     6b f0 46 44
-     83 14 40 ab
-     93 3c 87 a3
-
-  However, UUID should be saved like:
-     37 8d ae dc
-     f0 6b 44 46
-     83 14 40 ab
-     93 3c 87 a3
-
-  FF-A and other software components (i.e. linux-kernel)
-  uses below format.
-
-  To patch mm-service properly, the passed uuid should be converted to
-  EFI_GUID format.
-
-  @param [in]  Uuid            Uuid
-  @param [out] Guid            EFI_GUID
-
-**/
-STATIC
-VOID
-EFIAPI
-ConvertUuidToEfiGuid (
-  IN  UINT64    *Uuid,
-  OUT EFI_GUID  *Guid
-  )
-{
-  UINT32  *Data32;
-  UINT16  *Data16;
-
-  Data32    = (UINT32 *)Uuid;
-  Data32[0] = SwapBytes32 (Data32[0]);
-  Data16    = (UINT16 *)&Data32[1];
-  Data16[0] = SwapBytes16 (Data16[0]);
-  Data16[1] = SwapBytes16 (Data16[1]);
-  CopyGuid (Guid, (EFI_GUID *)Uuid);
-}
-
-/**
   A loop to delegate events from SPMC.
   DelegatedEventLoop() calls ArmCallSvc() to exit to SPMC.
   When an event is delegated to StandaloneMm the SPMC returns control
@@ -911,7 +899,7 @@ DelegatedEventLoop (
         FfaMsgInfo.DirectMsgVersion = DirectMsgV2;
         Uuid[0]                     = EventCompleteSvcArgs->Arg2;
         Uuid[1]                     = EventCompleteSvcArgs->Arg3;
-        ConvertUuidToEfiGuid (Uuid, &ServiceGuid);
+        ConvertUuidToGuid ((GUID *)Uuid, &ServiceGuid);
         ServiceType = GetServiceType (&ServiceGuid);
       } else {
         Status = EFI_INVALID_PARAMETER;

@@ -1000,7 +1000,7 @@ SetStringWorker (
     case EFI_HII_SIBT_STRING_SCSU_FONT:
     case EFI_HII_SIBT_STRINGS_SCSU:
     case EFI_HII_SIBT_STRINGS_SCSU_FONT:
-      BlockSize  = OldBlockSize + StrLen (String);
+      BlockSize  = OldBlockSize + StrSize (String);
       BlockSize -= AsciiStrSize ((CHAR8 *)StringTextPtr);
       Block      = AllocateZeroPool (BlockSize);
       if (Block == NULL) {

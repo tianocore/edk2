@@ -258,6 +258,11 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 #
 INF OvmfPkg/Tcg/TdTcg2Dxe/TdTcg2Dxe.inf
 
+  #
+  # Smbios Measurement support
+  #
+INF MdeModulePkg/Universal/SmbiosMeasurementDxe/SmbiosMeasurementDxe.inf
+
 ################################################################################
 
 [FV.NCCFV]
