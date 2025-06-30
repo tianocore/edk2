@@ -52,10 +52,6 @@ PreferNonshareableMemory (
   UINTN  Mmfr;
   UINTN  Val;
 
-  if (FeaturePcdGet (PcdNormalMemoryNonshareableOverride)) {
-    return TRUE;
-  }
-
   //
   // Check whether the innermost level of shareability (the level we will use
   // by default to map normal memory) is implemented with hardware coherency
