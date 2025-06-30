@@ -268,21 +268,19 @@ class CommitMessageCheck:
             # If CVE-xxxx-xxxxx is present in subject line, then limit length of
             # subject line to 92 characters
             #
-            if len(lines[0].rstrip()) >= 93:
-                self.error(
-                    'First line of commit message (subject line) is too long (%d >= 93).' %
-                    (len(lines[0].rstrip()))
-                    )
+            maxlength = 92
         else:
             #
             # If CVE-xxxx-xxxxx is not present in subject line, then limit
             # length of subject line to 75 characters
             #
-            if len(lines[0].rstrip()) >= 76:
-                self.error(
-                    'First line of commit message (subject line) is too long (%d >= 76).' %
-                    (len(lines[0].rstrip()))
-                    )
+            maxlength = 75
+
+        if len(lines[0].rstrip()) > maxlength:
+            self.error(
+                'First line of commit message (subject line) is too long (%d > %d).' %
+                (len(lines[0].rstrip()), maxlength)
+            )
 
         if count >= 1 and len(lines[0].strip()) == 0:
             self.error('First line of commit message (subject line) ' +
