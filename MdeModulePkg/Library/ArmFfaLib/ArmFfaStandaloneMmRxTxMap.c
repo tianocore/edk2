@@ -173,8 +173,8 @@ ArmFfaLibRxTxMap (
     goto ErrorHandler;
   }
 
-  mArmFfaRxTxBufferStmmInfo->TxBufferAddr = TxBuffer;
-  mArmFfaRxTxBufferStmmInfo->RxBufferAddr = RxBuffer;
+  mArmFfaRxTxBufferStmmInfo->TxBufferAddr = (UINTN)TxBuffer;
+  mArmFfaRxTxBufferStmmInfo->RxBufferAddr = (UINTN)RxBuffer;
   mArmFfaRxTxBufferStmmInfo->TxBufferSize = BufferSize;
   mArmFfaRxTxBufferStmmInfo->RxBufferSize = BufferSize;
 
