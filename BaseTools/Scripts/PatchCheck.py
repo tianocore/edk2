@@ -263,7 +263,7 @@ class CommitMessageCheck:
             self.error('Empty commit message!')
             return
 
-        if count >= 1 and re.search(self.cve_re, lines[0]):
+        if re.search(self.cve_re, lines[0]):
             #
             # If CVE-xxxx-xxxxx is present in subject line, then limit length of
             # subject line to 92 characters
