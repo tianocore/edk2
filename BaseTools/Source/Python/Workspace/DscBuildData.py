@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2008 - 2025, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+# Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
@@ -1670,7 +1671,7 @@ class DscBuildData(PlatformBuildClassObject):
             AllModulePcds = AllModulePcds | ModuleData.PcdsName
         return AllModulePcds
 
-    #Filter the StrucutrePcd that is not used by any module in dsc file and fdf file.
+    #Filter the StructurePcd that is not used by any module in dsc file and fdf file.
     def FilterStrcturePcd(self, S_pcd_set):
         UnusedStruPcds = set(S_pcd_set.keys()) - self.PlatformUsedPcds
         for (Token, TokenSpaceGuid) in UnusedStruPcds:
