@@ -151,12 +151,15 @@ PrintFirmwareVersion (
 
   @param[in]  PeiCoreEntryPoint   Address in ram of the entrypoint of the PEI
                                   core
+  @param[in]  TransferListBaseAddr Address of the Transfer List base address
+
 **/
 STATIC
 VOID
 EFIAPI
 SecMain (
-  IN  EFI_PEI_CORE_ENTRY_POINT  PeiCoreEntryPoint
+  IN  EFI_PEI_CORE_ENTRY_POINT  PeiCoreEntryPoint,
+  IN  UINTN                     TransferListBaseAddr
   )
 {
   EFI_SEC_PEI_HAND_OFF    SecCoreData;
@@ -164,6 +167,21 @@ SecMain (
   EFI_PEI_PPI_DESCRIPTOR  *PpiList;
   UINTN                   TemporaryRamBase;
   UINTN                   TemporaryRamSize;
+  VOID                    *TransferListBase;
+
+  // Dump the Transfer List
+  TransferListBase = (VOID *)TransferListBaseAddr;
+  if (TransferListBase != NULL) {
+    if (TransferListCheckHeader (TransferListBase) != TRANSFER_LIST_OPS_INVALID) {
+      DEBUG_CODE_BEGIN ();
+      TransferListDump (TransferListBase);
+      DEBUG_CODE_END ();
+    } else {
+      DEBUG ((DEBUG_ERROR, "%a: No valid operations possible on TransferList found @ 0x%p\n", __func__, TransferListBase));
+    }
+  } else {
+    DEBUG ((DEBUG_INFO, "%a: No TransferList found, continuing boot\n", __func__));
+  }
 
   CreatePpiList (&PpiListSize, &PpiList);
 
@@ -197,10 +215,13 @@ SecMain (
 
   @param[in]  PeiCoreEntryPoint   Address in ram of the entrypoint of the PEI
                                   core
+  @param[in]  TransferListBaseAddr Address of the Transfer List base address
+
 **/
 VOID
 CEntryPoint (
-  IN  EFI_PEI_CORE_ENTRY_POINT  PeiCoreEntryPoint
+  IN  EFI_PEI_CORE_ENTRY_POINT  PeiCoreEntryPoint,
+  IN  UINTN                     TransferListBaseAddr
   )
 {
   if (!ArmMmuEnabled ()) {
@@ -237,7 +258,7 @@ CEntryPoint (
   ArmPlatformInitialize (ArmReadMpidr ());
 
   // Goto primary Main.
-  SecMain (PeiCoreEntryPoint);
+  SecMain (PeiCoreEntryPoint, TransferListBaseAddr);
 
   // PEI Core should always load and never return
   ASSERT (FALSE);
