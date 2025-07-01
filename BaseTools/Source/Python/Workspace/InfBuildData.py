@@ -114,7 +114,6 @@ class InfBuildData(ModuleBuildClassObject):
         self._Target = Target
         self._Toolchain = Toolchain
         self._Platform = TAB_COMMON
-        self._TailComments = None
         self._BaseName = None
         self._DxsFile = None
         self._ModuleType = None
@@ -123,7 +122,6 @@ class InfBuildData(ModuleBuildClassObject):
         self._Guid = None
         self._Version = None
         self._PcdIsDriver = None
-        self._BinaryModule = None
         self._Shadow = None
         self._MakefileName = None
         self._CustomMakefile = None
