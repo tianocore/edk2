@@ -4,6 +4,7 @@
   Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2015-2021 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -2028,7 +2029,7 @@ FirmwareManagementDumpInformation (
           if (ImageInfoV1[Index].ImageId == ImageInfoV1[Index1].ImageId) {
             Found = TRUE;
             //
-            // At least one match found indicating presense of non unique ImageId values so no more comparisons needed
+            // At least one match found indicating presence of non unique ImageId values so no more comparisons needed
             //
             goto ENDLOOP;
           }
@@ -2036,7 +2037,7 @@ FirmwareManagementDumpInformation (
           if (ImageInfoV2[Index].ImageId == ImageInfoV2[Index1].ImageId) {
             Found = TRUE;
             //
-            // At least one match found indicating presense of non unique ImageId values so no more comparisons needed
+            // At least one match found indicating presence of non unique ImageId values so no more comparisons needed
             //
             goto ENDLOOP;
           }
@@ -2044,7 +2045,7 @@ FirmwareManagementDumpInformation (
           if (ImageInfo[Index].ImageId == ImageInfo[Index1].ImageId) {
             Found = TRUE;
             //
-            // At least one match found indicating presense of non unique ImageId values so no more comparisons needed
+            // At least one match found indicating presence of non unique ImageId values so no more comparisons needed
             //
             goto ENDLOOP;
           }
