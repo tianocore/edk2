@@ -2,6 +2,7 @@
   RedfishHttpData handles internal data to support Redfish HTTP protocol.
 
   Copyright (c) 2023-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -84,7 +85,7 @@ ReleaseRedfishService (
 }
 
 /**
-  This function creat new service. Host and HostName are copied to
+  This function create new service. Host and HostName are copied to
   newly created service instance.
 
   @param[in]  Host            Host string.
@@ -189,7 +190,7 @@ ReleaseRedfishPayload (
 }
 
 /**
-  This function creat new payload. Server and JsonObj are
+  This function create new payload. Server and JsonObj are
   copied to newly created payload.
 
   @param[in]  Service          Pointer to Service instance.
