@@ -2,6 +2,7 @@
 Private Include file for IdeBus PEIM.
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -524,7 +525,7 @@ CheckErrorStatus (
   );
 
 /**
-  Idendify Atapi devices.
+  Identify Atapi devices.
 
   @param[in]  AtapiBlkIoDev     A pointer to atapi block IO device.
   @param[in]  DevicePosition    An integer to signify device position.
