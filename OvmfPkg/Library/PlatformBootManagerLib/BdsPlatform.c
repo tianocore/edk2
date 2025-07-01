@@ -1661,6 +1661,11 @@ PlatformBootManagerAfterConsole (
   StoreQemuBootOrder ();
 
   //
+  // Check if we need to Uninstall MemAttrProtocol
+  //
+  CheckUninstallMemAttrProtocol ();
+
+  //
   // Process QEMU's -kernel command line option
   //
   TryRunningQemuKernel ();

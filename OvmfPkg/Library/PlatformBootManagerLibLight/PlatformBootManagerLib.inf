@@ -60,7 +60,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
-  gUefiOvmfPkgTokenSpaceGuid.PcdUninstallMemAttrProtocol
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
@@ -76,6 +75,5 @@
 [Protocols]
   gEfiFirmwareVolume2ProtocolGuid
   gEfiGraphicsOutputProtocolGuid
-  gEfiMemoryAttributeProtocolGuid
   gEfiPciRootBridgeIoProtocolGuid
   gVirtioDeviceProtocolGuid

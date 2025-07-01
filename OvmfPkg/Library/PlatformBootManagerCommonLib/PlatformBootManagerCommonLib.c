@@ -9,6 +9,7 @@
 #include <Library/QemuFwCfgLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/QemuFwCfgSimpleParserLib.h>
 #include <Library/UefiBootManagerLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -321,4 +322,64 @@ RemoveStaleFvFileOptions (
   }
 
   EfiBootManagerFreeLoadOptions (BootOptions, BootOptionCount);
+}
+
+/**
+  Check if we need to uninstall MemAttributeProtocol to
+  workaround older/broken shims.
+
+  This can be specified via PCD or fw_cfg, i.e.:
+
+  -fw_cfg opt/org.tianocore/UninstallMemAttrProtocol,string=y
+**/
+VOID
+CheckUninstallMemAttrProtocol (
+  VOID
+  )
+{
+  BOOLEAN     Uninstall;
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
+  UINTN       Size;
+  VOID        *MemoryAttributeProtocol;
+
+  Uninstall = FixedPcdGetBool (PcdUninstallMemAttrProtocol);
+  QemuFwCfgParseBool ("opt/org.tianocore/UninstallMemAttrProtocol", &Uninstall);
+  DEBUG ((
+    DEBUG_WARN,
+    "%a: %auninstalling EFI memory protocol\n",
+    __func__,
+    Uninstall ? "" : "not "
+    ));
+  if (!Uninstall) {
+    return;
+  }
+
+  Size   = sizeof (Handle);
+  Status = gBS->LocateHandle (
+                  ByProtocol,
+                  &gEfiMemoryAttributeProtocolGuid,
+                  NULL,
+                  &Size,
+                  &Handle
+                  );
+
+  if (EFI_ERROR (Status)) {
+    ASSERT (Status == EFI_NOT_FOUND);
+    return;
+  }
+
+  Status = gBS->HandleProtocol (
+                  Handle,
+                  &gEfiMemoryAttributeProtocolGuid,
+                  &MemoryAttributeProtocol
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->UninstallProtocolInterface (
+                  Handle,
+                  &gEfiMemoryAttributeProtocolGuid,
+                  MemoryAttributeProtocol
+                  );
+  ASSERT_EFI_ERROR (Status);
 }

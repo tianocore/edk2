@@ -16,7 +16,7 @@
   LIBRARY_CLASS                  = PlatformBootManagerCommonLib|DXE_DRIVER
 
 [Sources]
-PlatformBootManagerCommonLib.c
+  PlatformBootManagerCommonLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -27,6 +27,8 @@ PlatformBootManagerCommonLib.c
   QemuFwCfgLib
   DebugLib
   MemoryAllocationLib
+  PcdLib
+  QemuFwCfgSimpleParserLib
   UefiBootManagerLib
   UefiBootServicesTableLib
   UefiLib
@@ -37,6 +39,9 @@ PlatformBootManagerCommonLib.c
   BaseMemoryLib
   OrderedCollectionLib
 
+[FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdUninstallMemAttrProtocol
+
 [Guids]
   gEfiGlobalVariableGuid
   gVirtioMmioTransportGuid
@@ -44,4 +49,5 @@ PlatformBootManagerCommonLib.c
 
 [Protocols]
   gEfiDevicePathProtocolGuid                            ## CONSUMES
+  gEfiMemoryAttributeProtocolGuid                       ## CONSUMES
   gEfiPciRootBridgeIoProtocolGuid                       ## CONSUMES

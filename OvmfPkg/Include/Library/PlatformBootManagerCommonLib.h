@@ -25,4 +25,9 @@ RemoveStaleFvFileOptions (
   VOID
   );
 
+VOID
+CheckUninstallMemAttrProtocol (
+  VOID
+  );
+
 #endif
