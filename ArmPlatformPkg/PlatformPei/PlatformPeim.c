@@ -24,6 +24,7 @@
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/PcdLib.h>
+#include <Guid/TransferListHob.h>
 
 EFI_STATUS
 EFIAPI
@@ -76,13 +77,29 @@ InitializePlatformPeim (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_STATUS     Status;
-  EFI_BOOT_MODE  BootMode;
+  EFI_STATUS         Status;
+  EFI_BOOT_MODE      BootMode;
+  VOID               *TransferListBase;
+  UINTN              *TransferListHobData;
+  EFI_HOB_GUID_TYPE  *GuidHob;
 
   DEBUG ((DEBUG_LOAD | DEBUG_INFO, "Platform PEIM Loaded\n"));
 
   Status = PeiServicesSetBootMode (ArmPlatformGetBootMode ());
   ASSERT_EFI_ERROR (Status);
+
+  // If TransferList PPI is present and TransferListHobGuid is not present,
+  // then create a TransferListHob with the TransferListBase address.
+  Status = PeiServicesLocatePpi (&gArmTransferListPpiGuid, 0, NULL, &TransferListBase);
+  if (!EFI_ERROR (Status)) {
+    GuidHob = GetFirstGuidHob (&gArmTransferListHobGuid);
+    if ((GuidHob == NULL) && (TransferListBase != NULL)) {
+      TransferListHobData = BuildGuidHob (&gArmTransferListHobGuid, sizeof (*TransferListHobData));
+      ASSERT (TransferListHobData != NULL);
+
+      *TransferListHobData = (UINTN)TransferListBase;
+    }
+  }
 
   PlatformPeim ();
 
