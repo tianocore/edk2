@@ -1,6 +1,8 @@
 /** @file
 
   Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
+  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -398,7 +400,7 @@ BuildHobFromBl (
   }
 
   //
-  // Creat SmBios table Hob
+  // Create SmBios table Hob
   //
   SmBiosTableHob = BuildGuidHob (&gUniversalPayloadSmbiosTableGuid, sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE));
   ASSERT (SmBiosTableHob != NULL);
@@ -411,7 +413,7 @@ BuildHobFromBl (
   }
 
   //
-  // Creat ACPI table Hob
+  // Create ACPI table Hob
   //
   AcpiTableHob = BuildGuidHob (&gUniversalPayloadAcpiTableGuid, sizeof (UNIVERSAL_PAYLOAD_ACPI_TABLE));
   ASSERT (AcpiTableHob != NULL);
