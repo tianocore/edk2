@@ -80,6 +80,14 @@ STATIC CONST EFI_PEI_PPI_DESCRIPTOR  gCommonPpiTable[] = {
   }
 };
 
+// The Transfer List PPI is used to pass the Transfer List to the PEI Core
+// and goes at the end of the PPI list.
+STATIC EFI_PEI_PPI_DESCRIPTOR  mTransferListBase = {
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gArmTransferListPpiGuid,
+  NULL // Set later by SecMain
+};
+
 /**
   Construct a PPI list from the PPIs provided in this file and the ones
   provided by the platform code.
@@ -97,7 +105,6 @@ CreatePpiList (
   EFI_PEI_PPI_DESCRIPTOR  *PlatformPpiList;
   UINTN                   PlatformPpiListSize;
   UINTN                   ListBase;
-  EFI_PEI_PPI_DESCRIPTOR  *LastPpi;
 
   // Get the Platform PPIs
   PlatformPpiListSize = 0;
@@ -107,14 +114,15 @@ CreatePpiList (
   ListBase = PcdGet64 (PcdCPUCoresStackBase);
   CopyMem ((VOID *)ListBase, gCommonPpiTable, sizeof (gCommonPpiTable));
   CopyMem ((VOID *)(ListBase + sizeof (gCommonPpiTable)), PlatformPpiList, PlatformPpiListSize);
-
-  // Set the Terminate flag on the last PPI entry
-  LastPpi = (EFI_PEI_PPI_DESCRIPTOR *)ListBase +
-            ((sizeof (gCommonPpiTable) + PlatformPpiListSize) / sizeof (EFI_PEI_PPI_DESCRIPTOR)) - 1;
-  LastPpi->Flags |= EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
+  // Copy the Transfer List PPI after the Common and Platform PPIs
+  CopyMem (
+    (VOID *)(ListBase + sizeof (gCommonPpiTable) + PlatformPpiListSize),
+    &mTransferListBase,
+    sizeof (mTransferListBase)
+    );
 
   *PpiList     = (EFI_PEI_PPI_DESCRIPTOR *)ListBase;
-  *PpiListSize = sizeof (gCommonPpiTable) + PlatformPpiListSize;
+  *PpiListSize = sizeof (gCommonPpiTable) + PlatformPpiListSize + sizeof (mTransferListBase);
 }
 
 /**
@@ -176,6 +184,8 @@ SecMain (
       DEBUG_CODE_BEGIN ();
       TransferListDump (TransferListBase);
       DEBUG_CODE_END ();
+      // Set the Transfer List PPI to point to the Transfer List
+      mTransferListBase.Ppi = TransferListBase;
     } else {
       DEBUG ((DEBUG_ERROR, "%a: No valid operations possible on TransferList found @ 0x%p\n", __func__, TransferListBase));
     }
