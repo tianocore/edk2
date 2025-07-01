@@ -48,6 +48,7 @@
   PrintLib
   SerialPortLib
   StackCheckLib
+  ArmTransferListLib
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid

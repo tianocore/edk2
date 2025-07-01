@@ -23,6 +23,7 @@
 #include <Library/SerialPortLib.h>
 
 #include <Ppi/TemporaryRamSupport.h>
+#include <Library/ArmTransferListLib.h>
 
 /**
   Helper function to switch to a different stack. Implemented in assembler as
