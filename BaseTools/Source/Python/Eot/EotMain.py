@@ -25,7 +25,6 @@ from Eot import Database
 from array import array
 from Eot.Report import Report
 from Common.BuildVersion import gBUILD_VERSION
-from Eot.Parser import ConvertGuid
 from Common.LongFilePathSupport import OpenLongFilePath as open
 import struct
 import uuid
@@ -1009,9 +1008,6 @@ class Ffs(Image):
 
     def Pack(self):
         pass
-
-    def SetFreeSpace(self, Size):
-        self.FreeSpace = Size
 
     def _GetGuid(self):
         return gGuidStringFormat % self.Name

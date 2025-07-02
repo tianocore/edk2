@@ -60,7 +60,6 @@ class ElfNode:
         self.HeaderLength = len(struct2stream(self.Header))
         self.HOffset = 0
         self.DOffset = 0
-        self.ROffset = 0
         self.Data = b''
         self.PadData = b''
         self.Upld_Info_Align = False
@@ -122,7 +121,6 @@ class FvNode:
         self.HeaderLength = self.Header.HeaderLength
         self.HOffset = 0
         self.DOffset = 0
-        self.ROffset = 0
         self.Data = b''
         if self.Header.Signature != 1213613663:
             logger.error('Invalid Fv Header! Fv {} signature {} is not "_FVH".'.format(struct2stream(self.Header), self.Header.Signature))
@@ -179,10 +177,8 @@ class FfsNode:
         self.HeaderLength = self.Header.HeaderLength
         self.HOffset = 0
         self.DOffset = 0
-        self.ROffset = 0
         self.Data = b''
         self.PadData = b''
-        self.SectionMaxAlignment = SECTION_COMMON_ALIGNMENT  # 4-align
 
     def ModCheckSum(self) -> None:
         HeaderData = struct2stream(self.Header)
@@ -217,13 +213,10 @@ class SectionNode:
         self.Type = self.Header.Type
         self.HOffset = 0
         self.DOffset = 0
-        self.ROffset = 0
         self.Data = b''
         self.OriData = b''
-        self.OriHeader = b''
         self.PadData = b''
         self.IsPadSection = False
-        self.SectionMaxAlignment = SECTION_COMMON_ALIGNMENT  # 4-align
 
     def GetExtHeader(self, Type: int, buffer: bytes, nums: int=0) -> None:
         if Type == 0x01:
@@ -244,5 +237,4 @@ class FreeSpaceNode:
         self.Size = len(buffer)
         self.HOffset = 0
         self.DOffset = 0
-        self.ROffset = 0
         self.PadData = b''
