@@ -20,7 +20,7 @@
 //
 // Define the maximum debug and assert message length that this library supports
 //
-#define MAX_DEBUG_MESSAGE_LENGTH  0x100
+#define MAX_DEBUG_MESSAGE_LENGTH  0x200
 
 //
 // Define the timeout for EFI_DEBUGPORT_PROTOCOL.Write
