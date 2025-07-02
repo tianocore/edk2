@@ -802,6 +802,11 @@ ParseNoteSection (
       Prop2 = GNU_PROPERTY_X86_FEATURE_1_IBT;
       break;
 
+    case EM_RISCV64:
+      Prop0 = GNU_PROPERTY_RISCV64_FEATURE_1_AND;
+      Prop2 = GNU_PROPERTY_RISCV64_FEATURE_1_FCFI;
+      break;
+
     default:
       return;
     }
