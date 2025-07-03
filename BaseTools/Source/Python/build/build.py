@@ -82,7 +82,7 @@ TmpTableDict = {}
 #   If any of above environment variable is not set or has error, the build
 #   will be broken.
 #
-def CheckEnvVariable():
+def CheckEnvVariables():
     # check WORKSPACE
     if "WORKSPACE" not in os.environ:
         EdkLogger.error("build", ATTRIBUTE_NOT_AVAILABLE, "Environment variable not found",
@@ -2615,9 +2615,9 @@ def Main():
                             ExtraData="Please select one of: %s" % (' '.join(gSupportedTarget)))
 
         #
-        # Check environment variable: EDK_TOOLS_PATH, WORKSPACE, PATH
+        # Check environment variables: EDK_TOOLS_PATH, WORKSPACE, PATH, etc...
         #
-        CheckEnvVariable()
+        CheckEnvVariables()
         GlobalData.gCommandLineDefines.update(ParseDefines(Option.Macros))
 
         Workspace = os.getenv("WORKSPACE")
