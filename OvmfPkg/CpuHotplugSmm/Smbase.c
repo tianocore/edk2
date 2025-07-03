@@ -132,7 +132,8 @@ SmbaseReleasePostSmmPen (
 
   Note that this effects an "SMRAM to SMRAM" copy.
 
-  Additionally, shut the APIC ID gate in FIRST_SMI_HANDLER_CONTEXT.
+  Additionally, shut the APIC ID gate in FIRST_SMI_HANDLER_CONTEXT, and prepare
+  for configuring MSR_IA32_FEATURE_CONTROL.
 
   This function may only be called from the entry point function of the driver,
   and only after PcdQ35SmramAtDefaultSmbase has been determined to be TRUE.
@@ -152,6 +153,8 @@ SmbaseInstallFirstSmiHandler (
 
   Context             = (VOID *)(UINTN)SMM_DEFAULT_SMBASE;
   Context->ApicIdGate = MAX_UINT64;
+
+  Context->FeatureControl = 0;
 }
 
 /**
