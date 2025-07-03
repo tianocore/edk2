@@ -13,6 +13,7 @@
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = VirtMmCommunication2Initialize
+  VALID_ARCHITECTURES            = X64 AARCH64 RISCV64 LOONGARCH64
 
 [Sources]
   VirtMmCommunication.c
@@ -21,15 +22,20 @@
 #  QemuX64.c
   QemuHwInfo.c
   QemuMmio.c
+  Svsm.c
 
 [Sources.AARCH64, Sources.ARM]
   QemuFdt.c
   QemuMmio.c
+  SvsmNull.c
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   OvmfPkg/OvmfPkg.dec
+
+[Packages.X64]
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [Packages.AARCH64, Packages.ARM]
   EmbeddedPkg/EmbeddedPkg.dec
@@ -46,6 +52,7 @@
 [LibraryClasses.X64]
   DxeHardwareInfoLib
   QemuFwCfgLib
+  AmdSvsmLib
 
 [LibraryClasses.AARCH64, LibraryClasses.ARM]
   FdtLib
