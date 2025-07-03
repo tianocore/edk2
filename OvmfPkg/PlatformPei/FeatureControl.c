@@ -143,6 +143,7 @@ InstallFeatureControlCallback (
     return;
   }
 
+  PlatformInfoHob->FeatureControl = TRUE;
   QemuFwCfgSelectItem (FwCfgItem);
   QemuFwCfgReadBytes (
     sizeof (PlatformInfoHob->FeatureControlValue),
