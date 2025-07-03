@@ -5,6 +5,7 @@
 #  Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2018, Hewlett Packard Enterprise Development, L.P.<BR>
 #  Copyright (c) 2020 - 2021, ARM Limited. All rights reserved.<BR>
+#  Copyright (c) 2025 Qualcomm Technologies, Inc. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -70,6 +71,25 @@ gSupportedTarget = ['all', 'genc', 'genmake', 'modules', 'libraries', 'fds', 'cl
 
 TemporaryTablePattern = re.compile(r'^_\d+_\d+_[a-fA-F0-9]+$')
 TmpTableDict = {}
+
+## Set build time
+#
+# Check if SOURCE_DATE_EPOCH is set in environment, or set it to current timestamp.
+# Return the resulting value.
+#
+# @retval float         The time in seconds since the epoch as a floating-point number.
+#
+def GetBuildEpoch():
+    # Set SOURCE_DATE_EPOCH to the current time if not already set by environment
+    if "SOURCE_DATE_EPOCH" not in os.environ:
+        BuildEpoch = time.time()
+        BuildEpochString = str(int(BuildEpoch))
+        EdkLogger.quiet("SOURCE_DATE_EPOCH not set - using %s" % (BuildEpochString))
+        os.environ["SOURCE_DATE_EPOCH"] = BuildEpochString
+    else:
+        BuildEpoch = float(os.environ["SOURCE_DATE_EPOCH"])
+
+    return BuildEpoch
 
 ## Check environment variables
 #
@@ -2597,7 +2617,8 @@ def Main():
         GlobalData.gIsWindows = False
 
     EdkLogger.quiet("Build environment: %s" % platform.platform())
-    EdkLogger.quiet(time.strftime("Build start time: %H:%M:%S, %b.%d %Y\n", time.localtime()));
+    BuildStartTime = GetBuildEpoch()
+    EdkLogger.quiet(time.strftime("Build start time: %H:%M:%S, %b.%d %Y\n", time.localtime(BuildStartTime)));
     ReturnCode = 0
     MyBuild = None
     BuildError = True
