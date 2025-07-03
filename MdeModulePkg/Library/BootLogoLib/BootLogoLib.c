@@ -112,12 +112,13 @@ BootLogoEnableLogo (
   if (GraphicsOutput != NULL) {
     SizeOfX = GraphicsOutput->Mode->Info->HorizontalResolution;
     SizeOfY = GraphicsOutput->Mode->Info->VerticalResolution;
-  } else {
-    ASSERT (UgaDraw != NULL);
+  } else if (FeaturePcdGet (PcdUgaConsumeSupport) && (UgaDraw != NULL)) {
     Status = UgaDraw->GetMode (UgaDraw, &SizeOfX, &SizeOfY, &ColorDepth, &RefreshRate);
     if (EFI_ERROR (Status)) {
       return EFI_UNSUPPORTED;
     }
+  } else {
+    Status = EFI_UNSUPPORTED;
   }
 
   Blt           = NULL;
@@ -219,7 +220,7 @@ BootLogoEnableLogo (
                                    Image.Height,
                                    Image.Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
                                    );
-      } else {
+      } else if (FeaturePcdGet (PcdUgaConsumeSupport) && (UgaDraw != NULL)) {
         ASSERT (UgaDraw != NULL);
         Status = UgaDraw->Blt (
                             UgaDraw,
@@ -233,6 +234,8 @@ BootLogoEnableLogo (
                             Image.Height,
                             Image.Width * sizeof (EFI_UGA_PIXEL)
                             );
+      } else {
+        Status = EFI_UNSUPPORTED;
       }
 
       //
@@ -320,7 +323,7 @@ BootLogoEnableLogo (
                                  LogoHeight,
                                  LogoWidth * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
                                  );
-    } else {
+    } else if (FeaturePcdGet (PcdUgaConsumeSupport) && (UgaDraw != NULL)) {
       Status = UgaDraw->Blt (
                           UgaDraw,
                           (EFI_UGA_PIXEL *)LogoBlt,
@@ -333,6 +336,8 @@ BootLogoEnableLogo (
                           LogoHeight,
                           LogoWidth * sizeof (EFI_UGA_PIXEL)
                           );
+    } else {
+      Status = EFI_UNSUPPORTED;
     }
   }
 
@@ -490,7 +495,7 @@ BootLogoUpdateProgress (
                                  SizeOfY - (PosY - EFI_GLYPH_HEIGHT - 1),
                                  SizeOfX * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
                                  );
-    } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
+    } else if (FeaturePcdGet (PcdUgaConsumeSupport) && (UgaDraw != NULL)) {
       Status = UgaDraw->Blt (
                           UgaDraw,
                           (EFI_UGA_PIXEL *)&Color,
@@ -526,7 +531,7 @@ BootLogoUpdateProgress (
                                  BlockHeight,
                                  (BlockWidth) * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
                                  );
-    } else if (FeaturePcdGet (PcdUgaConsumeSupport)) {
+    } else if (FeaturePcdGet (PcdUgaConsumeSupport) && (UgaDraw != NULL)) {
       Status = UgaDraw->Blt (
                           UgaDraw,
                           (EFI_UGA_PIXEL *)&ProgressColor,
