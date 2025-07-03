@@ -41,9 +41,9 @@ SMM_DEFAULT_SMBASE: equ 0x3_0000
 ; Field offsets in FIRST_SMI_HANDLER_CONTEXT, which resides at
 ; SMM_DEFAULT_SMBASE.
 ;
-ApicIdGate:      equ  0 ; UINT64
-NewSmbase:       equ  8 ; UINT32
-AboutToLeaveSmm: equ 12 ; UINT8
+ApicIdGate:              equ  0 ; UINT64
+NewSmbase:               equ  8 ; UINT32
+AboutToLeaveSmm:         equ 12 ; UINT8
 
 ;
 ; SMRAM Save State Map field offsets, per the AMD (not Intel) layout that QEMU
