@@ -62,7 +62,10 @@ PerformQuickSort (
   ASSERT (CompareFunction  != NULL);
 
   Buffer = AllocateZeroPool (ElementSize);
-  ASSERT (Buffer != NULL);
+  if (Buffer == NULL) {
+    ASSERT (Buffer != NULL);
+    return;
+  }
 
   QuickSort (
     BufferToSort,

@@ -193,7 +193,9 @@ EfiBootManagerGetGopDevicePath (
             //
             TempDevicePath = GopPool;
             GopPool        = AppendDevicePathInstance (GopPool, DevicePath);
-            gBS->FreePool (TempDevicePath);
+            if (TempDevicePath != NULL) {
+              gBS->FreePool (TempDevicePath);
+            }
           }
         }
 
@@ -204,9 +206,14 @@ EfiBootManagerGetGopDevicePath (
           DEBUG ((DEBUG_INFO, "[Bds] Looking for GOP child deeper ... \n"));
           TempDevicePath   = GopPool;
           ReturnDevicePath = EfiBootManagerGetGopDevicePath (OpenInfoBuffer[Index].ControllerHandle);
-          GopPool          = AppendDevicePathInstance (GopPool, ReturnDevicePath);
-          gBS->FreePool (ReturnDevicePath);
-          gBS->FreePool (TempDevicePath);
+          if (ReturnDevicePath != NULL) {
+            GopPool = AppendDevicePathInstance (GopPool, ReturnDevicePath);
+            gBS->FreePool (ReturnDevicePath);
+          }
+
+          if (TempDevicePath != NULL) {
+            gBS->FreePool (TempDevicePath);
+          }
         }
       }
     }
@@ -421,7 +428,7 @@ EfiBootManagerUpdateConsoleVariable (
   IN  EFI_DEVICE_PATH_PROTOCOL  *ExclusiveDevicePath
   )
 {
-  EFI_STATUS                Status;
+  EFI_STATUS                Status = EFI_SUCCESS;
   EFI_DEVICE_PATH_PROTOCOL  *VarConsole;
   EFI_DEVICE_PATH_PROTOCOL  *NewDevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *TempNewDevicePath;
@@ -437,6 +444,8 @@ EfiBootManagerUpdateConsoleVariable (
   if (CustomizedConDevicePath == ExclusiveDevicePath) {
     return EFI_UNSUPPORTED;
   }
+
+  TempNewDevicePath = NULL;
 
   //
   // Delete the ExclusiveDevicePath from current default console
@@ -464,29 +473,34 @@ EfiBootManagerUpdateConsoleVariable (
       // Check if there is part of CustomizedConDevicePath in NewDevicePath, delete it.
       //
       NewDevicePath = BmDelPartMatchInstance (NewDevicePath, CustomizedConDevicePath);
-      //
-      // In the first check, the default console variable will be _ModuleEntryPoint,
-      // just append current customized device path
-      //
-      TempNewDevicePath = NewDevicePath;
-      NewDevicePath     = AppendDevicePathInstance (NewDevicePath, CustomizedConDevicePath);
+      if (NewDevicePath != NULL) {
+        //
+        // In the first check, the default console variable will be _ModuleEntryPoint,
+        // just append current customized device path
+        //
+        TempNewDevicePath = NewDevicePath;
+      }
+
+      NewDevicePath = AppendDevicePathInstance (NewDevicePath, CustomizedConDevicePath);
       if (TempNewDevicePath != NULL) {
         FreePool (TempNewDevicePath);
       }
     }
   }
 
-  //
-  // Finally, Update the variable of the default console by NewDevicePath
-  //
-  Status = gRT->SetVariable (
-                  mConVarName[ConsoleType],
-                  &gEfiGlobalVariableGuid,
-                  EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS
-                  | ((ConsoleType < ConInDev) ? EFI_VARIABLE_NON_VOLATILE : 0),
-                  GetDevicePathSize (NewDevicePath),
-                  NewDevicePath
-                  );
+  if (NewDevicePath != NULL) {
+    //
+    // Finally, Update the variable of the default console by NewDevicePath
+    //
+    Status = gRT->SetVariable (
+                    mConVarName[ConsoleType],
+                    &gEfiGlobalVariableGuid,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS
+                    | ((ConsoleType < ConInDev) ? EFI_VARIABLE_NON_VOLATILE : 0),
+                    GetDevicePathSize (NewDevicePath),
+                    NewDevicePath
+                    );
+  }
 
   if (VarConsole == NewDevicePath) {
     if (VarConsole != NULL) {

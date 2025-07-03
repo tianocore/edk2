@@ -540,6 +540,7 @@ BmRepairAllControllers (
   UINT32                               MaxRepairCount;
   UINT32                               RepairCount;
 
+  Count = 0;
   //
   // Configure PcdDriverHealthConfigureForm to ZeroGuid to disable driver health check.
   //
@@ -561,89 +562,94 @@ BmRepairAllControllers (
     // Deal with Repair Required
     //
     DriverHealthInfo = EfiBootManagerGetDriverHealthInfo (&Count);
-    for (Index = 0; Index < Count; Index++) {
-      if (DriverHealthInfo[Index].HealthStatus == EfiDriverHealthStatusConfigurationRequired) {
-        ConfigurationRequired = TRUE;
-      }
+    if (DriverHealthInfo != NULL) {
+      for (Index = 0; Index < Count; Index++) {
+        if (DriverHealthInfo[Index].HealthStatus == EfiDriverHealthStatusConfigurationRequired) {
+          ConfigurationRequired = TRUE;
+        }
 
-      if (DriverHealthInfo[Index].HealthStatus == EfiDriverHealthStatusRepairRequired) {
-        RepairRequired = TRUE;
+        if (DriverHealthInfo[Index].HealthStatus == EfiDriverHealthStatusRepairRequired) {
+          RepairRequired = TRUE;
 
-        BmDisplayMessages (&DriverHealthInfo[Index]);
+          BmDisplayMessages (&DriverHealthInfo[Index]);
 
-        Status = DriverHealthInfo[Index].DriverHealth->Repair (
-                                                         DriverHealthInfo[Index].DriverHealth,
-                                                         DriverHealthInfo[Index].ControllerHandle,
-                                                         DriverHealthInfo[Index].ChildHandle,
-                                                         BmRepairNotify
-                                                         );
-        if (!EFI_ERROR (Status) && !ConfigurationRequired) {
-          Status = DriverHealthInfo[Index].DriverHealth->GetHealthStatus (
+          Status = DriverHealthInfo[Index].DriverHealth->Repair (
                                                            DriverHealthInfo[Index].DriverHealth,
                                                            DriverHealthInfo[Index].ControllerHandle,
                                                            DriverHealthInfo[Index].ChildHandle,
-                                                           &HealthStatus,
-                                                           NULL,
-                                                           NULL
+                                                           BmRepairNotify
                                                            );
-          if (!EFI_ERROR (Status) && (HealthStatus == EfiDriverHealthStatusConfigurationRequired)) {
-            ConfigurationRequired = TRUE;
+          if (!EFI_ERROR (Status) && !ConfigurationRequired) {
+            Status = DriverHealthInfo[Index].DriverHealth->GetHealthStatus (
+                                                             DriverHealthInfo[Index].DriverHealth,
+                                                             DriverHealthInfo[Index].ControllerHandle,
+                                                             DriverHealthInfo[Index].ChildHandle,
+                                                             &HealthStatus,
+                                                             NULL,
+                                                             NULL
+                                                             );
+            if (!EFI_ERROR (Status) && (HealthStatus == EfiDriverHealthStatusConfigurationRequired)) {
+              ConfigurationRequired = TRUE;
+            }
           }
         }
       }
-    }
 
-    if (ConfigurationRequired) {
-      HiiHandles = HiiGetHiiHandles (NULL);
-      if (HiiHandles != NULL) {
-        for (Index = 0; HiiHandles[Index] != NULL; Index++) {
-          Status = FormBrowser2->SendForm (
-                                   FormBrowser2,
-                                   &HiiHandles[Index],
-                                   1,
-                                   PcdGetPtr (PcdDriverHealthConfigureForm),
-                                   0,
-                                   NULL,
-                                   NULL
-                                   );
-          if (!EFI_ERROR (Status)) {
-            break;
+      if (ConfigurationRequired) {
+        HiiHandles = HiiGetHiiHandles (NULL);
+        if (HiiHandles != NULL) {
+          for (Index = 0; HiiHandles[Index] != NULL; Index++) {
+            Status = FormBrowser2->SendForm (
+                                     FormBrowser2,
+                                     &HiiHandles[Index],
+                                     1,
+                                     PcdGetPtr (PcdDriverHealthConfigureForm),
+                                     0,
+                                     NULL,
+                                     NULL
+                                     );
+            if (!EFI_ERROR (Status)) {
+              break;
+            }
           }
-        }
 
-        FreePool (HiiHandles);
+          FreePool (HiiHandles);
+        }
       }
+
+      EfiBootManagerFreeDriverHealthInfo (DriverHealthInfo, Count);
     }
 
-    EfiBootManagerFreeDriverHealthInfo (DriverHealthInfo, Count);
     RepairCount++;
   } while ((RepairRequired || ConfigurationRequired) && ((MaxRepairCount == 0) || (RepairCount < MaxRepairCount)));
 
   RebootRequired    = FALSE;
   ReconnectRequired = FALSE;
   DriverHealthInfo  = EfiBootManagerGetDriverHealthInfo (&Count);
-  for (Index = 0; Index < Count; Index++) {
-    BmDisplayMessages (&DriverHealthInfo[Index]);
+  if (DriverHealthInfo != NULL) {
+    for (Index = 0; Index < Count; Index++) {
+      BmDisplayMessages (&DriverHealthInfo[Index]);
 
-    if (DriverHealthInfo[Index].HealthStatus == EfiDriverHealthStatusReconnectRequired) {
-      Status = gBS->DisconnectController (DriverHealthInfo[Index].ControllerHandle, NULL, NULL);
-      if (EFI_ERROR (Status)) {
-        //
-        // Disconnect failed. Need to promote reconnect to a reboot.
-        //
+      if (DriverHealthInfo[Index].HealthStatus == EfiDriverHealthStatusReconnectRequired) {
+        Status = gBS->DisconnectController (DriverHealthInfo[Index].ControllerHandle, NULL, NULL);
+        if (EFI_ERROR (Status)) {
+          //
+          // Disconnect failed. Need to promote reconnect to a reboot.
+          //
+          RebootRequired = TRUE;
+        } else {
+          gBS->ConnectController (DriverHealthInfo[Index].ControllerHandle, NULL, NULL, TRUE);
+          ReconnectRequired = TRUE;
+        }
+      }
+
+      if (DriverHealthInfo[Index].HealthStatus == EfiDriverHealthStatusRebootRequired) {
         RebootRequired = TRUE;
-      } else {
-        gBS->ConnectController (DriverHealthInfo[Index].ControllerHandle, NULL, NULL, TRUE);
-        ReconnectRequired = TRUE;
       }
     }
 
-    if (DriverHealthInfo[Index].HealthStatus == EfiDriverHealthStatusRebootRequired) {
-      RebootRequired = TRUE;
-    }
+    EfiBootManagerFreeDriverHealthInfo (DriverHealthInfo, Count);
   }
-
-  EfiBootManagerFreeDriverHealthInfo (DriverHealthInfo, Count);
 
   DEBUG_CODE_BEGIN ();
   CHAR16  *ControllerName = NULL;
@@ -651,57 +657,60 @@ BmRepairAllControllers (
   CHAR16  String[512];
 
   DriverHealthInfo = EfiBootManagerGetDriverHealthInfo (&Count);
-  for (Index = 0; Index < Count; Index++) {
-    if (DriverHealthInfo == NULL) {
-      continue;
+  if (DriverHealthInfo != NULL) {
+    for (Index = 0; Index < Count; Index++) {
+      if (DriverHealthInfo == NULL) {
+        continue;
+      }
+
+      ZeroMem (String, sizeof (String));
+      if (DriverHealthInfo[Index].DriverHealthHandle != NULL) {
+        DriverName = BmGetDriverName (DriverHealthInfo[Index].DriverHealthHandle);
+      }
+
+      if (DriverHealthInfo[Index].ControllerHandle != NULL) {
+        ControllerName = BmGetControllerName (
+                           DriverHealthInfo[Index].DriverHealthHandle,
+                           DriverHealthInfo[Index].ControllerHandle,
+                           DriverHealthInfo[Index].ChildHandle
+                           );
+      }
+
+      if ((DriverName == NULL) && (ControllerName == NULL)) {
+        continue;
+      }
+
+      UnicodeSPrint (
+        String,
+        sizeof (String),
+        L"%s%s%s",
+        DriverName != NULL ? DriverName : L"",
+        (DriverName != NULL && ControllerName != NULL) ? L"    " : L"",
+        ControllerName != NULL ? ControllerName : L""
+        );
+
+      DEBUG ((
+        DEBUG_INFO,
+        "%02d: %s - %s\n",
+        Index,
+        String,
+        mBmHealthStatusText[DriverHealthInfo[Index].HealthStatus]
+        ));
+
+      if (ControllerName != NULL) {
+        FreePool (ControllerName);
+        ControllerName = NULL;
+      }
+
+      if (DriverName != NULL) {
+        FreePool (DriverName);
+        DriverName = NULL;
+      }
     }
 
-    ZeroMem (String, sizeof (String));
-    if (DriverHealthInfo[Index].DriverHealthHandle != NULL) {
-      DriverName = BmGetDriverName (DriverHealthInfo[Index].DriverHealthHandle);
-    }
-
-    if (DriverHealthInfo[Index].ControllerHandle != NULL) {
-      ControllerName = BmGetControllerName (
-                         DriverHealthInfo[Index].DriverHealthHandle,
-                         DriverHealthInfo[Index].ControllerHandle,
-                         DriverHealthInfo[Index].ChildHandle
-                         );
-    }
-
-    if ((DriverName == NULL) && (ControllerName == NULL)) {
-      continue;
-    }
-
-    UnicodeSPrint (
-      String,
-      sizeof (String),
-      L"%s%s%s",
-      DriverName != NULL ? DriverName : L"",
-      (DriverName != NULL && ControllerName != NULL) ? L"    " : L"",
-      ControllerName != NULL ? ControllerName : L""
-      );
-
-    DEBUG ((
-      DEBUG_INFO,
-      "%02d: %s - %s\n",
-      Index,
-      String,
-      mBmHealthStatusText[DriverHealthInfo[Index].HealthStatus]
-      ));
-
-    if (ControllerName != NULL) {
-      FreePool (ControllerName);
-      ControllerName = NULL;
-    }
-
-    if (DriverName != NULL) {
-      FreePool (DriverName);
-      DriverName = NULL;
-    }
+    EfiBootManagerFreeDriverHealthInfo (DriverHealthInfo, Count);
   }
 
-  EfiBootManagerFreeDriverHealthInfo (DriverHealthInfo, Count);
   DEBUG_CODE_END ();
 
   if (ReconnectRequired) {
