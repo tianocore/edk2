@@ -1,5 +1,5 @@
 /** @file
-  Definitions based on NVMe spec. version 2.0c.
+  Definitions based on NVMe spec. version 2.1.
 
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2017 - 2023, Intel Corporation. All rights reserved.<BR>
@@ -11,6 +11,7 @@
   NVMe Specification 1.4
   NVMe Specification 2.0
   NVMe Specification 2.0c
+  NVMe Specification 2.1
 
 **/
 
@@ -392,6 +393,9 @@ typedef struct {
   UINT32               Ctratt;      /* Controller Attributes */
   UINT16               Rrls;        /* Read Recovery Levels Supported */
   UINT8                Rsvd1[9];    /* Reserved as of NVM Express 1.4c Spec */
+  UINT8                Plsi;        /* Power Loss Signaling Information */
+  #define PLS_EMERGENCY_POWER_FAIL  0x01
+  #define PLS_FORCED_QUIESCENCE     0x02
   UINT8                Cntrltype;   /* Controller Type */
   UINT8                Fguid[16];   /* FRU Globally Unique Identifier */
   UINT16               Crdt1;       /* Command Retry Delay Time 1 */
@@ -749,6 +753,12 @@ typedef struct {
   UINT32    Rsvd1 : 23;
   UINT32    Sv    : 1;        /* Save */
 } NVME_ADMIN_SET_FEATURES;
+
+//
+// Feature Identifier
+// (ref. spec. v2.1 Figure 32).
+//
+#define POWER_LOSS_SIGNALING_CONFIG_FID  0x1B  // Power Loss Signaling Config
 
 //
 // NvmExpress Admin Sanitize Command
@@ -1183,13 +1193,26 @@ typedef struct {
   //
   UINT32    BlockEraseEstimatedTimeWithNodmm;
   //
-  // Indicates  the number of seconds required to complete a Crypto Erase sanitize operation and the associated additional media modification after the Crypto Erase sanitize operation in the background.
+  // Indicates the number of seconds required to complete a Crypto Erase sanitize operation and the associated additional media modification after the Crypto Erase sanitize operation in the background.
   // The No-Deallocate After Sanitize bit was set to ?1? in the Sanitize command that requested the Crypto Erase sanitize operation.
   // The No-Deallocate Modifies Media After Sanitize field is set to 10b.
   //
   UINT32    CryptoEraseEstimatedTimeWithNodmm;
   UINT8     Reserved[480];
 } NVME_SANITIZE_STATUS_INFO_LOG;
+
+//
+// Power Loss Signaling Config
+// (ref. spec. v2.1 Figure 414).
+//
+typedef struct {
+  // Indicates the Power Loss Signaling mode of operation
+  UINT32    Plsm     : 2;                       // Power Loss Signaling Mode
+  #define PLS_DISABLED                      0x0 // PLS Disabled
+  #define PLS_EMERGENCY_POWER_FAIL_ENABLED  0x1 // PLS Emergency Power Fail Enabled
+  #define PLS_FORCED_QUIESCENCE_ENABLED     0x2 // PLS Forced Quiescence Enabled
+  UINT32    Reserved : 30;
+} NVME_POWER_LOSS_SIGNALING_CONFIG;
 
 #pragma pack()
 
