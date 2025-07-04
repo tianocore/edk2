@@ -675,7 +675,7 @@ InitializeUsbMouseDevice (
 
   UsbMouseDev->Mode.ResolutionX = 8;
   UsbMouseDev->Mode.ResolutionY = 8;
-  UsbMouseDev->Mode.ResolutionZ = 0;
+  UsbMouseDev->Mode.ResolutionZ = 8;
 
   //
   // Set boot protocol for the USB mouse.
