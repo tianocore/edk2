@@ -2107,4 +2107,114 @@ AmlCreatePssNode (
   OUT AML_OBJECT_NODE_HANDLE  *NewPssNode   OPTIONAL
   );
 
+/** Code generation for the "IRQ ()" ASL function.
+
+  The Resource Data effectively created is an IRQ Resource
+  Data. Cf ACPI 6.5 specification:
+   - s6.4.2.1 "IRQ Descriptor"
+   - s19.6.66 "IRQ (Interrupt Resource Descriptor Macro)"
+
+
+  The created resource data node can be:
+   - appended to the list of resource data elements of the NameOpNode.
+     In such case NameOpNode must be defined by a the "Name ()" ASL statement
+     and initially contain a "ResourceTemplate ()".
+   - returned through the NewRdNode parameter.
+
+  @param  [in]  IsEdgeTriggered The interrupt is edge triggered or
+                                level triggered.
+  @param  [in]  IsActiveLow The interrupt is active-high or active-low.
+  @param  [in]  IsShared  The interrupt can be shared with other
+                          devices or not (Exclusive).
+  @param  [in]  IrqList List of IRQ numbers. Must be non-NULL.
+  @param  [in]  IrqCount  Number of IRQs in IrqList. Must be > 0 and <= 16.
+  @param  [in]  NameOpNode  NameOp object node defining a named object.
+                            If provided, append the new resource data node
+                            to the list of resource data elements of this node.
+  @param  [out] NewRdNode If provided and success, contain the created node.
+
+  @retval EFI_SUCCESS           The function completed successfully.
+  @retval EFI_INVALID_PARAMETER Invalid parameter.
+  @retval various               Other errors as indicated.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenRdIrq (
+  IN  BOOLEAN                 IsEdgeTriggered,
+  IN  BOOLEAN                 IsActiveLow,
+  IN  BOOLEAN                 IsShared,
+  IN  UINT8                   *IrqList,
+  IN  UINT8                   IrqCount,
+  IN  AML_OBJECT_NODE_HANDLE  NameOpNode  OPTIONAL,
+  OUT AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
+  );
+
+/** Code generation for the "UARTSerialBusV2 ()" ASL macro.
+
+  The Resource Data effectively created is a UARTSerialBusV2 Resource
+  Data. Cf ACPI 6.5:
+   - s19.6.143 UARTSerialBusV2
+     (UART Serial Bus Connection Resource Descriptor Version 2 Macro)
+   - s6.4.3.8.2.3 UART Serial Bus Connection Resource Descriptor
+
+  The created resource data node can be:
+   - appended to the list of resource data elements of the NameOpNode.
+     In such case NameOpNode must be defined by a the "Name ()" ASL statement
+     and initially contain a "ResourceTemplate ()".
+   - returned through the NewRdNode parameter.
+
+  @param [in] IsResourceConsumer  ResourceUsage parameter.
+  @param [in] SlaveMode Indicates whether the uart operates in slave mode.
+  @param [in] BigEndian Indicates whether the bit transger is big-endian.
+  @param [in] BitsPerByte Indicates the number of bits per byte.
+  @param [in] StopBits  Specifies the stop bits format used.
+  @param [in] FlowControl Specifies the flow control protocol used.
+  @param [in] BaudRate  Specifies the baud rate.
+  @param [in] RxFifo  Number of bytes in the receiver FIFO.
+  @param [in] TxFifo  Number of bytes in the transmitter FIFO.
+  @param [in] Parity  Specifies the parity format used.
+  @param [in] SerialLinesEnabled  Specifies which serial lines are enabled.
+  @param [in] VendorDefinedData      VendorDefinedData parameter.
+  @param [in] VendorDefinedDataLength VendorDefinedDataLength parameter.
+  @param [in] AdditionalVendorData   AdditionalVendorData parameter.
+  @param [in] AdditionalVendorDataLength AdditionalVendorDataLength parameter.
+  @param [in] ResourceSource  Name of source resource used.
+  @param [in] ResourceSourceLength  Resource Source Length.
+  @param [in] NameOpNode  NameOpNode object node defining a named object.
+                          If provided, append the new resource data
+                          node to the list of resource data elements
+                          of this node.
+  @param [out] NewRdNode  If provided and success,
+                          contain the created node.
+
+  @retval EFI_SUCCESS           The function completed successfully.
+  @retval EFI_INVALID_PARAMETER Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES  Could not allocate memory.
+  @retval various               Other errors as indicated.
+
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenRdUartSerialBus (
+  IN  BOOLEAN IsResourceConsumer,
+  IN  BOOLEAN SlaveMode,
+  IN  BOOLEAN BigEndian,
+  IN  UINT8 BitsPerByte,
+  IN  UINT8 StopBits,
+  IN  UINT8 FlowControl,
+  IN  UINT32 BaudRate,
+  IN  UINT16 RxFifo,
+  IN  UINT16 TxFifo,
+  IN  UINT8 Parity,
+  IN  UINT8 SerialLinesEnabled,
+  IN  UINT8 *VendorDefinedData, OPTIONAL
+  IN  UINT16                  VendorDefinedDataLength,
+  IN  UINT8                  *AdditionalVendorData, OPTIONAL
+  IN  UINT16                  AdditionalVendorDataLength,
+  IN  CHAR8                  *ResourceSource,
+  IN  UINT16                  ResourceSourceLength,
+  IN  AML_OBJECT_NODE_HANDLE  NameOpNode OPTIONAL,
+  OUT AML_DATA_NODE_HANDLE   *NewRdNode OPTIONAL
+  );
+
 #endif // AML_LIB_H_
