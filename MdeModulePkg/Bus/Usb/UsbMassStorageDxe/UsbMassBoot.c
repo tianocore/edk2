@@ -207,6 +207,24 @@ UsbBootExecCmd (
     return EFI_SUCCESS;
   }
 
+  if (*((UINT8 *)Cmd) == USB_BOOT_INQUIRY_OPCODE) {
+    //
+    // Only take care the condition for INQUIRY command.
+    // It would indicate the DEVICE may not ready for other command.
+    // Return EFI_DEVICE_ERROR and the caller will do the retry.
+    // Usb Mass Boot spec 3.1
+    //
+    if (!EFI_ERROR (Status) && (CmdResult == USB_MASS_CMD_PERSISTENT)) {
+      Transport->Reset (UsbMass->Context, TRUE);
+      return EFI_DEVICE_ERROR;
+    }
+
+    if (Status == EFI_DEVICE_ERROR) {
+      Transport->Reset (UsbMass->Context, TRUE);
+      return EFI_DEVICE_ERROR;
+    }
+  }
+
   //
   // If command execution failed, then retrieve error info via sense request.
   //
