@@ -400,8 +400,15 @@ ReturnErrorStatus:
     DEBUG ((
       DEBUG_ERROR,
       "ERROR: qemu uefi variable service is not available, use \n"
-      "  'qemu-system-x86_64 -device uefi-vars-x64' or\n"
+ #if defined (MDE_CPU_X64)
+      "  'qemu-system-x86_64 -device uefi-vars-x64'\n"
+ #elif defined (MDE_CPU_AARCH64)
       "  'qemu-system-aarch64 -device uefi-vars-sysbus'\n"
+ #elif defined (MDE_CPU_RISCV64)
+      "  'qemu-system-riscv64 -device uefi-vars-sysbus'\n"
+ #else
+      #error unsupported architecture
+ #endif
       ));
     CpuDeadLoop ();
   }
