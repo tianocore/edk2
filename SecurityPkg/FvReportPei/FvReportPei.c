@@ -252,16 +252,27 @@ VerifyHashedFv (
     FvInfo[FvIndex].Base = (UINT64)(UINTN)FvBuffer;
   }
 
-  //
-  // Check final hash for all FVs.
-  //
-  if ((FvHashValue == HashValue) ||
-      (AlgInfo->HashAll (HashValue, FvHashValue - HashValue, FvHashValue) &&
-       (CompareMem (HashInfo->Hash, FvHashValue, AlgInfo->HashSize) == 0)))
-  {
-    Status = EFI_SUCCESS;
+  if (FvNumber == 1) {
+    //
+    // Directly compare the single FV's hash
+    //
+    if (CompareMem (HashInfo->Hash, HashValue, AlgInfo->HashSize) == 0) {
+      Status = EFI_SUCCESS;
+    } else {
+      Status = EFI_VOLUME_CORRUPTED;
+    }
   } else {
-    Status = EFI_VOLUME_CORRUPTED;
+    //
+    // Check final hash for all FVs. Handle multiple FVs
+    //
+    if ((FvHashValue == HashValue) ||
+        (AlgInfo->HashAll (HashValue, FvHashValue - HashValue, FvHashValue) &&
+         (CompareMem (HashInfo->Hash, FvHashValue, AlgInfo->HashSize) == 0)))
+    {
+      Status = EFI_SUCCESS;
+    } else {
+      Status = EFI_VOLUME_CORRUPTED;
+    }
   }
 
 Done:
