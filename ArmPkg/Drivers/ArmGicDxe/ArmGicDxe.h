@@ -37,6 +37,13 @@ GicV3DxeInitialize (
   IN  EFI_SYSTEM_TABLE  *SystemTable
   );
 
+// GicV5 API
+EFI_STATUS
+GicV5DxeInitialize (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  );
+
 // Shared code
 
 EFI_STATUS

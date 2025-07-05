@@ -1,0 +1,54 @@
+#/** @file
+#
+#  Copyright (c) 2025, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmGicV5Dxe
+  FILE_GUID                      = F7DA8B40-B9E0-4928-8B1E-85C969D5170A
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = GicV5DxeInitialize
+
+[Sources.common]
+  ArmGicCommonDxe.c
+  ArmGicDxe.h
+  GicV5/ArmGicV5Dxe.c
+
+[Sources.AARCH64]
+  GicV5/AArch64/ArmGicV5.S
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseLib
+  DebugLib
+  IoLib
+  PcdLib
+  PrintLib
+  TimerLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gHardwareInterruptProtocolGuid  ## PRODUCES
+  gHardwareInterrupt2ProtocolGuid ## PRODUCES
+  gEfiCpuArchProtocolGuid         ## CONSUMES ## NOTIFY
+
+[Pcd.common]
+  gArmTokenSpaceGuid.PcdGicDistributorBase
+  gArmTokenSpaceGuid.PcdGicIrsConfigFrameBase
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase
+
+[Depex]
+  TRUE
