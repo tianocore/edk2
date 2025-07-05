@@ -42,11 +42,7 @@
 
 [Protocols]
   gEfiGraphicsOutputProtocolGuid                ## SOMETIMES_CONSUMES
-  gEfiUgaDrawProtocolGuid |PcdUgaConsumeSupport ## SOMETIMES_CONSUMES
   gEfiBootLogoProtocolGuid                      ## SOMETIMES_CONSUMES
   gEdkiiBootLogo2ProtocolGuid                   ## SOMETIMES_CONSUMES
   gEfiUserManagerProtocolGuid                   ## CONSUMES
   gEdkiiPlatformLogoProtocolGuid                ## CONSUMES
-
-[FeaturePcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport ## CONSUMES
