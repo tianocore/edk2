@@ -177,6 +177,31 @@ typedef struct {
   UINT8     Interval;
 } USB_ENDPOINT_DESCRIPTOR;
 
+#define USB_DESC_TYPE_SUPERSPEED_ENDPOINT_COMPANION  48
+///
+/// SuperSpeed Endpoint Companion Descriptor
+/// USB 3.2 spec, Section 9.6.7
+///
+typedef struct {
+  UINT8     Length;
+  UINT8     DescriptorType;
+  UINT8     MaxBurst;
+  UINT8     Attributes;
+  UINT16    BytesPerInterval;
+} USB_SS_ENDPOINT_COMPANION_DESCRIPTOR;
+
+#define USB_DESC_TYPE_SUPERSPEEDPLUS_ISOCH_ENDPOINT_COMPANION  49
+///
+/// SuperSpeedPlus Isochronous Endpoint Companion Descriptor
+/// USB 3.2 spec, Section 9.6.8
+///
+typedef struct {
+  UINT8     Length;
+  UINT8     DescriptorType;
+  UINT16    Reserved;
+  UINT32    BytesPerInterval;
+} USB_SSP_ISOCH_ENDPOINT_COMPANION_DESCRIPTOR;
+
 ///
 /// UNICODE String Descriptor
 /// USB 2.0 spec, Section 9.6.7
