@@ -37,14 +37,6 @@ HandOffToDxeCore (
   UINTN                            GhcbSize;
 
   //
-  // Clear page 0 and mark it as allocated if NULL pointer detection is enabled.
-  //
-  if (IsNullDetectionEnabled ()) {
-    ClearFirst4KPage (HobList.Raw);
-    BuildMemoryAllocationHob (0, EFI_PAGES_TO_SIZE (1), EfiBootServicesData);
-  }
-
-  //
   // Get Vector Hand-off Info PPI and build Guided HOB
   //
   Status = PeiServicesLocatePpi (
