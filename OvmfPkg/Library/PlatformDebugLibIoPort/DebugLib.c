@@ -235,7 +235,9 @@ DebugAssert (
   //
   // Send the string to Memory Debug Log
   //
-  MemDebugLogWrite (Buffer, Length);
+  if (MemDebugLogEnabled ()) {
+    MemDebugLogWrite (Buffer, Length);
+  }
 
   //
   // Generate a Breakpoint, DeadLoop, or NOP based on PCD settings
