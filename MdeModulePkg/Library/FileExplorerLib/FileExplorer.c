@@ -560,7 +560,10 @@ LibFileInfo (
                     );
   if (Status == EFI_BUFFER_TOO_SMALL) {
     Buffer = AllocatePool (BufferSize);
-    ASSERT (Buffer != NULL);
+    if (Buffer == NULL) {
+      ASSERT (Buffer != NULL);
+      return NULL;
+    }
   }
 
   Status = FHand->GetInfo (
@@ -1074,6 +1077,10 @@ LibCreateNewFile (
 
   NewHandle    = NULL;
   FullFileName = NULL;
+  Status       = LibGetFileHandleFromDevicePath (gFileExplorerPrivate.RetDevicePath, &FileHandle, &ParentName, &DeviceHandle);
+  if (EFI_ERROR (Status)) {
+    return EFI_NOT_FOUND;
+  }
 
   if (EFI_ERROR (LibGetFileHandleFromDevicePath (gFileExplorerPrivate.RetDevicePath, &FileHandle, &ParentName, &DeviceHandle))) {
     return EFI_DEVICE_ERROR;

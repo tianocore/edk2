@@ -8,6 +8,8 @@
 
 #include "InternalHiiLib.h"
 
+#include <Library/SafeIntLib.h>
+
 #define GUID_CONFIG_STRING_TYPE  0x00
 #define NAME_CONFIG_STRING_TYPE  0x01
 #define PATH_CONFIG_STRING_TYPE  0x02
@@ -51,10 +53,11 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST EFI_HII_PACKAGE_HEADER  mEndOfPakageList = {
   If HiiHandle could not be found in the HII database, then ASSERT.
   If Guid is NULL, then ASSERT.
 
-  @param  Handle              Hii handle
-  @param  Guid                Package list GUID
+  @param  Handle                Hii handle
+  @param  Guid                  Package list GUID
 
-  @retval EFI_SUCCESS         Successfully extract GUID from Hii database.
+  @retval EFI_SUCCESS           Successfully extract GUID from Hii database.
+  @retval EFI_OUT_OF_RESOURCES  Insufficient memory resources to perform a necessary memory allocation.
 
 **/
 EFI_STATUS
@@ -68,8 +71,11 @@ InternalHiiExtractGuidFromHiiHandle (
   UINTN                        BufferSize;
   EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
 
-  ASSERT (Guid != NULL);
-  ASSERT (Handle != NULL);
+  if ((Handle == NULL) || (Guid == NULL)) {
+    ASSERT (Guid != NULL);
+    ASSERT (Handle != NULL);
+    return EFI_INVALID_PARAMETER;
+  }
 
   //
   // Get HII PackageList
@@ -82,7 +88,10 @@ InternalHiiExtractGuidFromHiiHandle (
 
   if (Status == EFI_BUFFER_TOO_SMALL) {
     HiiPackageList = AllocatePool (BufferSize);
-    ASSERT (HiiPackageList != NULL);
+    if (HiiPackageList == NULL) {
+      ASSERT (HiiPackageList != NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
 
     Status = gHiiDatabase->ExportPackageLists (gHiiDatabase, Handle, &BufferSize, HiiPackageList);
   }
@@ -95,7 +104,9 @@ InternalHiiExtractGuidFromHiiHandle (
   //
   // Extract GUID
   //
-  CopyGuid (Guid, &HiiPackageList->PackageListGuid);
+  if (HiiPackageList != NULL) {
+    CopyGuid (Guid, &HiiPackageList->PackageListGuid);
+  }
 
   FreePool (HiiPackageList);
 
@@ -1209,7 +1220,7 @@ ValidateQuestionFromVfr (
   // Check IFR value is in block data, then Validate Value
   //
   PackageOffset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
-  while (PackageOffset < PackageListLength) {
+  while ((UINTN)PackageOffset < PackageListLength) {
     CopyMem (&PackageHeader, (UINT8 *)HiiPackageList + PackageOffset, sizeof (PackageHeader));
 
     //
@@ -1359,7 +1370,10 @@ ValidateQuestionFromVfr (
 
             if (NameValueType) {
               QuestionName = HiiGetString (HiiHandle, IfrOneOf->Question.VarStoreInfo.VarName, NULL);
-              ASSERT (QuestionName != NULL);
+              if (QuestionName == NULL) {
+                ASSERT (QuestionName != NULL);
+                return EFI_INVALID_PARAMETER;
+              }
 
               if (StrStr (RequestElement, QuestionName) == NULL) {
                 //
@@ -1455,7 +1469,10 @@ ValidateQuestionFromVfr (
 
             if (NameValueType) {
               QuestionName = HiiGetString (HiiHandle, IfrNumeric->Question.VarStoreInfo.VarName, NULL);
-              ASSERT (QuestionName != NULL);
+              if (QuestionName == NULL) {
+                ASSERT (QuestionName != NULL);
+                return EFI_INVALID_PARAMETER;
+              }
 
               if (StrStr (RequestElement, QuestionName) == NULL) {
                 //
@@ -1647,7 +1664,10 @@ ValidateQuestionFromVfr (
 
             if (NameValueType) {
               QuestionName = HiiGetString (HiiHandle, IfrCheckBox->Question.VarStoreInfo.VarName, NULL);
-              ASSERT (QuestionName != NULL);
+              if (QuestionName == NULL) {
+                ASSERT (QuestionName != NULL);
+                return EFI_INVALID_PARAMETER;
+              }
 
               if (StrStr (RequestElement, QuestionName) == NULL) {
                 //
@@ -1749,7 +1769,10 @@ ValidateQuestionFromVfr (
             Width = (UINT16)(IfrString->MaxSize * sizeof (UINT16));
             if (NameValueType) {
               QuestionName = HiiGetString (HiiHandle, IfrString->Question.VarStoreInfo.VarName, NULL);
-              ASSERT (QuestionName != NULL);
+              if (QuestionName == NULL) {
+                ASSERT (QuestionName != NULL);
+                return EFI_INVALID_PARAMETER;
+              }
 
               StringPtr = StrStr (RequestElement, QuestionName);
               if (StringPtr == NULL) {
@@ -1928,6 +1951,8 @@ GetBlockDataInfo (
   EFI_STATUS      Status;
   IFR_BLOCK_DATA  *BlockArray;
   UINT8           *DataBuffer;
+  UINT16          Sum1;
+  UINT16          Sum2;
 
   //
   // Initialize the local variables.
@@ -1952,10 +1977,14 @@ GetBlockDataInfo (
     goto Done;
   }
 
-  InitializeListHead (&BlockArray->Entry);
-
   StringPtr = StrStr (ConfigElement, L"&OFFSET=");
-  ASSERT (StringPtr != NULL);
+  if (StringPtr == NULL) {
+    ASSERT (StringPtr != NULL);
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Done;
+  }
+
+  InitializeListHead (&BlockArray->Entry);
 
   //
   // Parse each <RequestElement> if exists
@@ -2120,14 +2149,20 @@ GetBlockDataInfo (
   while ((Link != &BlockArray->Entry) && (Link->ForwardLink != &BlockArray->Entry)) {
     BlockData    = BASE_CR (Link, IFR_BLOCK_DATA, Entry);
     NewBlockData = BASE_CR (Link->ForwardLink, IFR_BLOCK_DATA, Entry);
-    if ((NewBlockData->Offset >= BlockData->Offset) && (NewBlockData->Offset <= (BlockData->Offset + BlockData->Width))) {
-      if ((NewBlockData->Offset + NewBlockData->Width) > (BlockData->Offset + BlockData->Width)) {
-        BlockData->Width = (UINT16)(NewBlockData->Offset + NewBlockData->Width - BlockData->Offset);
+    if ((!EFI_ERROR (SafeUint16Add (BlockData->Offset, BlockData->Width, &Sum1))) &&
+        (!EFI_ERROR (SafeUint16Add (NewBlockData->Offset, NewBlockData->Width, &Sum2))) &&
+        (NewBlockData->Offset >= BlockData->Offset) &&
+        (NewBlockData->Offset <= Sum1) &&
+        (Sum2 > Sum1))
+    {
+      Sum1 = BlockData->Width;
+      if (!EFI_ERROR (SafeUint16Sub (Sum2, BlockData->Offset, &BlockData->Width))) {
+        RemoveEntryList (Link->ForwardLink);
+        FreePool (NewBlockData);
+        continue;
+      } else {
+        BlockData->Width = Sum1;
       }
-
-      RemoveEntryList (Link->ForwardLink);
-      FreePool (NewBlockData);
-      continue;
     }
 
     Link = Link->ForwardLink;
@@ -2210,7 +2245,10 @@ InternalHiiValidateCurrentSetting (
     // Skip header part.
     //
     StringPtr = StrStr (ConfigResp, L"PATH=");
-    ASSERT (StringPtr != NULL);
+    if (StringPtr == NULL) {
+      ASSERT (StringPtr != NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
 
     if (StrStr (StringPtr, L"&") != NULL) {
       NameValueType = TRUE;
@@ -2273,7 +2311,10 @@ GetElementsFromRequest (
   EFI_STRING  TmpRequest;
 
   TmpRequest = StrStr (ConfigRequest, L"PATH=");
-  ASSERT (TmpRequest != NULL);
+  if (TmpRequest == NULL) {
+    ASSERT (TmpRequest != NULL);
+    return FALSE;
+  }
 
   if ((StrStr (TmpRequest, L"&OFFSET=") != NULL) || (StrStr (TmpRequest, L"&") != NULL)) {
     return TRUE;
@@ -2896,6 +2937,11 @@ HiiGetBrowserData (
   Size       = (StrLen (mConfigHdrTemplate) + 1) * sizeof (CHAR16);
   Size       = Size + (StrLen (ResultsData) + 1) * sizeof (CHAR16);
   ConfigResp = AllocateZeroPool (Size);
+  if (ConfigResp == NULL) {
+    FreePool (ResultsData);
+    return FALSE;
+  }
+
   UnicodeSPrint (ConfigResp, Size, L"%s&%s", mConfigHdrTemplate, ResultsData);
 
   //
@@ -2976,6 +3022,10 @@ HiiSetBrowserData (
     //
     Size          = (StrLen (mConfigHdrTemplate) + 32 + 1) * sizeof (CHAR16);
     ConfigRequest = AllocateZeroPool (Size);
+    if (ConfigRequest == NULL) {
+      return FALSE;
+    }
+
     UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", mConfigHdrTemplate, (UINT64)BufferSize);
   } else {
     //
@@ -2985,6 +3035,10 @@ HiiSetBrowserData (
     Size          = StrLen (mConfigHdrTemplate) * sizeof (CHAR16);
     Size          = Size + (StrLen (RequestElement) + 1) * sizeof (CHAR16);
     ConfigRequest = AllocateZeroPool (Size);
+    if (ConfigRequest == NULL) {
+      return FALSE;
+    }
+
     UnicodeSPrint (ConfigRequest, Size, L"%s%s", mConfigHdrTemplate, RequestElement);
   }
 
