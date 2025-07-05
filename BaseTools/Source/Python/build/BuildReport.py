@@ -1814,13 +1814,21 @@ class FdRegionReport(object):
             for Ffs in Wa.FdfProfile.FvDict[FvName.upper()].FfsList:
                 for Section in Ffs.SectionList:
                     try:
-                        for FvSection in Section.SectionList:
-                            if FvSection.FvName in self.FvList:
-                                continue
-                            self._GuidsDb[Ffs.NameGuid.upper()] = FvSection.FvName
-                            self.FvList.append(FvSection.FvName)
-                            self.FvInfo[FvSection.FvName] = ("Nested FV", 0, 0)
-                            self._DiscoverNestedFvList(FvSection.FvName, Wa)
+                        # Handle the case where an entire FFS is a FV, and not
+                        # a sub-section of the FFS.
+                        if getattr(Section, 'FvFileName', None) is None:
+                            for FvSection in Section.SectionList:
+                                if FvSection.FvName in self.FvList:
+                                    continue
+                                self._GuidsDb[Ffs.NameGuid.upper()] = FvSection.FvName
+                                self.FvList.append(FvSection.FvName)
+                                self.FvInfo[FvSection.FvName] = ("Nested FV", 0, 0)
+                                self._DiscoverNestedFvList(FvSection.FvName, Wa)
+                        else:
+                            self._GuidsDb[Ffs.NameGuid.upper()] = Section.FvFileName
+                            self.FvList.append(Section.FvName)
+                            self.FvInfo[Section.FvName] = ("Nested FV", 0, 0)
+                            self._DiscoverNestedFvList(Section.FvName, Wa)
                     except AttributeError:
                         pass
 
