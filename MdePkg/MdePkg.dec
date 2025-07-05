@@ -312,6 +312,10 @@
   #
   StackCheckLib|Include/Library/StackCheckLib.h
 
+  ##  @libraryclass Provides the RAS agent client to retrieve error source informations.
+  #
+  DxeRasAgentClientLib|Include/Library/DxeRasAgentClient.h
+
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides services to generate random number.
   #
@@ -352,6 +356,7 @@
 [LibraryClasses.RISCV64]
   ##  @libraryclass  Provides function to make ecalls to SBI
   BaseRiscVSbiLib|Include/Library/BaseRiscVSbiLib.h
+  DxeRiscvMpxyLib|Include/Library/DxeRiscvMpxy.h
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides an interface to Arm registers.
