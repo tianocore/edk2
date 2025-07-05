@@ -1705,6 +1705,13 @@ DxeImageVerificationHandler (
   IsFoundInDatabase = FALSE;
 
   //
+  // Sanity check
+  //
+  if (File == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
   // Check the image type and get policy setting.
   //
   switch (GetImageType (File)) {

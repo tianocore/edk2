@@ -10,6 +10,19 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __IMAGEVERIFICATIONLIB_H__
 #define __IMAGEVERIFICATIONLIB_H__
 
+// EFI_HOST_APPLICATION is a locally defined macro in
+// DxeImageVerificationLibGoogleTest.inf that is used to indicate
+// that the current build is a Google Test binary file. This is done
+// because MODULE_TYPE HOST_APPLICATION does not add PiPei.h to the
+// list of inclusions in AutoGen.h. At the same time, for example,
+// DXE_DRIVER has PiPei.h in AutoGen.h.
+#ifdef EFI_HOST_APPLICATION
+  #include <Uefi/UefiBaseType.h>
+  #include <Uefi/UefiSpec.h>
+  #include <Pi/PiFirmwareFile.h>
+  #include <Pi/PiFirmwareVolume.h>
+#endif
+
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
