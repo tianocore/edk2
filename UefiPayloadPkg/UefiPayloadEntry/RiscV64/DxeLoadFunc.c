@@ -60,7 +60,7 @@ HandOffToDxeCore (
   //
   UpdateStackHob ((EFI_PHYSICAL_ADDRESS)(UINTN)BaseOfStack, STACK_SIZE);
 
-  DEBUG ((DEBUG_INFO, "DXE Core new stack at %x, stack pointer at %x\n", BaseOfStack, TopOfStack));
+  DEBUG ((DEBUG_INFO, "DXE Core new stack at %llx, stack pointer at %llx\n", BaseOfStack, TopOfStack));
 
   //
   // Transfer the control to the entry point of DxeCore.
