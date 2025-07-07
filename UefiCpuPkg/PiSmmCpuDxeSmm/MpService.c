@@ -236,12 +236,14 @@ SmmWaitForApArrival (
   UINTN    Index;
   UINT32   DelayedCount;
   UINT32   BlockedCount;
+  UINT32   DisabledCount;
   BOOLEAN  SyncNeeded;
 
   PERF_FUNCTION_BEGIN ();
 
-  DelayedCount = 0;
-  BlockedCount = 0;
+  DelayedCount  = 0;
+  BlockedCount  = 0;
+  DisabledCount = 0;
 
   ASSERT (SmmCpuSyncGetArrivedCpuCount (mSmmMpSyncData->SyncContext) <= mNumberOfCpus);
 
@@ -316,14 +318,24 @@ SmmWaitForApArrival (
 
       CpuPause ();
     }
+  } else {
+    //
+    // All APs have already entered SMI, so there is no need to send SMI IPIs. Set AllApArrivedWithException to TRUE.
+    // In some cases, the first timeout sync may be skipped, but all APs still arrive. Update AllApArrivedWithException in such scenarios.
+    // Example:
+    // If IsCpuSyncAlwaysNeeded() returns false, LMCE is enabled and triggered, and another SMI source combined with LMCE causes all APs to enter SMI.
+    //
+    mSmmMpSyncData->AllApArrivedWithException = TRUE;
   }
 
   if (!mSmmMpSyncData->AllApArrivedWithException) {
+    DEBUG ((DEBUG_ERROR, "SmmWaitForApArrival: Failed to wait all APs enter SMI!\n"));
+
     //
-    // Check for the Blocked & Delayed Case.
+    // Check for the Disabled & Blocked & Delayed Case.
     //
-    GetSmmDelayedBlockedDisabledCount (&DelayedCount, &BlockedCount, NULL);
-    DEBUG ((DEBUG_INFO, "SmmWaitForApArrival: Delayed AP Count = %d, Blocked AP Count = %d\n", DelayedCount, BlockedCount));
+    GetSmmDelayedBlockedDisabledCount (&DelayedCount, &BlockedCount, &DisabledCount);
+    DEBUG ((DEBUG_INFO, "SmmWaitForApArrival: Delayed AP Count = %d, Blocked AP Count = %d, Disabled AP Count = %d\n", DelayedCount, BlockedCount, DisabledCount));
   }
 
   PERF_FUNCTION_END ();
