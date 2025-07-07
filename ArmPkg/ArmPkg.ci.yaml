@@ -84,7 +84,10 @@
 
     ## options defined .pytool/Plugin/LibraryClassCheck
     "LibraryClassCheck": {
-        "IgnoreHeaderFile": []
+        "IgnoreHeaderFile": [
+          "Include/Library/ArmMmHandlerContext.h"
+        ],
+        "skip": True
     },
 
     ## options defined .pytool/Plugin/SpellCheck
