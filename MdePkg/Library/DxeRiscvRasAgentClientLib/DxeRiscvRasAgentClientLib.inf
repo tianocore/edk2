@@ -18,6 +18,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
 
 [Sources]
   DxeRiscvRasAgentClient.c
@@ -31,6 +32,9 @@
 
 [Protocols]
   gEfiMmCommunication2ProtocolGuid
+
+[Guids]
+  gMmHestGetErrorSourceInfoGuid
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdMMPassThroughEnable

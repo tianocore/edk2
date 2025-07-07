@@ -45,23 +45,6 @@ EFI_STATUS (EFIAPI *gSendCommand)(VOID *CommBuffer, UINTN CmdLen, UINTN *RespLen
 
 #define __packed32  __attribute__((packed,aligned(__alignof__(UINT32))))
 
-typedef struct __packed32 {
-  UINT32    status;
-  UINT32    flags;
-  UINT32    remaining;
-  UINT32    returned;
-} RasRpmiRespHeader;
-
-typedef struct __packed32 {
-  RasRpmiRespHeader    RespHdr;
-  UINT32               ErrSourceList[MAX_SOURCES];
-} ErrorSourceListResp;
-
-typedef struct __packed32 {
-  RasRpmiRespHeader    RspHdr;
-  UINT8                desc[MAX_DESC_SIZE];
-} ErrDescResp;
-
 static ErrorSourceListResp  gErrorSourceListResp;
 static ErrDescResp          gErrDescResp;
 UINT32                      gMpxyChannelId = 0;
@@ -170,7 +153,32 @@ RacSendMMCommand (
   UINT8  FuncId
   )
 {
-  return EFI_NOT_FOUND;
+  EFI_STATUS                 Status;
+  UINTN                      CommBufferSize;
+  EFI_MM_COMMUNICATE_HEADER  *SmmCommunicateHeader;
+
+  CommBufferSize       = MM_COMMUNICATE_HEADER_SIZE + *RespLen;
+  SmmCommunicateHeader = AllocateZeroPool (CommBufferSize);
+  if (SmmCommunicateHeader == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  CopyGuid (&SmmCommunicateHeader->HeaderGuid, &gMmHestGetErrorSourceInfoGuid);
+  CopyMem (SmmCommunicateHeader->Data, (const void *)CommBuffer, *RespLen);
+  SmmCommunicateHeader->MessageLength = *RespLen;
+
+  Status = mMmCommunication2->Communicate (
+                                mMmCommunication2,
+                                SmmCommunicateHeader,
+                                SmmCommunicateHeader,
+                                &CommBufferSize
+                                );
+
+  *RespLen = CommBufferSize - MM_COMMUNICATE_HEADER_SIZE;
+  CopyMem (CommBuffer, SmmCommunicateHeader->Data, *RespLen);
+  FreePool (SmmCommunicateHeader);
+
+  return Status;
 }
 
 /**
@@ -212,6 +220,7 @@ RacInit (
   )
 {
   EFI_STATUS  Status;
+
   if (!PcdGetBool (PcdMMPassThroughEnable)) {
     Status = gBS->LocateProtocol (
                     &gEfiMmCommunication2ProtocolGuid,
@@ -257,9 +266,9 @@ RacGetNumberErrorSources (
   UINTN              RespLen  = sizeof (RasMsgBuf);
 
   ZeroMem (&RasMsgBuf, sizeof (RasMsgBuf));
-
-  Status = gSendCommand (&RasMsgBuf, RespLen, &RespLen, RAS_GET_NUM_ERR_SRCS);
-  if (Status != EFI_SUCCESS) {
+  RespHdr->func_id = RAS_GET_NUM_ERR_SRCS;
+  Status           = gSendCommand (&RasMsgBuf, 0, &RespLen, RAS_GET_NUM_ERR_SRCS);
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
@@ -290,8 +299,9 @@ RacGetErrorSourceIDList (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = gSendCommand (&gErrorSourceListResp, RespLen, &RespLen, RAS_GET_ERR_SRCS_ID_LIST);
-  if (Status != EFI_SUCCESS) {
+  gErrorSourceListResp.RespHdr.func_id = RAS_GET_ERR_SRCS_ID_LIST;
+  Status                               = gSendCommand (&gErrorSourceListResp, 0, &RespLen, RAS_GET_ERR_SRCS_ID_LIST);
+  if (EFI_ERROR (Status)) {
     return Status;
   }
 
@@ -317,12 +327,12 @@ RacGetErrorSourceDescriptor (
   UINTN              RespLen = sizeof (gErrDescResp);
   EFI_STATUS         Status;
   RasRpmiRespHeader  *RspHdr = &gErrDescResp.RspHdr;
-  UINT8              *desc   = &gErrDescResp.desc[0];
-  UINT32             *EID    = (UINT32 *)&gErrDescResp;
+  UINT8              *Desc   = &gErrDescResp.desc[0];
 
   ZeroMem (&gErrDescResp, sizeof (gErrDescResp));
 
-  *EID = SourceID;
+  *Desc                       = (UINT8)SourceID;
+  gErrDescResp.RspHdr.func_id = RAS_GET_ERR_SRC_DESC;
 
   Status = gSendCommand (&gErrDescResp, RespLen, &RespLen, RAS_GET_ERR_SRC_DESC);
   if (Status != EFI_SUCCESS) {
@@ -341,7 +351,7 @@ RacGetErrorSourceDescriptor (
 
   ASSERT (*DescriptorType < MAX_ERROR_DESCRIPTOR_TYPES);
 
-  *ErrorDescriptor     = (VOID *)desc;
+  *ErrorDescriptor     = (VOID *)Desc;
   *ErrorDescriptorSize = RspHdr->returned;
 
   return EFI_SUCCESS;
