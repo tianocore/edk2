@@ -110,14 +110,6 @@ class Table(object):
         Tab = self.Db.GetTable(self.Table)
         Tab.append(self._DUMMY_)
 
-
-    def IsIntegral(self):
-        tab = self.Db.GetTable(self.Table)
-        Id = min([int(item[0]) for item in tab])
-        if Id != -1:
-            return False
-        return True
-
     def GetAll(self):
         tab = self.Db.GetTable(self.Table)
         return tab
@@ -209,27 +201,6 @@ class TableFile(Table):
             return None
         return RecordList[0][0]
 
-    ## Get file timestamp of a given file
-    #
-    #   @param  FileId      ID of file
-    #
-    #   @retval timestamp   TimeStamp value of given file in the table
-    #
-    def GetFileTimeStamp(self, FileId):
-        QueryScript = "select TimeStamp from %s where ID = '%s'" % (self.Table, FileId)
-        RecordList = self.Exec(QueryScript)
-        if len(RecordList) == 0:
-            return None
-        return RecordList[0][0]
-
-    ## Update the timestamp of a given file
-    #
-    #   @param  FileId      ID of file
-    #   @param  TimeStamp   Time stamp of file
-    #
-    def SetFileTimeStamp(self, FileId, TimeStamp):
-        self.Exec("update %s set TimeStamp=%s where ID='%s'" % (self.Table, TimeStamp, FileId))
-
     ## Get list of file with given type
     #
     #   @param  FileType    Type value of file
@@ -287,20 +258,3 @@ class TableDataModel(Table):
             Description = Item[0]
             self.Insert(CrossIndex, Name, Description)
         EdkLogger.verbose("Initialize table DataModel ... DONE!")
-
-    ## Get CrossIndex
-    #
-    # Get a model's cross index from its name
-    #
-    # @param ModelName:    Name of the model
-    # @retval CrossIndex:  CrossIndex of the model
-    #
-    def GetCrossIndex(self, ModelName):
-        CrossIndex = -1
-        SqlCommand = """select CrossIndex from DataModel where name = '""" + ModelName + """'"""
-        self.Db.execute(SqlCommand)
-        for Item in self.Db:
-            CrossIndex = Item[0]
-
-        return CrossIndex
-

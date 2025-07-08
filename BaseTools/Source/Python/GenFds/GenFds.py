@@ -65,7 +65,6 @@ def resetFdsGlobalVariable():
     # will be FvDir + os.sep + 'Ffs'
     GenFdsGlobalVariable.FfsDir = ''
     GenFdsGlobalVariable.FdfParser = None
-    GenFdsGlobalVariable.LibDir = ''
     GenFdsGlobalVariable.WorkSpace = None
     GenFdsGlobalVariable.WorkSpaceDir = ''
     GenFdsGlobalVariable.ConfDir = ''
@@ -548,41 +547,6 @@ class GenFds(object):
                 OptRomObj.AddToBuffer(Buffer=None, Flag=True)
 
         return GenFdsGlobalVariable.FfsCmdDict
-
-    ## GetFvBlockSize()
-    #
-    #   @param  FvObj           Whose block size to get
-    #   @retval int             Block size value
-    #
-    @staticmethod
-    def GetFvBlockSize(FvObj):
-        DefaultBlockSize = 0x1
-        FdObj = None
-        if GenFds.OnlyGenerateThisFd is not None and GenFds.OnlyGenerateThisFd.upper() in GenFdsGlobalVariable.FdfParser.Profile.FdDict:
-            FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict[GenFds.OnlyGenerateThisFd.upper()]
-        if FdObj is None:
-            for ElementFd in GenFdsGlobalVariable.FdfParser.Profile.FdDict.values():
-                for ElementRegion in ElementFd.RegionList:
-                    if ElementRegion.RegionType == BINARY_FILE_TYPE_FV:
-                        for ElementRegionData in ElementRegion.RegionDataList:
-                            if ElementRegionData is not None and ElementRegionData.upper() == FvObj.UiFvName:
-                                if FvObj.BlockSizeList != []:
-                                    return FvObj.BlockSizeList[0][0]
-                                else:
-                                    return ElementRegion.BlockSizeOfRegion(ElementFd.BlockSizeList)
-            if FvObj.BlockSizeList != []:
-                return FvObj.BlockSizeList[0][0]
-            return DefaultBlockSize
-        else:
-            for ElementRegion in FdObj.RegionList:
-                    if ElementRegion.RegionType == BINARY_FILE_TYPE_FV:
-                        for ElementRegionData in ElementRegion.RegionDataList:
-                            if ElementRegionData is not None and ElementRegionData.upper() == FvObj.UiFvName:
-                                if FvObj.BlockSizeList != []:
-                                    return FvObj.BlockSizeList[0][0]
-                                else:
-                                    return ElementRegion.BlockSizeOfRegion(ElementFd.BlockSizeList)
-            return DefaultBlockSize
 
     ## DisplayFvSpaceInfo()
     #

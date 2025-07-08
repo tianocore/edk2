@@ -247,3 +247,13 @@ qemu-system-x86_64 -fw_cfg name=opt/org.tianocore/UsbStorageSupport,string=yes
 ```
 
 
+## Other: opt/org.tianocore/SDCardSupport
+
+This enables/disables the edk2 drivers SD card support.
+Default: enabled.  Usage:
+
+```
+qemu-system-x86_64 -fw_cfg name=opt/org.tianocore/SDCardSupport,string=no
+```
+
+
