@@ -1,19 +1,19 @@
 ;***
-;ulldiv.asm - unsigned long divide routine
+;ulldiv.nasm - unsigned long divide routine
 ;
 ;       Copyright (c) Microsoft Corporation. All rights reserved.
+;       Copyright (c) 2025, Intel Corporation. All rights reserved.
 ;       SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ;Purpose:
 ;       defines the unsigned long divide routine
 ;           __aulldiv
 ;
-;Original Implemenation: MSVC 14.29.30133
+;Original Implementation: MSVC 14.29.30133
 ;
 ;*******************************************************************************
-    .686
-    .model  flat,C
-    .code
+
+    SECTION .text
 
 ;***
 ;ulldiv - unsigned long divide
@@ -37,10 +37,11 @@
 ;Exceptions:
 ;
 ;*******************************************************************************
-_aulldiv        PROC NEAR
+global ASM_PFX(_aulldiv)
+ASM_PFX(_aulldiv):
 
-HIWORD  EQU     [4]             ;
-LOWORD  EQU     [0]
+%define HIWORD_OFFSET 4
+%define LOWORD_OFFSET 0
 
         push    ebx
         push    esi
@@ -68,8 +69,10 @@ LOWORD  EQU     [0]
 ;               -----------------
 ;
 
-DVND    equ     [esp + 12]      ; stack address of dividend (a)
-DVSR    equ     [esp + 20]      ; stack address of divisor (b)
+; stack offset of dividend (a)
+%define DVND_OFFSET 12
+; stack offset of divisor (b)
+%define DVSR_OFFSET 20
 
 ;
 ; Now do the divide.  First look to see if the divisor is less than 4194304K.
@@ -77,15 +80,15 @@ DVSR    equ     [esp + 20]      ; stack address of divisor (b)
 ; things get a little more complex.
 ;
 
-        mov     eax,HIWORD(DVSR) ; check to see if divisor < 4194304K
+        mov     eax, dword [esp + DVSR_OFFSET + HIWORD_OFFSET] ; check to see if divisor < 4194304K
         or      eax,eax
         jnz     short L1        ; nope, gotta do this the hard way
-        mov     ecx,LOWORD(DVSR) ; load divisor
-        mov     eax,HIWORD(DVND) ; load high word of dividend
+        mov     ecx, dword [esp + DVSR_OFFSET + LOWORD_OFFSET] ; load divisor
+        mov     eax, dword [esp + DVND_OFFSET + HIWORD_OFFSET] ; load high word of dividend
         xor     edx,edx
         div     ecx             ; get high order bits of quotient
         mov     ebx,eax         ; save high bits of quotient
-        mov     eax,LOWORD(DVND) ; edx:eax <- remainder:lo word of dividend
+        mov     eax, dword [esp + DVND_OFFSET + LOWORD_OFFSET] ; edx:eax <- remainder:lo word of dividend
         div     ecx             ; get low order bits of quotient
         mov     edx,ebx         ; edx:eax <- quotient hi:quotient lo
         jmp     short L2        ; restore stack and return
@@ -96,9 +99,9 @@ DVSR    equ     [esp + 20]      ; stack address of divisor (b)
 
 L1:
         mov     ecx,eax         ; ecx:ebx <- divisor
-        mov     ebx,LOWORD(DVSR)
-        mov     edx,HIWORD(DVND) ; edx:eax <- dividend
-        mov     eax,LOWORD(DVND)
+        mov     ebx, dword [esp + DVSR_OFFSET + LOWORD_OFFSET]
+        mov     edx, dword [esp + DVND_OFFSET + HIWORD_OFFSET] ; edx:eax <- dividend
+        mov     eax, dword [esp + DVND_OFFSET + LOWORD_OFFSET]
 L3:
         shr     ecx,1           ; shift divisor right one bit; hi bit <- 0
         rcr     ebx,1
@@ -116,9 +119,9 @@ L3:
 ; dividend is close to 2**64 and the quotient is off by 1.
 ;
 
-        mul     dword ptr HIWORD(DVSR) ; QUOT * HIWORD(DVSR)
+        mul     dword [esp + DVSR_OFFSET + HIWORD_OFFSET] ; QUOT * HIWORD(DVSR)
         mov     ecx,eax
-        mov     eax,LOWORD(DVSR)
+        mov     eax, dword [esp + DVSR_OFFSET + LOWORD_OFFSET]
         mul     esi             ; QUOT * LOWORD(DVSR)
         add     edx,ecx         ; EDX:EAX = QUOT * DVSR
         jc      short L4        ; carry means Quotient is off by 1
@@ -129,10 +132,10 @@ L3:
 ; subtract one (1) from the quotient.
 ;
 
-        cmp     edx,HIWORD(DVND) ; compare hi words of result and original
+        cmp     edx, dword [esp + DVND_OFFSET + HIWORD_OFFSET] ; compare hi words of result and original
         ja      short L4        ; if result > original, do subtract
         jb      short L5        ; if result < original, we are ok
-        cmp     eax,LOWORD(DVND) ; hi words are equal, compare lo words
+        cmp     eax, dword [esp + DVND_OFFSET + LOWORD_OFFSET] ; hi words are equal, compare lo words
         jbe     short L5        ; if less or equal we are ok, else subtract
 L4:
         dec     esi             ; subtract 1 from quotient
@@ -151,7 +154,3 @@ L2:
         pop     ebx
 
         ret     16
-
-_aulldiv        ENDP
-
-        end

@@ -1,7 +1,7 @@
 ## @file
 #  Intrinsic Routines Wrapper Library Instance.
 #
-#  Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2025, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -33,7 +33,7 @@
   Ia32/MathFtol.c           | MSFT
   Ia32/MathLlmul.asm        | MSFT
   Ia32/MathLlshr.asm        | MSFT
-  Ia32/MathUlldiv.asm       | MSFT
+  Ia32/MathUlldiv.nasm      | MSFT
   Ia32/MathUlldvrm.asm      | MSFT
   Ia32/MathLldiv.asm        | MSFT
   Ia32/MathUllrem.asm       | MSFT
@@ -48,6 +48,8 @@
   Ia32/MathDivS64x64.c      | GCC
   Ia32/MathDivU64x64.c      | GCC
   Ia32/MathModU64x64.c      | GCC
+
+  Ia32/MathUlldiv.nasm      | CLANGPDB
 [Sources.X64]
   CopyMem.c
   Math.c                    | GCC
