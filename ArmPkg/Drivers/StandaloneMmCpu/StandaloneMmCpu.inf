@@ -46,6 +46,7 @@
   gZeroGuid
   gMpInformationHobGuid
   gEfiStandaloneMmNonSecureBufferGuid
+  gEfiMmCommunicateHeaderV3Guid
 
 [Depex]
   TRUE

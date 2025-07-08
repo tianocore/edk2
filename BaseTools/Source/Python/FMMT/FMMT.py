@@ -49,7 +49,7 @@ def print_banner():
 
 class FMMT():
     def __init__(self) -> None:
-        self.firmware_packet = {}
+        pass
 
     def SetConfigFilePath(self, configfilepath:str) -> str:
         os.environ['FmmtConfPath'] = os.path.abspath(configfilepath)

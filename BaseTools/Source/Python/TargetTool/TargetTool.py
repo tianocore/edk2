@@ -46,7 +46,6 @@ class TargetTool():
             return self.ConvertTextFileToDict(filename, '#', '=')
         else:
             raise ParseError('LoadTargetTxtFile() : No Target.txt file exists.')
-            return 1
 
 #
 # Convert a text file to a dictionary
