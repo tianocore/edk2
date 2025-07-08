@@ -204,6 +204,7 @@
   DebugLib                         | MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
   PeiServicesLib                   | MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   VariableFlashInfoLib             | MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
+  VirtNorFlashDeviceLib            | OvmfPkg/Library/VirtNorFlashDeviceLib/VirtNorFlashDeviceLib.inf
   VirtNorFlashPlatformLib          | OvmfPkg/Library/FdtNorFlashQemuLib/FdtNorFlashQemuLib.inf
 
 [LibraryClasses.common.SEC]
@@ -313,7 +314,6 @@
 #  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory               | TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress        | TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport                   | TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport                   | FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport         | FALSE
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation            | TRUE
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation           | TRUE

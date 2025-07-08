@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "PlatformBm.h"
 
-EMU_PLATFORM_UGA_DEVICE_PATH  gGopDevicePath = {
+EMU_PLATFORM_GRAPHICS_WINDOW_DEVICE_PATH  gGopDevicePath = {
   {
     {
       {
@@ -40,7 +40,7 @@ EMU_PLATFORM_UGA_DEVICE_PATH  gGopDevicePath = {
   gEndEntire
 };
 
-EMU_PLATFORM_UGA_DEVICE_PATH  gGopDevicePath2 = {
+EMU_PLATFORM_GRAPHICS_WINDOW_DEVICE_PATH  gGopDevicePath2 = {
   {
     {
       {

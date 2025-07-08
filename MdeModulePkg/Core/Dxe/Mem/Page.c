@@ -1459,6 +1459,11 @@ CoreInternalAllocatePages (
   // return EFI_NOT_FOUND.
   //
   if (Type == AllocateAddress) {
+    // Page 0 is not allowed to be allocated as it is reserved for null pointer detection
+    if (Start == 0) {
+      return EFI_NOT_FOUND;
+    }
+
     if ((NumberOfPages == 0) ||
         (NumberOfPages > RShiftU64 (MaxAddress, EFI_PAGE_SHIFT)))
     {

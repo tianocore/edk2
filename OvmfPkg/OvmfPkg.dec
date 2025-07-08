@@ -120,6 +120,10 @@
   #                  transports.
   VirtioMmioDeviceLib|Include/Library/VirtioMmioDeviceLib.h
 
+  ##  @libraryclass  Provides a Device Nor flash interface.
+  #
+  VirtNorFlashDeviceLib|Include/Library/VirtNorFlashDeviceLib.h
+
   ##  @libraryclass  Provides a Nor flash interface.
   #
   VirtNorFlashPlatformLib|Include/Library/VirtNorFlashPlatformLib.h
@@ -485,3 +489,7 @@
 
   ## This feature flag indicates the firmware build needs the qemu variable service.
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuVarsRequire|FALSE|BOOLEAN|0x77
+
+  ## Informs modules whether the platform firmware supports Standalone MM.
+  #
+  gUefiOvmfPkgTokenSpaceGuid.PcdStandaloneMmEnable|FALSE|BOOLEAN|0x100065

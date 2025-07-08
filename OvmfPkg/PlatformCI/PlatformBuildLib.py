@@ -110,8 +110,21 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
         The tuple should be (<workspace relative path to dsc file>, <input dictionary of dsc key value pairs>)
         '''
+        import re
+        import sys
+
+        cmd_line_input_vars = {}
+        for arg in sys.argv:
+            if "=" in arg:
+                key, value = arg.split("=", 1)
+                if key.startswith("-"):
+                    continue
+                if re.match(r"BLD_.+_", key):
+                    key = re.sub(r"^BLD_.+?_", "", key, count=1)
+                cmd_line_input_vars[key] = value
+
         dsc = CommonPlatform.GetDscName(",".join(self.ActualArchitectures))
-        return (f"OvmfPkg/{dsc}", {})
+        return (f"OvmfPkg/{dsc}", cmd_line_input_vars)
 
 
     # ####################################################################################### #
@@ -224,6 +237,11 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
             args += " -global driver=cfi.pflash01,property=secure,value=on"
             args += " -drive if=pflash,format=raw,unit=0,file=" + os.path.join(OutputPath_FV, "OVMF_CODE.fd") + ",readonly=on"
             args += " -drive if=pflash,format=raw,unit=1,file=" + os.path.join(OutputPath_FV, "OVMF_VARS.fd")
+            if (self.env.GetBuildValue("STANDALONE_MM_ENABLE") == "1"):
+                # We will not support S3 in standalone MM mode
+                args += " -global ICH9-LPC.disable_s3=1"
+                # Make MMRAM bigger as it will need to hold the FV where the MM core is at
+                args += " -global mch.extended-tseg-mbytes=32"
         else:
             args += " -pflash " + os.path.join(OutputPath_FV, "OVMF.fd")    # path to firmware
 
