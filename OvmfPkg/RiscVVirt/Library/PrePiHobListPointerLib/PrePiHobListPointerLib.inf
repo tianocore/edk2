@@ -9,7 +9,7 @@
   INF_VERSION                    = 0x0001001B
   BASE_NAME                      = PrePiHobListPointerLib
   FILE_GUID                      = E3FAFC60-758C-471B-A333-FE704A4C11B4
-  MODULE_TYPE                    = BASE
+  MODULE_TYPE                    = SEC
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = PrePiHobListPointerLib
 
