@@ -9,7 +9,10 @@
 **/
 
 #include "CpuDxe.h"
-
+#include <Pi/PiBootMode.h>
+#include <Pi/PiHob.h>
+#include <Library/HobLib.h>
+#include <Library/FdtLib.h>
 //
 // Global Variables
 //
@@ -335,15 +338,58 @@ InitializeCpu (
   EFI_RISCV_FIRMWARE_CONTEXT  *FirmwareContext;
 
   GetFirmwareContextPointer (&FirmwareContext);
-  ASSERT (FirmwareContext != NULL);
-  if (FirmwareContext == NULL) {
-    DEBUG ((DEBUG_ERROR, "Failed to get the pointer of EFI_RISCV_FIRMWARE_CONTEXT\n"));
-    return EFI_NOT_FOUND;
+  if (FirmwareContext != NULL) {
+    DEBUG ((DEBUG_INFO, " %a: Firmware Context is at 0x%x.\n", __func__, FirmwareContext));
+    mBootHartId = FirmwareContext->BootHartId;
+  } else {
+    DEBUG ((DEBUG_ERROR, "Failed to get the pointer of EFI_RISCV_FIRMWARE_CONTEXT, Fetching boot hartid from FDT instead\n"));
+    CONST EFI_HOB_GUID_TYPE  *Hob = GetFirstGuidHob (&gFdtHobGuid);
+
+    ASSERT (Hob != NULL);
+
+    CONST VOID  *DeviceTreeBase =
+      (CONST VOID *)(UINTN)*(CONST UINT64 *)GET_GUID_HOB_DATA (Hob);
+
+    ASSERT (FdtCheckHeader (DeviceTreeBase) == 0);
+    if (FdtCheckHeader (DeviceTreeBase) != 0) {
+      return EFI_NOT_FOUND;
+    }
+
+    //
+    // /chosen node
+    //
+    INT32  Node = FdtSubnodeOffsetNameLen (
+                    DeviceTreeBase,
+                    0,
+                    "chosen",
+                    sizeof ("chosen") - 1
+                    );
+
+    ASSERT (Node >= 0);
+    if (Node < 0) {
+      return EFI_NOT_FOUND;
+    }
+
+    //
+    // boot-hart
+    //
+    INT32               Len;
+    CONST FDT_PROPERTY  *Prop =
+      FdtGetProperty (DeviceTreeBase, Node, "boot-hartid", &Len);
+
+    ASSERT (Prop != NULL && Len == sizeof (UINT32));
+    if (Prop == NULL) {
+      return EFI_NOT_FOUND;
+    }
+
+    //
+    // Device-tree cells are big-endian
+    //
+    UINTN  BootHartId = SwapBytes32 (*(CONST UINT32 *)Prop->Data);
+
+    mBootHartId = BootHartId;
   }
 
-  DEBUG ((DEBUG_INFO, " %a: Firmware Context is at 0x%x.\n", __func__, FirmwareContext));
-
-  mBootHartId = FirmwareContext->BootHartId;
   DEBUG ((DEBUG_INFO, " %a: mBootHartId = 0x%x.\n", __func__, mBootHartId));
 
   InitializeCpuExceptionHandlers (NULL);
