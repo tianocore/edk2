@@ -271,8 +271,8 @@ IsTimeValid (
   )
 {
   // Check the input parameters are within the range specified by UEFI
-  if ((Time->Year  < 2000)              ||
-      (Time->Year   > 2099)              ||
+  if ((Time->Year  < 1900)              ||
+      (Time->Year   > 9999)              ||
       (Time->Month  < 1)              ||
       (Time->Month  > 12)              ||
       (!IsDayValid (Time))              ||

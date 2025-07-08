@@ -41,10 +41,6 @@
   #
   ArmHvcLib|Include/Library/ArmHvcLib.h
 
-  ##  @libraryclass  Provides a Mmu interface.
-  #
-  ArmMmuLib|Include/Library/ArmMmuLib.h
-
   ##  @libraryclass  Provides a Mailbox Transport Layer (MTL) interface
   #   for the System Control and Management Interface (SCMI).
   #
@@ -91,8 +87,6 @@
   # Include/Guid/ArmMpCoreInfo.h
   gArmMpCoreInfoGuid = { 0xa4ee0728, 0xe5d7, 0x4ac5,  {0xb2, 0x1e, 0x65, 0x8e, 0xd8, 0x57, 0xe8, 0x34} }
 
-  gArmMmuReplaceLiveTranslationEntryFuncGuid = { 0xa8b50ff3, 0x08ec, 0x4dd3, {0xbf, 0x04, 0x28, 0xbf, 0x71, 0x75, 0xc7, 0x4a} }
-
 [Protocols.common]
   ## Arm System Control and Management Interface(SCMI) Base protocol
   ## ArmPkg/Include/Protocol/ArmScmiBaseProtocol.h
@@ -120,12 +114,6 @@
   # protocol driver. This is needed on platforms that map all DRAM with RWX
   # attributes initially, and can be disabled otherwise.
   gArmTokenSpaceGuid.PcdRemapUnusedMemoryNx|TRUE|BOOLEAN|0x00000048
-
-[PcdsFeatureFlag.ARM]
-  # Whether to map normal memory as non-shareable. FALSE is the safe choice, but
-  # TRUE may be appropriate to fix performance problems if you don't care about
-  # hardware coherency (i.e., no virtualization or cache coherent DMA)
-  gArmTokenSpaceGuid.PcdNormalMemoryNonshareableOverride|FALSE|BOOLEAN|0x00000043
 
 [PcdsFixedAtBuild.common]
   gArmTokenSpaceGuid.PcdTrustzoneSupport|FALSE|BOOLEAN|0x00000006
