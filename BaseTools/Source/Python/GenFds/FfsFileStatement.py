@@ -33,8 +33,6 @@ class FileStatement (FileStatementClassObject):
     #
     def __init__(self):
         FileStatementClassObject.__init__(self)
-        self.CurrentLineNum = None
-        self.CurrentLineContent = None
         self.FileName = None
         self.InfFileName = None
         self.SubAlignment = None

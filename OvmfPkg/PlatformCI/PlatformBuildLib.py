@@ -110,8 +110,21 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
 
         The tuple should be (<workspace relative path to dsc file>, <input dictionary of dsc key value pairs>)
         '''
+        import re
+        import sys
+
+        cmd_line_input_vars = {}
+        for arg in sys.argv:
+            if "=" in arg:
+                key, value = arg.split("=", 1)
+                if key.startswith("-"):
+                    continue
+                if re.match(r"BLD_.+_", key):
+                    key = re.sub(r"^BLD_.+?_", "", key, count=1)
+                cmd_line_input_vars[key] = value
+
         dsc = CommonPlatform.GetDscName(",".join(self.ActualArchitectures))
-        return (f"OvmfPkg/{dsc}", {})
+        return (f"OvmfPkg/{dsc}", cmd_line_input_vars)
 
 
     # ####################################################################################### #

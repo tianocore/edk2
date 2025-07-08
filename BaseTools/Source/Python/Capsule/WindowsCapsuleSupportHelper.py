@@ -23,11 +23,6 @@ from edk2toollib.windows.locate_tools import FindToolInWinSdk
 
 class WindowsCapsuleSupportHelper(object):
 
-  def RegisterHelpers(self, obj):
-      fp = os.path.abspath(__file__)
-      obj.Register("PackageWindowsCapsuleFiles", WindowsCapsuleSupportHelper.PackageWindowsCapsuleFiles, fp)
-
-
   @staticmethod
   def PackageWindowsCapsuleFiles(OutputFolder, ProductName, ProductFmpGuid, CapsuleVersion_DotString,
     CapsuleVersion_HexString, ProductFwProvider, ProductFwMfgName, ProductFwDesc, CapsuleFileName, PfxFile=None, PfxPass=None,
