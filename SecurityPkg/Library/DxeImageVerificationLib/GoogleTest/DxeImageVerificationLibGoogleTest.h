@@ -7,6 +7,11 @@
 
 #pragma once
 
+#include <Library/BaseMemoryLib.h>
+#include <Guid/ImageAuthentication.h>
+
+#include "binfiles/UnsignedCOFF.h"
+
 /**
   Provide verification service for signed images, which include both signature validation
   and platform policy control. For signature types, both UEFI WIN_CERTIFICATE_UEFI_GUID and
