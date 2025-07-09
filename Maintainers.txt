@@ -647,6 +647,7 @@ M: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
 R: Dun Tan <dun.tan@intel.com> [td36]
 R: Khor Swee Aun <swee.aun.khor@intel.com> [sweeaun]
+R: Eduardo Cuevas Farfan <eduardo.cuevas.farfan@intel.com> [ecuevasf]
 
 UefiCpuPkg
 F: UefiCpuPkg/
@@ -658,6 +659,7 @@ R: Dun Tan <dun.tan@intel.com> [td36]
 R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
+R: Eduardo Cuevas Farfan <eduardo.cuevas.farfan@intel.com> [ecuevasf]
 
 UefiCpuPkg: AMD related files
 F: UefiCpuPkg/Library/MmSaveStateLib/*Amd*.*
