@@ -168,7 +168,6 @@ codecs.register(Ucs2Search)
 class StringDefClassObject(object):
     def __init__(self, Name = None, Value = None, Referenced = False, Token = None, UseOtherLangDef = ''):
         self.StringName = ''
-        self.StringNameByteList = []
         self.StringValue = ''
         self.StringValueByteList = ''
         self.Token = 0
@@ -178,7 +177,6 @@ class StringDefClassObject(object):
 
         if Name is not None:
             self.StringName = Name
-            self.StringNameByteList = UniToHexList(Name)
         if Value is not None:
             self.StringValue = Value + u'\x00'        # Add a NULL at string tail
             self.StringValueByteList = UniToHexList(self.StringValue)
@@ -359,13 +357,6 @@ class UniFileClassObject(object):
                 Value = LanguageList[IndexI][LanguageList[IndexI].find(u'\"') + len(u'\"') : LanguageList[IndexI].rfind(u'\"')] #.replace(u'\r\n', u'')
                 Language = GetLanguageCode(Language, self.IsCompatibleMode, self.File)
                 self.AddStringToList(Name, Language, Value)
-
-    #
-    # Get include file list and load them
-    #
-    def GetIncludeFile(self, Item, Dir):
-        FileName = Item[Item.find(u'#include ') + len(u'#include ') :Item.find(u' ', len(u'#include '))][1:-1]
-        self.LoadUniFile(FileName)
 
     #
     # Pre-process before parse .uni file
@@ -599,26 +590,6 @@ class UniFileClassObject(object):
             ItemIndexInList = self.OrderedStringDict[Lang][Name]
             Item = self.OrderedStringList[Lang][ItemIndexInList]
             Item.Referenced = True
-
-    #
-    # Search the string in language definition by Name
-    #
-    def FindStringValue(self, Name, Lang):
-        if Name in self.OrderedStringDict[Lang]:
-            ItemIndexInList = self.OrderedStringDict[Lang][Name]
-            return self.OrderedStringList[Lang][ItemIndexInList]
-
-        return None
-
-    #
-    # Search the string in language definition by Token
-    #
-    def FindByToken(self, Token, Lang):
-        for Item in self.OrderedStringList[Lang]:
-            if Item.Token == Token:
-                return Item
-
-        return None
 
     #
     # Re-order strings and re-generate tokens

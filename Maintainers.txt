@@ -209,7 +209,6 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/EmulatorPkg
 M: Oliver Smith-Denny <osde@microsoft.com> [os-d]
 M: Andrew Fish <afish@apple.com> [ajfish]
 M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
-M: Ray Ni <ray.ni@intel.com> [niruiyu]
 S: Maintained
 
 EmulatorPkg: Redfish-related modules
@@ -314,7 +313,7 @@ F: MdeModulePkg/Include/Ppi/StorageSecurityCommand.h
 F: MdeModulePkg/Include/Protocol/Ps2Policy.h
 F: MdeModulePkg/Library/NonDiscoverableDeviceRegistrationLib/
 F: MdeModulePkg/Universal/PcatSingleSegmentPciCfg2Pei/
-R: Ray Ni <ray.ni@intel.com> [niruiyu]
+R: Jacek Kolakowski <jacek.kolakowski@intel.com> [jkolakow]
 
 MdeModulePkg: Disk modules
 F: MdeModulePkg/Universal/Disk/
@@ -404,6 +403,13 @@ F: MdeModulePkg/Bus/Spi/
 M: Abner Chang <abner.chang@amd.com> [changab]
 R: Brit Chesley <brit.chesley@amd.com> [BritChesley]
 
+MdeModulePkg: ARM-FFA related modules
+F: MdeModulePkg/*ArmFfa*
+F: MdeModulePkg/*/ArmFfa*/
+M: Sami Mujawar <Sami.Mujawar@arm.com> [samimujawar]
+R: Yeo Reum Yun <YeoReum.Yun@arm.com> [LeviYeoReum]
+R: Kun Qin <kun.qin@microsoft.com> [kuqin12]
+
 MdePkg
 F: MdePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdePkg
@@ -447,6 +453,13 @@ F: MdePkg/Include/Library/ArmLib.h
 M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
+
+MdePkg: ARM-FFA related interfaces
+F: MdePkg/*ArmFfa*
+F: MdePkg/*/ArmFfa*/
+M: Sami Mujawar <Sami.Mujawar@arm.com> [samimujawar]
+R: Yeo Reum Yun <YeoReum.Yun@arm.com> [LeviYeoReum]
+R: Kun Qin <kun.qin@microsoft.com> [kuqin12]
 
 NetworkPkg
 F: NetworkPkg/
@@ -659,7 +672,6 @@ M: Guo Dong <guo.dong@intel.com> [gdong1]
 M: Sean Rhodes <sean@starlabs.systems> [Sean-StarLabs]
 M: James Lu <james.lu@intel.com> [jameslu8]
 M: Benjamin Doron <benjamin.doron@9elements.com> [benjamindoron]
-M: Linus Liu <linus.liu@intel.com> [LinusvPelt]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
 M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 R: Shuo Liu <shuo.liu@intel.com> [shuoliu0]
