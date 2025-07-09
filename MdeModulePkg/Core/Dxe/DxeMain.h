@@ -2804,4 +2804,22 @@ CoreInitializeHandleServices (
   VOID
   );
 
+/**
+  Helper function to compare two EFI_MEMORY_TYPE_INFORMATION entries by their
+  alignment granularity.
+
+  @param  Entry1    The first EFI_MEMORY_TYPE_STATISTICS entry to compare.
+  @param  Entry2    The second EFI_MEMORY_TYPE_STATISTICS entry to compare.
+
+  @return < 0 if Entry1 has a larger alignment granularity than Entry2.
+          > 0 if Entry1 has a smaller alignment granularity than Entry2.
+          = 0 if both entries have the same alignment granularity.
+**/
+INTN
+EFIAPI
+CompareMemTypeInfoByAlignment (
+  IN CONST VOID  *Entry1,
+  IN CONST VOID  *Entry2
+  );
+
 #endif
