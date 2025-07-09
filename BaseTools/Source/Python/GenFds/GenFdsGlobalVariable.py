@@ -44,7 +44,6 @@ class GenFdsGlobalVariable:
     # will be FvDir + os.sep + 'Ffs'
     FfsDir = ''
     FdfParser = None
-    LibDir = ''
     WorkSpace = None
     WorkSpaceDir = ''
     ConfDir = ''

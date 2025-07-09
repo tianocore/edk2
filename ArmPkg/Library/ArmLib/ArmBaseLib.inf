@@ -45,6 +45,3 @@
 [Packages]
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
-
-[FeaturePcd.ARM]
-  gArmTokenSpaceGuid.PcdNormalMemoryNonshareableOverride
