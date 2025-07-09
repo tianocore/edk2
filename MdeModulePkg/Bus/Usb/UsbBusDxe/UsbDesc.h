@@ -69,7 +69,36 @@ typedef struct {
 typedef struct {
   EFI_USB_DEVICE_DESCRIPTOR    Desc;
   USB_CONFIG_DESC              **Configs;
+  UINT8                        *BOSDesc;
+  UINT8                        *StrDescManufacturerUS;
+  UINT8                        *StrDescProductUS;
+  UINT8                        *StrDescSerialNumberUS;
 } USB_DEVICE_DESC;
+
+#pragma pack(1)
+
+///
+/// Binary Device Object Store (BOS)
+/// USB 3.0 spec, Section 9.6.2
+///
+#define USB_DESC_TYPE_BOS      0x0F
+#define USB_BOS_DESC_TYPE_CAP  0x10
+#define USB_BOS_CAP_SS_USB     0x03
+typedef struct {
+  UINT8     Length;
+  UINT8     DescriptorType;
+  UINT16    TotalLength;
+  UINT8     NumDeviceCaps;
+} USB_BOS_DESC;
+
+typedef struct {
+  UINT8    Length;
+  UINT8    DescriptorType;
+  UINT8    DevCapabilityType;
+  UINT8    CapData[1];
+} USB_DEV_CAP_DESC;
+
+#pragma pack()
 
 /**
   USB standard control transfer support routine. This
