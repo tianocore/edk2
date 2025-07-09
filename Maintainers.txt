@@ -314,7 +314,7 @@ F: MdeModulePkg/Include/Ppi/StorageSecurityCommand.h
 F: MdeModulePkg/Include/Protocol/Ps2Policy.h
 F: MdeModulePkg/Library/NonDiscoverableDeviceRegistrationLib/
 F: MdeModulePkg/Universal/PcatSingleSegmentPciCfg2Pei/
-R: Ray Ni <ray.ni@intel.com> [niruiyu]
+R: Jacek Kolakowski <jacek.kolakowski@intel.com> [jkolakow]
 
 MdeModulePkg: Disk modules
 F: MdeModulePkg/Universal/Disk/
