@@ -6,13 +6,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EMU_UGA_IO_H_
-#define _EMU_UGA_IO_H_
+#ifndef _EMU_GRAPHICS_WINDOW_H_
+#define _EMU_GRAPHICS_WINDOW_H_
 
 #include <Protocol/SimplePointer.h>
 #include <Protocol/SimpleTextIn.h>
 #include <Protocol/SimpleTextInEx.h>
-#include <Protocol/UgaDraw.h>
+#include <Protocol/GraphicsOutput.h>
 
 #define EMU_GRAPHICS_WINDOW_PROTOCOL_GUID \
  { 0x30FD316A, 0x6728, 0x2E41, { 0xA6, 0x90, 0x0D, 0x13, 0x33, 0xD8, 0xCA, 0xC1 } }
@@ -22,13 +22,13 @@ typedef struct _EMU_GRAPHICS_WINDOW_PROTOCOL EMU_GRAPHICS_WINDOW_PROTOCOL;
 typedef
 EFI_STATUS
 (EFIAPI *EMU_GRAPHICS_WINDOWS_CLOSE)(
-  EMU_GRAPHICS_WINDOW_PROTOCOL *Uga
+  EMU_GRAPHICS_WINDOW_PROTOCOL *GraphicsWindow
   );
 
 typedef
 EFI_STATUS
 (EFIAPI *EMU_GRAPHICS_WINDOWS_SIZE)(
-  EMU_GRAPHICS_WINDOW_PROTOCOL  *Uga,
+  EMU_GRAPHICS_WINDOW_PROTOCOL  *GraphicsWindow,
   UINT32                        Width,
   UINT32                        Height
   );
@@ -36,13 +36,13 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EMU_GRAPHICS_WINDOWS_CHECK_KEY)(
-  EMU_GRAPHICS_WINDOW_PROTOCOL *Uga
+  EMU_GRAPHICS_WINDOW_PROTOCOL *GraphicsWindow
   );
 
 typedef
 EFI_STATUS
 (EFIAPI *EMU_GRAPHICS_WINDOWS_GET_KEY)(
-  EMU_GRAPHICS_WINDOW_PROTOCOL  *Uga,
+  EMU_GRAPHICS_WINDOW_PROTOCOL  *GraphicsWindow,
   EFI_KEY_DATA                  *key
   );
 
@@ -83,8 +83,8 @@ typedef
 EFI_STATUS
 (EFIAPI *EMU_GRAPHICS_WINDOWS_BLT)(
   IN  EMU_GRAPHICS_WINDOW_PROTOCOL            *GraphicsWindows,
-  IN  EFI_UGA_PIXEL                           *BltBuffer OPTIONAL,
-  IN  EFI_UGA_BLT_OPERATION                   BltOperation,
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL           *BltBuffer OPTIONAL,
+  IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION       BltOperation,
   IN  EMU_GRAPHICS_WINDOWS__BLT_ARGS          *Args
   );
 

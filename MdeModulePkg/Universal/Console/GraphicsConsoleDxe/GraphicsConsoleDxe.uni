@@ -2,7 +2,7 @@
 // Console support on graphic devices.
 //
 // This driver will install Simple Text Output protocol by consuming Graphices Output
-// protocol or UGA Draw protocol on graphic devices.
+// protocol on graphic devices.
 //
 // Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 //
@@ -14,5 +14,5 @@
 #string STR_MODULE_ABSTRACT             #language en-US "Console support on graphic devices"
 
 #string STR_MODULE_DESCRIPTION          #language en-US "This driver will install SimpleTextOutputProtocol by consuming GraphicesOutput\n"
-                                                        "Protocol or UgaDrawProtocol on graphics devices."
+                                                        "Protocol on graphics devices."
 
