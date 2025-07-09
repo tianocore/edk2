@@ -41,4 +41,10 @@ typedef struct {
   BIO    *OutBio;
 } TLS_CONNECTION;
 
+/* This is a context that we pass to callbacks */
+typedef struct {
+  BIO      *BioDebug;
+  INT32    Ack;
+} TLS_EXT_CTX;
+
 #endif

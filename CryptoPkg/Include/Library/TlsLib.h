@@ -436,6 +436,23 @@ TlsSetVerifyHost (
   );
 
 /**
+  Set the specified server name to be verified.
+
+  @param[in]  Tls           Pointer to the TLS object.
+  @param[in]  SslCtx        Pointer to the SSL object.
+  @param[in]  HostName      The specified server name to be set.
+
+  @retval  EFI_SUCCESS      The Server Name was set successfully.
+**/
+EFI_STATUS
+EFIAPI
+TlsSetServerName (
+  VOID   *Tls,
+  VOID   *SslCtx,
+  CHAR8  *HostName
+  );
+
+/**
   Sets a TLS/SSL session ID to be used during TLS/SSL connect.
 
   This function sets a session ID to be used when the TLS/SSL connection is
