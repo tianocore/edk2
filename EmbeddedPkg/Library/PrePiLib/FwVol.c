@@ -488,15 +488,15 @@ FfsProcessSection (
         //
         DEBUG ((DEBUG_ERROR, "Decompress Failed - %r\n", Status));
         return EFI_NOT_FOUND;
-      } else {
-        return FfsProcessSection (
-                 SectionType,
-                 SectionCheckHook,
-                 DstBuffer,
-                 DstBufferSize,
-                 OutputBuffer
-                 );
       }
+
+      return FfsProcessSection (
+               SectionType,
+               SectionCheckHook,
+               DstBuffer,
+               DstBufferSize,
+               OutputBuffer
+               );
     }
 
 CheckNextSection:
