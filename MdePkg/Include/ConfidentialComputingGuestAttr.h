@@ -27,6 +27,8 @@ typedef enum {
   CCAttrAmdSevEs  = 0x101,
   CCAttrAmdSevSnp = 0x102,
 
+  /* The AMD SEV-SNP Alternate Injection feature is enabled in SEV_STATUS */
+  CCAttrFeatureAmdSevSnpAlternateInjection = 0x0000000000020000,
   /* The guest is running with Intel TDX memory encryption enabled. */
   CCAttrIntelTdx = 0x200,
 
