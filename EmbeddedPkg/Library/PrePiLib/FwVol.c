@@ -385,18 +385,14 @@ FfsProcessSection (
 
     if (Section->Type == SectionType) {
       if (SectionCheckHook != NULL) {
-        Found = SectionCheckHook (Section) == EFI_SUCCESS;
-      } else {
-        Found = TRUE;
+        if (SectionCheckHook (Section) != EFI_SUCCESS) {
+          goto CheckNextSection;
+        }
       }
 
-      if (Found) {
-        *OutputBuffer = (VOID *)((UINT8 *)Section + SectionHeaderSize);
+      *OutputBuffer = (VOID *)((UINT8 *)Section + SectionHeaderSize);
 
-        return EFI_SUCCESS;
-      } else {
-        goto CheckNextSection;
-      }
+      return EFI_SUCCESS;
     } else if ((Section->Type == EFI_SECTION_COMPRESSION) || (Section->Type == EFI_SECTION_GUID_DEFINED)) {
       CHAR8   *CompressedData;
       UINT32  CompressionSectionHeaderSize;
