@@ -166,6 +166,9 @@ extern "C" {
 # ifndef OPENSSL_NO_FILENAMES
 #  define OPENSSL_NO_FILENAMES
 # endif
+# ifndef OPENSSL_NO_FIPS_JITTER
+#  define OPENSSL_NO_FIPS_JITTER
+# endif
 # ifndef OPENSSL_NO_FIPS_POST
 #  define OPENSSL_NO_FIPS_POST
 # endif
@@ -183,6 +186,9 @@ extern "C" {
 # endif
 # ifndef OPENSSL_NO_H3DEMO
 #  define OPENSSL_NO_H3DEMO
+# endif
+# ifndef OPENSSL_NO_HQINTEROP
+#  define OPENSSL_NO_HQINTEROP
 # endif
 # ifndef OPENSSL_NO_IDEA
 #  define OPENSSL_NO_IDEA
@@ -204,6 +210,12 @@ extern "C" {
 # endif
 # ifndef OPENSSL_NO_MDC2
 #  define OPENSSL_NO_MDC2
+# endif
+# ifndef OPENSSL_NO_ML_DSA
+#  define OPENSSL_NO_ML_DSA
+# endif
+# ifndef OPENSSL_NO_ML_KEM
+#  define OPENSSL_NO_ML_KEM
 # endif
 # ifndef OPENSSL_NO_MSAN
 #  define OPENSSL_NO_MSAN
@@ -271,6 +283,9 @@ extern "C" {
 # ifndef OPENSSL_NO_SIV
 #  define OPENSSL_NO_SIV
 # endif
+# ifndef OPENSSL_NO_SLH_DSA
+#  define OPENSSL_NO_SLH_DSA
+# endif
 # ifndef OPENSSL_NO_SM2
 #  define OPENSSL_NO_SM2
 # endif
@@ -295,6 +310,9 @@ extern "C" {
 # ifndef OPENSSL_NO_SSL3_METHOD
 #  define OPENSSL_NO_SSL3_METHOD
 # endif
+# ifndef OPENSSL_NO_SSLKEYLOG
+#  define OPENSSL_NO_SSLKEYLOG
+# endif
 # ifndef OPENSSL_NO_STDIO
 #  define OPENSSL_NO_STDIO
 # endif
@@ -306,6 +324,9 @@ extern "C" {
 # endif
 # ifndef OPENSSL_NO_THREAD_POOL
 #  define OPENSSL_NO_THREAD_POOL
+# endif
+# ifndef OPENSSL_NO_TLS_DEPRECATED_EC
+#  define OPENSSL_NO_TLS_DEPRECATED_EC
 # endif
 # ifndef OPENSSL_NO_TLS1_3
 #  define OPENSSL_NO_TLS1_3

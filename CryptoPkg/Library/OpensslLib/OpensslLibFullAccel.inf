@@ -349,7 +349,9 @@
   $(OPENSSL_PATH)/crypto/evp/pmeth_check.c
   $(OPENSSL_PATH)/crypto/evp/pmeth_gn.c
   $(OPENSSL_PATH)/crypto/evp/pmeth_lib.c
+  $(OPENSSL_PATH)/crypto/evp/s_lib.c
   $(OPENSSL_PATH)/crypto/evp/signature.c
+  $(OPENSSL_PATH)/crypto/evp/skeymgmt_meth.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_backend.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_dh.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_key_generate.c
@@ -357,6 +359,7 @@
   $(OPENSSL_PATH)/crypto/ffc/ffc_params.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_params_generate.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_params_validate.c
+  $(OPENSSL_PATH)/crypto/hashtable/hashfunc.c
   $(OPENSSL_PATH)/crypto/hashtable/hashtable.c
   $(OPENSSL_PATH)/crypto/hmac/hmac.c
   $(OPENSSL_PATH)/crypto/hpke/hpke.c
@@ -412,6 +415,7 @@
   $(OPENSSL_PATH)/crypto/self_test_core.c
   $(OPENSSL_PATH)/crypto/sleep.c
   $(OPENSSL_PATH)/crypto/sparse_array.c
+  $(OPENSSL_PATH)/crypto/ssl_err.c
   $(OPENSSL_PATH)/crypto/threads_lib.c
   $(OPENSSL_PATH)/crypto/threads_none.c
   $(OPENSSL_PATH)/crypto/threads_pthread.c
@@ -526,13 +530,17 @@
   $(OPENSSL_PATH)/crypto/x509/t_crl.c
   $(OPENSSL_PATH)/crypto/x509/t_req.c
   $(OPENSSL_PATH)/crypto/x509/t_x509.c
+  $(OPENSSL_PATH)/crypto/x509/v3_aaa.c
   $(OPENSSL_PATH)/crypto/x509/v3_ac_tgt.c
   $(OPENSSL_PATH)/crypto/x509/v3_addr.c
   $(OPENSSL_PATH)/crypto/x509/v3_admis.c
   $(OPENSSL_PATH)/crypto/x509/v3_akeya.c
   $(OPENSSL_PATH)/crypto/x509/v3_akid.c
   $(OPENSSL_PATH)/crypto/x509/v3_asid.c
+  $(OPENSSL_PATH)/crypto/x509/v3_attrdesc.c
+  $(OPENSSL_PATH)/crypto/x509/v3_attrmap.c
   $(OPENSSL_PATH)/crypto/x509/v3_audit_id.c
+  $(OPENSSL_PATH)/crypto/x509/v3_authattid.c
   $(OPENSSL_PATH)/crypto/x509/v3_battcons.c
   $(OPENSSL_PATH)/crypto/x509/v3_bcons.c
   $(OPENSSL_PATH)/crypto/x509/v3_bitst.c
@@ -560,12 +568,14 @@
   $(OPENSSL_PATH)/crypto/x509/v3_pmaps.c
   $(OPENSSL_PATH)/crypto/x509/v3_prn.c
   $(OPENSSL_PATH)/crypto/x509/v3_purp.c
+  $(OPENSSL_PATH)/crypto/x509/v3_rolespec.c
   $(OPENSSL_PATH)/crypto/x509/v3_san.c
   $(OPENSSL_PATH)/crypto/x509/v3_sda.c
   $(OPENSSL_PATH)/crypto/x509/v3_single_use.c
   $(OPENSSL_PATH)/crypto/x509/v3_skid.c
   $(OPENSSL_PATH)/crypto/x509/v3_soa_id.c
   $(OPENSSL_PATH)/crypto/x509/v3_sxnet.c
+  $(OPENSSL_PATH)/crypto/x509/v3_timespec.c
   $(OPENSSL_PATH)/crypto/x509/v3_tlsf.c
   $(OPENSSL_PATH)/crypto/x509/v3_usernotice.c
   $(OPENSSL_PATH)/crypto/x509/v3_utf8.c
@@ -689,6 +699,8 @@
   $(OPENSSL_PATH)/providers/implementations/signature/eddsa_sig.c
   $(OPENSSL_PATH)/providers/implementations/signature/mac_legacy_sig.c
   $(OPENSSL_PATH)/providers/implementations/signature/rsa_sig.c
+  $(OPENSSL_PATH)/providers/implementations/skeymgmt/aes_skmgmt.c
+  $(OPENSSL_PATH)/providers/implementations/skeymgmt/generic.c
   $(OPENSSL_PATH)/ssl/record/methods/ssl3_cbc.c
   $(OPENSSL_GEN_PATH)/crypto/params_idx.c
   $(OPENSSL_PATH)/providers/common/der/der_ec_key.c
@@ -725,7 +737,6 @@
   $(OPENSSL_PATH)/ssl/ssl_cert_comp.c
   $(OPENSSL_PATH)/ssl/ssl_ciph.c
   $(OPENSSL_PATH)/ssl/ssl_conf.c
-  $(OPENSSL_PATH)/ssl/ssl_err.c
   $(OPENSSL_PATH)/ssl/ssl_err_legacy.c
   $(OPENSSL_PATH)/ssl/ssl_init.c
   $(OPENSSL_PATH)/ssl/ssl_lib.c
@@ -742,6 +753,8 @@
   $(OPENSSL_PATH)/ssl/tls13_enc.c
   $(OPENSSL_PATH)/ssl/tls_depr.c
   $(OPENSSL_PATH)/ssl/tls_srp.c
+  $(OPENSSL_PATH)/ssl/quic/quic_tls.c
+  $(OPENSSL_PATH)/ssl/quic/quic_tls_api.c
   $(OPENSSL_PATH)/ssl/record/rec_layer_d1.c
   $(OPENSSL_PATH)/ssl/record/rec_layer_s3.c
   $(OPENSSL_PATH)/ssl/record/methods/dtls_meth.c
@@ -1077,7 +1090,9 @@
   $(OPENSSL_PATH)/crypto/evp/pmeth_check.c
   $(OPENSSL_PATH)/crypto/evp/pmeth_gn.c
   $(OPENSSL_PATH)/crypto/evp/pmeth_lib.c
+  $(OPENSSL_PATH)/crypto/evp/s_lib.c
   $(OPENSSL_PATH)/crypto/evp/signature.c
+  $(OPENSSL_PATH)/crypto/evp/skeymgmt_meth.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_backend.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_dh.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_key_generate.c
@@ -1085,6 +1100,7 @@
   $(OPENSSL_PATH)/crypto/ffc/ffc_params.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_params_generate.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_params_validate.c
+  $(OPENSSL_PATH)/crypto/hashtable/hashfunc.c
   $(OPENSSL_PATH)/crypto/hashtable/hashtable.c
   $(OPENSSL_PATH)/crypto/hmac/hmac.c
   $(OPENSSL_PATH)/crypto/hpke/hpke.c
@@ -1140,6 +1156,7 @@
   $(OPENSSL_PATH)/crypto/self_test_core.c
   $(OPENSSL_PATH)/crypto/sleep.c
   $(OPENSSL_PATH)/crypto/sparse_array.c
+  $(OPENSSL_PATH)/crypto/ssl_err.c
   $(OPENSSL_PATH)/crypto/threads_lib.c
   $(OPENSSL_PATH)/crypto/threads_none.c
   $(OPENSSL_PATH)/crypto/threads_pthread.c
@@ -1253,13 +1270,17 @@
   $(OPENSSL_PATH)/crypto/x509/t_crl.c
   $(OPENSSL_PATH)/crypto/x509/t_req.c
   $(OPENSSL_PATH)/crypto/x509/t_x509.c
+  $(OPENSSL_PATH)/crypto/x509/v3_aaa.c
   $(OPENSSL_PATH)/crypto/x509/v3_ac_tgt.c
   $(OPENSSL_PATH)/crypto/x509/v3_addr.c
   $(OPENSSL_PATH)/crypto/x509/v3_admis.c
   $(OPENSSL_PATH)/crypto/x509/v3_akeya.c
   $(OPENSSL_PATH)/crypto/x509/v3_akid.c
   $(OPENSSL_PATH)/crypto/x509/v3_asid.c
+  $(OPENSSL_PATH)/crypto/x509/v3_attrdesc.c
+  $(OPENSSL_PATH)/crypto/x509/v3_attrmap.c
   $(OPENSSL_PATH)/crypto/x509/v3_audit_id.c
+  $(OPENSSL_PATH)/crypto/x509/v3_authattid.c
   $(OPENSSL_PATH)/crypto/x509/v3_battcons.c
   $(OPENSSL_PATH)/crypto/x509/v3_bcons.c
   $(OPENSSL_PATH)/crypto/x509/v3_bitst.c
@@ -1287,12 +1308,14 @@
   $(OPENSSL_PATH)/crypto/x509/v3_pmaps.c
   $(OPENSSL_PATH)/crypto/x509/v3_prn.c
   $(OPENSSL_PATH)/crypto/x509/v3_purp.c
+  $(OPENSSL_PATH)/crypto/x509/v3_rolespec.c
   $(OPENSSL_PATH)/crypto/x509/v3_san.c
   $(OPENSSL_PATH)/crypto/x509/v3_sda.c
   $(OPENSSL_PATH)/crypto/x509/v3_single_use.c
   $(OPENSSL_PATH)/crypto/x509/v3_skid.c
   $(OPENSSL_PATH)/crypto/x509/v3_soa_id.c
   $(OPENSSL_PATH)/crypto/x509/v3_sxnet.c
+  $(OPENSSL_PATH)/crypto/x509/v3_timespec.c
   $(OPENSSL_PATH)/crypto/x509/v3_tlsf.c
   $(OPENSSL_PATH)/crypto/x509/v3_usernotice.c
   $(OPENSSL_PATH)/crypto/x509/v3_utf8.c
@@ -1416,6 +1439,8 @@
   $(OPENSSL_PATH)/providers/implementations/signature/eddsa_sig.c
   $(OPENSSL_PATH)/providers/implementations/signature/mac_legacy_sig.c
   $(OPENSSL_PATH)/providers/implementations/signature/rsa_sig.c
+  $(OPENSSL_PATH)/providers/implementations/skeymgmt/aes_skmgmt.c
+  $(OPENSSL_PATH)/providers/implementations/skeymgmt/generic.c
   $(OPENSSL_PATH)/ssl/record/methods/ssl3_cbc.c
   $(OPENSSL_GEN_PATH)/crypto/params_idx.c
   $(OPENSSL_PATH)/providers/common/der/der_ec_key.c
@@ -1452,7 +1477,6 @@
   $(OPENSSL_PATH)/ssl/ssl_cert_comp.c
   $(OPENSSL_PATH)/ssl/ssl_ciph.c
   $(OPENSSL_PATH)/ssl/ssl_conf.c
-  $(OPENSSL_PATH)/ssl/ssl_err.c
   $(OPENSSL_PATH)/ssl/ssl_err_legacy.c
   $(OPENSSL_PATH)/ssl/ssl_init.c
   $(OPENSSL_PATH)/ssl/ssl_lib.c
@@ -1469,6 +1493,8 @@
   $(OPENSSL_PATH)/ssl/tls13_enc.c
   $(OPENSSL_PATH)/ssl/tls_depr.c
   $(OPENSSL_PATH)/ssl/tls_srp.c
+  $(OPENSSL_PATH)/ssl/quic/quic_tls.c
+  $(OPENSSL_PATH)/ssl/quic/quic_tls_api.c
   $(OPENSSL_PATH)/ssl/record/rec_layer_d1.c
   $(OPENSSL_PATH)/ssl/record/rec_layer_s3.c
   $(OPENSSL_PATH)/ssl/record/methods/dtls_meth.c
@@ -1491,6 +1517,7 @@
   $(OPENSSL_GEN_PATH)/X64-MSFT/crypto/aes/aesni-sha1-x86_64.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/X64-MSFT/crypto/aes/aesni-sha256-x86_64.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/X64-MSFT/crypto/aes/aesni-x86_64.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
+  $(OPENSSL_GEN_PATH)/X64-MSFT/crypto/aes/aesni-xts-avx512.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/X64-MSFT/crypto/aes/bsaes-x86_64.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/X64-MSFT/crypto/aes/vpaes-x86_64.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/X64-MSFT/crypto/x86_64cpuid.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
@@ -1509,6 +1536,7 @@
   $(OPENSSL_GEN_PATH)/X64-GCC/crypto/aes/aesni-sha1-x86_64.s ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/X64-GCC/crypto/aes/aesni-sha256-x86_64.s ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/X64-GCC/crypto/aes/aesni-x86_64.s ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
+  $(OPENSSL_GEN_PATH)/X64-GCC/crypto/aes/aesni-xts-avx512.s ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/X64-GCC/crypto/aes/bsaes-x86_64.s ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/X64-GCC/crypto/aes/vpaes-x86_64.s ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/X64-GCC/crypto/x86_64cpuid.s ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
@@ -1823,7 +1851,9 @@
   $(OPENSSL_PATH)/crypto/evp/pmeth_check.c
   $(OPENSSL_PATH)/crypto/evp/pmeth_gn.c
   $(OPENSSL_PATH)/crypto/evp/pmeth_lib.c
+  $(OPENSSL_PATH)/crypto/evp/s_lib.c
   $(OPENSSL_PATH)/crypto/evp/signature.c
+  $(OPENSSL_PATH)/crypto/evp/skeymgmt_meth.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_backend.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_dh.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_key_generate.c
@@ -1831,6 +1861,7 @@
   $(OPENSSL_PATH)/crypto/ffc/ffc_params.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_params_generate.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_params_validate.c
+  $(OPENSSL_PATH)/crypto/hashtable/hashfunc.c
   $(OPENSSL_PATH)/crypto/hashtable/hashtable.c
   $(OPENSSL_PATH)/crypto/hmac/hmac.c
   $(OPENSSL_PATH)/crypto/hpke/hpke.c
@@ -1886,6 +1917,7 @@
   $(OPENSSL_PATH)/crypto/self_test_core.c
   $(OPENSSL_PATH)/crypto/sleep.c
   $(OPENSSL_PATH)/crypto/sparse_array.c
+  $(OPENSSL_PATH)/crypto/ssl_err.c
   $(OPENSSL_PATH)/crypto/threads_lib.c
   $(OPENSSL_PATH)/crypto/threads_none.c
   $(OPENSSL_PATH)/crypto/threads_pthread.c
@@ -1999,13 +2031,17 @@
   $(OPENSSL_PATH)/crypto/x509/t_crl.c
   $(OPENSSL_PATH)/crypto/x509/t_req.c
   $(OPENSSL_PATH)/crypto/x509/t_x509.c
+  $(OPENSSL_PATH)/crypto/x509/v3_aaa.c
   $(OPENSSL_PATH)/crypto/x509/v3_ac_tgt.c
   $(OPENSSL_PATH)/crypto/x509/v3_addr.c
   $(OPENSSL_PATH)/crypto/x509/v3_admis.c
   $(OPENSSL_PATH)/crypto/x509/v3_akeya.c
   $(OPENSSL_PATH)/crypto/x509/v3_akid.c
   $(OPENSSL_PATH)/crypto/x509/v3_asid.c
+  $(OPENSSL_PATH)/crypto/x509/v3_attrdesc.c
+  $(OPENSSL_PATH)/crypto/x509/v3_attrmap.c
   $(OPENSSL_PATH)/crypto/x509/v3_audit_id.c
+  $(OPENSSL_PATH)/crypto/x509/v3_authattid.c
   $(OPENSSL_PATH)/crypto/x509/v3_battcons.c
   $(OPENSSL_PATH)/crypto/x509/v3_bcons.c
   $(OPENSSL_PATH)/crypto/x509/v3_bitst.c
@@ -2033,12 +2069,14 @@
   $(OPENSSL_PATH)/crypto/x509/v3_pmaps.c
   $(OPENSSL_PATH)/crypto/x509/v3_prn.c
   $(OPENSSL_PATH)/crypto/x509/v3_purp.c
+  $(OPENSSL_PATH)/crypto/x509/v3_rolespec.c
   $(OPENSSL_PATH)/crypto/x509/v3_san.c
   $(OPENSSL_PATH)/crypto/x509/v3_sda.c
   $(OPENSSL_PATH)/crypto/x509/v3_single_use.c
   $(OPENSSL_PATH)/crypto/x509/v3_skid.c
   $(OPENSSL_PATH)/crypto/x509/v3_soa_id.c
   $(OPENSSL_PATH)/crypto/x509/v3_sxnet.c
+  $(OPENSSL_PATH)/crypto/x509/v3_timespec.c
   $(OPENSSL_PATH)/crypto/x509/v3_tlsf.c
   $(OPENSSL_PATH)/crypto/x509/v3_usernotice.c
   $(OPENSSL_PATH)/crypto/x509/v3_utf8.c
@@ -2162,6 +2200,8 @@
   $(OPENSSL_PATH)/providers/implementations/signature/eddsa_sig.c
   $(OPENSSL_PATH)/providers/implementations/signature/mac_legacy_sig.c
   $(OPENSSL_PATH)/providers/implementations/signature/rsa_sig.c
+  $(OPENSSL_PATH)/providers/implementations/skeymgmt/aes_skmgmt.c
+  $(OPENSSL_PATH)/providers/implementations/skeymgmt/generic.c
   $(OPENSSL_PATH)/ssl/record/methods/ssl3_cbc.c
   $(OPENSSL_GEN_PATH)/crypto/params_idx.c
   $(OPENSSL_PATH)/providers/common/der/der_ec_key.c
@@ -2198,7 +2238,6 @@
   $(OPENSSL_PATH)/ssl/ssl_cert_comp.c
   $(OPENSSL_PATH)/ssl/ssl_ciph.c
   $(OPENSSL_PATH)/ssl/ssl_conf.c
-  $(OPENSSL_PATH)/ssl/ssl_err.c
   $(OPENSSL_PATH)/ssl/ssl_err_legacy.c
   $(OPENSSL_PATH)/ssl/ssl_init.c
   $(OPENSSL_PATH)/ssl/ssl_lib.c
@@ -2215,6 +2254,8 @@
   $(OPENSSL_PATH)/ssl/tls13_enc.c
   $(OPENSSL_PATH)/ssl/tls_depr.c
   $(OPENSSL_PATH)/ssl/tls_srp.c
+  $(OPENSSL_PATH)/ssl/quic/quic_tls.c
+  $(OPENSSL_PATH)/ssl/quic/quic_tls_api.c
   $(OPENSSL_PATH)/ssl/record/rec_layer_d1.c
   $(OPENSSL_PATH)/ssl/record/rec_layer_s3.c
   $(OPENSSL_PATH)/ssl/record/methods/dtls_meth.c
@@ -2278,8 +2319,8 @@
   #   C4819: The file contains a character that cannot be represented in the current code page
   #   C4133: incompatible types - from 'ASN1_TYPE *' to 'const ASN1_STRING *' (v3_genn.c(101))
   #
-  MSFT:*_*_IA32_CC_FLAGS   = -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_FLAGS_IA32) /wd4090 /wd4132 /wd4210 /wd4244 /wd4245 /wd4267 /wd4310 /wd4389 /wd4700 /wd4702 /wd4706 /wd4819 /wd4133 /wd4189
-  MSFT:*_*_X64_CC_FLAGS    = -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_FLAGS_X64) /wd4090 /wd4132 /wd4210 /wd4244 /wd4245 /wd4267 /wd4306 /wd4310 /wd4700 /wd4389 /wd4702 /wd4706 /wd4819 /wd4133 /wd4189
+  MSFT:*_*_IA32_CC_FLAGS   = -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_FLAGS_IA32) /wd4090 /wd4132 /wd4210 /wd4244 /wd4245 /wd4267 /wd4310 /wd4389 /wd4700 /wd4702 /wd4706 /wd4819 /wd4130 /wd4133 /wd4189
+  MSFT:*_*_X64_CC_FLAGS    = -U_WIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_FLAGS_X64) /wd4090 /wd4132 /wd4210 /wd4244 /wd4245 /wd4267 /wd4306 /wd4310 /wd4700 /wd4389 /wd4702 /wd4706 /wd4819 /wd4130 /wd4133 /wd4189
 
   #
   # Disable following Visual Studio 2015 compiler warnings brought by openssl source,
