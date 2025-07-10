@@ -1,16 +1,16 @@
 /*++
 
-Copyright (c) 2013-2014, ARM Ltd. All rights reserved.<BR>
+Copyright (c) 2013-2025, ARM Ltd. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 Module Name:
 
-  ArmGicDxe.c
+  ArmGicV3V5Dxe.c
 
 Abstract:
 
-  Driver implementing the GIC interrupt controller protocol
+  Driver implementing the GIC interrupt controller protocol for GICv3/v5
 
 --*/
 
@@ -55,7 +55,7 @@ GicV3Supported (
 }
 
 /**
-  Initialize the state information for the CPU Architectural Protocol
+  Initialize the GIC v3/v5 driver
 
   @param  ImageHandle   of the loaded driver
   @param  SystemTable   Pointer to the System Table
@@ -67,7 +67,7 @@ GicV3Supported (
 
 **/
 EFI_STATUS
-InterruptDxeInitialize (
+GicV3V5DxeInitialize (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
@@ -75,16 +75,11 @@ InterruptDxeInitialize (
   EFI_STATUS  Status;
 
   if (ArmHasGicV5SystemRegisters ()) {
- #ifdef MDE_CPU_AARCH64
-    // GICv5 is only supported on AArch64
     Status = GicV5DxeInitialize (ImageHandle, SystemTable);
- #else
-    Status = EFI_UNSUPPORTED;
- #endif
-  } else if (!GicV3Supported ()) {
-    Status = GicV2DxeInitialize (ImageHandle, SystemTable);
-  } else {
+  } else if (GicV3Supported ()) {
     Status = GicV3DxeInitialize (ImageHandle, SystemTable);
+  } else {
+    Status = EFI_UNSUPPORTED;
   }
 
   return Status;
