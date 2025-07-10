@@ -1,14 +1,14 @@
 /** @file
   Arm Ffa library common code.
 
-  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
    @par Glossary:
      - FF-A - Firmware Framework for Arm A-profile
 
    @par Reference(s):
-     - Arm Firmware Framework for Arm A-Profile v1.3 ALP1: [https://developer.arm.com/documentation/den0077/l]
+     - Arm Firmware Framework for Arm A-Profile [https://developer.arm.com/documentation/den0077/latest]
 
 **/
 #include <Uefi.h>
@@ -19,18 +19,20 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
-#include <Library/MmServicesTableLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 #include <IndustryStandard/ArmFfaSvc.h>
+
 #include <Guid/ArmFfaRxTxBufferInfo.h>
 
 #include "ArmFfaCommon.h"
 #include "ArmFfaRxTxMap.h"
 
-EFI_HANDLE                 mArmFfaRxTxBufferStmmInfoHandle = NULL;
-ARM_FFA_RX_TX_BUFFER_INFO  *mArmFfaRxTxBufferStmmInfo      = NULL;
+STATIC VOID  *mTxBuffer;
+STATIC VOID  *mRxBuffer;
 
 /**
   Get mapped Rx/Tx buffers.
@@ -53,41 +55,24 @@ ArmFfaLibGetRxTxBuffers (
   OUT UINT64  *RxBufferSize OPTIONAL
   )
 {
-  UINTN  TxBufferAddr;
-  UINTN  RxBufferAddr;
-
-  EFI_STATUS  Status = gMmst->MmLocateProtocol (
-                                &gArmFfaRxTxBufferInfoGuid,
-                                NULL,
-                                (VOID **)&mArmFfaRxTxBufferStmmInfo
-                                );
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Failed to locate Rx/Tx buffer protocol... Status: %r\n", __func__, Status));
-    return Status;
-  }
-
-  TxBufferAddr = (UINTN)mArmFfaRxTxBufferStmmInfo->TxBufferAddr;
-  RxBufferAddr = (UINTN)mArmFfaRxTxBufferStmmInfo->RxBufferAddr;
-
-  if ((TxBufferAddr == 0x00) || (RxBufferAddr == 0x00)) {
+  if ((mTxBuffer == NULL) || (mRxBuffer == NULL)) {
     return EFI_NOT_READY;
   }
 
   if (TxBuffer != NULL) {
-    *TxBuffer = (VOID *)TxBufferAddr;
+    *TxBuffer = mTxBuffer;
   }
 
   if (TxBufferSize != NULL) {
-    *TxBufferSize = mArmFfaRxTxBufferStmmInfo->TxBufferSize;
+    *TxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
   }
 
   if (RxBuffer != NULL) {
-    *RxBuffer = (VOID *)RxBufferAddr;
+    *RxBuffer = mRxBuffer;
   }
 
   if (RxBufferSize != NULL) {
-    *RxBufferSize = mArmFfaRxTxBufferStmmInfo->RxBufferSize;
+    *RxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
   }
 
   return EFI_SUCCESS;
@@ -120,15 +105,12 @@ ArmFfaLibRxTxMap (
   VOID          *Buffers;
   VOID          *TxBuffer;
   VOID          *RxBuffer;
-  UINT64        BufferSize;
 
-  Status = gMmst->MmLocateProtocol (
-                    &gArmFfaRxTxBufferInfoGuid,
-                    NULL,
-                    (VOID **)&mArmFfaRxTxBufferStmmInfo
-                    );
-  if (!EFI_ERROR (Status)) {
-    // Great, we got what we need.
+  /*
+   * If someone already mapped Rx/Tx Buffers, return EFI_ALREADY_STARTED.
+   * return EFI_ALREADY_STARTED.
+   */
+  if ((mTxBuffer != NULL) && (mRxBuffer != NULL)) {
     return EFI_ALREADY_STARTED;
   }
 
@@ -170,8 +152,10 @@ ArmFfaLibRxTxMap (
       return EFI_UNSUPPORTED;
   }
 
-  MaxSize = (Property1 >> ARM_FFA_BUFFER_MAXSIZE_PAGE_COUNT_SHIFT) &
-            ARM_FFA_BUFFER_MAXSIZE_PAGE_COUNT_MASK;
+  MaxSize =
+    (((Property1 >>
+       ARM_FFA_BUFFER_MAXSIZE_PAGE_COUNT_SHIFT) &
+      ARM_FFA_BUFFER_MAXSIZE_PAGE_COUNT_MASK));
 
   MaxSize = ((MaxSize == 0) ? MAX_UINTN : (MaxSize * MinSizeAndAlign));
 
@@ -194,9 +178,8 @@ ArmFfaLibRxTxMap (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  BufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
-  TxBuffer   = Buffers;
-  RxBuffer   = Buffers + BufferSize;
+  TxBuffer = Buffers;
+  RxBuffer = Buffers + (PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE);
 
   FfaArgs.Arg0 = ARM_FID_FFA_RXTX_MAP;
   FfaArgs.Arg1 = (UINTN)TxBuffer;
@@ -222,30 +205,13 @@ ArmFfaLibRxTxMap (
     goto ErrorHandler;
   }
 
-  mArmFfaRxTxBufferStmmInfo = AllocateZeroPool (sizeof (ARM_FFA_RX_TX_BUFFER_INFO));
-  if (mArmFfaRxTxBufferStmmInfo == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ErrorHandler;
-  }
+  mTxBuffer = TxBuffer;
+  mRxBuffer = RxBuffer;
 
-  mArmFfaRxTxBufferStmmInfo->TxBufferAddr = TxBuffer;
-  mArmFfaRxTxBufferStmmInfo->RxBufferAddr = RxBuffer;
-  mArmFfaRxTxBufferStmmInfo->TxBufferSize = BufferSize;
-  mArmFfaRxTxBufferStmmInfo->RxBufferSize = BufferSize;
-
-  Status = gMmst->MmInstallProtocolInterface (
-                    &mArmFfaRxTxBufferStmmInfoHandle,
-                    &gArmFfaRxTxBufferInfoGuid,
-                    EFI_NATIVE_INTERFACE,
-                    mArmFfaRxTxBufferStmmInfo
-                    );
-
-  return Status;
+  return EFI_SUCCESS;
 
 ErrorHandler:
-  FreeAlignedPages (Buffers, (PcdGet64 (PcdFfaTxRxPageCount) * 2));
-  TxBuffer = NULL;
-  RxBuffer = NULL;
+  FreePages (Buffers, (PcdGet64 (PcdFfaTxRxPageCount) * 2));
 
   return Status;
 }
@@ -270,12 +236,6 @@ ArmFfaLibRxTxUnmap (
   ARM_FFA_ARGS  FfaArgs;
   VOID          *Buffers;
 
-  if (mArmFfaRxTxBufferStmmInfoHandle == NULL) {
-    // This means that the agent tried to unmap the buffers before even know them.
-    // Let's be a nice player...
-    return EFI_UNSUPPORTED;
-  }
-
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
   FfaArgs.Arg0 = ARM_FID_FFA_RXTX_UNMAP;
@@ -293,29 +253,77 @@ ArmFfaLibRxTxUnmap (
    * and start address of these pages is set on PcdFfaTxBuffer.
    * See ArmFfaLibRxTxMap().
    */
-  Buffers = (VOID *)(UINTN)mArmFfaRxTxBufferStmmInfo->TxBufferAddr;
+  Buffers = mTxBuffer;
   if (Buffers != NULL) {
-    FreeAlignedPages (Buffers, (EFI_SIZE_TO_PAGES (mArmFfaRxTxBufferStmmInfo->TxBufferSize) * 2));
+    FreePages (Buffers, (PcdGet64 (PcdFfaTxRxPageCount) * 2));
   }
 
-  Status = gMmst->MmUninstallProtocolInterface (
-                    mArmFfaRxTxBufferStmmInfoHandle,
-                    &gArmFfaRxTxBufferInfoGuid,
-                    mArmFfaRxTxBufferStmmInfo
-                    );
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: Failed to uninstall Rx/Tx buffer protocol... Status: %r\n",
-      __func__,
-      Status
-      ));
-    return Status;
-  }
-
-  FreePool (mArmFfaRxTxBufferStmmInfo);
-  mArmFfaRxTxBufferStmmInfo = NULL;
+  mTxBuffer = NULL;
+  mRxBuffer = NULL;
 
   return EFI_SUCCESS;
+}
+
+/**
+  Update Rx/TX buffer information.
+
+  @param  BufferInfo            Rx/Tx buffer information.
+
+**/
+VOID
+EFIAPI
+UpdateRxTxBufferInfo (
+  OUT ARM_FFA_RX_TX_BUFFER_INFO  *BufferInfo
+  )
+{
+  BufferInfo->TxBufferAddr = (UINTN)mTxBuffer;
+  BufferInfo->TxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+  BufferInfo->RxBufferAddr = (UINTN)mRxBuffer;
+  BufferInfo->RxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+}
+
+/**
+  Find Rx/TX buffer memory allocation hob.
+
+  @param  UseGuid             Find MemoryAllocationHob using Guid.
+
+  @retval MemoryAllocationHob
+  @retval NULL                No memory allocation hob related to Rx/Tx buffer
+
+**/
+EFI_HOB_MEMORY_ALLOCATION *
+EFIAPI
+FindRxTxBufferAllocationHob (
+  IN BOOLEAN  UseGuid
+  )
+{
+  EFI_PHYSICAL_ADDRESS  BufferBase;
+  UINT64                BufferSize;
+
+  BufferBase = (EFI_PHYSICAL_ADDRESS)((UINTN)mTxBuffer);
+  BufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE * 2;
+
+  return GetRxTxBufferAllocationHob (BufferBase, BufferSize, UseGuid);
+}
+
+/**
+  Remap Rx/TX buffer with converted Rx/Tx Buffer address after
+  using permanent memory.
+
+  @param[out] BufferInfo    BufferInfo
+
+  @retval EFI_SUCCESS       Success
+  @retval EFI_NOT_FOUND     No memory allocation hob related to Rx/Tx buffer
+
+**/
+EFI_STATUS
+EFIAPI
+RemapFfaRxTxBuffer (
+  OUT ARM_FFA_RX_TX_BUFFER_INFO  *BufferInfo
+  )
+{
+  /*
+   * SEC binary shouldn't remap the Rx/Tx Buffer.
+   */
+  return EFI_UNSUPPORTED;
 }
