@@ -2,6 +2,7 @@
   MCFG Table Generator
 
   Copyright (c) 2017 - 2019, ARM Limited. All rights reserved.
+  Copyright (C) 2025, Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -27,7 +28,7 @@
 Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
-  - EArchCommonObjPciConfigSpaceInfo
+  - EArchCommonObjMcfgPciConfigSpaceInfo
 */
 
 #pragma pack(1)
@@ -52,7 +53,7 @@ typedef
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArchCommon,
-  EArchCommonObjPciConfigSpaceInfo,
+  EArchCommonObjMcfgPciConfigSpaceInfo,
   CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO
   );
 
@@ -154,7 +155,7 @@ BuildMcfgTable (
   }
 
   *Table = NULL;
-  Status = GetEArchCommonObjPciConfigSpaceInfo (
+  Status = GetEArchCommonObjMcfgPciConfigSpaceInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &PciConfigSpaceInfoList,

@@ -71,6 +71,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjMemoryLatBwInfo,                ///< 43 - Memory Latency Bandwidth Info
   EArchCommonObjMemoryCacheInfo,                ///< 44 - Memory Cache Info
   EArchCommonObjSpcrInfo,                       ///< 45 - Serial Terminal and Interrupt Info
+  EArchCommonObjMcfgPciConfigSpaceInfo,         ///< 46 - MCFG PCI Configuration Space Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
