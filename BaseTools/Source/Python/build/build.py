@@ -17,6 +17,7 @@ from __future__ import absolute_import
 import os.path as path
 import sys
 import os
+import json
 import re
 import glob
 import time
@@ -37,6 +38,7 @@ from AutoGen.WorkspaceAutoGen import WorkspaceAutoGen
 from AutoGen.AutoGenWorker import AutoGenWorkerInProcess,AutoGenManager,\
     LogAgent
 from AutoGen import GenMake
+from AutoGen import GenNinja
 from Common import Misc as Utils
 
 from Common.TargetTxtClassObject import TargetTxtDict
@@ -50,6 +52,7 @@ from Common.DataType import *
 import Common.EdkLogger as EdkLogger
 
 from Workspace.WorkspaceDatabase import BuildDB
+from Workspace.MetaFileParser import MetaFileParser
 
 from BuildReport import BuildReport
 from GenPatchPcdTable.GenPatchPcdTable import PeImageClass,parsePcdInfoFromMapFile
@@ -690,6 +693,8 @@ class Build():
         self.ArchList       = BuildOptions.TargetArch
         self.ToolChainList  = BuildOptions.ToolChain
         self.BuildTargetList= BuildOptions.BuildTarget
+        self.NinjaBuild     = BuildOptions.NinjaBuild
+        self.NinjaGen       = BuildOptions.NinjaGen
         self.Fdf            = BuildOptions.FdfFile
         self.FdList         = BuildOptions.RomImage
         self.FvList         = BuildOptions.FvImage
@@ -703,17 +708,24 @@ class Build():
             GlobalData.gSKUID_CMD = self.SkuId
         self.ConfDirectory = BuildOptions.ConfDirectory
         self.SpawnMode      = True
-        self.BuildReport    = BuildReport(BuildOptions.ReportFile, BuildOptions.ReportType)
+        self.BuildReport    = BuildReport(BuildOptions.ReportFile, BuildOptions.ReportType, self.NinjaBuild)
         self.AutoGenTime    = 0
         self.MakeTime       = 0
         self.GenFdsTime     = 0
         self.MakeFileName   = ""
+        self.AllDrivers = set()
+        self.AllModules = set()
+        self.PreMakeCacheMiss = set()
+        self.PreMakeCacheHit = set()
+        self.MakeCacheMiss = set()
+        self.MakeCacheHit = set()
         TargetObj = TargetTxtDict()
         ToolDefObj = ToolDefDict((os.path.join(os.getenv("WORKSPACE"),"Conf")))
         self.TargetTxt = TargetObj.Target
         self.ToolDef = ToolDefObj.ToolDef
         GlobalData.BuildOptionPcd     = BuildOptions.OptionPcd if BuildOptions.OptionPcd else []
         #Set global flag for build mode
+        GlobalData.gNinjaBuild   = BuildOptions.NinjaBuild
         GlobalData.gIgnoreSource = BuildOptions.IgnoreSources
         GlobalData.gUseHashCache = BuildOptions.UseHashCache
         GlobalData.gBinCacheDest   = BuildOptions.BinCacheDest
@@ -1792,6 +1804,7 @@ class Build():
                     Pa.DataPipe.DataContainer = {"Workspace_timestamp": Wa._SrcTimeStamp}
                     self._BuildPa(self.Target, Pa, FfsCommand=CmdListDict,PcdMaList=PcdMaList)
 
+
                 # Create MAP file when Load Fix Address is enabled.
                 if self.Target in ["", "all", "fds"]:
                     for Arch in Wa.ArchList:
@@ -1883,6 +1896,7 @@ class Build():
                 MaList = []
                 ExitFlag = threading.Event()
                 ExitFlag.clear()
+
                 self.AutoGenTime += int(round((time.time() - WorkspaceAutoGenTime)))
                 for Arch in Wa.ArchList:
                     AutoGenStart = time.time()
@@ -1922,6 +1936,10 @@ class Build():
                                         Ma.CreateMakeFile(True)
                                     self.Progress.Stop("done!")
                                 if self.Target == "genmake":
+                                    Pa = PlatformAutoGen(Wa, self.PlatformFile, BuildTarget, ToolChain, Wa.ArchList[0])
+                                    MetaFileListFilePath = os.path.join(Pa.BuildDir, 'MetaFilesList.txt')
+                                    with open(MetaFileListFilePath, "w") as Fd:
+                                        Fd.writelines([Item + '\n' for Item in MetaFileParser.MetaFilesList])
                                     return True
 
                                 if GlobalData.gBinCacheSource and self.Target in [None, "", "all"]:
@@ -1952,6 +1970,7 @@ class Build():
                     if BuildTask.HasError():
                         EdkLogger.error("build", BUILD_ERROR, "Failed to build module", ExtraData=GlobalData.gBuildingModule)
                     self.MakeTime += int(round((time.time() - MakeStart)))
+
 
                 MakeContiue = time.time()
                 ExitFlag.set()
@@ -2229,6 +2248,95 @@ class Build():
         self.Progress.Stop("done!")
         return Wa, BuildModules
 
+    def _MultiThreadBuildPlatformNinja(self):
+        SaveFileOnChange(self.PlatformBuildPath, '# DO NOT EDIT \n# FILE auto-generated\n', False)
+        for BuildTarget in self.BuildTargetList:
+            GlobalData.gGlobalDefines['TARGET'] = BuildTarget
+            index = 0
+            for ToolChain in self.ToolChainList:
+                resetFdsGlobalVariable()
+                GlobalData.gGlobalDefines['TOOLCHAIN'] = ToolChain
+                GlobalData.gGlobalDefines['TOOL_CHAIN_TAG'] = ToolChain
+                GlobalData.gGlobalDefines['FAMILY'] = self.ToolChainFamily[index]
+                index += 1
+                if self.SkipAutoGen:
+                    Wa = self.VerifyAutoGenFiles()
+                    if Wa is None:
+                        self.SkipAutoGen = False
+                        Wa, self.BuildModules = self.PerformAutoGen(BuildTarget,ToolChain)
+                    else:
+                        GlobalData.gAutoGenPhase = True
+                        self.BuildModules = self.SetupMakeSetting(Wa)
+                else:
+                    Wa, self.BuildModules = self.PerformAutoGen(BuildTarget,ToolChain)
+                Pa = Wa.AutoGenObjectList[0]
+                GlobalData.gAutoGenPhase = False
+
+                NinjaBuildFilePath = os.path.join(Pa.BuildDir, 'build.ninja')
+                MakeStart = time.time()
+
+                GenNinja.gNinjaBuildFilePath = NinjaBuildFilePath
+                CommandOption = self.PassCommandOption(self.BuildTargetList, self.ArchList, self.ToolChainList, self.PlatformFile, self.Target)
+                GenNinja.MergeNinjaFile()
+                if self.NinjaGen != True:
+                    GenNinja.CacheEdk2BuildCmd('build ' + CommandOption, NinjaBuildFilePath)
+                    GenNinja.CallNinjaBuild()
+
+                RegerateNinjaFileCmd = 'build ' + ' '.join(GlobalData.gCommand)
+                if 'ninja_gen' not in RegerateNinjaFileCmd:
+                    RegerateNinjaFileCmd += ' --ninja_gen'
+                MetaFilesList = {item for item in MetaFileParser.MetaFilesList}
+                GenNinja.GeneratePrebuildStageNinjaRule(RegerateNinjaFileCmd, list(MetaFilesList))
+
+                self.MakeTime += int(round((time.time() - MakeStart)))
+
+                #
+                # Get Module List
+                #
+                ModuleList = {ma.Guid.upper(): ma for ma in self.BuildModules}
+                self.BuildModules = []
+
+                # Create MAP file when Load Fix Address is enabled.
+                if self.Target in ["", "all", "fds"]:
+                    for Arch in Wa.ArchList:
+                        #
+                        # Check whether the set fix address is above 4G for 32bit image.
+                        #
+                        if (Arch == 'IA32' or Arch == 'ARM') and self.LoadFixAddress != 0xFFFFFFFFFFFFFFFF and self.LoadFixAddress >= 0x100000000:
+                            EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS can't be set to larger than or equal to 4G for the platorm with IA32 or ARM arch modules")
+
+                    #
+                    # Rebase module to the preferred memory address before GenFds
+                    #
+                    MapBuffer = []
+                    if self.LoadFixAddress != 0:
+                        self._CollectModuleMapBuffer(MapBuffer, ModuleList)
+
+                    if self.Fdf:
+                        #
+                        # Generate FD image if there's a FDF file found
+                        #
+                        GenFdsStart = time.time()
+                        if GenFdsApi(Wa.GenFdsCommandDict, self.Db):
+                            EdkLogger.error("build", COMMAND_FAILURE)
+                        if self.NinjaGen != True:
+                            GenNinja.CallNinjaBuild(True)
+                        Threshold = self.GetFreeSizeThreshold()
+                        if Threshold:
+                            self.CheckFreeSizeThreshold(Threshold, Wa.FvDir)
+
+                        #
+                        # Create MAP file for all platform FVs after GenFds.
+                        #
+                        self._CollectFvMapBuffer(MapBuffer, Wa, ModuleList)
+                        self.GenFdsTime += int(round((time.time() - GenFdsStart)))
+                    #
+                    # Save MAP buffer into MAP file.
+                    #
+                    self._SaveMapFile(MapBuffer, Wa)
+                self.CreateGuidedSectionToolsFile(Wa)
+
+
     def _MultiThreadBuildPlatform(self):
         SaveFileOnChange(self.PlatformBuildPath, '# DO NOT EDIT \n# FILE auto-generated\n', False)
         for BuildTarget in self.BuildTargetList:
@@ -2450,12 +2558,7 @@ class Build():
     ## Launch the module or platform build
     #
     def Launch(self):
-        self.AllDrivers = set()
-        self.AllModules = set()
-        self.PreMakeCacheMiss = set()
-        self.PreMakeCacheHit = set()
-        self.MakeCacheMiss = set()
-        self.MakeCacheHit = set()
+
         if not self.ModuleFile:
             if not self.SpawnMode or self.Target not in ["", "all"]:
                 self.SpawnMode = False
@@ -2665,8 +2768,18 @@ def Main():
 
         MyBuild = Build(Target, Workspace, Option,LogQ)
         GlobalData.gCommandLineDefines['ARCH'] = ' '.join(MyBuild.ArchList)
-        if not (MyBuild.LaunchPrebuildFlag and os.path.exists(MyBuild.PlatformBuildPath)):
+
+        if not (MyBuild.LaunchPrebuildFlag and os.path.exists(MyBuild.PlatformBuildPath)) and MyBuild.NinjaBuild != True:
             MyBuild.Launch()
+
+        if MyBuild.NinjaBuild == True:
+            CommandOption = 'build ' + MyBuild.PassCommandOption(MyBuild.BuildTargetList, MyBuild.ArchList, MyBuild.ToolChainList, MyBuild.PlatformFile, MyBuild.Target)
+            IncrementalBuildFlag, NinjaBuildFilePath = GenNinja.Edk2BuildCmdIsCached(CommandOption)
+            if IncrementalBuildFlag and NinjaBuildFilePath != None and MyBuild.NinjaGen != True:
+                GenNinja.gNinjaBuildFilePath = NinjaBuildFilePath
+                GenNinja.CallNinjaBuild(True)
+            else:
+                MyBuild._MultiThreadBuildPlatformNinja()
 
         #
         # All job done, no error found and no exception raised

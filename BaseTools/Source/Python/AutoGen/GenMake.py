@@ -13,6 +13,7 @@ import Common.LongFilePathOs as os
 import sys
 import string
 import re
+from AutoGen import GenNinja
 import os.path as path
 from Common import EdkLogger
 from Common.LongFilePathSupport import OpenLongFilePath as open
@@ -53,6 +54,7 @@ gIncludeMacroConversion = {
   "EFI_PPI_CONSUMER"                :   gPpiDefinition,
   "EFI_PPI_DEPENDENCY"              :   gPpiDefinition,
 }
+
 
 NMAKE_FILETYPE = "nmake"
 GMAKE_FILETYPE = "gmake"
@@ -197,7 +199,14 @@ class BuildFile(object):
     #  @retval FALSE    The build file exists and is the same as the one to be generated.
     #
     def Generate(self):
+
         FileContent = self._TEMPLATE_.Replace(self._TemplateDict)
+
+        if GlobalData.gNinjaBuild == True:
+            FileContent = "\nEDK_TOOLS_PATH={}\n".format(self._AutoGenObject.DataPipe.Get("Env_Var")["EDK_TOOLS_PATH"]) + "\nWORKSPACE={}\n".format(self._AutoGenObject.DataPipe.Get("Env_Var")["WORKSPACE"]) + FileContent
+            GenNinja.GenerateBuildStageNinjaRule(FileContent, os.path.join(self._AutoGenObject.MakeFileDir, 'build.ninja'), self.NinjaBuildTargetList)
+            return True
+
         FileName = self.getMakefileName()
         if not os.path.exists(os.path.join(self._AutoGenObject.MakeFileDir, "deps.txt")):
             with open(os.path.join(self._AutoGenObject.MakeFileDir, "deps.txt"),"w+") as fd:
@@ -448,6 +457,7 @@ cleanlib:
         self.IntermediateDirectoryList = ["$(DEBUG_DIR)", "$(OUTPUT_DIR)"]
 
         self.BuildTargetList = []           # [target string]
+        self.NinjaBuildTargetList = []
         self.CommonFileDependency = []
         self.FileListMacros = {}
         self.ListFileMacros = {}
@@ -733,6 +743,7 @@ cleanlib:
                     if '%s :' %(Dst) not in self.BuildTargetList:
                         self.BuildTargetList.append("%s : %s" %(Dst,Src))
                         self.BuildTargetList.append('\t' + self._CP_TEMPLATE_[self._Platform] %{'Src': Src, 'Dst': Dst})
+                        self.NinjaBuildTargetList.append((Dst, Src, [self._CP_TEMPLATE_[self._Platform] %{'Src': Src, 'Dst': Dst}]))
 
             FfsCmdList = Cmd[0]
             for index, Str in enumerate(FfsCmdList):
@@ -753,11 +764,13 @@ cleanlib:
             CmdString = ' '.join(FfsCmdList).strip()
             CmdString = self.ReplaceMacro(CmdString)
             self.BuildTargetList.append('\t%s' % CmdString)
+            self.NinjaBuildTargetList.append((OutputFile, DepsFileString, [CmdString]))
 
             self.ParseSecCmd(DepsFileList, Cmd[1])
             for SecOutputFile, SecDepsFile, SecCmd in self.FfsOutputFileList :
                 self.BuildTargetList.append('%s : %s' % (self.ReplaceMacro(SecOutputFile), self.ReplaceMacro(SecDepsFile)))
                 self.BuildTargetList.append('\t%s' % self.ReplaceMacro(SecCmd))
+                self.NinjaBuildTargetList.append((self.ReplaceMacro(SecOutputFile), self.ReplaceMacro(SecDepsFile), [self.ReplaceMacro(SecCmd)]))
             self.FfsOutputFileList = []
 
     def ParseSecCmd(self, OutputFileList, CmdTuple):
@@ -1056,7 +1069,7 @@ cleanlib:
                     if Type in [TAB_OBJECT_FILE, TAB_STATIC_LIBRARY]:
                         Deps.append("$(%s)" % T.ListFileMacro)
 
-                if self._AutoGenObject.BuildRuleFamily == TAB_COMPILER_MSFT and Type == TAB_C_CODE_FILE:
+                if self._AutoGenObject.BuildRuleFamily == TAB_COMPILER_MSFT and Type == TAB_C_CODE_FILE and GlobalData.gNinjaBuild != True:
                     T, CmdTarget, CmdTargetDict, CmdCppDict = self.ParserCCodeFile(T, Type, CmdSumDict, CmdTargetDict,
                                                                                    CmdCppDict, DependencyDict, RespFile,
                                                                                    ToolsDef, resp_file_number)
@@ -1069,12 +1082,14 @@ cleanlib:
                         self.BuildTargetList.append(CmdLine)
                 else:
                     TargetDict = {"target": self.PlaceMacro(T.Target.Path, self.Macros), "cmd": "\n\t".join(T.Commands),"deps": Deps}
+                    self.NinjaBuildTargetList.append((self.PlaceMacro(T.Target.Path, self.Macros), Deps, T.Commands))
                     self.BuildTargetList.append(self._BUILD_TARGET_TEMPLATE.Replace(TargetDict))
 
                     # Add a Makefile rule for targets generating multiple files.
                     # The main output is a prerequisite for the other output files.
                     for i in T.Outputs[1:]:
                         AnnexeTargetDict = {"target": self.PlaceMacro(i.Path, self.Macros), "cmd": "", "deps": self.PlaceMacro(T.Target.Path, self.Macros)}
+                        self.NinjaBuildTargetList.append((self.PlaceMacro(i.Path, self.Macros), self.PlaceMacro(T.Target.Path, self.Macros), []))
                         self.BuildTargetList.append(self._BUILD_TARGET_TEMPLATE.Replace(AnnexeTargetDict))
 
     def ParserCCodeFile(self, T, Type, CmdSumDict, CmdTargetDict, CmdCppDict, DependencyDict, RespFile, ToolsDef,

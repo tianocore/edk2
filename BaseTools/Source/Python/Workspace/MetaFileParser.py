@@ -121,6 +121,7 @@ class MetaFileParser(object):
 
     # Parser objects used to implement singleton
     MetaFiles = {}
+    MetaFilesList = set()
 
     ## Factory method
     #
@@ -162,7 +163,8 @@ class MetaFileParser(object):
         self._Packages = []
         self._FileLocalMacros = {}
         self._SectionsMacroDict = defaultdict(dict)
-
+        if r'.cache' not in FilePath.Path:
+            MetaFileParser.MetaFilesList.add(FilePath.Path)
         # for recursive parsing
         self._Owner = [Owner]
         self._From = From

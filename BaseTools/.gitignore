@@ -3,7 +3,6 @@
 *.obj
 *.pdb
 *.ilk
-*.exe
 *.pyc
 Source/C/VfrCompile/EfiVfrParser.cpp
 Source/C/VfrCompile/EfiVfrParser.h

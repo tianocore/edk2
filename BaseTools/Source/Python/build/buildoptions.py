@@ -73,6 +73,8 @@ class MyOptionParser():
 
         Parser.add_option("-w", "--warning-as-error", action="store_true", dest="WarningAsError", help="Treat warning in tools as error.")
         Parser.add_option("-j", "--log", action="store", dest="LogFile", help="Put log in specified file as well as on console.")
+        Parser.add_option("--ninja", action="store_true", dest="NinjaBuild", help="Use Ninja to build")
+        Parser.add_option("--ninja_gen", action="store_true", dest="NinjaGen", help="Generate Ninja build file")
 
         Parser.add_option("-s", "--silent", action="store_true", type=None, dest="SilentMode",
             help="Make use of silent mode of (n)make.")

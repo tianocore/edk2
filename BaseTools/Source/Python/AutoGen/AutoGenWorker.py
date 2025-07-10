@@ -204,6 +204,7 @@ class AutoGenWorkerInProcess(mp.Process):
             GlobalData.gDisableIncludePathCheck = False
             GlobalData.gFdfParser = self.data_pipe.Get("FdfParser")
             GlobalData.gDatabasePath = self.data_pipe.Get("DatabasePath")
+            GlobalData.gNinjaBuild = self.data_pipe.Get("NinjaBuild")
 
             GlobalData.gUseHashCache = self.data_pipe.Get("UseHashCache")
             GlobalData.gBinCacheSource = self.data_pipe.Get("BinCacheSource")

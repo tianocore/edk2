@@ -150,6 +150,8 @@ class MemoryDataPipe(DataPipe):
 
         self.DataContainer = {"gCommandMaxLength": GlobalData.gCommandMaxLength}
 
+        self.DataContainer = {"NinjaBuild": GlobalData.gNinjaBuild}
+
         self.DataContainer = {"Env_Var": {k:v for k, v in os.environ.items()}}
 
         self.DataContainer = {"PackageList": [(dec.MetaFile,dec.Arch) for dec in PlatformInfo.PackageList]}
