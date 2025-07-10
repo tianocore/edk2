@@ -2,6 +2,7 @@
 # RISC-V CPU Exception Handler Library
 #
 # Copyright (c) 2022-2023, Ventana Micro Systems Inc. All rights reserved.<BR>
+# Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -40,3 +41,6 @@
   PeCoffGetEntryPointLib
   MemoryAllocationLib
   DebugLib
+
+[Guids]
+  gEfiDebugImageInfoTableGuid
