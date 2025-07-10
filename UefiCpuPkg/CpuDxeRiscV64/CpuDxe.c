@@ -9,7 +9,10 @@
 **/
 
 #include "CpuDxe.h"
-
+#include <Pi/PiBootMode.h>
+#include <Pi/PiHob.h>
+#include <Library/HobLib.h>
+#include <Library/FdtLib.h>
 //
 // Global Variables
 //
@@ -331,19 +334,46 @@ InitializeCpu (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                  Status;
-  EFI_RISCV_FIRMWARE_CONTEXT  *FirmwareContext;
+  EFI_STATUS  Status;
+  //
+  // Locate the FDT HOB and validate header
+  //
+  CONST EFI_HOB_GUID_TYPE  *Hob = GetFirstGuidHob (&gFdtHobGuid);
 
-  GetFirmwareContextPointer (&FirmwareContext);
-  ASSERT (FirmwareContext != NULL);
-  if (FirmwareContext == NULL) {
-    DEBUG ((DEBUG_ERROR, "Failed to get the pointer of EFI_RISCV_FIRMWARE_CONTEXT\n"));
-    return EFI_NOT_FOUND;
-  }
+  ASSERT (Hob != NULL);
 
-  DEBUG ((DEBUG_INFO, " %a: Firmware Context is at 0x%x.\n", __func__, FirmwareContext));
+  CONST VOID  *DeviceTreeBase =
+    (CONST VOID *)(UINTN)*(CONST UINT64 *)GET_GUID_HOB_DATA (Hob);
 
-  mBootHartId = FirmwareContext->BootHartId;
+  ASSERT (FdtCheckHeader (DeviceTreeBase) == 0);
+
+  //
+  // /cpus node
+  //
+  INT32  Node = FdtSubnodeOffsetNameLen (
+                  DeviceTreeBase,
+                  0,
+                  "cpus",
+                  sizeof ("cpus") - 1
+                  );
+
+  ASSERT (Node >= 0);
+
+  //
+  // boot-hart
+  //
+  INT32               Len;
+  CONST FDT_PROPERTY  *Prop =
+    FdtGetProperty (DeviceTreeBase, Node, "boot-hart", &Len);
+
+  ASSERT (Prop != NULL && Len == sizeof (UINT32));
+
+  //
+  // Device-tree cells are big-endian
+  //
+  UINTN  BootHartId = SwapBytes32 (*(CONST UINT32 *)Prop->Data);
+
+  mBootHartId = BootHartId;
   DEBUG ((DEBUG_INFO, " %a: mBootHartId = 0x%x.\n", __func__, mBootHartId));
 
   InitializeCpuExceptionHandlers (NULL);
