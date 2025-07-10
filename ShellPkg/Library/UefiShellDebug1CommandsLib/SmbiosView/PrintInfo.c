@@ -7,6 +7,7 @@
   (C) Copyright 2015-2019 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2023 Apple Inc. All rights reserved.<BR>
   Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -2908,7 +2909,7 @@ DisplayProcessorStatus (
       break;
 
     case 3:
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_CPU_DIABLED_BY_BIOS), gShellDebug1HiiHandle);
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_CPU_DISABLED_BY_BIOS), gShellDebug1HiiHandle);
       break;
 
     case 4:

@@ -2,6 +2,7 @@
   Platform PEI driver
 
   Copyright (c) 2024 Loongson Technology Corporation Limited. All rights reserved.<BR>
+  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -238,7 +239,7 @@ MiscInitialization (
   CpuPhysMemAddressWidth = (UINT8)(CpucfgReg1Data.Bits.PALEN + 1);
 
   //
-  // Creat CPU HOBs.
+  // Create CPU HOBs.
   //
   BuildCpuHob (CpuPhysMemAddressWidth, FixedPcdGet8 (PcdPrePiCpuIoSize));
 }
