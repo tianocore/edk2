@@ -2524,7 +2524,7 @@
 
   ## This option chooses between pass through and MM mode of communication.
   # @Prompt Mode of transport for management service requests
-  gEfiMdePkgTokenSpaceGuid.PcdMMPassThroughEnable|TRUE|BOOLEAN|0x10000037
+  gEfiMdePkgTokenSpaceGuid.PcdMMPassThroughEnable|FALSE|BOOLEAN|0x10000037
 
   ## This is requester's LUN for IPMI Serial.
   # @Prompt IPMI Serial requester LUN
