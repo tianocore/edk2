@@ -19,8 +19,6 @@
   ENTRY_POINT                    = NorFlashInitialise
 
 [Sources.common]
-  VirtNorFlash.h
-  VirtNorFlash.c
   VirtNorFlashStandaloneMm.c
   VirtNorFlashFvb.c
 
@@ -41,6 +39,7 @@
   MmServicesTableLib
   VirtNorFlashPlatformLib
   StandaloneMmDriverEntryPoint
+  VirtNorFlashDeviceLib
 
 [Guids]
   gEfiSystemNvDataFvGuid
