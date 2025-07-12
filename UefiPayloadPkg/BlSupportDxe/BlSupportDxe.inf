@@ -47,13 +47,16 @@
   BaseMemoryLib
   UefiLib
   HobLib
+  MemoryAllocationLib
 
 [LibraryClasses.AARCH64]
   ArmMmuLib
 
 [Guids]
   gUefiAcpiBoardInfoGuid
+  gEfiFirmwareInfoHobGuid
   gEfiGraphicsInfoHobGuid
+  gEfiSystemResourceTableGuid
 
 [Protocols]
   gEfiCpuArchProtocolGuid

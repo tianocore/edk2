@@ -38,6 +38,7 @@
 #include <UniversalPayload/SerialPortInfo.h>
 #include <UniversalPayload/DeviceTree.h>
 #include <Guid/PcdDataBaseSignatureGuid.h>
+#include <Guid/FirmwareInfoGuid.h>
 #include <Guid/SmmStoreInfoGuid.h>
 
 #define LEGACY_8259_MASK_REGISTER_MASTER  0x21

@@ -14,6 +14,7 @@
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
 #include <Library/BlParseLib.h>
+#include <Library/PrintLib.h>
 #include <Library/SmmStoreParseLib.h>
 #include <IndustryStandard/Acpi.h>
 #include <Coreboot.h>
@@ -635,6 +636,117 @@ ParseSmmStoreInfo (
   SmmStoreInfo->NumBlocks     = CbSSRec->num_blocks;
   SmmStoreInfo->MmioAddress   = CbSSRec->mmap_addr;
   SmmStoreInfo->ApmCmd        = CbSSRec->apm_cmd;
+
+  return RETURN_SUCCESS;
+}
+
+/**
+  Parse information in a string form identified by a number
+
+  @param  Id  String identifier.
+
+  @retval NULL       The requested information wasn't found.
+  @retval Otherwise  A pointer to a static string.
+**/
+STATIC
+CONST CHAR8 *
+EFIAPI
+ParseInfoString (
+  IN UINTN  Id
+  )
+{
+  struct cb_string  *CbString;
+
+  CbString = FindCbTag (Id);
+  if (CbString == NULL) {
+    return NULL;
+  }
+
+  return (CONST CHAR8 *)CbString->string;
+}
+
+/**
+  Parse firmware information passed in by bootloader
+
+  @param  FwInfo   Information about current firmware.
+
+  @retval RETURN_INVALID_PARAMETER  The parameter is NULL.
+  @retval RETURN_SUCCESS            Successfully parsed information.
+  @retval RETURN_NOT_FOUND          The information is missing.
+**/
+RETURN_STATUS
+EFIAPI
+ParseFirmwareInfo (
+  OUT FIRMWARE_INFO  *FwInfo
+  )
+{
+  CONST CHAR8            *Version;
+  CONST CHAR8            *ExtraVersion;
+  struct lb_efi_fw_info  *Info;
+
+  if (FwInfo == NULL) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  Info = FindCbTag (CB_TAG_FW_INFO);
+  if (Info == NULL) {
+    return RETURN_NOT_FOUND;
+  }
+
+  Version      = ParseInfoString (CB_TAG_VERSION);
+  ExtraVersion = ParseInfoString (CB_TAG_EXTRA_VERSION);
+
+  /* No big deal if these aren't available. */
+  if ((Version == NULL) && (ExtraVersion == NULL)) {
+    Version      = "coreboot+EDK2 (unknown version)";
+    ExtraVersion = "";
+  } else if (Version == NULL) {
+    Version = "";
+  } else if (ExtraVersion == NULL) {
+    ExtraVersion = "";
+  }
+
+  CopyMem (&FwInfo->Type, &Info->guid, sizeof (FwInfo->Type));
+  FwInfo->Version                = Info->version;
+  FwInfo->LowestSupportedVersion = Info->lowest_supported_version;
+  FwInfo->ImageSize              = Info->fw_size;
+  AsciiSPrint (FwInfo->VersionStr, sizeof (FwInfo->VersionStr), "%a%a", Version, ExtraVersion);
+  return RETURN_SUCCESS;
+}
+
+/**
+  Parse update capsules passed in by bootloader
+
+  @param  CapsuleCallback   The callback routine invoked for each capsule.
+
+  @retval RETURN_SUCCESS    Successfully parsed capsules.
+  @retval RETURN_NOT_FOUND  Failed to look up the information.
+**/
+RETURN_STATUS
+EFIAPI
+ParseCapsules (
+  IN BL_CAPSULE_CALLBACK  CapsuleCallback
+  )
+{
+  struct cb_header  *Header;
+  struct cb_range   *Range;
+  UINT8             *TmpPtr;
+  UINTN             Idx;
+
+  Header = GetParameterBase ();
+  if (Header == NULL) {
+    return RETURN_NOT_FOUND;
+  }
+
+  TmpPtr = (UINT8 *)Header + Header->header_bytes;
+  for (Idx = 0; Idx < Header->table_entries; Idx++) {
+    Range = (struct cb_range *)TmpPtr;
+    if (Range->tag == CB_TAG_CAPSULE) {
+      CapsuleCallback (Range->range_start, Range->range_size);
+    }
+
+    TmpPtr += Range->size;
+  }
 
   return RETURN_SUCCESS;
 }
