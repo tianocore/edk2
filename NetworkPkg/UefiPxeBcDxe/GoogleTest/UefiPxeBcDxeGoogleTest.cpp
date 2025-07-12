@@ -3,7 +3,7 @@
   Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
-#include <gtest/gtest.h>
+#include <Library/GoogleTestLib.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Run the tests

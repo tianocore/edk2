@@ -107,5 +107,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase
   gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataSize
 
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogSize
+
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode

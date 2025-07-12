@@ -802,7 +802,7 @@ GetResourcePadding (
   @param[in] ImageHandle  Image handle of this driver.
   @param[in] SystemTable  Pointer to SystemTable.
 
-  @retval EFI_SUCESS       Driver has loaded successfully.
+  @retval EFI_SUCCESS      Driver has loaded successfully.
   @return                  Error codes from lower level functions.
 
 **/

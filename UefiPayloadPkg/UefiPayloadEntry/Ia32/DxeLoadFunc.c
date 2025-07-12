@@ -280,14 +280,6 @@ HandOffToDxeCore (
   IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, 0xFF);
   IoWrite8 (LEGACY_8259_MASK_REGISTER_SLAVE, 0xFF);
 
-  //
-  // Clear page 0 and mark it as allocated if NULL pointer detection is enabled.
-  //
-  if (IsNullDetectionEnabled ()) {
-    ClearFirst4KPage (HobList.Raw);
-    BuildMemoryAllocationHob (0, EFI_PAGES_TO_SIZE (1), EfiBootServicesData);
-  }
-
   BaseOfStack = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocatePages (EFI_SIZE_TO_PAGES (STACK_SIZE));
   ASSERT (BaseOfStack != 0);
 

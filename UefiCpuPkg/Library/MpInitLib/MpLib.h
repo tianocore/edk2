@@ -213,18 +213,23 @@ typedef struct {
   UINTN              StackStart;
   UINTN              StackSize;
   UINTN              CFunction;
+  //
+  // NumApsExecuting and ApIndex are used atomically (in the
+  // assembly code). To avoid split-lock violations, keep them
+  // naturally aligned within a single cacheline.
+  //
+  UINTN              NumApsExecuting;
+  UINTN              ApIndex;
   IA32_DESCRIPTOR    GdtrProfile;
   IA32_DESCRIPTOR    IdtrProfile;
   UINTN              BufferStart;
   UINTN              ModeOffset;
-  UINTN              ApIndex;
   UINTN              CodeSegment;
   UINTN              DataSegment;
   UINTN              EnableExecuteDisable;
   UINTN              Cr3;
   UINTN              InitFlag;
   CPU_INFO_IN_HOB    *CpuInfo;
-  UINTN              NumApsExecuting;
   CPU_MP_DATA        *CpuMpData;
   UINTN              InitializeFloatingPointUnitsAddress;
   UINT32             ModeTransitionMemory;
@@ -528,7 +533,7 @@ GetNextMpHandOffHob (
   @retval 0       Cannot find free memory below 4GB.
 **/
 UINTN
-AllocateCodeBuffer (
+AllocateCodePage (
   IN UINTN  BufferSize
   );
 
@@ -986,14 +991,23 @@ AllocateApLoopCodeBuffer (
 /**
   Remove Nx protection for the range specific by BaseAddress and Length.
 
-  The PEI implementation uses CpuPageTableLib to change the attribute.
-  The DXE implementation uses gDS to change the attribute.
-
   @param[in] BaseAddress  BaseAddress of the range.
   @param[in] Length       Length of the range.
 **/
 VOID
-RemoveNxprotection (
+RemoveNxProtection (
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN                 Length
+  );
+
+/**
+Add ReadOnly protection to the range specified by BaseAddress and Length.
+
+@param[in] BaseAddress  BaseAddress of the range.
+@param[in] Length       Length of the range.
+**/
+VOID
+ApplyRoProtection (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINTN                 Length
   );

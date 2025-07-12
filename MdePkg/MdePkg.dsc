@@ -24,9 +24,6 @@
 
 !include MdePkg/MdeLibs.dsc.inc
 
-[PcdsFeatureFlag]
-  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport|TRUE
-
 [PcdsFixedAtBuild]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0f
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
@@ -210,6 +207,7 @@
   MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
   MdePkg/Library/ArmSmcLibNull/ArmSmcLibNull.inf
   MdePkg/Library/ArmSvcLib/ArmSvcLib.inf
+  MdePkg/Library/ArmFfaMemMgmtLib/ArmFfaMemMgmtLib.inf
 
 [Components.RISCV64]
   MdePkg/Library/BaseRiscVSbiLib/BaseRiscVSbiLib.inf

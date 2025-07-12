@@ -58,7 +58,8 @@ TdxHashLogExtendEvent (
   }
 
   MrIndex = TdxMeasurementMapPcrToMrIndex (PcrIndex);
-  if (MrIndex == CC_MR_INDEX_INVALID) {
+  // MRTD is NOT extendable in TDVF.
+  if ((MrIndex == CC_MR_INDEX_INVALID) || (MrIndex == CC_MR_INDEX_0_MRTD)) {
     return EFI_INVALID_PARAMETER;
   }
 

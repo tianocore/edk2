@@ -1,0 +1,29 @@
+## @file
+#  SLIT Table Generator
+#
+#  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 1.30
+  BASE_NAME      = AcpiSlitLib
+  FILE_GUID      = 5735C624-E8ED-426C-8292-6712EF4D8329
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiSlitLibConstructor
+  DESTRUCTOR     = AcpiSlitLibDestructor
+
+[Sources]
+  SlitGenerator.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  CmObjHelperLib
