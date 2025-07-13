@@ -7,11 +7,7 @@
 //
 // ------------------------------------------------------------------------------
 
-#if defined (_M_ARM64)
-typedef unsigned __int64 size_t;
-#else
-typedef unsigned __int32 size_t;
-#endif
+#include <stddef.h>
 
 int
 memcmp (
