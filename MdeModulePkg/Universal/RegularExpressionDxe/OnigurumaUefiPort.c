@@ -110,29 +110,6 @@ realloc (
   return NULL;
 }
 
-#if !defined (MDE_CPU_ARM)
-void *
-memcpy (
-  void          *dest,
-  const void    *src,
-  unsigned int  count
-  )
-{
-  return CopyMem (dest, src, (UINTN)count);
-}
-
-#endif
-
-void *
-memset (
-  void          *dest,
-  int           ch,
-  unsigned int  count
-  )
-{
-  return SetMem (dest, (UINTN)count, (UINT8)ch);
-}
-
 void
 free (
   void  *ptr
