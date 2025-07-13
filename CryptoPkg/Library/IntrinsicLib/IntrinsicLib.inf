@@ -18,14 +18,10 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = IA32
 #
 
 [Sources]
-  MemoryIntrinsics.c
-
-[Sources.IA32]
-  CopyMem.c
   Math.c                    | GCC
 
   Ia32/MathLShiftS64.c      | MSFT
@@ -51,11 +47,7 @@
 
   Ia32/MathUlldiv.nasm      | CLANGPDB
 [Sources.X64]
-  CopyMem.c
   Math.c                    | GCC
-
-[Sources.RISCV64]
-  CopyMem.c
 
 [Packages]
   MdePkg/MdePkg.dec
