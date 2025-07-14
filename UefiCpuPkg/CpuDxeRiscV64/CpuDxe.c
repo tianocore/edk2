@@ -9,6 +9,10 @@
 **/
 
 #include "CpuDxe.h"
+#include <Pi/PiBootMode.h>
+#include <Pi/PiHob.h>
+#include <Library/HobLib.h>
+#include <Library/FdtLib.h>
 
 //
 // Global Variables
@@ -337,10 +341,72 @@ InitializeCpu (
   const EFI_GUID          SecHobDataGuid = RISCV_SEC_HANDOFF_HOB_GUID;
 
   Hob = GetFirstGuidHob (&SecHobDataGuid);
-  ASSERT (Hob != NULL);
+  if (Hob != NULL) {
+    SecData     = GET_GUID_HOB_DATA (Hob);
+    mBootHartId = SecData->BootHartId;
+  } else {
+    const EFI_HOB_GUID_TYPE  *FdtHob;
+    const VOID               *DeviceTreeBase;
+    const FDT_PROPERTY       *Prop;
+    INT32                    Node;
+    INT32                    Len;
 
-  SecData     = GET_GUID_HOB_DATA (Hob);
-  mBootHartId = SecData->BootHartId;
+    FdtHob = GetFirstGuidHob (&gFdtHobGuid);
+
+    if (FdtHob == NULL) {
+      DEBUG ((DEBUG_ERROR, "FDT GUID HOB not found!\n"));
+      return EFI_NOT_FOUND;
+    }
+
+    DeviceTreeBase = (CONST VOID *)(*(UINTN *)GET_GUID_HOB_DATA (FdtHob));
+
+    if (FdtCheckHeader (DeviceTreeBase) != 0) {
+      DEBUG ((DEBUG_ERROR, "FDT header is invalid!\n"));
+      return EFI_INVALID_PARAMETER;
+    }
+
+    //
+    // /chosen node
+    //
+    Node = FdtSubnodeOffsetNameLen (
+             DeviceTreeBase,
+             0,
+             "chosen",
+             sizeof ("chosen") - 1
+             );
+
+    if (Node < 0) {
+      DEBUG ((DEBUG_WARN, "/chosen node not found in FDT.\n"));
+      return EFI_NOT_FOUND;
+    }
+
+    //
+    // boot-hartid
+    //
+    Prop = FdtGetProperty (DeviceTreeBase, Node, "boot-hartid", &Len);
+
+    if (Prop == NULL) {
+      DEBUG ((DEBUG_WARN, "boot-hartid property not found.\n"));
+      return EFI_NOT_FOUND;
+    }
+
+    if (Len > sizeof (UINTN)) {
+      DEBUG ((DEBUG_ERROR, "boot-hartid value too large for this architecture.\n"));
+      return EFI_UNSUPPORTED;
+    }
+
+    //
+    // Device-tree cells are big-endian
+    //
+    if (Len == sizeof (UINT32)) {
+      mBootHartId = SwapBytes32 (*(CONST UINT32 *)Prop->Data);
+    } else if (Len == sizeof (UINT64)) {
+      mBootHartId = SwapBytes64 (*(CONST UINT64 *)Prop->Data);
+    } else {
+      DEBUG ((DEBUG_ERROR, "boot-hartid property has invalid size.\n"));
+      return EFI_INVALID_PARAMETER;
+    }
+  }
 
   DEBUG ((DEBUG_INFO, " %a: mBootHartId = 0x%x.\n", __func__, mBootHartId));
 
