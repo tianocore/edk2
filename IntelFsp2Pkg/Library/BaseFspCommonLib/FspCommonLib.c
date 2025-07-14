@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2025, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -165,37 +165,6 @@ SetFspApiReturnStatus (
 
   FspData                                                              = GetFspGlobalDataPointer ();
   *(UINTN *)(FspData->CoreStack + CONTEXT_STACK_OFFSET (Registers[7])) = ReturnStatus;
-}
-
-/**
-  This function sets the context switching stack to a new stack frame.
-
-  @param[in] NewStackTop       New core stack to be set.
-
-**/
-VOID
-EFIAPI
-SetFspCoreStackPointer (
-  IN VOID  *NewStackTop
-  )
-{
-  FSP_GLOBAL_DATA  *FspData;
-  UINTN            *OldStack;
-  UINTN            *NewStack;
-  UINT32           StackContextLen;
-
-  FspData         = GetFspGlobalDataPointer ();
-  StackContextLen = sizeof (CONTEXT_STACK) / sizeof (UINTN);
-
-  //
-  // Reserve space for the ContinuationFunc two parameters
-  //
-  OldStack           = (UINTN *)FspData->CoreStack;
-  NewStack           = (UINTN *)NewStackTop - StackContextLen - 2;
-  FspData->CoreStack = (UINTN)NewStack;
-  while (StackContextLen-- != 0) {
-    *NewStack++ = *OldStack++;
-  }
 }
 
 /**
