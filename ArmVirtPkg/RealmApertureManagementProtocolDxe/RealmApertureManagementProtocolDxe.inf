@@ -1,7 +1,7 @@
 ## @file
 #  Module to manage the sharing of buffers in a Realm with the Host.
 #
-#  Copyright (c) 2022 - 2023, Arm Limited. All rights reserved.
+#  Copyright (c) 2022 - 2025, Arm Limited. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -44,6 +44,7 @@
 
 [Protocols]
   gEfiRealmApertureManagementProtocolGuid         ## SOMETIME_PRODUCES
+  gEfiRealmApertureManagementAbsentProtocolGuid   ## SOMETIME_PRODUCES
   gEfiResetNotificationProtocolGuid               ## CONSUMES
 
 [Depex]
