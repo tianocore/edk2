@@ -242,7 +242,12 @@ if not defined WINDDK3790_PREFIX (
 )
 
 if not defined IASL_PREFIX (
-  set IASL_PREFIX=C:\ASL\
+  if exist "C:\ASL\" (
+    set IASL_PREFIX=C:\ASL\
+  ) else (
+      @echo.
+      @echo !!! WARNING !!! IASL_PREFIX environment variable is not set
+  )
 )
 
 popd
