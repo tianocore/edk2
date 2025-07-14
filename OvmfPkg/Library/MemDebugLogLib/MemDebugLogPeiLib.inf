@@ -29,11 +29,6 @@
 [LibraryClasses]
   SynchronizationLib
   PcdLib
-
-[LibraryClasses.Ia32]
-  QemuFwCfgSimpleParserLib
-
-[LibraryClasses.X64]
   QemuFwCfgSimpleParserLib
 
 [Guids]
