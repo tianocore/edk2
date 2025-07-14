@@ -163,7 +163,7 @@ typedef union {
 #define FOREGROUND_CONTROL_OFFSET  6
 #define BACKGROUND_CONTROL_OFFSET  11
 #define ROW_OFFSET                 2
-#define COLUMN_OFFSET              5
+#define COLUMN_OFFSET              6
 #define FW_BACK_OFFSET             2
 #define RESIZE_ROW_OFFSET          4
 #define RESIZE_COLUMN_OFFSET       8
