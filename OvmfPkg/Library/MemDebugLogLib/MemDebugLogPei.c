@@ -9,11 +9,10 @@
 
 #include <PiPei.h>
 #include <Library/PeiServicesLib.h>
-#include <Library/QemuFwCfgSimpleParserLib.h>
+#if !(defined (MDE_CPU_AARCH64))
+  #include <Library/QemuFwCfgSimpleParserLib.h>
+#endif
 #include <Library/MemDebugLogLib.h>
-
-EFI_PHYSICAL_ADDRESS  mMemDebugLogBufAddr;
-BOOLEAN               mMemDebugLogBufAddrInit;
 
 EFI_STATUS
 EFIAPI
@@ -22,23 +21,20 @@ MemDebugLogWrite (
   IN  UINTN  Length
   )
 {
-  EFI_STATUS  Status;
+  EFI_PHYSICAL_ADDRESS  MemDebugLogBufAddr;
+  EFI_STATUS            Status;
 
-  if (!mMemDebugLogBufAddrInit) {
-    //
-    // Obtain the Memory Debug Log buffer addr from HOB
-    // NOTE: This is expected to fail until the HOB is created.
-    //
-    Status = MemDebugLogAddrFromHOB (&mMemDebugLogBufAddr);
-    if (EFI_ERROR (Status)) {
-      mMemDebugLogBufAddr = 0;
-    } else {
-      mMemDebugLogBufAddrInit = TRUE;
-    }
+  //
+  // Obtain the Memory Debug Log buffer addr from HOB
+  // NOTE: This is expected to fail until the HOB is created.
+  //
+  Status = MemDebugLogAddrFromHOB (&MemDebugLogBufAddr);
+  if (EFI_ERROR (Status)) {
+    MemDebugLogBufAddr = 0;
   }
 
-  if (mMemDebugLogBufAddr) {
-    Status = MemDebugLogWriteBuffer (mMemDebugLogBufAddr, Buffer, Length);
+  if (MemDebugLogBufAddr) {
+    Status = MemDebugLogWriteBuffer (MemDebugLogBufAddr, Buffer, Length);
   } else {
     //
     // HOB has not yet been created, so
@@ -64,19 +60,28 @@ MemDebugLogPages (
   VOID
   )
 {
-  UINT32      FwCfg_MemDebugLogPages;
-  UINT32      MemDebugLogBufPages;
-  EFI_STATUS  Status;
+  UINT32  MemDebugLogBufPages;
 
+ #if !(defined (MDE_CPU_AARCH64))
+  UINT32      FwCfg_MemDebugLogPages;
+  EFI_STATUS  Status;
+ #endif
+
+  MemDebugLogBufPages = FixedPcdGet32 (PcdMemDebugLogPages);
+
+  //
+  // FwCfg is not supported on AARCH64 in PEI
+  //
+ #if !(defined (MDE_CPU_AARCH64))
   //
   // Allow FwCfg value to override Pcd.
   //
   Status = QemuFwCfgParseUint32 ("opt/ovmf/MemDebugLogPages", TRUE, &FwCfg_MemDebugLogPages);
   if (Status == EFI_SUCCESS) {
     MemDebugLogBufPages = FwCfg_MemDebugLogPages;
-  } else {
-    MemDebugLogBufPages = FixedPcdGet32 (PcdMemDebugLogPages);
   }
+
+ #endif
 
   //
   // Cap max memory debug log size at MAX_MEM_DEBUG_LOG_PAGES

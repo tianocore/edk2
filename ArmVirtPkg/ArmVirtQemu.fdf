@@ -106,6 +106,9 @@ READ_LOCK_STATUS   = TRUE
 
   INF ArmPlatformPkg/Sec/Sec.inf
   INF MdeModulePkg/Core/Pei/PeiMain.inf
+!if $(DEBUG_TO_MEM)
+INF  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
+!endif
   INF ArmPlatformPkg/PlatformPei/PlatformPeim.inf
   INF ArmVirtPkg/MemoryInitPei/MemoryInitPeim.inf
   INF ArmPkg/Drivers/CpuPei/CpuPei.inf

@@ -47,6 +47,11 @@
   DebugLib|ArmVirtPkg/Library/DebugLibFdtPL011Uart/DebugLibFdtPL011UartRam.inf
 !endif
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
+!if $(DEBUG_TO_MEM)
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogDxeLib.inf
+!else
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogLibNull.inf
+!endif
 
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
@@ -191,6 +196,9 @@
 !if $(TARGET) != RELEASE
   DebugLib|ArmVirtPkg/Library/DebugLibFdtPL011Uart/DebugLibFdtPL011UartFlash.inf
 !endif
+!if $(DEBUG_TO_MEM)
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogLibNull.inf
+!endif
 
 [LibraryClasses.common.PEI_CORE]
   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
@@ -209,6 +217,9 @@
 !if $(TARGET) != RELEASE
   DebugLib|ArmVirtPkg/Library/DebugLibFdtPL011Uart/DebugLibFdtPL011UartFlash.inf
 !endif
+!if $(DEBUG_TO_MEM)
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogPeiCoreLib.inf
+!endif
 
 [LibraryClasses.common.PEIM]
   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
@@ -226,6 +237,9 @@
   SerialPortLib|ArmVirtPkg/Library/FdtPL011SerialPortLib/EarlyFdtPL011SerialPortLib.inf
 !if $(TARGET) != RELEASE
   DebugLib|ArmVirtPkg/Library/DebugLibFdtPL011Uart/DebugLibFdtPL011UartFlash.inf
+!endif
+!if $(DEBUG_TO_MEM)
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogPeiLib.inf
 !endif
 
 [LibraryClasses.common.UEFI_DRIVER]
@@ -258,6 +272,9 @@
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
 !if $(TARGET) != RELEASE
   DebugLib|ArmVirtPkg/Library/DebugLibFdtPL011Uart/DxeRuntimeDebugLibFdtPL011Uart.inf
+!endif
+!if $(DEBUG_TO_MEM)
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogRtLib.inf
 !endif
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
 

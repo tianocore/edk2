@@ -345,6 +345,9 @@
   #
   ArmPlatformPkg/Sec/Sec.inf
   MdeModulePkg/Core/Pei/PeiMain.inf
+!if $(DEBUG_TO_MEM)
+  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
+!endif
   ArmPlatformPkg/PlatformPei/PlatformPeim.inf
   ArmVirtPkg/MemoryInitPei/MemoryInitPeim.inf
   ArmPkg/Drivers/CpuPei/CpuPei.inf
@@ -383,6 +386,9 @@
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf {
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+!if $(DEBUG_TO_MEM)
+      MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogLibNull.inf
+!endif
   }
 
   #
@@ -490,6 +496,9 @@
     <LibraryClasses>
       DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+!if $(DEBUG_TO_MEM)
+      MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogLibNull.inf
+!endif
   }
   MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
   MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf

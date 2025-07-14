@@ -24,6 +24,7 @@
 #include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugPrintErrorLevelLib.h>
+#include <Library/MemDebugLogLib.h>
 
 #include "Write.h"
 
@@ -120,6 +121,13 @@ DebugPrintMarker (
   // Send the print string to a Serial Port
   //
   DebugLibFdtPL011UartWrite ((UINT8 *)Buffer, AsciiStrLen (Buffer));
+
+  //
+  // Send string to Memory Debug Log if enabled
+  //
+  if (MemDebugLogEnabled ()) {
+    MemDebugLogWrite ((CHAR8 *)Buffer, AsciiStrLen (Buffer));
+  }
 }
 
 /**
@@ -216,6 +224,13 @@ DebugAssert (
   // Send the print string to the Console Output device
   //
   DebugLibFdtPL011UartWrite ((UINT8 *)Buffer, AsciiStrLen (Buffer));
+
+  //
+  // Send the string to Memory Debug Log
+  //
+  if (MemDebugLogEnabled ()) {
+    MemDebugLogWrite ((CHAR8 *)Buffer, AsciiStrLen (Buffer));
+  }
 
   //
   // Generate a Breakpoint, DeadLoop, or NOP based on PCD settings
