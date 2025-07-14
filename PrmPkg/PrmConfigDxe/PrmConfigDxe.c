@@ -87,7 +87,7 @@ SetRuntimeMemoryRangeAttributes (
       ));
     DEBUG ((
       DEBUG_INFO,
-      "      %a %a: Physical address = 0x%016x. Length = 0x%x.\n",
+      "      %a %a: Physical address = 0x%016llx. Length = 0x%x.\n",
       _DBGMSGID_,
       __func__,
       RuntimeMmioRanges->Range[Index].PhysicalBaseAddress,
@@ -144,7 +144,7 @@ SetRuntimeMemoryRangeAttributes (
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
-        "      %a %a: Error [%r] finding descriptor for runtime memory range 0x%016x.\n",
+        "      %a %a: Error [%r] finding descriptor for runtime memory range 0x%016llx.\n",
         _DBGMSGID_,
         __func__,
         Status,
@@ -171,7 +171,7 @@ SetRuntimeMemoryRangeAttributes (
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
-        "      %a %a: Error [%r] setting descriptor for runtime memory range 0x%016x.\n",
+        "      %a %a: Error [%r] setting descriptor for runtime memory range 0x%016llx.\n",
         _DBGMSGID_,
         __func__,
         Status,
