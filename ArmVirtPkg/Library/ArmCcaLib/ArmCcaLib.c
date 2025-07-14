@@ -249,7 +249,7 @@ ArmCcaMemRangeIsProtectedMmio (
       return RetStatus;
     }
 
-    if ((Top <= Base) || (State != RipasDev)) {
+    if (State != RipasDev) {
       // The address range is not protected MMIO.
       *IsProtectedMmio = FALSE;
       return RetStatus;

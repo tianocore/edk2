@@ -8,6 +8,7 @@
 **/
 
 #include <Base.h>
+#include <Library/ArmCcaLib.h>
 #include <Library/ArmCcaRsiLib.h>
 #include <Library/ArmLib.h>
 #include <Library/BaseLib.h>
@@ -47,6 +48,12 @@ ArmVirtGetMemoryMap (
   VOID                          *DtbBase;
   UINTN                         Devices;
   EFI_STATUS                    Status;
+  UINT64                        BaseAddress;
+  UINT64                        Length;
+  BOOLEAN                       IsProtectedMmio;
+  BOOLEAN                       IsRealmContext;
+  UINT64                        IpaWidth;
+  UINT64                        DevMapBit;
 
   ASSERT (VirtualMemoryMap != NULL);
 
@@ -93,20 +100,45 @@ ArmVirtGetMemoryMap (
   VirtualMemoryTable[Idx].Length         = FixedPcdGet32 (PcdFvSize);
   VirtualMemoryTable[Idx].Attributes     = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
 
+  IsRealmContext = IsRealm ();
+  if (IsRealmContext) {
+    Status = GetIpaWidth (&IpaWidth);
+    if (RETURN_ERROR (Status)) {
+      return;
+    }
+
+    DevMapBit = 1ULL << (IpaWidth - 1);
+  }
+
   // Map peripheral devices
   for (Devices = 0; Devices < mPlatInfo.MaxDevices; Devices++) {
-    VirtualMemoryTable[++Idx].PhysicalBase = mPlatInfo.Dev[Devices].BaseAddress;
-    VirtualMemoryTable[Idx].VirtualBase    = mPlatInfo.Dev[Devices].BaseAddress;
+    BaseAddress = mPlatInfo.Dev[Devices].BaseAddress;
+
     // Some devices may only use few registers and would report the length
     // accordingly. Although this is correct, the device is expected to reserve
     // at least a page for MMIO page mapping. Therefore, align the address
     // range to the nearest page size.
-    VirtualMemoryTable[Idx].Length = ALIGN_VALUE (
-                                       mPlatInfo.Dev[Devices].Length,
-                                       EFI_PAGE_SIZE
-                                       );
-    VirtualMemoryTable[Idx].Attributes = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
-  }
+    Length = ALIGN_VALUE (mPlatInfo.Dev[Devices].Length, EFI_PAGE_SIZE);
+
+    if (!IsRealmContext) {
+      VirtualMemoryTable[++Idx].PhysicalBase = BaseAddress;
+    } else {
+      Status = ArmCcaMemRangeIsProtectedMmio (
+                 BaseAddress,
+                 Length,
+                 &IsProtectedMmio
+                 );
+      if (RETURN_ERROR (Status)) {
+        return;
+      }
+
+      VirtualMemoryTable[++Idx].PhysicalBase = IsProtectedMmio ? BaseAddress : (BaseAddress | DevMapBit);
+    }
+
+    VirtualMemoryTable[Idx].VirtualBase = BaseAddress;
+    VirtualMemoryTable[Idx].Length      = Length;
+    VirtualMemoryTable[Idx].Attributes  = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
+  } // Map Peripheral devices
 
   // End of Table
   VirtualMemoryTable[++Idx].PhysicalBase = 0;

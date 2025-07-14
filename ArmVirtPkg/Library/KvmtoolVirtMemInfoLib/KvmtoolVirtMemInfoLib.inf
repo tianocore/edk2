@@ -27,6 +27,7 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  ArmCcaLib
   ArmLib
   BaseLib
   BaseMemoryLib
