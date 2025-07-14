@@ -12,9 +12,6 @@
 #include <Library/QemuFwCfgSimpleParserLib.h>
 #include <Library/MemDebugLogLib.h>
 
-EFI_PHYSICAL_ADDRESS  mMemDebugLogBufAddr;
-BOOLEAN               mMemDebugLogBufAddrInit;
-
 EFI_STATUS
 EFIAPI
 MemDebugLogWrite (
@@ -22,23 +19,21 @@ MemDebugLogWrite (
   IN  UINTN  Length
   )
 {
-  EFI_STATUS  Status;
+  EFI_PHYSICAL_ADDRESS  MemDebugLogBufAddr;
+  EFI_STATUS            Status;
 
-  if (!mMemDebugLogBufAddrInit) {
-    //
-    // Obtain the Memory Debug Log buffer addr from HOB
-    // NOTE: This is expected to fail until the HOB is created.
-    //
-    Status = MemDebugLogAddrFromHOB (&mMemDebugLogBufAddr);
-    if (EFI_ERROR (Status)) {
-      mMemDebugLogBufAddr = 0;
-    } else {
-      mMemDebugLogBufAddrInit = TRUE;
-    }
+  //
+  // Obtain the Memory Debug Log buffer addr from HOB
+  // NOTE: This is expected to fail until the HOB is created.
+  //
+  Status = MemDebugLogAddrFromHOB (&MemDebugLogBufAddr);
+
+  if (EFI_ERROR (Status)) {
+    MemDebugLogBufAddr = 0;
   }
 
-  if (mMemDebugLogBufAddr) {
-    Status = MemDebugLogWriteBuffer (mMemDebugLogBufAddr, Buffer, Length);
+  if (MemDebugLogBufAddr != 0) {
+    Status = MemDebugLogWriteBuffer (MemDebugLogBufAddr, Buffer, Length);
   } else {
     //
     // HOB has not yet been created, so
