@@ -40,6 +40,7 @@
   PL011UartLib
   PcdLib
   PrintLib
+  MemDebugLogLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress # Flash.c
