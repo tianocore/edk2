@@ -1,7 +1,7 @@
 /** @file
   Realm Aperture Management Protocol Dxe
 
-  Copyright (c) 2022 - 2023, Arm Limited. All rights reserved.
+  Copyright (c) 2022 - 2025, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -608,7 +608,15 @@ RealmApertureManagementProtocolDxeInitialize (
   // Management protocol otherwise return success so that other modules
   // can run.
   if (!IsRealm ()) {
-    return EFI_SUCCESS;
+    Handle = NULL;
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &Handle,
+                    &gEfiRealmApertureManagementAbsentProtocolGuid,
+                    NULL,
+                    NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
+    return Status;
   }
 
   // Retrieve the IPA Width of the Realm for subsequent use to configure
