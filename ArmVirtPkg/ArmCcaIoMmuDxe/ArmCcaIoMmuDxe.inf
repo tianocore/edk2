@@ -3,7 +3,7 @@
 #  drivers.
 #
 #  Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
-#  Copyright (c) 2022 - 2023, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2022 - 2025, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -44,4 +44,4 @@
   gEfiResetNotificationProtocolGuid           ## CONSUMES
 
 [Depex]
-  gEfiRealmApertureManagementProtocolGuid
+  gEfiRealmApertureManagementProtocolGuid OR gEfiRealmApertureManagementAbsentProtocolGuid
