@@ -1,6 +1,6 @@
 /** @file
-  This driver will report some MMIO/IO resources to dxe core, extract smbios and acpi
-  tables from bootloader.
+  This driver will setup PCDs for DXE phase from HOBs
+  and initialise architecture-specific settings and resources.
 
   Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -29,8 +29,6 @@ BlDxeEntryPoint (
   EFI_HOB_GUID_TYPE          *GuidHob;
   EFI_PEI_GRAPHICS_INFO_HOB  *GfxInfo;
   ACPI_BOARD_INFO            *AcpiBoardInfo;
-
-  Status = EFI_SUCCESS;
 
   //
   // Find the frame buffer information and update PCDs
