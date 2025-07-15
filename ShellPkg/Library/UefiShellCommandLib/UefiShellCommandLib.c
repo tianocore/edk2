@@ -398,7 +398,11 @@ ShellCommandIsCommandOnInternalList (
         ; Node = (SHELL_COMMAND_INTERNAL_LIST_ENTRY *)GetNextNode (&mCommandList.Link, &Node->Link)
         )
   {
-    ASSERT (Node->CommandString != NULL);
+    if (Node->CommandString == NULL) {
+      ASSERT (FALSE);
+      continue;
+    }
+
     if (gUnicodeCollation->StriColl (
                              gUnicodeCollation,
                              (CHAR16 *)CommandString,
@@ -485,7 +489,11 @@ ShellCommandGetInternalCommandHelp (
         ; Node = (SHELL_COMMAND_INTERNAL_LIST_ENTRY *)GetNextNode (&mCommandList.Link, &Node->Link)
         )
   {
-    ASSERT (Node->CommandString != NULL);
+    if (Node->CommandString == NULL) {
+      ASSERT (FALSE);
+      continue;
+    }
+
     if (gUnicodeCollation->StriColl (
                              gUnicodeCollation,
                              (CHAR16 *)CommandString,
@@ -672,23 +680,25 @@ ShellCommandRegisterCommandName (
     //
     // Get Lexical Comparison Value between PrevCommand and Command list entry
     //
-    LexicalMatchValue = gUnicodeCollation->StriColl (
-                                             gUnicodeCollation,
-                                             PrevCommand->CommandString,
-                                             Command->CommandString
-                                             );
+    if ((PrevCommand->CommandString != NULL) && (Command->CommandString != NULL)) {
+      LexicalMatchValue = gUnicodeCollation->StriColl (
+                                               gUnicodeCollation,
+                                               PrevCommand->CommandString,
+                                               Command->CommandString
+                                               );
 
-    //
-    // Swap PrevCommand and Command list entry if PrevCommand list entry
-    // is alphabetically greater than Command list entry
-    //
-    if (LexicalMatchValue > 0) {
-      Command = (SHELL_COMMAND_INTERNAL_LIST_ENTRY *)SwapListEntries (&PrevCommand->Link, &Command->Link);
-    } else if (LexicalMatchValue < 0) {
       //
-      // PrevCommand entry is lexically lower than Command entry
+      // Swap PrevCommand and Command list entry if PrevCommand list entry
+      // is alphabetically greater than Command list entry
       //
-      break;
+      if (LexicalMatchValue > 0) {
+        Command = (SHELL_COMMAND_INTERNAL_LIST_ENTRY *)SwapListEntries (&PrevCommand->Link, &Command->Link);
+      } else if (LexicalMatchValue < 0) {
+        //
+        // PrevCommand entry is lexically lower than Command entry
+        //
+        break;
+      }
     }
   }
 
@@ -758,7 +768,11 @@ ShellCommandRunCommandHandler (
         ; Node = (SHELL_COMMAND_INTERNAL_LIST_ENTRY *)GetNextNode (&mCommandList.Link, &Node->Link)
         )
   {
-    ASSERT (Node->CommandString != NULL);
+    if (Node->CommandString == NULL) {
+      ASSERT (FALSE);
+      continue;
+    }
+
     if (gUnicodeCollation->StriColl (
                              gUnicodeCollation,
                              (CHAR16 *)CommandString,
@@ -831,7 +845,11 @@ ShellCommandGetManFileNameHandler (
         ; Node = (SHELL_COMMAND_INTERNAL_LIST_ENTRY *)GetNextNode (&mCommandList.Link, &Node->Link)
         )
   {
-    ASSERT (Node->CommandString != NULL);
+    if (Node->CommandString == NULL) {
+      ASSERT (FALSE);
+      continue;
+    }
+
     if (gUnicodeCollation->StriColl (
                              gUnicodeCollation,
                              (CHAR16 *)CommandString,
