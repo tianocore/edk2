@@ -293,8 +293,6 @@ FillExchangeInfoDataSevEs (
       );
     ExchangeInfo->ExtTopoAvail = !!ExtTopoEbx.Bits.LogicalProcessors;
   }
-
-  ExchangeInfo->SevSnpKnownInitApicId = FALSE;
 }
 
 /**

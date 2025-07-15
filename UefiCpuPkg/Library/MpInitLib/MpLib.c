@@ -1018,9 +1018,11 @@ FillExchangeInfoData (
   ExchangeInfo->Enable5LevelPaging = (BOOLEAN)(Cr4.Bits.LA57 == 1);
   DEBUG ((DEBUG_INFO, "%a: 5-Level Paging = %d\n", gEfiCallerBaseName, ExchangeInfo->Enable5LevelPaging));
 
-  ExchangeInfo->SevEsIsEnabled  = CpuMpData->SevEsIsEnabled;
-  ExchangeInfo->SevSnpIsEnabled = CpuMpData->SevSnpIsEnabled;
-  ExchangeInfo->GhcbBase        = (UINTN)CpuMpData->GhcbBase;
+  ExchangeInfo->SevEsIsEnabled        = CpuMpData->SevEsIsEnabled;
+  ExchangeInfo->SevSnpIsEnabled       = CpuMpData->SevSnpIsEnabled;
+  ExchangeInfo->GhcbBase              = (UINTN)CpuMpData->GhcbBase;
+  ExchangeInfo->ExtTopoAvail          = FALSE;
+  ExchangeInfo->SevSnpKnownInitApicId = FALSE;
 
   //
   // Populate SEV-ES specific exchange data.
