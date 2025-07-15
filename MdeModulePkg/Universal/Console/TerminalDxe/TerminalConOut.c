@@ -4,6 +4,7 @@
 Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (C) 2016 Silicon Graphics, Inc. All rights reserved.<BR>
+Copyright (c) 2025, Loongson Technology Corporation Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -268,6 +269,13 @@ TerminalConOutOutputString (
         break;
 
       case TerminalTypeVtUtf8:
+        //
+        // Skip WIDE_CHAR/NARROW_CHAR, because they are not displayable.
+        //
+        if ((*WString == WIDE_CHAR) || (*WString == NARROW_CHAR)) {
+          break;
+        }
+
         UnicodeToUtf8 (*WString, &Utf8Char, &ValidBytes);
         Length = ValidBytes;
         Status = TerminalDevice->SerialIo->Write (
