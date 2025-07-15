@@ -1025,10 +1025,10 @@ FillExchangeInfoData (
   ExchangeInfo->SevSnpKnownInitApicId = FALSE;
 
   //
-  // Populate SEV-ES specific exchange data.
+  // Populate SEV-SNP specific exchange data.
   //
   if (ExchangeInfo->SevSnpIsEnabled) {
-    FillExchangeInfoDataSevEs (ExchangeInfo);
+    FillExchangeInfoDataSevSnp (ExchangeInfo);
   }
 
   //
