@@ -331,19 +331,17 @@ InitializeCpu (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                  Status;
-  EFI_RISCV_FIRMWARE_CONTEXT  *FirmwareContext;
+  EFI_STATUS              Status;
+  VOID                    *Hob;
+  RISCV_SEC_HANDOFF_DATA  *SecData;
+  const EFI_GUID          SecHobDataGuid = RISCV_SEC_HANDOFF_HOB_GUID;
 
-  GetFirmwareContextPointer (&FirmwareContext);
-  ASSERT (FirmwareContext != NULL);
-  if (FirmwareContext == NULL) {
-    DEBUG ((DEBUG_ERROR, "Failed to get the pointer of EFI_RISCV_FIRMWARE_CONTEXT\n"));
-    return EFI_NOT_FOUND;
-  }
+  Hob = GetFirstGuidHob (&SecHobDataGuid);
+  ASSERT (Hob != NULL);
 
-  DEBUG ((DEBUG_INFO, " %a: Firmware Context is at 0x%x.\n", __func__, FirmwareContext));
+  SecData     = GET_GUID_HOB_DATA (Hob);
+  mBootHartId = SecData->BootHartId;
 
-  mBootHartId = FirmwareContext->BootHartId;
   DEBUG ((DEBUG_INFO, " %a: mBootHartId = 0x%x.\n", __func__, mBootHartId));
 
   InitializeCpuExceptionHandlers (NULL);
@@ -362,8 +360,7 @@ InitializeCpu (
   //
   // Initialize FPU
   //
-  Status = RiscVInitializeFpu ();
-  ASSERT_EFI_ERROR (Status);
+  InitializeFloatingPointUnits ();
 
   //
   // Install Boot protocol
