@@ -54,6 +54,15 @@ GicV3Supported (
   return FALSE;
 }
 
+STATIC
+BOOLEAN
+GicV5Supported (
+  VOID
+  )
+{
+  return ArmHasGicV5SystemRegisters ();
+}
+
 /**
   Initialize the state information for the CPU Architectural Protocol
 
@@ -74,7 +83,7 @@ InterruptDxeInitialize (
 {
   EFI_STATUS  Status;
 
-  if (!GicV3Supported () && !ArmHasGicV5SystemRegisters ()) {
+  if (!GicV3Supported () && !GicV5Supported ()) {
     Status = GicV2DxeInitialize (ImageHandle, SystemTable);
   } else {
     Status = GicV3DxeInitialize (ImageHandle, SystemTable);
