@@ -86,7 +86,7 @@ InterruptDxeInitialize (
   if (!GicV3Supported () && !GicV5Supported ()) {
     Status = GicV2DxeInitialize (ImageHandle, SystemTable);
   } else {
-    Status = GicV3DxeInitialize (ImageHandle, SystemTable);
+    Status = GicDxeInitialize (ImageHandle, SystemTable);
   }
 
   return Status;

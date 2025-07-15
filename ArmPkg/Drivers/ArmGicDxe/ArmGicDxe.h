@@ -33,14 +33,20 @@ GicV2DxeInitialize (
 // GicV3 API
 EFI_STATUS
 GicV3DxeInitialize (
-  IN  EFI_HANDLE        ImageHandle,
-  IN  EFI_SYSTEM_TABLE  *SystemTable
+  VOID
   );
 
 // GicV5 API
 EFI_STATUS
 GicV5DxeInitialize (
   VOID
+  );
+
+// Generic GicV3+ API
+EFI_STATUS
+GicDxeInitialize (
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   );
 
 // Shared code
