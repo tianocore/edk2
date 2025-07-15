@@ -32,7 +32,7 @@ GicV3Supported (
   // feature is implemented on the CPU. This is also convenient as our GICv3
   // driver requires SRE. If only Memory mapped access is available we try to
   // drive the GIC as a v2.
-  if (ArmHasGicSystemRegisters ()) {
+  if (ArmHasGicV3SystemRegisters ()) {
     // Make sure System Register access is enabled (SRE). This depends on the
     // higher privilege level giving us permission, otherwise we will either
     // cause an exception here, or the write doesn't stick in which case we need

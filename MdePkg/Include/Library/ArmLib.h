@@ -688,14 +688,14 @@ ArmGetPhysicalAddressBits (
 ///
 
 /**
-  Check whether the CPU supports the GIC system register interface (any version)
+  Check whether the CPU supports the GIC system register interface (v3-v4)
 
-  @return   Whether GIC System Register Interface is supported
+  @return   Whether GICv3/v4 System Register Interface is supported
 
 **/
 BOOLEAN
 EFIAPI
-ArmHasGicSystemRegisters (
+ArmHasGicV3SystemRegisters (
   VOID
   );
 

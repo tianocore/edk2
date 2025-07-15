@@ -19,14 +19,14 @@
 #include "ArmLibPrivate.h"
 
 /**
-  Check whether the CPU supports the GIC system register interface (any version)
+  Check whether the CPU supports the GIC system register interface (v3-v4)
 
   @return   Whether GIC System Register Interface is supported
 
 **/
 BOOLEAN
 EFIAPI
-ArmHasGicSystemRegisters (
+ArmHasGicV3SystemRegisters (
   VOID
   )
 {
