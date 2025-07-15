@@ -2853,8 +2853,9 @@ EfiShellGetEnvEx (
           ; Node = (ENV_VAR_LIST *)GetNextNode (&gShellEnvVarList.Link, &Node->Link)
           )
     {
-      ASSERT (Node->Key != NULL);
-      Size += StrSize (Node->Key);
+      if (Node->Key != NULL) {
+        Size += StrSize (Node->Key);
+      }
     }
 
     Size += 2*sizeof (CHAR16);
