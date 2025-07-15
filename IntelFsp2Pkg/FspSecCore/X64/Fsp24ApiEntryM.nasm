@@ -1,7 +1,7 @@
 ;; @file
 ;  Provide FSP API entry points.
 ;
-; Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2022 - 2025, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;;
     DEFAULT REL
@@ -172,6 +172,24 @@ NotMultiPhaseMemoryInitApi:
   mov    rdx, cr0
   push   rdx
 SkipPagetableSave:
+
+  ; Save Segment registers
+  mov     rdx, ss
+  push    rdx
+  mov     rdx, gs
+  push    rdx
+  mov     rdx, fs
+  push    rdx
+  mov     rdx, es
+  push    rdx
+  mov     rdx, ds
+  push    rdx
+  mov     rdx, cs
+  push    rdx
+
+  ; Reserve 16 bytes for GDT save/restore
+  sub     rsp, 16
+  sgdt    [rsp]
 
   ; Reserve 16 bytes for IDT save/restore
   sub     rsp, 16
