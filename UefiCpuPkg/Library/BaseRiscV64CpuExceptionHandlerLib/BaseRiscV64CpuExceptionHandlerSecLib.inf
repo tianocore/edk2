@@ -1,0 +1,44 @@
+## @file
+# RISC-V CPU Exception Handler Library for SEC
+#
+# Copyright (c) 2025, Ventana Micro Systems Inc. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = BaseRiscV64CpuExceptionHandlerLibSec
+  MODULE_UNI_FILE                = BaseRiscV64CpuExceptionHandlerLib.uni
+  FILE_GUID                      = 6D3A9D64-91F2-4A71-8A5F-5C4E1EDE93BE
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CpuExceptionHandlerLib|SEC
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = RISCV64
+#
+
+[Sources]
+  SupervisorTrapHandler.S
+  CpuExceptionHandlerLib.c
+  CpuExceptionHandlerLib.h
+  Backtrace.c
+  Backtrace.h
+  BacktraceHelperSec.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  SerialPortLib
+  PrintLib
+  SynchronizationLib
+  MemoryAllocationLib
+  DebugLib
