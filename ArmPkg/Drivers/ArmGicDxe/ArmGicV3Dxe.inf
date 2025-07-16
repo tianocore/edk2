@@ -21,12 +21,9 @@
   ArmGicDxe.c
   ArmGicDxe.h
   GicV3/ArmGicV3Dxe.c
-
-[Sources.ARM]
-  GicV3/Arm/ArmGicV3.S     | GCC
-
-[Sources.AARCH64]
   GicV3/AArch64/ArmGicV3.S
+  GicV5/ArmGicV5Dxe.c
+  GicV5/AArch64/ArmGicV5.S
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -40,6 +37,7 @@
   IoLib
   PcdLib
   PrintLib
+  TimerLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiLib
@@ -51,6 +49,7 @@
 
 [Pcd.common]
   gArmTokenSpaceGuid.PcdGicDistributorBase
+  gArmTokenSpaceGuid.PcdGicIrsConfigFrameBase
   gArmTokenSpaceGuid.PcdGicRedistributorsBase
 
 [Depex]

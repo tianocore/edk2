@@ -66,13 +66,6 @@
 
 #define SBI_LAST_ERR  SBI_ERR_ALREADY_STOPPED
 
-typedef struct {
-  UINT64    BootHartId;
-  VOID      *PeiServiceTable;    // PEI Service table
-  VOID      *PrePiHobList;       // Pre PI Hob List
-  UINT64    FlattenedDeviceTree; // Pointer to Flattened Device tree
-} EFI_RISCV_FIRMWARE_CONTEXT;
-
 //
 // EDK2 OpenSBI firmware extension return status.
 //
@@ -107,55 +100,6 @@ EFIAPI
 SbiSystemReset (
   IN  UINTN  ResetType,
   IN  UINTN  ResetReason
-  );
-
-/**
-  Get firmware context of the calling hart.
-
-  @param[out] FirmwareContext      The firmware context pointer.
-**/
-VOID
-EFIAPI
-GetFirmwareContext (
-  OUT EFI_RISCV_FIRMWARE_CONTEXT  **FirmwareContext
-  );
-
-/**
-  Set firmware context of the calling hart.
-
-  @param[in] FirmwareContext       The firmware context pointer.
-**/
-VOID
-EFIAPI
-SetFirmwareContext (
-  IN EFI_RISCV_FIRMWARE_CONTEXT  *FirmwareContext
-  );
-
-/**
-  Get pointer to OpenSBI Firmware Context
-
-  Get the pointer of firmware context.
-
-  @param    FirmwareContextPtr   Pointer to retrieve pointer to the
-                                 Firmware Context.
-**/
-VOID
-EFIAPI
-GetFirmwareContextPointer (
-  IN OUT EFI_RISCV_FIRMWARE_CONTEXT  **FirmwareContextPtr
-  );
-
-/**
-  Set pointer to OpenSBI Firmware Context
-
-  Set the pointer of firmware context.
-
-  @param    FirmwareContextPtr   Pointer to Firmware Context.
-**/
-VOID
-EFIAPI
-SetFirmwareContextPointer (
-  IN EFI_RISCV_FIRMWARE_CONTEXT  *FirmwareContextPtr
   );
 
 /**
