@@ -206,7 +206,7 @@ typedef struct {
 /// FADT Version (as defined in ACPI 6.6 spec.)
 ///
 #define EFI_ACPI_6_6_FIXED_ACPI_DESCRIPTION_TABLE_REVISION        0x06
-#define EFI_ACPI_6_6_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION  0x05
+#define EFI_ACPI_6_6_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION  0x06
 
 //
 // Fixed ACPI Description Table Preferred Power Management Profile
@@ -324,7 +324,7 @@ typedef struct {
 ///
 /// MADT Revision (as defined in ACPI 6.6 spec.)
 ///
-#define EFI_ACPI_6_6_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION  0x06
+#define EFI_ACPI_6_6_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION  0x07
 
 ///
 /// Multiple APIC Flags
