@@ -381,7 +381,6 @@ MmCommunicationPeimCommon (
   EFI_MM_COMMUNICATE_HEADER_V3  *CommunicateHeaderV3;
   EFI_STATUS                    Status;
   UINTN                         BufferSize;
-  UINTN                         HeaderSize;
 
   //
   // Check parameters
@@ -400,7 +399,6 @@ MmCommunicationPeimCommon (
   {
     // This is a v3 header
     CommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)(UINTN)CommBuffer;
-    HeaderSize          = sizeof (EFI_MM_COMMUNICATE_HEADER_V3);
     BufferSize          = CommunicateHeaderV3->BufferSize;
   } else {
     // This is a v1 header, do some checks
@@ -428,9 +426,6 @@ MmCommunicationPeimCommon (
       *CommSize = (UINTN)PcdGet64 (PcdMmBufferSize);
       return EFI_BAD_BUFFER_SIZE;
     }
-
-    HeaderSize =  sizeof (CommunicateHeader->HeaderGuid) +
-                 sizeof (CommunicateHeader->MessageLength);
 
     // CommBuffer is a mandatory parameter. Hence, Rely on
     // MessageLength + Header to ascertain the
