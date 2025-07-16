@@ -33,6 +33,20 @@ ArmHasGicSystemRegisters (
   return ((ArmReadIdAA64Pfr0 () & AARCH64_PFR0_GIC) != 0);
 }
 
+/**
+  Check whether the CPU supports the GICv5 system register interface
+
+  @return   Whether GICv5 System Register Interface is supported
+**/
+BOOLEAN
+EFIAPI
+ArmHasGicV5SystemRegisters (
+  VOID
+  )
+{
+  return ((ArmReadIdAA64Pfr2 () & AARCH64_PFR2_GCIE) != 0);
+}
+
 /** Checks if CCIDX is implemented.
 
    @retval TRUE  CCIDX is implemented.

@@ -9,21 +9,29 @@
 #ifndef ARM_FFA_RX_TX_BUFFER_INFO_H_
 #define ARM_FFA_RX_TX_BUFFER_INFO_H_
 
+#include <Uefi/UefiBaseType.h>
+
 /**
  * Guid Hob Data for gArmFfaRxTxBufferInfoGuid Guid Hob.
  */
 typedef struct ArmFfaRxTxBuffersInfo {
   /// Tx Buffer Address.
-  VOID      *TxBufferAddr;
+  EFI_PHYSICAL_ADDRESS    TxBufferAddr;
 
   /// Tx Buffer Size.
-  UINT64    TxBufferSize;
+  UINT64                  TxBufferSize;
 
   /// Rx Buffer Address.
-  VOID      *RxBufferAddr;
+  EFI_PHYSICAL_ADDRESS    RxBufferAddr;
 
   /// Rx Buffer Size.
-  UINT64    RxBufferSize;
+  UINT64                  RxBufferSize;
+
+  /// Rx/Tx buffer should be remapped to permanent memory.
+  BOOLEAN                 RemapRequired;
+
+  /// Rx/Tx buffer offset from its allocation base.
+  UINT64                  RemapOffset;
 } ARM_FFA_RX_TX_BUFFER_INFO;
 
 extern EFI_GUID  gArmFfaRxTxBufferInfoGuid;
