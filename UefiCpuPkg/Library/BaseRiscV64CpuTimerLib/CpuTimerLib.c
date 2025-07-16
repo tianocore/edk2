@@ -16,8 +16,11 @@
 #include <Pi/PiHob.h>
 #include <Library/HobLib.h>
 #include <Library/FdtLib.h>
+#include <Library/TimerLib.h>
 
 STATIC UINT64  mTimeBase;
+
+#define GET_TIME_BASE()  (mTimeBase ?: GetPerformanceCounterProperties(NULL, NULL))
 
 /**
   Stalls the CPU for at least the given number of ticks.
@@ -63,7 +66,7 @@ MicroSecondDelay (
     DivU64x32 (
       MultU64x32 (
         MicroSeconds,
-        mTimeBase
+        GET_TIME_BASE ()
         ),
       1000000u
       )
@@ -91,7 +94,7 @@ NanoSecondDelay (
     DivU64x32 (
       MultU64x32 (
         NanoSeconds,
-        mTimeBase
+        GET_TIME_BASE ()
         ),
       1000000000u
       )
@@ -227,13 +230,13 @@ GetTimeInNanoSecond (
   // Time = --------- x 1,000,000,000
   //        Frequency
   //
-  NanoSeconds = MultU64x32 (DivU64x32Remainder (Ticks, mTimeBase, &Remainder), 1000000000u);
+  NanoSeconds = MultU64x32 (DivU64x32Remainder (Ticks, GET_TIME_BASE (), &Remainder), 1000000000u);
 
   //
   // Frequency < 0x100000000, so Remainder < 0x100000000, then (Remainder * 1,000,000,000)
   // will not overflow 64-bit.
   //
-  NanoSeconds += DivU64x32 (MultU64x32 ((UINT64)Remainder, 1000000000u), mTimeBase);
+  NanoSeconds += DivU64x32 (MultU64x32 ((UINT64)Remainder, 1000000000u), GET_TIME_BASE ());
 
   return NanoSeconds;
 }
