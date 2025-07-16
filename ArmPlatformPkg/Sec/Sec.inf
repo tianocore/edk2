@@ -52,6 +52,7 @@
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid
+  gArmTransferListPpiGuid
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
