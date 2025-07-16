@@ -739,6 +739,22 @@ GicV3ExitBootServicesEvent (
   ArmGicDisableDistributor (mGicDistributorBase);
 }
 
+#ifdef MDE_CPU_ARM
+
+/**
+  Dummy GICv5 init funtion to avoid symbol resolution failure on ARM,
+  which cannot support GICv5.
+ **/
+EFI_STATUS
+GicV5DxeInitialize (
+  VOID
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+#endif
+
 /**
   Initialize the state information for the CPU Architectural Protocol
 
