@@ -1,7 +1,8 @@
 ## @file
 # RISC-V CPU Exception Handler Library
 #
-# Copyright (c) 2022-2023, Ventana Micro Systems Inc. All rights reserved.<BR>
+# Copyright (c) 2022-2025, Ventana Micro Systems Inc. All rights reserved.<BR>
+# Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -14,7 +15,7 @@
   FILE_GUID                      = 6AB0D5FD-E615-45A3-9374-E284FB061FC9
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = CpuExceptionHandlerLib
+  LIBRARY_CLASS                  = CpuExceptionHandlerLib|PEIM DXE_CORE DXE_DRIVER
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -26,6 +27,9 @@
   SupervisorTrapHandler.S
   CpuExceptionHandlerLib.c
   CpuExceptionHandlerLib.h
+  Backtrace.c
+  Backtrace.h
+  BacktraceHelper.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -40,3 +44,6 @@
   PeCoffGetEntryPointLib
   MemoryAllocationLib
   DebugLib
+
+[Guids]
+  gEfiDebugImageInfoTableGuid

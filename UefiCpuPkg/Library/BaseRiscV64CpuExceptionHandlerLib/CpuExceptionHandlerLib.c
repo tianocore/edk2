@@ -2,6 +2,8 @@
   RISC-V Exception Handler library implementation.
 
   Copyright (c) 2016 - 2022, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -14,6 +16,7 @@
 #include <Library/SerialPortLib.h>
 #include <Library/PrintLib.h>
 #include <Register/RiscV64/RiscVEncoding.h>
+#include "Backtrace.h"
 #include "CpuExceptionHandlerLib.h"
 
 //
@@ -136,10 +139,20 @@ DumpCpuContext (
   )
 {
   UINTN                 Printed;
+  UINTN                 RecursiveException;
   SMODE_TRAP_REGISTERS  *Regs;
 
   Printed = 0;
   Regs    = (SMODE_TRAP_REGISTERS *)SystemContext.SystemContextRiscV64;
+
+  RecursiveException = RiscVGetSupervisorScratch ();
+  if (RecursiveException == 0xdeaddead) {
+    InternalPrintMessage ("\nRecursive exception occurred while dumping the CPU state\n");
+
+    CpuDeadLoop ();
+  }
+
+  RiscVSetSupervisorScratch ((UINTN)0xdeaddead);
 
   InternalPrintMessage (
     "!!!! RISCV64 Exception Type - %016x(%a) !!!!\n",
@@ -170,6 +183,8 @@ DumpCpuContext (
 
   #undef REG
   #undef REGS
+
+  DumpCpuBacktrace (SystemContext);
 
   DEBUG_CODE_END ();
 }
