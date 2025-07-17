@@ -823,8 +823,6 @@ CoreLoadPeImage (
   // Print the load address and the PDB file name if it is available
   //
 
-  DEBUG_CODE_BEGIN ();
-
   UINTN  Index;
   UINTN  StartIndex;
   CHAR8  EfiFileName[256];
@@ -876,8 +874,6 @@ CoreLoadPeImage (
   }
 
   DEBUG ((DEBUG_INFO | DEBUG_LOAD, "\n"));
-
-  DEBUG_CODE_END ();
 
   return EFI_SUCCESS;
 
