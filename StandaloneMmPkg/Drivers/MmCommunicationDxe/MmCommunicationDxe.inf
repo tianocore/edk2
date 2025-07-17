@@ -42,8 +42,6 @@
 [Guids]
   gMmCommBufferHobGuid
   gEfiEventVirtualAddressChangeGuid
-  gEfiEndOfDxeEventGroupGuid
-  gEfiEventExitBootServicesGuid
   gEfiMmCommunicateHeaderV3Guid
 
 [Protocols]
@@ -51,7 +49,6 @@
   gEfiMmCommunication2ProtocolGuid
   gEfiSmmControl2ProtocolGuid
   gEfiMmCommunicationProtocolGuid
-  gEfiDxeMmReadyToLockProtocolGuid
   gEfiSmmAccess2ProtocolGuid
 
 [Depex]

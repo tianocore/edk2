@@ -35,25 +35,6 @@
 #include "ArmFfaRxTxMap.h"
 
 /**
-  Update Rx/TX buffer information.
-
-  @param  BufferInfo            Rx/Tx buffer information.
-
-**/
-STATIC
-VOID
-EFIAPI
-UpdateRxTxBufferInfo (
-  OUT ARM_FFA_RX_TX_BUFFER_INFO  *BufferInfo
-  )
-{
-  BufferInfo->TxBufferAddr = (VOID *)(UINTN)PcdGet64 (PcdFfaTxBuffer);
-  BufferInfo->TxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
-  BufferInfo->RxBufferAddr = (VOID *)(UINTN)PcdGet64 (PcdFfaRxBuffer);
-  BufferInfo->RxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
-}
-
-/**
   Notification service to be called when gEfiPeiMemoryDiscoveredPpiGuid is installed.
   This function change reamp Rx/Tx buffer with permanent memory from
   temporary Rx/Tx buffer.
@@ -81,7 +62,6 @@ PeiServicesMemoryDiscoveredNotifyCallback (
   IN VOID                       *Ppi
   )
 {
-  EFI_STATUS                 Status;
   EFI_HOB_GUID_TYPE          *RxTxBufferHob;
   ARM_FFA_RX_TX_BUFFER_INFO  *BufferInfo;
 
@@ -89,26 +69,7 @@ PeiServicesMemoryDiscoveredNotifyCallback (
   ASSERT (RxTxBufferHob != NULL);
   BufferInfo = GET_GUID_HOB_DATA (RxTxBufferHob);
 
-  /*
-   * Temporary memory doesn't need to be free.
-   * otherwise PEI memory manager using permanent memory will be confused.
-   */
-  PcdSet64S (PcdFfaTxBuffer, 0x00);
-  PcdSet64S (PcdFfaRxBuffer, 0x00);
-
-  Status = ArmFfaLibRxTxUnmap ();
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = ArmFfaLibRxTxMap ();
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  UpdateRxTxBufferInfo (BufferInfo);
-
-  return EFI_SUCCESS;
+  return RemapFfaRxTxBuffer (BufferInfo);
 }
 
 STATIC EFI_PEI_NOTIFY_DESCRIPTOR  mNotifyOnPeiMemoryDiscovered = {
@@ -138,6 +99,7 @@ ArmFfaPeiLibConstructor (
   EFI_HOB_GUID_TYPE          *RxTxBufferHob;
   ARM_FFA_RX_TX_BUFFER_INFO  *BufferInfo;
   VOID                       *Dummy;
+  EFI_HOB_MEMORY_ALLOCATION  *RxTxBufferAllocationHob;
 
   Status = ArmFfaLibCommonInit ();
   if (EFI_ERROR (Status)) {
@@ -176,6 +138,11 @@ ArmFfaPeiLibConstructor (
 
     UpdateRxTxBufferInfo (BufferInfo);
 
+    /*
+     * When permanent memory is used, gEfiPeiMemoryDiscoveredPpiGuid
+     * is installed. If gEfiPeiMemoryDiscoveredPpiGuid is found,
+     * It doesn't need to remap Rx/Tx buffer.
+     */
     Status = (*PeiServices)->LocatePpi (
                                PeiServices,
                                &gEfiPeiMemoryDiscoveredPpiGuid,
@@ -183,10 +150,50 @@ ArmFfaPeiLibConstructor (
                                NULL,
                                &Dummy
                                );
-    if (EFI_ERROR (Status)) {
-      Status = (*PeiServices)->NotifyPpi (PeiServices, &mNotifyOnPeiMemoryDiscovered);
-      ASSERT_EFI_ERROR (Status);
+    BufferInfo->RemapRequired = EFI_ERROR (Status);
+  } else {
+    BufferInfo = GET_GUID_HOB_DATA (RxTxBufferHob);
+  }
+
+  if (BufferInfo->RemapRequired) {
+    /*
+     * If RxTxBufferAllocationHob can be found with gArmFfaRxTxBufferInfoGuid,
+     * This Rx/Tx buffer is mapped by ArmFfaSecLib.
+     */
+    RxTxBufferAllocationHob = FindRxTxBufferAllocationHob (TRUE);
+
+    /*
+     * Below case Rx/Tx buffer mapped by ArmPeiLib but in temporary memory.
+     */
+    if (RxTxBufferAllocationHob == NULL) {
+      RxTxBufferAllocationHob = FindRxTxBufferAllocationHob (FALSE);
+      ASSERT (RxTxBufferAllocationHob != NULL);
+      BufferInfo->RemapOffset =
+        (UINTN)(BufferInfo->TxBufferAddr -
+                RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress);
+
+      CopyGuid (
+        &RxTxBufferAllocationHob->AllocDescriptor.Name,
+        &gArmFfaRxTxBufferInfoGuid
+        );
     }
+
+    Status = (*PeiServices)->NotifyPpi (PeiServices, &mNotifyOnPeiMemoryDiscovered);
+
+    /*
+     * Failed to register NotifyPpi.
+     * In this case, return ERROR to make failure of load for PPI
+     * and postpone to remap to other PEIM.
+     */
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    /*
+     * Change RemapRequired to FALSE here to prevent other PEIM from
+     * registering notification again.
+     */
+    BufferInfo->RemapRequired = FALSE;
   }
 
   return EFI_SUCCESS;
