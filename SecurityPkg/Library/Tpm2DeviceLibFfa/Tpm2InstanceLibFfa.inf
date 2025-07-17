@@ -42,6 +42,7 @@
   BaseMemoryLib
   IoLib
   ArmFfaLib
+  Tpm2DumpLib
 
 [Guids]
   gTpm2ServiceFfaGuid
