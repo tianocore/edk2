@@ -32,6 +32,7 @@
   DxeCapsuleReportLib.c
   CapsuleOnDisk.c
   CapsuleOnDisk.h
+  DxeCapsuleRuntime.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -73,6 +74,7 @@
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportProcessCapsuleAtRuntime ## CONSUMES
 
 [Protocols]
   gEsrtManagementProtocolGuid                   ## CONSUMES
