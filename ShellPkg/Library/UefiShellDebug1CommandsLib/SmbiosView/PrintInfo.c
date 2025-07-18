@@ -3011,7 +3011,7 @@ DisplayMmBankConnections (
   //
   // Divide it to high and low
   //
-  High = (UINT8)(BankConnections & 0xF0);
+  High = (UINT8)((BankConnections & 0xF0)>>4);
   Low  = (UINT8)(BankConnections & 0x0F);
   if (High != 0xF) {
     if (Low != 0xF) {
