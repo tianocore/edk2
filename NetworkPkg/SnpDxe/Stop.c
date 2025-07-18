@@ -22,30 +22,30 @@ PxeStop (
   SNP_DRIVER  *Snp
   )
 {
-  Snp->Cdb.OpCode    = PXE_OPCODE_STOP;
-  Snp->Cdb.OpFlags   = PXE_OPFLAGS_NOT_USED;
-  Snp->Cdb.CPBsize   = PXE_CPBSIZE_NOT_USED;
-  Snp->Cdb.DBsize    = PXE_DBSIZE_NOT_USED;
-  Snp->Cdb.CPBaddr   = PXE_CPBADDR_NOT_USED;
-  Snp->Cdb.DBaddr    = PXE_DBADDR_NOT_USED;
-  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum     = Snp->IfNum;
-  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb->OpCode    = PXE_OPCODE_STOP;
+  Snp->Cdb->OpFlags   = PXE_OPFLAGS_NOT_USED;
+  Snp->Cdb->CPBsize   = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb->DBsize    = PXE_DBSIZE_NOT_USED;
+  Snp->Cdb->CPBaddr   = PXE_CPBADDR_NOT_USED;
+  Snp->Cdb->DBaddr    = PXE_DBADDR_NOT_USED;
+  Snp->Cdb->StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb->StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb->IFnum     = Snp->IfNum;
+  Snp->Cdb->Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command
   //
   DEBUG ((DEBUG_NET, "\nsnp->undi.stop()  "));
 
-  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)Snp->Cdb);
 
-  if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
+  if (Snp->Cdb->StatCode != PXE_STATCODE_SUCCESS) {
     DEBUG (
       (DEBUG_WARN,
        "\nsnp->undi.stop()  %xh:%xh\n",
-       Snp->Cdb.StatFlags,
-       Snp->Cdb.StatCode)
+       Snp->Cdb->StatFlags,
+       Snp->Cdb->StatCode)
       );
 
     return EFI_DEVICE_ERROR;
