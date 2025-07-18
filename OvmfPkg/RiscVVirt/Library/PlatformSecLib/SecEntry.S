@@ -8,6 +8,9 @@
 #include "PlatformSecLib.h"
 
 ASM_FUNC (_ModuleEntryPoint)
+/* Prevent stack unwinding from going further */
+li    s0, 0
+
 /* Use Temp memory as the stack for calling to C code */
 li    a2, FixedPcdGet32 (PcdOvmfSecPeiTempRamBase)
 li    a3, FixedPcdGet32 (PcdOvmfSecPeiTempRamSize)
