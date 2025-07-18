@@ -71,6 +71,7 @@
   gUniversalPayloadSmbiosTableGuid
   gUniversalPayloadAcpiTableGuid
   gUniversalPayloadSerialPortInfoGuid
+  gEfiFirmwareInfoHobGuid
   gEfiSmmStoreInfoHobGuid
 
 [FeaturePcd.IA32]
