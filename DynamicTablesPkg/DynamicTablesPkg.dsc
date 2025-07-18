@@ -55,6 +55,7 @@
 
 [Components.ARM, Components.AARCH64]
   DynamicTablesPkg/Library/FdtHwInfoParserLib/FdtHwInfoParserLib.inf
+  DynamicTablesPkg/Library/Smbios/Arm/SmbiosSmcLib/SmbiosSmcLib.inf
 
 [Components.AARCH64]
   DynamicTablesPkg/Library/DynamicTablesScmiInfoLib/DynamicTablesScmiInfoLib.inf
