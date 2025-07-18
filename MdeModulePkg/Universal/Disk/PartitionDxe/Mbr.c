@@ -359,7 +359,7 @@ PartitionInstallMbrChildHandles (
       if (ExtMbrStartingLba == 0) {
         break;
       }
-    } while (ExtMbrStartingLba  < ParentHdDev.PartitionSize);
+    } while ((UINT64)ExtMbrStartingLba  < ParentHdDev.PartitionSize);
   }
 
 Done:
