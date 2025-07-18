@@ -2107,4 +2107,121 @@ AmlCreatePssNode (
   OUT AML_OBJECT_NODE_HANDLE  *NewPssNode   OPTIONAL
   );
 
+/** Code generation for the IRQ Descriptor.
+
+  The Resource Data effectively created is an IRQ Resource
+  Data. Cf ACPI 6.5 specification:
+   - s6.4.2.1 "IRQ Descriptor"
+   - s19.6.66 "IRQ (Interrupt Resource Descriptor Macro)"
+
+
+  The created resource data node can be:
+   - appended to the list of resource data elements of the NameOpNode.
+     In such case NameOpNode must be defined by a the "Name ()" ASL statement
+     and initially contain a "ResourceTemplate ()".
+   - returned through the NewRdNode parameter.
+
+  @param  [in]  IsEdgeTriggered The interrupt is edge triggered or
+                                level triggered.
+  @param  [in]  IsActiveLow     The interrupt is active-high or active-low.
+  @param  [in]  IsShared        The interrupt can be shared with other
+                                devices or not (Exclusive).
+  @param  [in]  IrqList         List of IRQ numbers. Must be non-NULL.
+  @param  [in]  IrqCount        Number of IRQs in IrqList. Must be > 0 and <= 16.
+  @param  [in]  NameOpNode      NameOp object node defining a named object.
+                                If provided, append the new resource data node
+                                to the list of resource data elements of this node.
+  @param  [out] NewRdNode       If provided and success, contain the created node.
+
+  @retval EFI_SUCCESS           The function completed successfully.
+  @retval EFI_INVALID_PARAMETER Invalid parameter.
+  @retval various               Other errors as indicated.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenRdIrq (
+  IN  BOOLEAN                 IsEdgeTriggered,
+  IN  BOOLEAN                 IsActiveLow,
+  IN  BOOLEAN                 IsShared,
+  IN  UINT8                   *IrqList,
+  IN  UINT8                   IrqCount,
+  IN  AML_OBJECT_NODE_HANDLE  NameOpNode  OPTIONAL,
+  OUT AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
+  );
+
+/** Code generation for the UARTSerialBusV2() ASL macro.
+
+  The Resource Data effectively created is a UART Serial Bus Connection
+  Resource Descriptor Resource Data.
+  Cf ACPI 6.5:
+   - s19.6.143 UARTSerialBusV2
+     (UART Serial Bus Connection Resource Descriptor Version 2 Macro)
+   - s6.4.3.8.2.3 UART Serial Bus Connection Resource Descriptor
+
+  The created resource data node can be:
+   - appended to the list of resource data elements of the NameOpNode.
+     In such case NameOpNode must be defined by a the "Name ()" ASL statement
+     and initially contain a "ResourceTemplate ()".
+   - returned through the NewRdNode parameter.
+
+  @param [in]  InitialBaudRate           Initial baud rate.
+  @param [in]  BitsPerByte               Number of bits per byte.
+                                         Optional, default is 8.
+  @param [in]  StopBits                  Number of stop bits.
+                                         Optional, default is 1.
+  @param [in]  LinesInUse                Number of lines in use.
+  @param [in]  IsBigEndian               Indicates whether the bit transfer is big-endian.
+                                         Optional, default is FALSE (little-endian).
+  @param [in]  Parity                    Parity format used.
+                                          Optional, default is no parity.
+  @param [in]  FlowControl               Flow control protocol used.
+                                          Optional, default is no flow control.
+  @param [in]  ReceiveBufferSize         Size of the receive buffer.
+  @param [in]  TransmitBufferSize        Size of the transmit buffer.
+  @param [in]  ResourceSource            Name of source resource used.
+  @param [in]  ResourceSourceLength      Length of the Resource Source.
+  @param [in]  ResourceSourceIndex       Resource Source index.
+                                         Optional, default is 0.
+  @param [in]  ResourceUsage             Resource usage, TRUE for consumer,
+                                         FALSE for producer.
+                                         Optional, default is TRUE (consumer).
+  @param [in]  IsShared                  Indicates whether the resource is shared.
+                                         Optional, default is FALSE (exclusive).
+  @param [in]  VendorDefinedData         Vendor defined data.
+                                         Optional, can be NULL.
+  @param [in]  VendorDefinedDataLength   Length of the vendor defined data.
+  @param [in]  NameOpNode                NameOp object node defining a named object.
+                                         If provided, append the new resource data
+                                         node to the list of resource data elements
+                                         of this node.
+  @param [out] NewRdNode                 If provided and success,
+                                         contain the created node.
+
+  @retval EFI_SUCCESS                   The function completed successfully.
+  @retval EFI_INVALID_PARAMETER         Invalid parameter.
+  @retval various                       Various failure values of called functions.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenRdUartSerialBusV2 (
+  IN  UINT32                  InitialBaudRate,
+  IN  UINT8                   *BitsPerByte OPTIONAL,
+  IN  UINT8                   *StopBits OPTIONAL,
+  IN  UINT8                   LinesInUse,
+  IN  BOOLEAN                 *IsBigEndian OPTIONAL,
+  IN  UINT8                   *Parity OPTIONAL,
+  IN  UINT8                   *FlowControl OPTIONAL,
+  IN  UINT16                  ReceiveBufferSize,
+  IN  UINT16                  TransmitBufferSize,
+  IN  CHAR8                   *ResourceSource,
+  IN  UINT16                  ResourceSourceLength,
+  IN  UINT8                   *ResourceSourceIndex OPTIONAL,
+  IN  BOOLEAN                 *ResourceUsage OPTIONAL,
+  IN  BOOLEAN                 *IsShared OPTIONAL,
+  IN  UINT8                   *VendorDefinedData OPTIONAL,
+  IN  UINT16                  VendorDefinedDataLength,
+  IN  AML_OBJECT_NODE_HANDLE  NameOpNode OPTIONAL,
+  OUT AML_DATA_NODE_HANDLE    *NewRdNode OPTIONAL
+  );
+
 #endif // AML_LIB_H_
