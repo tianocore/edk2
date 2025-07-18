@@ -176,6 +176,7 @@ M: Rebecca Cran <rebecca@bsdio.com> [bexcran]
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 M: Guillermo Antonio Palomino Sosa <guillermo.a.palomino.sosa@intel.com> [gapalomi]
 R: Yuwei Chen <yuwei.chen@intel.com> [YuweiChen1110]
+R: Poncho Figueroa <poncho.figueroa.esqueda@intel.com> [ponchofigueroa]
 
 BaseTools: Plugins
 F: BaseTools/Plugin/
