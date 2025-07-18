@@ -1393,8 +1393,11 @@ SmmCoreUpdateProfileFree (
       }
     }
 
-    ASSERT (DriverInfoData != NULL);
-    ASSERT (AllocInfoData != NULL);
+    if ((DriverInfoData == NULL) || (AllocInfoData == NULL)) {
+      ASSERT (DriverInfoData != NULL);
+      ASSERT (AllocInfoData != NULL);
+      return EFI_NOT_FOUND;
+    }
 
     Found = TRUE;
 
@@ -1686,7 +1689,7 @@ SmramProfileCopyData (
   LIST_ENTRY                       *FreePoolList;
   FREE_POOL_HEADER                 *Pool;
   UINTN                            PoolListIndex;
-  UINT32                           Index;
+  UINTN                            Index;
   MEMORY_PROFILE_FREE_MEMORY       *FreeMemory;
   MEMORY_PROFILE_MEMORY_RANGE      *MemoryRange;
   MEMORY_PROFILE_DESCRIPTOR        *MemoryProfileDescriptor;
@@ -1805,7 +1808,7 @@ SmramProfileCopyData (
         }
       }
 
-      FreeMemory->FreeMemoryEntryCount = Index;
+      FreeMemory->FreeMemoryEntryCount = (UINT32)Index;
 
       RemainingSize -= sizeof (MEMORY_PROFILE_FREE_MEMORY);
       ProfileBuffer  = (UINT8 *)ProfileBuffer + sizeof (MEMORY_PROFILE_FREE_MEMORY);

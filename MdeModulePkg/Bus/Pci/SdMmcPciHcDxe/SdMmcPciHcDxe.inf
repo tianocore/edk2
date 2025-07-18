@@ -57,6 +57,7 @@
   UefiDriverEntryPoint
   DebugLib
   PcdLib
+  SafeIntLib # MU_CHANGE - CodeQL Change
 
 [Protocols]
   gEdkiiSdMmcOverrideProtocolGuid               ## SOMETIMES_CONSUMES

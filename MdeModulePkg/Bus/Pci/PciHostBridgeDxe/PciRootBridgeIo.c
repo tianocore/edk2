@@ -246,7 +246,7 @@ CreateRootBridge (
     }
 
     RootBridge->ResAllocNode[Index].Type = Index;
-    if (Bridge->ResourceAssigned && (Aperture->Limit >= Aperture->Base)) {
+    if (Bridge->ResourceAssigned && (Aperture != NULL) && (Aperture->Limit >= Aperture->Base)) {
       //
       // Base in ResAllocNode is a host address, while Base in Aperture is a
       // device address.

@@ -25,6 +25,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/PcdLib.h>
+#include <Library/SafeIntLib.h> // MU_CHANGE - CodeQL Change - Enable SafeIntLib usage
 
 #include <Protocol/DevicePath.h>
 #include <Protocol/PciIo.h>

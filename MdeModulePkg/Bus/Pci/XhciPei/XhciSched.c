@@ -676,6 +676,9 @@ XhcPeiCheckUrbResult (
     //
     PhyAddr = (EFI_PHYSICAL_ADDRESS)(EvtTrb->TRBPtrLo | LShiftU64 ((UINT64)EvtTrb->TRBPtrHi, 32));
     TRBPtr  = (TRB_TEMPLATE *)(UINTN)UsbHcGetHostAddrForPciAddr (Xhc->MemPool, (VOID *)(UINTN)PhyAddr, sizeof (TRB_TEMPLATE), FALSE);
+    if (TRBPtr == NULL) {
+      return FALSE;
+    }
 
     //
     // Update the status of Urb according to the finished event regardless of whether
@@ -1120,7 +1123,11 @@ XhcPeiInitializeDeviceSlot (
   // 1) Allocate an Input Context data structure (6.2.5) and initialize all fields to '0'.
   //
   InputContext = UsbHcAllocateMem (Xhc->MemPool, sizeof (INPUT_CONTEXT));
-  ASSERT (InputContext != NULL);
+  if (InputContext == NULL) {
+    ASSERT (InputContext != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   ASSERT (((UINTN)InputContext & 0x3F) == 0);
   ZeroMem (InputContext, sizeof (INPUT_CONTEXT));
 
@@ -1223,7 +1230,11 @@ XhcPeiInitializeDeviceSlot (
   // 6) Allocate the Output Device Context data structure (6.2.1) and initialize it to '0'.
   //
   OutputContext = UsbHcAllocateMem (Xhc->MemPool, sizeof (DEVICE_CONTEXT));
-  ASSERT (OutputContext != NULL);
+  if (OutputContext == NULL) {
+    ASSERT (OutputContext != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   ASSERT (((UINTN)OutputContext & 0x3F) == 0);
   ZeroMem (OutputContext, sizeof (DEVICE_CONTEXT));
 
@@ -1335,7 +1346,11 @@ XhcPeiInitializeDeviceSlot64 (
   // 1) Allocate an Input Context data structure (6.2.5) and initialize all fields to '0'.
   //
   InputContext = UsbHcAllocateMem (Xhc->MemPool, sizeof (INPUT_CONTEXT_64));
-  ASSERT (InputContext != NULL);
+  if (InputContext == NULL) {
+    ASSERT (InputContext != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   ASSERT (((UINTN)InputContext & 0x3F) == 0);
   ZeroMem (InputContext, sizeof (INPUT_CONTEXT_64));
 
@@ -1438,7 +1453,11 @@ XhcPeiInitializeDeviceSlot64 (
   // 6) Allocate the Output Device Context data structure (6.2.1) and initialize it to '0'.
   //
   OutputContext = UsbHcAllocateMem (Xhc->MemPool, sizeof (DEVICE_CONTEXT_64));
-  ASSERT (OutputContext != NULL);
+  if (OutputContext == NULL) {
+    ASSERT (OutputContext != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   ASSERT (((UINTN)OutputContext & 0x3F) == 0);
   ZeroMem (OutputContext, sizeof (DEVICE_CONTEXT_64));
 
@@ -2682,81 +2701,84 @@ XhcPeiCreateEventRing (
 
   Size = sizeof (TRB_TEMPLATE) * EVENT_RING_TRB_NUMBER;
   Buf  = UsbHcAllocateMem (Xhc->MemPool, Size);
-  ASSERT (Buf != NULL);
-  ASSERT (((UINTN)Buf & 0x3F) == 0);
-  ZeroMem (Buf, Size);
+  if (Buf != NULL) {
+    ASSERT (((UINTN)Buf & 0x3F) == 0);
+    ZeroMem (Buf, Size);
 
-  DequeuePhy = UsbHcGetPciAddrForHostAddr (Xhc->MemPool, Buf, Size, TRUE);
+    DequeuePhy = UsbHcGetPciAddrForHostAddr (Xhc->MemPool, Buf, Size, TRUE);
 
-  EventRing->EventRingSeg0    = Buf;
-  EventRing->TrbNumber        = EVENT_RING_TRB_NUMBER;
-  EventRing->EventRingDequeue = (TRB_TEMPLATE *)EventRing->EventRingSeg0;
-  EventRing->EventRingEnqueue = (TRB_TEMPLATE *)EventRing->EventRingSeg0;
+    EventRing->EventRingSeg0    = Buf;
+    EventRing->TrbNumber        = EVENT_RING_TRB_NUMBER;
+    EventRing->EventRingDequeue = (TRB_TEMPLATE *)EventRing->EventRingSeg0;
+    EventRing->EventRingEnqueue = (TRB_TEMPLATE *)EventRing->EventRingSeg0;
 
-  //
-  // Software maintains an Event Ring Consumer Cycle State (CCS) bit, initializing it to '1'
-  // and toggling it every time the Event Ring Dequeue Pointer wraps back to the beginning of the Event Ring.
-  //
-  EventRing->EventRingCCS = 1;
+    //
+    // Software maintains an Event Ring Consumer Cycle State (CCS) bit, initializing it to '1'
+    // and toggling it every time the Event Ring Dequeue Pointer wraps back to the beginning of the Event Ring.
+    //
+    EventRing->EventRingCCS = 1;
 
-  Size = sizeof (EVENT_RING_SEG_TABLE_ENTRY) * ERST_NUMBER;
-  Buf  = UsbHcAllocateMem (Xhc->MemPool, Size);
-  ASSERT (Buf != NULL);
-  ASSERT (((UINTN)Buf & 0x3F) == 0);
-  ZeroMem (Buf, Size);
+    Size = sizeof (EVENT_RING_SEG_TABLE_ENTRY) * ERST_NUMBER;
+    Buf  = UsbHcAllocateMem (Xhc->MemPool, Size);
+    if (Buf != NULL) {
+      ASSERT (Buf != NULL);
+      ASSERT (((UINTN)Buf & 0x3F) == 0);
+      ZeroMem (Buf, Size);
 
-  ERSTBase              = (EVENT_RING_SEG_TABLE_ENTRY *)Buf;
-  EventRing->ERSTBase   = ERSTBase;
-  ERSTBase->PtrLo       = XHC_LOW_32BIT (DequeuePhy);
-  ERSTBase->PtrHi       = XHC_HIGH_32BIT (DequeuePhy);
-  ERSTBase->RingTrbSize = EVENT_RING_TRB_NUMBER;
+      ERSTBase              = (EVENT_RING_SEG_TABLE_ENTRY *)Buf;
+      EventRing->ERSTBase   = ERSTBase;
+      ERSTBase->PtrLo       = XHC_LOW_32BIT (DequeuePhy);
+      ERSTBase->PtrHi       = XHC_HIGH_32BIT (DequeuePhy);
+      ERSTBase->RingTrbSize = EVENT_RING_TRB_NUMBER;
 
-  ERSTPhy = UsbHcGetPciAddrForHostAddr (Xhc->MemPool, Buf, Size, TRUE);
+      ERSTPhy = UsbHcGetPciAddrForHostAddr (Xhc->MemPool, Buf, Size, TRUE);
 
-  //
-  // Program the Interrupter Event Ring Segment Table Size (ERSTSZ) register (5.5.2.3.1)
-  //
-  XhcPeiWriteRuntimeReg (
-    Xhc,
-    XHC_ERSTSZ_OFFSET,
-    ERST_NUMBER
-    );
-  //
-  // Program the Interrupter Event Ring Dequeue Pointer (ERDP) register (5.5.2.3.3)
-  //
-  // Some 3rd party XHCI external cards don't support single 64-bytes width register access,
-  // So divide it to two 32-bytes width register access.
-  //
-  XhcPeiWriteRuntimeReg (
-    Xhc,
-    XHC_ERDP_OFFSET,
-    XHC_LOW_32BIT ((UINT64)(UINTN)DequeuePhy)
-    );
-  XhcPeiWriteRuntimeReg (
-    Xhc,
-    XHC_ERDP_OFFSET + 4,
-    XHC_HIGH_32BIT ((UINT64)(UINTN)DequeuePhy)
-    );
-  //
-  // Program the Interrupter Event Ring Segment Table Base Address (ERSTBA) register (5.5.2.3.2)
-  //
-  // Some 3rd party XHCI external cards don't support single 64-bytes width register access,
-  // So divide it to two 32-bytes width register access.
-  //
-  XhcPeiWriteRuntimeReg (
-    Xhc,
-    XHC_ERSTBA_OFFSET,
-    XHC_LOW_32BIT ((UINT64)(UINTN)ERSTPhy)
-    );
-  XhcPeiWriteRuntimeReg (
-    Xhc,
-    XHC_ERSTBA_OFFSET + 4,
-    XHC_HIGH_32BIT ((UINT64)(UINTN)ERSTPhy)
-    );
-  //
-  // Need set IMAN IE bit to enable the ring interrupt
-  //
-  XhcPeiSetRuntimeRegBit (Xhc, XHC_IMAN_OFFSET, XHC_IMAN_IE);
+      //
+      // Program the Interrupter Event Ring Segment Table Size (ERSTSZ) register (5.5.2.3.1)
+      //
+      XhcPeiWriteRuntimeReg (
+        Xhc,
+        XHC_ERSTSZ_OFFSET,
+        ERST_NUMBER
+        );
+      //
+      // Program the Interrupter Event Ring Dequeue Pointer (ERDP) register (5.5.2.3.3)
+      //
+      // Some 3rd party XHCI external cards don't support single 64-bytes width register access,
+      // So divide it to two 32-bytes width register access.
+      //
+      XhcPeiWriteRuntimeReg (
+        Xhc,
+        XHC_ERDP_OFFSET,
+        XHC_LOW_32BIT ((UINT64)(UINTN)DequeuePhy)
+        );
+      XhcPeiWriteRuntimeReg (
+        Xhc,
+        XHC_ERDP_OFFSET + 4,
+        XHC_HIGH_32BIT ((UINT64)(UINTN)DequeuePhy)
+        );
+      //
+      // Program the Interrupter Event Ring Segment Table Base Address (ERSTBA) register (5.5.2.3.2)
+      //
+      // Some 3rd party XHCI external cards don't support single 64-bytes width register access,
+      // So divide it to two 32-bytes width register access.
+      //
+      XhcPeiWriteRuntimeReg (
+        Xhc,
+        XHC_ERSTBA_OFFSET,
+        XHC_LOW_32BIT ((UINT64)(UINTN)ERSTPhy)
+        );
+      XhcPeiWriteRuntimeReg (
+        Xhc,
+        XHC_ERSTBA_OFFSET + 4,
+        XHC_HIGH_32BIT ((UINT64)(UINTN)ERSTPhy)
+        );
+      //
+      // Need set IMAN IE bit to enable the ring interrupt
+      //
+      XhcPeiSetRuntimeRegBit (Xhc, XHC_IMAN_OFFSET, XHC_IMAN_IE);
+    }
+  }
 }
 
 /**
@@ -2800,7 +2822,7 @@ XhcPeiSyncTrsRing (
       // Toggle PCS maintained by software
       //
       TrsRing->RingPCS = (TrsRing->RingPCS & BIT0) ? 0 : 1;
-      TrsTrb           = (TRB_TEMPLATE *)TrsRing->RingSeg0; // Use host address
+      TrsTrb           = (TRB_TEMPLATE *)TrsRing->RingSeg0;   // Use host address
     }
   }
 
@@ -2918,7 +2940,10 @@ XhcPeiInitSched (
   //
   Size  = (Xhc->MaxSlotsEn + 1) * sizeof (UINT64);
   Dcbaa = UsbHcAllocateMem (Xhc->MemPool, Size);
-  ASSERT (Dcbaa != NULL);
+  if (Dcbaa == NULL) {
+    ASSERT (Dcbaa != NULL);
+    return;
+  }
 
   //
   // A Scratchpad Buffer is a PAGESIZE block of system memory located on a PAGESIZE boundary.

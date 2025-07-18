@@ -306,7 +306,10 @@ Split2MPageTo4K (
   AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
 
   PageTableEntry = AllocatePageTableMemory (1);
-  ASSERT (PageTableEntry != NULL);
+  if (PageTableEntry == NULL) {
+    ASSERT (PageTableEntry != NULL);
+    return;
+  }
 
   //
   // Fill in 2M page entry.
@@ -388,7 +391,10 @@ Split1GPageTo2M (
   AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
 
   PageDirectoryEntry = AllocatePageTableMemory (1);
-  ASSERT (PageDirectoryEntry != NULL);
+  if (PageDirectoryEntry == NULL) {
+    ASSERT (PageDirectoryEntry != NULL);
+    return;
+  }
 
   //
   // Fill in 1G page entry.
@@ -517,7 +523,10 @@ SetPageTablePoolReadOnly (
       ASSERT (Level > 1);
 
       NewPageTable = AllocatePageTableMemory (1);
-      ASSERT (NewPageTable != NULL);
+      if (NewPageTable == NULL) {
+        ASSERT (NewPageTable != NULL);
+        return;
+      }
 
       PhysicalAddress = PageAttr & LevelMask[Level];
       for (EntryIndex = 0;
@@ -790,7 +799,7 @@ CreateIdentityMappingPageTables (
     PageMapLevel4Entry = (VOID *)BigPageAddress;
     BigPageAddress    += SIZE_4KB;
 
-    if (LevelOfPaging == 5) {
+    if ((LevelOfPaging == 5) && (PageMapLevel5Entry != NULL)) {
       //
       // Make a PML5 Entry
       //
@@ -811,70 +820,72 @@ CreateIdentityMappingPageTables (
       PageDirectoryPointerEntry = (VOID *)BigPageAddress;
       BigPageAddress           += SIZE_4KB;
 
-      //
-      // Make a PML4 Entry
-      //
-      PageMapLevel4Entry->Uint64         = (UINT64)(UINTN)PageDirectoryPointerEntry | AddressEncMask;
-      PageMapLevel4Entry->Bits.ReadWrite = 1;
-      PageMapLevel4Entry->Bits.Present   = 1;
+      if (PageMapLevel4Entry != NULL) {
+        //
+        // Make a PML4 Entry
+        //
+        PageMapLevel4Entry->Uint64         = (UINT64)(UINTN)PageDirectoryPointerEntry | AddressEncMask;
+        PageMapLevel4Entry->Bits.ReadWrite = 1;
+        PageMapLevel4Entry->Bits.Present   = 1;
 
-      if (Page1GSupport) {
-        PageDirectory1GEntry = (VOID *)PageDirectoryPointerEntry;
+        if (Page1GSupport) {
+          PageDirectory1GEntry = (VOID *)PageDirectoryPointerEntry;
 
-        for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {
-          if (ToSplitPageTable (PageAddress, SIZE_1GB, StackBase, StackSize, GhcbBase, GhcbSize)) {
-            Split1GPageTo2M (PageAddress, (UINT64 *)PageDirectory1GEntry, StackBase, StackSize, GhcbBase, GhcbSize);
-          } else {
-            //
-            // Fill in the Page Directory entries
-            //
-            PageDirectory1GEntry->Uint64         = (UINT64)PageAddress | AddressEncMask;
-            PageDirectory1GEntry->Bits.ReadWrite = 1;
-            PageDirectory1GEntry->Bits.Present   = 1;
-            PageDirectory1GEntry->Bits.MustBe1   = 1;
-          }
-        }
-      } else {
-        for ( IndexOfPdpEntries = 0
-              ; IndexOfPdpEntries < (NumberOfPml4EntriesNeeded == 1 ? NumberOfPdpEntriesNeeded : 512)
-              ; IndexOfPdpEntries++, PageDirectoryPointerEntry++)
-        {
-          //
-          // Each Directory Pointer entries points to a page of Page Directory entires.
-          // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
-          //
-          PageDirectoryEntry = (VOID *)BigPageAddress;
-          BigPageAddress    += SIZE_4KB;
-
-          //
-          // Fill in a Page Directory Pointer Entries
-          //
-          PageDirectoryPointerEntry->Uint64         = (UINT64)(UINTN)PageDirectoryEntry | AddressEncMask;
-          PageDirectoryPointerEntry->Bits.ReadWrite = 1;
-          PageDirectoryPointerEntry->Bits.Present   = 1;
-
-          for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += SIZE_2MB) {
-            if (ToSplitPageTable (PageAddress, SIZE_2MB, StackBase, StackSize, GhcbBase, GhcbSize)) {
-              //
-              // Need to split this 2M page that covers NULL or stack range.
-              //
-              Split2MPageTo4K (PageAddress, (UINT64 *)PageDirectoryEntry, StackBase, StackSize, GhcbBase, GhcbSize);
+          for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {
+            if (ToSplitPageTable (PageAddress, SIZE_1GB, StackBase, StackSize, GhcbBase, GhcbSize)) {
+              Split1GPageTo2M (PageAddress, (UINT64 *)PageDirectory1GEntry, StackBase, StackSize, GhcbBase, GhcbSize);
             } else {
               //
               // Fill in the Page Directory entries
               //
-              PageDirectoryEntry->Uint64         = (UINT64)PageAddress | AddressEncMask;
-              PageDirectoryEntry->Bits.ReadWrite = 1;
-              PageDirectoryEntry->Bits.Present   = 1;
-              PageDirectoryEntry->Bits.MustBe1   = 1;
+              PageDirectory1GEntry->Uint64         = (UINT64)PageAddress | AddressEncMask;
+              PageDirectory1GEntry->Bits.ReadWrite = 1;
+              PageDirectory1GEntry->Bits.Present   = 1;
+              PageDirectory1GEntry->Bits.MustBe1   = 1;
             }
           }
-        }
+        } else {
+          for ( IndexOfPdpEntries = 0
+                ; IndexOfPdpEntries < (NumberOfPml4EntriesNeeded == 1 ? NumberOfPdpEntriesNeeded : 512)
+                ; IndexOfPdpEntries++, PageDirectoryPointerEntry++)
+          {
+            //
+            // Each Directory Pointer entries points to a page of Page Directory entires.
+            // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
+            //
+            PageDirectoryEntry = (VOID *)BigPageAddress;
+            BigPageAddress    += SIZE_4KB;
 
-        //
-        // Fill with null entry for unused PDPTE
-        //
-        ZeroMem (PageDirectoryPointerEntry, (512 - IndexOfPdpEntries) * sizeof (PAGE_MAP_AND_DIRECTORY_POINTER));
+            //
+            // Fill in a Page Directory Pointer Entries
+            //
+            PageDirectoryPointerEntry->Uint64         = (UINT64)(UINTN)PageDirectoryEntry | AddressEncMask;
+            PageDirectoryPointerEntry->Bits.ReadWrite = 1;
+            PageDirectoryPointerEntry->Bits.Present   = 1;
+
+            for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += SIZE_2MB) {
+              if (ToSplitPageTable (PageAddress, SIZE_2MB, StackBase, StackSize, GhcbBase, GhcbSize)) {
+                //
+                // Need to split this 2M page that covers NULL or stack range.
+                //
+                Split2MPageTo4K (PageAddress, (UINT64 *)PageDirectoryEntry, StackBase, StackSize, GhcbBase, GhcbSize);
+              } else {
+                //
+                // Fill in the Page Directory entries
+                //
+                PageDirectoryEntry->Uint64         = (UINT64)PageAddress | AddressEncMask;
+                PageDirectoryEntry->Bits.ReadWrite = 1;
+                PageDirectoryEntry->Bits.Present   = 1;
+                PageDirectoryEntry->Bits.MustBe1   = 1;
+              }
+            }
+          }
+
+          //
+          // Fill with null entry for unused PDPTE
+          //
+          ZeroMem (PageDirectoryPointerEntry, (512 - IndexOfPdpEntries) * sizeof (PAGE_MAP_AND_DIRECTORY_POINTER));
+        }
       }
     }
 

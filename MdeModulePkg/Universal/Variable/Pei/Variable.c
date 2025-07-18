@@ -858,6 +858,7 @@ FindVariableEx (
   VARIABLE_STORE_HEADER  *VariableStoreHeader;
   VARIABLE_INDEX_TABLE   *IndexTable;
   VARIABLE_HEADER        *VariableHeader;
+  BOOLEAN                Valid;
 
   VariableStoreHeader = StoreInfo->VariableStoreHeader;
 
@@ -894,8 +895,8 @@ FindVariableEx (
       ASSERT (Index < sizeof (IndexTable->Index) / sizeof (IndexTable->Index[0]));
       Offset  += IndexTable->Index[Index];
       MaxIndex = (VARIABLE_HEADER *)((UINT8 *)IndexTable->StartPtr + Offset);
-      GetVariableHeader (StoreInfo, MaxIndex, &VariableHeader);
-      if (CompareWithValidVariable (StoreInfo, MaxIndex, VariableHeader, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS) {
+      Valid    = GetVariableHeader (StoreInfo, MaxIndex, &VariableHeader);
+      if (Valid && (CompareWithValidVariable (StoreInfo, MaxIndex, VariableHeader, VariableName, VendorGuid, PtrTrack) == EFI_SUCCESS)) {
         if (VariableHeader->State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
           InDeletedVariable = PtrTrack->CurrPtr;
         } else {
