@@ -264,7 +264,7 @@ BuildAndInstallMultipleSmbiosTables (
     Status = TableFactoryProtocol->AddSmbiosHandle (
                                      SmbiosProtocol,
                                      &TableHandle,
-                                     CmObjToken[Index],
+                                     CmObjToken ? CmObjToken[Index] : CM_NULL_TOKEN,
                                      SmbiosTableInfo->TableGeneratorId
                                      );
     if (EFI_ERROR (Status)) {
