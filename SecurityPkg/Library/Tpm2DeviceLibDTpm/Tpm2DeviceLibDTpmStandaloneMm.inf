@@ -37,7 +37,6 @@
   Tpm2DeviceLibDTpm.c
   Tpm2DeviceLibDTpmStandaloneMm.c
   Tpm2DeviceLibDTpm.h
-  Tpm2DeviceLibDTpmDump.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -50,6 +49,7 @@
   TimerLib
   DebugLib
   PcdLib
+  Tpm2DumpLib
 
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress            ## CONSUMES
