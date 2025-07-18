@@ -440,6 +440,29 @@ XhcWaitOpRegBit (
   );
 
 /**
+  Wait the PortSc register's bit as specified by Bit to become set (or clear).
+  Sometime device will be disapeared so that need to check the Xhc and Port status
+
+  @param  Xhc          The XHCI Instance.
+  @param  Offset       The offset of the operation register.
+  @param  Bit          The bit of the register to wait for.
+  @param  WaitToSet    Wait the bit to set or clear.
+  @param  Timeout      The time to wait before abort (in millisecond, ms).
+
+  @retval EFI_SUCCESS  The bit successfully changed by host controller.
+  @retval EFI_TIMEOUT  The time out occurred.
+
+**/
+EFI_STATUS
+XhcWaitPortScBit (
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN UINT32             Offset,
+  IN UINT32             Bit,
+  IN BOOLEAN            WaitToSet,
+  IN UINT32             Timeout
+  );
+
+/**
   Read XHCI runtime register.
 
   @param  Xhc          The XHCI Instance.
