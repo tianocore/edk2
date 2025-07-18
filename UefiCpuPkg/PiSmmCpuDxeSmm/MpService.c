@@ -318,6 +318,7 @@ SmmWaitForApArrival (
     }
   }
 
+  mSmmMpSyncData->AllApArrivedWithException = AllCpusInSmmExceptBlockedDisabled ();
   if (!mSmmMpSyncData->AllApArrivedWithException) {
     //
     // Check for the Blocked & Delayed Case.
