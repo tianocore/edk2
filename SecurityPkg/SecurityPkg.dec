@@ -103,6 +103,10 @@
   ##
   SpdmSecurityLib|Include/Library/SpdmSecurityLib.h
 
+  ##  @libraryclass  Provides helper functions to perform a detailed debugging of TPM transactions as they
+  #   go to and from the TPM device.
+  Tpm2DumpLib|Include/Library/Tpm2DumpLib.h
+
 [Guids]
   ## Security package token space guid.
   # Include/Guid/SecurityPkgTokenSpace.h
