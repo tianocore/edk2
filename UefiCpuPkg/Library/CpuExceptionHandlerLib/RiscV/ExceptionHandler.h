@@ -8,16 +8,16 @@
 
 **/
 
-#ifndef RISCV_CPU_EXECPTION_HANDLER_LIB_H_
-#define RISCV_CPU_EXECPTION_HANDLER_LIB_H_
+#ifndef EXCEPTION_HANDLER_H_
+#define EXCEPTION_HANDLER_H_
 
 #include <Register/RiscV64/RiscVImpl.h>
 
 /**
   Trap Handler for S-mode
-
 **/
 VOID
+EFIAPI
 SupervisorModeTrap (
   VOID
   );
@@ -108,4 +108,4 @@ typedef struct {
 } SMODE_TRAP_REGISTERS;
 #pragma pack()
 
-#endif
+#endif /* EXCEPTION_HANDLER_H_ */

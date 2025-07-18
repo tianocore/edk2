@@ -8,7 +8,7 @@
 **/
 
 #include <Base.h>
-#include "CpuExceptionHandlerLib.h"
+#include "ExceptionHandler.h"
 
   .align 3
   .section .entry, "ax", %progbits
