@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/Tpm2DeviceLib.h>
+#include <Library/Tpm2DumpLib.h>
 #include <Library/PcdLib.h>
 
 #include <Guid/TpmInstance.h>
@@ -36,7 +37,8 @@ Tpm2InstanceLibDTpmConstructor (
   VOID
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS               Status;
+  TPM2_PTP_INTERFACE_TYPE  PtpInterface;
 
   Status = Tpm2RegisterTpm2DeviceLib (&mDTpm2InternalTpm2Device);
   if ((Status == EFI_SUCCESS) || (Status == EFI_UNSUPPORTED)) {
@@ -44,8 +46,8 @@ Tpm2InstanceLibDTpmConstructor (
     // Unsupported means platform policy does not need this instance enabled.
     //
     if (Status == EFI_SUCCESS) {
-      Status = InternalTpm2DeviceLibDTpmCommonConstructor ();
-      DumpPtpInfo ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress));
+      Status = InternalTpm2DeviceLibDTpmCommonConstructor (&PtpInterface);
+      DumpPtpInfo ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress), PtpInterface);
     }
 
     return EFI_SUCCESS;

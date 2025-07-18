@@ -47,7 +47,7 @@ GetCachedPtpInterface (
 **/
 EFI_STATUS
 InternalTpm2DeviceLibDTpmCommonConstructor (
-  VOID
+  TPM2_PTP_INTERFACE_TYPE  *PtpInterface
   )
 {
   mActiveTpmInterfaceType = 0xFF;
@@ -60,6 +60,10 @@ InternalTpm2DeviceLibDTpmCommonConstructor (
 
   if (mActiveTpmInterfaceType == Tpm2PtpInterfaceCrb) {
     mCRBIdleByPass = Tpm2GetIdleByPass ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress));
+  }
+
+  if (PtpInterface != NULL) {
+    *PtpInterface = mActiveTpmInterfaceType;
   }
 
   return EFI_SUCCESS;

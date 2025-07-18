@@ -9,6 +9,7 @@
 **/
 
 #include <Uefi.h>
+#include <Library/Tpm2DeviceLib.h>
 
 #ifndef TPM2_DUMP_H_
 #define TPM2_DUMP_H_
@@ -37,6 +38,19 @@ EFIAPI
 DumpTpmOutputBlock (
   IN UINT32       OutputBlockSize,
   IN CONST UINT8  *OutputBlock
+  );
+
+/**
+  Dump PTP register information.
+
+  @param[in] Register                Pointer to PTP register.
+  @param[in] PtpInterface            Type of the PTP interface.
+**/
+VOID
+EFIAPI
+DumpPtpInfo (
+  IN VOID                     *Register,
+  IN TPM2_PTP_INTERFACE_TYPE  PtpInterface
   );
 
 #endif // TPM2_DUMP_H_

@@ -45,23 +45,27 @@ GetCachedPtpInterface (
 **/
 EFI_STATUS
 InternalTpm2DeviceLibDTpmCommonConstructor (
-  VOID
+  TPM2_PTP_INTERFACE_TYPE  *PtpInterface
   )
 {
-  TPM2_PTP_INTERFACE_TYPE  PtpInterface;
+  TPM2_PTP_INTERFACE_TYPE  PtpInterfaceTmp;
   UINT8                    IdleByPass;
 
   //
   // Cache current active TpmInterfaceType only when needed
   //
   if (PcdGet8 (PcdActiveTpmInterfaceType) == 0xFF) {
-    PtpInterface = Tpm2GetPtpInterface ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress));
-    PcdSet8S (PcdActiveTpmInterfaceType, PtpInterface);
+    PtpInterfaceTmp = Tpm2GetPtpInterface ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress));
+    PcdSet8S (PcdActiveTpmInterfaceType, PtpInterfaceTmp);
   }
 
   if ((PcdGet8 (PcdActiveTpmInterfaceType) == Tpm2PtpInterfaceCrb) && (PcdGet8 (PcdCRBIdleByPass) == 0xFF)) {
     IdleByPass = Tpm2GetIdleByPass ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress));
     PcdSet8S (PcdCRBIdleByPass, IdleByPass);
+  }
+
+  if (PtpInterface != NULL) {
+    *PtpInterface = GetCachedPtpInterface ();
   }
 
   return EFI_SUCCESS;

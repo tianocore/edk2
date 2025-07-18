@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Library/BaseLib.h>
 #include <Library/Tpm2DeviceLib.h>
+#include <Library/Tpm2DumpLib.h>
 
 #include <Guid/TpmInstance.h>
 
@@ -36,7 +37,8 @@ Tpm2InstanceLibDTpmConstructorSvsm (
   VOID
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS               Status;
+  TPM2_PTP_INTERFACE_TYPE  PtpInterface;
 
   Status = Tpm2RegisterTpm2DeviceLib (&mDTpm2InternalTpm2Device);
 
@@ -57,8 +59,8 @@ Tpm2InstanceLibDTpmConstructorSvsm (
   }
 
   // No SVSM vTPM found; set up regular DTPM Ptp implementation
-  Status = InternalTpm2DeviceLibDTpmCommonConstructor ();
-  DumpPtpInfo ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress));
+  Status = InternalTpm2DeviceLibDTpmCommonConstructor (&PtpInterface);
+  DumpPtpInfo ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress), PtpInterface);
 
   return Status;
 }

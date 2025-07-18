@@ -13,6 +13,7 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/Tpm2DeviceLib.h>
+#include <Library/Tpm2DumpLib.h>
 #include <IndustryStandard/Tpm20.h>
 #include <Guid/Tpm2ServiceFfa.h>
 
@@ -46,7 +47,7 @@ Tpm2InstanceLibFfaConstructor (
     //
     if (Status == EFI_SUCCESS) {
       Status = InternalTpm2DeviceLibFfaConstructor ();
-      DumpPtpInfo ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress));
+      DumpPtpInfo ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress), Tpm2PtpInterfaceCrb);
     }
 
     return Status;

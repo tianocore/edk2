@@ -12,16 +12,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define TPM2_PTP_H_
 
 /**
-  Dump PTP register information.
-
-  @param[in] Register                Pointer to PTP register.
-**/
-VOID
-DumpPtpInfo (
-  IN VOID  *Register
-  );
-
-/**
   This service enables the sending of commands to the TPM2.
 
   @param[in]      InputParameterBlockSize  Size of the TPM2 input parameter block.

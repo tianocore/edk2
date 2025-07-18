@@ -207,16 +207,6 @@ FfaTpm2GetServicePartitionId (
   );
 
 /**
-  Dump PTP register information.
-
-  @param[in] Register                Pointer to PTP register.
-**/
-VOID
-DumpPtpInfo (
-  IN VOID  *Register
-  );
-
-/**
   Check that we have an address for the CRB
 
   @retval EFI_SUCCESS      The entry point is executed successfully.

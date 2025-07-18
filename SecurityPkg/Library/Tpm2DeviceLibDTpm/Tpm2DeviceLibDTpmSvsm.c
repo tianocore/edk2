@@ -91,6 +91,6 @@ Tpm2DeviceLibConstructorSvsm (
   if (TryUseSvsmVTpm ()) {
     return EFI_SUCCESS;
   } else {
-    return InternalTpm2DeviceLibDTpmCommonConstructor ();
+    return InternalTpm2DeviceLibDTpmCommonConstructor (NULL);
   }
 }
