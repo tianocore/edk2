@@ -55,6 +55,9 @@
   ##  @libraryclass  Defines a set of methods for generating Tpm2 Device Table method.
   Tpm2DeviceTableLib|Include/Library/Tpm2DeviceTableLib.h
 
+  ##  @libraryclass  Defines a set of SMBIOS related SMC helper methods.
+  SmcbiosSmbLib|Include/Library/SmbiosSmcLib.h
+
 [LibraryClasses.AARCH64]
   ##  @libraryclass  Defines a set of APIs to populate CmObj using SCMI.
   DynamicTablesScmiInfoLib|Include/Library/DynamicTablesScmiInfoLib.h
