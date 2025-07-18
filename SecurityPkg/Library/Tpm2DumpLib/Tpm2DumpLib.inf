@@ -1,0 +1,34 @@
+## @file
+#  This lib contains helper functions to perform a detailed debugging of
+#  TPM transactions as they go to and from the TPM device.
+#
+#  Copyright (c) Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Tpm2DumpLib
+  FILE_GUID                      = 9F5A695F-AA4B-496C-A5D9-D3CB71DB73A4
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Tpm2DumpLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = ALL
+#
+
+[Sources]
+  Tpm2DumpLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib

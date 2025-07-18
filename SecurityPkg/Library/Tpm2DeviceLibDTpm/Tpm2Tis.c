@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/TimerLib.h>
 #include <Library/DebugLib.h>
 #include <Library/Tpm2DeviceLib.h>
+#include <Library/Tpm2DumpLib.h>
 #include <Library/PcdLib.h>
 
 #include <IndustryStandard/TpmTis.h>

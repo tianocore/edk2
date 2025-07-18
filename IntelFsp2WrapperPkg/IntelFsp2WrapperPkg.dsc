@@ -56,6 +56,7 @@
   FspWrapperHobProcessLib|IntelFsp2WrapperPkg/Library/PeiFspWrapperHobProcessLibSample/PeiFspWrapperHobProcessLibSample.inf
 
   Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
+  Tpm2DumpLib|SecurityPkg/Library/Tpm2DumpLib/Tpm2DumpLib.inf
 
 [LibraryClasses.common.PEIM,LibraryClasses.common.PEI_CORE]
   PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
