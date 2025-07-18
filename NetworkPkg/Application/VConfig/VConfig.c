@@ -654,18 +654,34 @@ VlanConfigMain (
 
   if (ShellCommandLineGetFlag (List, L"-l")) {
     Str = ShellCommandLineGetValue (List, L"-l");
+    if (Str == NULL) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VCONFIG_NO_IF), mHiiHandle);
+      goto Exit;
+    }
+
     DisplayVlan ((CHAR16 *)Str);
     goto Exit;
   }
 
   if (ShellCommandLineGetFlag (List, L"-a")) {
     Str = ShellCommandLineGetValue (List, L"-a");
+    if (Str == NULL) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VCONFIG_NO_IF), mHiiHandle);
+      goto Exit;
+    }
+
     AddVlan ((CHAR16 *)Str);
+
     goto Exit;
   }
 
   if (ShellCommandLineGetFlag (List, L"-d")) {
     Str = ShellCommandLineGetValue (List, L"-d");
+    if (Str == NULL) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VCONFIG_NO_IF), mHiiHandle);
+      goto Exit;
+    }
+
     DeleteVlan ((CHAR16 *)Str);
     goto Exit;
   }
