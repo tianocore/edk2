@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <openssl/rand.h>
 #include <openssl/evp.h>
 #include <Library/PrintLib.h>
+#include <Library/RngLib.h>
 
 /**
   Sets up the seed value for the pseudorandom number generator.
@@ -34,7 +35,7 @@ RandomSeed (
   IN  UINTN         SeedSize
   )
 {
-  CHAR8  DefaultSeed[128];
+  UINT32  RandomNumber;
 
   if (SeedSize > INT_MAX) {
     return FALSE;
@@ -47,17 +48,12 @@ RandomSeed (
   if (Seed != NULL) {
     RAND_seed (Seed, (UINT32)SeedSize);
   } else {
-    //
-    // Retrieve current time.
-    //
-    AsciiSPrint (
-      DefaultSeed,
-      sizeof (DefaultSeed),
-      "UEFI Crypto Library default seed (%ld)",
-      AsmReadTsc ()
-      );
+    // Use RngLib to get the RandomNumber.
+    if (!GetRandomNumber32 (&RandomNumber)) {
+      return FALSE;
+    }
 
-    RAND_seed (DefaultSeed, sizeof (DefaultSeed));
+    RAND_seed (&RandomNumber, sizeof (RandomNumber));
   }
 
   if (RAND_status () == 1) {
