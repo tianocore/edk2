@@ -47,6 +47,9 @@
   LoongArch/LoongArch64/ExceptionHandlerAsm.S | GCC
 
 [Sources.RISCV64]
+  RiscV/Backtrace.h
+  RiscV/Backtrace.c
+  RiscV/BacktraceHelperSec.c
   RiscV/ExceptionLib.c
   RiscV/ExceptionHandler.h
   RiscV/ExceptionHandlerAsm.S | GCC

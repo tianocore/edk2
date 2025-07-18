@@ -47,6 +47,9 @@
   LoongArch/LoongArch64/ExceptionHandlerAsm.S | GCC
 
 [Sources.RISCV64]
+  RiscV/Backtrace.h
+  RiscV/Backtrace.c
+  RiscV/BacktraceHelper.c
   RiscV/ExceptionLib.c
   RiscV/ExceptionHandler.h
   RiscV/ExceptionHandlerAsm.S | GCC
@@ -79,6 +82,9 @@
 
 [LibraryClasses.LoongArch64]
   CpuLib
+
+[Guids.RISCV64]
+  gEfiDebugImageInfoTableGuid
 
 [BuildOptions]
   XCODE:*_*_X64_NASM_FLAGS = -D NO_ABSOLUTE_RELOCS_IN_TEXT
