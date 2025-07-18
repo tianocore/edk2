@@ -32,7 +32,7 @@ GicV3Supported (
   // feature is implemented on the CPU. This is also convenient as our GICv3
   // driver requires SRE. If only Memory mapped access is available we try to
   // drive the GIC as a v2.
-  if (ArmHasGicSystemRegisters ()) {
+  if (ArmHasGicV3SystemRegisters ()) {
     // Make sure System Register access is enabled (SRE). This depends on the
     // higher privilege level giving us permission, otherwise we will either
     // cause an exception here, or the write doesn't stick in which case we need
@@ -52,6 +52,15 @@ GicV3Supported (
   }
 
   return FALSE;
+}
+
+STATIC
+BOOLEAN
+GicV5Supported (
+  VOID
+  )
+{
+  return ArmHasGicV5SystemRegisters ();
 }
 
 /**
@@ -74,10 +83,10 @@ InterruptDxeInitialize (
 {
   EFI_STATUS  Status;
 
-  if (!GicV3Supported () && !ArmHasGicV5SystemRegisters ()) {
+  if (!GicV3Supported () && !GicV5Supported ()) {
     Status = GicV2DxeInitialize (ImageHandle, SystemTable);
   } else {
-    Status = GicV3DxeInitialize (ImageHandle, SystemTable);
+    Status = GicDxeInitialize (ImageHandle, SystemTable);
   }
 
   return Status;
