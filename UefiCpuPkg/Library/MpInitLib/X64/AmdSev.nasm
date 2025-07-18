@@ -24,13 +24,6 @@
 ;
 SevSnpGetInitCpuNumber:
     ;
-    ; If not an SNP guest, leave EBX (CpuNumber) as is
-    ;
-    lea        edi, [esi + MP_CPU_EXCHANGE_INFO_FIELD (SevSnpIsEnabled)]
-    cmp        byte [edi], 1        ; SevSnpIsEnabled
-    jne        SevSnpGetCpuNumberDone
-
-    ;
     ; If not starting the AP with a specific ApicId, leave EBX (CpuNumber) as is
     ;
     lea        edi, [esi + MP_CPU_EXCHANGE_INFO_FIELD (SevSnpKnownInitApicId)]
