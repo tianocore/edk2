@@ -1,0 +1,38 @@
+## @file
+#  Light-weight Memory Management Routines at Runtime Phase.
+#
+#  Copyright (c) 2025, Arm Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = RuntimeMemoryAllocationLib
+  FILE_GUID                      = e3605f88-63d8-11f0-bffd-3b7fc2fbbd7b
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RuntimeMemoryAllocationLib|DXE_RUNTIME_DRIVER
+  CONSTRUCTOR                    = RuntimeMemoryAllocationLibConstructor
+
+[Sources]
+  RuntimeMemoryAllocationLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PcdLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+
+[Guids]
+  gEfiEventVirtualAddressChangeGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRuntimeMemoryPageCount

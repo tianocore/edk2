@@ -1,0 +1,23 @@
+## @file
+#  Light-weight Memory Management Routines at Runtime Phase.
+#
+#  Copyright (c) 2025, Arm Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = RuntimeMemoryAllocationLib
+  FILE_GUID                      = 1bc857bc-63f3-11f0-ac29-eb1a403bcb2f
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RuntimeMemoryAllocationLib
+
+[Sources]
+  RuntimeMemoryAllocationLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
