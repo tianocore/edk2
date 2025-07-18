@@ -14,7 +14,7 @@
 #include <Library/SerialPortLib.h>
 #include <Library/PrintLib.h>
 #include <Register/RiscV64/RiscVEncoding.h>
-#include "CpuExceptionHandlerLib.h"
+#include "ExceptionHandler.h"
 
 //
 // Define the maximum message length

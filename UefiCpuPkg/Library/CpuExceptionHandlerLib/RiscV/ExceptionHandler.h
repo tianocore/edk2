@@ -8,16 +8,16 @@
 
 **/
 
-#ifndef RISCV_CPU_EXECPTION_HANDLER_LIB_H_
-#define RISCV_CPU_EXECPTION_HANDLER_LIB_H_
+#ifndef ExceptionHandler_h_
+#define ExceptionHandler_h_
 
 #include <Register/RiscV64/RiscVImpl.h>
 
 /**
   Trap Handler for S-mode
-
 **/
 VOID
+EFIAPI
 SupervisorModeTrap (
   VOID
   );
@@ -70,42 +70,42 @@ typedef struct {
   //
   // Below follow the format of EFI_SYSTEM_CONTEXT.
   //
-  UINT64    zero;
-  UINT64    ra;
-  UINT64    sp;
-  UINT64    gp;
-  UINT64    tp;
-  UINT64    t0;
-  UINT64    t1;
-  UINT64    t2;
-  UINT64    s0;
-  UINT64    s1;
-  UINT64    a0;
-  UINT64    a1;
-  UINT64    a2;
-  UINT64    a3;
-  UINT64    a4;
-  UINT64    a5;
-  UINT64    a6;
-  UINT64    a7;
-  UINT64    s2;
-  UINT64    s3;
-  UINT64    s4;
-  UINT64    s5;
-  UINT64    s6;
-  UINT64    s7;
-  UINT64    s8;
-  UINT64    s9;
-  UINT64    s10;
-  UINT64    s11;
-  UINT64    t3;
-  UINT64    t4;
-  UINT64    t5;
-  UINT64    t6;
-  UINT64    sepc;
-  UINT64    sstatus;
-  UINT64    stval;
+  UINTN    zero;
+  UINTN    ra;
+  UINTN    sp;
+  UINTN    gp;
+  UINTN    tp;
+  UINTN    t0;
+  UINTN    t1;
+  UINTN    t2;
+  UINTN    s0;
+  UINTN    s1;
+  UINTN    a0;
+  UINTN    a1;
+  UINTN    a2;
+  UINTN    a3;
+  UINTN    a4;
+  UINTN    a5;
+  UINTN    a6;
+  UINTN    a7;
+  UINTN    s2;
+  UINTN    s3;
+  UINTN    s4;
+  UINTN    s5;
+  UINTN    s6;
+  UINTN    s7;
+  UINTN    s8;
+  UINTN    s9;
+  UINTN    s10;
+  UINTN    s11;
+  UINTN    t3;
+  UINTN    t4;
+  UINTN    t5;
+  UINTN    t6;
+  UINTN    sepc;
+  UINTN    sstatus;
+  UINTN    stval;
 } SMODE_TRAP_REGISTERS;
 #pragma pack()
 
-#endif
+#endif /* ExceptionHandler_h_ */
