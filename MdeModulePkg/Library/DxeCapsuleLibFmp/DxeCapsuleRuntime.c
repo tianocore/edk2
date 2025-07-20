@@ -176,7 +176,9 @@ DxeCapsuleLibSystemResourceTableInstallEventNotify (
     //
     // Free the pool to remove the cached ESRT table.
     //
-    if (mEsrtTable != NULL) {
+    if (!FeaturePcdGet (PcdSupportProcessCapsuleAtRuntime) &&
+        (mRuntimeFmpCount > 0) && (mEsrtTable != NULL))
+    {
       FreePool ((VOID *)mEsrtTable);
       mEsrtTable = NULL;
     }
@@ -197,6 +199,14 @@ DxeCapsuleLibSystemResourceTableInstallEventNotify (
     // Set FwResourceCountMax to a sane value.
     //
     mEsrtTable->FwResourceCountMax = mEsrtTable->FwResourceCount;
+
+    //
+    // If runtime capsule update is supported, replace Esrt with rt version.
+    //
+    if (FeaturePcdGet (PcdSupportProcessCapsuleAtRuntime) && (mRuntimeFmpCount > 0)) {
+      ConfigEntry->VendorTable = mEsrtTable;
+      FreePool ((VOID *)EsrtTable);
+    }
   }
 }
 
