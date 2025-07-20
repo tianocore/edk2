@@ -91,7 +91,6 @@
 #include <Protocol/HiiConfigRouting.h>
 #include <Protocol/HiiConfigAccess.h>
 #include <Protocol/FormBrowser2.h>
-#include <Protocol/DeviceIo.h>
 #include <Protocol/DriverConfiguration.h>
 #include <Protocol/DriverConfiguration2.h>
 #include <Protocol/DevicePathUtilities.h>
