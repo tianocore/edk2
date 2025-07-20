@@ -11,7 +11,6 @@
 #include <Library/ShellLib.h>
 #include <Library/IoLib.h>
 #include <Protocol/PciRootBridgeIo.h>
-#include <Protocol/DeviceIo.h>
 
 typedef enum {
   ShellMmMemory,
