@@ -47,6 +47,7 @@
   CacheMaintenanceLib
   PeiServicesTablePointerLib
   MmPlatformHobProducerLib
+  MmIplPlatformHookLib
 
 [Guids]
   gMmCommBufferHobGuid

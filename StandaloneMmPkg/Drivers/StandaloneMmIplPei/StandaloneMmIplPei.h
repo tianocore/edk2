@@ -25,6 +25,7 @@
 #include <Ppi/MmCommunication3.h>
 #include <Protocol/MmCommunication.h>
 #include <Library/MmPlatformHobProducerLib.h>
+#include <Library/MmIplPlatformHookLib.h>
 
 /**
   Communicates with a registered handler.
