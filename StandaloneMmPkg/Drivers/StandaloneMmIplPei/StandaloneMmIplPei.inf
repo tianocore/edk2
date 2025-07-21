@@ -45,6 +45,7 @@
   PeCoffLib
   CacheMaintenanceLib
   MmPlatformHobProducerLib
+  MmIplPlatformHookLib
 
 [Guids]
   gMmCommBufferHobGuid
