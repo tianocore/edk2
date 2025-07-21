@@ -1,0 +1,23 @@
+## @file
+#  NULL instance of MmIplPlatformHookLib
+#
+#  Copyright (c) 2025, 9elements GmbH.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = MmIplPlatformHookLibNull
+  FILE_GUID                      = 7E486268-BDFE-486F-A843-50BB1BA7C21F
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = MmIplPlatformHookLib
+
+[Sources]
+  MmIplPlatformHookLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec

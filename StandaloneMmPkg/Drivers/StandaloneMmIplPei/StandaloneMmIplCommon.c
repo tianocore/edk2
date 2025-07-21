@@ -315,6 +315,7 @@ ExecuteMmCoreFromMmram (
   )
 {
   EFI_STATUS                      Status;
+  EFI_STATUS                      Status2;
   UINTN                           PageCount;
   VOID                            *MmHobList;
   UINTN                           MmHobSize;
@@ -372,6 +373,11 @@ ExecuteMmCoreFromMmram (
   ImageContext.ImageAddress &= ~((EFI_PHYSICAL_ADDRESS)ImageContext.SectionAlignment - 1);
 
   //
+  // Call platform hook now that image info is known
+  //
+  PlatformHookBeforeMmLoad (&ImageContext);
+
+  //
   // Print debug message showing MM Core load address.
   //
   DEBUG ((DEBUG_INFO, "StandaloneMM IPL loading MM Core at MMRAM address %p\n", (VOID *)(UINTN)ImageContext.ImageAddress));
@@ -404,7 +410,7 @@ ExecuteMmCoreFromMmram (
                     MmFvBase,
                     MmFvSize,
                     &MmCoreFileName,
-                    ImageContext.ImageAddress,
+                    ImageContext.DestinationAddress != 0 ? ImageContext.DestinationAddress : ImageContext.ImageAddress,
                     EFI_PAGES_TO_SIZE (PageCount),
                     ImageContext.EntryPoint,
                     Block
@@ -418,8 +424,12 @@ ExecuteMmCoreFromMmram (
       //
       // Execute image
       //
-      Entry = (MM_FOUNDATION_ENTRY_POINT)(UINTN)ImageContext.EntryPoint;
-      Entry (MmHobList);
+      Status2 = PlatformHookCallMmCore (&ImageContext, MmHobList, &Status);
+      if (Status2 == EFI_UNSUPPORTED) {
+        Entry = (MM_FOUNDATION_ENTRY_POINT)(UINTN)ImageContext.EntryPoint;
+        Entry (MmHobList);
+      }
+
       FreePages (MmHobList, EFI_SIZE_TO_PAGES (MmHobSize));
       FreePool (Block);
     }
