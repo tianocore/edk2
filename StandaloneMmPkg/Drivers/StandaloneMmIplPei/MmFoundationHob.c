@@ -290,7 +290,7 @@ MmIplBuildMmramDescriptorHob (
 
   This function builds a customized HOB tagged with a GUID for identification, copies the
   input data to the HOB data field and returns the start address of the GUID HOB data.
-  If new HOB buffer is NULL or the GUID HOB could not found, then ASSERT().
+  If new HOB buffer is NULL, then ASSERT().
 
   @param[in]       HobBuffer            The pointer of HOB buffer.
   @param[in, out]  HobBufferSize        The available size of the HOB buffer when as input.
@@ -311,7 +311,10 @@ MmIplCopyGuidHob (
 
   UsedSize = 0;
   GuidHob  = GetFirstGuidHob (Guid);
-  ASSERT (GuidHob != NULL);
+
+  if (GuidHob == NULL) {
+    DEBUG ((DEBUG_WARN, "GUIDed HOB %g could not be found\n", Guid));
+  }
 
   while (GuidHob != NULL) {
     if (*HobBufferSize >= UsedSize + GuidHob->HobLength) {
