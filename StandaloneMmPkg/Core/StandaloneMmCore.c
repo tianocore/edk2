@@ -455,7 +455,7 @@ MmCorePrepareCommunicationBuffer (
   mMmCommunicationBuffer = (MM_COMM_BUFFER *)GET_GUID_HOB_DATA (GuidHob);
   DEBUG ((
     DEBUG_INFO,
-    "MM Communication Buffer is at %x, number of pages is %x\n",
+    "MM Communication Buffer is at 0x%x, number of pages is %d\n",
     mMmCommunicationBuffer->PhysicalStart,
     mMmCommunicationBuffer->NumberOfPages
     ));
