@@ -265,7 +265,9 @@ MmReadyToLockHandler (
   // Display any drivers that were not dispatched because dependency expression
   // evaluated to false if this is a debug build
   //
-  // MmDisplayDiscoveredNotDispatched ();
+  DEBUG_CODE_BEGIN ();
+  MmDisplayDiscoveredNotDispatched ();
+  DEBUG_CODE_END ();
 
   return Status;
 }
