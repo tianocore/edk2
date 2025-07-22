@@ -69,6 +69,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define AES_BLOCK_SIZE  16
 
 ///
+/// TLS Maximum security level
+#define MAX_SECURITY_LEVEL  5
+///
 /// RSA Key Tags Definition used in RsaSetKey() function for key component identification.
 ///
 typedef enum {
@@ -2263,6 +2266,24 @@ RsaOaepDecrypt (
   IN   UINT16  DigestLen   OPTIONAL,
   OUT  UINT8   **OutData,
   OUT  UINTN   *OutDataSize
+  );
+
+/**
+  This function Set the Tls security level.
+  If Tls is NULL, nothing is done.
+
+  @param[in]  Tls                Pointer to the TLS object.
+  @param[in]  Level              Tls Security level need to set.
+
+  @retval  EFI_SUCCESS           The Tls security level was set successfully.
+  @retval  EFI_INVALID_PARAMETER The parameters are invalid.
+
+**/
+EFI_STATUS
+EFIAPI
+TlsSetSecurityLevel (
+  IN VOID   *Tls,
+  IN UINT8  Level
   );
 
 /**
