@@ -50,11 +50,11 @@ typedef struct _SEC_SEV_ES_WORK_AREA {
 
   UINT64    EncryptionMask;
 
+  // Flags:
+  // - BIT0 - VC: Indicator that the VC handler was called. It is used
+  //   during the SevFeature detection in OvmfPkg/ResetVector/Ia32/AmdSev.asm
   //
-  // Indicator that the VC handler is called. It is used during the SevFeature
-  // detection in OvmfPkg/ResetVector/Ia32/AmdSev.c
-  //
-  UINT8     ReceivedVc;
+  UINT8     Flags;
   UINT8     Reserved[7];
 
   // Used by SEC to generate Page State Change requests. This should be
@@ -63,6 +63,8 @@ typedef struct _SEC_SEV_ES_WORK_AREA {
   //
   UINT8     WorkBuffer[1024];
 } SEC_SEV_ES_WORK_AREA;
+
+#define SEV_ES_WORK_AREA_VC  BIT0
 
 //
 // The SEV work area definition.

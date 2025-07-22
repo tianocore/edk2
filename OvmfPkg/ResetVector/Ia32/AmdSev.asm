@@ -306,9 +306,9 @@ NoSev:
     ; Perform an SEV-ES sanity check by seeing if a #VC exception occurred.
     ;
     ; If SEV-ES is enabled, the CPUID instruction will trigger a #VC exception
-    ; where the RECEIVED_VC offset in the workarea will be set to one.
+    ; where the VC bit in the FLAGS field in the workarea will be set to one.
     ;
-    cmp       byte[SEV_ES_WORK_AREA_RECEIVED_VC], 0
+    test      byte[SEV_ES_WORK_AREA_FLAGS], SEV_ES_WORK_AREA_FLAG_VC
     jz        NoSevPass
 
     ;
@@ -402,9 +402,9 @@ SevEsIdtVmmComm:
     ; If we're here, then we are an SEV-ES guest and this
     ; was triggered by a CPUID instruction
     ;
-    ; Set the recievedVc field in the workarea to communicate that
-    ; a #VC was taken.
-    mov     byte[SEV_ES_WORK_AREA_RECEIVED_VC], 1
+    ; Set the VC bit in the FLAGS field in the workarea to communicate
+    ; that a #VC was taken.
+    or      byte[SEV_ES_WORK_AREA_FLAGS], SEV_ES_WORK_AREA_FLAG_VC
 
     pop     ecx                     ; Error code
     cmp     ecx, 0x72               ; Be sure it was CPUID
