@@ -625,8 +625,8 @@ PeiLoadImageLoadImage (
   EFI_SECTION_TYPE      SearchType2;
   CHAR8                 *AsciiString;
   CHAR8                 EfiFileName[512];
-  INT32                 Index;
-  INT32                 StartIndex;
+  UINTN                 Index;
+  UINTN                 StartIndex;
 
   *EntryPoint          = 0;
   ImageSize            = 0;
