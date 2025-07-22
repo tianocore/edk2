@@ -315,10 +315,12 @@ InternalSetPageState (
     if (State == SevSnpPagePrivate) {
       AmdSvsmSnpPvalidate (Info);
 
-      for (Index = 0; Index <= Info->Header.EndEntry; Index++) {
-        Address     = LShiftU64 ((UINT64)Info->Entry[Index].GuestFrameNumber, EFI_PAGE_SHIFT);
-        RmpPageSize = Info->Entry[Index].PageSize;
-        SevEvictCache (Address, RmpPageSize == PvalidatePageSize2MB ? PAGES_PER_2MB_ENTRY : 1);
+      if (MemEncryptSevSnpDoCoherencyMitigation ()) {
+        for (Index = 0; Index <= Info->Header.EndEntry; Index++) {
+          Address     = LShiftU64 ((UINT64)Info->Entry[Index].GuestFrameNumber, EFI_PAGE_SHIFT);
+          RmpPageSize = Info->Entry[Index].PageSize;
+          SevEvictCache (Address, RmpPageSize == PvalidatePageSize2MB ? PAGES_PER_2MB_ENTRY : 1);
+        }
       }
     }
   }

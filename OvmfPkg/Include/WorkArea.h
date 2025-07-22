@@ -53,6 +53,8 @@ typedef struct _SEC_SEV_ES_WORK_AREA {
   // Flags:
   // - BIT0 - VC: Indicator that the VC handler was called. It is used
   //   during the SevFeature detection in OvmfPkg/ResetVector/Ia32/AmdSev.asm
+  // - BIT1 - CSFW_NO: Indicator that the SEV-SNP cache line evication
+  //   mitigation is not needed.
   //
   UINT8     Flags;
   UINT8     Reserved[7];
@@ -64,7 +66,8 @@ typedef struct _SEC_SEV_ES_WORK_AREA {
   UINT8     WorkBuffer[1024];
 } SEC_SEV_ES_WORK_AREA;
 
-#define SEV_ES_WORK_AREA_VC  BIT0
+#define SEV_ES_WORK_AREA_FLAG_VC       BIT0
+#define SEV_ES_WORK_AREA_FLAG_CSFW_NO  BIT1
 
 //
 // The SEV work area definition.
