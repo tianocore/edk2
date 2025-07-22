@@ -31,10 +31,13 @@
   SecMain.c
   SecMain.h
   FindPeiCore.c
-  SecBist.c
 
 [Sources.IA32]
   Ia32/ResetVec.nasmb
+
+[Sources.IA32, Sources.X64]
+  SecBist.c
+  SecTemporaryRamDone.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -55,8 +58,10 @@
   PeiServicesLib
   PeiServicesTablePointerLib
   HobLib
-  CpuPageTableLib
   StackCheckLib
+
+[LibraryClasses.IA32, LibraryClasses.X64]
+  CpuPageTableLib
 
 [Ppis]
   ## SOMETIMES_CONSUMES

@@ -34,6 +34,21 @@ ArmHasGicSystemRegisters (
 }
 
 /**
+  Check whether the CPU supports the GICv5 system register interface
+
+  @return   Whether GICv5 System Register Interface is supported
+**/
+BOOLEAN
+EFIAPI
+ArmHasGicV5SystemRegisters (
+  VOID
+  )
+{
+  // GICv5 not supported in AArch32.
+  return FALSE;
+}
+
+/**
   Check whether the CPU supports the Security extensions
 
   @return   Whether the Security extensions are implemented
