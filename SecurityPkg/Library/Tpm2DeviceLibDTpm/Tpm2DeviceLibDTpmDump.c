@@ -421,7 +421,7 @@ DumpTpmPcrCommand (
 
   // If this is an unrecognized command, we can't go much further.
   if ((Command != TPM_CC_PCR_Extend) && (Command != TPM_CC_PCR_Event)) {
-    DEBUG ((DEBUG_WARN, "%a - Unrecognized command! 0x%X\n", __func__, Command));
+    DEBUG ((DEBUG_SECURITY, "%a - Unrecognized command! 0x%X\n", __func__, Command));
     return;
   }
 
@@ -461,7 +461,7 @@ DumpTpmPcrCommand (
 
         default:
           // This algorithm hasn't been programmed yet. We need to bail.
-          DEBUG ((DEBUG_WARN, "%a - Unknown hash algorithm! 0x%04X\n", __func__, SwapBytes16 (CurrentDigest->hashAlg)));
+          DEBUG ((DEBUG_SECURITY, "%a - Unknown hash algorithm! 0x%04X\n", __func__, SwapBytes16 (CurrentDigest->hashAlg)));
           // Zero the count so we can get out of here.
           DigestCount = 0;
           break;
@@ -635,11 +635,11 @@ DumpTpmInputBlock (
   TPM_CC                     NativeCode;
 
   DEBUG ((DEBUG_SECURITY, "\n=== BEGIN TPM COMMAND ===\n"));
-  DEBUG ((DEBUG_VERBOSE, "Size:     %d (0x%X), Address:  0x%X\n", InputBlockSize, InputBlockSize, InputBlock));
+  DEBUG ((DEBUG_SECURITY, "Size:     %d (0x%X), Address:  0x%X\n", InputBlockSize, InputBlockSize, InputBlock));
 
   // Make sure we've got at least enough data for a valid header.
   if (InputBlockSize < sizeof (*CommHeader)) {
-    DEBUG ((DEBUG_WARN, "%a - Invalid buffer size!\n", __func__));
+    DEBUG ((DEBUG_SECURITY, "%a - Invalid buffer size!\n", __func__));
     return;
   }
 
@@ -704,7 +704,7 @@ DumpTpmOutputBlock (
   UINT32                      NativeSize;
   TPM_CC                      NativeCode;
 
-  DEBUG ((DEBUG_VERBOSE, "Size:     %d (0x%X), Address:  0x%X\n", OutputBlockSize, OutputBlockSize, OutputBlock));
+  DEBUG ((DEBUG_SECURITY, "Size:     %d (0x%X), Address:  0x%X\n", OutputBlockSize, OutputBlockSize, OutputBlock));
 
   // Start the debugging by mapping some stuff.
   RespHeader = (TPM2_RESPONSE_HEADER *)OutputBlock;
