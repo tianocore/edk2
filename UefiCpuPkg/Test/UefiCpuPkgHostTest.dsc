@@ -38,3 +38,8 @@
   # Build HOST_APPLICATION that tests the CpuPageTableLib
   #
   UefiCpuPkg/Library/CpuPageTableLib/UnitTest/CpuPageTableLibUnitTestHost.inf
+
+  #
+  # Build HOST_APPLICATION Libraries for GoogleTests
+  #
+  UefiCpuPkg/Test/Mock/Library/GoogleTest/MockLocalApicLib/MockLocalApicLib.inf
