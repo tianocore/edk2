@@ -249,9 +249,19 @@ ClearSevEsWorkArea:
 
     ; Check for SEV memory encryption feature:
     ; CPUID  Fn8000_001F[EAX] - Bit 1
+    ; Check for the COHERENCY_SFW_NO feature:
+    ; CPUID  Fn8000_001F[EBX] - Bit 31
     ;   CPUID raises a #VC exception if running as an SEV-ES guest
     mov       eax, 0x8000001f
     cpuid
+
+    ; If COHERENCY_SFW_NO is set, set the CSFW_NO bit in the FLAGS field
+    ; of the workarea (this can be set regardless of whether SEV is enabled).
+    bt        ebx, 31
+    jnc       CheckSev
+    or        byte[SEV_ES_WORK_AREA_FLAGS], SEV_ES_WORK_AREA_FLAG_CSFW_NO
+
+CheckSev:
     bt        eax, 1
     jnc       NoSev
 
