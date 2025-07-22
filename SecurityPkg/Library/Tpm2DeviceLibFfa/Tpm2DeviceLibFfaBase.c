@@ -21,8 +21,7 @@
 
 #include "Tpm2DeviceLibFfa.h"
 
-TPM2_PTP_INTERFACE_TYPE  mActiveTpmInterfaceType;
-UINT8                    mCRBIdleByPass;
+UINT8  mCRBIdleByPass;
 
 /**
   Return cached PTP CRB interface IdleByPass state.
@@ -52,28 +51,18 @@ InternalTpm2DeviceLibFfaConstructor (
 {
   EFI_STATUS  Status;
 
-  mActiveTpmInterfaceType = PcdGet8 (PcdActiveTpmInterfaceType);
-  mCRBIdleByPass          = 0xFF;
+  mCRBIdleByPass = 0xFF;
 
   if (PcdGet64 (PcdTpmBaseAddress) == 0) {
     Status = EFI_NO_MAPPING;
     goto Exit;
   }
 
-  //
-  // Start by checking the PCD out of the gate and read from the CRB if it is invalid
-  //
-  if (mActiveTpmInterfaceType == 0xFF) {
-    mActiveTpmInterfaceType = Tpm2GetPtpInterface ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress));
-    PcdSet8S (PcdActiveTpmInterfaceType, mActiveTpmInterfaceType);
-  }
-
-  if (mActiveTpmInterfaceType != Tpm2PtpInterfaceCrb) {
-    Status = EFI_UNSUPPORTED;
+  Status = ValidateTpmInterfaceType ();
+  if (EFI_ERROR (Status)) {
     goto Exit;
   }
 
-  DEBUG ((DEBUG_INFO, "Setting Tpm Active Interface Type %d\n", mActiveTpmInterfaceType));
   mCRBIdleByPass = Tpm2GetIdleByPass ((VOID *)(UINTN)PcdGet64 (PcdTpmBaseAddress));
 
   Status = EFI_SUCCESS;
