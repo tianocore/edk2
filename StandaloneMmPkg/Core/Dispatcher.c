@@ -145,7 +145,7 @@ MmLoadImage (
   EFI_PHYSICAL_ADDRESS  DstBuffer;
   UINTN                 Index;
   UINTN                 StartIndex;
-  CHAR8                 EfiFileName[256];
+  CHAR8                 EfiFileName[512];
 
   DEBUG ((DEBUG_INFO, "MmLoadImage - %g\n", &DriverEntry->FileName));
 
