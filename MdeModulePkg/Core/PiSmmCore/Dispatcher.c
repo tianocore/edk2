@@ -327,7 +327,7 @@ SmmLoadImage (
   PE_COFF_LOADER_IMAGE_CONTEXT   ImageContext;
   UINTN                          Index;
   UINTN                          StartIndex;
-  CHAR8                          EfiFileName[256];
+  CHAR8                          EfiFileName[512];
 
   PERF_LOAD_IMAGE_BEGIN (DriverEntry->ImageHandle);
 
