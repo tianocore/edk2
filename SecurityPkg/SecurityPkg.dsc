@@ -430,6 +430,7 @@
   SecurityPkg/Tcg/Tcg2AcpiFfa/Tcg2AcpiFfa.inf
   SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigFfaPei.inf
   SecurityPkg/Library/Tpm2DeviceLibFfa/Tpm2DeviceLibFfa.inf
+  SecurityPkg/Library/Tpm2DeviceLibFfa/Tpm2DeviceSecLibFfa.inf
   SecurityPkg/Library/Tpm2DeviceLibFfa/Tpm2InstanceLibFfa.inf
 
 [BuildOptions]

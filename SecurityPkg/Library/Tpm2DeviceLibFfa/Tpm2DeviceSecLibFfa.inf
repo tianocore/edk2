@@ -10,11 +10,11 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = Tpm2DeviceLibFfa
-  FILE_GUID                      = 30AB5914-CB27-4022-89A9-9942FBDB14E7
+  BASE_NAME                      = Tpm2DeviceSecLibFfa
+  FILE_GUID                      = d66e7482-615c-11f0-91d0-47f6d24396e9
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = Tpm2DeviceLib
+  LIBRARY_CLASS                  = Tpm2DeviceLib|SEC
   CONSTRUCTOR                    = Tpm2DeviceLibFfaConstructor
 
 #
@@ -29,7 +29,7 @@
   Tpm2DeviceLibFfaBase.c
   Tpm2Ptp.c
   Tpm2DeviceLibFfa.h
-  Tpm2InfoFfa.c
+  Tpm2InfoSecFfa.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -49,5 +49,3 @@
 
 [Pcd.common]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress            ## CONSUMES
-  gEfiSecurityPkgTokenSpaceGuid.PcdActiveTpmInterfaceType    ## PRODUCES
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmServiceFfaPartitionId  ## SOMETIMES_PRODUCES
