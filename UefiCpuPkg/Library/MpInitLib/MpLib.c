@@ -960,7 +960,7 @@ GetApResetVectorSize (
   )
 {
   if (SizeBelow1Mb != NULL) {
-    *SizeBelow1Mb = AddressMap->ModeTransitionOffset + sizeof (MP_CPU_EXCHANGE_INFO);
+    *SizeBelow1Mb = ALIGN_VALUE (AddressMap->ModeTransitionOffset, sizeof (UINTN)) + sizeof (MP_CPU_EXCHANGE_INFO);
   }
 
   if (SizeAbove1Mb != NULL) {
@@ -1018,15 +1018,17 @@ FillExchangeInfoData (
   ExchangeInfo->Enable5LevelPaging = (BOOLEAN)(Cr4.Bits.LA57 == 1);
   DEBUG ((DEBUG_INFO, "%a: 5-Level Paging = %d\n", gEfiCallerBaseName, ExchangeInfo->Enable5LevelPaging));
 
-  ExchangeInfo->SevEsIsEnabled  = CpuMpData->SevEsIsEnabled;
-  ExchangeInfo->SevSnpIsEnabled = CpuMpData->SevSnpIsEnabled;
-  ExchangeInfo->GhcbBase        = (UINTN)CpuMpData->GhcbBase;
+  ExchangeInfo->SevEsIsEnabled        = CpuMpData->SevEsIsEnabled;
+  ExchangeInfo->SevSnpIsEnabled       = CpuMpData->SevSnpIsEnabled;
+  ExchangeInfo->GhcbBase              = (UINTN)CpuMpData->GhcbBase;
+  ExchangeInfo->ExtTopoAvail          = FALSE;
+  ExchangeInfo->SevSnpKnownInitApicId = FALSE;
 
   //
-  // Populate SEV-ES specific exchange data.
+  // Populate SEV-SNP specific exchange data.
   //
   if (ExchangeInfo->SevSnpIsEnabled) {
-    FillExchangeInfoDataSevEs (ExchangeInfo);
+    FillExchangeInfoDataSevSnp (ExchangeInfo);
   }
 
   //
@@ -1092,7 +1094,7 @@ BackupAndPrepareWakeupBuffer (
   CopyMem (
     (VOID *)CpuMpData->WakeupBuffer,
     (VOID *)CpuMpData->AddressMap.RendezvousFunnelAddress,
-    CpuMpData->BackupBufferSize - sizeof (MP_CPU_EXCHANGE_INFO)
+    CpuMpData->AddressMap.ModeTransitionOffset
     );
 }
 
@@ -1126,17 +1128,22 @@ AllocateResetVectorBelow1Mb (
   UINTN  ApResetStackSize;
 
   if (CpuMpData->WakeupBuffer == (UINTN)-1) {
-    CpuMpData->WakeupBuffer      = GetWakeupBuffer (CpuMpData->BackupBufferSize);
+    CpuMpData->WakeupBuffer = GetWakeupBuffer (CpuMpData->BackupBufferSize);
+    //
+    // Align MpCpuExchangeInfo to avoid split-lock violations.
+    //
     CpuMpData->MpCpuExchangeInfo = (MP_CPU_EXCHANGE_INFO *)(UINTN)
-                                   (CpuMpData->WakeupBuffer + CpuMpData->BackupBufferSize - sizeof (MP_CPU_EXCHANGE_INFO));
+                                   (CpuMpData->WakeupBuffer +
+                                    ALIGN_VALUE (CpuMpData->AddressMap.ModeTransitionOffset, sizeof (UINTN)));
     DEBUG ((
       DEBUG_INFO,
       "AP Vector: 16-bit = %p/%x, ExchangeInfo = %p/%x\n",
       CpuMpData->WakeupBuffer,
-      CpuMpData->BackupBufferSize - sizeof (MP_CPU_EXCHANGE_INFO),
+      CpuMpData->AddressMap.ModeTransitionOffset,
       CpuMpData->MpCpuExchangeInfo,
       sizeof (MP_CPU_EXCHANGE_INFO)
       ));
+
     //
     // The AP reset stack is only used by SEV-ES guests. Do not allocate it
     // if SEV-ES is not enabled. An SEV-SNP guest is also considered
@@ -2067,6 +2074,7 @@ MpInitLibInitialize (
   UINTN                    ApResetVectorSizeAbove1Mb;
   UINTN                    BackupBufferAddr;
   UINTN                    ApIdtBase;
+  IA32_CR0                 Cr0;
 
   FirstMpHandOff = GetNextMpHandOffHob (NULL);
   if (FirstMpHandOff != NULL) {
@@ -2243,7 +2251,13 @@ MpInitLibInitialize (
   // Copy all 32-bit code and 64-bit code into memory with type of
   // EfiBootServicesCode to avoid page fault if NX memory protection is enabled.
   //
-  CpuMpData->WakeupBufferHigh = AllocateCodeBuffer (ApResetVectorSizeAbove1Mb);
+  CpuMpData->WakeupBufferHigh = AllocateCodePage (ApResetVectorSizeAbove1Mb);
+
+  Cr0.UintN = AsmReadCr0 ();
+  if (Cr0.Bits.PG != 0) {
+    RemoveNxProtection ((EFI_PHYSICAL_ADDRESS)(UINTN)CpuMpData->WakeupBufferHigh, ALIGN_VALUE (ApResetVectorSizeAbove1Mb, EFI_PAGE_SIZE));
+  }
+
   CopyMem (
     (VOID *)CpuMpData->WakeupBufferHigh,
     CpuMpData->AddressMap.RendezvousFunnelAddress +
@@ -2251,6 +2265,9 @@ MpInitLibInitialize (
     ApResetVectorSizeAbove1Mb
     );
   DEBUG ((DEBUG_INFO, "AP Vector: non-16-bit = %p/%x\n", CpuMpData->WakeupBufferHigh, ApResetVectorSizeAbove1Mb));
+  if (Cr0.Bits.PG != 0) {
+    ApplyRoProtection ((EFI_PHYSICAL_ADDRESS)(UINTN)CpuMpData->WakeupBufferHigh, ALIGN_VALUE (ApResetVectorSizeAbove1Mb, EFI_PAGE_SIZE));
+  }
 
   //
   // Save APIC mode for AP to sync
@@ -3479,7 +3496,7 @@ PrepareApLoopCode (
     // Make sure that the buffer memory is executable if NX protection is enabled
     // for EfiReservedMemoryType.
     //
-    RemoveNxprotection (Address, EFI_PAGES_TO_SIZE (FuncPages));
+    RemoveNxProtection (Address, EFI_PAGES_TO_SIZE (FuncPages));
   }
 
   mReservedTopOfApStack = (UINTN)Address + EFI_PAGES_TO_SIZE (StackPages+FuncPages);
@@ -3487,6 +3504,10 @@ PrepareApLoopCode (
   mReservedApLoop.Data = (VOID *)(UINTN)Address;
   ASSERT (mReservedApLoop.Data != NULL);
   CopyMem (mReservedApLoop.Data, ApLoopFunc, ApLoopFuncSize);
+  if (Cr0.Bits.PG != 0) {
+    ApplyRoProtection (Address, EFI_PAGES_TO_SIZE (FuncPages));
+  }
+
   if (!CpuMpData->UseSevEsAPMethod) {
     //
     // processors without SEV-ES and paging is enabled

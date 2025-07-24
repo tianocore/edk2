@@ -47,10 +47,10 @@
   DebugLib
   DxeServicesLib
   MemoryAllocationLib
-  MmServicesTableLib
   PcdLib
   PeCoffGetEntryPointLib
   SmmMemLib
+  SmmServicesTableLib
   SynchronizationLib
   TimerLib
   UefiBootServicesTableLib

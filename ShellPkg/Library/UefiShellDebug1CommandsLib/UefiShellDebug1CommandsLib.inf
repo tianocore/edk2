@@ -96,6 +96,7 @@
   MdePkg/MdePkg.dec
   ShellPkg/ShellPkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
 
 [LibraryClasses]
   MemoryAllocationLib
@@ -144,3 +145,4 @@
   gEfiConfProfilesUefiSpecGuid    ## SOMETIMES_CONSUMES ## GUID
   gEfiConfProfilesEbbrSpec21Guid  ## SOMETIMES_CONSUMES ## GUID
   gEfiConfProfilesEbbrSpec22Guid  ## SOMETIMES_CONSUMES ## GUID
+  gFdtTableGuid                   ## SOMETIMES_CONSUMES ## SystemTable

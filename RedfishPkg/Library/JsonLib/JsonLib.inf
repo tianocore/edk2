@@ -84,5 +84,5 @@
   #
   MSFT:*_*_X64_CC_FLAGS = /wd4204 /wd4244 /wd4090 /wd4334 /wd4706 /DHAVE_CONFIG_H=1 /U_WIN32 /UWIN64 /U_MSC_VER
   MSFT:*_*_IA32_CC_FLAGS = /wd4204 /wd4244 /wd4090 /wd4706 /DHAVE_CONFIG_H=1 /U_WIN32 /UWIN64 /U_MSC_VER
-  GCC:*_*_*_CC_FLAGS = -Wno-unused-function -Wno-unused-but-set-variable
+  GCC:*_*_*_CC_FLAGS = -Wno-unused-function -Wno-unused-but-set-variable -DHAVE_CONFIG_H=1 -UWIN32 -U_WIN32 -UWIN64 -U_MSC_VER
 

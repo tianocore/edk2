@@ -103,9 +103,12 @@ gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableBase|gUefiOvmfPkgTokenSpaceGui
 0x011000|0x00F000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
 
-0x020000|0x0E0000
+0x020000|0x0D0000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvSize
 FV = PEIFV
+
+0x0F0000|0x10000
+gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogSize
 
 0x100000|0xE80000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
@@ -173,6 +176,9 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
 APRIORI PEI {
+!if $(DEBUG_TO_MEM)
+  INF  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
+!endif
   INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 }
 
@@ -183,6 +189,9 @@ INF  MdeModulePkg/Core/Pei/PeiMain.inf
 INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 INF  MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf
 INF  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
+!if $(DEBUG_TO_MEM)
+INF  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
+!endif
 !if $(CC_MEASUREMENT_ENABLE) == TRUE
   INF  OvmfPkg/Tcg/TdTcg2Pei/TdTcg2Pei.inf
 !endif
@@ -269,15 +278,6 @@ INF  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
 INF  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
 INF  OvmfPkg/VirtioSerialDxe/VirtioSerial.inf
 INF  OvmfPkg/VirtioKeyboardDxe/VirtioKeyboard.inf
-!if $(PVSCSI_ENABLE) == TRUE
-INF  OvmfPkg/PvScsiDxe/PvScsiDxe.inf
-!endif
-!if $(MPT_SCSI_ENABLE) == TRUE
-INF  OvmfPkg/MptScsiDxe/MptScsiDxe.inf
-!endif
-!if $(LSI_SCSI_ENABLE) == TRUE
-INF  OvmfPkg/LsiScsiDxe/LsiScsiDxe.inf
-!endif
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   INF  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
@@ -321,8 +321,10 @@ INF  OvmfPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
 
 INF  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
 INF  OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
+!if $(STANDALONE_MM_ENABLE) != TRUE
 INF  MdeModulePkg/Universal/Acpi/S3SaveStateDxe/S3SaveStateDxe.inf
 INF  MdeModulePkg/Universal/Acpi/BootScriptExecutorDxe/BootScriptExecutorDxe.inf
+!endif
 INF  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
 
 INF  FatPkg/EnhancedFatDxe/Fat.inf
@@ -370,6 +372,14 @@ INF  OvmfPkg/VirtHstiDxe/VirtHstiDxe.inf
 !if $(SMM_REQUIRE) == TRUE
 INF  OvmfPkg/SmmAccess/SmmAccess2Dxe.inf
 INF  OvmfPkg/SmmControl2Dxe/SmmControl2Dxe.inf
+!if $(STANDALONE_MM_ENABLE) == TRUE
+INF  OvmfPkg/SmmControl2Dxe/MmControlPei.inf
+INF  StandaloneMmPkg/Drivers/StandaloneMmIplPei/StandaloneMmIplPei.inf
+INF  StandaloneMmPkg/Drivers/MmCommunicationDxe/MmCommunicationDxe.inf
+INF  StandaloneMmPkg/Core/StandaloneMmCore.inf
+INF  UefiCpuPkg/CpuIo2Smm/CpuIo2StandaloneMm.inf
+INF  UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuStandaloneMm.inf
+!else
 INF  OvmfPkg/CpuS3DataDxe/CpuS3DataDxe.inf
 INF  MdeModulePkg/Core/PiSmmCore/PiSmmIpl.inf
 INF  MdeModulePkg/Core/PiSmmCore/PiSmmCore.inf
@@ -377,14 +387,21 @@ INF  OvmfPkg/CpuHotplugSmm/CpuHotplugSmm.inf
 INF  UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
 INF  MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.inf
 INF  UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf
+!endif
 INF  MdeModulePkg/Universal/SmmCommunicationBufferDxe/SmmCommunicationBufferDxe.inf
 
 #
 # Variable driver stack (SMM)
 #
+!if $(STANDALONE_MM_ENABLE) == TRUE
+INF  OvmfPkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesStandaloneMm.inf
+INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm.inf
+INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf
+!else
 INF  OvmfPkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesSmm.inf
 INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteSmm.inf
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf
+!endif
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
 
 !else
@@ -423,6 +440,7 @@ INF OvmfPkg/Tcg/TdTcg2Dxe/TdTcg2Dxe.inf
 !include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
 !include OvmfPkg/Include/Fdf/MorLock.fdf.inc
 !include OvmfPkg/Include/Fdf/OvmfRngDxe.fdf.inc
+!include OvmfPkg/Include/Fdf/OvmfOptHw.fdf.inc
 
   #
   # Smbios Measurement support
@@ -559,6 +577,21 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
 
 [Rule.Common.DXE_SMM_DRIVER]
   FILE SMM = $(NAMED_GUID) {
+    SMM_DEPEX    SMM_DEPEX Optional      $(INF_OUTPUT)/$(MODULE_NAME).depex
+    PE32     PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI       STRING="$(MODULE_NAME)" Optional
+    VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.MM_CORE_STANDALONE]
+  FILE MM_CORE_STANDALONE = $(NAMED_GUID) {
+    PE32     PE32           $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI       STRING="$(MODULE_NAME)" Optional
+    VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.MM_STANDALONE]
+  FILE MM_STANDALONE = $(NAMED_GUID) {
     SMM_DEPEX    SMM_DEPEX Optional      $(INF_OUTPUT)/$(MODULE_NAME).depex
     PE32     PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
     UI       STRING="$(MODULE_NAME)" Optional

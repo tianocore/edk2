@@ -19,6 +19,8 @@
 [Sources]
   ArmFfaCommon.h
   ArmFfaCommon.c
+  ArmFfaRxTxMap.h
+  ArmFfaStandaloneMmRxTxMap.c
   ArmFfaStandaloneMmLib.c
 
 [Packages]
@@ -31,6 +33,11 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+  MmServicesTableLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaTxRxPageCount
+
+[Guids]
+  gArmFfaRxTxBufferInfoGuid

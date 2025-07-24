@@ -38,6 +38,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/MemoryAttributesTable.h>
 
 #include <Protocol/FirmwareVolume2.h>
+#include <Protocol/MemoryAttribute.h>
 #include <Protocol/SimpleFileSystem.h>
 
 #include "DxeMain.h"
@@ -66,6 +67,8 @@ UINT32  mImageProtectionPolicy;
 extern LIST_ENTRY  mGcdMemorySpaceMap;
 
 STATIC LIST_ENTRY  mProtectedImageRecordList;
+
+EFI_MEMORY_ATTRIBUTE_PROTOCOL  *gMemoryAttributeProtocol;
 
 /**
   Get the image type.
@@ -1034,6 +1037,37 @@ DisableNullDetectionAtTheEndOfDxe (
 }
 
 /**
+  A notification for the Memory Attribute Protocol Installation.
+
+  @param[in]  Event                 Event whose notification function is being invoked.
+  @param[in]  Context               Pointer to the notification function's context,
+                                    which is implementation-dependent.
+
+**/
+VOID
+EFIAPI
+MemoryAttributeProtocolNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = gBS->LocateProtocol (&gEfiMemoryAttributeProtocolGuid, NULL, (VOID **)&gMemoryAttributeProtocol);
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a - Unable to locate the memory attribute protocol! Status = %r\n",
+      __func__,
+      Status
+      ));
+  }
+
+  CoreCloseEvent (Event);
+}
+
+/**
   Initialize Memory Protection support.
 **/
 VOID
@@ -1083,6 +1117,35 @@ CoreInitializeMemoryProtection (
              &Registration
              );
   ASSERT_EFI_ERROR (Status);
+
+  // Register an event to populate the memory attribute protocol
+  Status = CoreCreateEvent (
+             EVT_NOTIFY_SIGNAL,
+             TPL_CALLBACK,
+             MemoryAttributeProtocolNotify,
+             NULL,
+             &Event
+             );
+
+  // if we fail to create the event or the protocol notify, we should still continue, we won't be able to query the
+  // memory attributes on FreePages(), so we may encounter a driver or bootloader that has not set attributes back to
+  // RW, but this matches the state of the world before this protocol was introduced, so it is not a regression.
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - Failed to create event for the Memory Attribute Protocol notification: %r\n", __func__, Status));
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  // Register for protocol notification
+  Status = CoreRegisterProtocolNotify (
+             &gEfiMemoryAttributeProtocolGuid,
+             Event,
+             &Registration
+             );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - Failed to register for the Memory Attribute Protocol notification: %r\n", __func__, Status));
+    ASSERT_EFI_ERROR (Status);
+  }
 
   //
   // Register a callback to disable NULL pointer detection at EndOfDxe

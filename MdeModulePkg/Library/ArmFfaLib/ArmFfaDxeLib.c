@@ -98,15 +98,32 @@ ArmFfaDxeLibConstructor (
     return EFI_SUCCESS;
   }
 
-  /*
-   * If PEIM uses ArmFfaPeiLib, the Rx/Tx buffers is already mapped in PEI phase.
-   * In this case, get Rx/Tx buffer info from Hob.
-   */
   RxTxBufferHob = GetFirstGuidHob (&gArmFfaRxTxBufferInfoGuid);
   if (RxTxBufferHob != NULL) {
     BufferInfo = GET_GUID_HOB_DATA (RxTxBufferHob);
-    PcdSet64S (PcdFfaTxBuffer, (UINTN)BufferInfo->TxBufferAddr);
-    PcdSet64S (PcdFfaRxBuffer, (UINTN)BufferInfo->RxBufferAddr);
+    if (!BufferInfo->RemapRequired) {
+      /*
+       * ArmFfaPeiLib handles the Rx/Tx buffer Remap and update the
+       * BufferInfo with permanant memory. So use it as it is.
+       */
+      PcdSet64S (PcdFfaTxBuffer, (UINTN)BufferInfo->TxBufferAddr);
+      PcdSet64S (PcdFfaRxBuffer, (UINTN)BufferInfo->RxBufferAddr);
+    } else {
+      /*
+       * SEC maps Rx/Tx buffer, But no PEIM module doesn't use
+       * ArmFfaPeiLib. In this case, the BufferInfo includes
+       * temporary Rx/Tx buffer address.
+       *
+       * Therefore, remap Rx/Tx buffer with migrated address again.
+       */
+      Status = RemapFfaRxTxBuffer (BufferInfo);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "%a: Failed to remap Rx/Tx buffer... Status: %r\n", __func__, Status));
+        return Status;
+      }
+
+      BufferInfo->RemapRequired = FALSE;
+    }
   } else {
     Status = ArmFfaLibRxTxMap ();
 

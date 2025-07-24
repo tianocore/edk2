@@ -22,7 +22,6 @@ from Library.StringUtils import GetLineNo
 from Library.Misc import PathClass
 from Library.Misc import GetCharIndexOutStr
 from Library import DataType as DT
-from Library.ParserValidate import CheckUTF16FileHeader
 
 ##
 # Static definitions
@@ -75,18 +74,6 @@ gLANG_CONV_TABLE = {'eng':'en', 'fra':'fr', \
                  'wln':'wa', 'wol':'wo', 'xho':'xh', 'yid':'yi', 'yor':'yo', 'zha':'za', \
                  'zho':'zh', 'zul':'zu'}
 
-## Convert a python unicode string to a normal string
-#
-# Convert a python unicode string to a normal string
-# UniToStr(u'I am a string') is 'I am a string'
-#
-# @param Uni:  The python unicode string
-#
-# @retval:     The formatted normal string
-#
-def UniToStr(Uni):
-    return repr(Uni)[2:-1]
-
 ## Convert a unicode string to a Hex list
 #
 # Convert a unicode string to a Hex list
@@ -133,40 +120,6 @@ def ConvertSpecialUnicodes(Uni):
 #
 def GetLanguageCode1766(LangName, File=None):
     return LangName
-
-    length = len(LangName)
-    if length == 2:
-        if LangName.isalpha():
-            for Key in gLANG_CONV_TABLE.keys():
-                if gLANG_CONV_TABLE.get(Key) == LangName.lower():
-                    return Key
-    elif length == 3:
-        if LangName.isalpha() and gLANG_CONV_TABLE.get(LangName.lower()):
-            return LangName
-        else:
-            EdkLogger.Error("Unicode File Parser",
-                             ToolError.FORMAT_INVALID,
-                             "Invalid RFC 1766 language code : %s" % LangName,
-                             File)
-    elif length == 5:
-        if LangName[0:2].isalpha() and LangName[2] == '-':
-            for Key in gLANG_CONV_TABLE.keys():
-                if gLANG_CONV_TABLE.get(Key) == LangName[0:2].lower():
-                    return Key
-    elif length >= 6:
-        if LangName[0:2].isalpha() and LangName[2] == '-':
-            for Key in gLANG_CONV_TABLE.keys():
-                if gLANG_CONV_TABLE.get(Key) == LangName[0:2].lower():
-                    return Key
-        if LangName[0:3].isalpha() and gLANG_CONV_TABLE.get(LangName.lower()) is None and LangName[3] == '-':
-            for Key in gLANG_CONV_TABLE.keys():
-                if Key == LangName[0:3].lower():
-                    return Key
-
-    EdkLogger.Error("Unicode File Parser",
-                             ToolError.FORMAT_INVALID,
-                             "Invalid RFC 4646 language code : %s" % LangName,
-                             File)
 
 ## GetLanguageCode
 #
@@ -259,7 +212,6 @@ def FormatUniEntry(StrTokenName, TokenValueList, ContainerFile):
 class StringDefClassObject(object):
     def __init__(self, Name = None, Value = None, Referenced = False, Token = None, UseOtherLangDef = ''):
         self.StringName = ''
-        self.StringNameByteList = []
         self.StringValue = ''
         self.StringValueByteList = ''
         self.Token = 0
@@ -269,7 +221,6 @@ class StringDefClassObject(object):
 
         if Name is not None:
             self.StringName = Name
-            self.StringNameByteList = UniToHexList(Name)
         if Value is not None:
             self.StringValue = Value
             self.StringValueByteList = UniToHexList(self.StringValue)
@@ -405,15 +356,6 @@ class UniFileClassObject(object):
                 LanguageList[IndexI][LanguageList[IndexI].find(u'\"') + len(u'\"') : LanguageList[IndexI].rfind(u'\"')]
                 Language = GetLanguageCode(Language, self.IsCompatibleMode, self.File)
                 self.AddStringToList(Name, Language, Value)
-
-    #
-    # Get include file list and load them
-    #
-    def GetIncludeFile(self, Item, Dir = None):
-        if Dir:
-            pass
-        FileName = Item[Item.find(u'!include ') + len(u'!include ') :Item.find(u' ', len(u'!include '))][1:-1]
-        self.LoadUniFile(FileName)
 
     #
     # Pre-process before parse .uni file
@@ -977,26 +919,6 @@ class UniFileClassObject(object):
             Item.Referenced = True
 
     #
-    # Search the string in language definition by Name
-    #
-    def FindStringValue(self, Name, Lang):
-        if Name in self.OrderedStringDict[Lang]:
-            ItemIndexInList = self.OrderedStringDict[Lang][Name]
-            return self.OrderedStringList[Lang][ItemIndexInList]
-
-        return None
-
-    #
-    # Search the string in language definition by Token
-    #
-    def FindByToken(self, Token, Lang):
-        for Item in self.OrderedStringList[Lang]:
-            if Item.Token == Token:
-                return Item
-
-        return None
-
-    #
     # Re-order strings and re-generate tokens
     #
     def ReToken(self):
@@ -1050,25 +972,3 @@ class UniFileClassObject(object):
             print(Item)
             for Member in self.OrderedStringList[Item]:
                 print(str(Member))
-
-    #
-    # Read content from '!include' UNI file
-    #
-    def ReadIncludeUNIfile(self, FilaPath):
-        if self.File:
-            pass
-
-        if not os.path.exists(FilaPath) or not os.path.isfile(FilaPath):
-            EdkLogger.Error("Unicode File Parser",
-                             ToolError.FILE_NOT_FOUND,
-                             ExtraData=FilaPath)
-        try:
-            FileIn = codecs.open(FilaPath, mode='rb', encoding='utf_8').readlines()
-        except UnicodeError as Xstr:
-            FileIn = codecs.open(FilaPath, mode='rb', encoding='utf_16').readlines()
-        except UnicodeError:
-            FileIn = codecs.open(FilaPath, mode='rb', encoding='utf_16_le').readlines()
-        except:
-            EdkLogger.Error("Unicode File Parser", ToolError.FILE_OPEN_FAILURE, ExtraData=FilaPath)
-        return FileIn
-

@@ -333,6 +333,17 @@ if defined VS2022 (
   call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat
   call %EDK_TOOLS_PATH%\get_vsvars.bat
 )
+if defined BASETOOLS_MINGW_BUILD (
+  if not defined IASL_PREFIX (
+    REM For VS builds this environment variable is set via set_vsprefix_envs.bat
+    if exist "C:\ASL\" (
+      set IASL_PREFIX=C:\ASL\
+    ) else (
+        @echo.
+        @echo !!! WARNING !!! IASL_PREFIX environment variable is not set
+    )
+  )
+)
 if %SCRIPT_ERROR% NEQ 0 (
   @echo.
   @echo !!! ERROR !!! %VSTool% is not installed !!!

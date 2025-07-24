@@ -188,11 +188,12 @@ RedfishConfigCommonStop (
                   &NumberOfHandles,
                   &HandleBuffer
                   );
-  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+  if (Status == EFI_NOT_FOUND) {
+    return EFI_SUCCESS;
+  } else if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = EFI_SUCCESS;
   for (Index = 0; Index < NumberOfHandles; Index++) {
     Status = gBS->HandleProtocol (
                     HandleBuffer[Index],
@@ -207,6 +208,8 @@ RedfishConfigCommonStop (
       break;
     }
   }
+
+  gBS->FreePool (HandleBuffer);
 
   return Status;
 }
@@ -272,4 +275,6 @@ RedfishConfigHandlerInitialization (
                     );
     ASSERT_EFI_ERROR (Status);
   }
+
+  gBS->FreePool (HandleBuffer);
 }

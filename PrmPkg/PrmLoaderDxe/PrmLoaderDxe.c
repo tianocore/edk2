@@ -210,7 +210,7 @@ ProcessPrmModules (
         CurrentHandlerInfoStruct->PhysicalAddress = HandlerPhysicalAddress;
         DEBUG ((
           DEBUG_INFO,
-          "    %a %a: Found %a handler physical address at 0x%016x.\n",
+          "    %a %a: Found %a handler physical address at 0x%016llx.\n",
           _DBGMSGID_,
           __func__,
           CurrentExportDescriptorHandlerName,

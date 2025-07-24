@@ -19,7 +19,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 LOONGARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 LOONGARCH64 RISCV64
 #
 
 [Sources.Ia32]
@@ -45,6 +45,14 @@
   LoongArch/ExceptionCommon.c
   LoongArch/LoongArch64/ArchExceptionHandler.c
   LoongArch/LoongArch64/ExceptionHandlerAsm.S | GCC
+
+[Sources.RISCV64]
+  RiscV/Backtrace.h
+  RiscV/Backtrace.c
+  RiscV/BacktraceHelper.c
+  RiscV/ExceptionLib.c
+  RiscV/ExceptionHandler.h
+  RiscV/ExceptionHandlerAsm.S | GCC
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard
@@ -74,6 +82,9 @@
 
 [LibraryClasses.LoongArch64]
   CpuLib
+
+[Guids.RISCV64]
+  gEfiDebugImageInfoTableGuid
 
 [BuildOptions]
   XCODE:*_*_X64_NASM_FLAGS = -D NO_ABSOLUTE_RELOCS_IN_TEXT

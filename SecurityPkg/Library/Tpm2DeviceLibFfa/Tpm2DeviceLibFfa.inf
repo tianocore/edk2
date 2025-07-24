@@ -29,6 +29,7 @@
   Tpm2DeviceLibFfaBase.c
   Tpm2Ptp.c
   Tpm2DeviceLibFfa.h
+  Tpm2InfoFfa.c
 
 [Packages]
   MdePkg/MdePkg.dec

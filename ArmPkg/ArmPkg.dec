@@ -41,10 +41,6 @@
   #
   ArmHvcLib|Include/Library/ArmHvcLib.h
 
-  ##  @libraryclass  Provides a Mmu interface.
-  #
-  ArmMmuLib|Include/Library/ArmMmuLib.h
-
   ##  @libraryclass  Provides a Mailbox Transport Layer (MTL) interface
   #   for the System Control and Management Interface (SCMI).
   #
@@ -91,7 +87,7 @@
   # Include/Guid/ArmMpCoreInfo.h
   gArmMpCoreInfoGuid = { 0xa4ee0728, 0xe5d7, 0x4ac5,  {0xb2, 0x1e, 0x65, 0x8e, 0xd8, 0x57, 0xe8, 0x34} }
 
-  gArmMmuReplaceLiveTranslationEntryFuncGuid = { 0xa8b50ff3, 0x08ec, 0x4dd3, {0xbf, 0x04, 0x28, 0xbf, 0x71, 0x75, 0xc7, 0x4a} }
+  gArmTransferListHobGuid = { 0xebe7bae8, 0xfe18, 0x43c5, { 0xbf, 0x3f, 0xf2, 0xb1, 0xaf, 0xb2, 0xdf, 0xb8 } }
 
 [Protocols.common]
   ## Arm System Control and Management Interface(SCMI) Base protocol
@@ -112,6 +108,7 @@
 [Ppis]
   ## Include/Ppi/ArmMpCoreInfo.h
   gArmMpCoreInfoPpiGuid = { 0x6847cc74, 0xe9ec, 0x4f8f, {0xa2, 0x9d, 0xab, 0x44, 0xe7, 0x54, 0xa8, 0xfc} }
+  gArmTransferListPpiGuid = { 0x6d2e9da1, 0x9414, 0x41c3, {0x86, 0xbe, 0xf9, 0x16, 0x9f, 0xb4, 0x76, 0x38} }
 
 [PcdsFeatureFlag.common]
   gArmTokenSpaceGuid.PcdCpuDxeProduceDebugSupport|FALSE|BOOLEAN|0x00000001
@@ -120,12 +117,6 @@
   # protocol driver. This is needed on platforms that map all DRAM with RWX
   # attributes initially, and can be disabled otherwise.
   gArmTokenSpaceGuid.PcdRemapUnusedMemoryNx|TRUE|BOOLEAN|0x00000048
-
-[PcdsFeatureFlag.ARM]
-  # Whether to map normal memory as non-shareable. FALSE is the safe choice, but
-  # TRUE may be appropriate to fix performance problems if you don't care about
-  # hardware coherency (i.e., no virtualization or cache coherent DMA)
-  gArmTokenSpaceGuid.PcdNormalMemoryNonshareableOverride|FALSE|BOOLEAN|0x00000043
 
 [PcdsFixedAtBuild.common]
   gArmTokenSpaceGuid.PcdTrustzoneSupport|FALSE|BOOLEAN|0x00000006
@@ -315,6 +306,7 @@
   gArmTokenSpaceGuid.PcdGicRedistributorsBase|0|UINT64|0x0000000E
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0|UINT64|0x0000000D
   gArmTokenSpaceGuid.PcdGicSgiIntId|0|UINT32|0x00000025
+  gArmTokenSpaceGuid.PcdGicIrsConfigFrameBase|0|UINT64|0x00000064
 
   #
   # Bases, sizes and translation offsets of IO and MMIO spaces, respectively.
