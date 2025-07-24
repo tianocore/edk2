@@ -209,6 +209,11 @@ struct _PCI_IO_DEVICE {
   BOOLEAN                                      Allocated;
 
   //
+  // TRUE if this PCI device was rejected to address a resource conflict
+  //
+  BOOLEAN                                      Rejected;
+
+  //
   // The attribute this PCI device currently set
   //
   UINT64                                       Attributes;
