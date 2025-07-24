@@ -387,7 +387,10 @@ Tcg2UserConfirm (
   NoPpiInfo   = FALSE;
   BufSize     = CONFIRM_BUFFER_SIZE;
   ConfirmText = AllocateZeroPool (BufSize);
-  ASSERT (ConfirmText != NULL);
+  if (ConfirmText == NULL) {
+    ASSERT (ConfirmText != NULL);
+    return FALSE;
+  }
 
   mTcg2PpStringPackHandle = HiiAddPackages (&gEfiTcg2PhysicalPresenceGuid, gImageHandle, DxeTcg2PhysicalPresenceLibStrings, NULL);
   ASSERT (mTcg2PpStringPackHandle != NULL);
@@ -401,10 +404,20 @@ Tcg2UserConfirm (
       TmpStr2    = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_CLEAR));
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_HEAD_STR));
+      if ((TmpStr1 == NULL) || (TmpStr2 == NULL)) {
+        FreePool (ConfirmText);
+        return FALSE;
+      }
+
       UnicodeSPrint (ConfirmText, BufSize, TmpStr1, TmpStr2);
       FreePool (TmpStr1);
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_WARNING_CLEAR));
+      if (TmpStr1 == NULL) {
+        FreePool (ConfirmText);
+        return FALSE;
+      }
+
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), L" \n\n", (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       FreePool (TmpStr1);
@@ -417,14 +430,29 @@ Tcg2UserConfirm (
       TmpStr2    = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_CLEAR));
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_PPI_HEAD_STR));
+      if ((TmpStr1 == NULL) || (TmpStr2 == NULL)) {
+        FreePool (ConfirmText);
+        return FALSE;
+      }
+
       UnicodeSPrint (ConfirmText, BufSize, TmpStr1, TmpStr2);
       FreePool (TmpStr1);
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_NOTE_CLEAR));
+      if (TmpStr1 == NULL) {
+        FreePool (ConfirmText);
+        return FALSE;
+      }
+
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       FreePool (TmpStr1);
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_WARNING_CLEAR));
+      if (TmpStr1 == NULL) {
+        FreePool (ConfirmText);
+        return FALSE;
+      }
+
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), L" \n\n", (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       FreePool (TmpStr1);
@@ -452,14 +480,29 @@ Tcg2UserConfirm (
       TmpStr2    = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_SET_PCR_BANKS));
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_HEAD_STR));
+      if ((TmpStr1 == NULL) || (TmpStr2 == NULL)) {
+        FreePool (ConfirmText);
+        return FALSE;
+      }
+
       UnicodeSPrint (ConfirmText, BufSize, TmpStr1, TmpStr2);
       FreePool (TmpStr1);
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_WARNING_SET_PCR_BANKS_1));
+      if (TmpStr1 == NULL) {
+        FreePool (ConfirmText);
+        return FALSE;
+      }
+
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       FreePool (TmpStr1);
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_WARNING_SET_PCR_BANKS_2));
+      if (TmpStr1 == NULL) {
+        FreePool (ConfirmText);
+        return FALSE;
+      }
+
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       FreePool (TmpStr1);
 
@@ -467,7 +510,11 @@ Tcg2UserConfirm (
       Tcg2FillBufferWithBootHashAlg (TempBuffer2, sizeof (TempBuffer2), CurrentPCRBanks);
 
       TmpStr1 = AllocateZeroPool (BufSize);
-      ASSERT (TmpStr1 != NULL);
+      if (TmpStr1 == NULL) {
+        ASSERT (TmpStr1 != NULL);
+        return FALSE;
+      }
+
       UnicodeSPrint (TmpStr1, BufSize, L"Current PCRBanks is 0x%x. (%s)\nNew PCRBanks is 0x%x. (%s)\n", CurrentPCRBanks, TempBuffer2, TpmPpCommandParameter, TempBuffer);
 
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
@@ -481,14 +528,29 @@ Tcg2UserConfirm (
       TmpStr2    = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_CHANGE_EPS));
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_HEAD_STR));
+      if ((TmpStr1 == NULL) || (TmpStr2 == NULL)) {
+        FreePool (ConfirmText);
+        return FALSE;
+      }
+
       UnicodeSPrint (ConfirmText, BufSize, TmpStr1, TmpStr2);
       FreePool (TmpStr1);
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_WARNING_CHANGE_EPS_1));
+      if (TmpStr1 == NULL) {
+        FreePool (ConfirmText);
+        return FALSE;
+      }
+
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       FreePool (TmpStr1);
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_WARNING_CHANGE_EPS_2));
+      if (TmpStr1 == NULL) {
+        FreePool (ConfirmText);
+        return FALSE;
+      }
+
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       FreePool (TmpStr1);
 
@@ -498,6 +560,11 @@ Tcg2UserConfirm (
       TmpStr2 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_ENABLE_BLOCK_SID));
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_HEAD_STR));
+      if ((TmpStr1 == NULL) || (TmpStr2 == NULL)) {
+        FreePool (ConfirmText);
+        return FALSE;
+      }
+
       UnicodeSPrint (ConfirmText, BufSize, TmpStr1, TmpStr2);
       FreePool (TmpStr1);
       break;
@@ -506,6 +573,11 @@ Tcg2UserConfirm (
       TmpStr2 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_DISABLE_BLOCK_SID));
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_HEAD_STR));
+      if ((TmpStr1 == NULL) || (TmpStr2 == NULL)) {
+        FreePool (ConfirmText);
+        return FALSE;
+      }
+
       UnicodeSPrint (ConfirmText, BufSize, TmpStr1, TmpStr2);
       FreePool (TmpStr1);
       break;
@@ -515,6 +587,11 @@ Tcg2UserConfirm (
       TmpStr2   = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_PP_ENABLE_BLOCK_SID));
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_PPI_HEAD_STR));
+      if ((TmpStr1 == NULL) || (TmpStr2 == NULL)) {
+        FreePool (ConfirmText);
+        return FALSE;
+      }
+
       UnicodeSPrint (ConfirmText, BufSize, TmpStr1, TmpStr2);
       FreePool (TmpStr1);
       break;
@@ -524,6 +601,11 @@ Tcg2UserConfirm (
       TmpStr2   = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_PP_DISABLE_BLOCK_SID));
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_PPI_HEAD_STR));
+      if ((TmpStr1 == NULL) || (TmpStr2 == NULL)) {
+        FreePool (ConfirmText);
+        return FALSE;
+      }
+
       UnicodeSPrint (ConfirmText, BufSize, TmpStr1, TmpStr2);
       FreePool (TmpStr1);
       break;
@@ -544,11 +626,21 @@ Tcg2UserConfirm (
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_ACCEPT_KEY));
     }
 
+    if (TmpStr1 == NULL) {
+      FreePool (ConfirmText);
+      return FALSE;
+    }
+
     StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
     FreePool (TmpStr1);
 
     if (NoPpiInfo) {
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_NO_PPI_INFO));
+      if (TmpStr1 == NULL) {
+        FreePool (ConfirmText);
+        return FALSE;
+      }
+
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       FreePool (TmpStr1);
     }
@@ -561,16 +653,31 @@ Tcg2UserConfirm (
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_ACCEPT_KEY));
     }
 
+    if (TmpStr1 == NULL) {
+      FreePool (ConfirmText);
+      return FALSE;
+    }
+
     StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
     FreePool (TmpStr1);
 
     if (NoPpiInfo) {
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_NO_PPI_INFO));
+      if (TmpStr1 == NULL) {
+        FreePool (ConfirmText);
+        return FALSE;
+      }
+
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       FreePool (TmpStr1);
     }
 
     TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TCG_STORAGE_REJECT_KEY));
+  }
+
+  if (TmpStr1 == NULL) {
+    FreePool (ConfirmText);
+    return FALSE;
   }
 
   BufSize -= StrSize (ConfirmText);

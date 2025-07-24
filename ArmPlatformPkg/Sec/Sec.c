@@ -86,12 +86,14 @@ STATIC CONST EFI_PEI_PPI_DESCRIPTOR  gCommonPpiTable[] = {
 
   @param[out]   PpiListSize   Size of the PPI list in bytes
   @param[out]   PpiList       Pointer to the constructed PPI list
+  @param[in]    TransferListBase  Pointer to the Transfer List base
 **/
 STATIC
 VOID
 CreatePpiList (
   OUT UINTN                   *PpiListSize,
-  OUT EFI_PEI_PPI_DESCRIPTOR  **PpiList
+  OUT EFI_PEI_PPI_DESCRIPTOR  **PpiList,
+  IN  VOID                    *TransferListBase
   )
 {
   EFI_PEI_PPI_DESCRIPTOR  *PlatformPpiList;
@@ -111,10 +113,20 @@ CreatePpiList (
   // Set the Terminate flag on the last PPI entry
   LastPpi = (EFI_PEI_PPI_DESCRIPTOR *)ListBase +
             ((sizeof (gCommonPpiTable) + PlatformPpiListSize) / sizeof (EFI_PEI_PPI_DESCRIPTOR)) - 1;
+  *PpiListSize = sizeof (gCommonPpiTable) + PlatformPpiListSize;
+
+  // Add the Transfer List PPI after the Common and Platform PPIs
+  if (TransferListBase != NULL) {
+    LastPpi++;
+    LastPpi->Flags = EFI_PEI_PPI_DESCRIPTOR_PPI;
+    LastPpi->Guid  = &gArmTransferListPpiGuid;
+    LastPpi->Ppi   = TransferListBase;
+    *PpiListSize  += sizeof (EFI_PEI_PPI_DESCRIPTOR);
+  }
+
   LastPpi->Flags |= EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
 
-  *PpiList     = (EFI_PEI_PPI_DESCRIPTOR *)ListBase;
-  *PpiListSize = sizeof (gCommonPpiTable) + PlatformPpiListSize;
+  *PpiList = (EFI_PEI_PPI_DESCRIPTOR *)ListBase;
 }
 
 /**
@@ -151,12 +163,15 @@ PrintFirmwareVersion (
 
   @param[in]  PeiCoreEntryPoint   Address in ram of the entrypoint of the PEI
                                   core
+  @param[in]  TransferListBaseAddr Address of the Transfer List base address
+
 **/
 STATIC
 VOID
 EFIAPI
 SecMain (
-  IN  EFI_PEI_CORE_ENTRY_POINT  PeiCoreEntryPoint
+  IN  EFI_PEI_CORE_ENTRY_POINT  PeiCoreEntryPoint,
+  IN  UINTN                     TransferListBaseAddr
   )
 {
   EFI_SEC_PEI_HAND_OFF    SecCoreData;
@@ -164,8 +179,24 @@ SecMain (
   EFI_PEI_PPI_DESCRIPTOR  *PpiList;
   UINTN                   TemporaryRamBase;
   UINTN                   TemporaryRamSize;
+  VOID                    *TransferListBase;
 
-  CreatePpiList (&PpiListSize, &PpiList);
+  // Dump the Transfer List
+  TransferListBase = (VOID *)TransferListBaseAddr;
+  if (TransferListBase != NULL) {
+    if (TransferListCheckHeader (TransferListBase) != TRANSFER_LIST_OPS_INVALID) {
+      DEBUG_CODE_BEGIN ();
+      TransferListDump (TransferListBase);
+      DEBUG_CODE_END ();
+    } else {
+      TransferListBase = NULL;
+      DEBUG ((DEBUG_ERROR, "%a: No valid operations possible on TransferList found @ 0x%p\n", __func__, TransferListBase));
+    }
+  } else {
+    DEBUG ((DEBUG_INFO, "%a: No TransferList found, continuing boot\n", __func__));
+  }
+
+  CreatePpiList (&PpiListSize, &PpiList, TransferListBase);
 
   // Adjust the Temporary Ram as the new Ppi List (Common + Platform Ppi Lists) is created at
   // the base of the primary core stack
@@ -197,10 +228,13 @@ SecMain (
 
   @param[in]  PeiCoreEntryPoint   Address in ram of the entrypoint of the PEI
                                   core
+  @param[in]  TransferListBaseAddr Address of the Transfer List base address
+
 **/
 VOID
 CEntryPoint (
-  IN  EFI_PEI_CORE_ENTRY_POINT  PeiCoreEntryPoint
+  IN  EFI_PEI_CORE_ENTRY_POINT  PeiCoreEntryPoint,
+  IN  UINTN                     TransferListBaseAddr
   )
 {
   if (!ArmMmuEnabled ()) {
@@ -237,7 +271,7 @@ CEntryPoint (
   ArmPlatformInitialize (ArmReadMpidr ());
 
   // Goto primary Main.
-  SecMain (PeiCoreEntryPoint);
+  SecMain (PeiCoreEntryPoint, TransferListBaseAddr);
 
   // PEI Core should always load and never return
   ASSERT (FALSE);

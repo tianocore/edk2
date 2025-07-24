@@ -143,6 +143,9 @@ MmLoadImage (
   UINTN                 PageCount;
   EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  DstBuffer;
+  UINTN                 Index;
+  UINTN                 StartIndex;
+  CHAR8                 EfiFileName[512];
 
   DEBUG ((DEBUG_INFO, "MmLoadImage - %g\n", &DriverEntry->FileName));
 
@@ -254,11 +257,6 @@ MmLoadImage (
   //
   // Print the load address and the PDB file name if it is available
   //
-  DEBUG_CODE_BEGIN ();
-
-  UINTN  Index;
-  UINTN  StartIndex;
-  CHAR8  EfiFileName[256];
 
   DEBUG ((
     DEBUG_INFO | DEBUG_LOAD,
@@ -307,8 +305,6 @@ MmLoadImage (
   }
 
   DEBUG ((DEBUG_INFO | DEBUG_LOAD, "\n"));
-
-  DEBUG_CODE_END ();
 
   return Status;
 }

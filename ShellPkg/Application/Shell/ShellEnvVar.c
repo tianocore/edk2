@@ -285,19 +285,23 @@ SetEnvironmentVariableList (
   //
   // set all the variables from the list
   //
-  for ( Node = (ENV_VAR_LIST *)GetFirstNode (ListHead)
-        ; !IsNull (ListHead, &Node->Link)
-        ; Node = (ENV_VAR_LIST *)GetNextNode (ListHead, &Node->Link)
-        )
-  {
-    Size = StrSize (Node->Val) - sizeof (CHAR16);
-    if (Node->Atts & EFI_VARIABLE_NON_VOLATILE) {
-      Status = SHELL_SET_ENVIRONMENT_VARIABLE_NV (Node->Key, Size, Node->Val);
-    } else {
-      Status = SHELL_SET_ENVIRONMENT_VARIABLE_V (Node->Key, Size, Node->Val);
-    }
+  if ((ListHead != NULL) && !IsListEmpty (ListHead)) {
+    for ( Node = (ENV_VAR_LIST *)GetFirstNode (ListHead)
+          ; !IsNull (ListHead, &Node->Link)
+          ; Node = (ENV_VAR_LIST *)GetNextNode (ListHead, &Node->Link)
+          )
+    {
+      if ((Node->Key != NULL) && (Node->Val != NULL)) {
+        Size = StrSize (Node->Val) - sizeof (CHAR16);
+        if (Node->Atts & EFI_VARIABLE_NON_VOLATILE) {
+          Status = SHELL_SET_ENVIRONMENT_VARIABLE_NV (Node->Key, Size, Node->Val);
+        } else {
+          Status = SHELL_SET_ENVIRONMENT_VARIABLE_V (Node->Key, Size, Node->Val);
+        }
 
-    ASSERT_EFI_ERROR (Status);
+        ASSERT_EFI_ERROR (Status);
+      }
+    }
   }
 
   FreeEnvironmentVariableList (ListHead);
@@ -441,7 +445,7 @@ ShellFindEnvVarInList (
         ; Node = (ENV_VAR_LIST *)GetNextNode (&gShellEnvVarList.Link, &Node->Link)
         )
   {
-    if ((Node->Key != NULL) && (StrCmp (Key, Node->Key) == 0)) {
+    if ((Node->Key != NULL) && (StrCmp (Key, Node->Key) == 0) && (Node->Val != NULL)) {
       *Value     = AllocateCopyPool (StrSize (Node->Val), Node->Val);
       *ValueSize = StrSize (Node->Val);
       if (Atts != NULL) {
