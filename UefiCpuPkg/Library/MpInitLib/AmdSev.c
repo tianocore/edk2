@@ -273,7 +273,7 @@ SevEsPlaceApHlt (
   @param[in]   ExchangeInfo  The pointer to CPU Exchange Data structure
 **/
 VOID
-FillExchangeInfoDataSevEs (
+FillExchangeInfoDataSevSnp (
   IN volatile MP_CPU_EXCHANGE_INFO  *ExchangeInfo
   )
 {
@@ -293,8 +293,6 @@ FillExchangeInfoDataSevEs (
       );
     ExchangeInfo->ExtTopoAvail = !!ExtTopoEbx.Bits.LogicalProcessors;
   }
-
-  ExchangeInfo->SevSnpKnownInitApicId = FALSE;
 }
 
 /**

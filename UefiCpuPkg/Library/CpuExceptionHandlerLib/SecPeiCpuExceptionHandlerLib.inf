@@ -20,7 +20,7 @@
 # The following information is for reference only and not required by the build tools.
 #
 #  VALID_ARCHITECTURES           = IA32 X64
-#  VALID_ARCHITECTURES           = IA32 X64 LOONGARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 LOONGARCH64 RISCV64
 #
 
 [Sources.Ia32]
@@ -46,6 +46,13 @@
   LoongArch/LoongArch64/ArchExceptionHandler.c
   LoongArch/LoongArch64/ExceptionHandlerAsm.S | GCC
 
+[Sources.RISCV64]
+  RiscV/Backtrace.h
+  RiscV/Backtrace.c
+  RiscV/BacktraceHelperSec.c
+  RiscV/ExceptionLib.c
+  RiscV/ExceptionHandler.h
+  RiscV/ExceptionHandlerAsm.S | GCC
 
 [Packages]
   MdePkg/MdePkg.dec
