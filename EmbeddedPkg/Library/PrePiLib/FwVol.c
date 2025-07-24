@@ -261,6 +261,95 @@ FindFileEx (
 }
 
 /**
+  Return the size of a section whether SECTION or SECTION2
+
+  @param  Section           - Pointer to start of section header
+
+  @retval Size in bytes.
+ **/
+STATIC
+UINT32
+GetSectionNSize (
+  IN EFI_COMMON_SECTION_HEADER  *Section
+  )
+{
+  UINT32  SectionSize;
+
+  if (IS_SECTION2 (Section)) {
+    ASSERT (SECTION2_SIZE (Section) > 0x00FFFFFF);
+    SectionSize = SECTION2_SIZE (Section);
+  } else {
+    SectionSize = SECTION_SIZE (Section);
+  }
+
+  return SectionSize;
+}
+
+/**
+  Return the size of a section header whether SECTION or SECTION2
+
+  @param  Section           - Pointer to start of section header
+
+  @retval Size in bytes.
+ **/
+STATIC
+UINT32
+GetCommonSectionNHeaderSize (
+  IN EFI_COMMON_SECTION_HEADER  *Section
+  )
+{
+  if (IS_SECTION2 (Section)) {
+    return sizeof (EFI_COMMON_SECTION_HEADER2);
+  } else {
+    return sizeof (EFI_COMMON_SECTION_HEADER);
+  }
+}
+
+/**
+  Return the size of a compression section header whether SECTION or SECTION2
+
+  @param  Section           - Pointer to start of section header
+
+  @retval Size in bytes.
+ **/
+STATIC
+UINT32
+GetCompressionSectionNHeaderSize (
+  IN EFI_COMMON_SECTION_HEADER  *Section
+  )
+{
+  ASSERT (Section->Type == EFI_SECTION_COMPRESSION);
+
+  if (IS_SECTION2 (Section)) {
+    return sizeof (EFI_COMPRESSION_SECTION2);
+  } else {
+    return sizeof (EFI_COMPRESSION_SECTION);
+  }
+}
+
+/**
+  Return the compression type of a section whether SECTION or SECTION2
+
+  @param  Section           - Pointer to start of section header
+
+  @retval EFI_SECTION_TYPE
+ **/
+STATIC
+EFI_SECTION_TYPE
+GetSectionNCompressionType (
+  IN EFI_COMMON_SECTION_HEADER  *Section
+  )
+{
+  ASSERT (Section->Type == EFI_SECTION_COMPRESSION);
+
+  if (IS_SECTION2 (Section)) {
+    return ((EFI_COMPRESSION_SECTION2 *)Section)->CompressionType;
+  } else {
+    return ((EFI_COMPRESSION_SECTION *)Section)->CompressionType;
+  }
+}
+
+/**
   Go through the file to search SectionType section,
   when meeting an encapsuled section.
 
@@ -281,70 +370,46 @@ FfsProcessSection (
   OUT VOID                      **OutputBuffer
   )
 {
-  EFI_STATUS                Status;
-  UINT32                    SectionLength;
-  UINTN                     ParsedLength;
-  EFI_COMPRESSION_SECTION   *CompressionSection;
-  EFI_COMPRESSION_SECTION2  *CompressionSection2;
-  UINT32                    DstBufferSize;
-  VOID                      *ScratchBuffer;
-  UINT32                    ScratchBufferSize;
-  VOID                      *DstBuffer;
-  UINT16                    SectionAttribute;
-  UINT32                    AuthenticationStatus;
-  CHAR8                     *CompressedData;
-  UINT32                    CompressedDataLength;
-  BOOLEAN                   Found;
+  EFI_STATUS  Status;
+  UINT32      SectionLength;
+  UINTN       ParsedLength;
+  UINT32      DstBufferSize;
+  VOID        *DstBuffer;
 
-  Found         = FALSE;
-  *OutputBuffer = NULL;
-  ParsedLength  = 0;
-  Status        = EFI_NOT_FOUND;
+  ParsedLength = 0;
+
   while (ParsedLength < SectionSize) {
-    if (IS_SECTION2 (Section)) {
-      ASSERT (SECTION2_SIZE (Section) > 0x00FFFFFF);
-    }
+    UINT32  SectionHeaderSize;
+
+    SectionHeaderSize = GetCommonSectionNHeaderSize (Section);
 
     if (Section->Type == SectionType) {
       if (SectionCheckHook != NULL) {
-        Found = SectionCheckHook (Section) == EFI_SUCCESS;
-      } else {
-        Found = TRUE;
-      }
-
-      if (Found) {
-        if (IS_SECTION2 (Section)) {
-          *OutputBuffer = (VOID *)((UINT8 *)Section + sizeof (EFI_COMMON_SECTION_HEADER2));
-        } else {
-          *OutputBuffer = (VOID *)((UINT8 *)Section + sizeof (EFI_COMMON_SECTION_HEADER));
+        if (SectionCheckHook (Section) != EFI_SUCCESS) {
+          goto CheckNextSection;
         }
-
-        return EFI_SUCCESS;
-      } else {
-        goto CheckNextSection;
       }
+
+      *OutputBuffer = (VOID *)((UINT8 *)Section + SectionHeaderSize);
+
+      return EFI_SUCCESS;
     } else if ((Section->Type == EFI_SECTION_COMPRESSION) || (Section->Type == EFI_SECTION_GUID_DEFINED)) {
+      CHAR8   *CompressedData;
+      UINT32  CompressionSectionHeaderSize;
+      VOID    *ScratchBuffer;
+      UINT32  ScratchBufferSize;
+
       if (Section->Type == EFI_SECTION_COMPRESSION) {
-        if (IS_SECTION2 (Section)) {
-          CompressionSection2 = (EFI_COMPRESSION_SECTION2 *)Section;
-          SectionLength       = SECTION2_SIZE (Section);
+        UINT32  CompressedDataLength;
 
-          if (CompressionSection2->CompressionType != EFI_STANDARD_COMPRESSION) {
-            return EFI_UNSUPPORTED;
-          }
+        CompressionSectionHeaderSize = GetCompressionSectionNHeaderSize (Section);
+        SectionLength                = GetSectionNSize (Section);
 
-          CompressedData       = (CHAR8 *)((EFI_COMPRESSION_SECTION2 *)Section + 1);
-          CompressedDataLength = SectionLength - sizeof (EFI_COMPRESSION_SECTION2);
-        } else {
-          CompressionSection = (EFI_COMPRESSION_SECTION *)Section;
-          SectionLength      = SECTION_SIZE (Section);
+        CompressedData       = (CHAR8 *)((UINTN)(Section) + CompressionSectionHeaderSize);
+        CompressedDataLength = SectionLength - CompressionSectionHeaderSize;
 
-          if (CompressionSection->CompressionType != EFI_STANDARD_COMPRESSION) {
-            return EFI_UNSUPPORTED;
-          }
-
-          CompressedData       = (CHAR8 *)((EFI_COMPRESSION_SECTION *)Section + 1);
-          CompressedDataLength = SectionLength - sizeof (EFI_COMPRESSION_SECTION);
+        if (GetSectionNCompressionType (Section) != EFI_STANDARD_COMPRESSION) {
+          return EFI_UNSUPPORTED;
         }
 
         Status = UefiDecompressGetInfo (
@@ -353,7 +418,9 @@ FfsProcessSection (
                    &DstBufferSize,
                    &ScratchBufferSize
                    );
-      } else if (Section->Type == EFI_SECTION_GUID_DEFINED) {
+      } else {  // Section->Type == EFI_SECTION_GUID_DEFINED)
+        UINT16  SectionAttribute;
+
         Status = ExtractGuidedSectionGetInfo (
                    Section,
                    &DstBufferSize,
@@ -390,21 +457,13 @@ FfsProcessSection (
       // DstBuffer still is one section. Adjust DstBuffer offset, skip EFI section header
       // to make section data at page alignment.
       //
-      if (IS_SECTION2 (Section)) {
-        DstBuffer = (UINT8 *)DstBuffer + EFI_PAGE_SIZE - sizeof (EFI_COMMON_SECTION_HEADER2);
-      } else {
-        DstBuffer = (UINT8 *)DstBuffer + EFI_PAGE_SIZE - sizeof (EFI_COMMON_SECTION_HEADER);
-      }
+      DstBuffer = (UINT8 *)DstBuffer + EFI_PAGE_SIZE - SectionHeaderSize;
 
       //
       // Call decompress function
       //
       if (Section->Type == EFI_SECTION_COMPRESSION) {
-        if (IS_SECTION2 (Section)) {
-          CompressedData = (CHAR8 *)((EFI_COMPRESSION_SECTION2 *)Section + 1);
-        } else {
-          CompressedData = (CHAR8 *)((EFI_COMPRESSION_SECTION *)Section + 1);
-        }
+        CompressedData = (CHAR8 *)((UINTN)(Section) + CompressionSectionHeaderSize);
 
         Status = UefiDecompress (
                    CompressedData,
@@ -412,6 +471,8 @@ FfsProcessSection (
                    ScratchBuffer
                    );
       } else if (Section->Type == EFI_SECTION_GUID_DEFINED) {
+        UINT32  AuthenticationStatus;
+
         Status = ExtractGuidedSectionDecode (
                    Section,
                    &DstBuffer,
@@ -426,23 +487,19 @@ FfsProcessSection (
         //
         DEBUG ((DEBUG_ERROR, "Decompress Failed - %r\n", Status));
         return EFI_NOT_FOUND;
-      } else {
-        return FfsProcessSection (
-                 SectionType,
-                 SectionCheckHook,
-                 DstBuffer,
-                 DstBufferSize,
-                 OutputBuffer
-                 );
       }
+
+      return FfsProcessSection (
+               SectionType,
+               SectionCheckHook,
+               DstBuffer,
+               DstBufferSize,
+               OutputBuffer
+               );
     }
 
 CheckNextSection:
-    if (IS_SECTION2 (Section)) {
-      SectionLength = SECTION2_SIZE (Section);
-    } else {
-      SectionLength = SECTION_SIZE (Section);
-    }
+    SectionLength = GetSectionNSize (Section);
 
     //
     // SectionLength is adjusted it is 4 byte aligned.
