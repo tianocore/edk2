@@ -4,7 +4,7 @@
 # This is MM Smram save state service lib that provide service to read and
 # save savestate area registers.
 #
-# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -20,7 +20,6 @@
 
 [Sources]
   MmSaveState.h
-  MmSaveStateCommon.c
   AmdMmSaveState.c
 
 [Packages]
@@ -32,3 +31,4 @@
   BaseMemoryLib
   DebugLib
   MmServicesTableLib
+  AmdSysCallLib

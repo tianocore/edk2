@@ -2,7 +2,7 @@
 Provides services to access SMRAM Save State Map
 
 Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
-Copyright (C) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+Copyright (C) 2023 - 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "MmSaveState.h"
 #include <Register/Amd/SmramSaveStateMap.h>
 #include <Library/BaseLib.h>
-#include <Register/Amd/Msr.h>
+#include <Library/AmdSysCallLib.h>
 
 #define AMD_MM_SAVE_STATE_REGISTER_SMMREVID_INDEX  1
 #define AMD_MM_SAVE_STATE_REGISTER_MAX_INDEX       2
@@ -80,6 +80,15 @@ CONST CPU_MM_SAVE_STATE_LOOKUP_ENTRY  mCpuWidthOffset[] = {
   { 0, 0, 0, 0,                                    0,                                    FALSE }
 };
 
+// Table used by MmSaveStateGetRegisterIndex() to convert an EFI_MM_SAVE_STATE_REGISTER
+// value to an index into a table of type CPU_MM_SAVE_STATE_LOOKUP_ENTRY
+CONST CPU_MM_SAVE_STATE_REGISTER_RANGE  mCpuRegisterRanges[] = {
+  MM_REGISTER_RANGE (EFI_MM_SAVE_STATE_REGISTER_GDTBASE, EFI_MM_SAVE_STATE_REGISTER_LDTINFO),
+  MM_REGISTER_RANGE (EFI_MM_SAVE_STATE_REGISTER_ES,      EFI_MM_SAVE_STATE_REGISTER_RIP),
+  MM_REGISTER_RANGE (EFI_MM_SAVE_STATE_REGISTER_RFLAGS,  EFI_MM_SAVE_STATE_REGISTER_CR4),
+  { (EFI_MM_SAVE_STATE_REGISTER)0,                       (EFI_MM_SAVE_STATE_REGISTER)0,      0}
+};
+
 /**
   Read a save state register on the target processor.  If this function
   returns EFI_UNSUPPORTED, then the caller is responsible for reading the
@@ -107,10 +116,10 @@ MmSaveStateReadRegister (
   OUT VOID                        *Buffer
   )
 {
-  UINT32                     SmmRevId;
   EFI_MM_SAVE_STATE_IO_INFO  *IoInfo;
   AMD_SMRAM_SAVE_STATE_MAP   *CpuSaveState;
   UINT8                      DataWidth;
+  UINT32                     SaveStateIoDword;
 
   // Read CPU State
   CpuSaveState = (AMD_SMRAM_SAVE_STATE_MAP *)gMmst->CpuSaveState[CpuIndex];
@@ -129,20 +138,19 @@ MmSaveStateReadRegister (
 
   // Check for special EFI_MM_SAVE_STATE_REGISTER_IO
   if (Register == EFI_MM_SAVE_STATE_REGISTER_IO) {
-    //
-    // Get SMM Revision ID
-    //
-    MmSaveStateReadRegisterByIndex (CpuIndex, AMD_MM_SAVE_STATE_REGISTER_SMMREVID_INDEX, sizeof (SmmRevId), &SmmRevId);
-
-    //
-    // See if the CPU supports the IOMisc register in the save state
-    //
-    if (SmmRevId < AMD_SMM_MIN_REV_ID_X64) {
-      return EFI_NOT_FOUND;
+    if (NeedSysCall () == TRUE) {
+      SaveStateIoDword = (UINT32)SysCall (
+                                   SMM_SC_SVST_READ,
+                                   CpuIndex,
+                                   (UINTN)&(CpuSaveState->x64.IO_DWord),
+                                   sizeof (CpuSaveState->x64.IO_DWord)
+                                   );
+    } else {
+      SaveStateIoDword = CpuSaveState->x64.IO_DWord;
     }
 
     // Check if IO Restart Dword [IO Trap] is valid or not using bit 1.
-    if (!(CpuSaveState->x64.IO_DWord & 0x02u)) {
+    if (!(SaveStateIoDword & 0x02u)) {
       return EFI_NOT_FOUND;
     }
 
@@ -150,12 +158,12 @@ MmSaveStateReadRegister (
     IoInfo = (EFI_MM_SAVE_STATE_IO_INFO *)Buffer;
     ZeroMem (IoInfo, sizeof (EFI_MM_SAVE_STATE_IO_INFO));
 
-    IoInfo->IoPort = (UINT16)(CpuSaveState->x64.IO_DWord >> 16u);
+    IoInfo->IoPort = (UINT16)(SaveStateIoDword >> 16u);
 
-    if (CpuSaveState->x64.IO_DWord & 0x10u) {
+    if (SaveStateIoDword & 0x10u) {
       IoInfo->IoWidth = EFI_MM_SAVE_STATE_IO_WIDTH_UINT8;
       DataWidth       = 0x01u;
-    } else if (CpuSaveState->x64.IO_DWord & 0x20u) {
+    } else if (SaveStateIoDword & 0x20u) {
       IoInfo->IoWidth = EFI_MM_SAVE_STATE_IO_WIDTH_UINT16;
       DataWidth       = 0x02u;
     } else {
@@ -163,7 +171,7 @@ MmSaveStateReadRegister (
       DataWidth       = 0x04u;
     }
 
-    if (CpuSaveState->x64.IO_DWord & 0x01u) {
+    if (SaveStateIoDword & 0x01u) {
       IoInfo->IoType = EFI_MM_SAVE_STATE_IO_TYPE_INPUT;
     } else {
       IoInfo->IoType = EFI_MM_SAVE_STATE_IO_TYPE_OUTPUT;
@@ -177,7 +185,12 @@ MmSaveStateReadRegister (
   }
 
   // Convert Register to a register lookup table index
-  return MmSaveStateReadRegisterByIndex (CpuIndex, MmSaveStateGetRegisterIndex (Register, AMD_MM_SAVE_STATE_REGISTER_MAX_INDEX), Width, Buffer);
+  return MmSaveStateReadRegisterByIndex (
+           CpuIndex,
+           MmSaveStateGetRegisterIndex (Register, AMD_MM_SAVE_STATE_REGISTER_MAX_INDEX),
+           Width,
+           Buffer
+           );
 }
 
 /**
@@ -278,18 +291,125 @@ MmSaveStateGetRegisterLma (
   VOID
   )
 {
-  UINT32  LMAValue;
-
-  MSR_IA32_EFER_REGISTER  Msr;
-
-  Msr.Uint64 = AsmReadMsr64 (MSR_IA32_EFER);
-  LMAValue   = Msr.Bits.LMA;
-  if (LMAValue) {
-    return EFI_MM_SAVE_STATE_REGISTER_LMA_64BIT;
-  }
-
   //
   // AMD64 processors support EFI_SMM_SAVE_STATE_REGISTER_LMA_64BIT only
   //
   return EFI_MM_SAVE_STATE_REGISTER_LMA_64BIT;
+}
+
+/**
+  Read information from the CPU save state.
+
+  @param  Register  Specifies the CPU register to read form the save state.
+  @param  RegOffset Offset for the next register index.
+
+  @retval 0   Register is not valid
+  @retval >0  Index into mCpuWidthOffset[] associated with Register
+
+**/
+UINTN
+MmSaveStateGetRegisterIndex (
+  IN EFI_MM_SAVE_STATE_REGISTER  Register,
+  IN UINTN                       RegOffset
+  )
+{
+  UINTN  Index;
+  UINTN  Offset;
+
+  for (Index = 0, Offset = RegOffset; mCpuRegisterRanges[Index].Length != 0; Index++) {
+    if ((Register >= mCpuRegisterRanges[Index].Start) && (Register <= mCpuRegisterRanges[Index].End)) {
+      return Register - mCpuRegisterRanges[Index].Start + Offset;
+    }
+
+    Offset += mCpuRegisterRanges[Index].Length;
+  }
+
+  return 0;
+}
+
+/**
+  Read a CPU Save State register on the target processor.
+
+  This function abstracts the differences that whether the CPU Save State register is in the
+  IA32 CPU Save State Map or X64 CPU Save State Map.
+
+  This function supports reading a CPU Save State register in SMBase relocation handler.
+
+  @param[in]  CpuIndex       Specifies the zero-based index of the CPU save state.
+  @param[in]  RegisterIndex  Index into mCpuWidthOffset[] look up table.
+  @param[in]  Width          The number of bytes to read from the CPU save state.
+  @param[out] Buffer         Upon return, this holds the CPU register value read from the save state.
+
+  @retval EFI_SUCCESS           The register was read from Save State.
+  @retval EFI_NOT_FOUND         The register is not defined for the Save State of Processor.
+  @retval EFI_INVALID_PARAMTER  This or Buffer is NULL.
+
+**/
+EFI_STATUS
+MmSaveStateReadRegisterByIndex (
+  IN UINTN  CpuIndex,
+  IN UINTN  RegisterIndex,
+  IN UINTN  Width,
+  OUT VOID  *Buffer
+  )
+{
+  if (RegisterIndex == 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // If 64-bit mode width is zero, then the specified register can not be accessed
+  //
+  if (mCpuWidthOffset[RegisterIndex].Width64 == 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // If Width is bigger than the 64-bit mode width, then the specified register can not be accessed
+  //
+  if (Width > mCpuWidthOffset[RegisterIndex].Width64) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Write lower 32-bits of return buffer
+  //
+  if (NeedSysCall () == TRUE) {
+    *(UINT32 *)Buffer = (UINT32)SysCall (
+                                  SMM_SC_SVST_READ,
+                                  CpuIndex,
+                                  (UINTN)((UINT8 *)gMmst->CpuSaveState[CpuIndex]
+                                          + mCpuWidthOffset[RegisterIndex].Offset64Lo),
+                                  MIN (4, Width)
+                                  );
+  } else {
+    CopyMem (
+      Buffer,
+      (UINT8 *)gMmst->CpuSaveState[CpuIndex] + mCpuWidthOffset[RegisterIndex].Offset64Lo,
+      MIN (4, Width)
+      );
+  }
+
+  if (Width > 4) {
+    //
+    // Write upper 32-bits of return buffer
+    //
+    if (NeedSysCall () == TRUE) {
+      *((UINT32 *)Buffer + 1) = (UINT32)SysCall (
+                                          SMM_SC_SVST_READ,
+                                          CpuIndex,
+                                          (UINTN)((UINT8 *)gMmst->CpuSaveState[CpuIndex] + mCpuWidthOffset[RegisterIndex].Offset64Hi),
+                                          Width - 4
+                                          );
+    } else {
+      CopyMem (
+        (UINT8 *)Buffer + 4,
+        (UINT8 *)gMmst->CpuSaveState[CpuIndex]
+        + mCpuWidthOffset[RegisterIndex].Offset64Hi,
+        Width - 4
+        );
+    }
+  }
+
+  return EFI_SUCCESS;
 }
