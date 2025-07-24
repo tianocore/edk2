@@ -626,7 +626,7 @@ DumpEventLog (
   TCG_PCR_EVENT_HDR         *EventHdr;
   TCG_PCR_EVENT2            *TcgPcrEvent2;
   TCG_EfiSpecIDEventStruct  *TcgEfiSpecIdEventStruct;
-  UINTN                     NumberOfEvents;
+  UINT64                    NumberOfEvents;
 
   if (!DebugPrintLevelEnabled (DEBUG_SECURITY)) {
     return;
@@ -637,7 +637,7 @@ DumpEventLog (
   switch (EventLogFormat) {
     case EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2:
       EventHdr = (TCG_PCR_EVENT_HDR *)(UINTN)EventLogLocation;
-      while ((UINTN)EventHdr <= EventLogLastEntry) {
+      while ((EFI_PHYSICAL_ADDRESS)(UINTN)EventHdr <= EventLogLastEntry) {
         DumpEvent (EventHdr);
         EventHdr = (TCG_PCR_EVENT_HDR *)((UINTN)EventHdr + sizeof (TCG_PCR_EVENT_HDR) + EventHdr->EventSize);
       }
@@ -668,7 +668,7 @@ DumpEventLog (
       DumpTcgEfiSpecIdEventStruct (TcgEfiSpecIdEventStruct);
 
       TcgPcrEvent2 = (TCG_PCR_EVENT2 *)((UINTN)TcgEfiSpecIdEventStruct + GetTcgEfiSpecIdEventStructSize (TcgEfiSpecIdEventStruct));
-      while ((UINTN)TcgPcrEvent2 <= EventLogLastEntry) {
+      while ((EFI_PHYSICAL_ADDRESS)(UINTN)TcgPcrEvent2 <= EventLogLastEntry) {
         DumpEvent2 (TcgPcrEvent2);
         TcgPcrEvent2 = (TCG_PCR_EVENT2 *)((UINTN)TcgPcrEvent2 + GetPcrEvent2Size (TcgPcrEvent2));
       }
@@ -798,6 +798,7 @@ Tcg2GetEventLog (
   @retval FALSE  This is NOT a Tcg800155PlatformIdEvent.
 
 **/
+STATIC
 BOOLEAN
 Is800155Event (
   IN      VOID    *NewEventHdr,
@@ -806,18 +807,26 @@ Is800155Event (
   IN      UINT32  NewEventSize
   )
 {
-  if ((((TCG_PCR_EVENT2_HDR *)NewEventHdr)->EventType == EV_NO_ACTION) &&
-      (NewEventSize >= sizeof (TCG_Sp800_155_PlatformId_Event2)) &&
-      ((CompareMem (
-          NewEventData,
-          TCG_Sp800_155_PlatformId_Event2_SIGNATURE,
-          sizeof (TCG_Sp800_155_PlatformId_Event2_SIGNATURE) - 1
-          ) == 0) ||
-       (CompareMem (
-          NewEventData,
-          TCG_Sp800_155_PlatformId_Event3_SIGNATURE,
-          sizeof (TCG_Sp800_155_PlatformId_Event3_SIGNATURE) - 1
-          ) == 0)))
+  if (((TCG_PCR_EVENT2_HDR *)NewEventHdr)->EventType != EV_NO_ACTION) {
+    return FALSE;
+  }
+
+  if ((NewEventSize >= sizeof (TCG_Sp800_155_PlatformId_Event2)) &&
+      (CompareMem (
+         NewEventData,
+         TCG_Sp800_155_PlatformId_Event2_SIGNATURE,
+         sizeof (TCG_Sp800_155_PlatformId_Event2_SIGNATURE) - 1
+         ) == 0))
+  {
+    return TRUE;
+  }
+
+  if ((NewEventSize >= sizeof (TCG_Sp800_155_PlatformId_Event3)) &&
+      (CompareMem (
+         NewEventData,
+         TCG_Sp800_155_PlatformId_Event3_SIGNATURE,
+         sizeof (TCG_Sp800_155_PlatformId_Event3_SIGNATURE) - 1
+         ) == 0))
   {
     return TRUE;
   }

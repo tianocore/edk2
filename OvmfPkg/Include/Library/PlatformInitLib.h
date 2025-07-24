@@ -64,6 +64,7 @@ typedef struct {
   UINT32                   S3AcpiReservedMemoryBase;
   UINT32                   S3AcpiReservedMemorySize;
 
+  BOOLEAN                  FeatureControl;
   UINT64                   FeatureControlValue;
 
   BOOLEAN                  QemuFwCfgChecked;

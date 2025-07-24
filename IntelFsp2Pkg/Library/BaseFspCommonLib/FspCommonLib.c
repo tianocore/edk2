@@ -31,7 +31,9 @@ typedef struct {
 } CONTEXT_STACK;
 
 typedef struct {
-  UINT64    Idtr[2];        // IDTR Limit - bit0:bi15, IDTR Base - bit16:bit79
+  UINT64    Idtr[2];        // IDTR Limit - bit0:bit15, IDTR Base - bit16:bit79
+  UINT64    Gdtr[2];        // GDTR Limit - bit0:bit15, GDTR Base - bit16:bit79
+  UINT64    Segment[6];     // Segment Registers: CS, DS, ES, FS, GS, SS
   UINT64    Cr0;
   UINT64    Cr3;
   UINT64    Cr4;
