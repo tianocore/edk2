@@ -130,9 +130,10 @@ AcquirePage (
   }
 
   //
-  // Link & Record the current uplink.
+  // Link & Record the current uplink. Not a leaf entry so do not include the
+  // encryption mask.
   //
-  *Uplink                                                             = Address | AddressEncMask | IA32_PG_P | IA32_PG_RW;
+  *Uplink                                                             = Address | IA32_PG_P | IA32_PG_RW;
   PageFaultContext->PageFaultUplink[PageFaultContext->PageFaultIndex] = Uplink;
 
   PageFaultContext->PageFaultIndex = (PageFaultContext->PageFaultIndex + 1) % EXTRA_PAGE_TABLE_PAGES;
@@ -187,7 +188,7 @@ PageFaultHandler (
     AcquirePage (PageFaultContext, &PageTable[PTIndex]);
   }
 
-  PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~AddressEncMask & PhyMask);
+  PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & PhyMask);
   PTIndex   = BitFieldRead64 (PFAddress, 30, 38);
   // PDPTE
   if (PageFaultContext->Page1GSupport) {
@@ -197,7 +198,7 @@ PageFaultHandler (
       AcquirePage (PageFaultContext, &PageTable[PTIndex]);
     }
 
-    PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~AddressEncMask & PhyMask);
+    PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & PhyMask);
     PTIndex   = BitFieldRead64 (PFAddress, 21, 29);
     // PD
     PageTable[PTIndex] = ((PFAddress | AddressEncMask) & ~((1ull << 21) - 1)) | IA32_PG_P | IA32_PG_RW | IA32_PG_PS;
