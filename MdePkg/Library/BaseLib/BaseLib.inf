@@ -55,6 +55,7 @@
   DivS64x64Remainder.c
   ARShiftU64.c
   BitField.c
+  ConvertGuidUuid.c
   CpuDeadLoop.c
   Cpu.c
   LinkedList.c

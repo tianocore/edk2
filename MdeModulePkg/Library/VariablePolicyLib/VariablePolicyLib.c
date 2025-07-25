@@ -2,6 +2,8 @@
 Business logic for Variable Policy enforcement.
 
 Copyright (c) Microsoft Corporation.
+Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -107,7 +109,7 @@ IsValidVariablePolicyStructure (
 
   // Sanitize some quick values.
   if ((NewPolicy == NULL) || (NewPolicy->Size == 0) ||
-      // Structure size should be at least as long as the minumum structure and a NULL string.
+      // Structure size should be at least as long as the minimum structure and a NULL string.
       (NewPolicy->Size < sizeof (VARIABLE_POLICY_ENTRY)) ||
       // Check for the known revision.
       (NewPolicy->Version != VARIABLE_POLICY_ENTRY_REVISION))

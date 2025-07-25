@@ -584,6 +584,9 @@ CoreLoadPeImage (
   EFI_STATUS  Status;
   BOOLEAN     DstBufAlocated;
   UINTN       Size;
+  UINTN       Index;
+  UINTN       StartIndex;
+  CHAR8       EfiFileName[512];
 
   ZeroMem (&Image->ImageContext, sizeof (Image->ImageContext));
 
@@ -823,12 +826,6 @@ CoreLoadPeImage (
   // Print the load address and the PDB file name if it is available
   //
 
-  DEBUG_CODE_BEGIN ();
-
-  UINTN  Index;
-  UINTN  StartIndex;
-  CHAR8  EfiFileName[256];
-
   DEBUG ((
     DEBUG_INFO | DEBUG_LOAD,
     "Loading driver at 0x%11p EntryPoint=0x%11p ",
@@ -876,8 +873,6 @@ CoreLoadPeImage (
   }
 
   DEBUG ((DEBUG_INFO | DEBUG_LOAD, "\n"));
-
-  DEBUG_CODE_END ();
 
   return EFI_SUCCESS;
 

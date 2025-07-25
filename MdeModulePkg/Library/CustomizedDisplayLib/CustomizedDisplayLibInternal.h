@@ -129,7 +129,7 @@ PrintFramework (
   );
 
 /**
-  Validate the input screen diemenstion info.
+  Validate the input screen dimension info.
 
   @param  FormData               The input form data info.
 
@@ -138,7 +138,7 @@ PrintFramework (
 
 **/
 EFI_STATUS
-ScreenDiemensionInfoValidate (
+ScreenDimensionInfoValidate (
   IN FORM_DISPLAY_ENGINE_FORM  *FormData
   );
 

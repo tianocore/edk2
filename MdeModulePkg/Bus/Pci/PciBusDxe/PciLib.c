@@ -1100,6 +1100,7 @@ PciScanBus (
   EFI_HPC_STATE                      State;
   UINT64                             PciAddress;
   EFI_HPC_PADDING_ATTRIBUTES         Attributes;
+  VOID                               *DescriptorsBuffer;
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Descriptors;
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *NextDescriptors;
   UINT16                             BusRange;
@@ -1108,16 +1109,17 @@ PciScanBus (
   UINT32                             TempReservedBusNum;
   BOOLEAN                            IsAriEnabled;
 
-  PciRootBridgeIo = Bridge->PciRootBridgeIo;
-  SecondBus       = 0;
-  Register        = 0;
-  State           = 0;
-  Attributes      = (EFI_HPC_PADDING_ATTRIBUTES)0;
-  BusRange        = 0;
-  BusPadding      = FALSE;
-  PciDevice       = NULL;
-  PciAddress      = 0;
-  IsAriEnabled    = FALSE;
+  PciRootBridgeIo   = Bridge->PciRootBridgeIo;
+  SecondBus         = 0;
+  Register          = 0;
+  State             = 0;
+  Attributes        = (EFI_HPC_PADDING_ATTRIBUTES)0;
+  BusRange          = 0;
+  BusPadding        = FALSE;
+  PciDevice         = NULL;
+  PciAddress        = 0;
+  IsAriEnabled      = FALSE;
+  DescriptorsBuffer = NULL;
 
   for (Device = 0; Device <= PCI_MAX_DEVICE; Device++) {
     if (!IsAriEnabled) {
@@ -1257,7 +1259,7 @@ PciScanBus (
                                           PciDevice->DevicePath,
                                           PciAddress,
                                           &State,
-                                          (VOID **)&Descriptors,
+                                          &DescriptorsBuffer,
                                           &Attributes
                                           );
 
@@ -1265,6 +1267,7 @@ PciScanBus (
                 return Status;
               }
 
+              Descriptors     = (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR *)DescriptorsBuffer;
               BusRange        = 0;
               NextDescriptors = Descriptors;
               Status          = PciGetBusRange (
@@ -1274,7 +1277,9 @@ PciScanBus (
                                   &BusRange
                                   );
 
-              FreePool (Descriptors);
+              FreePool (DescriptorsBuffer);
+              DescriptorsBuffer = NULL;
+              Descriptors       = NULL;
 
               if (!EFI_ERROR (Status)) {
                 BusPadding = TRUE;

@@ -45,6 +45,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/HiiPackageList.h>
 #include <Protocol/SmmBase2.h>
 #include <Protocol/PeCoffImageEmulator.h>
+#include <Protocol/MemoryAttribute.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/FirmwareFileSystem2.h>
 #include <Guid/FirmwareFileSystem3.h>
@@ -250,6 +251,7 @@ extern EFI_SECURITY_ARCH_PROTOCOL        *gSecurity;
 extern EFI_SECURITY2_ARCH_PROTOCOL       *gSecurity2;
 extern EFI_BDS_ARCH_PROTOCOL             *gBds;
 extern EFI_SMM_BASE2_PROTOCOL            *gSmmBase2;
+extern EFI_MEMORY_ATTRIBUTE_PROTOCOL     *gMemoryAttributeProtocol;
 
 extern EFI_TPL  gEfiCurrentTpl;
 

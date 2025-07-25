@@ -36,6 +36,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   StandaloneMmPkg/StandaloneMmPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [Packages]
   ArmPkg/ArmPkg.dec
@@ -48,6 +49,7 @@
   ArmTransferListLib
   ArmFfaLib
   StackCheckLib
+  HobLib
 
 [Guids]
   gMpInformationHobGuid
@@ -58,6 +60,7 @@
 [Protocols]
   gEdkiiPiMmCpuDriverEpProtocolGuid
   gEfiMmCommunication2ProtocolGuid
+  gEfiMmCommunication3ProtocolGuid
 
 [Pcd]
   gArmTokenSpaceGuid.PcdStMmStackSize

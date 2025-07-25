@@ -214,14 +214,20 @@ HandleStatusCode (
       DevPathString
       );
   } else {
+    EFI_STATUS  ReturnStatus;
+
+    ReturnStatus = ((EFI_RETURN_STATUS_EXTENDED_DATA *)Data)->ReturnStatus;
     Print (
-      L"%a: failed to %a %s \"%s\" from %s: %r\n",
+      L"%a: failed to %a %s \"%s\" from %s: %r%a\n",
       gEfiCallerBaseName,
       Value == mLoadFail ? "load" : "start",
       BootOptionName,
       BmBootOption.Description,
       DevPathString,
-      ((EFI_RETURN_STATUS_EXTENDED_DATA *)Data)->ReturnStatus
+      ReturnStatus,
+      ((ReturnStatus == EFI_SECURITY_VIOLATION ||
+        (Value == mLoadFail && ReturnStatus == EFI_ACCESS_DENIED)) ?
+       " -- rejected probably by Secure Boot" : "")
       );
   }
 

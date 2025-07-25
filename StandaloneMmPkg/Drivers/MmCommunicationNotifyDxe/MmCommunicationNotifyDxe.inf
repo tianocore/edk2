@@ -1,0 +1,51 @@
+## @file
+# MmCommunicationNotifyDxe driver create the notifications of
+# some protocols and event.
+#
+# Copyright (c) 2025, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = MmCommunicationNotifyDxe
+  FILE_GUID                      = DE05B887-A2EF-4D81-BFFE-FF9CDE458753
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  ENTRY_POINT                    = MmCommunicationNotifyEntryPoint
+
+[Sources]
+  MmCommunicationNotifyDxe.c
+  MmCommunicationNotifyDxe.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+  HobLib
+  BaseMemoryLib
+  UefiBootServicesTableLib
+  UefiLib
+  ReportStatusCodeLib
+
+[Guids]
+  gMmCommBufferHobGuid
+  gEfiEndOfDxeEventGroupGuid
+  gEfiEventExitBootServicesGuid
+
+[Protocols]
+  gEfiDxeMmReadyToLockProtocolGuid
+  gEfiSmmAccess2ProtocolGuid
+  gEfiMmCommunication2ProtocolGuid
+
+[Depex]
+  gEfiMmCommunication2ProtocolGuid

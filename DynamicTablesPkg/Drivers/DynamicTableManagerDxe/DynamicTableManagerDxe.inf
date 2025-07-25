@@ -37,6 +37,7 @@
   DynamicTablesPkg/DynamicTablesPkg.dec
 
 [LibraryClasses]
+  MetadataHandlerLib
   PrintLib
   TableHelperLib
   UefiBootServicesTableLib

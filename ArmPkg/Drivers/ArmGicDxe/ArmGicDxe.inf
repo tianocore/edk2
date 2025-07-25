@@ -26,9 +26,12 @@
 
 [Sources.ARM]
   GicV3/Arm/ArmGicV3.S     | GCC
+  GicV5/Arm/ArmGicV5.c
 
 [Sources.AARCH64]
   GicV3/AArch64/ArmGicV3.S
+  GicV5/AArch64/ArmGicV5.S
+  GicV5/ArmGicV5Dxe.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -46,6 +49,7 @@
   UefiDriverEntryPoint
   IoLib
   PcdLib
+  TimerLib
   UefiLib
 
 [Protocols]
@@ -57,6 +61,7 @@
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicRedistributorsBase
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
+  gArmTokenSpaceGuid.PcdGicIrsConfigFrameBase
 
 [Depex]
   gEfiCpuArchProtocolGuid

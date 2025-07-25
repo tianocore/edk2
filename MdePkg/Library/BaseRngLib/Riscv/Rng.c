@@ -3,6 +3,7 @@
    to provide pseudorandom numbers.
 
    Copyright (c) 2024, Rivos, Inc.
+  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
 
    SPDX-License-Identifier: BSD-2-Clause-Patent
  **/
@@ -153,7 +154,7 @@ Get64BitSeed (
 /**
    Constructor library which initializes Seeds and mStatus array.
 
-   @retval EFI_SUCCESS  Intialization was successful.
+   @retval EFI_SUCCESS  initialization was successful.
    @retval EFI_UNSUPPORTED Feature not supported.
 
  **/

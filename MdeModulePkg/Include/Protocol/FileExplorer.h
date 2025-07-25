@@ -48,7 +48,7 @@ BOOLEAN
                            after choose one file.
   @param  File             Return the device path for the last time chosed file.
 
-  @retval EFI_SUCESS       Choose the file success.
+  @retval EFI_SUCCESS      Choose the file success.
   @retval Other errors     Choose the file failed.
 **/
 typedef

@@ -22,6 +22,7 @@
 #include <AcpiTableGenerator.h>
 #include <ConfigurationManagerObject.h>
 #include <ConfigurationManagerHelper.h>
+#include <Library/CmObjHelperLib.h>
 #include <Library/TableHelperLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
@@ -172,6 +173,7 @@ AddGICCAffinity (
   IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat
   )
 {
+  EFI_STATUS                            Status;
   EFI_ACPI_6_3_GICC_AFFINITY_STRUCTURE  *GicCAff;
   CM_ARM_GICC_INFO                      *GicCInfo;
 
@@ -184,10 +186,30 @@ AddGICCAffinity (
 
     GicCAff->Type             = EFI_ACPI_6_3_GICC_AFFINITY;
     GicCAff->Length           = sizeof (EFI_ACPI_6_3_GICC_AFFINITY_STRUCTURE);
-    GicCAff->ProximityDomain  = GicCInfo->ProximityDomain;
     GicCAff->AcpiProcessorUid = GicCInfo->AcpiProcessorUid;
     GicCAff->Flags            = GicCInfo->AffinityFlags;
-    GicCAff->ClockDomain      = GicCInfo->ClockDomain;
+
+    Status = GetProximityDomainId (
+               CfgMgrProtocol,
+               GicCInfo->ProximityDomain,
+               GicCInfo->ProximityDomainToken,
+               &GicCAff->ProximityDomain
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return;
+    }
+
+    Status = GetProximityDomainId (
+               CfgMgrProtocol,
+               GicCInfo->ClockDomain,
+               GicCInfo->ClockDomainToken,
+               &GicCAff->ClockDomain
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return;
+    }
 
     // Next
     GicCAff++;
@@ -209,6 +231,7 @@ AddGICItsAffinity (
   IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat
   )
 {
+  EFI_STATUS                               Status;
   EFI_ACPI_6_3_GIC_ITS_AFFINITY_STRUCTURE  *GicItsAff;
   CM_ARM_GIC_ITS_INFO                      *GicItsInfo;
 
@@ -219,12 +242,22 @@ AddGICItsAffinity (
   while (mSratSubTable[EArmGicItsSubTableType].Count-- != 0) {
     DEBUG ((DEBUG_INFO, "SRAT: GicItsAff = 0x%p\n", GicItsAff));
 
-    GicItsAff->Type            = EFI_ACPI_6_3_GIC_ITS_AFFINITY;
-    GicItsAff->Length          = sizeof (EFI_ACPI_6_3_GIC_ITS_AFFINITY_STRUCTURE);
-    GicItsAff->ProximityDomain = GicItsInfo->ProximityDomain;
-    GicItsAff->Reserved[0]     = EFI_ACPI_RESERVED_BYTE;
-    GicItsAff->Reserved[1]     = EFI_ACPI_RESERVED_BYTE;
-    GicItsAff->ItsId           = GicItsInfo->GicItsId;
+    GicItsAff->Type        = EFI_ACPI_6_3_GIC_ITS_AFFINITY;
+    GicItsAff->Length      = sizeof (EFI_ACPI_6_3_GIC_ITS_AFFINITY_STRUCTURE);
+    GicItsAff->Reserved[0] = EFI_ACPI_RESERVED_BYTE;
+    GicItsAff->Reserved[1] = EFI_ACPI_RESERVED_BYTE;
+    GicItsAff->ItsId       = GicItsInfo->GicItsId;
+
+    Status = GetProximityDomainId (
+               CfgMgrProtocol,
+               GicItsInfo->ProximityDomain,
+               GicItsInfo->ProximityDomainToken,
+               &GicItsAff->ProximityDomain
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return;
+    }
 
     // Next
     GicItsAff++;

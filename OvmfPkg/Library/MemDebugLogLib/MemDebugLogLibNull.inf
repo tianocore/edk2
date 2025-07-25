@@ -1,0 +1,31 @@
+## @file
+#  Null Instance of MemDebugLog Library
+#
+#  Copyright (C) 2025, Oracle and/or its affiliates.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MemDebugLogLibNull
+  FILE_GUID                      = 11b4523c-2c30-44f7-9dee-e6d59eef3d04
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MemDebugLogLib|SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER SMM_CORE DXE_SMM_DRIVER MM_STANDALONE MM_CORE_STANDALONE
+
+
+[Sources]
+  MemDebugLogNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+
+[FixedPcd]
+
+[Guids]

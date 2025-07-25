@@ -1,7 +1,7 @@
 /** @file
   FSP MultiPhase library.
 
-  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2022 - 2025, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -58,7 +58,6 @@ FspVariableRequestSwitchStack (
   @retval EFI_DEVICE_ERROR            FSP initialization failed.
 **/
 EFI_STATUS
-EFIAPI
 FspMultiPhaseWorker (
   IN UINT32  ApiIdx,
   IN VOID    *ApiParam

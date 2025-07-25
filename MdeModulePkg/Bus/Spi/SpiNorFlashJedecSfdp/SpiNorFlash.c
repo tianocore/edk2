@@ -48,9 +48,9 @@ FillWriteBuffer (
   UINT32  Index;
   UINT8   SfdpAddressBytes;
 
-  if ((Instance == NULL) || (WriteBuffer == NULL)) {
+  if ((Instance == NULL) || ((WriteBytes != 0) && (WriteBuffer == NULL))) {
     ASSERT (Instance != NULL);
-    ASSERT (WriteBuffer != NULL);
+    ASSERT (WriteBytes == 0 || WriteBuffer != NULL);
     return 0;
   }
 
@@ -63,6 +63,7 @@ FillWriteBuffer (
   // Copy Opcode into Write Buffer
   Instance->SpiTransactionWriteBuffer[0] = Opcode;
   Index                                  = 1;
+  AddressSize                            = 0;
   if (UseAddress) {
     if (AddressBytesSupported == SPI_ADDR_3BYTE_ONLY) {
       if (SfdpAddressBytes != 0) {

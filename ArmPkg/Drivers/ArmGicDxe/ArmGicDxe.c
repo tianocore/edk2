@@ -74,7 +74,7 @@ InterruptDxeInitialize (
 {
   EFI_STATUS  Status;
 
-  if (!GicV3Supported ()) {
+  if (!GicV3Supported () && !ArmHasGicV5SystemRegisters ()) {
     Status = GicV2DxeInitialize (ImageHandle, SystemTable);
   } else {
     Status = GicV3DxeInitialize (ImageHandle, SystemTable);

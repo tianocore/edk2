@@ -43,6 +43,7 @@
 [Ppis]
   gEfiPeiMasterBootModePpiGuid                  # PPI ALWAYS_PRODUCED
   gEfiPeiBootInRecoveryModePpiGuid              # PPI SOMETIMES_PRODUCED
+  gArmTransferListPpiGuid                       # PPI SOMETIMES_CONSUMED
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFdBaseAddress
@@ -50,6 +51,9 @@
 
   gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmTokenSpaceGuid.PcdFvSize
+
+[Guids]
+  gArmTransferListHobGuid
 
 [Depex]
   TRUE

@@ -626,6 +626,24 @@ FdtAddSubnode (
 }
 
 /**
+  Delete a node (subtree)
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     The offset to the node (subtree) to delete.
+
+  @return  Zero for successfully, otherwise failed.
+
+ **/
+INT32
+FdtDelNode (
+  IN VOID   *Fdt,
+  IN INT32  NodeOffset
+  )
+{
+  return fdt_del_node (Fdt, NodeOffset);
+}
+
+/**
   Add or modify a property in the given node.
 
   @param[in] Fdt            The pointer to FDT blob.
@@ -782,6 +800,28 @@ FdtGetName (
   )
 {
   return fdt_get_name (Fdt, NodeOffset, Length);
+}
+
+/**
+  Determine the full path of a node.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     Offset of node to check.
+  @param[in] Buffer         The pointer to allocate a pool for FDT blob.
+  @param[in] BufferSize     The BufferSize to the pool size.
+
+  @return 0 on success, or negative error code.
+**/
+INT32
+EFIAPI
+FdtGetPath (
+  IN VOID    *Fdt,
+  IN INT32   NodeOffset,
+  IN VOID    *Buffer,
+  IN UINT32  BufferSize
+  )
+{
+  return fdt_get_path (Fdt, NodeOffset, Buffer, BufferSize);
 }
 
 /**

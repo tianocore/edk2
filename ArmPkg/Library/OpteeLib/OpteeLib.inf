@@ -23,6 +23,7 @@
 [Packages]
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   ArmMmuLib

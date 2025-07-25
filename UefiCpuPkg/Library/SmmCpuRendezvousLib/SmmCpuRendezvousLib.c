@@ -2,6 +2,8 @@
   SMM CPU Rendezvous sevice implement.
 
   Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -55,7 +57,7 @@ SmmCpuRendezvousProtocolNotify (
 
   @param[in] BlockingMode  Blocking mode or non-blocking mode.
 
-  @retval EFI_SUCCESS  All avaiable APs arrived.
+  @retval EFI_SUCCESS  All available APs arrived.
   @retval EFI_TIMEOUT  Wait for all APs until timeout.
   @retval OTHER        Fail to register SMM CPU Rendezvous service Protocol.
 **/

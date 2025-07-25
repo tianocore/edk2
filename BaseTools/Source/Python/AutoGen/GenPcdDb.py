@@ -435,23 +435,6 @@ class DbStringHeadTableItemList(DbItemList):
                     self.ListSize += self.ItemSize
         return self.ListSize
 
-## DbSkuHeadTableItemList
-#
-#  The class holds the Sku header value table
-#
-class DbSkuHeadTableItemList (DbItemList):
-    def __init__(self, ItemSize, DataList=None, RawDataList=None):
-        DbItemList.__init__(self, ItemSize, DataList, RawDataList)
-
-    def PackData(self):
-        PackStr = "=LL"
-        Buffer = bytearray()
-        for Data in self.RawDataList:
-            Buffer += pack(PackStr,
-                           GetIntegerValue(Data[0]),
-                           GetIntegerValue(Data[1]))
-        return Buffer
-
 ## DbSizeTableItemList
 #
 #  The class holds the size table

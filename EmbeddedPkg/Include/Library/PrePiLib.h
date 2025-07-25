@@ -11,6 +11,7 @@
 #define __PRE_PI_LIB_H__
 
 #include <Guid/ExtractSection.h>
+#include <Pi/PiPeiCis.h>
 
 /**
   This service enables discovery of additional firmware volumes.

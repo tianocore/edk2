@@ -16,6 +16,7 @@
 #include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugPrintErrorLevelLib.h>
+#include <Library/MemDebugLogLib.h>
 #include "DebugLibDetect.h"
 
 //
@@ -93,10 +94,11 @@ DebugPrintMarker (
   ASSERT (Format != NULL);
 
   //
-  // Check if the global mask disables this message or the device is inactive
+  // If the global mask disables this message OR the debug I/O port is not
+  // present and Memory Debug Logging is disabled, there's nothing to do.
   //
   if (((ErrorLevel & GetDebugPrintErrorLevel ()) == 0) ||
-      !PlatformDebugLibIoPortFound ())
+      (!PlatformDebugLibIoPortFound () && !MemDebugLogEnabled ()))
   {
     return;
   }
@@ -111,9 +113,18 @@ DebugPrintMarker (
   }
 
   //
-  // Send the print string to the debug I/O port
+  // Send the print string to the debug I/O port, if present
   //
-  IoWriteFifo8 (PcdGet16 (PcdDebugIoPort), Length, Buffer);
+  if (PlatformDebugLibIoPortFound ()) {
+    IoWriteFifo8 (PcdGet16 (PcdDebugIoPort), Length, Buffer);
+  }
+
+  //
+  // Send string to Memory Debug Log if enabled
+  //
+  if (MemDebugLogEnabled ()) {
+    MemDebugLogWrite (Buffer, Length);
+  }
 }
 
 /**
@@ -219,6 +230,13 @@ DebugAssert (
   //
   if (PlatformDebugLibIoPortFound ()) {
     IoWriteFifo8 (PcdGet16 (PcdDebugIoPort), Length, Buffer);
+  }
+
+  //
+  // Send the string to Memory Debug Log
+  //
+  if (MemDebugLogEnabled ()) {
+    MemDebugLogWrite (Buffer, Length);
   }
 
   //

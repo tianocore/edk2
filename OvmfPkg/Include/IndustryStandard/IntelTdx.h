@@ -17,11 +17,14 @@
 #define MP_CPU_PROTECTED_MODE_MAILBOX_APICID_INVALID    0xFFFFFFFF
 #define MP_CPU_PROTECTED_MODE_MAILBOX_APICID_BROADCAST  0xFFFFFFFE
 
+//
+// This enum is defined for the use of Intel TDX Guest.
+// TDX Guest CPUs wait for below commands and do corresponding tasks.
+//
 typedef enum {
   MpProtectedModeWakeupCommandNoop        = 0,
   MpProtectedModeWakeupCommandWakeup      = 1,
-  MpProtectedModeWakeupCommandSleep       = 2,
-  MpProtectedModeWakeupCommandAcceptPages = 3,
+  MpProtectedModeWakeupCommandAcceptPages = 2,
 } MP_CPU_PROTECTED_MODE_WAKEUP_CMD;
 
 #pragma pack(1)
@@ -60,6 +63,7 @@ typedef struct {
 typedef struct {
   UINT8    *RelocateApLoopFuncAddress;
   UINTN    RelocateApLoopFuncSize;
+  UINT8    *RelocateApResetVector;
 } MP_RELOCATION_MAP;
 
 #pragma pack()

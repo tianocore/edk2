@@ -3,7 +3,7 @@
 
   Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
-  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (C) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -180,7 +180,7 @@ EfiHttpConfigure (
     }
 
     //
-    // Creat Tcp child
+    // Create Tcp child
     //
     Status = HttpInitProtocol (HttpInstance, HttpInstance->LocalAddressIsIPv6);
     if (EFI_ERROR (Status)) {

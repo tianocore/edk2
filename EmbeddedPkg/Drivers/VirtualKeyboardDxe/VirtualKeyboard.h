@@ -43,7 +43,7 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gVirtualKeyboardComponentName2;
 #define KEYBOARD_TIMEOUT               65536         // 0.07s
 #define KEYBOARD_WAITFORVALUE_TIMEOUT  1000000       // 1s
 #define KEYBOARD_BAT_TIMEOUT           4000000       // 4s
-#define KEYBOARD_TIMER_INTERVAL        500000        // 0.5s
+#define KEYBOARD_TIMER_INTERVAL        500000        // 0.05s
 
 #define QUEUE_MAX_COUNT  32
 

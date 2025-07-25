@@ -190,6 +190,18 @@ typedef struct CmArmGicCInfo {
       i.e. a token referencing a CM_ARCH_COMMON_PSD_INFO object.
   */
   CM_OBJECT_TOKEN    PsdToken;
+
+  /** Optional field: Reference Token to the ProximityDomain this object
+      belongs to. If set to CM_NULL_TOKEN, the following field is used:
+        CM_ARM_GICC_INFO.ProximityDomain
+  */
+  CM_OBJECT_TOKEN    ProximityDomainToken;
+
+  /** Optional field: Reference Token to the ClockDomain this object belongs to.
+      belongs to. If set to CM_NULL_TOKEN, the following field is used:
+        CM_ARM_GICC_INFO.ClockDomain
+  */
+  CM_OBJECT_TOKEN    ClockDomainToken;
 } CM_ARM_GICC_INFO;
 
 /** A structure that describes the
@@ -261,16 +273,22 @@ typedef struct CmArmGicRedistInfo {
 */
 typedef struct CmArmGicItsInfo {
   /// The GIC ITS ID
-  UINT32    GicItsId;
+  UINT32             GicItsId;
 
   /// The physical address for the Interrupt Translation Service
-  UINT64    PhysicalBaseAddress;
+  UINT64             PhysicalBaseAddress;
 
   /** The proximity domain to which the logical processor belongs.
       This field is used to populate the GIC ITS affinity structure
       in the SRAT table.
   */
-  UINT32    ProximityDomain;
+  UINT32             ProximityDomain;
+
+  /** Optional field: Reference Token to the ProximityDomain this object
+      belongs to. If this field is used, the following field is ignored:
+        CM_ARM_GIC_ITS_INFO.ProximityDomain
+  */
+  CM_OBJECT_TOKEN    ProximityDomainToken;
 } CM_ARM_GIC_ITS_INFO;
 
 /** A structure that describes the
@@ -559,6 +577,12 @@ typedef struct CmArmSmmuV3Node {
 
   /// Unique identifier for this node.
   UINT32             Identifier;
+
+  /** Optional field: Reference Token to the ProximityDomain this object
+      belongs to. If set to CM_NULL_TOKEN, the following field is used:
+        CM_ARM_SMMUV3_NODE.ProximityDomain
+  */
+  CM_OBJECT_TOKEN    ProximityDomainToken;
 } CM_ARM_SMMUV3_NODE;
 
 /** A structure that describes the

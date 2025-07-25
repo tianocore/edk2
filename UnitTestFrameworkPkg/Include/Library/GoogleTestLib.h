@@ -13,6 +13,15 @@
 #include <gmock/gmock.h>
 #include <cstring>
 
+//
+// For all use of GoogleTestLib, make sure NULL is defined to nullptr to
+// support matching any unit test pointer value to NULL.
+//
+#ifdef NULL
+  #undef NULL
+#define NULL  nullptr
+#endif
+
 using ::testing::Throws;
 using ::testing::ThrowsMessage;
 using ::testing::HasSubstr;

@@ -104,37 +104,41 @@ GetModuleContextBuffers (
                   &HandleCount,
                   &HandleBuffer
                   );
-  if (!EFI_ERROR (Status)) {
-    for (Index = 0; Index < HandleCount; Index++) {
-      Status = gBS->HandleProtocol (
-                      HandleBuffer[Index],
-                      &gPrmConfigProtocolGuid,
-                      (VOID **)&PrmConfigProtocol
-                      );
-      ASSERT_EFI_ERROR (Status);
-      if (EFI_ERROR (Status) || (PrmConfigProtocol == NULL)) {
-        continue;
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  for (Index = 0; Index < HandleCount; Index++) {
+    Status = gBS->HandleProtocol (
+                    HandleBuffer[Index],
+                    &gPrmConfigProtocolGuid,
+                    (VOID **)&PrmConfigProtocol
+                    );
+    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status) || (PrmConfigProtocol == NULL)) {
+      continue;
+    }
+
+    if (GuidSearchType == ByModuleGuid) {
+      if (CompareGuid (&PrmConfigProtocol->ModuleContextBuffers.ModuleGuid, Guid)) {
+        DEBUG ((
+          DEBUG_INFO,
+          "      %a %a: Found a PRM configuration protocol for PRM module %g.\n",
+          _DBGMSGID_,
+          __func__,
+          Guid
+          ));
+
+        *PrmModuleContextBuffers = &PrmConfigProtocol->ModuleContextBuffers;
+        Status                   = EFI_SUCCESS;
+        goto Exit;
       }
-
-      if (GuidSearchType == ByModuleGuid) {
-        if (CompareGuid (&PrmConfigProtocol->ModuleContextBuffers.ModuleGuid, Guid)) {
-          DEBUG ((
-            DEBUG_INFO,
-            "      %a %a: Found a PRM configuration protocol for PRM module %g.\n",
-            _DBGMSGID_,
-            __func__,
-            Guid
-            ));
-
-          *PrmModuleContextBuffers = &PrmConfigProtocol->ModuleContextBuffers;
-          return EFI_SUCCESS;
-        }
-      } else {
-        Status = FindContextBufferInModuleBuffers (Guid, &PrmConfigProtocol->ModuleContextBuffers, &PrmContextBuffer);
-        if (!EFI_ERROR (Status)) {
-          *PrmModuleContextBuffers = &PrmConfigProtocol->ModuleContextBuffers;
-          return EFI_SUCCESS;
-        }
+    } else {
+      Status = FindContextBufferInModuleBuffers (Guid, &PrmConfigProtocol->ModuleContextBuffers, &PrmContextBuffer);
+      if (!EFI_ERROR (Status)) {
+        *PrmModuleContextBuffers = &PrmConfigProtocol->ModuleContextBuffers;
+        Status                   = EFI_SUCCESS;
+        goto Exit;
       }
     }
   }
@@ -147,7 +151,12 @@ GetModuleContextBuffers (
     Guid
     ));
 
-  return EFI_NOT_FOUND;
+  Status = EFI_NOT_FOUND;
+
+Exit:
+  gBS->FreePool (HandleBuffer);
+
+  return Status;
 }
 
 /**

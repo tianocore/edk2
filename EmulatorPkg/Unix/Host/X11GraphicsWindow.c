@@ -700,8 +700,8 @@ HandleEvents (
 
 unsigned long
 X11PixelToColor (
-  IN  GRAPHICS_IO_PRIVATE  *Drv,
-  IN  EFI_UGA_PIXEL        pixel
+  IN  GRAPHICS_IO_PRIVATE            *Drv,
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL  pixel
   )
 {
   return ((pixel.Red   >> Drv->r.csize) << Drv->r.shift)
@@ -709,15 +709,15 @@ X11PixelToColor (
          | ((pixel.Blue  >> Drv->b.csize) << Drv->b.shift);
 }
 
-EFI_UGA_PIXEL
+EFI_GRAPHICS_OUTPUT_BLT_PIXEL
 X11ColorToPixel (
   IN  GRAPHICS_IO_PRIVATE  *Drv,
   IN  unsigned long        val
   )
 {
-  EFI_UGA_PIXEL  Pixel;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL  Pixel;
 
-  memset (&Pixel, 0, sizeof (EFI_UGA_PIXEL));
+  memset (&Pixel, 0, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
 
   // Truncation not an issue since X11 and EFI are both using 8 bits per color
   Pixel.Red   =   (val >> Drv->r.shift) << Drv->r.csize;
@@ -782,7 +782,7 @@ X11KeySetState (
     if ((Drv->KeyState.KeyToggleState & EFI_CAPS_LOCK_ACTIVE) == 0) {
       //
       // We could create an XKeyEvent and send a XK_Caps_Lock to
-      // the UGA/GOP Window
+      // the GOP Window
       //
     }
   }
@@ -812,32 +812,32 @@ X11RegisterKeyNotify (
 
 EFI_STATUS
 X11Blt (
-  IN EMU_GRAPHICS_WINDOW_PROTOCOL     *GraphicsIo,
-  IN  EFI_UGA_PIXEL                   *BltBuffer OPTIONAL,
-  IN  EFI_UGA_BLT_OPERATION           BltOperation,
-  IN  EMU_GRAPHICS_WINDOWS__BLT_ARGS  *Args
+  IN EMU_GRAPHICS_WINDOW_PROTOCOL        *GraphicsIo,
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL      *BltBuffer OPTIONAL,
+  IN  EFI_GRAPHICS_OUTPUT_BLT_OPERATION  BltOperation,
+  IN  EMU_GRAPHICS_WINDOWS__BLT_ARGS     *Args
   )
 {
-  GRAPHICS_IO_PRIVATE  *Private;
-  UINTN                DstY;
-  UINTN                SrcY;
-  UINTN                DstX;
-  UINTN                SrcX;
-  UINTN                Index;
-  EFI_UGA_PIXEL        *Blt;
-  UINT8                *Dst;
-  UINT8                *Src;
-  UINTN                Nbr;
-  unsigned long        Color;
-  XEvent               ev;
+  GRAPHICS_IO_PRIVATE            *Private;
+  UINTN                          DstY;
+  UINTN                          SrcY;
+  UINTN                          DstX;
+  UINTN                          SrcX;
+  UINTN                          Index;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *Blt;
+  UINT8                          *Dst;
+  UINT8                          *Src;
+  UINTN                          Nbr;
+  unsigned long                  Color;
+  XEvent                         ev;
 
   Private = (GRAPHICS_IO_PRIVATE *)GraphicsIo;
 
   //
   //  Check bounds
   //
-  if (  (BltOperation == EfiUgaVideoToBltBuffer)
-     || (BltOperation == EfiUgaVideoToVideo))
+  if (  (BltOperation == EfiBltVideoToBltBuffer)
+     || (BltOperation == EfiBltVideoToVideo))
   {
     //
     // Source is Video.
@@ -851,9 +851,9 @@ X11Blt (
     }
   }
 
-  if (  (BltOperation == EfiUgaBltBufferToVideo)
-     || (BltOperation == EfiUgaVideoToVideo)
-     || (BltOperation == EfiUgaVideoFill))
+  if (  (BltOperation == EfiBltBufferToVideo)
+     || (BltOperation == EfiBltVideoToVideo)
+     || (BltOperation == EfiBltVideoFill))
   {
     //
     // Destination is Video
@@ -868,32 +868,32 @@ X11Blt (
   }
 
   switch (BltOperation) {
-    case EfiUgaVideoToBltBuffer:
-      Blt          = (EFI_UGA_PIXEL *)((UINT8 *)BltBuffer + (Args->DestinationY * Args->Delta) + Args->DestinationX * sizeof (EFI_UGA_PIXEL));
-      Args->Delta -= Args->Width * sizeof (EFI_UGA_PIXEL);
+    case EfiBltVideoToBltBuffer:
+      Blt          = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)((UINT8 *)BltBuffer + (Args->DestinationY * Args->Delta) + Args->DestinationX * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
+      Args->Delta -= Args->Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
       for (SrcY = Args->SourceY; SrcY < (Args->Height + Args->SourceY); SrcY++) {
         for (SrcX = Args->SourceX; SrcX < (Args->Width + Args->SourceX); SrcX++) {
           *Blt++ = X11ColorToPixel (Private, XGetPixel (Private->image, SrcX, SrcY));
         }
 
-        Blt = (EFI_UGA_PIXEL *)((UINT8 *)Blt + Args->Delta);
+        Blt = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)((UINT8 *)Blt + Args->Delta);
       }
 
       break;
-    case EfiUgaBltBufferToVideo:
-      Blt          = (EFI_UGA_PIXEL *)((UINT8 *)BltBuffer + (Args->SourceY * Args->Delta) + Args->SourceX * sizeof (EFI_UGA_PIXEL));
-      Args->Delta -= Args->Width * sizeof (EFI_UGA_PIXEL);
+    case EfiBltBufferToVideo:
+      Blt          = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)((UINT8 *)BltBuffer + (Args->SourceY * Args->Delta) + Args->SourceX * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
+      Args->Delta -= Args->Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL);
       for (DstY = Args->DestinationY; DstY < (Args->Height + Args->DestinationY); DstY++) {
         for (DstX = Args->DestinationX; DstX < (Args->Width + Args->DestinationX); DstX++) {
           XPutPixel (Private->image, DstX, DstY, X11PixelToColor (Private, *Blt));
           Blt++;
         }
 
-        Blt = (EFI_UGA_PIXEL *)((UINT8 *)Blt + Args->Delta);
+        Blt = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)((UINT8 *)Blt + Args->Delta);
       }
 
       break;
-    case EfiUgaVideoToVideo:
+    case EfiBltVideoToVideo:
       Dst = Private->image_data + (Args->DestinationX << Private->pixel_shift)
             + Args->DestinationY * Private->line_bytes;
       Src = Private->image_data + (Args->SourceX << Private->pixel_shift)
@@ -920,7 +920,7 @@ X11Blt (
       }
 
       break;
-    case EfiUgaVideoFill:
+    case EfiBltVideoFill:
       Color = X11PixelToColor (Private, *BltBuffer);
       for (DstY = Args->DestinationY; DstY < (Args->Height + Args->DestinationY); DstY++) {
         for (DstX = Args->DestinationX; DstX < (Args->Width + Args->DestinationX); DstX++) {
@@ -937,7 +937,7 @@ X11Blt (
   //  Refresh screen.
   //
   switch (BltOperation) {
-    case EfiUgaVideoToVideo:
+    case EfiBltVideoToVideo:
       XCopyArea (
         Private->display,
         Private->win,
@@ -960,7 +960,7 @@ X11Blt (
       }
 
       break;
-    case EfiUgaVideoFill:
+    case EfiBltVideoFill:
       Color = X11PixelToColor (Private, *BltBuffer);
       XSetForeground (Private->display, Private->gc, Color);
       XFillRectangle (
@@ -974,7 +974,7 @@ X11Blt (
         );
       XFlush (Private->display);
       break;
-    case EfiUgaBltBufferToVideo:
+    case EfiBltBufferToVideo:
       Redraw (Private, Args->DestinationX, Args->DestinationY, Args->Width, Args->Height);
       break;
     default:
@@ -1060,7 +1060,7 @@ X11GraphicsWindowOpen (
 
   Drv->display = XOpenDisplay (display_name);
   if (Drv->display == NULL) {
-    fprintf (stderr, "uga: cannot connect to X server %s\n", XDisplayName (display_name));
+    fprintf (stderr, "GOP: cannot connect to X server %s\n", XDisplayName (display_name));
     free (Drv);
     return EFI_DEVICE_ERROR;
   }

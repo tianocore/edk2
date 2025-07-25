@@ -81,7 +81,12 @@ INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
 INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
-INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+!if $(QEMU_PV_VARS) == TRUE
+  INF OvmfPkg/VirtMmCommunicationDxe/VirtMmCommunication.inf
+  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
+!else
+  INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+!endif
 !if $(SECURE_BOOT_ENABLE) == TRUE
   INF  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
 !endif
@@ -216,6 +221,11 @@ INF  MdeModulePkg/Logo/LogoDxe.inf
 #
 INF  MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
 
+!if $(CAPSULE_ENABLE) == TRUE
+INF  MdeModulePkg/Universal/EsrtFmpDxe/EsrtFmpDxe.inf
+INF  FILE_GUID = $(FMP_SYSTEM_DEVICE) FmpDevicePkg/FmpDxe/FmpDxe.inf
+!endif
+
 ################################################################################
 
 [FV.FVMAIN_COMPACT]
@@ -237,7 +247,15 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 FvNameGuid         = 27A72E80-3118-4c0c-8673-AA5B4EFA9613
 
-INF OvmfPkg/RiscVVirt/Sec/SecMain.inf
+INF  UefiCpuPkg/SecCore/SecCoreNative.inf
+
+!if $(RISCVVIRT_PEI_BOOTING) == TRUE
+  INF  OvmfPkg/RiscVVirt/PlatformPei/PlatformPeim.inf
+  INF  MdeModulePkg/Core/Pei/PeiMain.inf
+  INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
+  INF  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
+  INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+!endif
 
 FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
    SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
@@ -250,6 +268,21 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
     PE32     PE32    Align = Auto     $(INF_OUTPUT)/$(MODULE_NAME).efi
     UI       STRING ="$(MODULE_NAME)" Optional
     VERSION  STRING ="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.PEI_CORE]
+  FILE PEI_CORE = $(NAMED_GUID) FIXED {
+    PE32     PE32    Align = Auto     $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI     STRING ="$(MODULE_NAME)" Optional
+    VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.PEIM]
+  FILE PEIM = $(NAMED_GUID) FIXED {
+     PEI_DEPEX PEI_DEPEX Optional     $(INF_OUTPUT)/$(MODULE_NAME).depex
+     PE32     PE32    Align = Auto    $(INF_OUTPUT)/$(MODULE_NAME).efi
+     UI       STRING="$(MODULE_NAME)" Optional
+     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
 [Rule.Common.DXE_CORE]
