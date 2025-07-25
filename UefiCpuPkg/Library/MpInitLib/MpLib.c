@@ -1662,11 +1662,24 @@ ResetProcessorToIdleState (
   CPU_MP_DATA  *CpuMpData;
 
   CpuMpData = GetCpuMpData ();
-
-  CpuMpData->WakeUpByInitSipiSipi = TRUE;
   if (CpuMpData == NULL) {
     DEBUG ((DEBUG_ERROR, "[%a] - Failed to get CpuMpData.  Aborting the AP reset to idle.\n", __func__));
     return;
+  }
+
+  CpuMpData->WakeUpByInitSipiSipi = TRUE;
+
+  //
+  // "CpuMpData->WakeUpByInitSipiSipi = TRUE" requires that the AP must be in Halt loop.
+  // If AP loop mode is not Halt loop, make sure that the AP is in the known non-executable state.
+  //
+  // AP could be in MONITOR/MWAIT state that could wake up the AP when setting WAKEUP_AP_SIGNAL in WakeUpAp().
+  // And then SendInitSipiSipi() in WakeupAp() could wake up the AP again to run the AP Wakeup vector.
+  // But the AP wakeup vector could be freed by the BSP while the AP is running it.
+  //
+  if ((CpuMpData->InitFlag == ApInitDone) && (CpuMpData->ApLoopMode != ApInHltLoop)) {
+    SendInitIpi (((CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob)[ProcessorNumber].ApicId);
+    MicroSecondDelay (PcdGet32 (PcdCpuInitIpiDelayInMicroSeconds));
   }
 
   WakeUpAP (CpuMpData, FALSE, ProcessorNumber, NULL, NULL, TRUE);
