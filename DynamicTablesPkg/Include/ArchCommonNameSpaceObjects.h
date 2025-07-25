@@ -722,6 +722,11 @@ typedef struct CmArchCommonTpm2InterfaceInfo {
 
   /** Log Area Start Address */
   UINT64    Lasa;
+
+  /** Tpm Device Size.
+   *  This information is used for Tpm2 Device Table using DynamicTableGenerator.
+   */
+  UINT64    TpmDeviceSize;
 } CM_ARCH_COMMON_TPM2_INTERFACE_INFO;
 
 /** A structure that describes the
