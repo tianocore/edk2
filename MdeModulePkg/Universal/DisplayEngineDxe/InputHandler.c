@@ -1531,7 +1531,9 @@ TheKey:
             HighlightOptionIndex--;
 
             ASSERT (CurrentOption != NULL);
-            SwapListEntries (CurrentOption->Link.BackLink, &CurrentOption->Link);
+            if (CurrentOption != NULL ) {
+              SwapListEntries (CurrentOption->Link.BackLink, &CurrentOption->Link);
+            }
           }
         }
 
@@ -1561,7 +1563,9 @@ TheKey:
             HighlightOptionIndex++;
 
             ASSERT (CurrentOption != NULL);
-            SwapListEntries (&CurrentOption->Link, CurrentOption->Link.ForwardLink);
+            if (CurrentOption != NULL) {
+              SwapListEntries (&CurrentOption->Link, CurrentOption->Link.ForwardLink);
+            }
           }
         }
 
@@ -1656,7 +1660,7 @@ TheKey:
             //
             // Restore link list order for orderedlist
             //
-            if (OrderedList) {
+            if (OrderedList && (OrderList != NULL)) {
               HiiValue.Type      = ValueType;
               HiiValue.Value.u64 = 0;
               for (Index = 0; Index < OrderList->MaxContainers; Index++) {
@@ -1687,7 +1691,7 @@ TheKey:
         //
         // return the current selection
         //
-        if (OrderedList) {
+        if (OrderedList && (OrderList != NULL)) {
           ReturnValue = AllocateZeroPool (Question->CurrentValue.BufferLen);
           ASSERT (ReturnValue != NULL);
           Index = 0;
@@ -1713,17 +1717,20 @@ TheKey:
           }
         } else {
           ASSERT (CurrentOption != NULL);
-          gUserInput->InputValue.Type = CurrentOption->OptionOpCode->Type;
-          if (IsValuesEqual (&Question->CurrentValue.Value, &CurrentOption->OptionOpCode->Value, gUserInput->InputValue.Type)) {
-            return EFI_DEVICE_ERROR;
-          } else {
-            SetValuesByType (&gUserInput->InputValue.Value, &CurrentOption->OptionOpCode->Value, gUserInput->InputValue.Type);
+
+          if (CurrentOption != NULL) {
+            gUserInput->InputValue.Type = CurrentOption->OptionOpCode->Type;
+            if (IsValuesEqual (&Question->CurrentValue.Value, &CurrentOption->OptionOpCode->Value, gUserInput->InputValue.Type)) {
+              return EFI_DEVICE_ERROR;
+            } else {
+              SetValuesByType (&gUserInput->InputValue.Value, &CurrentOption->OptionOpCode->Value, gUserInput->InputValue.Type);
+            }
           }
+
+          gST->ConOut->SetAttribute (gST->ConOut, SavedAttribute);
+
+          return EFI_SUCCESS;
         }
-
-        gST->ConOut->SetAttribute (gST->ConOut, SavedAttribute);
-
-        return EFI_SUCCESS;
 
       default:
         break;
