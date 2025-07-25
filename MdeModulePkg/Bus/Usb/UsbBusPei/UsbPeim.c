@@ -33,7 +33,6 @@ EFI_PEI_PPI_DESCRIPTOR  mUsbIoPpiList = {
   The enumeration routine to detect device change.
 
   @param  PeiServices            Describes the list of possible PEI Services.
-  @param  UsbHcPpi               The pointer of PEI_USB_HOST_CONTROLLER_PPI instance.
   @param  Usb2HcPpi              The pointer of PEI_USB2_HOST_CONTROLLER_PPI instance.
 
   @retval EFI_SUCCESS            The usb is enumerated successfully.
@@ -44,7 +43,6 @@ EFI_PEI_PPI_DESCRIPTOR  mUsbIoPpiList = {
 EFI_STATUS
 PeiUsbEnumeration (
   IN EFI_PEI_SERVICES              **PeiServices,
-  IN PEI_USB_HOST_CONTROLLER_PPI   *UsbHcPpi,
   IN PEI_USB2_HOST_CONTROLLER_PPI  *Usb2HcPpi
   );
 
@@ -128,27 +126,19 @@ PeimInitializeUsb (
 {
   EFI_STATUS                    Status;
   UINTN                         Index;
-  PEI_USB_HOST_CONTROLLER_PPI   *UsbHcPpi;
   PEI_USB2_HOST_CONTROLLER_PPI  *Usb2HcPpi;
 
   if (!EFI_ERROR (PeiServicesRegisterForShadow (FileHandle))) {
     return EFI_SUCCESS;
   }
 
-  //
-  // gPeiUsbHostControllerPpiGuid and gPeiUsb2HostControllerPpiGuid should not
-  // be produced at the same time
-  //
   Index = 0;
   while (TRUE) {
-    //
-    // Get UsbHcPpi at first.
-    //
     Status = PeiServicesLocatePpi (
-               &gPeiUsbHostControllerPpiGuid,
+               &gPeiUsb2HostControllerPpiGuid,
                Index,
                NULL,
-               (VOID **)&UsbHcPpi
+               (VOID **)&Usb2HcPpi
                );
     if (EFI_ERROR (Status)) {
       //
@@ -157,31 +147,8 @@ PeimInitializeUsb (
       break;
     }
 
-    PeiUsbEnumeration ((EFI_PEI_SERVICES **)PeiServices, UsbHcPpi, NULL);
+    PeiUsbEnumeration ((EFI_PEI_SERVICES **)PeiServices, Usb2HcPpi);
     Index++;
-  }
-
-  if (Index == 0) {
-    //
-    // Then try to get Usb2HcPpi.
-    //
-    while (TRUE) {
-      Status = PeiServicesLocatePpi (
-                 &gPeiUsb2HostControllerPpiGuid,
-                 Index,
-                 NULL,
-                 (VOID **)&Usb2HcPpi
-                 );
-      if (EFI_ERROR (Status)) {
-        //
-        // No more host controller, break out
-        //
-        break;
-      }
-
-      PeiUsbEnumeration ((EFI_PEI_SERVICES **)PeiServices, NULL, Usb2HcPpi);
-      Index++;
-    }
   }
 
   if (Index == 0) {
@@ -277,7 +244,6 @@ PeiHubEnumeration (
           );
         NewPeiUsbDevice->UsbIoPpiList.Ppi = &NewPeiUsbDevice->UsbIoPpi;
         NewPeiUsbDevice->AllocateAddress  = (UINTN)AllocateAddress;
-        NewPeiUsbDevice->UsbHcPpi         = PeiUsbDevice->UsbHcPpi;
         NewPeiUsbDevice->Usb2HcPpi        = PeiUsbDevice->Usb2HcPpi;
         NewPeiUsbDevice->Tier             = (UINT8)(PeiUsbDevice->Tier + 1);
         NewPeiUsbDevice->IsHub            = 0x0;
@@ -404,7 +370,6 @@ PeiHubEnumeration (
   The enumeration routine to detect device change.
 
   @param  PeiServices            Describes the list of possible PEI Services.
-  @param  UsbHcPpi               The pointer of PEI_USB_HOST_CONTROLLER_PPI instance.
   @param  Usb2HcPpi              The pointer of PEI_USB2_HOST_CONTROLLER_PPI instance.
 
   @retval EFI_SUCCESS            The usb is enumerated successfully.
@@ -415,7 +380,6 @@ PeiHubEnumeration (
 EFI_STATUS
 PeiUsbEnumeration (
   IN EFI_PEI_SERVICES              **PeiServices,
-  IN PEI_USB_HOST_CONTROLLER_PPI   *UsbHcPpi,
   IN PEI_USB2_HOST_CONTROLLER_PPI  *Usb2HcPpi
   )
 {
@@ -438,12 +402,6 @@ PeiUsbEnumeration (
                  Usb2HcPpi,
                  (UINT8 *)&NumOfRootPort
                  );
-  } else if (UsbHcPpi != NULL) {
-    UsbHcPpi->GetRootHubPortNumber (
-                PeiServices,
-                UsbHcPpi,
-                (UINT8 *)&NumOfRootPort
-                );
   } else {
     ASSERT (FALSE);
     return EFI_INVALID_PARAMETER;
@@ -461,21 +419,12 @@ PeiUsbEnumeration (
       //
       // First get root port status to detect changes happen
       //
-      if (Usb2HcPpi != NULL) {
-        Usb2HcPpi->GetRootHubPortStatus (
-                     PeiServices,
-                     Usb2HcPpi,
-                     (UINT8)Index,
-                     &PortStatus
-                     );
-      } else {
-        UsbHcPpi->GetRootHubPortStatus (
-                    PeiServices,
-                    UsbHcPpi,
-                    (UINT8)Index,
-                    &PortStatus
-                    );
-      }
+      Usb2HcPpi->GetRootHubPortStatus (
+                   PeiServices,
+                   Usb2HcPpi,
+                   (UINT8)Index,
+                   &PortStatus
+                   );
 
       DEBUG ((DEBUG_INFO, "USB Status --- Port: %x ConnectChange[%04x] Status[%04x]\n", Index, PortStatus.PortChangeStatus, PortStatus.PortStatus));
       //
@@ -514,7 +463,6 @@ PeiUsbEnumeration (
             );
           PeiUsbDevice->UsbIoPpiList.Ppi = &PeiUsbDevice->UsbIoPpi;
           PeiUsbDevice->AllocateAddress  = (UINTN)AllocateAddress;
-          PeiUsbDevice->UsbHcPpi         = UsbHcPpi;
           PeiUsbDevice->Usb2HcPpi        = Usb2HcPpi;
           PeiUsbDevice->IsHub            = 0x0;
           PeiUsbDevice->DownStreamPortNo = 0x0;
@@ -527,43 +475,24 @@ PeiUsbEnumeration (
             //
             ResetRootPort (
               PeiServices,
-              PeiUsbDevice->UsbHcPpi,
               PeiUsbDevice->Usb2HcPpi,
               Index,
               0
               );
 
-            if (Usb2HcPpi != NULL) {
-              Usb2HcPpi->GetRootHubPortStatus (
-                           PeiServices,
-                           Usb2HcPpi,
-                           (UINT8)Index,
-                           &PortStatus
-                           );
-            } else {
-              UsbHcPpi->GetRootHubPortStatus (
-                          PeiServices,
-                          UsbHcPpi,
-                          (UINT8)Index,
-                          &PortStatus
-                          );
-            }
+            Usb2HcPpi->GetRootHubPortStatus (
+                         PeiServices,
+                         Usb2HcPpi,
+                         (UINT8)Index,
+                         &PortStatus
+                         );
           } else {
-            if (Usb2HcPpi != NULL) {
-              Usb2HcPpi->ClearRootHubPortFeature (
-                           PeiServices,
-                           Usb2HcPpi,
-                           (UINT8)Index,
-                           EfiUsbPortResetChange
-                           );
-            } else {
-              UsbHcPpi->ClearRootHubPortFeature (
-                          PeiServices,
-                          UsbHcPpi,
-                          (UINT8)Index,
-                          EfiUsbPortResetChange
-                          );
-            }
+            Usb2HcPpi->ClearRootHubPortFeature (
+                         PeiServices,
+                         Usb2HcPpi,
+                         (UINT8)Index,
+                         EfiUsbPortResetChange
+                         );
           }
 
           PeiUsbDevice->DeviceSpeed = (UINT8)PeiUsbGetDeviceSpeed (PortStatus.PortStatus);
@@ -1032,7 +961,6 @@ GetExpectedDescriptor (
   Send reset signal over the given root hub port.
 
   @param  PeiServices       Describes the list of possible PEI Services.
-  @param  UsbHcPpi          The pointer of PEI_USB_HOST_CONTROLLER_PPI instance.
   @param  Usb2HcPpi         The pointer of PEI_USB2_HOST_CONTROLLER_PPI instance.
   @param  PortNum           The port to be reset.
   @param  RetryIndex        The retry times.
@@ -1041,7 +969,6 @@ GetExpectedDescriptor (
 VOID
 ResetRootPort (
   IN EFI_PEI_SERVICES              **PeiServices,
-  IN PEI_USB_HOST_CONTROLLER_PPI   *UsbHcPpi,
   IN PEI_USB2_HOST_CONTROLLER_PPI  *Usb2HcPpi,
   IN UINT8                         PortNum,
   IN UINT8                         RetryIndex
@@ -1051,211 +978,105 @@ ResetRootPort (
   UINTN                Index;
   EFI_USB_PORT_STATUS  PortStatus;
 
-  if (Usb2HcPpi != NULL) {
-    MicroSecondDelay (200 * 1000);
+  MicroSecondDelay (200 * 1000);
 
-    //
-    // reset root port
-    //
-    Status = Usb2HcPpi->SetRootHubPortFeature (
-                          PeiServices,
-                          Usb2HcPpi,
-                          PortNum,
-                          EfiUsbPortReset
-                          );
+  //
+  // reset root port
+  //
+  Status = Usb2HcPpi->SetRootHubPortFeature (
+                        PeiServices,
+                        Usb2HcPpi,
+                        PortNum,
+                        EfiUsbPortReset
+                        );
 
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "SetRootHubPortFeature EfiUsbPortReset Failed\n"));
-      return;
-    }
-
-    //
-    // Drive the reset signal for at least 50ms. Check USB 2.0 Spec
-    // section 7.1.7.5 for timing requirements.
-    //
-    MicroSecondDelay (USB_SET_ROOT_PORT_RESET_STALL);
-
-    //
-    // clear reset root port
-    //
-    Status = Usb2HcPpi->ClearRootHubPortFeature (
-                          PeiServices,
-                          Usb2HcPpi,
-                          PortNum,
-                          EfiUsbPortReset
-                          );
-
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "ClearRootHubPortFeature EfiUsbPortReset Failed\n"));
-      return;
-    }
-
-    MicroSecondDelay (USB_CLR_ROOT_PORT_RESET_STALL);
-
-    //
-    // USB host controller won't clear the RESET bit until
-    // reset is actually finished.
-    //
-    ZeroMem (&PortStatus, sizeof (EFI_USB_PORT_STATUS));
-
-    for (Index = 0; Index < USB_WAIT_PORT_STS_CHANGE_LOOP; Index++) {
-      Status = Usb2HcPpi->GetRootHubPortStatus (
-                            PeiServices,
-                            Usb2HcPpi,
-                            PortNum,
-                            &PortStatus
-                            );
-      if (EFI_ERROR (Status)) {
-        return;
-      }
-
-      if (!USB_BIT_IS_SET (PortStatus.PortStatus, USB_PORT_STAT_RESET)) {
-        break;
-      }
-
-      MicroSecondDelay (USB_WAIT_PORT_STS_CHANGE_STALL);
-    }
-
-    if (Index == USB_WAIT_PORT_STS_CHANGE_LOOP) {
-      DEBUG ((DEBUG_ERROR, "ResetRootPort: reset not finished in time on port %d\n", PortNum));
-      return;
-    }
-
-    Usb2HcPpi->ClearRootHubPortFeature (
-                 PeiServices,
-                 Usb2HcPpi,
-                 PortNum,
-                 EfiUsbPortResetChange
-                 );
-
-    Usb2HcPpi->ClearRootHubPortFeature (
-                 PeiServices,
-                 Usb2HcPpi,
-                 PortNum,
-                 EfiUsbPortConnectChange
-                 );
-
-    //
-    // Set port enable
-    //
-    Usb2HcPpi->SetRootHubPortFeature (
-                 PeiServices,
-                 Usb2HcPpi,
-                 PortNum,
-                 EfiUsbPortEnable
-                 );
-
-    Usb2HcPpi->ClearRootHubPortFeature (
-                 PeiServices,
-                 Usb2HcPpi,
-                 PortNum,
-                 EfiUsbPortEnableChange
-                 );
-
-    MicroSecondDelay ((RetryIndex + 1) * 50 * 1000);
-  } else {
-    MicroSecondDelay (200 * 1000);
-
-    //
-    // reset root port
-    //
-    Status = UsbHcPpi->SetRootHubPortFeature (
-                         PeiServices,
-                         UsbHcPpi,
-                         PortNum,
-                         EfiUsbPortReset
-                         );
-
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "SetRootHubPortFeature EfiUsbPortReset Failed\n"));
-      return;
-    }
-
-    //
-    // Drive the reset signal for at least 50ms. Check USB 2.0 Spec
-    // section 7.1.7.5 for timing requirements.
-    //
-    MicroSecondDelay (USB_SET_ROOT_PORT_RESET_STALL);
-
-    //
-    // clear reset root port
-    //
-    Status = UsbHcPpi->ClearRootHubPortFeature (
-                         PeiServices,
-                         UsbHcPpi,
-                         PortNum,
-                         EfiUsbPortReset
-                         );
-
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "ClearRootHubPortFeature EfiUsbPortReset Failed\n"));
-      return;
-    }
-
-    MicroSecondDelay (USB_CLR_ROOT_PORT_RESET_STALL);
-
-    //
-    // USB host controller won't clear the RESET bit until
-    // reset is actually finished.
-    //
-    ZeroMem (&PortStatus, sizeof (EFI_USB_PORT_STATUS));
-
-    for (Index = 0; Index < USB_WAIT_PORT_STS_CHANGE_LOOP; Index++) {
-      Status = UsbHcPpi->GetRootHubPortStatus (
-                           PeiServices,
-                           UsbHcPpi,
-                           PortNum,
-                           &PortStatus
-                           );
-      if (EFI_ERROR (Status)) {
-        return;
-      }
-
-      if (!USB_BIT_IS_SET (PortStatus.PortStatus, USB_PORT_STAT_RESET)) {
-        break;
-      }
-
-      MicroSecondDelay (USB_WAIT_PORT_STS_CHANGE_STALL);
-    }
-
-    if (Index == USB_WAIT_PORT_STS_CHANGE_LOOP) {
-      DEBUG ((DEBUG_ERROR, "ResetRootPort: reset not finished in time on port %d\n", PortNum));
-      return;
-    }
-
-    UsbHcPpi->ClearRootHubPortFeature (
-                PeiServices,
-                UsbHcPpi,
-                PortNum,
-                EfiUsbPortResetChange
-                );
-
-    UsbHcPpi->ClearRootHubPortFeature (
-                PeiServices,
-                UsbHcPpi,
-                PortNum,
-                EfiUsbPortConnectChange
-                );
-
-    //
-    // Set port enable
-    //
-    UsbHcPpi->SetRootHubPortFeature (
-                PeiServices,
-                UsbHcPpi,
-                PortNum,
-                EfiUsbPortEnable
-                );
-
-    UsbHcPpi->ClearRootHubPortFeature (
-                PeiServices,
-                UsbHcPpi,
-                PortNum,
-                EfiUsbPortEnableChange
-                );
-
-    MicroSecondDelay ((RetryIndex + 1) * 50 * 1000);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "SetRootHubPortFeature EfiUsbPortReset Failed\n"));
+    return;
   }
 
-  return;
+  //
+  // Drive the reset signal for at least 50ms. Check USB 2.0 Spec
+  // section 7.1.7.5 for timing requirements.
+  //
+  MicroSecondDelay (USB_SET_ROOT_PORT_RESET_STALL);
+
+  //
+  // clear reset root port
+  //
+  Status = Usb2HcPpi->ClearRootHubPortFeature (
+                        PeiServices,
+                        Usb2HcPpi,
+                        PortNum,
+                        EfiUsbPortReset
+                        );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "ClearRootHubPortFeature EfiUsbPortReset Failed\n"));
+    return;
+  }
+
+  MicroSecondDelay (USB_CLR_ROOT_PORT_RESET_STALL);
+
+  //
+  // USB host controller won't clear the RESET bit until
+  // reset is actually finished.
+  //
+  ZeroMem (&PortStatus, sizeof (EFI_USB_PORT_STATUS));
+
+  for (Index = 0; Index < USB_WAIT_PORT_STS_CHANGE_LOOP; Index++) {
+    Status = Usb2HcPpi->GetRootHubPortStatus (
+                          PeiServices,
+                          Usb2HcPpi,
+                          PortNum,
+                          &PortStatus
+                          );
+    if (EFI_ERROR (Status)) {
+      return;
+    }
+
+    if (!USB_BIT_IS_SET (PortStatus.PortStatus, USB_PORT_STAT_RESET)) {
+      break;
+    }
+
+    MicroSecondDelay (USB_WAIT_PORT_STS_CHANGE_STALL);
+  }
+
+  if (Index == USB_WAIT_PORT_STS_CHANGE_LOOP) {
+    DEBUG ((DEBUG_ERROR, "ResetRootPort: reset not finished in time on port %d\n", PortNum));
+    return;
+  }
+
+  Usb2HcPpi->ClearRootHubPortFeature (
+               PeiServices,
+               Usb2HcPpi,
+               PortNum,
+               EfiUsbPortResetChange
+               );
+
+  Usb2HcPpi->ClearRootHubPortFeature (
+               PeiServices,
+               Usb2HcPpi,
+               PortNum,
+               EfiUsbPortConnectChange
+               );
+
+  //
+  // Set port enable
+  //
+  Usb2HcPpi->SetRootHubPortFeature (
+               PeiServices,
+               Usb2HcPpi,
+               PortNum,
+               EfiUsbPortEnable
+               );
+
+  Usb2HcPpi->ClearRootHubPortFeature (
+               PeiServices,
+               Usb2HcPpi,
+               PortNum,
+               EfiUsbPortEnableChange
+               );
+
+  MicroSecondDelay ((RetryIndex + 1) * 50 * 1000);
 }
