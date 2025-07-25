@@ -15,6 +15,7 @@
 #include <Library/TimerLib.h>
 #include <Library/DebugLib.h>
 #include <Library/Tpm2DeviceLib.h>
+#include <Library/Tpm2DumpLib.h>
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
 
@@ -191,27 +192,7 @@ PtpCrbTpmCommand (
   UINT32      Data32;
 
   DEBUG_CODE_BEGIN ();
-  UINTN  DebugSize;
-
-  DEBUG ((DEBUG_VERBOSE, "PtpCrbTpmCommand Send - "));
-  if (SizeIn > 0x100) {
-    DebugSize = 0x40;
-  } else {
-    DebugSize = SizeIn;
-  }
-
-  for (Index = 0; Index < DebugSize; Index++) {
-    DEBUG ((DEBUG_VERBOSE, "%02x ", BufferIn[Index]));
-  }
-
-  if (DebugSize != SizeIn) {
-    DEBUG ((DEBUG_VERBOSE, "...... "));
-    for (Index = SizeIn - 0x20; Index < SizeIn; Index++) {
-      DEBUG ((DEBUG_VERBOSE, "%02x ", BufferIn[Index]));
-    }
-  }
-
-  DEBUG ((DEBUG_VERBOSE, "\n"));
+  DumpTpmInputBlock (SizeIn, BufferIn);
   DEBUG_CODE_END ();
 
   TpmOutSize = 0;
@@ -265,14 +246,6 @@ PtpCrbTpmCommand (
     BufferOut[Index] = MmioRead8 ((UINTN)&CrbReg->CrbDataBuffer[Index]);
   }
 
-  DEBUG_CODE_BEGIN ();
-  DEBUG ((DEBUG_VERBOSE, "PtpCrbTpmCommand ReceiveHeader - "));
-  for (Index = 0; Index < sizeof (TPM2_RESPONSE_HEADER); Index++) {
-    DEBUG ((DEBUG_VERBOSE, "%02x ", BufferOut[Index]));
-  }
-
-  DEBUG ((DEBUG_VERBOSE, "\n"));
-  DEBUG_CODE_END ();
   //
   // Check the response data header (tag, parasize and returncode)
   //
@@ -303,12 +276,7 @@ PtpCrbTpmCommand (
   }
 
   DEBUG_CODE_BEGIN ();
-  DEBUG ((DEBUG_VERBOSE, "PtpCrbTpmCommand Receive - "));
-  for (Index = 0; Index < TpmOutSize; Index++) {
-    DEBUG ((DEBUG_VERBOSE, "%02x ", BufferOut[Index]));
-  }
-
-  DEBUG ((DEBUG_VERBOSE, "\n"));
+  DumpTpmOutputBlock (TpmOutSize, BufferOut);
   DEBUG_CODE_END ();
 
 Exit:
@@ -323,69 +291,6 @@ Exit:
              );
 
   return Status;
-}
-
-/**
-  Dump PTP register information.
-
-  @param[in] Register                Pointer to PTP register.
-**/
-VOID
-DumpPtpInfo (
-  IN VOID  *Register
-  )
-{
-  PTP_CRB_INTERFACE_IDENTIFIER   InterfaceId;
-  PTP_FIFO_INTERFACE_CAPABILITY  InterfaceCapability;
-  UINT8                          StatusEx;
-  UINT16                         Vid;
-  UINT16                         Did;
-  UINT8                          Rid;
-
-  if (!Tpm2IsPtpPresence (Register)) {
-    return;
-  }
-
-  InterfaceId.Uint32         = MmioRead32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId);
-  InterfaceCapability.Uint32 = MmioRead32 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->InterfaceCapability);
-  StatusEx                   = MmioRead8 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->StatusEx);
-
-  //
-  // Dump InterfaceId Register for PTP
-  //
-  DEBUG ((DEBUG_INFO, "InterfaceId - 0x%08x\n", InterfaceId.Uint32));
-  DEBUG ((DEBUG_INFO, "  InterfaceType    - 0x%02x\n", InterfaceId.Bits.InterfaceType));
-  if (InterfaceId.Bits.InterfaceType != PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_TIS) {
-    DEBUG ((DEBUG_INFO, "  InterfaceVersion - 0x%02x\n", InterfaceId.Bits.InterfaceVersion));
-    DEBUG ((DEBUG_INFO, "  CapFIFO          - 0x%x\n", InterfaceId.Bits.CapFIFO));
-    DEBUG ((DEBUG_INFO, "  CapCRB           - 0x%x\n", InterfaceId.Bits.CapCRB));
-  }
-
-  //
-  // Dump Capability Register for TIS and FIFO
-  //
-  DEBUG ((DEBUG_INFO, "InterfaceCapability - 0x%08x\n", InterfaceCapability.Uint32));
-  if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_TIS) ||
-      (InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_FIFO))
-  {
-    DEBUG ((DEBUG_INFO, "  InterfaceVersion - 0x%x\n", InterfaceCapability.Bits.InterfaceVersion));
-  }
-
-  //
-  // Dump StatusEx Register for PTP FIFO
-  //
-  DEBUG ((DEBUG_INFO, "StatusEx - 0x%02x\n", StatusEx));
-  if (InterfaceCapability.Bits.InterfaceVersion == INTERFACE_CAPABILITY_INTERFACE_VERSION_PTP) {
-    DEBUG ((DEBUG_INFO, "  TpmFamily - 0x%x\n", (StatusEx & PTP_FIFO_STS_EX_TPM_FAMILY) >> PTP_FIFO_STS_EX_TPM_FAMILY_OFFSET));
-  }
-
-  Vid = MmioRead16 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->Vid);
-  Did = MmioRead16 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->Did);
-  Rid = (UINT8)InterfaceId.Bits.Rid;
-
-  DEBUG ((DEBUG_INFO, "VID - 0x%04x\n", Vid));
-  DEBUG ((DEBUG_INFO, "DID - 0x%04x\n", Did));
-  DEBUG ((DEBUG_INFO, "RID - 0x%02x\n", Rid));
 }
 
 /**
