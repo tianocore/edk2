@@ -16,6 +16,7 @@
 
 [Sources]
   PlatformPeiLib.c
+  PlatformPeiTpmEventLog.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -23,11 +24,18 @@
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
+  SecurityPkg/SecurityPkg.dec
 
 [LibraryClasses]
   DebugLib
   HobLib
   ArmPlatformLib
+  ArmTransferListLib
+
+[Guids]
+  gArmTransferListHobGuid
+  gTcgEvent2EntryHobGuid
+  gTpm2StartupLocalityHobGuid
 
 [Ppis]
   gEfiPeiMasterBootModePpiGuid                  # PPI ALWAYS_PRODUCED
