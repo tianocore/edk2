@@ -517,6 +517,8 @@ MnpTransmit (
   UINT32             PktLen;
   EFI_TPL            OldTpl;
 
+  PktBuf = NULL;
+
   if ((This == NULL) || (Token == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
