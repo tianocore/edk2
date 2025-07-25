@@ -2,6 +2,7 @@
 Implementation of interfaces function for EFI_HII_CONFIG_ROUTING_PROTOCOL.
 
 Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2025, Loongson Technology Corporation Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -4265,7 +4266,7 @@ GenerateAltConfigResp (
         // Convert Value to a hex string in "%x" format
         // NOTE: This is in the opposite byte that GUID and PATH use
         //
-        if (BlockData->OpCode == EFI_IFR_STRING_OP) {
+        if ((BlockData->OpCode == EFI_IFR_STRING_OP) && (DefaultValueData->Value.string != 0)) {
           DefaultString = InternalGetString (HiiHandle, DefaultValueData->Value.string);
           TmpBuffer     = AllocateZeroPool (Width);
           ASSERT (TmpBuffer != NULL);
