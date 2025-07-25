@@ -135,7 +135,15 @@
            "TNSID",
            "Vatos",
            "WBINVD",
-           "xapic"
+           "xapic",
+           "aplic",
+           "aplics",
+           "eriscv",
+           "gmode",
+           "imsic",
+           "imsics",
+           "plics",
+           "rintc"
            ],           # words to extend to the dictionary for this package
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that
                                      # should be ignore

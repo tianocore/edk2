@@ -161,6 +161,13 @@ DynPlatRepoAddObject (
     }
 
     ObjList = &This->ArmCmObjList[ObjId];
+  } else if (EObjNameSpaceRiscV == NamespaceId) {
+    if (ObjId >= ERiscVObjMax) {
+      ASSERT (0);
+      return EFI_INVALID_PARAMETER;
+    }
+
+    ObjList = &This->RiscVCmObjList[ObjId];
   } else if (EObjNameSpaceArchCommon == NamespaceId) {
     if ((ObjId >= EArchCommonObjMax) ||
         ((CmObjDesc->Count > 1)  && (ObjId != EArchCommonObjCmRef)))
@@ -253,6 +260,14 @@ GroupCmObjNodes (
 
     ListHead = &This->ArmCmObjList[ObjIndex];
     ObjArray = &This->ArmCmObjArray[ObjIndex];
+  } else if (NamespaceId == EObjNameSpaceRiscV) {
+    if (ObjIndex >= ERiscVObjMax) {
+      ASSERT (0);
+      return EFI_INVALID_PARAMETER;
+    }
+
+    ListHead = &This->RiscVCmObjList[ObjIndex];
+    ObjArray = &This->RiscVCmObjArray[ObjIndex];
   } else if (NamespaceId == EObjNameSpaceArchCommon) {
     if (ObjIndex >= EArchCommonObjMax) {
       ASSERT (0);
@@ -396,6 +411,14 @@ DynamicPlatRepoFinalise (
     }
   } // for
 
+  for (ObjIndex = 0; ObjIndex < ERiscVObjMax; ObjIndex++) {
+    Status = GroupCmObjNodes (This, EObjNameSpaceRiscV, (UINT32)ObjIndex);
+    if (EFI_ERROR (Status)) {
+      ASSERT (0);
+      goto error_handler;
+    }
+  } // for
+
   for (ObjIndex = 0; ObjIndex < EArchCommonObjMax; ObjIndex++) {
     Status = GroupCmObjNodes (This, EObjNameSpaceArchCommon, (UINT32)ObjIndex);
     if (EFI_ERROR (Status)) {
@@ -458,6 +481,13 @@ DynamicPlatRepoGetObject (
     }
 
     Desc = &This->ArmCmObjArray[ObjId];
+  } else if (NamespaceId == EObjNameSpaceRiscV) {
+    if (ObjId >= ERiscVObjMax) {
+      ASSERT (0);
+      return EFI_INVALID_PARAMETER;
+    }
+
+    Desc = &This->RiscVCmObjArray[ObjId];
   } else if (NamespaceId == EObjNameSpaceArchCommon) {
     if ((ObjId >= EArchCommonObjMax) ||
         ((ObjId == EArchCommonObjCmRef) &&
@@ -534,6 +564,10 @@ DynamicPlatRepoInit (
     InitializeListHead (&Repo->ArmCmObjList[Index]);
   }
 
+  for (Index = 0; Index < ERiscVObjMax; Index++) {
+    InitializeListHead (&Repo->RiscVCmObjList[Index]);
+  }
+
   for (Index = 0; Index < EArchCommonObjMax; Index++) {
     InitializeListHead (&Repo->ArchCommonCmObjList[Index]);
   }
@@ -580,6 +614,47 @@ DynamicPlatRepoFreeArmObjects (
   // Free the arrays.
   CmObjDesc = DynPlatRepo->ArmCmObjArray;
   for (Index = 0; Index < EArmObjMax; Index++) {
+    Data = CmObjDesc[Index].Data;
+    if (Data != NULL) {
+      FreePool (Data);
+    }
+  } // for
+}
+
+/** Free RISC-V Namespace objects.
+
+  Free all the memory allocated for the Arm namespace objects in the
+  dynamic platform repository.
+
+  @param [in]  DynPlatRepo    The dynamic platform repository.
+
+**/
+STATIC
+VOID
+EFIAPI
+DynamicPlatRepoFreeRiscVObjects (
+  IN  DYNAMIC_PLATFORM_REPOSITORY_INFO  *DynPlatRepo
+  )
+{
+  UINT32             Index;
+  LIST_ENTRY         *ListHead;
+  CM_OBJ_DESCRIPTOR  *CmObjDesc;
+  VOID               *Data;
+
+  ASSERT (DynPlatRepo != NULL);
+
+  // Free the list of objects.
+  for (Index = 0; Index < ERiscVObjMax; Index++) {
+    // Free all the nodes with this object Id.
+    ListHead = &DynPlatRepo->RiscVCmObjList[Index];
+    while (!IsListEmpty (ListHead)) {
+      FreeCmObjNode ((CM_OBJ_NODE *)GetFirstNode (ListHead));
+    } // while
+  } // for
+
+  // Free the arrays.
+  CmObjDesc = DynPlatRepo->RiscVCmObjArray;
+  for (Index = 0; Index < ERiscVObjMax; Index++) {
     Data = CmObjDesc[Index].Data;
     if (Data != NULL) {
       FreePool (Data);
@@ -651,6 +726,7 @@ DynamicPlatRepoShutdown (
   }
 
   DynamicPlatRepoFreeArmObjects (DynPlatRepo);
+  DynamicPlatRepoFreeRiscVObjects (DynPlatRepo);
   DynamicPlatRepoFreeArchCommonObjects (DynPlatRepo);
 
   // Free the TokenMapper
