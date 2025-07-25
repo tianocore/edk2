@@ -41,11 +41,7 @@
 
 [LibraryClasses]
   UefiDriverEntryPoint
-  UefiBootServicesTableLib
-  DxeServicesTableLib
   DebugLib
-  BaseMemoryLib
-  UefiLib
   HobLib
 
 [LibraryClasses.AARCH64]
