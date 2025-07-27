@@ -143,6 +143,16 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 #define USB_BUS_FROM_THIS(a) \
           CR(a, USB_BUS, BusId, USB_BUS_SIGNATURE)
 
+#define USB_CONFIG_DESC_DEF_ALLOC_LEN  255
+
+typedef enum {
+  UsbEnumScriptEdk2    = 0,         // 0   :EDK2 flow
+  UsbEnumScriptRsrv    = 1,         // 1   :Reserved flow - EDK2
+  UsbEnumScriptLinux   = 2,         // 2   :Linux flow
+  UsbEnumScriptWin     = 3,         // 3   :Window flow
+  UsbEnumScriptUnknown = 0xFF,      // 0xff:Unknow flow
+} USB_ENUM_SCRIPT_TYPE;
+
 //
 // Used to locate USB_BUS
 // UsbBusProtocol is the private protocol.
@@ -188,6 +198,7 @@ struct _USB_DEVICE {
   UINT8                                 ParentPort; // Start at 0
   UINT8                                 Tier;
   BOOLEAN                               DisconnectFail;
+  UINT8                                 EnumScript;
 };
 
 //
