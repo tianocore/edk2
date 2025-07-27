@@ -1042,6 +1042,7 @@ UsbBusRecursivelyConnectWantedUsbIo (
   UINTN                     UsbIoHandleCount;
   EFI_HANDLE                *UsbIoBuffer;
   EFI_DEVICE_PATH_PROTOCOL  *UsbIoDevicePath;
+  EFI_TPL                   Tpl;
 
   if (UsbBusId == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1100,9 +1101,17 @@ UsbBusRecursivelyConnectWantedUsbIo (
         // Recursively connect the wanted Usb Io handle
         //
         DEBUG ((DEBUG_INFO, "UsbBusRecursivelyConnectWantedUsbIo: TPL before connect is %d\n", (UINT32)UsbGetCurrentTpl ()));
+        Tpl = UsbGetCurrentTpl ();
+        if (Tpl < TPL_CALLBACK) {
+          Tpl = gBS->RaiseTPL (TPL_CALLBACK);
+        }
+
         Status           = gBS->ConnectController (UsbIf->Handle, NULL, NULL, TRUE);
         UsbIf->IsManaged = (BOOLEAN) !EFI_ERROR (Status);
         DEBUG ((DEBUG_INFO, "UsbBusRecursivelyConnectWantedUsbIo: TPL after connect is %d\n", (UINT32)UsbGetCurrentTpl ()));
+        if (Tpl < TPL_CALLBACK) {
+          gBS->RestoreTPL (Tpl);
+        }
       }
     }
   }
