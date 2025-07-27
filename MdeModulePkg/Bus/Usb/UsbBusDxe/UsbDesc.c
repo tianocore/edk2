@@ -114,6 +114,10 @@ UsbFreeDevDesc (
     FreePool (DevDesc->Configs);
   }
 
+  if (DevDesc->BOSDesc != NULL) {
+    FreePool (DevDesc->BOSDesc);
+  }
+
   FreePool (DevDesc);
 }
 
@@ -317,6 +321,46 @@ ON_EXIT:
 ON_ERROR:
   UsbFreeInterfaceDesc (Setting);
   return NULL;
+}
+
+/**
+  Parse the BOS descriptor and check if it is a SS device.
+
+  @param  DescBuf               The buffer of raw descriptor.
+  @param  Len                   The length of the raw descriptor buffer.
+
+  @return TRUE                  The device is a SS device
+          FALSE                 The device is not a SS device
+
+**/
+BOOLEAN
+UsbIsSSDevice (
+  IN UINT8  *DescBuf,
+  IN UINTN  Len
+  )
+{
+  UINT8             *NextCap;
+  UINT8             Index;
+  UINT8             NumCapDesc;
+  USB_BOS_DESC      *BOSDesc;
+  USB_DEV_CAP_DESC  *DevCapDesc;
+
+  BOSDesc = (USB_BOS_DESC *)DescBuf;
+  if ((BOSDesc->DescriptorType != USB_DESC_TYPE_BOS) || (Len == 0)) {
+    return FALSE;
+  }
+
+  NumCapDesc = BOSDesc->NumDeviceCaps;
+  NextCap    = DescBuf + BOSDesc->Length;
+
+  for (Index = 0; Index < NumCapDesc; Index++, NextCap += DevCapDesc->Length) {
+    DevCapDesc = (USB_DEV_CAP_DESC  *)NextCap;
+    if ((DevCapDesc->DescriptorType == USB_BOS_DESC_TYPE_CAP) && (DevCapDesc->DevCapabilityType == USB_BOS_CAP_SS_USB)) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
 }
 
 /**
@@ -618,6 +662,66 @@ UsbGetDevDesc (
 }
 
 /**
+  Get the device BOS descriptor for the device.
+
+  @param  UsbDev                The Usb device to retrieve descriptor from.
+
+  @retval EFI_SUCCESS           The device descriptor is returned.
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory.
+
+**/
+EFI_STATUS
+UsbGetDevBOSDesc (
+  IN USB_DEVICE  *UsbDev
+  )
+{
+  UINT8       *Buf;
+  UINTN       TotalLength;
+  EFI_STATUS  Status;
+
+  Buf = AllocateZeroPool (sizeof (USB_BOS_DESC));
+  if (Buf == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = UsbCtrlGetDesc (
+             UsbDev,
+             USB_DESC_TYPE_BOS,
+             0,
+             0,
+             Buf,
+             sizeof (USB_BOS_DESC)
+             );
+  if (!EFI_ERROR (Status)) {
+    TotalLength = ((USB_BOS_DESC *)Buf)->TotalLength;
+    gBS->FreePool (Buf);
+    Buf = NULL;
+    Buf = AllocateZeroPool (TotalLength);
+    if (Buf == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    Status = UsbCtrlGetDesc (
+               UsbDev,
+               USB_DESC_TYPE_BOS,
+               0,
+               0,
+               Buf,
+               TotalLength
+               );
+
+    if (EFI_ERROR (Status)) {
+      gBS->FreePool (Buf);
+      Buf = NULL;
+    }
+
+    UsbDev->DevDesc->BOSDesc = Buf;
+  }
+
+  return Status;
+}
+
+/**
   Retrieve the indexed string for the language. It requires two
   steps to get a string, first to get the string's length. Then
   the string itself.
@@ -882,6 +986,16 @@ UsbBuildDescTable (
     }
 
     DevDesc->Configs[Index] = ConfigDesc;
+  }
+
+  if (DevDesc->Desc.BcdUSB >= 0x210) {
+    Status = UsbGetDevBOSDesc (UsbDev);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "UsbBuildDescTable: get BOS descriptor %r\n", Status));
+    } else {
+      UsbDev->IsSSDev = UsbIsSSDevice (UsbDev->DevDesc->BOSDesc, (UINTN)((USB_BOS_DESC *)(UsbDev->DevDesc->BOSDesc))->TotalLength);
+      DEBUG ((DEBUG_INFO, "UsbBuildDescTable: get BOS descriptor %r, UsbDev->IsSSDev = %d\n", Status, UsbDev->IsSSDev));
+    }
   }
 
   //
