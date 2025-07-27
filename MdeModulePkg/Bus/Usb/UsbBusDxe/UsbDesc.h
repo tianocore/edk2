@@ -70,6 +70,9 @@ typedef struct {
   EFI_USB_DEVICE_DESCRIPTOR    Desc;
   USB_CONFIG_DESC              **Configs;
   UINT8                        *BOSDesc;
+  UINT8                        *StrDescManufacturerUS;
+  UINT8                        *StrDescProductUS;
+  UINT8                        *StrDescSerialNumberUS;
 } USB_DEVICE_DESC;
 
 #pragma pack(1)

@@ -280,7 +280,7 @@ struct _USB_HUB_API {
   USB_HUB_RELEASE               Release;
 };
 
-#define USB_US_LAND_ID  0x0409
+#define USB_US_LANG_ID  0x0409
 
 #define DEVICE_PATH_LIST_ITEM_SIGNATURE  SIGNATURE_32('d','p','l','i')
 typedef struct _DEVICE_PATH_LIST_ITEM {
