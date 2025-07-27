@@ -901,7 +901,7 @@ if __name__ == '__main__':
                                            HashAlgorithm = SinglePayloadDescriptor.HashAlgorithm,
                                            Verbose = args.Verbose
                                            )
-                          else:
+                          elif SinglePayloadDescriptor.UseOpenSsl:
                               CertData = VerifyPayloadOpenSsl (
                                            FmpAuthHeader.Payload + struct.pack ('<Q', FmpAuthHeader.MonotonicCount),
                                            FmpAuthHeader.CertData,
