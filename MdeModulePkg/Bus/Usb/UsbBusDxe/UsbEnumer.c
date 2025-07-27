@@ -416,6 +416,19 @@ UsbSelectConfig (
     // the endpoint toggles to zero for its endpoints.
     //
     IfDesc = ConfigDesc->Interfaces[Index];
+
+    //
+    // Protect against hang. This is added to work around faulty device like Digidesign Mbox3 mini
+    //
+    if ((IfDesc == NULL) || (IfDesc->Settings[0] ==  NULL)) {
+      //
+      // If UsbCreateDesc() bailed on an interface or endpoint desc, don't try to
+      // configure that interface here.
+      //
+      DEBUG ((DEBUG_INFO, "UsbSelectConfig: Skipping uninitialized interface %d.\n", Index));
+      continue;
+    }
+
     UsbSelectSetting (IfDesc, IfDesc->Settings[0]->Desc.AlternateSetting);
 
     //
