@@ -679,6 +679,21 @@ UsbGetDevDesc (
   if (EFI_ERROR (Status)) {
     gBS->FreePool (DevDesc);
   } else {
+    // Do DevDesc sanity check
+    if (  (DevDesc->Desc.DescriptorType != USB_DESC_TYPE_DEVICE)
+       || (DevDesc->Desc.Length != sizeof (EFI_USB_DEVICE_DESCRIPTOR))
+       || (  (UsbDev->Speed != EFI_USB_SPEED_SUPER)
+          && (DevDesc->Desc.MaxPacketSize0 != 8)
+          && (DevDesc->Desc.MaxPacketSize0 != 16)
+          && (DevDesc->Desc.MaxPacketSize0 != 32)
+          && (DevDesc->Desc.MaxPacketSize0 != 64))
+       || (DevDesc->Desc.NumConfigurations == 0))
+    {
+      gBS->FreePool (DevDesc);
+      Status = EFI_DEVICE_ERROR;
+      return Status;
+    }
+
     UsbDev->DevDesc = DevDesc;
   }
 
@@ -973,12 +988,31 @@ UsbGetOneConfig (
   EFI_USB_CONFIG_DESCRIPTOR  Desc;
   EFI_STATUS                 Status;
   VOID                       *Buf;
+  UINT8                      BufDesc[USB_CONFIG_DESC_DEF_ALLOC_LEN];
 
   //
   // First get four bytes which contains the total length
   // for this configuration.
   //
-  Status = UsbCtrlGetDesc (UsbDev, USB_DESC_TYPE_CONFIG, Index, 0, &Desc, 8);
+  switch (UsbDev->EnumScript) {
+    case UsbEnumScriptWin:
+      ZeroMem (BufDesc, USB_CONFIG_DESC_DEF_ALLOC_LEN);
+      Status = UsbCtrlGetDesc (UsbDev, USB_DESC_TYPE_CONFIG, Index, 0, BufDesc, USB_CONFIG_DESC_DEF_ALLOC_LEN);
+      if (!EFI_ERROR (Status)) {
+        CopyMem (&Desc, BufDesc, sizeof (EFI_USB_CONFIG_DESCRIPTOR));
+      }
+
+      break;
+    case UsbEnumScriptLinux:
+      Status = UsbCtrlGetDesc (UsbDev, USB_DESC_TYPE_CONFIG, Index, 0, &Desc, sizeof (EFI_USB_CONFIG_DESCRIPTOR));
+      break;
+    case UsbEnumScriptRsrv:
+    case UsbEnumScriptEdk2:
+    case UsbEnumScriptUnknown:
+    default:
+      Status = UsbCtrlGetDesc (UsbDev, USB_DESC_TYPE_CONFIG, Index, 0, &Desc, 8);
+      break;
+  }
 
   if (EFI_ERROR (Status)) {
     DEBUG ((
@@ -1006,13 +1040,17 @@ UsbGetOneConfig (
     return NULL;
   }
 
-  Status = UsbCtrlGetDesc (UsbDev, USB_DESC_TYPE_CONFIG, Index, 0, Buf, Desc.TotalLength);
+  if ((UsbDev->EnumScript == UsbEnumScriptWin) && (Desc.TotalLength <= USB_CONFIG_DESC_DEF_ALLOC_LEN)) {
+    CopyMem (Buf, BufDesc, Desc.TotalLength);
+  } else {
+    Status = UsbCtrlGetDesc (UsbDev, USB_DESC_TYPE_CONFIG, Index, 0, Buf, Desc.TotalLength);
 
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "UsbGetOneConfig: failed to get full descript - %r\n", Status));
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "UsbGetOneConfig: failed to get full descript - %r\n", Status));
 
-    FreePool (Buf);
-    return NULL;
+      FreePool (Buf);
+      return NULL;
+    }
   }
 
   return Buf;

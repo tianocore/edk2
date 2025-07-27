@@ -234,6 +234,7 @@ UsbCreateDevice (
   Device->ParentPort = ParentPort;
   Device->Tier       = (UINT8)(ParentIf->Device->Tier + 1);
   Device->IsSSDev    = FALSE;
+  Device->EnumScript = 0;
   return Device;
 }
 
@@ -687,6 +688,7 @@ UsbEnumerateNewDev (
   UINTN                Address;
   UINT8                Config;
   EFI_STATUS           Status;
+  UINT8                RetryCount;
 
   Parent  = HubIf->Device;
   Bus     = Parent->Bus;
@@ -720,6 +722,9 @@ UsbEnumerateNewDev (
     return EFI_OUT_OF_RESOURCES;
   }
 
+  RetryCount = 3;
+
+DeviceRetry:
   //
   // OK, now identify the device speed. After reset, hub
   // fully knows the actual device speed.
@@ -731,9 +736,12 @@ UsbEnumerateNewDev (
     goto ON_ERROR;
   }
 
+  Child->EnumScript = RetryCount;
+
   if (!USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_CONNECTION)) {
     DEBUG ((DEBUG_ERROR, "UsbEnumerateNewDev: No device present at port %d\n", Port));
-    Status = EFI_NOT_FOUND;
+    Status     = EFI_NOT_FOUND;
+    RetryCount = 0;
     goto ON_ERROR;
   } else if (USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_SUPER_SPEED)) {
     Child->Speed      = EFI_USB_SPEED_SUPER;
@@ -787,17 +795,22 @@ UsbEnumerateNewDev (
   // ADDRESS state. Address zero is reserved for root hub.
   //
   ASSERT (Bus->MaxDevices <= 256);
-  for (Address = 1; Address < Bus->MaxDevices; Address++) {
-    if (Bus->Devices[Address] == NULL) {
-      break;
+  if (Child->Address == 0) {
+    for (Address = 1; Address < Bus->MaxDevices; Address++) {
+      if (Bus->Devices[Address] == NULL) {
+        break;
+      }
     }
-  }
 
-  if (Address >= Bus->MaxDevices) {
-    DEBUG ((DEBUG_ERROR, "UsbEnumerateNewDev: address pool is full for port %d\n", Port));
+    if (Address >= Bus->MaxDevices) {
+      DEBUG ((DEBUG_ERROR, "UsbEnumerateNewDev: address pool is full for port %d\n", Port));
 
-    Status = EFI_ACCESS_DENIED;
-    goto ON_ERROR;
+      Status = EFI_ACCESS_DENIED;
+      goto ON_ERROR;
+    }
+  } else {
+    Address        = Child->Address;
+    Child->Address = 0;
   }
 
   Status                = UsbSetAddress (Child, (UINT8)Address);
@@ -839,7 +852,8 @@ UsbEnumerateNewDev (
 
   // Below code is ensuring the device can be executed with SS.
   // Some device FW might execute with SS later but it would produce failure if the device is already enumerated with HS.
-  if (  (Bus->Usb2Hc != NULL)
+  if (  (RetryCount > 0)
+     && (Bus->Usb2Hc != NULL)
      && (Bus->Usb2Hc->MajorRevision >= 0x3)
      && (Child->IsSSDev)
      && (Child->Speed < EFI_USB_SPEED_SUPER)
@@ -883,6 +897,30 @@ UsbEnumerateNewDev (
   return EFI_SUCCESS;
 
 ON_ERROR:
+  //
+  // Do the error handling with retry counter.
+  //
+  Status = HubApi->GetPortStatus (HubIf, Port, &PortState);
+  if (EFI_ERROR (Status) || (!USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_CONNECTION))) {
+    DEBUG ((DEBUG_ERROR, "Device is gone. Don't reset the port\n"));
+    Status = EFI_NOT_FOUND;
+  }
+
+  if (!EFI_ERROR (Status) && (RetryCount > 0)) {
+    RetryCount--;
+    DEBUG ((DEBUG_INFO, "Reset the port due to Error\n"));
+    if ((Child != NULL) && (Child->DevDesc != NULL)) {
+      UsbFreeDevDesc (Child->DevDesc);
+      Child->DevDesc = NULL;
+    }
+
+    Status = HubApi->ResetPort (HubIf, Port);
+    if (!EFI_ERROR (Status)) {
+      gBS->Stall (USB_WAIT_PORT_STABLE_STALL);
+      goto DeviceRetry;
+    }
+  }
+
   //
   // If reach here, it means the enumeration process on a given port is interrupted due to error.
   // The s/w resources, including the assigned address(Address) and the allocated usb device data
