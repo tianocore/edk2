@@ -448,6 +448,8 @@ if __name__ == '__main__':
                 del PayloadField ['OpenSslTrustedPublicCertFile']
             if PayloadJsonDescriptorList[Index].SigningToolPath is None:
                 del PayloadField ['SigningToolPath']
+            if PayloadJsonDescriptorList[Index].DepexExp is None:
+                del PayloadField ['Dependencies']
             Index = Index + 1
         Result = json.dumps (PayloadJson, indent=4, sort_keys=True, separators=(',', ': '))
         with open (OutputJsonFile, 'w') as OutputFile:
