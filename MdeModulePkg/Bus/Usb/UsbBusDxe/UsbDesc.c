@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "UsbBus.h"
 
+#define INTERFACE_NOT_SET  0xFF
+
 /**
   Free the interface setting descriptor.
 
@@ -396,6 +398,7 @@ UsbParseConfigDesc (
   UINTN                  Index;
   UINTN                  NumIf;
   UINTN                  Consumed;
+  UINT8                  FirstIntfNum = INTERFACE_NOT_SET;
 
   ASSERT (DescBuf != NULL);
 
@@ -450,10 +453,19 @@ UsbParseConfigDesc (
   while (Len >= sizeof (EFI_USB_INTERFACE_DESCRIPTOR)) {
     Setting = UsbParseInterfaceDesc (DescBuf, Len, &Consumed);
 
+    // Usb standard spec expects the interface number to start from 0.
+    // Some devices might have the first interface number not equal to zero.
+    // This is a work around for these devices. For example, Dell WWAN DW2811e
+    if (Setting != NULL) {
+      if (FirstIntfNum == INTERFACE_NOT_SET) {
+        FirstIntfNum = Setting->Desc.InterfaceNumber;
+      }
+    }
+
     if (Setting == NULL) {
       DEBUG ((DEBUG_ERROR, "UsbParseConfigDesc: warning: failed to get interface setting, stop parsing now.\n"));
       break;
-    } else if (Setting->Desc.InterfaceNumber >= NumIf) {
+    } else if (Setting->Desc.InterfaceNumber >= (NumIf + FirstIntfNum)) {
       DEBUG ((DEBUG_ERROR, "UsbParseConfigDesc: malformatted interface descriptor\n"));
 
       UsbFreeInterfaceDesc (Setting);
@@ -463,7 +475,7 @@ UsbParseConfigDesc (
     //
     // Insert the descriptor to the corresponding set.
     //
-    Interface = Config->Interfaces[Setting->Desc.InterfaceNumber];
+    Interface = Config->Interfaces[(Setting->Desc.InterfaceNumber - FirstIntfNum)];
 
     if (Interface->NumOfSetting >= USB_MAX_INTERFACE_SETTING) {
       goto ON_ERROR;
