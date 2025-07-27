@@ -409,8 +409,13 @@ if __name__ == '__main__':
                                             DepexExp
                                             ))
 
-    def GenerateOutputJson (PayloadJsonDescriptorList):
+    def GenerateOutputJson (PayloadJsonDescriptorList, EmbeddedDriverPaths):
         PayloadJson = {
+                          "EmbeddedDrivers" : [
+                              {
+                                  "Driver": DriverPath
+                              }for DriverPath in EmbeddedDriverPaths
+                          ],
                           "Payloads" : [
                               {
                                   "Guid": str(PayloadDescriptor.Guid).upper(),
@@ -791,6 +796,8 @@ if __name__ == '__main__':
             except Exception as Msg:
                 print ('GenerateCapsule: error: ' + str(Msg))
                 sys.exit (1)
+
+        EmbeddedDriverPaths = []
         try:
             Result = UefiCapsuleHeader.Decode (Buffer)
             if len (Result) > 0:
@@ -965,10 +972,12 @@ if __name__ == '__main__':
                         print ('GenerateCapsule: error: can not write embedded driver file {File}'.format (File = EmbeddedDriverPath))
                         sys.exit (1)
 
+                    EmbeddedDriverPaths.append (EmbeddedDriverPath)
+
         except Exception as Msg:
             print ('GenerateCapsule: error: can not decode capsule: ' + str(Msg))
             sys.exit (1)
-        GenerateOutputJson(PayloadJsonDescriptorList)
+        GenerateOutputJson (PayloadJsonDescriptorList, EmbeddedDriverPaths)
         PayloadIndex = 0
         for SinglePayloadDescriptor in PayloadDescriptorList:
             if args.OutputFile is None:
