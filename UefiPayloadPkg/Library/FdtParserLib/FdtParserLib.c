@@ -774,6 +774,7 @@ ParsePciRootBridge (
       mPciRootBridgeInfo->RootBridge[RbIndex].PMem.Limit           = PcdGet32 (PcdPciReservedPMemLimit);
       mPciRootBridgeInfo->RootBridge[RbIndex].UID                  = RbIndex;
       mPciRootBridgeInfo->RootBridge[RbIndex].HID                  = EISA_PNP_ID (0x0A03);
+      mPciRootBridgeInfo->RootBridge[RbIndex].DmaAbove4G           = PcdGetBool (PcdPciReservedDmaAbove4G);
 
       Data32 = (UINT32 *)(PropertyPtr->Data);
       for (Base = 0; Base < TempLen / sizeof (UINT32); Base = Base + DWORDS_TO_NEXT_ADDR_TYPE) {
@@ -913,7 +914,7 @@ ParseDtb (
           DEBUG ((DEBUG_INFO, "\n         Property(%08X)  %a", Property, TempStr));
           DEBUG ((DEBUG_INFO, "  %016lX  %016lX", StartAddress, NumberOfBytes));
           if (!IsHobConstructed) {
-            if ((NumberOfBytes > MinimalNeededSize) && (StartAddress < BASE_4GB)) {
+            if (NumberOfBytes > MinimalNeededSize) {
               MemoryBottom     = StartAddress + NumberOfBytes - MinimalNeededSize;
               FreeMemoryBottom = MemoryBottom;
               FreeMemoryTop    = StartAddress + NumberOfBytes;
