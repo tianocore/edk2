@@ -1063,6 +1063,12 @@ CreateMmFoundationHobList (
   MmIplCopyGuidHob (FoundationHobList + UsedSize, &HobLength, &gMpInformation2HobGuid, TRUE);
   UsedSize += HobLength;
 
+  if (HobLength == 0) {
+    HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+    MmIplBuildMpInformationHob (FoundationHobList + UsedSize, &HobLength);
+    UsedSize += HobLength;
+  }
+
   //
   // Build ACPI variable HOB
   //
