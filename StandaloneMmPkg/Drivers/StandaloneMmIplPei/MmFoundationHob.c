@@ -1067,6 +1067,16 @@ CreateMmFoundationHobList (
   UsedSize += HobLength;
 
   //
+  // Platforms may use the DXE IPL when CpuMpPei isn't or cannot be used.
+  // In this case, there is no Mp Information2 HOB in the primary list, so, build it here.
+  //
+  if (HobLength == 0) {
+    HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+    MmIplBuildMpInformationHob (FoundationHobList + UsedSize, &HobLength);
+    UsedSize += HobLength;
+  }
+
+  //
   // Build ACPI variable HOB
   //
   HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);

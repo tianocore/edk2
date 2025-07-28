@@ -625,6 +625,24 @@ MmIplBuildCommBufferHob (
 }
 
 /**
+  Builds MP information HOB using MP services.
+  Should only be used in the absence of CpuMpPei.
+
+**/
+VOID
+MmIplBuildMpInformationHob (
+  IN UINT8      *HobBuffer,
+  IN OUT UINTN  *HobBufferSize
+  )
+{
+  //
+  // DEPEX guarantees that the HOB was already produced.
+  // Therefore, this function should never be called.
+  //
+  ASSERT (FALSE);
+}
+
+/**
   The Entry Point for MM IPL at PEI stage.
 
   Load MM Core into MMRAM.

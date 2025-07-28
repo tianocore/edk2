@@ -156,6 +156,17 @@ CreateMmHobHandoffInfoTable (
   );
 
 /**
+  Builds MP information HOB using MP services.
+  Should only be used in the absence of CpuMpPei.
+
+**/
+VOID
+MmIplBuildMpInformationHob (
+  IN UINT8      *HobBuffer,
+  IN OUT UINTN  *HobBufferSize
+  );
+
+/**
   Search all the available firmware volumes for MM Core driver.
 
   @param  MmFvBase             Base address of FV which included MM Core driver.
