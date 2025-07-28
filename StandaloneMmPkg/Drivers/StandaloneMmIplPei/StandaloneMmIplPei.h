@@ -17,6 +17,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/MmUnblockMemoryLib.h>
+#include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PeCoffLib.h>
 #include <Library/CacheMaintenanceLib.h>
