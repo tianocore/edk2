@@ -40,9 +40,11 @@
   HobLib
   MemoryAllocationLib
   MmUnblockMemoryLib
+  BaseLib
   BaseMemoryLib
   PeCoffLib
   CacheMaintenanceLib
+  PeiServicesTablePointerLib
   MmPlatformHobProducerLib
 
 [Guids]
@@ -58,6 +60,7 @@
   gMmUnblockRegionHobGuid
   gMmStatusCodeUseSerialHobGuid
   gEfiMmCommunicateHeaderV3Guid
+  gEfiHobMemoryAllocModuleGuid
 
 [Ppis]
   gEfiPeiMmControlPpiGuid
