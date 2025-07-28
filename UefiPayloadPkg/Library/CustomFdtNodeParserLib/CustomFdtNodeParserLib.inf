@@ -20,8 +20,11 @@
 #  VALID_ARCHITECTURES           = IA32 X64
 #
 
-[Sources]
+[Sources.X64]
   CustomFdtNodeParserLib.c
+
+[Sources.RISCV64]
+  RiscVFdtNodeParserLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -42,6 +45,7 @@
   gUniversalPayloadAcpiTableGuid
   gUniversalPayloadSmbios3TableGuid
   gEfiHobMemoryAllocModuleGuid
+  gUniversalPayloadRamdiskGuid
 
 [Pcd]
   gUefiPayloadPkgTokenSpaceGuid.PcdHandOffFdtEnable
