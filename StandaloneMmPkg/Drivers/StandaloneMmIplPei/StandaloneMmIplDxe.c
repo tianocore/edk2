@@ -316,6 +316,123 @@ SignalEndOfPei (
 }
 
 /**
+  Builds MP information HOB using MP services.
+  Should only be used in the absence of CpuMpPei.
+
+**/
+VOID
+MmIplBuildMpInformationHob (
+  IN UINT8      *HobBuffer,
+  IN OUT UINTN  *HobBufferSize
+  )
+{
+  EFI_MP_SERVICES_PROTOCOL  *MpServices;
+  EFI_STATUS                Status;
+  UINTN                     NumberOfCpus;
+  UINTN                     NumberOfEnabledProcessors;
+  UINTN                     MaxProcessorsPerHob;
+  UINTN                     NumberOfProcessorsInHob;
+  UINTN                     ProcessorIndex;
+  UINTN                     UsedSize;
+  UINTN                     HobLength;
+  EFI_HOB_GUID_TYPE         *GuidHob;
+  MP_INFORMATION2_HOB_DATA  *MpInformation2HobData;
+  MP_INFORMATION2_ENTRY     *MpInformation2Entry;
+  UINTN                     Index;
+
+  Status = gBS->LocateProtocol (&gEfiMpServiceProtocolGuid, NULL, (VOID **)&MpServices);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = MpServices->GetNumberOfProcessors (
+                         MpServices,
+                         &NumberOfCpus,
+                         &NumberOfEnabledProcessors
+                         );
+  ASSERT_EFI_ERROR (Status);
+
+  MaxProcessorsPerHob     = ((MAX_UINT16 & ~7) - sizeof (EFI_HOB_GUID_TYPE) - sizeof (MP_INFORMATION2_HOB_DATA)) / sizeof (MP_INFORMATION2_ENTRY);
+  NumberOfProcessorsInHob = MaxProcessorsPerHob;
+
+  ProcessorIndex = 0;
+
+  //
+  // Create MP_INFORMATION2_HOB. when the max HobLength 0xFFF8 is not enough, there
+  // will be a MP_INFORMATION2_HOB series in the HOB list.
+  // In the HOB list, there is a gMpInformation2HobGuid with 0 value NumberOfCpus
+  // fields to indicate it's the last MP_INFORMATION2_HOB.
+  //
+  UsedSize = 0;
+  while (NumberOfProcessorsInHob > 0) {
+    NumberOfProcessorsInHob = MIN (NumberOfCpus - ProcessorIndex, MaxProcessorsPerHob);
+
+    HobLength = sizeof (MP_INFORMATION2_HOB_DATA) + sizeof (MP_INFORMATION2_ENTRY) * NumberOfProcessorsInHob;
+    HobLength = ALIGN_VALUE (sizeof (EFI_HOB_GUID_TYPE) + HobLength, 8);
+    if (*HobBufferSize < UsedSize + HobLength) {
+      goto End;
+    }
+
+    MmIplCreateHob (HobBuffer + UsedSize, EFI_HOB_TYPE_GUID_EXTENSION, HobLength);
+
+    GuidHob = (EFI_HOB_GUID_TYPE *)(HobBuffer + UsedSize);
+    ASSERT (GuidHob != NULL);
+
+    CopyGuid (&GuidHob->Name, &gMpInformation2HobGuid);
+
+    MpInformation2HobData = (MP_INFORMATION2_HOB_DATA *)(GuidHob + 1);
+    MpInformation2HobData->Version            = MP_INFORMATION2_HOB_REVISION;
+    MpInformation2HobData->ProcessorIndex     = ProcessorIndex;
+    MpInformation2HobData->NumberOfProcessors = (UINT16)NumberOfProcessorsInHob;
+    MpInformation2HobData->EntrySize          = sizeof (MP_INFORMATION2_ENTRY);
+
+    DEBUG ((DEBUG_INFO, "Creating MpInformation2 HOB...\n"));
+
+    for (Index = 0; Index < NumberOfProcessorsInHob; Index++) {
+      MpInformation2Entry = &MpInformation2HobData->Entry[Index];
+      Status              = MpServices->GetProcessorInfo (
+                              MpServices,
+                              (Index + ProcessorIndex) | CPU_V2_EXTENDED_TOPOLOGY,
+                              &MpInformation2Entry->ProcessorInfo
+                              );
+      ASSERT_EFI_ERROR (Status);
+
+      // TODO: MpInformation2Entry->CoreType = (CoreTypes != NULL) ? CoreTypes[Index + ProcessorIndex] : 0;
+
+      DEBUG ((
+        DEBUG_INFO,
+        "  Processor[%04d]: ProcessorId = 0x%lx, StatusFlag = 0x%x, CoreType = 0x%x\n",
+        Index + ProcessorIndex,
+        MpInformation2Entry->ProcessorInfo.ProcessorId,
+        MpInformation2Entry->ProcessorInfo.StatusFlag,
+        MpInformation2Entry->CoreType
+        ));
+      DEBUG ((
+        DEBUG_INFO,
+        "    Location = Package:%d Core:%d Thread:%d\n",
+        MpInformation2Entry->ProcessorInfo.Location.Package,
+        MpInformation2Entry->ProcessorInfo.Location.Core,
+        MpInformation2Entry->ProcessorInfo.Location.Thread
+        ));
+      DEBUG ((
+        DEBUG_INFO,
+        "    Location2 = Package:%d Die:%d Tile:%d Module:%d Core:%d Thread:%d\n",
+        MpInformation2Entry->ProcessorInfo.ExtendedInformation.Location2.Package,
+        MpInformation2Entry->ProcessorInfo.ExtendedInformation.Location2.Die,
+        MpInformation2Entry->ProcessorInfo.ExtendedInformation.Location2.Tile,
+        MpInformation2Entry->ProcessorInfo.ExtendedInformation.Location2.Module,
+        MpInformation2Entry->ProcessorInfo.ExtendedInformation.Location2.Core,
+        MpInformation2Entry->ProcessorInfo.ExtendedInformation.Location2.Thread
+        ));
+    }
+
+End:
+    ProcessorIndex += NumberOfProcessorsInHob;
+    UsedSize += HobLength;
+  }
+
+  *HobBufferSize = UsedSize;
+}
+
+/**
   The Entry Point for MmCommunicateDxe driver.
 
   @param  ImageHandle    The firmware allocated handle for the EFI image.
