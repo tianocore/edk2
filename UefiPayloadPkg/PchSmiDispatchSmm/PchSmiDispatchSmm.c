@@ -87,6 +87,7 @@ FindContextByDispatchHandle (
 
 **/
 EFI_STATUS
+EFIAPI
 SmmSwDispatcher (
   IN     EFI_HANDLE  DispatchHandle,
   IN     CONST VOID  *RegisterContext,
