@@ -2,7 +2,7 @@
   Pei Core Firmware File System service routines.
 
 Copyright (c) 2015 HP Development Company, L.P.
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2025, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -456,6 +456,29 @@ FindFileEx (
 }
 
 /**
+  Return the pointer to the Firmware Volume GUID name in the FV header.
+
+  @param[in]  FvHeader   Pointer to the header of the Firmware Volume.
+
+  @retval     Pointer to the Firmware Volume GUID name in the FV header.
+              NULL if the FV is anonymous without an extended header.
+**/
+EFI_GUID *
+GetFvName (
+  IN  CONST EFI_FIRMWARE_VOLUME_HEADER  *FvHeader
+  )
+{
+  EFI_FIRMWARE_VOLUME_EXT_HEADER  *FvExtHeader;
+
+  if (FvHeader->ExtHeaderOffset == 0) {
+    return NULL;
+  }
+
+  FvExtHeader = (EFI_FIRMWARE_VOLUME_EXT_HEADER *)((UINT8 *)FvHeader + FvHeader->ExtHeaderOffset);
+  return &FvExtHeader->FvName;
+}
+
+/**
   Initialize PeiCore FV List.
 
   @param PrivateData     - Pointer to PEI_CORE_INSTANCE.
@@ -519,8 +542,9 @@ PeiInitializeFv (
   PrivateData->Fv[PrivateData->FvCount].AuthenticationStatus = 0;
   DEBUG ((
     DEBUG_INFO,
-    "The %dth FV start address is 0x%11p, size is 0x%08x, handle is 0x%p\n",
+    "The %dth FV[%g] start address is 0x%11p, size is 0x%08x, handle is 0x%p\n",
     (UINT32)PrivateData->FvCount,
+    GetFvName (BfvHeader),
     (VOID *)BfvHeader,
     (UINT32)BfvHeader->FvLength,
     FvHandle
@@ -661,8 +685,9 @@ FirmwareVolumeInfoPpiNotifyCallback (
     CurFvCount                                                 = PrivateData->FvCount;
     DEBUG ((
       DEBUG_INFO,
-      "The %dth FV start address is 0x%11p, size is 0x%08x, handle is 0x%p\n",
+      "The %dth FV[%g] start address is 0x%11p, size is 0x%08x, handle is 0x%p\n",
       (UINT32)CurFvCount,
+      GetFvName ((EFI_FIRMWARE_VOLUME_HEADER *)FvInfo2Ppi.FvInfo),
       (VOID *)FvInfo2Ppi.FvInfo,
       FvInfo2Ppi.FvInfoSize,
       FvHandle
@@ -696,7 +721,7 @@ FirmwareVolumeInfoPpiNotifyCallback (
           }
         }
 
-        DEBUG ((DEBUG_INFO, "Found firmware volume Image File %p in FV[%d] %p\n", FileHandle, CurFvCount, FvHandle));
+        DEBUG ((DEBUG_INFO, "Found firmware volume Image File[%g] %p in FV[%d] %p\n", FileHandle, FileHandle, CurFvCount, FvHandle));
         ProcessFvFile (PrivateData, &PrivateData->Fv[CurFvCount], FileHandle);
       }
     } while (FileHandle != NULL);
@@ -2434,8 +2459,9 @@ ThirdPartyFvPpiNotifyCallback (
     CurFvCount                                                 = PrivateData->FvCount;
     DEBUG ((
       DEBUG_INFO,
-      "The %dth FV start address is 0x%11p, size is 0x%08x, handle is 0x%p\n",
+      "The %dth FV[%g] start address is 0x%11p, size is 0x%08x, handle is 0x%p\n",
       (UINT32)CurFvCount,
+      GetFvName ((EFI_FIRMWARE_VOLUME_HEADER *)FvInfo),
       (VOID *)FvInfo,
       FvInfoSize,
       FvHandle
@@ -2469,7 +2495,7 @@ ThirdPartyFvPpiNotifyCallback (
           }
         }
 
-        DEBUG ((DEBUG_INFO, "Found firmware volume Image File %p in FV[%d] %p\n", FileHandle, CurFvCount, FvHandle));
+        DEBUG ((DEBUG_INFO, "Found firmware volume Image File[%g] %p in FV[%d] %p\n", FileHandle, FileHandle, CurFvCount, FvHandle));
         ProcessFvFile (PrivateData, &PrivateData->Fv[CurFvCount], FileHandle);
       }
     } while (FileHandle != NULL);
