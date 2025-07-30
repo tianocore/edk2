@@ -14,6 +14,48 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "Xhci.h"
 
 /**
+  Get EP State by Urb.
+
+  @param  Xhc       The XHCI Instance.
+  @param  Urb       The Urb to be executed.
+  @param  EpState   The EP state returned ptr.
+
+  @return EFI_STATUS
+
+**/
+EFI_STATUS
+XhcGetEpStateByUrb (
+  IN  USB_XHCI_INSTANCE  *Xhc,
+  IN  URB                *Urb,
+  OUT XHCI_EP_STATE      *EpState
+  )
+{
+  UINT8  SlotId         = 0;
+  UINT8  Dci            = 0;
+  VOID   *OutputContext = NULL;
+
+  if (Urb->Ring == &Xhc->CmdRing) {
+    *EpState = EP_RUNNING;
+  } else {
+    SlotId = XhcBusDevAddrToSlotId (Xhc, Urb->Ep.BusAddr);
+    if (SlotId == 0) {
+      return EFI_DEVICE_ERROR;
+    }
+
+    Dci = XhcEndpointToDci (Urb->Ep.EpAddr, (UINT8)(Urb->Ep.Direction));
+    ASSERT (Dci < 32);
+    OutputContext = Xhc->UsbDevContext[SlotId].OutputContext;
+    if (Xhc->HcCParams.Data.Csz == 0) {
+      *EpState = (UINT8)((DEVICE_CONTEXT *)OutputContext)->EP[Dci-1].EPState;
+    } else {
+      *EpState = (UINT8)((DEVICE_CONTEXT_64 *)OutputContext)->EP[Dci-1].EPState;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Create a command transfer TRB to support XHCI command interfaces.
 
   @param  Xhc       The XHCI Instance.
@@ -195,8 +237,36 @@ XhcFreeUrb (
   IN URB                *Urb
   )
 {
+  TRANSFER_RING  *EPRing  = NULL;
+  UINT8          EPType   = ED_NOT_VALID;
+  LINK_TRB       *LinkTrb = NULL;
+  UINT8          SlotId   = 0;
+  UINT8          Dci      = 0;
+
   if ((Xhc == NULL) || (Urb == NULL)) {
     return;
+  }
+
+  // Need to set CH bit to 0 while free up Urb.
+  if (Urb->Ring != &Xhc->CmdRing) {
+    SlotId = XhcBusDevAddrToSlotId (Xhc, Urb->Ep.BusAddr);
+    if (SlotId != 0) {
+      Dci = XhcEndpointToDci (Urb->Ep.EpAddr, (UINT8)(Urb->Ep.Direction));
+      ASSERT (Dci < 32);
+      if (Xhc->HcCParams.Data.Csz == 0) {
+        EPType = (UINT8)((DEVICE_CONTEXT *)(Xhc->UsbDevContext[SlotId].OutputContext))->EP[Dci-1].EPType;
+      } else {
+        EPType = (UINT8)((DEVICE_CONTEXT_64 *)(Xhc->UsbDevContext[SlotId].OutputContext))->EP[Dci-1].EPType;
+      }
+
+      if ((EPType == ED_BULK_OUT) || (EPType == ED_BULK_IN) || (EPType == ED_CONTROL_BIDIR)) {
+        if ((UINTN)(Urb->TrbStart) > (UINTN)(Urb->TrbEnd)) {
+          EPRing      = (TRANSFER_RING *)(UINTN)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1];
+          LinkTrb     = (LINK_TRB *)((UINTN)EPRing->RingSeg0 + sizeof (TRB_TEMPLATE) * (EPRing->TrbNumber - 1));
+          LinkTrb->CH = 0;
+        }
+      }
+    }
   }
 
   if (Urb->DataMap != NULL) {
@@ -234,17 +304,20 @@ XhcCreateTransferTrb (
   EFI_PHYSICAL_ADDRESS           PhyAddr;
   VOID                           *Map;
   EFI_STATUS                     Status;
+  UINTN                          TDSize;
+  LINK_TRB                       *LinkTrb;
 
   SlotId = XhcBusDevAddrToSlotId (Xhc, Urb->Ep.BusAddr);
   if (SlotId == 0) {
     return EFI_DEVICE_ERROR;
   }
 
-  Urb->Finished  = FALSE;
-  Urb->StartDone = FALSE;
-  Urb->EndDone   = FALSE;
-  Urb->Completed = 0;
-  Urb->Result    = EFI_USB_NOERROR;
+  Urb->Finished             = FALSE;
+  Urb->StartDone            = FALSE;
+  Urb->EndDone              = FALSE;
+  Urb->Completed            = 0;
+  Urb->Result               = EFI_USB_NOERROR;
+  Urb->ShortPacketOccurence = 0;
 
   Dci = XhcEndpointToDci (Urb->Ep.EpAddr, (UINT8)(Urb->Ep.Direction));
   ASSERT (Dci < 32);
@@ -398,19 +471,57 @@ XhcCreateTransferTrb (
           Len = 0x10000;
         }
 
+        //
+        // Xhci Spec 1.1
+        // Ch 4.11.2.4 TD Size
+        //
+        TDSize = 0;
+        TDSize =  (Urb->DataLen - TotalLen - Len + (Urb->Ep.MaxPacket - 1)) / (Urb->Ep.MaxPacket);
+        if (TDSize >= 31) {
+          TDSize = 31;
+        }
+
         TrbStart                      = (TRB *)(UINTN)EPRing->RingEnqueue;
         TrbStart->TrbNormal.TRBPtrLo  = XHC_LOW_32BIT ((UINT8 *)Urb->DataPhy + TotalLen);
         TrbStart->TrbNormal.TRBPtrHi  = XHC_HIGH_32BIT ((UINT8 *)Urb->DataPhy + TotalLen);
         TrbStart->TrbNormal.Length    = (UINT32)Len;
-        TrbStart->TrbNormal.TDSize    = 0;
+        TrbStart->TrbNormal.TDSize    = (UINT32)TDSize;
         TrbStart->TrbNormal.IntTarget = 0;
         TrbStart->TrbNormal.ISP       = 1;
-        TrbStart->TrbNormal.IOC       = 1;
-        TrbStart->TrbNormal.Type      = TRB_TYPE_NORMAL;
+
+        // Ch. 4.9.1 Transfer Descriptors
+        // Transfer Rings support Transfer Descriptors (TDs) that consists of 1 or more TRBs
+        // The Chain(CH) Bit is set in all but the last TRB of a TD.
+        //
+        if (TDSize == 0) {
+          TrbStart->TrbNormal.CH = 0;
+        } else {
+          TrbStart->TrbNormal.CH = 1;
+        }
+
+        //
+        // Ch. 4.10.1.1.2
+        // The ISP flag shall be set ('1') in all TRBs of the TD
+        // The IOC flag shall be set ('1') in the last TRB of the TD
+        // *********************************************************
+        //
+
+        // IOC should be set with the last TRB of the TD but here
+        // is an exception because UDK need to check all TRBs to
+        // calculate the completed length and see if all TRBs are done.
+        // Set IOC in all TRBs.
+        TrbStart->TrbNormal.IOC  = 1;
+        TrbStart->TrbNormal.Type = TRB_TYPE_NORMAL;
         //
         // Update the cycle bit
         //
         TrbStart->TrbNormal.CycleBit = EPRing->RingPCS & BIT0;
+
+        // If the Trb is across LinkTrb, need to set CH bit.
+        if ((UINTN)TrbStart < (UINTN)(Urb->TrbStart)) {
+          LinkTrb     = (LINK_TRB *)((UINTN)EPRing->RingSeg0 + sizeof (TRB_TEMPLATE) * (EPRing->TrbNumber - 1));
+          LinkTrb->CH = 1;
+        }
 
         XhcSyncTrsRing (Xhc, EPRing);
         TrbNum++;
@@ -459,8 +570,14 @@ XhcCreateTransferTrb (
 
     default:
       DEBUG ((DEBUG_INFO, "Not supported EPType 0x%x!\n", EPType));
-      ASSERT (FALSE);
-      break;
+      //
+      // We are seeing intermittent failures when the xHC failed to update the
+      // endpoint context of the device context data structure with a Belkin mouse.
+      // The Endpoint Conext EPType could be 0 in that case.
+      // We don't want to halt the system because of that, instead we can give up
+      // on this device and continue.
+      //
+      return EFI_DEVICE_ERROR;
   }
 
   return EFI_SUCCESS;
@@ -641,6 +758,126 @@ XhcInitSched (
     Xhc->EventRing.EventRingSeg0,
     (UINTN)Xhc->EventRing.EventRingSeg0 + sizeof (TRB_TEMPLATE) * EVENT_RING_TRB_NUMBER
     ));
+}
+
+/**
+  Reset endpoint through XHCI's Reset_Endpoint cmd with TSP = 1.
+
+  @param  Xhc                   The XHCI Instance.
+  @param  SlotId                The slot id to be configured.
+  @param  Dci                   The device context index of endpoint.
+
+  @retval EFI_SUCCESS           Reset endpoint successfully.
+  @retval Others                Failed to reset endpoint.
+
+**/
+EFI_STATUS
+EFIAPI
+XhcResetEndpointForSoftRetry (
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN UINT8              SlotId,
+  IN UINT8              Dci
+  )
+{
+  EFI_STATUS                  Status;
+  EVT_TRB_COMMAND_COMPLETION  *EvtTrb;
+  CMD_TRB_RESET_ENDPOINT      CmdTrbResetED;
+
+  DEBUG ((DEBUG_INFO, "[%a] Slot = 0x%x, Dci = 0x%x\n", __func__, SlotId, Dci));
+  //
+  // Send stop endpoint command to transit Endpoint from running to stop state
+  //
+  ZeroMem (&CmdTrbResetED, sizeof (CmdTrbResetED));
+  CmdTrbResetED.CycleBit = 1;
+  CmdTrbResetED.Type     = TRB_TYPE_RESET_ENDPOINT;
+  CmdTrbResetED.EDID     = Dci;
+  CmdTrbResetED.TSP      = 1;
+  CmdTrbResetED.SlotId   = SlotId;
+  Status                 = XhcCmdTransfer (
+                             Xhc,
+                             (TRB_TEMPLATE *)(UINTN)&CmdTrbResetED,
+                             XHC_GENERIC_TIMEOUT,
+                             (TRB_TEMPLATE **)(UINTN)&EvtTrb
+                             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "[%a] Reset Endpoint Failed, Status = %r\n", __func__, Status));
+  }
+
+  return Status;
+}
+
+/**
+  System software shall use a Reset Endpoint Command with TSP = 1 (section 4.6.8.1) to remove the Halted
+  condition in the xHC when software get the transaction error.
+  After the successful completion of the Reset Endpoint Command with TSP = 1, the Endpoint Context is transitioned
+  from the Halted to the Stopped state but does not change the state of Data Toggle or Sequence Number and allows Xhc to
+  continue the retry process another CErr times and the Transfer Ring of the endpoint is reenabled.
+  The next write to the Doorbell of the Endpoint will transition the Endpoint Context from the Stopped to the Running state.
+
+  @param  Xhc                   The XHCI Instance.
+  @param  SlotId                The slot id to be configured.
+  @param  Dci                   The device context index of endpoint.
+
+  @retval EFI_SUCCESS           The recovery is successful.
+  @retval Others                Failed to recovery halted endpoint.
+
+**/
+EFI_STATUS
+EFIAPI
+XhcRecoverHaltedEndpointForSoftRetry (
+  IN  USB_XHCI_INSTANCE  *Xhc,
+  IN  UINT8              SlotId,
+  IN  UINT8              Dci
+  )
+{
+  EFI_STATUS  Status;
+
+  DEBUG ((DEBUG_INFO, "[%a] Recovery Halted Slot = %x,Dci = %x\n", __func__, SlotId, Dci));
+  Status = EFI_SUCCESS;
+  //
+  // 1) Send Reset endpoint command to transit from halt to stop state
+  //
+  Status = XhcResetEndpointForSoftRetry (Xhc, SlotId, Dci);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "[%a]: Reset Endpoint Failed, Status = %r\n", __func__, Status));
+    return Status;
+  }
+
+  //
+  // 2)Ring the doorbell to transit from stop to active
+  //
+  XhcRingDoorBell (Xhc, SlotId, Dci);
+
+  return Status;
+}
+
+BOOLEAN
+IsUrbNeedSoftRetry (
+  IN  USB_XHCI_INSTANCE  *Xhc,
+  IN  UINT8              SlotId,
+  IN  UINT8              Dci,
+  IN  URB                *Urb,
+  IN  UINT8              EPType
+  )
+{
+  BOOLEAN  NeedSoftRetry = FALSE;
+
+  if (  (Urb->EvtTrb != NULL)
+     && (Urb->Result & EDKII_USB_ERR_TRANSACTION)
+     && (((EVT_TRB_TRANSFER *)(Urb->EvtTrb))->Completecode == TRB_COMPLETION_USB_TRANSACTION_ERROR))
+  {
+    DEBUG ((DEBUG_INFO, "[%a]: CompleteCode is TRB_COMPLETION_USB_TRANSACTION_ERROR\n", __func__));
+    if (SlotId == 0) {
+      NeedSoftRetry = TRUE;
+    } else if (  (EPType != ED_ISOCH_IN)
+              && (EPType != ED_ISOCH_OUT)
+              && (Xhc->UsbDevContext[SlotId].ParentRouteString.Dword == 0))
+    {
+      NeedSoftRetry = TRUE;
+    }
+  }
+
+  return NeedSoftRetry;
 }
 
 /**
@@ -1174,6 +1411,8 @@ XhcCheckUrbResult (
       continue;
     }
 
+    CheckedUrb->EvtTrb = (TRB_TEMPLATE *)EvtTrb;
+
     switch (EvtTrb->Completecode) {
       case TRB_COMPLETION_STALL_ERROR:
         CheckedUrb->Result  |= EFI_USB_ERR_STALL;
@@ -1216,6 +1455,10 @@ XhcCheckUrbResult (
       case TRB_COMPLETION_SUCCESS:
         if (EvtTrb->Completecode == TRB_COMPLETION_SHORT_PACKET) {
           DEBUG ((DEBUG_VERBOSE, "XhcCheckUrbResult: short packet happens!\n"));
+          //
+          // Advance the short packet counter
+          //
+          CheckedUrb->ShortPacketOccurence++;
         }
 
         TRBType = (UINT8)(TRBPtr->Type);
@@ -1223,7 +1466,13 @@ XhcCheckUrbResult (
             (TRBType == TRB_TYPE_NORMAL) ||
             (TRBType == TRB_TYPE_ISOCH))
         {
-          CheckedUrb->Completed += (((TRANSFER_TRB_NORMAL *)TRBPtr)->Length - EvtTrb->Length);
+          //
+          // By XHCI spec 4.10.1.1.2 to discard any following short packet or completion event
+          // after first occurrence of a short packet.
+          //
+          if (2 > CheckedUrb->ShortPacketOccurence) {
+            CheckedUrb->Completed += (((TRANSFER_TRB_NORMAL *)TRBPtr)->Length - EvtTrb->Length);
+          }
         }
 
         break;
@@ -1278,6 +1527,8 @@ EXIT:
   return Urb->Finished;
 }
 
+#define SOFT_RETRY_COUNT  500
+
 /**
   Execute the transfer by polling the URB. This is a synchronous operation.
 
@@ -1299,19 +1550,34 @@ XhcExecTransfer (
   IN  UINTN              Timeout
   )
 {
-  EFI_STATUS  Status;
-  UINT8       SlotId;
-  UINT8       Dci;
-  BOOLEAN     Finished;
-  UINT64      TimeoutTicks;
-  UINT64      ElapsedTicks;
-  UINT64      TicksDelta;
-  UINT64      CurrentTick;
-  BOOLEAN     IndefiniteTimeout;
+  EFI_STATUS     Status;
+  UINT8          SlotId;
+  UINT8          Dci;
+  BOOLEAN        Finished;
+  UINT64         TimeoutTicks;
+  UINT64         ElapsedTicks;
+  UINT64         TicksDelta;
+  UINT64         CurrentTick;
+  BOOLEAN        IndefiniteTimeout;
+  EFI_STATUS     RecoverEpStatus;
+  UINTN          SoftRetries;
+  XHCI_EP_STATE  EpState;
+  UINT8          EPType;
 
   Status            = EFI_SUCCESS;
   Finished          = FALSE;
   IndefiniteTimeout = FALSE;
+
+  Status = XhcGetEpStateByUrb (Xhc, Urb, &EpState);
+  if (!EFI_ERROR (Status)) {
+    if (EpState == EP_HALTED) {
+      Urb->Result = EFI_USB_ERR_TIMEOUT;
+      Status      = EFI_TIMEOUT;
+      return Status;
+    }
+  } else {
+    return EFI_DEVICE_ERROR;
+  }
 
   if (CmdTransfer) {
     SlotId = 0;
@@ -1325,6 +1591,18 @@ XhcExecTransfer (
     Dci = XhcEndpointToDci (Urb->Ep.EpAddr, (UINT8)(Urb->Ep.Direction));
     ASSERT (Dci < 32);
   }
+
+  if (CmdTransfer) {
+    EPType = ED_CONTROL_BIDIR;
+  } else {
+    if (Xhc->HcCParams.Data.Csz == 0) {
+      EPType = (UINT8)((DEVICE_CONTEXT *)(Xhc->UsbDevContext[SlotId].OutputContext))->EP[Dci-1].EPType;
+    } else {
+      EPType = (UINT8)((DEVICE_CONTEXT_64 *)(Xhc->UsbDevContext[SlotId].OutputContext))->EP[Dci-1].EPType;
+    }
+  }
+
+  SoftRetries = SOFT_RETRY_COUNT;
 
   if (Timeout == 0) {
     IndefiniteTimeout = TRUE;
@@ -1343,7 +1621,49 @@ XhcExecTransfer (
   do {
     Finished = XhcCheckUrbResult (Xhc, Urb);
     if (Finished) {
+      //
+      // XHCI spec 4.6.8.1 - Software can do Soft Retry for Usb Transaction Error
+      //
+      if (IsUrbNeedSoftRetry (Xhc, SlotId, Dci, Urb, EPType)) {
+        DEBUG ((DEBUG_INFO, "[%a] IsUrbNeedSoftRetry = TRUE, SoftRetries = %d\n", __func__, SoftRetries));
+        if (SoftRetries-- > 0) {
+          RecoverEpStatus = XhcRecoverHaltedEndpointForSoftRetry (Xhc, SlotId, Dci);
+          DEBUG ((DEBUG_ERROR, "[%a] XhcRecoverHaltedEndpointForSoftRetry Status = %r!\n", __func__, RecoverEpStatus));
+          if (!EFI_ERROR (RecoverEpStatus)) {
+            Urb->Result   = EFI_USB_NOERROR;
+            Urb->Finished = FALSE;
+            Urb->EvtTrb   = NULL;
+            gBS->Stall (XHC_1_MILLISECOND);
+            continue;
+          }
+        }
+      }
+
       break;
+    } else {
+      if (SoftRetries == 0) {
+        //
+        // Here means that BIOS did the Soft Retry but not worked and it seems to have another error occurred.
+        // Transfer is not finished so that break here immediately.
+        //
+        DEBUG ((DEBUG_INFO, "[%a] SoftRetries == 0, return EDKII_USB_ERR_TRANSACTION\n", __func__));
+        Urb->Result  |= EDKII_USB_ERR_TRANSACTION;
+        Urb->Finished =  TRUE;
+        break;
+      } else if ((Urb->EvtTrb != NULL) && (Urb->Result == EFI_USB_NOERROR) && (SoftRetries < SOFT_RETRY_COUNT)) {
+        //
+        // Here means that this Urb back to normal transaction so reset the SoftRetry.
+        //
+        DEBUG ((DEBUG_INFO, "[%a] Urb->EvtTrb != NULL, Urb->Result == EFI_USB_NOERROR\n", __func__));
+        SoftRetries = SOFT_RETRY_COUNT;
+      } else {
+        //
+        // Here means that this Urb is going normal transfer.
+        // No need to decrease the SoftRetries, just keep waiting next transfer.
+        //
+      }
+
+      Urb->EvtTrb = NULL;
     }
 
     gBS->Stall (XHC_1_MICROSECOND);
@@ -1450,7 +1770,11 @@ XhciDelAllAsyncIntTransfers (
     }
 
     RemoveEntryList (&Urb->UrbList);
-    FreePool (Urb->Data);
+    if (Urb->Data != NULL) {
+      FreePool (Urb->Data);
+      Urb->Data = NULL;
+    }
+
     XhcFreeUrb (Xhc, Urb);
   }
 }
@@ -1624,6 +1948,9 @@ XhcMonitorAsyncRequests (
   URB                *Urb;
   UINT8              SlotId;
   EFI_STATUS         Status;
+  UINT64             XhcDequeue;
+  UINT32             High;
+  UINT32             Low;
   EFI_TPL            OldTpl;
 
   OldTpl = gBS->RaiseTPL (XHC_TPL);
@@ -1708,6 +2035,18 @@ XhcMonitorAsyncRequests (
 
     XhcUpdateAsyncRequest (Xhc, Urb);
   }
+  //
+  // Advance event ring to last available entry
+  //
+  // EHB bit shall be cleared otherwise the interrupt would be stuck.
+  // Some 3rd party XHCI external cards don't support single 64-bytes width register access,
+  // So divide it to two 32-bytes width register access.
+  //
+  Low        = XhcReadRuntimeReg (Xhc, XHC_ERDP_OFFSET);
+  High       = XhcReadRuntimeReg (Xhc, XHC_ERDP_OFFSET + 4);
+  XhcDequeue = (UINT64)(LShiftU64 ((UINT64)High, 32) | Low);
+  XhcWriteRuntimeReg (Xhc, XHC_ERDP_OFFSET, XHC_LOW_32BIT (XhcDequeue) | BIT3);
+  XhcWriteRuntimeReg (Xhc, XHC_ERDP_OFFSET + 4, XHC_HIGH_32BIT (XhcDequeue));
   gBS->RestoreTPL (OldTpl);
 }
 
@@ -1761,7 +2100,11 @@ XhcPollPortStatusChange (
   }
 
   SlotId = XhcRouteStringToSlotId (Xhc, RouteChart);
-  if (SlotId != 0) {
+  if ((SlotId != 0) &&
+      (((PortState->PortChangeStatus & USB_PORT_STAT_C_RESET) != 0)  ||
+       ((PortState->PortStatus & USB_PORT_STAT_ENABLE) == 0)         ||
+       ((PortState->PortStatus & USB_PORT_STAT_CONNECTION) == 0)))
+  {
     if (Xhc->HcCParams.Data.Csz == 0) {
       Status = XhcDisableSlotCmd (Xhc, SlotId);
     } else {
@@ -1789,7 +2132,7 @@ XhcPollPortStatusChange (
       // Execute Enable_Slot cmd for attached device, initialize device context and assign device address.
       //
       SlotId = XhcRouteStringToSlotId (Xhc, RouteChart);
-      if ((SlotId == 0) && ((PortState->PortChangeStatus & USB_PORT_STAT_C_RESET) != 0)) {
+      if (SlotId == 0) {
         if (Xhc->HcCParams.Data.Csz == 0) {
           Status = XhcInitializeDeviceSlot (Xhc, ParentRouteChart, Port, RouteChart, Speed);
         } else {
@@ -2863,6 +3206,9 @@ CalculateInterval (
   return Interval;
 }
 
+#define MAX_PACKET_SIZE_FIELD_MASK  0x7FF
+#define MAX_BURST_FIELD_MASK        0x1800
+
 /**
   Initialize endpoint context in input context.
 
@@ -2885,15 +3231,17 @@ XhcInitializeEndpointContext (
   IN USB_INTERFACE_DESCRIPTOR  *IfDesc
   )
 {
-  USB_ENDPOINT_DESCRIPTOR  *EpDesc;
-  UINTN                    NumEp;
-  UINTN                    EpIndex;
-  UINT8                    EpAddr;
-  UINT8                    Direction;
-  UINT8                    Dci;
-  UINT8                    MaxDci;
-  EFI_PHYSICAL_ADDRESS     PhyAddr;
-  TRANSFER_RING            *EndpointTransferRing;
+  USB_ENDPOINT_DESCRIPTOR                      *EpDesc;
+  UINTN                                        NumEp;
+  UINTN                                        EpIndex;
+  UINT8                                        EpAddr;
+  UINT8                                        Direction;
+  UINT8                                        Dci;
+  UINT8                                        MaxDci;
+  EFI_PHYSICAL_ADDRESS                         PhyAddr;
+  TRANSFER_RING                                *EndpointTransferRing;
+  USB_SS_ENDPOINT_COMPANION_DESCRIPTOR         *SsEpComDesc;
+  USB_SSP_ISOCH_ENDPOINT_COMPANION_DESCRIPTOR  *SspIsoEpComDesc;
 
   MaxDci = 0;
 
@@ -2960,6 +3308,7 @@ XhcInitializeEndpointContext (
 
         break;
       case USB_ENDPOINT_ISO:
+        InputContext->EP[Dci-1].MaxPacketSize = EpDesc->MaxPacketSize & MAX_PACKET_SIZE_FIELD_MASK;
         if (Direction == EfiUsbDataIn) {
           InputContext->EP[Dci-1].CErr   = 0;
           InputContext->EP[Dci-1].EPType = ED_ISOCH_IN;
@@ -2972,10 +3321,77 @@ XhcInitializeEndpointContext (
 
         //
         // Do not support isochronous transfer now.
+        // But BIOS should still set correct parameter for AMD onboard XHCI.
         //
-        DEBUG ((DEBUG_INFO, "XhcInitializeEndpointContext: Unsupport ISO EP found, Transfer ring is not allocated.\n"));
-        EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
-        continue;
+        DEBUG ((DEBUG_INFO, "XhcInitializeEndpointContext: Unsupport ISO EP found.\n"));
+        DEBUG ((DEBUG_INFO, "Transfer ring should still be allocated for specific chipset\n"));
+
+        InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
+        InputContext->EP[Dci-1].MaxESITPayload   = InputContext->EP[Dci-1].MaxPacketSize;
+        InputContext->EP[Dci-1].MaxBurstSize     = 0x0;
+
+        if (DeviceSpeed == EFI_USB_SPEED_HIGH) {
+          //
+          // If bit[11:12] in bMaxPacketSize is greater than 0, the MaxPacketSize should set to 1024 and bMaxBurstSize = bit[11:12].
+          //
+          if ((EpDesc->MaxPacketSize & MAX_BURST_FIELD_MASK) != 0) {
+            InputContext->EP[Dci-1].MaxPacketSize  = 0x400;
+            InputContext->EP[Dci-1].MaxBurstSize   = (EpDesc->MaxPacketSize >> 11) & 3;
+            InputContext->EP[Dci-1].MaxESITPayload = (UINT16)((InputContext->EP[Dci-1].MaxPacketSize) * (InputContext->EP[Dci-1].MaxBurstSize + 1));
+          }
+        } else if (DeviceSpeed == EFI_USB_SPEED_SUPER) {
+          SsEpComDesc = (USB_SS_ENDPOINT_COMPANION_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+          if (SsEpComDesc->DescriptorType == USB_DESC_TYPE_SUPERSPEED_ENDPOINT_COMPANION) {
+            if (SsEpComDesc->MaxBurst != 0) {
+              InputContext->EP[Dci-1].MaxPacketSize = 0x400;
+              InputContext->EP[Dci-1].MaxBurstSize  = SsEpComDesc->MaxBurst;
+            }
+          } else {
+            SsEpComDesc = NULL;
+            ZeroMem (&InputContext->EP[Dci-1], sizeof (ENDPOINT_CONTEXT));
+            EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+            DEBUG ((DEBUG_ERROR, "ISOCH: Can't find the SuperSpeed Endpoint descriptor.\n"));
+            continue;
+          }
+        }
+
+        //
+        // Set other parameter of ISOCH EP from descriptor for Super Speed.
+        //
+        if (DeviceSpeed == EFI_USB_SPEED_SUPER) {
+          InputContext->EP[Dci-1].Mult = 0;
+          InputContext->EP[Dci-1].CErr = 0;
+          if (SsEpComDesc != NULL) {
+            InputContext->EP[Dci-1].Mult           = SsEpComDesc->Attributes & 0x3;         // Bit[0:1] : Mult
+            InputContext->EP[Dci-1].MaxESITPayload = SsEpComDesc->BytesPerInterval;         // UINT16
+            if ((SsEpComDesc->Attributes & BIT7) != 0) {
+              // Bit7 : SSP ISOCH Companion
+              SspIsoEpComDesc = (USB_SSP_ISOCH_ENDPOINT_COMPANION_DESCRIPTOR *)((UINTN)SsEpComDesc + SsEpComDesc->Length);
+              if (SsEpComDesc->DescriptorType == USB_DESC_TYPE_SUPERSPEEDPLUS_ISOCH_ENDPOINT_COMPANION) {
+                InputContext->EP[Dci-1].MaxESITPayload = (UINT16)(SspIsoEpComDesc->BytesPerInterval & 0xFFFF);          // Max ESIT payload Lo
+                InputContext->EP[Dci-1].RsvdZ2         = (UINT8)((SspIsoEpComDesc->BytesPerInterval >> 16) & 0xFF);     // Max ESIT payload Hi
+              } else {
+                SsEpComDesc     = NULL;
+                SspIsoEpComDesc = NULL;
+                ZeroMem (&InputContext->EP[Dci-1], sizeof (ENDPOINT_CONTEXT));
+                EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+                DEBUG ((DEBUG_ERROR, "ISOCH: Can't find the SuperSpeed Isoch Endpoint descriptor.\n"));
+                continue;
+              }
+            }
+          }
+        }
+
+        if (Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] == NULL) {
+          EndpointTransferRing                                   = AllocateZeroPool (sizeof (TRANSFER_RING));
+          Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] = (VOID *)EndpointTransferRing;
+          CreateTransferRing (Xhc, TR_RING_TRB_NUMBER, (TRANSFER_RING *)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1]);
+        }
+
+        SsEpComDesc     = NULL;
+        SspIsoEpComDesc = NULL;
+        break;
+
       case USB_ENDPOINT_INTERRUPT:
         if (Direction == EfiUsbDataIn) {
           InputContext->EP[Dci-1].CErr   = 3;
@@ -3061,15 +3477,17 @@ XhcInitializeEndpointContext64 (
   IN USB_INTERFACE_DESCRIPTOR  *IfDesc
   )
 {
-  USB_ENDPOINT_DESCRIPTOR  *EpDesc;
-  UINTN                    NumEp;
-  UINTN                    EpIndex;
-  UINT8                    EpAddr;
-  UINT8                    Direction;
-  UINT8                    Dci;
-  UINT8                    MaxDci;
-  EFI_PHYSICAL_ADDRESS     PhyAddr;
-  TRANSFER_RING            *EndpointTransferRing;
+  USB_ENDPOINT_DESCRIPTOR                      *EpDesc;
+  UINTN                                        NumEp;
+  UINTN                                        EpIndex;
+  UINT8                                        EpAddr;
+  UINT8                                        Direction;
+  UINT8                                        Dci;
+  UINT8                                        MaxDci;
+  EFI_PHYSICAL_ADDRESS                         PhyAddr;
+  TRANSFER_RING                                *EndpointTransferRing;
+  USB_SS_ENDPOINT_COMPANION_DESCRIPTOR         *SsEpComDesc;
+  USB_SSP_ISOCH_ENDPOINT_COMPANION_DESCRIPTOR  *SspIsoEpComDesc;
 
   MaxDci = 0;
 
@@ -3136,6 +3554,7 @@ XhcInitializeEndpointContext64 (
 
         break;
       case USB_ENDPOINT_ISO:
+        InputContext->EP[Dci-1].MaxPacketSize = EpDesc->MaxPacketSize & MAX_PACKET_SIZE_FIELD_MASK;
         if (Direction == EfiUsbDataIn) {
           InputContext->EP[Dci-1].CErr   = 0;
           InputContext->EP[Dci-1].EPType = ED_ISOCH_IN;
@@ -3148,10 +3567,77 @@ XhcInitializeEndpointContext64 (
 
         //
         // Do not support isochronous transfer now.
+        // But BIOS should still set correct parameter for AMD onboard XHCI.
         //
-        DEBUG ((DEBUG_INFO, "XhcInitializeEndpointContext64: Unsupport ISO EP found, Transfer ring is not allocated.\n"));
-        EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
-        continue;
+        DEBUG ((DEBUG_INFO, "XhcInitializeEndpointContext64: Unsupport ISO EP found.\n"));
+        DEBUG ((DEBUG_INFO, "Transfer ring should still be allocated for specific chipset\n"));
+
+        InputContext->EP[Dci-1].AverageTRBLength = 0x1000;
+        InputContext->EP[Dci-1].MaxESITPayload   = InputContext->EP[Dci-1].MaxPacketSize;
+        InputContext->EP[Dci-1].MaxBurstSize     = 0x0;
+
+        if (DeviceSpeed == EFI_USB_SPEED_HIGH) {
+          //
+          // If bit[11:12] in bMaxPacketSize is greater than 0, the MaxPacketSize should set to 1024 and bMaxBurstSize = bit[11:12].
+          //
+          if ((EpDesc->MaxPacketSize & MAX_BURST_FIELD_MASK) != 0) {
+            InputContext->EP[Dci-1].MaxPacketSize  = 0x400;
+            InputContext->EP[Dci-1].MaxBurstSize   = (EpDesc->MaxPacketSize >> 11) & 3;
+            InputContext->EP[Dci-1].MaxESITPayload = (UINT16)((InputContext->EP[Dci-1].MaxPacketSize) * (InputContext->EP[Dci-1].MaxBurstSize + 1));
+          }
+        } else if (DeviceSpeed == EFI_USB_SPEED_SUPER) {
+          SsEpComDesc = (USB_SS_ENDPOINT_COMPANION_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+          if (SsEpComDesc->DescriptorType == USB_DESC_TYPE_SUPERSPEED_ENDPOINT_COMPANION) {
+            if (SsEpComDesc->MaxBurst != 0) {
+              InputContext->EP[Dci-1].MaxPacketSize = 0x400;
+              InputContext->EP[Dci-1].MaxBurstSize  = SsEpComDesc->MaxBurst;
+            }
+          } else {
+            SsEpComDesc = NULL;
+            ZeroMem (&InputContext->EP[Dci-1], sizeof (ENDPOINT_CONTEXT_64));
+            EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+            DEBUG ((DEBUG_ERROR, "ISOCH: Can't find the SuperSpeed Endpoint descriptor.\n"));
+            continue;
+          }
+        }
+
+        //
+        // Set other parameter of ISOCH EP from descriptor for Super Speed.
+        //
+        if (DeviceSpeed == EFI_USB_SPEED_SUPER) {
+          InputContext->EP[Dci-1].Mult = 0;
+          InputContext->EP[Dci-1].CErr = 0;
+          if (SsEpComDesc != NULL) {
+            InputContext->EP[Dci-1].Mult           = SsEpComDesc->Attributes & 0x3;         // Bit[0:1] : Mult
+            InputContext->EP[Dci-1].MaxESITPayload = SsEpComDesc->BytesPerInterval;         // UINT16
+            if ((SsEpComDesc->Attributes & BIT7) != 0) {
+              // Bit7 : SSP ISOCH Companion
+              SspIsoEpComDesc = (USB_SSP_ISOCH_ENDPOINT_COMPANION_DESCRIPTOR *)((UINTN)SsEpComDesc + SsEpComDesc->Length);
+              if (SsEpComDesc->DescriptorType == USB_DESC_TYPE_SUPERSPEEDPLUS_ISOCH_ENDPOINT_COMPANION) {
+                InputContext->EP[Dci-1].MaxESITPayload = (UINT16)(SspIsoEpComDesc->BytesPerInterval & 0xFFFF);          // Max ESIT payload Lo
+                InputContext->EP[Dci-1].RsvdZ2         = (UINT8)((SspIsoEpComDesc->BytesPerInterval >> 16) & 0xFF);     // Max ESIT payload Hi
+              } else {
+                SsEpComDesc     = NULL;
+                SspIsoEpComDesc = NULL;
+                ZeroMem (&InputContext->EP[Dci-1], sizeof (ENDPOINT_CONTEXT_64));
+                EpDesc = (USB_ENDPOINT_DESCRIPTOR *)((UINTN)EpDesc + EpDesc->Length);
+                DEBUG ((DEBUG_ERROR, "ISOCH: Can't find the SuperSpeed Isoch Endpoint descriptor.\n"));
+                continue;
+              }
+            }
+          }
+        }
+
+        if (Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] == NULL) {
+          EndpointTransferRing                                   = AllocateZeroPool (sizeof (TRANSFER_RING));
+          Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1] = (VOID *)EndpointTransferRing;
+          CreateTransferRing (Xhc, TR_RING_TRB_NUMBER, (TRANSFER_RING *)Xhc->UsbDevContext[SlotId].EndpointTransferRing[Dci-1]);
+        }
+
+        SsEpComDesc     = NULL;
+        SspIsoEpComDesc = NULL;
+        break;
+
       case USB_ENDPOINT_INTERRUPT:
         if (Direction == EfiUsbDataIn) {
           InputContext->EP[Dci-1].CErr   = 3;
