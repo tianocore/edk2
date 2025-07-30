@@ -663,7 +663,7 @@ InitializeUsbMouseDevice (
 
   UsbMouseAbsolutePointerDev->Mode.AbsoluteMaxX = 1024;
   UsbMouseAbsolutePointerDev->Mode.AbsoluteMaxY = 1024;
-  UsbMouseAbsolutePointerDev->Mode.AbsoluteMaxZ = 0;
+  UsbMouseAbsolutePointerDev->Mode.AbsoluteMaxZ = 1024;
   UsbMouseAbsolutePointerDev->Mode.AbsoluteMinX = 0;
   UsbMouseAbsolutePointerDev->Mode.AbsoluteMinY = 0;
   UsbMouseAbsolutePointerDev->Mode.AbsoluteMinZ = 0;
