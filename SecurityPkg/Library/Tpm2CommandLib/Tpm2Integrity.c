@@ -773,8 +773,6 @@ Tpm2PcrReadForActiveBank (
   ZeroMem (&PcrValues, sizeof (PcrValues));
   ZeroMem (&Pcrs, sizeof (TPML_PCR_SELECTION));
 
-  DEBUG ((DEBUG_INFO, "ReadPcr - %02d\n", PcrIndex));
-
   //
   // Read TPM capabilities
   //
@@ -868,19 +866,21 @@ Tpm2PcrReadForActiveBank (
     return EFI_DEVICE_ERROR;
   }
 
-  for (Index = 0; Index < PcrValues.count; Index++) {
-    DEBUG ((
-      DEBUG_INFO,
-      "ReadPcr - HashAlg = 0x%04x, Pcr[%02d], digest = ",
-      PcrSelectionOut.pcrSelections[Index].hash,
-      PcrIndex
-      ));
+  if (DebugPrintLevelEnabled (DEBUG_SECURITY)) {
+    for (Index = 0; Index < PcrValues.count; Index++) {
+      DEBUG ((
+        DEBUG_SECURITY,
+        "ReadPcr - HashAlg = 0x%04x, Pcr[%02d], digest = ",
+        PcrSelectionOut.pcrSelections[Index].hash,
+        PcrIndex
+        ));
 
-    for (Index2 = 0; Index2 < PcrValues.digests[Index].size; Index2++) {
-      DEBUG ((DEBUG_INFO, "%02x ", PcrValues.digests[Index].buffer[Index2]));
+      for (Index2 = 0; Index2 < PcrValues.digests[Index].size; Index2++) {
+        DEBUG ((DEBUG_SECURITY, "%02x ", PcrValues.digests[Index].buffer[Index2]));
+      }
+
+      DEBUG ((DEBUG_SECURITY, "\n"));
     }
-
-    DEBUG ((DEBUG_INFO, "\n"));
   }
 
   if (HashList != NULL) {
