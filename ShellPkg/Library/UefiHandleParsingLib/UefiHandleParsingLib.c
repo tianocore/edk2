@@ -2280,7 +2280,6 @@ STATIC CONST GUID_INFO_BLOCK  mGuidStringList[] = {
   { STRING_TOKEN (STR_TCPV4),               &gEfiTcp4ProtocolGuid,                             NULL                                             },
   { STRING_TOKEN (STR_IPV4_SB),             &gEfiIp4ServiceBindingProtocolGuid,                NULL                                             },
   { STRING_TOKEN (STR_IPV4),                &gEfiIp4ProtocolGuid,                              NULL                                             },
-  { STRING_TOKEN (STR_IPV4_CFG),            &gEfiIp4ConfigProtocolGuid,                        NULL                                             },
   { STRING_TOKEN (STR_IPV4_CFG2),           &gEfiIp4Config2ProtocolGuid,                       NULL                                             },
   { STRING_TOKEN (STR_UDPV4_SB),            &gEfiUdp4ServiceBindingProtocolGuid,               NULL                                             },
   { STRING_TOKEN (STR_UDPV4),               &gEfiUdp4ProtocolGuid,                             NULL                                             },
