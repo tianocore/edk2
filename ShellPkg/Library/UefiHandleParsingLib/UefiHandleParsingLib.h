@@ -79,7 +79,6 @@
 #include <Protocol/Dhcp4.h>
 #include <Protocol/Tcp4.h>
 #include <Protocol/Ip4.h>
-#include <Protocol/Ip4Config.h>
 #include <Protocol/Ip4Config2.h>
 #include <Protocol/Udp4.h>
 #include <Protocol/Mtftp4.h>
