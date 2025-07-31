@@ -76,3 +76,23 @@ strcmp (
 {
   return (int)AsciiStrCmp (s1, s2);
 }
+
+/**strpbrk function. **/
+char *
+strpbrk (
+  const char  *s,
+  const char  *accept
+  )
+{
+  int  i;
+
+  for ( ; *s != '\0'; s++) {
+    for (i = 0; accept[i] != '\0'; i++) {
+      if (*s == accept[i]) {
+        return (char *)s;
+      }
+    }
+  }
+
+  return NULL;
+}
