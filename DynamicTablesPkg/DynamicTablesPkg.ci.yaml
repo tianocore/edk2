@@ -54,7 +54,8 @@
             "EmbeddedPkg/EmbeddedPkg.dec",
             "DynamicTablesPkg/DynamicTablesPkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
-            "MdePkg/MdePkg.dec"
+            "MdePkg/MdePkg.dec",
+            "SecurityPkg/SecurityPkg.dec"
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[

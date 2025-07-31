@@ -1352,10 +1352,6 @@
   # @Prompt Enable serial port cable detetion.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialDetectCable|FALSE|BOOLEAN|0x00020006
 
-  ## Base address of 16550 serial port registers in MMIO or I/O space. Default is 0x3F8.
-  # @Prompt Base address of serial port registers.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x03F8|UINT64|0x00020002
-
   ## Baud rate for the 16550 serial port.  Default is 115200 baud.
   # @Prompt Baud rate for serial port.
   # @ValidList  0x80000001 | 921600, 460800, 230400, 115200, 57600, 38400, 19200, 9600, 7200, 4800, 3600, 2400, 2000, 1800, 1200, 600, 300, 150, 134, 110, 75, 50
@@ -1790,6 +1786,11 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions|0x20|UINT32|0x0001004c
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+
+  ## Base address of 16550 serial port registers in MMIO or I/O space. Default is 0x3F8.
+  # @Prompt Base address of serial port registers.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x03F8|UINT64|0x00020002
+
   ## UART clock frequency is for the baud rate configuration.
   # @Prompt Serial Port Clock Rate.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate|1843200|UINT32|0x00010066

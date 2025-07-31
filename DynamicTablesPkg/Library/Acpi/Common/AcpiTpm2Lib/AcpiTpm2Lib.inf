@@ -26,4 +26,9 @@
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
+  AcpiHelperLib
   BaseLib
+  Tpm2DeviceTableLib
+
+[FixedPcd]
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdGenTpm2DeviceTable

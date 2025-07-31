@@ -237,11 +237,20 @@ class FvHandler:
                 Size_delta = len(CompressedData) - len(TargetTree.Data.OriData)
                 ChangeSize(TargetTree, -Size_delta)
                 if TargetTree.NextRel:
+                    Original_Pad_Size = len(TargetTree.Data.PadData)
                     TargetTree.Data.PadData = b'\x00' * New_Pad_Size
-                    self.Remain_New_Free_Space = len(TargetTree.Data.OriData) + len(TargetTree.Data.PadData) - len(CompressedData) - New_Pad_Size
+                    self.Remain_New_Free_Space = (
+                        len(TargetTree.Data.OriData) +
+                        Original_Pad_Size -
+                        len(CompressedData) -
+                        New_Pad_Size
+                    )
                 else:
                     TargetTree.Data.PadData = b''
-                    self.Remain_New_Free_Space = len(TargetTree.Data.OriData) - len(CompressedData)
+                    self.Remain_New_Free_Space = (
+                        len(TargetTree.Data.OriData) -
+                        len(CompressedData)
+                    )
                 TargetTree.Data.OriData = CompressedData
             elif len(CompressedData) == len(TargetTree.Data.OriData):
                 TargetTree.Data.OriData = CompressedData
@@ -347,15 +356,24 @@ class FvHandler:
                     ModifySectionType(ParTree)
                     Needed_Space += ParTree.Data.HeaderLength - OriHeaderLen
                     # Update needed space with Delta_Pad_Size
+                    Original_Pad_Size = len(ParTree.Data.PadData)
                     if ParTree.NextRel:
                         New_Pad_Size = GetPadSize(ParTree.Data.Size, SECTION_COMMON_ALIGNMENT)
-                        Delta_Pad_Size = New_Pad_Size - len(ParTree.Data.PadData)
+                        Delta_Pad_Size = New_Pad_Size - Original_Pad_Size
                         ParTree.Data.PadData = b'\x00' * New_Pad_Size
                         Needed_Space += Delta_Pad_Size
                     else:
                         ParTree.Data.PadData = b''
                     if Needed_Space < 0:
-                        self.Remain_New_Free_Space = len(ParTree.Data.OriData) - len(CompressedData)
+                        if ParTree.NextRel:
+                            self.Remain_New_Free_Space = (
+                                len(ParTree.Data.OriData) + Original_Pad_Size -
+                                len(CompressedData) - New_Pad_Size
+                            )
+                        else:
+                            self.Remain_New_Free_Space = (
+                                len(ParTree.Data.OriData) - len(CompressedData)
+                            )
                 # If current section is not guided section
                 elif Needed_Space:
                     ChangeSize(ParTree, -Needed_Space)
