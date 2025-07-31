@@ -1655,6 +1655,17 @@ XhcMonitorAsyncRequests (
   Xhc = (USB_XHCI_INSTANCE *)Context;
 
   BASE_LIST_FOR_EACH_SAFE (Entry, Next, &Xhc->AsyncIntTransfers) {
+    //
+    // Save values passed into the callback.
+    // `XhcUpdateAsyncRequest` must be called before the callback
+    // since the callback may free the URB, leading to a fault.
+    // However, the callback depends on values of the URB *before*
+    // `XhcUpdateAsyncRequest` is called, so we must save a copy.
+    //
+    UINTN   cbCompleted;
+    UINT32  cbResult;
+    VOID    *cbContext;
+
     Urb = EFI_LIST_CONTAINER (Entry, URB, UrbList);
 
     //
@@ -1707,6 +1718,19 @@ XhcMonitorAsyncRequests (
     }
 
     //
+    // Store values of URB before `XhcUpdateAsyncRequest`, since the callback depends on these values.
+    //
+    cbCompleted = Urb->Completed;
+    cbResult    = Urb->Result;
+    cbContext   = Urb->Context;
+
+    //
+    // The update call must occur before the callback since the callback
+    // may remove and free the URB, leading to a fault.
+    //
+    XhcUpdateAsyncRequest (Xhc, Urb);
+
+    //
     // Leave error recovery to its related device driver. A
     // common case of the error recovery is to re-submit the
     // interrupt transfer which is linked to the head of the
@@ -1722,15 +1746,13 @@ XhcMonitorAsyncRequests (
       // his callback. Some drivers may has a lower TPL restriction.
       //
       gBS->RestoreTPL (OldTpl);
-      (Urb->Callback)(ProcBuf, Urb->Completed, Urb->Context, Urb->Result);
+      (Urb->Callback)(ProcBuf, cbCompleted, cbContext, cbResult);
       OldTpl = gBS->RaiseTPL (XHC_TPL);
     }
 
     if (ProcBuf != NULL) {
       gBS->FreePool (ProcBuf);
     }
-
-    XhcUpdateAsyncRequest (Xhc, Urb);
   }
   gBS->RestoreTPL (OldTpl);
 }
