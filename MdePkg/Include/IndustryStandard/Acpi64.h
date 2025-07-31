@@ -2208,6 +2208,15 @@ typedef struct {
 } EFI_ACPI_6_4_HMAT_STRUCTURE_SYSTEM_LOCALITY_LATENCY_AND_BANDWIDTH_INFO;
 
 ///
+/// System Locality Latency and Bandwidth Dynamic Information Structure
+///
+typedef struct {
+  UINT32 *InitiatorProximityDomainList;
+  UINT32 *TargetProximityDomainList;
+  UINT16 *RelativeDistanceEntry;
+} EFI_ACPI_6_4_HMAT_STRUCTURE_SYSTEM_LOCALITY_LATENCY_AND_BANDWIDTH_DYNAMIC_INFO;
+
+///
 /// Memory Side Cache Information Structure cache attributes
 ///
 typedef struct {
@@ -2232,6 +2241,13 @@ typedef struct {
   UINT8                                                                  Reserved2[2];
   UINT16                                                                 NumberOfSmbiosHandles;
 } EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO;
+
+///
+/// Memory Side Cache Dynamic Information Structure
+///
+typedef struct {
+  UINT16 *SmbiosHandles;
+} EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_DYNAMIC_INFO;
 
 ///
 /// ERST - Error Record Serialization Table
