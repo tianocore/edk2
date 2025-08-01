@@ -46,7 +46,11 @@ Mtftp6RrqSendAck (
                                sizeof (EFI_MTFTP6_ACK_HEADER),
                                FALSE
                                );
-  ASSERT (Ack != NULL);
+  if (Ack == NULL) {
+    NetbufFree (Packet);
+    ASSERT (Ack != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   Ack->Ack.OpCode   = HTONS (EFI_MTFTP6_OPCODE_ACK);
   Ack->Ack.Block[0] = HTONS (BlockNum);
@@ -758,7 +762,11 @@ Mtftp6RrqInput (
     NetbufCopy (UdpPacket, 0, Len, (UINT8 *)Packet);
   } else {
     Packet = (EFI_MTFTP6_PACKET *)NetbufGetByte (UdpPacket, 0, NULL);
-    ASSERT (Packet != NULL);
+    if (Packet == NULL) {
+      ASSERT (Packet != NULL);
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ON_EXIT;
+    }
   }
 
   Opcode = NTOHS (Packet->OpCode);

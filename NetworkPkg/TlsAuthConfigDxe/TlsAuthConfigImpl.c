@@ -127,7 +127,7 @@ UpdateDeletePage (
   )
 {
   EFI_STATUS          Status;
-  UINT32              Index;
+  UINTN               Index;
   UINTN               CertCount;
   UINTN               GuidIndex;
   VOID                *StartOpCodeHandle;
@@ -318,7 +318,7 @@ DeleteCert (
   UINT8               *Data;
   UINT8               *OldData;
   UINT32              Attr;
-  UINT32              Index;
+  UINTN               Index;
   EFI_SIGNATURE_LIST  *CertList;
   EFI_SIGNATURE_LIST  *NewCertList;
   EFI_SIGNATURE_DATA  *Cert;
@@ -614,7 +614,11 @@ ExtractFileNameFromDevicePath (
 
   ASSERT (DevicePath != NULL);
 
-  String      = DevicePathToStr (DevicePath);
+  String = DevicePathToStr (DevicePath);
+  if (String == NULL) {
+    return NULL;
+  }
+
   MatchString = String;
   LastMatch   = String;
   FileName    = NULL;
@@ -1225,9 +1229,18 @@ TlsAuthConfigAccessExtractConfig (
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
     ConfigRequestHdr = HiiConstructConfigHdr (&gTlsAuthConfigGuid, mTlsAuthConfigStorageName, Private->DriverHandle);
-    Size             = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
-    ConfigRequest    = AllocateZeroPool (Size);
-    ASSERT (ConfigRequest != NULL);
+    if (ConfigRequestHdr == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    Size          = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest = AllocateZeroPool (Size);
+    if (ConfigRequest == NULL) {
+      ASSERT (ConfigRequest != NULL);
+      FreePool (ConfigRequestHdr);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     AllocatedRequest = TRUE;
     UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
     FreePool (ConfigRequestHdr);

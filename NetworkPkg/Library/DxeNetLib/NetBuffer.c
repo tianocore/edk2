@@ -303,6 +303,11 @@ NetbufDuplicate (
   NetbufReserve (Duplicate, HeadSpace);
 
   Dst = NetbufAllocSpace (Duplicate, Nbuf->TotalSize, NET_BUF_TAIL);
+  if (Dst == NULL) {
+    ASSERT (Dst != NULL);
+    return NULL;
+  }
+
   NetbufCopy (Nbuf, 0, Nbuf->TotalSize, Dst);
 
   return Duplicate;
