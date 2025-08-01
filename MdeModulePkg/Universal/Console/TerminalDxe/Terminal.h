@@ -4,6 +4,7 @@
 Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 Copyright (C) 2016 Silicon Graphics, Inc. All rights reserved.<BR>
+Copyright (c) 2025, Loongson Technology Corporation Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -17,6 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/PcAnsi.h>
 #include <Guid/TtyTerm.h>
 #include <Guid/StatusCodeDataTypeVariable.h>
+#include <Guid/MdeModuleHii.h>
 
 #include <Protocol/SimpleTextOut.h>
 #include <Protocol/SerialIo.h>

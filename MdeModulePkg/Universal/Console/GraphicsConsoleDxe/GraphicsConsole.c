@@ -2,6 +2,7 @@
   This is the main routine for initializing the Graphics Console support routines.
 
 Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2025, Loongson Technology Corporation Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1095,6 +1096,14 @@ GraphicsConsoleConOutTestString (
   Count = 0;
 
   while (WString[Count] != 0) {
+    //
+    // In TerminalConOutOutputString(), WIDE_CHAR/NARROW_CHAR will be ignored.
+    // So, WString contains WIDE_CHAR/NARROW_CHAR is also valid.
+    //
+    if ((WString[Count] == WIDE_CHAR) || (WString[Count] == NARROW_CHAR)) {
+      continue;
+    }
+
     Status = mHiiFont->GetGlyph (
                          mHiiFont,
                          WString[Count],
