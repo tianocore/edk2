@@ -1,19 +1,22 @@
-/** @file -- Tpm2DeviceLibDTpmDump.c
-This file contains helper functions to perform a detailed debugging of
-TPM transactions as they go to and from the TPM device.
+/** @file -- Tpm2DumpLib.c
 
-Copyright (c) Microsoft Corporation.
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  This lib contains helper functions to perform a detailed debugging of
+  TPM transactions as they go to and from the TPM device.
+
+  Copyright (c) Microsoft Corporation.
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include <Uefi.h>
 #include <Library/DebugLib.h>
+#include <Library/IoLib.h>
 #include <Library/BaseLib.h>
+#include <Library/Tpm2DeviceLib.h>
+#include <Library/Tpm2DumpLib.h>
 
 #include <IndustryStandard/Tpm20.h>
-
-#include "Tpm2Ptp.h"
+#include <IndustryStandard/TpmPtp.h>
 
 #define MAX_TPM_BUFFER_DUMP  240          // If printing an entire buffer, only print up to MAX bytes.
 
@@ -733,4 +736,89 @@ DumpTpmOutputBlock (
   DEBUG ((DEBUG_SECURITY, "=== END TPM COMMAND ===\n\n"));
 
   return;
+}
+
+/**
+  Dump PTP register information.
+
+  @param[in] Register                Pointer to PTP register.
+  @param[in] PtpInterface            Type of the PTP interface.
+**/
+VOID
+EFIAPI
+DumpPtpInfo (
+  IN VOID                     *Register,
+  IN TPM2_PTP_INTERFACE_TYPE  PtpInterface
+  )
+{
+  PTP_CRB_INTERFACE_IDENTIFIER   InterfaceId;
+  PTP_FIFO_INTERFACE_CAPABILITY  InterfaceCapability;
+  UINT8                          StatusEx;
+  UINT16                         Vid;
+  UINT16                         Did;
+  UINT8                          Rid;
+
+  if (MmioRead8 ((UINTN)Register) == 0xFF) {
+    //
+    // No TPM PTP register
+    //
+    return;
+  }
+
+  InterfaceId.Uint32         = MmioRead32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId);
+  InterfaceCapability.Uint32 = MmioRead32 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->InterfaceCapability);
+  StatusEx                   = MmioRead8 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->StatusEx);
+
+  //
+  // Dump InterfaceId Register for PTP
+  //
+  DEBUG ((DEBUG_SECURITY, "InterfaceId - 0x%08x\n", InterfaceId.Uint32));
+  DEBUG ((DEBUG_SECURITY, "  InterfaceType    - 0x%02x\n", InterfaceId.Bits.InterfaceType));
+  if (InterfaceId.Bits.InterfaceType != PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_TIS) {
+    DEBUG ((DEBUG_SECURITY, "  InterfaceVersion - 0x%02x\n", InterfaceId.Bits.InterfaceVersion));
+    DEBUG ((DEBUG_SECURITY, "  CapFIFO          - 0x%x\n", InterfaceId.Bits.CapFIFO));
+    DEBUG ((DEBUG_SECURITY, "  CapCRB           - 0x%x\n", InterfaceId.Bits.CapCRB));
+  }
+
+  //
+  // Dump Capability Register for TIS and FIFO
+  //
+  DEBUG ((DEBUG_SECURITY, "InterfaceCapability - 0x%08x\n", InterfaceCapability.Uint32));
+  if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_TIS) ||
+      (InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_FIFO))
+  {
+    DEBUG ((DEBUG_SECURITY, "  InterfaceVersion - 0x%x\n", InterfaceCapability.Bits.InterfaceVersion));
+  }
+
+  //
+  // Dump StatusEx Register for PTP FIFO
+  //
+  DEBUG ((DEBUG_SECURITY, "StatusEx - 0x%02x\n", StatusEx));
+  if (InterfaceCapability.Bits.InterfaceVersion == INTERFACE_CAPABILITY_INTERFACE_VERSION_PTP) {
+    DEBUG ((DEBUG_SECURITY, "  TpmFamily - 0x%x\n", (StatusEx & PTP_FIFO_STS_EX_TPM_FAMILY) >> PTP_FIFO_STS_EX_TPM_FAMILY_OFFSET));
+  }
+
+  Vid = 0xFFFF;
+  Did = 0xFFFF;
+  Rid = 0xFF;
+  DEBUG ((DEBUG_SECURITY, "PtpInterface - %x\n", PtpInterface));
+  switch (PtpInterface) {
+    case Tpm2PtpInterfaceCrb:
+      Vid = MmioRead16 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->Vid);
+      Did = MmioRead16 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->Did);
+      Rid = (UINT8)InterfaceId.Bits.Rid;
+      break;
+    case Tpm2PtpInterfaceFifo:
+    case Tpm2PtpInterfaceTis:
+      Vid = MmioRead16 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->Vid);
+      Did = MmioRead16 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->Did);
+      Rid = MmioRead8 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->Rid);
+      break;
+    default:
+      break;
+  }
+
+  DEBUG ((DEBUG_SECURITY, "VID - 0x%04x\n", Vid));
+  DEBUG ((DEBUG_SECURITY, "DID - 0x%04x\n", Did));
+  DEBUG ((DEBUG_SECURITY, "RID - 0x%02x\n", Rid));
 }

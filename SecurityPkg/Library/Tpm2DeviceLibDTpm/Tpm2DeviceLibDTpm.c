@@ -90,5 +90,5 @@ Tpm2DeviceLibConstructor (
   VOID
   )
 {
-  return InternalTpm2DeviceLibDTpmCommonConstructor ();
+  return InternalTpm2DeviceLibDTpmCommonConstructor (NULL);
 }
