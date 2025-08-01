@@ -35,7 +35,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_MEMORY_TYPE_INFORMATION  mDefaultMemoryTypeInf
   { EfiMaxMemoryType,       0                                                   }
 };
 
-extern VOID  *mHobList;
+extern VOID              *mHobList;
+EFI_HOB_FIRMWARE_VOLUME  *mDxeFvHob = NULL;
 
 CHAR8  *mLineBuffer = NULL;
 
@@ -409,19 +410,18 @@ CreatNewHobForHoblist (
 /**
   It will build HOBs based on information from bootloaders.
   @param[in]  NewFdtBase     The pointer to New FdtBase.
-  @param[out] DxeFv          The pointer to the DXE FV in memory.
   @retval EFI_SUCCESS        If it completed successfully.
   @retval Others             If it failed to build required HOBs.
 **/
-EFI_STATUS
+VOID
 FitBuildHobs (
-  IN  UINTN                       NewFdtBase,
-  OUT EFI_FIRMWARE_VOLUME_HEADER  **DxeFv
+  IN  UINTN  NewFdtBase
   )
 {
   UINT8                          *GuidHob;
   UINT32                         FdtSize;
-  EFI_HOB_FIRMWARE_VOLUME        *FvHob;
+  EFI_FIRMWARE_VOLUME_HEADER     *DxeFv;
+  EFI_STATUS                     Status;
   UNIVERSAL_PAYLOAD_ACPI_TABLE   *AcpiTable;
   ACPI_BOARD_INFO                *AcpiBoardInfo;
   UNIVERSAL_PAYLOAD_DEVICE_TREE  *Fdt;
@@ -470,19 +470,15 @@ FitBuildHobs (
   }
 
   //
-  // Create an empty FvHob for the DXE FV that contains DXE core.
-  //
-  BuildFvHob ((EFI_PHYSICAL_ADDRESS)0, 0);
-
-  BuildFitLoadablesFvHob (DxeFv);
-  //
   // Update DXE FV information to first fv hob in the hob list, which
   // is the empty FvHob created before.
   //
-  FvHob              = GetFirstHob (EFI_HOB_TYPE_FV);
-  FvHob->BaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)*DxeFv;
-  FvHob->Length      = (*DxeFv)->FvLength;
-  return EFI_SUCCESS;
+  Status = BuildFitLoadablesFvHob (&DxeFv);
+  if (!EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "UPL FVs found by parsing FIT header\n"));
+    mDxeFvHob->BaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)DxeFv;
+    mDxeFvHob->Length      = DxeFv->FvLength;
+  }
 }
 
 /**
@@ -496,16 +492,14 @@ FitUplEntryPoint (
   IN UINTN  BootloaderParameter
   )
 {
-  EFI_STATUS                  Status;
-  PHYSICAL_ADDRESS            DxeCoreEntryPoint;
-  EFI_PEI_HOB_POINTERS        Hob;
-  EFI_FIRMWARE_VOLUME_HEADER  *DxeFv;
-
- #if FixedPcdGetBool (PcdHandOffFdtEnable) == 1
+  VOID                     *FdtBaseResvd;
+  EFI_STATUS               Status;
+  PHYSICAL_ADDRESS         DxeCoreEntryPoint;
+  EFI_PEI_HOB_POINTERS     Hob;
+#if FixedPcdGetBool (PcdHandOffFdtEnable) == 1
   PHYSICAL_ADDRESS  HobListPtr;
   VOID              *FdtBase;
- #endif
-  VOID  *FdtBaseResvd;
+#endif
 
   if (FixedPcdGetBool (PcdHandOffFdtEnable)) {
     mHobList = (VOID *)NULL;
@@ -513,7 +507,6 @@ FitUplEntryPoint (
     mHobList = (VOID *)BootloaderParameter;
   }
 
-  DxeFv        = NULL;
   FdtBaseResvd = 0;
   // Call constructor for all libraries
   ProcessLibraryConstructorList ();
@@ -522,7 +515,8 @@ FitUplEntryPoint (
   DEBUG ((DEBUG_INFO, "sizeof(UINTN) = 0x%x\n", sizeof (UINTN)));
   DEBUG ((DEBUG_INFO, "BootloaderParameter = 0x%x\n", BootloaderParameter));
 
-  DEBUG ((DEBUG_INFO, "Start init Hobs...\n"));
+  DEBUG ((DEBUG_INFO, "Start init HOBs...\n"));
+
  #if FixedPcdGetBool (PcdHandOffFdtEnable) == 1
   HobListPtr = UplInitHob ((VOID *)BootloaderParameter);
 
@@ -542,7 +536,7 @@ FitUplEntryPoint (
  #endif
 
   // Build HOB based on information from Bootloader
-  Status = FitBuildHobs ((UINTN)FdtBaseResvd, &DxeFv);
+  FitBuildHobs ((UINTN)FdtBaseResvd);
 
   // Call constructor for all libraries again since hobs were built
   ProcessLibraryConstructorList ();
@@ -554,8 +548,8 @@ FitUplEntryPoint (
     PrintHob (mHobList);
     );
 
-  FixUpPcdDatabase (DxeFv);
-  Status = UniversalLoadDxeCore (DxeFv, &DxeCoreEntryPoint);
+  FixUpPcdDatabase ((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)mDxeFvHob->BaseAddress);
+  Status = UniversalLoadDxeCore ((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)mDxeFvHob->BaseAddress, &DxeCoreEntryPoint);
   ASSERT_EFI_ERROR (Status);
 
   Hob.HandoffInformationTable = (EFI_HOB_HANDOFF_INFO_TABLE *)GetFirstHob (EFI_HOB_TYPE_HANDOFF);
