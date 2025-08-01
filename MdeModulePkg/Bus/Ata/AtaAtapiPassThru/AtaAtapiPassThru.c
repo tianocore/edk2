@@ -712,7 +712,7 @@ AtaAtapiPassThruStart (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Get Pci_Io Protocol Error, Status=%r", Status));
+    DEBUG ((DEBUG_ERROR, "Get Pci_Io Protocol Error, Status=%r\n", Status));
     goto ErrorExit;
   }
 
