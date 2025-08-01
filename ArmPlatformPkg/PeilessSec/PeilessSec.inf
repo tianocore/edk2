@@ -49,6 +49,7 @@
   PrePiHobListPointerLib
   PrePiLib
   PrintLib
+  PeilessSecMeasureLib
   SerialPortLib
   TimerLib
   StackCheckLib
