@@ -14,7 +14,7 @@
   FILE_GUID                      = 953ff472-9b9e-4058-84cf-227daf89dc82
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  ENTRY_POINT                    = GicV3DxeInitialize
+  ENTRY_POINT                    = GicDxeInitialize
 
 [Sources.common]
   ArmGicCommonDxe.c
