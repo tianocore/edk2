@@ -1,0 +1,21 @@
+## @file
+# CodeQL Result Filters to suppress
+#
+# Note:
+#    It is recommended paths begin with `**/`. This enables filtering of the
+#    files that may result in projects placing edk2 as a subfolder in the
+#    project.
+#
+# Copyright (c) Microsoft Corporation
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+{
+  "Filters":
+    [
+      "-**/MdeModulePkg/Universal/EbcDxe/EbcDebugger/EdbCmdBreakpoint.c:cpp/missing-null-test",
+      "-**/MdeModulePkg/Core/Pei/FwVol/FwVol.c:cpp/missing-null-test",
+      "-**/MdeModulePkg/Bus/Ufs/UfsBlockIoPei/UfsHci.c:cpp/missing-null-test",
+      "-**/MdeModulePkg/Universal/RegularExpressionDxe/oniguruma/src/**/*:**",
+    ]
+}

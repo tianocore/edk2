@@ -13,7 +13,6 @@ from edk2toolext.invocables.edk2_ci_build import CiBuildSettingsManager
 from edk2toolext.invocables.edk2_setup import SetupSettingsManager, RequiredSubmodule
 from edk2toolext.invocables.edk2_update import UpdateSettingsManager
 from edk2toolext.invocables.edk2_pr_eval import PrEvalSettingsManager
-from edk2toollib.utility_functions import GetHostInfo
 from pathlib import Path
 
 
@@ -174,6 +173,11 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
                     shell_environment.GetBuildVars().SetValue(
                         "STUART_CODEQL_AUDIT_ONLY",
                         "TRUE",
+                        "Set in CISettings.py")
+                    shell_environment.GetBuildVars().SetValue(
+                        "STUART_CODEQL_FILTER_FILES",
+                        os.path.join(self.GetWorkspaceRoot(),
+                                     "CodeQlFilters.yml"),
                         "Set in CISettings.py")
             except NameError:
                 pass

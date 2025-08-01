@@ -456,7 +456,7 @@ EhcCreateQtds (
   //
   // Insert the status packet for control transfer
   //
-  if (Ep->Type == EHC_CTRL_TRANSFER) {
+  if ((Ep->Type == EHC_CTRL_TRANSFER) && (StatusQtd != NULL)) {
     InsertTailList (&Qh->Qtds, &StatusQtd->QtdList);
   }
 

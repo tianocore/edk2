@@ -21,6 +21,7 @@
 #include <Library/PciLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/SafeIntLib.h> // MU_CHANGE - CodeQL Change - Enable SafeIntLib usage
 
 #define SD_MMC_HC_PEI_SIGNATURE  SIGNATURE_32 ('S', 'D', 'M', 'C')
 

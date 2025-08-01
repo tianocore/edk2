@@ -289,6 +289,8 @@ PciIoMemRead (
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Desc;
   EFI_STATUS                         Status;
 
+  Desc = NULL;
+
   if (Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -376,6 +378,8 @@ PciIoMemWrite (
   VOID                               *Address;
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Desc;
   EFI_STATUS                         Status;
+
+  Desc = NULL; // MS_CHANGE for vs2017
 
   if (Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1008,7 +1012,7 @@ NonCoherentPciIoFreeBuffer (
     }
   }
 
-  if (!Found) {
+  if (!Found || (Alloc == NULL)) {
     ASSERT_EFI_ERROR (EFI_NOT_FOUND);
     return EFI_NOT_FOUND;
   }
@@ -1111,7 +1115,8 @@ NonCoherentPciIoAllocateBuffer (
   NON_DISCOVERABLE_DEVICE_UNCACHED_ALLOCATION  *Alloc;
   VOID                                         *AllocAddress;
 
-  MemType = EFI_MEMORY_XP;
+  MemType      = EFI_MEMORY_XP;
+  AllocAddress = NULL; // MS_CHANGE for vs2017
 
   if (HostAddress == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1272,6 +1277,8 @@ NonCoherentPciIoMap (
   VOID                                  *AllocAddress;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR       GcdDescriptor;
   BOOLEAN                               Bounce;
+
+  AllocAddress = NULL; // MS_CHANGE for vs2017
 
   if ((HostAddress   == NULL) ||
       (NumberOfBytes == NULL) ||
@@ -1639,6 +1646,8 @@ PciIoGetBarAttributes (
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *BarDesc;
   EFI_ACPI_END_TAG_DESCRIPTOR        *End;
   EFI_STATUS                         Status;
+
+  BarDesc = NULL; // MS_CHANGE for vs2017
 
   if ((Supports == NULL) && (Resources == NULL)) {
     return EFI_INVALID_PARAMETER;

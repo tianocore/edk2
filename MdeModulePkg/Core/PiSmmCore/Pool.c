@@ -210,8 +210,11 @@ InternalFreePoolByIndex (
   FreePoolHdr->Header.Signature = 0;
   FreePoolHdr->Header.Available = TRUE;
   FreePoolHdr->Header.Type      = 0;
-  PoolTail->Signature           = 0;
-  PoolTail->Size                = 0;
+  if (PoolTail != NULL) {
+    PoolTail->Signature = 0;
+    PoolTail->Size      = 0;
+  }
+
   ASSERT (PoolIndex < MAX_POOL_INDEX);
   InsertHeadList (&mSmmPoolLists[SmmPoolType][PoolIndex], &FreePoolHdr->Link);
   return EFI_SUCCESS;

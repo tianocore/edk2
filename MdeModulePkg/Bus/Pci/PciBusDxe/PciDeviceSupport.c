@@ -772,7 +772,11 @@ StartPciDevices (
   LIST_ENTRY     *CurrentLink;
 
   RootBridge = GetRootBridgeByHandle (Controller);
-  ASSERT (RootBridge != NULL);
+  if (RootBridge == NULL ) {
+    ASSERT (RootBridge != NULL);
+    return EFI_NOT_READY;
+  }
+
   ThisHostBridge = RootBridge->PciRootBridgeIo->ParentHandle;
 
   CurrentLink = mPciDevicePool.ForwardLink;

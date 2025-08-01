@@ -360,9 +360,12 @@ UpdateFvFileDevicePath (
     // Build the shell device path
     //
     NewDevicePath = DevicePathFromHandle (FoundFvHandle);
-    EfiInitializeFwVolDevicepathNode (&FvFileNode, FileGuid);
-    NewDevicePath = AppendDevicePathNode (NewDevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&FvFileNode);
-    *DevicePath   = NewDevicePath;
+    if (NewDevicePath != NULL) {
+      EfiInitializeFwVolDevicepathNode (&FvFileNode, FileGuid);
+      NewDevicePath = AppendDevicePathNode (NewDevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&FvFileNode);
+      *DevicePath   = NewDevicePath;
+    }
+
     return EFI_SUCCESS;
   }
 
@@ -1309,7 +1312,7 @@ GetDriverFromMapping (
     OverrideItemListIndex = GetNextNode (MappingDataBase, OverrideItemListIndex);
   }
 
-  if (!ControllerFound) {
+  if (!ControllerFound || (OverrideItem == NULL)) {
     return EFI_NOT_FOUND;
   }
 
@@ -1640,7 +1643,7 @@ CheckMapping (
     OverrideItemListIndex = GetNextNode (MappingDataBase, OverrideItemListIndex);
   }
 
-  if (!Found) {
+  if (!Found || (OverrideItem == NULL)) {
     //
     // ControllerDevicePath is not in MappingDataBase
     //
@@ -1717,6 +1720,7 @@ CheckMapping (
                                    recorded into the mapping database.
   @retval EFI_SUCCESS              The Controller and DriverImage are inserted into
                                    the mapping database successfully.
+  @retval EFI_OUT_OF_RESOURCES     Could not allocate a required resource.
 
 **/
 EFI_STATUS
@@ -1795,18 +1799,30 @@ InsertDriverImage (
   //
   if (!Found) {
     OverrideItem = AllocateZeroPool (sizeof (PLATFORM_OVERRIDE_ITEM));
-    ASSERT (OverrideItem != NULL);
+    if (OverrideItem == NULL) {
+      ASSERT (OverrideItem != NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     OverrideItem->Signature            = PLATFORM_OVERRIDE_ITEM_SIGNATURE;
     OverrideItem->ControllerDevicePath = DuplicateDevicePath (ControllerDevicePath);
     InitializeListHead (&OverrideItem->DriverInfoList);
     InsertTailList (MappingDataBase, &OverrideItem->Link);
   }
 
+  if (OverrideItem == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
   //
   // Prepare the driver image related DRIVER_IMAGE_INFO structure.
   //
   DriverImageInfo = AllocateZeroPool (sizeof (DRIVER_IMAGE_INFO));
-  ASSERT (DriverImageInfo != NULL);
+  if (DriverImageInfo == NULL) {
+    ASSERT (DriverImageInfo != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   DriverImageInfo->Signature       = DRIVER_IMAGE_INFO_SIGNATURE;
   DriverImageInfo->DriverImagePath = DuplicateDevicePath (DriverImageDevicePath);
   //
@@ -1919,60 +1935,62 @@ DeleteDriverImage (
     OverrideItemListIndex = GetNextNode (MappingDataBase, OverrideItemListIndex);
   }
 
-  ASSERT (Found);
-  ASSERT (OverrideItem->DriverInfoNum != 0);
+  if (Found) {
+    Found = FALSE;
 
-  Found              = FALSE;
-  ImageInfoListIndex = GetFirstNode (&OverrideItem->DriverInfoList);
-  while (!IsNull (&OverrideItem->DriverInfoList, ImageInfoListIndex)) {
-    DriverImageInfo    = CR (ImageInfoListIndex, DRIVER_IMAGE_INFO, Link, DRIVER_IMAGE_INFO_SIGNATURE);
-    ImageInfoListIndex = GetNextNode (&OverrideItem->DriverInfoList, ImageInfoListIndex);
-    if (DriverImageDevicePath != NULL) {
-      //
-      // Search for the specified DriverImageDevicePath and remove it, then break.
-      //
-      DevicePathSize = GetDevicePathSize (DriverImageDevicePath);
-      if (DevicePathSize == GetDevicePathSize (DriverImageInfo->DriverImagePath)) {
-        if (CompareMem (
-              DriverImageDevicePath,
-              DriverImageInfo->DriverImagePath,
-              GetDevicePathSize (DriverImageInfo->DriverImagePath)
-              ) == 0
-            )
-        {
+    if ((OverrideItem != NULL) && (OverrideItem->DriverInfoNum != 0)) {
+      ImageInfoListIndex = GetFirstNode (&OverrideItem->DriverInfoList);
+      while (!IsNull (&OverrideItem->DriverInfoList, ImageInfoListIndex)) {
+        DriverImageInfo    = CR (ImageInfoListIndex, DRIVER_IMAGE_INFO, Link, DRIVER_IMAGE_INFO_SIGNATURE);
+        ImageInfoListIndex = GetNextNode (&OverrideItem->DriverInfoList, ImageInfoListIndex);
+        if (DriverImageDevicePath != NULL) {
+          //
+          // Search for the specified DriverImageDevicePath and remove it, then break.
+          //
+          DevicePathSize = GetDevicePathSize (DriverImageDevicePath);
+          if (DevicePathSize == GetDevicePathSize (DriverImageInfo->DriverImagePath)) {
+            if (CompareMem (
+                  DriverImageDevicePath,
+                  DriverImageInfo->DriverImagePath,
+                  GetDevicePathSize (DriverImageInfo->DriverImagePath)
+                  ) == 0
+                )
+            {
+              Found = TRUE;
+              FreePool (DriverImageInfo->DriverImagePath);
+              RemoveEntryList (&DriverImageInfo->Link);
+              OverrideItem->DriverInfoNum--;
+              break;
+            }
+          }
+        } else {
+          //
+          // Remove all existing driver image info entries, so no break here.
+          //
           Found = TRUE;
           FreePool (DriverImageInfo->DriverImagePath);
           RemoveEntryList (&DriverImageInfo->Link);
           OverrideItem->DriverInfoNum--;
-          break;
         }
       }
-    } else {
+
       //
-      // Remove all existing driver image info entries, so no break here.
+      // Confirm all driver image info entries have been removed,
+      // if DriverImageDevicePath is NULL.
       //
-      Found = TRUE;
-      FreePool (DriverImageInfo->DriverImagePath);
-      RemoveEntryList (&DriverImageInfo->Link);
-      OverrideItem->DriverInfoNum--;
+      if (DriverImageDevicePath == NULL) {
+        ASSERT (OverrideItem->DriverInfoNum == 0);
+      }
+
+      //
+      // If Override Item has no driver image info entry, then delete this item.
+      //
+      if (OverrideItem->DriverInfoNum == 0) {
+        FreePool (OverrideItem->ControllerDevicePath);
+        RemoveEntryList (&OverrideItem->Link);
+        FreePool (OverrideItem);
+      }
     }
-  }
-
-  //
-  // Confirm all driver image info entries have been removed,
-  // if DriverImageDevicePath is NULL.
-  //
-  if (DriverImageDevicePath == NULL) {
-    ASSERT (OverrideItem->DriverInfoNum == 0);
-  }
-
-  //
-  // If Override Item has no driver image info entry, then delete this item.
-  //
-  if (OverrideItem->DriverInfoNum == 0) {
-    FreePool (OverrideItem->ControllerDevicePath);
-    RemoveEntryList (&OverrideItem->Link);
-    FreePool (OverrideItem);
   }
 
   if (!Found) {
