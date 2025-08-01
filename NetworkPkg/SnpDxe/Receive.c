@@ -58,28 +58,28 @@ PxeReceive (
 
   Cpb->reserved = 0;
 
-  Snp->Cdb.OpCode  = PXE_OPCODE_RECEIVE;
-  Snp->Cdb.OpFlags = PXE_OPFLAGS_NOT_USED;
+  Snp->Cdb->OpCode  = PXE_OPCODE_RECEIVE;
+  Snp->Cdb->OpFlags = PXE_OPFLAGS_NOT_USED;
 
-  Snp->Cdb.CPBsize = (UINT16)sizeof (PXE_CPB_RECEIVE);
-  Snp->Cdb.CPBaddr = (UINT64)(UINTN)Cpb;
+  Snp->Cdb->CPBsize = (UINT16)sizeof (PXE_CPB_RECEIVE);
+  Snp->Cdb->CPBaddr = (UINT64)(UINTN)Cpb;
 
-  Snp->Cdb.DBsize = (UINT16)sizeof (PXE_DB_RECEIVE);
-  Snp->Cdb.DBaddr = (UINT64)(UINTN)Db;
+  Snp->Cdb->DBsize = (UINT16)sizeof (PXE_DB_RECEIVE);
+  Snp->Cdb->DBaddr = (UINT64)(UINTN)Db;
 
-  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum     = Snp->IfNum;
-  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb->StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb->StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb->IFnum     = Snp->IfNum;
+  Snp->Cdb->Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command and check result.
   //
   DEBUG ((DEBUG_NET, "\nsnp->undi.receive ()  "));
 
-  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)Snp->Cdb);
 
-  switch (Snp->Cdb.StatCode) {
+  switch (Snp->Cdb->StatCode) {
     case PXE_STATCODE_SUCCESS:
       break;
 
@@ -87,8 +87,8 @@ PxeReceive (
       DEBUG (
         (DEBUG_NET,
          "\nsnp->undi.receive ()  %xh:%xh\n",
-         Snp->Cdb.StatFlags,
-         Snp->Cdb.StatCode)
+         Snp->Cdb->StatFlags,
+         Snp->Cdb->StatCode)
         );
 
       return EFI_NOT_READY;
@@ -97,8 +97,8 @@ PxeReceive (
       DEBUG (
         (DEBUG_ERROR,
          "\nsnp->undi.receive()  %xh:%xh\n",
-         Snp->Cdb.StatFlags,
-         Snp->Cdb.StatCode)
+         Snp->Cdb->StatFlags,
+         Snp->Cdb->StatCode)
         );
 
       return EFI_DEVICE_ERROR;
