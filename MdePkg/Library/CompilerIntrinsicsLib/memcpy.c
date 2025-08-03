@@ -7,7 +7,7 @@
 //
 // ------------------------------------------------------------------------------
 
-typedef __SIZE_TYPE__ size_t;
+#include <stddef.h>
 
 static void
 __memcpy (
