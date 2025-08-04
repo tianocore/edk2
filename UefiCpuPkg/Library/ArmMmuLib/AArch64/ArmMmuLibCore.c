@@ -1,7 +1,7 @@
 /** @file
 *  File managing the MMU for ARMv8 architecture
 *
-*  Copyright (c) 2011-2020, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2025, ARM Limited. All rights reserved.
 *  Copyright (c) 2016, Linaro Limited. All rights reserved.
 *  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
 *
@@ -91,9 +91,41 @@ ArmMemoryAttributeToPageAttribute (
   }
 }
 
+// T0SZ can be below MIN_T0SZ when LPA2 is in use, meaning the page table starts at level -1
 #define MIN_T0SZ        16
 #define BITS_PER_LEVEL  9
-#define MAX_VA_BITS     48
+#define MAX_VA_BITS     52
+
+STATIC
+VOID
+SetOutputAddress (
+  IN  UINTN    *Entry,
+  IN  UINTN    Address,
+  IN  BOOLEAN  Lpa2Enabled
+  )
+{
+  if (Lpa2Enabled) {
+    *Entry &= ~(TT_ADDRESS_MASK_BLOCK_ENTRY_LPA2 | TT_UPPER_ADDRESS_MASK);
+    *Entry |= ((UINTN)Address & TT_ADDRESS_MASK_BLOCK_ENTRY_LPA2) | (((UINTN)Address >> 50) << 8);
+  } else {
+    *Entry &= ~TT_ADDRESS_MASK_BLOCK_ENTRY;
+    *Entry |= (Address & TT_ADDRESS_MASK_BLOCK_ENTRY);
+  }
+}
+
+STATIC
+UINT64
+GetOutputAddress (
+  IN  UINT64   Entry,
+  IN  BOOLEAN  Lpa2Enabled
+  )
+{
+  if (Lpa2Enabled) {
+    return (Entry & TT_ADDRESS_MASK_BLOCK_ENTRY_LPA2) | ((Entry & TT_UPPER_ADDRESS_MASK) << (50 - 8));
+  } else {
+    return Entry & TT_ADDRESS_MASK_BLOCK_ENTRY;
+  }
+}
 
 STATIC
 UINTN
@@ -105,12 +137,12 @@ GetRootTableEntryCount (
 }
 
 STATIC
-UINTN
+INTN
 GetRootTableLevel (
   IN  UINTN  T0SZ
   )
 {
-  return (T0SZ - MIN_T0SZ) / BITS_PER_LEVEL;
+  return (INTN)(T0SZ - MIN_T0SZ) / BITS_PER_LEVEL;
 }
 
 STATIC
@@ -159,8 +191,9 @@ ReplaceTableEntry (
 STATIC
 VOID
 FreePageTablesRecursive (
-  IN  UINT64  *TranslationTable,
-  IN  UINTN   Level
+  IN  UINT64   *TranslationTable,
+  IN  UINTN    Level,
+  IN  BOOLEAN  Lpa2Enabled
   )
 {
   UINTN  Index;
@@ -171,9 +204,12 @@ FreePageTablesRecursive (
     for (Index = 0; Index < TT_ENTRY_COUNT; Index++) {
       if ((TranslationTable[Index] & TT_TYPE_MASK) == TT_TYPE_TABLE_ENTRY) {
         FreePageTablesRecursive (
-          (VOID *)(UINTN)(TranslationTable[Index] &
-                          TT_ADDRESS_MASK_BLOCK_ENTRY),
-          Level + 1
+          (VOID *)GetOutputAddress (
+                    TranslationTable[Index],
+                    Lpa2Enabled
+                    ),
+          Level + 1,
+          Lpa2Enabled
           );
       }
     }
@@ -222,8 +258,10 @@ UpdateRegionMappingRecursive (
   IN  UINT64   AttributeSetMask,
   IN  UINT64   AttributeClearMask,
   IN  UINT64   *PageTable,
-  IN  UINTN    Level,
-  IN  BOOLEAN  TableIsLive
+  IN  INTN     Level,
+  IN  BOOLEAN  IsRootTable,
+  IN  BOOLEAN  TableIsLive,
+  IN  BOOLEAN  Lpa2Enabled
   )
 {
   UINTN       BlockShift;
@@ -316,7 +354,9 @@ UpdateRegionMappingRecursive (
                      0,
                      TranslationTable,
                      Level + 1,
-                     FALSE
+                     FALSE,
+                     FALSE,
+                     Lpa2Enabled
                      );
           if (EFI_ERROR (Status)) {
             //
@@ -331,7 +371,7 @@ UpdateRegionMappingRecursive (
 
         NextTableIsLive = FALSE;
       } else {
-        TranslationTable = (VOID *)(UINTN)(*Entry & TT_ADDRESS_MASK_BLOCK_ENTRY);
+        TranslationTable = (VOID *)GetOutputAddress (*Entry, Lpa2Enabled);
         NextTableIsLive  = TableIsLive;
       }
 
@@ -345,7 +385,9 @@ UpdateRegionMappingRecursive (
                  AttributeClearMask,
                  TranslationTable,
                  Level + 1,
-                 NextTableIsLive
+                 FALSE,
+                 NextTableIsLive,
+                 Lpa2Enabled
                  );
       if (EFI_ERROR (Status)) {
         if (!IsTableEntry (*Entry, Level)) {
@@ -356,14 +398,16 @@ UpdateRegionMappingRecursive (
           // possible for existing table entries, since we cannot revert the
           // modifications we made to the subhierarchy it represents.)
           //
-          FreePageTablesRecursive (TranslationTable, Level + 1);
+          FreePageTablesRecursive (TranslationTable, Level + 1, Lpa2Enabled);
         }
 
         return Status;
       }
 
       if (!IsTableEntry (*Entry, Level)) {
-        EntryValue = (UINTN)TranslationTable | TT_TYPE_TABLE_ENTRY;
+        EntryValue = TT_TYPE_TABLE_ENTRY;
+        SetOutputAddress (&EntryValue, (UINTN)TranslationTable, Lpa2Enabled);
+
         ReplaceTableEntry (
           Entry,
           EntryValue,
@@ -373,8 +417,9 @@ UpdateRegionMappingRecursive (
           );
       }
     } else {
-      EntryValue  = (*Entry & AttributeClearMask) | AttributeSetMask;
-      EntryValue |= RegionStart;
+      EntryValue = (*Entry & AttributeClearMask) | AttributeSetMask;
+      // Below clears shareability bits when LPA2 is in use
+      SetOutputAddress (&EntryValue, RegionStart, Lpa2Enabled);
       EntryValue |= (Level == 3) ? TT_TYPE_BLOCK_ENTRY_LEVEL3
                                  : TT_TYPE_BLOCK_ENTRY;
 
@@ -393,7 +438,8 @@ UpdateRegionMapping (
   IN  UINT64   AttributeSetMask,
   IN  UINT64   AttributeClearMask,
   IN  UINT64   *RootTable,
-  IN  BOOLEAN  TableIsLive
+  IN  BOOLEAN  TableIsLive,
+  IN  BOOLEAN  Lpa2Enabled
   )
 {
   UINTN  T0SZ;
@@ -418,7 +464,9 @@ UpdateRegionMapping (
            AttributeClearMask,
            RootTable,
            GetRootTableLevel (T0SZ),
-           TableIsLive
+           TRUE,
+           TableIsLive,
+           Lpa2Enabled
            );
 }
 
@@ -426,7 +474,8 @@ STATIC
 EFI_STATUS
 FillTranslationTable (
   IN  UINT64                        *RootTable,
-  IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryRegion
+  IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryRegion,
+  IN  BOOLEAN                       Lpa2Enabled
   )
 {
   return UpdateRegionMapping (
@@ -435,7 +484,8 @@ FillTranslationTable (
            ArmMemoryAttributeToPageAttribute (MemoryRegion->Attributes) | TT_AF,
            0,
            RootTable,
-           FALSE
+           FALSE,
+           Lpa2Enabled
            );
 }
 
@@ -565,7 +615,8 @@ ArmSetMemoryAttributes (
            PageAttributes,
            PageAttributeMask,
            ArmGetTTBR0BaseAddress (),
-           TRUE
+           TRUE,
+           ArmGetTCR () & TCR_DS
            );
 }
 
@@ -628,13 +679,15 @@ ArmConfigureMmu (
       TCR |= TCR_PS_16TB;
     } else if (MaxAddress < SIZE_256TB) {
       TCR |= TCR_PS_256TB;
+    } else if ((MaxAddress < SIZE_4PB) && ArmHas52BitTgran4 ()) {
+      TCR |= TCR_PS_4PB | TCR_DS;
     } else {
       DEBUG ((
         DEBUG_ERROR,
         "ArmConfigureMmu: The MaxAddress 0x%lX is not supported by this MMU configuration.\n",
         MaxAddress
         ));
-      ASSERT (0); // Bigger than 48-bit memory space are not supported
+      ASSERT (0); // Bigger than 48/52-bit memory space are not supported
       return EFI_UNSUPPORTED;
     }
   } else {
@@ -654,13 +707,15 @@ ArmConfigureMmu (
       TCR |= TCR_IPS_16TB;
     } else if (MaxAddress < SIZE_256TB) {
       TCR |= TCR_IPS_256TB;
+    } else if ((MaxAddress < SIZE_4PB) && ArmHas52BitTgran4 ()) {
+      TCR |= TCR_IPS_4PB | TCR_DS;
     } else {
       DEBUG ((
         DEBUG_ERROR,
         "ArmConfigureMmu: The MaxAddress 0x%lX is not supported by this MMU configuration.\n",
         MaxAddress
         ));
-      ASSERT (0); // Bigger than 48-bit memory space are not supported
+      ASSERT (0); // Bigger than 48/52-bit memory space are not supported
       return EFI_UNSUPPORTED;
     }
   }
@@ -709,7 +764,7 @@ ArmConfigureMmu (
   ZeroMem (TranslationTable, RootTableEntryCount * sizeof (UINT64));
 
   while (MemoryTable->Length != 0) {
-    Status = FillTranslationTable (TranslationTable, MemoryTable);
+    Status = FillTranslationTable (TranslationTable, MemoryTable, TCR & TCR_DS);
     if (EFI_ERROR (Status)) {
       goto FreeTranslationTable;
     }
@@ -730,7 +785,15 @@ ArmConfigureMmu (
     MAIR_ATTR (TT_ATTR_INDX_MEMORY_WRITE_BACK, MAIR_ATTR_NORMAL_MEMORY_WRITE_BACK)
     );
 
-  ArmSetTTBR0 (TranslationTable);
+  if ((TCR & TCR_IPS_MASK) == TCR_IPS_4PB) {
+    ArmSetTTBR0 (
+      (VOID *)
+      (((UINTN)TranslationTable & 0xffffffffffc0) |
+       (((UINTN)TranslationTable >> 48) << 2))
+      );
+  } else {
+    ArmSetTTBR0 (TranslationTable);
+  }
 
   if (!ArmMmuEnabled ()) {
     ArmDisableAlignmentCheck ();
