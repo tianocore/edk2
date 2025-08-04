@@ -13,6 +13,45 @@
 #include <Library/ArmTransferListLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
+
+/**
+  Get the TransferList from HOB list.
+
+  @param[out] TransferList  TransferList
+
+  @retval EFI_SUCCESS      TransferList is found.
+  @retval EFI_NOT_FOUND    TransferList is not found.
+
+**/
+EFI_STATUS
+EFIAPI
+TransferListGetFromHobList (
+  OUT TRANSFER_LIST_HEADER  **TransferList
+  )
+{
+  VOID               *HobList;
+  EFI_HOB_GUID_TYPE  *GuidHob;
+  UINTN              *GuidHobData;
+
+  *TransferList = NULL;
+
+  HobList = GetHobList ();
+  if (HobList == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  GuidHob = GetNextGuidHob (&gArmTransferListHobGuid, HobList);
+  if (GuidHob == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  GuidHobData = GET_GUID_HOB_DATA (GuidHob);
+
+  *TransferList = (TRANSFER_LIST_HEADER *)(*GuidHobData);
+
+  return EFI_SUCCESS;
+}
 
 /**
   This function verifies the checksum of the Transfer List.
