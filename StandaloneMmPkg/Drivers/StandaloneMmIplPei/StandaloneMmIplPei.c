@@ -383,7 +383,7 @@ LocateMmCoreFv (
                                it is pointed to fundation and platform HOB list.
 **/
 VOID *
-CreatMmHobList (
+CreateMmHobList (
   OUT UINTN                           *HobSize,
   IN  MM_COMM_BUFFER                  *MmCommBuffer,
   IN  EFI_PHYSICAL_ADDRESS            MmFvBase,
@@ -785,10 +785,10 @@ ExecuteMmCoreFromMmram (
       InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
 
       //
-      // Get HOB list for Standalone MM Core.
+      // Create HOB list for Standalone MM Core.
       //
       MmHobSize = 0;
-      MmHobList = CreatMmHobList (
+      MmHobList = CreateMmHobList (
                     &MmHobSize,
                     MmCommBuffer,
                     MmFvBase,
