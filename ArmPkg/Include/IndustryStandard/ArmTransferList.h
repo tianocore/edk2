@@ -74,6 +74,12 @@
 #define TRANSFER_LIST_FL_HAS_CHECKSUM  BIT0
 
 /*
+ * Flag values for TPM event log table entry layout XFERLIST_EVLOG->Flags,
+ * see https://github.com/FirmwareHandoff/firmware_handoff/blob/main/source/transfer_list.rst#tpm-event-log-table-entry-layout-xferlist_evlog
+ */
+#define TRANSFER_LIST_EVENTLOG_FL_NEED_TO_REPLAY  BIT0 /* Need to replay */
+
+/*
  * Operation codes indicating the validity of the Transfer List.
  */
 typedef enum {
@@ -136,5 +142,19 @@ typedef struct TransferEntryHeader {
   /// The size of the data content in bytes.
   UINT32    DataSize;
 } TRANSFER_ENTRY_HEADER;
+
+/*
+ * TPM event log information entry,
+ * see Section 'TPM event log table entry layout (XFERLIST_EVLOG)' in
+ * the Firmware Handoff specification.
+ */
+typedef struct TransferListEventLog {
+  /// See the TRANSFER_LIST_EVENT_LOG_FL_*
+  UINT32    Flags;
+
+  /// TPM event log as much as
+  /// TRNASFER_ENTRY_HEADER->DataSize - sizeof (TRANSFER_LIST_EVENTLOG)->Flags
+  UINT8     EventLog[];
+} TRANSFER_LIST_EVENTLOG;
 
 #endif // ARM_TRANSFER_LIST_
