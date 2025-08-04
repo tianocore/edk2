@@ -2,7 +2,7 @@
 
 Copyright (c) 2009, Hewlett-Packard Company. All rights reserved.<BR>
 Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>
-Portions copyright (c) 2011-2021, Arm Limited. All rights reserved.<BR>
+Portions copyright (c) 2011-2025, Arm Limited. All rights reserved.<BR>
 Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -30,12 +30,12 @@ STATIC
 VOID
 GetRootTranslationTableInfo (
   IN  UINTN  T0SZ,
-  OUT UINTN  *RootTableLevel,
+  OUT  INTN  *RootTableLevel,
   OUT UINTN  *RootTableEntryCount
   )
 {
-  *RootTableLevel      = (T0SZ - MIN_T0SZ) / BITS_PER_LEVEL;
-  *RootTableEntryCount = TT_ENTRY_COUNT >> (T0SZ - MIN_T0SZ) % BITS_PER_LEVEL;
+  *RootTableLevel      = (INTN)(T0SZ - MIN_T0SZ) / BITS_PER_LEVEL;
+  *RootTableEntryCount = TT_ENTRY_COUNT >> (INTN)(T0SZ - MIN_T0SZ) % BITS_PER_LEVEL;
 }
 
 /**
@@ -167,7 +167,7 @@ UINT64
 GetNextEntryAttribute (
   IN     UINT64  *TableAddress,
   IN     UINTN   EntryCount,
-  IN     UINTN   TableLevel,
+  IN     INTN    TableLevel,
   IN     UINT64  BaseAddress,
   IN OUT UINT64  *PrevEntryAttribute,
   IN OUT UINT64  *StartGcdRegion
@@ -273,7 +273,7 @@ SyncCacheConfig (
   EFI_STATUS                       Status;
   UINT64                           PageAttribute;
   UINT64                           *FirstLevelTableAddress;
-  UINTN                            TableLevel;
+  INTN                             TableLevel;
   UINTN                            TableCount;
   UINTN                            NumberOfDescriptors;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
@@ -419,7 +419,7 @@ EfiAttributeToArmAttribute (
 EFI_STATUS
 GetMemoryRegionRec (
   IN     UINT64  *TranslationTable,
-  IN     UINTN   TableLevel,
+  IN     INTN    TableLevel,
   IN     UINT64  *LastBlockEntry,
   IN OUT UINTN   *BaseAddress,
   OUT    UINTN   *RegionLength,
@@ -520,7 +520,7 @@ GetMemoryRegion (
 {
   EFI_STATUS  Status;
   UINT64      *TranslationTable;
-  UINTN       TableLevel;
+  INTN        TableLevel;
   UINTN       EntryCount;
   UINTN       T0SZ;
 
