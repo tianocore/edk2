@@ -314,6 +314,56 @@ TransferListFindEntry (
 }
 
 /**
+  Get TPM event log from TransferList
+
+  @param [in]   TransferListHeader       Pointer to the Transfer List Header
+  @param [out]  EventLog                 Pointer to Eventlog in TransferList
+  @param [out]  EventLogSize             Size of Event log
+  @param [out]  EventLogFlags            Flags for Event log
+
+  @return EFI_SUCCESS
+  @return EFI_NOT_FOUND                  No Event log in TransferListHeader
+  @return EFI_INVALID_PARAMETER          Invalid parameters
+
+**/
+EFI_STATUS
+EFIAPI
+TransferListGetEventLog (
+  IN TRANSFER_LIST_HEADER  *TransferListHeader,
+  OUT VOID                 **EventLog,
+  OUT UINTN                *EventLogSize,
+  OUT UINT32               *EventLogFlags       OPTIONAL
+  )
+{
+  TRANSFER_ENTRY_HEADER   *Entry;
+  TRANSFER_LIST_EVENTLOG  *EntryData;
+
+  if ((TransferListHeader == NULL) || (EventLog == NULL) || (EventLogSize == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *EventLog     = NULL;
+  *EventLogSize = 0;
+
+  Entry = TransferListFindFirstEntry (TransferListHeader, TRANSFER_ENTRY_TAG_ID_TPM_EVENT_LOG);
+  if ((Entry == NULL) || (Entry->DataSize == 0) ||
+      ((Entry->DataSize - OFFSET_OF (TRANSFER_LIST_EVENTLOG, EventLog)) == 0))
+  {
+    return EFI_NOT_FOUND;
+  }
+
+  EntryData = TransferListGetEntryData (Entry);
+  if (EventLogFlags != NULL) {
+    *EventLogFlags = EntryData->Flags;
+  }
+
+  *EventLogSize = Entry->DataSize - OFFSET_OF (TRANSFER_LIST_EVENTLOG, EventLog);
+  *EventLog     = (VOID *)&EntryData->EventLog;
+
+  return EFI_SUCCESS;
+}
+
+/**
   Dump the transfer list to the debug output.
 
   @param [in]   TransferListHeader       Pointer to the Transfer List Header
