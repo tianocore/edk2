@@ -19,6 +19,21 @@
 #include <Pi/PiHob.h>
 
 /**
+  Get the TransferList from HOB list.
+
+  @param[out] TransferList  TransferList
+
+  @retval EFI_SUCCESS      TransferList is found.
+  @retval EFI_NOT_FOUND    TransferList is not found.
+
+**/
+EFI_STATUS
+EFIAPI
+TransferListGetFromHobList (
+  OUT TRANSFER_LIST_HEADER  **TransferList
+  );
+
+/**
   Return the first Transfer Entry Node in the Transfer List.
 
   @param [in]   TransferListHeader     Pointer to the Transfer List Header.
