@@ -298,7 +298,7 @@ MmEndOfPeiHandler (
 
   DEBUG ((DEBUG_INFO, "MmEndOfPeiHandler\n"));
   //
-  // Install MM EndOfDxe protocol
+  // Install MM EndOfPei protocol
   //
   MmHandle = NULL;
   Status   = MmInstallProtocolInterface (
