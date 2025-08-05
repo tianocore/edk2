@@ -42,6 +42,7 @@
   gUniversalPayloadAcpiTableGuid
   gUniversalPayloadSmbios3TableGuid
   gEfiHobMemoryAllocModuleGuid
+  gUniversalPayloadRamdiskGuid
 
 [Pcd]
   gUefiPayloadPkgTokenSpaceGuid.PcdHandOffFdtEnable

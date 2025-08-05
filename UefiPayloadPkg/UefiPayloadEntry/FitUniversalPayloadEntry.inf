@@ -85,6 +85,7 @@
   gUniversalPayloadPciRootBridgeInfoGuid
   gUniversalPayloadSmbios3TableGuid
   gUniversalPayloadDeviceTreeGuid
+  gUniversalPayloadRamdiskGuid
   gFdtHobGuid
 
 [FeaturePcd.IA32]
