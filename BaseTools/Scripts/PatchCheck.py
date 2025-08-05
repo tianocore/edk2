@@ -117,13 +117,13 @@ class CommitMessageCheck:
 
         self.check_contributed_under()
         if not MergifyMerge:
+            self.check_ci_options_format()
             self.check_subject(updated_packages)
             self.check_signed_off_by()
             self.check_misc_signatures()
             self.check_overall_format()
             if not PatchCheckConf.ignore_change_id:
                 self.check_change_id_format()
-            self.check_ci_options_format()
         self.report_message_result()
 
     url = 'https://github.com/tianocore/tianocore.github.io/wiki/Commit-Message-Format'
