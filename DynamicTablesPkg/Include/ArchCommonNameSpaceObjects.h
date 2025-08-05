@@ -73,6 +73,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjSpcrInfo,                       ///< 45 - Serial Terminal and Interrupt Info
   EArchCommonObjTpm2DeviceInfo,                 ///< 46 - TPM2 Device Info
   EArchCommonObjMcfgPciConfigSpaceInfo,         ///< 47 - MCFG PCI Configuration Space Info
+  EArchCommonObjPrtInfo,                        ///< 48 - Pci Interrupt Map Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -267,6 +268,19 @@ typedef struct CmArchCommonPciInterruptMapInfo {
   */
   CM_ARCH_COMMON_GENERIC_INTERRUPT    IntcInterrupt;
 } CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO;
+
+/** A structure that describes a PCI Routing Table (PRT) Info.
+  Cf ACPI spec 6.5
+  s6.2.13 _PRT (PCI Routing Table)
+
+  ID: EArchCommonObjPrtInfo
+*/
+typedef struct CmArchCommonPrtInfo {
+  UINT32             Address;
+  UINT8              Pin;
+  CM_OBJECT_TOKEN    SourceToken;
+  UINT32             SourceIndex;
+} CM_ARCH_COMMON_PRT_INFO;
 
 /** A structure that describes the Memory Affinity Structure (Type 1) in SRAT
 
