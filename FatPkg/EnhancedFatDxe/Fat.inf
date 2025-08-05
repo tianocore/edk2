@@ -78,7 +78,6 @@
   gEfiDiskIo2ProtocolGuid               ## TO_START
   gEfiBlockIoProtocolGuid               ## TO_START
   gEfiSimpleFileSystemProtocolGuid      ## BY_START
-  gEfiUnicodeCollationProtocolGuid      ## TO_START
   gEfiUnicodeCollation2ProtocolGuid     ## TO_START
 
 [Pcd]
