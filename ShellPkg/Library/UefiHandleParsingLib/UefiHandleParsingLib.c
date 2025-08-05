@@ -2249,7 +2249,6 @@ STATIC CONST GUID_INFO_BLOCK  mGuidStringList[] = {
   { STRING_TOKEN (STR_TAPE_IO),             &gEfiTapeIoProtocolGuid,                           NULL                                             },
   { STRING_TOKEN (STR_DISK_IO),             &gEfiDiskIoProtocolGuid,                           NULL                                             },
   { STRING_TOKEN (STR_BLK_IO),              &gEfiBlockIoProtocolGuid,                          BlockIoProtocolDumpInformation                   },
-  { STRING_TOKEN (STR_UC),                  &gEfiUnicodeCollationProtocolGuid,                 NULL                                             },
   { STRING_TOKEN (STR_UC2),                 &gEfiUnicodeCollation2ProtocolGuid,                NULL                                             },
   { STRING_TOKEN (STR_PCIRB_IO),            &gEfiPciRootBridgeIoProtocolGuid,                  PciRootBridgeIoDumpInformation                   },
   { STRING_TOKEN (STR_PCI_IO),              &gEfiPciIoProtocolGuid,                            PciIoProtocolDumpInformation                     },
