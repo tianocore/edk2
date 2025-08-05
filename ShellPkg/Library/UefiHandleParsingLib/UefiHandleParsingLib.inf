@@ -82,7 +82,6 @@
   gEfiTapeIoProtocolGuid                                  ## UNDEFINED
   gEfiDiskIoProtocolGuid                                  ## UNDEFINED
   gEfiBlockIoProtocolGuid                                 ## UNDEFINED
-  gEfiUnicodeCollationProtocolGuid                        ## UNDEFINED
   gEfiPciRootBridgeIoProtocolGuid                         ## UNDEFINED
   gEfiPciIoProtocolGuid                                   ## UNDEFINED
   gEfiScsiPassThruProtocolGuid                            ## UNDEFINED
