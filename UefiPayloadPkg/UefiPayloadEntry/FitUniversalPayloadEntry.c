@@ -485,6 +485,38 @@ FitBuildHobs (
   return EFI_SUCCESS;
 }
 
+#if FixedPcdGetBool (PcdHandOffFdtEnable) == 1
+
+/**
+  Build FDT HOB using infomation from FDT.
+
+  @param  FdtBase
+**/
+STATIC VOID
+EFIAPI
+BuildFdtHob (
+  IN VOID  *FdtBase
+  )
+{
+  VOID    *NewBase;
+  UINTN   FdtSize;
+  UINTN   FdtPages;
+  UINT64  *FdtHobData;
+
+  ASSERT (FdtCheckHeader (FdtBase) == 0);
+  FdtSize  = FdtTotalSize (FdtBase);
+  FdtPages = EFI_SIZE_TO_PAGES (FdtSize);
+  NewBase  = AllocatePages (FdtPages);
+  ASSERT (NewBase != NULL);
+  FdtOpenInto (FdtBase, NewBase, EFI_PAGES_TO_SIZE (FdtPages));
+
+  FdtHobData = BuildGuidHob (&gFdtHobGuid, sizeof *FdtHobData);
+  ASSERT (FdtHobData != NULL);
+  *FdtHobData = (UINTN)NewBase;
+}
+
+#endif
+
 /**
   Entry point to the C language phase of UEFI payload.
   @param[in]   BootloaderParameter  The starting address of FDT .
@@ -532,6 +564,7 @@ FitUplEntryPoint (
   if (HobListPtr != 0) {
     FdtBase = (VOID *)BootloaderParameter;
     if (FdtCheckHeader (FdtBase) == 0) {
+      BuildFdtHob (FdtBase);
       CustomFdtNodeParser ((VOID *)FdtBase, (VOID *)HobListPtr);
       FdtBaseResvd = PayloadAllocatePages (PcdGet8 (PcdFDTPageSize), EfiReservedMemoryType);
     }
