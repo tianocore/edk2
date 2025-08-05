@@ -9,6 +9,7 @@
 #include "StandaloneMmIplPei.h"
 #include <Library/PeiServicesLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
+#include <Ppi/MmAccess.h>
 #include <Ppi/MmControl.h>
 #include <Ppi/MmCoreFvLocationPpi.h>
 
@@ -388,6 +389,138 @@ LocateMmCoreFv (
   }
 
   return EFI_NOT_FOUND;
+}
+
+/**
+  Open all MMRAM ranges if platform provides an MmAccess implementation.
+  If it does, it's likely required to be able to use MMRAM.
+
+  @retval EFI_SUCCESS       MMRAM is opened.
+  @retval EFI_DEVICE_ERROR  MMRAM could not be opened.
+
+**/
+EFI_STATUS
+MmAccessOpen (
+  VOID
+  )
+{
+  EFI_PEI_MM_ACCESS_PPI  *MmAccess;
+  EFI_STATUS             Status;
+  UINTN                  Size;
+  UINTN                  Index;
+  UINTN                  MmramRangeCount;
+
+  //
+  // Prepare an MM access PPI for MM RAM.
+  //
+  MmAccess        = NULL;
+  MmramRangeCount = 0;
+  Status          = PeiServicesLocatePpi (
+                      &gEfiPeiMmAccessPpiGuid,
+                      0,
+                      NULL,
+                      (VOID **)&MmAccess
+                      );
+  if (!EFI_ERROR (Status)) {
+    //
+    // Open all MMRAM ranges, if MmAccess is available.
+    //
+    Size   = 0;
+    Status = MmAccess->GetCapabilities ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), MmAccess, &Size, NULL);
+    if (Status != EFI_BUFFER_TOO_SMALL) {
+      // This is not right...
+      ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+      return EFI_DEVICE_ERROR;
+    }
+
+    MmramRangeCount = Size / sizeof (EFI_MMRAM_DESCRIPTOR);
+    for (Index = 0; Index < MmramRangeCount; Index++) {
+      Status = MmAccess->Open ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), MmAccess, Index);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "MM IPL failed to open MMRAM windows index %d - %r\n", Index, Status));
+        ASSERT_EFI_ERROR (Status);
+        return EFI_DEVICE_ERROR;
+      }
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Close and lock all MMRAM ranges if platform provides an MmAccess implementation.
+  If it does, it's likely required for security reasons.
+
+**/
+EFI_STATUS
+MmAccessClose (
+  VOID
+  )
+{
+  EFI_PEI_MM_ACCESS_PPI  *MmAccess;
+  EFI_STATUS             Status;
+  UINTN                  Size;
+  UINTN                  Index;
+  UINTN                  MmramRangeCount;
+
+  //
+  // Prepare an MM access PPI for MM RAM.
+  //
+  MmAccess        = NULL;
+  MmramRangeCount = 0;
+  Status          = PeiServicesLocatePpi (
+                      &gEfiPeiMmAccessPpiGuid,
+                      0,
+                      NULL,
+                      (VOID **)&MmAccess
+                      );
+  if (!EFI_ERROR (Status)) {
+    //
+    // Close all MMRAM ranges, if MmAccess is available.
+    //
+    Size   = 0;
+    Status = MmAccess->GetCapabilities ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), MmAccess, &Size, NULL);
+    if (Status != EFI_BUFFER_TOO_SMALL) {
+      // This is not right...
+      ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+      return EFI_DEVICE_ERROR;
+    }
+
+    MmramRangeCount = Size / sizeof (EFI_MMRAM_DESCRIPTOR);
+    for (Index = 0; Index < MmramRangeCount; Index++) {
+      Status = MmAccess->Close ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), MmAccess, Index);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "MM IPL failed to close MMRAM windows index %d - %r\n", Index, Status));
+        ASSERT (FALSE);
+        return Status;
+      }
+
+      //
+      // Print debug message that the MMRAM window is now closed.
+      //
+      DEBUG ((DEBUG_INFO, "MM IPL closed MMRAM window index %d\n", Index));
+
+      //
+      // Lock the MMRAM (Note: Locking MMRAM may not be supported on all platforms)
+      //
+      Status = MmAccess->Lock ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), MmAccess, Index);
+      if (EFI_ERROR (Status)) {
+        //
+        // Print error message that the MMRAM failed to lock...
+        //
+        DEBUG ((DEBUG_ERROR, "MM IPL could not lock MMRAM (Index %d) after executing MM Core %r\n", Index, Status));
+        ASSERT (FALSE);
+        return Status;
+      }
+
+      //
+      // Print debug message that the MMRAM window is now closed.
+      //
+      DEBUG ((DEBUG_INFO, "MM IPL locked MMRAM window index %d\n", Index));
+    }
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**

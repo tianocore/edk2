@@ -21,7 +21,6 @@
 #include <Library/PcdLib.h>
 #include <Library/PeCoffLib.h>
 #include <Library/CacheMaintenanceLib.h>
-#include <Ppi/MmAccess.h>
 #include <Ppi/MmCommunication.h>
 #include <Ppi/MmCommunication3.h>
 #include <Protocol/MmCommunication.h>
@@ -174,6 +173,26 @@ LocateMmCoreFv (
   OUT UINTN                 *MmFvSize,
   OUT EFI_GUID              *MmCoreFileName,
   OUT VOID                  **MmCoreImageAddress
+  );
+
+/**
+  Open all MMRAM ranges if platform provides an MmAccess implementation.
+  If it does, it's likely required to be able to use MMRAM.
+
+**/
+EFI_STATUS
+MmAccessOpen (
+  VOID
+  );
+
+/**
+  Close and lock all MMRAM ranges if platform provides an MmAccess implementation.
+  If it does, it's likely required for security reasons.
+
+**/
+EFI_STATUS
+MmAccessClose (
+  VOID
   );
 
 /**
