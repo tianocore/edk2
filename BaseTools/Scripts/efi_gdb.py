@@ -572,14 +572,16 @@ class EfiTablesCmd (gdb.Command):
 
         gST = gdb.lookup_global_symbol('gST')
         if gST is None:
-            print('Error: This command requires symbols for gST to be loaded')
-            return
+            table = EfiConfigurationTable(self.file)
+        else:
+            table = EfiConfigurationTable(
+                self.file, int(gST.value(gdb.selected_frame())))
 
-        table = EfiConfigurationTable(
-            self.file, int(gST.value(gdb.selected_frame())))
         if table:
             print(table, '\n')
-
+        elif gST is None:
+            print('Error: This command requires symbols for gST to be loaded')
+            return
 
 class EfiSymbolsCmd (gdb.Command):
     """Load Symbols for EFI. Type 'efi symbols -h' for more info."""
