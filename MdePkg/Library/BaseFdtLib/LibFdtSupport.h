@@ -3,6 +3,7 @@
   libfdt library.
 
   Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -54,12 +55,6 @@ memcmp      (
   size_t
   );
 
-int
-strcmp      (
-  const char *,
-  const char *
-  );
-
 char *
 strchr     (
   const char *,
@@ -88,19 +83,15 @@ strcpy (
 //
 // Macros that directly map functions to BaseLib, BaseMemoryLib, and DebugLib functions
 //
-#define memcpy(dest, source, count)         CopyMem(dest,source, (UINTN)(count))
-#define memset(dest, ch, count)             SetMem(dest, (UINTN)(count),(UINT8)(ch))
-#define memchr(buf, ch, count)              ScanMem8(buf, (UINTN)(count),(UINT8)ch)
-#define memcmp(buf1, buf2, count)           (int)(CompareMem(buf1, buf2, (UINTN)(count)))
-#define memmove(dest, source, count)        CopyMem(dest, source, (UINTN)(count))
-#define strlen(str)                         (size_t)(AsciiStrLen(str))
-#define strnlen(str, count)                 (size_t)(AsciiStrnLenS(str, count))
-#define strncpy(strDest, strSource, count)  AsciiStrnCpyS(strDest, MAX_STRING_SIZE, strSource, (UINTN)count)
-#define strcat(strDest, strSource)          AsciiStrCatS(strDest, MAX_STRING_SIZE, strSource)
-#define strchr(str, ch)                     ScanMem8(str, AsciiStrSize (str), (UINT8)ch)
-#define strcmp(string1, string2, count)     (int)(AsciiStrCmp(string1, string2))
-#define strncmp(string1, string2, count)    (int)(AsciiStrnCmp(string1, string2, (UINTN)(count)))
-#define strrchr(str, ch)                    fdt_strrchr(str, ch)
-#define strtoul(ptr, end_ptr, base)         fdt_strtoul(ptr, end_ptr, base)
+#define memcpy(dest, source, count)   CopyMem(dest,source, (UINTN)(count))
+#define memset(dest, ch, count)       SetMem(dest, (UINTN)(count),(UINT8)(ch))
+#define memchr(buf, ch, count)        ScanMem8(buf, (UINTN)(count),(UINT8)ch)
+#define memcmp(buf1, buf2, count)     (int)(CompareMem(buf1, buf2, (UINTN)(count)))
+#define memmove(dest, source, count)  CopyMem(dest, source, (UINTN)(count))
+#define strlen(str)                   (size_t)(AsciiStrLen(str))
+#define strnlen(str, count)           (size_t)(AsciiStrnLenS(str, count))
+#define strchr(str, ch)               ScanMem8(str, AsciiStrSize (str), (UINT8)ch)
+#define strrchr(str, ch)              fdt_strrchr(str, ch)
+#define strtoul(ptr, end_ptr, base)   fdt_strtoul(ptr, end_ptr, base)
 
 #endif /* FDT_LIB_SUPPORT_H_ */
