@@ -7080,6 +7080,42 @@ PrintInterpretedExtendedCompatibilityFlitLogging (
 }
 
 /**
+ Function to interpret and print out the PTM structure
+
+ @param[in] HeaderAddress        The Address of this capability header.
+ @param[in] HeadersBaseAddress   The address of all the extended capability headers.
+**/
+EFI_STATUS
+PrintInterpretedExtendedCompatibilityPTM (
+  IN CONST PCI_EXP_EXT_HDR  *HeaderAddress,
+  IN CONST PCI_EXP_EXT_HDR  *HeadersBaseAddress
+  )
+{
+  CONST PCI_EXPRESS_EXTENDED_CAPABILITIES_PTM  *Header;
+
+  Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_PTM *)HeaderAddress;
+
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_PTM),
+    gShellDebug1HiiHandle,
+    Header->Capability.Uint32,
+    Header->Control.Uint32
+    );
+
+  DumpHex (
+    4,
+    EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
+    sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_PTM),
+    (VOID *)(HeaderAddress)
+    );
+
+  return (EFI_SUCCESS);
+}
+
+/**
   Display Pcie extended capability details
 
   @param[in] HeadersBaseAddress   The address of all the extended capability headers.
@@ -7166,6 +7202,8 @@ PrintPciExtendedCapabilityDetails (
       return PrintInterpretedExtendedCompatibilityPhysicalLayer64 (HeaderAddress, HeadersBaseAddress);
     case PCI_EXPRESS_EXTENDED_CAPABILITY_FLIT_LOGGING_ID:
       return PrintInterpretedExtendedCompatibilityFlitLogging (HeaderAddress, HeadersBaseAddress);
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_PTM_ID:
+      return PrintInterpretedExtendedCompatibilityPTM (HeaderAddress, HeadersBaseAddress);
     default:
       ShellPrintEx (
         -1,
