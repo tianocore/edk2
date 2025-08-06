@@ -24,6 +24,9 @@
 #
 ##
 
+merge_queue:
+  max_parallel_checks: 1
+
 queue_rules:
   - name: default
     queue_conditions:
