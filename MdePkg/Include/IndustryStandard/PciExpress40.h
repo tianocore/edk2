@@ -16,6 +16,48 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #pragma pack(1)
 
+/// Precision Time Management Extended Capability definitions.
+///
+/// Based on section 7.9.16 of PCI Express Base Specification 4.0.
+///@{
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_PTM_ID    0x001F
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_PTM_VER1  0x1
+
+#define PCI_EXPRESS_EXTENDED_CAPABILITIES_PTM_CAPABILITY_OFFSET  0x04
+#define PCI_EXPRESS_EXTENDED_CAPABILITIES_PTM_CONTROL_OFFSET     0x08
+
+typedef union {
+  struct {
+    UINT32    PTMRequesterCapable                  : 1;
+    UINT32    PTMResponderCapable                  : 1;
+    UINT32    PTMRootCapable                       : 1;
+    UINT32    ePTMCapable                          : 1;
+    UINT32    PTMPropagationDelayAdaptationCapable : 1;
+    UINT32    Reserved                             : 3;
+    UINT32    LocalClockGranularity                : 8;
+    UINT32    Reserved2                            : 16;
+  } Bits;
+  UINT32    Uint32;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_PTM_CAPABILITY;
+
+typedef union {
+  struct {
+    UINT32    PTMEnable            : 1;
+    UINT32    RootSelect           : 1;
+    UINT32    Reserved             : 6;
+    UINT32    EffectiveGranularity : 8;
+    UINT32    Reserved2            : 16;
+  } Bits;
+  UINT32    Uint32;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_PTM_CONTROL;
+
+typedef struct {
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER            Header;
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_PTM_CAPABILITY    Capability;
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_PTM_CONTROL       Control;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_PTM;
+///@}
+
 /// The Physical Layer PCI Express Extended Capability definitions.
 ///
 /// Based on section 7.7.5 of PCI Express Base Specification 4.0.
