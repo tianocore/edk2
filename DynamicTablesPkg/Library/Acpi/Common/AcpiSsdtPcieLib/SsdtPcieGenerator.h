@@ -2,6 +2,8 @@
   SSDT Pcie Table Generator.
 
   Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
+  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -20,10 +22,13 @@
 
   This can also be denoted as space code, address space or ss.
 */
-#define PCI_SS_CONFIG  0
-#define PCI_SS_IO      1
-#define PCI_SS_M32     2
-#define PCI_SS_M64     3
+#define PCI_SS_CONFIG   0
+#define PCI_SS_IO       1
+#define PCI_SS_M32      2
+#define PCI_SS_M64      3
+#define PCI_SS_IO_WORD  4
+#define PCI_SS_M32_UC   5
+#define PCI_SS_M64_UC   6
 
 /** Maximum Pci root complexes supported by this generator.
 

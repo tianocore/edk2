@@ -200,6 +200,9 @@ typedef struct CmArchCommonPciAddressMapInfo {
    - 1: I/O Space
    - 2: 32-bit-address Memory Space
    - 3: 64-bit-address Memory Space
+   - 4: Word I/O Space
+   - 5: 32-bit-address uncache Memory Space
+   - 6: 64-bit-address uncache Memory Space
   */
   UINT8     SpaceCode;
 
