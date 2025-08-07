@@ -192,6 +192,47 @@ PciHostBridgeUtilityUninitRootBridge (
 }
 
 /**
+  Utility function to get the subordinate bus of a PCI-PCI bridge.
+
+  @param Bus     Bus number.
+  @param Device  Device number.
+
+  @return        Subordinate bus number or 0 if not a PCI-PCI bridge.
+**/
+STATIC
+UINT8
+EFIAPI
+GetSubordinateBusOfPciBridge (
+  IN UINTN  Bus,
+  IN UINTN  Device
+  )
+{
+  UINT8  HeaderType;
+
+  HeaderType = PciRead8 (
+                 PCI_LIB_ADDRESS (
+                   Bus,
+                   Device,
+                   0,
+                   PCI_HEADER_TYPE_OFFSET
+                   )
+                 );
+
+  if (HeaderType == HEADER_TYPE_PCI_TO_PCI_BRIDGE) {
+    return PciRead8 (
+             PCI_LIB_ADDRESS (
+               Bus,
+               Device,
+               0,
+               PCI_BRIDGE_SUBORDINATE_BUS_REGISTER_OFFSET
+               )
+             );
+  }
+
+  return 0;
+}
+
+/**
   Utility function to scan PCI root bridges and create instances for those
   that are found not empty. Populate their resources from the default
   provided parameters and return all the root bridge instances in an array.
@@ -247,6 +288,7 @@ PciHostBridgeUtilityGetRootBridgesBusScan (
   UINTN                 Initialized;
   UINTN                 LastRootBridgeNumber;
   UINTN                 RootBridgeNumber;
+  UINT8                 SubordinateBus;
 
   if ((BusMin > BusMax) || (BusMax > PCI_MAX_BUS)) {
     DEBUG ((
@@ -365,6 +407,14 @@ PciHostBridgeUtilityGetRootBridgesBusScan (
 
       ++Initialized;
       LastRootBridgeNumber = RootBridgeNumber;
+    }
+
+    //
+    // If there is already a subordinate bus, defer to it.
+    //
+    SubordinateBus = GetSubordinateBusOfPciBridge (RootBridgeNumber, Device);
+    if ((SubordinateBus != 0) && (SubordinateBus > RootBridgeNumber)) {
+      RootBridgeNumber = SubordinateBus;
     }
   }
 
