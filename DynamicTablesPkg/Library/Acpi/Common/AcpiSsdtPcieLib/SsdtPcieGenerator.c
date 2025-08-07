@@ -85,6 +85,15 @@ GET_OBJECT_LIST (
   CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO
   );
 
+/** This macro expands to a function that retrieves the Root Bridge
+    Information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArchCommon,
+  EArchCommonObjPciRootBridgeInfo,
+  CM_ARCH_COMMON_PCI_ROOT_BRIDGE_INFO
+  );
+
 /** Initialize the MappingTable.
 
   @param [in] MappingTable  The mapping table structure.
@@ -434,6 +443,164 @@ exit_handler0:
   return Status;
 }
 
+/** Generate a _PRT object (Pci Routing Table) for the Pci root bridge device.
+
+  Cf. ACPI 6.4 specification, s6.2.13 "_PRT (PCI Routing Table)"
+
+  @param [in]       Generator       The SSDT Pci generator.
+  @param [in]       CfgMgrProtocol  Pointer to the Configuration Manager
+                                    Protocol interface.
+  @param [in]       PciInfo         Pci device information.
+  @param [in]       Uid             Unique Id of the Pci device.
+  @param [in, out]  PciNode         Pci node to amend.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GenerateRootBridgePrt (
+  IN            ACPI_PCI_GENERATOR                            *Generator,
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN      CONST CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO          *PciInfo,
+  IN            UINT32                                        Uid,
+  IN  OUT       AML_OBJECT_NODE_HANDLE                        PciNode
+  )
+{
+  AML_OBJECT_NODE_HANDLE               PrtNode;
+  CM_ARCH_COMMON_PCI_ROOT_BRIDGE_INFO  *RbPrtInfo;
+  EFI_STATUS                           Status;
+  UINT32                               Index;
+  UINT32                               RbPrtCount;
+
+  ASSERT (Generator != NULL);
+  ASSERT (CfgMgrProtocol != NULL);
+  ASSERT (PciInfo != NULL);
+  ASSERT (PciNode != NULL);
+
+  PrtNode = NULL;
+
+  RbPrtInfo  = NULL;
+  RbPrtCount = 0;
+  Status     = GetEArchCommonObjPciRootBridgeInfo (
+                 CfgMgrProtocol,
+                 PciInfo->RootBridgeInfoToken,
+                 &RbPrtInfo,
+                 &RbPrtCount
+                 );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  if ((RbPrtInfo == NULL) || (RbPrtCount == 0)) {
+    ASSERT_EFI_ERROR (EFI_NOT_FOUND);
+    return EFI_NOT_FOUND;
+  }
+
+  // ASL: Name (_PRT, Package () {})
+  Status = AmlCodeGenNamePackage ("_PRT", NULL, &PrtNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto exit_handler;
+  }
+
+  for (Index = 0; Index < RbPrtCount; Index++) {
+    if ((RbPrtInfo[Index].Address & 0xFFFF) != 0xFFFF) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "SSDT:PCIE: Invalid function number in Root Bridge _PRT entry (Index %d): 0x%X\n",
+        Index,
+        RbPrtInfo[Index].Address & 0xFFFF
+        ));
+      Status = EFI_INVALID_PARAMETER;
+      ASSERT_EFI_ERROR (Status);
+      goto exit_handler;
+    }
+
+    if (((RbPrtInfo[Index].Address >> 16) & 0xFFFF) > 32) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "SSDT:PCIE: Device number exceeds maximum in Root Bridge _PRT entry (Index %d): %u\n",
+        Index,
+        (RbPrtInfo[Index].Address >> 16) & 0xFFFF
+        ));
+      Status = EFI_INVALID_PARAMETER;
+      ASSERT_EFI_ERROR (Status);
+      goto exit_handler;
+    }
+
+    if (RbPrtInfo[Index].Pin > 3) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "SSDT:PCIE: Invalid interrupt pin in Root Bridge _PRT entry (Index %d): %d\n",
+        Index,
+        RbPrtInfo[Index].Pin
+        ));
+      Status = EFI_INVALID_PARAMETER;
+      ASSERT_EFI_ERROR (Status);
+      goto exit_handler;
+    }
+
+    if (RbPrtInfo[Index].SourceToken != CM_NULL_TOKEN) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "SSDT:PCIE: Legacy PCI link devices are not supported. (Index %d): 0x%X\n",
+        Index,
+        RbPrtInfo[Index].SourceToken
+        ));
+      Status = EFI_INVALID_PARAMETER;
+      ASSERT_EFI_ERROR (Status);
+      goto exit_handler;
+    }
+
+    /* Add a _PRT entry.
+       ASL
+       Name (_PRT, Package () {
+         <OldPrtEntries>,
+         <NewPrtEntry>
+       })
+
+     Address is set as:
+     ACPI 6.4 specification, Table 6.2: "ADR Object Address Encodings"
+       High word-Device #, Low word-Function #. (for example, device 3,
+       function 2 is 0x00030002). To refer to all the functions on a device #,
+       use a function number of FFFF).
+
+      Use the second model for _PRT object and describe a hardwired interrupt.
+    */
+    Status = AmlAddPrtEntry (
+               RbPrtInfo[Index].Address,
+               RbPrtInfo[Index].Pin,
+               NULL,
+               RbPrtInfo[Index].SourceIndex,
+               PrtNode
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      goto exit_handler;
+    }
+  } // for
+
+  // Attach the _PRT entry.
+  Status = AmlAttachNode (PciNode, PrtNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto exit_handler;
+  }
+
+  PrtNode = NULL;
+
+exit_handler:
+  if (PrtNode != NULL) {
+    AmlDeleteTree (PrtNode);
+  }
+
+  return Status;
+}
+
 /** Generate a _CRS method for the Pci device.
 
   @param [in]       Generator       The SSDT Pci generator.
@@ -621,10 +788,10 @@ GeneratePciCrs (
                    IsPosDecode,
                    3,
                    0,
-                   AddrMapInfo->PciAddress,
-                   AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1,
-                   Translation ? AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress : 0,
-                   AddrMapInfo->AddressSize,
+                   AddrMapInfo->PciAddress & MAX_UINT16,
+                   (AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1) & MAX_UINT16,
+                   (Translation ? AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress : 0) & MAX_UINT16,
+                   AddrMapInfo->AddressSize & MAX_UINT16,
                    0,
                    NULL,
                    TRUE,
@@ -893,6 +1060,18 @@ GeneratePciDevice (
                );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
+      return Status;
+    }
+  } else if (PciInfo->RootBridgeInfoToken != CM_NULL_TOKEN) {
+    Status = GenerateRootBridgePrt (
+               Generator,
+               CfgMgrProtocol,
+               PciInfo,
+               Uid,
+               PciNode
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
       return Status;
     }
   }
