@@ -2,6 +2,7 @@
   SSDT Pcie Table Generator.
 
   Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
+  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -608,7 +609,77 @@ GeneratePciCrs (
                    NULL
                    );
         break;
+      case PCI_SS_IO_WORD:
+        ASSERT ((AddrMapInfo->PciAddress & ~MAX_UINT16) == 0);
+        ASSERT (((AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1) & ~MAX_UINT16) == 0);
+        ASSERT (((Translation ? AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress : 0) & ~MAX_UINT16) == 0);
+        ASSERT ((AddrMapInfo->AddressSize & ~MAX_UINT16) == 0);
+        Status = AmlCodeGenRdWordIo (
+                   FALSE,
+                   TRUE,
+                   TRUE,
+                   IsPosDecode,
+                   3,
+                   0,
+                   AddrMapInfo->PciAddress & MAX_UINT16,
+                   (AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1) & MAX_UINT16,
+                   (Translation ? AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress : 0) & MAX_UINT16,
+                   AddrMapInfo->AddressSize & MAX_UINT16,
+                   0,
+                   NULL,
+                   TRUE,
+                   FALSE,
+                   CrsNode,
+                   NULL
+                   );
+        break;
+      case PCI_SS_M32_UC:
+        ASSERT ((AddrMapInfo->PciAddress & ~MAX_UINT32) == 0);
+        ASSERT (((AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1) & ~MAX_UINT32) == 0);
+        ASSERT (((Translation ? AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress : 0) & ~MAX_UINT32) == 0);
+        ASSERT ((AddrMapInfo->AddressSize & ~MAX_UINT32) == 0);
 
+        Status = AmlCodeGenRdDWordMemory (
+                   FALSE,
+                   IsPosDecode,
+                   TRUE,
+                   TRUE,
+                   AmlMemoryNonCacheable,
+                   TRUE,
+                   0,
+                   (UINT32)(AddrMapInfo->PciAddress),
+                   (UINT32)(AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1),
+                   (UINT32)(Translation ? AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress : 0),
+                   (UINT32)(AddrMapInfo->AddressSize),
+                   0,
+                   NULL,
+                   AmlAddressRangeMemory,
+                   TRUE,
+                   CrsNode,
+                   NULL
+                   );
+        break;
+      case PCI_SS_M64_UC:
+        Status = AmlCodeGenRdQWordMemory (
+                   FALSE,
+                   IsPosDecode,
+                   TRUE,
+                   TRUE,
+                   AmlMemoryNonCacheable,
+                   TRUE,
+                   0,
+                   AddrMapInfo->PciAddress,
+                   AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1,
+                   Translation ? AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress : 0,
+                   AddrMapInfo->AddressSize,
+                   0,
+                   NULL,
+                   AmlAddressRangeMemory,
+                   TRUE,
+                   CrsNode,
+                   NULL
+                   );
+        break;
       default:
         Status = EFI_INVALID_PARAMETER;
     } // switch
