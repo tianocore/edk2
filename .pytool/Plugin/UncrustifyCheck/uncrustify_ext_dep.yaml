@@ -7,10 +7,13 @@
 {
   "id": "uncrustify-ci-1",
   "scope": "cibuild",
-  "type": "nuget",
-  "name": "mu-uncrustify-release",
-  "source": "https://pkgs.dev.azure.com/projectmu/Uncrustify/_packaging/mu_uncrustify/nuget/v3/index.json",
-  "version": "73.0.8",
+  "type": "web",
+  "name": "tianocore-uncrustify-release",
+  "source": "https://github.com/tianocore/uncrustify/releases/download/73.0.10/uncrustify-release.zip",
+  "version": "73.0.10",
+  "sha256": "65d6f0f2e2bba9f25edaa1a9a5e5b9af32ba8d5c2792e467b84abfdf39b5e8ee",
+  "compression_type": "zip",
+  "internal_path": "/",
   "flags": ["set_shell_var", "host_specific"],
   "var_name": "UNCRUSTIFY_CI_PATH"
 }
