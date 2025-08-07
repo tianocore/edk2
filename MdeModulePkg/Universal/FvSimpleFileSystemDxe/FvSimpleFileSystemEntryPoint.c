@@ -450,7 +450,10 @@ FvSimpleFileSystemDriverStart (
   // Create an instance
   //
   Instance = AllocateZeroPool (sizeof (FV_FILESYSTEM_INSTANCE));
-  ASSERT (Instance != NULL);
+  if (Instance == NULL) {
+    ASSERT (Instance != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   Instance->Root       = NULL;
   Instance->FvProtocol = FvProtocol;

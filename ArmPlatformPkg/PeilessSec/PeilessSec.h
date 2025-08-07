@@ -24,6 +24,8 @@
 #include <Library/PrintLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/TimerLib.h>
+#include <Library/ArmTransferListLib.h>
+#include <Guid/TransferListHob.h>
 
 #include <Ppi/ArmMpCoreInfo.h>
 #include <Ppi/GuidedSectionExtraction.h>

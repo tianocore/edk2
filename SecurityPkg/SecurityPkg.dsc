@@ -91,6 +91,9 @@
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   ArmTrngLib|MdePkg/Library/BaseArmTrngLibNull/BaseArmTrngLibNull.inf
+  ArmSmcLib|MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
+  ArmSvcLib|MdePkg/Library/ArmSvcLib/ArmSvcLib.inf
+  ArmFfaLib|MdeModulePkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
 
 [LibraryClasses.ARM]
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
@@ -425,7 +428,9 @@
 [Components.AARCH64]
   SecurityPkg/Tcg/Tcg2StandaloneMmArm/Tcg2StandaloneMmArm.inf
   SecurityPkg/Tcg/Tcg2AcpiFfa/Tcg2AcpiFfa.inf
+  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigFfaPei.inf
   SecurityPkg/Library/Tpm2DeviceLibFfa/Tpm2DeviceLibFfa.inf
+  SecurityPkg/Library/Tpm2DeviceLibFfa/Tpm2DeviceSecLibFfa.inf
   SecurityPkg/Library/Tpm2DeviceLibFfa/Tpm2InstanceLibFfa.inf
 
 [BuildOptions]

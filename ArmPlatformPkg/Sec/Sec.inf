@@ -48,9 +48,11 @@
   PrintLib
   SerialPortLib
   StackCheckLib
+  ArmTransferListLib
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid
+  gArmTransferListPpiGuid
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString

@@ -236,12 +236,14 @@ SmmWaitForApArrival (
   UINTN    Index;
   UINT32   DelayedCount;
   UINT32   BlockedCount;
+  UINT32   DisabledCount;
   BOOLEAN  SyncNeeded;
 
   PERF_FUNCTION_BEGIN ();
 
-  DelayedCount = 0;
-  BlockedCount = 0;
+  DelayedCount  = 0;
+  BlockedCount  = 0;
+  DisabledCount = 0;
 
   ASSERT (SmmCpuSyncGetArrivedCpuCount (mSmmMpSyncData->SyncContext) <= mNumberOfCpus);
 
@@ -318,12 +320,13 @@ SmmWaitForApArrival (
     }
   }
 
+  mSmmMpSyncData->AllApArrivedWithException = AllCpusInSmmExceptBlockedDisabled ();
   if (!mSmmMpSyncData->AllApArrivedWithException) {
     //
-    // Check for the Blocked & Delayed Case.
+    // Check for the Disabled & Blocked & Delayed Case.
     //
-    GetSmmDelayedBlockedDisabledCount (&DelayedCount, &BlockedCount, NULL);
-    DEBUG ((DEBUG_INFO, "SmmWaitForApArrival: Delayed AP Count = %d, Blocked AP Count = %d\n", DelayedCount, BlockedCount));
+    GetSmmDelayedBlockedDisabledCount (&DelayedCount, &BlockedCount, &DisabledCount);
+    DEBUG ((DEBUG_ERROR, "SmmWaitForApArrival: Failed to wait all APs enter SMI. Delayed AP Count = %d, Blocked AP Count = %d, Disabled AP Count = %d\n", DelayedCount, BlockedCount, DisabledCount));
   }
 
   PERF_FUNCTION_END ();
