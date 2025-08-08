@@ -514,6 +514,12 @@ UpdateBootManager (
   GroupMultipleLegacyBootOption4SameType ();
 
   BootOption = EfiBootManagerGetLoadOptions (&BootOptionCount, LoadOptionTypeBoot);
+  if (BootOption == NULL) {
+    //
+    // No boot option available, return directly
+    //
+    return;
+  }
 
   HiiHandle = gBootManagerPrivate.HiiHandle;
 
@@ -853,34 +859,35 @@ BootManagerCallback (
   }
 
   BootOption = EfiBootManagerGetLoadOptions (&BootOptionCount, LoadOptionTypeBoot);
+  if (BootOption != NULL) {
+    //
+    // Clear  the  screen  before.
+    //
+    gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
+    gST->ConOut->ClearScreen (gST->ConOut);
 
-  //
-  // Clear  the  screen  before.
-  //
-  gST->ConOut->SetAttribute (gST->ConOut, EFI_TEXT_ATTR (EFI_LIGHTGRAY, EFI_BLACK));
-  gST->ConOut->ClearScreen (gST->ConOut);
+    //
+    // check any reset required change is applied? if yes, reset system
+    //
+    BmSetupResetReminder ();
 
-  //
-  // check any reset required change is applied? if yes, reset system
-  //
-  BmSetupResetReminder ();
+    //
+    // parse the selected option
+    //
+    BmSetConsoleMode (FALSE);
+    EfiBootManagerBoot (&BootOption[QuestionId - 1]);
+    BmSetConsoleMode (TRUE);
 
-  //
-  // parse the selected option
-  //
-  BmSetConsoleMode (FALSE);
-  EfiBootManagerBoot (&BootOption[QuestionId - 1]);
-  BmSetConsoleMode (TRUE);
+    if (EFI_ERROR (BootOption[QuestionId - 1].Status)) {
+      gST->ConOut->OutputString (
+                     gST->ConOut,
+                     HiiGetString (gBootManagerPrivate.HiiHandle, STRING_TOKEN (STR_ANY_KEY_CONTINUE), NULL)
+                     );
+      gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+    }
 
-  if (EFI_ERROR (BootOption[QuestionId - 1].Status)) {
-    gST->ConOut->OutputString (
-                   gST->ConOut,
-                   HiiGetString (gBootManagerPrivate.HiiHandle, STRING_TOKEN (STR_ANY_KEY_CONTINUE), NULL)
-                   );
-    gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+    EfiBootManagerFreeLoadOptions (BootOption, BootOptionCount);
   }
-
-  EfiBootManagerFreeLoadOptions (BootOption, BootOptionCount);
 
   return EFI_SUCCESS;
 }
