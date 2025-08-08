@@ -354,6 +354,14 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedStart|0|UINT32|0x62
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecValidatedEnd|0|UINT32|0x63
 
+  ## The base address and size of the IGVM parameter area.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmParamBase|0x0|UINT32|0x7d
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmParamSize|0x0|UINT32|0x7e
+
+  ## The base address and size of the IGVM hob area.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmHobBase|0x0|UINT32|0x7f
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmHobSize|0x0|UINT32|0x80
+
   ## The Tdx accept page size. 0x1000(4k),0x200000(2M)
   gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptPageSize|0x200000|UINT32|0x65
 

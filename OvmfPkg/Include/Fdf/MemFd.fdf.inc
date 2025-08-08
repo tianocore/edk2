@@ -99,9 +99,21 @@ gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableBase|gUefiOvmfPkgTokenSpaceGuid.PcdQe
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableSize
 
 #
+# IGVM parameter area
+#
+0x012000|0x001000
+gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmParamBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmParamSize
+
+#
+# IGVM data HOBs
+#
+0x013000|0x001000
+gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmHobBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmHobSize
+
+#
 # initial memory for SEC+PEI
 #
-0x012000|0x00E000
+0x014000|0x00C000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
 
 #
