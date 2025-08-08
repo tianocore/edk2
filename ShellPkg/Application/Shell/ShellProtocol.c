@@ -3254,7 +3254,7 @@ EfiShellSetCurDir (
       return (EFI_INVALID_PARAMETER);
     }
 
-    //    gShellCurMapping = MapListItem;
+    gShellCurMapping = MapListItem;
     if (DirectoryName != NULL) {
       //
       // change current dir on that file system
