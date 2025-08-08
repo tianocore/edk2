@@ -51,6 +51,13 @@ class FD(FDClassObject):
         if not Flag:
             GenFdsGlobalVariable.InfLogger("\nFd File Name:%s (%s)" %(self.FdUiName, FdFileName))
 
+        if GenFdsGlobalVariable.NinjaBuild == True:
+            PythonCmd =  os.environ['PYTHON_COMMAND']
+            EdkToolPath = os.environ['EDK_TOOLS_PATH']
+            PatchBinaryCmd = os.path.join(EdkToolPath, 'Scripts', 'PatchBinary.py ')
+            CmdStr = f"{PythonCmd} {PatchBinaryCmd} -o {FdFileName}"
+            GenFdsGlobalVariable.NinjaFdCmdDict[FdFileName] = CmdStr
+
         Offset = 0x00
         for item in self.BlockSizeList:
             Offset = Offset + item[0]  * item[1]
@@ -84,7 +91,7 @@ class FD(FDClassObject):
                     PadRegion.Offset = PreviousRegionStart + PreviousRegionSize
                     PadRegion.Size = RegionObj.Offset - PadRegion.Offset
                     if not Flag:
-                        PadRegion.AddToBuffer(TempFdBuffer, self.BaseAddress, self.BlockSizeList, self.ErasePolarity, GenFdsGlobalVariable.ImageBinDict, self.DefineVarDict)
+                        PadRegion.AddToBuffer(FdFileName, TempFdBuffer, self.BaseAddress, self.BlockSizeList, self.ErasePolarity, GenFdsGlobalVariable.ImageBinDict, self.DefineVarDict)
                 PreviousRegionStart = RegionObj.Offset
                 PreviousRegionSize = RegionObj.Size
                 #
@@ -93,7 +100,7 @@ class FD(FDClassObject):
                 if PreviousRegionSize > self.Size:
                     pass
                 GenFdsGlobalVariable.VerboseLogger('Call each region\'s AddToBuffer function')
-                RegionObj.AddToBuffer (TempFdBuffer, self.BaseAddress, self.BlockSizeList, self.ErasePolarity, GenFdsGlobalVariable.ImageBinDict, self.DefineVarDict)
+                RegionObj.AddToBuffer (FdFileName, TempFdBuffer, self.BaseAddress, self.BlockSizeList, self.ErasePolarity, GenFdsGlobalVariable.ImageBinDict, self.DefineVarDict)
 
         FdBuffer = BytesIO()
         PreviousRegionStart = -1
@@ -114,7 +121,7 @@ class FD(FDClassObject):
                 PadRegion.Offset = PreviousRegionStart + PreviousRegionSize
                 PadRegion.Size = RegionObj.Offset - PadRegion.Offset
                 if not Flag:
-                    PadRegion.AddToBuffer(FdBuffer, self.BaseAddress, self.BlockSizeList, self.ErasePolarity, GenFdsGlobalVariable.ImageBinDict, self.DefineVarDict)
+                    PadRegion.AddToBuffer(FdFileName, FdBuffer, self.BaseAddress, self.BlockSizeList, self.ErasePolarity, GenFdsGlobalVariable.ImageBinDict, self.DefineVarDict)
             PreviousRegionStart = RegionObj.Offset
             PreviousRegionSize = RegionObj.Size
             #
@@ -128,15 +135,24 @@ class FD(FDClassObject):
             # Call each region's AddToBuffer function
             #
             GenFdsGlobalVariable.VerboseLogger('Call each region\'s AddToBuffer function')
-            RegionObj.AddToBuffer (FdBuffer, self.BaseAddress, self.BlockSizeList, self.ErasePolarity, GenFdsGlobalVariable.ImageBinDict, self.DefineVarDict, Flag=Flag)
+            RegionObj.AddToBuffer (FdFileName, FdBuffer, self.BaseAddress, self.BlockSizeList, self.ErasePolarity, GenFdsGlobalVariable.ImageBinDict, self.DefineVarDict, Flag=Flag)
         #
         # Write the buffer contents to Fd file
         #
         GenFdsGlobalVariable.VerboseLogger('Write the buffer contents to Fd file')
         if not Flag:
-            SaveFileOnChange(FdFileName, FdBuffer.getvalue())
+            if GenFdsGlobalVariable.NinjaBuild == True:
+                with open(FdFileName, 'wb') as Fd:
+                    Fd.write(FdBuffer.getvalue())
+            else:
+                SaveFileOnChange(FdFileName, FdBuffer.getvalue())
+
         FdBuffer.close()
         GenFdsGlobalVariable.ImageBinDict[self.FdUiName.upper() + 'fd'] = FdFileName
+
+        if GenFdsGlobalVariable.NinjaBuild == True:
+            GenFdsGlobalVariable.NinjaCmdSet.add(GenFdsGlobalVariable.NinjaFdCmdDict[FdFileName])
+
         return FdFileName
 
 
