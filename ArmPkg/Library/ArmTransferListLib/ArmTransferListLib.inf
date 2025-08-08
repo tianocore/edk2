@@ -25,3 +25,6 @@
 
 [LibraryClasses]
   BaseLib
+
+[Guids]
+  gArmTransferListHobGuid
