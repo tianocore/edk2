@@ -108,7 +108,7 @@ InstallPreHashFvPpi (
   @param[in]  FvNumber            Length of the FV.
   @param[in]  BootMode            Length of the FV.
 
-  @retval EFI_SUCCESS           The given FV is integrate.
+  @retval EFI_SUCCESS           The given FV is integrated, hash verification is bypassed, or hash matches.
   @retval EFI_VOLUME_CORRUPTED  The given FV is corrupted (hash mismatch).
   @retval EFI_UNSUPPORTED       The hash algorithm is not supported.
 **/
@@ -389,16 +389,12 @@ CheckStoredHashFv (
                       );
   if (!EFI_ERROR (Status) && (StoredHashFvPpi != NULL) && (StoredHashFvPpi->FvNumber > 0)) {
     HashInfo = GetHashInfo (StoredHashFvPpi, BootMode);
-    if (HashInfo != NULL) {
-      Status = VerifyHashedFv (
-                 HashInfo,
-                 StoredHashFvPpi->FvInfo,
-                 StoredHashFvPpi->FvNumber,
-                 BootMode
-                 );
-    } else {
-      Status = EFI_NOT_FOUND;
-    }
+    Status = VerifyHashedFv (
+                HashInfo,
+                StoredHashFvPpi->FvInfo,
+                StoredHashFvPpi->FvNumber,
+                BootMode
+                );
 
     if (!EFI_ERROR (Status)) {
       DEBUG ((DEBUG_INFO, "OBB verification passed (%r)\r\n", Status));
