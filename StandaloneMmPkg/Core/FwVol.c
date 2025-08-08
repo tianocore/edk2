@@ -25,6 +25,11 @@ MmAddToDriverList (
   IN EFI_GUID                    *DriverName
   );
 
+VOID
+MmOrderDriversWithApriori (
+  IN EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader
+  );
+
 BOOLEAN
 FvHasBeenProcessed (
   IN EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader
@@ -227,6 +232,8 @@ MmCoreFfsFindMmDriver (
       }
     }
   } while (!EFI_ERROR (Status));
+
+  MmOrderDriversWithApriori (FwVolHeader);
 
   return EFI_SUCCESS;
 
