@@ -15,6 +15,7 @@ ALIGN 16
 
 %define IGVM_ID_HOB_AREA                                 0x200
 
+; keep in sync with OvmfPkg/Library/PlatformInitLib/Igvm.c
 %define MEMORY_MAP_OFFSET                                    0
 %define MEMORY_MAP_ENTRIES                                   8
 %define MEMORY_MAP_SIZE              (MEMORY_MAP_ENTRIES * 24)
