@@ -20,6 +20,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
 
 #include "ArmFfaCommon.h"
 #include "ArmFfaRxTxMap.h"
@@ -56,6 +57,15 @@ ArmFfaStandaloneMmLibConstructor (
 
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a failed. Status = %r\n", __func__, Status));
+    return Status;
+  }
+
+  /*
+   * Some legacy platform doesn't need to map Rx/Tx buffer (i.e) RPMB platform.
+   * In this case, Skip mapping Rx/Tx buffer.
+   */
+  if (PcdGetBool (PcdFfaSkipRxTxMapping)) {
+    return EFI_SUCCESS;
   }
 
   Status = ArmFfaLibRxTxMap ();

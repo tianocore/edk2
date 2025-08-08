@@ -38,6 +38,7 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaTxRxPageCount
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaSkipRxTxMapping
 
 [Guids]
   gArmFfaRxTxBufferInfoGuid
