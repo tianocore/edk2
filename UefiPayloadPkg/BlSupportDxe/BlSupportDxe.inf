@@ -39,6 +39,9 @@
   UefiPayloadPkg/UefiPayloadPkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
+[Packages.AARCH64]
+  ArmPkg/ArmPkg.dec
+
 [LibraryClasses]
   UefiDriverEntryPoint
   UefiBootServicesTableLib
