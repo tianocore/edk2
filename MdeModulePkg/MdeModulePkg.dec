@@ -1212,6 +1212,11 @@
   # @Prompt FFA TX/RX Buffer Page Count
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaTxRxPageCount|1|UINT64|0x30001062
 
+  ## Specifies wheteher ArmFfaLib maps TX/RX buffer.
+  #  Default is FALSE.
+  # @Prompt Skip TX/RX buffer mapping in ArmFfaLib.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaSkipRxTxMapping|FALSE|BOOLEAN|0x30001063
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicates the maximum number of callback function
