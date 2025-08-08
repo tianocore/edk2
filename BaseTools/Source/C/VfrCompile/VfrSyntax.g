@@ -2,6 +2,7 @@
 Vfr Syntax
 
 Copyright (c) 2004 - 2025, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2025, Loongson Technology Corporation Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 --*/
@@ -1618,7 +1619,7 @@ vfrConstantValueField[UINT8 Type, EFI_IFR_TYPE_VALUE &Value, BOOLEAN &ListType] 
                                                            $Value.b      = _STOU8(N1->getText(), N1->getLine());
                                                          break;
                                                          case EFI_IFR_TYPE_STRING :
-                                                           $Value.string = _STOU16(N1->getText(), N1->getLine());
+                                                           _PCATCH (VFR_RETURN_INVALID_PARAMETER, N1->getLine(), "string type can't be numeric constant.");
                                                          break;
                                                          case EFI_IFR_TYPE_TIME :
                                                          case EFI_IFR_TYPE_DATE :
@@ -3127,7 +3128,7 @@ vfrStatementString :
      UINT8 StringMaxSize;
   >>
   L:String                                             << SObj.SetLineNo(L->getLine()); gIsStringOp = TRUE;>>
-  vfrQuestionHeader[SObj] ","
+  vfrQuestionHeader[SObj] ","                          << _GET_CURRQEST_VARTINFO().mVarType = EFI_IFR_TYPE_STRING;>>
   { F:FLAGS "=" vfrStringFlagsField[SObj, F->getLine()] "," }
   {
     Key "=" KN:Number ","                              << AssignQuestionKey (SObj, KN); >>
