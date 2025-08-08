@@ -755,4 +755,17 @@ ArmHasEte (
   VOID
   );
 
+/**
+  Checks whether the CPU supports 52-bit addressing with 4KiB translation
+  granule size
+
+  @retval TRUE   52-bit addressing is implemented.
+  @retval FALSE  52-bit addressing is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHas52BitTgran4 (
+  VOID
+  );
+
 #endif // ARM_LIB_H_
