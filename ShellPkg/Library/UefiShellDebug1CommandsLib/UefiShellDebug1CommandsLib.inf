@@ -96,7 +96,6 @@
   MdePkg/MdePkg.dec
   ShellPkg/ShellPkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  EmbeddedPkg/EmbeddedPkg.dec
 
 [LibraryClasses]
   MemoryAllocationLib
