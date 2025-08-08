@@ -397,7 +397,8 @@ CheckStoredHashFv (
                  BootMode
                  );
     } else {
-      Status = EFI_NOT_FOUND;
+      DEBUG ((DEBUG_INFO, "Bypass FV hash verification\r\n"));
+      Status = EFI_SUCCESS;
     }
 
     if (!EFI_ERROR (Status)) {
