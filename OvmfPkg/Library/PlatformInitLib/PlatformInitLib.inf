@@ -24,6 +24,7 @@
 
 [Sources]
   Cmos.c
+  Igvm.c
   MemDetect.c
   Platform.c
 
@@ -109,6 +110,8 @@
 
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogSize
+
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmParamBase
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
