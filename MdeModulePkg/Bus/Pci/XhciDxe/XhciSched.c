@@ -1742,8 +1742,8 @@ XhcMonitorAsyncRequests (
     //
     if (Urb->Callback != NULL) {
       //
-      // Restore the old TPL, USB bus maybe connect device in
-      // his callback. Some drivers may has a lower TPL restriction.
+      // Restore the previous TPL. The USB bus may connect a device in its callback,
+      // and some drivers require a lower TPL to run correctly.
       //
       gBS->RestoreTPL (OldTpl);
       (Urb->Callback)(ProcBuf, cbCompleted, cbContext, cbResult);
