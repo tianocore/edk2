@@ -802,12 +802,6 @@
   # @Prompt Enable variable statistics collection.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics|FALSE|BOOLEAN|0x0001003f
 
-  ## Indicates if Unicode Collation Protocol will be installed.<BR><BR>
-  #   TRUE  - Installs Unicode Collation Protocol.<BR>
-  #   FALSE - Does not install Unicode Collation Protocol.<BR>
-  # @Prompt Enable Unicode Collation support.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollationSupport|TRUE|BOOLEAN|0x00010040
-
   ## Indicates if Unicode Collation 2 Protocol will be installed.<BR><BR>
   #   TRUE  - Installs Unicode Collation 2 Protocol.<BR>
   #   FALSE - Does not install Unicode Collation 2 Protocol.<BR>
