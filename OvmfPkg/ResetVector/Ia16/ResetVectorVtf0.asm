@@ -49,6 +49,18 @@ guidedStructureStart:
 
 %ifdef ARCH_X64
 ;
+; IGVM Metadata offset block
+;
+; GUID : 784fa70e-3176-4677-8a20-04b68699e374
+;
+igvmMetadataOffsetStart:
+    DD      fourGigabytes - IgvmParamStart
+    DW      igvmMetadataOffsetEnd - igvmMetadataOffsetStart
+    DB      0x0E, 0xA7, 0x4F, 0x78, 0x76, 0x31, 0x77, 0x46
+    DB      0x8A, 0x20, 0x04, 0xB6, 0x86, 0x99, 0xE3, 0x74
+igvmMetadataOffsetEnd:
+
+;
 ; TDX Metadata offset block
 ;
 ; TdxMetadata.asm is included in ARCH_X64 because Inte TDX is only

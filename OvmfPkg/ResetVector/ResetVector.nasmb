@@ -141,11 +141,18 @@
   %define TDX_WORK_AREA_PGTBL_READY (FixedPcdGet32 (PcdOvmfWorkAreaBase) + 4)
   %define TDX_WORK_AREA_GPAW        (FixedPcdGet32 (PcdOvmfWorkAreaBase) + 8)
 
+  %define IGVM_PARAM_START          (FixedPcdGet32 (PcdOvmfIgvmParamBase))
+  %define IGVM_PARAM_SIZE           (FixedPcdGet32 (PcdOvmfIgvmParamSize))
+
+  %define IGVM_HOB_START            (FixedPcdGet32 (PcdOvmfIgvmHobBase))
+  %define IGVM_HOB_SIZE             (FixedPcdGet32 (PcdOvmfIgvmHobSize))
+
   %include "X64/IntelTdxMetadata.asm"
   %include "Ia32/Flat32ToFlat64.asm"
   %include "Ia32/PageTables64.asm"
   %include "Ia32/IntelTdx.asm"
   %include "X64/OvmfSevMetadata.asm"
+  %include "X64/IgvmMetadata.asm"
 %endif
 
 %include "Ia32/AmdSev.asm"
