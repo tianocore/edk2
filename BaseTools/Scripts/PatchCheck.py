@@ -117,13 +117,13 @@ class CommitMessageCheck:
 
         self.check_contributed_under()
         if not MergifyMerge:
+            self.check_ci_options_format()
             self.check_subject(updated_packages)
             self.check_signed_off_by()
             self.check_misc_signatures()
             self.check_overall_format()
             if not PatchCheckConf.ignore_change_id:
                 self.check_change_id_format()
-            self.check_ci_options_format()
         self.report_message_result()
 
     url = 'https://github.com/tianocore/tianocore.github.io/wiki/Commit-Message-Format'
@@ -212,11 +212,17 @@ class CommitMessageCheck:
 
     def check_subject(self, updated_packages):
         if updated_packages:
+            num_found = 0
             for package in updated_packages:
                 current_package_re = r"(Revert \"|^|, ?)" + re.escape(package) + r"([ ,:\/])"
-                if not re.search(current_package_re, self.subject):
-                    self.error("Subject line not in \"package/component: description\" format!")
-                    return
+                if re.search(current_package_re, self.subject):
+                    num_found += 1
+
+            if self.ignore_multi_package and len(updated_packages) > 3:
+                if not re.search(r'^Global:', self.subject):
+                    self.error("Subject line does not start with 'Global:' for > 3 package multi-package commit!")
+            elif num_found != len(updated_packages):
+                self.error("Subject line not in \"package,package: description\" format!")
 
     def check_signed_off_by(self):
         sob='Signed-off-by'
