@@ -13,7 +13,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <PiPei.h>
 
 #include <Ppi/UsbIo.h>
-#include <Ppi/UsbHostController.h>
 #include <Ppi/BlockIo.h>
 #include <Ppi/BlockIo2.h>
 
