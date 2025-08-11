@@ -113,7 +113,7 @@ GetSavedOpalRequest (
 
   TempVariable = Variable;
   while ((VariableSize > sizeof (OPAL_REQUEST_VARIABLE)) &&
-         (VariableSize >= (UINTN)TempVariable->Length) &&
+         (VariableSize >= TempVariable->Length) &&
          (TempVariable->Length > sizeof (OPAL_REQUEST_VARIABLE)))
   {
     DevicePathInVariable     = (EFI_DEVICE_PATH_PROTOCOL *)((UINTN)TempVariable + sizeof (OPAL_REQUEST_VARIABLE));
@@ -193,7 +193,7 @@ SaveOpalRequest (
     TempVariable     = Variable;
     TempVariableSize = VariableSize;
     while ((TempVariableSize > sizeof (OPAL_REQUEST_VARIABLE)) &&
-           (TempVariableSize >= (UINTN)TempVariable->Length) &&
+           (TempVariableSize >= TempVariable->Length) &&
            (TempVariable->Length > sizeof (OPAL_REQUEST_VARIABLE)))
     {
       DevicePathInVariable     = (EFI_DEVICE_PATH_PROTOCOL *)((UINTN)TempVariable + sizeof (OPAL_REQUEST_VARIABLE));
@@ -226,11 +226,7 @@ SaveOpalRequest (
       DevicePathSize  = GetDevicePathSize (DevicePath);
       NewVariableSize = VariableSize + sizeof (OPAL_REQUEST_VARIABLE) + DevicePathSize;
       NewVariable     = AllocatePool (NewVariableSize);
-      if (NewVariable == NULL) {
-        ASSERT (NewVariable != NULL);
-        return;
-      }
-
+      ASSERT (NewVariable != NULL);
       CopyMem (NewVariable, Variable, VariableSize);
       TempVariable         = (OPAL_REQUEST_VARIABLE *)((UINTN)NewVariable + VariableSize);
       TempVariable->Length = (UINT32)(sizeof (OPAL_REQUEST_VARIABLE) + DevicePathSize);
@@ -243,11 +239,7 @@ SaveOpalRequest (
     DevicePathSize  = GetDevicePathSize (DevicePath);
     NewVariableSize = sizeof (OPAL_REQUEST_VARIABLE) + DevicePathSize;
     NewVariable     = AllocatePool (NewVariableSize);
-    if (NewVariable == NULL) {
-      ASSERT (NewVariable != NULL);
-      return;
-    }
-
+    ASSERT (NewVariable != NULL);
     NewVariable->Length = (UINT32)(sizeof (OPAL_REQUEST_VARIABLE) + DevicePathSize);
     CopyMem (&NewVariable->OpalRequest, &OpalRequest, sizeof (OPAL_REQUEST));
     DevicePathInVariable = (EFI_DEVICE_PATH_PROTOCOL *)((UINTN)NewVariable + sizeof (OPAL_REQUEST_VARIABLE));
@@ -1119,13 +1111,8 @@ ExtractConfig (
     //
     DriverHandle     = HiiGetDriverImageHandleCB ();
     ConfigRequestHdr = HiiConstructConfigHdr (&gHiiSetupVariableGuid, OpalPasswordStorageName, DriverHandle);
-    if (ConfigRequestHdr == NULL) {
-      ASSERT (ConfigRequestHdr != NULL);
-      return EFI_OUT_OF_RESOURCES;
-    }
-
-    Size          = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
-    ConfigRequest = AllocateZeroPool (Size);
+    Size             = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest    = AllocateZeroPool (Size);
     if (ConfigRequest == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
