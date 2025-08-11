@@ -56,10 +56,7 @@ Sha256HashInit (
 
   CtxSize   = Sha256GetContextSize ();
   Sha256Ctx = AllocatePool (CtxSize);
-  if (Sha256Ctx == NULL) {
-    ASSERT (Sha256Ctx != NULL);
-    return EFI_OUT_OF_RESOURCES;
-  }
+  ASSERT (Sha256Ctx != NULL);
 
   Sha256Init (Sha256Ctx);
 

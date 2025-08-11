@@ -103,11 +103,7 @@ InitializeTcg2VersionInfo (
                        TCG2_VERSION_NAME,
                        PrivateData->DriverHandle
                        );
-  if (ConfigRequestHdr == NULL) {
-    ASSERT (ConfigRequestHdr != NULL);
-    return;
-  }
-
+  ASSERT (ConfigRequestHdr != NULL);
   DataSize = sizeof (Tcg2Version);
   Status   = gRT->GetVariable (
                     TCG2_VERSION_NAME,
