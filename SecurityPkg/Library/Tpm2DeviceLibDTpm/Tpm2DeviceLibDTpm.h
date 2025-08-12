@@ -55,13 +55,15 @@ GetCachedIdleByPass (
   );
 
 /**
-  The common function cache current active TpmInterfaceType when needed.
+  The common function to cache the currently active TpmInterfaceType when needed.
 
-  @retval EFI_SUCCESS   DTPM2.0 instance is registered, or system does not support register DTPM2.0 instance
+  @param[out] PtpInterface  Pointer to store the cached PTP interface type.
+
+  @retval EFI_SUCCESS   DTPM2.0 instance is registered or the system does not support registering a DTPM2.0 instance
 **/
 EFI_STATUS
 InternalTpm2DeviceLibDTpmCommonConstructor (
-  VOID
+  TPM2_PTP_INTERFACE_TYPE  *PtpInterface
   );
 
 #endif // _TPM2_DEVICE_LIB_DTPM_H_
