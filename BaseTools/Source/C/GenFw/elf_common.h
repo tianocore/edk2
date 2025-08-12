@@ -68,6 +68,9 @@ typedef struct {
 #define GNU_PROPERTY_AARCH64_FEATURE_1_BTI  0x1
 #define GNU_PROPERTY_AARCH64_FEATURE_1_PAC  0x2
 
+#define GNU_PROPERTY_RISCV64_FEATURE_1_AND   0xc0000000
+#define GNU_PROPERTY_RISCV64_FEATURE_1_FCFI  0x1 /* zicfilp */
+
 /* Indexes into the e_ident array.  Keep synced with
    http://www.sco.com/developers/gabi/latest/ch4.eheader.html */
 #define EI_MAG0    0  /* Magic number, byte 0. */
