@@ -20,6 +20,16 @@ BITS 32
 ; If it is not Intel Tdx, EAX is 0
 ;
 IsTdx:
+
+    ;
+    ; When running on sev-es / sev-snp the cpuid instruction will
+    ; trigger a #vc exception.  Install the trap handler to avoid the
+    ; detection code double-fault.
+    ;
+    mov       esp, SEV_ES_VC_TOP_OF_STACK
+    mov       eax, ADDR_OF(Idtr)
+    lidt      [cs:eax]
+
     ;
     ; CPUID (0)
     ;
