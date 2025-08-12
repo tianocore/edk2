@@ -701,9 +701,14 @@ typedef union {
     UINT32    ReducedPhysBits : 5;
 
     ///
-    /// [Bit 31:12] Reserved
+    /// [Bit 30:12] Reserved
     ///
-    UINT32    ReservedBits    : 21;
+    UINT32    ReservedBits    : 20;
+
+    ///
+    /// [Bit 31] SEV-SNP Cache Coherency Mitigation is not needed
+    ///
+    UINT32    CoherencySfwNo  : 1;
   } Bits;
   ///
   /// All bit fields as a 32-bit value

@@ -249,9 +249,20 @@ ClearSevEsWorkArea:
 
     ; Check for SEV memory encryption feature:
     ; CPUID  Fn8000_001F[EAX] - Bit 1
+    ; Check for the COHERENCY_SFW_NO feature:
+    ; CPUID  Fn8000_001F[EBX] - Bit 31
     ;   CPUID raises a #VC exception if running as an SEV-ES guest
     mov       eax, 0x8000001f
     cpuid
+
+    ; If COHERENCY_SFW_NO is set, set the CoherencySfwNo bit in the
+    ; FLAGS field in the workarea (this can be set regardless of whether
+    ; SEV is enabled).
+    bt        ebx, 31
+    jnc       CheckSev
+    or        byte[SEV_ES_WORK_AREA_FLAGS], SEV_ES_WORK_AREA_FLAG_CSFW_NO
+
+CheckSev:
     bt        eax, 1
     jnc       NoSev
 
@@ -306,9 +317,10 @@ NoSev:
     ; Perform an SEV-ES sanity check by seeing if a #VC exception occurred.
     ;
     ; If SEV-ES is enabled, the CPUID instruction will trigger a #VC exception
-    ; where the RECEIVED_VC offset in the workarea will be set to one.
+    ; where the ReceivedVc bit in the FLAGS field in the workarea will be set
+    ; to one.
     ;
-    cmp       byte[SEV_ES_WORK_AREA_RECEIVED_VC], 0
+    test      byte[SEV_ES_WORK_AREA_FLAGS], SEV_ES_WORK_AREA_FLAG_VC
     jz        NoSevPass
 
     ;
@@ -402,9 +414,9 @@ SevEsIdtVmmComm:
     ; If we're here, then we are an SEV-ES guest and this
     ; was triggered by a CPUID instruction
     ;
-    ; Set the recievedVc field in the workarea to communicate that
-    ; a #VC was taken.
-    mov     byte[SEV_ES_WORK_AREA_RECEIVED_VC], 1
+    ; Set the ReceivedVc bit in the FLAGS field in the workarea
+    ; to communicate that a #VC was taken.
+    or      byte[SEV_ES_WORK_AREA_FLAGS], SEV_ES_WORK_AREA_FLAG_VC
 
     pop     ecx                     ; Error code
     cmp     ecx, 0x72               ; Be sure it was CPUID
