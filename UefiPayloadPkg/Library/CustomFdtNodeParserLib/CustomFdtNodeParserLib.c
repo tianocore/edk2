@@ -13,6 +13,8 @@
 #include <Library/FdtLib.h>
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
+#include "../UefiPayloadEntry/UefiPayloadEntry.h"
+#include <UniversalPayload/Ramdisk.h>
 
 /**
   Add a new HOB to the HOB List.
@@ -122,12 +124,18 @@ CustomFdtNodeParser (
   IN VOID  *HobList
   )
 {
-  INT32                 Node, CustomNode;
-  INT32                 TempLen;
-  UINT64                *Data64;
-  UINTN                 CHobList;
-  CONST FDT_PROPERTY    *PropertyPtr;
-  EFI_PEI_HOB_POINTERS  Hob;
+  INT32                      Node, CustomNode;
+  INT32                      TempLen;
+  UINT64                     *Data64;
+  UINTN                      CHobList;
+  CONST FDT_PROPERTY         *PropertyPtr;
+  EFI_PEI_HOB_POINTERS       Hob;
+  INT32                      Depth;
+  UINT64                     NumberOfBytes;
+  UNIVERSAL_PAYLOAD_RAMDISK  *Ramdisk;
+  UINT64                     StartAddress;
+  INT32                      SubNode;
+  CONST CHAR8                *TempStr;
 
   CHobList = (UINTN)HobList;
 
@@ -147,6 +155,41 @@ CustomFdtNodeParser (
       CHobList    = (UINTN)Fdt64ToCpu (ReadUnaligned64 (Data64));
       DEBUG ((DEBUG_INFO, "  Found hob list node (%08X)", CustomNode));
       DEBUG ((DEBUG_INFO, " -pointer  %016lX\n", CHobList));
+    }
+  }
+
+  // Look for a reserved memory range with compatible = "ramdisk"
+  Depth = 0;
+  for (Node = FdtNextNode (FdtBase, 0, &Depth); Node >= 0; Node = FdtNextNode (FdtBase, Node, &Depth)) {
+    NodePtr = (FDT_NODE_HEADER *)((CONST CHAR8 *)FdtBase + Node + Fdt32ToCpu (((FDT_HEADER *)FdtBase)->OffsetDtStruct));
+    if (AsciiStrnCmp (NodePtr->Name, "reserved-memory", AsciiStrLen ("reserved-memory")) != 0) {
+      continue;
+    }
+
+    for (SubNode = FdtFirstSubnode (FdtBase, Node); SubNode >= 0; SubNode = FdtNextSubnode (FdtBase, SubNode)) {
+      NodePtr       = (FDT_NODE_HEADER *)((CONST CHAR8 *)FdtBase + SubNode + Fdt32ToCpu (((FDT_HEADER *)FdtBase)->OffsetDtStruct));
+      PropertyPtr   = FdtGetProperty (FdtBase, SubNode, "reg", &TempLen);
+      Data64        = (UINT64 *)(PropertyPtr->Data);
+      StartAddress  = Fdt64ToCpu (*Data64);
+      NumberOfBytes = Fdt64ToCpu (*(Data64 + 1));
+      if (AsciiStrnCmp (NodePtr->Name, "memory@", AsciiStrLen ("memory@")) != 0) {
+        continue;
+      }
+
+      PropertyPtr = FdtGetProperty (FdtBase, SubNode, "compatible", &TempLen);
+      TempStr     = (CHAR8 *)(PropertyPtr->Data);
+      if (AsciiStrnCmp (TempStr, "ramdisk", AsciiStrLen ("ramdisk")) != 0) {
+        continue;
+      }
+
+      DEBUG ((DEBUG_INFO, "Found ramdisk\n"));
+      Ramdisk = BuildGuidHob (&gUniversalPayloadRamdiskGuid, sizeof (UNIVERSAL_PAYLOAD_RAMDISK));
+      if (Ramdisk != NULL) {
+        Ramdisk->Header.Revision = UNIVERSAL_PAYLOAD_RAMDISK_REVISION;
+        Ramdisk->Header.Length   = sizeof (UNIVERSAL_PAYLOAD_RAMDISK);
+        Ramdisk->RamdiskBase     = (EFI_PHYSICAL_ADDRESS)(UINTN)(StartAddress);
+        Ramdisk->RamdiskSize     = (UINTN)NumberOfBytes;
+      }
     }
   }
 
