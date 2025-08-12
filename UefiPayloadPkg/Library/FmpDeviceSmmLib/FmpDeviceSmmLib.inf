@@ -1,0 +1,47 @@
+## @file
+#  Provides firmware device specific services to support updates of a firmware
+#  image stored in a firmware device.
+#
+#  Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
+#  Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2025, 3mdeb Sp. z o.o. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION     = 0x00010005
+  BASE_NAME       = FmpDeviceSmmLib
+  MODULE_UNI_FILE = FmpDeviceSmmLib.uni
+  FILE_GUID       = 979CF0F8-7214-4D12-89CE-F32112ED71C6
+  MODULE_TYPE     = DXE_DRIVER
+  VERSION_STRING  = 1.0
+  LIBRARY_CLASS   = FmpDeviceLib|DXE_DRIVER UEFI_DRIVER
+  CONSTRUCTOR     = FmpDeviceSmmLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  FmpDeviceSmmLib.c
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  MemoryAllocationLib
+  SmmStoreLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+
+[Packages]
+  UefiPayloadPkg/UefiPayloadPkg.dec
+  FmpDevicePkg/FmpDevicePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[Guids]
+  gEfiFirmwareInfoHobGuid
