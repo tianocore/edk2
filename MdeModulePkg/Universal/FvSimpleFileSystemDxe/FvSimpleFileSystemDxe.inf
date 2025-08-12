@@ -60,7 +60,6 @@
 [Protocols]
   gEfiDevicePathProtocolGuid                                               ## TO_START
   gEfiFirmwareVolume2ProtocolGuid                                          ## TO_START
-  gEfiUnicodeCollationProtocolGuid                                         ## TO_START
   gEfiUnicodeCollation2ProtocolGuid                                        ## TO_START
   gEfiSimpleFileSystemProtocolGuid                                         ## BY_START
 
