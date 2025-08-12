@@ -25,13 +25,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/Tcg2PhysicalPresenceLib.h>
 
 /**
-  This function checks if the required DTPM instance is TPM 2.0.
+  This function checks if the required instance is a supported TPM 2.0 instance.
+  It currently supports two instances: dTPM and FFA.
 
-  @retval TRUE  The required DTPM instance is equal to gEfiTpmDeviceInstanceTpm20DtpmGuid.
-  @retval FALSE The required DTPM instance is not equal to gEfiTpmDeviceInstanceTpm20DtpmGuid.
+  @retval TRUE  The required DTPM instance is equal to gEfiTpmDeviceInstanceTpm20DtpmGuid or gTpm2ServiceFfaGuid.
+  @retval FALSE The required DTPM instance is not equal to either gEfiTpmDeviceInstanceTpm20DtpmGuid or gTpm2ServiceFfaGuid.
 **/
 BOOLEAN
-IsTpm20Dtpm (
+IsTpm20InstanceSupported (
   VOID
   )
 {
@@ -39,11 +40,13 @@ IsTpm20Dtpm (
 
   TpmGuid = PcdGetPtr (PcdTpmInstanceGuid);
   if (TpmGuid != NULL) {
-    if (CompareGuid ((EFI_GUID *)TpmGuid, &gEfiTpmDeviceInstanceTpm20DtpmGuid)) {
+    if (CompareGuid ((EFI_GUID *)TpmGuid, &gEfiTpmDeviceInstanceTpm20DtpmGuid) ||
+        CompareGuid ((EFI_GUID *)TpmGuid, &gTpm2ServiceFfaGuid))
+    {
       return TRUE;
     }
 
-    DEBUG ((DEBUG_ERROR, "No TPM2 DTPM instance required! - %g\n", (EFI_GUID *)TpmGuid));
+    DEBUG ((DEBUG_ERROR, "Unsupported TPM2 instance configured - %g!\n", (EFI_GUID *)TpmGuid));
   } else {
     DEBUG ((DEBUG_ERROR, "NULL PcdTpmInstanceGuid set!\n"));
   }
@@ -150,8 +153,8 @@ InitializeTcgStandaloneMm (
   EFI_STATUS  Status;
   EFI_HANDLE  PpSwHandle;
 
-  if (!IsTpm20Dtpm ()) {
-    DEBUG ((DEBUG_ERROR, "No TPM2 DTPM instance required!\n"));
+  if (!IsTpm20InstanceSupported ()) {
+    DEBUG ((DEBUG_ERROR, "The system does not have a TPM2 DTPM/FFA instance configured, PPI not supported!\n"));
     Status = EFI_UNSUPPORTED;
     goto Cleanup;
   }

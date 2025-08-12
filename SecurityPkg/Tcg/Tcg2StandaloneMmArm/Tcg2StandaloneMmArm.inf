@@ -54,7 +54,8 @@
   MemLib
 
 [Guids]
-  gEfiTpmDeviceInstanceTpm20DtpmGuid                            ## PRODUCES           ## GUID       # TPM device identifier
+  gEfiTpmDeviceInstanceTpm20DtpmGuid                            ## CONSUMES           ## GUID       # TPM device identifier
+  gTpm2ServiceFfaGuid                                           ## CONSUMES           ## GUID       # TPM device identifier
   gEdkiiTpmInstanceHobGuid
   gEfiPhysicalPresenceAcpiGuid
 
