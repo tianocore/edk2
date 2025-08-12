@@ -126,7 +126,7 @@
         $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
 
     <Command.MSFT, Command.INTEL>
-        "$(CC)" /Fo${dst} $(DEPS_FLAGS) $(CC_FLAGS) $(INC) ${src}
+        "$(CC)" /Fo${dst} /Fd$(DEBUG_DIR)\${s_base}.pdb $(DEPS_FLAGS) $(CC_FLAGS) $(INC) ${src}
 
     <Command.GCC>
         "$(CC)" $(DEPS_FLAGS) $(CC_FLAGS) -c -o ${dst} $(INC) ${src}

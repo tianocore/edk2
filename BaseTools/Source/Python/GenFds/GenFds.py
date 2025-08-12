@@ -19,6 +19,7 @@ from struct import unpack
 from linecache import getlines
 from io import BytesIO
 
+from AutoGen import GenNinja
 import Common.LongFilePathOs as os
 from Common.TargetTxtClassObject import TargetTxtDict,gDefaultTargetTxtFile
 from Common.DataType import *
@@ -372,8 +373,11 @@ def GenFdsApi(FdsCommandDict, WorkSpaceDataBase=None):
         """Generate GUID cross reference file"""
         GenFds.GenerateGuidXRefFile(BuildWorkSpace, ArchList, FdfParserObj)
 
-        """Display FV space info."""
-        GenFds.DisplayFvSpaceInfo(FdfParserObj)
+        if GenFdsGlobalVariable.NinjaBuild == True:
+            GenNinja.GeneratePostbuildStageNinjaRule(GenFdsGlobalVariable.NinjaCmdSet)
+        else:
+            """Display FV space info."""
+            GenFds.DisplayFvSpaceInfo(FdfParserObj)
 
     except Warning as X:
         EdkLogger.error(X.ToolName, FORMAT_INVALID, File=X.FileName, Line=X.LineNumber, ExtraData=X.Message, RaiseError=False)

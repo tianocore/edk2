@@ -1733,11 +1733,12 @@ class ModuleAutoGen(AutoGen):
 
         CreateTimeStamp()
 
-        MakefileType = Makefile._FileType
-        MakefileName = Makefile._FILE_NAME_[MakefileType]
-        MakefilePath = os.path.join(self.MakeFileDir, MakefileName)
-        FilePath = path.join(self.BuildDir, self.Name + ".makefile")
-        SaveFileOnChange(FilePath, MakefilePath, False)
+        if GlobalData.gNinjaBuild != True:
+            MakefileType = Makefile._FileType
+            MakefileName = Makefile._FILE_NAME_[MakefileType]
+            MakefilePath = os.path.join(self.MakeFileDir, MakefileName)
+            FilePath = path.join(self.BuildDir, self.Name + ".makefile")
+            SaveFileOnChange(FilePath, MakefilePath, False)
 
     def CopyBinaryFiles(self):
         for File in self.Module.Binaries:

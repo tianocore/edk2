@@ -55,6 +55,7 @@ class GenFdsGlobalVariable:
     ActivePlatform = None
     FvAddressFileName = ''
     VerboseMode = False
+    NinjaBuild = False
     DebugLevel = -1
     SharpCounter = 0
     SharpNumberPerLine = 40
@@ -70,6 +71,8 @@ class GenFdsGlobalVariable:
     FfsCmdDict = {}
     SecCmdList = []
     CopyList   = []
+    NinjaCmdSet = set()
+    NinjaFdCmdDict = dict()
     ModuleFile = ''
     EnableGenfdsMultiThread = True
 
@@ -330,6 +333,7 @@ class GenFdsGlobalVariable:
         GenFdsGlobalVariable.TargetName = GlobalData.gGlobalDefines["TARGET"]
         GenFdsGlobalVariable.ActivePlatform = GlobalData.gActivePlatform
         GenFdsGlobalVariable.ConfDir  = GlobalData.gConfDirectory
+        GenFdsGlobalVariable.NinjaBuild  = GlobalData.gNinjaBuild
         GenFdsGlobalVariable.EnableGenfdsMultiThread = GlobalData.gEnableGenfdsMultiThread
         for Arch in ArchList:
             GenFdsGlobalVariable.OutputDirDict[Arch] = os.path.normpath(
@@ -703,6 +707,10 @@ class GenFdsGlobalVariable:
 
     @staticmethod
     def CallExternalTool (cmd, errorMess, returnValue=[]):
+
+        if GenFdsGlobalVariable.NinjaBuild == True:
+            CmdStr = ' '.join(cmd)
+            GenFdsGlobalVariable.NinjaCmdSet.add(CmdStr)
 
         if type(cmd) not in (tuple, list):
             GenFdsGlobalVariable.ErrorLogger("ToolError!  Invalid parameter type in call to CallExternalTool")
