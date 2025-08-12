@@ -148,4 +148,11 @@ AmdSvsmQueryProtocol (
   OUT UINT32  *ProtocolMax
   );
 
+BOOLEAN
+EFIAPI
+AmdSvsmUefiMmRequest (
+  IN  UINT64  BufferAddr,
+  IN  UINT64  BufferSize
+  );
+
 #endif
