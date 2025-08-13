@@ -19,6 +19,21 @@
 #include <Pi/PiHob.h>
 
 /**
+  Get the TransferList from HOB list.
+
+  @param[out] TransferList  TransferList
+
+  @retval EFI_SUCCESS      TransferList is found.
+  @retval EFI_NOT_FOUND    TransferList is not found.
+
+**/
+EFI_STATUS
+EFIAPI
+TransferListGetFromHobList (
+  OUT TRANSFER_LIST_HEADER  **TransferList
+  );
+
+/**
   Return the first Transfer Entry Node in the Transfer List.
 
   @param [in]   TransferListHeader     Pointer to the Transfer List Header.
@@ -155,6 +170,28 @@ EFIAPI
 TransferListFindEntry (
   IN TRANSFER_LIST_HEADER  *TransferListHeader,
   IN UINT16                TagId
+  );
+
+/**
+  Get TPM event log from TransferList
+
+  @param [in]   TransferListHeader       Pointer to the Transfer List Header
+  @param [out]  EventLog                 Pointer to Eventlog in TransferList
+  @param [out]  EventLogSize             Size of Event log
+  @param [out]  EventLogFlags            Flags for Event log
+
+  @return EFI_SUCCESS
+  @return EFI_NOT_FOUND                  No Event log in TransferListHeader
+  @return EFI_INVALID_PARAMETER          Invalid parameters
+
+**/
+EFI_STATUS
+EFIAPI
+TransferListGetEventLog (
+  IN TRANSFER_LIST_HEADER  *TransferListHeader,
+  OUT VOID                 **EventLog,
+  OUT UINTN                *EventLogSize,
+  OUT UINT32               *EventLogFlags       OPTIONAL
   );
 
 #endif // ARM_TRANSFER_LIST_LIB_
