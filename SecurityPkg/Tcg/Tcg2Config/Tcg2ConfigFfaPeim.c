@@ -69,7 +69,7 @@ Tpm2FfaCheckInterfaceVersion (
   Status = ArmFfaLibMsgSendDirectReq2 (TpmPartId, &gTpm2ServiceFfaGuid, &TpmArgs);
   while (Status == EFI_INTERRUPT_PENDING) {
     // We are assuming vCPU0 of the TPM SP since it is UP.
-    Status = ArmFfaLibRun (TpmPartId, 0x00);
+    Status = ArmFfaLibRun (TpmPartId, 0x00, &TpmArgs);
   }
 
   if (EFI_ERROR (Status) || (TpmArgs.Arg0 != TPM2_FFA_SUCCESS_OK_RESULTS_RETURNED)) {
