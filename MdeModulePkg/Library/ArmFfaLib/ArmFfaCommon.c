@@ -535,6 +535,7 @@ ErrorHandler:
 
   @param [in]   PartId       Partition id
   @param [in]   CpuNumber    Cpu number in partition
+  @param [out]  DirectMsgArg return arguments for direct msg resp/resp2
 
   @retval EFI_SUCCESS
   @retval Other              Error
@@ -543,10 +544,12 @@ ErrorHandler:
 EFI_STATUS
 EFIAPI
 ArmFfaLibRun (
-  IN  UINT16  PartId,
-  IN  UINT16  CpuNumber
+  IN  UINT16           PartId,
+  IN  UINT16           CpuNumber,
+  OUT DIRECT_MSG_ARGS  *DirectMsgArg OPTIONAL
   )
 {
+  EFI_STATUS    Status;
   ARM_FFA_ARGS  FfaArgs;
 
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
@@ -556,7 +559,39 @@ ArmFfaLibRun (
 
   ArmCallFfa (&FfaArgs);
 
-  return FfaArgsToEfiStatus (&FfaArgs);
+  Status = FfaArgsToEfiStatus (&FfaArgs);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (DirectMsgArg != NULL) {
+    ZeroMem (DirectMsgArg, sizeof (DIRECT_MSG_ARGS));
+
+    if (FfaArgs.Arg0 == ARM_FID_FFA_MSG_SEND_DIRECT_RESP) {
+      DirectMsgArg->Arg0 = FfaArgs.Arg3;
+      DirectMsgArg->Arg1 = FfaArgs.Arg4;
+      DirectMsgArg->Arg2 = FfaArgs.Arg5;
+      DirectMsgArg->Arg3 = FfaArgs.Arg6;
+      DirectMsgArg->Arg4 = FfaArgs.Arg7;
+    } else if (FfaArgs.Arg0 == ARM_FID_FFA_MSG_SEND_DIRECT_RESP2) {
+      DirectMsgArg->Arg0  = FfaArgs.Arg4;
+      DirectMsgArg->Arg1  = FfaArgs.Arg5;
+      DirectMsgArg->Arg2  = FfaArgs.Arg6;
+      DirectMsgArg->Arg3  = FfaArgs.Arg7;
+      DirectMsgArg->Arg4  = FfaArgs.Arg8;
+      DirectMsgArg->Arg5  = FfaArgs.Arg9;
+      DirectMsgArg->Arg6  = FfaArgs.Arg10;
+      DirectMsgArg->Arg7  = FfaArgs.Arg11;
+      DirectMsgArg->Arg8  = FfaArgs.Arg12;
+      DirectMsgArg->Arg9  = FfaArgs.Arg13;
+      DirectMsgArg->Arg10 = FfaArgs.Arg14;
+      DirectMsgArg->Arg11 = FfaArgs.Arg15;
+      DirectMsgArg->Arg12 = FfaArgs.Arg16;
+      DirectMsgArg->Arg13 = FfaArgs.Arg17;
+    }
+  }
+
+  return Status;
 }
 
 /**
