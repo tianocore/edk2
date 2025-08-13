@@ -46,6 +46,10 @@
   #
   PL011UartLib|Include/Library/PL011UartLib.h
 
+  ##  @libraryclass  Provides measurement interface for PeilessSec.
+  #
+  PeilessSecMeasureLib|Include/Library/PeilessSecMeasureLib.h
+
 [Guids.common]
   gArmPlatformTokenSpaceGuid   = { 0x9c0aaed4, 0x74c5, 0x4043, { 0xb4, 0x17, 0xa3, 0x22, 0x38, 0x14, 0xce, 0x76 } }
 
