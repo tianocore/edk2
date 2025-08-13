@@ -16,7 +16,7 @@
   FILE_GUID                      = 33D33BF3-349E-4768-9459-836A9F7558FB
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = IoLib|DXE_DRIVER
+  LIBRARY_CLASS                  = IoLib|DXE_DRIVER UEFI_DRIVER UEFI_APPLICATION
   CONSTRUCTOR                    = IoLibConstructor
 
 #
