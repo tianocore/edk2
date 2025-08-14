@@ -739,29 +739,39 @@ GicV3ExitBootServicesEvent (
   ArmGicDisableDistributor (mGicDistributorBase);
 }
 
-/**
-  Initialize the state information for the CPU Architectural Protocol
+#ifdef MDE_CPU_ARM
 
-  @param  ImageHandle   of the loaded driver
-  @param  SystemTable   Pointer to the System Table
+/**
+  Dummy GICv5 init funtion to avoid symbol resolution failure on ARM,
+  which cannot support GICv5.
+ **/
+EFI_STATUS
+GicV5DxeInitialize (
+  VOID
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+#endif
+
+/**
+  Invoke the appropriate initializer for the CPU Architectural Protocol
 
   @retval EFI_SUCCESS           Protocol registered
   @retval EFI_OUT_OF_RESOURCES  Cannot allocate protocol data structure
   @retval EFI_DEVICE_ERROR      Hardware problems
 
+  @param  ImageHandle   of the loaded driver
+  @param  SystemTable   Pointer to the System Table
 **/
 EFI_STATUS
-GicV3DxeInitialize (
+GicDxeInitialize (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
-  UINTN       Index;
-  UINT64      MpId;
-  UINT64      CpuTarget;
-  UINT64      RegValue;
-  UINT64      TotalIntIds;
 
   // Make sure the Interrupt Controller Protocol is not already installed in
   // the system.
@@ -774,6 +784,29 @@ GicV3DxeInitialize (
   if (ArmHasGicV5SystemRegisters ()) {
     return GicV5DxeInitialize ();
   }
+
+  return GicV3DxeInitialize ();
+}
+
+/**
+  Initialize the state information for the CPU Architectural Protocol
+
+  @retval EFI_SUCCESS           Protocol registered
+  @retval EFI_OUT_OF_RESOURCES  Cannot allocate protocol data structure
+  @retval EFI_DEVICE_ERROR      Hardware problems
+
+**/
+EFI_STATUS
+GicV3DxeInitialize (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       Index;
+  UINT64      MpId;
+  UINT64      CpuTarget;
+  UINT64      RegValue;
+  UINT64      TotalIntIds;
 
   mGicDistributorBase = (UINTN)PcdGet64 (PcdGicDistributorBase);
 
