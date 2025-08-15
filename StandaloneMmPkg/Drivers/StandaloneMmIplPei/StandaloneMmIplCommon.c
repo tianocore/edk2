@@ -267,6 +267,9 @@ MmIplAllocateMmramPage (
                                                             sizeof (EFI_MMRAM_HOB_DESCRIPTOR_BLOCK) + ((FullMmramRangeCount - 1) * sizeof (EFI_MMRAM_DESCRIPTOR))
                                                             );
   ASSERT (NewDescriptorBlock != NULL);
+  if (NewDescriptorBlock == NULL) {
+    return 0;
+  }
 
   NewDescriptorBlock->NumberOfMmReservedRegions = FullMmramRangeCount;
   FullMmramRanges                               = NewDescriptorBlock->Descriptor;
