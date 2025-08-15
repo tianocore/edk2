@@ -116,6 +116,9 @@
   # Redfish variable guid
   gEfiRedfishVariableGuid           = { 0x85ef8dd3, 0xe606, 0x4b89, { 0x8b, 0xbd, 0x93, 0xbf, 0x5c, 0xbe, 0x1c, 0x18 } }
 
+  # Redfish Configuration Handler Disconnection
+  gEdkIIRedfisEventRedfishInterfaceDisconnectionGuid = { 0x11B81837, 0x249B, 0x4843, { 0xA5, 0x2C, 0xC8, 0x23, 0x7B, 0x35, 0xBF, 0xC2 } }
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   #
   # This PCD is the UEFI device path which is used as the Redfish host interface.
