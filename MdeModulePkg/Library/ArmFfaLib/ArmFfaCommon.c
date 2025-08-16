@@ -531,6 +531,165 @@ ErrorHandler:
 }
 
 /**
+  Get number of Partitions via registers.
+  This function is supported by aarch64 only.
+
+  @param [in]       ServiceGuid       Service guid.
+  @param [out]      PartDescCount     Return number of partition info related to
+                                      ServiceGuid.
+
+  @retval EFI_SUCCESS
+  @retval EFI_UNSUPPORTED
+  @retval EFI_INVALID_PARAMETER
+  @retval Other              Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibPartitionCountGetRegs (
+  IN  EFI_GUID  *ServiceGuid,
+  OUT UINT32    *PartDescCount
+  )
+{
+  EFI_STATUS    Status;
+  ARM_FFA_ARGS  FfaArgs;
+  UINT64        Uuid[2];
+
+  if (PartDescCount == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (ServiceGuid != NULL) {
+    ConvertGuidToUuid (ServiceGuid, (GUID *)Uuid);
+  } else {
+    ZeroMem (Uuid, sizeof (Uuid));
+  }
+
+  ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
+
+  FfaArgs.Arg0 = ARM_FID_FFA_PARTITION_INFO_GET_REGS;
+  FfaArgs.Arg1 = Uuid[0];
+  FfaArgs.Arg2 = Uuid[1];
+
+  ArmCallFfa (&FfaArgs);
+
+  Status = FfaArgsToEfiStatus (&FfaArgs);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  *PartDescCount = ((FfaArgs.Arg2 >> FFA_PART_INFO_METADATA_LAST_IDX_SHIFT) &
+                    FFA_PART_INFO_IDX_MASK) + 1;
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Get Partition info via registers.
+  This function is supported by aarch64 only.
+
+  @param [in]       ServiceGuid       Service guid.
+  @param [in,out]   PartDescCount     Number of PartDesc.
+                                      It'll return the copied number of
+                                      partition info in PartDesc.
+  @param [out]      PartDesc          Partition information Buffer
+
+  @retval EFI_SUCCESS
+  @retval EFI_UNSUPPORTED
+  @retval EFI_INVALID_PARAMETER
+  @retval EFI_BUFFER_TOO_SMALL
+  @retval Other                       Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibPartitionInfoGetRegs (
+  IN EFI_GUID                 *ServiceGuid,
+  IN OUT UINT32               *PartDescCount,
+  OUT EFI_FFA_PART_INFO_DESC  *PartDesc
+  )
+{
+  EFI_STATUS    Status;
+  ARM_FFA_ARGS  FfaArgs;
+  UINT64        Uuid[2];
+  UINT32        DescCount;
+  UINT16        Count;
+  UINT16        PrevIdx;
+  UINT16        StartIdx;
+  UINT16        CurIdx;
+  UINT16        Tag;
+  UINT16        Idx;
+  UINT16        DescSize;
+  UINTN         *Regs;
+
+  if ((PartDescCount == NULL) || (PartDesc == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (*PartDescCount == 0) {
+    return EFI_BUFFER_TOO_SMALL;
+  }
+
+  if (ServiceGuid != NULL) {
+    ConvertGuidToUuid (ServiceGuid, (GUID *)Uuid);
+  } else {
+    ZeroMem (Uuid, sizeof (Uuid));
+  }
+
+  PrevIdx   = 0;
+  Tag       = 0;
+  DescCount = *PartDescCount;
+
+  do {
+    StartIdx = (PrevIdx == 0) ? 0 : PrevIdx + 1;
+
+    ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
+
+    FfaArgs.Arg0 = ARM_FID_FFA_PARTITION_INFO_GET_REGS;
+    FfaArgs.Arg1 = Uuid[0];
+    FfaArgs.Arg2 = Uuid[1];
+    FfaArgs.Arg3 = (Tag << FFA_PART_INFO_START_TAG_SHIFT) | StartIdx;
+
+    ArmCallFfa (&FfaArgs);
+
+    Status = FfaArgsToEfiStatus (&FfaArgs);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    Count = ((FfaArgs.Arg2 >> FFA_PART_INFO_METADATA_LAST_IDX_SHIFT) &
+             FFA_PART_INFO_IDX_MASK) + 1;
+
+    CurIdx = ((FfaArgs.Arg2 >> FFA_PART_INFO_METADATA_CURRENT_IDX_SHIFT) &
+              FFA_PART_INFO_IDX_MASK);
+    Tag = ((FfaArgs.Arg2 >> FFA_PART_INFO_METADATA_TAG_SHIFT) &
+           FFA_PART_INFO_TAG_MASK);
+    DescSize = ((FfaArgs.Arg2 >> FFA_PART_INFO_METADATA_DESC_SIZE_SHIFT) &
+                FFA_PART_INFO_DESC_SIZE_MASK);
+
+    if (DescSize != sizeof (EFI_FFA_PART_INFO_DESC)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    Regs = &FfaArgs.Arg3;
+    for (Idx = 0; Idx < (CurIdx - StartIdx) + 1; Idx++) {
+      CopyMem (PartDesc, Regs, DescSize);
+      Regs += sizeof (EFI_FFA_PART_INFO_DESC) / sizeof (UINTN);
+      PartDesc++;
+      if (--DescCount == 0) {
+        break;
+      }
+    }
+
+    PrevIdx = CurIdx;
+  } while (CurIdx < (Count - 1) && (DescCount != 0));
+
+  *PartDescCount -= DescCount;
+
+  return EFI_SUCCESS;
+}
+
+/**
   Restore the context which was interrupted with FFA_INTERRUPT (EFI_INTERRUPT_PENDING).
 
   @param [in]   PartId       Partition id
