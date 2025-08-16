@@ -67,6 +67,13 @@ ArmFfaStandaloneMmLibConstructor (
      * buffer again but it uses the mapped one.
      */
     Status = EFI_SUCCESS;
+  } else if (Status == EFI_UNSUPPORTED) {
+    /*
+     * StandaloneMm can be only service provider but not consumer in
+     * some platform. so consider EFI_UNSUPPORTED as valid return.
+     */
+    Status = EFI_SUCCESS;
+    DEBUG ((DEBUG_INFO, "%a Rx/Tx buffer doesn't support.\n", __func__));
   } else if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a failed. Status = %r\n", __func__, Status));
   }
