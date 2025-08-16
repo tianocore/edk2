@@ -266,6 +266,31 @@ ArmFfaLibPartitionInfoGet (
   );
 
 /**
+  Get Partition info via registers.
+  This function is supported by aarch64 only.
+
+  @param [in]       ServiceGuid       Service guid.
+  @param [in, out]  PartDescCount     Return number of partition info realted to
+                                      Service guid when PartDesc == NULL.
+                                      Otherwise return number of partition info
+                                      copied in ParcDesc
+  @param [out]      PartDesc          Partition information Buffer
+
+  @retval EFI_SUCCESS
+  @retval EFI_UNSUPPORTED
+  @retval EFI_INVALID_PARAMETER
+  @retval Other              Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibPartitionInfoGetRegs (
+  IN EFI_GUID                 *ServiceGuid,
+  IN OUT UINT32               *PartDescCount,
+  OUT EFI_FFA_PART_INFO_DESC  *PartDesc OPTIONAL
+  );
+
+/**
   Get partition or VM id.
   This function is only called in ArmFfaLibConstructor.
 
