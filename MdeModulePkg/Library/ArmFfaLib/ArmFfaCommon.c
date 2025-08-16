@@ -877,6 +877,85 @@ ArmFfaLibCommonInit (
 }
 
 /**
+  This is helper function to get first partition info related with service guid.
+
+  @param [in]       ServiceGuid       Service guid.
+  @param [in, out]  PartDescCount     Return number of partition info realted to
+                                      Service guid when PartDesc == NULL.
+                                      Otherwise return number of partition info
+                                      copied in ParcDesc
+  @param [out]      PartDesc          Partition information Buffer
+
+  @retval EFI_SUCCESS
+  @retval EFI_UNSUPPORTED
+  @retval EFI_INVALID_PARAMETER
+  @retval Other                       Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibGetPartitionInfo (
+  IN EFI_GUID                 *ServiceGuid,
+  OUT EFI_FFA_PART_INFO_DESC  *PartDesc
+  )
+{
+  EFI_STATUS  Status;
+  VOID        *TxBuffer;
+  UINT64      TxBufferSize;
+  VOID        *RxBuffer;
+  UINT64      RxBufferSize;
+  UINT32      Count;
+  UINT32      Size;
+
+  if (PartDesc == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Count = 1;
+
+  Status = ArmFfaLibPartitionInfoGetRegs (ServiceGuid, &Count, PartDesc);
+  if (!EFI_ERROR (Status)) {
+    return EFI_SUCCESS;
+  }
+
+  Status = ArmFfaLibGetRxTxBuffers (
+             &TxBuffer,
+             &TxBufferSize,
+             &RxBuffer,
+             &RxBufferSize
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Failed to get Rx/Tx Buffer. Status: %r\n",
+      __func__,
+      Status
+      ));
+    return Status;
+  }
+
+  Status = ArmFfaLibPartitionInfoGet (
+             ServiceGuid,
+             FFA_PART_INFO_FLAG_TYPE_DESC,
+             &Count,
+             &Size
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if ((Size < sizeof (EFI_FFA_PART_INFO_DESC))) {
+    ArmFfaLibRxRelease (gPartId);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CopyMem (PartDesc, RxBuffer, sizeof (EFI_FFA_PART_INFO_DESC));
+  ArmFfaLibRxRelease (gPartId);
+
+  return EFI_SUCCESS;
+}
+
+/**
   Get first Rx/Tx Buffer allocation hob.
   If UseGuid is TRUE, BufferAddr and BufferSize parameters are ignored.
 

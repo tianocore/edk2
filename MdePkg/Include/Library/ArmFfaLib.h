@@ -378,4 +378,27 @@ ArmFfaLibMsgSendDirectReq2 (
   IN  OUT DIRECT_MSG_ARGS  *ImpDefArgs
   );
 
+/**
+  This is helper function to get first partition info related with service guid.
+
+  @param [in]       ServiceGuid       Service guid.
+  @param [in, out]  PartDescCount     Return number of partition info realted to
+                                      Service guid when PartDesc == NULL.
+                                      Otherwise return number of partition info
+                                      copied in ParcDesc
+  @param [out]      PartDesc          Partition information Buffer
+
+  @retval EFI_SUCCESS
+  @retval EFI_UNSUPPORTED
+  @retval EFI_INVALID_PARAMETER
+  @retval Other                       Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibGetPartitionInfo (
+  IN EFI_GUID                 *ServiceGuid,
+  OUT EFI_FFA_PART_INFO_DESC  *PartDesc
+  );
+
 #endif // ARM_FFA_LIB_H_
