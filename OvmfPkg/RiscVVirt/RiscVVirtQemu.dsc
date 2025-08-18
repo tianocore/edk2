@@ -193,13 +193,14 @@
 [PcdsFixedAtBuild.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
-!if $(NETWORK_TLS_ENABLE) == TRUE
+!if $(NETWORK_TLS_ENABLE) == TRUE || $(SECURE_BOOT_ENABLE) == TRUE
   #
   # The cumulative and individual VOLATILE variable size limits should be set
   # high enough for accommodating several and/or large CA certificates.
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x80000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVolatileVariableSize|0x40000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x8400
 !endif
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"2.7"
