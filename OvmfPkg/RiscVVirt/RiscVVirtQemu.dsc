@@ -391,7 +391,7 @@
 !endif
   }
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
-  OvmfPkg/EnrollDefaultKeys/EnrollDefaultKeys.inf
+  OvmfPkg/RiscVVirt/Feature/SecureBoot/SecureBootDefaultKeysInit/SecureBootDefaultKeysInit.inf
 !else
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 !endif
