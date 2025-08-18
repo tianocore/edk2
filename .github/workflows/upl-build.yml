@@ -17,7 +17,7 @@ jobs:
   build_vs2022:
     strategy:
       matrix:
-        os: [windows-latest]
+        os: [windows-2025]
         python-version: ['3.12']
         tool-chain: ['VS2022']
         target: ['DEBUG']
