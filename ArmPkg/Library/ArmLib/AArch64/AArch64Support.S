@@ -393,4 +393,8 @@ ASM_FUNC(ArmReadIdAA64Pfr2)
   mrs   x0, ID_AA64PFR2_EL1
   ret
 
+ASM_FUNC(ArmReadIdAA64Zfr0)
+  mrs   x0, s3_0_c0_c4_4
+#  mrs   x0, ID_AA64ZFR0_EL1
+  ret
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

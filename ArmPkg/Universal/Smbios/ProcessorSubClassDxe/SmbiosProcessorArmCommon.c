@@ -12,6 +12,7 @@
 #include <IndustryStandard/ArmCache.h>
 #include <IndustryStandard/ArmStdSmc.h>
 #include <IndustryStandard/SmBios.h>
+#include <Library/ArmLib/AArch64/AArch64Lib.h>
 #include <Library/ArmLib.h>
 #include <Library/ArmSmcLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -207,6 +208,7 @@ SmbiosGetProcessorFamily2 (
 {
   UINTN   MainIdRegister;
   UINT16  ProcessorFamily2;
+  UINT64  Zfr0Register;
 
   MainIdRegister = ArmReadMidr ();
 
@@ -216,7 +218,17 @@ SmbiosGetProcessorFamily2 (
     if (sizeof (VOID *) == 4) {
       ProcessorFamily2 = ProcessorFamilyARMv7;
     } else {
-      ProcessorFamily2 = ProcessorFamilyARMv8;
+      /*
+       * Let check for SVE2 - mandatory on ARMv9
+       */
+
+      Zfr0Register = ArmReadIdAA64Zfr0 ();
+
+      if (Zfr0Register & 0xF) {
+        ProcessorFamily2 = ProcessorFamilyARMv9;
+      } else {
+        ProcessorFamily2 = ProcessorFamilyARMv8;
+      }
     }
   }
 
