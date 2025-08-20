@@ -690,6 +690,7 @@ PlatformAddressWidthFromCpuid (
   IA32_CR4  Cr4;
   BOOLEAN   Valid         = FALSE;
   BOOLEAN   Page1GSupport = FALSE;
+  UINT64    AddrSpace;
 
   ZeroMem (Signature, sizeof (Signature));
 
@@ -713,6 +714,20 @@ PlatformAddressWidthFromCpuid (
   } else {
     PhysBits      = 36;
     GuestPhysBits = 0;
+  }
+
+  if (PlatformInfoHob->SevIsEnabled) {
+    AddrSpace = LShiftU64 (1, PhysBits);
+    if (AddrSpace >= PlatformInfoHob->SevEncryptionMask) {
+      PhysBits -= PlatformInfoHob->SevReducedPhysBits;
+    }
+
+    if (GuestPhysBits > 0) {
+      AddrSpace = LShiftU64 (1, GuestPhysBits);
+      if (AddrSpace >= PlatformInfoHob->SevEncryptionMask) {
+        GuestPhysBits -= PlatformInfoHob->SevReducedPhysBits;
+      }
+    }
   }
 
   if (!QemuQuirk) {
