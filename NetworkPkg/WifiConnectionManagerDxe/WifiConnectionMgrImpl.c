@@ -1490,7 +1490,7 @@ WifiMgrOnTimerTick (
   }
 
   Nic = (WIFI_MGR_DEVICE_DATA *)Context;
-  if (Nic->ConnectPendingNetwork == NULL) {
+  if ((Nic->ConnectPendingNetwork == NULL) && !Nic->HasDisconnectPendingNetwork) {
     DEBUG ((DEBUG_VERBOSE, "[WiFi Connection Manager] No profile for connection, no scan triggered!\n"));
     gBS->SetTimer (Nic->TickTimer, TimerCancel, 0);
     return;
