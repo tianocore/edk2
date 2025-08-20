@@ -173,4 +173,5 @@ GCC:*_*_*_CC_FLAGS = -mstrict-align
 
 [BuildOptions.X64]
   MSFT:*_*_*_DLINK_FLAGS = /ALIGN:4096
+  CLANGPDB: *_*_*_DLINK_FLAGS = /ALIGN:4096
   GCC:*_GCC*_*_DLINK_FLAGS = -z common-page-size=0x1000
