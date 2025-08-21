@@ -746,8 +746,9 @@ TEST_F (Dhcp6SeekStsOptionTest, SeekIATAOptionExpectFail) {
   UINT32        SearchPattern       = SEARCH_PATTERN;
   UINT16        SearchPatternLength = SEARCH_PATTERN_LEN;
   UINT16        *Len                = NULL;
-  EFI_DHCP6_IA  Ia                  = { 0 };
+  EFI_DHCP6_IA  Ia;
 
+  ZeroMem (&Ia, sizeof (Ia));
   Ia.Descriptor.Type                = DHCPV6_OPTION_IA_TA;
   Ia.IaAddressCount                 = 1;
   Ia.IaAddress[0].PreferredLifetime = 0xDEADBEEF;
@@ -800,8 +801,9 @@ TEST_F (Dhcp6SeekStsOptionTest, SeekIANAOptionExpectSuccess) {
   UINT8         *Option             = NULL;
   UINT32        SearchPattern       = SEARCH_PATTERN;
   UINT16        SearchPatternLength = SEARCH_PATTERN_LEN;
-  EFI_DHCP6_IA  Ia                  = { 0 };
+  EFI_DHCP6_IA  Ia;
 
+  ZeroMem (&Ia, sizeof (Ia));
   Ia.Descriptor.Type                = DHCPV6_OPTION_IA_NA;
   Ia.IaAddressCount                 = 1;
   Ia.IaAddress[0].PreferredLifetime = 0x11111111;
