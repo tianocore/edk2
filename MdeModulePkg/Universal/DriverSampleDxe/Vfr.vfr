@@ -186,7 +186,6 @@ formset
                  // CHECKBOX_DEFAULT_MFG indicate EFI_IFR_CHECKBOX_DEFAULT_MFG.
                  //
                  flags    = CHECKBOX_DEFAULT | CHECKBOX_DEFAULT_MFG,
-                 default  = TRUE,
         endcheckbox;
       endif;
     endif;
