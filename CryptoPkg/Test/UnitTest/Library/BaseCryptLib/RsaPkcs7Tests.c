@@ -587,7 +587,7 @@ TestVerifyPkcs7SignVerify (
 //
 // TestCase2: Non self issued CA (partial certificate chains)
 // This case uses a non-self-issued certificate as the signing certificate and CA.
-// BaseCryptLib can pass this case (with X509_V_FLAG_PARTIAL_CHAIN ​​enabled).
+// BaseCryptLib can pass this case (with X509_V_FLAG_PARTIAL_CHAIN enabled).
 // BaseCryptLibMbedTls cannot, because Mbedtls certificate chain validation lacks support for partial certificate chains currently .
 //
 UNIT_TEST_STATUS
