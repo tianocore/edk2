@@ -24,11 +24,26 @@ MOCK_FUNCTION_DEFINITION (MockSmmServicesTableLib, gSmst_SmmInterruptRegister, 3
 MOCK_FUNCTION_DEFINITION (MockSmmServicesTableLib, gSmst_SmmInterruptUnRegister, 1, EFIAPI);
 
 static EFI_SMM_SYSTEM_TABLE2  LocalSmst = {
-  { 0, 0, 0, 0, 0 },                   // EFI_TABLE_HEADER
+  {                                    // EFI_TABLE_HEADER
+    0,
+    0,
+    0,
+    0,
+    0
+  },
   NULL,                                // SmmFirmwareVendor
   0,                                   // SmmFirmwareRevision
   NULL,                                // EFI_SMM_INSTALL_CONFIGURATION_TABLE2
-  { NULL },                            // EFI_SMM_CPU_IO2_PROTOCOL
+  {                                    // EFI_SMM_CPU_IO2_PROTOCOL
+    {
+      NULL,
+      NULL
+    },
+    {
+      NULL,
+      NULL
+    }
+  },
   gSmst_SmmAllocatePool,               // EFI_ALLOCATE_POOL
   gSmst_SmmFreePool,                   // EFI_FREE_POOL
   gSmst_SmmAllocatePages,              // EFI_ALLOCATE_PAGES
