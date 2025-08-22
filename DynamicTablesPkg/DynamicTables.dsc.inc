@@ -47,6 +47,7 @@
   DynamicTablesPkg/Library/Acpi/Common/AcpiSlitLib/AcpiSlitLib.inf
   DynamicTablesPkg/Library/Acpi/Common/AcpiSpmiLib/AcpiSpmiLib.inf
   DynamicTablesPkg/Library/Acpi/Common/AcpiHestLib/AcpiHestLib.inf
+  DynamicTablesPkg/Library/Acpi/Common/AcpiEinjLib/AcpiEinjLib.inf
 
   # AML Fixup (Common)
   DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtSerialPortLib/SsdtSerialPortLib.inf
@@ -135,6 +136,7 @@
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSratLib/AcpiSratLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiTpm2Lib/AcpiTpm2Lib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiHestLib/AcpiHestLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiEinjLib/AcpiEinjLib.inf
       #   Arm specific
       NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiGtdtLibArm/AcpiGtdtLibArm.inf
       NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiIortLibArm/AcpiIortLibArm.inf
