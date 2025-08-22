@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017 - 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2017 - 2026, ARM Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -72,6 +72,7 @@ _______________________________________________________________________________
       25 - RHCT
       26 - SSDT DMC
       27 - HEST
+      28 - EINJ
 
     Standard SMBIOS Table IDs:
        0 - Reserved

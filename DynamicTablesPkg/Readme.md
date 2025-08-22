@@ -76,6 +76,7 @@ The framework currently supports the following table generators:
 * RHCT - RISC-V Hart Capabilities Table
 * SSDT DMC
 * HEST - Hardware Error Source Table
+* EINJ - APEI Error Injection Table
 
 ## Dynamic AML
 
