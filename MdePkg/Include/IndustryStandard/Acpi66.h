@@ -3425,6 +3425,11 @@ typedef struct {
 #define EFI_ACPI_6_6_IO_REMAPPING_TABLE_SIGNATURE  SIGNATURE_32('I', 'O', 'R', 'T')
 
 ///
+/// "IOVT" I/O Virtualization Table
+///
+#define EFI_ACPI_6_6_IO_VIRTUALIZATION_TABLE_SIGNATURE  SIGNATURE_32('I', 'O', 'V', 'T')
+
+///
 /// "IVRS" I/O Virtualization Reporting Structure
 ///
 #define EFI_ACPI_6_6_IO_VIRTUALIZATION_REPORTING_STRUCTURE_SIGNATURE  SIGNATURE_32('I', 'V', 'R', 'S')
