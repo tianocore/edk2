@@ -1,6 +1,7 @@
 /** @file
   Industry Standard Definitions of SMBIOS Table Specification v3.8.0.
 
+Copyright (c) Microsoft Corporation. All rights reserved.<BR>
 Copyright (c) 2024-2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
 Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
@@ -482,6 +483,24 @@ typedef struct {
 ///
 /// System Enclosure or Chassis (Type 3).
 ///
+
+///
+/// Chassis - Height.
+///
+typedef enum {
+  ChassisHeightUnspecified   = 0x00,
+  ChassisHeightUseRackHeight = 0xFF  ///< Enclosure Height is specified at offset 16h+(n*m)
+} CHASSIS_HEIGHT;
+
+///
+/// Chassis - Rack Type.
+/// SMBIOS Spec 3.9.0 CR251 Additional Rack Types
+///
+typedef enum {
+  ChassisRackTypeUnspecified = 0x00,
+  ChassisRackTypeOU          = 0x01,
+} CHASSIS_RACK_TYPE;
+
 /// The information in this structure defines attributes of the system's mechanical enclosure(s).
 /// For example, if a system included a separate enclosure for its peripheral devices,
 /// two structures would be returned: one for the main, system enclosure and the second for
@@ -513,9 +532,11 @@ typedef struct {
   //
   // Since ContainedElements has a variable number of entries, must not define SKUNumber in
   // the structure.  Need to reference it by starting at offset 0x15 and adding
-  // (ContainedElementCount * ContainedElementRecordLength) bytes.
+  // (ContainedElementCount(n) * ContainedElementRecordLength(m)) bytes.
   //
-  // SMBIOS_TABLE_STRING         SKUNumber;
+  // SMBIOS_TABLE_STRING         SKUNumber;         ///< SMBIOS spec 2.7+ Offset 15h+(n*m)
+  // UINT8                       RackType;          ///< SMBIOS spec 3.9+ Offset 16h+(n*m) CR251
+  // UINT8                       RackHeight;        ///< SMBIOS spec 3.9+ Offset 17h+(n*m) CR251
 } SMBIOS_TABLE_TYPE3;
 
 ///
@@ -1866,7 +1887,9 @@ typedef enum {
   MemoryFormFactorSrimm           = 0x0E,
   MemoryFormFactorFbDimm          = 0x0F,
   MemoryFormFactorDie             = 0x10,
-  MemoryFormFactorCamm            = 0x11
+  MemoryFormFactorCamm            = 0x11,
+  MemoryFormFactorCuDimm          = 0x12, ///< SMBIOS spec 3.9.0 CR244
+  MemoryFormFactorCsoDimm         = 0x13  ///< SMBIOS spec 3.9.0 CR244
 } MEMORY_FORM_FACTOR;
 
 ///
@@ -1906,7 +1929,7 @@ typedef enum {
   MemoryTypeDdr5                     = 0x22,
   MemoryTypeLpddr5                   = 0x23,
   MemoryTypeHBM3                     = 0x24,
-  MemoryTypeMrDimm                   = 0x25
+  MemoryTypeMrDimm                   = 0x25  ///< SMBIOS spec 3.9.0 CR248
 } MEMORY_DEVICE_TYPE;
 
 ///
@@ -1946,7 +1969,7 @@ typedef enum {
   // Optane DC Persistent Memory in SMBIOS spec 3.4.0
   //
   MemoryTechnologyIntelOptanePersistentMemory = 0x07,
-  MemoryTechnologyMrDimmDeprecated            = 0x08
+  MemoryTechnologyMrDimmDeprecated            = 0x08 ///< SMBIOS spec 3.9.0 CR248
 } MEMORY_DEVICE_TECHNOLOGY;
 
 ///
