@@ -72,6 +72,7 @@
   UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
   SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
 
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogLibNull.inf
 !include OvmfPkg/Include/Dsc/ShellLibs.dsc.inc
 
   ShellCEntryLib|ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.inf

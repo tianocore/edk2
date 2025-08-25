@@ -34,6 +34,7 @@
   ArmPlatformPkg/ArmPlatformPkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
   MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -43,6 +44,7 @@
   PL011UartLib
   PcdLib
   PrintLib
+  MemDebugLogLib
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue
