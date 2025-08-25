@@ -765,7 +765,7 @@ ParsePciRootBridge (
 
     if (AsciiStrCmp (TempStr, "ranges") == 0) {
       DEBUG ((DEBUG_INFO, "  Found ranges Property TempLen (%08X), limit %x\n", TempLen, TempLen / sizeof (UINT32)));
-
+      // TODO:  In future we should fetch these values from fdt and avoid using these Pcds
       mPciRootBridgeInfo->RootBridge[RbIndex].AllocationAttributes = EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM | EFI_PCI_HOST_BRIDGE_MEM64_DECODE;
       mPciRootBridgeInfo->RootBridge[RbIndex].Supports             = ROOT_BRIDGE_SUPPORTS_DEFAULT;
       mPciRootBridgeInfo->RootBridge[RbIndex].PMemAbove4G.Base     = PcdGet64 (PcdPciReservedPMemAbove4GBBase);
@@ -774,6 +774,7 @@ ParsePciRootBridge (
       mPciRootBridgeInfo->RootBridge[RbIndex].PMem.Limit           = PcdGet32 (PcdPciReservedPMemLimit);
       mPciRootBridgeInfo->RootBridge[RbIndex].UID                  = RbIndex;
       mPciRootBridgeInfo->RootBridge[RbIndex].HID                  = EISA_PNP_ID (0x0A03);
+      mPciRootBridgeInfo->RootBridge[RbIndex].DmaAbove4G           = FALSE;
 
       Data32 = (UINT32 *)(PropertyPtr->Data);
       for (Base = 0; Base < TempLen / sizeof (UINT32); Base = Base + DWORDS_TO_NEXT_ADDR_TYPE) {
@@ -801,6 +802,36 @@ ParsePciRootBridge (
 
       DEBUG ((DEBUG_INFO, "PciRootBridge->Io.Base %llx, \n", mPciRootBridgeInfo->RootBridge[RbIndex].Io.Base));
       DEBUG ((DEBUG_INFO, "PciRootBridge->Io.limit %llx, \n", mPciRootBridgeInfo->RootBridge[RbIndex].Io.Limit));
+    }
+
+    if (AsciiStrCmp (TempStr, "dma-ranges") == 0) {
+      Data32 = (UINT32 *)(PropertyPtr->Data);
+
+      if (TempLen == 0) {
+        continue;
+      }
+
+      UINT32  ChildAddrCells  = AddressCells;
+      UINT32  ParentAddrCells = AddressCells;
+      UINT32  SizeCells       = 2;
+
+      UINT32  TripletCells = ChildAddrCells + ParentAddrCells + SizeCells;
+
+      for (Base = 0; Base < TempLen / sizeof (UINT32); Base = Base + TripletCells) {
+        UINT64  ChildBusAddress = 0;
+
+        if (ChildAddrCells == 2) {
+          ChildBusAddress = (UINT64)Fdt32ToCpu (*(Data32 + Base)) << 32 |
+                            (UINT64)Fdt32ToCpu (*(Data32 + Base + 1));
+        } else if (ChildAddrCells == 1) {
+          ChildBusAddress = Fdt32ToCpu (*(Data32 + Base));
+        }
+
+        if (ChildBusAddress > 0xFFFFFFFF) {
+          mPciRootBridgeInfo->RootBridge[RbIndex].DmaAbove4G = TRUE;
+          break;
+        }
+      }
     }
 
     if (AsciiStrCmp (TempStr, "reg") == 0) {
@@ -873,6 +904,7 @@ ParseDtb (
   UINT8                 *RbSegNumAlreadyAssigned;
   UINT8                 NumberOfRbSegNumAlreadyAssigned;
   UINT32                RootAddressCells;
+  INT32                 ParentNode;
 
   Fdt               = FdtBase;
   Depth             = 0;
@@ -912,8 +944,12 @@ ParseDtb (
           NumberOfBytes = Fdt64ToCpu (ReadUnaligned64 (Data64 + 1));
           DEBUG ((DEBUG_INFO, "\n         Property(%08X)  %a", Property, TempStr));
           DEBUG ((DEBUG_INFO, "  %016lX  %016lX", StartAddress, NumberOfBytes));
-          if (!IsHobConstructed) {
-            if ((NumberOfBytes > MinimalNeededSize) && (StartAddress < BASE_4GB)) {
+          // If parent node type is reserved-memory we are looking at special-purpose memory. Ignore it.
+          ParentNode = FdtParentOffset (Fdt, Node);
+          NodePtr    = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + ParentNode + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
+          NodeType   = CheckNodeType (NodePtr->Name, Depth);
+          if (!IsHobConstructed && (NodeType != ReservedMemory)) {
+            if (NumberOfBytes > MinimalNeededSize) {
               MemoryBottom     = StartAddress + NumberOfBytes - MinimalNeededSize;
               FreeMemoryBottom = MemoryBottom;
               FreeMemoryTop    = StartAddress + NumberOfBytes;
