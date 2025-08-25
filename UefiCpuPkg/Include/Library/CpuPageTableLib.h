@@ -141,4 +141,30 @@ PageTableParse (
   IN OUT UINTN           *MapCount
   );
 
+/**
+  Retrieve page table entry.
+
+  @param[in]      PageTable      The pointer to the page table to use.
+  @param[in]      PagingMode     The paging mode.
+  @param[in]      LinearAddress  The linear address to use to walk the page table.
+  @param[in, out] Entry          The page table entry for the linear address.
+  @param[in, out] Level          The page table entry level for the linear address.
+
+  @retval RETURN_SUCCESS            Page table entry and level returned.
+  @retval RETURN_UNSUPPORTED        PagingMode is not supported.
+  @retval RETURN_INVALID_PARAMETER  PageTable is 0.
+  @retval RETURN_INVALID_PARAMETER  Entry or Level is NULL.
+  @retval RETURN_INVALID_PARAMETER  LinearAddress exceeds the maximum linear address
+                                    for the PagingMode.
+**/
+RETURN_STATUS
+EFIAPI
+PageTableGetEntry (
+  IN     UINTN        PageTable,
+  IN     PAGING_MODE  PagingMode,
+  IN     UINT64       LinearAddress,
+  IN OUT UINT64       *Entry,
+  IN OUT UINTN        *Level
+  );
+
 #endif
