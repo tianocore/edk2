@@ -47,7 +47,7 @@ IsCxlDoorbellBusy (
 
   Status = PciUefiMemRead32 (Private, Private->RegisterMap.MailboxRegistersOffset + CXL_DEV_MBOX_CTRL_OFFSET, &Value);
   if (Status != EFI_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Error reading Value for busy doorbell\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Error reading Value for busy doorbell\n", __func__));
   }
 
   ReturnValue = Value & CXL_DEV_MBOX_CTRL_DOORBELL;
@@ -77,7 +77,7 @@ CxlSendCmd (
   if ((Private->MailboxCmd.InputSize > Private->MemdevState.PayloadSize) ||
       (Private->MailboxCmd.OutputSize > Private->MemdevState.PayloadSize))
   {
-    DEBUG ((EFI_D_ERROR, "[%a]: InputSize or sizeout > PayloadSize\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: InputSize or sizeout > PayloadSize\n", __func__));
     Status = EFI_INVALID_PARAMETER;
     return Status;
   }
@@ -86,7 +86,7 @@ CxlSendCmd (
   MinimumOutput = (size_t)Private->MailboxCmd.MinimumOutput;
   Status        = CxlPciMboxSend (Private);
   if (Status != EFI_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Error returned in func CxlPciMboxSend()\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Error returned in func CxlPciMboxSend()\n", __func__));
     return Status;
   }
 
@@ -96,83 +96,83 @@ CxlSendCmd (
     // Command Return Codes
     switch (Private->MailboxCmd.ReturnCode) {
       case CXL_MBOX_CMD_INVALID_INPUT:
-        DEBUG ((EFI_D_ERROR, "[%a]: Invalid Input\n", __func__));
+        DEBUG ((DEBUG_ERROR, "[%a]: Invalid Input\n", __func__));
         break;
 
       case CXL_MBOX_CMD_UNSUPPORTED:
-        DEBUG ((EFI_D_ERROR, "[%a]: Unsupported\n", __func__));
+        DEBUG ((DEBUG_ERROR, "[%a]: Unsupported\n", __func__));
         break;
 
       case CXL_MBOX_CMD_INTERNAL_ERROR:
-        DEBUG ((EFI_D_ERROR, "[%a]: Internal Error\n", __func__));
+        DEBUG ((DEBUG_ERROR, "[%a]: Internal Error\n", __func__));
         break;
 
       case CXL_MBOX_CMD_RETRY_REQUIRED:
-        DEBUG ((EFI_D_ERROR, "[%a]: Retry Required\n", __func__));
+        DEBUG ((DEBUG_ERROR, "[%a]: Retry Required\n", __func__));
         break;
 
       case CXL_MBOX_CMD_BUSY:
-        DEBUG ((EFI_D_ERROR, "[%a]: Busy\n", __func__));
+        DEBUG ((DEBUG_ERROR, "[%a]: Busy\n", __func__));
         break;
 
       case CXL_MBOX_CMD_MEDIA_DISABLED:
-        DEBUG ((EFI_D_ERROR, "[%a]: Media Disabled\n", __func__));
+        DEBUG ((DEBUG_ERROR, "[%a]: Media Disabled\n", __func__));
         break;
 
       case CXL_MBOX_CMD_FW_TRANSFER_IN_PROGRESS:
-        DEBUG ((EFI_D_ERROR, "[%a]: FW Transfer in Progress\n", __func__));
+        DEBUG ((DEBUG_ERROR, "[%a]: FW Transfer in Progress\n", __func__));
         break;
 
       case CXL_MBOX_CMD_FW_TRANSFER_OUT_OF_ORDER:
-        DEBUG ((EFI_D_ERROR, "[%a]: FW Transfer Out of Order\n", __func__));
+        DEBUG ((DEBUG_ERROR, "[%a]: FW Transfer Out of Order\n", __func__));
         break;
 
       case CXL_MBOX_CMD_FW_VERIFICATION_FAILED:
-        DEBUG ((EFI_D_ERROR, "[%a]: FW Verification Failed\n", __func__));
+        DEBUG ((DEBUG_ERROR, "[%a]: FW Verification Failed\n", __func__));
         break;
 
       case CXL_MBOX_CMD_INVALID_SLOT:
-        DEBUG ((EFI_D_ERROR, "[%a]: Invalid Slot\n", __func__));
+        DEBUG ((DEBUG_ERROR, "[%a]: Invalid Slot\n", __func__));
         break;
 
       case CXL_MBOX_CMD_ACTIVATION_FAILED_FW_ROLLED_BACK:
-        DEBUG ((EFI_D_ERROR, "[%a]: Activation Failed, FW Rolled Back\n", __func__));
+        DEBUG ((DEBUG_ERROR, "[%a]: Activation Failed, FW Rolled Back\n", __func__));
         break;
 
       case CXL_MBOX_CMD_COLD_RESET_REQUIRED:
-        DEBUG ((EFI_D_ERROR, "[%a]: Activation Failed, Cold Reset Required\n", __func__));
+        DEBUG ((DEBUG_ERROR, "[%a]: Activation Failed, Cold Reset Required\n", __func__));
         break;
 
       case CXL_MBOX_CMD_INVALID_HANDLE:
-        DEBUG ((EFI_D_ERROR, "[%a]: Invalid Handle\n", __func__));
+        DEBUG ((DEBUG_ERROR, "[%a]: Invalid Handle\n", __func__));
         break;
 
       case CXL_MBOX_CMD_INVALID_PHYSICAL_ADDRESS:
-        DEBUG ((EFI_D_ERROR, "[%a]: Invalid Physical Address\n", __func__));
+        DEBUG ((DEBUG_ERROR, "[%a]: Invalid Physical Address\n", __func__));
         break;
 
       case CXL_MBOX_CMD_INJECT_POISON_LIMIT_REACHED:
-        DEBUG ((EFI_D_ERROR, "[%a]: Inject Poison Limit Reached\n", __func__));
+        DEBUG ((DEBUG_ERROR, "[%a]: Inject Poison Limit Reached\n", __func__));
         break;
 
       case CXL_MBOX_CMD_PERMANENT_MEDIA_FAILURE:
-        DEBUG ((EFI_D_ERROR, "[%a]: Permanent Media Failure\n", __func__));
+        DEBUG ((DEBUG_ERROR, "[%a]: Permanent Media Failure\n", __func__));
         break;
 
       case CXL_MBOX_CMD_ABORTED:
-        DEBUG ((EFI_D_ERROR, "[%a]: Aborted\n", __func__));
+        DEBUG ((DEBUG_ERROR, "[%a]: Aborted\n", __func__));
         break;
 
       case CXL_MBOX_CMD_INVALID_SECURITY_STATE:
-        DEBUG ((EFI_D_ERROR, "[%a]: Invalid Security State\n", __func__));
+        DEBUG ((DEBUG_ERROR, "[%a]: Invalid Security State\n", __func__));
         break;
 
       case CXL_MBOX_CMD_INCORRECT_PASSPHRASE:
-        DEBUG ((EFI_D_ERROR, "[%a]: Incorrect Passphrase\n", __func__));
+        DEBUG ((DEBUG_ERROR, "[%a]: Incorrect Passphrase\n", __func__));
         break;
 
       default:
-        DEBUG ((EFI_D_ERROR, "[%a]: Error \n", __func__));
+        DEBUG ((DEBUG_ERROR, "[%a]: Error \n", __func__));
         break;
     }
 
@@ -194,7 +194,7 @@ CxlSendCmd (
   }
 
   if (Private->MailboxCmd.OutputSize < MinimumOutput) {
-    DEBUG ((EFI_D_ERROR, "[%a]: OutputSize less than MinimumOutput \n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: OutputSize less than MinimumOutput \n", __func__));
     Status = EFI_LOAD_ERROR;
     return Status;
   }
@@ -229,14 +229,14 @@ CxlMemGetFwInfo (
 
   Status = CxlSendCmd (Private);
   if (Status != EFI_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "CxlMemGetFwInfo: Error CxlSendCmd\n"));
+    DEBUG ((DEBUG_ERROR, "CxlMemGetFwInfo: Error CxlSendCmd\n"));
     return Status;
   }
 
   for (int Index = 0; Index < CXL_FW_MAX_SLOTS - 1; Index++) {
     Private->SlotInfo.FirmwareVersion[Index] = AllocateZeroPool (CXL_FW_REVISION_LENGTH_IN_BYTES + 1);
     if (Private->SlotInfo.FirmwareVersion[Index] == NULL) {
-      DEBUG ((EFI_D_ERROR, "[%a]: Resource, memory cannot be allocated\n", __func__));
+      DEBUG ((DEBUG_ERROR, "[%a]: Resource, memory cannot be allocated\n", __func__));
       return EFI_INVALID_PARAMETER;
     }
   }
@@ -250,7 +250,7 @@ CxlMemGetFwInfo (
      || (Private->MemdevState.FwState.FwRevisionSlot3 == NULL)
      || (Private->MemdevState.FwState.FwRevisionSlot4 == NULL))
   {
-    DEBUG ((EFI_D_ERROR, "[%a]: Resource, memory cannot be allocated\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Resource, memory cannot be allocated\n", __func__));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -314,7 +314,7 @@ CxlMemActivateFw (
   UINT8  Slot = Private->MemdevState.FwState.NextSlot;
 
   if ((Slot == 0) || (Slot > Private->MemdevState.FwState.NumberOfSlots)) {
-    DEBUG ((EFI_D_ERROR, "[CxlMemActivateFw] Error, Slot = %d, num of slots = %d \n", Slot, Private->MemdevState.FwState.NumberOfSlots));
+    DEBUG ((DEBUG_ERROR, "[CxlMemActivateFw] Error, Slot = %d, num of slots = %d \n", Slot, Private->MemdevState.FwState.NumberOfSlots));
     Status = EFI_INVALID_PARAMETER;
     return Status;
   }
@@ -331,7 +331,7 @@ CxlMemActivateFw (
 
   Status = CxlSendCmd (Private);
   if (Status != EFI_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "CxlMemActivateFw: Error CxlSendCmd\n"));
+    DEBUG ((DEBUG_ERROR, "CxlMemActivateFw: Error CxlSendCmd\n"));
     return Status;
   }
 
@@ -378,7 +378,7 @@ CxlMemTransferFw (
 
   /* Offset has to be aligned to 128B */
   if (!IS_ALIGNED (Offset, CXL_FW_TRANSFER_ALIGNMENT)) {
-    DEBUG ((EFI_D_ERROR, "[CxlMemTransferFw] Error, misaligned Offset for FW TransferFw slice (%u) \n", Offset));
+    DEBUG ((DEBUG_ERROR, "[CxlMemTransferFw] Error, misaligned Offset for FW TransferFw slice (%u) \n", Offset));
     Status = EFI_LOAD_ERROR;
     return Status;
   }
@@ -402,7 +402,7 @@ CxlMemTransferFw (
 
   TransferFw = (CXL_MAILBOX_TRANSFER_FW *)AllocatePool (InputSize);
   if (!TransferFw) {
-    DEBUG ((EFI_D_ERROR, "CxlMemTransferFw: Error in AllocatePool\n"));
+    DEBUG ((DEBUG_ERROR, "CxlMemTransferFw: Error in AllocatePool\n"));
     Status = EFI_LOAD_ERROR;
     return Status;
   }
@@ -425,7 +425,7 @@ CxlMemTransferFw (
 
     Status = CxlSendCmd (Private);
     if (Status != EFI_SUCCESS) {
-      DEBUG ((EFI_D_ERROR, "CxlMemTransferFw: Error returned from func CxlSendCmd()\n"));
+      DEBUG ((DEBUG_ERROR, "CxlMemTransferFw: Error returned from func CxlSendCmd()\n"));
       goto OUT_FREE;
     }
   } else {
@@ -457,7 +457,7 @@ CxlMemTransferFw (
 
       Status = CxlSendCmd (Private);
       if (Status != EFI_SUCCESS) {
-        DEBUG ((EFI_D_ERROR, "CxlMemTransferFw: Error returned from func CxlSendCmd()\n"));
+        DEBUG ((DEBUG_ERROR, "CxlMemTransferFw: Error returned from func CxlSendCmd()\n"));
         goto OUT_FREE;
       }
 
@@ -535,7 +535,7 @@ CxlFindNextExtendedCapability (
   }
 
   if (PciUefiReadConfigWord (Private, Position, &Header) != EFI_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Error in PciUefiReadConfigWord\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Error in PciUefiReadConfigWord\n", __func__));
     return 0;
   }
 
@@ -544,7 +544,7 @@ CxlFindNextExtendedCapability (
    * Capability version and next pointer all being 0.
    */
   if (Header == 0) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Error, Header\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Error, Header\n", __func__));
     return 0;
   }
 
@@ -589,7 +589,7 @@ CxlFindDvsecCapability (
   /* CXL_PCI_EXT_CAP_ID_DVSEC: 23h is Extended Capability struct id for DVSEC */
   Position = CxlFindNextExtendedCapability (Private, 0, CXL_PCI_EXT_CAP_ID_DVSEC);
   if (!Position) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Error, Position = 0\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Error, Position = 0\n", __func__));
     return 0;
   }
 
@@ -747,14 +747,14 @@ CxlFindRegblockInstance (
   // Get Dvsec Capability with id 8, which is RegisterValue locator
   RegisterLocator = CxlFindDvsecCapability (Private, CXL_PCI_DVSEC_VENDOR_ID, CXL_DVSEC_ID_REGISTER_LOCATOR);
   if (RegisterLocator == 0) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Error in CxlFindDvsecCapability\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Error in CxlFindDvsecCapability\n", __func__));
     return EFI_UNSUPPORTED;
   }
 
   // Read Register Locator DVSEC - Header1
   Status = PciUefiReadConfigWord (Private, RegisterLocator + CXL_PCI_DVSEC_HEADER1, &DVSEC_Header1);
   if (Status != EFI_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Error in PciUefiReadConfigWord\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Error in PciUefiReadConfigWord\n", __func__));
     return Status;
   }
 
@@ -773,13 +773,13 @@ CxlFindRegblockInstance (
     RegisterHigh = 0;
     Status       = PciUefiReadConfigWord (Private, RegisterLocator, &RegisterLow);
     if (Status != EFI_SUCCESS) {
-      DEBUG ((EFI_D_ERROR, "[%a]: Error in PciUefiReadConfigWord, RegisterLow\n", __func__));
+      DEBUG ((DEBUG_ERROR, "[%a]: Error in PciUefiReadConfigWord, RegisterLow\n", __func__));
       return Status;
     }
 
     Status = PciUefiReadConfigWord (Private, RegisterLocator + 4, &RegisterHigh);
     if (Status != EFI_SUCCESS) {
-      DEBUG ((EFI_D_ERROR, "[%a]: Error in PciUefiReadConfigWord, RegisterHigh\n", __func__));
+      DEBUG ((DEBUG_ERROR, "[%a]: Error in PciUefiReadConfigWord, RegisterHigh\n", __func__));
       return Status;
     }
 
@@ -820,12 +820,12 @@ CxlGetMboxRegs (
 
   Status = PciUefiMemRead64 (Private, CXL_DEV_CAP_ARRAY_OFFSET, &CapabilityArray);
   if (Status != EFI_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Error getting CapabilityArray\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Error getting CapabilityArray\n", __func__));
     return Status;
   }
 
   if (GetFieldValues (CapabilityArray, 15, 0) != CXL_DEV_CAP_ARRAY_CAP_ID) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Error CXL_DEV_CAP_ARRAY_CAP_ID not matching\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Error CXL_DEV_CAP_ARRAY_CAP_ID not matching\n", __func__));
     return EFI_NOT_FOUND;
   }
 
@@ -838,7 +838,7 @@ CxlGetMboxRegs (
 
     Status = PciUefiMemRead32 (Private, Capability * 0x10, &Value);
     if (Status != EFI_SUCCESS) {
-      DEBUG ((EFI_D_ERROR, "[%a]: Error reading Value for CapabilityId\n", __func__));
+      DEBUG ((DEBUG_ERROR, "[%a]: Error reading Value for CapabilityId\n", __func__));
       return Status;
     }
 
@@ -847,13 +847,13 @@ CxlGetMboxRegs (
     // 8.2.8.2 CXL Device Capability Header Register
     Status = PciUefiMemRead32 (Private, Capability * 0x10 + 0x4, &Offset);
     if (Status != EFI_SUCCESS) {
-      DEBUG ((EFI_D_ERROR, "[%a]: Error reading Offset\n", __func__));
+      DEBUG ((DEBUG_ERROR, "[%a]: Error reading Offset\n", __func__));
       return Status;
     }
 
     Status = PciUefiMemRead32 (Private, Capability * 0x10 + 0x8, &Length);
     if (Status != EFI_SUCCESS) {
-      DEBUG ((EFI_D_ERROR, "[%a]: Error reading length\n", __func__));
+      DEBUG ((DEBUG_ERROR, "[%a]: Error reading length\n", __func__));
       return Status;
     }
 
@@ -928,13 +928,13 @@ CxlMboxBackgroundComplete (
 
   Status = PciUefiMemRead64 (Private, Private->RegisterMap.MailboxRegistersOffset + CXL_DEV_MBOX_BG_CMD_STATUS_OFFSET, &RegisterValue);
   if (Status != EFI_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Error reading RegisterValue for background status cmd\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Error reading RegisterValue for background status cmd\n", __func__));
     return 0;
   }
 
   BackgroundStatus = GetFieldValues (RegisterValue, 22, 16);
   if (BackgroundStatus == 100) {
-    DEBUG ((EFI_D_ERROR, "[%a]: BackgroundStatus = 100\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: BackgroundStatus = 100\n", __func__));
     return 0;
   }
 
@@ -987,14 +987,14 @@ CxlPciMboxSend (
 
   /* #1 */
   if (IsCxlDoorbellBusy (Private)) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Error mailbox queue busy\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Error mailbox queue busy\n", __func__));
     return EFI_TIMEOUT;
   }
 
   CommandRegister = Private->MailboxCmd.Opcode;
   if (Private->MailboxCmd.InputSize) {
     if (!Private->MailboxCmd.InputPayload) {
-      DEBUG ((EFI_D_ERROR, "[%a]: Error InputPayload is 0\n", __func__));
+      DEBUG ((DEBUG_ERROR, "[%a]: Error InputPayload is 0\n", __func__));
       return EFI_BAD_BUFFER_SIZE;
     }
 
@@ -1004,7 +1004,7 @@ CxlPciMboxSend (
     /*Read Payload buffer in n Bytes*/
     Status = PciUefiMemWriteNBits (Private, Private->RegisterMap.MailboxRegistersOffset + CXL_DEV_MBOX_PAYLOAD_OFFSET, Private->MailboxCmd.InputPayload, (UINT32)Private->MailboxCmd.InputSize);
     if (Status != EFI_SUCCESS) {
-      DEBUG ((EFI_D_ERROR, "[%a]: Error in PciUefiMemWriteNBits\n", __func__));
+      DEBUG ((DEBUG_ERROR, "[%a]: Error in PciUefiMemWriteNBits\n", __func__));
       return Status;
     }
   }
@@ -1012,7 +1012,7 @@ CxlPciMboxSend (
   /* #2, #3 */
   Status = PciUefiMemWrite64 (Private, Private->RegisterMap.MailboxRegistersOffset + CXL_DEV_MBOX_CMD_OFFSET, &CommandRegister);
   if (Status != EFI_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Error in PciUefiMemWrite64\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Error in PciUefiMemWrite64\n", __func__));
     return Status;
   }
 
@@ -1020,13 +1020,13 @@ CxlPciMboxSend (
   Value  = CXL_DEV_MBOX_CTRL_DOORBELL;
   Status = PciUefiMemWrite32 (Private, Private->RegisterMap.MailboxRegistersOffset + CXL_DEV_MBOX_CTRL_OFFSET, &Value);
   if (Status != EFI_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Error in PciUefiMemWrite32\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Error in PciUefiMemWrite32\n", __func__));
     return Status;
   }
 
   /* #5 */
   if (CxlMboxWaitForDoorbell (Private) != 0) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Error, Mailbox timeout\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Error, Mailbox timeout\n", __func__));
     Status = EFI_TIMEOUT;
     return Status;
   }
@@ -1034,7 +1034,7 @@ CxlPciMboxSend (
   /* #6 */
   Status = PciUefiMemRead64 (Private, Private->RegisterMap.MailboxRegistersOffset + CXL_DEV_MBOX_STATUS_OFFSET, &StatusRegister);
   if (Status != EFI_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Error in PciUefiMemRead64\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Error in PciUefiMemRead64\n", __func__));
     return Status;
   }
 
@@ -1052,13 +1052,13 @@ CxlPciMboxSend (
     }
 
     if (!CxlMboxBackgroundComplete (Private)) {
-      DEBUG ((EFI_D_ERROR, "[%a]: Error, Mailbox timeout\n", __func__));
+      DEBUG ((DEBUG_ERROR, "[%a]: Error, Mailbox timeout\n", __func__));
       return EFI_TIMEOUT;
     }
 
     Status = PciUefiMemRead64 (Private, Private->RegisterMap.MailboxRegistersOffset + CXL_DEV_MBOX_BG_CMD_STATUS_OFFSET, &BackgroundStatusRegister);
     if (Status != EFI_SUCCESS) {
-      DEBUG ((EFI_D_ERROR, "[%a]: Error in PciUefiMemRead64\n", __func__));
+      DEBUG ((DEBUG_ERROR, "[%a]: Error in PciUefiMemRead64\n", __func__));
       return Status;
     }
 
@@ -1066,14 +1066,14 @@ CxlPciMboxSend (
   }
 
   if (Private->MailboxCmd.ReturnCode != CXL_MBOX_CMD_RC_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Completed but caller must check ReturnCode\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Completed but caller must check ReturnCode\n", __func__));
     return EFI_SUCCESS;
   }
 
   // 8.2.8.4.5 Command Register (Mailbox Registers Capability Offset + 08h)
   Status = PciUefiMemRead64 (Private, Private->RegisterMap.MailboxRegistersOffset + CXL_DEV_MBOX_CMD_OFFSET, &CommandRegister);
   if (Status != EFI_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Error in PciUefiMemRead64\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Error in PciUefiMemRead64\n", __func__));
     return Status;
   }
 
@@ -1088,7 +1088,7 @@ CxlPciMboxSend (
     char  Buffer[256];
     Status = PciUefiMemReadNBits (Private, Private->RegisterMap.MailboxRegistersOffset + CXL_DEV_MBOX_PAYLOAD_OFFSET, Buffer, (UINT32)MinimumNumber);
     if (Status != EFI_SUCCESS) {
-      DEBUG ((EFI_D_ERROR, "[%a]: Error, Reading Buffer[n] in func PciUefiMemReadNBits()\n", __func__));
+      DEBUG ((DEBUG_ERROR, "[%a]: Error, Reading Buffer[n] in func PciUefiMemReadNBits()\n", __func__));
       return Status;
     }
 
@@ -1125,7 +1125,7 @@ CxlSetMailboxPayloadSize (
   }
 
   if (CxlMboxWaitForDoorbell (Private) != 0) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Error, Mailbox timeout\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Error, Mailbox timeout\n", __func__));
     Status = EFI_TIMEOUT;
     return Status;
   }
@@ -1134,7 +1134,7 @@ CxlSetMailboxPayloadSize (
   Private->MemdevState.PayloadSize = MIN (Private->MemdevState.PayloadSize, CXL_SZ_1M);
 
   if (Private->MemdevState.PayloadSize < 256) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Mailbox is too small\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Mailbox is too small\n", __func__));
     Status = EFI_LOAD_ERROR;
     return Status;
   }
@@ -1161,21 +1161,21 @@ CxlMailBoxSetup (
 
   Status = CxlFindRegblockInstance (Private, CxlRbiMemdev);
   if (Status != EFI_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Error CxlFindRegblockInstance\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Error CxlFindRegblockInstance\n", __func__));
     FreePool (Private);
     return Status;
   }
 
   Status = CxlGetMboxRegs (Private);
   if (Status != EFI_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Error CxlGetMboxRegs\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Error CxlGetMboxRegs\n", __func__));
     FreePool (Private);
     return Status;
   }
 
   Status = CxlSetMailboxPayloadSize (Private);
   if (Status != EFI_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Error CxlSetMailboxPayloadSize\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Error CxlSetMailboxPayloadSize\n", __func__));
     FreePool (Private);
     return Status;
   }
@@ -1242,7 +1242,7 @@ CxlDriverBindingSupported (
                   EFI_OPEN_PROTOCOL_TEST_PROTOCOL
                   );
   if (!EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "[%a]: [CXL-%08X] CallerGuid OpenProtocol Returning status = %r\n", __func__, Controller, Status));
+    DEBUG ((DEBUG_ERROR, "[%a]: [CXL-%08X] CallerGuid OpenProtocol Returning status = %r\n", __func__, Controller, Status));
     return EFI_ALREADY_STARTED;
   }
 
@@ -1260,7 +1260,7 @@ CxlDriverBindingSupported (
   }
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "[%a]: [CXL-%08X] PciGuid OpenProtocol Returning status = %r\n", __func__, Controller, Status));
+    DEBUG ((DEBUG_ERROR, "[%a]: [CXL-%08X] PciGuid OpenProtocol Returning status = %r\n", __func__, Controller, Status));
     return Status;
   }
 
@@ -1273,12 +1273,12 @@ CxlDriverBindingSupported (
                         );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "[%a]: [CXL-%08X] CallerGuid OpenProtocol Returning status = %r\n", __func__, Controller, Status));
+    DEBUG ((DEBUG_ERROR, "[%a]: [CXL-%08X] CallerGuid OpenProtocol Returning status = %r\n", __func__, Controller, Status));
     goto EXIT;
   }
 
   if ((ClassCode[0] != CXL_MEMORY_PROGIF) || (ClassCode[1] != CXL_MEMORY_SUB_CLASS) || (ClassCode[2] != CXL_MEMORY_CLASS)) {
-    DEBUG ((EFI_D_ERROR, "[%a]: UNSUPPORTED Class [CXL-%08X] \n", __func__, Controller));
+    DEBUG ((DEBUG_ERROR, "[%a]: UNSUPPORTED Class [CXL-%08X] \n", __func__, Controller));
     Status = EFI_UNSUPPORTED;
     goto EXIT;
   }
@@ -1301,7 +1301,7 @@ CxlDriverBindingSupported (
                              );
 
     if (EFI_ERROR (RegStatus)) {
-      DEBUG ((EFI_D_ERROR, "[%a]: Failed to read PCI IO for Ext. capability \n", __func__));
+      DEBUG ((DEBUG_ERROR, "[%a]: Failed to read PCI IO for Ext. capability \n", __func__));
       goto EXIT;
     }
 
@@ -1317,7 +1317,7 @@ CxlDriverBindingSupported (
   } while (NextExtCapOffset);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "[%a]: ****[CXL-%08X] Error: Non CXL Device****\n", __func__, Controller));
+    DEBUG ((DEBUG_ERROR, "[%a]: ****[CXL-%08X] Error: Non CXL Device****\n", __func__, Controller));
   }
 
 EXIT:
@@ -1481,7 +1481,7 @@ CxlDriverBindingStart (
                   );
 
   if ((EFI_ERROR (Status)) && (Status != EFI_ALREADY_STARTED)) {
-    DEBUG ((EFI_D_ERROR, "[%a]: [CXL-%08X] path OpenProtocol Returning status = %r\n", __func__, Controller, Status));
+    DEBUG ((DEBUG_ERROR, "[%a]: [CXL-%08X] path OpenProtocol Returning status = %r\n", __func__, Controller, Status));
     return Status;
   }
 
@@ -1495,23 +1495,23 @@ CxlDriverBindingStart (
                   );
 
   if (EFI_ERROR (Status) && (Status != EFI_ALREADY_STARTED)) {
-    DEBUG ((EFI_D_ERROR, "[%a]: [CXL-%08X] PciIo OpenProtocol Returning status = %r\n", __func__, Controller, Status));
+    DEBUG ((DEBUG_ERROR, "[%a]: [CXL-%08X] PciIo OpenProtocol Returning status = %r\n", __func__, Controller, Status));
     goto EXIT;
   }
 
   if (Status == EFI_ALREADY_STARTED) {
-    DEBUG ((EFI_D_ERROR, "[%a]: [CXL-%08X] PciIo EFI_ALREADY_STARTED status = %r\n", __func__, Controller, Status));
+    DEBUG ((DEBUG_ERROR, "[%a]: [CXL-%08X] PciIo EFI_ALREADY_STARTED status = %r\n", __func__, Controller, Status));
   } else {
     Private = AllocateZeroPool (sizeof (CXL_CONTROLLER_PRIVATE_DATA));
     if (Private == NULL) {
-      DEBUG ((EFI_D_ERROR, "[%a]: Allocating for CXL Private Data failed!\n", __func__));
+      DEBUG ((DEBUG_ERROR, "[%a]: Allocating for CXL Private Data failed!\n", __func__));
       Status = EFI_OUT_OF_RESOURCES;
       goto EXIT;
     }
 
     Private->PackageVersionName = AllocateZeroPool (CXL_STRING_BUFFER_WIDTH);
     if (Private->PackageVersionName == NULL) {
-      DEBUG ((EFI_D_ERROR, "[%a]: Allocating for CXL PackageVersionName Data failed!\n", __func__));
+      DEBUG ((DEBUG_ERROR, "[%a]: Allocating for CXL PackageVersionName Data failed!\n", __func__));
       Status = EFI_OUT_OF_RESOURCES;
       goto EXIT;
     }
@@ -1525,11 +1525,11 @@ CxlDriverBindingStart (
     StrCpyS (Private->PackageVersionName, CXL_STRING_BUFFER_WIDTH, CXL_PACKAGE_VERSION_NAME);
     Private->PackageVersion = CXL_PACKAGE_VERSION_FFFFFFFE;
 
-    DEBUG ((EFI_D_ERROR, "[%a]: [CXL-%08X] Allocation Completed status = %r\n", __func__, Controller, Status));
+    DEBUG ((DEBUG_ERROR, "[%a]: [CXL-%08X] Allocation Completed status = %r\n", __func__, Controller, Status));
 
     Status = PciIo->GetLocation (PciIo, &Private->Seg, &Private->Bus, &Private->Device, &Private->Function);
     if (Status != EFI_SUCCESS) {
-      DEBUG ((EFI_D_ERROR, "[%a]: Error PciIo GetLocation\n", __func__));
+      DEBUG ((DEBUG_ERROR, "[%a]: Error PciIo GetLocation\n", __func__));
       FreePool (Private);
       return Status;
     }
@@ -1538,7 +1538,7 @@ CxlDriverBindingStart (
 
     Status = CxlMailBoxSetup (Private);
     if (Status != EFI_SUCCESS) {
-      DEBUG ((EFI_D_ERROR, "[%a]: Error in setting up MailBox\n", __func__));
+      DEBUG ((DEBUG_ERROR, "[%a]: Error in setting up MailBox\n", __func__));
       return Status;
     }
 
@@ -1550,7 +1550,7 @@ CxlDriverBindingStart (
                     );
 
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "[CxlDriverBindingStart]: [CXL-%08X] Protocol Install failed status = %r\n", Controller, Status));
+      DEBUG ((DEBUG_ERROR, "[CxlDriverBindingStart]: [CXL-%08X] Protocol Install failed status = %r\n", Controller, Status));
       FreePool (Private);
       goto EXIT;
     } else {

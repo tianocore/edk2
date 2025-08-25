@@ -34,65 +34,65 @@ ReadFileToBuffer (
   ShellProtocol = NULL;
 
   Status = gBS->LocateProtocol (
-				  &gEfiShellProtocolGuid,
-				  NULL,
-				  (VOID **)&ShellProtocol
-				  );
+                  &gEfiShellProtocolGuid,
+                  NULL,
+                  (VOID **)&ShellProtocol
+                  );
 
   if (EFI_ERROR (Status)) {
-	Print (L"ReadFileToBuffer: Error gEfiShellProtocolGuid %r\n", Status);
-	ShellProtocol = NULL;
-	*BufferSize   = 0;
-	*Buffer       = NULL;
-	return Status;
+    Print (L"ReadFileToBuffer: Error gEfiShellProtocolGuid %r\n", Status);
+    ShellProtocol = NULL;
+    *BufferSize   = 0;
+    *Buffer       = NULL;
+    return Status;
   }
 
   Status = ShellProtocol->OpenFileByName (
-							FileName,
-							&FileHandle,
-							EFI_FILE_MODE_READ
-							);
+                            FileName,
+                            &FileHandle,
+                            EFI_FILE_MODE_READ
+                            );
 
   if (EFI_ERROR (Status)) {
-	Print (L"ReadFileToBuffer: Error open file by name %r\n", Status);
-	return Status;
+    Print (L"ReadFileToBuffer: Error open file by name %r\n", Status);
+    return Status;
   }
 
   Status = ShellProtocol->GetFileSize (FileHandle, &FileSize);
 
   if (EFI_ERROR (Status)) {
-	ShellProtocol->CloseFile (FileHandle);
-	return Status;
+    ShellProtocol->CloseFile (FileHandle);
+    return Status;
   }
 
   if (FileSize > CXL_FW_SIZE) {
-	Print (L"ReadFileToBuffer: Error FileSize = %d is greater then 32 MB\n", FileSize);
-	Status = EFI_INVALID_PARAMETER;
-	return Status;
+    Print (L"ReadFileToBuffer: Error FileSize = %d is greater then 32 MB\n", FileSize);
+    Status = EFI_INVALID_PARAMETER;
+    return Status;
   }
 
   TempBufferSize = (UINTN)FileSize;
   TempBuffer     = AllocateZeroPool (TempBufferSize);
   if (NULL == TempBuffer) {
-	ShellProtocol->CloseFile (FileHandle);
-	return Status;
+    ShellProtocol->CloseFile (FileHandle);
+    return Status;
   }
 
   Status = ShellProtocol->SetFilePosition (FileHandle, Position);
   if (EFI_ERROR (Status)) {
-	Print (L"Error in setting position...%r (Position = 0x%X)\n", Status, Position);
-	return Status;
+    Print (L"Error in setting position...%r (Position = 0x%X)\n", Status, Position);
+    return Status;
   }
 
   Status = ShellProtocol->ReadFile (
-							FileHandle,
-							&TempBufferSize,
-							TempBuffer
-							);
+                            FileHandle,
+                            &TempBufferSize,
+                            TempBuffer
+                            );
 
   if (EFI_ERROR (Status)) {
-	ShellProtocol->CloseFile (FileHandle);
-	return Status;
+    ShellProtocol->CloseFile (FileHandle);
+    return Status;
   }
 
   Status = ShellProtocol->CloseFile (FileHandle);
@@ -119,21 +119,21 @@ GetHandleInfo (
   EFI_STATUS  Status = EFI_SUCCESS;
 
   Status = gBS->LocateHandleBuffer (
-				  ByProtocol,
-				  &gEfiFirmwareManagementProtocolGuid,
-				  NULL,
-				  NumOfHandles,
-				  Handles
-				  );
+                  ByProtocol,
+                  &gEfiFirmwareManagementProtocolGuid,
+                  NULL,
+                  NumOfHandles,
+                  Handles
+                  );
 
   if (EFI_ERROR (Status)) {
-	Print (L"GetHandleInfo: LocateHandleBuffer failed status = %r, NumOfHandles = %d\n", Status, *NumOfHandles);
-	return Status;
+    Print (L"GetHandleInfo: LocateHandleBuffer failed status = %r, NumOfHandles = %d\n", Status, *NumOfHandles);
+    return Status;
   }
 
   if (0 == *NumOfHandles) {
-	Print (L"GetHandleInfo: Handle not found status = %r, NoHandles = %d\n", Status, *NumOfHandles);
-	return EFI_NOT_FOUND;
+    Print (L"GetHandleInfo: Handle not found status = %r, NoHandles = %d\n", Status, *NumOfHandles);
+    return EFI_NOT_FOUND;
   }
 
   return Status;
@@ -163,19 +163,19 @@ GetCxlPrivateData (
   FirmwareMgmt = NULL;
 
   Status = gBS->HandleProtocol (
-				  Handles[Index],
-				  &gEfiFirmwareManagementProtocolGuid,
-				  (VOID **)&FirmwareMgmt
-				  );
+                  Handles[Index],
+                  &gEfiFirmwareManagementProtocolGuid,
+                  (VOID **)&FirmwareMgmt
+                  );
 
   if (EFI_ERROR (Status)) {
-	return Status;
+    return Status;
   }
 
   *Private1 = CXL_CONTROLLER_PRIVATE_FROM_FIRMWARE_MGMT (FirmwareMgmt);
   if (CXL_CONTROLLER_PRIVATE_DATA_SIGNATURE != (*Private1)->Signature) {
-	Print (L"\ngetPrivateStr: Error, Private Data is not for CXL device!\n");
-	Status = EFI_NOT_FOUND;
+    Print (L"\ngetPrivateStr: Error, Private Data is not for CXL device!\n");
+    Status = EFI_NOT_FOUND;
   }
 
   return Status;
@@ -225,81 +225,81 @@ GetImageInfo (
 
   Status = GetHandleInfo (&NumOfHandles, &Handles);
   if (Status != EFI_SUCCESS) {
-	Print (L"GetImageInfo: Fail to locate handle buffer...\n");
-	return Status;
+    Print (L"GetImageInfo: Fail to locate handle buffer...\n");
+    return Status;
   }
 
   for (Index = 0; Index < NumOfHandles; Index++) {
-	Status = GetCxlPrivateData (&Private, Handles, Index);
-	if (Status != EFI_SUCCESS) {
-	  Print (L"GetImageInfo: Fail to locate handle buffer...\n");
-	  continue;
-	}
+    Status = GetCxlPrivateData (&Private, Handles, Index);
+    if (Status != EFI_SUCCESS) {
+      Print (L"GetImageInfo: Fail to locate handle buffer...\n");
+      continue;
+    }
 
-	if ((Bus == Private->Bus) && (Device == Private->Device) && (Function == Private->Function)) {
-	  Status = Private->FirmwareMgmt.GetImageInfo (
-									   &Private->FirmwareMgmt,
-									   &ImageInfoSize,
-									   ImageInfo,
-									   &DescriptorVersion,
-									   &DescriptorCount,
-									   &DescriptorSize,
-									   &PackageVersion,
-									   &PackageVersionName
-									   );
+    if ((Bus == Private->Bus) && (Device == Private->Device) && (Function == Private->Function)) {
+      Status = Private->FirmwareMgmt.GetImageInfo (
+                                       &Private->FirmwareMgmt,
+                                       &ImageInfoSize,
+                                       ImageInfo,
+                                       &DescriptorVersion,
+                                       &DescriptorCount,
+                                       &DescriptorSize,
+                                       &PackageVersion,
+                                       &PackageVersionName
+                                       );
 
-	  if (Status == EFI_BUFFER_TOO_SMALL) {
-		ImageInfo = AllocateZeroPool (ImageInfoSize);
-		if (ImageInfo == NULL) {
-		  DEBUG ((EFI_D_ERROR, "GetImageInfo: AllocateZeroPool failed!\n"));
-		  Status = EFI_OUT_OF_RESOURCES;
-		  return Status;
-		}
+      if (Status == EFI_BUFFER_TOO_SMALL) {
+        ImageInfo = AllocateZeroPool (ImageInfoSize);
+        if (ImageInfo == NULL) {
+          DEBUG ((DEBUG_ERROR, "GetImageInfo: AllocateZeroPool failed!\n"));
+          Status = EFI_OUT_OF_RESOURCES;
+          return Status;
+        }
 
-		Status = Private->FirmwareMgmt.GetImageInfo (
-										 &Private->FirmwareMgmt,
-										 &ImageInfoSize,
-										 ImageInfo,
-										 &DescriptorVersion,
-										 &DescriptorCount,
-										 &DescriptorSize,
-										 &PackageVersion,
-										 &PackageVersionName
-										 );
-	  }
+        Status = Private->FirmwareMgmt.GetImageInfo (
+                                         &Private->FirmwareMgmt,
+                                         &ImageInfoSize,
+                                         ImageInfo,
+                                         &DescriptorVersion,
+                                         &DescriptorCount,
+                                         &DescriptorSize,
+                                         &PackageVersion,
+                                         &PackageVersionName
+                                         );
+      }
 
-	  if (!EFI_ERROR (Status)) {
-		Print (L"===== Current Firmware Image Information =====\n");
-		Print (L"Package Version         : %08X\n", PackageVersion);
-		Print (L"Package Version Name    : %s\n", PackageVersionName);
-		if (ImageInfo != NULL) {
-		  Print (L"Image Index             : %d\n", ImageInfo->ImageIndex);
-		  Print (L"Image Type ID           : %g\n", ImageInfo->ImageTypeId);
-		  Print (L"Image ID                : %016lx\n", ImageInfo->ImageId);
-		  Print (L"Image ID Name           : %s\n", ImageInfo->ImageIdName);
-		  Print (L"Version                 : %d\n", ImageInfo->Version);
-		  Print (L"Version Name            : %a\n", ImageInfo->VersionName);
-		  Print (L"Size                    : %d\n", ImageInfo->Size);
-		  Print (L"Attributes Supported    : %d\n", ImageInfo->AttributesSupported);
-		  Print (L"Attributes Setting      : %d\n", ImageInfo->AttributesSetting);
-		  Print (L"Compatibilities         : %d\n", ImageInfo->Compatibilities);
-		}
-	  } else {
-		Print (L"Calling GetImageInfo Failed with status = %r\n", Status);
-	  }
+      if (!EFI_ERROR (Status)) {
+        Print (L"===== Current Firmware Image Information =====\n");
+        Print (L"Package Version         : %08X\n", PackageVersion);
+        Print (L"Package Version Name    : %s\n", PackageVersionName);
+        if (ImageInfo != NULL) {
+          Print (L"Image Index             : %d\n", ImageInfo->ImageIndex);
+          Print (L"Image Type ID           : %g\n", ImageInfo->ImageTypeId);
+          Print (L"Image ID                : %016lx\n", ImageInfo->ImageId);
+          Print (L"Image ID Name           : %s\n", ImageInfo->ImageIdName);
+          Print (L"Version                 : %d\n", ImageInfo->Version);
+          Print (L"Version Name            : %a\n", ImageInfo->VersionName);
+          Print (L"Size                    : %d\n", ImageInfo->Size);
+          Print (L"Attributes Supported    : %d\n", ImageInfo->AttributesSupported);
+          Print (L"Attributes Setting      : %d\n", ImageInfo->AttributesSetting);
+          Print (L"Compatibilities         : %d\n", ImageInfo->Compatibilities);
+        }
+      } else {
+        Print (L"Calling GetImageInfo Failed with status = %r\n", Status);
+      }
 
-	  break;
-	}
+      break;
+    }
   }
 
   FreePool (Handles);
 
   if (NULL != PackageVersionName) {
-	FreePool (PackageVersionName);
+    FreePool (PackageVersionName);
   }
 
   if (NULL != ImageInfo) {
-	FreePool (ImageInfo);
+    FreePool (ImageInfo);
   }
 
   return Status;
@@ -345,49 +345,49 @@ GetPackageInfo (
 
   Status = GetHandleInfo (&NumOfHandles, &Handles);
   if (Status != EFI_SUCCESS) {
-	Print (L"GetPackageInfo: Fail to locate handle buffer...\n");
-	return Status;
+    Print (L"GetPackageInfo: Fail to locate handle buffer...\n");
+    return Status;
   }
 
   for (Index = 0; Index < NumOfHandles; Index++) {
-	Status = GetCxlPrivateData (&Private, Handles, Index);
-	if (Status != EFI_SUCCESS) {
-	  Print (L"GetImageInfo: Fail to locate handle buffer...\n");
-	  continue;
-	}
+    Status = GetCxlPrivateData (&Private, Handles, Index);
+    if (Status != EFI_SUCCESS) {
+      Print (L"GetImageInfo: Fail to locate handle buffer...\n");
+      continue;
+    }
 
-	if ((Bus == Private->Bus) && (Device == Private->Device) && (Function == Private->Function)) {
-	  PackageVersionName = AllocateZeroPool (CXL_STRING_BUFFER_WIDTH);
-	  if (PackageVersionName == NULL) {
-		DEBUG ((EFI_D_ERROR, "GetImageInfo: AllocateZeroPool failed!\n"));
-		Status = EFI_OUT_OF_RESOURCES;
-		return Status;
-	  }
+    if ((Bus == Private->Bus) && (Device == Private->Device) && (Function == Private->Function)) {
+      PackageVersionName = AllocateZeroPool (CXL_STRING_BUFFER_WIDTH);
+      if (PackageVersionName == NULL) {
+        DEBUG ((DEBUG_ERROR, "GetImageInfo: AllocateZeroPool failed!\n"));
+        Status = EFI_OUT_OF_RESOURCES;
+        return Status;
+      }
 
-	  Status = Private->FirmwareMgmt.GetPackageInfo (
-									   &Private->FirmwareMgmt,
-									   &PackageVersion,
-									   &PackageVersionName,
-									   &PackageVersionNameMaxLen,
-									   &AttributesSupported,
-									   &AttributesSetting
-									   );
+      Status = Private->FirmwareMgmt.GetPackageInfo (
+                                       &Private->FirmwareMgmt,
+                                       &PackageVersion,
+                                       &PackageVersionName,
+                                       &PackageVersionNameMaxLen,
+                                       &AttributesSupported,
+                                       &AttributesSetting
+                                       );
 
-	  if (!EFI_ERROR (Status)) {
-		Print (L"Package Version Name      : %s\n", PackageVersionName);
-		Print (L"Package Version           : %d\n", PackageVersion);
-		Print (L"Attributes Supported      : %d\n", AttributesSupported);
-		Print (L"Attributes Setting        : %d\n", AttributesSetting);
-	  } else {
-		Print (L"Calling FMP.GetPackageInfo...%r\n", Status);
-	  }
+      if (!EFI_ERROR (Status)) {
+        Print (L"Package Version Name      : %s\n", PackageVersionName);
+        Print (L"Package Version           : %d\n", PackageVersion);
+        Print (L"Attributes Supported      : %d\n", AttributesSupported);
+        Print (L"Attributes Setting        : %d\n", AttributesSetting);
+      } else {
+        Print (L"Calling FMP.GetPackageInfo...%r\n", Status);
+      }
 
-	  if (NULL != PackageVersionName) {
-		FreePool (PackageVersionName);
-	  }
+      if (NULL != PackageVersionName) {
+        FreePool (PackageVersionName);
+      }
 
-	  break;
-	}
+      break;
+    }
   }
 
   FreePool (Handles);
@@ -430,58 +430,58 @@ GetImage (
 
   Status = GetHandleInfo (&NumOfHandles, &Handles);
   if (Status != EFI_SUCCESS) {
-	Print (L"GetImage: Fail to locate handle buffer...\n");
-	return Status;
+    Print (L"GetImage: Fail to locate handle buffer...\n");
+    return Status;
   }
 
   for (Index = 0; Index < NumOfHandles; Index++) {
-	Status = GetCxlPrivateData (&Private, Handles, Index);
-	if (Status != EFI_SUCCESS) {
-	  Print (L"GetImage: Fail to locate handle buffer...\n");
-	  continue;
-	}
+    Status = GetCxlPrivateData (&Private, Handles, Index);
+    if (Status != EFI_SUCCESS) {
+      Print (L"GetImage: Fail to locate handle buffer...\n");
+      continue;
+    }
 
-	if ((Bus == Private->Bus) && (Device == Private->Device) && (Function == Private->Function)) {
-	  Status = Private->FirmwareMgmt.GetImage (
-									   &Private->FirmwareMgmt,
-									   ImageIndex,
-									   Image,
-									   &ImageSize
-									   );
+    if ((Bus == Private->Bus) && (Device == Private->Device) && (Function == Private->Function)) {
+      Status = Private->FirmwareMgmt.GetImage (
+                                       &Private->FirmwareMgmt,
+                                       ImageIndex,
+                                       Image,
+                                       &ImageSize
+                                       );
 
-	  if (Status == EFI_BUFFER_TOO_SMALL) {
-		Print (L"\nGetImage: Image Allocated with Size = %d\n", ImageSize);
-		Image = AllocateZeroPool (ImageSize);
-		if (Image == NULL) {
-		  DEBUG ((EFI_D_ERROR, "GetImage: AllocateZeroPool failed!\n"));
-		  Status = EFI_OUT_OF_RESOURCES;
-		  return Status;
-		}
+      if (Status == EFI_BUFFER_TOO_SMALL) {
+        Print (L"\nGetImage: Image Allocated with Size = %d\n", ImageSize);
+        Image = AllocateZeroPool (ImageSize);
+        if (Image == NULL) {
+          DEBUG ((DEBUG_ERROR, "GetImage: AllocateZeroPool failed!\n"));
+          Status = EFI_OUT_OF_RESOURCES;
+          return Status;
+        }
 
-		Status = Private->FirmwareMgmt.GetImage (
-										 &Private->FirmwareMgmt,
-										 ImageIndex,
-										 Image,
-										 &ImageSize
-										 );
-	  }
+        Status = Private->FirmwareMgmt.GetImage (
+                                         &Private->FirmwareMgmt,
+                                         ImageIndex,
+                                         Image,
+                                         &ImageSize
+                                         );
+      }
 
-	  if (!EFI_ERROR (Status)) {
-		Print (L"GetImage, Image Size = %d\n", ImageSize);
-	  } else {
-		Print (L"Calling FMP GetImage Failed...%r\n", Status);
-	  }
+      if (!EFI_ERROR (Status)) {
+        Print (L"GetImage, Image Size = %d\n", ImageSize);
+      } else {
+        Print (L"Calling FMP GetImage Failed...%r\n", Status);
+      }
 
-	  break;
-	}
+      break;
+    }
   }
 
   if (NULL != Handles) {
-	FreePool (Handles);
+    FreePool (Handles);
   }
 
   if (NULL != Image) {
-	FreePool (Image);
+    FreePool (Image);
   }
 
   return Status;
@@ -525,36 +525,36 @@ SetPackageInfo (
 
   Status = GetHandleInfo (&NumOfHandles, &Handles);
   if (Status != EFI_SUCCESS) {
-	Print (L"SetPackageInfo: Fail to locate handle buffer...\n");
-	return Status;
+    Print (L"SetPackageInfo: Fail to locate handle buffer...\n");
+    return Status;
   }
 
   for (Index = 0; Index < NumOfHandles; Index++) {
-	Status = GetCxlPrivateData (&Private, Handles, Index);
-	if (Status != EFI_SUCCESS) {
-	  Print (L"GetImageInfo: Fail to locate handle buffer...\n");
-	  continue;
-	}
+    Status = GetCxlPrivateData (&Private, Handles, Index);
+    if (Status != EFI_SUCCESS) {
+      Print (L"GetImageInfo: Fail to locate handle buffer...\n");
+      continue;
+    }
 
-	if ((Bus == Private->Bus) && (Device == Private->Device) && (Function == Private->Function)) {
-	  StrCpyS (PackageVersionName, CXL_STRING_BUFFER_WIDTH, CXL_PACKAGE_VERSION_NAME_APP);
-	  Status = Private->FirmwareMgmt.SetPackageInfo (
-									   &Private->FirmwareMgmt,
-									   &Image,
-									   ImageSize,
-									   &VendorCode,
-									   PackageVersion,
-									   PackageVersionName
-									   );
+    if ((Bus == Private->Bus) && (Device == Private->Device) && (Function == Private->Function)) {
+      StrCpyS (PackageVersionName, CXL_STRING_BUFFER_WIDTH, CXL_PACKAGE_VERSION_NAME_APP);
+      Status = Private->FirmwareMgmt.SetPackageInfo (
+                                       &Private->FirmwareMgmt,
+                                       &Image,
+                                       ImageSize,
+                                       &VendorCode,
+                                       PackageVersion,
+                                       PackageVersionName
+                                       );
 
-	  if (!EFI_ERROR (Status)) {
-		Print (L"SetPackageInfo Success\n");
-	  } else {
-		Print (L"Calling FMP SetPackageInfo Failed...%r\n", Status);
-	  }
+      if (!EFI_ERROR (Status)) {
+        Print (L"SetPackageInfo Success\n");
+      } else {
+        Print (L"Calling FMP SetPackageInfo Failed...%r\n", Status);
+      }
 
-	  break;
-	}
+      break;
+    }
   }
 
   FreePool (Handles);
@@ -586,23 +586,23 @@ GetCxlDeviceList (
 
   Status = GetHandleInfo (&NumOfHandles, &Handles);
   if (Status != EFI_SUCCESS) {
-	Print (L"GetCxlDeviceList: Fail to locate handle buffer...\n");
-	return Status;
+    Print (L"GetCxlDeviceList: Fail to locate handle buffer...\n");
+    return Status;
   }
 
   for (Index = 0; Index < NumOfHandles; Index++) {
-	Status = GetCxlPrivateData (&Private, Handles, Index);
-	if (Status != EFI_SUCCESS) {
-	  Print (L"GetImageInfo: Fail to locate handle buffer...\n");
-	  continue;
-	}
+    Status = GetCxlPrivateData (&Private, Handles, Index);
+    if (Status != EFI_SUCCESS) {
+      Print (L"GetImageInfo: Fail to locate handle buffer...\n");
+      continue;
+    }
 
-	if (printFlag == FALSE) {
-	  Print (L"Device          BUS    DEVICE    FUNCTION   \n");
-	  printFlag = TRUE;
-	}
+    if (printFlag == FALSE) {
+      Print (L"Device          BUS    DEVICE    FUNCTION   \n");
+      printFlag = TRUE;
+    }
 
-	Print (L"CXLDevice[%d]:   %d       %d          %d\n", Index, Private->Bus, Private->Device, Private->Function);
+    Print (L"CXLDevice[%d]:   %d       %d          %d\n", Index, Private->Bus, Private->Device, Private->Function);
   }
 
   FreePool (Handles);
@@ -644,42 +644,42 @@ SetImage (
 
   Status = GetHandleInfo (&NumOfHandles, &Handles);
   if (Status != EFI_SUCCESS) {
-	Print (L"SetImage: Fail to locate handle buffer...\n");
-	return Status;
+    Print (L"SetImage: Fail to locate handle buffer...\n");
+    return Status;
   }
 
   for (Index = 0; Index < NumOfHandles; Index++) {
-	Status = GetCxlPrivateData (&Private, Handles, Index);
-	if (Status != EFI_SUCCESS) {
-	  Print (L"GetImageInfo: Fail to locate handle buffer...\n");
-	  continue;
-	}
+    Status = GetCxlPrivateData (&Private, Handles, Index);
+    if (Status != EFI_SUCCESS) {
+      Print (L"GetImageInfo: Fail to locate handle buffer...\n");
+      continue;
+    }
 
-	if ((Bus == Private->Bus) && (Device == Private->Device) && (Function == Private->Function)) {
-	  Status = ReadFileToBuffer (FileName, &BufferSize, &Buffer);
-	  if (EFI_SUCCESS != Status) {
-		Print (L"SetImage: ReadFileToBuffer FMP SetImage Failed...%r\n", Status);
-		break;
-	  }
+    if ((Bus == Private->Bus) && (Device == Private->Device) && (Function == Private->Function)) {
+      Status = ReadFileToBuffer (FileName, &BufferSize, &Buffer);
+      if (EFI_SUCCESS != Status) {
+        Print (L"SetImage: ReadFileToBuffer FMP SetImage Failed...%r\n", Status);
+        break;
+      }
 
-	  Status = Private->FirmwareMgmt.SetImage (
-									   &Private->FirmwareMgmt,
-									   (UINT8)Slot,
-									   Buffer,
-									   BufferSize,
-									   NULL,
-									   NULL,
-									   NULL
-									   );
+      Status = Private->FirmwareMgmt.SetImage (
+                                       &Private->FirmwareMgmt,
+                                       (UINT8)Slot,
+                                       Buffer,
+                                       BufferSize,
+                                       NULL,
+                                       NULL,
+                                       NULL
+                                       );
 
-	  if (!EFI_ERROR (Status)) {
-		Print (L"SetImage Success\n");
-	  } else {
-		Print (L"SetImage: Calling FMP SetImage Failed...%r\n", Status);
-	  }
+      if (!EFI_ERROR (Status)) {
+        Print (L"SetImage Success\n");
+      } else {
+        Print (L"SetImage: Calling FMP SetImage Failed...%r\n", Status);
+      }
 
-	  break;
-	}
+      break;
+    }
   }
 
   FreePool (Handles);
@@ -760,8 +760,8 @@ GetStrLength (
   int  Length = 0;
 
   while (*String != '\0') {
-	Length++;
-	String++;
+    Length++;
+    String++;
   }
 
   return Length;
@@ -783,9 +783,9 @@ IsNumber (
   int  Length = GetStrLength (String);
 
   for (int Index = 0; Index < Length; Index++) {
-	if (IsDigit (String[Index]) == FALSE) {
-	  return FALSE;
-	}
+    if (IsDigit (String[Index]) == FALSE) {
+      return FALSE;
+    }
   }
 
   return TRUE;
@@ -832,29 +832,29 @@ GetBdfValues (
   *Function = StrDecimalToUintn (Argv[4]);
 
   if (Argc >= 6) {
-	Slot1 = Argv[5];
-	*Slot = StrDecimalToUintn (Argv[5]);
-	if (IsNumber (Slot1) == FALSE) {
-	  return FALSE;
-	}
+    Slot1 = Argv[5];
+    *Slot = StrDecimalToUintn (Argv[5]);
+    if (IsNumber (Slot1) == FALSE) {
+      return FALSE;
+    }
   }
 
   if (Argc == 7) {
-	*FileName = AllocateZeroPool (CXL_MAX_FILE_NAME_LENGTH);
-	if (NULL == *FileName) {
-	  DEBUG ((EFI_D_ERROR, "GetBdfValues: EFI Out of resources...\n"));
-	  return FALSE;
-	}
+    *FileName = AllocateZeroPool (CXL_MAX_FILE_NAME_LENGTH);
+    if (NULL == *FileName) {
+      DEBUG ((DEBUG_ERROR, "GetBdfValues: EFI Out of resources...\n"));
+      return FALSE;
+    }
 
-	FileName1 = Argv[6];
-	StrCpyS (*FileName, CXL_MAX_FILE_NAME_LENGTH, FileName1);
-	if (IsNumber (FileName1) == TRUE) {
-	  return FALSE;
-	}
+    FileName1 = Argv[6];
+    StrCpyS (*FileName, CXL_MAX_FILE_NAME_LENGTH, FileName1);
+    if (IsNumber (FileName1) == TRUE) {
+      return FALSE;
+    }
   }
 
   if ((IsNumber (Bus1) == FALSE) || (IsNumber (Dev1) == FALSE) || (IsNumber (Func1) == FALSE)) {
-	return FALSE;
+    return FALSE;
   }
 
   return TRUE;
@@ -885,76 +885,76 @@ ValidateArguments (
   bool  IsBdfRequire = TRUE;
 
   switch (OpType) {
-	case OpTypeDisplayHelp:
-	  IsBdfRequire = FALSE;
-	  break;
+    case OpTypeDisplayHelp:
+      IsBdfRequire = FALSE;
+      break;
 
-	case OpTypeListDevice:
-	  if (Argc != 2) {
-		Print (L"Invalid argument...\n");
-		return FALSE;
-	  }
+    case OpTypeListDevice:
+      if (Argc != 2) {
+        Print (L"Invalid argument...\n");
+        return FALSE;
+      }
 
-	  IsBdfRequire = FALSE;
-	  break;
+      IsBdfRequire = FALSE;
+      break;
 
-	case OpTypeFmpGetImgInfo:
-	  if (Argc != 5) {
-		Print (L"Invalid argument...\n");
-		return FALSE;
-	  }
+    case OpTypeFmpGetImgInfo:
+      if (Argc != 5) {
+        Print (L"Invalid argument...\n");
+        return FALSE;
+      }
 
-	  break;
+      break;
 
-	case OpTypeFmpSetImg:
-	  if (Argc != 7) {
-		Print (L"Invalid argument...\n");
-		return FALSE;
-	  }
+    case OpTypeFmpSetImg:
+      if (Argc != 7) {
+        Print (L"Invalid argument...\n");
+        return FALSE;
+      }
 
-	  break;
+      break;
 
-	case OpTypeGetImage:
-	  if (Argc != 6) {
-		Print (L"Invalid argument...\n");
-		return FALSE;
-	  }
+    case OpTypeGetImage:
+      if (Argc != 6) {
+        Print (L"Invalid argument...\n");
+        return FALSE;
+      }
 
-	  break;
+      break;
 
-	case OpTypeFmpCheckImg:
-	  if (Argc != 7) {
-		Print (L"Invalid argument...\n");
-		return FALSE;
-	  }
+    case OpTypeFmpCheckImg:
+      if (Argc != 7) {
+        Print (L"Invalid argument...\n");
+        return FALSE;
+      }
 
-	  break;
+      break;
 
-	case OpTypeFmpGetPkgInfo:
-	  if (Argc != 5) {
-		Print (L"Invalid argument...\n");
-		return FALSE;
-	  }
+    case OpTypeFmpGetPkgInfo:
+      if (Argc != 5) {
+        Print (L"Invalid argument...\n");
+        return FALSE;
+      }
 
-	  break;
+      break;
 
-	case OpTypeSetPkgInfo:
-	  if (Argc != 5) {
-		Print (L"Invalid argument...\n");
-		return FALSE;
-	  }
+    case OpTypeSetPkgInfo:
+      if (Argc != 5) {
+        Print (L"Invalid argument...\n");
+        return FALSE;
+      }
 
-	  break;
+      break;
 
-	default:
-	  return FALSE;
+    default:
+      return FALSE;
   }
 
   if (IsBdfRequire == TRUE) {
-	if (FALSE == GetBdfValues (Argc, Argv, Bus, Device, Function, Slot, FileName)) {
-	  Print (L"Invalid argument...\n");
-	  return FALSE;
-	}
+    if (FALSE == GetBdfValues (Argc, Argv, Bus, Device, Function, Slot, FileName)) {
+      Print (L"Invalid argument...\n");
+      return FALSE;
+    }
   }
 
   return TRUE;
@@ -978,29 +978,29 @@ GetOperationType (
   String = NULL;
 
   if (1 == Argc) {
-	OpType = OpTypeDisplayHelp;
-	goto END;
+    OpType = OpTypeDisplayHelp;
+    goto END;
   }
 
   String = Argv[1];
 
   if (!StrCmp (String, L"-fGetCXLDeviceList")) {
-	OpType = OpTypeListDevice;
+    OpType = OpTypeListDevice;
   } else if (!StrCmp (String, L"-fimginfo")) {
-	OpType = OpTypeFmpGetImgInfo;
+    OpType = OpTypeFmpGetImgInfo;
   } else if (!StrCmp (String, L"-fsetimg")) {
-	OpType = OpTypeFmpSetImg;
+    OpType = OpTypeFmpSetImg;
   } else if (!StrCmp (String, L"-fgetimg")) {
-	OpType = OpTypeGetImage;
+    OpType = OpTypeGetImage;
   } else if (!StrCmp (String, L"-fchkimg")) {
-	OpType = OpTypeFmpCheckImg;
+    OpType = OpTypeFmpCheckImg;
   } else if (!StrCmp (String, L"-fsetpack")) {
-	OpType = OpTypeSetPkgInfo;
+    OpType = OpTypeSetPkgInfo;
   } else if (!StrCmp (String, L"-fgetpack")) {
-	OpType = OpTypeFmpGetPkgInfo;
+    OpType = OpTypeFmpGetPkgInfo;
   } else {
-	Print (L"Invalid argument...\n");
-	OpType = OpTypeDisplayHelp;
+    Print (L"Invalid argument...\n");
+    OpType = OpTypeDisplayHelp;
   }
 
 END:
@@ -1031,12 +1031,12 @@ ParseArguments (
 
   OpType = GetOperationType (Argc, Argv);
   if ((OpType == OpTypeDisplayHelp) || (OpType == OpTypeListDevice)) {
-	return OpType;
+    return OpType;
   }
 
   if (ValidateArguments (Argc, Argv, Bus, Device, Function, Slot, FileName, OpType) == FALSE) {
-	Print (L"Arguments Validation Fail\n");
-	OpType = OpTypeDisplayHelp;
+    Print (L"Arguments Validation Fail\n");
+    OpType = OpTypeDisplayHelp;
   }
 
   return OpType;
@@ -1068,46 +1068,46 @@ CxlFwMain (
   OpType = ParseArguments (Argc, Argv, &Bus, &Device, &Function, &Slot, &FileName);
 
   switch (OpType) {
-	case OpTypeDisplayHelp:
-	  PrintHelpPage ();
-	  Status = EFI_SUCCESS;
-	  break;
+    case OpTypeDisplayHelp:
+      PrintHelpPage ();
+      Status = EFI_SUCCESS;
+      break;
 
-	case OpTypeListDevice:
-	  Status = GetCxlDeviceList ();
-	  break;
+    case OpTypeListDevice:
+      Status = GetCxlDeviceList ();
+      break;
 
-	case OpTypeFmpGetImgInfo:
-	  Status = GetImageInfo (Bus, Device, Function);
-	  break;
+    case OpTypeFmpGetImgInfo:
+      Status = GetImageInfo (Bus, Device, Function);
+      break;
 
-	case OpTypeFmpSetImg:
-	  Status = SetImage (Bus, Device, Function, Slot, FileName);
-	  break;
+    case OpTypeFmpSetImg:
+      Status = SetImage (Bus, Device, Function, Slot, FileName);
+      break;
 
-	case OpTypeGetImage:
-	  Status = GetImage (Bus, Device, Function, Slot);
-	  break;
+    case OpTypeGetImage:
+      Status = GetImage (Bus, Device, Function, Slot);
+      break;
 
-	case OpTypeFmpCheckImg:
-	  Status = CheckImage (Bus, Device, Function, Slot);
-	  break;
+    case OpTypeFmpCheckImg:
+      Status = CheckImage (Bus, Device, Function, Slot);
+      break;
 
-	case OpTypeFmpGetPkgInfo:
-	  Status = GetPackageInfo (Bus, Device, Function);
-	  break;
+    case OpTypeFmpGetPkgInfo:
+      Status = GetPackageInfo (Bus, Device, Function);
+      break;
 
-	case OpTypeSetPkgInfo:
-	  Status = SetPackageInfo (Bus, Device, Function);
-	  break;
+    case OpTypeSetPkgInfo:
+      Status = SetPackageInfo (Bus, Device, Function);
+      break;
 
-	default:
-	  Print (L"Invalid Operation Type\n");
-	  break;
+    default:
+      Print (L"Invalid Operation Type\n");
+      break;
   }
 
   if (NULL != FileName) {
-	FreePool (FileName);
+    FreePool (FileName);
   }
 
   return Status;
@@ -1134,18 +1134,18 @@ MyShellCEntryLib (
   EfiShellParametersProtocol =  NULL;
 
   Status = SystemTable->BootServices->OpenProtocol (
-										ImageHandle,
-										&gEfiShellParametersProtocolGuid,
-										(VOID **)&EfiShellParametersProtocol,
-										ImageHandle,
-										NULL,
-										EFI_OPEN_PROTOCOL_GET_PROTOCOL
-										);
+                                        ImageHandle,
+                                        &gEfiShellParametersProtocolGuid,
+                                        (VOID **)&EfiShellParametersProtocol,
+                                        ImageHandle,
+                                        NULL,
+                                        EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                                        );
 
   if (!EFI_ERROR (Status)) {
-	Status = CxlFwMain (EfiShellParametersProtocol->Argc, EfiShellParametersProtocol->Argv);
+    Status = CxlFwMain (EfiShellParametersProtocol->Argc, EfiShellParametersProtocol->Argv);
   } else {
-	ASSERT (FALSE);
+    ASSERT (FALSE);
   }
 
   return Status;

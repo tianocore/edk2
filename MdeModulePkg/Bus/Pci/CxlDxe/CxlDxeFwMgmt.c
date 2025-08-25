@@ -70,7 +70,7 @@ CxlFirmwareMgmtGetImageInfo (
 
   *PackageVersionName = AllocateZeroPool (CXL_STRING_BUFFER_WIDTH);
   if (NULL == *PackageVersionName) {
-    DEBUG ((EFI_D_ERROR, "CxlFirmwareMgmtGetImageInfo: EFI Out of resources...\n"));
+    DEBUG ((DEBUG_ERROR, "CxlFirmwareMgmtGetImageInfo: EFI Out of resources...\n"));
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -123,7 +123,7 @@ CxlFirmwareMgmtGetImage (
   Private = CXL_CONTROLLER_PRIVATE_FROM_FIRMWARE_MGMT (This);
   if ((ImageIndex > Private->SlotInfo.NumberOfSlots) || (Private->SlotInfo.IsSetImageDone[ImageIndex] != TRUE)) {
     DEBUG (
-      (EFI_D_ERROR, "[%a]: ImageIndex = %d, NumberOfSlots = %d, IsSetImageDone = %d \n",
+      (DEBUG_ERROR, "[%a]: ImageIndex = %d, NumberOfSlots = %d, IsSetImageDone = %d \n",
        __func__, ImageIndex, Private->SlotInfo.NumberOfSlots, Private->SlotInfo.IsSetImageDone[ImageIndex])
       );
     return EFI_INVALID_PARAMETER;
@@ -209,7 +209,7 @@ CxlFirmwareMgmtSetImage (
   Private = CXL_CONTROLLER_PRIVATE_FROM_FIRMWARE_MGMT (This);
   if (ImageIndex > Private->SlotInfo.NumberOfSlots) {
     DEBUG (
-      (EFI_D_ERROR, "CxlFirmwareMgmtSetImage: ImageIndex = %d is greater then Total slots = %d \n",
+      (DEBUG_ERROR, "CxlFirmwareMgmtSetImage: ImageIndex = %d is greater then Total slots = %d \n",
        ImageIndex, Private->SlotInfo.NumberOfSlots)
       );
     Status = EFI_INVALID_PARAMETER;
@@ -219,13 +219,13 @@ CxlFirmwareMgmtSetImage (
   Status = CxlMemTransferFw (Private, ImageIndex, Image, 0, (UINT32)ImageSize, &Written);
 
   if (Status != EFI_SUCCESS) {
-    DEBUG ((EFI_D_ERROR, "CxlFirmwareMgmtSetImage: UEFI Driver Transfer FW (Opcode 0201h) Failed!\n"));
+    DEBUG ((DEBUG_ERROR, "CxlFirmwareMgmtSetImage: UEFI Driver Transfer FW (Opcode 0201h) Failed!\n"));
     return Status;
   }
 
   Private->SlotInfo.ImageFileBuffer[ImageIndex] = AllocateZeroPool (ImageSize);
   if (Private->SlotInfo.ImageFileBuffer[ImageIndex] == NULL) {
-    DEBUG ((EFI_D_ERROR, "CxlFirmwareMgmtSetImage: AllocateZeroPool failed!\n"));
+    DEBUG ((DEBUG_ERROR, "CxlFirmwareMgmtSetImage: AllocateZeroPool failed!\n"));
     Status = EFI_OUT_OF_RESOURCES;
     return Status;
   }

@@ -120,7 +120,7 @@ InitializeFwImageDescriptor (
     if (Private->SlotInfo.FirmwareVersion[Index][0] != '\0') {
       Private->SlotInfo.FwImageDescriptor[Index].VersionName = AllocateZeroPool (CXL_FW_REVISION_LENGTH_IN_BYTES);
       if (Private->SlotInfo.FwImageDescriptor[Index].VersionName == NULL) {
-        DEBUG ((EFI_D_ERROR, "InitializeFwImageDescriptor: AllocateZeroPool failed!\n"));
+        DEBUG ((DEBUG_ERROR, "InitializeFwImageDescriptor: AllocateZeroPool failed!\n"));
         return;
       }
 
@@ -172,7 +172,7 @@ PciUefiReadConfigWord (
                                  );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Failed to read PCI IO for Ext. capability\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Failed to read PCI IO for Ext. capability\n", __func__));
   }
 
   return Status;
@@ -211,7 +211,7 @@ PciUefiMemRead32 (
                                  );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Failed to read PCI Mem\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Failed to read PCI Mem\n", __func__));
     return Status;
   }
 
@@ -252,7 +252,7 @@ PciUefiMemRead64 (
                                  );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Failed to read PCI Mem\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Failed to read PCI Mem\n", __func__));
     return Status;
   }
 
@@ -295,7 +295,7 @@ PciUefiMemReadNBits (
                                    );
 
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "[%a]: Read err in Buffer[%d] \n", __func__, Index));
+      DEBUG ((DEBUG_ERROR, "[%a]: Read err in Buffer[%d] \n", __func__, Index));
       break;
     }
 
@@ -338,7 +338,7 @@ PciUefiMemWrite32 (
                                  );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Failed to write PCI Mem\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Failed to write PCI Mem\n", __func__));
   }
 
   return Status;
@@ -377,7 +377,7 @@ PciUefiMemWrite64 (
                                  );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "[%a]: Failed to write PCI Mem\n", __func__));
+    DEBUG ((DEBUG_ERROR, "[%a]: Failed to write PCI Mem\n", __func__));
   }
 
   return Status;
@@ -418,7 +418,7 @@ PciUefiMemWriteNBits (
                                    );
 
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "[%a]: Read err in Buffer[%d] \n", __func__, Index));
+      DEBUG ((DEBUG_ERROR, "[%a]: Read err in Buffer[%d] \n", __func__, Index));
       break;
     }
 
@@ -427,5 +427,4 @@ PciUefiMemWriteNBits (
 
   return Status;
 }
-
 
