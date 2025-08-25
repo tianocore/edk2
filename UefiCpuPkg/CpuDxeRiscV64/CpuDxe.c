@@ -9,6 +9,10 @@
 **/
 
 #include "CpuDxe.h"
+#include <Pi/PiBootMode.h>
+#include <Pi/PiHob.h>
+#include <Library/HobLib.h>
+#include <Library/FdtLib.h>
 
 //
 // Global Variables
@@ -337,10 +341,47 @@ InitializeCpu (
   const EFI_GUID          SecHobDataGuid = RISCV_SEC_HANDOFF_HOB_GUID;
 
   Hob = GetFirstGuidHob (&SecHobDataGuid);
-  ASSERT (Hob != NULL);
+  if (Hob != NULL) {
+    SecData     = GET_GUID_HOB_DATA (Hob);
+    mBootHartId = SecData->BootHartId;
+  } else {
+    CONST EFI_HOB_GUID_TYPE  *FdtHob = GetFirstGuidHob (&gFdtHobGuid);
 
-  SecData     = GET_GUID_HOB_DATA (Hob);
-  mBootHartId = SecData->BootHartId;
+    ASSERT (FdtHob != NULL);
+
+    CONST VOID  *DeviceTreeBase =
+      (CONST VOID *)(UINTN)*(CONST UINT64 *)GET_GUID_HOB_DATA (FdtHob);
+
+    ASSERT (FdtCheckHeader (DeviceTreeBase) == 0);
+
+    //
+    // /chosen node
+    //
+    INT32  Node = FdtSubnodeOffsetNameLen (
+                    DeviceTreeBase,
+                    0,
+                    "chosen",
+                    sizeof ("chosen") - 1
+                    );
+
+    ASSERT (Node >= 0);
+
+    //
+    // boot-hartid
+    //
+    INT32               Len;
+    CONST FDT_PROPERTY  *Prop =
+      FdtGetProperty (DeviceTreeBase, Node, "boot-hartid", &Len);
+
+    ASSERT (Prop != NULL && Len == sizeof (UINT32));
+
+    //
+    // Device-tree cells are big-endian
+    //
+    UINTN  BootHartId = SwapBytes32 (*(CONST UINT32 *)Prop->Data);
+
+    mBootHartId = BootHartId;
+  }
 
   DEBUG ((DEBUG_INFO, " %a: mBootHartId = 0x%x.\n", __func__, mBootHartId));
 
