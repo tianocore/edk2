@@ -246,11 +246,51 @@ MmIplBuildMmStatusCodeUseSerialHob (
 }
 
 /**
+  Builds MMRAM descriptor HOB.
+
+  This function builds MMRAM descriptor HOB.
+  It can only be invoked during PEI phase;
+  If new HOB buffer is NULL, then ASSERT().
+
+  @param[in]       Hob            The pointer of new HOB buffer.
+  @param[in]       MmramBlocks    The MMRAM descriptor blocks to insert to HOB list.
+
+**/
+VOID
+MmIplBuildMmramDescriptorHob (
+  IN UINT8                           *HobBuffer,
+  IN OUT UINTN                       *HobBufferSize,
+  IN EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramBlocks
+  )
+{
+  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramDescriptorBlock;
+  EFI_HOB_GUID_TYPE               *GuidHob;
+  UINT16                          HobLength;
+  UINT16                          DataSize;
+
+  DataSize = (UINT16)(sizeof (EFI_MMRAM_HOB_DESCRIPTOR_BLOCK) + (MmramBlocks->NumberOfMmReservedRegions - 1) * sizeof (EFI_MMRAM_DESCRIPTOR));
+
+  HobLength = ALIGN_VALUE (sizeof (EFI_HOB_GUID_TYPE) + DataSize, 8);
+  if (*HobBufferSize >= HobLength) {
+    ASSERT (HobBuffer != NULL);
+    MmIplCreateHob (HobBuffer, EFI_HOB_TYPE_GUID_EXTENSION, HobLength);
+
+    GuidHob = (EFI_HOB_GUID_TYPE *)HobBuffer;
+    CopyGuid (&GuidHob->Name, &gEfiSmmSmramMemoryGuid);
+
+    MmramDescriptorBlock = (EFI_MMRAM_HOB_DESCRIPTOR_BLOCK *)(GuidHob + 1);
+    CopyMem (MmramDescriptorBlock, MmramBlocks, DataSize);
+  }
+
+  *HobBufferSize = HobLength;
+}
+
+/**
   Copies a data buffer to a newly-built HOB for GUID HOB
 
   This function builds a customized HOB tagged with a GUID for identification, copies the
   input data to the HOB data field and returns the start address of the GUID HOB data.
-  If new HOB buffer is NULL or the GUID HOB could not found, then ASSERT().
+  If new HOB buffer is NULL, then ASSERT().
 
   @param[in]       HobBuffer            The pointer of HOB buffer.
   @param[in, out]  HobBufferSize        The available size of the HOB buffer when as input.
@@ -271,7 +311,10 @@ MmIplCopyGuidHob (
 
   UsedSize = 0;
   GuidHob  = GetFirstGuidHob (Guid);
-  ASSERT (GuidHob != NULL);
+
+  if (GuidHob == NULL) {
+    DEBUG ((DEBUG_WARN, "GUIDed HOB %g could not be found\n", Guid));
+  }
 
   while (GuidHob != NULL) {
     if (*HobBufferSize >= UsedSize + GuidHob->HobLength) {
@@ -1013,7 +1056,7 @@ CreateMmFoundationHobList (
   // Build SMRAM memory Hob in MM HOB list
   //
   HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
-  MmIplCopyGuidHob (FoundationHobList + UsedSize, &HobLength, &gEfiSmmSmramMemoryGuid, FALSE);
+  MmIplBuildMmramDescriptorHob (FoundationHobList + UsedSize, &HobLength, Block);
   UsedSize += HobLength;
 
   //
@@ -1022,6 +1065,16 @@ CreateMmFoundationHobList (
   HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
   MmIplCopyGuidHob (FoundationHobList + UsedSize, &HobLength, &gMpInformation2HobGuid, TRUE);
   UsedSize += HobLength;
+
+  //
+  // Platforms may use the DXE IPL when CpuMpPei isn't or cannot be used.
+  // In this case, there is no Mp Information2 HOB in the primary list, so, build it here.
+  //
+  if (HobLength == 0) {
+    HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+    MmIplBuildMpInformationHob (FoundationHobList + UsedSize, &HobLength);
+    UsedSize += HobLength;
+  }
 
   //
   // Build ACPI variable HOB
