@@ -640,36 +640,6 @@ QemuStartKernelImage (
                   NULL,              // ExitDataSize
                   NULL               // ExitData
                   );
- #ifdef MDE_CPU_IA32
-  if (Status == EFI_UNSUPPORTED) {
-    EFI_HANDLE  KernelImageHandle;
-
-    //
-    // On IA32, EFI_UNSUPPORTED means that the image's machine type is X64 while
-    // we are expecting a IA32 one, and the StartImage () boot service is unable
-    // to handle it, either because the image does not have the special .compat
-    // PE/COFF section that Linux specifies for mixed mode capable images, or
-    // because we are running without the support code for that. So load the
-    // image again, using the legacy loader, and unload the normally loaded
-    // image before starting the legacy one.
-    //
-    Status = QemuLoadLegacyImage (&KernelImageHandle);
-    if (EFI_ERROR (Status)) {
-      //
-      // Note: no change to (*ImageHandle), the caller will release it.
-      //
-      return Status;
-    }
-
-    //
-    // Swap in the legacy-loaded image.
-    //
-    QemuUnloadKernelImage (*ImageHandle);
-    *ImageHandle = KernelImageHandle;
-    return QemuStartLegacyImage (KernelImageHandle);
-  }
-
- #endif
   return Status;
 }
 
@@ -717,10 +687,9 @@ QemuUnloadKernelImage (
   }
 
   //
-  // We are unloading a normal, non-legacy loaded image, either on behalf of
-  // an external caller, or called from QemuStartKernelImage() on IA32, while
-  // switching from the normal to the legacy method to load and start a X64
-  // image.
+  // We are unloading a normal, non-legacy loaded image, on behalf of an external
+  // caller while switching from the normal to the legacy method to load and
+  // start a X64 image.
   //
   if (KernelLoadedImage->LoadOptions != NULL) {
     FreePool (KernelLoadedImage->LoadOptions);

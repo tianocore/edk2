@@ -22,7 +22,7 @@
   LIBRARY_CLASS                  = PciLib|DXE_DRIVER DXE_RUNTIME_DRIVER SMM_CORE DXE_SMM_DRIVER UEFI_DRIVER UEFI_APPLICATION
   CONSTRUCTOR                    = InitializeConfigAccessMethod
 
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = X64
 
 [Sources]
   PciLib.c

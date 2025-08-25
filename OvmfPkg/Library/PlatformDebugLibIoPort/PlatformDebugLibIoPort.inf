@@ -20,7 +20,7 @@
   CONSTRUCTOR                    = PlatformDebugLibIoPortConstructor
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#  VALID_ARCHITECTURES           = X64 EBC
 #
 
 [Sources]

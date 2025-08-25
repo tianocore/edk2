@@ -153,12 +153,6 @@ if [[ "$ARCH_IA32" == "yes" && "$ARCH_X64" == "yes" ]]; then
   BUILD_OPTIONS="$BUILD_OPTIONS -a IA32 -a X64"
   PLATFORM_BUILD_DIR=Ovmf3264
   BUILD_ROOT_ARCH=X64
-elif [[ "$ARCH_IA32" == "yes" && "$ARCH_X64" == "no" ]]; then
-  PROCESSOR=IA32
-  Processor=Ia32
-  BUILD_OPTIONS="$BUILD_OPTIONS -a IA32"
-  PLATFORM_BUILD_DIR=Ovmf$Processor
-  BUILD_ROOT_ARCH=$PROCESSOR
 else
   PROCESSOR=X64
   Processor=X64
@@ -168,23 +162,6 @@ else
 fi
 
 case $PROCESSOR in
-  IA32)
-    if [ -n "$QEMU_COMMAND" ]; then
-      #
-      # The user set the QEMU_COMMAND variable. We'll use it to run QEMU.
-      #
-      :
-    elif  [ -x `which qemu-system-i386` ]; then
-      QEMU_COMMAND=qemu-system-i386
-    elif  [ -x `which qemu-system-x86_64` ]; then
-      QEMU_COMMAND=qemu-system-x86_64
-    elif  [ -x `which qemu` ]; then
-      QEMU_COMMAND=qemu
-    else
-      echo Unable to find QEMU for IA32 architecture!
-      exit 1
-    fi
-    ;;
   X64|IA32X64)
     if [ -z "$QEMU_COMMAND" ]; then
       #

@@ -18,7 +18,7 @@
 # The following information is for reference only and not required by the build
 # tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = X64
 #
 
 [Sources]

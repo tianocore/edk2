@@ -17,7 +17,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#  VALID_ARCHITECTURES           = X64 EBC
 #
 
 [Sources]
@@ -71,7 +71,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity           ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits         ## CONSUMES
 
-[Pcd.IA32, Pcd.X64]
+[Pcd.X64]
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock
 
 [Protocols]

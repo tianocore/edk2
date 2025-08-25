@@ -43,9 +43,7 @@
   #endif
 #define set_xen_guest_handle(hnd, val)  set_xen_guest_handle_raw(hnd, val)
 
-  #if defined (MDE_CPU_IA32)
-    #include "xen-x86_32.h"
-  #elif defined (MDE_CPU_X64)
+  #if defined (MDE_CPU_X64)
     #include "xen-x86_64.h"
   #endif
 
@@ -66,9 +64,6 @@ typedef UINTN xen_ulong_t;
 
 typedef UINT64 tsc_timestamp_t; /* RDTSC timestamp */
 
-    #ifdef MDE_CPU_IA32
-      #pragma pack(4)
-    #endif
 struct arch_shared_info {
   UINTN        max_pfn;             /* max pfn that appears in table */
   /* Frame containing list of mfns containing list of mfns containing p2m. */
