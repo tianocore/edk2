@@ -1666,7 +1666,7 @@ RedfishPlatformConfigProtocolGetValue (
     goto RELEASE_RESOURCE;
   }
 
-  if (TargetStatement->Suppressed) {
+  if (TargetStatement->Suppressed && !RedfishPlatformConfigFeatureProp (REDFISH_PLATFORM_CONFIG_ALLOW_SUPPRESSED)) {
     Status = EFI_ACCESS_DENIED;
     goto RELEASE_RESOURCE;
   }
@@ -2289,7 +2289,7 @@ RedfishPlatformConfigProtocolGetDefaultValue (
     goto RELEASE_RESOURCE;
   }
 
-  if (TargetStatement->Suppressed) {
+  if (TargetStatement->Suppressed && !RedfishPlatformConfigFeatureProp (REDFISH_PLATFORM_CONFIG_ALLOW_SUPPRESSED)) {
     Status = EFI_ACCESS_DENIED;
     goto RELEASE_RESOURCE;
   }
