@@ -26,6 +26,9 @@
 [Sources.IA32, Sources.X64]
   X64/X64FadtGenerator.c
 
+[Sources.RISCV64]
+  RiscV/RiscVFadtGenerator.c
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
