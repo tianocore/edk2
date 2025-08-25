@@ -26,6 +26,7 @@ from Common.MultipleWorkspace import MultipleWorkspace as mws
 import Common.LongFilePathOs as os
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.RangeExpression import RangeExpression
+from Workspace.MetaFileParser import MetaFileParser
 from collections import OrderedDict
 
 from .Fd import FD
@@ -247,6 +248,7 @@ class FdfParser:
     def __init__(self, FileName):
         self.Profile = FileProfile(FileName)
         self.FileName = FileName
+        MetaFileParser.MetaFilesList.add(FileName)
         self.CurrentLineNumber = 1
         self.CurrentOffsetWithinLine = 0
         self.CurrentFdName = None

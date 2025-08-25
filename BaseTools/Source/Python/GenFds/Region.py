@@ -73,7 +73,7 @@ class Region(object):
     #   @retval string      Generated FV file path
     #
 
-    def AddToBuffer(self, Buffer, BaseAddress, BlockSizeList, ErasePolarity, ImageBinDict,  MacroDict=None, Flag=False):
+    def AddToBuffer(self, FdFileName, Buffer, BaseAddress, BlockSizeList, ErasePolarity, ImageBinDict,  MacroDict=None, Flag=False):
         Size = self.Size
         if MacroDict is None:
             MacroDict = {}
@@ -118,6 +118,11 @@ class Region(object):
                     if FvObj is not None :
                         if not Flag:
                             GenFdsGlobalVariable.InfLogger('   Region Name = FV')
+
+                        if GenFdsGlobalVariable.NinjaBuild == True:
+                            FvPath = os.path.join(GenFdsGlobalVariable.FvDir, FvObj.UiFvName + '.Fv')
+                            GenFdsGlobalVariable.NinjaFdCmdDict[FdFileName] += ' {}:{}'.format(FvPath, self.Offset)
+
                         #
                         # Call GenFv tool
                         #
