@@ -226,6 +226,7 @@ PlatformBootManagerBeforeConsole (
   VOID
   )
 {
+  EFI_STATUS                    Status;
   EFI_INPUT_KEY                 Enter;
   EFI_INPUT_KEY                 CustomKey;
   EFI_INPUT_KEY                 Down;
@@ -262,6 +263,17 @@ PlatformBootManagerBeforeConsole (
   Down.UnicodeChar = CHAR_NULL;
   EfiBootManagerGetBootManagerMenu (&BootOption);
   EfiBootManagerAddKeyOptionVariable (NULL, (UINT16)BootOption.OptionNumber, 0, &Down, NULL);
+
+  //
+  // Process update capsules that don't contain embedded drivers.
+  //
+  if (GetBootModeHob () == BOOT_ON_FLASH_UPDATE) {
+    // TODO: when enabling capsule support for laptops, add a battery check here
+    Status = ProcessCapsules ();
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a(): ProcessCapsule() failed with: %r\n", __func__, Status));
+    }
+  }
 
   //
   // Install ready to lock.
@@ -310,6 +322,33 @@ PlatformBootManagerAfterConsole (
 
   EfiBootManagerConnectAll ();
   EfiBootManagerRefreshAllBootOption ();
+
+  //
+  // Active BOOT_ON_FLASH_UPDATE mode means that at least one capsule has been
+  // discovered by a bootloader and passed for further processing into EDK which
+  // created EFI_HOB_TYPE_UEFI_CAPSULE HOB(s).
+  //
+  // Process update capsules that weren't processed on the first call to
+  // ProcessCapsules() in PlatformBootManagerBeforeConsole().
+  //
+  if (GetBootModeHob () == BOOT_ON_FLASH_UPDATE) {
+    // TODO: when enabling capsule support for laptops, add a battery check here
+    Status = ProcessCapsules ();
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a(): ProcessCapsule() failed with: %r\n", __func__, Status));
+    }
+
+    //
+    // Reset the system to disable SMI handler in order to exclude the
+    // possibility of it being used outside of the firmware.
+    //
+    // In practice, this will rarely execute because even the first
+    // ProcessCapsules() invocation might do a reset if all capsules were
+    // processed and at least one of them needed a reset.  This is just to catch
+    // a case when this doesn't happen which is possible on error.
+    //
+    gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
+  }
 
   //
   // Register UEFI Shell
