@@ -862,7 +862,11 @@ Ip4AccpetFrame (
   }
 
   Head = (IP4_HEAD *)NetbufGetByte (Packet, 0, NULL);
-  ASSERT (Head != NULL);
+  if (Head == NULL) {
+    ASSERT (Head != NULL);
+    goto RESTART;
+  }
+
   OptionLen = (Head->HeadLen << 2) - IP4_MIN_HEADLEN;
   if (OptionLen > 0) {
     Option = (UINT8 *)(Head + 1);
@@ -916,7 +920,11 @@ Ip4AccpetFrame (
     }
 
     Head = (IP4_HEAD *)NetbufGetByte (Packet, 0, NULL);
-    ASSERT (Head != NULL);
+    if (Head == NULL) {
+      ASSERT (Head != NULL);
+      goto RESTART;
+    }
+
     Status = Ip4PreProcessPacket (
                IpSb,
                &Packet,
@@ -1306,7 +1314,10 @@ Ip4InstanceDeliverPacket (
         // may be not continuous before the data.
         //
         Head = NetbufAllocSpace (Dup, IP4_MAX_HEADLEN, NET_BUF_HEAD);
-        ASSERT (Head != NULL);
+        if (Head == NULL) {
+          ASSERT (Head != NULL);
+          return EFI_OUT_OF_RESOURCES;
+        }
 
         Dup->Ip.Ip4 = (IP4_HEAD *)Head;
 

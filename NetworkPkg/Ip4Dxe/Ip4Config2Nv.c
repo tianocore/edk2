@@ -944,8 +944,13 @@ Ip4FormExtractConfig (
       // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
       //
       ConfigRequestHdr = HiiConstructConfigHdr (&gIp4Config2NvDataGuid, mIp4Config2StorageName, Private->ChildHandle);
-      Size             = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
-      ConfigRequest    = AllocateZeroPool (Size);
+      if (ConfigRequestHdr == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Failure;
+      }
+
+      Size          = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+      ConfigRequest = AllocateZeroPool (Size);
       if (ConfigRequest == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         goto Failure;
@@ -1376,24 +1381,27 @@ Ip4Config2FormInit (
                       STRING_TOKEN (STR_IP4_CONFIG2_FORM_HELP),
                       NULL
                       );
-    UnicodeSPrint (MenuString, 128, L"%s (MAC:%s)", OldMenuString, MacString);
-    HiiSetString (
-      CallbackInfo->RegisteredHandle,
-      STRING_TOKEN (STR_IP4_CONFIG2_FORM_HELP),
-      MenuString,
-      NULL
-      );
+    if (OldMenuString != NULL) {
+      UnicodeSPrint (MenuString, 128, L"%s (MAC:%s)", OldMenuString, MacString);
+      HiiSetString (
+        CallbackInfo->RegisteredHandle,
+        STRING_TOKEN (STR_IP4_CONFIG2_FORM_HELP),
+        MenuString,
+        NULL
+        );
 
-    UnicodeSPrint (PortString, 128, L"MAC:%s", MacString);
-    HiiSetString (
-      CallbackInfo->RegisteredHandle,
-      STRING_TOKEN (STR_IP4_DEVICE_FORM_HELP),
-      PortString,
-      NULL
-      );
+      UnicodeSPrint (PortString, 128, L"MAC:%s", MacString);
+      HiiSetString (
+        CallbackInfo->RegisteredHandle,
+        STRING_TOKEN (STR_IP4_DEVICE_FORM_HELP),
+        PortString,
+        NULL
+        );
+
+      FreePool (OldMenuString);
+    }
 
     FreePool (MacString);
-    FreePool (OldMenuString);
 
     return EFI_SUCCESS;
   }
