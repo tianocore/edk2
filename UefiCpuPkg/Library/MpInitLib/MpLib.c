@@ -1663,11 +1663,12 @@ ResetProcessorToIdleState (
 
   CpuMpData = GetCpuMpData ();
 
-  CpuMpData->WakeUpByInitSipiSipi = TRUE;
   if (CpuMpData == NULL) {
     DEBUG ((DEBUG_ERROR, "[%a] - Failed to get CpuMpData.  Aborting the AP reset to idle.\n", __func__));
     return;
   }
+
+  CpuMpData->WakeUpByInitSipiSipi = TRUE;
 
   WakeUpAP (CpuMpData, FALSE, ProcessorNumber, NULL, NULL, TRUE);
   while (CpuMpData->FinishedCount < 1) {
