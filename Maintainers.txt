@@ -647,7 +647,7 @@ M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
 R: Dun Tan <dun.tan@intel.com> [td36]
-R: Khor Swee Aun <swee.aun.khor@intel.com> [sweeaun]
+R: Khor Swee Aun <swee.aun.khor@gmail.com> [sweeaun]
 R: Eduardo Cuevas Farfan <eduardo.cuevas.farfan@intel.com> [ecuevasf]
 
 UefiCpuPkg
