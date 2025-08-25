@@ -60,11 +60,7 @@ NumBlocks     = $(FD_NUM_BLOCKS)
 #
 0x00000000|0x00001000
 DATA = {
-!if $(ARCH) == AARCH64
   0x00, 0x04, 0x00, 0x14   # 'b 0x1000' in AArch64 ASM
-!else
-  0xfe, 0x03, 0x00, 0xea   # 'b 0x1000' in AArch32 ASM
-!endif
 }
 
 0x00001000|$(FVMAIN_COMPACT_SIZE)
