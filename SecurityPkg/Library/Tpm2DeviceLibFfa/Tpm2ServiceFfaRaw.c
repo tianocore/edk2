@@ -101,71 +101,27 @@ FfaTpm2GetServicePartitionId (
   )
 {
   EFI_STATUS              Status;
-  UINT32                  Count;
-  UINT32                  Size;
-  EFI_FFA_PART_INFO_DESC  *TpmPartInfo;
-  VOID                    *TxBuffer;
-  UINT64                  TxBufferSize;
-  VOID                    *RxBuffer;
-  UINT64                  RxBufferSize;
-  UINT16                  PartId;
+  EFI_FFA_PART_INFO_DESC  TpmPartInfo;
 
   if (PartitionId == NULL) {
-    Status = EFI_INVALID_PARAMETER;
-    goto Exit;
+    return EFI_INVALID_PARAMETER;
   }
 
-  Status = ArmFfaLibPartitionIdGet (&PartId);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "Failed to get partition id. Status: %r\n",
-      Status
-      ));
-    goto Exit;
-  }
-
-  Status = ArmFfaLibGetRxTxBuffers (
-             &TxBuffer,
-             &TxBufferSize,
-             &RxBuffer,
-             &RxBufferSize
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Failed to get Rx/Tx Buffer. Status: %r\n", Status));
-    goto Exit;
-  }
-
-  Status = ArmFfaLibPartitionInfoGet (
-             &gTpm2ServiceFfaGuid,
-             FFA_PART_INFO_FLAG_TYPE_DESC,
-             &Count,
-             &Size
-             );
+  Status = ArmFfaLibGetPartitionInfo (&gTpm2ServiceFfaGuid, &TpmPartInfo);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Failed to get Tpm2 partition info. Status: %r\n", Status));
-    goto RxRelease;
+    return Status;
   }
 
-  if ((Count != 1) || (Size < sizeof (EFI_FFA_PART_INFO_DESC))) {
-    Status = EFI_INVALID_PARAMETER;
-    DEBUG ((DEBUG_ERROR, "Invalid partition Info(%g). Count: %d, Size: %d\n", &gTpm2ServiceFfaGuid, Count, Size));
-  } else {
-    TpmPartInfo  = (EFI_FFA_PART_INFO_DESC *)RxBuffer;
-    *PartitionId = TpmPartInfo->PartitionId;
-    if (TpmPartInfo->PartitionId == TPM2_FFA_PARTITION_ID_INVALID) {
-      /*
-       * Tpm partition id never be TPM2_FFA_PARTITION_ID_INVALID.
-       */
-      Status = EFI_DEVICE_ERROR;
-    }
+  *PartitionId = TpmPartInfo.PartitionId;
+  if (TpmPartInfo.PartitionId == TPM2_FFA_PARTITION_ID_INVALID) {
+    /*
+     * Tpm partition id never be TPM2_FFA_PARTITION_ID_INVALID.
+     */
+    return EFI_DEVICE_ERROR;
   }
 
-RxRelease:
-  ArmFfaLibRxRelease (PartId);
-
-Exit:
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**
