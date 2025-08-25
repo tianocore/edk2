@@ -50,27 +50,6 @@ jobs:
             Build.Target: "NOOPT"
             Run.Flags: $(run_flags)
             Run: $(should_run)
-          QEMU_ARM_DEBUG:
-            Build.File: "$(package)/PlatformCI/QemuBuild.py"
-            Build.Arch: "ARM"
-            Build.Flags: ""
-            Build.Target: "DEBUG"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
-          QEMU_ARM_RELEASE:
-            Build.File: "$(package)/PlatformCI/QemuBuild.py"
-            Build.Arch: "ARM"
-            Build.Flags: ""
-            Build.Target: "RELEASE"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
-          QEMU_ARM_NOOPT:
-            Build.File: "$(package)/PlatformCI/QemuBuild.py"
-            Build.Arch: "ARM"
-            Build.Flags: ""
-            Build.Target: "NOOPT"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
 
           QEMU_KERNEL_AARCH64_DEBUG:
             Build.File: "$(package)/PlatformCI/QemuKernelBuild.py"
@@ -93,27 +72,6 @@ jobs:
             Build.Target: "NOOPT"
             Run.Flags: $(run_flags)
             Run: $(should_run)
-          QEMU_KERNEL_ARM_DEBUG:
-            Build.File: "$(package)/PlatformCI/QemuKernelBuild.py"
-            Build.Arch: "ARM"
-            Build.Flags: ""
-            Build.Target: "DEBUG"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
-          QEMU_KERNEL_ARM_RELEASE:
-            Build.File: "$(package)/PlatformCI/QemuKernelBuild.py"
-            Build.Arch: "ARM"
-            Build.Flags: ""
-            Build.Target: "RELEASE"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
-          QEMU_KERNEL_ARM_NOOPT:
-            Build.File: "$(package)/PlatformCI/QemuKernelBuild.py"
-            Build.Arch: "ARM"
-            Build.Flags: ""
-            Build.Target: "NOOPT"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
 
           KVMTOOL_AARCH64_DEBUG:
             Build.File: "$(package)/PlatformCI/KvmToolBuild.py"
@@ -124,18 +82,6 @@ jobs:
           KVMTOOL_AARCH64_RELEASE:
             Build.File: "$(package)/PlatformCI/KvmToolBuild.py"
             Build.Arch: "AARCH64"
-            Build.Flags: ""
-            Build.Target: "RELEASE"
-            Run: false
-          KVMTOOL_ARM_DEBUG:
-            Build.File: "$(package)/PlatformCI/KvmToolBuild.py"
-            Build.Arch: "ARM"
-            Build.Flags: ""
-            Build.Target: "DEBUG"
-            Run: false
-          KVMTOOL_ARM_RELEASE:
-            Build.File: "$(package)/PlatformCI/KvmToolBuild.py"
-            Build.Arch: "ARM"
             Build.Flags: ""
             Build.Target: "RELEASE"
             Run: false

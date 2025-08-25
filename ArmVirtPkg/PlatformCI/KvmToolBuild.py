@@ -19,7 +19,7 @@ class CommonPlatform():
         for the different parts of stuart
     '''
     PackagesSupported = ("ArmVirtPkg",)
-    ArchSupported = ("AARCH64", "ARM")
+    ArchSupported = ("AARCH64",)
     TargetsSupported = ("DEBUG", "RELEASE")
     Scopes = ('armvirt', 'edk2-build')
     WorkspaceRoot = os.path.realpath(os.path.join(
