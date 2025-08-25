@@ -292,6 +292,10 @@ INF MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
 !endif
 INF UefiPayloadPkg/GraphicsOutputDxe/GraphicsOutputDxe.inf
 
+!if $(LOAD_OPTION_ROMS) == TRUE
+INF UefiPayloadPkg/PciPlatformDxe/PciPlatformDxe.inf
+!endif
+
 #
 # SCSI/ATA/IDE/DISK Support
 #

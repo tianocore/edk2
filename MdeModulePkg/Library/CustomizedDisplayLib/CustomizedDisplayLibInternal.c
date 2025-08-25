@@ -3,6 +3,7 @@
   This library class defines a set of interfaces to customize Display module
 
 Copyright (c) 2013-2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2025, Loongson Technology Corporation Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -859,10 +860,7 @@ PrintInternal (
   )
 {
   CHAR16  *Buffer;
-  CHAR16  *BackupBuffer;
   UINTN   Index;
-  UINTN   PreviousIndex;
-  UINTN   Count;
   UINTN   TotalCount;
   UINTN   PrintWidth;
   UINTN   CharWidth;
@@ -870,10 +868,8 @@ PrintInternal (
   //
   // For now, allocate an arbitrarily long buffer
   //
-  Buffer       = AllocateZeroPool (0x10000);
-  BackupBuffer = AllocateZeroPool (0x10000);
+  Buffer = AllocateZeroPool (0x10000);
   ASSERT (Buffer);
-  ASSERT (BackupBuffer);
 
   if (Column != (UINTN)-1) {
     Out->SetCursorPosition (Out, Column, Row);
@@ -884,73 +880,42 @@ PrintInternal (
   Out->Mode->Attribute = Out->Mode->Attribute & 0x7f;
 
   Out->SetAttribute (Out, Out->Mode->Attribute);
+  Out->OutputString (Out, Buffer);
 
-  Index         = 0;
-  PreviousIndex = 0;
-  Count         = 0;
-  TotalCount    = 0;
-  PrintWidth    = 0;
-  CharWidth     = 1;
+  Index      = 0;
+  TotalCount = 0;
+  PrintWidth = 0;
+  CharWidth  = 1;
 
   do {
-    for ( ; (Buffer[Index] != NARROW_CHAR) && (Buffer[Index] != WIDE_CHAR) && (Buffer[Index] != 0); Index++) {
-      BackupBuffer[Index] = Buffer[Index];
-    }
-
     if (Buffer[Index] == 0) {
       break;
     }
 
-    //
-    // Print this out, we are about to switch widths
-    //
-    Out->OutputString (Out, &BackupBuffer[PreviousIndex]);
-    Count       = StrLen (&BackupBuffer[PreviousIndex]);
-    PrintWidth += Count * CharWidth;
-    TotalCount += Count;
-
-    //
-    // Preserve the current index + 1, since this is where we will start printing from next
-    //
-    PreviousIndex = Index + 1;
-
-    //
-    // We are at a narrow or wide character directive.  Set attributes and strip it and print it
-    //
-    if (Buffer[Index] == NARROW_CHAR) {
-      //
-      // Preserve bits 0 - 6 and zero out the rest
-      //
-      Out->Mode->Attribute = Out->Mode->Attribute & 0x7f;
-      Out->SetAttribute (Out, Out->Mode->Attribute);
-      CharWidth = 1;
-    } else {
-      //
-      // Must be wide, set bit 7 ON
-      //
-      Out->Mode->Attribute = Out->Mode->Attribute | EFI_WIDE_ATTRIBUTE;
-      Out->SetAttribute (Out, Out->Mode->Attribute);
-      CharWidth = 2;
+    switch (Buffer[Index]) {
+      case NARROW_CHAR:
+        CharWidth = 1;
+        break;
+      case WIDE_CHAR:
+        CharWidth = 2;
+        break;
+      default:
+        PrintWidth += CharWidth;
+        TotalCount += 1;
+        break;
     }
 
     Index++;
   } while (Buffer[Index] != 0);
 
   //
-  // We hit the end of the string - print it
+  // We hit the end of the string - fill remaining space with SPACE.
   //
-  Out->OutputString (Out, &BackupBuffer[PreviousIndex]);
-  Count       = StrLen (&BackupBuffer[PreviousIndex]);
-  PrintWidth += Count * CharWidth;
-  TotalCount += Count;
   if (PrintWidth < Width) {
-    Out->Mode->Attribute = Out->Mode->Attribute & 0x7f;
-    Out->SetAttribute (Out, Out->Mode->Attribute);
     Out->OutputString (Out, &mSpaceBuffer[SPACE_BUFFER_SIZE - Width + PrintWidth]);
   }
 
   FreePool (Buffer);
-  FreePool (BackupBuffer);
   return TotalCount;
 }
 
