@@ -2224,7 +2224,7 @@ ProcessOpalRequest (
   //
   TempVariable = Variable;
   while ((VariableSize > sizeof (OPAL_REQUEST_VARIABLE)) &&
-         (VariableSize >= (UINTN)TempVariable->Length) &&
+         (VariableSize >= TempVariable->Length) &&
          (TempVariable->Length > sizeof (OPAL_REQUEST_VARIABLE)))
   {
     DevicePathInVariable     = (EFI_DEVICE_PATH_PROTOCOL *)((UINTN)TempVariable + sizeof (OPAL_REQUEST_VARIABLE));
@@ -2329,7 +2329,7 @@ RemoveDevice (
   }
 
   if (mOpalDriver.DeviceList == Dev) {
-    mOpalDriver.DeviceList = NULL;
+    mOpalDriver.DeviceList = Dev->Next;
     return;
   }
 
@@ -2339,6 +2339,8 @@ RemoveDevice (
       TmpDev->Next = Dev->Next;
       break;
     }
+
+    TmpDev = TmpDev->Next;
   }
 }
 

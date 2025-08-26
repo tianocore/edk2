@@ -342,6 +342,8 @@ BuildHobFromBl (
   ACPI_BOARD_INFO                   *AcpiBoardInfo;
   SMMSTORE_INFO                     SmmStoreInfo;
   SMMSTORE_INFO                     *NewSmmStoreInfo;
+  FIRMWARE_INFO                     FirmwareInfo;
+  FIRMWARE_INFO                     *NewFirmwareInfo;
   EFI_PEI_GRAPHICS_INFO_HOB         GfxInfo;
   EFI_PEI_GRAPHICS_INFO_HOB         *NewGfxInfo;
   EFI_PEI_GRAPHICS_DEVICE_INFO_HOB  GfxDeviceInfo;
@@ -397,6 +399,17 @@ BuildHobFromBl (
     ASSERT (NewSmmStoreInfo != NULL);
     CopyMem (NewSmmStoreInfo, &SmmStoreInfo, sizeof (SmmStoreInfo));
     DEBUG ((DEBUG_INFO, "Created SmmStore info hob\n"));
+  }
+
+  //
+  // Create guid hob for firmware information
+  //
+  Status = ParseFirmwareInfo (&FirmwareInfo);
+  if (!EFI_ERROR (Status)) {
+    NewFirmwareInfo = BuildGuidHob (&gEfiFirmwareInfoHobGuid, sizeof (FirmwareInfo));
+    ASSERT (NewFirmwareInfo != NULL);
+    CopyMem (NewFirmwareInfo, &FirmwareInfo, sizeof (FirmwareInfo));
+    DEBUG ((DEBUG_INFO, "Created firmware info hob\n"));
   }
 
   //
@@ -457,6 +470,15 @@ BuildHobFromBl (
     return Status;
   }
 
+  //
+  // Import update capsules, if there are any.
+  //
+  Status = ParseCapsules (BuildCvHob);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Error when importing update capsules, Status = %r\n", Status));
+    return Status;
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -512,6 +534,7 @@ _ModuleEntryPoint (
   EFI_PEI_HOB_POINTERS                Hob;
   SERIAL_PORT_INFO                    SerialPortInfo;
   UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO  *UniversalSerialPort;
+  EFI_HOB_HANDOFF_INFO_TABLE          *HobInfo;
 
   Status = PcdSet64S (PcdBootloaderParameter, BootloaderParameter);
   ASSERT_EFI_ERROR (Status);
@@ -535,7 +558,7 @@ _ModuleEntryPoint (
 
   HobMemTop = HobMemBase + FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
 
-  HobConstructor ((VOID *)MemBase, (VOID *)HobMemTop, (VOID *)HobMemBase, (VOID *)HobMemTop);
+  HobInfo = HobConstructor ((VOID *)MemBase, (VOID *)HobMemTop, (VOID *)HobMemBase, (VOID *)HobMemTop);
 
   //
   // Build serial port info
@@ -590,6 +613,13 @@ _ModuleEntryPoint (
   ASSERT_EFI_ERROR (Status);
 
   DEBUG ((DEBUG_INFO, "DxeCoreEntryPoint = 0x%lx\n", DxeCoreEntryPoint));
+
+  //
+  // Switch to update mode if there is at least one capsule.
+  //
+  if (GetFirstHob (EFI_HOB_TYPE_UEFI_CAPSULE) != NULL) {
+    HobInfo->BootMode = BOOT_ON_FLASH_UPDATE;
+  }
 
   //
   // Mask off all legacy 8259 interrupt sources

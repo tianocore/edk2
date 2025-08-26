@@ -1,6 +1,7 @@
 /** @file  SmmStore.c
 
   Copyright (c) 2022, 9elements GmbH<BR>
+  Copyright (c) 2025, 3mdeb Sp. z o.o.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -139,6 +140,52 @@ SmmStoreLibGetMmioAddress (
 }
 
 /**
+  Read a flash block.  The whole flash is represented as a
+  sequence of blocks.
+
+  @param[in] Lba      The starting logical block index to read from.
+  @param[in] Offset   Offset into the block at which to begin reading.
+  @param[in] NumBytes On input, indicates the requested read size. On
+                      output, indicates the actual number of bytes read
+  @param[in] Buffer   Pointer to the buffer to read into.
+  @param[in] ReadCmd  Read command to use.
+
+  @note Validation of mSmmStoreInfo and Lba must be done by the calling code.
+
+**/
+STATIC
+EFI_STATUS
+ReadBlock (
+  IN        EFI_LBA  Lba,
+  IN        UINTN    Offset,
+  IN        UINTN    *NumBytes,
+  IN        UINT8    *Buffer,
+  IN        UINT8    ReadCmd
+  )
+{
+  EFI_STATUS  Status;
+
+  if (((*NumBytes + Offset) > mSmmStoreInfo->BlockSize) ||
+      ((*NumBytes + Offset) > mSmmStoreInfo->ComBufferSize))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  mArgComBuf->Read.BufSize   = *NumBytes;
+  mArgComBuf->Read.BufOffset = Offset;
+  mArgComBuf->Read.BlockId   = Lba;
+
+  Status = CallSmm (mSmmStoreInfo->ApmCmd, ReadCmd, mArgComBufPhys);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  CopyMem (Buffer, (VOID *)(UINTN)(mSmmStoreInfo->ComBuffer + Offset), *NumBytes);
+
+  return EFI_SUCCESS;
+}
+
+/**
   Read from SmmStore
 
   @param[in] Lba      The starting logical block index to read from.
@@ -156,8 +203,6 @@ SmmStoreLibRead (
   IN        UINT8    *Buffer
   )
 {
-  EFI_STATUS  Status;
-
   if (mSmmStoreInfo == NULL) {
     return EFI_NO_MEDIA;
   }
@@ -166,24 +211,72 @@ SmmStoreLibRead (
     return EFI_INVALID_PARAMETER;
   }
 
+  return ReadBlock (Lba, Offset, NumBytes, Buffer, SMMSTORE_CMD_RAW_READ);
+}
+
+/**
+  Read from an arbitrary flash location.  The whole flash is represented as a
+  sequence of blocks.
+
+  @param[in] Lba      The starting logical block index to read from.
+  @param[in] Offset   Offset into the block at which to begin reading.
+  @param[in] NumBytes On input, indicates the requested read size. On
+                      output, indicates the actual number of bytes read
+  @param[in] Buffer   Pointer to the buffer to read into.
+
+**/
+EFI_STATUS
+SmmStoreLibReadAnyBlock (
+  IN        EFI_LBA  Lba,
+  IN        UINTN    Offset,
+  IN        UINTN    *NumBytes,
+  IN        UINT8    *Buffer
+  )
+{
+  if (mSmmStoreInfo == NULL) {
+    return EFI_NO_MEDIA;
+  }
+
+  return ReadBlock (Lba, Offset, NumBytes, Buffer, SMMSTORE_CMD_USE_FULL_FLASH | SMMSTORE_CMD_RAW_READ);
+}
+
+/**
+  Write a flash block.  The whole flash is represented as a
+  sequence of blocks.
+
+  @param[in] Lba      The starting logical block index to write to.
+  @param[in] Offset   Offset into the block at which to begin writing.
+  @param[in] NumBytes On input, indicates the requested write size. On
+                      output, indicates the actual number of bytes written
+  @param[in] Buffer   Pointer to the data to write.
+  @param[in] WriteCmd Write command to use.
+
+  @note Validation of mSmmStoreInfo and Lba must be done by the calling code.
+
+**/
+STATIC
+EFI_STATUS
+WriteBlock (
+  IN        EFI_LBA  Lba,
+  IN        UINTN    Offset,
+  IN        UINTN    *NumBytes,
+  IN        UINT8    *Buffer,
+  IN        UINT8    WriteCmd
+  )
+{
   if (((*NumBytes + Offset) > mSmmStoreInfo->BlockSize) ||
       ((*NumBytes + Offset) > mSmmStoreInfo->ComBufferSize))
   {
     return EFI_INVALID_PARAMETER;
   }
 
-  mArgComBuf->Read.BufSize   = *NumBytes;
-  mArgComBuf->Read.BufOffset = Offset;
-  mArgComBuf->Read.BlockId   = Lba;
+  mArgComBuf->Write.BufSize   = *NumBytes;
+  mArgComBuf->Write.BufOffset = Offset;
+  mArgComBuf->Write.BlockId   = Lba;
 
-  Status = CallSmm (mSmmStoreInfo->ApmCmd, SMMSTORE_CMD_RAW_READ, mArgComBufPhys);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  CopyMem ((VOID *)(UINTN)(mSmmStoreInfo->ComBuffer + Offset), Buffer, *NumBytes);
 
-  CopyMem (Buffer, (VOID *)(UINTN)(mSmmStoreInfo->ComBuffer + Offset), *NumBytes);
-
-  return EFI_SUCCESS;
+  return CallSmm (mSmmStoreInfo->ApmCmd, WriteCmd, mArgComBufPhys);
 }
 
 /**
@@ -212,19 +305,33 @@ SmmStoreLibWrite (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (((*NumBytes + Offset) > mSmmStoreInfo->BlockSize) ||
-      ((*NumBytes + Offset) > mSmmStoreInfo->ComBufferSize))
-  {
-    return EFI_INVALID_PARAMETER;
+  return WriteBlock (Lba, Offset, NumBytes, Buffer, SMMSTORE_CMD_RAW_WRITE);
+}
+
+/**
+  Write to an arbitrary flash location.  The whole flash is represented as a
+  sequence of blocks.
+
+  @param[in] Lba      The starting logical block index to write to.
+  @param[in] Offset   Offset into the block at which to begin writing.
+  @param[in] NumBytes On input, indicates the requested write size. On
+                      output, indicates the actual number of bytes written
+  @param[in] Buffer   Pointer to the data to write.
+
+**/
+EFI_STATUS
+SmmStoreLibWriteAnyBlock (
+  IN        EFI_LBA  Lba,
+  IN        UINTN    Offset,
+  IN        UINTN    *NumBytes,
+  IN        UINT8    *Buffer
+  )
+{
+  if (mSmmStoreInfo == NULL) {
+    return EFI_NO_MEDIA;
   }
 
-  mArgComBuf->Write.BufSize   = *NumBytes;
-  mArgComBuf->Write.BufOffset = Offset;
-  mArgComBuf->Write.BlockId   = Lba;
-
-  CopyMem ((VOID *)(UINTN)(mSmmStoreInfo->ComBuffer + Offset), Buffer, *NumBytes);
-
-  return CallSmm (mSmmStoreInfo->ApmCmd, SMMSTORE_CMD_RAW_WRITE, mArgComBufPhys);
+  return WriteBlock (Lba, Offset, NumBytes, Buffer, SMMSTORE_CMD_USE_FULL_FLASH | SMMSTORE_CMD_RAW_WRITE);
 }
 
 /**
@@ -249,6 +356,31 @@ SmmStoreLibEraseBlock (
   mArgComBuf->Clear.BlockId = Lba;
 
   return CallSmm (mSmmStoreInfo->ApmCmd, SMMSTORE_CMD_RAW_CLEAR, mArgComBufPhys);
+}
+
+/**
+  Erase an arbitrary block of the flash.  The whole flash is represented as a
+  sequence of blocks.
+
+  @param Lba    The logical block index to erase.
+
+**/
+EFI_STATUS
+SmmStoreLibEraseAnyBlock (
+  IN   EFI_LBA  Lba
+  )
+{
+  if (mSmmStoreInfo == NULL) {
+    return EFI_NO_MEDIA;
+  }
+
+  mArgComBuf->Clear.BlockId = Lba;
+
+  return CallSmm (
+           mSmmStoreInfo->ApmCmd,
+           SMMSTORE_CMD_USE_FULL_FLASH | SMMSTORE_CMD_RAW_CLEAR,
+           mArgComBufPhys
+           );
 }
 
 /**

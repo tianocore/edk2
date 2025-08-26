@@ -504,9 +504,6 @@
   ## Include/Ppi/AtaController.h
   gPeiAtaControllerPpiGuid       = { 0xa45e60d1, 0xc719, 0x44aa, { 0xb0, 0x7a, 0xaa, 0x77, 0x7f, 0x85, 0x90, 0x6d }}
 
-  ## Include/Ppi/UsbHostController.h
-  gPeiUsbHostControllerPpiGuid   = { 0x652B38A9, 0x77F4, 0x453F, { 0x89, 0xD5, 0xE7, 0xBD, 0xC3, 0x52, 0xFC, 0x53 }}
-
   ## Include/Ppi/Usb2HostController.h
   gPeiUsb2HostControllerPpiGuid  = { 0xfedd6305, 0xe2d7, 0x4ed5, { 0x9f, 0xaa, 0xda, 0x8, 0xe, 0x33, 0x6c, 0x22   }}
 
@@ -1676,6 +1673,14 @@
   ## Indicates the allowable maximum number of Reset Filters, Reset Notifications or Reset Handlers in PEI phase.
   # @Prompt Maximum Number of PEI Reset Filters, Reset Notifications or Reset Handlers.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaximumPeiResetNotifies|0x10|UINT32|0x0000010A
+
+  ## Whether to report support of FMP capsules in OsIndicationSupport.<BR><BR>
+  #  This PCD indicates if support of FMP capsules should be advertised.<BR>
+  #   TRUE  - support of FMP capsules is advertised.<BR>
+  #   FALSE - support of FMP capsules is not advertised.<BR>
+  #  If platform does not use this feature, this PCD should be set to FALSE.<BR><BR>
+  # @Prompt Enable advertising support of FMP capsules.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleFmpSupport|FALSE|BOOLEAN|0x00000028
 
   ## Capsule On Disk is to deliver capsules via files on Mass Storage device.<BR><BR>
   #  This PCD indicates if the Capsule On Disk is supported.<BR>
