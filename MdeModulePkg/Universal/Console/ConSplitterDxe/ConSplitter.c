@@ -1290,8 +1290,11 @@ ConSplitterConOutDriverBindingStart (
   EFI_STATUS                            Status;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL       *TextOut;
   EFI_GRAPHICS_OUTPUT_PROTOCOL          *GraphicsOutput;
+  UINT32                                ModeIndex;
   UINTN                                 SizeOfInfo;
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *Info;
+  UINTN                                 Columns;
+  UINTN                                 Rows;
 
   //
   // Start ConSplitter on ControllerHandle, and create the virtual
@@ -1345,6 +1348,23 @@ ConSplitterConOutDriverBindingStart (
 
     FreePool (Info);
   }
+
+  DEBUG_CODE_BEGIN ();
+  DEBUG ((DEBUG_INFO, "Console Output available modes:\n"));
+  for (ModeIndex = 0; ModeIndex < (UINTN)gST->ConOut->Mode->MaxMode; ModeIndex++) {
+    Status = gST->ConOut->QueryMode (gST->ConOut, ModeIndex, &Columns, &Rows);
+    if (!EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_INFO,
+        "ConsoleOut - Mode = %d, Columns = %u, Rows = %u\n",
+        ModeIndex,
+        Columns,
+        Rows
+        ));
+    }
+  }
+
+  DEBUG_CODE_END ();
 
   return Status;
 }
