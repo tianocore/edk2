@@ -1201,10 +1201,7 @@
 !if $(TIMER_SUPPORT) == "HPET"
   PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
 !elseif $(TIMER_SUPPORT) == "LAPIC"
-  OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf {
-    <LibraryClasses>
-      NestedInterruptTplLib|OvmfPkg/Library/NestedInterruptTplLib/NestedInterruptTplLib.inf
-  }
+  OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
 !else
   !error "Invalid TIMER_SUPPORT"
 !endif
