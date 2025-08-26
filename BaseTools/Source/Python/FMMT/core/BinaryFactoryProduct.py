@@ -109,6 +109,9 @@ class SectionProduct(BinaryProduct):
             Sec_Fv_Tree.Data.Data = Section_Tree.Data.Data[Sec_Fv_Tree.Data.Header.HeaderLength:]
             Section_Tree.insertChild(Sec_Fv_Tree)
             Fv_count += 1
+        elif Section_Tree.Data.Type == EFI_SECTION_PE32 or Section_Tree.Data.Type == EFI_SECTION_TE:
+            if Section_Tree.Parent.Parent.type == FV_TREE or Section_Tree.Parent.Parent.type == ROOT_FV_TREE or Section_Tree.Parent.Parent.type == ROOT_FFS_TREE:
+                self.ParserPeCoff(Section_Tree, b'')
 
     def ParserSection(self, ParTree, Whole_Data: bytes, Rel_Whole_Offset: int=0) -> None:
         Rel_Offset = 0
@@ -129,6 +132,7 @@ class SectionProduct(BinaryProduct):
             Section_Info.Data = Whole_Data[Rel_Offset+Section_Info.HeaderLength: Rel_Offset+Section_Info.Size]
             Section_Info.DOffset = Section_Offset + Section_Info.HeaderLength + Rel_Whole_Offset
             Section_Info.HOffset = Section_Offset + Rel_Whole_Offset
+            Section_Info.ROffset = Rel_Offset
             if Section_Info.Header.Type == 0:
                 break
             # The final Section in parent Section does not need to add padding, else must be 4-bytes align with parent Section start offset
@@ -151,6 +155,20 @@ class SectionProduct(BinaryProduct):
             Section_Tree.Data = Section_Info
             ParTree.insertChild(Section_Tree)
 
+    def ParserPeCoff(self, ParTree, Whole_Data: bytes, Rel_Whole_Offset: int=0) -> None:
+        SectionTypeList = [EFI_SECTION_PE32, EFI_SECTION_TE]
+        if ParTree.Data.Type in SectionTypeList:
+            # Find Pe Image
+            PeCoff_Info = PeCoffNode(ParTree.Data.Data, ParTree.Data.DOffset, ParTree.Data.Size-ParTree.Data.HeaderLength)
+            original_size = len(PeCoff_Info.Data) if hasattr(PeCoff_Info, 'Data') else 0
+            original_section_size = ParTree.Data.Size
+            if PeCoff_Info.IfRebase:
+                PeCoff_Info.PeCoffRebase()
+            PeCoff_Tree = BIOSTREE(PeCoff_Info.Name)
+            PeCoff_Tree.type = PECOFF_TREE
+            PeCoff_Tree.Data = PeCoff_Info
+            ParTree.insertChild(PeCoff_Tree)
+
 class FfsProduct(BinaryProduct):
     # ParserFFs / GetSection
     def ParserData(self, ParTree, Whole_Data: bytes, Rel_Whole_Offset: int=0) -> None:
@@ -172,6 +190,7 @@ class FfsProduct(BinaryProduct):
             Section_Info.Data = Whole_Data[Rel_Offset+Section_Info.HeaderLength: Rel_Offset+Section_Info.Size]
             Section_Info.DOffset = Section_Offset + Section_Info.HeaderLength + Rel_Whole_Offset
             Section_Info.HOffset = Section_Offset + Rel_Whole_Offset
+            Section_Info.ROffset = Rel_Offset
             if Section_Info.Header.Type == 0:
                 break
             # The final Section in Ffs does not need to add padding, else must be 4-bytes align with Ffs start offset
@@ -188,8 +207,22 @@ class FfsProduct(BinaryProduct):
             if Section_Info.Header.Type == 0x15:
                 ParTree.Data.UiName = Section_Info.ExtHeader.GetUiString()
             if Section_Info.Header.Type == 0x19:
+                if ParTree.Data.IsFsp:
+                    ParTree.Parent.Data.ImageSize = Bytes2Val(Section_Info.Data[24:28])
+                    ParTree.Parent.Data.BaseAddress = Bytes2Val(Section_Info.Data[28:32])
+                    print(f'ParTree.Parent.Data.ImageSize : {hex(ParTree.Parent.Data.ImageSize)}')
+                    print(f'ParTree.Parent.Data.BaseAddress : {hex(ParTree.Parent.Data.BaseAddress)}')
+                elif ParTree.Data.IsVtf:
+                    TargetFv = ParTree.Parent
+                    offset = 0
+                    while TargetFv:
+                        offset += TargetFv.Data.Size
+                        TargetFv = TargetFv.NextRel
+                    ParTree.Parent.Data.BaseAddress = 0x100000000 - offset
                 if Section_Info.Data.replace(b'\x00', b'') == b'':
                     Section_Info.IsPadSection = True
+            if Section_Info.Header.Type == EFI_SECTION_PE32 or Section_Info.Header.Type == EFI_SECTION_TE:
+                ParTree.Data.PeCoffSecIndex = len(ParTree.Child)
             Section_Offset += Section_Info.Size + Pad_Size
             Rel_Offset += Section_Info.Size + Pad_Size
             Section_Tree.Data = Section_Info
@@ -224,6 +257,7 @@ class FvProduct(BinaryProduct):
                 Ffs_Tree = BIOSTREE(Ffs_Info.Name)
                 Ffs_Info.HOffset = Ffs_Offset + Rel_Whole_Offset
                 Ffs_Info.DOffset = Ffs_Offset + Ffs_Info.Header.HeaderLength + Rel_Whole_Offset
+                Ffs_Info.ROffset = Rel_Offset
                 if Ffs_Info.Name == PADVECTOR:
                     Ffs_Tree.type = FFS_PAD
                     Ffs_Info.Data = Whole_Data[Rel_Offset+Ffs_Info.Header.HeaderLength: Rel_Offset+Ffs_Info.Size]
@@ -358,6 +392,15 @@ class FdProduct(BinaryProduct):
                 Fd_Struct.remove(Fd_Struct[i-tmp_index])
                 tmp_index += 1
         return Fd_Struct
+
+class ElfSectionProduct(BinaryProduct):
+    ## Decompress the compressed section.
+    def ParserData(self, Section_Tree, whole_Data: bytes, Rel_Whole_Offset: int=0) -> None:
+        pass
+    def ParserSectionData(self, Section_Tree, whole_Data: bytes, Rel_Whole_Offset: int=0) -> None:
+        pass
+    def ParserProgramData(self, Section_Tree, whole_Data: bytes, Rel_Whole_Offset: int=0) -> None:
+        pass
 
 class ElfProduct(BinaryProduct):
 
