@@ -23,12 +23,14 @@ SECTION_TREE = 'SECTION'
 SEC_FV_TREE = 'SEC_FV_IMAGE'
 BINARY_DATA = 'BINARY'
 ELF_TREE = 'ELF'
+PECOFF_TREE = 'PECOFF_TREE'
 
 RootType = [ROOT_TREE, ROOT_FV_TREE, ROOT_FFS_TREE, ROOT_SECTION_TREE]
 FvType = [FV_TREE, SEC_FV_TREE]
-FfsType = FFS_TREE
+FfsType = [FFS_TREE, FFS_PAD]
 SecType = SECTION_TREE
 ElfType = [ROOT_ELF_TREE, ELF_TREE]
+PeCoffTree = PECOFF_TREE
 
 class BIOSTREE:
     def __init__(self, NodeName: str) -> None:
@@ -71,6 +73,36 @@ class BIOSTREE:
                 self.Child[pos].LastRel = newNode
                 self.Child.insert(pos, newNode)
         newNode.Parent = self
+
+    # lastNode.insertRel(newNode)
+    def insertRel(self, newNode) -> None:
+        if self.Parent:
+            parentTree = self.Parent
+            new_index = parentTree.Child.index(self) + 1
+            parentTree.Child.insert(new_index, newNode)
+        self.NextRel = newNode
+        newNode.LastRel = self
+
+    def deleteNode(self, deletekey: str) -> None:
+        FindStatus, DeleteTree = self.FindNode(deletekey)
+        if FindStatus:
+            parentTree = DeleteTree.Parent
+            lastTree = DeleteTree.LastRel
+            nextTree = DeleteTree.NextRel
+            if parentTree:
+                index = parentTree.Child.index(DeleteTree)
+                del parentTree.Child[index]
+            if lastTree and nextTree:
+                lastTree.NextRel = nextTree
+                nextTree.LastRel = lastTree
+            elif lastTree:
+                lastTree.NextRel = None
+            elif nextTree:
+                nextTree.LastRel = None
+            return DeleteTree
+        else:
+            logger.error('Could not find the target tree')
+            return None
 
     def FindNode(self, key: str, Findlist: list) -> None:
         if self.key == key or (self.Data and self.Data.Name == key) or (self.type == FFS_TREE and self.Data.UiName == key):
@@ -188,6 +220,14 @@ class BIOSTREE:
             TreeInfo[key]["Size"] = hex(self.Data.Size)
             TreeInfo[key]["Offset"] = hex(self.Data.HOffset)
             TreeInfo[key]["FilesNum"] = len(self.Child)
+        elif self.type == FFS_PAD:
+            key = str(self.Data.Name)
+            TreeInfo[key] = collections.OrderedDict()
+            TreeInfo[key]["Name"] = key
+            TreeInfo[key]["UiName"] = 'Ffs_pad'
+            TreeInfo[key]["Type"] = self.type
+            TreeInfo[key]["Size"] = hex(self.Data.Size)
+            TreeInfo[key]["Offset"] = hex(self.Data.HOffset)
         elif self.type == SECTION_TREE and self.Data.Type == 0x02:
             key = str(self.Data.Name)
             TreeInfo[key] = collections.OrderedDict()

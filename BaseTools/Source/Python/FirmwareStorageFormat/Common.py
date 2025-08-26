@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 from ctypes import *
+from functools import reduce
 import uuid
 
 # ZeroGuid = uuid.UUID('{00000000-0000-0000-0000-000000000000}')
@@ -24,6 +25,8 @@ EFI_FFS_VOLUME_TOP_FILE_GUID = uuid.UUID("1ba0062e-c779-4582-8566-336ae8f78f09")
 EFI_FFS_VOLUME_TOP_FILE_GUID_BYTE = b'.\x06\xa0\x1by\xc7\x82E\x85f3j\xe8\xf7\x8f\t'
 ZEROVECTOR_BYTE = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 PADVECTOR = uuid.UUID("ffffffff-ffff-ffff-ffff-ffffffffffff")
+EFI_FSP_GUID = uuid.UUID("912740be-2284-4734-b971-84b027353f0c")
+
 FVH_SIGNATURE = b'_FVH'
 
 #Alignment
@@ -83,3 +86,13 @@ def GetPadSize(Size: int, alignment: int) -> int:
         return 0
     Pad_Size = alignment - Size % alignment
     return Pad_Size
+
+def Bytes2Val (bytes):
+    return reduce(lambda x,y: (x<<8)|y,  bytes[::-1] )
+
+def Val2Bytes (value, blen):
+    BytesList = [hex((value>>(i*8) & 0xff)) for i in range(blen)]
+    FinalBytes = b''
+    for item in BytesList:
+        FinalBytes += item
+    return FinalBytes
