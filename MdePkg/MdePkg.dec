@@ -2519,6 +2519,10 @@
   # @Prompt IPMI Serial responder Software ID
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialResponderAddress|0x20|UINT8|0x00000051
 
+  ## This option chooses between pass through and MM mode of communication.
+  # @Prompt Mode of transport for management service requests
+  gEfiMdePkgTokenSpaceGuid.PcdMMPassThroughEnable|TRUE|BOOLEAN|0x10000037
+
   ## This is requester's LUN for IPMI Serial.
   # @Prompt IPMI Serial requester LUN
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequesterLun|0x0|UINT8|0x00000052
