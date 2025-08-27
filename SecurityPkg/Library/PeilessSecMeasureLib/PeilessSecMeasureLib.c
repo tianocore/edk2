@@ -17,6 +17,7 @@
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/Tpm2CommandLib.h>
+#include <Library/Tpm2HelpLib.h>
 #include <Library/HashLib.h>
 #include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>

@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/Tpm2CommandLib.h>
+#include <Library/Tpm2HelpLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
