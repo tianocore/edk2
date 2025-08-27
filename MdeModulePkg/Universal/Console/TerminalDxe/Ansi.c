@@ -2,6 +2,7 @@
   Implementation of translation upon PC ANSI.
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2025, Loongson Technology Corporation Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -35,8 +36,8 @@ AnsiRawDataToUnicode (
 }
 
 /**
-  Check if input string is valid Ascii string, valid EFI control characters
-  or valid text graphics.
+  Check if input string is valid Ascii string, valid EFI control characters,
+  wide/narrow character or valid text graphics.
 
   @param  TerminalDevice          The terminal device.
   @param  WString                 The input string.
@@ -54,10 +55,14 @@ AnsiTestString (
   CHAR8  GraphicChar;
 
   //
-  // support three kind of character:
-  // valid ascii, valid efi control char, valid text graphics.
+  // support four kind of character:
+  // valid ascii, valid efi control char, wide/narrow char, valid text graphics.
   //
   for ( ; *WString != CHAR_NULL; WString++) {
+    if ((*WString == WIDE_CHAR) || (*WString == NARROW_CHAR)) {
+      continue;
+    }
+
     if ( !(TerminalIsValidAscii (*WString) ||
            TerminalIsValidEfiCntlChar (*WString) ||
            TerminalIsValidTextGraphics (*WString, &GraphicChar, NULL)))
