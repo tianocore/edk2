@@ -17,6 +17,7 @@
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Protocol/MmCommunication2.h>
 
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -35,6 +36,12 @@
 #define RAS_GET_NUM_ERR_SRCS      0x1
 #define RAS_GET_ERR_SRCS_ID_LIST  0x2
 #define RAS_GET_ERR_SRC_DESC      0x3
+
+#define MM_COMMUNICATE_HEADER_SIZE  (OFFSET_OF(EFI_MM_COMMUNICATE_HEADER, Data))
+
+STATIC EFI_MM_COMMUNICATION2_PROTOCOL  *mMmCommunication2 = NULL;
+
+EFI_STATUS (EFIAPI *gSendCommand)(VOID *CommBuffer, UINTN CmdLen, UINTN *RespLen, UINT8 FuncId);
 
 #define __packed32  __attribute__((packed,aligned(__alignof__(UINT32))))
 
@@ -141,18 +148,94 @@ GetRasAgentMpxyChannelId (
   return ProbeRasAgentMpxyChannelId (ChannelId);
 }
 
+/**
+  TODO: This is a placeholder method that sends a RAS command to the SMM handler
+  via MM communication, for now this will return EFI_NOT_FOUND. When the downstream
+  logic that will handle the MM Communication calls is merged then this method
+  should be updated.
+  @param[in,out] CommBuffer   Command and response buffer.
+  @param[in]     CmdLen       Command length.
+  @param[out]    RespLen      Length of response received.
+  @param[in]     FuncId       Function ID for the RAS operation.
+  @retval EFI_SUCCESS         Command sent and response received successfully.
+  @retval EFI_OUT_OF_RESOURCES  Allocation failure.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+RacSendMMCommand (
+  VOID   *CommBuffer,
+  UINTN  CmdLen,
+  UINTN  *RespLen,
+  UINT8  FuncId
+  )
+{
+  return EFI_NOT_FOUND;
+}
+
+/**
+  Sends a RAS command using SBI MPXY messaging.
+  @param[in,out] CommBuffer   Buffer for both command and response.
+  @param[in]     CmdLen       Length of command data.
+  @param[out]    RespLen      Length of response data.
+  @param[in]     FuncId       Function ID for the command.
+  @retval EFI_SUCCESS         Communication successful.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+RacSendPassThroughCommand (
+  VOID   *CommBuffer,
+  UINTN  CmdLen,
+  UINTN  *RespLen,
+  UINT8  FuncId
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = SbiMpxySendMessage (
+             gMpxyChannelId,
+             FuncId,
+             CommBuffer,
+             CmdLen,
+             CommBuffer,
+             RespLen
+             );
+
+  return Status;
+}
+
 EFI_STATUS
 EFIAPI
 RacInit (
   VOID
   )
 {
-  if (GetRasAgentMpxyChannelId (&gMpxyChannelId) != EFI_SUCCESS) {
-    return EFI_NOT_READY;
-  }
+  EFI_STATUS  Status;
+  if (!PcdGetBool (PcdMMPassThroughEnable)) {
+    Status = gBS->LocateProtocol (
+                    &gEfiMmCommunication2ProtocolGuid,
+                    NULL,
+                    (VOID **)&mMmCommunication2
+                    );
 
-  if (SbiMpxyChannelOpen (gMpxyChannelId) != EFI_SUCCESS) {
-    return EFI_NOT_READY;
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    gSendCommand = RacSendMMCommand;
+  } else {
+    if (SbiMpxyInit () != EFI_SUCCESS) {
+      return EFI_NOT_READY;
+    }
+
+    if (GetRasAgentMpxyChannelId (&gMpxyChannelId) != EFI_SUCCESS) {
+      return EFI_NOT_READY;
+    }
+
+    DEBUG ((DEBUG_ERROR, "Rac Init Done\n"));
+
+    gSendCommand = RacSendPassThroughCommand;
   }
 
   return EFI_SUCCESS;
@@ -175,14 +258,7 @@ RacGetNumberErrorSources (
 
   ZeroMem (&RasMsgBuf, sizeof (RasMsgBuf));
 
-  Status = SbiMpxySendMessage (
-             gMpxyChannelId,
-             RAS_GET_NUM_ERR_SRCS,
-             &RasMsgBuf,
-             sizeof (UINT32),
-             (VOID *)&RasMsgBuf,
-             &RespLen
-             );
+  Status = gSendCommand (&RasMsgBuf, RespLen, &RespLen, RAS_GET_NUM_ERR_SRCS);
   if (Status != EFI_SUCCESS) {
     return Status;
   }
@@ -214,15 +290,7 @@ RacGetErrorSourceIDList (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = SbiMpxySendMessage (
-             gMpxyChannelId,
-             RAS_GET_ERR_SRCS_ID_LIST,
-             &gErrorSourceListResp,
-             sizeof (gErrorSourceListResp),
-             &gErrorSourceListResp,
-             &RespLen
-             );
-
+  Status = gSendCommand (&gErrorSourceListResp, RespLen, &RespLen, RAS_GET_ERR_SRCS_ID_LIST);
   if (Status != EFI_SUCCESS) {
     return Status;
   }
@@ -256,15 +324,7 @@ RacGetErrorSourceDescriptor (
 
   *EID = SourceID;
 
-  Status = SbiMpxySendMessage (
-             gMpxyChannelId,
-             RAS_GET_ERR_SRC_DESC,
-             &gErrDescResp,
-             sizeof (gErrDescResp),
-             &gErrDescResp,
-             &RespLen
-             );
-
+  Status = gSendCommand (&gErrDescResp, RespLen, &RespLen, RAS_GET_ERR_SRC_DESC);
   if (Status != EFI_SUCCESS) {
     return Status;
   }
