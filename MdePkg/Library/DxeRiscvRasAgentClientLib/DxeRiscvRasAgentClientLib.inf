@@ -27,4 +27,10 @@
   UefiBootServicesTableLib
   RiscVSbiLib
   SafeIntLib
-  DxeRiscvMpxyLib
+  CommonRiscvMpxyLib
+
+[Protocols]
+  gEfiMmCommunication2ProtocolGuid
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdMMPassThroughEnable
