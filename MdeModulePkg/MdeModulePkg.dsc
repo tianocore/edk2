@@ -543,7 +543,7 @@
 [Components.RISCV64]
   MdeModulePkg/Universal/Acpi/AcpiHardwareErrorTableDxe/HardwareErrorSourceTableDxe.inf {
     <LibraryClasses>
-      DxeRiscvMpxyLib|MdePkg/Library/DxeRiscvMpxyLib/DxeRiscvMpxy.inf
+      CommonRiscvMpxyLib|MdePkg/Library/CommonRiscvMpxyLib/CommonRiscvMpxy.inf
       DxeRasAgentClientLib|MdePkg/Library/DxeRiscvRasAgentClientLib/DxeRiscvRasAgentClientLib.inf
       RiscVSbiLib|MdePkg/Library/BaseRiscVSbiLib/BaseRiscVSbiLib.inf
   }

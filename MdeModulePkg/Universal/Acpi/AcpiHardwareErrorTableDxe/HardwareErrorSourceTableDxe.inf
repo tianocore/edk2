@@ -40,7 +40,7 @@
   UefiLib
 
 [LibraryClasses.RISCV64]
-  DxeRiscvMpxyLib
+  CommonRiscvMpxyLib
   DxeRasAgentClientLib
   RiscVSbiLib
 
