@@ -9,7 +9,7 @@
 #ifndef SBI_MPXY_H_
 #define SBI_MPXY_H_
 
-enum {
+typedef enum {
   MpxyChanAttrProtId,
   MpxyChanAttrProtVersion,
   MpxyChanAttrMsgDataMaxLen,
@@ -23,7 +23,7 @@ enum {
   MpxyChanAttrMsiData,
   MpxyChanAttrEventStateControl,
   MpxyChanAttrMax
-};
+} SBI_MPXY_CHAN_ATTR;
 
 #define MPXY_MSG_PROTO_ATTR_START  0x80000000
 #define MPXY_MSG_PROTO_ATTR_END    0xffffffff
@@ -78,8 +78,8 @@ SbiMpxyReadChannelAttrs (
 **/
 EFI_STATUS
 EFIAPI
-SbiMpxyChannelOpen (
-  IN UINTN  ChannelId
+SbiMpxyInit (
+  VOID
   );
 
 /**
@@ -91,8 +91,8 @@ SbiMpxyChannelOpen (
 **/
 EFI_STATUS
 EFIAPI
-SbiMpxyChannelClose (
-  IN UINTN  ChannelId
+SbiMpxyDeinit (
+  VOID
   );
 
 /**
