@@ -133,4 +133,56 @@ GetDigestFromDigestList (
   OUT VOID               *Digest
   );
 
+/**
+  Copy a buffer into  TPML_DIGEST_VALUES structure.
+  This is the opposite to the CopyDigestListToBuffer function.
+
+  @param[in]     Buffer             Buffer to hold TPML_DIGEST_VALUES compact binary.
+  @param[in]     BufferSize         Size of Buffer.
+  @param[in,out] DigestList         TPML_DIGEST_VALUES.
+
+  @return EFI_STATUS
+  @retval EFI_SUCCESS               Buffer was successfully copied to Digest List.
+  @retval EFI_BAD_BUFFER_SIZE       Bad buffer size passed to function.
+  @retval EFI_INVALID_PARAMETER     Invalid parameter passed to function: NULL pointer or
+                                    BufferSize bigger than TPML_DIGEST_VALUES
+**/
+EFI_STATUS
+EFIAPI
+CopyBufferToDigestList (
+  IN     VOID                *Buffer,
+  IN     UINT32              BufferSize,
+  IN OUT TPML_DIGEST_VALUES  *DigestList
+  );
+
+/**
+  Get TPML_DIGEST_VALUES data size from HashAlgorithmMask
+
+  @param[in]     DigestList    TPML_DIGEST_VALUES data.
+
+  @return TPML_DIGEST_VALUES data size.
+**/
+UINT32
+EFIAPI
+GetDigestListSizeFromHashAlgorithmMask (
+  IN UINT32  HashAlgorithmMask
+  );
+
+/**
+  Check if all hash algorithms supported in HashAlgorithmMask are
+  present in the DigestList.
+
+  @param DigestList         Digest list
+  @param HashAlgorithmMask  Bitfield of allowed hash algorithms.
+
+  @retval TRUE  All hash algorithms present.
+  @retval FALSE Some hash algorithms not present.
+**/
+BOOLEAN
+EFIAPI
+IsDigestListInSyncWithHashAlgorithmMask (
+  IN TPML_DIGEST_VALUES  *DigestList,
+  IN UINT32              HashAlgorithmMask
+  );
+
 #endif
