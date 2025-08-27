@@ -9,22 +9,20 @@
 
 [Defines]
   INF_VERSION     = 1.27
-  BASE_NAME       = DxeRiscvMpxyLib
-  MODULE_UNI_FILE = DxeRiscvMpxy.uni
-  FILE_GUID       = 8e992db5-4383-4023-a24e-7c99955bde80
-  MODULE_TYPE     = DXE_DRIVER
+  BASE_NAME       = CommonRiscvMpxyLib
+  MODULE_UNI_FILE = CommonRiscvMpxy.uni
+  FILE_GUID       = 8E992DB5-4383-4023-A24E-7C99955BDE80
+  MODULE_TYPE     = BASE
   VERSION_STRING  = 1.0
-  LIBRARY_CLASS   = DxeRiscvMpxyLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
-  CONSTRUCTOR     = SbiMpxyLibConstructor
+  LIBRARY_CLASS   = CommonRiscvMpxyLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER MM_CORE_STANDALONE
 
 [Packages]
   MdePkg/MdePkg.dec
 
 [Sources]
-  DxeRiscvMpxy.c
+  CommonRiscvMpxy.c
 
 [LibraryClasses]
   DebugLib
-  UefiBootServicesTableLib
   RiscVSbiLib
   SafeIntLib

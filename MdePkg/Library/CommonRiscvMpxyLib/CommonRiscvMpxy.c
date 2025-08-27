@@ -1,10 +1,12 @@
 /** @file
-  This module implements functions to be used by MPXY client
-
+  This module implements functions to be used by MPXY client.
+  It facilitates communication with the SBI MPXY extension for shared memory
+  configuration, channel querying, and attribute reading.
   Copyright (c) 2024, Ventana Micro Systems, Inc.
-
+  Copyright (c) 2025, Rivos Inc.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
+
 #include <Base.h>
 #include <Uefi.h>
 
@@ -21,7 +23,9 @@
 #define INVAL_PHYS_ADDR  (-1U)
 #define INVALID_CHAN     -1
 
-#if defined (__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__  /* CPU(little-endian) */
+#define MPXY_SHMEM_SIZE  4096
+
+#if defined (__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define LLE_TO_CPU(x)  (SwapBytes64(x))
 #define CPU_TO_LLE(x)  (SwapBytes64(x))
 #else
@@ -29,15 +33,13 @@
 #define CPU_TO_LLE(x)  (x)
 #endif
 
-STATIC VOID     *gNonChanTempShmem  = NULL;
 STATIC VOID     *gShmemVirt         = NULL;
 STATIC UINTN    gNrShmemPages       = 0;
 STATIC UINT64   gShmemPhysHi        = INVAL_PHYS_ADDR;
 STATIC UINT64   gShmemPhysLo        = INVAL_PHYS_ADDR;
 STATIC UINT64   gShmemSize          = 0;
-STATIC UINT64   gShmemSet           = 0;
 STATIC BOOLEAN  gMpxyLibInitialized = FALSE;
-STATIC UINTN    gShmemRefCount      = 0;
+STATIC UINT64   gShmemSet           = 0;
 
 STATIC
 EFI_STATUS
@@ -62,6 +64,13 @@ SbiMpxyGetShmemSize (
   return TranslateError (Ret.Error);
 }
 
+/**
+  Configure the shared memory physical address using SBI MPXY extension.
+  @param[in]  ShmemPhysHi   High Addr physical address.
+  @param[in]  ShmemPhysLo   Low Addr physical address.
+  @retval EFI_SUCCESS           The operation completed successfully.
+  @retval EFI_DEVICE_ERROR      SBI call failed or invalid parameters.
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -113,6 +122,11 @@ SbiMpxySetShmem (
   return TranslateError (Ret.Error);
 }
 
+/**
+  Disable shared memory by resetting the physical address.
+  @retval EFI_SUCCESS           Successfully disabled.
+  @retval EFI_DEVICE_ERROR      SBI call failed.
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -137,23 +151,28 @@ SbiMpxyDisableShmem (
   return Status;
 }
 
+/**
+  Check whether MPXY shared memory is initialized.
+  @retval TRUE     Initialized.
+  @retval FALSE    Not initialized.
+**/
 BOOLEAN
 SbiMpxyShmemInitialized (
   VOID
   )
 {
-  return (gMpxyLibInitialized);
+  return gMpxyLibInitialized;
 }
 
-STATIC
-BOOLEAN
-SbiMpxyShmemIsSet (
-  VOID
-  )
-{
-  return (gShmemSet);
-}
-
+/**
+  Retrieve the list of MPXY channel IDs.
+  @param[in]   StartIndex     Index to start from.
+  @param[out]  ChannelList    Pointer to array to hold channel IDs.
+  @param[out]  Remaining      Channels yet to be read.
+  @param[out]  Returned       Number of channels returned.
+  @retval EFI_SUCCESS         Channel list retrieved.
+  @retval EFI_DEVICE_ERROR    MPXY not initialized or SBI error.
+**/
 EFI_STATUS
 EFIAPI
 SbiMpxyGetChannelList (
@@ -166,7 +185,7 @@ SbiMpxyGetChannelList (
   UINT64      OPhysHi, OPhysLo;
   EFI_STATUS  Status;
   SBI_RET     Ret;
-  UINT32      *Shmem = gNonChanTempShmem;
+  UINT32      *Shmem = gShmemVirt;
   UINTN       i;
 
   if (!gMpxyLibInitialized) {
@@ -176,7 +195,7 @@ SbiMpxyGetChannelList (
   /* Set the shared memory to memory allocated for non-channel specific reads */
   Status = SbiMpxySetShmem (
              0,
-             (UINT64)gNonChanTempShmem,
+             (UINT64)gShmemVirt,
              &OPhysHi,
              &OPhysLo,
              TRUE /* Read back the old address */
@@ -227,6 +246,15 @@ SbiMpxyGetChannelList (
   return EFI_SUCCESS;
 }
 
+/**
+  Read multiple attributes from a specified channel.
+  @param[in]   ChannelId    Channel ID to query.
+  @param[in]   BaseAttrId   Starting attribute ID.
+  @param[in]   NrAttrs      Number of attributes to read.
+  @param[out]  Attrs        Buffer to receive attributes.
+  @retval EFI_SUCCESS       Attributes successfully read.
+  @retval EFI_DEVICE_ERROR  MPXY not initialized or SBI call failed.
+**/
 EFI_STATUS
 EFIAPI
 SbiMpxyReadChannelAttrs (
@@ -247,7 +275,7 @@ SbiMpxyReadChannelAttrs (
   /* Set the shared memory to memory allocated for non-channel specific reads */
   Status = SbiMpxySetShmem (
              0,
-             (UINT64)gNonChanTempShmem,
+             (UINT64)gShmemVirt,
              &OPhysHi,
              &OPhysLo,
              TRUE /* Read back the old address */
@@ -272,7 +300,7 @@ SbiMpxyReadChannelAttrs (
 
   CopyMem (
     Attrs,
-    gNonChanTempShmem,
+    gShmemVirt,
     sizeof (UINT32) * NrAttrs
     );
 
@@ -292,199 +320,28 @@ SbiMpxyReadChannelAttrs (
   return EFI_SUCCESS;
 }
 
+/**
+  Initialize the MPXY library and shared memory.
+  @retval EFI_SUCCESS         Successfully initialized.
+  @retval EFI_OUT_OF_RESOURCES Memory allocation failed.
+  @retval EFI_DEVICE_ERROR     SBI calls failed.
+**/
 EFI_STATUS
 EFIAPI
-SbiMpxyChannelOpen (
-  IN UINTN  ChannelId
+SbiMpxyInit (
+  VOID
   )
 {
-  UINT32      Attributes[MpxyChanAttrMsgDataMaxLen]; // space to read id and version
-  UINT32      ChanDataLen;
   VOID        *SbiShmem;
   UINTN       NrEfiPages;
   EFI_STATUS  Status;
-
-  if (SbiMpxyShmemInitialized () == FALSE) {
-    return (EFI_UNSUPPORTED);
-  }
-
-  Status = SbiMpxyReadChannelAttrs (
-             ChannelId,
-             0,
-             MpxyChanAttrMax,
-             &Attributes[0]
-             );
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  ChanDataLen = Attributes[MpxyChanAttrMsgDataMaxLen];
-  NrEfiPages  = EFI_SIZE_TO_PAGES (ChanDataLen);
-
-  /*
-   * If shared memory is already set and if this channel's memory requirement
-   * is more than the current then reallocate memory.
-   */
-  if (SbiMpxyShmemIsSet ()) {
-    /* Does this channel needs bigger shared memory? */
-    if (ChanDataLen > gShmemSize) {
-      SbiShmem = AllocateAlignedPages (
-                   NrEfiPages,
-                   EFI_PAGE_SIZE // Align
-                   );
-
-      if (SbiShmem == NULL) {
-        return (EFI_OUT_OF_RESOURCES);
-      }
-
-      /* Set the new shared memory */
-      Status = SbiMpxySetShmem (
-                 0,
-                 (UINT64)SbiShmem,
-                 NULL,
-                 NULL,
-                 FALSE /* Not interested in old memory */
-                 );
-
-      if (EFI_ERROR (Status)) {
-        FreeAlignedPages (SbiShmem, NrEfiPages);
-        return (EFI_DEVICE_ERROR);
-      }
-
-      /* Free the previous memory */
-      FreeAlignedPages (gShmemVirt, gNrShmemPages);
-      /* Save the new shared memory */
-      gShmemVirt    = SbiShmem;
-      gNrShmemPages = NrEfiPages;
-    }
-  } else {
-    /* No shared memory yet. Allocate a new one. */
-    SbiShmem = AllocateAlignedPages (
-                 NrEfiPages,
-                 EFI_PAGE_SIZE
-                 );
-
-    if (SbiShmem == NULL) {
-      return (EFI_OUT_OF_RESOURCES);
-    }
-
-    Status = SbiMpxySetShmem (
-               0,
-               (UINT64)SbiShmem,
-               NULL,
-               NULL,
-               FALSE
-               );
-
-    if (EFI_ERROR (Status)) {
-      FreeAlignedPages (SbiShmem, NrEfiPages);
-      return (EFI_DEVICE_ERROR);
-    }
-
-    /* Save the new shared memory */
-    gShmemVirt    = SbiShmem;
-    gNrShmemPages = NrEfiPages;
-  }
-
-  /* Increase the reference count */
-  gShmemRefCount++;
-
-  return EFI_SUCCESS;
-}
-
-EFI_STATUS
-EFIAPI
-SbiMpxyChannelClose (
-  IN UINTN  ChannelId
-  )
-{
-  EFI_STATUS  Status;
-
-  if (--gShmemRefCount == 0) {
-    /* Ref count is zero. Release the memory */
-    Status = SbiMpxyDisableShmem ();
-    if (EFI_ERROR (Status)) {
-      return (EFI_DEVICE_ERROR);
-    }
-
-    FreeAlignedPages (gShmemVirt, gNrShmemPages);
-  }
-
-  return (EFI_SUCCESS);
-}
-
-EFI_STATUS
-EFIAPI
-SbiMpxySendMessage (
-  IN UINTN   ChannelId,
-  IN UINTN   MessageId,
-  IN VOID    *Message,
-  IN UINTN   MessageDataLen,
-  OUT VOID   *Response,
-  OUT UINTN  *ResponseLen
-  )
-{
-  SBI_RET  Ret;
-  UINT64   Phys = gShmemPhysLo;
-
-  if (!gShmemSet) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  if (MessageDataLen >= gShmemSize) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  /* Copy message to Hart's shared memory */
-  CopyMem (
-    (VOID *)Phys,
-    Message,
-    MessageDataLen
-    );
-
-  Ret = SbiCall (
-          SBI_EXT_MPXY,
-          SBI_EXT_MPXY_SEND_MSG_WITH_RESP,
-          3,
-          ChannelId,
-          MessageId,
-          MessageDataLen
-          );
-
-  if ((Ret.Error == SBI_SUCCESS) && Response) {
-    /* Copy the response to out buffer */
-    CopyMem (
-      Response,
-      (const VOID *)Phys,
-      Ret.Value
-      );
-  }
-
-  return TranslateError (Ret.Error);
-}
-
-/**
-  Constructor allocates the global memory to store the registered guid and Handler list.
-
-  @param  ImageHandle   The firmware allocated handle for the EFI image.
-  @param  SystemTable   A pointer to the EFI System Table.
-
-  @retval  RETURN_SUCCESS            Allocated the global memory space to store guid and function tables.
-  @retval  RETURN_OUT_OF_RESOURCES   Not enough memory to allocate.
-**/
-RETURN_STATUS
-EFIAPI
-SbiMpxyLibConstructor (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
-  )
-{
-  EFI_STATUS  Status;
   UINT64      ShmemSize;
 
-  Status = SbiProbeExtension (SBI_EXT_MPXY);
+  if (SbiMpxyShmemInitialized ()) {
+    return EFI_SUCCESS;
+  }
 
+  Status = SbiProbeExtension (SBI_EXT_MPXY);
   ASSERT_EFI_ERROR (Status);
 
   Status = SbiMpxyGetShmemSize (&ShmemSize);
@@ -504,24 +361,113 @@ SbiMpxyLibConstructor (
     ShmemSize
     ));
 
-  //
-  // Allocate memory to be shared with OpenSBI for initial MPXY communications
-  // untils channels are initialized by their respective drivers.
-  //
-  gNonChanTempShmem = AllocateAlignedPages (
-                        EFI_SIZE_TO_PAGES (ShmemSize),
-                        ShmemSize // Align
-                        );
-
+  NrEfiPages = (ShmemSize / EFI_PAGE_SIZE) + 1;
   gShmemSize = ShmemSize;
 
-  if (gNonChanTempShmem == NULL) {
-    return (0);
+  SbiShmem = AllocateAlignedPages (NrEfiPages, EFI_PAGE_SIZE);
+  if (SbiShmem == NULL) {
+    return EFI_OUT_OF_RESOURCES;
   }
 
+  Status = SbiMpxySetShmem (
+                 0,
+                 (UINT64)SbiShmem,
+                 NULL,
+                 NULL,
+                 FALSE /* Not interested in old memory */
+                 );
+  if (EFI_ERROR (Status)) {
+    FreeAlignedPages (SbiShmem, NrEfiPages);
+    return EFI_DEVICE_ERROR;
+  }
+
+  gShmemVirt          = SbiShmem;
+  gNrShmemPages       = NrEfiPages;
   gMpxyLibInitialized = TRUE;
 
-  DEBUG ((DEBUG_WARN, "%a: initialization done\n", __func__));
+  return EFI_SUCCESS;
+}
 
-  return (0);
+/**
+  De-initialize MPXY library and release shared memory.
+  @retval EFI_SUCCESS            Successfully deinitialized.
+  @retval EFI_INVALID_PARAMETER  Library not initialized.
+  @retval EFI_DEVICE_ERROR       Failed to disable memory.
+**/
+EFI_STATUS
+EFIAPI
+SbiMpxyDeinit (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+
+  if (!SbiMpxyShmemInitialized ()) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  /* Ref count is zero. Release the memory */
+  Status = SbiMpxyDisableShmem ();
+  if (EFI_ERROR (Status)) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  FreeAlignedPages (gShmemVirt, gNrShmemPages);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Send a message to an MPXY channel and receive response.
+  @param[in]  ChannelId      ID of the channel.
+  @param[in]  MessageId      Message type identifier.
+  @param[in]  Message        Pointer to message payload.
+  @param[in]  MessageDataLen Length of message payload.
+  @param[out] Response       Pointer to receive response.
+  @param[out] ResponseLen    Actual response length returned.
+  @retval EFI_SUCCESS            Message sent and response received.
+  @retval EFI_INVALID_PARAMETER  Invalid message length or uninitialized state.
+  @retval EFI_DEVICE_ERROR       SBI call failed.
+**/
+EFI_STATUS
+EFIAPI
+SbiMpxySendMessage (
+  IN UINTN   ChannelId,
+  IN UINTN   MessageId,
+  IN VOID    *Message,
+  IN UINTN   MessageDataLen,
+  OUT VOID   *Response,
+  OUT UINTN  *ResponseLen
+  )
+{
+  SBI_RET  Ret;
+  UINT64   Phys = gShmemPhysLo;
+
+  if (!SbiMpxyShmemInitialized ()) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (MessageDataLen >= gShmemSize) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CopyMem ((VOID *)Phys, Message, MessageDataLen);
+
+  Ret = SbiCall (
+          SBI_EXT_MPXY,
+          SBI_EXT_MPXY_SEND_MSG_WITH_RESP,
+          3,
+          ChannelId,
+          MessageId,
+          MessageDataLen
+          );
+
+  if ((Ret.Error == SBI_SUCCESS) && Ret.Value) {
+    CopyMem (Response, (const VOID *)Phys, Ret.Value);
+    if (ResponseLen) {
+      *ResponseLen = Ret.Value;
+    }
+  }
+
+  return TranslateError (Ret.Error);
 }
