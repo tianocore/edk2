@@ -425,6 +425,25 @@ strtoul (
   return 0;
 }
 
+char *
+strpbrk (
+  const char  *s,
+  const char  *accept
+  )
+{
+  int  i;
+
+  for ( ; *s != '\0'; s++) {
+    for (i = 0; accept[i] != '\0'; i++) {
+      if (*s == accept[i]) {
+        return (char *)s;
+      }
+    }
+  }
+
+  return NULL;
+}
+
 /* Convert character to lowercase */
 int
 tolower (

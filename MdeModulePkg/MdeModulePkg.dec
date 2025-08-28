@@ -504,9 +504,6 @@
   ## Include/Ppi/AtaController.h
   gPeiAtaControllerPpiGuid       = { 0xa45e60d1, 0xc719, 0x44aa, { 0xb0, 0x7a, 0xaa, 0x77, 0x7f, 0x85, 0x90, 0x6d }}
 
-  ## Include/Ppi/UsbHostController.h
-  gPeiUsbHostControllerPpiGuid   = { 0x652B38A9, 0x77F4, 0x453F, { 0x89, 0xD5, 0xE7, 0xBD, 0xC3, 0x52, 0xFC, 0x53 }}
-
   ## Include/Ppi/Usb2HostController.h
   gPeiUsb2HostControllerPpiGuid  = { 0xfedd6305, 0xe2d7, 0x4ed5, { 0x9f, 0xaa, 0xda, 0x8, 0xe, 0x33, 0x6c, 0x22   }}
 
@@ -1211,6 +1208,10 @@
   # @Prompt Defines the page allocation for the MM communication buffer; default is 128 pages (512KB).
   gEfiMdeModulePkgTokenSpaceGuid.PcdMmCommBufferPages|128|UINT32|0x30001061
 
+  ## This PCD holds the number of pages for the FFA TX/RX buffer.
+  # @Prompt FFA TX/RX Buffer Page Count
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaTxRxPageCount|1|UINT64|0x30001062
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicates the maximum number of callback function
@@ -1347,10 +1348,6 @@
   #   FALSE - 16550 serial Tx operations will not be blocked if DSR is not asserted.<BR>
   # @Prompt Enable serial port cable detetion.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialDetectCable|FALSE|BOOLEAN|0x00020006
-
-  ## Base address of 16550 serial port registers in MMIO or I/O space. Default is 0x3F8.
-  # @Prompt Base address of serial port registers.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x03F8|UINT64|0x00020002
 
   ## Baud rate for the 16550 serial port.  Default is 115200 baud.
   # @Prompt Baud rate for serial port.
@@ -1677,6 +1674,14 @@
   # @Prompt Maximum Number of PEI Reset Filters, Reset Notifications or Reset Handlers.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaximumPeiResetNotifies|0x10|UINT32|0x0000010A
 
+  ## Whether to report support of FMP capsules in OsIndicationSupport.<BR><BR>
+  #  This PCD indicates if support of FMP capsules should be advertised.<BR>
+  #   TRUE  - support of FMP capsules is advertised.<BR>
+  #   FALSE - support of FMP capsules is not advertised.<BR>
+  #  If platform does not use this feature, this PCD should be set to FALSE.<BR><BR>
+  # @Prompt Enable advertising support of FMP capsules.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleFmpSupport|FALSE|BOOLEAN|0x00000028
+
   ## Capsule On Disk is to deliver capsules via files on Mass Storage device.<BR><BR>
   #  This PCD indicates if the Capsule On Disk is supported.<BR>
   #   TRUE  - Capsule On Disk is supported.<BR>
@@ -1786,6 +1791,11 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions|0x20|UINT32|0x0001004c
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+
+  ## Base address of 16550 serial port registers in MMIO or I/O space. Default is 0x3F8.
+  # @Prompt Base address of serial port registers.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x03F8|UINT64|0x00020002
+
   ## UART clock frequency is for the baud rate configuration.
   # @Prompt Serial Port Clock Rate.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate|1843200|UINT32|0x00010066
@@ -2367,10 +2377,6 @@
   ## This dynamic PCD holds the address of the FFA RX buffer.
   # @Prompt FFA RX Buffer Address
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaRxBuffer|0x00|UINT64|0x0003000A
-
-  ## This dynamic PCD holds the number of pages for the FFA TX/RX buffer.
-  # @Prompt FFA TX/RX Buffer Page Count
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaTxRxPageCount|1|UINT64|0x0003000B
 
   ## This dynamic PCD holds the information if the FFA exit boot event is registered.
   # @Prompt FFA Exit Boot Event Registered

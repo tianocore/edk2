@@ -250,7 +250,6 @@
   MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
   MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
   MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
-  MdeModulePkg/Bus/Pci/UhciPei/UhciPei.inf
   MdeModulePkg/Bus/Pci/EhciPei/EhciPei.inf
   MdeModulePkg/Bus/Pci/XhciPei/XhciPei.inf
   MdeModulePkg/Bus/Pci/IdeBusPei/IdeBusPei.inf
@@ -535,6 +534,7 @@
   MdeModulePkg/Universal/CapsulePei/CapsuleX64.inf
 
 [Components.ARM, Components.AARCH64]
+  MdeModulePkg/Library/ArmFfaLib/ArmFfaSecLib.inf
   MdeModulePkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
   MdeModulePkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
   MdeModulePkg/Library/ArmFfaLib/ArmFfaStandaloneMmCoreLib.inf

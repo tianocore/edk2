@@ -176,6 +176,7 @@ M: Rebecca Cran <rebecca@bsdio.com> [bexcran]
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 M: Guillermo Antonio Palomino Sosa <guillermo.a.palomino.sosa@intel.com> [gapalomi]
 R: Yuwei Chen <yuwei.chen@intel.com> [YuweiChen1110]
+R: Poncho Figueroa <poncho.figueroa.esqueda@intel.com> [ponchofigueroa]
 
 BaseTools: Plugins
 F: BaseTools/Plugin/
@@ -514,7 +515,7 @@ F: OvmfPkg/ResetVector/
 F: OvmfPkg/Sec/
 R: Erdem Aktas <erdemaktas@google.com> [ruleof2]
 R: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
-R: Min Xu <min.m.xu@intel.com> [mxu9]
+R: Stanislaw Grams <stanislaw.grams@intel.com> [sgrams]
 R: Tom Lendacky <thomas.lendacky@amd.com> [tlendacky]
 R: Michael Roth <michael.roth@amd.com> [mdroth]
 
@@ -614,7 +615,7 @@ R: Min Xu <min.m.xu@intel.com> [mxu9]
 
 SecurityPkg: Tcg related modules
 F: SecurityPkg/Tcg/
-R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
+R: Arun Subramanian Baskaran <arun.subramanian.baskaran@intel.com> [arunsbaskaran]
 
 SecurityPkg: SVSM related modules
 F: SecurityPkg/Library/Tpm2DeviceLibDTpm/*Svsm*
@@ -656,7 +657,7 @@ M: Ray Ni <ray.ni@intel.com> [niruiyu]
 M: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
 R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]
 R: Dun Tan <dun.tan@intel.com> [td36]
-R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
+R: Arun Subramanian Baskaran <arun.subramanian.baskaran@intel.com> [arunsbaskaran]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 R: Eduardo Cuevas Farfan <eduardo.cuevas.farfan@intel.com> [ecuevasf]

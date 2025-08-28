@@ -1,0 +1,32 @@
+## @file
+#  SSDT Serial Port fixup Library
+#
+#  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 1.30
+  BASE_NAME      = DynamicSsdtSerialPortFixupLib
+  FILE_GUID      = 83F367CE-9EA3-4A5B-B61F-60E06CA7D9FF
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = SsdtSerialPortFixupLib
+
+[Sources]
+  SsdtSerialPortFixupLib.c
+
+[Packages.common]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  AcpiHelperLib
+  AmlLib
+  BaseLib
+
+[Pcd]
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdNonBsaCompliant16550SerialHid
