@@ -17,6 +17,15 @@
   BUILD_TARGETS           = NOOPT
   SKUID_IDENTIFIER        = DEFAULT
 
+!ifndef CRYPTO_TEST_TYPE
+  DEFINE CRYPTO_TEST_TYPE = OPENSSL
+!endif
+
+!if $(CRYPTO_TEST_TYPE) IN "OPENSSL MBEDTLS"
+!else
+  !error CRYPTO_TEST_TYPE must be set to one of OPENSSL MBEDTLS.
+!endif
+
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc
 
 !include CryptoPkg/CryptoPkgFeatureFlagPcds.dsc.inc
@@ -34,6 +43,7 @@
   #
   # Build HOST_APPLICATION that tests the SampleUnitTest
   #
+!if $(CRYPTO_TEST_TYPE) IN "OPENSSL"
   CryptoPkg/Test/UnitTest/Library/BaseCryptLib/TestBaseCryptLibHost.inf {
     <LibraryClasses>
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
@@ -44,6 +54,16 @@
     <LibraryClasses>
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
   }
+!endif
+
+!if $(CRYPTO_TEST_TYPE) IN "MBEDTLS"
+  CryptoPkg/Test/UnitTest/Library/BaseCryptLib/TestBaseCryptLibHost.inf {
+    <LibraryClasses>
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLibMbedTls/UnitTestHostBaseCryptLib.inf
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibSm3.inf
+      MbedTlsLib|CryptoPkg/Library/MbedTlsLib/MbedTlsLib.inf
+  }
+!endif
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES

@@ -57,7 +57,7 @@ RsaGetPrivateKeyFromPem (
       return FALSE;
     }
 
-    CopyMem (NewPemData, PemData, PemSize + 1);
+    CopyMem (NewPemData, PemData, PemSize);
     NewPemData[PemSize] = 0;
     PemData             = NewPemData;
     PemSize            += 1;

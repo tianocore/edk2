@@ -1407,7 +1407,11 @@ class DscParser(MetaFileParser):
                 if self._ContentIndex >= len(self._Content):
                     break
                 Record = self._Content[self._ContentIndex]
-                if LineStart == Record[10] and LineEnd == Record[12]:
+                #
+                # Avoid merging includes with different owners to make sure an
+                # include is correctly processed per arch.
+                #
+                if Owner == Record[8] and LineStart == Record[10] and LineEnd == Record[12]:
                     if [Record[5], Record[6], Record[7]] not in self._Scope:
                         self._Scope.append([Record[5], Record[6], Record[7]])
                     self._ContentIndex += 1
