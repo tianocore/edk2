@@ -55,7 +55,13 @@ typedef struct _SEC_SEV_ES_WORK_AREA {
   // detection in OvmfPkg/ResetVector/Ia32/AmdSev.c
   //
   UINT8     ReceivedVc;
-  UINT8     Reserved[7];
+
+  //
+  // Indicator that 5-level paging is supported.
+  //
+  UINT8     Support5Level;
+
+  UINT8     Reserved[6];
 
   // Used by SEC to generate Page State Change requests. This should be
   // sized less than an equal to the GHCB shared buffer area to allow a

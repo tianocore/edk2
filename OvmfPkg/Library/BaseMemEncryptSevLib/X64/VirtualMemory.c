@@ -9,6 +9,7 @@
 **/
 
 #include <Library/CpuLib.h>
+#include <Library/CpuPageTableLib.h>
 #include <Library/MemEncryptSevLib.h>
 
 #include "VirtualMemory.h"
@@ -80,17 +81,15 @@ InternalMemEncryptSevGetAddressRangeState (
   IN UINTN             Length
   )
 {
-  PAGE_MAP_AND_DIRECTORY_POINTER       *PageMapLevel4Entry;
-  PAGE_MAP_AND_DIRECTORY_POINTER       *PageUpperDirectoryPointerEntry;
-  PAGE_MAP_AND_DIRECTORY_POINTER       *PageDirectoryPointerEntry;
-  PAGE_TABLE_1G_ENTRY                  *PageDirectory1GEntry;
-  PAGE_TABLE_ENTRY                     *PageDirectory2MEntry;
-  PAGE_TABLE_4K_ENTRY                  *PageTableEntry;
+  IA32_CR4                             Cr4;
+  PAGING_MODE                          PagingMode;
   UINT64                               AddressEncMask;
-  UINT64                               PgTableMask;
   PHYSICAL_ADDRESS                     Address;
   PHYSICAL_ADDRESS                     AddressEnd;
+  PAGE_TABLE_4K_ENTRY                  Entry;
+  UINTN                                Level;
   MEM_ENCRYPT_SEV_ADDRESS_RANGE_STATE  State;
+  RETURN_STATUS                        Status;
 
   //
   // If Cr3BaseAddress is not specified then read the current CR3
@@ -99,10 +98,11 @@ InternalMemEncryptSevGetAddressRangeState (
     Cr3BaseAddress = AsmReadCr3 ();
   }
 
+  Cr4.UintN  = AsmReadCr4 ();
+  PagingMode = Cr4.Bits.LA57 ? Paging5Level1GB : Paging4Level1GB;
+
   AddressEncMask  = MemEncryptSevGetEncryptionMask ();
   AddressEncMask &= PAGING_1G_ADDRESS_MASK_64;
-
-  PgTableMask = AddressEncMask | EFI_PAGE_MASK;
 
   State = MemEncryptSevAddressRangeError;
 
@@ -115,92 +115,37 @@ InternalMemEncryptSevGetAddressRangeState (
                (UINTN)(BaseAddress + Length);
 
   while (Address < AddressEnd) {
-    PageMapLevel4Entry  = (VOID *)(Cr3BaseAddress & ~PgTableMask);
-    PageMapLevel4Entry += PML4_OFFSET (Address);
-    if (!PageMapLevel4Entry->Bits.Present) {
+    //
+    // The present bit and encryption bit is valid for all leaf entries, so use
+    // a 4K PTE entry as a base to hold the pagetable entry.
+    //
+    Status = PageTableGetEntry (Cr3BaseAddress, PagingMode, Address, &Entry.Uint64, &Level);
+    if (Status != RETURN_SUCCESS) {
       return MemEncryptSevAddressRangeError;
     }
 
-    PageDirectory1GEntry = (VOID *)(
-                                    (PageMapLevel4Entry->Bits.PageTableBaseAddress <<
-                                     12) & ~PgTableMask
-                                    );
-    PageDirectory1GEntry += PDP_OFFSET (Address);
-    if (!PageDirectory1GEntry->Bits.Present) {
+    if (Entry.Bits.Present == 0) {
       return MemEncryptSevAddressRangeError;
     }
 
-    //
-    // If the MustBe1 bit is not 1, it's not actually a 1GB entry
-    //
-    if (PageDirectory1GEntry->Bits.MustBe1) {
-      //
-      // Valid 1GB page
-      //
-      State = UpdateAddressState (
-                State,
-                PageDirectory1GEntry->Uint64,
-                AddressEncMask
-                );
+    State = UpdateAddressState (State, Entry.Uint64, AddressEncMask);
 
-      Address += BIT30;
-      continue;
+    switch (Level) {
+      case 1:
+        Address += EFI_PAGE_SIZE;
+        break;
+
+      case 2:
+        Address += BIT21;
+        break;
+
+      case 3:
+        Address += BIT30;
+        break;
+
+      default:
+        return MemEncryptSevAddressRangeError;
     }
-
-    //
-    // Actually a PDP
-    //
-    PageUpperDirectoryPointerEntry =
-      (PAGE_MAP_AND_DIRECTORY_POINTER *)PageDirectory1GEntry;
-    PageDirectory2MEntry =
-      (VOID *)(
-               (PageUpperDirectoryPointerEntry->Bits.PageTableBaseAddress <<
-                12) & ~PgTableMask
-               );
-    PageDirectory2MEntry += PDE_OFFSET (Address);
-    if (!PageDirectory2MEntry->Bits.Present) {
-      return MemEncryptSevAddressRangeError;
-    }
-
-    //
-    // If the MustBe1 bit is not a 1, it's not a 2MB entry
-    //
-    if (PageDirectory2MEntry->Bits.MustBe1) {
-      //
-      // Valid 2MB page
-      //
-      State = UpdateAddressState (
-                State,
-                PageDirectory2MEntry->Uint64,
-                AddressEncMask
-                );
-
-      Address += BIT21;
-      continue;
-    }
-
-    //
-    // Actually a PMD
-    //
-    PageDirectoryPointerEntry =
-      (PAGE_MAP_AND_DIRECTORY_POINTER *)PageDirectory2MEntry;
-    PageTableEntry =
-      (VOID *)(
-               (PageDirectoryPointerEntry->Bits.PageTableBaseAddress <<
-                12) & ~PgTableMask
-               );
-    PageTableEntry += PTE_OFFSET (Address);
-    if (!PageTableEntry->Bits.Present) {
-      return MemEncryptSevAddressRangeError;
-    }
-
-    State = UpdateAddressState (
-              State,
-              PageTableEntry->Uint64,
-              AddressEncMask
-              );
-
-    Address += EFI_PAGE_SIZE;
   }
 
   return State;

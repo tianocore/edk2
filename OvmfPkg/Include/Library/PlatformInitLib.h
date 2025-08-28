@@ -30,6 +30,9 @@ typedef struct {
   UINT16                   HostBridgeDevId;
 
   UINT64                   PcdConfidentialComputingGuestAttr;
+  UINT64                   SevEncryptionMask;
+  UINT8                    SevReducedPhysBits;
+  BOOLEAN                  SevIsEnabled;
   BOOLEAN                  SevEsIsEnabled;
 
   UINT32                   BootMode;

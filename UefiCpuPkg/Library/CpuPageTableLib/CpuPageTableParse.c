@@ -344,3 +344,78 @@ PageTableParse (
 
   return RETURN_SUCCESS;
 }
+
+/**
+  Retrieve page table entry.
+
+  @param[in]      PageTable      The pointer to the page table to use.
+  @param[in]      PagingMode     The paging mode.
+  @param[in]      LinearAddress  The linear address to use to walk the page table.
+  @param[in, out] Entry          The page table entry for the linear address.
+  @param[in, out] Level          The page table entry level for the linear address.
+
+  @retval RETURN_SUCCESS         Page table entry and level returned.
+**/
+RETURN_STATUS
+EFIAPI
+PageTableGetEntry (
+  IN     UINTN        PageTable,
+  IN     PAGING_MODE  PagingMode,
+  IN     UINT64       LinearAddress,
+  IN OUT UINT64       *Entry,
+  IN OUT UINTN        *Level
+  )
+{
+  IA32_PAGING_ENTRY  *PagingEntry;
+  UINT64             MaxLinearAddress;
+  IA32_PAGE_LEVEL    CurLevel;
+  IA32_PAGE_LEVEL    MaxLevel;
+  UINTN              BitStart;
+  UINTN              Index;
+
+  if ((PagingMode == Paging32bit) || (PagingMode >= PagingModeMax)) {
+    //
+    // 32bit paging is never supported.
+    //
+    return RETURN_UNSUPPORTED;
+  }
+
+  if ((PageTable == 0) || (Entry == NULL) || (Level == NULL)) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  MaxLevel         = (IA32_PAGE_LEVEL)(UINT8)(PagingMode >> 8);
+  MaxLinearAddress = (PagingMode == PagingPae) ? LShiftU64 (1, 32) : LShiftU64 (1, 12 + MaxLevel * 9);
+
+  if (LinearAddress > MaxLinearAddress) {
+    //
+    // Maximum linear address is (1 << 32), (1 << 48) or (1 << 57)
+    //
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  *Entry = 0;
+  *Level = 0;
+
+  PagingEntry = (IA32_PAGING_ENTRY *)(UINTN)PageTable;
+  for (CurLevel = MaxLevel; CurLevel; CurLevel--) {
+    BitStart = 12 + (CurLevel - 1) * 9;
+    Index    = (UINTN)BitFieldRead64 (LinearAddress, BitStart, BitStart + 9 - 1);
+
+    if ((PagingEntry[Index].Uint64 == 0) || (PagingEntry[Index].Pce.Present == 0) || IsPle (&PagingEntry[Index], CurLevel)) {
+      *Level = CurLevel;
+      *Entry = PagingEntry[Index].Uint64;
+
+      return RETURN_SUCCESS;
+    }
+
+    PagingEntry = (IA32_PAGING_ENTRY *)(UINTN)IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (&PagingEntry[Index].Pnle);
+  }
+
+  //
+  // Should never get here because the loop will exit for a non-present page
+  // table entry or a leaf entry entry (which will always be encountered if
+  // all pages are present).
+  //
+  return RETURN_INVALID_PARAMETER;
+}
