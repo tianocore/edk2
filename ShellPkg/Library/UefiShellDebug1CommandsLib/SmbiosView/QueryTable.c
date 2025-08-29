@@ -2969,6 +2969,10 @@ TABLE_ITEM  MemoryDeviceMemoryTechnologyTable[] = {
   {
     MemoryTechnologyIntelOptanePersistentMemory,
     L" Intel Optane Persistent Memory"
+  },
+  {
+    0x08,
+    L" MRDIMM"
   }
 };
 
