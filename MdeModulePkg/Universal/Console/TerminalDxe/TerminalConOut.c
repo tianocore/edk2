@@ -1,7 +1,6 @@
 /** @file
   Implementation for EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL protocol.
 
-Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (C) 2016 Silicon Graphics, Inc. All rights reserved.<BR>
 Copyright (c) 2025, Loongson Technology Corporation Limited. All rights reserved.<BR>
@@ -76,7 +75,6 @@ UNICODE_TO_CHAR  UnicodeToPcAnsiOrAscii[] = {
 };
 
 CHAR16  mSetModeString[]           = { ESC, '[', '=', '3', 'h', 0 };
-CHAR16  mSetModeStringResize[]     = { ESC, '[', '8', ';', '0', '0', '0', ';', '0', '0', '0', 't', '0', 0 };
 CHAR16  mSetAttributeString[]      = { ESC, '[', '0', 'm', ESC, '[', '4', '0', 'm', ESC, '[', '4', '0', 'm', 0 };
 CHAR16  mClearScreenString[]       = { ESC, '[', '2', 'J', 0 };
 CHAR16  mSetCursorPositionString[] = { ESC, '[', '0', '0', ';', '0', '0', 'H', 0 };
@@ -463,6 +461,7 @@ TerminalConOutQueryMode (
   Implements EFI_SIMPLE_TEXT_OUT.SetMode().
 
   Set the terminal to a specified display mode.
+  In this driver, we only support mode 0.
 
   @param This          Indicates the calling context.
   @param ModeNumber    The text mode to set.
@@ -482,36 +481,14 @@ TerminalConOutSetMode (
 {
   EFI_STATUS    Status;
   TERMINAL_DEV  *TerminalDevice;
-  CHAR16        *String;
-  UINTN         Columns;
-  UINTN         Rows;
 
   //
-  // Get Terminal device data structure pointer.
+  //  get Terminal device data structure pointer.
   //
   TerminalDevice = TERMINAL_CON_OUT_DEV_FROM_THIS (This);
 
   if (ModeNumber >= (UINTN)This->Mode->MaxMode) {
     return EFI_UNSUPPORTED;
-  }
-
-  //
-  // Configure terminal string for the text mode to set.
-  //
-  if (ModeNumber == 0) {
-    String = mSetModeString;
-  } else {
-    Columns = TerminalDevice->TerminalConsoleModeData[ModeNumber].Columns;
-    Rows    = TerminalDevice->TerminalConsoleModeData[ModeNumber].Rows;
-
-    mSetModeStringResize[RESIZE_ROW_OFFSET + 0]    = (CHAR16)('0' + (Rows / 100));
-    mSetModeStringResize[RESIZE_ROW_OFFSET + 1]    = (CHAR16)('0' + ((Rows - ((Rows / 100) * 100)) / 10));
-    mSetModeStringResize[RESIZE_ROW_OFFSET + 2]    = (CHAR16)('0' + (Rows % 10));
-    mSetModeStringResize[RESIZE_COLUMN_OFFSET + 0] = (CHAR16)('0' + (Columns / 100));
-    mSetModeStringResize[RESIZE_COLUMN_OFFSET + 1] = (CHAR16)('0' + ((Columns - ((Columns / 100) * 100)) / 10));
-    mSetModeStringResize[RESIZE_COLUMN_OFFSET + 2] = (CHAR16)('0' + (Columns % 10));
-
-    String = mSetModeStringResize;
   }
 
   //
@@ -522,7 +499,7 @@ TerminalConOutSetMode (
   This->ClearScreen (This);
 
   TerminalDevice->OutputEscChar = TRUE;
-  Status                        = This->OutputString (This, String);
+  Status                        = This->OutputString (This, mSetModeString);
   TerminalDevice->OutputEscChar = FALSE;
 
   if (EFI_ERROR (Status)) {
