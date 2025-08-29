@@ -15,9 +15,9 @@
 #include <PrmContextBuffer.h>
 
 #if defined (_MSC_VER)
-#define PRM_EXPORT_API  __declspec(dllexport)
+#define PRM_EXPORT_API  volatile __declspec(dllexport)
 #elif defined (__GNUC__)
-#define PRM_EXPORT_API  __attribute__ ((visibility ("default")))
+#define PRM_EXPORT_API  __attribute__((used)) __attribute__ ((visibility ("default")))
 #else
 #define PRM_EXPORT_API
 #endif

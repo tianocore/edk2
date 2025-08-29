@@ -43,5 +43,4 @@
   MSFT:*_*_*_GENFW_FLAGS = --keepoptionalheader
 
   GCC:*_*_*_GENFW_FLAGS = --prm
-  GCC:*_*_*_DLINK_FLAGS = -Wl,--no-gc-sections -Wl,--require-defined=PrmModuleExportDescriptor -Wl,--require-defined=CheckParamBufferPrmHandler
-  GCC:*_*_X64_OBJCOPY_STRIPFLAG = --keep-symbol=PrmModuleExportDescriptor --keep-symbol=CheckParamBufferPrmHandler
+  GCC:*_*_*_DLINK_FLAGS = -Wl,--no-gc-sections
