@@ -765,7 +765,7 @@ ParsePciRootBridge (
 
     if (AsciiStrCmp (TempStr, "ranges") == 0) {
       DEBUG ((DEBUG_INFO, "  Found ranges Property TempLen (%08X), limit %x\n", TempLen, TempLen / sizeof (UINT32)));
-
+      // TODO:  In future we should fetch these values from fdt and avoid using these Pcds
       mPciRootBridgeInfo->RootBridge[RbIndex].AllocationAttributes = EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM | EFI_PCI_HOST_BRIDGE_MEM64_DECODE;
       mPciRootBridgeInfo->RootBridge[RbIndex].Supports             = ROOT_BRIDGE_SUPPORTS_DEFAULT;
       mPciRootBridgeInfo->RootBridge[RbIndex].PMemAbove4G.Base     = PcdGet64 (PcdPciReservedPMemAbove4GBBase);
@@ -774,6 +774,7 @@ ParsePciRootBridge (
       mPciRootBridgeInfo->RootBridge[RbIndex].PMem.Limit           = PcdGet32 (PcdPciReservedPMemLimit);
       mPciRootBridgeInfo->RootBridge[RbIndex].UID                  = RbIndex;
       mPciRootBridgeInfo->RootBridge[RbIndex].HID                  = EISA_PNP_ID (0x0A03);
+      mPciRootBridgeInfo->RootBridge[RbIndex].DmaAbove4G           = FALSE;
 
       Data32 = (UINT32 *)(PropertyPtr->Data);
       for (Base = 0; Base < TempLen / sizeof (UINT32); Base = Base + DWORDS_TO_NEXT_ADDR_TYPE) {
@@ -801,6 +802,88 @@ ParsePciRootBridge (
 
       DEBUG ((DEBUG_INFO, "PciRootBridge->Io.Base %llx, \n", mPciRootBridgeInfo->RootBridge[RbIndex].Io.Base));
       DEBUG ((DEBUG_INFO, "PciRootBridge->Io.limit %llx, \n", mPciRootBridgeInfo->RootBridge[RbIndex].Io.Limit));
+    }
+
+    //
+    // Check for the "dma-ranges" property to determine if the device supports
+    // DMA (Direct Memory Access) addresses above the 4GiB boundary.
+    //
+    if (AsciiStrCmp (TempStr, "dma-ranges") == 0) {
+      Data32 = (UINT32 *)(PropertyPtr->Data);
+
+      if (TempLen == 0) {
+        continue;
+      }
+
+      //
+      // According to the device tree specification, a dma-ranges entry is a tuple of
+      // (child-bus-address, parent-bus-address, size). The number of 32-bit cells
+      // for each part of the tuple is defined by the '#address-cells' and '#size-cells'
+      // properties.
+      //
+      UINT32  ChildAddrCells = AddressCells;
+
+      UINT32  ParentAddrCells = AddressCells;
+      INT32   ParentNode      = FdtParentOffset (Fdt, Node);
+      if (ParentNode >= 0) {
+        PropertyPtr = FdtGetProperty (Fdt, ParentNode, "#address-cells", &TempLen);
+        if ((PropertyPtr != NULL) && (TempLen > 0)) {
+          ParentAddrCells = Fdt32ToCpu (*(UINT32 *)PropertyPtr->Data);
+        }
+      }
+
+      UINT32  SizeCells = 2;
+      PropertyPtr = FdtGetProperty (Fdt, Node, "#size-cells", &TempLen);
+      if ((PropertyPtr != NULL) && (TempLen > 0)) {
+        SizeCells = Fdt32ToCpu (*(UINT32 *)PropertyPtr->Data);
+      }
+
+      UINT32  TripletCells = ChildAddrCells + ParentAddrCells + SizeCells;
+
+      for (Base = 0; Base < TempLen / sizeof (UINT32); Base = Base + TripletCells) {
+        UINT64  ChildBusAddress  = 0;
+        UINT64  ParentBusAddress = 0;
+        UINT64  DmaRangeSize     = 0;
+
+        if (ChildAddrCells == 3) {
+          ChildBusAddress = (UINT64)Fdt32ToCpu (*(Data32 + Base + 1)) << 32 |
+                            (UINT64)Fdt32ToCpu (*(Data32 + Base + 2));
+        } else if (ChildAddrCells == 2) {
+          ChildBusAddress = (UINT64)Fdt32ToCpu (*(Data32 + Base)) << 32 |
+                            (UINT64)Fdt32ToCpu (*(Data32 + Base + 1));
+        } else if (ChildAddrCells == 1) {
+          ChildBusAddress = Fdt32ToCpu (*(Data32 + Base));
+        }
+
+        UINT32  ParentBase = Base + ChildAddrCells;
+        if (ParentAddrCells == 2) {
+          ParentBusAddress = (UINT64)Fdt32ToCpu (*(Data32 + ParentBase)) << 32 |
+                             (UINT64)Fdt32ToCpu (*(Data32 + ParentBase + 1));
+        } else if (ParentAddrCells == 1) {
+          ParentBusAddress = Fdt32ToCpu (*(Data32 + ParentBase));
+        }
+
+        UINT32  SizeBase = Base + ChildAddrCells + ParentAddrCells;
+        if (SizeCells == 2) {
+          DmaRangeSize = (UINT64)Fdt32ToCpu (*(Data32 + SizeBase)) << 32 |
+                         (UINT64)Fdt32ToCpu (*(Data32 + SizeBase + 1));
+        } else if (SizeCells == 1) {
+          DmaRangeSize = Fdt32ToCpu (*(Data32 + SizeBase));
+        }
+
+        if ((ParentBusAddress > 0xFFFFFFFF) ||
+            ((ParentBusAddress + DmaRangeSize - 1) > 0xFFFFFFFF))
+        {
+          mPciRootBridgeInfo->RootBridge[RbIndex].DmaAbove4G = TRUE;
+          DEBUG ((
+            DEBUG_INFO,
+            "DMA Above 4G supported: Parent=0x%llx, Size=0x%llx\n",
+            ParentBusAddress,
+            DmaRangeSize
+            ));
+          break;
+        }
+      }
     }
 
     if (AsciiStrCmp (TempStr, "reg") == 0) {
@@ -913,7 +996,7 @@ ParseDtb (
           DEBUG ((DEBUG_INFO, "\n         Property(%08X)  %a", Property, TempStr));
           DEBUG ((DEBUG_INFO, "  %016lX  %016lX", StartAddress, NumberOfBytes));
           if (!IsHobConstructed) {
-            if ((NumberOfBytes > MinimalNeededSize) && (StartAddress < BASE_4GB)) {
+            if (NumberOfBytes > MinimalNeededSize) {
               MemoryBottom     = StartAddress + NumberOfBytes - MinimalNeededSize;
               FreeMemoryBottom = MemoryBottom;
               FreeMemoryTop    = StartAddress + NumberOfBytes;
