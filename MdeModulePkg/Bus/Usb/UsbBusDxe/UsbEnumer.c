@@ -330,7 +330,7 @@ UsbSelectSetting (
     }
   }
 
-  if (Index == IfDesc->NumOfSetting) {
+  if ((Index == IfDesc->NumOfSetting) || (Setting == NULL)) {
     return EFI_NOT_FOUND;
   }
 
@@ -393,7 +393,7 @@ UsbSelectConfig (
     }
   }
 
-  if (Index == DevDesc->Desc.NumConfigurations) {
+  if ((Index == DevDesc->Desc.NumConfigurations) || (ConfigDesc == NULL)) {
     return EFI_NOT_FOUND;
   }
 

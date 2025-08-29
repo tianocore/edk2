@@ -149,10 +149,7 @@ BuildHddPasswordDeviceInfo (
     S3InitDevicesExist = FALSE;
   } else if (Status == EFI_BUFFER_TOO_SMALL) {
     S3InitDevices = AllocatePool (S3InitDevicesLength);
-    if (S3InitDevices == NULL) {
-      ASSERT (S3InitDevices != NULL);
-      return;
-    }
+    ASSERT (S3InitDevices != NULL);
 
     Status = RestoreLockBox (
                &gS3StorageDeviceInitListGuid,
@@ -187,10 +184,7 @@ BuildHddPasswordDeviceInfo (
         FreePool (S3InitDevicesBak);
       }
 
-      if (S3InitDevices == NULL) {
-        ASSERT (S3InitDevices != NULL);
-        return;
-      }
+      ASSERT (S3InitDevices != NULL);
 
       TempDevInfo = (HDD_PASSWORD_DEVICE_INFO *)((UINTN)TempDevInfo +
                                                  sizeof (HDD_PASSWORD_DEVICE_INFO) +
@@ -2201,14 +2195,8 @@ HddPasswordFormExtractConfig (
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
     ConfigRequestHdr = HiiConstructConfigHdr (&mHddPasswordVendorGuid, mHddPasswordVendorStorageName, Private->DriverHandle);
-    if (ConfigRequestHdr == NULL) {
-      ASSERT (ConfigRequestHdr != NULL);
-      FreePool (IfrData);
-      return EFI_OUT_OF_RESOURCES;
-    }
-
-    Size          = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
-    ConfigRequest = AllocateZeroPool (Size);
+    Size             = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest    = AllocateZeroPool (Size);
     ASSERT (ConfigRequest != NULL);
     AllocatedRequest = TRUE;
     UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
@@ -2398,11 +2386,7 @@ HddPasswordFormCallback (
           // In case goto the device configuration form, update the device form title.
           //
           ConfigFormEntry = HddPasswordGetConfigFormEntryByIndex ((UINT32)(QuestionId - KEY_HDD_DEVICE_ENTRY_BASE));
-          if (ConfigFormEntry == NULL) {
-            ASSERT (ConfigFormEntry != NULL);
-            FreePool (IfrData);
-            return EFI_NOT_FOUND;
-          }
+          ASSERT (ConfigFormEntry != NULL);
 
           DeviceFormTitleToken = (EFI_STRING_ID)STR_HDD_SECURITY_HD;
           HiiSetString (Private->HiiHandle, DeviceFormTitleToken, ConfigFormEntry->HddString, NULL);

@@ -883,7 +883,7 @@ IsCertHashFoundInDbx (
     return Status;
   }
 
-  while ((DbxSize > 0) && (SignatureListSize >= (UINTN)DbxList->SignatureListSize)) {
+  while ((DbxSize > 0) && (SignatureListSize >= DbxList->SignatureListSize)) {
     //
     // Determine Hash Algorithm of Certificate in the forbidden database.
     //
@@ -1028,7 +1028,7 @@ IsSignatureFoundInDatabase (
   // Enumerate all signature data in SigDB to check if signature exists for executable.
   //
   CertList = (EFI_SIGNATURE_LIST *)Data;
-  while ((DataSize > 0) && (DataSize >= (UINTN)CertList->SignatureListSize)) {
+  while ((DataSize > 0) && (DataSize >= CertList->SignatureListSize)) {
     CertCount = (CertList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - CertList->SignatureHeaderSize) / CertList->SignatureSize;
     Cert      = (EFI_SIGNATURE_DATA *)((UINT8 *)CertList + sizeof (EFI_SIGNATURE_LIST) + CertList->SignatureHeaderSize);
     if ((CertList->SignatureSize == sizeof (EFI_SIGNATURE_DATA) - 1 + SignatureSize) && (CompareGuid (&CertList->SignatureType, CertType))) {
@@ -1193,7 +1193,7 @@ PassTimestampCheck (
   }
 
   CertList = (EFI_SIGNATURE_LIST *)DbtData;
-  while ((DbtDataSize > 0) && (DbtDataSize >= (UINTN)CertList->SignatureListSize)) {
+  while ((DbtDataSize > 0) && (DbtDataSize >= CertList->SignatureListSize)) {
     if (CompareGuid (&CertList->SignatureType, &gEfiCertX509Guid)) {
       Cert      = (EFI_SIGNATURE_DATA *)((UINT8 *)CertList + sizeof (EFI_SIGNATURE_LIST) + CertList->SignatureHeaderSize);
       CertCount = (CertList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - CertList->SignatureHeaderSize) / CertList->SignatureSize;
@@ -1319,7 +1319,7 @@ IsForbiddenByDbx (
   //
   CertList     = (EFI_SIGNATURE_LIST *)Data;
   CertListSize = DataSize;
-  while ((CertListSize > 0) && (CertListSize >= (UINTN)CertList->SignatureListSize)) {
+  while ((CertListSize > 0) && (CertListSize >= CertList->SignatureListSize)) {
     if (CompareGuid (&CertList->SignatureType, &gEfiCertX509Guid)) {
       CertData  = (EFI_SIGNATURE_DATA *)((UINT8 *)CertList + sizeof (EFI_SIGNATURE_LIST) + CertList->SignatureHeaderSize);
       CertCount = (CertList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - CertList->SignatureHeaderSize) / CertList->SignatureSize;
@@ -1524,7 +1524,7 @@ IsAllowedByDb (
   // Find X509 certificate in Signature List to verify the signature in pkcs7 signed data.
   //
   CertList = (EFI_SIGNATURE_LIST *)Data;
-  while ((DataSize > 0) && (DataSize >= (UINTN)CertList->SignatureListSize)) {
+  while ((DataSize > 0) && (DataSize >= CertList->SignatureListSize)) {
     if (CompareGuid (&CertList->SignatureType, &gEfiCertX509Guid)) {
       CertData  = (EFI_SIGNATURE_DATA *)((UINT8 *)CertList + sizeof (EFI_SIGNATURE_LIST) + CertList->SignatureHeaderSize);
       CertCount = (CertList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - CertList->SignatureHeaderSize) / CertList->SignatureSize;
@@ -1703,6 +1703,13 @@ DxeImageVerificationHandler (
   IsVerified        = FALSE;
   IsFound           = FALSE;
   IsFoundInDatabase = FALSE;
+
+  //
+  // Sanity check
+  //
+  if (File == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   //
   // Check the image type and get policy setting.
@@ -2050,9 +2057,8 @@ Failed:
   // executable information table in either case.
   //
   NameStr = ConvertDevicePathToText (File, FALSE, TRUE);
-
+  AddImageExeInfo (Action, NameStr, File, SignatureList, SignatureListSize);
   if (NameStr != NULL) {
-    AddImageExeInfo (Action, NameStr, File, SignatureList, SignatureListSize);
     DEBUG ((DEBUG_INFO, "The image doesn't pass verification: %s\n", NameStr));
     FreePool (NameStr);
   }
