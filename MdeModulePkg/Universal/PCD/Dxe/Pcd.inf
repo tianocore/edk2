@@ -322,6 +322,7 @@
   BaseLib
   PcdLib
   DxeServicesLib
+  VariablePolicyHelperLib
 
 [Guids]
   gPcdDataBaseHobGuid                           ## SOMETIMES_CONSUMES  ## HOB
@@ -335,7 +336,7 @@
   gEfiGetPcdInfoProtocolGuid                    ## SOMETIMES_PRODUCES
   ## NOTIFY
   ## SOMETIMES_CONSUMES
-  gEdkiiVariableLockProtocolGuid
+  gEdkiiVariablePolicyProtocolGuid
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress      ## SOMETIMES_CONSUMES
