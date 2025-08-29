@@ -2879,6 +2879,14 @@ TABLE_ITEM  MemoryDeviceTypeTable[] = {
   {
     MemoryTypeLpddr5,
     L"  LPDDR5"
+  },
+  {
+    MemoryTypeHBM3,
+    L"  HBM3 (High Bandwidth Memory Generation 3)"
+  },
+  {
+    MemoryTypeMRDIMM,
+    L"  MRDIMM (Multi-Channel RDIMM)"
   }
 };
 
@@ -2969,6 +2977,10 @@ TABLE_ITEM  MemoryDeviceMemoryTechnologyTable[] = {
   {
     MemoryTechnologyIntelOptanePersistentMemory,
     L" Intel Optane Persistent Memory"
+  },
+  {
+    MemoryTechnologyMrdimm,
+    L" MRDIMM"
   }
 };
 
