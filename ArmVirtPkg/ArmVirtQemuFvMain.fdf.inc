@@ -133,6 +133,13 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
 
   #
+  # SATA
+  #
+  INF  MdeModulePkg/Bus/Pci/SataControllerDxe/SataControllerDxe.inf
+  INF  MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
+  INF  MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
+
+  #
   # NVME Driver
   #
   INF MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
