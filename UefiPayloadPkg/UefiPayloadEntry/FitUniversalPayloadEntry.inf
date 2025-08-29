@@ -85,6 +85,8 @@
   gUniversalPayloadPciRootBridgeInfoGuid
   gUniversalPayloadSmbios3TableGuid
   gUniversalPayloadDeviceTreeGuid
+  gUniversalPayloadRamdiskGuid
+  gFdtHobGuid
 
 [FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES

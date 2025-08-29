@@ -8,6 +8,7 @@
 #include <UniversalPayload/SerialPortInfo.h>
 #include <UniversalPayload/PciRootBridges.h>
 #include <UniversalPayload/ExtraData.h>
+#include <UniversalPayload/Ramdisk.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/AcpiBoardInfoGuid.h>
 #include <Library/HobPrintLib.h>
@@ -265,6 +266,28 @@ PrintMemoryTypeInfoGuidHob (
   return EFI_SUCCESS;
 }
 
+/**
+  Print the information in UniversalPayloadRamdiskGuidHob.
+  @param[in] HobRaw          A pointer to the start of gUniversalPayloadRamdiskGuid HOB.
+  @param[in] HobLength       The size of the HOB data buffer.
+
+  @retval EFI_SUCCESS        If it completed successfully.
+**/
+EFI_STATUS
+PrintRamdiskHob (
+  IN  UINT8   *HobRaw,
+  IN  UINT16  HobLength
+  )
+{
+  UNIVERSAL_PAYLOAD_RAMDISK  *Ramdisk;
+
+  Ramdisk = (UNIVERSAL_PAYLOAD_RAMDISK *)GET_GUID_HOB_DATA (HobRaw);
+  ASSERT (HobLength >= sizeof (*Ramdisk));
+  DEBUG ((DEBUG_INFO, "   Base    = 0x%x\n", Ramdisk->RamdiskBase));
+  DEBUG ((DEBUG_INFO, "   Size    = 0x%x\n", Ramdisk->RamdiskSize));
+  return EFI_SUCCESS;
+}
+
 //
 // Mappint table for dump Guid Hob information.
 // This table can be easily extented.
@@ -279,7 +302,8 @@ GUID_HOB_PRINT_HANDLE  GuidHobPrintHandleTable[] = {
   { &gUefiAcpiBoardInfoGuid,                 PrintAcpiBoardInfoGuidHob,     "gUefiAcpiBoardInfoGuid(Acpi Guid)"                           },
   { &gUniversalPayloadPciRootBridgeInfoGuid, PrintPciRootBridgeInfoGuidHob, "gUniversalPayloadPciRootBridgeInfoGuid(Pci Guid)"            },
   { &gEfiMemoryTypeInformationGuid,          PrintMemoryTypeInfoGuidHob,    "gEfiMemoryTypeInformationGuid(Memory Type Information Guid)" },
-  { &gUniversalPayloadExtraDataGuid,         PrintExtraDataGuidHob,         "gUniversalPayloadExtraDataGuid(PayLoad Extra Data Guid)"     }
+  { &gUniversalPayloadExtraDataGuid,         PrintExtraDataGuidHob,         "gUniversalPayloadExtraDataGuid(PayLoad Extra Data Guid)"     },
+  { &gUniversalPayloadRamdiskGuid,           PrintRamdiskHob,               "gUniversalPayloadRamdisk(Ramdisk Guid)"                      }
 };
 
 /**
