@@ -1,7 +1,7 @@
 /** @file
 *  File managing the MMU for ARMv8 architecture
 *
-*  Copyright (c) 2011-2020, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2025, ARM Limited. All rights reserved.
 *  Copyright (c) 2016, Linaro Limited. All rights reserved.
 *  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
 *
@@ -91,9 +91,24 @@ ArmMemoryAttributeToPageAttribute (
   }
 }
 
+// T0SZ can be below MIN_T0SZ when LPA2 is in use, meaning the page table starts at level -1
 #define MIN_T0SZ        16
 #define BITS_PER_LEVEL  9
-#define MAX_VA_BITS     48
+#define MAX_VA_BITS     52
+
+STATIC
+UINT64
+GetPageTableAddress (
+  IN  UINTN  Address,
+  IN  UINTN  VaBits
+  )
+{
+  if (VaBits == 52) {
+    return ((UINTN)Address & 0x0003fffffffff000) | (((UINTN)Address >> 50) << 8);
+  }
+
+  return Address;
+}
 
 STATIC
 UINTN
@@ -105,12 +120,12 @@ GetRootTableEntryCount (
 }
 
 STATIC
-UINTN
+INTN
 GetRootTableLevel (
   IN  UINTN  T0SZ
   )
 {
-  return (T0SZ - MIN_T0SZ) / BITS_PER_LEVEL;
+  return (INTN)(T0SZ - MIN_T0SZ) / BITS_PER_LEVEL;
 }
 
 STATIC
@@ -222,8 +237,10 @@ UpdateRegionMappingRecursive (
   IN  UINT64   AttributeSetMask,
   IN  UINT64   AttributeClearMask,
   IN  UINT64   *PageTable,
-  IN  UINTN    Level,
-  IN  BOOLEAN  TableIsLive
+  IN  INTN     Level,
+  IN  BOOLEAN  IsRootTable,
+  IN  BOOLEAN  TableIsLive,
+  IN  UINTN    VaBits
   )
 {
   UINTN       BlockShift;
@@ -316,7 +333,9 @@ UpdateRegionMappingRecursive (
                      0,
                      TranslationTable,
                      Level + 1,
-                     FALSE
+                     FALSE,
+                     FALSE,
+                     VaBits
                      );
           if (EFI_ERROR (Status)) {
             //
@@ -345,7 +364,9 @@ UpdateRegionMappingRecursive (
                  AttributeClearMask,
                  TranslationTable,
                  Level + 1,
-                 NextTableIsLive
+                 FALSE,
+                 NextTableIsLive,
+                 VaBits
                  );
       if (EFI_ERROR (Status)) {
         if (!IsTableEntry (*Entry, Level)) {
@@ -363,7 +384,8 @@ UpdateRegionMappingRecursive (
       }
 
       if (!IsTableEntry (*Entry, Level)) {
-        EntryValue = (UINTN)TranslationTable | TT_TYPE_TABLE_ENTRY;
+        EntryValue = GetPageTableAddress ((UINTN)TranslationTable, VaBits) | TT_TYPE_TABLE_ENTRY;
+
         ReplaceTableEntry (
           Entry,
           EntryValue,
@@ -373,8 +395,9 @@ UpdateRegionMappingRecursive (
           );
       }
     } else {
-      EntryValue  = (*Entry & AttributeClearMask) | AttributeSetMask;
-      EntryValue |= RegionStart;
+      EntryValue  = ((*Entry & AttributeClearMask) | AttributeSetMask);
+      EntryValue &= (VaBits == 52) ? (~TT_UPPER_ADDRESS_MASK) : MAX_UINT64;
+      EntryValue |= GetPageTableAddress (RegionStart, VaBits);
       EntryValue |= (Level == 3) ? TT_TYPE_BLOCK_ENTRY_LEVEL3
                                  : TT_TYPE_BLOCK_ENTRY;
 
@@ -393,7 +416,8 @@ UpdateRegionMapping (
   IN  UINT64   AttributeSetMask,
   IN  UINT64   AttributeClearMask,
   IN  UINT64   *RootTable,
-  IN  BOOLEAN  TableIsLive
+  IN  BOOLEAN  TableIsLive,
+  IN  UINTN    VaBits
   )
 {
   UINTN  T0SZ;
@@ -418,7 +442,9 @@ UpdateRegionMapping (
            AttributeClearMask,
            RootTable,
            GetRootTableLevel (T0SZ),
-           TableIsLive
+           TRUE,
+           TableIsLive,
+           VaBits
            );
 }
 
@@ -426,7 +452,8 @@ STATIC
 EFI_STATUS
 FillTranslationTable (
   IN  UINT64                        *RootTable,
-  IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryRegion
+  IN  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryRegion,
+  IN  BOOLEAN                       VaBits
   )
 {
   return UpdateRegionMapping (
@@ -435,7 +462,8 @@ FillTranslationTable (
            ArmMemoryAttributeToPageAttribute (MemoryRegion->Attributes) | TT_AF,
            0,
            RootTable,
-           FALSE
+           FALSE,
+           VaBits
            );
 }
 
@@ -484,6 +512,24 @@ GcdAttributeToPageAttribute (
   }
 
   return PageAttributes;
+}
+
+STATIC
+UINTN
+ArmMmuGetVaBits (
+  )
+{
+  UINTN   MaxAddressBits;
+  UINT64  MaxAddress;
+
+  MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS);
+  MaxAddress     = LShiftU64 (1ULL, MaxAddressBits) - 1;
+
+  if ((MaxAddress > SIZE_256TB) && ArmHas52BitTgran4 ()) {
+    return 52;
+  }
+
+  return 48;
 }
 
 /**
@@ -565,7 +611,8 @@ ArmSetMemoryAttributes (
            PageAttributes,
            PageAttributeMask,
            ArmGetTTBR0BaseAddress (),
-           TRUE
+           TRUE,
+           ArmMmuGetVaBits ()
            );
 }
 
@@ -583,6 +630,7 @@ ArmConfigureMmu (
   UINTN       T0SZ;
   UINTN       RootTableEntryCount;
   UINT64      TCR;
+  UINTN       VaBits;
   EFI_STATUS  Status;
 
   ASSERT (ArmReadCurrentEL () < AARCH64_EL3);
@@ -608,6 +656,8 @@ ArmConfigureMmu (
   T0SZ                = 64 - MaxAddressBits;
   RootTableEntryCount = GetRootTableEntryCount (T0SZ);
 
+  VaBits = 48;
+
   //
   // Set TCR that allows us to retrieve T0SZ in the subsequent functions
   //
@@ -628,13 +678,16 @@ ArmConfigureMmu (
       TCR |= TCR_PS_16TB;
     } else if (MaxAddress < SIZE_256TB) {
       TCR |= TCR_PS_256TB;
+    } else if ((MaxAddress < SIZE_4PB) && ArmHas52BitTgran4 ()) {
+      TCR   |= TCR_PS_4PB | TCR_DS;
+      VaBits = 52;
     } else {
       DEBUG ((
         DEBUG_ERROR,
         "ArmConfigureMmu: The MaxAddress 0x%lX is not supported by this MMU configuration.\n",
         MaxAddress
         ));
-      ASSERT (0); // Bigger than 48-bit memory space are not supported
+      ASSERT (0); // Bigger than 48/52-bit memory space are not supported
       return EFI_UNSUPPORTED;
     }
   } else {
@@ -654,13 +707,16 @@ ArmConfigureMmu (
       TCR |= TCR_IPS_16TB;
     } else if (MaxAddress < SIZE_256TB) {
       TCR |= TCR_IPS_256TB;
+    } else if ((MaxAddress < SIZE_4PB) && ArmHas52BitTgran4 ()) {
+      TCR   |= TCR_IPS_4PB | TCR_DS;
+      VaBits = 52;
     } else {
       DEBUG ((
         DEBUG_ERROR,
         "ArmConfigureMmu: The MaxAddress 0x%lX is not supported by this MMU configuration.\n",
         MaxAddress
         ));
-      ASSERT (0); // Bigger than 48-bit memory space are not supported
+      ASSERT (0); // Bigger than 48/52-bit memory space are not supported
       return EFI_UNSUPPORTED;
     }
   }
@@ -709,7 +765,7 @@ ArmConfigureMmu (
   ZeroMem (TranslationTable, RootTableEntryCount * sizeof (UINT64));
 
   while (MemoryTable->Length != 0) {
-    Status = FillTranslationTable (TranslationTable, MemoryTable);
+    Status = FillTranslationTable (TranslationTable, MemoryTable, VaBits);
     if (EFI_ERROR (Status)) {
       goto FreeTranslationTable;
     }
