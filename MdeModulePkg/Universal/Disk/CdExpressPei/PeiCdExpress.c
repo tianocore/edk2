@@ -199,13 +199,13 @@ UpdateBlocksAndVolumes (
     }
 
     PeiServices = (EFI_PEI_SERVICES  **)GetPeiServicesTablePointer ();
-    if (BlockIo2) {
+    if (BlockIo2 && (BlockIo2Ppi != NULL)) {
       Status = BlockIo2Ppi->GetNumberOfBlockDevices (
                               PeiServices,
                               BlockIo2Ppi,
                               &NumberBlockDevices
                               );
-    } else {
+    } else if (BlockIoPpi != NULL) {
       Status = BlockIoPpi->GetNumberOfBlockDevices (
                              PeiServices,
                              BlockIoPpi,
@@ -221,7 +221,7 @@ UpdateBlocksAndVolumes (
     // Just retrieve the first block, should emulate all blocks.
     //
     for (IndexBlockDevice = 1; IndexBlockDevice <= NumberBlockDevices && PrivateData->CapsuleCount < PEI_CD_EXPRESS_MAX_CAPSULE_NUMBER; IndexBlockDevice++) {
-      if (BlockIo2) {
+      if (BlockIo2 && (BlockIo2Ppi != NULL)) {
         Status = BlockIo2Ppi->GetBlockDeviceMediaInfo (
                                 PeiServices,
                                 BlockIo2Ppi,
@@ -240,7 +240,7 @@ UpdateBlocksAndVolumes (
         DEBUG ((DEBUG_INFO, "PeiCdExpress InterfaceType is %d\n", Media2.InterfaceType));
         DEBUG ((DEBUG_INFO, "PeiCdExpress MediaPresent is %d\n", Media2.MediaPresent));
         DEBUG ((DEBUG_INFO, "PeiCdExpress BlockSize is  0x%x\n", Media2.BlockSize));
-      } else {
+      } else if (BlockIoPpi != NULL) {
         Status = BlockIoPpi->GetBlockDeviceMediaInfo (
                                PeiServices,
                                BlockIoPpi,
