@@ -864,19 +864,23 @@ Ip6ManualAddrDadCallback (
         // data with those passed.
         //
         PassedAddr = (EFI_IP6_CONFIG_MANUAL_ADDRESS *)AllocatePool (Item->DataSize);
-        ASSERT (PassedAddr != NULL);
+        if (PassedAddr == NULL) {
+          ASSERT (PassedAddr != NULL);
+          Item->Data.Ptr = NULL;
+          Item->Status   = EFI_OUT_OF_RESOURCES;
+        } else {
+          Item->Data.Ptr = PassedAddr;
+          Item->Status   = EFI_SUCCESS;
 
-        Item->Data.Ptr = PassedAddr;
-        Item->Status   = EFI_SUCCESS;
+          while (!NetMapIsEmpty (&Instance->DadPassedMap)) {
+            ManualAddr = (EFI_IP6_CONFIG_MANUAL_ADDRESS *)NetMapRemoveHead (&Instance->DadPassedMap, NULL);
+            CopyMem (PassedAddr, ManualAddr, sizeof (EFI_IP6_CONFIG_MANUAL_ADDRESS));
 
-        while (!NetMapIsEmpty (&Instance->DadPassedMap)) {
-          ManualAddr = (EFI_IP6_CONFIG_MANUAL_ADDRESS *)NetMapRemoveHead (&Instance->DadPassedMap, NULL);
-          CopyMem (PassedAddr, ManualAddr, sizeof (EFI_IP6_CONFIG_MANUAL_ADDRESS));
+            PassedAddr++;
+          }
 
-          PassedAddr++;
+          ASSERT ((UINTN)PassedAddr - (UINTN)Item->Data.Ptr == Item->DataSize);
         }
-
-        ASSERT ((UINTN)PassedAddr - (UINTN)Item->Data.Ptr == Item->DataSize);
       }
     } else {
       //

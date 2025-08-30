@@ -822,7 +822,7 @@ IScsiCreateAttempts (
   UINT8                        Index;
   EFI_STATUS                   Status;
 
-  for (Index = 1; Index <= AttemptNum; Index++) {
+  for (Index = 1; (UINTN)Index <= AttemptNum; Index++) {
     //
     // Get the initialized attempt order. This is used to essure creating attempts by order.
     //
@@ -2219,7 +2219,11 @@ IScsiGetConfigData (
     //
 
     NicInfo = IScsiGetNicInfoByIndex (mPrivate->CurrentNic);
-    ASSERT (NicInfo != NULL);
+    if (NicInfo == NULL) {
+      ASSERT (NicInfo != NULL);
+      break;
+    }
+
     IScsiMacAddrToStr (&NicInfo->PermanentAddress, NicInfo->HwAddressSize, NicInfo->VlanId, MacString);
     UnicodeSPrint (
       mPrivate->PortString,
