@@ -18,14 +18,11 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#  VALID_ARCHITECTURES           = X64 ARM AARCH64
 #
 
-[Sources.IA32, Sources.X64]
+[Sources.X64]
   X86XenHypercall.c
-
-[Sources.IA32]
-  Ia32/hypercall.nasm
 
 [Sources.X64]
   X64/hypercall.nasm
@@ -46,11 +43,11 @@
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
 
-[LibraryClasses.IA32, LibraryClasses.X64]
+[LibraryClasses.X64]
   CpuLib
   BaseLib
   HobLib
   DebugLib
 
-[Guids.IA32, Guids.X64]
+[Guids.X64]
   gEfiXenInfoGuid

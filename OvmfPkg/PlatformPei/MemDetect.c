@@ -126,18 +126,6 @@ AddressWidthInitialization (
 
   PlatformAddressWidthInitialization (PlatformInfoHob);
 
-  //
-  // If DXE is 32-bit, then we're done; PciBusDxe will degrade 64-bit MMIO
-  // resources to 32-bit anyway. See DegradeResource() in
-  // "PciResourceSupport.c".
-  //
- #ifdef MDE_CPU_IA32
-  if (!FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
-    return;
-  }
-
- #endif
-
   if (PlatformInfoHob->PcdPciMmio64Size == 0) {
     if (PlatformInfoHob->BootMode != BOOT_ON_S3_RESUME) {
       DEBUG ((
@@ -193,16 +181,6 @@ GetPeiMemoryCap (
   UINT32   TotalPages;
   UINT64   ApStacks;
   UINT64   MemoryCap;
-
-  //
-  // If DXE is 32-bit, then just return the traditional 64 MB cap.
-  //
- #ifdef MDE_CPU_IA32
-  if (!FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
-    return SIZE_64MB;
-  }
-
- #endif
 
   //
   // Dependent on physical address width, PEI memory allocations can be

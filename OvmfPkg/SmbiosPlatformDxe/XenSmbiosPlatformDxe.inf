@@ -21,7 +21,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64
+#  VALID_ARCHITECTURES           = X64 EBC ARM AARCH64
 #
 
 [Sources]
@@ -30,7 +30,7 @@
   Xen.c
   XenSmbiosPlatformDxe.h
 
-[Sources.IA32, Sources.X64]
+[Sources.X64]
   X86Xen.c
 
 [Sources.ARM, Sources.AARCH64]
@@ -40,7 +40,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
-[Packages.IA32, Packages.X64]
+[Packages.X64]
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
@@ -50,7 +50,7 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
 
-[LibraryClasses.IA32, LibraryClasses.X64]
+[LibraryClasses.X64]
   HobLib
 
 [Pcd]
@@ -61,7 +61,7 @@
 [Protocols]
   gEfiSmbiosProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
 
-[Guids.IA32, Guids.X64]
+[Guids.X64]
   gEfiXenInfoGuid
 
 [Depex]

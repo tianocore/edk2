@@ -18,7 +18,7 @@
   DEFINE DEBUG_PRINT_ERROR_LEVEL = 0x8000004F
 
 # Dynamic stack cookies pushes the FD size up slightly over 2MB
-!if $(TARGET) != NOOPT && $(ARCH) == ARM
+!if $(TARGET) != NOOPT
   DEFINE FD_SIZE_IN_MB    = 2
 !else
   DEFINE FD_SIZE_IN_MB    = 3
@@ -37,7 +37,6 @@
   GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
-  GCC:*_*_ARM_DLINK_FLAGS = -z common-page-size=0x1000
   GCC:*_*_AARCH64_DLINK_FLAGS = -z common-page-size=0x10000
 
 [LibraryClasses.common]
@@ -95,9 +94,6 @@
 
   # Networking Requirements
 !include NetworkPkg/NetworkLibs.dsc.inc
-!if ($(NETWORK_TLS_ENABLE) == TRUE) AND ($(ARCH) == ARM)
-  !error "NETWORK_TLS_ENABLE is not supported on ARM build!"
-!endif
 
   # ARM Architectural Libraries
   CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
@@ -178,6 +174,9 @@
   UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
 
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
+
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+  TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
 
 [LibraryClasses.common.SEC]
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
@@ -262,23 +261,7 @@
 !endif
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
 
-[LibraryClasses.AARCH64.DXE_RUNTIME_DRIVER]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
-
-[LibraryClasses.ARM.DXE_RUNTIME_DRIVER]
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLibMbedTls/RuntimeCryptLib.inf
-
-[LibraryClasses.AARCH64]
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-  TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
-
-[LibraryClasses.ARM]
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLibMbedTls/BaseCryptLib.inf
-  MbedTlsLib|CryptoPkg/Library/MbedTlsLib/MbedTlsLib.inf
-  RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
-  UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
-  UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
-  DxeCoreEntryPoint|MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
 
 [BuildOptions]
   GCC:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
@@ -299,7 +282,6 @@
 
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
 
-[PcdsFeatureFlag.AARCH64]
   #
   # Activate AcpiSdtProtocol
   #
@@ -407,7 +389,6 @@
 
 !include OvmfPkg/Include/Dsc/ShellComponents.dsc.inc
 
-[Components.AARCH64]
   #
   # ACPI Support
   #

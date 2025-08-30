@@ -11,7 +11,6 @@ supported and are described below.
 
 | Configuration name      | Architectures      | DSC File            |Additional Flags |
 | :----                   | :-----             | :----               | :----           |
-| IA32                    | IA32               | OvmfPkgIa32.dsc     | None            |
 | X64                     | X64                | OvmfPkgIa64.dsc     | None            |
 | IA32 X64                | PEI-IA32 DXE-X64   | OvmfPkgIa32X64.dsc  | None            |
 | IA32 X64 Full           | PEI-IA32 DXE-X64   | OvmfPkgIa32X64.dsc  | SECURE_BOOT_ENABLE=1 SMM_REQUIRE=1 TPM1_ENABLE=1 TPM2_ENABLE=1 NETWORK_TLS_ENABLE=1 NETWORK_IP6_ENABLE=1 NETWORK_HTTP_BOOT_ENABLE=1 |
@@ -79,12 +78,6 @@ the generic set of edk2 [Build Instructions](https://github.com/tianocore/tianoc
     ```
 
 7. Compile Firmware
-    - To build IA32
-
-    ``` bash
-    stuart_build -c OvmfPkg/PlatformCI/PlatformBuild.py -a IA32 TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG>
-    ```
-
     - To build X64
 
     ``` bash

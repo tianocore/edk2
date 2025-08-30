@@ -57,7 +57,6 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
         ret = RunCmd("git", "config --file .gitmodules --get-regexp path", workingdir=self.GetWorkspaceRoot(), outstream=result)
         # Cmd output is expected to look like:
         # submodule.CryptoPkg/Library/OpensslLib/openssl.path CryptoPkg/Library/OpensslLib/openssl
-        # submodule.SoftFloat.path ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3
         if ret == 0:
             for line in result.getvalue().splitlines():
                 _, _, path = line.partition(" ")
@@ -94,8 +93,6 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
         if GetHostInfo().os.upper() == "LINUX" and ActualToolChainTag.upper().startswith("GCC"):
             if "AARCH64" in self.ActualArchitectures:
                 scopes += ("gcc_aarch64_linux",)
-            if "ARM" in self.ActualArchitectures:
-                scopes += ("gcc_arm_linux",)
         return scopes
 
     def FilterPackagesToTest(self, changedFilesList: list, potentialPackagesList: list) -> list:
@@ -168,8 +165,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         if GetHostInfo().os.upper() == "LINUX" and ActualToolChainTag.upper().startswith("GCC"):
             if "AARCH64" == Arch:
                 scopes += ("gcc_aarch64_linux",)
-            elif "ARM" == Arch:
-                scopes += ("gcc_arm_linux",)
         return scopes
 
     def GetName(self):
@@ -236,10 +231,6 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             cmd = "qemu-system-aarch64"
             args = "-M virt"
             args += " -cpu neoverse-n2"                                         # emulate cpu
-        elif(self.env.GetValue("TARGET_ARCH").upper() == "ARM"):
-            cmd = "qemu-system-arm"
-            args = "-M virt,highmem=off"
-            args += " -cpu cortex-a15"                                          # emulate cpu
         else:
             raise NotImplementedError()
 

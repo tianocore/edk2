@@ -216,16 +216,6 @@ GetPeiMemoryCap (
   UINTN    TotalPages;
 
   //
-  // If DXE is 32-bit, then just return the traditional 64 MB cap.
-  //
- #ifdef MDE_CPU_IA32
-  if (!FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
-    return SIZE_64MB;
-  }
-
- #endif
-
-  //
   // Dependent on physical address width, PEI memory allocations can be
   // dominated by the page tables built for 64-bit DXE. So we key the cap off
   // of those. The code below is based on CreateIdentityMappingPageTables() in

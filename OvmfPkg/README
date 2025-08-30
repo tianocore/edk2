@@ -10,7 +10,7 @@ http://www.tianocore.org/ovmf/
 === STATUS ===
 
 Current capabilities:
-* IA32 and X64 architectures
+* X64 architecture (optionally with IA32 SEC/PEI)
 * QEMU (version 1.7.1 or later, with 1.7 or later machine types)
   - Video, keyboard, IDE, CD-ROM, serial
   - Runs UEFI shell
@@ -36,13 +36,11 @@ Pre-requisites:
 
 Update Conf/target.txt ACTIVE_PLATFORM for OVMF:
                              PEI arch   DXE arch   UEFI interfaces
-* OvmfPkg/OvmfPkgIa32.dsc      IA32       IA32           IA32
 * OvmfPkg/OvmfPkgIa32X64.dsc   IA32       X64            X64
 * OvmfPkg/OvmfPkgX64.dsc       X64        X64            X64
 
 Update Conf/target.txt TARGET_ARCH based on the .dsc file:
                              TARGET_ARCH
-* OvmfPkg/OvmfPkgIa32.dsc     IA32
 * OvmfPkg/OvmfPkgIa32X64.dsc  IA32 X64
 * OvmfPkg/OvmfPkgX64.dsc      X64
 
@@ -65,7 +63,7 @@ https://github.com/tianocore/tianocore.github.io/wiki/How%20to%20build%20OVMF
 === RUNNING OVMF on QEMU ===
 
 * Be sure to use qemu-system-x86_64, if you are using an X64 firmware.
-  (qemu-system-x86_64 works for the IA32 firmware as well, of course.)
+  (qemu-system-x86_64 works for the IA32 SEC/PEI as well, of course.)
 * Use OVMF for QEMU firmware (3 options available)
   - Option 1: Use QEMU -pflash parameter
     * QEMU/OVMF will use emulated flash, and fully support UEFI variables
@@ -118,9 +116,6 @@ $ OvmfPkg/build.sh -a X64 qemu
 
 And to run a 64-bit UEFI bootable ISO image:
 $ OvmfPkg/build.sh -a X64 qemu -cdrom /path/to/disk-image.iso
-
-To build a 32-bit OVMF without debug messages using GCC 4.8:
-$ OvmfPkg/build.sh -a IA32 -b RELEASE -t GCC48
 
 === Secure Boot ===
 
@@ -230,7 +225,6 @@ initialization and runtime phases are distinct from Traditional MM.
 Due to the nature of Standalone MM, there are some limitations, requirements and
 considerations when using it in OVMF:
 
-* Standalone MM is only supported in X64 mode and is not available in IA32 mode.
 * The Standalone MM driver must be built with `-D STANDALONE_MM_ENABLE` flag.
 * For X64, Standalone MM does not currently support S3 resume or LockBox
   functionality. While LockBox functionality could be supported in the future
@@ -295,9 +289,6 @@ longer.)
       "unzip" utility on platforms different from Windows as well).
     - Copy the "APPS/EFI/EFIx64/E3522X2.EFI" driver binary to
       "Intel3.5/EFIX64/E3522X2.EFI" in your WORKSPACE.
-    - Intel have stopped distributing an IA32 driver binary (which used to
-      match the filename pattern "E35??E2.EFI"), thus this method will only
-      work for the IA32X64 and X64 builds of OVMF.
 
   - Include the driver in OVMF during the build:
     - Add "-D E1000_ENABLE" to your build command (only when building

@@ -123,10 +123,10 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
 
     def AddCommandLineOptions(self, parserObj):
         ''' Add command line options to the argparser '''
-        parserObj.add_argument('-a', "--arch", dest="build_arch", type=str, default="IA32,X64",
-            help="Optional - CSV of architecture to build.  IA32 will use IA32 for Pei & Dxe. "
+        parserObj.add_argument('-a', "--arch", dest="build_arch", type=str, default="X64",
+            help="Optional - CSV of architecture to build. "
             "X64 will use X64 for both PEI and DXE.  IA32,X64 will use IA32 for PEI and "
-            "X64 for DXE. default is IA32,X64")
+            "X64 for DXE. Default is X64")
 
     def RetrieveCommandLineOptions(self, args):
         '''  Retrieve command line options from the argparser '''

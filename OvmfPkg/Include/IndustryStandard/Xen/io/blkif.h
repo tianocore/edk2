@@ -657,14 +657,6 @@ struct blkif_request_segment {
  * 'sector-size' xenstore node.  Note however that the offset in
  * 'sector_number' must be aligned to 'sector-size'.
  */
-#if defined (MDE_CPU_IA32)
-//
-// pack(4) is necessary when these structs are compiled for Ia32.
-// Without it, the struct will have a different alignment than the one
-// a backend expect for a 32bit guest.
-//
-  #pragma pack(4)
-#endif
 struct blkif_request {
   UINT8                           operation;     /* BLKIF_OP_???                         */
   UINT8                           nr_segments;   /* number of segments                   */
@@ -709,9 +701,6 @@ struct blkif_request_indirect {
   blkif_sector_t    sector_number; /* start sector idx on disk (r/w only)  */
   blkif_vdev_t      handle;        /* same as for read/write requests      */
   grant_ref_t       indirect_grefs[BLKIF_MAX_INDIRECT_PAGES_PER_REQUEST];
- #ifdef MDE_CPU_IA32
-  UINT64            pad;       /* Make it 64 byte aligned on i386      */
- #endif
 };
 
 typedef struct blkif_request_indirect blkif_request_indirect_t;
@@ -723,9 +712,6 @@ struct blkif_response {
 };
 
 typedef struct blkif_response blkif_response_t;
-#if defined (MDE_CPU_IA32)
-  #pragma pack()
-#endif
 
 /*
  * STATUS RETURN CODES.
