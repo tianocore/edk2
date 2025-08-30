@@ -69,12 +69,12 @@ PrintBannerInfo (
   //
   //    for (Line = 0; Line < BANNER_HEIGHT; Line++) {
   //
-  for (Line = (UINT8)gScreenDimensions.TopRow; Line < BANNER_HEIGHT + (UINT8)gScreenDimensions.TopRow; Line++) {
+  for (Line = (UINT8)gScreenDimensions.TopRow; (UINTN)Line < (UINTN)(BANNER_HEIGHT + (UINT8)gScreenDimensions.TopRow); Line++) {
     //
     //      for (Alignment = 0; Alignment < BANNER_COLUMNS; Alignment++) {
     //
     for (Alignment = (UINT8)gScreenDimensions.LeftColumn;
-         Alignment < BANNER_COLUMNS + (UINT8)gScreenDimensions.LeftColumn;
+         (UINTN)Alignment < (UINTN)(BANNER_COLUMNS + (UINT8)gScreenDimensions.LeftColumn);
          Alignment++
          )
     {

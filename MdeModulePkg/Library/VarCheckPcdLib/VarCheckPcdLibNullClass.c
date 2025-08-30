@@ -429,6 +429,8 @@ LocateVarCheckPcdBin (
   VAR_CHECK_PCD_VARIABLE_HEADER  *VarCheckPcdBin;
   UINTN                          VarCheckPcdBinSize;
 
+  VarCheckPcdBin = NULL;
+
   //
   // Search the VarCheckPcdBin from the first RAW section of current FFS.
   //
