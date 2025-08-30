@@ -124,9 +124,9 @@ CustomFdtNodeParser (
 {
   INT32                 Node, CustomNode;
   INT32                 TempLen;
+  CONST FDT_PROPERTY    *PropertyPtr;
   UINT64                *Data64;
   UINTN                 CHobList;
-  CONST FDT_PROPERTY    *PropertyPtr;
   EFI_PEI_HOB_POINTERS  Hob;
 
   CHobList = (UINTN)HobList;
@@ -143,10 +143,14 @@ CustomFdtNodeParser (
     if (CustomNode > 0) {
       DEBUG ((DEBUG_INFO, "  Found upl-custom node (%08X)", CustomNode));
       PropertyPtr = FdtGetProperty (FdtBase, CustomNode, "hoblistptr", &TempLen);
-      Data64      = (UINT64 *)(PropertyPtr->Data);
-      CHobList    = (UINTN)Fdt64ToCpu (ReadUnaligned64 (Data64));
-      DEBUG ((DEBUG_INFO, "  Found hob list node (%08X)", CustomNode));
-      DEBUG ((DEBUG_INFO, " -pointer  %016lX\n", CHobList));
+      if (PropertyPtr != NULL) {
+        Data64   = (UINT64 *)(PropertyPtr->Data);
+        CHobList = (UINTN)Fdt64ToCpu (ReadUnaligned64 (Data64));
+        DEBUG ((DEBUG_INFO, "  Found hob list node (%08X) -pointer  %016lX\n", CustomNode, CHobList));
+      } else {
+        DEBUG ((DEBUG_INFO, "  Not Found hob list node\n"));
+        return CHobList;
+      }
     }
   }
 
