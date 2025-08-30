@@ -25,17 +25,24 @@
   MdeModulePkg/MdeModulePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
   OvmfPkg/OvmfPkg.dec
+  SecurityPkg/SecurityPkg.dec
 
 [LibraryClasses]
   PeimEntryPoint
   DebugLib
+  FdtLib
   HobLib
+  PcdLib
   PeiServicesLib
   PlatformSecLib
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress
 
 [Ppis]
   gEfiPeiMasterBootModePpiGuid                  # PPI ALWAYS_PRODUCED
   gEfiSecHobDataPpiGuid                         # ALWAYS_CONSUMED
+  gOvmfTpmDiscoveredPpiGuid                     # SOMETIMES_PRODUCES
 
 [Depex]
   TRUE
