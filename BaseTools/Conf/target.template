@@ -28,8 +28,8 @@ ACTIVE_PLATFORM       = EmulatorPkg/EmulatorPkg.dsc
 TARGET                = DEBUG
 
 #  TARGET_ARCH           List       Optional    What kind of architecture is the binary being target for.
-#                                               One, or more, of the following, IA32, IPF, X64, EBC, ARM
-#                                               or AArch64.
+#                                               One, or more, of the following, IA32, X64, EBC, ARM, AARCH64,
+#                                               RISCV64 or LOONGARCH64.
 #                                               Multiple values can be specified on a single line, using
 #                                               space characters to separate the values.  These are used
 #                                               during the parsing of a platform description file,
