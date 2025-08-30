@@ -160,3 +160,27 @@ MemEncryptSevEsDebugVirtualizationIsEnabled (
 
   return Msr.Bits.DebugVirtualization ? TRUE : FALSE;
 }
+
+/**
+  Returns a boolean to indicate whether the SEV-SNP cache line eviction
+  mitigation is needed.
+
+  @retval TRUE           Cache line eviction mitigation required
+  @retval FALSE          Cache line eviction migigation not required
+
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevSnpDoCoherencyMitigation (
+  VOID
+  )
+{
+  SEC_SEV_ES_WORK_AREA  *SevEsWorkArea;
+
+  SevEsWorkArea = GetSevEsWorkArea ();
+  if (SevEsWorkArea == NULL) {
+    return FALSE;
+  }
+
+  return MemEncryptSevSnpIsEnabled () && (SevEsWorkArea->CoherencySfwNo == 0);
+}

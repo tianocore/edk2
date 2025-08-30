@@ -22,6 +22,8 @@
 
 #include "SnpPageStateChange.h"
 
+#define PAGES_PER_2MB_ENTRY  512
+
 STATIC
 UINTN
 MemoryStateToGhcbOp (
@@ -213,6 +215,33 @@ PageStateChange (
   }
 }
 
+STATIC
+VOID
+SevEvictCache (
+  IN EFI_PHYSICAL_ADDRESS  Address,
+  IN UINTN                 NumPages
+  )
+{
+ #if defined (__GNUC__) || defined (__clang__)
+  volatile UINT8  Val __attribute__ ((__unused__));
+ #else
+  volatile UINT8  Val;
+ #endif
+  UINT8  *Bytes = (UINT8 *)Address;
+  UINTN  PageIdx;
+
+  /*
+   * For SEV guests, a read from the first/last cache-lines of a 4K page
+   * using the guest key is sufficient to cause a flush of all cache-lines
+   * associated with that 4K page without incurring all the overhead of a
+   * full CLFLUSH sequence.
+   */
+  for (PageIdx = 0; PageIdx < NumPages; PageIdx++) {
+    Val = Bytes[PageIdx * SIZE_4KB];
+    Val = Bytes[PageIdx * SIZE_4KB + SIZE_4KB - 1];
+  }
+}
+
 /**
  The function is used to set the page state when SEV-SNP is active. The page state
  transition consist of changing the page ownership in the RMP table, and using the
@@ -231,8 +260,12 @@ InternalSetPageState (
   IN UINTN                 PscBufferSize
   )
 {
-  EFI_PHYSICAL_ADDRESS        NextAddress, EndAddress;
+  EFI_PHYSICAL_ADDRESS        NextAddress;
+  EFI_PHYSICAL_ADDRESS        EndAddress;
+  EFI_PHYSICAL_ADDRESS        Address;
   SNP_PAGE_STATE_CHANGE_INFO  *Info;
+  UINTN                       RmpPageSize;
+  UINTN                       Index;
 
   EndAddress = BaseAddress + EFI_PAGES_TO_SIZE (NumPages);
 
@@ -281,6 +314,14 @@ InternalSetPageState (
     //
     if (State == SevSnpPagePrivate) {
       AmdSvsmSnpPvalidate (Info);
+
+      if (MemEncryptSevSnpDoCoherencyMitigation ()) {
+        for (Index = 0; Index <= Info->Header.EndEntry; Index++) {
+          Address     = ((EFI_PHYSICAL_ADDRESS)Info->Entry[Index].GuestFrameNumber) << EFI_PAGE_SHIFT;
+          RmpPageSize = Info->Entry[Index].PageSize;
+          SevEvictCache (Address, RmpPageSize == PvalidatePageSize2MB ? PAGES_PER_2MB_ENTRY : 1);
+        }
+      }
     }
   }
 }
