@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/TimerLib.h>
 #include <Library/DebugLib.h>
 #include <Library/Tpm2DeviceLib.h>
+#include <Library/Tpm2DumpLib.h>
 #include <Library/PcdLib.h>
 
 #include <IndustryStandard/TpmPtp.h>
@@ -460,87 +461,6 @@ Tpm2GetIdleByPass (
   InterfaceId.Uint32 = MmioRead32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId);
 
   return (UINT8)(InterfaceId.Bits.CapCRBIdleBypass);
-}
-
-/**
-  Dump PTP register information.
-
-  @param[in] Register                Pointer to PTP register.
-**/
-VOID
-DumpPtpInfo (
-  IN VOID  *Register
-  )
-{
-  PTP_CRB_INTERFACE_IDENTIFIER   InterfaceId;
-  PTP_FIFO_INTERFACE_CAPABILITY  InterfaceCapability;
-  UINT8                          StatusEx;
-  UINT16                         Vid;
-  UINT16                         Did;
-  UINT8                          Rid;
-  TPM2_PTP_INTERFACE_TYPE        PtpInterface;
-
-  if (!Tpm2IsPtpPresence (Register)) {
-    return;
-  }
-
-  InterfaceId.Uint32         = MmioRead32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId);
-  InterfaceCapability.Uint32 = MmioRead32 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->InterfaceCapability);
-  StatusEx                   = MmioRead8 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->StatusEx);
-
-  //
-  // Dump InterfaceId Register for PTP
-  //
-  DEBUG ((DEBUG_INFO, "InterfaceId - 0x%08x\n", InterfaceId.Uint32));
-  DEBUG ((DEBUG_INFO, "  InterfaceType    - 0x%02x\n", InterfaceId.Bits.InterfaceType));
-  if (InterfaceId.Bits.InterfaceType != PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_TIS) {
-    DEBUG ((DEBUG_INFO, "  InterfaceVersion - 0x%02x\n", InterfaceId.Bits.InterfaceVersion));
-    DEBUG ((DEBUG_INFO, "  CapFIFO          - 0x%x\n", InterfaceId.Bits.CapFIFO));
-    DEBUG ((DEBUG_INFO, "  CapCRB           - 0x%x\n", InterfaceId.Bits.CapCRB));
-  }
-
-  //
-  // Dump Capability Register for TIS and FIFO
-  //
-  DEBUG ((DEBUG_INFO, "InterfaceCapability - 0x%08x\n", InterfaceCapability.Uint32));
-  if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_TIS) ||
-      (InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_FIFO))
-  {
-    DEBUG ((DEBUG_INFO, "  InterfaceVersion - 0x%x\n", InterfaceCapability.Bits.InterfaceVersion));
-  }
-
-  //
-  // Dump StatusEx Register for PTP FIFO
-  //
-  DEBUG ((DEBUG_INFO, "StatusEx - 0x%02x\n", StatusEx));
-  if (InterfaceCapability.Bits.InterfaceVersion == INTERFACE_CAPABILITY_INTERFACE_VERSION_PTP) {
-    DEBUG ((DEBUG_INFO, "  TpmFamily - 0x%x\n", (StatusEx & PTP_FIFO_STS_EX_TPM_FAMILY) >> PTP_FIFO_STS_EX_TPM_FAMILY_OFFSET));
-  }
-
-  Vid          = 0xFFFF;
-  Did          = 0xFFFF;
-  Rid          = 0xFF;
-  PtpInterface = GetCachedPtpInterface ();
-  DEBUG ((DEBUG_INFO, "PtpInterface - %x\n", PtpInterface));
-  switch (PtpInterface) {
-    case Tpm2PtpInterfaceCrb:
-      Vid = MmioRead16 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->Vid);
-      Did = MmioRead16 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->Did);
-      Rid = (UINT8)InterfaceId.Bits.Rid;
-      break;
-    case Tpm2PtpInterfaceFifo:
-    case Tpm2PtpInterfaceTis:
-      Vid = MmioRead16 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->Vid);
-      Did = MmioRead16 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->Did);
-      Rid = MmioRead8 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->Rid);
-      break;
-    default:
-      break;
-  }
-
-  DEBUG ((DEBUG_INFO, "VID - 0x%04x\n", Vid));
-  DEBUG ((DEBUG_INFO, "DID - 0x%04x\n", Did));
-  DEBUG ((DEBUG_INFO, "RID - 0x%02x\n", Rid));
 }
 
 /**
