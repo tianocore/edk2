@@ -1,20 +1,19 @@
 ## @file
-#  This module provide a Standalone MM compliant implementation of MM IPL PEIM.
+#  This module provide a Standalone MM compliant implementation of the MM IPL.
 #
-#  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
-#
+#  Copyright (c) 2025, 9elements GmbH.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
 [Defines]
-  INF_VERSION                    = 0x00010005
-  BASE_NAME                      = StandaloneMmIplPei
-  FILE_GUID                      = 578A0D17-2DC0-4C7D-A121-D8D771923BB0
-  MODULE_TYPE                    = PEIM
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = StandaloneMmIplDxe
+  FILE_GUID                      = 4C5D5F73-3616-4D37-8459-3ACA6E2D8FC5
+  MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  PI_SPECIFICATION_VERSION       = 0x0001000A
-  ENTRY_POINT                    = StandaloneMmIplPeiEntry
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  ENTRY_POINT                    = StandaloneMmIplDxeEntry
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -24,7 +23,7 @@
 
 [Sources]
   StandaloneMmIplCommon.c
-  StandaloneMmIplPei.c
+  StandaloneMmIplDxe.c
   StandaloneMmIplPei.h
   MmFoundationHob.c
 
@@ -35,17 +34,16 @@
   UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
-  PeimEntryPoint
-  PeiServicesLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DxeServicesLib
   DebugLib
   HobLib
   MemoryAllocationLib
-  MmUnblockMemoryLib
   BaseLib
   BaseMemoryLib
   PeCoffLib
   CacheMaintenanceLib
-  PeiServicesTablePointerLib
   MmPlatformHobProducerLib
   MmIplPlatformHookLib
 
@@ -64,19 +62,15 @@
   gEfiMmCommunicateHeaderV3Guid
   gEfiHobMemoryAllocModuleGuid
 
-[Ppis]
-  gEfiPeiMmControlPpiGuid
-  gEfiPeiMmCommunicationPpiGuid
-  gEfiPeiMmCommunication3PpiGuid
-  gEfiEndOfPeiSignalPpiGuid
-  gMmCoreFvLocationPpiGuid
-  gEfiPeiMmAccessPpiGuid
-
 [Protocols]
+  gEfiMmCommunicationProtocolGuid
+  gEfiFirmwareVolume2ProtocolGuid
+  gEfiFirmwareVolumeBlock2ProtocolGuid
+  gEfiMmAccessProtocolGuid
   gEfiMmEndOfPeiProtocol
+  gEfiMpServiceProtocolGuid
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMmCommBufferPages
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                   ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial            ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode                      ## CONSUMES
@@ -89,4 +83,4 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmRestrictedMemoryAccess        ## CONSUMES
 
 [Depex]
-  gEfiPeiMmControlPpiGuid AND gEfiPeiMpServicesPpiGuid
+  gEfiMmCommunicationProtocolGuid AND gEfiMpServiceProtocolGuid
