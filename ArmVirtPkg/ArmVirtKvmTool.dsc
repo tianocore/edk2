@@ -30,6 +30,16 @@
   DEFINE PLAT_KVMTOOL            = TRUE
   DEFINE ACPIVIEW_ENABLE         = TRUE
 
+  # Arm CCA Measured Boot for Realm VMs
+  # An Arm CCA Realm has support for Realm Extensible
+  # Measurement Registers (REMs), which are similar to
+  # TPM PCRs and can be used to record the measurements
+  # taken by the firmware during boot.
+  # Therefore, UEFI Measured Boot can be enabled for
+  # Realm VMs.
+  # Note: This option MUST NOT be enabled for normal VM builds.
+  DEFINE ARMCCA_MEASURE_BOOT_ENABLE = FALSE
+
 # This comes at the beginning of includes to pick all relevant defines early on.
 !include ArmVirtPkg/ArmVirtStackCookies.dsc.inc
 
@@ -82,6 +92,11 @@
 
 [LibraryClasses.common.SEC]
   ArmCcaInitPeiLib|ArmVirtPkg/Library/ArmCcaInitPeiLib/ArmCcaInitPeiLib.inf
+
+[LibraryClasses.common.SEC]
+!if $(ARMCCA_MEASURE_BOOT_ENABLE) == TRUE
+  PeilessSecMeasureLib|ArmVirtPkg/Library/ArmCcaPeilessSecMeasureLib/ArmCcaPeilessSecMeasureLib.inf
+!endif
 
 [LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM]
   PciExpressLib|MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
