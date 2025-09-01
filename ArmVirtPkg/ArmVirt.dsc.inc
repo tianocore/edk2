@@ -253,6 +253,7 @@ DEFINE FD_SIZE_IN_MB    = 3
   # Arm CCA Libraries
   ArmCcaInitPeiLib|ArmVirtPkg/Library/ArmCcaInitPeiLib/ArmCcaInitPeiLib.inf
   ArmCcaLib|MdeModulePkg/Library/ArmCcaLib/ArmCcaLibEarly.inf
+  PeilessSecMeasureLib|SecurityPkg/Library/PeilessSecMeasureLib/PeilessSecMeasureLibNull.inf
 
 [LibraryClasses.common.PEI_CORE]
   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
