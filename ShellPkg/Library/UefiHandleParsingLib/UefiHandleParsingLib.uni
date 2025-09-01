@@ -89,7 +89,6 @@
 
 // USB
 #string STR_USB_IO                #language en-US "USBIO"
-#string STR_USB_HC                #language en-US "USBHostControler"
 #string STR_USB_HC2               #language en-US "USBHostController2"
 
 // Debug
@@ -161,8 +160,6 @@
 #string STR_SHELL_ALIAS           #language en-US "ShellAlias"
 #string STR_DEVICE_IO             #language en-US "DeviceIO"
 #string STR_TCP                   #language en-US "TCP"
-#string STR_UGA_DRAW              #language en-US "UGADraw"
-#string STR_UGA_IO                #language en-US "UGAIO"
 #string STR_ESP                   #language en-US "EFISystemPartition"
 #string STR_GPT_NBR               #language en-US "LegacyMBR"
 #string STR_DRIVER_CONFIG         #language en-US "DriverConfiguration"

@@ -16,15 +16,18 @@ The sample modules are built as part of the normal `PrmPkg` build so you can fol
 workspace build output directory. For example, if your build workspace is called "edk2" and you build
 64-bit binaries on the Visual Studio 2017 tool chain, your sample module binaries will be in the following
 location: \
-``edk2/Build/Prm/DEBUG_VS2017/X64/PrmPkg/Samples``
+``edk2/Build/Prm/DEBUG_VS2022/X64/PrmPkg/Samples``
 
 ### Build an Individual PRM Sample Module
 
 Note that the build command does provide the option to build a specific module in a package which can result in
 faster build time. If you would like to just build a single PRM module that can be done by specifying the path to
 the module INF file with the "-m" argument to `build`. For example, this command builds 32-bit and 64-bit binaries
-with Visual Studio 2019: \
-``build -p PrmPkg/PrmPkg.dsc -m PrmPkg/Samples/PrmSampleContextBufferModule/PrmSampleContextBufferModule.inf -a IA32 -a X64 -t VS2019``
+with Visual Studio 2022: \
+
+```shell
+build -p PrmPkg/PrmPkg.dsc -m PrmPkg/Samples/PrmSampleContextBufferModule/PrmSampleContextBufferModule.inf -a X64 -t VS2022
+```
 
 ## PRM Sample Module User's Guide
 

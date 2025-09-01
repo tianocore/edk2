@@ -687,6 +687,11 @@ FindQuestionDefaultSetting (
   PCD_DATA_DELTA                 *DeltaData;
   BOOLEAN                        VarCheck;
 
+  if (EfiVarStore == NULL) {
+    DEBUG ((DEBUG_ERROR, "EfiVarStore is null\n"));
+    return EFI_NOT_FOUND;
+  }
+
   if (gSkuId == 0xFFFFFFFFFFFFFFFF) {
     gSkuId = LibPcdGetSku ();
   }
@@ -825,7 +830,7 @@ FindQuestionDefaultSetting (
       if (BitFieldQuestion) {
         CopyMem (&BufferValue, (UINT8 *)AuthVariableHeader + sizeof (AUTHENTICATED_VARIABLE_HEADER) + AuthVariableHeader->NameSize + ByteOffset, Width);
         BitFieldVal = BitFieldRead32 (BufferValue, StartBit, EndBit);
-        CopyMem (ValueBuffer, &BitFieldVal, Width);
+        CopyMem (ValueBuffer, &BitFieldVal, sizeof (UINT32));
       } else {
         CopyMem (ValueBuffer, (UINT8 *)AuthVariableHeader + sizeof (AUTHENTICATED_VARIABLE_HEADER) + AuthVariableHeader->NameSize + IfrQuestionHdr->VarStoreInfo.VarOffset, Width);
       }
@@ -862,7 +867,7 @@ FindQuestionDefaultSetting (
       if (BitFieldQuestion) {
         CopyMem (&BufferValue, (UINT8 *)VariableHeader + sizeof (VARIABLE_HEADER) + VariableHeader->NameSize + ByteOffset, Width);
         BitFieldVal = BitFieldRead32 (BufferValue, StartBit, EndBit);
-        CopyMem (ValueBuffer, &BitFieldVal, Width);
+        CopyMem (ValueBuffer, &BitFieldVal, sizeof (UINT32));
       } else {
         CopyMem (ValueBuffer, (UINT8 *)VariableHeader + sizeof (VARIABLE_HEADER) + VariableHeader->NameSize + IfrQuestionHdr->VarStoreInfo.VarOffset, Width);
       }

@@ -55,6 +55,7 @@
   StandaloneMmCoreEntryPoint
   HobPrintLib
   ImagePropertiesRecordLib
+  PerformanceLib
 
 [Protocols]
   gEfiDxeMmReadyToLockProtocolGuid             ## UNDEFINED # SmiHandlerRegister
@@ -63,6 +64,8 @@
   gEfiLoadedImageProtocolGuid                   ## PRODUCES
   gEfiMmConfigurationProtocolGuid               ## CONSUMES
   gEfiMmEndOfPeiProtocol                        ## PRODUCES
+  gEfiMmEntryNotifyProtocolGuid                 ## PRODUCES
+  gEfiMmExitNotifyProtocolGuid                  ## PRODUCES
 
 [Guids]
   gAprioriGuid                                  ## SOMETIMES_CONSUMES   ## File
@@ -81,10 +84,13 @@
   gMmCommBufferHobGuid
   gEfiSmmSmramMemoryGuid
   gEdkiiPiSmmMemoryAttributesTableGuid
+  gEfiMmPeiMmramMemoryReserveGuid
+  gEfiMmCommunicateHeaderV3Guid    ## CONSUMES   ## GUID # Communicate header
 
 [Pcd]
   gStandaloneMmPkgTokenSpaceGuid.PcdFwVolMmMaxEncapsulationDepth    ##CONSUMES
   gStandaloneMmPkgTokenSpaceGuid.PcdRestartMmDispatcherOnceMmEntryRegistered    ##CONSUMES
+  gStandaloneMmPkgTokenSpaceGuid.PcdShadowBfv    ##CONSUMES
 
 #
 # This configuration fails for CLANGPDB, which does not support PIE in the GCC

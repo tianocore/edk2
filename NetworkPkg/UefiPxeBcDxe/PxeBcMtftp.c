@@ -52,12 +52,12 @@ PxeBcMtftp6CheckPacket (
   Callback = Private->PxeBcCallback;
   Status   = EFI_SUCCESS;
 
-  if (Packet->OpCode == EFI_MTFTP6_OPCODE_ERROR) {
+  if (NTOHS (Packet->OpCode) == EFI_MTFTP6_OPCODE_ERROR) {
     //
     // Store the tftp error message into mode data and set the received flag.
     //
     Private->Mode.TftpErrorReceived   = TRUE;
-    Private->Mode.TftpError.ErrorCode = (UINT8)Packet->Error.ErrorCode;
+    Private->Mode.TftpError.ErrorCode = (UINT8)NTOHS (Packet->Error.ErrorCode);
     AsciiStrnCpyS (
       Private->Mode.TftpError.ErrorString,
       PXE_MTFTP_ERROR_STRING_LENGTH,
@@ -184,7 +184,7 @@ PxeBcMtftp6GetFileSize (
       // Store the tftp error message into mode data and set the received flag.
       //
       Private->Mode.TftpErrorReceived   = TRUE;
-      Private->Mode.TftpError.ErrorCode = (UINT8)Packet->Error.ErrorCode;
+      Private->Mode.TftpError.ErrorCode = (UINT8)NTOHS (Packet->Error.ErrorCode);
       AsciiStrnCpyS (
         Private->Mode.TftpError.ErrorString,
         PXE_MTFTP_ERROR_STRING_LENGTH,
@@ -530,12 +530,12 @@ PxeBcMtftp4CheckPacket (
   Callback = Private->PxeBcCallback;
   Status   = EFI_SUCCESS;
 
-  if (Packet->OpCode == EFI_MTFTP4_OPCODE_ERROR) {
+  if (NTOHS (Packet->OpCode) == EFI_MTFTP4_OPCODE_ERROR) {
     //
     // Store the tftp error message into mode data and set the received flag.
     //
     Private->Mode.TftpErrorReceived   = TRUE;
-    Private->Mode.TftpError.ErrorCode = (UINT8)Packet->Error.ErrorCode;
+    Private->Mode.TftpError.ErrorCode = (UINT8)NTOHS (Packet->Error.ErrorCode);
     AsciiStrnCpyS (
       Private->Mode.TftpError.ErrorString,
       PXE_MTFTP_ERROR_STRING_LENGTH,
@@ -662,7 +662,7 @@ PxeBcMtftp4GetFileSize (
       // Store the tftp error message into mode data and set the received flag.
       //
       Private->Mode.TftpErrorReceived   = TRUE;
-      Private->Mode.TftpError.ErrorCode = (UINT8)Packet->Error.ErrorCode;
+      Private->Mode.TftpError.ErrorCode = (UINT8)NTOHS (Packet->Error.ErrorCode);
       AsciiStrnCpyS (
         Private->Mode.TftpError.ErrorString,
         PXE_MTFTP_ERROR_STRING_LENGTH,

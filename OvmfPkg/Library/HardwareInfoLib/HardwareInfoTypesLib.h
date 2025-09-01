@@ -18,10 +18,10 @@
 // types which have an associated type definition
 //
 typedef enum {
-  HardwareInfoTypeUndefined  = 0,
-  HardwareInfoTypeHostBridge = 1,
-
-  HardwareInfoTypeMax
+  HardwareInfoTypeUndefined      = 0,
+  HardwareInfoTypeHostBridge     = 1,
+  HardwareInfoTypeQemuUefiVars   = 2,
+  HardwareInfoTypeSvsmVirtioMmio = 0x1000,
 } HARDWARE_INFO_TYPE;
 
 //
@@ -39,6 +39,16 @@ typedef struct {
 #pragma pack()
 
 //
+// used by:
+//  - HardwareInfoTypeQemuUefiVars
+//
+#pragma pack(1)
+typedef struct {
+  UINT64    MmioAddress;
+} SIMPLE_INFO;
+#pragma pack()
+
+//
 // Generic data structure to access any supported hardware type
 // resource definition
 //
@@ -49,6 +59,7 @@ typedef struct {
   union {
     UINT8               *Raw;
     HOST_BRIDGE_INFO    *PciHostBridge;
+    SIMPLE_INFO         *SimpleDevice;
   } Data;
 } HARDWARE_INFO;
 #pragma pack()

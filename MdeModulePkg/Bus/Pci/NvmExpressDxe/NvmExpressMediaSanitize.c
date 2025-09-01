@@ -360,6 +360,8 @@ NvmExpressMediaClear (
     return EFI_INVALID_PARAMETER;
   }
 
+  Status = EFI_SUCCESS;
+
   //
   // Per NIST 800-88r1, one or more pass of writes may be alteratively used.
   //

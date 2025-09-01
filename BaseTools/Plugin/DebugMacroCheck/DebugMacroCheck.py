@@ -429,7 +429,7 @@ def check_macros_in_directory(directory: PurePath,
 
         files = []
         for file in root_directory.rglob('*'):
-            if file.suffix in extensions:
+            if file.suffix in extensions and not file.is_dir():
                 files.append(Path(file))
 
             # Give an indicator progress is being made
@@ -576,6 +576,9 @@ def _show_progress(step: int, total: int, suffix: str = '') -> None:
         suffix (str): String to print at the end of the progress bar.
     """
     global _progress_start_time
+
+    if total == 0:
+        return
 
     if step == 0:
         _progress_start_time = timeit.default_timer()

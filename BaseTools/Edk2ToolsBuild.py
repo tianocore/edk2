@@ -1,7 +1,7 @@
 # @file Edk2ToolsBuild.py
 # Invocable class that builds the basetool c files.
 #
-# Supports VS2017, VS2019, and GCC5
+# Supports VS2019, VS2022, and GCC5
 ##
 # Copyright (c) Microsoft Corporation
 #
@@ -12,10 +12,11 @@ import sys
 import logging
 import argparse
 import multiprocessing
+import shutil
 from edk2toolext import edk2_logging
-from edk2toolext.environment import self_describing_environment
+from edk2toolext.environment import self_describing_environment, shell_environment
 from edk2toolext.base_abstract_invocable import BaseAbstractInvocable
-from edk2toollib.utility_functions import RunCmd
+from edk2toollib.utility_functions import RunCmd, GetHostInfo
 from edk2toollib.windows.locate_tools import QueryVcVariables
 
 
@@ -24,10 +25,14 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
     def ParseCommandLineOptions(self):
         ''' parse arguments '''
         ParserObj = argparse.ArgumentParser()
-        ParserObj.add_argument("-t", "--tool_chain_tag", dest="tct", default="VS2017",
+        ParserObj.add_argument("-t", "--tool_chain_tag", dest="tct", default="VS2022",
                                help="Set the toolchain used to compile the build tools")
+        ParserObj.add_argument("-a", "--target_arch", dest="arch", default=None, choices=[None, 'IA32', 'X64', 'ARM', 'AARCH64'],
+                               help="Specify the architecture of the built base tools. Not specifying this will fall back to the default "
+                               "behavior, for Windows builds, IA32 target will be built, for Linux builds, target arch will be the same as host arch.")
         args = ParserObj.parse_args()
         self.tool_chain_tag = args.tct
+        self.target_arch = args.arch
 
     def GetWorkspaceRoot(self):
         ''' Return the workspace root for initializing the SDE '''
@@ -38,8 +43,16 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
 
-        # for now don't use scopes
-        return ('global',)
+        # Adding scope for cross compilers when building for ARM/AARCH64
+        scopes = ('global',)
+        if GetHostInfo().os == "Linux" and self.tool_chain_tag.lower().startswith("gcc"):
+            if self.target_arch is None:
+                return scopes
+            if "AARCH64" in self.target_arch:
+                scopes += ("gcc_aarch64_linux",)
+            if "ARM" in self.target_arch:
+                scopes += ("gcc_arm_linux",)
+        return scopes
 
     def GetLoggingLevel(self, loggerType):
         ''' Get the logging level for a given type (return Logging.Level)
@@ -110,6 +123,103 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
         shell_env.set_shell_var("PYTHON_COMMAND", pc)
 
         if self.tool_chain_tag.lower().startswith("vs"):
+            if self.target_arch is None:
+                # Put a default as IA32
+                self.target_arch = "IA32"
+
+            if self.target_arch == "IA32":
+                VcToolChainArch = "x86"
+                TargetInfoArch = "x86"
+                OutputDir = "Win32"
+            elif self.target_arch == "ARM":
+                VcToolChainArch = "x86_arm"
+                TargetInfoArch = "ARM"
+                OutputDir = "Win32"
+            elif self.target_arch == "X64":
+                VcToolChainArch = "amd64"
+                TargetInfoArch = "x86"
+                OutputDir = "Win64"
+            elif self.target_arch == "AARCH64":
+                VcToolChainArch = "amd64_arm64"
+                TargetInfoArch = "ARM"
+                OutputDir = "Win64"
+            else:
+                raise NotImplementedError()
+
+            self.OutputDir = os.path.join(
+                shell_env.get_shell_var("EDK_TOOLS_PATH"), "Bin", OutputDir)
+
+            # compiled tools need to be added to path because antlr is referenced
+            HostInfo = GetHostInfo()
+            if TargetInfoArch == HostInfo.arch:
+                # not cross compiling
+                shell_env.insert_path(self.OutputDir)
+            else:
+                # cross compiling:
+                # as the VfrCompile tool is needed in the build process, we need
+                # to build one for the host system, then add the path to the
+                # tools to the PATH environment variable
+                shell_environment.CheckpointBuildVars()
+                if HostInfo.arch == "x86" and HostInfo.bit == "64":
+                    host_arch = "X64"
+                    host_toolchain_arch = "amd64"
+                    TempOutputDir = os.path.join(shell_env.get_shell_var("EDK_TOOLS_PATH"), "Bin", "Win64")
+                elif HostInfo.arch == "x86" and HostInfo.bit == "32":
+                    host_arch = "IA32"
+                    host_toolchain_arch = "x86"
+                    TempOutputDir = os.path.join(shell_env.get_shell_var("EDK_TOOLS_PATH"), "Bin", "Win32")
+                elif HostInfo.arch == "ARM" and HostInfo.bit == "64":
+                    host_arch = "AARCH64"
+                    host_toolchain_arch = "amd64_arm64"
+                    TempOutputDir = os.path.join(shell_env.get_shell_var("EDK_TOOLS_PATH"), "Bin", "Win64")
+                elif HostInfo.arch == "ARM" and HostInfo.bit == "32":
+                    host_arch = "ARM"
+                    host_toolchain_arch = "x86_arm"
+                    TempOutputDir = os.path.join(shell_env.get_shell_var("EDK_TOOLS_PATH"), "Bin", "Win32")
+                else:
+                    raise Exception("Unsupported host system. %s %s" % (HostInfo.arch, HostInfo.bit))
+
+                interesting_keys = ["ExtensionSdkDir", "INCLUDE", "LIB"]
+                interesting_keys.extend(
+                    ["LIBPATH", "Path", "UniversalCRTSdkDir", "UCRTVersion", "WindowsLibPath", "WindowsSdkBinPath"])
+                interesting_keys.extend(
+                    ["WindowsSdkDir", "WindowsSdkVerBinPath", "WindowsSDKVersion", "VCToolsInstallDir"])
+                vc_vars = QueryVcVariables(
+                    interesting_keys, host_toolchain_arch, vs_version=self.tool_chain_tag.lower())
+                for key in vc_vars.keys():
+                    logging.debug(f"Var - {key} = {vc_vars[key]}")
+                    if key.lower() == 'path':
+                        shell_env.set_path(vc_vars[key])
+                    else:
+                        shell_env.set_shell_var(key, vc_vars[key])
+
+                # Note: This HOST_ARCH is in respect to the BUILT base tools, not the host arch where
+                # this script is BUILDING the base tools.
+                shell_env.set_shell_var('HOST_ARCH', host_arch)
+                shell_env.insert_path(TempOutputDir)
+
+                # All set, build the tools for the host system.
+                ret = RunCmd('nmake.exe', None,
+                             workingdir=shell_env.get_shell_var("EDK_TOOLS_PATH"))
+                if ret != 0:
+                    raise Exception("Failed to build base tools for host system.")
+
+                # Copy the output to a temp directory
+                TempFolder = os.path.join(shell_env.get_shell_var("EDK_TOOLS_PATH"), "BaseToolsBuild", "Temp")
+                if not os.path.exists(TempFolder):
+                    os.makedirs(TempFolder)
+                for file in os.listdir(TempOutputDir):
+                    shutil.copy(os.path.join(TempOutputDir, file), TempFolder)
+
+                # Clean up the build output
+                ret = RunCmd('nmake.exe', 'cleanall',
+                             workingdir=shell_env.get_shell_var("EDK_TOOLS_PATH"))
+
+                # Remove the entire TempOutputDir
+                shutil.rmtree(TempOutputDir)
+
+                shell_environment.RevertBuildVars()
+                shell_env.insert_path(TempFolder)
 
             # # Update environment with required VC vars.
             interesting_keys = ["ExtensionSdkDir", "INCLUDE", "LIB"]
@@ -118,7 +228,7 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
             interesting_keys.extend(
                 ["WindowsSdkDir", "WindowsSdkVerBinPath", "WindowsSDKVersion", "VCToolsInstallDir"])
             vc_vars = QueryVcVariables(
-                interesting_keys, 'x86', vs_version=self.tool_chain_tag.lower())
+                interesting_keys, VcToolChainArch, vs_version=self.tool_chain_tag.lower())
             for key in vc_vars.keys():
                 logging.debug(f"Var - {key} = {vc_vars[key]}")
                 if key.lower() == 'path':
@@ -126,11 +236,9 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
                 else:
                     shell_env.set_shell_var(key, vc_vars[key])
 
-            self.OutputDir = os.path.join(
-                shell_env.get_shell_var("EDK_TOOLS_PATH"), "Bin", "Win32")
-
-            # compiled tools need to be added to path because antlr is referenced
-            shell_env.insert_path(self.OutputDir)
+            # Note: This HOST_ARCH is in respect to the BUILT base tools, not the host arch where
+            # this script is BUILDING the base tools.
+            shell_env.set_shell_var('HOST_ARCH', self.target_arch)
 
             # Actually build the tools.
             output_stream = edk2_logging.create_output_stream()
@@ -147,6 +255,87 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
             return ret
 
         elif self.tool_chain_tag.lower().startswith("gcc"):
+            # Note: This HOST_ARCH is in respect to the BUILT base tools, not the host arch where
+            # this script is BUILDING the base tools.
+            HostInfo = GetHostInfo()
+            prefix = None
+            TargetInfoArch = None
+            if self.target_arch is not None:
+                shell_env.set_shell_var('HOST_ARCH', self.target_arch)
+
+                if "AARCH64" in self.target_arch:
+                    prefix = shell_env.get_shell_var("GCC5_AARCH64_PREFIX")
+                    if prefix == None:
+                        # now check for install dir.  If set then set the Prefix
+                        install_path = shell_environment.GetEnvironment().get_shell_var("GCC5_AARCH64_INSTALL")
+
+                        # make GCC5_AARCH64_PREFIX to align with tools_def.txt
+                        prefix = os.path.join(install_path, "bin", "aarch64-none-linux-gnu-")
+
+                    shell_environment.GetEnvironment().set_shell_var("GCC_PREFIX", prefix)
+                    TargetInfoArch = "ARM"
+
+                elif "ARM" in self.target_arch:
+                    prefix = shell_env.get_shell_var("GCC5_ARM_PREFIX")
+                    if prefix == None:
+                        # now check for install dir.  If set then set the Prefix
+                        install_path = shell_environment.GetEnvironment().get_shell_var("GCC5_ARM_INSTALL")
+
+                        # make GCC5_ARM_PREFIX to align with tools_def.txt
+                        prefix = os.path.join(install_path, "bin", "arm-none-linux-gnueabihf-")
+
+                    shell_environment.GetEnvironment().set_shell_var("GCC_PREFIX", prefix)
+                    TargetInfoArch = "ARM"
+
+                else:
+                    TargetInfoArch = "x86"
+            else:
+                self.target_arch = HostInfo.arch
+                TargetInfoArch = HostInfo.arch
+            # Otherwise, the built binary arch will be consistent with the host system
+
+            # Added logic to support cross compilation scenarios
+            if TargetInfoArch != HostInfo.arch:
+                # this is defaulting to the version that comes with Ubuntu 20.04
+                ver = shell_environment.GetBuildVars().GetValue("LIBUUID_VERSION", "2.34")
+                work_dir = os.path.join(shell_env.get_shell_var("EDK_TOOLS_PATH"), self.GetLoggingFolderRelativeToRoot())
+                pack_name = f"util-linux-{ver}"
+                unzip_dir = os.path.join(work_dir, pack_name)
+
+                if os.path.isfile(os.path.join(work_dir, f"{pack_name}.tar.gz")):
+                    os.remove(os.path.join(work_dir, f"{pack_name}.tar.gz"))
+                if os.path.isdir(unzip_dir):
+                    shutil.rmtree(unzip_dir)
+
+                # cross compiling, need to rebuild libuuid for the target
+                ret = RunCmd("wget", f"https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v{ver}/{pack_name}.tar.gz", workingdir=work_dir)
+                if ret != 0:
+                    raise Exception(f"Failed to download libuuid version {ver} - {ret}")
+
+                ret = RunCmd("tar", f"xvzf {pack_name}.tar.gz", workingdir=work_dir)
+                if ret != 0:
+                    raise Exception(f"Failed to untar the downloaded file {ret}")
+
+                # configure the source to use the cross compiler
+                pack_name = f"util-linux-{ver}"
+                if "AARCH64" in self.target_arch:
+                    ret = RunCmd("sh", f"./configure --host=aarch64-linux  -disable-all-programs --enable-libuuid CC={prefix}gcc", workingdir=unzip_dir)
+                elif "ARM" in self.target_arch:
+                    ret = RunCmd("sh", f"./configure --host=arm-linux  -disable-all-programs --enable-libuuid CC={prefix}gcc", workingdir=unzip_dir)
+                if ret != 0:
+                    raise Exception(f"Failed to configure the util-linux to build with our gcc {ret}")
+
+                ret = RunCmd("make", "", workingdir=unzip_dir)
+                if ret != 0:
+                    raise Exception(f"Failed to build the libuuid with our gcc {ret}")
+
+                shell_environment.GetEnvironment().set_shell_var("CROSS_LIB_UUID", unzip_dir)
+                shell_environment.GetEnvironment().set_shell_var("CROSS_LIB_UUID_INC", os.path.join(unzip_dir, "libuuid", "src"))
+
+            ret = RunCmd("make", "clean", workingdir=shell_env.get_shell_var("EDK_TOOLS_PATH"))
+            if ret != 0:
+                raise Exception("Failed to build.")
+
             cpu_count = self.GetCpuThreads()
 
             output_stream = edk2_logging.create_output_stream()

@@ -87,7 +87,7 @@ SetRuntimeMemoryRangeAttributes (
       ));
     DEBUG ((
       DEBUG_INFO,
-      "      %a %a: Physical address = 0x%016x. Length = 0x%x.\n",
+      "      %a %a: Physical address = 0x%016llx. Length = 0x%x.\n",
       _DBGMSGID_,
       __func__,
       RuntimeMmioRanges->Range[Index].PhysicalBaseAddress,
@@ -100,12 +100,17 @@ SetRuntimeMemoryRangeAttributes (
 
     Status2 = EFI_NOT_FOUND;
     Status  = gDS->GetMemorySpaceDescriptor (RuntimeMmioRanges->Range[Index].PhysicalBaseAddress, &Descriptor);
-    if (!EFI_ERROR (Status) &&
-        (
-         ((Descriptor.GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo) && (Descriptor.GcdMemoryType != EfiGcdMemoryTypeReserved)) ||
-         ((Descriptor.Length & EFI_PAGE_MASK) != 0)
-        )
-        )
+    if (!EFI_ERROR (Status) && (Descriptor.GcdMemoryType == EfiGcdMemoryTypeNonExistent)) {
+      // The MMIO range was found in the GCD, but is non-existent. We need to add this MMIO range to the GCD so that
+      // the PRM module can use it. As such, mark it as not found, as the behavior we want is the same as in that
+      // case.
+      Status = EFI_NOT_FOUND;
+    } else if (!EFI_ERROR (Status) &&
+               (
+                ((Descriptor.GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo) && (Descriptor.GcdMemoryType != EfiGcdMemoryTypeReserved)) ||
+                ((Descriptor.Length & EFI_PAGE_MASK) != 0)
+               )
+               )
     {
       Status2 =  gDS->RemoveMemorySpace (
                         RuntimeMmioRanges->Range[Index].PhysicalBaseAddress,
@@ -139,7 +144,7 @@ SetRuntimeMemoryRangeAttributes (
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
-        "      %a %a: Error [%r] finding descriptor for runtime memory range 0x%016x.\n",
+        "      %a %a: Error [%r] finding descriptor for runtime memory range 0x%016llx.\n",
         _DBGMSGID_,
         __func__,
         Status,
@@ -166,7 +171,7 @@ SetRuntimeMemoryRangeAttributes (
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
-        "      %a %a: Error [%r] setting descriptor for runtime memory range 0x%016x.\n",
+        "      %a %a: Error [%r] setting descriptor for runtime memory range 0x%016llx.\n",
         _DBGMSGID_,
         __func__,
         Status,

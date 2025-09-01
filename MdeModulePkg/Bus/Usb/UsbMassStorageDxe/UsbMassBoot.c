@@ -210,7 +210,7 @@ UsbBootExecCmd (
   //
   // If command execution failed, then retrieve error info via sense request.
   //
-  DEBUG ((DEBUG_ERROR, "UsbBootExecCmd: %r to Exec 0x%x Cmd (Result = %x)\n", Status, *(UINT8 *)Cmd, CmdResult));
+  DEBUG ((DEBUG_INFO, "UsbBootExecCmd: %r to Exec 0x%x Cmd (Result = %x)\n", Status, *(UINT8 *)Cmd, CmdResult));
   return UsbBootRequestSense (UsbMass);
 }
 

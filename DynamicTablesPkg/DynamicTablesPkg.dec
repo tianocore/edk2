@@ -15,6 +15,7 @@
 
 [Includes]
   Include
+  Test/Mock/Include
 
 [LibraryClasses]
   ##  @libraryclass  Defines a set of Acpi helper methods
@@ -23,6 +24,9 @@
 
   ##  @libraryclass  Defines a set of APIs for Dynamic AML generation.
   AmlLib|Include/Library/AmlLib/AmlLib.h
+
+  ## @libraryclass  Defines a set of APIs to help CmObj handling.
+  CmObjHelperLib|Include/Library/CmObjHelperLib.h
 
   ##  @libraryclass  Defines a set of APIs to handle dynamically created CmObj.
   DynamicPlatRepoLib|Include/Library/DynamicPlatRepoLib.h
@@ -41,6 +45,15 @@
 
   ##  @libraryclass  Defines a set of SMBIOS string helper methods.
   SmbiosStringTableLib|Include/Library/SmbiosStringTableLib.h
+
+  ##  @libraryclass  Defines a set of APIs to a handle Metadata around CmObj.
+  MetadataObjLib|Include/Library/MetadataObjLib.h
+
+  ##  @libraryclass  Defines a set of APIs to a handle Metadata generation/validation.
+  MetadataHandlerLib|Include/Library/MetadataHandlerLib.h
+
+  ##  @libraryclass  Defines a set of methods for generating Tpm2 Device Table method.
+  Tpm2DeviceTableLib|Include/Library/Tpm2DeviceTableLib.h
 
 [LibraryClasses.AARCH64]
   ##  @libraryclass  Defines a set of APIs to populate CmObj using SCMI.
@@ -73,6 +86,9 @@
   # Allow some relaxation on some specific points for the platforms that desire it.
   #   BIT0: Allow the absence of some registers in the _CPC object.
   gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdDevelopmentPlatformRelaxations|0|UINT64|0x4000000A
+
+  # Generate Tpm2 device table when generate TPM2 acpi table together.
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdGenTpm2DeviceTable|FALSE|BOOLEAN|0x4000000B
 
 [Guids]
   gEdkiiDynamicTablesPkgTokenSpaceGuid = { 0xab226e66, 0x31d8, 0x4613, { 0x87, 0x9d, 0xd2, 0xfa, 0xb6, 0x10, 0x26, 0x3c } }

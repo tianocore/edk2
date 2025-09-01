@@ -166,6 +166,10 @@ FatStriCmp (
   IN CHAR16  *S2
   )
 {
+  //
+  // ASSERT s1 and s2 are shorter than PcdMaximumUnicodeStringLength.
+  // Length tests are performed inside StrLen().
+  //
   ASSERT (StrSize (S1) != 0);
   ASSERT (StrSize (S2) != 0);
   ASSERT (mUnicodeCollationInterface != NULL);
@@ -189,6 +193,10 @@ FatStrUpr (
   IN OUT CHAR16  *String
   )
 {
+  //
+  // ASSERT String is shorter than PcdMaximumUnicodeStringLength.
+  // Length tests are performed inside StrLen().
+  //
   ASSERT (StrSize (String) != 0);
   ASSERT (mUnicodeCollationInterface != NULL);
 
@@ -207,6 +215,10 @@ FatStrLwr (
   IN OUT CHAR16  *String
   )
 {
+  //
+  // ASSERT String is shorter than PcdMaximumUnicodeStringLength.
+  // Length tests are performed inside StrLen().
+  //
   ASSERT (StrSize (String) != 0);
   ASSERT (mUnicodeCollationInterface != NULL);
 
@@ -231,6 +243,10 @@ FatFatToStr (
   )
 {
   ASSERT (Fat != NULL);
+  //
+  // ASSERT String is shorter than PcdMaximumUnicodeStringLength.
+  // Length tests are performed inside StrLen().
+  //
   ASSERT (String != NULL);
   ASSERT (((UINTN)String & 0x01) == 0);
   ASSERT (mUnicodeCollationInterface != NULL);
@@ -257,6 +273,10 @@ FatStrToFat (
   )
 {
   ASSERT (Fat != NULL);
+  //
+  // ASSERT String is shorter than PcdMaximumUnicodeStringLength.
+  // Length tests are performed inside StrLen().
+  //
   ASSERT (StrSize (String) != 0);
   ASSERT (mUnicodeCollationInterface != NULL);
 

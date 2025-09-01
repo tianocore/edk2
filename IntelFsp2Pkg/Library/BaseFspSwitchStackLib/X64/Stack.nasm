@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2022 - 2023, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2022 - 2025, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Abstract:
@@ -92,6 +92,25 @@ ASM_PFX(FspSwitchStack):
     push   rdx
 SkipPagetableSave:
 
+    ; Save Segment registers
+    mov     rdx, ss
+    push    rdx
+    mov     rdx, gs
+    push    rdx
+    mov     rdx, fs
+    push    rdx
+    mov     rdx, es
+    push    rdx
+    mov     rdx, ds
+    push    rdx
+    mov     rdx, cs
+    push    rdx
+
+    ; Reserve 16 bytes for GDT save/restore
+    sub     rsp, 16
+    sgdt    [rsp]
+
+    ; Reserve 16 bytes for IDT save/restore
     sub     rsp, 16
     sidt    [rsp]
 
@@ -105,6 +124,26 @@ SkipPagetableSave:
     ; Restore previous contexts
     lidt    [rsp]
     add     rsp, 16
+
+    ; Restore GDTR
+    lgdt    [rsp]
+    add     rsp, 16
+
+    ; Restore Segment registers
+    lea     rdx, [.0]
+    push    rdx       ; Push return address
+    retfq             ; Far return to restore CS (uses CS from stack + return address)
+.0:
+    pop     rdx
+    mov     ds, dx
+    pop     rdx
+    mov     es, dx
+    pop     rdx
+    mov     fs, dx
+    pop     rdx
+    mov     gs, dx
+    pop     rdx
+    mov     ss, dx
 
     lea     rax, [ASM_PFX(FeaturePcdGet (PcdFspSaveRestorePageTableEnable))]
     mov     al, byte [rax]

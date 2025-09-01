@@ -22,6 +22,8 @@
 #include <Protocol/Timer.h>
 #include <Protocol/HardwareInterrupt.h>
 
+#include "TimerDxe.h"
+
 // The notification function to call on every timer interrupt.
 EFI_TIMER_NOTIFY  mTimerNotifyFunction     = (EFI_TIMER_NOTIFY)NULL;
 EFI_EVENT         EfiExitBootServicesEvent = (EFI_EVENT)NULL;
@@ -143,8 +145,7 @@ TimerDriverSetTimerPeriod (
     // mTimerTicks = TimerPeriod in 1ms unit x Frequency.10^-3
     //             = TimerPeriod.10^-4 x Frequency.10^-3
     //             = (TimerPeriod x Frequency) x 10^-7
-    TimerTicks = MultU64x32 (TimerPeriod, ArmGenericTimerGetTimerFreq ());
-    TimerTicks = DivU64x32 (TimerTicks, 10000000U);
+    TimerTicks = TimerPeriod * ArmGenericTimerGetTimerFreq () / 10000000U;
 
     // Raise TPL to update the mTimerTicks and mTimerPeriod to ensure these values
     // are coherent in the interrupt handler
@@ -360,6 +361,9 @@ TimerInitialize (
   EFI_STATUS  Status;
   UINTN       TimerCtrlReg;
   UINT32      TimerHypIntrNum;
+  UINT32      TimerVirtIntrNum;
+  UINT32      TimerSecIntrNum;
+  UINT32      TimerIntrNum;
 
   if (ArmIsArchTimerImplemented () == 0) {
     DEBUG ((DEBUG_ERROR, "ARM Architectural Timer is not available in the CPU, hence can't use this Driver \n"));
@@ -378,27 +382,38 @@ TimerInitialize (
   Status = TimerDriverSetTimerPeriod (&gTimer, 0);
   ASSERT_EFI_ERROR (Status);
 
+  if (ArmHasGicV5SystemRegisters ()) {
+    TimerSecIntrNum  = GICV5_ARCH_TIMER_SEC_INTID;
+    TimerIntrNum     = GICV5_ARCH_TIMER_INTID;
+    TimerHypIntrNum  = GICV5_ARCH_TIMER_HYP_INTID;
+    TimerVirtIntrNum = GICV5_ARCH_TIMER_VIRT_INTID;
+  } else {
+    TimerVirtIntrNum = PcdGet32 (PcdArmArchTimerVirtIntrNum);
+    TimerHypIntrNum  = PcdGet32 (PcdArmArchTimerHypIntrNum);
+    TimerSecIntrNum  = PcdGet32 (PcdArmArchTimerSecIntrNum);
+    TimerIntrNum     = PcdGet32 (PcdArmArchTimerIntrNum);
+  }
+
   // Install secure and Non-secure interrupt handlers
   // Note: Because it is not possible to determine the security state of the
   // CPU dynamically, we just install interrupt handler for both sec and non-sec
   // timer PPI
-  Status = gInterrupt->RegisterInterruptSource (gInterrupt, PcdGet32 (PcdArmArchTimerVirtIntrNum), TimerInterruptHandler);
+  Status = gInterrupt->RegisterInterruptSource (gInterrupt, TimerVirtIntrNum, TimerInterruptHandler);
   ASSERT_EFI_ERROR (Status);
 
   //
   // The hypervisor timer interrupt may be omitted by implementations that
   // execute under virtualization.
   //
-  TimerHypIntrNum = PcdGet32 (PcdArmArchTimerHypIntrNum);
   if (TimerHypIntrNum != 0) {
     Status = gInterrupt->RegisterInterruptSource (gInterrupt, TimerHypIntrNum, TimerInterruptHandler);
     ASSERT_EFI_ERROR (Status);
   }
 
-  Status = gInterrupt->RegisterInterruptSource (gInterrupt, PcdGet32 (PcdArmArchTimerSecIntrNum), TimerInterruptHandler);
+  Status = gInterrupt->RegisterInterruptSource (gInterrupt, TimerSecIntrNum, TimerInterruptHandler);
   ASSERT_EFI_ERROR (Status);
 
-  Status = gInterrupt->RegisterInterruptSource (gInterrupt, PcdGet32 (PcdArmArchTimerIntrNum), TimerInterruptHandler);
+  Status = gInterrupt->RegisterInterruptSource (gInterrupt, TimerIntrNum, TimerInterruptHandler);
   ASSERT_EFI_ERROR (Status);
 
   // Set up default timer

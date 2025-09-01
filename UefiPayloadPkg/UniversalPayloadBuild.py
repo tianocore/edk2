@@ -137,6 +137,9 @@ def BuildUniversalPayload(Args):
     elif Args.Arch == 'RISCV64':
         BuildArch      = "RISCV64"
         FitArch        = "RISCV64"
+    elif Args.Arch == 'AARCH64':
+        BuildArch      = "AARCH64"
+        FitArch        = "AARCH64"
     else:
         print("Incorrect arch option provided")
 
@@ -161,10 +164,19 @@ def BuildUniversalPayload(Args):
         for MacroItem in Args.Macro:
             Defines += " -D {}".format (MacroItem)
 
+    if (Args.add_cc_flags!= None):
+        CcFlags = " ".join(Args.add_cc_flags)
+
+        # Wrap the CC flags with double quotes since we might have plenty of
+        # specified build options
+        FinalFlags = f'"{CcFlags}"'
+        Defines += " -D APPEND_CC_FLAGS={}".format (FinalFlags)
+
     #
     # Building DXE core and DXE drivers as DXEFV.
+    # In edk2 CI build this step will be done by CI common build step.
     #
-    if Args.BuildEntryOnly == False:
+    if Args.BuildEntryOnly == False and Args.CiBuild == False:
         BuildPayload = "build -p {} -b {} -a {} -t {} -y {} {}".format (DscPath, BuildTarget, BuildArch, ToolChain, PayloadReportPath, Quiet)
         BuildPayload += Pcds
         BuildPayload += Defines
@@ -266,13 +278,14 @@ def BuildUniversalPayload(Args):
         #
         RelocBinary     = b''
         PeCoff = pefile.PE (TargetRebaseFile)
-        for reloc in PeCoff.DIRECTORY_ENTRY_BASERELOC:
-            for entry in reloc.entries:
-                if (entry.type == 0):
-                    continue
-                Type = entry.type
-                Offset = entry.rva + fit_image_info_header.DataOffset
-                RelocBinary += Offset.to_bytes (8, 'little') + Type.to_bytes (8, 'little')
+        if hasattr(PeCoff, 'DIRECTORY_ENTRY_BASERELOC'):
+            for reloc in PeCoff.DIRECTORY_ENTRY_BASERELOC:
+                for entry in reloc.entries:
+                    if (entry.type == 0):
+                        continue
+                    Type = entry.type
+                    Offset = entry.rva + fit_image_info_header.DataOffset
+                    RelocBinary += Offset.to_bytes (8, 'little') + Type.to_bytes (8, 'little')
         RelocBinary += b'\x00' * (0x1000 - (len(RelocBinary) % 0x1000))
 
         #
@@ -307,11 +320,11 @@ def BuildUniversalPayload(Args):
     else:
         return MultiFvList, os.path.join(BuildDir, 'UniversalPayload.elf')
 
-def main():
+def InitArgumentParser(LoadDefault):
     parser = argparse.ArgumentParser(description='For building Universal Payload')
     parser.add_argument('-t', '--ToolChain')
     parser.add_argument('-b', '--Target', default='DEBUG')
-    parser.add_argument('-a', '--Arch', choices=['IA32', 'X64', 'RISCV64'], help='Specify the ARCH for payload entry module. Default build X64 image.', default ='X64')
+    parser.add_argument('-a', '--Arch', choices=['IA32', 'X64', 'RISCV64', 'AARCH64'], help='Specify the ARCH for payload entry module. Default build X64 image.', default ='X64')
     parser.add_argument("-D", "--Macro", action="append", default=["UNIVERSAL_PAYLOAD=TRUE"])
     parser.add_argument('-i', '--ImageId', type=str, help='Specify payload ID (16 bytes maximal).', default ='UEFI')
     parser.add_argument('-q', '--Quiet', action='store_true', help='Disable all build messages except FATAL ERRORS.')
@@ -326,10 +339,15 @@ def main():
     parser.add_argument("-f", "--Fit", action='store_true', help='Build UniversalPayload file as UniversalPayload.fit', default=False)
     parser.add_argument('-l', "--LoadAddress", type=int, help='Specify payload load address', default =0x000800000)
     parser.add_argument('-c', '--DscPath', type=str, default="UefiPayloadPkg/UefiPayloadPkg.dsc", help='Path to the DSC file')
+    parser.add_argument('-ac', '--add_cc_flags', action='append', help='Add specified CC compile flags')
+    parser.add_argument('-ci','--CiBuild', action='store_true', help='Call from edk2 CI Build Process or not', default=False)
+    if LoadDefault:
+        args, _ = parser.parse_known_args()
+    else:
+        args = parser.parse_args()
+    return args
 
-    args = parser.parse_args()
-
-
+def UniversalPayloadFullBuild(args):
     MultiFvList = []
     UniversalPayloadBinary = args.PreBuildUplBinary
     if (args.SkipBuild == False):
@@ -361,6 +379,12 @@ def main():
                 return status
 
     print ("\nSuccessfully build Universal Payload")
+    return 0
+
+def main():
+
+    args = InitArgumentParser(False)
+    return UniversalPayloadFullBuild(args)
 
 if __name__ == '__main__':
     main()

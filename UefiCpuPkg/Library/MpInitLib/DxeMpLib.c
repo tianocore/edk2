@@ -160,7 +160,7 @@ GetWakeupBuffer (
   @retval 0       Cannot find free memory below 4GB.
 **/
 UINTN
-AllocateCodeBuffer (
+AllocateCodePage (
   IN UINTN  BufferSize
   )
 {
@@ -313,7 +313,9 @@ GetProtectedMode16CS (
   IA32_DESCRIPTOR          GdtrDesc;
   IA32_SEGMENT_DESCRIPTOR  *GdtEntry;
   UINTN                    GdtEntryCount;
-  UINT16                   Index;
+  UINTN                    Index;
+  UINT16                   CodeSegmentValue;
+  EFI_STATUS               Status;
 
   Index = (UINT16)-1;
   AsmReadGdtr (&GdtrDesc);
@@ -329,8 +331,19 @@ GetProtectedMode16CS (
     GdtEntry++;
   }
 
-  ASSERT (Index != GdtEntryCount);
-  return Index * 8;
+  Status = SafeUintnToUint16 (Index, &CodeSegmentValue);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return 0;
+  }
+
+  Status = SafeUint16Mult (CodeSegmentValue, 8, &CodeSegmentValue);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return 0;
+  }
+
+  return CodeSegmentValue;
 }
 
 /**
@@ -346,7 +359,9 @@ GetProtectedModeCS (
   IA32_DESCRIPTOR          GdtrDesc;
   IA32_SEGMENT_DESCRIPTOR  *GdtEntry;
   UINTN                    GdtEntryCount;
-  UINT16                   Index;
+  UINTN                    Index;
+  UINT16                   CodeSegmentValue;
+  EFI_STATUS               Status;
 
   AsmReadGdtr (&GdtrDesc);
   GdtEntryCount = (GdtrDesc.Limit + 1) / sizeof (IA32_SEGMENT_DESCRIPTOR);
@@ -361,8 +376,19 @@ GetProtectedModeCS (
     GdtEntry++;
   }
 
-  ASSERT (Index != GdtEntryCount);
-  return Index * 8;
+  Status = SafeUintnToUint16 (Index, &CodeSegmentValue);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return 0;
+  }
+
+  Status = SafeUint16Mult (CodeSegmentValue, 8, &CodeSegmentValue);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return 0;
+  }
+
+  return CodeSegmentValue;
 }
 
 /**
@@ -391,14 +417,11 @@ AllocateApLoopCodeBuffer (
 /**
   Remove Nx protection for the range specific by BaseAddress and Length.
 
-  The PEI implementation uses CpuPageTableLib to change the attribute.
-  The DXE implementation uses gDS to change the attribute.
-
   @param[in] BaseAddress  BaseAddress of the range.
   @param[in] Length       Length of the range.
 **/
 VOID
-RemoveNxprotection (
+RemoveNxProtection (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINTN                 Length
   )
@@ -406,17 +429,58 @@ RemoveNxprotection (
   EFI_STATUS                       Status;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  MemDesc;
 
-  //
-  // TODO: Check EFI_MEMORY_XP bit set or not once it's available in DXE GCD
-  //       service.
-  //
   Status = gDS->GetMemorySpaceDescriptor (BaseAddress, &MemDesc);
   if (!EFI_ERROR (Status)) {
-    gDS->SetMemorySpaceAttributes (
-           BaseAddress,
-           Length,
-           MemDesc.Attributes & (~EFI_MEMORY_XP)
-           );
+    if (((MemDesc.Capabilities & EFI_MEMORY_XP) == EFI_MEMORY_XP) && ((MemDesc.Attributes & EFI_MEMORY_XP) == EFI_MEMORY_XP)) {
+      Status = gDS->SetMemorySpaceAttributes (
+                      BaseAddress,
+                      Length,
+                      MemDesc.Attributes & (~EFI_MEMORY_XP)
+                      );
+
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "%a - Setting Nx on 0x%p returned %r\n", __func__, BaseAddress, Status));
+        ASSERT_EFI_ERROR (Status);
+      }
+    }
+  } else {
+    DEBUG ((DEBUG_ERROR, "%a - Memory Address was not found in Memory map! %lp %r\n", __func__, BaseAddress, Status));
+    ASSERT_EFI_ERROR (Status);
+  }
+}
+
+/**
+  Add ReadOnly protection to the range specified by BaseAddress and Length.
+
+  @param[in] BaseAddress  BaseAddress of the range.
+  @param[in] Length       Length of the range.
+**/
+VOID
+ApplyRoProtection (
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN                 Length
+  )
+{
+  EFI_STATUS                       Status;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  MemDesc;
+
+  Status = gDS->GetMemorySpaceDescriptor (BaseAddress, &MemDesc);
+  if (!EFI_ERROR (Status)) {
+    if (((MemDesc.Capabilities & EFI_MEMORY_RO) == EFI_MEMORY_RO) && ((MemDesc.Attributes & EFI_MEMORY_RO) != EFI_MEMORY_RO)) {
+      Status = gDS->SetMemorySpaceAttributes (
+                      BaseAddress,
+                      Length,
+                      MemDesc.Attributes | EFI_MEMORY_RO
+                      );
+
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "%a - Setting Ro on 0x%p returned %r\n", __func__, BaseAddress, Status));
+        ASSERT_EFI_ERROR (Status);
+      }
+    }
+  } else {
+    DEBUG ((DEBUG_ERROR, "%a - Memory Address was not found in Memory map! %lp %r\n", __func__, BaseAddress, Status));
+    ASSERT_EFI_ERROR (Status);
   }
 }
 

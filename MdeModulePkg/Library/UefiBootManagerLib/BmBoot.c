@@ -1404,7 +1404,7 @@ BmDestroyRamDisk (
 
   Status = mRamDisk->Unregister (RamDiskDevicePath);
   ASSERT_EFI_ERROR (Status);
-  FreePages (RamDiskBuffer, RamDiskSizeInPages);
+  FreeAlignedPages (RamDiskBuffer, RamDiskSizeInPages);
 }
 
 /**
@@ -1454,8 +1454,12 @@ BmExpandLoadFile (
 
   //
   // The load option resides in a RAM disk.
+  // Use a reasonable default of 2MB for alignment as the ramdisk device is
+  // implemented as an NVDIMM persistent memory and operating systems may
+  // wish to map this with huge page support.
   //
-  FileBuffer = AllocateReservedPages (EFI_SIZE_TO_PAGES (BufferSize));
+
+  FileBuffer = AllocateAlignedReservedPages (EFI_SIZE_TO_PAGES (BufferSize), SIZE_2MB);
   if (FileBuffer == NULL) {
     DEBUG_CODE_BEGIN ();
     EFI_DEVICE_PATH  *LoadFilePath;
@@ -1496,7 +1500,7 @@ BmExpandLoadFile (
 
   Status = LoadFile->LoadFile (LoadFile, FilePath, TRUE, &BufferSize, FileBuffer);
   if (EFI_ERROR (Status)) {
-    FreePages (FileBuffer, EFI_SIZE_TO_PAGES (BufferSize));
+    FreeAlignedPages (FileBuffer, EFI_SIZE_TO_PAGES (BufferSize));
     return NULL;
   }
 
@@ -1541,6 +1545,11 @@ BmExpandLoadFiles (
   UINTN                     HandleCount;
   UINTN                     Index;
   EFI_DEVICE_PATH_PROTOCOL  *Node;
+  EFI_DEVICE_PATH_PROTOCOL  *NewDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL  *HttpPath;
+  URI_DEVICE_PATH           *NullUriPath;
+
+  NullUriPath = NULL;
 
   //
   // Get file buffer from load file instance.
@@ -1573,11 +1582,50 @@ BmExpandLoadFiles (
 
     for (Index = 0; Index < HandleCount; Index++) {
       if (BmMatchHttpBootDevicePath (DevicePathFromHandle (Handles[Index]), FilePath)) {
+        //
+        // Matches HTTP Boot Device Path described as
+        //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv4(...)[/Dns(...)]/Uri(...)
+        //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv6(...)[/Dns(...)]/Uri(...)
+        //
+        Handle = Handles[Index];
+        goto Done;
+      }
+    }
+
+    NullUriPath = (URI_DEVICE_PATH *)CreateDeviceNode (
+                                       MESSAGING_DEVICE_PATH,
+                                       MSG_URI_DP,
+                                       (UINT16)(sizeof (URI_DEVICE_PATH))
+                                       );
+    for (Index = 0; Index < HandleCount; Index++) {
+      if ((Handles == NULL) || (Handles[Index] == NULL)) {
+        continue;
+      }
+
+      NewDevicePath = DevicePathFromHandle (Handles[Index]);
+      if (NewDevicePath == NULL) {
+        continue;
+      }
+
+      HttpPath = AppendDevicePathNode (NewDevicePath, (EFI_DEVICE_PATH_PROTOCOL *)NullUriPath);
+      if (HttpPath == NULL) {
+        continue;
+      }
+
+      if (BmMatchHttpBootDevicePath (HttpPath, FilePath)) {
+        //
+        // Matches HTTP Boot Device Path described as
+        //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv4(...)[/Dns(...)]/Uri(...)/Uri(...)
+        //   ....../Mac(...)[/Vlan(...)][/Wi-Fi(...)]/IPv6(...)[/Dns(...)]/Uri(...)/Uri(...)
+        //
         Handle = Handles[Index];
         break;
       }
     }
 
+    FreePool (NullUriPath);
+
+Done:
     if (Handles != NULL) {
       FreePool (Handles);
     }
@@ -2667,4 +2715,81 @@ EfiBootManagerGetNextLoadOptionDevicePath (
   )
 {
   return BmGetNextLoadOptionDevicePath (FilePath, FullPath);
+}
+
+/**
+  Variable policy protocol installation notification.
+
+  @param[in]    Event           The notification event.
+  @param[in]    Context         Pointer to the context registered when the event is created. Not used.
+
+**/
+VOID
+EFIAPI
+OnVariablePolicyNotification (
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
+  )
+{
+  EFI_STATUS                      Status;
+  EDKII_VARIABLE_POLICY_PROTOCOL  *VariablePolicy = NULL;
+
+  Status = gBS->LocateProtocol (&gEdkiiVariablePolicyProtocolGuid, NULL, (VOID **)&VariablePolicy);
+  if (!EFI_ERROR (Status)) {
+    Status = RegisterBasicVariablePolicy (
+               VariablePolicy,
+               &mBmHardDriveBootVariableGuid,
+               L"HDDP",
+               sizeof (EFI_DEVICE_PATH_PROTOCOL),
+               VARIABLE_POLICY_NO_MAX_SIZE,
+               EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+               (UINT32) ~(EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE),
+               VARIABLE_POLICY_TYPE_NO_LOCK
+               );
+
+    // Multiple modules link to UefiBootManagerLib. There are a couple of cases that need to be ignored.
+    // 1. Write Protected.  Write Protected occurs after Ready to Boot.  Some modules, such as the Shell, run
+    //                      after Ready To Boot.
+    // 2. Already Started.  Only the first module to register a variable policy will successfully register
+    //                      a policy. The subsequent modules will get EFI_ALREADY_STARTED.
+    if (EFI_ERROR (Status) && (Status != EFI_ALREADY_STARTED) && (Status != EFI_WRITE_PROTECTED)) {
+      DEBUG ((DEBUG_ERROR, "%a: - Error setting policy for HDDP - Status=%r\n", __func__, Status));
+      ASSERT_EFI_ERROR (Status);
+    }
+
+    if (Event != NULL) {
+      gBS->CloseEvent (Event);
+    }
+  } else {
+    DEBUG ((DEBUG_ERROR, "%a: - Unable to locate variable policy protocol - Status=%r\n", __func__, Status));
+  }
+}
+
+/**
+  Constructor for UefiBootMangerLib.
+
+  @param[in] ImageHandle  The handle of the loaded image.
+  @param[in] SystemTable  System resources and configuration
+
+  @retval EFI_SUCCESS   The constructor set the variable policy if implemented
+  @retval others        The constructor did not succeed and one or more variable policy are not set
+**/
+EFI_STATUS
+EFIAPI
+UefiBootManagerLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  VOID  *Registration;
+
+  EfiCreateProtocolNotifyEvent (
+    &gEdkiiVariablePolicyProtocolGuid,
+    TPL_CALLBACK,
+    OnVariablePolicyNotification,
+    NULL,
+    &Registration
+    );
+
+  return EFI_SUCCESS;
 }

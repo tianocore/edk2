@@ -1351,7 +1351,6 @@ WifiMgrDxeHiiConfigAccessRouteConfig (
   @retval EFI_SUCCESS            The callback successfully handled the action.
   @retval EFI_OUT_OF_RESOURCES   Not enough storage is available to hold the
                                  variable and its data.
-  @retval EFI_DEVICE_ERROR       The variable could not be saved.
   @retval EFI_UNSUPPORTED        The specified Action is not supported by the
                                  callback.
 
@@ -1400,7 +1399,7 @@ WifiMgrDxeHiiConfigAccessCallback (
   Status  = EFI_SUCCESS;
   Private = WIFI_MGR_PRIVATE_DATA_FROM_CONFIG_ACCESS (This);
   if (Private->CurrentNic == NULL) {
-    return EFI_DEVICE_ERROR;
+    return EFI_UNSUPPORTED;
   }
 
   //
@@ -1490,6 +1489,7 @@ WifiMgrDxeHiiConfigAccessCallback (
   } else if (Action == EFI_BROWSER_ACTION_FORM_CLOSE) {
     switch (QuestionId) {
       case KEY_EAP_ENROLL_CERT_FROM_FILE:
+      case KEY_EAP_ENROLL_PRIVATE_KEY_FROM_FILE:
       case KEY_REFRESH_NETWORK_LIST:
 
         if (Private->CurrentNic->UserSelectedProfile == NULL) {
@@ -1559,6 +1559,11 @@ WifiMgrDxeHiiConfigAccessCallback (
         // User triggered a scan process.
         //
         Private->CurrentNic->OneTimeScanRequest = TRUE;
+        Status                                  = WifiMgrStartScan (Private->CurrentNic);
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_WARN, "[WiFi Connection Manager] Error: Failed in start scan for network list with status %r", Status));
+        }
+
         break;
 
       case KEY_PASSWORD_CONNECT_NETWORK:
@@ -1661,6 +1666,12 @@ WifiMgrDxeHiiConfigAccessCallback (
           //
           Private->CurrentNic->OneTimeDisconnectRequest    = TRUE;
           Private->CurrentNic->HasDisconnectPendingNetwork = TRUE;
+        }
+
+        Status = gBS->SetTimer (Private->CurrentNic->TickTimer, TimerPeriodic, EFI_TIMER_PERIOD_MILLISECONDS (500));
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_WARN, "[WiFi Connection Manager] Error: Failed to set timer for connect action!"));
+          gBS->SetTimer (Private->CurrentNic->TickTimer, TimerCancel, 0);
         }
 
         break;
@@ -1912,6 +1923,12 @@ WifiMgrDxeHiiConfigAccessCallback (
               NULL
               );
           }
+        }
+
+        Status = gBS->SetTimer (Private->CurrentNic->TickTimer, TimerPeriodic, EFI_TIMER_PERIOD_MILLISECONDS (500));
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_WARN, "[WiFi Connection Manager] Error: Failed to set timer for connect action!"));
+          gBS->SetTimer (Private->CurrentNic->TickTimer, TimerCancel, 0);
         }
 
         break;

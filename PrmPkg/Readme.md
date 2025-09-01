@@ -14,9 +14,9 @@ to be leveraged by platform firmware with minimal overhead to integrate PRM func
 `PlatformRtMechanism`. Support for this OperationRegion is planned for the next release of the ACPI specification.
 However, support for `PlatformRtMechanism` is already included in the iASL Compiler/Disassembler for early prototyping
 (i.e. this package). If you would like the default build to work and/or to use PRM handlers that are invoked
-through ACPI, iASL compiler [20200528](https://acpica.org/node/181) or greater must be used. If you are only
-interested in compiling the code and/or using direct call style PRM handlers, you can simply remove
-`PrmSsdtInstallDxe` from `PrmPkg.dsc`.
+through ACPI, iASL compiler [20200528](https://www.intel.com/content/www/us/en/download/774849/774861/acpi-component-architecture-downloads-previous-releases-2020.html)
+or greater must be used. If you are only interested in compiling the code and/or using direct call style PRM
+handlers, you can simply remove `PrmSsdtInstallDxe` from `PrmPkg.dsc`.
 
 The changes in the ACPI Specification include two elements:
 
@@ -53,11 +53,13 @@ To build `PrmPkg` as a standalone package:
 
 5. Build PrmPkg \
 
-The PrmPkg can be built targetting the IA32/X64 and AArch64 architectures.
+The PrmPkg can be built targeting the X64 and AArch64 architectures. PRM is not supported on IA32 and ARM primarily
+because the OS support for PRM is only in 64 bit OSes. In addition, the MSVC toolchain does not support export tables
+on IA32 with the unique UEFI configuration required.
 
- - IA32/X64
+* X64
 
-   ``build -p PrmPkg/PrmPkg.dsc -a IA32 -a X64``
+   ``build -p PrmPkg/PrmPkg.dsc -a X64``
    > ***Note***: Due to the way PRM modules are compiled with exports, **only building on Visual Studio compiler tool
    chains has been tested**.
 
@@ -68,11 +70,13 @@ The PrmPkg can be built targetting the IA32/X64 and AArch64 architectures.
 > You can add your own PRM modules into the build and check them with the `PrmInfo` UEFI application described
 > later in this document and dump the PRMT table in the OS to check if your PRM module is represented as expected.
 
- - AArch64
+* AArch64
     ``build -p PrmPkg/PrmPkg.dsc -a AARCH64 -t GCC5``
 
    > ***Note***: Only builds with the GCC5 toolchain have been tested.
-   > ***Note***: For builds with the GCC5 toolchain, the PrmModuleExportDescriptor and any other handler entry points symbols, to be listed in the PRMT, must be explicitly preserved by enumerating these in the AARCH64 linker flags. The --require-defined linker flag must be used for each symbol to be preserved.
+   > ***Note***: For builds with the GCC5 toolchain, the PrmModuleExportDescriptor and any other handler entry points
+   symbols, to be listed in the PRMT, must be explicitly preserved by enumerating these in the AARCH64 linker flags.
+   The --require-defined linker flag must be used for each symbol to be preserved.
 
 ### PRM Platform GUID
 
@@ -97,8 +101,8 @@ the package being built.
 Like a typical EDK II package, the PrmPkg binary build output can be found in the Build directory in the edk2
 workspace. The organization in that directory follows the same layout as other EDK II packages.
 
-For example, that path to PRM module sample binaries for a DEBUG VS2017 X64 build is: \
-``edk2/Build/Prm/DEBUG_VS2017/X64/PrmPkg/Samples``
+For example, that path to PRM module sample binaries for a DEBUG VS2022 X64 build is: \
+``edk2/Build/Prm/DEBUG_VS2022/X64/PrmPkg/Samples``
 
 ## Overview
 

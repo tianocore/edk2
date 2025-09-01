@@ -59,8 +59,7 @@ SpiBusEntry (
 
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_VERBOSE, "No SpiHcProtocol is found\n"));
-    Status = EFI_NOT_FOUND;
-    goto Exit;
+    return EFI_NOT_FOUND;
   }
 
   // Locate the SPI Configuration Protocol
@@ -108,7 +107,7 @@ SpiBusEntry (
       // Get SpiHc from the SpiHcHandles
       Status = gBS->HandleProtocol (
                       SpiHcHandles[HcIndex],
-                      &gEfiDevicePathProtocolGuid,
+                      &gEfiSpiHcProtocolGuid,
                       (VOID **)&SpiHc
                       );
 
@@ -193,6 +192,9 @@ SpiBusEntry (
   }
 
 Exit:
+
+  gBS->FreePool (SpiHcHandles);
+
   DEBUG ((DEBUG_VERBOSE, "%a - EXIT (Status = %r)\n", __func__, Status));
   return Status;
 }

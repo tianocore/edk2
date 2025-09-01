@@ -56,6 +56,8 @@
   PlatformBmPrintScLib
   Tcg2PhysicalPresenceLib
   XenPlatformLib
+  QemuFwCfgSimpleParserLib
+  PlatformBootManagerCommonLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent
@@ -87,3 +89,4 @@
   gRootBridgesConnectedEventGroupGuid
   gUefiShellFileGuid
   gGrubFileGuid
+  gUiAppFileGuid

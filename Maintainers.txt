@@ -67,8 +67,10 @@ Tianocore Stewards
 ------------------
 F: *
 M: Andrew Fish <afish@apple.com> [ajfish]
-M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
+M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
+M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 M: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
+M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 
 Responsible Disclosure, Reporting Security Issues
 -------------------------------------------------
@@ -82,22 +84,27 @@ M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 EDK II Architectures:
 ---------------------
 ARM, AARCH64
-F: */AArch64/
-F: */Arm/
-M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
+F: MdeModulePkg/*/AArch64/
+F: MdeModulePkg/*/Arm/
+F: MdePkg/*/AArch64/
+F: MdePkg/*/Arm/
+F: UefiCpuPkg/*/AArch64/
+F: UefiCpuPkg/*/Arm/
+M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 
 RISCV64
 F: */RiscV64/
 M: Sunil V L <sunilvl@ventanamicro.com> [vlsunil]
-R: Andrei Warkentin <andrei.warkentin@intel.com> [andreiw]
+R: Andrei Warkentin <andyw@imsa.edu> [andreiw]
 
 LOONGARCH64
 F: */LoongArch64/
 M: Chao Li <lichao@loongson.cn> [kilaterlee]
 M: Baoqi Zhang <zhangbaoqi@loongson.cn> [zhangbaoqi-ls]
 R: Dongyan Qian <qiandongyan@loongson.cn> [MarsDoge]
+R: Xiangdong Meng <mengxiangdong@loongson.cn> [AydenMeng]
 
 EDK II Continuous Integration:
 ------------------------------
@@ -132,19 +139,25 @@ M: Joey Vagedes <joey.vagedes@gmail.com> [javagedes]
 R: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
+EDK II Contributed Files:
+-------------------------
+VS Code PR Dashboard Notebook
+F: contrib/PullRequests.github-issues
+M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
+
 EDK II Packages:
 ----------------
 ArmPkg
 F: ArmPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPkg
-M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
+M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 
 ArmPlatformPkg
 F: ArmPlatformPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPlatformPkg
-M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
+M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 
@@ -153,7 +166,7 @@ F: ArmVirtPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmVirtPkg
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
-R: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
+R: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 
 BaseTools
@@ -161,8 +174,9 @@ F: BaseTools/
 W: https://github.com/tianocore/tianocore.github.io/wiki/BaseTools
 M: Rebecca Cran <rebecca@bsdio.com> [bexcran]
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
-R: Bob Feng <bob.c.feng@intel.com> [BobCF]
+M: Guillermo Antonio Palomino Sosa <guillermo.a.palomino.sosa@intel.com> [gapalomi]
 R: Yuwei Chen <yuwei.chen@intel.com> [YuweiChen1110]
+R: Poncho Figueroa <poncho.figueroa.esqueda@intel.com> [ponchofigueroa]
 
 BaseTools: Plugins
 F: BaseTools/Plugin/
@@ -186,15 +200,16 @@ M: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
 EmbeddedPkg
 F: EmbeddedPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmbeddedPkg
-M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
+M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Abner Chang <abner.chang@amd.com> [changab]
 
 EmulatorPkg
 F: EmulatorPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmulatorPkg
+M: Oliver Smith-Denny <osde@microsoft.com> [os-d]
 M: Andrew Fish <afish@apple.com> [ajfish]
-M: Ray Ni <ray.ni@intel.com> [niruiyu]
+M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 S: Maintained
 
 EmulatorPkg: Redfish-related modules
@@ -205,7 +220,7 @@ M: Nickle Wang <nicklew@nvidia.com> [nicklela]
 FatPkg
 F: FatPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/Edk2-fat-driver
-M: Ray Ni <ray.ni@intel.com> [niruiyu]
+M: Oliver Smith-Denny <osde@microsoft.com> [os-d]
 T: svn - https://svn.code.sf.net/p/edk2-fatdriver2/code/trunk/EnhancedFat
 T: git - https://github.com/tianocore/edk2-FatPkg.git
 
@@ -221,7 +236,6 @@ F: IntelFsp2Pkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFsp2Pkg
 M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
-M: Duggapu Chinni B <chinni.b.duggapu@intel.com> [cbduggap]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 R: Ted Kuo <ted.kuo@intel.com> [tedkuo1]
 R: Ashraf Ali S <ashraf.ali.s@intel.com> [AshrafAliS]
@@ -231,8 +245,6 @@ F: IntelFsp2WrapperPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFsp2WrapperPkg
 M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
-M: Duggapu Chinni B <chinni.b.duggapu@intel.com> [cbduggap]
-M: Chen Gang C <gang.c.chen@intel.com> [chengangc]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 R: Ted Kuo <ted.kuo@intel.com> [tedkuo1]
 R: Ashraf Ali S <ashraf.ali.s@intel.com> [AshrafAliS]
@@ -257,7 +269,7 @@ F: MdeModulePkg/Universal/DevicePathDxe/
 F: MdeModulePkg/Universal/DriverHealthManagerDxe/
 F: MdeModulePkg/Universal/LoadFileOnFv2/
 F: MdeModulePkg/Universal/SecurityStubDxe/Defer3rdPartyImageLoad.*
-R: Ray Ni <ray.ni@intel.com> [niruiyu]
+R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
 
 MdeModulePkg: Core services (PEI, DXE and Runtime) modules
 F: MdeModulePkg/*Mem*/
@@ -302,11 +314,11 @@ F: MdeModulePkg/Include/Ppi/StorageSecurityCommand.h
 F: MdeModulePkg/Include/Protocol/Ps2Policy.h
 F: MdeModulePkg/Library/NonDiscoverableDeviceRegistrationLib/
 F: MdeModulePkg/Universal/PcatSingleSegmentPciCfg2Pei/
-R: Ray Ni <ray.ni@intel.com> [niruiyu]
+R: Jacek Kolakowski <jacek.kolakowski@intel.com> [jkolakow]
 
 MdeModulePkg: Disk modules
 F: MdeModulePkg/Universal/Disk/
-R: Ray Ni <ray.ni@intel.com> [niruiyu]
+R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
 
 MdeModulePkg: Firmware Update modules
 F: MdeModulePkg/*Capsule*/
@@ -365,7 +377,6 @@ R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
 MdeModulePkg: Universal Payload definitions
 F: MdeModulePkg/Include/UniversalPayload/
-R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
 
 MdeModulePkg: Trace Hub debug message related library instance
@@ -393,12 +404,18 @@ F: MdeModulePkg/Bus/Spi/
 M: Abner Chang <abner.chang@amd.com> [changab]
 R: Brit Chesley <brit.chesley@amd.com> [BritChesley]
 
+MdeModulePkg: ARM-FFA related modules
+F: MdeModulePkg/*ArmFfa*
+F: MdeModulePkg/*/ArmFfa*/
+M: Sami Mujawar <Sami.Mujawar@arm.com> [samimujawar]
+R: Yeo Reum Yun <YeoReum.Yun@arm.com> [LeviYeoReum]
+R: Kun Qin <kun.qin@microsoft.com> [kuqin12]
+
 MdePkg
 F: MdePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdePkg
 M: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
-R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]
 
 MdePkg: Trace Hub debug message related library instance
 F: MdePkg/Library/TraceHubDebugSysTLibNull/
@@ -413,7 +430,7 @@ MdePkg: FDT related library instance
 F: MdePkg/Library/BaseFdtLib/*
 F: MdePkg/Include/Library/FdtLib.h
 M: Benny Lin <benny.lin@intel.com> [Benny3345678]
-M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
+M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
 R: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 R: James Lu <james.lu@intel.com> [jameslu8]
@@ -434,9 +451,16 @@ R: Brit Chesley <brit.chesley@amd.com> [BritChesley]
 
 MdePkg: ARM/AARCH64 standard interfaces
 F: MdePkg/Include/Library/ArmLib.h
-M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
+M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
+
+MdePkg: ARM-FFA related interfaces
+F: MdePkg/*ArmFfa*
+F: MdePkg/*/ArmFfa*/
+M: Sami Mujawar <Sami.Mujawar@arm.com> [samimujawar]
+R: Yeo Reum Yun <YeoReum.Yun@arm.com> [LeviYeoReum]
+R: Kun Qin <kun.qin@microsoft.com> [kuqin12]
 
 NetworkPkg
 F: NetworkPkg/
@@ -491,13 +515,13 @@ F: OvmfPkg/ResetVector/
 F: OvmfPkg/Sec/
 R: Erdem Aktas <erdemaktas@google.com> [ruleof2]
 R: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
-R: Min Xu <min.m.xu@intel.com> [mxu9]
+R: Stanislaw Grams <stanislaw.grams@intel.com> [sgrams]
 R: Tom Lendacky <thomas.lendacky@amd.com> [tlendacky]
 R: Michael Roth <michael.roth@amd.com> [mdroth]
 
 OvmfPkg: FDT related modules
 F: OvmfPkg/Fdt
-R: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
+R: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 R: Abner Chang <abner.chang@amd.com> [changab]
 
@@ -549,7 +573,7 @@ R: Anthony Perard <anthony@xenproject.org> [tperard]
 OvmfPkg: RISC-V Qemu Virt Platform
 F: OvmfPkg/RiscVVirt
 M: Sunil V L <sunilvl@ventanamicro.com> [vlsunil]
-R: Andrei Warkentin <andrei.warkentin@intel.com> [andreiw]
+R: Andrei Warkentin <andyw@imsa.edu> [andreiw]
 
 OvmfPkg: LOONGARCH Qemu Virt Platform
 F: OvmfPkg/LoongArchVirt
@@ -566,9 +590,11 @@ PrmPkg
 F: PrmPkg/
 M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
+M: Aaron Li <aaron.li@intel.com> [Li-Aaron]
 
 PrmPkg: ACPI related modules
 R: Ankit Sinha <ankit.sinha@intel.com> [ankit13s]
+R: Aaron Li <aaron.li@intel.com> [Li-Aaron]
 
 RedfishPkg: Redfish related modules
 F: RedfishPkg/
@@ -589,11 +615,22 @@ R: Min Xu <min.m.xu@intel.com> [mxu9]
 
 SecurityPkg: Tcg related modules
 F: SecurityPkg/Tcg/
-R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
+R: Arun Subramanian Baskaran <arun.subramanian.baskaran@intel.com> [arunsbaskaran]
+
+SecurityPkg: SVSM related modules
+F: SecurityPkg/Library/Tpm2DeviceLibDTpm/*Svsm*
+R: Oliver Steffen <osteffen@redhat.com> [osteffenrh]
+R: Tom Lendacky <thomas.lendacky@amd.com> [tlendacky]
+
+SecurityPkg: ARM-FFA related modules
+F: SecurityPkg/*Arm
+F: SecurityPkg/*Ffa
+R: Kun Qin <kun.qin@microsoft.com> [kuqin12]
 
 ShellPkg
 F: ShellPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
+R: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
 
 SignedCapsulePkg
 F: SignedCapsulePkg/
@@ -609,14 +646,21 @@ M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
+R: Dun Tan <dun.tan@intel.com> [td36]
+R: Khor Swee Aun <swee.aun.khor@intel.com> [sweeaun]
+R: Eduardo Cuevas Farfan <eduardo.cuevas.farfan@intel.com> [ecuevasf]
 
 UefiCpuPkg
 F: UefiCpuPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
-R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
+M: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
+R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]
+R: Dun Tan <dun.tan@intel.com> [td36]
+R: Arun Subramanian Baskaran <arun.subramanian.baskaran@intel.com> [arunsbaskaran]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
-R: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
+R: Star Zeng <star.zeng@intel.com> [lzeng14]
+R: Eduardo Cuevas Farfan <eduardo.cuevas.farfan@intel.com> [ecuevasf]
 
 UefiCpuPkg: AMD related files
 F: UefiCpuPkg/Library/MmSaveStateLib/*Amd*.*
@@ -631,8 +675,9 @@ M: Guo Dong <guo.dong@intel.com> [gdong1]
 M: Sean Rhodes <sean@starlabs.systems> [Sean-StarLabs]
 M: James Lu <james.lu@intel.com> [jameslu8]
 M: Benjamin Doron <benjamin.doron@9elements.com> [benjamindoron]
-M: Linus Liu <linus.liu@intel.com> [LinusvPelt]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
+M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
+R: Shuo Liu <shuo.liu@intel.com> [shuoliu0]
 S: Maintained
 
 UnitTestFrameworkPkg

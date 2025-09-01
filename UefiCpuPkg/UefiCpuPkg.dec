@@ -25,6 +25,11 @@
   ##
   RegisterCpuFeaturesLib|Include/Library/RegisterCpuFeaturesLib.h
 
+  ##  @libraryclass  Defines some common architecture-level fundamental routines which
+  ##                 are supported at different architectures.
+  ##
+  UefiCpuBaseArchSupportLib|Include/Library/BaseArchLibSupport.h
+
 [LibraryClasses.IA32, LibraryClasses.X64]
   ##  @libraryclass  Provides functions to manage MTRR settings on IA32 and X64 CPUs.
   ##
@@ -75,8 +80,6 @@
   SmmRelocationLib|Include/Library/SmmRelocationLib.h
 
 [LibraryClasses.RISCV64]
-  ##  @libraryclass  Provides function to initialize the FPU.
-  RiscVFpuLib|Include/Library/BaseRiscVFpuLib.h
   ##  @libraryclass  Provides functions to manage MMU features on RISCV64 CPUs.
   ##
   RiscVMmuLib|Include/Library/BaseRiscVMmuLib.h
@@ -84,6 +87,11 @@
 [LibraryClasses.LoongArch64]
   ##  @libraryclass  Provides functions for the memory management unit.
   CpuMmuLib|Include/Library/CpuMmuLib.h
+
+[LibraryClasses.ARM, LibraryClasses.AARCH64]
+  ##  @libraryclass  Provides a Mmu interface.
+  #
+  ArmMmuLib|Include/Library/ArmMmuLib.h
 
 [Guids]
   gUefiCpuPkgTokenSpaceGuid      = { 0xac05bf33, 0x995a, 0x4ed4, { 0xaa, 0xb8, 0xef, 0x7a, 0xe8, 0xf, 0x5c, 0xb0 }}
@@ -122,6 +130,9 @@
   # Include/Guid/MmAcpiS3Enable.h
   gMmAcpiS3EnableHobGuid         = { 0xe7402821, 0x2654, 0x4c1b, { 0x99, 0x0e, 0x04, 0x8f, 0x8d, 0x82, 0xcf, 0x67 }}
 
+[Guids.ARM, Guids.AARCH64]
+  gArmMmuReplaceLiveTranslationEntryFuncGuid = { 0xa8b50ff3, 0x08ec, 0x4dd3, {0xbf, 0x04, 0x28, 0xbf, 0x71, 0x75, 0xc7, 0x4a} }
+
 [Protocols]
   ## Include/Protocol/SmmCpuService.h
   gEfiSmmCpuServiceProtocolGuid   = { 0x1d202cab, 0xc8ab, 0x4d5c, { 0x94, 0xf7, 0x3c, 0xfc, 0xc0, 0xd3, 0xd3, 0x35 }}
@@ -143,6 +154,11 @@
 #
 
 [Ppis]
+  #
+  # The EDK II PEI MP Services 2 PPI has been replaced by the PEI MP Services 2 PPI
+  # in the MdePkg. The following definition is only present for backwards compatibility
+  # and will be removed in the future.
+  #
   gEdkiiPeiMpServices2PpiGuid =    { 0x5cb9cb3d, 0x31a4, 0x480c, { 0x94, 0x98, 0x29, 0xd2, 0x69, 0xba, 0xcf, 0xba}}
 
   ## Include/Ppi/ShadowMicrocode.h

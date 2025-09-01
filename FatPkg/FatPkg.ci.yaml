@@ -6,6 +6,9 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
+    "PrEval": {
+        "DscPath": "FatPkg.dsc",
+    },
     "LicenseCheck": {
         "IgnoreFiles": []
     },
@@ -60,7 +63,7 @@
             "FFFFFFFFL",
             "CDVOL",
             "DMDEPKG",
-            "lba's"
+            "lba's",
         ]
     }
 }

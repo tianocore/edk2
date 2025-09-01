@@ -542,8 +542,19 @@ OneOfStatementToAttributeValues (
     }
 
     if (Option->Text != 0) {
-      Values->ValueArray[Index].ValueName        = HiiGetRedfishAsciiString (HiiHandle, SchemaName, Option->Text);
       Values->ValueArray[Index].ValueDisplayName = HiiGetEnglishAsciiString (HiiHandle, Option->Text);
+      Values->ValueArray[Index].ValueName        = HiiGetRedfishAsciiString (HiiHandle, SchemaName, Option->Text);
+      if (Values->ValueArray[Index].ValueName == NULL) {
+        DEBUG ((DEBUG_MANAGEABILITY, "%a: Redfish x-UEFI string is not found.\n", __func__));
+        //
+        // No x-UEFI-redfish string defined. Try to get string in English.
+        //
+        Values->ValueArray[Index].ValueName =
+          AllocateCopyPool (AsciiStrSize (Values->ValueArray[Index].ValueDisplayName), (VOID *)Values->ValueArray[Index].ValueDisplayName);
+        if (Values->ValueArray[Index].ValueName == NULL) {
+          DEBUG ((DEBUG_MANAGEABILITY, "%a: Both Redfish and English string are not found.\n", __func__));
+        }
+      }
     }
 
     Index += 1;
@@ -1309,8 +1320,16 @@ HiiValueToRedfishValue (
 
       RedfishValue->Value.Buffer = HiiGetRedfishAsciiString (HiiHandle, FullSchema, StringId);
       if (RedfishValue->Value.Buffer == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        break;
+        DEBUG ((DEBUG_MANAGEABILITY, "%a: Redfish x-UEFI string is not found.\n", __func__));
+        //
+        // No x-UEFI-redfish string defined. Try to get string in English.
+        //
+        RedfishValue->Value.Buffer = HiiGetEnglishAsciiString (HiiHandle, StringId);
+        if (RedfishValue->Value.Buffer == NULL) {
+          DEBUG ((DEBUG_MANAGEABILITY, "%a: Both Redfish and English string are not found.\n", __func__));
+          Status = EFI_OUT_OF_RESOURCES;
+          break;
+        }
       }
 
       RedfishValue->Type = RedfishValueTypeString;
@@ -1399,6 +1418,18 @@ HiiValueToRedfishValue (
         }
 
         RedfishValue->Value.StringArray[Index] = HiiGetRedfishAsciiString (HiiHandle, FullSchema, StringIdArray[Index]);
+        if (RedfishValue->Value.StringArray[Index] == NULL) {
+          DEBUG ((DEBUG_MANAGEABILITY, "%a: Redfish x-UEFI string is not found.\n", __func__));
+          //
+          // No x-UEFI-redfish string defined. Try to get string in English.
+          //
+          RedfishValue->Value.StringArray[Index] = HiiGetEnglishAsciiString (HiiHandle, StringIdArray[Index]);
+          if (RedfishValue->Value.StringArray[Index] == NULL) {
+            DEBUG ((DEBUG_MANAGEABILITY, "%a: Both Redfish and English string are not found.\n", __func__));
+            Status = EFI_OUT_OF_RESOURCES;
+          }
+        }
+
         ASSERT (RedfishValue->Value.StringArray[Index] != NULL);
       }
 
@@ -1418,6 +1449,7 @@ HiiValueToRedfishValue (
 
       RedfishValue->Value.Buffer = HiiGetRedfishAsciiString (HiiHandle, FullSchema, HiiStatement->ExtraData.TextTwo);
       if (RedfishValue->Value.Buffer == NULL) {
+        DEBUG ((DEBUG_MANAGEABILITY, "%a: Redfish x-UEFI string is not found.\n", __func__));
         //
         // No x-UEFI-redfish string defined. Try to get string in English.
         //
@@ -1666,7 +1698,7 @@ RedfishPlatformConfigProtocolGetValue (
     goto RELEASE_RESOURCE;
   }
 
-  if (TargetStatement->Suppressed) {
+  if (TargetStatement->Suppressed && !RedfishPlatformConfigFeatureProp (REDFISH_PLATFORM_CONFIG_ALLOW_SUPPRESSED)) {
     Status = EFI_ACCESS_DENIED;
     goto RELEASE_RESOURCE;
   }
@@ -1764,6 +1796,7 @@ RedfishPlatformConfigSetStatementCommon (
   UINTN                                      Index;
   UINT64                                     Value;
   CHAR8                                      **CharArray;
+  UINTN                                      StrLength;
 
   if ((RedfishPlatformConfigPrivate == NULL) || IS_EMPTY_STRING (Schema) || IS_EMPTY_STRING (ConfigureLang) || (StatementValue == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -1771,6 +1804,7 @@ RedfishPlatformConfigSetStatementCommon (
 
   TempBuffer  = NULL;
   StringArray = NULL;
+  StrLength   = 0;
 
   Status = ProcessPendingList (&RedfishPlatformConfigPrivate->FormsetList, &RedfishPlatformConfigPrivate->PendingList);
   if (EFI_ERROR (Status)) {
@@ -1840,12 +1874,27 @@ RedfishPlatformConfigSetStatementCommon (
       StatementValue->Buffer          = StringArray;
       StatementValue->BufferLen       = TargetStatement->HiiStatement->StorageWidth;
       StatementValue->BufferValueType = TargetStatement->HiiStatement->Value.BufferValueType;
-    } else if ((TargetStatement->HiiStatement->Operand == EFI_IFR_NUMERIC_OP) && (StatementValue->Type == EFI_IFR_TYPE_NUM_SIZE_64)) {
+    } else if (TargetStatement->HiiStatement->Operand == EFI_IFR_NUMERIC_OP) {
+      if (StatementValue->Type == EFI_IFR_TYPE_NUM_SIZE_64) {
+        //
+        // Redfish only has numeric value type and it does not care about the value size.
+        // Do a patch here so we have proper value size applied.
+        //
+        StatementValue->Type = TargetStatement->HiiStatement->Value.Type;
+      }
+
       //
-      // Redfish only has numeric value type and it does not care about the value size.
-      // Do a patch here so we have proper value size applied.
+      // Check maximum and minimum values when they are set.
       //
-      StatementValue->Type = TargetStatement->HiiStatement->Value.Type;
+      if ((TargetStatement->StatementData.NumMaximum > 0) && (TargetStatement->StatementData.NumMaximum >= TargetStatement->StatementData.NumMinimum)) {
+        if (StatementValue->Value.u64 > TargetStatement->StatementData.NumMaximum) {
+          DEBUG ((DEBUG_ERROR, "%a: integer value: %lu is greater than maximum value: %lu\n", __func__, StatementValue->Value.u64, TargetStatement->StatementData.NumMaximum));
+          return EFI_ACCESS_DENIED;
+        } else if (StatementValue->Value.u64 < TargetStatement->StatementData.NumMinimum) {
+          DEBUG ((DEBUG_ERROR, "%a: integer value: %lu is smaller than minimum value: %lu\n", __func__, StatementValue->Value.u64, TargetStatement->StatementData.NumMinimum));
+          return EFI_ACCESS_DENIED;
+        }
+      }
     } else {
       DEBUG ((DEBUG_ERROR, "%a: catch value type mismatch! input type: 0x%x but target value type: 0x%x\n", __func__, StatementValue->Type, TargetStatement->HiiStatement->Value.Type));
       ASSERT (FALSE);
@@ -1853,6 +1902,20 @@ RedfishPlatformConfigSetStatementCommon (
   }
 
   if ((TargetStatement->HiiStatement->Operand == EFI_IFR_STRING_OP) && (StatementValue->Type == EFI_IFR_TYPE_STRING)) {
+    //
+    // Check string length when length limitation is set.
+    //
+    if ((TargetStatement->StatementData.StrMaxSize > 0) && (TargetStatement->StatementData.StrMaxSize >= TargetStatement->StatementData.StrMinSize)) {
+      StrLength = StrLen ((EFI_STRING)StatementValue->Buffer);
+      if (StrLength > TargetStatement->StatementData.StrMaxSize) {
+        DEBUG ((DEBUG_ERROR, "%a: string length: %u is greater than maximum string length: %u\n", __func__, StrLength, TargetStatement->StatementData.StrMaxSize));
+        return EFI_ACCESS_DENIED;
+      } else if (StrLength < TargetStatement->StatementData.StrMinSize) {
+        DEBUG ((DEBUG_ERROR, "%a: string length: %u is smaller than minimum string length: %u\n", __func__, StrLength, TargetStatement->StatementData.StrMinSize));
+        return EFI_ACCESS_DENIED;
+      }
+    }
+
     //
     // Create string ID for new string.
     //
@@ -2258,7 +2321,7 @@ RedfishPlatformConfigProtocolGetDefaultValue (
     goto RELEASE_RESOURCE;
   }
 
-  if (TargetStatement->Suppressed) {
+  if (TargetStatement->Suppressed && !RedfishPlatformConfigFeatureProp (REDFISH_PLATFORM_CONFIG_ALLOW_SUPPRESSED)) {
     Status = EFI_ACCESS_DENIED;
     goto RELEASE_RESOURCE;
   }

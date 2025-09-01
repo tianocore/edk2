@@ -24,12 +24,16 @@
 #
 ##
 
+merge_queue:
+  max_parallel_checks: 1
+
 queue_rules:
   - name: default
     queue_conditions:
       - base~=(^main|^master|^stable/)
       - label=push
     merge_method: rebase
+    update_bot_account: tianocore-issues
 
 pull_request_rules:
   - name: Automatically merge a PR when all required checks pass and 'push' label is present

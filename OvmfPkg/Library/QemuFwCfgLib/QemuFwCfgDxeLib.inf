@@ -30,6 +30,7 @@
   QemuFwCfgLibInternal.h
   QemuFwCfgLib.c
   QemuFwCfgDxe.c
+  QemuFwCfgCache.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -42,11 +43,16 @@
   DebugLib
   IoLib
   MemoryAllocationLib
-  MemEncryptSevLib
-  MemEncryptTdxLib
+  HobLib
 
 [Protocols]
   gEdkiiIoMmuProtocolGuid                         ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
+
+[Guids]
+  gOvmfFwCfgInfoHobGuid
 
 [Depex]
   gEdkiiIoMmuProtocolGuid OR gIoMmuAbsentProtocolGuid

@@ -63,7 +63,6 @@
 #include <Protocol/ScsiIo.h>
 #include <Protocol/IScsiInitiatorName.h>
 #include <Protocol/UsbIo.h>
-#include <Protocol/UsbHostController.h>
 #include <Protocol/Usb2HostController.h>
 #include <Protocol/DebugSupport.h>
 #include <Protocol/DebugPort.h>
@@ -94,8 +93,6 @@
 #include <Protocol/HiiConfigAccess.h>
 #include <Protocol/FormBrowser2.h>
 #include <Protocol/DeviceIo.h>
-#include <Protocol/UgaDraw.h>
-#include <Protocol/UgaIo.h>
 #include <Protocol/DriverConfiguration.h>
 #include <Protocol/DriverConfiguration2.h>
 #include <Protocol/DevicePathUtilities.h>

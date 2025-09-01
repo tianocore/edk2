@@ -447,19 +447,14 @@ cleanlib:
         self.ResultFileList = []
         self.IntermediateDirectoryList = ["$(DEBUG_DIR)", "$(OUTPUT_DIR)"]
 
-        self.FileBuildTargetList = []       # [(src, target string)]
         self.BuildTargetList = []           # [target string]
-        self.PendingBuildTargetList = []    # [FileBuildRule objects]
         self.CommonFileDependency = []
         self.FileListMacros = {}
         self.ListFileMacros = {}
         self.ObjTargetDict = OrderedDict()
         self.FileCache = {}
-        self.LibraryBuildCommandList = []
-        self.LibraryFileList = []
         self.LibraryMakefileList = []
         self.LibraryBuildDirectoryList = []
-        self.SystemLibraryList = []
         self.Macros = OrderedDict()
         self.Macros["OUTPUT_DIR"      ] = self._AutoGenObject.Macros["OUTPUT_DIR"]
         self.Macros["DEBUG_DIR"       ] = self._AutoGenObject.Macros["DEBUG_DIR"]
@@ -899,9 +894,20 @@ cleanlib:
                                 break
 
                         if self._AutoGenObject.ToolChainFamily == 'GCC':
-                            RespDict[Key] = Value.replace('\\', '/')
-                        else:
-                            RespDict[Key] = Value
+                            #
+                            # Replace '\' with '/' in the response file.
+                            # Skip content within "" or \"\"
+                            #
+                            ValueList = re.split(r'("|\\"|\s+)', Value)
+                            Skip = False
+                            for i, v in enumerate(ValueList):
+                                if v in ('"', '\\"'):
+                                    Skip = not Skip
+                                elif not Skip:
+                                    ValueList[i] = v.replace('\\', '/')
+                            Value = ''.join(ValueList)
+                        RespDict[Key] = Value
+
                         for Target in BuildTargets:
                             for i, SingleCommand in enumerate(BuildTargets[Target].Commands):
                                 if FlagDict[Flag]['Macro'] in SingleCommand:
@@ -1145,21 +1151,6 @@ cleanlib:
         for LibraryAutoGen in self._AutoGenObject.LibraryAutoGenList:
             if not LibraryAutoGen.IsBinaryModule:
                 self.LibraryBuildDirectoryList.append(self.PlaceMacro(LibraryAutoGen.BuildDir, self.Macros))
-
-    ## Return a list containing source file's dependencies
-    #
-    #   @param      FileList        The list of source files
-    #   @param      ForceInculeList The list of files which will be included forcely
-    #   @param      SearchPathList  The list of search path
-    #
-    #   @retval     dict            The mapping between source file path and its dependencies
-    #
-    def GetFileDependency(self, FileList, ForceInculeList, SearchPathList):
-        Dependency = {}
-        for F in FileList:
-            Dependency[F] = GetDependencyList(self._AutoGenObject, self.FileCache, F, ForceInculeList, SearchPathList)
-        return Dependency
-
 
 ## CustomMakefile class
 #
@@ -1452,7 +1443,6 @@ cleanlib:
     #
     def __init__(self, PlatformAutoGen):
         BuildFile.__init__(self, PlatformAutoGen)
-        self.ModuleBuildCommandList = []
         self.ModuleMakefileList = []
         self.IntermediateDirectoryList = []
         self.ModuleBuildDirectoryList = []

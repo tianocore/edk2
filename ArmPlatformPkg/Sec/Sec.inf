@@ -47,9 +47,12 @@
   DebugLib
   PrintLib
   SerialPortLib
+  StackCheckLib
+  ArmTransferListLib
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid
+  gArmTransferListPpiGuid
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
@@ -57,9 +60,11 @@
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmTokenSpaceGuid.PcdFvSize
-  gArmTokenSpaceGuid.PcdVFPEnabled
 
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack
+
+[FixedPcd.ARM]
+  gArmTokenSpaceGuid.PcdVFPEnabled

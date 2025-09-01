@@ -49,6 +49,7 @@
   PeCoffLib
   TpmMeasurementLib
   TdxLib
+  TdxMeasurementLib
 
 [Guids]
   ## SOMETIMES_CONSUMES     ## Variable:L"SecureBoot"

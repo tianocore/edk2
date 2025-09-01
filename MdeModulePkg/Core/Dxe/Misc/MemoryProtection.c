@@ -38,6 +38,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/MemoryAttributesTable.h>
 
 #include <Protocol/FirmwareVolume2.h>
+#include <Protocol/MemoryAttribute.h>
 #include <Protocol/SimpleFileSystem.h>
 
 #include "DxeMain.h"
@@ -66,6 +67,8 @@ UINT32  mImageProtectionPolicy;
 extern LIST_ENTRY  mGcdMemorySpaceMap;
 
 STATIC LIST_ENTRY  mProtectedImageRecordList;
+
+EFI_MEMORY_ATTRIBUTE_PROTOCOL  *gMemoryAttributeProtocol;
 
 /**
   Get the image type.
@@ -194,16 +197,113 @@ SetUefiImageMemoryAttributes (
   EFI_STATUS                       Status;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  Descriptor;
   UINT64                           FinalAttributes;
+  UINT64                           CurrentAddress;
+  UINT64                           CurrentLength;
+  UINT64                           ImageEnd;
+  UINT64                           DescEnd;
 
-  Status = CoreGetMemorySpaceDescriptor (BaseAddress, &Descriptor);
-  ASSERT_EFI_ERROR (Status);
+  CurrentAddress = BaseAddress;
+  ImageEnd       = BaseAddress + Length;
 
-  FinalAttributes = (Descriptor.Attributes & EFI_CACHE_ATTRIBUTE_MASK) | (Attributes & EFI_MEMORY_ATTRIBUTE_MASK);
+  // we loop here because we may have multiple memory space descriptors that overlap the requested range
+  // this will definitely be the case for unprotecting an image, because that calls this function for the entire image,
+  // which we split into different GCD descriptors when we protected it.
+  while (CurrentAddress < BaseAddress + Length) {
+    Status = CoreGetMemorySpaceDescriptor (CurrentAddress, &Descriptor);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a - Failed to get memory space descriptor for address %llx with status %r. Cannot protect image.\n",
+        __func__,
+        CurrentAddress,
+        Status
+        ));
+      ASSERT_EFI_ERROR (Status);
+      return;
+    }
 
-  DEBUG ((DEBUG_INFO, "SetUefiImageMemoryAttributes - 0x%016lx - 0x%016lx (0x%016lx)\n", BaseAddress, Length, FinalAttributes));
+    DescEnd = Descriptor.BaseAddress + Descriptor.Length;
 
-  ASSERT (gCpu != NULL);
-  gCpu->SetMemoryAttributes (gCpu, BaseAddress, Length, FinalAttributes);
+    // ensure that we only change the attributes for the range that we are interested in, not the entire descriptor, we
+    // may also be in the middle of a descriptor, so ensure our length is not larger than the descriptor length
+    if (ImageEnd > DescEnd) {
+      CurrentLength = DescEnd - CurrentAddress;
+    } else {
+      CurrentLength = ImageEnd - CurrentAddress;
+    }
+
+    // Preserve the existing caching and virtual attributes, but remove the hardware access bits
+    FinalAttributes = (Descriptor.Attributes & ~EFI_MEMORY_ACCESS_MASK) | (Attributes & EFI_MEMORY_ATTRIBUTE_MASK);
+
+    DEBUG ((DEBUG_VERBOSE, "SetUefiImageMemoryAttributes - 0x%016lx - 0x%016lx (0x%016lx)\n", CurrentAddress, CurrentLength, FinalAttributes));
+
+    // check to see if the capabilities support the attributes we want to set. If not, set the capabilities appropriately
+    if ((Descriptor.Capabilities & FinalAttributes) != FinalAttributes) {
+      Status = CoreSetMemorySpaceCapabilities (
+                 CurrentAddress,
+                 CurrentLength,
+                 Descriptor.Capabilities | FinalAttributes
+                 );
+
+      // if we failed to set the capabilities, we should try to continue, it is possible we could succeed
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "%a failed setting capabilities on %llx of length %llx with capabilities %llx - %r\n",
+          __func__,
+          CurrentAddress,
+          CurrentLength,
+          Descriptor.Capabilities | FinalAttributes,
+          Status
+          ));
+        ASSERT_EFI_ERROR (Status);
+      }
+    }
+
+    // Call into the GCD to update the attributes there. It will call into the CPU Arch protocol to update the
+    // page table attributes
+    Status = CoreSetMemorySpaceAttributes (
+               CurrentAddress,
+               CurrentLength,
+               FinalAttributes
+               );
+
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a failed on %llx of length %llx with attributes %llx - %r\n",
+        __func__,
+        CurrentAddress,
+        CurrentLength,
+        FinalAttributes,
+        Status
+        ));
+      ASSERT_EFI_ERROR (Status);
+    }
+
+    if (((FinalAttributes & (EFI_MEMORY_ATTRIBUTE_MASK | EFI_CACHE_ATTRIBUTE_MASK)) == 0) && (gCpu != NULL)) {
+      // if the passed hardware attributes are 0, CoreSetMemorySpaceAttributes() will not call into the CPU Arch protocol
+      // to set the attributes, so we need to do it manually here. This can be the case when we are unprotecting an
+      // image if no caching attributes are set. If gCpu has not been populated yet, we'll still have updated the GCD
+      // descriptor and we should sync the attributes with the CPU Arch protocol when it is available.
+      Status = gCpu->SetMemoryAttributes (gCpu, CurrentAddress, CurrentLength, 0);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "%a failed to update page table for %llx of length %llx with attributes 0 - %r\n",
+          __func__,
+          CurrentAddress,
+          CurrentLength,
+          Status
+          ));
+        ASSERT_EFI_ERROR (Status);
+      }
+    }
+
+    // we may have started in the middle of a descriptor, so we need to move to the beginning of the next descriptor,
+    // or the end of the image, whichever is smaller
+    CurrentAddress += CurrentLength;
+  }
 }
 
 /**
@@ -371,6 +471,19 @@ ProtectUefiImage (
 
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a failed to create image properties record\n", __func__));
+
+    // if we failed to create the image properties record, this may mean that the image is not aligned properly
+    // the GCD will believe that this memory is non-executable, because the NX initialization routine doesn't know what
+    // memory is image memory or not, even though the page table has the correct attributes, so we need to set the
+    // attributes here to RWX so that future updates to the GCD do not apply the NX attributes to this memory in the
+    // page table (as can happen when applying virtual attributes). This may have the side effect of marking other
+    // memory as RWX, since this image may not be page aligned, but that is safe to do, it may just remove some
+    // page protections, but it already has to to execute this image.
+    SetUefiImageMemoryAttributes (
+      (UINT64)(UINTN)LoadedImage->ImageBase & ~EFI_PAGE_MASK,
+      (LoadedImage->ImageSize + EFI_PAGE_MASK) & ~EFI_PAGE_MASK,
+      0
+      );
     FreePool (ImageRecord);
     goto Finish;
   }
@@ -924,6 +1037,37 @@ DisableNullDetectionAtTheEndOfDxe (
 }
 
 /**
+  A notification for the Memory Attribute Protocol Installation.
+
+  @param[in]  Event                 Event whose notification function is being invoked.
+  @param[in]  Context               Pointer to the notification function's context,
+                                    which is implementation-dependent.
+
+**/
+VOID
+EFIAPI
+MemoryAttributeProtocolNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = gBS->LocateProtocol (&gEfiMemoryAttributeProtocolGuid, NULL, (VOID **)&gMemoryAttributeProtocol);
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a - Unable to locate the memory attribute protocol! Status = %r\n",
+      __func__,
+      Status
+      ));
+  }
+
+  CoreCloseEvent (Event);
+}
+
+/**
   Initialize Memory Protection support.
 **/
 VOID
@@ -973,6 +1117,35 @@ CoreInitializeMemoryProtection (
              &Registration
              );
   ASSERT_EFI_ERROR (Status);
+
+  // Register an event to populate the memory attribute protocol
+  Status = CoreCreateEvent (
+             EVT_NOTIFY_SIGNAL,
+             TPL_CALLBACK,
+             MemoryAttributeProtocolNotify,
+             NULL,
+             &Event
+             );
+
+  // if we fail to create the event or the protocol notify, we should still continue, we won't be able to query the
+  // memory attributes on FreePages(), so we may encounter a driver or bootloader that has not set attributes back to
+  // RW, but this matches the state of the world before this protocol was introduced, so it is not a regression.
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - Failed to create event for the Memory Attribute Protocol notification: %r\n", __func__, Status));
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  // Register for protocol notification
+  Status = CoreRegisterProtocolNotify (
+             &gEfiMemoryAttributeProtocolGuid,
+             Event,
+             &Registration
+             );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - Failed to register for the Memory Attribute Protocol notification: %r\n", __func__, Status));
+    ASSERT_EFI_ERROR (Status);
+  }
 
   //
   // Register a callback to disable NULL pointer detection at EndOfDxe

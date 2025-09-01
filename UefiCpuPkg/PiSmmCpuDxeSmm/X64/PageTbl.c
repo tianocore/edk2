@@ -184,6 +184,7 @@ CalculateMaximumSupportAddress (
   Create PageTable for SMM use.
 
   @return The address of PML4 (to set CR3).
+          Zero if any error occurs.
 
 **/
 UINT32
@@ -200,6 +201,9 @@ SmmInitPageTable (
   UINT64                    *PdptEntry;
   UINT64                    *Pml4Entry;
   UINT64                    *Pml5Entry;
+
+  Pml4Entry = NULL;
+  Pml5Entry = NULL;
 
   //
   // Initialize spin lock
@@ -254,7 +258,16 @@ SmmInitPageTable (
     // Add pages to page pool
     //
     FreePage = (LIST_ENTRY *)AllocatePageTableMemory (PAGE_TABLE_PAGES);
-    ASSERT (FreePage != NULL);
+    if (FreePage == NULL) {
+      FreePages (Pml4Entry, 1);
+      if (Pml5Entry != NULL) {
+        FreePages (Pml5Entry, 1);
+      }
+
+      ASSERT (FreePage != NULL);
+      return 0;
+    }
+
     for (Index = 0; Index < PAGE_TABLE_PAGES; Index++) {
       InsertTailList (&mPagePool, FreePage);
       FreePage += EFI_PAGE_SIZE / sizeof (*FreePage);

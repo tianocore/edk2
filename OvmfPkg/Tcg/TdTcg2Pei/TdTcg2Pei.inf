@@ -1,0 +1,51 @@
+## @file
+#
+#  Produces EDKII_CC_MEASUREMENT_PPI
+#
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TdTcg2Pei
+  FILE_GUID                      = fcb3a3d6-6274-411c-a548-bd0e717d533a
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PeimEntryMA
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  TdTcg2Pei.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  CryptoPkg/CryptoPkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  HobLib
+  PeimEntryPoint
+  PeiServicesLib
+  BaseMemoryLib
+  DebugLib
+  PrintLib
+  TdxLib
+  BaseCryptLib
+  TdxMeasurementLib
+
+[Ppis]
+  gEdkiiCcPpiGuid
+
+[Guids]
+  gCcEventEntryHobGuid
+
+[Depex]
+  TRUE

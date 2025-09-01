@@ -14,7 +14,6 @@
 #include <Library/DebugLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/PrintLib.h>
-#include <Library/ArmDisassemblerLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
@@ -128,7 +127,7 @@ DescribeInstructionOrDataAbort (
 STATIC
 VOID
 DescribeExceptionSyndrome (
-  IN UINT32  Esr
+  IN UINT64  Esr
   )
 {
   CHAR8  *Message;

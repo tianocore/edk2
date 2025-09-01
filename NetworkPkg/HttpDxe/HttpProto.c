@@ -4,6 +4,7 @@
 Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+(c) Copyright 2025 HP Development Company, L.P.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -852,6 +853,19 @@ HttpCleanProtocol (
     HttpInstance->UrlLen = 0;
   }
 
+  if (HttpInstance->ProxyUrl != NULL) {
+    FreePool (HttpInstance->ProxyUrl);
+    HttpInstance->ProxyUrl    = NULL;
+    HttpInstance->ProxyUrlLen = 0;
+  }
+
+  if (HttpInstance->EndPointHostName != NULL) {
+    FreePool (HttpInstance->EndPointHostName);
+    HttpInstance->EndPointHostName = NULL;
+  }
+
+  HttpInstance->ProxyConnected = FALSE;
+
   NetMapClean (&HttpInstance->TxTokens);
   NetMapClean (&HttpInstance->RxTokens);
 
@@ -1077,8 +1091,8 @@ HttpConfigureTcp4 (
   IP4_COPY_ADDRESS (&Tcp4AP->RemoteAddress, &HttpInstance->RemoteAddr);
 
   Tcp4Option                      = Tcp4CfgData->ControlOption;
-  Tcp4Option->ReceiveBufferSize   = HTTP_BUFFER_SIZE_DEAULT;
-  Tcp4Option->SendBufferSize      = HTTP_BUFFER_SIZE_DEAULT;
+  Tcp4Option->ReceiveBufferSize   = PcdGet32 (PcdHttpTransferBufferSize);
+  Tcp4Option->SendBufferSize      = PcdGet32 (PcdHttpTransferBufferSize);
   Tcp4Option->MaxSynBackLog       = HTTP_MAX_SYN_BACK_LOG;
   Tcp4Option->ConnectionTimeout   = HTTP_CONNECTION_TIMEOUT;
   Tcp4Option->DataRetries         = HTTP_DATA_RETRIES;
@@ -1161,8 +1175,8 @@ HttpConfigureTcp6 (
   IP6_COPY_ADDRESS (&Tcp6Ap->RemoteAddress, &HttpInstance->RemoteIpv6Addr);
 
   Tcp6Option                      = Tcp6CfgData->ControlOption;
-  Tcp6Option->ReceiveBufferSize   = HTTP_BUFFER_SIZE_DEAULT;
-  Tcp6Option->SendBufferSize      = HTTP_BUFFER_SIZE_DEAULT;
+  Tcp6Option->ReceiveBufferSize   = PcdGet32 (PcdHttpTransferBufferSize);
+  Tcp6Option->SendBufferSize      = PcdGet32 (PcdHttpTransferBufferSize);
   Tcp6Option->MaxSynBackLog       = HTTP_MAX_SYN_BACK_LOG;
   Tcp6Option->ConnectionTimeout   = HTTP_CONNECTION_TIMEOUT;
   Tcp6Option->DataRetries         = HTTP_DATA_RETRIES;
@@ -1211,6 +1225,7 @@ HttpConfigureTcp6 (
   connect one TLS session if required.
 
   @param[in]  HttpInstance       The HTTP instance private data.
+  @param[in]  TlsConfigure       The Flag indicates whether it's the new Tls session.
 
   @retval EFI_SUCCESS            The TCP connection is established.
   @retval EFI_NOT_READY          TCP4 protocol child is not created or configured.
@@ -1219,7 +1234,8 @@ HttpConfigureTcp6 (
 **/
 EFI_STATUS
 HttpConnectTcp4 (
-  IN  HTTP_PROTOCOL  *HttpInstance
+  IN  HTTP_PROTOCOL  *HttpInstance,
+  IN  BOOLEAN        TlsConfigure
   )
 {
   EFI_STATUS                 Status;
@@ -1242,16 +1258,18 @@ HttpConnectTcp4 (
     return Status;
   }
 
-  if (Tcp4State == Tcp4StateEstablished) {
+  if ((Tcp4State == Tcp4StateEstablished) && (!HttpInstance->ProxyConnected || !TlsConfigure)) {
     return EFI_SUCCESS;
-  } else if (Tcp4State > Tcp4StateEstablished ) {
+  } else if (Tcp4State > Tcp4StateEstablished) {
     HttpCloseConnection (HttpInstance);
   }
 
-  Status = HttpCreateConnection (HttpInstance);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Tcp4 Connection fail - %x\n", Status));
-    return Status;
+  if (!HttpInstance->ProxyConnected) {
+    Status = HttpCreateConnection (HttpInstance);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Tcp4 Connection fail - %x\n", Status));
+      return Status;
+    }
   }
 
   //
@@ -1303,6 +1321,7 @@ HttpConnectTcp4 (
   connect one TLS session if required.
 
   @param[in]  HttpInstance       The HTTP instance private data.
+  @param[in]  TlsConfigure       The Flag indicates whether it's the new Tls session.
 
   @retval EFI_SUCCESS            The TCP connection is established.
   @retval EFI_NOT_READY          TCP6 protocol child is not created or configured.
@@ -1311,7 +1330,8 @@ HttpConnectTcp4 (
 **/
 EFI_STATUS
 HttpConnectTcp6 (
-  IN  HTTP_PROTOCOL  *HttpInstance
+  IN  HTTP_PROTOCOL  *HttpInstance,
+  IN  BOOLEAN        TlsConfigure
   )
 {
   EFI_STATUS                 Status;
@@ -1335,16 +1355,18 @@ HttpConnectTcp6 (
     return Status;
   }
 
-  if (Tcp6State == Tcp6StateEstablished) {
+  if ((Tcp6State == Tcp6StateEstablished) && (!HttpInstance->ProxyConnected || !TlsConfigure)) {
     return EFI_SUCCESS;
-  } else if (Tcp6State > Tcp6StateEstablished ) {
+  } else if (Tcp6State > Tcp6StateEstablished) {
     HttpCloseConnection (HttpInstance);
   }
 
-  Status = HttpCreateConnection (HttpInstance);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Tcp6 Connection fail - %x\n", Status));
-    return Status;
+  if (!HttpInstance->ProxyConnected) {
+    Status = HttpCreateConnection (HttpInstance);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Tcp6 Connection fail - %x\n", Status));
+      return Status;
+    }
   }
 
   //
@@ -1440,7 +1462,7 @@ HttpInitSession (
     //
     // Connect TCP.
     //
-    Status = HttpConnectTcp4 (HttpInstance);
+    Status = HttpConnectTcp4 (HttpInstance, TlsConfigure);
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -1458,7 +1480,7 @@ HttpInitSession (
     //
     // Connect TCP.
     //
-    Status = HttpConnectTcp6 (HttpInstance);
+    Status = HttpConnectTcp6 (HttpInstance, TlsConfigure);
     if (EFI_ERROR (Status)) {
       return Status;
     }

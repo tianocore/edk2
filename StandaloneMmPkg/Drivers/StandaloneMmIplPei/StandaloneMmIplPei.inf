@@ -56,11 +56,16 @@
   gMmCpuSyncConfigHobGuid
   gMmProfileDataHobGuid
   gMmUnblockRegionHobGuid
+  gMmStatusCodeUseSerialHobGuid
+  gEfiMmCommunicateHeaderV3Guid
 
 [Ppis]
   gEfiPeiMmControlPpiGuid
   gEfiPeiMmCommunicationPpiGuid
+  gEfiPeiMmCommunication3PpiGuid
   gEfiEndOfPeiSignalPpiGuid
+  gMmCoreFvLocationPpiGuid
+  gEfiPeiMmAccessPpiGuid
 
 [Protocols]
   gEfiMmEndOfPeiProtocol
@@ -68,6 +73,7 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMmCommBufferPages
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial            ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode                      ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout                 ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout2                ## CONSUMES

@@ -1,18 +1,12 @@
 /** @file
   This is a sample to demostrate the usage of the Unit Test Library that
-  supports the PEI, DXE, SMM, UEFI SHell, and host execution environments.
+  supports the PEI, DXE, SMM, and UEFI Shell environments.
 
   Copyright (c) Microsoft Corporation.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 #include "TestBaseCryptLib.h"
-
-VOID
-EFIAPI
-ProcessLibraryConstructorList (
-  VOID
-  );
 
 /**
   Initialize the unit test framework, suite, and unit tests for the
@@ -32,13 +26,18 @@ UefiTestMain (
   UNIT_TEST_FRAMEWORK_HANDLE  Framework;
 
   DEBUG ((DEBUG_INFO, "%a v%a\n", UNIT_TEST_NAME, UNIT_TEST_VERSION));
-  CreateUnitTest (UNIT_TEST_NAME, UNIT_TEST_VERSION, &Framework);
+  Status = CreateUnitTest (UNIT_TEST_NAME, UNIT_TEST_VERSION, &Framework);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed in CreateUnitTestsfor BaseCryptLib Tests!  Status = %r\n", Status));
+    goto Done;
+  }
 
   //
   // Execute the tests.
   //
   Status = RunAllTestSuites (Framework);
 
+Done:
   if (Framework) {
     FreeUnitTestFramework (Framework);
   }
@@ -70,18 +69,5 @@ DxeEntryPoint (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  return UefiTestMain ();
-}
-
-/**
-  Standard POSIX C entry point for host based unit test execution.
-**/
-int
-main (
-  int   argc,
-  char  *argv[]
-  )
-{
-  ProcessLibraryConstructorList ();
   return UefiTestMain ();
 }

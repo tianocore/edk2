@@ -81,7 +81,8 @@ typedef struct {
 ///
 /// Size of SMM communicate header, without including the payload.
 ///
-#define SMM_COMMUNICATE_HEADER_SIZE  (OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data))
+#define SMM_COMMUNICATE_HEADER_SIZE     (OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data))
+#define SMM_COMMUNICATE_HEADER_SIZE_V3  (sizeof (EFI_MM_COMMUNICATE_HEADER_V3))
 
 ///
 /// Size of SMM variable communicate header, without including the payload.

@@ -22,8 +22,6 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
-            "Library/ArmSoftFloatLib/berkeley-softfloat-3",
-            "Library/ArmSoftFloatLib/ArmSoftFloatLib.c",
             "Universal/Smbios/SmbiosMiscDxe"
         ]
     },
@@ -51,7 +49,9 @@
             "EmbeddedPkg/EmbeddedPkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
             "MdePkg/MdePkg.dec",
-            "ShellPkg/ShellPkg.dec"
+            "ShellPkg/ShellPkg.dec",
+            "StandaloneMmPkg/StandaloneMmPkg.dec",
+            "UefiCpuPkg/UefiCpuPkg.dec"
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[
@@ -90,10 +90,6 @@
     ## options defined .pytool/Plugin/SpellCheck
     "SpellCheck": {
         "AuditOnly": True,
-        "IgnoreFiles": [
-            "Library/ArmSoftFloatLib/berkeley-softfloat-3/**"
-        ],                           # use gitignore syntax to ignore errors
-                                     # in matching files
         "ExtendWords": [
           "api's",
           "ackintid",

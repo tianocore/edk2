@@ -249,6 +249,48 @@ struct cb_cbmem_tab {
   UINT64    cbmem_tab;
 };
 
+#define CB_TAG_SMMSTOREV2  0x0039
+struct cb_smmstorev2 {
+  UINT32    tag;
+  UINT32    size;
+  UINT32    num_blocks;      /* Number of writeable blocks in the store */
+  UINT32    block_size;      /* Size of a block in bytes (64 KiB by default) */
+  UINT32    mmap_addr;       /* MMIO address of the store for read-only access */
+  UINT32    com_buffer;      /* Physical address of the communication buffer */
+  UINT32    com_buffer_size; /* Size of the communication buffer in bytes */
+  UINT8     apm_cmd;         /* The command byte to write to the APM I/O port to
+                                communicate with the store */
+  UINT8     unused[3];       /* Set to zero */
+} __attribute__ ((packed));
+
+/*
+ * Machine-friendly version of a system firmware component.  A component is
+ * identified by a GUID.  coreboot is an obvious main component but there could
+ * be others (like EC) which should get their own instances of the tag.
+ *
+ * The main consumer of this information is UEFI firmware but something else
+ * could reuse it too.
+ *
+ * Larger number in a version field corresponds to a more recent version.
+ */
+#define CB_TAG_FW_INFO  0x0045
+struct lb_efi_fw_info {
+  UINT32    tag;
+  UINT32    size;
+  UINT8     guid[16];                 /* Called "firmware class" in UEFI */
+  UINT32    version;                  /* Current version */
+  UINT32    lowest_supported_version; /* Lowest allowed version */
+  UINT32    fw_size;                  /* Size of firmware in bytes */
+} __attribute__ ((packed));
+
+#define CB_TAG_CAPSULE  0x0046
+struct cb_range {
+  UINT32    tag;
+  UINT32    size;
+  UINT64    range_start;
+  UINT32    range_size;
+} __attribute__ ((packed));
+
 /* Helpful macros */
 
 #define MEM_RANGE_COUNT(_rec) \

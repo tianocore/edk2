@@ -1,17 +1,36 @@
 //
-//  Copyright (c) 2011 - 2020, Arm Limited. All rights reserved.<BR>
+//  Copyright (c) 2011 - 2025, Arm Limited. All rights reserved.<BR>
 //
 //  SPDX-License-Identifier: BSD-2-Clause-Patent
 //
+// @Par Reference(s):
+// - Firmware Handoff specification [https://firmwarehandoff.github.io/firmware_handoff/main]
 //
 
 #include <AsmMacroLib.h>
 
 ASM_FUNC(_ModuleEntryPoint)
+
+  // Check if register assignment at handoff matches spec
+  MOV64 (x4, 0x14a0fb10b)
+  cmp   x1, x4
+  // Skip TransferList init if x1 is not equal to the TransferList signature
+  b.ne  _SkipTransferList
+
+  // Skip TransferList init if x2 is not equal to 0
+  cbnz  x2, _SkipTransferList
+
+  // Set the TransferList Base Address from register x3
+  mov   x6, x3
+
+_SkipTransferList:
   // Do early platform specific actions
   bl    ASM_PFX(ArmPlatformPeiBootAction)
 
-_SetSVCMode:
+  // Enable Floating Point. This needs to be done before entering C code, which
+  // may use FP/SIMD registers.
+  bl    ArmEnableVFP
+
 // Check if we can install the stack at the top of the System Memory or if we need
 // to install the stacks at the bottom of the Firmware Device (case the FD is located
 // at the top of the DRAM)
@@ -73,6 +92,8 @@ _GetStackBase:
   MOV32 (x2, FixedPcdGet32(PcdCPUCorePrimaryStackSize))
   sub   x1, x1, x2
 
+  // Pass Transfer List Base Address
+  mov   x2, x6
   // Move sec startup address into a data register
   // Ensure we're jumping to FV version of the code (not boot remapped alias)
   ldr   x4, =ASM_PFX(CEntryPoint)

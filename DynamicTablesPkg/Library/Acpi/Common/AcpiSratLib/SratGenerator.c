@@ -2,6 +2,8 @@
   SRAT Table Generator
 
   Copyright (c) 2019 - 2020, Arm Limited. All rights reserved.
+  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -22,7 +24,10 @@
 #include <AcpiTableGenerator.h>
 #include <ConfigurationManagerObject.h>
 #include <ConfigurationManagerHelper.h>
+#include <MetadataHelpers.h>
+#include <Library/CmObjHelperLib.h>
 #include <Library/TableHelperLib.h>
+#include <Library/MetadataHandlerLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
 #include "SratGenerator.h"
@@ -80,9 +85,9 @@ GET_OBJECT_LIST (
 
 /** Return the PCI Device information in BDF format
 
-    PCI Bus Number - Max 256 busses (Bits 15:8 of BDF)
-    PCI Device Number - Max 32 devices (Bits 7:3 of BDF)
-    PCI Function Number - Max 8 functions (Bits 2:0 of BDF)
+    PCI Bus Number - Max 256 busses (Bits 7:0 of byte 0 of BDF)
+    PCI Device Number - Max 32 devices (Bits 7:3 of byte 1 of BDF)
+    PCI Function Number - Max 8 functions (Bits 2:0 of byte 1 BDF)
 
     @param [in]  DeviceHandlePci   Pointer to the PCI Device Handle.
 
@@ -94,12 +99,12 @@ GetBdf (
   IN CONST CM_ARCH_COMMON_DEVICE_HANDLE_PCI  *DeviceHandlePci
   )
 {
-  UINT16  Bdf;
+  UINT8  Bdf[2];
 
-  Bdf  = (UINT16)DeviceHandlePci->BusNumber << 8;
-  Bdf |= (DeviceHandlePci->DeviceNumber & 0x1F) << 3;
-  Bdf |= DeviceHandlePci->FunctionNumber & 0x7;
-  return Bdf;
+  Bdf[0]  = DeviceHandlePci->BusNumber;
+  Bdf[1]  = (DeviceHandlePci->DeviceNumber & 0x1F) << 3;
+  Bdf[1] |= DeviceHandlePci->FunctionNumber & 0x7;
+  return *(UINT16 *)Bdf;
 }
 
 /** Add the Memory Affinity Structures in the SRAT Table.
@@ -124,7 +129,9 @@ AddMemoryAffinity (
   IN       UINT32                                               MemAffCount
   )
 {
+  EFI_STATUS                              Status;
   EFI_ACPI_6_3_MEMORY_AFFINITY_STRUCTURE  *MemAff;
+  UINT32                                  ProximityDomain;
 
   ASSERT (Srat != NULL);
   ASSERT (MemAffInfo != NULL);
@@ -137,15 +144,28 @@ AddMemoryAffinity (
 
     MemAff->Type            = EFI_ACPI_6_3_MEMORY_AFFINITY;
     MemAff->Length          = sizeof (EFI_ACPI_6_3_MEMORY_AFFINITY_STRUCTURE);
-    MemAff->ProximityDomain = MemAffInfo->ProximityDomain;
     MemAff->Reserved1       = EFI_ACPI_RESERVED_WORD;
     MemAff->AddressBaseLow  = (UINT32)(MemAffInfo->BaseAddress & MAX_UINT32);
-    MemAff->AddressBaseHigh = (UINT32)(MemAffInfo->BaseAddress >> 32);
+    MemAff->AddressBaseHigh = (UINT32)RShiftU64 (MemAffInfo->BaseAddress, 32);
     MemAff->LengthLow       = (UINT32)(MemAffInfo->Length & MAX_UINT32);
-    MemAff->LengthHigh      = (UINT32)(MemAffInfo->Length >> 32);
+    MemAff->LengthHigh      = (UINT32)RShiftU64 (MemAffInfo->Length, 32);
     MemAff->Reserved2       = EFI_ACPI_RESERVED_DWORD;
     MemAff->Flags           = MemAffInfo->Flags;
     MemAff->Reserved3       = EFI_ACPI_RESERVED_QWORD;
+
+    Status = GetProximityDomainId (
+               CfgMgrProtocol,
+               MemAffInfo->ProximityDomain,
+               MemAffInfo->ProximityDomainToken,
+               &ProximityDomain
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
+
+    // Needed as the field is not 32-bits aligned.
+    MemAff->ProximityDomain = ProximityDomain;
 
     // Next
     MemAff++;
@@ -204,7 +224,17 @@ AddGenericInitiatorAffinity (
       sizeof (EFI_ACPI_6_3_GENERIC_INITIATOR_AFFINITY_STRUCTURE);
     GenInitAff->Reserved1        = EFI_ACPI_RESERVED_WORD;
     GenInitAff->DeviceHandleType = GenInitAffInfo->DeviceHandleType;
-    GenInitAff->ProximityDomain  = GenInitAffInfo->ProximityDomain;
+
+    Status = GetProximityDomainId (
+               CfgMgrProtocol,
+               GenInitAffInfo->ProximityDomain,
+               GenInitAffInfo->ProximityDomainToken,
+               &GenInitAff->ProximityDomain
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
 
     if (GenInitAffInfo->DeviceHandleToken == CM_NULL_TOKEN) {
       DEBUG ((

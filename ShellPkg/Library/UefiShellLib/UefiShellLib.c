@@ -3894,6 +3894,10 @@ InternalShellIsHexOrDecimalNumber (
     Hex = FALSE;
   }
 
+  if ((*String == CHAR_NULL) && LeadingZero) {
+    return (TRUE);
+  }
+
   //
   // loop through the remaining characters and use the lib function
   //
@@ -4009,9 +4013,10 @@ InternalShellStrHexToUint64 (
   IN CONST BOOLEAN  StopAtSpace
   )
 {
-  UINT64  Result;
+  UINT64   Result;
+  BOOLEAN  LeadingZero;
 
-  if ((String == NULL) || (StrSize (String) == 0) || (Value == NULL)) {
+  if ((String == NULL) || (*String == CHAR_NULL) || (Value == NULL)) {
     return (EFI_INVALID_PARAMETER);
   }
 
@@ -4025,12 +4030,14 @@ InternalShellStrHexToUint64 (
   //
   // Ignore leading Zeros after the spaces
   //
+  LeadingZero = FALSE;
   while (*String == L'0') {
     String++;
+    LeadingZero = TRUE;
   }
 
   if (CharToUpper (*String) == L'X') {
-    if (*(String - 1) != L'0') {
+    if (!LeadingZero) {
       return 0;
     }
 
@@ -4038,16 +4045,16 @@ InternalShellStrHexToUint64 (
     // Skip the 'X'
     //
     String++;
+
+    //
+    // there is a space where there should't be
+    //
+    if (*String == L' ') {
+      return (EFI_INVALID_PARAMETER);
+    }
   }
 
   Result = 0;
-
-  //
-  // there is a space where there should't be
-  //
-  if (*String == L' ') {
-    return (EFI_INVALID_PARAMETER);
-  }
 
   while (ShellIsHexaDecimalDigitCharacter (*String)) {
     //
@@ -4113,7 +4120,7 @@ InternalShellStrDecimalToUint64 (
 {
   UINT64  Result;
 
-  if ((String == NULL) || (StrSize (String) == 0) || (Value == NULL)) {
+  if ((String == NULL) || (*String == CHAR_NULL) || (Value == NULL)) {
     return (EFI_INVALID_PARAMETER);
   }
 
@@ -4231,15 +4238,17 @@ ShellConvertStringToUint64 (
     Status = InternalShellStrDecimalToUint64 (Walker, &RetVal, StopAtSpace);
   }
 
-  if ((Value == NULL) && !EFI_ERROR (Status)) {
-    return (EFI_NOT_FOUND);
+  if (EFI_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
   }
 
-  if (Value != NULL) {
-    *Value = RetVal;
+  if (Value == NULL) {
+    return EFI_NOT_FOUND;
   }
 
-  return (Status);
+  *Value = RetVal;
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -4370,6 +4379,7 @@ ShellFileHandleReadLine (
 {
   EFI_STATUS  Status;
   CHAR16      CharBuffer;
+  UINTN       BufferLength;
   UINTN       CharSize;
   UINTN       CountSoFar;
   UINT64      OriginalFilePosition;
@@ -4446,8 +4456,9 @@ ShellFileHandleReadLine (
     return (EFI_BUFFER_TOO_SMALL);
   }
 
-  while (Buffer[StrLen (Buffer)-1] == L'\r') {
-    Buffer[StrLen (Buffer)-1] = CHAR_NULL;
+  BufferLength = StrLen (Buffer);
+  while ((BufferLength != 0) && (Buffer[--BufferLength] == L'\r')) {
+    Buffer[BufferLength] = CHAR_NULL;
   }
 
   return (Status);

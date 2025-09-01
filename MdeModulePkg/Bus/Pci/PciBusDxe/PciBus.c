@@ -49,7 +49,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_PCI_HOTPLUG_REQUEST_PROTOCOL  mPciHotPlugReque
   Installs driver module protocols and. Creates virtual device handles for ConIn,
   ConOut, and StdErr. Installs Simple Text In protocol, Simple Text In Ex protocol,
   Simple Pointer protocol, Absolute Pointer protocol on those virtual handlers.
-  Installs Graphics Output protocol and/or UGA Draw protocol if needed.
+  Installs Graphics Output protocol if needed.
 
   @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.

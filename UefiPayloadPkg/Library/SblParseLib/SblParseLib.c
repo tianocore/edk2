@@ -14,6 +14,7 @@
 #include <Library/IoLib.h>
 #include <Library/HobLib.h>
 #include <Library/BlParseLib.h>
+#include <Library/SmmStoreParseLib.h>
 #include <IndustryStandard/Acpi.h>
 #include <UniversalPayload/PciRootBridges.h>
 
@@ -288,4 +289,59 @@ ParseMiscInfo (
   }
 
   return Status;
+}
+
+/**
+  Find the SmmStore HOB.
+
+  @param  SmmStoreInfo       Pointer to the SMMSTORE_INFO structure
+
+  @retval RETURN_SUCCESS     Successfully found the Smm store buffer information.
+  @retval RETURN_NOT_FOUND   Failed to find the Smm store buffer information.
+**/
+RETURN_STATUS
+EFIAPI
+ParseSmmStoreInfo (
+  OUT SMMSTORE_INFO  *SmmStoreInfo
+  )
+{
+  return RETURN_NOT_FOUND;
+}
+
+/**
+  Parse firmware information passed in by bootloader
+
+  @param  FwInfo   Information about current firmware.
+
+  @retval RETURN_INVALID_PARAMETER  The parameter is NULL.
+  @retval RETURN_SUCCESS            Successfully parsed information.
+  @retval RETURN_NOT_FOUND          The information is missing.
+**/
+RETURN_STATUS
+EFIAPI
+ParseFirmwareInfo (
+  OUT FIRMWARE_INFO  *FwInfo
+  )
+{
+  return RETURN_NOT_FOUND;
+}
+
+/**
+  Parse update capsules passed in by bootloader
+
+  @param  CapsuleCallback   The callback routine invoked for each capsule.
+
+  @retval RETURN_SUCCESS    Successfully parsed capsules.
+  @retval RETURN_NOT_FOUND  Failed to look up the information.
+**/
+RETURN_STATUS
+EFIAPI
+ParseCapsules (
+  IN BL_CAPSULE_CALLBACK  CapsuleCallback
+  )
+{
+  //
+  // Treat not supporting this function like reporting zero capsules.
+  //
+  return RETURN_SUCCESS;
 }

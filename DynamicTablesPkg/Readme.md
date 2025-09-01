@@ -325,7 +325,8 @@ or
 
 Ensure that the latest ACPICA iASL compiler is used for building *Dynamic Tables Framework*.
 *Dynamic Tables Framework* has been tested using the following iASL compiler version:
-[Version 20200717](https://www.acpica.org/node/183), dated 17 July, 2020.
+[Version 20200717](https://www.intel.com/content/www/us/en/download/774849/774863/acpi-component-architecture-downloads-previous-releases-2020.html),
+dated 17 July, 2020.
 
 
 #Running CI builds locally
@@ -500,6 +501,12 @@ The CM_OBJECT_ID type is used to identify the Configuration Manager
 |  26   | TPM Interface Info                        | |
 |  27   | SPMI Interface Info                       | |
 |  28   | SPMI Interrupt and Device/Uid Info        | |
+|  29   | Processor C-State Control Info            | |
+|  30   | Processor C-State Dependency Info         | |
+|  31   | Processor P-State Control Info            | |
+|  32   | Processor P-State Status Info             | |
+|  33   | Processor P-State Capability Info         | |
+|  34   | _STA Device Status Info                   | |
 |  `*`  | All other values are reserved.            | |
 
 #### Object ID's in the X64 Namespace:
@@ -518,4 +525,11 @@ The CM_OBJECT_ID type is used to identify the Configuration Manager
 |   9   | Miscellaneous Block Info                  | |
 |  10   | Windows protection flag Info              | |
 |  11   | HPET device Info                          | |
+|  12   | MADT Table Info                           | |
+|  13   | Local APIC and X2APIC info                | |
+|  14   | IO APIC info                              | |
+|  15   | Interrupt Source Override info            | |
+|  16   | Local APIC and X2APIC NMI info            | |
+|  17   | FACS Information                          | |
+|  18   | Local APIC and X2APIC Affinity info       | |
 |  `*`  | All other values are reserved.            | |

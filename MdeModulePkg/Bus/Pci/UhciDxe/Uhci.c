@@ -875,7 +875,7 @@ Uhci2BulkTransfer (
 
   //
   // Link the TDs to bulk queue head. According to the platfore
-  // defintion of UHCI_NO_BW_RECLAMATION, BulkQh is either configured
+  // definition of UHCI_NO_BW_RECLAMATION, BulkQh is either configured
   // to do full speed bandwidth reclamation or not.
   //
   BulkQh = Uhc->BulkQh;
@@ -1330,8 +1330,7 @@ UhciDriverEntryPoint (
 }
 
 /**
-  Test to see if this driver supports ControllerHandle. Any
-  ControllerHandle that has UsbHcProtocol installed will be supported.
+  Test to see if this driver supports ControllerHandle.
 
   @param  This                 Protocol instance pointer.
   @param  Controller           Handle of device to test.

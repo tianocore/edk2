@@ -10,12 +10,8 @@
 
 // Setup EL1 while in EL1
 ASM_FUNC(SetupExceptionLevel1)
-   mov  x5, x30                   // Save LR
-
-   mov  x0, #CPACR_CP_FULL_ACCESS
-   bl   ASM_PFX(ArmWriteCpacr)    // Disable copro traps to EL1
-
-   ret  x5
+   mov  x0, #CPACR_DEFAULT
+   b    ASM_PFX(ArmWriteCpacr)    // Tail call
 
 // Setup EL2 while in EL2
 ASM_FUNC(SetupExceptionLevel2)
@@ -28,15 +24,13 @@ ASM_FUNC(SetupExceptionLevel2)
    orr     x0, x0, #(1 << 5)      // Enable EL2 SError and Abort
    msr     hcr_el2, x0            // Write back our settings
 
-   msr     cptr_el2, xzr          // Disable copro traps to EL2
+   // Check whether we have been entered with HCR_EL2.E2H set, which is
+   // permitted to be RES1. In this case, CPACR_EL1 is aliased to CPTR_EL2.
+   tst     x0, #ARM_HCR_E2H
+   b.ne    SetupExceptionLevel1
 
-   // Enable Timer access for non-secure EL1 and EL0
-   // The cnthctl_el2 register bits are architecturally
-   // UNKNOWN on reset.
-   // Disable event stream as it is not in use at this stage
-   mov     x0, #(CNTHCTL_EL2_EL1PCTEN | CNTHCTL_EL2_EL1PCEN)
-   msr     cnthctl_el2, x0
-
+   mov     x0, #AARCH64_CPTR_DEFAULT
+   msr     cptr_el2, x0           // Enable architectural features
    ret
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

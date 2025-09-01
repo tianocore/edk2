@@ -1,18 +1,13 @@
 /** @file
   MM Core Main Entry Point
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2025, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "StandaloneMmCore.h"
-
-EFI_STATUS
-MmDispatcher (
-  VOID
-  );
 
 //
 // Globals used to initialize the protocol
@@ -83,10 +78,9 @@ MM_CORE_MMI_HANDLERS  mMmCoreMmiHandlers[] = {
   { NULL,                     NULL,                              NULL, FALSE },
 };
 
-BOOLEAN                     mMmEntryPointRegistered = FALSE;
-MM_COMM_BUFFER              *mMmCommunicationBuffer;
-VOID                        *mInternalCommBufferCopy;
-EFI_FIRMWARE_VOLUME_HEADER  *mBfv = NULL;
+BOOLEAN         mMmEntryPointRegistered = FALSE;
+MM_COMM_BUFFER  *mMmCommunicationBuffer;
+VOID            *mInternalCommBufferCopy;
 
 /**
   Place holder function until all the MM System Table Service are available.
@@ -304,7 +298,7 @@ MmEndOfPeiHandler (
 
   DEBUG ((DEBUG_INFO, "MmEndOfPeiHandler\n"));
   //
-  // Install MM EndOfDxe protocol
+  // Install MM EndOfPei protocol
   //
   MmHandle = NULL;
   Status   = MmInstallProtocolInterface (
@@ -452,8 +446,9 @@ MmCorePrepareCommunicationBuffer (
   mInternalCommBufferCopy = NULL;
 
   GuidHob = GetFirstGuidHob (&gMmCommBufferHobGuid);
-  ASSERT (GuidHob != NULL);
   if (GuidHob == NULL) {
+    DEBUG ((DEBUG_ERROR, "Failed to find MM Communication Buffer HOB\n"));
+    DEBUG ((DEBUG_ERROR, "Only Root MMI Handlers will be supported!\n"));
     return;
   }
 
@@ -507,10 +502,15 @@ MmEntryPoint (
   IN CONST EFI_MM_ENTRY_CONTEXT  *MmEntryContext
   )
 {
-  EFI_STATUS                 Status;
-  EFI_MM_COMMUNICATE_HEADER  *CommunicateHeader;
-  MM_COMM_BUFFER_STATUS      *CommunicationStatus;
-  UINTN                      BufferSize;
+  EFI_STATUS                    Status;
+  EFI_MM_COMMUNICATE_HEADER_V3  *CommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER     *LegacyCommunicateHeader;
+  MM_COMM_BUFFER_STATUS         *CommunicationStatus;
+  UINTN                         BufferSize;
+  EFI_HANDLE                    MmHandle;
+  EFI_GUID                      *CommGuid;
+  UINTN                         CommGuidOffset;
+  UINTN                         CommHeaderSize;
 
   DEBUG ((DEBUG_INFO, "MmEntryPoint ...\n"));
 
@@ -520,9 +520,22 @@ MmEntryPoint (
   CopyMem (&gMmCoreMmst.MmStartupThisAp, MmEntryContext, sizeof (EFI_MM_ENTRY_CONTEXT));
 
   //
-  // Call platform hook before Mm Dispatch
+  // Install a protocol to notify BeforeMmDispatch.
   //
-  // PlatformHookBeforeMmDispatch ();
+  MmHandle = NULL;
+  Status   = MmInstallProtocolInterface (
+               &MmHandle,
+               &gEfiMmEntryNotifyProtocolGuid,
+               EFI_NATIVE_INTERFACE,
+               NULL
+               );
+  if (!EFI_ERROR (Status)) {
+    MmUninstallProtocolInterface (
+      MmHandle,
+      &gEfiMmEntryNotifyProtocolGuid,
+      NULL
+      );
+  }
 
   //
   // Check to see if this is a Synchronous MMI sent through the MM Communication
@@ -534,8 +547,22 @@ MmEntryPoint (
       //
       // Synchronous MMI for MM Core or request from Communicate protocol
       //
-      CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)(UINTN)mMmCommunicationBuffer->PhysicalStart;
-      BufferSize        = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + CommunicateHeader->MessageLength;
+      CommGuid = &((EFI_MM_COMMUNICATE_HEADER_V3 *)(UINTN)mMmCommunicationBuffer->PhysicalStart)->HeaderGuid;
+      //
+      // Check if the signature matches EFI_MM_COMMUNICATE_HEADER_V3 definition
+      //
+      if (CompareGuid (CommGuid, &gEfiMmCommunicateHeaderV3Guid)) {
+        CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER_V3 *)(UINTN)mMmCommunicationBuffer->PhysicalStart;
+        CommGuidOffset    = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER_V3, MessageGuid);
+        CommHeaderSize    = sizeof (EFI_MM_COMMUNICATE_HEADER_V3);
+        BufferSize        = CommunicateHeader->BufferSize;
+      } else {
+        LegacyCommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)(UINTN)mMmCommunicationBuffer->PhysicalStart;
+        CommGuidOffset          = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, HeaderGuid);
+        CommHeaderSize          = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+        BufferSize              = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + LegacyCommunicateHeader->MessageLength;
+      }
+
       if (BufferSize <= EFI_PAGES_TO_SIZE (mMmCommunicationBuffer->NumberOfPages)) {
         //
         // Shadow the data from MM Communication Buffer to internal buffer
@@ -550,16 +577,15 @@ MmEntryPoint (
           EFI_PAGES_TO_SIZE (mMmCommunicationBuffer->NumberOfPages) - BufferSize
           );
 
-        CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)mInternalCommBufferCopy;
-        BufferSize        = CommunicateHeader->MessageLength;
-        Status            = MmiManage (
-                              &CommunicateHeader->HeaderGuid,
-                              NULL,
-                              CommunicateHeader->Data,
-                              &BufferSize
-                              );
+        BufferSize -= CommHeaderSize;
+        Status      = MmiManage (
+                        (EFI_GUID *)((UINT8 *)mInternalCommBufferCopy + CommGuidOffset),
+                        NULL,
+                        (UINT8 *)mInternalCommBufferCopy + CommHeaderSize,
+                        &BufferSize
+                        );
 
-        BufferSize = BufferSize + OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+        BufferSize = BufferSize + CommHeaderSize;
         if (BufferSize <= EFI_PAGES_TO_SIZE (mMmCommunicationBuffer->NumberOfPages)) {
           //
           // Copy the data back to MM Communication Buffer
@@ -587,13 +613,31 @@ MmEntryPoint (
       }
     }
   } else {
-    DEBUG ((DEBUG_ERROR, "No valid communication buffer, no Synchronous MMI will be processed\n"));
+    DEBUG ((DEBUG_INFO, "No valid communication buffer, no Synchronous MMI will be processed\n"));
   }
 
   //
   // Process Asynchronous MMI sources
   //
   MmiManage (NULL, NULL, NULL, NULL);
+
+  //
+  // Install a protocol to notify AfterMmDispatch.
+  //
+  MmHandle = NULL;
+  Status   = MmInstallProtocolInterface (
+               &MmHandle,
+               &gEfiMmExitNotifyProtocolGuid,
+               EFI_NATIVE_INTERFACE,
+               NULL
+               );
+  if (!EFI_ERROR (Status)) {
+    MmUninstallProtocolInterface (
+      MmHandle,
+      &gEfiMmExitNotifyProtocolGuid,
+      NULL
+      );
+  }
 
   //
   // TBD: Do not use private data structure ?
@@ -802,15 +846,8 @@ StandaloneMmMain (
   EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHobData;
   EFI_MMRAM_DESCRIPTOR            *MmramRanges;
   UINTN                           MmramRangeCount;
-  EFI_HOB_FIRMWARE_VOLUME         *BfvHob;
-
-  ProcessLibraryConstructorList (HobStart, &gMmCoreMmst);
 
   DEBUG ((DEBUG_INFO, "MmMain - 0x%x\n", HobStart));
-
-  DEBUG_CODE (
-    PrintHobList (HobStart, NULL);
-    );
 
   //
   // Extract the MMRAM ranges from the MMRAM descriptor HOB
@@ -845,15 +882,22 @@ StandaloneMmMain (
   }
 
   //
-  // No need to initialize memory service.
-  // It is done in the constructor of StandaloneMmCoreMemoryAllocationLib(),
-  // so that the library linked with StandaloneMmCore can use AllocatePool() in
-  // the constructor.
+  // Initialize memory service using free MMRAM
   //
+  DEBUG ((DEBUG_INFO, "MmInitializeMemoryServices\n"));
+  MmInitializeMemoryServices (MmramRangeCount, MmramRanges);
+  mMemoryAllocationMmst = &gMmCoreMmst;
+
   //
   // Install HobList
   //
   gHobList = InitializeMmHobList (HobStart, MmramRanges, MmramRangeCount);
+
+  ProcessLibraryConstructorList (gHobList, &gMmCoreMmst);
+
+  DEBUG_CODE (
+    PrintHobList (gHobList, NULL);
+    );
 
   //
   // Register notification for EFI_MM_CONFIGURATION_PROTOCOL registration and
@@ -868,30 +912,14 @@ StandaloneMmMain (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Get Boot Firmware Volume address from the BFV Hob
+  // Dispatch Standalone FVs
   //
-  BfvHob = GetFirstHob (EFI_HOB_TYPE_FV);
-  if (BfvHob != NULL) {
-    DEBUG ((DEBUG_INFO, "BFV address - 0x%x\n", BfvHob->BaseAddress));
-    DEBUG ((DEBUG_INFO, "BFV size    - 0x%x\n", BfvHob->Length));
+  MmDispatchFvs ();
+  if (!FeaturePcdGet (PcdRestartMmDispatcherOnceMmEntryRegistered)) {
     //
-    // Dispatch standalone BFV
+    // Free shadowed standalone FVs
     //
-    if (BfvHob->BaseAddress != 0) {
-      //
-      // Shadow standalone BFV into MMRAM
-      //
-      mBfv = AllocatePool (BfvHob->Length);
-      if (mBfv != NULL) {
-        CopyMem ((VOID *)mBfv, (VOID *)(UINTN)BfvHob->BaseAddress, BfvHob->Length);
-        DEBUG ((DEBUG_INFO, "Mm Dispatch StandaloneBfvAddress - 0x%08x\n", mBfv));
-        MmCoreFfsFindMmDriver (mBfv, 0);
-        MmDispatcher ();
-        if (!FeaturePcdGet (PcdRestartMmDispatcherOnceMmEntryRegistered)) {
-          FreePool (mBfv);
-        }
-      }
-    }
+    MmFreeShadowedFvs ();
   }
 
   //

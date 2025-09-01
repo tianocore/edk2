@@ -2,6 +2,7 @@
 # CI configuration for DynamicTablesPkg
 #
 # Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
+# Copyright (C) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
@@ -37,7 +38,7 @@
 
     ## options defined .pytool/Plugin/HostUnitTestCompilerPlugin
     "HostUnitTestCompilerPlugin": {
-        "DscPath": "" # Don't support this test
+        "DscPath": "Test/DynamicTablesPkgHostTest.dsc"
     },
 
     ## options defined .pytool/Plugin/CharEncodingCheck
@@ -53,7 +54,8 @@
             "EmbeddedPkg/EmbeddedPkg.dec",
             "DynamicTablesPkg/DynamicTablesPkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
-            "MdePkg/MdePkg.dec"
+            "MdePkg/MdePkg.dec",
+            "SecurityPkg/SecurityPkg.dec"
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[
@@ -103,6 +105,7 @@
            "cacheablity",
            "CCIDX",
            "CCSIDR",
+           "cfmws",
            "countof",
            "deviceid",
            "EArch",
@@ -122,6 +125,7 @@
            "Rdword",
            "Roadmap",
            "ROOTNODEBASE",
+           "sapic",
            "ssdtcmn",
            "ssdtserialporttemplate",
            "SMMUV",
@@ -131,7 +135,8 @@
            "TABLEEX",
            "TNSID",
            "Vatos",
-           "WBINVD"
+           "WBINVD",
+           "xapic"
            ],           # words to extend to the dictionary for this package
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that
                                      # should be ignore

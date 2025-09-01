@@ -49,9 +49,6 @@ def GetTypedefFuncPointerPattern():
 def GetDB():
     return EccGlobalData.gDb
 
-def GetConfig():
-    return EccGlobalData.gConfig
-
 def PrintErrorMsg(ErrorType, Msg, TableName, ItemId):
     Msg = Msg.replace('\n', '').replace('\r', '')
     MsgPartList = Msg.split()
@@ -480,18 +477,6 @@ def GetFunctionList():
         FuncObjList.append(FuncObj)
 
     return FuncObjList
-
-def GetFileModificationTimeFromDB(FullFileName):
-    TimeValue = 0.0
-    Db = GetDB()
-    SqlStatement = """ select TimeStamp
-                       from File
-                       where FullPath = \'%s\'
-                   """ % (FullFileName)
-    ResultSet = Db.TblFile.Exec(SqlStatement)
-    for Result in ResultSet:
-        TimeValue = Result[0]
-    return TimeValue
 
 def CollectSourceCodeDataIntoDB(RootDir):
     FileObjList = []
@@ -2235,7 +2220,7 @@ def CheckDoxygenCommand(FullFileName):
                    """ % (FileTable, DataClass.MODEL_IDENTIFIER_COMMENT, DataClass.MODEL_IDENTIFIER_FUNCTION_HEADER)
     ResultSet = Db.TblFile.Exec(SqlStatement)
     DoxygenCommandList = ['bug', 'todo', 'example', 'file', 'attention', 'param', 'post', 'pre', 'retval',
-                          'return', 'sa', 'since', 'test', 'note', 'par', 'endcode', 'code']
+                          'return', 'sa', 'since', 'test', 'note', 'par', 'endcode', 'code', 'endverbatim', 'verbatim']
     for Result in ResultSet:
         CommentStr = Result[0]
         CommentPartList = CommentStr.split()

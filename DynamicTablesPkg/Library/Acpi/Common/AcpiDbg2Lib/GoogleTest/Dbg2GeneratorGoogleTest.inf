@@ -1,0 +1,36 @@
+## @file
+#  Google Test application for DBG2 Generator.
+#
+#  Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved. <BR>
+#  Copyright (c) Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = Dbg2GeneratorGoogleTest
+  FILE_GUID                      = 65dd5a9e-fe40-439c-9ce3-01202d8436c9
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = GoogleTestCppMain
+
+[Sources]
+  Dbg2GeneratorGoogleTest.cpp
+  ../../../../../Test/Mock/Library/GoogleTest/Protocol/MockConfigurationManagerProtocol.cpp
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+  BaseLib
+  TableHelperLib
+
+[Protocols]
+  gEdkiiConfigurationManagerProtocolGuid  ## CONSUMES
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /EHsc

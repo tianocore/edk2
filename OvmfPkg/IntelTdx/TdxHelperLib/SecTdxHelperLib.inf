@@ -41,6 +41,7 @@
   PcdLib
   TdxMailboxLib
   TdxLib
+  TdxMeasurementLib
 
 [FixedPcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase

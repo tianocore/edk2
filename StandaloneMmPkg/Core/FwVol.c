@@ -11,6 +11,10 @@
 #include <Library/FvLib.h>
 #include <Library/ExtractGuidedSectionLib.h>
 
+#define MAX_MM_FV_COUNT  2
+
+EFI_FIRMWARE_VOLUME_HEADER  *mMmFv[MAX_MM_FV_COUNT];
+
 EFI_STATUS
 MmAddToDriverList (
   IN EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader,
@@ -232,4 +236,97 @@ FreeDstBuffer:
   }
 
   return Status;
+}
+
+/**
+  Dispatch Standalone MM FVs.
+  The FVs will be shadowed into MMRAM, caller is responsible for calling
+  MmFreeShadowedFvs() to free the shadowed MM FVs.
+
+**/
+VOID
+MmDispatchFvs (
+  VOID
+  )
+{
+  UINTN                       Index;
+  EFI_PEI_HOB_POINTERS        FvHob;
+  EFI_FIRMWARE_VOLUME_HEADER  *Fv;
+
+  ZeroMem (mMmFv, sizeof (mMmFv));
+
+  Index = 0;
+  for ( FvHob.Raw = GetNextHob (EFI_HOB_TYPE_FV, GetHobList ())
+        ; FvHob.Raw != NULL
+        ; FvHob.Raw = GetNextHob (EFI_HOB_TYPE_FV, GET_NEXT_HOB (FvHob))
+        )
+  {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: FV[%d] address = 0x%x, size = 0x%x\n",
+      __func__,
+      Index,
+      FvHob.FirmwareVolume->BaseAddress,
+      FvHob.FirmwareVolume->Length
+      ));
+
+    if (FvHob.FirmwareVolume->Length == 0x00) {
+      DEBUG ((DEBUG_INFO, "%a: Skip zero-length FV.\n", __func__));
+      continue;
+    }
+
+    if (Index == ARRAY_SIZE (mMmFv)) {
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: The number of FV Hobs exceeds the max supported FVs (%d) in StandaloneMmCore, skip it.\n",
+        __func__,
+        ARRAY_SIZE (mMmFv)
+        ));
+      continue;
+    }
+
+    if (!FixedPcdGetBool (PcdShadowBfv)) {
+      Fv = (EFI_FIRMWARE_VOLUME_HEADER *)((UINTN)FvHob.FirmwareVolume->BaseAddress);
+    } else {
+      Fv = AllocateCopyPool (FvHob.FirmwareVolume->Length, (VOID *)(UINTN)FvHob.FirmwareVolume->BaseAddress);
+      ASSERT (Fv != NULL);
+      if (Fv == NULL) {
+        DEBUG ((DEBUG_ERROR, "%a: Fail to allocate MM memory for Fv!\n", __func__));
+        CpuDeadLoop ();
+        continue;
+      }
+    }
+
+    MmCoreFfsFindMmDriver (Fv, 0);
+    mMmFv[Index++] = Fv;
+  }
+
+  if (Index == 0) {
+    DEBUG ((DEBUG_ERROR, "%a: No FV hob is found\n", __func__));
+    return;
+  }
+
+  MmDispatcher ();
+}
+
+/**
+  Free the shadowed MM FVs.
+
+**/
+VOID
+MmFreeShadowedFvs (
+  VOID
+  )
+{
+  UINTN  Index;
+
+  if (!FixedPcdGetBool (PcdShadowBfv)) {
+    return;
+  }
+
+  for (Index = 0; Index < ARRAY_SIZE (mMmFv); Index++) {
+    if (mMmFv[Index] != NULL) {
+      FreePool (mMmFv[Index]);
+    }
+  }
 }

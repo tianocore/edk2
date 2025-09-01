@@ -272,16 +272,7 @@ ASM_FUNC(ArmReadVBar)
    ret
 
 ASM_FUNC(ArmEnableVFP)
-  // Check whether floating-point is implemented in the processor.
-  mov   x1, x30                 // Save LR
-  bl    ArmReadIdAA64Pfr0       // Read EL1 Processor Feature Register (PFR0)
-  mov   x30, x1                 // Restore LR
-  ubfx  x0, x0, #16, #4         // Extract the FP bits 16:19
-  cmp   x0, #0xF                // Check if FP bits are '1111b',
-                                // i.e. Floating Point not implemented
-  b.eq  4f                      // Exit when VFP is not implemented.
-
-  // FVP is implemented.
+  // FP support is mandated by the UEFI specification, no need to check ID registers
   // Make sure VFP exceptions are not trapped (to any exception level).
   mrs   x0, cpacr_el1           // Read EL1 Coprocessor Access Control Register (CPACR)
   orr   x0, x0, #CPACR_VFP_BITS // Disable FVP traps to EL1
@@ -292,7 +283,7 @@ ASM_FUNC(ArmEnableVFP)
 2:mrs   x0, cptr_el2            // Disable VFP traps to EL2
   bic   x0, x0, x1
   msr   cptr_el2, x0
-4:ret
+  ret
 
 
 ASM_FUNC(ArmCallWFI)
@@ -396,6 +387,10 @@ ASM_FUNC(ArmReadIdAA64Pfr0)
 
 ASM_FUNC(ArmReadIdAA64Pfr1)
   mrs   x0, ID_AA64PFR1_EL1
+  ret
+
+ASM_FUNC(ArmReadIdAA64Pfr2)
+  mrs   x0, ID_AA64PFR2_EL1
   ret
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

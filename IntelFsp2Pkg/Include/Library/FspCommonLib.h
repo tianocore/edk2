@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2025, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -88,18 +88,6 @@ VOID
 EFIAPI
 SetFspApiReturnStatus (
   IN UINTN  ReturnStatus
-  );
-
-/**
-  This function sets the context switching stack to a new stack frame.
-
-  @param[in] NewStackTop       New core stack to be set.
-
-**/
-VOID
-EFIAPI
-SetFspCoreStackPointer (
-  IN VOID  *NewStackTop
   );
 
 /**

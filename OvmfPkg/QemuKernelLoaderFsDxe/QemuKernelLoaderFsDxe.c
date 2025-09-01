@@ -21,6 +21,7 @@
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PrintLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -31,25 +32,24 @@
 //
 // Static data that hosts the fw_cfg blobs and serves file requests.
 //
-typedef enum {
-  KernelBlobTypeKernel,
-  KernelBlobTypeInitrd,
-  KernelBlobTypeCommandLine,
-  KernelBlobTypeMax
-} KERNEL_BLOB_TYPE;
-
 typedef struct {
-  CONST CHAR16    Name[8];
+  CHAR16    Name[48];
   struct {
-    FIRMWARE_CONFIG_ITEM CONST    SizeKey;
-    FIRMWARE_CONFIG_ITEM CONST    DataKey;
-    UINT32                        Size;
-  }                             FwCfgItem[2];
-  UINT32          Size;
-  UINT8           *Data;
-} KERNEL_BLOB;
+    FIRMWARE_CONFIG_ITEM    SizeKey;
+    FIRMWARE_CONFIG_ITEM    DataKey;
+    UINT32                  Size;
+  }                         FwCfgItem[2];
+} KERNEL_BLOB_ITEMS;
 
-STATIC KERNEL_BLOB  mKernelBlob[KernelBlobTypeMax] = {
+typedef struct KERNEL_BLOB KERNEL_BLOB;
+struct KERNEL_BLOB {
+  CHAR16         Name[48];
+  UINT32         Size;
+  UINT8          *Data;
+  KERNEL_BLOB    *Next;
+};
+
+STATIC KERNEL_BLOB_ITEMS  mKernelBlobItems[] = {
   {
     L"kernel",
     {
@@ -69,7 +69,10 @@ STATIC KERNEL_BLOB  mKernelBlob[KernelBlobTypeMax] = {
   }
 };
 
-STATIC UINT64  mTotalBlobBytes;
+STATIC KERNEL_BLOB  *mKernelBlobs;
+STATIC UINT64       mKernelBlobCount;
+STATIC UINT64       mKernelNamedBlobCount;
+STATIC UINT64       mTotalBlobBytes;
 
 //
 // Device path for the handle that incorporates our "EFI stub filesystem".
@@ -117,7 +120,7 @@ STATIC EFI_TIME  mInitTime;
 typedef struct {
   UINT64               Signature; // Carries STUB_FILE_SIG.
 
-  KERNEL_BLOB_TYPE     BlobType; // Index into mKernelBlob. KernelBlobTypeMax
+  KERNEL_BLOB          *Blob;    // Index into mKernelBlob. KernelBlobTypeMax
                                  // denotes the root directory of the filesystem.
 
   UINT64               Position; // Byte position for regular files;
@@ -177,7 +180,7 @@ typedef struct {
 STATIC
 EFI_STATUS
 EFIAPI
-StubFileOpen (
+QemuKernelStubFileOpen (
   IN EFI_FILE_PROTOCOL   *This,
   OUT EFI_FILE_PROTOCOL  **NewHandle,
   IN CHAR16              *FileName,
@@ -196,7 +199,7 @@ StubFileOpen (
 STATIC
 EFI_STATUS
 EFIAPI
-StubFileClose (
+QemuKernelStubFileClose (
   IN EFI_FILE_PROTOCOL  *This
   )
 {
@@ -219,7 +222,7 @@ StubFileClose (
 STATIC
 EFI_STATUS
 EFIAPI
-StubFileDelete (
+QemuKernelStubFileDelete (
   IN EFI_FILE_PROTOCOL  *This
   )
 {
@@ -229,18 +232,17 @@ StubFileDelete (
 
 /**
   Helper function that formats an EFI_FILE_INFO structure into the
-  user-allocated buffer, for any valid KERNEL_BLOB_TYPE value (including
-  KernelBlobTypeMax, which stands for the root directory).
+  user-allocated buffer, for any valid KERNEL_BLOB (including NULL,
+  which stands for the root directory).
 
   The interface follows the EFI_FILE_GET_INFO -- and for directories, the
   EFI_FILE_READ -- interfaces.
 
-  @param[in]     BlobType     The KERNEL_BLOB_TYPE value identifying the fw_cfg
+  @param[in]     Blob         The KERNEL_BLOB identifying the fw_cfg
                               blob backing the STUB_FILE that information is
-                              being requested about. If BlobType equals
-                              KernelBlobTypeMax, then information will be
-                              provided about the root directory of the
-                              filesystem.
+                              being requested about. If Blob is NULL,
+                              then information will be provided about the root
+                              directory of the filesystem.
 
   @param[in,out] BufferSize  On input, the size of Buffer. On output, the
                              amount of data returned in Buffer. In both cases,
@@ -257,10 +259,10 @@ StubFileDelete (
 **/
 STATIC
 EFI_STATUS
-ConvertKernelBlobTypeToFileInfo (
-  IN KERNEL_BLOB_TYPE  BlobType,
-  IN OUT UINTN         *BufferSize,
-  OUT VOID             *Buffer
+QemuKernelBlobTypeToFileInfo (
+  IN KERNEL_BLOB  *Blob,
+  IN OUT UINTN    *BufferSize,
+  OUT VOID        *Buffer
   )
 {
   CONST CHAR16  *Name;
@@ -272,25 +274,23 @@ ConvertKernelBlobTypeToFileInfo (
   EFI_FILE_INFO  *FileInfo;
   UINTN          OriginalBufferSize;
 
-  if (BlobType == KernelBlobTypeMax) {
+  if (Blob == NULL) {
     //
     // getting file info about the root directory
     //
-    Name      = L"\\";
-    FileSize  = KernelBlobTypeMax;
+    DEBUG ((DEBUG_INFO, "%a: file info: directory\n", __func__));
+    Name      = L"";
+    FileSize  = mKernelBlobCount;
     Attribute = EFI_FILE_READ_ONLY | EFI_FILE_DIRECTORY;
   } else {
-    CONST KERNEL_BLOB  *Blob;
-
-    Blob      = &mKernelBlob[BlobType];
+    DEBUG ((DEBUG_INFO, "%a: file info: \"%s\"\n", __func__, Blob->Name));
     Name      = Blob->Name;
     FileSize  = Blob->Size;
     Attribute = EFI_FILE_READ_ONLY;
   }
 
   NameSize     = (StrLen (Name) + 1) * 2;
-  FileInfoSize = OFFSET_OF (EFI_FILE_INFO, FileName) + NameSize;
-  ASSERT (FileInfoSize >= sizeof *FileInfo);
+  FileInfoSize = SIZE_OF_EFI_FILE_INFO + NameSize;
 
   OriginalBufferSize = *BufferSize;
   *BufferSize        = FileInfoSize;
@@ -310,6 +310,23 @@ ConvertKernelBlobTypeToFileInfo (
   CopyMem (FileInfo->FileName, Name, NameSize);
 
   return EFI_SUCCESS;
+}
+
+STATIC
+KERNEL_BLOB *
+FindKernelBlob (
+  CHAR16  *FileName
+  )
+{
+  KERNEL_BLOB  *Blob;
+
+  for (Blob = mKernelBlobs; Blob != NULL; Blob = Blob->Next) {
+    if (StrCmp (FileName, Blob->Name) == 0) {
+      return Blob;
+    }
+  }
+
+  return NULL;
 }
 
 /**
@@ -349,25 +366,25 @@ ConvertKernelBlobTypeToFileInfo (
 STATIC
 EFI_STATUS
 EFIAPI
-StubFileRead (
+QemuKernelStubFileRead (
   IN EFI_FILE_PROTOCOL  *This,
   IN OUT UINTN          *BufferSize,
   OUT VOID              *Buffer
   )
 {
-  STUB_FILE          *StubFile;
-  CONST KERNEL_BLOB  *Blob;
-  UINT64             Left;
+  STUB_FILE    *StubFile;
+  KERNEL_BLOB  *Blob;
+  UINT64       Left, Pos;
 
   StubFile = STUB_FILE_FROM_FILE (This);
 
   //
   // Scanning the root directory?
   //
-  if (StubFile->BlobType == KernelBlobTypeMax) {
+  if (StubFile->Blob == NULL) {
     EFI_STATUS  Status;
 
-    if (StubFile->Position == KernelBlobTypeMax) {
+    if (StubFile->Position == mKernelBlobCount) {
       //
       // Scanning complete.
       //
@@ -375,8 +392,16 @@ StubFileRead (
       return EFI_SUCCESS;
     }
 
-    Status = ConvertKernelBlobTypeToFileInfo (
-               (KERNEL_BLOB_TYPE)StubFile->Position,
+    for (Pos = 0, Blob = mKernelBlobs;
+         Pos < StubFile->Position;
+         Pos++, Blob = Blob->Next)
+    {
+    }
+
+    DEBUG ((DEBUG_INFO, "%a: file list: #%d \"%s\"\n", __func__, Pos, Blob->Name));
+
+    Status = QemuKernelBlobTypeToFileInfo (
+               Blob,
                BufferSize,
                Buffer
                );
@@ -391,7 +416,7 @@ StubFileRead (
   //
   // Reading a file.
   //
-  Blob = &mKernelBlob[StubFile->BlobType];
+  Blob = StubFile->Blob;
   if (StubFile->Position > Blob->Size) {
     return EFI_DEVICE_ERROR;
   }
@@ -402,6 +427,7 @@ StubFileRead (
   }
 
   if (Blob->Data != NULL) {
+    DEBUG ((DEBUG_INFO, "%a: file read: \"%s\", %d bytes\n", __func__, Blob->Name, *BufferSize));
     CopyMem (Buffer, Blob->Data + StubFile->Position, *BufferSize);
   }
 
@@ -435,7 +461,7 @@ StubFileRead (
 STATIC
 EFI_STATUS
 EFIAPI
-StubFileWrite (
+QemuKernelStubFileWrite (
   IN EFI_FILE_PROTOCOL  *This,
   IN OUT UINTN          *BufferSize,
   IN VOID               *Buffer
@@ -444,7 +470,7 @@ StubFileWrite (
   STUB_FILE  *StubFile;
 
   StubFile = STUB_FILE_FROM_FILE (This);
-  return (StubFile->BlobType == KernelBlobTypeMax) ?
+  return (StubFile->Blob == NULL) ?
          EFI_UNSUPPORTED :
          EFI_WRITE_PROTECTED;
 }
@@ -466,7 +492,7 @@ StubFileWrite (
 STATIC
 EFI_STATUS
 EFIAPI
-StubFileGetPosition (
+QemuKernelStubFileGetPosition (
   IN EFI_FILE_PROTOCOL  *This,
   OUT UINT64            *Position
   )
@@ -474,7 +500,7 @@ StubFileGetPosition (
   STUB_FILE  *StubFile;
 
   StubFile = STUB_FILE_FROM_FILE (This);
-  if (StubFile->BlobType == KernelBlobTypeMax) {
+  if (StubFile->Blob == NULL) {
     return EFI_UNSUPPORTED;
   }
 
@@ -501,7 +527,7 @@ StubFileGetPosition (
 STATIC
 EFI_STATUS
 EFIAPI
-StubFileSetPosition (
+QemuKernelStubFileSetPosition (
   IN EFI_FILE_PROTOCOL  *This,
   IN UINT64             Position
   )
@@ -511,7 +537,7 @@ StubFileSetPosition (
 
   StubFile = STUB_FILE_FROM_FILE (This);
 
-  if (StubFile->BlobType == KernelBlobTypeMax) {
+  if (StubFile->Blob == NULL) {
     if (Position == 0) {
       //
       // rewinding a directory scan is allowed
@@ -526,7 +552,7 @@ StubFileSetPosition (
   //
   // regular file seek
   //
-  Blob = &mKernelBlob[StubFile->BlobType];
+  Blob = StubFile->Blob;
   if (Position == MAX_UINT64) {
     //
     // seek to end
@@ -583,7 +609,7 @@ StubFileSetPosition (
 STATIC
 EFI_STATUS
 EFIAPI
-StubFileGetInfo (
+QemuKernelStubFileGetInfo (
   IN EFI_FILE_PROTOCOL  *This,
   IN EFI_GUID           *InformationType,
   IN OUT UINTN          *BufferSize,
@@ -596,8 +622,8 @@ StubFileGetInfo (
   StubFile = STUB_FILE_FROM_FILE (This);
 
   if (CompareGuid (InformationType, &gEfiFileInfoGuid)) {
-    return ConvertKernelBlobTypeToFileInfo (
-             StubFile->BlobType,
+    return QemuKernelBlobTypeToFileInfo (
+             StubFile->Blob,
              BufferSize,
              Buffer
              );
@@ -685,7 +711,7 @@ StubFileGetInfo (
 STATIC
 EFI_STATUS
 EFIAPI
-StubFileSetInfo (
+QemuKernelStubFileSetInfo (
   IN EFI_FILE_PROTOCOL  *This,
   IN EFI_GUID           *InformationType,
   IN UINTN              BufferSize,
@@ -712,7 +738,7 @@ StubFileSetInfo (
 STATIC
 EFI_STATUS
 EFIAPI
-StubFileFlush (
+QemuKernelStubFileFlush (
   IN EFI_FILE_PROTOCOL  *This
   )
 {
@@ -724,16 +750,16 @@ StubFileFlush (
 //
 STATIC CONST EFI_FILE_PROTOCOL  mEfiFileProtocolTemplate = {
   EFI_FILE_PROTOCOL_REVISION, // revision 1
-  StubFileOpen,
-  StubFileClose,
-  StubFileDelete,
-  StubFileRead,
-  StubFileWrite,
-  StubFileGetPosition,
-  StubFileSetPosition,
-  StubFileGetInfo,
-  StubFileSetInfo,
-  StubFileFlush,
+  QemuKernelStubFileOpen,
+  QemuKernelStubFileClose,
+  QemuKernelStubFileDelete,
+  QemuKernelStubFileRead,
+  QemuKernelStubFileWrite,
+  QemuKernelStubFileGetPosition,
+  QemuKernelStubFileSetPosition,
+  QemuKernelStubFileGetInfo,
+  QemuKernelStubFileSetInfo,
+  QemuKernelStubFileFlush,
   NULL,                       // OpenEx, revision 2
   NULL,                       // ReadEx, revision 2
   NULL,                       // WriteEx, revision 2
@@ -743,7 +769,7 @@ STATIC CONST EFI_FILE_PROTOCOL  mEfiFileProtocolTemplate = {
 STATIC
 EFI_STATUS
 EFIAPI
-StubFileOpen (
+QemuKernelStubFileOpen (
   IN EFI_FILE_PROTOCOL   *This,
   OUT EFI_FILE_PROTOCOL  **NewHandle,
   IN CHAR16              *FileName,
@@ -752,7 +778,7 @@ StubFileOpen (
   )
 {
   CONST STUB_FILE  *StubFile;
-  UINTN            BlobType;
+  KERNEL_BLOB      *Blob;
   STUB_FILE        *NewStubFile;
 
   //
@@ -774,21 +800,25 @@ StubFileOpen (
   // Only the root directory supports opening files in it.
   //
   StubFile = STUB_FILE_FROM_FILE (This);
-  if (StubFile->BlobType != KernelBlobTypeMax) {
+  if (StubFile->Blob != NULL) {
     return EFI_UNSUPPORTED;
   }
 
   //
   // Locate the file.
   //
-  for (BlobType = 0; BlobType < KernelBlobTypeMax; ++BlobType) {
-    if (StrCmp (FileName, mKernelBlob[BlobType].Name) == 0) {
-      break;
-    }
+  if (FileName[0] == '\\') {
+    // also accept absolute paths, i.e. '\kernel' for 'kernel'
+    FileName++;
   }
 
-  if (BlobType == KernelBlobTypeMax) {
+  Blob = FindKernelBlob (FileName);
+
+  if (Blob == NULL) {
+    DEBUG ((DEBUG_INFO, "%a: file not found: \"%s\"\n", __func__, FileName));
     return EFI_NOT_FOUND;
+  } else {
+    DEBUG ((DEBUG_INFO, "%a: file opened: \"%s\"\n", __func__, FileName));
   }
 
   //
@@ -800,7 +830,7 @@ StubFileOpen (
   }
 
   NewStubFile->Signature = STUB_FILE_SIG;
-  NewStubFile->BlobType  = (KERNEL_BLOB_TYPE)BlobType;
+  NewStubFile->Blob      = Blob;
   NewStubFile->Position  = 0;
   CopyMem (
     &NewStubFile->File,
@@ -842,7 +872,7 @@ StubFileOpen (
 STATIC
 EFI_STATUS
 EFIAPI
-StubFileSystemOpenVolume (
+QemuKernelStubFileSystemOpenVolume (
   IN EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *This,
   OUT EFI_FILE_PROTOCOL               **Root
   )
@@ -855,7 +885,7 @@ StubFileSystemOpenVolume (
   }
 
   StubFile->Signature = STUB_FILE_SIG;
-  StubFile->BlobType  = KernelBlobTypeMax;
+  StubFile->Blob      = NULL;
   StubFile->Position  = 0;
   CopyMem (
     &StubFile->File,
@@ -869,13 +899,13 @@ StubFileSystemOpenVolume (
 
 STATIC CONST EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  mFileSystem = {
   EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_REVISION,
-  StubFileSystemOpenVolume
+  QemuKernelStubFileSystemOpenVolume
 };
 
 STATIC
 EFI_STATUS
 EFIAPI
-InitrdLoadFile2 (
+QemuKernelInitrdLoadFile2 (
   IN      EFI_LOAD_FILE2_PROTOCOL   *This,
   IN      EFI_DEVICE_PATH_PROTOCOL  *FilePath,
   IN      BOOLEAN                   BootPolicy,
@@ -883,8 +913,11 @@ InitrdLoadFile2 (
   OUT     VOID                      *Buffer     OPTIONAL
   )
 {
-  CONST KERNEL_BLOB  *InitrdBlob = &mKernelBlob[KernelBlobTypeInitrd];
+  KERNEL_BLOB  *InitrdBlob;
 
+  DEBUG ((DEBUG_INFO, "%a: initrd read\n", __func__));
+  InitrdBlob = FindKernelBlob (L"initrd");
+  ASSERT (InitrdBlob != NULL);
   ASSERT (InitrdBlob->Size > 0);
 
   if (BootPolicy) {
@@ -913,17 +946,33 @@ InitrdLoadFile2 (
 }
 
 STATIC CONST EFI_LOAD_FILE2_PROTOCOL  mInitrdLoadFile2 = {
-  InitrdLoadFile2,
+  QemuKernelInitrdLoadFile2,
 };
 
 //
 // Utility functions.
 //
 
+STATIC VOID
+QemuKernelChunkedRead (
+  UINT8   *Dest,
+  UINT32  Bytes
+  )
+{
+  UINT32  Chunk;
+
+  while (Bytes > 0) {
+    Chunk = (Bytes < SIZE_1MB) ? Bytes : SIZE_1MB;
+    QemuFwCfgReadBytes (Chunk, Dest);
+    Bytes -= Chunk;
+    Dest  += Chunk;
+  }
+}
+
 /**
   Populate a blob in mKernelBlob.
 
-  param[in,out] Blob  Pointer to the KERNEL_BLOB element in mKernelBlob that is
+  param[in,out] Blob  Pointer to the KERNEL_BLOB_ITEMS that is
                       to be filled from fw_cfg.
 
   @retval EFI_SUCCESS           Blob has been populated. If fw_cfg reported a
@@ -934,35 +983,54 @@ STATIC CONST EFI_LOAD_FILE2_PROTOCOL  mInitrdLoadFile2 = {
 **/
 STATIC
 EFI_STATUS
-FetchBlob (
-  IN OUT KERNEL_BLOB  *Blob
+QemuKernelFetchBlob (
+  IN KERNEL_BLOB_ITEMS  *BlobItems
   )
 {
-  UINT32  Left;
-  UINTN   Idx;
-  UINT8   *ChunkData;
+  UINT32       Size;
+  UINTN        Idx;
+  UINT8        *ChunkData;
+  KERNEL_BLOB  *Blob;
+  EFI_STATUS   Status;
 
   //
   // Read blob size.
+  //   Size != 0      ->  use size as-is
+  //   SizeKey != 0   ->  read size from fw_cfg
+  //   both are 0     ->  unused entry
   //
-  Blob->Size = 0;
-  for (Idx = 0; Idx < ARRAY_SIZE (Blob->FwCfgItem); Idx++) {
-    if (Blob->FwCfgItem[Idx].SizeKey == 0) {
+  for (Size = 0, Idx = 0; Idx < ARRAY_SIZE (BlobItems->FwCfgItem); Idx++) {
+    if ((BlobItems->FwCfgItem[Idx].SizeKey == 0) &&
+        (BlobItems->FwCfgItem[Idx].Size == 0))
+    {
       break;
     }
 
-    QemuFwCfgSelectItem (Blob->FwCfgItem[Idx].SizeKey);
-    Blob->FwCfgItem[Idx].Size = QemuFwCfgRead32 ();
-    Blob->Size               += Blob->FwCfgItem[Idx].Size;
+    if (BlobItems->FwCfgItem[Idx].SizeKey) {
+      QemuFwCfgSelectItem (BlobItems->FwCfgItem[Idx].SizeKey);
+      BlobItems->FwCfgItem[Idx].Size = QemuFwCfgRead32 ();
+    }
+
+    Size += BlobItems->FwCfgItem[Idx].Size;
   }
 
-  if (Blob->Size == 0) {
+  if (Size == 0) {
     return EFI_SUCCESS;
   }
+
+  Blob = AllocatePool (sizeof (*Blob));
+  if (Blob == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  ZeroMem (Blob, sizeof (*Blob));
 
   //
   // Read blob.
   //
+  Status = StrCpyS (Blob->Name, sizeof (Blob->Name), BlobItems->Name);
+  ASSERT (!EFI_ERROR (Status));
+  Blob->Size = Size;
   Blob->Data = AllocatePool (Blob->Size);
   if (Blob->Data == NULL) {
     DEBUG ((
@@ -972,6 +1040,7 @@ FetchBlob (
       (INT64)Blob->Size,
       Blob->Name
       ));
+    FreePool (Blob);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -984,33 +1053,98 @@ FetchBlob (
     ));
 
   ChunkData = Blob->Data;
-  for (Idx = 0; Idx < ARRAY_SIZE (Blob->FwCfgItem); Idx++) {
-    if (Blob->FwCfgItem[Idx].DataKey == 0) {
+  for (Idx = 0; Idx < ARRAY_SIZE (BlobItems->FwCfgItem); Idx++) {
+    if (BlobItems->FwCfgItem[Idx].DataKey == 0) {
       break;
     }
 
-    QemuFwCfgSelectItem (Blob->FwCfgItem[Idx].DataKey);
-
-    Left = Blob->FwCfgItem[Idx].Size;
-    while (Left > 0) {
-      UINT32  Chunk;
-
-      Chunk = (Left < SIZE_1MB) ? Left : SIZE_1MB;
-      QemuFwCfgReadBytes (Chunk, ChunkData + Blob->FwCfgItem[Idx].Size - Left);
-      Left -= Chunk;
-      DEBUG ((
-        DEBUG_VERBOSE,
-        "%a: %Ld bytes remaining for \"%s\" (%d)\n",
-        __func__,
-        (INT64)Left,
-        Blob->Name,
-        (INT32)Idx
-        ));
-    }
-
-    ChunkData += Blob->FwCfgItem[Idx].Size;
+    QemuFwCfgSelectItem (BlobItems->FwCfgItem[Idx].DataKey);
+    QemuKernelChunkedRead (ChunkData, BlobItems->FwCfgItem[Idx].Size);
+    ChunkData += BlobItems->FwCfgItem[Idx].Size;
   }
 
+  Blob->Next   = mKernelBlobs;
+  mKernelBlobs = Blob;
+  mKernelBlobCount++;
+  mTotalBlobBytes += Blob->Size;
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+QemuKernelVerifyBlob (
+  CHAR16      *FileName,
+  EFI_STATUS  FetchStatus
+  )
+{
+  KERNEL_BLOB  *Blob;
+  EFI_STATUS   Status;
+
+  if ((StrCmp (FileName, L"kernel") != 0) &&
+      (StrCmp (FileName, L"initrd") != 0) &&
+      (StrCmp (FileName, L"cmdline") != 0))
+  {
+    return EFI_SUCCESS;
+  }
+
+  Blob   = FindKernelBlob (FileName);
+  Status = VerifyBlob (
+             FileName,
+             Blob ? Blob->Data : NULL,
+             Blob ? Blob->Size : 0,
+             FetchStatus
+             );
+  return Status;
+}
+
+STATIC
+EFI_STATUS
+QemuKernelFetchNamedBlobs (
+  VOID
+  )
+{
+  struct {
+    UINT32    FileSize;
+    UINT16    FileSelect;
+    UINT16    Reserved;
+    CHAR8     FileName[QEMU_FW_CFG_FNAME_SIZE];
+  } *DirEntry;
+  KERNEL_BLOB_ITEMS  Items;
+  EFI_STATUS         Status;
+  EFI_STATUS         FetchStatus;
+  UINT32             Count;
+  UINT32             Idx;
+
+  QemuFwCfgSelectItem (QemuFwCfgItemFileDir);
+  Count = SwapBytes32 (QemuFwCfgRead32 ());
+
+  DirEntry = AllocatePool (sizeof (*DirEntry) * Count);
+  QemuFwCfgReadBytes (sizeof (*DirEntry) * Count, DirEntry);
+
+  for (Idx = 0; Idx < Count; ++Idx) {
+    if (AsciiStrnCmp (DirEntry[Idx].FileName, "etc/boot/", 9) != 0) {
+      continue;
+    }
+
+    ZeroMem (&Items, sizeof (Items));
+    UnicodeSPrint (Items.Name, sizeof (Items.Name), L"%a", DirEntry[Idx].FileName + 9);
+    Items.FwCfgItem[0].DataKey = SwapBytes16 (DirEntry[Idx].FileSelect);
+    Items.FwCfgItem[0].Size    = SwapBytes32 (DirEntry[Idx].FileSize);
+
+    FetchStatus = QemuKernelFetchBlob (&Items);
+    Status      = QemuKernelVerifyBlob (
+                    (CHAR16 *)Items.Name,
+                    FetchStatus
+                    );
+    if (EFI_ERROR (Status)) {
+      FreePool (DirEntry);
+      return Status;
+    }
+
+    mKernelNamedBlobCount++;
+  }
+
+  FreePool (DirEntry);
   return EFI_SUCCESS;
 }
 
@@ -1038,13 +1172,13 @@ QemuKernelLoaderFsDxeEntrypoint (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  UINTN        BlobType;
-  KERNEL_BLOB  *CurrentBlob;
-  KERNEL_BLOB  *KernelBlob;
-  EFI_STATUS   Status;
-  EFI_STATUS   FetchStatus;
-  EFI_HANDLE   FileSystemHandle;
-  EFI_HANDLE   InitrdLoadFile2Handle;
+  UINTN              BlobIdx;
+  KERNEL_BLOB_ITEMS  *BlobItems;
+  KERNEL_BLOB        *Blob;
+  EFI_STATUS         Status;
+  EFI_STATUS         FetchStatus;
+  EFI_HANDLE         FileSystemHandle;
+  EFI_HANDLE         InitrdLoadFile2Handle;
 
   if (!QemuFwCfgIsAvailable ()) {
     return EFI_NOT_FOUND;
@@ -1057,28 +1191,38 @@ QemuKernelLoaderFsDxeEntrypoint (
   }
 
   //
-  // Fetch all blobs.
+  // Fetch named blobs.
   //
-  for (BlobType = 0; BlobType < KernelBlobTypeMax; ++BlobType) {
-    CurrentBlob = &mKernelBlob[BlobType];
-    FetchStatus = FetchBlob (CurrentBlob);
+  DEBUG ((DEBUG_INFO, "%a: named blobs (etc/boot/*)\n", __func__));
+  Status = QemuKernelFetchNamedBlobs ();
+  if (EFI_ERROR (Status)) {
+    goto FreeBlobs;
+  }
 
-    Status = VerifyBlob (
-               CurrentBlob->Name,
-               CurrentBlob->Data,
-               CurrentBlob->Size,
+  //
+  // Fetch traditional blobs.
+  //
+  DEBUG ((DEBUG_INFO, "%a: traditional blobs\n", __func__));
+  for (BlobIdx = 0; BlobIdx < ARRAY_SIZE (mKernelBlobItems); ++BlobIdx) {
+    BlobItems = &mKernelBlobItems[BlobIdx];
+    if (FindKernelBlob (BlobItems->Name)) {
+      continue;
+    }
+
+    FetchStatus = QemuKernelFetchBlob (BlobItems);
+
+    Status = QemuKernelVerifyBlob (
+               (CHAR16 *)BlobItems->Name,
                FetchStatus
                );
     if (EFI_ERROR (Status)) {
       goto FreeBlobs;
     }
-
-    mTotalBlobBytes += CurrentBlob->Size;
   }
 
-  KernelBlob = &mKernelBlob[KernelBlobTypeKernel];
-
-  if (KernelBlob->Data == NULL) {
+  Blob = FindKernelBlob (L"kernel");
+  if ((Blob == NULL) && (mKernelNamedBlobCount == 0)) {
+    DEBUG ((DEBUG_INFO, "%a: no kernel and no named blobs present -> quit\n", __func__));
     Status = EFI_NOT_FOUND;
     goto FreeBlobs;
   }
@@ -1106,7 +1250,9 @@ QemuKernelLoaderFsDxeEntrypoint (
     goto FreeBlobs;
   }
 
-  if (KernelBlob[KernelBlobTypeInitrd].Size > 0) {
+  Blob = FindKernelBlob (L"initrd");
+  if (Blob != NULL) {
+    DEBUG ((DEBUG_INFO, "%a: initrd setup\n", __func__));
     InitrdLoadFile2Handle = NULL;
     Status                = gBS->InstallMultipleProtocolInterfaces (
                                    &InitrdLoadFile2Handle,
@@ -1141,13 +1287,11 @@ UninstallFileSystemHandle:
   ASSERT_EFI_ERROR (Status);
 
 FreeBlobs:
-  while (BlobType > 0) {
-    CurrentBlob = &mKernelBlob[--BlobType];
-    if (CurrentBlob->Data != NULL) {
-      FreePool (CurrentBlob->Data);
-      CurrentBlob->Size = 0;
-      CurrentBlob->Data = NULL;
-    }
+  while (mKernelBlobs != NULL) {
+    Blob         = mKernelBlobs;
+    mKernelBlobs = Blob->Next;
+    FreePool (Blob->Data);
+    FreePool (Blob);
   }
 
   return Status;

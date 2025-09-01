@@ -4,7 +4,7 @@
 # Copyright (c) 2019 - 2021, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2021 Hewlett-Packard Enterprise Development LP.
 # Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.
-# Copyright (c) 2023-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# Copyright (c) 2023-2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -16,7 +16,7 @@
   PLATFORM_VERSION               = 1.0
   DSC_SPECIFICATION              = 0x0001001c
   OUTPUT_DIRECTORY               = Build/RedfishPkg
-  SUPPORTED_ARCHITECTURES        = IA32|X64|ARM|AARCH64|RISCV64
+  SUPPORTED_ARCHITECTURES        = IA32|X64|AARCH64|RISCV64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -47,13 +47,11 @@
   RedfishContentCodingLib|RedfishPkg/Library/RedfishContentCodingLibNull/RedfishContentCodingLibNull.inf
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
+  RedfishPlatformWantedDeviceLib|RedfishPkg/Library/RedfishPlatformWantedDeviceLibNull/RedfishPlatformWantedDeviceLibNull.inf
 
   # NULL instance of IPMI related library.
   IpmiLib|MdeModulePkg/Library/BaseIpmiLibNull/BaseIpmiLibNull.inf
   IpmiCommandLib|MdeModulePkg/Library/BaseIpmiCommandLibNull/BaseIpmiCommandLibNull.inf
-
-[LibraryClasses.ARM, LibraryClasses.AARCH64]
-  ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
 
 [Components]
   RedfishPkg/Library/PlatformHostInterfaceLibNull/PlatformHostInterfaceLibNull.inf
@@ -70,5 +68,6 @@
   RedfishPkg/Library/HiiUtilityLib/HiiUtilityLib.inf
   RedfishPkg/Library/RedfishPlatformConfigLib/RedfishPlatformConfigLib.inf
   RedfishPkg/Library/RedfishHttpLib/RedfishHttpLib.inf
+  RedfishPkg/Library/RedfishPlatformWantedDeviceLibNull/RedfishPlatformWantedDeviceLibNull.inf
 
   !include RedfishPkg/Redfish.dsc.inc

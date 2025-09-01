@@ -32,72 +32,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 PAGE_TABLE_POOL  *mPageTablePool = NULL;
 
 /**
-  Clear legacy memory located at the first 4K-page, if available.
-
-  This function traverses the whole HOB list to check if memory from 0 to 4095
-  exists and has not been allocated, and then clear it if so.
-
-  @param HobStart                  The start of HobList passed to DxeCore.
-
-**/
-VOID
-ClearFirst4KPage (
-  IN  VOID  *HobStart
-  )
-{
-  EFI_PEI_HOB_POINTERS  RscHob;
-  EFI_PEI_HOB_POINTERS  MemHob;
-  BOOLEAN               DoClear;
-
-  RscHob.Raw = HobStart;
-  MemHob.Raw = HobStart;
-  DoClear    = FALSE;
-
-  //
-  // Check if page 0 exists and free
-  //
-  while ((RscHob.Raw = GetNextHob (
-                         EFI_HOB_TYPE_RESOURCE_DESCRIPTOR,
-                         RscHob.Raw
-                         )) != NULL)
-  {
-    if ((RscHob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) &&
-        (RscHob.ResourceDescriptor->PhysicalStart == 0))
-    {
-      DoClear = TRUE;
-      //
-      // Make sure memory at 0-4095 has not been allocated.
-      //
-      while ((MemHob.Raw = GetNextHob (
-                             EFI_HOB_TYPE_MEMORY_ALLOCATION,
-                             MemHob.Raw
-                             )) != NULL)
-      {
-        if (MemHob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress
-            < EFI_PAGE_SIZE)
-        {
-          DoClear = FALSE;
-          break;
-        }
-
-        MemHob.Raw = GET_NEXT_HOB (MemHob);
-      }
-
-      break;
-    }
-
-    RscHob.Raw = GET_NEXT_HOB (RscHob);
-  }
-
-  if (DoClear) {
-    DEBUG ((DEBUG_INFO, "Clearing first 4K-page!\r\n"));
-    SetMem (NULL, EFI_PAGE_SIZE, 0);
-  }
-
-  return;
-}
-
-/**
   Return configure status of NULL pointer detection feature.
 
   @return TRUE   NULL pointer detection feature is enabled
@@ -485,14 +419,14 @@ Split1GPageTo2M (
 
   @param[in] PageTableBase    Base address of page table (CR3).
   @param[in] Address          Start address of a page to be set as read-only.
-  @param[in] Level4Paging     Level 4 paging flag.
+  @param[in] LevelOfPaging     Level of paging.
 
 **/
 VOID
 SetPageTablePoolReadOnly (
   IN  UINTN                 PageTableBase,
   IN  EFI_PHYSICAL_ADDRESS  Address,
-  IN  BOOLEAN               Level4Paging
+  IN  UINT8                 LevelOfPaging
   )
 {
   UINTN                 Index;
@@ -502,9 +436,9 @@ SetPageTablePoolReadOnly (
   UINT64                *PageTable;
   UINT64                *NewPageTable;
   UINT64                PageAttr;
-  UINT64                LevelSize[5];
-  UINT64                LevelMask[5];
-  UINTN                 LevelShift[5];
+  UINT64                LevelSize[6];
+  UINT64                LevelMask[6];
+  UINTN                 LevelShift[6];
   UINTN                 Level;
   UINT64                PoolUnitSize;
 
@@ -521,23 +455,26 @@ SetPageTablePoolReadOnly (
   LevelShift[2] = PAGING_L2_ADDRESS_SHIFT;
   LevelShift[3] = PAGING_L3_ADDRESS_SHIFT;
   LevelShift[4] = PAGING_L4_ADDRESS_SHIFT;
+  LevelShift[5] = PAGING_L5_ADDRESS_SHIFT;
 
   LevelMask[1] = PAGING_4K_ADDRESS_MASK_64;
   LevelMask[2] = PAGING_2M_ADDRESS_MASK_64;
   LevelMask[3] = PAGING_1G_ADDRESS_MASK_64;
-  LevelMask[4] = PAGING_1G_ADDRESS_MASK_64;
+  LevelMask[4] = PAGING_512G_ADDRESS_MASK_64;
+  LevelMask[5] = PAGING_256T_ADDRESS_MASK_64;
 
   LevelSize[1] = SIZE_4KB;
   LevelSize[2] = SIZE_2MB;
   LevelSize[3] = SIZE_1GB;
   LevelSize[4] = SIZE_512GB;
+  LevelSize[5] = SIZE_256TB;
 
   AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) &
                    PAGING_1G_ADDRESS_MASK_64;
   PageTable    = (UINT64 *)(UINTN)PageTableBase;
   PoolUnitSize = PAGE_TABLE_POOL_UNIT_SIZE;
 
-  for (Level = (Level4Paging) ? 4 : 3; Level > 0; --Level) {
+  for (Level = LevelOfPaging; Level > 0; --Level) {
     Index  = ((UINTN)RShiftU64 (Address, LevelShift[Level]));
     Index &= PAGING_PAE_INDEX_MASK;
 
@@ -607,13 +544,13 @@ SetPageTablePoolReadOnly (
   Prevent the memory pages used for page table from been overwritten.
 
   @param[in] PageTableBase    Base address of page table (CR3).
-  @param[in] Level4Paging     Level 4 paging flag.
+  @param[in] LevelOfPaging     Level of paging.
 
 **/
 VOID
 EnablePageTableProtection (
-  IN  UINTN    PageTableBase,
-  IN  BOOLEAN  Level4Paging
+  IN  UINTN  PageTableBase,
+  IN  UINT8  LevelOfPaging
   )
 {
   PAGE_TABLE_POOL       *HeadPool;
@@ -642,7 +579,7 @@ EnablePageTableProtection (
     // protection to them one by one.
     //
     while (PoolSize > 0) {
-      SetPageTablePoolReadOnly (PageTableBase, Address, Level4Paging);
+      SetPageTablePoolReadOnly (PageTableBase, Address, LevelOfPaging);
       Address  += PAGE_TABLE_POOL_UNIT_SIZE;
       PoolSize -= PAGE_TABLE_POOL_UNIT_SIZE;
     }
@@ -696,7 +633,7 @@ CreateIdentityMappingPageTables (
   UINTN                                        TotalPagesNum;
   UINTN                                        BigPageAddress;
   VOID                                         *Hob;
-  BOOLEAN                                      Page5LevelEnabled;
+  UINT8                                        LevelOfPaging;
   BOOLEAN                                      Page1GSupport;
   PAGE_TABLE_1G_ENTRY                          *PageDirectory1GEntry;
   UINT64                                       AddressEncMask;
@@ -743,16 +680,16 @@ CreateIdentityMappingPageTables (
     //
     // If cpu has already run in 64bit long mode PEI, Page table Level in DXE must align with previous level.
     //
-    Cr4.UintN         = AsmReadCr4 ();
-    Page5LevelEnabled = (Cr4.Bits.LA57 != 0);
-    if (Page5LevelEnabled) {
+    Cr4.UintN     = AsmReadCr4 ();
+    LevelOfPaging = (Cr4.Bits.LA57 == 1) ? 5 : 4;
+    if (LevelOfPaging == 5) {
       ASSERT (PcdGetBool (PcdUse5LevelPageTable));
     }
   } else {
     //
     // If cpu runs in 32bit protected mode PEI, Page table Level in DXE is decided by PCD and feature capability.
     //
-    Page5LevelEnabled = FALSE;
+    LevelOfPaging = 4;
     if (PcdGetBool (PcdUse5LevelPageTable)) {
       AsmCpuidEx (
         CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS,
@@ -763,12 +700,12 @@ CreateIdentityMappingPageTables (
         NULL
         );
       if (EcxFlags.Bits.FiveLevelPage != 0) {
-        Page5LevelEnabled = TRUE;
+        LevelOfPaging = 5;
       }
     }
   }
 
-  DEBUG ((DEBUG_INFO, "AddressBits=%u 5LevelPaging=%u 1GPage=%u\n", PhysicalAddressBits, Page5LevelEnabled, Page1GSupport));
+  DEBUG ((DEBUG_INFO, "AddressBits=%u LevelOfPaging=%u 1GPage=%u\n", PhysicalAddressBits, LevelOfPaging, Page1GSupport));
 
   //
   // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses
@@ -776,7 +713,7 @@ CreateIdentityMappingPageTables (
   //  due to either unsupported by HW, or disabled by PCD.
   //
   ASSERT (PhysicalAddressBits <= 52);
-  if (!Page5LevelEnabled && (PhysicalAddressBits > 48)) {
+  if ((LevelOfPaging != 5) && (PhysicalAddressBits > 48)) {
     PhysicalAddressBits = 48;
   }
 
@@ -811,7 +748,7 @@ CreateIdentityMappingPageTables (
   //
   // Substract the one page occupied by PML5 entries if 5-Level Paging is disabled.
   //
-  if (!Page5LevelEnabled) {
+  if (LevelOfPaging != 5) {
     TotalPagesNum--;
   }
 
@@ -831,7 +768,7 @@ CreateIdentityMappingPageTables (
   // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
   //
   PageMap = (VOID *)BigPageAddress;
-  if (Page5LevelEnabled) {
+  if (LevelOfPaging == 5) {
     //
     // By architecture only one PageMapLevel5 exists - so lets allocate storage for it.
     //
@@ -853,7 +790,7 @@ CreateIdentityMappingPageTables (
     PageMapLevel4Entry = (VOID *)BigPageAddress;
     BigPageAddress    += SIZE_4KB;
 
-    if (Page5LevelEnabled) {
+    if (LevelOfPaging == 5) {
       //
       // Make a PML5 Entry
       //
@@ -947,7 +884,7 @@ CreateIdentityMappingPageTables (
     ZeroMem (PageMapLevel4Entry, (512 - IndexOfPml4Entries) * sizeof (PAGE_MAP_AND_DIRECTORY_POINTER));
   }
 
-  if (Page5LevelEnabled) {
+  if (LevelOfPaging == 5) {
     Cr4.UintN     = AsmReadCr4 ();
     Cr4.Bits.LA57 = 1;
     AsmWriteCr4 (Cr4.UintN);
@@ -961,7 +898,7 @@ CreateIdentityMappingPageTables (
   // Protect the page table by marking the memory used for page table to be
   // read-only.
   //
-  EnablePageTableProtection ((UINTN)PageMap, TRUE);
+  EnablePageTableProtection ((UINTN)PageMap, LevelOfPaging);
 
   //
   // Set IA32_EFER.NXE if necessary.

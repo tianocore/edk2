@@ -1,7 +1,7 @@
 ## @file
 # This file is used to parse meta files
 #
-# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2025, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2015-2018 Hewlett Packard Enterprise Development LP<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -158,7 +158,6 @@ class MetaFileParser(object):
         self._Arch = Arch
         self._FileType = FileType
         self.MetaFile = FilePath
-        self._FileDir = self.MetaFile.Dir
         self._Defines = {}
         self._Packages = []
         self._FileLocalMacros = {}
@@ -1183,9 +1182,6 @@ class DscParser(MetaFileParser):
     def _LibraryInstanceParser(self):
         self._ValueList[0] = self._CurrentLine
 
-
-    def _DecodeCODEData(self):
-        pass
     ## PCD sections parser
     #
     #   [PcdsFixedAtBuild]
@@ -1388,7 +1384,7 @@ class DscParser(MetaFileParser):
         self._SectionsMacroDict.clear()
         GlobalData.gPlatformDefines = {}
 
-        # Get all macro and PCD which has straitforward value
+        # Get all macro and PCD which has straightforward value
         self.__RetrievePcdValue()
         self._Content = self._RawTable.GetAll()
         self._ContentIndex = 0
@@ -1411,7 +1407,11 @@ class DscParser(MetaFileParser):
                 if self._ContentIndex >= len(self._Content):
                     break
                 Record = self._Content[self._ContentIndex]
-                if LineStart == Record[10] and LineEnd == Record[12]:
+                #
+                # Avoid merging includes with different owners to make sure an
+                # include is correctly processed per arch.
+                #
+                if Owner == Record[8] and LineStart == Record[10] and LineEnd == Record[12]:
                     if [Record[5], Record[6], Record[7]] not in self._Scope:
                         self._Scope.append([Record[5], Record[6], Record[7]])
                     self._ContentIndex += 1
@@ -1464,7 +1464,7 @@ class DscParser(MetaFileParser):
                                 self._ValueList[0],
                                 self._ValueList[1],
                                 self._ValueList[2],
-                                S1,
+                                self._Scope[0][0],
                                 S2,
                                 S3,
                                 NewOwner,
@@ -1711,6 +1711,7 @@ class DscParser(MetaFileParser):
 
     def __ProcessComponent(self):
         self._ValueList[0] = ReplaceMacro(self._ValueList[0], self._Macros)
+        self._Scope[0][0] = ReplaceMacro(self._Scope[0][0], self._Macros)
 
     def __ProcessBuildOption(self):
         self._ValueList = [ReplaceMacro(Value, self._Macros, RaiseError=False)
@@ -1792,8 +1793,6 @@ class DecParser(MetaFileParser):
         self._CurrentStructurePcdName = ""
         self._include_flag = False
         self._package_flag = False
-
-        self._RestofValue = ""
 
     ## Parser starter
     def Start(self):

@@ -2,7 +2,7 @@
 
   Defines the X64 Namespace Object.
 
-  Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+  Copyright (C) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -15,25 +15,45 @@
 #ifndef X64_NAMESPACE_OBJECTS_H_
 #define X64_NAMESPACE_OBJECTS_H_
 
-#include <IndustryStandard/Acpi.h>
+#include <AcpiObjects.h>
+#include <StandardNameSpaceObjects.h>
+#include <ArchCommonNameSpaceObjects.h>
+
+#pragma pack(1)
+
+/** The LOCAL_APIC_MODE enum describes the Local APIC
+    mode in the X64 Namespace
+*/
+typedef enum {
+  LocalApicModeInvalid = 0,
+  LocalApicModeXApic,
+  LocalApicModeX2Apic
+} LOCAL_APIC_MODE;
 
 /** The EX64_OBJECT_ID enum describes the Object IDs
     in the X64 Namespace
 */
 typedef enum X64ObjectID {
-  EX64ObjReserved,               ///<  0 - Reserved
-  EX64ObjFadtSciInterrupt,       ///<  1 - FADT SCI Interrupt information
-  EX64ObjFadtSciCmdInfo,         ///<  2 - FADT SCI CMD information
-  EX64ObjFadtPmBlockInfo,        ///<  3 - FADT Power management block info
-  EX64ObjFadtGpeBlockInfo,       ///<  4 - FADT GPE block info
-  EX64ObjFadtXpmBlockInfo,       ///<  5 - FADT 64-bit Power Management block info
-  EX64ObjFadtXgpeBlockInfo,      ///<  6 - FADT 64-bit GPE block info
-  EX64ObjFadtSleepBlockInfo,     ///<  7 - FADT Sleep block info
-  EX64ObjFadtResetBlockInfo,     ///<  8 - FADT Reset block info
-  EX64ObjFadtMiscInfo,           ///<  9 - FADT Legacy fields info
-  EX64ObjWsmtFlagsInfo,          ///< 10 - WSMT protection flags info
-  EX64ObjHpetInfo,               ///< 11 - HPET device info
-  EX64ObjMax                     ///< 12 - Maximum Object ID
+  EX64ObjReserved,                    ///<  0 - Reserved
+  EX64ObjFadtSciInterrupt,            ///<  1 - FADT SCI Interrupt information
+  EX64ObjFadtSciCmdInfo,              ///<  2 - FADT SCI CMD information
+  EX64ObjFadtPmBlockInfo,             ///<  3 - FADT Power management block info
+  EX64ObjFadtGpeBlockInfo,            ///<  4 - FADT GPE block info
+  EX64ObjFadtXpmBlockInfo,            ///<  5 - FADT 64-bit Power Management block info
+  EX64ObjFadtXgpeBlockInfo,           ///<  6 - FADT 64-bit GPE block info
+  EX64ObjFadtSleepBlockInfo,          ///<  7 - FADT Sleep block info
+  EX64ObjFadtResetBlockInfo,          ///<  8 - FADT Reset block info
+  EX64ObjFadtMiscInfo,                ///<  9 - FADT Legacy fields info
+  EX64ObjWsmtFlagsInfo,               ///< 10 - WSMT protection flags info
+  EX64ObjHpetInfo,                    ///< 11 - HPET device info
+  EX64ObjMadtInfo,                    ///< 12 - MADT info
+  EX64ObjLocalApicX2ApicInfo,         ///< 13 - Local APIC and X2APIC info
+  EX64ObjIoApicInfo,                  ///< 14 - IO APIC info
+  EX64ObjIntrSourceOverrideInfo,      ///< 15 - Interrupt Source Override info
+  EX64ObjLocalApicX2ApicNmiInfo,      ///< 16 - Local APIC and X2APIC NMI info
+  EX64ObjFacsInfo,                    ///< 17 - FACS info
+  EX64ObjLocalApicX2ApicAffinityInfo, ///< 18 - Local APIC and X2APIC Affinity info
+  EX64ObjMax                          ///< 19 - Maximum Object ID
 } EX64_OBJECT_ID;
 
 /** A structure that describes the
@@ -188,4 +208,144 @@ typedef struct CmX64HpetInfo {
   UINT16    MainCounterMinimumClockTickInPeriodicMode;
   UINT8     PageProtectionAndOemAttribute;
 } CM_X64_HPET_INFO;
+
+/**
+  A structure that describes the MADT information.
+
+  ID: EX64ObjMadtInfo
+*/
+typedef struct CmX64MadtInfo {
+  UINT32             LocalApicAddress;
+  UINT32             Flags;
+  LOCAL_APIC_MODE    ApicMode;
+} CM_X64_MADT_INFO;
+
+/**
+  A structure that describes the Local APIC and X2APIC information.
+  This structure includes fields from the ACPI_6_5_LOCAL_APIC_STRUCTURE
+  and ACPI_6_5_LOCAL_X2APIC_STRUCTURE from the ACPI specifications.
+  Additional fields are included to support CPU SSDT topology generation.
+
+  ID: EX64ObjLocalApicX2ApicInfo
+*/
+typedef struct CmX64LocalApicX2ApicInfo {
+  UINT32             ApicId;
+  UINT32             Flags;
+  UINT32             AcpiProcessorUid;
+
+  /** Optional field: Reference Token for the Cst info of this processor.
+      i.e. a token referencing a CM_ARCH_COMMON_OBJ_REF,
+      which in turn refers to an array of CM_ARCH_COMMON_OBJ_REF objects,
+      each pointing to individual CM_ARCH_COMMON_CST_INFO objects.
+  */
+  CM_OBJECT_TOKEN    CstToken;
+
+  /** Optional field: Reference Token for the Csd info of this processor.
+      i.e. a token referencing a CM_ARCH_COMMON_CSD_INFO object.
+  */
+  CM_OBJECT_TOKEN    CsdToken;
+
+  /** Optional field: Reference Token for the Pct info of this processor.
+      i.e. a token referencing a CM_ARCH_COMMON_Pct_INFO object.
+  */
+  CM_OBJECT_TOKEN    PctToken;
+
+  /** Optional field: Reference Token for the Pss info of this processor.
+      i.e. a token referencing a CM_ARCH_COMMON_PSS_INFO object.
+  */
+  CM_OBJECT_TOKEN    PssToken;
+
+  /** Optional field: Reference Token for the Ppc info of this processor.
+      i.e. a token referencing a CM_ARCH_COMMON_PPC_INFO object.
+  */
+  CM_OBJECT_TOKEN    PpcToken;
+
+  /** Optional field: Reference Token for the Psd info of this processor.
+      i.e. a token referencing a CM_ARCH_COMMON_PSD_INFO object.
+  */
+  CM_OBJECT_TOKEN    PsdToken;
+
+  /** Optional field: Reference Token for the Cpc info of this processor.
+      i.e. a token referencing a CM_ARCH_COMMON_CPC_INFO object.
+  */
+  CM_OBJECT_TOKEN    CpcToken;
+
+  /** Optional field: Reference Token for _STA info of this processor.
+      i.e. a token referencing a CM_ARCH_COMMON_STA_INFO object.
+   */
+  CM_OBJECT_TOKEN    StaToken;
+} CM_X64_LOCAL_APIC_X2APIC_INFO;
+
+/**
+  A structure that describes the IO APIC information.
+
+  ID: EX64ObjIoApicInfo
+*/
+typedef struct CmX64IoApicInfo {
+  UINT8     IoApicId;
+  UINT32    IoApicAddress;
+  UINT32    GlobalSystemInterruptBase;
+} CM_X64_IO_APIC_INFO;
+
+/**
+  A structure that describes the Interrupt Source Override information.
+
+  ID: EX64ObjIntrSourceOverrideInfo
+*/
+typedef struct CmX64IntrSourceOverrideInfo {
+  UINT8     Bus;
+  UINT8     Source;
+  UINT32    GlobalSystemInterrupt;
+  UINT16    Flags;
+} CM_X64_INTR_SOURCE_OVERRIDE_INFO;
+
+/**
+  A structure that describes the Local APIC NMI information.
+
+  ID: EX64ObjLocalApicX2ApicNmiInfo
+*/
+typedef struct CmX64LocalApicX2ApicNmiInfo {
+  UINT16    Flags;
+  UINT32    AcpiProcessorUid;
+  UINT8     LocalApicLint;
+} CM_X64_LOCAL_APIC_X2APIC_NMI_INFO;
+
+/**
+  A structure that describes the FACS information.
+
+  ID: EX64ObjFacsInfo
+*/
+typedef struct CmX64FacsInfo {
+  UINT32    FirmwareWakingVector;
+  UINT32    Flags;
+  UINT64    XFirmwareWakingVector;
+  UINT32    OspmFlags;
+} CM_X64_FACS_INFO;
+
+/**
+  A structure that describes the Local APIC and X2APIC Affinity information.
+
+  ID: EX64ObjLocalApicX2ApicAffinityInfo
+ */
+typedef struct CmX64LocalApicX2ApicAffinityInfo {
+  LOCAL_APIC_MODE    ApicMode;
+  UINT32             ApicId;
+  UINT32             ProximityDomain;
+  UINT32             Flags;
+  UINT32             ClockDomain;
+
+  /** Optional field: Reference Token to the ProximityDomain this object
+      belongs to. If set to CM_NULL_TOKEN, the following field is used:
+        CM_X64_LOCAL_APIC_X2APIC_AFFINITY_INFO.ProximityDomain
+  */
+  CM_OBJECT_TOKEN    ProximityDomainToken;
+
+  /** Optional field: Reference Token to the ProximityDomain this object
+      belongs to. If set to CM_NULL_TOKEN, the following field is used:
+        CM_X64_LOCAL_APIC_X2APIC_AFFINITY_INFO.ClockDomain
+  */
+  CM_OBJECT_TOKEN    ClockDomainToken;
+} CM_X64_LOCAL_APIC_X2APIC_AFFINITY_INFO;
+
+#pragma pack()
 #endif // X64_NAMESPACE_OBJECTS_H_

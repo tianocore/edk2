@@ -51,6 +51,8 @@
   PrintLib
   SerialPortLib
   TimerLib
+  StackCheckLib
+  ArmTransferListLib
 
 [Ppis]
   gArmMpCoreInfoPpiGuid
@@ -58,6 +60,7 @@
 [Guids]
   gArmMpCoreInfoGuid
   gEfiFirmwarePerformanceGuid
+  gArmTransferListHobGuid
 
 [FeaturePcd]
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob
@@ -69,8 +72,10 @@
   gArmTokenSpaceGuid.PcdFdSize
   gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmTokenSpaceGuid.PcdFvSize
-  gArmTokenSpaceGuid.PcdVFPEnabled
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
+
+[FixedPcd.ARM]
+  gArmTokenSpaceGuid.PcdVFPEnabled
 
 [Pcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase

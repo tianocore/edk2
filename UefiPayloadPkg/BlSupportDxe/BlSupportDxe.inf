@@ -27,23 +27,37 @@
   BlSupportDxe.c
   BlSupportDxe.h
 
+[Sources.IA32, Sources.X64]
+  X86/BlSupport.c
+
+[Sources.AARCH64]
+  AArch64/BlSupport.c
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   UefiPayloadPkg/UefiPayloadPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   UefiDriverEntryPoint
   UefiBootServicesTableLib
-  DxeServicesTableLib
   DebugLib
   BaseMemoryLib
-  UefiLib
   HobLib
+  MemoryAllocationLib
+
+[LibraryClasses.AARCH64]
+  ArmMmuLib
 
 [Guids]
   gUefiAcpiBoardInfoGuid
+  gEfiFirmwareInfoHobGuid
   gEfiGraphicsInfoHobGuid
+  gEfiSystemResourceTableGuid
+
+[Protocols]
+  gEfiCpuArchProtocolGuid
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
@@ -52,6 +66,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseSize
+
+[Pcd.AARCH64]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
 
 [Depex]
   TRUE

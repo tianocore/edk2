@@ -23,7 +23,7 @@
 ///
 #define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION  0x02
 
-#define EFI_ACPI_4_0_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION  0x04
+#define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION_4  0x04
 ///
 /// Serial Port Console Redirection Table Format
 ///
@@ -80,7 +80,7 @@ typedef struct {
   UINT16                                    NameSpaceStrLength;
   UINT16                                    NameSpaceStrOffset;
   CHAR8                                     NameSpaceString[0];
-} EFI_ACPI_4_0_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE;
+} EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_4;
 
 #pragma pack()
 
@@ -164,6 +164,7 @@ typedef struct {
 //
 // Baud Rate
 //
+#define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_BAUD_RATE_AS_IS   0
 #define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_BAUD_RATE_9600    3
 #define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_BAUD_RATE_19200   4
 #define EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_BAUD_RATE_57600   6

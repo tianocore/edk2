@@ -1,7 +1,7 @@
 /** @file
 This file contains the internal functions required to generate a Firmware Volume.
 
-Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2025, Intel Corporation. All rights reserved.<BR>
 Portions Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 Portions Copyright (c) 2016 HP Development Company, L.P.<BR>
 Portions Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
@@ -14,6 +14,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Include files
 //
 
+#if defined(__FreeBSD__)
+#include <uuid.h>
+#elif defined(__GNUC__) && !defined(_WIN32)
+#if !defined(__CROSS_LIB_UUID__)
+#include <uuid/uuid.h>
+#else
+#include <uuid.h>
+#endif
+#endif
 #ifdef __GNUC__
 #include <sys/stat.h>
 #endif
@@ -3144,7 +3153,6 @@ Returns:
 --*/
 {
   UINTN               CurrentOffset;
-  UINTN               OrigOffset;
   UINTN               Index;
   FILE                *fpin;
   UINTN               FfsFileSize;
@@ -3153,11 +3161,11 @@ Returns:
   UINT32              FfsHeaderSize;
   EFI_FFS_FILE_HEADER FfsHeader;
   UINTN               VtfFileSize;
-  UINTN               MaxPadFileSize;
+  UINTN               VtfPadSize;
 
   FvExtendHeaderSize = 0;
-  MaxPadFileSize = 0;
   VtfFileSize = 0;
+  VtfPadSize = 0;
   fpin  = NULL;
   Index = 0;
 
@@ -3265,12 +3273,8 @@ Returns:
         //
         // Only EFI_FFS_FILE_HEADER is needed for a pad section.
         //
-        OrigOffset    = CurrentOffset;
         CurrentOffset = (CurrentOffset + FfsHeaderSize + sizeof(EFI_FFS_FILE_HEADER) + FfsAlignment - 1) & ~(FfsAlignment - 1);
         CurrentOffset -= FfsHeaderSize;
-        if ((CurrentOffset - OrigOffset) > MaxPadFileSize) {
-          MaxPadFileSize = CurrentOffset - OrigOffset;
-        }
       }
     }
 
@@ -3295,9 +3299,18 @@ Returns:
 
   if (FvInfoPtr->Size == 0) {
     //
+    // Vtf file should be bottom aligned at end of block.
+    // If it is not aligned, insert EFI_FFS_FILE_HEADER to ensure the minimum pad file size for left space.
+    //
+    if ((VtfFileSize > 0) && (CurrentOffset % FvInfoPtr->FvBlocks[0].Length)) {
+      VtfPadSize = sizeof (EFI_FFS_FILE_HEADER);
+    }
+
+    //
     // Update FvInfo data
     //
-    FvInfoPtr->FvBlocks[0].NumBlocks = CurrentOffset / FvInfoPtr->FvBlocks[0].Length + ((CurrentOffset % FvInfoPtr->FvBlocks[0].Length)?1:0);
+    FvInfoPtr->FvBlocks[0].NumBlocks = ((CurrentOffset + VtfPadSize) / FvInfoPtr->FvBlocks[0].Length) +
+                                       (((CurrentOffset + VtfPadSize) % FvInfoPtr->FvBlocks[0].Length) ? 1 : 0);
     FvInfoPtr->Size = FvInfoPtr->FvBlocks[0].NumBlocks * FvInfoPtr->FvBlocks[0].Length;
     FvInfoPtr->FvBlocks[1].NumBlocks = 0;
     FvInfoPtr->FvBlocks[1].Length = 0;
@@ -3307,6 +3320,23 @@ Returns:
     //
     Error (NULL, 0, 3000, "Invalid", "the required fv image size 0x%x exceeds the set fv image size 0x%x", (unsigned) CurrentOffset, (unsigned) FvInfoPtr->Size);
     return EFI_INVALID_PARAMETER;
+  } else if ((VtfFileSize > 0) &&
+             (FvInfoPtr->Size > CurrentOffset) &&
+             ((FvInfoPtr->Size - CurrentOffset) < sizeof (EFI_FFS_FILE_HEADER)))
+  {
+    //
+    // Not invalid
+    //
+    Error (
+      NULL,
+      0,
+      3000,
+      "Invalid",
+      "the required fv image size = 0x%x. the set fv image size = 0x%x. Free space left is not enough to add a pad file (0x18)",
+      (unsigned)CurrentOffset,
+      (unsigned)FvInfoPtr->Size
+      );
+    return EFI_INVALID_PARAMETER;
   }
 
   //
@@ -3314,12 +3344,6 @@ Returns:
   //
   mFvTotalSize = FvInfoPtr->Size;
   mFvTakenSize = CurrentOffset;
-  if ((mFvTakenSize == mFvTotalSize) && (MaxPadFileSize > 0)) {
-    //
-    // This FV means TOP FFS has been taken. Then, check whether there is padding data for use.
-    //
-    mFvTakenSize = mFvTakenSize - MaxPadFileSize;
-  }
 
   return EFI_SUCCESS;
 }

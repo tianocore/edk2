@@ -70,7 +70,7 @@ class LicenseCheck(ICiBuildPlugin):
         temp_diff_output = os.path.join (temp_path, 'diff.txt')
         params = "diff --output={} --unified=0 origin/master HEAD".format(temp_diff_output)
         RunCmd("git", params)
-        with open(temp_diff_output) as file:
+        with open(temp_diff_output, encoding='utf8') as file:
             patch = file.read().strip().split("\n")
         # Delete temp directory
         if os.path.exists(temp_path):

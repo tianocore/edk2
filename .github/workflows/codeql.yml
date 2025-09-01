@@ -25,7 +25,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: windows-2019
+    runs-on: windows-2022
     permissions:
       actions: read
       contents: read
@@ -35,8 +35,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - Package: "ArmPkg"
-            ArchList: "IA32,X64"
           - Package: "CryptoPkg"
             ArchList: "IA32"
           - Package: "CryptoPkg"
@@ -149,7 +147,7 @@ jobs:
 
     - name: Setup
       if: steps.get_ci_file_operations.outputs.setup_supported == 'true'
-      run: stuart_setup -c .pytool/CISettings.py -t DEBUG -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=VS2019
+      run: stuart_setup -c .pytool/CISettings.py -t DEBUG -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=VS2022
 
     - name: Upload Setup Log As An Artifact
       uses: actions/upload-artifact@v4
@@ -163,7 +161,7 @@ jobs:
 
     - name: CI Setup
       if: steps.get_ci_file_operations.outputs.ci_setup_supported == 'true'
-      run: stuart_ci_setup -c .pytool/CISettings.py -t DEBUG -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=VS2019
+      run: stuart_ci_setup -c .pytool/CISettings.py -t DEBUG -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=VS2022
 
     - name: Upload CI Setup Log As An Artifact
       uses: actions/upload-artifact@v4
@@ -176,7 +174,7 @@ jobs:
         if-no-files-found: ignore
 
     - name: Update
-      run: stuart_update -c .pytool/CISettings.py -t DEBUG -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=VS2019
+      run: stuart_update -c .pytool/CISettings.py -t DEBUG -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=VS2022
 
     - name: Upload Update Log As An Artifact
       uses: actions/upload-artifact@v4
@@ -189,7 +187,7 @@ jobs:
         if-no-files-found: ignore
 
     - name: Build Tools From Source
-      run: python BaseTools/Edk2ToolsBuild.py -t VS2019
+      run: python BaseTools/Edk2ToolsBuild.py -t VS2022
 
     - name: Find CodeQL Plugin Directory
       id: find_dir
@@ -246,7 +244,7 @@ jobs:
 
     - name: Download CodeQL CLI
       if: steps.codeqlcli_cache.outputs.cache-hit != 'true'
-      run: stuart_update -c .pytool/CISettings.py -t DEBUG -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=VS2019 --codeql
+      run: stuart_update -c .pytool/CISettings.py -t DEBUG -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=VS2022 --codeql
 
     - name: Remove CI Plugins Irrelevant to CodeQL
       shell: python
@@ -269,7 +267,7 @@ jobs:
     - name: CI Build
       env:
         STUART_CODEQL_PATH: ${{ steps.cache_key_gen.outputs.codeql_cli_ext_dep_dir }}
-      run: stuart_ci_build -c .pytool/CISettings.py -t DEBUG -p ${{ matrix.Package }} -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=VS2019 --codeql
+      run: stuart_ci_build -c .pytool/CISettings.py -t DEBUG -p ${{ matrix.Package }} -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=VS2022 --codeql
 
     - name: Build Cleanup
       id: build_cleanup

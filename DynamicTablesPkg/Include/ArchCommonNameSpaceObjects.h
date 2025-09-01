@@ -1,8 +1,8 @@
 /** @file
 
   Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
-  Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
-  Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+  Copyright (c) 2024 - 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
+  Copyright (C) 2024 - 2025, Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -18,6 +18,7 @@
 #include <AcpiObjects.h>
 #include <StandardNameSpaceObjects.h>
 
+#include <IndustryStandard/AcpiAml.h>
 #include <IndustryStandard/Tpm2Acpi.h>
 
 /** The EARCH_COMMON_OBJECT_ID enum describes the Object IDs
@@ -53,6 +54,25 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjTpm2InterfaceInfo,              ///< 26 - TPM Interface Info
   EArchCommonObjSpmiInterfaceInfo,              ///< 27 - SPMI Interface Info
   EArchCommonObjSpmiInterruptDeviceInfo,        ///< 28 - SPMI Interrupt and Device Info
+  EArchCommonObjCstInfo,                        ///< 29 - C-State Info
+  EArchCommonObjCsdInfo,                        ///< 30 - C-State Dependency (CSD) Info
+  EArchCommonObjPctInfo,                        ///< 31 - P-State control (PCT) Info
+  EArchCommonObjPssInfo,                        ///< 32 - P-State status (PSS) Info
+  EArchCommonObjPpcInfo,                        ///< 33 - P-State control (PPC) Info
+  EArchCommonObjStaInfo,                        ///< 34 - _STA (Device Status) Info
+  EArchCommonObjMemoryRangeDescriptor,          ///< 35 - Memory Range Descriptor
+  EArchCommonObjGenericDbg2DeviceInfo,          ///< 36 - Generic DBG2 Device Info
+  EArchCommonObjCxlHostBridgeInfo,              ///< 37 - CXL Host Bridge Info
+  EArchCommonObjCxlFixedMemoryWindowInfo,       ///< 38 - CXL Fixed Memory Window Info
+  EArchCommonObjProximityDomainInfo,            ///< 39 - Proximity Domain Info
+  EArchCommonObjProximityDomainRelationInfo,    ///< 40 - Proximity Domain Relation Info
+  EArchCommonObjSystemLocalityInfo,             ///< 41 - System Locality Info
+  EArchCommonObjMemoryProximityDomainAttrInfo,  ///< 42 - Memory Proximity Domain Attribute
+  EArchCommonObjMemoryLatBwInfo,                ///< 43 - Memory Latency Bandwidth Info
+  EArchCommonObjMemoryCacheInfo,                ///< 44 - Memory Cache Info
+  EArchCommonObjSpcrInfo,                       ///< 45 - Serial Terminal and Interrupt Info
+  EArchCommonObjTpm2DeviceInfo,                 ///< 46 - TPM2 Device Info
+  EArchCommonObjMcfgPciConfigSpaceInfo,         ///< 47 - MCFG PCI Configuration Space Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -251,16 +271,22 @@ typedef struct CmArchCommonPciInterruptMapInfo {
 */
 typedef struct CmArchCommonMemoryAffinityInfo {
   /// The proximity domain to which the "range of memory" belongs.
-  UINT32    ProximityDomain;
+  UINT32             ProximityDomain;
 
   /// Base Address
-  UINT64    BaseAddress;
+  UINT64             BaseAddress;
 
   /// Length
-  UINT64    Length;
+  UINT64             Length;
 
   /// Flags
-  UINT32    Flags;
+  UINT32             Flags;
+
+  /** Optional field: Reference Token to the ProximityDomain this object
+      belongs to. If set to CM_NULL_TOKEN, the following field is used:
+        CM_ARCH_COMMON_MEMORY_AFFINITY_INFO.ProximityDomain
+  */
+  CM_OBJECT_TOKEN    ProximityDomainToken;
 } CM_ARCH_COMMON_MEMORY_AFFINITY_INFO;
 
 /** A structure that describes the ACPI Device Handle (Type 0) in the
@@ -311,6 +337,12 @@ typedef struct CmArchCommonGenericInitiatorAffinityInfo {
 
   /// Reference Token for the Device Handle
   CM_OBJECT_TOKEN    DeviceHandleToken;
+
+  /** Optional field: Reference Token to the ProximityDomain this object
+      belongs to. If set to CM_NULL_TOKEN, the following field is used:
+        CM_ARCH_COMMON_GENERIC_INITIATOR_AFFINITY_INFO.ProximityDomain
+  */
+  CM_OBJECT_TOKEN    ProximityDomainToken;
 } CM_ARCH_COMMON_GENERIC_INITIATOR_AFFINITY_INFO;
 
 /** A structure that describes the Lpi information.
@@ -694,6 +726,18 @@ typedef struct CmArchCommonTpm2InterfaceInfo {
   UINT64    Lasa;
 } CM_ARCH_COMMON_TPM2_INTERFACE_INFO;
 
+/** A structure that describes TPM2 device.
+
+  ID: EArchCommonObjTpm2DeviceInfo
+*/
+typedef struct CmArchCommonTpm2DeviceInfo {
+  /** TPM2 Device's Base Address */
+  UINT64    Tpm2DeviceBaseAddress;
+
+  /** TPM2 Device' Size */
+  UINT64    Tpm2DeviceSize;
+} CM_ARCH_COMMON_TPM2_DEVICE_INFO;
+
 /** A structure that describes the
     SPMI (Service Processor Management Interface) Info.
 
@@ -728,6 +772,311 @@ typedef struct CmArchCommonObjSpmiInterruptDeviceInfo {
   /** Uid of the device */
   UINT32    DeviceId;
 } CM_ARCH_COMMON_SPMI_INTERRUPT_DEVICE_INFO;
+
+/** A structure that describes the Cst information.
+
+  Processor power state (C-state) is described in DSDT/SSDT and associated
+  to cpus/clusters in the cpu topology.
+
+  Unsupported Optional registers should be encoded with NULL resource
+  Register {(SystemMemory, 0, 0, 0, 0)}
+
+  For values that support Integer or Buffer, integer will be used
+  if buffer is NULL resource.
+  If resource is not NULL then Integer must be 0
+
+  Cf. ACPI 6.5, s8.4.1.1 _CST (C states)
+
+  ID: EArchCommonObjCstInfo
+*/
+typedef AML_CST_INFO CM_ARCH_COMMON_CST_INFO;
+
+/** A structure that describes the C-State Dependency (CSD) Info.
+
+    Cf. ACPI 6.5, s8.4.1.2 _CSD (C-State Dependency).
+
+    ID: EArchCommonObjCsdInfo
+*/
+typedef struct CmArchCommonObjCsdInfo {
+  /// The revision of the C-State dependency table.
+  UINT8              Revision;
+
+  /// The domain ID.
+  UINT32             Domain;
+
+  /// The coordination type.
+  UINT32             CoordType;
+
+  /// The number of processors in the domain.
+  UINT32             NumProcessors;
+
+  /// Token referencing the CST package of the CM object
+  CM_OBJECT_TOKEN    CstPkgRefToken;
+} CM_ARCH_COMMON_CSD_INFO;
+
+/** A structure that describes the P-State _PCT.
+
+    Cf. ACPI 6.5, s8.4.5.1 Processor Performance Control
+
+    ID: EArchCommonObjPctInfo
+*/
+typedef AML_PCT_INFO CM_ARCH_COMMON_PCT_INFO;
+
+/** A structure that describes the P-State _PSS.
+
+    Cf. ACPI 6.5, s8.4.5.2 Processor Performance Control
+
+    ID: EArchCommonObjPssInfo
+*/
+typedef AML_PSS_INFO CM_ARCH_COMMON_PSS_INFO;
+
+/** A structure that describes the P-State _PPC.
+
+    Cf. ACPI 6.5, s8.4.5.3 Processor Performance Control
+
+    ID: EArchCommonObjPpcInfo
+*/
+typedef struct CmArchCommonObjPpcInfo {
+  /// The number of performance states supported by the processor.
+  UINT32    PstateCount;
+} CM_ARCH_COMMON_PPC_INFO;
+
+/** A structure that describes the _STA (Device Status) Info.
+
+    ID: EArchCommonObjStaInfo
+*/
+typedef struct CmArchCommonStaInfo {
+  /// Device Status
+  UINT32    DeviceStatus;
+} CM_ARCH_COMMON_STA_INFO;
+
+/** A structure that describes the
+    Memory Range descriptor.
+
+    ID: EArchCommonObjMemoryRangeDescriptor
+*/
+typedef struct CmArchCommonMemoryRangeDescriptor {
+  /// Base address of Memory Range,
+  UINT64    BaseAddress;
+
+  /// Length of the Memory Range.
+  UINT64    Length;
+} CM_ARCH_COMMON_MEMORY_RANGE_DESCRIPTOR;
+
+/** A structure that describes a generic device to add a DBG2 device node from.
+
+  ID: EArchCommonObjGenericDbg2DeviceInfo,
+*/
+typedef struct CmArchCommonDbg2DeviceInfo {
+  /// Token identifying an array of CM_ARCH_COMMON_MEMORY_RANGE_DESCRIPTOR objects
+  CM_OBJECT_TOKEN    AddressResourceToken;
+
+  /// The DBG2 port type
+  UINT16             PortType;
+
+  /// The DBG2 port subtype
+  UINT16             PortSubtype;
+
+  /// Access Size
+  UINT8              AccessSize;
+
+  /** ASCII Null terminated string that will be appended to \_SB_. for the full path.
+  */
+  CHAR8              ObjectName[AML_NAME_SEG_SIZE + 1];
+} CM_ARCH_COMMON_DBG2_DEVICE_INFO;
+
+/** A structure that describes a CXL Host Bridge Structure (Type 0).
+
+  ID: EArchCommonObjCxlHostBridgeInfo
+*/
+
+typedef struct CmArchCommonCxlHostBridgeInfo {
+  /// Token to identify this object.
+  CM_OBJECT_TOKEN    Token;
+
+  /// Unique id to associate with a host bridge instance.
+  UINT32             Uid;
+
+  /// CXL version.
+  UINT32             Version;
+
+  /// Base address of the component registers.
+  UINT64             ComponentRegisterBase;
+} CM_ARCH_COMMON_CXL_HOST_BRIDGE_INFO;
+
+// Maximum interleave ways is defined in the CXL spec section 8.2.4.19.7.
+#define CFMWS_MAX_INTERLEAVE_WAYS  (16)
+
+/** A structure that describes the CXL Fixed Memory Window Structure (Type 1).
+
+    ID: EArchCommonObjCxlFixedMemoryWindowInfo
+*/
+typedef struct CmArchCommonCxlFixedMemoryWindowInfo {
+  /// Base host physical address. Should be 256 MB aligned.
+  UINT64             BaseHostPhysicalAddress;
+
+  /// Size of the window in bytes. Should be 256 MB aligned.
+  UINT64             WindowSizeBytes;
+
+  /// Number of ways the memory region is interleaved.
+  UINT8              NumberOfInterleaveWays;
+
+  /// Interleave arithmetic method.
+  UINT8              InterleaveArithmetic;
+
+  /// Number of consecutive bytes per interleave.
+  UINT32             HostBridgeInterleaveGranularity;
+
+  /// Bit vector of window restriction settings.
+  UINT16             WindowRestrictions;
+
+  /// ID of Quality of Service Throttling Group for this window.
+  UINT16             QtgId;
+
+  /// Host bridge UIDs that are part of the interleave configuration.
+  /// The number of InterleaveTargetTokens is equal to NumberOfInterleaveWays.
+  /// Each array element identifies a CM_ARCH_COMMON_CXL_HOST_BRIDGE_INFO
+  /// structure via token matching.
+  CM_OBJECT_TOKEN    InterleaveTargetTokens[CFMWS_MAX_INTERLEAVE_WAYS];
+} CM_ARCH_COMMON_CXL_FIXED_MEMORY_WINDOW_INFO;
+
+/** A structure that describes a proximity domain.
+
+    ID: EArchCommonObjProximityDomainInfo
+*/
+typedef struct CmArchCommonProximityDomainInfo {
+  /// GenerateDomainId
+  /// - TRUE if the DynamicTablesPkg framework should generate DomainId values.
+  /// - FALSE if CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO.DomainId should be used instead.
+  /// If GenerateDomainId is FALSE, user supplied DomainId values should be used.
+  /// Note: It is the user's responsibility to ensure that the DomainId values
+  /// are unique.
+  BOOLEAN    GenerateDomainId;
+
+  /// DomainId.
+  /// Generators will use this DomainId if GenerateDomainId=FALSE.
+  UINT32     DomainId;
+} CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO;
+
+/** A structure that describes a relation between two proximity domains.
+
+    ID: EArchCommonObjProximityDomainRelationInfo
+*/
+typedef struct CmArchCommonProximityDomainRelationInfo {
+  /// First Domain Id Token.
+  /// Token referencing a CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO.
+  ///
+  /// For the HMAT sub-table of type 1 -
+  ///   System Locality Latency and Bandwidth Information Structure
+  /// the First Domain is an Initiator Domain.
+  CM_OBJECT_TOKEN    FirstDomainToken;
+
+  /// Second Domain Id Token.
+  /// Token referencing a CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO.
+  ///
+  /// For the HMAT sub-table of type 1 -
+  ///   System Locality Latency and Bandwidth Information Structure
+  /// the Second Domain is a Target Domain.
+  CM_OBJECT_TOKEN    SecondDomainToken;
+
+  /// Relation.
+  /// The meaning of this field depends on the object referencing this struct.
+  /// This could be a bandwidth, latency, relative distance (SLIT)...
+  UINT64             Relation;
+} CM_ARCH_COMMON_PROXIMITY_DOMAIN_RELATION_INFO;
+
+/** A structure that describes a relation between two proximity domains.
+
+    ID: EArchCommonObjSystemLocalityInfo
+*/
+typedef struct CmArchCommonSystemLocalityInfo {
+  /// Array of relative distances.
+  /// Token identifying an array of CM_ARCH_COMMON_DOMAIN_RELATION.
+  ///
+  /// If a relative distance between two domains is not provided,
+  /// the default value used is:
+  /// - 10 for the distance between a domain and itself, cf. the normalized
+  ///   distance in the spec.
+  /// - 0xFF otherwise, i.e. the domains are unreachable from each other.
+  /// Relative distances must be > 10 for two different domains.
+  CM_OBJECT_TOKEN    RelativeDistanceArray;
+} CM_ARCH_COMMON_SYSTEM_LOCALITY_INFO;
+
+/** A structure that describes the Memory Proximity Domain Attribute.
+
+    ID: EArchCommonObjMemoryProximityDomainAttrInfo
+*/
+typedef struct CmArchCommonMemoryProximityDomainAttrInfo {
+  /// Flags
+  UINT16             Flags;
+
+  /// Token referencing an Initiator Proximity Domain
+  /// I.e. a CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO
+  CM_OBJECT_TOKEN    InitiatorProximityDomain;
+
+  /// Token referencing an Memory Proximity Domain
+  /// I.e. a CM_ARCH_COMMON_PROXIMITY_DOMAIN_INFO
+  CM_OBJECT_TOKEN    MemoryProximityDomain;
+} CM_ARCH_COMMON_MEMORY_PROXIMITY_DOMAIN_ATTR_INFO;
+
+/** A structure that describes the Memory Latency Bandwidth Info.
+
+    ID: EArchCommonObjMemoryLatBwInfo
+*/
+typedef struct CmArchCommonMemoryLatBwInfo {
+  /// Flags
+  UINT8              Flags;
+
+  /// Data Type
+  UINT8              DataType;
+
+  /// Minimum Transfer Type
+  UINT8              MinTransferSize;
+
+  /// Entry Base Unit
+  UINT64             EntryBaseUnit;
+
+  /// Token referencing an array of CM_ARCH_COMMON_DOMAIN_RELATION_INFO
+  /// From this array, it is possible to retrieve:
+  /// - the number and Ids of the initiator domains
+  /// - the number and Ids of the target domains
+  /// - the latency/bandwidth between each domain
+  CM_OBJECT_TOKEN    RelativeDistanceArray;
+} CM_ARCH_COMMON_MEMORY_LAT_BW_INFO;
+
+/** A structure that describes the Memory Cache Info.
+
+    ID: EArchCommonObjMemoryCacheInfo
+*/
+typedef struct CmArchCommonMemoryCacheInfo {
+  /// Token referencing a memory proximity domain.
+  CM_OBJECT_TOKEN    MemoryProximityDomain;
+
+  /// Memory side cache size.
+  UINT64             MemorySideCacheSize;
+
+  /// Cache attributes.
+  UINT32             CacheAttributes;
+
+  /// @todo It is not possible to generate Smbios tables yet.
+  /// @todo Referencing Smbios tables is not possible for now,
+  /// @todo but will be in a near future.
+} CM_ARCH_COMMON_MEMORY_CACHE_INFO;
+
+/** A structure that describes the Serial Terminal and Interrupt Information.
+
+  This structure provides details about the interrupt type and terminal type
+  associated with a console device, used for the SPCR Table.
+
+  ID: EArchCommonObjSpcrInfo
+*/
+typedef struct CmArchCommonObjSpcrInfo {
+  /// Specifies the type of interrupt used by the console device.
+  UINT8    InterruptType;
+  /// Specifies the terminal type used by the console device.
+  UINT8    TerminalType;
+} CM_ARCH_COMMON_SPCR_INFO;
+
 #pragma pack()
 
 #endif // ARCH_COMMON_NAMESPACE_OBJECTS_H_

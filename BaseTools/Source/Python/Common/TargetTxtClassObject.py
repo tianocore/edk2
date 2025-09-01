@@ -176,7 +176,7 @@ class TargetTxtDict():
                 ConfDirectoryPath = mws.join(os.environ["WORKSPACE"], ConfDirectoryPath)
         else:
             if "CONF_PATH" in os.environ:
-                ConfDirectoryPath = os.path.normcase(os.path.normpath(os.environ["CONF_PATH"]))
+                ConfDirectoryPath = os.path.normpath(os.environ["CONF_PATH"])
             else:
                 # Get standard WORKSPACE/Conf use the absolute path to the WORKSPACE/Conf
                 ConfDirectoryPath = mws.join(os.environ["WORKSPACE"], 'Conf')

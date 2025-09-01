@@ -694,6 +694,7 @@ DriverHealthManagerUpdateForm (
   UINTN               Index;
   EFI_STRING_ID       Prompt;
   EFI_STRING_ID       Help;
+  EFI_STRING_ID       TextTwo;
   CHAR16              String[512];
   UINTN               StringCount;
   EFI_STRING          TmpString;
@@ -848,11 +849,12 @@ DriverHealthManagerUpdateForm (
           mDriverHealthManagerHealthInfo[Index].HealthStatus == EfiDriverHealthStatusHealthy ||
           mDriverHealthManagerHealthInfo[Index].HealthStatus == EfiDriverHealthStatusFailed
           );
+        TextTwo = Help;
         HiiCreateTextOpCode (
           StartOpCodeHandle,
           Prompt,
-          Help,
-          0
+          0,
+          TextTwo
           );
         break;
     }
@@ -872,7 +874,7 @@ DriverHealthManagerUpdateForm (
 }
 
 /**
-  Called when the form is closing to remove the dynamicly added string from the HII package list.
+  Called when the form is closing to remove the dynamically added string from the HII package list.
 **/
 VOID
 DriverHealthManagerCleanDynamicString (

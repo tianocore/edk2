@@ -62,8 +62,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdRemapFrameBufferWriteCombine
 
 [Pcd]
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
   gUefiOvmfPkgTokenSpaceGuid.PcdVideoResolutionSource
-  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution

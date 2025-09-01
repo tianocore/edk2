@@ -7,6 +7,7 @@
   (C) Copyright 2015-2019 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2023 Apple Inc. All rights reserved.<BR>
   Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1294,8 +1295,43 @@ SmbiosPrintStructure (
     case 42:
       DisplayMCHostInterfaceType (Struct->Type42->InterfaceType, Option);
       if (AE_SMBIOS_VERSION (0x3, 0x2)) {
+        UINT32  DataValue = 0;
         PRINT_STRUCT_VALUE_H (Struct, Type42, InterfaceTypeSpecificDataLength);
-        PRINT_BIT_FIELD (Struct, Type42, InterfaceTypeSpecificData, Struct->Type42->InterfaceTypeSpecificDataLength);
+        if (Struct->Type42->InterfaceTypeSpecificDataLength < 4) {
+          ShellPrintEx (-1, -1, L"WARNING: InterfaceTypeSpecificDataLength should be >= 4.\n");
+        }
+
+        ShellPrintEx (-1, -1, L"InterfaceTypeSpecificData\n");
+        // Decode and interpret InterfaceTypeSpecificData based on the InterfaceType
+        switch (Struct->Type42->InterfaceType) {
+          case MCHostInterfaceTypeOemDefined:
+            // The first four bytes are the vendor ID (MSB first), as assigned by the Internet Assigned Numbers Authority (IANA) as "Enterprise Number".
+            // See https://www.iana.org/assignments/enterprise-numbers.txt
+            ShellPrintEx (-1, -1, L"Vendor ID (IANA Enterprise Number): %d", (UINT32)*(Struct->Type42->InterfaceTypeSpecificData));
+            break;
+
+          // As defined in MCTP Host Interface Specification, DSP0256
+          case MCHostInterfaceTypeMMBI:
+            // For MCTP interface type of MMBI; this defines the pointer to the MMBI capability descriptor, as defined in DSP0282, Section 7.1
+            DataValue = *(UINT32 *)Struct->Type42->InterfaceTypeSpecificData;
+            ShellPrintEx (-1, -1, L"Pointer to MMBI capability descriptor: 0x%x\n", DataValue);
+            break;
+
+          case MCHostInterfaceTypeI2C_SMBUS:
+          case MCHostInterfaceTypeI3C:
+          case MCHostInterfaceTypeKCS:
+            // switch case fall through
+            // For MCTP interface type of I2C, I3C, KCS; this value is reserved and must be 0
+            DataValue = *(UINT32 *)Struct->Type42->InterfaceTypeSpecificData;
+            ShellPrintEx (-1, -1, L"For Interface type I2C, I3C or KCS, InterfaceTypeSpecificData is reserved and must be 0.\n");
+            ShellPrintEx (-1, -1, L"Actual value is : 0x%x\n", DataValue);
+            break;
+
+          default:
+            // The decoding is not defined for these values in SMBIOS 3.8.0. The value is dumped
+            PRINT_BIT_FIELD (Struct, Type42, InterfaceTypeSpecificData, Struct->Type42->InterfaceTypeSpecificDataLength);
+            break;
+        }
       }
 
       break;
@@ -2577,6 +2613,10 @@ DisplayProcessorFamily2 (
       Print (L"ARMv8\n");
       break;
 
+    case 0x102:
+      Print (L"ARMv9\n");
+      break;
+
     case 0x104:
       Print (L"SH-3\n");
       break;
@@ -2869,7 +2909,7 @@ DisplayProcessorStatus (
       break;
 
     case 3:
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_CPU_DIABLED_BY_BIOS), gShellDebug1HiiHandle);
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_CPU_DISABLED_BY_BIOS), gShellDebug1HiiHandle);
       break;
 
     case 4:
@@ -2971,7 +3011,7 @@ DisplayMmBankConnections (
   //
   // Divide it to high and low
   //
-  High = (UINT8)(BankConnections & 0xF0);
+  High = (UINT8)((BankConnections & 0xF0)>>4);
   Low  = (UINT8)(BankConnections & 0x0F);
   if (High != 0xF) {
     if (Low != 0xF) {

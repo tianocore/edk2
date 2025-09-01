@@ -10,9 +10,9 @@
 // drivers to controllers.
 //
 // The main flow:
-// 1. It dynamicly locate all controller device path.
-// 2. It dynamicly locate all drivers which support binding protocol.
-// 3. It export and dynamicly update two menu to let user select the
+// 1. It dynamically locate all controller device path.
+// 2. It dynamically locate all drivers which support binding protocol.
+// 3. It export and dynamically update two menu to let user select the
 // mapping between drivers to controllers.
 // 4. It save all the mapping info in NV variables for the following boot,
 // which will be consumed by GetDriver API of the produced the platform override protocol.
@@ -32,6 +32,6 @@
                                                         "The main flow:<BR>\n"
                                                         "1. It dynamically locates all controller device path.<BR>\n"
                                                         "2. It dynamically locates all drivers which support binding protocol.<BR>\n"
-                                                        "3. It exports and dynamicly updates two menu to let user select the  mapping between drivers to controllers.<BR>\n"
+                                                        "3. It exports and dynamically updates two menu to let user select the  mapping between drivers to controllers.<BR>\n"
                                                         "4. It saves all the mapping info in NV variables for the following boot,  which will be consumed by GetDriver API of the produced the platform override protocol.<BR>"
 

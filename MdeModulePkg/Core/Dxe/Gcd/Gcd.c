@@ -26,7 +26,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
                                        EFI_RESOURCE_ATTRIBUTE_16_BIT_IO           | \
                                        EFI_RESOURCE_ATTRIBUTE_32_BIT_IO           | \
                                        EFI_RESOURCE_ATTRIBUTE_64_BIT_IO           | \
-                                       EFI_RESOURCE_ATTRIBUTE_PERSISTENT          )
+                                       EFI_RESOURCE_ATTRIBUTE_PERSISTENT          | \
+                                       EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE     )
 
 #define TESTED_MEMORY_ATTRIBUTES  (EFI_RESOURCE_ATTRIBUTE_PRESENT     |     \
                                        EFI_RESOURCE_ATTRIBUTE_INITIALIZED | \
@@ -93,6 +94,7 @@ GCD_ATTRIBUTE_CONVERSION_ENTRY  mAttributeConversionTable[] = {
   { EFI_RESOURCE_ATTRIBUTE_PERSISTABLE,             EFI_MEMORY_NV,            TRUE  },
   { EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE,           EFI_MEMORY_MORE_RELIABLE, TRUE  },
   { EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE,         EFI_MEMORY_SP,            TRUE  },
+  { EFI_RESOURCE_ATTRIBUTE_HOT_PLUGGABLE,           EFI_MEMORY_HOT_PLUGGABLE, TRUE  },
   { 0,                                              0,                        FALSE }
 };
 
@@ -151,6 +153,13 @@ CoreDumpGcdMemorySpaceMap (
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
   UINTN                            Index;
 
+  // The compiler is not smart enough to compile out the whole function if DEBUG_GCD is not enabled, so we end up
+  // looping through the GCD every time it gets updated, which wastes a lot of needless cycles if we aren't going to
+  // print it. So shortcircuit and jump out if we don't need to print it.
+  if (!DebugPrintLevelEnabled (DEBUG_GCD)) {
+    return;
+  }
+
   Status = CoreGetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
   ASSERT (Status == EFI_SUCCESS && MemorySpaceMap != NULL);
 
@@ -196,6 +205,13 @@ CoreDumpGcdIoSpaceMap (
   UINTN                        NumberOfDescriptors;
   EFI_GCD_IO_SPACE_DESCRIPTOR  *IoSpaceMap;
   UINTN                        Index;
+
+  // The compiler is not smart enough to compile out the whole function if DEBUG_GCD is not enabled, so we end up
+  // looping through the GCD every time it gets updated, which wastes a lot of needless cycles if we aren't going to
+  // print it. So shortcircuit and jump out if we don't need to print it.
+  if (!DebugPrintLevelEnabled (DEBUG_GCD)) {
+    return;
+  }
 
   Status = CoreGetIoSpaceMap (&NumberOfDescriptors, &IoSpaceMap);
   ASSERT (Status == EFI_SUCCESS && IoSpaceMap != NULL);
@@ -974,7 +990,7 @@ CoreConvertSpace (
       // Set attributes operation
       //
       case GCD_SET_ATTRIBUTES_MEMORY_OPERATION:
-        if (CpuArchAttributes == 0) {
+        if ((CpuArchAttributes == 0) && (Attributes != 0)) {
           //
           // Keep original CPU arch attributes when caller just calls
           // SetMemorySpaceAttributes() with none CPU arch attributes (for example, RUNTIME).
@@ -2666,6 +2682,12 @@ CoreInitializeGcdServices (
 
           if ((ResourceHob->ResourceAttribute & EFI_RESOURCE_ATTRIBUTE_PERSISTENT) == EFI_RESOURCE_ATTRIBUTE_PERSISTENT) {
             GcdMemoryType = EfiGcdMemoryTypePersistent;
+          }
+
+          // Mark special purpose memory as system memory, if it was system memory in the HOB
+          // However, if this is also marked as persistent, let persistent take precedence
+          if ((ResourceHob->ResourceAttribute & EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE) == EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE) {
+            GcdMemoryType = EfiGcdMemoryTypeSystemMemory;
           }
 
           break;

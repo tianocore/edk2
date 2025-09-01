@@ -392,6 +392,8 @@ UiCreateLanguageMenu (
     OptionsOpCodeHandle,
     NULL
     );
+
+  HiiFreeOpCodeHandle (OptionsOpCodeHandle);
 }
 
 /**
@@ -450,7 +452,7 @@ UiCreateResetMenu (
     StartOpCodeHandle,
     FRONT_PAGE_KEY_RESET,
     STRING_TOKEN (STR_RESET_STRING),
-    STRING_TOKEN (STR_RESET_STRING),
+    STRING_TOKEN (STR_RESET_STRING_HELP),
     EFI_IFR_FLAG_CALLBACK,
     0
     );

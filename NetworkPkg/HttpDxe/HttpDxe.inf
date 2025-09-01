@@ -2,6 +2,7 @@
 #  Implementation of EFI HTTP protocol interfaces.
 #
 #  Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
+# (c) Copyright 2025 HP Development Company, L.P.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -47,6 +48,8 @@
   NetLib
   HttpLib
   DpcLib
+  PrintLib
+  PcdLib
 
 [Protocols]
   gEfiHttpServiceBindingProtocolGuid               ## BY_START
@@ -77,6 +80,7 @@
   gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout              ## CONSUMES
   gEfiNetworkPkgTokenSpaceGuid.PcdHttpDnsRetryInterval       ## CONSUMES
   gEfiNetworkPkgTokenSpaceGuid.PcdHttpDnsRetryCount          ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpTransferBufferSize     ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   HttpDxeExtra.uni

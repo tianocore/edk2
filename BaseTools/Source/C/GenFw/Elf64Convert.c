@@ -11,7 +11,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #ifndef __GNUC__
+#define RUNTIME_FUNCTION  _WINNT_DUP_RUNTIME_FUNCTION
 #include <windows.h>
+#undef RUNTIME_FUNCTION
 #include <io.h>
 #endif
 #include <assert.h>
@@ -1394,6 +1396,18 @@ WriteSections64 (
           const UINT8 *SymName = GetSymName(Sym);
           if (SymName == NULL) {
             SymName = (const UINT8 *)"<unknown>";
+          }
+
+          if (mEhdr->e_machine == EM_X86_64) {
+            //
+            // For x86_64, we can ignore R_X86_64_NONE relocations.
+            // They are used to indicate that the symbol is not defined
+            // in the current module, but in a shared library that may be
+            // used when building modules for inclusion in host-based unit tests.
+            //
+            if (ELF_R_TYPE(Rel->r_info) == R_X86_64_NONE) {
+              continue;
+            }
           }
 
           //

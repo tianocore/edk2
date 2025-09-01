@@ -33,6 +33,20 @@ ArmHasGicSystemRegisters (
   return ((ArmReadIdAA64Pfr0 () & AARCH64_PFR0_GIC) != 0);
 }
 
+/**
+  Check whether the CPU supports the GICv5 system register interface
+
+  @return   Whether GICv5 System Register Interface is supported
+**/
+BOOLEAN
+EFIAPI
+ArmHasGicV5SystemRegisters (
+  VOID
+  )
+{
+  return ((ArmReadIdAA64Pfr2 () & AARCH64_PFR2_GCIE) != 0);
+}
+
 /** Checks if CCIDX is implemented.
 
    @retval TRUE  CCIDX is implemented.
@@ -54,7 +68,7 @@ ArmHasCcidx (
   Checks whether the CPU implements the Virtualization Host Extensions.
 
   @retval TRUE  FEAT_VHE is implemented.
-  @retval FALSE FEAT_VHE is not mplemented.
+  @retval FALSE FEAT_VHE is not implemented.
 **/
 BOOLEAN
 EFIAPI
@@ -69,7 +83,7 @@ ArmHasVhe (
   Checks whether the CPU implements the Trace Buffer Extension.
 
   @retval TRUE  FEAT_TRBE is implemented.
-  @retval FALSE FEAT_TRBE is not mplemented.
+  @retval FALSE FEAT_TRBE is not implemented.
 **/
 BOOLEAN
 EFIAPI
@@ -84,7 +98,7 @@ ArmHasTrbe (
   Checks whether the CPU implements the Embedded Trace Extension.
 
   @retval TRUE  FEAT_ETE is implemented.
-  @retval FALSE FEAT_ETE is not mplemented.
+  @retval FALSE FEAT_ETE is not implemented.
 **/
 BOOLEAN
 EFIAPI

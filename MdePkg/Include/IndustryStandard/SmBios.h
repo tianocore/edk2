@@ -1,6 +1,7 @@
 /** @file
   Industry Standard Definitions of SMBIOS Table Specification v3.8.0.
 
+Copyright (c) 2024-2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
 Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
 (C) Copyright 2015 - 2019 Hewlett Packard Enterprise Development LP<BR>
@@ -1864,7 +1865,8 @@ typedef enum {
   MemoryFormFactorSodimm          = 0x0D,
   MemoryFormFactorSrimm           = 0x0E,
   MemoryFormFactorFbDimm          = 0x0F,
-  MemoryFormFactorDie             = 0x10
+  MemoryFormFactorDie             = 0x10,
+  MemoryFormFactorCamm            = 0x11
 } MEMORY_FORM_FACTOR;
 
 ///
@@ -2719,6 +2721,22 @@ typedef struct {
 /// 00h - 3Fh: MCTP Host Interfaces
 ///
 typedef enum {
+  // MCTP Host Interface type indentifiers as defined in DSP0239
+  MCHostInterfaceTypeKCS                                 = 0x02,
+  MCHostInterfaceType8250_UARTRegisterCompatible         = 0x03,
+  MCHostInterfaceType16450_UARTRegisterCompatible        = 0x04,
+  MCHostInterfaceType16550_16550A_UARTRegisterCompatible = 0x05,
+  MCHostInterfaceType16650_16650A_UARTRegisterCompatible = 0x06,
+  MCHostInterfaceType16750_16750A_UARTRegisterCompatible = 0x07,
+  MCHostInterfaceType16850_16850A_UARTRegisterCompatible = 0x08,
+  MCHostInterfaceTypeI2C_SMBUS                           = 0x09,
+  MCHostInterfaceTypeI3C                                 = 0x0A,
+  MCHostInterfaceTypePCIeVDM                             = 0x0B,
+  MCHostInterfaceTypeMMBI                                = 0x0C,
+  MCHostInterfaceTypePCC                                 = 0x0D,
+  MCHostInterfaceTypeUCIe                                = 0x0E,
+  MCHostInterfaceTypeUSB                                 = 0x0F,
+
   MCHostInterfaceTypeNetworkHostInterface = 0x40,
   MCHostInterfaceTypeOemDefined           = 0xF0
 } MC_HOST_INTERFACE_TYPE;

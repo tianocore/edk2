@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define HTTP_BOOT_IP6_ROUTE_TABLE_TIMEOUT  10
 #define HTTP_BOOT_DEFAULT_HOPLIMIT         64
 #define HTTP_BOOT_DEFAULT_LIFETIME         50000
+#define HTTP_BOOT_DAD_ADDITIONAL_DELAY     30000000   // 3 seconds
 
 #define HTTP_BOOT_DHCP6_ENTERPRISE_NUM      343     // TODO: IANA TBD: temporarily using Intel's
 #define HTTP_BOOT_DHCP6_MAX_BOOT_FILE_SIZE  65535   //   It's a limitation of bit length, 65535*512 bytes.

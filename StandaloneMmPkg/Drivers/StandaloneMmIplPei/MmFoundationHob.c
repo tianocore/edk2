@@ -13,6 +13,7 @@
 #include <Guid/MmCpuSyncConfig.h>
 #include <Guid/MmProfileData.h>
 #include <Guid/MmUnblockRegion.h>
+#include <Guid/MmStatusCodeUseSerial.h>
 #include <Register/Intel/Cpuid.h>
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -202,6 +203,43 @@ MmIplBuildMmCpuSyncConfigHob (
     MmSyncModeInfoHob->RelaxedApMode = (BOOLEAN)(PcdGet8 (PcdCpuSmmSyncMode) == MmCpuSyncModeRelaxedAp);
     MmSyncModeInfoHob->Timeout       = PcdGet64 (PcdCpuSmmApSyncTimeout);
     MmSyncModeInfoHob->Timeout2      = PcdGet64 (PcdCpuSmmApSyncTimeout2);
+  }
+
+  *HobBufferSize = HobLength;
+}
+
+/**
+  Builds MM Status Code Use Serial HOB.
+
+  This function builds MM Status Code Use Serial HOB.
+  It can only be invoked during PEI phase;
+  If new HOB buffer is NULL, then ASSERT().
+
+  @param[in]       Hob            The pointer of new HOB buffer.
+  @param[in, out]  HobBufferSize  The available size of the HOB buffer when as input.
+                                  The used size of when as output.
+
+**/
+VOID
+MmIplBuildMmStatusCodeUseSerialHob (
+  IN UINT8      *Hob,
+  IN OUT UINTN  *HobBufferSize
+  )
+{
+  EFI_HOB_GUID_TYPE          *GuidHob;
+  MM_STATUS_CODE_USE_SERIAL  *MmStatusCodeUseSerial;
+  UINT16                     HobLength;
+
+  HobLength = ALIGN_VALUE (sizeof (EFI_HOB_GUID_TYPE) + sizeof (MM_STATUS_CODE_USE_SERIAL), 8);
+  if (*HobBufferSize >= HobLength) {
+    ASSERT (Hob != NULL);
+    MmIplCreateHob (Hob, EFI_HOB_TYPE_GUID_EXTENSION, HobLength);
+
+    GuidHob = (EFI_HOB_GUID_TYPE *)Hob;
+    CopyGuid (&GuidHob->Name, &gMmStatusCodeUseSerialHobGuid);
+
+    MmStatusCodeUseSerial                      = (MM_STATUS_CODE_USE_SERIAL *)(GuidHob + 1);
+    MmStatusCodeUseSerial->StatusCodeUseSerial = PcdGetBool (PcdStatusCodeUseSerial);
   }
 
   *HobBufferSize = HobLength;
@@ -804,6 +842,46 @@ GetRemainingHobSize (
 }
 
 /**
+  Check if FV HOB was created.
+
+  Check if FV HOB was created on HOB list,
+  if yes, skip building MM Core FV HOB,
+  if No, continue to build MM Core FV HOB
+
+  @param[in]      HobList     HOB list.
+  @param[in]      HobSize     HOB size.
+
+  @retval TRUE    Skip building MM Core FV HOB.
+          FALSE   Continue to build MM Core FV HOB.
+**/
+BOOLEAN
+IsFvHobExist  (
+  IN UINT8  *HobList,
+  IN UINTN  HobSize
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+
+  if ((HobList == NULL) || (HobSize == 0)) {
+    return FALSE;
+  }
+
+  //
+  // Parse the HOB list until end of list or matching type is found.
+  //
+  Hob.Raw = HobList;
+  while ((UINTN)(Hob.Raw - HobList) < HobSize) {
+    if (Hob.Header->HobType == EFI_HOB_TYPE_FV) {
+      return TRUE;
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+
+  return FALSE;
+}
+
+/**
   Create the MM foundation specific HOB list which StandaloneMm Core needed.
 
   This function build the MM foundation specific HOB list needed by StandaloneMm Core
@@ -892,11 +970,16 @@ CreateMmFoundationHobList (
   UsedSize += HobLength;
 
   //
-  // BFV address for StandaloneMm Core
+  // Skip to report FV that contains MmCore when Platform reports FV
   //
-  HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
-  MmIplBuildFvHob (FoundationHobList + UsedSize, &HobLength, MmFvBase, MmFvSize);
-  UsedSize += HobLength;
+  if (!IsFvHobExist (PlatformHobList, PlatformHobSize)) {
+    //
+    // BFV address for StandaloneMm Core
+    //
+    HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+    MmIplBuildFvHob (FoundationHobList + UsedSize, &HobLength, MmFvBase, MmFvSize);
+    UsedSize += HobLength;
+  }
 
   //
   // Build MM ACPI S3 Enable HOB
@@ -910,6 +993,13 @@ CreateMmFoundationHobList (
   //
   HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
   MmIplBuildMmCpuSyncConfigHob (FoundationHobList + UsedSize, &HobLength);
+  UsedSize += HobLength;
+
+  //
+  // Build MM Status Code Use Serial HOB
+  //
+  HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+  MmIplBuildMmStatusCodeUseSerialHob (FoundationHobList + UsedSize, &HobLength);
   UsedSize += HobLength;
 
   //
@@ -983,4 +1073,34 @@ CreateMmFoundationHobList (
 
   *FoundationHobSize = UsedSize;
   return Status;
+}
+
+/**
+
+  Builds a Handoff Information Table HOB.
+
+  @param Hob       - Pointer to handoff information table HOB.
+  @param HobEnd    - End of the HOB list.
+
+**/
+VOID
+CreateMmHobHandoffInfoTable (
+  IN EFI_HOB_HANDOFF_INFO_TABLE  *Hob,
+  IN VOID                        *HobEnd
+  )
+{
+  ASSERT ((Hob != NULL) && (HobEnd != NULL));
+
+  Hob->Header.HobType   = EFI_HOB_TYPE_HANDOFF;
+  Hob->Header.HobLength = (UINT16)sizeof (EFI_HOB_HANDOFF_INFO_TABLE);
+  Hob->Header.Reserved  = 0;
+
+  Hob->Version  = EFI_HOB_HANDOFF_TABLE_VERSION;
+  Hob->BootMode = GetBootModeHob ();
+
+  Hob->EfiMemoryTop        = 0;
+  Hob->EfiMemoryBottom     = 0;
+  Hob->EfiFreeMemoryTop    = 0;
+  Hob->EfiFreeMemoryBottom = 0;
+  Hob->EfiEndOfHobList     = (EFI_PHYSICAL_ADDRESS)(UINTN)HobEnd;
 }

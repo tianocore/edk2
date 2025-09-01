@@ -24,10 +24,9 @@
 
 #include "QemuFwCfgLibInternal.h"
 
-STATIC BOOLEAN  mQemuFwCfgSupported = FALSE;
-STATIC BOOLEAN  mQemuFwCfgDmaSupported;
-
 STATIC EDKII_IOMMU_PROTOCOL  *mIoMmuProtocol;
+
+STATIC QEMU_FW_CFG_WORK_AREA  mQemuFwCfgWorkArea = { 0 };
 
 /**
   Returns a boolean indicating if the firmware configuration interface
@@ -56,13 +55,14 @@ QemuFwCfgInitialize (
 {
   UINT32  Signature;
   UINT32  Revision;
+  UINT64  CcGuestAttr;
 
   //
   // Enable the access routines while probing to see if it is supported.
   // For probing we always use the IO Port (IoReadFifo8()) access method.
   //
-  mQemuFwCfgSupported    = TRUE;
-  mQemuFwCfgDmaSupported = FALSE;
+  mQemuFwCfgWorkArea.QemuFwCfgSupported    = TRUE;
+  mQemuFwCfgWorkArea.QemuFwCfgDmaSupported = FALSE;
 
   QemuFwCfgSelectItem (QemuFwCfgItemSignature);
   Signature = QemuFwCfgRead32 ();
@@ -75,18 +75,21 @@ QemuFwCfgInitialize (
       )
   {
     DEBUG ((DEBUG_INFO, "QemuFwCfg interface not supported.\n"));
-    mQemuFwCfgSupported = FALSE;
+    mQemuFwCfgWorkArea.QemuFwCfgSupported = FALSE;
     return RETURN_SUCCESS;
   }
 
   if ((Revision & FW_CFG_F_DMA) == 0) {
     DEBUG ((DEBUG_INFO, "QemuFwCfg interface (IO Port) is supported.\n"));
   } else {
-    mQemuFwCfgDmaSupported = TRUE;
+    mQemuFwCfgWorkArea.QemuFwCfgDmaSupported = TRUE;
     DEBUG ((DEBUG_INFO, "QemuFwCfg interface (DMA) is supported.\n"));
   }
 
-  if (mQemuFwCfgDmaSupported && (MemEncryptSevIsEnabled () || (MemEncryptTdxIsEnabled ()))) {
+  CcGuestAttr = PcdGet64 (PcdConfidentialComputingGuestAttr);
+  if (mQemuFwCfgWorkArea.QemuFwCfgDmaSupported && (CC_GUEST_IS_SEV (CcGuestAttr) ||
+                                                   CC_GUEST_IS_TDX (CcGuestAttr)))
+  {
     EFI_STATUS  Status;
 
     //
@@ -127,7 +130,7 @@ InternalQemuFwCfgIsAvailable (
   VOID
   )
 {
-  return mQemuFwCfgSupported;
+  return mQemuFwCfgWorkArea.QemuFwCfgSupported;
 }
 
 /**
@@ -142,7 +145,7 @@ InternalQemuFwCfgDmaIsAvailable (
   VOID
   )
 {
-  return mQemuFwCfgDmaSupported;
+  return mQemuFwCfgWorkArea.QemuFwCfgDmaSupported;
 }
 
 /**
@@ -415,7 +418,7 @@ InternalQemuFwCfgDmaBytes (
   // When SEV or TDX is enabled, map Buffer to DMA address before issuing the DMA
   // request
   //
-  if (MemEncryptSevIsEnabled () || MemEncryptTdxIsEnabled ()) {
+  if (mIoMmuProtocol != NULL) {
     VOID                  *AccessBuffer;
     EFI_PHYSICAL_ADDRESS  DataBufferAddress;
 
@@ -491,4 +494,41 @@ InternalQemuFwCfgDmaBytes (
   if (DataMapping != NULL) {
     UnmapFwCfgDmaDataBuffer (DataMapping);
   }
+}
+
+/**
+  Check if the Ovmf work area is built as HobList before invoking Hob services.
+
+  @retval    TRUE   Ovmf work area is not NULL and it is built as HobList.
+  @retval    FALSE   Ovmf work area is NULL or it is not built as HobList.
+**/
+BOOLEAN
+InternalQemuFwCfgCheckOvmfWorkArea (
+  VOID
+  )
+{
+  return TRUE;
+}
+
+/**
+  Get the pointer to the QEMU_FW_CFG_WORK_AREA. This data is used as the
+  workarea to record the ongoing fw_cfg item and offset.
+  @retval   QEMU_FW_CFG_WORK_AREA  Pointer to the QEMU_FW_CFG_WORK_AREA
+  @retval   NULL                QEMU_FW_CFG_WORK_AREA doesn't exist
+**/
+QEMU_FW_CFG_WORK_AREA *
+InternalQemuFwCfgCacheGetWorkArea (
+  VOID
+  )
+{
+  return &mQemuFwCfgWorkArea;
+}
+
+RETURN_STATUS
+EFIAPI
+QemuFwCfgInitCache (
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  return RETURN_UNSUPPORTED;
 }

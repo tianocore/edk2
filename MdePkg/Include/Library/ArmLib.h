@@ -156,7 +156,7 @@ ArmInstructionCacheLineLength (
   VOID
   );
 
-UINTN
+UINT32
 EFIAPI
 ArmCacheWritebackGranule (
   VOID
@@ -696,6 +696,18 @@ ArmGetPhysicalAddressBits (
 BOOLEAN
 EFIAPI
 ArmHasGicSystemRegisters (
+  VOID
+  );
+
+/**
+  Check whether the CPU supports the GICv5 system register interface
+
+  @return   Whether GICv5 System Register Interface is supported
+
+**/
+BOOLEAN
+EFIAPI
+ArmHasGicV5SystemRegisters (
   VOID
   );
 

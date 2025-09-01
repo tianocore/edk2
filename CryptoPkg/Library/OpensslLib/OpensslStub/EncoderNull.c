@@ -362,3 +362,14 @@ ossl_encoder_store_cache_flush (
 {
   return -1;
 }
+
+int
+ossl_bio_print_labeled_buf (
+  BIO                  *out,
+  const char           *label,
+  const unsigned char  *buf,
+  size_t               buflen
+  )
+{
+  return -1;
+}

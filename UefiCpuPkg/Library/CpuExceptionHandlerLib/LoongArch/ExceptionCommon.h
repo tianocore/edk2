@@ -10,16 +10,15 @@
 #ifndef EXCEPTION_COMMON_H_
 #define EXCEPTION_COMMON_H_
 
-#define MAX_DEBUG_MESSAGE_LENGTH  0x100
+#include <Base.h>
 
-//
-// For coding convenience, define the maximum valid
-// LoongArch exception.
-// Since UEFI V2.11, it will be present in DebugSupport.h.
-//
-#define MAX_LOONGARCH_EXCEPTION  64
+#define MAX_DEBUG_MESSAGE_LENGTH  0x100
+#define SMP_BOOT_CPU              BIT0
+#define SMP_RESCHEDULE            BIT1
+#define SMP_CALL_FUNCTION         BIT2
 
 extern INTN  mExceptionKnownNameNum;
+extern INTN  mInterruptKnownNameNum;
 
 /**
   Get ASCII format string exception name by exception type.
@@ -32,6 +31,19 @@ extern INTN  mExceptionKnownNameNum;
 CONST CHAR8 *
 GetExceptionNameStr (
   IN EFI_EXCEPTION_TYPE  ExceptionType
+  );
+
+/**
+  Get ASCII format string interrupt name by exception type.
+
+  @param InterruptType  Interrupt type.
+
+  @return  ASCII format string interrupt name.
+
+**/
+CONST CHAR8 *
+GetInterruptNameStr (
+  IN EFI_EXCEPTION_TYPE  InterruptType
   );
 
 /**

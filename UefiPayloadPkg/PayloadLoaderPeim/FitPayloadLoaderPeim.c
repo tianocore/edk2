@@ -340,8 +340,8 @@ FdtPpiNotifyCallback (
 
   // Set cell property of root node
   Data32 = CpuToFdt32 (2);
-  Status = FdtSetProperty (FdtBase, 0, "#address-cells", &Data32, sizeof (UINT32));
-  Status = FdtSetProperty (FdtBase, 0, "#size-cells", &Data32, sizeof (UINT32));
+  Status = FdtSetProp (FdtBase, 0, "#address-cells", &Data32, sizeof (UINT32));
+  Status = FdtSetProp (FdtBase, 0, "#size-cells", &Data32, sizeof (UINT32));
 
   Status = BuildFdtForUPL (FdtBase);
   ASSERT_EFI_ERROR (Status);
@@ -375,7 +375,7 @@ FdtPpiNotifyCallback (
   Install Pei Load File PPI.
   @param  FileHandle  Handle of the file being invoked.
   @param  PeiServices Describes the list of possible PEI Services.
-  @retval EFI_SUCESS  The entry point executes successfully.
+  @retval EFI_SUCCESS The entry point executes successfully.
   @retval Others      Some error occurs during the execution of this function.
 **/
 EFI_STATUS

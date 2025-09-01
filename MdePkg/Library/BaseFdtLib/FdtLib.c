@@ -380,7 +380,7 @@ FdtParentOffset (
 **/
 INT32
 EFIAPI
-FdtNodeOffsetByPropertyValue (
+FdtNodeOffsetByPropValue (
   IN CONST VOID   *Fdt,
   IN INT32        StartOffset,
   IN CONST CHAR8  *PropertyName,
@@ -451,6 +451,55 @@ FdtGetProperty (
   )
 {
   return (FDT_PROPERTY *)fdt_get_property (Fdt, NodeOffset, Name, Length);
+}
+
+/**
+  Returns a property with the given name from the given node.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     The offset to the given node.
+  @param[in] Name           The name to the property which need be searched
+  @param[in] Length         The length to the size of the property found.
+
+  @return The property to the structure of the found property. Since the data
+          come from FDT blob, it's encoding with big-endian.
+
+**/
+FDT_PROPERTY *
+EFIAPI
+FdtGetPropertyW (
+  IN CONST VOID   *Fdt,
+  IN INT32        NodeOffset,
+  IN CONST CHAR8  *Name,
+  IN INT32        *Length
+  )
+{
+  return (FDT_PROPERTY *)fdt_get_property (Fdt, NodeOffset, Name, Length);
+}
+
+/**
+  Returns the value of a given property.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     The offset to the given node.
+  @param[in] Name           The name to the property which need be searched
+  @param[in] Length         The length to the size of the property found.
+
+  @return Pointer to the value of the property.
+          Since the data comes from the FDT blob, it's encoded as big-endian.
+          NULL on error, with error-code stored at Length (if non-NULL).
+
+**/
+CONST VOID *
+EFIAPI
+FdtGetProp (
+  IN CONST VOID   *Fdt,
+  IN INT32        NodeOffset,
+  IN CONST CHAR8  *Name,
+  IN INT32        *Length
+  )
+{
+  return fdt_getprop (Fdt, NodeOffset, Name, Length);
 }
 
 /**
@@ -577,6 +626,24 @@ FdtAddSubnode (
 }
 
 /**
+  Delete a node (subtree)
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     The offset to the node (subtree) to delete.
+
+  @return  Zero for successfully, otherwise failed.
+
+ **/
+INT32
+FdtDelNode (
+  IN VOID   *Fdt,
+  IN INT32  NodeOffset
+  )
+{
+  return fdt_del_node (Fdt, NodeOffset);
+}
+
+/**
   Add or modify a property in the given node.
 
   @param[in] Fdt            The pointer to FDT blob.
@@ -590,7 +657,7 @@ FdtAddSubnode (
 **/
 INT32
 EFIAPI
-FdtSetProperty (
+FdtSetProp (
   IN VOID         *Fdt,
   IN INT32        NodeOffset,
   IN CONST CHAR8  *Name,
@@ -733,6 +800,28 @@ FdtGetName (
   )
 {
   return fdt_get_name (Fdt, NodeOffset, Length);
+}
+
+/**
+  Determine the full path of a node.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     Offset of node to check.
+  @param[in] Buffer         The pointer to allocate a pool for FDT blob.
+  @param[in] BufferSize     The BufferSize to the pool size.
+
+  @return 0 on success, or negative error code.
+**/
+INT32
+EFIAPI
+FdtGetPath (
+  IN VOID    *Fdt,
+  IN INT32   NodeOffset,
+  IN VOID    *Buffer,
+  IN UINT32  BufferSize
+  )
+{
+  return fdt_get_path (Fdt, NodeOffset, Buffer, BufferSize);
 }
 
 /**

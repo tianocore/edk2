@@ -36,6 +36,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   ArmLib
@@ -56,6 +57,7 @@
 [Protocols]
   gEfiCpuArchProtocolGuid
   gEfiMemoryAttributeProtocolGuid
+  gHardwareInterruptProtocolGuid
 
 [Guids]
   gEfiDebugImageInfoTableGuid
@@ -64,12 +66,10 @@
   gEfiVectorHandoffTableGuid
 
 [Pcd.common]
-  gArmTokenSpaceGuid.PcdVFPEnabled
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy
 
 [FeaturePcd.common]
-  gArmTokenSpaceGuid.PcdDebuggerExceptionSupport
   gArmTokenSpaceGuid.PcdRemapUnusedMemoryNx
 
 [Depex]
-  gHardwareInterruptProtocolGuid OR gHardwareInterrupt2ProtocolGuid
+  TRUE

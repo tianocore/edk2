@@ -6,7 +6,7 @@ to use the same Pytools based build infrastructure locally.
 ## Supported Configuration Details
 
 This solution for building and running OvmfPkg has only been validated with Windows 10
-with VS2019 and Ubuntu 18.04 with GCC5 toolchain. Four different firmware builds are
+with VS2022 and Ubuntu 18.04 with GCC5 toolchain. Four different firmware builds are
 supported and are described below.
 
 | Configuration name      | Architectures      | DSC File            |Additional Flags |
@@ -18,7 +18,8 @@ supported and are described below.
 
 ## EDK2 Developer environment
 
-- [Python 3.8.x - Download & Install](https://www.python.org/downloads/)
+![Minimum Python Version](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2Ftianocore%2Fedk2-pytool-extensions%2Frefs%2Fheads%2Fmaster%2Fpyproject.toml&query=%24.%5B'requires-python'%5D&style=for-the-badge&logo=python&logoColor=ffd343&label=Minimum%20Python%20Version%20for%20CI&color=3776ab&link=https%3A%2F%2Fwww.python.org%2Fdownloads%2F)
+
 - [GIT - Download & Install](https://git-scm.com/download/)
 - [QEMU - Download, Install, and add to your path](https://www.qemu.org/download/)
 - [Edk2 Source](https://github.com/tianocore/edk2)

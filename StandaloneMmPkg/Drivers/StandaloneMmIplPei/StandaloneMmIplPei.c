@@ -1,19 +1,27 @@
 /** @file
   MM IPL that load the MM Core into MMRAM at PEI stage
 
-  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2024 - 2025, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "StandaloneMmIplPei.h"
 
-EFI_PEI_MM_COMMUNICATION_PPI  mMmCommunicationPpi = { Communicate };
+EFI_PEI_MM_COMMUNICATION_PPI   mMmCommunicationPpi  = { Communicate };
+EFI_PEI_MM_COMMUNICATION3_PPI  mMmCommunication3Ppi = { Communicate3 };
 
-EFI_PEI_PPI_DESCRIPTOR  mPpiList = {
-  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
-  &gEfiPeiMmCommunicationPpiGuid,
-  &mMmCommunicationPpi
+EFI_PEI_PPI_DESCRIPTOR  mPpiList[] = {
+  {
+    EFI_PEI_PPI_DESCRIPTOR_PPI,
+    &gEfiPeiMmCommunicationPpiGuid,
+    &mMmCommunicationPpi
+  },
+  {
+    (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    &gEfiPeiMmCommunication3PpiGuid,
+    &mMmCommunication3Ppi
+  }
 };
 
 EFI_PEI_NOTIFY_DESCRIPTOR  mNotifyList = {
@@ -128,6 +136,120 @@ Communicate (
 }
 
 /**
+  Communicates with a registered handler.
+
+  This function provides a service to send and receive messages from a registered UEFI service.
+
+  @param[in] This                The EFI_PEI_MM_COMMUNICATE3 instance.
+  @param[in, out] CommBuffer     A pointer to the buffer to convey into MMRAM.
+
+  @retval EFI_SUCCESS            The message was successfully posted.
+  @retval EFI_INVALID_PARAMETER  The CommBuffer was NULL.
+**/
+EFI_STATUS
+EFIAPI
+Communicate3 (
+  IN CONST EFI_PEI_MM_COMMUNICATION3_PPI  *This,
+  IN OUT VOID                             *CommBuffer
+  )
+{
+  EFI_STATUS                    Status;
+  EFI_PEI_MM_CONTROL_PPI        *MmControl;
+  UINT8                         SmiCommand;
+  UINTN                         Size;
+  UINTN                         TempCommSize;
+  EFI_HOB_GUID_TYPE             *GuidHob;
+  MM_COMM_BUFFER                *MmCommBuffer;
+  MM_COMM_BUFFER_STATUS         *MmCommBufferStatus;
+  EFI_MM_COMMUNICATE_HEADER_V3  *CommunicateHeader;
+
+  DEBUG ((DEBUG_INFO, "StandaloneMmIpl Communicate Enter\n"));
+
+  GuidHob = GetFirstGuidHob (&gMmCommBufferHobGuid);
+  if (GuidHob != NULL) {
+    MmCommBuffer       = GET_GUID_HOB_DATA (GuidHob);
+    MmCommBufferStatus = (MM_COMM_BUFFER_STATUS *)(UINTN)MmCommBuffer->Status;
+  } else {
+    DEBUG ((DEBUG_ERROR, "MmCommBuffer is not existed !!!\n"));
+    ASSERT (GuidHob != NULL);
+    return EFI_NOT_FOUND;
+  }
+
+  SmiCommand = 0;
+  Size       = sizeof (SmiCommand);
+
+  //
+  // Check parameters
+  //
+  if (CommBuffer == NULL) {
+    return EFI_INVALID_PARAMETER;
+  } else {
+    CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommBuffer;
+    //
+    // Check if the HeaderGuid is valid
+    //
+    if (CompareGuid (&CommunicateHeader->HeaderGuid, &gEfiMmCommunicateHeaderV3Guid)) {
+      DEBUG ((DEBUG_ERROR, "HeaderGuid is not valid!\n"));
+      return EFI_INVALID_PARAMETER;
+    }
+
+    TempCommSize = CommunicateHeader->BufferSize;
+    //
+    // CommSize must hold HeaderGuid and MessageLength
+    //
+    if (TempCommSize < sizeof (EFI_MM_COMMUNICATE_HEADER_V3)) {
+      DEBUG ((DEBUG_ERROR, "Communicate buffer size (%d) is less than minimum size (%d)!", TempCommSize, sizeof (EFI_MM_COMMUNICATE_HEADER_V3)));
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+
+  if (TempCommSize > EFI_PAGES_TO_SIZE (MmCommBuffer->NumberOfPages)) {
+    DEBUG ((DEBUG_ERROR, "Communicate buffer size (%d) is over MAX (%d) size!", TempCommSize, EFI_PAGES_TO_SIZE (MmCommBuffer->NumberOfPages)));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CopyMem ((VOID *)(UINTN)MmCommBuffer->PhysicalStart, CommBuffer, TempCommSize);
+  MmCommBufferStatus->IsCommBufferValid = TRUE;
+
+  //
+  // Generate Software SMI
+  //
+  Status = PeiServicesLocatePpi (&gEfiPeiMmControlPpiGuid, 0, NULL, (VOID **)&MmControl);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = MmControl->Trigger (
+                        (EFI_PEI_SERVICES **)GetPeiServicesTablePointer (),
+                        MmControl,
+                        (INT8 *)&SmiCommand,
+                        &Size,
+                        FALSE,
+                        0
+                        );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Return status from software SMI
+  //
+  TempCommSize = (UINTN)MmCommBufferStatus->ReturnBufferSize;
+
+  //
+  // Copy the returned data to the non-mmram buffer (CommBuffer)
+  //
+  CopyMem (CommBuffer, (VOID *)(MmCommBuffer->PhysicalStart), TempCommSize);
+
+  CommunicateHeader->BufferSize = TempCommSize;
+
+  Status = (EFI_STATUS)MmCommBufferStatus->ReturnStatus;
+  if (Status != EFI_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "StandaloneMmIpl Communicate failed (%r)\n", Status));
+  } else {
+    MmCommBufferStatus->IsCommBufferValid = FALSE;
+  }
+
+  return Status;
+}
+
+/**
   Search all the available firmware volumes for MM Core driver.
 
   @param  MmFvBase             Base address of FV which included MM Core driver.
@@ -147,12 +269,47 @@ LocateMmCoreFv (
   OUT VOID                  **MmCoreImageAddress
   )
 {
-  EFI_STATUS           Status;
-  UINTN                FvIndex;
-  EFI_PEI_FV_HANDLE    VolumeHandle;
-  EFI_PEI_FILE_HANDLE  FileHandle;
-  EFI_PE32_SECTION     *SectionData;
-  EFI_FV_INFO          VolumeInfo;
+  EFI_STATUS               Status;
+  UINTN                    FvIndex;
+  EFI_PEI_FV_HANDLE        VolumeHandle;
+  EFI_PEI_FILE_HANDLE      FileHandle;
+  EFI_PE32_SECTION         *SectionData;
+  EFI_FV_INFO              VolumeInfo;
+  MM_CORE_FV_LOCATION_PPI  *MmCoreFvLocation;
+
+  //
+  // The producer of the MmCoreFvLocation PPI is responsible for ensuring
+  // that it reports the correct Firmware Volume (FV) containing the MmCore.
+  // If the gMmCoreFvLocationPpiGuid is not found, the system will search
+  // all Firmware Volumes (FVs) to locate the FV that contains the MM Core.
+  //
+  Status = PeiServicesLocatePpi (&gMmCoreFvLocationPpiGuid, 0, NULL, (VOID **)&MmCoreFvLocation);
+  if (Status == EFI_SUCCESS) {
+    *MmFvBase  = MmCoreFvLocation->Address;
+    *MmFvSize  = MmCoreFvLocation->Size;
+    FileHandle = NULL;
+    Status     = PeiServicesFfsFindNextFile (EFI_FV_FILETYPE_MM_CORE_STANDALONE, (VOID *)(UINTN)MmCoreFvLocation->Address, &FileHandle);
+    ASSERT_EFI_ERROR (Status);
+    if (Status == EFI_SUCCESS) {
+      ASSERT (FileHandle != NULL);
+      if (FileHandle != NULL) {
+        CopyGuid (MmCoreFileName, &((EFI_FFS_FILE_HEADER *)FileHandle)->Name);
+        //
+        // Search Section
+        //
+        Status = PeiServicesFfsFindSectionData (EFI_SECTION_PE32, FileHandle, MmCoreImageAddress);
+        ASSERT_EFI_ERROR (Status);
+
+        //
+        // Get MM Core section data.
+        //
+        SectionData = (EFI_PE32_SECTION *)((UINT8 *)*MmCoreImageAddress - sizeof (EFI_PE32_SECTION));
+        ASSERT (SectionData->Type == EFI_SECTION_PE32);
+      }
+    }
+
+    return EFI_SUCCESS;
+  }
 
   //
   // Search all FV
@@ -226,7 +383,7 @@ LocateMmCoreFv (
                                it is pointed to fundation and platform HOB list.
 **/
 VOID *
-CreatMmHobList (
+CreateMmHobList (
   OUT UINTN                           *HobSize,
   IN  MM_COMM_BUFFER                  *MmCommBuffer,
   IN  EFI_PHYSICAL_ADDRESS            MmFvBase,
@@ -245,6 +402,8 @@ CreatMmHobList (
   UINTN                      BufferSize;
   UINTN                      FoundationHobSize;
   EFI_HOB_MEMORY_ALLOCATION  *MmProfileDataHob;
+  UINTN                      PhitHobSize;
+  VOID                       *HobEnd;
 
   //
   // Get platform HOBs
@@ -252,24 +411,35 @@ CreatMmHobList (
   PlatformHobSize = 0;
   Status          = CreateMmPlatformHob (NULL, &PlatformHobSize);
   if (Status == RETURN_BUFFER_TOO_SMALL) {
-    ASSERT (PlatformHobSize != 0);
+    if (PlatformHobSize == 0) {
+      DEBUG ((DEBUG_ERROR, "%a: PlatformHobSize is zero, cannot create MM HOBs\n", __func__));
+      ASSERT (PlatformHobSize != 0);
+      return NULL;
+    }
+
     //
     // Create platform HOBs for MM foundation to get MMIO HOB data.
     //
     PlatformHobList = AllocatePages (EFI_SIZE_TO_PAGES (PlatformHobSize));
-    ASSERT (PlatformHobList != NULL);
     if (PlatformHobList == NULL) {
       DEBUG ((DEBUG_ERROR, "%a: Out of resource to create platform MM HOBs\n", __func__));
-      CpuDeadLoop ();
+      ASSERT (PlatformHobList != NULL);
+      return NULL;
     }
 
     BufferSize = PlatformHobSize;
     Status     = CreateMmPlatformHob (PlatformHobList, &PlatformHobSize);
-    ASSERT_EFI_ERROR (Status);
-    ASSERT (BufferSize == PlatformHobSize);
+    if (BufferSize != PlatformHobSize) {
+      DEBUG ((DEBUG_ERROR, "%a: CreateMmPlatformHob returned unexpected size (%d != %d)\n", __func__, BufferSize, PlatformHobSize));
+      FreePages (PlatformHobList, EFI_SIZE_TO_PAGES (PlatformHobSize));
+      return NULL;
+    }
   }
 
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: CreateMmPlatformHob failed (%r)\n", __func__, Status));
+    return NULL;
+  }
 
   //
   // Build memory allocation HOB in PEI HOB list for MM profile data.
@@ -297,14 +467,18 @@ CreatMmHobList (
                         MmProfileDataHob,
                         Block
                         );
-  FreePages (PlatformHobList, EFI_SIZE_TO_PAGES (PlatformHobSize));
+  if (PlatformHobSize != 0) {
+    FreePages (PlatformHobList, EFI_SIZE_TO_PAGES (PlatformHobSize));
+  }
+
   ASSERT (Status == RETURN_BUFFER_TOO_SMALL);
   ASSERT (FoundationHobSize != 0);
 
+  PhitHobSize = sizeof (EFI_HOB_HANDOFF_INFO_TABLE);
   //
-  // Final result includes platform HOBs, foundation HOBs and a END node.
+  // Final result includes: PHIT HOB, Platform HOBs, Foundation HOBs and an END node.
   //
-  *HobSize = PlatformHobSize + FoundationHobSize + sizeof (EFI_HOB_GENERIC_HEADER);
+  *HobSize = PhitHobSize + PlatformHobSize + FoundationHobSize + sizeof (EFI_HOB_GENERIC_HEADER);
   HobList  = AllocatePages (EFI_SIZE_TO_PAGES (*HobSize));
   ASSERT (HobList != NULL);
   if (HobList == NULL) {
@@ -312,17 +486,23 @@ CreatMmHobList (
     CpuDeadLoop ();
   }
 
+  HobEnd = (UINT8 *)(UINTN)HobList + PhitHobSize + PlatformHobSize + FoundationHobSize;
+  //
+  // Create MmHobHandoffInfoTable
+  //
+  CreateMmHobHandoffInfoTable (HobList, HobEnd);
+
   //
   // Get platform HOBs
   //
-  Status = CreateMmPlatformHob (HobList, &PlatformHobSize);
+  Status = CreateMmPlatformHob ((UINT8 *)HobList + PhitHobSize, &PlatformHobSize);
   ASSERT_EFI_ERROR (Status);
 
   //
   // Get foundation HOBs
   //
   Status = CreateMmFoundationHobList (
-             (UINT8 *)HobList + PlatformHobSize,
+             (UINT8 *)HobList + PhitHobSize + PlatformHobSize,
              &FoundationHobSize,
              HobList,
              PlatformHobSize,
@@ -340,7 +520,7 @@ CreatMmHobList (
   //
   // Create MM HOB list end.
   //
-  MmIplCreateHob ((UINT8 *)HobList + PlatformHobSize + FoundationHobSize, EFI_HOB_TYPE_END_OF_HOB_LIST, sizeof (EFI_HOB_GENERIC_HEADER));
+  MmIplCreateHob (HobEnd, EFI_HOB_TYPE_END_OF_HOB_LIST, sizeof (EFI_HOB_GENERIC_HEADER));
 
   return HobList;
 }
@@ -504,6 +684,10 @@ ExecuteMmCoreFromMmram (
   PE_COFF_LOADER_IMAGE_CONTEXT          ImageContext;
   STANDALONE_MM_FOUNDATION_ENTRY_POINT  Entry;
   EFI_MMRAM_HOB_DESCRIPTOR_BLOCK        *Block;
+  EFI_PEI_MM_ACCESS_PPI                 *MmAccess;
+  UINTN                                 Size;
+  UINTN                                 Index;
+  UINTN                                 MmramRangeCount;
 
   MmFvBase = 0;
   MmFvSize = 0;
@@ -512,6 +696,40 @@ ExecuteMmCoreFromMmram (
   //
   Status = LocateMmCoreFv (&MmFvBase, &MmFvSize, &MmCoreFileName, &ImageContext.Handle);
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Prepare an MM access PPI for MM RAM.
+  //
+  MmAccess        = NULL;
+  MmramRangeCount = 0;
+  Status          = PeiServicesLocatePpi (
+                      &gEfiPeiMmAccessPpiGuid,
+                      0,
+                      NULL,
+                      (VOID **)&MmAccess
+                      );
+  if (!EFI_ERROR (Status)) {
+    //
+    // Open all MMRAM ranges, if MmAccess is available.
+    //
+    Size   = 0;
+    Status = MmAccess->GetCapabilities ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), MmAccess, &Size, NULL);
+    if (Status != EFI_BUFFER_TOO_SMALL) {
+      // This is not right...
+      ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+      return EFI_DEVICE_ERROR;
+    }
+
+    MmramRangeCount = Size / sizeof (EFI_MMRAM_DESCRIPTOR);
+    for (Index = 0; Index < MmramRangeCount; Index++) {
+      Status = MmAccess->Open ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), MmAccess, Index);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "MM IPL failed to open MMRAM windows index %d - %r\n", Index, Status));
+        ASSERT_EFI_ERROR (Status);
+        goto Done;
+      }
+    }
+  }
 
   //
   // Initialize ImageContext
@@ -523,7 +741,7 @@ ExecuteMmCoreFromMmram (
   //
   Status = PeCoffLoaderGetImageInfo (&ImageContext);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto Done;
   }
 
   PageCount = (UINTN)EFI_SIZE_TO_PAGES ((UINTN)ImageContext.ImageSize + ImageContext.SectionAlignment);
@@ -533,7 +751,8 @@ ExecuteMmCoreFromMmram (
   //
   ImageContext.ImageAddress = MmIplAllocateMmramPage (PageCount, &Block);
   if (ImageContext.ImageAddress == 0) {
-    return EFI_NOT_FOUND;
+    Status = EFI_NOT_FOUND;
+    goto Done;
   }
 
   //
@@ -566,17 +785,17 @@ ExecuteMmCoreFromMmram (
       InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
 
       //
-      // Get HOB list for Standalone MM Core.
+      // Create HOB list for Standalone MM Core.
       //
       MmHobSize = 0;
-      MmHobList = CreatMmHobList (
+      MmHobList = CreateMmHobList (
                     &MmHobSize,
                     MmCommBuffer,
                     MmFvBase,
                     MmFvSize,
                     &MmCoreFileName,
                     ImageContext.ImageAddress,
-                    ImageContext.ImageSize,
+                    EFI_PAGES_TO_SIZE (PageCount),
                     ImageContext.EntryPoint,
                     Block
                     );
@@ -593,6 +812,44 @@ ExecuteMmCoreFromMmram (
       Status = Entry (MmHobList);
       ASSERT_EFI_ERROR (Status);
       FreePages (MmHobList, EFI_SIZE_TO_PAGES (MmHobSize));
+    }
+  }
+
+Done:
+  if (MmAccess != NULL) {
+    //
+    // Close all MMRAM ranges, if MmAccess is available.
+    //
+    for (Index = 0; Index < MmramRangeCount; Index++) {
+      Status = MmAccess->Close ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), MmAccess, Index);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "MM IPL failed to close MMRAM windows index %d - %r\n", Index, Status));
+        ASSERT (FALSE);
+        return Status;
+      }
+
+      //
+      // Print debug message that the MMRAM window is now closed.
+      //
+      DEBUG ((DEBUG_INFO, "MM IPL closed MMRAM window index %d\n", Index));
+
+      //
+      // Lock the MMRAM (Note: Locking MMRAM may not be supported on all platforms)
+      //
+      Status = MmAccess->Lock ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), MmAccess, Index);
+      if (EFI_ERROR (Status)) {
+        //
+        // Print error message that the MMRAM failed to lock...
+        //
+        DEBUG ((DEBUG_ERROR, "MM IPL could not lock MMRAM (Index %d) after executing MM Core %r\n", Index, Status));
+        ASSERT (FALSE);
+        return Status;
+      }
+
+      //
+      // Print debug message that the MMRAM window is now closed.
+      //
+      DEBUG ((DEBUG_INFO, "MM IPL locked MMRAM window index %d\n", Index));
     }
   }
 
@@ -773,7 +1030,7 @@ StandaloneMmIplPeiEntry (
   //
   // Install MmCommunicationPpi
   //
-  Status = PeiServicesInstallPpi (&mPpiList);
+  Status = PeiServicesInstallPpi (mPpiList);
   ASSERT_EFI_ERROR (Status);
 
   //

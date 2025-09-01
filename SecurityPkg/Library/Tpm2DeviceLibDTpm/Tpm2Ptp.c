@@ -1,5 +1,5 @@
 /** @file
-  PTP (Platform TPM Profile) CRB (Command Response Buffer) interface used by dTPM2.0 library.
+  PTP (Platform TPM Profile) CRB (Command Response Buffer) interface used by DTPM2.0 library.
 
 Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
 Copyright (c), Microsoft Corporation.
@@ -21,6 +21,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <IndustryStandard/TpmTis.h>
 
 #include "Tpm2DeviceLibDTpm.h"
+
+#include "Tpm2Ptp.h"
 
 //
 // Execution of the command may take from several seconds to minutes for certain
@@ -162,27 +164,7 @@ PtpCrbTpmCommand (
   UINT8       RetryCnt;
 
   DEBUG_CODE_BEGIN ();
-  UINTN  DebugSize;
-
-  DEBUG ((DEBUG_VERBOSE, "PtpCrbTpmCommand Send - "));
-  if (SizeIn > 0x100) {
-    DebugSize = 0x40;
-  } else {
-    DebugSize = SizeIn;
-  }
-
-  for (Index = 0; Index < DebugSize; Index++) {
-    DEBUG ((DEBUG_VERBOSE, "%02x ", BufferIn[Index]));
-  }
-
-  if (DebugSize != SizeIn) {
-    DEBUG ((DEBUG_VERBOSE, "...... "));
-    for (Index = SizeIn - 0x20; Index < SizeIn; Index++) {
-      DEBUG ((DEBUG_VERBOSE, "%02x ", BufferIn[Index]));
-    }
-  }
-
-  DEBUG ((DEBUG_VERBOSE, "\n"));
+  DumpTpmInputBlock (SizeIn, BufferIn);
   DEBUG_CODE_END ();
   TpmOutSize = 0;
 
@@ -324,14 +306,6 @@ PtpCrbTpmCommand (
     BufferOut[Index] = MmioRead8 ((UINTN)&CrbReg->CrbDataBuffer[Index]);
   }
 
-  DEBUG_CODE_BEGIN ();
-  DEBUG ((DEBUG_VERBOSE, "PtpCrbTpmCommand ReceiveHeader - "));
-  for (Index = 0; Index < sizeof (TPM2_RESPONSE_HEADER); Index++) {
-    DEBUG ((DEBUG_VERBOSE, "%02x ", BufferOut[Index]));
-  }
-
-  DEBUG ((DEBUG_VERBOSE, "\n"));
-  DEBUG_CODE_END ();
   //
   // Check the response data header (tag, parasize and returncode)
   //
@@ -362,12 +336,7 @@ PtpCrbTpmCommand (
   }
 
   DEBUG_CODE_BEGIN ();
-  DEBUG ((DEBUG_VERBOSE, "PtpCrbTpmCommand Receive - "));
-  for (Index = 0; Index < TpmOutSize; Index++) {
-    DEBUG ((DEBUG_VERBOSE, "%02x ", BufferOut[Index]));
-  }
-
-  DEBUG ((DEBUG_VERBOSE, "\n"));
+  DumpTpmOutputBlock (TpmOutSize, BufferOut);
   DEBUG_CODE_END ();
 
   //

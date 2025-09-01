@@ -2,6 +2,7 @@
 Implementation of interfaces function for EFI_HII_CONFIG_ROUTING_PROTOCOL.
 
 Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2025, Loongson Technology Corporation Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1372,6 +1373,149 @@ GetSupportedLanguages (
 }
 
 /**
+  This function create a new string in String Package or updates an existing
+  string in a String Package.  If StringId is 0, then a new string is added to
+  a String Package.  If StringId is not zero, then a string in String Package is
+  updated.  If SupportedLanguages is NULL, then the string is added or updated
+  for all the languages that the String Package supports.  If SupportedLanguages
+  is not NULL, then the string is added or updated for the set of languages
+  specified by SupportedLanguages.
+
+  If HiiHandle is NULL, then ASSERT().
+  If String is NULL, then ASSERT().
+
+  @param[in]  HiiHandle           A handle that was previously registered in the
+                                  HII Database.
+  @param[in]  StringId            If zero, then a new string is created in the
+                                  String Package associated with HiiHandle.  If
+                                  non-zero, then the string specified by StringId
+                                  is updated in the String Package  associated
+                                  with HiiHandle.
+  @param[in]  String              A pointer to the Null-terminated Unicode string
+                                  to add or update in the String Package associated
+                                  with HiiHandle.
+  @param[in]  SupportedLanguages  A pointer to a Null-terminated ASCII string of
+                                  language codes.  If this parameter is NULL, then
+                                  String is added or updated in the String Package
+                                  associated with HiiHandle for all the languages
+                                  that the String Package supports.  If this
+                                  parameter is not NULL, then then String is added
+                                  or updated in the String Package associated with
+                                  HiiHandle for the set oflanguages specified by
+                                  SupportedLanguages.  The format of
+                                  SupportedLanguages must follow the language
+                                  format assumed the HII Database.
+
+  @retval 0      The string could not be added or updated in the String Package.
+  @retval Other  The EFI_STRING_ID of the newly added or updated string.
+
+**/
+EFI_STRING_ID
+InternalHiiSetString (
+  IN EFI_HII_HANDLE    HiiHandle,
+  IN EFI_STRING_ID     StringId             OPTIONAL,
+  IN CONST EFI_STRING  String,
+  IN CONST CHAR8       *SupportedLanguages  OPTIONAL
+  )
+{
+  EFI_STATUS  Status;
+  CHAR8       *AllocatedLanguages;
+  CHAR8       *Supported;
+  CHAR8       *Language;
+
+  ASSERT (HiiHandle != NULL);
+
+  if (SupportedLanguages == NULL) {
+    //
+    // Retrieve the languages that the package specified by HiiHandle supports
+    //
+    AllocatedLanguages = GetSupportedLanguages (HiiHandle);
+  } else {
+    //
+    // Allocate a copy of the SupportLanguages string that passed in
+    //
+    AllocatedLanguages = AllocateCopyPool (AsciiStrSize (SupportedLanguages), SupportedLanguages);
+  }
+
+  //
+  // If there are not enough resources for the supported languages string, then return a StringId of 0
+  //
+  if (AllocatedLanguages == NULL) {
+    return (EFI_STRING_ID)(0);
+  }
+
+  Status = EFI_INVALID_PARAMETER;
+  //
+  // Loop through each language that the string supports
+  //
+  for (Supported = AllocatedLanguages; *Supported != '\0'; ) {
+    //
+    // Cache a pointer to the beginning of the current language in the list of languages
+    //
+    Language = Supported;
+
+    //
+    // Search for the next language separator and replace it with a Null-terminator
+    //
+    for ( ; *Supported != 0 && *Supported != ';'; Supported++) {
+    }
+
+    if (*Supported != 0) {
+      *(Supported++) = '\0';
+    }
+
+    if ((SupportedLanguages == NULL) && (AsciiStrnCmp (Language, UEFI_CONFIG_LANG, AsciiStrLen (UEFI_CONFIG_LANG)) == 0)) {
+      //
+      // Skip string package used for keyword protocol.
+      //
+      continue;
+    }
+
+    //
+    // If StringId is 0, then call NewString().  Otherwise, call SetString()
+    //
+    if (StringId == (EFI_STRING_ID)(0)) {
+      Status = mPrivate.HiiString.NewString (
+                                    &mPrivate.HiiString,
+                                    HiiHandle,
+                                    &StringId,
+                                    Language,
+                                    NULL,
+                                    String,
+                                    NULL
+                                    );
+    } else {
+      Status = mPrivate.HiiString.SetString (
+                                    &mPrivate.HiiString,
+                                    HiiHandle,
+                                    StringId,
+                                    Language,
+                                    String,
+                                    NULL
+                                    );
+    }
+
+    //
+    // If there was an error, then break out of the loop and return a StringId of 0
+    //
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+  }
+
+  //
+  // Free the buffer of supported languages
+  //
+  FreePool (AllocatedLanguages);
+
+  if (EFI_ERROR (Status)) {
+    return (EFI_STRING_ID)(0);
+  } else {
+    return StringId;
+  }
+}
+
+/**
   Retrieves a string from a string package.
 
   If HiiHandle is NULL, then ASSERT().
@@ -2202,6 +2346,7 @@ ParseIfrData (
   BOOLEAN                      SmallestIdFromFlag;
   BOOLEAN                      FromOtherDefaultOpcode;
   BOOLEAN                      QuestionReferBitField;
+  UINT16                       *StringData;
 
   Status           = EFI_SUCCESS;
   BlockData        = NULL;
@@ -2215,6 +2360,7 @@ ParseIfrData (
   FromOtherDefaultOpcode = FALSE;
   QuestionReferBitField  = FALSE;
   IfrEfiVarStoreTmp      = NULL;
+  StringData             = NULL;
 
   //
   // Go through the form package to parse OpCode one by one.
@@ -2869,6 +3015,33 @@ ParseIfrData (
           }
 
           goto Done;
+        }
+
+        if (IfrEfiVarStoreTmp == NULL) {
+          break;
+        }
+
+        //
+        // Set default value base on the DefaultId list get from IFR data.
+        //
+        NvDefaultStoreSize = PcdGetSize (PcdNvStoreDefaultValueBuffer);
+        for (LinkData = DefaultIdArray->Entry.ForwardLink; LinkData != &DefaultIdArray->Entry; LinkData = LinkData->ForwardLink) {
+          DefaultDataPtr        = BASE_CR (LinkData, IFR_DEFAULT_DATA, Entry);
+          DefaultData.DefaultId = DefaultDataPtr->DefaultId;
+          if (NvDefaultStoreSize > sizeof (PCD_NV_STORE_DEFAULT_BUFFER_HEADER)) {
+            StringData = AllocateZeroPool (VarWidth*2);
+            if (StringData == NULL) {
+              Status = EFI_OUT_OF_RESOURCES;
+              goto Done;
+            }
+
+            FindQuestionDefaultSetting (DefaultData.DefaultId, IfrEfiVarStoreTmp, &(IfrString->Question), (VOID *)StringData, VarWidth, QuestionReferBitField);
+            if ((DefaultData.Value.string != 0) && (StringData != NULL)) {
+              DefaultData.Value.string = InternalHiiSetString (HiiHandle, 0, StringData, NULL);
+              InsertDefaultValue (BlockData, &DefaultData);
+              FreePool (StringData);
+            }
+          }
         }
 
         break;
@@ -4093,7 +4266,7 @@ GenerateAltConfigResp (
         // Convert Value to a hex string in "%x" format
         // NOTE: This is in the opposite byte that GUID and PATH use
         //
-        if (BlockData->OpCode == EFI_IFR_STRING_OP) {
+        if ((BlockData->OpCode == EFI_IFR_STRING_OP) && (DefaultValueData->Value.string != 0)) {
           DefaultString = InternalGetString (HiiHandle, DefaultValueData->Value.string);
           TmpBuffer     = AllocateZeroPool (Width);
           ASSERT (TmpBuffer != NULL);

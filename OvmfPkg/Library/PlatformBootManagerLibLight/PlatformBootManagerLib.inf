@@ -53,6 +53,7 @@
   UefiBootServicesTableLib
   UefiLib
   UefiRuntimeServicesTableLib
+  PlatformBootManagerCommonLib
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
@@ -70,6 +71,7 @@
   gEfiGlobalVariableGuid
   gRootBridgesConnectedEventGroupGuid
   gUefiShellFileGuid
+  gUiAppFileGuid
 
 [Protocols]
   gEfiFirmwareVolume2ProtocolGuid
