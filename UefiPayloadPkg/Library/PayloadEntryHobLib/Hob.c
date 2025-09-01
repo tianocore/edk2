@@ -558,6 +558,39 @@ BuildFv3Hob (
 }
 
 /**
+  Builds a Capsule Volume HOB.
+
+  This function builds a Capsule Volume HOB.
+  It can only be invoked during PEI phase;
+  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+
+  If the platform does not support Capsule Volume HOBs, then ASSERT().
+  If there is no additional space for HOB creation, then ASSERT().
+
+  @param  BaseAddress   The base address of the Capsule Volume.
+  @param  Length        The size of the Capsule Volume in bytes.
+
+**/
+VOID
+EFIAPI
+BuildCvHob (
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINT64                Length
+  )
+{
+  EFI_HOB_UEFI_CAPSULE  *Hob;
+
+  Hob = CreateHob (EFI_HOB_TYPE_UEFI_CAPSULE, sizeof (EFI_HOB_UEFI_CAPSULE));
+  ASSERT (Hob != NULL);
+  if (Hob == NULL) {
+    return;
+  }
+
+  Hob->BaseAddress = BaseAddress;
+  Hob->Length      = Length;
+}
+
+/**
   Builds a HOB for the CPU.
 
   This function builds a HOB for the CPU.

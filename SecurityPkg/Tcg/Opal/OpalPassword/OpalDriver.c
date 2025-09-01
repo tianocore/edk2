@@ -2329,7 +2329,7 @@ RemoveDevice (
   }
 
   if (mOpalDriver.DeviceList == Dev) {
-    mOpalDriver.DeviceList = NULL;
+    mOpalDriver.DeviceList = Dev->Next;
     return;
   }
 
@@ -2339,6 +2339,8 @@ RemoveDevice (
       TmpDev->Next = Dev->Next;
       break;
     }
+
+    TmpDev = TmpDev->Next;
   }
 }
 

@@ -4,6 +4,7 @@
 Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (C) 2016 Silicon Graphics, Inc. All rights reserved.<BR>
+Copyright (c) 2025, Loongson Technology Corporation Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -216,6 +217,13 @@ TerminalConOutOutputString (
           );
 
   for ( ; *WString != CHAR_NULL; WString++) {
+    //
+    // Skip WIDE_CHAR/NARROW_CHAR, because they are not displayable.
+    //
+    if ((*WString == WIDE_CHAR) || (*WString == NARROW_CHAR)) {
+      continue;
+    }
+
     switch (TerminalDevice->TerminalType) {
       case TerminalTypePcAnsi:
       case TerminalTypeVt100:

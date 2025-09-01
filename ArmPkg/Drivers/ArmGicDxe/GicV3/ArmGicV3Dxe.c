@@ -771,6 +771,10 @@ GicV3DxeInitialize (
   Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&gCpuArch);
   ASSERT_EFI_ERROR (Status);
 
+  if (ArmHasGicV5SystemRegisters ()) {
+    return GicV5DxeInitialize ();
+  }
+
   mGicDistributorBase = (UINTN)PcdGet64 (PcdGicDistributorBase);
 
   Status = gCpuArch->SetMemoryAttributes (gCpuArch, mGicDistributorBase, GICD_V3_SIZE, EFI_MEMORY_UC | EFI_MEMORY_XP);

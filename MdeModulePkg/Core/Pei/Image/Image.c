@@ -623,6 +623,10 @@ PeiLoadImageLoadImage (
   UINT16                Machine;
   EFI_SECTION_TYPE      SearchType1;
   EFI_SECTION_TYPE      SearchType2;
+  CHAR8                 *AsciiString;
+  CHAR8                 EfiFileName[512];
+  UINTN                 Index;
+  UINTN                 StartIndex;
 
   *EntryPoint          = 0;
   ImageSize            = 0;
@@ -706,12 +710,6 @@ PeiLoadImageLoadImage (
     *ImageSizeArg = ImageSize;
   }
 
-  DEBUG_CODE_BEGIN ();
-  CHAR8  *AsciiString;
-  CHAR8  EfiFileName[512];
-  INT32  Index;
-  INT32  StartIndex;
-
   //
   // Print debug message: Loading PEIM at 0x12345678 EntryPoint=0x12345688 Driver.efi
   //
@@ -763,8 +761,6 @@ PeiLoadImageLoadImage (
 
     DEBUG ((DEBUG_INFO | DEBUG_LOAD, "%a", EfiFileName));
   }
-
-  DEBUG_CODE_END ();
 
   DEBUG ((DEBUG_INFO | DEBUG_LOAD, "\n"));
 

@@ -71,6 +71,8 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjMemoryLatBwInfo,                ///< 43 - Memory Latency Bandwidth Info
   EArchCommonObjMemoryCacheInfo,                ///< 44 - Memory Cache Info
   EArchCommonObjSpcrInfo,                       ///< 45 - Serial Terminal and Interrupt Info
+  EArchCommonObjTpm2DeviceInfo,                 ///< 46 - TPM2 Device Info
+  EArchCommonObjMcfgPciConfigSpaceInfo,         ///< 47 - MCFG PCI Configuration Space Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -723,6 +725,18 @@ typedef struct CmArchCommonTpm2InterfaceInfo {
   /** Log Area Start Address */
   UINT64    Lasa;
 } CM_ARCH_COMMON_TPM2_INTERFACE_INFO;
+
+/** A structure that describes TPM2 device.
+
+  ID: EArchCommonObjTpm2DeviceInfo
+*/
+typedef struct CmArchCommonTpm2DeviceInfo {
+  /** TPM2 Device's Base Address */
+  UINT64    Tpm2DeviceBaseAddress;
+
+  /** TPM2 Device' Size */
+  UINT64    Tpm2DeviceSize;
+} CM_ARCH_COMMON_TPM2_DEVICE_INFO;
 
 /** A structure that describes the
     SPMI (Service Processor Management Interface) Info.
