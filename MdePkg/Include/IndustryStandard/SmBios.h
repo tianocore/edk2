@@ -1903,7 +1903,8 @@ typedef enum {
   MemoryTypeHBM2                     = 0x21,
   MemoryTypeDdr5                     = 0x22,
   MemoryTypeLpddr5                   = 0x23,
-  MemoryTypeHBM3                     = 0x24
+  MemoryTypeHBM3                     = 0x24,
+  MemoryTypeMRDIMM                   = 0x25
 } MEMORY_DEVICE_TYPE;
 
 ///
@@ -1942,7 +1943,8 @@ typedef enum {
   // This definition is updated to represent Intel
   // Optane DC Persistent Memory in SMBIOS spec 3.4.0
   //
-  MemoryTechnologyIntelOptanePersistentMemory = 0x07
+  MemoryTechnologyIntelOptanePersistentMemory = 0x07,
+  MemoryTechnologyMrdimm                      = 0x08
 } MEMORY_DEVICE_TECHNOLOGY;
 
 ///
