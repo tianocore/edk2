@@ -16,10 +16,22 @@
   This parser expects FdtBranch to be a Gic interrupt-controller node.
   Gic version must be v3 or higher.
   typedef struct CmArmGicItsInfo {
-    UINT32  GicItsId;                         // {Populated}
-    UINT64  PhysicalBaseAddress;              // {Populated}
-    UINT32  ProximityDomain;                  // {default = 0}
+    UINT32           GicItsId;                         // {Populated}
+    UINT64           PhysicalBaseAddress;              // {Populated}
+    UINT32           ProximityDomain;                  // {default = 0}
+    CM_OBJECT_TOKEN  ProximityDomainToken;             // {default = CM_NULL_TOKEN}
   } CM_ARM_GIC_ITS_INFO;
+
+  typedef struct CmArmItsGroupNode {
+    CM_OBJECT_TOKEN    Token;                          // {default = CM_NULL_TOKEN}
+    UINT32             ItsIdCount;                     // {Populated}
+    CM_OBJECT_TOKEN    ItsIdToken;                     // {Populated}
+    UINT32             Identifier;                     // {default = 0}
+  } CM_ARM_ITS_GROUP_NODE;
+
+  typedef struct CmArmGicItsIdentifier {
+    UINT32    ItsId;                                   // {Populated}
+  } CM_ARM_ITS_IDENTIFIER;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.
