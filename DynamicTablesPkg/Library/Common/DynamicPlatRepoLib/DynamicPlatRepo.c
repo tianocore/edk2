@@ -113,6 +113,8 @@ FreeCmObjNode (
 
   @param [in]  This       This dynamic platform repository.
   @param [in]  CmObjDesc  CmObj to add. The data is copied.
+  @param [in]  NewToken   Token for this object. If CM_NULL_TOKEN, then
+                          a new token is generated.
   @param [out] Token      If not NULL, token allocated to this CmObj.
 
   @retval EFI_SUCCESS           Success.
@@ -124,13 +126,13 @@ EFIAPI
 DynPlatRepoAddObject (
   IN        DYNAMIC_PLATFORM_REPOSITORY_INFO  *This,
   IN  CONST CM_OBJ_DESCRIPTOR                 *CmObjDesc,
+  IN        CM_OBJECT_TOKEN                   NewToken,
   OUT       CM_OBJECT_TOKEN                   *Token OPTIONAL
   )
 {
   EFI_STATUS            Status;
   CM_OBJ_NODE           *ObjNode;
   CM_OBJECT_ID          ObjId;
-  CM_OBJECT_TOKEN       NewToken;
   LIST_ENTRY            *ObjList;
   EOBJECT_NAMESPACE_ID  NamespaceId;
 
@@ -175,8 +177,10 @@ DynPlatRepoAddObject (
     return EFI_INVALID_PARAMETER;
   }
 
-  // Generate a token.
-  NewToken = GenerateToken ();
+  // Generate a token if required.
+  if (NewToken == CM_NULL_TOKEN) {
+    NewToken = GenerateToken ();
+  }
 
   // Create an ObjNode.
   Status = AllocCmObjNode (CmObjDesc, NewToken, &ObjNode);
