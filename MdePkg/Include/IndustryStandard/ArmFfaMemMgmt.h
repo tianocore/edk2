@@ -1,5 +1,5 @@
 /** @file
-  Memory management protocol definitions as specfied in the FF-A Memory Management
+  Memory management protocol definitions as specified in the FF-A Memory Management
   v1.3 APL1 specification.
 
   Copyright 2021 The Hafnium Authors.
@@ -30,7 +30,7 @@
 #define FFA_DATA_ACCESS_RESERVED       3
 
 /**
-  Intruction access attributes in a memory access permission descriptor.
+  Instruction access attributes in a memory access permission descriptor.
 
   This corresponds to table 1.15 of the FF-A Memory Management v1.3 APL1, "Memory
   access permissions descriptor", bits[3:2].
@@ -210,7 +210,7 @@ typedef struct {
     an `FFA_COMPOSITE_MEMORY_REGION` struct.
   **/
   UINT32                                      CompositeMemoryRegionOffset;
-  UINT8                                       ImpementationDefined[16];
+  UINT8                                       ImplementationDefined[16];
   UINT64                                      Reserved;
 } FFA_ENDPOINT_MEMORY_ACCESS_DESCRIPTOR;
 
