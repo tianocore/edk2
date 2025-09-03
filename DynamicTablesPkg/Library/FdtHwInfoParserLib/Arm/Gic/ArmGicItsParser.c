@@ -92,10 +92,22 @@ GicItsIntcNodeParser (
   This parser expects FdtBranch to be a Gic interrupt-controller node.
   Gic version must be v3 or higher.
   typedef struct CmArmGicItsInfo {
-    UINT32  GicItsId;                         // {Populated}
-    UINT64  PhysicalBaseAddress;              // {Populated}
-    UINT32  ProximityDomain;                  // {default = 0}
+    UINT32           GicItsId;                         // {Populated}
+    UINT64           PhysicalBaseAddress;              // {Populated}
+    UINT32           ProximityDomain;                  // {default = 0}
+    CM_OBJECT_TOKEN  ProximityDomainToken;             // {default = CM_NULL_TOKEN}
   } CM_ARM_GIC_ITS_INFO;
+
+  typedef struct CmArmItsGroupNode {
+    CM_OBJECT_TOKEN    Token;                          // {default = CM_NULL_TOKEN}
+    UINT32             ItsIdCount;                     // {Populated}
+    CM_OBJECT_TOKEN    ItsIdToken;                     // {Populated}
+    UINT32             Identifier;                     // {default = 0}
+  } CM_ARM_ITS_GROUP_NODE;
+
+  typedef struct CmArmGicItsIdentifier {
+    UINT32    ItsId;                                   // {Populated}
+  } CM_ARM_ITS_IDENTIFIER;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.
@@ -128,6 +140,10 @@ ArmGicItsInfoParser (
   INT32                GicItsNode;
   UINT32               GicItsNodeCount;
   VOID                 *Fdt;
+
+  CM_ARM_ITS_GROUP_NODE  ItsGroupNodeInfo;
+  CM_ARM_ITS_IDENTIFIER  ItsIdentifier;
+  CM_OBJECT_TOKEN        Token;
 
   if (FdtParserHandle == NULL) {
     ASSERT (0);
@@ -174,6 +190,8 @@ ArmGicItsInfoParser (
   GicItsNode = FdtBranch;
   for (Index = 0; Index < GicItsNodeCount; Index++) {
     ZeroMem (&GicItsInfo, sizeof (CM_ARM_GIC_ITS_INFO));
+    ZeroMem (&ItsGroupNodeInfo, sizeof (CM_ARM_ITS_GROUP_NODE));
+    ZeroMem (&ItsIdentifier, sizeof (CM_ARM_ITS_IDENTIFIER));
 
     Status = FdtGetNextPropNodeInBranch (
                Fdt,
@@ -209,6 +227,38 @@ ArmGicItsInfoParser (
                &GicItsInfo,
                sizeof (CM_ARM_GIC_ITS_INFO),
                NULL
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT (0);
+      return Status;
+    }
+
+    ItsIdentifier.ItsId = Index;
+
+    // Add the CmObj to the Configuration Manager.
+    Status = AddSingleCmObj (
+               FdtParserHandle,
+               CREATE_CM_ARM_OBJECT_ID (EArmObjGicItsIdentifierArray),
+               &ItsIdentifier,
+               sizeof (CM_ARM_ITS_IDENTIFIER),
+               &Token
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT (0);
+      return Status;
+    }
+
+    ItsGroupNodeInfo.ItsIdCount = 1;
+    ItsGroupNodeInfo.ItsIdToken = Token;
+
+    // Add the CmObj to the Configuration Manager.
+    // Abstract token allows the IORT parser to link to this object
+    Status = AddSingleCmObjWithToken (
+               FdtParserHandle,
+               CREATE_CM_ARM_OBJECT_ID (EArmObjItsGroup),
+               &ItsGroupNodeInfo,
+               sizeof (CM_ARM_ITS_GROUP_NODE),
+               CM_ABSTRACT_TOKEN_MAKE (ETokenNameSpaceFdtHwInfo, EFdtHwInfoIortObject, FdtGetPhandle (Fdt, GicItsNode))
                );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
