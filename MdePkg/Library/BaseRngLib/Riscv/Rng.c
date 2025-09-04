@@ -19,75 +19,7 @@
 
 #define SEED_RETRY_LOOPS  100
 
-// 64-bit Mersenne Twister implementation
-// A widely used pseudo random number generator. It performs bit shifts etc to
-// achieve the random number. It's output is determined by SEED value generated
-// by RISC-V SEED CSR"
-
-#define STATE_SIZE  312
-#define MIDDLE      156
-#define INIT_SHIFT  62
-#define TWIST_MASK  0xb5026f5aa96619e9ULL
-#define INIT_FACT   6364136223846793005ULL
-#define SHIFT1      29
-#define MASK1       0x5555555555555555ULL
-#define SHIFT2      17
-#define MASK2       0x71d67fffeda60000ULL
-#define SHIFT3      37
-#define MASK3       0xfff7eee000000000ULL
-#define SHIFT4      43
-
-#define LOWER_MASK  0x7fffffff
-#define UPPER_MASK  (~(UINT64)LOWER_MASK)
-
-static UINT64  mState[STATE_SIZE];
-static UINTN   mIndex = STATE_SIZE + 1;
-
-/**
-   Initialize mState to defualt state.
-
-   @param[in] S Input seed value
- **/
-STATIC
-VOID
-SeedRng (
-  IN UINT64  S
-  )
-{
-  UINTN  I;
-
-  mIndex    = STATE_SIZE;
-  mState[0] = S;
-
-  for (I = 1; I < STATE_SIZE; I++) {
-    mState[I] = (INIT_FACT * (mState[I - 1] ^ (mState[I - 1] >> INIT_SHIFT))) + I;
-  }
-}
-
-/**
-   Initializes mState with entropy values. The initialization is based on the
-   Seed value populated in mState[0] which then influences all the other values
-   in the mState array. Later values are retrieved from the same array instead
-   of calling trng instruction every time.
-
- **/
-STATIC
-VOID
-TwistRng (
-  VOID
-  )
-{
-  UINTN   I;
-  UINT64  X;
-
-  for (I = 0; I < STATE_SIZE; I++) {
-    X         = (mState[I] & UPPER_MASK) | (mState[(I + 1) % STATE_SIZE] & LOWER_MASK);
-    X         = (X >> 1) ^ (X & 1 ? TWIST_MASK : 0);
-    mState[I] = mState[(I + MIDDLE) % STATE_SIZE] ^ X;
-  }
-
-  mIndex = 0;
-}
+// 64-bit CPU-based RNG using risc-v Zkr instruction
 
 // Defined in Seed.S
 extern UINT64
@@ -164,14 +96,7 @@ BaseRngLibConstructor (
   VOID
   )
 {
-  UINT64  Seed;
-
-  if (Get64BitSeed (&Seed)) {
-    SeedRng (Seed);
-    return EFI_SUCCESS;
-  } else {
-    return EFI_UNSUPPORTED;
-  }
+  return EFI_SUCCESS;
 }
 
 /**
@@ -241,23 +166,9 @@ ArchGetRandomNumber64 (
 {
   UINT64  Y;
 
-  // Never initialized.
-  if (mIndex > STATE_SIZE) {
+  if (!Get64BitSeed (&Y)) {
     return FALSE;
   }
-
-  // Mersenne Twister
-  if (mIndex == STATE_SIZE) {
-    TwistRng ();
-  }
-
-  Y  = mState[mIndex];
-  Y ^= (Y >> SHIFT1) & MASK1;
-  Y ^= (Y << SHIFT2) & MASK2;
-  Y ^= (Y << SHIFT3) & MASK3;
-  Y ^= Y >> SHIFT4;
-
-  mIndex++;
 
   *Rand = Y;
   return TRUE;

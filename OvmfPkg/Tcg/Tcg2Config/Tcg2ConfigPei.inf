@@ -52,3 +52,6 @@
 
 [Depex.ARM, Depex.AARCH64]
   gOvmfTpmDiscoveredPpiGuid
+
+[Depex.RISCV64]
+  gOvmfTpmDiscoveredPpiGuid
