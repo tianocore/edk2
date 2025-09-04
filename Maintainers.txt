@@ -93,6 +93,7 @@ F: UefiCpuPkg/*/Arm/
 M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
+R: Vishal Oliyil Kunnnil <vishalo@qti.qualcomm.com> [vishalo]
 
 RISCV64
 F: */RiscV64/
@@ -153,6 +154,7 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPkg
 M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
+R: Vishal Oliyil Kunnnil <vishalo@qti.qualcomm.com> [vishalo]
 
 ArmPlatformPkg
 F: ArmPlatformPkg/
@@ -454,6 +456,7 @@ F: MdePkg/Include/Library/ArmLib.h
 M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
+R: Vishal Oliyil Kunnnil <vishalo@qti.qualcomm.com> [vishalo]
 
 MdePkg: ARM-FFA related interfaces
 F: MdePkg/*ArmFfa*
