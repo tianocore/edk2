@@ -270,7 +270,7 @@ Tpm12TisTpmCommand (
 {
   EFI_STATUS  Status;
   UINT16      BurstCount;
-  UINTN       Index;
+  UINT32      Index;
   UINT32      TpmOutSize;
   UINT16      Data16;
   UINT32      Data32;

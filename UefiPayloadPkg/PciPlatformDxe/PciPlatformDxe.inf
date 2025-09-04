@@ -1,0 +1,43 @@
+## @file
+# This driver produces gEfiPciPlatformProtocol to load PCI Option ROMs
+#
+# Copyright (c) 2025, 9elements Agency GmbH
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PciPlatformDxe
+  FILE_GUID                      = 86D58F7B-6E7C-401F-BDD4-E32E6D582AAD
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InstallPciPlatformProtocol
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources.common]
+  PciPlatformDxe.h
+  PciPlatformDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  DxeServicesTableLib
+  DebugLib
+  MemoryAllocationLib
+  BaseMemoryLib
+
+[Protocols]
+  gEfiPciPlatformProtocolGuid                   ## PRODUCES
+  gEfiPciIoProtocolGuid                         ## COMSUMES
