@@ -218,8 +218,6 @@ TPM2_CODE_STRING  ResponseCodeStrings[] = {
 };
 UINTN             ResponseCodeStringsCount = sizeof (ResponseCodeStrings) / sizeof (ResponseCodeStrings[0]);
 
-UINT32  mLastCommandSent = 0;
-
 /**
   This simple function will dump up to MAX_TPM_BUFFER_DUMP bytes
   of a TPM data buffer and apppend '...' if buffer is larger.
@@ -678,9 +676,6 @@ DumpTpmInputBlock (
   // If verbose, dump all of the buffer contents for deeper analysis.
   DumpTpmBuffer ("DATA:     ", MIN (InputBlockSize, NativeSize), InputBlock);
 
-  // Update the last command sent so that response parsing can have some context.
-  mLastCommandSent = NativeCode;
-
   return;
 }
 
@@ -690,13 +685,15 @@ DumpTpmInputBlock (
 
   @param[in]  OutputBlockSize  Size of the output buffer.
   @param[in]  OutputBlock      Pointer to the output buffer itself.
+  @param[in]  CommandCode      Command code for the input block.
 
 **/
 VOID
 EFIAPI
 DumpTpmOutputBlock (
   IN UINT32       OutputBlockSize,
-  IN CONST UINT8  *OutputBlock
+  IN CONST UINT8  *OutputBlock,
+  IN UINT32       CommandCode
   )
 {
   CONST TPM2_RESPONSE_HEADER  *RespHeader;
@@ -716,8 +713,8 @@ DumpTpmOutputBlock (
   DEBUG ((DEBUG_SECURITY, "Size:     %d (0x%X)\n", NativeSize, NativeSize));
 
   // Debug anything else based on the Command context.
-  if (mLastCommandSent != 0x00) {
-    switch (mLastCommandSent) {
+  if (CommandCode != 0x00) {
+    switch (CommandCode) {
       case TPM_CC_StartAuthSession:
         DumpTpmStartAuthSessionResponse (OutputBlockSize, OutputBlock);
         break;
