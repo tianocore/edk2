@@ -73,12 +73,14 @@ DumpTpmInputBlock (
   a response from the TPM for maximum user-readability.
   @param[in]  OutputBlockSize  Size of the output buffer.
   @param[in]  OutputBlock      Pointer to the output buffer itself.
+  @param[in]  CommandCode      Command code for the input block.
 **/
 VOID
 EFIAPI
 DumpTpmOutputBlock (
   IN UINT32       OutputBlockSize,
-  IN CONST UINT8  *OutputBlock
+  IN CONST UINT8  *OutputBlock,
+  IN UINT32       CommandCode
   );
 
 #endif // TPM2_PTP_H_

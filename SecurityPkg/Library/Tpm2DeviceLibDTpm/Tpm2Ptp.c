@@ -162,6 +162,7 @@ PtpCrbTpmCommand (
   UINT16      Data16;
   UINT32      Data32;
   UINT8       RetryCnt;
+  UINT32      CommandCode;
 
   DEBUG_CODE_BEGIN ();
   DumpTpmInputBlock (SizeIn, BufferIn);
@@ -336,7 +337,13 @@ PtpCrbTpmCommand (
   }
 
   DEBUG_CODE_BEGIN ();
-  DumpTpmOutputBlock (TpmOutSize, BufferOut);
+  if (SizeIn >= sizeof (TPM2_COMMAND_HEADER)) {
+    CommandCode = SwapBytes32 (((TPM2_COMMAND_HEADER *)BufferIn)->commandCode);
+  } else {
+    CommandCode = 0;
+  }
+
+  DumpTpmOutputBlock (TpmOutSize, BufferOut, CommandCode);
   DEBUG_CODE_END ();
 
   //
