@@ -3,6 +3,7 @@
 #
 #  Copyright (c) 2016 - 2023, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
+#  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -100,3 +101,4 @@
   gUefiCpuPkgTokenSpaceGuid.PcdGhcbHypervisorFeatures                  ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase                       ## SOMETIMES_CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi                ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuInitIpiDelayInMicroSeconds           ## SOMETIMES_CONSUMES
