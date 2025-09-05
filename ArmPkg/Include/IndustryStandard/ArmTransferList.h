@@ -2,7 +2,7 @@
   Header file defining a Transfer List and Transfer Entry as specified by the
   A-profile Firmware Handoff Protocol specification.
 
-  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -74,6 +74,22 @@
 #define TRANSFER_LIST_FL_HAS_CHECKSUM  BIT0
 
 /*
+ * Flag values for TPM event log table entry layout XFERLIST_EVLOG->Flags,
+ * see https://github.com/FirmwareHandoff/firmware_handoff/blob/main/source/transfer_list.rst#tpm-event-log-table-entry-layout-xferlist_evlog
+ */
+#define TRANSFER_LIST_EVENTLOG_FL_NEED_TO_REPLAY  BIT0 /* Need to replay */
+
+/*
+ * Operation codes indicating the validity of the Transfer List.
+ */
+typedef enum {
+  TRANSFER_LIST_OPS_INVALID,  /* invalid for any operation */
+  TRANSFER_LIST_OPS_ALL,      /* valid for all operations */
+  TRANSFER_LIST_OPS_RO,       /* valid for read only */
+  TRANSFER_LIST_OPS_CUSTOM,   /* abort or switch to special code to interpret */
+} TRANSFER_LIST_OPS;
+
+/*
  * Transfer list starts with the following header.
  * Transfer entries followed after the following header.
  */
@@ -126,5 +142,19 @@ typedef struct TransferEntryHeader {
   /// The size of the data content in bytes.
   UINT32    DataSize;
 } TRANSFER_ENTRY_HEADER;
+
+/*
+ * TPM event log information entry,
+ * see Section 'TPM event log table entry layout (XFERLIST_EVLOG)' in
+ * the Firmware Handoff specification.
+ */
+typedef struct TransferListEventLog {
+  /// See the TRANSFER_LIST_EVENT_LOG_FL_*
+  UINT32    Flags;
+
+  /// TPM event log as much as
+  /// TRNASFER_ENTRY_HEADER->DataSize - sizeof (TRANSFER_LIST_EVENTLOG)->Flags
+  UINT8     EventLog[];
+} TRANSFER_LIST_EVENTLOG;
 
 #endif // ARM_TRANSFER_LIST_

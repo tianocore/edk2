@@ -206,7 +206,7 @@ typedef struct {
 /// FADT Version (as defined in ACPI 6.6 spec.)
 ///
 #define EFI_ACPI_6_6_FIXED_ACPI_DESCRIPTION_TABLE_REVISION        0x06
-#define EFI_ACPI_6_6_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION  0x05
+#define EFI_ACPI_6_6_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION  0x06
 
 //
 // Fixed ACPI Description Table Preferred Power Management Profile
@@ -324,7 +324,7 @@ typedef struct {
 ///
 /// MADT Revision (as defined in ACPI 6.6 spec.)
 ///
-#define EFI_ACPI_6_6_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION  0x06
+#define EFI_ACPI_6_6_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION  0x07
 
 ///
 /// Multiple APIC Flags
@@ -361,6 +361,10 @@ typedef struct {
 #define EFI_ACPI_6_6_MSI_PIC                        0x15
 #define EFI_ACPI_6_6_BIO_PIC                        0x16
 #define EFI_ACPI_6_6_LPC_PIC                        0x17
+#define EFI_ACPI_6_6_RINTC                          0x18
+#define EFI_ACPI_6_6_IMSIC                          0x19
+#define EFI_ACPI_6_6_APLIC                          0x1A
+#define EFI_ACPI_6_6_PLIC                           0x1B
 
 //
 // APIC Structure Definitions
@@ -746,6 +750,83 @@ typedef struct {
 } EFI_ACPI_6_6_LPC_PIC_STRUCTURE;
 
 ///
+/// RISC-V INTC (RINTC)
+///
+typedef struct {
+  UINT8     Type;
+  UINT8     Length;
+  UINT8     Version;
+  UINT8     Reserved;
+  UINT32    Flags;
+  UINT64    HartId;
+  UINT32    Uid;
+  UINT32    ExtIntcId;
+  UINT64    ImsicAddr;
+  UINT32    ImsicSize;
+} EFI_ACPI_6_6_RINTC_STRUCTURE;
+
+#define EFI_ACPI_6_6_RINTC_STRUCTURE_VERSION  1
+
+#define EFI_ACPI_6_6_RINTC_FLAG_ENABLE  1
+
+///
+/// RISC-V Incoming MSI Controller (IMSIC)
+///
+typedef struct {
+  UINT8     Type;
+  UINT8     Length;
+  UINT8     Version;
+  UINT8     Reserved;
+  UINT32    Flags;
+  UINT16    NumIds;
+  UINT16    NumGuestIds;
+  UINT8     GuestIndexBits;
+  UINT8     HartIndexBits;
+  UINT8     GroupIndexBits;
+  UINT8     GroupIndexShift;
+} EFI_ACPI_6_6_IMSIC_STRUCTURE;
+
+#define EFI_ACPI_6_6_IMSIC_STRUCTURE_VERSION  1
+
+///
+/// RISC-V APLIC
+///
+typedef struct {
+  UINT8     Type;
+  UINT8     Length;
+  UINT8     Version;
+  UINT8     Id;
+  UINT32    Flags;
+  UINT8     HwId[8];
+  UINT16    NumIdcs;
+  UINT16    NumSources;
+  UINT32    GsiBase;
+  UINT64    BaseAddr;
+  UINT32    Size;
+} EFI_ACPI_6_6_APLIC_STRUCTURE;
+
+#define EFI_ACPI_6_6_APLIC_STRUCTURE_VERSION  1
+
+///
+/// RISC-V PLIC
+///
+typedef struct {
+  UINT8     Type;
+  UINT8     Length;
+  UINT8     Version;
+  UINT8     Id;
+  UINT8     HwId[8];
+  UINT16    NumIrqs;
+  UINT16    MaxPrio;
+  UINT32    Flags;
+  UINT32    Size;
+  UINT64    BaseAddr;
+  UINT32    GsiBase;
+} EFI_ACPI_6_6_PLIC_STRUCTURE;
+
+#define EFI_ACPI_6_6_PLIC_STRUCTURE_VERSION  1
+
+///
 /// Smart Battery Description Table (SBST)
 ///
 typedef struct {
@@ -804,6 +885,8 @@ typedef struct {
 #define EFI_ACPI_6_6_GICC_AFFINITY                        0x03
 #define EFI_ACPI_6_6_GIC_ITS_AFFINITY                     0x04
 #define EFI_ACPI_6_6_GENERIC_INITIATOR_AFFINITY           0x05
+#define EFI_ACPI_6_6_GENERIC_PORT_AFFINITY                0x06
+#define EFI_ACPI_6_6_RINTC_AFFINITY                       0x07
 
 ///
 /// Processor Local APIC/SAPIC Affinity Structure Definition
@@ -889,6 +972,19 @@ typedef struct {
   UINT8     Reserved[2];
   UINT32    ItsId;
 } EFI_ACPI_6_6_GIC_ITS_AFFINITY_STRUCTURE;
+
+///
+/// RINTC Affinity Structure Definition
+///
+typedef struct {
+  UINT8     Type;
+  UINT8     Length;
+  UINT16    Reserved;
+  UINT32    ProximityDomain;
+  UINT32    AcpiProcessorUid;
+  UINT32    Flags;
+  UINT32    ClockDomain;
+} EFI_ACPI_6_6_RINTC_AFFINITY_STRUCTURE;
 
 //
 // Generic Initiator Affinity Structure Device Handle Types
@@ -3024,6 +3120,86 @@ typedef struct {
 #define EFI_ACPI_6_6_PHAT_RESET_REASON_REASON_POWER_LOSS        0x24
 #define EFI_ACPI_6_6_PHAT_RESET_REASON_REASON_POWER_BUTTON      0x25
 
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER    Header;
+  UINT32                         Flags;
+  UINT64                         TimeBaseFreq;
+  UINT32                         NodeCount;
+  UINT32                         NodeOffset;
+} EFI_ACPI_6_6_RISCV_HART_CAPABILITIES_TABLE;
+
+#define EFI_ACPI_6_6_RHCT_TABLE_REVISION  1
+//
+// RHCT Flags
+//
+#define EFI_ACPI_6_6_RHCT_FLAG_TIMER_CANNOT_WAKEUP_CPU  1
+
+//
+// RHCT subtables
+//
+typedef struct {
+  UINT16    Type;
+  UINT16    Length;
+  UINT16    Revision;
+} EFI_ACPI_6_6_RHCT_NODE_HEADER;
+
+/* Values for RHCT subtable Type above */
+#define EFI_ACPI_6_6_RHCT_NODE_TYPE_ISA_STRING  0x0000
+#define EFI_ACPI_6_6_RHCT_NODE_TYPE_CMO         0x0001
+#define EFI_ACPI_6_6_RHCT_NODE_TYPE_MMU         0x0002
+#define EFI_ACPI_6_6_RHCT_NODE_TYPE_HART_INFO   0xFFFF
+
+//
+// ISA string node structure
+//
+typedef struct {
+  EFI_ACPI_6_6_RHCT_NODE_HEADER    Node;
+  UINT16                           IsaLength;
+  char                             Isa[];
+} EFI_ACPI_6_6_RHCT_ISA_STRING_NODE;
+
+#define EFI_ACPI_6_6_RHCT_ISA_NODE_STRUCTURE_VERSION  1
+
+//
+// CMO node structure
+//
+typedef struct {
+  EFI_ACPI_6_6_RHCT_NODE_HEADER    Node;
+  UINT8                            Reserved;
+  UINT8                            CbomBlockSize;
+  UINT8                            CbopBlockSize;
+  UINT8                            CbozBlockSize;
+} EFI_ACPI_6_6_RHCT_CMO_NODE;
+
+#define EFI_ACPI_6_6_RHCT_CMO_NODE_STRUCTURE_VERSION  1
+
+//
+// MMU node structure
+//
+typedef struct {
+  EFI_ACPI_6_6_RHCT_NODE_HEADER    Node;
+  UINT8                            Reserved;
+  UINT8                            MmuType;
+} EFI_ACPI_6_6_RHCT_MMU_NODE;
+
+#define EFI_ACPI_6_6_RHCT_MMU_NODE_STRUCTURE_VERSION  1
+
+#define EFI_ACPI_6_6_RHCT_MMU_TYPE_SV39  0
+#define EFI_ACPI_6_6_RHCT_MMU_TYPE_SV48  1
+#define EFI_ACPI_6_6_RHCT_MMU_TYPE_SV57  2
+
+//
+// Hart Info node structure
+//
+typedef struct {
+  EFI_ACPI_6_6_RHCT_NODE_HEADER    Node;
+  UINT16                           NumOffsets;
+  UINT32                           Uid;
+  UINT32                           Offsets[];
+} EFI_ACPI_6_6_RHCT_HART_INFO_NODE;
+
+#define EFI_ACPI_6_6_RHCT_HART_INFO_NODE_STRUCTURE_VERSION  1
+
 //
 // Known table signatures
 //
@@ -3283,6 +3459,10 @@ typedef struct {
 ///
 #define EFI_ACPI_6_6_PLATFORM_HEALTH_ASSESSMENT_TABLE_SIGNATURE  SIGNATURE_32('P', 'H', 'A', 'T')
 
+///
+/// "RHCT" RISC-V Hart Capabilities Table (RHCT)
+///
+#define EFI_ACPI_6_6_RISCV_HART_CAPABILITIES_TABLE_SIGNATURE  SIGNATURE_32('R', 'H', 'C', 'T')
 ///
 /// "SDEI" Software Delegated Exceptions Interface Table
 ///

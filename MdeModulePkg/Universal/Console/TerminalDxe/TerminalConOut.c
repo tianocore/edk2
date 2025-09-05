@@ -4,6 +4,7 @@
 Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (C) 2016 Silicon Graphics, Inc. All rights reserved.<BR>
+Copyright (c) 2025, Loongson Technology Corporation Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -75,12 +76,12 @@ UNICODE_TO_CHAR  UnicodeToPcAnsiOrAscii[] = {
 };
 
 CHAR16  mSetModeString[]           = { ESC, '[', '=', '3', 'h', 0 };
-CHAR16  mSetModeStringResize[]     = { ESC, '[', '8', ';', '0', '0', '0', ';', '0', '0', '0', 't', '0', 0 };
+CHAR16  mSetModeStringResize[]     = { ESC, '[', '8', ';', '0', '0', '0', ';', '0', '0', '0', 't', 0 };
 CHAR16  mSetAttributeString[]      = { ESC, '[', '0', 'm', ESC, '[', '4', '0', 'm', ESC, '[', '4', '0', 'm', 0 };
 CHAR16  mClearScreenString[]       = { ESC, '[', '2', 'J', 0 };
-CHAR16  mSetCursorPositionString[] = { ESC, '[', '0', '0', ';', '0', '0', 'H', 0 };
-CHAR16  mCursorForwardString[]     = { ESC, '[', '0', '0', 'C', 0 };
-CHAR16  mCursorBackwardString[]    = { ESC, '[', '0', '0', 'D', 0 };
+CHAR16  mSetCursorPositionString[] = { ESC, '[', '0', '0', '0', ';', '0', '0', '0', 'H', 0 };
+CHAR16  mCursorForwardString[]     = { ESC, '[', '0', '0', '0', 'C', 0 };
+CHAR16  mCursorBackwardString[]    = { ESC, '[', '0', '0', '0', 'D', 0 };
 
 //
 // Body of the ConOut functions
@@ -216,6 +217,13 @@ TerminalConOutOutputString (
           );
 
   for ( ; *WString != CHAR_NULL; WString++) {
+    //
+    // Skip WIDE_CHAR/NARROW_CHAR, because they are not displayable.
+    //
+    if ((*WString == WIDE_CHAR) || (*WString == NARROW_CHAR)) {
+      continue;
+    }
+
     switch (TerminalDevice->TerminalType) {
       case TerminalTypePcAnsi:
       case TerminalTypeVt100:
@@ -497,10 +505,10 @@ TerminalConOutSetMode (
     Rows    = TerminalDevice->TerminalConsoleModeData[ModeNumber].Rows;
 
     mSetModeStringResize[RESIZE_ROW_OFFSET + 0]    = (CHAR16)('0' + (Rows / 100));
-    mSetModeStringResize[RESIZE_ROW_OFFSET + 1]    = (CHAR16)('0' + ((Rows - ((Rows / 100) * 100)) / 10));
+    mSetModeStringResize[RESIZE_ROW_OFFSET + 1]    = (CHAR16)('0' + ((Rows % 100) / 10));
     mSetModeStringResize[RESIZE_ROW_OFFSET + 2]    = (CHAR16)('0' + (Rows % 10));
     mSetModeStringResize[RESIZE_COLUMN_OFFSET + 0] = (CHAR16)('0' + (Columns / 100));
-    mSetModeStringResize[RESIZE_COLUMN_OFFSET + 1] = (CHAR16)('0' + ((Columns - ((Columns / 100) * 100)) / 10));
+    mSetModeStringResize[RESIZE_COLUMN_OFFSET + 1] = (CHAR16)('0' + ((Columns % 100) / 10));
     mSetModeStringResize[RESIZE_COLUMN_OFFSET + 2] = (CHAR16)('0' + (Columns % 10));
 
     String = mSetModeStringResize;
@@ -804,21 +812,25 @@ TerminalConOutSetCursorPosition (
       ((UINTN)Mode->CursorRow == Row))
   {
     if ((UINTN)Mode->CursorColumn > Column) {
-      mCursorBackwardString[FW_BACK_OFFSET + 0] = (CHAR16)('0' + ((Mode->CursorColumn - Column) / 10));
-      mCursorBackwardString[FW_BACK_OFFSET + 1] = (CHAR16)('0' + ((Mode->CursorColumn - Column) % 10));
+      mCursorBackwardString[FW_BACK_OFFSET + 0] = (CHAR16)('0' + ((Mode->CursorColumn - Column) / 100));
+      mCursorBackwardString[FW_BACK_OFFSET + 1] = (CHAR16)('0' + (((Mode->CursorColumn - Column) % 100) / 10));
+      mCursorBackwardString[FW_BACK_OFFSET + 2] = (CHAR16)('0' + ((Mode->CursorColumn - Column) % 10));
       String                                    = mCursorBackwardString;
     } else if (Column > (UINTN)Mode->CursorColumn) {
-      mCursorForwardString[FW_BACK_OFFSET + 0] = (CHAR16)('0' + ((Column - Mode->CursorColumn) / 10));
-      mCursorForwardString[FW_BACK_OFFSET + 1] = (CHAR16)('0' + ((Column - Mode->CursorColumn) % 10));
+      mCursorForwardString[FW_BACK_OFFSET + 0] = (CHAR16)('0' + ((Column - Mode->CursorColumn) / 100));
+      mCursorForwardString[FW_BACK_OFFSET + 1] = (CHAR16)('0' + (((Column - Mode->CursorColumn) % 100) / 10));
+      mCursorForwardString[FW_BACK_OFFSET + 2] = (CHAR16)('0' + ((Column - Mode->CursorColumn) % 10));
       String                                   = mCursorForwardString;
     } else {
       String = L"";  // No cursor motion necessary
     }
   } else {
-    mSetCursorPositionString[ROW_OFFSET + 0]    = (CHAR16)('0' + ((Row + 1) / 10));
-    mSetCursorPositionString[ROW_OFFSET + 1]    = (CHAR16)('0' + ((Row + 1) % 10));
-    mSetCursorPositionString[COLUMN_OFFSET + 0] = (CHAR16)('0' + ((Column + 1) / 10));
-    mSetCursorPositionString[COLUMN_OFFSET + 1] = (CHAR16)('0' + ((Column + 1) % 10));
+    mSetCursorPositionString[ROW_OFFSET + 0]    = (CHAR16)('0' + ((Row + 1) / 100));
+    mSetCursorPositionString[ROW_OFFSET + 1]    = (CHAR16)('0' + (((Row + 1) % 100) / 10));
+    mSetCursorPositionString[ROW_OFFSET + 2]    = (CHAR16)('0' + ((Row + 1) % 10));
+    mSetCursorPositionString[COLUMN_OFFSET + 0] = (CHAR16)('0' + ((Column + 1) / 100));
+    mSetCursorPositionString[COLUMN_OFFSET + 1] = (CHAR16)('0' + (((Column + 1) % 100) / 10));
+    mSetCursorPositionString[COLUMN_OFFSET + 2] = (CHAR16)('0' + ((Column + 1) % 10));
     String                                      = mSetCursorPositionString;
   }
 
