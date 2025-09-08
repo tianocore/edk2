@@ -82,7 +82,6 @@
   gEfiTapeIoProtocolGuid                                  ## UNDEFINED
   gEfiDiskIoProtocolGuid                                  ## UNDEFINED
   gEfiBlockIoProtocolGuid                                 ## UNDEFINED
-  gEfiUnicodeCollationProtocolGuid                        ## UNDEFINED
   gEfiPciRootBridgeIoProtocolGuid                         ## UNDEFINED
   gEfiPciIoProtocolGuid                                   ## UNDEFINED
   gEfiScsiPassThruProtocolGuid                            ## UNDEFINED
@@ -112,7 +111,6 @@
   gEfiTcp4ProtocolGuid                                    ## UNDEFINED
   gEfiIp4ServiceBindingProtocolGuid                       ## UNDEFINED
   gEfiIp4ProtocolGuid                                     ## UNDEFINED
-  gEfiIp4ConfigProtocolGuid                               ## UNDEFINED
   gEfiIp4Config2ProtocolGuid                              ## UNDEFINED
   gEfiUdp4ServiceBindingProtocolGuid                      ## UNDEFINED
   gEfiUdp4ProtocolGuid                                    ## UNDEFINED
@@ -127,7 +125,6 @@
   gEfiHiiConfigRoutingProtocolGuid                        ## UNDEFINED
   gEfiHiiConfigAccessProtocolGuid                         ## UNDEFINED
   gEfiFormBrowser2ProtocolGuid                            ## UNDEFINED
-  gEfiDeviceIoProtocolGuid                                ## UNDEFINED
   gEfiDriverConfigurationProtocolGuid                     ## UNDEFINED
   gEfiDriverConfiguration2ProtocolGuid                    ## UNDEFINED
   gEfiSimpleTextInputExProtocolGuid                       ## UNDEFINED

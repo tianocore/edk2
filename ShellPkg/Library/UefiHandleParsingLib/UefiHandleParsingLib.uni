@@ -158,7 +158,6 @@
 #string STR_SHELL_ENV2            #language en-US "ShellEnvironment2"
 #string STR_SHELL_DP_MAP          #language en-US "ShellDevicePathMap"
 #string STR_SHELL_ALIAS           #language en-US "ShellAlias"
-#string STR_DEVICE_IO             #language en-US "DeviceIO"
 #string STR_TCP                   #language en-US "TCP"
 #string STR_ESP                   #language en-US "EFISystemPartition"
 #string STR_GPT_NBR               #language en-US "LegacyMBR"
