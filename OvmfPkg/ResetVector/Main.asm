@@ -53,9 +53,13 @@ Main32:
     ;
     OneTimeCall ReloadFlat32
 
-    OneTimeCall InitTdx
-
 SearchBfv:
+    ;
+    ; install #vc exception handler (for cpuid on sev)
+    ;
+    OneTimeCall SevCpuidInit
+
+    OneTimeCall InitTdx
 
 %endif
 

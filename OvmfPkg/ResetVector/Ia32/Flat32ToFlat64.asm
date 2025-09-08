@@ -77,6 +77,11 @@ EnablePaging:
     bts     eax, 31                     ; set PG
     mov     cr0, eax                    ; enable paging
 
+    ;
+    ; uninstall #vc exception handler
+    ;
+    OneTimeCall SevCpuidExit
+
     jmp     LINEAR_CODE64_SEL:ADDR_OF(jumpTo64BitAndLandHere)
 BITS    64
 jumpTo64BitAndLandHere:
