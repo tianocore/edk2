@@ -48,6 +48,11 @@ BITS    32
 ; Entry point of Main32
 ;
 Main32:
+    ;
+    ; First load the GDT and jump to Flat32 mode
+    ;
+    OneTimeCall ReloadFlat32
+
     OneTimeCall InitTdx
 
 SearchBfv:
