@@ -226,16 +226,6 @@ ClearSevEsWorkArea:
     inc    eax
     loop   ClearSevEsWorkArea
 
-    ;
-    ; Set up exception handlers to check for SEV-ES
-    ;   Load temporary RAM stack based on PCDs (see SevEsIdtVmmComm for
-    ;   stack usage)
-    ;   Establish exception handlers
-    ;
-    mov       esp, SEV_ES_VC_TOP_OF_STACK
-    mov       eax, ADDR_OF(Idtr)
-    lidt      [cs:eax]
-
     ; Check if we have a valid (0x8000_001F) CPUID leaf
     ;   CPUID raises a #VC exception if running as an SEV-ES guest
     mov       eax, 0x80000000
@@ -334,15 +324,6 @@ NoSevPass:
     xor       eax, eax
 
 SevExit:
-    ;
-    ; Clear exception handlers and stack
-    ;
-    push      eax
-    mov       eax, ADDR_OF(IdtrClear)
-    lidt      [cs:eax]
-    pop       eax
-    mov       esp, 0
-
     OneTimeCallRet CheckSevFeatures
 
 ; Start of #VC exception handling routines
@@ -510,6 +491,34 @@ VmmDoneSnpCpuid:
     ; (the CPUID instruction has a length of 2)
     add     word [esp], CPUID_INSN_LEN
     iret
+
+%ifdef ARCH_X64
+
+SevCpuidInit:
+    ;
+    ; Set up exception handlers to check for SEV-ES
+    ;   Load temporary RAM stack based on PCDs (see SevEsIdtVmmComm for
+    ;   stack usage)
+    ;   Establish exception handlers
+    ;
+    mov       esp, SEV_ES_VC_TOP_OF_STACK
+    mov       eax, ADDR_OF(Idtr)
+    lidt      [cs:eax]
+
+    OneTimeCallRet SevCpuidInit
+
+SevCpuidExit:
+    ;
+    ; Clear exception handlers and stack
+    ;
+    mov       eax, ADDR_OF(IdtrClear)
+    lidt      [cs:eax]
+    xor       eax, eax
+    mov       esp, eax
+
+    OneTimeCallRet SevCpuidExit
+
+%endif
 
 ALIGN   2
 
