@@ -292,6 +292,10 @@ INF MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
 !endif
 INF UefiPayloadPkg/GraphicsOutputDxe/GraphicsOutputDxe.inf
 
+!if $(LOAD_OPTION_ROMS) == TRUE
+INF UefiPayloadPkg/PciPlatformDxe/PciPlatformDxe.inf
+!endif
+
 #
 # SCSI/ATA/IDE/DISK Support
 #
@@ -363,6 +367,13 @@ INF ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
 INF ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf
 !endif
 INF ShellPkg/Application/Shell/Shell.inf
+!endif
+
+#
+# Capsules
+#
+!if $(CAPSULE_SUPPORT) == TRUE
+INF MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
 !endif
 
 !if $(UNIVERSAL_PAYLOAD) == TRUE

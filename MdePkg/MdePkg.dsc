@@ -111,7 +111,6 @@
   MdePkg/Library/UefiDebugLibStdErr/UefiDebugLibStdErr.inf
   MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibBase.inf
-  MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibStandaloneMm.inf
   MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibOptionalDevicePathProtocol.inf
   MdePkg/Library/UefiDevicePathLibDevicePathProtocol/UefiDevicePathLibDevicePathProtocol.inf
   MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
@@ -217,5 +216,6 @@
 
 [Components.LOONGARCH64]
   MdePkg/Library/PeiServicesTablePointerLibKs0/PeiServicesTablePointerLibKs0.inf
+  MdePkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
 [BuildOptions]

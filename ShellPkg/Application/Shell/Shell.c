@@ -971,14 +971,7 @@ ProcessCommandLine (
                   (VOID **)&UnicodeCollation
                   );
   if (EFI_ERROR (Status)) {
-    Status = gBS->LocateProtocol (
-                    &gEfiUnicodeCollationProtocolGuid,
-                    NULL,
-                    (VOID **)&UnicodeCollation
-                    );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+    return Status;
   }
 
   // Set default options

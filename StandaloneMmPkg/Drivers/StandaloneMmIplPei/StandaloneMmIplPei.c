@@ -1,7 +1,7 @@
 /** @file
   MM IPL that load the MM Core into MMRAM at PEI stage
 
-  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2024 - 2025, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -383,7 +383,7 @@ LocateMmCoreFv (
                                it is pointed to fundation and platform HOB list.
 **/
 VOID *
-CreatMmHobList (
+CreateMmHobList (
   OUT UINTN                           *HobSize,
   IN  MM_COMM_BUFFER                  *MmCommBuffer,
   IN  EFI_PHYSICAL_ADDRESS            MmFvBase,
@@ -785,17 +785,17 @@ ExecuteMmCoreFromMmram (
       InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
 
       //
-      // Get HOB list for Standalone MM Core.
+      // Create HOB list for Standalone MM Core.
       //
       MmHobSize = 0;
-      MmHobList = CreatMmHobList (
+      MmHobList = CreateMmHobList (
                     &MmHobSize,
                     MmCommBuffer,
                     MmFvBase,
                     MmFvSize,
                     &MmCoreFileName,
                     ImageContext.ImageAddress,
-                    ImageContext.ImageSize,
+                    EFI_PAGES_TO_SIZE (PageCount),
                     ImageContext.EntryPoint,
                     Block
                     );
