@@ -654,6 +654,7 @@ ScsiRead10Command (
   @param[in, out] DataLength           The length of data buffer.
   @param[in]      StartLba             The start address of LBA.
   @param[in]      SectorSize           The number of contiguous logical blocks of data that shall be transferred.
+  @param[in]      bFUA                 If TRUE, FUA bit will be set.
 
   @retval  EFI_SUCCESS                 Command is executed successfully.
   @retval  EFI_BAD_BUFFER_SIZE         The SCSI Request Packet was executed, but the entire DataBuffer could
@@ -679,7 +680,8 @@ ScsiWrite10Command (
   IN OUT VOID                  *DataBuffer   OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     UINT32                StartLba,
-  IN     UINT32                SectorSize
+  IN     UINT32                SectorSize,
+  IN     BOOLEAN               bFUA
   );
 
 /**
@@ -774,6 +776,7 @@ ScsiRead16Command (
   @param[in, out] DataLength           The length of data buffer.
   @param[in]      StartLba             The start address of LBA.
   @param[in]      SectorSize           The number of contiguous logical blocks of data that shall be transferred.
+  @param[in]      bFUA                 If TRUE, FUA bit will be set.
 
   @retval  EFI_SUCCESS                 Command is executed successfully.
   @retval  EFI_BAD_BUFFER_SIZE         The SCSI Request Packet was executed, but the entire DataBuffer could
@@ -799,7 +802,8 @@ ScsiWrite16Command (
   IN OUT VOID                  *DataBuffer   OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     UINT64                StartLba,
-  IN     UINT32                SectorSize
+  IN     UINT32                SectorSize,
+  IN     BOOLEAN               bFUA
   );
 
 /**
