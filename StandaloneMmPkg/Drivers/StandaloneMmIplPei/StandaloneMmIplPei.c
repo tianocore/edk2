@@ -674,20 +674,20 @@ ExecuteMmCoreFromMmram (
   IN  MM_COMM_BUFFER  *MmCommBuffer
   )
 {
-  EFI_STATUS                            Status;
-  UINTN                                 PageCount;
-  VOID                                  *MmHobList;
-  UINTN                                 MmHobSize;
-  EFI_GUID                              MmCoreFileName;
-  UINTN                                 MmFvSize;
-  EFI_PHYSICAL_ADDRESS                  MmFvBase;
-  PE_COFF_LOADER_IMAGE_CONTEXT          ImageContext;
-  STANDALONE_MM_FOUNDATION_ENTRY_POINT  Entry;
-  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK        *Block;
-  EFI_PEI_MM_ACCESS_PPI                 *MmAccess;
-  UINTN                                 Size;
-  UINTN                                 Index;
-  UINTN                                 MmramRangeCount;
+  EFI_STATUS                      Status;
+  UINTN                           PageCount;
+  VOID                            *MmHobList;
+  UINTN                           MmHobSize;
+  EFI_GUID                        MmCoreFileName;
+  UINTN                           MmFvSize;
+  EFI_PHYSICAL_ADDRESS            MmFvBase;
+  PE_COFF_LOADER_IMAGE_CONTEXT    ImageContext;
+  MM_FOUNDATION_ENTRY_POINT       Entry;
+  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *Block;
+  EFI_PEI_MM_ACCESS_PPI           *MmAccess;
+  UINTN                           Size;
+  UINTN                           Index;
+  UINTN                           MmramRangeCount;
 
   MmFvBase = 0;
   MmFvSize = 0;
@@ -808,9 +808,8 @@ ExecuteMmCoreFromMmram (
       //
       // Execute image
       //
-      Entry  = (STANDALONE_MM_FOUNDATION_ENTRY_POINT)(UINTN)ImageContext.EntryPoint;
-      Status = Entry (MmHobList);
-      ASSERT_EFI_ERROR (Status);
+      Entry = (MM_FOUNDATION_ENTRY_POINT)(UINTN)ImageContext.EntryPoint;
+      Entry (MmHobList);
       FreePages (MmHobList, EFI_SIZE_TO_PAGES (MmHobSize));
     }
   }
