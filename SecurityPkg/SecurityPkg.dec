@@ -466,6 +466,10 @@
   # @Prompt TPM device address.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0xFED40000|UINT64|0x00010012
 
+  ## This PCD indicates TPM base address.<BR><BR>
+  # @Prompt TPM device address.
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmLastCommandSent|0x0|UINT32|0x0002002F
+
   ## This PCD indicates internal TPM base address.<BR><BR>
   # @Prompt TPM device base address.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInternalBaseAddress|0x10000200000|UINT64|0x0001002A
