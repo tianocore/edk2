@@ -61,6 +61,7 @@
 [Guids]
   gEfiSmmSmramMemoryGuid
   gEfiAcpiVariableGuid
+  gEfiIgvmDataHobGuid
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
@@ -112,6 +113,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogSize
 
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmParamBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmHobBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmHobSize
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode

@@ -250,6 +250,8 @@ PlatformMemMapInitialization (
 
   PlatformInfoHob->PcdPciIoBase = PciIoBase;
   PlatformInfoHob->PcdPciIoSize = PciIoSize;
+
+  PlatformIgvmDataHobs ();
 }
 
 /**
