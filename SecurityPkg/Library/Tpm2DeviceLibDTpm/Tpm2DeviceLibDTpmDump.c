@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Uefi.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
+#include <Library/PcdLib.h>
 
 #include <IndustryStandard/Tpm20.h>
 
@@ -217,8 +218,6 @@ TPM2_CODE_STRING  ResponseCodeStrings[] = {
   { TPM_RC_SENSITIVE,         "TPM_RC_SENSITIVE"         },
 };
 UINTN             ResponseCodeStringsCount = sizeof (ResponseCodeStrings) / sizeof (ResponseCodeStrings[0]);
-
-UINT32  mLastCommandSent = 0;
 
 /**
   This simple function will dump up to MAX_TPM_BUFFER_DUMP bytes
@@ -679,7 +678,8 @@ DumpTpmInputBlock (
   DumpTpmBuffer ("DATA:     ", MIN (InputBlockSize, NativeSize), InputBlock);
 
   // Update the last command sent so that response parsing can have some context.
-  mLastCommandSent = NativeCode;
+  //mLastCommandSent = NativeCode;
+  PcdSet32S (PcdTpmLastCommandSent, NativeCode);
 
   return;
 }
@@ -703,6 +703,7 @@ DumpTpmOutputBlock (
   TPM_ST                      NativeTag;
   UINT32                      NativeSize;
   TPM_CC                      NativeCode;
+  UINT32                      LastCommandSent;
 
   DEBUG ((DEBUG_SECURITY, "Size:     %d (0x%X), Address:  0x%X\n", OutputBlockSize, OutputBlockSize, OutputBlock));
 
@@ -716,8 +717,9 @@ DumpTpmOutputBlock (
   DEBUG ((DEBUG_SECURITY, "Size:     %d (0x%X)\n", NativeSize, NativeSize));
 
   // Debug anything else based on the Command context.
-  if (mLastCommandSent != 0x00) {
-    switch (mLastCommandSent) {
+  LastCommandSent = PcdGet32(PcdTpmLastCommandSent);
+  if (LastCommandSent != 0x00) {
+    switch (LastCommandSent) {
       case TPM_CC_StartAuthSession:
         DumpTpmStartAuthSessionResponse (OutputBlockSize, OutputBlock);
         break;

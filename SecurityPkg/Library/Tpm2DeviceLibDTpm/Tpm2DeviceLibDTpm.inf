@@ -55,3 +55,4 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress            ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdActiveTpmInterfaceType    ## PRODUCES
   gEfiSecurityPkgTokenSpaceGuid.PcdCRBIdleByPass             ## PRODUCES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmLastCommandSent

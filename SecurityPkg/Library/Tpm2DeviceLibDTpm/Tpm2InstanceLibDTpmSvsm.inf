@@ -60,3 +60,4 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdSvsmVTpmPresence        ## PRODUCES
   gEfiSecurityPkgTokenSpaceGuid.PcdSvsmVTpmBufferPtr       ## PRODUCES
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmLastCommandSent
