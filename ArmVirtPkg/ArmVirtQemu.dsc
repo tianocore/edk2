@@ -322,7 +322,8 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0x0
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0
-!else
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmLastCommandSent|0
+  !else
 [PcdsPatchableInModule]
   # make this PCD patchable instead of dynamic when TPM support is not enabled
   # this permits setting the PCD in unreachable code without pulling in dynamic PCD support
