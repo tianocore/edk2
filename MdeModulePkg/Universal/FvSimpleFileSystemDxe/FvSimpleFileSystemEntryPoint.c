@@ -271,7 +271,7 @@ InitializeUnicodeCollationSupportWorker (
     return Status;
   }
 
-  Iso639Language = (BOOLEAN)(ProtocolGuid == &gEfiUnicodeCollationProtocolGuid);
+  Iso639Language = (BOOLEAN)(ProtocolGuid == &gEfiUnicodeCollation2ProtocolGuid);
   GetEfiGlobalVariable2 (VariableName, (VOID **)&Language, NULL);
 
   ReturnStatus = EFI_UNSUPPORTED;
@@ -350,18 +350,6 @@ InitializeUnicodeCollationSupport (
              L"PlatformLang",
              (CONST CHAR8 *)PcdGetPtr (PcdUefiVariableDefaultPlatformLang)
              );
-  //
-  // If the attempt to use Unicode Collation 2 Protocol fails, then we fall back
-  // on the ISO 639-2 Unicode Collation Protocol.
-  //
-  if (EFI_ERROR (Status)) {
-    Status = InitializeUnicodeCollationSupportWorker (
-               AgentHandle,
-               &gEfiUnicodeCollationProtocolGuid,
-               L"Lang",
-               (CONST CHAR8 *)PcdGetPtr (PcdUefiVariableDefaultLang)
-               );
-  }
 
   return Status;
 }

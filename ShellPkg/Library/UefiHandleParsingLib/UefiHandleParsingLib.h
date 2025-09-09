@@ -79,7 +79,6 @@
 #include <Protocol/Dhcp4.h>
 #include <Protocol/Tcp4.h>
 #include <Protocol/Ip4.h>
-#include <Protocol/Ip4Config.h>
 #include <Protocol/Ip4Config2.h>
 #include <Protocol/Udp4.h>
 #include <Protocol/Mtftp4.h>
@@ -92,7 +91,6 @@
 #include <Protocol/HiiConfigRouting.h>
 #include <Protocol/HiiConfigAccess.h>
 #include <Protocol/FormBrowser2.h>
-#include <Protocol/DeviceIo.h>
 #include <Protocol/DriverConfiguration.h>
 #include <Protocol/DriverConfiguration2.h>
 #include <Protocol/DevicePathUtilities.h>

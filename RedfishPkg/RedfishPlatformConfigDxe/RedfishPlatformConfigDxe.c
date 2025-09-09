@@ -542,8 +542,19 @@ OneOfStatementToAttributeValues (
     }
 
     if (Option->Text != 0) {
-      Values->ValueArray[Index].ValueName        = HiiGetRedfishAsciiString (HiiHandle, SchemaName, Option->Text);
       Values->ValueArray[Index].ValueDisplayName = HiiGetEnglishAsciiString (HiiHandle, Option->Text);
+      Values->ValueArray[Index].ValueName        = HiiGetRedfishAsciiString (HiiHandle, SchemaName, Option->Text);
+      if (Values->ValueArray[Index].ValueName == NULL) {
+        DEBUG ((DEBUG_MANAGEABILITY, "%a: Redfish x-UEFI string is not found.\n", __func__));
+        //
+        // No x-UEFI-redfish string defined. Try to get string in English.
+        //
+        Values->ValueArray[Index].ValueName =
+          AllocateCopyPool (AsciiStrSize (Values->ValueArray[Index].ValueDisplayName), (VOID *)Values->ValueArray[Index].ValueDisplayName);
+        if (Values->ValueArray[Index].ValueName == NULL) {
+          DEBUG ((DEBUG_MANAGEABILITY, "%a: Both Redfish and English string are not found.\n", __func__));
+        }
+      }
     }
 
     Index += 1;
@@ -1309,8 +1320,16 @@ HiiValueToRedfishValue (
 
       RedfishValue->Value.Buffer = HiiGetRedfishAsciiString (HiiHandle, FullSchema, StringId);
       if (RedfishValue->Value.Buffer == NULL) {
-        Status = EFI_OUT_OF_RESOURCES;
-        break;
+        DEBUG ((DEBUG_MANAGEABILITY, "%a: Redfish x-UEFI string is not found.\n", __func__));
+        //
+        // No x-UEFI-redfish string defined. Try to get string in English.
+        //
+        RedfishValue->Value.Buffer = HiiGetEnglishAsciiString (HiiHandle, StringId);
+        if (RedfishValue->Value.Buffer == NULL) {
+          DEBUG ((DEBUG_MANAGEABILITY, "%a: Both Redfish and English string are not found.\n", __func__));
+          Status = EFI_OUT_OF_RESOURCES;
+          break;
+        }
       }
 
       RedfishValue->Type = RedfishValueTypeString;
@@ -1399,6 +1418,18 @@ HiiValueToRedfishValue (
         }
 
         RedfishValue->Value.StringArray[Index] = HiiGetRedfishAsciiString (HiiHandle, FullSchema, StringIdArray[Index]);
+        if (RedfishValue->Value.StringArray[Index] == NULL) {
+          DEBUG ((DEBUG_MANAGEABILITY, "%a: Redfish x-UEFI string is not found.\n", __func__));
+          //
+          // No x-UEFI-redfish string defined. Try to get string in English.
+          //
+          RedfishValue->Value.StringArray[Index] = HiiGetEnglishAsciiString (HiiHandle, StringIdArray[Index]);
+          if (RedfishValue->Value.StringArray[Index] == NULL) {
+            DEBUG ((DEBUG_MANAGEABILITY, "%a: Both Redfish and English string are not found.\n", __func__));
+            Status = EFI_OUT_OF_RESOURCES;
+          }
+        }
+
         ASSERT (RedfishValue->Value.StringArray[Index] != NULL);
       }
 
@@ -1418,6 +1449,7 @@ HiiValueToRedfishValue (
 
       RedfishValue->Value.Buffer = HiiGetRedfishAsciiString (HiiHandle, FullSchema, HiiStatement->ExtraData.TextTwo);
       if (RedfishValue->Value.Buffer == NULL) {
+        DEBUG ((DEBUG_MANAGEABILITY, "%a: Redfish x-UEFI string is not found.\n", __func__));
         //
         // No x-UEFI-redfish string defined. Try to get string in English.
         //
@@ -1666,7 +1698,7 @@ RedfishPlatformConfigProtocolGetValue (
     goto RELEASE_RESOURCE;
   }
 
-  if (TargetStatement->Suppressed) {
+  if (TargetStatement->Suppressed && !RedfishPlatformConfigFeatureProp (REDFISH_PLATFORM_CONFIG_ALLOW_SUPPRESSED)) {
     Status = EFI_ACCESS_DENIED;
     goto RELEASE_RESOURCE;
   }
@@ -2289,7 +2321,7 @@ RedfishPlatformConfigProtocolGetDefaultValue (
     goto RELEASE_RESOURCE;
   }
 
-  if (TargetStatement->Suppressed) {
+  if (TargetStatement->Suppressed && !RedfishPlatformConfigFeatureProp (REDFISH_PLATFORM_CONFIG_ALLOW_SUPPRESSED)) {
     Status = EFI_ACCESS_DENIED;
     goto RELEASE_RESOURCE;
   }
