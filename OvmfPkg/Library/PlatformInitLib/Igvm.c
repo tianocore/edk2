@@ -1,13 +1,20 @@
 /** @file
   IGVM Parameter parsing
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2025, Red Hat. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
+#include <Base.h>
+#include <PiPei.h>
+#include <IndustryStandard/IgvmData.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/HobLib.h>
 #include <Library/PlatformInitLib.h>
 #include <Library/DebugLib.h>
+#include <Pi/PiHob.h>
 
 /* keep in sync with OvmfPkg/ResetVector/X64/IgvmMetadata.asm */
 #define MEMORY_MAP_OFFSET   0
@@ -107,4 +114,69 @@ PlatformIgvmScanE820 (
 
   First = FALSE;
   return EFI_SUCCESS;
+}
+
+VOID
+EFIAPI
+PlatformIgvmDataHobs (
+  VOID
+  )
+{
+  UINT64                Start, End;
+  EFI_PEI_HOB_POINTERS  Hob;
+  EFI_IGVM_DATA_HOB     *IgvmData;
+
+  Start = FixedPcdGet64 (PcdOvmfIgvmHobBase);
+  End   = Start + FixedPcdGet64 (PcdOvmfIgvmHobSize);
+  if (Start == 0) {
+    // no parameter area
+    return;
+  }
+
+  for (Hob.Raw = (VOID *)(UINTN)Start;
+       ;
+       Hob.Raw = GET_NEXT_HOB (Hob))
+  {
+    DEBUG ((
+      DEBUG_VERBOSE,
+      "%a: hob: ptr=%p type=0x%x length=%u\n",
+      __func__,
+      Hob.Raw,
+      Hob.Header->HobType,
+      Hob.Header->HobLength
+      ));
+
+    if (Hob.Header->HobType != EFI_HOB_TYPE_GUID_EXTENSION) {
+      break;
+    }
+
+    if ((UINTN)Hob.Raw + Hob.Header->HobLength > End) {
+      break;
+    }
+
+    if (CompareMem (&Hob.Guid->Name, &gEfiIgvmDataHobGuid, sizeof (EFI_GUID)) != 0) {
+      break;
+    }
+
+    IgvmData = (VOID *)(&Hob.Guid->Name + 1);
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: data: address=0x%x length=0x%x type=0x%x flags=0x%x\n",
+      __func__,
+      IgvmData->Address,
+      IgvmData->Length,
+      IgvmData->DataType,
+      IgvmData->DataFlags
+      ));
+
+    // copy over hob so dxe can easily use it
+    BuildGuidDataHob (&gEfiIgvmDataHobGuid, IgvmData, sizeof (*IgvmData));
+
+    // reserve data block memory
+    BuildMemoryAllocationHob (
+      IgvmData->Address,
+      ALIGN_VALUE (IgvmData->Length, EFI_PAGE_SIZE),
+      EfiBootServicesData
+      );
+  }
 }

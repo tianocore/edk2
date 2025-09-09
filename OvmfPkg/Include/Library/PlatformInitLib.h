@@ -309,4 +309,10 @@ PlatformIgvmScanE820 (
   IN OUT  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
+VOID
+EFIAPI
+PlatformIgvmDataHobs (
+  VOID
+  );
+
 #endif // PLATFORM_INIT_LIB_H_
