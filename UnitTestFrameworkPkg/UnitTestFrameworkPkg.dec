@@ -23,7 +23,6 @@
   Library/SubhookLib/subhook
 
 [Includes.Common.Private]
-  PrivateInclude
   Library/CmockaLib/cmocka/include/cmockery
   Library/GoogleTestLib/googletest/googletest
   Library/GoogleTestLib/googletest/googlemock
@@ -44,14 +43,14 @@
   #
   HostMemoryAllocationBelowAddressLib|Include/Library/HostMemoryAllocationBelowAddressLib.h
 
-[LibraryClasses.Common.Private]
+[LibraryClasses.Common]
   ## @libraryclass Provides a unit test result report
   #
-  UnitTestResultReportLib|PrivateInclude/Library/UnitTestResultReportLib.h
+  UnitTestResultReportLib|Include/Library/UnitTestResultReportLib.h
 
   ## @libraryclass Provides boot-option routines useful in shell-based tests.
   #
-  UnitTestBootLib|PrivateInclude/Library/UnitTestBootLib.h
+  UnitTestBootLib|Include/Library/UnitTestBootLib.h
 
 [Guids]
   gUnitTestFrameworkPkgTokenSpaceGuid = { 0x833d3aba, 0x39b4, 0x43a2, { 0xb9, 0x30, 0x7a, 0x34, 0x53, 0x39, 0x31, 0xb3 } }
