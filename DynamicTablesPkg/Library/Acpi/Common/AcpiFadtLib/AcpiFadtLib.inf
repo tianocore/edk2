@@ -2,6 +2,7 @@
 #  FADT Table Generator
 #
 #  Copyright (c) 2017 - 2018, ARM Limited. All rights reserved.
+#  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -23,7 +24,7 @@
 [Sources.ARM, Sources.AARCH64]
   Arm/ArmFadtGenerator.c
 
-[Sources.IA32, Sources.X64]
+[Sources.X64]
   X64/X64FadtGenerator.c
 
 [Packages]
