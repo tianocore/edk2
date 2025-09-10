@@ -184,7 +184,8 @@ STATIC CONST CM_OBJ_PARSER  CmArmGenericWatchdogInfoParser[] = {
   { "Flags",               4, "0x%x",   NULL }
 };
 
-/** A parser for EArchCommonObjPciConfigSpaceInfo.
+/** A parser for EArchCommonObjPciConfigSpaceInfo or
+    EArchCommonObjMcfgPciConfigSpaceInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonPciConfigSpaceInfoParser[] = {
   { "BaseAddress",           8,                        "0x%llx", NULL },
@@ -930,6 +931,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryLatBwInfo,              CmArchCommonMemoryLatBwInfo),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryCacheInfo,              CmArchCommonMemoryCacheInfo),
   CM_PARSER_ADD_OBJECT (EArchCommonObjSpcrInfo,                     CmArchCommonObjSpcrInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMcfgPciConfigSpaceInfo,       CmArchCommonPciConfigSpaceInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 

@@ -2,6 +2,7 @@
   Build a table, each item is (Key, Info) pair.
   And give a interface of query a string out of a table.
 
+  Copyright (c) Microsoft Corporation. All rights reserved.<BR>
   Copyright (c) 2005 - 2024, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016-2019 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2023-2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
@@ -2752,6 +2753,14 @@ TABLE_ITEM  MemoryDeviceFormFactorTable[] = {
   {
     MemoryFormFactorCamm,
     L"  CAMM"
+  },
+  {
+    MemoryFormFactorCuDimm,
+    L"  CUDIMM"
+  },
+  {
+    MemoryFormFactorCsoDimm,
+    L"  CSODIMM"
   }
 };
 
@@ -2883,6 +2892,14 @@ TABLE_ITEM  MemoryDeviceTypeTable[] = {
   {
     MemoryTypeLpddr5,
     L"  LPDDR5"
+  },
+  {
+    MemoryTypeHBM3,
+    L"  HBM3 (High Bandwidth Memory Generation 3)"
+  },
+  {
+    MemoryTypeMrDimm,
+    L"  MRDIMM (Multi-Channel RDIMM)"
   }
 };
 
@@ -2973,6 +2990,10 @@ TABLE_ITEM  MemoryDeviceMemoryTechnologyTable[] = {
   {
     MemoryTechnologyIntelOptanePersistentMemory,
     L" Intel Optane Persistent Memory"
+  },
+  {
+    MemoryTechnologyMrDimmDeprecated,
+    L" MRDIMM"
   }
 };
 

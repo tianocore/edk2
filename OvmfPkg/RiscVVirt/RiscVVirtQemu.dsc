@@ -25,6 +25,11 @@
   FLASH_DEFINITION               = OvmfPkg/RiscVVirt/RiscVVirtQemu.fdf
 
   #
+  # Option to enable PEI booting.
+  #
+  DEFINE RISCVVIRT_PEI_BOOTING   = FALSE
+
+  #
   # Enable below options may cause build error or may not work on
   # the initial version of RISC-V package
   # Defines for default states.  These can be changed on the command line.
@@ -72,6 +77,9 @@
 !endif
 
 [BuildOptions]
+!if $(RISCVVIRT_PEI_BOOTING) == TRUE
+  GCC:*_*_*_CC_FLAGS             = -DRISCVVIRT_PEI_BOOTING
+!endif
   GCC:RELEASE_*_*_CC_FLAGS       = -DMDEPKG_NDEBUG
 !ifdef $(SOURCE_DEBUG_ENABLE)
   GCC:*_*_RISCV64_GENFW_FLAGS    = --keepexceptiontable
@@ -92,6 +100,8 @@
 !include MdePkg/MdeLibs.dsc.inc
 
 [LibraryClasses.common]
+  PlatformSecLib|OvmfPkg/RiscVVirt/Library/PlatformSecLib/PlatformSecLib.inf
+
   # Virtio Support
   VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
   VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
@@ -183,13 +193,14 @@
 [PcdsFixedAtBuild.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
-!if $(NETWORK_TLS_ENABLE) == TRUE
+!if $(NETWORK_TLS_ENABLE) == TRUE || $(SECURE_BOOT_ENABLE) == TRUE
   #
   # The cumulative and individual VOLATILE variable size limits should be set
   # high enough for accommodating several and/or large CA certificates.
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x80000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVolatileVariableSize|0x40000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x8400
 !endif
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"2.7"
@@ -280,6 +291,8 @@
 [LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM]
 !if $(TPM2_ENABLE) == TRUE
   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
+  Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
 !else
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
 !endif
@@ -294,15 +307,47 @@
   #
   # SEC Phase modules
   #
-  OvmfPkg/RiscVVirt/Sec/SecMain.inf {
+!if $(RISCVVIRT_PEI_BOOTING) == TRUE
+  UefiCpuPkg/SecCore/SecCoreNative.inf
+  OvmfPkg/RiscVVirt/PlatformPei/PlatformPeim.inf
+  MdeModulePkg/Core/Pei/PeiMain.inf
+  MdeModulePkg/Universal/PCD/Pei/Pcd.inf  {
+    <LibraryClasses>
+      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  }
+  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
+  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
+  }
+!if $(TPM2_ENABLE) == TRUE
+  OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
+  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf {
+    <LibraryClasses>
+      Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibRouter/Tpm2DeviceLibRouterPei.inf
+      NULL|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2InstanceLibDTpm.inf
+      HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCryptoRouterPei.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha256.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha512/HashInstanceLibSha512.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSm3/HashInstanceLibSm3.inf
+  }
+  SecurityPkg/Tcg/Tcg2PlatformPei/Tcg2PlatformPei.inf {
+    <LibraryClasses>
+      TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLib/PeiDxeTpmPlatformHierarchyLib.inf
+  }
+!endif
+!else
+  UefiCpuPkg/SecCore/SecCoreNative.inf {
     <LibraryClasses>
       ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
-      LzmaDecompressLib|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
-      PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
+      NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
       HobLib|EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf
       PrePiHobListPointerLib|OvmfPkg/RiscVVirt/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
       MemoryAllocationLib|EmbeddedPkg/Library/PrePiMemoryAllocationLib/PrePiMemoryAllocationLib.inf
   }
+!endif
 
   #
   # DXE
@@ -346,7 +391,7 @@
 !endif
   }
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
-  OvmfPkg/EnrollDefaultKeys/EnrollDefaultKeys.inf
+  OvmfPkg/RiscVVirt/Feature/SecureBoot/SecureBootDefaultKeysInit/SecureBootDefaultKeysInit.inf
 !else
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 !endif

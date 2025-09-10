@@ -11,10 +11,10 @@
 
 #include <Protocol/HardwareInterrupt.h>
 
-// 22838932-1a2d-4a47-aaba-f3f7cf569470
+// 32898322-2da1-474a-baaa-f3f7cf569470
 
 #define EFI_HARDWARE_INTERRUPT2_PROTOCOL_GUID \
-  { 0x32898322, 0x2d1a, 0x474a, \
+  { 0x32898322, 0x2da1, 0x474a, \
     { 0xba, 0xaa, 0xf3, 0xf7, 0xcf, 0x56, 0x94, 0x70 } }
 
 typedef enum {

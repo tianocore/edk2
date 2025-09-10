@@ -26,7 +26,7 @@
 
 #include "Tpm2DeviceLibFfa.h"
 
-UINT32  mFfaTpm2PartitionId = MAX_UINT32;
+UINT16  mFfaTpm2PartitionId = TPM2_FFA_PARTITION_ID_INVALID;
 
 /**
   Check the return status from the FF-A call and returns EFI_STATUS
@@ -84,7 +84,7 @@ TranslateTpmReturnStatus (
 }
 
 /**
-  This function is used to get the TPM service partition id.
+  This function is used to get the TPM service partition id via FF-A.
 
   @param[out] PartitionId - Supplies the pointer to the TPM service partition id.
 
@@ -92,11 +92,12 @@ TranslateTpmReturnStatus (
                                 and the response was copied to the Output buffer.
   @retval EFI_INVALID_PARAMETER The TPM command buffer is NULL or the TPM command
                                 buffer size is 0.
+  @retval EFI_DEVICE_ERROR      The TPM partition information is wrong.
   @retval EFI_DEVICE_ERROR      An error occurred in communication with the TPM.
 **/
 EFI_STATUS
-GetTpmServicePartitionId (
-  OUT UINT32  *PartitionId
+FfaTpm2GetServicePartitionId (
+  OUT UINT16  *PartitionId
   )
 {
   EFI_STATUS              Status;
@@ -111,20 +112,6 @@ GetTpmServicePartitionId (
 
   if (PartitionId == NULL) {
     Status = EFI_INVALID_PARAMETER;
-    goto Exit;
-  }
-
-  if (mFfaTpm2PartitionId != MAX_UINT32) {
-    *PartitionId = mFfaTpm2PartitionId;
-    Status       = EFI_SUCCESS;
-    goto Exit;
-  }
-
-  if (PcdGet16 (PcdTpmServiceFfaPartitionId) != 0) {
-    mFfaTpm2PartitionId = PcdGet16 (PcdTpmServiceFfaPartitionId);
-    *PartitionId        = mFfaTpm2PartitionId;
-    Status              = EFI_SUCCESS;
-
     goto Exit;
   }
 
@@ -164,11 +151,14 @@ GetTpmServicePartitionId (
     Status = EFI_INVALID_PARAMETER;
     DEBUG ((DEBUG_ERROR, "Invalid partition Info(%g). Count: %d, Size: %d\n", &gTpm2ServiceFfaGuid, Count, Size));
   } else {
-    TpmPartInfo         = (EFI_FFA_PART_INFO_DESC *)RxBuffer;
-    mFfaTpm2PartitionId = TpmPartInfo->PartitionId;
-    *PartitionId        = mFfaTpm2PartitionId;
-
-    Status = PcdSet16S (PcdTpmServiceFfaPartitionId, mFfaTpm2PartitionId);
+    TpmPartInfo  = (EFI_FFA_PART_INFO_DESC *)RxBuffer;
+    *PartitionId = TpmPartInfo->PartitionId;
+    if (TpmPartInfo->PartitionId == TPM2_FFA_PARTITION_ID_INVALID) {
+      /*
+       * Tpm partition id never be TPM2_FFA_PARTITION_ID_INVALID.
+       */
+      Status = EFI_DEVICE_ERROR;
+    }
   }
 
 RxRelease:
@@ -202,7 +192,7 @@ Tpm2GetInterfaceVersion (
     goto Exit;
   }
 
-  if (mFfaTpm2PartitionId == MAX_UINT32) {
+  if (mFfaTpm2PartitionId == TPM2_FFA_PARTITION_ID_INVALID) {
     GetTpmServicePartitionId (&mFfaTpm2PartitionId);
   }
 
@@ -212,7 +202,7 @@ Tpm2GetInterfaceVersion (
   Status = ArmFfaLibMsgSendDirectReq2 (mFfaTpm2PartitionId, &gTpm2ServiceFfaGuid, &FfaDirectReq2Args);
   while (Status == EFI_INTERRUPT_PENDING) {
     // We are assuming vCPU0 of the TPM SP since it is UP.
-    Status = ArmFfaLibRun (mFfaTpm2PartitionId, 0x00);
+    Status = ArmFfaLibRun (mFfaTpm2PartitionId, 0x00, &FfaDirectReq2Args);
   }
 
   if (EFI_ERROR (Status)) {
@@ -253,7 +243,7 @@ Tpm2GetFeatureInfo (
     goto Exit;
   }
 
-  if (mFfaTpm2PartitionId == MAX_UINT32) {
+  if (mFfaTpm2PartitionId == TPM2_FFA_PARTITION_ID_INVALID) {
     GetTpmServicePartitionId (&mFfaTpm2PartitionId);
   }
 
@@ -264,7 +254,7 @@ Tpm2GetFeatureInfo (
   Status = ArmFfaLibMsgSendDirectReq2 (mFfaTpm2PartitionId, &gTpm2ServiceFfaGuid, &FfaDirectReq2Args);
   while (Status == EFI_INTERRUPT_PENDING) {
     // We are assuming vCPU0 of the TPM SP since it is UP.
-    Status = ArmFfaLibRun (mFfaTpm2PartitionId, 0x00);
+    Status = ArmFfaLibRun (mFfaTpm2PartitionId, 0x00, &FfaDirectReq2Args);
   }
 
   if (EFI_ERROR (Status)) {
@@ -296,7 +286,7 @@ Tpm2ServiceStart (
   EFI_STATUS       Status;
   DIRECT_MSG_ARGS  FfaDirectReq2Args;
 
-  if (mFfaTpm2PartitionId == MAX_UINT32) {
+  if (mFfaTpm2PartitionId == TPM2_FFA_PARTITION_ID_INVALID) {
     GetTpmServicePartitionId (&mFfaTpm2PartitionId);
   }
 
@@ -308,7 +298,7 @@ Tpm2ServiceStart (
   Status = ArmFfaLibMsgSendDirectReq2 (mFfaTpm2PartitionId, &gTpm2ServiceFfaGuid, &FfaDirectReq2Args);
   while (Status == EFI_INTERRUPT_PENDING) {
     // We are assuming vCPU0 of the TPM SP since it is UP.
-    Status = ArmFfaLibRun (mFfaTpm2PartitionId, 0x00);
+    Status = ArmFfaLibRun (mFfaTpm2PartitionId, 0x00, &FfaDirectReq2Args);
   }
 
   if (EFI_ERROR (Status)) {
@@ -341,7 +331,7 @@ Tpm2RegisterNotification (
   EFI_STATUS       Status;
   DIRECT_MSG_ARGS  FfaDirectReq2Args;
 
-  if (mFfaTpm2PartitionId == MAX_UINT32) {
+  if (mFfaTpm2PartitionId == TPM2_FFA_PARTITION_ID_INVALID) {
     GetTpmServicePartitionId (&mFfaTpm2PartitionId);
   }
 
@@ -353,7 +343,7 @@ Tpm2RegisterNotification (
   Status = ArmFfaLibMsgSendDirectReq2 (mFfaTpm2PartitionId, &gTpm2ServiceFfaGuid, &FfaDirectReq2Args);
   while (Status == EFI_INTERRUPT_PENDING) {
     // We are assuming vCPU0 of the TPM SP since it is UP.
-    Status = ArmFfaLibRun (mFfaTpm2PartitionId, 0x00);
+    Status = ArmFfaLibRun (mFfaTpm2PartitionId, 0x00, &FfaDirectReq2Args);
   }
 
   if (EFI_ERROR (Status)) {
@@ -380,7 +370,7 @@ Tpm2UnregisterNotification (
   EFI_STATUS       Status;
   DIRECT_MSG_ARGS  FfaDirectReq2Args;
 
-  if (mFfaTpm2PartitionId == MAX_UINT32) {
+  if (mFfaTpm2PartitionId == TPM2_FFA_PARTITION_ID_INVALID) {
     GetTpmServicePartitionId (&mFfaTpm2PartitionId);
   }
 
@@ -390,7 +380,7 @@ Tpm2UnregisterNotification (
   Status = ArmFfaLibMsgSendDirectReq2 (mFfaTpm2PartitionId, &gTpm2ServiceFfaGuid, &FfaDirectReq2Args);
   while (Status == EFI_INTERRUPT_PENDING) {
     // We are assuming vCPU0 of the TPM SP since it is UP.
-    Status = ArmFfaLibRun (mFfaTpm2PartitionId, 0x00);
+    Status = ArmFfaLibRun (mFfaTpm2PartitionId, 0x00, &FfaDirectReq2Args);
   }
 
   if (EFI_ERROR (Status)) {
@@ -417,7 +407,7 @@ Tpm2FinishNotified (
   EFI_STATUS       Status;
   DIRECT_MSG_ARGS  FfaDirectReq2Args;
 
-  if (mFfaTpm2PartitionId == MAX_UINT32) {
+  if (mFfaTpm2PartitionId == TPM2_FFA_PARTITION_ID_INVALID) {
     GetTpmServicePartitionId (&mFfaTpm2PartitionId);
   }
 
@@ -427,7 +417,7 @@ Tpm2FinishNotified (
   Status = ArmFfaLibMsgSendDirectReq2 (mFfaTpm2PartitionId, &gTpm2ServiceFfaGuid, &FfaDirectReq2Args);
   while (Status == EFI_INTERRUPT_PENDING) {
     // We are assuming vCPU0 of the TPM SP since it is UP.
-    Status = ArmFfaLibRun (mFfaTpm2PartitionId, 0x00);
+    Status = ArmFfaLibRun (mFfaTpm2PartitionId, 0x00, &FfaDirectReq2Args);
   }
 
   if (EFI_ERROR (Status)) {

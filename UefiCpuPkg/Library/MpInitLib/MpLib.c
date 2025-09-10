@@ -2,7 +2,7 @@
   CPU MP Initialize Library common functions.
 
   Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2020 - 2024, AMD Inc. All rights reserved.<BR>
+  Copyright (C) 2020 - 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -1018,15 +1018,17 @@ FillExchangeInfoData (
   ExchangeInfo->Enable5LevelPaging = (BOOLEAN)(Cr4.Bits.LA57 == 1);
   DEBUG ((DEBUG_INFO, "%a: 5-Level Paging = %d\n", gEfiCallerBaseName, ExchangeInfo->Enable5LevelPaging));
 
-  ExchangeInfo->SevEsIsEnabled  = CpuMpData->SevEsIsEnabled;
-  ExchangeInfo->SevSnpIsEnabled = CpuMpData->SevSnpIsEnabled;
-  ExchangeInfo->GhcbBase        = (UINTN)CpuMpData->GhcbBase;
+  ExchangeInfo->SevEsIsEnabled        = CpuMpData->SevEsIsEnabled;
+  ExchangeInfo->SevSnpIsEnabled       = CpuMpData->SevSnpIsEnabled;
+  ExchangeInfo->GhcbBase              = (UINTN)CpuMpData->GhcbBase;
+  ExchangeInfo->ExtTopoAvail          = FALSE;
+  ExchangeInfo->SevSnpKnownInitApicId = FALSE;
 
   //
-  // Populate SEV-ES specific exchange data.
+  // Populate SEV-SNP specific exchange data.
   //
   if (ExchangeInfo->SevSnpIsEnabled) {
-    FillExchangeInfoDataSevEs (ExchangeInfo);
+    FillExchangeInfoDataSevSnp (ExchangeInfo);
   }
 
   //
@@ -1661,10 +1663,24 @@ ResetProcessorToIdleState (
 
   CpuMpData = GetCpuMpData ();
 
-  CpuMpData->WakeUpByInitSipiSipi = TRUE;
   if (CpuMpData == NULL) {
     DEBUG ((DEBUG_ERROR, "[%a] - Failed to get CpuMpData.  Aborting the AP reset to idle.\n", __func__));
     return;
+  }
+
+  CpuMpData->WakeUpByInitSipiSipi = TRUE;
+
+  //
+  // "CpuMpData->WakeUpByInitSipiSipi = TRUE" requires that the AP must be in Halt loop.
+  // If AP loop mode is not Halt loop, make sure that the AP is in the known non-executable state.
+  //
+  // AP could be in MONITOR/MWAIT state that could wake up the AP when setting WAKEUP_AP_SIGNAL in WakeUpAp().
+  // And then SendInitSipiSipi() in WakeupAp() could wake up the AP again to run the AP Wakeup vector.
+  // But the AP wakeup vector could be freed by the BSP while the AP is running it.
+  //
+  if (CpuMpData->ApLoopMode != ApInHltLoop) {
+    SendInitIpi (((CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob)[ProcessorNumber].ApicId);
+    MicroSecondDelay (PcdGet32 (PcdCpuInitIpiDelayInMicroSeconds));
   }
 
   WakeUpAP (CpuMpData, FALSE, ProcessorNumber, NULL, NULL, TRUE);

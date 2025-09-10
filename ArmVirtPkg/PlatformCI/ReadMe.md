@@ -12,15 +12,10 @@ supported.
 | Configuration name      | Architecture       | DSC File               | Additional Flags |
 | :----------             | :-----             | :-----                 | :----            |
 | AARCH64 - KVM Cloud HV  | AARCH64            | ArmVirtCloudHv.dsc     | None             |
-| ARM - KVM Cloud HV      | ARM                | ArmVirtCloudHv.dsc     | None             |
 | AARCH64 - kvmtool       | AARCH64            | ArmVirtKvmTool.dsc     | None             |
-| ARM - kvmtool           | ARM                | ArmVirtKvmTool.dsc     | None             |
 | AARCH64 - QEMU          | AARCH64            | ArmVirtQemu.dsc        | None             |
-| ARM - QEMU              | ARM                | ArmVirtQemu.dsc        | None             |
 | AARCH64 - QEMU Kernel   | AARCH64            | ArmVirtQemuKernel.dsc  | None             |
-| ARM - QEMU Kernel       | ARM                | ArmVirtQemuKernel.dsc  | None             |
 | AARCH64 - Xen HV        | AARCH64            | ArmVirtXen.dsc         | None             |
-| ARM - Xen HV            | ARM                | ArmVirtXen.dsc         | None             |
 
 ## EDK2 Developer environment
 

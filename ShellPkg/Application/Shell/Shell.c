@@ -971,14 +971,7 @@ ProcessCommandLine (
                   (VOID **)&UnicodeCollation
                   );
   if (EFI_ERROR (Status)) {
-    Status = gBS->LocateProtocol (
-                    &gEfiUnicodeCollationProtocolGuid,
-                    NULL,
-                    (VOID **)&UnicodeCollation
-                    );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+    return Status;
   }
 
   // Set default options
@@ -1262,9 +1255,11 @@ LocateStartupScript (
 
     InternalEfiShellSetEnv (L"homefilesystem", StartupScriptPath, TRUE);
 
-    StartupScriptPath = StrnCatGrow (&StartupScriptPath, &Size, ((FILEPATH_DEVICE_PATH *)FileDevicePath)->PathName, 0);
-    PathRemoveLastItem (StartupScriptPath);
-    StartupScriptPath = StrnCatGrow (&StartupScriptPath, &Size, mStartupScript, 0);
+    if ((DevicePathType (FileDevicePath) == MEDIA_DEVICE_PATH) && (DevicePathSubType (FileDevicePath) == MEDIA_FILEPATH_DP)) {
+      StartupScriptPath = StrnCatGrow (&StartupScriptPath, &Size, ((FILEPATH_DEVICE_PATH *)FileDevicePath)->PathName, 0);
+      PathRemoveLastItem (StartupScriptPath);
+      StartupScriptPath = StrnCatGrow (&StartupScriptPath, &Size, mStartupScript, 0);
+    }
   }
 
   //

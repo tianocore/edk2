@@ -87,6 +87,8 @@
   # Include/Guid/ArmMpCoreInfo.h
   gArmMpCoreInfoGuid = { 0xa4ee0728, 0xe5d7, 0x4ac5,  {0xb2, 0x1e, 0x65, 0x8e, 0xd8, 0x57, 0xe8, 0x34} }
 
+  gArmTransferListHobGuid = { 0xebe7bae8, 0xfe18, 0x43c5, { 0xbf, 0x3f, 0xf2, 0xb1, 0xaf, 0xb2, 0xdf, 0xb8 } }
+
 [Protocols.common]
   ## Arm System Control and Management Interface(SCMI) Base protocol
   ## ArmPkg/Include/Protocol/ArmScmiBaseProtocol.h
@@ -106,6 +108,7 @@
 [Ppis]
   ## Include/Ppi/ArmMpCoreInfo.h
   gArmMpCoreInfoPpiGuid = { 0x6847cc74, 0xe9ec, 0x4f8f, {0xa2, 0x9d, 0xab, 0x44, 0xe7, 0x54, 0xa8, 0xfc} }
+  gArmTransferListPpiGuid = { 0x6d2e9da1, 0x9414, 0x41c3, {0x86, 0xbe, 0xf9, 0x16, 0x9f, 0xb4, 0x76, 0x38} }
 
 [PcdsFeatureFlag.common]
   gArmTokenSpaceGuid.PcdCpuDxeProduceDebugSupport|FALSE|BOOLEAN|0x00000001
@@ -303,6 +306,7 @@
   gArmTokenSpaceGuid.PcdGicRedistributorsBase|0|UINT64|0x0000000E
   gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0|UINT64|0x0000000D
   gArmTokenSpaceGuid.PcdGicSgiIntId|0|UINT32|0x00000025
+  gArmTokenSpaceGuid.PcdGicIrsConfigFrameBase|0|UINT64|0x00000064
 
   #
   # Bases, sizes and translation offsets of IO and MMIO spaces, respectively.

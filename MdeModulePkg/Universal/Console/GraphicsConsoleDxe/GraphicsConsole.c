@@ -2,6 +2,7 @@
   This is the main routine for initializing the Graphics Console support routines.
 
 Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2025, Loongson Technology Corporation Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -257,7 +258,10 @@ InitializeGraphicsConsoleTextMode (
   // Reserve 2 modes for 80x25, 80x50 of graphics console.
   //
   NewModeBuffer = AllocateZeroPool (sizeof (GRAPHICS_CONSOLE_MODE_DATA) * (Count + 2));
-  ASSERT (NewModeBuffer != NULL);
+  if (NewModeBuffer == NULL) {
+    ASSERT (NewModeBuffer != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   //
   // Mode 0 and mode 1 is for 80x25, 80x50 according to UEFI spec.
@@ -422,7 +426,7 @@ GraphicsConsoleControllerDriverStart (
       //
       MaxMode = Private->GraphicsOutput->Mode->MaxMode;
 
-      for (ModeIndex = 0; ModeIndex < MaxMode; ModeIndex++) {
+      for (ModeIndex = 0; (UINTN)ModeIndex < MaxMode; ModeIndex++) {
         Status = Private->GraphicsOutput->QueryMode (
                                             Private->GraphicsOutput,
                                             ModeIndex,
@@ -1092,6 +1096,14 @@ GraphicsConsoleConOutTestString (
   Count = 0;
 
   while (WString[Count] != 0) {
+    //
+    // In TerminalConOutOutputString(), WIDE_CHAR/NARROW_CHAR will be ignored.
+    // So, WString contains WIDE_CHAR/NARROW_CHAR is also valid.
+    //
+    if ((WString[Count] == WIDE_CHAR) || (WString[Count] == NARROW_CHAR)) {
+      continue;
+    }
+
     Status = mHiiFont->GetGlyph (
                          mHiiFont,
                          WString[Count],
@@ -1802,7 +1814,10 @@ RegisterFontPackage (
 
   PackageLength = sizeof (EFI_HII_SIMPLE_FONT_PACKAGE_HDR) + mNarrowFontSize + 4;
   Package       = AllocateZeroPool (PackageLength);
-  ASSERT (Package != NULL);
+  if (Package == NULL) {
+    ASSERT (Package != NULL);
+    return;
+  }
 
   WriteUnaligned32 ((UINT32 *)Package, PackageLength);
   SimplifiedFont                       = (EFI_HII_SIMPLE_FONT_PACKAGE_HDR *)(Package + 4);

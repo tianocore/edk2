@@ -520,10 +520,6 @@ ShellCommandRunConnect (
         }
 
         Handle1 = ConvertHandleIndexToHandle ((UINTN)Intermediate);
-        if (EFI_ERROR (Status)) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"connect", Param1);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        }
       } else {
         Handle1 = NULL;
       }

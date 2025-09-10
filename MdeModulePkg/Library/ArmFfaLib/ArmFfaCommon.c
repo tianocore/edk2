@@ -21,11 +21,14 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 
 #include <IndustryStandard/ArmFfaSvc.h>
 #include <IndustryStandard/ArmFfaPartInfo.h>
 #include <IndustryStandard/ArmStdSmc.h>
+
+#include <Guid/ArmFfaRxTxBufferInfo.h>
 
 #include "ArmFfaCommon.h"
 
@@ -532,6 +535,7 @@ ErrorHandler:
 
   @param [in]   PartId       Partition id
   @param [in]   CpuNumber    Cpu number in partition
+  @param [out]  DirectMsgArg return arguments for direct msg resp/resp2
 
   @retval EFI_SUCCESS
   @retval Other              Error
@@ -540,10 +544,12 @@ ErrorHandler:
 EFI_STATUS
 EFIAPI
 ArmFfaLibRun (
-  IN  UINT16  PartId,
-  IN  UINT16  CpuNumber
+  IN  UINT16           PartId,
+  IN  UINT16           CpuNumber,
+  OUT DIRECT_MSG_ARGS  *DirectMsgArg OPTIONAL
   )
 {
+  EFI_STATUS    Status;
   ARM_FFA_ARGS  FfaArgs;
 
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
@@ -553,7 +559,39 @@ ArmFfaLibRun (
 
   ArmCallFfa (&FfaArgs);
 
-  return FfaArgsToEfiStatus (&FfaArgs);
+  Status = FfaArgsToEfiStatus (&FfaArgs);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (DirectMsgArg != NULL) {
+    ZeroMem (DirectMsgArg, sizeof (DIRECT_MSG_ARGS));
+
+    if (FfaArgs.Arg0 == ARM_FID_FFA_MSG_SEND_DIRECT_RESP) {
+      DirectMsgArg->Arg0 = FfaArgs.Arg3;
+      DirectMsgArg->Arg1 = FfaArgs.Arg4;
+      DirectMsgArg->Arg2 = FfaArgs.Arg5;
+      DirectMsgArg->Arg3 = FfaArgs.Arg6;
+      DirectMsgArg->Arg4 = FfaArgs.Arg7;
+    } else if (FfaArgs.Arg0 == ARM_FID_FFA_MSG_SEND_DIRECT_RESP2) {
+      DirectMsgArg->Arg0  = FfaArgs.Arg4;
+      DirectMsgArg->Arg1  = FfaArgs.Arg5;
+      DirectMsgArg->Arg2  = FfaArgs.Arg6;
+      DirectMsgArg->Arg3  = FfaArgs.Arg7;
+      DirectMsgArg->Arg4  = FfaArgs.Arg8;
+      DirectMsgArg->Arg5  = FfaArgs.Arg9;
+      DirectMsgArg->Arg6  = FfaArgs.Arg10;
+      DirectMsgArg->Arg7  = FfaArgs.Arg11;
+      DirectMsgArg->Arg8  = FfaArgs.Arg12;
+      DirectMsgArg->Arg9  = FfaArgs.Arg13;
+      DirectMsgArg->Arg10 = FfaArgs.Arg14;
+      DirectMsgArg->Arg11 = FfaArgs.Arg15;
+      DirectMsgArg->Arg12 = FfaArgs.Arg16;
+      DirectMsgArg->Arg13 = FfaArgs.Arg17;
+    }
+  }
+
+  return Status;
 }
 
 /**
@@ -749,6 +787,149 @@ ArmFfaLibCommonInit (
   }
 
   gFfaSupported = TRUE;
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Get first Rx/Tx Buffer allocation hob.
+  If UseGuid is TRUE, BufferAddr and BufferSize parameters are ignored.
+
+  @param[in]  BufferAddr       Buffer address
+  @param[in]  BufferSize       Buffer Size
+  @param[in]  UseGuid          Find MemoryAllocationHob using gArmFfaRxTxBufferInfoGuid.
+
+  @retval     NULL             Not found
+  @retval     Other            MemoryAllocationHob related to Rx/Tx buffer
+
+**/
+EFI_HOB_MEMORY_ALLOCATION *
+EFIAPI
+GetRxTxBufferAllocationHob (
+  IN EFI_PHYSICAL_ADDRESS  BufferAddr,
+  IN UINT64                BufferSize,
+  IN BOOLEAN               UseGuid
+  )
+{
+  EFI_PEI_HOB_POINTERS       Hob;
+  EFI_HOB_MEMORY_ALLOCATION  *MemoryAllocationHob;
+  EFI_PHYSICAL_ADDRESS       MemoryBase;
+  UINT64                     MemorySize;
+
+  if (!UseGuid && (BufferAddr == 0x00)) {
+    return NULL;
+  }
+
+  MemoryAllocationHob = NULL;
+  Hob.Raw             = GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION);
+
+  while (Hob.Raw != NULL) {
+    if (Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiConventionalMemory) {
+      continue;
+    }
+
+    MemoryBase = Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress;
+    MemorySize = Hob.MemoryAllocation->AllocDescriptor.MemoryLength;
+
+    if ((!UseGuid && (BufferAddr >= MemoryBase) &&
+         ((BufferAddr + BufferSize) <= (MemoryBase + MemorySize))) ||
+        (UseGuid && CompareGuid (
+                      &gArmFfaRxTxBufferInfoGuid,
+                      &Hob.MemoryAllocation->AllocDescriptor.Name
+                      )))
+    {
+      MemoryAllocationHob = (EFI_HOB_MEMORY_ALLOCATION *)Hob.Raw;
+      break;
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+    Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw);
+  }
+
+  return MemoryAllocationHob;
+}
+
+/**
+  Get Rx/Tx buffer MinSizeAndAign and MaxSize
+
+  @param[out] MinSizeAndAlign  Minimum size of Buffer.
+
+  @retval EFI_SUCCESS
+  @retval EFI_UNSUPPORTED          Wrong min size received from SPMC
+  @retval EFI_INVALID_PARAMETER    Wrong buffer size
+  @retval Others                   Failure of ArmFfaLibGetFeatures()
+
+**/
+EFI_STATUS
+EFIAPI
+GetRxTxBufferMinSizeAndAlign (
+  OUT UINTN  *MinSizeAndAlign
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       MinAndAlign;
+  UINTN       MaxSize;
+  UINTN       Property1;
+  UINTN       Property2;
+
+  Status = ArmFfaLibGetFeatures (
+             ARM_FID_FFA_RXTX_MAP,
+             FFA_RXTX_MAP_INPUT_PROPERTY_DEFAULT,
+             &Property1,
+             &Property2
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Failed to get RX/TX buffer property... Status: %r\n",
+      __func__,
+      Status
+      ));
+    return Status;
+  }
+
+  MinAndAlign =
+    ((Property1 >>
+      ARM_FFA_BUFFER_MINSIZE_AND_ALIGN_SHIFT) &
+     ARM_FFA_BUFFER_MINSIZE_AND_ALIGN_MASK);
+
+  switch (MinAndAlign) {
+    case ARM_FFA_BUFFER_MINSIZE_AND_ALIGN_4K:
+      MinAndAlign = SIZE_4KB;
+      break;
+    case ARM_FFA_BUFFER_MINSIZE_AND_ALIGN_16K:
+      MinAndAlign = SIZE_16KB;
+      break;
+    case ARM_FFA_BUFFER_MINSIZE_AND_ALIGN_64K:
+      MinAndAlign = SIZE_64KB;
+      break;
+    default:
+      DEBUG ((DEBUG_ERROR, "%a: Invalid MinSizeAndAlign: 0x%x\n", __func__, MinAndAlign));
+      return EFI_UNSUPPORTED;
+  }
+
+  MaxSize =
+    (((Property1 >>
+       ARM_FFA_BUFFER_MAXSIZE_PAGE_COUNT_SHIFT) &
+      ARM_FFA_BUFFER_MAXSIZE_PAGE_COUNT_MASK));
+
+  MaxSize = ((MaxSize == 0) ? MAX_UINTN : (MaxSize * MinAndAlign));
+
+  if ((MinAndAlign > (PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE)) ||
+      (MaxSize < (PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE)))
+  {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Buffer is too small! MinSize: 0x%x, MaxSize: 0x%x, PageCount: %d\n",
+      __func__,
+      MinAndAlign,
+      MaxSize,
+      PcdGet64 (PcdFfaTxRxPageCount)
+      ));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *MinSizeAndAlign = MinAndAlign;
 
   return EFI_SUCCESS;
 }

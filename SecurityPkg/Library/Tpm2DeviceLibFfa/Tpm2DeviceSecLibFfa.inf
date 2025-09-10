@@ -1,0 +1,51 @@
+## @file
+#  Provides function interfaces to communicate with TPM 2.0 device
+#
+#  This library helps to use TPM 2.0 device in library function API
+#  based on FF-A using Command Response Buffer (CRB).
+#
+# Copyright (c), Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Tpm2DeviceSecLibFfa
+  FILE_GUID                      = d66e7482-615c-11f0-91d0-47f6d24396e9
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Tpm2DeviceLib|SEC
+  CONSTRUCTOR                    = Tpm2DeviceLibFfaConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources.common]
+  Tpm2DeviceLibFfa.c
+  Tpm2ServiceFfaRaw.c
+  Tpm2DeviceLibFfaBase.c
+  Tpm2Ptp.c
+  Tpm2DeviceLibFfa.h
+  Tpm2InfoSecFfa.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  TimerLib
+  BaseMemoryLib
+  IoLib
+  ArmFfaLib
+
+[Guids]
+  gTpm2ServiceFfaGuid
+
+[Pcd.common]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress            ## CONSUMES
