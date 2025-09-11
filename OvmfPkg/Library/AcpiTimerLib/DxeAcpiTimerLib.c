@@ -17,6 +17,8 @@
 #include <Library/PciLib.h>
 #include <Library/PlatformInitLib.h>
 #include <OvmfPlatforms.h>
+#include "AcpiTimerLib.h"
+#include "TscTimerLib.h"
 
 //
 // Cached ACPI Timer IO Address
@@ -106,4 +108,41 @@ InternalAcpiGetTimerTick (
   //   Return the current ACPI timer value.
   //
   return IoRead32 (mAcpiTimerIoAddr);
+}
+
+/**
+  Retrieves the current value of a 64-bit free running performance counter.
+
+  @return The current value of the free running performance counter.
+
+**/
+UINT64
+EFIAPI
+GetPerformanceCounter (
+  VOID
+  )
+{
+  return IsTscTimerFrequencyAvailable () ? TscGetPerformanceCounter () : AcpiGetPerformanceCounter ();
+}
+
+/**
+  Retrieves the 64-bit frequency in Hz and the range of performance counter
+  values.
+
+  @param  StartValue  The value the performance counter starts with when it
+                      rolls over.
+  @param  EndValue    The value that the performance counter ends with before
+                      it rolls over.
+
+  @return The frequency in Hz.
+
+**/
+UINT64
+EFIAPI
+GetPerformanceCounterProperties (
+  OUT      UINT64  *StartValue   OPTIONAL,
+  OUT      UINT64  *EndValue     OPTIONAL
+  )
+{
+  return IsTscTimerFrequencyAvailable () ? TscGetPerformanceCounterProperties (StartValue, EndValue) : AcpiGetPerformanceCounterProperties (StartValue, EndValue);
 }

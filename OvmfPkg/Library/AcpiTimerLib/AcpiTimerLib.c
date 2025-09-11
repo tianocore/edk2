@@ -124,8 +124,7 @@ NanoSecondDelay (
 
 **/
 UINT64
-EFIAPI
-GetPerformanceCounter (
+AcpiGetPerformanceCounter (
   VOID
   )
 {
@@ -156,8 +155,7 @@ GetPerformanceCounter (
 
 **/
 UINT64
-EFIAPI
-GetPerformanceCounterProperties (
+AcpiGetPerformanceCounterProperties (
   OUT      UINT64  *StartValue   OPTIONAL,
   OUT      UINT64  *EndValue     OPTIONAL
   )

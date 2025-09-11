@@ -1,38 +1,27 @@
 /** @file
-  Internal definitions for ACPI Timer Library
+  Internal definitions for TSC Timer Library
 
   Copyright (C) 2014, Gabriel L. Somlo <somlo@cmu.edu>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _ACPI_TIMER_LIB_INTERNAL_H_
-#define _ACPI_TIMER_LIB_INTERNAL_H_
+#ifndef _TSC_TIMER_LIB_INTERNAL_H_
+#define _TSC_TIMER_LIB_INTERNAL_H_
 
 /**
-  Internal function to read the current tick counter of ACPI.
-
-  @return The tick counter read.
-
-**/
-UINT32
-InternalAcpiGetTimerTick (
-  VOID
-  );
-
-/**
-  Get ACPI-based performance counter value.
+  Get TSC-based performance counter value.
 
   @return The current value of the free running performance counter.
 
 **/
 UINT64
-AcpiGetPerformanceCounter (
+TscGetPerformanceCounter (
   VOID
   );
 
 /**
-  Get ACPI-based performance counter properties.
+  Get TSC-based performance counter properties.
 
   @param  StartValue  The value the performance counter starts with when it
                       rolls over.
@@ -43,9 +32,20 @@ AcpiGetPerformanceCounter (
 
 **/
 UINT64
-AcpiGetPerformanceCounterProperties (
+TscGetPerformanceCounterProperties (
   OUT      UINT64  *StartValue   OPTIONAL,
   OUT      UINT64  *EndValue     OPTIONAL
   );
 
-#endif // _ACPI_TIMER_LIB_INTERNAL_H_
+/**
+  Check if TSC timer frequency is available.
+
+  @return TRUE if TSC frequency is available, FALSE otherwise.
+
+**/
+BOOLEAN
+IsTscTimerFrequencyAvailable (
+  VOID
+  );
+
+#endif // _TSC_TIMER_LIB_INTERNAL_H_
