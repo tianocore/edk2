@@ -1,0 +1,47 @@
+## @file
+# Module entry point library for Standalone MM core.
+#
+# Copyright (c) 2025 Rivos Inc.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = StandaloneMmCoreEntryPoint
+  FILE_GUID                      = 6D1B60B2-5DD1-4523-8F0A-607DB4D6B0CE
+  MODULE_TYPE                    = MM_CORE_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = StandaloneMmCoreEntryPoint|MM_CORE_STANDALONE
+
+#
+#  VALID_ARCHITECTURES           = RISCV64
+#
+
+[Sources]
+  RiscV64/StandaloneMmCoreEntryPoint.c
+  RiscV64/EntryPoint.S
+  RiscV64/CreateHobList.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  StackCheckLib
+
+[LibraryClasses.RISCV64]
+  RiscVSbiLib
+  CommonRiscvMpxyLib
+[Guids]
+  gMpInformationHobGuid
+  gEfiMmPeiMmramMemoryReserveGuid
+
+[Protocols.RISCV64]
+  gEdkiiPiMmCpuDriverEpProtocolGuid

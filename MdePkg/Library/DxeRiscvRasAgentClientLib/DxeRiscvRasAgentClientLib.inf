@@ -1,0 +1,40 @@
+# @file
+# Provides implementation of the library class RasAgentClient for RAS on RISC-V architecture
+#
+# @copyright
+# Copyright (c) Ventana Micro Systems, Inc.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION     = 1.27
+  BASE_NAME       = DxeRasAgentClientLib
+  MODULE_UNI_FILE = DxeRiscvRasAgentClient.uni
+  FILE_GUID       = d1342a6d-43fb-41e4-a998-2227461c1901
+  MODULE_TYPE     = DXE_DRIVER
+  VERSION_STRING  = 1.0
+  LIBRARY_CLASS   = DxeRasAgentClientLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[Sources]
+  DxeRiscvRasAgentClient.c
+
+[LibraryClasses]
+  DebugLib
+  UefiBootServicesTableLib
+  RiscVSbiLib
+  SafeIntLib
+  CommonRiscvMpxyLib
+
+[Protocols]
+  gEfiMmCommunication2ProtocolGuid
+
+[Guids]
+  gMmHestGetErrorSourceInfoGuid
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdMMPassThroughEnable

@@ -49,6 +49,7 @@
 [Protocols]
   gEfiMmEntryNotifyProtocolGuid            = { 0x9bfbcc5f, 0x6435, 0x46d3, { 0xb9, 0xa5, 0x70, 0xfb, 0xa4, 0x71, 0xe1, 0x26 }}
   gEfiMmExitNotifyProtocolGuid             = { 0x0e265f48, 0x47c0, 0x471f, { 0x9c, 0x83, 0xc6, 0xd6, 0x57, 0x64, 0x21, 0xa4 }}
+  gEdkiiPiMmCpuDriverEpProtocolGuid        = { 0x6ecbd5a1, 0xc0f8, 0x4702, { 0x83, 0x01, 0x4f, 0xc2, 0xc5, 0x47, 0x0a, 0x51 }}
 
 [Ppis]
   gMmCoreFvLocationPpiGuid                 = { 0x47a00618, 0x237a, 0x4386, { 0x8f, 0xc5, 0x2a, 0x86, 0xd8, 0xac, 0x41, 0x05 }}
@@ -79,3 +80,8 @@
   #   FALSE - Do not restart MM Dispatcher once MM Entry Point is registered.<BR>
   # @Prompt Restart MM Dispatcher once MM Entry Point is registered.
   gStandaloneMmPkgTokenSpaceGuid.PcdRestartMmDispatcherOnceMmEntryRegistered|TRUE|BOOLEAN|0x00000002
+
+[PcdsFeatureFlag.RISCV64]
+  # The RiscV Standalone MM FV offset and size
+  gStandaloneMmPkgTokenSpaceGuid.PcdRiscVStandaloneMmFvBase|0|UINT64|0x00000005
+  gStandaloneMmPkgTokenSpaceGuid.PcdRiscVStandaloneMmFvSize|0|UINT32|0x00000004

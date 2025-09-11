@@ -312,6 +312,10 @@
   #
   StackCheckLib|Include/Library/StackCheckLib.h
 
+  ##  @libraryclass Provides the RAS agent client to retrieve error source informations.
+  #
+  DxeRasAgentClientLib|Include/Library/DxeRasAgentClient.h
+
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides services to generate random number.
   #
@@ -352,6 +356,7 @@
 [LibraryClasses.RISCV64]
   ##  @libraryclass  Provides function to make ecalls to SBI
   BaseRiscVSbiLib|Include/Library/BaseRiscVSbiLib.h
+  CommonRiscvMpxyLib|Include/Library/DxeRiscvMpxy.h
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides an interface to Arm registers.
@@ -955,6 +960,9 @@
   ## Include/Guid/Cper.h
   gEfiIa32X64ErrorTypeMsCheckGuid    = { 0x48AB7F57, 0xDC34, 0x4f6c, { 0xA7, 0xD3, 0xB0, 0xB5, 0xB0, 0xA7, 0x43, 0x14 }}
 
+[Guids.RISCV64]
+  gMmHestGetErrorSourceInfoGuid = { 0x7d602951, 0x678e, 0x4cc4, { 0x98, 0xd9, 0xe3, 0x76, 0x04, 0xf6, 0x93, 0x0d } }
+
 [Ppis]
   ## Include/Ppi/MasterBootMode.h
   gEfiPeiMasterBootModePpiGuid = { 0x7408d748, 0xfc8c, 0x4ee6, {0x92, 0x88, 0xc4, 0xbe, 0xc0, 0x92, 0xa4, 0x10 } }
@@ -1210,6 +1218,9 @@
 
   ## Include/Protocol/Capsule.h
   gEfiCapsuleArchProtocolGuid    = { 0x5053697E, 0x2CBC, 0x4819, { 0x90, 0xD9, 0x05, 0x80, 0xDE, 0xEE, 0x57, 0x54 }}
+
+  gMmHestErrorSourceDescProtocolGuid = { 0x560bf236, 0xa4a8, 0x4d69, { 0xbc, 0xf6, 0xc2, 0x97, 0x24, 0x10, 0x9d, 0x91 } }
+
 
   #
   # Protocols defined in PI 1.2.
@@ -2501,6 +2512,10 @@
   #  This byte is 20h when the BMC is the responder (section 14.4.3).
   # @Prompt IPMI Serial responder Software ID
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialResponderAddress|0x20|UINT8|0x00000051
+
+  ## This option chooses between pass through and MM mode of communication.
+  # @Prompt Mode of transport for management service requests
+  gEfiMdePkgTokenSpaceGuid.PcdMMPassThroughEnable|FALSE|BOOLEAN|0x10000037
 
   ## This is requester's LUN for IPMI Serial.
   # @Prompt IPMI Serial requester LUN

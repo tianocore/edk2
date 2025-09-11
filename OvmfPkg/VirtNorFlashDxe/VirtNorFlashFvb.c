@@ -740,6 +740,38 @@ FvbRead (
 
 
  **/
+#if !FixedPcdGetBool (PcdMMPassThroughEnable)
+EFI_STATUS
+EFIAPI
+FvbWrite (
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *This,
+  IN        EFI_LBA                              Lba,
+  IN        UINTN                                Offset,
+  IN OUT    UINTN                                *NumBytes,
+  IN        UINT8                                *Buffer
+  )
+{
+  EFI_STATUS          Status;
+  NOR_FLASH_INSTANCE  *Instance;
+
+  Instance = INSTANCE_FROM_FVB_THIS (This);
+
+  Status = NorFlashWriteSingleBlock (
+             Instance->DeviceBaseAddress,
+             Instance->RegionBaseAddress,
+             Instance->StartLba + Lba,
+             Instance->LastBlock,
+             Instance->BlockSize,
+             Instance->Size,
+             Offset,
+             NumBytes,
+             Buffer,
+             Instance->ShadowBuffer
+             );
+  return Status;
+}
+
+#else
 EFI_STATUS
 EFIAPI
 FvbWrite (
@@ -786,6 +818,8 @@ FvbWrite (
   return Status;
 }
 
+#endif
+
 /**
  Erases and initialises a firmware volume block.
 
@@ -829,6 +863,109 @@ FvbWrite (
                                  not exist in the firmware volume.
 
  **/
+#if !FixedPcdGetBool (PcdMMPassThroughEnable)
+EFI_STATUS
+EFIAPI
+FvbEraseBlocks (
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *This,
+  ...
+  )
+{
+  EFI_STATUS          Status;
+  VA_LIST             Args;
+  UINTN               BlockAddress; // Physical address of Lba to erase
+  EFI_LBA             StartingLba;  // Lba from which we start erasing
+  UINTN               NumOfLba;     // Number of Lba blocks to erase
+  NOR_FLASH_INSTANCE  *Instance;
+
+  Instance = INSTANCE_FROM_FVB_THIS (This);
+
+  DEBUG ((DEBUG_BLKIO, "FvbEraseBlocks()\n"));
+
+  Status = EFI_SUCCESS;
+
+  // Before erasing, check the entire list of parameters to ensure all specified blocks are valid
+
+  VA_START (Args, This);
+  do {
+    // Get the Lba from which we start erasing
+    StartingLba = VA_ARG (Args, EFI_LBA);
+
+    // Have we reached the end of the list?
+    if (StartingLba == EFI_LBA_LIST_TERMINATOR) {
+      // Exit the while loop
+      break;
+    }
+
+    // How many Lba blocks are we requested to erase?
+    NumOfLba = VA_ARG (Args, UINTN);
+
+    // All blocks must be within range
+    DEBUG ((
+      DEBUG_BLKIO,
+      "FvbEraseBlocks: Check if: ( StartingLba=%ld + NumOfLba=%Lu - 1 ) > LastBlock=%ld.\n",
+      Instance->StartLba + StartingLba,
+      (UINT64)NumOfLba,
+      Instance->LastBlock
+      ));
+    if ((NumOfLba == 0) || ((Instance->StartLba + StartingLba + NumOfLba - 1) > Instance->LastBlock)) {
+      VA_END (Args);
+      DEBUG ((DEBUG_ERROR, "FvbEraseBlocks: ERROR - Lba range goes past the last Lba.\n"));
+      Status = EFI_INVALID_PARAMETER;
+      goto EXIT;
+    }
+  } while (TRUE);
+
+  VA_END (Args);
+
+  //
+  // To get here, all must be ok, so start erasing
+  //
+  VA_START (Args, This);
+  do {
+    // Get the Lba from which we start erasing
+    StartingLba = VA_ARG (Args, EFI_LBA);
+
+    // Have we reached the end of the list?
+    if (StartingLba == EFI_LBA_LIST_TERMINATOR) {
+      // Exit the while loop
+      break;
+    }
+
+    // How many Lba blocks are we requested to erase?
+    NumOfLba = VA_ARG (Args, UINTN);
+
+    // Go through each one and erase it
+    while (NumOfLba > 0) {
+      // Get the physical address of Lba to erase
+      BlockAddress = GET_NOR_BLOCK_ADDRESS (
+                       Instance->RegionBaseAddress,
+                       Instance->StartLba + StartingLba,
+                       Instance->BlockSize
+                       );
+
+      // Erase it
+      DEBUG ((DEBUG_BLKIO, "FvbEraseBlocks: Erasing Lba=%ld @ 0x%08x.\n", Instance->StartLba + StartingLba, BlockAddress));
+      Status = NorFlashUnlockAndEraseSingleBlock (Instance->DeviceBaseAddress, BlockAddress);
+      if (EFI_ERROR (Status)) {
+        VA_END (Args);
+        Status = EFI_DEVICE_ERROR;
+        goto EXIT;
+      }
+
+      // Move to the next Lba
+      StartingLba++;
+      NumOfLba--;
+    }
+  } while (TRUE);
+
+  VA_END (Args);
+
+EXIT:
+  return Status;
+}
+
+#else
 EFI_STATUS
 EFIAPI
 FvbEraseBlocks (
@@ -944,6 +1081,8 @@ FvbEraseBlocks (
 EXIT:
   return Status;
 }
+
+#endif
 
 /**
   Fixup internal data so that EFI can be call in virtual mode.
