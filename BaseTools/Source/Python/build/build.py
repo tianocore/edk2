@@ -1799,8 +1799,8 @@ class Build():
                         #
                         # Check whether the set fix address is above 4G for 32bit image.
                         #
-                        if (Arch == 'IA32' or Arch == 'ARM') and self.LoadFixAddress != 0xFFFFFFFFFFFFFFFF and self.LoadFixAddress >= 0x100000000:
-                            EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS can't be set to larger than or equal to 4G for the platform with IA32 or ARM arch modules")
+                        if Arch == 'IA32' and self.LoadFixAddress != 0xFFFFFFFFFFFFFFFF and self.LoadFixAddress >= 0x100000000:
+                            EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS can't be set to larger than or equal to 4G for the platform with IA32 arch modules")
                     #
                     # Get Module List
                     #
@@ -1985,8 +1985,8 @@ class Build():
                         #
                         # Check whether the set fix address is above 4G for 32bit image.
                         #
-                        if (Arch == 'IA32' or Arch == 'ARM') and self.LoadFixAddress != 0xFFFFFFFFFFFFFFFF and self.LoadFixAddress >= 0x100000000:
-                            EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS can't be set to larger than or equal to 4G for the platorm with IA32 or ARM arch modules")
+                        if Arch == 'IA32' and self.LoadFixAddress != 0xFFFFFFFFFFFFFFFF and self.LoadFixAddress >= 0x100000000:
+                            EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS can't be set to larger than or equal to 4G for the platorm with IA32 arch modules")
                     #
                     # Get Module List
                     #
@@ -2316,8 +2316,8 @@ class Build():
                         #
                         # Check whether the set fix address is above 4G for 32bit image.
                         #
-                        if (Arch == 'IA32' or Arch == 'ARM') and self.LoadFixAddress != 0xFFFFFFFFFFFFFFFF and self.LoadFixAddress >= 0x100000000:
-                            EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS can't be set to larger than or equal to 4G for the platorm with IA32 or ARM arch modules")
+                        if Arch == 'IA32' and self.LoadFixAddress != 0xFFFFFFFFFFFFFFFF and self.LoadFixAddress >= 0x100000000:
+                            EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS can't be set to larger than or equal to 4G for the platorm with IA32 arch modules")
 
                     #
                     # Rebase module to the preferred memory address before GenFds

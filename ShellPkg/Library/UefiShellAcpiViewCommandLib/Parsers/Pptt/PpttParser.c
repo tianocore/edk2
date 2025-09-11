@@ -23,7 +23,7 @@ STATIC CONST UINT32                                   *NumberOfPrivateResources;
 STATIC CONST EFI_ACPI_6_4_PPTT_STRUCTURE_CACHE_FLAGS  *CacheFlags;
 STATIC ACPI_DESCRIPTION_HEADER_INFO                   AcpiHdrInfo;
 
-#if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+#if defined (MDE_CPU_AARCH64)
 
 /**
   Increment the error count and print an error that a required flag is missing.
@@ -65,7 +65,7 @@ ValidateCacheFlags (
   IN VOID    *Context
   )
 {
- #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+ #if defined (MDE_CPU_AARCH64)
   CacheFlags = (EFI_ACPI_6_4_PPTT_STRUCTURE_CACHE_FLAGS *)Ptr;
 
   if (CacheFlags == NULL) {
@@ -140,7 +140,7 @@ ValidateCacheNumberOfSets (
     return;
   }
 
- #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+ #if defined (MDE_CPU_AARCH64)
   if (NumberOfSets > PPTT_ARM_CCIDX_CACHE_NUMBER_OF_SETS_MAX) {
     IncrementErrorCount ();
     Print (
@@ -211,7 +211,7 @@ ValidateCacheLineSize (
   IN VOID    *Context
   )
 {
- #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+ #if defined (MDE_CPU_AARCH64)
   // Reference: ARM Architecture Reference Manual ARMv8 (D.a)
   // Section D12.2.25: CCSIDR_EL1, Current Cache Size ID Register
   //   LineSize, bits [2:0]

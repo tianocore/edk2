@@ -40,10 +40,9 @@ one of the dynamic stack cookie entry points when possible.
 
 `StackCheckLib` provides the stack cookie checking functionality per architecture and
 toolchain. The currently supported pairs are IA32{GCC,MSVC}, X64{GCC, MSVC},
-ARM{GCC, MSVC}, and AARCH64{GCC, MSVC}. `StackCheckLib` is agnostic as to
-whether the stack cookie was updated during build time or run time; it simply
-checks the cookie in the MSVC case and in both GCC and MSVC responds to stack
-cookie checking failures.
+and AARCH64{GCC, MSVC}. `StackCheckLib` is agnostic as to whether the stack cookie was
+updated during build time or run time; it simply checks the cookie in the MSVC case and
+in both GCC and MSVC responds to stack cookie checking failures.
 
 To add support for other architectures/toolchains, additional assembly files
 should be added to `StackCheckLib.inf` and scoped to that architecture/toolchain.
@@ -102,11 +101,6 @@ PcdStackCookieExceptionVector.
 
 - On IA32 and X64 platforms, PcdStackCookieExceptionVector is used as an index into the
 Interrupt Descriptor Table.
-- On ARM platforms, a software interrupt (`SWI`) is called with the value of
-PcdStackCookieExceptionVector. The value can be retrieved by the handler by reading
-bits [7:0] of the instruction opcode which will allow the handler to determine if the
-interrupt was triggered by the stack cookie check. Reference:
-[Arm A64 Instruction Set Architecture Version 2024-3](https://developer.arm.com/documentation/ddi0597/2024-03/Base-Instructions/SVC--Supervisor-Call-?lang=en)
 - On AARCH64 platforms, a supervisor call (`SVC`) is called with the value
 of PcdStackCookieExceptionVector. This value can similarly be retrieved by the
 handler to determine if the interrupt was triggered by the stack cookie check. Reference:

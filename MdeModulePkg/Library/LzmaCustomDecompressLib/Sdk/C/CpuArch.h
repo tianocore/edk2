@@ -46,20 +46,6 @@ MY_CPU_LE_UNALIGN means that CPU is LITTLE ENDIAN and CPU supports unaligned mem
 #define MY_CPU_64BIT
 #endif
 
-#if  defined (_M_ARM) \
-  || defined (_M_ARM_NT) \
-  || defined (_M_ARMT) \
-  || defined (__arm__) \
-  || defined (__thumb__) \
-  || defined (__ARMEL__) \
-  || defined (__ARMEB__) \
-  || defined (__THUMBEL__) \
-  || defined (__THUMBEB__)
-#define MY_CPU_ARM
-#define MY_CPU_NAME  "arm"
-#define MY_CPU_32BIT
-#endif
-
 #if  defined (_M_IA64) \
   || defined (__ia64__)
 #define MY_CPU_IA64
@@ -105,10 +91,6 @@ MY_CPU_LE_UNALIGN means that CPU is LITTLE ENDIAN and CPU supports unaligned mem
 
 #ifdef _WIN32
 
-  #ifdef MY_CPU_ARM
-#define MY_CPU_ARM_LE
-  #endif
-
   #ifdef MY_CPU_ARM64
 #define MY_CPU_ARM64_LE
   #endif
@@ -120,12 +102,9 @@ MY_CPU_LE_UNALIGN means that CPU is LITTLE ENDIAN and CPU supports unaligned mem
 #endif
 
 #if defined (MY_CPU_X86_OR_AMD64) \
-  || defined (MY_CPU_ARM_LE) \
   || defined (MY_CPU_ARM64_LE) \
   || defined (MY_CPU_IA64_LE) \
   || defined (__LITTLE_ENDIAN__) \
-  || defined (__ARMEL__) \
-  || defined (__THUMBEL__) \
   || defined (__AARCH64EL__) \
   || defined (__MIPSEL__) \
   || defined (__MIPSEL) \
@@ -136,8 +115,6 @@ MY_CPU_LE_UNALIGN means that CPU is LITTLE ENDIAN and CPU supports unaligned mem
 #endif
 
 #if defined (__BIG_ENDIAN__) \
-  || defined (__ARMEB__) \
-  || defined (__THUMBEB__) \
   || defined (__AARCH64EB__) \
   || defined (__MIPSEB__) \
   || defined (__MIPSEB) \

@@ -20,7 +20,7 @@
   LIBRARY_CLASS                  = IoLib
 
 #
-#  VALID_ARCHITECTURES           = ARM AARCH64
+#  VALID_ARCHITECTURES           = AARCH64
 #
 
 [Sources]
@@ -28,11 +28,6 @@
   BaseIoLibIntrinsicInternal.h
   IoHighLevel.c
 
-[Sources.ARM]
-  IoLibArmVirt.c
-  Arm/ArmVirtMmio.S       | GCC
-
-[Sources.AARCH64]
   IoLibArmVirt.c
   AArch64/ArmVirtMmio.S   | GCC
   AArch64/ArmVirtMmio.asm | MSFT

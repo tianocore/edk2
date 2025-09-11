@@ -16,7 +16,7 @@
   LIBRARY_CLASS                  = NULL
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
 #
 
 [Sources]

@@ -23,12 +23,7 @@
   ProcessorSubClass.c
   ProcessorSubClassStrings.uni
   SmbiosProcessor.h
-
-[Sources.AARCH64]
   SmbiosProcessorAArch64.c
-
-[Sources.ARM]
-  SmbiosProcessorArm.c
 
 [Packages]
   ArmPkg/ArmPkg.dec

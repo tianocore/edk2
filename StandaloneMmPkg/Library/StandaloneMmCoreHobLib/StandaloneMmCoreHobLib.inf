@@ -22,7 +22,7 @@
   LIBRARY_CLASS                  = HobLib|MM_CORE_STANDALONE
 
 #
-#  VALID_ARCHITECTURES           = X64 AARCH64 ARM
+#  VALID_ARCHITECTURES           = X64 AARCH64
 #
 [Sources]
   Common.c

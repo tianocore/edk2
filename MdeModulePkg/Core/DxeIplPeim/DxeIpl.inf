@@ -45,7 +45,7 @@
   X64/VirtualMemory.c
   X64/DxeLoadFunc.c
 
-[Sources.LOONGARCH64,Sources.RISCV64,Sources.EBC,Sources.ARM,Sources.AARCH64]
+[Sources.LOONGARCH64,Sources.RISCV64,Sources.EBC,Sources.AARCH64]
   DxeHandoff.c
 
 [Packages]
@@ -108,7 +108,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                            ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbSize                            ## CONSUMES
 
-[Pcd.IA32,Pcd.X64,Pcd.ARM,Pcd.AARCH64]
+[Pcd.IA32,Pcd.X64,Pcd.AARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy       ## SOMETIMES_CONSUMES
 
