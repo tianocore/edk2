@@ -3460,6 +3460,11 @@ typedef struct {
 #define EFI_ACPI_6_6_PLATFORM_HEALTH_ASSESSMENT_TABLE_SIGNATURE  SIGNATURE_32('P', 'H', 'A', 'T')
 
 ///
+/// "RIMT" RISC-V IO Mapping Table
+///
+#define EFI_ACPI_6_6_RIMT_TABLE_SIGNATURE  SIGNATURE_32('R', 'I', 'M', 'T')
+
+///
 /// "RHCT" RISC-V Hart Capabilities Table (RHCT)
 ///
 #define EFI_ACPI_6_6_RISCV_HART_CAPABILITIES_TABLE_SIGNATURE  SIGNATURE_32('R', 'H', 'C', 'T')
