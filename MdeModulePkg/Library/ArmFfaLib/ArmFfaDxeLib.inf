@@ -33,6 +33,7 @@
   BaseMemoryLib
   DebugLib
   HobLib
+  MemoryAllocationLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc
