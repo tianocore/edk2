@@ -2,7 +2,7 @@
 #  Library that implements the helper functions to parse and pack a
 #  Transfer List according to the A-profile Firmware Handoff Specification.
 #
-#  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2024-2025, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -16,8 +16,16 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmTransferListLib
 
+  DEFINE TL_LIB_PATH             = libtl
+  DEFINE TL_LIB_INCLUDE_PATH     = $(TL_LIB_PATH)/include
+
 [Sources]
   ArmTransferListLib.c
+  assert.h
+  $(TL_LIB_PATH)/src/generic/transfer_list.c
+  $(TL_LIB_PATH)/src/generic/logging.c
+  $(TL_LIB_INCLUDE_PATH)/transfer_list.h
+  $(TL_LIB_INCLUDE_PATH)/logging.h
 
 [Packages]
   ArmPkg/ArmPkg.dec

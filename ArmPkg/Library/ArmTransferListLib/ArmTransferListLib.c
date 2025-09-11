@@ -10,10 +10,22 @@
 **/
 
 #include <Base.h>
-#include <Library/ArmTransferListLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <assert.h>
+#include <libtl/include/transfer_list.h>
+#include <Library/ArmTransferListLib.h>
 #include <Library/HobLib.h>
+
+STATIC_ASSERT (
+  sizeof (TRANSFER_LIST_HEADER) == sizeof (struct transfer_list_header),
+  "TRANSFER_LIST_HEADER size mismatch"
+  );
+
+STATIC_ASSERT (
+  sizeof (TRANSFER_ENTRY_HEADER) == sizeof (struct transfer_list_entry),
+  "TRANSFER_ENTRY_HEADER size mismatch"
+  );
 
 /**
   Get the TransferList from HOB list.
@@ -68,24 +80,59 @@ TransferListVerifyChecksum (
   IN TRANSFER_LIST_HEADER  *TransferListHeader
   )
 {
-  if (TransferListHeader == NULL) {
-    return FALSE;
-  }
-
-  if ((TransferListHeader->Flags & TRANSFER_LIST_FL_HAS_CHECKSUM) == 0) {
-    return TRUE;
-  }
-
-  return (CalculateSum8 ((UINT8 *)TransferListHeader, TransferListHeader->UsedSize) == 0);
+  return transfer_list_verify_checksum ((struct transfer_list_header *)TransferListHeader);
 }
 
 /**
-  This function checks the header of the Transfer List.
+  This helper maps Transfer List operation modes to corresponding libtl ops.
 
-  @param [in]   TransferListHeader       Pointer to the Transfer List Header
+  @param[in]  ops                     libtl Operation modes.
 
-  @return TRANSFER_LIST_OPS code indicating the validity of the Transfer List
+  @retval TRANSFER_LIST_OPS_ALL       Header is valid and usable (read/write).
+  @retval TRANSFER_LIST_OPS_RO        Header is valid but only supports read-only
+                                      operations.
+  @retval TRANSFER_LIST_OPS_CUSTOM    Header is valid but requires custom handling
+                                      due to a version mismatch.
+  @retval TRANSFER_LIST_OPS_INVALID   Header is invalid or unsupported.
+**/
+static TRANSFER_LIST_OPS
+MapLibtlOps (
+  enum transfer_list_ops  ops
+  )
+{
+  TRANSFER_LIST_OPS  Status;
 
+  switch (ops) {
+    case TL_OPS_ALL:
+      Status = TRANSFER_LIST_OPS_ALL;
+      break;
+    case TL_OPS_RO:
+      Status = TRANSFER_LIST_OPS_RO;
+      break;
+    case TL_OPS_CUS:
+      Status = TRANSFER_LIST_OPS_CUSTOM;
+      break;
+    default:
+      Status = TRANSFER_LIST_OPS_INVALID;
+  }
+
+  return Status;
+}
+
+/**
+  Check the Transfer List header and return an operation mode.
+
+  This function forwards to transfer_list_check_header() (libtl) and converts
+  the returned libtl operation code into the TRANSFER_LIST_OPS enum.
+
+  @param[in]  TransferListHeader      Pointer to the Transfer List header.
+
+  @retval TRANSFER_LIST_OPS_ALL       Header is valid and usable (read/write).
+  @retval TRANSFER_LIST_OPS_RO        Header is valid but only supports read-only
+                                      operations.
+  @retval TRANSFER_LIST_OPS_CUSTOM    Header is valid but requires custom handling
+                                      due to a version mismatch.
+  @retval TRANSFER_LIST_OPS_INVALID   Header is invalid or unsupported.
 **/
 TRANSFER_LIST_OPS
 EFIAPI
@@ -93,48 +140,7 @@ TransferListCheckHeader (
   IN TRANSFER_LIST_HEADER  *TransferListHeader
   )
 {
-  if (TransferListHeader == NULL) {
-    return TRANSFER_LIST_OPS_INVALID;
-  }
-
-  if (TransferListHeader->Signature != TRANSFER_LIST_SIGNATURE_64) {
-    DEBUG ((DEBUG_ERROR, "Bad transfer list signature 0x%x\n", TransferListHeader->Signature));
-    return TRANSFER_LIST_OPS_INVALID;
-  }
-
-  if (TransferListHeader->TotalSize == 0) {
-    DEBUG ((DEBUG_ERROR, "Bad transfer list total size 0x%x\n", TransferListHeader->TotalSize));
-    return TRANSFER_LIST_OPS_INVALID;
-  }
-
-  if (TransferListHeader->UsedSize > TransferListHeader->TotalSize) {
-    DEBUG ((DEBUG_ERROR, "Bad transfer list used size 0x%x\n", TransferListHeader->UsedSize));
-    return TRANSFER_LIST_OPS_INVALID;
-  }
-
-  if (TransferListHeader->HeaderSize != sizeof (TRANSFER_LIST_HEADER)) {
-    DEBUG ((DEBUG_ERROR, "Bad transfer list header size 0x%x\n", TransferListHeader->HeaderSize));
-    return TRANSFER_LIST_OPS_INVALID;
-  }
-
-  if (TransferListVerifyChecksum (TransferListHeader) == FALSE) {
-    DEBUG ((DEBUG_ERROR, "Bad transfer list checksum 0x%x\n", TransferListHeader->Checksum));
-    return TRANSFER_LIST_OPS_INVALID;
-  }
-
-  if (TransferListHeader->Version == 0) {
-    DEBUG ((DEBUG_ERROR, "Transfer list version is invalid\n"));
-    return TRANSFER_LIST_OPS_INVALID;
-  } else if (TransferListHeader->Version == ARM_FW_HANDOFF_PROTOCOL_VERSION) {
-    DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Transfer list version is valid for all operations\n"));
-    return TRANSFER_LIST_OPS_ALL;
-  } else if (TransferListHeader->Version > ARM_FW_HANDOFF_PROTOCOL_VERSION) {
-    DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Transfer list version is valid for read-only\n"));
-    return TRANSFER_LIST_OPS_RO;
-  }
-
-  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Old or custom transfer list version is detected\n"));
-  return TRANSFER_LIST_OPS_CUSTOM;
+  return MapLibtlOps (transfer_list_check_header ((const struct transfer_list_header *)TransferListHeader));
 }
 
 /**
@@ -151,7 +157,7 @@ TransferListGetFirstEntry (
   IN TRANSFER_LIST_HEADER  *TransferListHeader
   )
 {
-  return TransferListGetNextEntry (TransferListHeader, NULL);
+  return (TRANSFER_ENTRY_HEADER *)transfer_list_next ((struct transfer_list_header *)TransferListHeader, NULL);
 }
 
 /**
@@ -173,35 +179,7 @@ TransferListGetNextEntry (
   IN TRANSFER_ENTRY_HEADER  *CurrentEntry
   )
 {
-  TRANSFER_ENTRY_HEADER  *Entry;
-  UINTN                  CurrentAddr;
-  UINTN                  EndAddr;
-
-  if (TransferListHeader == NULL) {
-    return NULL;
-  }
-
-  EndAddr = (UINTN)TransferListHeader + TransferListHeader->UsedSize;
-
-  if (CurrentEntry != NULL) {
-    CurrentAddr = (UINTN)CurrentEntry + CurrentEntry->HeaderSize + CurrentEntry->DataSize;
-  } else {
-    CurrentAddr = (UINTN)TransferListHeader + TransferListHeader->HeaderSize;
-  }
-
-  CurrentAddr = ALIGN_VALUE (CurrentAddr, (1 << TransferListHeader->Alignment));
-
-  Entry = (TRANSFER_ENTRY_HEADER *)CurrentAddr;
-
-  if (((CurrentAddr + sizeof (TRANSFER_LIST_HEADER)) < CurrentAddr) ||
-      ((CurrentAddr + sizeof (TRANSFER_ENTRY_HEADER)) > EndAddr) ||
-      ((CurrentAddr + Entry->HeaderSize + Entry->DataSize) < CurrentAddr) ||
-      ((CurrentAddr + Entry->HeaderSize + Entry->DataSize) > EndAddr))
-  {
-    return NULL;
-  }
-
-  return Entry;
+  return (TRANSFER_ENTRY_HEADER *)transfer_list_next ((struct transfer_list_header *)TransferListHeader, (struct transfer_list_entry *)CurrentEntry);
 }
 
 /**
@@ -218,18 +196,10 @@ TRANSFER_ENTRY_HEADER *
 EFIAPI
 TransferListFindFirstEntry (
   IN TRANSFER_LIST_HEADER  *TransferListHeader,
-  IN UINT16                TagId
+  IN UINT32                TagId
   )
 {
-  TRANSFER_ENTRY_HEADER  *Entry;
-
-  Entry = TransferListGetFirstEntry (TransferListHeader);
-
-  while ((Entry != NULL) && ((Entry->TagId != TagId) || Entry->Reserved0 != 0)) {
-    Entry = TransferListGetNextEntry (TransferListHeader, Entry);
-  }
-
-  return Entry;
+  return (TRANSFER_ENTRY_HEADER *)transfer_list_find ((struct transfer_list_header *)TransferListHeader, TagId);
 }
 
 /**
@@ -250,7 +220,7 @@ EFIAPI
 TransferListFindNextEntry (
   IN TRANSFER_LIST_HEADER   *TransferListHeader,
   IN TRANSFER_ENTRY_HEADER  *CurrentEntry,
-  IN UINT16                 TagId
+  IN UINT32                 TagId
   )
 {
   TRANSFER_ENTRY_HEADER  *Entry;
@@ -261,7 +231,7 @@ TransferListFindNextEntry (
     Entry = TransferListGetNextEntry (TransferListHeader, CurrentEntry);
   }
 
-  while ((Entry != NULL) && ((Entry->TagId != TagId) || Entry->Reserved0 != 0)) {
+  while ((Entry != NULL) && ((Entry->TagId & 0xFFFFFF) != (TagId & 0xFFFFFF))) {
     Entry = TransferListGetNextEntry (TransferListHeader, Entry);
   }
 
@@ -286,7 +256,7 @@ TransferListGetEntryData (
     return NULL;
   }
 
-  return (VOID *)((UINTN)TransferEntry + TransferEntry->HeaderSize);
+  return transfer_list_entry_data ((struct transfer_list_entry *)TransferEntry);
 }
 
 /**
@@ -301,14 +271,14 @@ TRANSFER_ENTRY_HEADER *
 EFIAPI
 TransferListFindEntry (
   IN TRANSFER_LIST_HEADER  *TransferListHeader,
-  IN UINT16                TagId
+  IN UINT32                TagId
   )
 {
   TRANSFER_ENTRY_HEADER  *Entry = NULL;
 
   do {
     Entry = TransferListGetNextEntry (TransferListHeader, Entry);
-  } while ((Entry != NULL) && (Entry->TagId != TagId));
+  } while ((Entry != NULL) && ((Entry->TagId & 0xFFFFFF) != (TagId & 0xFFFFFF)));
 
   return Entry;
 }
@@ -402,7 +372,7 @@ TransferListDump (
     }
 
     DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Entry %d:\n", Idx++));
-    DEBUG ((DEBUG_INFO | DEBUG_LOAD, "tag_id     0x%x\n", Entry->TagId));
+    DEBUG ((DEBUG_INFO | DEBUG_LOAD, "TagId     0x%x\n", Entry->TagId));
     DEBUG ((DEBUG_INFO | DEBUG_LOAD, "hdr_size   0x%x\n", Entry->HeaderSize));
     DEBUG ((DEBUG_INFO | DEBUG_LOAD, "data_size  0x%x\n", Entry->DataSize));
     DEBUG ((DEBUG_INFO | DEBUG_LOAD, "data_addr  0x%lx\n", (UINTN)TransferListGetEntryData (Entry)));
