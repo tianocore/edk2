@@ -1053,6 +1053,25 @@ ParseAcpiRasf (
   );
 
 /**
+  This function parses the ACPI RIMT table.
+  When trace is enabled this function parses the RIMT table and
+  traces the ACPI table fields.
+
+  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] Ptr                Pointer to the start of the buffer.
+  @param [in] AcpiTableLength    Length of the ACPI table.
+  @param [in] AcpiTableRevision  Revision of the ACPI table.
+**/
+VOID
+EFIAPI
+ParseAcpiRimt (
+  IN BOOLEAN  Trace,
+  IN UINT8    *Ptr,
+  IN UINT32   AcpiTableLength,
+  IN UINT8    AcpiTableRevision
+  );
+
+/**
   This function parses the ACPI RSDP table.
 
   This function invokes the parser for the XSDT table.
