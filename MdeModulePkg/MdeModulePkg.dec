@@ -1735,6 +1735,10 @@
   # @Prompt UFS device initial completion timoeout (us), default value is 600ms.
   gEfiMdeModulePkgTokenSpaceGuid.PcdUfsInitialCompletionTimeout|600000|UINT32|0x00000036
 
+  ## Delayed Dispatch Max Entries
+  # @Prompt Maximum number of delayed dispatch entries. Default value is 8.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDelayedDispatchMaxEntries|8|UINT32|0x00000037
+
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.
   #  This PCD could be set to 0 then console output would be at max column and max row.
