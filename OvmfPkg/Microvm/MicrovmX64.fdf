@@ -34,54 +34,7 @@ FV = SECFV
 
 ################################################################################
 
-[FD.MEMFD]
-BaseAddress   = $(MEMFD_BASE_ADDRESS)
-Size          = 0xD00000
-ErasePolarity = 1
-BlockSize     = 0x10000
-NumBlocks     = 0xD0
-
-0x000000|0x006000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesSize
-
-0x006000|0x001000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
-
-0x007000|0x001000
-gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress|gUefiOvmfPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
-
-0x008000|0x001000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableSize
-
-0x009000|0x002000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbSize
-
-0x00B000|0x001000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize
-
-0x00C000|0x001000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
-
-0x00D000|0x001000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableSize
-
-0x010000|0x010000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
-
-0x020000|0x0E0000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvSize
-FV = PEIFV
-
-0x100000|0xC00000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
-FV = DXEFV
-
-##########################################################################################
-# Set the SEV-ES specific work area PCDs
-#
-SET gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase = $(MEMFD_BASE_ADDRESS) +  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase + gUefiOvmfPkgTokenSpaceGuid.PcdOvmfConfidentialComputingWorkAreaHeader
-SET gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaSize = gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize - gUefiOvmfPkgTokenSpaceGuid.PcdOvmfConfidentialComputingWorkAreaHeader
-##########################################################################################
+!include OvmfPkg/Include/Fdf/MemFd.fdf.inc
 
 ################################################################################
 
