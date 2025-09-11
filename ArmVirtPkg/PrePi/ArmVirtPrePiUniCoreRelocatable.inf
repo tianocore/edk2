@@ -19,14 +19,8 @@
   FdtParser.c
   PrePi.c
   PrePi.h
-
-[Sources.AArch64]
-  AArch64/ArchPrePi.c
-  AArch64/ModuleEntryPoint.S
-
-[Sources.ARM]
-  Arm/ArchPrePi.c
-  Arm/ModuleEntryPoint.S
+  ArchPrePi.c
+  ModuleEntryPoint.S
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -84,9 +78,6 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesData
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData
-
-[FixedPcd.ARM]
-  gArmTokenSpaceGuid.PcdVFPEnabled
 
 [Pcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase

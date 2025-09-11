@@ -29,28 +29,6 @@ jobs:
     #Use matrix to speed up the build process
     strategy:
         matrix:
-          OVMF_IA32_DEBUG:
-            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
-            Build.Arch: "IA32"
-            Build.Flags: ""
-            Build.Target: "DEBUG"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
-          OVMF_IA32_RELEASE:
-            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
-            Build.Arch: "IA32"
-            Build.Flags: ""
-            Build.Target: "RELEASE"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
-          OVMF_IA32_NOOPT:
-            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
-            Build.Arch: "IA32"
-            Build.Flags: ""
-            Build.Target: "NOOPT"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
-
           OVMF_X64_DEBUG:
             Build.File: "$(package)/PlatformCI/PlatformBuild.py"
             Build.Arch: "X64"

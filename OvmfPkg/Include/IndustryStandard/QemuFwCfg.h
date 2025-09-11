@@ -37,8 +37,7 @@
 #define FW_CFG_DMA_CTL_WRITE   BIT4
 
 //
-// The fw_cfg registers can be found at these IO Ports, on the IO-mapped
-// platforms (Ia32 and X64).
+// The fw_cfg registers can be found at these IO Ports
 //
 #define FW_CFG_IO_SELECTOR     0x510
 #define FW_CFG_IO_DATA         0x511
