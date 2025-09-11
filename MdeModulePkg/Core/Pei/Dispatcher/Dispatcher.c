@@ -134,9 +134,15 @@ PeiDelayedDispatchRegister (
   }
 
   // Check for available entry slots
-  ASSERT (DelayedDispatchTable->Count <= DELAYED_DISPATCH_MAX_ENTRIES);
-  if (DelayedDispatchTable->Count == DELAYED_DISPATCH_MAX_ENTRIES) {
-    DEBUG ((DEBUG_ERROR, "%a Too many entries requested\n", __func__));
+  if (DelayedDispatchTable->Count >= PcdGet32 (PcdDelayedDispatchMaxEntries)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a DelayedDispatchTable->Count = %d. PcdDelayedDispatchMaxEntries (%d) is too small.\n",
+      __func__,
+      DelayedDispatchTable->Count,
+      PcdGet32 (PcdDelayedDispatchMaxEntries)
+      ));
+    ASSERT (DelayedDispatchTable->Count < PcdGet32 (PcdDelayedDispatchMaxEntries));
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
   }
@@ -1807,7 +1813,7 @@ PeiDispatcher (
     if (GuidHob != NULL) {
       Private->DelayedDispatchTable = (DELAYED_DISPATCH_TABLE *)(GET_GUID_HOB_DATA (GuidHob));
     } else {
-      TableSize                     = sizeof (DELAYED_DISPATCH_TABLE) + ((DELAYED_DISPATCH_MAX_ENTRIES - 1) * sizeof (DELAYED_DISPATCH_ENTRY));
+      TableSize                     = sizeof (DELAYED_DISPATCH_TABLE) + (PcdGet32 (PcdDelayedDispatchMaxEntries) * sizeof (DELAYED_DISPATCH_ENTRY));
       Private->DelayedDispatchTable = BuildGuidHob (&gEfiDelayedDispatchTableGuid, TableSize);
       if (Private->DelayedDispatchTable != NULL) {
         ZeroMem (Private->DelayedDispatchTable, TableSize);
