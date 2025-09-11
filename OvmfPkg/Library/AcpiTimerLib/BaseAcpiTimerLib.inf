@@ -21,6 +21,7 @@
   AcpiTimerLib.c
   AcpiTimerLib.h
   BaseAcpiTimerLib.c
+  TscTimerLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
