@@ -48,9 +48,18 @@ BITS    32
 ; Entry point of Main32
 ;
 Main32:
-    OneTimeCall InitTdx
+    ;
+    ; First load the GDT and jump to Flat32 mode
+    ;
+    OneTimeCall ReloadFlat32
 
 SearchBfv:
+    ;
+    ; install #vc exception handler (for cpuid on sev)
+    ;
+    OneTimeCall SevCpuidInit
+
+    OneTimeCall InitTdx
 
 %endif
 
