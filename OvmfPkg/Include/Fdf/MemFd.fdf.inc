@@ -81,15 +81,27 @@ gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCp
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecSvsmCaaBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecSvsmCaaSize
 
 #
+# SEV-SNP: pass secrets from host (qemu) to guest
+#
+0x010000|0x000C00
+gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretBase|gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretSize
+
+#
+# SEV-SNP: pass hashes for kernel/initrd/cmdline from host (qemu) to guest
+#
+0x010C00|0x000400
+gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableBase|gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableSize
+
+#
 # page table, for 2M -> 4k split when mapping APIC
 #
-0x010000|0x001000
+0x011000|0x001000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableSize
 
 #
 # initial memory for SEC+PEI
 #
-0x011000|0x00F000
+0x012000|0x00E000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
 
 #
