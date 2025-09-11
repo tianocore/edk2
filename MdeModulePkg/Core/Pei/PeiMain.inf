@@ -121,6 +121,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMigrateTemporaryRamFirmwareVolumes      ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdDelayedDispatchMaxDelayUs               ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdDelayedDispatchCompletionTimeoutUs      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDelayedDispatchMaxEntries               ## CONSUMES
 
 # [BootMode]
 # S3_RESUME             ## SOMETIMES_CONSUMES
