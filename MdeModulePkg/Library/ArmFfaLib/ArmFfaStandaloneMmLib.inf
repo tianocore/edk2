@@ -33,6 +33,7 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+  HobLib
   MmServicesTableLib
 
 [Pcd]
