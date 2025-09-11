@@ -79,7 +79,7 @@ TRANSFER_ENTRY_HEADER *
 EFIAPI
 TransferListFindFirstEntry (
   IN TRANSFER_LIST_HEADER  *TransferListHeader,
-  IN UINT16                TagId
+  IN UINT32                TagId
   );
 
 /**
@@ -100,7 +100,7 @@ EFIAPI
 TransferListFindNextEntry (
   IN TRANSFER_LIST_HEADER   *TransferListHeader,
   IN TRANSFER_ENTRY_HEADER  *CurrentEntry,
-  IN UINT16                 TagId
+  IN UINT32                 TagId
   );
 
 /**
@@ -168,7 +168,7 @@ TRANSFER_ENTRY_HEADER *
 EFIAPI
 TransferListFindEntry (
   IN TRANSFER_LIST_HEADER  *TransferListHeader,
-  IN UINT16                TagId
+  IN UINT32                TagId
   );
 
 /**
