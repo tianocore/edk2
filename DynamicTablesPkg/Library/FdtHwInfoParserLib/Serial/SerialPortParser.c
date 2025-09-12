@@ -182,6 +182,15 @@ SerialPortNodeParser (
 
   SerialPortInfo->Interrupt = FdtGetInterruptId ((CONST UINT32 *)Data);
 
+  /*
+   * In RISC-V, GSI space can be divided among multiple APLIC/PLICs.
+   * So, convert the interrupt number in DT to appropriate GSI number
+   * using the parent interrupt controller information.
+   */
+ #if defined (MDE_CPU_RISCV64)
+  SerialPortInfo->Interrupt = FdtConvertToGsi (IntcNode, SerialPortInfo->Interrupt);
+ #endif
+
   // Note: clock-frequency is optional for SBSA UART.
   Data = FdtGetProp (Fdt, SerialPortNode, "clock-frequency", &DataSize);
   if (Data != NULL) {
