@@ -11,6 +11,7 @@
 
 #include <Base.h>
 #include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <libtl/include/transfer_list.h>
 #include <Library/ArmTransferListLib.h>
@@ -33,6 +34,51 @@ STATIC_ASSERT (
   OFFSET_OF (TRANSFER_LIST_EVENTLOG, EventLog) == sizeof (UINT32),
   "TRANSFER_LIST_EVENTLOG layout mismatch"
   );
+
+//
+// TransferListCheckHeader() casts the libtl operation value directly to
+// TRANSFER_LIST_OPS, so verify both enum definitions stay numerically aligned.
+//
+STATIC_ASSERT (
+  (UINT32)TL_OPS_NON == (UINT32)TRANSFER_LIST_OPS_INVALID,
+  "TL_OPS_NON mismatch"
+  );
+
+STATIC_ASSERT (
+  (UINT32)TL_OPS_ALL == (UINT32)TRANSFER_LIST_OPS_ALL,
+  "TL_OPS_ALL mismatch"
+  );
+
+STATIC_ASSERT (
+  (UINT32)TL_OPS_RO == (UINT32)TRANSFER_LIST_OPS_RO,
+  "TL_OPS_RO mismatch"
+  );
+
+STATIC_ASSERT (
+  (UINT32)TL_OPS_CUS == (UINT32)TRANSFER_LIST_OPS_CUSTOM,
+  "TL_OPS_CUS mismatch"
+  );
+
+/**
+  Convert a libtl transfer entry address to the public transfer entry type.
+
+  libtl marks the entry structure as packed for layout, while the transfer list
+  format keeps entries 8-byte aligned.
+
+  @param[in]  Entry  libtl entry address, or NULL.
+
+  @return Transfer entry header address, or NULL.
+**/
+STATIC
+TRANSFER_ENTRY_HEADER *
+LibtlEntryToTransferEntryHeader (
+  IN VOID  *Entry
+  )
+{
+  ASSERT ((Entry == NULL) || (((UINTN)Entry & (TRANSFER_LIST_ALIGNMENT - 1)) == 0));
+
+  return (TRANSFER_ENTRY_HEADER *)Entry;
+}
 
 /**
   Get the TransferList from HOB list.
@@ -116,11 +162,6 @@ TransferListCheckHeader (
   IN TRANSFER_LIST_HEADER  *TransferListHeader
   )
 {
-  STATIC_ASSERT ((UINT32)TL_OPS_NON == (UINT32)TRANSFER_LIST_OPS_INVALID, "TL_OPS_NON mismatch");
-  STATIC_ASSERT ((UINT32)TL_OPS_ALL == (UINT32)TRANSFER_LIST_OPS_ALL, "TL_OPS_ALL mismatch");
-  STATIC_ASSERT ((UINT32)TL_OPS_RO  == (UINT32)TRANSFER_LIST_OPS_RO, "TL_OPS_RO mismatch");
-  STATIC_ASSERT ((UINT32)TL_OPS_CUS == (UINT32)TRANSFER_LIST_OPS_CUSTOM, "TL_OPS_CUS mismatch");
-
   return (TRANSFER_LIST_OPS)transfer_list_check_header ((CONST LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader);
 }
 
@@ -138,7 +179,9 @@ TransferListGetFirstEntry (
   IN TRANSFER_LIST_HEADER  *TransferListHeader
   )
 {
-  return (TRANSFER_ENTRY_HEADER *)transfer_list_next ((LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader, NULL);
+  return LibtlEntryToTransferEntryHeader (
+           transfer_list_next ((LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader, NULL)
+           );
 }
 
 /**
@@ -160,10 +203,12 @@ TransferListGetNextEntry (
   IN TRANSFER_ENTRY_HEADER  *CurrentEntry
   )
 {
-  return (TRANSFER_ENTRY_HEADER *)transfer_list_next (
-                                    (LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader,
-                                    (LIBTL_TRANSFER_LIST_ENTRY *)CurrentEntry
-                                    );
+  return LibtlEntryToTransferEntryHeader (
+           transfer_list_next (
+             (LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader,
+             (LIBTL_TRANSFER_LIST_ENTRY *)CurrentEntry
+             )
+           );
 }
 
 /**
@@ -183,7 +228,9 @@ TransferListFindFirstEntry (
   IN UINT32                TagId
   )
 {
-  return (TRANSFER_ENTRY_HEADER *)transfer_list_find ((LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader, TagId);
+  return LibtlEntryToTransferEntryHeader (
+           transfer_list_find ((LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader, TagId)
+           );
 }
 
 /**
@@ -362,4 +409,319 @@ TransferListDump (
     DEBUG ((DEBUG_INFO | DEBUG_LOAD, "data_size  0x%x\n", Entry->DataSize));
     DEBUG ((DEBUG_INFO | DEBUG_LOAD, "data_addr  0x%lx\n", (UINTN)TransferListGetEntryData (Entry)));
   }
+}
+
+/**
+  Ensure a valid Transfer List exists at the specified buffer; initialize
+  if the buffer does not have a valid TL header.
+
+  @param[in,out]  TransferListBase      Base address of the buffer/region.
+  @param[in]      TransferListCapacity  Total capacity (bytes) of the buffer.
+
+  @return Pointer to the Transfer List header on success; NULL on failure.
+**/
+TRANSFER_LIST_HEADER *
+EFIAPI
+TransferListEnsure (
+  IN OUT VOID  *TransferListBase,
+  IN UINTN     TransferListCapacity
+  )
+{
+  return (TRANSFER_LIST_HEADER *)transfer_list_ensure (TransferListBase, (size_t)TransferListCapacity);
+}
+
+/**
+  Relocate an existing Transfer List to a new buffer with the given capacity.
+
+  Useful when the Transfer List must grow beyond its current region (e.g., when
+  backed by a fixed flash window).
+
+  @param[in]   TransferListHeader    Pointer to the current Transfer List header.
+  @param[out]  DestinationBase       Destination buffer address.
+  @param[in]   DestinationCapacity   Capacity in bytes of the destination buffer.
+
+  @return Pointer to the relocated Transfer List header; NULL on failure.
+**/
+TRANSFER_LIST_HEADER *
+EFIAPI
+TransferListRelocate (
+  IN TRANSFER_LIST_HEADER  *TransferListHeader,
+  OUT VOID                 *DestinationBase,
+  IN UINTN                 DestinationCapacity
+  )
+{
+  return (TRANSFER_LIST_HEADER *)transfer_list_relocate (
+                                   (LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader,
+                                   DestinationBase,
+                                   (size_t)DestinationCapacity
+                                   );
+}
+
+/**
+  Append a new Transfer Entry.
+
+  @param[in,out]  TransferListHeader  Pointer to the Transfer List header.
+  @param[in]      TagId               Full (up to 24-bit) tag identifier.
+  @param[in]      DataSize            Payload size in bytes.
+  @param[in]      Data                Optional source buffer (may be NULL).
+
+  @retval NULL      Append failed (e.g., insufficient capacity).
+  @retval non-NULL  Pointer to the newly added entry.
+**/
+TRANSFER_ENTRY_HEADER *
+EFIAPI
+TransferListAdd (
+  IN OUT TRANSFER_LIST_HEADER  *TransferListHeader,
+  IN     UINT32                TagId,
+  IN     UINT32                DataSize,
+  IN     CONST VOID            *Data   OPTIONAL
+  )
+{
+  return LibtlEntryToTransferEntryHeader (
+           transfer_list_add (
+             (LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader,
+             TagId,
+             DataSize,
+             Data
+             )
+           );
+}
+
+/**
+  Resize an existing Transfer Entry payload.
+
+  On growth, subsequent entries may be moved to make room. On shrink, space is
+  reclaimed. Call TransferListUpdateChecksum() after modifications.
+
+  @param[in,out]  TransferListHeader  Pointer to the Transfer List header.
+  @param[in,out]  Entry               Entry to resize.
+  @param[in]      NewDataSize         New payload size in bytes.
+
+  @retval TRUE   Resize succeeded; Entry remains valid.
+  @retval FALSE  Resize failed (e.g., insufficient capacity).
+**/
+BOOLEAN
+EFIAPI
+TransferListSetDataSize (
+  IN OUT TRANSFER_LIST_HEADER   *TransferListHeader,
+  IN OUT TRANSFER_ENTRY_HEADER  *Entry,
+  IN     UINT32                 NewDataSize
+  )
+{
+  return transfer_list_set_data_size (
+           (LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader,
+           (LIBTL_TRANSFER_LIST_ENTRY *)Entry,
+           NewDataSize
+           ) ? TRUE : FALSE;
+}
+
+/**
+  Remove a Transfer Entry.
+
+  After removal, the Transfer List is compacted as required by the underlying
+  implementation. Call TransferListUpdateChecksum() if not done automatically.
+
+  @param[in,out]  TransferListHeader  Pointer to the Transfer List header.
+  @param[in,out]  Entry               Entry to remove.
+
+  @retval TRUE   Entry removed.
+  @retval FALSE  Removal failed.
+**/
+BOOLEAN
+EFIAPI
+TransferListRemove (
+  IN OUT TRANSFER_LIST_HEADER   *TransferListHeader,
+  IN OUT TRANSFER_ENTRY_HEADER  *Entry
+  )
+{
+  return transfer_list_rem (
+           (LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader,
+           (LIBTL_TRANSFER_LIST_ENTRY  *)Entry
+           ) ? TRUE : FALSE;
+}
+
+/**
+  Optional reverse iterator: return the previous entry.
+
+  @param[in]  TransferListHeader  TL header.
+  @param[in]  CurrentEntry        Current entry.
+
+  @retval NULL      No previous entry.
+  @retval non-NULL  Previous entry.
+**/
+TRANSFER_ENTRY_HEADER *
+EFIAPI
+TransferListGetPrevEntry (
+  TRANSFER_LIST_HEADER   *TransferListHeader,
+  TRANSFER_ENTRY_HEADER  *CurrentEntry
+  )
+{
+  return LibtlEntryToTransferEntryHeader (
+           transfer_list_prev (
+             (LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader,
+             (LIBTL_TRANSFER_LIST_ENTRY *)CurrentEntry
+             )
+           );
+}
+
+/**
+  Find the first Transfer Entry whose full TagId (up to 24 bits) matches.
+
+  This is a thin wrapper over the underlying implementation. It returns the
+  first matching entry, or NULL if no match exists.
+
+  @param[in]  TransferListHeader  Pointer to the Transfer List header.
+  @param[in]  TagId               Full tag identifier to match.
+
+  @retval NULL      No matching entry or TransferListHeader is NULL.
+  @retval non-NULL  Pointer to the first matching entry.
+**/
+TRANSFER_ENTRY_HEADER *
+EFIAPI
+TransferListFindEntryByTag  (
+  IN TRANSFER_LIST_HEADER  *TransferListHeader,
+  IN UINT32                TagId
+  )
+{
+  return LibtlEntryToTransferEntryHeader (
+           transfer_list_find ((LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader, TagId)
+           );
+}
+
+/**
+  Read the first entry matching the full TagId (up to 24-bit).
+
+  @param[in]   TransferListHeader   Pointer to the Transfer List header.
+  @param[in]   TagId                Full tag identifier to match.
+  @param[out]  EntryOut             On success, receives the entry pointer.
+  @param[out]  EntryDataOut         Optional; receives pointer to entry data.
+  @param[out]  EntryDataSizeOut     Optional; receives data size in bytes.
+
+  @retval EFI_SUCCESS      Match found and output parameters set.
+  @retval EFI_NOT_FOUND    No entry with TagId.
+  @retval EFI_INVALID_PARAMETER  TransferListHeader or EntryOut is NULL.
+**/
+EFI_STATUS
+EFIAPI
+TransferListReadEntryByTag (
+  IN  TRANSFER_LIST_HEADER   *TransferListHeader,
+  IN  UINT32                 TagId,
+  OUT TRANSFER_ENTRY_HEADER  **EntryOut,
+  OUT VOID                   **EntryDataOut     OPTIONAL,
+  OUT UINT32                 *EntryDataSizeOut  OPTIONAL
+  )
+{
+  TRANSFER_ENTRY_HEADER  *Entry;
+
+  if ((TransferListHeader == NULL) || (EntryOut == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Entry = TransferListFindEntryByTag (TransferListHeader, TagId);
+  if (Entry == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  *EntryOut = Entry;
+
+  if (EntryDataOut != NULL) {
+    *EntryDataOut = TransferListGetEntryData (Entry);
+  }
+
+  if (EntryDataSizeOut != NULL) {
+    *EntryDataSizeOut = Entry->DataSize;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Update (or create) an entry by TagId.
+
+  If an entry with TagId exists, it is resized if needed and the payload is
+  overwritten with Data (if Data is not NULL). If no entry exists and
+  CreateIfMissing is TRUE, a new entry is appended (aligned to Alignment if
+  non-zero). The Transfer List checksum is updated on success.
+
+  @param[in,out]  TransferListHeader   Pointer to the Transfer List header.
+  @param[in]      TagId                Full tag identifier to update.
+  @param[in]      Data                 Source buffer (may be NULL to only resize).
+  @param[in]      DataSize             Size of Data in bytes.
+  @param[in]      CreateIfMissing      If TRUE, create the entry when missing.
+  @param[in]      AlignmentLog2        Optional power-of-two alignment (0 to use default).
+
+  @retval EFI_SUCCESS           Entry updated or created.
+  @retval EFI_NOT_FOUND         Entry not found and CreateIfMissing is FALSE.
+  @retval EFI_BUFFER_TOO_SMALL  Not enough capacity to add/resize.
+  @retval EFI_INVALID_PARAMETER TransferListHeader is NULL.
+**/
+EFI_STATUS
+EFIAPI
+TransferListUpdateEntryByTag (
+  IN OUT TRANSFER_LIST_HEADER  *TransferListHeader,
+  IN     UINT32                TagId,
+  IN     CONST VOID            *Data        OPTIONAL,
+  IN     UINT32                DataSize,
+  IN     BOOLEAN               CreateIfMissing,
+  IN     UINT8                 AlignmentLog2
+  )
+{
+  TRANSFER_ENTRY_HEADER  *Entry;
+  VOID                   *EntryData;
+
+  if (TransferListHeader == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Entry = TransferListFindEntryByTag (TransferListHeader, TagId);
+
+  if (Entry == NULL) {
+    if (!CreateIfMissing) {
+      return EFI_NOT_FOUND;
+    }
+
+    if (AlignmentLog2 != 0) {
+      Entry = LibtlEntryToTransferEntryHeader (
+                transfer_list_add_with_align (
+                  (LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader,
+                  TagId,
+                  DataSize,
+                  NULL,
+                  AlignmentLog2
+                  )
+                );
+    } else {
+      Entry = LibtlEntryToTransferEntryHeader (
+                transfer_list_add (
+                  (LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader,
+                  TagId,
+                  DataSize,
+                  NULL
+                  )
+                );
+    }
+
+    if (Entry == NULL) {
+      return EFI_BUFFER_TOO_SMALL;
+    }
+  } else if (Entry->DataSize != DataSize) {
+    if (!(transfer_list_set_data_size (
+            (LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader,
+            (LIBTL_TRANSFER_LIST_ENTRY *)Entry,
+            DataSize
+            ))
+        )
+    {
+      return EFI_BUFFER_TOO_SMALL;
+    }
+  }
+
+  if ((Data != NULL) && (DataSize != 0)) {
+    EntryData = transfer_list_entry_data ((LIBTL_TRANSFER_LIST_ENTRY *)Entry);
+    CopyMem (EntryData, Data, DataSize);
+  }
+
+  transfer_list_update_checksum ((LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader);
+
+  return EFI_SUCCESS;
 }
