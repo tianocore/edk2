@@ -47,6 +47,13 @@
   Arm/Gic/ArmGicRParser.c
   Arm/Gic/ArmGicRParser.h
 
+[Sources.RISCV64]
+  RiscV/RiscVFdtInterrupt.c
+  RiscV/RiscVFdtHwInfoParser.c
+  RiscV/Intc/RiscVIntcParser.c
+  RiscV/Intc/RiscVIntcParser.h
+  RiscV/HartInfo/RiscVHartInfoDispatcher.c
+
 [Packages.ARM, Packages.AARCH64]
   ArmPkg/ArmPkg.dec
 

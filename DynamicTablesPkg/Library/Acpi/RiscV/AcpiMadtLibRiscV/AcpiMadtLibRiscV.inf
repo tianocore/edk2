@@ -1,0 +1,29 @@
+## @file
+#  MADT Table Generator
+#
+#  Copyright (c) 2024, Ventana Micro Systems Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010019
+  BASE_NAME      = AcpiMadtLibRiscV
+  FILE_GUID      = 4696C865-9751-4811-832E-3DA8287F168A
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiMadtLibConstructor
+  DESTRUCTOR     = AcpiMadtLibDestructor
+
+[Sources]
+  MadtGenerator.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  BaseLib

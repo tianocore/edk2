@@ -24,6 +24,9 @@
 [Sources.ARM, Sources.AARCH64]
   Arm/ArmSratGenerator.c
 
+[Sources.RISCV64]
+  RiscV/RiscVSratGenerator.c
+
 [Sources.IA32, Sources.X64]
   X64/X64SratGenerator.c
 
