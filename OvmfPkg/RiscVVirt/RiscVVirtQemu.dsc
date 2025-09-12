@@ -88,6 +88,7 @@
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
   GCC:  *_*_*_DLINK_FLAGS = -z common-page-size=0x1000
   MSFT: *_*_*_DLINK_FLAGS = /ALIGN:4096
+  CLANGPDB: *_CLANGPDB_*_DLINK_FLAGS = /ALIGN:4096
 
 ################################################################################
 #
