@@ -408,6 +408,8 @@ typedef struct CmArchCommonLpiInfo {
   CHAR8                                     StateName[16];
 } CM_ARCH_COMMON_LPI_INFO;
 
+#define SMBIOS_MAX_STRING_SIZE  (1024)
+
 /** A structure that describes the Processor Hierarchy Node (Type 0) in PPTT
 
     ID: EArchCommonObjProcHierarchyInfo
@@ -447,6 +449,24 @@ typedef struct CmArchCommonProcHierarchyInfo {
   /// If OverrideNameUidEnabled is TRUE then this value will be used for
   /// the UID of processor containers.
   UINT32             OverrideUid;
+  /// SMBIOS: Processor ID. See SMBIOS "Processor ID field format" for format details.
+  UINT64             ProcessorId;
+  /// SMBIOS: Designation of this CM_ARCH_COMMON_PROC_HIERARCHY_INFO instance.
+  /// This string (and all that follow) are intended only for instances with
+  /// EFI_ACPI_6_3_PPTT_PACKAGE_PHYSICAL set, ie describing physical sockets.
+  CHAR8              SocketDesignation[SMBIOS_MAX_STRING_SIZE];
+  /// SMBIOS: String stating processor manufacturer.
+  CHAR8              ProcessorManufacturer[SMBIOS_MAX_STRING_SIZE];
+  /// SMBIOS: String stating processor version / device name.
+  CHAR8              ProcessorVersion[SMBIOS_MAX_STRING_SIZE];
+  /// SMBIOS: String stating processor serial number.
+  CHAR8              SerialNumber[SMBIOS_MAX_STRING_SIZE];
+  /// SMBIOS: String stating processor asset tag.
+  CHAR8              AssetTag[SMBIOS_MAX_STRING_SIZE];
+  /// SMBIOS: String stating processor part number.
+  CHAR8              PartNumber[SMBIOS_MAX_STRING_SIZE];
+  /// SMBIOS: String stating processor socket type.
+  CHAR8              SocketType[SMBIOS_MAX_STRING_SIZE];
 } CM_ARCH_COMMON_PROC_HIERARCHY_INFO;
 
 /** A structure that describes the Cache Type Structure (Type 1) in PPTT
@@ -477,6 +497,11 @@ typedef struct CmArchCommonCacheInfo {
   UINT16             LineSize;
   /// Unique ID for the cache
   UINT32             CacheId;
+  /// SMBIOS: Level of cache within the processor hierarchy
+  /// 0-2 = cache level 1-3
+  UINT32             Level;
+  /// SMBIOS: Designation of this cache on this socket
+  CHAR8              SocketDesignation[SMBIOS_MAX_STRING_SIZE];
 } CM_ARCH_COMMON_CACHE_INFO;
 
 /** A structure that describes the Cpc information.
