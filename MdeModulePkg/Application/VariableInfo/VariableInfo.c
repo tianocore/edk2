@@ -131,7 +131,12 @@ PrintInfoFromSmm (
     Entry = (EFI_MEMORY_DESCRIPTOR *)((UINT8 *)Entry + PiSmmCommunicationRegionTable->DescriptorSize);
   }
 
-  ASSERT (CommBuffer != NULL);
+  if (CommBuffer == NULL) {
+    Print (L"Warning: No SMM communication buffer found!\n");
+    ASSERT (CommBuffer != NULL);
+    return EFI_NOT_FOUND;
+  }
+
   ZeroMem (CommBuffer, RealCommSize);
 
   Print (L"SMM Driver Non-Volatile Variables:\n");
