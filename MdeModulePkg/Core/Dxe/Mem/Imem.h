@@ -146,6 +146,21 @@ CoreInternalAllocatePages (
   IN BOOLEAN                   NeedGuard
   );
 
+/**
+  Get the memory bin type for a given memory range.
+
+  @param  PhysicalStart  The address of the first byte in the memory region.
+  @param  PhysicalEnd    The address of the last byte in the memory region.
+
+  @return The memory type for the bin that contains the given physical address range.
+          If the address range does not match any special bin, it returns EfiMaxMemoryType.
+**/
+EFI_MEMORY_TYPE
+GetMemoryBinType (
+  IN EFI_PHYSICAL_ADDRESS  PhysicalStart,
+  IN EFI_PHYSICAL_ADDRESS  PhysicalEnd
+  );
+
 //
 // Internal Global data
 //
