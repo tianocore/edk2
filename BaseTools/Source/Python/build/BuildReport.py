@@ -2240,8 +2240,9 @@ class BuildReport(object):
     # @param ReportFile      The file name to save report file
     # @param ReportType      The kind of report items in the final report file
     #
-    def __init__(self, ReportFile, ReportType):
+    def __init__(self, ReportFile, ReportType, NinjaBuild):
         self.ReportFile = ReportFile
+        self.NinjaBuild = NinjaBuild
         if ReportFile:
             self.ReportList = []
             self.ReportType = []
@@ -2382,10 +2383,11 @@ class BuildReport(object):
                         # Add module to report
                         module_report.append(module_report_data)
 
-                        # Include file dependencies to used files
-                        includes_autogen = IncludesAutoGen(module.MakeFileDir, module)
-                        for dep in includes_autogen.DepsCollection:
-                            used_files.add(dep)
+                        if self.NinjaBuild != True:
+                            # Include file dependencies to used files
+                            includes_autogen = IncludesAutoGen(module.MakeFileDir, module)
+                            for dep in includes_autogen.DepsCollection:
+                                used_files.add(dep)
 
                         inc_flag = "-I" # Default include flag
                         if module.BuildRuleFamily == TAB_COMPILER_MSFT:
