@@ -294,6 +294,8 @@ Ip6SelectInterface (
   IP6_INTERFACE     *IpIf;
   BOOLEAN           Exist;
 
+  IpIf = NULL;
+
   NET_CHECK_SIGNATURE (IpSb, IP6_SERVICE_SIGNATURE);
   ASSERT (Destination != NULL && Source != NULL);
 
@@ -609,7 +611,11 @@ Ip6Output (
       }
 
       IcmpHead = (IP6_ICMP_HEAD *)NetbufGetByte (Packet, 0, NULL);
-      ASSERT (IcmpHead != NULL);
+      if (IcmpHead == NULL) {
+        ASSERT (IcmpHead != NULL);
+        return EFI_INVALID_PARAMETER;
+      }
+
       if (IcmpHead->Checksum == 0) {
         Checksum = &IcmpHead->Checksum;
       }
@@ -843,13 +849,22 @@ Ip6Output (
       // be fragmented below.
       //
       TmpPacket = NetbufGetFragment (Packet, 0, Packet->TotalSize, FragmentHdrsLen);
-      ASSERT (TmpPacket != NULL);
+      if (TmpPacket == NULL) {
+        ASSERT (TmpPacket != NULL);
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Error;
+      }
 
       //
       // Allocate the space to contain the fragmentable hdrs and copy the data.
       //
       Buf = NetbufAllocSpace (TmpPacket, FragmentHdrsLen, TRUE);
-      ASSERT (Buf != NULL);
+      if (Buf == NULL) {
+        ASSERT (Buf != NULL);
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Error;
+      }
+
       CopyMem (Buf, ExtHdrs + UnFragmentHdrsLen, FragmentHdrsLen);
 
       //

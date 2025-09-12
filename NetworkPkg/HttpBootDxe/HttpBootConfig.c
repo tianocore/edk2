@@ -324,8 +324,12 @@ HttpBootFormExtractConfig (
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
     ConfigRequestHdr = HiiConstructConfigHdr (&gHttpBootConfigGuid, mHttpBootConfigStorageName, CallbackInfo->ChildHandle);
-    Size             = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
-    ConfigRequest    = AllocateZeroPool (Size);
+    if (ConfigRequestHdr == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    Size          = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest = AllocateZeroPool (Size);
     if (ConfigRequest == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -683,16 +687,19 @@ HttpBootConfigFormInit (
                       STRING_TOKEN (STR_HTTP_BOOT_CONFIG_FORM_HELP),
                       NULL
                       );
-    UnicodeSPrint (MenuString, 128, L"%s (MAC:%s)", OldMenuString, MacString);
-    HiiSetString (
-      CallbackInfo->RegisteredHandle,
-      STRING_TOKEN (STR_HTTP_BOOT_CONFIG_FORM_HELP),
-      MenuString,
-      NULL
-      );
+    if (OldMenuString != NULL) {
+      UnicodeSPrint (MenuString, 128, L"%s (MAC:%s)", OldMenuString, MacString);
+      HiiSetString (
+        CallbackInfo->RegisteredHandle,
+        STRING_TOKEN (STR_HTTP_BOOT_CONFIG_FORM_HELP),
+        MenuString,
+        NULL
+        );
+
+      FreePool (OldMenuString);
+    }
 
     FreePool (MacString);
-    FreePool (OldMenuString);
 
     CallbackInfo->Initialized = TRUE;
     return EFI_SUCCESS;
