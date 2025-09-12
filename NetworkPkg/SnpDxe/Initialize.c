@@ -30,6 +30,11 @@ PxeInit (
   VOID                *Addr;
   EFI_STATUS          Status;
 
+  if (Snp->Cdb == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Snp->Cdb is NULL\n", __func__));
+    return EFI_DEVICE_ERROR;
+  }
+
   Status = EFI_SUCCESS;
 
   Cpb = Snp->Cpb;
@@ -76,41 +81,41 @@ PxeInit (
 
   Cpb->LoopBackMode = LOOPBACK_NORMAL;
 
-  Snp->Cdb.OpCode  = PXE_OPCODE_INITIALIZE;
-  Snp->Cdb.OpFlags = CableDetectFlag;
+  Snp->Cdb->OpCode  = PXE_OPCODE_INITIALIZE;
+  Snp->Cdb->OpFlags = CableDetectFlag;
 
-  Snp->Cdb.CPBsize = (UINT16)sizeof (PXE_CPB_INITIALIZE);
-  Snp->Cdb.DBsize  = (UINT16)sizeof (PXE_DB_INITIALIZE);
+  Snp->Cdb->CPBsize = (UINT16)sizeof (PXE_CPB_INITIALIZE);
+  Snp->Cdb->DBsize  = (UINT16)sizeof (PXE_DB_INITIALIZE);
 
-  Snp->Cdb.CPBaddr = (UINT64)(UINTN)Snp->Cpb;
-  Snp->Cdb.DBaddr  = (UINT64)(UINTN)Snp->Db;
+  Snp->Cdb->CPBaddr = (UINT64)(UINTN)Snp->Cpb;
+  Snp->Cdb->DBaddr  = (UINT64)(UINTN)Snp->Db;
 
-  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum     = Snp->IfNum;
-  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
+  Snp->Cdb->StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb->StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb->IFnum     = Snp->IfNum;
+  Snp->Cdb->Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   DEBUG ((DEBUG_NET, "\nSnp->undi.initialize()  "));
 
-  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)Snp->Cdb);
 
   //
   // There are two fields need to be checked here:
-  // First is the upper two bits (14 & 15) in the CDB.StatFlags field. Until these bits change to report
+  // First is the upper two bits (14 & 15) in the Cdb->StatFlags field. Until these bits change to report
   // PXE_STATFLAGS_COMMAND_COMPLETE or PXE_STATFLAGS_COMMAND_FAILED, the command has not been executed by the UNDI.
-  // Second is the CDB.StatCode field. After command execution completes, either successfully or not,
-  // the CDB.StatCode field contains the result of the command execution.
+  // Second is the Cdb->StatCode field. After command execution completes, either successfully or not,
+  // the Cdb->StatCode field contains the result of the command execution.
   //
-  if ((((Snp->Cdb.StatFlags) & PXE_STATFLAGS_STATUS_MASK) == PXE_STATFLAGS_COMMAND_COMPLETE) &&
-      (Snp->Cdb.StatCode == PXE_STATCODE_SUCCESS))
+  if ((((Snp->Cdb->StatFlags) & PXE_STATFLAGS_STATUS_MASK) == PXE_STATFLAGS_COMMAND_COMPLETE) &&
+      (Snp->Cdb->StatCode == PXE_STATCODE_SUCCESS))
   {
     //
-    // If cable detect feature is enabled in CDB.OpFlags, check the CDB.StatFlags to see if there is an
+    // If cable detect feature is enabled in Cdb->OpFlags, check the Cdb->StatFlags to see if there is an
     // active connection to this network device. If the no media StatFlag is set, the UNDI and network
     // device are still initialized.
     //
     if (CableDetectFlag == PXE_OPFLAGS_INITIALIZE_DETECT_CABLE) {
-      if (((Snp->Cdb.StatFlags) & PXE_STATFLAGS_INITIALIZED_NO_MEDIA) != PXE_STATFLAGS_INITIALIZED_NO_MEDIA) {
+      if (((Snp->Cdb->StatFlags) & PXE_STATFLAGS_INITIALIZED_NO_MEDIA) != PXE_STATFLAGS_INITIALIZED_NO_MEDIA) {
         Snp->Mode.MediaPresent = TRUE;
       } else {
         Snp->Mode.MediaPresent = FALSE;
@@ -123,8 +128,8 @@ PxeInit (
     DEBUG (
       (DEBUG_WARN,
        "\nSnp->undi.initialize()  %xh:%xh\n",
-       Snp->Cdb.StatFlags,
-       Snp->Cdb.StatCode)
+       Snp->Cdb->StatFlags,
+       Snp->Cdb->StatCode)
       );
 
     if (Snp->TxRxBuffer != NULL) {
