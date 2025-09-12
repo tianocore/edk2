@@ -17,7 +17,7 @@
   PI_SPECIFICATION_VERSION       = 0x00010032
   ENTRY_POINT                    = StandaloneMmMain
 
-#  VALID_ARCHITECTURES           = IA32 X64 AARCH64 ARM
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
 
 [Sources]
   StandaloneMmCore.c
@@ -99,7 +99,5 @@
 # AARCH64 for this module.
 #
 [BuildOptions]
-  GCC:*_*_ARM_CC_FLAGS = -fpie
-  GCC:*_*_ARM_DLINK_FLAGS = -Wl,-z,text,-Bsymbolic,-pie
   GCC:*_*_AARCH64_CC_FLAGS = -fpie
   GCC:*_*_AARCH64_DLINK_FLAGS = -Wl,-z,text,-Bsymbolic,-pie

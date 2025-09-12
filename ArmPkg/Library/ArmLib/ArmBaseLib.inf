@@ -18,26 +18,18 @@
   LIBRARY_CLASS                  = ArmLib
 
 [Sources]
-  ArmLibPrivate.h
+  AArch64ArchTimerSupport.S
+
+  AArch64Lib.h
+  AArch64Lib.c
+
+  AArch64Support.S
+
   ArmLib.c
+  ArmLibPrivate.h
 
-[Sources.ARM]
-  Arm/ArmV7Lib.h
-  Arm/ArmV7Lib.c
-
-  Arm/ArmLibSupport.S           | GCC
-  Arm/ArmLibSupportV7.S         | GCC
-  Arm/ArmV7Support.S            | GCC
-  Arm/ArmV7ArchTimerSupport.S   | GCC
-
-[Sources.AARCH64]
-  AArch64/AArch64Lib.h
-  AArch64/AArch64Lib.c
-
-  AArch64/ArmLibSupport.S
-  AArch64/ArmLibSupportV8.S
-  AArch64/AArch64Support.S
-  AArch64/AArch64ArchTimerSupport.S
+  ArmLibSupport.S
+  ArmLibSupportV8.S
 
 [LibraryClasses]
   DebugLib

@@ -98,7 +98,6 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
         return (
                 "IA32",
                 "X64",
-                "ARM",
                 "AARCH64",
                 "RISCV64",
                 "LOONGARCH64")

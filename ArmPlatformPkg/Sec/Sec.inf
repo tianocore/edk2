@@ -15,21 +15,13 @@
   VERSION_STRING                 = 1.0
 
 [Sources.common]
+  ArchSec.c
+  Exception.S
+  Helper.S
+  ModuleEntryPoint.S
   Sec.h
   Sec.c
-
-[Sources.ARM]
-  Arm/ArchSec.c
-  Arm/Exception.S
-  Arm/ModuleEntryPoint.S
-  Arm/SwitchStack.S
-
-[Sources.AARCH64]
-  AArch64/ArchSec.c
-  AArch64/Exception.S
-  AArch64/Helper.S
-  AArch64/ModuleEntryPoint.S
-  AArch64/SwitchStack.S
+  SwitchStack.S
 
 [Packages]
   ArmPlatformPkg/ArmPlatformPkg.dec
@@ -65,6 +57,3 @@
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack
-
-[FixedPcd.ARM]
-  gArmTokenSpaceGuid.PcdVFPEnabled

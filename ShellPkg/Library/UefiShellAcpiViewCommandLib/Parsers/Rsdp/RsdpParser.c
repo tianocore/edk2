@@ -32,7 +32,7 @@ ValidateRsdtAddress (
   IN VOID    *Context
   )
 {
- #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+ #if defined (MDE_CPU_AARCH64)
   // Reference: Server Base Boot Requirements System Software on ARM Platforms
   // Section: 4.2.1.1 RSDP
   // Root System Description Pointer (RSDP), ACPI ? 5.2.5.
@@ -70,7 +70,7 @@ ValidateXsdtAddress (
   IN VOID    *Context
   )
 {
- #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+ #if defined (MDE_CPU_AARCH64)
   // Reference: Server Base Boot Requirements System Software on ARM Platforms
   // Section: 4.2.1.1 RSDP
   // Root System Description Pointer (RSDP), ACPI ? 5.2.5.

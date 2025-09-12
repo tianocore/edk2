@@ -16,11 +16,11 @@
   LIBRARY_CLASS                  = ArmMmuLib|PEIM
   CONSTRUCTOR                    = ArmMmuPeiLibConstructor
 
-[Sources.AARCH64]
+[Sources]
+  ArmMmuLibCore.c
   ArmMmuLibInternal.h
-  AArch64/ArmMmuLibCore.c
-  AArch64/ArmMmuPeiLibConstructor.c
-  AArch64/ArmMmuLibReplaceEntry.S
+  ArmMmuPeiLibConstructor.c
+  ArmMmuLibReplaceEntry.S
 
 [Packages]
   MdePkg/MdePkg.dec

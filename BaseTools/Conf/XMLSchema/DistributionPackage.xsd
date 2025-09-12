@@ -330,7 +330,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
               having an error
             </xs:documentation>
             <xs:documentation xml:lang="en-us">
-              #3 Allow for inclusion of ARM and future architecture
+              #3 Allow for inclusion of  and future architecture
               types
             </xs:documentation>
           </xs:annotation>
@@ -2861,7 +2861,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
       <xs:enumeration value="X64"/>
       <xs:enumeration value="IPF"/>
       <xs:enumeration value="EBC"/>
-      <xs:enumeration value="ARM"/>
+      <xs:enumeration value=""/>
       <xs:pattern value="([A-Z])([a-zA-Z0-9])*">
         <xs:annotation>
           <xs:documentation xml:lang="en-us">

@@ -14,11 +14,8 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmHvcLib
 
-[Sources.ARM]
-  Arm/ArmHvc.S      | GCC
-
-[Sources.AARCH64]
-  AArch64/ArmHvc.S
+[Sources]
+  ArmHvc.S
 
 [Packages]
   MdePkg/MdePkg.dec

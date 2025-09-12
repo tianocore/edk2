@@ -30,7 +30,7 @@
 #include <Library/AmlLib/AmlLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
-#if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+#if defined (MDE_CPU_AARCH64)
   #include <Library/ArmGicLib.h>
 #endif
 
@@ -107,7 +107,7 @@ ValidateSerialPortInfo (
       return EFI_INVALID_PARAMETER;
     }
 
- #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+ #if defined (MDE_CPU_AARCH64)
     // If an interrupt is not wired to the serial port, the Configuration
     // Manager specifies the interrupt as 0.
     // Any other value must be within the SPI or extended SPI range.
