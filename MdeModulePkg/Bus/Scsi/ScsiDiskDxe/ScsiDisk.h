@@ -174,6 +174,7 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gScsiDiskComponentName2;
 #define ACTION_READ_CAPACITY            0x01
 #define ACTION_RETRY_COMMAND_LATER      0x02
 #define ACTION_RETRY_WITH_BACKOFF_ALGO  0x03
+#define ACTION_RETRY_WITHOUT_FUA        0x04
 
 #define SCSI_COMMAND_VERSION_1  0x01
 #define SCSI_COMMAND_VERSION_2  0x02
@@ -1176,6 +1177,7 @@ ScsiDiskRead10 (
   @param  DataLength         The length of buffer
   @param  StartLba           The start logic block address
   @param  SectorCount        The number of blocks to write
+  @param  bFUA               If TURE, the FUA bit will be set
 
   @return  EFI_STATUS is returned by calling ScsiWrite10Command().
 
@@ -1188,7 +1190,8 @@ ScsiDiskWrite10 (
   IN     UINT8          *DataBuffer,
   IN OUT UINT32         *DataLength,
   IN     UINT32         StartLba,
-  IN     UINT32         SectorCount
+  IN     UINT32         SectorCount,
+  IN     BOOLEAN        bFUA
   );
 
 /**
@@ -1225,6 +1228,7 @@ ScsiDiskRead16 (
   @param  DataLength         The length of buffer
   @param  StartLba           The start logic block address
   @param  SectorCount        The number of blocks to write
+  @param  bFUA               If TURE, the FUA bit will be set
 
   @return  EFI_STATUS is returned by calling ScsiWrite16Command().
 
@@ -1237,7 +1241,8 @@ ScsiDiskWrite16 (
   IN     UINT8          *DataBuffer,
   IN OUT UINT32         *DataLength,
   IN     UINT64         StartLba,
-  IN     UINT32         SectorCount
+  IN     UINT32         SectorCount,
+  IN     BOOLEAN        bFUA
   );
 
 /**

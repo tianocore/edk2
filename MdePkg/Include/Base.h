@@ -1240,6 +1240,11 @@ typedef UINTN RETURN_STATUS;
 #define RETURN_HTTP_ERROR  ENCODE_ERROR (35)
 
 ///
+/// A Device error caused by FUA bit.
+///
+#define RETURN_DEVICE_NO_FUA  ENCODE_ERROR (36)
+
+///
 /// The string contained one or more characters that
 /// the device could not render and were skipped.
 ///
