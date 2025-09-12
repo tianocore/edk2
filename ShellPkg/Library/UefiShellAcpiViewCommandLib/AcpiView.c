@@ -237,8 +237,14 @@ AcpiView (
     }
   }
 
-  if (FoundAcpiTable) {
+  if (FoundAcpiTable && (EfiConfigurationTable != NULL)) {
     RsdpPtr = (UINT8 *)EfiConfigurationTable->VendorTable;
+
+    if (RsdpPtr == NULL) {
+      IncrementErrorCount ();
+      Print (L"ERROR: ACPI Table Guid found but RSDP pointer is NULL.\n");
+      return EFI_NOT_FOUND;
+    }
 
     // The RSDP revision is 1 byte starting at offset 15
     RsdpRevision = *(RsdpPtr + RSDP_REVISION_OFFSET);
