@@ -763,6 +763,19 @@ ArmHasEte (
   VOID
   );
 
+/**
+  Checks whether the CPU supports 52-bit addressing with 4KiB translation
+  granule size
+
+  @retval TRUE   52-bit addressing is implemented.
+  @retval FALSE  52-bit addressing is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHas52BitTgran4 (
+  VOID
+  );
+
 #endif // MDE_CPU_AARCH64
 
 #ifdef MDE_CPU_ARM

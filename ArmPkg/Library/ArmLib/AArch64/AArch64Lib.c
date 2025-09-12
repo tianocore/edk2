@@ -109,3 +109,23 @@ ArmHasEte (
   // The ID_AA64DFR0_EL1.TraceVer field identifies the presence of FEAT_ETE.
   return ((ArmReadIdAA64Dfr0 () & AARCH64_DFR0_TRACEVER) != 0);
 }
+
+/**
+  Checks whether the CPU supports 52-bit addressing with 4KiB translation
+  granule size
+
+  @retval TRUE   52-bit addressing is implemented.
+  @retval FALSE  52-bit addressing is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHas52BitTgran4 (
+  VOID
+  )
+{
+  UINT64  Mmfr0;
+
+  Mmfr0 = ArmReadIdAA64Mmfr0 ();
+
+  return ((Mmfr0 & AARCH64_MMFR0_TGRAN4_MASK) == AARCH64_MMFR0_TGRAN4_52BITS);
+}
