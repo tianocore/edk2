@@ -19,7 +19,7 @@
   AndroidFastbootApp.c
   AndroidBootImg.c
 
-[Sources.ARM, Sources.AARCH64]
+[Sources.AARCH64]
   Arm/BootAndroidBootImg.c
 
 [LibraryClasses]
@@ -48,6 +48,6 @@
   MdeModulePkg/MdeModulePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
 
-[Packages.ARM, Packages.AARCH64]
+[Packages.AARCH64]
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec

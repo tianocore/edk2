@@ -16,15 +16,6 @@
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = InitializeVirtualKeyboard
 
-#
-# The following information is for reference only and not required by the build tools.
-#
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
-#
-#  DRIVER_BINDING                = gVirtualKeyboardDriverBinding
-#  COMPONENT_NAME                = gVirtualKeyboardComponentName
-#
-
 [Sources.common]
   ComponentName.c
   VirtualKeyboard.c
