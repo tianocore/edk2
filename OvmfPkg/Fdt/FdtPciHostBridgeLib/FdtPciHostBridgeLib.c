@@ -428,7 +428,7 @@ PciHostBridgeGetRootBridges (
   } else {
     //
     // UEFI mandates a 1:1 virtual-to-physical mapping, so on a 32-bit
-    // architecture such as ARM, we will not be able to access 64-bit MMIO
+    // architecture, we will not be able to access 64-bit MMIO
     // BARs unless they are allocated below 4 GB. So ignore the range above
     // 4 GB in this case.
     //
