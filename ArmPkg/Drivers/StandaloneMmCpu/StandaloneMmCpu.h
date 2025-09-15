@@ -30,7 +30,6 @@ extern EFI_MM_CPU_PROTOCOL  mMmCpuState;
 //
 // MM event handling specific declarations
 //
-extern EFI_MM_COMMUNICATE_HEADER      *gGuidedEventContext;
 extern EFI_MM_CONFIGURATION_PROTOCOL  mMmConfig;
 
 /**
