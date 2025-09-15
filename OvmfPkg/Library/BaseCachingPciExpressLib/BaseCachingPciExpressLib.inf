@@ -21,7 +21,7 @@
   CONSTRUCTOR                    = PciExpressLibInitialize
 
 #
-#  VALID_ARCHITECTURES           = ARM AARCH64 RISCV64
+#  VALID_ARCHITECTURES           = AARCH64 RISCV64
 #
 
 [Sources]
