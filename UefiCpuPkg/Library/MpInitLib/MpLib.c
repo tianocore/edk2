@@ -1643,14 +1643,30 @@ TimedWaitForApFinish (
                               TimeLimit,
                               &CpuMpData->CurrentTime
                               );
-  while (CpuMpData->FinishedCount < FinishedApLimit &&
-         !CheckTimeout (
-            &CpuMpData->CurrentTime,
-            &CpuMpData->TotalTime,
-            CpuMpData->ExpectedTime
-            ))
   {
-    CpuPause ();
+    UINTN  LoopCount;
+    UINTN  PauseCount;
+    UINTN  Index;
+
+    LoopCount  = 0;
+    PauseCount = 1;
+
+    while (CpuMpData->FinishedCount < FinishedApLimit &&
+           !CheckTimeout (
+              &CpuMpData->CurrentTime,
+              &CpuMpData->TotalTime,
+              CpuMpData->ExpectedTime
+              ))
+    {
+      for (Index = 0; Index < PauseCount; Index++) {
+        CpuPause ();
+      }
+
+      LoopCount++;
+      if ((LoopCount % 8) == 0 && PauseCount < 1024) {
+        PauseCount *= 2;
+      }
+    }
   }
 
   if (CpuMpData->FinishedCount >= FinishedApLimit) {
