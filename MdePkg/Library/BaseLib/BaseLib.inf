@@ -21,7 +21,7 @@
   LIBRARY_CLASS                  = BaseLib
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64 RISCV64 LOONGARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 EBC AARCH64 RISCV64 LOONGARCH64
 #
 
 [Sources]
@@ -341,35 +341,9 @@
   Math64.c
   IntelTdxNull.c
 
-[Sources.ARM]
-  Arm/InternalSwitchStack.c
-  Arm/Unaligned.c
-  Math64.c                   | MSFT
-
-  Arm/SwitchStack.asm        | MSFT
-  Arm/SetJumpLongJump.asm    | MSFT
-  Arm/DisableInterrupts.asm  | MSFT
-  Arm/EnableInterrupts.asm   | MSFT
-  Arm/GetInterruptsState.asm | MSFT
-  Arm/CpuPause.asm           | MSFT
-  Arm/CpuBreakpoint.asm      | MSFT
-  Arm/MemoryFence.asm        | MSFT
-  Arm/SpeculationBarrier.asm | MSFT
-
-  Arm/Math64.S                  | GCC
-  Arm/SwitchStack.S             | GCC
-  Arm/EnableInterrupts.S        | GCC
-  Arm/DisableInterrupts.S       | GCC
-  Arm/GetInterruptsState.S      | GCC
-  Arm/SetJumpLongJump.S         | GCC
-  Arm/CpuBreakpoint.S           | GCC
-  Arm/MemoryFence.S             | GCC
-  Arm/SpeculationBarrier.S      | GCC
-  IntelTdxNull.c
-
 [Sources.AARCH64]
-  Arm/InternalSwitchStack.c
-  Arm/Unaligned.c
+  AArch64/InternalSwitchStack.c
+  AArch64/Unaligned.c
   Math64.c
 
   AArch64/MemoryFence.S             | GCC
