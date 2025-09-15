@@ -14,11 +14,8 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmMonitorLib
 
-[Sources.ARM]
-  Arm/ArmMonitorLib.S
-
-[Sources.AARCH64]
-  AArch64/ArmMonitorLib.S
+[Sources]
+  ArmMonitorLib.S
 
 [Packages]
   ArmPkg/ArmPkg.dec
