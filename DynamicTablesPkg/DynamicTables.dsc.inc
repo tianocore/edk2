@@ -94,7 +94,7 @@
       NULL|DynamicTablesPkg/Library/Acpi/X64/AcpiSsdtHpetLib/AcpiSsdtHpetLib.inf
   }
 
-[Components.ARM, Components.AARCH64]
+[Components.AARCH64]
   #
   # Generators (Arm specific)
   #

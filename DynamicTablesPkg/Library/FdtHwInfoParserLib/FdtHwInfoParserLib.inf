@@ -27,7 +27,7 @@
   Serial/SerialPortParser.c
   Serial/SerialPortParser.h
 
-[Sources.ARM, Sources.AARCH64]
+[Sources.AARCH64]
   Arm/ArmFdtInterrupt.c
   Arm/ArmFdtHwInfoParser.c
   Arm/BootArch/ArmBootArchParser.c
@@ -47,7 +47,7 @@
   Arm/Gic/ArmGicRParser.c
   Arm/Gic/ArmGicRParser.h
 
-[Packages.ARM, Packages.AARCH64]
+[Packages.AARCH64]
   ArmPkg/ArmPkg.dec
 
 [Packages]

@@ -21,7 +21,7 @@
   FadtGenerator.c
   FadtGenerator.h
 
-[Sources.ARM, Sources.AARCH64]
+[Sources.AARCH64]
   Arm/ArmFadtGenerator.c
 
 [Sources.X64]

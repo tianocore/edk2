@@ -21,13 +21,13 @@
   Dbg2Generator.c
   Dbg2Generator.h
 
-[Sources.ARM, Sources.AARCH64]
+[Sources.AARCH64]
   Arm/ArmDbg2Generator.c
 
 [Sources.X64]
   Dbg2GeneratorNull.c
 
-[Packages.ARM, Packages.AARCH64]
+[Packages.AARCH64]
   ArmPlatformPkg/ArmPlatformPkg.dec
 
 [Packages]
@@ -36,7 +36,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
   DynamicTablesPkg/DynamicTablesPkg.dec
 
-[LibraryClasses.ARM, LibraryClasses.AARCH64]
+[LibraryClasses.AARCH64]
   PL011UartLib
 
 [LibraryClasses]

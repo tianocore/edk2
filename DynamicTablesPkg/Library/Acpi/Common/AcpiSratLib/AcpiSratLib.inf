@@ -21,7 +21,7 @@
   SratGenerator.c
   SratGenerator.h
 
-[Sources.ARM, Sources.AARCH64]
+[Sources.AARCH64]
   Arm/ArmSratGenerator.c
 
 [Sources.X64]
