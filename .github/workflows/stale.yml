@@ -27,7 +27,7 @@ jobs:
 
     steps:
     - name: Check for Stale Items
-      uses: actions/stale@v8
+      uses: actions/stale@v10
       with:
         days-before-issue-close: -1
         days-before-issue-stale: -1
