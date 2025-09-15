@@ -262,18 +262,16 @@ typedef struct {
 ///@{
 #define EFI_GENERIC_ERROR_PROC_TYPE_IA32_X64  0x00
 #define EFI_GENERIC_ERROR_PROC_TYPE_IA64      0x01
-#define EFI_GENERIC_ERROR_PROC_TYPE_ARM       0x02
 ///@}
 
 ///
 /// The type of the instruction set executing when the error occurred in Proessor
 /// Generic Error section.
 ///@{
-#define EFI_GENERIC_ERROR_PROC_ISA_IA32         0x00
-#define EFI_GENERIC_ERROR_PROC_ISA_IA64         0x01
-#define EFI_GENERIC_ERROR_PROC_ISA_X64          0x02
-#define EFI_GENERIC_ERROR_PROC_ISA_ARM_A32_T32  0x03
-#define EFI_GENERIC_ERROR_PROC_ISA_ARM_A64      0x04
+#define EFI_GENERIC_ERROR_PROC_ISA_IA32     0x00
+#define EFI_GENERIC_ERROR_PROC_ISA_IA64     0x01
+#define EFI_GENERIC_ERROR_PROC_ISA_X64      0x02
+#define EFI_GENERIC_ERROR_PROC_ISA_ARM_A64  0x04
 ///@}
 
 ///
