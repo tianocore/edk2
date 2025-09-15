@@ -154,17 +154,13 @@
 
   ArmPkg/Drivers/MmCommunicationPei/MmCommunicationPei.inf
 
-[Components.common.MM_CORE_STANALONE]
-  ArmPkg/Library/ArmStandaloneMmCoreEntryPoint/ArmStandaloneMmCoreEntryPoint.inf
-
-[Components.common.MM_STANDALONE]
-  ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
-
-[Components.AARCH64]
   ArmPkg/Drivers/ArmCrashDumpDxe/ArmCrashDumpDxe.inf
   ArmPkg/Drivers/ArmGicDxe/ArmGicV3Dxe.inf
   ArmPkg/Drivers/ArmPsciMpServicesDxe/ArmPsciMpServicesDxe.inf
   ArmPkg/Drivers/MmCommunicationDxe/MmCommunication.inf
 
-[Components.AARCH64, Components.ARM]
   ArmPkg/Library/StandaloneMmMmuLib/ArmMmuStandaloneMmLib.inf
+
+  ArmPkg/Library/ArmStandaloneMmCoreEntryPoint/ArmStandaloneMmCoreEntryPoint.inf
+
+  ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
