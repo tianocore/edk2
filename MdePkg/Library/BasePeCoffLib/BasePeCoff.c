@@ -1,6 +1,6 @@
 /** @file
   Base PE/COFF loader supports loading any PE32/PE32+ or TE image, but
-  only supports relocating IA32, x64, IPF, ARM, RISC-V, LoongArch and EBC images.
+  only supports relocating IA32, x64, IPF, RISC-V, LoongArch and EBC images.
 
   Caution: This file requires additional review when modified.
   This library will have external input - PE/COFF image.
