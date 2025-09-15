@@ -23,15 +23,9 @@
   LIBRARY_CLASS                  = CpuExceptionHandlerLib
 
 [Sources.common]
+  AArch64Exception.c
   ArmExceptionLib.c
-
-[Sources.Arm]
-  Arm/ArmException.c
-  Arm/ExceptionSupport.S   | GCC
-
-[Sources.AARCH64]
-  AArch64/AArch64Exception.c
-  AArch64/ExceptionSupport.S
+  ExceptionSupport.S
 
 [Packages]
   MdePkg/MdePkg.dec
