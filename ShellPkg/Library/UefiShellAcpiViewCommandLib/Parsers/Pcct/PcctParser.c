@@ -98,9 +98,9 @@ ValidatePccMemoryIoGas (
   )
 {
   switch (*(UINT8 *)Ptr) {
- #if !(defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64))
+ #if !(defined (MDE_CPU_AARCH64))
     case EFI_ACPI_6_4_SYSTEM_IO:
- #endif //if not (defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64))
+ #endif //if not (defined (MDE_CPU_AARCH64))
     case EFI_ACPI_6_4_SYSTEM_MEMORY:
       return;
     default:
@@ -127,9 +127,9 @@ ValidatePccGas (
   )
 {
   switch (*(UINT8 *)Ptr) {
- #if !(defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64))
+ #if !(defined (MDE_CPU_AARCH64))
     case EFI_ACPI_6_4_SYSTEM_IO:
- #endif //if not (defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64))
+ #endif //if not (defined (MDE_CPU_AARCH64))
     case EFI_ACPI_6_4_FUNCTIONAL_FIXED_HARDWARE:
     case EFI_ACPI_6_4_SYSTEM_MEMORY:
       return;
