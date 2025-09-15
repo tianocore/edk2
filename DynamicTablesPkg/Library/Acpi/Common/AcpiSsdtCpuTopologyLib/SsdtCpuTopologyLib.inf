@@ -21,13 +21,13 @@
   SsdtCpuTopologyGenerator.c
   SsdtCpuTopologyGenerator.h
 
-[Sources.ARM, Sources.AARCH64]
+[Sources.AARCH64]
   Arm/ArmSsdtCpuTopologyGenerator.c
 
 [Sources.X64]
   X64/X64SsdtCpuTopologyGenerator.c
 
-[Packages.ARM, Packages.AARCH64]
+[Packages.AARCH64]
   ArmPlatformPkg/ArmPlatformPkg.dec
 
 [Packages]

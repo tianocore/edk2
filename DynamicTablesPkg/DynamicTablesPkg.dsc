@@ -15,7 +15,7 @@
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x0001001a
   OUTPUT_DIRECTORY               = Build/DynamicTables
-  SUPPORTED_ARCHITECTURES        = ARM|AARCH64|X64
+  SUPPORTED_ARCHITECTURES        = AARCH64|X64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -37,7 +37,7 @@
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
 
-[LibraryClasses.ARM, LibraryClasses.AARCH64]
+[LibraryClasses.AARCH64]
   PL011UartLib|ArmPlatformPkg/Library/PL011UartLib/PL011UartLib.inf
 
 [Components.common]
@@ -53,7 +53,7 @@
   DynamicTablesPkg/Library/Common/MetadataHandlerLib/MetadataHandlerLib.inf
   DynamicTablesPkg/Library/Common/Tpm2DeviceTableLib/Tpm2DeviceTableLib.inf
 
-[Components.ARM, Components.AARCH64]
+[Components.AARCH64]
   DynamicTablesPkg/Library/FdtHwInfoParserLib/FdtHwInfoParserLib.inf
 
 [Components.AARCH64]

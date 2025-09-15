@@ -18,14 +18,14 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = ARM AARCH64
+#  VALID_ARCHITECTURES           = X64 AARCH64
 #
 
 [Sources]
   DynamicTableManagerDxe.c
   DynamicTableManagerDxe.h
 
-[Sources.ARM, Sources.AARCH64]
+[Sources.AARCH64]
   Arm/ArmDynamicTableManager.c
 
 [Sources.X64]
