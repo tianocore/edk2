@@ -50,7 +50,6 @@ Ubuntu 24.04
  Toolchain                    CONFIG            DEBUG         RELEASE       NOOPT
 ============================= ================= ============= ============= ==============
 ArmVirtPkg_Ubuntu_GCC_        | AARCH64         |avAArch64du| |avAArch64ru| |avAArch64nu|
-|                             | ARM             |avArmdu|     |avArmru|     |avArmnu|
 EmulatorPkg_Ubuntu_GCC_       | IA32            **N/A**       **N/A**       **N/A**
 |                             | X64             |em64du|      |em64ru|      |em64nu|
 |                             | IA32 FULL       **N/A**       **N/A**       **N/A**

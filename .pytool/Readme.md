@@ -9,7 +9,7 @@ on the TianoCore wiki.
 
 ## Basic Status
 
-| Package              | Windows VS2022 (IA32/X64)| Ubuntu GCC (IA32/X64/ARM/AARCH64) | Known Issues |
+| Package              | Windows VS2022 (IA32/X64)| Ubuntu GCC (IA32/X64/AARCH64) | Known Issues |
 | :----                | :-----                   | :----                             | :---         |
 | ArmPkg               |                    | :heavy_check_mark: |
 | ArmPlatformPkg       |                    | :heavy_check_mark: |
@@ -272,7 +272,7 @@ few standard scopes.
 * PatchCheck tests as plugins
 * MacOS/xcode support
 * Clang/LLVM support
-* Visual Studio AARCH64 and ARM support
+* Visual Studio AARCH64 support
 * BaseTools C tools CI/PR and binary release process
 * BaseTools Python tools CI/PR process
 * Extensible private/closed source platform reporting
