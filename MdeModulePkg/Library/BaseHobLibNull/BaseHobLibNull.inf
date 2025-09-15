@@ -18,11 +18,6 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = HobLib
 
-
-#
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
-#
-
 [Sources]
   BaseHobLibNull.c
 

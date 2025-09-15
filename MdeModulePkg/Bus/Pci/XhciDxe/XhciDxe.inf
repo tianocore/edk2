@@ -21,16 +21,6 @@
 
   ENTRY_POINT                    = XhcDriverEntryPoint
 
-#
-# The following information is for reference only and not required by the build tools.
-#
-#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64
-#
-#  DRIVER_BINDING                =  gXhciDriverBinding
-#  COMPONENT_NAME                =  gXhciComponentName
-#  COMPONENT_NAME2               =  gXhciComponentName2
-#
-
 [Sources]
   Xhci.c
   XhciReg.c

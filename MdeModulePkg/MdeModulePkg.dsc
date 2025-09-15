@@ -16,7 +16,7 @@
   PLATFORM_VERSION               = 0.98
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/MdeModule
-  SUPPORTED_ARCHITECTURES        = IA32|X64|EBC|ARM|AARCH64|RISCV64|LOONGARCH64
+  SUPPORTED_ARCHITECTURES        = IA32|X64|EBC|AARCH64|RISCV64|LOONGARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -182,7 +182,7 @@
   VarCheckHiiLibMmDependency|MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLibMmDependency.inf
   VarCheckHiiLib|MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLibStandaloneMm.inf
 
-[LibraryClasses.ARM, LibraryClasses.AARCH64]
+[LibraryClasses.AARCH64]
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
   ArmSmcLib|MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
   ArmSvcLib|MdePkg/Library/ArmSvcLib/ArmSvcLib.inf
@@ -460,7 +460,7 @@
   MdeModulePkg/Universal/EbcDxe/EbcDebugger.inf
   MdeModulePkg/Universal/EbcDxe/EbcDebuggerConfig.inf
 
-[Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
+[Components.IA32, Components.X64, Components.AARCH64]
   MdeModulePkg/Library/BrotliCustomDecompressLib/BrotliCustomDecompressLib.inf
   MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
@@ -533,7 +533,7 @@
 [Components.X64]
   MdeModulePkg/Universal/CapsulePei/CapsuleX64.inf
 
-[Components.ARM, Components.AARCH64]
+[Components.AARCH64]
   MdeModulePkg/Library/ArmFfaLib/ArmFfaSecLib.inf
   MdeModulePkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
   MdeModulePkg/Library/ArmFfaLib/ArmFfaDxeLib.inf

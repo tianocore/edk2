@@ -18,16 +18,6 @@
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = PciBusEntryPoint
 
-#
-# The following information is for reference only and not required by the build tools.
-#
-#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64
-#
-#  DRIVER_BINDING                =  gPciBusDriverBinding
-#  COMPONENT_NAME                =  gPciBusComponentName
-#  COMPONENT_NAME2               =  gPciBusComponentName2
-#
-
 [Sources]
   PciLib.c
   PciIo.c
