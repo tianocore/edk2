@@ -65,8 +65,6 @@ class HostUnitTestCompilerPlugin(ICiBuildPlugin):
         elif GetHostInfo().arch == 'ARM':
             if GetHostInfo().bit == '64':
                 host.append("AARCH64")
-            elif GetHostInfo().bit == '32':
-                host.append("ARM")
 
         willrun = set(requested) & set(host)
         return (len(willrun), " ".join(willrun))
