@@ -70,7 +70,7 @@ ValidateFirmwareCtrl (
   IN VOID    *Context
   )
 {
- #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+ #if defined (MDE_CPU_AARCH64)
   if (*(UINT32 *)Ptr != 0) {
     IncrementErrorCount ();
     Print (
@@ -98,7 +98,7 @@ ValidateXFirmwareCtrl (
   IN VOID    *Context
   )
 {
- #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+ #if defined (MDE_CPU_AARCH64)
   if (*(UINT64 *)Ptr != 0) {
     IncrementErrorCount ();
     Print (
@@ -126,7 +126,7 @@ ValidateFlags (
   IN VOID    *Context
   )
 {
- #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+ #if defined (MDE_CPU_AARCH64)
   if (((*(UINT32 *)Ptr) & HW_REDUCED_ACPI) == 0) {
     IncrementErrorCount ();
     Print (
@@ -374,7 +374,7 @@ ParseAcpiFadt (
     DsdtPtr = (UINT8 *)(UINTN)(*DsdtAddress);
   } else {
     // Both DSDT and X_DSDT cannot be invalid.
- #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+ #if defined (MDE_CPU_AARCH64)
     if (Trace) {
       // The DSDT Table is mandatory for ARM systems
       // as the CPU information MUST be presented in
