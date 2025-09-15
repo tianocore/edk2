@@ -1,5 +1,5 @@
 /** @file
-  Implementation of GUID functions for ARM and AARCH64
+  Implementation of GUID functions for AARCH64
 
   Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
