@@ -4,7 +4,7 @@
 #  I/O Library that uses compiler intrinsics to perform IN and OUT instructions
 #  for IA-32 and x64.  On IPF, I/O port requests are translated into MMIO requests.
 #  MMIO requests are forwarded directly to memory.  For EBC, I/O port requests
-#  ASSERT(). For ARM, AARCH64, RISCV64 and LoongArch, this I/O library only provides
+#  ASSERT(). For AARCH64, RISCV64 and LoongArch, this I/O library only provides
 #  non I/O read and write.
 #
 #  Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
@@ -28,7 +28,7 @@
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64 RISCV64 LOONGARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 EBC AARCH64 RISCV64 LOONGARCH64
 #
 
 [Sources]
@@ -47,9 +47,6 @@
 [Sources.EBC]
   IoLibEbc.c
   IoLib.c
-
-[Sources.ARM]
-  IoLibNoIo.c
 
 [Sources.AARCH64]
   IoLibNoIo.c
