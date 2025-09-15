@@ -1,7 +1,7 @@
 ## @file
 #  Instance of CPU Library for various architecture.
 #
-#  CPU Library implemented using ASM functions for IA32, X64, ARM, AARCH64,
+#  CPU Library implemented using ASM functions for IA32, X64, AARCH64,
 #  PAL CALLs for IPF, and empty functions for EBC.
 #
 #  Copyright (c) 2007 - 2022, Intel Corporation. All rights reserved.<BR>
@@ -26,7 +26,7 @@
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64 RISCV64 LOONGARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 EBC AARCH64 RISCV64 LOONGARCH64
 #
 
 [Sources.IA32, Sources.X64]
@@ -48,12 +48,6 @@
 
 [Sources.EBC]
   Ebc/CpuSleepFlushTlb.c
-
-[Sources.ARM]
-  Arm/CpuFlushTlb.asm | MSFT
-  Arm/CpuSleep.asm    | MSFT
-  Arm/CpuFlushTlb.S   | GCC
-  Arm/CpuSleep.S      | GCC
 
 [Sources.AARCH64]
   AArch64/CpuFlushTlb.S   | GCC
