@@ -429,6 +429,7 @@
   SecurityPkg/Library/Tpm2DeviceLibFfa/Tpm2DeviceLibFfa.inf
   SecurityPkg/Library/Tpm2DeviceLibFfa/Tpm2DeviceSecLibFfa.inf
   SecurityPkg/Library/Tpm2DeviceLibFfa/Tpm2InstanceLibFfa.inf
+  SecurityPkg/Library/HashLibTpm2/HashLibTpm2PeilessSecLib.inf
 
 [BuildOptions]
    MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:256
