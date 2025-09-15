@@ -39,7 +39,7 @@ MmFoundationEntryRegister (
 // maintained in single global variable because StandaloneMm is UP-migratable
 // (which means it cannot run concurrently)
 //
-EFI_MM_COMMUNICATE_HEADER            *gGuidedEventContext = NULL;
+STATIC EFI_MM_COMMUNICATE_HEADER     *mGuidedEventContext = NULL;
 STATIC CONST ARM_MM_HANDLER_CONTEXT  *mMmHandlerContext   = NULL;
 
 EFI_MM_CONFIGURATION_PROTOCOL  mMmConfig = {
@@ -107,16 +107,16 @@ PiMmStandaloneMmCpuDriverEntry (
   Status = mMmst->MmAllocatePool (
                     EfiRuntimeServicesData,
                     CommBufferSize,
-                    (VOID **)&gGuidedEventContext
+                    (VOID **)&mGuidedEventContext
                     );
 
   if (EFI_ERROR (Status)) {
-    gGuidedEventContext = NULL;
+    mGuidedEventContext = NULL;
     DEBUG ((DEBUG_ERROR, "%a: Mem alloc failed\n", __func__));
     return Status;
   }
 
-  CopyMem (gGuidedEventContext, (CONST VOID *)CommBufferAddr, CommBufferSize);
+  CopyMem (mGuidedEventContext, (CONST VOID *)CommBufferAddr, CommBufferSize);
   mMmHandlerContext = MmHandlerContext;
 
   ZeroMem (&MmEntryPointContext, sizeof (EFI_MM_ENTRY_CONTEXT));
@@ -135,11 +135,11 @@ PiMmStandaloneMmCpuDriverEntry (
   mMmEntryPoint (&MmEntryPointContext);
 
   // Free the memory allocation done earlier and reset the per-cpu context
-  CopyMem ((VOID *)CommBufferAddr, (CONST VOID *)gGuidedEventContext, CommBufferSize);
+  CopyMem ((VOID *)CommBufferAddr, (CONST VOID *)mGuidedEventContext, CommBufferSize);
 
-  Status = mMmst->MmFreePool ((VOID *)gGuidedEventContext);
+  Status = mMmst->MmFreePool ((VOID *)mGuidedEventContext);
   ASSERT_EFI_ERROR (Status);
-  gGuidedEventContext = NULL;
+  mGuidedEventContext = NULL;
   mMmHandlerContext   = NULL;
 
   return Status;
@@ -197,16 +197,16 @@ PiMmCpuTpFwRootMmiHandler (
   ASSERT (CommBuffer == NULL);
   ASSERT (CommBufferSize == NULL);
 
-  if (gGuidedEventContext == NULL) {
+  if (mGuidedEventContext == NULL) {
     return EFI_NOT_FOUND;
   }
 
   if (CompareGuid (
-        &gGuidedEventContext->HeaderGuid,
+        &mGuidedEventContext->HeaderGuid,
         &gEfiMmCommunicateHeaderV3Guid
         ))
   {
-    GuidedEventContextV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)gGuidedEventContext;
+    GuidedEventContextV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)mGuidedEventContext;
     DEBUG ((
       DEBUG_INFO,
       "CommBuffer - 0x%x, CommBufferSize - 0x%llx, MessageSize - 0x%llx\n",
@@ -225,14 +225,14 @@ PiMmCpuTpFwRootMmiHandler (
     DEBUG ((
       DEBUG_INFO,
       "CommBuffer - 0x%x, CommBufferSize - 0x%x\n",
-      gGuidedEventContext,
-      gGuidedEventContext->MessageLength
+      mGuidedEventContext,
+      mGuidedEventContext->MessageLength
       ));
     Status = mMmst->MmiManage (
-                      &gGuidedEventContext->HeaderGuid,
+                      &mGuidedEventContext->HeaderGuid,
                       mMmHandlerContext,
-                      gGuidedEventContext->Data,
-                      (UINTN *)(&gGuidedEventContext->MessageLength)
+                      mGuidedEventContext->Data,
+                      (UINTN *)(&mGuidedEventContext->MessageLength)
                       );
   }
 
