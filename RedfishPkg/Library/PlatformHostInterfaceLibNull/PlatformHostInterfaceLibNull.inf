@@ -15,10 +15,6 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = RedfishPlatformHostInterfaceLib
 
-#
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64 RISCV64
-#
-
 [Sources]
   PlatformHostInterfaceLibNull.c
 
