@@ -1,5 +1,5 @@
 /** @file
-  Detect Xen SMBIOS data on ARM / AARCH64.
+  Detect Xen SMBIOS data on AARCH64.
 
   Copyright (C) 2015, Red Hat, Inc.
   Copyright (c) 2011, Bei Guan <gbtju85@gmail.com>
