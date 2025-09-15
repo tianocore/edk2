@@ -17,16 +17,11 @@
   VERSION_STRING                 = 1.0
 
 [Sources]
+  ArchPeilessSec.c
+  ModuleEntryPoint.S
+
   PeilessSec.h
   PeilessSec.c
-
-[Sources.ARM]
-  Arm/ArchPeilessSec.c
-  Arm/ModuleEntryPoint.S
-
-[Sources.AArch64]
-  AArch64/ArchPeilessSec.c
-  AArch64/ModuleEntryPoint.S
 
 [Packages]
   ArmPlatformPkg/ArmPlatformPkg.dec
@@ -73,9 +68,6 @@
   gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmTokenSpaceGuid.PcdFvSize
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
-
-[FixedPcd.ARM]
-  gArmTokenSpaceGuid.PcdVFPEnabled
 
 [Pcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase
