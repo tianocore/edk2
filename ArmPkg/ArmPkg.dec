@@ -77,7 +77,7 @@
   ArmTransferListLib|Include/Library/ArmTransferListLib.h
 
   ##  @libraryclass  Defines a set of interfaces for the MM core entrypoint for
-  ##                 AArch64 and ARM.
+  ##                 AArch64.
   StandaloneMmCoreEntryPoint|Include/Library/ArmStandaloneMmCoreEntryPoint.h
 
 [Guids.common]
@@ -176,9 +176,8 @@
 
   #
   # Value to add to a host address to obtain a device address, using
-  # unsigned 64-bit integer arithmetic on both ARM and AArch64. This
-  # means we can rely on truncation on overflow to specify negative
-  # offsets.
+  # unsigned 64-bit integer arithmetic on AArch64. This means we can
+  # rely on truncation on overflow to specify negative offsets.
   #
   gArmTokenSpaceGuid.PcdArmDmaDeviceOffset|0x0|UINT64|0x0000044
 
