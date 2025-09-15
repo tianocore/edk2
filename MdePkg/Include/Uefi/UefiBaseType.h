@@ -233,11 +233,6 @@ typedef union {
 #define EFI_IMAGE_MACHINE_X64  0x8664
 
 ///
-/// PE32+ Machine type for ARM mixed ARM and Thumb/Thumb2 images.
-///
-#define EFI_IMAGE_MACHINE_ARMTHUMB_MIXED  0x01C2
-
-///
 /// PE32+ Machine type for AARCH64 A64 images.
 ///
 #define EFI_IMAGE_MACHINE_AARCH64  0xAA64
@@ -269,12 +264,6 @@ typedef union {
   ((Machine) == EFI_IMAGE_MACHINE_X64)
 
 #define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine)  ((Machine) == EFI_IMAGE_MACHINE_IA32)
-
-  #elif defined (MDE_CPU_ARM)
-
-#define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine)  ((Machine) == EFI_IMAGE_MACHINE_ARMTHUMB_MIXED)
-
-#define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine)  (FALSE)
 
   #elif defined (MDE_CPU_AARCH64)
 

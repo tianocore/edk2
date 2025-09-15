@@ -849,7 +849,6 @@ typedef enum {
   IsaX64     = IMAGE_FILE_MACHINE_X64,            ///< 0x8664
   IsaIpf     = IMAGE_FILE_MACHINE_IA64,           ///< 0x0200
   IsaEbc     = IMAGE_FILE_MACHINE_EBC,            ///< 0x0EBC
-  IsaArm     = IMAGE_FILE_MACHINE_ARMTHUMB_MIXED, ///< 0x01c2
   IsaAArch64 = IMAGE_FILE_MACHINE_ARM64           ///< 0xAA64
 } EFI_INSTRUCTION_SET_ARCHITECTURE;
 

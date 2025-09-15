@@ -15,10 +15,6 @@
   VERSION_STRING                 = 1.1
   LIBRARY_CLASS                  = CacheMaintenanceLib
 
-#
-#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64
-#
-
 [Sources]
   BaseCacheMaintenanceLibNull.c
 
