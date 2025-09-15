@@ -36,7 +36,7 @@ ArchVectorConfig (
   IN  UINTN  VectorBaseAddress
   );
 
-// these globals are provided by the architecture specific source (Arm or AArch64)
+// these globals are provided by the architecture specific source (AArch64)
 extern UINTN                   gMaxExceptionNumber;
 extern EFI_EXCEPTION_CALLBACK  gExceptionHandlers[];
 extern PHYSICAL_ADDRESS        gExceptionVectorAlignmentMask;
@@ -70,10 +70,9 @@ InitializeCpuExceptionHandlers (
   // The vector table must be aligned for the architecture.  If this
   // assertion fails ensure the appropriate FFS alignment is in effect,
   // which can be accomplished by ensuring the proper Align=X statement
-  // in the platform packaging rules.  For ARM Align=32 is required and
-  // for AArch64 Align=4K is required.  Align=Auto can be used but this
-  // is known to cause an issue with populating the reset vector area
-  // for encapsulated FVs.
+  // in the platform packaging rules.  For AArch64 Align=4K is required.
+  // Align=Auto can be used but this is known to cause an issue with
+  // populating the reset vector area for encapsulated FVs.
   ASSERT (((UINTN)ExceptionHandlersStart & gExceptionVectorAlignmentMask) == 0);
 
   VectorBase = (UINT64)(UINTN)ExceptionHandlersStart;
@@ -88,7 +87,7 @@ InitializeCpuExceptionHandlers (
 }
 
 /**
-Registers a function to be called from the processor exception handler. (On ARM/AArch64 this only
+Registers a function to be called from the processor exception handler. (On AArch64 this only
 provides exception handlers, not interrupt handling which is provided through the Hardware Interrupt
 Protocol.)
 

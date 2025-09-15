@@ -1,5 +1,5 @@
 ## @file
-# Instance of CpuExceptionHandlerLib Library for ARM/AArch64 architectures
+# Instance of CpuExceptionHandlerLib Library for AArch64 architectures
 #
 # This library instance is used for modules that will implement exception
 # handlers in-place (by programming VBAR).  The exception handlers will be
