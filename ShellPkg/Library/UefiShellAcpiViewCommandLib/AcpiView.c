@@ -23,7 +23,7 @@
 #include "AcpiView.h"
 #include "AcpiViewConfig.h"
 
-#if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+#if defined (MDE_CPU_AARCH64)
   #include "Arm/SbbrValidator.h"
 #endif
 
@@ -237,7 +237,7 @@ AcpiView (
     return EFI_UNSUPPORTED;
   }
 
- #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+ #if defined (MDE_CPU_AARCH64)
   if (GetMandatoryTableValidate ()) {
     ArmSbbrResetTableCounts ();
   }
@@ -264,7 +264,7 @@ AcpiView (
     RsdpRevision
     );
 
- #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+ #if defined (MDE_CPU_AARCH64)
   if (GetMandatoryTableValidate ()) {
     ArmSbbrReqsValidate ((ARM_SBBR_VERSION)GetMandatoryTableSpec ());
   }

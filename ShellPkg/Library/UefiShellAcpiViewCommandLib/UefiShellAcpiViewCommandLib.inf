@@ -63,7 +63,7 @@
   UefiShellAcpiViewCommandLib.c
   UefiShellAcpiViewCommandLib.uni
 
-[Sources.ARM, Sources.AARCH64]
+[Sources.AARCH64]
   Arm/SbbrValidator.h
   Arm/SbbrValidator.c
 
