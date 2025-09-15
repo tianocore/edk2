@@ -27,9 +27,6 @@
   GdbStub.c
   SerialIo.c
 
-[Sources.ARM]
-  Arm/Processor.c
-
 [Sources.IA32]
   Ia32/Processor.c
 
