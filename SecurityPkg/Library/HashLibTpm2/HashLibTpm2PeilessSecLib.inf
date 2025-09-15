@@ -1,0 +1,47 @@
+## @file
+#  SEC library for measurement in PeilessSec.
+#
+#  Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = HashLib
+  FILE_GUID                      = 50f7ecfc-4dca-11f0-aa44-075999529161
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = HashLib|SEC
+  CONSTRUCTOR                    = HasLibTpm2PeilessSecLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources]
+  HashLibTpm2PeilessSecLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  ArmLib
+  ArmFfaLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  PrePiLib
+  Tpm2DeviceLib
+  Tpm2CommandLib
+
+[Guids]
+  gTpmErrorHobGuid
