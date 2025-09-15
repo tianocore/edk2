@@ -17,10 +17,6 @@
   LIBRARY_CLASS                  = JsonLib|DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER
   CONSTRUCTOR                    = JsonLibConstructor
 
-#
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64 RISCV64
-#
-
 [Sources]
   #
   # Below are the source code of third
