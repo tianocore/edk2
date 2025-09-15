@@ -26,10 +26,6 @@
 [Sources.IA32, Sources.X64]
   IA32/StackCookieInterrupt.nasm
 
-[Sources.ARM]
-  Arm/StackCookieInterrupt.S   |GCC
-  Arm/StackCookieInterrupt.asm |MSFT
-
 [Sources.AARCH64]
   AArch64/StackCookieInterrupt.S   |GCC
   AArch64/StackCookieInterrupt.asm |MSFT
