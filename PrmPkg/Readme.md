@@ -53,7 +53,7 @@ To build `PrmPkg` as a standalone package:
 
 5. Build PrmPkg \
 
-The PrmPkg can be built targeting the X64 and AArch64 architectures. PRM is not supported on IA32 and ARM primarily
+The PrmPkg can be built targeting the X64 and AArch64 architectures. PRM is not supported on IA32 primarily
 because the OS support for PRM is only in 64 bit OSes. In addition, the MSVC toolchain does not support export tables
 on IA32 with the unique UEFI configuration required.
 
