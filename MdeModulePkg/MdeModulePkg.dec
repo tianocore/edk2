@@ -10,6 +10,7 @@
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.<BR>
 # Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -1695,6 +1696,14 @@
   #  On Disk will be bypassed.
   # @Prompt Enable Capsule On Disk support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleOnDiskSupport|FALSE|BOOLEAN|0x0000002d
+
+  ## Indicates whether the platform supports processing Capsules that include EmbeddedDrivers.
+  #  Default value is FALSE, meaning embedded drivers are not supported.
+  #  Platforms that require embedded driver support must explicitly opt-in by setting this PCD to TRUE.
+  #   TRUE  - Capsule with EmbeddedDriver is supported.<BR>
+  #   FALSE - Capsule with EmbeddedDriver is not supported.<BR>
+  # @Prompt Enable Capsule with EmbeddedDriver support.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleEmbeddedDriverSupport|FALSE|BOOLEAN|0x00010021
 
   ## Maximum permitted encapsulation levels of sections in a firmware volume,
   #  in the DXE phase. Minimum value is 1. Sections nested more deeply are
