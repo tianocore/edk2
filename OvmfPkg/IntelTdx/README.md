@@ -79,17 +79,26 @@ Usage
 -----
 
 Assuming TDX-QEMU/TDX-KVM are already built, one can start a TD virtual
-machine as [launching-td-guest](https://github.com/intel/qemu-tdx/blob/tdx-qemu-upstream-rfc-v3/docs/system/i386/tdx.rst#launching-a-td-tdx-vm):
+machine as [launching-a-tdx-vm](https://gitlab.com/qemu/qemu/-/blob/master/docs/system/i386/tdx.rst):
 
-`qemu_system_x86 \`
-`   -machine ...,confidential-guest-support=tdx0 \`
-`   -object tdx-guest,id=tdx0,[sept-ve-disable=off] \`
-`   -drive if=pflash,format=raw,unit=0,file=/path/to/OVMF_CODE.fd \`
-`   -drive if=pflash,format=raw,unit=1,file=/path/to/OVMF_VARS.fd \`
+```
+qemu_system_x86 \
+   -accel kvm \
+   -cpu host \
+   -object tdx-guest,id=tdx0 \
+   -machine ...,confidential-guest-support=tdx0 \
+   -bios /path/to/OVMF.fd
+```
 
 Note:
-TDX-QEMU/TDX-KVM are still in upstreaming progress. Please refer to:
- - kvm  : https://github.com/intel/tdx/tree/kvm-upstream
- - qemu : https://github.com/intel/qemu-tdx/blob/tdx-qemu-upstream-rfc-v3
+Avoid using the '-pflash' QEMU parameter with TDX configurations, as TDX lacks support for read-only memory slots.
 
-Once above 2 upstreaming are completed a minimum qemu/kvm version will be updated here.
+Linux Software Stack
+--------------------
+KVM with TDX support:
+  - Linux kernel version >= 6.16
+  - Source code: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+
+QEMU with TDX support:
+  - QEMU version >= 10.1
+  - Source code: https://gitlab.com/qemu-project/qemu.git
