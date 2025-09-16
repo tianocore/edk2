@@ -221,6 +221,7 @@
 !else
   CcProbeLib|MdePkg/Library/CcProbeLibNull/CcProbeLibNull.inf
 !if $(STANDALONE_MM_ENABLE) == TRUE
+  MmIplPlatformHookLib|StandaloneMmPkg/Library/MmIplPlatformHookLibNull/MmIplPlatformHookLibNull.inf
   MmPlatformHobProducerLib|OvmfPkg/Library/MmPlatformHobProducerLibOvmf/MmPlatformHobProducerLibOvmf.inf
 !endif
 !endif

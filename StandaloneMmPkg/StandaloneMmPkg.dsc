@@ -60,6 +60,7 @@
   VariableMmDependency|StandaloneMmPkg/Library/VariableMmDependency/VariableMmDependency.inf
   HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
   MmPlatformHobProducerLib|StandaloneMmPkg/Library/MmPlatformHobProducerLibNull/MmPlatformHobProducerLibNull.inf
+  MmIplPlatformHookLib|StandaloneMmPkg/Library/MmIplPlatformHookLibNull/MmIplPlatformHookLibNull.inf
   ImagePropertiesRecordLib|MdeModulePkg/Library/ImagePropertiesRecordLib/ImagePropertiesRecordLib.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
 
@@ -101,6 +102,7 @@
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
+  DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
@@ -148,6 +150,7 @@
   StandaloneMmPkg/Library/VariableMmDependency/VariableMmDependency.inf
   StandaloneMmPkg/Library/SmmLockBoxMmDependency/SmmLockBoxMmDependency.inf
   StandaloneMmPkg/Library/MmPlatformHobProducerLibNull/MmPlatformHobProducerLibNull.inf
+  StandaloneMmPkg/Library/MmIplPlatformHookLibNull/MmIplPlatformHookLibNull.inf
   StandaloneMmPkg/Drivers/MmCommunicationDxe/MmCommunicationDxe.inf
   StandaloneMmPkg/Drivers/MmCommunicationNotifyDxe/MmCommunicationNotifyDxe.inf
   StandaloneMmPkg/Library/StandaloneMmExtractGuidedSectionLib/StandaloneMmExtractGuidedSectionLib.inf
@@ -157,6 +160,7 @@
 
 [Components.X64]
   StandaloneMmPkg/Drivers/StandaloneMmIplPei/StandaloneMmIplPei.inf
+  StandaloneMmPkg/Drivers/StandaloneMmIplPei/StandaloneMmIplDxe.inf
 
 ###################################################################################################
 #

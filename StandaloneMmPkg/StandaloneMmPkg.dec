@@ -19,6 +19,8 @@
   Include
 
 [LibraryClasses]
+  ##  @libraryclass  Provide platform specific hooks for MM IPL.
+  MmIplPlatformHookLib|Include/Library/MmIplPlatformHookLib.h
 
   ##  @libraryclass  Defines a set of helper methods.
   FvLib|Include/Library/FvLib.h
