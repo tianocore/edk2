@@ -12,6 +12,7 @@ ALIGN 16
 
 %define IGVM_ID_PARAM_AREA                               0x100
 %define IGVM_ID_PARAM_MEMORY_MAP                         0x101
+%define IGVM_ID_PARAM_VP_COUNT                           0x102
 
 %define IGVM_ID_HOB_AREA                                 0x200
 
@@ -19,6 +20,9 @@ ALIGN 16
 %define MEMORY_MAP_OFFSET                                    0
 %define MEMORY_MAP_ENTRIES                                   8
 %define MEMORY_MAP_SIZE              (MEMORY_MAP_ENTRIES * 24)
+
+%define VP_COUNT_OFFSET  (MEMORY_MAP_OFFSET + MEMORY_MAP_SIZE)
+%define VP_COUNT_SIZE                                       16
 
 IgvmParamStart:
 _IgvmDescriptor:
@@ -38,6 +42,11 @@ _IgvmMemoryMap:
   DD  MEMORY_MAP_OFFSET
   DD  MEMORY_MAP_SIZE
   DD  IGVM_ID_PARAM_MEMORY_MAP
+
+_IgvmVpCount:
+  DD  VP_COUNT_OFFSET
+  DD  VP_COUNT_SIZE
+  DD  IGVM_ID_PARAM_VP_COUNT
 
 %endif
 

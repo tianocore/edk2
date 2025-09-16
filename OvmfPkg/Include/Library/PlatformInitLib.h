@@ -315,4 +315,10 @@ PlatformIgvmDataHobs (
   VOID
   );
 
+UINT32
+EFIAPI
+PlatformIgvmVpCount (
+  VOID
+  );
+
 #endif // PLATFORM_INIT_LIB_H_
