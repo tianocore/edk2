@@ -30,6 +30,7 @@
 //
 #include <Protocol/EdkIIRedfishCredential.h>
 #include <Protocol/EdkIIRedfishConfigHandler.h>
+#include <Protocol/RestEx.h>
 
 //
 // Driver Version
