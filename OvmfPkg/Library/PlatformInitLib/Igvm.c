@@ -21,6 +21,9 @@
 #define MEMORY_MAP_ENTRIES  8
 #define MEMORY_MAP_SIZE     (MEMORY_MAP_ENTRIES * sizeof(IGVM_MEMORY_MAP_ENTRY))
 
+#define VP_COUNT_OFFSET  (MEMORY_MAP_OFFSET + MEMORY_MAP_SIZE)
+#define VP_COUNT_SIZE    16
+
 #define IGVM_MM_ENTRY_TYPE_MEMORY      0x00
 #define IGVM_MM_ENTRY_TYPE_RESERVED    0x01
 #define IGVM_MM_ENTRY_TYPE_PERSISTENT  0x02
@@ -179,4 +182,29 @@ PlatformIgvmDataHobs (
       EfiBootServicesData
       );
   }
+}
+
+UINT32
+EFIAPI
+PlatformIgvmVpCount (
+  VOID
+  )
+{
+  UINT64  Address;
+  UINT32  *VpCount;
+
+  Address = FixedPcdGet64 (PcdOvmfIgvmParamBase);
+  if (Address == 0) {
+    // no parameter area
+    return 0;
+  }
+
+  VpCount = (VOID *)(UINTN)(Address + VP_COUNT_OFFSET);
+  if (!(*VpCount)) {
+    // no vp count
+    return 0;
+  }
+
+  DEBUG ((DEBUG_INFO, "%a: vp-count=%d\n", __func__, *VpCount));
+  return *VpCount;
 }
