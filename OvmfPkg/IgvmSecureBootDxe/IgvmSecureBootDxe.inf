@@ -1,0 +1,43 @@
+## @file
+#  Enroll secure boot variables passed in via IGVM
+#
+#  Copyright (c) 2025, Red Hat Inc.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.27
+  BASE_NAME                      = IgvmSecureBootDxe
+  FILE_GUID                      = 12b8373f-e3df-4851-aa32-77d3fbb77de3
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = IgvmSecureBootDxeEntrypoint
+
+[Sources]
+  IgvmSecureBootDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  HobLib
+  UefiDriverEntryPoint
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
+
+[Guids]
+  gEfiCustomModeEnableGuid
+  gEfiGlobalVariableGuid
+  gEfiIgvmDataHobGuid
+  gEfiImageSecurityDatabaseGuid
+
+[Depex]
+  gEfiVariableWriteArchProtocolGuid

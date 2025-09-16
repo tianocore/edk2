@@ -221,6 +221,7 @@ INF  OvmfPkg/VirtioKeyboardDxe/VirtioKeyboard.inf
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   INF  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+  INF  OvmfPkg/IgvmSecureBootDxe/IgvmSecureBootDxe.inf
 !endif
 
 INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
