@@ -345,6 +345,190 @@ DisplayConformanceProfiles (
   return (ShellStatus);
 }
 
+/**
+  Display the System Tables.
+
+  @param[in] Package    List of input parameters.
+  @param[in] Address    The address of the System Table.
+**/
+STATIC
+SHELL_STATUS
+DisplaySystemTable (
+  IN  LIST_ENTRY  *Package,
+  IN  VOID        *Address
+  )
+{
+  UINT64        AcpiTableAddress;
+  UINT64        Acpi20TableAddress;
+  UINT64        SalTableAddress;
+  UINT64        SmbiosTableAddress;
+  UINT64        MpsTableAddress;
+  UINT64        DtbTableAddress;
+  UINT64        MemoryAttributesTableAddress;
+  UINT64        RtPropertiesTableAddress;
+  UINT64        SystemResourceTableAddress;
+  UINT64        DebugImageInfoTableAddress;
+  UINT64        ImageExecutionTableAddress;
+  UINT64        JsonConfigDataTableAddress;
+  UINT64        JsonCapsuleDataTableAddress;
+  UINT64        JsonCapsuleResultTableAddress;
+  UINT64        MemoryRangeCapsuleAddress;
+  UINT64        HiiDatabaseExportBufferAddress;
+  UINT64        ConformanceProfileTableAddress;
+  UINTN         TableWalker;
+  SHELL_STATUS  ShellStatus;
+
+  ShellStatus = SHELL_SUCCESS;
+
+  Acpi20TableAddress             = 0;
+  AcpiTableAddress               = 0;
+  SalTableAddress                = 0;
+  SmbiosTableAddress             = 0;
+  MpsTableAddress                = 0;
+  DtbTableAddress                = 0;
+  MemoryAttributesTableAddress   = 0;
+  RtPropertiesTableAddress       = 0;
+  SystemResourceTableAddress     = 0;
+  DebugImageInfoTableAddress     = 0;
+  ImageExecutionTableAddress     = 0;
+  JsonConfigDataTableAddress     = 0;
+  JsonCapsuleDataTableAddress    = 0;
+  JsonCapsuleResultTableAddress  = 0;
+  MemoryRangeCapsuleAddress      = 0;
+  HiiDatabaseExportBufferAddress = 0;
+  ConformanceProfileTableAddress = 0;
+  for (TableWalker = 0; TableWalker < gST->NumberOfTableEntries; TableWalker++) {
+    if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiAcpi20TableGuid)) {
+      Acpi20TableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+      continue;
+    }
+
+    if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiAcpi10TableGuid)) {
+      AcpiTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+      continue;
+    }
+
+    if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiSmbiosTableGuid)) {
+      SmbiosTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+      continue;
+    }
+
+    if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiSmbios3TableGuid)) {
+      SmbiosTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+      continue;
+    }
+
+    if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiMpsTableGuid)) {
+      MpsTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+      continue;
+    }
+
+    if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gFdtTableGuid)) {
+      DtbTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+      continue;
+    }
+
+    if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiMemoryAttributesTableGuid)) {
+      MemoryAttributesTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+      continue;
+    }
+
+    if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiRtPropertiesTableGuid)) {
+      RtPropertiesTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+      continue;
+    }
+
+    if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiSystemResourceTableGuid)) {
+      SystemResourceTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+      continue;
+    }
+
+    if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiDebugImageInfoTableGuid)) {
+      DebugImageInfoTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+      continue;
+    }
+
+    if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiImageSecurityDatabaseGuid)) {
+      ImageExecutionTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+      continue;
+    }
+
+    if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiJsonConfigDataTableGuid)) {
+      JsonConfigDataTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+      continue;
+    }
+
+    if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiJsonCapsuleDataTableGuid)) {
+      JsonCapsuleDataTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+      continue;
+    }
+
+    if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiJsonCapsuleResultTableGuid)) {
+      JsonCapsuleResultTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+      continue;
+    }
+
+    if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiHiiDatabaseProtocolGuid)) {
+      HiiDatabaseExportBufferAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+      continue;
+    }
+
+    if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiConfProfilesTableGuid)) {
+      ConformanceProfileTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+      continue;
+    }
+  }
+
+  ShellPrintHiiEx (
+    -1,
+    -1,
+    NULL,
+    STRING_TOKEN (STR_DMEM_SYSTEM_TABLE),
+    gShellDebug1HiiHandle,
+    (UINT64)(UINTN)Address,
+    gST->Hdr.HeaderSize,
+    gST->Hdr.Revision,
+    (UINT64)(UINTN)gST->ConIn,
+    (UINT64)(UINTN)gST->ConOut,
+    (UINT64)(UINTN)gST->StdErr,
+    (UINT64)(UINTN)gST->RuntimeServices,
+    (UINT64)(UINTN)gST->BootServices,
+    SalTableAddress,
+    AcpiTableAddress,
+    Acpi20TableAddress,
+    MpsTableAddress,
+    SmbiosTableAddress,
+    DtbTableAddress,
+    MemoryAttributesTableAddress,
+    RtPropertiesTableAddress,
+    SystemResourceTableAddress,
+    DebugImageInfoTableAddress,
+    ImageExecutionTableAddress,
+    JsonConfigDataTableAddress,
+    JsonCapsuleDataTableAddress,
+    JsonCapsuleResultTableAddress,
+    MemoryRangeCapsuleAddress,
+    HiiDatabaseExportBufferAddress,
+    ConformanceProfileTableAddress
+    );
+
+  if (ShellCommandLineGetFlag (Package, L"-verbose")) {
+    if (ShellStatus == SHELL_SUCCESS) {
+      ShellStatus = DisplayRtProperties (RtPropertiesTableAddress);
+    }
+
+    if (ShellStatus == SHELL_SUCCESS) {
+      ShellStatus = DisplayImageExecutionEntries (ImageExecutionTableAddress);
+    }
+
+    if (ShellStatus == SHELL_SUCCESS) {
+      ShellStatus = DisplayConformanceProfiles (ConformanceProfileTableAddress);
+    }
+  }
+
+  return ShellStatus;
+}
+
 STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
   { L"-mmio",    TypeFlag },
   { L"-verbose", TypeFlag },
@@ -371,24 +555,6 @@ ShellCommandRunDmem (
   VOID          *Address;
   UINT64        Size;
   CONST CHAR16  *Temp1;
-  UINT64        AcpiTableAddress;
-  UINT64        Acpi20TableAddress;
-  UINT64        SalTableAddress;
-  UINT64        SmbiosTableAddress;
-  UINT64        MpsTableAddress;
-  UINT64        DtbTableAddress;
-  UINT64        MemoryAttributesTableAddress;
-  UINT64        RtPropertiesTableAddress;
-  UINT64        SystemResourceTableAddress;
-  UINT64        DebugImageInfoTableAddress;
-  UINT64        ImageExecutionTableAddress;
-  UINT64        JsonConfigDataTableAddress;
-  UINT64        JsonCapsuleDataTableAddress;
-  UINT64        JsonCapsuleResultTableAddress;
-  UINT64        MemoryRangeCapsuleAddress;
-  UINT64        HiiDatabaseExportBufferAddress;
-  UINT64        ConformanceProfileTableAddress;
-  UINTN         TableWalker;
 
   ShellStatus = SHELL_SUCCESS;
   Status      = EFI_SUCCESS;
@@ -448,151 +614,7 @@ ShellCommandRunDmem (
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_HEADER_ROW), gShellDebug1HiiHandle, (UINT64)(UINTN)Address, Size);
         DumpHex (2, (UINTN)Address, (UINTN)Size, Address);
         if (Address == (VOID *)gST) {
-          Acpi20TableAddress             = 0;
-          AcpiTableAddress               = 0;
-          SalTableAddress                = 0;
-          SmbiosTableAddress             = 0;
-          MpsTableAddress                = 0;
-          DtbTableAddress                = 0;
-          MemoryAttributesTableAddress   = 0;
-          RtPropertiesTableAddress       = 0;
-          SystemResourceTableAddress     = 0;
-          DebugImageInfoTableAddress     = 0;
-          ImageExecutionTableAddress     = 0;
-          JsonConfigDataTableAddress     = 0;
-          JsonCapsuleDataTableAddress    = 0;
-          JsonCapsuleResultTableAddress  = 0;
-          MemoryRangeCapsuleAddress      = 0;
-          HiiDatabaseExportBufferAddress = 0;
-          ConformanceProfileTableAddress = 0;
-          for (TableWalker = 0; TableWalker < gST->NumberOfTableEntries; TableWalker++) {
-            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiAcpi20TableGuid)) {
-              Acpi20TableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
-              continue;
-            }
-
-            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiAcpi10TableGuid)) {
-              AcpiTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
-              continue;
-            }
-
-            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiSmbiosTableGuid)) {
-              SmbiosTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
-              continue;
-            }
-
-            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiSmbios3TableGuid)) {
-              SmbiosTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
-              continue;
-            }
-
-            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiMpsTableGuid)) {
-              MpsTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
-              continue;
-            }
-
-            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gFdtTableGuid)) {
-              DtbTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
-              continue;
-            }
-
-            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiMemoryAttributesTableGuid)) {
-              MemoryAttributesTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
-              continue;
-            }
-
-            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiRtPropertiesTableGuid)) {
-              RtPropertiesTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
-              continue;
-            }
-
-            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiSystemResourceTableGuid)) {
-              SystemResourceTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
-              continue;
-            }
-
-            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiDebugImageInfoTableGuid)) {
-              DebugImageInfoTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
-              continue;
-            }
-
-            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiImageSecurityDatabaseGuid)) {
-              ImageExecutionTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
-              continue;
-            }
-
-            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiJsonConfigDataTableGuid)) {
-              JsonConfigDataTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
-              continue;
-            }
-
-            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiJsonCapsuleDataTableGuid)) {
-              JsonCapsuleDataTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
-              continue;
-            }
-
-            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiJsonCapsuleResultTableGuid)) {
-              JsonCapsuleResultTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
-              continue;
-            }
-
-            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiHiiDatabaseProtocolGuid)) {
-              HiiDatabaseExportBufferAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
-              continue;
-            }
-
-            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiConfProfilesTableGuid)) {
-              ConformanceProfileTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
-              continue;
-            }
-          }
-
-          ShellPrintHiiEx (
-            -1,
-            -1,
-            NULL,
-            STRING_TOKEN (STR_DMEM_SYSTEM_TABLE),
-            gShellDebug1HiiHandle,
-            (UINT64)(UINTN)Address,
-            gST->Hdr.HeaderSize,
-            gST->Hdr.Revision,
-            (UINT64)(UINTN)gST->ConIn,
-            (UINT64)(UINTN)gST->ConOut,
-            (UINT64)(UINTN)gST->StdErr,
-            (UINT64)(UINTN)gST->RuntimeServices,
-            (UINT64)(UINTN)gST->BootServices,
-            SalTableAddress,
-            AcpiTableAddress,
-            Acpi20TableAddress,
-            MpsTableAddress,
-            SmbiosTableAddress,
-            DtbTableAddress,
-            MemoryAttributesTableAddress,
-            RtPropertiesTableAddress,
-            SystemResourceTableAddress,
-            DebugImageInfoTableAddress,
-            ImageExecutionTableAddress,
-            JsonConfigDataTableAddress,
-            JsonCapsuleDataTableAddress,
-            JsonCapsuleResultTableAddress,
-            MemoryRangeCapsuleAddress,
-            HiiDatabaseExportBufferAddress,
-            ConformanceProfileTableAddress
-            );
-
-          if (ShellCommandLineGetFlag (Package, L"-verbose")) {
-            if (ShellStatus == SHELL_SUCCESS) {
-              ShellStatus = DisplayRtProperties (RtPropertiesTableAddress);
-            }
-
-            if (ShellStatus == SHELL_SUCCESS) {
-              ShellStatus = DisplayImageExecutionEntries (ImageExecutionTableAddress);
-            }
-
-            if (ShellStatus == SHELL_SUCCESS) {
-              ShellStatus = DisplayConformanceProfiles (ConformanceProfileTableAddress);
-            }
-          }
+          ShellStatus = DisplaySystemTable (Package, Address);
         }
       } else {
         ShellStatus = DisplayMmioMemory (Address, (UINTN)Size);
