@@ -744,7 +744,10 @@ ExecuteMmCoreFromMmram (
     goto Done;
   }
 
-  PageCount = (UINTN)EFI_SIZE_TO_PAGES ((UINTN)ImageContext.ImageSize + ImageContext.SectionAlignment);
+  //
+  // Align image size on section boundary and get correct page count
+  //
+  PageCount = (UINTN)EFI_SIZE_TO_PAGES ((UINTN)ALIGN_VALUE (ImageContext.ImageSize, ImageContext.SectionAlignment));
 
   //
   // Allocate memory for the image being loaded from unallocated mmram range
