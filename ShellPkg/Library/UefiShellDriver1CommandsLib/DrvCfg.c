@@ -294,6 +294,108 @@ ConfigToFile (
   return (SHELL_SUCCESS);
 }
 
+/** Parse the config contained in the input Buffer.
+
+  @param[in] Handle           The handle to get info for.
+  @param[in] MainBuffer       Main Buffer, containing the list of package list.
+  @param[in] MainBufferSize   Main Buffer Size.
+  @param[in] HiiDatabase      HII Database.
+**/
+STATIC
+SHELL_STATUS
+ParseBufferConfig (
+  IN  EFI_HANDLE                 Handle,
+  IN  VOID                       *MainBuffer,
+  IN  UINTN                      MainBufferSize,
+  IN  EFI_HII_DATABASE_PROTOCOL  *HiiDatabase
+  )
+{
+  CHAR16                       *TempDevPathString;
+  EFI_DEVICE_PATH_PROTOCOL     *DevPath;
+  EFI_HII_HANDLE               HiiHandle;
+  EFI_HII_PACKAGE_LIST_HEADER  *PackageListHeader;
+  UINTN                        HandleIndex;
+  EFI_STATUS                   Status;
+  EFI_HII_PACKAGE_HEADER       *PackageHeader;
+
+  //
+  // we need to parse the buffer and try to match the device paths for each item to try to find it's device path.
+  //
+
+  for (PackageListHeader = (EFI_HII_PACKAGE_LIST_HEADER *)MainBuffer
+       ; PackageListHeader != NULL && ((CHAR8 *)PackageListHeader) < (((CHAR8 *)MainBuffer)+MainBufferSize)
+       ; PackageListHeader = (EFI_HII_PACKAGE_LIST_HEADER *)(((CHAR8 *)(PackageListHeader)) + PackageListHeader->PackageLength))
+  {
+    for (PackageHeader = (EFI_HII_PACKAGE_HEADER *)(((CHAR8 *)(PackageListHeader))+sizeof (EFI_HII_PACKAGE_LIST_HEADER))
+         ; PackageHeader != NULL && ((CHAR8 *)PackageHeader) < (((CHAR8 *)MainBuffer)+MainBufferSize) && PackageHeader->Type != EFI_HII_PACKAGE_END
+         ; PackageHeader = (EFI_HII_PACKAGE_HEADER *)(((CHAR8 *)(PackageHeader))+PackageHeader->Length))
+    {
+      if (PackageHeader->Type == EFI_HII_PACKAGE_DEVICE_PATH) {
+        HiiHandle = NULL;
+        Status    = FindHiiHandleViaDevPath ((EFI_DEVICE_PATH_PROTOCOL *)(((CHAR8 *)PackageHeader) + sizeof (EFI_HII_PACKAGE_HEADER)), &HiiHandle, HiiDatabase);
+        if (EFI_ERROR (Status)) {
+          //
+          // print out an error.
+          //
+          TempDevPathString = ConvertDevicePathToText ((EFI_DEVICE_PATH_PROTOCOL *)(((CHAR8 *)PackageHeader) + sizeof (EFI_HII_PACKAGE_HEADER)), TRUE, TRUE);
+          if (TempDevPathString == NULL) {
+            ShellPrintHiiEx (
+              -1,
+              -1,
+              NULL,
+              STRING_TOKEN (STR_GEN_OUT_MEM),
+              gShellDriver1HiiHandle,
+              L"drvcfg"
+              );
+
+            return SHELL_OUT_OF_RESOURCES;
+          }
+
+          ShellPrintHiiEx (
+            -1,
+            -1,
+            NULL,
+            STRING_TOKEN (STR_DRVCFG_IN_FILE_NF),
+            gShellDriver1HiiHandle,
+            TempDevPathString
+            );
+          SHELL_FREE_NON_NULL (TempDevPathString);
+        } else {
+          Status = HiiDatabase->UpdatePackageList (HiiDatabase, HiiHandle, PackageListHeader);
+          if (EFI_ERROR (Status)) {
+            ShellPrintHiiEx (
+              -1,
+              -1,
+              NULL,
+              STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN),
+              gShellDriver1HiiHandle,
+              L"drvcfg",
+              L"HiiDatabase->UpdatePackageList",
+              Status
+              );
+
+            return SHELL_DEVICE_ERROR;
+          } else {
+            DevPath = (EFI_DEVICE_PATH_PROTOCOL *)(((CHAR8 *)PackageHeader) + sizeof (EFI_HII_PACKAGE_HEADER));
+            gBS->LocateDevicePath (&gEfiHiiConfigAccessProtocolGuid, &DevPath, &Handle);
+            HandleIndex = ConvertHandleToHandleIndex (Handle);
+            ShellPrintHiiEx (
+              -1,
+              -1,
+              NULL,
+              STRING_TOKEN (STR_DRVCFG_DONE_HII),
+              gShellDriver1HiiHandle,
+              HandleIndex
+              );
+          }
+        }
+      }
+    }
+  }
+
+  return SHELL_SUCCESS;
+}
+
 /**
   Function to read in HII configuration information from a file.
 
@@ -306,19 +408,14 @@ ConfigFromFile (
   IN CONST CHAR16      *FileName
   )
 {
-  EFI_HII_DATABASE_PROTOCOL    *HiiDatabase;
-  EFI_STATUS                   Status;
-  VOID                         *MainBuffer;
-  UINT64                       Temp;
-  UINTN                        MainBufferSize;
-  EFI_HII_HANDLE               HiiHandle;
-  SHELL_FILE_HANDLE            FileHandle;
-  CHAR16                       *TempDevPathString;
-  EFI_HII_PACKAGE_LIST_HEADER  *PackageListHeader;
-  EFI_HII_PACKAGE_HEADER       *PackageHeader;
-  EFI_DEVICE_PATH_PROTOCOL     *DevPath;
-  UINTN                        HandleIndex;
-  SHELL_STATUS                 ShellStatus;
+  EFI_HII_DATABASE_PROTOCOL  *HiiDatabase;
+  EFI_STATUS                 Status;
+  VOID                       *MainBuffer;
+  UINT64                     Temp;
+  UINTN                      MainBufferSize;
+  EFI_HII_HANDLE             HiiHandle;
+  SHELL_FILE_HANDLE          FileHandle;
+  SHELL_STATUS               ShellStatus;
 
   HiiDatabase    = NULL;
   MainBufferSize = 0;
@@ -472,82 +569,7 @@ ConfigFromFile (
       goto Done;
     }
   } else {
-    //
-    // we need to parse the buffer and try to match the device paths for each item to try to find it's device path.
-    //
-
-    for (PackageListHeader = (EFI_HII_PACKAGE_LIST_HEADER *)MainBuffer
-         ; PackageListHeader != NULL && ((CHAR8 *)PackageListHeader) < (((CHAR8 *)MainBuffer)+MainBufferSize)
-         ; PackageListHeader = (EFI_HII_PACKAGE_LIST_HEADER *)(((CHAR8 *)(PackageListHeader)) + PackageListHeader->PackageLength))
-    {
-      for (PackageHeader = (EFI_HII_PACKAGE_HEADER *)(((CHAR8 *)(PackageListHeader))+sizeof (EFI_HII_PACKAGE_LIST_HEADER))
-           ; PackageHeader != NULL && ((CHAR8 *)PackageHeader) < (((CHAR8 *)MainBuffer)+MainBufferSize) && PackageHeader->Type != EFI_HII_PACKAGE_END
-           ; PackageHeader = (EFI_HII_PACKAGE_HEADER *)(((CHAR8 *)(PackageHeader))+PackageHeader->Length))
-      {
-        if (PackageHeader->Type == EFI_HII_PACKAGE_DEVICE_PATH) {
-          HiiHandle = NULL;
-          Status    = FindHiiHandleViaDevPath ((EFI_DEVICE_PATH_PROTOCOL *)(((CHAR8 *)PackageHeader) + sizeof (EFI_HII_PACKAGE_HEADER)), &HiiHandle, HiiDatabase);
-          if (EFI_ERROR (Status)) {
-            //
-            // print out an error.
-            //
-            TempDevPathString = ConvertDevicePathToText ((EFI_DEVICE_PATH_PROTOCOL *)(((CHAR8 *)PackageHeader) + sizeof (EFI_HII_PACKAGE_HEADER)), TRUE, TRUE);
-            if (TempDevPathString == NULL) {
-              ShellPrintHiiEx (
-                -1,
-                -1,
-                NULL,
-                STRING_TOKEN (STR_GEN_OUT_MEM),
-                gShellDriver1HiiHandle,
-                L"drvcfg"
-                );
-
-              ShellStatus = SHELL_OUT_OF_RESOURCES;
-              goto Done;
-            }
-
-            ShellPrintHiiEx (
-              -1,
-              -1,
-              NULL,
-              STRING_TOKEN (STR_DRVCFG_IN_FILE_NF),
-              gShellDriver1HiiHandle,
-              TempDevPathString
-              );
-            SHELL_FREE_NON_NULL (TempDevPathString);
-          } else {
-            Status = HiiDatabase->UpdatePackageList (HiiDatabase, HiiHandle, PackageListHeader);
-            if (EFI_ERROR (Status)) {
-              ShellPrintHiiEx (
-                -1,
-                -1,
-                NULL,
-                STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN),
-                gShellDriver1HiiHandle,
-                L"drvcfg",
-                L"HiiDatabase->UpdatePackageList",
-                Status
-                );
-
-              ShellStatus = SHELL_DEVICE_ERROR;
-              goto Done;
-            } else {
-              DevPath = (EFI_DEVICE_PATH_PROTOCOL *)(((CHAR8 *)PackageHeader) + sizeof (EFI_HII_PACKAGE_HEADER));
-              gBS->LocateDevicePath (&gEfiHiiConfigAccessProtocolGuid, &DevPath, &Handle);
-              HandleIndex = ConvertHandleToHandleIndex (Handle);
-              ShellPrintHiiEx (
-                -1,
-                -1,
-                NULL,
-                STRING_TOKEN (STR_DRVCFG_DONE_HII),
-                gShellDriver1HiiHandle,
-                HandleIndex
-                );
-            }
-          }
-        }
-      }
-    }
+    ShellStatus = ParseBufferConfig (Handle, MainBuffer, MainBufferSize, HiiDatabase);
   }
 
 Done:
