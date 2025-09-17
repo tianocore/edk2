@@ -262,59 +262,11 @@ ShellConnectFromDevPaths (
     //
     // connect short form device path
     //
-    if ((DevicePathType (Instance) == MESSAGING_DEVICE_PATH) &&
-        (  (DevicePathSubType (Instance) == MSG_USB_CLASS_DP)
-        || (DevicePathSubType (Instance) == MSG_USB_WWID_DP)
-        ))
+    if (!((DevicePathType (Instance) == MESSAGING_DEVICE_PATH) &&
+          (  (DevicePathSubType (Instance) == MSG_USB_CLASS_DP)
+          || (DevicePathSubType (Instance) == MSG_USB_WWID_DP)
+          )))
     {
-      Status = ShellConnectPciRootBridge ();
-      if (EFI_ERROR (Status)) {
-        FreePool (Instance);
-        FreePool (DevPath);
-        return Status;
-      }
-
-      Status = gBS->LocateHandleBuffer (
-                      ByProtocol,
-                      &gEfiPciIoProtocolGuid,
-                      NULL,
-                      &HandleArrayCount,
-                      &HandleArray
-                      );
-
-      if (!EFI_ERROR (Status)) {
-        for (Index = 0; Index < HandleArrayCount; Index++) {
-          Status = gBS->HandleProtocol (
-                          HandleArray[Index],
-                          &gEfiPciIoProtocolGuid,
-                          (VOID **)&PciIo
-                          );
-
-          if (!EFI_ERROR (Status)) {
-            Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, 0x09, 3, &Class);
-            if (!EFI_ERROR (Status)) {
-              if ((PCI_CLASS_SERIAL == Class[2]) &&
-                  (PCI_CLASS_SERIAL_USB == Class[1]))
-              {
-                Status = gBS->ConnectController (
-                                HandleArray[Index],
-                                NULL,
-                                Instance,
-                                FALSE
-                                );
-                if (!EFI_ERROR (Status)) {
-                  AtLeastOneConnected = TRUE;
-                }
-              }
-            }
-          }
-        }
-      }
-
-      if (HandleArray != NULL) {
-        FreePool (HandleArray);
-      }
-    } else {
       //
       // connect the entire device path
       //
@@ -322,6 +274,57 @@ ShellConnectFromDevPaths (
       if (!EFI_ERROR (Status)) {
         AtLeastOneConnected = TRUE;
       }
+
+      FreePool (Instance);
+      continue;
+    }
+
+    Status = ShellConnectPciRootBridge ();
+    if (EFI_ERROR (Status)) {
+      FreePool (Instance);
+      FreePool (DevPath);
+      return Status;
+    }
+
+    Status = gBS->LocateHandleBuffer (
+                    ByProtocol,
+                    &gEfiPciIoProtocolGuid,
+                    NULL,
+                    &HandleArrayCount,
+                    &HandleArray
+                    );
+
+    if (!EFI_ERROR (Status)) {
+      for (Index = 0; Index < HandleArrayCount; Index++) {
+        Status = gBS->HandleProtocol (
+                        HandleArray[Index],
+                        &gEfiPciIoProtocolGuid,
+                        (VOID **)&PciIo
+                        );
+
+        if (!EFI_ERROR (Status)) {
+          Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, 0x09, 3, &Class);
+          if (!EFI_ERROR (Status)) {
+            if ((PCI_CLASS_SERIAL == Class[2]) &&
+                (PCI_CLASS_SERIAL_USB == Class[1]))
+            {
+              Status = gBS->ConnectController (
+                              HandleArray[Index],
+                              NULL,
+                              Instance,
+                              FALSE
+                              );
+              if (!EFI_ERROR (Status)) {
+                AtLeastOneConnected = TRUE;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if (HandleArray != NULL) {
+      FreePool (HandleArray);
     }
 
     FreePool (Instance);
