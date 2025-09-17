@@ -90,7 +90,7 @@ if __name__ == '__main__':
     parser.add_argument("--product-fw-desc", dest = "ProductFwDesc", help = "description about resource update driver")
     parser.add_argument("--capsule-file-name", dest = 'CapsuleFileName', help ="firmware resource image file")
     parser.add_argument("--pfx-file", dest = 'PfxFile', help = "pfx file path used to sign resource update driver")
-    parser.add_argument("--arch", dest = 'Arch', help = "supported architecture:arm/x64/amd64/arm64/aarch64", default = 'amd64')
+    parser.add_argument("--arch", dest = 'Arch', help = "supported architecture:x64/amd64/arm64/aarch64", default = 'amd64')
     parser.add_argument("--operating-system-string", dest = 'OperatingSystemString', help = "supported operating system:win10/10/10_au/10_rs2/10_rs3/10_rs4/server10/server2016/serverrs2/serverrs3/serverrs4", default = "win10")
 
     args = parser.parse_args()

@@ -3,7 +3,6 @@
 # The makefile can be invoked with
 # HOST_ARCH = x86_64 or x64 for EM64T build
 # HOST_ARCH = ia32 or IA32 for IA32 build
-# HOST_ARCH = Arm or ARM for ARM build
 #
 # Copyright (c) 2007 - 2025, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -135,9 +134,6 @@ ARCH_INCLUDE = -I $(EDK2_PATH)/MdePkg/Include/Ia32/
 
 else ifeq ($(HOST_ARCH), X64)
 ARCH_INCLUDE = -I $(EDK2_PATH)/MdePkg/Include/X64/
-
-else ifeq ($(HOST_ARCH), ARM)
-ARCH_INCLUDE = -I $(EDK2_PATH)/MdePkg/Include/Arm/
 
 else ifeq ($(HOST_ARCH), AARCH64)
 ARCH_INCLUDE = -I $(EDK2_PATH)/MdePkg/Include/AArch64/

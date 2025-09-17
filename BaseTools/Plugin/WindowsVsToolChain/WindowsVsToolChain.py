@@ -43,7 +43,6 @@ class WindowsVsToolChain(IUefiBuildPlugin):
             # HostType for VS2017 should be (defined in tools_def):
             # x86   == 32bit Intel
             # x64   == 64bit Intel
-            # arm   == 32bit Arm
             # arm64 == 64bit Arm
             #
             HostType = shell_environment.GetEnvironment().get_shell_var("VS2017_HOST")
@@ -63,7 +62,7 @@ class WindowsVsToolChain(IUefiBuildPlugin):
 
             # VS2017_HOST options are not exactly the same as QueryVcVariables. This translates.
             VC_HOST_ARCH_TRANSLATOR = {
-                "x86": "x86", "x64": "AMD64", "arm": "not supported", "arm64": "not supported"}
+                "x86": "x86", "x64": "AMD64", "arm64": "not supported"}
 
             # check to see if full path already configured
             if shell_environment.GetEnvironment().get_shell_var("VS2017_PREFIX") != None:
@@ -116,7 +115,6 @@ class WindowsVsToolChain(IUefiBuildPlugin):
             # HostType for VS2019 should be (defined in tools_def):
             # x86   == 32bit Intel
             # x64   == 64bit Intel
-            # arm   == 32bit Arm
             # arm64 == 64bit Arm
             #
             HostType = shell_environment.GetEnvironment().get_shell_var("VS2019_HOST")
@@ -136,7 +134,7 @@ class WindowsVsToolChain(IUefiBuildPlugin):
 
             # VS2019_HOST options are not exactly the same as QueryVcVariables. This translates.
             VC_HOST_ARCH_TRANSLATOR = {
-                "x86": "x86", "x64": "AMD64", "arm": "not supported", "arm64": "not supported"}
+                "x86": "x86", "x64": "AMD64", "arm64": "not supported"}
 
             # check to see if full path already configured
             if shell_environment.GetEnvironment().get_shell_var("VS2019_PREFIX") != None:
@@ -189,7 +187,6 @@ class WindowsVsToolChain(IUefiBuildPlugin):
             # HostType for VS2022 should be (defined in tools_def):
             # x86   == 32bit Intel
             # x64   == 64bit Intel
-            # arm   == 32bit Arm
             # arm64 == 64bit Arm
             #
             HostType = shell_environment.GetEnvironment().get_shell_var("VS2022_HOST")
@@ -209,7 +206,7 @@ class WindowsVsToolChain(IUefiBuildPlugin):
 
             # VS2022_HOST options are not exactly the same as QueryVcVariables. This translates.
             VC_HOST_ARCH_TRANSLATOR = {
-                "x86": "x86", "x64": "AMD64", "arm": "not supported", "arm64": "not supported"}
+                "x86": "x86", "x64": "AMD64", "arm64": "not supported"}
 
             # check to see if full path already configured
             if shell_environment.GetEnvironment().get_shell_var("VS2022_PREFIX") is not None:
@@ -265,7 +262,6 @@ class WindowsVsToolChain(IUefiBuildPlugin):
             # HostType for VS tools should be (defined in tools_def):
             # x86   == 32bit Intel
             # x64   == 64bit Intel
-            # arm   == 32bit Arm
             # arm64 == 64bit Arm
             #
             HostType = shell_environment.GetEnvironment().get_shell_var("CLANG_VS_HOST")
@@ -286,7 +282,7 @@ class WindowsVsToolChain(IUefiBuildPlugin):
 
             # CLANG_VS_HOST options are not exactly the same as QueryVcVariables. This translates.
             VC_HOST_ARCH_TRANSLATOR = {
-                "x86": "x86", "x64": "AMD64", "arm": "not supported", "arm64": "not supported"}
+                "x86": "x86", "x64": "AMD64", "arm64": "not supported"}
 
             # now get the environment variables for the platform
             shell_env = shell_environment.GetEnvironment()

@@ -2042,8 +2042,8 @@ def CreateFooterCode(Info, AutoGenC, AutoGenH):
 def CreateCode(Info, AutoGenC, AutoGenH, StringH, UniGenCFlag, UniGenBinBuffer, StringIdf, IdfGenCFlag, IdfGenBinBuffer):
     CreateHeaderCode(Info, AutoGenC, AutoGenH)
 
-    # The only 32 bit archs we have are IA32 and ARM, everything else is 64 bit
-    Bitwidth = 32 if Info.Arch == 'IA32' or Info.Arch == 'ARM' else 64
+    # The only 32 bit arch we have is IA32, everything else is 64 bit
+    Bitwidth = 32 if Info.Arch == 'IA32' else 64
 
     if GlobalData.gStackCookieValues64 == [] and os.path.exists(os.path.join(Info.PlatformInfo.BuildDir, "StackCookieValues64.json")):
         with open (os.path.join(Info.PlatformInfo.BuildDir, "StackCookieValues64.json"), "r") as file:

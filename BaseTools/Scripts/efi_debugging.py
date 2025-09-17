@@ -346,7 +346,6 @@ image_machine_dict = {
     0x0200: "IPF",
     0x0EBC: "EBC",
     0x8664: "X64",
-    0x01c2: "ARM",
     0xAA64: "AArch64",
     0x5032: "RISC32",
     0x5064: "RISC64",

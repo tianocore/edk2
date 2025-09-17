@@ -152,7 +152,7 @@
     <Command.XCODE>
         "$(CC)" $(DEPS_FLAGS) $(CC_FLAGS) $(CXX_FLAGS) -o ${dst} $(INC) ${src}
 
-[C-Code-File.BASE.AARCH64,C-Code-File.SEC.AARCH64,C-Code-File.PEI_CORE.AARCH64,C-Code-File.PEIM.AARCH64,C-Code-File.BASE.ARM,C-Code-File.SEC.ARM,C-Code-File.PEI_CORE.ARM,C-Code-File.PEIM.ARM]
+[C-Code-File.BASE.AARCH64,C-Code-File.SEC.AARCH64,C-Code-File.PEI_CORE.AARCH64,C-Code-File.PEIM.AARCH64]
     <InputFile>
         ?.c
 
@@ -198,7 +198,7 @@
         Trim --trim-long --source-code -o ${d_path}(+)${s_base}.iiii ${d_path}(+)${s_base}.ii
         "$(ASM)" $(ASM_FLAGS) -o ${dst} $(INC) ${d_path}(+)${s_base}.iiii
 
-[Assembly-Code-File.COMMON.ARM,Assembly-Code-File.COMMON.AARCH64]
+[Assembly-Code-File.COMMON.AARCH64]
     # Remove --convert-hex for ARM as it breaks MSFT assemblers
     <InputFile.MSFT, InputFile.INTEL>
         ?.asm, ?.Asm, ?.ASM
