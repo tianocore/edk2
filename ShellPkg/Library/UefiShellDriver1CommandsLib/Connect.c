@@ -183,6 +183,73 @@ ConnectControllers (
 }
 
 /**
+  Iterate over the Handles that have a gEfiPciIoProtocol
+  and try to connect them to the input Instance of the console variable.
+
+  @param[in] HandleArray            Array of handles having a gEfiPciIoProtocol.
+  @param[in] HandleArrayCount       Number of handles in HandleArray.
+  @param[in] Instance               Instance of the console variable.
+  @param[in] AtLeastOneConnected    asd
+
+  @retval EFI_SUCCESS   The operation was successful.
+**/
+STATIC
+EFI_STATUS
+ConnectConsoles (
+  EFI_HANDLE                *HandleArray,
+  UINTN                     HandleArrayCount,
+  EFI_DEVICE_PATH_PROTOCOL  *Instance,
+  BOOLEAN                   *AtLeastOneConnected
+  )
+{
+  UINTN                Index;
+  UINT8                Class[3];
+  EFI_STATUS           Status;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+
+  ASSERT (HandleArray != NULL);
+  ASSERT (HandleArrayCount != 0);
+  ASSERT (Instance != NULL);
+  ASSERT (AtLeastOneConnected != NULL);
+
+  for (Index = 0; Index < HandleArrayCount; Index++) {
+    Status = gBS->HandleProtocol (
+                    HandleArray[Index],
+                    &gEfiPciIoProtocolGuid,
+                    (VOID **)&PciIo
+                    );
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, 0x09, 3, &Class);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    if ((PCI_CLASS_SERIAL != Class[2]) ||
+        (PCI_CLASS_SERIAL_USB != Class[1]))
+    {
+      return EFI_NOT_FOUND;
+    }
+
+    Status = gBS->ConnectController (
+                    HandleArray[Index],
+                    NULL,
+                    Instance,
+                    FALSE
+                    );
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    *AtLeastOneConnected = TRUE;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Do a connect from an EFI variable via it's key name.
 
   @param[in] Key      The name of the EFI Variable.
@@ -199,14 +266,11 @@ ShellConnectFromDevPaths (
   EFI_DEVICE_PATH_PROTOCOL  *Instance;
   EFI_DEVICE_PATH_PROTOCOL  *Next;
   UINTN                     Length;
-  UINTN                     Index;
   UINTN                     HandleArrayCount;
   UINTN                     Size;
   EFI_HANDLE                *HandleArray;
   EFI_STATUS                Status;
   BOOLEAN                   AtLeastOneConnected;
-  EFI_PCI_IO_PROTOCOL       *PciIo;
-  UINT8                     Class[3];
 
   DevPath             = NULL;
   Length              = 0;
@@ -293,35 +357,16 @@ ShellConnectFromDevPaths (
                     &HandleArrayCount,
                     &HandleArray
                     );
-
-    if (!EFI_ERROR (Status)) {
-      for (Index = 0; Index < HandleArrayCount; Index++) {
-        Status = gBS->HandleProtocol (
-                        HandleArray[Index],
-                        &gEfiPciIoProtocolGuid,
-                        (VOID **)&PciIo
-                        );
-
-        if (!EFI_ERROR (Status)) {
-          Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, 0x09, 3, &Class);
-          if (!EFI_ERROR (Status)) {
-            if ((PCI_CLASS_SERIAL == Class[2]) &&
-                (PCI_CLASS_SERIAL_USB == Class[1]))
-            {
-              Status = gBS->ConnectController (
-                              HandleArray[Index],
-                              NULL,
-                              Instance,
-                              FALSE
-                              );
-              if (!EFI_ERROR (Status)) {
-                AtLeastOneConnected = TRUE;
-              }
-            }
-          }
-        }
-      }
+    if (EFI_ERROR (Status)) {
+      continue;
     }
+
+    Status = ConnectConsoles (
+               HandleArray,
+               HandleArrayCount,
+               Instance,
+               &AtLeastOneConnected
+               );
 
     if (HandleArray != NULL) {
       FreePool (HandleArray);
