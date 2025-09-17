@@ -52,7 +52,9 @@ FspApiCommon1:
   PUSHA_64
   mov    rdx, rcx           ; move ApiParam to rdx
   mov    rcx, rax           ; move ApiIdx to rcx
+  sub    rsp, 0x28
   call   ASM_PFX(FspApiCallingCheck)
+  add    rsp, 0x28
   cmp    rax, 0
   jz     FspApiCommon2
   mov    [rsp + STACK_SAVED_RAX_OFFSET], rax
