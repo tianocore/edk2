@@ -27,7 +27,7 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
         ParserObj = argparse.ArgumentParser()
         ParserObj.add_argument("-t", "--tool_chain_tag", dest="tct", default="VS2022",
                                help="Set the toolchain used to compile the build tools")
-        ParserObj.add_argument("-a", "--target_arch", dest="arch", default=None, choices=[None, 'IA32', 'X64', 'ARM', 'AARCH64'],
+        ParserObj.add_argument("-a", "--target_arch", dest="arch", default=None, choices=[None, 'IA32', 'X64', 'AARCH64'],
                                help="Specify the architecture of the built base tools. Not specifying this will fall back to the default "
                                "behavior, for Windows builds, IA32 target will be built, for Linux builds, target arch will be the same as host arch.")
         args = ParserObj.parse_args()
@@ -43,15 +43,13 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
     def GetActiveScopes(self):
         ''' return tuple containing scopes that should be active for this process '''
 
-        # Adding scope for cross compilers when building for ARM/AARCH64
+        # Adding scope for cross compilers when building for AARCH64
         scopes = ('global',)
         if GetHostInfo().os == "Linux" and self.tool_chain_tag.lower().startswith("gcc"):
             if self.target_arch is None:
                 return scopes
             if "AARCH64" in self.target_arch:
                 scopes += ("gcc_aarch64_linux",)
-            if "ARM" in self.target_arch:
-                scopes += ("gcc_arm_linux",)
         return scopes
 
     def GetLoggingLevel(self, loggerType):
@@ -131,10 +129,6 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
                 VcToolChainArch = "x86"
                 TargetInfoArch = "x86"
                 OutputDir = "Win32"
-            elif self.target_arch == "ARM":
-                VcToolChainArch = "x86_arm"
-                TargetInfoArch = "ARM"
-                OutputDir = "Win32"
             elif self.target_arch == "X64":
                 VcToolChainArch = "amd64"
                 TargetInfoArch = "x86"
@@ -172,10 +166,6 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
                     host_arch = "AARCH64"
                     host_toolchain_arch = "amd64_arm64"
                     TempOutputDir = os.path.join(shell_env.get_shell_var("EDK_TOOLS_PATH"), "Bin", "Win64")
-                elif HostInfo.arch == "ARM" and HostInfo.bit == "32":
-                    host_arch = "ARM"
-                    host_toolchain_arch = "x86_arm"
-                    TempOutputDir = os.path.join(shell_env.get_shell_var("EDK_TOOLS_PATH"), "Bin", "Win32")
                 else:
                     raise Exception("Unsupported host system. %s %s" % (HostInfo.arch, HostInfo.bit))
 
@@ -275,18 +265,6 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
                     shell_environment.GetEnvironment().set_shell_var("GCC_PREFIX", prefix)
                     TargetInfoArch = "ARM"
 
-                elif "ARM" in self.target_arch:
-                    prefix = shell_env.get_shell_var("GCC5_ARM_PREFIX")
-                    if prefix == None:
-                        # now check for install dir.  If set then set the Prefix
-                        install_path = shell_environment.GetEnvironment().get_shell_var("GCC5_ARM_INSTALL")
-
-                        # make GCC5_ARM_PREFIX to align with tools_def.txt
-                        prefix = os.path.join(install_path, "bin", "arm-none-linux-gnueabihf-")
-
-                    shell_environment.GetEnvironment().set_shell_var("GCC_PREFIX", prefix)
-                    TargetInfoArch = "ARM"
-
                 else:
                     TargetInfoArch = "x86"
             else:
@@ -320,8 +298,6 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
                 pack_name = f"util-linux-{ver}"
                 if "AARCH64" in self.target_arch:
                     ret = RunCmd("sh", f"./configure --host=aarch64-linux  -disable-all-programs --enable-libuuid CC={prefix}gcc", workingdir=unzip_dir)
-                elif "ARM" in self.target_arch:
-                    ret = RunCmd("sh", f"./configure --host=arm-linux  -disable-all-programs --enable-libuuid CC={prefix}gcc", workingdir=unzip_dir)
                 if ret != 0:
                     raise Exception(f"Failed to configure the util-linux to build with our gcc {ret}")
 
