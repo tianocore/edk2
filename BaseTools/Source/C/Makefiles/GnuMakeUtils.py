@@ -22,7 +22,6 @@ ARCH_UNKNOWN = 'Unknown'
 ARCH_IA32 = 'IA32'
 ARCH_X64 = 'X64'
 ARCH_AARCH64 = 'AARCH64'
-ARCH_ARM = 'ARM'
 ARCH_RISCV64 = 'RISCV64'
 ARCH_LOONGARCH64 = 'LOONGARCH64'
 _Process = namedtuple('Process', ['process_id', 'parent_process_id', 'exe_filename'])
@@ -203,21 +202,10 @@ def get_host_arch():
             host_arch = ARCH_IA32
         elif 'aarch64' in uname_m or 'arm64' in uname_m:
             host_arch = ARCH_AARCH64
-        elif 'arm' in uname_m:
-            host_arch = ARCH_ARM
         elif 'riscv64' in uname_m:
             host_arch = ARCH_RISCV64
         elif 'loongarch64' in uname_m:
             host_arch = ARCH_LOONGARCH64
-        # There is a corner case for the Raspberry Pi. Sometimes it has a 64-bit
-        # kernel paired with an exclusively 32-bit user mode. Check for this case.
-        if shutil.which("lsb_release") is not None:
-            res = subprocess.run(["lsb_release", "-i"], universal_newlines=True,
-                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                check=True)
-            distributor = res.stdout.strip()
-            if distributor == "Distributor ID:\tRaspbian":
-                host_arch = ARCH_ARM
     print(host_arch)
     return 0
 
