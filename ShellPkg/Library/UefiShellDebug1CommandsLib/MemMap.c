@@ -147,6 +147,204 @@ AddMemoryLength (
   NewEntry->NumberOfPages += NumberOfPages;
 }
 
+/** Parse Memory Descriptors
+
+@param[in]  Descriptors   Array of pointers to Memory Descriptors.
+@param[in]  Size          Size of the Descriptors array.
+@param[in]  ItemSize      Size of a Memory Descriptor.
+@param[in]  Sfo           Whether 'Standard Format Output' should be used.
+**/
+STATIC
+SHELL_STATUS
+ParseMemoryDescriptors (
+  IN  EFI_MEMORY_DESCRIPTOR  *Descriptors,
+  IN  UINTN                  Size,
+  IN  UINTN                  ItemSize,
+  IN  BOOLEAN                Sfo
+  )
+{
+  EFI_MEMORY_DESCRIPTOR   *Walker;
+  UINT64                  TotalPages;
+  UINT64                  TotalPagesSize;
+  MEMORY_TYPE_PAGES_INFO  MemoryPageCount[EfiMaxMemoryType];
+  CONST CHAR16            *MemoryTypeName;
+  UINTN                   Index;
+  LIST_ENTRY              MemoryList;
+  LIST_ENTRY              *Link;
+  MEMORY_LENGTH_ENTRY     *Entry;
+
+  InitializeListHead (&MemoryList);
+
+  TotalPages = 0;
+
+  // Reset the MemoryPageCount array.
+  ZeroMem (MemoryPageCount, sizeof (MemoryPageCount));
+
+  for (Walker = Descriptors
+       ; (Walker < (EFI_MEMORY_DESCRIPTOR *)((UINT8 *)Descriptors + Size)) && (Walker != NULL)
+       ; Walker = (EFI_MEMORY_DESCRIPTOR *)((UINT8 *)Walker + ItemSize)
+       )
+  {
+    if (Walker->Type < EfiMaxMemoryType) {
+      MemoryPageCount[Walker->Type].Pages += Walker->NumberOfPages;
+
+      if (MemoryPageArray[Walker->Type].ContributeTotalPages) {
+        TotalPages += Walker->NumberOfPages;
+      }
+
+      if (!Sfo && MemoryPageArray[Walker->Type].HasShortName) {
+        MemoryTypeName = ShortNameEfiMemory[Walker->Type];
+      } else {
+        MemoryTypeName = FullNameEfiMemory[Walker->Type];
+      }
+
+      ShellPrintHiiEx (
+        -1,
+        -1,
+        NULL,
+        (EFI_STRING_ID)(!Sfo ? STRING_TOKEN (STR_MEMMAP_LIST_ITEM) : STRING_TOKEN (STR_MEMMAP_LIST_ITEM_SFO)),
+        gShellDebug1HiiHandle,
+        MemoryTypeName,
+        Walker->PhysicalStart,
+        Walker->PhysicalStart+MultU64x64 (SIZE_4KB, Walker->NumberOfPages)-1,
+        Walker->NumberOfPages,
+        Walker->Attribute
+        );
+    } else {
+      //
+      // Shell Spec defines the SFO format.
+      // Do not print the OEM/OS memory usage in the SFO format, to avoid conflict with Shell Spec.
+      //
+      if (!Sfo) {
+        ShellPrintHiiEx (
+          -1,
+          -1,
+          NULL,
+          STRING_TOKEN (STR_MEMMAP_LIST_ITEM_OTHER),
+          gShellDebug1HiiHandle,
+          Walker->Type,
+          Walker->PhysicalStart,
+          Walker->PhysicalStart + MultU64x64 (SIZE_4KB, Walker->NumberOfPages) - 1,
+          Walker->NumberOfPages,
+          Walker->Attribute
+          );
+      }
+
+      TotalPages += Walker->NumberOfPages;
+      AddMemoryLength (&MemoryList, Walker->Type, Walker->NumberOfPages);
+    }
+  }
+
+  TotalPagesSize = MultU64x64 (SIZE_4KB, TotalPages);
+  for (Index = EfiReservedMemoryType; Index < EfiMaxMemoryType; Index++) {
+    MemoryPageCount[Index].PagesSize = MultU64x64 (SIZE_4KB, MemoryPageCount[Index].Pages);
+  }
+
+  //
+  // print the summary
+  //
+  if (!Sfo) {
+    ShellPrintHiiEx (
+      -1,
+      -1,
+      NULL,
+      STRING_TOKEN (STR_MEMMAP_LIST_SUMM),
+      gShellDebug1HiiHandle,
+      MemoryPageCount[EfiReservedMemoryType].Pages,
+      MemoryPageCount[EfiReservedMemoryType].PagesSize,
+      MemoryPageCount[EfiLoaderCode].Pages,
+      MemoryPageCount[EfiLoaderCode].PagesSize,
+      MemoryPageCount[EfiLoaderData].Pages,
+      MemoryPageCount[EfiLoaderData].PagesSize,
+      MemoryPageCount[EfiBootServicesCode].Pages,
+      MemoryPageCount[EfiBootServicesCode].PagesSize,
+      MemoryPageCount[EfiBootServicesData].Pages,
+      MemoryPageCount[EfiBootServicesData].PagesSize,
+      MemoryPageCount[EfiRuntimeServicesCode].Pages,
+      MemoryPageCount[EfiRuntimeServicesCode].PagesSize,
+      MemoryPageCount[EfiRuntimeServicesData].Pages,
+      MemoryPageCount[EfiRuntimeServicesData].PagesSize,
+      MemoryPageCount[EfiACPIReclaimMemory].Pages,
+      MemoryPageCount[EfiACPIReclaimMemory].PagesSize,
+      MemoryPageCount[EfiACPIMemoryNVS].Pages,
+      MemoryPageCount[EfiACPIMemoryNVS].PagesSize,
+      MemoryPageCount[EfiMemoryMappedIO].Pages,
+      MemoryPageCount[EfiMemoryMappedIO].PagesSize,
+      MemoryPageCount[EfiMemoryMappedIOPortSpace].Pages,
+      MemoryPageCount[EfiMemoryMappedIOPortSpace].PagesSize,
+      MemoryPageCount[EfiPalCode].Pages,
+      MemoryPageCount[EfiPalCode].PagesSize,
+      MemoryPageCount[EfiUnacceptedMemoryType].Pages,
+      MemoryPageCount[EfiUnacceptedMemoryType].PagesSize,
+      MemoryPageCount[EfiConventionalMemory].Pages,
+      MemoryPageCount[EfiConventionalMemory].PagesSize,
+      MemoryPageCount[EfiPersistentMemory].Pages,
+      MemoryPageCount[EfiPersistentMemory].PagesSize
+      );
+
+    //
+    // Print out the total memory usage for OEM/OS types in the order of type.
+    //
+    for (Link = GetFirstNode (&MemoryList); !IsNull (&MemoryList, Link); Link = GetNextNode (&MemoryList, Link)) {
+      Entry = BASE_CR (Link, MEMORY_LENGTH_ENTRY, Link);
+      ShellPrintHiiEx (
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN (STR_MEMMAP_LIST_SUMM_OTHER),
+        gShellDebug1HiiHandle,
+        Entry->Type,
+        Entry->NumberOfPages,
+        MultU64x64 (SIZE_4KB, Entry->NumberOfPages)
+        );
+    }
+
+    ShellPrintHiiEx (
+      -1,
+      -1,
+      NULL,
+      STRING_TOKEN (STR_MEMMAP_LIST_SUMM2),
+      gShellDebug1HiiHandle,
+      DivU64x32 (MultU64x64 (SIZE_4KB, TotalPages), SIZE_1MB),
+      TotalPagesSize
+      );
+  } else {
+    ShellPrintHiiEx (
+      -1,
+      -1,
+      NULL,
+      STRING_TOKEN (STR_MEMMAP_LIST_SUMM_SFO),
+      gShellDebug1HiiHandle,
+      TotalPagesSize,
+      MemoryPageCount[EfiReservedMemoryType].PagesSize,
+      MemoryPageCount[EfiBootServicesCode].PagesSize,
+      MemoryPageCount[EfiBootServicesData].PagesSize,
+      MemoryPageCount[EfiRuntimeServicesCode].PagesSize,
+      MemoryPageCount[EfiRuntimeServicesData].PagesSize,
+      MemoryPageCount[EfiLoaderCode].PagesSize,
+      MemoryPageCount[EfiLoaderData].PagesSize,
+      MemoryPageCount[EfiConventionalMemory].PagesSize,
+      MemoryPageCount[EfiMemoryMappedIO].PagesSize,
+      MemoryPageCount[EfiMemoryMappedIOPortSpace].PagesSize,
+      MemoryPageCount[EfiUnusableMemory].PagesSize,
+      MemoryPageCount[EfiACPIReclaimMemory].PagesSize,
+      MemoryPageCount[EfiACPIMemoryNVS].PagesSize,
+      MemoryPageCount[EfiPalCode].PagesSize,
+      MemoryPageCount[EfiUnacceptedMemoryType].PagesSize,
+      MemoryPageCount[EfiPersistentMemory].PagesSize
+      );
+  }
+
+  //
+  // Free the memory list.
+  //
+  for (Link = GetFirstNode (&MemoryList); !IsNull (&MemoryList, Link); ) {
+    Link = RemoveEntryList (Link);
+  }
+
+  return SHELL_SUCCESS;
+}
+
 /**
   Function for 'memmap' command.
 
@@ -160,35 +358,21 @@ ShellCommandRunMemMap (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS              Status;
-  LIST_ENTRY              *Package;
-  CHAR16                  *ProblemParam;
-  SHELL_STATUS            ShellStatus;
-  UINTN                   Size;
-  EFI_MEMORY_DESCRIPTOR   *Descriptors;
-  UINTN                   MapKey;
-  UINTN                   ItemSize;
-  UINT32                  Version;
-  EFI_MEMORY_DESCRIPTOR   *Walker;
-  BOOLEAN                 Sfo;
-  LIST_ENTRY              MemoryList;
-  MEMORY_LENGTH_ENTRY     *Entry;
-  LIST_ENTRY              *Link;
-  CONST CHAR16            *MemoryTypeName;
-  UINTN                   Index;
-  UINT64                  TotalPages;
-  UINT64                  TotalPagesSize;
-  MEMORY_TYPE_PAGES_INFO  MemoryPageCount[EfiMaxMemoryType];
+  EFI_STATUS             Status;
+  LIST_ENTRY             *Package;
+  CHAR16                 *ProblemParam;
+  SHELL_STATUS           ShellStatus;
+  UINTN                  Size;
+  EFI_MEMORY_DESCRIPTOR  *Descriptors;
+  UINTN                  MapKey;
+  UINTN                  ItemSize;
+  UINT32                 Version;
+  BOOLEAN                Sfo;
 
-  TotalPages  = 0;
   Size        = 0;
   Descriptors = NULL;
   ShellStatus = SHELL_SUCCESS;
   Status      = EFI_SUCCESS;
-  InitializeListHead (&MemoryList);
-
-  // Reset the MemoryPageCount array.
-  ZeroMem (MemoryPageCount, sizeof (MemoryPageCount));
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -242,160 +426,7 @@ ShellCommandRunMemMap (
           ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_SFO_HEADER), gShellDebug1HiiHandle, L"memmap");
         }
 
-        for ( Walker = Descriptors
-              ; (Walker < (EFI_MEMORY_DESCRIPTOR *)((UINT8 *)Descriptors + Size)) && (Walker != NULL)
-              ; Walker = (EFI_MEMORY_DESCRIPTOR *)((UINT8 *)Walker + ItemSize)
-              )
-        {
-          if (Walker->Type < EfiMaxMemoryType) {
-            MemoryPageCount[Walker->Type].Pages += Walker->NumberOfPages;
-
-            if (MemoryPageArray[Walker->Type].ContributeTotalPages) {
-              TotalPages += Walker->NumberOfPages;
-            }
-
-            if (!Sfo && MemoryPageArray[Walker->Type].HasShortName) {
-              MemoryTypeName = ShortNameEfiMemory[Walker->Type];
-            } else {
-              MemoryTypeName = FullNameEfiMemory[Walker->Type];
-            }
-
-            ShellPrintHiiEx (
-              -1,
-              -1,
-              NULL,
-              (EFI_STRING_ID)(!Sfo ? STRING_TOKEN (STR_MEMMAP_LIST_ITEM) : STRING_TOKEN (STR_MEMMAP_LIST_ITEM_SFO)),
-              gShellDebug1HiiHandle,
-              MemoryTypeName,
-              Walker->PhysicalStart,
-              Walker->PhysicalStart+MultU64x64 (SIZE_4KB, Walker->NumberOfPages)-1,
-              Walker->NumberOfPages,
-              Walker->Attribute
-              );
-          } else {
-            //
-            // Shell Spec defines the SFO format.
-            // Do not print the OEM/OS memory usage in the SFO format, to avoid conflict with Shell Spec.
-            //
-            if (!Sfo) {
-              ShellPrintHiiEx (
-                -1,
-                -1,
-                NULL,
-                STRING_TOKEN (STR_MEMMAP_LIST_ITEM_OTHER),
-                gShellDebug1HiiHandle,
-                Walker->Type,
-                Walker->PhysicalStart,
-                Walker->PhysicalStart + MultU64x64 (SIZE_4KB, Walker->NumberOfPages) - 1,
-                Walker->NumberOfPages,
-                Walker->Attribute
-                );
-            }
-
-            TotalPages += Walker->NumberOfPages;
-            AddMemoryLength (&MemoryList, Walker->Type, Walker->NumberOfPages);
-          }
-        }
-
-        TotalPagesSize = MultU64x64 (SIZE_4KB, TotalPages);
-        for (Index = EfiReservedMemoryType; Index < EfiMaxMemoryType; Index++) {
-          MemoryPageCount[Index].PagesSize = MultU64x64 (SIZE_4KB, MemoryPageCount[Index].Pages);
-        }
-
-        //
-        // print the summary
-        //
-        if (!Sfo) {
-          ShellPrintHiiEx (
-            -1,
-            -1,
-            NULL,
-            STRING_TOKEN (STR_MEMMAP_LIST_SUMM),
-            gShellDebug1HiiHandle,
-            MemoryPageCount[EfiReservedMemoryType].Pages,
-            MemoryPageCount[EfiReservedMemoryType].PagesSize,
-            MemoryPageCount[EfiLoaderCode].Pages,
-            MemoryPageCount[EfiLoaderCode].PagesSize,
-            MemoryPageCount[EfiLoaderData].Pages,
-            MemoryPageCount[EfiLoaderData].PagesSize,
-            MemoryPageCount[EfiBootServicesCode].Pages,
-            MemoryPageCount[EfiBootServicesCode].PagesSize,
-            MemoryPageCount[EfiBootServicesData].Pages,
-            MemoryPageCount[EfiBootServicesData].PagesSize,
-            MemoryPageCount[EfiRuntimeServicesCode].Pages,
-            MemoryPageCount[EfiRuntimeServicesCode].PagesSize,
-            MemoryPageCount[EfiRuntimeServicesData].Pages,
-            MemoryPageCount[EfiRuntimeServicesData].PagesSize,
-            MemoryPageCount[EfiACPIReclaimMemory].Pages,
-            MemoryPageCount[EfiACPIReclaimMemory].PagesSize,
-            MemoryPageCount[EfiACPIMemoryNVS].Pages,
-            MemoryPageCount[EfiACPIMemoryNVS].PagesSize,
-            MemoryPageCount[EfiMemoryMappedIO].Pages,
-            MemoryPageCount[EfiMemoryMappedIO].PagesSize,
-            MemoryPageCount[EfiMemoryMappedIOPortSpace].Pages,
-            MemoryPageCount[EfiMemoryMappedIOPortSpace].PagesSize,
-            MemoryPageCount[EfiPalCode].Pages,
-            MemoryPageCount[EfiPalCode].PagesSize,
-            MemoryPageCount[EfiUnacceptedMemoryType].Pages,
-            MemoryPageCount[EfiUnacceptedMemoryType].PagesSize,
-            MemoryPageCount[EfiConventionalMemory].Pages,
-            MemoryPageCount[EfiConventionalMemory].PagesSize,
-            MemoryPageCount[EfiPersistentMemory].Pages,
-            MemoryPageCount[EfiPersistentMemory].PagesSize
-            );
-
-          //
-          // Print out the total memory usage for OEM/OS types in the order of type.
-          //
-          for (Link = GetFirstNode (&MemoryList); !IsNull (&MemoryList, Link); Link = GetNextNode (&MemoryList, Link)) {
-            Entry = BASE_CR (Link, MEMORY_LENGTH_ENTRY, Link);
-            ShellPrintHiiEx (
-              -1,
-              -1,
-              NULL,
-              STRING_TOKEN (STR_MEMMAP_LIST_SUMM_OTHER),
-              gShellDebug1HiiHandle,
-              Entry->Type,
-              Entry->NumberOfPages,
-              MultU64x64 (SIZE_4KB, Entry->NumberOfPages)
-              );
-          }
-
-          ShellPrintHiiEx (
-            -1,
-            -1,
-            NULL,
-            STRING_TOKEN (STR_MEMMAP_LIST_SUMM2),
-            gShellDebug1HiiHandle,
-            DivU64x32 (MultU64x64 (SIZE_4KB, TotalPages), SIZE_1MB),
-            TotalPagesSize
-            );
-        } else {
-          ShellPrintHiiEx (
-            -1,
-            -1,
-            NULL,
-            STRING_TOKEN (STR_MEMMAP_LIST_SUMM_SFO),
-            gShellDebug1HiiHandle,
-            TotalPagesSize,
-            MemoryPageCount[EfiReservedMemoryType].PagesSize,
-            MemoryPageCount[EfiBootServicesCode].PagesSize,
-            MemoryPageCount[EfiBootServicesData].PagesSize,
-            MemoryPageCount[EfiRuntimeServicesCode].PagesSize,
-            MemoryPageCount[EfiRuntimeServicesData].PagesSize,
-            MemoryPageCount[EfiLoaderCode].PagesSize,
-            MemoryPageCount[EfiLoaderData].PagesSize,
-            MemoryPageCount[EfiConventionalMemory].PagesSize,
-            MemoryPageCount[EfiMemoryMappedIO].PagesSize,
-            MemoryPageCount[EfiMemoryMappedIOPortSpace].PagesSize,
-            MemoryPageCount[EfiUnusableMemory].PagesSize,
-            MemoryPageCount[EfiACPIReclaimMemory].PagesSize,
-            MemoryPageCount[EfiACPIMemoryNVS].PagesSize,
-            MemoryPageCount[EfiPalCode].PagesSize,
-            MemoryPageCount[EfiUnacceptedMemoryType].PagesSize,
-            MemoryPageCount[EfiPersistentMemory].PagesSize
-            );
-        }
+        ParseMemoryDescriptors (Descriptors, Size, ItemSize, Sfo);
       }
     }
 
@@ -404,13 +435,6 @@ ShellCommandRunMemMap (
 
   if (Descriptors != NULL) {
     FreePool (Descriptors);
-  }
-
-  //
-  // Free the memory list.
-  //
-  for (Link = GetFirstNode (&MemoryList); !IsNull (&MemoryList, Link); ) {
-    Link = RemoveEntryList (Link);
   }
 
   return (ShellStatus);
