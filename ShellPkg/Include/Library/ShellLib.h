@@ -968,6 +968,16 @@ ShellPrintHiiEx (
   ...
   );
 
+/** Macro aliasing the ShellPrintEx() function and providing default parameters for
+    the Col and Row position.
+**/
+#define ShellPrintDefaultEx(...)  ShellPrintEx(-1, -1, __VA_ARGS__)
+
+/** Macro aliasing the ShellPrintHiiEx() function and providing default parameters for
+    the Col and Row position + Language.
+**/
+#define ShellPrintHiiDefaultEx(...)  ShellPrintHiiEx(-1, -1, NULL, __VA_ARGS__)
+
 /**
   Function to determine if a given filename represents a directory.
 
