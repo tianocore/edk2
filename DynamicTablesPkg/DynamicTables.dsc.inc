@@ -79,9 +79,11 @@
       #   Common
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiCedtLib/AcpiCedtLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiFadtLib/AcpiFadtLib.inf
-      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSratLib/AcpiSratLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiMcfgLib/AcpiMcfgLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSlitLib/AcpiSlitLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSpcrLib/AcpiSpcrLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSpmiLib/AcpiSpmiLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSratLib/AcpiSratLib.inf
       #   X64 specific
       NULL|DynamicTablesPkg/Library/Acpi/X64/AcpiFacsLib/AcpiFacsLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/X64/AcpiHpetLib/AcpiHpetLib.inf
@@ -90,6 +92,7 @@
       # AML Codegen
       #  Common
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib/SsdtCpuTopologyLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtPcieLib/SsdtPcieLib.inf
       #  X64 specific
       NULL|DynamicTablesPkg/Library/Acpi/X64/AcpiSsdtHpetLib/AcpiSsdtHpetLib.inf
   }
