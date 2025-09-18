@@ -4298,7 +4298,7 @@ GenerateAltConfigResp (
           DefaultString = NULL;
         }
 
-        if ((BlockData->OpCode == EFI_IFR_STRING_OP) && (TmpBuffer != NULL)) {
+        if ((BlockData->OpCode == EFI_IFR_STRING_OP) && (DefaultValueData->Value.string != 0) && (TmpBuffer != NULL)) {
           FreePool (TmpBuffer);
           TmpBuffer = NULL;
         }
