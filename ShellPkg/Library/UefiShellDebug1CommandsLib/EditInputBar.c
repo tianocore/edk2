@@ -154,7 +154,7 @@ InputBarRefresh (
   EditorClearLine (LastRow, LastColumn, LastRow);
 
   gST->ConOut->SetCursorPosition (gST->ConOut, 0, LastRow - 1);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_EDIT_LIBINPUTBAR_MAININPUTBAR), gShellDebug1HiiHandle, mPrompt);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_EDIT_LIBINPUTBAR_MAININPUTBAR), gShellDebug1HiiHandle, mPrompt);
 
   //
   // this is a selection mPrompt, cursor will stay in edit area

@@ -70,7 +70,7 @@ ShellCommandRunEfiDecompress (
   Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"efidecompress", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"efidecompress", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -78,16 +78,16 @@ ShellCommandRunEfiDecompress (
     }
   } else {
     if (ShellCommandLineGetCount (Package) > 3) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"efidecompress");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"efidecompress");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetCount (Package) < 3) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"efidecompress");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"efidecompress");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       TempParam = ShellCommandLineGetRawValue (Package, 1);
       if (TempParam == NULL) {
         ASSERT (TempParam != NULL);
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"efidecompress");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"efidecompress");
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
@@ -95,23 +95,23 @@ ShellCommandRunEfiDecompress (
       InFileName  = ShellFindFilePath (TempParam);
       OutFileName = ShellCommandLineGetRawValue (Package, 2);
       if ((InFileName == NULL) || (OutFileName == NULL)) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, L"efidecompress", TempParam);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, L"efidecompress", TempParam);
         ShellStatus = SHELL_NOT_FOUND;
       } else {
         if (ShellIsDirectory (InFileName) == EFI_SUCCESS) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, L"efidecompress", InFileName);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, L"efidecompress", InFileName);
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
 
         if (ShellIsDirectory (OutFileName) == EFI_SUCCESS) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, L"efidecompress", OutFileName);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, L"efidecompress", OutFileName);
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
 
         if (ShellStatus == SHELL_SUCCESS) {
           Status = ShellOpenFileByName (InFileName, &InFileHandle, EFI_FILE_MODE_READ, 0);
           if (EFI_ERROR (Status)) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"efidecompress", ShellCommandLineGetRawValue (Package, 1));
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"efidecompress", ShellCommandLineGetRawValue (Package, 1));
             ShellStatus = SHELL_NOT_FOUND;
           }
         }
@@ -119,7 +119,7 @@ ShellCommandRunEfiDecompress (
         if (ShellStatus == SHELL_SUCCESS) {
           Status = FileHandleGetSize (InFileHandle, &Temp64Bit);
           if (EFI_ERROR (Status)) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"efidecompress", ShellCommandLineGetRawValue (Package, 1));
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"efidecompress", ShellCommandLineGetRawValue (Package, 1));
             ShellStatus = SHELL_NOT_FOUND;
           }
         }
@@ -150,12 +150,12 @@ ShellCommandRunEfiDecompress (
           }
 
           if (EFI_ERROR (Status) || (OutSize == 0)) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_EFI_DECOMPRESS_NOPE), gShellDebug1HiiHandle, InFileName);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_EFI_DECOMPRESS_NOPE), gShellDebug1HiiHandle, InFileName);
             ShellStatus = SHELL_NOT_FOUND;
           } else {
             Status = ShellOpenFileByName (OutFileName, &OutFileHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, 0);
             if (EFI_ERROR (Status)) {
-              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue (Package, 2), Status);
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_OPEN_FAIL), gShellDebug1HiiHandle, ShellCommandLineGetRawValue (Package, 2), Status);
               ShellStatus = SHELL_NOT_FOUND;
             } else {
               OutBuffer     = AllocateZeroPool (OutSize);
@@ -169,14 +169,14 @@ ShellCommandRunEfiDecompress (
           }
 
           if (EFI_ERROR (Status)) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_EFI_DECOMPRESS_FAIL), gShellDebug1HiiHandle, Status);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_EFI_DECOMPRESS_FAIL), gShellDebug1HiiHandle, Status);
             ShellStatus = ((Status == EFI_OUT_OF_RESOURCES) ? SHELL_OUT_OF_RESOURCES : SHELL_DEVICE_ERROR);
           } else {
             OutSizeTemp = OutSize;
             Status      = gEfiShellProtocol->WriteFile (OutFileHandle, &OutSizeTemp, OutBuffer);
             OutSize     = (UINT32)OutSizeTemp;
             if (EFI_ERROR (Status)) {
-              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_FILE_WRITE_FAIL), gShellDebug1HiiHandle, L"efidecompress", OutFileName, Status);
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_FILE_WRITE_FAIL), gShellDebug1HiiHandle, L"efidecompress", OutFileName, Status);
               ShellStatus = SHELL_DEVICE_ERROR;
             }
           }
