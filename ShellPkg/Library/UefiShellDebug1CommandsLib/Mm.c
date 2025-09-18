@@ -611,7 +611,7 @@ ShellCommandRunMm (
       }
 
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_BUF), gShellDebug1HiiHandle, Size * 2, Buffer & mShellMmMaxNumber[Size]);
-      ShellPrintEx (-1, -1, L"\r\n");
+      ShellPrintDefaultEx (L"\r\n");
       goto Done;
     }
 
@@ -624,7 +624,7 @@ ShellCommandRunMm (
       ShellPrintHiiDefaultEx (mShellMmAccessTypeStr[AccessType], gShellDebug1HiiHandle);
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_ADDRESS), gShellDebug1HiiHandle, Address);
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MM_BUF), gShellDebug1HiiHandle, Size * 2, Buffer & mShellMmMaxNumber[Size]);
-      ShellPrintEx (-1, -1, L" > ");
+      ShellPrintDefaultEx (L" > ");
       //
       // wait user input to modify
       //
@@ -658,7 +658,7 @@ ShellCommandRunMm (
       }
 
       Address += Size;
-      ShellPrintEx (-1, -1, L"\r\n");
+      ShellPrintDefaultEx (L"\r\n");
     } while (!Complete);
   }
 

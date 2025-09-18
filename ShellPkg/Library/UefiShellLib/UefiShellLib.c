@@ -3553,7 +3553,7 @@ ShellPromptForResponse (
   switch (Type) {
     case ShellPromptResponseTypeQuitContinue:
       if (Prompt != NULL) {
-        ShellPrintEx (-1, -1, L"%s", Prompt);
+        ShellPrintDefaultEx (L"%s", Prompt);
       }
 
       //
@@ -3565,7 +3565,7 @@ ShellPromptForResponse (
         break;
       }
 
-      ShellPrintEx (-1, -1, L"%c", Key.UnicodeChar);
+      ShellPrintDefaultEx (L"%c", Key.UnicodeChar);
       if ((Key.UnicodeChar == L'Q') || (Key.UnicodeChar == L'q')) {
         *Resp = ShellPromptResponseQuit;
       } else {
@@ -3575,7 +3575,7 @@ ShellPromptForResponse (
       break;
     case ShellPromptResponseTypeYesNoCancel:
       if (Prompt != NULL) {
-        ShellPrintEx (-1, -1, L"%s", Prompt);
+        ShellPrintDefaultEx (L"%s", Prompt);
       }
 
       //
@@ -3594,7 +3594,7 @@ ShellPromptForResponse (
           break;
         }
 
-        ShellPrintEx (-1, -1, L"%c", Key.UnicodeChar);
+        ShellPrintDefaultEx (L"%c", Key.UnicodeChar);
         switch (Key.UnicodeChar) {
           case L'Y':
           case L'y':
@@ -3614,7 +3614,7 @@ ShellPromptForResponse (
       break;
     case ShellPromptResponseTypeYesNoAllCancel:
       if (Prompt != NULL) {
-        ShellPrintEx (-1, -1, L"%s", Prompt);
+        ShellPrintDefaultEx (L"%s", Prompt);
       }
 
       //
@@ -3634,7 +3634,7 @@ ShellPromptForResponse (
         }
 
         if ((Key.UnicodeChar <= 127) && (Key.UnicodeChar >= 32)) {
-          ShellPrintEx (-1, -1, L"%c", Key.UnicodeChar);
+          ShellPrintDefaultEx (L"%c", Key.UnicodeChar);
         }
 
         switch (Key.UnicodeChar) {
@@ -3661,7 +3661,7 @@ ShellPromptForResponse (
     case ShellPromptResponseTypeEnterContinue:
     case ShellPromptResponseTypeAnyKeyContinue:
       if (Prompt != NULL) {
-        ShellPrintEx (-1, -1, L"%s", Prompt);
+        ShellPrintDefaultEx (L"%s", Prompt);
       }
 
       //
@@ -3681,7 +3681,7 @@ ShellPromptForResponse (
             break;
           }
 
-          ShellPrintEx (-1, -1, L"%c", Key.UnicodeChar);
+          ShellPrintDefaultEx (L"%c", Key.UnicodeChar);
           if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
             *Resp = ShellPromptResponseContinue;
             break;
@@ -3699,7 +3699,7 @@ ShellPromptForResponse (
       break;
     case ShellPromptResponseTypeYesNo:
       if (Prompt != NULL) {
-        ShellPrintEx (-1, -1, L"%s", Prompt);
+        ShellPrintDefaultEx (L"%s", Prompt);
       }
 
       //
@@ -3718,7 +3718,7 @@ ShellPromptForResponse (
           break;
         }
 
-        ShellPrintEx (-1, -1, L"%c", Key.UnicodeChar);
+        ShellPrintDefaultEx (L"%c", Key.UnicodeChar);
         switch (Key.UnicodeChar) {
           case L'Y':
           case L'y':
@@ -3734,7 +3734,7 @@ ShellPromptForResponse (
       break;
     case ShellPromptResponseTypeFreeform:
       if (Prompt != NULL) {
-        ShellPrintEx (-1, -1, L"%s", Prompt);
+        ShellPrintDefaultEx (L"%s", Prompt);
       }
 
       while (1) {
@@ -3749,7 +3749,7 @@ ShellPromptForResponse (
           break;
         }
 
-        ShellPrintEx (-1, -1, L"%c", Key.UnicodeChar);
+        ShellPrintDefaultEx (L"%c", Key.UnicodeChar);
         if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
           break;
         }
@@ -3785,7 +3785,7 @@ ShellPromptForResponse (
     }
   }
 
-  ShellPrintEx (-1, -1, L"\r\n");
+  ShellPrintDefaultEx (L"\r\n");
   return (Status);
 }
 
@@ -4515,9 +4515,9 @@ ShellPrintHelp (
   // Print this out to the console
   //
   if (PrintCommandText) {
-    ShellPrintEx (-1, -1, L"%H%-14s%N- %s\r\n", CommandToGetHelpOn, OutText);
+    ShellPrintDefaultEx (L"%H%-14s%N- %s\r\n", CommandToGetHelpOn, OutText);
   } else {
-    ShellPrintEx (-1, -1, L"%N%s\r\n", OutText);
+    ShellPrintDefaultEx (L"%N%s\r\n", OutText);
   }
 
   SHELL_FREE_NON_NULL (OutText);

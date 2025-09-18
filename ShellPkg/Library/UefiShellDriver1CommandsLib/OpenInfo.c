@@ -68,7 +68,7 @@ TraverseHandleDatabase (
         continue;
       }
 
-      ShellPrintEx (-1, -1, L"%H%s%N\r\n", TempString);
+      ShellPrintDefaultEx (L"%H%s%N\r\n", TempString);
       FreePool (TempString);
 
       //

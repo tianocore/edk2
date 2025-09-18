@@ -159,7 +159,7 @@ DoDiagnostics (
       }
     } else {
       if (Mode == TestModeList) {
-        ShellPrintEx (-1, -1, L"\r\n");
+        ShellPrintDefaultEx (L"\r\n");
       }
 
       for (ControllerHandleListLoop = 0

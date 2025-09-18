@@ -103,7 +103,7 @@ ShellCommandRunEcho (
         }
       }
 
-      ShellPrintEx (-1, -1, L"%s\r\n", PrintString);
+      ShellPrintDefaultEx (L"%s\r\n", PrintString);
       SHELL_FREE_NON_NULL (PrintString);
     }
 

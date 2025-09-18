@@ -101,9 +101,7 @@ DoDevTreeForHandle (
   //
   // print out the information for ourselves
   //
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     FormatString,
     L"",
     ConvertHandleToHandleIndex (TheHandle),

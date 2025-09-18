@@ -1216,7 +1216,7 @@ SavePortion (
   }
 
   if (Context->ContentDownloaded == 0) {
-    ShellPrintEx (-1, -1, L"%s       0 Kb", HTTP_PROGR_FRAME);
+    ShellPrintDefaultEx (L"%s       0 Kb", HTTP_PROGR_FRAME);
   }
 
   Context->ContentDownloaded += DownloadLen;
@@ -1237,14 +1237,14 @@ SavePortion (
       //
       // Update downloaded size, there is no length info available.
       //
-      ShellPrintEx (-1, -1, L"%s", HTTP_KB);
-      ShellPrintEx (-1, -1, L"%7d Kb", NbOfKb);
+      ShellPrintDefaultEx (L"%s", HTTP_KB);
+      ShellPrintDefaultEx (L"%7d Kb", NbOfKb);
     }
 
     return EFI_SUCCESS;
   }
 
-  ShellPrintEx (-1, -1, L"%s", HTTP_PROGRESS_DEL);
+  ShellPrintDefaultEx (L"%s", HTTP_PROGRESS_DEL);
 
   Status = StrCpyS (Progress, HTTP_PROGRESS_MESSAGE_SIZE, HTTP_PROGR_FRAME);
   if (EFI_ERROR (Status)) {
@@ -1266,7 +1266,7 @@ SavePortion (
     NbOfKb
     );
 
-  ShellPrintEx (-1, -1, L"%s", Progress);
+  ShellPrintDefaultEx (L"%s", Progress);
 
   return EFI_SUCCESS;
 }

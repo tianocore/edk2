@@ -559,7 +559,7 @@ ValidateAndCopyFiles (
     PathCleanUpDirectories (DestPath);
 
     if (!SilentMode) {
-      ShellPrintEx (-1, -1, HiiOutput, Node->FullName, DestPath);
+      ShellPrintDefaultEx (HiiOutput, Node->FullName, DestPath);
     }
 
     //
@@ -572,7 +572,7 @@ ValidateAndCopyFiles (
   }
 
   if ((ShellStatus == SHELL_SUCCESS) && (Resp == NULL)) {
-    ShellPrintEx (-1, -1, L"%s", HiiResultOk);
+    ShellPrintDefaultEx (L"%s", HiiResultOk);
   }
 
   SHELL_FREE_NON_NULL (DestPath);

@@ -1978,7 +1978,7 @@ DumpHex (
 
     Val[Index * 3] = 0;
     Str[Index]     = 0;
-    ShellPrintEx (-1, -1, L"%*a%08X: %-48a *%a*\r\n", Indent, "", Offset, Val, Str);
+    ShellPrintDefaultEx (L"%*a%08X: %-48a *%a*\r\n", Indent, "", Offset, Val, Str);
 
     Data     += Size;
     Offset   += Size;

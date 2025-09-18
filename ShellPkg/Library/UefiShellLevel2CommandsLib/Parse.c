@@ -212,7 +212,7 @@ PerformParsing (
 
                 SfoString = HandleStringWithEscapeCharForParse (ColumnPointer);
                 if (SfoString != NULL) {
-                  ShellPrintEx (-1, -1, L"%s\r\n", SfoString);
+                  ShellPrintDefaultEx (L"%s\r\n", SfoString);
                   SHELL_FREE_NON_NULL (SfoString);
                 }
               }
