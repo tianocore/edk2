@@ -122,7 +122,6 @@
                                                   "Json Config Data Table        %016LX\r\n"
                                                   "Json Capsule Data Table       %016LX\r\n"
                                                   "Json Capsule Results Table    %016LX\r\n"
-                                                  "Memory Range Capsule          %016LX\r\n"
                                                   "Hii Database Export Buffer    %016LX\r\n"
                                                   "Conformance Profile Table     %016LX\r\n"
 #string STR_DMEM_RT_PROPERTIES    #language en-US "\r\nRT Properties Table\r\n"
