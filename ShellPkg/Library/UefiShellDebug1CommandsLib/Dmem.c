@@ -371,7 +371,6 @@ DisplaySystemTable (
   UINT64        JsonConfigDataTableAddress;
   UINT64        JsonCapsuleDataTableAddress;
   UINT64        JsonCapsuleResultTableAddress;
-  UINT64        MemoryRangeCapsuleAddress;
   UINT64        HiiDatabaseExportBufferAddress;
   UINT64        ConformanceProfileTableAddress;
   UINTN         TableWalker;
@@ -392,7 +391,6 @@ DisplaySystemTable (
   JsonConfigDataTableAddress     = 0;
   JsonCapsuleDataTableAddress    = 0;
   JsonCapsuleResultTableAddress  = 0;
-  MemoryRangeCapsuleAddress      = 0;
   HiiDatabaseExportBufferAddress = 0;
   ConformanceProfileTableAddress = 0;
   for (TableWalker = 0; TableWalker < gST->NumberOfTableEntries; TableWalker++) {
@@ -504,7 +502,6 @@ DisplaySystemTable (
     JsonConfigDataTableAddress,
     JsonCapsuleDataTableAddress,
     JsonCapsuleResultTableAddress,
-    MemoryRangeCapsuleAddress,
     HiiDatabaseExportBufferAddress,
     ConformanceProfileTableAddress
     );
