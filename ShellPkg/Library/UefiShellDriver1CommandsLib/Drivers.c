@@ -405,9 +405,7 @@ ShellCommandRunDrivers (
         }
 
         if (!SfoFlag) {
-          ShellPrintEx (
-            -1,
-            -1,
+          ShellPrintDefaultEx (
             FormatString,
             ConvertHandleToHandleIndex (*HandleWalker),
             DriverVersion,
@@ -420,9 +418,7 @@ ShellCommandRunDrivers (
             ImageName == NULL ? L"" : ImageName
             );
         } else {
-          ShellPrintEx (
-            -1,
-            -1,
+          ShellPrintDefaultEx (
             FormatString,
             ConvertHandleToHandleIndex (*HandleWalker),
             DriverVersion,

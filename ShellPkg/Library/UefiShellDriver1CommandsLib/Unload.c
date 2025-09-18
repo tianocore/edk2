@@ -29,7 +29,7 @@ DumpLoadedImageProtocolInfo (
     return (EFI_INVALID_PARAMETER);
   }
 
-  ShellPrintEx (-1, -1, L"%s", TheString);
+  ShellPrintDefaultEx (L"%s", TheString);
 
   SHELL_FREE_NON_NULL (TheString);
 
