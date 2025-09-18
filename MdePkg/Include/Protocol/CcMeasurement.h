@@ -87,7 +87,9 @@ typedef UINT32 EFI_CC_MR_INDEX;
 #define   ARMCCA_MR_INDEX_INVALID  4
 
 #define EFI_CC_EVENT_LOG_FORMAT_TCG_2  0x00000002
+#define EFI_CC_BOOT_HASH_ALG_SHA256    0x00000002
 #define EFI_CC_BOOT_HASH_ALG_SHA384    0x00000004
+#define EFI_CC_BOOT_HASH_ALG_SHA512    0x00000008
 
 //
 // This bit is shall be set when an event shall be extended but not logged.
