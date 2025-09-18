@@ -653,7 +653,7 @@ ValidateAndMoveFiles (
       continue;
     }
 
-    ShellPrintEx (-1, -1, HiiOutput, Node->FullName, FullDestPath != NULL ? FullDestPath : DestPath);
+    ShellPrintDefaultEx (HiiOutput, Node->FullName, FullDestPath != NULL ? FullDestPath : DestPath);
 
     //
     // See if destination exists
@@ -728,7 +728,7 @@ ValidateAndMoveFiles (
         ShellStatus = SHELL_ACCESS_DENIED;
       }
     } else {
-      ShellPrintEx (-1, -1, L"%s", HiiResultOk);
+      ShellPrintDefaultEx (L"%s", HiiResultOk);
     }
   } // main for loop
 

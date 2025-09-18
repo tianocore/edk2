@@ -315,10 +315,10 @@ SmbiosPrintStructure (
     // BIOS Information (Type 0)
     //
     case 0:
-      ShellPrintEx (-1, -1, L"Vendor: %a\n", LibGetSmbiosString (Struct, Struct->Type0->Vendor));
-      ShellPrintEx (-1, -1, L"BIOS Version: %a\n", LibGetSmbiosString (Struct, Struct->Type0->BiosVersion));
-      ShellPrintEx (-1, -1, L"BIOS Starting Address Segment: 0x%x\n", Struct->Type0->BiosSegment);
-      ShellPrintEx (-1, -1, L"BIOS Release Date: %a\n", LibGetSmbiosString (Struct, Struct->Type0->BiosReleaseDate));
+      ShellPrintDefaultEx (L"Vendor: %a\n", LibGetSmbiosString (Struct, Struct->Type0->Vendor));
+      ShellPrintDefaultEx (L"BIOS Version: %a\n", LibGetSmbiosString (Struct, Struct->Type0->BiosVersion));
+      ShellPrintDefaultEx (L"BIOS Starting Address Segment: 0x%x\n", Struct->Type0->BiosSegment);
+      ShellPrintDefaultEx (L"BIOS Release Date: %a\n", LibGetSmbiosString (Struct, Struct->Type0->BiosReleaseDate));
       if ((Struct->Type0->BiosSize != 0xFF) || !(AE_SMBIOS_VERSION (0x3, 0x1))) {
         ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_BIOS_SIZE), gShellDebug1HiiHandle, 64 * (Struct->Type0->BiosSize + 1));
       }
@@ -334,10 +334,10 @@ SmbiosPrintStructure (
       }
 
       if (AE_SMBIOS_VERSION (0x2, 0x4) && (Struct->Hdr->Length > 0x14)) {
-        ShellPrintEx (-1, -1, L"System BIOS Major Release: %u\n", Struct->Type0->SystemBiosMajorRelease);
-        ShellPrintEx (-1, -1, L"System BIOS Minor Release: %u\n", Struct->Type0->SystemBiosMinorRelease);
-        ShellPrintEx (-1, -1, L"Embedded Controller Firmware Major Release: %u\n", Struct->Type0->EmbeddedControllerFirmwareMajorRelease);
-        ShellPrintEx (-1, -1, L"Embedded Controller Firmware Minor Release: %u\n", Struct->Type0->EmbeddedControllerFirmwareMinorRelease);
+        ShellPrintDefaultEx (L"System BIOS Major Release: %u\n", Struct->Type0->SystemBiosMajorRelease);
+        ShellPrintDefaultEx (L"System BIOS Minor Release: %u\n", Struct->Type0->SystemBiosMinorRelease);
+        ShellPrintDefaultEx (L"Embedded Controller Firmware Major Release: %u\n", Struct->Type0->EmbeddedControllerFirmwareMajorRelease);
+        ShellPrintDefaultEx (L"Embedded Controller Firmware Minor Release: %u\n", Struct->Type0->EmbeddedControllerFirmwareMinorRelease);
       }
 
       if (AE_SMBIOS_VERSION (0x3, 0x1) && (Struct->Hdr->Length > 0x18)) {
@@ -449,33 +449,33 @@ SmbiosPrintStructure (
     // Processor Information (Type 4)
     //
     case 4:
-      ShellPrintEx (-1, -1, L"Socket Designation: %a\n", LibGetSmbiosString (Struct, Struct->Type4->Socket));
+      ShellPrintDefaultEx (L"Socket Designation: %a\n", LibGetSmbiosString (Struct, Struct->Type4->Socket));
       DisplayProcessorType (Struct->Type4->ProcessorType, Option);
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_PROCESSOR_FAMILY), gShellDebug1HiiHandle);
       DisplayProcessorFamily (Struct->Type4->ProcessorFamily, Option);
-      ShellPrintEx (-1, -1, L"Processor Manufacturer: %a\n", LibGetSmbiosString (Struct, Struct->Type4->ProcessorManufacturer));
+      ShellPrintDefaultEx (L"Processor Manufacturer: %a\n", LibGetSmbiosString (Struct, Struct->Type4->ProcessorManufacturer));
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_PROCESSOR_ID), gShellDebug1HiiHandle, 8);
       DumpHex (0, 0, 8, &(Struct->Type4->ProcessorId));
-      ShellPrintEx (-1, -1, L"Processor Version: %a\n", LibGetSmbiosString (Struct, Struct->Type4->ProcessorVersion));
+      ShellPrintDefaultEx (L"Processor Version: %a\n", LibGetSmbiosString (Struct, Struct->Type4->ProcessorVersion));
       DisplayProcessorVoltage (*(UINT8 *)&(Struct->Type4->Voltage), Option);
-      ShellPrintEx (-1, -1, L"External Clock: %u\n", Struct->Type4->ExternalClock);
-      ShellPrintEx (-1, -1, L"Max Speed: %u\n", Struct->Type4->MaxSpeed);
-      ShellPrintEx (-1, -1, L"Current Speed: %u\n", Struct->Type4->CurrentSpeed);
+      ShellPrintDefaultEx (L"External Clock: %u\n", Struct->Type4->ExternalClock);
+      ShellPrintDefaultEx (L"Max Speed: %u\n", Struct->Type4->MaxSpeed);
+      ShellPrintDefaultEx (L"Current Speed: %u\n", Struct->Type4->CurrentSpeed);
       DisplayProcessorStatus (Struct->Type4->Status, Option);
       DisplayProcessorUpgrade (Struct->Type4->ProcessorUpgrade, Option);
-      ShellPrintEx (-1, -1, L"L1 Cache Handle: 0x%x\n", Struct->Type4->L1CacheHandle);
-      ShellPrintEx (-1, -1, L"L2 Cache Handle: 0x%x\n", Struct->Type4->L2CacheHandle);
-      ShellPrintEx (-1, -1, L"L3 Cache Handle: 0x%x\n", Struct->Type4->L3CacheHandle);
+      ShellPrintDefaultEx (L"L1 Cache Handle: 0x%x\n", Struct->Type4->L1CacheHandle);
+      ShellPrintDefaultEx (L"L2 Cache Handle: 0x%x\n", Struct->Type4->L2CacheHandle);
+      ShellPrintDefaultEx (L"L3 Cache Handle: 0x%x\n", Struct->Type4->L3CacheHandle);
       if (AE_SMBIOS_VERSION (0x2, 0x3) && (Struct->Hdr->Length > 0x20)) {
-        ShellPrintEx (-1, -1, L"Serial Number: %a\n", LibGetSmbiosString (Struct, Struct->Type4->SerialNumber));
-        ShellPrintEx (-1, -1, L"Asset Tag: %a\n", LibGetSmbiosString (Struct, Struct->Type4->AssetTag));
-        ShellPrintEx (-1, -1, L"Part Number: %a\n", LibGetSmbiosString (Struct, Struct->Type4->PartNumber));
+        ShellPrintDefaultEx (L"Serial Number: %a\n", LibGetSmbiosString (Struct, Struct->Type4->SerialNumber));
+        ShellPrintDefaultEx (L"Asset Tag: %a\n", LibGetSmbiosString (Struct, Struct->Type4->AssetTag));
+        ShellPrintDefaultEx (L"Part Number: %a\n", LibGetSmbiosString (Struct, Struct->Type4->PartNumber));
       }
 
       if (AE_SMBIOS_VERSION (0x2, 0x5) && (Struct->Hdr->Length > 0x23)) {
-        ShellPrintEx (-1, -1, L"Core Count: %u\n", Struct->Type4->CoreCount);
-        ShellPrintEx (-1, -1, L"Core Enabled: %u\n", Struct->Type4->EnabledCoreCount);
-        ShellPrintEx (-1, -1, L"Thread Count: %u\n", Struct->Type4->ThreadCount);
+        ShellPrintDefaultEx (L"Core Count: %u\n", Struct->Type4->CoreCount);
+        ShellPrintDefaultEx (L"Core Enabled: %u\n", Struct->Type4->EnabledCoreCount);
+        ShellPrintDefaultEx (L"Thread Count: %u\n", Struct->Type4->ThreadCount);
         DisplayProcessorCharacteristics (Struct->Type4->ProcessorCharacteristics, Option);
       }
 
@@ -489,17 +489,17 @@ SmbiosPrintStructure (
       }
 
       if ((SmbiosMajorVersion >= 0x3) && (Struct->Hdr->Length > 0x2A)) {
-        ShellPrintEx (-1, -1, L"Core Count 2: %u\n", Struct->Type4->CoreCount2);
-        ShellPrintEx (-1, -1, L"Core Enabled 2: %u\n", Struct->Type4->EnabledCoreCount2);
-        ShellPrintEx (-1, -1, L"Thread Count 2: %u\n", Struct->Type4->ThreadCount2);
+        ShellPrintDefaultEx (L"Core Count 2: %u\n", Struct->Type4->CoreCount2);
+        ShellPrintDefaultEx (L"Core Enabled 2: %u\n", Struct->Type4->EnabledCoreCount2);
+        ShellPrintDefaultEx (L"Thread Count 2: %u\n", Struct->Type4->ThreadCount2);
       }
 
       if (AE_SMBIOS_VERSION (0x3, 0x6) && (Struct->Hdr->Length > 0x30)) {
-        ShellPrintEx (-1, -1, L"Thread Enabled: %u\n", Struct->Type4->ThreadEnabled);
+        ShellPrintDefaultEx (L"Thread Enabled: %u\n", Struct->Type4->ThreadEnabled);
       }
 
       if (AE_SMBIOS_VERSION (0x3, 0x8) && (Struct->Hdr->Length > 0x32)) {
-        ShellPrintEx (-1, -1, L"Socket Type: %a\n", LibGetSmbiosString (Struct, Struct->Type4->SocketType));
+        ShellPrintDefaultEx (L"Socket Type: %a\n", LibGetSmbiosString (Struct, Struct->Type4->SocketType));
       }
 
       break;
@@ -651,10 +651,10 @@ SmbiosPrintStructure (
       UINTN  NumOfDevice;
       NumOfDevice = (Struct->Type10->Hdr.Length - sizeof (SMBIOS_STRUCTURE)) / (2 * sizeof (UINT8));
       for (Index = 0; (UINTN)Index < NumOfDevice; Index++) {
-        ShellPrintEx (-1, -1, (((Struct->Type10->Device[Index].DeviceType) & 0x80) != 0) ? L"Device Enabled\n" : L"Device Disabled\n");
+        ShellPrintDefaultEx ((((Struct->Type10->Device[Index].DeviceType) & 0x80) != 0) ? L"Device Enabled\n" : L"Device Disabled\n");
         DisplayOnboardDeviceTypes ((Struct->Type10->Device[Index].DeviceType) & 0x7F, Option);
         ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_DESC_STRING), gShellDebug1HiiHandle);
-        ShellPrintEx (-1, -1, L"%a\n", LibGetSmbiosString (Struct, Struct->Type10->Device[Index].DescriptionString));
+        ShellPrintDefaultEx (L"%a\n", LibGetSmbiosString (Struct, Struct->Type10->Device[Index].DescriptionString));
       }
 
       break;
@@ -666,7 +666,7 @@ SmbiosPrintStructure (
     case 11:
       PRINT_STRUCT_VALUE (Struct, Type11, StringCount);
       for (Index = 1; Index <= Struct->Type11->StringCount; Index++) {
-        ShellPrintEx (-1, -1, L"%a\n", LibGetSmbiosString (Struct, Index));
+        ShellPrintDefaultEx (L"%a\n", LibGetSmbiosString (Struct, Index));
       }
 
       break;
@@ -677,7 +677,7 @@ SmbiosPrintStructure (
     case 12:
       PRINT_STRUCT_VALUE (Struct, Type12, StringCount);
       for (Index = 1; Index <= Struct->Type12->StringCount; Index++) {
-        ShellPrintEx (-1, -1, L"%a\n", LibGetSmbiosString (Struct, Index));
+        ShellPrintDefaultEx (L"%a\n", LibGetSmbiosString (Struct, Index));
       }
 
       break;
@@ -701,8 +701,8 @@ SmbiosPrintStructure (
       NumOfItem = (Struct->Type14->Hdr.Length - 5) / 3;
       PRINT_PENDING_STRING (Struct, Type14, GroupName);
       for (Index = 0; Index < NumOfItem; Index++) {
-        ShellPrintEx (-1, -1, L"ItemType %u: %u\n", Index + 1, Struct->Type14->Group[Index].ItemType);
-        ShellPrintEx (-1, -1, L"ItemHandle %u: %u\n", Index + 1, Struct->Type14->Group[Index].ItemHandle);
+        ShellPrintDefaultEx (L"ItemType %u: %u\n", Index + 1, Struct->Type14->Group[Index].ItemType);
+        ShellPrintDefaultEx (L"ItemHandle %u: %u\n", Index + 1, Struct->Type14->Group[Index].ItemHandle);
       }
 
       break;
@@ -814,75 +814,75 @@ SmbiosPrintStructure (
     // Memory Device (Type 17)
     //
     case 17:
-      ShellPrintEx (-1, -1, L"Physical Memory Array Handle: 0x%x\n", Struct->Type17->MemoryArrayHandle);
-      ShellPrintEx (-1, -1, L"Memory Error Information Handle: 0x%x\n", Struct->Type17->MemoryErrorInformationHandle);
-      ShellPrintEx (-1, -1, L"Total Width: 0x%x\n", Struct->Type17->TotalWidth);
-      ShellPrintEx (-1, -1, L"Data Width: 0x%x\n", Struct->Type17->DataWidth);
+      ShellPrintDefaultEx (L"Physical Memory Array Handle: 0x%x\n", Struct->Type17->MemoryArrayHandle);
+      ShellPrintDefaultEx (L"Memory Error Information Handle: 0x%x\n", Struct->Type17->MemoryErrorInformationHandle);
+      ShellPrintDefaultEx (L"Total Width: 0x%x\n", Struct->Type17->TotalWidth);
+      ShellPrintDefaultEx (L"Data Width: 0x%x\n", Struct->Type17->DataWidth);
       PRINT_STRUCT_VALUE (Struct, Type17, Size);
       DisplayMemoryDeviceFormFactor (Struct->Type17->FormFactor, Option);
-      ShellPrintEx (-1, -1, L"Device Set: 0x%x\n", Struct->Type17->DeviceSet);
-      ShellPrintEx (-1, -1, L"Device Locator: %a\n", LibGetSmbiosString (Struct, Struct->Type17->DeviceLocator));
-      ShellPrintEx (-1, -1, L"Bank Locator: %a\n", LibGetSmbiosString (Struct, Struct->Type17->BankLocator));
+      ShellPrintDefaultEx (L"Device Set: 0x%x\n", Struct->Type17->DeviceSet);
+      ShellPrintDefaultEx (L"Device Locator: %a\n", LibGetSmbiosString (Struct, Struct->Type17->DeviceLocator));
+      ShellPrintDefaultEx (L"Bank Locator: %a\n", LibGetSmbiosString (Struct, Struct->Type17->BankLocator));
       DisplayMemoryDeviceType (Struct->Type17->MemoryType, Option);
       DisplayMemoryDeviceTypeDetail (ReadUnaligned16 ((UINT16 *)(UINTN)&(Struct->Type17->TypeDetail)), Option);
       PRINT_STRUCT_VALUE_H (Struct, Type17, Speed);
       PRINT_PENDING_STRING (Struct, Type17, Manufacturer);
-      ShellPrintEx (-1, -1, L"Serial Number: %a\n", LibGetSmbiosString (Struct, Struct->Type17->SerialNumber));
-      ShellPrintEx (-1, -1, L"Asset Tag: %a\n", LibGetSmbiosString (Struct, Struct->Type17->AssetTag));
-      ShellPrintEx (-1, -1, L"Part Number: %a\n", LibGetSmbiosString (Struct, Struct->Type17->PartNumber));
+      ShellPrintDefaultEx (L"Serial Number: %a\n", LibGetSmbiosString (Struct, Struct->Type17->SerialNumber));
+      ShellPrintDefaultEx (L"Asset Tag: %a\n", LibGetSmbiosString (Struct, Struct->Type17->AssetTag));
+      ShellPrintDefaultEx (L"Part Number: %a\n", LibGetSmbiosString (Struct, Struct->Type17->PartNumber));
       if (AE_SMBIOS_VERSION (0x2, 0x6) && (Struct->Hdr->Length > 0x1B)) {
         PRINT_STRUCT_VALUE_H (Struct, Type17, Attributes);
       }
 
       if (AE_SMBIOS_VERSION (0x2, 0x7) && (Struct->Hdr->Length > 0x1C)) {
-        ShellPrintEx (-1, -1, L"Extended Size: %u\n", Struct->Type17->ExtendedSize);
-        ShellPrintEx (-1, -1, L"Configured Memory Speed: 0x%x\n", Struct->Type17->ConfiguredMemoryClockSpeed);
+        ShellPrintDefaultEx (L"Extended Size: %u\n", Struct->Type17->ExtendedSize);
+        ShellPrintDefaultEx (L"Configured Memory Speed: 0x%x\n", Struct->Type17->ConfiguredMemoryClockSpeed);
       }
 
       if (AE_SMBIOS_VERSION (0x2, 0x8) && (Struct->Hdr->Length > 0x22)) {
-        ShellPrintEx (-1, -1, L"Minimum voltage: %u\n", Struct->Type17->MinimumVoltage);
-        ShellPrintEx (-1, -1, L"Maximum voltage: %u\n", Struct->Type17->MaximumVoltage);
-        ShellPrintEx (-1, -1, L"Configured voltage: %u\n", Struct->Type17->ConfiguredVoltage);
+        ShellPrintDefaultEx (L"Minimum voltage: %u\n", Struct->Type17->MinimumVoltage);
+        ShellPrintDefaultEx (L"Maximum voltage: %u\n", Struct->Type17->MaximumVoltage);
+        ShellPrintDefaultEx (L"Configured voltage: %u\n", Struct->Type17->ConfiguredVoltage);
       }
 
       if (AE_SMBIOS_VERSION (0x3, 0x2)) {
         if (Struct->Hdr->Length > 0x28) {
           DisplayMemoryDeviceMemoryTechnology (Struct->Type17->MemoryTechnology, Option);
           DisplayMemoryDeviceMemoryOperatingModeCapability (Struct->Type17->MemoryOperatingModeCapability.Uint16, Option);
-          ShellPrintEx (-1, -1, L"Firmware Version: %a\n", LibGetSmbiosString (Struct, Struct->Type17->FirmwareVersion));
-          ShellPrintEx (-1, -1, L"Module Manufacturer ID: 0x%x\n", Struct->Type17->ModuleManufacturerID);
-          ShellPrintEx (-1, -1, L"Module Product ID: 0x%x\n", Struct->Type17->ModuleProductID);
-          ShellPrintEx (-1, -1, L"Memory Subsystem Controller Manufacturer ID: 0x%x\n", Struct->Type17->MemorySubsystemControllerManufacturerID);
-          ShellPrintEx (-1, -1, L"Memory Subsystem Controller Product ID: 0x%x\n", Struct->Type17->MemorySubsystemControllerProductID);
+          ShellPrintDefaultEx (L"Firmware Version: %a\n", LibGetSmbiosString (Struct, Struct->Type17->FirmwareVersion));
+          ShellPrintDefaultEx (L"Module Manufacturer ID: 0x%x\n", Struct->Type17->ModuleManufacturerID);
+          ShellPrintDefaultEx (L"Module Product ID: 0x%x\n", Struct->Type17->ModuleProductID);
+          ShellPrintDefaultEx (L"Memory Subsystem Controller Manufacturer ID: 0x%x\n", Struct->Type17->MemorySubsystemControllerManufacturerID);
+          ShellPrintDefaultEx (L"Memory Subsystem Controller Product ID: 0x%x\n", Struct->Type17->MemorySubsystemControllerProductID);
         }
 
         if (Struct->Hdr->Length > 0x34) {
-          ShellPrintEx (-1, -1, L"Non-volatile Size: 0x%lx\n", Struct->Type17->NonVolatileSize);
+          ShellPrintDefaultEx (L"Non-volatile Size: 0x%lx\n", Struct->Type17->NonVolatileSize);
         }
 
         if (Struct->Hdr->Length > 0x3C) {
-          ShellPrintEx (-1, -1, L"Volatile Size: 0x%lx\n", Struct->Type17->VolatileSize);
+          ShellPrintDefaultEx (L"Volatile Size: 0x%lx\n", Struct->Type17->VolatileSize);
         }
 
         if (Struct->Hdr->Length > 0x44) {
-          ShellPrintEx (-1, -1, L"Cache Size: 0x%lx\n", Struct->Type17->CacheSize);
+          ShellPrintDefaultEx (L"Cache Size: 0x%lx\n", Struct->Type17->CacheSize);
         }
 
         if (Struct->Hdr->Length > 0x4C) {
-          ShellPrintEx (-1, -1, L"Logical Size: 0x%lx\n", Struct->Type17->LogicalSize);
+          ShellPrintDefaultEx (L"Logical Size: 0x%lx\n", Struct->Type17->LogicalSize);
         }
       }
 
       if (AE_SMBIOS_VERSION (0x3, 0x3) && (Struct->Hdr->Length > 0x54)) {
-        ShellPrintEx (-1, -1, L"Extended Speed: 0x%x\n", Struct->Type17->ExtendedSpeed);
-        ShellPrintEx (-1, -1, L"Extended Configured Memory Speed: 0x%x\n", Struct->Type17->ExtendedConfiguredMemorySpeed);
+        ShellPrintDefaultEx (L"Extended Speed: 0x%x\n", Struct->Type17->ExtendedSpeed);
+        ShellPrintDefaultEx (L"Extended Configured Memory Speed: 0x%x\n", Struct->Type17->ExtendedConfiguredMemorySpeed);
       }
 
       if (AE_SMBIOS_VERSION (0x3, 0x7) && (Struct->Hdr->Length > 0x5C)) {
-        ShellPrintEx (-1, -1, L"PMIC0 Manufacturer ID: 0x%x\n", Struct->Type17->Pmic0ManufacturerID);
-        ShellPrintEx (-1, -1, L"PMIC0 Revision Number: 0x%x\n", Struct->Type17->Pmic0RevisionNumber);
-        ShellPrintEx (-1, -1, L"RCD Manufacturer ID: 0x%x\n", Struct->Type17->RcdManufacturerID);
-        ShellPrintEx (-1, -1, L"RCD Revision Number: 0x%x\n", Struct->Type17->RcdRevisionNumber);
+        ShellPrintDefaultEx (L"PMIC0 Manufacturer ID: 0x%x\n", Struct->Type17->Pmic0ManufacturerID);
+        ShellPrintDefaultEx (L"PMIC0 Revision Number: 0x%x\n", Struct->Type17->Pmic0RevisionNumber);
+        ShellPrintDefaultEx (L"RCD Manufacturer ID: 0x%x\n", Struct->Type17->RcdManufacturerID);
+        ShellPrintDefaultEx (L"RCD Revision Number: 0x%x\n", Struct->Type17->RcdRevisionNumber);
       }
 
       break;
@@ -1247,13 +1247,13 @@ SmbiosPrintStructure (
     // Onboard Devices Extended Information (Type 41)
     //
     case 41:
-      ShellPrintEx (-1, -1, L"Reference Designation: %a\n", LibGetSmbiosString (Struct, Struct->Type41->ReferenceDesignation));
-      ShellPrintEx (-1, -1, (((Struct->Type41->DeviceType) & 0x80) != 0) ? L"Device Enabled\n" : L"Device Disabled\n");
+      ShellPrintDefaultEx (L"Reference Designation: %a\n", LibGetSmbiosString (Struct, Struct->Type41->ReferenceDesignation));
+      ShellPrintDefaultEx ((((Struct->Type41->DeviceType) & 0x80) != 0) ? L"Device Enabled\n" : L"Device Disabled\n");
       DisplayOnboardDeviceTypes ((Struct->Type41->DeviceType) & 0x7F, Option);
-      ShellPrintEx (-1, -1, L"Device Type Instance: 0x%x\n", Struct->Type41->DeviceTypeInstance);
-      ShellPrintEx (-1, -1, L"Segment Group Number: 0x%x\n", Struct->Type41->SegmentGroupNum);
-      ShellPrintEx (-1, -1, L"Bus Number: 0x%x\n", Struct->Type41->BusNum);
-      ShellPrintEx (-1, -1, L"Device/Function Number: 0x%x\n", Struct->Type41->DevFuncNum);
+      ShellPrintDefaultEx (L"Device Type Instance: 0x%x\n", Struct->Type41->DeviceTypeInstance);
+      ShellPrintDefaultEx (L"Segment Group Number: 0x%x\n", Struct->Type41->SegmentGroupNum);
+      ShellPrintDefaultEx (L"Bus Number: 0x%x\n", Struct->Type41->BusNum);
+      ShellPrintDefaultEx (L"Device/Function Number: 0x%x\n", Struct->Type41->DevFuncNum);
       break;
 
     //
@@ -1265,23 +1265,23 @@ SmbiosPrintStructure (
         UINT32  DataValue = 0;
         PRINT_STRUCT_VALUE_H (Struct, Type42, InterfaceTypeSpecificDataLength);
         if (Struct->Type42->InterfaceTypeSpecificDataLength < 4) {
-          ShellPrintEx (-1, -1, L"WARNING: InterfaceTypeSpecificDataLength should be >= 4.\n");
+          ShellPrintDefaultEx (L"WARNING: InterfaceTypeSpecificDataLength should be >= 4.\n");
         }
 
-        ShellPrintEx (-1, -1, L"InterfaceTypeSpecificData\n");
+        ShellPrintDefaultEx (L"InterfaceTypeSpecificData\n");
         // Decode and interpret InterfaceTypeSpecificData based on the InterfaceType
         switch (Struct->Type42->InterfaceType) {
           case MCHostInterfaceTypeOemDefined:
             // The first four bytes are the vendor ID (MSB first), as assigned by the Internet Assigned Numbers Authority (IANA) as "Enterprise Number".
             // See https://www.iana.org/assignments/enterprise-numbers.txt
-            ShellPrintEx (-1, -1, L"Vendor ID (IANA Enterprise Number): %d", (UINT32)*(Struct->Type42->InterfaceTypeSpecificData));
+            ShellPrintDefaultEx (L"Vendor ID (IANA Enterprise Number): %d", (UINT32)*(Struct->Type42->InterfaceTypeSpecificData));
             break;
 
           // As defined in MCTP Host Interface Specification, DSP0256
           case MCHostInterfaceTypeMMBI:
             // For MCTP interface type of MMBI; this defines the pointer to the MMBI capability descriptor, as defined in DSP0282, Section 7.1
             DataValue = *(UINT32 *)Struct->Type42->InterfaceTypeSpecificData;
-            ShellPrintEx (-1, -1, L"Pointer to MMBI capability descriptor: 0x%x\n", DataValue);
+            ShellPrintDefaultEx (L"Pointer to MMBI capability descriptor: 0x%x\n", DataValue);
             break;
 
           case MCHostInterfaceTypeI2C_SMBUS:
@@ -1290,8 +1290,8 @@ SmbiosPrintStructure (
             // switch case fall through
             // For MCTP interface type of I2C, I3C, KCS; this value is reserved and must be 0
             DataValue = *(UINT32 *)Struct->Type42->InterfaceTypeSpecificData;
-            ShellPrintEx (-1, -1, L"For Interface type I2C, I3C or KCS, InterfaceTypeSpecificData is reserved and must be 0.\n");
-            ShellPrintEx (-1, -1, L"Actual value is : 0x%x\n", DataValue);
+            ShellPrintDefaultEx (L"For Interface type I2C, I3C or KCS, InterfaceTypeSpecificData is reserved and must be 0.\n");
+            ShellPrintDefaultEx (L"Actual value is : 0x%x\n", DataValue);
             break;
 
           default:

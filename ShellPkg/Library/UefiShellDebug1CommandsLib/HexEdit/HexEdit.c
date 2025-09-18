@@ -257,7 +257,7 @@ ShellCommandRunHexEdit (
             //
             // print out the status string
             //
-            ShellPrintEx (-1, -1, L"%s", Buffer);
+            ShellPrintDefaultEx (L"%s", Buffer);
           } else {
             ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HEXEDIT_UNKNOWN_EDITOR), gShellDebug1HiiHandle);
           }

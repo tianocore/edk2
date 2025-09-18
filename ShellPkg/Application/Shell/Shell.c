@@ -3168,7 +3168,7 @@ RunScriptFileHandle (
                 ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SHELL_SHELL), ShellInfoObject.HiiHandle);
               }
 
-              ShellPrintEx (-1, -1, L"%s\r\n", CommandLine2);
+              ShellPrintDefaultEx (L"%s\r\n", CommandLine2);
             }
 
             Status = RunCommand (CommandLine3);

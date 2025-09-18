@@ -127,7 +127,7 @@ ShellCommandRunVer (
       // implementation specific support for displaying processor architecture
       //
       if (ShellCommandLineGetFlag (Package, L"-_pa")) {
-        ShellPrintEx (-1, -1, L"%d\r\n", sizeof (UINTN) == sizeof (UINT64) ? 64 : 32);
+        ShellPrintDefaultEx (L"%d\r\n", sizeof (UINTN) == sizeof (UINT64) ? 64 : 32);
       }
     }
 

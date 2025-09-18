@@ -1815,9 +1815,7 @@ PciPrintClassCode (
     //
     // Print base class, sub class, and programming inferface name
     //
-    ShellPrintEx (
-      -1,
-      -1,
+    ShellPrintDefaultEx (
       L"%s - %s - %s",
       ClassStrings.BaseClass,
       ClassStrings.SubClass,
@@ -1827,9 +1825,7 @@ PciPrintClassCode (
     //
     // Only print base class and sub class name
     //
-    ShellPrintEx (
-      -1,
-      -1,
+    ShellPrintDefaultEx (
       L"%s - %s",
       ClassStrings.BaseClass,
       ClassStrings.SubClass
@@ -2884,7 +2880,7 @@ ShellCommandRunPci (
     SizeOfHeader = sizeof (ConfigSpace.Common) + sizeof (ConfigSpace.NonCommon);
 
     DumpHex (2, 0, SizeOfHeader, &ConfigSpace);
-    ShellPrintEx (-1, -1, L"\r\n");
+    ShellPrintDefaultEx (L"\r\n");
 
     //
     // Dump device dependent Part of configuration space
@@ -2920,7 +2916,7 @@ ShellCommandRunPci (
       //
       // Print the PciEx extend space in raw bytes ( 0xFF-0xFFF)
       //
-      ShellPrintEx (-1, -1, L"\r\n%HStart dumping PCIex extended configuration space (0x100 - 0xFFF).%N\r\n\r\n");
+      ShellPrintDefaultEx (L"\r\n%HStart dumping PCIex extended configuration space (0x100 - 0xFFF).%N\r\n\r\n");
 
       DumpHex (
         2,
@@ -3154,7 +3150,7 @@ PciExplainPci (
 
   Common = &(ConfigSpace->Common);
 
-  ShellPrintEx (-1, -1, L"\r\n");
+  ShellPrintDefaultEx (L"\r\n");
 
   //
   // Print Vendor Id and Device Id
@@ -3181,7 +3177,7 @@ PciExplainPci (
   //
   // Print register Revision ID
   //
-  ShellPrintEx (-1, -1, L"\r\n");
+  ShellPrintDefaultEx (L"\r\n");
   ShellPrintHiiDefaultEx (
     STRING_TOKEN (STR_PCI_LINE_RID),
     gShellDebug1HiiHandle,
@@ -3259,7 +3255,7 @@ PciExplainPci (
   //
   ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI2_CLASS), gShellDebug1HiiHandle);
   PciPrintClassCode ((UINT8 *)Common->ClassCode, TRUE);
-  ShellPrintEx (-1, -1, L"\r\n");
+  ShellPrintDefaultEx (L"\r\n");
 }
 
 /**
@@ -3300,7 +3296,7 @@ PciExplainDeviceData (
     if (!BarExist) {
       BarExist = TRUE;
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI2_START_TYPE), gShellDebug1HiiHandle);
-      ShellPrintEx (-1, -1, L"  --------------------------------------------------------------------------");
+      ShellPrintDefaultEx (L"  --------------------------------------------------------------------------");
     }
 
     Status = PciExplainBar (
@@ -3319,7 +3315,7 @@ PciExplainDeviceData (
   if (!BarExist) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI2_NONE), gShellDebug1HiiHandle);
   } else {
-    ShellPrintEx (-1, -1, L"\r\n  --------------------------------------------------------------------------");
+    ShellPrintDefaultEx (L"\r\n  --------------------------------------------------------------------------");
   }
 
   //
@@ -3450,7 +3446,7 @@ PciExplainBridgeData (
     if (!BarExist) {
       BarExist = TRUE;
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI2_START_TYPE_2), gShellDebug1HiiHandle);
-      ShellPrintEx (-1, -1, L"  --------------------------------------------------------------------------");
+      ShellPrintDefaultEx (L"  --------------------------------------------------------------------------");
     }
 
     Status = PciExplainBar (
@@ -3469,7 +3465,7 @@ PciExplainBridgeData (
   if (!BarExist) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI2_NONE), gShellDebug1HiiHandle);
   } else {
-    ShellPrintEx (-1, -1, L"\r\n  --------------------------------------------------------------------------");
+    ShellPrintDefaultEx (L"\r\n  --------------------------------------------------------------------------");
   }
 
   //
@@ -3497,7 +3493,7 @@ PciExplainBridgeData (
     INDEX_OF (&(Bridge->SubordinateBus))
     );
 
-  ShellPrintEx (-1, -1, L"               ------------------------------------------------------\r\n");
+  ShellPrintDefaultEx (L"               ------------------------------------------------------\r\n");
 
   ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI2_BRIDGE), gShellDebug1HiiHandle, Bridge->PrimaryBus);
   ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI2_BRIDGE), gShellDebug1HiiHandle, Bridge->SecondaryBus);
@@ -3524,7 +3520,7 @@ PciExplainBridgeData (
   // base and limit address are listed.
   //
   ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI2_RESOURCE_TYPE), gShellDebug1HiiHandle);
-  ShellPrintEx (-1, -1, L"----------------------------------------------------------------------\r\n");
+  ShellPrintDefaultEx (L"----------------------------------------------------------------------\r\n");
 
   //
   // IO Base & Limit
@@ -3689,7 +3685,7 @@ PciExplainBar (
     //
     IsMem = FALSE;
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI2_ONE_VAR_4), gShellDebug1HiiHandle, *Bar & 0xfffffffc);
-    ShellPrintEx (-1, -1, L"I/O                               ");
+    ShellPrintDefaultEx (L"I/O                               ");
   }
 
   //
@@ -3760,7 +3756,7 @@ PciExplainBar (
     } else {
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI2_RSHIFT), gShellDebug1HiiHandle, (UINT32)RShiftU64 (NewBar64, 32));
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI2_RSHIFT), gShellDebug1HiiHandle, (UINT32)NewBar64);
-      ShellPrintEx (-1, -1, L"  ");
+      ShellPrintDefaultEx (L"  ");
       ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_PCI2_RSHIFT),
         gShellDebug1HiiHandle,
@@ -3819,7 +3815,7 @@ PciExplainCardBusData (
     INDEX_OF (&(CardBus->SubordinateBusNumber))
     );
 
-  ShellPrintEx (-1, -1, L"               ------------------------------------------------------\r\n");
+  ShellPrintDefaultEx (L"               ------------------------------------------------------\r\n");
 
   ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI2_CARDBUS), gShellDebug1HiiHandle, CardBus->PciBusNumber);
   ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI2_CARDBUS_2), gShellDebug1HiiHandle, CardBus->CardBusBusNumber);
@@ -3839,7 +3835,7 @@ PciExplainCardBusData (
   // Print Memory/Io ranges this cardbus bridge forwards
   //
   ShellPrintHiiDefaultEx (STRING_TOKEN (STR_PCI2_RESOURCE_TYPE_2), gShellDebug1HiiHandle);
-  ShellPrintEx (-1, -1, L"----------------------------------------------------------------------\r\n");
+  ShellPrintDefaultEx (L"----------------------------------------------------------------------\r\n");
 
   ShellPrintHiiDefaultEx (
     STRING_TOKEN (STR_PCI2_MEM_3),
@@ -4274,9 +4270,7 @@ ExplainPcieCapReg (
 {
   CHAR16  *DevicePortType;
 
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Capability Version(3:0):          %E0x%04x%N\r\n",
     PciExpressCap->Capability.Bits.Version
     );
@@ -4286,9 +4280,7 @@ ExplainPcieCapReg (
     DevicePortType = L"Unknown Type";
   }
 
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Device/PortType(7:4):             %E%s%N\r\n",
     DevicePortType
     );
@@ -4300,17 +4292,13 @@ ExplainPcieCapReg (
   if ((PciExpressCap->Capability.Bits.DevicePortType == PCIE_DEVICE_PORT_TYPE_ROOT_PORT) ||
       (PciExpressCap->Capability.Bits.DevicePortType == PCIE_DEVICE_PORT_TYPE_DOWNSTREAM_PORT))
   {
-    ShellPrintEx (
-      -1,
-      -1,
+    ShellPrintDefaultEx (
       L"  Slot Implemented(8):              %E%d%N\r\n",
       PciExpressCap->Capability.Bits.SlotImplemented
       );
   }
 
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Interrupt Message Number(13:9):   %E0x%05x%N\r\n",
     PciExpressCap->Capability.Bits.InterruptMessageNumber
     );
@@ -4334,22 +4322,18 @@ ExplainPcieDeviceCap (
   UINT8  L1Latency;
 
   DevicePortType = (UINT8)PciExpressCap->Capability.Bits.DevicePortType;
-  ShellPrintEx (-1, -1, L"  Max_Payload_Size Supported(2:0):          ");
+  ShellPrintDefaultEx (L"  Max_Payload_Size Supported(2:0):          ");
   if (PciExpressCap->DeviceCapability.Bits.MaxPayloadSize < 6) {
-    ShellPrintEx (-1, -1, L"%E%d bytes%N\r\n", 1 << (PciExpressCap->DeviceCapability.Bits.MaxPayloadSize + 7));
+    ShellPrintDefaultEx (L"%E%d bytes%N\r\n", 1 << (PciExpressCap->DeviceCapability.Bits.MaxPayloadSize + 7));
   } else {
-    ShellPrintEx (-1, -1, L"%EUnknown%N\r\n");
+    ShellPrintDefaultEx (L"%EUnknown%N\r\n");
   }
 
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Phantom Functions Supported(4:3):         %E%d%N\r\n",
     PciExpressCap->DeviceCapability.Bits.PhantomFunctions
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Extended Tag Field Supported(5):          %E%d-bit Tag field supported%N\r\n",
     PciExpressCap->DeviceCapability.Bits.ExtendedTagField ? 8 : 5
     );
@@ -4359,28 +4343,26 @@ ExplainPcieDeviceCap (
   if (IS_PCIE_ENDPOINT (DevicePortType)) {
     L0sLatency = (UINT8)PciExpressCap->DeviceCapability.Bits.EndpointL0sAcceptableLatency;
     L1Latency  = (UINT8)PciExpressCap->DeviceCapability.Bits.EndpointL1AcceptableLatency;
-    ShellPrintEx (-1, -1, L"  Endpoint L0s Acceptable Latency(8:6):     ");
+    ShellPrintDefaultEx (L"  Endpoint L0s Acceptable Latency(8:6):     ");
     if (L0sLatency < 4) {
-      ShellPrintEx (-1, -1, L"%EMaximum of %d ns%N\r\n", 1 << (L0sLatency + 6));
+      ShellPrintDefaultEx (L"%EMaximum of %d ns%N\r\n", 1 << (L0sLatency + 6));
     } else {
       if (L0sLatency < 7) {
-        ShellPrintEx (-1, -1, L"%EMaximum of %d us%N\r\n", 1 << (L0sLatency - 3));
+        ShellPrintDefaultEx (L"%EMaximum of %d us%N\r\n", 1 << (L0sLatency - 3));
       } else {
-        ShellPrintEx (-1, -1, L"%ENo limit%N\r\n");
+        ShellPrintDefaultEx (L"%ENo limit%N\r\n");
       }
     }
 
-    ShellPrintEx (-1, -1, L"  Endpoint L1 Acceptable Latency(11:9):     ");
+    ShellPrintDefaultEx (L"  Endpoint L1 Acceptable Latency(11:9):     ");
     if (L1Latency < 7) {
-      ShellPrintEx (-1, -1, L"%EMaximum of %d us%N\r\n", 1 << (L1Latency + 1));
+      ShellPrintDefaultEx (L"%EMaximum of %d us%N\r\n", 1 << (L1Latency + 1));
     } else {
-      ShellPrintEx (-1, -1, L"%ENo limit%N\r\n");
+      ShellPrintDefaultEx (L"%ENo limit%N\r\n");
     }
   }
 
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Role-based Error Reporting(15):           %E%d%N\r\n",
     PciExpressCap->DeviceCapability.Bits.RoleBasedErrorReporting
     );
@@ -4390,15 +4372,11 @@ ExplainPcieDeviceCap (
   // b) Captured Slot Power Scale
   //
   if (DevicePortType == PCIE_DEVICE_PORT_TYPE_UPSTREAM_PORT) {
-    ShellPrintEx (
-      -1,
-      -1,
+    ShellPrintDefaultEx (
       L"  Captured Slot Power Limit Value(25:18):   %E0x%02x%N\r\n",
       PciExpressCap->DeviceCapability.Bits.CapturedSlotPowerLimitValue
       );
-    ShellPrintEx (
-      -1,
-      -1,
+    ShellPrintDefaultEx (
       L"  Captured Slot Power Limit Scale(27:26):   %E%s%N\r\n",
       SlotPwrLmtScaleTable[PciExpressCap->DeviceCapability.Bits.CapturedSlotPowerLimitScale]
       );
@@ -4408,9 +4386,7 @@ ExplainPcieDeviceCap (
   // Function Level Reset Capability is only valid for Endpoint
   //
   if (IS_PCIE_ENDPOINT (DevicePortType)) {
-    ShellPrintEx (
-      -1,
-      -1,
+    ShellPrintDefaultEx (
       L"  Function Level Reset Capability(28):      %E%d%N\r\n",
       PciExpressCap->DeviceCapability.Bits.FunctionLevelReset
       );
@@ -4431,81 +4407,61 @@ ExplainPcieDeviceControl (
   IN PCI_CAPABILITY_PCIEXP  *PciExpressCap
   )
 {
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Correctable Error Reporting Enable(0):    %E%d%N\r\n",
     PciExpressCap->DeviceControl.Bits.CorrectableError
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Non-Fatal Error Reporting Enable(1):      %E%d%N\r\n",
     PciExpressCap->DeviceControl.Bits.NonFatalError
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Fatal Error Reporting Enable(2):          %E%d%N\r\n",
     PciExpressCap->DeviceControl.Bits.FatalError
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Unsupported Request Reporting Enable(3):  %E%d%N\r\n",
     PciExpressCap->DeviceControl.Bits.UnsupportedRequest
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Enable Relaxed Ordering(4):               %E%d%N\r\n",
     PciExpressCap->DeviceControl.Bits.RelaxedOrdering
     );
-  ShellPrintEx (-1, -1, L"  Max_Payload_Size(7:5):                    ");
+  ShellPrintDefaultEx (L"  Max_Payload_Size(7:5):                    ");
   if (PciExpressCap->DeviceControl.Bits.MaxPayloadSize < 6) {
-    ShellPrintEx (-1, -1, L"%E%d bytes%N\r\n", 1 << (PciExpressCap->DeviceControl.Bits.MaxPayloadSize + 7));
+    ShellPrintDefaultEx (L"%E%d bytes%N\r\n", 1 << (PciExpressCap->DeviceControl.Bits.MaxPayloadSize + 7));
   } else {
-    ShellPrintEx (-1, -1, L"%EUnknown%N\r\n");
+    ShellPrintDefaultEx (L"%EUnknown%N\r\n");
   }
 
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Extended Tag Field Enable(8):             %E%d%N\r\n",
     PciExpressCap->DeviceControl.Bits.ExtendedTagField
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Phantom Functions Enable(9):              %E%d%N\r\n",
     PciExpressCap->DeviceControl.Bits.PhantomFunctions
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Auxiliary (AUX) Power PM Enable(10):      %E%d%N\r\n",
     PciExpressCap->DeviceControl.Bits.AuxPower
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Enable No Snoop(11):                      %E%d%N\r\n",
     PciExpressCap->DeviceControl.Bits.NoSnoop
     );
-  ShellPrintEx (-1, -1, L"  Max_Read_Request_Size(14:12):             ");
+  ShellPrintDefaultEx (L"  Max_Read_Request_Size(14:12):             ");
   if (PciExpressCap->DeviceControl.Bits.MaxReadRequestSize < 6) {
-    ShellPrintEx (-1, -1, L"%E%d bytes%N\r\n", 1 << (PciExpressCap->DeviceControl.Bits.MaxReadRequestSize + 7));
+    ShellPrintDefaultEx (L"%E%d bytes%N\r\n", 1 << (PciExpressCap->DeviceControl.Bits.MaxReadRequestSize + 7));
   } else {
-    ShellPrintEx (-1, -1, L"%EUnknown%N\r\n");
+    ShellPrintDefaultEx (L"%EUnknown%N\r\n");
   }
 
   //
   // Read operation is only valid for PCI Express to PCI/PCI-X Bridges
   //
   if (PciExpressCap->Capability.Bits.DevicePortType == PCIE_DEVICE_PORT_TYPE_PCIE_TO_PCI_BRIDGE) {
-    ShellPrintEx (
-      -1,
-      -1,
+    ShellPrintDefaultEx (
       L"  Bridge Configuration Retry Enable(15):  %E%d%N\r\n",
       PciExpressCap->DeviceControl.Bits.BridgeConfigurationRetryOrFunctionLevelReset
       );
@@ -4526,39 +4482,27 @@ ExplainPcieDeviceStatus (
   IN PCI_CAPABILITY_PCIEXP  *PciExpressCap
   )
 {
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Correctable Error Detected(0):            %E%d%N\r\n",
     PciExpressCap->DeviceStatus.Bits.CorrectableError
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Non-Fatal Error Detected(1):              %E%d%N\r\n",
     PciExpressCap->DeviceStatus.Bits.NonFatalError
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Fatal Error Detected(2):                  %E%d%N\r\n",
     PciExpressCap->DeviceStatus.Bits.FatalError
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Unsupported Request Detected(3):          %E%d%N\r\n",
     PciExpressCap->DeviceStatus.Bits.UnsupportedRequest
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  AUX Power Detected(4):                    %E%d%N\r\n",
     PciExpressCap->DeviceStatus.Bits.AuxPower
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Transactions Pending(5):                  %E%d%N\r\n",
     PciExpressCap->DeviceStatus.Bits.TransactionsPending
     );
@@ -4604,15 +4548,11 @@ ExplainPcieLinkCap (
       break;
   }
 
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Maximum Link Speed(3:0):                            %E%s%N\r\n",
     MaxLinkSpeed
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Maximum Link Width(9:4):                            %Ex%d%N\r\n",
     PciExpressCap->LinkCapability.Bits.MaxLinkWidth
     );
@@ -4634,51 +4574,35 @@ ExplainPcieLinkCap (
       break;
   }
 
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Active State Power Management Support(11:10):       %E%s Supported%N\r\n",
     AspmValue
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  L0s Exit Latency(14:12):                            %E%s%N\r\n",
     L0sLatencyStrTable[PciExpressCap->LinkCapability.Bits.L0sExitLatency]
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  L1 Exit Latency(17:15):                             %E%s%N\r\n",
     L1LatencyStrTable[PciExpressCap->LinkCapability.Bits.L1ExitLatency]
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Clock Power Management(18):                         %E%d%N\r\n",
     PciExpressCap->LinkCapability.Bits.ClockPowerManagement
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Surprise Down Error Reporting Capable(19):          %E%d%N\r\n",
     PciExpressCap->LinkCapability.Bits.SurpriseDownError
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Data Link Layer Link Active Reporting Capable(20):  %E%d%N\r\n",
     PciExpressCap->LinkCapability.Bits.DataLinkLayerLinkActive
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Link Bandwidth Notification Capability(21):         %E%d%N\r\n",
     PciExpressCap->LinkCapability.Bits.LinkBandwidthNotification
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Port Number(31:24):                                 %E0x%02x%N\r\n",
     PciExpressCap->LinkCapability.Bits.PortNumber
     );
@@ -4700,9 +4624,7 @@ ExplainPcieLinkControl (
   UINT8  DevicePortType;
 
   DevicePortType = (UINT8)PciExpressCap->Capability.Bits.DevicePortType;
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Active State Power Management Control(1:0):         %E%s%N\r\n",
     ASPMCtrlStrTable[PciExpressCap->LinkControl.Bits.AspmControl]
     );
@@ -4710,9 +4632,7 @@ ExplainPcieLinkControl (
   // RCB is not applicable to switches
   //
   if (!IS_PCIE_SWITCH (DevicePortType)) {
-    ShellPrintEx (
-      -1,
-      -1,
+    ShellPrintDefaultEx (
       L"  Read Completion Boundary (RCB)(3):                  %E%d byte%N\r\n",
       1 << (PciExpressCap->LinkControl.Bits.ReadCompletionBoundary + 6)
       );
@@ -4728,47 +4648,33 @@ ExplainPcieLinkControl (
       (DevicePortType != PCIE_DEVICE_PORT_TYPE_UPSTREAM_PORT) &&
       (DevicePortType != PCIE_DEVICE_PORT_TYPE_PCIE_TO_PCI_BRIDGE))
   {
-    ShellPrintEx (
-      -1,
-      -1,
+    ShellPrintDefaultEx (
       L"  Link Disable(4):                                    %E%d%N\r\n",
       PciExpressCap->LinkControl.Bits.LinkDisable
       );
   }
 
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Common Clock Configuration(6):                      %E%d%N\r\n",
     PciExpressCap->LinkControl.Bits.CommonClockConfiguration
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Extended Synch(7):                                  %E%d%N\r\n",
     PciExpressCap->LinkControl.Bits.ExtendedSynch
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Enable Clock Power Management(8):                   %E%d%N\r\n",
     PciExpressCap->LinkControl.Bits.ClockPowerManagement
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Hardware Autonomous Width Disable(9):               %E%d%N\r\n",
     PciExpressCap->LinkControl.Bits.HardwareAutonomousWidthDisable
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Link Bandwidth Management Interrupt Enable(10):     %E%d%N\r\n",
     PciExpressCap->LinkControl.Bits.LinkBandwidthManagementInterrupt
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Link Autonomous Bandwidth Interrupt Enable(11):     %E%d%N\r\n",
     PciExpressCap->LinkControl.Bits.LinkAutonomousBandwidthInterrupt
     );
@@ -4813,45 +4719,31 @@ ExplainPcieLinkStatus (
       break;
   }
 
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Current Link Speed(3:0):                            %E%s%N\r\n",
     CurLinkSpeed
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Negotiated Link Width(9:4):                         %Ex%d%N\r\n",
     PciExpressCap->LinkStatus.Bits.NegotiatedLinkWidth
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Link Training(11):                                  %E%d%N\r\n",
     PciExpressCap->LinkStatus.Bits.LinkTraining
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Slot Clock Configuration(12):                       %E%d%N\r\n",
     PciExpressCap->LinkStatus.Bits.SlotClockConfiguration
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Data Link Layer Link Active(13):                    %E%d%N\r\n",
     PciExpressCap->LinkStatus.Bits.DataLinkLayerLinkActive
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Link Bandwidth Management Status(14):               %E%d%N\r\n",
     PciExpressCap->LinkStatus.Bits.LinkBandwidthManagement
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Link Autonomous Bandwidth Status(15):               %E%d%N\r\n",
     PciExpressCap->LinkStatus.Bits.LinkAutonomousBandwidth
     );
@@ -4870,75 +4762,51 @@ ExplainPcieSlotCap (
   IN PCI_CAPABILITY_PCIEXP  *PciExpressCap
   )
 {
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Attention Button Present(0):                        %E%d%N\r\n",
     PciExpressCap->SlotCapability.Bits.AttentionButton
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Power Controller Present(1):                        %E%d%N\r\n",
     PciExpressCap->SlotCapability.Bits.PowerController
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  MRL Sensor Present(2):                              %E%d%N\r\n",
     PciExpressCap->SlotCapability.Bits.MrlSensor
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Attention Indicator Present(3):                     %E%d%N\r\n",
     PciExpressCap->SlotCapability.Bits.AttentionIndicator
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Power Indicator Present(4):                         %E%d%N\r\n",
     PciExpressCap->SlotCapability.Bits.PowerIndicator
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Hot-Plug Surprise(5):                               %E%d%N\r\n",
     PciExpressCap->SlotCapability.Bits.HotPlugSurprise
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Hot-Plug Capable(6):                                %E%d%N\r\n",
     PciExpressCap->SlotCapability.Bits.HotPlugCapable
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Slot Power Limit Value(14:7):                       %E0x%02x%N\r\n",
     PciExpressCap->SlotCapability.Bits.SlotPowerLimitValue
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Slot Power Limit Scale(16:15):                      %E%s%N\r\n",
     SlotPwrLmtScaleTable[PciExpressCap->SlotCapability.Bits.SlotPowerLimitScale]
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Electromechanical Interlock Present(17):            %E%d%N\r\n",
     PciExpressCap->SlotCapability.Bits.ElectromechanicalInterlock
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  No Command Completed Support(18):                   %E%d%N\r\n",
     PciExpressCap->SlotCapability.Bits.NoCommandCompleted
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Physical Slot Number(31:19):                        %E%d%N\r\n",
     PciExpressCap->SlotCapability.Bits.PhysicalSlotNumber
     );
@@ -4958,73 +4826,53 @@ ExplainPcieSlotControl (
   IN PCI_CAPABILITY_PCIEXP  *PciExpressCap
   )
 {
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Attention Button Pressed Enable(0):                 %E%d%N\r\n",
     PciExpressCap->SlotControl.Bits.AttentionButtonPressed
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Power Fault Detected Enable(1):                     %E%d%N\r\n",
     PciExpressCap->SlotControl.Bits.PowerFaultDetected
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  MRL Sensor Changed Enable(2):                       %E%d%N\r\n",
     PciExpressCap->SlotControl.Bits.MrlSensorChanged
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Presence Detect Changed Enable(3):                  %E%d%N\r\n",
     PciExpressCap->SlotControl.Bits.PresenceDetectChanged
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Command Completed Interrupt Enable(4):              %E%d%N\r\n",
     PciExpressCap->SlotControl.Bits.CommandCompletedInterrupt
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Hot-Plug Interrupt Enable(5):                       %E%d%N\r\n",
     PciExpressCap->SlotControl.Bits.HotPlugInterrupt
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Attention Indicator Control(7:6):                   %E%s%N\r\n",
     IndicatorTable[
                    PciExpressCap->SlotControl.Bits.AttentionIndicator]
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Power Indicator Control(9:8):                       %E%s%N\r\n",
     IndicatorTable[PciExpressCap->SlotControl.Bits.PowerIndicator]
     );
-  ShellPrintEx (-1, -1, L"  Power Controller Control(10):                       %EPower ");
+  ShellPrintDefaultEx (L"  Power Controller Control(10):                       %EPower ");
   if (
       PciExpressCap->SlotControl.Bits.PowerController)
   {
-    ShellPrintEx (-1, -1, L"Off%N\r\n");
+    ShellPrintDefaultEx (L"Off%N\r\n");
   } else {
-    ShellPrintEx (-1, -1, L"On%N\r\n");
+    ShellPrintDefaultEx (L"On%N\r\n");
   }
 
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Electromechanical Interlock Control(11):            %E%d%N\r\n",
     PciExpressCap->SlotControl.Bits.ElectromechanicalInterlock
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Data Link Layer State Changed Enable(12):           %E%d%N\r\n",
     PciExpressCap->SlotControl.Bits.DataLinkLayerStateChanged
     );
@@ -5043,66 +4891,54 @@ ExplainPcieSlotStatus (
   IN PCI_CAPABILITY_PCIEXP  *PciExpressCap
   )
 {
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Attention Button Pressed(0):           %E%d%N\r\n",
     PciExpressCap->SlotStatus.Bits.AttentionButtonPressed
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Power Fault Detected(1):               %E%d%N\r\n",
     PciExpressCap->SlotStatus.Bits.PowerFaultDetected
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  MRL Sensor Changed(2):                 %E%d%N\r\n",
     PciExpressCap->SlotStatus.Bits.MrlSensorChanged
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Presence Detect Changed(3):            %E%d%N\r\n",
     PciExpressCap->SlotStatus.Bits.PresenceDetectChanged
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Command Completed(4):                  %E%d%N\r\n",
     PciExpressCap->SlotStatus.Bits.CommandCompleted
     );
-  ShellPrintEx (-1, -1, L"  MRL Sensor State(5):                   %EMRL ");
+  ShellPrintDefaultEx (L"  MRL Sensor State(5):                   %EMRL ");
   if (
       PciExpressCap->SlotStatus.Bits.MrlSensor)
   {
-    ShellPrintEx (-1, -1, L" Opened%N\r\n");
+    ShellPrintDefaultEx (L" Opened%N\r\n");
   } else {
-    ShellPrintEx (-1, -1, L" Closed%N\r\n");
+    ShellPrintDefaultEx (L" Closed%N\r\n");
   }
 
-  ShellPrintEx (-1, -1, L"  Presence Detect State(6):              ");
+  ShellPrintDefaultEx (L"  Presence Detect State(6):              ");
   if (
       PciExpressCap->SlotStatus.Bits.PresenceDetect)
   {
-    ShellPrintEx (-1, -1, L"%ECard Present in slot%N\r\n");
+    ShellPrintDefaultEx (L"%ECard Present in slot%N\r\n");
   } else {
-    ShellPrintEx (-1, -1, L"%ESlot Empty%N\r\n");
+    ShellPrintDefaultEx (L"%ESlot Empty%N\r\n");
   }
 
-  ShellPrintEx (-1, -1, L"  Electromechanical Interlock Status(7): %EElectromechanical Interlock ");
+  ShellPrintDefaultEx (L"  Electromechanical Interlock Status(7): %EElectromechanical Interlock ");
   if (
       PciExpressCap->SlotStatus.Bits.ElectromechanicalInterlock)
   {
-    ShellPrintEx (-1, -1, L"Engaged%N\r\n");
+    ShellPrintDefaultEx (L"Engaged%N\r\n");
   } else {
-    ShellPrintEx (-1, -1, L"Disengaged%N\r\n");
+    ShellPrintDefaultEx (L"Disengaged%N\r\n");
   }
 
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  Data Link Layer State Changed(8):      %E%d%N\r\n",
     PciExpressCap->SlotStatus.Bits.DataLinkLayerStateChanged
     );
@@ -5121,33 +4957,23 @@ ExplainPcieRootControl (
   IN PCI_CAPABILITY_PCIEXP  *PciExpressCap
   )
 {
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  System Error on Correctable Error Enable(0):  %E%d%N\r\n",
     PciExpressCap->RootControl.Bits.SystemErrorOnCorrectableError
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  System Error on Non-Fatal Error Enable(1):    %E%d%N\r\n",
     PciExpressCap->RootControl.Bits.SystemErrorOnNonFatalError
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  System Error on Fatal Error Enable(2):        %E%d%N\r\n",
     PciExpressCap->RootControl.Bits.SystemErrorOnFatalError
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  PME Interrupt Enable(3):                      %E%d%N\r\n",
     PciExpressCap->RootControl.Bits.PmeInterrupt
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  CRS Software Visibility Enable(4):            %E%d%N\r\n",
     PciExpressCap->RootControl.Bits.CrsSoftwareVisibility
     );
@@ -5167,9 +4993,7 @@ ExplainPcieRootCap (
   IN PCI_CAPABILITY_PCIEXP  *PciExpressCap
   )
 {
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  CRS Software Visibility(0):                   %E%d%N\r\n",
     PciExpressCap->RootCapability.Bits.CrsSoftwareVisibility
     );
@@ -5189,21 +5013,15 @@ ExplainPcieRootStatus (
   IN PCI_CAPABILITY_PCIEXP  *PciExpressCap
   )
 {
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  PME Requester ID(15:0):                       %E0x%04x%N\r\n",
     PciExpressCap->RootStatus.Bits.PmeRequesterId
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  PME Status(16):                               %E%d%N\r\n",
     PciExpressCap->RootStatus.Bits.PmeStatus
     );
-  ShellPrintEx (
-    -1,
-    -1,
+  ShellPrintDefaultEx (
     L"  PME Pending(17):                              %E%d%N\r\n",
     PciExpressCap->RootStatus.Bits.PmePending
     );
@@ -6827,9 +6645,7 @@ PrintPciExtendedCapabilityDetails (
     case PCI_EXPRESS_EXTENDED_CAPABILITY_PTM_ID:
       return PrintInterpretedExtendedCompatibilityPTM (HeaderAddress, HeadersBaseAddress);
     default:
-      ShellPrintEx (
-        -1,
-        -1,
+      ShellPrintDefaultEx (
         L"Unknown PCIe extended capability ID (%04xh).  No interpretation available.\r\n",
         HeaderAddress->CapabilityId
         );
@@ -6861,7 +6677,7 @@ PciExplainPciExpress (
 
   DevicePortType = (UINT8)PciExpressCap->Capability.Bits.DevicePortType;
 
-  ShellPrintEx (-1, -1, L"\r\nPci Express device capability structure:\r\n");
+  ShellPrintDefaultEx (L"\r\nPci Express device capability structure:\r\n");
 
   for (Index = 0; PcieExplainList[Index].Type < PcieExplainTypeMax; Index++) {
     if (ShellGetExecutionBreakFlag ()) {
