@@ -36,6 +36,5 @@
   BaseLib
   BaseMemoryLib
   DebugLib
-  Tpm2CommandLib
   MemoryAllocationLib
   BaseCryptLib
