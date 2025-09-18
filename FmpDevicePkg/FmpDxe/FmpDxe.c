@@ -923,8 +923,7 @@ CheckTheImageInternal (
         break;
       }
 
-      PublicKeyDataXdr += PublicKeyDataLength;
-      PublicKeyDataXdr  = (UINT8 *)ALIGN_POINTER (PublicKeyDataXdr, sizeof (UINT32));
+      PublicKeyDataXdr += ALIGN_VALUE (PublicKeyDataLength, 4);
     }
   }
 
