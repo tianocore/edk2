@@ -446,6 +446,40 @@ STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
   { NULL,  TypeMax  }
 };
 
+/** EFI Variable names to connect. */
+STATIC CONST CHAR16  *EfiVariableNames[] = {
+  L"ConInDev",
+  L"ConOutDev",
+  L"ErrOutDev",
+  L"ErrOut",
+  L"ConIn",
+  L"ConOut",
+};
+
+/** Initiate connections for the EFI variables listed in EfiVariableNames.
+ */
+STATIC
+EFI_STATUS
+ConnectFromEfiVariable (
+  VOID
+  )
+{
+  UINTN       Index;
+  EFI_STATUS  Status;
+  EFI_STATUS  RetStatus;
+
+  RetStatus = EFI_SUCCESS;
+
+  for (Index = 0; Index < ARRAY_SIZE (EfiVariableNames); Index++) {
+    Status = ShellConnectFromDevPaths (EfiVariableNames[Index]);
+    if (EFI_ERROR (Status)) {
+      RetStatus = Status;
+    }
+  }
+
+  return RetStatus;
+}
+
 /**
   Function for 'connect' command.
 
@@ -513,37 +547,7 @@ ShellCommandRunConnect (
       // do the conin and conout from EFI variables
       // if the first fails dont 'loose' the error
       //
-      Status = ShellConnectFromDevPaths (L"ConInDev");
-      if (EFI_ERROR (Status)) {
-        ShellConnectFromDevPaths (L"ConOutDev");
-      } else {
-        Status = ShellConnectFromDevPaths (L"ConOutDev");
-      }
-
-      if (EFI_ERROR (Status)) {
-        ShellConnectFromDevPaths (L"ErrOutDev");
-      } else {
-        Status = ShellConnectFromDevPaths (L"ErrOutDev");
-      }
-
-      if (EFI_ERROR (Status)) {
-        ShellConnectFromDevPaths (L"ErrOut");
-      } else {
-        Status = ShellConnectFromDevPaths (L"ErrOut");
-      }
-
-      if (EFI_ERROR (Status)) {
-        ShellConnectFromDevPaths (L"ConIn");
-      } else {
-        Status = ShellConnectFromDevPaths (L"ConIn");
-      }
-
-      if (EFI_ERROR (Status)) {
-        ShellConnectFromDevPaths (L"ConOut");
-      } else {
-        Status = ShellConnectFromDevPaths (L"ConOut");
-      }
-
+      Status = ConnectFromEfiVariable ();
       if (EFI_ERROR (Status)) {
         ShellStatus = SHELL_DEVICE_ERROR;
       }
