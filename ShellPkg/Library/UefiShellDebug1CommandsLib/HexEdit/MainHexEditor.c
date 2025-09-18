@@ -1751,25 +1751,25 @@ HMainEditorInit (
   //
   Status = MainTitleBarInit (L"UEFI HEXEDIT");
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HEXEDIT_LIBEDITOR_MAINEDITOR_TITLE), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HEXEDIT_LIBEDITOR_MAINEDITOR_TITLE), gShellDebug1HiiHandle);
     return EFI_LOAD_ERROR;
   }
 
   Status = ControlHotKeyInit (HexMainControlBasedMenuFunctions);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HEXEDIT_LIBEDITOR_MAINEDITOR_MAINMENU), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HEXEDIT_LIBEDITOR_MAINEDITOR_MAINMENU), gShellDebug1HiiHandle);
     return EFI_LOAD_ERROR;
   }
 
   Status = MenuBarInit (HexEditorMenuItems);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HEXEDIT_LIBEDITOR_MAINEDITOR_MAINMENU), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HEXEDIT_LIBEDITOR_MAINEDITOR_MAINMENU), gShellDebug1HiiHandle);
     return EFI_LOAD_ERROR;
   }
 
   Status = StatusBarInit ();
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HEXEDIT_LIBEDITOR_MAINEDITOR_STATUS), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HEXEDIT_LIBEDITOR_MAINEDITOR_STATUS), gShellDebug1HiiHandle);
     return EFI_LOAD_ERROR;
   }
 
@@ -1777,13 +1777,13 @@ HMainEditorInit (
 
   Status = HBufferImageInit ();
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HEXEDIT_LIBEDITOR_MAINEDITOR_BUFFERIMAGE), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HEXEDIT_LIBEDITOR_MAINEDITOR_BUFFERIMAGE), gShellDebug1HiiHandle);
     return EFI_LOAD_ERROR;
   }
 
   Status = HClipBoardInit ();
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HEXEDIT_LIBEDITOR_MAINEDITOR_CLIPBOARD), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HEXEDIT_LIBEDITOR_MAINEDITOR_CLIPBOARD), gShellDebug1HiiHandle);
     return EFI_LOAD_ERROR;
   }
 
@@ -1829,12 +1829,12 @@ HMainEditorCleanup (
 
   Status = HBufferImageCleanup ();
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HEXEDIT_LIBEDITOR_BUFFERIMAGE_CLEAN), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HEXEDIT_LIBEDITOR_BUFFERIMAGE_CLEAN), gShellDebug1HiiHandle);
   }
 
   Status = HClipBoardCleanup ();
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HEXEDIT_LIBEDITOR_CLIPBOARD_CLEAN), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HEXEDIT_LIBEDITOR_CLIPBOARD_CLEAN), gShellDebug1HiiHandle);
   }
 
   //

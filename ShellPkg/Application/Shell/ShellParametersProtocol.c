@@ -1346,9 +1346,9 @@ UpdateStdInStdOutStdErr (
   }
 
   if (Status == EFI_NOT_FOUND) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SHELL_REDUNDA_REDIR), ShellInfoObject.HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SHELL_REDUNDA_REDIR), ShellInfoObject.HiiHandle);
   } else if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SHELL_INVALID_REDIR), ShellInfoObject.HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SHELL_INVALID_REDIR), ShellInfoObject.HiiHandle);
   }
 
   return (Status);

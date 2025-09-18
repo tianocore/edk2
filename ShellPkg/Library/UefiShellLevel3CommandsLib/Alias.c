@@ -31,14 +31,14 @@ PrintSingleShellAlias (
   ShellStatus   = SHELL_SUCCESS;
   ConstAliasVal = gEfiShellProtocol->GetAlias (Alias, &Volatile);
   if (ConstAliasVal == NULL) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"alias", Alias);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"alias", Alias);
     ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
     if (ShellCommandIsOnAliasList (Alias)) {
       Volatile = FALSE;
     }
 
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_ALIAS_OUTPUT), gShellLevel3HiiHandle, !Volatile ? L' ' : L'*', Alias, ConstAliasVal);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_ALIAS_OUTPUT), gShellLevel3HiiHandle, !Volatile ? L' ' : L'*', Alias, ConstAliasVal);
   }
 
   return ShellStatus;
@@ -123,13 +123,13 @@ ShellLevel3CommandsLibSetAlias (
   Status      = gEfiShellProtocol->SetAlias (Command, Alias, Replace, Volatile);
   if (EFI_ERROR (Status)) {
     if (Status == EFI_ACCESS_DENIED) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellLevel3HiiHandle, L"alias");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_AD), gShellLevel3HiiHandle, L"alias");
       ShellStatus = SHELL_ACCESS_DENIED;
     } else if (Status == EFI_NOT_FOUND) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_NOT_FOUND), gShellLevel3HiiHandle, L"alias", Command);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_NOT_FOUND), gShellLevel3HiiHandle, L"alias", Command);
       ShellStatus = SHELL_NOT_FOUND;
     } else {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel3HiiHandle, L"alias", Status);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel3HiiHandle, L"alias", Status);
       ShellStatus = SHELL_DEVICE_ERROR;
     }
   }
@@ -186,7 +186,7 @@ ShellCommandRunAlias (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"alias", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"alias", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -233,17 +233,17 @@ ShellCommandRunAlias (
           ShellStatus = ShellLevel3CommandsLibSetAlias (CleanParam2, Param1, FALSE, VolatileFlag);
           break;
         default:
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"alias");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"alias");
           ShellStatus = SHELL_INVALID_PARAMETER;
       }
     } else if (DeleteFlag) {
       if (VolatileFlag || (ShellCommandLineGetCount (Package) > 1)) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"alias");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"alias");
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
         ParamStrD = ShellCommandLineGetValue (Package, L"-d");
         if (ParamStrD == NULL) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel3HiiHandle, L"alias");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel3HiiHandle, L"alias");
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
           //
@@ -261,7 +261,7 @@ ShellCommandRunAlias (
       switch (ShellCommandLineGetCount (Package)) {
         case 1:
         case 2:
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel3HiiHandle, L"alias");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel3HiiHandle, L"alias");
           ShellStatus = SHELL_INVALID_PARAMETER;
           break;
         case 3:
@@ -271,7 +271,7 @@ ShellCommandRunAlias (
           ShellStatus = ShellLevel3CommandsLibSetAlias (CleanParam2, Param1, FALSE, VolatileFlag);
           break;
         default:
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"alias");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"alias");
           ShellStatus = SHELL_INVALID_PARAMETER;
       }
     }
