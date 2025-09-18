@@ -139,10 +139,10 @@ PerformParsing (
 
   Status = ShellOpenFileByName (FileName, &FileHandle, EFI_FILE_MODE_READ, 0);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel2HiiHandle, L"parse", FileName);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel2HiiHandle, L"parse", FileName);
     ShellStatus = SHELL_NOT_FOUND;
   } else if (!EFI_ERROR (FileHandleIsDirectory (FileHandle))) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_FILE), gShellLevel2HiiHandle, L"parse", FileName);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NOT_FILE), gShellLevel2HiiHandle, L"parse", FileName);
     ShellStatus = SHELL_NOT_FOUND;
   } else {
     for (LoopVariable = 0; LoopVariable < ShellCommandInstance && !ShellFileHandleEof (FileHandle);) {
@@ -190,7 +190,7 @@ PerformParsing (
 
             if (ColumnLoop == ColumnIndex) {
               if (ColumnPointer == NULL) {
-                ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellLevel2HiiHandle, L"parse", L"Column Index");
+                ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellLevel2HiiHandle, L"parse", L"Column Index");
                 ShellStatus = SHELL_INVALID_PARAMETER;
               } else {
                 TempSpot = StrStr (ColumnPointer, L",\"");
@@ -274,7 +274,7 @@ ShellCommandRunParse (
   Status = ShellCommandLineParseEx (ParamList, &Package, &ProblemParam, TRUE, FALSE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"parse", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"parse", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -285,12 +285,12 @@ ShellCommandRunParse (
     if ((!StreamingUnicode && (ShellCommandLineGetCount (Package) < 4)) ||
         (ShellCommandLineGetCount (Package) < 3))
     {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"parse");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"parse");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if ((StreamingUnicode && (ShellCommandLineGetCount (Package) > 3)) ||
                (ShellCommandLineGetCount (Package) > 4))
     {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"parse");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"parse");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       if (StreamingUnicode) {

@@ -63,7 +63,7 @@ DisplayMmioMemory (
 
   Status = gBS->LocateProtocol (&gEfiPciRootBridgeIoProtocolGuid, NULL, (VOID **)&PciRbIo);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PCIRBIO_NF), gShellDebug1HiiHandle, L"dmem");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PCIRBIO_NF), gShellDebug1HiiHandle, L"dmem");
     return (SHELL_NOT_FOUND);
   }
 
@@ -74,10 +74,10 @@ DisplayMmioMemory (
 
   Status = PciRbIo->Mem.Read (PciRbIo, EfiPciWidthUint8, (UINT64)(UINTN)Address, Size, Buffer);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PCIRBIO_ER), gShellDebug1HiiHandle, L"dmem");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PCIRBIO_ER), gShellDebug1HiiHandle, L"dmem");
     ShellStatus = SHELL_NOT_FOUND;
   } else {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_MMIO_HEADER_ROW), gShellDebug1HiiHandle, (UINT64)(UINTN)Address, Size);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DMEM_MMIO_HEADER_ROW), gShellDebug1HiiHandle, (UINT64)(UINTN)Address, Size);
     DumpHex (2, (UINTN)Address, Size, Buffer);
   }
 
@@ -100,15 +100,12 @@ DisplayRtProperties (
   EFI_STATUS  Status;
 
   if (RtPropertiesTable == NULL) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_NOT_FOUND), gShellDebug1HiiHandle, L"RtPropertiesTable");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DMEM_ERR_NOT_FOUND), gShellDebug1HiiHandle, L"RtPropertiesTable");
     return;
   }
 
   RtServices = (UINT32)RtPropertiesTable->RuntimeServicesSupported;
-  Status     = ShellPrintHiiEx (
-                 -1,
-                 -1,
-                 NULL,
+  Status     = ShellPrintHiiDefaultEx (
                  STRING_TOKEN (STR_DMEM_RT_PROPERTIES),
                  gShellDebug1HiiHandle,
                  EFI_RT_PROPERTIES_TABLE_VERSION,
@@ -129,7 +126,7 @@ DisplayRtProperties (
                  );
 
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_GET_FAIL), gShellDebug1HiiHandle, L"RtPropertiesTable");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DMEM_ERR_GET_FAIL), gShellDebug1HiiHandle, L"RtPropertiesTable");
   }
 }
 
@@ -222,10 +219,7 @@ GetImageExecutionInfo (
         ActionType = L"invalid action";
     }
 
-    Status = ShellPrintHiiEx (
-               -1,
-               -1,
-               NULL,
+    Status = ShellPrintHiiDefaultEx (
                STRING_TOKEN (STR_DMEM_IMG_EXE_ENTRY),
                gShellDebug1HiiHandle,
                ImageName,
@@ -250,14 +244,14 @@ DisplayImageExecutionEntries (
   EFI_STATUS  Status;
 
   if (ExecInfoTablePtr == NULL) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_NOT_FOUND), gShellDebug1HiiHandle, L"ImageExecutionTable");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DMEM_ERR_NOT_FOUND), gShellDebug1HiiHandle, L"ImageExecutionTable");
     return;
   }
 
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_IMG_EXE_TABLE), gShellDebug1HiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DMEM_IMG_EXE_TABLE), gShellDebug1HiiHandle);
   Status = GetImageExecutionInfo (ExecInfoTablePtr);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_GET_FAIL), gShellDebug1HiiHandle, L"ImageExecutionTable");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DMEM_ERR_GET_FAIL), gShellDebug1HiiHandle, L"ImageExecutionTable");
   }
 }
 
@@ -280,11 +274,8 @@ DisplayConformanceProfiles (
   Status = EFI_SUCCESS;
 
   if (ConfProfTable == NULL) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_CONF_PRO_TABLE), gShellDebug1HiiHandle);
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DMEM_CONF_PRO_TABLE), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_DMEM_CONF_PRO_ROW),
       gShellDebug1HiiHandle,
       L"EFI_CONFORMANCE_PROFILES_UEFI_SPEC_GUID",
@@ -293,7 +284,7 @@ DisplayConformanceProfiles (
     return;
   }
 
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_CONF_PRO_TABLE), gShellDebug1HiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DMEM_CONF_PRO_TABLE), gShellDebug1HiiHandle);
 
   EntryGuid = (EFI_GUID *)(ConfProfTable + 1);
 
@@ -312,10 +303,7 @@ DisplayConformanceProfiles (
       GuidName = L"EBBR_2.2";
     }
 
-    Status = ShellPrintHiiEx (
-               -1,
-               -1,
-               NULL,
+    Status = ShellPrintHiiDefaultEx (
                STRING_TOKEN (STR_DMEM_CONF_PRO_ROW),
                gShellDebug1HiiHandle,
                GuidName,
@@ -324,7 +312,7 @@ DisplayConformanceProfiles (
   }
 
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_GET_FAIL), gShellDebug1HiiHandle, L"ComformanceProfilesTable");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DMEM_ERR_GET_FAIL), gShellDebug1HiiHandle, L"ComformanceProfilesTable");
   }
 }
 
@@ -405,10 +393,7 @@ DisplaySystemTable (
     AddressArray[EDstSmbiosTable] = AddressArray[EDstSmbios3Table];
   }
 
-  ShellPrintHiiEx (
-    -1,
-    -1,
-    NULL,
+  ShellPrintHiiDefaultEx (
     STRING_TOKEN (STR_DMEM_SYSTEM_TABLE),
     gShellDebug1HiiHandle,
     (UINT64)(UINTN)Address,
@@ -492,7 +477,7 @@ ShellCommandRunDmem (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"dmem", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"dmem", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -500,7 +485,7 @@ ShellCommandRunDmem (
     }
   } else {
     if (ShellCommandLineGetCount (Package) > 3) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"dmem");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"dmem");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       Temp1 = ShellCommandLineGetRawValue (Package, 1);
@@ -509,7 +494,7 @@ ShellCommandRunDmem (
         Size    = sizeof (*gST);
       } else {
         if (!ShellIsHexOrDecimalNumber (Temp1, TRUE, FALSE) || EFI_ERROR (ShellConvertStringToUint64 (Temp1, (UINT64 *)&Address, TRUE, FALSE))) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dmem", Temp1);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dmem", Temp1);
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
 
@@ -518,7 +503,7 @@ ShellCommandRunDmem (
           Size = 512;
         } else {
           if (!ShellIsHexOrDecimalNumber (Temp1, FALSE, FALSE) || EFI_ERROR (ShellConvertStringToUint64 (Temp1, &Size, TRUE, FALSE))) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dmem", Temp1);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dmem", Temp1);
             ShellStatus = SHELL_INVALID_PARAMETER;
           }
         }
@@ -527,7 +512,7 @@ ShellCommandRunDmem (
 
     if (ShellStatus == SHELL_SUCCESS) {
       if (!ShellCommandLineGetFlag (Package, L"-mmio")) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_HEADER_ROW), gShellDebug1HiiHandle, (UINT64)(UINTN)Address, Size);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DMEM_HEADER_ROW), gShellDebug1HiiHandle, (UINT64)(UINTN)Address, Size);
         DumpHex (2, (UINTN)Address, (UINTN)Size, Address);
         if (Address == (VOID *)gST) {
           ShellStatus = DisplaySystemTable (Package, Address);
