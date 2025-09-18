@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <PiPei.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/Tpm2CommandLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseCryptLib.h>
 #include <Library/MemoryAllocationLib.h>
