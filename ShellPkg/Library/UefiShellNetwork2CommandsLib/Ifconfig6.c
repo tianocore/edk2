@@ -341,13 +341,13 @@ IfConfig6PrintMacAddr (
   ASSERT (Size <= MACADDRMAXSIZE);
 
   for (Index = 0; Index < Size; Index++) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_MAC_ADDR_BODY), gShellNetwork2HiiHandle, Node[Index]);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_MAC_ADDR_BODY), gShellNetwork2HiiHandle, Node[Index]);
     if (Index + 1 < Size) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_COLON), gShellNetwork2HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_COLON), gShellNetwork2HiiHandle);
     }
   }
 
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_NEWLINE), gShellNetwork2HiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_NEWLINE), gShellNetwork2HiiHandle);
 }
 
 /**
@@ -377,10 +377,10 @@ IfConfig6PrintIpAddr (
         //
         // :: is at the beginning of the address.
         //
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_COLON), gShellNetwork2HiiHandle);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_COLON), gShellNetwork2HiiHandle);
       }
 
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_COLON), gShellNetwork2HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_COLON), gShellNetwork2HiiHandle);
 
       while ((Index < PREFIXMAXLEN) && (Ip->Addr[Index] == 0) && (Ip->Addr[Index + 1] == 0)) {
         Index = Index + 2;
@@ -400,17 +400,17 @@ IfConfig6PrintIpAddr (
     }
 
     if (Index < PREFIXMAXLEN - 1) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_IP_ADDR_BODY), gShellNetwork2HiiHandle, Ip->Addr[Index]);
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_IP_ADDR_BODY), gShellNetwork2HiiHandle, Ip->Addr[Index + 1]);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_IP_ADDR_BODY), gShellNetwork2HiiHandle, Ip->Addr[Index]);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_IP_ADDR_BODY), gShellNetwork2HiiHandle, Ip->Addr[Index + 1]);
     }
 
     if (Index + 2 < PREFIXMAXLEN) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_COLON), gShellNetwork2HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_COLON), gShellNetwork2HiiHandle);
     }
   }
 
   if (PrefixLen != NULL) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_PREFIX_LEN), gShellNetwork2HiiHandle, *PrefixLen);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_PREFIX_LEN), gShellNetwork2HiiHandle, *PrefixLen);
   }
 }
 
@@ -792,7 +792,7 @@ IfConfig6GetInterfaceInfo (
                        );
 
     if (Status != EFI_BUFFER_TOO_SMALL) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
       goto ON_ERROR;
     }
 
@@ -814,7 +814,7 @@ IfConfig6GetInterfaceInfo (
                        );
 
     if (EFI_ERROR (Status)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
       goto ON_ERROR;
     }
 
@@ -838,7 +838,7 @@ IfConfig6GetInterfaceInfo (
                        );
 
     if ((Status != EFI_BUFFER_TOO_SMALL) && (Status != EFI_NOT_FOUND)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
       goto ON_ERROR;
     }
 
@@ -866,7 +866,7 @@ IfConfig6GetInterfaceInfo (
                          );
 
       if (EFI_ERROR (Status)) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
         goto ON_ERROR;
       }
     }
@@ -889,7 +889,7 @@ IfConfig6GetInterfaceInfo (
                        );
 
     if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
       goto ON_ERROR;
     }
 
@@ -910,7 +910,7 @@ IfConfig6GetInterfaceInfo (
                          );
 
     if (EFI_ERROR (Status)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
       goto ON_ERROR;
     }
 
@@ -926,7 +926,7 @@ IfConfig6GetInterfaceInfo (
                          );
 
     if (EFI_ERROR (Status)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
       goto ON_ERROR;
     }
 
@@ -986,7 +986,7 @@ IfConfig6ShowInterfaceInfo (
   Entry = IfList->ForwardLink;
 
   if (IsListEmpty (IfList)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_INTERFACE), gShellNetwork2HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_INTERFACE), gShellNetwork2HiiHandle);
   }
 
   //
@@ -995,32 +995,32 @@ IfConfig6ShowInterfaceInfo (
   while (Entry != IfList) {
     IfCb = BASE_CR (Entry, IFCONFIG6_INTERFACE_CB, Link);
 
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_BREAK), gShellNetwork2HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_BREAK), gShellNetwork2HiiHandle);
 
     //
     // Print interface name.
     //
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_IF_NAME), gShellNetwork2HiiHandle, IfCb->IfInfo->Name);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_IF_NAME), gShellNetwork2HiiHandle, IfCb->IfInfo->Name);
 
     //
     // Print interface config policy.
     //
     if (IfCb->Policy == Ip6ConfigPolicyAutomatic) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_POLICY_AUTO), gShellNetwork2HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_POLICY_AUTO), gShellNetwork2HiiHandle);
     } else {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_POLICY_MAN), gShellNetwork2HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_POLICY_MAN), gShellNetwork2HiiHandle);
     }
 
     //
     // Print dad transmit.
     //
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_DAD_TRANSMITS), gShellNetwork2HiiHandle, IfCb->Xmits);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_DAD_TRANSMITS), gShellNetwork2HiiHandle, IfCb->Xmits);
 
     //
     // Print interface id if has.
     //
     if (IfCb->IfId != NULL) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_INTERFACE_ID_HEAD), gShellNetwork2HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_INTERFACE_ID_HEAD), gShellNetwork2HiiHandle);
 
       IfConfig6PrintMacAddr (
         IfCb->IfId->Id,
@@ -1031,7 +1031,7 @@ IfConfig6ShowInterfaceInfo (
     //
     // Print mac address of the interface.
     //
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_MAC_ADDR_HEAD), gShellNetwork2HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_MAC_ADDR_HEAD), gShellNetwork2HiiHandle);
 
     IfConfig6PrintMacAddr (
       IfCb->IfInfo->HwAddress.Addr,
@@ -1041,53 +1041,53 @@ IfConfig6ShowInterfaceInfo (
     //
     // Print ip addresses list of the interface.
     //
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_IP_ADDR_HEAD), gShellNetwork2HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_IP_ADDR_HEAD), gShellNetwork2HiiHandle);
 
     for (Index = 0; Index < IfCb->IfInfo->AddressInfoCount; Index++) {
       IfConfig6PrintIpAddr (
         &IfCb->IfInfo->AddressInfo[Index].Address,
         &IfCb->IfInfo->AddressInfo[Index].PrefixLength
         );
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_NEWLINE), gShellNetwork2HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_NEWLINE), gShellNetwork2HiiHandle);
     }
 
     //
     // Print dns server addresses list of the interface if has.
     //
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_DNS_ADDR_HEAD), gShellNetwork2HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_DNS_ADDR_HEAD), gShellNetwork2HiiHandle);
 
     for (Index = 0; Index < IfCb->DnsCnt; Index++) {
       IfConfig6PrintIpAddr (
         &IfCb->DnsAddr[Index],
         NULL
         );
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_NEWLINE), gShellNetwork2HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_NEWLINE), gShellNetwork2HiiHandle);
     }
 
     //
     // Print route table of the interface if has.
     //
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_ROUTE_HEAD), gShellNetwork2HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_ROUTE_HEAD), gShellNetwork2HiiHandle);
 
     for (Index = 0; Index < IfCb->IfInfo->RouteCount; Index++) {
       IfConfig6PrintIpAddr (
         &IfCb->IfInfo->RouteTable[Index].Destination,
         &IfCb->IfInfo->RouteTable[Index].PrefixLength
         );
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_JOINT), gShellNetwork2HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_JOINT), gShellNetwork2HiiHandle);
 
       IfConfig6PrintIpAddr (
         &IfCb->IfInfo->RouteTable[Index].Gateway,
         NULL
         );
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_NEWLINE), gShellNetwork2HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_NEWLINE), gShellNetwork2HiiHandle);
     }
 
     Entry = Entry->ForwardLink;
   }
 
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_BREAK), gShellNetwork2HiiHandle);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_NEWLINE), gShellNetwork2HiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_BREAK), gShellNetwork2HiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_NEWLINE), gShellNetwork2HiiHandle);
 
   return SHELL_SUCCESS;
 }
@@ -1119,7 +1119,7 @@ IfConfig6ClearInterfaceInfo (
   ShellStatus = SHELL_SUCCESS;
 
   if (IsListEmpty (IfList)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_INTERFACE), gShellNetwork2HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_INTERFACE), gShellNetwork2HiiHandle);
   }
 
   //
@@ -1139,7 +1139,7 @@ IfConfig6ClearInterfaceInfo (
                               &Policy
                               );
       if (EFI_ERROR (Status)) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellNetwork2HiiHandle, L"ifconfig6");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_AD), gShellNetwork2HiiHandle, L"ifconfig6");
         ShellStatus = SHELL_ACCESS_DENIED;
         break;
       }
@@ -1155,7 +1155,7 @@ IfConfig6ClearInterfaceInfo (
                             );
 
     if (EFI_ERROR (Status)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellNetwork2HiiHandle, L"ifconfig6");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_AD), gShellNetwork2HiiHandle, L"ifconfig6");
       ShellStatus = SHELL_ACCESS_DENIED;
       break;
     }
@@ -1214,7 +1214,7 @@ IfConfig6SetInterfaceInfo (
   CurDadXmits = 0;
 
   if (IsListEmpty (IfList)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_INTERFACE), gShellNetwork2HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_INTERFACE), gShellNetwork2HiiHandle);
     return SHELL_INVALID_PARAMETER;
   }
 
@@ -1277,15 +1277,15 @@ IfConfig6SetInterfaceInfo (
     if (VarCheckOk != CheckCode) {
       switch (CheckCode) {
         case VarCheckDuplicate:
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_DUPLICATE_COMMAND), gShellNetwork2HiiHandle, VarArg->Arg);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_DUPLICATE_COMMAND), gShellNetwork2HiiHandle, VarArg->Arg);
           break;
 
         case VarCheckConflict:
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_CONFLICT_COMMAND), gShellNetwork2HiiHandle, VarArg->Arg);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_CONFLICT_COMMAND), gShellNetwork2HiiHandle, VarArg->Arg);
           break;
 
         case VarCheckUnknown:
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_UNKNOWN_COMMAND), gShellNetwork2HiiHandle, VarArg->Arg);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_UNKNOWN_COMMAND), gShellNetwork2HiiHandle, VarArg->Arg);
           break;
 
         default:
@@ -1320,15 +1320,15 @@ IfConfig6SetInterfaceInfo (
 
       if (VarArg != NULL) {
         if (StrCmp (VarArg->Arg, L"host") == 0) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_IP_CONFIG), gShellNetwork2HiiHandle, Status);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_IP_CONFIG), gShellNetwork2HiiHandle, Status);
           ShellStatus = SHELL_INVALID_PARAMETER;
           goto ON_EXIT;
         } else if (StrCmp (VarArg->Arg, L"gw") == 0) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_GW_CONFIG), gShellNetwork2HiiHandle, Status);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_GW_CONFIG), gShellNetwork2HiiHandle, Status);
           ShellStatus = SHELL_INVALID_PARAMETER;
           goto ON_EXIT;
         } else if (StrCmp (VarArg->Arg, L"dns") == 0) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_DNS_CONFIG), gShellNetwork2HiiHandle, Status);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_DNS_CONFIG), gShellNetwork2HiiHandle, Status);
           ShellStatus = SHELL_INVALID_PARAMETER;
           goto ON_EXIT;
         }
@@ -1365,7 +1365,7 @@ IfConfig6SetInterfaceInfo (
       if (EFI_ERROR (Status)) {
         if (Status == EFI_INVALID_PARAMETER) {
           ShellStatus = SHELL_INVALID_PARAMETER;
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_LACK_ARGUMENTS), gShellNetwork2HiiHandle, L"host");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_LACK_ARGUMENTS), gShellNetwork2HiiHandle, L"host");
           continue;
         } else {
           ShellStatus = SHELL_ACCESS_DENIED;
@@ -1425,7 +1425,7 @@ IfConfig6SetInterfaceInfo (
                      );
 
       if (EFI_ERROR (Status)) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_MAN_HOST), gShellNetwork2HiiHandle, Status);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_MAN_HOST), gShellNetwork2HiiHandle, Status);
         ShellStatus = SHELL_ACCESS_DENIED;
         goto ON_EXIT;
       }
@@ -1443,7 +1443,7 @@ IfConfig6SetInterfaceInfo (
                               );
 
       if (Status != EFI_BUFFER_TOO_SMALL) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
         ShellStatus = SHELL_ACCESS_DENIED;
         goto ON_EXIT;
       }
@@ -1463,7 +1463,7 @@ IfConfig6SetInterfaceInfo (
                               );
 
       if (EFI_ERROR (Status)) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_IP6CFG_GETDATA), gShellNetwork2HiiHandle, Status);
         ShellStatus = SHELL_ACCESS_DENIED;
         goto ON_EXIT;
       }
@@ -1487,12 +1487,12 @@ IfConfig6SetInterfaceInfo (
         }
 
         if (!IsAddressSet) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_ADDRESS_FAILED), gShellNetwork2HiiHandle);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_ADDRESS_FAILED), gShellNetwork2HiiHandle);
           IfConfig6PrintIpAddr (
             &CfgManAddr[Index].Address,
             &CfgManAddr[Index].PrefixLength
             );
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_NEWLINE), gShellNetwork2HiiHandle);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_INFO_NEWLINE), gShellNetwork2HiiHandle);
         }
       }
     } else if (StrCmp (VarArg->Arg, L"gw") == 0) {
@@ -1509,7 +1509,7 @@ IfConfig6SetInterfaceInfo (
       if (EFI_ERROR (Status)) {
         if (Status == EFI_INVALID_PARAMETER) {
           ShellStatus = SHELL_INVALID_PARAMETER;
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_LACK_ARGUMENTS), gShellNetwork2HiiHandle, L"gw");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_LACK_ARGUMENTS), gShellNetwork2HiiHandle, L"gw");
           continue;
         } else {
           ShellStatus = SHELL_ACCESS_DENIED;
@@ -1529,7 +1529,7 @@ IfConfig6SetInterfaceInfo (
 
       if (EFI_ERROR (Status)) {
         ShellStatus = SHELL_ACCESS_DENIED;
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_MAN_GW), gShellNetwork2HiiHandle, Status);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_MAN_GW), gShellNetwork2HiiHandle, Status);
         goto ON_EXIT;
       }
     } else if (StrCmp (VarArg->Arg, L"dns") == 0) {
@@ -1546,7 +1546,7 @@ IfConfig6SetInterfaceInfo (
       if (EFI_ERROR (Status)) {
         if (Status == EFI_INVALID_PARAMETER) {
           ShellStatus = SHELL_INVALID_PARAMETER;
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_LACK_ARGUMENTS), gShellNetwork2HiiHandle, L"dns");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_LACK_ARGUMENTS), gShellNetwork2HiiHandle, L"dns");
           continue;
         } else {
           ShellStatus = SHELL_ACCESS_DENIED;
@@ -1791,7 +1791,7 @@ ShellCommandRunIfconfig6 (
 
   Status = ShellCommandLineParseEx (mIfConfig6CheckList, &ParamPackage, &ProblemParam, TRUE, FALSE);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_COMMAND), gShellNetwork2HiiHandle, L"ifconfig6", ProblemParam);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_INVALID_COMMAND), gShellNetwork2HiiHandle, L"ifconfig6", ProblemParam);
     ShellStatus = SHELL_INVALID_PARAMETER;
     goto ON_EXIT;
   }
@@ -1802,7 +1802,7 @@ ShellCommandRunIfconfig6 (
   if (!ShellCommandLineGetFlag (ParamPackage, L"-r") && !ShellCommandLineGetFlag (ParamPackage, L"-s") &&
       !ShellCommandLineGetFlag (ParamPackage, L"-?") && !ShellCommandLineGetFlag (ParamPackage, L"-l"))
   {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_LACK_OPTION), gShellNetwork2HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_LACK_OPTION), gShellNetwork2HiiHandle);
     ShellStatus = SHELL_INVALID_PARAMETER;
     goto ON_EXIT;
   }
@@ -1817,7 +1817,7 @@ ShellCommandRunIfconfig6 (
       ((ShellCommandLineGetFlag (ParamPackage, L"-s")) && (ShellCommandLineGetFlag (ParamPackage, L"-?"))) ||
       ((ShellCommandLineGetFlag (ParamPackage, L"-l")) && (ShellCommandLineGetFlag (ParamPackage, L"-?"))))
   {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_CONFLICT_OPTIONS), gShellNetwork2HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_CONFLICT_OPTIONS), gShellNetwork2HiiHandle);
     ShellStatus = SHELL_INVALID_PARAMETER;
     goto ON_EXIT;
   }
@@ -1840,7 +1840,7 @@ ShellCommandRunIfconfig6 (
     if (ValueStr != NULL) {
       Str = AllocateCopyPool (StrSize (ValueStr), ValueStr);
       if (Str == NULL) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellNetwork2HiiHandle, L"ifconfig6");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellNetwork2HiiHandle, L"ifconfig6");
         ShellStatus = SHELL_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
@@ -1858,7 +1858,7 @@ ShellCommandRunIfconfig6 (
     if (ValueStr != NULL) {
       Str = AllocateCopyPool (StrSize (ValueStr), ValueStr);
       if (Str == NULL) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellNetwork2HiiHandle, L"ifconfig6");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellNetwork2HiiHandle, L"ifconfig6");
         ShellStatus = SHELL_OUT_OF_RESOURCES;
         goto ON_EXIT;
       }
@@ -1873,7 +1873,7 @@ ShellCommandRunIfconfig6 (
   if (ShellCommandLineGetFlag (ParamPackage, L"-s")) {
     ValueStr = ShellCommandLineGetValue (ParamPackage, L"-s");
     if (ValueStr == NULL) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_LACK_INTERFACE), gShellNetwork2HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_LACK_INTERFACE), gShellNetwork2HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto ON_EXIT;
     }
@@ -1883,7 +1883,7 @@ ShellCommandRunIfconfig6 (
     //
     ArgList = IfConfig6SplitStrToList (ValueStr, L' ');
     if (ArgList == NULL) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellNetwork2HiiHandle, L"ifconfig6");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellNetwork2HiiHandle, L"ifconfig6");
       ShellStatus = SHELL_OUT_OF_RESOURCES;
       goto ON_EXIT;
     }
@@ -1894,7 +1894,7 @@ ShellCommandRunIfconfig6 (
     Private->VarArg = ArgList->Next;
 
     if ((Private->IfName == NULL) || (Private->VarArg == NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_ERR_LACK_COMMAND), gShellNetwork2HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_IFCONFIG6_ERR_LACK_COMMAND), gShellNetwork2HiiHandle);
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto ON_EXIT;
     }

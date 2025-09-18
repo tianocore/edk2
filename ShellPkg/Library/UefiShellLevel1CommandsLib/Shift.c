@@ -30,7 +30,7 @@ ShellCommandRunShift (
   ASSERT_EFI_ERROR (Status);
 
   if (!gEfiShellProtocol->BatchIsActive ()) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_NO_SCRIPT), gShellLevel1HiiHandle, L"shift");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_NO_SCRIPT), gShellLevel1HiiHandle, L"shift");
     return (SHELL_UNSUPPORTED);
   }
 
@@ -41,7 +41,7 @@ ShellCommandRunShift (
   }
 
   if (CurrentScriptFile->Argc < 2) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"shift");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"shift");
     return (SHELL_UNSUPPORTED);
   }
 

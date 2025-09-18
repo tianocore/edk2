@@ -179,7 +179,7 @@ ShellCommandRunDevTree (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"devtree", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"devtree", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -187,7 +187,7 @@ ShellCommandRunDevTree (
     }
   } else {
     if (ShellCommandLineGetCount (Package) > 2) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"devtree");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"devtree");
       ShellCommandLineFreeVarList (Package);
       return (SHELL_INVALID_PARAMETER);
     }
@@ -196,7 +196,7 @@ ShellCommandRunDevTree (
     if (Lang != NULL) {
       Language = AllocateZeroPool (StrSize (Lang));
       if (Language == NULL) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"devtree");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"devtree");
         ShellCommandLineFreeVarList (Package);
         return (SHELL_OUT_OF_RESOURCES);
       }
@@ -208,7 +208,7 @@ ShellCommandRunDevTree (
       //      AsciiSPrint(Language, 10, "en-us");
     } else {
       ASSERT (Language == NULL);
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"devtree", L"-l");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"devtree", L"-l");
       ShellCommandLineFreeVarList (Package);
       return (SHELL_INVALID_PARAMETER);
     }
@@ -269,7 +269,7 @@ ShellCommandRunDevTree (
     } else {
       Status = ShellConvertStringToUint64 (Lang, &Intermediate, TRUE, FALSE);
       if (EFI_ERROR (Status) || (ConvertHandleIndexToHandle ((UINTN)Intermediate) == NULL)) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"devtree", Lang);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"devtree", Lang);
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
         ShellStatus = DoDevTreeForHandle (ConvertHandleIndexToHandle ((UINTN)Intermediate), Language, FlagD, 0, HiiString);
