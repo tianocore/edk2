@@ -109,7 +109,6 @@
                                                   "ConIn (%016LX) ConOut (%016LX) StdErr (%016LX)\r\n"
                                                   "Runtime Services              %016LX\r\n"
                                                   "Boot Services                 %016LX\r\n"
-                                                  "SAL System Table              %016LX\r\n"
                                                   "ACPI Table                    %016LX\r\n"
                                                   "ACPI 2.0 Table                %016LX\r\n"
                                                   "MPS Table                     %016LX\r\n"

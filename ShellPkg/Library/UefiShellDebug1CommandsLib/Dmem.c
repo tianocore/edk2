@@ -360,7 +360,6 @@ DisplaySystemTable (
 {
   UINT64        AcpiTableAddress;
   UINT64        Acpi20TableAddress;
-  UINT64        SalTableAddress;
   UINT64        SmbiosTableAddress;
   UINT64        MpsTableAddress;
   UINT64        DtbTableAddress;
@@ -382,7 +381,6 @@ DisplaySystemTable (
 
   Acpi20TableAddress             = 0;
   AcpiTableAddress               = 0;
-  SalTableAddress                = 0;
   SmbiosTableAddress             = 0;
   MpsTableAddress                = 0;
   DtbTableAddress                = 0;
@@ -493,7 +491,6 @@ DisplaySystemTable (
     (UINT64)(UINTN)gST->StdErr,
     (UINT64)(UINTN)gST->RuntimeServices,
     (UINT64)(UINTN)gST->BootServices,
-    SalTableAddress,
     AcpiTableAddress,
     Acpi20TableAddress,
     MpsTableAddress,
