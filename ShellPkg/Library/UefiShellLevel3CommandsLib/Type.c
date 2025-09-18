@@ -87,7 +87,7 @@ TypeFileByHandle (
             // print CR and LF. This is because Shell 2.0 requires carriage
             // return with line feed for displaying each new line from left.
             //
-            ShellPrintEx (-1, -1, L"\r\n");
+            ShellPrintDefaultEx (L"\r\n");
             continue;
           }
         } else {
@@ -99,7 +99,7 @@ TypeFileByHandle (
           }
         }
 
-        ShellPrintEx (-1, -1, L"%c", AsciiChar);
+        ShellPrintDefaultEx (L"%c", AsciiChar);
       }
     } else {
       if (*(UINT16 *)Buffer == gUnicodeFileTag) {
@@ -133,7 +133,7 @@ TypeFileByHandle (
             // print CR and LF. This is because Shell 2.0 requires carriage
             // return with line feed for displaying each new line from left.
             //
-            ShellPrintEx (-1, -1, L"\r\n");
+            ShellPrintDefaultEx (L"\r\n");
             continue;
           }
         } else if (Ucs2Char < 0x20) {
@@ -143,7 +143,7 @@ TypeFileByHandle (
           Ucs2Char = L'.';
         }
 
-        ShellPrintEx (-1, -1, L"%c", Ucs2Char);
+        ShellPrintDefaultEx (L"%c", Ucs2Char);
       }
     }
 
@@ -153,7 +153,7 @@ TypeFileByHandle (
   }
 
   FreePool (AllocatedBuffer);
-  ShellPrintEx (-1, -1, L"\r\n");
+  ShellPrintDefaultEx (L"\r\n");
   return (Status);
 }
 

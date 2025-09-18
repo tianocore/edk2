@@ -55,7 +55,7 @@ DisplayTheBlocks (
     OriginalBuffer = AllocateZeroPool (BufferSize + BlockIo->Media->IoAlign);
     Buffer         = ALIGN_POINTER (OriginalBuffer, BlockIo->Media->IoAlign);
   } else {
-    ShellPrintEx (-1, -1, L"  BlockSize: 0x%08x, BlockCount: 0x%08x\r\n", BlockIo->Media->BlockSize, BlockCount);
+    ShellPrintDefaultEx (L"  BlockSize: 0x%08x, BlockCount: 0x%08x\r\n", BlockIo->Media->BlockSize, BlockCount);
     OriginalBuffer = NULL;
     Buffer         = NULL;
   }

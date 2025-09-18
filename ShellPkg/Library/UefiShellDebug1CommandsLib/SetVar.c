@@ -446,10 +446,10 @@ ShellCommandRunSetVar (
         if (!EFI_ERROR (Status) && (Buffer != NULL)) {
           ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SETVAR_PRINT), gShellDebug1HiiHandle, &Guid, VariableName, Size);
           for (LoopVar = 0; LoopVar < Size; LoopVar++) {
-            ShellPrintEx (-1, -1, L"%02x ", ((UINT8 *)Buffer)[LoopVar]);
+            ShellPrintDefaultEx (L"%02x ", ((UINT8 *)Buffer)[LoopVar]);
           }
 
-          ShellPrintEx (-1, -1, L"\r\n");
+          ShellPrintDefaultEx (L"\r\n");
         } else {
           ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SETVAR_ERROR_GET), gShellDebug1HiiHandle, L"setvar", &Guid, VariableName);
           ShellStatus = SHELL_ACCESS_DENIED;
