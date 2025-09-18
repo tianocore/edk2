@@ -173,12 +173,12 @@ PrintStats (
   IN  UINTN  TotalVariablesSize
   )
 {
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_STATS_HEADER_1), mVarPolicyShellCommandHiiHandle);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_STATS_HEADER_2), mVarPolicyShellCommandHiiHandle);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_STATS_HEADER_1), mVarPolicyShellCommandHiiHandle);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_STATS_TOTAL_VARS), mVarPolicyShellCommandHiiHandle, TotalVariables);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_STATS_TOTAL_SIZE), mVarPolicyShellCommandHiiHandle, TotalVariablesSize, TotalVariablesSize);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_STATS_HEADER_1), mVarPolicyShellCommandHiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_STATS_HEADER_1), mVarPolicyShellCommandHiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_STATS_HEADER_2), mVarPolicyShellCommandHiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_STATS_HEADER_1), mVarPolicyShellCommandHiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_STATS_TOTAL_VARS), mVarPolicyShellCommandHiiHandle, TotalVariables);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_STATS_TOTAL_SIZE), mVarPolicyShellCommandHiiHandle, TotalVariablesSize, TotalVariablesSize);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_STATS_HEADER_1), mVarPolicyShellCommandHiiHandle);
 }
 
 /**
@@ -259,9 +259,9 @@ PrintNonVerboseVarInfo (
     DescriptionStr = CmdVarNamespace->Description;
   }
 
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_VAR_TYPE), mVarPolicyShellCommandHiiHandle, DescriptionStr);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_VAR_NAME), mVarPolicyShellCommandHiiHandle, VariableName);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_VAR_SIZE), mVarPolicyShellCommandHiiHandle, VariableSize, VariableSize);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_VAR_TYPE), mVarPolicyShellCommandHiiHandle, DescriptionStr);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_VAR_NAME), mVarPolicyShellCommandHiiHandle, VariableName);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_VAR_SIZE), mVarPolicyShellCommandHiiHandle, VariableSize, VariableSize);
 
   AttributesStr = AllocatePages (1);
   if (AttributesStr == NULL) {
@@ -272,10 +272,7 @@ PrintNonVerboseVarInfo (
   ZeroMem ((VOID *)AttributesStr, EFI_PAGES_TO_SIZE (1));
   Status = GetAttributesString (VariableAttributes, EFI_PAGES_TO_SIZE (1), AttributesStr);
   if (Status == EFI_SUCCESS) {
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_VAR_POL_VAR_ATTR),
       mVarPolicyShellCommandHiiHandle,
       AttributesStr
@@ -354,13 +351,13 @@ PrintVariablePolicyInfo (
 
   if ((VariableName == NULL) || (VendorGuid == NULL)) {
     ASSERT ((VariableName != NULL) && (VendorGuid != NULL));
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_INT_ERR), mVarPolicyShellCommandHiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_INT_ERR), mVarPolicyShellCommandHiiHandle);
     return FALSE;
   }
 
   Status = gBS->LocateProtocol (&gEdkiiVariablePolicyProtocolGuid, NULL, (VOID **)&VariablePolicy);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_NO_PROT), mVarPolicyShellCommandHiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_NO_PROT), mVarPolicyShellCommandHiiHandle);
     return FALSE;
   }
 
@@ -382,41 +379,41 @@ PrintVariablePolicyInfo (
                                                 VariablePolicyVariableName
                                                 );
   if (Status == EFI_NOT_READY) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_NOT_INIT), mVarPolicyShellCommandHiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_NOT_INIT), mVarPolicyShellCommandHiiHandle);
   } else if (Status == EFI_NOT_FOUND) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_NOT_FOUND), mVarPolicyShellCommandHiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_NOT_FOUND), mVarPolicyShellCommandHiiHandle);
   } else if (EFI_ERROR (Status)) {
     // A different error return code is not expected
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_UNEXP_ERR), mVarPolicyShellCommandHiiHandle, Status);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_UNEXP_ERR), mVarPolicyShellCommandHiiHandle, Status);
   } else {
     PolicyHeaderPresent = TRUE;
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_HEADER_1), mVarPolicyShellCommandHiiHandle);
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_HEADER_2), mVarPolicyShellCommandHiiHandle);
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_HEADER_1), mVarPolicyShellCommandHiiHandle);
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_VERSION), mVarPolicyShellCommandHiiHandle, VariablePolicyEntry.Version);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_HEADER_1), mVarPolicyShellCommandHiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_HEADER_2), mVarPolicyShellCommandHiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_HEADER_1), mVarPolicyShellCommandHiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_VERSION), mVarPolicyShellCommandHiiHandle, VariablePolicyEntry.Version);
 
     if ((ReturnedVariableNameSize > 0) && (VariablePolicyVariableName[0] != CHAR_NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_VARIABLE), mVarPolicyShellCommandHiiHandle, VariablePolicyVariableName);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_VARIABLE), mVarPolicyShellCommandHiiHandle, VariablePolicyVariableName);
     } else {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_VARIABLE), mVarPolicyShellCommandHiiHandle, L"<Entire Namespace>");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_VARIABLE), mVarPolicyShellCommandHiiHandle, L"<Entire Namespace>");
     }
 
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_NAMESPACE), mVarPolicyShellCommandHiiHandle, &VariablePolicyEntry.Namespace);
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_MIN_SIZE), mVarPolicyShellCommandHiiHandle, VariablePolicyEntry.MinSize);
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_MAX_SIZE), mVarPolicyShellCommandHiiHandle, VariablePolicyEntry.MaxSize);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_NAMESPACE), mVarPolicyShellCommandHiiHandle, &VariablePolicyEntry.Namespace);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_MIN_SIZE), mVarPolicyShellCommandHiiHandle, VariablePolicyEntry.MinSize);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_MAX_SIZE), mVarPolicyShellCommandHiiHandle, VariablePolicyEntry.MaxSize);
 
     switch (VariablePolicyEntry.LockPolicyType) {
       case VARIABLE_POLICY_TYPE_NO_LOCK:
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_LOCK_TYPE), mVarPolicyShellCommandHiiHandle, L"No Lock");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_LOCK_TYPE), mVarPolicyShellCommandHiiHandle, L"No Lock");
         break;
       case VARIABLE_POLICY_TYPE_LOCK_NOW:
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_LOCK_TYPE), mVarPolicyShellCommandHiiHandle, L"Lock Now");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_LOCK_TYPE), mVarPolicyShellCommandHiiHandle, L"Lock Now");
         break;
       case VARIABLE_POLICY_TYPE_LOCK_ON_CREATE:
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_LOCK_TYPE), mVarPolicyShellCommandHiiHandle, L"On Create");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_LOCK_TYPE), mVarPolicyShellCommandHiiHandle, L"On Create");
         break;
       case VARIABLE_POLICY_TYPE_LOCK_ON_VAR_STATE:
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_LOCK_TYPE), mVarPolicyShellCommandHiiHandle, L"On Variable State");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_LOCK_TYPE), mVarPolicyShellCommandHiiHandle, L"On Variable State");
 
         ZeroMem (VariablePolicyVariableName, VariablePolicyVariableNameBufferSize);
         ReturnedVariableNameSize = VariablePolicyVariableNameBufferSize;
@@ -428,21 +425,21 @@ PrintVariablePolicyInfo (
                                                       VariablePolicyVariableName
                                                       );
         if (EFI_ERROR (Status)) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_UNEXP_ERR), mVarPolicyShellCommandHiiHandle, Status);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_UNEXP_ERR), mVarPolicyShellCommandHiiHandle, Status);
           goto Done;
         } else {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_STATE_NS), mVarPolicyShellCommandHiiHandle, &LockOnVarStatePolicy.Namespace);
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_STATE_VAL), mVarPolicyShellCommandHiiHandle, LockOnVarStatePolicy.Value);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_STATE_NS), mVarPolicyShellCommandHiiHandle, &LockOnVarStatePolicy.Namespace);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_STATE_VAL), mVarPolicyShellCommandHiiHandle, LockOnVarStatePolicy.Value);
           if ((ReturnedVariableNameSize > 0) && (VariablePolicyVariableName[0] != CHAR_NULL)) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_STATE_NAME), mVarPolicyShellCommandHiiHandle, VariablePolicyVariableName);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_STATE_NAME), mVarPolicyShellCommandHiiHandle, VariablePolicyVariableName);
           } else {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_STATE_NAME), mVarPolicyShellCommandHiiHandle, L"<Entire Namespace>");
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_STATE_NAME), mVarPolicyShellCommandHiiHandle, L"<Entire Namespace>");
           }
         }
 
         break;
       default:
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_LOCK_TYPE), mVarPolicyShellCommandHiiHandle, L"Unknown");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_LOCK_TYPE), mVarPolicyShellCommandHiiHandle, L"Unknown");
         break;
     }
 
@@ -456,17 +453,11 @@ PrintVariablePolicyInfo (
     ZeroMem (VariableAttributesStr, EFI_PAGES_TO_SIZE (1));
     Status = GetAttributesString (VariablePolicyEntry.AttributesMustHave, EFI_PAGES_TO_SIZE (1), VariableAttributesStr);
     if (Status == EFI_SUCCESS) {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_VAR_POL_POLICY_ATTR_MUST),
         mVarPolicyShellCommandHiiHandle
         );
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_VAR_POL_POLICY_ATTR_GEN),
         mVarPolicyShellCommandHiiHandle,
         VariableAttributesStr
@@ -476,17 +467,11 @@ PrintVariablePolicyInfo (
     ZeroMem (VariableAttributesStr, EFI_PAGES_TO_SIZE (1));
     Status = GetAttributesString (VariablePolicyEntry.AttributesCantHave, EFI_PAGES_TO_SIZE (1), VariableAttributesStr);
     if (Status == EFI_SUCCESS) {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_VAR_POL_POLICY_ATTR_NOT),
         mVarPolicyShellCommandHiiHandle
         );
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_VAR_POL_POLICY_ATTR_GEN),
         mVarPolicyShellCommandHiiHandle,
         VariableAttributesStr
@@ -496,7 +481,7 @@ PrintVariablePolicyInfo (
 
 Done:
   if (PolicyHeaderPresent) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_VAR_POL_POLICY_HEADER_1), mVarPolicyShellCommandHiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_VAR_POL_POLICY_HEADER_1), mVarPolicyShellCommandHiiHandle);
   }
 
   if (VariableAttributesStr != NULL) {
@@ -507,7 +492,7 @@ Done:
     FreePages (VariablePolicyVariableName, 1);
   }
 
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_LINE_BREAK), mVarPolicyShellCommandHiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_LINE_BREAK), mVarPolicyShellCommandHiiHandle);
 
   return Status == EFI_SUCCESS;
 }
@@ -674,7 +659,7 @@ DumpVars (
       if (!Stats || Verbose) {
         Status = PrintNonVerboseVarInfo (VariableName, &VariableGuid, DataSize, Attributes);
         if (!EFI_ERROR (Status)) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_LINE_BREAK), mVarPolicyShellCommandHiiHandle);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_LINE_BREAK), mVarPolicyShellCommandHiiHandle);
         }
       }
 
@@ -721,7 +706,7 @@ DumpVars (
   } while (!EFI_ERROR (GetNextVariableStatus));
 
   if (TotalVariables == 0) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VARS), mVarPolicyShellCommandHiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VARS), mVarPolicyShellCommandHiiHandle);
   } else {
     if (Verbose || Stats) {
       PrintStats (TotalVariables, TotalDataSize);
@@ -730,22 +715,16 @@ DumpVars (
     if (Verbose || PolicyCheck) {
       ASSERT (TotalVariablesWithPolicy <= TotalVariables);
 
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_LINE_BREAK), mVarPolicyShellCommandHiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_LINE_BREAK), mVarPolicyShellCommandHiiHandle);
       if (TotalVariablesWithPolicy == TotalVariables) {
-        ShellPrintHiiEx (
-          -1,
-          -1,
-          NULL,
+        ShellPrintHiiDefaultEx (
           STRING_TOKEN (STR_VAR_POL_POLICY_STATS_PASS),
           mVarPolicyShellCommandHiiHandle,
           TotalVariablesWithPolicy,
           TotalVariables
           );
       } else {
-        ShellPrintHiiEx (
-          -1,
-          -1,
-          NULL,
+        ShellPrintHiiDefaultEx (
           STRING_TOKEN (STR_VAR_POL_POLICY_STATS_FAIL),
           mVarPolicyShellCommandHiiHandle,
           TotalVariablesWithPolicy,
@@ -753,7 +732,7 @@ DumpVars (
           );
       }
 
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_LINE_BREAK), mVarPolicyShellCommandHiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_LINE_BREAK), mVarPolicyShellCommandHiiHandle);
     }
   }
 
@@ -816,7 +795,7 @@ RunVarPolicy (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), mVarPolicyShellCommandHiiHandle, VAR_POLICY_COMMAND_NAME, ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), mVarPolicyShellCommandHiiHandle, VAR_POLICY_COMMAND_NAME, ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
@@ -825,7 +804,7 @@ RunVarPolicy (
     }
   } else {
     if (ShellCommandLineGetCount (Package) > 1) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), mVarPolicyShellCommandHiiHandle, VAR_POLICY_COMMAND_NAME);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), mVarPolicyShellCommandHiiHandle, VAR_POLICY_COMMAND_NAME);
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     }

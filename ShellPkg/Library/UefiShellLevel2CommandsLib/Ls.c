@@ -120,10 +120,7 @@ PrintSfoVolumeInfoTableEntry (
     ASSERT_EFI_ERROR (Status);
   }
 
-  ShellPrintHiiEx (
-    -1,
-    -1,
-    NULL,
+  ShellPrintHiiDefaultEx (
     STRING_TOKEN (STR_GEN_SFO_HEADER),
     gShellLevel2HiiHandle,
     L"ls"
@@ -216,10 +213,7 @@ PrintFileInformation (
     // print this one out...
     // first print the universal start, next print the type specific name format, last print the CRLF
     //
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_LS_LINE_START_ALL),
       gShellLevel2HiiHandle,
       &TheNode->Info->ModificationTime,
@@ -229,10 +223,7 @@ PrintFileInformation (
       );
     if (TheNode->Info->Attribute & EFI_FILE_DIRECTORY) {
       (*Dirs)++;
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_LS_LINE_END_DIR),
         gShellLevel2HiiHandle,
         TheNode->FileName
@@ -244,19 +235,13 @@ PrintFileInformation (
          || (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)L".efi", (CHAR16 *)&(TheNode->FileName[StrLen (TheNode->FileName) - 4])) == 0)
             )
       {
-        ShellPrintHiiEx (
-          -1,
-          -1,
-          NULL,
+        ShellPrintHiiDefaultEx (
           STRING_TOKEN (STR_LS_LINE_END_EXE),
           gShellLevel2HiiHandle,
           TheNode->FileName
           );
       } else {
-        ShellPrintHiiEx (
-          -1,
-          -1,
-          NULL,
+        ShellPrintHiiDefaultEx (
           STRING_TOKEN (STR_LS_LINE_END_FILE),
           gShellLevel2HiiHandle,
           TheNode->FileName
@@ -317,10 +302,7 @@ PrintNonSfoFooter (
   //
   // print footer
   //
-  ShellPrintHiiEx (
-    -1,
-    -1,
-    NULL,
+  ShellPrintHiiDefaultEx (
     STRING_TOKEN (STR_LS_FOOTER_LINE),
     gShellLevel2HiiHandle,
     Files,
@@ -769,7 +751,7 @@ ShellCommandRunLs (
   Status = ShellCommandLineParse (LsParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"ls", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"ls", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -784,7 +766,7 @@ ShellCommandRunLs (
     }
 
     if (ShellCommandLineGetCount (Package) > 2) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"ls");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"ls");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       //
@@ -823,7 +805,7 @@ ShellCommandRunLs (
               Count++;
               continue;
             default:
-              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ATTRIBUTE), gShellLevel2HiiHandle, L"ls", ShellCommandLineGetValue (Package, L"-a"));
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ATTRIBUTE), gShellLevel2HiiHandle, L"ls", ShellCommandLineGetValue (Package, L"-a"));
               ShellStatus = SHELL_INVALID_PARAMETER;
               break;
           } // switch
@@ -846,7 +828,7 @@ ShellCommandRunLs (
           CurDir = gEfiShellProtocol->GetCurDir (NULL);
           if (CurDir == NULL) {
             ShellStatus = SHELL_NOT_FOUND;
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"ls");
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"ls");
           }
 
           ListUnfiltered = TRUE;
@@ -865,7 +847,7 @@ ShellCommandRunLs (
             // If we got something and it doesnt have a fully qualified path, then we needed to have a CWD.
             //
             ShellStatus = SHELL_NOT_FOUND;
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"ls");
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"ls");
           } else {
             //
             // We got a valid fully qualified path or we have a CWD
@@ -913,7 +895,7 @@ ShellCommandRunLs (
 
         Status = gRT->GetTime (&TheTime, NULL);
         if (EFI_ERROR (Status)) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"ls", L"gRT->GetTime", Status);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"ls", L"gRT->GetTime", Status);
           TheTime.TimeZone = EFI_UNSPECIFIED_TIMEZONE;
         }
 
@@ -930,15 +912,15 @@ ShellCommandRunLs (
                           ListUnfiltered
                           );
           if (ShellStatus == SHELL_NOT_FOUND) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_LS_FILE_NOT_FOUND), gShellLevel2HiiHandle, L"ls", FullPath);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_LS_FILE_NOT_FOUND), gShellLevel2HiiHandle, L"ls", FullPath);
           } else if (ShellStatus == SHELL_INVALID_PARAMETER) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"ls", FullPath);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"ls", FullPath);
           } else if (ShellStatus == SHELL_ABORTED) {
             //
             // Ignore aborting.
             //
           } else if (ShellStatus != SHELL_SUCCESS) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"ls", FullPath);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"ls", FullPath);
           }
         }
       }

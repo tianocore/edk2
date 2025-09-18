@@ -102,7 +102,7 @@ CheckAndSetDate (
 
   Status = gRT->GetTime (&TheTime, NULL);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"date", L"gRT->GetTime", Status);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"date", L"gRT->GetTime", Status);
     return (SHELL_DEVICE_ERROR);
   }
 
@@ -201,7 +201,7 @@ ShellCommandRunDate (
   Status = ShellCommandLineParse (SfoParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"date", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"date", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -214,7 +214,7 @@ ShellCommandRunDate (
     if (ShellCommandLineGetFlag (Package, L"-?")) {
       ASSERT (FALSE);
     } else if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"date");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"date");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       //
@@ -227,7 +227,7 @@ ShellCommandRunDate (
         //
         Status = gRT->GetTime (&TheTime, NULL);
         if (EFI_ERROR (Status)) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"date", L"gRT->GetTime", Status);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"date", L"gRT->GetTime", Status);
           return (SHELL_DEVICE_ERROR);
         }
 
@@ -240,14 +240,14 @@ ShellCommandRunDate (
           // ShellCommand,"date"
           // Date,"DD","MM","YYYY"
           //
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_SFO_HEADER), gShellLevel2HiiHandle, L"date");
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DATE_SFO_FORMAT), gShellLevel2HiiHandle, TheTime.Day, TheTime.Month, TheTime.Year);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_SFO_HEADER), gShellLevel2HiiHandle, L"date");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DATE_SFO_FORMAT), gShellLevel2HiiHandle, TheTime.Day, TheTime.Month, TheTime.Year);
         } else {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DATE_FORMAT), gShellLevel2HiiHandle, TheTime.Month, TheTime.Day, TheTime.Year);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DATE_FORMAT), gShellLevel2HiiHandle, TheTime.Month, TheTime.Day, TheTime.Year);
         }
       } else {
         if (PcdGet8 (PcdShellSupportLevel) == 2) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"date");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"date");
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
           //
@@ -261,7 +261,7 @@ ShellCommandRunDate (
           }
 
           if (ShellStatus != SHELL_SUCCESS) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"date", Param1);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"date", Param1);
             ShellStatus = SHELL_INVALID_PARAMETER;
           }
         }
@@ -329,7 +329,7 @@ CheckAndSetTime (
 
   Status = gRT->GetTime (&TheTime, NULL);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"time", L"gRT->GetTime", Status);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"time", L"gRT->GetTime", Status);
     return (SHELL_DEVICE_ERROR);
   }
 
@@ -445,7 +445,7 @@ ShellCommandRunTime (
 
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"time", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"time", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -457,14 +457,14 @@ ShellCommandRunTime (
     //
     Status = gRT->GetTime (&TheTime, NULL);
     if (EFI_ERROR (Status)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"time", L"gRT->GetTime", Status);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"time", L"gRT->GetTime", Status);
       return (SHELL_DEVICE_ERROR);
     }
 
     if (ShellCommandLineGetFlag (Package, L"-?")) {
       ASSERT (FALSE);
     } else if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"time");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"time");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       //
@@ -484,10 +484,7 @@ ShellCommandRunTime (
         }
 
         if (TheTime.TimeZone != EFI_UNSPECIFIED_TIMEZONE) {
-          ShellPrintHiiEx (
-            -1,
-            -1,
-            NULL,
+          ShellPrintHiiDefaultEx (
             STRING_TOKEN (STR_TIME_FORMAT),
             gShellLevel2HiiHandle,
             TheTime.Hour,
@@ -498,10 +495,7 @@ ShellCommandRunTime (
             TzMinutes
             );
         } else {
-          ShellPrintHiiEx (
-            -1,
-            -1,
-            NULL,
+          ShellPrintHiiDefaultEx (
             STRING_TOKEN (STR_TIME_FORMAT_LOCAL),
             gShellLevel2HiiHandle,
             TheTime.Hour,
@@ -510,13 +504,10 @@ ShellCommandRunTime (
             );
         }
 
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_CRLF), gShellLevel2HiiHandle);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_CRLF), gShellLevel2HiiHandle);
       } else if (ShellCommandLineGetFlag (Package, L"-d") && (ShellCommandLineGetValue (Package, L"-d") == NULL)) {
         if (TheTime.TimeZone == EFI_UNSPECIFIED_TIMEZONE) {
-          ShellPrintHiiEx (
-            -1,
-            -1,
-            NULL,
+          ShellPrintHiiDefaultEx (
             STRING_TOKEN (STR_TIME_FORMAT_LOCAL),
             gShellLevel2HiiHandle,
             TheTime.Hour,
@@ -525,10 +516,7 @@ ShellCommandRunTime (
             );
         } else {
           TzMinutes = (ABS (TheTime.TimeZone)) % 60;
-          ShellPrintHiiEx (
-            -1,
-            -1,
-            NULL,
+          ShellPrintHiiDefaultEx (
             STRING_TOKEN (STR_TIME_FORMAT),
             gShellLevel2HiiHandle,
             TheTime.Hour,
@@ -542,23 +530,23 @@ ShellCommandRunTime (
 
         switch (TheTime.Daylight) {
           case 0:
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_TIME_DST0), gShellLevel2HiiHandle);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIME_DST0), gShellLevel2HiiHandle);
             break;
           case EFI_TIME_ADJUST_DAYLIGHT:
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_TIME_DST1), gShellLevel2HiiHandle);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIME_DST1), gShellLevel2HiiHandle);
             break;
           case EFI_TIME_IN_DAYLIGHT:
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_TIME_DST2), gShellLevel2HiiHandle);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIME_DST2), gShellLevel2HiiHandle);
             break;
           case EFI_TIME_IN_DAYLIGHT|EFI_TIME_ADJUST_DAYLIGHT:
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_TIME_DST3), gShellLevel2HiiHandle);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIME_DST3), gShellLevel2HiiHandle);
             break;
           default:
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_UEFI_FUNC_ERROR), gShellLevel2HiiHandle, L"time", L"gRT->GetTime", L"TheTime.Daylight", TheTime.Daylight);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_ERROR), gShellLevel2HiiHandle, L"time", L"gRT->GetTime", L"TheTime.Daylight", TheTime.Daylight);
         }
       } else {
         if (PcdGet8 (PcdShellSupportLevel) == 2) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"time");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"time");
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
           //
@@ -594,7 +582,7 @@ ShellCommandRunTime (
             }
 
             if (!((Tz >= -1440) && (Tz <= 1440)) && (Tz != EFI_UNSPECIFIED_TIMEZONE)) {
-              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"time", TempLocation, L"-tz");
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"time", TempLocation, L"-tz");
               ShellStatus = SHELL_INVALID_PARAMETER;
             }
           } else {
@@ -617,7 +605,7 @@ ShellCommandRunTime (
             }
 
             if ((Daylight != 0) && (Daylight != 1) && (Daylight != 3)) {
-              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"time", TempLocation, L"-d");
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"time", TempLocation, L"-d");
               ShellStatus = SHELL_INVALID_PARAMETER;
             }
           } else {
@@ -630,7 +618,7 @@ ShellCommandRunTime (
           if (ShellStatus == SHELL_SUCCESS) {
             ShellStatus = CheckAndSetTime (ShellCommandLineGetRawValue (Package, 1), Tz, Daylight);
             if (ShellStatus != SHELL_SUCCESS) {
-              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"time", ShellCommandLineGetRawValue (Package, 1));
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"time", ShellCommandLineGetRawValue (Package, 1));
               ShellStatus = SHELL_INVALID_PARAMETER;
             }
           }
@@ -735,7 +723,7 @@ CheckAndSetTimeZone (
   if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)TimeZoneString, L"_local") == 0) {
     Status = gRT->GetTime (&TheTime, NULL);
     if (EFI_ERROR (Status)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"gRT->GetTime", Status);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"gRT->GetTime", Status);
       return (SHELL_DEVICE_ERROR);
     }
 
@@ -754,7 +742,7 @@ CheckAndSetTimeZone (
 
   Status = gRT->GetTime (&TheTime, NULL);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"timezone", L"gRT->GetTime", Status);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"timezone", L"gRT->GetTime", Status);
     return (SHELL_DEVICE_ERROR);
   }
 
@@ -856,7 +844,7 @@ ShellCommandRunTimeZone (
 
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"timezone", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"timezone", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -867,18 +855,18 @@ ShellCommandRunTimeZone (
     // check for "-?"
     //
     if (ShellCommandLineGetCount (Package) > 1) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"timezone");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"timezone");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetFlag (Package, L"-?")) {
       ASSERT (FALSE);
     } else if (ShellCommandLineGetFlag (Package, L"-s")) {
       if ((ShellCommandLineGetFlag (Package, L"-l")) || (ShellCommandLineGetFlag (Package, L"-f"))) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"timezone", L"-l or -f");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"timezone", L"-l or -f");
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
         ASSERT (PcdGet8 (PcdShellSupportLevel) == 3);
         if (ShellCommandLineGetValue (Package, L"-s") == NULL) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellLevel2HiiHandle, L"timezone", L"-s");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellLevel2HiiHandle, L"timezone", L"-s");
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
           //
@@ -886,7 +874,7 @@ ShellCommandRunTimeZone (
           //
           ShellStatus = CheckAndSetTimeZone (ShellCommandLineGetValue (Package, L"-s"));
           if (ShellStatus != SHELL_SUCCESS) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"timezone", ShellCommandLineGetValue (Package, L"-s"));
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"timezone", ShellCommandLineGetValue (Package, L"-s"));
             ShellStatus = SHELL_INVALID_PARAMETER;
           }
         }
@@ -900,7 +888,7 @@ ShellCommandRunTimeZone (
             ; LoopVar++
             )
       {
-        ShellPrintHiiEx (-1, -1, NULL, TimeZoneList[LoopVar].StringId, gShellLevel2HiiHandle);
+        ShellPrintHiiDefaultEx (TimeZoneList[LoopVar].StringId, gShellLevel2HiiHandle);
       }
     } else {
       //
@@ -908,7 +896,7 @@ ShellCommandRunTimeZone (
       //
       Status = gRT->GetTime (&TheTime, NULL);
       if (EFI_ERROR (Status)) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"timezone", L"gRT->GetTime", Status);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"timezone", L"gRT->GetTime", Status);
         return (SHELL_DEVICE_ERROR);
       }
 
@@ -924,17 +912,14 @@ ShellCommandRunTimeZone (
               //
               //  Print all info about current time zone
               //
-              ShellPrintHiiEx (-1, -1, NULL, TimeZoneList[LoopVar].StringId, gShellLevel2HiiHandle);
+              ShellPrintHiiDefaultEx (TimeZoneList[LoopVar].StringId, gShellLevel2HiiHandle);
             } else {
               //
               // Print basic info only
               //
               TzMinutes = (ABS (TheTime.TimeZone)) % 60;
 
-              ShellPrintHiiEx (
-                -1,
-                -1,
-                NULL,
+              ShellPrintHiiDefaultEx (
                 STRING_TOKEN (STR_TIMEZONE_SIMPLE),
                 gShellLevel2HiiHandle,
                 (TheTime.TimeZone > 0 ? L"-" : L"+"),
@@ -954,10 +939,7 @@ ShellCommandRunTimeZone (
           //
           TzMinutes = (ABS (TheTime.TimeZone)) % 60;
 
-          ShellPrintHiiEx (
-            -1,
-            -1,
-            NULL,
+          ShellPrintHiiDefaultEx (
             STRING_TOKEN (STR_TIMEZONE_SIMPLE),
             gShellLevel2HiiHandle,
             (TheTime.TimeZone > 0 ? L"-" : L"+"),
@@ -966,7 +948,7 @@ ShellCommandRunTimeZone (
             );
 
           if (ShellCommandLineGetFlag (Package, L"-f")) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_TIMEZONE_NI), gShellLevel2HiiHandle);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIMEZONE_NI), gShellLevel2HiiHandle);
           }
         }
       } else {
@@ -983,7 +965,7 @@ ShellCommandRunTimeZone (
               //
               //  Print all info about current time zone
               //
-              ShellPrintHiiEx (-1, -1, NULL, TimeZoneList[LoopVar].StringId, gShellLevel2HiiHandle);
+              ShellPrintHiiDefaultEx (TimeZoneList[LoopVar].StringId, gShellLevel2HiiHandle);
               break;
             }
           }
@@ -991,7 +973,7 @@ ShellCommandRunTimeZone (
           //
           // Print basic info only
           //
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_TIMEZONE_SIMPLE_LOCAL), gShellLevel2HiiHandle);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIMEZONE_SIMPLE_LOCAL), gShellLevel2HiiHandle);
         }
       }
     }

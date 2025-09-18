@@ -213,7 +213,7 @@ ShellCommandRunCd (
   Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"cd", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"cd", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -227,7 +227,7 @@ ShellCommandRunCd (
   if (ShellCommandLineGetFlag (Package, L"-?")) {
     ASSERT (FALSE);
   } else if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"cd");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"cd");
     ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
     //
@@ -238,7 +238,7 @@ ShellCommandRunCd (
     //
     Cwd = ShellGetCurrentDir (NULL);
     if (Cwd == NULL) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"cd");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"cd");
       ShellStatus = SHELL_NOT_FOUND;
     } else {
       Param1 = ShellCommandLineGetRawValue (Package, 1);
@@ -246,7 +246,7 @@ ShellCommandRunCd (
         //
         // display the current directory
         //
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_CD_PRINT), gShellLevel2HiiHandle, Cwd);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_CD_PRINT), gShellLevel2HiiHandle, Cwd);
       } else {
         Param1Copy = CatSPrint (NULL, L"%s", Param1, NULL);
         for (Walker = Param1Copy; Walker != NULL && *Walker != CHAR_NULL; Walker++) {
@@ -261,7 +261,7 @@ ShellCommandRunCd (
           //
           // Can't use cd command to change filesystem.
           //
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle, L"cd");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle, L"cd");
           Status = EFI_NOT_FOUND;
         }
 
@@ -314,12 +314,12 @@ ShellCommandRunCd (
 
         if (!EFI_ERROR (Status) && (Drive != NULL) && (Path != NULL)) {
           if (EFI_ERROR (ShellIsDirectory (Param1Copy))) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_DIR), gShellLevel2HiiHandle, L"cd", Param1Copy);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NOT_DIR), gShellLevel2HiiHandle, L"cd", Param1Copy);
             ShellStatus = SHELL_NOT_FOUND;
           } else {
             Status = gEfiShellProtocol->SetCurDir (Drive, Path + 1);
             if (EFI_ERROR (Status)) {
-              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, L"cd", Param1Copy);
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_DIR_NF), gShellLevel2HiiHandle, L"cd", Param1Copy);
               ShellStatus = SHELL_NOT_FOUND;
             }
           }

@@ -54,7 +54,7 @@ ShellCommandRunReset (
   Status = ShellCommandLineParse (ResetParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"reset", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"reset", ProblemParam);
       FreePool (ProblemParam);
       return (SHELL_INVALID_PARAMETER);
     } else {
@@ -67,7 +67,7 @@ ShellCommandRunReset (
     if (ShellCommandLineGetFlag (Package, L"-?")) {
       ASSERT (FALSE);
     } else if (ShellCommandLineGetRawValue (Package, 1) != NULL) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"reset");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"reset");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       if (ShellCommandLineGetFlag (Package, L"-fwui")) {
@@ -121,7 +121,7 @@ ShellCommandRunReset (
       //
       if (ShellCommandLineGetFlag (Package, L"-w")) {
         if (ShellCommandLineGetFlag (Package, L"-s") || ShellCommandLineGetFlag (Package, L"-c")) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"reset");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"reset");
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
           String = ShellCommandLineGetValue (Package, L"-w");
@@ -133,7 +133,7 @@ ShellCommandRunReset (
         }
       } else if (ShellCommandLineGetFlag (Package, L"-s")) {
         if (ShellCommandLineGetFlag (Package, L"-c")) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"reset");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"reset");
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
           String = ShellCommandLineGetValue (Package, L"-s");

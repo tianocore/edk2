@@ -44,7 +44,7 @@ DisplaySettings (
 
   Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiSerialIoProtocolGuid, NULL, &NoHandles, &Handles);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SERMODE_NO_FOUND), gShellDebug1HiiHandle, L"sermode");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_NO_FOUND), gShellDebug1HiiHandle, L"sermode");
     return SHELL_INVALID_PARAMETER;
   }
 
@@ -119,10 +119,7 @@ DisplaySettings (
           StopBits = L"Unknown";
       }
 
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_SERMODE_DISPLAY),
         gShellDebug1HiiHandle,
         ConvertHandleToHandleIndex (Handles[Index]),
@@ -133,7 +130,7 @@ DisplaySettings (
         StopBits
         );
     } else {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SERMODE_NO_FOUND), gShellDebug1HiiHandle, L"sermode");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_NO_FOUND), gShellDebug1HiiHandle, L"sermode");
       ShellStatus = SHELL_NOT_FOUND;
       break;
     }
@@ -145,7 +142,7 @@ DisplaySettings (
 
   if (Index == NoHandles) {
     if (((NoHandles != 0) && HandleValid) || (0 == NoHandles)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SERMODE_NOT_FOUND), gShellDebug1HiiHandle, L"sermode");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_NOT_FOUND), gShellDebug1HiiHandle, L"sermode");
       ShellStatus = SHELL_NOT_FOUND;
     }
   }
@@ -194,7 +191,7 @@ ShellCommandRunSerMode (
   Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"sermode", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"sermode", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -202,10 +199,10 @@ ShellCommandRunSerMode (
     }
   } else {
     if ((ShellCommandLineGetCount (Package) < 6) && (ShellCommandLineGetCount (Package) > 2)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"sermode");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"sermode");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetCount (Package) > 6) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"sermode");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"sermode");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       Temp = ShellCommandLineGetRawValue (Package, 1);
@@ -232,7 +229,7 @@ ShellCommandRunSerMode (
 
       Temp = ShellCommandLineGetRawValue (Package, 3);
       if ((Temp == NULL) || (StrLen (Temp) > 1)) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
         switch (Temp[0]) {
@@ -261,7 +258,7 @@ ShellCommandRunSerMode (
             Parity = SpaceParity;
             break;
           default:
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
             ShellStatus = SHELL_INVALID_PARAMETER;
             goto Done;
         }
@@ -283,14 +280,14 @@ ShellCommandRunSerMode (
         case 8:
           break;
         default:
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
           ShellStatus = SHELL_INVALID_PARAMETER;
           goto Done;
       }
 
       Temp = ShellCommandLineGetRawValue (Package, 5);
       if (Temp == NULL) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode");
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
@@ -314,14 +311,14 @@ ShellCommandRunSerMode (
           break;
 
         default:
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
           ShellStatus = SHELL_INVALID_PARAMETER;
           goto Done;
       }
 
       Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiSerialIoProtocolGuid, NULL, &NoHandles, &Handles);
       if (EFI_ERROR (Status)) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SERMODE_NO_FOUND), gShellDebug1HiiHandle, L"sermode");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_NO_FOUND), gShellDebug1HiiHandle, L"sermode");
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
@@ -344,17 +341,17 @@ ShellCommandRunSerMode (
                                );
           if (EFI_ERROR (Status)) {
             if (Status == EFI_INVALID_PARAMETER) {
-              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SERMODE_SET_UNSUPPORTED), gShellDebug1HiiHandle, L"sermode", ConvertHandleToHandleIndex (Handles[Index]));
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_SET_UNSUPPORTED), gShellDebug1HiiHandle, L"sermode", ConvertHandleToHandleIndex (Handles[Index]));
               ShellStatus = SHELL_UNSUPPORTED;
             } else if (Status == EFI_DEVICE_ERROR) {
-              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SERMODE_SET_DEV_ERROR), gShellDebug1HiiHandle, L"sermode", ConvertHandleToHandleIndex (Handles[Index]));
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_SET_DEV_ERROR), gShellDebug1HiiHandle, L"sermode", ConvertHandleToHandleIndex (Handles[Index]));
               ShellStatus = SHELL_ACCESS_DENIED;
             } else {
-              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SERMODE_SET_FAIL), gShellDebug1HiiHandle, L"sermode", ConvertHandleToHandleIndex (Handles[Index]));
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_SET_FAIL), gShellDebug1HiiHandle, L"sermode", ConvertHandleToHandleIndex (Handles[Index]));
               ShellStatus = SHELL_ACCESS_DENIED;
             }
           } else {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SERMODE_SET_HANDLE), gShellDebug1HiiHandle, ConvertHandleToHandleIndex (Handles[Index]));
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_SET_HANDLE), gShellDebug1HiiHandle, ConvertHandleToHandleIndex (Handles[Index]));
           }
 
           break;
@@ -364,7 +361,7 @@ ShellCommandRunSerMode (
   }
 
   if ((ShellStatus == SHELL_SUCCESS) && (Index == NoHandles)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SERMODE_BAD_HANDLE), gShellDebug1HiiHandle, L"sermode", HandleIdx);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_BAD_HANDLE), gShellDebug1HiiHandle, L"sermode", HandleIdx);
     ShellStatus = SHELL_INVALID_PARAMETER;
   }
 

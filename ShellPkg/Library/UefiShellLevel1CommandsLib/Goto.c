@@ -43,7 +43,7 @@ ShellCommandRunGoto (
   ASSERT_EFI_ERROR (Status);
 
   if (!gEfiShellProtocol->BatchIsActive ()) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_NO_SCRIPT), gShellLevel1HiiHandle, L"Goto");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_NO_SCRIPT), gShellLevel1HiiHandle, L"Goto");
     return (SHELL_UNSUPPORTED);
   }
 
@@ -53,7 +53,7 @@ ShellCommandRunGoto (
   Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel1HiiHandle, L"goto", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel1HiiHandle, L"goto", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -61,10 +61,10 @@ ShellCommandRunGoto (
     }
   } else {
     if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"goto");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"goto");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"goto");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"goto");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       Size = 0;
@@ -81,16 +81,13 @@ ShellCommandRunGoto (
       //
       if (!MoveToTag (GetNextNode, L"endfor", L"for", CompareString, ShellCommandGetCurrentScriptFile (), FALSE, FALSE, TRUE)) {
         CurrentScriptFile = ShellCommandGetCurrentScriptFile ();
-        ShellPrintHiiEx (
-          -1,
-          -1,
-          NULL,
+        ShellPrintHiiDefaultEx (
           STRING_TOKEN (STR_SYNTAX_NO_MATCHING),
           gShellLevel1HiiHandle,
           CompareString,
           L"Goto",
           CurrentScriptFile != NULL
-                        && CurrentScriptFile->CurrentCommand != NULL
+                               && CurrentScriptFile->CurrentCommand != NULL
             ? CurrentScriptFile->CurrentCommand->Line : 0
           );
         ShellStatus = SHELL_NOT_FOUND;
