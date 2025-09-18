@@ -54,36 +54,36 @@ PrintDifferentPoint (
 {
   UINTN  Index;
 
-  ShellPrintEx (-1, -1, L"%s: %s\r\n  %08x:", FileTag, FileName, Address);
+  ShellPrintDefaultEx (L"%s: %s\r\n  %08x:", FileTag, FileName, Address);
 
   //
   // Print data in hex-format.
   //
   for (Index = 0; Index < BufferSize; Index++) {
-    ShellPrintEx (-1, -1, L" %02x", Buffer[Index]);
+    ShellPrintDefaultEx (L" %02x", Buffer[Index]);
   }
 
   if (BufferSize < DifferentBytes) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_COMP_END_OF_FILE), gShellDebug1HiiHandle);
   }
 
-  ShellPrintEx (-1, -1, L"    *");
+  ShellPrintDefaultEx (L"    *");
 
   //
   // Print data in char-format.
   //
   for (Index = 0; Index < BufferSize; Index++) {
     if ((Buffer[Index] >= 0x20) && (Buffer[Index] <= 0x7E)) {
-      ShellPrintEx (-1, -1, L"%c", Buffer[Index]);
+      ShellPrintDefaultEx (L"%c", Buffer[Index]);
     } else {
       //
       // Print dots for control characters
       //
-      ShellPrintEx (-1, -1, L".");
+      ShellPrintDefaultEx (L".");
     }
   }
 
-  ShellPrintEx (-1, -1, L"*\r\n");
+  ShellPrintDefaultEx (L"*\r\n");
 }
 
 /**

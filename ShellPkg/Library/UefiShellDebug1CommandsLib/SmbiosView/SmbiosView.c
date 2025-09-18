@@ -273,7 +273,7 @@ SMBiosView (
     SmbiosMajorVersion = SMBiosTable->MajorVersion;
     SmbiosMinorVersion = SMBiosTable->MinorVersion;
 
-    ShellPrintEx (-1, -1, L"=========================================================\n");
+    ShellPrintDefaultEx (L"=========================================================\n");
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_QUERY_STRUCT_COND), gShellDebug1HiiHandle);
 
     if (QueryType == STRUCTURE_TYPE_RANDOM) {
@@ -289,8 +289,8 @@ SMBiosView (
     }
 
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_SHOWTYPE), gShellDebug1HiiHandle);
-    ShellPrintEx (-1, -1, GetShowTypeString (gShowType));
-    ShellPrintEx (-1, -1, L"\n\n");
+    ShellPrintDefaultEx (GetShowTypeString (gShowType));
+    ShellPrintDefaultEx (L"\n\n");
 
     /*
         //
@@ -336,7 +336,7 @@ SMBiosView (
         continue;
       }
 
-      ShellPrintEx (-1, -1, L"\n=========================================================\n");
+      ShellPrintDefaultEx (L"\n=========================================================\n");
       ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_TYPE_HANDLE_DUMP_STRUCT),
         gShellDebug1HiiHandle,
@@ -369,7 +369,7 @@ SMBiosView (
         // Print structure information
         //
         SmbiosPrintStructure (&SmbiosStruct, gShowType);
-        ShellPrintEx (-1, -1, L"\n");
+        ShellPrintDefaultEx (L"\n");
 
         /*
                 //
@@ -398,7 +398,7 @@ SMBiosView (
       }
     }
 
-    ShellPrintEx (-1, -1, L"\n=========================================================\n");
+    ShellPrintDefaultEx (L"\n=========================================================\n");
     return EFI_SUCCESS;
   }
 
@@ -448,7 +448,7 @@ SMBios64View (
     SmbiosMajorVersion = SMBiosTable->MajorVersion;
     SmbiosMinorVersion = SMBiosTable->MinorVersion;
 
-    ShellPrintEx (-1, -1, L"=========================================================\n");
+    ShellPrintDefaultEx (L"=========================================================\n");
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_QUERY_STRUCT_COND), gShellDebug1HiiHandle);
 
     if (QueryType == STRUCTURE_TYPE_RANDOM) {
@@ -464,8 +464,8 @@ SMBios64View (
     }
 
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_SHOWTYPE), gShellDebug1HiiHandle);
-    ShellPrintEx (-1, -1, GetShowTypeString (gShowType));
-    ShellPrintEx (-1, -1, L"\n\n");
+    ShellPrintDefaultEx (GetShowTypeString (gShowType));
+    ShellPrintDefaultEx (L"\n\n");
 
     /*
         //
@@ -511,7 +511,7 @@ SMBios64View (
         continue;
       }
 
-      ShellPrintEx (-1, -1, L"\n=========================================================\n");
+      ShellPrintDefaultEx (L"\n=========================================================\n");
       ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_TYPE_HANDLE_DUMP_STRUCT),
         gShellDebug1HiiHandle,
@@ -544,7 +544,7 @@ SMBios64View (
         // Print structure information
         //
         SmbiosPrintStructure (&SmbiosStruct, gShowType);
-        ShellPrintEx (-1, -1, L"\n");
+        ShellPrintDefaultEx (L"\n");
 
         /*
                 //
@@ -573,7 +573,7 @@ SMBios64View (
       }
     }
 
-    ShellPrintEx (-1, -1, L"\n=========================================================\n");
+    ShellPrintDefaultEx (L"\n=========================================================\n");
     return EFI_SUCCESS;
   }
 
@@ -849,7 +849,7 @@ DisplayStatisticsTable (
     return EFI_UNSUPPORTED;
   }
 
-  ShellPrintEx (-1, -1, L"\n============================================================\n");
+  ShellPrintDefaultEx (L"\n============================================================\n");
   SmbiosPrintEPSInfo (SMBiosTable, Option);
 
   if (Option < SHOW_NORMAL) {
@@ -861,7 +861,7 @@ DisplayStatisticsTable (
     return EFI_NOT_FOUND;
   }
 
-  ShellPrintEx (-1, -1, L"============================================================\n");
+  ShellPrintDefaultEx (L"============================================================\n");
   StatisticsPointer = &mStatisticsTable[0];
   Num               = SMBiosTable->NumberOfSmbiosStructures;
   //
@@ -876,7 +876,7 @@ DisplayStatisticsTable (
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_LENGTH), gShellDebug1HiiHandle, StatisticsPointer->Length);
     }
 
-    ShellPrintEx (-1, -1, L"\n");
+    ShellPrintDefaultEx (L"\n");
     StatisticsPointer = &mStatisticsTable[Index];
 
     /*
@@ -931,7 +931,7 @@ DisplaySmbios64BitStatisticsTable (
     return EFI_UNSUPPORTED;
   }
 
-  ShellPrintEx (-1, -1, L"\n============================================================\n");
+  ShellPrintDefaultEx (L"\n============================================================\n");
   Smbios64BitPrintEPSInfo (SMBiosTable, Option);
 
   if (Option < SHOW_NORMAL) {
@@ -943,7 +943,7 @@ DisplaySmbios64BitStatisticsTable (
     return EFI_NOT_FOUND;
   }
 
-  ShellPrintEx (-1, -1, L"============================================================\n");
+  ShellPrintDefaultEx (L"============================================================\n");
   StatisticsPointer = &mSmbios64BitStatisticsTable[0];
   Num               = mNumberOfSmbios64BitStructures;
   //
@@ -958,7 +958,7 @@ DisplaySmbios64BitStatisticsTable (
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_LENGTH), gShellDebug1HiiHandle, StatisticsPointer->Length);
     }
 
-    ShellPrintEx (-1, -1, L"\n");
+    ShellPrintDefaultEx (L"\n");
     StatisticsPointer = &mSmbios64BitStatisticsTable[Index];
 
     /*
