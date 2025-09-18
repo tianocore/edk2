@@ -1,7 +1,7 @@
 ## @file
-# Module that drives the table generation and installation process.
+#  Module that drives the table generation and installation process.
 #
-#  Copyright (c) 2017 - 2019, ARM Limited. All rights reserved.
+#  Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.
 #  Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -24,6 +24,10 @@
 [Sources]
   DynamicTableManagerDxe.c
   DynamicTableManagerDxe.h
+  SmbiosTableDispatcher.c
+  SmbiosTableDispatcher.h
+  AcpiTableBuilder.c
+  SmbiosTableBuilder.c
 
 [Sources.ARM, Sources.AARCH64]
   Arm/ArmDynamicTableManager.c
@@ -42,6 +46,7 @@
   TableHelperLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
+  UefiLib
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol  ## CONSUMES
@@ -49,12 +54,11 @@
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
   gEfiAcpiSdtProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
-
+  gEfiSmbiosProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
   gEdkiiConfigurationManagerProtocolGuid        # PROTOCOL ALWAYS_CONSUMED
   gEdkiiDynamicTableFactoryProtocolGuid         # PROTOCOL ALWAYS_CONSUMED
 
 [Depex]
-  gEfiAcpiTableProtocolGuid AND
   gEdkiiConfigurationManagerProtocolGuid AND
   gEdkiiDynamicTableFactoryProtocolGuid
 
