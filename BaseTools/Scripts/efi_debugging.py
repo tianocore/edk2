@@ -1775,6 +1775,8 @@ class EfiConfigurationTable:
             system_table_pointer = self._get_system_table_pointer()
             if not system_table_pointer is None:
                 gST_addr = system_table_pointer.EfiSystemTableBase
+            else:
+                return
 
         gST = self._ctype_read(EFI_SYSTEM_TABLE, gST_addr)
         self.read_efi_config_table(gST.NumberOfTableEntries,
