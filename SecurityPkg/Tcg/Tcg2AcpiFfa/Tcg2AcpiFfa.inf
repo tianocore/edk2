@@ -48,7 +48,7 @@
   PcdLib
 
 [Guids]
-  gEfiTpmDeviceInstanceTpm20DtpmGuid                            ## PRODUCES ## GUID # TPM device identifier
+  gTpm2ServiceFfaGuid                                           ## PRODUCES ## GUID # TPM device identifier
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                                     ## CONSUMES
