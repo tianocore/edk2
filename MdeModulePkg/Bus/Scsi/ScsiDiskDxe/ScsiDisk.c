@@ -2996,6 +2996,18 @@ DetectMediaParsingSenseKeys (
     return EFI_DEVICE_ERROR;
   }
 
+  //
+  // Setting FUA bit sometimes causes SCSI commands to fail with
+  // ILLEGAL_REQUEST and INVALID_FIELD. Resend the SCSI command
+  // without FUA bit being set.
+  //
+  if ((SenseData->Sense_Key == EFI_SCSI_SK_ILLEGAL_REQUEST) &&
+      (SenseData->Addnl_Sense_Code == EFI_SCSI_ASC_INVALID_FIELD))
+  {
+    *Action = ACTION_RETRY_WITHOUT_FUA;
+    return EFI_SUCCESS;
+  }
+
   *Action = ACTION_RETRY_WITH_BACKOFF_ALGO;
   DEBUG ((DEBUG_VERBOSE, "ScsiDisk: Sense Key = 0x%x ASC = 0x%x!\n", SenseData->Sense_Key, SenseData->Addnl_Sense_Code));
   return EFI_SUCCESS;
@@ -3636,8 +3648,10 @@ ScsiDiskWriteSectors (
   UINT8       Index;
   UINT8       MaxRetry;
   BOOLEAN     NeedRetry;
+  BOOLEAN     SetFUA;
 
   Status = EFI_SUCCESS;
+  SetFUA = TRUE;
 
   BlocksRemaining = NumberOfBlocks;
   BlockSize       = ScsiDiskDevice->BlkIo.Media->BlockSize;
@@ -3700,6 +3714,10 @@ ScsiDiskWriteSectors (
     Timeout  = EFI_TIMER_PERIOD_SECONDS (ByteCount / 2100000 + 31);
     MaxRetry = 2;
     for (Index = 0; Index < MaxRetry; Index++) {
+      if ((Index == 1) && (Status == EFI_DEVICE_NO_FUA)) {
+        SetFUA = FALSE;
+      }
+
       if (!ScsiDiskDevice->Cdb16Byte) {
         Status = ScsiDiskWrite10 (
                    ScsiDiskDevice,
@@ -3708,7 +3726,8 @@ ScsiDiskWriteSectors (
                    PtrBuffer,
                    &ByteCount,
                    (UINT32)Lba,
-                   SectorCount
+                   SectorCount,
+                   SetFUA
                    );
       } else {
         Status = ScsiDiskWrite16 (
@@ -3718,7 +3737,8 @@ ScsiDiskWriteSectors (
                    PtrBuffer,
                    &ByteCount,
                    Lba,
-                   SectorCount
+                   SectorCount,
+                   SetFUA
                    );
       }
 
@@ -4338,6 +4358,7 @@ BackOff:
   @param  DataLength         The length of buffer
   @param  StartLba           The start logic block address
   @param  SectorCount        The number of blocks to write
+  @param  bFUA               If TRUE, FUA bit will be set
 
   @return  EFI_STATUS is returned by calling ScsiWrite10Command().
 
@@ -4350,7 +4371,8 @@ ScsiDiskWrite10 (
   IN     UINT8          *DataBuffer,
   IN OUT UINT32         *DataLength,
   IN     UINT32         StartLba,
-  IN     UINT32         SectorCount
+  IN     UINT32         SectorCount,
+  IN     BOOLEAN        bFUA
   )
 {
   EFI_STATUS  Status;
@@ -4382,7 +4404,8 @@ BackOff:
                       DataBuffer,
                       DataLength,
                       StartLba,
-                      SectorCount
+                      SectorCount,
+                      bFUA
                       );
   if ((ReturnStatus == EFI_NOT_READY) || (ReturnStatus == EFI_BAD_BUFFER_SIZE)) {
     *NeedRetry = TRUE;
@@ -4428,6 +4451,9 @@ BackOff:
     if (Action == ACTION_RETRY_COMMAND_LATER) {
       *NeedRetry = TRUE;
       return EFI_DEVICE_ERROR;
+    } else if (Action == ACTION_RETRY_WITHOUT_FUA) {
+      *NeedRetry = TRUE;
+      return EFI_DEVICE_NO_FUA;
     } else if (Action == ACTION_RETRY_WITH_BACKOFF_ALGO) {
       if (SectorCount <= 1) {
         //
@@ -4585,6 +4611,7 @@ BackOff:
   @param  DataLength         The length of buffer
   @param  StartLba           The start logic block address
   @param  SectorCount        The number of blocks to write
+  @param  bFUA               If TRUE, the FUA bit will be set
 
   @return  EFI_STATUS is returned by calling ScsiWrite16Command().
 
@@ -4597,7 +4624,8 @@ ScsiDiskWrite16 (
   IN     UINT8          *DataBuffer,
   IN OUT UINT32         *DataLength,
   IN     UINT64         StartLba,
-  IN     UINT32         SectorCount
+  IN     UINT32         SectorCount,
+  IN     BOOLEAN        bFUA
   )
 {
   EFI_STATUS  Status;
@@ -4629,7 +4657,8 @@ BackOff:
                       DataBuffer,
                       DataLength,
                       StartLba,
-                      SectorCount
+                      SectorCount,
+                      bFUA
                       );
   if ((ReturnStatus == EFI_NOT_READY) || (ReturnStatus == EFI_BAD_BUFFER_SIZE)) {
     *NeedRetry = TRUE;
@@ -4675,6 +4704,9 @@ BackOff:
     if (Action == ACTION_RETRY_COMMAND_LATER) {
       *NeedRetry = TRUE;
       return EFI_DEVICE_ERROR;
+    } else if (Action == ACTION_RETRY_WITHOUT_FUA) {
+      *NeedRetry = TRUE;
+      return EFI_DEVICE_NO_FUA;
     } else if (Action == ACTION_RETRY_WITH_BACKOFF_ALGO) {
       if (SectorCount <= 1) {
         //
