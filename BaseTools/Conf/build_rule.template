@@ -359,7 +359,7 @@
         "$(DLINK)" $(DLINK_FLAGS) $(DLINK_SPATH) $(OUTPUT_DIR)/Empty_C_File_Host_Application_Build.obj @$(STATIC_LIBRARY_FILES_LIST)
 
     <Command.CLANGPDB>
-        "$(CC)" -o $(OUTPUT_DIR)/Empty_C_File_Host_Application_Build.obj $(CC_FLAGS) $(INC) $(EDK_TOOLS_PATH)/Conf/Empty_C_File_Host_Application_Build.c
+        "$(CC)" -c -o $(OUTPUT_DIR)/Empty_C_File_Host_Application_Build.obj $(CC_FLAGS) $(INC) $(EDK_TOOLS_PATH)/Conf/Empty_C_File_Host_Application_Build.c
         "$(DLINK)" $(DLINK_FLAGS) $(DLINK_SPATH) $(OUTPUT_DIR)/Empty_C_File_Host_Application_Build.obj @$(STATIC_LIBRARY_FILES_LIST)
 
     <Command.GCC, Command.CLANGDWARF>
