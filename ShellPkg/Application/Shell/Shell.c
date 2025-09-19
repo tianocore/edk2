@@ -358,6 +358,17 @@ UefiMain (
   EFI_HANDLE                      ConInHandle;
   EFI_SIMPLE_TEXT_INPUT_PROTOCOL  *OldConIn;
   SPLIT_LIST                      *Split;
+  UINT8                           *SecureBoot;
+
+  // If Secure Boot is enabled, do not launch the UEFI shell
+  SecureBoot = NULL;
+  GetEfiGlobalVariable2 (EFI_SECURE_BOOT_MODE_NAME, (VOID **)&SecureBoot, NULL);
+  if ((SecureBoot != NULL) && (*SecureBoot == SECURE_BOOT_MODE_ENABLE)) {
+    FreePool (SecureBoot);
+    return EFI_SECURITY_VIOLATION;
+  } else if (SecureBoot != NULL) {
+    FreePool (SecureBoot);
+  }
 
   if (PcdGet8 (PcdShellSupportLevel) > 3) {
     return (EFI_UNSUPPORTED);
