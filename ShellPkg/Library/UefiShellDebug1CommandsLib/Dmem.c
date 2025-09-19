@@ -90,20 +90,18 @@ DisplayMmioMemory (
 
   @param[in] RtPropertiesTable    The pointer to the RtPropertiesTable.
 **/
-SHELL_STATUS
+STATIC
+VOID
 DisplayRtProperties (
   IN EFI_RT_PROPERTIES_TABLE  *RtPropertiesTable
   )
 {
-  UINT32        RtServices;
-  SHELL_STATUS  ShellStatus;
-  EFI_STATUS    Status;
-
-  ShellStatus = SHELL_SUCCESS;
+  UINT32      RtServices;
+  EFI_STATUS  Status;
 
   if (RtPropertiesTable == NULL) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_NOT_FOUND), gShellDebug1HiiHandle, L"RtPropertiesTable");
-    return ShellStatus;
+    return;
   }
 
   RtServices = (UINT32)RtPropertiesTable->RuntimeServicesSupported;
@@ -131,11 +129,8 @@ DisplayRtProperties (
                  );
 
   if (EFI_ERROR (Status)) {
-    ShellStatus = SHELL_ABORTED;
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_GET_FAIL), gShellDebug1HiiHandle, L"RtPropertiesTable");
   }
-
-  return (ShellStatus);
 }
 
 /**
@@ -246,29 +241,24 @@ GetImageExecutionInfo (
 
   @param[in] ExecInfoTablePtr    The pointer to the ImageExecutionTable.
 **/
-SHELL_STATUS
+STATIC
+VOID
 DisplayImageExecutionEntries (
   IN EFI_IMAGE_EXECUTION_INFO_TABLE  *ExecInfoTablePtr
   )
 {
-  SHELL_STATUS  ShellStatus;
-  EFI_STATUS    Status;
-
-  ShellStatus = SHELL_SUCCESS;
+  EFI_STATUS  Status;
 
   if (ExecInfoTablePtr == NULL) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_NOT_FOUND), gShellDebug1HiiHandle, L"ImageExecutionTable");
-    return ShellStatus;
+    return;
   }
 
   ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_IMG_EXE_TABLE), gShellDebug1HiiHandle);
   Status = GetImageExecutionInfo (ExecInfoTablePtr);
   if (EFI_ERROR (Status)) {
-    ShellStatus = SHELL_ABORTED;
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_GET_FAIL), gShellDebug1HiiHandle, L"ImageExecutionTable");
   }
-
-  return (ShellStatus);
 }
 
 /**
@@ -276,19 +266,18 @@ DisplayImageExecutionEntries (
 
   @param[in] ConfProfTable    The pointer to the ConformanceProfileTable.
 **/
-SHELL_STATUS
+STATIC
+VOID
 DisplayConformanceProfiles (
   IN  EFI_CONFORMANCE_PROFILES_TABLE  *ConfProfTable
   )
 {
-  SHELL_STATUS  ShellStatus;
-  EFI_STATUS    Status;
-  EFI_GUID      *EntryGuid;
-  CHAR16        *GuidName;
-  UINTN         Profile;
+  EFI_STATUS  Status;
+  EFI_GUID    *EntryGuid;
+  CHAR16      *GuidName;
+  UINTN       Profile;
 
-  Status      = EFI_SUCCESS;
-  ShellStatus = SHELL_SUCCESS;
+  Status = EFI_SUCCESS;
 
   if (ConfProfTable == NULL) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_CONF_PRO_TABLE), gShellDebug1HiiHandle);
@@ -301,7 +290,7 @@ DisplayConformanceProfiles (
       L"EFI_CONFORMANCE_PROFILES_UEFI_SPEC_GUID",
       &gEfiConfProfilesUefiSpecGuid
       );
-    return ShellStatus;
+    return;
   }
 
   ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_CONF_PRO_TABLE), gShellDebug1HiiHandle);
@@ -335,11 +324,8 @@ DisplayConformanceProfiles (
   }
 
   if (EFI_ERROR (Status)) {
-    ShellStatus = SHELL_ABORTED;
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_GET_FAIL), gShellDebug1HiiHandle, L"ComformanceProfilesTable");
   }
-
-  return (ShellStatus);
 }
 
 /** Enum of the System tables to print. */
@@ -451,17 +437,9 @@ DisplaySystemTable (
     );
 
   if (ShellCommandLineGetFlag (Package, L"-verbose")) {
-    if (ShellStatus == SHELL_SUCCESS) {
-      ShellStatus = DisplayRtProperties ((EFI_RT_PROPERTIES_TABLE *)AddressArray[EDstRtPropertiesTable]);
-    }
-
-    if (ShellStatus == SHELL_SUCCESS) {
-      ShellStatus = DisplayImageExecutionEntries ((EFI_IMAGE_EXECUTION_INFO_TABLE *)AddressArray[EDstImageSecurityDatabase]);
-    }
-
-    if (ShellStatus == SHELL_SUCCESS) {
-      ShellStatus = DisplayConformanceProfiles ((EFI_CONFORMANCE_PROFILES_TABLE *)AddressArray[EDstConfProfilesTable]);
-    }
+    DisplayRtProperties ((EFI_RT_PROPERTIES_TABLE *)AddressArray[EDstRtPropertiesTable]);
+    DisplayImageExecutionEntries ((EFI_IMAGE_EXECUTION_INFO_TABLE *)AddressArray[EDstImageSecurityDatabase]);
+    DisplayConformanceProfiles ((EFI_CONFORMANCE_PROFILES_TABLE *)AddressArray[EDstConfProfilesTable]);
   }
 
   return ShellStatus;
