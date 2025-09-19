@@ -338,7 +338,7 @@
     <Command.MSFT, Command.INTEL, Command.CLANGPDB>
         "$(DLINK)" $(DLINK_FLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
 
-    <Command.GCC>
+    <Command.GCC, Command.CLANGDWARF>
         "$(DLINK)" $(DLINK_FLAGS) -Wl,--start-group,@$(STATIC_LIBRARY_FILES_LIST),--end-group $(DLINK2_FLAGS)
 
     <Command.XCODE>
@@ -362,7 +362,7 @@
         "$(CC)" -o $(OUTPUT_DIR)/Empty_C_File_Host_Application_Build.obj $(CC_FLAGS) $(INC) $(EDK_TOOLS_PATH)/Conf/Empty_C_File_Host_Application_Build.c
         "$(DLINK)" $(DLINK_FLAGS) $(DLINK_SPATH) $(OUTPUT_DIR)/Empty_C_File_Host_Application_Build.obj @$(STATIC_LIBRARY_FILES_LIST)
 
-    <Command.GCC>
+    <Command.GCC, Command.CLANGDWARF>
         "$(DLINK)" $(DLINK_FLAGS) -Wl,--start-group,@$(STATIC_LIBRARY_FILES_LIST),--end-group $(DLINK2_FLAGS)
 
     <Command.XCODE>
