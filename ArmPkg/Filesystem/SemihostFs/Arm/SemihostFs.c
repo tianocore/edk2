@@ -98,6 +98,7 @@ AllocateFCB (
   if (Fcb != NULL) {
     CopyMem (&Fcb->File, &gSemihostFsFile, sizeof (gSemihostFsFile));
     Fcb->Signature = SEMIHOST_FCB_SIGNATURE;
+    InitializeListHead (&Fcb->Link);
   }
 
   return Fcb;
@@ -109,7 +110,9 @@ FreeFCB (
   )
 {
   // Remove Fcb from gFileList.
-  RemoveEntryList (&Fcb->Link);
+  if (!IsListEmpty (&Fcb->Link)) {
+    RemoveEntryList (&Fcb->Link);
+  }
 
   // To help debugging...
   Fcb->Signature = 0;
