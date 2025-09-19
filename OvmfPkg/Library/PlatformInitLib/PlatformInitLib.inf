@@ -24,6 +24,7 @@
 
 [Sources]
   Cmos.c
+  Igvm.c
   MemDetect.c
   Platform.c
 
@@ -60,6 +61,7 @@
 [Guids]
   gEfiSmmSmramMemoryGuid
   gEfiAcpiVariableGuid
+  gEfiIgvmDataHobGuid
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
@@ -109,6 +111,10 @@
 
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogSize
+
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmParamBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmHobBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmHobSize
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode

@@ -15,11 +15,13 @@
 #include <Guid/FileSystemVolumeLabelInfo.h>
 #include <Guid/LinuxEfiInitrdMedia.h>
 #include <Guid/QemuKernelLoaderFsMedia.h>
+#include <IndustryStandard/IgvmData.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/BlobVerifierLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PrintLib.h>
 #include <Library/QemuFwCfgLib.h>
@@ -1148,6 +1150,69 @@ QemuKernelFetchNamedBlobs (
   return EFI_SUCCESS;
 }
 
+STATIC
+EFI_STATUS
+QemuKernelRegisterIgvmBlobs (
+  VOID
+  )
+{
+  EFI_HOB_GUID_TYPE  *Hob;
+  EFI_IGVM_DATA_HOB  *IgvmData;
+  CHAR16             *Name;
+  KERNEL_BLOB        *Blob;
+  EFI_STATUS         Status;
+
+  Hob = GetFirstGuidHob (&gEfiIgvmDataHobGuid);
+  while (Hob) {
+    IgvmData = (VOID *)(Hob + 1);
+
+    switch (IgvmData->DataType) {
+      case EFI_IGVM_DATA_TYPE_SHIM:
+        Name = L"shim";
+        break;
+      case EFI_IGVM_DATA_TYPE_KERNEL:
+        Name = L"kernel";
+        break;
+      default:
+        Name = NULL;
+        break;
+    }
+
+    if (Name != NULL) {
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: address=0x%lx length=0x%lx type=0x%x -> Name=%s\n",
+        __func__,
+        IgvmData->Address,
+        IgvmData->Length,
+        IgvmData->DataType,
+        Name
+        ));
+
+      Blob = AllocatePool (sizeof (*Blob));
+      if (Blob == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      ZeroMem (Blob, sizeof (*Blob));
+
+      Status = StrCpyS (Blob->Name, sizeof (Blob->Name), Name);
+      ASSERT (!EFI_ERROR (Status));
+      Blob->Data = (VOID *)(UINTN)IgvmData->Address;
+      Blob->Size = (UINT32)IgvmData->Length;
+
+      Blob->Next   = mKernelBlobs;
+      mKernelBlobs = Blob;
+      mKernelBlobCount++;
+      mTotalBlobBytes += Blob->Size;
+    }
+
+    Hob = GetNextGuidHob (&gEfiIgvmDataHobGuid, GET_NEXT_HOB (Hob));
+  }
+
+  return EFI_SUCCESS;
+}
+
 //
 // The entry point of the feature.
 //
@@ -1191,6 +1256,21 @@ QemuKernelLoaderFsDxeEntrypoint (
   }
 
   //
+  // Register IGVM blobs
+  //
+  DEBUG ((DEBUG_INFO, "%a: igvm blobs\n", __func__));
+  Status = QemuKernelRegisterIgvmBlobs ();
+  if (EFI_ERROR (Status)) {
+    goto FreeBlobs;
+  }
+
+  if (mKernelBlobCount) {
+    // If we got efi binaries via igvm data blobs:
+    // Use only those and ignore fw_cfg data.
+    goto skipFwCfg;
+  }
+
+  //
   // Fetch named blobs.
   //
   DEBUG ((DEBUG_INFO, "%a: named blobs (etc/boot/*)\n", __func__));
@@ -1227,6 +1307,7 @@ QemuKernelLoaderFsDxeEntrypoint (
     goto FreeBlobs;
   }
 
+skipFwCfg:
   //
   // Create a new handle with a single VenMedia() node device path protocol on
   // it, plus a custom SimpleFileSystem protocol on it.
