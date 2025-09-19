@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011 - 2021, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2011 - 2025, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -26,7 +26,12 @@
 #define AARCH64_CPTR_RES1     0x33ff
 #define AARCH64_CPTR_DEFAULT  AARCH64_CPTR_RES1
 
-// ID_AA64MMFR1 - AArch64 Memory Model Feature Register 0 definitions
+// ID_AA64MMFR0 - AArch64 Memory Model Feature Register 0 definitions
+#define AARCH64_MMFR0_TGRAN4_52BITS  (0x1UL << 28)
+#define AARCH64_MMFR0_TGRAN4_FIELD   (28)
+#define AARCH64_MMFR0_TGRAN4_MASK    (0xFUL << AARCH64_MMFR0_TGRAN4_FIELD)
+
+// ID_AA64MMFR1 - AArch64 Memory Model Feature Register 1 definitions
 #define AARCH64_MMFR1_VH  (0xF << 8)
 
 // ID_AA64PFR0 - AArch64 Processor Feature Register 0 definitions
