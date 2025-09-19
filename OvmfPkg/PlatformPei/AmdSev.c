@@ -424,6 +424,48 @@ AmdSevEsInitialize (
 
 /**
 
+  Function initializes the SEV-related PCDs needed before we get to
+  AmdSevInitialize().
+
+  **/
+VOID
+AmdSevInitializePcds (
+  VOID
+  )
+{
+  UINT64         CCGuestAttr;
+  RETURN_STATUS  PcdStatus;
+
+  //
+  // Check if SEV is enabled
+  //
+  if (!MemEncryptSevIsEnabled ()) {
+    return;
+  }
+
+  //
+  // Set the Confidential computing attr PCD to communicate which SEV
+  // technology is active.
+  //
+  if (MemEncryptSevSnpIsEnabled ()) {
+    CCGuestAttr = CCAttrAmdSevSnp;
+  } else if (MemEncryptSevEsIsEnabled ()) {
+    CCGuestAttr = CCAttrAmdSevEs;
+  } else {
+    CCGuestAttr = CCAttrAmdSev;
+  }
+
+  if (MemEncryptSevEsDebugVirtualizationIsEnabled ()) {
+    CCGuestAttr |= CCAttrFeatureAmdSevEsDebugVirtualization;
+  }
+
+  PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCGuestAttr);
+
+  ASSERT_RETURN_ERROR (PcdStatus);
+}
+
+/**
+
   Function checks if SEV support is available, if present then it sets
   the dynamic PcdPteMemoryEncryptionAddressOrMask with memory encryption mask.
 
@@ -434,7 +476,6 @@ AmdSevInitialize (
   )
 {
   UINT64         EncryptionMask;
-  UINT64         CCGuestAttr;
   RETURN_STATUS  PcdStatus;
 
   //
@@ -512,26 +553,6 @@ AmdSevInitialize (
   // Check and perform SEV-ES initialization if required.
   //
   AmdSevEsInitialize (PlatformInfoHob);
-
-  //
-  // Set the Confidential computing attr PCD to communicate which SEV
-  // technology is active.
-  //
-  if (MemEncryptSevSnpIsEnabled ()) {
-    CCGuestAttr = CCAttrAmdSevSnp;
-  } else if (MemEncryptSevEsIsEnabled ()) {
-    CCGuestAttr = CCAttrAmdSevEs;
-  } else {
-    CCGuestAttr = CCAttrAmdSev;
-  }
-
-  if (MemEncryptSevEsDebugVirtualizationIsEnabled ()) {
-    CCGuestAttr |= CCAttrFeatureAmdSevEsDebugVirtualization;
-  }
-
-  PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCGuestAttr);
-
-  ASSERT_RETURN_ERROR (PcdStatus);
 }
 
 /**

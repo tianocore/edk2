@@ -19,6 +19,8 @@
 #include <Library/CpuLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
+#include <ConfidentialComputingGuestAttr.h>
 
 #define OR_SEED              0x0101010101010101ull
 #define CLEAR_SEED           0xFFFFFFFFFFFFFFFFull
@@ -142,6 +144,42 @@ MtrrDebugPrintAllMtrrsWorker (
   );
 
 /**
+Check if AMD SEV-SNP is active.
+
+@retval TRUE   AMD SEV-SNP is active.
+@retval FALSE  AMD SEV-SNP is not active.
+
+**/
+STATIC
+BOOLEAN
+EFIAPI
+SnpIsEnabled (
+  VOID
+  )
+{
+  STATIC BOOLEAN  mCurrentAttrRead = FALSE;
+  STATIC UINT64   mCurrentAttr     = 0;
+
+  if (!mCurrentAttrRead) {
+    mCurrentAttr     = PcdGet64 (PcdConfidentialComputingGuestAttr);
+    mCurrentAttrRead = TRUE;
+  }
+
+  //
+  // If attr is for the AMD group then do AMD SEV-SNP specific check.
+  //
+  if (((RShiftU64 (mCurrentAttr, 8)) & 0xff) == 1) {
+    UINT64  CurrentLevel = mCurrentAttr & CCAttrTypeMask;
+
+    if (CurrentLevel == CCAttrAmdSevSnp) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
   Return whether MTRR is supported.
 
   @param[out]  FixedMtrrSupported   Return whether fixed MTRR is supported.
@@ -162,9 +200,9 @@ MtrrLibIsMtrrSupported (
   MSR_IA32_MTRRCAP_REGISTER  MtrrCap;
 
   //
-  // MTRR is not supported in TD-Guest.
+  // MTRR is not supported in TD-Guest or SEV-SNP guests.
   //
-  if (TdIsEnabled ()) {
+  if (TdIsEnabled () || SnpIsEnabled ()) {
     return FALSE;
   }
 

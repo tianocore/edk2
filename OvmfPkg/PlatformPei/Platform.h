@@ -84,6 +84,11 @@ RelocateSmBase (
   );
 
 VOID
+AmdSevInitializePcds (
+  VOID
+  );
+
+VOID
 AmdSevInitialize (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
