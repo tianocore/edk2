@@ -102,39 +102,40 @@ DisplayRtProperties (
 
   ShellStatus = SHELL_SUCCESS;
 
-  if (Address != 0) {
-    EfiGetSystemConfigurationTable (&gEfiRtPropertiesTableGuid, (VOID **)&RtPropertiesTable);
-
-    RtServices = (UINT32)RtPropertiesTable->RuntimeServicesSupported;
-    Status     = ShellPrintHiiEx (
-                   -1,
-                   -1,
-                   NULL,
-                   STRING_TOKEN (STR_DMEM_RT_PROPERTIES),
-                   gShellDebug1HiiHandle,
-                   EFI_RT_PROPERTIES_TABLE_VERSION,
-                   (RtServices & EFI_RT_SUPPORTED_GET_TIME) ? 1 : 0,
-                   (RtServices & EFI_RT_SUPPORTED_SET_TIME) ? 1 : 0,
-                   (RtServices & EFI_RT_SUPPORTED_GET_WAKEUP_TIME) ? 1 : 0,
-                   (RtServices & EFI_RT_SUPPORTED_SET_WAKEUP_TIME) ? 1 : 0,
-                   (RtServices & EFI_RT_SUPPORTED_GET_VARIABLE) ? 1 : 0,
-                   (RtServices & EFI_RT_SUPPORTED_GET_NEXT_VARIABLE_NAME) ? 1 : 0,
-                   (RtServices & EFI_RT_SUPPORTED_SET_VARIABLE) ? 1 : 0,
-                   (RtServices & EFI_RT_SUPPORTED_SET_VIRTUAL_ADDRESS_MAP) ? 1 : 0,
-                   (RtServices & EFI_RT_SUPPORTED_CONVERT_POINTER) ? 1 : 0,
-                   (RtServices & EFI_RT_SUPPORTED_GET_NEXT_HIGH_MONOTONIC_COUNT) ? 1 : 0,
-                   (RtServices & EFI_RT_SUPPORTED_RESET_SYSTEM) ? 1 : 0,
-                   (RtServices & EFI_RT_SUPPORTED_UPDATE_CAPSULE) ? 1 : 0,
-                   (RtServices & EFI_RT_SUPPORTED_QUERY_CAPSULE_CAPABILITIES) ? 1 : 0,
-                   (RtServices & EFI_RT_SUPPORTED_QUERY_VARIABLE_INFO) ? 1 : 0
-                   );
-
-    if (EFI_ERROR (Status)) {
-      ShellStatus = SHELL_ABORTED;
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_GET_FAIL), gShellDebug1HiiHandle, L"RtPropertiesTable");
-    }
-  } else {
+  if (Address == 0) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_NOT_FOUND), gShellDebug1HiiHandle, L"RtPropertiesTable");
+    return ShellStatus;
+  }
+
+  EfiGetSystemConfigurationTable (&gEfiRtPropertiesTableGuid, (VOID **)&RtPropertiesTable);
+
+  RtServices = (UINT32)RtPropertiesTable->RuntimeServicesSupported;
+  Status     = ShellPrintHiiEx (
+                 -1,
+                 -1,
+                 NULL,
+                 STRING_TOKEN (STR_DMEM_RT_PROPERTIES),
+                 gShellDebug1HiiHandle,
+                 EFI_RT_PROPERTIES_TABLE_VERSION,
+                 (RtServices & EFI_RT_SUPPORTED_GET_TIME) ? 1 : 0,
+                 (RtServices & EFI_RT_SUPPORTED_SET_TIME) ? 1 : 0,
+                 (RtServices & EFI_RT_SUPPORTED_GET_WAKEUP_TIME) ? 1 : 0,
+                 (RtServices & EFI_RT_SUPPORTED_SET_WAKEUP_TIME) ? 1 : 0,
+                 (RtServices & EFI_RT_SUPPORTED_GET_VARIABLE) ? 1 : 0,
+                 (RtServices & EFI_RT_SUPPORTED_GET_NEXT_VARIABLE_NAME) ? 1 : 0,
+                 (RtServices & EFI_RT_SUPPORTED_SET_VARIABLE) ? 1 : 0,
+                 (RtServices & EFI_RT_SUPPORTED_SET_VIRTUAL_ADDRESS_MAP) ? 1 : 0,
+                 (RtServices & EFI_RT_SUPPORTED_CONVERT_POINTER) ? 1 : 0,
+                 (RtServices & EFI_RT_SUPPORTED_GET_NEXT_HIGH_MONOTONIC_COUNT) ? 1 : 0,
+                 (RtServices & EFI_RT_SUPPORTED_RESET_SYSTEM) ? 1 : 0,
+                 (RtServices & EFI_RT_SUPPORTED_UPDATE_CAPSULE) ? 1 : 0,
+                 (RtServices & EFI_RT_SUPPORTED_QUERY_CAPSULE_CAPABILITIES) ? 1 : 0,
+                 (RtServices & EFI_RT_SUPPORTED_QUERY_VARIABLE_INFO) ? 1 : 0
+                 );
+
+  if (EFI_ERROR (Status)) {
+    ShellStatus = SHELL_ABORTED;
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_GET_FAIL), gShellDebug1HiiHandle, L"RtPropertiesTable");
   }
 
   return (ShellStatus);
@@ -258,15 +259,16 @@ DisplayImageExecutionEntries (
 
   ShellStatus = SHELL_SUCCESS;
 
-  if (Address != 0) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_IMG_EXE_TABLE), gShellDebug1HiiHandle);
-    Status = GetImageExecutionInfo ();
-    if (EFI_ERROR (Status)) {
-      ShellStatus = SHELL_ABORTED;
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_GET_FAIL), gShellDebug1HiiHandle, L"ImageExecutionTable");
-    }
-  } else {
+  if (Address == 0) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_NOT_FOUND), gShellDebug1HiiHandle, L"ImageExecutionTable");
+    return ShellStatus;
+  }
+
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_IMG_EXE_TABLE), gShellDebug1HiiHandle);
+  Status = GetImageExecutionInfo ();
+  if (EFI_ERROR (Status)) {
+    ShellStatus = SHELL_ABORTED;
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_GET_FAIL), gShellDebug1HiiHandle, L"ImageExecutionTable");
   }
 
   return (ShellStatus);
@@ -292,44 +294,7 @@ DisplayConformanceProfiles (
   Status      = EFI_SUCCESS;
   ShellStatus = SHELL_SUCCESS;
 
-  if (Address != 0) {
-    EfiGetSystemConfigurationTable (&gEfiConfProfilesTableGuid, (VOID **)&ConfProfTable);
-
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_CONF_PRO_TABLE), gShellDebug1HiiHandle);
-
-    EntryGuid = (EFI_GUID *)(ConfProfTable + 1);
-
-    for (Profile = 0; Profile < ConfProfTable->NumberOfProfiles; Profile++, EntryGuid++) {
-      GuidName = L"Unknown_Profile";
-
-      if (CompareGuid (EntryGuid, &gEfiConfProfilesUefiSpecGuid)) {
-        GuidName = L"EFI_CONFORMANCE_PROFILE_UEFI_SPEC_GUID";
-      }
-
-      if (CompareGuid (EntryGuid, &gEfiConfProfilesEbbrSpec21Guid)) {
-        GuidName = L"EBBR_2.1";
-      }
-
-      if (CompareGuid (EntryGuid, &gEfiConfProfilesEbbrSpec22Guid)) {
-        GuidName = L"EBBR_2.2";
-      }
-
-      Status = ShellPrintHiiEx (
-                 -1,
-                 -1,
-                 NULL,
-                 STRING_TOKEN (STR_DMEM_CONF_PRO_ROW),
-                 gShellDebug1HiiHandle,
-                 GuidName,
-                 EntryGuid
-                 );
-    }
-
-    if (EFI_ERROR (Status)) {
-      ShellStatus = SHELL_ABORTED;
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_GET_FAIL), gShellDebug1HiiHandle, L"ComformanceProfilesTable");
-    }
-  } else {
+  if (Address == 0) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_CONF_PRO_TABLE), gShellDebug1HiiHandle);
     ShellPrintHiiEx (
       -1,
@@ -340,6 +305,44 @@ DisplayConformanceProfiles (
       L"EFI_CONFORMANCE_PROFILES_UEFI_SPEC_GUID",
       &gEfiConfProfilesUefiSpecGuid
       );
+    return ShellStatus;
+  }
+
+  EfiGetSystemConfigurationTable (&gEfiConfProfilesTableGuid, (VOID **)&ConfProfTable);
+
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_CONF_PRO_TABLE), gShellDebug1HiiHandle);
+
+  EntryGuid = (EFI_GUID *)(ConfProfTable + 1);
+
+  for (Profile = 0; Profile < ConfProfTable->NumberOfProfiles; Profile++, EntryGuid++) {
+    GuidName = L"Unknown_Profile";
+
+    if (CompareGuid (EntryGuid, &gEfiConfProfilesUefiSpecGuid)) {
+      GuidName = L"EFI_CONFORMANCE_PROFILE_UEFI_SPEC_GUID";
+    }
+
+    if (CompareGuid (EntryGuid, &gEfiConfProfilesEbbrSpec21Guid)) {
+      GuidName = L"EBBR_2.1";
+    }
+
+    if (CompareGuid (EntryGuid, &gEfiConfProfilesEbbrSpec22Guid)) {
+      GuidName = L"EBBR_2.2";
+    }
+
+    Status = ShellPrintHiiEx (
+               -1,
+               -1,
+               NULL,
+               STRING_TOKEN (STR_DMEM_CONF_PRO_ROW),
+               gShellDebug1HiiHandle,
+               GuidName,
+               EntryGuid
+               );
+  }
+
+  if (EFI_ERROR (Status)) {
+    ShellStatus = SHELL_ABORTED;
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_GET_FAIL), gShellDebug1HiiHandle, L"ComformanceProfilesTable");
   }
 
   return (ShellStatus);
