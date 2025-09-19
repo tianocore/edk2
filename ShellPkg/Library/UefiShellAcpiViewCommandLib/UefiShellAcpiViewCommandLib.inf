@@ -63,6 +63,9 @@
   UefiShellAcpiViewCommandLib.c
   UefiShellAcpiViewCommandLib.uni
 
+[Sources.AARCH64]
+  Parsers/Agdi/AgdiParser.c
+
 [Sources.ARM, Sources.AARCH64]
   Arm/SbbrValidator.h
   Arm/SbbrValidator.c
