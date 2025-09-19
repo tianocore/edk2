@@ -9,9 +9,20 @@
 #ifndef GOOGLE_TEST_LIB_H_
 #define GOOGLE_TEST_LIB_H_
 
+//
+// For Windows/clang builds if _MSC_VER is not defined, then set to
+// Visual Studio 2015 value of 1900
+//
+#if defined (__clang__) && defined (_WIN32)
+  #ifndef _MSC_VER
+#define _MSC_VER  1900
+  #endif
+#endif
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <cstring>
+#include <iomanip>
 
 //
 // For all use of GoogleTestLib, make sure NULL is defined to nullptr to
@@ -31,16 +42,53 @@ using ::testing::HasSubstr;
 // in the exception message.  Typically used to check that the expression
 // that generates an ASSERT() matches the expected expression.
 //
+// NOTE: Windows/CLANG builds with ASAN enabled generate an exception
+// due to the generated exception string being NULL. An alternate implementation
+// of these macros is provided for Windows/CLANG builds that disables ASAN
+// checks in a function that uses try/catch for the expected exception type
+// and provides the correct exception string for comparison.
+//
+#if defined (__clang__) && defined (_WIN32)
+#define EXPECT_THROW_MESSAGE(statement, description)            \
+  [&]() __attribute__((no_sanitize_address)){                   \
+    try {                                                       \
+      (statement);                                              \
+      FAIL() << "Exception not thrown";                         \
+    } catch (const std::runtime_error& ex) {                    \
+      EXPECT_THAT (                                             \
+        std::string(ex.what()),                                 \
+        HasSubstr(description)                                  \
+        );                                                      \
+    } catch(...) {                                              \
+      FAIL() << "Unexpected exception";                         \
+    }                                                           \
+  }()
+#define ASSERT_THROW_MESSAGE(statement, description)            \
+  [&]() __attribute__((no_sanitize_address)){                   \
+    try {                                                       \
+      (statement);                                              \
+      FAIL() << "Exception not thrown";                         \
+    } catch (const std::runtime_error& ex) {                    \
+      ASSERT_THAT (                                             \
+        std::string(ex.what()),                                 \
+        HasSubstr(description)                                  \
+        );                                                      \
+    } catch(...) {                                              \
+      FAIL() << "Unexpected exception";                         \
+    }                                                           \
+  }()
+#else
 #define EXPECT_THROW_MESSAGE(statement, description)            \
   EXPECT_THAT (                                                 \
-    []() { statement; },                                        \
+    [&]() { statement; },                                       \
     ThrowsMessage<std::runtime_error>(HasSubstr (description))  \
     )
 #define ASSERT_THROW_MESSAGE(statement, description)            \
   ASSERT_THAT (                                                 \
-    []() { statement; },                                        \
+    [&]() { statement; },                                       \
     ThrowsMessage<std::runtime_error>(HasSubstr (description))  \
     )
+#endif
 
 extern "C" {
   #include <Uefi.h>
