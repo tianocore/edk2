@@ -29,8 +29,6 @@ in CALL instructions to increase the compression ratio.
   Type   Endian  Alignment  LookAhead
 
   x86    little      1          4
-  ARMT   little      2          2
-  ARM    little      4          0
   PPC     big        4          0
   SPARC   big        4          0
   IA64   little     16          0
@@ -58,22 +56,6 @@ x86_Convert (
   SizeT   size,
   UInt32  ip,
   UInt32  *state,
-  int     encoding
-  );
-
-SizeT
-ARM_Convert (
-  Byte    *data,
-  SizeT   size,
-  UInt32  ip,
-  int     encoding
-  );
-
-SizeT
-ARMT_Convert (
-  Byte    *data,
-  SizeT   size,
-  UInt32  ip,
   int     encoding
   );
 

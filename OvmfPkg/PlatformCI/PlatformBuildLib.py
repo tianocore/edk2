@@ -54,7 +54,6 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
         ret = RunCmd("git", "config --file .gitmodules --get-regexp path", workingdir=self.GetWorkspaceRoot(), outstream=result)
         # Cmd output is expected to look like:
         # submodule.CryptoPkg/Library/OpensslLib/openssl.path CryptoPkg/Library/OpensslLib/openssl
-        # submodule.SoftFloat.path ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3
         if ret == 0:
             for line in result.getvalue().splitlines():
                 _, _, path = line.partition(" ")

@@ -24,7 +24,7 @@
   DESTRUCTOR                     = DxeRuntimeDebugLibSerialPortDestructor
 
 #
-#  VALID_ARCHITECTURES           = AARCH64 ARM IA32 X64 EBC
+#  VALID_ARCHITECTURES           = AARCH64 IA32 X64 EBC
 #
 
 [Sources]

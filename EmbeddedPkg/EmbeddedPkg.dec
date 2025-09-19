@@ -149,9 +149,6 @@
 
   gEmbeddedTokenSpaceGuid.PcdAndroidBootDevicePath|L""|VOID*|0x00000057
 
-[PcdsFixedAtBuild.ARM]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0|UINT8|0x00000011
-
 [PcdsFixedAtBuild.AARCH64]
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0|UINT8|0x00000011
 

@@ -52,15 +52,6 @@ PeCoffLoaderRelocateIa32Image (
   IN UINT64      Adjust
   );
 
-
-RETURN_STATUS
-PeCoffLoaderRelocateArmImage (
-  IN UINT16      **Reloc,
-  IN OUT CHAR8   *Fixup,
-  IN OUT CHAR8   **FixupData,
-  IN UINT64      Adjust
-  );
-
 RETURN_STATUS
 PeCoffLoaderRelocateRiscVImage (
   IN UINT16      *Reloc,
@@ -171,7 +162,6 @@ PeCoffLoaderCheckImageType (
 
   if (ImageContext->Machine != IMAGE_FILE_MACHINE_I386 && \
       ImageContext->Machine != IMAGE_FILE_MACHINE_X64  && \
-      ImageContext->Machine != IMAGE_FILE_MACHINE_ARMTHUMB_MIXED && \
       ImageContext->Machine != IMAGE_FILE_MACHINE_EBC  && \
       ImageContext->Machine != IMAGE_FILE_MACHINE_ARM64 && \
       ImageContext->Machine != IMAGE_FILE_MACHINE_RISCV64 && \
@@ -762,9 +752,6 @@ PeCoffLoaderRelocateImage (
         case IMAGE_FILE_MACHINE_I386:
           Status = PeCoffLoaderRelocateIa32Image (Reloc, Fixup, &FixupData, Adjust);
           break;
-        case IMAGE_FILE_MACHINE_ARMTHUMB_MIXED:
-          Status = PeCoffLoaderRelocateArmImage (&Reloc, Fixup, &FixupData, Adjust);
-          break;
         case IMAGE_FILE_MACHINE_RISCV64:
           Status = PeCoffLoaderRelocateRiscVImage (Reloc, Fixup, &FixupData, Adjust);
           break;
@@ -1256,7 +1243,6 @@ PeCoffLoaderGetPdbPointer (
     //
     switch (Hdr.Pe32->FileHeader.Machine) {
     case IMAGE_FILE_MACHINE_I386:
-    case IMAGE_FILE_MACHINE_ARMTHUMB_MIXED:
       //
       // Assume PE32 image with IA32 Machine field.
       //

@@ -88,8 +88,6 @@ extern CONST CHAR8  mHexToStr[];
 #define REG_SIZE  32
 #elif defined (MDE_CPU_X64)
 #define REG_SIZE  64
-#elif defined (MDE_CPU_ARM)
-#define REG_SIZE  32
 #endif
 
 #define GDB_SERIAL_DEV_SIGNATURE  SIGNATURE_32 ('g', 'd', 'b', 's')

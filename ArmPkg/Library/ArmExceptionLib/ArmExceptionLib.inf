@@ -1,5 +1,5 @@
 ## @file
-# Instance of CpuExceptionHandlerLib Library for ARM/AArch64 architectures
+# Instance of CpuExceptionHandlerLib Library for AArch64 architectures
 #
 # This library instance is used for modules that will implement exception
 # handlers in-place (by programming VBAR).  The exception handlers will be
@@ -23,15 +23,9 @@
   LIBRARY_CLASS                  = CpuExceptionHandlerLib
 
 [Sources.common]
+  AArch64Exception.c
   ArmExceptionLib.c
-
-[Sources.Arm]
-  Arm/ArmException.c
-  Arm/ExceptionSupport.S   | GCC
-
-[Sources.AARCH64]
-  AArch64/AArch64Exception.c
-  AArch64/ExceptionSupport.S
+  ExceptionSupport.S
 
 [Packages]
   MdePkg/MdePkg.dec

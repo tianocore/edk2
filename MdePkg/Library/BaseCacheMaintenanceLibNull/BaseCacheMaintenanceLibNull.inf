@@ -16,7 +16,7 @@
   LIBRARY_CLASS                  = CacheMaintenanceLib
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 EBC AARCH64
 #
 
 [Sources]

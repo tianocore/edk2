@@ -23,7 +23,7 @@
 #include "AcpiView.h"
 #include "AcpiViewConfig.h"
 
-#if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+#if defined (MDE_CPU_AARCH64)
   #include "Arm/SbbrValidator.h"
 #endif
 
@@ -237,8 +237,14 @@ AcpiView (
     }
   }
 
-  if (FoundAcpiTable) {
+  if (FoundAcpiTable && (EfiConfigurationTable != NULL)) {
     RsdpPtr = (UINT8 *)EfiConfigurationTable->VendorTable;
+
+    if (RsdpPtr == NULL) {
+      IncrementErrorCount ();
+      Print (L"ERROR: ACPI Table Guid found but RSDP pointer is NULL.\n");
+      return EFI_NOT_FOUND;
+    }
 
     // The RSDP revision is 1 byte starting at offset 15
     RsdpRevision = *(RsdpPtr + RSDP_REVISION_OFFSET);
@@ -250,7 +256,7 @@ AcpiView (
       return EFI_UNSUPPORTED;
     }
 
- #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+ #if defined (MDE_CPU_AARCH64)
     if (GetMandatoryTableValidate ()) {
       ArmSbbrResetTableCounts ();
     }
@@ -284,7 +290,7 @@ AcpiView (
     return EFI_NOT_FOUND;
   }
 
- #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+ #if defined (MDE_CPU_AARCH64)
   if (GetMandatoryTableValidate ()) {
     ArmSbbrReqsValidate ((ARM_SBBR_VERSION)GetMandatoryTableSpec ());
   }

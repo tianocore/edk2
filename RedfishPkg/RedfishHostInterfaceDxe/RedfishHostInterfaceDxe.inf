@@ -20,7 +20,7 @@
   ENTRY_POINT                    = RedfishHostInterfaceDxeEntryPoint
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64 RISCV64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64 RISCV64
 #
 
 [Sources]

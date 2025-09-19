@@ -1798,8 +1798,7 @@ LoadPeImage (
   // Note the size of FileHeader field is constant for both IA32 and X64 arch
   //
   if (  (NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_IA32)
-     || (NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_EBC)
-     || (NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_ARMTHUMB_MIXED))
+     || (NtHeader32->FileHeader.Machine == EFI_IMAGE_MACHINE_EBC))
   {
     //
     // 32-bits Architecture

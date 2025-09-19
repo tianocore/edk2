@@ -142,7 +142,7 @@ InitializeElf32 (
     Error (NULL, 0, 3000, "Unsupported", "ELF e_type not ET_EXEC or ET_DYN");
     return FALSE;
   }
-  if (!((mEhdr->e_machine == EM_386) || (mEhdr->e_machine == EM_ARM) || (mEhdr->e_machine == EM_RISCV))) {
+  if (!((mEhdr->e_machine == EM_386) || (mEhdr->e_machine == EM_RISCV))) {
     Warning (NULL, 0, 3000, "Unsupported", "ELF e_machine is not Elf32 machine.");
   }
   if (mEhdr->e_version != EV_CURRENT) {
@@ -195,20 +195,6 @@ GetShdrByIndex (
   }
 
   return (Elf_Shdr*)((UINT8*)mShdrBase + Num * mEhdr->e_shentsize);
-}
-
-STATIC
-Elf_Phdr*
-GetPhdrByIndex (
-  UINT32 num
-  )
-{
-  if (num >= mEhdr->e_phnum) {
-    Error (NULL, 0, 3000, "Invalid", "GetPhdrByIndex: Index %u is too high.", num);
-    exit(EXIT_FAILURE);
-  }
-
-  return (Elf_Phdr *)((UINT8*)mPhdrBase + num * mEhdr->e_phentsize);
 }
 
 STATIC
@@ -352,7 +338,6 @@ ScanSections32 (
   mNtHdrOffset = mCoffOffset;
   switch (mEhdr->e_machine) {
   case EM_386:
-  case EM_ARM:
     mCoffOffset += sizeof (EFI_IMAGE_NT_HEADERS32);
   break;
   default:
@@ -558,10 +543,6 @@ ScanSections32 (
     NtHdr->Pe32.FileHeader.Machine = IMAGE_FILE_MACHINE_I386;
     NtHdr->Pe32.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC;
     break;
-  case EM_ARM:
-    NtHdr->Pe32.FileHeader.Machine = IMAGE_FILE_MACHINE_ARMTHUMB_MIXED;
-    NtHdr->Pe32.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC;
-    break;
   default:
     VerboseMsg ("%s unknown e_machine type %hu. Assume IA-32", mInImageName, mEhdr->e_machine);
     NtHdr->Pe32.FileHeader.Machine = IMAGE_FILE_MACHINE_I386;
@@ -738,7 +719,6 @@ WriteSections32 (
 
         Elf_Shdr *SymShdr;
         UINT8 *Targ;
-        UINT16 Address;
 
         //
         // Check section header index found in symbol table and get the section
@@ -790,74 +770,6 @@ WriteSections32 (
           default:
             Error (NULL, 0, 3000, "Invalid", "%s unsupported ELF EM_386 relocation 0x%x.", mInImageName, (unsigned) ELF_R_TYPE(Rel->r_info));
           }
-        } else if (mEhdr->e_machine == EM_ARM) {
-          switch (ELF32_R_TYPE(Rel->r_info)) {
-          case R_ARM_RBASE:
-            // No relocation - no action required
-            // break skipped
-
-          case R_ARM_PC24:
-          case R_ARM_REL32:
-          case R_ARM_XPC25:
-          case R_ARM_THM_PC22:
-          case R_ARM_THM_JUMP19:
-          case R_ARM_CALL:
-          case R_ARM_JMP24:
-          case R_ARM_THM_JUMP24:
-          case R_ARM_PREL31:
-          case R_ARM_MOVW_PREL_NC:
-          case R_ARM_MOVT_PREL:
-          case R_ARM_THM_MOVW_PREL_NC:
-          case R_ARM_THM_MOVT_PREL:
-          case R_ARM_THM_JMP6:
-          case R_ARM_THM_ALU_PREL_11_0:
-          case R_ARM_THM_PC12:
-          case R_ARM_REL32_NOI:
-          case R_ARM_ALU_PC_G0_NC:
-          case R_ARM_ALU_PC_G0:
-          case R_ARM_ALU_PC_G1_NC:
-          case R_ARM_ALU_PC_G1:
-          case R_ARM_ALU_PC_G2:
-          case R_ARM_LDR_PC_G1:
-          case R_ARM_LDR_PC_G2:
-          case R_ARM_LDRS_PC_G0:
-          case R_ARM_LDRS_PC_G1:
-          case R_ARM_LDRS_PC_G2:
-          case R_ARM_LDC_PC_G0:
-          case R_ARM_LDC_PC_G1:
-          case R_ARM_LDC_PC_G2:
-          case R_ARM_THM_JUMP11:
-          case R_ARM_THM_JUMP8:
-          case R_ARM_TLS_GD32:
-          case R_ARM_TLS_LDM32:
-          case R_ARM_TLS_IE32:
-            // Thease are all PC-relative relocations and don't require modification
-            // GCC does not seem to have the concept of a application that just needs to get relocated.
-            break;
-
-          case R_ARM_THM_MOVW_ABS_NC:
-            // MOVW is only lower 16-bits of the addres
-            Address = (UINT16)(Sym->st_value - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx]);
-            ThumbMovtImmediatePatch ((UINT16 *)Targ, Address);
-            break;
-
-          case R_ARM_THM_MOVT_ABS:
-            // MOVT is only upper 16-bits of the addres
-            Address = (UINT16)((Sym->st_value - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx]) >> 16);
-            ThumbMovtImmediatePatch ((UINT16 *)Targ, Address);
-            break;
-
-          case R_ARM_ABS32:
-          case R_ARM_RABS32:
-            //
-            // Absolute relocation.
-            //
-            *(UINT32 *)Targ = *(UINT32 *)Targ - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx];
-            break;
-
-          default:
-            Error (NULL, 0, 3000, "Invalid", "WriteSections (): %s unsupported ELF EM_ARM relocation 0x%x.", mInImageName, (unsigned) ELF32_R_TYPE(Rel->r_info));
-          }
         }
       }
     }
@@ -877,23 +789,15 @@ WriteRelocations32 (
   UINT32                           Index;
   EFI_IMAGE_OPTIONAL_HEADER_UNION  *NtHdr;
   EFI_IMAGE_DATA_DIRECTORY         *Dir;
-  BOOLEAN                          FoundRelocations;
-  Elf_Dyn                          *Dyn;
   Elf_Rel                          *Rel;
-  UINTN                            RelElementSize;
-  UINTN                            RelSize;
-  UINTN                            RelOffset;
-  UINTN                            K;
-  Elf32_Phdr                       *DynamicSegment;
 
-  for (Index = 0, FoundRelocations = FALSE; Index < mEhdr->e_shnum; Index++) {
+  for (Index = 0; Index < mEhdr->e_shnum; Index++) {
     Elf_Shdr *RelShdr = GetShdrByIndex(Index);
     if ((RelShdr->sh_type == SHT_REL) || (RelShdr->sh_type == SHT_RELA)) {
       Elf_Shdr *SecShdr = GetShdrByIndex (RelShdr->sh_info);
       if (IsTextShdr(SecShdr) || IsDataShdr(SecShdr)) {
         UINT32 RelIdx;
 
-        FoundRelocations = TRUE;
         for (RelIdx = 0; RelIdx < RelShdr->sh_size; RelIdx += RelShdr->sh_entsize) {
           Rel = (Elf_Rel *)((UINT8*)mEhdr + RelShdr->sh_offset + RelIdx);
 
@@ -916,174 +820,10 @@ WriteRelocations32 (
             default:
               Error (NULL, 0, 3000, "Invalid", "%s unsupported ELF EM_386 relocation 0x%x.", mInImageName, (unsigned) ELF_R_TYPE(Rel->r_info));
             }
-          } else if (mEhdr->e_machine == EM_ARM) {
-            switch (ELF32_R_TYPE(Rel->r_info)) {
-            case R_ARM_RBASE:
-              // No relocation - no action required
-              // break skipped
-
-            case R_ARM_PC24:
-            case R_ARM_REL32:
-            case R_ARM_XPC25:
-            case R_ARM_THM_PC22:
-            case R_ARM_THM_JUMP19:
-            case R_ARM_CALL:
-            case R_ARM_JMP24:
-            case R_ARM_THM_JUMP24:
-            case R_ARM_PREL31:
-            case R_ARM_MOVW_PREL_NC:
-            case R_ARM_MOVT_PREL:
-            case R_ARM_THM_MOVW_PREL_NC:
-            case R_ARM_THM_MOVT_PREL:
-            case R_ARM_THM_JMP6:
-            case R_ARM_THM_ALU_PREL_11_0:
-            case R_ARM_THM_PC12:
-            case R_ARM_REL32_NOI:
-            case R_ARM_ALU_PC_G0_NC:
-            case R_ARM_ALU_PC_G0:
-            case R_ARM_ALU_PC_G1_NC:
-            case R_ARM_ALU_PC_G1:
-            case R_ARM_ALU_PC_G2:
-            case R_ARM_LDR_PC_G1:
-            case R_ARM_LDR_PC_G2:
-            case R_ARM_LDRS_PC_G0:
-            case R_ARM_LDRS_PC_G1:
-            case R_ARM_LDRS_PC_G2:
-            case R_ARM_LDC_PC_G0:
-            case R_ARM_LDC_PC_G1:
-            case R_ARM_LDC_PC_G2:
-            case R_ARM_THM_JUMP11:
-            case R_ARM_THM_JUMP8:
-            case R_ARM_TLS_GD32:
-            case R_ARM_TLS_LDM32:
-            case R_ARM_TLS_IE32:
-              // Thease are all PC-relative relocations and don't require modification
-              break;
-
-            case R_ARM_THM_MOVW_ABS_NC:
-              CoffAddFixup (
-                mCoffSectionsOffset[RelShdr->sh_info]
-                + (Rel->r_offset - SecShdr->sh_addr),
-                EFI_IMAGE_REL_BASED_ARM_MOV32T
-                );
-
-              // PE/COFF treats MOVW/MOVT relocation as single 64-bit instruction
-              // Track this address so we can log an error for unsupported sequence of MOVW/MOVT
-              gMovwOffset = mCoffSectionsOffset[RelShdr->sh_info] + (Rel->r_offset - SecShdr->sh_addr);
-              break;
-
-            case R_ARM_THM_MOVT_ABS:
-              if ((gMovwOffset + 4) !=  (mCoffSectionsOffset[RelShdr->sh_info] + (Rel->r_offset - SecShdr->sh_addr))) {
-                Error (NULL, 0, 3000, "Not Supported", "PE/COFF requires MOVW+MOVT instruction sequence %x +4 != %x.", gMovwOffset, mCoffSectionsOffset[RelShdr->sh_info] + (Rel->r_offset - SecShdr->sh_addr));
-              }
-              break;
-
-            case R_ARM_ABS32:
-            case R_ARM_RABS32:
-              CoffAddFixup (
-                mCoffSectionsOffset[RelShdr->sh_info]
-                + (Rel->r_offset - SecShdr->sh_addr),
-                EFI_IMAGE_REL_BASED_HIGHLOW
-                );
-              break;
-
-           default:
-              Error (NULL, 0, 3000, "Invalid", "WriteRelocations(): %s unsupported ELF EM_ARM relocation 0x%x.", mInImageName, (unsigned) ELF32_R_TYPE(Rel->r_info));
-            }
           } else {
             Error (NULL, 0, 3000, "Not Supported", "This tool does not support relocations for ELF with e_machine %u (processor type).", (unsigned) mEhdr->e_machine);
           }
         }
-      }
-    }
-  }
-
-  if (!FoundRelocations && (mEhdr->e_machine == EM_ARM)) {
-    /* Try again, but look for PT_DYNAMIC instead of SHT_REL */
-
-    for (Index = 0; Index < mEhdr->e_phnum; Index++) {
-      RelElementSize = 0;
-      RelSize = 0;
-      RelOffset = 0;
-
-      DynamicSegment = GetPhdrByIndex (Index);
-
-      if (DynamicSegment->p_type == PT_DYNAMIC) {
-        Dyn = (Elf32_Dyn *) ((UINT8 *)mEhdr + DynamicSegment->p_offset);
-
-        while (Dyn->d_tag != DT_NULL) {
-          switch (Dyn->d_tag) {
-            case  DT_REL:
-              RelOffset = Dyn->d_un.d_val;
-              break;
-
-            case  DT_RELSZ:
-              RelSize = Dyn->d_un.d_val;
-              break;
-
-            case  DT_RELENT:
-              RelElementSize = Dyn->d_un.d_val;
-              break;
-
-            default:
-              break;
-          }
-          Dyn++;
-        }
-        if (( RelOffset == 0 ) || ( RelSize == 0 ) || ( RelElementSize == 0 )) {
-          Error (NULL, 0, 3000, "Invalid", "%s bad ARM dynamic relocations.", mInImageName);
-        }
-
-        for (Index = 0; Index < mEhdr->e_shnum; Index++) {
-          Elf_Shdr *shdr = GetShdrByIndex(Index);
-
-          //
-          // The PT_DYNAMIC section contains DT_REL relocations whose r_offset
-          // field is relative to the base of a segment (or the entire image),
-          // and not to the base of an ELF input section as is the case for
-          // SHT_REL sections. This means that we cannot fix up such relocations
-          // unless we cross-reference ELF sections and segments, considering
-          // that the output placement recorded in mCoffSectionsOffset[] is
-          // section based, not segment based.
-          //
-          // Fortunately, there is a simple way around this: we require that the
-          // in-memory layout of the ELF and PE/COFF versions of the binary is
-          // identical. That way, r_offset will retain its validity as a PE/COFF
-          // image offset, and we can record it in the COFF fixup table
-          // unmodified.
-          //
-          if (shdr->sh_addr != mCoffSectionsOffset[Index]) {
-            Error (NULL, 0, 3000,
-              "Invalid", "%s: PT_DYNAMIC relocations require identical ELF and PE/COFF section offsets.",
-              mInImageName);
-          }
-        }
-
-        for (K = 0; K < RelSize; K += RelElementSize) {
-
-          if (DynamicSegment->p_paddr == 0) {
-            // Older versions of the ARM ELF (SWS ESPC 0003 B-02) specification define DT_REL
-            // as an offset in the dynamic segment. p_paddr is defined to be zero for ARM tools
-            Rel = (Elf32_Rel *) ((UINT8 *) mEhdr + DynamicSegment->p_offset + RelOffset + K);
-          } else {
-            // This is how it reads in the generic ELF specification
-            Rel = (Elf32_Rel *) ((UINT8 *) mEhdr + RelOffset + K);
-          }
-
-          switch (ELF32_R_TYPE (Rel->r_info)) {
-          case  R_ARM_RBASE:
-            break;
-
-          case  R_ARM_RABS32:
-            CoffAddFixup (Rel->r_offset, EFI_IMAGE_REL_BASED_HIGHLOW);
-            break;
-
-          default:
-            Error (NULL, 0, 3000, "Invalid", "%s bad ARM dynamic relocations, unknown type %d.", mInImageName, ELF32_R_TYPE (Rel->r_info));
-            break;
-          }
-        }
-        break;
       }
     }
   }

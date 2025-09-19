@@ -192,7 +192,7 @@ LZMA features
   - Estimated compressing speed: about 2 MB/s on 2 GHz CPU
   - Estimated decompressing speed:
       - 20-30 MB/s on modern 2 GHz cpu
-      - 1-2 MB/s on 200 MHz simple RISC cpu: (ARM, MIPS, PowerPC)
+      - 1-2 MB/s on 200 MHz simple RISC cpu: (MIPS, PowerPC)
   - Small memory requirements for decompressing (16 KB + DictionarySize)
   - Small code size for decompressing: 5-8 KB
 
@@ -296,7 +296,7 @@ for decompression.
 2) LZMA e file.bin file.lzma -lc0 -lp2
 
 compresses file.bin to file.lzma with settings suitable
-for 32-bit periodical data (for example, ARM or MIPS code).
+for 32-bit periodical data (for example, MIPS code).
 
 3) LZMA d file.lzma file.bin
 
@@ -321,17 +321,17 @@ Filters
 You can increase the compression ratio for some data types, using
 special filters before compressing. For example, it's possible to
 increase the compression ratio on 5-10% for code for those CPU ISAs:
-x86, IA-64, ARM, ARM-Thumb, PowerPC, SPARC.
+x86, IA-64, PowerPC, SPARC.
 
 You can find C source code of such filters in C/Bra*.* files
 
 You can check the compression ratio gain of these filters with such
-7-Zip commands (example for ARM code):
+7-Zip commands (example for MIPS code):
 No filter:
   7z a a1.7z a.bin -m0=lzma
 
-With filter for little-endian ARM code:
-  7z a a2.7z a.bin -m0=arm -m1=lzma
+With filter for little-endian MIPS code:
+  7z a a2.7z a.bin -m0=mips -m1=lzma
 
 It works in such manner:
 Compressing    = Filter_encoding + LZMA_encoding
