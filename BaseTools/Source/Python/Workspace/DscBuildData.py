@@ -43,6 +43,8 @@ import os
 import shutil
 import sys
 
+LoggedLibraryWarnings = set()
+
 def _IsFieldValueAnArray (Value):
     Value = Value.strip()
     if Value.startswith(TAB_GUID) and Value.endswith(')'):
@@ -771,6 +773,12 @@ class DscBuildData(PlatformBuildClassObject):
                 LibraryPath = PathClass(NormPath(Record[1], Macros), GlobalData.gWorkspace, Arch=self._Arch)
                 LineNo = Record[-1]
 
+                # Validate that the Library instance implements the Library Class
+                if self._ShouldLogLibrary(LineNo) and not self._ValidateLibraryClass(LibraryClass, LibraryPath, self._Arch):
+                    EdkLogger.warn("build",
+                                   f"{str(LibraryPath)} does not support LIBRARY_CLASS {LibraryClass}",
+                                   File=self.MetaFile)
+
                 # check the file validation
                 ErrorCode, ErrorInfo = LibraryPath.Validate('.inf')
                 if ErrorCode != 0:
@@ -874,6 +882,13 @@ class DscBuildData(PlatformBuildClassObject):
                     EdkLogger.verbose("Found forced library for arch=%s\n\t%s [%s]" % (Arch, LibraryInstance, LibraryClass))
                 LibraryClassSet.add(LibraryClass)
                 LibraryInstance = PathClass(NormPath(LibraryInstance, Macros), GlobalData.gWorkspace, Arch=self._Arch)
+
+                # Validate that the Library instance implements the Library Class
+                if self._ShouldLogLibrary(LineNo) and not self._ValidateLibraryClass(LibraryClass, LibraryInstance, Arch):
+                    EdkLogger.warn("build",
+                                   f"{str(LibraryInstance)} does not support LIBRARY_CLASS {LibraryClass}",
+                                   File=self.MetaFile)
+
                 # check the file validation
                 ErrorCode, ErrorInfo = LibraryInstance.Validate('.inf')
                 if ErrorCode != 0:
@@ -1138,6 +1153,27 @@ class DscBuildData(PlatformBuildClassObject):
                         field_assign[TokenSpaceGuid, Token] = []
             for item in delete_assign:
                 GlobalData.BuildOptionPcd.remove(item)
+
+    def _ValidateLibraryClass(self, LibraryClass: str, LibraryInstance: PathClass, Arch: str) -> bool:
+        if LibraryClass.upper().startswith('NULL'):
+            return True
+
+        ParsedLibraryInfo = self._Bdb[LibraryInstance, Arch, self._Target, self._Toolchain]
+
+        for LibraryClassObject in ParsedLibraryInfo.LibraryClass:
+            if LibraryClassObject.LibraryClass == LibraryClass:
+                return True
+        return False
+
+    def _ShouldLogLibrary(self, LineNo) -> bool:
+        if not GlobalData.gLogLibraryMismatch:
+            return False
+
+        if LineNo in LoggedLibraryWarnings:
+            return False
+
+        LoggedLibraryWarnings.add(LineNo)
+        return True
 
     @staticmethod
     def HandleFlexiblePcd(TokenSpaceGuidCName, TokenCName, PcdValue, PcdDatumType, GuidDict, FieldName=''):
