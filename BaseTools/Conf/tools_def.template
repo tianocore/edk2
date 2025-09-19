@@ -942,7 +942,7 @@ DEFINE GCC_ASM_FLAGS               = -c -x assembler -imacros AutoGen.h
 DEFINE GCC_PP_FLAGS                = -E -x assembler-with-cpp -include AutoGen.h
 DEFINE GCC_VFRPP_FLAGS             = -x c -E -DVFRCOMPILE --include $(MODULE_NAME)StrDefs.h
 DEFINE GCC_ASLPP_FLAGS             = -x c -E -include AutoGen.h
-DEFINE GCC_ASLCC_FLAGS             = -x c
+DEFINE GCC_ASLCC_FLAGS             = -x c -include AutoGen.h -fshort-wchar
 DEFINE GCC_WINDRES_FLAGS           = -J rc -O coff
 DEFINE GCC_DTCPP_FLAGS             = -E -x assembler-with-cpp -imacros AutoGen.h -nostdinc -undef
 DEFINE GCC_IA32_RC_FLAGS           = -I binary -O elf32-i386          -B i386        --rename-section .data=.hii
