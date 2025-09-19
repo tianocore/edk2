@@ -938,7 +938,7 @@ DEFINE GCC_ARM_AARCH64_ASLDLINK_FLAGS = -Wl,--defsym=PECOFF_HEADER_SIZE=0 DEF(GC
 DEFINE GCC_ARM_ASLDLINK_FLAGS      = DEF(GCC_ARM_DLINK_FLAGS) -Wl,--entry,ReferenceAcpiTable -u $(IMAGE_ENTRY_POINT) DEF(GCC_ARM_AARCH64_ASLDLINK_FLAGS)
 DEFINE GCC_AARCH64_ASLDLINK_FLAGS  = DEF(GCC_AARCH64_DLINK_FLAGS) -Wl,--entry,ReferenceAcpiTable -u $(IMAGE_ENTRY_POINT) DEF(GCC_ARM_AARCH64_ASLDLINK_FLAGS)
 DEFINE GCC_LOONGARCH64_ASLDLINK_FLAGS = DEF(GCC_LOONGARCH64_DLINK_FLAGS) -Wl,--entry,ReferenceAcpiTable -u $(IMAGE_ENTRY_POINT)
-DEFINE GCC_ASM_FLAGS               = -c -x assembler -imacros AutoGen.h
+DEFINE GCC_ASM_FLAGS               = -c -x assembler
 DEFINE GCC_PP_FLAGS                = -E -x assembler-with-cpp -include AutoGen.h
 DEFINE GCC_VFRPP_FLAGS             = -x c -E -DVFRCOMPILE --include $(MODULE_NAME)StrDefs.h
 DEFINE GCC_ASLPP_FLAGS             = -x c -E -include AutoGen.h
