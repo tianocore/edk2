@@ -1,0 +1,83 @@
+# This workflow validates basic pull request formatting requirements are met.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+name: Validate Pull Request Formatting
+
+on:
+  pull_request_target:
+    types:
+      - edited
+      - opened
+      - reopened
+      - synchronize
+
+jobs:
+  validate_pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate Token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.TIANOCORE_ASSIGN_REVIEWERS_APPLICATION_ID }}
+          private-key: ${{ secrets.TIANOCORE_ASSIGN_REVIEWERS_APPLICATION_PRIVATE_KEY }}
+
+      - run: |
+            prData="$(gh api graphql -F owner=$OWNER -F name=$REPO -F pr_number=$PR_NUMBER -f query='
+            query($name: String!, $owner: String!, $pr_number: Int!) {
+              repository(owner: $owner, name: $name) {
+              pullRequest(number: $pr_number) {
+                title
+                body
+              }
+              }
+            }')"
+
+            prTitle=$(echo "$prData" | jq -r '.data.repository.pullRequest.title')
+            prBody=$(echo "$prData" | jq -r '.data.repository.pullRequest.body')
+
+            templateContent="$(gh api repos/$OWNER/$REPO/contents/.github/pull_request_template.md --jq '.content' | base64 -d)"
+
+            # Template lines are those that begin with '<'
+            templateLines=$(echo "$templateContent" | grep '^<' || true)
+
+            if [[ -n "$templateLines" ]]; then
+              templateLinesFound=""
+              while IFS= read -r line; do
+              if [[ -n "$line" && "$prBody" == *"$line"* ]]; then
+                if [[ -n "$templateLinesFound" ]]; then
+                templateLinesFound="$templateLinesFound"$'\n'"\`$line\`"
+                else
+                templateLinesFound="\`$line\`"
+                fi
+              fi
+              done <<< "$templateLines"
+
+              if [[ -n "$templateLinesFound" ]]; then
+                gh pr comment $PR_URL --body "⚠️ Please remove the following template lines from your PR description:"$'\n'"$templateLinesFound"
+                echo 'VALIDATION_ERROR=true' >> $GITHUB_ENV
+              fi
+            fi
+
+            # Check if the PR body is empty
+            if [[ -z "$prBody" || "$prBody" == "null" ]]; then
+              gh pr comment $PR_URL --body "⚠️ Please add a pull request description."
+              echo 'VALIDATION_ERROR=true' >> $GITHUB_ENV
+            fi
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+          OWNER: ${{ github.repository_owner }}
+          PR_NUMBER: ${{ github.event.number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          REPO: ${{ github.event.repository.name }}
+
+      - name: Check for Validation Errors
+        if: env.VALIDATION_ERROR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.setFailed('PR Formatting Validation Check Failed!')
