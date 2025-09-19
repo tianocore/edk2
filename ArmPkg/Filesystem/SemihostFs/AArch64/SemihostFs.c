@@ -95,10 +95,13 @@ AllocateFCB (
   SEMIHOST_FCB  *Fcb;
 
   Fcb = AllocateZeroPool (sizeof (SEMIHOST_FCB));
-  if (Fcb != NULL) {
-    CopyMem (&Fcb->File, &gSemihostFsFile, sizeof (gSemihostFsFile));
-    Fcb->Signature = SEMIHOST_FCB_SIGNATURE;
+  if (Fcb == NULL) {
+    return NULL;
   }
+
+  CopyMem (&Fcb->File, &gSemihostFsFile, sizeof (gSemihostFsFile));
+  Fcb->Signature = SEMIHOST_FCB_SIGNATURE;
+  InitializeListHead (&Fcb->Link);
 
   return Fcb;
 }
@@ -108,9 +111,6 @@ FreeFCB (
   IN SEMIHOST_FCB  *Fcb
   )
 {
-  // Remove Fcb from gFileList.
-  RemoveEntryList (&Fcb->Link);
-
   // To help debugging...
   Fcb->Signature = 0;
 
@@ -429,6 +429,9 @@ FileClose (
 
     FreePool (Fcb->FileName);
   }
+
+  // Remove Fcb from gFileList.
+  RemoveEntryList (&Fcb->Link);
 
   FreeFCB (Fcb);
 
