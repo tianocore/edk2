@@ -358,6 +358,8 @@ InitializePlatform (
 
   PlatformQemuUc32BaseInitialization (PlatformInfoHob);
 
+  AmdSevInitializePcds ();
+
   InitializeRamRegions (PlatformInfoHob);
 
   if (PlatformInfoHob->BootMode != BOOT_ON_S3_RESUME) {
