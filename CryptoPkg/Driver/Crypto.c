@@ -5125,6 +5125,30 @@ CryptoServiceTlsSetServerName (
 }
 
 /**
+  Set the Tls security level.
+
+  This function Set the Tls security level.
+  If Tls is NULL, nothing is done.
+
+  @param[in]  Tls                Pointer to the TLS object.
+  @param[in]  Level              The Tls Security level need to set.
+
+  @retval  EFI_SUCCESS           The Tls security level was set successfully.
+  @retval  EFI_INVALID_PARAMETER The parameters are invalid.
+  @retval  EFI_UNSUPPORTED       The requested TLS set security level is not supported.
+
+**/
+EFI_STATUS
+EFIAPI
+CryptoServiceTlsSetSecurityLevel (
+  IN VOID   *Tls,
+  IN UINT8  Level
+  )
+{
+  return CALL_BASECRYPTLIB (TlsSet.Services.SecurityLevel, TlsSetSecurityLevel, (Tls, Level), EFI_UNSUPPORTED);
+}
+
+/**
   Set the signature algorithm list to used by the TLS object.
 
   This function sets the signature algorithms for use by a specified TLS object.
@@ -7137,6 +7161,7 @@ const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   CryptoServicePkcs1v2Decrypt,
   CryptoServiceRsaOaepEncrypt,
   CryptoServiceRsaOaepDecrypt,
-  /// TLS Set (continued)
+  /// TLS Set (Continued)
   CryptoServiceTlsSetServerName,
+  CryptoServiceTlsSetSecurityLevel,
 };
