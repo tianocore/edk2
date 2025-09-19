@@ -1,0 +1,41 @@
+## @file
+#
+#  CxlDxe Application setup file
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CxlFwMgmtApp
+  FILE_GUID                      = 05092440-531A-4D13-B3F2-B91EEDA9B95F
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = MyShellCEntryLib
+
+[Sources]
+  CxlFwMgmtApp.c
+
+[Packages]
+ MdePkg/MdePkg.dec
+ MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiLib
+  FileHandleLib
+  PcdLib
+
+[Protocols]
+  gEfiPciIoProtocolGuid
+  gEfiFirmwareManagementProtocolGuid  ## BY_START
+  gEfiShellParametersProtocolGuid
+  gEfiDevicePathToTextProtocolGuid
+  gEfiShellProtocolGuid
+  gEfiShellParametersProtocolGuid
+
+[Guids]
+  gEfiDxeServicesTableGuid
+  gEfiFileInfoGuid
+
+
