@@ -168,7 +168,6 @@
   X86SpeculationBarrier.c
   X64/GccInline.c | GCC
   X64/RdRand.nasm
-  ChkStkGcc.c  | GCC
   X86UnitTestHost.c
   IntelTdxNull.c
 

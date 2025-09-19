@@ -331,7 +331,6 @@
   X64/XSetBv.nasm
   X64/VmgExit.nasm
   X64/VmgExitSvsm.nasm
-  ChkStkGcc.c  | GCC
 
 [Sources.EBC]
   Ebc/CpuBreakpoint.c

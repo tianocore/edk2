@@ -66,7 +66,7 @@ protected:
 
   void
   TearDown (
-    )
+    ) override
   {
     SampleGlobalTestPointer = NULL;
   }
