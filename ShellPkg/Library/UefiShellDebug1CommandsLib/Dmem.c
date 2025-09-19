@@ -88,26 +88,23 @@ DisplayMmioMemory (
 /**
   Display the RtPropertiesTable entries
 
-  @param[in] Address    The pointer to the RtPropertiesTable.
+  @param[in] RtPropertiesTable    The pointer to the RtPropertiesTable.
 **/
 SHELL_STATUS
 DisplayRtProperties (
-  IN UINT64  Address
+  IN EFI_RT_PROPERTIES_TABLE  *RtPropertiesTable
   )
 {
-  EFI_RT_PROPERTIES_TABLE  *RtPropertiesTable;
-  UINT32                   RtServices;
-  SHELL_STATUS             ShellStatus;
-  EFI_STATUS               Status;
+  UINT32        RtServices;
+  SHELL_STATUS  ShellStatus;
+  EFI_STATUS    Status;
 
   ShellStatus = SHELL_SUCCESS;
 
-  if (Address == 0) {
+  if (RtPropertiesTable == NULL) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_NOT_FOUND), gShellDebug1HiiHandle, L"RtPropertiesTable");
     return ShellStatus;
   }
-
-  EfiGetSystemConfigurationTable (&gEfiRtPropertiesTableGuid, (VOID **)&RtPropertiesTable);
 
   RtServices = (UINT32)RtPropertiesTable->RuntimeServicesSupported;
   Status     = ShellPrintHiiEx (
@@ -172,22 +169,22 @@ GetBaseName (
 
 /**
   Retrieve the ImageExecutionTable entries.
+
+  @param[in] ExecInfoTablePtr    The pointer to the ImageExecutionTable.
 **/
 EFI_STATUS
 GetImageExecutionInfo (
+  IN EFI_IMAGE_EXECUTION_INFO_TABLE  *ExecInfoTablePtr
   )
 {
-  EFI_STATUS                      Status;
-  EFI_IMAGE_EXECUTION_INFO_TABLE  *ExecInfoTablePtr;
-  EFI_IMAGE_EXECUTION_INFO        *InfoPtr;
-  CHAR8                           *ptr;
-  CHAR16                          *ImagePath;
-  CHAR16                          *ImageName;
-  UINTN                           Image;
-  UINTN                           *NumberOfImages;
-  CHAR16                          *ActionType;
-
-  EfiGetSystemConfigurationTable (&gEfiImageSecurityDatabaseGuid, (VOID **)&ExecInfoTablePtr);
+  EFI_STATUS                Status;
+  EFI_IMAGE_EXECUTION_INFO  *InfoPtr;
+  CHAR8                     *ptr;
+  CHAR16                    *ImagePath;
+  CHAR16                    *ImageName;
+  UINTN                     Image;
+  UINTN                     *NumberOfImages;
+  CHAR16                    *ActionType;
 
   NumberOfImages = &ExecInfoTablePtr->NumberOfImages;
 
@@ -247,11 +244,11 @@ GetImageExecutionInfo (
 /**
   Display the ImageExecutionTable entries
 
-  @param[in] Address    The pointer to the ImageExecutionTable.
+  @param[in] ExecInfoTablePtr    The pointer to the ImageExecutionTable.
 **/
 SHELL_STATUS
 DisplayImageExecutionEntries (
-  IN UINT64  Address
+  IN EFI_IMAGE_EXECUTION_INFO_TABLE  *ExecInfoTablePtr
   )
 {
   SHELL_STATUS  ShellStatus;
@@ -259,13 +256,13 @@ DisplayImageExecutionEntries (
 
   ShellStatus = SHELL_SUCCESS;
 
-  if (Address == 0) {
+  if (ExecInfoTablePtr == NULL) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_NOT_FOUND), gShellDebug1HiiHandle, L"ImageExecutionTable");
     return ShellStatus;
   }
 
   ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_IMG_EXE_TABLE), gShellDebug1HiiHandle);
-  Status = GetImageExecutionInfo ();
+  Status = GetImageExecutionInfo (ExecInfoTablePtr);
   if (EFI_ERROR (Status)) {
     ShellStatus = SHELL_ABORTED;
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_GET_FAIL), gShellDebug1HiiHandle, L"ImageExecutionTable");
@@ -277,24 +274,23 @@ DisplayImageExecutionEntries (
 /**
   Display the ConformanceProfileTable entries
 
-  @param[in] Address    The pointer to the ConformanceProfileTable.
+  @param[in] ConfProfTable    The pointer to the ConformanceProfileTable.
 **/
 SHELL_STATUS
 DisplayConformanceProfiles (
-  IN UINT64  Address
+  IN  EFI_CONFORMANCE_PROFILES_TABLE  *ConfProfTable
   )
 {
-  SHELL_STATUS                    ShellStatus;
-  EFI_STATUS                      Status;
-  EFI_GUID                        *EntryGuid;
-  CHAR16                          *GuidName;
-  UINTN                           Profile;
-  EFI_CONFORMANCE_PROFILES_TABLE  *ConfProfTable;
+  SHELL_STATUS  ShellStatus;
+  EFI_STATUS    Status;
+  EFI_GUID      *EntryGuid;
+  CHAR16        *GuidName;
+  UINTN         Profile;
 
   Status      = EFI_SUCCESS;
   ShellStatus = SHELL_SUCCESS;
 
-  if (Address == 0) {
+  if (ConfProfTable == NULL) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_CONF_PRO_TABLE), gShellDebug1HiiHandle);
     ShellPrintHiiEx (
       -1,
@@ -307,8 +303,6 @@ DisplayConformanceProfiles (
       );
     return ShellStatus;
   }
-
-  EfiGetSystemConfigurationTable (&gEfiConfProfilesTableGuid, (VOID **)&ConfProfTable);
 
   ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_CONF_PRO_TABLE), gShellDebug1HiiHandle);
 
@@ -458,15 +452,15 @@ DisplaySystemTable (
 
   if (ShellCommandLineGetFlag (Package, L"-verbose")) {
     if (ShellStatus == SHELL_SUCCESS) {
-      ShellStatus = DisplayRtProperties (AddressArray[EDstRtPropertiesTable]);
+      ShellStatus = DisplayRtProperties ((EFI_RT_PROPERTIES_TABLE *)AddressArray[EDstRtPropertiesTable]);
     }
 
     if (ShellStatus == SHELL_SUCCESS) {
-      ShellStatus = DisplayImageExecutionEntries (AddressArray[EDstImageSecurityDatabase]);
+      ShellStatus = DisplayImageExecutionEntries ((EFI_IMAGE_EXECUTION_INFO_TABLE *)AddressArray[EDstImageSecurityDatabase]);
     }
 
     if (ShellStatus == SHELL_SUCCESS) {
-      ShellStatus = DisplayConformanceProfiles (AddressArray[EDstConfProfilesTable]);
+      ShellStatus = DisplayConformanceProfiles ((EFI_CONFORMANCE_PROFILES_TABLE *)AddressArray[EDstConfProfilesTable]);
     }
   }
 
