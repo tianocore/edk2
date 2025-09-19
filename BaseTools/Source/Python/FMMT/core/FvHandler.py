@@ -237,6 +237,7 @@ class FvHandler:
                 Size_delta = len(CompressedData) - len(TargetTree.Data.OriData)
                 ChangeSize(TargetTree, -Size_delta)
                 if TargetTree.NextRel:
+                    # Save original pad size before modifying PadData
                     Original_Pad_Size = len(TargetTree.Data.PadData)
                     TargetTree.Data.PadData = b'\x00' * New_Pad_Size
                     self.Remain_New_Free_Space = (
@@ -401,6 +402,7 @@ class FvHandler:
                 self.NewFfs.Data.Header.State = c_uint8(
                     ~self.NewFfs.Data.Header.State)
         # NewFfs parsing will not calculate the PadSize, thus recalculate.
+        self.Ffs_PecoffRebase()
         self.NewFfs.Data.PadData = b'\xff' * GetPadSize(self.NewFfs.Data.Size, FFS_COMMON_ALIGNMENT)
         if self.NewFfs.Data.Size >= self.TargetFfs.Data.Size:
             Needed_Space = self.NewFfs.Data.Size + len(self.NewFfs.Data.PadData) - self.TargetFfs.Data.Size - len(self.TargetFfs.Data.PadData)
@@ -699,3 +701,131 @@ class FvHandler:
             TargetFv.Data.ModCheckSum()
             self.Status = True
         return self.Status
+
+    def Ffs_PecoffRebase(self):
+        new_pe_exist = False
+        origin_pe_exist = False
+        # Handle the current FFS being replaced - check for PE32
+        for NewSection in self.NewFfs.Child:
+            if NewSection.Data.Type == EFI_SECTION_PE32 or NewSection.Data.Type == EFI_SECTION_TE:
+                if NewSection.Child[0].Data.Name == 'PeCoff':
+                    New_Pecoff = NewSection.Child[0]
+                    new_pe_image_address = NewSection.Child[0].Data.ImageAddress if hasattr(NewSection.Child[0].Data, 'ImageAddress') else 0
+                    new_pe_exist = True
+                    break
+        # Check original FFS for PE32 or TE
+        for OriSection in self.TargetFfs.Child:
+            if OriSection.Data.Type == EFI_SECTION_PE32 or OriSection.Data.Type == EFI_SECTION_TE:
+                if (len(OriSection.Child) > 0) and OriSection.Child[0].Data.Name == 'PeCoff':
+                    Ori_Pecoff = OriSection.Child[0]
+                    origin_pe_image_address = OriSection.Child[0].Data.ImageAddress if hasattr(OriSection.Child[0].Data, 'ImageAddress') else 0
+                    origin_pe_exist = True
+                    break
+
+        # Handle PE32 rebasing
+        if new_pe_exist and origin_pe_exist:
+            if new_pe_image_address == 0x0 and origin_pe_image_address != 0x0:
+                New_Pecoff.Data.PeCoffRebase(origin_pe_image_address)
+                NewSection.Child[0].Data.Data = New_Pecoff.Data.Data
+            elif origin_pe_image_address != new_pe_image_address:
+                delta_image_address = origin_pe_image_address - new_pe_image_address
+                New_Pecoff.Data.PeCoffRebase(delta_image_address)
+                NewSection.Child[0].Data.Data = New_Pecoff.Data.Data
+
+        # If new PE/TE exist, we need to rebuild the FFS data
+        # This is necessary to ensure the new PE/TE sections are correctly integrated into the FFS structure
+        if new_pe_exist:
+            # Rebuild the FFS data
+            NewFfs_Data = b''
+            for item in self.NewFfs.Child:
+                if item.type == SECTION_TREE and not item.Data.OriData and item.Data.ExtHeader:
+                    NewFfs_Data += struct2stream(item.Data.Header) + struct2stream(item.Data.ExtHeader) + item.Data.Data + item.Data.PadData
+                elif item.type == SECTION_TREE and item.Data.OriData and not item.Data.ExtHeader:
+                    NewFfs_Data += struct2stream(item.Data.Header) + item.Data.OriData + item.Data.PadData
+                elif item.type == SECTION_TREE and item.Data.OriData and item.Data.ExtHeader:
+                    NewFfs_Data += struct2stream(item.Data.Header) + struct2stream(item.Data.ExtHeader) + item.Data.OriData + item.Data.PadData
+                elif item.type == FFS_FREE_SPACE:
+                    NewFfs_Data += item.Data.Data + item.Data.PadData
+                else:
+                    NewFfs_Data += struct2stream(item.Data.Header) + item.Data.Data + item.Data.PadData
+            self.NewFfs.Data.Data = NewFfs_Data
+
+        # Rebase subsequent FFS files in the SAME FV only
+        self._rebase_subsequent_ffs_in_current_fv()
+
+    def _rebase_subsequent_ffs_in_current_fv(self):
+        """Rebase PE/COFF images in subsequent FFS files within the current FV only"""
+        if not hasattr(self, 'TargetFfs') or self.TargetFfs is None:
+            return
+
+        # Calculate size change from the replacement
+        old_size = self.TargetFfs.Data.Size + len(self.TargetFfs.Data.PadData)
+        new_size = self.NewFfs.Data.Size + len(self.NewFfs.Data.PadData)
+        size_delta = new_size - old_size
+
+        if size_delta == 0:
+            return  # No size change, no rebasing needed
+
+        # Get the current FV (where the replacement is happening)
+        current_fv = self.TargetFfs.Parent
+        if not current_fv:
+            return
+
+        # Find the index of the target FFS in the current FV
+        try:
+            target_index = current_fv.Child.index(self.TargetFfs)
+        except ValueError:
+            return
+
+        # Process only subsequent FFS files in the SAME FV
+        for i in range(target_index + 1, len(current_fv.Child)):
+            subsequent_ffs = current_fv.Child[i]
+
+            # Skip free space entries
+            if subsequent_ffs.type == FFS_FREE_SPACE:
+                continue
+            # Look for PE32 sections in this FFS and rebase them
+            self._rebase_ffs_pe_sections(subsequent_ffs, size_delta)
+
+    def _rebase_ffs_pe_sections(self, ffs_node, address_delta):
+        """Rebase PE/COFF and TE images in a specific FFS node"""
+        found_pe = False
+        for section in ffs_node.Child:
+            # Check for PE32 sections
+            if hasattr(section.Data, 'Type') and (section.Data.Type == EFI_SECTION_PE32 or section.Data.Type == EFI_SECTION_TE):
+                for child in section.Child:
+                    if hasattr(child.Data, 'Name') and child.Data.Name == 'PeCoff':
+                        old_address = child.Data.ImageAddress if hasattr(child.Data, 'ImageAddress') else 0
+                        child.Data.PeCoffRebase(address_delta)
+                        section.Data.Data = child.Data.Data
+                        found_pe = True
+                        break
+
+            # Handle nested sections recursively
+            elif hasattr(section, 'Child') and section.Child:
+                nested_found = self._rebase_nested_sections(section, address_delta)
+                found_pe = found_pe or nested_found
+
+        if not found_pe:
+            logger.debug('No PE/COFF or TE found in this FFS')
+
+        return found_pe
+
+    def _rebase_nested_sections(self, section_node, address_delta):
+        """Recursively rebase PE/COFF and TE images in nested sections within current FV"""
+        found_pe = False
+        for child in section_node.Child:
+            # Check for PE32 sections
+            if hasattr(child.Data, 'Type') and (child.Data.Type == EFI_SECTION_PE32 or child.Data.Type == EFI_SECTION_TE):
+                for pe_child in child.Child:
+                    if hasattr(pe_child.Data, 'Name') and pe_child.Data.Name == 'PeCoff':
+                        old_address = pe_child.Data.ImageAddress if hasattr(pe_child.Data, 'ImageAddress') else 0
+                        pe_child.Data.PeCoffRebase(address_delta)
+                        found_pe = True
+                        break
+            # Continue recursing
+            elif hasattr(child, 'Child') and child.Child:
+                nested_found = self._rebase_nested_sections(child, address_delta)
+                found_pe = found_pe or nested_found
+
+        return found_pe
