@@ -113,11 +113,6 @@
     <InputFile>
         ?.c
         ?.C
-        ?.cc
-        ?.CC
-        ?.cpp
-        ?.Cpp
-        ?.CPP
 
     <ExtraDependency>
         $(MAKE_FILE)
@@ -133,6 +128,29 @@
 
     <Command.XCODE>
         "$(CC)" $(DEPS_FLAGS) $(CC_FLAGS) -o ${dst} $(INC) ${src}
+
+[Cxx-Code-File]
+    <InputFile>
+        ?.cc
+        ?.CC
+        ?.cpp
+        ?.Cpp
+        ?.CPP
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+
+    <Command.MSFT, Command.INTEL>
+        "$(CC)" /Fo${dst} $(DEPS_FLAGS) $(CC_FLAGS) $(CXX_FLAGS) $(INC) ${src}
+
+    <Command.GCC>
+        "$(CC)" $(DEPS_FLAGS) $(CC_FLAGS) $(CXX_FLAGS) -c -o ${dst} $(INC) ${src}
+
+    <Command.XCODE>
+        "$(CC)" $(DEPS_FLAGS) $(CC_FLAGS) $(CXX_FLAGS) -o ${dst} $(INC) ${src}
 
 [C-Code-File.BASE.AARCH64,C-Code-File.SEC.AARCH64,C-Code-File.PEI_CORE.AARCH64,C-Code-File.PEIM.AARCH64,C-Code-File.BASE.ARM,C-Code-File.SEC.ARM,C-Code-File.PEI_CORE.ARM,C-Code-File.PEIM.ARM]
     <InputFile>
