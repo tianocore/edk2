@@ -44,7 +44,7 @@ jobs:
       #   - BaseTools/Scripts: Contains the GetMaintainer.py script
       #   - Maintainers.txt: Contains the list of maintainers for the repository
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 1
           sparse-checkout: |
