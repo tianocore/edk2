@@ -531,6 +531,127 @@ ErrorHandler:
 }
 
 /**
+  Get Partition info via registers.
+  This function is supported by aarch64 only.
+
+  @param [in]       ServiceGuid       Service guid.
+  @param [in, out]  PartDescCount     Return number of partition info related to
+                                      Service guid when PartDesc == NULL or
+                                      *PartDescCount == 0.
+                                      Otherwise return number of partition info
+                                      copied in ParcDesc
+  @param [out]      PartDesc          Partition information Buffer
+
+  @retval EFI_SUCCESS
+  @retval EFI_UNSUPPORTED
+  @retval EFI_INVALID_PARAMETER
+  @retval Other              Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibPartitionInfoGetRegs (
+  IN EFI_GUID                 *ServiceGuid,
+  IN OUT UINT32               *PartDescCount,
+  OUT EFI_FFA_PART_INFO_DESC  *PartDesc OPTIONAL
+  )
+{
+ #if !defined (MDE_CPU_AARCH64)
+  return EFI_UNSUPPORTED;
+ #else
+  EFI_STATUS    Status;
+  ARM_FFA_ARGS  FfaArgs;
+  UINT64        Uuid[2];
+  UINT32        DescCount;
+  UINT16        Count;
+  UINT16        PrevIdx;
+  UINT16        StartIdx;
+  UINT16        CurIdx;
+  UINT16        Tag;
+  UINT16        Idx;
+  UINT16        DescSize;
+  UINTN         *Regs;
+
+  if (PartDescCount == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (ServiceGuid != NULL) {
+    ConvertGuidToUuid (ServiceGuid, (GUID *)Uuid);
+  } else {
+    ZeroMem (Uuid, sizeof (Uuid));
+  }
+
+  PrevIdx   = 0;
+  Tag       = 0;
+  DescCount = *PartDescCount;
+
+  do {
+    StartIdx = (PrevIdx == 0) ? 0 : PrevIdx + 1;
+
+    ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
+
+    FfaArgs.Arg0 = ARM_FID_FFA_PARTITION_INFO_GET_REGS;
+    FfaArgs.Arg1 = Uuid[0];
+    FfaArgs.Arg2 = Uuid[1];
+    FfaArgs.Arg3 = (Tag << FFA_PART_INFO_START_TAG_SHIFT) | StartIdx;
+
+    ArmCallFfa (&FfaArgs);
+
+    Status = FfaArgsToEfiStatus (&FfaArgs);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Failed to get partition information of %g. Status: %r\n",
+        __func__,
+        (ServiceGuid != NULL) ? ServiceGuid : (EFI_GUID *)Uuid,
+        Status
+        ));
+      return Status;
+    }
+
+    Count = ((FfaArgs.Arg2 >> FFA_PART_INFO_METADATA_LAST_IDX_SHIFT) &
+             FFA_PART_INFO_IDX_MASK) + 1;
+
+    /*
+     * Return Total number of partitions related ServiceGuid.
+     */
+    if ((PartDesc == NULL) || (*PartDescCount == 0)) {
+      *PartDescCount = Count;
+      return EFI_SUCCESS;
+    }
+
+    CurIdx = ((FfaArgs.Arg2 >> FFA_PART_INFO_METADATA_CURRENT_IDX_SHIFT) &
+              FFA_PART_INFO_IDX_MASK);
+    Tag = ((FfaArgs.Arg2 >> FFA_PART_INFO_METADATA_TAG_SHIFT) &
+           FFA_PART_INFO_TAG_MASK);
+    DescSize = ((FfaArgs.Arg2 >> FFA_PART_INFO_METADATA_DESC_SIZE_SHIFT) &
+                FFA_PART_INFO_DESC_SIZE_MASK);
+
+    if (DescSize != sizeof (EFI_FFA_PART_INFO_DESC)) {
+      return EFI_ACCESS_DENIED;
+    }
+
+    Regs = &FfaArgs.Arg3;
+    for (Idx = 0; Idx < (CurIdx - StartIdx) + 1; Idx++) {
+      CopyMem (PartDesc, Regs, DescSize);
+      Regs += (sizeof (EFI_FFA_PART_INFO_DESC) / sizeof (FfaArgs.Arg0));
+      PartDesc++;
+      if (--DescCount == 0) {
+        break;
+      }
+    }
+
+    PrevIdx = CurIdx;
+  } while (CurIdx < (Count -1) && (DescCount != 0));
+
+  *PartDescCount -= DescCount;
+
+  return EFI_SUCCESS;
+ #endif
+}
+
+/**
   Restore the context which was interrupted with FFA_INTERRUPT (EFI_INTERRUPT_PENDING).
 
   @param [in]   PartId       Partition id
@@ -787,6 +908,85 @@ ArmFfaLibCommonInit (
   }
 
   gFfaSupported = TRUE;
+
+  return EFI_SUCCESS;
+}
+
+/**
+  This is helper function to get first partition info related with service guid.
+
+  @param [in]       ServiceGuid       Service guid.
+  @param [in, out]  PartDescCount     Return number of partition info realted to
+                                      Service guid when PartDesc == NULL.
+                                      Otherwise return number of partition info
+                                      copied in ParcDesc
+  @param [out]      PartDesc          Partition information Buffer
+
+  @retval EFI_SUCCESS
+  @retval EFI_UNSUPPORTED
+  @retval EFI_INVALID_PARAMETER
+  @retval Other                       Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibGetPartitionInfo (
+  IN EFI_GUID                 *ServiceGuid,
+  OUT EFI_FFA_PART_INFO_DESC  *PartDesc
+  )
+{
+  EFI_STATUS  Status;
+  VOID        *TxBuffer;
+  UINT64      TxBufferSize;
+  VOID        *RxBuffer;
+  UINT64      RxBufferSize;
+  UINT32      Count;
+  UINT32      Size;
+
+  if (PartDesc == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Count = 1;
+
+  Status = ArmFfaLibPartitionInfoGetRegs (ServiceGuid, &Count, PartDesc);
+  if (!EFI_ERROR (Status)) {
+    return EFI_SUCCESS;
+  }
+
+  Status = ArmFfaLibGetRxTxBuffers (
+             &TxBuffer,
+             &TxBufferSize,
+             &RxBuffer,
+             &RxBufferSize
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Failed to get Rx/Tx Buffer. Status: %r\n",
+      __func__,
+      Status
+      ));
+    return Status;
+  }
+
+  Status = ArmFfaLibPartitionInfoGet (
+             ServiceGuid,
+             FFA_PART_INFO_FLAG_TYPE_DESC,
+             &Count,
+             &Size
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if ((Size < sizeof (EFI_FFA_PART_INFO_DESC))) {
+    ArmFfaLibRxRelease (gPartId);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CopyMem (PartDesc, RxBuffer, sizeof (EFI_FFA_PART_INFO_DESC));
+  ArmFfaLibRxRelease (gPartId);
 
   return EFI_SUCCESS;
 }
