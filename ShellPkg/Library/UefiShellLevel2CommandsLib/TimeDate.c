@@ -166,50 +166,22 @@ CheckAndSetDate (
   return (SHELL_INVALID_PARAMETER);
 }
 
-/**
-  Function for 'date' command.
+/** Main function of the 'Date' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunDate (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdDate (
+  LIST_ENTRY  *Package
   )
 {
   EFI_STATUS    Status;
-  LIST_ENTRY    *Package;
   EFI_TIME      TheTime;
-  CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
   CONST CHAR16  *Param1;
 
-  ShellStatus  = SHELL_SUCCESS;
-  ProblemParam = NULL;
-
-  //
-  // initialize the shell lib (we must be in non-auto-init...)
-  //
-  Status = ShellInitialize ();
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // parse the command line
-  //
-  Status = ShellCommandLineParse (SfoParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"date", ProblemParam);
-      FreePool (ProblemParam);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  }
+  ShellStatus = SHELL_SUCCESS;
 
   //
   // check for "-?"
@@ -270,6 +242,54 @@ ShellCommandRunDate (
       }
     }
   }
+
+  return ShellStatus;
+}
+
+/**
+  Function for 'date' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunDate (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+
+  ShellStatus  = SHELL_SUCCESS;
+  ProblemParam = NULL;
+
+  //
+  // initialize the shell lib (we must be in non-auto-init...)
+  //
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // parse the command line
+  //
+  Status = ShellCommandLineParse (SfoParamList, &Package, &ProblemParam, TRUE);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"date", ProblemParam);
+      FreePool (ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  }
+
+  ShellStatus = MainCmdDate (Package);
 
   //
   // free the command line package
@@ -400,62 +420,25 @@ CheckAndSetTime (
   return (SHELL_INVALID_PARAMETER);
 }
 
-/**
-  Function for 'time' command.
+/** Main function of the 'Time' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunTime (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdTime (
+  LIST_ENTRY  *Package
   )
 {
   EFI_STATUS    Status;
-  LIST_ENTRY    *Package;
   EFI_TIME      TheTime;
-  CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
   INT16         Tz;
   UINT8         Daylight;
   CONST CHAR16  *TempLocation;
   UINTN         TzMinutes;
 
-  //
-  // Initialize variables
-  //
-  ShellStatus  = SHELL_SUCCESS;
-  ProblemParam = NULL;
-
-  //
-  // initialize the shell lib (we must be in non-auto-init...)
-  //
-  Status = ShellInitialize ();
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // parse the command line
-  //
-  if (PcdGet8 (PcdShellSupportLevel) == 2) {
-    Status = ShellCommandLineParseEx (TimeParamList2, &Package, &ProblemParam, TRUE, TRUE);
-  } else {
-    ASSERT (PcdGet8 (PcdShellSupportLevel) == 3);
-    Status = ShellCommandLineParseEx (TimeParamList3, &Package, &ProblemParam, TRUE, TRUE);
-  }
-
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"time", ProblemParam);
-      FreePool (ProblemParam);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  }
+  ShellStatus = SHELL_SUCCESS;
 
   //
   // check for "-?"
@@ -631,6 +614,63 @@ ShellCommandRunTime (
     }
   }
 
+  return ShellStatus;
+}
+
+/**
+  Function for 'time' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunTime (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+
+  //
+  // Initialize variables
+  //
+  ShellStatus  = SHELL_SUCCESS;
+  ProblemParam = NULL;
+
+  //
+  // initialize the shell lib (we must be in non-auto-init...)
+  //
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // parse the command line
+  //
+  if (PcdGet8 (PcdShellSupportLevel) == 2) {
+    Status = ShellCommandLineParseEx (TimeParamList2, &Package, &ProblemParam, TRUE, TRUE);
+  } else {
+    ASSERT (PcdGet8 (PcdShellSupportLevel) == 3);
+    Status = ShellCommandLineParseEx (TimeParamList3, &Package, &ProblemParam, TRUE, TRUE);
+  }
+
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"time", ProblemParam);
+      FreePool (ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  }
+
+  ShellStatus = MainCmdTime (Package);
+
   //
   // free the command line package
   //
@@ -802,61 +842,24 @@ CheckAndSetTimeZone (
   return (SHELL_INVALID_PARAMETER);
 }
 
-/**
-  Function for 'timezone' command.
+/** Main function of the 'TimeZone' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunTimeZone (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdTimeZone (
+  LIST_ENTRY  *Package
   )
 {
-  //
-  // non interactive
-  //
   EFI_STATUS    Status;
-  LIST_ENTRY    *Package;
-  CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
   UINT8         LoopVar;
   EFI_TIME      TheTime;
   BOOLEAN       Found;
   UINTN         TzMinutes;
 
-  ShellStatus  = SHELL_SUCCESS;
-  ProblemParam = NULL;
-
-  //
-  // initialize the shell lib (we must be in non-auto-init...)
-  //
-  Status = ShellInitialize ();
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // parse the command line
-  //
-  if (PcdGet8 (PcdShellSupportLevel) == 2) {
-    Status = ShellCommandLineParse (TimeZoneParamList2, &Package, &ProblemParam, TRUE);
-  } else {
-    ASSERT (PcdGet8 (PcdShellSupportLevel) == 3);
-    Status = ShellCommandLineParseEx (TimeZoneParamList3, &Package, &ProblemParam, TRUE, TRUE);
-  }
-
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"timezone", ProblemParam);
-      FreePool (ProblemParam);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  }
+  ShellStatus = SHELL_SUCCESS;
 
   //
   // check for "-?"
@@ -984,6 +987,63 @@ ShellCommandRunTimeZone (
       }
     }
   }
+
+  return ShellStatus;
+}
+
+/**
+  Function for 'timezone' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunTimeZone (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  //
+  // non interactive
+  //
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+
+  ShellStatus  = SHELL_SUCCESS;
+  ProblemParam = NULL;
+
+  //
+  // initialize the shell lib (we must be in non-auto-init...)
+  //
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // parse the command line
+  //
+  if (PcdGet8 (PcdShellSupportLevel) == 2) {
+    Status = ShellCommandLineParse (TimeZoneParamList2, &Package, &ProblemParam, TRUE);
+  } else {
+    ASSERT (PcdGet8 (PcdShellSupportLevel) == 3);
+    Status = ShellCommandLineParseEx (TimeZoneParamList3, &Package, &ProblemParam, TRUE, TRUE);
+  }
+
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"timezone", ProblemParam);
+      FreePool (ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  }
+
+  ShellStatus = MainCmdTimeZone (Package);
 
   //
   // free the command line package

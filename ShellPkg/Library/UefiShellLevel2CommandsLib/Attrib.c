@@ -23,24 +23,19 @@ STATIC CONST SHELL_PARAM_ITEM  AttribParamList[] = {
   { NULL,  TypeMax  }
 };
 
-/**
-  Function for 'attrib' command.
+/** Main function of the 'Attrib' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunAttrib (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdAttrib (
+  LIST_ENTRY  *Package
   )
 {
   UINT64               FileAttributesToAdd;
   UINT64               FileAttributesToRemove;
   EFI_STATUS           Status;
-  LIST_ENTRY           *Package;
-  CHAR16               *ProblemParam;
   SHELL_STATUS         ShellStatus;
   UINTN                ParamNumberCount;
   CONST CHAR16         *FileName;
@@ -48,31 +43,8 @@ ShellCommandRunAttrib (
   EFI_SHELL_FILE_INFO  *FileNode;
   EFI_FILE_INFO        *FileInfo;
 
-  ListOfFiles  = NULL;
-  ShellStatus  = SHELL_SUCCESS;
-  ProblemParam = NULL;
-
-  //
-  // initialize the shell lib (we must be in non-auto-init...)
-  //
-  Status = ShellInitialize ();
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // parse the command line
-  //
-  Status = ShellCommandLineParse (AttribParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"attrib", ProblemParam);
-      FreePool (ProblemParam);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  }
+  ListOfFiles = NULL;
+  ShellStatus = SHELL_SUCCESS;
 
   //
   // check for "-?"
@@ -271,6 +243,54 @@ ShellCommandRunAttrib (
       }
     }
   }
+
+  return ShellStatus;
+}
+
+/**
+  Function for 'attrib' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunAttrib (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+
+  ShellStatus  = SHELL_SUCCESS;
+  ProblemParam = NULL;
+
+  //
+  // initialize the shell lib (we must be in non-auto-init...)
+  //
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // parse the command line
+  //
+  Status = ShellCommandLineParse (AttribParamList, &Package, &ProblemParam, TRUE);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"attrib", ProblemParam);
+      FreePool (ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  }
+
+  ShellStatus = MainCmdAttrib (Package);
 
   //
   // free the command line package
