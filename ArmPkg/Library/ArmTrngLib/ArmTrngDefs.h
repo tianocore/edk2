@@ -25,17 +25,6 @@
 #define TRNG_REV_MINOR_MASK   0xFFFF
 #define TRNG_REV_MAJOR_SHIFT  16
 
-#if defined (MDE_CPU_ARM)
-
-/** FID to use on AArch32 platform to request entropy.
-*/
-#define ARM_SMC_ID_TRNG_RND  ARM_SMC_ID_TRNG_RND_AARCH32
-
-/** Maximum bits of entropy supported on AArch32.
-*/
-#define MAX_ENTROPY_BITS  96
-#elif defined (MDE_CPU_AARCH64)
-
 /** FID to use on AArch64 platform to request entropy.
 */
 #define ARM_SMC_ID_TRNG_RND  ARM_SMC_ID_TRNG_RND_AARCH64
@@ -43,8 +32,5 @@
 /** Maximum bits of entropy supported on AArch64.
 */
 #define MAX_ENTROPY_BITS  192
-#else
-  #error "Firmware TRNG not supported. Unknown chipset."
-#endif
 
 #endif // ARM_FW_TRNG_DEFS_H_
