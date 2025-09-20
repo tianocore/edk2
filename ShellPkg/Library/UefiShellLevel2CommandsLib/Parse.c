@@ -280,46 +280,48 @@ ShellCommandRunParse (
     } else {
       ASSERT (FALSE);
     }
+
+    return ShellStatus;
+  }
+
+  StreamingUnicode = IsStdInDataAvailable ();
+  if ((!StreamingUnicode && (ShellCommandLineGetCount (Package) < 4)) ||
+      (ShellCommandLineGetCount (Package) < 3))
+  {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"parse");
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  } else if ((StreamingUnicode && (ShellCommandLineGetCount (Package) > 3)) ||
+             (ShellCommandLineGetCount (Package) > 4))
+  {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"parse");
+    ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
-    StreamingUnicode = IsStdInDataAvailable ();
-    if ((!StreamingUnicode && (ShellCommandLineGetCount (Package) < 4)) ||
-        (ShellCommandLineGetCount (Package) < 3))
-    {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"parse");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if ((StreamingUnicode && (ShellCommandLineGetCount (Package) > 3)) ||
-               (ShellCommandLineGetCount (Package) > 4))
-    {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"parse");
-      ShellStatus = SHELL_INVALID_PARAMETER;
+    if (StreamingUnicode) {
+      FileName     = L">i";
+      TableName    = ShellCommandLineGetRawValue (Package, 1);
+      ColumnString = ShellCommandLineGetRawValue (Package, 2);
     } else {
-      if (StreamingUnicode) {
-        FileName     = L">i";
-        TableName    = ShellCommandLineGetRawValue (Package, 1);
-        ColumnString = ShellCommandLineGetRawValue (Package, 2);
-      } else {
-        FileName     = ShellCommandLineGetRawValue (Package, 1);
-        TableName    = ShellCommandLineGetRawValue (Package, 2);
-        ColumnString = ShellCommandLineGetRawValue (Package, 3);
-      }
+      FileName     = ShellCommandLineGetRawValue (Package, 1);
+      TableName    = ShellCommandLineGetRawValue (Package, 2);
+      ColumnString = ShellCommandLineGetRawValue (Package, 3);
+    }
 
-      if (ShellCommandLineGetValue (Package, L"-i") == NULL) {
-        TableNameInstance = (UINTN)-1;
-      } else {
-        TableNameInstance = ShellStrToUintn (ShellCommandLineGetValue (Package, L"-i"));
-      }
+    if (ShellCommandLineGetValue (Package, L"-i") == NULL) {
+      TableNameInstance = (UINTN)-1;
+    } else {
+      TableNameInstance = ShellStrToUintn (ShellCommandLineGetValue (Package, L"-i"));
+    }
 
-      if (ShellCommandLineGetValue (Package, L"-s") == NULL) {
-        ShellCommandInstance = 1;
-      } else {
-        ShellCommandInstance = ShellStrToUintn (ShellCommandLineGetValue (Package, L"-s"));
-      }
+    if (ShellCommandLineGetValue (Package, L"-s") == NULL) {
+      ShellCommandInstance = 1;
+    } else {
+      ShellCommandInstance = ShellStrToUintn (ShellCommandLineGetValue (Package, L"-s"));
+    }
 
-      if ((FileName != NULL) && (TableName != NULL) && (ColumnString != NULL)) {
-        ShellStatus = PerformParsing (FileName, TableName, ShellStrToUintn (ColumnString), TableNameInstance, ShellCommandInstance, StreamingUnicode);
-      } else {
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      }
+    if ((FileName != NULL) && (TableName != NULL) && (ColumnString != NULL)) {
+      ShellStatus = PerformParsing (FileName, TableName, ShellStrToUintn (ColumnString), TableNameInstance, ShellCommandInstance, StreamingUnicode);
+    } else {
+      ShellStatus = SHELL_INVALID_PARAMETER;
     }
   }
 
