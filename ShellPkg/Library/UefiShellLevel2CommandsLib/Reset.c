@@ -17,52 +17,24 @@ STATIC CONST SHELL_PARAM_ITEM  ResetParamList[] = {
   { NULL,     TypeMax   }
 };
 
-/**
-  Function for 'reset' command.
+/** Main function of the 'Reset' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunReset (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdReset (
+  LIST_ENTRY  *Package
   )
 {
   EFI_STATUS    Status;
-  LIST_ENTRY    *Package;
   CONST CHAR16  *String;
-  CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
   UINT64        OsIndications;
   UINT32        Attr;
   UINTN         DataSize;
 
-  ShellStatus  = SHELL_SUCCESS;
-  ProblemParam = NULL;
-
-  //
-  // initialize the shell lib (we must be in non-auto-init...)
-  //
-  Status = ShellInitialize ();
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // parse the command line
-  //
-  Status = ShellCommandLineParse (ResetParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"reset", ProblemParam);
-      FreePool (ProblemParam);
-      return (SHELL_INVALID_PARAMETER);
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  }
+  ShellStatus = SHELL_SUCCESS;
 
   //
   // check for "-?"
@@ -84,8 +56,7 @@ ShellCommandRunReset (
                         );
 
       if (EFI_ERROR (Status)) {
-        ShellStatus = SHELL_UNSUPPORTED;
-        goto Error;
+        return SHELL_UNSUPPORTED;
       }
 
       if ((OsIndications & EFI_OS_INDICATIONS_BOOT_TO_FW_UI) != 0) {
@@ -114,8 +85,7 @@ ShellCommandRunReset (
       }
 
       if (EFI_ERROR (Status)) {
-        ShellStatus = SHELL_UNSUPPORTED;
-        goto Error;
+        return SHELL_UNSUPPORTED;
       }
     }
 
@@ -162,12 +132,59 @@ ShellCommandRunReset (
     }
   }
 
+  return ShellStatus;
+}
+
+/**
+  Function for 'reset' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunReset (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+
+  ShellStatus  = SHELL_SUCCESS;
+  ProblemParam = NULL;
+
+  //
+  // initialize the shell lib (we must be in non-auto-init...)
+  //
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // parse the command line
+  //
+  Status = ShellCommandLineParse (ResetParamList, &Package, &ProblemParam, TRUE);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"reset", ProblemParam);
+      FreePool (ProblemParam);
+      return (SHELL_INVALID_PARAMETER);
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  }
+
+  ShellStatus = MainCmdReset (Package);
+
   //
   // we should never get here... so the free and return are for formality more than use
   // as the ResetSystem function should not return...
   //
 
-Error:
   //
   // free the command line package
   //
