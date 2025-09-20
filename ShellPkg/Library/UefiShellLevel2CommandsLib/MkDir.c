@@ -55,108 +55,110 @@ ShellCommandRunMkDir (
     } else {
       ASSERT (FALSE);
     }
+
+    return ShellStatus;
+  }
+
+  //
+  // check for "-?"
+  //
+  if (ShellCommandLineGetFlag (Package, L"-?")) {
+    ASSERT (FALSE);
+  }
+
+  //
+  // create a set of directories
+  //
+  if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
+    //
+    // we didnt get a single parameter
+    //
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"mkdir");
+    ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
-    //
-    // check for "-?"
-    //
-    if (ShellCommandLineGetFlag (Package, L"-?")) {
-      ASSERT (FALSE);
-    }
-
-    //
-    // create a set of directories
-    //
-    if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
+    for ( DirCreateCount = 1
+          ;
+          ; DirCreateCount++
+          )
+    {
       //
-      // we didnt get a single parameter
+      // loop through each directory specified
       //
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"mkdir");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      for ( DirCreateCount = 1
-            ;
-            ; DirCreateCount++
-            )
-      {
-        //
-        // loop through each directory specified
-        //
 
-        NewDirName = ShellCommandLineGetRawValue (Package, DirCreateCount);
-        if (NewDirName == NULL) {
+      NewDirName = ShellCommandLineGetRawValue (Package, DirCreateCount);
+      if (NewDirName == NULL) {
+        break;
+      }
+
+      //
+      // check if that already exists... if yes fail
+      //
+      FileHandle = NULL;
+      Status     = ShellOpenFileByName (
+                     NewDirName,
+                     &FileHandle,
+                     EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE,
+                     EFI_FILE_DIRECTORY
+                     );
+      if (!EFI_ERROR (Status)) {
+        ShellCloseFile (&FileHandle);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MKDIR_ALREADY), gShellLevel2HiiHandle, NewDirName);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      } else {
+        ASSERT (FileHandle == NULL);
+        //
+        // create the nested directory from parent to child.
+        // if NewDirName = test1\test2\test3, first create "test1\" directory, then "test1\test2\", finally "test1\test2\test3".
+        //
+        NewDirNameCopy = AllocateCopyPool (StrSize (NewDirName), NewDirName);
+        NewDirNameCopy = PathCleanUpDirectories (NewDirNameCopy);
+        if (NewDirNameCopy == NULL) {
+          ShellStatus = SHELL_OUT_OF_RESOURCES;
           break;
         }
 
-        //
-        // check if that already exists... if yes fail
-        //
-        FileHandle = NULL;
-        Status     = ShellOpenFileByName (
-                       NewDirName,
-                       &FileHandle,
-                       EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE,
-                       EFI_FILE_DIRECTORY
-                       );
-        if (!EFI_ERROR (Status)) {
-          ShellCloseFile (&FileHandle);
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MKDIR_ALREADY), gShellLevel2HiiHandle, NewDirName);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        } else {
-          ASSERT (FileHandle == NULL);
+        SplitName = NewDirNameCopy;
+        while (SplitName != NULL) {
+          SplitName = StrStr (SplitName + 1, L"\\");
+          if (SplitName != NULL) {
+            SaveSplitChar    = *(SplitName + 1);
+            *(SplitName + 1) = '\0';
+          }
+
           //
-          // create the nested directory from parent to child.
-          // if NewDirName = test1\test2\test3, first create "test1\" directory, then "test1\test2\", finally "test1\test2\test3".
+          // check if current nested directory already exists... continue to create the child directory.
           //
-          NewDirNameCopy = AllocateCopyPool (StrSize (NewDirName), NewDirName);
-          NewDirNameCopy = PathCleanUpDirectories (NewDirNameCopy);
-          if (NewDirNameCopy == NULL) {
-            ShellStatus = SHELL_OUT_OF_RESOURCES;
-            break;
-          }
-
-          SplitName = NewDirNameCopy;
-          while (SplitName != NULL) {
-            SplitName = StrStr (SplitName + 1, L"\\");
-            if (SplitName != NULL) {
-              SaveSplitChar    = *(SplitName + 1);
-              *(SplitName + 1) = '\0';
+          Status = ShellOpenFileByName (
+                     NewDirNameCopy,
+                     &FileHandle,
+                     EFI_FILE_MODE_READ,
+                     EFI_FILE_DIRECTORY
+                     );
+          if (!EFI_ERROR (Status)) {
+            ShellCloseFile (&FileHandle);
+          } else {
+            Status = ShellCreateDirectory (NewDirNameCopy, &FileHandle);
+            if (EFI_ERROR (Status)) {
+              break;
             }
 
-            //
-            // check if current nested directory already exists... continue to create the child directory.
-            //
-            Status = ShellOpenFileByName (
-                       NewDirNameCopy,
-                       &FileHandle,
-                       EFI_FILE_MODE_READ,
-                       EFI_FILE_DIRECTORY
-                       );
-            if (!EFI_ERROR (Status)) {
-              ShellCloseFile (&FileHandle);
-            } else {
-              Status = ShellCreateDirectory (NewDirNameCopy, &FileHandle);
-              if (EFI_ERROR (Status)) {
-                break;
-              }
-
-              if (FileHandle != NULL) {
-                gEfiShellProtocol->CloseFile (FileHandle);
-              }
-            }
-
-            if (SplitName != NULL) {
-              *(SplitName + 1) = SaveSplitChar;
+            if (FileHandle != NULL) {
+              gEfiShellProtocol->CloseFile (FileHandle);
             }
           }
 
-          if (EFI_ERROR (Status)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MKDIR_CREATEFAIL), gShellLevel2HiiHandle, NewDirName);
-            ShellStatus = SHELL_ACCESS_DENIED;
-            break;
+          if (SplitName != NULL) {
+            *(SplitName + 1) = SaveSplitChar;
           }
-
-          SHELL_FREE_NON_NULL (NewDirNameCopy);
         }
+
+        if (EFI_ERROR (Status)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MKDIR_CREATEFAIL), gShellLevel2HiiHandle, NewDirName);
+          ShellStatus = SHELL_ACCESS_DENIED;
+          break;
+        }
+
+        SHELL_FREE_NON_NULL (NewDirNameCopy);
       }
     }
   }

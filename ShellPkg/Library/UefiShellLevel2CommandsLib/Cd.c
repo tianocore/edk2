@@ -219,6 +219,8 @@ ShellCommandRunCd (
     } else {
       ASSERT (FALSE);
     }
+
+    return ShellStatus;
   }
 
   //

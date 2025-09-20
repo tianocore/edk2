@@ -260,60 +260,62 @@ ShellCommandRunVol (
     } else {
       ASSERT (FALSE);
     }
+
+    return ShellStatus;
+  }
+
+  //
+  // check for "-?"
+  //
+  if (ShellCommandLineGetFlag (Package, L"-?")) {
+    ASSERT (FALSE);
+  }
+
+  if (ShellCommandLineGetCount (Package) > 2) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"vol");
+    ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
-    //
-    // check for "-?"
-    //
-    if (ShellCommandLineGetFlag (Package, L"-?")) {
-      ASSERT (FALSE);
+    PathName = ShellCommandLineGetRawValue (Package, 1);
+    if (PathName == NULL) {
+      CurDir = gEfiShellProtocol->GetCurDir (NULL);
+      if (CurDir == NULL) {
+        ShellStatus = SHELL_NOT_FOUND;
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"vol");
+      } else {
+        PathName = CurDir;
+      }
     }
 
-    if (ShellCommandLineGetCount (Package) > 2) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"vol");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      PathName = ShellCommandLineGetRawValue (Package, 1);
-      if (PathName == NULL) {
-        CurDir = gEfiShellProtocol->GetCurDir (NULL);
-        if (CurDir == NULL) {
-          ShellStatus = SHELL_NOT_FOUND;
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"vol");
-        } else {
-          PathName = CurDir;
-        }
+    if (PathName != NULL) {
+      TempSpot = StrStr (PathName, L":");
+      if (TempSpot != NULL) {
+        *TempSpot = CHAR_NULL;
       }
 
-      if (PathName != NULL) {
-        TempSpot = StrStr (PathName, L":");
-        if (TempSpot != NULL) {
-          *TempSpot = CHAR_NULL;
-        }
+      TempSpot = StrStr (PathName, L"\\");
+      if (TempSpot != NULL) {
+        *TempSpot = CHAR_NULL;
+      }
 
-        TempSpot = StrStr (PathName, L"\\");
-        if (TempSpot != NULL) {
-          *TempSpot = CHAR_NULL;
-        }
-
-        StrnCatGrow (&FullPath, &Length, PathName, 0);
-        StrnCatGrow (&FullPath, &Length, L":\\", 0);
-        DeleteMode = ShellCommandLineGetFlag (Package, L"-d");
-        NewName    = ShellCommandLineGetValue (Package, L"-n");
-        if (DeleteMode && ShellCommandLineGetFlag (Package, L"-n")) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_CONFLICT), gShellLevel2HiiHandle, L"vol", L"-d", L"-n");
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        } else if (ShellCommandLineGetFlag (Package, L"-n") && (NewName == NULL)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellLevel2HiiHandle, L"vol", L"-n");
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        } else if ((NewName != NULL) && (StrLen (NewName) > 11)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"vol", NewName, L"-n");
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        } else if (ShellStatus == SHELL_SUCCESS) {
-          ShellStatus = HandleVol (
-                          FullPath,
-                          DeleteMode,
-                          NewName
-                          );
-        }
+      StrnCatGrow (&FullPath, &Length, PathName, 0);
+      StrnCatGrow (&FullPath, &Length, L":\\", 0);
+      DeleteMode = ShellCommandLineGetFlag (Package, L"-d");
+      NewName    = ShellCommandLineGetValue (Package, L"-n");
+      if (DeleteMode && ShellCommandLineGetFlag (Package, L"-n")) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_CONFLICT), gShellLevel2HiiHandle, L"vol", L"-d", L"-n");
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      } else if (ShellCommandLineGetFlag (Package, L"-n") && (NewName == NULL)) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellLevel2HiiHandle, L"vol", L"-n");
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      } else if ((NewName != NULL) && (StrLen (NewName) > 11)) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"vol", NewName, L"-n");
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      } else if (ShellStatus == SHELL_SUCCESS) {
+        ShellStatus = HandleVol (
+                        FullPath,
+                        DeleteMode,
+                        NewName
+                        );
       }
     }
   }

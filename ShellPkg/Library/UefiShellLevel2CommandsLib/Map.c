@@ -1147,131 +1147,98 @@ ShellCommandRunMap (
     } else {
       ASSERT (FALSE);
     }
+
+    return ShellStatus;
+  }
+
+  //
+  // check for "-?"
+  //
+  SfoMode   = ShellCommandLineGetFlag (Package, L"-sfo");
+  ConstMode = ShellCommandLineGetFlag (Package, L"-c");
+  NormlMode = ShellCommandLineGetFlag (Package, L"-f");
+  if (ShellCommandLineGetFlag (Package, L"-?")) {
+    ASSERT (FALSE);
+  } else if (ShellCommandLineGetRawValue (Package, 3) != NULL) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"map");
+    ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
     //
-    // check for "-?"
+    // Deleting a map name...
     //
-    SfoMode   = ShellCommandLineGetFlag (Package, L"-sfo");
-    ConstMode = ShellCommandLineGetFlag (Package, L"-c");
-    NormlMode = ShellCommandLineGetFlag (Package, L"-f");
-    if (ShellCommandLineGetFlag (Package, L"-?")) {
-      ASSERT (FALSE);
-    } else if (ShellCommandLineGetRawValue (Package, 3) != NULL) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"map");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      //
-      // Deleting a map name...
-      //
-      if (ShellCommandLineGetFlag (Package, L"-d")) {
-        if (  ShellCommandLineGetFlag (Package, L"-r")
-           || ShellCommandLineGetFlag (Package, L"-v")
-           || ConstMode
-           || NormlMode
-           || ShellCommandLineGetFlag (Package, L"-u")
-           || ShellCommandLineGetFlag (Package, L"-t")
-              )
-        {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_CON), gShellLevel2HiiHandle, L"map");
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        } else {
-          SName = ShellCommandLineGetValue (Package, L"-d");
-          if (SName != NULL) {
-            Status = PerformMappingDelete (SName);
-            if (EFI_ERROR (Status)) {
-              if (Status == EFI_ACCESS_DENIED) {
-                ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_AD), gShellLevel2HiiHandle, L"map");
-                ShellStatus = SHELL_ACCESS_DENIED;
-              } else if (Status == EFI_NOT_FOUND) {
-                ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MAP_NF), gShellLevel2HiiHandle, L"map", SName);
-                ShellStatus = SHELL_INVALID_PARAMETER;
-              } else {
-                ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, L"map", Status);
-                ShellStatus = SHELL_UNSUPPORTED;
-              }
-            }
-          } else {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"map");
-            ShellStatus = SHELL_INVALID_PARAMETER;
-          }
-        }
-      } else if (  ShellCommandLineGetFlag (Package, L"-r")
-                   //               || ShellCommandLineGetFlag(Package, L"-v")
-                || ConstMode
-                || NormlMode
-                || ShellCommandLineGetFlag (Package, L"-u")
-                || ShellCommandLineGetFlag (Package, L"-t")
-                   )
+    if (ShellCommandLineGetFlag (Package, L"-d")) {
+      if (  ShellCommandLineGetFlag (Package, L"-r")
+         || ShellCommandLineGetFlag (Package, L"-v")
+         || ConstMode
+         || NormlMode
+         || ShellCommandLineGetFlag (Package, L"-u")
+         || ShellCommandLineGetFlag (Package, L"-t")
+            )
       {
-        ProbeForMediaChange ();
-        if ( ShellCommandLineGetFlag (Package, L"-r")) {
-          //
-          // Do the reset
-          //
-          Status = ShellCommandCreateInitialMappingsAndPaths ();
-          if (EFI_ERROR (Status)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, L"map", Status);
-            ShellStatus = SHELL_UNSUPPORTED;
-          }
-        }
-
-        if ((ShellStatus == SHELL_SUCCESS) && ShellCommandLineGetFlag (Package, L"-u")) {
-          //
-          // Do the Update
-          //
-          Status = ShellCommandUpdateMapping ();
-          if (EFI_ERROR (Status)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, L"map", Status);
-            ShellStatus = SHELL_UNSUPPORTED;
-          }
-        }
-
-        if (ShellStatus == SHELL_SUCCESS) {
-          Param1     = ShellCommandLineGetRawValue (Package, 1);
-          TypeString = ShellCommandLineGetValue (Package, L"-t");
-          if (  !ConstMode
-             && !NormlMode
-             && (TypeString  == NULL)
-                )
-          {
-            //
-            // now do the display...
-            //
-            ShellStatus = PerformMappingDisplay (
-                            ShellCommandLineGetFlag (Package, L"-v"),
-                            TRUE,
-                            TRUE,
-                            NULL,
-                            SfoMode,
-                            Param1,
-                            TRUE
-                            );
-          } else {
-            //
-            // now do the display...
-            //
-            ShellStatus = PerformMappingDisplay2 (
-                            ShellCommandLineGetFlag (Package, L"-v"),
-                            ConstMode,
-                            NormlMode,
-                            TypeString,
-                            SfoMode,
-                            Param1
-                            );
-          }
-        }
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_CON), gShellLevel2HiiHandle, L"map");
+        ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
+        SName = ShellCommandLineGetValue (Package, L"-d");
+        if (SName != NULL) {
+          Status = PerformMappingDelete (SName);
+          if (EFI_ERROR (Status)) {
+            if (Status == EFI_ACCESS_DENIED) {
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_AD), gShellLevel2HiiHandle, L"map");
+              ShellStatus = SHELL_ACCESS_DENIED;
+            } else if (Status == EFI_NOT_FOUND) {
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MAP_NF), gShellLevel2HiiHandle, L"map", SName);
+              ShellStatus = SHELL_INVALID_PARAMETER;
+            } else {
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, L"map", Status);
+              ShellStatus = SHELL_UNSUPPORTED;
+            }
+          }
+        } else {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"map");
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        }
+      }
+    } else if (  ShellCommandLineGetFlag (Package, L"-r")
+                 //               || ShellCommandLineGetFlag(Package, L"-v")
+              || ConstMode
+              || NormlMode
+              || ShellCommandLineGetFlag (Package, L"-u")
+              || ShellCommandLineGetFlag (Package, L"-t")
+                 )
+    {
+      ProbeForMediaChange ();
+      if ( ShellCommandLineGetFlag (Package, L"-r")) {
         //
-        // adding or displaying (there were no flags)
+        // Do the reset
         //
-        SName   = ShellCommandLineGetRawValue (Package, 1);
-        Mapping = ShellCommandLineGetRawValue (Package, 2);
-        if (  (SName == NULL)
-           && (Mapping == NULL)
+        Status = ShellCommandCreateInitialMappingsAndPaths ();
+        if (EFI_ERROR (Status)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, L"map", Status);
+          ShellStatus = SHELL_UNSUPPORTED;
+        }
+      }
+
+      if ((ShellStatus == SHELL_SUCCESS) && ShellCommandLineGetFlag (Package, L"-u")) {
+        //
+        // Do the Update
+        //
+        Status = ShellCommandUpdateMapping ();
+        if (EFI_ERROR (Status)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, L"map", Status);
+          ShellStatus = SHELL_UNSUPPORTED;
+        }
+      }
+
+      if (ShellStatus == SHELL_SUCCESS) {
+        Param1     = ShellCommandLineGetRawValue (Package, 1);
+        TypeString = ShellCommandLineGetValue (Package, L"-t");
+        if (  !ConstMode
+           && !NormlMode
+           && (TypeString  == NULL)
               )
         {
           //
-          // display only since no flags
+          // now do the display...
           //
           ShellStatus = PerformMappingDisplay (
                           ShellCommandLineGetFlag (Package, L"-v"),
@@ -1279,83 +1246,118 @@ ShellCommandRunMap (
                           TRUE,
                           NULL,
                           SfoMode,
-                          NULL,
-                          TRUE
-                          );
-        } else if (  (SName == NULL)
-                  || (Mapping == NULL)
-                     )
-        {
-          //
-          // Display only the one specified
-          //
-          ShellStatus = PerformMappingDisplay (
-                          FALSE,
-                          FALSE,
-                          FALSE,
-                          NULL,
-                          SfoMode,
-                          SName, // note the variable here...
+                          Param1,
                           TRUE
                           );
         } else {
-          if (ShellIsHexOrDecimalNumber (Mapping, TRUE, FALSE)) {
-            MapAsHandle = ConvertHandleIndexToHandle (ShellStrToUintn (Mapping));
-          } else {
-            MapAsHandle = NULL;
+          //
+          // now do the display...
+          //
+          ShellStatus = PerformMappingDisplay2 (
+                          ShellCommandLineGetFlag (Package, L"-v"),
+                          ConstMode,
+                          NormlMode,
+                          TypeString,
+                          SfoMode,
+                          Param1
+                          );
+        }
+      }
+    } else {
+      //
+      // adding or displaying (there were no flags)
+      //
+      SName   = ShellCommandLineGetRawValue (Package, 1);
+      Mapping = ShellCommandLineGetRawValue (Package, 2);
+      if (  (SName == NULL)
+         && (Mapping == NULL)
+            )
+      {
+        //
+        // display only since no flags
+        //
+        ShellStatus = PerformMappingDisplay (
+                        ShellCommandLineGetFlag (Package, L"-v"),
+                        TRUE,
+                        TRUE,
+                        NULL,
+                        SfoMode,
+                        NULL,
+                        TRUE
+                        );
+      } else if (  (SName == NULL)
+                || (Mapping == NULL)
+                   )
+      {
+        //
+        // Display only the one specified
+        //
+        ShellStatus = PerformMappingDisplay (
+                        FALSE,
+                        FALSE,
+                        FALSE,
+                        NULL,
+                        SfoMode,
+                        SName, // note the variable here...
+                        TRUE
+                        );
+      } else {
+        if (ShellIsHexOrDecimalNumber (Mapping, TRUE, FALSE)) {
+          MapAsHandle = ConvertHandleIndexToHandle (ShellStrToUintn (Mapping));
+        } else {
+          MapAsHandle = NULL;
+        }
+
+        if ((MapAsHandle == NULL) && (Mapping[StrLen (Mapping)-1] != L':')) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"map", Mapping);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+        } else {
+          TempStringLength = StrLen (SName);
+          if (!IsNumberLetterOnly (SName, TempStringLength-((SName[TempStringLength-1] == L':') ? 1 : 0))) {
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"map", SName);
+            ShellStatus = SHELL_INVALID_PARAMETER;
           }
 
-          if ((MapAsHandle == NULL) && (Mapping[StrLen (Mapping)-1] != L':')) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"map", Mapping);
-            ShellStatus = SHELL_INVALID_PARAMETER;
-          } else {
-            TempStringLength = StrLen (SName);
-            if (!IsNumberLetterOnly (SName, TempStringLength-((SName[TempStringLength-1] == L':') ? 1 : 0))) {
-              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"map", SName);
-              ShellStatus = SHELL_INVALID_PARAMETER;
+          if (ShellStatus == SHELL_SUCCESS) {
+            if (MapAsHandle != NULL) {
+              ShellStatus = AddMappingFromHandle (MapAsHandle, SName);
+            } else {
+              ShellStatus = AddMappingFromMapping (Mapping, SName);
             }
 
-            if (ShellStatus == SHELL_SUCCESS) {
-              if (MapAsHandle != NULL) {
-                ShellStatus = AddMappingFromHandle (MapAsHandle, SName);
-              } else {
-                ShellStatus = AddMappingFromMapping (Mapping, SName);
+            if (ShellStatus != SHELL_SUCCESS) {
+              switch (ShellStatus) {
+                case SHELL_ACCESS_DENIED:
+                  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_AD), gShellLevel2HiiHandle, L"map");
+                  break;
+                case SHELL_INVALID_PARAMETER:
+                  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"map", Mapping);
+                  break;
+                case SHELL_DEVICE_ERROR:
+                  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MAP_NOF), gShellLevel2HiiHandle, L"map", Mapping);
+                  break;
+                default:
+                  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, L"map", ShellStatus|MAX_BIT);
               }
-
-              if (ShellStatus != SHELL_SUCCESS) {
-                switch (ShellStatus) {
-                  case SHELL_ACCESS_DENIED:
-                    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_AD), gShellLevel2HiiHandle, L"map");
-                    break;
-                  case SHELL_INVALID_PARAMETER:
-                    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"map", Mapping);
-                    break;
-                  case SHELL_DEVICE_ERROR:
-                    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MAP_NOF), gShellLevel2HiiHandle, L"map", Mapping);
-                    break;
-                  default:
-                    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, L"map", ShellStatus|MAX_BIT);
-                }
-              } else {
-                //
-                // now do the display...
-                //
-                ShellStatus = PerformMappingDisplay (
-                                FALSE,
-                                FALSE,
-                                FALSE,
-                                NULL,
-                                SfoMode,
-                                SName,
-                                TRUE
-                                );
-              } // we were successful so do an output
-            }
-          } // got a valid map target
-        } // got 2 variables
-      } // we are adding a mapping
-    } // got valid parameters
-  }
+            } else {
+              //
+              // now do the display...
+              //
+              ShellStatus = PerformMappingDisplay (
+                              FALSE,
+                              FALSE,
+                              FALSE,
+                              NULL,
+                              SfoMode,
+                              SName,
+                              TRUE
+                              );
+            } // we were successful so do an output
+          }
+        } // got a valid map target
+      } // got 2 variables
+    } // we are adding a mapping
+  } // got valid parameters
 
   //
   // free the command line package
