@@ -160,7 +160,7 @@ IsValidMove (
       //
       // Invalid move
       //
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_MV_INV_CWD), gShellLevel2HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MV_INV_CWD), gShellLevel2HiiHandle);
       return FALSE;
     }
   }
@@ -173,7 +173,7 @@ IsValidMove (
      || ((DestAttr & EFI_FILE_READ_ONLY) != 0)
         )
   {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_MV_INV_RO), gShellLevel2HiiHandle, SourcePath);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MV_INV_RO), gShellLevel2HiiHandle, SourcePath);
     return (FALSE);
   }
 
@@ -201,7 +201,7 @@ IsValidMove (
       )
       )
   {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_MV_INV_SUB), gShellLevel2HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_MV_INV_SUB), gShellLevel2HiiHandle);
     FreePool (DestPathCopy);
     return (FALSE);
   }
@@ -284,7 +284,7 @@ GetDestinationLocation (
     if (StrStr (DestParameter, L":") == NULL) {
       if (Cwd == NULL) {
         ShellCloseFileMetaArg (&DestList);
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle);
         return (SHELL_INVALID_PARAMETER);
       }
 
@@ -320,7 +320,7 @@ GetDestinationLocation (
     //
     if (!IsNodeAtEnd (&DestList->Link, &Node->Link)) {
       ShellCloseFileMetaArg (&DestList);
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_MARG_ERROR), gShellLevel2HiiHandle, L"mv", DestParameter);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_MARG_ERROR), gShellLevel2HiiHandle, L"mv", DestParameter);
       return (SHELL_INVALID_PARAMETER);
     }
 
@@ -341,7 +341,7 @@ GetDestinationLocation (
       // cant move multiple files onto a single file.
       //
       ShellCloseFileMetaArg (&DestList);
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_ERROR), gShellLevel2HiiHandle, L"mv", DestParameter);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_ERROR), gShellLevel2HiiHandle, L"mv", DestParameter);
       return (SHELL_INVALID_PARAMETER);
     }
   }
@@ -475,7 +475,7 @@ MoveWithinFileSystems (
   NewSize    += StrSize (Node->FileName) + SIZE_OF_EFI_FILE_INFO + sizeof (CHAR16);
   NewFileInfo = AllocateZeroPool (NewSize);
   if (NewFileInfo == NULL) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_MEM), gShellLevel2HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_MEM), gShellLevel2HiiHandle);
     Status = EFI_OUT_OF_RESOURCES;
   } else {
     CopyMem (NewFileInfo, Node->Info, SIZE_OF_EFI_FILE_INFO);
@@ -653,7 +653,7 @@ ValidateAndMoveFiles (
       continue;
     }
 
-    ShellPrintEx (-1, -1, HiiOutput, Node->FullName, FullDestPath != NULL ? FullDestPath : DestPath);
+    ShellPrintDefaultEx (HiiOutput, Node->FullName, FullDestPath != NULL ? FullDestPath : DestPath);
 
     //
     // See if destination exists
@@ -707,7 +707,7 @@ ValidateAndMoveFiles (
       // Display error status
       //
       if (EFI_ERROR (Status)) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, L"mv", Status);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, L"mv", Status);
       }
     }
 
@@ -728,7 +728,7 @@ ValidateAndMoveFiles (
         ShellStatus = SHELL_ACCESS_DENIED;
       }
     } else {
-      ShellPrintEx (-1, -1, L"%s", HiiResultOk);
+      ShellPrintDefaultEx (L"%s", HiiResultOk);
     }
   } // main for loop
 
@@ -782,7 +782,7 @@ ShellCommandRunMv (
   Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"mv", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"mv", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -802,7 +802,7 @@ ShellCommandRunMv (
         //
         // we have insufficient parameters
         //
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"mv");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"mv");
         ShellStatus = SHELL_INVALID_PARAMETER;
         break;
       case 2:
@@ -810,12 +810,12 @@ ShellCommandRunMv (
         // must have valid CWD for single parameter...
         //
         if (ShellGetCurrentDir (NULL) == NULL) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"mv");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"mv");
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
           Status = ShellOpenFileMetaArg ((CHAR16 *)ShellCommandLineGetRawValue (Package, 1), EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
           if ((FileList == NULL) || IsListEmpty (&FileList->Link) || EFI_ERROR (Status)) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"mv", ShellCommandLineGetRawValue (Package, 1));
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"mv", ShellCommandLineGetRawValue (Package, 1));
             ShellStatus = SHELL_NOT_FOUND;
           } else {
             //
@@ -824,7 +824,7 @@ ShellCommandRunMv (
             CwdSize = StrSize (ShellGetCurrentDir (NULL)) + sizeof (CHAR16);
             Cwd     = AllocateZeroPool (CwdSize);
             if (Cwd == NULL) {
-              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellLevel2HiiHandle, L"mv");
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellLevel2HiiHandle, L"mv");
               ShellStatus = SHELL_OUT_OF_RESOURCES;
             } else {
               StrCpyS (Cwd, CwdSize / sizeof (CHAR16), ShellGetCurrentDir (NULL));
@@ -845,7 +845,7 @@ ShellCommandRunMv (
 
           Status = ShellOpenFileMetaArg ((CHAR16 *)ShellCommandLineGetRawValue (Package, LoopCounter), EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
           if ((FileList == NULL) || IsListEmpty (&FileList->Link) || EFI_ERROR (Status)) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"mv", ShellCommandLineGetRawValue (Package, LoopCounter));
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"mv", ShellCommandLineGetRawValue (Package, LoopCounter));
             ShellStatus = SHELL_NOT_FOUND;
           } else {
             //
@@ -863,7 +863,7 @@ ShellCommandRunMv (
             Status = ShellCloseFileMetaArg (&FileList);
             if (EFI_ERROR (Status) && (ShellStatus == SHELL_SUCCESS)) {
               ShellStatus = SHELL_ACCESS_DENIED;
-              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_FILE), gShellLevel2HiiHandle, L"mv", ShellCommandLineGetRawValue (Package, 1), ShellStatus|MAX_BIT);
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_FILE), gShellLevel2HiiHandle, L"mv", ShellCommandLineGetRawValue (Package, 1), ShellStatus|MAX_BIT);
             }
           }
         }

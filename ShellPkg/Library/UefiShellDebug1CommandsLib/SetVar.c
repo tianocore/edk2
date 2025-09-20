@@ -229,7 +229,7 @@ ParseParameterData (
 
     DevPath = ConvertTextToDevicePath (Data);
     if (DevPath == NULL) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_DPFT), gShellDebug1HiiHandle, L"setvar");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SETVAR_ERROR_DPFT), gShellDebug1HiiHandle, L"setvar");
       Status = EFI_INVALID_PARAMETER;
     } else {
       Size = GetDevicePathSize (DevPath);
@@ -291,7 +291,7 @@ GetVariableDataFromParameter (
     }
 
     if (TempData[0] != L'=') {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setvar", TempData);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setvar", TempData);
       return EFI_INVALID_PARAMETER;
     }
 
@@ -306,9 +306,9 @@ GetVariableDataFromParameter (
         TotalSize += Size;
       } else {
         if (Status == EFI_INVALID_PARAMETER) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setvar", TempData);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setvar", TempData);
         } else if (Status == EFI_NOT_FOUND) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_DPFT), gShellDebug1HiiHandle, L"setvar");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SETVAR_ERROR_DPFT), gShellDebug1HiiHandle, L"setvar");
         }
 
         return Status;
@@ -388,19 +388,19 @@ ShellCommandRunSetVar (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"setvar", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"setvar", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       ASSERT (FALSE);
     }
   } else if (ShellCommandLineCheckDuplicate (Package, &ProblemParam) != EFI_SUCCESS) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_DUPLICATE), gShellDebug1HiiHandle, L"setvar", ProblemParam);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_DUPLICATE), gShellDebug1HiiHandle, L"setvar", ProblemParam);
     FreePool (ProblemParam);
     ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
     if (ShellCommandLineGetCount (Package) < 2) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"setvar");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"setvar");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       VariableName = ShellCommandLineGetRawValue (Package, 1);
@@ -416,13 +416,13 @@ ShellCommandRunSetVar (
         if (StringGuid != NULL) {
           RStatus = StrToGuid (StringGuid, &Guid);
         } else {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setvar", StringGuid);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setvar", StringGuid);
           ShellCommandLineFreeVarList (Package);
           return SHELL_INVALID_PARAMETER;
         }
 
         if (RETURN_ERROR (RStatus) || (StringGuid[GUID_STRING_LENGTH] != L'\0')) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setvar", StringGuid);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setvar", StringGuid);
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
       }
@@ -435,7 +435,7 @@ ShellCommandRunSetVar (
         if (Status == EFI_BUFFER_TOO_SMALL) {
           Buffer = AllocateZeroPool (Size);
           if (Buffer == NULL) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"setvar");
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"setvar");
             ShellCommandLineFreeVarList (Package);
             return SHELL_OUT_OF_RESOURCES;
           }
@@ -444,14 +444,14 @@ ShellCommandRunSetVar (
         }
 
         if (!EFI_ERROR (Status) && (Buffer != NULL)) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SETVAR_PRINT), gShellDebug1HiiHandle, &Guid, VariableName, Size);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SETVAR_PRINT), gShellDebug1HiiHandle, &Guid, VariableName, Size);
           for (LoopVar = 0; LoopVar < Size; LoopVar++) {
-            ShellPrintEx (-1, -1, L"%02x ", ((UINT8 *)Buffer)[LoopVar]);
+            ShellPrintDefaultEx (L"%02x ", ((UINT8 *)Buffer)[LoopVar]);
           }
 
-          ShellPrintEx (-1, -1, L"\r\n");
+          ShellPrintDefaultEx (L"\r\n");
         } else {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_GET), gShellDebug1HiiHandle, L"setvar", &Guid, VariableName);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SETVAR_ERROR_GET), gShellDebug1HiiHandle, L"setvar", &Guid, VariableName);
           ShellStatus = SHELL_ACCESS_DENIED;
         }
       } else {
@@ -462,7 +462,7 @@ ShellCommandRunSetVar (
         if (Status == EFI_BUFFER_TOO_SMALL) {
           Buffer = AllocateZeroPool (Size);
           if (Buffer == NULL) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"setvar");
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"setvar");
             ShellCommandLineFreeVarList (Package);
             return SHELL_OUT_OF_RESOURCES;
           }
@@ -498,7 +498,7 @@ ShellCommandRunSetVar (
         }
 
         if (EFI_ERROR (Status)) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SETVAR_ERROR_SET), gShellDebug1HiiHandle, L"setvar", &Guid, VariableName);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SETVAR_ERROR_SET), gShellDebug1HiiHandle, L"setvar", &Guid, VariableName);
           ShellStatus = SHELL_ACCESS_DENIED;
         } else {
           ASSERT (ShellStatus == SHELL_SUCCESS);

@@ -82,14 +82,14 @@ CascadeDelete (
   Status      = EFI_SUCCESS;
 
   if ((Node->Info->Attribute & EFI_FILE_READ_ONLY) == EFI_FILE_READ_ONLY) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_RM_LOG_DETELE_RO), gShellLevel2HiiHandle, L"rm", Node->FullName);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_RM_LOG_DETELE_RO), gShellLevel2HiiHandle, L"rm", Node->FullName);
     return (SHELL_ACCESS_DENIED);
   }
 
   if ((Node->Info->Attribute & EFI_FILE_DIRECTORY) == EFI_FILE_DIRECTORY) {
     if (!IsDirectoryEmpty (Node->Handle)) {
       if (!Quiet) {
-        Status = ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_RM_LOG_DELETE_CONF), gShellLevel2HiiHandle, Node->FullName);
+        Status = ShellPrintHiiDefaultEx (STRING_TOKEN (STR_RM_LOG_DELETE_CONF), gShellLevel2HiiHandle, Node->FullName);
         Status = ShellPromptForResponse (ShellPromptResponseTypeYesNo, NULL, (VOID **)&Resp);
         ASSERT (Resp != NULL);
         if (EFI_ERROR (Status) || (*Resp != ShellPromptResponseYes)) {
@@ -173,7 +173,7 @@ CascadeDelete (
     // now delete the current node...
     //
     if (!Quiet) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_RM_LOG_DELETE), gShellLevel2HiiHandle, Node->FullName);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_RM_LOG_DELETE), gShellLevel2HiiHandle, Node->FullName);
     }
 
     Status       = gEfiShellProtocol->DeleteFile (Node->Handle);
@@ -184,11 +184,11 @@ CascadeDelete (
   // We cant allow for the warning here! (Dont use EFI_ERROR Macro).
   //
   if (Status != EFI_SUCCESS) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_RM_LOG_DELETE_ERR), gShellLevel2HiiHandle, Status);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_RM_LOG_DELETE_ERR), gShellLevel2HiiHandle, Status);
     return (SHELL_ACCESS_DENIED);
   } else {
     if (!Quiet) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_RM_LOG_DELETE_COMP), gShellLevel2HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_RM_LOG_DELETE_COMP), gShellLevel2HiiHandle);
     }
 
     return (SHELL_SUCCESS);
@@ -307,7 +307,7 @@ ShellCommandRunRm (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"rm", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"rm", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -325,7 +325,7 @@ ShellCommandRunRm (
       //
       // we insufficient parameters
       //
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"rm");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"rm");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       //
@@ -339,7 +339,7 @@ ShellCommandRunRm (
       {
         Status = ShellOpenFileMetaArg ((CHAR16 *)Param, EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
         if (EFI_ERROR (Status) || (FileList == NULL) || IsListEmpty (&FileList->Link)) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"rm", (CHAR16 *)Param);
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"rm", (CHAR16 *)Param);
           ShellStatus = SHELL_NOT_FOUND;
           break;
         }
@@ -365,13 +365,13 @@ ShellCommandRunRm (
           // do the deleting of nodes
           //
           if (EFI_ERROR (Node->Status)) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_RM_LOG_DELETE_ERR2), gShellLevel2HiiHandle, Node->Status);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_RM_LOG_DELETE_ERR2), gShellLevel2HiiHandle, Node->Status);
             ShellStatus = SHELL_ACCESS_DENIED;
             break;
           }
 
           if (!IsValidDeleteTarget (FileList, Node, Package)) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_RM_LOG_DELETE_ERR3), gShellLevel2HiiHandle, Node->FullName);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_RM_LOG_DELETE_ERR3), gShellLevel2HiiHandle, Node->FullName);
             ShellStatus = SHELL_INVALID_PARAMETER;
             break;
           }
