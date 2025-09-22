@@ -20,22 +20,19 @@
 !ifdef $(EDK2_OUT_DIR)
   OUTPUT_DIRECTORY               = $(EDK2_OUT_DIR)
 !else
-  OUTPUT_DIRECTORY               = Build/ArmVirtKvmTool-$(ARCH)
+  OUTPUT_DIRECTORY               = Build/ArmVirtKvmTool-AARCH64
 !endif
-  SUPPORTED_ARCHITECTURES        = AARCH64|ARM
+  SUPPORTED_ARCHITECTURES        = AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = ArmVirtPkg/ArmVirtKvmTool.fdf
 
-[Defines.AARCH64]
   DEFINE ACPIVIEW_ENABLE         = TRUE
 
 # This comes at the beginning of includes to pick all relevant defines early on.
 !include ArmVirtPkg/ArmVirtStackCookies.dsc.inc
 
-!if $(ARCH) == AARCH64
 !include DynamicTablesPkg/DynamicTables.dsc.inc
-!endif
 
 !include MdePkg/MdeLibs.dsc.inc
 
@@ -392,9 +389,7 @@
   #
   SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
 
-!if $(ARCH) == AARCH64
   #
   # ACPI Support
   #
   ArmVirtPkg/KvmtoolCfgMgrDxe/ConfigurationManagerDxe.inf
-!endif

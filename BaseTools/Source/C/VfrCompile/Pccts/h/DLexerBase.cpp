@@ -193,7 +193,7 @@ replchar(DLGChar c)
 void DLGLexerBase::
 replstr(const DLGChar *s) /* MR20 const */
 {
-	register DLGChar *l= &_lextext[_bufsize -1];
+	DLGChar *l= &_lextext[_bufsize -1];
 
 	nextpos = _begexpr;
 	if (s){

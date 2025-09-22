@@ -17,8 +17,8 @@
   PLATFORM_GUID                  = 37d7e986-f7e9-45c2-8067-e371421a626c
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = Build/ArmVirtQemuKernel-$(ARCH)
-  SUPPORTED_ARCHITECTURES        = AARCH64|ARM
+  OUTPUT_DIRECTORY               = Build/ArmVirtQemuKernel-AArch64
+  SUPPORTED_ARCHITECTURES        = AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = ArmVirtPkg/ArmVirtQemuKernel.fdf
@@ -44,10 +44,6 @@
 
 # This comes at the beginning of includes to pick all relevant defines early on.
 !include ArmVirtPkg/ArmVirtStackCookies.dsc.inc
-
-!if $(NETWORK_SNP_ENABLE) == TRUE
-  !error "NETWORK_SNP_ENABLE is IA32/X64/EBC only"
-!endif
 
 !include NetworkPkg/NetworkDefines.dsc.inc
 

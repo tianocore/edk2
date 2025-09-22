@@ -181,6 +181,10 @@
   #
   HobPrintLib|Include/Library/HobPrintLib.h
 
+  ##  @libraryclass  Provides time and date related EFI runtime services
+  #
+  RealTimeClockLib|Include/Library/RealTimeClockLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
@@ -801,12 +805,6 @@
   #   FALSE - Statistics about variable usage will not be collected.<BR>
   # @Prompt Enable variable statistics collection.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics|FALSE|BOOLEAN|0x0001003f
-
-  ## Indicates if Unicode Collation Protocol will be installed.<BR><BR>
-  #   TRUE  - Installs Unicode Collation Protocol.<BR>
-  #   FALSE - Does not install Unicode Collation Protocol.<BR>
-  # @Prompt Enable Unicode Collation support.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollationSupport|TRUE|BOOLEAN|0x00010040
 
   ## Indicates if Unicode Collation 2 Protocol will be installed.<BR><BR>
   #   TRUE  - Installs Unicode Collation 2 Protocol.<BR>
@@ -1673,6 +1671,14 @@
   ## Indicates the allowable maximum number of Reset Filters, Reset Notifications or Reset Handlers in PEI phase.
   # @Prompt Maximum Number of PEI Reset Filters, Reset Notifications or Reset Handlers.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaximumPeiResetNotifies|0x10|UINT32|0x0000010A
+
+  ## Whether to report support of FMP capsules in OsIndicationSupport.<BR><BR>
+  #  This PCD indicates if support of FMP capsules should be advertised.<BR>
+  #   TRUE  - support of FMP capsules is advertised.<BR>
+  #   FALSE - support of FMP capsules is not advertised.<BR>
+  #  If platform does not use this feature, this PCD should be set to FALSE.<BR><BR>
+  # @Prompt Enable advertising support of FMP capsules.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleFmpSupport|FALSE|BOOLEAN|0x00000028
 
   ## Capsule On Disk is to deliver capsules via files on Mass Storage device.<BR><BR>
   #  This PCD indicates if the Capsule On Disk is supported.<BR>

@@ -15,8 +15,8 @@
   PLATFORM_GUID                  = DFFED32B-DFFE-D32B-DFFE-D32BDFFED32B
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = Build/ArmVirtCloudHv-$(ARCH)
-  SUPPORTED_ARCHITECTURES        = AARCH64|ARM
+  OUTPUT_DIRECTORY               = Build/ArmVirtCloudHv-AARCH64
+  SUPPORTED_ARCHITECTURES        = AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = ArmVirtPkg/ArmVirtCloudHv.fdf
@@ -157,7 +157,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|3
   gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|0x20000
 
-[PcdsFixedAtBuild.AARCH64]
   # Clearing BIT0 in this PCD prevents installing a 32-bit SMBIOS entry point,
   # if the entry point version is >= 3.0. AARCH64 OSes cannot assume the
   # presence of the 32-bit entry point anyway (because many AARCH64 systems
@@ -363,7 +362,6 @@
   # ACPI Support
   #
   ArmVirtPkg/CloudHvPlatformHasAcpiDtDxe/CloudHvHasAcpiDtDxe.inf
-[Components.AARCH64]
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
   ArmVirtPkg/CloudHvAcpiPlatformDxe/CloudHvAcpiPlatformDxe.inf {
     <LibraryClasses>

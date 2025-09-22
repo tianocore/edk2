@@ -324,6 +324,28 @@ TlsSetCertRevocationList (
 }
 
 /**
+  Set the specified server name in Server/Client.
+
+  @param[in]  Tls           Pointer to the TLS object.
+  @param[in]  SslCtx        Pointer to the SSL object.
+  @param[in]  HostName      The specified server name to be set.
+
+  @retval  EFI_SUCCESS      The Server Name was set successfully.
+  @retval  EFI_UNSUPPORTED  Failed to set the Server Name.
+**/
+EFI_STATUS
+EFIAPI
+TlsSetServerName (
+  IN     VOID   *Tls,
+  IN     VOID   *SslCtx,
+  IN     CHAR8  *HostName
+  )
+{
+  ASSERT (FALSE);
+  return EFI_UNSUPPORTED;
+}
+
+/**
   Set the signature algorithm list to used by the TLS object.
 
   This function sets the signature algorithms for use by a specified TLS object.
