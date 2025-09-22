@@ -17,8 +17,8 @@
 
   ENTRY_POINT                    = SemihostFsEntryPoint
 
-[Sources.ARM, Sources.AARCH64]
-  Arm/SemihostFs.c
+[Sources.AARCH64]
+  AArch64/SemihostFs.c
 
 [Packages]
   MdePkg/MdePkg.dec
