@@ -57,12 +57,7 @@
 #define ARM_SMC_ID_MM_COMMUNICATE_AARCH64  0xC4000041
 
 /* Generic ID when using AArch32 or AArch64 execution state */
-#ifdef MDE_CPU_AARCH64
 #define ARM_SMC_ID_MM_COMMUNICATE  ARM_SMC_ID_MM_COMMUNICATE_AARCH64
-#endif
-#ifdef MDE_CPU_ARM
-#define ARM_SMC_ID_MM_COMMUNICATE  ARM_SMC_ID_MM_COMMUNICATE_AARCH32
-#endif
 
 /* MM return error codes */
 #define ARM_SMC_MM_RET_SUCCESS         0
