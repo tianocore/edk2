@@ -125,54 +125,51 @@ LoadDriver (
     }
 
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_LOAD_NOT_IMAGE), gShellLevel2HiiHandle, FileName, Status);
+    goto Exit;
+  }
+
+  //
+  // Make sure it is a driver image
+  //
+  Status = gBS->HandleProtocol (LoadedDriverHandle, &gEfiLoadedImageProtocolGuid, (VOID *)&LoadedDriverImage);
+
+  ASSERT (LoadedDriverImage != NULL);
+
+  if (EFI_ERROR (Status) ||
+      ((LoadedDriverImage->ImageCodeType != EfiBootServicesCode) &&
+       (LoadedDriverImage->ImageCodeType != EfiRuntimeServicesCode)))
+  {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_LOAD_NOT_DRIVER), gShellLevel2HiiHandle, FileName);
+
+    //
+    // Exit and unload the non-driver image
+    //
+    gBS->Exit (LoadedDriverHandle, EFI_INVALID_PARAMETER, 0, NULL);
+    Status = EFI_INVALID_PARAMETER;
+    goto Exit;
+  }
+
+  //
+  // Start the image
+  //
+  Status = gBS->StartImage (LoadedDriverHandle, NULL, NULL);
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_LOAD_ERROR), gShellLevel2HiiHandle, FileName, Status);
   } else {
-    //
-    // Make sure it is a driver image
-    //
-    Status = gBS->HandleProtocol (LoadedDriverHandle, &gEfiLoadedImageProtocolGuid, (VOID *)&LoadedDriverImage);
-
-    ASSERT (LoadedDriverImage != NULL);
-
-    if (  EFI_ERROR (Status)
-       || (  (LoadedDriverImage->ImageCodeType != EfiBootServicesCode)
-          && (LoadedDriverImage->ImageCodeType != EfiRuntimeServicesCode))
-          )
-    {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_LOAD_NOT_DRIVER), gShellLevel2HiiHandle, FileName);
-
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_LOAD_LOADED), gShellLevel2HiiHandle, FileName, LoadedDriverImage->ImageBase, Status);
+    if (Connect) {
       //
-      // Exit and unload the non-driver image
+      // Connect it...
       //
-      gBS->Exit (LoadedDriverHandle, EFI_INVALID_PARAMETER, 0, NULL);
-      Status = EFI_INVALID_PARAMETER;
+      Status = ConnectAllEfi ();
     }
   }
 
-  if (!EFI_ERROR (Status)) {
-    //
-    // Start the image
-    //
-    Status = gBS->StartImage (LoadedDriverHandle, NULL, NULL);
-    if (EFI_ERROR (Status)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_LOAD_ERROR), gShellLevel2HiiHandle, FileName, Status);
-    } else {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_LOAD_LOADED), gShellLevel2HiiHandle, FileName, LoadedDriverImage->ImageBase, Status);
-    }
-  }
-
-  if (!EFI_ERROR (Status) && Connect) {
-    //
-    // Connect it...
-    //
-    Status = ConnectAllEfi ();
-  }
-
+Exit:
   //
   // clean up memory...
   //
-  if (FilePath != NULL) {
-    FreePool (FilePath);
-  }
+  FreePool (FilePath);
 
   return (Status);
 }
