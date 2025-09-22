@@ -938,11 +938,11 @@ DEFINE GCC_ARM_AARCH64_ASLDLINK_FLAGS = -Wl,--defsym=PECOFF_HEADER_SIZE=0 DEF(GC
 DEFINE GCC_ARM_ASLDLINK_FLAGS      = DEF(GCC_ARM_DLINK_FLAGS) -Wl,--entry,ReferenceAcpiTable -u $(IMAGE_ENTRY_POINT) DEF(GCC_ARM_AARCH64_ASLDLINK_FLAGS)
 DEFINE GCC_AARCH64_ASLDLINK_FLAGS  = DEF(GCC_AARCH64_DLINK_FLAGS) -Wl,--entry,ReferenceAcpiTable -u $(IMAGE_ENTRY_POINT) DEF(GCC_ARM_AARCH64_ASLDLINK_FLAGS)
 DEFINE GCC_LOONGARCH64_ASLDLINK_FLAGS = DEF(GCC_LOONGARCH64_DLINK_FLAGS) -Wl,--entry,ReferenceAcpiTable -u $(IMAGE_ENTRY_POINT)
-DEFINE GCC_ASM_FLAGS               = -c -x assembler -imacros AutoGen.h
+DEFINE GCC_ASM_FLAGS               = -c -x assembler
 DEFINE GCC_PP_FLAGS                = -E -x assembler-with-cpp -include AutoGen.h
 DEFINE GCC_VFRPP_FLAGS             = -x c -E -DVFRCOMPILE --include $(MODULE_NAME)StrDefs.h
 DEFINE GCC_ASLPP_FLAGS             = -x c -E -include AutoGen.h
-DEFINE GCC_ASLCC_FLAGS             = -x c
+DEFINE GCC_ASLCC_FLAGS             = -x c -include AutoGen.h -fshort-wchar
 DEFINE GCC_WINDRES_FLAGS           = -J rc -O coff
 DEFINE GCC_DTCPP_FLAGS             = -E -x assembler-with-cpp -imacros AutoGen.h -nostdinc -undef
 DEFINE GCC_IA32_RC_FLAGS           = -I binary -O elf32-i386          -B i386        --rename-section .data=.hii
@@ -1933,7 +1933,7 @@ DEFINE CLANGPDB_IA32_TARGET          = -target i686-pc-windows-msvc
 DEFINE CLANGPDB_X64_TARGET           = -target x86_64-pc-windows-msvc
 
 DEFINE CLANGPDB_WARNING_OVERRIDES    = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body -Wno-unused-const-variable -Wno-varargs -Wno-unknown-warning-option -Wno-unused-but-set-variable -Wno-unused-const-variable -Wno-unaligned-access -Wno-microsoft-enum-forward-reference
-DEFINE CLANGPDB_ALL_CC_FLAGS         = DEF(GCC48_ALL_CC_FLAGS) DEF(CLANGPDB_WARNING_OVERRIDES) -fno-stack-protector -funsigned-char -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -Wno-address -Wno-shift-negative-value -Wno-unknown-pragmas -Wno-incompatible-library-redeclaration -Wno-null-dereference -mno-implicit-float -mms-bitfields -mno-stack-arg-probe -nostdlib -nostdlibinc -fno-omit-frame-pointer -U _MSC_VER -D __GNUC__
+DEFINE CLANGPDB_ALL_CC_FLAGS         = DEF(GCC48_ALL_CC_FLAGS) DEF(CLANGPDB_WARNING_OVERRIDES) -fno-stack-protector -funsigned-char -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -Wno-address -Wno-shift-negative-value -Wno-unknown-pragmas -Wno-incompatible-library-redeclaration -Wno-null-dereference -mno-implicit-float -mms-bitfields -mno-stack-arg-probe -fno-omit-frame-pointer -U _MSC_VER -D __GNUC__
 
 ###########################
 # CLANGPDB IA32 definitions
