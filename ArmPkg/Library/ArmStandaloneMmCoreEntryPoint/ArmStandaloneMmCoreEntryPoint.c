@@ -186,12 +186,9 @@ ValidateSpmMmBootInfo (
     if ((RegVersion != 1) || (Arg2 != 0x00) || (TransferListAddress == 0x00)) {
       return EFI_INVALID_PARAMETER;
     }
-  } else if ((Fields & TRANSFER_LIST_SIGNATURE_MASK_32) == TRANSFER_LIST_SIGNATURE_32) {
-    RegVersion = (Fields >> REGISTER_CONVENTION_VERSION_SHIFT_32) &
-                 REGISTER_CONVENTION_VERSION_MASK;
-    if ((RegVersion != 1) || (Arg0 != 0x00) || (TransferListAddress == 0x00)) {
-      return EFI_INVALID_PARAMETER;
-    }
+  } else {
+    // ARM32 is not supported
+    return EFI_INVALID_PARAMETER;
   }
 
   return EFI_SUCCESS;
