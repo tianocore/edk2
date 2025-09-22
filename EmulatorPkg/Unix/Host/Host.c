@@ -93,9 +93,7 @@ main (
   UINTN                 Index;
   UINTN                 Index1;
   UINTN                 Index2;
-  UINTN                 PeiIndex;
   CHAR8                 *FileName;
-  BOOLEAN               Done;
   EFI_PEI_FILE_HANDLE   FileHandle;
   VOID                  *SecFile;
   CHAR16                *MemorySizeStr;
@@ -232,7 +230,7 @@ main (
   }
 
   Index2 = 0;
-  for (Done = FALSE, Index = 0, PeiIndex = 0, SecFile = NULL;
+  for (Index = 0, SecFile = NULL;
        FirmwareVolumesStr[Index2] != 0;
        Index++)
   {
@@ -286,7 +284,6 @@ main (
       if (!EFI_ERROR (Status)) {
         Status = PeiServicesFfsFindSectionData (EFI_SECTION_PE32, FileHandle, &SecFile);
         if (!EFI_ERROR (Status)) {
-          PeiIndex = Index;
           printf (" contains SEC Core");
         }
       }
@@ -550,7 +547,6 @@ SecLoadFromCore (
   )
 {
   EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  TopOfMemory;
   VOID                  *TopOfStack;
   EFI_PHYSICAL_ADDRESS  PeiCoreEntryPoint;
   EFI_SEC_PEI_HAND_OFF  *SecCoreData;
@@ -559,7 +555,6 @@ SecLoadFromCore (
   //
   // Compute Top Of Memory for Stack and PEI Core Allocations
   //
-  TopOfMemory  = LargestRegion + LargestRegionSize;
   PeiStackSize = (UINTN)RShiftU64 ((UINT64)STACK_SIZE, 1);
 
   //
@@ -571,11 +566,10 @@ SecLoadFromCore (
   // |  Stack    |
   // |-----------| <---- TemporaryRamBase
   //
-  TopOfStack  = (VOID *)(LargestRegion + PeiStackSize);
-  TopOfMemory = LargestRegion + PeiStackSize;
+  TopOfStack = (VOID *)(LargestRegion + PeiStackSize);
 
   //
-  // Reservet space for storing PeiCore's parament in stack.
+  // Reserve space for storing PeiCore's parament in stack.
   //
   TopOfStack = (VOID *)((UINTN)TopOfStack - sizeof (EFI_SEC_PEI_HAND_OFF) - CPU_STACK_ALIGNMENT);
   TopOfStack = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
