@@ -20,10 +20,6 @@
   PeilessSec.h
   PeilessSec.c
 
-[Sources.ARM]
-  Arm/ArchPeilessSec.c
-  Arm/ModuleEntryPoint.S
-
 [Sources.AArch64]
   AArch64/ArchPeilessSec.c
   AArch64/ModuleEntryPoint.S
@@ -73,9 +69,6 @@
   gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmTokenSpaceGuid.PcdFvSize
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
-
-[FixedPcd.ARM]
-  gArmTokenSpaceGuid.PcdVFPEnabled
 
 [Pcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase
