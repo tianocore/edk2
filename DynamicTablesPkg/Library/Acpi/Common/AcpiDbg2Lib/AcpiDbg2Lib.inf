@@ -26,6 +26,9 @@
 [Sources.IA32, Sources.X86, Sources.X64]
   Dbg2GeneratorNull.c
 
+[Sources.RISCV64]
+  RiscV/RiscVDbg2Generator.c
+
 [Packages.ARM, Packages.AARCH64]
   ArmPlatformPkg/ArmPlatformPkg.dec
 
