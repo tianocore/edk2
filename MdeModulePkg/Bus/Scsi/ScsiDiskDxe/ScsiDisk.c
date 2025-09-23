@@ -2473,9 +2473,11 @@ ScsiDiskDetectMedia (
   // Get Write Cache Mode
   //
   for (Retry = 0; Retry < MaxRetry; Retry++) {
-    Status = ScsiDiskWriteCacheMode (ScsiDiskDevice);
-    if (!EFI_ERROR (Status)) {
-      break;
+    if (ScsiDiskDevice->DeviceType == EFI_SCSI_TYPE_DISK) {
+      Status = ScsiDiskWriteCacheMode (ScsiDiskDevice);
+      if (!EFI_ERROR (Status)) {
+        break;
+      }
     }
   }
 
@@ -4504,7 +4506,8 @@ BackOff:
                       DataBuffer,
                       DataLength,
                       StartLba,
-                      SectorCount
+                      SectorCount,
+                      *SetFUA
                       );
   if ((ReturnStatus == EFI_NOT_READY) || (ReturnStatus == EFI_BAD_BUFFER_SIZE)) {
     *NeedRetry = TRUE;
@@ -4762,7 +4765,8 @@ BackOff:
                       DataBuffer,
                       DataLength,
                       StartLba,
-                      SectorCount
+                      SectorCount,
+                      *SetFUA
                       );
   if ((ReturnStatus == EFI_NOT_READY) || (ReturnStatus == EFI_BAD_BUFFER_SIZE)) {
     *NeedRetry = TRUE;
