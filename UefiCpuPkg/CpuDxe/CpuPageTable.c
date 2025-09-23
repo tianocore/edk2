@@ -975,6 +975,7 @@ RefreshGcdMemoryAttributesFromPaging (
   UINT64                           Capabilities;
   UINT64                           NewAttributes;
   UINTN                            Index;
+  UINT64                           AddressEncMask;
 
   //
   // Assuming that memory space map returned is sorted already; otherwise sort
@@ -1056,9 +1057,17 @@ RefreshGcdMemoryAttributesFromPaging (
         }
 
         //
+        // Get the mask for the memory encryption bit for Tdx and Sev
+        //
+        AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask);
+        if (AddressEncMask == 0) {
+          AddressEncMask = PcdGet64 (PcdTdxSharedBitMask);
+        }
+
+        //
         // Note current memory space might start in the middle of a page
         //
-        PageStartAddress = (*PageEntry) & (UINT64)PageAttributeToMask (PageAttribute);
+        PageStartAddress = (*PageEntry) & (UINT64)PageAttributeToMask (PageAttribute) & ~AddressEncMask;
         PageLength       = PageAttributeToLength (PageAttribute) - (BaseAddress - PageStartAddress);
         Attributes       = GetAttributesFromPageEntry (PageEntry);
       }
