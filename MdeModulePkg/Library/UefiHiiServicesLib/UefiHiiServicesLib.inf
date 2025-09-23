@@ -51,11 +51,6 @@
   gEfiHiiDatabaseProtocolGuid      AND
   gEfiHiiConfigRoutingProtocolGuid
 
-[Depex.common.DXE_SAL_DRIVER]
-  gEfiHiiStringProtocolGuid        AND
-  gEfiHiiDatabaseProtocolGuid      AND
-  gEfiHiiConfigRoutingProtocolGuid
-
 [Depex.common.DXE_SMM_DRIVER]
   gEfiHiiStringProtocolGuid        AND
   gEfiHiiDatabaseProtocolGuid      AND
