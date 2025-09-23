@@ -175,11 +175,11 @@ Returns:
   fprintf (stdout, "  -e EFI_FILETYPE, --efiImage EFI_FILETYPE\n\
                         Create Efi Image. EFI_FILETYPE is one of BASE,SMM_CORE,\n\
                         PEI_CORE, PEIM, DXE_CORE, DXE_DRIVER, UEFI_APPLICATION,\n\
-                        SEC, DXE_SAL_DRIVER, UEFI_DRIVER, DXE_RUNTIME_DRIVER,\n\
+                        SEC, UEFI_DRIVER, DXE_RUNTIME_DRIVER,\n\
                         DXE_SMM_DRIVER, SECURITY_CORE, COMBINED_PEIM_DRIVER,\n\
                         MM_STANDALONE, MM_CORE_STANDALONE,\n\
                         PIC_PEIM, RELOCATABLE_PEIM, BS_DRIVER, RT_DRIVER,\n\
-                        APPLICATION, SAL_RT_DRIVER to support all module types\n\
+                        APPLICATION to support all module types\n\
                         It can only be used together with --keepexceptiontable,\n\
                         --keepzeropending, --keepoptionalheader, -r, -o option.\n\
                         It is a action option. If it is combined with other action options,\n\
@@ -2179,11 +2179,6 @@ Returns:
         stricmp (ModuleType, "RT_DRIVER") == 0) {
           Type = EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER;
           VerboseMsg ("Efi Image subsystem type is efi runtime driver.");
-
-      } else if (stricmp (ModuleType, "DXE_SAL_DRIVER") == 0 ||
-        stricmp (ModuleType, "SAL_RT_DRIVER") == 0) {
-          Type = EFI_IMAGE_SUBSYSTEM_SAL_RUNTIME_DRIVER;
-          VerboseMsg ("Efi Image subsystem type is efi sal runtime driver.");
 
       } else {
         Error (NULL, 0, 1003, "Invalid option value", "EFI_FILETYPE = %s", ModuleType);

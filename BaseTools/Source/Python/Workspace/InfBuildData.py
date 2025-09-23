@@ -775,7 +775,7 @@ class InfBuildData(ModuleBuildClassObject):
         # PEIM and DXE drivers must have a valid [Depex] section
         if len(self.LibraryClass) == 0 and len(RecordList) == 0:
             if self.ModuleType == SUP_MODULE_DXE_DRIVER or self.ModuleType == SUP_MODULE_PEIM or self.ModuleType == SUP_MODULE_DXE_SMM_DRIVER or \
-                self.ModuleType == SUP_MODULE_DXE_SAL_DRIVER or self.ModuleType == SUP_MODULE_DXE_RUNTIME_DRIVER:
+                self.ModuleType == SUP_MODULE_DXE_RUNTIME_DRIVER:
                 EdkLogger.error('build', RESOURCE_NOT_AVAILABLE, "No [Depex] section or no valid expression in [Depex] section for [%s] module" \
                                 % self.ModuleType, File=self.MetaFile)
 

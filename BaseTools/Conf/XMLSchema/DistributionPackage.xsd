@@ -2960,13 +2960,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
           </xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      <xs:enumeration value="DXE_SAL_DRIVER">
-        <xs:annotation>
-          <xs:documentation xml:lang="en-us">
-            This module is only applicable to an IPF DXE runtime driver.
-          </xs:documentation>
-        </xs:annotation>
-      </xs:enumeration>
       <xs:enumeration value="DXE_SMM_DRIVER">
         <xs:annotation>
           <xs:documentation xml:lang="en-us">

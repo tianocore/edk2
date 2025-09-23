@@ -35,7 +35,6 @@ gType2Phase = {
     SUP_MODULE_DXE_DRIVER        :   "DXE",
     SUP_MODULE_DXE_SMM_DRIVER    :   "DXE",
     SUP_MODULE_DXE_RUNTIME_DRIVER:   "DXE",
-    SUP_MODULE_DXE_SAL_DRIVER    :   "DXE",
     SUP_MODULE_UEFI_DRIVER       :   "DXE",
     SUP_MODULE_UEFI_APPLICATION  :   "DXE",
     SUP_MODULE_SMM_CORE          :   "DXE",
@@ -301,7 +300,7 @@ class DependencyExpression:
             return
 
         # don't generate depex if all operands are architecture protocols
-        if self.ModuleType in [SUP_MODULE_UEFI_DRIVER, SUP_MODULE_DXE_DRIVER, SUP_MODULE_DXE_RUNTIME_DRIVER, SUP_MODULE_DXE_SAL_DRIVER, SUP_MODULE_DXE_SMM_DRIVER, SUP_MODULE_MM_STANDALONE] and \
+        if self.ModuleType in [SUP_MODULE_UEFI_DRIVER, SUP_MODULE_DXE_DRIVER, SUP_MODULE_DXE_RUNTIME_DRIVER, SUP_MODULE_DXE_SMM_DRIVER, SUP_MODULE_MM_STANDALONE] and \
            Op == DEPEX_OPCODE_AND and \
            self.ArchProtocols == set(GuidStructureStringToGuidString(Guid) for Guid in AllOperand):
             self.PostfixNotation = []

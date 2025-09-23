@@ -551,7 +551,7 @@ def ValidateMS2(Module, TopXmlTreeLevel):
         # <ModuleTypes>      ::= {"BASE"} {"SEC"} {"PEI_CORE"} {"PEIM"}
         #                       {"DXE_CORE"} {"DXE_DRIVER"} {"SMM_CORE"}
         #                       {"DXE_SMM_DRIVER"} {"DXE_RUNTIME_DRIVER"}
-        #                       {"DXE_SAL_DRIVER"} {"UEFI_DRIVER"}
+        #                       {"UEFI_DRIVER"}
         #                       {"UEFI_APPLICATION"} {"USER_DEFINED"}
         #
         if len(Item.SupModuleList) > 0:
