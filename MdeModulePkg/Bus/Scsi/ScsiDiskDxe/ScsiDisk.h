@@ -94,6 +94,11 @@ typedef struct {
   // The queue for asynchronous task requests
   //
   LIST_ENTRY                               AsyncTaskQueue;
+
+  //
+  // The flag indicates Write Cache Mode
+  //
+  BOOLEAN                                  WriteCacheMode;
 } SCSI_DISK_DEV;
 
 #define SCSI_DISK_DEV_FROM_BLKIO(a)     CR (a, SCSI_DISK_DEV, BlkIo, SCSI_DISK_DEV_SIGNATURE)
@@ -1176,6 +1181,7 @@ ScsiDiskRead10 (
   @param  DataLength         The length of buffer
   @param  StartLba           The start logic block address
   @param  SectorCount        The number of blocks to write
+  @param  SetFUA             The pointer of flag indicate if the FUA bit will be set
 
   @return  EFI_STATUS is returned by calling ScsiWrite10Command().
 
@@ -1188,7 +1194,8 @@ ScsiDiskWrite10 (
   IN     UINT8          *DataBuffer,
   IN OUT UINT32         *DataLength,
   IN     UINT32         StartLba,
-  IN     UINT32         SectorCount
+  IN     UINT32         SectorCount,
+  IN     BOOLEAN        *SetFUA
   );
 
 /**
@@ -1225,6 +1232,7 @@ ScsiDiskRead16 (
   @param  DataLength         The length of buffer
   @param  StartLba           The start logic block address
   @param  SectorCount        The number of blocks to write
+  @param  SetFUA             The pointer of flag indicates if the FUA bit will be set
 
   @return  EFI_STATUS is returned by calling ScsiWrite16Command().
 
@@ -1237,7 +1245,8 @@ ScsiDiskWrite16 (
   IN     UINT8          *DataBuffer,
   IN OUT UINT32         *DataLength,
   IN     UINT64         StartLba,
-  IN     UINT32         SectorCount
+  IN     UINT32         SectorCount,
+  IN     BOOLEAN        *SetFUA
   );
 
 /**
@@ -1591,6 +1600,31 @@ BOOLEAN
 DetermineInstallStorageSecurity (
   IN  SCSI_DISK_DEV  *ScsiDiskDevice,
   IN  EFI_HANDLE     ChildHandle
+  );
+
+/**
+  Get Write Cache Mode of the storage.
+
+  @param   ScsiDiskDevice    The pointer of SCSI_DISK_DEV.
+
+**/
+EFI_STATUS
+ScsiDiskWriteCacheMode (
+  IN     SCSI_DISK_DEV  *ScsiDiskDevice
+  );
+
+/**
+  Check if SCSI command may fail with FUA being set
+
+  @param  ScsiDiskDevice     The pointer of ScsiDiskDevice
+
+  @retval TRUE   SCSI command may fail with FUA being set
+  @retval FALSE  SCSI command may fail with other reason
+
+**/
+BOOLEAN
+ScsiDiskFailFUA (
+  IN     SCSI_DISK_DEV  *ScsiDiskDevice
   );
 
 #endif
