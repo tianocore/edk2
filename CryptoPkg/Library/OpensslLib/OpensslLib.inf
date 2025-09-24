@@ -391,6 +391,22 @@
   $(OPENSSL_PATH)/crypto/pem/pem_x509.c
   $(OPENSSL_PATH)/crypto/pem/pem_xaux.c
   $(OPENSSL_PATH)/crypto/pem/pvkfmt.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_add.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_asn.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_attr.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_crpt.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_crt.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_decr.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_init.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_key.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_kiss.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_mutl.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_npas.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_p8d.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_p8e.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_sbag.c
+  $(OPENSSL_PATH)/crypto/pkcs12/p12_utl.c
+  $(OPENSSL_PATH)/crypto/pkcs12/pk12err.c
   $(OPENSSL_PATH)/crypto/pkcs7/bio_pk7.c
   $(OPENSSL_PATH)/crypto/pkcs7/pk7_asn1.c
   $(OPENSSL_PATH)/crypto/pkcs7/pk7_attr.c
@@ -706,7 +722,6 @@
   OpensslStub/EncoderNull.c
   OpensslStub/SslStatServNull.c
   OpensslStub/SslExtServNull.c
-  OpensslStub/Pkcs12Null.c
 
 [Packages]
   MdePkg/MdePkg.dec

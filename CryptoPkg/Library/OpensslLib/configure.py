@@ -258,7 +258,6 @@ def sources_filter_fn(filename):
         '/store/',
         '/storemgmt/',
         '/encode_decode/encode',
-        '/pkcs12/',
         'statem_srvr.c',
         'extensions_srvr.c',
         'defltprov.c',
