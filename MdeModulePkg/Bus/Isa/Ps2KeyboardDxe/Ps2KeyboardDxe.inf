@@ -64,6 +64,7 @@
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFastPS2Detection             ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation                   ## CONSUMES
 
 #
 # [Event]
