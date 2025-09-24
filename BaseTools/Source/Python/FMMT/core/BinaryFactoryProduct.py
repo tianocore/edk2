@@ -2,6 +2,7 @@
 # This file is used to implement of the various bianry parser.
 #
 # Copyright (c) 2021-, Intel Corporation. All rights reserved.<BR>
+# Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 import copy
@@ -136,9 +137,6 @@ class SectionProduct(BinaryProduct):
             if (Rel_Offset+Section_Info.HeaderLength+len(Section_Info.Data) != Data_Size):
                 Pad_Size = GetPadSize(Section_Info.Size, SECTION_COMMON_ALIGNMENT)
                 Section_Info.PadData = Pad_Size * b'\x00'
-            if Section_Info.Header.Type == 0x02:
-                Section_Info.DOffset = Section_Offset + Section_Info.ExtHeader.DataOffset + Rel_Whole_Offset
-                Section_Info.Data = Whole_Data[Rel_Offset+Section_Info.ExtHeader.DataOffset: Rel_Offset+Section_Info.Size]
             if Section_Info.Header.Type == 0x14:
                 ParTree.Data.Version = Section_Info.ExtHeader.GetVersionString()
             if Section_Info.Header.Type == 0x15:
@@ -179,9 +177,6 @@ class FfsProduct(BinaryProduct):
             if (Rel_Offset+Section_Info.HeaderLength+len(Section_Info.Data) != Data_Size):
                 Pad_Size = GetPadSize(Section_Info.Size, SECTION_COMMON_ALIGNMENT)
                 Section_Info.PadData = Pad_Size * b'\x00'
-            if Section_Info.Header.Type == 0x02:
-                Section_Info.DOffset = Section_Offset + Section_Info.ExtHeader.DataOffset + Rel_Whole_Offset
-                Section_Info.Data = Whole_Data[Rel_Offset+Section_Info.ExtHeader.DataOffset: Rel_Offset+Section_Info.Size]
             # If Section is Version or UI type, it saves the version and UI info of its parent Ffs.
             if Section_Info.Header.Type == 0x14:
                 ParTree.Data.Version = Section_Info.ExtHeader.GetVersionString()
