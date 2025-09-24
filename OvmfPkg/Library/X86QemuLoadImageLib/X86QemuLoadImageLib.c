@@ -437,6 +437,12 @@ QemuLoadKernelImage (
         "OVMF: command line switch for qemu (available in version 10.0 + newer).\n"
         "\n"
         );
+      if (PcdGet64 (PcdConfidentialComputingGuestAttr)) {
+        AsciiPrint (
+          "OVMF: Running in confidential VM, not using insecure legacy linux kernel loader.\n"
+          );
+        return EFI_ACCESS_DENIED;
+      }
 
       RetStatus = QemuFwCfgParseBool (
                     "opt/org.tianocore/EnableLegacyLoader",
