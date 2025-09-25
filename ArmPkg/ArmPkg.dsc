@@ -154,6 +154,8 @@
 
   ArmPkg/Drivers/MmCommunicationPei/MmCommunicationPei.inf
 
+  ArmPkg/Library/FmpDevicePsaFwuLib/FmpDevicePsaFwuLib.inf
+
 [Components.common.MM_CORE_STANALONE]
   ArmPkg/Library/ArmStandaloneMmCoreEntryPoint/ArmStandaloneMmCoreEntryPoint.inf
 
