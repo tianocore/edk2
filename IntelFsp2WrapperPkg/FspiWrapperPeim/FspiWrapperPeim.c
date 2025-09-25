@@ -29,6 +29,104 @@
 #include <Library/FspMeasurementLib.h>
 #include <Ppi/Tcg.h>
 #include <Ppi/FirmwareVolumeInfoMeasurementExcluded.h>
+#include <Library/PeCoffLib.h>
+#include <Library/FvLib.h>
+
+/**
+  Rebase a PE32/TE Image from an FFS file.
+
+  @param FileHeader   Pointer to the FFS file header.
+
+  @return Status of the rebase operation.
+**/
+EFI_STATUS
+RebasePeTeFromFfs (
+  EFI_FFS_FILE_HEADER  *FileHeader
+  )
+{
+  EFI_STATUS                    Status;
+  VOID                          *ImageBase;
+  PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
+  UINTN                         ImageSize;
+
+  Status = FfsFindSectionData (EFI_SECTION_PE32, FileHeader, &ImageBase, &ImageSize);
+  if (EFI_ERROR (Status)) {
+    Status = FfsFindSectionData (EFI_SECTION_TE, FileHeader, &ImageBase, &ImageSize);
+  }
+
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  ZeroMem (&ImageContext, sizeof (ImageContext));
+  ImageContext.Handle    = ImageBase;
+  ImageContext.ImageRead = PeCoffLoaderImageReadFromMemory;
+
+  Status = PeCoffLoaderGetImageInfo (&ImageContext);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)ImageBase;
+  Status                    = PeCoffLoaderRelocateImage (&ImageContext);
+  ASSERT_EFI_ERROR (Status);
+
+  return Status;
+}
+
+/**
+  Rebase Fsp Fv.
+  Only SEC and PEI Core FFS files need to be rebased. Other PEIMs will
+  be rebased by PEI Core when dispatching.
+  FSP FV must contain SEC FFS and may contains PEI Core FFS files.
+
+  @param PcdFspFvBaseAddress   Fsp Fv base address.
+
+  @return Status of the rebase result.
+**/
+EFI_STATUS
+RebaseFspFv (
+  UINT64  PcdFspFvBaseAddress
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader;
+  EFI_FFS_FILE_HEADER         *FileHeader;
+
+  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdFspFvBaseAddress;
+
+  //
+  // Find and rebase SEC FFS file
+  //
+  FileHeader = NULL;
+  Status     = FfsFindNextFile (EFI_FV_FILETYPE_SECURITY_CORE, FwVolHeader, &FileHeader);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  Status = RebasePeTeFromFfs (FileHeader);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  //
+  // Find and rebase PEI Core FFS file
+  //
+  FileHeader = NULL;
+  Status     = FfsFindNextFile (EFI_FV_FILETYPE_PEI_CORE, FwVolHeader, &FileHeader);
+  if (!EFI_ERROR (Status)) {
+    Status = RebasePeTeFromFfs (FileHeader);
+    ASSERT_EFI_ERROR (Status);
+  } else {
+    return EFI_SUCCESS;
+  }
+
+  return Status;
+}
 
 /**
   Call FspSmmInit API.
@@ -57,6 +155,13 @@ FspiWrapperInitApiMode (
   DEBUG ((DEBUG_INFO, "FspiHeaderPtr - 0x%x\n", FspiHeaderPtr));
   if (FspiHeaderPtr == NULL) {
     return EFI_DEVICE_ERROR;
+  }
+
+  if (FspiHeaderPtr->ImageBase != PcdGet32 (PcdFspiBaseAddress)) {
+    FspiHeaderPtr->ImageBase = PcdGet32 (PcdFspiBaseAddress);
+    Status                   = RebaseFspFv (PcdGet32 (PcdFspiBaseAddress));
+    ASSERT_EFI_ERROR (Status);
+    DEBUG ((DEBUG_INFO, "FSP-I Rebase completed.\n"));
   }
 
   if ((PcdGet64 (PcdFspiUpdDataAddress) == 0) && (FspiHeaderPtr->CfgRegionSize != 0) && (FspiHeaderPtr->CfgRegionOffset != 0)) {

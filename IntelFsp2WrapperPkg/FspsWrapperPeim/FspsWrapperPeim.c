@@ -38,6 +38,8 @@
 #include <FspEas.h>
 #include <FspStatusCode.h>
 #include <FspGlobalData.h>
+#include <Library/FvLib.h>
+#include <Library/PeCoffLib.h>
 
 extern EFI_PEI_NOTIFY_DESCRIPTOR  mS3EndOfPeiNotifyDesc;
 extern EFI_GUID                   gFspHobGuid;
@@ -268,6 +270,102 @@ EFI_PEI_NOTIFY_DESCRIPTOR  mPeiMemoryDiscoveredNotifyDesc = {
 };
 
 /**
+  Rebase a PE32/TE Image from an FFS file.
+
+  @param FileHeader   Pointer to the FFS file header.
+
+  @return Status of the rebase operation.
+**/
+EFI_STATUS
+RebasePeTeFromFfs (
+  EFI_FFS_FILE_HEADER  *FileHeader
+  )
+{
+  EFI_STATUS                    Status;
+  VOID                          *ImageBase;
+  PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
+  UINTN                         ImageSize;
+
+  Status = FfsFindSectionData (EFI_SECTION_PE32, FileHeader, &ImageBase, &ImageSize);
+  if (EFI_ERROR (Status)) {
+    Status = FfsFindSectionData (EFI_SECTION_TE, FileHeader, &ImageBase, &ImageSize);
+  }
+
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  ZeroMem (&ImageContext, sizeof (ImageContext));
+  ImageContext.Handle    = ImageBase;
+  ImageContext.ImageRead = PeCoffLoaderImageReadFromMemory;
+
+  Status = PeCoffLoaderGetImageInfo (&ImageContext);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)ImageBase;
+  Status                    = PeCoffLoaderRelocateImage (&ImageContext);
+  ASSERT_EFI_ERROR (Status);
+
+  return Status;
+}
+
+/**
+  Rebase Fsp Fv.
+  Only SEC and PEI Core FFS files need to be rebased. Other PEIMs will
+  be rebased by PEI Core when dispatching.
+  FSP FV must contain SEC FFS and may contains PEI Core FFS files.
+
+  @param PcdFspFvBaseAddress   Fsp Fv base address.
+
+  @return Status of the rebase result.
+**/
+EFI_STATUS
+RebaseFspFv (
+  UINT64  PcdFspFvBaseAddress
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader;
+  EFI_FFS_FILE_HEADER         *FileHeader;
+
+  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdFspFvBaseAddress;
+
+  //
+  // Find and rebase SEC FFS file
+  //
+  FileHeader = NULL;
+  Status     = FfsFindNextFile (EFI_FV_FILETYPE_SECURITY_CORE, FwVolHeader, &FileHeader);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  Status = RebasePeTeFromFfs (FileHeader);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  //
+  // Find and rebase PEI Core FFS file
+  //
+  FileHeader = NULL;
+  Status     = FfsFindNextFile (EFI_FV_FILETYPE_PEI_CORE, FwVolHeader, &FileHeader);
+  if (!EFI_ERROR (Status)) {
+    Status = RebasePeTeFromFfs (FileHeader);
+    ASSERT_EFI_ERROR (Status);
+  } else {
+    return EFI_SUCCESS;
+  }
+
+  return Status;
+}
+
+/**
   This function is called after PEI core discover memory and finish migration.
 
   @param[in] PeiServices    Pointer to PEI Services Table.
@@ -300,6 +398,13 @@ PeiMemoryDiscoveredNotify (
   DEBUG ((DEBUG_INFO, "FspsHeaderPtr - 0x%x\n", FspsHeaderPtr));
   if (FspsHeaderPtr == NULL) {
     return EFI_DEVICE_ERROR;
+  }
+
+  if (FspsHeaderPtr->ImageBase != PcdGet32 (PcdFspsBaseAddress)) {
+    FspsHeaderPtr->ImageBase = PcdGet32 (PcdFspsBaseAddress);
+    Status                   = RebaseFspFv (PcdGet32 (PcdFspsBaseAddress));
+    ASSERT_EFI_ERROR (Status);
+    DEBUG ((DEBUG_INFO, "FSP-S Rebase completed.\n"));
   }
 
   if ((GetFspsUpdDataAddress () == 0) && (FspsHeaderPtr->CfgRegionSize != 0) && (FspsHeaderPtr->CfgRegionOffset != 0)) {
