@@ -1138,17 +1138,17 @@ X509GetIssuerName (
   Ret = mbedtls_x509_crt_parse_der (&Crt, Cert, CertSize);
 
   if (Ret == 0) {
-    if (*CertIssuerSize < Crt.serial.len) {
-      *CertIssuerSize = Crt.serial.len;
+    if (*CertIssuerSize < Crt.issuer_raw.len) {
+      *CertIssuerSize = Crt.issuer_raw.len;
       Status          = FALSE;
       goto Cleanup;
     }
 
     if (CertIssuer != NULL) {
-      CopyMem (CertIssuer, Crt.serial.p, Crt.serial.len);
+      CopyMem (CertIssuer, Crt.issuer_raw.p, Crt.issuer_raw.len);
     }
 
-    *CertIssuerSize = Crt.serial.len;
+    *CertIssuerSize = Crt.issuer_raw.len;
     Status          = TRUE;
   }
 
@@ -1932,18 +1932,18 @@ X509FormatDateTime (
 
   Tm = (mbedtls_x509_time *)DateTime;
 
-  Tm->year = (DateTimeStr[0] + '0') * 1000 + (DateTimeStr[1] + '0') * 100 +
-             (DateTimeStr[2] + '0') * 10 + (DateTimeStr[3] + '0') * 1;
+  Tm->year = (DateTimeStr[0] - '0') * 1000 + (DateTimeStr[1] - '0') * 100 +
+             (DateTimeStr[2] - '0') * 10 + (DateTimeStr[3] - '0') * 1;
 
-  Tm->mon = (DateTimeStr[4] + '0') * 10 + (DateTimeStr[5] + '0') * 1;
+  Tm->mon = (DateTimeStr[4] - '0') * 10 + (DateTimeStr[5] - '0') * 1;
 
-  Tm->day = (DateTimeStr[6] + '0') * 10 + (DateTimeStr[7] + '0') * 1;
+  Tm->day = (DateTimeStr[6] - '0') * 10 + (DateTimeStr[7] - '0') * 1;
 
-  Tm->hour = (DateTimeStr[8] + '0') * 10 + (DateTimeStr[9] + '0') * 1;
+  Tm->hour = (DateTimeStr[8] - '0') * 10 + (DateTimeStr[9] - '0') * 1;
 
-  Tm->min = (DateTimeStr[10] + '0') * 10 + (DateTimeStr[11] + '0') * 1;
+  Tm->min = (DateTimeStr[10] - '0') * 10 + (DateTimeStr[11] - '0') * 1;
 
-  Tm->sec = (DateTimeStr[12] + '0') * 10 + (DateTimeStr[13] + '0') * 1;
+  Tm->sec = (DateTimeStr[12] - '0') * 10 + (DateTimeStr[13] - '0') * 1;
 
   return TRUE;
 }
