@@ -179,18 +179,45 @@ BspApAcceptMemoryResourceRange (
   UINT64                Stride;
   UINT64                AcceptPageSize;
   EFI_PHYSICAL_ADDRESS  PhysicalAddress;
+  UINT64                TotalSize;
+  UINT64                ProcessedSize;
+  UINT64                RemainderSize;
+  UINT64                RemainderPages;
+  UINT64                RemainderStart;
 
   AcceptPageSize = (UINT64)(UINTN)FixedPcdGet32 (PcdTdxAcceptPageSize);
 
   Status          = EFI_SUCCESS;
   Stride          = (UINTN)CpusNum * ACCEPT_CHUNK_SIZE;
   PhysicalAddress = PhysicalStart + ACCEPT_CHUNK_SIZE * (UINTN)CpuIndex;
+  TotalSize       = PhysicalEnd - PhysicalStart;
 
   while (!EFI_ERROR (Status) && PhysicalAddress < PhysicalEnd) {
     Pages  = MIN (ACCEPT_CHUNK_SIZE, PhysicalEnd - PhysicalAddress) / AcceptPageSize;
     Status = TdAcceptPages (PhysicalAddress, Pages, (UINT32)(UINTN)AcceptPageSize);
     ASSERT (!EFI_ERROR (Status));
     PhysicalAddress += Stride;
+  }
+
+  if (CpuIndex == 0) {
+    ProcessedSize = (TotalSize / AcceptPageSize) * AcceptPageSize;
+
+    RemainderStart = PhysicalStart + ProcessedSize;
+    RemainderSize  = TotalSize % AcceptPageSize;
+    if (RemainderSize > 0) {
+      RemainderPages = RemainderSize / SIZE_4KB;
+      if (RemainderPages > 0) {
+        Status = TdAcceptPages (
+                   RemainderStart,
+                   RemainderPages,
+                   SIZE_4KB
+                   );
+        ASSERT (!EFI_ERROR (Status));
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+      }
+    }
   }
 
   return EFI_SUCCESS;
