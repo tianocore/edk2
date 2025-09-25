@@ -692,7 +692,7 @@ ConverToCpuArchAttributes (
 {
   UINT64  CpuArchAttributes;
 
-  CpuArchAttributes = Attributes & EFI_MEMORY_ATTRIBUTE_MASK;
+  CpuArchAttributes = Attributes & EFI_MEMORY_ACCESS_MASK;
 
   if ((Attributes & EFI_MEMORY_UC) == EFI_MEMORY_UC) {
     CpuArchAttributes |= EFI_MEMORY_UC;
@@ -995,7 +995,7 @@ CoreConvertSpace (
           // Keep original CPU arch attributes when caller just calls
           // SetMemorySpaceAttributes() with none CPU arch attributes (for example, RUNTIME).
           //
-          Attributes |= (Entry->Attributes & (EFI_CACHE_ATTRIBUTE_MASK | EFI_MEMORY_ATTRIBUTE_MASK));
+          Attributes |= (Entry->Attributes & (EFI_CACHE_ATTRIBUTE_MASK | EFI_MEMORY_ACCESS_MASK));
         }
 
         Entry->Attributes = Attributes;
