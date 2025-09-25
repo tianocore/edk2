@@ -281,9 +281,9 @@ Tcg2ConfigDriverEntryPoint (
   //
   // Create a private data structure.
   //
-  PrivateData = AllocateCopyPool (sizeof (TCG2_CONFIG_PRIVATE_DATA), &mTcg2ConfigPrivateDateTemplate);
+  PrivateData = AllocateCopyPool (sizeof (TCG2_CONFIG_PRIVATE_DATA), &mTcg2ConfigPrivateDataTemplate);
   ASSERT (PrivateData != NULL);
-  mTcg2ConfigPrivateDate = PrivateData;
+  mTcg2ConfigPrivateData = PrivateData;
   //
   // Install private GUID.
   //
