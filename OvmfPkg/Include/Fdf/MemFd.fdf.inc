@@ -105,17 +105,17 @@ gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableBase|gUefiOvmfPkgTokenSpaceGui
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
 
 #
-# PEI firmware volume is uncompressed to this area
-#
-0x020000|0x0D0000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvSize
-FV = PEIFV
-
-#
 # memory debug log buffer for early boot phase
 #
-0x0F0000|0x10000
+0x020000|0x10000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogSize
+
+#
+# PEI firmware volume is uncompressed to this area
+#
+0x030000|0x0D0000
+gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvSize
+FV = PEIFV
 
 #
 # DXE firmware volume is uncompressed to this area
