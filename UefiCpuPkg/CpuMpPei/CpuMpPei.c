@@ -68,7 +68,8 @@ InitializeExceptionStackSwitchHandlers (
 }
 
 /**
-  Initializes MP exceptions handlers for the sake of stack switch requirement.
+  Initializes MP exceptions handlers for the sake of stack switch requirement and giving the APs
+  their own GDTs.
 
   This function will allocate required resources required to setup stack switch
   and pass them through SwitchStackData to each logic processor.
@@ -85,10 +86,6 @@ InitializeMpExceptionStackSwitchHandlers (
   UINTN                           BufferSize;
   EFI_STATUS                      Status;
   UINT8                           *Buffer;
-
-  if (!PcdGetBool (PcdCpuStackGuard)) {
-    return;
-  }
 
   Status = MpInitLibGetNumberOfProcessors (&NumberOfProcessors, NULL);
   ASSERT_EFI_ERROR (Status);
