@@ -12,6 +12,7 @@
 
   Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
+  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -333,6 +334,9 @@ ValidateFmpCapsule (
 
   if (EmbeddedDriverCount != NULL) {
     *EmbeddedDriverCount = FmpCapsuleHeader->EmbeddedDriverCount;
+    if (!PcdGetBool (PcdCapsuleEmbeddedDriverSupport) && (*EmbeddedDriverCount != 0)) {
+      return EFI_UNSUPPORTED;
+    }
   }
 
   return EFI_SUCCESS;
