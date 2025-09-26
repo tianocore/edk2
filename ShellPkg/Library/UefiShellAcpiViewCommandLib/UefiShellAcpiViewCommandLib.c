@@ -8,6 +8,7 @@
 
 #include <Guid/ShellLibHiiGuid.h>
 #include <IndustryStandard/Acpi.h>
+#include <IndustryStandard/ArmAgdiTable.h>
 #include <IndustryStandard/ArmErrorSourceTable.h>
 
 #include <Library/BaseMemoryLib.h>
@@ -49,6 +50,7 @@ STATIC
 CONST
 ACPI_TABLE_PARSER  ParserList[] = {
   { EFI_ACPI_6_3_ARM_ERROR_SOURCE_TABLE_SIGNATURE,                                                       ParseAcpiAest },
+  { EFI_ACPI_ARM_AGDI_TABLE_SIGNATURE,                                                                   ParseAcpiAgdi },
   { EFI_ACPI_6_4_ARM_PERFORMANCE_MONITORING_UNIT_TABLE_SIGNATURE,                                        ParseAcpiApmt },
   { EFI_ACPI_6_2_BOOT_GRAPHICS_RESOURCE_TABLE_SIGNATURE,                                                 ParseAcpiBgrt },
   { EFI_ACPI_6_2_DEBUG_PORT_2_TABLE_SIGNATURE,                                                           ParseAcpiDbg2 },
