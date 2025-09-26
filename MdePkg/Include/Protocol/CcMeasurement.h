@@ -59,6 +59,33 @@ typedef UINT32 EFI_CC_MR_INDEX;
 #define TDX_MR_INDEX_RTMR2  3
 #define TDX_MR_INDEX_RTMR3  4
 
+/**
+  Macro definitions for mapping CC Measurement indices to Arm CCA
+  Realm measurement registers.
+
+  The mapping between the TPM PCR index and the Arm CCA Realm
+  Extensible measurement as defined by the UEFI specification
+  in section 38.4.3 Arm Confidential Compute Architecture Extension.
+
+  The following table shows the TPM PCR index mapping and CC event log
+  measurement register index interpretation for Arm CCA where:
+    - RIM means Realm Initial Measurement Register and
+    - REM means Realm Extensible Measurement Register
+
+  TPM PCR Index | CC Measurement  | Arm CCA-measurement | RIM/REM
+                | Register Index  |  register           | Index
+  --------------------------------------------------------------
+  0             |   0             |   RIM               | 0
+  1, 7          |   1             |   REM[0]            | 1
+  2~6           |   2             |   REM[1]            | 2
+  8~15          |   3             |   REM[2]            | 3
+*/
+#define   ARMCCA_MR_INDEX_0_RIM    0
+#define   ARMCCA_MR_INDEX_1_REM0   1
+#define   ARMCCA_MR_INDEX_2_REM1   2
+#define   ARMCCA_MR_INDEX_3_REM2   3
+#define   ARMCCA_MR_INDEX_INVALID  4
+
 #define EFI_CC_EVENT_LOG_FORMAT_TCG_2  0x00000002
 #define EFI_CC_BOOT_HASH_ALG_SHA384    0x00000004
 
