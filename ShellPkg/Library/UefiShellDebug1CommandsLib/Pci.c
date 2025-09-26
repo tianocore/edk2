@@ -2421,6 +2421,36 @@ CHAR16  *IndicatorTable[] = {
 };
 
 /**
+  Safe wrapper function for DumpHex that validates PCI configuration space boundaries.
+
+  This function ensures that hex dumps do not exceed the standard 4KB PCIe configuration
+  space boundary (0x1000). If the requested dump would exceed this boundary, it prints
+  an error message and truncates the dump size to remain within valid bounds.
+
+  @param[in] Indent     Number of spaces to indent the hex dump output for formatting.
+  @param[in] Offset     Starting offset within the PCI configuration space to begin dumping.
+  @param[in] DataSize   Number of bytes to dump. Will be truncated if it exceeds the 4KB boundary.
+  @param[in] UserData   Pointer to the data buffer containing the PCI configuration space data.
+
+**/
+VOID
+PciConfigSpaceDumpHex (
+  IN UINTN  Indent,
+  IN UINTN  Offset,
+  IN UINTN  DataSize,
+  IN VOID   *UserData
+  )
+{
+  // Ensure we don't exceed the 4KB config space boundary
+  if (Offset + DataSize > 0x1000) {
+    ShellPrintDefaultEx (L"\nError: Requested dump size exceeds PCIe 4KB configuration space boundary (CurrentOffset: 0x%03X, Size: 0x%03X). Truncating to valid range.\n\n", Offset, DataSize);
+    DataSize = 0x1000 - Offset;
+  }
+
+  DumpHex (Indent, Offset, DataSize, UserData);
+}
+
+/**
   Function for 'pci' command.
 
   @param[in] ImageHandle  Handle to the Image (NULL if Internal).
@@ -5051,7 +5081,7 @@ PrintInterpretedExtendedCompatibilityLinkControl (
     Header->RootComplexLinkControl,
     Header->RootComplexLinkStatus
     );
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_INTERNAL_LINK_CONTROL),
@@ -5083,7 +5113,7 @@ PrintInterpretedExtendedCompatibilityPowerBudgeting (
     Header->Data,
     Header->PowerBudgetCapability
     );
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_POWER_BUDGETING),
@@ -5133,7 +5163,7 @@ PrintInterpretedExtendedCompatibilityAcs (
     }
   }
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_ACS_EXTENDED) + (VectorSize / 8) - 1,
@@ -5164,7 +5194,7 @@ PrintInterpretedExtendedCompatibilityLatencyToleranceReporting (
     Header->MaxSnoopLatency,
     Header->MaxNoSnoopLatency
     );
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_LATENCE_TOLERANCE_REPORTING),
@@ -5194,7 +5224,7 @@ PrintInterpretedExtendedCompatibilitySerialNumber (
     gShellDebug1HiiHandle,
     Header->SerialNumber
     );
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_SERIAL_NUMBER),
@@ -5227,7 +5257,7 @@ PrintInterpretedExtendedCompatibilityRcrb (
     Header->RcrbCapabilities,
     Header->RcrbControl
     );
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_RCRB_HEADER),
@@ -5257,7 +5287,7 @@ PrintInterpretedExtendedCompatibilityVendorSpecific (
     gShellDebug1HiiHandle,
     Header->VendorSpecificHeader
     );
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     PCI_EXPRESS_EXTENDED_CAPABILITY_VENDOR_SPECIFIC_GET_SIZE (Header),
@@ -5287,7 +5317,7 @@ PrintInterpretedExtendedCompatibilityECEA (
     gShellDebug1HiiHandle,
     Header->AssociationBitmap
     );
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_EVENT_COLLECTOR_ENDPOINT_ASSOCIATION),
@@ -5318,7 +5348,7 @@ PrintInterpretedExtendedCompatibilityAri (
     Header->AriCapability,
     Header->AriControl
     );
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_ARI_CAPABILITY),
@@ -5361,7 +5391,7 @@ PrintInterpretedExtendedCompatibilityDynamicPowerAllocation (
       );
   }
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_DYNAMIC_POWER_ALLOCATION) - 1 + PCI_EXPRESS_EXTENDED_CAPABILITY_DYNAMIC_POWER_ALLOCATION_GET_SUBSTATE_MAX (Header),
@@ -5402,7 +5432,7 @@ PrintInterpretedExtendedCompatibilityLinkDeclaration (
       );
   }
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_LINK_DECLARATION) + (PCI_EXPRESS_EXTENDED_CAPABILITY_LINK_DECLARATION_GET_LINK_COUNT (Header)-1)*sizeof (UINT32),
@@ -5449,7 +5479,7 @@ PrintInterpretedExtendedCompatibilityAer (
     Header->TlpPrefixLog[2],
     Header->TlpPrefixLog[3]
     );
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_ADVANCED_ERROR_REPORTING),
@@ -5488,7 +5518,7 @@ PrintInterpretedExtendedCompatibilityMulticast (
     Header->McOverlayBar
     );
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_MULTICAST),
@@ -5539,7 +5569,7 @@ PrintInterpretedExtendedCompatibilityVirtualChannel (
       );
   }
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_VIRTUAL_CHANNEL_CAPABILITY)
@@ -5577,7 +5607,7 @@ PrintInterpretedExtendedCompatibilityResizeableBar (
       );
   }
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     (UINT32)GET_NUMBER_RESIZABLE_BARS (Header) * sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_ENTRY),
@@ -5609,14 +5639,14 @@ PrintInterpretedExtendedCompatibilityTph (
     Header->TphRequesterCapability,
     Header->TphRequesterControl
     );
-  DumpHex (
+  PciConfigSpaceDumpHex (
     8,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)Header->TphStTable - (UINT8 *)HeadersBaseAddress),
     GET_TPH_TABLE_SIZE (Header),
     (VOID *)Header->TphStTable
     );
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_TPH) + GET_TPH_TABLE_SIZE (Header) - sizeof (UINT16),
@@ -5650,14 +5680,14 @@ PrintInterpretedExtendedCompatibilitySecondary (
     Header->LinkControl3.Uint32,
     Header->LaneErrorStatus
     );
-  DumpHex (
+  PciConfigSpaceDumpHex (
     8,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)Header->EqualizationControl - (UINT8 *)HeadersBaseAddress),
     PciExpressCap->LinkCapability.Bits.MaxLinkWidth * sizeof (PCI_EXPRESS_REG_LANE_EQUALIZATION_CONTROL),
     (VOID *)Header->EqualizationControl
     );
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_SECONDARY_PCIE) - sizeof (Header->EqualizationControl)
@@ -5691,7 +5721,7 @@ PrintInterpretedExtendedCompatibilityAts (
     Header->Control.Uint16
     );
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_ATS),
@@ -5746,7 +5776,7 @@ PrintInterpretedExtendedCompatibilitySriov (
     Header->VFMigrationStateArrayOffset
     );
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (SR_IOV_CAPABILITY_REGISTER),
@@ -5780,7 +5810,7 @@ PrintInterpretedExtendedCompatibilityPri (
     Header->Status.Uint32
     );
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_PRI),
@@ -5813,7 +5843,7 @@ PrintInterpretedExtendedCompatibilityPasid (
     Header->Control.Uint16
     );
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_PASID),
@@ -5847,7 +5877,7 @@ PrintInterpretedExtendedCompatibilityL1PmSubstates (
     Header->Control2.Uint32
     );
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_L1_PM_SUBSTATES),
@@ -5882,19 +5912,12 @@ PrintInterpretedExtendedCompatibilityDesignatedVendorSpecific (
     Header->DesignatedVendorSpecificHeader1.Bits.DvsecLength
     );
 
-  UINT32  NextCapOffset = HeaderAddress->NextCapabilityOffset;
-  UINTN   Size;
+  UINTN  Size;
 
-  if (NextCapOffset == 0) {
-    // The DVSEC length field plus the PCI Express header
-    Size = sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER) +
-           Header->DesignatedVendorSpecificHeader1.Bits.DvsecLength;
-  } else {
-    Size = NextCapOffset - (((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress) & 0xFFF);
-  }
+  Size = Header->DesignatedVendorSpecificHeader1.Bits.DvsecLength;
 
   // Dump the entire structure including the variable-length vendor specific data
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     Size,
@@ -5969,7 +5992,7 @@ PrintInterpretedExtendedCompatibilityVfResizableBar (
       );
   }
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     HeaderSize + EntryCount * EntrySize,
@@ -6002,7 +6025,7 @@ PrintInterpretedExtendedCompatibilityDataLinkFeature (
     Header->Control.Uint32
     );
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_DATA_LINK_FEATURE),
@@ -6058,7 +6081,7 @@ PrintInterpretedExtendedCompatibilityPhysicalLayer16 (
     Header->SecondRetimerDataParityMismatchStatus
     );
 
-  // Calculate the size for DumpHex
+  // Calculate the size for PciConfigSpaceDumpHex
   UINT32  NextCapOffset = HeaderAddress->NextCapabilityOffset;
   UINTN   Size;
 
@@ -6072,7 +6095,7 @@ PrintInterpretedExtendedCompatibilityPhysicalLayer16 (
     Size = NextCapOffset - (((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress) & 0xFFF);
   }
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     Size,
@@ -6131,7 +6154,7 @@ PrintInterpretedExtendedCompatibilityLaneMargining (
     Header->Status.Bits.MaxLanesReceivingTestPattern
     );
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_LANE_MARGINING_AT_RECEIVER),
@@ -6227,7 +6250,7 @@ PrintInterpretedExtendedCompatibilityPhysicalLayer32 (
     Size = NextCapOffset - (((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress) & 0xFFF);
   }
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     Size,
@@ -6261,7 +6284,7 @@ PrintInterpretedExtendedCompatibilityAlternateProtocol (
     Header->AltProtocolControl
     );
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_ALTERNATE_PROTOCOL),
@@ -6295,7 +6318,7 @@ PrintInterpretedExtendedCompatibilityDataObjectExchange (
     Header->DoeStatus
     );
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_DATA_OBJECT_EXCHANGE),
@@ -6362,7 +6385,7 @@ PrintInterpretedExtendedCompatibilityDevice3 (
     Header->Status.Bits.RemoteL0pSupported
     );
 
-  // Calculate the size for DumpHex
+  // Calculate the size for PciConfigSpaceDumpHex
   UINT32  NextCapOffset = HeaderAddress->NextCapabilityOffset;
   UINTN   Size;
 
@@ -6374,7 +6397,7 @@ PrintInterpretedExtendedCompatibilityDevice3 (
     Size = NextCapOffset - (((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress) & 0xFFF);
   }
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     Size,
@@ -6408,7 +6431,7 @@ PrintInterpretedExtendedCompatibilityIntegrityEncryption (
     Header->IdeStatus
     );
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_INTEGRITY_DATA_ENCRYPTION),
@@ -6457,7 +6480,7 @@ PrintInterpretedExtendedCompatibilityPhysicalLayer64 (
     Header->Status.Bits.NoEqualizationNeededRcvd
     );
 
-  // Calculate the size for DumpHex
+  // Calculate the size for PciConfigSpaceDumpHex
   UINT32  NextCapOffset = HeaderAddress->NextCapabilityOffset;
   UINTN   Size;
 
@@ -6471,7 +6494,7 @@ PrintInterpretedExtendedCompatibilityPhysicalLayer64 (
     Size = NextCapOffset - (((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress) & 0xFFF);
   }
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     Size,
@@ -6512,7 +6535,7 @@ PrintInterpretedExtendedCompatibilityFlitLogging (
     Header->FlitErrorData3
     );
 
-  DumpHex (
+  PciConfigSpaceDumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8 *)HeaderAddress - (UINT8 *)HeadersBaseAddress),
     sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_FLIT_LOGGING),
