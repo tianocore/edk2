@@ -1359,7 +1359,10 @@ PxeDhcpInput (
   }
 
   Packet = (EFI_DHCP4_PACKET *)NetbufAllocSpace (Wrap, Len, NET_BUF_TAIL);
-  ASSERT (Packet != NULL);
+  if (Packet == NULL) {
+    ASSERT (Packet != NULL);
+    goto RESTART;
+  }
 
   Packet->Size   = Len;
   Head           = &Packet->Dhcp4.Header;
