@@ -47,6 +47,7 @@ EFI_HII_HANDLE                       mDriverHealthManagerHiiHandle;
 EFI_BOOT_MANAGER_DRIVER_HEALTH_INFO  *mDriverHealthManagerHealthInfo     = NULL;
 UINTN                                mDriverHealthManagerHealthInfoCount = 0;
 EFI_HII_DATABASE_PROTOCOL            *mDriverHealthManagerDatabase;
+EFI_HII_PACKAGE_LIST_HEADER          *mBackupHiiPackageList = NULL;
 
 extern UINT8  DriverHealthManagerVfrBin[];
 extern UINT8  DriverHealthConfigureVfrBin[];
@@ -124,6 +125,42 @@ DriverHealthManagerFakeRouteConfig (
 }
 
 /**
+  Create a default HiiPackageList that only contains static STRING_ARRAY_NAME data
+  once the driver is initialized. This HiiPackageList is used to be updated in
+  DriverHealthManagerCleanDynamicString function.
+**/
+EFI_HII_PACKAGE_LIST_HEADER *
+CreateBackupStringPackageList (
+  VOID
+  )
+{
+  EFI_HII_PACKAGE_LIST_HEADER  *BackupHiiPackageList;
+  UINTN                        BufferSize;
+  EFI_HII_PACKAGE_HEADER       *PackageHeader;
+  UINT32                       StringSize;
+
+  StringSize           = *(UINT32 *)&STRING_ARRAY_NAME - sizeof (UINT32);
+  BufferSize           = sizeof (EFI_HII_PACKAGE_LIST_HEADER) + StringSize + sizeof (EFI_HII_PACKAGE_HEADER);
+  BackupHiiPackageList = AllocateZeroPool (BufferSize);
+  if (BackupHiiPackageList == NULL) {
+    ASSERT (BackupHiiPackageList != NULL);
+    return NULL;
+  }
+
+  BackupHiiPackageList->PackageLength = (UINT32)BufferSize;
+  CopyMem (&BackupHiiPackageList->PackageListGuid, &gEfiCallerIdGuid, sizeof (EFI_GUID));
+
+  PackageHeader = (EFI_HII_PACKAGE_HEADER *)(BackupHiiPackageList + 1);
+  CopyMem (PackageHeader, STRING_ARRAY_NAME + sizeof (UINT32), StringSize);
+
+  PackageHeader         = (EFI_HII_PACKAGE_HEADER *)((UINT8 *)PackageHeader + StringSize);
+  PackageHeader->Type   = EFI_HII_PACKAGE_END;
+  PackageHeader->Length = sizeof (EFI_HII_PACKAGE_HEADER);
+
+  return BackupHiiPackageList;
+}
+
+/**
 
   Install the health manager forms.
   One will be used by BDS core to configure the Configured Required
@@ -176,6 +213,8 @@ InitializeDriverHealthManager (
                                     NULL
                                     );
   ASSERT (mDriverHealthManagerHiiHandle != NULL);
+
+  mBackupHiiPackageList = CreateBackupStringPackageList ();
 
   return EFI_SUCCESS;
 }
@@ -889,41 +928,14 @@ DriverHealthManagerCleanDynamicString (
   VOID
   )
 {
-  EFI_STATUS                   Status;
-  EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
-  UINTN                        BufferSize;
-  EFI_HII_PACKAGE_HEADER       *PackageHeader;
-  UINT32                       FixedStringSize;
-
-  FixedStringSize = *(UINT32 *)&STRING_ARRAY_NAME - sizeof (UINT32);
-  BufferSize      = sizeof (EFI_HII_PACKAGE_LIST_HEADER) + FixedStringSize + sizeof (EFI_HII_PACKAGE_HEADER);
-  HiiPackageList  = AllocatePool (BufferSize);
-  if (HiiPackageList == NULL) {
-    ASSERT (HiiPackageList != NULL);
-    return;
-  }
-
-  HiiPackageList->PackageLength = (UINT32)BufferSize;
-  CopyMem (&HiiPackageList->PackageListGuid, &gEfiCallerIdGuid, sizeof (EFI_GUID));
-
-  PackageHeader = (EFI_HII_PACKAGE_HEADER *)(HiiPackageList + 1);
-  CopyMem (PackageHeader, STRING_ARRAY_NAME + sizeof (UINT32), FixedStringSize);
-
-  PackageHeader         = (EFI_HII_PACKAGE_HEADER *)((UINT8 *)PackageHeader + PackageHeader->Length);
-  PackageHeader->Type   = EFI_HII_PACKAGE_END;
-  PackageHeader->Length = sizeof (EFI_HII_PACKAGE_HEADER);
+  EFI_STATUS  Status;
 
   Status = mDriverHealthManagerDatabase->UpdatePackageList (
                                            mDriverHealthManagerDatabase,
                                            mDriverHealthManagerHiiHandle,
-                                           HiiPackageList
+                                           mBackupHiiPackageList
                                            );
   ASSERT_EFI_ERROR (Status);
-
-  //
-  // Form package not found in this Package List
-  //
-  FreePool (HiiPackageList);
 }
 
 /**
