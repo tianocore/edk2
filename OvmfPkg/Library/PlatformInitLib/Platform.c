@@ -250,6 +250,8 @@ PlatformMemMapInitialization (
 
   PlatformInfoHob->PcdPciIoBase = PciIoBase;
   PlatformInfoHob->PcdPciIoSize = PciIoSize;
+
+  PlatformIgvmDataHobs ();
 }
 
 /**
@@ -565,6 +567,13 @@ PlatformMaxCpuCountInitialization (
 {
   UINT16  BootCpuCount = 0;
   UINT32  MaxCpuCount;
+
+  MaxCpuCount = PlatformIgvmVpCount ();
+  if (MaxCpuCount != 0) {
+    PlatformInfoHob->PcdCpuMaxLogicalProcessorNumber  = MaxCpuCount;
+    PlatformInfoHob->PcdCpuBootLogicalProcessorNumber = MaxCpuCount;
+    return;
+  }
 
   if (TdIsEnabled ()) {
     BootCpuCount = (UINT16)TdVCpuNum ();
