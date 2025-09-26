@@ -147,7 +147,12 @@
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsicSev.inf
   OemHookStatusCodeLib|MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   SerialPortLib|PcAtChipsetPkg/Library/SerialIoLib/SerialIoLib.inf
+!if $(STANDALONE_MM_ENABLE) != TRUE
+  MtrrLib|UefiCpuPkg/Library/MtrrLib/MtrrLibCc.inf
+!else
+  # CC is not supported with standalone MM enabled
   MtrrLib|UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
+!endif
   MicrocodeLib|UefiCpuPkg/Library/MicrocodeLib/MicrocodeLib.inf
   CpuPageTableLib|UefiCpuPkg/Library/CpuPageTableLib/CpuPageTableLib.inf
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
