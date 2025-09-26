@@ -35,7 +35,6 @@ fi
 # Configure defaults for various options
 #
 
-ARCH_IA32=no
 ARCH_X64=no
 BUILDTARGET=DEBUG
 BUILD_OPTIONS=
@@ -91,6 +90,7 @@ case `uname` in
         TARGET_TOOLS=GCC5
         ;;
     esac
+    ;;
 esac
 
 #
@@ -119,9 +119,9 @@ do
   else
     case $LAST_ARG in
       -a)
-        if [[ x"$arg" != x"IA32" && x"$arg" != x"X64" ]]; then
+        if [[ x"$arg" != x"X64" ]]; then
           echo Unsupported processor architecture: $arg
-          echo Only IA32 or X64 is supported
+          echo Only X64 is supported
           exit 1
         fi
         eval ARCH_$arg=yes
@@ -147,22 +147,14 @@ do
   shift
 done
 
-if [[ "$ARCH_IA32" == "yes" && "$ARCH_X64" == "yes" ]]; then
-  PROCESSOR=IA32X64
-  Processor=Ia32X64
-  BUILD_OPTIONS="$BUILD_OPTIONS -a IA32 -a X64"
-  PLATFORM_BUILD_DIR=Ovmf3264
-  BUILD_ROOT_ARCH=X64
-else
-  PROCESSOR=X64
-  Processor=X64
-  BUILD_OPTIONS="$BUILD_OPTIONS -a X64"
-  PLATFORM_BUILD_DIR=Ovmf$Processor
-  BUILD_ROOT_ARCH=X64
-fi
+PROCESSOR=X64
+Processor=X64
+BUILD_OPTIONS="$BUILD_OPTIONS -a X64"
+PLATFORM_BUILD_DIR=Ovmf$Processor
+BUILD_ROOT_ARCH=X64
 
 case $PROCESSOR in
-  X64|IA32X64)
+  X64)
     if [ -z "$QEMU_COMMAND" ]; then
       #
       # The user didn't set the QEMU_COMMAND variable.
@@ -172,7 +164,7 @@ case $PROCESSOR in
     ;;
   *)
     echo Unsupported processor architecture: $PROCESSOR
-    echo Only IA32 or X64 is supported
+    echo Only X64 is supported
     exit 1
     ;;
 esac
