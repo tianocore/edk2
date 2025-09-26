@@ -92,6 +92,7 @@
 "       MPAM  - Memory System Resource Partitioning and Monitoring Table\r\n"
 "       PPTT  - Processor Properties Topology Table\r\n"
 "       RSDP  - Root System Description Pointer\r\n"
+"       RIMT  - RISC-V IO Mapping Table\r\n"
 "       SLIT  - System Locality Information Table\r\n"
 "       SPCR  - Serial Port Console Redirection Table\r\n"
 "       SRAT  - System Resource Affinity Table\r\n"
