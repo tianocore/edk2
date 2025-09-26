@@ -55,7 +55,7 @@ ShellCommandRunEcho (
   Status = ShellCommandLineParseEx (ParamList, &Package, &ProblemParam, TRUE, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"echo", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"echo", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -84,9 +84,9 @@ ShellCommandRunEcho (
       // output its current state
       //
       if (ShellCommandGetEchoState ()) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_ECHO_ON), gShellLevel3HiiHandle);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_ECHO_ON), gShellLevel3HiiHandle);
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_ECHO_OFF), gShellLevel3HiiHandle);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_ECHO_OFF), gShellLevel3HiiHandle);
       }
     } else {
       //
@@ -103,7 +103,7 @@ ShellCommandRunEcho (
         }
       }
 
-      ShellPrintEx (-1, -1, L"%s\r\n", PrintString);
+      ShellPrintDefaultEx (L"%s\r\n", PrintString);
       SHELL_FREE_NON_NULL (PrintString);
     }
 

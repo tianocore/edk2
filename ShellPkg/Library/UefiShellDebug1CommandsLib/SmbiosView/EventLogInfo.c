@@ -26,7 +26,7 @@ DisplaySELAccessMethod (
   //
   // Print prompt
   //
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_ACCESS_METHOD), gShellDebug1HiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_ACCESS_METHOD), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Key, Option);
 
   //
@@ -34,30 +34,30 @@ DisplaySELAccessMethod (
   //
   switch (Key) {
     case 0:
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_ONE_EIGHT_BIT), gShellDebug1HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_ONE_EIGHT_BIT), gShellDebug1HiiHandle);
       break;
 
     case 1:
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_TWO_EIGHT_BITS), gShellDebug1HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_TWO_EIGHT_BITS), gShellDebug1HiiHandle);
       break;
 
     case 2:
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_ONE_SIXTEEN_BIT), gShellDebug1HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_ONE_SIXTEEN_BIT), gShellDebug1HiiHandle);
       break;
 
     case 3:
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_MEM_MAPPED_PHYS), gShellDebug1HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_MEM_MAPPED_PHYS), gShellDebug1HiiHandle);
       break;
 
     case 4:
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_AVAIL_VIA_GENERAL), gShellDebug1HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_AVAIL_VIA_GENERAL), gShellDebug1HiiHandle);
       break;
 
     default:
       if (Key <= 0x7f) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_AVAIL_FOR_FUTURE_ASSIGN), gShellDebug1HiiHandle);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_AVAIL_FOR_FUTURE_ASSIGN), gShellDebug1HiiHandle);
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_BIOS_VENDOR_OEM), gShellDebug1HiiHandle);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_BIOS_VENDOR_OEM), gShellDebug1HiiHandle);
       }
   }
 }
@@ -77,26 +77,26 @@ DisplaySELLogStatus (
   //
   // Print prompt
   //
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_LOG_STATUS), gShellDebug1HiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_LOG_STATUS), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Key, Option);
 
   //
   // Print value info
   //
   if ((Key & 0x01) != 0) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_LOG_AREA_VALID), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_LOG_AREA_VALID), gShellDebug1HiiHandle);
   } else {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_LOG_AREA_VALID), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_LOG_AREA_VALID), gShellDebug1HiiHandle);
   }
 
   if ((Key & 0x02) != 0) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_LOG_AREA_FULL), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_LOG_AREA_FULL), gShellDebug1HiiHandle);
   } else {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_LOG_AREA_NOT_FULL), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_LOG_AREA_NOT_FULL), gShellDebug1HiiHandle);
   }
 
   if ((Key & 0xFC) != 0) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_RES_BITS_NOT_ZERO), gShellDebug1HiiHandle, Key & 0xFC);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_RES_BITS_NOT_ZERO), gShellDebug1HiiHandle, Key & 0xFC);
   }
 }
 
@@ -115,20 +115,20 @@ DisplaySysEventLogHeaderFormat (
   //
   // Print prompt
   //
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_LOG_HEADER_FORMAT), gShellDebug1HiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_LOG_HEADER_FORMAT), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Key, Option);
 
   //
   // Print value info
   //
   if (Key == 0x00) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_NO_HEADER), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_NO_HEADER), gShellDebug1HiiHandle);
   } else if (Key == 0x01) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_TYPE_LOG_HEADER), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_TYPE_LOG_HEADER), gShellDebug1HiiHandle);
   } else if (Key <= 0x7f) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_AVAIL_FOR_FUTURE), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_AVAIL_FOR_FUTURE), gShellDebug1HiiHandle);
   } else {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_BIOS_VENDOR), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_BIOS_VENDOR), gShellDebug1HiiHandle);
   }
 }
 
@@ -144,19 +144,19 @@ DisplaySELLogHeaderLen (
   UINT8  Option
   )
 {
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_LOG_HEADER_LEN), gShellDebug1HiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_LOG_HEADER_LEN), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Key, Option);
 
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_ONE_VAR_D), gShellDebug1HiiHandle, Key & 0x7F);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_ONE_VAR_D), gShellDebug1HiiHandle, Key & 0x7F);
 
   //
   // The most-significant bit of the field specifies
   // whether (0) or not (1) the record has been read
   //
   if ((Key & 0x80) != 0) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_THIS_RECORD_READ), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_THIS_RECORD_READ), gShellDebug1HiiHandle);
   } else {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_THIS_RECORD_NOT_READ), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_THIS_RECORD_NOT_READ), gShellDebug1HiiHandle);
   }
 }
 
@@ -172,17 +172,14 @@ DisplaySysEventLogHeaderType1 (
 {
   LOG_HEADER_TYPE1_FORMAT  *Header;
 
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_SYSTEM_EVENT_LOG), gShellDebug1HiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_SYSTEM_EVENT_LOG), gShellDebug1HiiHandle);
 
   //
   // Print Log Header Type1 Format info
   //
   Header = (LOG_HEADER_TYPE1_FORMAT *)(LogHeader);
 
-  ShellPrintHiiEx (
-    -1,
-    -1,
-    NULL,
+  ShellPrintHiiDefaultEx (
     STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_OEM_RESERVED),
     gShellDebug1HiiHandle,
     Header->OEMReserved[0],
@@ -191,23 +188,20 @@ DisplaySysEventLogHeaderType1 (
     Header->OEMReserved[3],
     Header->OEMReserved[4]
     );
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_MULTIPLE_EVENT_TIME), gShellDebug1HiiHandle, Header->Metw);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_MULTIPLE_EVENT_COUNT), gShellDebug1HiiHandle, Header->Meci);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_PREBOOT_ADDRESS), gShellDebug1HiiHandle, Header->CMOSAddress);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_PREBOOT_INDEX), gShellDebug1HiiHandle, Header->CMOSBitIndex);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_CHECKSUM_STARTING_OFF), gShellDebug1HiiHandle, Header->StartingOffset);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_CHECKSUN_BYTE_COUNT), gShellDebug1HiiHandle, Header->ChecksumOffset);
-  ShellPrintHiiEx (
-    -1,
-    -1,
-    NULL,
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_MULTIPLE_EVENT_TIME), gShellDebug1HiiHandle, Header->Metw);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_MULTIPLE_EVENT_COUNT), gShellDebug1HiiHandle, Header->Meci);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_PREBOOT_ADDRESS), gShellDebug1HiiHandle, Header->CMOSAddress);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_PREBOOT_INDEX), gShellDebug1HiiHandle, Header->CMOSBitIndex);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_CHECKSUM_STARTING_OFF), gShellDebug1HiiHandle, Header->StartingOffset);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_CHECKSUN_BYTE_COUNT), gShellDebug1HiiHandle, Header->ChecksumOffset);
+  ShellPrintHiiDefaultEx (
     STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_RESERVED),
     gShellDebug1HiiHandle,
     Header->OEMReserved[0],
     Header->OEMReserved[1],
     Header->OEMReserved[2]
     );
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_HEADER_REVISION), gShellDebug1HiiHandle, Header->HeaderRevision);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_HEADER_REVISION), gShellDebug1HiiHandle, Header->HeaderRevision);
 }
 
 /**
@@ -225,20 +219,20 @@ DisplaySysEventLogHeader (
   //
   // Print prompt
   //
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_LOG_HEADER), gShellDebug1HiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_LOG_HEADER), gShellDebug1HiiHandle);
 
   //
   // Print value info
   //
   if (LogHeaderFormat == 0x00) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_NO_HEADER), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_NO_HEADER), gShellDebug1HiiHandle);
   } else if (LogHeaderFormat == 0x01) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_TYPE_LOG_HEADER), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_TYPE_LOG_HEADER), gShellDebug1HiiHandle);
     DisplaySysEventLogHeaderType1 (LogHeader);
   } else if (LogHeaderFormat <= 0x7f) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_AVAIL_FUTURE_ASSIGN), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_AVAIL_FUTURE_ASSIGN), gShellDebug1HiiHandle);
   } else {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_BIOS_VENDOR), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_BIOS_VENDOR), gShellDebug1HiiHandle);
   }
 }
 
@@ -267,29 +261,29 @@ DisplayElVdfInfo (
   //
   switch (ElVdfType) {
     case 0:
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_NO_STD_FORMAT), gShellDebug1HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_NO_STD_FORMAT), gShellDebug1HiiHandle);
       break;
 
     case 1:
       Word = (UINT16 *)(VarData + 1);
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_SMBIOS_STRUCT_ASSOC), gShellDebug1HiiHandle);
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_STRUCT_HANDLE), gShellDebug1HiiHandle, *Word);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_SMBIOS_STRUCT_ASSOC), gShellDebug1HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_STRUCT_HANDLE), gShellDebug1HiiHandle, *Word);
       break;
 
     case 2:
       Dword = (UINT32 *)(VarData + 1);
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_MULT_EVENT_COUNTER), gShellDebug1HiiHandle, *Dword);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_MULT_EVENT_COUNTER), gShellDebug1HiiHandle, *Dword);
       break;
 
     case 3:
       Word = (UINT16 *)(VarData + 1);
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_SMBIOS_STRUCT_ASSOC), gShellDebug1HiiHandle);
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_STRUCT_HANDLE), gShellDebug1HiiHandle, *Word);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_SMBIOS_STRUCT_ASSOC), gShellDebug1HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_STRUCT_HANDLE), gShellDebug1HiiHandle, *Word);
       //
       // Followed by a multiple-event counter
       //
       Dword = (UINT32 *)(VarData + 1);
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_MULT_EVENT_COUNTER), gShellDebug1HiiHandle, *Dword);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_MULT_EVENT_COUNTER), gShellDebug1HiiHandle, *Dword);
       break;
 
     case 4:
@@ -311,14 +305,14 @@ DisplayElVdfInfo (
       // Followed by a multiple-event counter
       //
       Dword = (UINT32 *)(VarData + 1);
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_MULT_EVENT_COUNTER), gShellDebug1HiiHandle, *Dword);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_MULT_EVENT_COUNTER), gShellDebug1HiiHandle, *Dword);
       break;
 
     default:
       if (ElVdfType <= 0x7F) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_UNUSED_AVAIL_FOR_ASSIGN), gShellDebug1HiiHandle);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_UNUSED_AVAIL_FOR_ASSIGN), gShellDebug1HiiHandle);
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_AVAIL_FOR_SYSTEM), gShellDebug1HiiHandle);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_AVAIL_FOR_SYSTEM), gShellDebug1HiiHandle);
       }
   }
 }
@@ -345,7 +339,7 @@ DisplaySysEventLogData (
   //
   // Print prompt
   //
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_SYSTEM_EVENT_LOG_2), gShellDebug1HiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_SYSTEM_EVENT_LOG_2), gShellDebug1HiiHandle);
 
   //
   // Print Log info
@@ -367,13 +361,13 @@ DisplaySysEventLogData (
       // (as read from CMOS) of the occurrence of the event
       // So Print as hex and represent decimal
       //
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_DATE), gShellDebug1HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_DATE), gShellDebug1HiiHandle);
       if ((Log != NULL) && (Log->Year >= 80) && (Log->Year <= 99)) {
         Print (L"19");
       } else if ((Log != NULL) && (Log->Year <= 79)) {
         Print (L"20");
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_ERROR), gShellDebug1HiiHandle);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_ERROR), gShellDebug1HiiHandle);
         //
         // Get a Event Log Record
         //
@@ -381,10 +375,7 @@ DisplaySysEventLogData (
         continue;
       }
 
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_SMBIOSVIEW_EVENTLOGINFO_TIME_SIX_VARS),
         gShellDebug1HiiHandle,
         Log->Year,

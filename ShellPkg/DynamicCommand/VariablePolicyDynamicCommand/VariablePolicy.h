@@ -87,12 +87,12 @@ typedef struct {
             _Val[_DumpHexIndex * 3]  = 0;                                             \
             _Str[_DumpHexIndex]      = 0;                                             \
                                                                                       \
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_HEX_DUMP_LINE), mVarPolicyShellCommandHiiHandle, _LocalOffset, _Val, _Str); \
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_HEX_DUMP_LINE), mVarPolicyShellCommandHiiHandle, _LocalOffset, _Val, _Str); \
             _DataToDump = (UINT8 *)(((UINTN)_DataToDump) + _Size);                    \
             _LocalOffset += _Size;                                                    \
             _LocalDataSize -= _Size;                                                  \
           }                                                                           \
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_LINE_BREAK), mVarPolicyShellCommandHiiHandle); \
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_LINE_BREAK), mVarPolicyShellCommandHiiHandle); \
         }
 
 /**
