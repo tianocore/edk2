@@ -106,6 +106,50 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
                 return 0
 
             for test in testList:
+                #
+                # If environment variable "CODE_COVERAGE" is None,
+                # then initialize this variable to "FALSE".
+                #
+                # The "CODE_COVERAGE" variable need to be initialized in the
+                # Windows command prompt or Linux shell.
+                #
+                # If the variable not be initialized then getvariable return None
+                # directly, it made code flow not rubust.
+                #
+                if (thebuilder.env.GetValue("CODE_COVERAGE") == None):
+                    thebuilder.env.SetValue("CODE_COVERAGE", "FALSE", "default settings")
+                #
+                # The unit tests are executed in 2 places in Windows.
+                # One is in this loop.
+                # The other is in the method gen_code_coverage_msvc() that runs
+                # each unit test through OpenCppCoverage.
+                #
+                # The goal of this change is to make sure the call to
+                # gen_code_coverage_msvc() is the only time the unit test is
+                # executed when code coverage information is being collected.
+                #
+                # If code coverage information is not being collected then
+                # the call to gen_code_coverage_msvc() will not be made and
+                # the unit tests must be executed in this loop.
+                #
+                # Also, if the unit tests are being executed in a Linux env,
+                # then gen_code_coverage_msvc() will never be called and
+                # OpenCppCoverage will never be called.
+                #
+                # Created below small logic table to make it clear.
+                # ______________________________________________________________
+                # | CODE_COVERAGE | TOOL_CHAIN_TAG | Where Unit Tests Run      |
+                # |____________________________________________________________|
+                # | FALSE         | GCC5           | do_post_build() loop      |
+                # | FALSE         | VSxxxx         | do_post_build() loop      |
+                # | TRUE          | GCC5           | do_post_build() loop      |
+                # | TRUE          | VSxxxx         | gen_code_coverage_msvc()  |
+                # |_______________|________________|___________________________|
+                #
+                if (thebuilder.env.GetValue("CODE_COVERAGE")) and \
+                    (not thebuilder.env.GetValue("TOOL_CHAIN_TAG").startswith("GCC")):
+                    continue
+
                 # Configure output name if test uses cmocka.
                 shell_env.set_shell_var(
                     'CMOCKA_XML_FILE', test + ".CMOCKA.%g." + arch + ".result.xml")
@@ -113,7 +157,6 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
                 shell_env.set_shell_var(
                     'GTEST_OUTPUT', "xml:" + test + ".GTEST." + arch + ".result.xml")
 
-                # Run the test.
                 ret = RunCmd('"' + test + '"', "", workingdir=cp)
                 if ret != 0:
                     logging.error("UnitTest Execution Error: " +
@@ -138,7 +181,7 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
                                         failure_count += 1
 
             if thebuilder.env.GetValue("CODE_COVERAGE") != "FALSE":
-                if thebuilder.env.GetValue("TOOL_CHAIN_TAG") == "GCC5":
+                if thebuilder.env.GetValue("TOOL_CHAIN_TAG").startswith("GCC"):
                     ret = self.gen_code_coverage_gcc(thebuilder)
                     if ret != 0:
                         failure_count += 1
