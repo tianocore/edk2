@@ -7,6 +7,7 @@
 
 import git
 import logging
+import os
 import re
 
 from collections import OrderedDict
@@ -286,3 +287,35 @@ def add_reviewers_to_pr(
         pr.create_review_request(reviewers=new_pr_reviewers)
 
     return new_pr_reviewers
+
+
+def set_github_output(key: str, value: str):
+    """Set a GitHub workflow output variable.
+
+    This function writes to the GITHUB_OUTPUT file to set an output variable
+    that can be used by subsequent steps in a GitHub workflow.
+
+    Args:
+        key (str): The output variable name.
+        value (str): The output variable value.
+    """
+    github_output = os.environ.get('GITHUB_OUTPUT')
+    if github_output:
+        with open(github_output, 'a') as f:
+            f.write(f"{key}={value}\n")
+
+
+def set_github_env(key: str, value: str):
+    """Set a GitHub workflow environment variable.
+
+    This function writes to the GITHUB_ENV file to set an environment variable
+    that will be available to subsequent steps in a GitHub workflow.
+
+    Args:
+        key (str): The environment variable name.
+        value (str): The environment variable value.
+    """
+    github_env = os.environ.get('GITHUB_ENV')
+    if github_env:
+        with open(github_env, 'a') as f:
+            f.write(f"{key}<<EOF\n{value}\nEOF\n")
