@@ -73,6 +73,11 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjSpcrInfo,                       ///< 45 - Serial Terminal and Interrupt Info
   EArchCommonObjTpm2DeviceInfo,                 ///< 46 - TPM2 Device Info
   EArchCommonObjMcfgPciConfigSpaceInfo,         ///< 47 - MCFG PCI Configuration Space Info
+  EArchCommonObjPrtInfo,                        ///< 48 - PCI Routing Table Info
+  EArchCommonObjRbPrtInfo,                      ///< 49 - Root Bridge PRT Info
+  EArchCommonObjPciRootBridgeInfo,              ///< 50 - PCI Root Bridge Info
+  EArchCommonObjPciRootPortInfo,                ///< 51 - Pci Root Port Info
+  EArchCommonObjRpPrtInfo,                      ///< 52 - Root Port PRT Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -184,6 +189,10 @@ typedef struct CmArchCommonPciConfigSpaceInfo {
   /// Optional field: Reference Token for interrupt mapping.
   /// Token identifying a CM_ARCH_COMMON_OBJ_REF structure.
   CM_OBJECT_TOKEN    InterruptMapToken;
+
+  /// Optional field: Reference Token for PCI root bridge information.
+  /// Token identifying a CM_ARCH_COMMON_PCI_ROOT_BRIDGE_INFO structure.
+  CM_OBJECT_TOKEN    RootBridgeInfoToken;
 } CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO;
 
 /** A structure that describes a PCI Address Map.
@@ -200,6 +209,9 @@ typedef struct CmArchCommonPciAddressMapInfo {
    - 1: I/O Space
    - 2: 32-bit-address Memory Space
    - 3: 64-bit-address Memory Space
+   - 4: Word I/O Space
+   - 5: 32-bit-address uncache Memory Space
+   - 6: 64-bit-address uncache Memory Space
   */
   UINT8     SpaceCode;
 
@@ -264,6 +276,60 @@ typedef struct CmArchCommonPciInterruptMapInfo {
   */
   CM_ARCH_COMMON_GENERIC_INTERRUPT    IntcInterrupt;
 } CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO;
+
+/** A structure that describes a PCI Routing Table (PRT) Info.
+  Cf ACPI spec 6.5
+  s6.2.13 _PRT (PCI Routing Table)
+
+  ID: EArchCommonObjPrtInfo
+      EArchCommonObjRbPrtInfo
+      EArchCommonObjRpPrtInfo
+*/
+typedef struct CmArchCommonPrtInfo {
+  /// The address of the device, High word-Device #, Low word-Function #.
+  UINT32             Address;
+
+  /// The PCI pin number of the device (0-INTA, 1-INTB, 2-INTC, 3-INTD).
+  UINT8              Pin;
+
+  /// Reference token to the interrupt allocating device name.
+  /// Used by Legacy X64/IA32 devices, most modern platform uses GSI.
+  CM_OBJECT_TOKEN    SourceToken;
+
+  /// If SourceToken is NULL, this is the Global System Interrupt number.
+  /// Otherwise, this is the index into resource descriptor.
+  UINT32             SourceIndex;
+} CM_ARCH_COMMON_PRT_INFO;
+
+/** A structure that describes PCI root port information.
+  Contains the PCI Routing Table (PRT) details for the root bridge.
+  Cf ACPI spec 6.5
+  s6.2.13 _PRT (PCI Routing Table)
+
+  ID: EArchCommonObjPciRootPortInfo
+*/
+typedef struct CmArchCommonObjPciRootPortInfo {
+  /// Token for an array of CM_ARCH_COMMON_PRT_INFO objects.
+  CM_OBJECT_TOKEN    RootPortPrtToken;
+
+  /// 6.1.11 _SUN (Slot User Number)
+  /// integer value, 0xFFFFFFFF means no slot user number
+  UINT64             Sun;
+} CM_ARCH_COMMON_PCI_ROOT_PORT_INFO;
+
+/** A structure that describes PCI Root Bridge information.
+  Contains the PCI Routing Table (PRT) details for the root bridge.
+  Cf ACPI spec 6.5
+  s6.2.13 _PRT (PCI Routing Table)
+
+  ID: EArchCommonObjPciRootBridgeInfo
+*/
+typedef struct CmArchCommonObjPciRootBridgeInfo {
+  /// Token of array of CM_ARCH_COMMON_PRT_INFO objects
+  CM_OBJECT_TOKEN    RootBridgePrtToken;
+  /// Token for an array of CM_ARCH_COMMON_PCI_ROOT_PORT_INFO object.
+  CM_OBJECT_TOKEN    RootPortToken;
+} CM_ARCH_COMMON_PCI_ROOT_BRIDGE_INFO;
 
 /** A structure that describes the Memory Affinity Structure (Type 1) in SRAT
 
