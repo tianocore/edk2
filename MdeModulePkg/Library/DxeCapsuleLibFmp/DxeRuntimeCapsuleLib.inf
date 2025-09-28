@@ -35,6 +35,7 @@
   DxeCapsuleRuntime.c
 
 [Packages]
+  FmpDevicePkg/FmpDevicePkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
@@ -51,6 +52,8 @@
   HobLib
   BmpSupportLib
 
+[Pcd]
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr  ## SOMETIMES_CONSUMES
 
 [Protocols]
   gEsrtManagementProtocolGuid                   ## CONSUMES
