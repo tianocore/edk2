@@ -13,10 +13,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #pragma pack(1)
 
 typedef enum {
-  EfiAcpiAddressRangeMemory   = 1,
-  EfiAcpiAddressRangeReserved = 2,
-  EfiAcpiAddressRangeACPI     = 3,
-  EfiAcpiAddressRangeNVS      = 4
+  EfiAcpiAddressRangeMemory       = 1,
+  EfiAcpiAddressRangeReserved     = 2,
+  EfiAcpiAddressRangeACPI         = 3,
+  EfiAcpiAddressRangeNVS          = 4,
+  EfiAcpiAddressRangeSoftReserved = 0xEFFFFFFF
 } EFI_ACPI_MEMORY_TYPE;
 
 typedef struct {
