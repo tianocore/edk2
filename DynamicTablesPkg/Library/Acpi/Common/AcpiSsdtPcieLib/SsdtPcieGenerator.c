@@ -37,6 +37,7 @@
 
 #define PCI_MAX_DEVICE_COUNT_PER_BUS       32
 #define PCI_MAX_FUNCTION_COUNT_PER_DEVICE  8
+#define PCI_MAX_PCI_INTERRUPT_PIN_VALUE    3
 
 /** ARM standard SSDT Pcie Table Generator.
 
@@ -47,6 +48,7 @@ Requirements:
   - EArchCommonObjPciConfigSpaceInfo
   - EArchCommonObjPciAddressMapInfo
   - EArchCommonObjPciInterruptMapInfo
+  - EArchCommonObjPciRootPortInfo (OPTIONAL)
 */
 
 /** This macro expands to a function that retrieves the cross-CM-object-
@@ -83,6 +85,15 @@ GET_OBJECT_LIST (
   EObjNameSpaceArchCommon,
   EArchCommonObjPciInterruptMapInfo,
   CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO
+  );
+
+/** This macro expands to a function that retrieves the Root Port
+    Information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArchCommon,
+  EArchCommonObjPciRootPortInfo,
+  CM_ARCH_COMMON_PCI_ROOT_PORT_INFO
   );
 
 /** Initialize the MappingTable.
@@ -427,6 +438,226 @@ GeneratePrt (
 exit_handler:
   MappingTableFree (&Generator->DeviceTable);
 exit_handler0:
+  if (PrtNode != NULL) {
+    AmlDeleteTree (PrtNode);
+  }
+
+  return Status;
+}
+
+/** Generate a root port device objects.
+
+  Cf. ACPI 6.4 specification, s6.2.13 "_PRT (PCI Routing Table)"
+
+  @param [in]       CfgMgrProtocol  Pointer to the Configuration Manager
+                                    Protocol interface.
+  @param [in]       PciInfo         Pci device information.
+  @param [in, out]  PciNode       Pci node to amend.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+GenerateRootPortDevices (
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN      CONST CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO          *PciInfo,
+  IN  OUT       AML_OBJECT_NODE_HANDLE                        PciNode
+  )
+{
+  AML_OBJECT_NODE_HANDLE                 DeviceNode;
+  AML_OBJECT_NODE_HANDLE                 PrtNode;
+  CHAR8                                  AslName[AML_NAME_SEG_SIZE + 1];
+  CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO  *IrqMapInfo;
+  CM_ARCH_COMMON_PCI_ROOT_PORT_INFO      *RpInfo;
+  EFI_STATUS                             Status;
+  UINT32                                 DeviceAddress;
+  UINT32                                 Index;
+  UINT32                                 IrqMapInfoCount;
+  UINT32                                 PrtIndex;
+  UINT32                                 RpInfoCount;
+
+  if ((CfgMgrProtocol == NULL) ||
+      (PciNode == NULL) ||
+      (PciInfo == NULL))
+  {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = GetEArchCommonObjPciRootPortInfo (
+             CfgMgrProtocol,
+             PciInfo->RootPortInfoToken,
+             &RpInfo,
+             &RpInfoCount
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  for (Index = 0; Index < RpInfoCount; Index++) {
+    PrtNode    = NULL;
+    DeviceNode = NULL;
+
+    /// Create root port device
+    DeviceAddress = RpInfo[Index].RootPortAddress;
+    if (((DeviceAddress >> 16) > PCI_MAX_DEVICE_COUNT_PER_BUS) ||
+        (((DeviceAddress & 0xFFFF) != 0xFFFF) &&
+         ((DeviceAddress & 0xFFFF) > PCI_MAX_FUNCTION_COUNT_PER_DEVICE)))
+    {
+      DEBUG ((
+        DEBUG_ERROR,
+        "SSDT:PCIE: Invalid device/function (0x%x)\n",
+        DeviceAddress
+        ));
+      Status = EFI_INVALID_PARAMETER;
+      ASSERT_EFI_ERROR (Status);
+      goto exit_handler;
+    }
+
+    // Generic device name is "Dxxy".
+    // Where xx is device number
+    // and y is function number
+    CopyMem (AslName, "Dxxy", AML_NAME_SEG_SIZE + 1);
+    AslName[AML_NAME_SEG_SIZE - 3] = AsciiFromHex ((DeviceAddress >> 20) & 0xF);
+    AslName[AML_NAME_SEG_SIZE - 2] = AsciiFromHex ((DeviceAddress >> 16) & 0xF);
+    AslName[AML_NAME_SEG_SIZE - 1] = AsciiFromHex (DeviceAddress  & 0xF);
+
+    // ASL:
+    // Device (Dxxy) {
+    //   Name (_ADR, <address value>)
+    // }
+    Status = AmlCodeGenDevice (AslName, PciNode, &DeviceNode);
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      goto exit_handler;
+    }
+
+    Status = AmlCodeGenNameInteger (
+               "_ADR",
+               DeviceAddress,
+               DeviceNode,
+               NULL
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      goto exit_handler;
+    }
+
+    if (RpInfo[Index].Sun != MAX_UINT64) {
+      // ASL: Name (_SUN, <Sun value>)
+      Status = AmlCodeGenNameInteger (
+                 "_SUN",
+                 RpInfo[Index].Sun,
+                 DeviceNode,
+                 NULL
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        goto exit_handler;
+      }
+    }
+
+    if (RpInfo[Index].RootPortPrtToken == CM_NULL_TOKEN) {
+      continue;
+    }
+
+    IrqMapInfo      = NULL;
+    IrqMapInfoCount = 0;
+    Status          = GetEArchCommonObjPciInterruptMapInfo (
+                        CfgMgrProtocol,
+                        RpInfo[Index].RootPortPrtToken,
+                        &IrqMapInfo,
+                        &IrqMapInfoCount
+                        );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      goto exit_handler;
+    }
+
+    if ((IrqMapInfo == NULL) || (IrqMapInfoCount == 0)) {
+      Status = EFI_NOT_FOUND;
+      ASSERT_EFI_ERROR (Status);
+      goto exit_handler;
+    }
+
+    // ASL: Name (_PRT, Package () {})
+    Status = AmlCodeGenNamePackage ("_PRT", NULL, &PrtNode);
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      goto exit_handler;
+    }
+
+    for (PrtIndex = 0; PrtIndex < IrqMapInfoCount; PrtIndex++) {
+      if (IrqMapInfo[PrtIndex].PciInterrupt > PCI_MAX_PCI_INTERRUPT_PIN_VALUE) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "SSDT:PCIE: Invalid interrupt pin (Index %d, PrtIndex %d): %d\n",
+          Index,
+          PrtIndex,
+          IrqMapInfo[PrtIndex].PciInterrupt
+          ));
+        Status = EFI_INVALID_PARAMETER;
+        ASSERT_EFI_ERROR (Status);
+        goto exit_handler;
+      }
+
+      // Check that the interrupts flags are SPIs, level high.
+      // Cf. Arm BSA v1.0, sE.6 "Legacy interrupts"
+      if ((IrqMapInfo[PrtIndex].IntcInterrupt.Interrupt >= 32)   &&
+          (IrqMapInfo[PrtIndex].IntcInterrupt.Interrupt < 1020)  &&
+          ((IrqMapInfo[PrtIndex].IntcInterrupt.Flags & 0xB) != 0))
+      {
+        Status = EFI_INVALID_PARAMETER;
+        ASSERT_EFI_ERROR (Status);
+        goto exit_handler;
+      }
+
+      /* Add a _PRT entry.
+        ASL
+        Name (_PRT, Package () {
+          <OldPrtEntries>,
+          <NewPrtEntry>
+        })
+
+      Address is set as:
+      ACPI 6.4 specification, Table 6.2: "ADR Object Address Encodings"
+        High word-Device #, Low word-Function #. (for example, device 3,
+        function 2 is 0x00030002). To refer to all the functions on a device #,
+        use a function number of FFFF).
+
+        Use the second model for _PRT object and describe a hardwired interrupt.
+      */
+      Status = AmlAddPrtEntry (
+                 DeviceAddress,
+                 IrqMapInfo[PrtIndex].PciInterrupt,
+                 NULL,
+                 IrqMapInfo[PrtIndex].IntcInterrupt.Interrupt,
+                 PrtNode
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        goto exit_handler;
+      }
+    }
+
+    // Attach the _PRT entry.
+    Status = AmlAttachNode (DeviceNode, PrtNode);
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      goto exit_handler;
+    }
+  }
+
+  return EFI_SUCCESS;
+exit_handler:
+  if (DeviceNode != NULL) {
+    AmlDetachNode (DeviceNode);
+    AmlDeleteTree (DeviceNode);
+  }
+
   if (PrtNode != NULL) {
     AmlDeleteTree (PrtNode);
   }
@@ -909,6 +1140,19 @@ GeneratePciDevice (
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
+  }
+
+  if (PciInfo->RootPortInfoToken != CM_NULL_TOKEN) {
+    // Create root port devices
+    Status = GenerateRootPortDevices (
+               CfgMgrProtocol,
+               PciInfo,
+               PciNode
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
   }
 
   // Add the template _OSC method.
