@@ -1,0 +1,27 @@
+## @file
+# This dummy DXE exists merely to pull in root key PCDs defined in FmpDevicePkg
+# and satisfy requirement of a build system that FDF must include an INF file
+# referencing parent package of PCDs.  The key is still included in DSC file
+# where !include works.
+#
+# Copyright (c) 2026, 3mdeb Sp. z o.o. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CapsuleRootDxe
+  FILE_GUID                      = A51065FC-B3E9-47E0-90A5-BF7CAEBE034F
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+[Sources]
+  Empty.c
+
+[Packages]
+  FmpDevicePkg/FmpDevicePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
