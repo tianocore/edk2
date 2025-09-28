@@ -34,6 +34,7 @@
   CapsuleOnDisk.h
 
 [Packages]
+  FmpDevicePkg/FmpDevicePkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
@@ -53,6 +54,8 @@
   FileHandleLib
   UefiBootManagerLib
   VariablePolicyHelperLib
+  FmpAuthenticationLib
+  FmpPayloadLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleMax                               ## CONSUMES
@@ -70,6 +73,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdCodRelocationDevPath                     ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCoDRelocationFileName                    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleEmbeddedDriverSupport             ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUseNestedFmpCapsuleFormat                ## CONSUMES
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr                 ## SOMETIMES_CONSUMES
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset ## CONSUMES
@@ -99,6 +104,7 @@
   ## SOMETIMES_PRODUCES ## Variable:L"BootNext"
   gEfiGlobalVariableGuid
   gEdkiiCapsuleOnDiskNameGuid             ## SOMETIMES_CONSUMES ## GUID
+  gEfiCertPkcs7Guid                       ## SOMETIMES_CONSUMES ## GUID
 
 [Depex]
   gEfiVariableWriteArchProtocolGuid
