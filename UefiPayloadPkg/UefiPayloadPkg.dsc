@@ -53,6 +53,7 @@
   # CAPSULE_SUPPORT is set to TRUE
   #
   DEFINE CAPSULE_SUPPORT              = FALSE
+  DEFINE SEALED_CAPSULE_SUPPORT       = FALSE
   DEFINE CAPSULE_MAIN_FW_GUID         =
 
   #
@@ -308,6 +309,7 @@
   FmpDependencyLib|FmpDevicePkg/Library/FmpDependencyLib/FmpDependencyLib.inf
   FmpPayloadHeaderLib|FmpDevicePkg/Library/FmpPayloadHeaderLibV1/FmpPayloadHeaderLibV1.inf
   DetectTestKeyLib|FmpDevicePkg/Library/DetectTestKeyLib/DetectTestKeyLib.inf
+  FmpPayloadLib|FmpDevicePkg/Library/FmpPayloadLib/FmpPayloadLib.inf
   !else
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   !endif
@@ -516,7 +518,7 @@
 !endif
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
-!if $(SECURE_BOOT_ENABLE) == TRUE
+!if $(SECURE_BOOT_ENABLE) == TRUE || $(CAPSULE_SUPPORT) == TRUE
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
 !endif
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
@@ -629,6 +631,13 @@
 
   ## Whether FMP capsules are enabled.
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleFmpSupport|$(CAPSULE_SUPPORT)
+  # Whether the platform uses nested capsules or not.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUseNestedFmpCapsuleFormat|$(SEALED_CAPSULE_SUPPORT)
+!if $(SEALED_CAPSULE_SUPPORT)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleEmbeddedDriverSupport|TRUE
+  # Root key for signing the top capsule.
+  !include BaseTools/Source/Python/Pkcs7Sign/TestRoot.cer.gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr.inc
+!endif
 
 !if $(CRYPTO_PROTOCOL_SUPPORT) == TRUE
 !if $(CRYPTO_DRIVER_EXTERNAL_SUPPORT) == FALSE
@@ -1005,6 +1014,9 @@
 !endif
   }
   MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
+!if $(SEALED_CAPSULE_SUPPORT)
+  FmpDevicePkg/DetectTestKeyDxe/DetectTestKeyDxe.inf
+!endif
 !endif
 
 
