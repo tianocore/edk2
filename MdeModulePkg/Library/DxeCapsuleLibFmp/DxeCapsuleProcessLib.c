@@ -15,6 +15,7 @@
 **/
 
 #include <PiDxe.h>
+#include <Protocol/CapsuleTransformation.h>
 #include <Protocol/EsrtManagement.h>
 #include <Protocol/FirmwareManagementProgress.h>
 
@@ -34,6 +35,21 @@
 #include <IndustryStandard/WindowsUxCapsule.h>
 
 extern EDKII_FIRMWARE_MANAGEMENT_PROGRESS_PROTOCOL  *mFmpProgress;
+
+/**
+  Record capsule status variable.
+
+  @param[in] CapsuleHeader  The capsule image header
+  @param[in] CapsuleStatus  The capsule process stauts
+
+  @retval EFI_SUCCESS          The capsule status variable is recorded.
+  @retval EFI_OUT_OF_RESOURCES No resource to record the capsule status variable.
+**/
+EFI_STATUS
+RecordCapsuleStatusVariable (
+  IN EFI_CAPSULE_HEADER  *CapsuleHeader,
+  IN EFI_STATUS          CapsuleStatus
+  );
 
 /**
   Return if this FMP is a system FMP or a device FMP, based upon CapsuleHeader.
@@ -129,6 +145,8 @@ VOID        **mCapsulePtr;
 CHAR16      **mCapsuleNamePtr;
 EFI_STATUS  *mCapsuleStatusArray;
 UINT32      mCapsuleTotalNumber;
+
+STATIC CAPSULE_TRANSFORMATION_PROTOCOL  *CapsuleTransformation;
 
 /**
   The firmware implements to process the capsule image.
@@ -572,16 +590,50 @@ ProcessTheseCapsules (
       // Call capsule library to process capsule image.
       //
       EmbeddedDriverCount = 0;
-      if (IsFmpCapsule (CapsuleHeader)) {
-        Status = ValidateFmpCapsule (CapsuleHeader, &EmbeddedDriverCount);
+      if (!IsFmpCapsule (CapsuleHeader)) {
+        mCapsuleStatusArray[Index] = EFI_ABORTED;
+        continue;
+      }
+
+      Status = ValidateFmpCapsule (CapsuleHeader, &EmbeddedDriverCount);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "ValidateFmpCapsule failed with %r. Ignore!\n", Status));
+        mCapsuleStatusArray[Index] = EFI_ABORTED;
+        continue;
+      }
+
+      if (CapsuleTransformation != NULL) {
+        Status = CapsuleTransformation->Transform (CapsuleTransformation, &CapsuleHeader);
         if (EFI_ERROR (Status)) {
-          DEBUG ((DEBUG_ERROR, "ValidateFmpCapsule failed. Ignore!\n"));
+          DEBUG ((DEBUG_ERROR, "Capsule transformation failed with %r. Ignore!\n", Status));
+          if ((Status == EFI_INVALID_PARAMETER) || (Status == EFI_UNSUPPORTED) || (Status == EFI_SECURITY_VIOLATION)) {
+            //
+            // Report issues with the capsule to the user.
+            //
+            RecordCapsuleStatusVariable (CapsuleHeader, Status);
+          }
+
           mCapsuleStatusArray[Index] = EFI_ABORTED;
           continue;
         }
-      } else {
-        mCapsuleStatusArray[Index] = EFI_ABORTED;
-        continue;
+
+        if (!IsFmpCapsule (CapsuleHeader)) {
+          mCapsuleStatusArray[Index] = EFI_ABORTED;
+          continue;
+        }
+
+        //
+        // Re-validate the capsule after the transformation and obtain updated
+        // driver count.
+        //
+        Status = ValidateFmpCapsule (CapsuleHeader, &EmbeddedDriverCount);
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_ERROR, "ValidateFmpCapsule failed for transformed capsule with %r. Ignore!\n", Status));
+          mCapsuleStatusArray[Index] = EFI_ABORTED;
+          continue;
+        }
+
+        DEBUG ((DEBUG_INFO, "New EmbeddedDriverCount: %d\n", EmbeddedDriverCount));
       }
 
       if ((!FirstRound) || (EmbeddedDriverCount == 0)) {
@@ -680,6 +732,19 @@ ProcessCapsules (
   EFI_STATUS  Status;
 
   if (!mDxeCapsuleLibEndOfDxe) {
+    //
+    // The lookup for this protocol must happen on the first call to not pick up
+    // an implementation provided by an embedded driver of some capsule.
+    //
+    Status = gBS->LocateProtocol (
+                    &gCapsuleTransformationProtocolGuid,
+                    NULL,
+                    (VOID **)&CapsuleTransformation
+                    );
+    if (!EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "Discovered CapsuleTransformation protocol\n"));
+    }
+
     Status = ProcessTheseCapsules (TRUE);
 
     //
