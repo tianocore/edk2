@@ -13,9 +13,6 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmSmcLib
 
-[Sources.ARM]
-  Arm/ArmSmc.S      | GCC
-
 [Sources.AARCH64]
   AArch64/ArmSmc.S
 

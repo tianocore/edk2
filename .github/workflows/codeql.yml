@@ -277,7 +277,7 @@ jobs:
         import shutil
         from pathlib import Path
 
-        dirs_to_delete = ['ia32', 'x64', 'arm', 'aarch64']
+        dirs_to_delete = ['ia32', 'x64', 'aarch64']
 
         def delete_dirs(path: Path):
             if path.exists() and path.is_dir():

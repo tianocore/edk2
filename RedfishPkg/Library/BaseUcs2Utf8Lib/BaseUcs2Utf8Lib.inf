@@ -16,10 +16,6 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = Ucs2Utf8Lib
 
-#
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64 RISCV64
-#
-
 [Sources]
   BaseUcs2Utf8Lib.c
 

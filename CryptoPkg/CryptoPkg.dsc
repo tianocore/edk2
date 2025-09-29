@@ -122,7 +122,7 @@
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
 
-[LibraryClasses.ARM, LibraryClasses.AARCH64]
+[LibraryClasses.AARCH64]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
 
 [LibraryClasses.common.SEC]
@@ -318,7 +318,7 @@
 # available services.
 #
 !if $(CRYPTO_SERVICES) == TARGET_UNIT_TESTS
-[Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
+[Components.IA32, Components.X64, Components.AARCH64]
   #
   # Target based unit tests
   #
@@ -437,7 +437,7 @@
     <LibraryClasses>
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   }
-[Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
+[Components.IA32, Components.X64, Components.AARCH64]
   #
   # CryptoPei with OpensslLib instance with all services
   #
@@ -508,7 +508,7 @@
     <LibraryClasses>
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   }
-[Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
+[Components.IA32, Components.X64, Components.AARCH64]
   #
   # CryptoDxe with OpensslLib instance with all services
   #

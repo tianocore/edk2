@@ -19,7 +19,7 @@
 #include "AcpiView.h"
 #include "AcpiViewConfig.h"
 
-#if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+#if defined (MDE_CPU_AARCH64)
   #include "Arm/SbbrValidator.h"
 #endif
 
@@ -227,7 +227,7 @@ ProcessAcpiTable (
     }
   }
 
- #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+ #if defined (MDE_CPU_AARCH64)
   if (GetMandatoryTableValidate ()) {
     ArmSbbrIncrementTableCount (*AcpiTableSignature);
   }

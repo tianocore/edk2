@@ -1254,8 +1254,8 @@ UnicodeToEfiKey (
   );
 
 /**
-  Check if input string is valid Ascii string, valid EFI control characters
-  or valid text graphics.
+  Check if input string is valid Ascii string, valid EFI control characters,
+  wide/narrow character or valid text graphics.
 
   @param  TerminalDevice          The terminal device.
   @param  WString                 The input string.

@@ -17,13 +17,6 @@
   LIBRARY_CLASS                  = NULL
   CONSTRUCTOR                    = VariableMmDependencyLibConstructor
 
-#
-# The following information is for reference only and not required by the build tools.
-#
-#  VALID_ARCHITECTURES           = AARCH64|ARM
-#
-#
-
 [Sources]
   VariableMmDependency.c
 

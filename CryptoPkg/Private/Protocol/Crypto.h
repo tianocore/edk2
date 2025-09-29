@@ -21,7 +21,7 @@
 /// the EDK II Crypto Protocol is extended, this version define must be
 /// increased.
 ///
-#define EDKII_CRYPTO_VERSION  18
+#define EDKII_CRYPTO_VERSION  19
 
 ///
 /// EDK II Crypto Protocol forward declaration
@@ -3970,6 +3970,26 @@ EFI_STATUS
   );
 
 /**
+  Set the Tls security level.
+
+  This function Set the Tls security level.
+  If Tls is NULL, nothing is done.
+
+  @param[in]  Tls                Pointer to the TLS object.
+  @param[in]  Level              The Tls Security level need to set.
+
+  @retval  EFI_SUCCESS           The Tls security level was set successfully.
+  @retval  EFI_INVALID_PARAMETER The parameters are invalid.
+
+**/
+typedef
+EFI_STATUS
+(EFIAPI *EDKII_CRYPTO_TLS_SET_SECURITY_LEVEL)(
+  IN VOID    *Tls,
+  IN UINT8   Level
+  );
+
+/**
   Gets the protocol version used by the specified TLS connection.
 
   This function returns the protocol version used by the specified TLS
@@ -5728,8 +5748,9 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_PKCS1V2_DECRYPT                        Pkcs1v2Decrypt;
   EDKII_CRYPTO_RSA_OAEP_ENCRYPT                       RsaOaepEncrypt;
   EDKII_CRYPTO_RSA_OAEP_DECRYPT                       RsaOaepDecrypt;
-  /// TLS Set (continued)
+  /// TLS Set (Continued)
   EDKII_CRYPTO_TLS_SET_SERVER_NAME                    TlsSetServerName;
+  EDKII_CRYPTO_TLS_SET_SECURITY_LEVEL                 TlsSetSecurityLevel;
 };
 
 extern GUID  gEdkiiCryptoProtocolGuid;
