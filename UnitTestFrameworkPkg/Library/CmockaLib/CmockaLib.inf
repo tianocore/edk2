@@ -33,3 +33,4 @@
   GCC:NOOPT_*_*_CC_FLAGS =  -O0
   GCC:*_*_IA32_CC_FLAGS  =  -m32
   GCC:*_*_X64_CC_FLAGS   =  -m64
+  GCC:*_CLANGPDB_*_CC_FLAGS = -DHAVE_VSNPRINTF -DHAVE_SNPRINTF -Wno-deprecated-declarations
