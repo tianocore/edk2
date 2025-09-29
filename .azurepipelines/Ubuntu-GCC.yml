@@ -22,5 +22,5 @@ jobs:
     tool_chain_tag: 'GCC5'
     vm_image: 'ubuntu-24.04'
     container: ${{ variables.default_linux_image }}
-    arch_list: "IA32,X64,ARM,AARCH64,RISCV64,LOONGARCH64"
+    arch_list: "IA32,X64,AARCH64,RISCV64,LOONGARCH64"
     usePythonVersion: ''  # use Python from the container image

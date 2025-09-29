@@ -61,6 +61,10 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
         # Set up the reporting type for Cmocka.
         shell_env.set_shell_var('CMOCKA_MESSAGE_OUTPUT', 'xml')
 
+        # Configure LLVM code coverage collection to generate unique file for
+        # each host based unit test executable.
+        shell_env.set_shell_var('LLVM_PROFILE_FILE', '%m.profraw')
+
         for arch in thebuilder.env.GetValue("TARGET_ARCH").split():
             logging.log(edk2_logging.get_subsection_level(),
                         "Testing for architecture: " + arch)
@@ -138,8 +142,12 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
                                         failure_count += 1
 
             if thebuilder.env.GetValue("CODE_COVERAGE") != "FALSE":
-                if thebuilder.env.GetValue("TOOL_CHAIN_TAG") == "GCC5":
+                if thebuilder.env.GetValue("TOOL_CHAIN_TAG").startswith("GCC"):
                     ret = self.gen_code_coverage_gcc(thebuilder)
+                    if ret != 0:
+                        failure_count += 1
+                elif thebuilder.env.GetValue("TOOL_CHAIN_TAG").startswith("CLANG"):
+                    ret = self.gen_code_coverage_clang(thebuilder)
                     if ret != 0:
                         failure_count += 1
                 elif thebuilder.env.GetValue("TOOL_CHAIN_TAG").startswith ("VS"):
@@ -147,7 +155,7 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
                     if ret != 0:
                         failure_count += 1
                 else:
-                    logging.info("Skipping code coverage. Currently, support GCC and MSVC compiler.")
+                    logging.info("Skipping code coverage. Currently, support GCC, CLANG, and MSVC compiler.")
 
         return failure_count
 
@@ -223,6 +231,137 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
 
         return 0
 
+
+    def gen_code_coverage_clang(self, thebuilder):
+        logging.info("Generating UnitTest code coverage")
+
+        buildOutputBase = thebuilder.env.GetValue("BUILD_OUTPUT_BASE")
+        if GetHostInfo().os.upper() == "LINUX":
+            # Collect test executables with no file extension
+            testList = glob.glob(os.path.join(buildOutputBase, "**", "*Test*"), recursive=True)
+            testList = [f for f in testList if os.path.isfile(f) and os.path.splitext(f)[1] == ""]
+        elif GetHostInfo().os.upper() == "WINDOWS":
+            # Collect test executables with a .exe file extension
+            testList = glob.glob(os.path.join(buildOutputBase, "**","*Test*.exe"), recursive=True)
+        else:
+            raise NotImplementedError("Unsupported Operating System")
+        if not testList:
+            logging.warning("UnitTest Coverage: No test binaries found.")
+            return 0
+
+        profrawlistFile = os.path.join(buildOutputBase, 'profrawlist.txt')
+        mergedProfData = os.path.join(buildOutputBase, 'merged.profdata')
+        mergedCoverageXml = os.path.join(buildOutputBase, 'coverage.xml')
+
+        with open(profrawlistFile, "w") as f:
+            f.write("\n".join(glob.glob(os.path.join(buildOutputBase, "**", "*.profraw"), recursive=True)))
+        # Generate coverage file
+        ret = RunCmd("llvm-profdata", f"merge -sparse --input-files {profrawlistFile} --output {mergedProfData}")
+        if ret != 0:
+            logging.error("UnitTest Coverage: Failed to merge coverage data.")
+            return 1
+        # Generate and LCOV and XML file for each unit test executable
+        for testFile in testList:
+            lcovFile = f"{testFile}.lcov"
+            ret = RunCmd("llvm-cov", f"export -format=lcov --instr-profile={mergedProfData} {testFile} > {lcovFile} ")
+            if ret != 0:
+                logging.error("UnitTest Coverage: Failed to generate coverage data for " + testFile)
+                return 1
+            coveragexmlFile = f"{testFile}.coverage.xml"
+            ret = RunCmd("lcov_cobertura",f"{lcovFile} -o {coveragexmlFile}")
+            if ret != 0:
+                logging.error("UnitTest Coverage: Failed generate filtered coverage XML.")
+                return 1
+        # Merge all XML files
+        ret = self.merge_cobertura_xml_files([f"{testFile}.coverage.xml" for testFile in testList], mergedCoverageXml)
+        if ret != 0:
+            logging.error("UnitTest Coverage: Failed to merge coverage XML files.")
+            return 1
+        return 0
+
+    def merge_cobertura_xml_files(self, xml_file_list, output_file):
+        """
+        Merge multiple Cobertura XML files into a single output file.
+
+        Args:
+            xml_file_list (list): List of Cobertura XML file paths to merge.
+            output_file (str): Path to the merged output XML file.
+        """
+        if not xml_file_list:
+            logging.warning("No Cobertura XML files provided for merging.")
+            return 1
+
+        try:
+            # Parse the first file as the base
+            base_tree = xml.etree.ElementTree.parse(xml_file_list[0])
+            base_root = base_tree.getroot()
+            base_packages = base_root.find("packages")
+            if base_packages is None:
+                base_packages = xml.etree.ElementTree.SubElement(base_root, "packages")
+
+            # Merge the rest
+            for xml_file in xml_file_list[1:]:
+                tree = xml.etree.ElementTree.parse(xml_file)
+                root = tree.getroot()
+                packages = root.find("packages")
+                if packages is not None:
+                    for package in packages.findall("package"):
+                        base_packages.append(package)
+
+            # Recalculate line-rate and branch-rate for the merged XML
+            lines_covered = 0
+            lines_valid = 0
+            branches_covered = 0
+            branches_valid = 0
+
+            def parse_condition_coverage(cond_cov: str) -> int:
+                """
+                Parse a condition-coverage string like '50% (1/2)'.
+                Returns the number of covered branches.
+                """
+                try:
+                    inside_parens = cond_cov.split("(", 1)[1].split(")", 1)[0]
+                    covered, total = map(int, inside_parens.split("/"))
+                    return covered
+                except Exception:
+                    return 0
+
+            for package in base_packages.findall("package"):
+                for packageclass in package.findall("classes/class"):
+                    lines = packageclass.find("lines")
+                    if lines is None:
+                        continue
+                    for line in lines.findall("line"):
+                        lines_valid += 1
+                        # line coverage
+                        if "hits" in line.attrib and int(line.attrib["hits"]) > 0:
+                            lines_covered += 1
+                        # branch coverage
+                        if "branch" in line.attrib and line.attrib["branch"] == "true":
+                            branches_valid += 1
+                        if "condition-coverage" in line.attrib:
+                            # Example: "50% (1/2)"
+                            branches_covered += parse_condition_coverage(
+                                                  line.attrib["condition-coverage"]
+                                                  )
+
+            def safe_rate(covered, valid):
+                return float(covered) / float(valid) if valid else 0.0
+
+            base_root.set("lines-covered", str(lines_covered))
+            base_root.set("lines-valid", str(lines_valid))
+            base_root.set("line-rate", str(safe_rate(lines_covered, lines_valid)))
+            base_root.set("branches-covered", str(branches_covered))
+            base_root.set("branches-valid", str(branches_valid))
+            base_root.set("branch-rate", str(safe_rate(branches_covered, branches_valid)))
+
+            # Write merged XML
+            base_tree.write(output_file, encoding="utf-8", xml_declaration=True)
+            logging.info(f"Merged Cobertura XML written to {output_file}")
+            return 0
+        except Exception as e:
+            logging.error(f"Failed to merge Cobertura XML files: {e}")
+            return 1
 
     def gen_code_coverage_msvc(self, thebuilder):
         logging.info("Generating UnitTest code coverage")

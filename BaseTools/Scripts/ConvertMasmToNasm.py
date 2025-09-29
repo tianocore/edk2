@@ -28,7 +28,7 @@ class NoSourceFile(Exception):
 
 
 class UnsupportedArch(Exception):
-    unsupported = ('aarch64', 'arm', 'ebc', 'ipf')
+    unsupported = ('aarch64', 'ebc', 'ipf')
 
 
 class CommonUtils:

@@ -26,12 +26,6 @@
   LIBRARY_CLASS                  = BaseCryptLib|DXE_RUNTIME_DRIVER
   CONSTRUCTOR                    = RuntimeCryptLibConstructor
 
-#
-# The following information is for reference only and not required by the build tools.
-#
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
-#
-
 [Sources]
   InternalCryptLib.h
   Hash/CryptMd5.c

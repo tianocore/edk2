@@ -168,7 +168,6 @@
   X86SpeculationBarrier.c
   X64/GccInline.c | GCC
   X64/RdRand.nasm
-  ChkStkGcc.c  | GCC
   X86UnitTestHost.c
   IntelTdxNull.c
 
@@ -180,28 +179,9 @@
   Unaligned.c
   Math64.c
 
-[Sources.ARM]
-  Arm/InternalSwitchStack.c
-  Arm/Unaligned.c
-  Math64.c                   | MSFT
-
-  Arm/SwitchStack.asm        | MSFT
-  Arm/SetJumpLongJump.asm    | MSFT
-  Arm/CpuPause.asm           | MSFT
-  Arm/CpuBreakpoint.asm      | MSFT
-  Arm/MemoryFence.asm        | MSFT
-  Arm/SpeculationBarrier.asm | MSFT
-
-  Arm/Math64.S                  | GCC
-  Arm/SwitchStack.S             | GCC
-  Arm/SetJumpLongJump.S         | GCC
-  Arm/CpuBreakpoint.S           | GCC
-  Arm/MemoryFence.S             | GCC
-  Arm/SpeculationBarrier.S      | GCC
-
 [Sources.AARCH64]
-  Arm/InternalSwitchStack.c
-  Arm/Unaligned.c
+  AArch64/InternalSwitchStack.c
+  AArch64/Unaligned.c
   Math64.c
 
   AArch64/MemoryFence.S             | GCC

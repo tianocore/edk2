@@ -6,7 +6,7 @@
 **/
 
 #ifndef MOCK_SECURITY_MANAGEMENT_LIB_H_
-#define MOCK_SECURITY_MANAGEMENT_LIB_LIB_H_
+#define MOCK_SECURITY_MANAGEMENT_LIB_H_
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>

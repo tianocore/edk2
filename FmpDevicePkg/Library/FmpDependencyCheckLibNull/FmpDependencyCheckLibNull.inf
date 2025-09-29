@@ -16,12 +16,6 @@
   VERSION_STRING  = 1.0
   LIBRARY_CLASS   = FmpDependencyCheckLib|DXE_DRIVER UEFI_DRIVER UEFI_APPLICATION
 
-#
-# The following information is for reference only and not required by the build tools.
-#
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
-#
-
 [Sources]
   FmpDependencyCheckLibNull.c
 

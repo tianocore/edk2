@@ -162,6 +162,7 @@ PtpCrbTpmCommand (
   UINT16      Data16;
   UINT32      Data32;
   UINT8       RetryCnt;
+  UINT32      CommandCode;
 
   DEBUG_CODE_BEGIN ();
   DumpTpmInputBlock (SizeIn, BufferIn);
@@ -336,7 +337,13 @@ PtpCrbTpmCommand (
   }
 
   DEBUG_CODE_BEGIN ();
-  DumpTpmOutputBlock (TpmOutSize, BufferOut);
+  if (SizeIn >= sizeof (TPM2_COMMAND_HEADER)) {
+    CommandCode = SwapBytes32 (((TPM2_COMMAND_HEADER *)BufferIn)->commandCode);
+  } else {
+    CommandCode = 0;
+  }
+
+  DumpTpmOutputBlock (TpmOutSize, BufferOut, CommandCode);
   DEBUG_CODE_END ();
 
   //
@@ -419,7 +426,8 @@ Tpm2GetPtpInterface (
   InterfaceCapability.Uint32 = MmioRead32 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->InterfaceCapability);
 
   if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_CRB) &&
-      (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_CRB) &&
+      ((InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_CRB) ||
+       (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_CRB_V2)) &&
       (InterfaceId.Bits.CapCRB != 0))
   {
     return Tpm2PtpInterfaceCrb;

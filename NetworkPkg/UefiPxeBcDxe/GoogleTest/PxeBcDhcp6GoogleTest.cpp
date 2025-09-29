@@ -37,6 +37,7 @@ typedef struct {
 ///////////////////////////////////////////////////////////////////////////////
 
 EFI_STATUS
+EFIAPI
 MockUdpWrite (
   IN EFI_PXE_BASE_CODE_PROTOCOL      *This,
   IN UINT16                          OpFlags,
@@ -55,6 +56,7 @@ MockUdpWrite (
 }
 
 EFI_STATUS
+EFIAPI
 MockUdpRead (
   IN EFI_PXE_BASE_CODE_PROTOCOL      *This,
   IN UINT16                          OpFlags,
@@ -72,6 +74,7 @@ MockUdpRead (
 }
 
 EFI_STATUS
+EFIAPI
 MockConfigure (
   IN EFI_UDP6_PROTOCOL     *This,
   IN EFI_UDP6_CONFIG_DATA  *UdpConfigData OPTIONAL

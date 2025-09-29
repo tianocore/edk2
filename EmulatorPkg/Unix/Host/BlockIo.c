@@ -215,33 +215,28 @@ EmuBlockIoError (
   )
 {
   EFI_STATUS  Status;
-  BOOLEAN     ReinstallBlockIoFlag;
 
   switch (errno) {
     case EAGAIN:
       Status                       = EFI_NO_MEDIA;
       Private->Media->ReadOnly     = FALSE;
       Private->Media->MediaPresent = FALSE;
-      ReinstallBlockIoFlag         = FALSE;
       break;
 
     case EACCES:
       Private->Media->ReadOnly     = FALSE;
       Private->Media->MediaPresent = TRUE;
       Private->Media->MediaId     += 1;
-      ReinstallBlockIoFlag         = TRUE;
       Status                       = EFI_MEDIA_CHANGED;
       break;
 
     case EROFS:
       Private->Media->ReadOnly = TRUE;
-      ReinstallBlockIoFlag     = FALSE;
       Status                   = EFI_WRITE_PROTECTED;
       break;
 
     default:
-      ReinstallBlockIoFlag = FALSE;
-      Status               = EFI_DEVICE_ERROR;
+      Status = EFI_DEVICE_ERROR;
       break;
   }
 

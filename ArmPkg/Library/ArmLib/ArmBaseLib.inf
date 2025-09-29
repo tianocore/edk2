@@ -21,15 +21,6 @@
   ArmLibPrivate.h
   ArmLib.c
 
-[Sources.ARM]
-  Arm/ArmV7Lib.h
-  Arm/ArmV7Lib.c
-
-  Arm/ArmLibSupport.S           | GCC
-  Arm/ArmLibSupportV7.S         | GCC
-  Arm/ArmV7Support.S            | GCC
-  Arm/ArmV7ArchTimerSupport.S   | GCC
-
 [Sources.AARCH64]
   AArch64/AArch64Lib.h
   AArch64/AArch64Lib.c

@@ -85,6 +85,7 @@ ReadString (
   DimensionsWidth  = gStatementDimensions.RightColumn - gStatementDimensions.LeftColumn;
   DimensionsHeight = gStatementDimensions.BottomRow - gStatementDimensions.TopRow;
 
+  Index         = 0;
   NullCharacter = CHAR_NULL;
   ScreenSize    = GetStringWidth (Prompt) / sizeof (CHAR16);
   Space[0]      = L' ';

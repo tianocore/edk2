@@ -19,10 +19,6 @@
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = RedfishHostInterfaceDxeEntryPoint
 
-#
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64 RISCV64
-#
-
 [Sources]
   RedfishHostInterfaceDxe.c
 

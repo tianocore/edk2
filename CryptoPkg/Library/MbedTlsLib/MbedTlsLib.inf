@@ -14,12 +14,6 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = MbedTlsLib
 
-#
-# The following information is for reference only and not required by the build tools.
-#
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
-#
-
 [Sources]
   Include/mbedtls/mbedtls_config.h
   mbedtls/library/aes.c
@@ -131,7 +125,6 @@
   #
   GCC:*_*_IA32_CC_FLAGS    = -U_WIN32 -U_WIN64 -Wno-error=maybe-uninitialized -Wno-error=unused-but-set-variable
   GCC:*_*_X64_CC_FLAGS     = -U_WIN32 -U_WIN64 -Wno-error=maybe-uninitialized -Wno-error=format -Wno-format -Wno-error=unused-but-set-variable -DNO_MSABI_VA_FUNCS
-  GCC:*_*_ARM_CC_FLAGS     =  -Wno-error=maybe-uninitialized -Wno-error=unused-but-set-variable
   GCC:*_*_AARCH64_CC_FLAGS =  -Wno-error=maybe-uninitialized -Wno-format -Wno-error=unused-but-set-variable -Wno-error=format
   GCC:*_*_RISCV64_CC_FLAGS =  -Wno-error=maybe-uninitialized -Wno-format -Wno-error=unused-but-set-variable
   GCC:*_*_LOONGARCH64_CC_FLAGS =  -Wno-error=maybe-uninitialized -Wno-format -Wno-error=unused-but-set-variable

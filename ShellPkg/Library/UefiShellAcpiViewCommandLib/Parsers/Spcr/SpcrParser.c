@@ -38,7 +38,7 @@ ValidateInterruptType (
   IN VOID    *Context
   )
 {
- #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+ #if defined (MDE_CPU_AARCH64)
   UINT8  InterruptType;
 
   InterruptType = *Ptr;
@@ -73,7 +73,7 @@ ValidateIrq (
   IN VOID    *Context
   )
 {
- #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+ #if defined (MDE_CPU_AARCH64)
   UINT8  Irq;
 
   Irq = *Ptr;

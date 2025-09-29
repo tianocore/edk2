@@ -17,10 +17,6 @@
   LIBRARY_CLASS                  = JsonLib|DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER
   CONSTRUCTOR                    = JsonLibConstructor
 
-#
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64 RISCV64
-#
-
 [Sources]
   #
   # Below are the source code of third
@@ -85,4 +81,4 @@
   MSFT:*_*_X64_CC_FLAGS = /wd4204 /wd4244 /wd4090 /wd4334 /wd4706 /DHAVE_CONFIG_H=1 /U_WIN32 /UWIN64 /U_MSC_VER
   MSFT:*_*_IA32_CC_FLAGS = /wd4204 /wd4244 /wd4090 /wd4706 /DHAVE_CONFIG_H=1 /U_WIN32 /UWIN64 /U_MSC_VER
   GCC:*_*_*_CC_FLAGS = -Wno-unused-function -Wno-unused-but-set-variable -DHAVE_CONFIG_H=1 -UWIN32 -U_WIN32 -UWIN64 -U_MSC_VER
-
+  GCC:*_*_X64_CC_FLAGS = -DNO_MSABI_VA_FUNCS
