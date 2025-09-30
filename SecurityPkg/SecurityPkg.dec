@@ -103,6 +103,10 @@
   ##
   SpdmSecurityLib|Include/Library/SpdmSecurityLib.h
 
+  ##  @libraryclass  Provides measurement interface for PeilessSec.
+  #
+  PeilessSecMeasureLib|Include/Library/PeilessSecMeasureLib.h
+
 [Guids]
   ## Security package token space guid.
   # Include/Guid/SecurityPkgTokenSpace.h

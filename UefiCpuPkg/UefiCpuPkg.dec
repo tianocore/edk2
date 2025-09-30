@@ -2,7 +2,7 @@
 # This Package provides UEFI compatible CPU modules and libraries.
 #
 # Copyright (c) 2007 - 2024, Intel Corporation. All rights reserved.<BR>
-# Copyright (C) 2023 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (C) 2023 - 2025, Advanced Micro Devices, Inc. All rights reserved.<BR>
 # Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -78,6 +78,9 @@
 
   ## @libraryclass   Provides functions for SMM Relocation Operation.
   SmmRelocationLib|Include/Library/SmmRelocationLib.h
+
+## @libraryclass   Provides functions for AmdSysCallLib
+  AmdSysCallLib|Include/Library/AmdSysCallLib.h
 
 [LibraryClasses.RISCV64]
   ##  @libraryclass  Provides functions to manage MMU features on RISCV64 CPUs.
