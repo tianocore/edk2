@@ -49,8 +49,8 @@
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
-  LcdHwLib|ArmPlatformPkg/Library/LcdHwNullLib/LcdHwNullLib.inf
-  LcdPlatformLib|ArmPlatformPkg/Library/LcdPlatformNullLib/LcdPlatformNullLib.inf
+  LcdHwLib|ArmPlatformPkg/Library/LcdHwLibNull/LcdHwLibNull.inf
+  LcdPlatformLib|ArmPlatformPkg/Library/LcdPlatformLibNull/LcdPlatformLibNull.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   MemoryInitPeiLib|ArmPlatformPkg/MemoryInitPei/MemoryInitPeiLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
@@ -105,8 +105,8 @@
 
   ArmPlatformPkg/Library/ArmPlatformLibNull/ArmPlatformLibNull.inf
   ArmPlatformPkg/Library/HdLcd/HdLcd.inf
-  ArmPlatformPkg/Library/LcdHwNullLib/LcdHwNullLib.inf
-  ArmPlatformPkg/Library/LcdPlatformNullLib/LcdPlatformNullLib.inf
+  ArmPlatformPkg/Library/LcdHwLibNull/LcdHwLibNull.inf
+  ArmPlatformPkg/Library/LcdPlatformLibNull/LcdPlatformLibNull.inf
   ArmPlatformPkg/Library/PL011SerialPortLib/PL011SerialPortLib.inf
   ArmPlatformPkg/Library/PL011UartClockLib/PL011UartClockLib.inf
   ArmPlatformPkg/Library/PL011UartLib/PL011UartLib.inf
