@@ -9,7 +9,7 @@
 
 [Defines]
   INF_VERSION                    = 0x0001001B
-  BASE_NAME                      = PeilessSecMeasureNullLib
+  BASE_NAME                      = PeilessSecMeasureLibNull
   FILE_GUID                      = 0f0f90f8-4062-11f0-9da8-f3bb80081317
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
@@ -22,7 +22,7 @@
 #
 
 [Sources]
-  PeilessSecMeasureNullLib.c
+  PeilessSecMeasureLibNull.c
 
 [Packages]
   ArmPkg/ArmPkg.dec
