@@ -430,7 +430,7 @@
   SecurityPkg/Library/Tpm2DeviceLibFfa/Tpm2DeviceSecLibFfa.inf
   SecurityPkg/Library/Tpm2DeviceLibFfa/Tpm2InstanceLibFfa.inf
   SecurityPkg/Library/HashLibTpm2/HashLibTpm2PeilessSecLib.inf
-  SecurityPkg/Library/PeilessSecMeasureLib/PeilessSecMeasureNullLib.inf
+  SecurityPkg/Library/PeilessSecMeasureLib/PeilessSecMeasureLibNull.inf
   SecurityPkg/Library/PeilessSecMeasureLib/PeilessSecMeasureLib.inf
 
 [BuildOptions]
