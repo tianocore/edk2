@@ -719,6 +719,7 @@ FvbInitialize (
   EFI_HANDLE            Handle;
   EFI_PHYSICAL_ADDRESS  Address;
   RETURN_STATUS         PcdStatus;
+  VOID                  *Template;
 
   DEBUG ((DEBUG_INFO, "EMU Variable FVB Started\n"));
 
@@ -780,8 +781,15 @@ FvbInitialize (
   // Initialize the main FV header and variable store header
   //
   if (Initialize) {
-    SetMem (Ptr, EMU_FVB_SIZE, ERASED_UINT8);
-    InitializeFvAndVariableStoreHeaders (Ptr);
+    Template = (VOID *)(UINTN)PcdGet32 (PcdOvmfFlashNvStorageVariableBase);
+    Status   = ValidateFvHeader (Template);
+    if (!EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "EMU Variable FVB: Initialized FV from ROM template.\n"));
+      CopyMem (Ptr, Template, EMU_FVB_SIZE);
+    } else {
+      SetMem (Ptr, EMU_FVB_SIZE, ERASED_UINT8);
+      InitializeFvAndVariableStoreHeaders (Ptr);
+    }
   }
 
   PcdStatus = PcdSet64S (PcdFlashNvStorageVariableBase64, (UINTN)Ptr);
