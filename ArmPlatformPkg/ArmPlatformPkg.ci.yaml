@@ -50,6 +50,7 @@
             "EmbeddedPkg/EmbeddedPkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
             "MdePkg/MdePkg.dec",
+            "SecurityPkg/SecurityPkg.dec",
             "UefiCpuPkg/UefiCpuPkg.dec"
         ],
         # For host based unit tests

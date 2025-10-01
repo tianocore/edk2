@@ -31,6 +31,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SMBIOS_HANDLE_PI_RESERVED  0xFFFE
 
 ///
+/// Reference SMBIOS 3.6, chapter 6.1.2.
+/// Unless otherwise specified, when referring to another structure’s handle, the value
+/// 0FFFFh is used to indicate that the referenced handle is not applicable or does not
+/// exist.
+///
+#define SMBIOS_HANDLE_INVALID  0xFFFF
+
+///
 /// Reference SMBIOS 2.6, chapter 3.1.3.
 /// Each text string is limited to 64 significant characters due to system MIF limitations.
 /// Reference SMBIOS 2.7, chapter 6.1.3.
@@ -989,10 +997,26 @@ typedef union {
   UINT8    Data;
 } PROCESSOR_STATUS_DATA;
 
+#ifdef MDE_CPU_AARCH64
+// This structure assumes Arm64 SoC ID is supported
+typedef struct {
+  UINT16    SocId;
+  UINT8     SipId;
+  UINT8     SipBankIndex;
+  UINT32    SocRevision;
+} PROCESSOR_ID_DATA;
+#elif defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 typedef struct {
   PROCESSOR_SIGNATURE        Signature;
   PROCESSOR_FEATURE_FLAGS    FeatureFlags;
 } PROCESSOR_ID_DATA;
+#else
+// Please define PROCESSOR_ID_DATA for your architecture
+typedef struct {
+  PROCESSOR_SIGNATURE        Signature;
+  PROCESSOR_FEATURE_FLAGS    FeatureFlags;
+} PROCESSOR_ID_DATA;
+#endif
 
 ///
 /// Processor Information (Type 4).
@@ -1177,6 +1201,40 @@ typedef struct {
 } SMBIOS_TABLE_TYPE6;
 
 ///
+/// Cache Information - Configuration.
+///
+typedef struct {
+  UINT16    CacheLevel    : 3;
+  UINT16    CacheSocketed : 1;
+  UINT16    Reserved      : 1;
+  UINT16    Location      : 2;
+  UINT16    Enabled       : 1;
+  UINT16    OperationMode : 2;
+  UINT16    Reserved2     : 6;
+} SMBIOS_CACHE_CONFIGURATION_DATA;
+
+///
+/// Cache Information - Size
+///
+typedef struct {
+  UINT16    Size           : 15;
+  UINT16    Granularity64K : 1;
+} SMBIOS_CACHE_SIZE;
+
+/// Maximum cache size representable in CACHE_SIZE at 1 KiB granularity
+#define SMBIOS_CACHE_SIZE_MAX_SIZE_1K_GRANULARITY  32767
+/// Maximum cache size representable in CACHE_SIZE at 64 KiB granularity
+#define SMBIOS_CACHE_SIZE_MAX_SIZE_64K_GRANULARITY  (32767 * 64)
+
+///
+/// Cache Information - Size 2
+///
+typedef struct {
+  UINT32    Size           : 31;
+  UINT32    Granularity64K : 1;
+} SMBIOS_CACHE_SIZE_2;
+
+///
 /// Cache Information - SRAM Type.
 ///
 typedef struct {
@@ -1245,8 +1303,8 @@ typedef struct {
   SMBIOS_STRUCTURE        Hdr;
   SMBIOS_TABLE_STRING     SocketDesignation;
   UINT16                  CacheConfiguration;
-  UINT16                  MaximumCacheSize;
-  UINT16                  InstalledSize;
+  SMBIOS_CACHE_SIZE       MaximumCacheSize;
+  SMBIOS_CACHE_SIZE       InstalledSize;
   CACHE_SRAM_TYPE_DATA    SupportedSRAMType;
   CACHE_SRAM_TYPE_DATA    CurrentSRAMType;
   UINT8                   CacheSpeed;
@@ -1256,8 +1314,8 @@ typedef struct {
   //
   // Add for smbios 3.1.0
   //
-  UINT32                  MaximumCacheSize2;
-  UINT32                  InstalledSize2;
+  SMBIOS_CACHE_SIZE_2     MaximumCacheSize2;
+  SMBIOS_CACHE_SIZE_2     InstalledSize2;
 } SMBIOS_TABLE_TYPE7;
 
 ///

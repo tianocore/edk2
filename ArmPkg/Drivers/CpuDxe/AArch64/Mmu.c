@@ -2,7 +2,7 @@
 
 Copyright (c) 2009, Hewlett-Packard Company. All rights reserved.<BR>
 Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>
-Portions copyright (c) 2011-2021, Arm Limited. All rights reserved.<BR>
+Portions copyright (c) 2011-2025, Arm Limited. All rights reserved.<BR>
 Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -18,6 +18,20 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define MIN_T0SZ        16
 #define BITS_PER_LEVEL  9
 
+STATIC
+UINT64
+GetOutputAddress (
+  IN  UINT64   Entry,
+  IN  BOOLEAN  Lpa2Enabled
+  )
+{
+  if (Lpa2Enabled) {
+    return (Entry & TT_ADDRESS_MASK_DESCRIPTION_TABLE_LPA2) | ((Entry & TT_UPPER_ADDRESS_MASK) << (50 - 8));
+  } else {
+    return Entry & TT_ADDRESS_MASK_DESCRIPTION_TABLE;
+  }
+}
+
 /**
   Parses T0SZ to determine the level and number of entries at the root
   of the translation table.
@@ -30,12 +44,12 @@ STATIC
 VOID
 GetRootTranslationTableInfo (
   IN  UINTN  T0SZ,
-  OUT UINTN  *RootTableLevel,
+  OUT  INTN  *RootTableLevel,
   OUT UINTN  *RootTableEntryCount
   )
 {
-  *RootTableLevel      = (T0SZ - MIN_T0SZ) / BITS_PER_LEVEL;
-  *RootTableEntryCount = TT_ENTRY_COUNT >> (T0SZ - MIN_T0SZ) % BITS_PER_LEVEL;
+  *RootTableLevel      = (INTN)(T0SZ - MIN_T0SZ) / BITS_PER_LEVEL;
+  *RootTableEntryCount = TT_ENTRY_COUNT >> (INTN)(T0SZ - MIN_T0SZ) % BITS_PER_LEVEL;
 }
 
 /**
@@ -126,8 +140,9 @@ RegionAttributeToGcdAttribute (
 STATIC
 UINT64
 GetFirstPageAttribute (
-  IN UINT64  *FirstLevelTableAddress,
-  IN UINTN   TableLevel
+  IN UINT64   *FirstLevelTableAddress,
+  IN UINTN    TableLevel,
+  IN BOOLEAN  Lpa2Enabled
   )
 {
   UINT64  FirstEntry;
@@ -139,7 +154,7 @@ GetFirstPageAttribute (
     // Only valid for Levels 0, 1 and 2
 
     // Get the attribute of the subsequent table
-    return GetFirstPageAttribute ((UINT64 *)(FirstEntry & TT_ADDRESS_MASK_DESCRIPTION_TABLE), TableLevel + 1);
+    return GetFirstPageAttribute ((UINT64 *)GetOutputAddress (FirstEntry, Lpa2Enabled), TableLevel + 1, Lpa2Enabled);
   } else if (((FirstEntry & TT_TYPE_MASK) == TT_TYPE_BLOCK_ENTRY) ||
              ((TableLevel == 3) && ((FirstEntry & TT_TYPE_MASK) == TT_TYPE_BLOCK_ENTRY_LEVEL3)))
   {
@@ -167,7 +182,7 @@ UINT64
 GetNextEntryAttribute (
   IN     UINT64  *TableAddress,
   IN     UINTN   EntryCount,
-  IN     UINTN   TableLevel,
+  IN     INTN    TableLevel,
   IN     UINT64  BaseAddress,
   IN OUT UINT64  *PrevEntryAttribute,
   IN OUT UINT64  *StartGcdRegion
@@ -226,7 +241,7 @@ GetNextEntryAttribute (
 
       // Increase the level number and scan the sub-level table
       GetNextEntryAttribute (
-        (UINT64 *)(Entry & TT_ADDRESS_MASK_DESCRIPTION_TABLE),
+        (UINT64 *)GetOutputAddress (Entry, ArmGetTCR () & TCR_DS),
         TT_ENTRY_COUNT,
         TableLevel + 1,
         (BaseAddress + (Index * TT_ADDRESS_AT_LEVEL (TableLevel))),
@@ -273,7 +288,7 @@ SyncCacheConfig (
   EFI_STATUS                       Status;
   UINT64                           PageAttribute;
   UINT64                           *FirstLevelTableAddress;
-  UINTN                            TableLevel;
+  INTN                             TableLevel;
   UINTN                            TableCount;
   UINTN                            NumberOfDescriptors;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
@@ -314,7 +329,7 @@ SyncCacheConfig (
   GetRootTranslationTableInfo (T0SZ, &TableLevel, &TableCount);
 
   // First Attribute of the Page Tables
-  PageAttribute = GetFirstPageAttribute (FirstLevelTableAddress, TableLevel);
+  PageAttribute = GetFirstPageAttribute (FirstLevelTableAddress, TableLevel, ArmGetTCR () & TCR_DS);
 
   // We scan from the start of the memory map (ie: at the address 0x0)
   BaseAddressGcdRegion = 0x0;
@@ -419,7 +434,7 @@ EfiAttributeToArmAttribute (
 EFI_STATUS
 GetMemoryRegionRec (
   IN     UINT64  *TranslationTable,
-  IN     UINTN   TableLevel,
+  IN     INTN    TableLevel,
   IN     UINT64  *LastBlockEntry,
   IN OUT UINTN   *BaseAddress,
   OUT    UINTN   *RegionLength,
@@ -443,7 +458,7 @@ GetMemoryRegionRec (
   EntryType  = *BlockEntry & TT_TYPE_MASK;
 
   if ((TableLevel < 3) && (EntryType == TT_TYPE_TABLE_ENTRY)) {
-    NextTranslationTable = (UINT64 *)(*BlockEntry & TT_ADDRESS_MASK_DESCRIPTION_TABLE);
+    NextTranslationTable = (UINT64 *)GetOutputAddress (*BlockEntry, ArmGetTCR () & TCR_DS);
 
     // The entry is a page table, so we go to the next level
     Status = GetMemoryRegionRec (
@@ -520,7 +535,7 @@ GetMemoryRegion (
 {
   EFI_STATUS  Status;
   UINT64      *TranslationTable;
-  UINTN       TableLevel;
+  INTN        TableLevel;
   UINTN       EntryCount;
   UINTN       T0SZ;
 

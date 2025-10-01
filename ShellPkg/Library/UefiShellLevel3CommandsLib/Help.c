@@ -251,19 +251,13 @@ PrintDynamicCommandHelp (
                  PrintCommandText
                  );
       if (Status == EFI_DEVICE_ERROR) {
-        ShellPrintHiiEx (
-          -1,
-          -1,
-          NULL,
+        ShellPrintHiiDefaultEx (
           STRING_TOKEN (STR_HELP_INV),
           gShellLevel3HiiHandle,
           DynamicCommand->CommandName
           );
       } else if (EFI_ERROR (Status)) {
-        ShellPrintHiiEx (
-          -1,
-          -1,
-          NULL,
+        ShellPrintHiiDefaultEx (
           STRING_TOKEN (STR_HELP_NF),
           gShellLevel3HiiHandle,
           DynamicCommand->CommandName
@@ -335,7 +329,7 @@ ShellCommandRunHelp (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"help", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"help", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -350,10 +344,10 @@ ShellCommandRunHelp (
        && (ShellCommandLineGetFlag (Package, L"-verbose") || ShellCommandLineGetFlag (Package, L"-v"))
           )
     {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CON), gShellLevel3HiiHandle, L"help");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_CON), gShellLevel3HiiHandle, L"help");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"help");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"help");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       //
@@ -396,8 +390,8 @@ ShellCommandRunHelp (
         //
         // we need info on the special characters
         //
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HELP_SC_HEADER), gShellLevel3HiiHandle);
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HELP_SC_DATA), gShellLevel3HiiHandle);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_SC_HEADER), gShellLevel3HiiHandle);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_SC_DATA), gShellLevel3HiiHandle);
         Found = TRUE;
       } else {
         SortedCommandList     = NULL;
@@ -432,9 +426,9 @@ ShellCommandRunHelp (
             }
 
             if (Status == EFI_DEVICE_ERROR) {
-              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, CurrentCommand);
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, CurrentCommand);
             } else if (EFI_ERROR (Status)) {
-              ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, CurrentCommand);
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, CurrentCommand);
             } else {
               Found = TRUE;
             }
@@ -447,9 +441,9 @@ ShellCommandRunHelp (
         if (!Found) {
           Status = ShellPrintHelp (CommandToGetHelpOn, SectionToGetHelpOn, FALSE);
           if (Status == EFI_DEVICE_ERROR) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, CommandToGetHelpOn);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, CommandToGetHelpOn);
           } else if (EFI_ERROR (Status)) {
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, CommandToGetHelpOn);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, CommandToGetHelpOn);
           } else {
             Found = TRUE;
           }
@@ -472,7 +466,7 @@ ShellCommandRunHelp (
     // If '*' then the command entered was 'Help' without qualifiers, This footer
     // provides additional info on help switches
     //
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_HELP_FOOTER), gShellLevel3HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_FOOTER), gShellLevel3HiiHandle);
   }
 
   if (CommandToGetHelpOn != NULL) {

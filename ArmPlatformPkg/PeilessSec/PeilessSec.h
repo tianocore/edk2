@@ -19,6 +19,7 @@
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/PerformanceLib.h>
+#include <Library/PeilessSecMeasureLib.h>
 #include <Library/PrePiHobListPointerLib.h>
 #include <Library/PrePiLib.h>
 #include <Library/PrintLib.h>
