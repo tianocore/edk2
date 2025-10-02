@@ -52,6 +52,7 @@ SECTIONS {
   .data ALIGN(ALIGNOF(.text)) : ALIGN(CONSTANT(COMMONPAGESIZE)) {
     *(.data .data.* .gnu.linkonce.d.*)
     *(.bss .bss.*)
+    KEEP(*(.prmexportdescriptor))
   } :data
 
   .eh_frame ALIGN(CONSTANT(COMMONPAGESIZE)) : {
