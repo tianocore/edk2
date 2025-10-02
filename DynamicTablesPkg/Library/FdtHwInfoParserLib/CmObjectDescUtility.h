@@ -71,6 +71,28 @@ AddSingleCmObj (
   OUT       CM_OBJECT_TOKEN            *Token    OPTIONAL
   );
 
+/** Add a CmObj representing an array to the Configuration Manager.
+  @param  [in]  FdtParserHandle   A handle to the parser instance.
+  @param  [in]  ObjectId          CmObj ObjectId.
+  @param  [in]  Data              CmObj Data.
+  @param  [in]  Size              Total size of array, in bytes.
+  @param  [in]  Count             Count of objects in array.
+  @param  [out] Token             If provided and success,
+                                  token generated for this CmObj.
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+AddSingleCmObjArray (
+  IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
+  IN        CM_OBJECT_ID               ObjectId,
+  IN        VOID                       *Data,
+  IN        UINT32                     Size,
+  IN        UINT32                     Count,
+  OUT       CM_OBJECT_TOKEN            *Token    OPTIONAL
+  );
+
 /** Add a single CmObj to the Configuration Manager.
 
   @param  [in]  FdtParserHandle   A handle to the parser instance.
