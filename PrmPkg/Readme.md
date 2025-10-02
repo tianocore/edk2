@@ -73,11 +73,6 @@ on IA32 with the unique UEFI configuration required.
 * AArch64
     ``build -p PrmPkg/PrmPkg.dsc -a AARCH64 -t GCC5``
 
-   > ***Note***: Only builds with the GCC5 toolchain have been tested.
-   > ***Note***: For builds with the GCC5 toolchain, the PrmModuleExportDescriptor and any other handler entry points
-   symbols, to be listed in the PRMT, must be explicitly preserved by enumerating these in the AARCH64 linker flags.
-   The --require-defined linker flag must be used for each symbol to be preserved.
-
 ### PRM Platform GUID
 
 **IMPORTANT** PRM has a concept of a "Platform GUID" which associates a specific platform with a set of PRM modules
