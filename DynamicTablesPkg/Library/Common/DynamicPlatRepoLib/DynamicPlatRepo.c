@@ -286,7 +286,9 @@ GroupCmObjNodes (
 
     if ((CmObjDesc->Count != 1) &&
         ((NamespaceId != EObjNameSpaceArchCommon) ||
-         (ObjIndex != EArchCommonObjCmRef)))
+         (ObjIndex != EArchCommonObjCmRef)) &&
+        ((NamespaceId != EObjNameSpaceArm) ||
+         (ObjIndex != EArmObjIdMappingArray)))
     {
       // We expect each descriptor to contain an individual object.
       // EArchCommonObjCmRef objects are counted as groups, so +1 as well.
