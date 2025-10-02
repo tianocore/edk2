@@ -58,6 +58,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define DEBUG_MANAGEABILITY  0x00800000  // Detailed debug and payload manageability messages
                                          // related to modules such as Redfish, IPMI, MCTP etc.
 #define DEBUG_SECURITY  0x01000000       // Security and security HW related messages, such as TPM
+#define DEBUG_PAGING    0x02000000       // Page table updates (memory encryption, page attributes, ...)
 #define DEBUG_ERROR     0x80000000       // Error
 
 //
