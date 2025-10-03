@@ -16,6 +16,30 @@
 #include <Library/HobLib.h>
 
 /**
+  Compute the byte-wise XOR over the used portion of a Transfer List.
+
+  @param[in]  TransferListHeader   Pointer to the Transfer List Header.
+
+  @retval 0-255   XOR of all bytes across the used portion.
+**/
+STATIC
+UINT8
+CalculateXor8 (
+  IN TRANSFER_LIST_HEADER  *TransferListHeader
+  )
+{
+  UINT8  Xor;
+  UINTN  Index;
+
+  Xor = 0;
+  for (Index = 0; Index < TransferListHeader->UsedSize; Index++) {
+    Xor ^= ((UINT8 *)TransferListHeader)[Index];
+  }
+
+  return Xor;
+}
+
+/**
   Get the TransferList from HOB list.
 
   @param[out] TransferList  TransferList
@@ -76,7 +100,7 @@ TransferListVerifyChecksum (
     return TRUE;
   }
 
-  return (CalculateSum8 ((UINT8 *)TransferListHeader, TransferListHeader->UsedSize) == 0);
+  return (CalculateXor8 (TransferListHeader) == 0);
 }
 
 /**
