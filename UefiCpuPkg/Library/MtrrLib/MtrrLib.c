@@ -19,6 +19,9 @@
 #include <Library/CpuLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
+
+#include "DetectCc.h"
 
 #define OR_SEED              0x0101010101010101ull
 #define CLEAR_SEED           0xFFFFFFFFFFFFFFFFull
@@ -162,9 +165,9 @@ MtrrLibIsMtrrSupported (
   MSR_IA32_MTRRCAP_REGISTER  MtrrCap;
 
   //
-  // MTRR is not supported in TD-Guest.
+  // MTRR is not supported in Confidential Computing mode
   //
-  if (TdIsEnabled ()) {
+  if (CcMode ()) {
     return FALSE;
   }
 
