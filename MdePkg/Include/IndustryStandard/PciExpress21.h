@@ -31,8 +31,13 @@
 
 #pragma pack(1)
 ///
-/// PCI Express Capability Structure
+/// PCI Express Capability Structure version 2.
+/// Mandatory for PCI Express devices. If not present it is not PCI Express device, thus no extended config space.
 ///
+#define PCI_EXPRESS_CAPABILITY_ID         0x0010
+#define PCI_EXPRESS_CAPABILITY_VER1       0x1    // Version 1 ends at PCI_CAPABILITY_PCIEXP::RootStatus register
+#define PCI_EXPRESS_CAPABILITY_VER2       0x2    // Version 2 extends version 1 up to PCI_CAPABILITY_PCIEXP::SlotStatus2 register
+
 typedef union {
   struct {
     UINT16    Version                : 4;
@@ -396,29 +401,29 @@ typedef union {
 } PCI_REG_PCIE_SLOT_CAPABILITY2;
 
 typedef struct {
-  EFI_PCI_CAPABILITY_HDR             Hdr;
-  PCI_REG_PCIE_CAPABILITY            Capability;
-  PCI_REG_PCIE_DEVICE_CAPABILITY     DeviceCapability;
-  PCI_REG_PCIE_DEVICE_CONTROL        DeviceControl;
-  PCI_REG_PCIE_DEVICE_STATUS         DeviceStatus;
-  PCI_REG_PCIE_LINK_CAPABILITY       LinkCapability;
-  PCI_REG_PCIE_LINK_CONTROL          LinkControl;
-  PCI_REG_PCIE_LINK_STATUS           LinkStatus;
-  PCI_REG_PCIE_SLOT_CAPABILITY       SlotCapability;
-  PCI_REG_PCIE_SLOT_CONTROL          SlotControl;
-  PCI_REG_PCIE_SLOT_STATUS           SlotStatus;
-  PCI_REG_PCIE_ROOT_CONTROL          RootControl;
-  PCI_REG_PCIE_ROOT_CAPABILITY       RootCapability;
-  PCI_REG_PCIE_ROOT_STATUS           RootStatus;
-  PCI_REG_PCIE_DEVICE_CAPABILITY2    DeviceCapability2;
-  PCI_REG_PCIE_DEVICE_CONTROL2       DeviceControl2;
-  UINT16                             DeviceStatus2;
-  PCI_REG_PCIE_LINK_CAPABILITY2      LinkCapability2;
-  PCI_REG_PCIE_LINK_CONTROL2         LinkControl2;
-  PCI_REG_PCIE_LINK_STATUS2          LinkStatus2;
-  PCI_REG_PCIE_SLOT_CAPABILITY2      SlotCapability2;
-  UINT16                             SlotControl2;
-  UINT16                             SlotStatus2;
+  EFI_PCI_CAPABILITY_HDR             Hdr;                         // Offset 00 size 2
+  PCI_REG_PCIE_CAPABILITY            Capability;                  // Offset 02 size 2
+  PCI_REG_PCIE_DEVICE_CAPABILITY     DeviceCapability;            // Offset 04 size 4
+  PCI_REG_PCIE_DEVICE_CONTROL        DeviceControl;               // Offset 08 size 2
+  PCI_REG_PCIE_DEVICE_STATUS         DeviceStatus;                // Offset 0A size 2
+  PCI_REG_PCIE_LINK_CAPABILITY       LinkCapability;              // Offset 0C size 4
+  PCI_REG_PCIE_LINK_CONTROL          LinkControl;                 // Offset 10 size 2
+  PCI_REG_PCIE_LINK_STATUS           LinkStatus;                  // Offset 12 size 2
+  PCI_REG_PCIE_SLOT_CAPABILITY       SlotCapability;              // Offset 14 size 4
+  PCI_REG_PCIE_SLOT_CONTROL          SlotControl;                 // Offset 18 size 2
+  PCI_REG_PCIE_SLOT_STATUS           SlotStatus;                  // Offset 1A size 2
+  PCI_REG_PCIE_ROOT_CONTROL          RootControl;                 // Offset 1C size 2
+  PCI_REG_PCIE_ROOT_CAPABILITY       RootCapability;              // Offset 1E size 2
+  PCI_REG_PCIE_ROOT_STATUS           RootStatus;                  // Offset 20 size 4 - Ver1 ends here
+  PCI_REG_PCIE_DEVICE_CAPABILITY2    DeviceCapability2;           // Offset 24 size 4
+  PCI_REG_PCIE_DEVICE_CONTROL2       DeviceControl2;              // Offset 28 size 2
+  UINT16                             DeviceStatus2;               // Offset 2A size 2
+  PCI_REG_PCIE_LINK_CAPABILITY2      LinkCapability2;             // Offset 2C size 4
+  PCI_REG_PCIE_LINK_CONTROL2         LinkControl2;                // Offset 30 size 2
+  PCI_REG_PCIE_LINK_STATUS2          LinkStatus2;                 // Offset 32 size 2
+  PCI_REG_PCIE_SLOT_CAPABILITY2      SlotCapability2;             // Offset 34 size 4
+  UINT16                             SlotControl2;                // Offset 38 size 2
+  UINT16                             SlotStatus2;                 // Offset 3A size 2
 } PCI_CAPABILITY_PCIEXP;
 
 #define EFI_PCIE_CAPABILITY_BASE_OFFSET                           0x100
@@ -429,15 +434,15 @@ typedef struct {
 #define EFI_PCIE_CAPABILITY_DEVICE_CONTROL_2_ARI_FORWARDING       0x20
 
 //
-// for SR-IOV
+// Single Root IO Virtualization (SR-IOV) Extended Capability Structure.
 //
-#define EFI_PCIE_CAPABILITY_ID_ARI    0x0E
-#define EFI_PCIE_CAPABILITY_ID_ATS    0x0F
-#define EFI_PCIE_CAPABILITY_ID_SRIOV  0x10
-#define EFI_PCIE_CAPABILITY_ID_MRIOV  0x11
+#define EFI_PCIE_CAPABILITY_ID_ARI    0x0E  // Obsolete, use PCI_EXPRESS_EXTENDED_CAPABILITY_ARI_CAPABILITY_ID
+#define EFI_PCIE_CAPABILITY_ID_ATS    0x0F  // Obsolete, use PCI_EXPRESS_EXTENDED_CAPABILITY_ATS_ID
+#define EFI_PCIE_CAPABILITY_ID_SRIOV  0x10  // Obsolete, use PCI_EXPRESS_EXTENDED_CAPABILITY_SRIOV_ID
+#define EFI_PCIE_CAPABILITY_ID_MRIOV  0x11  // Obsolete, deprecated in 6.0
 
-#define PCI_EXPRESS_EXTENDED_CAPABILITY_SRIOV_ID    0x0010
-#define PCI_EXPRESS_EXTENDED_CAPABILITY_SRIOV_VER1  0x1
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_SRIOV_ID               0x0010
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_SRIOV_VER1             0x1
 
 typedef struct {
   UINT32    CapabilityHeader;
@@ -739,12 +744,13 @@ typedef struct {
 
 #define GET_TPH_TABLE_SIZE(x)  ((x->TphRequesterCapability & 0x7FF0000)>>16) * sizeof(UINT16)
 
-/// Address Translation Services Extended Capability Structure
+///
+/// Address Translation Services (ATS) Extended Capability Structure
 ///
 /// Based on section 5.1 of PCI Express Address Translation Services Specification 1.1
 ///@{
-#define PCI_EXPRESS_EXTENDED_CAPABILITY_ATS_ID    0x000F
-#define PCI_EXPRESS_EXTENDED_CAPABILITY_ATS_VER1  0x1
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_ATS_ID     0x000F
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_ATS_VER1   0x1
 
 typedef union {
   struct {
@@ -766,12 +772,13 @@ typedef union {
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_ATS_CONTROL;
 
 typedef struct {
-  PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER            Header;
-  PCI_EXPRESS_EXTENDED_CAPABILITIES_ATS_CAPABILITY    Capability;
-  PCI_EXPRESS_EXTENDED_CAPABILITIES_ATS_CONTROL       Control;
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER         Header;
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_ATS_CAPABILITY Capability;
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_ATS_CONTROL    Control;
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_ATS;
 ///@}
 
 #pragma pack()
 
 #endif
+
