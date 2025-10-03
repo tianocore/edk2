@@ -27,7 +27,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_ACPI_TABLE_INSTANCE  *mPrivateData = NULL;
 
   @return EFI_SUCCESS           Driver initialized successfully.
   @return EFI_LOAD_ERROR        Failed to Initialize or has been loaded.
-  @return EFI_OUT_OF_RESOURCES  Could not allocate needed resources.
+  @return EFI_OUT_OF_RESOURCES  Could not allocate a required resource.
 
 **/
 EFI_STATUS
@@ -44,7 +44,11 @@ InitializeAcpiTableDxe (
   // Initialize our protocol
   //
   PrivateData = AllocateZeroPool (sizeof (EFI_ACPI_TABLE_INSTANCE));
-  ASSERT (PrivateData);
+  if (PrivateData == NULL) {
+    ASSERT (PrivateData);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   PrivateData->Signature = EFI_ACPI_TABLE_SIGNATURE;
 
   //
