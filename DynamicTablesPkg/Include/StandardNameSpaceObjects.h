@@ -55,6 +55,7 @@ typedef enum AbstractTokenID {
   ETokenNameSpaceUnknown = 0,
   ETokenNameSpaceSmbios,
   ETokenNameSpaceFdtHwInfo,
+  ETokenNameSpaceGenerated,
 
   ETokenNameSpaceMax
 } EABSTRACT_TOKEN_ID;
