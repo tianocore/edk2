@@ -23,7 +23,9 @@ GenerateToken (
   )
 {
   // Start Tokens at 1 to avoid collisions with CM_NULL_TOKEN.
-  STATIC UINTN  CurrentToken = 1;
+  STATIC UINTN  CurrentToken = 0;
 
-  return (CM_OBJECT_TOKEN)(CurrentToken++);
+  CurrentToken++;
+
+  return (CM_OBJECT_TOKEN)CM_ABSTRACT_TOKEN_MAKE (ETokenNameSpaceGenerated, 0, CurrentToken);
 }
