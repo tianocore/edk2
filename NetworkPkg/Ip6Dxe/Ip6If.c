@@ -705,7 +705,11 @@ Ip6SendFrame (
   //
 
   NeighborCache = Ip6FindNeighborEntry (IpSb, NextHop);
-  ASSERT (NeighborCache != NULL);
+  if (NeighborCache == NULL) {
+    ASSERT (NeighborCache != NULL);
+    Status = EFI_NOT_FOUND;
+    goto Error;
+  }
 
   if (NeighborCache->Interface == NULL) {
     NeighborCache->Interface = Interface;

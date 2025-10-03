@@ -225,7 +225,7 @@ MnpAddFreeTxBuf (
   ASSERT ((Count > 0) && (MnpDeviceData->BufferLength > 0));
 
   Status = EFI_SUCCESS;
-  for (Index = 0; Index < Count; Index++) {
+  for (Index = 0; (UINTN)Index < Count; Index++) {
     TxBufWrap = (MNP_TX_BUF_WRAP *)AllocatePool (OFFSET_OF (MNP_TX_BUF_WRAP, TxBuf) + MnpDeviceData->BufferLength);
     if (TxBufWrap == NULL) {
       DEBUG ((DEBUG_ERROR, "MnpAddFreeTxBuf: TxBuf Alloc failed.\n"));
