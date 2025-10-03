@@ -1813,7 +1813,7 @@ PciPrintClassCode (
 
   if (IncludePIF) {
     //
-    // Print base class, sub class, and programming inferface name
+    // Print base class, sub class, and programming interface name
     //
     ShellPrintDefaultEx (
       L"%s - %s - %s",
@@ -1835,7 +1835,7 @@ PciPrintClassCode (
 
 /**
   This function finds out the protocol which is in charge of the given
-  segment, and its bus range covers the current bus number. It lookes
+  segment, and its bus range covers the current bus number. It looks
   each instances of RootBridgeIoProtocol handle, until the one meets the
   criteria is found.
 
@@ -2367,7 +2367,7 @@ CHAR16  *DevicePortTypeTable[] = {
   L"PCI Express Endpoint",
   L"Legacy PCI Express Endpoint",
   L"Unknown Type",
-  L"Unknonw Type",
+  L"Unknown Type",
   L"Root Port of PCI Express Root Complex",
   L"Upstream Port of PCI Express Switch",
   L"Downstream Port of PCI Express Switch",
@@ -2987,7 +2987,7 @@ Done:
 
 /**
   This function finds out the protocol which is in charge of the given
-  segment, and its bus range covers the current bus number. It lookes
+  segment, and its bus range covers the current bus number. It looks
   each instances of RootBridgeIoProtocol handle, until the one meets the
   criteria is found.
 
@@ -3077,7 +3077,7 @@ PciGetProtocolAndResource (
   EFI_STATUS  Status;
 
   //
-  // Get inferface from protocol
+  // Get interface from protocol
   //
   Status = gBS->HandleProtocol (
                   Handle,
