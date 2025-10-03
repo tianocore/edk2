@@ -13,8 +13,8 @@ PROPERTY_DATA  PropertyData32List[] = {
 };
 
 PROPERTY_DATA  PropertyData64List[] = {
-  { "entry-start", PAYLOAD_ENTRY_POINT_OFFSET },
-  { "load",        PAYLOAD_LOAD_ADDR_OFFSET   }
+  { "entry", PAYLOAD_ENTRY_POINT_OFFSET },
+  { "load",  PAYLOAD_LOAD_ADDR_OFFSET   }
 };
 
 /**
@@ -66,6 +66,12 @@ FitParseFirmwarePropertyData (
     ContextOffset64  = (UINT64 *)((UINTN)Context + PropertyData64List[Index].Offset);
     *ContextOffset64 = Fdt64ToCpu (*Data64);
   }
+
+  //
+  // Need to load the FIT header (FDT) too. "load" property of tianocore entrypoint refers to image.
+  // Since FDT is directly before tianocore, subtract its size from load.
+  //
+  Context->PayloadLoadAddress -= FdtTotalSize (Fdt);
 
   return EFI_SUCCESS;
 }
