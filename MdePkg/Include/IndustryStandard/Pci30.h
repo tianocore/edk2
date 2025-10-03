@@ -42,7 +42,7 @@
 ///
 /// PCI Capability List IDs and records
 ///
-#define EFI_PCI_CAPABILITY_ID_PCIEXP  0x10
+#define EFI_PCI_CAPABILITY_ID_PCIEXP  0x10  // Obsolete, use PCI_EXPRESS_CAPABILITY_ID
 
 #pragma pack(1)
 
