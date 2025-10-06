@@ -723,7 +723,7 @@
     #
     <Command.MSFT, Command.INTEL, Command.GCC, Command.CLANGPDB, Command.CLANGDWARF>
         "$(GENFW)" -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) $(GENFWHII_FLAGS) $(HII_BINARY_PACKAGES) $(GENFW_FLAGS)
-        "$(RC)" $(RC_FLAGS) $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc
+        "$(RC)" $(RC_FLAGS) -- $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc
         -$(CP) $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.res $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc
         $(CP) $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc ${dst}
 
