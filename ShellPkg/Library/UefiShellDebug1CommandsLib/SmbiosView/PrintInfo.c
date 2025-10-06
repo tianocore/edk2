@@ -382,6 +382,18 @@ SmbiosPrintStructure (
         PRINT_PENDING_STRING (Struct, Type2, LocationInChassis);
         PRINT_STRUCT_VALUE_H (Struct, Type2, ChassisHandle);
         DisplayBaseBoardBoardType (Struct->Type2->BoardType, Option);
+        ShellPrintHiiDefaultEx (
+          STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_NUM_CONTAINED_OBJECTS_HANDLES),
+          gShellDebug1HiiHandle,
+          Struct->Type2->NumberOfContainedObjectHandles
+          );
+        for (Index = 0; Index < Struct->Type2->NumberOfContainedObjectHandles; Index++) {
+          ShellPrintHiiDefaultEx (
+            STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_CONTAINED_OBJECTS_HANDLE),
+            gShellDebug1HiiHandle,
+            Struct->Type2->ContainedObjectHandles[Index]
+            );
+        }
       }
 
       break;
