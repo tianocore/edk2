@@ -443,6 +443,16 @@ SmbiosPrintStructure (
         }
       }
 
+      if (AE_SMBIOS_VERSION (0x3, 0x9)) {
+        if (Struct->Hdr->Length > (0x16 + (Struct->Type3->ContainedElementCount * Struct->Type3->ContainedElementRecordLength))) {
+          ShellPrintDefaultEx (L"Rack Type: %x\n", Buffer[0x16 + (Struct->Type3->ContainedElementCount * Struct->Type3->ContainedElementRecordLength)]);
+        }
+
+        if (Struct->Hdr->Length > (0x17 + (Struct->Type3->ContainedElementCount * Struct->Type3->ContainedElementRecordLength))) {
+          ShellPrintDefaultEx (L"Rack Height: %x\n", Buffer[0x17 + (Struct->Type3->ContainedElementCount * Struct->Type3->ContainedElementRecordLength)]);
+        }
+      }
+
       break;
 
     //
