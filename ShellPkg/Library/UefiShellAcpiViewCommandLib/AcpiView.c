@@ -33,6 +33,7 @@ STATIC UINT32  mBinTableCount;
 /**
   This function dumps the ACPI table to a file.
 
+  @param [in] Signature The ACPI table Signature.
   @param [in] Ptr       Pointer to the ACPI table data.
   @param [in] Length    The length of the ACPI table.
 
@@ -42,25 +43,31 @@ STATIC UINT32  mBinTableCount;
 STATIC
 BOOLEAN
 DumpAcpiTableToFile (
-  IN CONST UINT8  *Ptr,
-  IN CONST UINTN  Length
+  IN CONST UINT32  Signature,
+  IN CONST UINT8   *Ptr,
+  IN CONST UINTN   Length
   )
 {
   CHAR16               FileNameBuffer[MAX_FILE_NAME_LEN];
   UINTN                TransferBytes;
+  UINT8                *SignaturePtr;
   SELECTED_ACPI_TABLE  *SelectedTable;
 
+  SignaturePtr = (UINT8 *)(UINTN)&Signature;
   GetSelectedAcpiTable (&SelectedTable);
 
   UnicodeSPrint (
     FileNameBuffer,
     sizeof (FileNameBuffer),
-    L".\\%s%04d.bin",
-    SelectedTable->Name,
+    L".\\%c%c%c%c%04d.aml",
+    SignaturePtr[0],
+    SignaturePtr[1],
+    SignaturePtr[2],
+    SignaturePtr[3],
     mBinTableCount++
     );
 
-  Print (L"Dumping ACPI table to : %s ... ", FileNameBuffer);
+  Print (L"Dumping ACPI table to: %s (%d bytes) ... ", FileNameBuffer, Length);
 
   TransferBytes = ShellDumpBufferToFile (FileNameBuffer, Ptr, Length);
   return (Length == TransferBytes);
@@ -121,7 +128,7 @@ ProcessTableReportOptions (
                          );
         }
 
-        Print (L"\nInstalled Table(s):\n");
+        Print (L"Installed Table(s):\n");
         if (HighLight) {
           gST->ConOut->SetAttribute (gST->ConOut, OriginalAttribute);
         }
@@ -139,7 +146,7 @@ ProcessTableReportOptions (
     case ReportDumpBinFile:
       if (Signature == SelectedTable->Type) {
         SelectedTable->Found = TRUE;
-        DumpAcpiTableToFile (TablePtr, Length);
+        DumpAcpiTableToFile (Signature, TablePtr, Length);
       }
 
       break;
@@ -277,13 +284,13 @@ AcpiView (
          (ReportDumpBinFile == ReportOption)) &&
         (!SelectedTable->Found))
     {
-      Print (L"\nRequested ACPI Table not found.\n");
+      Print (L"Requested ACPI Table not found.\n");
     } else if (GetConsistencyChecking () &&
                (ReportDumpBinFile != ReportOption))
     {
       OriginalAttribute = gST->ConOut->Mode->Attribute;
 
-      Print (L"\nTable Statistics:\n");
+      Print (L"Table Statistics:\n");
 
       if (GetColourHighlighting ()) {
         PrintAttribute = (GetErrorCount () > 0) ?
