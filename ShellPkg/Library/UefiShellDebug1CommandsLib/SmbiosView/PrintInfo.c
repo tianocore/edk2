@@ -1343,6 +1343,11 @@ SmbiosPrintStructure (
     // Processor Additional Information (Type 44)
     //
     case 44:
+      ShellPrintHiiDefaultEx (
+        STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_REFERENCEDHANDLE),
+        gShellDebug1HiiHandle,
+        Struct->Type44->RefHandle
+        );
       DisplayProcessorArchitectureType (Struct->Type44->ProcessorSpecificBlock.ProcessorArchType, Option);
       break;
 
