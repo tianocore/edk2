@@ -18,6 +18,18 @@
 
 [Sources]
   ArmTransferListLib.c
+
+  # Standard C header wrapper files
+  Include/assert.h
+  Include/stdbool.h
+  Include/stddef.h
+  Include/stdint.h
+  Include/stdarg.h
+  Include/stdio.h
+  Include/stdlib.h
+  Include/inttypes.h
+  Include/string.h
+
   libtl/src/generic/transfer_list.c
   libtl/src/generic/logging.c
   libtl/include/transfer_list.h
