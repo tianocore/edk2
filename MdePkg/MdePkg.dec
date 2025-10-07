@@ -309,6 +309,9 @@
   #
   StackCheckLib|Include/Library/StackCheckLib.h
 
+  ##  @libraryclass  Provides services for QEMU PvPanic Operation.
+  PvPanicLib|Include/Library/PvPanicLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides services to generate random number.
   #
@@ -2516,6 +2519,17 @@
   #  The IPMB specification specified min value is 60ms (section 4).
   # @Prompt Time-out for a request, internal
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequestRetryInterval|60000|UINT32|0x00000055
+
+  ##
+  # Default PVPANIC IO Port.
+  # Configured at QEMU `qemu/hw/misc/pvpanic-isa.c` file.
+  # PVPANIC 1-byte port, where the first three bits are used to indicate the
+  # signal type (see https://www.qemu.org/docs/master/specs/pvpanic.html for
+  # details).
+  # For the default MMIO address, the port obtained from
+  # https://www.kernel.org/doc/Documentation/devicetree/bindings/misc/pvpanic-mmio.txt
+  gEfiMdePkgTokenSpaceGuid.PcdPvPanicIoPort|0x505|UINT32|0x00000056
+  gEfiMdePkgTokenSpaceGuid.PcdPvPanicMmioAddr|0x9060000|UINT32|0x00000057
 
 [PcdsFixedAtBuild.AARCH64, PcdsPatchableInModule.AARCH64]
   ## GUID identifying the Rng algorithm implemented by CPU instruction.
