@@ -21,7 +21,12 @@
 
 [Sources]
   ArmTransferListLib.c
+  TransferListLibSupport.h
+  # header Wrapper files
   assert.h
+  stdbool.h
+  stddef.h
+  stdint.h
   $(TL_LIB_PATH)/src/generic/transfer_list.c
   $(TL_LIB_PATH)/src/generic/logging.c
   $(TL_LIB_INCLUDE_PATH)/transfer_list.h
@@ -33,6 +38,8 @@
 
 [LibraryClasses]
   BaseLib
+  BaseMemoryLib
+  DebugLib
 
 [Guids]
   gArmTransferListHobGuid
