@@ -39,3 +39,4 @@
   PciLib
   TimerLib
   XenHypercallLib
+  PvPanicLib

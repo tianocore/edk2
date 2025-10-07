@@ -38,6 +38,7 @@
   IoLib
   PcdLib
   TimerLib
+  PvPanicLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId ## CONSUMES

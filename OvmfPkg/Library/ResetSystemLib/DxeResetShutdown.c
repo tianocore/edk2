@@ -12,6 +12,7 @@
 #include <Library/DebugLib.h>       // ASSERT()
 #include <Library/IoLib.h>          // IoOr16()
 #include <Library/PcdLib.h>         // PcdGet16()
+#include <Library/PvPanicLib.h>     // PvPanicLibSendEventGuestShutdown()
 #include <Library/ResetSystemLib.h> // ResetShutdown()
 #include <OvmfPlatforms.h>          // PIIX4_PMBA_VALUE
 
@@ -60,6 +61,9 @@ ResetShutdown (
   VOID
   )
 {
+  // Notify the host that the system is performing a normal shutdown.
+  PvPanicLibSendEventGuestShutdown ();
+
   if (mAcpiHwReducedSleepCtl) {
     IoWrite8 (mAcpiHwReducedSleepCtl, 5 << 2 | 1 << 5);
   } else {
