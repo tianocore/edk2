@@ -21,6 +21,18 @@
 
 [Sources]
   ArmTransferListLib.c
+
+  # Standard C header wrapper files
+  Include/assert.h
+  Include/stdbool.h
+  Include/stddef.h
+  Include/stdint.h
+  Include/stdarg.h
+  Include/stdio.h
+  Include/stdlib.h
+  Include/inttypes.h
+  Include/string.h
+
   $(TL_LIB_PATH)/src/generic/transfer_list.c
   $(TL_LIB_PATH)/src/generic/logging.c
   $(TL_LIB_INCLUDE_PATH)/transfer_list.h
