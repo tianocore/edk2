@@ -30,6 +30,7 @@
   DEFINE TTY_TERMINAL            = FALSE
   DEFINE SECURE_BOOT_ENABLE      = FALSE
   DEFINE QEMU_PV_VARS            = FALSE
+  DEFINE QEMU_PV_PANIC           = FALSE
 
   #
   # Network definition
