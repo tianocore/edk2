@@ -1622,6 +1622,21 @@ InitVariableStoreHeader (
 }
 
 /**
+  Invalidates all runtime cache pointers to prevent access to boot services memory.
+
+**/
+VOID
+InvalidateAllRuntimeCaches (
+  VOID
+  )
+{
+  mVariableRtCacheInfo.CacheInfoFlagBuffer        = 0;
+  mVariableRtCacheInfo.RuntimeHobCacheBuffer      = 0;
+  mVariableRtCacheInfo.RuntimeNvCacheBuffer       = 0;
+  mVariableRtCacheInfo.RuntimeVolatileCacheBuffer = 0;
+}
+
+/**
   Initialize the runtime variable cache related content.
 
   @param[in]  RuntimeCacheInfoGuidHob     Pointer to the gEdkiiVariableRuntimeCacheInfoHobGuid HOB.
@@ -1644,8 +1659,14 @@ InitVariableCache (
   UINTN                        AllocatedVolatileCacheSize;
   VARIABLE_RUNTIME_CACHE_INFO  *VariableRuntimeCacheInfo;
   VOID                         *RuntimeBuffer;
-  EFI_PHYSICAL_ADDRESS         RuntimeBufferPhysicalAddress;
   UINTN                        Pages;
+
+  // Storage for temporary allocations - only committed to mVariableRtCacheInfo if all succeed
+  EFI_PHYSICAL_ADDRESS  TempCacheInfoBuffer             = 0;
+  EFI_PHYSICAL_ADDRESS  TempHobCacheBuffer              = 0;
+  EFI_PHYSICAL_ADDRESS  TempNvCacheBuffer               = 0;
+  EFI_PHYSICAL_ADDRESS  TempVolatileCacheBuffer         = 0;
+  BOOLEAN               AllRtBufferAllocationsSucceeded = TRUE;
 
   //
   // Get needed runtime cache buffer size and check if auth variables are to be used from SMM
@@ -1682,101 +1703,143 @@ InitVariableCache (
                       AllocateAnyPages,
                       EfiRuntimeServicesData,
                       Pages,
-                      &RuntimeBufferPhysicalAddress
+                      &TempCacheInfoBuffer
                       );
-      if (!EFI_ERROR (Status)) {
-        RuntimeBuffer = (VOID *)(UINTN)RuntimeBufferPhysicalAddress;
-        CopyMem (RuntimeBuffer, (VOID *)(UINTN)mVariableRtCacheInfo.CacheInfoFlagBuffer, sizeof (CACHE_INFO_FLAG));
-        mVariableRtCacheInfo.CacheInfoFlagBuffer = (UINTN)RuntimeBuffer;
-
-        Status = MmUnblockMemoryRequest (RuntimeBufferPhysicalAddress, Pages);
-        if ((Status != EFI_UNSUPPORTED) && EFI_ERROR (Status)) {
-          return Status;
-        }
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_WARN, "Failed to allocate runtime CacheInfoFlag buffer: %r\n", Status));
+        AllRtBufferAllocationsSucceeded = FALSE;
       } else {
-        return Status;
+        Status = MmUnblockMemoryRequest (TempCacheInfoBuffer, Pages);
+        if ((Status != EFI_UNSUPPORTED) && EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_WARN, "Failed to unblock CacheInfoFlag buffer: %r\n", Status));
+          gBS->FreePages (TempCacheInfoBuffer, Pages);
+          TempCacheInfoBuffer             = 0;
+          AllRtBufferAllocationsSucceeded = FALSE;
+        }
       }
     }
 
-    //
-    // Relocate RuntimeHobCache buffer from boot services to runtime services
-    //
-    if ((mVariableRtCacheInfo.RuntimeHobCacheBuffer != 0) && (AllocatedHobCacheSize > 0)) {
+    if (AllRtBufferAllocationsSucceeded && (mVariableRtCacheInfo.RuntimeHobCacheBuffer != 0) && (AllocatedHobCacheSize > 0)) {
       Pages  = EFI_SIZE_TO_PAGES (AllocatedHobCacheSize);
       Status = gBS->AllocatePages (
                       AllocateAnyPages,
                       EfiRuntimeServicesData,
                       Pages,
-                      &RuntimeBufferPhysicalAddress
+                      &TempHobCacheBuffer
                       );
-      if (!EFI_ERROR (Status)) {
-        RuntimeBuffer = (VOID *)(UINTN)RuntimeBufferPhysicalAddress;
-        CopyMem (RuntimeBuffer, (VOID *)(UINTN)mVariableRtCacheInfo.RuntimeHobCacheBuffer, AllocatedHobCacheSize);
-        mVariableRtCacheInfo.RuntimeHobCacheBuffer = (UINTN)RuntimeBuffer;
-
-        Status = MmUnblockMemoryRequest (RuntimeBufferPhysicalAddress, Pages);
-        if ((Status != EFI_UNSUPPORTED) && EFI_ERROR (Status)) {
-          return Status;
-        }
-
-        InitVariableStoreHeader (RuntimeBuffer, AllocatedHobCacheSize);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_WARN, "Failed to allocate runtime HOB cache buffer: %r\n", Status));
+        AllRtBufferAllocationsSucceeded = FALSE;
       } else {
-        return Status;
+        Status = MmUnblockMemoryRequest (TempHobCacheBuffer, Pages);
+        if ((Status != EFI_UNSUPPORTED) && EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_WARN, "Failed to unblock HOB cache buffer: %r\n", Status));
+          gBS->FreePages (TempHobCacheBuffer, Pages);
+          TempHobCacheBuffer              = 0;
+          AllRtBufferAllocationsSucceeded = FALSE;
+        }
       }
     }
 
-    //
-    // Relocate RuntimeNvCache buffer from boot services to runtime services
-    //
-    if ((mVariableRtCacheInfo.RuntimeNvCacheBuffer != 0) && (AllocatedNvCacheSize > 0)) {
+    if (AllRtBufferAllocationsSucceeded && (mVariableRtCacheInfo.RuntimeNvCacheBuffer != 0) && (AllocatedNvCacheSize > 0)) {
       Pages  = EFI_SIZE_TO_PAGES (AllocatedNvCacheSize);
       Status = gBS->AllocatePages (
                       AllocateAnyPages,
                       EfiRuntimeServicesData,
                       Pages,
-                      &RuntimeBufferPhysicalAddress
+                      &TempNvCacheBuffer
                       );
-      if (!EFI_ERROR (Status)) {
-        RuntimeBuffer = (VOID *)(UINTN)RuntimeBufferPhysicalAddress;
-        CopyMem (RuntimeBuffer, (VOID *)(UINTN)mVariableRtCacheInfo.RuntimeNvCacheBuffer, AllocatedNvCacheSize);
-        mVariableRtCacheInfo.RuntimeNvCacheBuffer = (UINTN)RuntimeBuffer;
-
-        Status = MmUnblockMemoryRequest (RuntimeBufferPhysicalAddress, Pages);
-        if ((Status != EFI_UNSUPPORTED) && EFI_ERROR (Status)) {
-          return Status;
-        }
-
-        InitVariableStoreHeader (RuntimeBuffer, AllocatedNvCacheSize);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_WARN, "Failed to allocate runtime NV cache buffer: %r\n", Status));
+        AllRtBufferAllocationsSucceeded = FALSE;
       } else {
-        return Status;
+        Status = MmUnblockMemoryRequest (TempNvCacheBuffer, Pages);
+        if ((Status != EFI_UNSUPPORTED) && EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_WARN, "Failed to unblock NV cache buffer: %r\n", Status));
+          gBS->FreePages (TempNvCacheBuffer, Pages);
+          TempNvCacheBuffer               = 0;
+          AllRtBufferAllocationsSucceeded = FALSE;
+        }
       }
     }
 
-    //
-    // Relocate RuntimeVolatileCache buffer from boot services to runtime services
-    //
-    if ((mVariableRtCacheInfo.RuntimeVolatileCacheBuffer != 0) && (AllocatedVolatileCacheSize > 0)) {
+    if (AllRtBufferAllocationsSucceeded && (mVariableRtCacheInfo.RuntimeVolatileCacheBuffer != 0) && (AllocatedVolatileCacheSize > 0)) {
       Pages  = EFI_SIZE_TO_PAGES (AllocatedVolatileCacheSize);
       Status = gBS->AllocatePages (
                       AllocateAnyPages,
                       EfiRuntimeServicesData,
                       Pages,
-                      &RuntimeBufferPhysicalAddress
+                      &TempVolatileCacheBuffer
                       );
-      if (!EFI_ERROR (Status)) {
-        RuntimeBuffer = (VOID *)(UINTN)RuntimeBufferPhysicalAddress;
-        CopyMem (RuntimeBuffer, (VOID *)(UINTN)mVariableRtCacheInfo.RuntimeVolatileCacheBuffer, AllocatedVolatileCacheSize);
-        mVariableRtCacheInfo.RuntimeVolatileCacheBuffer = (UINTN)RuntimeBuffer;
-
-        Status = MmUnblockMemoryRequest (RuntimeBufferPhysicalAddress, Pages);
-        if ((Status != EFI_UNSUPPORTED) && EFI_ERROR (Status)) {
-          return Status;
-        }
-
-        InitVariableStoreHeader (RuntimeBuffer, AllocatedVolatileCacheSize);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_WARN, "Failed to allocate runtime volatile cache buffer: %r\n", Status));
+        AllRtBufferAllocationsSucceeded = FALSE;
       } else {
-        return Status;
+        Status = MmUnblockMemoryRequest (TempVolatileCacheBuffer, Pages);
+        if ((Status != EFI_UNSUPPORTED) && EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_WARN, "Failed to unblock volatile cache buffer: %r\n", Status));
+          gBS->FreePages (TempVolatileCacheBuffer, Pages);
+          TempVolatileCacheBuffer         = 0;
+          AllRtBufferAllocationsSucceeded = FALSE;
+        }
       }
+    }
+
+    if (AllRtBufferAllocationsSucceeded) {
+      if (TempCacheInfoBuffer != 0) {
+        RuntimeBuffer = (VOID *)(UINTN)TempCacheInfoBuffer;
+        CopyMem (RuntimeBuffer, (VOID *)(UINTN)mVariableRtCacheInfo.CacheInfoFlagBuffer, sizeof (CACHE_INFO_FLAG));
+        mVariableRtCacheInfo.CacheInfoFlagBuffer = TempCacheInfoBuffer;
+      }
+
+      if (TempHobCacheBuffer != 0) {
+        RuntimeBuffer = (VOID *)(UINTN)TempHobCacheBuffer;
+        CopyMem (RuntimeBuffer, (VOID *)(UINTN)mVariableRtCacheInfo.RuntimeHobCacheBuffer, AllocatedHobCacheSize);
+        mVariableRtCacheInfo.RuntimeHobCacheBuffer = TempHobCacheBuffer;
+        InitVariableStoreHeader (RuntimeBuffer, AllocatedHobCacheSize);
+      }
+
+      if (TempNvCacheBuffer != 0) {
+        RuntimeBuffer = (VOID *)(UINTN)TempNvCacheBuffer;
+        CopyMem (RuntimeBuffer, (VOID *)(UINTN)mVariableRtCacheInfo.RuntimeNvCacheBuffer, AllocatedNvCacheSize);
+        mVariableRtCacheInfo.RuntimeNvCacheBuffer = TempNvCacheBuffer;
+        InitVariableStoreHeader (RuntimeBuffer, AllocatedNvCacheSize);
+      }
+
+      if (TempVolatileCacheBuffer != 0) {
+        RuntimeBuffer = (VOID *)(UINTN)TempVolatileCacheBuffer;
+        CopyMem (RuntimeBuffer, (VOID *)(UINTN)mVariableRtCacheInfo.RuntimeVolatileCacheBuffer, AllocatedVolatileCacheSize);
+        mVariableRtCacheInfo.RuntimeVolatileCacheBuffer = TempVolatileCacheBuffer;
+        InitVariableStoreHeader (RuntimeBuffer, AllocatedVolatileCacheSize);
+      }
+
+      DEBUG ((DEBUG_INFO, "Runtime variable cache buffers successfully relocated\n"));
+    } else {
+      //
+      // One or more allocations failed - clean up any successful allocations
+      // and disable runtime caching entirely
+      //
+      if (TempCacheInfoBuffer != 0) {
+        gBS->FreePages (TempCacheInfoBuffer, EFI_SIZE_TO_PAGES (sizeof (CACHE_INFO_FLAG)));
+      }
+
+      if (TempHobCacheBuffer != 0) {
+        gBS->FreePages (TempHobCacheBuffer, EFI_SIZE_TO_PAGES (AllocatedHobCacheSize));
+      }
+
+      if (TempNvCacheBuffer != 0) {
+        gBS->FreePages (TempNvCacheBuffer, EFI_SIZE_TO_PAGES (AllocatedNvCacheSize));
+      }
+
+      if (TempVolatileCacheBuffer != 0) {
+        gBS->FreePages (TempVolatileCacheBuffer, EFI_SIZE_TO_PAGES (AllocatedVolatileCacheSize));
+      }
+
+      InvalidateAllRuntimeCaches ();
+
+      DEBUG ((DEBUG_WARN, "Runtime variable cache disabled due to allocation failure.\n"));
+
+      // Don't return failure - the variable service can function without the runtime cache
     }
   }
 
