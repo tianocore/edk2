@@ -58,7 +58,6 @@
 #include <Protocol/UnicodeCollation.h>
 #include <Protocol/PciRootBridgeIo.h>
 #include <Protocol/PciIo.h>
-#include <Protocol/ScsiPassThru.h>
 #include <Protocol/ScsiPassThruExt.h>
 #include <Protocol/ScsiIo.h>
 #include <Protocol/IScsiInitiatorName.h>
