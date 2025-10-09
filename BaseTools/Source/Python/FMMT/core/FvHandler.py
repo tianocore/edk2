@@ -9,6 +9,7 @@ from core.BiosTree import *
 from core.GuidTools import GUIDTools
 from core.BiosTreeNode import *
 from FirmwareStorageFormat.Common import *
+from FirmwareStorageFormat.FfsFileHeader import *
 from utils.FmmtLogger import FmmtLogger as logger
 
 EFI_FVB2_ERASE_POLARITY = 0x00000800
@@ -704,6 +705,33 @@ class FvHandler:
         return self.Status
 
     def Ffs_PecoffRebase(self):
+        # --- FFS type filtering, only do PE/TE rebase for specific FFS types ---
+        ALLOWED_REBASE_TYPES = {
+            EFI_FV_FILETYPE_SECURITY_CORE,
+            EFI_FV_FILETYPE_PEI_CORE,
+            EFI_FV_FILETYPE_DXE_CORE,
+            EFI_FV_FILETYPE_PEIM,
+            EFI_FV_FILETYPE_DRIVER,
+            EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER,
+            EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE,
+        }
+        if self.NewFfs.Data.Header.Type not in ALLOWED_REBASE_TYPES:
+            return
+
+        # Recursively process child Fv
+        if self.NewFfs.Data.Header.Type == EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE:
+            # Traverse all FFS file nodes in child Fv and recursively rebase
+            for child in self.NewFfs.Child:
+                # Only process FFS file type nodes
+                if hasattr(child, 'Data') and hasattr(child.Data, 'Header') and hasattr(child.Data.Header, 'Type'):
+                    # Avoid infinite recursion, exclude non-FFS types
+                    if child.Data.Header.Type in ALLOWED_REBASE_TYPES:
+                        # Construct recursive FvHandler instance
+                        sub_handler = FvHandler(child)
+                        sub_handler.Ffs_PecoffRebase()
+            # After recursion, return directly, do not process PE/TE
+            return
+
         new_pe_exist = False
         origin_pe_exist = False
         # Handle the current FFS being replaced - check for PE32
@@ -711,6 +739,15 @@ class FvHandler:
             if NewSection.Data.Type == EFI_SECTION_PE32 or NewSection.Data.Type == EFI_SECTION_TE:
                 if NewSection.Child[0].Data.Name == 'PeCoff':
                     New_Pecoff = NewSection.Child[0]
+                    # Check and complete the relocation table (reloc section) for PE/COFF or TE image
+                    # If there is no relocation table, complete it; if present, skip
+                    if hasattr(New_Pecoff.Data, 'FillPeReloc'):
+                        # If HasRelocTable method exists, check first; otherwise, complete directly (idempotent)
+                        if hasattr(New_Pecoff.Data, 'HasRelocTable'):
+                            if not New_Pecoff.Data.HasRelocTable():
+                                New_Pecoff.Data.FillPeReloc()
+                        else:
+                            New_Pecoff.Data.FillPeReloc()
                     new_pe_image_address = NewSection.Child[0].Data.ImageAddress if hasattr(NewSection.Child[0].Data, 'ImageAddress') else 0
                     new_pe_exist = True
                     break
@@ -754,8 +791,23 @@ class FvHandler:
         # Rebase subsequent FFS files in the SAME FV only
         self._rebase_subsequent_ffs_in_current_fv()
 
+        # Checksum and update
+        # 1. FFS checksum
+        if hasattr(self.NewFfs, 'Data') and hasattr(self.NewFfs.Data, 'ModCheckSum'):
+            self.NewFfs.Data.ModCheckSum()
+        # 2. FV alignment/capacity refresh (if parent FV node exists)
+        if hasattr(self.NewFfs, 'Parent') and self.NewFfs.Parent and hasattr(self.NewFfs.Parent, 'Data'):
+            if hasattr(self.NewFfs.Parent.Data, 'ModFvExt'):
+                self.NewFfs.Parent.Data.ModFvExt()
+            if hasattr(self.NewFfs.Parent.Data, 'ModFvSize'):
+                self.NewFfs.Parent.Data.ModFvSize()
+            if hasattr(self.NewFfs.Parent.Data, 'ModExtHeaderData'):
+                self.NewFfs.Parent.Data.ModExtHeaderData()
+            if hasattr(self.NewFfs.Parent.Data, 'ModCheckSum'):
+                self.NewFfs.Parent.Data.ModCheckSum()
+
     def _rebase_subsequent_ffs_in_current_fv(self):
-        """Rebase PE/COFF images in subsequent FFS files within the current FV only"""
+        # Rebase PE/COFF images in subsequent FFS files within the current FV only
         if not hasattr(self, 'TargetFfs') or self.TargetFfs is None:
             return
 
@@ -787,9 +839,12 @@ class FvHandler:
                 continue
             # Look for PE32 sections in this FFS and rebase them
             self._rebase_ffs_pe_sections(subsequent_ffs, size_delta)
+            # Checksum update
+            if hasattr(subsequent_ffs, 'Data') and hasattr(subsequent_ffs.Data, 'ModCheckSum'):
+                subsequent_ffs.Data.ModCheckSum()
 
     def _rebase_ffs_pe_sections(self, ffs_node, address_delta):
-        """Rebase PE/COFF and TE images in a specific FFS node"""
+        # Rebase PE/COFF and TE images in a specific FFS node
         found_pe = False
         for section in ffs_node.Child:
             # Check for PE32 sections
@@ -800,6 +855,9 @@ class FvHandler:
                         child.Data.PeCoffRebase(address_delta)
                         section.Data.Data = child.Data.Data
                         found_pe = True
+                        # Checksum update
+                        if hasattr(ffs_node, 'Data') and hasattr(ffs_node.Data, 'ModCheckSum'):
+                            ffs_node.Data.ModCheckSum()
                         break
 
             # Handle nested sections recursively
@@ -813,7 +871,7 @@ class FvHandler:
         return found_pe
 
     def _rebase_nested_sections(self, section_node, address_delta):
-        """Recursively rebase PE/COFF and TE images in nested sections within current FV"""
+        # Recursively rebase PE/COFF and TE images in nested sections within current FV
         found_pe = False
         for child in section_node.Child:
             # Check for PE32 sections
