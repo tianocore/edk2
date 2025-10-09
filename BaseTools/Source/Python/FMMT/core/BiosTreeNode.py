@@ -304,6 +304,112 @@ class PeCoffNode:
         if self.IfRebase:
             self.PeCoffParseReloc()
 
+    def HasRelocTable(self) -> bool:
+        """
+        Check if the PE/COFF image has a valid relocation table.
+        Returns True if the relocation table exists and is non-empty, False otherwise.
+        """
+        # For TE image
+        if self.IsTeImage:
+            # DataDirectory[0] is Base Relocation Table
+            if hasattr(self.TeHeader, 'DataDirectory') and self.TeHeader.DataDirectory[0].Size > 0:
+                return True
+            return False
+        # For PE image
+        if self.PeHeader:
+            if hasattr(self.PeHeader.Pe32, 'OptionalHeader'):
+                dir_entry = self.PeHeader.Pe32.OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC]
+                if dir_entry.Size > 0:
+                    return True
+            if hasattr(self.PeHeader, 'Pe32Plus') and hasattr(self.PeHeader.Pe32Plus, 'OptionalHeader'):
+                dir_entry = self.PeHeader.Pe32Plus.OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC]
+                if dir_entry.Size > 0:
+                    return True
+        return False
+
+    def FillPeReloc(self) -> bool:
+        """
+        Supplement the PE/COFF relocation table if missing or incomplete.
+        Returns True if the table was supplemented, False otherwise.
+        """
+        from ctypes import sizeof, c_uint16, c_uint32
+        from FirmwareStorageFormat.PECOFFHeader import EFI_IMAGE_BASE_RELOCATION, EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC, EFI_IMAGE_SIZEOF_BASE_RELOCATION
+
+        # If already has a reloc table, do nothing
+        if self.HasRelocTable():
+            return False
+
+        # For TE image
+        if self.IsTeImage and self.TeHeader:
+            if hasattr(self.TeHeader, 'DataDirectory') and self.TeHeader.DataDirectory[0].Size == 0:
+                # Check if Data is valid
+                if not isinstance(self.Data, (bytes, bytearray)):
+                    logger.error('TE image Data is not bytes/bytearray')
+                    return False
+                # Construct the minimal valid reloc block
+                reloc = EFI_IMAGE_BASE_RELOCATION()
+                reloc.VirtualAddress = 0
+                reloc.SizeOfBlock = EFI_IMAGE_SIZEOF_BASE_RELOCATION + 2  # header+1个WORD
+                reloc_block = bytes(reloc) + (c_uint16(0).value).to_bytes(2, 'little')
+                # Boundary check: DataDirectory[0].VirtualAddress must not overflow
+                va = len(self.Data)
+                if va > 0xFFFFFFFF:
+                    logger.error('Reloc VA overflow for TE image')
+                    return False
+                self.TeHeader.DataDirectory[0].VirtualAddress = va
+                self.TeHeader.DataDirectory[0].Size = len(reloc_block)
+                self.Data += reloc_block
+                return True
+            return False
+
+        # For PE image
+        if self.PeHeader:
+            # 32-bit PE
+            if hasattr(self.PeHeader.Pe32, 'OptionalHeader'):
+                opt = self.PeHeader.Pe32.OptionalHeader
+                # Check NumberOfRvaAndSizes
+                if hasattr(opt, 'NumberOfRvaAndSizes') and opt.NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC:
+                    dir_entry = opt.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC]
+                    if dir_entry.Size == 0:
+                        # Check if Data is valid
+                        if not isinstance(self.Data, (bytes, bytearray)):
+                            logger.error('PE image Data is not bytes/bytearray')
+                            return False
+                        reloc = EFI_IMAGE_BASE_RELOCATION()
+                        reloc.VirtualAddress = 0
+                        reloc.SizeOfBlock = EFI_IMAGE_SIZEOF_BASE_RELOCATION + 2
+                        reloc_block = bytes(reloc) + (c_uint16(0).value).to_bytes(2, 'little')
+                        va = len(self.Data)
+                        if va > 0xFFFFFFFF:
+                            logger.error('Reloc VA overflow for PE32')
+                            return False
+                        dir_entry.VirtualAddress = va
+                        dir_entry.Size = len(reloc_block)
+                        self.Data += reloc_block
+                        return True
+            # 64-bit PE
+            if hasattr(self.PeHeader, 'Pe32Plus') and hasattr(self.PeHeader.Pe32Plus, 'OptionalHeader'):
+                opt = self.PeHeader.Pe32Plus.OptionalHeader
+                if hasattr(opt, 'NumberOfRvaAndSizes') and opt.NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC:
+                    dir_entry = opt.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC]
+                    if dir_entry.Size == 0:
+                        if not isinstance(self.Data, (bytes, bytearray)):
+                            logger.error('PE+ image Data is not bytes/bytearray')
+                            return False
+                        reloc = EFI_IMAGE_BASE_RELOCATION()
+                        reloc.VirtualAddress = 0
+                        reloc.SizeOfBlock = EFI_IMAGE_SIZEOF_BASE_RELOCATION + 2
+                        reloc_block = bytes(reloc) + (c_uint16(0).value).to_bytes(2, 'little')
+                        va = len(self.Data)
+                        if va > 0xFFFFFFFF:
+                            logger.error('Reloc VA overflow for PE32+')
+                            return False
+                        dir_entry.VirtualAddress = va
+                        dir_entry.Size = len(reloc_block)
+                        self.Data += reloc_block
+                        return True
+        return False
+
     def PeCoffLoaderCheckImageType(self) -> None:
         MachineTypeList = [EFI_IMAGE_FILE_MACHINE_I386, EFI_IMAGE_FILE_MACHINE_EBC, EFI_IMAGE_FILE_MACHINE_X64, EFI_IMAGE_FILE_MACHINE_ARMT, EFI_IMAGE_FILE_MACHINE_ARM64, EFI_IMAGE_FILE_MACHINE_RISCV64]
         ImageTypeList = [EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION, EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER, EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER, EFI_IMAGE_SUBSYSTEM_SAL_RUNTIME_DRIVER]
@@ -380,7 +486,25 @@ class PeCoffNode:
                 self.RelocList.append((EachRType, TarROff))
             CurOff += self.BlkHeader.BlockSize
 
-    def PeCoffRebase(self, DeltaSize=0, CalcuFlag=0) -> None:  # if CalcuFlag is set to 0, DeltaSize is a delta address, if set to 1, DeltaSize is a absolute address
+    def PeCoffRebase(self, DeltaSize=0, CalcuFlag=0, base_address=None, xip_offset=0) -> None:
+        """
+        Support absolute base address (base_address) and XIP offset (xip_offset) parameters, compatible with original DeltaSize/CalcuFlag logic.
+        base_address has higher priority than DeltaSize/CalcuFlag.
+        """
+        # If base_address is explicitly specified, force absolute relocation
+        # XIP offset can be used for future extension (if needed)
+        ## Rebase function
+        # Architecture relocation type table driven
+        SUPPORTED_RELOC_TYPES = {
+            3: 4,   # IMAGE_REL_BASED_HIGHLOW (x86/x64 32bit)
+            10: 8,  # IMAGE_REL_BASED_DIR64 (x64 64bit)
+            # Extendable: e.g. ARM/ARM64 etc.
+        }
+        # If base_address is explicitly specified, force absolute relocation
+        if base_address is not None:
+            CalcuFlag = 1
+            DeltaSize = base_address
+        # XIP offset can be used for future extension (if needed)
         if self.TeHeader:
             ImageBase = self.TeHeader.ImageBase
             CurOff = self.offset + EFI_TE_IMAGE_HEADER.ImageBase.offset
@@ -426,16 +550,15 @@ class PeCoffNode:
                 CurValue = self.ImageAddress
         self.Data = self.Data[:CurOff-self.offset] + CurValue.to_bytes(ImageBaseSize, byteorder='little',signed=False) + self.Data[CurOff-self.offset+ImageBaseSize:]
 
-        ## Rebase function
         for (EachRType, TarROff) in self.RelocList:
-            if EachRType == 3: # IMAGE_REL_BASED_HIGHLOW
-                CurValue = Bytes2Val(self.Data[TarROff-self.offset:TarROff+4-self.offset])
+            if EachRType in SUPPORTED_RELOC_TYPES:
+                size = SUPPORTED_RELOC_TYPES[EachRType]
+                CurValue = Bytes2Val(self.Data[TarROff-self.offset:TarROff+size-self.offset])
                 CurValue += DeltaSize
-                self.Data = self.Data[:TarROff-self.offset] + CurValue.to_bytes(4, byteorder='little',signed=False) + self.Data[TarROff+4-self.offset:]
-            elif EachRType == 10: # IMAGE_REL_BASED_DIR64
-                CurValue = Bytes2Val(self.Data[TarROff-self.offset:TarROff+8-self.offset])
-                CurValue += DeltaSize
-                self.Data = self.Data[:TarROff-self.offset] + CurValue.to_bytes(8, byteorder='little',signed=False) + self.Data[TarROff+8-self.offset:]
+                self.Data = self.Data[:TarROff-self.offset] + CurValue.to_bytes(size, byteorder='little',signed=False) + self.Data[TarROff+size-self.offset:]
+            else:
+                logger.error(f"ERROR: Unsupported relocation type {EachRType}! (please extend SUPPORTED_RELOC_TYPES)")
+                raise Exception(f"ERROR: Unsupported relocation type {EachRType}! (please extend SUPPORTED_RELOC_TYPES)")
 
 class FreeSpaceNode:
     def __init__(self, buffer: bytes) -> None:
