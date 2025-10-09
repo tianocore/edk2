@@ -197,6 +197,65 @@ ScsiDiskDriverBindingSupported (
 }
 
 /**
+ Check whether the SCSI disk is write protected.
+
+ @param[in]  ScsiDiskDevice         The SCSI disk device.
+ @param[out] WriteProtectionEnabled A pointer to a Boolean that will be set to TRUE if the disk is write protected,
+                                    FALSE otherwise.
+
+ @retval EFI_SUCCESS                The operation completed successfully.
+ @retval other                      An error occurred while executing the SCSI command.
+ */
+STATIC
+EFI_STATUS
+IsWriteProtected (
+  IN OUT SCSI_DISK_DEV  *ScsiDiskDevice,
+  OUT BOOLEAN           *WriteProtectionEnabled
+  )
+{
+  EFI_STATUS                       Status;
+  EFI_SCSI_IO_SCSI_REQUEST_PACKET  CommandPacket;
+  UINT8                            Cdb[6];
+  UINT8                            DataBuffer[64];
+
+  if ((ScsiDiskDevice == NULL) || (ScsiDiskDevice->ScsiIo == NULL) || (WriteProtectionEnabled == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Initialize SCSI REQUEST_PACKET and 6-byte Cdb
+  //
+  ZeroMem (&CommandPacket, sizeof (CommandPacket));
+  ZeroMem (Cdb, sizeof (Cdb));
+
+  // Initialize output parameter to default value
+  *WriteProtectionEnabled = FALSE;
+
+  Cdb[0] = ATA_CMD_MODE_SENSE6;
+  Cdb[1] = BIT3;                         // Setting the bit for Disable Block Descriptor
+  Cdb[2] = ATA_PAGE_CODE_RETURN_ALL_PAGES;
+  Cdb[4] = sizeof (DataBuffer);
+
+  CommandPacket.Timeout          = SCSI_DISK_TIMEOUT;
+  CommandPacket.Cdb              = Cdb;
+  CommandPacket.CdbLength        = (UINT8)sizeof (Cdb);
+  CommandPacket.InDataBuffer     = &DataBuffer;
+  CommandPacket.InTransferLength = sizeof (DataBuffer);
+
+  Status = ScsiDiskDevice->ScsiIo->ExecuteScsiCommand (ScsiDiskDevice->ScsiIo, &CommandPacket, NULL);
+
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // Mode Sense 6 Byte Command returns the Write Protection status in the 3rd byte
+  // Bit 7 of the 3rd byte indicates the Write Protection status
+  // See SCSI Block Commands - 3 section 6.3.1 and SCSI-2 Spec, 8.3.3.
+  *WriteProtectionEnabled = (DataBuffer[2] & BIT7) != 0;
+  return EFI_SUCCESS;
+}
+
+/**
   Start this driver on ControllerHandle.
 
   This service is called by the EFI boot service ConnectController(). In order
@@ -234,6 +293,7 @@ ScsiDiskDriverBindingStart (
   CHAR8                 VendorStr[VENDOR_IDENTIFICATION_LENGTH + 1];
   CHAR8                 ProductStr[PRODUCT_IDENTIFICATION_LENGTH + 1];
   CHAR16                DeviceStr[VENDOR_IDENTIFICATION_LENGTH + PRODUCT_IDENTIFICATION_LENGTH + 2];
+  BOOLEAN               WriteProtectionEnabled = FALSE;
 
   MustReadCapacity = TRUE;
 
@@ -295,6 +355,17 @@ ScsiDiskDriverBindingStart (
     case EFI_SCSI_TYPE_WLUN:
       MustReadCapacity = FALSE;
       break;
+  }
+
+  if (ScsiDiskDevice->DeviceType == EFI_SCSI_TYPE_DISK) {
+    Status = IsWriteProtected (ScsiDiskDevice, &WriteProtectionEnabled);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "ScsiDisk: IsWriteProtected() fails. Status = %r\n", Status));
+    }
+
+    if (WriteProtectionEnabled) {
+      ScsiDiskDevice->BlkIo.Media->ReadOnly = TRUE;
+    }
   }
 
   //
