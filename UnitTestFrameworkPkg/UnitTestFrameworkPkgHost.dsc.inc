@@ -27,6 +27,7 @@
   HostMemoryAllocationBelowAddressLib|UnitTestFrameworkPkg/Library/Posix/MemoryAllocationLibPosix/MemoryAllocationLibPosix.inf
   UefiBootServicesTableLib|UnitTestFrameworkPkg/Library/UnitTestUefiBootServicesTableLib/UnitTestUefiBootServicesTableLib.inf
   PeiServicesTablePointerLib|UnitTestFrameworkPkg/Library/UnitTestPeiServicesTablePointerLib/UnitTestPeiServicesTablePointerLib.inf
+  PvPanicLib|MdePkg/Library/PvPanicNull/PvPanicNull.inf
   NULL|UnitTestFrameworkPkg/Library/UnitTestDebugAssertLib/UnitTestDebugAssertLibHost.inf
   NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNullHostApplication.inf
 
