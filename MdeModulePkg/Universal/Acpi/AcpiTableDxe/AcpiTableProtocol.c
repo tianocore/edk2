@@ -1,7 +1,7 @@
 /** @file
   ACPI Table Protocol Implementation
 
-  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2025, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -1960,8 +1960,8 @@ InstallAcpiTableFromHob (
 **/
 EFI_STATUS
 InstallAcpiTableFromAcpiSiliconHob (
-  EFI_ACPI_TABLE_INSTANCE  *AcpiTableInstance,
-  EFI_HOB_GUID_TYPE        *GuidHob
+  IN OUT EFI_ACPI_TABLE_INSTANCE  *AcpiTableInstance,
+  IN     EFI_HOB_GUID_TYPE        *GuidHob
   )
 {
   ACPI_SILICON_HOB                              *AcpiSiliconHob;
@@ -1978,6 +1978,8 @@ InstallAcpiTableFromAcpiSiliconHob (
   UINT8                                         *Buffer;
   EFI_PHYSICAL_ADDRESS                          PageAddress;
   UINTN                                         TotalSocTablesize;
+  UINT8                                         *Pointer;
+  EFI_MEMORY_TYPE                               AcpiAllocateMemoryType;
 
   DEBUG ((DEBUG_INFO, "InstallAcpiTableFromAcpiSiliconHob - Start\n"));
   //
@@ -1989,6 +1991,13 @@ InstallAcpiTableFromAcpiSiliconHob (
   Status            = EFI_SUCCESS;
   Version           = PcdGet32 (PcdAcpiExposedTableVersions);
   TableKey          = 0;
+
+  if (PcdGetBool (PcdNoACPIReclaimMemory)) {
+    AcpiAllocateMemoryType = EfiACPIMemoryNVS;
+  } else {
+    AcpiAllocateMemoryType = EfiACPIReclaimMemory;
+  }
+
   //
   // Got RSDP table from ACPI Silicon Hob.
   //
@@ -2018,26 +2027,47 @@ InstallAcpiTableFromAcpiSiliconHob (
   // Calcaue 64bit Acpi table number.
   //
   NumOfTblEntries = (SiCommonAcpiTable->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) / sizeof (UINT64);
-  DEBUG ((DEBUG_ERROR, "64bit NumOfTblEntries : 0x%x\n", NumOfTblEntries));
+  DEBUG ((DEBUG_INFO, "64bit NumOfTblEntries : 0x%x\n", NumOfTblEntries));
   //
   // Reserved the ACPI reclaim memory for XSDT.
   //
-  //
-  TotalSocTablesize = sizeof (EFI_ACPI_DESCRIPTION_HEADER) + sizeof (UINT64);
-  PageAddress       = 0xFFFFFFFF;
-  Status            = gBS->AllocatePages (
-                             mAcpiTableAllocType,
-                             EfiACPIReclaimMemory,
-                             EFI_SIZE_TO_PAGES (TotalSocTablesize),
-                             &PageAddress
-                             );
+  TotalSocTablesize = sizeof (EFI_ACPI_DESCRIPTION_HEADER) + (mEfiAcpiMaxNumTables * sizeof (UINT64));
+  if (mAcpiTableAllocType != AllocateAnyPages) {
+    //
+    // Allocate memory in the lower 32 bit of address range for
+    // compatibility with ACPI 1.0 OS.
+    //
+    // This is done because ACPI 1.0 pointers are 32 bit values.
+    // ACPI 2.0 OS and all 64 bit OS must use the 64 bit ACPI table addresses.
+    // There is no architectural reason these should be below 4GB, it is purely
+    // for convenience of implementation that we force memory below 4GB.
+    //
+    PageAddress = 0xFFFFFFFF;
+    Status      = gBS->AllocatePages (
+                         mAcpiTableAllocType,
+                         AcpiAllocateMemoryType,
+                         EFI_SIZE_TO_PAGES (TotalSocTablesize),
+                         &PageAddress
+                         );
+  } else {
+    Status = gBS->AllocatePool (
+                    AcpiAllocateMemoryType,
+                    TotalSocTablesize,
+                    (VOID **)&Pointer
+                    );
+  }
+
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Fail to allocate EfiACPIReclaimMemory for XSDT. Status : %r\n", Status));
     return EFI_OUT_OF_RESOURCES;
   }
 
-  ZeroMem (&PageAddress, TotalSocTablesize);
-  AcpiTableInstance->Xsdt = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)PageAddress;
+  if (mAcpiTableAllocType != AllocateAnyPages) {
+    Pointer = (UINT8 *)(UINTN)PageAddress;
+  }
+
+  ZeroMem (Pointer, TotalSocTablesize);
+  AcpiTableInstance->Xsdt = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)Pointer;
 
   //
   // Initial XSDT table content.
@@ -2112,6 +2142,16 @@ InstallAcpiTableFromAcpiSiliconHob (
       DEBUG ((DEBUG_ERROR, "InstallAcpiTableFromAcpiSiliconHob: Fail to add ACPI table at 0x%p\n", SocEntryTable));
       ASSERT_EFI_ERROR (Status);
       break;
+    } else {
+      Status = PublishTables (AcpiTableInstance, Version);
+      if (!EFI_ERROR (Status)) {
+        //
+        // Add a new table successfully, notify registed callback
+        //
+        if (FeaturePcdGet (PcdInstallAcpiSdtProtocol)) {
+          SdtNotifyAcpiList (AcpiTableInstance, Version, TableKey);
+        }
+      }
     }
 
     if (SocEntryTable->Signature == EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
@@ -2134,7 +2174,17 @@ InstallAcpiTableFromAcpiSiliconHob (
           ASSERT_EFI_ERROR (Status);
           break;
         } else {
-          DEBUG ((DEBUG_ERROR, "Installed DSDT in the DXE Table list!\n"));
+          Status = PublishTables (AcpiTableInstance, Version);
+          if (!EFI_ERROR (Status)) {
+            //
+            // Add a new table successfully, notify registed callback
+            //
+            if (FeaturePcdGet (PcdInstallAcpiSdtProtocol)) {
+              SdtNotifyAcpiList (AcpiTableInstance, Version, TableKey);
+            }
+          }
+
+          DEBUG ((DEBUG_INFO, "Installed DSDT in the DXE Table list!\n"));
         }
       } else {
         DEBUG ((DEBUG_ERROR, "The DSDT content is not correct, then skip it!\n"));
@@ -2156,7 +2206,17 @@ InstallAcpiTableFromAcpiSiliconHob (
           ASSERT_EFI_ERROR (Status);
           break;
         } else {
-          DEBUG ((DEBUG_ERROR, "Installed FACS in the DXE Table list!\n"));
+          Status = PublishTables (AcpiTableInstance, Version);
+          if (!EFI_ERROR (Status)) {
+            //
+            // Add a new table successfully, notify registed callback
+            //
+            if (FeaturePcdGet (PcdInstallAcpiSdtProtocol)) {
+              SdtNotifyAcpiList (AcpiTableInstance, Version, TableKey);
+            }
+          }
+
+          DEBUG ((DEBUG_INFO, "Installed FACS in the DXE Table list!\n"));
         }
       } else {
         DEBUG ((DEBUG_ERROR, "The FACS content is not correct, then skip it!\n"));
