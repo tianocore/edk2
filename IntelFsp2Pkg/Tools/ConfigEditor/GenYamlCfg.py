@@ -167,7 +167,7 @@ class ExpressionEval(ast.NodeVisitor):
             return self._namespace[node.id]
 
     def visit_Num(self, node):
-        return node.n
+        return node.value
 
     def visit_NameConstant(self, node):
         return node.value
@@ -624,6 +624,8 @@ class CGenYamlCfg:
     builtin_option = {'$EN_DIS': [('0', 'Disable'), ('1', 'Enable')]}
     exclude_struct = ['FSP_UPD_HEADER', 'FSPT_ARCH_UPD',
                       'FSPM_ARCH_UPD', 'FSPS_ARCH_UPD',
+                      'FSPI_ARCH_UPD', 'FSPT_ARCH2_UPD',
+                      'FSPM_ARCH2_UPD', 'FSPS_ARCH2_UPD',
                       'GPIO_GPP_*', 'GPIO_CFG_DATA',
                       'GpioConfPad*', 'GpioPinConfig',
                       'BOOT_OPTION*', 'PLATFORMID_CFG_DATA', '\\w+_Half[01]']
@@ -730,7 +732,11 @@ class CGenYamlCfg:
 
         if count > 1:
             name = '%s[%d]' % (name, count)
-
+        #
+        # FSP[T/M/S]_ARCH2_UPD struct field name is Fsp[t/m/s]Arch2Upd,
+        # it should change to Fsp[t/m/s]ArchUpd for code compatibility.
+        #
+        name = re.sub(r'(Fsp[tms]Arch)2Upd', r'\1Upd', name)
         return name
 
     def get_mode(self):
@@ -1597,7 +1603,7 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
         if len(cfg_segs) == 3:
             fsp = True
             for idx, seg in enumerate(cfg_segs):
-                if not seg[0].endswith('UPD_%s' % 'TMS'[idx]):
+                if not seg[0].endswith('UPD_%s' % 'TMSI'[idx]):
                     fsp = False
                     break
         else:
@@ -1894,7 +1900,7 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
     def write_cfg_header_file(self, hdr_file_name, tag_mode,
                               tag_dict, struct_list):
         lines = []
-        lines.append('\n\n')
+        lines.append ('\n')
         if self.get_mode() == 'FSP':
             lines.append('#include <FspUpd.h>\n')
 
@@ -1906,15 +1912,14 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
                 continue
             lines.append('#define    %-30s 0x%03X\n' % (
                 'CDATA_%s_TAG' % tagname[:-9], tagval))
-        lines.append('\n\n')
-
+        lines.append ('\n#pragma pack(1)\n')
         name_dict = {}
         new_dict = {}
         for each in struct_list:
             if (tag_mode == 0 and each['tag'] >= 0x100) or \
                (tag_mode == 1 and each['tag'] < 0x100):
                 continue
-            new_dict[each['name']] = (each['alias'], each['count'])
+            new_dict[each['name']] = (each['alias'], each['count'], each['exclude'])
             if each['alias'] not in name_dict:
                 name_dict[each['alias']] = 1
                 lines.extend(self.create_struct(each['alias'],
@@ -1932,12 +1937,8 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
         lines = []
         lines.append("%s\n" % get_copyright_header(type))
         lines.append("#ifndef __%s__\n" % file_name_def)
-        lines.append("#define __%s__\n\n" % file_name_def)
-        if type == 'h':
-            lines.append("#pragma pack(1)\n\n")
+        lines.append ("#define __%s__\n" % file_name_def)
         lines.extend(txt_body)
-        if type == 'h':
-            lines.append("#pragma pack()\n\n")
         lines.append("#endif\n")
 
         # Don't rewrite if the contents are the same
@@ -2070,8 +2071,8 @@ xbe\x8f\x64\x12\x05\x8d\x0a\xa8'
                      bsf_name, help, option, bits_length=None):
         pos_name = 28
         name_line = ''
-        # help_line = ''
-        # option_line = ''
+        help_line=''
+        option_line=''
 
         if length == 0 and name == 'dummy':
             return '\n'
@@ -2115,11 +2116,11 @@ xbe\x8f\x64\x12\x05\x8d\x0a\xa8'
         else:
             name_line = "N/A\n"
 
-        # if help != '':
-            # help_line = self.process_multilines(help, 80)
+        if help != '':
+            help_line = self.process_multilines(help, 80)
 
-        # if option != '':
-            # option_line = self.process_multilines(option, 80)
+        if option != '':
+            option_line = self.process_multilines(option, 80)
 
         if offset is None:
             offset_str = '????'
@@ -2131,11 +2132,7 @@ xbe\x8f\x64\x12\x05\x8d\x0a\xa8'
         else:
             bits_length = ' : %d' % bits_length
 
-        # return "\n/** %s%s%s**/\n  %s%s%s%s;\n" % (name_line, help_line,
-        # option_line, type, ' ' * space1, name, bits_length)
-        return "\n  /* Offset %s: %s */\n  %s%s%s%s;\n" % (
-            offset_str, name_line.strip(), type, ' ' * space1,
-            name, bits_length)
+        return "\n/** %s%s%s**/\n  %s%s%s%s;\n" % (name_line, help_line, option_line, type, ' ' * space1, name, bits_length)
 
     def create_struct(self, cname, top, struct_dict):
         index = 0
@@ -2214,7 +2211,7 @@ xbe\x8f\x64\x12\x05\x8d\x0a\xa8'
             prompt = item['name']
             help = item['help']
             option = item['option']
-            line = self.create_field(item, name, length, offset, struct,
+            line = self.create_field(item, name, length, offset - off_base, struct,
                                      prompt, help, option, bit_length)
             lines.append('  %s' % line)
             last = struct
@@ -2231,7 +2228,7 @@ xbe\x8f\x64\x12\x05\x8d\x0a\xa8'
                      "#include <FspEas.h>\n\n"
                      "#pragma pack(1)\n\n")
         lines = []
-        for fsp_comp in 'TMS':
+        for fsp_comp in 'TMSI':
             top = self.locate_cfg_item('FSP%s_UPD' % fsp_comp)
             if not top:
                 raise Exception('Could not find FSP UPD definition !')
@@ -2278,7 +2275,7 @@ xbe\x8f\x64\x12\x05\x8d\x0a\xa8'
         else:
             hdr_mode = 1
 
-        if re.match('FSP[TMS]_UPD', path):
+        if re.match('FSP[TMSI]_UPD', path):
             hdr_mode |= 0x80
 
         # filter out the items to be built for tags and structures
@@ -2292,11 +2289,11 @@ xbe\x8f\x64\x12\x05\x8d\x0a\xa8'
                         if each not in CGenYamlCfg.include_tag:
                             del tag_dict[each]
                     break
-            if not match:
-                struct_list.append({'name': each, 'alias': '', 'count': 0,
-                                    'level': struct_dict[each][0],
-                                    'tag': struct_dict[each][1],
-                                    'node': struct_dict[each][2]})
+            struct_list.append({'name': each, 'alias': '', 'count': 0,
+                                'level': struct_dict[each][0],
+                                'tag': struct_dict[each][1],
+                                'node': struct_dict[each][2],
+                                'exclude': True if match else False})
 
         # sort by level so that the bottom level struct
         # will be build first to satisfy dependencies
