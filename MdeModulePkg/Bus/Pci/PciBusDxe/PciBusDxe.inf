@@ -97,6 +97,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport                ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration    ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarSupport     ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarMaxSize     ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   PciBusDxeExtra.uni
