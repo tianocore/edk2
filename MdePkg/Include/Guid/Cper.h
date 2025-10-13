@@ -262,6 +262,7 @@ typedef struct {
 ///@{
 #define EFI_GENERIC_ERROR_PROC_TYPE_IA32_X64  0x00
 #define EFI_GENERIC_ERROR_PROC_TYPE_IA64      0x01
+#define EFI_GENERIC_ERROR_PROC_TYPE_ARM       0x02
 ///@}
 
 ///
