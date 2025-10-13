@@ -40,7 +40,6 @@ InitializeUnicodeCollationSupportWorker (
   UINTN                           Index;
   EFI_HANDLE                      *Handles;
   EFI_UNICODE_COLLATION_PROTOCOL  *Uci;
-  BOOLEAN                         Iso639Language;
   CHAR8                           *Language;
   CHAR8                           *BestLanguage;
 
@@ -55,7 +54,6 @@ InitializeUnicodeCollationSupportWorker (
     return Status;
   }
 
-  Iso639Language = (BOOLEAN)(ProtocolGuid == &gEfiUnicodeCollation2ProtocolGuid);
   GetEfiGlobalVariable2 (VariableName, (VOID **)&Language, NULL);
 
   ReturnStatus = EFI_UNSUPPORTED;
@@ -81,7 +79,7 @@ InitializeUnicodeCollationSupportWorker (
     //
     BestLanguage = GetBestLanguage (
                      Uci->SupportedLanguages,
-                     Iso639Language,
+                     FALSE,
                      (Language == NULL) ? "" : Language,
                      DefaultLanguage,
                      NULL
