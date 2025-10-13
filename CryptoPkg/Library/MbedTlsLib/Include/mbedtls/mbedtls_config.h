@@ -118,7 +118,7 @@
  *       regardless of the setting of MBEDTLS_HAVE_TIME, unless
  *       MBEDTLS_TIMING_ALT is used. See timing.c for more information.
  */
-#define MBEDTLS_HAVE_TIME
+// #define MBEDTLS_HAVE_TIME
 
 /**
  * \def MBEDTLS_HAVE_TIME_DATE
@@ -3817,6 +3817,14 @@ mbedtls_free (
  * MBEDTLS_ECDH_LEGACY_CONTEXT in include/mbedtls/ecdh.h.
  */
 // #define MBEDTLS_ECDH_VARIANT_EVEREST_ENABLED
+
+/**
+ * \def MBEDTLS_TEST_SW_INET_PTON
+ *
+ * Enable to use inet_pton() software version
+ *
+ */
+#define MBEDTLS_TEST_SW_INET_PTON
 
 /** \} name SECTION: Module configuration options */
 

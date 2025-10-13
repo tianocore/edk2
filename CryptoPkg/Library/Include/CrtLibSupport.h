@@ -448,4 +448,30 @@ strpbrk (
 #define offsetof(type, member)  OFFSET_OF(type,member)
 #define atoi(nptr)              AsciiStrDecimalToUintn(nptr)
 
+#ifndef _BYTESWAP_DEFINED
+#define _BYTESWAP_DEFINED
+#define _byteswap_ushort  SwapBytes16
+#define _byteswap_ulong   SwapBytes32
+#define _byteswap_uint64  SwapBytes64
+#endif
+
+#ifndef SecureZeroMemory
+#define SecureZeroMemory(ptr, sz)  memset((ptr), 0, (sz))
+#endif
+
+#ifndef INT64_MAX
+#define INT64_MAX  0x7FFFFFFFFFFFFFFFL
+#define INT64_MIN  (-0x7FFFFFFFFFFFFFFFL - 1)
+#endif
+
+#ifndef UINT64_MAX
+#define UINT64_MAX  0xFFFFFFFFFFFFFFFFUL
+#endif
+
+#undef UINTPTR_MAX
+#if (UINT_MAX > 0xFFFFFFFFUL)
+#define UINTPTR_MAX  0xFFFFFFFFFFFFFFFFUL
+#else
+#define UINTPTR_MAX  0xFFFFFFFFUL
+#endif
 #endif
