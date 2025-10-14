@@ -691,7 +691,19 @@ KeyReadDataRegister (
   )
 
 {
-  return IoRead8 (ConsoleIn->DataRegisterAddress);
+  UINT32  Port;
+  UINT64  Translation;
+  UINT64  MmioAddress;
+
+  Port        = ConsoleIn->DataRegisterAddress;
+  Translation = PcdGet64 (PcdPciIoTranslation);
+  if (Translation != 0) {
+    MmioAddress = Translation + Port;
+    ASSERT (MmioAddress >= Port);
+    return MmioRead8 ((UINTN)MmioAddress);
+  }
+
+  return IoRead8 (Port);
 }
 
 /**
@@ -707,7 +719,19 @@ KeyWriteDataRegister (
   IN UINT8                    Data
   )
 {
-  IoWrite8 (ConsoleIn->DataRegisterAddress, Data);
+  UINT32  Port;
+  UINT64  Translation;
+  UINT64  MmioAddress;
+
+  Port        = ConsoleIn->DataRegisterAddress;
+  Translation = PcdGet64 (PcdPciIoTranslation);
+  if (Translation != 0) {
+    MmioAddress = Translation + Port;
+    ASSERT (MmioAddress >= Port);
+    MmioWrite8 ((UINTN)MmioAddress, Data);
+  } else {
+    IoWrite8 (Port, Data);
+  }
 }
 
 /**
@@ -723,7 +747,19 @@ KeyReadStatusRegister (
   IN KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn
   )
 {
-  return IoRead8 (ConsoleIn->StatusRegisterAddress);
+  UINT32  Port;
+  UINT64  Translation;
+  UINT64  MmioAddress;
+
+  Port        = ConsoleIn->StatusRegisterAddress;
+  Translation = PcdGet64 (PcdPciIoTranslation);
+  if (Translation != 0) {
+    MmioAddress = Translation + Port;
+    ASSERT (MmioAddress >= Port);
+    return MmioRead8 ((UINTN)MmioAddress);
+  }
+
+  return IoRead8 (Port);
 }
 
 /**
@@ -739,7 +775,19 @@ KeyWriteCommandRegister (
   IN UINT8                    Data
   )
 {
-  IoWrite8 (ConsoleIn->CommandRegisterAddress, Data);
+  UINT32  Port;
+  UINT64  Translation;
+  UINT64  MmioAddress;
+
+  Port        = ConsoleIn->CommandRegisterAddress;
+  Translation = PcdGet64 (PcdPciIoTranslation);
+  if (Translation != 0) {
+    MmioAddress = Translation + Port;
+    ASSERT (MmioAddress >= Port);
+    MmioWrite8 ((UINTN)MmioAddress, Data);
+  } else {
+    IoWrite8 (Port, Data);
+  }
 }
 
 /**
