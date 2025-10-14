@@ -43,6 +43,7 @@
   DxeServicesTableLib
   UefiBootServicesTableLib
   UefiRuntimeServicesTableLib
+  VariablePolicyHelperLib
 
 [Guids]
   gEfiSystemResourceTableGuid             ## PRODUCES             ## SystemTable
@@ -51,7 +52,7 @@
 [Protocols]
   gEfiFirmwareManagementProtocolGuid      ## SOMETIMES_CONSUMES
   gEsrtManagementProtocolGuid             ## PRODUCES
-  gEdkiiVariableLockProtocolGuid          ## SOMETIMES_CONSUMES
+  gEdkiiVariablePolicyProtocolGuid        ## SOMETIMES_CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxFmpEsrtCacheNum                  ## CONSUMES
