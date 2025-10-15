@@ -87,7 +87,7 @@
   #
   # Set MSFT HOST_APPLICATION options
   #
-  MSFT:*_*_*_DLINK_FLAGS            == /nologo /SUBSYSTEM:CONSOLE /DEBUG /out:"$(BIN_DIR)\$(MODULE_NAME_GUID).exe" /pdb:"$(BIN_DIR)\$(MODULE_NAME_GUID).pdb" /WHOLEARCHIVE
+  MSFT:*_*_*_DLINK_FLAGS            == /nologo /SUBSYSTEM:CONSOLE /DEBUG /out:"$(BIN_DIR)\$(MODULE_NAME_GUID).exe" /pdb:"$(BIN_DIR)\$(MODULE_NAME_GUID).pdb" /WHOLEARCHIVE /STACK:0x00800000,0x00800000
 
   MSFT:*_VS2015_IA32_DLINK_FLAGS    = /LIBPATH:"%VS2015_PREFIX%Lib" /LIBPATH:"%VS2015_PREFIX%VC\Lib" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x86"
   MSFT:*_VS2015x86_IA32_DLINK_FLAGS = /LIBPATH:"%VS2015_PREFIX%Lib" /LIBPATH:"%VS2015_PREFIX%VC\Lib" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x86"
@@ -132,7 +132,7 @@
   #
   # Set CLANGPDB HOST_APPLICATION options
   #
-  CLANGPDB:*_*_*_DLINK_FLAGS   == /nologo /SUBSYSTEM:CONSOLE /DEBUG /out:"$(BIN_DIR)\$(MODULE_NAME_GUID).exe" /pdb:"$(BIN_DIR)\$(MODULE_NAME_GUID).pdb" /WHOLEARCHIVE
+  CLANGPDB:*_*_*_DLINK_FLAGS   == /nologo /SUBSYSTEM:CONSOLE /DEBUG /out:"$(BIN_DIR)\$(MODULE_NAME_GUID).exe" /pdb:"$(BIN_DIR)\$(MODULE_NAME_GUID).pdb" /WHOLEARCHIVE /STACK:0x00800000,0x00800000
   CLANGPDB:*_*_X64_DLINK_FLAGS  = /LIBPATH:"%VCToolsInstallDir%lib\x64" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x64" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x64"
 !if $(UNIT_TESTING_ADDRESS_SANITIZER_ENABLE)
   CLANGPDB:*_*_X64_DLINK_FLAGS  = clang_rt.profile-x86_64.lib clang_rt.asan_dynamic-x86_64.lib clang_rt.asan_dynamic_runtime_thunk-x86_64.lib
