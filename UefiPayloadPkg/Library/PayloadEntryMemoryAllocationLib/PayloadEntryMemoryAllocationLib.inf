@@ -1,0 +1,36 @@
+## @file
+#  Provides Payload Entry based Memory Allocation Library.
+#
+#  Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MemoryAllocationLib
+  FILE_GUID                      = F883AE99-22AB-4820-A4C3-45F8B91F1E38
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MemoryAllocationLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources.common]
+  MemoryAllocation.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  PayloadEntryHelperLib
