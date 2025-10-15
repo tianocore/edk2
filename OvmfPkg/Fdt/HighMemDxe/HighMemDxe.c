@@ -101,10 +101,11 @@ InitializeHighMemDxe (
       }
 
       if (GcdDescriptor.GcdMemoryType == EfiGcdMemoryTypeNonExistent) {
-        Status = gDS->AddMemorySpace (
+        Status = gDS->AddMemorySpaceV2 (              // [CODE_FIRST] 11627
                         EfiGcdMemoryTypeSystemMemory,
                         CurBase,
                         CurSize,
+                        EFI_MEMORY_WB,                // [CODE_FIRST] 11627
                         EFI_MEMORY_WB
                         );
 
@@ -118,22 +119,6 @@ InitializeHighMemDxe (
             Status
             ));
           continue;
-        }
-
-        Status = gDS->SetMemorySpaceAttributes (
-                        CurBase,
-                        CurSize,
-                        EFI_MEMORY_WB
-                        );
-        if (EFI_ERROR (Status)) {
-          DEBUG ((
-            DEBUG_WARN,
-            "%a: gDS->SetMemorySpaceAttributes() failed on region 0x%lx - 0x%lx (%r)\n",
-            __func__,
-            CurBase,
-            CurBase + CurSize - 1,
-            Status
-            ));
         }
 
         //

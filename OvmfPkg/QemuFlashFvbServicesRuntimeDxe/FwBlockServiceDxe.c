@@ -161,7 +161,6 @@ MarkIoMemoryRangeForRuntimeAccess (
   )
 {
   EFI_STATUS                       Status;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  GcdDescriptor;
 
   //
   // Mark flash region as runtime memory
@@ -171,11 +170,12 @@ MarkIoMemoryRangeForRuntimeAccess (
                   Length
                   );
 
-  Status = gDS->AddMemorySpace (
+  Status = gDS->AddMemorySpaceV2 (                     // [CODE_FIRST] 11627
                   EfiGcdMemoryTypeMemoryMappedIo,
                   BaseAddress,
                   Length,
-                  EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
+                  EFI_MEMORY_UC | EFI_MEMORY_RUNTIME,  // [CODE_FIRST] 11627
+                  EFI_MEMORY_RUNTIME                   // [CODE_FIRST] 11627
                   );
   ASSERT_EFI_ERROR (Status);
 
@@ -187,16 +187,6 @@ MarkIoMemoryRangeForRuntimeAccess (
                   &BaseAddress,
                   gImageHandle,
                   NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  Status = gDS->GetMemorySpaceDescriptor (BaseAddress, &GcdDescriptor);
-  ASSERT_EFI_ERROR (Status);
-
-  Status = gDS->SetMemorySpaceAttributes (
-                  BaseAddress,
-                  Length,
-                  GcdDescriptor.Attributes | EFI_MEMORY_RUNTIME
                   );
   ASSERT_EFI_ERROR (Status);
 

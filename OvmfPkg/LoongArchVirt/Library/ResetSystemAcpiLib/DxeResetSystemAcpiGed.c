@@ -51,24 +51,15 @@ SetMemoryAttributesRunTime (
   }
 
   if (Descriptor.GcdMemoryType == EfiGcdMemoryTypeNonExistent) {
-    Status = gDS->AddMemorySpace (
+    Status = gDS->AddMemorySpaceV2 (                                    // [CODE_FIRST] 11627
                     EfiGcdMemoryTypeMemoryMappedIo,
                     Address,
                     EFI_PAGE_SIZE,
-                    EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
+                    EFI_MEMORY_UC | EFI_MEMORY_RUNTIME,                 // [CODE_FIRST] 11627
+                    EFI_MEMORY_RUNTIME                                  // [CODE_FIRST] 11627
                     );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_INFO, "%a: AddMemorySpace failed\n", __func__));
-      return Status;
-    }
-
-    Status = gDS->SetMemorySpaceAttributes (
-                    Address,
-                    EFI_PAGE_SIZE,
-                    EFI_MEMORY_RUNTIME
-                    );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_INFO, "%a:%d SetMemorySpaceAttributes failed\n", __func__, __LINE__));
+      DEBUG ((DEBUG_INFO, "%a: AddMemorySpaceV2 failed\n", __func__));  // [CODE_FIRST] 11627
       return Status;
     }
   } else if (!(Descriptor.Attributes & EFI_MEMORY_RUNTIME)) {
