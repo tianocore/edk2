@@ -129,7 +129,7 @@
   GCC:*_*_RISCV64_CC_FLAGS =  -Wno-error=maybe-uninitialized -Wno-format -Wno-error=unused-but-set-variable
   GCC:*_*_LOONGARCH64_CC_FLAGS =  -Wno-error=maybe-uninitialized -Wno-format -Wno-error=unused-but-set-variable
   GCC:*_CLANGDWARF_*_CC_FLAGS = -std=gnu99 -Wno-error=uninitialized
-  GCC:*_CLANGPDB_*_CC_FLAGS = -std=c99 -Wno-error=uninitialized -Wno-error=incompatible-pointer-types -Wno-error=pointer-sign -Wno-error=implicit-function-declaration -Wno-error=ignored-pragma-optimize
+  GCC:*_CLANGPDB_*_CC_FLAGS = -std=c99 -Wno-error=uninitialized -Wno-error=incompatible-pointer-types -Wno-error=pointer-sign -Wno-error=implicit-function-declaration -Wno-error=ignored-pragma-optimize -D__USE_MINGW_ANSI_STDIO=0
 
   # suppress the following warnings in mbedtls so we don't break the build with warnings-as-errors:
   # 1295: Deprecated declaration <entity> - give arg types
