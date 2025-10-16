@@ -96,6 +96,7 @@
   PrintLib
   UefiBootServicesTableLib
   SynchronizationLib
+  RngLib
 
 [Protocols]
   gEfiMpServiceProtocolGuid
