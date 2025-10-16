@@ -36,6 +36,8 @@ typedef struct IGVM_MEMORY_MAP_ENTRY {
   UINT32    Reserved;
 } IGVM_MEMORY_MAP_ENTRY;
 
+STATIC BOOLEAN  mIgvmParamsInvalid;
+
 STATIC
 IGVM_MEMORY_MAP_ENTRY *
 EFIAPI
@@ -46,6 +48,10 @@ PlatformIgvmMemoryMapFind (
   UINT64                 Address;
   IGVM_MEMORY_MAP_ENTRY  *Map;
 
+  if (mIgvmParamsInvalid) {
+    return NULL;
+  }
+
   Address = FixedPcdGet64 (PcdOvmfIgvmParamBase);
   if (Address == 0) {
     // no parameter area
@@ -55,6 +61,14 @@ PlatformIgvmMemoryMapFind (
   Map = (VOID *)(UINTN)(Address + MEMORY_MAP_OFFSET);
   if (Map[0].PageCount == 0) {
     // no memory map entries
+    return NULL;
+  }
+
+  if ((Map[0].EntryType & 0xfff0) ||
+      (Map[0].Reserved != 0))
+  {
+    DEBUG ((DEBUG_INFO, "%a: memory map sanity check failed, ignoring\n", __func__));
+    mIgvmParamsInvalid = TRUE;
     return NULL;
   }
 
@@ -193,6 +207,10 @@ PlatformIgvmVpCount (
   UINT64  Address;
   UINT32  *VpCount;
 
+  if (mIgvmParamsInvalid) {
+    return 0;
+  }
+
   Address = FixedPcdGet64 (PcdOvmfIgvmParamBase);
   if (Address == 0) {
     // no parameter area
@@ -202,6 +220,12 @@ PlatformIgvmVpCount (
   VpCount = (VOID *)(UINTN)(Address + VP_COUNT_OFFSET);
   if (!(*VpCount)) {
     // no vp count
+    return 0;
+  }
+
+  if (*VpCount & 0xffff0000) {
+    DEBUG ((DEBUG_INFO, "%a: vp-count sanity check failed, ignoring\n", __func__));
+    mIgvmParamsInvalid = TRUE;
     return 0;
   }
 
