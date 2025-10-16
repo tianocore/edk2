@@ -72,6 +72,10 @@ TokenMapperAddObject (
       (GET_CM_OBJECT_ID (ObjectId) == EArchCommonObjCmRef))
   {
     CmObjDesc->Count = Size / sizeof (CM_ARCH_COMMON_OBJ_REF);
+  } else if ((GET_CM_NAMESPACE_ID (ObjectId) == EObjNameSpaceArm) &&
+             (GET_CM_OBJECT_ID (ObjectId) == EArmObjIdMappingArray))
+  {
+    CmObjDesc->Count = Size / sizeof (CM_ARM_ID_MAPPING);
   } else {
     CmObjDesc->Count = 1;
   }
