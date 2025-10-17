@@ -34,7 +34,7 @@
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
-  MtrrLib|UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
+  MtrrLib|UefiCpuPkg/Library/MtrrLib/MtrrLibCc.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
@@ -101,16 +101,19 @@
   CpuCacheInfoLib|UefiCpuPkg/Library/CpuCacheInfoLib/DxeCpuCacheInfoLib.inf
 
 [LibraryClasses.common.DXE_SMM_DRIVER]
+  MtrrLib|UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
   SmmServicesTableLib|MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
   MmServicesTableLib|MdePkg/Library/MmServicesTableLib/MmServicesTableLib.inf
   MemoryAllocationLib|MdePkg/Library/SmmMemoryAllocationLib/SmmMemoryAllocationLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
 
 [LibraryClasses.common.MM_STANDALONE]
+  MtrrLib|UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
   MmServicesTableLib|MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
   SmmCpuFeaturesLib|UefiCpuPkg/Library/SmmCpuFeaturesLib/StandaloneMmCpuFeaturesLib.inf
 
 [LibraryClasses.common.MM_STANDALONE, LibraryClasses.common.DXE_SMM_DRIVER]
+  MtrrLib|UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SmmCpuExceptionHandlerLib.inf
   MmSaveStateLib|UefiCpuPkg/Library/MmSaveStateLib/IntelMmSaveStateLib.inf
 
@@ -163,6 +166,7 @@
   UefiCpuPkg/Library/MpInitLibUp/MpInitLibUp.inf
   UefiCpuPkg/Library/MicrocodeLib/MicrocodeLib.inf
   UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
+  UefiCpuPkg/Library/MtrrLib/MtrrLibCc.inf
   UefiCpuPkg/Library/PlatformSecLibNull/PlatformSecLibNull.inf
   UefiCpuPkg/Library/RegisterCpuFeaturesLib/PeiRegisterCpuFeaturesLib.inf
   UefiCpuPkg/Library/RegisterCpuFeaturesLib/DxeRegisterCpuFeaturesLib.inf
