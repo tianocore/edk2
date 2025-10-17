@@ -322,22 +322,21 @@ LibRtcInitialize (
   )
 {
   EFI_STATUS  Status;
+  UINT64      Attributes;                                          // [CODE_FIRST] 11627
+                                                                   // [CODE_FIRST] 11627
+  Attributes = EFI_MEMORY_UC | EFI_MEMORY_RUNTIME | EFI_MEMORY_XP; // [CODE_FIRST] 11627
 
   // Initialize RTC Base Address
   mPL031RtcBase = PcdGet32 (PcdPL031RtcBase);
 
   // Declare the controller as EFI_MEMORY_RUNTIME
-  Status = gDS->AddMemorySpace (
+  Status = gDS->AddMemorySpaceV2 (                                 // [CODE_FIRST] 11627
                   EfiGcdMemoryTypeMemoryMappedIo,
                   mPL031RtcBase,
                   SIZE_4KB,
-                  EFI_MEMORY_UC | EFI_MEMORY_RUNTIME | EFI_MEMORY_XP
+                  Attributes,                                      // [CODE_FIRST] 11627
+                  Attributes                                       // [CODE_FIRST] 11627
                   );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = gDS->SetMemorySpaceAttributes (mPL031RtcBase, SIZE_4KB, EFI_MEMORY_UC | EFI_MEMORY_RUNTIME | EFI_MEMORY_XP);
   if (EFI_ERROR (Status)) {
     return Status;
   }
