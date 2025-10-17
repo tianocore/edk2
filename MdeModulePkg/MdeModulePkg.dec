@@ -2303,6 +2303,15 @@
   # @Prompt Conduit to use in ArmFfaLib.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc|TRUE|BOOLEAN|0x10000029
 
+  ## Defines platform limit for BAR size that can be accepted in Resizable BAR Capability.
+  # 0           1 MB (2^20)
+  # 1           2 MB (2^21)
+  # ...
+  # 42          4 EB (2^62)
+  # 43          8 EB (2^63)
+  # @Prompt Max size to accept in PCIe Resizable BAR Capability register.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarMaxSize|43|UINT8|0x10000030
+
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
   #  Loading Module at Fixed Address feature is enabled.
