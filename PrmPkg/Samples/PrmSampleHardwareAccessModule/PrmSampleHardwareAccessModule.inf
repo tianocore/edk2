@@ -38,6 +38,12 @@
 [Depex]
   TRUE
 
-[BuildOptions.common]
-  MSFT:*_*_*_DLINK_FLAGS  = /DLL /SUBSYSTEM:CONSOLE /VERSION:1.0
-  MSFT:*_*_*_GENFW_FLAGS = --keepoptionalheader
+[BuildOptions]
+  MSFT:*_*_*_DLINK_FLAGS = /SUBSYSTEM:CONSOLE
+  MSFT:*_*_*_GENFW_FLAGS = --keepoptionalheader --image-version $(VERSION_STRING)
+
+  CLANGPDB:*_*_*_DLINK_FLAGS = /SUBSYSTEM:CONSOLE
+  CLANGPDB:*_*_*_GENFW_FLAGS = --keepoptionalheader --image-version $(VERSION_STRING)
+
+  GCC:*_*_*_GENFW_FLAGS = --prm --image-version $(VERSION_STRING)
+  GCC:*_*_*_OBJCOPY_STRIPFLAG ==
