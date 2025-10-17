@@ -1,0 +1,48 @@
+## @file
+# Instance of HOB Library for PEI phase.
+#
+# Copyright (c) 2025, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeilessHobLib
+  MODULE_UNI_FILE                = PeilessHobLib.uni
+  FILE_GUID                      = 734e77ce-f3e9-43ca-88f0-bf214eca6b11
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = HobLib|PEIM SEC
+
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC (EBC is for build only)
+#
+
+[Sources]
+  HobLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+
+[Guids]
+  gEfiHobMemoryAllocStackGuid                   ## SOMETIMES_PRODUCES ## HOB # MemoryAllocation StackHob
+  gEfiHobMemoryAllocBspStoreGuid                ## SOMETIMES_PRODUCES ## HOB # MemoryAllocation BspStoreHob
+  gEfiHobMemoryAllocModuleGuid                  ## SOMETIMES_PRODUCES ## HOB # MemoryAllocation ModuleHob
+
+#
+# [Hob]
+#   MEMORY_ALLOCATION     ## SOMETIMES_PRODUCES
+#   RESOURCE_DESCRIPTOR   ## SOMETIMES_PRODUCES
+#   FIRMWARE_VOLUME       ## SOMETIMES_PRODUCES
+#
+
