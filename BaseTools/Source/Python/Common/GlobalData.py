@@ -68,6 +68,8 @@ gGuidCFormatPattern = re.compile(r"{}".format(_GuidCFormatPattern))
 #
 gAutoGenPhase = False
 
+gNinjaBuild = False
+
 #
 # The Conf dir outside the workspace dir
 #
