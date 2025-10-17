@@ -882,6 +882,14 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonObjSpcrInfoParser[] = {
   { "TerminalType",  1, "0x%x", NULL }
 };
 
+/** A parser for EArchCommonObjPciRootPortInfo
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonObjPciRootPortInfoParser[] = {
+  { "RootPortAddress",  4,                        "0x%x", NULL },
+  { "RootPortPrtToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "Sun",              4,                        "0x%x", NULL }
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -932,6 +940,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryCacheInfo,              CmArchCommonMemoryCacheInfo),
   CM_PARSER_ADD_OBJECT (EArchCommonObjSpcrInfo,                     CmArchCommonObjSpcrInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMcfgPciConfigSpaceInfo,       CmArchCommonPciConfigSpaceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPciRootPortInfo,              CmArchCommonObjPciRootPortInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
