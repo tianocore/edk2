@@ -439,11 +439,24 @@ InitMpGlobalData (
   IN CPU_MP_DATA  *CpuMpData
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS     Status;
+  EFI_BOOT_MODE  BootMode;
 
   BuildMicrocodeCacheHob (CpuMpData);
   SaveCpuMpData (CpuMpData);
-  PrepareApLoopCode (CpuMpData);
+
+  Status = PeiServicesGetBootMode (&BootMode);
+  ASSERT_EFI_ERROR (Status);
+
+  if (!EFI_ERROR (Status) && (BootMode == BOOT_ON_S3_RESUME)) {
+    //
+    // Only allocate the AP loop code buffer on S3 resume.
+    // This allocates ACPI NVS memory which is a RT visible memory type that
+    // remains fragmented against the overall EfiACPIMemoryNVS memory bucket
+    // allocated by the DXE Core.
+    //
+    PrepareApLoopCode (CpuMpData);
+  }
 
   ///
   /// Install Notify
