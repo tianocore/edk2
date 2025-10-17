@@ -80,6 +80,6 @@
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdMaximumDevicePathNodeCount ## SOMETIMES_CONSUMES
 
-[Depex.common.DXE_DRIVER, Depex.common.DXE_RUNTIME_DRIVER, Depex.common.DXE_SAL_DRIVER, Depex.common.DXE_SMM_DRIVER]
+[Depex.common.DXE_DRIVER, Depex.common.DXE_RUNTIME_DRIVER, Depex.common.DXE_SMM_DRIVER]
   gEfiDevicePathUtilitiesProtocolGuid
 
