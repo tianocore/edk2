@@ -194,6 +194,7 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonPciConfigSpaceInfoParser[] = {
   { "EndBusNumber",          1,                        "0x%x",   NULL },
   { "AddressMapToken",       sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
   { "InterruptMapToken",     sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "RootPortInfoToken",     sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL }
 };
 
 /** A parser for EArchCommonObjHypervisorVendorIdentity.
