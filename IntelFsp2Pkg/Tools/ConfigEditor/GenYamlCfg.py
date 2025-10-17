@@ -1537,7 +1537,7 @@ option format '%s' !" % option)
                 return
             act_cfg = self.get_item_by_index(cfgs['indx'])
             actual_offset = act_cfg['offset'] - struct_info['offset']
-            if force or act_cfg['value'] == '':
+            if act_cfg['value'] == '':
                 value = get_bits_from_bytes(full_bytes,
                                             actual_offset,
                                             act_cfg['length'])
