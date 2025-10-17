@@ -318,7 +318,13 @@ IScsiFillNICAndTargetSections (
     // Get Nic Info: VLAN tag, Mac address, PCI location.
     //
     NicInfo = IScsiGetNicInfoByIndex (Attempt->NicIndex);
-    ASSERT (NicInfo != NULL);
+    // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+    if (NicInfo == NULL) {
+      ASSERT (NicInfo != NULL);
+      break;
+    }
+
+    // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
 
     Nic->VLanTag = NicInfo->VlanId;
     CopyMem (Nic->Mac, &NicInfo->PermanentAddress, sizeof (Nic->Mac));

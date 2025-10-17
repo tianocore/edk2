@@ -331,7 +331,13 @@ Ip6Reassemble (
     // Revert IP head to network order.
     //
     DupHead = NetbufGetByte (Duplicate, 0, NULL);
-    ASSERT (DupHead != NULL);
+    // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+    if (DupHead == NULL) {
+      ASSERT (DupHead != NULL);
+      goto Error;
+    }
+
+    // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
     Duplicate->Ip.Ip6 = Ip6NtohHead ((EFI_IP6_HEADER *)DupHead);
     Assemble->Packet  = Duplicate;
 
@@ -399,7 +405,14 @@ Ip6Reassemble (
     // the Fragment Header is excluded.
     //
     TmpPacket = NetbufGetFragment (Fragment, 0, This->HeadLen, 0);
-    ASSERT (TmpPacket != NULL);
+    // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+    if (TmpPacket == NULL) {
+      ASSERT (TmpPacket != NULL);
+      Ip6FreeAssembleEntry (Assemble);
+      goto Error;
+    }
+
+    // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
 
     NET_LIST_FOR_EACH (Cur, ListHead) {
       //
@@ -1302,19 +1315,20 @@ Ip6InstanceFrameAcceptable (
   //
   ExtHdrs = NetbufGetByte (Packet, 0, NULL);
 
-  if (!Ip6IsExtsValid (
-         IpInstance->Service,
-         Packet,
-         &Head->NextHeader,
-         ExtHdrs,
-         (UINT32)Head->PayloadLength,
-         TRUE,
-         NULL,
-         &Proto,
-         NULL,
-         NULL,
-         NULL
-         ))
+  if ((ExtHdrs == NULL) || !Ip6IsExtsValid (
+                              // // MU_CHANGE - CodeQL Change - unguardednullreturndereference
+                              IpInstance->Service,
+                              Packet,
+                              &Head->NextHeader,
+                              ExtHdrs,
+                              (UINT32)Head->PayloadLength,
+                              TRUE,
+                              NULL,
+                              &Proto,
+                              NULL,
+                              NULL,
+                              NULL
+                              ))
   {
     return FALSE;
   }
@@ -1336,20 +1350,20 @@ Ip6InstanceFrameAcceptable (
       //
       ErrMsgPayloadLen = NTOHS (Icmp.IpHead.PayloadLength);
       ErrMsgPayload    = NetbufGetByte (Packet, sizeof (Icmp), NULL);
-
-      if (!Ip6IsExtsValid (
-             NULL,
-             NULL,
-             &Icmp.IpHead.NextHeader,
-             ErrMsgPayload,
-             ErrMsgPayloadLen,
-             TRUE,
-             NULL,
-             &Proto,
-             NULL,
-             NULL,
-             NULL
-             ))
+      if ((ErrMsgPayload == NULL) || !Ip6IsExtsValid (
+                                        // MU_CHANGE - CodeQL Change - unguardednullreturndereference
+                                        NULL,
+                                        NULL,
+                                        &Icmp.IpHead.NextHeader,
+                                        ErrMsgPayload,
+                                        ErrMsgPayloadLen,
+                                        TRUE,
+                                        NULL,
+                                        &Proto,
+                                        NULL,
+                                        NULL,
+                                        NULL
+                                        ))
       {
         return FALSE;
       }
@@ -1506,7 +1520,13 @@ Ip6InstanceDeliverPacket (
       // may be not continuous before the data.
       //
       Head = NetbufAllocSpace (Dup, sizeof (EFI_IP6_HEADER), NET_BUF_HEAD);
-      ASSERT (Head != NULL);
+      // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+      if (Head == NULL) {
+        ASSERT (Head != NULL);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
       Dup->Ip.Ip6 = (EFI_IP6_HEADER *)Head;
 
       CopyMem (Head, Packet->Ip.Ip6, sizeof (EFI_IP6_HEADER));
