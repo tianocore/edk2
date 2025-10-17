@@ -36,6 +36,7 @@
   HobLib
   MemoryAllocationLib
   MmServicesTableLib
+  TimerLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc
