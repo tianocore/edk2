@@ -215,6 +215,7 @@
   PcdLib
   DebugLib
   BaseMemoryLib
+  PvPanicLib
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength      ## SOMETIMES_CONSUMES
