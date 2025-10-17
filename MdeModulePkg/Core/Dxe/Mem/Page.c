@@ -1953,6 +1953,7 @@ CoreGetMemoryMap (
     GcdMapEntry = CR (Link, EFI_GCD_MAP_ENTRY, Link, EFI_GCD_MAP_SIGNATURE);
     if ((GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypePersistent) ||
         (GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeReserved) ||
+        (GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeUnaccepted) ||
         ((GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) &&
          ((GcdMapEntry->Attributes & EFI_MEMORY_RUNTIME) == EFI_MEMORY_RUNTIME)))
     {
