@@ -7,7 +7,7 @@
 # Copyright (c) 2007 - 2025, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 
-# Set SEP to the platform specific path seperator
+# Set SEP to the platform specific path separator
 ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
   SHELL := cmd.exe
   SEP:=$(shell echo \)
@@ -19,28 +19,29 @@ EDK2_PATH ?= $(MAKEROOT)/../../..
 ifndef PYTHON_COMMAND
   ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
     #
-    # Try using the Python Launcher for Windows to find an interperter.
+    # Try using the Python Launcher for Windows to find an interpreter.
     #
     CHECK_PY := $(shell where py.exe || echo NotFound)
     ifeq ($(CHECK_PY),NotFound)
       #
-      # PYTHON_HOME is the old method of specifying a Python interperter on Windows.
-      # Check if an interperter can be found using PYTHON_HOME.
+      # PYTHON_HOME is the old method of specifying a Python interpreter on Windows.
+      # Check if an interpreter can be found using PYTHON_HOME.
       #
       ifdef PYTHON_HOME
         ifndef (,$(wildcard $(PYTHON_HOME)$(SEP)python.exe)) # Make sure the file exists
           PYTHON_COMMAND := $(PYTHON_HOME)$(SEP)python.exe
         else
-          $(error Unable to find a Python interperter, if one is installed, set the PYTHON_COMMAND environment variable!)
+          $(error Unable to find a Python interpreter, if one is installed, set the PYTHON_COMMAND environment variable!)
         endif
       endif
     else
       PYTHON_COMMAND := $(shell py -3 -c "import sys; print(sys.executable)")
       ifdef (,$(wildcard $(PYTHON_COMMAND))) # Make sure the file exists
-        $(error Unable to find a Python interperter, if one is installed, set the PYTHON_COMMAND environment variable!)
+        $(error Unable to find a Python interpreter, if one is installed, set the PYTHON_COMMAND environment variable!)
       endif
     endif
     undefine CHECK_PY
+    PYTHON_COMMAND := "$(PYTHON_COMMAND)"
   else # UNIX
     PYTHON_COMMAND := $(shell /usr/bin/env python3 -c "import sys; print(sys.executable)")
     ifdef (,$(wildcard $(PYTHON_COMMAND))) # Make sure the file exists
