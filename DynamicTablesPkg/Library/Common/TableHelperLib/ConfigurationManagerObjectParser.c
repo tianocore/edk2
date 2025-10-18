@@ -883,6 +883,13 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonObjSpcrInfoParser[] = {
   { "TerminalType",  1, "0x%x", NULL }
 };
 
+/** A Parser for EArchCommonObjTpm2DeviceInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonObjTpm2DeviceInfoParser[] = {
+  { "Tpm2DeviceBaseAddress", sizeof (UINT64), "0x%lx", NULL },
+  { "Tpm2DeviceSize",        sizeof (UINT64), "0x%lx", NULL }
+};
+
 /** A parser for EArchCommonObjPciRootPortInfo
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonObjPciRootPortInfoParser[] = {
@@ -940,6 +947,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryLatBwInfo,              CmArchCommonMemoryLatBwInfo),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryCacheInfo,              CmArchCommonMemoryCacheInfo),
   CM_PARSER_ADD_OBJECT (EArchCommonObjSpcrInfo,                     CmArchCommonObjSpcrInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjTpm2DeviceInfo,               CmArchCommonObjTpm2DeviceInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMcfgPciConfigSpaceInfo,       CmArchCommonPciConfigSpaceInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPciRootPortInfo,              CmArchCommonObjPciRootPortInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
