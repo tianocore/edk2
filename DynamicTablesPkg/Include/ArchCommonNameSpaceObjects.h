@@ -73,6 +73,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjSpcrInfo,                       ///< 45 - Serial Terminal and Interrupt Info
   EArchCommonObjTpm2DeviceInfo,                 ///< 46 - TPM2 Device Info
   EArchCommonObjMcfgPciConfigSpaceInfo,         ///< 47 - MCFG PCI Configuration Space Info
+  EArchCommonObjPciRootPortInfo,                ///< 48 - PCI root port configuration Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -184,6 +185,10 @@ typedef struct CmArchCommonPciConfigSpaceInfo {
   /// Optional field: Reference Token for interrupt mapping.
   /// Token identifying a CM_ARCH_COMMON_OBJ_REF structure.
   CM_OBJECT_TOKEN    InterruptMapToken;
+
+  /// Optional field: Reference Token for PCI root bridge information.
+  /// Token identifying a CM_ARCH_COMMON_PCI_ROOT_PORT_INFO structure.
+  CM_OBJECT_TOKEN    RootPortInfoToken;
 } CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO;
 
 /** A structure that describes a PCI Address Map.
@@ -200,6 +205,11 @@ typedef struct CmArchCommonPciAddressMapInfo {
    - 1: I/O Space
    - 2: 32-bit-address Memory Space
    - 3: 64-bit-address Memory Space
+
+  Custom values:
+   - 4: Word I/O Space
+   - 5: 32-bit-address uncache Memory Space
+   - 6: 64-bit-address uncache Memory Space
   */
   UINT8     SpaceCode;
 
@@ -264,6 +274,27 @@ typedef struct CmArchCommonPciInterruptMapInfo {
   */
   CM_ARCH_COMMON_GENERIC_INTERRUPT    IntcInterrupt;
 } CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO;
+
+/** A structure that describes PCI root port information.
+  Contains the interrupt map and Slot user name.
+
+  ID: EArchCommonObjPciRootPortInfo
+*/
+typedef struct CmArchCommonObjPciRootPortInfo {
+  /// Address of root port
+  /// 6.1.1 _ADR (Address)
+  /// High word-Device #, Low word-Function #. (for example, device 3, function
+  /// 2 is 0x00030002). To refer to all the functions on a device #, use a function
+  /// number of FFFF).
+  UINT32             RootPortAddress;
+
+  /// Token for an array of CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO objects.
+  CM_OBJECT_TOKEN    RootPortPrtToken;
+
+  /// 6.1.11 _SUN (Slot User Number)
+  /// integer value, 0xFFFFFFFF means no slot user number
+  UINT32             Sun;
+} CM_ARCH_COMMON_PCI_ROOT_PORT_INFO;
 
 /** A structure that describes the Memory Affinity Structure (Type 1) in SRAT
 
