@@ -46,4 +46,3 @@
   CLANGPDB:*_*_*_GENFW_FLAGS = --keepoptionalheader
 
   GCC:*_*_*_GENFW_FLAGS = --prm --image-version $(VERSION_STRING)
-  GCC:*_*_*_OBJCOPY_STRIPFLAG ==
