@@ -312,12 +312,8 @@
     <Command.CLANGPDB>
         "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST) $(DLINK2_FLAGS)
 
-    <Command.CLANGDWARF>
+    <Command.GCC, Command.CLANGDWARF>
         "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -Wl,--start-group,@$(STATIC_LIBRARY_FILES_LIST),--end-group $(CC_FLAGS) $(DLINK2_FLAGS)
-
-    <Command.GCC>
-        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -Wl,--start-group,@$(STATIC_LIBRARY_FILES_LIST),--end-group $(CC_FLAGS) $(DLINK2_FLAGS)
-        "$(OBJCOPY)" $(OBJCOPY_FLAGS) ${dst}
 
     <Command.XCODE>
         "$(DLINK)" $(DLINK_FLAGS) -o ${dst} $(DLINK_SPATH) -filelist $(STATIC_LIBRARY_FILES_LIST)  $(DLINK2_FLAGS)
@@ -340,7 +336,6 @@
 
     <Command.GCC>
         "$(DLINK)" -o ${dst} $(DLINK_FLAGS) $(DLINK_XIPFLAGS) -Wl,--start-group,@$(STATIC_LIBRARY_FILES_LIST),--end-group $(CC_FLAGS) $(CC_XIPFLAGS) $(DLINK2_FLAGS)
-        "$(OBJCOPY)" $(OBJCOPY_FLAGS) ${dst}
 
 
 [Static-Library-File.USER_DEFINED]
@@ -403,7 +398,7 @@
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
         -$(CP) $(DEBUG_DIR)(+)*.pdb $(OUTPUT_DIR) 
 
-    <Command.CLANGDWARF>
+    <Command.GCC, Command.CLANGDWARF>
         $(CP) ${src} $(DEBUG_DIR)(+)$(MODULE_NAME).debug
         -$(CP) $(DEBUG_DIR)(+)$(MODULE_NAME).debug $(BIN_DIR)(+)$(MODULE_NAME_GUID).debug
 
@@ -412,21 +407,6 @@
         $(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).efi
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
 
-    <Command.GCC>
-        $(CP) ${src} $(DEBUG_DIR)(+)$(MODULE_NAME).debug
-        "$(OBJCOPY)" $(OBJCOPY_STRIPFLAG) ${src}
-
-        #
-        #The below 2 lines are only needed for UNIXGCC tool chain, which generates PE image directly
-        #
-        -"$(OBJCOPY)" $(OBJCOPY_ADDDEBUGFLAG) ${src}
-        -$(CP) $(DEBUG_DIR)(+)$(MODULE_NAME).debug $(BIN_DIR)(+)$(MODULE_NAME_GUID).debug
-
-        "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} ${src} $(GENFW_FLAGS)
-        $(CP) ${dst} $(DEBUG_DIR)
-        $(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).efi
-        -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
-        
     <Command.XCODE>
         # tool to convert Mach-O to PE/COFF
         "$(MTOC)" -subsystem $(MODULE_TYPE)  $(MTOC_FLAGS)  ${src}  $(DEBUG_DIR)(+)$(MODULE_NAME).pecoff
