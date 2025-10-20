@@ -2,7 +2,7 @@
 #  UefiCpuPkg Package
 #
 #  Copyright (c) 2007 - 2024, Intel Corporation. All rights reserved.<BR>
-#  Copyright (C) 2023 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  Copyright (C) 2023 - 2025, Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -212,6 +212,7 @@
   UefiCpuPkg/Library/AmdSysCallLibNull/AmdSysCallLibNull.inf
   UefiCpuPkg/Library/MmSaveStateLib/IntelMmSaveStateLib.inf
   UefiCpuPkg/Library/SmmCpuFeaturesLib/AmdSmmCpuFeaturesLib.inf
+  UefiCpuPkg/Library/SmmCpuFeaturesLib/AmdStandaloneMmCpuFeaturesLib.inf
   UefiCpuPkg/Library/SmmRelocationLib/SmmRelocationLib.inf
   UefiCpuPkg/Library/SmmRelocationLib/AmdSmmRelocationLib.inf
 
