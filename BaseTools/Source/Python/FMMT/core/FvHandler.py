@@ -346,7 +346,8 @@ class FvHandler:
                         raise Exception("Process Failed: GuidTool not found!")
                     # Recompress current data, and recalculate the needed space
                     CompressedData = guidtool.pack(ParTree.Data.Data)
-                    Needed_Space = len(CompressedData) - len(ParTree.Data.OriData)
+                    Original_Data_Size = len(ParTree.Data.OriData)
+                    Needed_Space = len(CompressedData) - Original_Data_Size
                     ParTree.Data.OriData = CompressedData
                     New_Size = ParTree.Data.HeaderLength + len(CompressedData)
                     ParTree.Data.Header.Size[0] = New_Size % (16**2)
@@ -367,12 +368,12 @@ class FvHandler:
                     if Needed_Space < 0:
                         if ParTree.NextRel:
                             self.Remain_New_Free_Space = (
-                                len(ParTree.Data.OriData) + Original_Pad_Size -
+                                Original_Data_Size + Original_Pad_Size -
                                 len(CompressedData) - New_Pad_Size
                             )
                         else:
                             self.Remain_New_Free_Space = (
-                                len(ParTree.Data.OriData) - len(CompressedData)
+                                Original_Data_Size - len(CompressedData)
                             )
                 # If current section is not guided section
                 elif Needed_Space:
