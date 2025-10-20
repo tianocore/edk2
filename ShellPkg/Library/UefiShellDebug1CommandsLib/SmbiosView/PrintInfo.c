@@ -382,6 +382,18 @@ SmbiosPrintStructure (
         PRINT_PENDING_STRING (Struct, Type2, LocationInChassis);
         PRINT_STRUCT_VALUE_H (Struct, Type2, ChassisHandle);
         DisplayBaseBoardBoardType (Struct->Type2->BoardType, Option);
+        ShellPrintHiiDefaultEx (
+          STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_NUM_CONTAINED_OBJECTS_HANDLES),
+          gShellDebug1HiiHandle,
+          Struct->Type2->NumberOfContainedObjectHandles
+          );
+        for (Index = 0; Index < Struct->Type2->NumberOfContainedObjectHandles; Index++) {
+          ShellPrintHiiDefaultEx (
+            STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_CONTAINED_OBJECTS_HANDLE),
+            gShellDebug1HiiHandle,
+            Struct->Type2->ContainedObjectHandles[Index]
+            );
+        }
       }
 
       break;
@@ -440,6 +452,16 @@ SmbiosPrintStructure (
       if (AE_SMBIOS_VERSION (0x2, 0x7) && (Struct->Hdr->Length > 0x13)) {
         if (Struct->Hdr->Length > (0x15 + (Struct->Type3->ContainedElementCount * Struct->Type3->ContainedElementRecordLength))) {
           PRINT_SMBIOS_STRING (Struct, Buffer[0x15 + (Struct->Type3->ContainedElementCount * Struct->Type3->ContainedElementRecordLength)], SKUNumber);
+        }
+      }
+
+      if (AE_SMBIOS_VERSION (0x3, 0x9)) {
+        if (Struct->Hdr->Length > (0x16 + (Struct->Type3->ContainedElementCount * Struct->Type3->ContainedElementRecordLength))) {
+          ShellPrintDefaultEx (L"Rack Type: %x\n", Buffer[0x16 + (Struct->Type3->ContainedElementCount * Struct->Type3->ContainedElementRecordLength)]);
+        }
+
+        if (Struct->Hdr->Length > (0x17 + (Struct->Type3->ContainedElementCount * Struct->Type3->ContainedElementRecordLength))) {
+          ShellPrintDefaultEx (L"Rack Height: %x\n", Buffer[0x17 + (Struct->Type3->ContainedElementCount * Struct->Type3->ContainedElementRecordLength)]);
         }
       }
 
@@ -1321,6 +1343,11 @@ SmbiosPrintStructure (
     // Processor Additional Information (Type 44)
     //
     case 44:
+      ShellPrintHiiDefaultEx (
+        STRING_TOKEN (STR_SMBIOSVIEW_SMBIOSVIEW_REFERENCEDHANDLE),
+        gShellDebug1HiiHandle,
+        Struct->Type44->RefHandle
+        );
       DisplayProcessorArchitectureType (Struct->Type44->ProcessorSpecificBlock.ProcessorArchType, Option);
       break;
 

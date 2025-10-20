@@ -327,11 +327,6 @@
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
       TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
-    <BuildOptions>
-      MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096 /FILEALIGN:4096 /SUBSYSTEM:CONSOLE
-      MSFT:DEBUG_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
-      MSFT:DEBUG_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
-      MSFT:NOOPT_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
   }
 
 [Components.IA32, Components.X64, Components.AARCH64]
@@ -343,10 +338,8 @@
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
       TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
     <BuildOptions>
-      MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096 /FILEALIGN:4096 /SUBSYSTEM:CONSOLE
-      MSFT:DEBUG_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
-      MSFT:DEBUG_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
-      MSFT:NOOPT_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
+      MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096
+      CLANGPDB: *_*_*_DLINK_FLAGS = /ALIGN:4096
   }
 
 [Components.RISCV64]
@@ -463,6 +456,8 @@
       MSFT:*_*_IA32_DLINK_XIPFLAGS = /ALIGN:64
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:256
       MSFT:*_*_X64_DLINK_XIPFLAGS  = /ALIGN:256
+      CLANGPDB: *_*_IA32_DLINK_FLAGS = /ALIGN:64
+      CLANGPDB: *_*_X64_DLINK_FLAGS = /ALIGN:256
   }
 
   #
@@ -480,6 +475,8 @@
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
       MSFT:*_*_X64_DLINK_XIPFLAGS  = /ALIGN:4096
       GCC:*_*_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x1000
+      CLANGPDB: *_*_IA32_DLINK_FLAGS = /ALIGN:4096
+      CLANGPDB: *_*_X64_DLINK_FLAGS = /ALIGN:4096
   }
 !endif
 
@@ -533,6 +530,8 @@
     <BuildOptions>
       MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:64
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:256
+      CLANGPDB: *_*_IA32_DLINK_FLAGS = /ALIGN:64
+      CLANGPDB: *_*_X64_DLINK_FLAGS = /ALIGN:256
   }
   #
   # CryptoDxe with IA32/X64/AARCH64 performance optimized OpensslLib instance with all services.
@@ -547,6 +546,8 @@
       MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:4096
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
       GCC:*_*_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x1000
+      CLANGPDB: *_*_IA32_DLINK_FLAGS = /ALIGN:4096
+      CLANGPDB: *_*_X64_DLINK_FLAGS = /ALIGN:4096
   }
   #
   # CryptoSmm with OpensslLib instance with no SSL or EC services
@@ -587,6 +588,8 @@
     <BuildOptions>
       MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:64
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:256
+      CLANGPDB: *_*_IA32_DLINK_FLAGS = /ALIGN:64
+      CLANGPDB: *_*_X64_DLINK_FLAGS = /ALIGN:256
   }
   #
   # CryptoSmm with IA32/X64/AARCH64 performance optimized OpensslLib instance with all services
@@ -601,6 +604,8 @@
       MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:4096
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
       GCC:*_*_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x1000
+      CLANGPDB: *_*_IA32_DLINK_FLAGS = /ALIGN:4096
+      CLANGPDB: *_*_X64_DLINK_FLAGS = /ALIGN:4096
   }
   #
   # CryptoStandaloneMm with OpensslLib instance with no SSL or EC services
@@ -641,6 +646,8 @@
     <BuildOptions>
       MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:64
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:256
+      CLANGPDB: *_*_IA32_DLINK_FLAGS = /ALIGN:64
+      CLANGPDB: *_*_X64_DLINK_FLAGS = /ALIGN:256
   }
   #
   # CryptoStandaloneMm with IA32/X64/AARCH64 performance optimized OpensslLib instance with all services
@@ -654,6 +661,8 @@
     <BuildOptions>
       MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:4096
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
+      CLANGPDB: *_*_IA32_DLINK_FLAGS = /ALIGN:4096
+      CLANGPDB: *_*_X64_DLINK_FLAGS = /ALIGN:4096
   }
 !endif
 
