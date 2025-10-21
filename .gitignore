@@ -6,3 +6,4 @@ __pycache__/
 tags/
 .vscode/
 .venv/
+.github/workflows/comprehensive-testing.yml
