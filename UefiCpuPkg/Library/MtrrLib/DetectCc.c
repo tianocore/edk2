@@ -11,8 +11,34 @@
 
 **/
 
+#include <ConfidentialComputingGuestAttr.h>
 #include <Library/BaseLib.h>
 #include "DetectCc.h"
+
+/**
+Check if AMD SEV-SNP is active.
+
+@retval TRUE   AMD SEV-SNP is active.
+@retval FALSE  AMD SEV-SNP is not active.
+
+**/
+STATIC
+BOOLEAN
+SnpIsEnabled (
+  VOID
+  )
+{
+  UINT64  CurrentAttr = PcdGet64 (PcdConfidentialComputingGuestAttr);
+
+  //
+  // If attr is for the AMD group then do AMD SEV-SNP specific check.
+  //
+  if (((RShiftU64 (CurrentAttr, 8)) & 0xff) == 1) {
+    return ((CurrentAttr & CCAttrTypeMask) == CCAttrAmdSevSnp) ? TRUE : FALSE;
+  }
+
+  return FALSE;
+}
 
 BOOLEAN
 CcMode (
@@ -23,7 +49,7 @@ CcMode (
   STATIC BOOLEAN  mCcModeRead = FALSE;
 
   if (!mCcModeRead) {
-    mCcMode     = TdIsEnabled ();
+    mCcMode     = TdIsEnabled () || SnpIsEnabled ();
     mCcModeRead = TRUE;
   }
 
