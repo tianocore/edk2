@@ -2036,7 +2036,7 @@ InstallAcpiTableFromAcpiSiliconHob (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  ZeroMem (&PageAddress, TotalSocTablesize);
+  ZeroMem ((VOID *)(UINTN)PageAddress, TotalSocTablesize);
   AcpiTableInstance->Xsdt = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)PageAddress;
 
   //
