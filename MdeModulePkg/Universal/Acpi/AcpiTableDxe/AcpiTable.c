@@ -14,8 +14,8 @@
 //
 // Handle to install ACPI Table Protocol
 //
-EFI_HANDLE                                             mHandle       = NULL;
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_ACPI_TABLE_INSTANCE  *mPrivateData = NULL;
+EFI_HANDLE                                             mHandle = NULL;
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_ACPI_TABLE_INSTANCE* mPrivateData = NULL;
 
 /**
   Entry point of the ACPI table driver.
@@ -32,53 +32,59 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_ACPI_TABLE_INSTANCE  *mPrivateData = NULL;
 **/
 EFI_STATUS
 EFIAPI
-InitializeAcpiTableDxe (
+InitializeAcpiTableDxe(
   IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
-  )
+  IN EFI_SYSTEM_TABLE* SystemTable
+)
 {
   EFI_STATUS               Status;
-  EFI_ACPI_TABLE_INSTANCE  *PrivateData;
+  EFI_ACPI_TABLE_INSTANCE* PrivateData;
 
   //
-  // Initialize our protocol
+  // Initialize ACPI Table instance
   //
-  PrivateData = AllocateZeroPool (sizeof (EFI_ACPI_TABLE_INSTANCE));
-  ASSERT (PrivateData);
-  PrivateData->Signature = EFI_ACPI_TABLE_SIGNATURE;
+  PrivateData = AllocateZeroPool(sizeof(EFI_ACPI_TABLE_INSTANCE));
+  if (PrivateData != NULL) {
+    PrivateData->Signature = EFI_ACPI_TABLE_SIGNATURE;
+  }
+  else {
+    ASSERT(PrivateData);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   //
   // Call all constructors per produced protocols
   //
-  Status = AcpiTableAcpiTableConstructor (PrivateData);
-  if (EFI_ERROR (Status)) {
-    gBS->FreePool (PrivateData);
+  Status = AcpiTableAcpiTableConstructor(PrivateData);
+  if (EFI_ERROR(Status)) {
+    gBS->FreePool(PrivateData);
     return EFI_LOAD_ERROR;
   }
 
+  mPrivateData = PrivateData;
   //
   // Install ACPI Table protocol
   //
-  if (FeaturePcdGet (PcdInstallAcpiSdtProtocol)) {
-    mPrivateData = PrivateData;
-    Status       = gBS->InstallMultipleProtocolInterfaces (
-                          &mHandle,
-                          &gEfiAcpiTableProtocolGuid,
-                          &PrivateData->AcpiTableProtocol,
-                          &gEfiAcpiSdtProtocolGuid,
-                          &mPrivateData->AcpiSdtProtocol,
-                          NULL
-                          );
-  } else {
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                    &mHandle,
-                    &gEfiAcpiTableProtocolGuid,
-                    &PrivateData->AcpiTableProtocol,
-                    NULL
-                    );
+  if (FeaturePcdGet(PcdInstallAcpiSdtProtocol)) {
+    Status = gBS->InstallMultipleProtocolInterfaces(
+      &mHandle,
+      &gEfiAcpiTableProtocolGuid,
+      &mPrivateData->AcpiTableProtocol,
+      &gEfiAcpiSdtProtocolGuid,
+      &mPrivateData->AcpiSdtProtocol,
+      NULL
+    );
+  }
+  else {
+    Status = gBS->InstallMultipleProtocolInterfaces(
+      &mHandle,
+      &gEfiAcpiTableProtocolGuid,
+      &mPrivateData->AcpiTableProtocol,
+      NULL
+    );
   }
 
-  ASSERT_EFI_ERROR (Status);
+  ASSERT_EFI_ERROR(Status);
 
   return Status;
 }
