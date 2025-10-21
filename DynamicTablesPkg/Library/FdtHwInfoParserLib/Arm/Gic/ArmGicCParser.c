@@ -747,26 +747,36 @@ GicCPmuNodeParser (
   }
 
   Data = FdtGetProp (Fdt, PmuNode, "interrupts", &DataSize);
-  if ((Data == NULL) || (DataSize != (IntCells * sizeof (UINT32)))) {
-    // If error or not 1 interrupt.
+  if ((Data == NULL) || ((DataSize != (GicCCmObjDesc->Count * IntCells * sizeof (UINT32))) && (DataSize != (IntCells * sizeof (UINT32))))) {
+    // If error, not 1 interrupt or not 1 interrupt per core.
     ASSERT (Data != NULL);
-    ASSERT (DataSize == (IntCells * sizeof (UINT32)));
+    ASSERT (DataSize == (IntCells * sizeof (UINT32)) || DataSize == (GicCCmObjDesc->Count * IntCells * sizeof (UINT32)));
     return EFI_ABORTED;
   }
 
-  PmuIrq = FdtGetInterruptId ((CONST UINT32 *)Data);
+  if (DataSize == (IntCells * sizeof (UINT32))) {
+    // One shared PMU IRQ
+    PmuIrq = FdtGetInterruptId ((CONST UINT32 *)Data);
 
-  // Only supports PPI 23 for now.
-  // According to BSA 1.0 s3.6 PPI assignments, PMU IRQ ID is 23. A non BSA
-  // compliant system may assign a different IRQ for the PMU, however this
-  // is not implemented for now.
-  if (PmuIrq != BSA_PMU_IRQ) {
-    ASSERT (PmuIrq == BSA_PMU_IRQ);
-    return EFI_ABORTED;
-  }
+    // Only supports PPI 23 for now.
+    // According to BSA 1.0 s3.6 PPI assignments, PMU IRQ ID is 23. A non BSA
+    // compliant system may assign a different IRQ for the PMU, however this
+    // is not implemented for now.
+    if (PmuIrq != BSA_PMU_IRQ) {
+      ASSERT (PmuIrq == BSA_PMU_IRQ);
+      return EFI_ABORTED;
+    }
 
-  for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
-    GicCInfo[Index].PerformanceInterruptGsiv = PmuIrq;
+    for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
+      GicCInfo[Index].PerformanceInterruptGsiv = PmuIrq;
+    }
+  } else {
+    // One PMU IRQ per core
+    for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
+      GicCInfo[Index].PerformanceInterruptGsiv = FdtGetInterruptId ((CONST UINT32 *)Data);
+
+      Data += IntCells * sizeof (UINT32);
+    }
   }
 
   return EFI_SUCCESS;
