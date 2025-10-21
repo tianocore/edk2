@@ -2142,6 +2142,16 @@ InstallAcpiTableFromAcpiSiliconHob (
       DEBUG ((DEBUG_ERROR, "InstallAcpiTableFromAcpiSiliconHob: Fail to add ACPI table at 0x%p\n", SocEntryTable));
       ASSERT_EFI_ERROR (Status);
       break;
+    } else {
+      Status = PublishTables (AcpiTableInstance, Version);
+      if (!EFI_ERROR (Status)) {
+        //
+        // Add a new table successfully, notify registed callback
+        //
+        if (FeaturePcdGet (PcdInstallAcpiSdtProtocol)) {
+          SdtNotifyAcpiList (AcpiTableInstance, Version, TableKey);
+        }
+      }
     }
 
     if (SocEntryTable->Signature == EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
@@ -2164,7 +2174,17 @@ InstallAcpiTableFromAcpiSiliconHob (
           ASSERT_EFI_ERROR (Status);
           break;
         } else {
-          DEBUG ((DEBUG_ERROR, "Installed DSDT in the DXE Table list!\n"));
+          Status = PublishTables (AcpiTableInstance, Version);
+          if (!EFI_ERROR (Status)) {
+            //
+            // Add a new table successfully, notify registed callback
+            //
+            if (FeaturePcdGet (PcdInstallAcpiSdtProtocol)) {
+              SdtNotifyAcpiList (AcpiTableInstance, Version, TableKey);
+            }
+          }
+
+          DEBUG ((DEBUG_INFO, "Installed DSDT in the DXE Table list!\n"));
         }
       } else {
         DEBUG ((DEBUG_ERROR, "The DSDT content is not correct, then skip it!\n"));
@@ -2186,7 +2206,17 @@ InstallAcpiTableFromAcpiSiliconHob (
           ASSERT_EFI_ERROR (Status);
           break;
         } else {
-          DEBUG ((DEBUG_ERROR, "Installed FACS in the DXE Table list!\n"));
+          Status = PublishTables (AcpiTableInstance, Version);
+          if (!EFI_ERROR (Status)) {
+            //
+            // Add a new table successfully, notify registed callback
+            //
+            if (FeaturePcdGet (PcdInstallAcpiSdtProtocol)) {
+              SdtNotifyAcpiList (AcpiTableInstance, Version, TableKey);
+            }
+          }
+
+          DEBUG ((DEBUG_INFO, "Installed FACS in the DXE Table list!\n"));
         }
       } else {
         DEBUG ((DEBUG_ERROR, "The FACS content is not correct, then skip it!\n"));
