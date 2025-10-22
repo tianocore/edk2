@@ -568,6 +568,8 @@ DebuggerUnloadSymbol (
   UINTN       Index;
   VOID        *BufferPtr;
 
+  BufferPtr = NULL;
+
   //
   // Check the argument
   //
