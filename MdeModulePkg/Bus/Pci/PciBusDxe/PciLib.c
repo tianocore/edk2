@@ -1802,7 +1802,7 @@ PciProgramResizableBar (
 {
   EFI_PCI_IO_PROTOCOL                                    *PciIo;
   UINT64                                                 Capabilities;
-  UINT32                                                 Index;
+  UINTN                                                  Index;
   UINT32                                                 Offset;
   INTN                                                   Bit;
   UINTN                                                  ResizableBarNumber;
