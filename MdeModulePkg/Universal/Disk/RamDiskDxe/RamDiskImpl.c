@@ -477,10 +477,16 @@ UpdateMainForm (
   // Init OpCode Handle
   //
   StartOpCodeHandle = HiiAllocateOpCodeHandle ();
-  ASSERT (StartOpCodeHandle != NULL);
+  if (StartOpCodeHandle == NULL) {
+    ASSERT (StartOpCodeHandle != NULL);
+    return;
+  }
 
   EndOpCodeHandle = HiiAllocateOpCodeHandle ();
-  ASSERT (EndOpCodeHandle != NULL);
+  if (EndOpCodeHandle == NULL) {
+    ASSERT (EndOpCodeHandle != NULL);
+    goto Exit;
+  }
 
   //
   // Create Hii Extend Label OpCode as the start opcode
@@ -552,8 +558,9 @@ UpdateMainForm (
     EndOpCodeHandle
     );
 
-  HiiFreeOpCodeHandle (StartOpCodeHandle);
   HiiFreeOpCodeHandle (EndOpCodeHandle);
+Exit:
+  HiiFreeOpCodeHandle (StartOpCodeHandle);
 }
 
 /**
