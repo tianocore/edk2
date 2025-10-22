@@ -84,7 +84,7 @@ ExcludeTrailingBackslashes (
   }
 
   TempString = String;
-  while (*TempString != L'\0' && *TempString == L'\\') {
+  while (*TempString == L'\\') {
     TempString++;
   }
 
