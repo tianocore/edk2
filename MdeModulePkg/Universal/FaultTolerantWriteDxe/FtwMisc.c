@@ -856,7 +856,7 @@ FtwGetLastWriteRecord (
   OUT EFI_FAULT_TOLERANT_WRITE_RECORD  **FtwWriteRecord
   )
 {
-  UINTN                            Index;
+  UINT64                           Index;
   EFI_FAULT_TOLERANT_WRITE_RECORD  *FtwRecord;
 
   *FtwWriteRecord = NULL;
