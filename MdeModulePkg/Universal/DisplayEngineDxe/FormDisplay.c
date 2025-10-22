@@ -1154,6 +1154,9 @@ ProcessStringForDateTime (
     Date = (EFI_IFR_DATE *)Statement->OpCode;
   } else if (Statement->OpCode->OpCode == EFI_IFR_TIME_OP) {
     Time = (EFI_IFR_TIME *)Statement->OpCode;
+  } else {
+    // If not in a time/date opcode, exit.
+    return;
   }
 
   //
@@ -1558,7 +1561,9 @@ FindTopOfScreenMenu (
     }
   } else {
     TopOfScreen = Link;
-    *SkipValue  = PreviousMenuOption->Skip - Rows;
+    if (PreviousMenuOption != NULL) {
+      *SkipValue = PreviousMenuOption->Skip - Rows;
+    }
   }
 
   return TopOfScreen;
@@ -2917,7 +2922,10 @@ UiDisplayMenu (
         if (SkipHighLight) {
           SkipHighLight = FALSE;
           MenuOption    = SavedMenuOption;
-          RefreshKeyHelp (gFormData, SavedMenuOption->ThisTag, FALSE);
+          if (SavedMenuOption != NULL) {
+            RefreshKeyHelp (gFormData, SavedMenuOption->ThisTag, FALSE);
+          }
+
           break;
         }
 
@@ -3000,7 +3008,11 @@ UiDisplayMenu (
             //
             // Don't print anything if it is a NULL help token
             //
-            ASSERT (MenuOption != NULL);
+            if (MenuOption == NULL) {
+              ASSERT (MenuOption != NULL);
+              break;
+            }
+
             HelpInfo       = ((EFI_IFR_STATEMENT_HEADER *)((CHAR8 *)MenuOption->ThisTag->OpCode + sizeof (EFI_IFR_OP_HEADER)))->Help;
             Statement      = MenuOption->ThisTag;
             StatementValue = &Statement->CurrentValue;
@@ -3257,7 +3269,11 @@ UiDisplayMenu (
             // If the screen has no menu items, and the user didn't select UiReset
             // ignore the selection and go back to reading keys.
             //
-            ASSERT (MenuOption != NULL);
+            if (MenuOption != NULL ) {
+              ASSERT (MenuOption != NULL);
+              break;
+            }
+
             if (IsListEmpty (&gMenuOption) || MenuOption->GrayOut || MenuOption->ReadOnly) {
               ControlFlag = CfReadKey;
               break;
@@ -3308,7 +3324,11 @@ UiDisplayMenu (
               break;
             }
 
-            ASSERT (MenuOption != NULL);
+            if (MenuOption != NULL) {
+              ASSERT (MenuOption != NULL);
+              break;
+            }
+
             if ((MenuOption->ThisTag->OpCode->OpCode == EFI_IFR_CHECKBOX_OP) && !MenuOption->GrayOut && !MenuOption->ReadOnly) {
               ScreenOperation = UiSelect;
             }
@@ -3393,8 +3413,11 @@ UiDisplayMenu (
 
       case CfUiSelect:
         ControlFlag = CfRepaint;
+        if (MenuOption != NULL ) {
+          ASSERT (MenuOption != NULL);
+          break;
+        }
 
-        ASSERT (MenuOption != NULL);
         Statement = MenuOption->ThisTag;
         if (Statement->OpCode->OpCode == EFI_IFR_TEXT_OP) {
           break;
@@ -3449,8 +3472,10 @@ UiDisplayMenu (
 
       case CfUiHotKey:
         ControlFlag = CfRepaint;
-
-        ASSERT (HotKey != NULL);
+        if (HotKey != NULL ) {
+          ASSERT (HotKey != NULL);
+          break;
+        }
 
         if (FxConfirmPopup (HotKey->Action)) {
           gUserInput->Action = HotKey->Action;
@@ -3469,7 +3494,11 @@ UiDisplayMenu (
 
       case CfUiLeft:
         ControlFlag = CfRepaint;
-        ASSERT (MenuOption != NULL);
+        if (MenuOption == NULL) {
+          ASSERT (MenuOption != NULL);
+          break;
+        }
+
         if ((MenuOption->ThisTag->OpCode->OpCode == EFI_IFR_DATE_OP) || (MenuOption->ThisTag->OpCode->OpCode == EFI_IFR_TIME_OP)) {
           if (MenuOption->Sequence != 0) {
             //
@@ -3484,7 +3513,11 @@ UiDisplayMenu (
 
       case CfUiRight:
         ControlFlag = CfRepaint;
-        ASSERT (MenuOption != NULL);
+        if (MenuOption == NULL) {
+          ASSERT (MenuOption != NULL);
+          break;
+        }
+
         if ((MenuOption->ThisTag->OpCode->OpCode == EFI_IFR_DATE_OP) || (MenuOption->ThisTag->OpCode->OpCode == EFI_IFR_TIME_OP)) {
           if (MenuOption->Sequence != 2) {
             //
@@ -3934,9 +3967,12 @@ BrowserStatusProcess (
   TimeOutEvent         = NULL;
   RefreshIntervalEvent = NULL;
   OpCodeBuf            = NULL;
-  if (gFormData->HighLightedStatement != NULL) {
-    OpCodeBuf = gFormData->HighLightedStatement->OpCode;
+  if (gFormData->HighLightedStatement == NULL) {
+    // Ensure there is a highlighted statement, otherwise exit
+    return;
   }
+
+  OpCodeBuf = gFormData->HighLightedStatement->OpCode;
 
   if (gFormData->BrowserStatus == (BROWSER_WARNING_IF)) {
     ASSERT (OpCodeBuf != NULL && OpCodeBuf->OpCode == EFI_IFR_WARNING_IF_OP);
