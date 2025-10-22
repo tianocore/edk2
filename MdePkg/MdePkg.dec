@@ -309,6 +309,10 @@
   #
   StackCheckLib|Include/Library/StackCheckLib.h
 
+  ##  @libraryclass  Provides APIs for Arm Compatible Semi Hosting interface
+  #
+  ArmCompatSemiHostingLib|Include/Library/ArmCompatSemiHostingLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides services to generate random number.
   #
