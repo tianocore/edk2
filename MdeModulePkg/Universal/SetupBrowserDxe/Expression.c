@@ -2708,16 +2708,18 @@ EvaluateExpression (
                   ASSERT (StrPtr != NULL);
                   TempLength = StrLen (StrPtr);
                   if (OpCode->ValueWidth >= ((TempLength + 1) / 2)) {
+                    UINTN  Index2;
+
                     Value->Type = OpCode->ValueType;
                     TempBuffer  = (UINT8 *)&Value->Value;
                     ZeroMem (TempStr, sizeof (TempStr));
-                    for (Index = 0; Index < TempLength; Index++) {
-                      TempStr[0] = StrPtr[TempLength - Index - 1];
+                    for (Index2 = 0; Index2 < TempLength; Index2++) {
+                      TempStr[0] = StrPtr[TempLength - Index2 - 1];
                       DigitUint8 = (UINT8)StrHexToUint64 (TempStr);
-                      if ((Index & 1) == 0) {
-                        TempBuffer[Index/2] = DigitUint8;
+                      if ((Index2 & 1) == 0) {
+                        TempBuffer[Index2/2] = DigitUint8;
                       } else {
-                        TempBuffer[Index/2] = (UINT8)((DigitUint8 << 4) + TempBuffer[Index/2]);
+                        TempBuffer[Index2/2] = (UINT8)((DigitUint8 << 4) + TempBuffer[Index2/2]);
                       }
                     }
                   }
@@ -3012,8 +3014,7 @@ EvaluateExpression (
           //
           Value->Value.string = NewString (gEmptyString, FormSet->HiiHandle);
         } else {
-          Index               = (UINT16)Value->Value.u64;
-          Value->Value.string = Index;
+          Value->Value.string = (UINT16)Value->Value.u64;
           FreePool (StrPtr);
         }
 
