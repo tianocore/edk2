@@ -8,6 +8,7 @@
 **/
 
 #include "SdMmcPciHcPei.h"
+#include <Library/SafeIntLib.h>
 
 EDKII_SD_MMC_HOST_CONTROLLER_PPI  mSdMmcHostControllerPpi = { GetSdMmcHcMmioBar };
 
@@ -84,6 +85,7 @@ InitializeSdMmcHcPeim (
   UINT8                       SubClass;
   UINT8                       BaseClass;
   UINT8                       SlotInfo;
+  UINT8                       SlotMax;
   UINT8                       SlotNum;
   UINT8                       FirstBar;
   UINT8                       Index;
@@ -133,7 +135,13 @@ InitializeSdMmcHcPeim (
           SlotNum  = (*(SD_MMC_HC_PEI_SLOT_INFO *)&SlotInfo).SlotNum + 1;
           ASSERT ((FirstBar + SlotNum) < MAX_SD_MMC_SLOTS);
 
-          for (Index = 0, Slot = FirstBar; Slot < (FirstBar + SlotNum); Index++, Slot++) {
+          Status = SafeUint8Add (FirstBar, SlotNum, &SlotMax);
+          if (EFI_ERROR (Status)) {
+            DEBUG ((DEBUG_ERROR, "[%a] Overflow when calculating SlotMax!\n", __func__));
+            return Status;
+          }
+
+          for (Index = 0, Slot = FirstBar; Slot < SlotMax; Index++, Slot++) {
             //
             // Get the SD/MMC Pci host controller's MMIO region size.
             //

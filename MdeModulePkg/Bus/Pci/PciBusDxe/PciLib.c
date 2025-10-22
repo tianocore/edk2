@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "PciBus.h"
+#include <Library/SafeIntLib.h>
 
 GLOBAL_REMOVE_IF_UNREFERENCED
 CHAR16  *mBarTypeStr[] = {
@@ -1940,9 +1941,16 @@ PciProgramResizableBar (
       continue;
     }
 
-    Offset = PciIoDevice->ResizableBarOffset + sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER)
-             + Index * sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_ENTRY)
-             + OFFSET_OF (PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_ENTRY, ResizableBarControl);
+    Status = SafeUint64ToUint32 (
+               PciIoDevice->ResizableBarOffset + sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER)
+               + Index * sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_ENTRY)
+               + OFFSET_OF (PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_ENTRY, ResizableBarControl),
+               &Offset
+               );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a - Overflow in resizeable bar\n", __func__));
+      continue;
+    }
 
     Entries[Index].ResizableBarControl.Bits.BarSize = (UINT32)Bit;
     DEBUG ((
