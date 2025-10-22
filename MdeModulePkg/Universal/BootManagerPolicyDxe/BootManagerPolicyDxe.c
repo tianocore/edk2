@@ -43,8 +43,7 @@ ConnectAllAndCreateNetworkDeviceList (
 
   Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiManagedNetworkServiceBindingProtocolGuid, NULL, &HandleCount, &Handles);
   if (EFI_ERROR (Status)) {
-    Handles     = NULL;
-    HandleCount = 0;
+    return EFI_DEVICE_ERROR;
   }
 
   Devices = NULL;
