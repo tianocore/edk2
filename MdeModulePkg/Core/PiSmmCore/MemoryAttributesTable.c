@@ -433,6 +433,8 @@ SmmInstallImageRecord (
   UINTN                      Index;
   EFI_SMM_DRIVER_ENTRY       DriverEntry;
 
+  HandleBuffer = NULL;
+
   Status = SmmLocateHandleBuffer (
              ByProtocol,
              &gEfiLoadedImageProtocolGuid,

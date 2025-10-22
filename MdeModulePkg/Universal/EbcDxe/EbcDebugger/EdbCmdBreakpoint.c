@@ -324,6 +324,8 @@ DebuggerBreakpointSet (
   UINTN       Address;
   EFI_STATUS  Status;
 
+  Address = 0;
+
   if (CommandArg == NULL) {
     EDBPrint (L"BreakpointSet Argument error!\n");
     return EFI_DEBUG_CONTINUE;
