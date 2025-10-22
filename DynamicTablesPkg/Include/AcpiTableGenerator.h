@@ -69,6 +69,10 @@ The Dynamic Tables Framework implements the following ACPI table generators:
             The SSDT Cpu-Topology generator collates the cpu and LPI
             information from the Configuration Manager and generates a
             SSDT table describing the CPU hierarchy.
+  - SSDT DMC-620 PMU:
+            The SSDT DMC620 PMU generator collates the PMU specific information
+            from the Configuration Manager and patches the SSDT DMC620 PMU
+            template to build the SSDT DMC620 PMU table.
   - SSDT Pci-Express:
             The SSDT Pci Express generator collates the Pci Express
             information from the Configuration Manager and generates a
@@ -122,6 +126,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdCedt,                          ///< CEDT Generator
   EStdAcpiTableIdSlit,                          ///< SLIT Generator
   EStdAcpiTableIdRhct,                          ///< RHCT Generator
+  EStdAcpiTableIdSsdtDmc620Pmu,                 ///< SSDT DMC620 PMU Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 

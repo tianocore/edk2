@@ -99,6 +99,7 @@
         "ExtendWords": [
            "ARMHB",                  # ARMHB000
            "ARMHC",                  # ARMHC600
+           "ARMHD",                  # ARMHD620
            "ARMLTD",
            "AMLDBG",
            "EISAID",
@@ -131,6 +132,7 @@
            "ROOTNODEBASE",
            "sapic",
            "ssdtcmn",
+           "ssdtdmc",
            "ssdtserialporttemplate",
            "SMCCC",
            "SMMUV",
