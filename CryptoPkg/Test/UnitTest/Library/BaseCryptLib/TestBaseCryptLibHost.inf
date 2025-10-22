@@ -43,6 +43,7 @@
   BnTests.c
   EcTests.c
   X509Tests.c
+  SlhDsaTests.c
 
 [Packages]
   MdePkg/MdePkg.dec
