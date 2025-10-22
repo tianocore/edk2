@@ -371,13 +371,20 @@ PciBusDriverBindingStart (
   if (gFullEnumeration) {
     gFullEnumeration = FALSE;
 
-    Status = gBS->InstallProtocolInterface (
-                    &PciRootBridgeIo->ParentHandle,
-                    &gEfiPciEnumerationCompleteProtocolGuid,
-                    EFI_NATIVE_INTERFACE,
-                    NULL
-                    );
-    ASSERT_EFI_ERROR (Status);
+    //
+    // Ensure that PciRootBridgeIo is not null to work around
+    //  static analysis recognizing it as unchecked before
+    //  use.
+    //
+    if (PciRootBridgeIo != NULL) {
+      Status = gBS->InstallProtocolInterface (
+                      &PciRootBridgeIo->ParentHandle,
+                      &gEfiPciEnumerationCompleteProtocolGuid,
+                      EFI_NATIVE_INTERFACE,
+                      NULL
+                      );
+      ASSERT_EFI_ERROR (Status);
+    }
   }
 
   return Status;
