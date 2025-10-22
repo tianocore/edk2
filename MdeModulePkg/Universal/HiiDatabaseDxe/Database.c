@@ -959,7 +959,12 @@ UpdateDefaultSettingInFormPackage (
           EfiVarStoreMaxNum = EfiVarStoreMaxNum + BASE_NUMBER;
         }
 
+        if (EfiVarStoreList == NULL) {
+          goto Done;
+        }
+
         IfrEfiVarStore = (EFI_IFR_VARSTORE_EFI *)IfrOpHdr;
+
         //
         // Convert VarStore Name from ASCII string to Unicode string.
         //
@@ -993,6 +998,7 @@ UpdateDefaultSettingInFormPackage (
         }
 
         DefaultIdList[DefaultIdNumber++] = ((EFI_IFR_DEFAULTSTORE *)IfrOpHdr)->DefaultId;
+
         break;
       case EFI_IFR_FORM_OP:
       case EFI_IFR_FORM_MAP_OP:
@@ -1005,13 +1011,21 @@ UpdateDefaultSettingInFormPackage (
 
         break;
       case EFI_IFR_CHECKBOX_OP:
-        IfrScope         = IfrOpHdr->Scope;
-        IfrQuestionType  = IfrOpHdr->OpCode;
-        IfrQuestionHdr   = (EFI_IFR_QUESTION_HEADER *)(IfrOpHdr + 1);
-        IfrCheckBox      = (EFI_IFR_CHECKBOX *)IfrOpHdr;
+        IfrScope        = IfrOpHdr->Scope;
+        IfrQuestionType = IfrOpHdr->OpCode;
+        IfrQuestionHdr  = (EFI_IFR_QUESTION_HEADER *)(IfrOpHdr + 1);
+        IfrCheckBox     = (EFI_IFR_CHECKBOX *)IfrOpHdr;
+        Width           = sizeof (BOOLEAN);
+
+        if (EfiVarStoreList == NULL) {
+          goto Done;
+        }
+
         EfiVarStoreIndex = IsEfiVarStoreQuestion (IfrQuestionHdr, EfiVarStoreList, EfiVarStoreNumber);
-        Width            = sizeof (BOOLEAN);
         if (EfiVarStoreIndex < EfiVarStoreNumber) {
+          if (DefaultIdList != NULL) {
+			goto Done;
+         }
           for (Index = 0; Index < DefaultIdNumber; Index++) {
             if (DefaultIdList[Index] == EFI_HII_DEFAULT_CLASS_STANDARD) {
               Status = FindQuestionDefaultSetting (DefaultIdList[Index], EfiVarStoreList[EfiVarStoreIndex], IfrQuestionHdr, &IfrValue, sizeof (BOOLEAN), QuestionReferBitField);
@@ -1057,23 +1071,29 @@ UpdateDefaultSettingInFormPackage (
           Width = (UINTN)((UINT32)1 << (((EFI_IFR_ONE_OF *)IfrOpHdr)->Flags & EFI_IFR_NUMERIC_SIZE));
         }
 
-        EfiVarStoreIndex     = IsEfiVarStoreQuestion (IfrQuestionHdr, EfiVarStoreList, EfiVarStoreNumber);
         StandardDefaultIsSet = FALSE;
         ManufactDefaultIsSet = FALSE;
+        if (EfiVarStoreList == NULL) {
+          goto Done;
+        }
+
+        EfiVarStoreIndex = IsEfiVarStoreQuestion (IfrQuestionHdr, EfiVarStoreList, EfiVarStoreNumber);
         //
         // Find Default and Manufacturing default for OneOf question
         //
         if (EfiVarStoreIndex < EfiVarStoreNumber) {
           for (Index = 0; Index < DefaultIdNumber; Index++) {
-            if (DefaultIdList[Index] == EFI_HII_DEFAULT_CLASS_STANDARD) {
-              Status = FindQuestionDefaultSetting (EFI_HII_DEFAULT_CLASS_STANDARD, EfiVarStoreList[EfiVarStoreIndex], IfrQuestionHdr, &IfrValue, Width, QuestionReferBitField);
-              if (!EFI_ERROR (Status)) {
-                StandardDefaultIsSet = TRUE;
-              }
-            } else if (DefaultIdList[Index] == EFI_HII_DEFAULT_CLASS_MANUFACTURING) {
-              Status = FindQuestionDefaultSetting (EFI_HII_DEFAULT_CLASS_MANUFACTURING, EfiVarStoreList[EfiVarStoreIndex], IfrQuestionHdr, &IfrManufactValue, Width, QuestionReferBitField);
-              if (!EFI_ERROR (Status)) {
-                ManufactDefaultIsSet = TRUE;
+            if (DefaultIdList != NULL) {
+              if (DefaultIdList[Index] == EFI_HII_DEFAULT_CLASS_STANDARD) {
+                Status = FindQuestionDefaultSetting (EFI_HII_DEFAULT_CLASS_STANDARD, EfiVarStoreList[EfiVarStoreIndex], IfrQuestionHdr, &IfrValue, Width, QuestionReferBitField);
+                if (!EFI_ERROR (Status)) {
+                  StandardDefaultIsSet = TRUE;
+                }
+              } else if (DefaultIdList[Index] == EFI_HII_DEFAULT_CLASS_MANUFACTURING) {
+                Status = FindQuestionDefaultSetting (EFI_HII_DEFAULT_CLASS_MANUFACTURING, EfiVarStoreList[EfiVarStoreIndex], IfrQuestionHdr, &IfrManufactValue, Width, QuestionReferBitField);
+                if (!EFI_ERROR (Status)) {
+                  ManufactDefaultIsSet = TRUE;
+                }
               }
             }
           }
@@ -1134,6 +1154,10 @@ UpdateDefaultSettingInFormPackage (
           // Update the default value
           //
           if (Width > 0) {
+            if (EfiVarStoreList == NULL) {
+              goto Done;
+            }
+
             EfiVarStoreIndex = IsEfiVarStoreQuestion (IfrQuestionHdr, EfiVarStoreList, EfiVarStoreNumber);
             if (EfiVarStoreIndex < EfiVarStoreNumber) {
               Status = FindQuestionDefaultSetting (IfrDefault->DefaultId, EfiVarStoreList[EfiVarStoreIndex], IfrQuestionHdr, &IfrDefault->Value, Width, QuestionReferBitField);

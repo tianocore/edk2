@@ -261,7 +261,7 @@ PeimFaultTolerantWriteInitialize (
 
     if (!EFI_ERROR (Status)) {
       ASSERT (FtwLastWriteRecord != NULL);
-      if ((FtwLastWriteRecord->SpareComplete == FTW_VALID_STATE) && (FtwLastWriteRecord->DestinationComplete != FTW_VALID_STATE)) {
+      if ((FtwLastWriteRecord != NULL) && (FtwLastWriteRecord->SpareComplete == FTW_VALID_STATE) && (FtwLastWriteRecord->DestinationComplete != FTW_VALID_STATE)) {
         //
         // If FTW last write was still in progress with SpareComplete set and DestinationComplete not set.
         // It means the target buffer has been backed up in spare block, then target block has been erased,

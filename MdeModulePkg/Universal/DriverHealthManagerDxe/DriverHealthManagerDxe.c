@@ -528,8 +528,9 @@ DriverHealthManagerRepairNotify (
   @param Handle         Handle to the HII package list.
   @param FormsetGuid    Return the formset GUID.
 
-  @retval EFI_SUCCESS   The formset is found successfully.
-  @retval EFI_NOT_FOUND The formset cannot be found.
+  @retval EFI_SUCCESS           The formset is found successfully.
+  @retval EFI_NOT_FOUND         The formset cannot be found.
+  @retval EFI_OUT_OF_RESOURCES  Failed to find enough free memory
 **/
 EFI_STATUS
 DriverHealthManagerGetFormsetId (
@@ -557,7 +558,10 @@ DriverHealthManagerGetFormsetId (
   Status         = mDriverHealthManagerDatabase->ExportPackageLists (mDriverHealthManagerDatabase, Handle, &BufferSize, HiiPackageList);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     HiiPackageList = AllocatePool (BufferSize);
-    ASSERT (HiiPackageList != NULL);
+    if (HiiPackageList == NULL) {
+      ASSERT (HiiPackageList != NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
 
     Status = mDriverHealthManagerDatabase->ExportPackageLists (mDriverHealthManagerDatabase, Handle, &BufferSize, HiiPackageList);
   }
@@ -566,7 +570,10 @@ DriverHealthManagerGetFormsetId (
     return Status;
   }
 
-  ASSERT (HiiPackageList != NULL);
+  if (HiiPackageList == NULL) {
+    ASSERT (HiiPackageList != NULL);
+    return EFI_NOT_FOUND;
+  }
 
   //
   // Get Form package from this HII package List
@@ -607,6 +614,7 @@ DriverHealthManagerGetFormsetId (
   // Form package not found in this Package List
   //
   FreePool (HiiPackageList);
+
   return EFI_NOT_FOUND;
 }
 
@@ -891,28 +899,29 @@ DriverHealthManagerCleanDynamicString (
   BufferSize      = sizeof (EFI_HII_PACKAGE_LIST_HEADER) + FixedStringSize + sizeof (EFI_HII_PACKAGE_HEADER);
   HiiPackageList  = AllocatePool (BufferSize);
   ASSERT (HiiPackageList != NULL);
+  if (HiiPackageList != NULL ) {
+    HiiPackageList->PackageLength = (UINT32)BufferSize;
+    CopyMem (&HiiPackageList->PackageListGuid, &gEfiCallerIdGuid, sizeof (EFI_GUID));
 
-  HiiPackageList->PackageLength = (UINT32)BufferSize;
-  CopyMem (&HiiPackageList->PackageListGuid, &gEfiCallerIdGuid, sizeof (EFI_GUID));
+    PackageHeader = (EFI_HII_PACKAGE_HEADER *)(HiiPackageList + 1);
+    CopyMem (PackageHeader, STRING_ARRAY_NAME + sizeof (UINT32), FixedStringSize);
 
-  PackageHeader = (EFI_HII_PACKAGE_HEADER *)(HiiPackageList + 1);
-  CopyMem (PackageHeader, STRING_ARRAY_NAME + sizeof (UINT32), FixedStringSize);
+    PackageHeader         = (EFI_HII_PACKAGE_HEADER *)((UINT8 *)PackageHeader + PackageHeader->Length);
+    PackageHeader->Type   = EFI_HII_PACKAGE_END;
+    PackageHeader->Length = sizeof (EFI_HII_PACKAGE_HEADER);
 
-  PackageHeader         = (EFI_HII_PACKAGE_HEADER *)((UINT8 *)PackageHeader + PackageHeader->Length);
-  PackageHeader->Type   = EFI_HII_PACKAGE_END;
-  PackageHeader->Length = sizeof (EFI_HII_PACKAGE_HEADER);
+    Status = mDriverHealthManagerDatabase->UpdatePackageList (
+                                             mDriverHealthManagerDatabase,
+                                             mDriverHealthManagerHiiHandle,
+                                             HiiPackageList
+                                             );
+    ASSERT_EFI_ERROR (Status);
 
-  Status = mDriverHealthManagerDatabase->UpdatePackageList (
-                                           mDriverHealthManagerDatabase,
-                                           mDriverHealthManagerHiiHandle,
-                                           HiiPackageList
-                                           );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Form package not found in this Package List
-  //
-  FreePool (HiiPackageList);
+    //
+    // Form package not found in this Package List
+    //
+    FreePool (HiiPackageList);
+  }
 }
 
 /**

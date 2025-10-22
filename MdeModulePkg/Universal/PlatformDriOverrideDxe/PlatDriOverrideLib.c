@@ -157,6 +157,8 @@ CheckExistInStack (
                                    is valid
   @retval EFI_SUCCESS              Successfully updated the invalid DevicePath,
                                    and return the updated device path in DevicePath
+  @retval EFI_NOT_FOUND            Failed to update the device path because the FV
+                                   was not found
 
 **/
 EFI_STATUS
@@ -360,9 +362,14 @@ UpdateFvFileDevicePath (
     // Build the shell device path
     //
     NewDevicePath = DevicePathFromHandle (FoundFvHandle);
+    if (NewDevicePath != NULL) {
+      return EFI_NOT_FOUND;
+    }
+
     EfiInitializeFwVolDevicepathNode (&FvFileNode, FileGuid);
     NewDevicePath = AppendDevicePathNode (NewDevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&FvFileNode);
     *DevicePath   = NewDevicePath;
+
     return EFI_SUCCESS;
   }
 
@@ -1309,7 +1316,7 @@ GetDriverFromMapping (
     OverrideItemListIndex = GetNextNode (MappingDataBase, OverrideItemListIndex);
   }
 
-  if (!ControllerFound) {
+  if (!ControllerFound || (OverrideItem == NULL)) {
     return EFI_NOT_FOUND;
   }
 
@@ -1640,7 +1647,7 @@ CheckMapping (
     OverrideItemListIndex = GetNextNode (MappingDataBase, OverrideItemListIndex);
   }
 
-  if (!Found) {
+  if (!Found || (OverrideItem == NULL)) {
     //
     // ControllerDevicePath is not in MappingDataBase
     //
@@ -1717,6 +1724,7 @@ CheckMapping (
                                    recorded into the mapping database.
   @retval EFI_SUCCESS              The Controller and DriverImage are inserted into
                                    the mapping database successfully.
+  @retval EFI_OUT_OF_RESOURCES     Could not allocate a required resource.
 
 **/
 EFI_STATUS
@@ -1795,18 +1803,30 @@ InsertDriverImage (
   //
   if (!Found) {
     OverrideItem = AllocateZeroPool (sizeof (PLATFORM_OVERRIDE_ITEM));
-    ASSERT (OverrideItem != NULL);
+    if (OverrideItem == NULL) {
+      ASSERT (OverrideItem != NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     OverrideItem->Signature            = PLATFORM_OVERRIDE_ITEM_SIGNATURE;
     OverrideItem->ControllerDevicePath = DuplicateDevicePath (ControllerDevicePath);
     InitializeListHead (&OverrideItem->DriverInfoList);
     InsertTailList (MappingDataBase, &OverrideItem->Link);
   }
 
+  if (OverrideItem == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
   //
   // Prepare the driver image related DRIVER_IMAGE_INFO structure.
   //
   DriverImageInfo = AllocateZeroPool (sizeof (DRIVER_IMAGE_INFO));
-  ASSERT (DriverImageInfo != NULL);
+  if (DriverImageInfo == NULL) {
+    ASSERT (DriverImageInfo != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   DriverImageInfo->Signature       = DRIVER_IMAGE_INFO_SIGNATURE;
   DriverImageInfo->DriverImagePath = DuplicateDevicePath (DriverImageDevicePath);
   //
@@ -1919,8 +1939,9 @@ DeleteDriverImage (
     OverrideItemListIndex = GetNextNode (MappingDataBase, OverrideItemListIndex);
   }
 
-  ASSERT (Found);
-  ASSERT (OverrideItem->DriverInfoNum != 0);
+  if (!Found) {
+    goto Exit;
+  }
 
   Found              = FALSE;
   ImageInfoListIndex = GetFirstNode (&OverrideItem->DriverInfoList);
@@ -1975,6 +1996,7 @@ DeleteDriverImage (
     FreePool (OverrideItem);
   }
 
+Exit:
   if (!Found) {
     //
     // DriverImageDevicePath is not NULL and cannot be found in the controller's

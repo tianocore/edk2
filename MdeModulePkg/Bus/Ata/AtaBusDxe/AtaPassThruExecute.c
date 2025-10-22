@@ -929,11 +929,19 @@ EXIT:
     if (EFI_ERROR (Status)) {
       OldTpl                   = gBS->RaiseTPL (TPL_NOTIFY);
       Token->TransactionStatus = Status;
-      *EventCount              = (*EventCount) - (TempCount - Index);
-      *IsError                 = TRUE;
+      if (EventCount != NULL) {
+        *EventCount = (*EventCount) - (TempCount - Index);
+      }
 
-      if (*EventCount == 0) {
+      if (IsError != NULL) {
+        *IsError = TRUE;
+      }
+
+      if ((EventCount != NULL) && (*EventCount == 0)) {
         FreePool (EventCount);
+      }
+
+      if (IsError != NULL) {
         FreePool (IsError);
       }
 

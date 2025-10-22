@@ -455,8 +455,12 @@ EhcCreateQtds (
 
   //
   // Insert the status packet for control transfer
+  // Given that EhcCreateQtd has the possibility to return an error
+  // and that static scanners are still flagging it as
+  // having a path where its uninitialized, ensure
+  // the check against NULL is performed.
   //
-  if (Ep->Type == EHC_CTRL_TRANSFER) {
+  if ((Ep->Type == EHC_CTRL_TRANSFER) && (StatusQtd != NULL)) {
     InsertTailList (&Qh->Qtds, &StatusQtd->QtdList);
   }
 

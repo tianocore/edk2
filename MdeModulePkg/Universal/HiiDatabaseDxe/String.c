@@ -1078,6 +1078,11 @@ SetStringWorker (
     return EFI_SUCCESS;
   }
 
+  if (GlobalFont == NULL ) {
+    ASSERT (GlobalFont != NULL);
+    return EFI_NOT_FOUND;
+  }
+
   OldBlockSize = StringPackage->StringPkgHdr->Header.Length - StringPackage->StringPkgHdr->HdrSize;
   BlockSize    = OldBlockSize + sizeof (EFI_HII_SIBT_FONT_BLOCK) - sizeof (CHAR16) +
                  StrSize (GlobalFont->FontInfo->FontName);
@@ -1094,25 +1099,27 @@ SetStringWorker (
   CopyMem (BlockPtr, &Ext2, sizeof (EFI_HII_SIBT_EXT2_BLOCK));
   BlockPtr += sizeof (EFI_HII_SIBT_EXT2_BLOCK);
 
-  *BlockPtr = LocalFont->FontId;
-  BlockPtr++;
-  CopyMem (BlockPtr, &GlobalFont->FontInfo->FontSize, sizeof (UINT16));
-  BlockPtr += sizeof (UINT16);
-  CopyMem (BlockPtr, &GlobalFont->FontInfo->FontStyle, sizeof (UINT32));
-  BlockPtr += sizeof (UINT32);
-  CopyMem (
-    BlockPtr,
-    GlobalFont->FontInfo->FontName,
-    StrSize (GlobalFont->FontInfo->FontName)
-    );
-  BlockPtr += StrSize (GlobalFont->FontInfo->FontName);
+  if (LocalFont != NULL) {
+    *BlockPtr = LocalFont->FontId;
+    BlockPtr++;
+    CopyMem (BlockPtr, &GlobalFont->FontInfo->FontSize, sizeof (UINT16));
+    BlockPtr += sizeof (UINT16);
+    CopyMem (BlockPtr, &GlobalFont->FontInfo->FontStyle, sizeof (UINT32));
+    BlockPtr += sizeof (UINT32);
+    CopyMem (
+      BlockPtr,
+      GlobalFont->FontInfo->FontName,
+      StrSize (GlobalFont->FontInfo->FontName)
+      );
+    BlockPtr += StrSize (GlobalFont->FontInfo->FontName);
 
-  CopyMem (BlockPtr, StringPackage->StringBlock, OldBlockSize);
+    CopyMem (BlockPtr, StringPackage->StringBlock, OldBlockSize);
 
-  ZeroMem (StringPackage->StringBlock, OldBlockSize);
-  FreePool (StringPackage->StringBlock);
-  StringPackage->StringBlock                  = Block;
-  StringPackage->StringPkgHdr->Header.Length += Ext2.Length;
+    ZeroMem (StringPackage->StringBlock, OldBlockSize);
+    FreePool (StringPackage->StringBlock);
+    StringPackage->StringBlock                  = Block;
+    StringPackage->StringPkgHdr->Header.Length += Ext2.Length;
+  }
 
   return EFI_SUCCESS;
 }
@@ -1578,7 +1585,7 @@ Done:
       StringPackage              = CR (Link, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
       StringPackage->MaxStringId = *StringId;
     }
-  } else if (NewStringPackageCreated) {
+  } else if (NewStringPackageCreated && (StringPackage != NULL)) {
     //
     // Free the allocated new string Package when new string can't be added.
     //

@@ -703,6 +703,8 @@ DebuggerLoadCode (
   CHAR16      *FileName;
   CHAR16      *MapFileName;
 
+  Buffer = NULL;
+
   //
   // Check the argument
   //
@@ -800,6 +802,7 @@ DebuggerUnloadCode (
   EFI_STATUS  Status;
   VOID        *BufferPtr;
 
+  BufferPtr = NULL;
   //
   // Check the argument
   //
