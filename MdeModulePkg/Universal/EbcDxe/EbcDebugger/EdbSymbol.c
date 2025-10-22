@@ -1268,7 +1268,10 @@ EdbLoadCodBySymbolByIec (
         // get function name, function name is followed by char 0x09.
         //
         FieldBuffer = AsciiStrGetNewTokenField (LineBuffer, Char);
-        ASSERT (FieldBuffer != NULL);
+        if (FieldBuffer != NULL) {
+          break;
+        }
+
         if (AsciiStriCmp (FieldBuffer, Name) == 0) {
           BufferStart   = FieldBuffer;
           CodParseState = EdbEbcCodParseStateSymbolStart;

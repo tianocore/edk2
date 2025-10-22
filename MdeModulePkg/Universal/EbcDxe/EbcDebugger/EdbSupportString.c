@@ -25,7 +25,10 @@ Xtoi (
   CHAR16  TempChar;
   UINTN   MaxVal;
 
-  ASSERT (Str != NULL);
+  if (Str == NULL) {
+    ASSERT (Str != NULL);
+    return 0;
+  }
 
   MaxVal = (UINTN)-1 >> 4;
   //
