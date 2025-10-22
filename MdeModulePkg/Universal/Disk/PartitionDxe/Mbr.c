@@ -127,7 +127,7 @@ PartitionInstallMbrChildHandles (
 {
   EFI_STATUS                   Status;
   MASTER_BOOT_RECORD           *Mbr;
-  UINT32                       ExtMbrStartingLba;
+  UINT64                       ExtMbrStartingLba;
   UINT32                       Index;
   HARDDRIVE_DEVICE_PATH        HdDev;
   HARDDRIVE_DEVICE_PATH        ParentHdDev;
