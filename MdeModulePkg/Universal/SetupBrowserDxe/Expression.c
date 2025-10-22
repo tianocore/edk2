@@ -2544,7 +2544,7 @@ EvaluateExpression (
   EXPRESSION_OPCODE         *OpCode;
   FORM_BROWSER_STATEMENT    *Question;
   FORM_BROWSER_STATEMENT    *Question2;
-  UINT16                    Index;
+  UINTN                     Index;
   EFI_HII_VALUE             Data1;
   EFI_HII_VALUE             Data2;
   EFI_HII_VALUE             Data3;
@@ -2649,7 +2649,7 @@ EvaluateExpression (
         }
 
         Value->Value.b = FALSE;
-        for (Index = 0; Index < OpCode->ListLength; Index++) {
+        for (Index = 0; Index < (UINTN)OpCode->ListLength; Index++) {
           if (Question->HiiValue.Value.u16 == OpCode->ValueList[Index]) {
             Value->Value.b = TRUE;
             break;
@@ -3012,8 +3012,8 @@ EvaluateExpression (
           //
           Value->Value.string = NewString (gEmptyString, FormSet->HiiHandle);
         } else {
-          Index               = (UINT16)Value->Value.u64;
-          Value->Value.string = Index;
+          Index               = (UINTN)Value->Value.u64;
+          Value->Value.string = (UINT16)Index;
           FreePool (StrPtr);
         }
 
