@@ -469,7 +469,9 @@ SmmInstallImageRecord (
     SmmInsertImageRecord (&DriverEntry);
   }
 
-  FreePool (HandleBuffer);
+  if (HandleBuffer != NULL) {
+    FreePool (HandleBuffer);
+  }
 }
 
 /**
