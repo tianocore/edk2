@@ -1447,6 +1447,12 @@ PciBridgeResourceAllocator (
   UINT64             PMem64Base;
   EFI_STATUS         Status;
 
+  IoBridge     = NULL;
+  Mem32Bridge  = NULL;
+  PMem32Bridge = NULL;
+  Mem64Bridge  = NULL;
+  PMem64Bridge = NULL;
+
   IoBridge = CreateResourceNode (
                Bridge,
                0,
