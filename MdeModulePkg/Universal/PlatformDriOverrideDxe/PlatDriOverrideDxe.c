@@ -1225,9 +1225,18 @@ PlatOverMngrExtractConfig (
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
     ConfigRequestHdr = HiiConstructConfigHdr (&gPlatformOverridesManagerGuid, mVariableName, Private->DriverHandle);
-    Size             = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
-    ConfigRequest    = AllocateZeroPool (Size);
-    ASSERT (ConfigRequest != NULL);
+    if (ConfigRequestHdr == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    Size          = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest = AllocateZeroPool (Size);
+    if (ConfigRequest == NULL) {
+      ASSERT (ConfigRequest != NULL);
+      FreePool (ConfigRequestHdr);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     AllocatedRequest = TRUE;
     BufferSize       = sizeof (PLAT_OVER_MNGR_DATA);
     UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
@@ -1346,6 +1355,7 @@ PlatOverMngrRouteConfig (
   @retval EFI_UNSUPPORTED       An action is being passed that is not supported.
   @retval EFI_DEVICE_ERROR      Changed failed to be commited.
   @retval EFI_NOT_FOUND         Unable to get data from Hii.
+  @retval EFI_INVALID_PARMETER  Input parameters are invalid.
 
 **/
 EFI_STATUS
@@ -1372,6 +1382,10 @@ PlatOverMngrCallback (
     return EFI_UNSUPPORTED;
   }
 
+  if (Value == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   Private    = EFI_CALLBACK_INFO_FROM_THIS (This);
   FakeNvData = &Private->FakeNvData;
   if (!HiiGetBrowserData (&gPlatformOverridesManagerGuid, mVariableName, sizeof (PLAT_OVER_MNGR_DATA), (UINT8 *)FakeNvData)) {
@@ -1379,10 +1393,6 @@ PlatOverMngrCallback (
   }
 
   if (Action == EFI_BROWSER_ACTION_CHANGING) {
-    if (Value == NULL) {
-      return EFI_INVALID_PARAMETER;
-    }
-
     if (KeyValue == KEY_VALUE_DRIVER_GOTO_PREVIOUS) {
       UpdateDeviceSelectPage (Private, KeyValue, FakeNvData);
       //
