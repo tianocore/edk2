@@ -1476,7 +1476,7 @@ BuildAdmaDescTable (
   EFI_PHYSICAL_ADDRESS  Data;
   UINT64                DataLen;
   UINT64                Entries;
-  UINT32                Index;
+  UINT64                Index;
   UINT64                Remaining;
   UINT64                Address;
   UINTN                 TableSize;
