@@ -252,7 +252,11 @@ CreateRefreshEventForStatement (
   ASSERT_EFI_ERROR (Status);
 
   EventNode = AllocateZeroPool (sizeof (FORM_BROWSER_REFRESH_EVENT_NODE));
-  ASSERT (EventNode != NULL);
+  if (EventNode == NULL) {
+    ASSERT (EventNode != NULL);
+    return;
+  }
+
   EventNode->RefreshEvent = RefreshEvent;
   InsertTailList (&mRefreshEventList, &EventNode->Link);
 }
@@ -286,7 +290,11 @@ CreateRefreshEventForForm (
   ASSERT_EFI_ERROR (Status);
 
   EventNode = AllocateZeroPool (sizeof (FORM_BROWSER_REFRESH_EVENT_NODE));
-  ASSERT (EventNode != NULL);
+  if (EventNode == NULL) {
+    ASSERT (EventNode != NULL);
+    return;
+  }
+
   EventNode->RefreshEvent = RefreshEvent;
   InsertTailList (&mRefreshEventList, &EventNode->Link);
 }
@@ -337,7 +345,10 @@ InitializeDisplayStatement (
     }
 
     DisplayOption = AllocateZeroPool (sizeof (DISPLAY_QUESTION_OPTION));
-    ASSERT (DisplayOption != NULL);
+    if (DisplayOption == NULL) {
+      ASSERT (DisplayOption != NULL);
+      continue;
+    }
 
     DisplayOption->ImageId      = Option->ImageId;
     DisplayOption->Signature    = DISPLAY_QUESTION_OPTION_SIGNATURE;
@@ -410,7 +421,9 @@ InitializeDisplayStatement (
   if (Statement->ParentStatement != NULL) {
     ParentStatement = GetDisplayStatement (Statement->ParentStatement->OpCode);
     ASSERT (ParentStatement != NULL);
-    InsertTailList (&ParentStatement->NestStatementList, &DisplayStatement->DisplayLink);
+    if (ParentStatement != NULL) {
+      InsertTailList (&ParentStatement->NestStatementList, &DisplayStatement->DisplayLink);
+    }
   } else {
     InsertTailList (&gDisplayFormData.StatementListHead, &DisplayStatement->DisplayLink);
   }
@@ -555,7 +568,11 @@ AddStatementToDisplayForm (
     Link      = GetNextNode (&gCurrentSelection->FormSet->StatementListOSF, Link);
 
     DisplayStatement = AllocateZeroPool (sizeof (FORM_DISPLAY_ENGINE_STATEMENT));
-    ASSERT (DisplayStatement != NULL);
+    if (DisplayStatement == NULL) {
+      ASSERT (DisplayStatement != NULL);
+      return;
+    }
+
     DisplayStatement->Signature = FORM_DISPLAY_ENGINE_STATEMENT_SIGNATURE;
     DisplayStatement->Version   = FORM_DISPLAY_ENGINE_STATEMENT_VERSION_1;
     DisplayStatement->OpCode    = Statement->OpCode;
@@ -570,7 +587,10 @@ AddStatementToDisplayForm (
   // treat formset as statement outside the form,get its opcode.
   //
   DisplayStatement = AllocateZeroPool (sizeof (FORM_DISPLAY_ENGINE_STATEMENT));
-  ASSERT (DisplayStatement != NULL);
+  if (DisplayStatement == NULL) {
+    ASSERT (DisplayStatement != NULL);
+    return;
+  }
 
   DisplayStatement->Signature = FORM_DISPLAY_ENGINE_STATEMENT_SIGNATURE;
   DisplayStatement->Version   = FORM_DISPLAY_ENGINE_STATEMENT_VERSION_1;
@@ -605,7 +625,10 @@ AddStatementToDisplayForm (
     }
 
     DisplayStatement = AllocateZeroPool (sizeof (FORM_DISPLAY_ENGINE_STATEMENT));
-    ASSERT (DisplayStatement != NULL);
+    if (DisplayStatement == NULL) {
+      ASSERT (DisplayStatement != NULL);
+      continue;
+    }
 
     //
     // Initialize this statement and add it to the display form.
@@ -641,7 +664,11 @@ AddStatementToDisplayForm (
     ASSERT_EFI_ERROR (Status);
 
     EventNode = AllocateZeroPool (sizeof (FORM_BROWSER_REFRESH_EVENT_NODE));
-    ASSERT (EventNode != NULL);
+    if (EventNode == NULL) {
+      ASSERT (EventNode != NULL);
+      return;
+    }
+
     EventNode->RefreshEvent = RefreshIntervalEvent;
     InsertTailList (&mRefreshEventList, &EventNode->Link);
   }
@@ -1097,7 +1124,10 @@ GetFormsetGuidFromHiiHandle (
   Status = mHiiDatabase->ExportPackageLists (mHiiDatabase, HiiHandle, &BufferSize, HiiPackageList);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     HiiPackageList = AllocatePool (BufferSize);
-    ASSERT (HiiPackageList != NULL);
+    if (HiiPackageList == NULL) {
+      ASSERT (HiiPackageList != NULL);
+      return FALSE;
+    }
 
     Status = mHiiDatabase->ExportPackageLists (mHiiDatabase, HiiHandle, &BufferSize, HiiPackageList);
   }
@@ -1253,7 +1283,10 @@ FormSetGuidToHiiHandle (
   // Get all the Hii handles
   //
   HiiHandles = HiiGetHiiHandles (NULL);
-  ASSERT (HiiHandles != NULL);
+  if (HiiHandles == NULL ) {
+    ASSERT (HiiHandles != NULL);
+    return NULL;
+  }
 
   //
   // Search for formset of each class type
@@ -1558,7 +1591,7 @@ ProcessQuestionConfig (
   @param UserInput               The user input data.
 
   @retval EFI_SUCCESS            This function always return successfully for now.
-
+  @retval EFI_NOT_FOUND          The satement associated with the userinput was not found.
 **/
 EFI_STATUS
 ProcessUserInput (
@@ -1582,7 +1615,10 @@ ProcessUserInput (
   gCurrentSelection->QuestionId = 0;
   if (UserInput->SelectedStatement != NULL) {
     Statement = GetBrowserStatement (UserInput->SelectedStatement);
-    ASSERT (Statement != NULL);
+    if (Statement == NULL ) {
+      ASSERT (Statement != NULL);
+      return EFI_NOT_FOUND;
+    }
 
     //
     // This question is the current user select one,record it and later
@@ -1606,8 +1642,7 @@ ProcessUserInput (
   if (UserInput->Action != 0) {
     Status                       = ProcessAction (UserInput->Action, UserInput->DefaultId);
     gCurrentSelection->Statement = NULL;
-  } else {
-    ASSERT (Statement != NULL);
+  } else if (Statement != NULL) {
     gCurrentSelection->Statement = Statement;
     switch (Statement->Operand) {
       case EFI_IFR_REF_OP:
@@ -1715,7 +1750,10 @@ DisplayForm (
                     gCurrentSelection->FormId,
                     gCurrentSelection->QuestionId
                     );
-    ASSERT (CurrentMenu != NULL);
+    if (CurrentMenu == NULL) {
+      ASSERT (CurrentMenu != NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
   }
 
   //
@@ -2083,7 +2121,10 @@ ProcessCallBackFunction (
       //
       if (HiiValue->Type == EFI_IFR_TYPE_STRING) {
         NewString = GetToken (Statement->HiiValue.Value.string, FormSet->HiiHandle);
-        ASSERT (NewString != NULL);
+        if (NewString == NULL) {
+          ASSERT (NewString != NULL);
+          continue;
+        }
 
         ASSERT (StrLen (NewString) * sizeof (CHAR16) <= Statement->StorageWidth);
         if (StrLen (NewString) * sizeof (CHAR16) <= Statement->StorageWidth) {
@@ -2346,7 +2387,10 @@ ProcessRetrieveForQuestion (
                                   );
   if (!EFI_ERROR (Status) && (HiiValue->Type == EFI_IFR_TYPE_STRING)) {
     NewString = GetToken (Statement->HiiValue.Value.string, FormSet->HiiHandle);
-    ASSERT (NewString != NULL);
+    if (NewString == NULL) {
+      ASSERT (NewString != NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
 
     ASSERT (StrLen (NewString) * sizeof (CHAR16) <= Statement->StorageWidth);
     if (StrLen (NewString) * sizeof (CHAR16) <= Statement->StorageWidth) {
