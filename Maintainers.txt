@@ -83,16 +83,14 @@ M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
 EDK II Architectures:
 ---------------------
-ARM, AARCH64
+AARCH64
 F: MdeModulePkg/*/AArch64/
-F: MdeModulePkg/*/Arm/
 F: MdePkg/*/AArch64/
-F: MdePkg/*/Arm/
 F: UefiCpuPkg/*/AArch64/
-F: UefiCpuPkg/*/Arm/
 M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
+R: Vishal Oliyil Kunnnil <vishalo@qti.qualcomm.com> [vishalo]
 
 RISCV64
 F: */RiscV64/
@@ -153,6 +151,7 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPkg
 M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
+R: Vishal Oliyil Kunnnil <vishalo@qti.qualcomm.com> [vishalo]
 
 ArmPlatformPkg
 F: ArmPlatformPkg/
@@ -172,7 +171,6 @@ R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 BaseTools
 F: BaseTools/
 W: https://github.com/tianocore/tianocore.github.io/wiki/BaseTools
-M: Rebecca Cran <rebecca@bsdio.com> [bexcran]
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 M: Guillermo Antonio Palomino Sosa <guillermo.a.palomino.sosa@intel.com> [gapalomi]
 R: Yuwei Chen <yuwei.chen@intel.com> [YuweiChen1110]
@@ -449,11 +447,12 @@ F: MdePkg/Include/IndustryStandard/SpiNorFlashJedecSfdp.h
 M: Abner Chang <abner.chang@amd.com> [changab]
 R: Brit Chesley <brit.chesley@amd.com> [BritChesley]
 
-MdePkg: ARM/AARCH64 standard interfaces
+MdePkg: AARCH64 standard interfaces
 F: MdePkg/Include/Library/ArmLib.h
 M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
+R: Vishal Oliyil Kunnnil <vishalo@qti.qualcomm.com> [vishalo]
 
 MdePkg: ARM-FFA related interfaces
 F: MdePkg/*ArmFfa*
@@ -647,7 +646,7 @@ M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
 R: Dun Tan <dun.tan@intel.com> [td36]
-R: Khor Swee Aun <swee.aun.khor@intel.com> [sweeaun]
+R: Star Zeng <star.zeng@intel.com> [lzeng14]
 R: Eduardo Cuevas Farfan <eduardo.cuevas.farfan@intel.com> [ecuevasf]
 
 UefiCpuPkg

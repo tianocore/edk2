@@ -2,7 +2,7 @@
   CPU MP Initialize Library common functions.
 
   Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2020 - 2024, AMD Inc. All rights reserved.<BR>
+  Copyright (C) 2020 - 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -278,8 +278,30 @@ RestoreVolatileRegisters (
   {
     Tss = (IA32_TSS_DESCRIPTOR *)(VolatileRegisters->Gdtr.Base +
                                   VolatileRegisters->Tr);
-    if (Tss->Bits.P == 1) {
-      Tss->Bits.Type &= 0xD;  // 1101 - Clear busy bit just in case
+
+    if ((Tss->Bits.P == 1) && ((Tss->Bits.Type & BIT1) == 0)) {
+      // TR is used to enable a separate safe stack when a stack overflow occurs.
+      // When PEI starts up the APs, TR is non-zero and so each processor has its
+      // own GDT. TR is an offset into the GDT and so points to a different TSS entry
+      // in each AP.
+      // There is a small window in early DXE after MpInitLibInitialize() is called
+      // where:
+      // - TR is non-zero because it has been inherited from the PEI phase
+      // - TR is not restored to 0
+      // - The APs are all switched to using the BSP's GDT
+      // - SaveVolatileRegisters() is called from ApWakeupFunction() before the APs
+      //   go to sleep, which saves the non-zero TR value to CpuMpData->CpuData[].VolatileRegisters.Tr,
+      //   cause TR to point to the same TSS entry in the BSP's GDT
+      // - The next time the APs are woken up, RestoreVolatileRegisters() is called
+      //   from ApWakeupFunction() which would attempt to load the non-zero TR value into the actual
+      //   task register, which creates a race condition to a #GP fault because loading the task
+      //   register sets the busy bit in the TSS descriptor and a #GP fault occurs if the busy bit
+      //   is already set when loading the task register.
+      //
+      // To avoid this issue, the task register is only loaded if TR is non-zero and the
+      // TSS descriptor is valid and not busy. HW sets the busy bit and does not clear it. edk2 does
+      // not clear the busy bit, so the BSP's TSS descriptor will be marked busy forever and the APs
+      // will not load the task register until they have their own GDT/TSS set up.
       AsmWriteTr (VolatileRegisters->Tr);
     }
   }
@@ -1663,10 +1685,24 @@ ResetProcessorToIdleState (
 
   CpuMpData = GetCpuMpData ();
 
-  CpuMpData->WakeUpByInitSipiSipi = TRUE;
   if (CpuMpData == NULL) {
     DEBUG ((DEBUG_ERROR, "[%a] - Failed to get CpuMpData.  Aborting the AP reset to idle.\n", __func__));
     return;
+  }
+
+  CpuMpData->WakeUpByInitSipiSipi = TRUE;
+
+  //
+  // "CpuMpData->WakeUpByInitSipiSipi = TRUE" requires that the AP must be in Halt loop.
+  // If AP loop mode is not Halt loop, make sure that the AP is in the known non-executable state.
+  //
+  // AP could be in MONITOR/MWAIT state that could wake up the AP when setting WAKEUP_AP_SIGNAL in WakeUpAp().
+  // And then SendInitSipiSipi() in WakeupAp() could wake up the AP again to run the AP Wakeup vector.
+  // But the AP wakeup vector could be freed by the BSP while the AP is running it.
+  //
+  if (CpuMpData->ApLoopMode != ApInHltLoop) {
+    SendInitIpi (((CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob)[ProcessorNumber].ApicId);
+    MicroSecondDelay (PcdGet32 (PcdCpuInitIpiDelayInMicroSeconds));
   }
 
   WakeUpAP (CpuMpData, FALSE, ProcessorNumber, NULL, NULL, TRUE);

@@ -22,7 +22,7 @@
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/Arm
-  SUPPORTED_ARCHITECTURES        = ARM|AARCH64
+  SUPPORTED_ARCHITECTURES        = AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -87,7 +87,7 @@
   ArmTransferListLib|ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
   ArmFfaLib|MdeModulePkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
 
-  ArmMtlLib|ArmPkg/Library/ArmMtlNullLib/ArmMtlNullLib.inf
+  ArmMtlLib|ArmPkg/Library/ArmMtlLibNull/ArmMtlLibNull.inf
 
   OemMiscLib|ArmPkg/Universal/Smbios/OemMiscLibNull/OemMiscLibNull.inf
 
@@ -141,7 +141,7 @@
   ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
   ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
   ArmPkg/Library/ArmLib/ArmBaseLib.inf
-  ArmPkg/Library/ArmMtlNullLib/ArmMtlNullLib.inf
+  ArmPkg/Library/ArmMtlLibNull/ArmMtlLibNull.inf
   ArmPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   ArmPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   ArmPkg/Library/LinuxBootBootManagerLib/LinuxBootBootManagerLib.inf
@@ -154,17 +154,13 @@
 
   ArmPkg/Drivers/MmCommunicationPei/MmCommunicationPei.inf
 
-[Components.common.MM_CORE_STANALONE]
   ArmPkg/Library/ArmStandaloneMmCoreEntryPoint/ArmStandaloneMmCoreEntryPoint.inf
 
-[Components.common.MM_STANDALONE]
   ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
 
-[Components.AARCH64]
   ArmPkg/Drivers/ArmCrashDumpDxe/ArmCrashDumpDxe.inf
   ArmPkg/Drivers/ArmGicDxe/ArmGicV3Dxe.inf
   ArmPkg/Drivers/ArmPsciMpServicesDxe/ArmPsciMpServicesDxe.inf
   ArmPkg/Drivers/MmCommunicationDxe/MmCommunication.inf
 
-[Components.AARCH64, Components.ARM]
   ArmPkg/Library/StandaloneMmMmuLib/ArmMmuStandaloneMmLib.inf

@@ -41,7 +41,7 @@ typedef struct {
 
 #pragma pack(pop)
 
-#if defined (_MSC_VER)
+#if defined (_MSC_EXTENSIONS)
 #define PRM_PACKED_STRUCT(definition) \
   __pragma(pack(push, 1)) typedef struct definition __pragma(pack(pop))
 #elif defined (__GNUC__) || defined (__clang__)
@@ -92,10 +92,10 @@ typedef struct {
     {                                                                                                     \
       PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT_HEADER  Header;                                                 \
       PRM_HANDLER_EXPORT_DESCRIPTOR_STRUCT        PrmHandlerExportDescriptors[VA_ARG_COUNT(__VA_ARGS__)]; \
-    } PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT_                                                                \
-  );                                                                                                      \
+    } PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT_;                                                               \
+  )                                                                                                       \
                                                                                                           \
-  PRM_EXPORT_API PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT_ PRM_MODULE_EXPORT_DESCRIPTOR_NAME = {               \
+  PRM_EXPORT_DESCRIPTOR PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT_ PRM_MODULE_EXPORT_DESCRIPTOR_NAME = {               \
     {                                                                                                     \
       PRM_MODULE_EXPORT_DESCRIPTOR_SIGNATURE,                                                             \
       PRM_MODULE_EXPORT_REVISION,                                                                         \

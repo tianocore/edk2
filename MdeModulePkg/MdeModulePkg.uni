@@ -691,12 +691,6 @@
                                                                                               "TRUE  - Statistics about variable usage will be collected.<BR>\n"
                                                                                               "FALSE - Statistics about variable usage will not be collected.<BR>"
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdUnicodeCollationSupport_PROMPT  #language en-US "Enable Unicode Collation support"
-
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdUnicodeCollationSupport_HELP  #language en-US "Indicates if Unicode Collation Protocol will be installed.<BR><BR>\n"
-                                                                                            "TRUE  - Installs Unicode Collation Protocol.<BR>\n"
-                                                                                            "FALSE - Does not install Unicode Collation Protocol.<BR>"
-
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdUnicodeCollation2Support_PROMPT  #language en-US "Enable Unicode Collation 2 support"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdUnicodeCollation2Support_HELP  #language en-US "Indicates if Unicode Collation 2 Protocol will be installed.<BR><BR>\n"

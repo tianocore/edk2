@@ -10,6 +10,7 @@
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.<BR>
 # Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -180,6 +181,10 @@
   ##  @libraryclass   Provides services to prints all HOB information.
   #
   HobPrintLib|Include/Library/HobPrintLib.h
+
+  ##  @libraryclass  Provides time and date related EFI runtime services
+  #
+  RealTimeClockLib|Include/Library/RealTimeClockLib.h
 
 [Guids]
   ## MdeModule package token space guid
@@ -802,12 +807,6 @@
   # @Prompt Enable variable statistics collection.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics|FALSE|BOOLEAN|0x0001003f
 
-  ## Indicates if Unicode Collation Protocol will be installed.<BR><BR>
-  #   TRUE  - Installs Unicode Collation Protocol.<BR>
-  #   FALSE - Does not install Unicode Collation Protocol.<BR>
-  # @Prompt Enable Unicode Collation support.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdUnicodeCollationSupport|TRUE|BOOLEAN|0x00010040
-
   ## Indicates if Unicode Collation 2 Protocol will be installed.<BR><BR>
   #   TRUE  - Installs Unicode Collation 2 Protocol.<BR>
   #   FALSE - Does not install Unicode Collation 2 Protocol.<BR>
@@ -987,7 +986,7 @@
   # @Prompt Enable process non-reset capsule image at runtime.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportProcessCapsuleAtRuntime|FALSE|BOOLEAN|0x00010079
 
-[PcdsFeatureFlag.IA32, PcdsFeatureFlag.ARM, PcdsFeatureFlag.AARCH64, PcdsFeatureFlag.LOONGARCH64]
+[PcdsFeatureFlag.IA32, PcdsFeatureFlag.AARCH64, PcdsFeatureFlag.LOONGARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom|FALSE|BOOLEAN|0x0001003a
 
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.X64]
@@ -1674,6 +1673,14 @@
   # @Prompt Maximum Number of PEI Reset Filters, Reset Notifications or Reset Handlers.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaximumPeiResetNotifies|0x10|UINT32|0x0000010A
 
+  ## Whether to report support of FMP capsules in OsIndicationSupport.<BR><BR>
+  #  This PCD indicates if support of FMP capsules should be advertised.<BR>
+  #   TRUE  - support of FMP capsules is advertised.<BR>
+  #   FALSE - support of FMP capsules is not advertised.<BR>
+  #  If platform does not use this feature, this PCD should be set to FALSE.<BR><BR>
+  # @Prompt Enable advertising support of FMP capsules.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleFmpSupport|FALSE|BOOLEAN|0x00000028
+
   ## Capsule On Disk is to deliver capsules via files on Mass Storage device.<BR><BR>
   #  This PCD indicates if the Capsule On Disk is supported.<BR>
   #   TRUE  - Capsule On Disk is supported.<BR>
@@ -1689,6 +1696,14 @@
   #  On Disk will be bypassed.
   # @Prompt Enable Capsule On Disk support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleOnDiskSupport|FALSE|BOOLEAN|0x0000002d
+
+  ## Indicates whether the platform supports processing Capsules that include EmbeddedDrivers.
+  #  Default value is FALSE, meaning embedded drivers are not supported.
+  #  Platforms that require embedded driver support must explicitly opt-in by setting this PCD to TRUE.
+  #   TRUE  - Capsule with EmbeddedDriver is supported.<BR>
+  #   FALSE - Capsule with EmbeddedDriver is not supported.<BR>
+  # @Prompt Enable Capsule with EmbeddedDriver support.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleEmbeddedDriverSupport|FALSE|BOOLEAN|0x00010021
 
   ## Maximum permitted encapsulation levels of sections in a firmware volume,
   #  in the DXE phase. Minimum value is 1. Sections nested more deeply are
@@ -1728,6 +1743,10 @@
   #
   # @Prompt UFS device initial completion timoeout (us), default value is 600ms.
   gEfiMdeModulePkgTokenSpaceGuid.PcdUfsInitialCompletionTimeout|600000|UINT32|0x00000036
+
+  ## Delayed Dispatch Max Entries
+  # @Prompt Maximum number of delayed dispatch entries. Default value is 8.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDelayedDispatchMaxEntries|8|UINT32|0x00000037
 
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.

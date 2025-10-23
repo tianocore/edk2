@@ -96,6 +96,8 @@ InitializeUnicodeCollationEng (
   UINTN       Index;
   UINTN       Index2;
 
+  Status = EFI_SUCCESS;
+
   //
   // Initialize mapping tables for the supported languages
   //
@@ -120,42 +122,13 @@ InitializeUnicodeCollationEng (
   }
 
   if (FeaturePcdGet (PcdUnicodeCollation2Support)) {
-    if (FeaturePcdGet (PcdUnicodeCollationSupport)) {
-      Status = gBS->InstallMultipleProtocolInterfaces (
-                      &mHandle,
-                      &gEfiUnicodeCollationProtocolGuid,
-                      &UnicodeEng,
-                      &gEfiUnicodeCollation2ProtocolGuid,
-                      &Unicode2Eng,
-                      NULL
-                      );
-      ASSERT_EFI_ERROR (Status);
-    } else {
-      Status = gBS->InstallMultipleProtocolInterfaces (
-                      &mHandle,
-                      &gEfiUnicodeCollation2ProtocolGuid,
-                      &Unicode2Eng,
-                      NULL
-                      );
-      ASSERT_EFI_ERROR (Status);
-    }
-  } else {
-    if (FeaturePcdGet (PcdUnicodeCollationSupport)) {
-      Status = gBS->InstallMultipleProtocolInterfaces (
-                      &mHandle,
-                      &gEfiUnicodeCollationProtocolGuid,
-                      &UnicodeEng,
-                      NULL
-                      );
-      ASSERT_EFI_ERROR (Status);
-    } else {
-      //
-      // This module must support to produce at least one of Unicode Collation Protocol
-      // and Unicode Collation 2 Protocol.
-      //
-      ASSERT (FALSE);
-      Status = EFI_UNSUPPORTED;
-    }
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &mHandle,
+                    &gEfiUnicodeCollation2ProtocolGuid,
+                    &Unicode2Eng,
+                    NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
   }
 
   return Status;

@@ -102,11 +102,6 @@ PlatformQemuUc32BaseInitialization (
   }
 }
 
-typedef VOID (*E820_SCAN_CALLBACK) (
-  EFI_E820_ENTRY64       *E820Entry,
-  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
-  );
-
 STATIC
 EFI_STATUS
 PlatformScanE820Tdx (
@@ -372,6 +367,10 @@ PlatformScanE820 (
   UINTN                 FwCfgSize;
   EFI_E820_ENTRY64      E820Entry;
   UINTN                 Processed;
+
+  if (PlatformIgvmMemoryMapCheck ()) {
+    return PlatformIgvmScanE820 (Callback, PlatformInfoHob);
+  }
 
   if (PlatformInfoHob->HostBridgeDevId == CLOUDHV_DEVICE_ID) {
     return PlatformScanE820Pvh (Callback, PlatformInfoHob);

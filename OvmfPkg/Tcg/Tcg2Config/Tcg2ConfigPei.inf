@@ -50,5 +50,8 @@
 [Depex.IA32, Depex.X64]
   gOvmfTpmMmioAccessiblePpiGuid
 
-[Depex.ARM, Depex.AARCH64]
+[Depex.AARCH64]
+  gOvmfTpmDiscoveredPpiGuid
+
+[Depex.RISCV64]
   gOvmfTpmDiscoveredPpiGuid

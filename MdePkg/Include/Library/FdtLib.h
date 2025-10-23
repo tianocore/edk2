@@ -723,6 +723,7 @@ FdtAddSubnode (
 
  **/
 INT32
+EFIAPI
 FdtDelNode (
   IN VOID   *Fdt,
   IN INT32  NodeOffset
@@ -940,6 +941,21 @@ FdtAddressCells (
 INT32
 EFIAPI
 FdtSizeCells (
+  IN CONST VOID  *Fdt,
+  IN INT32       NodeOffset
+  );
+
+/**
+  Retrieve the phandle of a given node
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     Offset of node to check.
+
+  @return Phandle of the node at NodeOffset, or 0 on error.
+**/
+UINT32
+EFIAPI
+FdtGetPhandle (
   IN CONST VOID  *Fdt,
   IN INT32       NodeOffset
   );

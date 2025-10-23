@@ -48,7 +48,9 @@
         UefiDriverEntryPoint|OvmfPkg/Library/UefiDriverEntryPointFwCfgOverrideLib/UefiDriverEntryPointFwCfgOverrideLib.inf
       <PcdsFixedAtBuild>
         gUefiOvmfPkgTokenSpaceGuid.PcdEntryPointOverrideFwCfgVarName|"opt/org.tianocore/ISCSISupport"
-        gUefiOvmfPkgTokenSpaceGuid.PcdEntryPointOverrideDefaultValue|"no"
+        !if $(NETWORK_ISCSI_DEFAULT_ENABLE) == FALSE
+          gUefiOvmfPkgTokenSpaceGuid.PcdEntryPointOverrideDefaultValue|"no"
+        !endif
     }
   !endif
 

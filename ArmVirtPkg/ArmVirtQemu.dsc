@@ -17,8 +17,8 @@
   PLATFORM_GUID                  = 37d7e986-f7e9-45c2-8067-e371421a626c
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
-  OUTPUT_DIRECTORY               = Build/ArmVirtQemu-$(ARCH)
-  SUPPORTED_ARCHITECTURES        = AARCH64|ARM
+  OUTPUT_DIRECTORY               = Build/ArmVirtQemu-AArch64
+  SUPPORTED_ARCHITECTURES        = AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = ArmVirtPkg/ArmVirtQemu.fdf
@@ -47,10 +47,6 @@
 
 # This comes at the beginning of includes to pick all relevant defines early on.
 !include ArmVirtPkg/ArmVirtStackCookies.dsc.inc
-
-!if $(NETWORK_SNP_ENABLE) == TRUE
-  !error "NETWORK_SNP_ENABLE is IA32/X64/EBC only"
-!endif
 
 !include NetworkPkg/NetworkDefines.dsc.inc
 
@@ -103,25 +99,28 @@
 !endif
 
   ArmMonitorLib|ArmVirtPkg/Library/ArmVirtMonitorLib/ArmVirtMonitorLib.inf
+!if $(DEBUG_TO_MEM)
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogDxeLib.inf
+!else
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogLibNull.inf
+!endif
 
-[LibraryClasses.AARCH64]
   ArmPlatformLib|ArmVirtPkg/Library/ArmPlatformLibQemu/ArmPlatformLibQemu.inf
-
-[LibraryClasses.ARM]
-  ArmPlatformLib|ArmPlatformPkg/Library/ArmPlatformLibNull/ArmPlatformLibNull.inf
 
 [LibraryClasses.common.PEIM]
   ArmVirtMemInfoLib|ArmVirtPkg/Library/QemuVirtMemInfoLib/QemuVirtMemInfoPeiLib.inf
   ArmMonitorLib|ArmVirtPkg/Library/ArmVirtMonitorPeiLib/ArmVirtMonitorPeiLib.inf
   FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
+  QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgMmioPeiLib.inf
+!if $(DEBUG_TO_MEM)
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogPeiLib.inf
+!else
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogLibNull.inf
+!endif
 
-[LibraryClasses.AARCH64.PEIM]
   ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuPeiLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
-
-[LibraryClasses.ARM.PEIM]
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLibMbedTls/PeiCryptLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   AcpiPlatformLib|OvmfPkg/Library/AcpiPlatformLib/DxeAcpiPlatformLib.inf
@@ -335,6 +334,23 @@
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
 !endif
 
+[LibraryClasses.common.SEC]
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogLibNull.inf
+
+[LibraryClasses.common.PEI_CORE]
+!if $(DEBUG_TO_MEM)
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogPeiCoreLib.inf
+!else
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogLibNull.inf
+!endif
+
+[LibraryClasses.common.DXE_RUNTIME_DRIVER]
+!if $(DEBUG_TO_MEM)
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogRtLib.inf
+!else
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogLibNull.inf
+!endif
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform
@@ -349,6 +365,10 @@
   ArmPlatformPkg/PlatformPei/PlatformPeim.inf
   ArmVirtPkg/MemoryInitPei/MemoryInitPeim.inf
   ArmPkg/Drivers/CpuPei/CpuPei.inf
+
+!if $(DEBUG_TO_MEM)
+  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
+!endif
 
 !if $(TPM2_ENABLE) == TRUE
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf {

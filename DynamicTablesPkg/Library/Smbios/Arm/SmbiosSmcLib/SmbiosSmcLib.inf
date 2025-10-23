@@ -1,0 +1,26 @@
+#/** @file
+#
+#  Copyright (c) 2025, ARM Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = SmbiosSmcLib
+  FILE_GUID                      = 201d7312-46c8-42f4-a1cf-38897ddfe916
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SmbiosSmcLib
+
+[Sources]
+  SmbiosSmcLib.c
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmSmcLib
+

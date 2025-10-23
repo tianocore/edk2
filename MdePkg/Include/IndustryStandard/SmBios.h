@@ -1,6 +1,7 @@
 /** @file
   Industry Standard Definitions of SMBIOS Table Specification v3.8.0.
 
+Copyright (c) Microsoft Corporation. All rights reserved.<BR>
 Copyright (c) 2024-2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
 Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
@@ -28,6 +29,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /// This number is not used for any other purpose by the SMBIOS specification.
 ///
 #define SMBIOS_HANDLE_PI_RESERVED  0xFFFE
+
+///
+/// Reference SMBIOS 3.6, chapter 6.1.2.
+/// Unless otherwise specified, when referring to another structure’s handle, the value
+/// 0FFFFh is used to indicate that the referenced handle is not applicable or does not
+/// exist.
+///
+#define SMBIOS_HANDLE_INVALID  0xFFFF
 
 ///
 /// Reference SMBIOS 2.6, chapter 3.1.3.
@@ -482,6 +491,24 @@ typedef struct {
 ///
 /// System Enclosure or Chassis (Type 3).
 ///
+
+///
+/// Chassis - Height.
+///
+typedef enum {
+  ChassisHeightUnspecified   = 0x00,
+  ChassisHeightUseRackHeight = 0xFF  ///< Enclosure Height is specified at offset 16h+(n*m)
+} CHASSIS_HEIGHT;
+
+///
+/// Chassis - Rack Type.
+/// SMBIOS Spec 3.9.0 CR251 Additional Rack Types
+///
+typedef enum {
+  ChassisRackTypeUnspecified = 0x00,
+  ChassisRackTypeOU          = 0x01,
+} CHASSIS_RACK_TYPE;
+
 /// The information in this structure defines attributes of the system's mechanical enclosure(s).
 /// For example, if a system included a separate enclosure for its peripheral devices,
 /// two structures would be returned: one for the main, system enclosure and the second for
@@ -513,9 +540,11 @@ typedef struct {
   //
   // Since ContainedElements has a variable number of entries, must not define SKUNumber in
   // the structure.  Need to reference it by starting at offset 0x15 and adding
-  // (ContainedElementCount * ContainedElementRecordLength) bytes.
+  // (ContainedElementCount(n) * ContainedElementRecordLength(m)) bytes.
   //
-  // SMBIOS_TABLE_STRING         SKUNumber;
+  // SMBIOS_TABLE_STRING         SKUNumber;         ///< SMBIOS spec 2.7+ Offset 15h+(n*m)
+  // UINT8                       RackType;          ///< SMBIOS spec 3.9+ Offset 16h+(n*m) CR251
+  // UINT8                       RackHeight;        ///< SMBIOS spec 3.9+ Offset 17h+(n*m) CR251
 } SMBIOS_TABLE_TYPE3;
 
 ///
@@ -968,10 +997,26 @@ typedef union {
   UINT8    Data;
 } PROCESSOR_STATUS_DATA;
 
+#ifdef MDE_CPU_AARCH64
+// This structure assumes Arm64 SoC ID is supported
+typedef struct {
+  UINT16    SocId;
+  UINT8     SipId;
+  UINT8     SipBankIndex;
+  UINT32    SocRevision;
+} PROCESSOR_ID_DATA;
+#elif defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 typedef struct {
   PROCESSOR_SIGNATURE        Signature;
   PROCESSOR_FEATURE_FLAGS    FeatureFlags;
 } PROCESSOR_ID_DATA;
+#else
+// Please define PROCESSOR_ID_DATA for your architecture
+typedef struct {
+  PROCESSOR_SIGNATURE        Signature;
+  PROCESSOR_FEATURE_FLAGS    FeatureFlags;
+} PROCESSOR_ID_DATA;
+#endif
 
 ///
 /// Processor Information (Type 4).
@@ -1156,6 +1201,40 @@ typedef struct {
 } SMBIOS_TABLE_TYPE6;
 
 ///
+/// Cache Information - Configuration.
+///
+typedef struct {
+  UINT16    CacheLevel    : 3;
+  UINT16    CacheSocketed : 1;
+  UINT16    Reserved      : 1;
+  UINT16    Location      : 2;
+  UINT16    Enabled       : 1;
+  UINT16    OperationMode : 2;
+  UINT16    Reserved2     : 6;
+} SMBIOS_CACHE_CONFIGURATION_DATA;
+
+///
+/// Cache Information - Size
+///
+typedef struct {
+  UINT16    Size           : 15;
+  UINT16    Granularity64K : 1;
+} SMBIOS_CACHE_SIZE;
+
+/// Maximum cache size representable in CACHE_SIZE at 1 KiB granularity
+#define SMBIOS_CACHE_SIZE_MAX_SIZE_1K_GRANULARITY  32767
+/// Maximum cache size representable in CACHE_SIZE at 64 KiB granularity
+#define SMBIOS_CACHE_SIZE_MAX_SIZE_64K_GRANULARITY  (32767 * 64)
+
+///
+/// Cache Information - Size 2
+///
+typedef struct {
+  UINT32    Size           : 31;
+  UINT32    Granularity64K : 1;
+} SMBIOS_CACHE_SIZE_2;
+
+///
 /// Cache Information - SRAM Type.
 ///
 typedef struct {
@@ -1224,8 +1303,8 @@ typedef struct {
   SMBIOS_STRUCTURE        Hdr;
   SMBIOS_TABLE_STRING     SocketDesignation;
   UINT16                  CacheConfiguration;
-  UINT16                  MaximumCacheSize;
-  UINT16                  InstalledSize;
+  SMBIOS_CACHE_SIZE       MaximumCacheSize;
+  SMBIOS_CACHE_SIZE       InstalledSize;
   CACHE_SRAM_TYPE_DATA    SupportedSRAMType;
   CACHE_SRAM_TYPE_DATA    CurrentSRAMType;
   UINT8                   CacheSpeed;
@@ -1235,8 +1314,8 @@ typedef struct {
   //
   // Add for smbios 3.1.0
   //
-  UINT32                  MaximumCacheSize2;
-  UINT32                  InstalledSize2;
+  SMBIOS_CACHE_SIZE_2     MaximumCacheSize2;
+  SMBIOS_CACHE_SIZE_2     InstalledSize2;
 } SMBIOS_TABLE_TYPE7;
 
 ///
@@ -1866,7 +1945,9 @@ typedef enum {
   MemoryFormFactorSrimm           = 0x0E,
   MemoryFormFactorFbDimm          = 0x0F,
   MemoryFormFactorDie             = 0x10,
-  MemoryFormFactorCamm            = 0x11
+  MemoryFormFactorCamm            = 0x11,
+  MemoryFormFactorCuDimm          = 0x12, ///< SMBIOS spec 3.9.0 CR244
+  MemoryFormFactorCsoDimm         = 0x13  ///< SMBIOS spec 3.9.0 CR244
 } MEMORY_FORM_FACTOR;
 
 ///
@@ -1905,7 +1986,8 @@ typedef enum {
   MemoryTypeHBM2                     = 0x21,
   MemoryTypeDdr5                     = 0x22,
   MemoryTypeLpddr5                   = 0x23,
-  MemoryTypeHBM3                     = 0x24
+  MemoryTypeHBM3                     = 0x24,
+  MemoryTypeMrDimm                   = 0x25  ///< SMBIOS spec 3.9.0 CR248
 } MEMORY_DEVICE_TYPE;
 
 ///
@@ -1944,7 +2026,8 @@ typedef enum {
   // This definition is updated to represent Intel
   // Optane DC Persistent Memory in SMBIOS spec 3.4.0
   //
-  MemoryTechnologyIntelOptanePersistentMemory = 0x07
+  MemoryTechnologyIntelOptanePersistentMemory = 0x07,
+  MemoryTechnologyMrDimmDeprecated            = 0x08 ///< SMBIOS spec 3.9.0 CR248
 } MEMORY_DEVICE_TECHNOLOGY;
 
 ///

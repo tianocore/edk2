@@ -1560,20 +1560,20 @@ MainEditorInit (
   //
   Status = MainTitleBarInit (L"UEFI EDIT");
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_EDIT_LIBEDITOR_TITLEBAR), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_EDIT_LIBEDITOR_TITLEBAR), gShellDebug1HiiHandle);
     return EFI_LOAD_ERROR;
   }
 
   Status = ControlHotKeyInit (MainControlBasedMenuFunctions);
   Status = MenuBarInit (MainMenuItems);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_EDIT_LIBEDITOR_MAINMENU), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_EDIT_LIBEDITOR_MAINMENU), gShellDebug1HiiHandle);
     return EFI_LOAD_ERROR;
   }
 
   Status = StatusBarInit ();
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_EDIT_LIBEDITOR_STATUSBAR), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_EDIT_LIBEDITOR_STATUSBAR), gShellDebug1HiiHandle);
     return EFI_LOAD_ERROR;
   }
 
@@ -1581,7 +1581,7 @@ MainEditorInit (
 
   Status = FileBufferInit ();
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_EDIT_LIBEDITOR_FILEBUFFER), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_EDIT_LIBEDITOR_FILEBUFFER), gShellDebug1HiiHandle);
     return EFI_LOAD_ERROR;
   }
 
@@ -1626,7 +1626,7 @@ MainEditorCleanup (
 
   Status = FileBufferCleanup ();
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_EDIT_LIBEDITOR_FILEBUFFER_CLEANUP), gShellDebug1HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_EDIT_LIBEDITOR_FILEBUFFER_CLEANUP), gShellDebug1HiiHandle);
   }
 
   //

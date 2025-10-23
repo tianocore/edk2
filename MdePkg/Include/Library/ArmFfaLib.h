@@ -301,6 +301,7 @@ ArmFfaLibSpmIdGet (
 
   @param [in]   PartId       Partition id
   @param [in]   CpuNumber    Cpu number in partition
+  @param [out]  DirectMsgArg return arguments for direct msg resp/resp2
 
   @retval EFI_SUCCESS
   @retval Other              Error
@@ -309,8 +310,9 @@ ArmFfaLibSpmIdGet (
 EFI_STATUS
 EFIAPI
 ArmFfaLibRun (
-  IN  UINT16  PartId,
-  IN  UINT16  CpuNumber
+  IN  UINT16           PartId,
+  IN  UINT16           CpuNumber,
+  OUT DIRECT_MSG_ARGS  *DirectMsgArg OPTIONAL
   );
 
 /**

@@ -191,6 +191,7 @@
     <LibraryClasses>
       SmmCpuFeaturesLib|UefiCpuPkg/Library/SmmCpuFeaturesLib/AmdSmmCpuFeaturesLib.inf
       MmSaveStateLib|UefiCpuPkg/Library/MmSaveStateLib/AmdMmSaveStateLib.inf
+      AmdSysCallLib|UefiCpuPkg/Library/AmdSysCallLibNull/AmdSysCallLibNull.inf
   }
   UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
   UefiCpuPkg/ResetVector/Vtf0/Vtf0.inf
@@ -208,6 +209,7 @@
       UnitTestResultReportLib|UnitTestFrameworkPkg/Library/UnitTestResultReportLib/UnitTestResultReportLibConOut.inf
   }
   UefiCpuPkg/Library/MmSaveStateLib/AmdMmSaveStateLib.inf
+  UefiCpuPkg/Library/AmdSysCallLibNull/AmdSysCallLibNull.inf
   UefiCpuPkg/Library/MmSaveStateLib/IntelMmSaveStateLib.inf
   UefiCpuPkg/Library/SmmCpuFeaturesLib/AmdSmmCpuFeaturesLib.inf
   UefiCpuPkg/Library/SmmRelocationLib/SmmRelocationLib.inf
@@ -224,10 +226,8 @@
   UefiCpuPkg/CpuDxeRiscV64/CpuDxeRiscV64.inf
   UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf
 
-[Components.ARM, Components.AARCH64]
-  UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
-
 [Components.AARCH64]
+  UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
   UefiCpuPkg/Library/ArmMmuLib/ArmMmuPeiLib.inf
   UefiCpuPkg/Library/BaseArchSupportLib/BaseArchSupportLib.inf
 

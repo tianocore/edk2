@@ -113,11 +113,6 @@
     <InputFile>
         ?.c
         ?.C
-        ?.cc
-        ?.CC
-        ?.cpp
-        ?.Cpp
-        ?.CPP
 
     <ExtraDependency>
         $(MAKE_FILE)
@@ -134,7 +129,30 @@
     <Command.XCODE>
         "$(CC)" $(DEPS_FLAGS) $(CC_FLAGS) -o ${dst} $(INC) ${src}
 
-[C-Code-File.BASE.AARCH64,C-Code-File.SEC.AARCH64,C-Code-File.PEI_CORE.AARCH64,C-Code-File.PEIM.AARCH64,C-Code-File.BASE.ARM,C-Code-File.SEC.ARM,C-Code-File.PEI_CORE.ARM,C-Code-File.PEIM.ARM]
+[Cxx-Code-File]
+    <InputFile>
+        ?.cc
+        ?.CC
+        ?.cpp
+        ?.Cpp
+        ?.CPP
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+
+    <Command.MSFT, Command.INTEL>
+        "$(CC)" /Fo${dst} $(DEPS_FLAGS) $(CC_FLAGS) $(CXX_FLAGS) $(INC) ${src}
+
+    <Command.GCC>
+        "$(CC)" $(DEPS_FLAGS) $(CC_FLAGS) $(CXX_FLAGS) -c -o ${dst} $(INC) ${src}
+
+    <Command.XCODE>
+        "$(CC)" $(DEPS_FLAGS) $(CC_FLAGS) $(CXX_FLAGS) -o ${dst} $(INC) ${src}
+
+[C-Code-File.BASE.AARCH64,C-Code-File.SEC.AARCH64,C-Code-File.PEI_CORE.AARCH64,C-Code-File.PEIM.AARCH64]
     <InputFile>
         ?.c
 
@@ -180,7 +198,7 @@
         Trim --trim-long --source-code -o ${d_path}(+)${s_base}.iiii ${d_path}(+)${s_base}.ii
         "$(ASM)" $(ASM_FLAGS) -o ${dst} $(INC) ${d_path}(+)${s_base}.iiii
 
-[Assembly-Code-File.COMMON.ARM,Assembly-Code-File.COMMON.AARCH64]
+[Assembly-Code-File.COMMON.AARCH64]
     # Remove --convert-hex for ARM as it breaks MSFT assemblers
     <InputFile.MSFT, InputFile.INTEL>
         ?.asm, ?.Asm, ?.ASM
@@ -338,7 +356,7 @@
     <Command.MSFT, Command.INTEL, Command.CLANGPDB>
         "$(DLINK)" $(DLINK_FLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
 
-    <Command.GCC>
+    <Command.GCC, Command.CLANGDWARF>
         "$(DLINK)" $(DLINK_FLAGS) -Wl,--start-group,@$(STATIC_LIBRARY_FILES_LIST),--end-group $(DLINK2_FLAGS)
 
     <Command.XCODE>
@@ -359,10 +377,10 @@
         "$(DLINK)" $(DLINK_FLAGS) $(DLINK_SPATH) $(OUTPUT_DIR)/Empty_C_File_Host_Application_Build.obj @$(STATIC_LIBRARY_FILES_LIST)
 
     <Command.CLANGPDB>
-        "$(CC)" -o $(OUTPUT_DIR)/Empty_C_File_Host_Application_Build.obj $(CC_FLAGS) $(INC) $(EDK_TOOLS_PATH)/Conf/Empty_C_File_Host_Application_Build.c
+        "$(CC)" -c -o $(OUTPUT_DIR)/Empty_C_File_Host_Application_Build.obj $(CC_FLAGS) $(INC) $(EDK_TOOLS_PATH)/Conf/Empty_C_File_Host_Application_Build.c
         "$(DLINK)" $(DLINK_FLAGS) $(DLINK_SPATH) $(OUTPUT_DIR)/Empty_C_File_Host_Application_Build.obj @$(STATIC_LIBRARY_FILES_LIST)
 
-    <Command.GCC>
+    <Command.GCC, Command.CLANGDWARF>
         "$(DLINK)" $(DLINK_FLAGS) -Wl,--start-group,@$(STATIC_LIBRARY_FILES_LIST),--end-group $(DLINK2_FLAGS)
 
     <Command.XCODE>
@@ -485,8 +503,13 @@
         "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(GENFW_FLAGS)
 
     <Command.GCC>
-        "$(ASLCC)" $(DEPS_FLAGS) -c -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(CC_FLAGS) $(ASLCC_FLAGS) $(DEPS_FLAGS) $(INC) ${src}
+        "$(ASLCC)" $(DEPS_FLAGS) -c -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(ASLCC_FLAGS) $(DEPS_FLAGS) $(INC) ${src}
         "$(ASLDLINK)" -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+        "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(GENFW_FLAGS)
+
+    <Command.CLANGPDB>
+        "$(ASLCC)" $(DEPS_FLAGS) -c -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(ASLCC_FLAGS) $(DEPS_FLAGS) $(INC) ${src}
+        "$(ASLDLINK)" /OUT:$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
         "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(GENFW_FLAGS)
 
 [Acpi-Table-Code-File]
@@ -505,12 +528,12 @@
         "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(GENFW_FLAGS)
 
     <Command.GCC>
-        "$(ASLCC)" $(DEPS_FLAGS) -c -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(CC_FLAGS) $(ASLCC_FLAGS) $(DEPS_FLAGS) $(INC) ${src}
+        "$(ASLCC)" $(DEPS_FLAGS) -c -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(ASLCC_FLAGS) $(DEPS_FLAGS) $(INC) ${src}
         "$(ASLDLINK)" -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
         "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(GENFW_FLAGS)
 
     <Command.CLANGPDB>
-        "$(ASLCC)" $(DEPS_FLAGS) -c -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(CC_FLAGS) $(ASLCC_FLAGS) $(DEPS_FLAGS) $(INC) ${src}
+        "$(ASLCC)" $(DEPS_FLAGS) -c -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(ASLCC_FLAGS) $(DEPS_FLAGS) $(INC) ${src}
         "$(ASLDLINK)" /OUT:$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
         "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(GENFW_FLAGS)
 

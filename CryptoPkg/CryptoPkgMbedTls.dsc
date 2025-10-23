@@ -18,7 +18,7 @@
   PLATFORM_VERSION               = 0.98
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/CryptoPkgMbed
-  SUPPORTED_ARCHITECTURES        = IA32|X64|ARM|AARCH64|RISCV64
+  SUPPORTED_ARCHITECTURES        = IA32|X64|AARCH64|RISCV64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -89,7 +89,7 @@
 [LibraryClasses.IA32.PEIM, LibraryClasses.X64.PEIM]
   PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
 
-[LibraryClasses.ARM.PEIM, LibraryClasses.AARCH64.PEIM]
+[LibraryClasses.AARCH64.PEIM]
   PeiServicesTablePointerLib|ArmPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
@@ -215,7 +215,7 @@
 ###################################################################################################
 
 !if $(CRYPTO_IMG_TYPE) IN "PEI_DEFAULT PEI_PREMEM"
-[Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
+[Components.IA32, Components.X64, Components.AARCH64]
   CryptoPkg/Driver/CryptoPei.inf {
     <Defines>
       !if "$(CRYPTO_SERVICES)" == "ALL"
@@ -262,5 +262,6 @@
   RVCT:*_*_*_CC_FLAGS = -DENABLE_MD5_DEPRECATED_INTERFACES
 !if $(CRYPTO_IMG_TYPE) IN "DXE_SMM"
   MSFT:*_*_*_DLINK_FLAGS = /ALIGN:4096
+  CLANGPDB: *_*_*_DLINK_FLAGS = /ALIGN:4096
   GCC:*_GCC*_*_DLINK_FLAGS = -z common-page-size=0x1000
 !endif

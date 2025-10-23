@@ -16,7 +16,7 @@
   PLATFORM_VERSION               = 1.08
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/Mde
-  SUPPORTED_ARCHITECTURES        = IA32|X64|EBC|ARM|AARCH64|RISCV64|LOONGARCH64
+  SUPPORTED_ARCHITECTURES        = IA32|X64|EBC|AARCH64|RISCV64|LOONGARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -144,7 +144,7 @@
   MdePkg/Library/DynamicStackCookieEntryPointLib/UefiApplicationEntryPoint.inf
   MdePkg/Library/DynamicStackCookieEntryPointLib/UefiDriverEntryPoint.inf
 
-[Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
+[Components.IA32, Components.X64, Components.AARCH64]
   #
   # Add UEFI Target Based Unit Tests
   #
@@ -200,7 +200,7 @@
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
 
-[Components.ARM, Components.AARCH64]
+[Components.AARCH64]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsicArmVirt.inf
   MdePkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
   MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
@@ -216,5 +216,6 @@
 
 [Components.LOONGARCH64]
   MdePkg/Library/PeiServicesTablePointerLibKs0/PeiServicesTablePointerLibKs0.inf
+  MdePkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
 [BuildOptions]

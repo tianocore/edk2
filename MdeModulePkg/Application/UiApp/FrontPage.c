@@ -17,7 +17,6 @@ EFI_GUID  mFrontPageGuid = FRONT_PAGE_FORMSET_GUID;
 BOOLEAN  mResetRequired = FALSE;
 
 EFI_FORM_BROWSER2_PROTOCOL  *gFormBrowser2;
-CHAR8                       *mLanguageString;
 BOOLEAN                     mModeInitialized = FALSE;
 //
 // Boot video resolution and text mode.
@@ -1031,11 +1030,6 @@ UiEntry (
   CallFrontPage ();
 
   FreeFrontPage ();
-
-  if (mLanguageString != NULL) {
-    FreePool (mLanguageString);
-    mLanguageString = NULL;
-  }
 
   //
   // Will leave browser, check any reset required change is applied? if yes, reset system

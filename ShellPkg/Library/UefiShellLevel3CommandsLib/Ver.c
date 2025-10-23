@@ -58,7 +58,7 @@ ShellCommandRunVer (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"ver", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"ver", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -76,12 +76,12 @@ ShellCommandRunVer (
       //
       // we have too many parameters
       //
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"ver");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"ver");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       if (ShellCommandLineGetFlag (Package, L"-s")) {
         if (ShellCommandLineGetFlag (Package, L"-terse") || ShellCommandLineGetFlag (Package, L"-t")) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CONFLICT), gShellLevel3HiiHandle, L"ver", L"-t or -terse", L"-s");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_CONFLICT), gShellLevel3HiiHandle, L"ver", L"-t or -terse", L"-s");
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
           ShellPrintHiiEx (
@@ -106,19 +106,13 @@ ShellCommandRunVer (
           gEfiShellProtocol->MinorVersion
           );
         if (!ShellCommandLineGetFlag (Package, L"-terse") && !ShellCommandLineGetFlag (Package, L"-t")) {
-          ShellPrintHiiEx (
-            -1,
-            -1,
-            NULL,
+          ShellPrintHiiDefaultEx (
             STRING_TOKEN (STR_VER_OUTPUT_SUPPLIER),
             gShellLevel3HiiHandle,
             (CHAR16 *)PcdGetPtr (PcdShellSupplier)
             );
 
-          ShellPrintHiiEx (
-            -1,
-            -1,
-            NULL,
+          ShellPrintHiiDefaultEx (
             STRING_TOKEN (STR_VER_OUTPUT_UEFI),
             gShellLevel3HiiHandle,
             (gST->Hdr.Revision&0xffff0000)>>16,
@@ -133,7 +127,7 @@ ShellCommandRunVer (
       // implementation specific support for displaying processor architecture
       //
       if (ShellCommandLineGetFlag (Package, L"-_pa")) {
-        ShellPrintEx (-1, -1, L"%d\r\n", sizeof (UINTN) == sizeof (UINT64) ? 64 : 32);
+        ShellPrintDefaultEx (L"%d\r\n", sizeof (UINTN) == sizeof (UINT64) ? 64 : 32);
       }
     }
 

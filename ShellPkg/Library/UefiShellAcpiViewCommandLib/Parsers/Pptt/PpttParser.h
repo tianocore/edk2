@@ -11,7 +11,7 @@
 #ifndef PPTT_PARSER_H_
 #define PPTT_PARSER_H_
 
-#if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+#if defined (MDE_CPU_AARCH64)
 
 /// Cache parameters allowed by the architecture with
 /// ARMv8.3-CCIDX (Cache extended number of sets)
@@ -33,6 +33,6 @@
 #define PPTT_ARM_CACHE_LINE_SIZE_MAX  (1 << 11)
 #define PPTT_ARM_CACHE_LINE_SIZE_MIN  (1 << 4)
 
-#endif // if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+#endif // if defined (MDE_CPU_AARCH64)
 
 #endif // PPTT_PARSER_H_

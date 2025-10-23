@@ -55,6 +55,9 @@
   ##  @libraryclass  Defines a set of methods for generating Tpm2 Device Table method.
   Tpm2DeviceTableLib|Include/Library/Tpm2DeviceTableLib.h
 
+  ##  @libraryclass  Defines a set of SMBIOS related SMC helper methods.
+  SmcbiosSmbLib|Include/Library/SmbiosSmcLib.h
+
 [LibraryClasses.AARCH64]
   ##  @libraryclass  Defines a set of APIs to populate CmObj using SCMI.
   DynamicTablesScmiInfoLib|Include/Library/DynamicTablesScmiInfoLib.h
@@ -76,6 +79,10 @@
 
   # Maximum number of Custom DT Generators
   gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxCustomDTGenerators|1|UINT16|0xC0000003
+
+  # Maximum number of Entries in the SMBIOS Handle Map
+  # Note that a larger value may degrade performance.
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxSmbiosHandleMapEntries|255|UINT16|0xC0000004
 
   # Non BSA Compliant 16550 Serial HID
   gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdNonBsaCompliant16550SerialHid|""|VOID*|0x40000008

@@ -32,7 +32,6 @@
 
 [LibraryClasses.common]
   PrePiLib|Include/Library/PrePiLib.h
-  RealTimeClockLib|Include/Library/RealTimeClockLib.h
   GdbSerialLib|Include/Library/GdbSerialLib.h
   DebugAgentTimerLib|Include/Library/DebugAgentTimerLib.h
   NorFlashInfoLib|Include/Library/NorFlashInfoLib.h
@@ -149,9 +148,6 @@
   gEmbeddedTokenSpaceGuid.PcdAndroidFastbootTcpPort|1234|UINT32|0x00000024
 
   gEmbeddedTokenSpaceGuid.PcdAndroidBootDevicePath|L""|VOID*|0x00000057
-
-[PcdsFixedAtBuild.ARM]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0|UINT8|0x00000011
 
 [PcdsFixedAtBuild.AARCH64]
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0|UINT8|0x00000011

@@ -18,12 +18,6 @@
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = CpuMmio2Initialize
 
-#
-# The following information is for reference only and not required by the build tools.
-#
-#  VALID_ARCHITECTURES           = ARM AARCH64 LOONGARCH64 RISCV64
-#
-
 [Sources]
   CpuMmio2Dxe.c
 

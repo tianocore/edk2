@@ -13,6 +13,45 @@
 #include <Library/ArmTransferListLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
+
+/**
+  Get the TransferList from HOB list.
+
+  @param[out] TransferList  TransferList
+
+  @retval EFI_SUCCESS      TransferList is found.
+  @retval EFI_NOT_FOUND    TransferList is not found.
+
+**/
+EFI_STATUS
+EFIAPI
+TransferListGetFromHobList (
+  OUT TRANSFER_LIST_HEADER  **TransferList
+  )
+{
+  VOID               *HobList;
+  EFI_HOB_GUID_TYPE  *GuidHob;
+  UINTN              *GuidHobData;
+
+  *TransferList = NULL;
+
+  HobList = GetHobList ();
+  if (HobList == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  GuidHob = GetNextGuidHob (&gArmTransferListHobGuid, HobList);
+  if (GuidHob == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  GuidHobData = GET_GUID_HOB_DATA (GuidHob);
+
+  *TransferList = (TRANSFER_LIST_HEADER *)(*GuidHobData);
+
+  return EFI_SUCCESS;
+}
 
 /**
   This function verifies the checksum of the Transfer List.
@@ -272,6 +311,56 @@ TransferListFindEntry (
   } while ((Entry != NULL) && (Entry->TagId != TagId));
 
   return Entry;
+}
+
+/**
+  Get TPM event log from TransferList
+
+  @param [in]   TransferListHeader       Pointer to the Transfer List Header
+  @param [out]  EventLog                 Pointer to Eventlog in TransferList
+  @param [out]  EventLogSize             Size of Event log
+  @param [out]  EventLogFlags            Flags for Event log
+
+  @return EFI_SUCCESS
+  @return EFI_NOT_FOUND                  No Event log in TransferListHeader
+  @return EFI_INVALID_PARAMETER          Invalid parameters
+
+**/
+EFI_STATUS
+EFIAPI
+TransferListGetEventLog (
+  IN TRANSFER_LIST_HEADER  *TransferListHeader,
+  OUT VOID                 **EventLog,
+  OUT UINTN                *EventLogSize,
+  OUT UINT32               *EventLogFlags       OPTIONAL
+  )
+{
+  TRANSFER_ENTRY_HEADER   *Entry;
+  TRANSFER_LIST_EVENTLOG  *EntryData;
+
+  if ((TransferListHeader == NULL) || (EventLog == NULL) || (EventLogSize == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *EventLog     = NULL;
+  *EventLogSize = 0;
+
+  Entry = TransferListFindFirstEntry (TransferListHeader, TRANSFER_ENTRY_TAG_ID_TPM_EVENT_LOG);
+  if ((Entry == NULL) || (Entry->DataSize == 0) ||
+      ((Entry->DataSize - OFFSET_OF (TRANSFER_LIST_EVENTLOG, EventLog)) == 0))
+  {
+    return EFI_NOT_FOUND;
+  }
+
+  EntryData = TransferListGetEntryData (Entry);
+  if (EventLogFlags != NULL) {
+    *EventLogFlags = EntryData->Flags;
+  }
+
+  *EventLogSize = Entry->DataSize - OFFSET_OF (TRANSFER_LIST_EVENTLOG, EventLog);
+  *EventLog     = (VOID *)&EntryData->EventLog;
+
+  return EFI_SUCCESS;
 }
 
 /**

@@ -278,10 +278,7 @@ InternalEfiShellStartCtrlSMonitor (
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
                   );
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_SHELL_NO_IN_EX),
       ShellInfoObject.HiiHandle
       );
@@ -526,19 +523,13 @@ UefiMain (
         gEfiShellProtocol->MinorVersion
         );
 
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_VER_OUTPUT_MAIN_SUPPLIER),
         ShellInfoObject.HiiHandle,
         (CHAR16 *)PcdGetPtr (PcdShellSupplier)
         );
 
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_VER_OUTPUT_MAIN_UEFI),
         ShellInfoObject.HiiHandle,
         (gST->Hdr.Revision&0xffff0000)>>16,
@@ -971,14 +962,7 @@ ProcessCommandLine (
                   (VOID **)&UnicodeCollation
                   );
   if (EFI_ERROR (Status)) {
-    Status = gBS->LocateProtocol (
-                    &gEfiUnicodeCollationProtocolGuid,
-                    NULL,
-                    (VOID **)&UnicodeCollation
-                    );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+    return Status;
   }
 
   // Set default options
@@ -1099,10 +1083,7 @@ ProcessCommandLine (
       ShellInfoObject.ShellInitSettings.BitUnion.Bits.Exit = TRUE;
     } else if (StrnCmp (L"-", CurrentArg, 1) == 0) {
       // Unrecognized option
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_GEN_PROBLEM),
         ShellInfoObject.HiiHandle,
         CurrentArg
@@ -1364,7 +1345,7 @@ DoStartupScript (
     }
   }
 
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SHELL_CRLF), ShellInfoObject.HiiHandle);
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SHELL_CRLF), ShellInfoObject.HiiHandle);
   gST->ConOut->EnableCursor (gST->ConOut, TRUE);
 
   //
@@ -1437,9 +1418,9 @@ DoShellPrompt (
   gST->ConOut->SetCursorPosition (gST->ConOut, 0, gST->ConOut->Mode->CursorRow);
 
   if ((CurDir != NULL) && (StrLen (CurDir) > 1)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SHELL_CURDIR), ShellInfoObject.HiiHandle, CurDir);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SHELL_CURDIR), ShellInfoObject.HiiHandle, CurDir);
   } else {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SHELL_SHELL), ShellInfoObject.HiiHandle);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SHELL_SHELL), ShellInfoObject.HiiHandle);
   }
 
   //
@@ -2174,7 +2155,7 @@ IsValidSplit (
     TempWalker = (CHAR16 *)Temp;
     if (!EFI_ERROR (GetNextParameter (&TempWalker, &FirstParameter, StrSize (CmdLine), TRUE))) {
       if (GetOperationType (FirstParameter) == Unknown_Invalid) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
         SetLastError (SHELL_NOT_FOUND);
         Status = EFI_NOT_FOUND;
       }
@@ -2269,7 +2250,7 @@ ProcessNewSplitCommandLine (
   }
 
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SHELL_INVALID_SPLIT), ShellInfoObject.HiiHandle, CmdLine);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SHELL_INVALID_SPLIT), ShellInfoObject.HiiHandle, CmdLine);
   }
 
   return (Status);
@@ -2305,7 +2286,7 @@ ChangeMappedDrive (
   // Report any errors
   //
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SHELL_INVALID_MAPPING), ShellInfoObject.HiiHandle, CmdLine);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SHELL_INVALID_MAPPING), ShellInfoObject.HiiHandle, CmdLine);
   }
 
   return (Status);
@@ -2617,7 +2598,7 @@ RunCommandOrFile (
         // This should be impossible now.
         //
         ASSERT (CommandWithPath != NULL);
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
         SetLastError (SHELL_NOT_FOUND);
         return EFI_NOT_FOUND;
       }
@@ -2626,7 +2607,7 @@ RunCommandOrFile (
       // Make sure that path is not just a directory (or not found)
       //
       if (!EFI_ERROR (ShellIsDirectory (CommandWithPath))) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
         SetLastError (SHELL_NOT_FOUND);
       }
 
@@ -2748,9 +2729,9 @@ SetupAndRunCommandOrFile (
   if (EFI_ERROR (Status)) {
     ConstScriptFile = ShellCommandGetCurrentScriptFile ();
     if ((ConstScriptFile == NULL) || (ConstScriptFile->CurrentCommand == NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SHELL_ERROR), ShellInfoObject.HiiHandle, (VOID *)(Status));
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SHELL_ERROR), ShellInfoObject.HiiHandle, (VOID *)(Status));
     } else {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SHELL_ERROR_SCRIPT), ShellInfoObject.HiiHandle, (VOID *)(Status), ConstScriptFile->CurrentCommand->Line);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SHELL_ERROR_SCRIPT), ShellInfoObject.HiiHandle, (VOID *)(Status), ConstScriptFile->CurrentCommand->Line);
     }
   }
 
@@ -2870,12 +2851,12 @@ RunShellCommand (
         //
         // Whatever was typed, it was invalid.
         //
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
         SetLastError (SHELL_NOT_FOUND);
         break;
     }
   } else {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
     SetLastError (SHELL_NOT_FOUND);
   }
 
@@ -3182,12 +3163,12 @@ RunScriptFileHandle (
             if (ShellCommandGetEchoState ()) {
               CurDir = ShellInfoObject.NewEfiShellProtocol->GetEnv (L"cwd");
               if ((CurDir != NULL) && (StrLen (CurDir) > 1)) {
-                ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SHELL_CURDIR), ShellInfoObject.HiiHandle, CurDir);
+                ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SHELL_CURDIR), ShellInfoObject.HiiHandle, CurDir);
               } else {
-                ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SHELL_SHELL), ShellInfoObject.HiiHandle);
+                ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SHELL_SHELL), ShellInfoObject.HiiHandle);
               }
 
-              ShellPrintEx (-1, -1, L"%s\r\n", CommandLine2);
+              ShellPrintDefaultEx (L"%s\r\n", CommandLine2);
             }
 
             Status = RunCommand (CommandLine3);

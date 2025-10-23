@@ -12,14 +12,7 @@
 #define ARM_LIB_H_
 
 #include <Uefi/UefiBaseType.h>
-
-#ifdef MDE_CPU_ARM
-  #include <Arm/AArch32.h>
-#elif defined (MDE_CPU_AARCH64)
-  #include <AArch64/AArch64.h>
-#else
-  #error "Unknown chipset."
-#endif
+#include <AArch64/AArch64.h>
 
 #define EFI_MEMORY_CACHETYPE_MASK  (EFI_MEMORY_UC | EFI_MEMORY_WC |  \
                                      EFI_MEMORY_WT | EFI_MEMORY_WB | \
@@ -722,7 +715,6 @@ ArmHasCcidx (
   VOID
   );
 
-#ifdef MDE_CPU_AARCH64
 ///
 /// AArch64-only ID Register Helper functions
 ///
@@ -763,25 +755,17 @@ ArmHasEte (
   VOID
   );
 
-#endif // MDE_CPU_AARCH64
-
-#ifdef MDE_CPU_ARM
-///
-/// AArch32-only ID Register Helper functions
-///
-
 /**
-  Check whether the CPU supports the Security extensions
+  Checks whether the CPU supports 52-bit addressing with 4KiB translation
+  granule size
 
-  @return   Whether the Security extensions are implemented
-
+  @retval TRUE   52-bit addressing is implemented.
+  @retval FALSE  52-bit addressing is not implemented.
 **/
 BOOLEAN
 EFIAPI
-ArmHasSecurityExtensions (
+ArmHas52BitTgran4 (
   VOID
   );
-
-#endif // MDE_CPU_ARM
 
 #endif // ARM_LIB_H_

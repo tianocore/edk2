@@ -19,10 +19,6 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = FmpPayloadHeaderLib|DXE_DRIVER UEFI_DRIVER UEFI_APPLICATION
 
-#
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
-#
-
 [Sources]
   FmpPayloadHeaderLib.c
 

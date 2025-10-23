@@ -88,6 +88,7 @@
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
   GCC:  *_*_*_DLINK_FLAGS = -z common-page-size=0x1000
   MSFT: *_*_*_DLINK_FLAGS = /ALIGN:4096
+  CLANGPDB: *_*_*_DLINK_FLAGS = /ALIGN:4096
 
 ################################################################################
 #
@@ -193,13 +194,14 @@
 [PcdsFixedAtBuild.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
-!if $(NETWORK_TLS_ENABLE) == TRUE
+!if $(NETWORK_TLS_ENABLE) == TRUE || $(SECURE_BOOT_ENABLE) == TRUE
   #
   # The cumulative and individual VOLATILE variable size limits should be set
   # high enough for accommodating several and/or large CA certificates.
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x80000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVolatileVariableSize|0x40000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x8400
 !endif
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"2.7"
@@ -290,6 +292,8 @@
 [LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM]
 !if $(TPM2_ENABLE) == TRUE
   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
+  Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
 !else
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
 !endif
@@ -317,6 +321,24 @@
     <LibraryClasses>
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   }
+!if $(TPM2_ENABLE) == TRUE
+  OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
+  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf {
+    <LibraryClasses>
+      Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibRouter/Tpm2DeviceLibRouterPei.inf
+      NULL|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2InstanceLibDTpm.inf
+      HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCryptoRouterPei.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha256.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha512/HashInstanceLibSha512.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSm3/HashInstanceLibSm3.inf
+  }
+  SecurityPkg/Tcg/Tcg2PlatformPei/Tcg2PlatformPei.inf {
+    <LibraryClasses>
+      TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLib/PeiDxeTpmPlatformHierarchyLib.inf
+  }
+!endif
 !else
   UefiCpuPkg/SecCore/SecCoreNative.inf {
     <LibraryClasses>
@@ -370,7 +392,7 @@
 !endif
   }
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
-  OvmfPkg/EnrollDefaultKeys/EnrollDefaultKeys.inf
+  OvmfPkg/RiscVVirt/Feature/SecureBoot/SecureBootDefaultKeysInit/SecureBootDefaultKeysInit.inf
 !else
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 !endif
