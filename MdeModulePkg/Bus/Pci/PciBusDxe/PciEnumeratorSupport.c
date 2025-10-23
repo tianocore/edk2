@@ -2839,6 +2839,7 @@ ResetAllPpbBusNumber (
   UINT8                            Func;
   UINT64                           Address;
   UINT8                            SecondaryBus;
+  UINT8                            SubordinateBus;
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo;
 
   PciRootBridgeIo = Bridge->PciRootBridgeIo;
@@ -2873,23 +2874,26 @@ ResetAllPpbBusNumber (
                                           1,
                                           &Register
                                           );
-        SecondaryBus = (UINT8)(Register >> 8);
+        SecondaryBus   = (UINT8)(Register >> 8);
+        SubordinateBus = (UINT8)(Register >> 16);
 
         if (SecondaryBus != 0) {
           ResetAllPpbBusNumber (Bridge, SecondaryBus);
         }
 
-        //
-        // Reset register 18h, 19h, 1Ah on PCI Bridge
-        //
-        Register &= 0xFF000000;
-        Status    = PciRootBridgeIo->Pci.Write (
-                                           PciRootBridgeIo,
-                                           EfiPciWidthUint32,
-                                           Address,
-                                           1,
-                                           &Register
-                                           );
+        if (SubordinateBus == 0) {
+          //
+          // Reset register 18h, 19h, 1Ah on PCI Bridge if no subordinate bus is set
+          //
+          Register &= 0xFF000000;
+          Status    = PciRootBridgeIo->Pci.Write (
+                                             PciRootBridgeIo,
+                                             EfiPciWidthUint32,
+                                             Address,
+                                             1,
+                                             &Register
+                                             );
+        }
       }
 
       if ((Func == 0) && !IS_PCI_MULTI_FUNC (&Pci)) {
