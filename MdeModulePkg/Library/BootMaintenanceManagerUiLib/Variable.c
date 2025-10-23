@@ -537,7 +537,7 @@ Var_UpdateBootNext (
   BM_MENU_ENTRY     *NewMenuEntry;
   BM_LOAD_CONTEXT   *NewLoadContext;
   BMM_FAKE_NV_DATA  *CurrentFakeNVMap;
-  UINT16            Index;
+  UINTN             Index;
   EFI_STATUS        Status;
 
   Status           = EFI_SUCCESS;
@@ -592,8 +592,8 @@ Var_UpdateBootOrder (
   )
 {
   EFI_STATUS  Status;
-  UINT16      Index;
-  UINT16      OrderIndex;
+  UINTN       Index;
+  UINTN       OrderIndex;
   UINT16      *BootOrder;
   UINTN       BootOrderSize;
   UINT16      OptionNumber;
@@ -654,7 +654,7 @@ Var_UpdateDriverOrder (
   )
 {
   EFI_STATUS  Status;
-  UINT16      Index;
+  UINTN       Index;
   UINT16      *DriverOrderList;
   UINT16      *NewDriverOrderList;
   UINTN       DriverOrderListSize;

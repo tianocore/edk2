@@ -1209,7 +1209,7 @@ ValidateQuestionFromVfr (
   // Check IFR value is in block data, then Validate Value
   //
   PackageOffset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
-  while (PackageOffset < PackageListLength) {
+  while ((UINTN)PackageOffset < PackageListLength) {
     CopyMem (&PackageHeader, (UINT8 *)HiiPackageList + PackageOffset, sizeof (PackageHeader));
 
     //

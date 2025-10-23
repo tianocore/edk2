@@ -49,7 +49,7 @@ BmmCreateBootNextMenu (
   OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
   ASSERT (OptionsOpCodeHandle != NULL);
 
-  for (Index = 0; Index < BootOptionMenu.MenuNumber; Index++) {
+  for (Index = 0; (UINTN)Index < BootOptionMenu.MenuNumber; Index++) {
     NewMenuEntry   = BOpt_GetMenuEntry (&BootOptionMenu, Index);
     NewLoadContext = (BM_LOAD_CONTEXT *)NewMenuEntry->VariableContext;
 
