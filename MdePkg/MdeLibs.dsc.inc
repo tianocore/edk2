@@ -53,6 +53,12 @@
   StackCheckLib|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 !endif
 
+!if $(QEMU_PV_PANIC)
+  PvPanicLib|MdePkg/Library/PvPanicLib/PvPanicLib.inf
+!else
+  PvPanicLib|MdePkg/Library/PvPanicNull/PvPanicNull.inf
+!endif
+
 [LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE]
   # edk2 does not implement exception handling for SEC and PEI_CORE, so StackCheckLibNull is used, as failing
   # stack cookies will generate an exception, which if unhandled can lead to a hung system state. If a platform

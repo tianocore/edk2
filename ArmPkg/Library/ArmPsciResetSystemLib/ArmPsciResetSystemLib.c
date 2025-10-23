@@ -18,6 +18,7 @@
 #include <Library/ArmMonitorLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/PvPanicLib.h>
 #include <Library/ResetSystemLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
@@ -49,6 +50,10 @@ ResetCold (
   VOID
   )
 {
+  // Notify the host that the system may be in an emergency state, but the
+  // guest can handle this state.
+  PvPanicLibSendEventGuestCrashLoaded ();
+
   ARM_MONITOR_ARGS  Args;
 
   // Send a PSCI 0.2 SYSTEM_RESET command
@@ -69,6 +74,10 @@ ResetWarm (
   VOID
   )
 {
+  // Notify the host that the system may be in an emergency state, but the
+  // guest can handle this state.
+  PvPanicLibSendEventGuestCrashLoaded ();
+
   ARM_MONITOR_ARGS  Args;
 
   Args.Arg0 = ARM_SMC_ID_PSCI_FEATURES;
@@ -105,6 +114,9 @@ ResetShutdown (
   VOID
   )
 {
+  // Notify the host that the system is performing a normal shutdown.
+  PvPanicLibSendEventGuestShutdown ();
+
   ARM_MONITOR_ARGS  Args;
 
   // Send a PSCI 0.2 SYSTEM_RESET command

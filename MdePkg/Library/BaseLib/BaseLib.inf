@@ -419,6 +419,7 @@
   PcdLib
   DebugLib
   BaseMemoryLib
+  PvPanicLib
 
 [LibraryClasses.X64, LibraryClasses.IA32]
   RegisterFilterLib
