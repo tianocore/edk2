@@ -607,6 +607,10 @@ TlsSetServerName (
   TlsConn = (TLS_CONNECTION *)Tls;
   Ctx     = (SSL_CTX *)SslCtx;
 
+  if (TlsConn == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   TlsExtCtx = AllocateZeroPool (sizeof (TLS_EXT_CTX));
   if (TlsExtCtx == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -1254,7 +1258,9 @@ TlsGetVersion (
 
   TlsConn = (TLS_CONNECTION *)Tls;
 
-  ASSERT (TlsConn != NULL);
+  if (TlsConn == NULL) {
+    return 0;
+  }
 
   return (UINT16)(SSL_version (TlsConn->Ssl));
 }
@@ -1282,7 +1288,9 @@ TlsGetConnectionEnd (
 
   TlsConn = (TLS_CONNECTION *)Tls;
 
-  ASSERT (TlsConn != NULL);
+  if (TlsConn == NULL) {
+    return 0;
+  }
 
   return (UINT8)SSL_is_server (TlsConn->Ssl);
 }
@@ -1377,7 +1385,9 @@ TlsGetVerify (
 
   TlsConn = (TLS_CONNECTION *)Tls;
 
-  ASSERT (TlsConn != NULL);
+  if (TlsConn == NULL) {
+    return 0;
+  }
 
   return SSL_get_verify_mode (TlsConn->Ssl);
 }
