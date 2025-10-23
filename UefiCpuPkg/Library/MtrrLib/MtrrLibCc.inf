@@ -8,9 +8,9 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = MtrrLib
+  BASE_NAME                      = MtrrLibCc
   MODULE_UNI_FILE                = MtrrLib.uni
-  FILE_GUID                      = 6826b408-f4f3-47ee-917f-af7047f9d937
+  FILE_GUID                      = afa7fe9d-a4c5-4800-b8c6-2f6071446997
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = MtrrLib
@@ -24,7 +24,7 @@
 
 [Sources]
   MtrrLib.c
-  DetectCcNull.c
+  DetectCc.c
   DetectCc.h
 
 [Packages]
@@ -39,4 +39,5 @@
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuNumberOfReservedVariableMtrrs   ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr      ## SOMETIMES_CONSUMES
 
