@@ -1451,10 +1451,17 @@ CustomizeMenus (
   // Allocate space for creation of UpdateData Buffer
   //
   StartOpCodeHandle = HiiAllocateOpCodeHandle ();
-  ASSERT (StartOpCodeHandle != NULL);
+  if (StartOpCodeHandle == NULL) {
+    ASSERT (StartOpCodeHandle != NULL);
+    return;
+  }
 
   EndOpCodeHandle = HiiAllocateOpCodeHandle ();
-  ASSERT (EndOpCodeHandle != NULL);
+  if (EndOpCodeHandle == NULL) {
+    ASSERT (EndOpCodeHandle != NULL);
+    goto Exit;
+  }
+
   //
   // Create Hii Extend Label OpCode as the start opcode
   //
@@ -1485,6 +1492,7 @@ CustomizeMenus (
     );
 
   HiiFreeOpCodeHandle (StartOpCodeHandle);
+Exit:
   HiiFreeOpCodeHandle (EndOpCodeHandle);
 }
 

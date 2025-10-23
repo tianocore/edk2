@@ -378,10 +378,18 @@ BmmListThirdPartyDrivers (
   }
 
   HiiHandles = HiiGetHiiHandles (NULL);
-  ASSERT (HiiHandles != NULL);
+  if (HiiHandles == NULL) {
+    ASSERT (HiiHandles != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   gHiiDriverList = AllocateZeroPool (UI_HII_DRIVER_LIST_SIZE * sizeof (UI_HII_DRIVER_INSTANCE));
-  ASSERT (gHiiDriverList != NULL);
+  if (gHiiDriverList == NULL) {
+    ASSERT (gHiiDriverList != NULL);
+    FreePool (HiiHandles);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   DriverListPtr = gHiiDriverList;
   CurrentSize   = UI_HII_DRIVER_LIST_SIZE;
 

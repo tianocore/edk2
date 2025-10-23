@@ -803,6 +803,10 @@ GetConsoleMenu (
   Index2          = 0;
   for (Index = 0; Index < AllCount; Index++) {
     DevicePathInst = GetNextDevicePathInstance (&MultiDevicePath, &Size);
+    if (DevicePathInst == NULL) {
+      ASSERT (DevicePathInst != NULL);
+      continue;
+    }
 
     NewMenuEntry = BOpt_CreateMenuEntry (BM_CONSOLE_CONTEXT_SELECT);
     if (NULL == NewMenuEntry) {
@@ -813,7 +817,11 @@ GetConsoleMenu (
     NewMenuEntry->OptionNumber = Index2;
 
     NewConsoleContext->DevicePath = DuplicateDevicePath (DevicePathInst);
-    ASSERT (NewConsoleContext->DevicePath != NULL);
+    if (NewConsoleContext->DevicePath == NULL) {
+      ASSERT (NewConsoleContext->DevicePath != NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     NewMenuEntry->DisplayString = EfiLibStrFromDatahub (NewConsoleContext->DevicePath);
     if (NULL == NewMenuEntry->DisplayString) {
       NewMenuEntry->DisplayString = UiDevicePathToStr (NewConsoleContext->DevicePath);
