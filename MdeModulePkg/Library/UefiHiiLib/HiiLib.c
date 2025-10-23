@@ -1164,7 +1164,7 @@ ValidateQuestionFromVfr (
   EFI_IFR_TYPE_VALUE           TmpValue;
   EFI_STATUS                   Status;
   EFI_HII_PACKAGE_HEADER       PackageHeader;
-  UINT32                       PackageOffset;
+  UINTN                        PackageOffset;
   UINT8                        *PackageData;
   UINTN                        IfrOffset;
   EFI_IFR_OP_HEADER            *IfrOpHdr;
