@@ -1,0 +1,30 @@
+## @file
+#  Provides reusable TPM 2.0 data helper routines that are independent
+#  of TPM command/device communication libraries. Includes serialization
+#  and parsing helpers for common TPM data structures.
+#
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Tpm2HelpLib
+  FILE_GUID                      = DDFCEB08-9CE3-4CB8-ABBD-D32925E8CAAB
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Tpm2HelpLib
+
+[Sources]
+  Tpm2Help.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
