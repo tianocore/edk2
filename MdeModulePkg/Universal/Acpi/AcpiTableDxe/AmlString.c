@@ -379,7 +379,7 @@ AmlUpperCaseCopyMem (
 
   @param[in]    AslPath     ASL name.
 
-  @return AmlName
+  @return AmlName or NULL if insufficient resources to allocate a buffer
 **/
 UINT8 *
 AmlNameFromAslName (
@@ -401,7 +401,10 @@ AmlNameFromAslName (
   }
 
   AmlPath = AllocatePool (TotalLength);
-  ASSERT (AmlPath != NULL);
+  if (AmlPath == NULL) {
+    ASSERT (AmlPath != NULL);
+    return NULL;
+  }
 
   AmlBuffer = AmlPath;
   Buffer    = AslPath;
