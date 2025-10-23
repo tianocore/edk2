@@ -25,7 +25,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION          10
 #define EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER  11
 #define EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER       12
-#define EFI_IMAGE_SUBSYSTEM_SAL_RUNTIME_DRIVER       13///< defined PI Specification, 1.0
 
 //
 // PE32+ Machine type for EFI images
