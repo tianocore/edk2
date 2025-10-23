@@ -48,7 +48,7 @@ ConnectAllAndCreateNetworkDeviceList (
   }
 
   Devices = NULL;
-  while (HandleCount-- != 0) {
+  while (HandleCount-- != 0 && Handles != NULL) {
     Status = gBS->HandleProtocol (Handles[HandleCount], &gEfiDevicePathProtocolGuid, (VOID **)&SingleDevice);
     if (EFI_ERROR (Status) || (SingleDevice == NULL)) {
       continue;

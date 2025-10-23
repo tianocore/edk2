@@ -1274,8 +1274,11 @@ CoreUpdateProfileFree (
       }
     }
 
-    ASSERT (DriverInfoData != NULL);
-    ASSERT (AllocInfoData != NULL);
+    if ((DriverInfoData == NULL) || (AllocInfoData == NULL)) {
+      ASSERT (DriverInfoData != NULL);
+      ASSERT (AllocInfoData != NULL);
+      return EFI_NOT_FOUND;
+    }
 
     Found = TRUE;
 

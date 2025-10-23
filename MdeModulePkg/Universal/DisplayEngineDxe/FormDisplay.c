@@ -1154,6 +1154,9 @@ ProcessStringForDateTime (
     Date = (EFI_IFR_DATE *)Statement->OpCode;
   } else if (Statement->OpCode->OpCode == EFI_IFR_TIME_OP) {
     Time = (EFI_IFR_TIME *)Statement->OpCode;
+  } else {
+    // If not in a time/date opcode, exit.
+    return;
   }
 
   //
@@ -1178,7 +1181,7 @@ ProcessStringForDateTime (
   //
   // Enable to suppress field in the opcode base on the flag.
   //
-  if (Statement->OpCode->OpCode == EFI_IFR_DATE_OP) {
+  if ((Statement->OpCode->OpCode == EFI_IFR_DATE_OP) && (Date != NULL)) {
     //
     // OptionString format is: <**:  **: ****>
     //                        |month|day|year|
@@ -1203,7 +1206,7 @@ ProcessStringForDateTime (
       //
       SetUnicodeMem (&OptionString[0], 4, L' ');
     }
-  } else if (Statement->OpCode->OpCode == EFI_IFR_TIME_OP) {
+  } else if ((Statement->OpCode->OpCode == EFI_IFR_TIME_OP) && (Time != NULL)) {
     //
     // OptionString format is: <**:  **:    **>
     //                        |hour|minute|second|
@@ -1558,7 +1561,9 @@ FindTopOfScreenMenu (
     }
   } else {
     TopOfScreen = Link;
-    *SkipValue  = PreviousMenuOption->Skip - Rows;
+    if (PreviousMenuOption != NULL) {
+      *SkipValue = PreviousMenuOption->Skip - Rows;
+    }
   }
 
   return TopOfScreen;
@@ -2917,7 +2922,10 @@ UiDisplayMenu (
         if (SkipHighLight) {
           SkipHighLight = FALSE;
           MenuOption    = SavedMenuOption;
-          RefreshKeyHelp (gFormData, SavedMenuOption->ThisTag, FALSE);
+          if (SavedMenuOption != NULL) {
+            RefreshKeyHelp (gFormData, SavedMenuOption->ThisTag, FALSE);
+          }
+
           break;
         }
 
@@ -3001,26 +3009,28 @@ UiDisplayMenu (
             // Don't print anything if it is a NULL help token
             //
             ASSERT (MenuOption != NULL);
-            HelpInfo       = ((EFI_IFR_STATEMENT_HEADER *)((CHAR8 *)MenuOption->ThisTag->OpCode + sizeof (EFI_IFR_OP_HEADER)))->Help;
-            Statement      = MenuOption->ThisTag;
-            StatementValue = &Statement->CurrentValue;
-            if ((HelpInfo == 0) || !IsSelectable (MenuOption)) {
-              if (((Statement->OpCode->OpCode == EFI_IFR_DATE_OP) && (StatementValue->Value.date.Month == 0xff)) || ((Statement->OpCode->OpCode == EFI_IFR_TIME_OP) && (StatementValue->Value.time.Hour == 0xff))) {
-                StringPtr = GetToken (STRING_TOKEN (GET_TIME_FAIL), gHiiHandle);
+            if (MenuOption != NULL) {
+              HelpInfo       = ((EFI_IFR_STATEMENT_HEADER *)((CHAR8 *)MenuOption->ThisTag->OpCode + sizeof (EFI_IFR_OP_HEADER)))->Help;
+              Statement      = MenuOption->ThisTag;
+              StatementValue = &Statement->CurrentValue;
+              if ((HelpInfo == 0) || !IsSelectable (MenuOption)) {
+                if (((Statement->OpCode->OpCode == EFI_IFR_DATE_OP) && (StatementValue->Value.date.Month == 0xff)) || ((Statement->OpCode->OpCode == EFI_IFR_TIME_OP) && (StatementValue->Value.time.Hour == 0xff))) {
+                  StringPtr = GetToken (STRING_TOKEN (GET_TIME_FAIL), gHiiHandle);
+                } else {
+                  StringPtr = GetToken (STRING_TOKEN (EMPTY_STRING), gHiiHandle);
+                }
               } else {
-                StringPtr = GetToken (STRING_TOKEN (EMPTY_STRING), gHiiHandle);
-              }
-            } else {
-              if (((Statement->OpCode->OpCode == EFI_IFR_DATE_OP) && (StatementValue->Value.date.Month == 0xff)) || ((Statement->OpCode->OpCode == EFI_IFR_TIME_OP) && (StatementValue->Value.time.Hour == 0xff))) {
-                StringRightPtr = GetToken (HelpInfo, gFormData->HiiHandle);
-                StringErrorPtr = GetToken (STRING_TOKEN (GET_TIME_FAIL), gHiiHandle);
-                StringPtr      = AllocateZeroPool ((StrLen (StringRightPtr) + StrLen (StringErrorPtr)+ 1) * sizeof (CHAR16));
-                StrCpyS (StringPtr, StrLen (StringRightPtr) + StrLen (StringErrorPtr) + 1, StringRightPtr);
-                StrCatS (StringPtr, StrLen (StringRightPtr) + StrLen (StringErrorPtr) + 1, StringErrorPtr);
-                FreePool (StringRightPtr);
-                FreePool (StringErrorPtr);
-              } else {
-                StringPtr = GetToken (HelpInfo, gFormData->HiiHandle);
+                if (((Statement->OpCode->OpCode == EFI_IFR_DATE_OP) && (StatementValue->Value.date.Month == 0xff)) || ((Statement->OpCode->OpCode == EFI_IFR_TIME_OP) && (StatementValue->Value.time.Hour == 0xff))) {
+                  StringRightPtr = GetToken (HelpInfo, gFormData->HiiHandle);
+                  StringErrorPtr = GetToken (STRING_TOKEN (GET_TIME_FAIL), gHiiHandle);
+                  StringPtr      = AllocateZeroPool ((StrLen (StringRightPtr) + StrLen (StringErrorPtr)+ 1) * sizeof (CHAR16));
+                  StrCpyS (StringPtr, StrLen (StringRightPtr) + StrLen (StringErrorPtr) + 1, StringRightPtr);
+                  StrCatS (StringPtr, StrLen (StringRightPtr) + StrLen (StringErrorPtr) + 1, StringErrorPtr);
+                  FreePool (StringRightPtr);
+                  FreePool (StringErrorPtr);
+                } else {
+                  StringPtr = GetToken (HelpInfo, gFormData->HiiHandle);
+                }
               }
             }
           }
@@ -3258,36 +3268,38 @@ UiDisplayMenu (
             // ignore the selection and go back to reading keys.
             //
             ASSERT (MenuOption != NULL);
-            if (IsListEmpty (&gMenuOption) || MenuOption->GrayOut || MenuOption->ReadOnly) {
-              ControlFlag = CfReadKey;
-              break;
-            }
-
-            Statement = MenuOption->ThisTag;
-            if (  (Statement->OpCode->OpCode == EFI_IFR_DATE_OP)
-               || (Statement->OpCode->OpCode == EFI_IFR_TIME_OP)
-               || ((Statement->OpCode->OpCode == EFI_IFR_NUMERIC_OP) && (GetFieldFromNum (Statement->OpCode) != 0))
-                  )
-            {
-              if (Key.UnicodeChar == '+') {
-                gDirection = SCAN_RIGHT;
-              } else {
-                gDirection = SCAN_LEFT;
+            if (MenuOption != NULL ) {
+              if (IsListEmpty (&gMenuOption) || MenuOption->GrayOut || MenuOption->ReadOnly) {
+                ControlFlag = CfReadKey;
+                break;
               }
 
-              Status = ProcessOptions (MenuOption, TRUE, &OptionString, TRUE);
-              if (OptionString != NULL) {
-                FreePool (OptionString);
-              }
+              Statement = MenuOption->ThisTag;
+              if (  (Statement->OpCode->OpCode == EFI_IFR_DATE_OP)
+                 || (Statement->OpCode->OpCode == EFI_IFR_TIME_OP)
+                 || ((Statement->OpCode->OpCode == EFI_IFR_NUMERIC_OP) && (GetFieldFromNum (Statement->OpCode) != 0))
+                    )
+              {
+                if (Key.UnicodeChar == '+') {
+                  gDirection = SCAN_RIGHT;
+                } else {
+                  gDirection = SCAN_LEFT;
+                }
 
-              if (EFI_ERROR (Status)) {
-                //
-                // Repaint to clear possible error prompt pop-up
-                //
-                Repaint = TRUE;
-                NewLine = TRUE;
-              } else {
-                ControlFlag = CfExit;
+                Status = ProcessOptions (MenuOption, TRUE, &OptionString, TRUE);
+                if (OptionString != NULL) {
+                  FreePool (OptionString);
+                }
+
+                if (EFI_ERROR (Status)) {
+                  //
+                  // Repaint to clear possible error prompt pop-up
+                  //
+                  Repaint = TRUE;
+                  NewLine = TRUE;
+                } else {
+                  ControlFlag = CfExit;
+                }
               }
             }
 
@@ -3309,8 +3321,10 @@ UiDisplayMenu (
             }
 
             ASSERT (MenuOption != NULL);
-            if ((MenuOption->ThisTag->OpCode->OpCode == EFI_IFR_CHECKBOX_OP) && !MenuOption->GrayOut && !MenuOption->ReadOnly) {
-              ScreenOperation = UiSelect;
+            if (MenuOption != NULL) {
+              if ((MenuOption->ThisTag->OpCode->OpCode == EFI_IFR_CHECKBOX_OP) && !MenuOption->GrayOut && !MenuOption->ReadOnly) {
+                ScreenOperation = UiSelect;
+              }
             }
 
             break;
@@ -3395,38 +3409,40 @@ UiDisplayMenu (
         ControlFlag = CfRepaint;
 
         ASSERT (MenuOption != NULL);
-        Statement = MenuOption->ThisTag;
-        if (Statement->OpCode->OpCode == EFI_IFR_TEXT_OP) {
-          break;
-        }
-
-        switch (Statement->OpCode->OpCode) {
-          case EFI_IFR_REF_OP:
-          case EFI_IFR_ACTION_OP:
-          case EFI_IFR_RESET_BUTTON_OP:
-            ControlFlag = CfExit;
+        if (MenuOption != NULL ) {
+          Statement = MenuOption->ThisTag;
+          if (Statement->OpCode->OpCode == EFI_IFR_TEXT_OP) {
             break;
+          }
 
-          default:
-            //
-            // Editable Questions: oneof, ordered list, checkbox, numeric, string, password
-            //
-            RefreshKeyHelp (gFormData, Statement, TRUE);
-            Status = ProcessOptions (MenuOption, TRUE, &OptionString, TRUE);
-
-            if (OptionString != NULL) {
-              FreePool (OptionString);
-            }
-
-            if (EFI_ERROR (Status)) {
-              Repaint = TRUE;
-              NewLine = TRUE;
-              RefreshKeyHelp (gFormData, Statement, FALSE);
-              break;
-            } else {
+          switch (Statement->OpCode->OpCode) {
+            case EFI_IFR_REF_OP:
+            case EFI_IFR_ACTION_OP:
+            case EFI_IFR_RESET_BUTTON_OP:
               ControlFlag = CfExit;
               break;
-            }
+
+            default:
+              //
+              // Editable Questions: oneof, ordered list, checkbox, numeric, string, password
+              //
+              RefreshKeyHelp (gFormData, Statement, TRUE);
+              Status = ProcessOptions (MenuOption, TRUE, &OptionString, TRUE);
+
+              if (OptionString != NULL) {
+                FreePool (OptionString);
+              }
+
+              if (EFI_ERROR (Status)) {
+                Repaint = TRUE;
+                NewLine = TRUE;
+                RefreshKeyHelp (gFormData, Statement, FALSE);
+                break;
+              } else {
+                ControlFlag = CfExit;
+                break;
+              }
+          }
         }
 
         break;
@@ -3449,28 +3465,28 @@ UiDisplayMenu (
 
       case CfUiHotKey:
         ControlFlag = CfRepaint;
-
         ASSERT (HotKey != NULL);
 
-        if (FxConfirmPopup (HotKey->Action)) {
-          gUserInput->Action = HotKey->Action;
-          if ((HotKey->Action & BROWSER_ACTION_DEFAULT) == BROWSER_ACTION_DEFAULT) {
-            gUserInput->DefaultId = HotKey->DefaultId;
-          }
+        if (HotKey != NULL ) {
+          if (FxConfirmPopup (HotKey->Action)) {
+            gUserInput->Action = HotKey->Action;
+            if ((HotKey->Action & BROWSER_ACTION_DEFAULT) == BROWSER_ACTION_DEFAULT) {
+              gUserInput->DefaultId = HotKey->DefaultId;
+            }
 
-          ControlFlag = CfExit;
-        } else {
-          Repaint     = TRUE;
-          NewLine     = TRUE;
-          ControlFlag = CfRepaint;
+            ControlFlag = CfExit;
+          } else {
+            Repaint     = TRUE;
+            NewLine     = TRUE;
+            ControlFlag = CfRepaint;
+          }
         }
 
         break;
 
       case CfUiLeft:
         ControlFlag = CfRepaint;
-        ASSERT (MenuOption != NULL);
-        if ((MenuOption->ThisTag->OpCode->OpCode == EFI_IFR_DATE_OP) || (MenuOption->ThisTag->OpCode->OpCode == EFI_IFR_TIME_OP)) {
+        if ((MenuOption != NULL) && ((MenuOption->ThisTag->OpCode->OpCode == EFI_IFR_DATE_OP) || (MenuOption->ThisTag->OpCode->OpCode == EFI_IFR_TIME_OP))) {
           if (MenuOption->Sequence != 0) {
             //
             // In the middle or tail of the Date/Time op-code set, go left.
@@ -3484,8 +3500,7 @@ UiDisplayMenu (
 
       case CfUiRight:
         ControlFlag = CfRepaint;
-        ASSERT (MenuOption != NULL);
-        if ((MenuOption->ThisTag->OpCode->OpCode == EFI_IFR_DATE_OP) || (MenuOption->ThisTag->OpCode->OpCode == EFI_IFR_TIME_OP)) {
+        if ((MenuOption != NULL) && ((MenuOption->ThisTag->OpCode->OpCode == EFI_IFR_DATE_OP) || (MenuOption->ThisTag->OpCode->OpCode == EFI_IFR_TIME_OP))) {
           if (MenuOption->Sequence != 2) {
             //
             // In the middle or tail of the Date/Time op-code set, go left.
@@ -3934,9 +3949,12 @@ BrowserStatusProcess (
   TimeOutEvent         = NULL;
   RefreshIntervalEvent = NULL;
   OpCodeBuf            = NULL;
-  if (gFormData->HighLightedStatement != NULL) {
-    OpCodeBuf = gFormData->HighLightedStatement->OpCode;
+  if (gFormData->HighLightedStatement == NULL) {
+    // Ensure there is a highlighted statement, otherwise exit
+    return;
   }
+
+  OpCodeBuf = gFormData->HighLightedStatement->OpCode;
 
   if (gFormData->BrowserStatus == (BROWSER_WARNING_IF)) {
     ASSERT (OpCodeBuf != NULL && OpCodeBuf->OpCode == EFI_IFR_WARNING_IF_OP);
