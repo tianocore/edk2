@@ -223,6 +223,7 @@ Tpm2TisTpmCommand (
   UINT32      TpmOutSize;
   UINT16      Data16;
   UINT32      Data32;
+  UINT32      CommandCode;
 
   DEBUG_CODE_BEGIN ();
   DumpTpmInputBlock (SizeIn, BufferIn);
@@ -370,7 +371,13 @@ Tpm2TisTpmCommand (
 
 Exit:
   DEBUG_CODE_BEGIN ();
-  DumpTpmOutputBlock (TpmOutSize, BufferOut);
+  if (SizeIn >= sizeof (TPM2_COMMAND_HEADER)) {
+    CommandCode = SwapBytes32 (((TPM2_COMMAND_HEADER *)BufferIn)->commandCode);
+  } else {
+    CommandCode = 0;
+  }
+
+  DumpTpmOutputBlock (TpmOutSize, BufferOut, CommandCode);
   DEBUG_CODE_END ();
   MmioWrite8 ((UINTN)&TisReg->Status, TIS_PC_STS_READY);
   return Status;

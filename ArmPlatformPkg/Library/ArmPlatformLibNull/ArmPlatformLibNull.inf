@@ -27,9 +27,6 @@
   ArmPlatformLibNull.c
   ArmPlatformLibNullMem.c
 
-[Sources.Arm]
-  Arm/ArmPlatformHelper.S    | GCC
-
 [Sources.AArch64]
   AArch64/ArmPlatformHelper.S
 

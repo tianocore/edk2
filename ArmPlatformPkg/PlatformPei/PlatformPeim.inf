@@ -16,14 +16,9 @@
 
   ENTRY_POINT                    = InitializePlatformPeim
 
-#
-# The following information is for reference only and not required by the build tools.
-#
-#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM
-#
-
 [Sources]
   PlatformPeim.c
+  PlatformPeiTpmEventLog.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -31,12 +26,14 @@
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
+  SecurityPkg/SecurityPkg.dec
 
 [LibraryClasses]
   PeimEntryPoint
   DebugLib
   HobLib
   ArmPlatformLib
+  ArmTransferListLib
   PlatformPeiLib
   PeiServicesLib
 
@@ -54,6 +51,7 @@
 
 [Guids]
   gArmTransferListHobGuid
+  gTcgEvent2EntryHobGuid
 
 [Depex]
   TRUE

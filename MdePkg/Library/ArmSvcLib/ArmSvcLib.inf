@@ -13,9 +13,6 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmSvcLib
 
-[Sources.ARM]
-  Arm/ArmSvc.S      | GCC
-
 [Sources.AARCH64]
   AArch64/ArmSvc.S
 

@@ -36,7 +36,7 @@
 [Sources.IA32, Sources.X64]
   StandaloneMmTcg2PhysicalPresenceLib.c
 
-[Sources.ARM, Sources.AARCH64]
+[Sources.AARCH64]
   StandaloneMmTcg2PhysicalPresenceLibArm.c
 
 [Packages]
@@ -64,7 +64,7 @@
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2PhysicalPresenceFlags        ## SOMETIMES_CONSUMES
 
-[Pcd.ARM, Pcd.AARCH64]
+[Pcd.AARCH64]
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer
 
 [Depex]
