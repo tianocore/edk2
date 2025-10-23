@@ -540,6 +540,7 @@ BmRepairAllControllers (
   UINT32                               MaxRepairCount;
   UINT32                               RepairCount;
 
+  Count = 0;
   //
   // Configure PcdDriverHealthConfigureForm to ZeroGuid to disable driver health check.
   //

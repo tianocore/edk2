@@ -551,7 +551,7 @@ BmFindUsbDevice (
                   );
   if (EFI_ERROR (Status)) {
     *UsbIoHandleCount = 0;
-    UsbIoHandles      = NULL;
+    return NULL;
   }
 
   for (Index = 0; Index < *UsbIoHandleCount; ) {
@@ -725,6 +725,10 @@ BmExpandFileDevicePath (
           )
       {
         NextFullPath = AppendDevicePath (DevicePathFromHandle (Handles[Index]), FilePath);
+        if (NextFullPath == NULL) {
+          goto Exit;
+        }
+
         if (GetNext) {
           break;
         } else {
@@ -740,6 +744,7 @@ BmExpandFileDevicePath (
     }
   }
 
+Exit:
   if (Handles != NULL) {
     FreePool (Handles);
   }
@@ -775,8 +780,7 @@ BmExpandUriDevicePath (
   EfiBootManagerConnectAll ();
   Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiLoadFileProtocolGuid, NULL, &HandleCount, &Handles);
   if (EFI_ERROR (Status)) {
-    HandleCount = 0;
-    Handles     = NULL;
+    return NULL;
   }
 
   NextFullPath = NULL;
@@ -1009,6 +1013,7 @@ BmExpandPartitionDevicePath (
   // to search all devices in the system for a matched partition
   //
   BlockIoBuffer       = NULL;
+  BlockIoHandleCount  = 0;
   MatchFound          = FALSE;
   ConnectAllAttempted = FALSE;
   do {
@@ -1035,7 +1040,11 @@ BmExpandPartitionDevicePath (
         // Find the matched partition device path
         //
         TempDevicePath = AppendDevicePath (BlockIoDevicePath, NextDevicePathNode (FilePath));
-        FullPath       = BmGetNextLoadOptionDevicePath (TempDevicePath, NULL);
+        if (TempDevicePath == NULL) {
+          continue;
+        }
+
+        FullPath = BmGetNextLoadOptionDevicePath (TempDevicePath, NULL);
         FreePool (TempDevicePath);
 
         if (FullPath != NULL) {
