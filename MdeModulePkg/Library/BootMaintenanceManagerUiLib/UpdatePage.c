@@ -486,7 +486,9 @@ UpdateConsolePage (
       break;
   }
 
-  ASSERT (ConsoleCheck != NULL);
+  if (ConsoleCheck == NULL) {
+    ASSERT (ConsoleCheck != NULL);
+  }
 
   for (Index = 0; (((UINTN)Index < ConsoleMenu->MenuNumber) && \
                    (Index < MAX_MENU_NUMBER)); Index++)
@@ -619,10 +621,16 @@ UpdateOrderPage (
       break;
   }
 
-  ASSERT (OptionOrder != NULL);
+  if (OptionOrder == NULL ) {
+    ASSERT (OptionOrder != NULL);
+    return;
+  }
 
   OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
-  ASSERT (OptionsOpCodeHandle != NULL);
+  if (OptionsOpCodeHandle == NULL) {
+    ASSERT (OptionsOpCodeHandle != NULL);
+    return;
+  }
 
   NewMenuEntry = NULL;
   for (OptionIndex = 0; (OptionIndex < MAX_MENU_NUMBER && OptionOrder[OptionIndex] != 0); OptionIndex++) {
@@ -635,7 +643,7 @@ UpdateOrderPage (
       }
     }
 
-    if (BootOptionFound) {
+    if (BootOptionFound && (NewMenuEntry != NULL)) {
       HiiCreateOneOfOptionOpCode (
         OptionsOpCodeHandle,
         NewMenuEntry->DisplayStringToken,

@@ -1219,13 +1219,16 @@ InsertFpdtRecord (
     case PERF_CROSSMODULE_START_ID:
     case PERF_CROSSMODULE_END_ID:
       GetModuleInfoFromHandle ((EFI_HANDLE)CallerIdentifier, ModuleName, sizeof (ModuleName), &ModuleGuid);
+
+      StringPtr = NULL;
+
       if (String != NULL) {
         StringPtr = String;
-      } else {
+      } else if (ModuleName != NULL) {
         StringPtr = ModuleName;
       }
 
-      if (AsciiStrLen (StringPtr) == 0) {
+      if ((StringPtr == NULL) || (AsciiStrLen (StringPtr) == 0)) {
         StringPtr = "unknown name";
       }
 
@@ -1244,13 +1247,16 @@ InsertFpdtRecord (
     default:
       if (Attribute != PerfEntry) {
         GetModuleInfoFromHandle ((EFI_HANDLE)CallerIdentifier, ModuleName, sizeof (ModuleName), &ModuleGuid);
+
+        StringPtr = NULL;
+
         if (String != NULL) {
           StringPtr = String;
-        } else {
+        } else if (ModuleName != NULL) {
           StringPtr = ModuleName;
         }
 
-        if (AsciiStrLen (StringPtr) == 0) {
+        if ((StringPtr == NULL) || (AsciiStrLen (StringPtr) == 0)) {
           StringPtr = "unknown name";
         }
 

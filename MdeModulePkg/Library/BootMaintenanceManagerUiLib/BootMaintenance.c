@@ -1452,40 +1452,43 @@ CustomizeMenus (
   //
   StartOpCodeHandle = HiiAllocateOpCodeHandle ();
   ASSERT (StartOpCodeHandle != NULL);
+  if (StartOpCodeHandle != NULL) {
+    EndOpCodeHandle = HiiAllocateOpCodeHandle ();
+    ASSERT (EndOpCodeHandle != NULL);
+    if (EndOpCodeHandle != NULL) {
+      //
+      // Create Hii Extend Label OpCode as the start opcode
+      //
+      StartGuidLabel               = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+      StartGuidLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+      StartGuidLabel->Number       = LABEL_FORM_MAIN_START;
+      //
+      // Create Hii Extend Label OpCode as the end opcode
+      //
+      EndGuidLabel               = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+      EndGuidLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+      EndGuidLabel->Number       = LABEL_FORM_MAIN_END;
 
-  EndOpCodeHandle = HiiAllocateOpCodeHandle ();
-  ASSERT (EndOpCodeHandle != NULL);
-  //
-  // Create Hii Extend Label OpCode as the start opcode
-  //
-  StartGuidLabel               = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
-  StartGuidLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
-  StartGuidLabel->Number       = LABEL_FORM_MAIN_START;
-  //
-  // Create Hii Extend Label OpCode as the end opcode
-  //
-  EndGuidLabel               = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
-  EndGuidLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
-  EndGuidLabel->Number       = LABEL_FORM_MAIN_END;
+      //
+      // Updata Front Page form
+      //
+      UiCustomizeBMMPage (
+        mBmmCallbackInfo->BmmHiiHandle,
+        StartOpCodeHandle
+        );
 
-  //
-  // Updata Front Page form
-  //
-  UiCustomizeBMMPage (
-    mBmmCallbackInfo->BmmHiiHandle,
-    StartOpCodeHandle
-    );
+      HiiUpdateForm (
+        mBmmCallbackInfo->BmmHiiHandle,
+        &mBootMaintGuid,
+        FORM_MAIN_ID,
+        StartOpCodeHandle,
+        EndOpCodeHandle
+        );
+      HiiFreeOpCodeHandle (EndOpCodeHandle);
+    }
 
-  HiiUpdateForm (
-    mBmmCallbackInfo->BmmHiiHandle,
-    &mBootMaintGuid,
-    FORM_MAIN_ID,
-    StartOpCodeHandle,
-    EndOpCodeHandle
-    );
-
-  HiiFreeOpCodeHandle (StartOpCodeHandle);
-  HiiFreeOpCodeHandle (EndOpCodeHandle);
+    HiiFreeOpCodeHandle (StartOpCodeHandle);
+  }
 }
 
 /**

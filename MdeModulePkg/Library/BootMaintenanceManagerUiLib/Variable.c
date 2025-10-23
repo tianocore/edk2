@@ -198,11 +198,13 @@ Var_UpdateConsoleOption (
                              (EFI_DEVICE_PATH_PROTOCOL *)&Vendor
                              );
       ASSERT (TerminalDevicePath != NULL);
-      ChangeTerminalDevicePath (TerminalDevicePath, TRUE);
-      ConDevicePath = AppendDevicePathInstance (
-                        ConDevicePath,
-                        TerminalDevicePath
-                        );
+      if (TerminalDevicePath != NULL) {
+        ChangeTerminalDevicePath (TerminalDevicePath, TRUE);
+        ConDevicePath = AppendDevicePathInstance (
+                          ConDevicePath,
+                          TerminalDevicePath
+                          );
+      }
     }
   }
 
