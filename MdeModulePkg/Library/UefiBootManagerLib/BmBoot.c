@@ -535,6 +535,8 @@ BmFindUsbDevice (
     return NULL;
   }
 
+  *UsbIoHandleCount = 0;
+  UsbIoHandles      = NULL;
   //
   // Get all UsbIo Handles.
   //
@@ -545,40 +547,37 @@ BmFindUsbDevice (
                   UsbIoHandleCount,
                   &UsbIoHandles
                   );
-  if (EFI_ERROR (Status)) {
-    *UsbIoHandleCount = 0;
-    UsbIoHandles      = NULL;
-  }
-
-  for (Index = 0; Index < *UsbIoHandleCount; ) {
-    //
-    // Get the Usb IO interface.
-    //
-    Status = gBS->HandleProtocol (
-                    UsbIoHandles[Index],
-                    &gEfiUsbIoProtocolGuid,
-                    (VOID **)&UsbIo
-                    );
-    UsbIoDevicePath = DevicePathFromHandle (UsbIoHandles[Index]);
-    Matched         = FALSE;
-    if (!EFI_ERROR (Status) && (UsbIoDevicePath != NULL)) {
+  if (!EFI_ERROR (Status)) {
+    for (Index = 0; Index < *UsbIoHandleCount; ) {
       //
-      // Compare starting part of UsbIoHandle's device path with ParentDevicePath.
+      // Get the Usb IO interface.
       //
-      if (CompareMem (UsbIoDevicePath, DevicePath, ParentDevicePathSize) == 0) {
-        if (BmMatchUsbClass (UsbIo, (USB_CLASS_DEVICE_PATH *)((UINTN)DevicePath + ParentDevicePathSize)) ||
-            BmMatchUsbWwid (UsbIo, (USB_WWID_DEVICE_PATH *)((UINTN)DevicePath + ParentDevicePathSize)))
-        {
-          Matched = TRUE;
+      Status = gBS->HandleProtocol (
+                      UsbIoHandles[Index],
+                      &gEfiUsbIoProtocolGuid,
+                      (VOID **)&UsbIo
+                      );
+      UsbIoDevicePath = DevicePathFromHandle (UsbIoHandles[Index]);
+      Matched         = FALSE;
+      if (!EFI_ERROR (Status) && (UsbIoDevicePath != NULL)) {
+        //
+        // Compare starting part of UsbIoHandle's device path with ParentDevicePath.
+        //
+        if (CompareMem (UsbIoDevicePath, DevicePath, ParentDevicePathSize) == 0) {
+          if (BmMatchUsbClass (UsbIo, (USB_CLASS_DEVICE_PATH *)((UINTN)DevicePath + ParentDevicePathSize)) ||
+              BmMatchUsbWwid (UsbIo, (USB_WWID_DEVICE_PATH *)((UINTN)DevicePath + ParentDevicePathSize)))
+          {
+            Matched = TRUE;
+          }
         }
       }
-    }
 
-    if (!Matched) {
-      (*UsbIoHandleCount)--;
-      CopyMem (&UsbIoHandles[Index], &UsbIoHandles[Index + 1], (*UsbIoHandleCount - Index) * sizeof (EFI_HANDLE));
-    } else {
-      Index++;
+      if (!Matched) {
+        (*UsbIoHandleCount)--;
+        CopyMem (&UsbIoHandles[Index], &UsbIoHandles[Index + 1], (*UsbIoHandleCount - Index) * sizeof (EFI_HANDLE));
+      } else {
+        Index++;
+      }
     }
   }
 
@@ -696,48 +695,52 @@ BmExpandFileDevicePath (
   EFI_DEVICE_PATH_PROTOCOL  *NextFullPath;
   BOOLEAN                   GetNext;
 
+  HandleCount = 0;
+  Handles     = NULL;
   EfiBootManagerConnectAll ();
   Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiSimpleFileSystemProtocolGuid, NULL, &HandleCount, &Handles);
-  if (EFI_ERROR (Status)) {
-    HandleCount = 0;
-    Handles     = NULL;
-  }
+  if (!EFI_ERROR (Status)) {
+    GetNext      = (BOOLEAN)(FullPath == NULL);
+    NextFullPath = NULL;
+    //
+    // Enumerate all removable media devices followed by all fixed media devices,
+    //   followed by media devices which don't layer on block io.
+    //
+    for (MediaType = 0; MediaType < 3; MediaType++) {
+      for (Index = 0; Index < HandleCount; Index++) {
+        Status = gBS->HandleProtocol (Handles[Index], &gEfiBlockIoProtocolGuid, (VOID *)&BlockIo);
+        if (EFI_ERROR (Status)) {
+          BlockIo = NULL;
+        }
 
-  GetNext      = (BOOLEAN)(FullPath == NULL);
-  NextFullPath = NULL;
-  //
-  // Enumerate all removable media devices followed by all fixed media devices,
-  //   followed by media devices which don't layer on block io.
-  //
-  for (MediaType = 0; MediaType < 3; MediaType++) {
-    for (Index = 0; Index < HandleCount; Index++) {
-      Status = gBS->HandleProtocol (Handles[Index], &gEfiBlockIoProtocolGuid, (VOID *)&BlockIo);
-      if (EFI_ERROR (Status)) {
-        BlockIo = NULL;
-      }
+        if (((MediaType == 0) && (BlockIo != NULL) && BlockIo->Media->RemovableMedia) ||
+            ((MediaType == 1) && (BlockIo != NULL) && !BlockIo->Media->RemovableMedia) ||
+            ((MediaType == 2) && (BlockIo == NULL))
+            )
+        {
+          NextFullPath = AppendDevicePath (DevicePathFromHandle (Handles[Index]), FilePath);
+          if (NextFullPath == NULL) {
+            continue;
+          }
 
-      if (((MediaType == 0) && (BlockIo != NULL) && BlockIo->Media->RemovableMedia) ||
-          ((MediaType == 1) && (BlockIo != NULL) && !BlockIo->Media->RemovableMedia) ||
-          ((MediaType == 2) && (BlockIo == NULL))
-          )
-      {
-        NextFullPath = AppendDevicePath (DevicePathFromHandle (Handles[Index]), FilePath);
-        if (GetNext) {
-          break;
-        } else {
+          if (GetNext) {
+            // this is the break/exit condition.  Occurs on first if FullPath input parameter was NULL
+            // or on the next loop after input parameter FullPath matches NextFullPath.
+            // NextFullPath will not be NULL so outer loop is broken too
+            break;
+          }
+
           GetNext = (BOOLEAN)(CompareMem (NextFullPath, FullPath, GetDevicePathSize (NextFullPath)) == 0);
           FreePool (NextFullPath);
           NextFullPath = NULL;
         }
       }
+
+      if (NextFullPath != NULL) {
+        break;
+      }
     }
 
-    if (NextFullPath != NULL) {
-      break;
-    }
-  }
-
-  if (Handles != NULL) {
     FreePool (Handles);
   }
 
@@ -769,41 +772,39 @@ BmExpandUriDevicePath (
   EFI_DEVICE_PATH_PROTOCOL  *RamDiskDevicePath;
   BOOLEAN                   GetNext;
 
+  HandleCount = 0;
+  Handles     = NULL;
+
   EfiBootManagerConnectAll ();
   Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiLoadFileProtocolGuid, NULL, &HandleCount, &Handles);
-  if (EFI_ERROR (Status)) {
-    HandleCount = 0;
-    Handles     = NULL;
-  }
+  if (!EFI_ERROR (Status)) {
+    NextFullPath = NULL;
+    GetNext      = (BOOLEAN)(FullPath == NULL);
+    for (Index = 0; Index < HandleCount; Index++) {
+      NextFullPath = BmExpandLoadFile (Handles[Index], FilePath);
 
-  NextFullPath = NULL;
-  GetNext      = (BOOLEAN)(FullPath == NULL);
-  for (Index = 0; Index < HandleCount; Index++) {
-    NextFullPath = BmExpandLoadFile (Handles[Index], FilePath);
-
-    if (NextFullPath == NULL) {
-      continue;
-    }
-
-    if (GetNext) {
-      break;
-    } else {
-      GetNext = (BOOLEAN)(CompareMem (NextFullPath, FullPath, GetDevicePathSize (NextFullPath)) == 0);
-      //
-      // Free the resource occupied by the RAM disk.
-      //
-      RamDiskDevicePath = BmGetRamDiskDevicePath (NextFullPath);
-      if (RamDiskDevicePath != NULL) {
-        BmDestroyRamDisk (RamDiskDevicePath);
-        FreePool (RamDiskDevicePath);
+      if (NextFullPath == NULL) {
+        continue;
       }
 
-      FreePool (NextFullPath);
-      NextFullPath = NULL;
-    }
-  }
+      if (GetNext) {
+        break;
+      } else {
+        GetNext = (BOOLEAN)(CompareMem (NextFullPath, FullPath, GetDevicePathSize (NextFullPath)) == 0);
+        //
+        // Free the resource occupied by the RAM disk.
+        //
+        RamDiskDevicePath = BmGetRamDiskDevicePath (NextFullPath);
+        if (RamDiskDevicePath != NULL) {
+          BmDestroyRamDisk (RamDiskDevicePath);
+          FreePool (RamDiskDevicePath);
+        }
 
-  if (Handles != NULL) {
+        FreePool (NextFullPath);
+        NextFullPath = NULL;
+      }
+    }
+
     FreePool (Handles);
   }
 
@@ -1002,6 +1003,7 @@ BmExpandPartitionDevicePath (
   // to search all devices in the system for a matched partition
   //
   BlockIoBuffer       = NULL;
+  BlockIoHandleCount  = 0;
   MatchFound          = FALSE;
   ConnectAllAttempted = FALSE;
   do {
@@ -1010,45 +1012,46 @@ BmExpandPartitionDevicePath (
     }
 
     Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiBlockIoProtocolGuid, NULL, &BlockIoHandleCount, &BlockIoBuffer);
-    if (EFI_ERROR (Status)) {
-      BlockIoHandleCount = 0;
-      BlockIoBuffer      = NULL;
-    }
+    if (!EFI_ERROR (Status)) {
+      //
+      // Loop through all the device handles that support the BLOCK_IO Protocol
+      //
+      for (Index = 0; Index < BlockIoHandleCount; Index++) {
+        BlockIoDevicePath = DevicePathFromHandle (BlockIoBuffer[Index]);
+        if (BlockIoDevicePath == NULL) {
+          continue;
+        }
 
-    //
-    // Loop through all the device handles that support the BLOCK_IO Protocol
-    //
-    for (Index = 0; Index < BlockIoHandleCount; Index++) {
-      BlockIoDevicePath = DevicePathFromHandle (BlockIoBuffer[Index]);
-      if (BlockIoDevicePath == NULL) {
-        continue;
-      }
-
-      if (BmMatchPartitionDevicePathNode (BlockIoDevicePath, (HARDDRIVE_DEVICE_PATH *)FilePath)) {
-        //
-        // Find the matched partition device path
-        //
-        TempDevicePath = AppendDevicePath (BlockIoDevicePath, NextDevicePathNode (FilePath));
-        FullPath       = BmGetNextLoadOptionDevicePath (TempDevicePath, NULL);
-        FreePool (TempDevicePath);
-
-        if (FullPath != NULL) {
-          BmCachePartitionDevicePath (&CachedDevicePath, BlockIoDevicePath);
-
+        if (BmMatchPartitionDevicePathNode (BlockIoDevicePath, (HARDDRIVE_DEVICE_PATH *)FilePath)) {
           //
-          // Save the matching Device Path so we don't need to do a connect all next time
-          // Failing to save only impacts performance next time expanding the short-form device path
+          // Find the matched partition device path
           //
-          Status = gRT->SetVariable (
-                          L"HDDP",
-                          &mBmHardDriveBootVariableGuid,
-                          EFI_VARIABLE_BOOTSERVICE_ACCESS |
-                          EFI_VARIABLE_NON_VOLATILE,
-                          GetDevicePathSize (CachedDevicePath),
-                          CachedDevicePath
-                          );
-          MatchFound = TRUE;
-          break;
+          TempDevicePath = AppendDevicePath (BlockIoDevicePath, NextDevicePathNode (FilePath));
+          if (TempDevicePath == NULL) {
+            continue;
+          }
+
+          FullPath = BmGetNextLoadOptionDevicePath (TempDevicePath, NULL);
+          FreePool (TempDevicePath);
+
+          if (FullPath != NULL) {
+            BmCachePartitionDevicePath (&CachedDevicePath, BlockIoDevicePath);
+
+            //
+            // Save the matching Device Path so we don't need to do a connect all next time
+            // Failing to save only impacts performance next time expanding the short-form device path
+            //
+            Status = gRT->SetVariable (
+                            L"HDDP",
+                            &mBmHardDriveBootVariableGuid,
+                            EFI_VARIABLE_BOOTSERVICE_ACCESS |
+                            EFI_VARIABLE_NON_VOLATILE,
+                            GetDevicePathSize (CachedDevicePath),
+                            CachedDevicePath
+                            );
+            MatchFound = TRUE;
+            break;
+          }
         }
       }
     }
@@ -1276,6 +1279,10 @@ BmExpandNetworkFileSystem (
   UINTN                     Index;
   EFI_DEVICE_PATH_PROTOCOL  *Node;
 
+  Handle      = NULL;
+  Handles     = NULL;
+  HandleCount = 0;
+
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
                   &gEfiBlockIoProtocolGuid,
@@ -1283,12 +1290,7 @@ BmExpandNetworkFileSystem (
                   &HandleCount,
                   &Handles
                   );
-  if (EFI_ERROR (Status)) {
-    Handles     = NULL;
-    HandleCount = 0;
-  }
 
-  Handle = NULL;
   for (Index = 0; Index < HandleCount; Index++) {
     Node   = DevicePathFromHandle (Handles[Index]);
     Status = gBS->LocateDevicePath (&gEfiLoadFileProtocolGuid, &Node, &Handle);

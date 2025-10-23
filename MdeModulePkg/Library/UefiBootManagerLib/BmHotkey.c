@@ -1025,6 +1025,8 @@ EfiBootManagerAddKeyOptionVariable (
     return Status;
   }
 
+  Index           = 0;
+  KeyOptionCount  = 0;
   KeyOptionNumber = LoadOptionNumberUnassigned;
   //
   // Check if the hot key sequence was defined already

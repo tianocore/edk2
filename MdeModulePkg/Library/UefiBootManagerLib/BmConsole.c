@@ -445,6 +445,9 @@ EfiBootManagerUpdateConsoleVariable (
     return EFI_UNSUPPORTED;
   }
 
+  Status            = EFI_SUCCESS;
+  TempNewDevicePath = NULL;
+
   //
   // Delete the ExclusiveDevicePath from current default console
   //
