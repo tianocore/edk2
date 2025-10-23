@@ -1019,22 +1019,24 @@ EfiBootManagerAddKeyOptionVariable (
   // Check if the hot key sequence was defined already
   //
   KeyOptions = BmGetKeyOptions (&KeyOptionCount);
-  for (Index = 0; Index < KeyOptionCount; Index++) {
-    if ((KeyOptions[Index].KeyData.PackedValue == KeyOption.KeyData.PackedValue) &&
-        (CompareMem (KeyOptions[Index].Keys, KeyOption.Keys, KeyOption.KeyData.Options.InputKeyCount * sizeof (EFI_INPUT_KEY)) == 0))
-    {
-      break;
+  if (KeyOptions != NULL) {
+    for (Index = 0; Index < KeyOptionCount; Index++) {
+      if ((KeyOptions[Index].KeyData.PackedValue == KeyOption.KeyData.PackedValue) &&
+          (CompareMem (KeyOptions[Index].Keys, KeyOption.Keys, KeyOption.KeyData.Options.InputKeyCount * sizeof (EFI_INPUT_KEY)) == 0))
+      {
+        break;
+      }
+
+      if ((KeyOptionNumber == LoadOptionNumberUnassigned) &&
+          (KeyOptions[Index].OptionNumber > Index)
+          )
+      {
+        KeyOptionNumber = Index;
+      }
     }
 
-    if ((KeyOptionNumber == LoadOptionNumberUnassigned) &&
-        (KeyOptions[Index].OptionNumber > Index)
-        )
-    {
-      KeyOptionNumber = Index;
-    }
+    BmFreeKeyOptions (KeyOptions, KeyOptionCount);
   }
-
-  BmFreeKeyOptions (KeyOptions, KeyOptionCount);
 
   if (Index < KeyOptionCount) {
     return EFI_ALREADY_STARTED;
@@ -1155,6 +1157,10 @@ EfiBootManagerDeleteKeyOptionVariable (
   //
   Status     = EFI_NOT_FOUND;
   KeyOptions = BmGetKeyOptions (&KeyOptionCount);
+  if (KeyOptions == NULL) {
+    goto Exit;
+  }
+
   for (Index = 0; Index < KeyOptionCount; Index++) {
     if ((KeyOptions[Index].KeyData.PackedValue == KeyOption.KeyData.PackedValue) &&
         (CompareMem (
@@ -1185,6 +1191,7 @@ EfiBootManagerDeleteKeyOptionVariable (
 
   BmFreeKeyOptions (KeyOptions, KeyOptionCount);
 
+Exit:
   EfiReleaseLock (&mBmHotkeyLock);
 
   return Status;

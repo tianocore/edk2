@@ -548,7 +548,10 @@ BmRepairAllControllers (
   }
 
   Status = gBS->LocateProtocol (&gEfiFormBrowser2ProtocolGuid, NULL, (VOID **)&FormBrowser2);
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return;
+  }
 
   MaxRepairCount = PcdGet32 (PcdMaxRepairCount);
   RepairCount    = 0;
@@ -561,6 +564,10 @@ BmRepairAllControllers (
     // Deal with Repair Required
     //
     DriverHealthInfo = EfiBootManagerGetDriverHealthInfo (&Count);
+    if (DriverHealthInfo == NULL) {
+      return;
+    }
+
     for (Index = 0; Index < Count; Index++) {
       if (DriverHealthInfo[Index].HealthStatus == EfiDriverHealthStatusConfigurationRequired) {
         ConfigurationRequired = TRUE;
@@ -622,6 +629,10 @@ BmRepairAllControllers (
   RebootRequired    = FALSE;
   ReconnectRequired = FALSE;
   DriverHealthInfo  = EfiBootManagerGetDriverHealthInfo (&Count);
+  if (DriverHealthInfo == NULL) {
+    return;
+  }
+
   for (Index = 0; Index < Count; Index++) {
     BmDisplayMessages (&DriverHealthInfo[Index]);
 
@@ -651,6 +662,10 @@ BmRepairAllControllers (
   CHAR16  String[512];
 
   DriverHealthInfo = EfiBootManagerGetDriverHealthInfo (&Count);
+  if (DriverHealthInfo == NULL) {
+    return;
+  }
+
   for (Index = 0; Index < Count; Index++) {
     if (DriverHealthInfo == NULL) {
       continue;
