@@ -302,6 +302,11 @@ GetLocalApicBaseAddress (
 {
   MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
 
+  // Since the SvsmAPIC is based on X2APIC, the base address is not needed.
+  if (SvsmApicEnabled ()) {
+    return 0;
+  }
+
   if (!LocalApicBaseAddressMsrSupported ()) {
     //
     // If CPU does not support Local APIC Base Address MSR, then retrieve
