@@ -484,6 +484,9 @@ UpdateConsolePage (
       QuestionIdBase     = CON_ERR_DEVICE_QUESTION_ID;
       VariableOffsetBase = CON_ERR_DEVICE_VAR_OFFSET;
       break;
+
+    default:
+      return;
   }
 
   if (ConsoleCheck == NULL) {
