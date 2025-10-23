@@ -194,7 +194,7 @@ UpdateConCOMPage (
   )
 {
   BM_MENU_ENTRY  *NewMenuEntry;
-  UINT16         Index;
+  UINTN          Index;
 
   CallbackData->BmmAskSaveOrNot = TRUE;
 
@@ -230,7 +230,7 @@ UpdateBootDelPage (
 {
   BM_MENU_ENTRY    *NewMenuEntry;
   BM_LOAD_CONTEXT  *NewLoadContext;
-  UINT16           Index;
+  UINTN            Index;
 
   CallbackData->BmmAskSaveOrNot = TRUE;
 
@@ -285,7 +285,7 @@ UpdateDrvAddHandlePage (
   )
 {
   BM_MENU_ENTRY  *NewMenuEntry;
-  UINT16         Index;
+  UINTN          Index;
 
   CallbackData->BmmAskSaveOrNot = FALSE;
 
@@ -321,7 +321,7 @@ UpdateDrvDelPage (
 {
   BM_MENU_ENTRY    *NewMenuEntry;
   BM_LOAD_CONTEXT  *NewLoadContext;
-  UINT16           Index;
+  UINTN            Index;
 
   CallbackData->BmmAskSaveOrNot = TRUE;
 
@@ -451,8 +451,8 @@ UpdateConsolePage (
   BM_MENU_ENTRY        *NewMenuEntry;
   BM_CONSOLE_CONTEXT   *NewConsoleContext;
   BM_TERMINAL_CONTEXT  *NewTerminalContext;
-  UINT16               Index;
-  UINT16               Index2;
+  UINTN                Index;
+  UINTN                Index2;
   UINT8                CheckFlags;
   UINT8                *ConsoleCheck;
   EFI_QUESTION_ID      QuestionIdBase;
@@ -571,7 +571,7 @@ UpdateOrderPage (
   )
 {
   BM_MENU_ENTRY    *NewMenuEntry;
-  UINT16           Index;
+  UINTN            Index;
   UINT16           OptionIndex;
   VOID             *OptionsOpCodeHandle;
   BOOLEAN          BootOptionFound;
