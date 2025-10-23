@@ -1396,6 +1396,7 @@ XhciDelAsyncIntTransfer (
   LIST_ENTRY              *Next;
   URB                     *Urb;
   VOID                    *UrbData;
+  UINTN                   DataLen;
   EFI_USB_DATA_DIRECTION  Direction;
   EFI_STATUS              Status;
 
@@ -1425,9 +1426,15 @@ XhciDelAsyncIntTransfer (
       // and allocates and manages its own data buffer, so free it here.
       //
       UrbData = Urb->Data;
+      DataLen = Urb->DataLen;
       XhcFreeUrb (Xhc, Urb);
       if (UrbData != NULL) {
-        FreePool (UrbData);
+        Status = Xhc->PciIo->FreeBuffer (Xhc->PciIo, EFI_SIZE_TO_PAGES (DataLen), UrbData);
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_ERROR, "%a: failed to free buffer via PciIo\n", __func__));
+          ASSERT_EFI_ERROR (Status);
+          return EFI_SUCCESS;
+        }
       }
 
       return EFI_SUCCESS;
@@ -1452,6 +1459,7 @@ XhciDelAllAsyncIntTransfers (
   LIST_ENTRY  *Next;
   URB         *Urb;
   VOID        *UrbData;
+  UINTN       DataLen;
   EFI_STATUS  Status;
 
   BASE_LIST_FOR_EACH_SAFE (Entry, Next, &Xhc->AsyncIntTransfers) {
@@ -1472,9 +1480,13 @@ XhciDelAllAsyncIntTransfers (
     // and allocates and manages its own data buffer, so free it here.
     //
     UrbData = Urb->Data;
+    DataLen = Urb->DataLen;
     XhcFreeUrb (Xhc, Urb);
     if (UrbData != NULL) {
-      FreePool (UrbData);
+      Status = Xhc->PciIo->FreeBuffer (Xhc->PciIo, EFI_SIZE_TO_PAGES (DataLen), UrbData);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "%a: failed to free buffer via PciIo\n", __func__));
+      }
     }
   }
 }
@@ -1507,14 +1519,26 @@ XhciInsertAsyncIntTransfer (
   IN VOID                             *Context
   )
 {
-  VOID  *Data;
-  URB   *Urb;
+  VOID        *Data;
+  URB         *Urb;
+  EFI_STATUS  Status;
 
-  Data = AllocateZeroPool (DataLen);
-  if (Data == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: failed to allocate buffer\n", __func__));
+  Data = NULL;
+
+  Status = Xhc->PciIo->AllocateBuffer (
+                         Xhc->PciIo,
+                         AllocateAnyPages,
+                         EfiBootServicesData,
+                         EFI_SIZE_TO_PAGES (DataLen),
+                         &Data,
+                         0
+                         );
+  if (EFI_ERROR (Status) || (Data == NULL)) {
+    DEBUG ((DEBUG_ERROR, "%a: failed to allocate buffer via PciIo\n", __func__));
     return NULL;
   }
+
+  ZeroMem (Data, DataLen);
 
   Urb = XhcCreateUrb (
           Xhc,
@@ -1531,7 +1555,11 @@ XhciInsertAsyncIntTransfer (
           );
   if (Urb == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: failed to create URB\n", __func__));
-    FreePool (Data);
+    Status = Xhc->PciIo->FreeBuffer (Xhc->PciIo, EFI_SIZE_TO_PAGES (DataLen), Data);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: failed to free buffer via PciIo\n", __func__));
+    }
+
     return NULL;
   }
 
