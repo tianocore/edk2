@@ -305,6 +305,8 @@ IsRequiredDriver (
   UINTN             TempSize;
   BOOLEAN           RetVal;
 
+  Buffer = NULL;
+
   Status = HiiGetFormSetFromHiiHandle (HiiHandle, &Buffer, &BufferSize);
   if (EFI_ERROR (Status)) {
     return FALSE;
