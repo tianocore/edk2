@@ -250,6 +250,9 @@ NorFlashFvbInitialize (
   UINT32         FvbNumLba;
   EFI_BOOT_MODE  BootMode;
   UINTN          RuntimeMmioRegionSize;
+  UINT64         Attributes;                       // [CODE_FIRST] 11627
+                                                   // [CODE_FIRST] 11627
+  Attributes = EFI_MEMORY_UC | EFI_MEMORY_RUNTIME; // [CODE_FIRST] 11627
 
   DEBUG ((DEBUG_BLKIO, "NorFlashFvbInitialize\n"));
   ASSERT ((Instance != NULL));
@@ -264,18 +267,12 @@ NorFlashFvbInitialize (
   //       is written as the base of the flash region (ie: Instance->DeviceBaseAddress)
   RuntimeMmioRegionSize = (Instance->RegionBaseAddress - Instance->DeviceBaseAddress) + Instance->Size;
 
-  Status = gDS->AddMemorySpace (
+  Status = gDS->AddMemorySpaceV2 (                 // [CODE_FIRST] 11627
                   EfiGcdMemoryTypeMemoryMappedIo,
                   Instance->DeviceBaseAddress,
                   RuntimeMmioRegionSize,
-                  EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  Status = gDS->SetMemorySpaceAttributes (
-                  Instance->DeviceBaseAddress,
-                  RuntimeMmioRegionSize,
-                  EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
+                  Attributes,                      // [CODE_FIRST] 11627
+                  Attributes                       // [CODE_FIRST] 11627
                   );
   ASSERT_EFI_ERROR (Status);
 

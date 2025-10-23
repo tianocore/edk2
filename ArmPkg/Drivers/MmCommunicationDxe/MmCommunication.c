@@ -739,6 +739,9 @@ MmCommunication2Initialize (
 {
   EFI_STATUS  Status;
   UINTN       Index;
+  UINT64      Attributes;                                           // [CODE_FIRST] 11627
+                                                                    // [CODE_FIRST] 11627
+  Attributes = EFI_MEMORY_WB | EFI_MEMORY_XP | EFI_MEMORY_RUNTIME;  // [CODE_FIRST] 11627
 
   // Initialize to make mm communication
   Status = InitializeCommunication ();
@@ -755,13 +758,12 @@ MmCommunication2Initialize (
 
   ASSERT (mNsCommBuffMemRegion.Length != 0);
 
-  Status = gDS->AddMemorySpace (
+  Status = gDS->AddMemorySpaceV2 (                    // [CODE_FIRST] 11627
                   EfiGcdMemoryTypeReserved,
                   mNsCommBuffMemRegion.PhysicalBase,
                   mNsCommBuffMemRegion.Length,
-                  EFI_MEMORY_WB |
-                  EFI_MEMORY_XP |
-                  EFI_MEMORY_RUNTIME
+                  Attributes,                         // [CODE_FIRST] 11627
+                  Attributes                          // [CODE_FIRST] 11627
                   );
   if (EFI_ERROR (Status)) {
     DEBUG ((
@@ -770,20 +772,6 @@ MmCommunication2Initialize (
       "Failed to add MM-NS Buffer Memory Space\n"
       ));
     goto ReturnErrorStatus;
-  }
-
-  Status = gDS->SetMemorySpaceAttributes (
-                  mNsCommBuffMemRegion.PhysicalBase,
-                  mNsCommBuffMemRegion.Length,
-                  EFI_MEMORY_WB | EFI_MEMORY_XP | EFI_MEMORY_RUNTIME
-                  );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "MmCommunicateInitialize: "
-      "Failed to set MM-NS Buffer Memory attributes\n"
-      ));
-    goto CleanAddedMemorySpace;
   }
 
   // Install the communication protocol
