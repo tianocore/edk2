@@ -25,9 +25,93 @@
 #include <Library/CpuLib.h>
 #include <IndustryStandard/Tdx.h>
 
+#include <Uefi/UefiBaseType.h>
+#include <Library/AmdSvsmLib.h>
 //
 // Library internal functions
 //
+
+/**
+  Check whether an SVSM APIC implementation is present and
+  should be used instead of the standard APIC functionality.
+
+  @retval TRUE   SVSM APIC
+  @retval FALSE  NO SVSM APIC
+
+**/
+STATIC
+BOOLEAN
+SvsmApicEnabled (
+  VOID
+  )
+{
+  if (!AmdSvsmIsSvsmPresent ()) {
+    return FALSE;
+  }
+
+  if (!AmdSvsmAltInjEnabled ()) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+  MSRs when Alternate Injection is enabled are accessed via SvsmCall.
+
+  @param  MsrIndex  Index of the MSR
+  @retval TRUE      MSR accessed via SvsmCall.
+  @retval FALSE     MSR accessed not via SvsmCall.
+
+**/
+STATIC
+BOOLEAN
+AccessMsrSvsmCall (
+  IN UINT32  MsrIndex
+  )
+{
+  if (!SvsmApicEnabled ()) {
+    return FALSE;
+  }
+
+  switch (MsrIndex) {
+    case MSR_IA32_X2APIC_APICID:
+    case MSR_IA32_X2APIC_TPR:
+    case MSR_IA32_X2APIC_PPR:
+    case MSR_IA32_X2APIC_ISR0:
+    case MSR_IA32_X2APIC_ISR1:
+    case MSR_IA32_X2APIC_ISR2:
+    case MSR_IA32_X2APIC_ISR3:
+    case MSR_IA32_X2APIC_ISR4:
+    case MSR_IA32_X2APIC_ISR5:
+    case MSR_IA32_X2APIC_ISR6:
+    case MSR_IA32_X2APIC_ISR7:
+    case MSR_IA32_X2APIC_TMR0:
+    case MSR_IA32_X2APIC_TMR1:
+    case MSR_IA32_X2APIC_TMR2:
+    case MSR_IA32_X2APIC_TMR3:
+    case MSR_IA32_X2APIC_TMR4:
+    case MSR_IA32_X2APIC_TMR5:
+    case MSR_IA32_X2APIC_TMR6:
+    case MSR_IA32_X2APIC_TMR7:
+    case MSR_IA32_X2APIC_IRR0:
+    case MSR_IA32_X2APIC_IRR1:
+    case MSR_IA32_X2APIC_IRR2:
+    case MSR_IA32_X2APIC_IRR3:
+    case MSR_IA32_X2APIC_IRR4:
+    case MSR_IA32_X2APIC_IRR5:
+    case MSR_IA32_X2APIC_IRR6:
+    case MSR_IA32_X2APIC_IRR7:
+    case MSR_IA32_X2APIC_EOI:
+    case MSR_IA32_X2APIC_ICR:
+    case MSR_IA32_X2APIC_SELF_IPI:
+      return TRUE;
+    default:
+      break;
+  }
+
+  return FALSE;
+}
 
 /**
   Some MSRs in TDX are accessed via TdCall.
@@ -103,6 +187,8 @@ LocalApicReadMsrReg64 (
     if (Status != 0) {
       TdVmCall (TDVMCALL_HALT, 0, 0, 0, 0, 0);
     }
+  } else if (AccessMsrSvsmCall (MsrIndex)) {
+    Val = AmdSvsmSnpReadApicMsr (MsrIndex);
   } else {
     Val = AsmReadMsr64 (MsrIndex);
   }
@@ -132,6 +218,8 @@ LocalApicWriteMsrReg64 (
     if (Status != 0) {
       TdVmCall (TDVMCALL_HALT, 0, 0, 0, 0, 0);
     }
+  } else if (AccessMsrSvsmCall (MsrIndex)) {
+    AmdSvsmSnpWriteApicMsr (MsrIndex, Value);
   } else {
     AsmWriteMsr64 (MsrIndex, Value);
   }
@@ -422,7 +510,12 @@ SendIpi (
     // interrupt in x2APIC mode.
     //
     MsrValue = LShiftU64 ((UINT64)ApicId, 32) | IcrLow;
-    AsmWriteMsr64 (X2APIC_MSR_ICR_ADDRESS, MsrValue);
+
+    if (SvsmApicEnabled ()) {
+      AmdSvsmSnpWriteApicMsr (X2APIC_MSR_ICR_ADDRESS, MsrValue);
+    } else {
+      AsmWriteMsr64 (X2APIC_MSR_ICR_ADDRESS, MsrValue);
+    }
   }
 }
 
@@ -489,6 +582,10 @@ SetApicMode (
     //
     // Ignore set request if the CPU does not support APIC Base Address MSR
     //
+    return;
+  }
+
+  if (SvsmApicEnabled () && (ApicMode != LOCAL_APIC_MODE_X2APIC)) {
     return;
   }
 
