@@ -197,7 +197,11 @@ Var_UpdateConsoleOption (
                              NewTerminalContext->DevicePath,
                              (EFI_DEVICE_PATH_PROTOCOL *)&Vendor
                              );
-      ASSERT (TerminalDevicePath != NULL);
+      if (TerminalDevicePath == NULL) {
+        ASSERT (TerminalDevicePath != NULL);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
       ChangeTerminalDevicePath (TerminalDevicePath, TRUE);
       ConDevicePath = AppendDevicePathInstance (
                         ConDevicePath,
