@@ -1407,9 +1407,24 @@ Ip6FormExtractConfig (
                          mIp6ConfigStorageName,
                          Private->ChildHandle
                          );
+    // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+    if (ConfigRequestHdr == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
+    }
+
+    // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
+
     Size          = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
     ConfigRequest = AllocateZeroPool (Size);
-    ASSERT (ConfigRequest != NULL);
+    // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+    if (ConfigRequest == NULL) {
+      ASSERT (ConfigRequest != NULL);
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
+    }
+
+    // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
     AllocatedRequest = TRUE;
     UnicodeSPrint (
       ConfigRequest,
@@ -1994,25 +2009,30 @@ Ip6ConfigFormInit (
                       CallbackInfo->RegisteredHandle,
                       STRING_TOKEN (STR_IP6_CONFIG_FORM_HELP),
                       NULL
-                      )
-    ;
-    UnicodeSPrint (MenuString, 128, L"%s (MAC:%s)", OldMenuString, MacString);
-    HiiSetString (
-      CallbackInfo->RegisteredHandle,
-      STRING_TOKEN (STR_IP6_CONFIG_FORM_HELP),
-      MenuString,
-      NULL
-      );
-    UnicodeSPrint (PortString, 128, L"MAC:%s", MacString);
-    HiiSetString (
-      CallbackInfo->RegisteredHandle,
-      STRING_TOKEN (STR_IP6_DEVICE_FORM_HELP),
-      PortString,
-      NULL
-      );
+                      );
+    // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+    if (OldMenuString != NULL) {
+      UnicodeSPrint (MenuString, 128, L"%s (MAC:%s)", OldMenuString, MacString);
+      HiiSetString (
+        CallbackInfo->RegisteredHandle,
+        STRING_TOKEN (STR_IP6_CONFIG_FORM_HELP),
+        MenuString,
+        NULL
+        );
+      UnicodeSPrint (PortString, 128, L"MAC:%s", MacString);
+      HiiSetString (
+        CallbackInfo->RegisteredHandle,
+        STRING_TOKEN (STR_IP6_DEVICE_FORM_HELP),
+        PortString,
+        NULL
+        );
+
+      FreePool (OldMenuString);
+    }
 
     FreePool (MacString);
-    FreePool (OldMenuString);
+
+    // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
 
     InitializeListHead (&Instance->Ip6NvData.ManualAddress);
     InitializeListHead (&Instance->Ip6NvData.GatewayAddress);

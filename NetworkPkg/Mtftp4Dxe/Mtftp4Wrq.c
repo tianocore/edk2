@@ -44,7 +44,14 @@ Mtftp4WrqSendBlock (
   }
 
   Packet = (EFI_MTFTP4_PACKET *)NetbufAllocSpace (UdpPacket, MTFTP4_DATA_HEAD_LEN, FALSE);
-  ASSERT (Packet != NULL);
+  // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+  if (Packet == NULL) {
+    ASSERT (Packet != NULL);
+    NetbufFree (UdpPacket);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
 
   Packet->Data.OpCode = HTONS (EFI_MTFTP4_OPCODE_DATA);
   Packet->Data.Block  = HTONS (BlockNum);
@@ -387,7 +394,14 @@ Mtftp4WrqInput (
     NetbufCopy (UdpPacket, 0, Len, (UINT8 *)Packet);
   } else {
     Packet = (EFI_MTFTP4_PACKET *)NetbufGetByte (UdpPacket, 0, NULL);
-    ASSERT (Packet != NULL);
+    // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+    if (Packet == NULL) {
+      ASSERT (Packet != NULL);
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ON_EXIT;
+    }
+
+    // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
   }
 
   Opcode = NTOHS (Packet->OpCode);

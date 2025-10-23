@@ -306,7 +306,13 @@ TcpTransmitSegment (
                        NET_BUF_HEAD
                        );
 
-  ASSERT (Head != NULL);
+  // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+  if (Head == NULL) {
+    ASSERT (Head != NULL);
+    return -1;
+  }
+
+  // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
 
   Nbuf->Tcp = Head;
 
@@ -496,7 +502,13 @@ TcpGetSegmentSndQue (
   //
   if (CopyLen != 0) {
     Data = NetbufAllocSpace (Nbuf, CopyLen, NET_BUF_TAIL);
-    ASSERT (Data != NULL);
+    // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+    if (Data == NULL) {
+      ASSERT (Data != NULL);
+      goto OnError;
+    }
+
+    // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
 
     if ((INT32)NetbufCopy (Node, Offset, CopyLen, Data) != CopyLen) {
       goto OnError;
@@ -560,8 +572,14 @@ TcpGetSegmentSock (
     // copy data to the segment.
     //
     Data = NetbufAllocSpace (Nbuf, Len, NET_BUF_TAIL);
-    ASSERT (Data != NULL);
+    // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+    if (Data == NULL) {
+      ASSERT (Data != NULL);
+      NetbufFree (Nbuf);
+      return NULL;
+    }
 
+    // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
     DataGet = SockGetDataToSend (Tcb->Sk, 0, Len, Data);
   }
 
@@ -608,6 +626,12 @@ TcpGetSegment (
     Nbuf = TcpGetSegmentSndQue (Tcb, Seq, Len);
   } else {
     Nbuf = TcpGetSegmentSock (Tcb, Seq, Len);
+    // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+  }
+
+  if (Nbuf == NULL) {
+    return NULL;
+    // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
   }
 
   if (TcpVerifySegment (Nbuf) == 0) {
@@ -1124,7 +1148,14 @@ TcpSendReset (
                         NET_BUF_TAIL
                         );
 
-  ASSERT (Nhead != NULL);
+  // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+  if (Nhead == NULL) {
+    ASSERT (Nhead != NULL);
+    NetbufFree (Nbuf);
+    return -1;
+  }
+
+  // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
 
   Nbuf->Tcp   = Nhead;
   Nhead->Flag = TCP_FLG_RST;
