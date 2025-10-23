@@ -8,6 +8,8 @@
 
 #include "InternalHiiLib.h"
 
+#include <Library/SafeIntLib.h>
+
 #define GUID_CONFIG_STRING_TYPE  0x00
 #define NAME_CONFIG_STRING_TYPE  0x01
 #define PATH_CONFIG_STRING_TYPE  0x02
@@ -1949,6 +1951,8 @@ GetBlockDataInfo (
   EFI_STATUS      Status;
   IFR_BLOCK_DATA  *BlockArray;
   UINT8           *DataBuffer;
+  UINT16          Sum1;
+  UINT16          Sum2;
 
   //
   // Initialize the local variables.
@@ -2145,14 +2149,20 @@ GetBlockDataInfo (
   while ((Link != &BlockArray->Entry) && (Link->ForwardLink != &BlockArray->Entry)) {
     BlockData    = BASE_CR (Link, IFR_BLOCK_DATA, Entry);
     NewBlockData = BASE_CR (Link->ForwardLink, IFR_BLOCK_DATA, Entry);
-    if ((NewBlockData->Offset >= BlockData->Offset) && (NewBlockData->Offset <= (BlockData->Offset + BlockData->Width))) {
-      if ((NewBlockData->Offset + NewBlockData->Width) > (BlockData->Offset + BlockData->Width)) {
-        BlockData->Width = (UINT16)(NewBlockData->Offset + NewBlockData->Width - BlockData->Offset);
+    if ((!EFI_ERROR (SafeUint16Add (BlockData->Offset, BlockData->Width, &Sum1))) &&
+        (!EFI_ERROR (SafeUint16Add (NewBlockData->Offset, NewBlockData->Width, &Sum2))) &&
+        (NewBlockData->Offset >= BlockData->Offset) &&
+        (NewBlockData->Offset <= Sum1) &&
+        (Sum2 > Sum1))
+    {
+      Sum1 = BlockData->Width;
+      if (!EFI_ERROR (SafeUint16Sub (Sum2, BlockData->Offset, &BlockData->Width))) {
+        RemoveEntryList (Link->ForwardLink);
+        FreePool (NewBlockData);
+        continue;
+      } else {
+        BlockData->Width = Sum1;
       }
-
-      RemoveEntryList (Link->ForwardLink);
-      FreePool (NewBlockData);
-      continue;
     }
 
     Link = Link->ForwardLink;
