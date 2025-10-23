@@ -36,7 +36,7 @@ BmmCreateBootNextMenu (
 {
   BM_MENU_ENTRY    *NewMenuEntry;
   BM_LOAD_CONTEXT  *NewLoadContext;
-  UINT16           Index;
+  UINTN            Index;
   VOID             *OptionsOpCodeHandle;
   UINT32           BootNextIndex;
 
@@ -61,7 +61,7 @@ BmmCreateBootNextMenu (
         EFI_IFR_TYPE_NUM_SIZE_32,
         Index
         );
-      BootNextIndex = Index;
+      BootNextIndex = (UINT32)Index;
     } else {
       HiiCreateOneOfOptionOpCode (
         OptionsOpCodeHandle,
