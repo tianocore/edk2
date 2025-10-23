@@ -65,6 +65,13 @@
       NvmExpressDxe|MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
   }
 
+  MdeModulePkg/Core/Dxe/GoogleTest/DxeCoreMemoryBinGoogleTest/DxeCoreMemoryBinGoogleTest.inf {
+    <PcdsFixedAtBuild>
+      gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable|0
+      gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressRuntimeCodePageNumber|0
+      gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressBootTimeCodePageNumber|0
+  }
+
   #
   # Build HOST_APPLICATION Libraries
   #

@@ -1,0 +1,49 @@
+## @file
+# Unit test suite for the DxeCore memory bin using Google Test
+#
+# Copyright (c) 2022, Intel Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = DxeCoreMemoryBinGoogleTest
+  FILE_GUID           = E21BB887-CF47-440C-9EEC-CE9423752A6B
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = HOST_APPLICATION
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  DxeCoreAddRangeGoogleTest.cpp
+  DxeCoreMemoryBinGoogleTest.cpp
+  DxeCoreGetMemoryMapGoogleTest.cpp
+  ../../DxeMain.h
+  ../../Mem/Imem.h
+  ../../Mem/Page.c
+  ../../Mem/MemData.c
+  ../../Library/Library.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+  BaseLib
+
+[Guids]
+  gEfiEventMemoryMapChangeGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressRuntimeCodePageNumber
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressBootTimeCodePageNumber
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPageType
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPoolType
