@@ -778,22 +778,16 @@ BuildMadtTable (
              &GicDInfo,
              &GicDCount
              );
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) &&                                                                           // [CODE_FIRST] 11148
+      ((AcpiTableInfo->AcpiTableRevision < EFI_ACPI_6_7_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION) ||  // [CODE_FIRST] 11148
+       (Status != EFI_NOT_FOUND)))                                                                    // [CODE_FIRST] 11148
+  {
+    // [CODE_FIRST] 11148
     DEBUG ((
       DEBUG_ERROR,
       "ERROR: MADT: Failed to get GICD Info. Status = %r\n",
       Status
       ));
-    goto error_handler;
-  }
-
-  if (GicDCount == 0) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: MADT: GIC Distributor information not provided.\n"
-      ));
-    ASSERT (GicDCount != 0);
-    Status = EFI_INVALID_PARAMETER;
     goto error_handler;
   }
 
@@ -911,6 +905,34 @@ BuildMadtTable (
   }                                                                                               // [CODE_FIRST] 11148
 
   // [CODE_FIRST] 11148
+  if (((GicIrsCount == 0) && (GicDCount == 0)) ||                                                 // [CODE_FIRST] 11148
+      ((GicIrsCount > 0) && (GicDCount > 0)))                                                     // [CODE_FIRST] 11148
+  {
+    // [CODE_FIRST] 11148
+    Status = EFI_INVALID_PARAMETER;                                                               // [CODE_FIRST] 11148
+    DEBUG ((
+      // [CODE_FIRST] 11148
+      DEBUG_ERROR,                                                                                // [CODE_FIRST] 11148
+      "ERROR: MADT: No GicIrs and GicD Info or have both. Status = %r\n",                         // [CODE_FIRST] 11148
+      Status                                                                                      // [CODE_FIRST] 11148
+      ));                                                                                         // [CODE_FIRST] 11148
+    goto error_handler;                                                                           // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
+  if ((GicItsV5Count != 0) && (GicItsV5Count > GicItsV5TransFrameCount)) {
+    // [CODE_FIRST] 11148
+    Status = EFI_INVALID_PARAMETER;                                                               // [CODE_FIRST] 11148
+    DEBUG ((
+      // [CODE_FIRST] 11148
+      DEBUG_ERROR,                                                                                // [CODE_FIRST] 11148
+      "ERROR: MADT: Each GicItsV5 should have at least 1 Translate Frame. Status = %r\n",         // [CODE_FIRST] 11148
+      Status                                                                                      // [CODE_FIRST] 11148
+      ));                                                                                         // [CODE_FIRST] 11148
+    goto error_handler;                                                                           // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
   TableSize = sizeof (EFI_ACPI_6_7_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER);                       // [CODE_FIRST] 11148
 
   GicCOffset = TableSize;
@@ -993,10 +1015,14 @@ BuildMadtTable (
     goto error_handler;
   }
 
-  AddGICD (
-    (EFI_ACPI_6_5_GIC_DISTRIBUTOR_STRUCTURE *)((UINT8 *)Madt + GicDOffset),
-    GicDInfo
-    );
+  if (GicDCount != 0) {
+    // [CODE_FIRST] 11148
+    AddGICD (
+      // [CODE_FIRST] 11148
+      (EFI_ACPI_6_5_GIC_DISTRIBUTOR_STRUCTURE *)((UINT8 *)Madt + GicDOffset),                     // [CODE_FIRST] 11148
+      GicDInfo                                                                                    // [CODE_FIRST] 11148
+      );                                                                                          // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
 
   if (GicMSICount != 0) {
     AddGICMsiFrameInfoList (
