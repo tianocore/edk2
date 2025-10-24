@@ -125,7 +125,7 @@ BOOLEAN  gDispatcherRunning = FALSE;
 BOOLEAN  gRequestDispatch = FALSE;
 
 /**
-  Loads an EFI image into SMRAM.
+  Loads an EFI image into MMRAM.
 
   @param  DriverEntry             EFI_MM_DRIVER_ENTRY instance
   @param  ImageContext            Allocated ImageContext to be filled out by this function
@@ -225,7 +225,7 @@ MmLoadImage (
 
   //
   // Fill in the remaining fields of the Loaded Image Protocol instance.
-  // Note: ImageBase is an SMRAM address that can not be accessed outside of SMRAM if SMRAM window is closed.
+  // Note: ImageBase is an MMRAM address that can not be accessed outside of MMRAM if MMRAM window is closed.
   //
   DriverEntry->LoadedImage.Revision     = EFI_LOADED_IMAGE_PROTOCOL_REVISION;
   DriverEntry->LoadedImage.ParentHandle = NULL;
