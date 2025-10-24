@@ -479,18 +479,38 @@ EsrtDxeLockEsrtRepository (
   VOID
   )
 {
-  EFI_STATUS                    Status;
-  EDKII_VARIABLE_LOCK_PROTOCOL  *VariableLock;
+  EFI_STATUS                         Status;
+  IN EDKII_VARIABLE_POLICY_PROTOCOL  *VariablePolicy;
 
   //
-  // Mark ACPI_GLOBAL_VARIABLE variable to read-only if the Variable Lock protocol exists
+  // Mark ACPI_GLOBAL_VARIABLE variable to read-only if the Variable Policy protocol exists
   //
-  Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **)&VariableLock);
+  Status = gBS->LocateProtocol (&gEdkiiVariablePolicyProtocolGuid, NULL, (VOID **)&VariablePolicy);
   if (!EFI_ERROR (Status)) {
-    Status = VariableLock->RequestToLock (VariableLock, EFI_ESRT_FMP_VARIABLE_NAME, &gEfiCallerIdGuid);
+    Status = RegisterBasicVariablePolicy (
+               VariablePolicy,
+               &gEfiCallerIdGuid,
+               EFI_ESRT_FMP_VARIABLE_NAME,
+               VARIABLE_POLICY_NO_MIN_SIZE,
+               VARIABLE_POLICY_NO_MAX_SIZE,
+               VARIABLE_POLICY_NO_MUST_ATTR,
+               VARIABLE_POLICY_NO_CANT_ATTR,
+               VARIABLE_POLICY_TYPE_LOCK_NOW
+               );
+
     DEBUG ((DEBUG_INFO, "EsrtDxe Lock EsrtFmp Variable Status 0x%x", Status));
 
-    Status = VariableLock->RequestToLock (VariableLock, EFI_ESRT_NONFMP_VARIABLE_NAME, &gEfiCallerIdGuid);
+    Status = RegisterBasicVariablePolicy (
+               VariablePolicy,
+               &gEfiCallerIdGuid,
+               EFI_ESRT_NONFMP_VARIABLE_NAME,
+               VARIABLE_POLICY_NO_MIN_SIZE,
+               VARIABLE_POLICY_NO_MAX_SIZE,
+               VARIABLE_POLICY_NO_MUST_ATTR,
+               VARIABLE_POLICY_NO_CANT_ATTR,
+               VARIABLE_POLICY_TYPE_LOCK_NOW
+               );
+
     DEBUG ((DEBUG_INFO, "EsrtDxe Lock EsrtNonFmp Variable Status 0x%x", Status));
   }
 
