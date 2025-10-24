@@ -220,6 +220,11 @@ static const OSSL_ALGORITHM deflt_signature[] = {
     { PROV_NAMES_SLH_DSA_SHAKE_256F, "provider=default",
       ossl_slh_dsa_shake_256f_signature_functions, PROV_DESCS_SLH_DSA_SHAKE_256F },
 #endif /* OPENSSL_NO_SLH_DSA */
+#ifndef OPENSSL_NO_ML_DSA
+    { PROV_NAMES_ML_DSA_44, "provider=default", ossl_ml_dsa_44_signature_functions },
+    { PROV_NAMES_ML_DSA_65, "provider=default", ossl_ml_dsa_65_signature_functions },
+    { PROV_NAMES_ML_DSA_87, "provider=default", ossl_ml_dsa_87_signature_functions },
+#endif
 
     { NULL, NULL, NULL }
 };
@@ -277,6 +282,14 @@ static const OSSL_ALGORITHM deflt_keymgmt[] = {
     { PROV_NAMES_SLH_DSA_SHAKE_256F, "provider=default", ossl_slh_dsa_shake_256f_keymgmt_functions,
       PROV_DESCS_SLH_DSA_SHAKE_256F },
 #endif /* OPENSSL_NO_SLH_DSA */
+#ifndef OPENSSL_NO_ML_DSA
+    { PROV_NAMES_ML_DSA_44, "provider=default", ossl_ml_dsa_44_keymgmt_functions,
+      PROV_DESCS_ML_DSA_44 },
+    { PROV_NAMES_ML_DSA_65, "provider=default", ossl_ml_dsa_65_keymgmt_functions,
+      PROV_DESCS_ML_DSA_65 },
+    { PROV_NAMES_ML_DSA_87, "provider=default", ossl_ml_dsa_87_keymgmt_functions,
+      PROV_DESCS_ML_DSA_87 },
+#endif /* OPENSSL_NO_ML_DSA */
 
     { NULL, NULL, NULL }
 };
