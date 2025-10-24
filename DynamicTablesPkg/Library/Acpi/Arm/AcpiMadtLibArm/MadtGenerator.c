@@ -740,22 +740,15 @@ BuildMadtTable (
              &GicDInfo,
              &GicDCount
              );
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) &&
+      ((AcpiTableInfo->AcpiTableRevision < EFI_ACPI_6_7_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION) ||
+       (Status != EFI_NOT_FOUND)))
+  {
     DEBUG ((
       DEBUG_ERROR,
       "ERROR: MADT: Failed to get GICD Info. Status = %r\n",
       Status
       ));
-    goto error_handler;
-  }
-
-  if (GicDCount == 0) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: MADT: GIC Distributor information not provided.\n"
-      ));
-    ASSERT (GicDCount != 0);
-    Status = EFI_INVALID_PARAMETER;
     goto error_handler;
   }
 
@@ -861,6 +854,28 @@ BuildMadtTable (
     goto error_handler;
   }
 
+  if (((GicIrsCount == 0) && (GicDCount == 0)) ||
+      ((GicIrsCount > 0) && (GicDCount > 0)))
+  {
+    Status = EFI_INVALID_PARAMETER;
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: MADT: No GicIrs and GicD Info or have both. Status = %r\n",
+      Status
+      ));
+    goto error_handler;
+  }
+
+  if ((GicItsV5Count != 0) && (GicItsV5Count > GicItsV5TransFrameCount)) {
+    Status = EFI_INVALID_PARAMETER;
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: MADT: Each GicItsV5 should have at least 1 Translate Frame. Status = %r\n",
+      Status
+      ));
+    goto error_handler;
+  }
+
   TableSize = sizeof (EFI_ACPI_6_7_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER);
 
   GicCOffset = TableSize;
@@ -942,10 +957,12 @@ BuildMadtTable (
     goto error_handler;
   }
 
-  AddGICD (
-    (EFI_ACPI_6_5_GIC_DISTRIBUTOR_STRUCTURE *)((UINT8 *)Madt + GicDOffset),
-    GicDInfo
-    );
+  if (GicDCount != 0) {
+    AddGICD (
+      (EFI_ACPI_6_5_GIC_DISTRIBUTOR_STRUCTURE *)((UINT8 *)Madt + GicDOffset),
+      GicDInfo
+      );
+  }
 
   if (GicMSICount != 0) {
     AddGICMsiFrameInfoList (
