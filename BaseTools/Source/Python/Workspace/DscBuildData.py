@@ -2942,7 +2942,8 @@ class DscBuildData(PlatformBuildClassObject):
         else:
             AppSuffix = '.exe' if sys.platform == "win32" else ''
             MakeApp = MakeApp + PcdGccMakefile
-            MakeApp = MakeApp + 'APPFILE = %s%s%s%s\n' % (self.OutputPath, os.sep, PcdValueInitName, AppSuffix) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s/%s.o %s.o\n' % (self.OutputPath, PcdValueInitName, os.path.join(self.OutputPath, PcdValueCommonName)) + \
+            MakeApp = MakeApp + 'OBJDIR = %s\n' % self.OutputPath
+            MakeApp = MakeApp + 'APPFILE = %s%s%s%s\n' % (self.OutputPath, os.sep, PcdValueInitName, AppSuffix) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s.o %s.o\n' % (PcdValueInitName, PcdValueCommonName) + \
                     'include $(MAKEROOT)/Makefiles/app.makefile\n' + 'TOOL_INCLUDE +='
 
         IncSearchList = []
