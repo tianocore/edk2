@@ -1207,6 +1207,12 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryArrayMappedAddressParser[] = {
   { "NumMemDevices",                 sizeof (UINT8),                "0x%u",  NULL },
 };
 
+/** A parser for EArchCommonObjMsctMaxPhysicalAddrInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonMsctMaxPhysicalAddrInfoParser[] = {
+  { "MaxPhysicalAddress", 8, "0x%llx", NULL }
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -1269,6 +1275,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjPhysicalMemoryArray,          CmArchCommonPhysicalMemoryArrayParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryDeviceInfo,             CmArchCommonMemoryDeviceInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryArrayMappedAddress,     CmArchCommonMemoryArrayMappedAddressParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMsctMaxPhysicalAddrInfo,      CmArchCommonMsctMaxPhysicalAddrInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 

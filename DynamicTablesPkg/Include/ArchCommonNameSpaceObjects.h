@@ -83,6 +83,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjPhysicalMemoryArray,            ///< 55 - Physical Memory Array Info
   EArchCommonObjMemoryDeviceInfo,               ///< 56 - Memory Device Info
   EArchCommonObjMemoryArrayMappedAddress,       ///< 57 - Memory Array Mapped Address Info
+  EArchCommonObjMsctMaxPhysicalAddrInfo,        ///< 58 - MSCT Maximum physical address Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1463,5 +1464,15 @@ typedef struct CmArchCommonMemoryArrayMappedAddress {
   /// Number of memory devices that form a row in the address partition.
   UINT8                   NumMemDevices;
 } CM_ARCH_COMMON_MEMORY_ARRAY_MAPPED_ADDRESS;
+
+/** A structure that describes the Maximum Physical Address Information
+    for the MSCT (Maximum System Characteristics Table).
+
+    ID: EArchCommonObjMsctMaxPhysicalAddrInfo
+*/
+typedef struct CmArchCommonObjMsctMaxPhysicalAddrInfo {
+  /// Maximum Physical Address
+  UINT64    MaxPhysicalAddress;
+} CM_ARCH_COMMON_MSCT_MAX_PHYSICAL_ADDR_INFO;
 
 #pragma pack()
