@@ -14,6 +14,104 @@ STATIC UINT64      gHandleDatabaseKey      = 0;
 STATIC UINTN       mEfiLocateHandleRequest = 0;
 
 //
+// Cleanup functions
+//
+
+/**
+  Frees all protocols registered in protocol database
+
+  @param  ProtocolDatabase       Protocol database
+
+  @retval none
+
+**/
+STATIC
+VOID
+FreeProtocols (
+  LIST_ENTRY  *ProtocolDatabase
+  )
+{
+  LIST_ENTRY      *Link;
+  PROTOCOL_ENTRY  *Protocol;
+
+  while (!IsListEmpty (ProtocolDatabase)) {
+    Link     = GetFirstNode (ProtocolDatabase);
+    Protocol = CR (Link, PROTOCOL_ENTRY, AllEntries, PROTOCOL_ENTRY_SIGNATURE);
+    RemoveEntryList (GetFirstNode (ProtocolDatabase));
+    FreePool (Protocol);
+  }
+}
+
+/**
+  Frees all protocol interfaces from a handle
+
+  @param  Protocols       List of protocols on a handle
+
+  @retval none
+
+**/
+STATIC
+VOID
+FreeProtocolInterfaces (
+  LIST_ENTRY  *Protocols
+  )
+{
+  LIST_ENTRY          *Link;
+  PROTOCOL_INTERFACE  *ProtocolInterface;
+
+  while (!IsListEmpty (Protocols)) {
+    Link              = GetFirstNode (Protocols);
+    ProtocolInterface = CR (Link, PROTOCOL_INTERFACE, Link, PROTOCOL_INTERFACE_SIGNATURE);
+    RemoveEntryList (GetFirstNode (Protocols));
+    FreePool (ProtocolInterface);
+  }
+}
+
+/**
+  Frees all handles registered in handle database
+
+  @param  HandleList       Handle database
+
+  @retval none
+
+**/
+STATIC
+VOID
+FreeHandles (
+  LIST_ENTRY  *HandleList
+  )
+{
+  LIST_ENTRY  *Link;
+  IHANDLE     *Handle;
+
+  while (!IsListEmpty (HandleList)) {
+    Link   = GetFirstNode (HandleList);
+    Handle = CR (Link, IHANDLE, AllHandles, EFI_HANDLE_SIGNATURE);
+    FreeProtocolInterfaces (&Handle->Protocols);
+    RemoveEntryList (GetFirstNode (HandleList));
+    FreePool (Handle);
+  }
+}
+
+/**
+  Reinitializes library state - frees all registered handles and protocols
+
+  @retval none
+
+**/
+VOID
+EFIAPI
+UnitTestResetBootServicesTableLibProtocols (
+  VOID
+  )
+{
+  FreeProtocols (&mProtocolDatabase);
+  FreeHandles (&gHandleList);
+  gHandleDatabaseKey      = 0;
+  mEfiLocateHandleRequest = 0;
+}
+
+//
 // Helper Functions
 //
 
