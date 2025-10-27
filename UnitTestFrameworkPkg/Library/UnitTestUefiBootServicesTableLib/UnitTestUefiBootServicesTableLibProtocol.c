@@ -8,10 +8,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "UnitTestUefiBootServicesTableLibProtocol.h"
 
-STATIC LIST_ENTRY  mProtocolDatabase       = INITIALIZE_LIST_HEAD_VARIABLE (mProtocolDatabase);
-STATIC LIST_ENTRY  gHandleList             = INITIALIZE_LIST_HEAD_VARIABLE (gHandleList);
-STATIC UINT64      gHandleDatabaseKey      = 0;
-STATIC UINTN       mEfiLocateHandleRequest = 0;
+LIST_ENTRY  mProtocolDatabase       = INITIALIZE_LIST_HEAD_VARIABLE (mProtocolDatabase);
+LIST_ENTRY  gHandleList             = INITIALIZE_LIST_HEAD_VARIABLE (gHandleList);
+UINT64      gHandleDatabaseKey      = 0;
+UINTN       mEfiLocateHandleRequest = 0;
 
 //
 // Helper Functions
