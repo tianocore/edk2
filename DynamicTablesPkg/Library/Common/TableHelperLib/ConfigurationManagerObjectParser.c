@@ -1470,6 +1470,12 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonEnclosureElementParser[] = {
   { "ContainedElementMaximum", sizeof (UINT8), "%u",   NULL },
 };
 
+/** A parser for EArchCommonObjMsctMaxPhysicalAddrInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonMsctMaxPhysicalAddrInfoParser[] = {
+  { "MaxPhysicalAddress", 8, "0x%llx", NULL }
+};
+
 /** A parser for EArchCommonObjBaseboardContainedObject.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonBaseboardContainedObjectParser[] = {
@@ -1572,6 +1578,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjEnclosureElement,             CmArchCommonEnclosureElementParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjBaseboardInfo,                CmArchCommonBaseboardInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjBaseboardContainedObject,     CmArchCommonBaseboardContainedObjectParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMsctMaxPhysicalAddrInfo,      CmArchCommonMsctMaxPhysicalAddrInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
