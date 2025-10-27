@@ -43,6 +43,7 @@ SmmReadyToLockEventCallBack (
                   &Interface
                   );
   if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed to locate gEfiDxeSmmReadyToLockProtocolGuid.\n"));
     return;
   }
 
@@ -79,7 +80,10 @@ Tcg2PlatformDxeEntryPoint (
             &Registration
             );
 
-  ASSERT (Event != NULL);
+  if (Event == NULL) {
+    DEBUG ((DEBUG_ERROR, "Failed to create protocol notify event for SmmReadyToLockProtocol.\n"));
+    return EFI_DEVICE_ERROR;
+  }
 
   return EFI_SUCCESS;
 }
