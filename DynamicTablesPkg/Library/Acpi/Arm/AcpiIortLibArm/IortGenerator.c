@@ -2819,7 +2819,7 @@ ACPI_IORT_GENERATOR  IortGenerator = {
     // ACPI Table Signature
     EFI_ACPI_6_4_IO_REMAPPING_TABLE_SIGNATURE,
     // ACPI Table Revision supported by this Generator
-    EFI_ACPI_IO_REMAPPING_TABLE_REVISION_05,
+    EFI_ACPI_IO_REMAPPING_TABLE_REVISION_06,
     // Minimum supported ACPI Table Revision
     EFI_ACPI_IO_REMAPPING_TABLE_REVISION_00,
     // Creator ID
