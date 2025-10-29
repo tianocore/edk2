@@ -538,7 +538,7 @@ UnitTestInstallProtocolInterfaceNotify (
   //
   // Print debug message
   //
-  UT_LOG_INFO ("InstallProtocolInterface: %g %p\n", Protocol, Interface);
+  DEBUG ((DEBUG_INFO, "InstallProtocolInterface: %g %p\n", Protocol, Interface));
 
   Status = EFI_OUT_OF_RESOURCES;
   Prot   = NULL;
