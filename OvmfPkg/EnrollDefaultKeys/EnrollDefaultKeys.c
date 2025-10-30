@@ -702,6 +702,15 @@ ShellAppMain (
                mMicrosoftUefiCa,
                mSizeOfMicrosoftUefiCa,
                &gMicrosoftVendorGuid,
+               mMicrosoftUefiCa2023,
+               mSizeOfMicrosoftUefiCa2023,
+               &gMicrosoftVendorGuid,
+               mMicrosoftUefiOpRom2023,
+               mSizeOfMicrosoftUefiOpRom2023,
+               &gMicrosoftVendorGuid,
+               mWindowsUefi2023,
+               mSizeOfWindowsUefi2023,
+               &gMicrosoftVendorGuid,
                NULL
                );
   }
@@ -749,6 +758,9 @@ ShellAppMain (
                &gEfiCallerIdGuid,
                mMicrosoftKek,
                mSizeOfMicrosoftKek,
+               &gMicrosoftVendorGuid,
+               mMicrosoftKek2023,
+               mSizeOfMicrosoftKek2023,
                &gMicrosoftVendorGuid,
                NULL
                );
