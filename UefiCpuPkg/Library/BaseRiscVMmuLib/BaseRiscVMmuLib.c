@@ -651,6 +651,7 @@ RiscVMmuSetSatpMode  (
   UINTN                            NumberOfDescriptors;
   UINTN                            Index;
   EFI_STATUS                       Status;
+  BOOLEAN                          InterruptState;
 
   if (SatpMode > PcdGet32 (PcdCpuRiscVMmuMaxSatpMode)) {
     return EFI_DEVICE_ERROR;
@@ -720,9 +721,7 @@ RiscVMmuSetSatpMode  (
 
   FreePool ((VOID *)MemoryMap);
 
-  if (GetInterruptState ()) {
-    DisableInterrupts ();
-  }
+  InterruptState = SaveAndDisableInterrupts ();
 
   Ppn = (UINT64)TranslationTable >> RISCV_MMU_PAGE_SHIFT;
   ASSERT (!(Ppn & ~(SATP64_PPN)));
@@ -745,9 +744,7 @@ RiscVMmuSetSatpMode  (
 
   RiscVLocalTlbFlushAll ();
 
-  if (GetInterruptState ()) {
-    EnableInterrupts ();
-  }
+  SetInterruptState (InterruptState);
 
   return Status;
 }
