@@ -20,8 +20,8 @@ ASM_FUNC(_ModuleEntryPoint)
   // Skip TransferList init if x2 is not equal to 0
   cbnz  x2, _SkipTransferList
 
-  // Set the TransferList Base Address from register x3
-  mov   x6, x3
+  // Set the TransferList Base Address from register x3 to TPIDRRO_EL0
+  msr   TPIDRRO_EL0, x3
 
 _SkipTransferList:
   // Do early platform specific actions
@@ -93,7 +93,7 @@ _GetStackBase:
   sub   x1, x1, x2
 
   // Pass Transfer List Base Address
-  mov   x2, x6
+  mrs   x2, TPIDRRO_EL0
   // Move sec startup address into a data register
   // Ensure we're jumping to FV version of the code (not boot remapped alias)
   ldr   x4, =ASM_PFX(CEntryPoint)
