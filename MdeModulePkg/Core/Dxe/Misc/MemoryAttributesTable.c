@@ -87,7 +87,6 @@ STATIC IMAGE_PROPERTIES_PRIVATE_DATA  mImagePropertiesPrivateData = {
 STATIC EFI_LOCK  mMemoryAttributesTableLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
 
 BOOLEAN                      mMemoryAttributesTableEnable      = TRUE;
-BOOLEAN                      mMemoryAttributesTableEndOfDxe    = FALSE;
 EFI_MEMORY_ATTRIBUTES_TABLE  *mMemoryAttributesTable           = NULL;
 BOOLEAN                      mMemoryAttributesTableReadyToBoot = FALSE;
 BOOLEAN                      gMemoryAttributesTableForwardCfi  = TRUE;
@@ -282,7 +281,6 @@ InstallMemoryAttributesTableOnEndOfDxe (
   IN VOID       *Context
   )
 {
-  mMemoryAttributesTableEndOfDxe = TRUE;
   InstallMemoryAttributesTable ();
 
   DEBUG_CODE_BEGIN ();
@@ -591,11 +589,6 @@ InsertImageRecord (
 
   DEBUG ((DEBUG_VERBOSE, "InsertImageRecord - 0x%x\n", RuntimeImage));
 
-  if (mMemoryAttributesTableEndOfDxe) {
-    DEBUG ((DEBUG_INFO, "Do not insert runtime image record after EndOfDxe\n"));
-    return;
-  }
-
   ImageRecord = AllocatePool (sizeof (*ImageRecord));
   if (ImageRecord == NULL) {
     return;
@@ -677,11 +670,6 @@ RemoveImageRecord (
 
   DEBUG ((DEBUG_VERBOSE, "RemoveImageRecord - 0x%x\n", RuntimeImage));
   DEBUG ((DEBUG_VERBOSE, "RemoveImageRecord - 0x%016lx - 0x%016lx\n", (EFI_PHYSICAL_ADDRESS)(UINTN)RuntimeImage->ImageBase, RuntimeImage->ImageSize));
-
-  if (mMemoryAttributesTableEndOfDxe) {
-    DEBUG ((DEBUG_INFO, "Do not remove runtime image record after EndOfDxe\n"));
-    return;
-  }
 
   ImageRecord = FindImageRecord ((EFI_PHYSICAL_ADDRESS)(UINTN)RuntimeImage->ImageBase, RuntimeImage->ImageSize, &mImagePropertiesPrivateData.ImageRecordList);
   if (ImageRecord == NULL) {

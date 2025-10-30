@@ -1063,20 +1063,22 @@ ScanSections64 (
       //
       // Second Get PrmHandler
       //
-      for (SymIndex = 0; SymIndex < SymNum; SymIndex++) {
-        UINT32   ExpIndex;
-        Sym = (Elf_Sym *)(Symtab + SymIndex * shdr->sh_entsize);
-        SymName = GetSymName(Sym);
-        if (SymName == NULL) {
-            continue;
-        }
-
-        for (ExpIndex = 0; ExpIndex < (mExportSymNum -1); ExpIndex++) {
-          if (strcmp((CHAR8*)SymName, mExportSymName[ExpIndex]) != 0) {
-            continue;
+      if (mExportSymNum > 0) {
+        for (SymIndex = 0; SymIndex < SymNum; SymIndex++) {
+          UINT32   ExpIndex;
+          Sym = (Elf_Sym *)(Symtab + SymIndex * shdr->sh_entsize);
+          SymName = GetSymName(Sym);
+          if (SymName == NULL) {
+              continue;
           }
-          mExportRVA[ExpIndex] = (UINT32)(Sym->st_value);
-          mExportSize += 2 * EFI_IMAGE_EXPORT_ADDR_SIZE + EFI_IMAGE_EXPORT_ORDINAL_SIZE + strlen((CHAR8 *)SymName) + 1;
+
+          for (ExpIndex = 0; ExpIndex < (mExportSymNum -1); ExpIndex++) {
+            if (strcmp((CHAR8*)SymName, mExportSymName[ExpIndex]) != 0) {
+              continue;
+            }
+            mExportRVA[ExpIndex] = (UINT32)(Sym->st_value);
+            mExportSize += 2 * EFI_IMAGE_EXPORT_ADDR_SIZE + EFI_IMAGE_EXPORT_ORDINAL_SIZE + strlen((CHAR8 *)SymName) + 1;
+          }
         }
       }
 
@@ -2398,6 +2400,10 @@ WriteExport64 (
   UINT16                              Index;
   UINT8                               *Tdata = NULL;
 
+  if (mExportSymNum == 0) {
+    Error (NULL, 0, 3000, "Invalid", "--prm option set but no export symbols were found in %s", mInImageName);
+    exit(EXIT_FAILURE);
+  }
   ExportDir = (EFI_IMAGE_EXPORT_DIRECTORY*)(mCoffFile + mExportOffset);
   ExportDir->Characteristics = 0;
   ExportDir->TimeDateStamp = 0;

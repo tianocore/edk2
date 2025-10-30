@@ -246,6 +246,9 @@ Returns:
   fprintf (stdout, "  --keepoptionalheader  Don't zero PE/COFF optional header fields.\n\
                         This option can be used together with -e or -t.\n\
                         It doesn't work for other options.\n");
+  fprintf (stdout, "  --image-version       MAJOR.MINOR Set the PE/COFF optional header\n\
+                        field MajorImageVersion to MAJOR and MinorImageVersion\n\
+                        to MINOR.\n");
   fprintf (stdout, "  --keepzeropending     Don't strip zero pending of .reloc.\n\
                         This option can be used together with -e or -t.\n\
                         It doesn't work for other options.\n");
@@ -1177,6 +1180,10 @@ Returns:
   time_t                           OutputFileTime;
   struct stat                      Stat_Buf;
   BOOLEAN                          ZeroDebugFlag;
+  BOOLEAN                          ImageVersionFlag;
+  CHAR8                            *ImageVersionDot;
+  UINT16                           ImageMajorVersion;
+  UINT16                           ImageMinorVersion;
 
   SetUtilityName (UTILITY_NAME);
 
@@ -1225,6 +1232,10 @@ Returns:
   InputFileTime          = 0;
   OutputFileTime         = 0;
   ZeroDebugFlag          = FALSE;
+  ImageVersionFlag       = FALSE;
+  ImageVersionDot        = NULL;
+  ImageMajorVersion      = 0;
+  ImageMinorVersion      = 0;
 
   if (argc == 1) {
     Error (NULL, 0, 1001, "Missing options", "No input options.");
@@ -1355,6 +1366,53 @@ Returns:
       KeepOptionalHeaderFlag = TRUE;
       argc--;
       argv++;
+      continue;
+    }
+
+    if (stricmp(argv[0], "--image-version") == 0) {
+      if (argc == 1) {
+        Error (NULL, 0, 1003, "Invalid option value", "Image major and minor values missing");
+        goto Finish;
+      }
+      ImageVersionFlag = TRUE;
+      // Split argv[1] at '.'
+      ImageVersionDot = strchr(argv[1], '.');
+      if (ImageVersionDot != NULL) {
+        *ImageVersionDot = '\0';
+        // Convert major and minor version strings to UINT16
+        if (AsciiStringToUint64(argv[1], FALSE, &Temp64) != EFI_SUCCESS) {
+          Error (NULL, 0, 1003, "Invalid option value", "Image major version %s is not a valid number", argv[1]);
+          goto Finish;
+        }
+        if (Temp64 > 0xFFFF) {
+          Error (NULL, 0, 1003, "Invalid option value", "Image major version %s is out of range (0-65535)", argv[1]);
+          goto Finish;
+        }
+        ImageMajorVersion = (UINT16) Temp64;
+        if (AsciiStringToUint64(ImageVersionDot + 1, FALSE, &Temp64) != EFI_SUCCESS) {
+          Error (NULL, 0, 1003, "Invalid option value", "Image minor version %s is not a valid number", ImageVersionDot + 1);
+          goto Finish;
+        }
+        if (Temp64 > 0xFFFF) {
+          Error (NULL, 0, 1003, "Invalid option value", "Image minor version %s is out of range (0-65535)", ImageVersionDot + 1);
+          goto Finish;
+        }
+        ImageMinorVersion = (UINT16) Temp64;
+        *ImageVersionDot = '.';
+      } else {
+        // Convert major and minor version strings to UINT16
+        if (AsciiStringToUint64(argv[1], FALSE, &Temp64) != EFI_SUCCESS) {
+          Error (NULL, 0, 1003, "Invalid option value", "Image major version %s is not a valid number", argv[1]);
+          goto Finish;
+        }
+        if (Temp64 > 0xFFFF) {
+          Error (NULL, 0, 1003, "Invalid option value", "Image major version %s is out of range (0-65535)", argv[1]);
+          goto Finish;
+        }
+        ImageMajorVersion = (UINT16) Temp64;
+      }
+      argc -= 2;
+      argv += 2;
       continue;
     }
 
@@ -2422,6 +2480,11 @@ Returns:
       Optional32->SizeOfHeapReserve = 0;
       Optional32->SizeOfHeapCommit = 0;
     }
+    if (ImageVersionFlag) {
+      Optional32->MajorImageVersion = (UINT16) ImageMajorVersion;
+      Optional32->MinorImageVersion = (UINT16) ImageMinorVersion;
+    }
+
     TEImageHeader.AddressOfEntryPoint = Optional32->AddressOfEntryPoint;
     TEImageHeader.BaseOfCode          = Optional32->BaseOfCode;
     TEImageHeader.ImageBase           = (UINT64) (Optional32->ImageBase);
@@ -2515,6 +2578,11 @@ Returns:
       Optional64->SizeOfHeapReserve = 0;
       Optional64->SizeOfHeapCommit = 0;
     }
+    if (ImageVersionFlag) {
+      Optional64->MajorImageVersion = (UINT16) ImageMajorVersion;
+      Optional64->MinorImageVersion = (UINT16) ImageMinorVersion;
+    }
+
     TEImageHeader.AddressOfEntryPoint = Optional64->AddressOfEntryPoint;
     TEImageHeader.BaseOfCode          = Optional64->BaseOfCode;
     TEImageHeader.ImageBase           = (UINT64) (Optional64->ImageBase);
