@@ -1217,14 +1217,14 @@ PeCoffLoaderRelocateImageExtraAction (
         }
 
         //
-        // Loop over every DWORD in memory and compute the union of the memory
+        // Loop over every byte in memory and compute the union of the memory
         // access bits.
         //
         End        = (UINTN)Library + (UINTN)PeCoffImageContext.ImageSize;
         RegionBase = (UINTN)Library;
         RegionSize = 0;
         Flags      = 0;
-        for (Base = (UINTN)Library + sizeof (UINT32); Base < End; Base += sizeof (UINT32)) {
+        for (Base = (UINTN)Library; Base < End; Base++) {
           for (Index = 0; Index < NumberOfSections; Index++) {
             if ((SectionData[Index].Base <= Base) &&
                 ((SectionData[Index].Base + SectionData[Index].Size) > Base))
@@ -1234,10 +1234,10 @@ PeCoffLoaderRelocateImageExtraAction (
           }
 
           //
-          // When a new page is reached configure the memory access for the
-          // previous page.
+          // When end of current page is reached configure the memory access for
+          // the current page.
           //
-          if (Base % SIZE_4KB == 0) {
+          if (IS_ALIGNED (Base + 1, SIZE_4KB)) {
             RegionSize += SIZE_4KB;
             if ((Flags & EFI_IMAGE_SCN_MEM_WRITE) == EFI_IMAGE_SCN_MEM_WRITE) {
               if ((Flags & EFI_IMAGE_SCN_MEM_EXECUTE) == EFI_IMAGE_SCN_MEM_EXECUTE) {
@@ -1263,7 +1263,7 @@ PeCoffLoaderRelocateImageExtraAction (
             }
 
             Flags      = 0;
-            RegionBase = Base;
+            RegionBase = Base + 1;
             RegionSize = 0;
           }
         }
