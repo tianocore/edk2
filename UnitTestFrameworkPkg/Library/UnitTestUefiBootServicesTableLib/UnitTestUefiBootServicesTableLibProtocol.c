@@ -655,7 +655,7 @@ Done:
     // There was an error, clean up
     //
     if (Prot != NULL) {
-      UnitTestFreePool (Prot);
+      FreePool (Prot);
     }
 
     DEBUG ((DEBUG_ERROR, "InstallProtocolInterface: %g %p failed with %r\n", Protocol, Interface, Status));
