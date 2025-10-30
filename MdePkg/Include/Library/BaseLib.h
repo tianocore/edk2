@@ -5396,6 +5396,18 @@ TdIsEnabled (
   VOID
   );
 
+/**
+  Probe if running as some kind of SEV guest.
+
+  @return FALSE   Not running as a guest under any kind of SEV
+  @return TRUE    Running as a guest under any kind of SEV
+**/
+BOOLEAN
+EFIAPI
+SevGuestIsEnabled (
+  VOID
+  );
+
 #if defined (MDE_CPU_X64)
 //
 // The page size for the PVALIDATE instruction
