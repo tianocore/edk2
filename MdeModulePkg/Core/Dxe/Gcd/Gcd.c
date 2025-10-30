@@ -2430,8 +2430,14 @@ CoreInitializeMemoryServices (
     //
     Attributes  = PhitResourceHob->ResourceAttribute;
     BaseAddress = PageAlignAddress (PhitHob->EfiMemoryTop);
-    Length      = PageAlignLength (ResourceHobMemoryTop - BaseAddress);
-    FindLargestFreeRegion (&BaseAddress, &Length, (EFI_HOB_MEMORY_ALLOCATION *)GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION));
+
+    if (BaseAddress > ResourceHobMemoryTop) {
+      Length = 0;
+    } else {
+      Length = PageAlignLength (ResourceHobMemoryTop - BaseAddress);
+      FindLargestFreeRegion (&BaseAddress, &Length, (EFI_HOB_MEMORY_ALLOCATION *)GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION));
+    }
+
     if (Length < MinimalMemorySizeNeeded) {
       //
       // If that range is not large enough to intialize the DXE Core, then
