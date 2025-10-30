@@ -1,0 +1,62 @@
+## @file
+# RISC-V IOMMU DXE Driver.
+#
+# This driver detects and initialises PCI and system RISC-V IOMMUs
+# and their downstreams, providing DMA protection for the platform
+# using information provided in the FDT/ACPI RIMT.
+#
+# Copyright (c) 2025, 9elements GmbH. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = RiscVIoMmuDxe
+  FILE_GUID                      = 699ABE9A-9CB2-40D6-942A-F6FE4B176DDF
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = RiscVIoMmuDxeEntryPoint
+
+[Sources]
+  RiscVIoMmuDxe.c
+  IoMmuDetection.c
+  IoMmuProtocol.c
+  Utilities.c
+  AsmUtilities.S
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  FdtLib
+  HobLib
+  IoLib
+  MemoryAllocationLib
+  TimerLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Guids]
+  gEdkiiPlatformHasAcpiGuid                   ## CONSUMES
+  gEdkiiPlatformHasDeviceTreeGuid             ## CONSUMES
+  gFdtTableGuid
+  #gEfiEventExitBootServicesGuid   ## CONSUMES ## Event
+
+[Protocols]
+  gEdkiiIoMmuProtocolGuid                     ## PRODUCES
+  gEfiCpuArchProtocolGuid                     ## CONSUMES
+  gEfiPciEnumerationCompleteProtocolGuid      ## CONSUMES
+  gEfiPciIoProtocolGuid                       ## CONSUMES
+  #gEfiPciRootBridgeIoProtocolGuid             ## CONSUMES
+
+[Depex]
+  gEfiCpuArchProtocolGuid AND
+  ( gEdkiiPlatformHasDeviceTreeGuid OR gEdkiiPlatformHasAcpiGuid )
