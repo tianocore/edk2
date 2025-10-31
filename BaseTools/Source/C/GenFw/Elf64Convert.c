@@ -940,7 +940,9 @@ ScanSections64 (
     assert (FALSE);
   }
 
-  mDebugOffset = DebugRvaAlign(mCoffOffset);
+  if (!mSkipDebugInfo) {
+    mDebugOffset = DebugRvaAlign(mCoffOffset);
+  }
   mCoffOffset = CoffAlign(mCoffOffset);
 
   if (SectionCount > 1 && mOutImageType == FW_EFI_IMAGE) {
@@ -979,27 +981,29 @@ ScanSections64 (
     }
   }
 
-  //
-  // Make room for .debug data in .data (or .text if .data is empty) instead of
-  // putting it in a section of its own. This is explicitly allowed by the
-  // PE/COFF spec, and prevents bloat in the binary when using large values for
-  // section alignment.
-  //
-  if (SectionCount > 0) {
-    mDebugOffset = DebugRvaAlign(mCoffOffset);
-  }
-  mCoffOffset = mDebugOffset + sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY) +
-                sizeof(EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY) +
-                strlen(mInImageName) + 1;
+  if (!mSkipDebugInfo) {
+    //
+    // Make room for .debug data in .data (or .text if .data is empty) instead of
+    // putting it in a section of its own. This is explicitly allowed by the
+    // PE/COFF spec, and prevents bloat in the binary when using large values for
+    // section alignment.
+    //
+    if (SectionCount > 0) {
+      mDebugOffset = DebugRvaAlign(mCoffOffset);
+    }
+    mCoffOffset = mDebugOffset + sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY) +
+                  sizeof(EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY) +
+                  strlen(mInImageName) + 1;
 
-  //
-  // Add more space in the .debug data region for the DllCharacteristicsEx
-  // field.
-  //
-  if (mDllCharacteristicsEx != 0) {
-    mCoffOffset = DebugRvaAlign(mCoffOffset) +
-                  sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY) +
-                  sizeof (EFI_IMAGE_DEBUG_EX_DLLCHARACTERISTICS_ENTRY);
+    //
+    // Add more space in the .debug data region for the DllCharacteristicsEx
+    // field.
+    //
+    if (mDllCharacteristicsEx != 0) {
+      mCoffOffset = DebugRvaAlign(mCoffOffset) +
+                    sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY) +
+                    sizeof (EFI_IMAGE_DEBUG_EX_DLLCHARACTERISTICS_ENTRY);
+    }
   }
 
   mCoffOffset = CoffAlign(mCoffOffset);
