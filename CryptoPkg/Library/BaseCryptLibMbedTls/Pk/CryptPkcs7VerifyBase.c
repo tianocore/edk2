@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "InternalCryptLib.h"
+#include "CryptPkcs7Internal.h"
 #include <mbedtls/pkcs7.h>
 
 /**
@@ -38,15 +39,16 @@ Pkcs7GetAttachedContent (
   OUT UINTN       *ContentSize
   )
 {
-  BOOLEAN             Status;
-  UINT8               *SignedData;
-  UINTN               SignedDataSize;
-  BOOLEAN             Wrapped;
-  INTN                Ret;
-  mbedtls_pkcs7       Pkcs7;
-  mbedtls_pkcs7_data  *MbedtlsContent;
+  BOOLEAN                 Status;
+  UINT8                   *SignedData;
+  UINTN                   SignedDataSize;
+  BOOLEAN                 Wrapped;
+  INTN                    Ret;
+  mbedtls_pkcs7           Pkcs7;
+  MbedtlsPkcs7SignedData  *Pkcs7Attached;
+  MbedtlsPkcs7Data        *MbedtlsContent;
 
-  mbedtls_pkcs7_init (&Pkcs7);
+  ZeroMem (&Pkcs7, sizeof (MbedtlsPkcs7SignedData));
 
   //
   // Check input parameter.
@@ -77,7 +79,8 @@ Pkcs7GetAttachedContent (
   //
   // Check for detached or attached content
   //
-  MbedtlsContent = &(Pkcs7.signed_data.content);
+  Pkcs7Attached  = (MbedtlsPkcs7SignedData *)&Pkcs7;
+  MbedtlsContent = &(Pkcs7Attached->ContentInfo);
 
   if (MbedtlsContent == NULL) {
     //
@@ -89,15 +92,15 @@ Pkcs7GetAttachedContent (
     //
     // Retrieve the attached content in PKCS7 signedData
     //
-    if ((MbedtlsContent->data.len > 0) && (MbedtlsContent->data.p != NULL)) {
-      *ContentSize = MbedtlsContent->data.len;
+    if ((MbedtlsContent->Data.len > 0) && (MbedtlsContent->Data.p != NULL)) {
+      *ContentSize = MbedtlsContent->Data.len;
       *Content     = AllocateZeroPool (*ContentSize);
       if (*Content == NULL) {
         *ContentSize = 0;
         goto _Exit;
       }
 
-      CopyMem (*Content, MbedtlsContent->data.p, *ContentSize);
+      CopyMem (*Content, MbedtlsContent->Data.p, *ContentSize);
     }
   }
 
