@@ -143,6 +143,7 @@
   MdePkg/Library/DynamicStackCookieEntryPointLib/StandaloneMmDriverEntryPoint.inf
   MdePkg/Library/DynamicStackCookieEntryPointLib/UefiApplicationEntryPoint.inf
   MdePkg/Library/DynamicStackCookieEntryPointLib/UefiDriverEntryPoint.inf
+  MdePkg/Library/FvLib/FvLib.inf
 
 [Components.IA32, Components.X64, Components.AARCH64]
   #

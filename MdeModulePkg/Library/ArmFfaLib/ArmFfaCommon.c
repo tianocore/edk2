@@ -143,7 +143,7 @@ FfaArgsToEfiStatus (
      * FfaStatusToEfiStatus (FfaARgs.Arg2) returns proper EFI_STATUS.
      */
     FfaStatus = ARM_FFA_RET_NOT_SUPPORTED;
-  } else if (FfaArgs->Arg0 == ARM_FID_FFA_INTERRUPT) {
+  } else if ((FfaArgs->Arg0 == ARM_FID_FFA_INTERRUPT) || (FfaArgs->Arg0 == ARM_FID_FFA_YIELD)) {
     FfaStatus = ARM_FFA_RET_INTERRUPTED;
   } else {
     FfaStatus = ARM_FFA_RET_SUCCESS;

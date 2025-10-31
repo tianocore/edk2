@@ -1416,7 +1416,7 @@ class ModuleAutoGen(AutoGen):
         if self.DepexGenerated:
             if self.ModuleType in [SUP_MODULE_PEIM]:
                 AsBuiltInfDict['binary_item'].append('PEI_DEPEX|' + self.Name + '.depex')
-            elif self.ModuleType in [SUP_MODULE_DXE_DRIVER, SUP_MODULE_DXE_RUNTIME_DRIVER, SUP_MODULE_DXE_SAL_DRIVER, SUP_MODULE_UEFI_DRIVER]:
+            elif self.ModuleType in [SUP_MODULE_DXE_DRIVER, SUP_MODULE_DXE_RUNTIME_DRIVER, SUP_MODULE_UEFI_DRIVER]:
                 AsBuiltInfDict['binary_item'].append('DXE_DEPEX|' + self.Name + '.depex')
             elif self.ModuleType in [SUP_MODULE_DXE_SMM_DRIVER]:
                 AsBuiltInfDict['binary_item'].append('SMM_DEPEX|' + self.Name + '.depex')

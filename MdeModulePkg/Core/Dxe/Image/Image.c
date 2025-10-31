@@ -627,7 +627,6 @@ CoreLoadPeImage (
       Image->ImageContext.ImageDataMemoryType = EfiBootServicesData;
       break;
     case EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER:
-    case EFI_IMAGE_SUBSYSTEM_SAL_RUNTIME_DRIVER:
       Image->ImageContext.ImageCodeMemoryType = EfiRuntimeServicesCode;
       Image->ImageContext.ImageDataMemoryType = EfiRuntimeServicesData;
       break;

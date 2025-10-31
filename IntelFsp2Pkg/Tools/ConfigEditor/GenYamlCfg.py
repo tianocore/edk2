@@ -12,8 +12,6 @@ import marshal
 import string
 import operator as op
 import ast
-import tkinter.messagebox as messagebox
-import tkinter
 
 from datetime import date
 from collections import OrderedDict
@@ -639,6 +637,7 @@ class CGenYamlCfg:
         self._macro_dict = {}
         self.binseg_dict = {}
         self.initialize()
+        self._tk = self.import_tkinter()
 
     def initialize(self):
         self._old_bin = None
@@ -1640,6 +1639,15 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
 
         return cfg_segs
 
+    def import_tkinter(self):
+        try:
+            import tkinter
+            import tkinter.messagebox
+            return tkinter
+        except ImportError:
+            print('tkinter is not supported under current OS')
+            return None
+
     def get_bin_segment(self, bin_data):
         cfg_segs = self.get_cfg_segment()
         bin_segs = []
@@ -1654,11 +1662,14 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
                 next_pos = bin_data.find(key, pos + len(seg[0]))
                 if next_pos >= 0:
                     if key == b'$SKLFSP$' or key == b'$BSWFSP$':
-                        string = ('Warning: Multiple matches for %s in '
+                        string = ('Multiple matches for %s in '
                                   'binary!\n\nA workaround applied to such '
                                   'FSP 1.x binary to use second'
                                   ' match instead of first match!' % key)
-                        messagebox.showwarning('Warning!', string)
+                        if self._tk:
+                            self._tk.messagebox.showwarning('Warning: ', string)
+                        else:
+                            print('Warning: ', string)
                         pos = next_pos
                     else:
                         print("Warning: Multiple matches for '%s' "
@@ -1688,7 +1699,10 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
             else:
                 self.missing_fv.append(each[0])
                 string = each[0] + ' is not availabe.'
-                messagebox.showinfo('', string)
+                if self._tk:
+                    self._tk.messagebox.showinfo('', string)
+                else:
+                    print('warning: ', string)
                 cfg_bins.extend(bytearray(each[2]))
             Dummy_offset += each[2]
         return cfg_bins
@@ -1715,32 +1729,34 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
         return bin_data
 
     def show_data_difference(self, data_diff):
+        if self._tk is None:
+            return
         # Displays if any data difference detected in BSF and Binary file
         pop_up_text = 'There are differences in Config file and binary '\
             'data detected!\n'
         pop_up_text += data_diff
 
-        window = tkinter.Tk()
+        window = self._tk.Tk()
         window.title("Data Difference")
         window.resizable(1, 1)
         # Window Size
         window.geometry("800x400")
-        frame = tkinter.Frame(window, height=800, width=700)
-        frame.pack(side=tkinter.BOTTOM)
+        frame = self._tk.Frame(window, height=800, width=700)
+        frame.pack(side=self._tk.BOTTOM)
         # Vertical (y) Scroll Bar
-        scroll = tkinter.Scrollbar(window)
-        scroll.pack(side=tkinter.RIGHT, fill=tkinter.Y)
+        scroll = self._tk.Scrollbar(window)
+        scroll.pack(side=self._tk.RIGHT, fill=self._tk.Y)
 
-        text = tkinter.Text(window, wrap=tkinter.NONE,
+        text = self._tk.Text(window, wrap=self._tk.NONE,
                             yscrollcommand=scroll.set,
                             width=700, height=400)
-        text.insert(tkinter.INSERT, pop_up_text)
+        text.insert(self._tk.INSERT, pop_up_text)
         text.pack()
         # Configure the scrollbars
         scroll.config(command=text.yview)
-        exit_button = tkinter.Button(
+        exit_button = self._tk.Button(
             window, text="Close", command=window.destroy)
-        exit_button.pack(in_=frame, side=tkinter.RIGHT, padx=20, pady=10)
+        exit_button.pack(in_=frame, side=self._tk.RIGHT, padx=20, pady=10)
 
     def load_default_from_bin(self, bin_data):
         self._old_bin = bin_data

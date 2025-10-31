@@ -341,6 +341,9 @@
   ##  @libraryclass  Provides function to support TDX processing.
   TdxLib|Include/Library/TdxLib.h
 
+  ##  @libraryclass  Provides function to support FV operatation.
+  FvLib|Include/Library/FvLib.h
+
 [LibraryClasses.X64]
   ##  @libraryclass  Defines a set of interfaces for the MM core entrypoint. The AARCH64 version lives in ArmPkg
   #

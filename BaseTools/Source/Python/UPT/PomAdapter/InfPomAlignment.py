@@ -698,7 +698,7 @@ class InfPomAlignment(ModuleObject):
 
         PEI_LIST = [DT.SUP_MODULE_PEIM]
         SMM_LIST = [DT.SUP_MODULE_DXE_SMM_DRIVER]
-        DXE_LIST = [DT.SUP_MODULE_DXE_DRIVER, DT.SUP_MODULE_DXE_SAL_DRIVER,
+        DXE_LIST = [DT.SUP_MODULE_DXE_DRIVER,
                     DT.SUP_MODULE_DXE_RUNTIME_DRIVER]
 
         IsLibraryClass = self.GetIsLibrary()
