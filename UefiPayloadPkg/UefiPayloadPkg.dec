@@ -17,6 +17,8 @@
 [Includes]
   Include
 
+[LibraryClasses]
+  PayloadEntryHelperLib|Include/Library/PayloadEntryHelperLib.h
 
 [Guids]
   #
