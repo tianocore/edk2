@@ -154,6 +154,7 @@ IsValidMove (
 {
   CHAR16  *DestPathCopy;
   CHAR16  *DestPathWalker;
+  UINTN   WalkerLen;
 
   if ((Cwd != NULL) && ((Attribute & EFI_FILE_DIRECTORY) == EFI_FILE_DIRECTORY)) {
     if (!IsSoucePathValid (SourcePath, Cwd)) {
@@ -185,8 +186,10 @@ IsValidMove (
   for (DestPathWalker = DestPathCopy; *DestPathWalker == L'\\'; DestPathWalker++) {
   }
 
-  while (DestPathWalker != NULL && DestPathWalker[StrLen (DestPathWalker)-1] == L'\\') {
-    DestPathWalker[StrLen (DestPathWalker)-1] = CHAR_NULL;
+  WalkerLen = StrLen (DestPathWalker);
+  while ((WalkerLen > 0) && (DestPathWalker[WalkerLen - 1] == L'\\')) {
+    DestPathWalker[WalkerLen - 1] = CHAR_NULL;
+    WalkerLen--;
   }
 
   ASSERT (DestPathWalker != NULL);
@@ -544,6 +547,7 @@ ValidateAndMoveFiles (
   CHAR16               *HiiOutput;
   CHAR16               *HiiResultOk;
   CHAR16               *DestPath;
+  UINTN                DestPathLen;
   CHAR16               *FullDestPath;
   CONST CHAR16         *Cwd;
   CHAR16               *FullCwd;
@@ -696,8 +700,12 @@ ValidateAndMoveFiles (
     }
 
     if (IsBetweenFileSystem (Node->FullName, FullCwd, DestPath)) {
-      while (FullDestPath == NULL && DestPath != NULL && DestPath[0] != CHAR_NULL && DestPath[StrLen (DestPath) - 1] == L'\\') {
-        DestPath[StrLen (DestPath) - 1] = CHAR_NULL;
+      if ((FullDestPath == NULL) && (DestPath != NULL)) {
+        DestPathLen = StrLen (DestPath);
+        while ((DestPathLen > 0) && (DestPath[DestPathLen - 1] == L'\\')) {
+          DestPath[DestPathLen - 1] = CHAR_NULL;
+          DestPathLen--;
+        }
       }
 
       Status = MoveBetweenFileSystems (Node, FullDestPath != NULL ? FullDestPath : DestPath, &Response);
