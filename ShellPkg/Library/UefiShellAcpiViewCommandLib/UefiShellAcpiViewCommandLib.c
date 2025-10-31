@@ -8,6 +8,7 @@
 
 #include <Guid/ShellLibHiiGuid.h>
 #include <IndustryStandard/Acpi.h>
+#include <IndustryStandard/ArmAgdiTable.h>
 #include <IndustryStandard/ArmErrorSourceTable.h>
 
 #include <Library/BaseMemoryLib.h>
@@ -49,6 +50,7 @@ STATIC
 CONST
 ACPI_TABLE_PARSER  ParserList[] = {
   { EFI_ACPI_6_3_ARM_ERROR_SOURCE_TABLE_SIGNATURE,                                                       ParseAcpiAest },
+  { EFI_ACPI_ARM_AGDI_TABLE_SIGNATURE,                                                                   ParseAcpiAgdi },
   { EFI_ACPI_6_4_ARM_PERFORMANCE_MONITORING_UNIT_TABLE_SIGNATURE,                                        ParseAcpiApmt },
   { EFI_ACPI_6_2_BOOT_GRAPHICS_RESOURCE_TABLE_SIGNATURE,                                                 ParseAcpiBgrt },
   { EFI_ACPI_6_2_DEBUG_PORT_2_TABLE_SIGNATURE,                                                           ParseAcpiDbg2 },
@@ -145,10 +147,7 @@ ShellDumpBufferToFile (
              );
 
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_GEN_READONLY_MEDIA),
       gShellAcpiViewHiiHandle,
       L"acpiview"
@@ -223,10 +222,7 @@ ShellCommandRunAcpiView (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_GEN_PROBLEM),
         gShellAcpiViewHiiHandle,
         L"acpiview",
@@ -240,20 +236,14 @@ ShellCommandRunAcpiView (
     ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
     if (ShellCommandLineGetCount (Package) > 1) {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_GEN_TOO_MANY),
         gShellAcpiViewHiiHandle,
         L"acpiview"
         );
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetFlag (Package, L"-?")) {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_GET_HELP_ACPIVIEW),
         gShellAcpiViewHiiHandle,
         L"acpiview"
@@ -261,10 +251,7 @@ ShellCommandRunAcpiView (
     } else if (ShellCommandLineGetFlag (Package, L"-s") &&
                (ShellCommandLineGetValue (Package, L"-s") == NULL))
     {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_GEN_NO_VALUE),
         gShellAcpiViewHiiHandle,
         L"acpiview",
@@ -274,10 +261,7 @@ ShellCommandRunAcpiView (
     } else if (ShellCommandLineGetFlag (Package, L"-r") &&
                (ShellCommandLineGetValue (Package, L"-r") == NULL))
     {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_GEN_NO_VALUE),
         gShellAcpiViewHiiHandle,
         L"acpiview",
@@ -287,10 +271,7 @@ ShellCommandRunAcpiView (
     } else if ((ShellCommandLineGetFlag (Package, L"-s") &&
                 ShellCommandLineGetFlag (Package, L"-l")))
     {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_GEN_TOO_MANY),
         gShellAcpiViewHiiHandle,
         L"acpiview"
@@ -299,10 +280,7 @@ ShellCommandRunAcpiView (
     } else if (ShellCommandLineGetFlag (Package, L"-d") &&
                !ShellCommandLineGetFlag (Package, L"-s"))
     {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_GEN_MISSING_OPTION),
         gShellAcpiViewHiiHandle,
         L"acpiview",
@@ -356,10 +334,7 @@ ShellCommandRunAcpiView (
             if (EFI_ERROR (Status)) {
               ShellStatus       = SHELL_INVALID_PARAMETER;
               TmpDumpFileHandle = NULL;
-              ShellPrintHiiEx (
-                -1,
-                -1,
-                NULL,
+              ShellPrintHiiDefaultEx (
                 STRING_TOKEN (STR_GEN_READONLY_MEDIA),
                 gShellAcpiViewHiiHandle,
                 L"acpiview"

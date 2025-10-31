@@ -48,10 +48,6 @@
 # This comes at the beginning of includes to pick all relevant defines early on.
 !include ArmVirtPkg/ArmVirtStackCookies.dsc.inc
 
-!if $(NETWORK_SNP_ENABLE) == TRUE
-  !error "NETWORK_SNP_ENABLE is IA32/X64/EBC only"
-!endif
-
 !include NetworkPkg/NetworkDefines.dsc.inc
 
 !include MdePkg/MdeLibs.dsc.inc

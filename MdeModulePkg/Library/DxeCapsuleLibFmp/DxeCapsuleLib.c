@@ -12,6 +12,7 @@
 
   Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
+  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -244,6 +245,11 @@ ValidateFmpCapsule (
   if (FmpCapsuleHeader->Version != EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER_INIT_VERSION) {
     DEBUG ((DEBUG_ERROR, "FmpCapsuleHeader->Version(0x%x) != EFI_FIRMWARE_MANAGEMENT_CAPSULE_HEADER_INIT_VERSION\n", FmpCapsuleHeader->Version));
     return EFI_INVALID_PARAMETER;
+  }
+
+  if (!PcdGetBool (PcdCapsuleEmbeddedDriverSupport) && (FmpCapsuleHeader->EmbeddedDriverCount != 0)) {
+    DEBUG ((DEBUG_ERROR, "FMP Capsule with one or more embedded drivers is not supported by this platform\n"));
+    return EFI_UNSUPPORTED;
   }
 
   ItemOffsetList = (UINT64 *)(FmpCapsuleHeader + 1);

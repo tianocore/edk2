@@ -77,13 +77,12 @@ typedef struct {
 } MACHINE_TYPE_INFO;
 
 GLOBAL_REMOVE_IF_UNREFERENCED MACHINE_TYPE_INFO  mMachineTypeInfo[] = {
-  { EFI_IMAGE_MACHINE_IA32,           L"IA32"        },
-  { EFI_IMAGE_MACHINE_IA64,           L"IA64"        },
-  { EFI_IMAGE_MACHINE_X64,            L"X64"         },
-  { EFI_IMAGE_MACHINE_ARMTHUMB_MIXED, L"ARM"         },
-  { EFI_IMAGE_MACHINE_AARCH64,        L"AARCH64"     },
-  { EFI_IMAGE_MACHINE_RISCV64,        L"RISCV64"     },
-  { EFI_IMAGE_MACHINE_LOONGARCH64,    L"LOONGARCH64" },
+  { EFI_IMAGE_MACHINE_IA32,        L"IA32"        },
+  { EFI_IMAGE_MACHINE_IA64,        L"IA64"        },
+  { EFI_IMAGE_MACHINE_X64,         L"X64"         },
+  { EFI_IMAGE_MACHINE_AARCH64,     L"AARCH64"     },
+  { EFI_IMAGE_MACHINE_RISCV64,     L"RISCV64"     },
+  { EFI_IMAGE_MACHINE_LOONGARCH64, L"LOONGARCH64" },
 };
 
 UINT16  mDxeCoreImageMachineType = 0;
@@ -628,7 +627,6 @@ CoreLoadPeImage (
       Image->ImageContext.ImageDataMemoryType = EfiBootServicesData;
       break;
     case EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER:
-    case EFI_IMAGE_SUBSYSTEM_SAL_RUNTIME_DRIVER:
       Image->ImageContext.ImageCodeMemoryType = EfiRuntimeServicesCode;
       Image->ImageContext.ImageDataMemoryType = EfiRuntimeServicesData;
       break;

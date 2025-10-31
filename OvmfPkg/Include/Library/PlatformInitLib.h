@@ -10,6 +10,7 @@
 #define PLATFORM_INIT_LIB_H_
 
 #include <PiPei.h>
+#include <IndustryStandard/E820.h>
 
 #pragma pack(1)
 
@@ -288,6 +289,36 @@ EFI_STATUS
 EFIAPI
 PlatformInitEmuVariableNvStore (
   IN VOID  *EmuVariableNvStore
+  );
+
+typedef VOID (*E820_SCAN_CALLBACK) (
+  EFI_E820_ENTRY64       *E820Entry,
+  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  );
+
+BOOLEAN
+EFIAPI
+PlatformIgvmMemoryMapCheck (
+  VOID
+  );
+
+EFI_STATUS
+EFIAPI
+PlatformIgvmScanE820 (
+  IN      E820_SCAN_CALLBACK     Callback,
+  IN OUT  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  );
+
+VOID
+EFIAPI
+PlatformIgvmDataHobs (
+  VOID
+  );
+
+UINT32
+EFIAPI
+PlatformIgvmVpCount (
+  VOID
   );
 
 #endif // PLATFORM_INIT_LIB_H_

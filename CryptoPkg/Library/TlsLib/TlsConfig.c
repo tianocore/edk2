@@ -607,6 +607,10 @@ TlsSetServerName (
   TlsConn = (TLS_CONNECTION *)Tls;
   Ctx     = (SSL_CTX *)SslCtx;
 
+  if (TlsConn == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   TlsExtCtx = AllocateZeroPool (sizeof (TLS_EXT_CTX));
   if (TlsExtCtx == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -1192,6 +1196,46 @@ TlsSetEcCurve (
 }
 
 /**
+  Set the Tls security level.
+
+  This function Set the Tls security level.
+  If Tls is NULL, nothing is done.
+
+  @param[in]  Tls                Pointer to the TLS object.
+  @param[in]  Level              Tls Security level need to set.
+
+  @retval  EFI_SUCCESS           The Tls security level was set successfully.
+  @retval  EFI_INVALID_PARAMETER The parameters are invalid.
+  @retval  EFI_UNSUPPORTED       The requested TLS set security level is not supported.
+
+**/
+EFI_STATUS
+EFIAPI
+TlsSetSecurityLevel (
+  IN VOID   *Tls,
+  IN UINT8  Level
+  )
+{
+  TLS_CONNECTION  *TlsConn;
+
+  TlsConn = (TLS_CONNECTION *)Tls;
+
+  if ((TlsConn == NULL) || (TlsConn->Ssl == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Check if the security level is within the valid range (2 to 5).
+  // Return EFI_INVALID_PARAMETER if the level is out of bounds.
+  if ((Level < MIN_SECURITY_LEVEL) || (Level > MAX_SECURITY_LEVEL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  SSL_set_security_level (TlsConn->Ssl, Level);
+
+  return EFI_SUCCESS;
+}
+
+/**
   Gets the protocol version used by the specified TLS connection.
 
   This function returns the protocol version used by the specified TLS
@@ -1214,7 +1258,9 @@ TlsGetVersion (
 
   TlsConn = (TLS_CONNECTION *)Tls;
 
-  ASSERT (TlsConn != NULL);
+  if (TlsConn == NULL) {
+    return 0;
+  }
 
   return (UINT16)(SSL_version (TlsConn->Ssl));
 }
@@ -1242,7 +1288,9 @@ TlsGetConnectionEnd (
 
   TlsConn = (TLS_CONNECTION *)Tls;
 
-  ASSERT (TlsConn != NULL);
+  if (TlsConn == NULL) {
+    return 0;
+  }
 
   return (UINT8)SSL_is_server (TlsConn->Ssl);
 }
@@ -1337,7 +1385,9 @@ TlsGetVerify (
 
   TlsConn = (TLS_CONNECTION *)Tls;
 
-  ASSERT (TlsConn != NULL);
+  if (TlsConn == NULL) {
+    return 0;
+  }
 
   return SSL_get_verify_mode (TlsConn->Ssl);
 }

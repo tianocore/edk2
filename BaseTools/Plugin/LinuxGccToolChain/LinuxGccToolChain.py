@@ -1,5 +1,5 @@
 # @file LinuxGccToolChain.py
-# Plugin to configures paths for GCC/GCC5 ARM/AARCH64/RISCV/LOONGARCH64 Toolchain
+# Plugin to configures paths for GCC/GCC5 AARCH64/RISCV/LOONGARCH64 Toolchain
 ##
 # This plugin sets environment variables used in tools_def.template to specify the GCC compiler
 # for the requested build architecture.
@@ -43,12 +43,6 @@ class LinuxGccToolChain(IUefiBuildPlugin):
                 self.Logger.critical("Failed in check aarch64")
                 return ret
 
-            # Check arm compiler
-            ret = self._check_arm(toolchain)
-            if ret != 0:
-                self.Logger.critical("Failed in check arm")
-                return ret
-
             # Check RISCV64 compiler
             ret = self._check_riscv64(toolchain)
             if ret != 0:
@@ -60,28 +54,6 @@ class LinuxGccToolChain(IUefiBuildPlugin):
             if ret != 0:
                 self.Logger.critical("Failed in check loongarch64")
                 return ret
-
-        return 0
-
-    def _check_arm(self, toolchain):
-        # check to see if full path already configured
-        if shell_environment.GetEnvironment().get_shell_var(toolchain + "_ARM_PREFIX") is not None:
-            self.Logger.info(toolchain + "_ARM_PREFIX is already set.")
-
-        else:
-            # now check for install dir.  If set then set the Prefix
-            install_path = shell_environment.GetEnvironment().get_shell_var(toolchain + "_ARM_INSTALL")
-            if install_path is None:
-                return 0
-
-            # make the PREFIX to align with tools_def.txt
-            prefix = os.path.join(install_path, "bin", "arm-none-linux-gnueabihf-")
-            shell_environment.GetEnvironment().set_shell_var(toolchain + "_ARM_PREFIX", prefix)
-
-        # now confirm it exists
-        if not os.path.exists(shell_environment.GetEnvironment().get_shell_var(toolchain + "_ARM_PREFIX") + "gcc"):
-            self.Logger.error("Path for " + toolchain + "_ARM_PREFIX toolchain is invalid")
-            return -2
 
         return 0
 

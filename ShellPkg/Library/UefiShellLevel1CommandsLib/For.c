@@ -69,12 +69,12 @@ ShellCommandRunEndFor (
   ASSERT_EFI_ERROR (Status);
 
   if (!gEfiShellProtocol->BatchIsActive ()) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_NO_SCRIPT), gShellLevel1HiiHandle, L"endfor");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_NO_SCRIPT), gShellLevel1HiiHandle, L"endfor");
     return (SHELL_UNSUPPORTED);
   }
 
   if (gEfiShellParametersProtocol->Argc > 1) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"endfor");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"endfor");
     return (SHELL_INVALID_PARAMETER);
   }
 
@@ -82,16 +82,13 @@ ShellCommandRunEndFor (
 
   if (!Found) {
     CurrentScriptFile = ShellCommandGetCurrentScriptFile ();
-    ShellPrintHiiEx (
-      -1,
-      -1,
-      NULL,
+    ShellPrintHiiDefaultEx (
       STRING_TOKEN (STR_SYNTAX_NO_MATCHING),
       gShellLevel1HiiHandle,
       L"For",
       L"EndFor",
       CurrentScriptFile != NULL
-                    && CurrentScriptFile->CurrentCommand != NULL
+                           && CurrentScriptFile->CurrentCommand != NULL
           ? CurrentScriptFile->CurrentCommand->Line : 0
       );
     return (SHELL_NOT_FOUND);
@@ -324,12 +321,12 @@ ShellCommandRunFor (
   ASSERT_EFI_ERROR (Status);
 
   if (!gEfiShellProtocol->BatchIsActive ()) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_NO_SCRIPT), gShellLevel1HiiHandle, L"for");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_NO_SCRIPT), gShellLevel1HiiHandle, L"for");
     return (SHELL_UNSUPPORTED);
   }
 
   if (gEfiShellParametersProtocol->Argc < 4) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"for");
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"for");
     return (SHELL_INVALID_PARAMETER);
   }
 
@@ -346,10 +343,7 @@ ShellCommandRunFor (
     // Make sure that an End exists.
     //
     if (!MoveToTag (GetNextNode, L"endfor", L"for", NULL, CurrentScriptFile, TRUE, TRUE, FALSE)) {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_SYNTAX_NO_MATCHING),
         gShellLevel1HiiHandle,
         L"EndFor",
@@ -367,7 +361,7 @@ ShellCommandRunFor (
            || ((gEfiShellParametersProtocol->Argv[1][1] >= L'A') && (gEfiShellParametersProtocol->Argv[1][1] <= L'Z')))
           )
     {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_VAR), gShellLevel1HiiHandle, gEfiShellParametersProtocol->Argv[1]);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_VAR), gShellLevel1HiiHandle, gEfiShellParametersProtocol->Argv[1]);
       return (SHELL_INVALID_PARAMETER);
     }
 
@@ -491,10 +485,7 @@ ShellCommandRunFor (
         Info->CurrentValue    = NULL;
         ArgSetWalker          = ArgSet;
         if (ArgSetWalker[0] != L'(') {
-          ShellPrintHiiEx (
-            -1,
-            -1,
-            NULL,
+          ShellPrintHiiDefaultEx (
             STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT),
             gShellLevel1HiiHandle,
             ArgSet,
@@ -517,10 +508,7 @@ ShellCommandRunFor (
           }
 
           if (TempSpot == NULL) {
-            ShellPrintHiiEx (
-              -1,
-              -1,
-              NULL,
+            ShellPrintHiiDefaultEx (
               STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT),
               gShellLevel1HiiHandle,
               CurrentScriptFile->CurrentCommand->Line
@@ -534,10 +522,7 @@ ShellCommandRunFor (
             }
 
             if (!ShellIsValidForNumber (ArgSetWalker)) {
-              ShellPrintHiiEx (
-                -1,
-                -1,
-                NULL,
+              ShellPrintHiiDefaultEx (
                 STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT),
                 gShellLevel1HiiHandle,
                 ArgSet,
@@ -557,10 +542,7 @@ ShellCommandRunFor (
               }
 
               if ((ArgSetWalker == NULL) || (*ArgSetWalker == CHAR_NULL) || !ShellIsValidForNumber (ArgSetWalker)) {
-                ShellPrintHiiEx (
-                  -1,
-                  -1,
-                  NULL,
+                ShellPrintHiiDefaultEx (
                   STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT),
                   gShellLevel1HiiHandle,
                   ArgSet,
@@ -587,10 +569,7 @@ ShellCommandRunFor (
 
                 if ((ArgSetWalker != NULL) && (*ArgSetWalker != CHAR_NULL)) {
                   if ((ArgSetWalker == NULL) || (*ArgSetWalker == CHAR_NULL) || !ShellIsValidForNumber (ArgSetWalker)) {
-                    ShellPrintHiiEx (
-                      -1,
-                      -1,
-                      NULL,
+                    ShellPrintHiiDefaultEx (
                       STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT),
                       gShellLevel1HiiHandle,
                       ArgSet,
@@ -608,10 +587,7 @@ ShellCommandRunFor (
                       }
 
                       if (StrStr (ArgSetWalker, L" ") != NULL) {
-                        ShellPrintHiiEx (
-                          -1,
-                          -1,
-                          NULL,
+                        ShellPrintHiiDefaultEx (
                           STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT),
                           gShellLevel1HiiHandle,
                           ArgSet,
@@ -640,15 +616,12 @@ ShellCommandRunFor (
         }
       }
     } else {
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        NULL,
+      ShellPrintHiiDefaultEx (
         STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT),
         gShellLevel1HiiHandle,
         ArgSet,
         CurrentScriptFile != NULL
-                      && CurrentScriptFile->CurrentCommand != NULL
+                             && CurrentScriptFile->CurrentCommand != NULL
           ? CurrentScriptFile->CurrentCommand->Line : 0
         );
       ShellStatus = SHELL_INVALID_PARAMETER;
@@ -706,16 +679,13 @@ ShellCommandRunFor (
         // find the matching endfor (we're done with the loop)
         //
         if (!MoveToTag (GetNextNode, L"endfor", L"for", NULL, CurrentScriptFile, TRUE, FALSE, FALSE)) {
-          ShellPrintHiiEx (
-            -1,
-            -1,
-            NULL,
+          ShellPrintHiiDefaultEx (
             STRING_TOKEN (STR_SYNTAX_NO_MATCHING),
             gShellLevel1HiiHandle,
             L"EndFor",
             L"For",
             CurrentScriptFile != NULL
-                          && CurrentScriptFile->CurrentCommand != NULL
+                                 && CurrentScriptFile->CurrentCommand != NULL
               ? CurrentScriptFile->CurrentCommand->Line : 0
             );
           ShellStatus = SHELL_DEVICE_ERROR;
@@ -776,16 +746,13 @@ ShellCommandRunFor (
         // find the matching endfor (we're done with the loop)
         //
         if (!MoveToTag (GetNextNode, L"endfor", L"for", NULL, CurrentScriptFile, TRUE, FALSE, FALSE)) {
-          ShellPrintHiiEx (
-            -1,
-            -1,
-            NULL,
+          ShellPrintHiiDefaultEx (
             STRING_TOKEN (STR_SYNTAX_NO_MATCHING),
             gShellLevel1HiiHandle,
             L"EndFor",
             L"For",
             CurrentScriptFile != NULL
-                          && CurrentScriptFile->CurrentCommand != NULL
+                                 && CurrentScriptFile->CurrentCommand != NULL
               ? CurrentScriptFile->CurrentCommand->Line : 0
             );
           ShellStatus = SHELL_DEVICE_ERROR;

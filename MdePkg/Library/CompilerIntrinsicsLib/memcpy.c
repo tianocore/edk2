@@ -37,31 +37,3 @@ memcpy (
   __memcpy (dest, src, n);
   return dest;
 }
-
-#ifdef __arm__
-
-__attribute__ ((__alias__ ("__memcpy")))
-void
-__aeabi_memcpy (
-  void        *dest,
-  const void  *src,
-  size_t      n
-  );
-
-__attribute__ ((__alias__ ("__memcpy")))
-void
-__aeabi_memcpy4 (
-  void        *dest,
-  const void  *src,
-  size_t      n
-  );
-
-__attribute__ ((__alias__ ("__memcpy")))
-void
-__aeabi_memcpy8 (
-  void        *dest,
-  const void  *src,
-  size_t      n
-  );
-
-#endif

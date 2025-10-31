@@ -462,10 +462,6 @@ WinNtSnpStationAddress (
   IN EFI_MAC_ADDRESS   *New OPTIONAL
   )
 {
-  WIN_NT_SNP_PRIVATE  *Private;
-
-  Private = WIN_NT_SNP_PRIVATE_DATA_FROM_THIS (This);
-
   return EFI_UNSUPPORTED;
 }
 
@@ -498,10 +494,6 @@ WinNtSnpStatistics (
   OUT EFI_NETWORK_STATISTICS  *StatisticsTable  OPTIONAL
   )
 {
-  WIN_NT_SNP_PRIVATE  *Private;
-
-  Private = WIN_NT_SNP_PRIVATE_DATA_FROM_THIS (This);
-
   return EFI_UNSUPPORTED;
 }
 
@@ -534,10 +526,6 @@ WinNtSnpMCastIpToMac (
   OUT EFI_MAC_ADDRESS  *MAC
   )
 {
-  WIN_NT_SNP_PRIVATE  *Private;
-
-  Private = WIN_NT_SNP_PRIVATE_DATA_FROM_THIS (This);
-
   return EFI_UNSUPPORTED;
 }
 
@@ -570,10 +558,6 @@ WinNtSnpNvData (
   IN OUT VOID          *Buffer
   )
 {
-  WIN_NT_SNP_PRIVATE  *Private;
-
-  Private = WIN_NT_SNP_PRIVATE_DATA_FROM_THIS (This);
-
   return EFI_UNSUPPORTED;
 }
 

@@ -1492,7 +1492,7 @@ PrintCommandHistory (
   UINTN        LineNumber;
   UINTN        LineCount;
 
-  ShellPrintEx (-1, -1, L"\n");
+  ShellPrintDefaultEx (L"\n");
   Index      = 0;
   LineNumber = 0;
   //
@@ -1516,7 +1516,7 @@ PrintCommandHistory (
       LineNumber = 0;
     }
 
-    ShellPrintEx (-1, -1, L"%2d. %s\n", Index, Node->Buffer);
+    ShellPrintDefaultEx (L"%2d. %s\n", Index, Node->Buffer);
     LineNumber += LineCount;
   }
 }

@@ -24,7 +24,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
   DynamicTablesPkg/DynamicTablesPkg.dec
 
-[Packages.ARM, Packages.AARCH64]
+[Packages.AARCH64]
   ArmPkg/ArmPkg.dec
 
 [LibraryClasses]

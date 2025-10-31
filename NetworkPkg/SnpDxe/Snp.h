@@ -100,7 +100,7 @@ typedef struct {
   // Buffers for command descriptor block, command parameter block
   // and data block.
   //
-  PXE_CDB                        Cdb;
+  PXE_CDB                        *Cdb;
   VOID                           *Cpb;
   VOID                           *CpbUnmap;
   VOID                           *Db;

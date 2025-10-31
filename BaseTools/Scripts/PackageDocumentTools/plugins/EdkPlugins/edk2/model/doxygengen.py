@@ -157,7 +157,6 @@ class PackageDocumentAction(DoxygenAction):
             self._configFile.AddPreDefined('MDE_CPU_X64')
             self._configFile.AddPreDefined('MDE_CPU_IPF')
             self._configFile.AddPreDefined('MDE_CPU_EBC')
-            self._configFile.AddPreDefined('MDE_CPU_ARM')
 
         namestr = self._pObj.GetName()
         if self._arch is not None:
@@ -271,7 +270,7 @@ class PackageDocumentAction(DoxygenAction):
                     self.ProcessSourceFileForInclude(fullpath, pObj, configFile)
                     topPage.AddDescription('<li> \link %s\endlink </li>\n' % self._ConvertPathToDoxygen(fullpath, pObj))
                 else:
-                    if file.lower() in ['library', 'protocol', 'guid', 'ppi', 'ia32', 'x64', 'ipf', 'ebc', 'arm', 'pi', 'uefi', 'aarch64']:
+                    if file.lower() in ['library', 'protocol', 'guid', 'ppi', 'ia32', 'x64', 'ipf', 'ebc', 'pi', 'uefi', 'aarch64']:
                         continue
                     bNeedAddSubPage = False
                     subpage = doxygen.Page(self._ConvertPathToDoxygen(fullpath, pObj), 'public_include_%s' % file)

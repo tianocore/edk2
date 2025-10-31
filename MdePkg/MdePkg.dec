@@ -41,9 +41,6 @@
 [Includes.EBC]
   Include/Ebc
 
-[Includes.ARM]
-  Include/Arm
-
 [Includes.AARCH64]
   Include/AArch64
 
@@ -344,8 +341,11 @@
   ##  @libraryclass  Provides function to support TDX processing.
   TdxLib|Include/Library/TdxLib.h
 
+  ##  @libraryclass  Provides function to support FV operatation.
+  FvLib|Include/Library/FvLib.h
+
 [LibraryClasses.X64]
-  ##  @libraryclass  Defines a set of interfaces for the MM core entrypoint. The ARM/AARCH64 version lives in ArmPkg
+  ##  @libraryclass  Defines a set of interfaces for the MM core entrypoint. The AARCH64 version lives in ArmPkg
   #
   StandaloneMmCoreEntryPoint|Include/Library/StandaloneMmCoreEntryPoint.h
 
@@ -353,7 +353,7 @@
   ##  @libraryclass  Provides function to make ecalls to SBI
   BaseRiscVSbiLib|Include/Library/BaseRiscVSbiLib.h
 
-[LibraryClasses.ARM, LibraryClasses.AARCH64]
+[LibraryClasses.AARCH64]
   ##  @libraryclass  Provides an interface to Arm registers.
   #
   ArmLib|Include/Library/ArmLib.h

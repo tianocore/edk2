@@ -167,7 +167,7 @@ ShellCommandRunDevices (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
     if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"devices", ProblemParam);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"devices", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -181,7 +181,7 @@ ShellCommandRunDevices (
       //
       // error for too many parameters
       //
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"devices");
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"devices");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       //
@@ -191,7 +191,7 @@ ShellCommandRunDevices (
       if (Lang != NULL) {
         Language = AllocateZeroPool (StrSize (Lang));
         if (Language == NULL) {
-          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"devices");
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"devices");
           ShellCommandLineFreeVarList (Package);
           return (SHELL_OUT_OF_RESOURCES);
         }
@@ -203,7 +203,7 @@ ShellCommandRunDevices (
         //        AsciiSPrint(Language, 10, "en-us");
       } else {
         ASSERT (Language == NULL);
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"devices", L"-l");
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"devices", L"-l");
         ShellCommandLineFreeVarList (Package);
         return (SHELL_INVALID_PARAMETER);
       }

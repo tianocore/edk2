@@ -773,7 +773,6 @@ gModuleTypeHeaderFile = {
     SUP_MODULE_DXE_DRIVER        :   ["PiDxe.h", "Library/BaseLib.h", "Library/DebugLib.h", "Library/UefiBootServicesTableLib.h", "Library/UefiDriverEntryPoint.h"],
     SUP_MODULE_DXE_SMM_DRIVER    :   ["PiDxe.h", "Library/BaseLib.h", "Library/DebugLib.h", "Library/UefiBootServicesTableLib.h", "Library/UefiDriverEntryPoint.h"],
     SUP_MODULE_DXE_RUNTIME_DRIVER:   ["PiDxe.h", "Library/BaseLib.h", "Library/DebugLib.h", "Library/UefiBootServicesTableLib.h", "Library/UefiDriverEntryPoint.h"],
-    SUP_MODULE_DXE_SAL_DRIVER    :   ["PiDxe.h", "Library/BaseLib.h", "Library/DebugLib.h", "Library/UefiBootServicesTableLib.h", "Library/UefiDriverEntryPoint.h"],
     SUP_MODULE_UEFI_DRIVER       :   ["Uefi.h",  "Library/BaseLib.h", "Library/DebugLib.h", "Library/UefiBootServicesTableLib.h", "Library/UefiDriverEntryPoint.h"],
     SUP_MODULE_UEFI_APPLICATION  :   ["Uefi.h",  "Library/BaseLib.h", "Library/DebugLib.h", "Library/UefiBootServicesTableLib.h", "Library/UefiApplicationEntryPoint.h"],
     SUP_MODULE_SMM_CORE          :   ["PiDxe.h", "Library/BaseLib.h", "Library/DebugLib.h", "Library/UefiDriverEntryPoint.h"],
@@ -1348,7 +1347,7 @@ def CreateLibraryConstructorCode(Info, AutoGenC, AutoGenH):
                 ConstructorPrototypeString.Append(gLibraryStructorPrototype['PEI'].Replace(Dict))
                 ConstructorCallingString.Append(gLibraryStructorCall['PEI'].Replace(Dict))
             elif Lib.ModuleType in [SUP_MODULE_DXE_CORE, SUP_MODULE_DXE_DRIVER, SUP_MODULE_DXE_SMM_DRIVER, SUP_MODULE_DXE_RUNTIME_DRIVER,
-                                    SUP_MODULE_DXE_SAL_DRIVER, SUP_MODULE_UEFI_DRIVER, SUP_MODULE_UEFI_APPLICATION, SUP_MODULE_SMM_CORE]:
+                                    SUP_MODULE_UEFI_DRIVER, SUP_MODULE_UEFI_APPLICATION, SUP_MODULE_SMM_CORE]:
                 ConstructorPrototypeString.Append(gLibraryStructorPrototype['DXE'].Replace(Dict))
                 ConstructorCallingString.Append(gLibraryStructorCall['DXE'].Replace(Dict))
             elif Lib.ModuleType in [SUP_MODULE_MM_STANDALONE, SUP_MODULE_MM_CORE_STANDALONE]:
@@ -1385,7 +1384,7 @@ def CreateLibraryConstructorCode(Info, AutoGenC, AutoGenH):
         elif Info.ModuleType in SUP_MODULE_SET_PEI:
             AutoGenC.Append(gLibraryString['PEI'].Replace(Dict))
         elif Info.ModuleType in [SUP_MODULE_DXE_CORE, SUP_MODULE_DXE_DRIVER, SUP_MODULE_DXE_SMM_DRIVER, SUP_MODULE_DXE_RUNTIME_DRIVER,
-                                 SUP_MODULE_DXE_SAL_DRIVER, SUP_MODULE_UEFI_DRIVER, SUP_MODULE_UEFI_APPLICATION, SUP_MODULE_SMM_CORE]:
+                                 SUP_MODULE_UEFI_DRIVER, SUP_MODULE_UEFI_APPLICATION, SUP_MODULE_SMM_CORE]:
             AutoGenC.Append(gLibraryString['DXE'].Replace(Dict))
         elif Info.ModuleType in [SUP_MODULE_MM_STANDALONE, SUP_MODULE_MM_CORE_STANDALONE]:
             AutoGenC.Append(gLibraryString['MM'].Replace(Dict))
@@ -1419,7 +1418,7 @@ def CreateLibraryDestructorCode(Info, AutoGenC, AutoGenH):
                 DestructorPrototypeString.Append(gLibraryStructorPrototype['PEI'].Replace(Dict))
                 DestructorCallingString.Append(gLibraryStructorCall['PEI'].Replace(Dict))
             elif Lib.ModuleType in [SUP_MODULE_DXE_CORE, SUP_MODULE_DXE_DRIVER, SUP_MODULE_DXE_SMM_DRIVER, SUP_MODULE_DXE_RUNTIME_DRIVER,
-                                    SUP_MODULE_DXE_SAL_DRIVER, SUP_MODULE_UEFI_DRIVER, SUP_MODULE_UEFI_APPLICATION, SUP_MODULE_SMM_CORE]:
+                                    SUP_MODULE_UEFI_DRIVER, SUP_MODULE_UEFI_APPLICATION, SUP_MODULE_SMM_CORE]:
                 DestructorPrototypeString.Append(gLibraryStructorPrototype['DXE'].Replace(Dict))
                 DestructorCallingString.Append(gLibraryStructorCall['DXE'].Replace(Dict))
             elif Lib.ModuleType in [SUP_MODULE_MM_STANDALONE, SUP_MODULE_MM_CORE_STANDALONE]:
@@ -1448,7 +1447,7 @@ def CreateLibraryDestructorCode(Info, AutoGenC, AutoGenH):
         elif Info.ModuleType in SUP_MODULE_SET_PEI:
             AutoGenC.Append(gLibraryString['PEI'].Replace(Dict))
         elif Info.ModuleType in [SUP_MODULE_DXE_CORE, SUP_MODULE_DXE_DRIVER, SUP_MODULE_DXE_SMM_DRIVER, SUP_MODULE_DXE_RUNTIME_DRIVER,
-                                 SUP_MODULE_DXE_SAL_DRIVER, SUP_MODULE_UEFI_DRIVER, SUP_MODULE_UEFI_APPLICATION, SUP_MODULE_SMM_CORE]:
+                                 SUP_MODULE_UEFI_DRIVER, SUP_MODULE_UEFI_APPLICATION, SUP_MODULE_SMM_CORE]:
             AutoGenC.Append(gLibraryString['DXE'].Replace(Dict))
         elif Info.ModuleType in [SUP_MODULE_MM_STANDALONE, SUP_MODULE_MM_CORE_STANDALONE]:
             AutoGenC.Append(gLibraryString['MM'].Replace(Dict))
@@ -1509,7 +1508,7 @@ def CreateModuleEntryPointCode(Info, AutoGenC, AutoGenH):
         else:
             AutoGenC.Append(gPeimEntryPointString[2].Replace(Dict))
         AutoGenH.Append(gPeimEntryPointPrototype.Replace(Dict))
-    elif Info.ModuleType in [SUP_MODULE_DXE_RUNTIME_DRIVER, SUP_MODULE_DXE_DRIVER, SUP_MODULE_DXE_SAL_DRIVER, SUP_MODULE_UEFI_DRIVER]:
+    elif Info.ModuleType in [SUP_MODULE_DXE_RUNTIME_DRIVER, SUP_MODULE_DXE_DRIVER, SUP_MODULE_UEFI_DRIVER]:
         if NumEntryPoints < 2:
             AutoGenC.Append(gUefiDriverEntryPointString[NumEntryPoints].Replace(Dict))
         else:
@@ -2042,8 +2041,8 @@ def CreateFooterCode(Info, AutoGenC, AutoGenH):
 def CreateCode(Info, AutoGenC, AutoGenH, StringH, UniGenCFlag, UniGenBinBuffer, StringIdf, IdfGenCFlag, IdfGenBinBuffer):
     CreateHeaderCode(Info, AutoGenC, AutoGenH)
 
-    # The only 32 bit archs we have are IA32 and ARM, everything else is 64 bit
-    Bitwidth = 32 if Info.Arch == 'IA32' or Info.Arch == 'ARM' else 64
+    # The only 32 bit arch we have is IA32, everything else is 64 bit
+    Bitwidth = 32 if Info.Arch == 'IA32' else 64
 
     if GlobalData.gStackCookieValues64 == [] and os.path.exists(os.path.join(Info.PlatformInfo.BuildDir, "StackCookieValues64.json")):
         with open (os.path.join(Info.PlatformInfo.BuildDir, "StackCookieValues64.json"), "r") as file:
