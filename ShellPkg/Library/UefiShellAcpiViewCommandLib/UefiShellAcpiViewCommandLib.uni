@@ -91,6 +91,7 @@
 "       MCFG  - Memory Mapped Config Space Base Address Description Table\r\n"
 "       MPAM  - Memory System Resource Partitioning and Monitoring Table\r\n"
 "       PPTT  - Processor Properties Topology Table\r\n"
+"       RIMT  - RISC-V IO Mapping Table\r\n"
 "       RSDP  - Root System Description Pointer\r\n"
 "       SLIT  - System Locality Information Table\r\n"
 "       SPCR  - Serial Port Console Redirection Table\r\n"
