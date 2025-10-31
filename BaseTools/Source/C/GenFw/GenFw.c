@@ -89,6 +89,7 @@ UINT32 mOutImageType = FW_DUMMY_IMAGE;
 BOOLEAN mIsConvertXip = FALSE;
 BOOLEAN mExportFlag = FALSE;
 BOOLEAN mNoNxCompat = FALSE;
+BOOLEAN mSkipDebugInfo = FALSE;
 
 STATIC
 EFI_STATUS
@@ -251,6 +252,9 @@ Returns:
                         to MINOR.\n");
   fprintf (stdout, "  --keepzeropending     Don't strip zero pending of .reloc.\n\
                         This option can be used together with -e or -t.\n\
+                        It doesn't work for other options.\n");
+  fprintf (stdout, "  --no-debug            Skip debug information generation.\n\
+                        This option can be used together with -e.\n\
                         It doesn't work for other options.\n");
   fprintf (stdout, "  -r, --replace         Overwrite the input file with the output content.\n\
                         If more input files are specified,\n\
@@ -1418,6 +1422,13 @@ Returns:
 
     if (stricmp (argv[0], "--keepzeropending") == 0) {
       KeepZeroPendingFlag = TRUE;
+      argc --;
+      argv ++;
+      continue;
+    }
+
+    if (stricmp (argv[0], "--no-debug") == 0) {
+      mSkipDebugInfo = TRUE;
       argc --;
       argv ++;
       continue;

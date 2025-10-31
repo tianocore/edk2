@@ -25,6 +25,7 @@ extern UINT32 mTableOffset;
 extern UINT32 mOutImageType;
 extern UINT32 mFileBufferSize;
 extern BOOLEAN mExportFlag;
+extern BOOLEAN mSkipDebugInfo;
 
 //
 // Common EFI specific data.

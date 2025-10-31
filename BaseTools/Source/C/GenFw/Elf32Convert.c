@@ -426,7 +426,9 @@ ScanSections32 (
     assert (FALSE);
   }
 
-  mDebugOffset = DebugRvaAlign(mCoffOffset);
+  if (!mSkipDebugInfo) {
+    mDebugOffset = DebugRvaAlign(mCoffOffset);
+  }
   mCoffOffset = CoffAlign(mCoffOffset);
 
   if (SectionCount > 1 && mOutImageType == FW_EFI_IMAGE) {
@@ -470,18 +472,20 @@ ScanSections32 (
     Warning (NULL, 0, 0, NULL, "Multiple sections in %s are merged into 1 data section. Source level debug might not work correctly.", mInImageName);
   }
 
-  //
-  // Make room for .debug data in .data (or .text if .data is empty) instead of
-  // putting it in a section of its own. This is explicitly allowed by the
-  // PE/COFF spec, and prevents bloat in the binary when using large values for
-  // section alignment.
-  //
-  if (SectionCount > 0) {
-    mDebugOffset = DebugRvaAlign(mCoffOffset);
+  if (!mSkipDebugInfo) {
+    //
+    // Make room for .debug data in .data (or .text if .data is empty) instead of
+    // putting it in a section of its own. This is explicitly allowed by the
+    // PE/COFF spec, and prevents bloat in the binary when using large values for
+    // section alignment.
+    //
+    if (SectionCount > 0) {
+      mDebugOffset = DebugRvaAlign(mCoffOffset);
+    }
+    mCoffOffset = mDebugOffset + sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY) +
+                  sizeof(EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY) +
+                  strlen(mInImageName) + 1;
   }
-  mCoffOffset = mDebugOffset + sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY) +
-                sizeof(EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY) +
-                strlen(mInImageName) + 1;
 
   mCoffOffset = CoffAlign(mCoffOffset);
   if (SectionCount == 0) {
