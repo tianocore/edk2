@@ -145,6 +145,9 @@
   MdePkg/Library/DynamicStackCookieEntryPointLib/UefiDriverEntryPoint.inf
   MdePkg/Library/FvLib/FvLib.inf
 
+  MdePkg/Library/PvPanicLib/PvPanicLib.inf
+  MdePkg/Library/PvPanicNull/PvPanicNull.inf
+
 [Components.IA32, Components.X64, Components.AARCH64]
   #
   # Add UEFI Target Based Unit Tests

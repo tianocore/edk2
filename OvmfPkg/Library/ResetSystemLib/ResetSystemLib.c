@@ -10,6 +10,7 @@
 
 #include <Library/BaseLib.h>        // CpuDeadLoop()
 #include <Library/IoLib.h>          // IoWrite8()
+#include <Library/PvPanicLib.h>     // PvPanicLibSendEventGuestCrashLoaded()
 #include <Library/ResetSystemLib.h> // ResetCold()
 #include <Library/TimerLib.h>       // MicroSecondDelay()
 
@@ -28,6 +29,10 @@ ResetCold (
   VOID
   )
 {
+  // Notify the host that the system may be in an emergency state, but the
+  // guest can handle this state.
+  PvPanicLibSendEventGuestCrashLoaded ();
+
   IoWrite8 (0xCF9, BIT2 | BIT1); // 1st choice: PIIX3 RCR, RCPU|SRST
   MicroSecondDelay (50);
 
@@ -48,6 +53,10 @@ ResetWarm (
   VOID
   )
 {
+  // Notify the host that the system may be in an emergency state, but the
+  // guest can handle this state.
+  PvPanicLibSendEventGuestCrashLoaded ();
+
   IoWrite8 (0x64, 0xfe);
   CpuDeadLoop ();
 }
