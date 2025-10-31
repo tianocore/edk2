@@ -289,7 +289,14 @@ DumpCapsuleStatusVariable (
                );
     if (Status == EFI_NOT_FOUND) {
       break;
-    } else if (EFI_ERROR (Status)) {
+    }
+
+    Index++;
+    if (Index > 0xFFFF) {
+      break;
+    }
+
+    if (EFI_ERROR (Status)) {
       continue;
     }
 
@@ -321,11 +328,6 @@ DumpCapsuleStatusVariable (
     }
 
     FreePool (CapsuleResult);
-
-    Index++;
-    if (Index > 0xFFFF) {
-      break;
-    }
   }
 
   return EFI_SUCCESS;
