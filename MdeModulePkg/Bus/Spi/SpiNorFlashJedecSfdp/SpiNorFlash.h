@@ -16,12 +16,18 @@
 #include "SpiNorFlashJedecSfdpInternal.h"
 
 /**
-  Fill Write Buffer with Opcode, Address, Dummy Bytes, and Data
+  Fill Write Buffer with Opcode, Address, Dummy Bytes, and Data.
 
-  @param[in]    Opcode      - Opcode for transaction
-  @param[in]    Address     - SPI Offset Start Address
-  @param[in]    WriteBytes  - Number of bytes to write to SPI device
-  @param[in]    WriteBuffer - Buffer containing bytes to write to SPI device
+  If WriteBytes is non-zero, WriteBuffer must be a valid buffer.
+
+  @param[in]    Instance               The instance of SPI_NOR_FLASH
+  @param[in]    Opcode                 Opcode for transaction
+  @param[in]    DummyBytes             The dummy bytes send to SPI flash device
+  @param[in]    AddressBytesSupported  Bytes of address supported by SPI flash device
+  @param[in]    UseAddress             Send the address for SPI flash command
+  @param[in]    Address                SPI Offset Start Address
+  @param[in]    WriteBytes             Number of bytes to write to SPI device
+  @param[in]    WriteBuffer            Buffer containing bytes to write to SPI device
 
   @retval       Size of Data in Buffer
 **/
