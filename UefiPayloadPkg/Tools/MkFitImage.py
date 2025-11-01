@@ -63,7 +63,7 @@ def BuildFvImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Descript
     libfdt.fdt_setprop_u32(Fdt, ParentNode, 'data-size', DataSize)
     libfdt.fdt_setprop_u32(Fdt, ParentNode, 'data-offset', DataOffset)
     libfdt.fdt_setprop(Fdt, ParentNode, 'compression', bytes('none',                'utf-8'), len('none') + 1)
-    libfdt.fdt_setprop(Fdt, ParentNode, 'project ',    bytes('tianocore',           'utf-8'), len('tianocore') + 1)
+    libfdt.fdt_setprop(Fdt, ParentNode, 'project',    bytes('tianocore',           'utf-8'), len('tianocore') + 1)
     libfdt.fdt_setprop(Fdt, ParentNode, 'arch',        bytes(Arch,                  'utf-8'), len(Arch) + 1)
     libfdt.fdt_setprop(Fdt, ParentNode, 'type',        bytes('flat-binary',         'utf-8'), len('flat-binary') + 1)
     libfdt.fdt_setprop(Fdt, ParentNode, 'description', bytes(Description,           'utf-8'), len(Description) + 1)
@@ -76,7 +76,7 @@ def BuildTianoImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Descr
     if InfoHeader.LoadAddr is not None:
         libfdt.fdt_setprop_u64(Fdt, ParentNode, 'load', InfoHeader.LoadAddr)
     if InfoHeader.Entry is not None:
-        libfdt.fdt_setprop_u64(Fdt, ParentNode, 'entry-start', InfoHeader.Entry)
+        libfdt.fdt_setprop_u64(Fdt, ParentNode, 'entry', InfoHeader.Entry)
     if InfoHeader.RelocStart is not None:
         libfdt.fdt_setprop_u32(Fdt, ParentNode, 'reloc-start', InfoHeader.RelocStart)
     if InfoHeader.DataSize is not None:
@@ -84,16 +84,16 @@ def BuildTianoImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Descr
     if InfoHeader.DataOffset is not None:
         libfdt.fdt_setprop_u32(Fdt, ParentNode, 'data-offset', DataOffset)
     if InfoHeader.Producer is not None:
-        libfdt.fdt_setprop(Fdt, ParentNode, 'producer ', bytes(InfoHeader.Producer, 'utf-8'), len(InfoHeader.Producer) + 1)
+        libfdt.fdt_setprop(Fdt, ParentNode, 'producer', bytes(InfoHeader.Producer, 'utf-8'), len(InfoHeader.Producer) + 1)
     if InfoHeader.Capabilities is not None:
         CapStrs = ','.join(InfoHeader.Capabilities)
-        libfdt.fdt_setprop(Fdt, ParentNode, 'capabilities ', bytes(CapStrs, 'utf-8'), len(CapStrs) + 1)
+        libfdt.fdt_setprop(Fdt, ParentNode, 'capabilities', bytes(CapStrs, 'utf-8'), len(CapStrs) + 1)
     if InfoHeader.Type is not None:
-        libfdt.fdt_setprop(Fdt, ParentNode, 'type ', bytes(InfoHeader.Type, 'utf-8'), len(InfoHeader.Type) + 1)
+        libfdt.fdt_setprop(Fdt, ParentNode, 'type', bytes(InfoHeader.Type, 'utf-8'), len(InfoHeader.Type) + 1)
     if InfoHeader.Arch is not None:
-        libfdt.fdt_setprop(Fdt, ParentNode, 'arch ', bytes(InfoHeader.Arch, 'utf-8'), len(InfoHeader.Arch) + 1)
+        libfdt.fdt_setprop(Fdt, ParentNode, 'arch', bytes(InfoHeader.Arch, 'utf-8'), len(InfoHeader.Arch) + 1)
     if InfoHeader.Project is not None:
-        libfdt.fdt_setprop(Fdt, ParentNode, 'project ', bytes(InfoHeader.Project, 'utf-8'), len(InfoHeader.Project) + 1)
+        libfdt.fdt_setprop(Fdt, ParentNode, 'project', bytes(InfoHeader.Project, 'utf-8'), len(InfoHeader.Project) + 1)
     if InfoHeader.Description is not None:
         libfdt.fdt_setprop(Fdt, ParentNode, 'description', bytes(Description, 'utf-8'), len(Description) + 1)
 
@@ -105,13 +105,15 @@ def BuildFitImage(Fdt, InfoHeader, Arch):
         ["tianocore",   InfoHeader.Binary,        BuildTianoImageNode , InfoHeader.Description,     None, 0 ],
         ["uefi-fv",     InfoHeader.UefifvPath,    BuildFvImageNode,     "UEFI Firmware Volume",     None, 0 ],
         ["bds-fv",      InfoHeader.BdsfvPath,     BuildFvImageNode ,    "BDS Firmware Volume",      None, 0 ],
+        ["sec-fv",      InfoHeader.SecfvPath,     BuildFvImageNode ,    "Security Firmware Volume", None, 0 ],
         ["network-fv",  InfoHeader.NetworkfvPath, BuildFvImageNode ,    "Network Firmware Volume",  None, 0 ],
     ]
 
     #
     # Set basic information
     #
-    libfdt.fdt_setprop_u32(Fdt, 0, 'build-revision ', InfoHeader.Revision)
+    libfdt.fdt_setprop_u32(Fdt, 0, '#address-cells', 2)
+    libfdt.fdt_setprop_u32(Fdt, 0, 'build-revision', InfoHeader.Revision)
     libfdt.fdt_setprop_u32(Fdt, 0, 'spec-version', InfoHeader.UplVersion)
 
     #
@@ -241,7 +243,7 @@ def ReplaceFv (UplBinary, SectionFvFile, SectionName, Arch):
                     libfdt.fdt_setprop_u32(NewFitHeader, ImageNode, 'data-offset', ImageOffset + OffsetDelta)
 
         ConfNodes     = libfdt.fdt_subnode_offset(NewFitHeader, 0, 'configurations')
-        libfdt.fdt_setprop(NewFitHeader, ConfNodes, 'default ', bytes('conf-1', 'utf-8'), len('conf-1') + 1)
+        libfdt.fdt_setprop(NewFitHeader, ConfNodes, 'default', bytes('conf-1', 'utf-8'), len('conf-1') + 1)
         ConfNode      = libfdt.fdt_subnode_offset(NewFitHeader, ConfNodes, 'conf-1')
 
         libfdt.fdt_setprop_u32(NewFitHeader, 0, 'size', FitSize)
