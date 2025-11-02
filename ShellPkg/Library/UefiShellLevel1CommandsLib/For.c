@@ -568,7 +568,7 @@ ShellCommandRunFor (
                 }
 
                 if ((ArgSetWalker != NULL) && (*ArgSetWalker != CHAR_NULL)) {
-                  if ((ArgSetWalker == NULL) || (*ArgSetWalker == CHAR_NULL) || !ShellIsValidForNumber (ArgSetWalker)) {
+                  if (!ShellIsValidForNumber (ArgSetWalker)) {
                     ShellPrintHiiDefaultEx (
                       STRING_TOKEN (STR_GEN_PROBLEM_SCRIPT),
                       gShellLevel1HiiHandle,
