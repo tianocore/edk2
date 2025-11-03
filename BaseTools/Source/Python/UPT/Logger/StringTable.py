@@ -268,7 +268,7 @@ ERR_XML_INVALID_VARIABLENAME = \
       "Only a Hex Byte Array of UCS-2 format or L\"string\" is allowed): %s %s %s")
 ERR_XML_INVALID_LIB_SUPMODLIST = _("The LIBRARY_CLASS entry %s must have the list appended using the format as: \n"
 "BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER SMM_CORE DXE_SMM_DRIVER DXE_RUNTIME_DRIVER "
-"DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION USER_DEFINED\n Current is %s.")
+"UEFI_DRIVER UEFI_APPLICATION USER_DEFINED\n Current is %s.")
 ERR_XML_INVALID_EXTERN_SUPARCHLIST = \
     _("There is a mismatch of SupArchList %s between the EntryPoint, UnloadImage, Constructor, "
       "and Destructor elements in the ModuleSurfaceArea.ModuleProperties: SupArchList: %s. ")

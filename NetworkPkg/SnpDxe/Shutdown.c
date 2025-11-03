@@ -22,29 +22,34 @@ PxeShutdown (
   IN SNP_DRIVER  *Snp
   )
 {
-  Snp->Cdb.OpCode    = PXE_OPCODE_SHUTDOWN;
-  Snp->Cdb.OpFlags   = PXE_OPFLAGS_NOT_USED;
-  Snp->Cdb.CPBsize   = PXE_CPBSIZE_NOT_USED;
-  Snp->Cdb.DBsize    = PXE_DBSIZE_NOT_USED;
-  Snp->Cdb.CPBaddr   = PXE_CPBADDR_NOT_USED;
-  Snp->Cdb.DBaddr    = PXE_DBADDR_NOT_USED;
-  Snp->Cdb.StatCode  = PXE_STATCODE_INITIALIZE;
-  Snp->Cdb.StatFlags = PXE_STATFLAGS_INITIALIZE;
-  Snp->Cdb.IFnum     = Snp->IfNum;
-  Snp->Cdb.Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
+  if (Snp->Cdb == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Snp->Cdb is NULL\n", __func__));
+    return EFI_DEVICE_ERROR;
+  }
+
+  Snp->Cdb->OpCode    = PXE_OPCODE_SHUTDOWN;
+  Snp->Cdb->OpFlags   = PXE_OPFLAGS_NOT_USED;
+  Snp->Cdb->CPBsize   = PXE_CPBSIZE_NOT_USED;
+  Snp->Cdb->DBsize    = PXE_DBSIZE_NOT_USED;
+  Snp->Cdb->CPBaddr   = PXE_CPBADDR_NOT_USED;
+  Snp->Cdb->DBaddr    = PXE_DBADDR_NOT_USED;
+  Snp->Cdb->StatCode  = PXE_STATCODE_INITIALIZE;
+  Snp->Cdb->StatFlags = PXE_STATFLAGS_INITIALIZE;
+  Snp->Cdb->IFnum     = Snp->IfNum;
+  Snp->Cdb->Control   = PXE_CONTROL_LAST_CDB_IN_LIST;
 
   //
   // Issue UNDI command and check result.
   //
   DEBUG ((DEBUG_NET, "\nsnp->undi.shutdown()  "));
 
-  (*Snp->IssueUndi32Command)((UINT64)(UINTN)&Snp->Cdb);
+  (*Snp->IssueUndi32Command)((UINT64)(UINTN)Snp->Cdb);
 
-  if (Snp->Cdb.StatCode != PXE_STATCODE_SUCCESS) {
+  if (Snp->Cdb->StatCode != PXE_STATCODE_SUCCESS) {
     //
     // UNDI could not be shutdown. Return UNDI error.
     //
-    DEBUG ((DEBUG_WARN, "\nsnp->undi.shutdown()  %xh:%xh\n", Snp->Cdb.StatFlags, Snp->Cdb.StatCode));
+    DEBUG ((DEBUG_WARN, "\nsnp->undi.shutdown()  %xh:%xh\n", Snp->Cdb->StatFlags, Snp->Cdb->StatCode));
 
     return EFI_DEVICE_ERROR;
   }
