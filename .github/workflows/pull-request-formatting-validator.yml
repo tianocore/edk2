@@ -71,7 +71,7 @@ jobs:
 
       - name: Check for Validation Errors
         if: steps.validate.outputs.validation_error == 'true'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             core.setFailed('PR Formatting Validation Check Failed!')
