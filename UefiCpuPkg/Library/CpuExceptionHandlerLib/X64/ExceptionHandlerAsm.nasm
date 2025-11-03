@@ -57,7 +57,7 @@ ALIGN   8
 AsmIdtVectorBegin:
 %assign Vector 0
 %rep  256
-    push    strict dword %[Vector] ; This instruction pushes sign-extended 8-byte value on stack
+    push    strict qword %[Vector]
     push    rax
 %ifdef NO_ABSOLUTE_RELOCS_IN_TEXT
     mov     rax, strict qword 0    ; mov     rax, ASM_PFX(CommonInterruptEntry)
@@ -70,7 +70,7 @@ AsmIdtVectorBegin:
 AsmIdtVectorEnd:
 
 HookAfterStubHeaderBegin:
-    push    strict dword 0      ; 0 will be fixed
+    push    strict qword 0      ; 0 will be fixed
 VectorNum:
     push    rax
 %ifdef NO_ABSOLUTE_RELOCS_IN_TEXT
