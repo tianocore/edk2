@@ -281,7 +281,7 @@ SetUefiImageMemoryAttributes (
       ASSERT_EFI_ERROR (Status);
     }
 
-    if (((FinalAttributes & (EFI_MEMORY_ATTRIBUTE_MASK | EFI_CACHE_ATTRIBUTE_MASK)) == 0) && (gCpu != NULL)) {
+    if (((FinalAttributes & (EFI_MEMORY_ACCESS_MASK | EFI_CACHE_ATTRIBUTE_MASK)) == 0) && (gCpu != NULL)) {
       // if the passed hardware attributes are 0, CoreSetMemorySpaceAttributes() will not call into the CPU Arch protocol
       // to set the attributes, so we need to do it manually here. This can be the case when we are unprotecting an
       // image if no caching attributes are set. If gCpu has not been populated yet, we'll still have updated the GCD

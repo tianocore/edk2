@@ -137,7 +137,7 @@
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.inf
   FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
 
-[LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.DXE_SAL_DRIVER,]
+[LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_RUNTIME_DRIVER,]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   DebugLib|MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
   HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCryptoRouterDxe.inf
@@ -434,7 +434,8 @@
   SecurityPkg/Library/PeilessSecMeasureLib/PeilessSecMeasureLib.inf
 
 [BuildOptions]
-   MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:256
-   MSFT:*_*_IA32_DLINK_XIPFLAGS = /ALIGN:256
+  MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:256
+  MSFT:*_*_IA32_DLINK_XIPFLAGS = /ALIGN:256
+  CLANGPDB: *_*_IA32_DLINK_FLAGS = /ALIGN:256
   INTEL:*_*_IA32_DLINK_FLAGS = /ALIGN:256
         *_*_*_CC_FLAGS       = -D DISABLE_NEW_DEPRECATED_INTERFACES

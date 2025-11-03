@@ -1,0 +1,47 @@
+## @file
+#  Standalone MM CPU specific programming.
+#
+#  Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation.<BR>
+#  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AmdStandaloneMmCpuFeaturesLib
+  MODULE_UNI_FILE                = SmmCpuFeaturesLib.uni
+  FILE_GUID                      = 1CDE089F-6038-4C8A-96DF-6B6AE602FC84
+  MODULE_TYPE                    = MM_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = SmmCpuFeaturesLib
+  CONSTRUCTOR                    = StandaloneMmCpuFeaturesLibConstructor
+
+[Sources]
+  SmmCpuFeaturesLibCommon.c
+  StandaloneMmCpuFeaturesLib.c
+  AmdSmmCpuFeaturesLib.c
+  CpuFeaturesLib.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  PcdLib
+  HobLib
+  MmSaveStateLib
+
+[Guids]
+  gSmmBaseHobGuid                ## CONSUMES
+
+[FixedPcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber   ## SOMETIMES_CONSUMES
+
+[FeaturePcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdSmrrEnable                     ## CONSUMES
