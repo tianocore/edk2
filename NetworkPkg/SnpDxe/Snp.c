@@ -324,6 +324,8 @@ SimpleNetworkDriverStart (
 
   DEBUG ((DEBUG_NET, "\nSnpNotifyNetworkInterfaceIdentifier()  "));
 
+  Snp = NULL;
+
   Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiDevicePathProtocolGuid,
