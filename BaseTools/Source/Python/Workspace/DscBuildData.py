@@ -1588,7 +1588,7 @@ class DscBuildData(PlatformBuildClassObject):
         S_pcd_set = DscBuildData.OverrideByFdf(S_pcd_set,self.WorkspaceDir)
         S_pcd_set = DscBuildData.OverrideByComm(S_pcd_set)
 
-        # Create a tool to caculate structure pcd value
+        # Create a tool to calculate structure pcd value
         Str_Pcd_Values = self.GenerateByteArrayValue(S_pcd_set)
 
         if Str_Pcd_Values:
