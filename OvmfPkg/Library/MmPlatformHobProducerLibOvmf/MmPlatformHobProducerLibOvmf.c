@@ -103,14 +103,14 @@ CreateMmPlatformHob (
                           EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
                           EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
                           EFI_RESOURCE_ATTRIBUTE_TESTED;
-  Hob.PhysicalStart  = PcdGet32 (PcdOvmfFlashNvStorageVariableBase);
+  Hob.PhysicalStart  = PcdGet32 (PcdCpuLocalApicBaseAddress);
   Hob.ResourceLength = SIZE_1MB;
   ZeroMem (&(Hob.Owner), sizeof (EFI_GUID));
   CopyMem ((UINT8 *)Buffer + Size, &Hob, sizeof (EFI_HOB_RESOURCE_DESCRIPTOR));
   Size += sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
   NumberOfHobResourceDescriptor++;
 
-  // Variable Storage
+  // flash device
   Hob.Header.HobType    = EFI_HOB_TYPE_RESOURCE_DESCRIPTOR;
   Hob.Header.HobLength  = (UINT16)sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
   Hob.ResourceType      = EFI_RESOURCE_MEMORY_MAPPED_IO;
@@ -118,8 +118,8 @@ CreateMmPlatformHob (
                           EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
                           EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
                           EFI_RESOURCE_ATTRIBUTE_TESTED;
-  Hob.PhysicalStart  = PcdGet32 (PcdCpuLocalApicBaseAddress);
-  Hob.ResourceLength = PcdGet32 (PcdFlashNvStorageVariableSize);
+  Hob.PhysicalStart  = PcdGet32 (PcdOvmfFdBaseAddress);
+  Hob.ResourceLength = PcdGet32 (PcdOvmfFirmwareFdSize);
   ZeroMem (&(Hob.Owner), sizeof (EFI_GUID));
   CopyMem ((UINT8 *)Buffer + Size, &Hob, sizeof (EFI_HOB_RESOURCE_DESCRIPTOR));
   Size += sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
