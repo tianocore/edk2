@@ -419,7 +419,7 @@ DxePcdGet64 (
 
   @param[in]  TokenNumber The PCD token number.
 
-  @return The pointer to the buffer to be retrived.
+  @return The pointer to the buffer to be retrieved.
 
 **/
 VOID *
@@ -623,7 +623,7 @@ DxePcdGet64Ex (
   @param[in]  Guid The token space for the token number.
   @param[in]  ExTokenNumber The PCD token number.
 
-  @return The pointer to the buffer to be retrived.
+  @return The pointer to the buffer to be retrieved.
 
 **/
 VOID *

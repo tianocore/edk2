@@ -133,7 +133,7 @@ Register (
   CallbackEntry->Tpl                = Tpl;
 
   //
-  // If TPL of registered callback funtion is not TPL_HIGH_LEVEL, then event should be created
+  // If TPL of registered callback function is not TPL_HIGH_LEVEL, then event should be created
   // for it, and related buffer for status code data should be prepared.
   // Here the data buffer must be prepared in advance, because Report Status Code Protocol might
   // be invoked under TPL_HIGH_LEVEL and no memory allocation is allowed then.
