@@ -1850,7 +1850,7 @@ class ModuleAutoGen(AutoGen):
         if lines:
             DependencyFileSet.update(lines)
 
-        # Caculate all above dependency files hash
+        # Calculate all above dependency files hash
         # Initialze hash object
         FileList = []
         m = hashlib.md5()
@@ -1905,7 +1905,7 @@ class ModuleAutoGen(AutoGen):
             DependencyFileSet.update(rt)
 
 
-        # Caculate all above dependency files hash
+        # Calculate all above dependency files hash
         # Initialze hash object
         FileList = []
         m = hashlib.md5()
