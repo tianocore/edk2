@@ -1705,6 +1705,21 @@
   # @Prompt Enable Capsule with EmbeddedDriver support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleEmbeddedDriverSupport|FALSE|BOOLEAN|0x00010021
 
+  ## Indicates whether the platform supports only SingleStage capsule updates where all
+  #  capsule images are processed before EFI_END_OF_DXE_EVENT.
+  #  This PCD indicates if SingleStage Capsule Update is supported .<BR>
+  #   TRUE  - Single Stage Only capsule update support.<BR>
+  #   FALSE - Multi Stage capsule update support.
+  #   a) If PcdSingleStageOnlyCapsuleUpdate = TRUE, BDS phase invokes ProcessCapsules() only once
+  #      before EFI_END_OF_DXE_EVENT. As system flash is locked at EFI_END_OF_DXE_EVENT,
+  #      system capsules are processed in this call. If a device capsule FMP protocol is installed
+  #      and its EmbeddedDriverCount is zero, the device capsule will also be processed during this call.
+  #   b) If PcdSingleStageOnlyCapsuleUpdate = FALSE, BDS phase invokes ProcessCapsules() a second
+  #      time after EFI_END_OF_DXE_EVENT and completion of ConnectAll(). All device capsule FMP protocols
+  #      are exposed. Capsules processed during the first call are skipped in the second.
+  # @Prompt Enable Capsule with only SingleStage support.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSingleStageOnlyCapsuleUpdate|FALSE|BOOLEAN|0x00010024
+
   ## Maximum permitted encapsulation levels of sections in a firmware volume,
   #  in the DXE phase. Minimum value is 1. Sections nested more deeply are
   #  rejected.

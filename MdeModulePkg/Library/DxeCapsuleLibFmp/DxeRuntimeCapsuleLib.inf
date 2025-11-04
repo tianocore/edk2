@@ -73,6 +73,7 @@
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleEmbeddedDriverSupport             ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSingleStageOnlyCapsuleUpdate             ## CONSUMES
 
 [Depex]
   gEfiVariableWriteArchProtocolGuid

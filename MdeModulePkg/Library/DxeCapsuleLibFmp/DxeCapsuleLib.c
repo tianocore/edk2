@@ -1315,11 +1315,17 @@ ProcessFmpCapsuleImage (
         (HandleBuffer == NULL) ||
         (ResetRequiredBuffer == NULL))
     {
-      NotReady = TRUE;
+      if (!PcdGetBool (PcdSingleStageOnlyCapsuleUpdate)) {
+        NotReady = TRUE;
+        Status   = EFI_NOT_READY;
+      }
+
+      DEBUG ((DEBUG_ERROR, "ProcessFmpCapsuleImage: GetFmpHandleBufferByType Failed %r for UpdateImageTypeId %g \n", Status, &ImageHeader->UpdateImageTypeId));
+
       RecordFmpCapsuleStatus (
         NULL,
         CapsuleHeader,
-        EFI_NOT_READY,
+        Status,
         Index - FmpCapsuleHeader->EmbeddedDriverCount,
         ImageHeader,
         CapFileName
