@@ -2863,7 +2863,7 @@ ParseIfrData (
           }
         } else {
           //
-          // When flag is not set, default value is FASLE.
+          // When flag is not set, default value is FALSE.
           //
           DefaultData.Type = DefaultValueFromDefault;
           if (QuestionReferBitField) {
