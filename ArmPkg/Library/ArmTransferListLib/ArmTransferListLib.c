@@ -16,6 +16,45 @@
 #include <Library/HobLib.h>
 
 /**
+  Returns the xor of all elements in a buffer in unit of UINT8.
+  During calculation, the carry bits are dropped.
+
+  This function calculates the xor value of all elements in a buffer
+  in unit of UINT8 start from Zero.
+  The result is returned as UINT8. If Length is Zero, then Zero is
+  returned.
+
+  If Buffer is NULL, then ASSERT().
+  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
+
+  @param[in]  Buffer      The pointer to the buffer to carry out the xor operation.
+  @param[in]  Length      The size, in bytes, of Buffer.
+
+  @return CheckSum    The xor of Buffer calculated from Zero.
+
+**/
+STATIC
+UINT8
+EFIAPI
+CalculateXor8 (
+  IN      CONST UINT8  *Buffer,
+  IN      UINTN        Length
+  )
+{
+  UINT8  CheckSum;
+  UINTN  Count;
+
+  ASSERT (Buffer != NULL);
+  ASSERT (Length <= (MAX_ADDRESS - ((UINTN)Buffer) + 1));
+
+  for (CheckSum = 0, Count = 0; Count < Length; Count++) {
+    CheckSum ^= *(Buffer + Count);
+  }
+
+  return CheckSum;
+}
+
+/**
   Get the TransferList from HOB list.
 
   @param[out] TransferList  TransferList
@@ -76,7 +115,7 @@ TransferListVerifyChecksum (
     return TRUE;
   }
 
-  return (CalculateSum8 ((UINT8 *)TransferListHeader, TransferListHeader->UsedSize) == 0);
+  return (CalculateXor8 ((UINT8 *)TransferListHeader, TransferListHeader->UsedSize) == 0);
 }
 
 /**
