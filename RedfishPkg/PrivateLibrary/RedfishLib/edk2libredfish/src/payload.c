@@ -220,7 +220,7 @@ getPayloadByIndex (
 
     if (*StatusCode != NULL) {
       //
-      // The Payload (members) are retrived from server.
+      // The Payload (members) are retrieved from server.
       //
       FreePool (*StatusCode);
       *StatusCode    = NULL;
@@ -231,7 +231,7 @@ getPayloadByIndex (
     if ((*StatusCode == NULL) && (ret != NULL) && FromServerFlag) {
       //
       // In such a case, the Redfish resource is parsed from the input payload (members) directly.
-      // Since the members are retrived from server, we still return HTTP_STATUS_200_OK.
+      // Since the members are retrieved from server, we still return HTTP_STATUS_200_OK.
       //
       *StatusCode = AllocateZeroPool (sizeof (EFI_HTTP_STATUS_CODE));
       if (*StatusCode == NULL) {
@@ -339,7 +339,7 @@ getPayloadForPath (
     if ((*StatusCode == NULL) && (tmp != NULL) && FromServerFlag) {
       //
       // In such a case, the Redfish resource is parsed from the input payload (ret) directly.
-      // Since the ret are retrived from server, we still return HTTP_STATUS_200_OK.
+      // Since the ret are retrieved from server, we still return HTTP_STATUS_200_OK.
       //
       *StatusCode = AllocateZeroPool (sizeof (EFI_HTTP_STATUS_CODE));
       if (*StatusCode == NULL) {
