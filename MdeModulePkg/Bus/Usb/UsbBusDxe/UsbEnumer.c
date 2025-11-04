@@ -1081,6 +1081,7 @@ UsbRootHubEnumeration (
   USB_INTERFACE  *RootHub;
   UINT8          Index;
   USB_DEVICE     *Child;
+  EFI_STATUS     Status;
 
   RootHub = (USB_INTERFACE *)Context;
 
@@ -1091,6 +1092,10 @@ UsbRootHubEnumeration (
       UsbRemoveDevice (Child);
     }
 
-    UsbEnumeratePort (RootHub, Index);
+    Status = UsbEnumeratePort (RootHub, Index);
+
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "UsbRootHubEnumeration: failed to enumerate port - %r\n", Status));
+    }
   }
 }
