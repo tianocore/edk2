@@ -130,6 +130,7 @@
   X86SpeculationBarrier.c
   X86UnitTestHost.c
   IntelTdxNull.c
+  AmdSevNull.c
 
 [Sources.X64]
   X64/LongJump.nasm
@@ -170,6 +171,7 @@
   X64/RdRand.nasm
   X86UnitTestHost.c
   IntelTdxNull.c
+  AmdSevNull.c
 
 [Sources.EBC]
   Ebc/CpuBreakpoint.c

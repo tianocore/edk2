@@ -184,8 +184,7 @@ PeCoffLoaderCheckImageType (
 
   if (ImageContext->ImageType != EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION && \
       ImageContext->ImageType != EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER && \
-      ImageContext->ImageType != EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER && \
-      ImageContext->ImageType != EFI_IMAGE_SUBSYSTEM_SAL_RUNTIME_DRIVER) {
+      ImageContext->ImageType != EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER) {
     //
     // unsupported PeImage subsystem type
     //

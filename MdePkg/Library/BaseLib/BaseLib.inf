@@ -213,6 +213,7 @@
   X86PatchInstruction.c
   X86SpeculationBarrier.c
   IntelTdxNull.c
+  X64/SevProbe.c
 
 [Sources.X64]
   X64/Thunk16.nasm
@@ -299,6 +300,7 @@
   X64/TdCall.nasm
   X64/TdVmcall.nasm
   X64/TdProbe.c
+  X64/SevProbe.c
 
   X64/Non-existing.c
   Math64.c
@@ -340,6 +342,7 @@
   Unaligned.c
   Math64.c
   IntelTdxNull.c
+  AmdSevNull.c
 
 [Sources.AARCH64]
   AArch64/InternalSwitchStack.c
@@ -368,6 +371,7 @@
   AArch64/ArmReadCntPctReg.asm      | MSFT
   AArch64/ArmReadIdAA64Isar0Reg.asm     | MSFT
   IntelTdxNull.c
+  AmdSevNull.c
 
 [Sources.RISCV64]
   Math64.c
@@ -390,6 +394,7 @@
   RiscV64/RiscVMmu.S                | GCC
   RiscV64/SpeculationBarrier.S      | GCC
   IntelTdxNull.c
+  AmdSevNull.c
 
 [Sources.LOONGARCH64]
   Math64.c
@@ -411,6 +416,7 @@
   LoongArch64/Cpucfg.S              | GCC
   LoongArch64/ReadStableCounter.S   | GCC
   IntelTdxNull.c
+  AmdSevNull.c
 
 [Packages]
   MdePkg/MdePkg.dec
