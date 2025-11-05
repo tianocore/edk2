@@ -1,0 +1,62 @@
+##  @file
+# Provides Shell 'http' dynamic command.
+#
+# Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved. <BR>
+# Copyright (c) 2015, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2020, Broadcom. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = httpDynamicCommand
+  FILE_GUID                      = 19618BCE-55AE-09C6-37E9-4CE04084C7A1
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = HttpCommandInitialize
+  UNLOAD_IMAGE                   = HttpUnload
+#
+#  This flag specifies whether HII resource section is generated into PE image.
+#
+  UEFI_HII_RESOURCE_SECTION      = TRUE
+
+[Sources.common]
+  Http.c
+  HttpDynamicCommand.c
+  Http.h
+  Http.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  FileHandleLib
+  HiiLib
+  HttpLib
+  MemoryAllocationLib
+  NetLib
+  ShellLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiHiiServicesLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gEfiHiiPackageListProtocolGuid                 ## CONSUMES
+  gEfiHttpProtocolGuid                         ## CONSUMES
+  gEfiHttpServiceBindingProtocolGuid           ## CONSUMES
+  gEfiManagedNetworkServiceBindingProtocolGuid   ## CONSUMES
+  gEfiShellDynamicCommandProtocolGuid            ## PRODUCES
+
+[DEPEX]
+  TRUE

@@ -1,0 +1,83 @@
+// /** @file
+// Firmware Management Protocol Device Package
+//
+// This package provides an implementation of a Firmware Management Protocol
+// instance that supports the update of firmware storage devices using UEFI
+// Capsules.  The behavior of the Firmware Management Protocol instance is
+// customized using libraries and PCDs.
+//
+// Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_PACKAGE_ABSTRACT     #language en-US  "Firmware Management Protocol Software Development Kit"
+
+#string STR_PACKAGE_DESCRIPTION  #language en-US  "This package provides libraries that support the implementation of a module that produces the Firmware Management Protocol to support the update of a system firmware component."
+
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceStorageAccessEnable_PROMPT  #language en-US "Firmware Device Storage Access Enabled."
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceStorageAccessEnable_HELP    #language en-US "Indicates if the Firmware Management Protocol supports access to"
+                                                                                                "to a firmware storage device.  If set to FALSE, then only GetImageInfo()"
+                                                                                                "is supported.  This is used by FMP drivers that require the smallest"
+                                                                                                "possible Firmware Management Protocol implementation that supports"
+                                                                                                "advertising the updatable firmware device in the ESRT.<BR>"
+                                                                                                "  TRUE  - All Firmware Management Protocol services supported.<BR>"
+                                                                                                "  FALSE - Firmware Management Protocol returns EFI_UNSUPPORTED for"
+                                                                                                "          all services except GetImageInfo().<BR>"
+
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceTestKeySha256Digest_PROMPT  #language en-US "SHA-256 hash of PKCS7 test key."
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceTestKeySha256Digest_HELP    #language en-US "The SHA-256 hash of a PKCS7 test key that is used to detect if a test key"
+                                                                                                "is being used to authenticate capsules.  Test key detection can be disabled"
+                                                                                                "by setting the value to {0}"
+
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceProgressColor_PROMPT  #language en-US "Firmware Device Progress Bar Color."
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceProgressColor_HELP    #language en-US "The color of the progress bar during a firmware update.  Each firmware"
+                                                                                          "device can set its own color.  The default color is white.<BR><BR>\n"
+                                                                                          "Bits  7..0  - Red<BR>\n"
+                                                                                          "Bits 15..8  - Green<BR>\n"
+                                                                                          "Bits 23..16 - Blue<BR>\n"
+
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceImageIdName_PROMPT  #language en-US "Firmware Device ImageIdName string."
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceImageIdName_HELP    #language en-US "The Null-terminated Unicode string used to fill in the ImageIdName field of"
+                                                                                        "the EFI_FIRMWARE_IMAGE_DESCRIPTOR structure that is returned by the"
+                                                                                        "GetImageInfo() service of the Firmware Management Protocol for the firmware"
+                                                                                        "device.  An ImageIdName string must be provided for each firmware device."
+                                                                                        "The default value is an empty string."
+
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceBuildTimeLowestSupportedVersion_PROMPT  #language en-US "Build Time Firmware Device Lowest Support Version."
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceBuildTimeLowestSupportedVersion_HELP    #language en-US "The build time value used to fill in the LowestSupportedVersion field of"
+                                                                                                            "the EFI_FIRMWARE_IMAGE_DESCRIPTOR structure that is returned by the"
+                                                                                                            "GetImageInfo() service of the Firmware Management Protocol.  This value is"
+                                                                                                            "only used if the firmware device does not provide a method to report the"
+                                                                                                            "lowest supported version value from the current firmware image and the"
+                                                                                                            "UEFI variable used to provide the lowest supported version value does not"
+                                                                                                            "exist.  The default value is 0."
+
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceProgressWatchdogTimeInSeconds_PROMPT  #language en-US "Firmware Device Watchdog Time in Seconds."
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceProgressWatchdogTimeInSeconds_HELP    #language en-US "Indicates the time in seconds to arm a watchdog timer during the update of"
+                                                                                                          "a firmware device.  The watchdog is re-armed each time the FmpDeviceLib"
+                                                                                                          "calls the Progress() function passed into FmpDeviceSetImage() function."
+                                                                                                          "The FmpDeviceLib calls Progress() to update the percent completion of a"
+                                                                                                          "firmware update.  If the watchdog timer expires, the system reboots.  A"
+                                                                                                          "value of 0 disables the watchdog timer.  The default value is 0 (watchdog"
+                                                                                                          "disabled)."
+
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceImageTypeIdGuid_PROMPT  #language en-US "Firmware Device Image Type ID."
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceImageTypeIdGuid_HELP    #language en-US "The Image Type ID to use if one is not provided by FmpDeviceLib. If this"
+                                                                                            "PCD is not a valid GUID value, then gEfiCallerIdGuid is used."
+
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDevicePkcs7CertBufferXdr_PROMPT  #language en-US "One or more XDR encoded PKCS7 certificates used to verify firmware device capsule update images"
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDevicePkcs7CertBufferXdr_HELP    #language en-US "Provides one or more PKCS7 certificates used to verify a firmware device"
+                                                                                               "capsule update image.  This PCD is encoded using the Variable-Length Opaque"
+                                                                                               "Data format of RFC 4506 External Data Representation Standard (XDR)."
+                                                                                               "The default value is empty with 0 certificates."
+
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceLockEventGuid_PROMPT  #language en-US "Firmware Device Lock Event GUID."
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceLockEventGuid_HELP    #language en-US "An event GUID that locks the firmware device when the event is signaled."
+                                                                                          "If this PCD is not a valid GUID value, then the firmware device is locked"
+                                                                                          "when gEfiEndOfDxeEventGroupGuid (End of DXE Phase) is signaled.  The"
+                                                                                          "default value is empty, so by default the firmware device is locked at the"
+                                                                                          "end of the DXE phase."
+
+

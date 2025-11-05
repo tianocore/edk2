@@ -1,0 +1,75 @@
+## @file
+#    Lite Fat driver only used in Pei Phase.
+#
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FatPei
+  MODULE_UNI_FILE                = FatPei.uni
+  FILE_GUID                      = 5B60CCFD-1011-4BCF-B7D1-BB99CA96A603
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = FatPeimEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  Mbr.c
+  Gpt.c
+  Eltorito.c
+  Part.c
+  FatLiteApi.c
+  FatLiteLib.c
+  FatLiteAccess.c
+  FatLiteApi.h
+  FatLitePeim.h
+  FatLiteFmt.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  PcdLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PeimEntryPoint
+  BaseLib
+  DebugLib
+  PeiServicesTablePointerLib
+  PeiServicesLib
+
+
+[Guids]
+  gRecoveryOnFatUsbDiskGuid                   ## SOMETIMES_CONSUMES   ## UNDEFINED
+  gRecoveryOnFatIdeDiskGuid                   ## SOMETIMES_CONSUMES   ## UNDEFINED
+  gRecoveryOnFatFloppyDiskGuid                ## SOMETIMES_CONSUMES   ## UNDEFINED
+  gRecoveryOnFatNvmeDiskGuid                  ## SOMETIMES_CONSUMES   ## UNDEFINED
+  gEfiPartTypeUnusedGuid                      ## SOMETIMES_CONSUMES   ## UNDEFINED
+
+
+[Ppis]
+  gEfiPeiVirtualBlockIoPpiGuid                  ## SOMETIMES_CONSUMES PPI_NOTIFY
+  gEfiPeiVirtualBlockIo2PpiGuid                 ## SOMETIMES_CONSUMES PPI_NOTIFY
+  gEfiPeiDeviceRecoveryModulePpiGuid            ## SOMETIMES_PRODUCES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryFileName         ## CONSUMES
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  FatPeiExtra.uni

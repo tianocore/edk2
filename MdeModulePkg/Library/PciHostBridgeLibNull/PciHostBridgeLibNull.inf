@@ -1,0 +1,32 @@
+## @file
+#  Null instance of PCI Host Bridge Library with empty functions.
+#
+#  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PciHostBridgeLibNull
+  MODULE_UNI_FILE                = PciHostBridgeLibNull.uni
+  FILE_GUID                      = A19A6C36-7053-4E2C-8BD0-E8286230E473
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciHostBridgeLib
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  PciHostBridgeLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec

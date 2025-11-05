@@ -1,0 +1,16 @@
+// /** @file
+// Instance of Resource Publication Library using PEI Services.
+//
+// Resource Publication Library that uses PEI Services to publish system memory.
+//
+// Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Instance of Resource Publication Library using PEI Services"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This Resource Publication Library uses PEI Services to publish system memory."
+

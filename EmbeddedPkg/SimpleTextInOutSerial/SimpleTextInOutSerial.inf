@@ -1,0 +1,56 @@
+#/** @file
+#
+#    Component description file for Bds module
+#
+#  Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SimpleTextInOutSerial
+  FILE_GUID                      = 6696936D-3637-467C-87CB-14EA8248948C
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = SimpleTextInOutEntryPoint
+
+
+[Sources.common]
+  SimpleTextInOut.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  ReportStatusCodeLib
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  UefiDriverEntryPoint
+  SerialPortLib
+
+[Guids]
+
+
+[Protocols]
+  gEfiSimpleTextInProtocolGuid
+  gEfiSimpleTextOutProtocolGuid
+  gEfiSerialIoProtocolGuid
+  gEfiDevicePathProtocolGuid
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
+
+
+[depex]
+  TRUE

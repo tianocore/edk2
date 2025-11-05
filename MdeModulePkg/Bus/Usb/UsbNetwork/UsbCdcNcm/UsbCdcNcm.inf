@@ -1,0 +1,42 @@
+## @file
+#   This is Usb Cdc Ncm driver for DXE phase.
+#
+# Copyright (c) 2023, American Megatrends International LLC. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UsbCdcNcm
+  FILE_GUID                      = 52230d31-6c11-4442-b262-bec6bfe84efa
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UsbNcmEntry
+
+[Sources]
+  UsbCdcNcm.c
+  UsbCdcNcm.h
+  UsbNcmFunction.c
+  ComponentName.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+  DebugLib
+  UefiUsbLib
+  MemoryAllocationLib
+  BaseMemoryLib
+
+[Protocols]
+  gEfiUsbIoProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEfiDriverBindingProtocolGuid
+  gEdkIIUsbEthProtocolGuid
+
+[Depex]
+  TRUE

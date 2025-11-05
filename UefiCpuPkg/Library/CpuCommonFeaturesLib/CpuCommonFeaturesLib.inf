@@ -1,0 +1,66 @@
+## @file
+#  NULL instance to register CPU features.
+#
+#  This library registers CPU features defined in Intel(R) 64 and IA-32
+#  Architectures Software Developer's Manual.
+#
+# Copyright (c) 2017 - 2023, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CpuCommonFeaturesLib
+  MODULE_UNI_FILE                = CpuCommonFeaturesLib.uni
+  FILE_GUID                      = 6D69F79F-9535-4893-9DD7-93929898252C
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+
+  CONSTRUCTOR                    = CpuCommonFeaturesLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  CpuCommonFeaturesLib.c
+  CpuCommonFeatures.h
+  Aesni.c
+  C1e.c
+  ClockModulation.c
+  Eist.c
+  FastStrings.c
+  FeatureControl.c
+  LimitCpuIdMaxval.c
+  MachineCheck.c
+  MonitorMwait.c
+  PendingBreak.c
+  X2Apic.c
+  Ppin.c
+  ProcTrace.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  DebugLib
+  RegisterCpuFeaturesLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  LocalApicLib
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuClockModulationDutyCycle       ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdIsPowerOnReset                    ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceOutputScheme          ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceMemSize               ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceBspOnly               ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTracePerformanceCollecting ## SOMETIMES_CONSUMES

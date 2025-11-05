@@ -1,0 +1,30 @@
+## @file
+# Plug an EFI_PCI_IO_PROTOCOL backend into PciCapLib, for config space access.
+#
+# Copyright (C) 2018, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 1.27
+  BASE_NAME      = UefiPciCapPciIoLib
+  FILE_GUID      = 4102F4FE-DA10-4F0F-AC18-4982ED506154
+  MODULE_TYPE    = UEFI_DRIVER
+  VERSION_STRING = 1.0
+  LIBRARY_CLASS  = PciCapPciIoLib
+
+[Sources]
+  UefiPciCapPciIoLib.h
+  UefiPciCapPciIoLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  MemoryAllocationLib
+
+[Protocols]
+  gEfiPciIoProtocolGuid ## CONSUMES

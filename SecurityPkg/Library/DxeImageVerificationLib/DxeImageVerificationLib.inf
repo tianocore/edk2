@@ -1,0 +1,95 @@
+## @file
+#  Provides security service of image verification
+#
+#  This library hooks LoadImage() API to verify every image by the verification policy.
+#
+#  Caution: This module requires additional review when modified.
+#  This library will have external input - PE/COFF image.
+#  This external input must be validated carefully to avoid security issues such as
+#  buffer overflow or integer overflow.
+#
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeImageVerificationLib
+  MODULE_UNI_FILE                = DxeImageVerificationLib.uni
+  FILE_GUID                      = 0CA970E1-43FA-4402-BC0A-81AF336BFFD6
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = DxeImageVerificationLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DxeImageVerificationLib.c
+  DxeImageVerificationLib.h
+  Measurement.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  CryptoPkg/CryptoPkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  BaseCryptLib
+  SecurityManagementLib
+  PeCoffLib
+  TpmMeasurementLib
+
+[Protocols]
+  gEfiFirmwareVolume2ProtocolGuid       ## SOMETIMES_CONSUMES
+  gEfiBlockIoProtocolGuid               ## SOMETIMES_CONSUMES
+  gEfiSimpleFileSystemProtocolGuid      ## SOMETIMES_CONSUMES
+
+[Guids]
+  ## SOMETIMES_CONSUMES   ## Variable:L"DB"
+  ## SOMETIMES_CONSUMES   ## Variable:L"DBX"
+  ## SOMETIMES_CONSUMES   ## Variable:L"DBT"
+  ## PRODUCES             ## SystemTable
+  ## CONSUMES             ## SystemTable
+  gEfiImageSecurityDatabaseGuid
+
+  ## SOMETIMES_CONSUMES   ## GUID       # Unique ID for the type of the signature.
+  ## SOMETIMES_PRODUCES   ## GUID       # Unique ID for the type of the signature.
+  gEfiCertSha1Guid
+
+  ## SOMETIMES_CONSUMES   ## GUID       # Unique ID for the type of the signature.
+  ## SOMETIMES_PRODUCES   ## GUID       # Unique ID for the type of the signature.
+  gEfiCertSha256Guid
+
+  ## SOMETIMES_CONSUMES   ## GUID       # Unique ID for the type of the signature.
+  ## SOMETIMES_PRODUCES   ## GUID       # Unique ID for the type of the signature.
+  gEfiCertSha384Guid
+
+  ## SOMETIMES_CONSUMES   ## GUID       # Unique ID for the type of the signature.
+  ## SOMETIMES_PRODUCES   ## GUID       # Unique ID for the type of the signature.
+  gEfiCertSha512Guid
+
+  gEfiCertX509Guid                      ## SOMETIMES_CONSUMES    ## GUID     # Unique ID for the type of the signature.
+  gEfiCertX509Sha256Guid                ## SOMETIMES_CONSUMES    ## GUID     # Unique ID for the type of the signature.
+  gEfiCertX509Sha384Guid                ## SOMETIMES_CONSUMES    ## GUID     # Unique ID for the type of the signature.
+  gEfiCertX509Sha512Guid                ## SOMETIMES_CONSUMES    ## GUID     # Unique ID for the type of the signature.
+  gEfiCertPkcs7Guid                     ## SOMETIMES_CONSUMES    ## GUID     # Unique ID for the type of the certificate.
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy          ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdRemovableMediaImageVerificationPolicy     ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdFixedMediaImageVerificationPolicy         ## SOMETIMES_CONSUMES

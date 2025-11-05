@@ -1,0 +1,123 @@
+## @file
+#  Runtime DXE part corresponding to SMM authenticated variable module.
+#
+#  This module installs variable arch protocol and variable write arch protocol to provide
+#  variable service. This module need work together with SMM authenticated variable module.
+#
+#  Caution: This module requires additional review when modified.
+#  This driver will have external input - variable data.
+#  This external input must be validated carefully to avoid security issues such as
+#  buffer overflow or integer overflow.
+#    The whole SMM authentication variable design relies on the integrity of flash part and SMM.
+#  which is assumed to be protected by platform.  All variable code and metadata in flash/SMM Memory
+#  may not be modified without authorization. If platform fails to protect these resources,
+#  the authentication service provided in this driver will be broken, and the behavior is undefined.
+#
+# Copyright (c) 2010 - 2024, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VariableSmmRuntimeDxe
+  MODULE_UNI_FILE                = VariableSmmRuntimeDxe.uni
+  FILE_GUID                      = 9F7DCADE-11EA-448a-A46F-76E003657DD1
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = VariableSmmRuntimeInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+#  VIRTUAL_ADDRESS_MAP_CALLBACK  =  VariableAddressChangeEvent
+#
+
+[Sources]
+  VariableSmmRuntimeDxe.c
+  PrivilegePolymorphic.h
+  Measurement.c
+  VariableParsing.c
+  VariableParsing.h
+  Variable.h
+  VariablePolicySmmDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  UefiBootServicesTableLib
+  DebugLib
+  UefiRuntimeLib
+  DxeServicesTableLib
+  UefiDriverEntryPoint
+  TpmMeasurementLib
+  SafeIntLib
+  PcdLib
+  HobLib
+
+[Protocols]
+  gEfiVariableWriteArchProtocolGuid             ## PRODUCES
+  gEfiVariableArchProtocolGuid                  ## PRODUCES
+  gEfiMmCommunication2ProtocolGuid              ## CONSUMES
+  gEfiMmCommunication3ProtocolGuid              ## CONSUMES
+  ## CONSUMES
+  ## NOTIFY
+  ## UNDEFINED # Used to do smm communication
+  gEfiSmmVariableProtocolGuid
+  gEdkiiVariableLockProtocolGuid                ## PRODUCES
+  gEdkiiVarCheckProtocolGuid                    ## PRODUCES
+  gEdkiiVariablePolicyProtocolGuid              ## PRODUCES
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics            ## CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAllowVariablePolicyEnforcementDisable     ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTcgPfpMeasurementRevision                 ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableSpdmDeviceAuthentication             ## PRODUCES AND CONSUMES
+
+[Guids]
+  ## PRODUCES             ## GUID # Signature of Variable store header
+  ## CONSUMES             ## GUID # Signature of Variable store header
+  ## SOMETIMES_PRODUCES   ## SystemTable
+  gEfiAuthenticatedVariableGuid
+
+  ## PRODUCES             ## GUID # Signature of Variable store header
+  ## CONSUMES             ## GUID # Signature of Variable store header
+  ## SOMETIMES_PRODUCES   ## SystemTable
+  gEfiVariableGuid
+
+  gEfiEventVirtualAddressChangeGuid             ## CONSUMES ## Event
+  gEfiEventExitBootServicesGuid                 ## CONSUMES ## Event
+  ## CONSUMES ## GUID # Locate protocol
+  ## CONSUMES ## GUID # Protocol notify
+  gSmmVariableWriteGuid
+
+  ## SOMETIMES_CONSUMES   ## Variable:L"PK"
+  ## SOMETIMES_CONSUMES   ## Variable:L"KEK"
+  ## SOMETIMES_CONSUMES   ## Variable:L"SecureBoot"
+  gEfiGlobalVariableGuid
+
+  ## SOMETIMES_CONSUMES   ## Variable:L"db"
+  ## SOMETIMES_CONSUMES   ## Variable:L"dbx"
+  ## SOMETIMES_CONSUMES   ## Variable:L"dbt"
+  gEfiImageSecurityDatabaseGuid
+
+  gVarCheckPolicyLibMmiHandlerGuid
+  gEfiEndOfDxeEventGroupGuid
+  gEfiDeviceSignatureDatabaseGuid
+  gEdkiiVariableRuntimeCacheInfoHobGuid
+  gEfiMmCommunicateHeaderV3Guid
+
+[Depex]
+  gEfiMmCommunication2ProtocolGuid OR gEfiMmCommunication3ProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  VariableSmmRuntimeDxeExtra.uni

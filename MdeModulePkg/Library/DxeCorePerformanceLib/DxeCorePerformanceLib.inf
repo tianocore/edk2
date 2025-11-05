@@ -1,0 +1,78 @@
+## @file
+#  Performance library instance mainly for DxeCore usage.
+#
+#  This library provides the performance measurement interfaces and initializes performance
+#  logging for DXE phase. It first initializes its private global data structure for
+#  performance logging and saves the performance GUIDed HOB passed from PEI phase.
+#  It initializes DXE phase performance logging by publishing the Performance and PerformanceEx Protocol,
+#  which is consumed by DxePerformanceLib to logging performance data in DXE phase.
+#  This library is mainly used by DxeCore to start performance logging to ensure that
+#  Performance and PerformanceEx Protocol are installed at the very beginning of DXE phase.
+#
+#  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
+# (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeCorePerformanceLib
+  MODULE_UNI_FILE                = DxeCorePerformanceLib.uni
+  FILE_GUID                      = D0F78BBF-0A30-4c63-8A48-0F618A4AFACD
+  MODULE_TYPE                    = DXE_CORE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PerformanceLib|DXE_CORE
+
+  CONSTRUCTOR                    = DxeCorePerformanceLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DxeCorePerformanceLib.c
+  DxeCorePerformanceLibInternal.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  PcdLib
+  TimerLib
+  BaseMemoryLib
+  BaseLib
+  HobLib
+  DebugLib
+  UefiLib
+  ReportStatusCodeLib
+  DxeServicesLib
+  PeCoffGetEntryPointLib
+  DevicePathLib
+
+[Protocols]
+  gEfiSmmCommunicationProtocolGuid              ## SOMETIMES_CONSUMES
+
+
+[Guids]
+  ## PRODUCES             ## SystemTable
+  gPerformanceProtocolGuid
+  gZeroGuid                                     ## SOMETIMES_CONSUMES ## GUID
+  gEfiFirmwarePerformanceGuid                   ## SOMETIMES_PRODUCES ## UNDEFINED # StatusCode Data
+  gEdkiiFpdtExtendedFirmwarePerformanceGuid     ## SOMETIMES_CONSUMES ## HOB # StatusCode Data
+  gEfiEndOfDxeEventGroupGuid                    ## CONSUMES           ## Event
+  gEfiEventReadyToBootGuid                      ## CONSUMES           ## Event
+  gEdkiiPiSmmCommunicationRegionTableGuid       ## SOMETIMES_CONSUMES    ## SystemTable
+  gEdkiiPerformanceMeasurementProtocolGuid      ## PRODUCES           ## UNDEFINED # Install protocol
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask         ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEdkiiFpdtStringRecordEnableOnly  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdExtFpdtBootRecordPadSize         ## CONSUMES

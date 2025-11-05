@@ -1,0 +1,21 @@
+// /** @file
+// Produces the UEFI Random Number Generator protocol
+//
+// This module will leverage Intel Secure Key technology to produce the Random
+// Number Generator protocol, which is used to provide high-quality random numbers
+// for use in applications, or entropy for seeding other random number generators.
+// Refer to http://software.intel.com/en-us/articles/intel-digital-random-number
+// -generator-drng-software-implementation-guide/ for more information about Intel
+// Secure Key technology.
+//
+// Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces UEFI Random Number Generator protocol"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module will produce UEFI Random Number Generator protocol. In current implementation, Only SP800_90_CTR_256 and "RAW" RNG algorithms are supported."
+

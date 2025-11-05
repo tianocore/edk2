@@ -1,0 +1,13 @@
+## @file
+# GitHub Helpers Python PIP requirements file
+#
+# This file provides the list of python components used in GitHub scripts in this repository.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+edk2-pytool-library==0.*
+GitPython==3.*
+PyGithub==2.*

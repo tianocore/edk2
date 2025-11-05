@@ -1,0 +1,172 @@
+/** @file
+  VFR file used by the IP6 configuration component.
+
+  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include "Ip6NvData.h"
+
+#define EFI_NETWORK_DEVICE_CLASS  0x04
+
+formset
+  guid     = IP6_CONFIG_NVDATA_GUID,
+  title    = STRING_TOKEN(STR_IP6_CONFIG_FORM_TITLE),
+  help     = STRING_TOKEN(STR_IP6_CONFIG_FORM_HELP),
+
+  varstore IP6_CONFIG_IFR_NVDATA,
+    name = IP6_CONFIG_IFR_NVDATA,
+    guid = IP6_CONFIG_NVDATA_GUID;
+
+  form formid = FORMID_HEAD_FORM,
+    title  = STRING_TOKEN(STR_IP6_DEVICE_FORM_TITLE);
+
+    goto FORMID_MAIN_FORM,
+    prompt = STRING_TOKEN (STR_GET_CURRENT_SETTING),
+    help   = STRING_TOKEN (STR_GET_CURRENT_SETTING_HELP),
+    flags  = INTERACTIVE,
+    key    = KEY_GET_CURRENT_SETTING;
+
+  endform;
+
+  form formid = FORMID_MAIN_FORM,
+    title  = STRING_TOKEN(STR_IP6_DEVICE_FORM_TITLE);
+
+    text
+      help   = STRING_TOKEN(STR_IP6_INTERFACE_NAME_HELP),
+      text   = STRING_TOKEN(STR_IP6_INTERFACE_NAME),
+        text   = STRING_TOKEN(STR_IP6_INTERFACE_NAME_CONTENT);
+
+    text
+      help   = STRING_TOKEN(STR_IP6_INTERFACE_TYPE_HELP),
+      text   = STRING_TOKEN(STR_IP6_INTERFACE_TYPE),
+        text   = STRING_TOKEN(STR_IP6_INTERFACE_TYPE_CONTENT);
+
+    text
+      help   = STRING_TOKEN(STR_IP6_MAC_ADDRESS_HELP),
+      text   = STRING_TOKEN(STR_IP6_MAC_ADDRESS),
+        text   = STRING_TOKEN(STR_IP6_MAC_ADDRESS_CONTENT);
+
+    text
+      help   = STRING_TOKEN(STR_IP6_HOST_ADDRESS_HELP),
+      text   = STRING_TOKEN(STR_IP6_HOST_ADDRESS),
+        text   = STRING_TOKEN(STR_NULL);
+
+    label HOST_ADDRESS_LABEL;
+    label LABEL_END;
+
+    text
+      help   = STRING_TOKEN(STR_IP6_ROUTE_TABLE_HELP),
+      text   = STRING_TOKEN(STR_IP6_ROUTE_TABLE),
+        text   = STRING_TOKEN(STR_NULL);
+
+    label ROUTE_TABLE_LABEL;
+    label LABEL_END;
+
+    text
+      help   = STRING_TOKEN(STR_IP6_GATEWAY_ADDRESS_HELP),
+      text   = STRING_TOKEN(STR_IP6_GATEWAY_ADDRESS),
+        text   = STRING_TOKEN(STR_NULL);
+
+    label GATEWAY_ADDRESS_LABEL;
+    label LABEL_END;
+
+    text
+      help   = STRING_TOKEN(STR_IP6_DNS_ADDRESS_HELP),
+      text   = STRING_TOKEN(STR_IP6_DNS_ADDRESS),
+        text   = STRING_TOKEN(STR_NULL);
+
+    label DNS_ADDRESS_LABEL;
+    label LABEL_END;
+
+    string  varid   = IP6_CONFIG_IFR_NVDATA.InterfaceId,
+            prompt  = STRING_TOKEN(STR_IP6_INTERFACE_ID),
+            help    = STRING_TOKEN(STR_IP6_INTERFACE_ID_HELP),
+            flags   = INTERACTIVE,
+            key     = KEY_INTERFACE_ID,
+            minsize = INTERFACE_ID_STR_MIN_SIZE,
+            maxsize = INTERFACE_ID_STR_MAX_SIZE,
+    endstring;
+
+    numeric varid   = IP6_CONFIG_IFR_NVDATA.DadTransmitCount,
+            prompt  = STRING_TOKEN(STR_IP6_DAD_TRANSMIT_COUNT),
+            help    = STRING_TOKEN(STR_IP6_DAD_TRANSMIT_COUNT_HELP),
+            flags   = 0,
+            minimum = 0,
+            maximum = DAD_MAX_TRANSMIT_COUNT,
+            step    = 0,
+    endnumeric;
+
+    oneof varid  = IP6_CONFIG_IFR_NVDATA.Policy,
+          prompt = STRING_TOKEN(STR_POLICY_TYPE_PROMPT),
+          help   = STRING_TOKEN(STR_POLICY_TYPE_HELP),
+          option text = STRING_TOKEN(STR_POLICY_TYPE_AUTO),   value = IP6_POLICY_AUTO,   flags = DEFAULT;
+          option text = STRING_TOKEN(STR_POLICY_TYPE_MANUAL), value = IP6_POLICY_MANUAL, flags = 0;
+    endoneof;
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    suppressif ideqval IP6_CONFIG_IFR_NVDATA.Policy == IP6_POLICY_AUTO;
+    goto FORMID_MANUAL_CONFIG_FORM,
+         prompt = STRING_TOKEN(STR_IP6_AD_CONFIG_FORM),
+         help   = STRING_TOKEN(STR_IP6_AD_CONFIG_FORM_HELP),
+         flags  = 0;
+    subtitle text = STRING_TOKEN(STR_NULL);
+    endif;
+
+    text
+      help   = STRING_TOKEN (STR_SAVE_CHANGES_HELP),
+      text   = STRING_TOKEN (STR_SAVE_CHANGES),
+      flags  = INTERACTIVE,
+      key    = KEY_SAVE_CHANGES;
+
+  endform;
+
+  form formid = FORMID_MANUAL_CONFIG_FORM,
+    title  = STRING_TOKEN(STR_IP6_AD_CONFIG_FORM);
+
+    string  varid   = IP6_CONFIG_IFR_NVDATA.ManualAddress,
+            prompt  = STRING_TOKEN(STR_IP6_MANUAL_ADDRESS),
+            help    = STRING_TOKEN(STR_IP6_MANUAL_ADDRESS_HELP),
+            flags   = INTERACTIVE,
+            key     = KEY_MANUAL_ADDRESS,
+            minsize = ADDRESS_STR_MIN_SIZE,
+            maxsize = ADDRESS_STR_MAX_SIZE,
+    endstring;
+
+    string  varid   = IP6_CONFIG_IFR_NVDATA.GatewayAddress,
+            prompt  = STRING_TOKEN(STR_IP6_NEW_GATEWAY_ADDRESS),
+            help    = STRING_TOKEN(STR_IP6_NEW_GATEWAY_ADDR_HELP),
+            flags   = INTERACTIVE,
+            key     = KEY_GATEWAY_ADDRESS,
+            minsize = ADDRESS_STR_MIN_SIZE,
+            maxsize = ADDRESS_STR_MAX_SIZE,
+    endstring;
+
+    string  varid   = IP6_CONFIG_IFR_NVDATA.DnsAddress,
+            prompt  = STRING_TOKEN(STR_IP6_NEW_DNS_ADDRESS),
+            help    = STRING_TOKEN(STR_IP6_NEW_DNS_ADDRESS_HELP),
+            flags   = INTERACTIVE,
+            key     = KEY_DNS_ADDRESS,
+            minsize = ADDRESS_STR_MIN_SIZE,
+            maxsize = ADDRESS_STR_MAX_SIZE,
+    endstring;
+
+    text
+      help   = STRING_TOKEN (STR_SAVE_AND_EXIT),
+      text   = STRING_TOKEN (STR_SAVE_AND_EXIT),
+      flags  = INTERACTIVE,
+      key    = KEY_SAVE_CONFIG_CHANGES;
+
+    text
+      help   = STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
+      text   = STRING_TOKEN (STR_NO_SAVE_AND_EXIT),
+      flags  = INTERACTIVE,
+      key    = KEY_IGNORE_CONFIG_CHANGES;
+
+  endform;
+
+endformset;
+

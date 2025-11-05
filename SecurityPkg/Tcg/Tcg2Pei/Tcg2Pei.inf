@@ -1,0 +1,96 @@
+## @file
+#  Initializes TPM 2.0 device and measure FVs in PEI phase
+#
+#  Spec Compliance Info:
+#    "TCG PC Client Platform Firmware Profile Specification for TPM Family 2.0 Level 00 Revision 1.03 v51"
+#      along with
+#    "Errata for PC Client Specific Platform Firmware Profile Specification Version 1.0 Revision 1.03"
+#
+#  This module will initialize TPM device, measure reported FVs and BIOS version.
+#
+# Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2017, Microsoft Corporation.  All rights reserved. <BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Tcg2Pei
+  MODULE_UNI_FILE                = Tcg2Pei.uni
+  FILE_GUID                      = A0C98B77-CBA5-4BB8-993B-4AF6CE33ECE4
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PeimEntryMA
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+# [BootMode]
+#   S3_RESUME                 ## SOMETIMES_CONSUMES
+#
+
+[Sources]
+  Tcg2Pei.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  HobLib
+  PeimEntryPoint
+  PeiServicesLib
+  BaseMemoryLib
+  DebugLib
+  Tpm2CommandLib
+  PeiServicesTablePointerLib
+  Tpm2DeviceLib
+  HashLib
+  PerformanceLib
+  MemoryAllocationLib
+  ReportStatusCodeLib
+  ResetSystemLib
+  PrintLib
+
+[Guids]
+  gTcgEventEntryHobGuid                                                ## PRODUCES               ## HOB
+  gTpmErrorHobGuid                                                     ## SOMETIMES_PRODUCES     ## HOB
+  gMeasuredFvHobGuid                                                   ## PRODUCES               ## HOB
+  gTcgEvent2EntryHobGuid                                               ## PRODUCES               ## HOB
+  gEfiTpmDeviceInstanceNoneGuid                                        ## SOMETIMES_PRODUCES     ## GUID       # TPM device identifier
+  gEfiTpmDeviceInstanceTpm12Guid                                       ## SOMETIMES_PRODUCES     ## GUID       # TPM device identifier
+  gEdkiiMigratedFvInfoGuid                                             ## SOMETIMES_CONSUMES     ## HOB
+
+[Ppis]
+  gEfiPeiFirmwareVolumeInfoPpiGuid                                     ## SOMETIMES_CONSUMES     ## NOTIFY
+  gEfiPeiFirmwareVolumeInfo2PpiGuid                                    ## SOMETIMES_CONSUMES     ## NOTIFY
+  gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid                  ## SOMETIMES_CONSUMES
+  gPeiTpmInitializedPpiGuid                                            ## SOMETIMES_PRODUCES
+  gPeiTpmInitializationDonePpiGuid                                     ## PRODUCES
+  gEfiEndOfPeiSignalPpiGuid                                            ## SOMETIMES_CONSUMES     ## NOTIFY
+  gEdkiiPeiFirmwareVolumeInfoPrehashedFvPpiGuid                        ## SOMETIMES_CONSUMES
+  gEdkiiTcgPpiGuid                                                     ## PRODUCES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString              ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTcgPfpMeasurementRevision          ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid                     ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2InitializationPolicy            ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2SelfTestPolicy                  ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2ScrtmPolicy                     ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeSubClassTpmDevice         ## SOMETIMES_CONSUMES
+  ## SOMETIMES_CONSUMES
+  ## SOMETIMES_PRODUCES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcg2HashAlgorithmBitmap                  ## CONSUMES
+
+[Depex]
+  gEfiPeiMasterBootModePpiGuid AND
+  gEfiTpmDeviceSelectedGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  Tcg2PeiExtra.uni

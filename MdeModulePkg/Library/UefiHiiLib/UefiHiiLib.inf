@@ -1,0 +1,50 @@
+## @file
+#  HII Library implementation using UEFI HII protocols and services.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UefiHiiLib
+  MODULE_UNI_FILE                = UefiHiiLib.uni
+  FILE_GUID                      = 3143687A-7C80-404e-B5FE-2D88980E1B1C
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = HiiLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  HiiLib.c
+  HiiString.c
+  HiiLanguage.c
+  InternalHiiLib.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+  DevicePathLib
+  UefiLib
+  UefiHiiServicesLib
+  PrintLib
+
+[Protocols]
+  gEfiFormBrowser2ProtocolGuid ## SOMETIMES_CONSUMES
+  gEfiDevicePathProtocolGuid   ## SOMETIMES_CONSUMES
+
+[Guids]
+  gEdkiiIfrBitVarstoreGuid       ## SOMETIMES_CONSUMES ## GUID

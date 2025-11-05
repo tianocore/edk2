@@ -1,0 +1,67 @@
+## @file
+# The EhcPeim driver is responsible for managing EHCI host controller at PEI phase.
+#
+# It produces gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid
+# which is used to enable recovery function from USB Drivers.
+#
+# Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EhciPei
+  MODULE_UNI_FILE                = EhciPei.uni
+  FILE_GUID                      = BAB4F20F-0981-4b5f-A047-6EF83BEEAB3C
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = EhcPeimEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  EhcPeim.c
+  EhcPeim.h
+  EhciUrb.c
+  EhciSched.c
+  UsbHcMem.c
+  EhciReg.h
+  EhciSched.h
+  EhciUrb.h
+  UsbHcMem.h
+  DmaMem.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  IoLib
+  TimerLib
+  BaseLib
+  BaseMemoryLib
+  PeimEntryPoint
+  PeiServicesLib
+
+
+[Ppis]
+  gPeiUsb2HostControllerPpiGuid                 ## PRODUCES
+  gPeiUsbControllerPpiGuid                      ## CONSUMES
+  gEdkiiIoMmuPpiGuid                            ## CONSUMES
+  gEfiEndOfPeiSignalPpiGuid                     ## CONSUMES
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid AND gPeiUsbControllerPpiGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  EhciPeiExtra.uni

@@ -1,0 +1,64 @@
+##  @file
+# Provides shell network1 functions
+#
+# Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved. <BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = UefiShellNetwork1CommandsLib
+  FILE_GUID                      = 9A929F7E-3861-45ce-87AB-7371219AE255
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = ShellNetwork1CommandsLibConstructor
+  DESTRUCTOR                     = ShellNetwork1CommandsLibDestructor
+
+[Sources.common]
+  UefiShellNetwork1CommandsLib.uni
+  UefiShellNetwork1CommandsLib.c
+  UefiShellNetwork1CommandsLib.h
+  Ping.c
+  Ifconfig.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  ShellCommandLib
+  ShellLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  PcdLib
+  HiiLib
+  FileHandleLib
+  NetLib
+
+[Pcd]
+  gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask ## CONSUMES
+
+[Protocols]
+  gEfiCpuArchProtocolGuid                       ## CONSUMES
+  gEfiTimerArchProtocolGuid                     ## CONSUMES
+  gEfiIp6ProtocolGuid                           ## SOMETIMES_CONSUMES
+  gEfiIp6ServiceBindingProtocolGuid             ## SOMETIMES_CONSUMES
+  gEfiIp6ConfigProtocolGuid                     ## SOMETIMES_CONSUMES
+
+  gEfiIp4ProtocolGuid                           ## SOMETIMES_CONSUMES
+  gEfiIp4ServiceBindingProtocolGuid             ## SOMETIMES_CONSUMES
+  gEfiIp4Config2ProtocolGuid                    ## SOMETIMES_CONSUMES
+
+[Guids]
+  gShellNetwork1HiiGuid                         ## SOMETIMES_CONSUMES ## HII

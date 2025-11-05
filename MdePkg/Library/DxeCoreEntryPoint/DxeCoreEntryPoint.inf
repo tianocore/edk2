@@ -1,0 +1,37 @@
+## @file
+# Module entry point library for DXE core.
+#
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeCoreEntryPoint
+  MODULE_UNI_FILE                = DxeCoreEntryPoint.uni
+  FILE_GUID                      = d258d6af-2fc0-4019-9c1f-1101c3dd19b5
+  MODULE_TYPE                    = DXE_CORE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DxeCoreEntryPoint|DXE_CORE
+
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC (EBC is for build only)
+#
+
+[Sources]
+  DxeCoreEntryPoint.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  StackCheckLib
+

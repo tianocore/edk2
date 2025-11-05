@@ -1,0 +1,43 @@
+## @file
+#  FMP Authentication PKCS7 handler.
+#
+# Instance of FmpAuthentication Library for DXE/PEI post memory phase.
+#
+#  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FmpAuthenticationLibPkcs7
+  MODULE_UNI_FILE                = FmpAuthenticationLibPkcs7.uni
+  FILE_GUID                      = F4EA205B-7345-452C-9D62-53BA6F3B8910
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FmpAuthenticationLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  FmpAuthenticationLibPkcs7.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  BaseCryptLib
+
+[Guids]
+  gEfiCertPkcs7Guid        ## CONSUMES   ## GUID

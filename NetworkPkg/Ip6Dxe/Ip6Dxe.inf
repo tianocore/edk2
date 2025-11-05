@@ -1,0 +1,110 @@
+## @file
+#  Basic IPv6 packet I/O Service.
+#
+#  This module provides basic network IPv6 packet I/O services which includes support for
+#  Neighbor Discovery Protocol (ND), Multicast Listener Discovery Protocol (MLD),
+#  and a subset of the Internet Control Message Protocol (ICMPv6). This driver
+#  also provides the mechanism to set and get various types of configurations for
+#  the EFI IPv6 network stack.
+#
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Ip6Dxe
+  FILE_GUID                      = 5BEDB5CC-D830-4eb2-8742-2D4CC9B54F2C
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Ip6DriverEntryPoint
+  UNLOAD_IMAGE                   = NetLibDefaultUnload
+  MODULE_UNI_FILE                = Ip6Dxe.uni
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  gIp6DriverBinding
+#  COMPONENT_NAME                =  gIp6ComponentName
+#  COMPONENT_NAME2               =  gIp6ComponentName2
+#
+
+[Sources]
+  Ip6Output.h
+  Ip6Option.h
+  Ip6Input.h
+  Ip6Nd.h
+  Ip6Mld.h
+  Ip6Impl.c
+  Ip6Driver.c
+  ComponentName.c
+  Ip6Nd.c
+  Ip6Input.c
+  Ip6ConfigImpl.c
+  Ip6ConfigImpl.h
+  Ip6Impl.h
+  Ip6Option.c
+  Ip6If.h
+  Ip6Icmp.h
+  Ip6Mld.c
+  Ip6Common.c
+  Ip6Route.c
+  Ip6If.c
+  Ip6Driver.h
+  Ip6Output.c
+  Ip6Icmp.c
+  Ip6Common.h
+  Ip6Route.h
+  Ip6DxeStrings.uni
+  Ip6NvData.h
+  Ip6ConfigNv.c
+  Ip6ConfigNv.h
+  Ip6Config.vfr
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DevicePathLib
+  HiiLib
+  UefiHiiServicesLib
+  PrintLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  UefiLib
+  DebugLib
+  NetLib
+  DpcLib
+
+[Protocols]
+  gEfiManagedNetworkServiceBindingProtocolGuid     ## TO_START
+  gEfiManagedNetworkProtocolGuid                   ## TO_START
+  gEfiIp6ServiceBindingProtocolGuid                ## BY_START
+  gEfiIp6ProtocolGuid                              ## BY_START
+  gEfiIp6ConfigProtocolGuid                        ## BY_START
+  gEfiDhcp6ServiceBindingProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiDhcp6ProtocolGuid                            ## SOMETIMES_CONSUMES
+  gEfiIpSec2ProtocolGuid                           ## SOMETIMES_CONSUMES
+  gEfiHiiConfigAccessProtocolGuid                  ## SOMETIMES_CONSUMES
+
+[Guids]
+  ## SOMETIMES_CONSUMES ## HII
+  gEfiIfrTianoGuid
+  ## SOMETIMES_CONSUMES ## UNDEFINED # HiiIsConfigHdrMatch   mIp6ConfigStorageName
+  ## SOMETIMES_PRODUCES ## UNDEFINED # HiiConstructConfigHdr mIp6ConfigStorageName
+  ## SOMETIMES_PRODUCES ## UNDEFINED # HiiAddPackages        Ip6DxeStrings Ip6ConfigBin
+  ## SOMETIMES_CONSUMES ## UNDEFINED # HiiUpdateForm
+  ## SOMETIMES_CONSUMES ## HII
+  gIp6ConfigNvDataGuid
+[UserExtensions.TianoCore."ExtraFiles"]
+  Ip6DxeExtra.uni

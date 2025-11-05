@@ -1,0 +1,35 @@
+#/** @file
+#
+#  Copyright (c) 2019, Linaro, Ltd. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 1.27
+  BASE_NAME                      = NonCoherentIoMmuDxe
+  FILE_GUID                      = 7ed510aa-9cdc-49d2-a306-6e11e359f9b3
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = NonCoherentIoMmuDxeEntryPoint
+
+[Sources]
+  NonCoherentIoMmuDxe.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  DmaLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEdkiiIoMmuProtocolGuid                     ## PRODUCES
+
+[Depex]
+  TRUE

@@ -1,0 +1,19 @@
+// /** @file
+// Performance library instance used in SMM phase.
+//
+// This library instance provides infrastructure for SMM drivers to log performance
+// data. It consumes SMM PerformanceEx or Performance Protocol published by SmmCorePerformanceLib
+// to log performance data. If both SMM PerformanceEx and Performance Protocol are not available,
+// it does not log any performance information.
+//
+// Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Performance library instance used in the SMM phase"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library instance provides infrastructure for SMM drivers to log performance data. It consumes SMM PerformanceEx or Performance Protocol published by SmmCorePerformanceLib to log performance data. If both SMM PerformanceEx and Performance Protocol are not available, it does not log any performance information."
+

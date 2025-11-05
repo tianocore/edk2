@@ -1,0 +1,18 @@
+// /** @file
+// Produces a PPI to indicate whether to lock TPM in PEI phase
+//
+// This module produces PEI_LOCK_PHYSICAL_PRESENCE_PPI to indicate whether
+// TPM physical presence needs to be locked. It can be replaced by a
+// platform specific module.
+//
+// Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces a PPI to indicate whether to lock TPM in PEI phase"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module produces PEI_LOCK_PHYSICAL_PRESENCE_PPI to indicate whether TPM physical presence needs to be locked. It can be replaced by a platform-specific module."
+

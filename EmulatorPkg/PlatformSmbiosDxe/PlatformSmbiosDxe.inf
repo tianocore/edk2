@@ -1,0 +1,50 @@
+## @file
+# Platform SMBIOS driver that fills in SMBIOS table entries.
+#
+# Copyright (c) 2012, Apple Inc. All rights reserved.
+# Portions copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformSmbiosDxe
+  FILE_GUID                      = 67FA951E-4FA2-9F4E-A658-4DBD954AC22E
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PlatformSmbiosDriverEntryPoint
+
+
+[Sources]
+  SmbiosTable.c
+  PlatformSmbiosDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  PcdLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiLib
+  HobLib
+ SmbiosLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareReleaseDateString
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang
+  gEmulatorPkgTokenSpaceGuid.PcdEmuMemorySize
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareFdSize
+
+[Depex]
+  TRUE

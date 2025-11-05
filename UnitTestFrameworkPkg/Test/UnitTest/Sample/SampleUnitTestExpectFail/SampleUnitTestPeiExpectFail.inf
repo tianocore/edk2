@@ -1,0 +1,41 @@
+## @file
+# Sample UnitTest built for execution in PEI.
+# All test case are always expected to fail to demonstrate the format of the log
+# file and reports when failures occur.
+#
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010006
+  BASE_NAME      = SampleUnitTestPeiExpectFail
+  FILE_GUID      = A65EA745-A15E-480A-82E5-6AEED8AE8788
+  MODULE_TYPE    = PEIM
+  VERSION_STRING = 1.0
+  ENTRY_POINT    = PeiEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SampleUnitTestExpectFail.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  BaseLib
+  DebugLib
+  UnitTestLib
+  PrintLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid

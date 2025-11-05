@@ -1,0 +1,98 @@
+## @file
+#  Terminal module installs Simple Text Input(ex)/Out protocols for serial devices.
+#
+#  This module will install Simple Text Input (Ex) protocol and Simple Test Output
+#  protocols based on Serial I/O protocol for serial devices including hotplug serial
+#  devices.
+#
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TerminalDxe
+  MODULE_UNI_FILE                = TerminalDxe.uni
+  FILE_GUID                      = 9E863906-A40F-4875-977F-5B93FF237FC6
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeTerminal
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  gTerminalDriverBinding
+#  COMPONENT_NAME                =  gTerminalComponentName
+#  COMPONENT_NAME2               =  gTerminalComponentName2
+#
+
+[Sources]
+  ComponentName.c
+  Vtutf8.c
+  Ansi.c
+  TerminalConOut.c
+  TerminalConIn.c
+  Terminal.c
+  Terminal.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DevicePathLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  ReportStatusCodeLib
+  UefiLib
+  UefiDriverEntryPoint
+  DebugLib
+  PcdLib
+  BaseLib
+
+[Guids]
+  ## SOMETIMES_PRODUCES ## Variable:L"ConInDev"
+  ## SOMETIMES_CONSUMES ## Variable:L"ConInDev"
+  ## SOMETIMES_PRODUCES ## Variable:L"ConOutDev"
+  ## SOMETIMES_CONSUMES ## Variable:L"ConOutDev"
+  ## SOMETIMES_PRODUCES ## Variable:L"ErrOutDev"
+  ## SOMETIMES_CONSUMES ## Variable:L"ErrOutDev"
+  gEfiGlobalVariableGuid
+  gEfiVTUTF8Guid                                ## SOMETIMES_CONSUMES ## GUID # used with a Vendor-Defined Messaging Device Path
+  gEfiVT100Guid                                 ## SOMETIMES_CONSUMES ## GUID # used with a Vendor-Defined Messaging Device Path
+  gEfiVT100PlusGuid                             ## SOMETIMES_CONSUMES ## GUID # used with a Vendor-Defined Messaging Device Path
+  gEfiPcAnsiGuid                                ## SOMETIMES_CONSUMES ## GUID # used with a Vendor-Defined Messaging Device Path
+  gEfiTtyTermGuid                               ## SOMETIMES_CONSUMES ## GUID # used with a Vendor-Defined Messaging Device Path
+  gEdkiiLinuxTermGuid                           ## SOMETIMES_CONSUMES ## GUID # used with a Vendor-Defined Messaging Device Path
+  gEdkiiXtermR6Guid                             ## SOMETIMES_CONSUMES ## GUID # used with a Vendor-Defined Messaging Device Path
+  gEdkiiVT400Guid                               ## SOMETIMES_CONSUMES ## GUID # used with a Vendor-Defined Messaging Device Path
+  gEdkiiSCOTermGuid                             ## SOMETIMES_CONSUMES ## GUID # used with a Vendor-Defined Messaging Device Path
+  gEdkiiStatusCodeDataTypeVariableGuid          ## SOMETIMES_CONSUMES ## GUID
+
+[Protocols]
+  gEfiSerialIoProtocolGuid                      ## TO_START
+  ## BY_START
+  ## TO_START
+  gEfiDevicePathProtocolGuid
+  gEfiSimpleTextInProtocolGuid                  ## BY_START
+  gEfiSimpleTextInputExProtocolGuid             ## BY_START
+  gEfiSimpleTextOutProtocolGuid                 ## BY_START
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType           ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdErrorCodeSetVariable    ## CONSUMES
+
+# [Event]
+# # Relative timer event set by UnicodeToEfiKey(), used to be one 2 seconds input timeout.
+# EVENT_TYPE_RELATIVE_TIMER                   ## CONSUMES
+# # Period timer event to invoke TerminalConInTimerHandler(), period value is KEYBOARD_TIMER_INTERVAL and used to poll the key from serial
+# EVENT_TYPE_PERIODIC_TIMER                   ## CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  TerminalDxeExtra.uni

@@ -1,0 +1,16 @@
+// /** @file
+// This driver installs Generic Memory Test Protocol which does not perform real memory test.
+//
+// This driver installs Generic Memory Test Protocol, which does not perform a real memory test.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Installs Generic Memory Test Protocol, which does not perform real memory test"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver installs Generic Memory Test Protocol, which does not perform a real memory test."
+

@@ -1,0 +1,28 @@
+## @file
+# This is an instance of the Unit Test Persistence Lib does nothing.
+#
+# Copyright (c) Microsoft Corporation.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION     = 0x00010017
+  BASE_NAME       = UnitTestPersistenceLibNull
+  MODULE_UNI_FILE = UnitTestPersistenceLibNull.uni
+  FILE_GUID       = B8553C7A-0B0B-4BBD-9DF3-825804BF26AB
+  VERSION_STRING  = 1.0
+  MODULE_TYPE     = UEFI_DRIVER
+  LIBRARY_CLASS   = UnitTestPersistenceLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  UnitTestPersistenceLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec

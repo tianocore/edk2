@@ -1,0 +1,86 @@
+// /**
+// String definitions for the Variable Policy ("varpolicy") shell command/app.
+//
+// Copyright (c) Microsoft Corporation.
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+/=#
+
+#langdef   en-US "english"
+
+// General Strings
+#string STR_GEN_PROBLEM               #language en-US "%H%s%N: Unknown flag - '%H%s%N'\r\n"
+#string STR_GEN_TOO_MANY              #language en-US "%H%s%N: Too many arguments.\r\n"
+#string STR_GEN_NO_VARS               #language en-US "No UEFI variables found!\r\n"
+#string STR_GEN_LINE_BREAK            #language en-US "\r\n"
+
+#string STR_GEN_HEX_DUMP_LINE         #language en-US "%B%08X%N: %-48a %V*%a*%N\r\n"
+
+#string STR_VAR_POL_POLICY_INT_ERR     #language en-US "%EInternal Application Error Getting Policy Info!%N\r\n"
+#string STR_VAR_POL_POLICY_NO_PROT     #language en-US "%EVariable Policy Protocol Was Not Found!%N\r\n"
+#string STR_VAR_POL_POLICY_NOT_INIT    #language en-US "%EUEFI Variable Policy is Not Initialized!%N\r\n"
+#string STR_VAR_POL_POLICY_NOT_FOUND   #language en-US "%EVariable Policy Not Found for This Variable!%N\r\n"
+#string STR_VAR_POL_POLICY_UNEXP_ERR   #language en-US "%EUnexpected Error Getting Policy Info!%N - %H%r%N\r\n"
+#string STR_VAR_POL_POLICY_HEADER_1    #language en-US "+-----------------------------------------------------------------------------+\r\n"
+#string STR_VAR_POL_POLICY_HEADER_2    #language en-US "| Variable Policy Info                                                        |\r\n"
+#string STR_VAR_POL_POLICY_VERSION     #language en-US "| Version: 0x%-8x                                                         |\r\n"
+#string STR_VAR_POL_POLICY_VARIABLE    #language en-US "| Variable: % -64s  |\r\n"
+#string STR_VAR_POL_POLICY_NAMESPACE   #language en-US "| Namespace: {%g}                           |\r\n"
+#string STR_VAR_POL_POLICY_MIN_SIZE    #language en-US "| Minimum Size: 0x%-8x                                                    |\r\n"
+#string STR_VAR_POL_POLICY_MAX_SIZE    #language en-US "| Maximum Size: 0x%-8x                                                    |\r\n"
+#string STR_VAR_POL_POLICY_ATTR_MUST   #language en-US "| Required Attributes:                                                        |\r\n"
+#string STR_VAR_POL_POLICY_ATTR_NOT    #language en-US "| Disallowed Attributes:                                                      |\r\n"
+#string STR_VAR_POL_POLICY_ATTR_GEN    #language en-US "|   %73-.73s |\r\n"
+#string STR_VAR_POL_POLICY_LOCK_TYPE   #language en-US "| Lock Type: % -64s |\r\n"
+#string STR_VAR_POL_POLICY_STATE_NS    #language en-US "|   Namespace: {%g}                         |\r\n"
+#string STR_VAR_POL_POLICY_STATE_VAL   #language en-US "|   Value: 0x%-8x                                                         |\r\n"
+#string STR_VAR_POL_POLICY_STATE_NAME  #language en-US "|   Name: % -64s    |\r\n"
+#string STR_VAR_POL_POLICY_STATS_PASS  #language en-US "  %V%d/%d UEFI variables have policy%N\r\n"
+#string STR_VAR_POL_POLICY_STATS_FAIL  #language en-US "  %E%d/%d UEFI variables have policy%N\r\n"
+
+#string STR_VAR_POL_VAR_TYPE         #language en-US "%H% -70s%N\r\n"
+#string STR_VAR_POL_VAR_NAME         #language en-US "Name: % -70s\r\n"
+#string STR_VAR_POL_VAR_SIZE         #language en-US "Size: 0x%-16x (%-,d) bytes\r\n"
+#string STR_VAR_POL_VAR_ATTR         #language en-US "Attributes: % -60s\r\n"
+
+#string STR_VAR_POL_STATS_HEADER_1   #language en-US "+----------------------------------------------------------------+\r\n"
+#string STR_VAR_POL_STATS_HEADER_2   #language en-US "| UEFI Variable Statistics                                       |\r\n"
+#string STR_VAR_POL_STATS_TOTAL_VARS #language en-US "  Total UEFI Variables: %,d\r\n"
+#string STR_VAR_POL_STATS_TOTAL_SIZE #language en-US "  Total UEFI Variable Size: 0x%x (%,d) bytes\r\n"
+
+#string STR_GET_HELP_VAR_POLICY      #language en-US ""
+".TH varpolicy 0 "Lists UEFI variable policy information."\r\n"
+".SH NAME\r\n"
+"Lists UEFI variable policy information.\r\n"
+".SH SYNOPSIS\r\n"
+" \r\n"
+"VARPOLICY [-p] [-s] [-v]\r\n"
+".SH OPTIONS\r\n"
+" \r\n"
+"  -p - The policy flag will print variable policy info for each variable.\r\n"
+" \r\n"
+"  -s - The stats flag will print overall UEFI variable policy statistics.\r\n"
+" \r\n"
+"  -v - The verbose flag indicates all known information should be printed.\r\n"
+" \r\n"
+"       This includes a dump of the corresponding UEFI variable data in\r\n"
+"       addition to all other UEFI variable policy information.\r\n"
+".SH DESCRIPTION\r\n"
+" \r\n"
+".SH EXAMPLES\r\n"
+" \r\n"
+"EXAMPLES:\r\n"
+"  * To dump all active UEFI variables:\r\n"
+"    fs0:\> varpolicy\r\n"
+"\r\n"
+"  * To include UEFI variable policy information:\r\n"
+"    fs0:\> varpolicy -p\r\n"
+"\r\n"
+"  * To include UEFI variable statistics:\r\n"
+"    fs0:\> varpolicy -s\r\n"
+"\r\n"
+"  * To include a hexadecimal dump of data for each variable\r\n"
+"    and all other variable information:\r\n"
+"    fs0:\> varpolicy -v\r\n"

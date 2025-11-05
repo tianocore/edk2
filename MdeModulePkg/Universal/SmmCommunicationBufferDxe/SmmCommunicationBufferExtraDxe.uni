@@ -1,0 +1,12 @@
+// /** @file
+// SmmCommunicationBuffer Localized Strings and Content
+//
+// Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_PROPERTIES_MODULE_NAME
+#language en-US
+"SMM Communication Buffer DXE Driver"

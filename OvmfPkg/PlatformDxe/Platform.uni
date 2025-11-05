@@ -1,0 +1,31 @@
+// *++
+//
+// Copyright (C) 2014, Red Hat, Inc.
+// Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Module Name:
+//
+//   Platform.uni
+//
+// Abstract:
+//
+//   String definitions for PlatformForms.vfr
+//
+// --*/
+
+/=#
+
+#langdef en-US "English"
+
+#string STR_FORMSET_TITLE        #language en-US "OVMF Platform Configuration"
+#string STR_FORMSET_HELP         #language en-US "Change various OVMF platform settings."
+#string STR_MAIN_FORM_TITLE      #language en-US "OVMF Settings"
+#string STR_RES_CUR              #language en-US "Preferred Resolution at Next Boot"
+#string STR_RES_CUR_HELP         #language en-US "The preferred resolution of the Graphics Console at next boot. It might be unset, or even invalid (hence ignored) wrt. the video RAM size."
+#string STR_RES_NEXT             #language en-US "Change Preferred Resolution for Next Boot"
+#string STR_RES_NEXT_HELP        #language en-US "You can specify a new preference for the Graphics Console here. The list is filtered against the video RAM size."
+#string STR_SAVE_EXIT            #language en-US "Commit Changes and Exit"
+#string STR_DISCARD_EXIT         #language en-US "Discard Changes and Exit"
+

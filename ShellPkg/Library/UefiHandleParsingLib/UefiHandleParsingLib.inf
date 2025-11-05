@@ -1,0 +1,330 @@
+##  @file
+#  Provides interface to advanced shell functionality for parsing both handle and protocol database.
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved. <BR>
+#  (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
+#  (C) Copyright 2015-2021 Hewlett Packard Enterprise Development LP<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = UefiHandleParsingLib
+  FILE_GUID                      = 3CDC7177-CC2A-4678-BA8F-1A936A093FA4
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = HandleParsingLib|UEFI_APPLICATION UEFI_DRIVER DXE_RUNTIME_DRIVER
+  CONSTRUCTOR                    = HandleParsingLibConstructor
+  DESTRUCTOR                     = HandleParsingLibDestructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources.common]
+  UefiHandleParsingLib.c
+  UefiHandleParsingLib.h
+  UefiHandleParsingLib.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  DevicePathLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  FileHandleLib
+  PrintLib
+  UefiLib
+  HiiLib
+  SortLib
+  PeCoffGetEntryPointLib
+
+[Protocols]
+  gEfiSimpleFileSystemProtocolGuid                        ## SOMETIMES_CONSUMES
+
+  # shell 2.0
+  gEfiShellProtocolGuid                                   ## SOMETIMES_CONSUMES
+  gEfiShellParametersProtocolGuid                         ## SOMETIMES_CONSUMES
+
+  # 'old' shell
+  gEfiShellEnvironment2Guid                               ## SOMETIMES_CONSUMES
+  gEfiShellInterfaceGuid                                  ## SOMETIMES_CONSUMES
+
+  gEfiUnicodeCollation2ProtocolGuid                       ## UNDEFINED
+  gEfiDevicePathToTextProtocolGuid                        ## UNDEFINED
+  gEfiBusSpecificDriverOverrideProtocolGuid               ## UNDEFINED
+  gEfiDevicePathUtilitiesProtocolGuid                     ## UNDEFINED
+  gEfiDevicePathFromTextProtocolGuid                      ## UNDEFINED
+  gEfiPlatformDriverOverrideProtocolGuid                  ## UNDEFINED
+  gEfiSimpleTextInProtocolGuid                            ## UNDEFINED
+  gEfiPlatformToDriverConfigurationProtocolGuid           ## UNDEFINED
+  gEfiDriverSupportedEfiVersionProtocolGuid               ## UNDEFINED
+  gEfiLoadedImageProtocolGuid                             ## CONSUMES
+  gEfiDevicePathProtocolGuid                              ## CONSUMES
+  gEfiLoadedImageDevicePathProtocolGuid                   ## UNDEFINED
+  gEfiSimpleTextOutProtocolGuid                           ## UNDEFINED
+  gEfiSimplePointerProtocolGuid                           ## UNDEFINED
+  gEfiAbsolutePointerProtocolGuid                         ## UNDEFINED
+  gEfiSerialIoProtocolGuid                                ## UNDEFINED
+  gEfiEdidDiscoveredProtocolGuid                          ## UNDEFINED
+  gEfiEdidActiveProtocolGuid                              ## UNDEFINED
+  gEfiEdidOverrideProtocolGuid                            ## UNDEFINED
+  gEfiLoadFileProtocolGuid                                ## UNDEFINED
+  gEfiLoadFile2ProtocolGuid                               ## UNDEFINED
+  gEfiTapeIoProtocolGuid                                  ## UNDEFINED
+  gEfiDiskIoProtocolGuid                                  ## UNDEFINED
+  gEfiBlockIoProtocolGuid                                 ## UNDEFINED
+  gEfiPciRootBridgeIoProtocolGuid                         ## UNDEFINED
+  gEfiPciIoProtocolGuid                                   ## UNDEFINED
+  gEfiScsiPassThruProtocolGuid                            ## UNDEFINED
+  gEfiScsiIoProtocolGuid                                  ## UNDEFINED
+  gEfiExtScsiPassThruProtocolGuid                         ## UNDEFINED
+  gEfiIScsiInitiatorNameProtocolGuid                      ## UNDEFINED
+  gEfiUsbIoProtocolGuid                                   ## UNDEFINED
+  gEfiUsb2HcProtocolGuid                                  ## UNDEFINED
+  gEfiDebugSupportProtocolGuid                            ## UNDEFINED
+  gEfiDebugPortProtocolGuid                               ## UNDEFINED
+  gEfiDecompressProtocolGuid                              ## UNDEFINED
+  gEfiAcpiTableProtocolGuid                               ## UNDEFINED
+  gEfiEbcProtocolGuid                                     ## UNDEFINED
+  gEfiSimpleNetworkProtocolGuid                           ## UNDEFINED
+  gEfiNetworkInterfaceIdentifierProtocolGuid              ## UNDEFINED
+  gEfiNetworkInterfaceIdentifierProtocolGuid_31           ## UNDEFINED
+  gEfiPxeBaseCodeProtocolGuid                             ## UNDEFINED
+  gEfiPxeBaseCodeCallbackProtocolGuid                     ## UNDEFINED
+  gEfiBisProtocolGuid                                     ## UNDEFINED
+  gEfiManagedNetworkServiceBindingProtocolGuid            ## UNDEFINED
+  gEfiManagedNetworkProtocolGuid                          ## UNDEFINED
+  gEfiArpServiceBindingProtocolGuid                       ## UNDEFINED
+  gEfiArpProtocolGuid                                     ## UNDEFINED
+  gEfiDhcp4ServiceBindingProtocolGuid                     ## UNDEFINED
+  gEfiDhcp4ProtocolGuid                                   ## UNDEFINED
+  gEfiTcp4ServiceBindingProtocolGuid                      ## UNDEFINED
+  gEfiTcp4ProtocolGuid                                    ## UNDEFINED
+  gEfiIp4ServiceBindingProtocolGuid                       ## UNDEFINED
+  gEfiIp4ProtocolGuid                                     ## UNDEFINED
+  gEfiIp4Config2ProtocolGuid                              ## UNDEFINED
+  gEfiUdp4ServiceBindingProtocolGuid                      ## UNDEFINED
+  gEfiUdp4ProtocolGuid                                    ## UNDEFINED
+  gEfiMtftp4ServiceBindingProtocolGuid                    ## UNDEFINED
+  gEfiMtftp4ProtocolGuid                                  ## UNDEFINED
+  gEfiAuthenticationInfoProtocolGuid                      ## UNDEFINED
+  gEfiHashServiceBindingProtocolGuid                      ## UNDEFINED
+  gEfiHashProtocolGuid                                    ## UNDEFINED
+  gEfiHiiFontProtocolGuid                                 ## UNDEFINED
+  gEfiHiiStringProtocolGuid                               ## UNDEFINED
+  gEfiHiiImageProtocolGuid                                ## UNDEFINED
+  gEfiHiiConfigRoutingProtocolGuid                        ## UNDEFINED
+  gEfiHiiConfigAccessProtocolGuid                         ## UNDEFINED
+  gEfiFormBrowser2ProtocolGuid                            ## UNDEFINED
+  gEfiDriverConfigurationProtocolGuid                     ## UNDEFINED
+  gEfiDriverConfiguration2ProtocolGuid                    ## UNDEFINED
+  gEfiSimpleTextInputExProtocolGuid                       ## UNDEFINED
+  gEfiIp6ServiceBindingProtocolGuid                       ## UNDEFINED
+  gEfiIp6ProtocolGuid                                     ## UNDEFINED
+  gEfiIp6ConfigProtocolGuid                               ## UNDEFINED
+  gEfiMtftp6ServiceBindingProtocolGuid                    ## UNDEFINED
+  gEfiMtftp6ProtocolGuid                                  ## UNDEFINED
+  gEfiDhcp6ServiceBindingProtocolGuid                     ## UNDEFINED
+  gEfiDhcp6ProtocolGuid                                   ## UNDEFINED
+  gEfiUdp6ServiceBindingProtocolGuid                      ## UNDEFINED
+  gEfiUdp6ProtocolGuid                                    ## UNDEFINED
+  gEfiTcp6ServiceBindingProtocolGuid                      ## UNDEFINED
+  gEfiTcp6ProtocolGuid                                    ## UNDEFINED
+  gEfiVlanConfigProtocolGuid                              ## UNDEFINED
+  gEfiEapProtocolGuid                                     ## UNDEFINED
+  gEfiEapManagementProtocolGuid                           ## UNDEFINED
+  gEfiFtp4ServiceBindingProtocolGuid                      ## UNDEFINED
+  gEfiFtp4ProtocolGuid                                    ## UNDEFINED
+  gEfiIpSecConfigProtocolGuid                             ## UNDEFINED
+  gEfiDriverHealthProtocolGuid                            ## UNDEFINED
+  gEfiDeferredImageLoadProtocolGuid                       ## UNDEFINED
+  gEfiUserCredentialProtocolGuid                          ## UNDEFINED
+  gEfiUserManagerProtocolGuid                             ## UNDEFINED
+  gEfiAtaPassThruProtocolGuid                             ## UNDEFINED
+  gEfiFirmwareManagementProtocolGuid                      ## UNDEFINED
+  gEfiIpSecProtocolGuid                                   ## UNDEFINED
+  gEfiIpSec2ProtocolGuid                                  ## UNDEFINED
+  gEfiKmsProtocolGuid                                     ## UNDEFINED
+  gEfiBlockIo2ProtocolGuid                                ## UNDEFINED
+  gEfiStorageSecurityCommandProtocolGuid                  ## UNDEFINED
+  gEfiUserCredential2ProtocolGuid                         ## UNDEFINED
+  gPcdProtocolGuid                                        ## UNDEFINED
+  gEfiTcgProtocolGuid                                     ## UNDEFINED
+  gEfiHiiPackageListProtocolGuid                          ## UNDEFINED
+  gEfiDriverFamilyOverrideProtocolGuid                    ## UNDEFINED
+  gEfiIdeControllerInitProtocolGuid                       ## UNDEFINED
+  gEfiDiskIo2ProtocolGuid                                 ## UNDEFINED
+  gEfiAdapterInformationProtocolGuid                      ## UNDEFINED
+  gEfiShellDynamicCommandProtocolGuid                     ## UNDEFINED
+  gEfiDiskInfoProtocolGuid                                ## UNDEFINED
+  gGetPcdInfoProtocolGuid                                 ## UNDEFINED
+  gEfiBdsArchProtocolGuid                                 ## UNDEFINED
+  gEfiCpuArchProtocolGuid                                 ## UNDEFINED
+  gEfiMetronomeArchProtocolGuid                           ## UNDEFINED
+  gEfiMonotonicCounterArchProtocolGuid                    ## UNDEFINED
+  gEfiRealTimeClockArchProtocolGuid                       ## UNDEFINED
+  gEfiResetArchProtocolGuid                               ## UNDEFINED
+  gEfiRuntimeArchProtocolGuid                             ## UNDEFINED
+  gEfiSecurityArchProtocolGuid                            ## UNDEFINED
+  gEfiTimerArchProtocolGuid                               ## UNDEFINED
+  gEfiVariableWriteArchProtocolGuid                       ## UNDEFINED
+  gEfiVariableArchProtocolGuid                            ## UNDEFINED
+  gEfiSecurityPolicyProtocolGuid                          ## UNDEFINED
+  gEfiWatchdogTimerArchProtocolGuid                       ## UNDEFINED
+  gEfiStatusCodeRuntimeProtocolGuid                       ## UNDEFINED
+  gEfiSmbusHcProtocolGuid                                 ## UNDEFINED
+  gEfiFirmwareVolume2ProtocolGuid                         ## UNDEFINED
+  gEfiFirmwareVolumeBlockProtocolGuid                     ## UNDEFINED
+  gEfiCapsuleArchProtocolGuid                             ## UNDEFINED
+  gEfiMpServiceProtocolGuid                               ## UNDEFINED
+  gEfiPciHostBridgeResourceAllocationProtocolGuid         ## UNDEFINED
+  gEfiPciPlatformProtocolGuid                             ## UNDEFINED
+  gEfiPciOverrideProtocolGuid                             ## UNDEFINED
+  gEfiPciEnumerationCompleteProtocolGuid                  ## UNDEFINED
+  gEfiIncompatiblePciDeviceSupportProtocolGuid            ## UNDEFINED
+  gEfiPciHotPlugInitProtocolGuid                          ## UNDEFINED
+  gEfiPciHotPlugRequestProtocolGuid                       ## UNDEFINED
+  gEfiSmbiosProtocolGuid                                  ## UNDEFINED
+  gEfiS3SaveStateProtocolGuid                             ## UNDEFINED
+  gEfiS3SmmSaveStateProtocolGuid                          ## UNDEFINED
+  gEfiRscHandlerProtocolGuid                              ## UNDEFINED
+  gEfiSmmRscHandlerProtocolGuid                           ## UNDEFINED
+  gEfiAcpiSdtProtocolGuid                                 ## UNDEFINED
+  gEfiSioProtocolGuid                                     ## UNDEFINED
+  gEfiSmmCpuIo2ProtocolGuid                               ## UNDEFINED
+  gEfiSmmBase2ProtocolGuid                                ## UNDEFINED
+  gEfiSmmAccess2ProtocolGuid                              ## UNDEFINED
+  gEfiSmmControl2ProtocolGuid                             ## UNDEFINED
+  gEfiSmmConfigurationProtocolGuid                        ## UNDEFINED
+  gEfiSmmReadyToLockProtocolGuid                          ## UNDEFINED
+  gEfiDxeSmmReadyToLockProtocolGuid                       ## UNDEFINED
+  gEfiSmmCommunicationProtocolGuid                        ## UNDEFINED
+  gEfiSmmStatusCodeProtocolGuid                           ## UNDEFINED
+  gEfiSmmCpuProtocolGuid                                  ## UNDEFINED
+  gEfiSmmPciRootBridgeIoProtocolGuid                      ## UNDEFINED
+  gEfiSmmSwDispatch2ProtocolGuid                          ## UNDEFINED
+  gEfiSmmSxDispatch2ProtocolGuid                          ## UNDEFINED
+  gEfiSmmPeriodicTimerDispatch2ProtocolGuid               ## UNDEFINED
+  gEfiSmmUsbDispatch2ProtocolGuid                         ## UNDEFINED
+  gEfiSmmGpiDispatch2ProtocolGuid                         ## UNDEFINED
+  gEfiSmmStandbyButtonDispatch2ProtocolGuid               ## UNDEFINED
+  gEfiSmmPowerButtonDispatch2ProtocolGuid                 ## UNDEFINED
+  gEfiSmmIoTrapDispatch2ProtocolGuid                      ## UNDEFINED
+  gEfiPcdProtocolGuid                                     ## UNDEFINED
+  gEfiFirmwareVolumeBlock2ProtocolGuid                    ## UNDEFINED
+  gEfiCpuIo2ProtocolGuid                                  ## UNDEFINED
+  gEfiLegacyRegion2ProtocolGuid                           ## UNDEFINED
+  gEfiSecurity2ArchProtocolGuid                           ## UNDEFINED
+  gEfiSmmEndOfDxeProtocolGuid                             ## UNDEFINED
+  gEfiIsaHcProtocolGuid                                   ## UNDEFINED
+  gEfiIsaHcServiceBindingProtocolGuid                     ## UNDEFINED
+  gEfiSioControlProtocolGuid                              ## UNDEFINED
+  gEfiGetPcdInfoProtocolGuid                              ## UNDEFINED
+  gEfiI2cMasterProtocolGuid                               ## UNDEFINED
+  gEfiI2cIoProtocolGuid                                   ## UNDEFINED
+  gEfiI2cEnumerateProtocolGuid                            ## UNDEFINED
+  gEfiI2cHostProtocolGuid                                 ## UNDEFINED
+  gEfiI2cBusConfigurationManagementProtocolGuid           ## UNDEFINED
+  gEfiTcg2ProtocolGuid                                    ## UNDEFINED
+  gEfiTimestampProtocolGuid                               ## UNDEFINED
+  gEfiRngProtocolGuid                                     ## UNDEFINED
+  gEfiNvmExpressPassThruProtocolGuid                      ## UNDEFINED
+  gEfiHash2ServiceBindingProtocolGuid                     ## UNDEFINED
+  gEfiHash2ProtocolGuid                                   ## UNDEFINED
+  gEfiBlockIoCryptoProtocolGuid                           ## UNDEFINED
+  gEfiSmartCardReaderProtocolGuid                         ## UNDEFINED
+  gEfiSmartCardEdgeProtocolGuid                           ## UNDEFINED
+  gEfiUsbFunctionIoProtocolGuid                           ## UNDEFINED
+  gEfiBluetoothHcProtocolGuid                             ## UNDEFINED
+  gEfiBluetoothIoServiceBindingProtocolGuid               ## UNDEFINED
+  gEfiBluetoothIoProtocolGuid                             ## UNDEFINED
+  gEfiBluetoothConfigProtocolGuid                         ## UNDEFINED
+  gEfiRegularExpressionProtocolGuid                       ## UNDEFINED
+  gEfiBootManagerPolicyProtocolGuid                       ## UNDEFINED
+  gEfiConfigKeywordHandlerProtocolGuid                    ## UNDEFINED
+  gEfiWiFiProtocolGuid                                    ## UNDEFINED
+  gEfiEapManagement2ProtocolGuid                          ## UNDEFINED
+  gEfiEapConfigurationProtocolGuid                        ## UNDEFINED
+  gEfiPkcs7VerifyProtocolGuid                             ## UNDEFINED
+  gEfiDns4ServiceBindingProtocolGuid                      ## UNDEFINED
+  gEfiDns4ProtocolGuid                                    ## UNDEFINED
+  gEfiDns6ServiceBindingProtocolGuid                      ## UNDEFINED
+  gEfiDns6ProtocolGuid                                    ## UNDEFINED
+  gEfiHttpServiceBindingProtocolGuid                      ## UNDEFINED
+  gEfiHttpProtocolGuid                                    ## UNDEFINED
+  gEfiHttpUtilitiesProtocolGuid                           ## UNDEFINED
+  gEfiRestProtocolGuid                                    ## UNDEFINED
+  gEfiRestExProtocolGuid                                  ## UNDEFINED
+  gEfiRedfishDiscoverProtocolGuid                         ## UNDEFINED
+  gEfiMmEndOfDxeProtocolGuid                              ## UNDEFINED
+  gEfiMmIoTrapDispatchProtocolGuid                        ## UNDEFINED
+  gEfiMmPowerButtonDispatchProtocolGuid                   ## UNDEFINED
+  gEfiMmStandbyButtonDispatchProtocolGuid                 ## UNDEFINED
+  gEfiMmGpiDispatchProtocolGuid                           ## UNDEFINED
+  gEfiMmUsbDispatchProtocolGuid                           ## UNDEFINED
+  gEfiMmPeriodicTimerDispatchProtocolGuid                 ## UNDEFINED
+  gEfiMmSxDispatchProtocolGuid                            ## UNDEFINED
+  gEfiMmSwDispatchProtocolGuid                            ## UNDEFINED
+  gEfiMmPciRootBridgeIoProtocolGuid                       ## UNDEFINED
+  gEfiMmCpuProtocolGuid                                   ## UNDEFINED
+  gEfiMmStatusCodeProtocolGuid                            ## UNDEFINED
+  gEfiDxeMmReadyToLockProtocolGuid                        ## UNDEFINED
+  gEfiMmConfigurationProtocolGuid                         ## UNDEFINED
+  gEfiMmReadyToLockProtocolGuid                           ## UNDEFINED
+  gEfiMmControlProtocolGuid                               ## UNDEFINED
+  gEfiMmAccessProtocolGuid                                ## UNDEFINED
+  gEfiMmBaseProtocolGuid                                  ## UNDEFINED
+  gEfiMmCpuIoProtocolGuid                                 ## UNDEFINED
+  gEfiMmRscHandlerProtocolGuid                            ## UNDEFINED
+  gEfiMmCommunicationProtocolGuid                         ## UNDEFINED
+  gEfiTlsServiceBindingProtocolGuid                       ## UNDEFINED
+  gEfiTlsProtocolGuid                                     ## UNDEFINED
+  gEfiTlsConfigurationProtocolGuid                        ## UNDEFINED
+  gEfiSupplicantServiceBindingProtocolGuid                ## UNDEFINED
+  gEfiSupplicantProtocolGuid                              ## UNDEFINED
+  gEfiWiFi2ProtocolGuid                                   ## UNDEFINED
+  gEfiRamDiskProtocolGuid                                 ## UNDEFINED
+  gEfiHiiImageDecoderProtocolGuid                         ## UNDEFINED
+  gEfiHiiImageExProtocolGuid                              ## UNDEFINED
+  gEfiSdMmcPassThruProtocolGuid                           ## UNDEFINED
+  gEfiEraseBlockProtocolGuid                              ## UNDEFINED
+  gEfiBluetoothAttributeProtocolGuid                      ## UNDEFINED
+  gEfiBluetoothAttributeServiceBindingProtocolGuid        ## UNDEFINED
+  gEfiBluetoothLeConfigProtocolGuid                       ## UNDEFINED
+  gEfiUfsDeviceConfigProtocolGuid                         ## UNDEFINED
+  gEfiHttpBootCallbackProtocolGuid                        ## UNDEFINED
+  gEfiResetNotificationProtocolGuid                       ## UNDEFINED
+  gEfiPartitionInfoProtocolGuid                           ## UNDEFINED
+  gEfiHiiPopupProtocolGuid                                ## UNDEFINED
+
+[Guids]
+  gEfiFileInfoGuid                                        ## UNDEFINED
+  gEfiShellEnvironment2ExtGuid                            ## SOMETIMES_CONSUMES ## GUID
+  gEfiPcAnsiGuid                                          ## UNDEFINED
+  gEfiVT100Guid                                           ## UNDEFINED
+  gEfiVT100PlusGuid                                       ## UNDEFINED
+  gEfiVTUTF8Guid                                          ## UNDEFINED
+  gEfiStandardErrorDeviceGuid                             ## UNDEFINED
+  gEfiConsoleInDeviceGuid                                 ## UNDEFINED
+  gEfiConsoleOutDeviceGuid                                ## UNDEFINED
+  gEfiFileSystemInfoGuid                                  ## UNDEFINED
+  gEfiGlobalVariableGuid                                  ## UNDEFINED
+  gEfiPartTypeSystemPartGuid                              ## UNDEFINED
+  gEfiPartTypeLegacyMbrGuid                               ## UNDEFINED
+  gHandleParsingHiiGuid                                   ## UNDEFINED
+  gEfiAdapterInfoMediaStateGuid                           ## SOMETIMES_CONSUMES ## GUID
+  gEfiAdapterInfoNetworkBootGuid                          ## SOMETIMES_CONSUMES ## GUID
+  gEfiAdapterInfoSanMacAddressGuid                        ## SOMETIMES_CONSUMES ## GUID
+  gEfiAdapterInfoUndiIpv6SupportGuid                      ## SOMETIMES_CONSUMES ## GUID
+
+[Pcd.common]
+  gEfiShellPkgTokenSpaceGuid.PcdShellIncludeNtGuids       ## CONSUMES

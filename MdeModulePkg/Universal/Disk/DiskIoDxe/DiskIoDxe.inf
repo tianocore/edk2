@@ -1,0 +1,65 @@
+## @file
+#  Module that lays Disk I/O protocol on every Block I/O protocol.
+#
+#  This module produces Disk I/O protocol to abstract the block accesses
+#  of the Block I/O protocol to a more general offset-length protocol
+#  to provide byte-oriented access to block media. It adds this protocol
+#  to any Block I/O interface that appears in the system that does not
+#  already have a Disk I/O protocol. File systems and other disk access
+#  code utilize the Disk I/O protocol.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DiskIoDxe
+  MODULE_UNI_FILE                = DiskIoDxe.uni
+  FILE_GUID                      = 6B38F7B4-AD98-40e9-9093-ACA2B5A253C4
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeDiskIo
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  gDiskIoDriverBinding
+#  COMPONENT_NAME                =  gDiskIoComponentName
+#  COMPONENT_NAME2               =  gDiskIoComponentName2
+#
+
+[Sources]
+  ComponentName.c
+  DiskIo.h
+  DiskIo.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  UefiLib
+  UefiDriverEntryPoint
+  DebugLib
+  PcdLib
+
+[Protocols]
+  gEfiDiskIoProtocolGuid                        ## BY_START
+  gEfiDiskIo2ProtocolGuid                       ## BY_START
+  gEfiBlockIoProtocolGuid                       ## TO_START
+  gEfiBlockIo2ProtocolGuid                      ## TO_START
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDiskIoDataBufferBlockNum    ## SOMETIMES_CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  DiskIoDxeExtra.uni

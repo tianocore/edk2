@@ -1,0 +1,21 @@
+/** @file
+*
+*  Copyright (c) 2017, Linaro, Ltd. All rights reserved.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+#langdef en-US  "English"
+
+#string STR_FORM_SET_TITLE             #language en-US "O/S Hardware Description Selection"
+#string STR_FORM_SET_TITLE_HELP        #language en-US "Press <Enter> to choose between ACPI and DT hardware descriptions."
+
+#string STR_MAIN_FORM_TITLE            #language en-US "O/S Hardware Description Selection"
+#string STR_NULL_STRING                #language en-US ""
+
+#string STR_DT_ACPI_SELECT_PROMPT      #language en-US "O/S Hardware Description"
+#string STR_DT_ACPI_SELECT_HELP        #language en-US "Select the hardware description that will be exposed to the O/S."
+
+#string STR_DT_ACPI_SELECT_DT          #language en-US "Device Tree"
+#string STR_DT_ACPI_SELECT_ACPI        #language en-US "ACPI"

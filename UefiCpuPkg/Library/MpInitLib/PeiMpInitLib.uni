@@ -1,0 +1,16 @@
+// /** @file
+// MP Initialize Library instance for PEI driver.
+//
+// MP Initialize Library instance for PEI driver.
+//
+// Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "MP Initialize Library instance for PEI driver."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "MP Initialize Library instance for PEI driver."
+

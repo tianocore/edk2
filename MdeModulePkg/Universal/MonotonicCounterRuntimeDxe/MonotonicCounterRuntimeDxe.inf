@@ -1,0 +1,55 @@
+## @file
+# This module produces the UEFI boot service GetNextMonotonicCount() and runtime service GetNextHighMonotonicCount().
+#
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MonotonicCounterRuntimeDxe
+  MODULE_UNI_FILE                = MonotonicCounterRuntimeDxe.uni
+  FILE_GUID                      = AD608272-D07F-4964-801E-7BD3B7888652
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = MonotonicCounterDriverInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  MonotonicCounter.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  DebugLib
+  UefiRuntimeLib
+  UefiDriverEntryPoint
+  BaseLib
+
+[Guids]
+  ## PRODUCES ## Variable:L"MTC"
+  ## CONSUMES ## Variable:L"MTC"
+  gMtcVendorGuid
+
+[Protocols]
+  gEfiMonotonicCounterArchProtocolGuid  ## PRODUCES
+
+
+[Depex]
+  gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  MonotonicCounterRuntimeDxeExtra.uni

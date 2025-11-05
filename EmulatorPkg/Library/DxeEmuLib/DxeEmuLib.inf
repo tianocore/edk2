@@ -1,0 +1,41 @@
+## @file
+# A library to produce the global variable 'gEmuThunk'
+#
+# This library contains a single global variable 'gEmuThunk' along with a constructor to
+# initialize that global.
+# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2011, Apple Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeEmuLib
+  FILE_GUID                      = 31479AFD-B06F-4E4A-863B-A8F7E7710778
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = EmuThunkLib
+
+  CONSTRUCTOR                    = DxeEmuLibConstructor
+
+
+[Sources]
+  DxeEmuLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  HobLib
+  DebugLib
+  BaseMemoryLib
+
+
+[Protocols]
+  gEmuThunkProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+

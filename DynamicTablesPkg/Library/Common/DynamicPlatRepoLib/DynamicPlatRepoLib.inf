@@ -1,0 +1,34 @@
+## @file
+#  Dynamic Platform Repository
+#
+#  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = DynamicPlatRepoLib
+  FILE_GUID      = 836D253D-3144-4A89-9BEE-BC55AFDC814E
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = DynamicPlatRepoLib
+
+[Sources]
+  CmObjectTokenFixer.c
+  CmObjectTokenFixer.h
+  DynamicPlatRepo.c
+  DynamicPlatRepoInternal.h
+  TokenGenerator.c
+  TokenGenerator.h
+  TokenMapper.c
+  TokenMapper.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  AcpiHelperLib
+  BaseLib
+  MemoryAllocationLib

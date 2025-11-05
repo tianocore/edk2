@@ -1,0 +1,41 @@
+// /** @file
+// String definitions for RamDiskDxe driver form.
+//
+// Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+// (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#langdef en-US  "English"
+
+#string STR_FORM_SET_TITLE             #language en-US "RAM Disk Configuration"
+#string STR_FORM_SET_TITLE_HELP        #language en-US "Press <Enter> to add/remove RAM disks."
+
+#string STR_MAIN_FORM_TITLE            #language en-US "RAM Disk HII Main Screen"
+#string STR_RAM_DISK_NULL_STRING       #language en-US ""
+
+#string STR_RAM_DISK_LIST_TEXT         #language en-US "Created RAM disk list:"
+#string STR_RAM_DISK_LIST_HELP         #language en-US "Select for remove"
+#string STR_GOTO_ADD_RAW_FORM          #language en-US "Create raw"
+#string STR_GOTO_ADD_RAW_FORM_HELP     #language en-US "Create a raw RAM disk."
+#string STR_GOTO_ADD_FROM_FILE_FORM    #language en-US "Create from file"
+#string STR_GOTO_ADD_FROM_FILE_FORM_HELP #language en-US "Create a RAM disk from a given file."
+#string STR_REMOVE_SEL_HELP            #language en-US "Remove selected RAM disk(s)"
+#string STR_REMOVE_SEL_TEXT            #language en-US "Remove selected RAM disk(s)."
+
+#string STR_ADD_RAW_FORM_TITLE         #language en-US "Add A Raw RAM Disk"
+#string STR_ADD_RAW_FORM_SUBTITLE_TEXT #language en-US " "
+
+#string STR_SIZE_PROMPT                #language en-US "Size (Hex):"
+#string STR_SIZE_HELP                  #language en-US "The valid RAM disk size should be multiples of the RAM disk block size."
+
+#string STR_MEMORY_TYPE_PROMPT                #language en-US "Disk Memory Type:"
+#string STR_MEMORY_TYPE_HELP                  #language en-US "Specifies type of memory to use from available memory pool in system to create a disk."
+#string STR_RAM_DISK_BOOT_SERVICE_DATA_MEMORY #language en-US "Boot Service Data"
+#string STR_RAM_DISK_RESERVED_MEMORY          #language en-US "Reserved"
+
+#string STR_CREATE_AND_EXIT_HELP       #language en-US "Create a new RAM disk with the given starting and ending address."
+#string STR_CREATE_AND_EXIT_PROMPT     #language en-US "Create & Exit"
+#string STR_DISCARD_AND_EXIT_HELP      #language en-US "Discard and exit."
+#string STR_DISCARD_AND_EXIT_PROMPT    #language en-US "Discard & Exit"

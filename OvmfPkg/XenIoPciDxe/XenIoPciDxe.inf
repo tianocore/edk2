@@ -1,0 +1,39 @@
+## @file
+#  Driver for the virtual Xen PCI device
+#
+#  Copyright (C) 2015, Linaro Ltd.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION               = 0x00010005
+  BASE_NAME                 = XenIoPciDxe
+  FILE_GUID                 = cf569f50-de44-4f54-b4d7-f4ae25cda599
+  MODULE_TYPE               = UEFI_DRIVER
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = XenIoPciDeviceEntryPoint
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Sources]
+  XenIoPciDxe.c
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  UefiLib
+  DebugLib
+
+[Protocols]
+  gEfiDriverBindingProtocolGuid
+  gEfiPciIoProtocolGuid
+  gEfiComponentName2ProtocolGuid
+  gEfiComponentNameProtocolGuid
+  gXenIoProtocolGuid

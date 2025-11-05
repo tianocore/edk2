@@ -1,0 +1,13 @@
+// /** @file
+// EBC Debugger configuration application.
+//
+// Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "EBC Debugger configuration application"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This application allows configuring the EBC Debugger."

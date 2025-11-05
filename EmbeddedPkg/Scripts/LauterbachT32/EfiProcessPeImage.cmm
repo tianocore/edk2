@@ -1,0 +1,72 @@
+;
+; Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
+; Copyright (c) 2011, Hewlett-Packard Company. All rights reserved.<BR>
+; 
+; SPDX-License-Identifier: BSD-2-Clause-Patent
+; 
+
+  LOCAL &imgstart &filehdrstart &debugdirentryrva &debugtype &debugrva &dwarfsig &baseofcode &baseofdata &elfbase &elfpath &pathoffset
+  ENTRY &imgstart
+
+  &imgstart=&imgstart
+  print "PE32 image found at &imgstart"
+
+  ; offset from dos hdr to PE file hdr (i.e. 'PE\0\0' signature)
+  &filehdrstart=&imgstart+Data.Long(c:&imgstart+0x3C)
+
+  ; offset to debug dir in PE hdrs
+  &debugdirentryrva=Data.Long(c:&imgstart+0xf10)
+  if &debugdirentryrva==0
+  (
+    print "no debug dir for image at &imgstart"
+    enddo
+  )
+  
+  &debugtype=Data.Long(c:&imgstart+&debugdirentryrva+0xc)
+  if (&debugtype!=0xdf)&&(&debugtype!=0x02)
+  (
+    print "debug type is not dwarf for image at &imgstart, it's &debugtype"
+    enddo
+  )
+  
+  &debugrva=Data.Long(c:&imgstart+&debugdirentryrva+0x14)
+  &dwarfsig=Data.Long(c:&imgstart+&debugrva)
+  
+  if &dwarfsig==0x66727764
+  (
+    &pathoffset=0xc
+  )
+  else
+  (
+    if &dwarfsig==0x3031424E
+    (
+      &pathoffset=0x10
+    )
+    else
+    (
+      print "debug signature not found for image at &imgstart, its &dwarfsig"
+      enddo
+    )
+  )
+
+  &elfpath=Data.String(c:&imgstart+&debugrva+&pathoffset)
+
+  &baseofcode=&imgstart+Data.Long(c:&filehdrstart+0x28)
+  &baseofdata=&imgstart+Data.Long(c:&filehdrstart+0x2c)
+ 
+  if (&baseofcode<&baseofdata)&&(&baseofcode!=0)
+  (
+    &elfbase=&baseofcode;
+  )
+  else
+  (
+    &elfbase=&baseofdata;
+  )
+
+  print "found path &elfpath with address &elfbase"
+        ON ERROR GOSUB
+              return
+  data.load.elf &elfpath &elfbase /NOCODE /NOCLEAR
+        ON error
+
+enddo

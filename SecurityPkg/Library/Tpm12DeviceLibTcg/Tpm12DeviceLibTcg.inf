@@ -1,0 +1,41 @@
+## @file
+#  Provides function interfaces to communicate with TPM 1.2 device
+#
+#  This library helps to use TPM 1.2 device in library function API
+#  based on TCG protocol.
+#
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Tpm12DeviceLibTcg
+  MODULE_UNI_FILE                = Tpm12DeviceLibTcg.uni
+  FILE_GUID                      = 4D8B77D9-E923-48f8-B070-4053D78B7E56
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Tpm12DeviceLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  Tpm12DeviceLibTcg.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiTcgProtocolGuid                           ## CONSUMES

@@ -1,0 +1,22 @@
+// /** @file
+// Cryptographic Library Instance for SMM driver.
+//
+// Caution: This module requires additional review when modified.
+// This library will have external input - signature.
+// This external input must be validated carefully to avoid security issues such as
+// buffer overflow or integer overflow.
+//
+// Note: AES
+// functions, RSA external functions, PKCS#7 SignedData sign functions,
+// Diffie-Hellman functions, and authenticode signature verification functions are
+// not supported in this instance.
+//
+// Copyright (c) 2010 - 2020, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "Cryptographic Library Instance for SMM driver"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Caution: This module requires additional review when modified. This library will have external input - signature. This external input must be validated carefully to avoid security issues such as buffer overflow or integer overflow. Note: AES functions, RSA external functions, PKCS#7 SignedData sign functions, Diffie-Hellman functions, and authenticode signature verification functions are not supported in this instance."

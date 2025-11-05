@@ -1,0 +1,46 @@
+## @file
+# This driver implements EFI_PCI_HOT_PLUG_INIT_PROTOCOL, providing the PCI bus
+# driver with resource padding information, for PCIe hotplug purposes.
+#
+# Copyright (C) 2016, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PciHotPlugInitDxe
+  FILE_GUID                      = 11A6EDF6-A9BE-426D-A6CC-B22FE51D9224
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DriverInitialize
+
+[Sources]
+  PciHotPlugInit.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  PciCapLib
+  PciCapPciSegmentLib
+  PciLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiPciHotPlugInitProtocolGuid ## ALWAYS_PRODUCES
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size          ## CONSUMES
+
+[Depex]
+  TRUE

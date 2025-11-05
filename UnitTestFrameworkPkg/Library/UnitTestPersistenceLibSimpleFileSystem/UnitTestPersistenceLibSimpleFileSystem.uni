@@ -1,0 +1,15 @@
+// /** @file
+// UEFI Simple File System based version of the Unit Test Persistence Lib
+//
+// Instance of the Unit Test Persistence Lib that utilizes the UEFI filesystem
+// that a test application is running from to save a serialized version of the
+// internal test state in case the test needs to quit and restore.
+//
+// Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "UEFI Simple File System based version of the Unit Test Persistence Lib"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "UEFI Simple File System based version of the Unit Test Persistence Lib."

@@ -1,0 +1,49 @@
+## @file
+#  Debug Library based on report status code library
+#
+#  Debug Library for PEIMs and DXE drivers that sends debug messages to ReportStatusCode
+#  Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiDxeDebugLibReportStatusCode
+  MODULE_UNI_FILE                = PeiDxeDebugLibReportStatusCode.uni
+  FILE_GUID                      = bda39d3a-451b-4350-8266-81ab10fa0523
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DebugLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER SMM_CORE PEIM SEC PEI_CORE UEFI_APPLICATION UEFI_DRIVER MM_STANDALONE
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DebugLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PcdLib
+  ReportStatusCodeLib
+  BaseMemoryLib
+  BaseLib
+  DebugPrintErrorLevelLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue  ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask      ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel ## CONSUMES
+
+[Guids]
+  gEfiStatusCodeDataTypeDebugGuid    ## SOMETIMES_CONSUMES ## GUID
+

@@ -1,0 +1,57 @@
+/** @file
+  String definitions for VLAN configuration Shell application.
+
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#langdef en-US "English"
+
+#string STR_VCONFIG_LOCATE_FAIL          #language en-US    "Failed to locate EFI_VLAN_CONFIG_PROTOCOL - %r.\n"
+#string STR_VCONFIG_MAC_FAIL             #language en-US    "Failed to get MAC address - %r.\n"
+#string STR_VCONFIG_FIND_FAIL            #language en-US    "Failed to find VLAN configuration - %r.\n"
+#string STR_VCONFIG_SET_FAIL             #language en-US    "Failed to set VLAN configuration - %r.\n"
+#string STR_VCONFIG_REMOVE_FAIL          #language en-US    "Failed to remove VLAN - %r.\n"
+#string STR_VCONFIG_NO_IF                #language en-US    "Network interface not specified.\n"
+#string STR_VCONFIG_NO_VID               #language en-US    "VLAN ID not specified.\n"
+#string STR_VCONFIG_INVALID_IF           #language en-US    "Invalid network interface - %s.\n"
+#string STR_VCONFIG_INVALID_VID          #language en-US    "Invalid VLAN ID - %s.\n"
+#string STR_VCONFIG_INVALID_PRIORITY     #language en-US    "Invalid VLAN Priority - %s.\n"
+#string STR_VCONFIG_NOT_FOUND            #language en-US    "Cannot find the VLAN device specified.\n"
+#string STR_VCONFIG_VLAN_DISPLAY         #language en-US    "    VLAN ID: %4d  Priority: %d\n"
+#string STR_VCONFIG_NO_VLAN              #language en-US    "    VLAN is not configured.\n"
+#string STR_VCONFIG_ETH_MAC              #language en-US    "eth%d  MAC:%s\n"
+#string STR_VCONFIG_SET_SUCCESS          #language en-US    "VLAN device added.\n"
+#string STR_VCONFIG_REMOVE_SUCCESS       #language en-US    "VLAN device removed.\n"
+#string STR_VCONFIG_NO_ARG               #language en-US    "Invalid argument, try "-?" for help.\n"
+
+#string STR_VCONFIG_HELP                 #language en-US    ""
+".TH VConfig 0 "Display or modify VLAN configuration for network interface."\r\n"
+".SH NAME\r\n"
+"Display or modify VLAN configuration for network interface.\r\n"
+".SH SYNOPSIS\r\n"
+" \r\n"
+"VCONFIG [-?] [-l [IfName]] [-a IfName VlanId [Priority]] [-d IfName.VlanId]\r\n"
+".SH OPTIONS\r\n"
+" \r\n"
+"  -l          Display VLAN configuration for all or specified interface.\r\n"
+"  -a          Add a VLAN device for the network interface.\r\n"
+"  -d          Delete a VLAN device.\r\n"
+"  IfName      Name of network interface, e.g. eth0, eth1.\r\n"
+"  VlanId      Unique VLAN identifier (0~4094).\r\n"
+"  Priority    802.1Q priority level (0~7), default 0.\r\n"
+".SH EXAMPLES\r\n"
+" \r\n"
+"Examples:\r\n"
+"  * To display VLAN configuration:\r\n"
+"    fs0:\> vconfig -l\r\n"
+"    fs0:\> vconfig -l eth0\r\n"
+"\r\n"
+"  * To add VLAN device:\r\n"
+"    fs0:\> vconfig -a eth0 1000\r\n"
+"    fs0:\> vconfig -a eth0 2000 7\r\n"
+"\r\n"
+"  * To delete VLAN device:\r\n"
+"    fs0:\> vconfig -d eth0.1000\r\n"

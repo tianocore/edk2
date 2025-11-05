@@ -1,0 +1,16 @@
+// /** @file
+// SerialPortLib instance for 16550 UART.
+//
+// SerialPortLib instance for 16550 UART.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "SerialPortLib instance for 16550 UART"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "SerialPortLib instance for 16550 UART."
+

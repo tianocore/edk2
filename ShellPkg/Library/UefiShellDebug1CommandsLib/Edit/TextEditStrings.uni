@@ -1,0 +1,69 @@
+// /**
+//
+// Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Abstract:
+//
+// Additional string definitions for UEFI Shell 2.0 Debug1 profile Edit command
+//
+//
+// **/
+
+/=#
+
+#langdef   en-US "english"
+
+#string STR_EDIT_LIBEDITOR_TITLEBAR           #language en-US "%EMainEditor init failed on TitleBar init\r\n%N"
+#string STR_EDIT_LIBEDITOR_MAINMENU           #language en-US "%EMainEditor init was not successful on MainMenu init\r\n%N"
+#string STR_EDIT_LIBEDITOR_STATUSBAR          #language en-US "%EMainEditor init was not successful on StatusBar init\r\n%N"
+#string STR_EDIT_LIBEDITOR_INPUTBAR           #language en-US "%EMainEditor init was not successful on InputBar init\r\n%N"
+#string STR_EDIT_LIBEDITOR_FILEBUFFER         #language en-US "%EMainEditor init was not successful on FileBuffer init\r\n%N"
+#string STR_EDIT_LIBEDITOR_TITLEBAR_CLEANUP   #language en-US "TitleBar cleanup was not successful\r\n"
+#string STR_EDIT_LIBEDITOR_MENUBAR_CLEANUP    #language en-US "MenuBar cleanup was not successful\r\n"
+#string STR_EDIT_LIBEDITOR_STATUSBAR_CLEANUP  #language en-US "StatusBar cleanup was not successful\r\n"
+#string STR_EDIT_LIBEDITOR_INPUTBAR_CLEANUP    #language en-US "InputBar cleanup was not successful\r\n"
+#string STR_EDIT_LIBEDITOR_FILEBUFFER_CLEANUP  #language en-US "FileBuffer cleanup was not successful\r\n"
+#string STR_EDIT_LIBEDITOR_MAINEDITOR_INIT    #language en-US "%EMainEditor init was not succesful on TitleBar init\r\n%N"
+#string STR_EDIT_LIBINPUTBAR_MAININPUTBAR     #language en-US "%s"
+#string STR_EDIT_LIBMENUBAR_OPEN_FILE          #language en-US "Open File"
+#string STR_EDIT_LIBMENUBAR_SAVE_FILE          #language en-US "Save File"
+#string STR_EDIT_LIBMENUBAR_EXIT              #language en-US "Exit"
+#string STR_EDIT_LIBMENUBAR_CUT_LINE          #language en-US "Cut Line"
+#string STR_EDIT_LIBMENUBAR_PASTE_LINE        #language en-US "Paste Line"
+#string STR_EDIT_LIBMENUBAR_GO_TO_LINE        #language en-US "Go To Line"
+#string STR_EDIT_LIBMENUBAR_SEARCH            #language en-US "Search"
+#string STR_EDIT_LIBMENUBAR_SEARCH_REPLACE    #language en-US "Search/Replace"
+#string STR_EDIT_LIBMENUBAR_FILE_TYPE          #language en-US "File Type"
+#string STR_EDIT_LIBMENUBAR_F1                #language en-US "F1"
+#string STR_EDIT_LIBMENUBAR_F2                #language en-US "F2"
+#string STR_EDIT_LIBMENUBAR_F3                #language en-US "F3"
+#string STR_EDIT_LIBMENUBAR_F4                #language en-US "F4"
+#string STR_EDIT_LIBMENUBAR_F5                #language en-US "F5"
+#string STR_EDIT_LIBMENUBAR_F6                #language en-US "F6"
+#string STR_EDIT_LIBMENUBAR_F7                #language en-US "F7"
+#string STR_EDIT_LIBMENUBAR_F8                #language en-US "F8"
+#string STR_EDIT_LIBMENUBAR_F9                #language en-US "F9"
+#string STR_EDIT_LIBMENUBAR_F10               #language en-US "F10"
+#string STR_EDIT_LIBMENUBAR_F11               #language en-US "F11"
+#string STR_EDIT_LIBMENUBAR_F12               #language en-US "F12"
+#string STR_EDIT_LIBMENUBAR_CTRL_E               #language en-US "Ctrl+E"
+#string STR_EDIT_LIBMENUBAR_CTRL_W               #language en-US "Ctrl+W"
+#string STR_EDIT_HELP_TITLE                   #language en-US "Help                                                        \n"
+#string STR_EDIT_HELP_BLANK                   #language en-US "                                                            \n"
+#string STR_EDIT_HELP_LIST_TITLE              #language en-US "Control Key   Function Key   Command                        \n"
+#string STR_EDIT_HELP_DIV                     #language en-US "-----------   ------------   -----------------              \n"
+#string STR_EDIT_HELP_GO_TO_LINE              #language en-US "Ctrl-G        F1             Go To Line                     \n"
+#string STR_EDIT_HELP_SAVE_FILE               #language en-US "Ctrl-S        F2             Save File                      \n"
+#string STR_EDIT_HELP_EXIT                    #language en-US "Ctrl-Q        F3             Exit                           \n"
+#string STR_EDIT_HELP_SEARCH                  #language en-US "Ctrl-F        F4             Search                         \n"
+#string STR_EDIT_HELP_SEARCH_REPLACE          #language en-US "Ctrl-R        F5             Search/Replace                 \n"
+#string STR_EDIT_HELP_CUT_LINE                #language en-US "Ctrl-K        F6             Cut Line                       \n"
+#string STR_EDIT_HELP_PASTE_LINE              #language en-US "Ctrl-U        F7             Paste Line                     \n"
+#string STR_EDIT_HELP_OPEN_FILE               #language en-US "Ctrl-O        F8             Open File                      \n"
+#string STR_EDIT_HELP_FILE_TYPE               #language en-US "Ctrl-T        F9             File Type                      \n"
+#string STR_EDIT_HELP_EXIT_HELP               #language en-US "Use Ctrl-W to exit this help                                \n"
+#string STR_EDIT_MAIN_INVALID_FILE_NAME        #language en-US "%Hedit%N: Invalid File Name\r\n"
+#string STR_EDIT_MAIN_INIT_FAILED              #language en-US "%Hedit%N: Initialization was not successful\r\n"
+#string STR_EDIT_MAIN_BUFFER                  #language en-US "%Hedit%N: %s\r\n"
+#string STR_EDIT_MAIN_UNKNOWN_EDITOR_ERR      #language en-US "%Hedit%N: Unknown Editor Error\r\n"

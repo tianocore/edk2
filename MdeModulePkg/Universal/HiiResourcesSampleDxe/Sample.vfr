@@ -1,0 +1,39 @@
+// *++
+//
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Module Name:
+//
+//   Sample.vfr
+//
+// Abstract:
+//
+//   Sample Form.
+//
+// Revision History:
+//
+// --*/
+
+#include <Guid/HiiResourceSampleHii.h>
+
+formset
+  guid     = HII_RESOURCE_SAMPLE_FORM_SET_GUID,
+  title    = STRING_TOKEN(STR_SAMPLE_FORM_SET_TITLE),
+  help     = STRING_TOKEN(STR_SAMPLE_FORM_SET_HELP),
+
+  form formid = 1,
+       title  = STRING_TOKEN(STR_SAMPLE_FORM1_TITLE);
+
+    text
+      help   = STRING_TOKEN(STR_SAMPLE_VERSION_HELP),
+      text   = STRING_TOKEN(STR_SAMPLE_VERSION_TEXT),
+      text   = STRING_TOKEN(STR_SAMPLE_EMPTY);
+
+    subtitle text = STRING_TOKEN(STR_SAMPLE_EMPTY);
+
+    subtitle text = STRING_TOKEN(STR_SAMPLE_ESC);
+
+  endform;
+
+endformset;

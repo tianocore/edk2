@@ -1,0 +1,29 @@
+## @file
+# Library of virtio utility functions.
+#
+# Copyright (C) 2012, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VirtioLib
+  FILE_GUID                      = 90CED1D9-18F2-47CC-BF24-41EC29406637
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = VirtioLib
+
+[Sources]
+  VirtioLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  UefiBootServicesTableLib

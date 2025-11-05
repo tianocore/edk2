@@ -1,0 +1,34 @@
+#/** @file
+#
+#  Copyright (c) 2014, ARM Ltd. All rights reserved.
+#  Copyright (c) 2021, Ampere Computing LLC. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AcpiLib
+  FILE_GUID                      = 24b9d62c-5a36-417b-94b6-38dbaea90dcf
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = AcpiLib
+
+[Sources.common]
+  AcpiLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid
+  gEfiFirmwareVolume2ProtocolGuid

@@ -1,0 +1,48 @@
+## @file
+#  Produces the SMM CPU I/O 2 Protocol by using the services of the I/O Library.
+#
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CpuIo2Smm
+  MODULE_UNI_FILE                = CpuIo2Smm.uni
+  FILE_GUID                      = A47EE2D8-F60E-42fd-8E58-7BD65EE4C29B
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  ENTRY_POINT                    = SmmCpuIo2Initialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  CpuIo2Smm.c
+  CpuIo2Mm.c
+  CpuIo2Mm.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+  IoLib
+  MmServicesTableLib
+  BaseMemoryLib
+
+[Protocols]
+  gEfiSmmCpuIo2ProtocolGuid                   ## PRODUCES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  CpuIo2SmmExtra.uni

@@ -1,0 +1,17 @@
+// /** @file
+// UEFI Application to display CPUID leaf information.
+//
+// This UEFI application displays the registers values returned by CPUID for
+// all the CPUID leafs and sub-leafs that a CPU supports.  It also displays
+// the values of all the bit fields in the registers returned by each CPUID
+// leaf and sub-leaf.
+//
+// Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "UEFI Application to display CPUID leaf information"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This UEFI application displays the registers values returned by CPUID for all the CPUID leafs and sub-leafs that a CPU supports.  It also displays the values of all the bit fields in the registers returned by each CPUID leaf and sub-leaf."

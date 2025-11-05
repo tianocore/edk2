@@ -1,0 +1,49 @@
+## @file
+#  Sample PRM Driver
+#
+#  A sample PRM Module implementation. This PRM Module includes a PRM Module configuration library instance
+#  that applies the configuration for an ACPI parameter buffer in the boot environment. A PRM handler
+#  is provided that checks for a specific value in the parameter buffer that should be provided by ACPI
+#  code at OS runtime.
+#
+#  Copyright (c) Microsoft Corporation
+#  Copyright (c) 2022, Arm Limited. All rights reserved.<BR>
+#  Copyright (C) 2025, Advanced Micro Devices, Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION         = 0x00010005
+  BASE_NAME           = PrmSampleAcpiParameterBufferModule
+  FILE_GUID           = DC2A58A6-5927-4776-B995-D118A27335A2
+  MODULE_TYPE         = DXE_RUNTIME_DRIVER
+  VERSION_STRING      = 1.0
+  ENTRY_POINT         = PrmSampleAcpiParameterBufferModuleInit
+
+[Sources]
+  PrmSampleAcpiParameterBufferModule.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  PrmPkg/PrmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Depex]
+  TRUE
+
+[BuildOptions]
+  MSFT:*_*_*_DLINK_FLAGS = /SUBSYSTEM:CONSOLE /VERSION:$(VERSION_STRING)
+  MSFT:*_*_*_GENFW_FLAGS = --keepoptionalheader
+
+  CLANGPDB:*_*_*_DLINK_FLAGS = /SUBSYSTEM:CONSOLE /VERSION:$(VERSION_STRING)
+  CLANGPDB:*_*_*_GENFW_FLAGS = --keepoptionalheader
+
+  GCC:*_*_*_GENFW_FLAGS = --prm --image-version $(VERSION_STRING)
+  GCC:*_*_*_OBJCOPY_STRIPFLAG ==

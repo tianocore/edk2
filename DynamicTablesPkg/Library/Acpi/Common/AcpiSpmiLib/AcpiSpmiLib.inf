@@ -1,0 +1,29 @@
+## @file
+#  SPMI Table Generator
+#
+#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 1.30
+  BASE_NAME      = AcpiSpmiLib
+  FILE_GUID      = 31307BFF-BA0E-42C3-BD73-6C482740120D
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiSpmiLibConstructor
+  DESTRUCTOR     = AcpiSpmiLibDestructor
+
+[Sources]
+  SpmiGenerator.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  IpmiCommandLib

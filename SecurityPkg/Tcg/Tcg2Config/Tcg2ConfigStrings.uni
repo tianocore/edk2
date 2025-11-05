@@ -1,0 +1,132 @@
+/** @file
+  String definitions for TCG2 configuration form.
+
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#langdef en-US "English"
+
+#string STR_TCG2_TITLE                      #language en-US "TCG2 Configuration"
+#string STR_TCG2_HELP                       #language en-US "Press <Enter> to select TCG2 Setup options."
+
+#string STR_TCG2_DEVICE_STATE_PROMPT        #language en-US "Current TPM Device"
+#string STR_TCG2_DEVICE_STATE_HELP          #language en-US "Current TPM Device: Disable, TPM1.2, or TPM2.0"
+#string STR_TCG2_DEVICE_STATE_CONTENT       #language en-US ""
+
+#string STR_TCG2_DEVICE_PROMPT              #language en-US "Attempt TPM Device"
+#string STR_TCG2_DEVICE_HELP                #language en-US "Attempt TPM Device: TPM1.2, or TPM2.0"
+#string STR_TCG2_DEVICE_CONTENT             #language en-US ""
+
+#string STR_TCG2_PPI_VERSION_STATE_PROMPT   #language en-US "Current PPI Version"
+#string STR_TCG2_PPI_VERSION_STATE_HELP     #language en-US "Current PPI Version: 1.2 or 1.3"
+#string STR_TCG2_PPI_VERSION_STATE_CONTENT  #language en-US ""
+
+#string STR_TCG2_PPI_VERSION_PROMPT         #language en-US "Attempt PPI Version"
+#string STR_TCG2_PPI_VERSION_HELP           #language en-US "Attempt PPI Version: 1.2 or 1.3\n"
+                                                            "PcdTcgPhysicalPresenceInterfaceVer needs to be DynamicHii type and map to this option\n"
+                                                            "Otherwise the version configuring by this setup option will not work"
+
+#string STR_TPM2_ACPI_HID_PROMPT                  #language en-US "HID from TPM2 ACPI Table"
+#string STR_TPM2_ACPI_HID_HELP                    #language en-US "HID from TPM2 ACPI Table: ManufacturerID + FirmwareVersion_1"
+#string STR_TPM2_ACPI_HID_CONTENT                 #language en-US ""
+
+#string STR_TPM2_ACPI_REVISION_STATE_PROMPT   #language en-US "Current Rev of TPM2 ACPI Table"
+#string STR_TPM2_ACPI_REVISION_STATE_HELP     #language en-US "Current Rev of TPM2 ACPI Table: Rev 3 or Rev 4"
+#string STR_TPM2_ACPI_REVISION_STATE_CONTENT  #language en-US ""
+
+#string STR_TPM2_ACPI_REVISION_PROMPT          #language en-US "Attempt Rev of TPM2 ACPI Table"
+#string STR_TPM2_ACPI_REVISION_HELP            #language en-US "Rev 3 or Rev 4 (Rev 4 is defined in TCG ACPI Spec 00.37)"
+                                                               "PcdTpm2AcpiTableRev needs to be DynamicHii type and map to this option\n"
+                                                               "Otherwise the version configuring by this setup option will not work"
+
+#string STR_TCG2_DEVICE_INTERFACE_STATE_PROMPT         #language en-US "Current TPM Device Interface"
+#string STR_TCG2_DEVICE_INTERFACE_STATE_HELP           #language en-US "Current TPM Device Interface: TIS, PTP FIFO, PTP CRB"
+#string STR_TCG2_DEVICE_INTERFACE_STATE_CONTENT        #language en-US ""
+
+#string STR_TCG2_DEVICE_INTERFACE_CAPABILITY_PROMPT    #language en-US "PTP TPM Device Interface Capability"
+#string STR_TCG2_DEVICE_INTERFACE_CAPABILITY_HELP      #language en-US "PTP TPM Device Interface Capability: PTP FIFO, PTP CRB"
+#string STR_TCG2_DEVICE_INTERFACE_CAPABILITY_CONTENT   #language en-US ""
+
+#string STR_TCG2_DEVICE_INTERFACE_PROMPT               #language en-US "Attempt PTP TPM Device Interface"
+#string STR_TCG2_DEVICE_INTERFACE_HELP                 #language en-US "Attempt PTP TPM Device Interface: PTP FIFO, PTP CRB"
+#string STR_TCG2_DEVICE_INTERFACE_CONTENT              #language en-US ""
+
+#string STR_TCG2_DEVICE_INTERFACE_TIS                  #language en-US "TIS"
+#string STR_TCG2_DEVICE_INTERFACE_PTP_FIFO             #language en-US "PTP FIFO"
+#string STR_TCG2_DEVICE_INTERFACE_PTP_CRB              #language en-US "PTP CRB"
+
+#string STR_TCG2_PP_OPERATION              #language en-US "TPM2 Physical Presence Operation"
+
+#string STR_TCG2_OPERATION                 #language en-US "TPM2 Operation"
+#string STR_TCG2_OPERATION_HELP            #language en-US "Select one of the supported operation to change TPM2 state."
+
+#string STR_TCG2_NO_ACTION                 #language en-US "No Action"
+#string STR_TCG2_ENABLE                    #language en-US "TPM2 HierarchyControl (TPM_RH_OWNER YES, TPM_RH_ENDORSEMENT YES)"
+#string STR_TCG2_DISABLE                   #language en-US "TPM2 HierarchyControl (TPM_RH_OWNER NO, TPM_RH_ENDORSEMENT NO)"
+#string STR_TCG2_CLEAR                     #language en-US "TPM2 ClearControl(NO) + Clear"
+#string STR_TCG2_SET_PCD_BANKS             #language en-US "TPM2 PCR_Allocate(Algorithm IDs)"
+#string STR_TCG2_CHANGE_EPS                #language en-US "TPM2 ChangeEPS"
+#string STR_TCG2_LOG_ALL_DIGESTS           #language en-US "TCG2 LogAllDigests"
+#string STR_TCG2_DISABLE_ENDORSEMENT_ENABLE_STORAGE_HIERARCHY   #language en-US "TPM2 HierarchyControl (TPM_RH_OWNER NO, TPM_RH_ENDORSEMENT YES)"
+
+#string STR_TCG2_OPERATION_PARAMETER       #language en-US "TPM2 Operation Parameter"
+#string STR_TCG2_OPERATION_PARAMETER_HELP  #language en-US "Additional TPM2 Operation Parameter need be sent with Operation Code (required for SetPCRBanks)"
+
+#string STR_TCG2_TPM_1_2                   #language en-US "TPM 1.2"
+#string STR_TCG2_TPM_2_0_DTPM              #language en-US "TPM 2.0"
+
+#string STR_TPM2_ACPI_REVISION_3           #language en-US "Rev 3"
+#string STR_TPM2_ACPI_REVISION_4           #language en-US "Rev 4"
+
+#string STR_TCG2_PPI_VERSION_1_2           #language en-US "1.2"
+#string STR_TCG2_PPI_VERSION_1_3           #language en-US "1.3"
+
+#string STR_TPM2_ACTIVE_HASH_ALGO                 #language en-US "TPM2 Active PCR Hash Algorithm"
+#string STR_TPM2_ACTIVE_HASH_ALGO_HELP            #language en-US "TPM2 Active PCR Hash Algorithm: SHA1, SHA256, SHA384, SHA512, SM3_256"
+#string STR_TPM2_ACTIVE_HASH_ALGO_CONTENT         #language en-US ""
+
+#string STR_TPM2_SUPPORTED_HASH_ALGO              #language en-US "TPM2 Hardware Supported Hash Algorithm"
+#string STR_TPM2_SUPPORTED_HASH_ALGO_HELP         #language en-US "TPM2 Hardware Supported Hash Algorithm: SHA1, SHA256, SHA384, SHA512, SM3_256"
+#string STR_TPM2_SUPPORTED_HASH_ALGO_CONTENT      #language en-US ""
+
+#string STR_BIOS_HASH_ALGO                 #language en-US "BIOS Supported Hash Algorithm"
+#string STR_BIOS_HASH_ALGO_HELP            #language en-US "BIOS Supported Hash Algorithm: SHA1, SHA256, SHA384, SHA512, SM3_256"
+#string STR_BIOS_HASH_ALGO_CONTENT         #language en-US ""
+
+#string STR_TCG2_CONFIGURATION             #language en-US "TCG2 Protocol Configuration"
+
+#string STR_TCG2_PROTOCOL_VERSION          #language en-US "TCG2 Protocol Version"
+#string STR_TCG2_PROTOCOL_VERSION_HELP     #language en-US "TCG2 Protocol Version: 1.0 or 1.1"
+#string STR_TCG2_PROTOCOL_VERSION_1_0      #language en-US "1.0"
+#string STR_TCG2_PROTOCOL_VERSION_1_1      #language en-US "1.1"
+
+#string STR_TCG2_SUPPORTED_EVENT_LOG_FORMAT               #language en-US "Supported Event Log Format"
+#string STR_TCG2_SUPPORTED_EVENT_LOG_FORMAT_HELP          #language en-US "TCG2 Supported Event Log Format: TCG_1_2, TCG_2"
+#string STR_TCG2_SUPPORTED_EVENT_LOG_FORMAT_CONTENT       #language en-US ""
+
+#string STR_TCG2_HASH_ALGO_BITMAP                         #language en-US "Hash Algorithm Bitmap"
+#string STR_TCG2_HASH_ALGO_BITMAP_HELP                    #language en-US "TCG2 Supported Hash Algorithm Bitmap: SHA1, SHA256, SHA384, SHA512"
+#string STR_TCG2_HASH_ALGO_BITMAP_CONTENT                 #language en-US ""
+
+#string STR_TCG2_NUMBER_OF_PCR_BANKS                      #language en-US "Number of PCR Banks"
+#string STR_TCG2_NUMBER_OF_PCR_BANKS_HELP                 #language en-US "TCG2 Number of PCR Banks"
+#string STR_TCG2_NUMBER_OF_PCR_BANKS_CONTENT              #language en-US ""
+
+#string STR_TCG2_ACTIVE_PCR_BANKS                         #language en-US "Active PCR Banks"
+#string STR_TCG2_ACTIVE_PCR_BANKS_HELP                    #language en-US "TCG2 Active PCR Banks: SHA1, SHA256, SHA384, SHA512"
+#string STR_TCG2_ACTIVE_PCR_BANKS_CONTENT                 #language en-US ""
+
+#string STR_TCG2_PCR_BANK_SHA1                            #language en-US "  PCR Bank: SHA1"
+#string STR_TCG2_PCR_BANK_SHA1_HELP                       #language en-US "TCG2 Request PCR Bank: SHA1"
+#string STR_TCG2_PCR_BANK_SHA256                          #language en-US "  PCR Bank: SHA256"
+#string STR_TCG2_PCR_BANK_SHA256_HELP                     #language en-US "TCG2 Request PCR Bank: SHA256"
+#string STR_TCG2_PCR_BANK_SHA384                          #language en-US "  PCR Bank: SHA384"
+#string STR_TCG2_PCR_BANK_SHA384_HELP                     #language en-US "TCG2 Request PCR Bank: SHA384"
+#string STR_TCG2_PCR_BANK_SHA512                          #language en-US "  PCR Bank: SHA512"
+#string STR_TCG2_PCR_BANK_SHA512_HELP                     #language en-US "TCG2 Request PCR Bank: SHA512"
+#string STR_TCG2_PCR_BANK_SM3_256                         #language en-US "  PCR Bank: SM3_256"
+#string STR_TCG2_PCR_BANK_SM3_256_HELP                    #language en-US "TCG2 Request PCR Bank: SM3_256"
+
+#string STR_NULL                           #language en-US ""

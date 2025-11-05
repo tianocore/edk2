@@ -1,0 +1,38 @@
+// *++
+//
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Module Name:
+//
+//   SampleStrings.uni
+//
+// Abstract:
+//
+//   String definitions for Sample.vfr
+//
+// Revision History:
+//
+// --*/
+
+
+/=#
+
+#langdef en-US "English"
+#langdef fr-FR "Francais"
+
+
+#string STR_SAMPLE_FORM_SET_TITLE      #language en-US  "HII Resource Section Sample"
+                                       #language fr-FR  "HII Resource Section Sample"
+#string STR_SAMPLE_FORM_SET_HELP       #language en-US  "This HII Package List is built in PE/COFF .rsrc section"
+                                       #language fr-FR  "This HII Package List is built in PE/COFF .rsrc section"
+#string STR_SAMPLE_FORM1_TITLE         #language en-US  "Sample Form"
+                                       #language fr-FR  "Sample Form"
+#string STR_SAMPLE_VERSION_TEXT        #language en-US  "Firmware Revision EDKII"
+                                       #language fr-FR  "Firmware Revision EDKII"
+#string STR_SAMPLE_VERSION_HELP        #language en-US  "The date of the revision of the Firmware being used."
+                                       #language fr-FR  "The date of the revision of the Firmware being used."
+#string STR_SAMPLE_ESC                 #language en-US  "Press ESC to exit."
+                                       #language fr-FR  "Press ESC to exit."
+#string STR_SAMPLE_EMPTY               #language en-US  ""
+                                       #language fr-FR  ""

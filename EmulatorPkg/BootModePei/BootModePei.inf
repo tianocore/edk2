@@ -1,0 +1,54 @@
+## @file
+# Component description file for BootMode module
+#
+# This module provides platform specific function to detect boot mode.
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2011, Apple Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BootModePei
+  FILE_GUID                      = 64196C76-58E3-0B4D-9484-B54F7C4349CA
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeBootMode
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  BootModePei.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+
+[LibraryClasses]
+  PeiServicesTablePointerLib
+  PeiServicesLib
+  BaseLib
+  PeimEntryPoint
+  DebugLib
+
+
+[Ppis]
+  gEfiPeiMasterBootModePpiGuid                  # PPI ALWAYS_PRODUCED
+  gEfiPeiBootInRecoveryModePpiGuid              # PPI SOMETIMES_PRODUCED
+
+[FixedPcd]
+  gEmulatorPkgTokenSpaceGuid.PcdEmuBootMode
+
+[Depex]
+  TRUE
+

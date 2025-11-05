@@ -1,0 +1,35 @@
+## @file
+# FmpAuthentication Library
+#
+# NULL Instance of FmpAuthentication Library.
+#
+# Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FmpAuthenticationLibNull
+  MODULE_UNI_FILE                = FmpAuthenticationLibNull.uni
+  FILE_GUID                      = 5011522C-7B0E-4ACB-8E30-9B1D133CF2E0
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FmpAuthenticationLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  FmpAuthenticationLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DebugLib

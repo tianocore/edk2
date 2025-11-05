@@ -1,0 +1,58 @@
+## @file
+# Timer Architectural Protocol module using High Precision Event Timer (HPET).
+#
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = HpetTimerDxe
+  MODULE_UNI_FILE                = HpetTimerDxe.uni
+  FILE_GUID                      = 6CE6B0DE-781C-4f6c-B42D-98346C614BEC
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = TimerDriverInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#
+
+[Sources]
+  HpetTimer.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  PcAtChipsetPkg/PcAtChipsetPkg.dec
+
+[LibraryClasses]
+  PcdLib
+  IoLib
+  DebugLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  BaseLib
+  LocalApicLib
+  IoApicLib
+
+[Protocols]
+  gEfiTimerArchProtocolGuid                     ## PRODUCES
+  gEfiCpuArchProtocolGuid                       ## CONSUMES
+
+[FeaturePcd]
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetMsiEnable    ## CONSUMES
+
+[Pcd]
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetBaseAddress          ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetLocalApicVector      ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetDefaultTimerPeriod   ## CONSUMES
+
+[Depex]
+  gEfiCpuArchProtocolGuid
+[UserExtensions.TianoCore."ExtraFiles"]
+  HpetTimerDxeExtra.uni

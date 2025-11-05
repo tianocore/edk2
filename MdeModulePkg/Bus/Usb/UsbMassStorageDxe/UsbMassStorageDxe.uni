@@ -1,0 +1,31 @@
+// /** @file
+// USB Mass Storage Driver that manages USB mass storage devices and produces Block I/O Protocol.
+//
+// The USB mass storage class is specified in two layers: the bottom layer
+// is the transportation protocol. The top layer is the command set.
+// The transportation layer provides the transportation of the command, data and result.
+// The command set defines the command, data and result.
+// The Bulk-Only-Transport and Control/Bulk/Interrupt transport are two transportation protocol.
+// USB mass storage class adopts various industrial standard as its command set.
+// This module refers to following specifications:
+// 1. USB Mass Storage Specification for Bootability, Revision 1.0
+// 2. USB Mass Storage Class Control/Bulk/Interrupt (CBI) Transport, Revision 1.1
+// 3. USB Mass Storage Class Bulk-Only Transport, Revision 1.0.
+// 4. UEFI Specification, v2.1
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Manages USB mass storage devices and produces Block I/O Protocol"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "The USB mass storage class is specified in two layers: the bottom layer is the transportation protocol. The top layer is the command set. The transportation layer provides the transportation of the command, data and result. The command set defines the command, data and result. The Bulk-Only-Transport and Control/Bulk/Interrupt transport are two transportation protocol. USB mass storage class adopts various industrial standard as its command set.<BR><BR>\n"
+                                                        "This module refers to following specifications:<BR>\n"
+                                                        "1. USB Mass Storage Specification for Bootability, Revision 1.0<BR>\n"
+                                                        "2. USB Mass Storage Class Control/Bulk/Interrupt (CBI) Transport, Revision 1.1<BR>\n"
+                                                        "3. USB Mass Storage Class Bulk-Only Transport, Revision 1.0.<BR>\n"
+                                                        "4. UEFI Specification, v2.1<BR>"
+

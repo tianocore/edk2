@@ -1,0 +1,21 @@
+// /** @file
+// This Package provides all definitions (including functions, MACROs,
+// structures library classes, and PCDs) and libraries instances, which are used
+// to support unit testing and interface testing.
+//
+// Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_PACKAGE_ABSTRACT     #language en-US "This Package provides all definitions (including functions, MACROs, structures library classes, and PCDs) and libraries instances, which are used to support unit testing and interface testing."
+
+#string STR_PACKAGE_DESCRIPTION  #language en-US "This Package provides all definitions (including functions, MACROs, structures library classes, and PCDs) and libraries instances, which are used to support unit testing and interface testing."
+
+#string STR_gUnitTestFrameworkPkgTokenSpaceGuid_PcdUnitTestLogLevel_PROMPT  #language en-US "Unit Test Log Message Level"
+
+#string STR_gUnitTestFrameworkPkgTokenSpaceGuid_PcdUnitTestLogLevel_HELP    #language en-US "This flag is used to control build time optimization based on unit test log level.  The default value is 0xFFFFFFFF to enable all unit test log messages.<BR><BR>\n"
+                                                                                   "BIT0 - Error unit test log messages.<BR>\n"
+                                                                                   "BIT1 - Warning unit test log messages.<BR>\n"
+                                                                                   "BIT2 - Informational unit test log messages.<BR>\n"
+                                                                                   "BIT3 - Verbose unit test log messages.<BR>\n"

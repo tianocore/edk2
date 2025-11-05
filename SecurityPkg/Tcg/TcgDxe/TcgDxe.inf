@@ -1,0 +1,81 @@
+## @file
+#  Produces TCG protocol and measures boot environment
+#  This module will produce TCG protocol and measure boot environment.
+#
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TcgDxe
+  MODULE_UNI_FILE                = TcgDxe.uni
+  FILE_GUID                      = A5683620-7998-4bb2-A377-1C1E31E1E215
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DriverEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  TcgDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  CryptoPkg/CryptoPkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  UefiBootServicesTableLib
+  HobLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  Tpm12DeviceLib
+  BaseCryptLib
+  PrintLib
+  UefiLib
+  PcdLib
+  ReportStatusCodeLib
+  Tpm12CommandLib
+
+[Guids]
+  gEfiGlobalVariableGuid                             ## SOMETIMES_CONSUMES  ## Variable:L"BootXXXX"
+  gTcgEventEntryHobGuid                              ## SOMETIMES_CONSUMES  ## HOB
+  gTpmErrorHobGuid                                   ## SOMETIMES_CONSUMES  ## HOB
+  gEfiEventExitBootServicesGuid                      ## CONSUMES            ## Event
+  gEventExitBootServicesFailedGuid                   ## SOMETIMES_CONSUMES  ## Event
+  gEfiTpmDeviceInstanceTpm12Guid                     ## PRODUCES            ## GUID       # TPM device identifier
+
+[Protocols]
+  gEfiTcgProtocolGuid                                ## PRODUCES
+  gEfiAcpiTableProtocolGuid                          ## NOTIFY
+  gEfiMpServiceProtocolGuid                          ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmPlatformClass              ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid               ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress                ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId             ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId        ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision       ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId         ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision   ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeSubClassTpmDevice   ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcgLogAreaMinLen              ## CONSUMES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  TcgDxeExtra.uni
+

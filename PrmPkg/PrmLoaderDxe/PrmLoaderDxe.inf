@@ -1,0 +1,61 @@
+## @file
+#  PRM Loader Driver
+#
+#  This driver discovers PRM Modules loaded in memory and places those modules and the
+#  PRM handlers within those modules into a PRMT ACPI table such that the handlers are
+#  made available for invocation in the OS.
+#
+#  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PrmLoaderDxe
+  FILE_GUID                      = 226A500A-E14F-414A-A956-40E5762D3D1E
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PrmLoaderEntryPoint
+
+[Sources]
+  PrmAcpiTable.h
+  PrmLoaderDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  PrmPkg/PrmPkg.dec
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+  gZeroGuid
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PcdLib
+  PrmContextBufferLib
+  PrmModuleDiscoveryLib
+  PrmPeCoffLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId            ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision  ## CONSUMES
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid
+  gPrmConfigProtocolGuid
+
+[Depex]
+  TRUE

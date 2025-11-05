@@ -1,0 +1,17 @@
+// /** @file
+// AtaAtapiPassThru driver to provide native IDE/AHCI mode support.
+//
+// This driver installs AtaPassThru and ExtScsiPassThru protocol in each ide/sata controller
+// to access to all attached Ata/Atapi devices.
+//
+// Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "AtaAtapiPassThru driver to provide native IDE/AHCI mode support."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver installs AtaPassThru and ExtScsiPassThru protocols in each IDE/SATA controller to access to all attached ATA/ATAPI devices."
+

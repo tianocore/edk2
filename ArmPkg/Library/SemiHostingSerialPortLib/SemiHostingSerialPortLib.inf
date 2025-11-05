@@ -1,0 +1,29 @@
+#/** @file
+# Semihosting  serial port lib
+#
+# Copyright (c) 2008, Apple Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SemiHostingSerialPortLib
+  FILE_GUID                      = E9FB2D1E-05D9-421C-8C35-6100BB0093B7
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SerialPortLib
+
+
+[Sources.common]
+  SerialPortLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ArmPkg/ArmPkg.dec
+
+[LibraryClasses]
+  SemihostLib

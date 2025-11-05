@@ -1,0 +1,105 @@
+##  @file
+#  This is the shell application
+#
+#  (C) Copyright 2013 Hewlett-Packard Development Company, L.P.<BR>
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = Shell
+  FILE_GUID                      = 7C04A583-9E3E-4f1c-AD65-E05268D0B4D1 # gUefiShellFileGuid
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UefiMain
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  Shell.c
+  Shell.h
+  ShellParametersProtocol.c
+  ShellParametersProtocol.h
+  ShellProtocol.c
+  ShellProtocol.h
+  FileHandleWrappers.c
+  FileHandleWrappers.h
+  FileHandleInternal.h
+  ShellEnvVar.c
+  ShellEnvVar.h
+  ShellManParser.c
+  ShellManParser.h
+  Shell.uni
+  ConsoleLogger.c
+  ConsoleLogger.h
+  ConsoleWrappers.c
+  ConsoleWrappers.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiApplicationEntryPoint
+  UefiLib
+  DebugLib
+  MemoryAllocationLib
+  ShellCommandLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  DevicePathLib
+  BaseMemoryLib
+  PcdLib
+  FileHandleLib
+  PrintLib
+  HiiLib
+  SortLib
+  HandleParsingLib
+  UefiHiiServicesLib
+
+[Guids]
+  gShellVariableGuid                                      ## SOMETIMES_CONSUMES ## GUID
+  gShellAliasGuid                                         ## SOMETIMES_CONSUMES ## GUID
+  gShellAliasGuid                                         ## SOMETIMES_PRODUCES ## GUID
+
+[Protocols]
+  gEfiShellProtocolGuid                                   ## PRODUCES
+                                                          ## SOMETIMES_CONSUMES
+  gEfiShellParametersProtocolGuid                         ## PRODUCES
+                                                          ## SOMETIMES_CONSUMES
+
+#  gEfiShellEnvironment2Guid                              ## SOMETIMES_PRODUCES
+#  gEfiShellInterfaceGuid                                 ## SOMETIMES_PRODUCES
+
+  gEfiSimpleTextInputExProtocolGuid                       ## CONSUMES
+  gEfiSimpleTextInProtocolGuid                            ## CONSUMES
+  gEfiSimpleTextOutProtocolGuid                           ## CONSUMES
+  gEfiSimpleFileSystemProtocolGuid                        ## SOMETIMES_CONSUMES
+  gEfiLoadedImageProtocolGuid                             ## CONSUMES
+  gEfiComponentName2ProtocolGuid                          ## SOMETIMES_CONSUMES
+  gEfiUnicodeCollation2ProtocolGuid                       ## CONSUMES
+  gEfiDevicePathProtocolGuid                              ## CONSUMES
+  gEfiHiiPackageListProtocolGuid                          ## SOMETIMES_PRODUCES
+
+[Pcd]
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel           ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellRequireHiiPlatform     ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportFrameworkHii    ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellPageBreakDefault       ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellInsertModeDefault      ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellScreenLogCount         ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize        ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellForceConsole           ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupplier               ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellMaxHistoryCommandCount ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellDefaultDelay           ## CONSUMES

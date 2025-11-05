@@ -1,0 +1,16 @@
+// /** @file
+// Library instance for ResetSystem library class for PCAT systems
+//
+// Library instance for ResetSystem library class for PCAT systems
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Library instance for ResetSystem library class for PCAT systems"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Library instance for ResetSystem library class for PCAT systems"
+

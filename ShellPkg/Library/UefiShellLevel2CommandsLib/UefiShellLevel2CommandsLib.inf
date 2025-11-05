@@ -1,0 +1,79 @@
+##  @file
+# Provides shell level 2 functions
+#
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = UefiShellLevel2CommandsLib
+  FILE_GUID                      = CBF3931C-A2DF-40e5-B77E-CCA9555E9755
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = ShellLevel2CommandsLibConstructor
+  DESTRUCTOR                     = ShellLevel2CommandsLibDestructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources.common]
+  UefiShellLevel2CommandsLib.c
+  UefiShellLevel2CommandsLib.h
+  UefiShellLevel2CommandsLib.uni
+  TimeDate.c
+  Load.c
+  Ls.c
+  Map.c
+  Reset.c
+  Set.c
+  MkDir.c
+  Cd.c
+  Cp.c
+  Parse.c
+  Rm.c
+  Mv.c
+  Attrib.c
+  Vol.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  ShellCommandLib
+  ShellLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  PcdLib
+  HiiLib
+  HandleParsingLib
+  DevicePathLib
+
+[Protocols]
+  gEfiUnicodeCollation2ProtocolGuid                       ## CONSUMES
+  gEfiShellProtocolGuid                                   ## CONSUMES
+  gEfiShellParametersProtocolGuid                         ## CONSUMES
+  gEfiDevicePathProtocolGuid                              ## CONSUMES
+  gEfiLoadedImageProtocolGuid                             ## CONSUMES
+  gEfiSimpleFileSystemProtocolGuid                        ## SOMETIMES_CONSUMES
+
+[Pcd.common]
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel         ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize    ## CONSUMES
+
+[Guids]
+  gEfiFileSystemInfoGuid                                  ## SOMETIMES_CONSUMES ## GUID
+  gEfiFileInfoGuid                                        ## UNDEFINED
+  gShellLevel2HiiGuid                                     ## SOMETIMES_CONSUMES ## HII

@@ -1,0 +1,73 @@
+## @file
+#  Reset Vector
+#
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ResetVector
+  FILE_GUID                      = 1BA0062E-C779-4582-8566-336AE8F78F09
+  MODULE_TYPE                    = USER_DEFINED
+  VERSION_STRING                 = 1.1
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  ResetVector.nasmb
+
+[Packages]
+  OvmfPkg/OvmfPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[BuildOptions]
+   *_*_IA32_NASMB_FLAGS = -I$(WORKSPACE)/UefiCpuPkg/ResetVector/Vtf0/
+   *_*_X64_NASMB_FLAGS = -I$(WORKSPACE)/UefiCpuPkg/ResetVector/Vtf0/
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdCfvBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataOffset
+  gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataOffset
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataSize
+
+[FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecSvsmCaaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecSvsmCaaSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmParamBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmParamSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmHobBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfIgvmHobSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse5LevelPageTable

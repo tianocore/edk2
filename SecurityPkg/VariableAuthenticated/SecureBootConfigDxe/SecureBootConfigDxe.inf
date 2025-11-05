@@ -1,0 +1,131 @@
+## @file
+#  Provides the capability to configure secure boot in a setup browser
+#  By this module, user may change the content of DB, DBX, PK and KEK.
+#
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecureBootConfigDxe
+  MODULE_UNI_FILE                = SecureBootConfigDxe.uni
+  FILE_GUID                      = F0E6A44F-7195-41c3-AC64-54F202CD0A21
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SecureBootConfigDriverEntryPoint
+  UNLOAD_IMAGE                   = SecureBootConfigDriverUnload
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  SecureBootConfigDriver.c
+  SecureBootConfigImpl.c
+  SecureBootConfigFileExplorer.c
+  SecureBootConfigDevicePath.c
+  SecureBootConfigMisc.c
+  SecureBootConfigImpl.h
+  SecureBootConfig.vfr
+  SecureBootConfigStrings.uni
+  SecureBootConfigNvData.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  BaseCryptLib
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+  UefiHiiServicesLib
+  DebugLib
+  HiiLib
+  PlatformSecureLib
+  DevicePathLib
+  FileExplorerLib
+  PeCoffLib
+  SecureBootVariableLib
+  SecureBootVariableProvisionLib
+
+[Guids]
+  ## SOMETIMES_CONSUMES      ## Variable:L"CustomMode"
+  ## SOMETIMES_PRODUCES      ## Variable:L"CustomMode"
+  gEfiCustomModeEnableGuid
+
+  ## SOMETIMES_CONSUMES      ## Variable:L"SecureBootEnable"
+  ## SOMETIMES_PRODUCES      ## Variable:L"SecureBootEnable"
+  gEfiSecureBootEnableDisableGuid
+
+  ## SOMETIMES_CONSUMES      ## GUID            # Unique ID for the type of the signature.
+  ## SOMETIMES_PRODUCES      ## GUID            # Unique ID for the type of the signature.
+  gEfiCertRsa2048Guid
+
+  ## SOMETIMES_CONSUMES      ## GUID            # Unique ID for the type of the signature.
+  ## SOMETIMES_PRODUCES      ## GUID            # Unique ID for the type of the signature.
+  gEfiCertX509Guid
+
+  ## SOMETIMES_CONSUMES      ## GUID            # Unique ID for the type of the signature.
+  ## SOMETIMES_PRODUCES      ## GUID            # Unique ID for the type of the signature.
+  gEfiCertSha1Guid
+
+  ## SOMETIMES_CONSUMES      ## GUID            # Unique ID for the type of the signature.
+  ## SOMETIMES_PRODUCES      ## GUID            # Unique ID for the type of the signature.
+  gEfiCertSha256Guid
+
+  ## SOMETIMES_CONSUMES      ## GUID            # Unique ID for the type of the signature.
+  ## SOMETIMES_PRODUCES      ## GUID            # Unique ID for the type of the signature.
+  gEfiCertSha384Guid
+
+  ## SOMETIMES_CONSUMES      ## GUID            # Unique ID for the type of the signature.
+  ## SOMETIMES_PRODUCES      ## GUID            # Unique ID for the type of the signature.
+  gEfiCertSha512Guid
+
+  ## SOMETIMES_CONSUMES      ## Variable:L"db"
+  ## SOMETIMES_PRODUCES      ## Variable:L"db"
+  ## SOMETIMES_CONSUMES      ## Variable:L"dbx"
+  ## SOMETIMES_PRODUCES      ## Variable:L"dbx"
+  gEfiImageSecurityDatabaseGuid
+
+  ## SOMETIMES_CONSUMES      ## Variable:L"SetupMode"
+  ## SOMETIMES_PRODUCES      ## Variable:L"PK"
+  ## SOMETIMES_CONSUMES      ## Variable:L"KEK"
+  ## SOMETIMES_PRODUCES      ## Variable:L"KEK"
+  ## SOMETIMES_CONSUMES      ## Variable:L"SecureBoot"
+  gEfiGlobalVariableGuid
+
+  gEfiIfrTianoGuid                              ## PRODUCES            ## GUID       # HII opcode
+  ## PRODUCES                ## HII
+  ## CONSUMES                ## HII
+  gSecureBootConfigFormSetGuid
+  gEfiCertPkcs7Guid                             ## SOMETIMES_PRODUCES  ## GUID  # Unique ID for the type of the certificate.
+  gEfiCertTypeRsa2048Sha256Guid                 ## SOMETIMES_CONSUMES  ## GUID  # Unique ID for the type of the certificate.
+  gEfiFileSystemVolumeLabelInfoIdGuid           ## SOMETIMES_CONSUMES  ## GUID  # Indicate the information type
+
+  gEfiCertX509Sha256Guid                        ## SOMETIMES_PRODUCES  ## GUID  # Unique ID for the type of the certificate.
+  gEfiCertX509Sha384Guid                        ## SOMETIMES_PRODUCES  ## GUID  # Unique ID for the type of the certificate.
+  gEfiCertX509Sha512Guid                        ## SOMETIMES_PRODUCES  ## GUID  # Unique ID for the type of the certificate.
+
+[Protocols]
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
+  gEfiDevicePathProtocolGuid                    ## PRODUCES
+  gEfiHiiPopupProtocolGuid
+  gEfiRealTimeClockArchProtocolGuid             ## CONSUMES
+
+[Depex]
+  gEfiHiiConfigRoutingProtocolGuid  AND
+  gEfiHiiDatabaseProtocolGuid       AND
+  gEfiVariableArchProtocolGuid      AND
+  gEfiVariableWriteArchProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SecureBootConfigDxeExtra.uni

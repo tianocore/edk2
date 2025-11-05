@@ -1,0 +1,26 @@
+## @file
+#  The default logo bitmap picture shown on setup screen, which is corresponding to gEfiDefaultBmpLogoGuid.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#  Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
+
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Logo
+  MODULE_UNI_FILE                = Logo.uni
+  FILE_GUID                      = 7BB28B99-61BB-11D5-9A5D-0090273FC14D
+  MODULE_TYPE                    = USER_DEFINED
+  VERSION_STRING                 = 1.0
+
+[Binaries]
+  BIN|Logo.bmp|*
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  LogoExtra.uni

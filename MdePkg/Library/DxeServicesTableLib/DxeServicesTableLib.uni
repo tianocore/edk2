@@ -1,0 +1,17 @@
+// /** @file
+// Instance of DXE Services Table Library using EFI Configuration Table.
+//
+// DXE Services Table Library that retrieves a pointer to the DXE Services
+// Table from the Configuration Table in the EFI System Table.
+//
+// Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Uses EFI Configuration Table"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "DXE Services Table Library retrieves a pointer to the DXE Services Table from the Configuration Table in the EFI System Table."
+

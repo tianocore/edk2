@@ -1,0 +1,15 @@
+// /** @file
+// Null instance of Memory Allocation Library
+//
+// Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2018, Linaro, Ltd. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Null instance of Memory Allocation Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Memory Allocation Library for build testing only."
+

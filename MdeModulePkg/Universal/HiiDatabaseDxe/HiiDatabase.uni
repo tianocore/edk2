@@ -1,0 +1,17 @@
+// /** @file
+// The DXE driver produces HII protocols defined in UEFI specification.
+//
+// This driver produces all required HII serivces that includes HiiDataBase, HiiString,
+// HiiFont, HiiConfigRouting. To support UEFI HII, this driver is required.
+//
+// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces HII protocols defined in the UEFI Specification"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver produces all required HII services that includes HiiDataBase, HiiString, HiiFont, HiiConfigRouting. To support UEFI HII, this driver is required."
+

@@ -1,0 +1,267 @@
+variable:
+  PLATFORM_NAME                  : QemuFspPkg
+  PLATFORM_GUID                  : 1BEDB57A-7904-406e-8486-C89FC7FB39EE
+  PLATFORM_VERSION               : 0.1
+  DSC_SPECIFICATION              : 0x00010005
+  OUTPUT_DIRECTORY               : Build/QemuFspPkg
+  SUPPORTED_ARCHITECTURES        : IA32|X64
+  BUILD_TARGETS                  : DEBUG|RELEASE
+  SKUID_IDENTIFIER               : DEFAULT
+  FLASH_DEFINITION               : QemuFspPkg/QemuFspPkg.fdf
+  FSP_T_UPD_TOOL_GUID            : 34686CA3-34F9-4901-B82A-BA630F0714C6
+  FSP_V_UPD_TOOL_GUID            : 4E2F4725-734A-4399-BAF5-B4E16348EB2F
+  FSP_M_UPD_TOOL_GUID            : 39A250DB-E465-4DD1-A2AC-E2BD3C0E2385
+  FSP_S_UPD_TOOL_GUID            : CAE3605B-5B34-4C85-B3D7-27D54273C40F
+  FSP_T_UPD_FFS_GUID             : 70BCF6A5-FFB1-47D8-B1AE-EFE5508E23EA
+  FSP_V_UPD_FFS_GUID             : 0197EF5E-2FFC-4089-8E55-F70400B18146
+  FSP_M_UPD_FFS_GUID             : D5B86AEA-6AF7-40D4-8014-982301BC3D89
+  FSP_S_UPD_FFS_GUID             : E3CD9B18-998C-4F76-B65E-98B154E5446F
+  FSP_PACKAGE                    : QemuFspPkg
+  FSP_IMAGE_ID                   : 0x245053464D455124  # $QEMFSP$
+  FSP_IMAGE_REV                  : 0x00001010
+  CAR_BASE_ADDRESS               : 0x00000000
+  CAR_REGION_SIZE                : 0x00080000
+  CAR_BLD_REGION_SIZE            : 0x00070000
+  CAR_FSP_REGION_SIZE            : 0x00010000
+  FSP_ARCH                       : X64
+
+
+template:
+
+
+configs:
+  - $ACTION      :
+      page         : TMP::"FSP T", MEM::"FSP MemoryInit Settings", SIL::"FSP SiliconInit Settings"
+  - $ACTION      :
+      find         : QEMUPD_T
+  - FSPT_UPD     :
+    - FSP_UPD_HEADER :
+      - Signature    :
+          length       : 0x08
+          value        : 0x545F4450554D4551
+      - Revision     :
+          name         : FsptUpdRevision
+          length       : 0x01
+          value        : 0x01
+      - Reserved     :
+          length       : 0x17
+          value        : {0x00}
+    - FSPT_ARCH_UPD :
+      - Revision     :
+          length       : 0x01
+          value        : 0x01
+      - Reserved     :
+          length       : 0x03
+          value        : {0x00}
+      - Length       :
+          length       : 0x04
+          value        : 0x00000020
+      - FspDebugHandler :
+          length       : 0x04
+          value        : 0x00000000
+      - Reserved1    :
+          length       : 0x14
+          value        : {0x00}
+    - FSPT_COMMON_UPD :
+      - Revision     :
+          length       : 0x01
+          value        : 0x01
+      - Reserved     :
+          length       : 0x03
+          value        : {0x00}
+      - MicrocodeRegionBase :
+          length       : 0x04
+          value        : 0x00000000
+      - MicrocodeRegionLength :
+          length       : 0x04
+          value        : 0x00000000
+      - CodeRegionBase :
+          length       : 0x04
+          value        : 0x00000000
+      - CodeRegionLength :
+          length       : 0x04
+          value        : 0x00000000
+      - Reserved1    :
+          length       : 0x0C
+          value        : {0x00}
+    - FSP_T_CONFIG :
+      - $ACTION      :
+          page         : TMP
+      - ChickenBytes :
+          name         : Chicken bytes to test Hex config
+          type         : EditNum, HEX, (0x00000000,0xFFFFFFFF)
+          help         : >
+                         This option shows how to present option for 4 bytes data
+          length       : 0x04
+          value        : 0x00000000
+      - ReservedFsptUpd1 :
+          length       : 0x1C
+          value        : {0x00}
+    - UpdTerminator :
+        length       : 0x02
+        value        : 0x55AA
+    - $ACTION      :
+        find         : QEMUPD_M
+  - FSPM_UPD     :
+    - FSP_UPD_HEADER :
+      - Signature    :
+          length       : 0x08
+          value        : 0x4D5F4450554D4551
+      - Revision     :
+          name         : FspmUpdRevision
+          length       : 0x01
+          value        : 0x01
+      - Reserved     :
+          length       : 0x17
+          value        : {0x00}
+    - FSPM_ARCH_UPD :
+      - Revision     :
+          length       : 0x01
+          value        : 0x01
+      - Reserved     :
+          length       : 0x03
+          value        : {0x00}
+      - NvsBufferPtr :
+          struct       : VOID*
+          length       : 0x04
+          value        : 0x00000000
+      - StackBase    :
+          struct       : VOID*
+          name         : StackBase
+          help         : >
+                         Stack base for FSP use. Default- 0xFEF16000
+          length       : 0x04
+          value        : $(CAR_BLD_REGION_SIZE)
+      - StackSize    :
+          name         : StackSize
+          help         : >
+                         To pass the stack size for FSP use. Bootloader can programmatically get the FSP requested StackSize by using the defaults in the FSP-M component. This is the minimum stack size expected by this revision of FSP. Default- 0x2A000
+          length       : 0x04
+          value        : $(CAR_FSP_REGION_SIZE)
+      - BootLoaderTolumSize :
+          name         : BootLoaderTolumSize
+          help         : >
+                         To pass Bootloader Tolum size.
+          length       : 0x04
+          value        : 0x00000000
+      - Bootmode     :
+          name         : Bootmode
+          help         : >
+                         To maintain Bootmode details.
+          length       : 0x04
+          value        : 0x00000000
+      - Reserved1    :
+          length       : 0x08
+          value        : {0x00}
+    - FSP_M_CONFIG :
+      - $ACTION      :
+          page         : MEM
+      - SerialDebugPortAddress :
+          name         : Debug Serial Port Base address
+          type         : EditNum, HEX, (0x00000000,0xFFFFFFFF)
+          help         : >
+                         Debug serial port base address. This option will be used only when the 'Serial Port Debug Device'
+                         option is set to 'External Device'. 0x00000000(Default).
+          length       : 0x04
+          value        : 0x00000000
+      - SerialDebugPortType :
+          name         : Debug Serial Port Type
+          type         : Combo
+          option       : 0:NONE, 1:I/O, 2:MMIO
+          help         : >
+                         16550 compatible debug serial port resource type. NONE means no serial port support. 0x02:MMIO(Default).
+          length       : 0x01
+          value        : 0x02
+      - SerialDebugPortDevice :
+          name         : Serial Port Debug Device
+          type         : Combo
+          option       : 0:SOC UART0, 1:SOC UART1, 2:SOC UART2, 3:External Device
+          help         : >
+                         Select active serial port device for debug.
+                         For SOC UART devices,'Debug Serial Port Base' options will be ignored. 0x02:SOC UART2(Default).
+          length       : 0x01
+          value        : 0x02
+      - SerialDebugPortStrideSize :
+          name         : Debug Serial Port Stride Size
+          type         : Combo
+          option       : 0:1, 2:4
+          help         : >
+                         Debug serial port register map stride size in bytes. 0x00:1, 0x02:4(Default).
+          length       : 0x01
+          value        : 0x02
+      - ReservedFspmUpd :
+          length       : 0x04
+          value        : {0x00}
+    - UpdTerminator :
+        length       : 0x02
+        value        : 0x55AA
+    - $ACTION      :
+        find         : QEMUPD_S
+  - FSPS_UPD     :
+    - FSP_UPD_HEADER :
+      - Signature    :
+          length       : 0x08
+          value        : 0x535F4450554D4551
+      - Revision     :
+          name         : FspsUpdRevision
+          length       : 0x01
+          value        : 0x01
+      - Reserved     :
+          length       : 0x17
+          value        : {0x00}
+    - FSPS_ARCH_UPD :
+      - Revision     :
+          length       : 0x01
+          value        : 0x01
+      - Reserved     :
+          length       : 0x03
+          value        : {0x00}
+      - Length       :
+          length       : 0x04
+          value        : 0x00000020
+      - FspEventHandler :
+          length       : 0x04
+          value        : 0x00000000
+      - EnableMultiPhaseSiliconInit :
+          length       : 0x01
+          value        : 0x00
+      - Reserved1    :
+          length       : 0x13
+          value        : {0x00}
+    - FSP_S_CONFIG :
+      - $ACTION      :
+          page         : SIL
+      - LogoSize     :
+          name         : BMP Logo Data Size
+          type         : Reserved
+          help         : >
+                         BMP logo data buffer size. 0x00000000(Default).
+          length       : 0x04
+          value        : 0x00000000
+      - LogoPtr      :
+          name         : BMP Logo Data Pointer
+          type         : Reserved
+          help         : >
+                         BMP logo data pointer to a BMP format buffer. 0x00000000(Default).
+          length       : 0x04
+          value        : 0x00000000
+      - GraphicsConfigPtr :
+          name         : Graphics Configuration Data Pointer
+          type         : Reserved
+          help         : >
+                         Graphics configuration data used for initialization. 0x00000000(Default).
+          length       : 0x04
+          value        : 0x00000000
+      - PciTempResourceBase :
+          name         : PCI GFX Temporary MMIO Base
+          type         : EditNum, HEX, (0x80000000,0xDFFFFFFF)
+          help         : >
+                         PCI Temporary PCI GFX Base used before full PCI enumeration. 0x80000000(Default).
+          length       : 0x04
+          value        : 0x80000000
+      - ReservedFspsUpd :
+          length       : 0x01
+          value        : 0x00
+    - UpdTerminator :
+        length       : 0x02
+        value        : 0x55AA

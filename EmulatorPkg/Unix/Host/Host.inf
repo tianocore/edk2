@@ -1,0 +1,138 @@
+## @file
+# Entry Point of Emu Emulator
+#
+# Main executable file of Unix Emulator that loads PEI core after initialization finished.
+# Copyright (c) 2008 - 2022, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Host
+  FILE_GUID                      = 8863C0AD-7724-C84B-88E5-A33B116D1485
+  MODULE_TYPE                    = USER_DEFINED
+  VERSION_STRING                 = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  Host.c
+  EmuThunk.c
+  X11GraphicsWindow.c
+  Pthreads.c
+  PosixFileSystem.c
+  BlockIo.c
+  LinuxPacketFilter.c
+  BerkeleyPacketFilter.c
+  MemoryAllocationLib.c
+
+[Sources.X64]
+  X64/Gasket.S        # convert between Emu x86_64 ABI and EFI X64 ABI
+  X64/SwitchStack.S
+
+[Sources.IA32]
+  Ia32/Gasket.S       # enforce 16-byte stack alignment for Mac OS X
+  Ia32/SwitchStack.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  PcdLib
+  PrintLib
+  BaseMemoryLib
+  BaseLib
+  PeCoffLib
+  ThunkPpiList
+  ThunkProtocolList
+  PpiListLib
+  PeiServicesLib
+  PeCoffGetEntryPointLib
+  StackCheckLib
+
+[Ppis]
+  gEfiPeiStatusCodePpiGuid                      # PPI ALWAYS_PRODUCED
+  gEmuThunkPpiGuid
+
+[Protocols]
+  gEmuIoThunkProtocolGuid
+  gEmuIoThunkProtocolGuid
+  gEmuGraphicsWindowProtocolGuid
+  gEmuThreadThunkProtocolGuid
+  gEmuBlockIoProtocolGuid
+  gEmuSnpProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
+
+[Guids]
+  gEfiFileSystemVolumeLabelInfoIdGuid           # SOMETIMES_CONSUMED
+  gEfiFileInfoGuid                              # SOMETIMES_CONSUMED
+  gEfiFileSystemInfoGuid                        # SOMETIMES_CONSUMED
+
+[Pcd]
+  gEmulatorPkgTokenSpaceGuid.PcdEmuBootMode
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareVolume
+  gEmulatorPkgTokenSpaceGuid.PcdEmuMemorySize
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFdBaseAddress
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareFdSize
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareBlockSize
+  gEmulatorPkgTokenSpaceGuid.PcdEmuApCount
+  gEmulatorPkgTokenSpaceGuid.PcdEmuVirtualDisk
+  gEmulatorPkgTokenSpaceGuid.PcdEmuGop|L"GOP Window"
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFileSystem
+  gEmulatorPkgTokenSpaceGuid.PcdEmuSerialPort
+  gEmulatorPkgTokenSpaceGuid.PcdEmuNetworkInterface
+  gEmulatorPkgTokenSpaceGuid.PcdNetworkPacketFilterSize
+
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashFvRecoveryBase
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashFvRecoverySize
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageVariableBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageEventLogBase
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageEventLogSize
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwWorkingBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwSpareBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+  gEmulatorPkgTokenSpaceGuid.PcdPeiServicesTablePage
+  gEmulatorPkgTokenSpaceGuid.PcdPersistentMemorySize
+
+[FeaturePcd]
+  gEmulatorPkgTokenSpaceGuid.PcdEmulatorLazyLoadSymbols
+
+
+[BuildOptions]
+  GCC:*_*_*_CC_FLAGS    == -g -fshort-wchar -fno-strict-aliasing -Wall -malign-double -idirafter/usr/include -c -include $(DEST_DIR_DEBUG)/AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
+  GCC:*_*_IA32_CC_FLAGS  = -m32
+  GCC:*_*_X64_CC_FLAGS   = -m64 "-DEFIAPI=__attribute__((ms_abi))" -flto -DUSING_LTO -Os
+
+  GCC:*_*_*_DLINK_FLAGS    == -o $(BIN_DIR)/Host -z noexecstack -L/usr/X11R6/lib
+  GCC:*_*_IA32_DLINK_FLAGS  = -m32
+  GCC:*_*_X64_DLINK_FLAGS   = -m64 -flto
+
+  GCC:*_*_*_DLINK2_FLAGS == -lpthread -ldl -lXext -lX11
+
+#
+# Need to do this link via gcc and not ld as the pathing to libraries changes from OS version to OS version
+#
+   XCODE:*_*_IA32_DLINK_PATH == gcc
+   XCODE:*_*_IA32_CC_FLAGS = -I$(WORKSPACE)/EmulatorPkg/Unix/Host/X11IncludeHack
+   XCODE:*_*_IA32_DLINK_FLAGS == -arch i386 -o $(BIN_DIR)/Host -L/usr/X11R6/lib -lXext -lX11 -framework Carbon
+   XCODE:*_*_IA32_ASM_FLAGS == -arch i386 -g
+
+   XCODE:*_*_X64_DLINK_PATH == gcc
+   XCODE:*_*_X64_DLINK_FLAGS == -o $(BIN_DIR)/Host -L/usr/X11R6/lib -lXext -lX11 -framework Carbon -Wl,-no_pie
+   XCODE:*_*_X64_ASM_FLAGS == -g
+   XCODE:*_*_X64_CC_FLAGS = -O0 -target x86_64-apple-darwin -I$(WORKSPACE)/EmulatorPkg/Unix/Host/X11IncludeHack "-DEFIAPI=__attribute__((ms_abi))"

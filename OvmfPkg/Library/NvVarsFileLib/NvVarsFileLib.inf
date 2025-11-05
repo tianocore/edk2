@@ -1,0 +1,59 @@
+## @file
+#  NvVarsFileLib
+#
+#  This library saves and restores non-volatile variables in a
+#  file within a file system.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = NvVarsFileLib
+  FILE_GUID                      = 9172fe8b-9a36-40f8-bba5-5e57a44390bd
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NvVarsFileLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64 EBC
+#
+
+[Sources]
+  FsAccess.c
+  NvVarsFileLib.c
+  NvVarsFileLib.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  FileHandleLib
+  MemoryAllocationLib
+  SerializeVariablesLib
+
+[Protocols]
+  gEfiSimpleFileSystemProtocolGuid              ## CONSUMES
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported
+  gUefiOvmfPkgTokenSpaceGuid.PcdBootRestrictToFirmware
+
+[Guids]
+  gEfiFileInfoGuid
+
+[Depex]
+  gEfiVariableWriteArchProtocolGuid
+

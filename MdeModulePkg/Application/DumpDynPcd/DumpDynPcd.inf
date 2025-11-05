@@ -1,0 +1,50 @@
+##  @file
+#  DumpDynPcd is a shell application to dump dynamic pcd information.
+#
+#  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = DumpDynPcd
+  FILE_GUID                      = 31ADA2B2-62EA-4866-9B87-03FEA8425974
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DumpDynPcdMain
+
+#
+# This flag specifies whether HII resource section is generated into PE image.
+#
+  UEFI_HII_RESOURCE_SECTION      = TRUE
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DumpDynPcd.c
+  DumpDynPcdStr.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiApplicationEntryPoint
+  DebugLib
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiUnicodeCollation2ProtocolGuid     ## SOMETIMES_CONSUMES
+  gEfiPcdProtocolGuid                   ## CONSUMES
+  gPcdProtocolGuid                      ## CONSUMES
+  gEfiGetPcdInfoProtocolGuid            ## CONSUMES
+  gGetPcdInfoProtocolGuid               ## CONSUMES
+  gEfiShellParametersProtocolGuid       ## CONSUMES
+

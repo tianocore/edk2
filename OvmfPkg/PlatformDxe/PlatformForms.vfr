@@ -1,0 +1,67 @@
+// *++
+//
+// Copyright (C) 2014, Red Hat, Inc.
+// Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Module Name:
+//
+//   PlatformForms.vfr
+//
+// Abstract:
+//
+//   Form definitions for exposing some of OVMF's platform knobs via HII.
+//
+// --*/
+
+#include <Guid/OvmfPlatformConfig.h>
+#include "Platform.h"
+
+formset
+  guid  = OVMF_PLATFORM_CONFIG_GUID,
+  title = STRING_TOKEN(STR_FORMSET_TITLE),
+  help  = STRING_TOKEN(STR_FORMSET_HELP),
+
+  varstore MAIN_FORM_STATE,
+    varid = FORMSTATEID_MAIN_FORM,
+    name  = MainFormState,
+    guid  = OVMF_PLATFORM_CONFIG_GUID;
+
+  form
+    formid = FORMID_MAIN_FORM,
+    title  = STRING_TOKEN(STR_MAIN_FORM_TITLE);
+
+    //
+    // Display the current preference in a read-only string field.
+    //
+    string
+      varid      = MainFormState.CurrentPreferredResolution,
+      questionid = QUESTION_RES_CUR,
+      prompt     = STRING_TOKEN(STR_RES_CUR),
+      help       = STRING_TOKEN(STR_RES_CUR_HELP),
+      flags      = READ_ONLY,
+      minsize    = 0,
+      maxsize    = MAXSIZE_RES_CUR,
+    endstring;
+
+    //
+    // We'll dynamically generate a one-of-many selection at this label.
+    //
+    label LABEL_RES_NEXT;
+
+    text
+      help  = STRING_TOKEN(STR_SAVE_EXIT),
+      text  = STRING_TOKEN(STR_SAVE_EXIT),
+      flags = INTERACTIVE,
+      key   = QUESTION_SAVE_EXIT;
+
+    text
+      help  = STRING_TOKEN(STR_DISCARD_EXIT),
+      text  = STRING_TOKEN(STR_DISCARD_EXIT),
+      flags = INTERACTIVE,
+      key   = QUESTION_DISCARD_EXIT;
+
+  endform;
+
+endformset;

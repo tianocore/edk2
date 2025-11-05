@@ -1,0 +1,47 @@
+## @file
+#  Implementation functions and structures for var check services.
+#
+#  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = VarCheckHiiLib
+  MODULE_UNI_FILE                = VarCheckHiiLibStandaloneMm.uni
+  FILE_GUID                      = 8545E553-AF7D-4FA0-B402-9B5A67ABC812
+  MODULE_TYPE                    = MM_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = VarCheckHiiLib|MM_STANDALONE
+  CONSTRUCTOR                    = VarCheckHiiLibConstructorStandaloneMm
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  VarCheckHiiLibStandaloneMm.c
+  VarCheckHii.h
+  InternalVarCheckStructure.h
+  VarCheckHiiLibCommon.c
+  VarCheckHiiLibCommon.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  VarCheckLib
+
+[Protocols]
+  gEfiMmEndOfDxeProtocolGuid

@@ -1,0 +1,38 @@
+## @file
+# Library to support Unit Testing from host environments using Cmocka services.
+#
+# Copyright (c) 2019 - 2020, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION     = 0x00010017
+  BASE_NAME       = UnitTestLibCmocka
+  MODULE_UNI_FILE = UnitTestLibCmocka.uni
+  FILE_GUID       = C800595F-45A3-45A1-8B50-28F01C2A5A4F
+  VERSION_STRING  = 1.0
+  MODULE_TYPE     = UEFI_DRIVER
+  LIBRARY_CLASS   = UnitTestLib|HOST_APPLICATION
+
+[Sources]
+  UnitTestLib.c
+  RunTestsCmocka.c
+  AssertCmocka.c
+  Log.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  PcdLib
+  DebugLib
+  MemoryAllocationLib
+  UnitTestPersistenceLib
+  UnitTestResultReportLib
+  CmockaLib
+
+[Pcd]
+  gUnitTestFrameworkPkgTokenSpaceGuid.PcdUnitTestLogLevel  ## CONSUMES

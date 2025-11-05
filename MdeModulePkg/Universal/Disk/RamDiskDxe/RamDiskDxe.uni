@@ -1,0 +1,14 @@
+// /** @file
+// Produces EFI_RAM_DISK_PROTOCOL and provides the capability to
+// create/remove RAM disks in a setup browser.
+//
+// Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces EFI_RAM_DISK_PROTOCOL and provides the capability to create/remove RAM disks in a setup browser."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module produces EFI_RAM_DISK_PROTOCOL and provides the capability to create/remove RAM disks in a setup browser."
+

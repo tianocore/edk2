@@ -1,0 +1,29 @@
+## @file
+#  Debug device library instance that retrieves the current enabling state for
+#  the platform debug output device.
+#
+#  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseDebugDeviceLibNull
+  FILE_GUID                      = 5E975522-176F-4E2D-BB25-64ADCC7792A4
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DebugDeviceLib
+
+#
+#  VALID_ARCHITECTURES           = IA32
+#
+
+[Sources]
+  DebugDeviceLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+

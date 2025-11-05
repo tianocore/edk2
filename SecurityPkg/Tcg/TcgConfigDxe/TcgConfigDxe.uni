@@ -1,0 +1,16 @@
+// /** @file
+// Provides the capability to update TPM state setup browser
+//
+// By this module, user may enable/disable/activate/deactivate/clear TPM, etc.
+//
+// Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Provides the capability to update TPM state setup browser"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "By this module, user may enable/disable/activate/deactivate/clear TPM, etc."
+

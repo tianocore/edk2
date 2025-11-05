@@ -1,0 +1,58 @@
+///** @file
+//
+//  String definitions for the Device Manager.
+//
+//  Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//**/
+
+/=#
+
+#langdef   en-US "English"
+#langdef   fr-FR "Français"
+
+#string STR_EDKII_MENU_TITLE           #language en-US  "Device Manager"
+                                       #language fr-FR  "Device Manager"
+#string STR_EDKII_MENU_HELP            #language en-US  "This selection will take you to the Device Manager"
+                                       #language fr-FR  "This selection will take you to the Device Manager"
+#string STR_DEVICES_LIST               #language en-US  "Devices List"
+                                       #language fr-FR  "Devices List"
+#string STR_DISK_DEVICE                #language en-US  "Disk Devices"
+                                       #language fr-FR  "Disk Devices"
+#string STR_VIDEO_DEVICE               #language en-US  "Video Devices"
+                                       #language fr-FR  "Video Devices"
+#string STR_NETWORK_DEVICE             #language en-US  "Network Devices"
+                                       #language fr-FR  "Network Devices"
+#string STR_INPUT_DEVICE               #language en-US  "Input Devices"
+                                       #language fr-FR  "Input Devices"
+#string STR_ON_BOARD_DEVICE            #language en-US  "Motherboard Devices"
+                                       #language fr-FR  "Motherboard Devices"
+#string STR_OTHER_DEVICE               #language en-US  "Other Devices"
+                                       #language fr-FR  "Other Devices"
+#string STR_MISSING_STRING             #language en-US  "Missing String"
+                                       #language fr-FR  "Missing String"
+#string STR_EMPTY_STRING               #language en-US  ""
+                                       #language fr-FR  ""
+#string STR_EXIT_STRING                #language en-US  "Press ESC to exit."
+                                       #language fr-FR  "Press ESC to exit."
+#string STR_FORM_NETWORK_DEVICE_TITLE_HEAD  #language en-US  "Network Device"
+#string STR_FORM_NETWORK_DEVICE_TITLE       #language en-US  "Network Device"
+                                       #language fr-FR  "Network Device"
+#string STR_FORM_NETWORK_DEVICE_HELP   #language en-US  "Network Device Help..."
+                                       #language fr-FR  "Network Device Help..."
+#string STR_NETWORK_DEVICE_STRING      #language en-US  "Network Device"
+                                       #language fr-FR  "Network Device"
+#string STR_FORM_NETWORK_DEVICE_LIST_HELP   #language en-US  "Select the network device according the MAC address"
+                                            #language fr-FR  "Select the network device according the MAC address"
+#string STR_FORM_NETWORK_DEVICE_LIST_TITLE  #language en-US  "Network Device List"
+                                            #language fr-FR  "Network Device List"
+#string STR_NETWORK_DEVICE_LIST_STRING      #language en-US  "Network Device List"
+                                            #language fr-FR  "Network Device List"
+#string STR_NETWORK_DEVICE_HELP             #language en-US  "Network Device"
+                                            #language fr-FR  "Network Device"
+//
+// Ensure that this is the last string.  We are using it programmatically
+// to do string token re-usage settings for the Device Manager since we are
+// constantly recreating this page based on HII population.
+////

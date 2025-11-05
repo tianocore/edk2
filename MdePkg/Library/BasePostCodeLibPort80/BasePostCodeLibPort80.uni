@@ -1,0 +1,16 @@
+// /** @file
+// Instance of Post Code Library using I/O port 0x80.
+//
+// Post Code Library that writes post code values to I/O port 0x80.
+//
+// Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Instance of Post Code Library using I/O port 0x80"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Post Code Library that writes post code values to I/O port 0x80."
+

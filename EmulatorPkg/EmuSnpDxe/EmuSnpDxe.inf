@@ -1,0 +1,53 @@
+#/** @file
+# Component name for module EmuSnpDxe
+#
+#  Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010, Apple, Inc. All rights reserved.<BR>
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EmuSnpDxe
+  FILE_GUID                      = 22597239-6107-DF44-AD3F-5F053E92222E
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  EDK_RELEASE_VERSION            = 0x00020000
+  EFI_SPECIFICATION_VERSION      = 0x00020000
+
+  ENTRY_POINT                    = InitializeEmuSnpDriver
+#  UNLOAD_IMAGE                   = EmuSnpUnload
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources.common]
+  ComponentName.c
+  EmuSnpDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[LibraryClasses]
+  DevicePathLib
+  UefiLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  UefiDriverEntryPoint
+  NetLib
+
+[Protocols]
+  gEfiSimpleNetworkProtocolGuid                 # PROTOCOL ALWAYS_CONSUMED
+  gEfiDevicePathProtocolGuid                    # PROTOCOL ALWAYS_CONSUMED
+  gEmuSnpProtocolGuid
+  gEmuIoThunkProtocolGuid
+
+

@@ -1,0 +1,16 @@
+// /** @file
+// Provides services to retrieve values from Version 1 of a capsule's FMP Payload
+// Header. The FMP Payload Header structure is not defined in the library class.
+// Instead, services are provided to retrieve information from the FMP Payload
+// Header.  If information is added to the FMP Payload Header, then new services
+// may be added to this library class to retrieve the new information.
+//
+// Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT     #language en-US  "Provides services to retrieve values from Version 1 of a capsule's FMP Payload Header."
+
+#string STR_MODULE_DESCRIPTION  #language en-US  "Provides services to retrieve values from Version 1 of a capsule's FMP Payload Header."

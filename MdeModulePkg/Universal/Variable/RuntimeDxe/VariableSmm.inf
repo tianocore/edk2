@@ -1,0 +1,152 @@
+## @file
+#  Provides SMM variable service.
+#
+#  This module installs SMM variable protocol into SMM protocol database,
+#  which can be used by SMM driver, and installs SMM variable protocol
+#  into BS protocol database, which can be used to notify the SMM Runtime
+#  Dxe driver that the SMM variable service is ready.
+#  This module should be used with SMM Runtime DXE module together. The
+#  SMM Runtime DXE module would install variable arch protocol and variable
+#  write arch protocol based on SMM variable module.
+#
+#  Caution: This module requires additional review when modified.
+#  This driver will have external input - variable data and communicate buffer in SMM mode.
+#  This external input must be validated carefully to avoid security issues such as
+#  buffer overflow or integer overflow.
+#    The whole SMM authentication variable design relies on the integrity of flash part and SMM.
+#  which is assumed to be protected by platform.  All variable code and metadata in flash/SMM Memory
+#  may not be modified without authorization. If platform fails to protect these resources,
+#  the authentication service provided in this driver will be broken, and the behavior is undefined.
+#
+# Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VariableSmm
+  MODULE_UNI_FILE                = VariableSmm.uni
+  FILE_GUID                      = 23A089B3-EED5-4ac5-B2AB-43E3298C2343
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  ENTRY_POINT                    = VariableServiceInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+
+[Sources]
+  Reclaim.c
+  Variable.c
+  VariableTraditionalMm.c
+  VariableSmm.c
+  VariableNonVolatile.c
+  VariableNonVolatile.h
+  VariableParsing.c
+  VariableParsing.h
+  VariableRuntimeCache.c
+  VariableRuntimeCache.h
+  VarCheck.c
+  Variable.h
+  PrivilegePolymorphic.h
+  VariableExLib.c
+  TcgMorLockSmm.c
+  SpeculationBarrierSmm.c
+  VariableLockRequestToLock.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  MemoryAllocationLib
+  BaseLib
+  SynchronizationLib
+  UefiLib
+  MmServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  DxeServicesTableLib
+  HobLib
+  PcdLib
+  SmmMemLib
+  AuthVariableLib
+  VarCheckLib
+  UefiBootServicesTableLib
+  VariableFlashInfoLib
+  VariablePolicyLib
+  VariablePolicyHelperLib
+  SafeIntLib
+
+[Protocols]
+  gEfiSmmFirmwareVolumeBlockProtocolGuid        ## CONSUMES
+  ## CONSUMES
+  ## NOTIFY
+  gEfiSmmFaultTolerantWriteProtocolGuid
+  ## PRODUCES
+  ## UNDEFINED # SmiHandlerRegister
+  gEfiSmmVariableProtocolGuid
+  gEfiMmEndOfDxeProtocolGuid                    ## NOTIFY
+  gEdkiiSmmVarCheckProtocolGuid                 ## PRODUCES
+  gEfiTcgProtocolGuid                           ## SOMETIMES_CONSUMES
+  gEfiTcg2ProtocolGuid                          ## SOMETIMES_CONSUMES
+
+[Guids]
+  ## SOMETIMES_CONSUMES   ## GUID # Signature of Variable store header
+  ## SOMETIMES_PRODUCES   ## GUID # Signature of Variable store header
+  ## SOMETIMES_CONSUMES   ## HOB
+  ## SOMETIMES_PRODUCES   ## SystemTable
+  gEfiAuthenticatedVariableGuid
+
+  ## SOMETIMES_CONSUMES   ## GUID # Signature of Variable store header
+  ## SOMETIMES_PRODUCES   ## GUID # Signature of Variable store header
+  ## SOMETIMES_CONSUMES   ## HOB
+  ## SOMETIMES_PRODUCES   ## SystemTable
+  gEfiVariableGuid
+
+  ## SOMETIMES_CONSUMES   ## Variable:L"PlatformLang"
+  ## SOMETIMES_PRODUCES   ## Variable:L"PlatformLang"
+  ## SOMETIMES_CONSUMES   ## Variable:L"Lang"
+  ## SOMETIMES_PRODUCES   ## Variable:L"Lang"
+  gEfiGlobalVariableGuid
+
+  gEfiMemoryOverwriteControlDataGuid            ## SOMETIMES_CONSUMES   ## Variable:L"MemoryOverwriteRequestControl"
+  gEfiMemoryOverwriteRequestControlLockGuid     ## SOMETIMES_PRODUCES   ## Variable:L"MemoryOverwriteRequestControlLock"
+
+  gSmmVariableWriteGuid                         ## PRODUCES             ## GUID # Install protocol
+  gEfiSystemNvDataFvGuid                        ## CONSUMES             ## GUID
+  gEdkiiFaultTolerantWriteGuid                  ## SOMETIMES_CONSUMES   ## HOB
+
+  ## SOMETIMES_CONSUMES   ## Variable:L"VarErrorFlag"
+  ## SOMETIMES_PRODUCES   ## Variable:L"VarErrorFlag"
+  gEdkiiVarErrorFlagGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize                  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize              ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVolatileVariableSize          ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize     ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize                ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize                 ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxUserNvVariableSpaceSize           ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBoottimeReservedNvVariableSpaceSize  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdReclaimVariableSpaceAtEndOfDxe   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable          ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved       ## SOMETIMES_CONSUMES
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics        ## CONSUMES  # statistic the information of variable.
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate       ## CONSUMES  # Auto update PlatformLang/Lang
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  VariableSmmExtra.uni

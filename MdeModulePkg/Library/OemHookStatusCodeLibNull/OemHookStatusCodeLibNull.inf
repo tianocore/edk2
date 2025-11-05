@@ -1,0 +1,30 @@
+## @file
+#  Null instance of OEM Hook Status Code Library with empty functions.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = OemHookStatusCodeLibNull
+  MODULE_UNI_FILE                = OemHookStatusCodeLibNull.uni
+  FILE_GUID                      = 54D2878F-25CD-4a2b-8420-EBD18E609C76
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = OemHookStatusCodeLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  OemHookStatusCodeLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec

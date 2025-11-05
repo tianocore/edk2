@@ -1,0 +1,67 @@
+## @file
+#  EmmcDxe driver is used to manage the EMMC device.
+#
+#  It produces BlockIo, BlockIo2 and StorageSecurity protocols to allow upper layer
+#  access the EMMC device.
+#
+#  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EmmcDxe
+  MODULE_UNI_FILE                = EmmcDxe.uni
+  FILE_GUID                      = 2145F72F-E6F1-4440-A828-59DC9AAB5F89
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeEmmcDxe
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  gEmmcDxeDriverBinding
+#  COMPONENT_NAME                =  gEmmcDxeComponentName
+#  COMPONENT_NAME2               =  gEmmcDxeComponentName2
+#
+
+[Sources.common]
+  ComponentName.c
+  EmmcDxe.c
+  EmmcDxe.h
+  EmmcBlockIo.c
+  EmmcBlockIo.h
+  EmmcDiskInfo.c
+  EmmcDiskInfo.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DevicePathLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  UefiLib
+  BaseLib
+  UefiDriverEntryPoint
+  DebugLib
+
+[Protocols]
+  gEfiSdMmcPassThruProtocolGuid                ## TO_START
+  gEfiBlockIoProtocolGuid                      ## BY_START
+  gEfiBlockIo2ProtocolGuid                     ## BY_START
+  gEfiStorageSecurityCommandProtocolGuid       ## SOMETIMES_PRODUCES
+  gEfiEraseBlockProtocolGuid                   ## BY_START
+  gEfiDiskInfoProtocolGuid                     ## BY_START
+  ## TO_START
+  ## BY_START
+  gEfiDevicePathProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  EmmcDxeExtra.uni

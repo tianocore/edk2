@@ -1,0 +1,29 @@
+## @file
+#  Instance of BaseCache.
+#
+#  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseCacheLib
+  FILE_GUID                      = 8EF3A653-DA8B-4FFA-BB85-FF47406DB9F0
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CacheLib
+
+[Sources]
+  CacheLib.c
+  CacheLibInternal.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  CacheAsRamLib
+

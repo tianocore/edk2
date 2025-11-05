@@ -1,0 +1,35 @@
+## @file
+#  Provides security service of image authentication status check
+#
+#  Authentication Status Library module supports UEFI2.3.1
+#
+# Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeImageAuthenticationStatusLib
+  MODULE_UNI_FILE                = DxeImageAuthenticationStatusLib.uni
+  FILE_GUID                      = EB92D1DE-7C36-4680-BB88-A67E96049F72
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = DxeImageAuthenticationStatusLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DxeImageAuthenticationStatusLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  SecurityManagementLib

@@ -1,0 +1,87 @@
+## @file
+#  This module installs ACPI Firmware Performance Data Table (FPDT).
+#
+#  This module registers report status code listener to collect performance data
+#  for Firmware Basic Boot Performance Record and other boot performance records,
+#  and install FPDT to ACPI table.
+#
+#  Copyright (c) 2011 - 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FirmwarePerformanceDxe
+  MODULE_UNI_FILE                = FirmwarePerformanceDxe.uni
+  FILE_GUID                      = 00160F8D-2B35-4df2-BBE0-B272A8D631F0
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = FirmwarePerformanceDxeEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  FirmwarePerformanceDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseLib
+  DebugLib
+  DxeServicesLib
+  TimerLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PcdLib
+  HobLib
+  LockBoxLib
+  UefiLib
+  VariablePolicyHelperLib
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                     ## CONSUMES
+  gEfiRscHandlerProtocolGuid                    ## CONSUMES
+  gEfiVariableArchProtocolGuid                  ## CONSUMES
+  gEfiLockBoxProtocolGuid                       ## CONSUMES
+  gEdkiiVariablePolicyProtocolGuid              ## CONSUMES
+
+[Guids]
+  gEfiEventExitBootServicesGuid                 ## CONSUMES             ## Event
+  ## SOMETIMES_CONSUMES   ## HOB
+  ## SOMETIMES_CONSUMES   ## Variable:L"FirmwarePerformance"
+  ## PRODUCES             ## Variable:L"FirmwarePerformance"
+  ## SOMETIMES_CONSUMES ## UNDEFINED # Used to do smm communication
+  ## SOMETIMES_CONSUMES ## UNDEFINED # StatusCode Data
+  gEfiFirmwarePerformanceGuid
+  gEdkiiFpdtExtendedFirmwarePerformanceGuid     ## SOMETIMES_CONSUMES ## UNDEFINED # StatusCode Data
+  gFirmwarePerformanceS3PointerGuid             ## PRODUCES ## UNDEFINED # SaveLockBox
+  gEfiEndOfDxeEventGroupGuid                    ## CONSUMES ## Event
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderLoad    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderStart   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId            ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision  ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask    ## CONSUMES
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwarePerformanceDataTableS3Support   ## CONSUMES
+
+[Depex]
+  gEfiRscHandlerProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  FirmwarePerformanceDxeExtra.uni

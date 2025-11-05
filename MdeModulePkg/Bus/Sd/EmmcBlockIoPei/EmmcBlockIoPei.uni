@@ -1,0 +1,14 @@
+// /** @file
+// The EmmcBlockIoPei driver is used to support recovery from EMMC device.
+//
+// Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Support recovery from EMMC devices"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "The EmmcBlockIoPei driver is used to support recovery from EMMC device."
+

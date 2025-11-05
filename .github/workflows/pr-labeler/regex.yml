@@ -1,0 +1,16 @@
+# Specifies labels to apply to pull requests based on regular expressions.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+# For more information, see:
+# https://github.com/github/issue-labeler
+
+impact:breaking-change:
+  - '\s*-\s*\[\s*[x|X]\s*\] Breaking change\?'
+
+impact:security:
+  - '\s*-\s*\[\s*[x|X]\s*\] Impacts security\?'
+
+impact:testing:
+  - '\s*-\s*\[\s*[x|X]\s*\] Includes tests\?'

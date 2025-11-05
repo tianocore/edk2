@@ -1,0 +1,17 @@
+// /** @file
+// Uefi Scsi Library Instance.
+//
+// This libarary provides the functions to submit Scsi commands defined
+// in SCSI-2 specification for scsi device.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "UEFI SCSI Library Instance"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library provides the functions to submit SCSI commands defined in SCSI-2 specification for SCSI devices."
+

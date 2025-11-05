@@ -1,0 +1,43 @@
+## @file
+#  Null DevicePathToText library.
+#
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DevicePathTextLib
+  FILE_GUID                      = DCD1F939-1732-CA4D-81B7-C757AEC84DBC
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER SMM_CORE
+  CONSTRUCTOR                    = DevicePathToTextLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DevicePathTextLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  DevicePathLib
+
+[Protocols]
+  gEmuThunkProtocolGuid
+  gEmuGraphicsWindowProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
+  gEmuBlockIoProtocolGuid
+  gEmuThreadThunkProtocolGuid

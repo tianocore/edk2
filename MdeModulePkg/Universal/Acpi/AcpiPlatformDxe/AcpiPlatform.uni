@@ -1,0 +1,16 @@
+// /** @file
+// Sample ACPI Platform Driver
+//
+// Sample ACPI Platform Driver
+//
+// Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Sample ACPI Platform Driver"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Sample ACPI Platform Driver"
+

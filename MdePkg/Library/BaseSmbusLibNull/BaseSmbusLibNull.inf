@@ -1,0 +1,30 @@
+## @file
+# Null implementation of the SMBUS Library.
+#
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseSmbusLibNull
+  MODULE_UNI_FILE                = BaseSmbusLibNull.uni
+  FILE_GUID                      = E2ECA273-A1C0-407E-9A5C-F10C55142196
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SmbusLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  BaseSmbusLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib

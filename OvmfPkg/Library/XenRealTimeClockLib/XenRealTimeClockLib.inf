@@ -1,0 +1,33 @@
+#/** @file
+#
+# Copyright (c) 2015, Linaro Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = XenRealTimeClockLib
+  FILE_GUID                      = EC2557E8-7005-430B-9F6F-9BA109698248
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RealTimeClockLib|DXE_CORE DXE_DRIVER UEFI_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION
+
+[Sources.common]
+  XenRealTimeClockLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  UefiLib
+  DebugLib
+  DxeServicesTableLib
+  UefiRuntimeLib
+
+[Guids]
+  gEfiEventVirtualAddressChangeGuid

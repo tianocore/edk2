@@ -1,0 +1,35 @@
+/** @file
+ Platform variable cleanup Formset.
+
+Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include "PlatVarCleanupHii.h"
+
+formset
+  guid     = VARIABLE_CLEANUP_HII_GUID,
+  title    = STRING_TOKEN(STR_ENTRY_TITLE),
+  help     = STRING_TOKEN(STR_TITLE_HELP),
+
+  varstore VARIABLE_CLEANUP_DATA,
+    varid = VARIABLE_CLEANUP_VARSTORE_ID,
+    name  = VariableCleanup,
+    guid  = VARIABLE_CLEANUP_HII_GUID;
+
+  form formid = FORM_ID_VARIABLE_CLEANUP,
+    title = STRING_TOKEN(STR_TITLE);
+
+    checkbox varid = VARIABLE_CLEANUP_DATA.SelectAll,
+      prompt   = STRING_TOKEN(STR_SELECT_ALL_PROMPT),
+      help     = STRING_TOKEN(STR_SELECT_ALL_HELP),
+      flags    = INTERACTIVE,
+      key      = SELECT_ALL_QUESTION_ID,
+    endcheckbox;
+
+    label LABEL_START;
+    label LABEL_END;
+
+  endform;
+endformset;

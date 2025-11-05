@@ -1,0 +1,440 @@
+## @file
+#  Base Library implementation.
+#
+#  Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
+#  Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+#  Portions copyright (c) 2011 - 2024, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2020 - 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseLib
+  MODULE_UNI_FILE                = BaseLib.uni
+  FILE_GUID                      = 27d67720-ea68-48ae-93da-a3a074c90e30
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.1
+  LIBRARY_CLASS                  = BaseLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC AARCH64 RISCV64 LOONGARCH64
+#
+
+[Sources]
+  CheckSum.c
+  SwitchStack.c
+  SwapBytes64.c
+  SwapBytes32.c
+  SwapBytes16.c
+  LongJump.c
+  SetJump.c
+  QuickSort.c
+  RShiftU64.c
+  RRotU64.c
+  RRotU32.c
+  MultU64x64.c
+  MultU64x32.c
+  MultS64x64.c
+  ModU64x32.c
+  LShiftU64.c
+  LRotU64.c
+  LRotU32.c
+  LowBitSet64.c
+  LowBitSet32.c
+  HighBitSet64.c
+  HighBitSet32.c
+  GetPowerOfTwo64.c
+  GetPowerOfTwo32.c
+  DivU64x64Remainder.c
+  DivU64x32Remainder.c
+  DivU64x32.c
+  DivS64x64Remainder.c
+  ARShiftU64.c
+  BitField.c
+  ConvertGuidUuid.c
+  CpuDeadLoop.c
+  Cpu.c
+  LinkedList.c
+  SafeString.c
+  String.c
+  FilePaths.c
+  BaseLibInternals.h
+
+[Sources.Ia32]
+  Ia32/WriteTr.nasm
+  Ia32/Lfence.nasm
+
+  Ia32/Wbinvd.c | MSFT
+  Ia32/WriteMm7.c | MSFT
+  Ia32/WriteMm6.c | MSFT
+  Ia32/WriteMm5.c | MSFT
+  Ia32/WriteMm4.c | MSFT
+  Ia32/WriteMm3.c | MSFT
+  Ia32/WriteMm2.c | MSFT
+  Ia32/WriteMm1.c | MSFT
+  Ia32/WriteMm0.c | MSFT
+  Ia32/WriteLdtr.c | MSFT
+  Ia32/WriteIdtr.c | MSFT
+  Ia32/WriteGdtr.c | MSFT
+  Ia32/WriteDr7.c | MSFT
+  Ia32/WriteDr6.c | MSFT
+  Ia32/WriteDr5.c | MSFT
+  Ia32/WriteDr4.c | MSFT
+  Ia32/WriteDr3.c | MSFT
+  Ia32/WriteDr2.c | MSFT
+  Ia32/WriteDr1.c | MSFT
+  Ia32/WriteDr0.c | MSFT
+  Ia32/WriteCr4.c | MSFT
+  Ia32/WriteCr3.c | MSFT
+  Ia32/WriteCr2.c | MSFT
+  Ia32/WriteCr0.c | MSFT
+  Ia32/WriteMsr64.c | MSFT
+  Ia32/SwapBytes64.c | MSFT
+  Ia32/RRotU64.c | MSFT
+  Ia32/RShiftU64.c | MSFT
+  Ia32/ReadPmc.c | MSFT
+  Ia32/ReadTsc.c | MSFT
+  Ia32/ReadLdtr.c | MSFT
+  Ia32/ReadIdtr.c | MSFT
+  Ia32/ReadGdtr.c | MSFT
+  Ia32/ReadTr.c | MSFT
+  Ia32/ReadSs.c | MSFT
+  Ia32/ReadGs.c | MSFT
+  Ia32/ReadFs.c | MSFT
+  Ia32/ReadEs.c | MSFT
+  Ia32/ReadDs.c | MSFT
+  Ia32/ReadCs.c | MSFT
+  Ia32/ReadMsr64.c | MSFT
+  Ia32/ReadMm7.c | MSFT
+  Ia32/ReadMm6.c | MSFT
+  Ia32/ReadMm5.c | MSFT
+  Ia32/ReadMm4.c | MSFT
+  Ia32/ReadMm3.c | MSFT
+  Ia32/ReadMm2.c | MSFT
+  Ia32/ReadMm1.c | MSFT
+  Ia32/ReadMm0.c | MSFT
+  Ia32/ReadEflags.c | MSFT
+  Ia32/ReadDr7.c | MSFT
+  Ia32/ReadDr6.c | MSFT
+  Ia32/ReadDr5.c | MSFT
+  Ia32/ReadDr4.c | MSFT
+  Ia32/ReadDr3.c | MSFT
+  Ia32/ReadDr2.c | MSFT
+  Ia32/ReadDr1.c | MSFT
+  Ia32/ReadDr0.c | MSFT
+  Ia32/ReadCr4.c | MSFT
+  Ia32/ReadCr3.c | MSFT
+  Ia32/ReadCr2.c | MSFT
+  Ia32/ReadCr0.c | MSFT
+  Ia32/Mwait.c | MSFT
+  Ia32/Monitor.c | MSFT
+  Ia32/ModU64x32.c | MSFT
+  Ia32/MultU64x64.c | MSFT
+  Ia32/MultU64x32.c | MSFT
+  Ia32/LShiftU64.c | MSFT
+  Ia32/LRotU64.c | MSFT
+  Ia32/Invd.c | MSFT
+  Ia32/FxRestore.c | MSFT
+  Ia32/FxSave.c | MSFT
+  Ia32/FlushCacheLine.c | MSFT
+  Ia32/EnablePaging32.c | MSFT
+  Ia32/EnableInterrupts.c | MSFT
+  Ia32/EnableDisableInterrupts.c | MSFT
+  Ia32/DivU64x32Remainder.c | MSFT
+  Ia32/DivU64x32.c | MSFT
+  Ia32/DisablePaging32.c | MSFT
+  Ia32/DisableInterrupts.c | MSFT
+  Ia32/CpuPause.c | MSFT
+  Ia32/CpuIdEx.c | MSFT
+  Ia32/CpuId.c | MSFT
+  Ia32/CpuBreakpoint.c | MSFT
+  Ia32/ARShiftU64.c | MSFT
+  Ia32/EnableCache.c | MSFT
+  Ia32/DisableCache.c | MSFT
+
+
+  Ia32/GccInline.c | GCC
+  Ia32/GccInlinePriv.c | GCC
+  Ia32/Thunk16.nasm
+  Ia32/EnableDisableInterrupts.nasm| GCC
+  Ia32/EnablePaging64.nasm
+  Ia32/DisablePaging32.nasm| GCC
+  Ia32/EnablePaging32.nasm| GCC
+  Ia32/Mwait.nasm| GCC
+  Ia32/Monitor.nasm| GCC
+  Ia32/CpuIdEx.nasm| GCC
+  Ia32/CpuId.nasm| GCC
+  Ia32/LongJump.nasm
+  Ia32/SetJump.nasm
+  Ia32/SwapBytes64.nasm| GCC
+  Ia32/DivU64x64Remainder.nasm
+  Ia32/DivU64x32Remainder.nasm| GCC
+  Ia32/ModU64x32.nasm| GCC
+  Ia32/DivU64x32.nasm| GCC
+  Ia32/MultU64x64.nasm| GCC
+  Ia32/MultU64x32.nasm| GCC
+  Ia32/RRotU64.nasm| GCC
+  Ia32/LRotU64.nasm| GCC
+  Ia32/ARShiftU64.nasm| GCC
+  Ia32/RShiftU64.nasm| GCC
+  Ia32/LShiftU64.nasm| GCC
+  Ia32/EnableCache.nasm| GCC
+  Ia32/DisableCache.nasm| GCC
+  Ia32/RdRand.nasm
+  Ia32/XGetBv.nasm
+  Ia32/XSetBv.nasm
+  Ia32/VmgExit.nasm
+  Ia32/VmgExitSvsm.nasm
+
+  Ia32/DivS64x64Remainder.c
+  Ia32/InternalSwitchStack.c | MSFT
+  Ia32/InternalSwitchStack.nasm | GCC
+  Ia32/Non-existing.c
+  Unaligned.c
+  X86WriteIdtr.c
+  X86WriteGdtr.c
+  X86Thunk.c
+  X86ReadIdtr.c
+  X86ReadGdtr.c
+  X86Msr.c
+  X86MemoryFence.c | MSFT
+  X86GetInterruptState.c
+  X86FxSave.c
+  X86FxRestore.c
+  X86EnablePaging64.c
+  X86EnablePaging32.c
+  X86DisablePaging64.c
+  X86DisablePaging32.c
+  X86RdRand.c
+  X86PatchInstruction.c
+  X86SpeculationBarrier.c
+  IntelTdxNull.c
+  X64/SevProbe.c
+
+[Sources.X64]
+  X64/Thunk16.nasm
+  X64/CpuIdEx.nasm
+  X64/CpuId.nasm
+  X64/LongJump.nasm
+  X64/SetJump.nasm
+  X64/SwitchStack.nasm
+  X64/EnableCache.nasm
+  X64/DisableCache.nasm
+  X64/WriteTr.nasm
+  X64/Lfence.nasm
+
+  X64/CpuBreakpoint.c | MSFT
+  X64/WriteMsr64.c | MSFT
+  X64/ReadMsr64.c | MSFT
+  X64/CpuPause.nasm| MSFT
+  X64/DisableInterrupts.nasm| MSFT
+  X64/EnableInterrupts.nasm| MSFT
+  X64/FlushCacheLine.nasm| MSFT
+  X64/Invd.nasm| MSFT
+  X64/Wbinvd.nasm| MSFT
+  X64/Mwait.nasm| MSFT
+  X64/Monitor.nasm| MSFT
+  X64/ReadPmc.nasm| MSFT
+  X64/ReadTsc.nasm| MSFT
+  X64/WriteMm7.nasm| MSFT
+  X64/WriteMm6.nasm| MSFT
+  X64/WriteMm5.nasm| MSFT
+  X64/WriteMm4.nasm| MSFT
+  X64/WriteMm3.nasm| MSFT
+  X64/WriteMm2.nasm| MSFT
+  X64/WriteMm1.nasm| MSFT
+  X64/WriteMm0.nasm| MSFT
+  X64/ReadMm7.nasm| MSFT
+  X64/ReadMm6.nasm| MSFT
+  X64/ReadMm5.nasm| MSFT
+  X64/ReadMm4.nasm| MSFT
+  X64/ReadMm3.nasm| MSFT
+  X64/ReadMm2.nasm| MSFT
+  X64/ReadMm1.nasm| MSFT
+  X64/ReadMm0.nasm| MSFT
+  X64/FxRestore.nasm| MSFT
+  X64/FxSave.nasm| MSFT
+  X64/WriteLdtr.nasm| MSFT
+  X64/ReadLdtr.nasm| MSFT
+  X64/WriteIdtr.nasm| MSFT
+  X64/ReadIdtr.nasm| MSFT
+  X64/WriteGdtr.nasm| MSFT
+  X64/ReadGdtr.nasm| MSFT
+  X64/ReadTr.nasm| MSFT
+  X64/ReadSs.nasm| MSFT
+  X64/ReadGs.nasm| MSFT
+  X64/ReadFs.nasm| MSFT
+  X64/ReadEs.nasm| MSFT
+  X64/ReadDs.nasm| MSFT
+  X64/ReadCs.nasm| MSFT
+  X64/WriteDr7.nasm| MSFT
+  X64/WriteDr6.nasm| MSFT
+  X64/WriteDr5.nasm| MSFT
+  X64/WriteDr4.nasm| MSFT
+  X64/WriteDr3.nasm| MSFT
+  X64/WriteDr2.nasm| MSFT
+  X64/WriteDr1.nasm| MSFT
+  X64/WriteDr0.nasm| MSFT
+  X64/ReadDr7.nasm| MSFT
+  X64/ReadDr6.nasm| MSFT
+  X64/ReadDr5.nasm| MSFT
+  X64/ReadDr4.nasm| MSFT
+  X64/ReadDr3.nasm| MSFT
+  X64/ReadDr2.nasm| MSFT
+  X64/ReadDr1.nasm| MSFT
+  X64/ReadDr0.nasm| MSFT
+  X64/WriteCr4.nasm| MSFT
+  X64/WriteCr3.nasm| MSFT
+  X64/WriteCr2.nasm| MSFT
+  X64/WriteCr0.nasm| MSFT
+  X64/ReadCr4.nasm| MSFT
+  X64/ReadCr3.nasm| MSFT
+  X64/ReadCr2.nasm| MSFT
+  X64/ReadCr0.nasm| MSFT
+  X64/ReadEflags.nasm| MSFT
+
+  X64/TdCall.nasm
+  X64/TdVmcall.nasm
+  X64/TdProbe.c
+  X64/SevProbe.c
+
+  X64/Non-existing.c
+  Math64.c
+  Unaligned.c
+  X86WriteIdtr.c
+  X86WriteGdtr.c
+  X86Thunk.c
+  X86ReadIdtr.c
+  X86ReadGdtr.c
+  X86Msr.c
+  X86MemoryFence.c | MSFT
+  X86GetInterruptState.c
+  X86FxSave.c
+  X86FxRestore.c
+  X86EnablePaging64.c
+  X86EnablePaging32.c
+  X86DisablePaging64.c
+  X86DisablePaging32.c
+  X86RdRand.c
+  X86PatchInstruction.c
+  X86SpeculationBarrier.c
+  X64/GccInline.c | GCC
+  X64/GccInlinePriv.c | GCC
+  X64/EnableDisableInterrupts.nasm
+  X64/DisablePaging64.nasm
+  X64/Pvalidate.nasm
+  X64/RdRand.nasm
+  X64/RmpAdjust.nasm
+  X64/XGetBv.nasm
+  X64/XSetBv.nasm
+  X64/VmgExit.nasm
+  X64/VmgExitSvsm.nasm
+
+[Sources.EBC]
+  Ebc/CpuBreakpoint.c
+  Ebc/SetJumpLongJump.c
+  Ebc/SwitchStack.c
+  Ebc/SpeculationBarrier.c
+  Unaligned.c
+  Math64.c
+  IntelTdxNull.c
+  AmdSevNull.c
+
+[Sources.AARCH64]
+  AArch64/InternalSwitchStack.c
+  AArch64/Unaligned.c
+  Math64.c
+
+  AArch64/MemoryFence.S             | GCC
+  AArch64/SwitchStack.S             | GCC
+  AArch64/EnableInterrupts.S        | GCC
+  AArch64/DisableInterrupts.S       | GCC
+  AArch64/GetInterruptsState.S      | GCC
+  AArch64/SetJumpLongJump.S         | GCC
+  AArch64/CpuBreakpoint.S           | GCC
+  AArch64/SpeculationBarrier.S      | GCC
+  AArch64/ArmReadCntPctReg.S        | GCC
+  AArch64/ArmReadIdAA64Isar0Reg.S       | GCC
+
+  AArch64/MemoryFence.asm           | MSFT
+  AArch64/SwitchStack.asm           | MSFT
+  AArch64/EnableInterrupts.asm      | MSFT
+  AArch64/DisableInterrupts.asm     | MSFT
+  AArch64/GetInterruptsState.asm    | MSFT
+  AArch64/SetJumpLongJump.asm       | MSFT
+  AArch64/CpuBreakpoint.asm         | MSFT
+  AArch64/SpeculationBarrier.asm    | MSFT
+  AArch64/ArmReadCntPctReg.asm      | MSFT
+  AArch64/ArmReadIdAA64Isar0Reg.asm     | MSFT
+  IntelTdxNull.c
+  AmdSevNull.c
+
+[Sources.RISCV64]
+  Math64.c
+  Unaligned.c
+  RiscV64/InternalSwitchStack.c
+  RiscV64/CpuBreakpoint.c
+  RiscV64/GetInterruptState.c
+  RiscV64/DisableInterrupts.c
+  RiscV64/EnableInterrupts.c
+  RiscV64/CpuPause.c
+  RiscV64/MemoryFence.S             | GCC
+  RiscV64/RiscVSetJumpLongJump.S    | GCC
+  RiscV64/SwitchStack.S             | GCC
+  RiscV64/RiscVCpuBreakpoint.S      | GCC
+  RiscV64/RiscVCpuPause.S           | GCC
+  RiscV64/RiscVInterrupt.S          | GCC
+  RiscV64/RiscVCacheMgmt.S          | GCC
+  RiscV64/CpuScratch.S              | GCC
+  RiscV64/ReadTimer.S               | GCC
+  RiscV64/RiscVMmu.S                | GCC
+  RiscV64/SpeculationBarrier.S      | GCC
+  IntelTdxNull.c
+  AmdSevNull.c
+
+[Sources.LOONGARCH64]
+  Math64.c
+  Unaligned.c
+  LoongArch64/Csr.c
+  LoongArch64/InternalSwitchStack.c
+  LoongArch64/AsmCsr.S              | GCC
+  LoongArch64/IoCsr.S               | GCC
+  LoongArch64/GetInterruptState.S   | GCC
+  LoongArch64/EnableInterrupts.S    | GCC
+  LoongArch64/DisableInterrupts.S   | GCC
+  LoongArch64/Barrier.S             | GCC
+  LoongArch64/MemoryFence.S         | GCC
+  LoongArch64/CpuBreakpoint.S       | GCC
+  LoongArch64/CpuPause.S            | GCC
+  LoongArch64/SetJumpLongJump.S     | GCC
+  LoongArch64/SwitchStack.S         | GCC
+  LoongArch64/ExceptionBase.S       | GCC
+  LoongArch64/Cpucfg.S              | GCC
+  LoongArch64/ReadStableCounter.S   | GCC
+  IntelTdxNull.c
+  AmdSevNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  PcdLib
+  DebugLib
+  BaseMemoryLib
+
+[LibraryClasses.X64, LibraryClasses.IA32]
+  RegisterFilterLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumLinkedListLength      ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength     ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength   ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdControlFlowEnforcementPropertyMask   ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdSpeculationBarrierType       ## SOMETIMES_CONSUMES
+
+[FeaturePcd]
+  gEfiMdePkgTokenSpaceGuid.PcdVerifyNodeInList  ## CONSUMES

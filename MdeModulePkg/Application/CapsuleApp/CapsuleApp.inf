@@ -1,0 +1,69 @@
+##  @file
+#  A shell application that triggers capsule update process.
+#
+# This application can trigger capsule update process. It can also
+# generate capsule image, or dump capsule variable information.
+#
+#  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = CapsuleApp
+  MODULE_UNI_FILE                = CapsuleApp.uni
+  FILE_GUID                      = 4CEF31DA-8682-4274-9CC4-AEE7516A5E7B
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UefiMain
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  CapsuleApp.c
+  CapsuleApp.h
+  CapsuleDump.c
+  CapsuleOnDisk.c
+  AppSupport.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Guids]
+  gEfiGlobalVariableGuid                 ## CONSUMES   ## GUID
+  gEfiCapsuleReportGuid                  ## CONSUMES   ## GUID
+  gEfiFmpCapsuleGuid                     ## CONSUMES   ## GUID
+  gWindowsUxCapsuleGuid                  ## CONSUMES   ## GUID
+  gEfiSystemResourceTableGuid            ## CONSUMES   ## GUID
+  gEfiCapsuleVendorGuid                  ## SOMETIMES_CONSUMES ## Variable:L"CapsuleUpdateData"
+  gEfiPartTypeSystemPartGuid             ## SOMETIMES_CONSUMES ## GUID
+
+[Protocols]
+  gEfiGraphicsOutputProtocolGuid         ## CONSUMES
+  gEfiFirmwareManagementProtocolGuid     ## CONSUMES
+  gEfiShellParametersProtocolGuid        ## CONSUMES
+  gEfiShellProtocolGuid                  ## CONSUMES
+  gEfiSimpleFileSystemProtocolGuid       ## SOMETIMES_CONSUMES
+
+[LibraryClasses]
+  BaseLib
+  UefiApplicationEntryPoint
+  DebugLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+  PrintLib
+  BmpSupportLib
+  FileHandleLib
+  UefiBootManagerLib
+  SortLib
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  CapsuleAppExtra.uni

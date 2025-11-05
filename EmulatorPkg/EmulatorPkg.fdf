@@ -1,0 +1,332 @@
+## @file
+# This is Emulator FDF file with UEFI HII features enabled
+#
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2009 - 2011, Apple Inc. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[FD.Fv_Recovery]
+#
+# In OS X PEIMs are really XIP, so we need to make this address match the malloced
+# buffer for the FD (0x41000000). If this address does not match the FV will get
+# relocated in place (works, but not a great idea).
+#
+BaseAddress   = 0x102000000|gEmulatorPkgTokenSpaceGuid.PcdEmuFdBaseAddress   #The base address of the FLASH Device.
+Size          = 0x005a0000|gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareFdSize  #The size in bytes of the FLASH Device
+ErasePolarity = 1
+BlockSize     = 0x10000
+NumBlocks     = 0x5a
+
+0x00000000|0x00580000
+gEmulatorPkgTokenSpaceGuid.PcdEmuFlashFvRecoveryBase|gEmulatorPkgTokenSpaceGuid.PcdEmuFlashFvRecoverySize
+FV = FvRecovery
+
+0x00580000|0x0000c000
+gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+#NV_VARIABLE_STORE
+DATA = {
+  ## This is the EFI_FIRMWARE_VOLUME_HEADER
+  # ZeroVector []
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  # FileSystemGuid: gEfiSystemNvDataFvGuid         =
+  #  { 0xFFF12B8D, 0x7696, 0x4C8B, { 0xA9, 0x85, 0x27, 0x47, 0x07, 0x5B, 0x4F, 0x50 }}
+  0x8D, 0x2B, 0xF1, 0xFF, 0x96, 0x76, 0x8B, 0x4C,
+  0xA9, 0x85, 0x27, 0x47, 0x07, 0x5B, 0x4F, 0x50,
+  # FvLength: 0x20000
+  0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
+  # Signature "_FVH"       #Attributes
+  0x5f, 0x46, 0x56, 0x48, 0xff, 0xfe, 0x04, 0x00,
+  # HeaderLength #CheckSum #ExtHeaderOffset #Reserved #Revision
+  0x48, 0x00, 0x36, 0x09, 0x00, 0x00, 0x00, 0x02,
+  # Blockmap[0]: 2 Blocks * 0x10000 Bytes / Block
+  0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00,
+  # Blockmap[1]: End
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  ## This is the VARIABLE_STORE_HEADER
+!if $(SECURE_BOOT_ENABLE) == FALSE
+  #Signature: gEfiVariableGuid =
+  #  { 0xddcf3616, 0x3275, 0x4164, { 0x98, 0xb6, 0xfe, 0x85, 0x70, 0x7f, 0xfe, 0x7d }}
+  0x16, 0x36, 0xcf, 0xdd, 0x75, 0x32, 0x64, 0x41,
+  0x98, 0xb6, 0xfe, 0x85, 0x70, 0x7f, 0xfe, 0x7d,
+!else
+  # Signature: gEfiAuthenticatedVariableGuid =
+  #  { 0xaaf32c78, 0x947b, 0x439a, { 0xa1, 0x80, 0x2e, 0x14, 0x4e, 0xc3, 0x77, 0x92 }}
+  0x78, 0x2c, 0xf3, 0xaa, 0x7b, 0x94, 0x9a, 0x43,
+  0xa1, 0x80, 0x2e, 0x14, 0x4e, 0xc3, 0x77, 0x92,
+!endif
+  #Size: 0xc000 (gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize) - 0x48 (size of EFI_FIRMWARE_VOLUME_HEADER) = 0xBFB8
+  # This can speed up the Variable Dispatch a bit.
+  0xB8, 0xBF, 0x00, 0x00,
+  #FORMATTED: 0x5A #HEALTHY: 0xFE #Reserved: UINT16 #Reserved1: UINT32
+  0x5A, 0xFE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+}
+
+0x0058c000|0x00002000
+#NV_EVENT_LOG
+gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageEventLogBase|gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageEventLogSize
+
+0x0058e000|0x00002000
+gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+#NV_FTW_WORKING
+DATA = {
+  # EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER->Signature = gEdkiiWorkingBlockSignatureGuid         =
+  #  { 0x9e58292b, 0x7c68, 0x497d, { 0xa0, 0xce, 0x65,  0x0, 0xfd, 0x9f, 0x1b, 0x95 }}
+  0x2b, 0x29, 0x58, 0x9e, 0x68, 0x7c, 0x7d, 0x49,
+  0xa0, 0xce, 0x65,  0x0, 0xfd, 0x9f, 0x1b, 0x95,
+  # Crc:UINT32            #WorkingBlockValid:1, WorkingBlockInvalid:1, Reserved
+  0xE2, 0x33, 0xF2, 0x03, 0xFE, 0xFF, 0xFF, 0xFF,
+  # WriteQueueSize: UINT64
+  0xE0, 0x1F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+}
+
+0x00590000|0x00010000
+#NV_FTW_SPARE
+gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+
+[FV.FvRecovery]
+FvNameGuid         = 6D99E806-3D38-42c2-A095-5F4300BFD7DC
+FvAlignment        = 16         #FV alignment and FV attributes setting.
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+#
+#  PEI Phase modules
+#
+
+#
+#  PEI Apriori file example, more PEIM module added later.
+#
+APRIORI PEI {
+  INF  MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf
+  INF  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
+  INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
+  }
+APRIORI DXE {
+  INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+  INF  MdeModulePkg/Universal/Metronome/Metronome.inf
+  }
+INF  EmulatorPkg/Sec/Sec.inf
+INF  MdeModulePkg/Core/Pei/PeiMain.inf
+INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
+INF  MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf
+INF  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
+INF  EmulatorPkg/BootModePei/BootModePei.inf
+INF  EmulatorPkg/AutoScanPei/AutoScanPei.inf
+INF  EmulatorPkg/FirmwareVolumePei/FirmwareVolumePei.inf
+INF  EmulatorPkg/FlashMapPei/FlashMapPei.inf
+INF  EmulatorPkg/ThunkPpiToProtocolPei/ThunkPpiToProtocolPei.inf
+INF  MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
+INF  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
+INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+
+#
+#  DXE Phase modules
+#
+INF  MdeModulePkg/Core/Dxe/DxeMain.inf
+INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+INF  MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
+INF  MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
+INF  MdeModulePkg/Universal/Metronome/Metronome.inf
+INF  EmulatorPkg/RealTimeClockRuntimeDxe/RealTimeClock.inf
+INF  EmulatorPkg/ResetRuntimeDxe/Reset.inf
+INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+INF  EmulatorPkg/FvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
+INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+INF  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
+INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
+INF  EmulatorPkg/EmuThunkDxe/EmuThunk.inf
+INF  EmulatorPkg/CpuRuntimeDxe/Cpu.inf
+INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
+INF  EmulatorPkg/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
+INF  EmulatorPkg/TimerDxe/Timer.inf
+INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+INF  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
+INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
+INF  MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
+INF  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+INF  MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
+
+INF  MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
+INF  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
+INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+INF  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+INF  MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
+INF  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
+INF  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+
+INF  EmulatorPkg/EmuBusDriverDxe/EmuBusDriverDxe.inf
+INF  EmulatorPkg/EmuGopDxe/EmuGopDxe.inf
+INF  EmulatorPkg/EmuSimpleFileSystemDxe/EmuSimpleFileSystemDxe.inf
+INF  EmulatorPkg/EmuBlockIoDxe/EmuBlockIoDxe.inf
+INF  EmulatorPkg/EmuSnpDxe/EmuSnpDxe.inf
+
+INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+INF  MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
+INF  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+INF  MdeModulePkg/Universal/PrintDxe/PrintDxe.inf
+INF  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+!if "XCODE5" not in $(TOOL_CHAIN_TAG)
+INF  MdeModulePkg/Logo/LogoDxe.inf
+!endif
+INF  MdeModulePkg/Universal/LoadFileOnFv2/LoadFileOnFv2.inf
+INF  RuleOverride = UI MdeModulePkg/Application/UiApp/UiApp.inf
+INF  MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
+INF  MdeModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
+
+#
+# Rng Protocol producer
+#
+INF  SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
+
+#
+# Hash2 Protocol producer
+#
+INF  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+
+#
+# Secure Boot Key Enroll
+#
+!if $(SECURE_BOOT_ENABLE) == TRUE
+INF SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+!endif
+
+#
+# Network stack drivers
+#
+!if $(NETWORK_SUPPORT)
+INF  EmulatorPkg/EmuSnpDxe/EmuSnpDxe.inf
+!endif
+!include NetworkPkg/Network.fdf.inc
+
+#
+# EFI Redfish drivers
+#
+!include RedfishPkg/Redfish.fdf.inc
+
+INF FatPkg/EnhancedFatDxe/Fat.inf
+
+!if "XCODE5" not in $(TOOL_CHAIN_TAG)
+INF  ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
+!endif
+INF  ShellPkg/Application/Shell/Shell.inf
+
+[Rule.Common.SEC]
+  FILE SEC = $(NAMED_GUID)  {
+    PE32     PE32    Align=Auto     $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI       STRING ="$(MODULE_NAME)" Optional
+    VERSION  STRING ="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+
+[Rule.Common.PEI_CORE]
+  FILE PEI_CORE = $(NAMED_GUID) {
+    PE32     PE32    Align=Auto     $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI       STRING ="$(MODULE_NAME)" Optional
+    VERSION  STRING ="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.PEIM]
+  FILE PEIM = $(NAMED_GUID) {
+     PEI_DEPEX PEI_DEPEX Optional        $(INF_OUTPUT)/$(MODULE_NAME).depex
+     PE32      PE32   Align=Auto     $(INF_OUTPUT)/$(MODULE_NAME).efi
+     UI       STRING="$(MODULE_NAME)" Optional
+     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.DXE_CORE]
+  FILE DXE_CORE = $(NAMED_GUID) {
+    COMPRESS PI_STD {
+      PE32     PE32           $(INF_OUTPUT)/$(MODULE_NAME).efi
+      UI       STRING="$(MODULE_NAME)" Optional
+      VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+    }
+  }
+
+[Rule.Common.UEFI_DRIVER]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX    DXE_DEPEX Optional      $(INF_OUTPUT)/$(MODULE_NAME).depex
+    COMPRESS PI_STD {
+      GUIDED {
+        PE32     PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
+        UI       STRING="$(MODULE_NAME)" Optional
+        VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+      }
+    }
+  }
+
+[Rule.Common.DXE_DRIVER]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX    DXE_DEPEX Optional      $(INF_OUTPUT)/$(MODULE_NAME).depex
+    COMPRESS PI_STD {
+      GUIDED {
+        PE32     PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
+        UI       STRING="$(MODULE_NAME)" Optional
+        VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+      }
+    }
+  }
+
+[Rule.Common.DXE_RUNTIME_DRIVER]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX    DXE_DEPEX Optional      $(INF_OUTPUT)/$(MODULE_NAME).depex
+    COMPRESS PI_STD {
+      GUIDED {
+        PE32     PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
+        UI       STRING="$(MODULE_NAME)" Optional
+        VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+      }
+    }
+  }
+
+[Rule.Common.UEFI_APPLICATION]
+  FILE APPLICATION = $(NAMED_GUID) {
+    COMPRESS PI_STD {
+      GUIDED {
+        PE32     PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
+        UI       STRING="$(MODULE_NAME)" Optional
+        VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+      }
+    }
+  }
+
+[Rule.Common.UEFI_APPLICATION.UI]
+  FILE APPLICATION = $(NAMED_GUID) {
+    PE32      PE32                     $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI        STRING="Enter Setup"
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.UEFI_DRIVER.BINARY]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX DXE_DEPEX Optional      |.depex
+    PE32      PE32                    |.efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.UEFI_APPLICATION.BINARY]
+  FILE APPLICATION = $(NAMED_GUID) {
+    PE32      PE32                    |.efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }

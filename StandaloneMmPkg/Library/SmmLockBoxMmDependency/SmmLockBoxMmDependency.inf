@@ -1,0 +1,34 @@
+## @file
+#  LockBox Dependency DXE Library.
+#
+#  By installing the LockBox protocol with the gEfiLockBoxProtocolGuid,
+#  it signals that the LockBox API is fully operational and ready for use.
+#
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = SmmLockBoxMmDependency
+  FILE_GUID                      = c45ce910-7f8b-4f49-88e2-2c26c5743ee2
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = SmmLockBoxMmDependencyConstructor
+
+[Sources]
+  SmmLockBoxMmDependency.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Protocols]
+  gEfiLockBoxProtocolGuid
+
+[LibraryClasses]
+  BaseLib
+  UefiBootServicesTableLib

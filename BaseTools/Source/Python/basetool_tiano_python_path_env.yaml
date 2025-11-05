@@ -1,0 +1,11 @@
+## @file
+# Add this folder to the pypath so modules can be easily
+# loaded
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "global",
+  "flags": ["set_pypath"]
+}

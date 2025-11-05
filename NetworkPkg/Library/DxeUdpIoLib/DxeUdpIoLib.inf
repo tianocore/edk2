@@ -1,0 +1,46 @@
+## @file
+#  This library instance provides UDP services by consuming EFI UDPv4/UDPv6 Protocols.
+#
+#  Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeUpdIoLib
+  MODULE_UNI_FILE                = DxeUpdIoLib.uni
+  FILE_GUID                      = 7E615AA1-41EE-49d4-B7E9-1D7A60AA5C8D
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = UdpIoLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DxeUdpIoLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  DpcLib
+
+[Protocols]
+  gEfiUdp4ServiceBindingProtocolGuid            ## SOMETIMES_CONSUMES
+  gEfiUdp4ProtocolGuid                          ## SOMETIMES_CONSUMES
+  gEfiUdp6ServiceBindingProtocolGuid            ## SOMETIMES_CONSUMES
+  gEfiUdp6ProtocolGuid                          ## SOMETIMES_CONSUMES
+

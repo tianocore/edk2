@@ -1,0 +1,16 @@
+// /** @file
+// Instance of Debug Library based on Serial Port Library.
+//
+// It uses Print Library to produce formatted output strings to seiral port device.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Instance of Debug Library based on Serial Port Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "It uses Print Library to produce formatted output strings to a serial port device."
+

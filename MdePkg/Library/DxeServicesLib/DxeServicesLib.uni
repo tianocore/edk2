@@ -1,0 +1,18 @@
+// /** @file
+// DXE Services Library instance provides functions that simplify the development of DXE Drivers.
+//
+// DXE Services Library provides access data from sections of FFS files based on FV protocol.
+// It also provides access file based on file path from a firmware volume,
+// from a file system interface, or from the load file interface.
+//
+// Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Provides functions that simplify the development of DXE Drivers"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "A DXE Services Library provides access data from sections of FFS files based on FV protocol. It also provides access file based on file path from a firmware volume, from a file system interface, or from the load file interface."
+

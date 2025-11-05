@@ -1,0 +1,65 @@
+##  @file
+# Provides Shell 'dp' standalone application.
+#
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = dp
+  FILE_GUID                      = 1831A379-2D48-45BD-9744-D4059D93815D
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DpAppInitialize
+#
+#  This flag specifies whether HII resource section is generated into PE image.
+#
+  UEFI_HII_RESOURCE_SECTION      = TRUE
+
+[Sources.common]
+  Dp.uni
+  Dp.c
+  Dp.h
+  Literals.h
+  Literals.c
+  DpInternal.h
+  DpUtilities.c
+  DpTrace.c
+  DpApp.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  ShellLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  UefiApplicationEntryPoint
+  SortLib
+  PrintLib
+  DevicePathLib
+  PerformanceLib
+  DxeServicesLib
+  PeCoffGetEntryPointLib
+
+[Guids]
+  gPerformanceProtocolGuid                                ## CONSUMES ## SystemTable
+  gEdkiiFpdtExtendedFirmwarePerformanceGuid               ## CONSUMES ## SystemTable
+
+[Protocols]
+  gEfiLoadedImageProtocolGuid                             ## CONSUMES
+  gEfiDriverBindingProtocolGuid                           ## SOMETIMES_CONSUMES
+  gEfiComponentName2ProtocolGuid                          ## SOMETIMES_CONSUMES
+  gEfiLoadedImageDevicePathProtocolGuid                   ## SOMETIMES_CONSUMES
+  gEfiHiiPackageListProtocolGuid                          ## CONSUMES
+

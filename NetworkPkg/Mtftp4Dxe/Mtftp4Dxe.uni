@@ -1,0 +1,17 @@
+// /** @file
+// This module produces EFI MTFTPv4 Protocol and EFI MTFTPv4 Service Binding Protocol.
+//
+// This module produces EFI MTFTPv4 Protocol upon EFI UDPv4 Protocol, to provide
+// basic services for client-side unicast and/or multicase TFTP operations.
+//
+// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces EFI MTFTPv4 Protocol and EFI MTFTPv4 Service Binding Protocol"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module produces EFI MTFTPv4 Protocol upon EFI UDPv4 Protocol, to provide basic services for client-side unicast or multicase TFTP operations or both."
+

@@ -1,0 +1,16 @@
+// /** @file
+// The SataControllerDxe driver is responsible for managing the standard SATA controller.
+//
+// It consumes PciIo protocol and produces IdeControllerInit protocol for upper layer use.
+//
+// Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Responsible for managing the standard SATA controller"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Implements the IdeControllerInit protocol interface for upper layer use\n"
+

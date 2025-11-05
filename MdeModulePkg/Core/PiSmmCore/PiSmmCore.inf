@@ -1,0 +1,126 @@
+## @file
+# This module provide an SMM CIS compliant implementation of SMM Core.
+#
+# Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PiSmmCore
+  MODULE_UNI_FILE                = PiSmmCore.uni
+  FILE_GUID                      = E94F54CD-81EB-47ed-AEC3-856F5DC157A9
+  MODULE_TYPE                    = SMM_CORE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  ENTRY_POINT                    = SmmMain
+
+#  VALID_ARCHITECTURES           = IA32 X64
+
+[Sources]
+  PiSmmCore.c
+  PiSmmCore.h
+  PiSmmCorePrivateData.h
+  Page.c
+  Pool.c
+  Handle.c
+  Locate.c
+  Notify.c
+  Dependency.c
+  Dispatcher.c
+  Smi.c
+  InstallConfigurationTable.c
+  SmramProfileRecord.c
+  MemoryAttributesTable.c
+  SmiHandlerProfile.c
+  HeapGuard.c
+  HeapGuard.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  BaseMemoryLib
+  PeCoffLib
+  PeCoffGetEntryPointLib
+  CacheMaintenanceLib
+  DebugLib
+  ReportStatusCodeLib
+  DevicePathLib
+  UefiLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  PcdLib
+  SmmCorePlatformHookLib
+  PerformanceLib
+  HobLib
+  SmmMemLib
+  SafeIntLib
+  ImagePropertiesRecordLib
+
+[Protocols]
+  gEfiDxeSmmReadyToLockProtocolGuid             ## UNDEFINED # SmiHandlerRegister
+  gEfiSmmReadyToLockProtocolGuid                ## PRODUCES
+  gEfiSmmCpuIo2ProtocolGuid                     ## CONSUMES
+  gEfiFirmwareVolume2ProtocolGuid               ## CONSUMES
+  gEfiSmmEndOfDxeProtocolGuid                   ## PRODUCES
+  gEfiSecurityArchProtocolGuid                  ## SOMETIMES_CONSUMES
+  gEfiSecurity2ArchProtocolGuid                 ## SOMETIMES_CONSUMES
+  gEfiLoadedImageProtocolGuid                   ## PRODUCES
+  gEfiDevicePathProtocolGuid                    ## CONSUMES
+  gEdkiiSmmExitBootServicesProtocolGuid         ## SOMETIMES_PRODUCES
+  gEdkiiSmmLegacyBootProtocolGuid               ## SOMETIMES_PRODUCES
+  gEdkiiSmmReadyToBootProtocolGuid              ## PRODUCES
+
+  gEfiSmmSwDispatch2ProtocolGuid                ## SOMETIMES_CONSUMES
+  gEfiSmmSxDispatch2ProtocolGuid                ## SOMETIMES_CONSUMES
+  gEfiSmmPowerButtonDispatch2ProtocolGuid       ## SOMETIMES_CONSUMES
+  gEfiSmmStandbyButtonDispatch2ProtocolGuid     ## SOMETIMES_CONSUMES
+  gEfiSmmPeriodicTimerDispatch2ProtocolGuid     ## SOMETIMES_CONSUMES
+  gEfiSmmGpiDispatch2ProtocolGuid               ## SOMETIMES_CONSUMES
+  gEfiSmmIoTrapDispatch2ProtocolGuid            ## SOMETIMES_CONSUMES
+  gEfiSmmUsbDispatch2ProtocolGuid               ## SOMETIMES_CONSUMES
+  gEdkiiSmmMemoryAttributeProtocolGuid          ## CONSUMES
+  gEfiSmmSxDispatch2ProtocolGuid                ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressSmmCodePageNumber     ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfileMemoryType             ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfilePropertyMask           ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfileDriverPath             ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmiHandlerProfilePropertyMask       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPageType                   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPoolType                   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                        ## CONSUMES
+
+[Guids]
+  gAprioriGuid                                  ## SOMETIMES_CONSUMES   ## File
+  gEfiEventDxeDispatchGuid                      ## PRODUCES             ## GUID # SmiHandlerRegister
+  gEfiEventLegacyBootGuid                       ## PRODUCES             ## GUID # SmiHandlerRegister
+  gEfiEventExitBootServicesGuid                 ## PRODUCES             ## GUID # SmiHandlerRegister
+  gEfiEventReadyToBootGuid                      ## PRODUCES             ## GUID # SmiHandlerRegister
+  gEfiEndOfDxeEventGroupGuid                    ## PRODUCES             ## GUID # SmiHandlerRegister
+  ## SOMETIMES_CONSUMES   ## GUID # Locate protocol
+  ## SOMETIMES_PRODUCES   ## GUID # SmiHandlerRegister
+  gEdkiiMemoryProfileGuid
+  ## SOMETIMES_PRODUCES   ## GUID # Install protocol
+  gEdkiiSmmMemoryProfileGuid
+  gEdkiiPiSmmMemoryAttributesTableGuid          ## PRODUCES   ## SystemTable
+  ## SOMETIMES_CONSUMES   ## SystemTable
+  gLoadFixedAddressConfigurationTableGuid
+  ## SOMETIMES_PRODUCES   ## GUID # Install protocol
+  ## SOMETIMES_PRODUCES   ## GUID # SmiHandlerRegister
+  gSmiHandlerProfileGuid
+  gEdkiiEndOfS3ResumeGuid ## SOMETIMES_PRODUCES ## GUID # Install protocol
+  gEdkiiS3SmmInitDoneGuid ## SOMETIMES_PRODUCES ## GUID # Install protocol
+  gEfiMmCommunicateHeaderV3Guid    ## CONSUMES   ## GUID # Communicate header
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  PiSmmCoreExtra.uni

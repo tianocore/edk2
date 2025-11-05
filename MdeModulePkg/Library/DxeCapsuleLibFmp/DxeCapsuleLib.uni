@@ -1,0 +1,16 @@
+// /** @file
+// Capsule library instance for DXE_DRIVER.
+//
+// Capsule library instance for DXE_DRIVER module types.
+//
+// Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Capsule Support Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Capsule library instance for DXE_DRIVER module types."
+

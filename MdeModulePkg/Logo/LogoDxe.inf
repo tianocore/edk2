@@ -1,0 +1,56 @@
+## @file
+#  The default logo bitmap picture shown on setup screen.
+#
+#  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = LogoDxe
+  MODULE_UNI_FILE                = LogoDxe.uni
+  FILE_GUID                      = F74D20EE-37E7-48FC-97F7-9B1047749C69
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeLogo
+#
+#  This flag specifies whether HII resource section is generated into PE image.
+#
+  UEFI_HII_RESOURCE_SECTION      = TRUE
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  Logo.bmp
+  Logo.c
+  Logo.idf
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  DebugLib
+
+[Protocols]
+  gEfiHiiDatabaseProtocolGuid        ## CONSUMES
+  gEfiHiiImageExProtocolGuid         ## CONSUMES
+  gEfiHiiPackageListProtocolGuid     ## PRODUCES CONSUMES
+  gEdkiiPlatformLogoProtocolGuid     ## PRODUCES
+
+[Depex]
+  gEfiHiiDatabaseProtocolGuid AND
+  gEfiHiiImageExProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  LogoDxeExtra.uni

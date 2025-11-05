@@ -1,0 +1,16 @@
+// /** @file
+// Instance of Debug Library using Console Output Device.
+//
+// Debug Lib that sends messages to the Console Output Device in the EFI System Table.
+//
+// Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Instance of Debug Library using Console Output Device"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Debug Lib that sends messages to the Console Output Device in the EFI System Table."
+

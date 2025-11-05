@@ -1,0 +1,22 @@
+## @file
+#  Arm Hvc Null Library
+#
+#  Copyright (c) 2022, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = ArmHvcLibNull
+  FILE_GUID                      = 02076A46-D6DB-48DD-8E5F-153172DD73A1
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmHvcLib
+
+[Sources]
+  ArmHvcLibNull.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec

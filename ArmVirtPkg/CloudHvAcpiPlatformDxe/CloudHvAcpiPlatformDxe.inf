@@ -1,0 +1,46 @@
+## @file
+#  ACPI Platform Driver for Cloud Hypervisor
+#
+#  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = CloudHvAcpiPlatformDxe
+  FILE_GUID                      = 6c76e407-73f2-dc1c-938f-5d6c4691ea93
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = CloudHvAcpiPlatformEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources]
+  CloudHvAcpi.c
+
+[Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  OrderedCollectionLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+
+[Pcd]
+  gArmVirtTokenSpaceGuid.PcdCloudHvAcpiRsdpBaseAddress
+
+[Depex]
+  gEfiAcpiTableProtocolGuid

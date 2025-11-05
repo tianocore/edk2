@@ -1,0 +1,17 @@
+// /** @file
+// Boot Script Executor Module
+//
+// This is a standalone Boot Script Executor. Standalone means it does not
+// depends on any PEI or DXE service.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Boot Script Executor Module"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This is a standalone Boot Script Executor. Standalone means it does not depends on any PEI or DXE service."
+

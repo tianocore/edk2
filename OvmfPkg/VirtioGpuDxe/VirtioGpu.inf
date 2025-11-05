@@ -1,0 +1,53 @@
+## @file
+#
+# This hybrid driver produces the Graphics Output Protocol for the Virtio GPU
+# device (head #0, only and unconditionally).
+#
+# Copyright (C) 2016, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VirtioGpuDxe
+  FILE_GUID                      = D6099B94-CD97-4CC5-8714-7F6312701A8A
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = VirtioGpuEntryPoint
+
+[Sources]
+  Commands.c
+  DriverBinding.c
+  Gop.c
+  VirtioGpu.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  PrintLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+  VirtioLib
+
+[Protocols]
+  gEfiDevicePathProtocolGuid     ## TO_START ## BY_START
+  gEfiGraphicsOutputProtocolGuid ## BY_START
+  gEfiPciIoProtocolGuid          ## TO_START
+  gVirtioDeviceProtocolGuid      ## TO_START
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdVideoResolutionSource
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution

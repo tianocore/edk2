@@ -1,0 +1,48 @@
+## @file
+#  Instance of BaseFspDebugLib
+#
+#  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseFspDebugLibSerialPort
+  FILE_GUID                      = CEA4FF9C-D7BC-4F07-96F1-03F41F2B17AE
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DebugLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  DebugLib.c
+
+[Sources.Ia32]
+  Ia32/FspDebug.nasm
+
+[Sources.X64]
+  X64/FspDebug.nasm
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+
+[LibraryClasses]
+  SerialPortLib
+  BaseMemoryLib
+  PcdLib
+  PrintLib
+  BaseLib
+  DebugDeviceLib
+  DebugPrintErrorLevelLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue       ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask           ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel   ## CONSUMES
+

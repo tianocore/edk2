@@ -1,0 +1,51 @@
+#/* @file
+#
+#  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
+#  Copyright (c) 2014-2017, Linaro Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#*/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = QemuVirtMemInfoPeiLib
+  FILE_GUID                      = 0c4d10cf-d949-49b4-bd13-47a4ae22efce
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmVirtMemInfoLib|PEIM
+  CONSTRUCTOR                    = QemuVirtMemInfoPeiLibConstructor
+
+[Sources]
+  QemuVirtMemInfoLib.c
+  QemuVirtMemInfoPeiLibConstructor.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  FdtLib
+  MemoryAllocationLib
+
+[Guids]
+  gArmVirtSystemMemorySizeGuid
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdFdBaseAddress
+  gArmTokenSpaceGuid.PcdFvBaseAddress
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdFdSize
+  gArmTokenSpaceGuid.PcdFvSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress

@@ -1,0 +1,66 @@
+## @file
+#  This module collects performance data for SMM driver boot records and S3 Suspend Performance Record.
+#
+#  This module registers report status code listener to collect performance data
+#  for SMM boot performance records and S3 Suspend Performance Record.
+#
+#  Copyright (c) 2011 - 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FirmwarePerformanceSmm
+  MODULE_UNI_FILE                = FirmwarePerformanceSmm.uni
+  FILE_GUID                      = 044310AB-77FD-402a-AF1A-87D4120E7329
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  ENTRY_POINT                    = FirmwarePerformanceSmmEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  FirmwarePerformanceCommon.c
+  FirmwarePerformanceCommon.h
+  FirmwarePerformanceTraditional.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  MmServicesTableLib
+  BaseLib
+  DebugLib
+  TimerLib
+  LockBoxLib
+  PcdLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  SynchronizationLib
+  SmmMemLib
+
+[Protocols]
+  gEfiMmRscHandlerProtocolGuid                 ## CONSUMES
+
+[Guids]
+  ## SOMETIMES_PRODUCES   ## UNDEFINED # SaveLockBox
+  ## SOMETIMES_CONSUMES   ## UNDEFINED # StatusCode Data
+  gEfiFirmwarePerformanceGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeS3SuspendStart  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeS3SuspendEnd    ## CONSUMES
+
+[Depex]
+  gEfiMmRscHandlerProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  FirmwarePerformanceSmmExtra.uni

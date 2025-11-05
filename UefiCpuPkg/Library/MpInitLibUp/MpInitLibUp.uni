@@ -1,0 +1,14 @@
+// /** @file
+// MP Initialize Library instance for uniprocessor platforms.
+//
+// MP Initialize Library instance for uniprocessor platforms.
+//
+// Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "MP Initialize Library instance for uniprocessor platforms."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "MP Initialize Library instance for uniprocessor platforms."

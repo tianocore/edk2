@@ -1,0 +1,39 @@
+## @file
+#  CPU Memory Manager Unit library instance.
+#
+#  Copyright (c) 2024 Loongson Technology Corporation Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = CpuMmuLib
+  MODULE_UNI_FILE                = CpuMmuLib.uni
+  FILE_GUID                      = DA8F0232-FB14-42F0-922C-63104D2C70BE
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CpuMmuLib
+
+#
+#  VALID_ARCHITECTURES           = LOONGARCH64
+#
+
+[Sources.LoongArch64]
+  LoongArch64/TlbInvalid.S         | GCC
+  LoongArch64/TlbExceptionHandle.S | GCC
+  LoongArch64/CpuMmu.c
+  LoongArch64/Page.h
+  LoongArch64/TlbInvalid.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  MemoryAllocationLib
+
+[Pcd.LoongArch64]
+  gUefiCpuPkgTokenSpaceGuid.PcdLoongArchExceptionVectorBaseAddress      ## CONSUMES

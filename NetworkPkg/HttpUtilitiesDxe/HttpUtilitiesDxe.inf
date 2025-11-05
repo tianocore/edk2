@@ -1,0 +1,48 @@
+## @file
+#  Implementation of EFI Http Utilities Protocol interfaces.
+#
+#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION               = 0x00010005
+  BASE_NAME                 = HttpUtilitiesDxe
+  FILE_GUID                 = 22ea234f-e72a-11e4-91f9-28d2447c4829
+  MODULE_TYPE               = DXE_DRIVER
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = HttpUtilitiesDxeDriverEntryPoint
+  UNLOAD_IMAGE              = HttpUtilitiesDxeUnload
+  MODULE_UNI_FILE           = HttpUtilitiesDxe.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[Sources]
+  HttpUtilitiesDxe.h
+  HttpUtilitiesDxe.c
+  HttpUtilitiesProtocol.c
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  UefiLib
+  DebugLib
+  HttpLib
+
+[Protocols]
+  gEfiHttpUtilitiesProtocolGuid               ## PRODUCES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  HttpUtilitiesDxeExtra.uni

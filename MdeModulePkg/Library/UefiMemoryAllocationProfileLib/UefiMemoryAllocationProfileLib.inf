@@ -1,0 +1,48 @@
+## @file
+# Instance of Memory Allocation Library using EFI Boot Services,
+#  with memory profile support.
+#
+# Memory Allocation Library that uses EFI Boot Services to allocate
+#  and free memory, with memory profile support.
+#
+# The implementation of this instance is copied from UefiMemoryAllocationLib
+# in MdePkg and updated to support both MemoryAllocationLib and MemoryProfileLib.
+#
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UefiMemoryAllocationProfileLib
+  MODULE_UNI_FILE                = UefiMemoryAllocationProfileLib.uni
+  FILE_GUID                      = 9E8A380A-231E-41E4-AD40-5E706196B853
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MemoryAllocationLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  LIBRARY_CLASS                  = MemoryProfileLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = MemoryProfileLibConstructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  MemoryAllocationLib.c
+  DxeMemoryProfileLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  BaseMemoryLib
+  UefiBootServicesTableLib
+
+[Guids]
+  gEdkiiMemoryProfileGuid   ## SOMETIMES_CONSUMES   ## GUID # Locate protocol
+

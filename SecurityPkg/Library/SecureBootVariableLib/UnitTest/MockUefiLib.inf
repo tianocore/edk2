@@ -1,0 +1,45 @@
+## @file
+# Instance of UEFI Library.
+#
+# The UEFI Library provides functions and macros that simplify the development of
+#  UEFI Drivers and UEFI Applications.  These functions and macros help manage EFI
+#  events, build simple locks utilizing EFI Task Priority Levels (TPLs), install
+#  EFI Driver Model related protocols, manage Unicode string tables for UEFI Drivers,
+#  and print messages on the console output and standard error devices.
+#
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MockUefiLib
+  FILE_GUID                      = E3B7AEF9-4E55-49AF-B035-ED776C928EC6
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = UefiLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  MockUefiLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  PrintLib
+  PcdLib
+  MemoryAllocationLib
+  DebugLib
+  BaseMemoryLib
+  BaseLib
+  UefiRuntimeServicesTableLib
+
+[Guids]
+  gEfiGlobalVariableGuid                        ## SOMETIMES_CONSUMES  ## Variable

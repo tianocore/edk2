@@ -1,0 +1,15 @@
+// /** @file
+// CPU Cache Info Library
+//
+// Provides cache info for each package, core type, cache level and cache type.
+//
+// Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "CPU Cache Info Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Provides cache info for each package, core type, cache level and cache type."

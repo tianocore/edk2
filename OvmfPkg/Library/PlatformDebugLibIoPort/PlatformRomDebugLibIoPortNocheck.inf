@@ -1,0 +1,48 @@
+## @file
+#  Instance of Debug Library for an hypervisor debug console port.
+#  It uses Print Library to produce formatted output strings.
+#
+#  Copyright (c) 2020, Citrix Systems, Inc.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformRomDebugLibIoPortNocheck
+  FILE_GUID                      = 92AEB68E-C2CF-466E-9AB2-3F5E713F7DE6
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DebugLib
+  CONSTRUCTOR                    = PlatformRomDebugLibIoPortConstructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DebugIoPortNocheck.c
+  DebugLib.c
+  DebugLibDetect.h
+  DebugLibDetectRom.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  IoLib
+  PcdLib
+  PrintLib
+  BaseLib
+  DebugPrintErrorLevelLib
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdDebugIoPort                ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue        ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask            ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel    ## CONSUMES
+

@@ -1,0 +1,61 @@
+## @file
+#  initializes MemoryOverwriteRequestControl variable
+#
+#  This module will clear MOR_CLEAR_MEMORY_BIT bit if it is set. It will also do
+#  TPer Reset for those encrypted drives through EFI_STORAGE_SECURITY_COMMAND_PROTOCOL
+#  at EndOfDxe.
+#
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TcgMor
+  MODULE_UNI_FILE                = TcgMor.uni
+  FILE_GUID                      = AD416CE3-A483-45b1-94C2-4B4E4D575562
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = MorDriverEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  TcgMor.c
+  TcgMor.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  DebugLib
+  UefiLib
+  MemoryAllocationLib
+
+[Guids]
+  ## SOMETIMES_CONSUMES      ## Variable:L"MemoryOverwriteRequestControl"
+  ## PRODUCES                ## Variable:L"MemoryOverwriteRequestControl"
+  gEfiMemoryOverwriteControlDataGuid
+  gEfiEndOfDxeEventGroupGuid                  ## SOMETIMES_CONSUMES    ## Event
+
+[Protocols]
+  gEfiStorageSecurityCommandProtocolGuid      ## SOMETIMES_CONSUMES
+  gEfiBlockIoProtocolGuid                     ## SOMETIMES_CONSUMES
+
+[Depex]
+  gEfiVariableArchProtocolGuid AND
+  gEfiVariableWriteArchProtocolGuid AND
+  ( gEfiTcgProtocolGuid OR gEfiTcg2ProtocolGuid )
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  TcgMorExtra.uni

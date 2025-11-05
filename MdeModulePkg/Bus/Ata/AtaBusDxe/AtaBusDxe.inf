@@ -1,0 +1,71 @@
+## @file
+#  ATA Bus driver to enumerate and identify ATA devices.
+#
+#  This driver follows UEFI driver model and layers on ATA Pass Thru protocol defined
+#  in UEFI spec 2.2. It installs Block IO and Disk Info protocol for each ATA device
+#  it enumerates and identifies successfully.
+#
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AtaBusDxe
+  MODULE_UNI_FILE                = AtaBusDxe.uni
+  FILE_GUID                      = 19DF145A-B1D4-453f-8507-38816676D7F6
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeAtaBus
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  gAtaBusDriverBinding
+#  COMPONENT_NAME                =  gAtaBusComponentName
+#  COMPONENT_NAME2               =  gAtaBusComponentName2
+#
+#
+
+[Sources]
+  AtaBus.h
+  AtaBus.c
+  AtaPassThruExecute.c
+  ComponentName.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DevicePathLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  UefiLib
+  BaseLib
+  UefiDriverEntryPoint
+  DebugLib
+  TimerLib
+  ReportStatusCodeLib
+
+[Guids]
+  gEfiDiskInfoAhciInterfaceGuid                 ## SOMETIMES_PRODUCES ## UNDEFINED
+
+[Protocols]
+  gEfiDiskInfoProtocolGuid                      ## BY_START
+  gEfiBlockIoProtocolGuid                       ## BY_START
+  gEfiBlockIo2ProtocolGuid                      ## BY_START
+  ## TO_START
+  ## BY_START
+  gEfiDevicePathProtocolGuid
+  gEfiAtaPassThruProtocolGuid                   ## TO_START
+  gEfiStorageSecurityCommandProtocolGuid        ## BY_START
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  AtaBusDxeExtra.uni

@@ -1,0 +1,44 @@
+## @file
+# Standalone MM driver instance of SmiHandlerProfile Library.
+#
+# This library instance provides real functionality for SmmChildDispatcher module.
+#
+#  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = StandaloneMmSmiHandlerProfileLib
+  FILE_GUID                      = 1F2ED27B-A01D-4867-B993-9B710E5926C5
+  MODULE_TYPE                    = MM_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x10000032
+  LIBRARY_CLASS                  = SmiHandlerProfileLib|MM_STANDALONE
+  CONSTRUCTOR                    = StandaloneMmSmiHandlerProfileLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  MmSmiHandlerProfileLib.c
+  MmSmiHandlerProfileLib.h
+  StandaloneMmSmiHandlerProfileLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MmServicesTableLib
+
+[Guids]
+  gSmiHandlerProfileGuid  ## CONSUMES   ## GUID # Locate protocol
+

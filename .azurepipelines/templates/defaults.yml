@@ -1,0 +1,12 @@
+## @file
+# File templates/default.yml
+#
+# template file containing common default values
+#
+# Copyright (c) Red Hat, Inc.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+variables:
+  default_python_version: "3.12"
+  default_linux_image: "ghcr.io/tianocore/containers/fedora-41-test:4dbfa9e"

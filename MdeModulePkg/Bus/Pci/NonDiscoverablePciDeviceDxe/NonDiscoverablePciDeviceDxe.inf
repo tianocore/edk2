@@ -1,0 +1,50 @@
+## @file
+# PCI I/O driver for non-discoverable devices.
+#
+# Copyright (C) 2016, Linaro Ltd.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = NonDiscoverablePciDeviceDxe
+  FILE_GUID                      = 71fd84cd-353b-464d-b7a4-6ea7b96995cb
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = NonDiscoverablePciDeviceDxeEntryPoint
+
+[Sources]
+  ComponentName.c
+  NonDiscoverablePciDeviceDxe.c
+  NonDiscoverablePciDeviceIo.c
+  NonDiscoverablePciDeviceIo.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  DxeServicesTableLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiPciIoProtocolGuid                         ## BY_START
+  gEdkiiNonDiscoverableDeviceProtocolGuid       ## TO_START
+  gEfiCpuArchProtocolGuid                       ## CONSUMES
+
+[Guids]
+  gEdkiiNonDiscoverableAhciDeviceGuid       ## CONSUMES ## GUID
+  gEdkiiNonDiscoverableEhciDeviceGuid       ## CONSUMES ## GUID
+  gEdkiiNonDiscoverableNvmeDeviceGuid       ## CONSUMES ## GUID
+  gEdkiiNonDiscoverableOhciDeviceGuid       ## CONSUMES ## GUID
+  gEdkiiNonDiscoverableSdhciDeviceGuid      ## CONSUMES ## GUID
+  gEdkiiNonDiscoverableUfsDeviceGuid        ## CONSUMES ## GUID
+  gEdkiiNonDiscoverableUhciDeviceGuid       ## CONSUMES ## GUID
+  gEdkiiNonDiscoverableXhciDeviceGuid       ## CONSUMES ## GUID

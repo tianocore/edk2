@@ -1,0 +1,64 @@
+## @file
+#  The SCSI bus driver scans all SCSI devices and creates a device handle for each of them.
+#  Note that the driver will install the Device Path Protocol and SCSI I/O Protocol on
+#  these handles.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ScsiBus
+  MODULE_UNI_FILE                = ScsiBus.uni
+  FILE_GUID                      = 0167CCC4-D0F7-4f21-A3EF-9E64B7CDCE8B
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeScsiBus
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES              =  IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  gSCSIBusDriverBinding
+#  COMPONENT_NAME                =  gScsiBusComponentName
+#  COMPONENT_NAME2               =  gScsiBusComponentName2
+#
+
+[Sources]
+  ComponentName.c
+  ScsiBus.c
+  ScsiBus.h
+
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  DevicePathLib
+  UefiBootServicesTableLib
+  UefiScsiLib
+  BaseMemoryLib
+  UefiLib
+  UefiDriverEntryPoint
+  DebugLib
+  MemoryAllocationLib
+  ReportStatusCodeLib
+
+
+[Protocols]
+  gEfiScsiIoProtocolGuid                        ## BY_START
+  ## TO_START
+  ## BY_START
+  gEfiDevicePathProtocolGuid
+  gEfiScsiPassThruProtocolGuid                  ## TO_START
+  gEfiExtScsiPassThruProtocolGuid               ## TO_START
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  ScsiBusExtra.uni

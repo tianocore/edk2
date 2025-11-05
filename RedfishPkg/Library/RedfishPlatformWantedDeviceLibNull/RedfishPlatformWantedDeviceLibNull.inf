@@ -1,0 +1,24 @@
+## @file
+#  NULL instance of RedfishPlatformWantedDeviceLib
+#
+#  Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001000b
+  BASE_NAME                      = RedfishPlatformWantedDeviceLibNull
+  FILE_GUID                      = C5AEFFCA-3692-401E-8F82-9FFAA0622E45
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RedfishPlatformWantedDeviceLib
+
+[Sources]
+  RedfishPlatformWantedDeviceLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  RedfishPkg/RedfishPkg.dec

@@ -1,0 +1,14 @@
+// /** @file
+// Produce the Capsule Update Policy Protocol using the services of the Capsule
+// Update Policy Library.
+//
+// Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produce the Capsule Update Policy Protocol using the services of the Capsule Update Policy Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Produce the Capsule Update Policy Protocol using the services of the Capsule Update Policy Library."
+

@@ -1,0 +1,17 @@
+// /** @file
+// Instance of HOB Library using HOB list from EFI Configuration Table.
+//
+// HOB Library implementation that retrieves the HOB List
+// from the System Configuration Table in the EFI System Table.
+//
+// Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Instance of HOB Library using HOB list from EFI Configuration Table"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "The HOB Library implementation that retrieves the HOB List from the System Configuration Table in the EFI System Table."
+

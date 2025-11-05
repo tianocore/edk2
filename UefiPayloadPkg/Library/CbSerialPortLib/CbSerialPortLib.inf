@@ -1,0 +1,28 @@
+## @file
+#  CBMEM console SerialPortLib instance
+#
+#  Copyright (c) 2022, Baruch Binyamin Doron
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CbSerialPortLib
+  FILE_GUID                      = 0DB3EF12-1426-4086-B012-113184C4CE11
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SerialPortLib
+  CONSTRUCTOR                    = SerialPortInitialize
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  BlParseLib
+
+[Sources]
+  CbSerialPortLib.c

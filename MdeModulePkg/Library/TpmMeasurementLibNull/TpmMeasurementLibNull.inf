@@ -1,0 +1,29 @@
+## @file
+#  Provides NULL TPM measurement function.
+#
+# Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TpmMeasurementLibNull
+  FILE_GUID                      = 6DFD6E9F-9278-48D8-8F45-B6CFF2C2B69C
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TpmMeasurementLib
+  MODULE_UNI_FILE                = TpmMeasurementLibNull.uni
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  TpmMeasurementLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec

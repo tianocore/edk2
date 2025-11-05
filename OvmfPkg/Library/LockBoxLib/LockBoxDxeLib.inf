@@ -1,0 +1,46 @@
+## @file
+#
+#  Library implementing the LockBox interface for OVMF
+#
+#  Copyright (C) 2013, Red Hat, Inc.
+#  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = LockBoxDxeLib
+  FILE_GUID                      = f61c9a34-2e18-44ce-af2f-21a998e64fda
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = LockBoxLib
+
+  CONSTRUCTOR                    = LockBoxDxeLibInitialize
+
+[Sources]
+  LockBoxDxe.c
+  LockBoxLib.c
+  LockBoxLib.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiLockBoxProtocolGuid    ## SOMETIMES_PRODUCES
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable
+
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire

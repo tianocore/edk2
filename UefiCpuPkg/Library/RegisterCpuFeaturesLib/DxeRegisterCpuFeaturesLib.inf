@@ -1,0 +1,57 @@
+## @file
+#  Register CPU Features Library DXE instance.
+#
+#  Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeRegisterCpuFeaturesLib
+  MODULE_UNI_FILE                = RegisterCpuFeaturesLib.uni
+  FILE_GUID                      = ADE8F745-AA2E-49f6-8ED4-746B34867E52
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RegisterCpuFeaturesLib|DXE_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.common]
+  DxeRegisterCpuFeaturesLib.c
+  RegisterCpuFeaturesLib.c
+  RegisterCpuFeatures.h
+  CpuFeaturesInitialize.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  PcdLib
+  LocalApicLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  SynchronizationLib
+  UefiBootServicesTableLib
+  IoLib
+  UefiBootServicesTableLib
+  UefiLib
+
+[Protocols]
+  gEfiMpServiceProtocolGuid                                            ## CONSUMES
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuS3DataAddress                        ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesSupport                      ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesCapability                   ## PRODUCES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesSetting                      ## PRODUCES ## CONSUMES
+
+[Depex]
+  gEfiMpServiceProtocolGuid AND gEdkiiCpuFeaturesSetDoneGuid

@@ -1,0 +1,53 @@
+## @file
+# Component description file for EmuAutoScan module
+#
+# This module abstracts memory auto-scan in a Emu environment.
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2011, Apple Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AutoScanPei
+  FILE_GUID                      = 2D6F6BCC-9681-8E42-8579-B57DCD0060F0
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = PeimInitializeAutoScanPei
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  AutoScanPei.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+#  MdeModulePkg/MdeModulePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  PeiServicesTablePointerLib
+  PeiServicesLib
+  HobLib
+  BaseMemoryLib
+  BaseLib
+  PeimEntryPoint
+  DebugLib
+
+
+[Ppis]
+  gEfiPeiMemoryDiscoveredPpiGuid                # PPI ALWAYS_PRODUCED
+  gEmuThunkPpiGuid                              # PPI ALWAYS_CONSUMED
+
+
+[Depex]
+  gEmuThunkPpiGuid AND gEfiPeiMasterBootModePpiGuid
+

@@ -1,0 +1,77 @@
+## @file
+#  Provides the capability to update TPM state setup browser
+#  By this module, user may enable/disable/activate/deactivate/clear TPM, etc.
+#
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TcgConfigDxe
+  MODULE_UNI_FILE                = TcgConfigDxe.uni
+  FILE_GUID                      = 1FA4DAFE-FA5D-4d75-BEA6-5863862C520A
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = TcgConfigDriverEntryPoint
+  UNLOAD_IMAGE                   = TcgConfigDriverUnload
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  TcgConfigDriver.c
+  TcgConfigImpl.c
+  TcgConfigImpl.h
+  TcgConfig.vfr
+  TcgConfigStrings.uni
+  TcgConfigNvData.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+  UefiHiiServicesLib
+  DebugLib
+  HiiLib
+  PcdLib
+  PrintLib
+  Tpm12DeviceLib
+
+[Guids]
+  ## SOMETIMES_PRODUCES ## Variable:L"PhysicalPresence"
+  ## SOMETIMES_CONSUMES ## Variable:L"PhysicalPresence"
+  gEfiPhysicalPresenceGuid
+
+  ## PRODUCES            ## HII
+  ## CONSUMES            ## HII
+  gTcgConfigFormSetGuid
+  gEfiTpmDeviceInstanceTpm12Guid                      ## CONSUMES     ## GUID       # TPM device identifier
+
+[Protocols]
+  gEfiHiiConfigAccessProtocolGuid                     ## PRODUCES
+  gEfiDevicePathProtocolGuid                          ## PRODUCES
+  gEfiTcgProtocolGuid                                 ## CONSUMES
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid    ## CONSUMES
+
+[Depex]
+  gEfiHiiConfigRoutingProtocolGuid  AND
+  gEfiHiiDatabaseProtocolGuid       AND
+  gEfiVariableArchProtocolGuid      AND
+  gEfiVariableWriteArchProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  TcgConfigDxeExtra.uni

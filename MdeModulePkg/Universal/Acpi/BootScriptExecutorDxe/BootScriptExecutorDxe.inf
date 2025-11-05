@@ -1,0 +1,86 @@
+## @file
+# Boot Script Executor Module
+#
+# This is a standalone Boot Script Executor. Standalone means it does not
+# depends on any PEI or DXE service.
+#
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BootScriptExecutorDxe
+  MODULE_UNI_FILE                = BootScriptExecutorDxe.uni
+  FILE_GUID                      = FA20568B-548B-4b2b-81EF-1BA08D4A3CEC
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = BootScriptExecutorEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  ScriptExecute.h
+  ScriptExecute.c
+
+[Sources.X64]
+  X64/SetIdtEntry.c
+  X64/S3Asm.nasm
+
+[Sources.Ia32]
+  IA32/SetIdtEntry.c
+  IA32/S3Asm.nasm
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PcdLib
+  BaseMemoryLib
+  UefiDriverEntryPoint
+  BaseLib
+  S3BootScriptLib
+  PeCoffLib
+  DxeServicesLib
+  UefiBootServicesTableLib
+  CacheMaintenanceLib
+  UefiLib
+  DebugAgentLib
+  LockBoxLib
+  CpuExceptionHandlerLib
+  DevicePathLib
+  DxeServicesTableLib
+
+[Guids]
+  gEfiBootScriptExecutorVariableGuid    ## PRODUCES ## UNDEFINED # SaveLockBox
+  gEfiBootScriptExecutorContextGuid     ## PRODUCES ## UNDEFINED # SaveLockBox
+  gEdkiiMemoryProfileGuid               ## SOMETIMES_CONSUMES ## GUID # Locate protocol
+
+[Protocols]
+  ## NOTIFY
+  ## CONSUMES
+  gEfiDxeSmmReadyToLockProtocolGuid
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode  ## CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable              ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfilePropertyMask   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
+
+[Depex]
+  gEfiLockBoxProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  BootScriptExecutorDxeExtra.uni

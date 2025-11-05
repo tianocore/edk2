@@ -1,0 +1,55 @@
+## @file
+#  NULL instance of Platform Sec Lib.
+#
+#  Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseFspSecPlatformLibNull
+  FILE_GUID                      = C128CADC-623E-4E41-97CB-A7138E627460
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FspSecPlatformLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources]
+  PlatformSecLibNull.c
+
+[Sources.IA32]
+  Ia32/Flat32.nasm
+  Ia32/SecCarInit.nasm
+
+[Sources.X64]
+  X64/Long64.nasm
+  X64/SecCarInit.nasm
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec

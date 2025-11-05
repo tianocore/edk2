@@ -1,0 +1,59 @@
+## @file
+# FV Report/Verify PEI Driver.
+#
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FvReportPei
+  MODULE_UNI_FILE                = FvReportPei.uni
+  FILE_GUID                      = 72405B40-38DA-4ABA-9283-CA8321C23E63
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = FvReportEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  FvReportPei.c
+  FvReportPei.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  CryptoPkg/CryptoPkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  PeiServicesLib
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  PcdLib
+  HobLib
+  MemoryAllocationLib
+  BaseCryptLib
+  ReportStatusCodeLib
+
+[Ppis]
+  gEdkiiPeiFirmwareVolumeInfoPrehashedFvPpiGuid   ## PRODUCES
+  gEdkiiPeiFirmwareVolumeInfoStoredHashFvPpiGuid  ## CONSUMES
+  gEdkiiPeiFirmwareVolumeShadowPpiGuid            ## CONSUMES
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeFvVerificationPass
+  gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeFvVerificationFail
+
+[Depex]
+  gEdkiiPeiFirmwareVolumeInfoStoredHashFvPpiGuid AND gEfiPeiMemoryDiscoveredPpiGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  FvReportPeiPeiExtra.uni

@@ -1,0 +1,32 @@
+## @file
+#  NULL LockBox library instance.
+#
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = LockBoxNullLib
+  MODULE_UNI_FILE                = LockBoxNullLib.uni
+  FILE_GUID                      = 0BA38EBD-E190-4df7-8EC4-0A6E2B43772D
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = LockBoxLib
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  LockBoxNullLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+

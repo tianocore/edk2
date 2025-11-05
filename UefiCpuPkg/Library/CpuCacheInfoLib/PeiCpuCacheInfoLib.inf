@@ -1,0 +1,43 @@
+## @file
+#  CPU Cache Info Library instance for PEI module.
+#
+#  Provides cache info for each package, core type, cache level and cache type.
+#
+#  Copyright (c) 2020 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiCpuCacheInfoLib
+  FILE_GUID                      = CFEE2DBE-53B2-4916-84CA-0BA83C3DDA6E
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CpuCacheInfoLib|PEIM
+  MODULE_UNI_FILE                = CpuCacheInfoLib.uni
+
+[Sources]
+  InternalCpuCacheInfoLib.h
+  CpuCacheInfoLib.c
+  PeiCpuCacheInfoLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PeiServicesTablePointerLib
+
+[Ppis]
+  gEfiPeiMpServices2PpiGuid
+
+[Pcd]
+
+[Depex]
+  gEfiPeiMpServices2PpiGuid

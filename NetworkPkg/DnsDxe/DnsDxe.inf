@@ -1,0 +1,71 @@
+## @file
+# Implementation of EFI_DNS4_PROTOCOL and EFI_DNS6_PROTOCOL interfaces.
+#
+# Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION               = 0x00010005
+  BASE_NAME                 = DnsDxe
+  FILE_GUID                 = b219e140-dffc-11e3-b956-0022681e6906
+  MODULE_TYPE               = UEFI_DRIVER
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = DnsDriverEntryPoint
+  UNLOAD_IMAGE              = DnsUnload
+  MODULE_UNI_FILE           = DnsDxe.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[Sources]
+  ComponentName.c
+  DnsDriver.h
+  DnsDriver.c
+  DnsImpl.h
+  DnsImpl.c
+  DnsProtocol.c
+  DnsDhcp.h
+  DnsDhcp.c
+
+
+[LibraryClasses]
+  BaseLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  NetLib
+  DebugLib
+  DpcLib
+  PrintLib
+  UdpIoLib
+
+
+[Protocols]
+  gEfiDns4ServiceBindingProtocolGuid              ## BY_START
+  gEfiDns4ProtocolGuid                            ## BY_START
+  gEfiUdp4ServiceBindingProtocolGuid              ## TO_START
+  gEfiUdp4ProtocolGuid                            ## TO_START
+  gEfiDhcp4ServiceBindingProtocolGuid             ## SOMETIMES_CONSUMES
+  gEfiDhcp4ProtocolGuid                           ## SOMETIMES_CONSUMES
+  gEfiIp4Config2ProtocolGuid                      ## SOMETIMES_CONSUMES
+  gEfiManagedNetworkServiceBindingProtocolGuid    ## SOMETIMES_CONSUMES
+  gEfiManagedNetworkProtocolGuid                  ## SOMETIMES_CONSUMES
+
+  gEfiDns6ServiceBindingProtocolGuid              ## BY_START
+  gEfiDns6ProtocolGuid                            ## BY_START
+  gEfiUdp6ServiceBindingProtocolGuid              ## TO_START
+  gEfiUdp6ProtocolGuid                            ## TO_START
+  gEfiDhcp6ServiceBindingProtocolGuid             ## SOMETIMES_CONSUMES
+  gEfiDhcp6ProtocolGuid                           ## SOMETIMES_CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  DnsDxeExtra.uni
+

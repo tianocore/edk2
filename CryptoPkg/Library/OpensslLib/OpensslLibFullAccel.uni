@@ -1,0 +1,14 @@
+// /** @file
+// This module provides openSSL Library implementation with ECC and TLS
+// features along with performance optimized implementations of SHA1,
+// SHA256, SHA512 AESNI, VPAED, and GHASH for IA32 and X64.
+//
+// Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "OpenSSL Library implementation with TLS and ECC features and performance optimizations"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module provides OpenSSL Library implementation with TLS and ECC features and performance optimizations."

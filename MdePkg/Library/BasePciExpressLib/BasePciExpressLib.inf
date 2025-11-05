@@ -1,0 +1,41 @@
+## @file
+#  Instance of PCI Express Library using the variable size PCI Express MMIO window.
+#
+#  PCI Express Library that uses the variable size PCI Express MMIO window to perform
+#  PCI Configuration cycles. Layers on top of an I/O Library instance.
+#
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BasePciExpressLib
+  MODULE_UNI_FILE                = BasePciExpressLib.uni
+  FILE_GUID                      = 287e50f4-a188-4699-b907-3e4080ca5688
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciExpressLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  PciExpressLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  DebugLib
+  IoLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress  ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseSize  ## CONSUMES

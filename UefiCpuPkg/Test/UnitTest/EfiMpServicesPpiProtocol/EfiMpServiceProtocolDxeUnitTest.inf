@@ -1,0 +1,46 @@
+## @file
+# DXE driver that unit tests the EfiMpServiceProtocol
+#
+# Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION     = 0x00010005
+  BASE_NAME       = EfiMpServiceProtocolDxeUnitTest
+  FILE_GUID       = F1E468E2-A32D-4574-895D-6D82B27B08BC
+  MODULE_TYPE     = DXE_DRIVER
+  VERSION_STRING  = 1.0
+  ENTRY_POINT     = DxeEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  EfiMpServicesUnitTestCommom.c
+  EfiMpServicesUnitTestCommom.h
+  EfiMpServiceProtocolUnitTest.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UnitTestPersistenceLib
+  UnitTestLib
+
+[Protocols]
+  gEfiMpServiceProtocolGuid           ## CONSUMES
+
+[Depex]
+  gEfiMpServiceProtocolGuid

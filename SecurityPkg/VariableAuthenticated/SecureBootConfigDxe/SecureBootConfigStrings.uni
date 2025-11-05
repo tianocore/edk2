@@ -1,0 +1,142 @@
+/** @file
+  String definitions for Secure Boot Configuration form.
+
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#langdef en-US "English"
+
+#string STR_SECUREBOOT_TITLE               #language en-US "Secure Boot Configuration"
+#string STR_SECUREBOOT_HELP                #language en-US "Press <Enter> to select Secure Boot options."
+
+#string STR_NULL                           #language en-US ""
+#string STR_DBX_SUBTITLE_TEXT              #language en-US ""
+
+#string STR_SECURE_BOOT_STATE_PROMPT       #language en-US "Current Secure Boot State"
+#string STR_SECURE_BOOT_STATE_HELP         #language en-US "Current Secure Boot state: enabled or disabled."
+#string STR_SECURE_BOOT_STATE_CONTENT      #language en-US " "
+
+#string STR_SECURE_BOOT_PROMPT             #language en-US "Attempt Secure Boot"
+#string STR_SECURE_BOOT_HELP               #language en-US "Enable/Disable the Secure Boot feature after platform reset"
+
+#string STR_SECURE_RESET_TO_DEFAULTS_HELP  #language en-US "Enroll keys with data from default variables"
+#string STR_SECURE_RESET_TO_DEFAULTS       #language en-US "Reset Secure Boot Keys"
+#string STR_RESET_TO_DEFAULTS_POPUP        #language en-US "Secure Boot Keys & databases will be initialized from defaults.\n Are you sure?"
+
+#string STR_SECURE_BOOT_ENROLL_SIGNATURE   #language en-US "Enroll Signature"
+#string STR_SECURE_BOOT_DELETE_SIGNATURE   #language en-US "Delete Signature"
+#string STR_SECURE_BOOT_DELETE_LIST_FORM   #language en-US "Delete Signature List Form"
+#string STR_SECURE_BOOT_DELETE_DATA_FORM   #language en-US "Delete Signature Data Form"
+#string STR_SECURE_BOOT_DELETE_ALL_LIST    #language en-US "Delete All Signature List"
+#string STR_SECURE_BOOT_DELETE_ALL_DATA    #language en-US "Delete All Signature Data"
+#string STR_SECURE_BOOT_DELETE_CHECK_DATA  #language en-US "Delete Checked Signature Data"
+#string STR_SECURE_BOOT_DELETE_ALL_DATA_HELP   #language en-US "All signature data will be deleted, no matter how many signature data have you checked."
+#string STR_SECURE_BOOT_DELETE_CHECK_DATA_HELP #language en-US "All checked signature data will be deleted."
+
+#string STR_SECURE_BOOT_SIGNATURE_GUID     #language en-US "Signature GUID"
+#string STR_SECURE_BOOT_SIGNATURE_GUID_HELP #language en-US "Input digit character in 11111111-2222-3333-4444-1234567890ab format."
+#string STR_SECURE_BOOT_ADD_SIGNATURE_FILE #language en-US "Enroll Signature Using File"
+
+#string STR_DBX_CERTIFICATE_FORMAT_PROMPT  #language en-US "Signature Format"
+#string STR_DBX_CERTIFICATE_FORMAT_HELP    #language en-US "X509 DER-Cert enrolled. Select different option to enroll it into DBX."
+#string STR_DBX_CERTIFICATE_FORMAT_SHA256  #language en-US "X509 CERT SHA256"
+#string STR_DBX_CERTIFICATE_FORMAT_SHA384  #language en-US "X509 CERT SHA384"
+#string STR_DBX_CERTIFICATE_FORMAT_SHA512  #language en-US "X509 CERT SHA512"
+#string STR_DBX_CERTIFICATE_FORMAT_RAW     #language en-US "X509 CERT"
+
+#string STR_DBX_PE_IMAGE_FORMAT_HELP       #language en-US "PE image enrolled. Use SHA256 hash to enroll it into DBX"
+#string STR_DBX_PE_FORMAT_SHA256           #language en-US "PE Image SHA256"
+
+#string STR_DBX_AUTH_2_FORMAT_HELP         #language en-US "VARIABLE_AUTHENTICATION_2 binary enrolled. Use raw binary to enroll it into DBX"
+#string STR_DBX_AUTH_2_FORMAT              #language en-US "VARIABLE_AUTHENTICATION_2"
+
+#string STR_CERTIFICATE_REVOCATION_TIME_PROMPT #language en-US "  Revocation Time"
+#string STR_CERTIFICATE_REVOCATION_TIME_HELP   #language en-US "Input the revocation time of the certificate"
+#string STR_CERTIFICATE_REVOCATION_DATE_PROMPT #language en-US "  Revocation Date"
+#string STR_CERTIFICATE_REVOCATION_DATE_HELP   #language en-US "Input the revocation date of the certificate"
+
+#string STR_ALWAYS_CERTIFICATE_REVOCATION_PROMPT   #language en-US "Always Revocation"
+#string STR_ALWAYS_CERTIFICATE_REVOCATION_HELP     #language en-US "Indicate whether the certificate is always revoked."
+
+
+#string STR_SAVE_SIGNATURE_FILE            #language en-US "Save Signature File"
+
+#string STR_SAVE_AND_EXIT                  #language en-US  "Commit Changes and Exit"
+#string STR_NO_SAVE_AND_EXIT               #language en-US  "Discard Changes and Exit"
+
+#string STR_FILE_EXPLORER_TITLE            #language en-US  "File Explorer"
+
+#string STR_SECURE_BOOT_MODE_PROMPT        #language en-US "Secure Boot Mode"
+#string STR_SECURE_BOOT_MODE_HELP          #language en-US "Secure Boot Mode: Custom Mode or Standard Mode"
+
+#string STR_STANDARD_MODE                  #language en-US "Standard Mode"
+#string STR_CUSTOM_MODE                    #language en-US "Custom Mode"
+
+#string STR_SECURE_BOOT_OPTION             #language en-US "Custom Secure Boot Options"
+#string STR_SECURE_BOOT_OPTION_HELP        #language en-US "Enter into Custom Secure Boot Options Form"
+
+#string STR_SECURE_BOOT_OPTION_TITLE       #language en-US "Custom Secure Boot Options"
+
+#string STR_SECURE_BOOT_PK_OPTION          #language en-US "PK Options"
+#string STR_SECURE_BOOT_PK_OPTION_HELP     #language en-US "Enroll/Delete PK"
+#string STR_SECURE_BOOT_KEK_OPTION         #language en-US "KEK Options"
+#string STR_SECURE_BOOT_KEK_OPTION_HELP    #language en-US "Enroll/Delete KEK"
+#string STR_SECURE_BOOT_DB_OPTION          #language en-US "DB Options"
+#string STR_SECURE_BOOT_DB_OPTION_HELP     #language en-US "Enroll/Delete Signature"
+#string STR_SECURE_BOOT_DBX_OPTION         #language en-US "DBX Options"
+#string STR_SECURE_BOOT_DBX_OPTION_HELP    #language en-US "Enroll/Delete DBX"
+#string STR_SECURE_BOOT_DBT_OPTION         #language en-US "DBT Options"
+#string STR_SECURE_BOOT_DBT_OPTION_HELP    #language en-US "Enroll/Delete DBT"
+
+#string STR_ENROLL_PK                      #language en-US "Enroll PK"
+#string STR_ENROLL_PK_HELP                 #language en-US "Enter into Enroll PK Form"
+#string STR_SAVE_PK_FILE                   #language en-US "Save PK file"
+#string STR_SECURE_BOOT_ENROLL_PK_FILE     #language en-US "Enroll PK Using File"
+
+#string STR_DELETE_PK                      #language en-US "Delete Pk"
+#string STR_DELETE_PK_HELP                 #language en-US "Choose to Delete PK, Otherwise keep the PK"
+
+#string STR_ENROLL_PK_TITLE                #language en-US "Enroll PK"
+
+#string STR_ENROLL_KEK                     #language en-US "Enroll KEK"
+#string STR_ENROLL_KEK_HELP                #language en-US "Enter into Enroll KEK Form"
+
+#string STR_DELETE_KEK                     #language en-US "Delete KEK"
+#string STR_DELETE_KEK_HELP                 #language en-US "Enter into Delete KEK Form"
+
+#string STR_ENROLL_KEK_TITLE                #language en-US "Enroll KEK"
+#string STR_DELETE_KEK_TITLE                #language en-US "Delete KEK"
+
+#string STR_FORM_ENROLL_KEK_FROM_FILE_TITLE         #language en-US "Enroll KEK using File"
+#string STR_FORM_ENROLL_KEK_FROM_FILE_TITLE_HELP    #language en-US "Read the public key of KEK from file"
+#string STR_FILE_EXPLORER_TITLE                   #language en-US "File Explorer"
+#string STR_CERT_TYPE_RSA2048_SHA256_GUID         #language en-US "RSA2048_SHA256_GUID"
+#string STR_CERT_TYPE_PCKS7_GUID                  #language en-US "PKCS7_GUID"
+#string STR_CERT_TYPE_SHA1_GUID                   #language en-US "SHA1_GUID"
+#string STR_CERT_TYPE_SHA256_GUID                 #language en-US "SHA256_GUID"
+#string STR_CERT_TYPE_X509_SHA256_GUID            #language en-US "X509_SHA256_GUID"
+#string STR_CERT_TYPE_X509_SHA384_GUID            #language en-US "X509_SHA384_GUID"
+#string STR_CERT_TYPE_X509_SHA512_GUID            #language en-US "X509_SHA512_GUID"
+
+#string STR_LIST_TYPE_RSA2048_SHA256              #language en-US "RSA2048_SHA256"
+#string STR_LIST_TYPE_X509                        #language en-US "X509"
+#string STR_LIST_TYPE_SHA1                        #language en-US "SHA1"
+#string STR_LIST_TYPE_SHA256                      #language en-US "SHA256"
+#string STR_LIST_TYPE_SHA384                      #language en-US "SHA384"
+#string STR_LIST_TYPE_SHA512                      #language en-US "SHA512"
+#string STR_LIST_TYPE_X509_SHA256                 #language en-US "X509_SHA256"
+#string STR_LIST_TYPE_X509_SHA384                 #language en-US "X509_SHA384"
+#string STR_LIST_TYPE_X509_SHA512                 #language en-US "X509_SHA512"
+#string STR_LIST_TYPE_UNKNOWN                     #language en-US "UnKnown"
+
+#string STR_SIGNATURE_LIST_NAME_FORMAT            #language en-US "Signature List, Entry-%d"
+#string STR_SIGNATURE_DATA_NAME_FORMAT            #language en-US "Signature Data, Entry-%d"
+#string STR_SIGNATURE_LIST_HELP_FORMAT            #language en-US "List Type:\n  %s\n\nEntry Number:\n  %d"
+#string STR_SIGNATURE_DATA_HELP_FORMAT_GUID       #language en-US "Owner GUID:\n%s\n\n"
+#string STR_SIGNATURE_DATA_HELP_FORMAT_CN         #language en-US "%s(%d bytes):\nCN = %s\n"
+#string STR_SIGNATURE_DATA_HELP_FORMAT_HASH       #language en-US "%s(%d bytes):\n%s\n"
+#string STR_SIGNATURE_DATA_HELP_FORMAT_TIME       #language en-US "Revocation Time:\n%s"
+
+#string STR_SIGNATURE_DELETE_ALL_CONFIRM          #language en-US "Press 'Y' to delete all signature List."

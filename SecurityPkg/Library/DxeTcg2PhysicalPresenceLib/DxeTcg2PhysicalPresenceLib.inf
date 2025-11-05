@@ -1,0 +1,67 @@
+## @file
+#  Executes TPM 2.0 requests from OS or BIOS
+#
+#  This library will check and execute TPM 2.0 request from OS or BIOS. The request may
+#  ask for user confirmation before execution.
+#
+#  Caution: This module requires additional review when modified.
+#  This driver will have external input - variable.
+#  This external input must be validated carefully to avoid security issue.
+#
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeTcg2PhysicalPresenceLib
+  MODULE_UNI_FILE                = DxeTcg2PhysicalPresenceLib.uni
+  FILE_GUID                      = 7E507A86-DE8B-4AD3-BC4C-0498389098D3
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Tcg2PhysicalPresenceLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DxeTcg2PhysicalPresenceLib.c
+  PhysicalPresenceStrings.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  PrintLib
+  HiiLib
+  HobLib
+  Tpm2CommandLib
+  Tcg2PpVendorLib
+
+[Protocols]
+  gEfiTcg2ProtocolGuid                 ## SOMETIMES_CONSUMES
+  gEdkiiVariableLockProtocolGuid       ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcg2PhysicalPresenceFlags       ## SOMETIMES_CONSUMES
+
+[Guids]
+  ## SOMETIMES_CONSUMES ## HII
+  ## SOMETIMES_PRODUCES ## Variable:L"Tcg2PhysicalPresence"
+  ## SOMETIMES_CONSUMES ## Variable:L"Tcg2PhysicalPresence"
+  ## SOMETIMES_PRODUCES ## Variable:L"Tcg2PhysicalPresenceFlags"
+  ## SOMETIMES_CONSUMES ## Variable:L"Tcg2PhysicalPresenceFlags"
+  gEfiTcg2PhysicalPresenceGuid

@@ -1,0 +1,40 @@
+## @file
+#  Instance of RNG (Random Number Generator) Library.
+#
+#  BaseRng Library that uses the TimerLib to provide reasonably random numbers.
+#  Do NOT use this on a production system as this uses the system performance
+#  counter rather than a true source of random in addition to having a weak
+#  random algorithm. This is provided primarily as a source of entropy for
+#  OpenSSL for platforms that do not have a good built in RngLib as this
+#  emulates what was done before (though it isn't perfect).
+#
+#  Copyright (c) Microsoft Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.27
+  BASE_NAME                      = BaseRngLibTimerLib
+  MODULE_UNI_FILE                = BaseRngLibTimerLib.uni
+  FILE_GUID                      = B3E66B05-D218-4B9A-AC33-EF0F83D6A513
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RngLib
+
+[Sources]
+  RngLibTimer.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Guids]
+  gEdkiiRngAlgorithmUnSafe
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  TimerLib

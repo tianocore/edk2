@@ -1,0 +1,17 @@
+// /** @file
+// This is a sample HII driver.
+//
+// This driver shows how HII protocol, VFR and UNI files are used to create a HII
+// driver which can be displayed and configured by a UEFI HII Form Browser.
+//
+// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "A sample HII driver"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver shows how HII protocol, VFR and UNI files are used to create a HII driver that can be displayed and configured by a UEFI HII Form Browser."
+

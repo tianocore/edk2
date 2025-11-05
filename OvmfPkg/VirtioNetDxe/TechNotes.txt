@@ -1,0 +1,361 @@
+## @file
+#
+# Technical notes for the virtio-net driver.
+#
+# Copyright (C) 2013, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+Disclaimer
+----------
+
+All statements concerning standards and specifications are informative and not
+normative. They are made in good faith. Corrections are most welcome on the
+edk2-devel mailing list.
+
+The following documents have been perused while writing the driver and this
+document:
+- Unified Extensible Firmware Interface Specification, Version 2.3.1, Errata C;
+  June 27, 2012
+- Driver Writer's Guide for UEFI 2.3.1, 03/08/2012, Version 1.01;
+- Virtio PCI Card Specification, v0.9.5 DRAFT, 2012 May 7.
+
+
+Summary
+-------
+
+The VirtioNetDxe UEFI_DRIVER implements the Simple Network Protocol for
+virtio-net devices. Higher level protocols are automatically installed on top
+of it by the DXE Core / the ConnectController() boot service, enabling for
+virtio-net devices eg. DHCP configuration, TCP transfers with edk2 StdLib
+applications, and PXE booting in OVMF.
+
+
+UEFI driver structure
+---------------------
+
+A driver instance, belonging to a given virtio-net device, can be in one of
+four states at any time. The states stack up as follows below. The state
+transitions are labeled with the primary function (and its important callees
+faithfully indented) that implement the transition.
+
+                               |  ^
+                               |  |
+   [DriverBinding.c]           |  | [DriverBinding.c]
+   VirtioNetDriverBindingStart |  | VirtioNetDriverBindingStop
+     VirtioNetSnpPopulate      |  |   VirtioNetSnpEvacuate
+       VirtioNetGetFeatures    |  |
+                               v  |
+                   +-------------------------+
+                   | EfiSimpleNetworkStopped |
+                   +-------------------------+
+                               |  ^
+                [SnpStart.c]   |  | [SnpStop.c]
+                VirtioNetStart |  | VirtioNetStop
+                               |  |
+                               v  |
+                   +-------------------------+
+                   | EfiSimpleNetworkStarted |
+                   +-------------------------+
+                               |  ^
+  [SnpInitialize.c]            |  | [SnpShutdown.c]
+  VirtioNetInitialize          |  | VirtioNetShutdown
+    VirtioNetInitRing {Rx, Tx} |  |   VirtioNetShutdownRx [SnpSharedHelpers.c]
+      VirtioRingInit           |  |     VirtIo->UnmapSharedBuffer
+      VirtioRingMap            |  |     VirtIo->FreeSharedPages
+    VirtioNetInitTx            |  |   VirtioNetShutdownTx [SnpSharedHelpers.c]
+      VirtIo->AllocateShare... |  |     VirtIo->UnmapSharedBuffer
+      VirtioMapAllBytesInSh... |  |     VirtIo->FreeSharedPages
+    VirtioNetInitRx            |  |   VirtioNetUninitRing [SnpSharedHelpers.c]
+      VirtIo->AllocateShare... |  |                       {Tx, Rx}
+      VirtioMapAllBytesInSh... |  |     VirtIo->UnmapSharedBuffer
+                               |  |     VirtioRingUninit
+                               v  |
+                  +-----------------------------+
+                  | EfiSimpleNetworkInitialized |
+                  +-----------------------------+
+
+The state at the top means "nonexistent" and is hence unnamed on the diagram --
+a driver instance actually doesn't exist at that point. The transition
+functions out of and into that state implement the Driver Binding Protocol.
+
+The lower three states characterize an existent driver instance and are all
+states defined by the Simple Network Protocol. The transition functions between
+them are member functions of the Simple Network Protocol.
+
+Each transition function validates its expected source state and its
+parameters. For example, VirtioNetDriverBindingStop will refuse to disconnect
+from the controller unless it's in EfiSimpleNetworkStopped.
+
+
+Driver instance states (Simple Network Protocol)
+------------------------------------------------
+
+In the EfiSimpleNetworkStopped state, the virtio-net device is (has been)
+re-set. No resources are allocated for networking / traffic purposes. The MAC
+address and other device attributes have been retrieved from the device (this
+is necessary for completing the VirtioNetDriverBindingStart transition).
+
+The EfiSimpleNetworkStarted is completely identical to the
+EfiSimpleNetworkStopped state for virtio-net, in the functional and
+resource-usage sense. This state is mandated / provided by the Simple Network
+Protocol for flexibility that the virtio-net driver doesn't exploit.
+
+In particular, the EfiSimpleNetworkStarted state is the target of the Shutdown
+SNP member function, and must therefore correspond to a hardware configuration
+where "[it] is safe for another driver to initialize". (Clearly another UEFI
+driver could not do that due to the exclusivity of the driver binding that
+VirtioNetDriverBindingStart() installs, but a later OS driver might qualify.)
+
+The EfiSimpleNetworkInitialized state is the live state of the virtio NIC / the
+driver instance. Virtio and other resources required for network traffic have
+been allocated, and the following SNP member functions are available (in
+addition to VirtioNetShutdown which leaves the state):
+
+- VirtioNetReceive [SnpReceive.c]: poll the virtio NIC for an Rx packet that
+  may have arrived asynchronously;
+
+- VirtioNetTransmit [SnpTransmit.c]: queue a Tx packet for asynchronous
+  transmission (meant to be used together with VirtioNetGetStatus);
+
+- VirtioNetGetStatus [SnpGetStatus.c]: query link status and status of pending
+  Tx packets;
+
+- VirtioNetMcastIpToMac [SnpMcastIpToMac.c]: transform a multicast IPv4/IPv6
+  address into a multicast MAC address;
+
+- VirtioNetReceiveFilters [SnpReceiveFilters.c]: emulate unicast / multicast /
+  broadcast filter configuration (not their actual effect -- a more liberal
+  filter setting than requested is allowed by the UEFI specification).
+
+The following SNP member functions are not supported [SnpUnsupported.c]:
+
+- VirtioNetReset: reinitialize the virtio NIC without shutting it down (a loop
+  from/to EfiSimpleNetworkInitialized);
+
+- VirtioNetStationAddress: assign a new MAC address to the virtio NIC,
+
+- VirtioNetStatistics: collect statistics,
+
+- VirtioNetNvData: access non-volatile data on the virtio NIC.
+
+Missing support for these functions is allowed by the UEFI specification and
+doesn't seem to trip up higher level protocols.
+
+
+Events and task priority levels
+-------------------------------
+
+The UEFI specification defines a sophisticated mechanism for asynchronous
+events / callbacks (see "6.1 Event, Timer, and Task Priority Services" for
+details). Such callbacks work like software interrupts, and some notion of
+locking / masking is important to implement critical sections (atomic or
+exclusive access to data or a device). This notion is defined as Task Priority
+Levels.
+
+The virtio-net driver for OVMF must concern itself with events for two reasons:
+
+- The Simple Network Protocol provides its clients with a (non-optional) WAIT
+  type event called WaitForPacket: it allows them to check or wait for Rx
+  packets by polling or blocking on this event. (This functionality overlaps
+  with the Receive member function.) The event is available to clients starting
+  with EfiSimpleNetworkStopped (inclusive).
+
+  The virtio-net driver is informed about such client polling or blockage by
+  receiving an asynchronous callback (a software interrupt). In the callback
+  function the driver must interrogate the driver instance state, and if it is
+  EfiSimpleNetworkInitialized, access the Rx queue and see if any packets are
+  available for consumption. If so, it must signal the WaitForPacket WAIT type
+  event, waking the client.
+
+  For simplicity and safety, all parts of the virtio-net driver that access any
+  bit of the driver instance (data or device) run at the TPL_CALLBACK level.
+  This is the highest level allowed for an SNP implementation, and all code
+  protected in this manner satisfies even stricter non-blocking requirements
+  than what's documented for TPL_CALLBACK.
+
+  The task priority level for the WaitForPacket callback too is set by the
+  driver, the choice is TPL_CALLBACK again. This in effect serializes  the
+  WaitForPacket callback (VirtioNetIsPacketAvailable [Events.c]) with "normal"
+  parts of the driver.
+
+- According to the Driver Writer's Guide, a network driver should install a
+  callback function for the global EXIT_BOOT_SERVICES event (a special NOTIFY
+  type event). When the ExitBootServices() boot service has cleaned up internal
+  firmware state and is about to pass control to the OS, any network driver has
+  to stop any in-flight DMA transfers, lest it corrupts OS memory. For this
+  reason EXIT_BOOT_SERVICES is emitted and the network driver must abort
+  in-flight DMA transfers.
+
+  This callback (VirtioNetExitBoot) is synchronized with the rest of the driver
+  code just the same as explained for WaitForPacket. In
+  EfiSimpleNetworkInitialized state it resets the virtio NIC, halting all data
+  transfer. After the callback returns, no further driver code is expected to
+  be scheduled.
+
+
+Virtio internals -- Rx
+----------------------
+
+Requests (Rx and Tx alike) are always submitted by the guest and processed by
+the host. For Tx, processing means transmission. For Rx, processing means
+filling in the request with an incoming packet. Submitted requests exist on the
+"Available Ring", and answered (processed) requests show up on the "Used Ring".
+
+Packet data includes the media (Ethernet) header: destination MAC, source MAC,
+and Ethertype (14 bytes total).
+
+The following structures implement packet reception. Most of them are defined
+in the Virtio specification, the only driver-specific trait here is the static
+pre-configuration of the two-part descriptor chains, in VirtioNetInitRx. The
+diagram is simplified.
+
+                     Available Index       Available Index
+                     last processed          incremented
+                       by the host           by the guest
+                           v       ------->        v
+Available  +-------+-------+-------+-------+-------+
+Ring       |DescIdx|DescIdx|DescIdx|DescIdx|DescIdx|
+           +-------+-------+-------+-------+-------+
+                              =D6     =D2
+
+       D2         D3          D4         D5          D6         D7
+Descr. +----------+----------++----------+----------++----------+----------+
+Table  |Adr:Len:Nx|Adr:Len:Nx||Adr:Len:Nx|Adr:Len:Nx||Adr:Len:Nx|Adr:Len:Nx|
+       +----------+----------++----------+----------++----------+----------+
+        =A2    =D3 =A3         =A4    =D5 =A5         =A6    =D7 =A7
+
+
+            A2        A3     A4       A5     A6       A7
+Receive     +---------------+---------------+---------------+
+Destination |vnet hdr:packet|vnet hdr:packet|vnet hdr:packet|
+Area        +---------------+---------------+---------------+
+
+                Used Index                               Used Index incremented
+        last processed by the guest                            by the host
+                    v                    ------->                   v
+Used    +-----------+-----------+-----------+-----------+-----------+
+Ring    |DescIdx:Len|DescIdx:Len|DescIdx:Len|DescIdx:Len|DescIdx:Len|
+        +-----------+-----------+-----------+-----------+-----------+
+                                     =D4
+
+In VirtioNetInitRx, the guest allocates the fixed size Receive Destination
+Area, which accommodates all packets delivered asynchronously by the host. To
+each packet, a slice of this area is dedicated; each slice is further
+subdivided into virtio-net request header and network packet data. The
+(device-physical) addresses of these sub-slices are denoted with A2, A3, A4 and
+so on. Importantly, an even-subscript "A" always belongs to a virtio-net
+request header, while an odd-subscript "A" always belongs to a packet
+sub-slice.
+
+Furthermore, the guest lays out a static pattern in the Descriptor Table. For
+each packet that can be in-flight or already arrived from the host,
+VirtioNetInitRx sets up a separate, two-part descriptor chain. For packet N,
+the Nth descriptor chain is set up as follows:
+
+- the first (=head) descriptor, with even index, points to the fixed-size
+  sub-slice receiving the virtio-net request header,
+
+- the second descriptor (with odd index) points to the fixed (1514 byte) size
+  sub-slice receiving the packet data,
+
+- a link from the first (head) descriptor in the chain is established to the
+  second (tail) descriptor in the chain.
+
+Finally, the guest populates the Available Ring with the indices of the head
+descriptors. All descriptor indices on both the Available Ring and the Used
+Ring are even.
+
+Packet reception occurs as follows:
+
+- The host consumes a descriptor index off the Available Ring. This index is
+  even (=2*N), and fingers the head descriptor of the chain belonging to packet
+  N.
+
+- The host reads the descriptors D(2*N) and -- following the Next link there
+  --- D(2*N+1), and stores the virtio-net request header at A(2*N), and the
+  packet data at A(2*N+1).
+
+- The host places the index of the head descriptor, 2*N, onto the Used Ring,
+  and sets the Len field in the same Used Ring Element to the total number of
+  bytes transferred for the entire descriptor chain. This enables the guest to
+  identify the length of Rx packets.
+
+- VirtioNetReceive polls the Used Ring. If a new Used Ring Element shows up, it
+  copies the data out to the caller, and recycles the index of the head
+  descriptor (ie. 2*N) to the Available Ring.
+
+- Because the host can process (answer) Rx requests in any order theoretically,
+  the order of head descriptor indices on each of the Available Ring and the
+  Used Ring is virtually random. (Except right after the initial population in
+  VirtioNetInitRx, when the Available Ring is full and increasing, and the Used
+  Ring is empty.)
+
+- If the Available Ring is empty, the host is forced to drop packets. If the
+  Used Ring is empty, VirtioNetReceive returns EFI_NOT_READY (no packet
+  available).
+
+
+Virtio internals -- Tx
+----------------------
+
+The transmission structure erected by VirtioNetInitTx is similar, it differs
+in the following:
+
+- There is no Receive Destination Area.
+
+- Each head descriptor, D(2*N), points to a read-only virtio-net request header
+  that is shared by all of the head descriptors. This virtio-net request header
+  is never modified by the host.
+
+- Each tail descriptor is re-pointed to the device-mapped address of the
+  caller-supplied packet buffer whenever VirtioNetTransmit places the
+  corresponding head descriptor on the Available Ring. A reverse mapping, from
+  the device-mapped address to the caller-supplied packet address, is saved in
+  an associative data structure that belongs to the driver instance.
+
+- Per spec, the caller is responsible to hang on to the unmodified packet
+  buffer until it is reported transmitted by VirtioNetGetStatus.
+
+Steps of packet transmission:
+
+- Client code calls VirtioNetTransmit. VirtioNetTransmit tracks free descriptor
+  chains by keeping the indices of their head descriptors in a stack that is
+  private to the driver instance. All elements of the stack are even.
+
+- If the stack is empty (that is, each descriptor chain, in isolation, is
+  either pending transmission, or has been processed by the host but not
+  yet recycled by a VirtioNetGetStatus call), then VirtioNetTransmit returns
+  EFI_NOT_READY.
+
+- Otherwise the index of a free chain's head descriptor is popped from the
+  stack. The linked tail descriptor is re-pointed as discussed above. The head
+  descriptor's index is pushed on the Available Ring.
+
+- The host moves the head descriptor index from the Available Ring to the Used
+  Ring when it transmits the packet.
+
+- Client code calls VirtioNetGetStatus. In case the Used Ring is empty, the
+  function reports no Tx completion. Otherwise, a head descriptor's index is
+  consumed from the Used Ring and recycled to the private stack. The client
+  code's original packet buffer address is calculated by fetching the
+  device-mapped address from the tail descriptor (where it has been stored at
+  VirtioNetTransmit time), and by looking up the device-mapped address in the
+  associative data structure. The reverse-mapped packet buffer address is
+  returned to the caller.
+
+- The Len field of the Used Ring Element is not checked. The host is assumed to
+  have transmitted the entire packet -- VirtioNetTransmit had forced it below
+  1514 bytes (inclusive). The Virtio specification suggests this packet size is
+  always accepted (and a lower MTU could be encountered on any later hop as
+  well). Additionally, there's no good way to report a short transmit via
+  VirtioNetGetStatus; EFI_DEVICE_ERROR seems too serious from the specification
+  and higher level protocols could interpret it as a fatal condition.
+
+- The host can theoretically reorder head descriptor indices when moving them
+  from the Available Ring to the Used Ring (out of order transmission). Because
+  of this (and the choice of a stack over a list for free descriptor chain
+  tracking) the order of head descriptor indices on either Ring is
+  unpredictable.

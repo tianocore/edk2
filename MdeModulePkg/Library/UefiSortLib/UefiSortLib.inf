@@ -1,0 +1,42 @@
+##  @file
+#   Library used for sorting routines.
+#
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = UefiSortLib
+  MODULE_UNI_FILE                = UefiSortLib.uni
+  FILE_GUID                      = 4264A823-45A3-42db-B92C-AA078555CBD3
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SortLib|UEFI_APPLICATION UEFI_DRIVER UEFI_DRIVER DXE_RUNTIME_DRIVER DXE_DRIVER
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources.common]
+  UefiSortLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  UefiBootServicesTableLib
+  DevicePathLib
+
+[Protocols]
+  gEfiUnicodeCollation2ProtocolGuid                       ## SOMETIMES_CONSUMES
+  gEfiDevicePathProtocolGuid                              ## CONSUMES
+

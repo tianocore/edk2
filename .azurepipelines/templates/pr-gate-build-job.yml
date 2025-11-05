@@ -1,0 +1,154 @@
+## @file
+# File templates/pr-gate-build-job.yml
+#
+# template file used to build supported packages.
+#
+# Copyright (c) Microsoft Corporation.
+# Copyright (c) 2020 - 2021, ARM Limited. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+parameters:
+  tool_chain_tag: ''
+  vm_image: ''
+  arch_list: ''
+  extra_install_step: []
+  usePythonVersion: ''
+  container: ''
+
+# Build step
+jobs:
+
+- job: Build_${{ parameters.tool_chain_tag }}
+  timeoutInMinutes: 120
+  #Use matrix to speed up the build process
+  strategy:
+    matrix:
+      ${{ if eq(parameters.tool_chain_tag, 'GCC5') }}:
+        TARGET_GCC_ONLY:
+          Build.Pkgs: 'EmbeddedPkg'
+          Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+          Build.Archlist: ${{ parameters.arch_list }}
+      TARGET_ARM_ARMPLATFORM:
+        Build.Pkgs: 'ArmPkg,ArmPlatformPkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        Build.Archlist: ${{ parameters.arch_list }}
+      TARGET_MDE_CPU:
+        Build.Pkgs: 'MdePkg,UefiCpuPkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        Build.Archlist: ${{ parameters.arch_list }}
+      TARGET_MDEMODULE_DEBUG:
+        Build.Pkgs: 'MdeModulePkg'
+        Build.Targets: 'DEBUG,NOOPT'
+        Build.Archlist: ${{ parameters.arch_list }}
+      TARGET_MDEMODULE_RELEASE:
+        Build.Pkgs: 'MdeModulePkg'
+        Build.Targets: 'RELEASE,NO-TARGET'
+        Build.Archlist: ${{ parameters.arch_list }}
+      TARGET_NETWORK:
+        Build.Pkgs: 'NetworkPkg,RedfishPkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        Build.Archlist: ${{ parameters.arch_list }}
+      TARGET_OTHER:
+        Build.Pkgs: 'PcAtChipsetPkg,PrmPkg,ShellPkg,SourceLevelDebugPkg,StandaloneMmPkg,SignedCapsulePkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        Build.Archlist: ${{ parameters.arch_list }}
+      TARGET_FMP_FAT_TEST:
+        Build.Pkgs: 'FmpDevicePkg,FatPkg,UnitTestFrameworkPkg,DynamicTablesPkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        Build.Archlist: ${{ parameters.arch_list }}
+      TARGET_CRYPTO_DEBUG:
+        Build.Pkgs: 'CryptoPkg'
+        Build.Targets: 'DEBUG,NOOPT'
+        Build.Archlist: ${{ parameters.arch_list }}
+      TARGET_CRYPTO_RELEASE:
+        Build.Pkgs: 'CryptoPkg'
+        Build.Targets: 'RELEASE,NO-TARGET'
+        Build.Archlist: ${{ parameters.arch_list }}
+      TARGET_FSP:
+        Build.Pkgs: 'IntelFsp2Pkg,IntelFsp2WrapperPkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        Build.Archlist: ${{ parameters.arch_list }}
+      TARGET_SECURITY:
+        Build.Pkgs: 'SecurityPkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        Build.Archlist: ${{ parameters.arch_list }}
+      TARGET_UEFIPAYLOAD_IA32_X64:
+        Build.Pkgs: 'UefiPayloadPkg'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        Build.Archlist: 'IA32,X64'
+      ${{ if eq(parameters.tool_chain_tag, 'GCC5') }}:
+        TARGET_UEFIPAYLOAD_AARCH64_GCC_ONLY:
+          Build.Pkgs: 'UefiPayloadPkg'
+          Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+          Build.Archlist: 'AARCH64'
+      TARGET_PLATFORMS:
+        # For Platforms only check code. Leave it to Platform CI
+        # to build them.
+        Build.Pkgs: 'ArmVirtPkg,EmulatorPkg,OvmfPkg'
+        Build.Targets: 'NO-TARGET,NOOPT'
+        Build.Archlist: ${{ parameters.arch_list }}
+
+  workspace:
+    clean: all
+
+  pool:
+    vmImage: ${{ parameters.vm_image }}
+
+  ${{ if not(eq(parameters.container, '')) }}:
+    container: ${{ parameters.container }}
+
+  steps:
+  - template: pr-gate-steps.yml
+    parameters:
+      tool_chain_tag: ${{ parameters.tool_chain_tag }}
+      build_pkgs: $(Build.Pkgs)
+      build_targets: $(Build.Targets)
+      build_archs: $(Build.Archlist)
+      usePythonVersion: ${{ parameters.usePythonVersion }}
+      extra_install_step: ${{ parameters.extra_install_step }}
+
+- job: Build_${{ parameters.tool_chain_tag }}_TARGET_CODE_COVERAGE
+  # Disable this job from running in PR gatees. It causes the entire pipeline run to wait while the job is requeued
+  # causing runs take several hours.
+  condition: false
+  dependsOn: Build_${{ parameters.tool_chain_tag }}
+  workspace:
+    clean: all
+
+  pool:
+    vmImage: 'windows-2022'
+
+  steps:
+    - checkout: self
+      clean: true
+      fetchDepth: 1
+      submodules: true
+
+    - task: DownloadPipelineArtifact@2
+      displayName: 'Download Build Artifacts'
+      inputs:
+        buildType: 'current'
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+
+    - powershell: Write-Host "##vso[task.setvariable variable=is_code_coverage]0"
+      displayName: Give default value for whether CodeCoverage or not
+
+    - powershell: if (Test-Path -Path $(Build.ArtifactStagingDirectory)/**/coverage.xml) {Write-Host "##vso[task.setvariable variable=is_code_coverage]1"}
+      displayName: Check coverage.xml exist or not
+
+    - task: CmdLine@2
+      displayName: Create code coverage report
+      inputs:
+        script: |
+          dotnet tool install -g dotnet-reportgenerator-globaltool
+          reportgenerator -reports:$(Build.ArtifactStagingDirectory)/**/coverage.xml -targetdir:$(Build.ArtifactStagingDirectory)/Coverage -reporttypes:Cobertura -filefilters:-*Build*;-*UnitTest*;-*Mock*;-*usr*
+      condition: eq(variables.is_code_coverage, 1)
+
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Publish code coverage'
+      inputs:
+        codeCoverageTool: Cobertura
+        summaryFileLocation: '$(Build.ArtifactStagingDirectory)/Coverage/Cobertura.xml'
+      condition: eq(variables.is_code_coverage, 1)
+

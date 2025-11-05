@@ -1,0 +1,19 @@
+// /** @file
+// PcRtc driver to install EFI_REAL_TIME_CLOCK_ARCH_PROTOCOL
+//
+// PcRtc driver to install EFI_REAL_TIME_CLOCK_ARCH_PROTOCOL.
+//
+// This driver provides GetTime, SetTime, GetWakeupTime, SetWakeupTime services to Runtime Service Table.
+// It will install a tagging protocol with gEfiRealTimeClockArchProtocolGuid.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "PcRtc driver to install EFI_REAL_TIME_CLOCK_ARCH_PROTOCOL"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver provides GetTime, SetTime, GetWakeupTime, SetWakeupTime services to Runtime Service Table. It will install a tagging protocol with gEfiRealTimeClockArchProtocolGuid."
+

@@ -1,0 +1,17 @@
+// /** @file
+// Provides TPM measurement functions for TPM1.2 and TPM 2.0
+//
+// This library provides TpmMeasureAndLogData() to to measure and log data, and
+// extend the measurement result into a specific PCR.
+//
+// Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Provides TPM measurement functions for TPM1.2 and TPM 2.0"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library provides TpmMeasureAndLogData() to to measure and log data, and extend the measurement result into a specific PCR."
+

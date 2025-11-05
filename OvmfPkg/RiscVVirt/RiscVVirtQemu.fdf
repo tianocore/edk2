@@ -1,0 +1,374 @@
+# @file
+#  Flash definition file on RiscVVirt RISC-V platform
+#
+#  Copyright (c) 2021, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#  Copyright (c) 2022, Ventana Micro Systems Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+# Platform definitions
+#
+
+!include RiscVVirt.fdf.inc
+
+################################################################################
+[FD.RISCV_VIRT_CODE]
+BaseAddress   = $(CODE_BASE_ADDRESS)|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
+Size          = $(CODE_SIZE)|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize
+ErasePolarity = 1
+BlockSize     = $(BLOCK_SIZE)
+NumBlocks     = $(CODE_BLOCKS)
+
+0x00000000|$(CODE_SIZE)
+gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
+FV = FVMAIN_COMPACT
+
+################################################################################
+[FD.RISCV_VIRT_VARS]
+BaseAddress   = $(VARS_BASE_ADDRESS)
+Size          = $(VARS_SIZE)
+ErasePolarity = 1
+BlockSize     = $(VARS_BLOCK_SIZE)
+NumBlocks     = $(VARS_BLOCKS)
+
+!include VarStore.fdf.inc
+################################################################################
+
+[FV.DXEFV]
+BlockSize          = 0x10000
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+APRIORI DXE {
+  INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+  INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+  INF  MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
+  INF  MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
+  INF  EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
+  INF  UefiCpuPkg/CpuDxeRiscV64/CpuDxeRiscV64.inf
+  INF  OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf
+}
+
+#
+# DXE Phase modules
+#
+INF  MdeModulePkg/Core/Dxe/DxeMain.inf
+INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+INF  OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
+INF  EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
+INF  OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
+
+#
+# PI DXE Drivers producing Architectural Protocols (EFI Services)
+#
+INF  UefiCpuPkg/CpuDxeRiscV64/CpuDxeRiscV64.inf
+INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
+INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
+!if $(QEMU_PV_VARS) == TRUE
+  INF OvmfPkg/VirtMmCommunicationDxe/VirtMmCommunication.inf
+  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
+!else
+  INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+!endif
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  INF  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+  INF  OvmfPkg/RiscVVirt/Feature/SecureBoot/SecureBootDefaultKeysInit/SecureBootDefaultKeysInit.inf
+
+  FILE FREEFORM = 85254ea7-4759-4fc4-82d4-5eed5fb0a4a0 {
+    SECTION RAW = OvmfPkg/RiscVVirt/Feature/SecureBoot/SecureBootKeys/PK/PK.cer
+  }
+
+  FILE FREEFORM = 6f64916e-9f7a-4c35-b952-cd041efb05a3 {
+    SECTION RAW = OvmfPkg/RiscVVirt/Feature/SecureBoot/SecureBootKeys/KEK/MicCorKEKCA2011_2011-06-24.crt
+  }
+
+  FILE FREEFORM = c491d352-7623-4843-accc-2791a7574421 {
+    SECTION RAW = OvmfPkg/RiscVVirt/Feature/SecureBoot/SecureBootKeys/db/MicWinProPCA2011_2011-10-19.crt
+    SECTION RAW = OvmfPkg/RiscVVirt/Feature/SecureBoot/SecureBootKeys/db/MicCorUEFCA2011_2011-06-27.crt
+  }
+
+  FILE FREEFORM = 5740766a-718e-4dc0-9935-c36f7d3f884f {
+    SECTION RAW = OvmfPkg/RiscVVirt/Feature/SecureBoot/SecureBootKeys/dbx/dbxupdate_x64.bin
+  }
+!endif
+INF  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
+INF  MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
+INF  EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
+INF  EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
+INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+
+#
+# Multiple Console IO support
+#
+INF  MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
+INF  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+INF  MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
+INF  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
+INF  MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
+
+# RISC-V Core Drivers
+INF  UefiCpuPkg/CpuTimerDxeRiscV64/CpuTimerDxeRiscV64.inf
+INF  OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf
+INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+
+#
+# FAT filesystem + GPT/MBR partitioning + UDF filesystem + virtio-fs
+#
+INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+INF  FatPkg/EnhancedFatDxe/Fat.inf
+INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+INF  MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
+INF  OvmfPkg/VirtioFsDxe/VirtioFsDxe.inf
+
+#
+# Status Code Routing
+#
+INF  MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
+INF  MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
+
+#
+# Platform Driver
+#
+INF  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
+INF  OvmfPkg/VirtioNetDxe/VirtioNet.inf
+INF  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
+INF  OvmfPkg/VirtioRngDxe/VirtioRng.inf
+
+!include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
+
+#
+# Bds
+#
+INF  MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
+INF  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+INF  MdeModulePkg/Universal/DriverHealthManagerDxe/DriverHealthManagerDxe.inf
+INF  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+INF  MdeModulePkg/Application/UiApp/UiApp.inf
+INF  OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf
+
+#
+# Networking stack
+#
+!include NetworkPkg/Network.fdf.inc
+
+#
+# SCSI Bus and Disk Driver
+#
+INF  MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
+INF  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
+
+#
+# SATA
+#
+INF  MdeModulePkg/Bus/Pci/SataControllerDxe/SataControllerDxe.inf
+INF  MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
+INF  MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
+
+#
+# NVME Driver
+#
+INF  MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
+
+#
+# SMBIOS Support
+#
+INF  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+INF  OvmfPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
+
+#
+# ACPI Support
+#
+INF  OvmfPkg/PlatformHasAcpiDtDxe/PlatformHasAcpiDtDxe.inf
+INF  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
+INF  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
+INF  OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
+
+#
+# PCI support
+#
+INF  UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf
+INF  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
+INF  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+INF  OvmfPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
+INF  OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
+INF  OvmfPkg/Virtio10Dxe/Virtio10.inf
+
+#
+# Video support
+#
+INF  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
+INF  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
+INF  OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
+INF  OvmfPkg/PlatformDxe/Platform.inf
+
+#
+# Usb Support
+#
+INF  MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
+INF  MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
+INF  MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
+INF  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+
+#
+# TPM2 support
+#
+!if $(TPM2_ENABLE) == TRUE
+  INF SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
+!if $(TPM2_CONFIG_ENABLE) == TRUE
+  INF SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
+!endif
+!endif
+
+#
+# TianoCore logo (splash screen)
+#
+INF  MdeModulePkg/Logo/LogoDxe.inf
+
+#
+# Ramdisk support
+#
+INF  MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
+
+!if $(CAPSULE_ENABLE) == TRUE
+INF  MdeModulePkg/Universal/EsrtFmpDxe/EsrtFmpDxe.inf
+INF  FILE_GUID = $(FMP_SYSTEM_DEVICE) FmpDevicePkg/FmpDxe/FmpDxe.inf
+!endif
+
+################################################################################
+
+[FV.FVMAIN_COMPACT]
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+FvNameGuid         = 27A72E80-3118-4c0c-8673-AA5B4EFA9613
+
+INF  UefiCpuPkg/SecCore/SecCoreNative.inf
+
+!if $(RISCVVIRT_PEI_BOOTING) == TRUE
+  INF  OvmfPkg/RiscVVirt/PlatformPei/PlatformPeim.inf
+  INF  MdeModulePkg/Core/Pei/PeiMain.inf
+  INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
+  INF  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
+  INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+!endif
+
+FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
+   SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
+     SECTION FV_IMAGE = DXEFV
+   }
+ }
+
+[Rule.Common.SEC]
+  FILE SEC = $(NAMED_GUID) RELOCS_STRIPPED FIXED {
+    PE32     PE32    Align = Auto     $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI       STRING ="$(MODULE_NAME)" Optional
+    VERSION  STRING ="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.PEI_CORE]
+  FILE PEI_CORE = $(NAMED_GUID) FIXED {
+    PE32     PE32    Align = Auto     $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI     STRING ="$(MODULE_NAME)" Optional
+    VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.PEIM]
+  FILE PEIM = $(NAMED_GUID) FIXED {
+     PEI_DEPEX PEI_DEPEX Optional     $(INF_OUTPUT)/$(MODULE_NAME).depex
+     PE32     PE32    Align = Auto    $(INF_OUTPUT)/$(MODULE_NAME).efi
+     UI       STRING="$(MODULE_NAME)" Optional
+     VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.DXE_CORE]
+  FILE DXE_CORE = $(NAMED_GUID) {
+    PE32     PE32    $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI       STRING="$(MODULE_NAME)" Optional
+    VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.DXE_DRIVER]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX    DXE_DEPEX Optional      $(INF_OUTPUT)/$(MODULE_NAME).depex
+    PE32     PE32    $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI       STRING="$(MODULE_NAME)" Optional
+    VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.DXE_RUNTIME_DRIVER]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX    DXE_DEPEX Optional      $(INF_OUTPUT)/$(MODULE_NAME).depex
+    PE32     PE32    $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI       STRING="$(MODULE_NAME)" Optional
+    VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.UEFI_DRIVER]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX    DXE_DEPEX Optional      $(INF_OUTPUT)/$(MODULE_NAME).depex
+    PE32     PE32   $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI       STRING="$(MODULE_NAME)" Optional
+    VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.UEFI_DRIVER.BINARY]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX DXE_DEPEX Optional      |.depex
+    PE32      PE32                    |.efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.UEFI_APPLICATION]
+  FILE APPLICATION = $(NAMED_GUID) {
+    PE32     PE32    $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI       STRING="$(MODULE_NAME)" Optional
+    VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.UEFI_APPLICATION.BINARY]
+  FILE APPLICATION = $(NAMED_GUID) {
+    PE32      PE32                    |.efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.USER_DEFINED.ACPITABLE]
+  FILE FREEFORM = $(NAMED_GUID) {
+    RAW ACPI               |.acpi
+    RAW ASL                |.aml
+    UI        STRING="$(MODULE_NAME)" Optional
+  }

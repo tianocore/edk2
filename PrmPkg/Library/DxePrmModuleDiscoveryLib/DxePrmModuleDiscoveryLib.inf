@@ -1,0 +1,41 @@
+## @file
+#  PRM Module Discovery Library
+#
+#  Provides functionality to discover PRM modules loaded in the system boot.
+#
+#  Copyright (c) Microsoft Corporation
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION         = 0x00010005
+  BASE_NAME           = DxePrmModuleDiscoveryLib
+  FILE_GUID           = 95D3893F-4CBA-4C20-92C1-D24BFE3CE7B9
+  MODULE_TYPE         = DXE_DRIVER
+  VERSION_STRING      = 1.0
+  LIBRARY_CLASS       = PrmModuleDiscoveryLib|DXE_DRIVER UEFI_DRIVER UEFI_APPLICATION
+  CONSTRUCTOR         = PrmModuleDiscoveryLibConstructor
+  DESTRUCTOR          = PrmModuleDiscoveryLibDestructor
+
+[Sources]
+  PrmModuleDiscovery.h
+  DxePrmModuleDiscoveryLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  PrmPkg/PrmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PrmPeCoffLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiLoadedImageProtocolGuid
+  gEfiMmAccessProtocolGuid

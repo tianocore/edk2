@@ -1,0 +1,53 @@
+## @file
+# Mergify YML file that automatically merges a GitHub pull request against
+# edk2-ci if all of the GitHub branch protections have passed.  It also
+# contains rules to:
+# * auto close branches that are not from an EDK II Maintainer
+# * post a comment on pull requests that have merge conflicts.
+# * post a comment on pull requests that have PatchCheck.py errors.
+#
+# Configuration Notes:
+# * Update the 'base=edk2-ci' statements with the name of the branch to merge
+#   pull requests.
+#
+# * Update the 'status-failure' statement with the name of the name of the Azure
+#   Pipelines Build that performs the EDK II Maintainer check.
+#
+# * This file must be checked into the 'default' branch of a repo.  Copies
+#   of this file on other branches of a repo are ignored by Mergify.
+#
+# Copyright (c) 2019 - 2021, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+# https://github.com/apps/mergify
+# https://doc.mergify.io/
+#
+##
+
+merge_queue:
+  max_parallel_checks: 1
+
+queue_rules:
+  - name: default
+    queue_conditions:
+      - base~=(^main|^master|^stable/)
+      - label=push
+    merge_method: rebase
+    update_bot_account: tianocore-issues
+
+pull_request_rules:
+  - name: Automatically merge a PR when all required checks pass and 'push' label is present
+    conditions:
+      - base~=(^main|^master|^stable/)
+      - label=push
+    actions:
+      queue:
+        name: default
+
+  - name: Post a comment on a PR that can not be merged due to a merge conflict
+    conditions:
+      - base~=(^main|^master|^stable/)
+      - conflict
+    actions:
+      comment:
+        message: PR can not be merged due to conflict.  Please rebase and resubmit

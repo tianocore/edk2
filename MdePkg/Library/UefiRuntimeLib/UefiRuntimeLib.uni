@@ -1,0 +1,18 @@
+// /** @file
+// Instance of UEFI Runtime Library.
+//
+// Instance of UEFI Runtime Library, with hooked EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE and
+// EVT_SIGNAL_EXIT_BOOT_SERVICES event, to provide runtime services.
+// This instance also supports SAL drivers for better performance.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Instance of UEFI Runtime Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Instance of UEFI Runtime Library, with hooked EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE and EVT_SIGNAL_EXIT_BOOT_SERVICES event, to provide runtime services. This instance also supports SAL drivers for better performance."
+

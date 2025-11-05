@@ -1,0 +1,48 @@
+## @file
+#  Library instance for SPI flash library using SPI hardware sequence
+#
+#  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SpiFlashLib
+  FILE_GUID                      = 6F96AFCB-DE89-4ca1-A63F-8703EE8FDE50
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SpiFlashLib
+  CONSTRUCTOR                    = SpiConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  RegsSpi.h
+  SpiCommon.h
+  PchSpi.c
+  SpiFlashLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  IoLib
+  PciLib
+  HobLib
+  TimerLib
+  BaseLib
+
+[Guids]
+  gSpiFlashInfoGuid
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress

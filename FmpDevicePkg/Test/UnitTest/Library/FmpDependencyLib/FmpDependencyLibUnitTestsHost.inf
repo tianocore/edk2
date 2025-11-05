@@ -1,0 +1,34 @@
+## @file
+# Unit tests of EvaluateDependency API in FmpDependencyLib that are run from host
+# environment.
+#
+# Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = FmpDependencyLibUnitTestsHost
+  FILE_GUID                      = CE32C647-CAD7-4099-9463-653B932C1691
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  EvaluateDependencyUnitTest.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  FmpDevicePkg/FmpDevicePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  UnitTestLib
+  FmpDependencyLib

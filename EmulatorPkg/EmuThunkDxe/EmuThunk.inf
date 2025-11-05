@@ -1,0 +1,54 @@
+## @file
+#   A DXE driver to produce EMU_THUNK_PROTOCOL
+#
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2011, Apple Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EmuThunk
+  FILE_GUID                      = 2F62A818-4A72-CD40-90B9-FF00DAABEE7B
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeEmuThunk
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  EmuThunk.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  EmuThunkLib
+  UefiDriverEntryPoint
+  UefiLib
+  DebugLib
+  DevicePathLib
+
+
+
+[Protocols]
+  gEfiDevicePathProtocolGuid                # PROTOCOL ALWAYS_PRODUCED
+  gEmuThunkProtocolGuid                     # PROTOCOL ALWAYS_PRODUCED
+
+
+[Depex]
+  TRUE
+

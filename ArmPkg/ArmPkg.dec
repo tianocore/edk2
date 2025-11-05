@@ -1,0 +1,338 @@
+#/** @file
+# ARM processor package.
+#
+# Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
+# Copyright (c) 2011 - 2023, ARM Limited. All rights reserved.
+# Copyright (c) 2021, Ampere Computing LLC. All rights reserved.
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = ArmPkg
+  PACKAGE_GUID                   = 5CFBD99E-3C43-4E7F-8054-9CDEAFF7710F
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes.common]
+  Include                        # Root include for the package
+
+[LibraryClasses.common]
+  ##  @libraryclass  Provides an interface to Arm generic counters.
+  #
+  ArmGenericTimerCounterLib|Include/Library/ArmGenericTimerCounterLib.h
+
+  ##  @libraryclass  Provides a Generic Interrupt Controller (GIC)
+  #   configuration interface.
+  #
+  ArmGicLib|Include/Library/ArmGicLib.h
+
+  ##  @libraryclass  Provides a HyperVisor Call (HVC) interface.
+  #
+  ArmHvcLib|Include/Library/ArmHvcLib.h
+
+  ##  @libraryclass  Provides a Mailbox Transport Layer (MTL) interface
+  #   for the System Control and Management Interface (SCMI).
+  #
+  ArmMtlLib|Include/Library/ArmMtlLib.h
+
+  ##  @libraryclass  Provides a Monitor Call interface that will use the
+  #   default conduit (HVC or SMC).
+  #
+  ArmMonitorLib|Include/Library/ArmMonitorLib.h
+
+  ##  @libraryclass  Provides a default exception handler.
+  #
+  DefaultExceptionHandlerLib|Include/Library/DefaultExceptionHandlerLib.h
+
+  ##  @libraryclass  Provides an interface to query miscellaneous OEM
+  #   information.
+  #
+  OemMiscLib|Include/Library/OemMiscLib.h
+
+  ##  @libraryclass  Provides an OpTee interface.
+  #
+  OpteeLib|Include/Library/OpteeLib.h
+
+  ##  @libraryclass  Provides a semihosting interface.
+  #
+  SemihostLib|Include/Library/SemihostLib.h
+
+  ##  @libraryclass  Provides an interface for a StandaloneMm Mmu.
+  #
+  StandaloneMmMmuLib|Include/Library/StandaloneMmMmuLib.h
+
+  ##  @libraryclass  Provides an interface for a Arm Transfer List.
+  #
+  ArmTransferListLib|Include/Library/ArmTransferListLib.h
+
+  ##  @libraryclass  Defines a set of interfaces for the MM core entrypoint for
+  ##                 AArch64.
+  StandaloneMmCoreEntryPoint|Include/Library/ArmStandaloneMmCoreEntryPoint.h
+
+[Guids.common]
+  gArmTokenSpaceGuid       = { 0xBB11ECFE, 0x820F, 0x4968, { 0xBB, 0xA6, 0xF7, 0x6A, 0xFE, 0x30, 0x25, 0x96 } }
+
+  ## ARM MPCore table
+  # Include/Guid/ArmMpCoreInfo.h
+  gArmMpCoreInfoGuid = { 0xa4ee0728, 0xe5d7, 0x4ac5,  {0xb2, 0x1e, 0x65, 0x8e, 0xd8, 0x57, 0xe8, 0x34} }
+
+  gArmTransferListHobGuid = { 0xebe7bae8, 0xfe18, 0x43c5, { 0xbf, 0x3f, 0xf2, 0xb1, 0xaf, 0xb2, 0xdf, 0xb8 } }
+
+[Protocols.common]
+  ## Arm System Control and Management Interface(SCMI) Base protocol
+  ## ArmPkg/Include/Protocol/ArmScmiBaseProtocol.h
+  gArmScmiBaseProtocolGuid = { 0xd7e5abe9, 0x33ab, 0x418e, { 0x9f, 0x91, 0x72, 0xda, 0xe2, 0xba, 0x8e, 0x2f } }
+
+  ## Arm System Control and Management Interface(SCMI) Clock management protocol
+  ## ArmPkg/Include/Protocol/ArmScmiClockProtocol.h
+  gArmScmiClockProtocolGuid = { 0x91ce67a8, 0xe0aa, 0x4012, { 0xb9, 0x9f, 0xb6, 0xfc, 0xf3, 0x4, 0x8e, 0xaa } }
+  gArmScmiClock2ProtocolGuid = { 0xb8d8caf2, 0x9e94, 0x462c, { 0xa8, 0x34, 0x6c, 0x99, 0xfc, 0x05, 0xef, 0xcf } }
+
+  ## Arm System Control and Management Interface(SCMI) Clock management protocol
+  ## ArmPkg/Include/Protocol/ArmScmiPerformanceProtocol.h
+  gArmScmiPerformanceProtocolGuid = { 0x9b8ba84, 0x3dd3, 0x49a6, { 0xa0, 0x5a, 0x31, 0x34, 0xa5, 0xf0, 0x7b, 0xad } }
+
+  gEdkiiPiMmCpuDriverEpProtocolGuid          = { 0x6ecbd5a1, 0xc0f8, 0x4702, { 0x83, 0x01, 0x4f, 0xc2, 0xc5, 0x47, 0x0a, 0x51 }}
+
+[Ppis]
+  ## Include/Ppi/ArmMpCoreInfo.h
+  gArmMpCoreInfoPpiGuid = { 0x6847cc74, 0xe9ec, 0x4f8f, {0xa2, 0x9d, 0xab, 0x44, 0xe7, 0x54, 0xa8, 0xfc} }
+  gArmTransferListPpiGuid = { 0x6d2e9da1, 0x9414, 0x41c3, {0x86, 0xbe, 0xf9, 0x16, 0x9f, 0xb4, 0x76, 0x38} }
+
+[PcdsFeatureFlag.common]
+  gArmTokenSpaceGuid.PcdCpuDxeProduceDebugSupport|FALSE|BOOLEAN|0x00000001
+
+  # Whether to remap all unused memory NX before installing the CPU arch
+  # protocol driver. This is needed on platforms that map all DRAM with RWX
+  # attributes initially, and can be disabled otherwise.
+  gArmTokenSpaceGuid.PcdRemapUnusedMemoryNx|TRUE|BOOLEAN|0x00000048
+
+[PcdsFixedAtBuild.common]
+  gArmTokenSpaceGuid.PcdTrustzoneSupport|FALSE|BOOLEAN|0x00000006
+
+  gArmTokenSpaceGuid.PcdCpuResetAddress|0x00000000|UINT32|0x00000005
+
+  #
+  # ARM Secure Firmware PCDs
+  #
+  gArmTokenSpaceGuid.PcdSecureFdBaseAddress|0|UINT64|0x00000015
+  gArmTokenSpaceGuid.PcdSecureFdSize|0|UINT32|0x00000016
+  gArmTokenSpaceGuid.PcdSecureFvBaseAddress|0x0|UINT64|0x0000002F
+  gArmTokenSpaceGuid.PcdSecureFvSize|0x0|UINT32|0x00000030
+
+  #
+  # ARM Hypervisor Firmware PCDs
+  #
+  gArmTokenSpaceGuid.PcdHypFdBaseAddress|0|UINT32|0x0000003A
+  gArmTokenSpaceGuid.PcdHypFdSize|0|UINT32|0x0000003B
+  gArmTokenSpaceGuid.PcdHypFvBaseAddress|0|UINT32|0x0000003C
+  gArmTokenSpaceGuid.PcdHypFvSize|0|UINT32|0x0000003D
+
+  #
+  # ARM StanaloneMm Stack size.
+  #
+  gArmTokenSpaceGuid.PcdStMmStackSize|0x2000|UINT32|0x0000005D
+
+  # Use ClusterId + CoreId to identify the PrimaryCore
+  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask|0xF03|UINT32|0x00000031
+  # The Primary Core is ClusterId[0] & CoreId[0]
+  gArmTokenSpaceGuid.PcdArmPrimaryCore|0|UINT32|0x00000037
+
+  #
+  # SMBIOS PCDs
+  #
+  gArmTokenSpaceGuid.PcdSystemProductName|L""|VOID*|0x30000053
+  gArmTokenSpaceGuid.PcdSystemVersion|L""|VOID*|0x30000054
+  gArmTokenSpaceGuid.PcdBaseBoardManufacturer|L""|VOID*|0x30000055
+  gArmTokenSpaceGuid.PcdBaseBoardProductName|L""|VOID*|0x30000056
+  gArmTokenSpaceGuid.PcdBaseBoardVersion|L""|VOID*|0x30000057
+  gArmTokenSpaceGuid.PcdProcessorManufacturer|L""|VOID*|0x30000071
+  gArmTokenSpaceGuid.PcdProcessorVersion|L""|VOID*|0x30000072
+  gArmTokenSpaceGuid.PcdProcessorSerialNumber|L""|VOID*|0x30000073
+  gArmTokenSpaceGuid.PcdProcessorAssetTag|L""|VOID*|0x30000074
+  gArmTokenSpaceGuid.PcdProcessorPartNumber|L""|VOID*|0x30000075
+
+  #
+  # ARM L2x0 PCDs
+  #
+  gArmTokenSpaceGuid.PcdL2x0ControllerBase|0|UINT32|0x0000001B
+
+  #
+  # ARM Normal (or Non Secure) Firmware PCDs
+  #
+  gArmTokenSpaceGuid.PcdFdSize|0|UINT32|0x0000002C
+  gArmTokenSpaceGuid.PcdFvSize|0|UINT32|0x0000002E
+
+  #
+  # Value to add to a host address to obtain a device address, using
+  # unsigned 64-bit integer arithmetic on AArch64. This means we can
+  # rely on truncation on overflow to specify negative offsets.
+  #
+  gArmTokenSpaceGuid.PcdArmDmaDeviceOffset|0x0|UINT64|0x0000044
+
+  #
+  # Boot the Uefi Shell instead of UiApp when no valid boot option is found.
+  # This is useful in CI environment so that startup.nsh can be launched.
+  # The default value is FALSE.
+  #
+  gArmTokenSpaceGuid.PcdUefiShellDefaultBootEnable|FALSE|BOOLEAN|0x0000052
+
+  ## Define the conduit to use for monitor calls.
+  # Default PcdMonitorConduitHvc = FALSE, conduit = SMC
+  # If PcdMonitorConduitHvc = TRUE, conduit = HVC
+  gArmTokenSpaceGuid.PcdMonitorConduitHvc|FALSE|BOOLEAN|0x00000047
+
+  #
+  # AArch64 Security Extension
+  #
+
+  # Secure Configuration Register
+  # - BIT0 : NS - Non Secure bit
+  # - BIT1 : IRQ Handler
+  # - BIT2 : FIQ Handler
+  # - BIT3 : EA - External Abort
+  # - BIT4 : FW - F bit writable
+  # - BIT5 : AW - A bit writable
+  # - BIT6 : nET - Not Early Termination
+  # - BIT7 : SCD - Secure Monitor Call Disable
+  # - BIT8 : HCE - Hyp Call enable
+  # - BIT9 : SIF - Secure Instruction Fetch
+  # - BIT10: RW -  Register width control for lower exception levels
+  # - BIT11: SIF - Enables Secure EL1 access to EL1 Architectural Timer
+  # - BIT12: TWI - Trap WFI
+  # - BIT13: TWE - Trap WFE
+  # 0x501 = NS | HCE | RW
+  gArmTokenSpaceGuid.PcdArmScr|0x501|UINT32|0x00000038
+
+  # By default we do transition to EL2 non-secure mode with Stack for EL2.
+  #        Mode Description              Bits
+  # NS EL2 SP2 all interrupts disabled =  0x3c9
+  # NS EL1 SP1 all interrupts disabled =  0x3c5
+  # Other modes include using SP0 or switching to Aarch32, but these are
+  # not currently supported.
+  gArmTokenSpaceGuid.PcdArmNonSecModeTransition|0x3c9|UINT32|0x0000003E
+
+[PcdsFixedAtBuild.common, PcdsPatchableInModule.common]
+  gArmTokenSpaceGuid.PcdFdBaseAddress|0|UINT64|0x0000002B
+  gArmTokenSpaceGuid.PcdFvBaseAddress|0|UINT64|0x0000002D
+
+#
+# These PCDs are also defined as 'PcdsDynamic' or 'PcdsPatchableInModule' to be
+# redefined when using UEFI in a context of virtual machine.
+#
+[PcdsFixedAtBuild.common, PcdsDynamic.common, PcdsPatchableInModule.common]
+
+  # System Memory (DRAM): These PCDs define the region of in-built system memory
+  # Some platforms can get DRAM extensions, these additional regions may be
+  # declared to UEFI using separate resource descriptor HOBs
+  gArmTokenSpaceGuid.PcdSystemMemoryBase|0|UINT64|0x00000029
+  gArmTokenSpaceGuid.PcdSystemMemorySize|0|UINT64|0x0000002A
+
+  gArmTokenSpaceGuid.PcdMmBufferBase|0|UINT64|0x00000045
+  gArmTokenSpaceGuid.PcdMmBufferSize|0|UINT64|0x00000046
+
+  gArmTokenSpaceGuid.PcdSystemBiosRelease|0xFFFF|UINT16|0x30000058
+  gArmTokenSpaceGuid.PcdEmbeddedControllerFirmwareRelease|0xFFFF|UINT16|0x30000059
+
+[PcdsFixedAtBuild.common, PcdsDynamic.common]
+  # ARM Architectural Timer Interrupt(GIC PPI) numbers
+  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29|UINT32|0x00000035
+  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30|UINT32|0x00000036
+  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|26|UINT32|0x00000040
+  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|27|UINT32|0x00000041
+  gArmTokenSpaceGuid.PcdArmArchTimerHypVirtIntrNum|28|UINT32|0x0000004A
+
+  #
+  # ARM Generic Watchdog
+  #
+
+  gArmTokenSpaceGuid.PcdGenericWatchdogControlBase|0x2A440000|UINT64|0x00000007
+  gArmTokenSpaceGuid.PcdGenericWatchdogRefreshBase|0x2A450000|UINT64|0x00000008
+  gArmTokenSpaceGuid.PcdGenericWatchdogEl2IntrNum|93|UINT32|0x00000009
+
+  #
+  # ARM Generic Interrupt Controller
+  #
+  gArmTokenSpaceGuid.PcdGicDistributorBase|0|UINT64|0x0000000C
+  # Base address for the GIC Redistributor region that contains the boot CPU
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0|UINT64|0x0000000E
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0|UINT64|0x0000000D
+  gArmTokenSpaceGuid.PcdGicSgiIntId|0|UINT32|0x00000025
+  gArmTokenSpaceGuid.PcdGicIrsConfigFrameBase|0|UINT64|0x00000064
+
+  #
+  # Bases, sizes and translation offsets of IO and MMIO spaces, respectively.
+  # Note that "IO" is just another MMIO range that simulates IO space; there
+  # are no special instructions to access it.
+  #
+  # The base addresses PcdPciIoBase, PcdPciMmio32Base and PcdPciMmio64Base are
+  # specific to their containing address spaces. In order to get the physical
+  # address for the CPU, for a given access, the respective translation value
+  # has to be added.
+  #
+  # The translations always have to be initialized like this, using UINT64:
+  #
+  #   UINT64 IoCpuBase;     // mapping target in 64-bit cpu-physical space
+  #   UINT64 Mmio32CpuBase; // mapping target in 64-bit cpu-physical space
+  #   UINT64 Mmio64CpuBase; // mapping target in 64-bit cpu-physical space
+  #
+  #   gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation = IoCpuBase - PcdPciIoBase;
+  #   gEfiMdePkgTokenSpaceGuid.PcdPciMmio32Translation = Mmio32CpuBase - (UINT64)PcdPciMmio32Base;
+  #   gEfiMdePkgTokenSpaceGuid.PcdPciMmio64Translation = Mmio64CpuBase - PcdPciMmio64Base;
+  #
+  # because (a) the target address space (ie. the cpu-physical space) is
+  # 64-bit, and (b) the translation values are meant as offsets for *modular*
+  # arithmetic.
+  #
+  # Accordingly, the translation itself needs to be implemented as:
+  #
+  #   UINT64 UntranslatedIoAddress;     // input parameter
+  #   UINT32 UntranslatedMmio32Address; // input parameter
+  #   UINT64 UntranslatedMmio64Address; // input parameter
+  #
+  #   UINT64 TranslatedIoAddress;       // output parameter
+  #   UINT64 TranslatedMmio32Address;   // output parameter
+  #   UINT64 TranslatedMmio64Address;   // output parameter
+  #
+  #   TranslatedIoAddress     = UntranslatedIoAddress +
+  #                             gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation;
+  #   TranslatedMmio32Address = (UINT64)UntranslatedMmio32Address +
+  #                             gEfiMdePkgTokenSpaceGuid.PcdPciMmio32Translation;
+  #   TranslatedMmio64Address = UntranslatedMmio64Address +
+  #                             gEfiMdePkgTokenSpaceGuid.PcdPciMmio64Translation;
+  #
+  #  The modular arithmetic performed in UINT64 ensures that the translation
+  #  works correctly regardless of the relation between IoCpuBase and
+  #  PcdPciIoBase, Mmio32CpuBase and PcdPciMmio32Base, and Mmio64CpuBase and
+  #  PcdPciMmio64Base.
+  #
+  gArmTokenSpaceGuid.PcdPciIoBase|0x0|UINT64|0x00000050
+  gArmTokenSpaceGuid.PcdPciIoSize|0x0|UINT64|0x00000051
+  gArmTokenSpaceGuid.PcdPciMmio32Base|0x0|UINT32|0x00000053
+  gArmTokenSpaceGuid.PcdPciMmio32Size|0x0|UINT32|0x00000054
+  gArmTokenSpaceGuid.PcdPciMmio64Base|0x0|UINT64|0x00000056
+  gArmTokenSpaceGuid.PcdPciMmio64Size|0x0|UINT64|0x00000057
+
+  #
+  # Inclusive range of allowed PCI buses.
+  #
+  gArmTokenSpaceGuid.PcdPciBusMin|0x0|UINT32|0x00000059
+  gArmTokenSpaceGuid.PcdPciBusMax|0x0|UINT32|0x0000005A
+
+[PcdsDynamicEx]
+  #
+  # This dynamic PCD hold the GUID of a firmware FFS which contains
+  # the LinuxBoot payload.
+  #
+  gArmTokenSpaceGuid.PcdLinuxBootFileGuid|{0x0}|VOID*|0x0000005C

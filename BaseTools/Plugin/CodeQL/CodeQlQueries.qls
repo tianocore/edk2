@@ -1,0 +1,116 @@
+---
+- description: C++ queries
+
+- queries: '.'
+  from: codeql/cpp-queries@1.1.0
+
+##########################################################################################
+# Queries
+##########################################################################################
+
+## Errors
+- include:
+    id: cpp/badoverflowguard
+- include:
+    id: cpp/infiniteloop
+- include:
+    id: cpp/likely-bugs/memory-management/v2/conditionally-uninitialized-variable
+- include:
+    id: cpp/missing-null-test
+- include:
+    id: cpp/missing-return
+- include:
+    id: cpp/no-space-for-terminator
+- include:
+    id: cpp/pointer-overflow-check
+- include:
+    id: cpp/redundant-null-check-simple
+- include:
+    id: cpp/sizeof/const-int-argument
+- include:
+    id: cpp/sizeof/sizeof-or-operation-as-argument
+- include:
+    id: cpp/unguardednullreturndereferenc
+- include:
+    id: cpp/very-likely-overrunning-write
+
+## Warnings
+- include:
+    id: cpp/comparison-with-wider-type
+- include:
+    id: cpp/conditionallyuninitializedvariable
+- include:
+    id: cpp/comparison-precedence
+- include:
+    id: cpp/implicit-bitfield-downcast
+- include:
+    id: cpp/infinite-loop-with-unsatisfiable-exit-condition
+- include:
+    id: cpp/offset-use-before-range-check
+- include:
+    id: cpp/overflow-buffer
+- include:
+    id: cpp/overflow-calculated
+- include:
+    id: cpp/overflow-destination
+- include:
+    id: cpp/paddingbyteinformationdisclosure
+- include:
+    id: cpp/return-stack-allocated-memory
+- include:
+    id: cpp/static-buffer-overflow
+- include:
+    id: cpp/unsigned-comparison-zero
+- include:
+    id: cpp/uselesstest
+
+## Recommendations
+- include:
+    id: cpp/missing-header-guard
+- include:
+    id: cpp/unused-local-variable
+- include:
+    id: cpp/unused-static-variable
+
+# Note: Some queries above are not active by default with the below filter.
+#       Update the filter and run the queries again to get all results.
+- include:
+    tags:
+      - "security"
+      - "correctness"
+    severity:
+      - "error"
+      - "warning"
+      - "recommendation"
+
+# Specifically hide the results of these.
+#
+# The following rules have been evaluated and explicitly not included for the following reasons:
+#   - `cpp/allocation-too-small` - Appears to be hardcoded for C standard library functions `malloc`, `calloc`,
+#     `realloc`, so it consumes time without much value with custom allocation functions in the codebase.
+#   - `cpp/commented-out-code` - Triggers often. Needs further review.
+#   - `cpp/duplicate-include-guard` - The <Phase>EntryPoint.h files includes a common include guard value
+#     `__MODULE_ENTRY_POINT_H__`. This was the only occurrence found. So not very useful.
+#   - `cpp/invalid-pointer-deref` - Very limited results with what appear to be false positives.
+#   - `cpp/use-of-goto` - Goto is valid and allowed in the codebase.
+#   - `cpp/useless-expression` - Triggers too often on cases where a NULL lib implementation is provided for a function.
+#     Because the implementation simply returns, the check considers it useless.
+#   - `cpp/weak-crypto/*` - Crypto algorithms are tracked outside CodeQL.
+- exclude:
+    id: cpp/allocation-too-small
+- exclude:
+    id: cpp/commented-out-code
+- exclude:
+    id: cpp/duplicate-include-guard
+- exclude:
+    id: cpp/invalid-pointer-deref
+- exclude:
+    id: cpp/use-of-goto
+- exclude:
+    id: cpp/useless-expression
+- exclude:
+    id: cpp/weak-crypto/banned-hash-algorithms
+- exclude:
+    id: cpp/weak-crypto/capi/banned-modes
+- exclude:
+    id: cpp/weak-crypto/openssl/banned-hash-algorithms

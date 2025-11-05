@@ -1,0 +1,36 @@
+## @file
+#  Instance of IPMI Library in DXE phase for SMS.
+#
+#  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeIpmiLibIpmiProtocol
+  MODULE_UNI_FILE                = DxeIpmiLibIpmiProtocol.uni
+  FILE_GUID                      = 62408AD5-4EAC-432B-AB9B-C4B85BFAED02
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = IpmiLib|DXE_RUNTIME_DRIVER DXE_DRIVER DXE_CORE UEFI_DRIVER UEFI_APPLICATION
+
+#
+#  VALID_ARCHITECTURES          = IA32 X64
+#
+
+[Sources]
+  DxeIpmiLibIpmiProtocol.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  DebugLib
+
+[Protocols]
+  gIpmiProtocolGuid      ## SOMETIMES_CONSUMES

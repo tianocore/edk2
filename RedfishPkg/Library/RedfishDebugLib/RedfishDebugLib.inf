@@ -1,0 +1,43 @@
+## @file
+#  INF file for Redfish debug library.
+#
+#  Copyright (c) 2023-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = RedfishDebugLib
+  FILE_GUID                      = 7F64C79F-ABD0-4446-86B5-2C1AE36168AD
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RedfishDebugLib| DXE_DRIVER UEFI_DRIVER
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  RedfishDebugLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  RedfishPkg/RedfishPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  JsonLib
+  MemoryAllocationLib
+  RedfishHttpLib
+  UefiLib
+
+[FixedPcd]
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDebugCategory
+
+[Depex]
+  TRUE

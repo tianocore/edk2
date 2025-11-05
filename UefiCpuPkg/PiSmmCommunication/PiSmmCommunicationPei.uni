@@ -1,0 +1,15 @@
+// /** @file
+// PI SMM Communication PEIM which produces PEI SMM Communication PPI.
+//
+// This PEIM retrieves the SMM communication context and produces PEI SMM
+// Communication PPIin the S3 boot mode.
+//
+// Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "PI SMM Communication PEIM that produces PEI SMM Communication PPI"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This PEIM retrieves the SMM communication context and produces PEI SMM Communication PPI in the S3 boot mode."

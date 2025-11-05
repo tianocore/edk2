@@ -1,0 +1,62 @@
+## @file
+#  I2c Dxe driver includes both I2c Bus and Host functionality.
+#
+#  This driver produce I2C Host Protocol on I2C controller handle, enumerate I2C
+#  devices on I2C bus and produce I2C IO Protocol on I2C devices.
+#
+#  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = I2cDxe
+  MODULE_UNI_FILE                = I2cDxe.uni
+  FILE_GUID                      = ECA2AE9E-7594-4901-871C-449DA1A11660
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeI2c
+  UNLOAD_IMAGE                   = I2cUnload
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources.common]
+  I2cDxe.c
+  I2cDxe.h
+  I2cHost.c
+  I2cBus.c
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[Protocols]
+  gEfiI2cIoProtocolGuid                             ## BY_START
+  ## BY_START
+  ## TO_START
+  gEfiI2cHostProtocolGuid
+  ## BY_START
+  ## TO_START
+  gEfiDevicePathProtocolGuid
+  gEfiI2cMasterProtocolGuid                         ## TO_START
+  gEfiI2cEnumerateProtocolGuid                      ## TO_START
+  gEfiI2cBusConfigurationManagementProtocolGuid     ## TO_START
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  I2cDxeExtra.uni
+

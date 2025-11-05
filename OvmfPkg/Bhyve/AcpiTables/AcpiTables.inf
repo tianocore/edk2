@@ -1,0 +1,39 @@
+## @file
+#  Component description file for PlatformAcpiTables module.
+#
+#  ACPI table data and ASL sources required to boot the platform.
+#
+#  Copyright (c) 2020, Rebecca Cran <rebecca@bsdio.com>
+#  Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2014, Pluribus Networks, Inc.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = PlatformAcpiTables
+  FILE_GUID                      = B4BA6241-936C-4485-A483-9FA832C758CA
+  MODULE_TYPE                    = USER_DEFINED
+  VERSION_STRING                 = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64 EBC
+#
+
+[Sources]
+  Dsdt.asl
+  Facp.aslc
+  Facs.aslc
+  Hpet.aslc
+  Madt.aslc
+  Mcfg.aslc
+  Platform.h
+  Spcr.aslc
+
+[Packages]
+  MdePkg/MdePkg.dec
+

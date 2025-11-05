@@ -1,0 +1,65 @@
+##  @file
+#  Provides interface to shell internal functions for shell commands.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = UefiShellCommandLib
+  FILE_GUID                      = 5C12F31F-EBAC-466e-A400-FCA8C9EA3A05
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.1
+  LIBRARY_CLASS                  = ShellCommandLib|UEFI_APPLICATION UEFI_DRIVER DXE_RUNTIME_DRIVER
+  CONSTRUCTOR                    = ShellCommandLibConstructor
+  DESTRUCTOR                     = ShellCommandLibDestructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources.common]
+  UefiShellCommandLib.c
+  UefiShellCommandLib.h
+  ConsistMapping.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  PrintLib
+  UefiBootServicesTableLib
+  ShellLib
+  HiiLib
+  HandleParsingLib
+  OrderedCollectionLib
+
+[Protocols]
+  gEfiUnicodeCollation2ProtocolGuid                       ## CONSUMES
+  gEfiShellProtocolGuid                                   ## CONSUMES
+  gEfiShellParametersProtocolGuid                         ## CONSUMES
+  gEfiShellDynamicCommandProtocolGuid                     ## SOMETIMES_CONSUMES
+  gEfiUsbIoProtocolGuid                                   ## SOMETIMES_CONSUMES
+
+[Guids]
+  gEfiSasDevicePathGuid                                   ## SOMETIMES_CONSUMES ## GUID
+
+[Pcd.common]
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel         ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellMapNameLength        ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdUsbExtendedDecode         ## SOMETIMES_CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellDecodeIScsiMapNames  ## SOMETIMES_CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellVendorExtendedDecode ## SOMETIMES_CONSUMES
+
+[Depex]
+  gEfiUnicodeCollation2ProtocolGuid

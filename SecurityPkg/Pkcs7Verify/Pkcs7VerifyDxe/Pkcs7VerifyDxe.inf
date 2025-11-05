@@ -1,0 +1,64 @@
+## @file
+#  Produces the UEFI PKCS7 Verification protocol.
+#
+#  PKCS7 is a general-purpose Cryptographic Message Syntax Standard (defined by
+#  RFC2315, http://tools.ietf.org/html/rfc2315). This module will produce the
+#  UEFI PKCS7 Verification Protocol which is used to verify data signed using PKCS7
+#  structure.
+#
+#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Pkcs7VerifyDxe
+  FILE_GUID                      = DC952D08-C62B-41c6-BAC7-70ED054F91E5
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Pkcs7VerifyDriverEntry
+  MODULE_UNI_FILE                = Pkcs7VerifyDxe.uni
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.common]
+  Pkcs7VerifyDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  UefiLib
+  UefiBootServicesTableLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  UefiDriverEntryPoint
+  BaseCryptLib
+
+[Protocols]
+  gEfiPkcs7VerifyProtocolGuid   ## PRODUCES
+
+[Guids]
+  gEfiCertX509Guid              ## SOMETIMES_CONSUMES    ## GUID     # Unique ID for the type of the signature.
+  gEfiCertSha1Guid              ## SOMETIMES_CONSUMES    ## GUID     # Unique ID for the type of the signature.
+  gEfiCertSha256Guid            ## SOMETIMES_CONSUMES    ## GUID     # Unique ID for the type of the signature.
+  gEfiCertSha384Guid            ## SOMETIMES_CONSUMES    ## GUID     # Unique ID for the type of the signature.
+  gEfiCertSha512Guid            ## SOMETIMES_CONSUMES    ## GUID     # Unique ID for the type of the signature.
+  gEfiCertX509Sha256Guid        ## SOMETIMES_CONSUMES    ## GUID     # Unique ID for the type of the signature.
+  gEfiCertX509Sha384Guid        ## SOMETIMES_CONSUMES    ## GUID     # Unique ID for the type of the signature.
+  gEfiCertX509Sha512Guid        ## SOMETIMES_CONSUMES    ## GUID     # Unique ID for the type of the signature.
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  Pkcs7VerifyDxeExtra.uni

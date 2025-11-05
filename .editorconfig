@@ -1,0 +1,31 @@
+# EditorConfig file: https://EditorConfig.org
+
+root = true
+
+[*]
+charset = latin1
+end_of_line = crlf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.py]
+charset = utf-8
+indent_style = space
+indent_size = 4
+
+[*.sh]
+end_of_line = lf
+
+[.gitattributes]
+end_of_line = lf
+
+[.mailmap]
+charset = utf-8
+
+[Maintainers.txt]
+charset = utf-8
+
+[Makefile,GNUmakefile]
+indent_style = tab

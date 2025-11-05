@@ -1,0 +1,41 @@
+## @file
+# A simple DXE_DRIVER that causes the PCI Bus UEFI_DRIVER to allocate 64-bit
+# MMIO BARs above 4 GB, regardless of option ROM availability, conserving 32-bit
+# MMIO aperture for 32-bit BARs.
+#
+# Copyright (C) 2016, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = IncompatiblePciDeviceSupportDxe
+  FILE_GUID                      = F6697AC4-A776-4EE1-B643-1FEFF2B615BB
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DriverInitialize
+
+[Sources]
+  IncompatiblePciDeviceSupport.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  CcProbeLib
+  DebugLib
+  MemoryAllocationLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiIncompatiblePciDeviceSupportProtocolGuid ## SOMETIMES_PRODUCES
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size                ## CONSUMES
+
+[Depex]
+  TRUE

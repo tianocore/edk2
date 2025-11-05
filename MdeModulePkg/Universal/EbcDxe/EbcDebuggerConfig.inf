@@ -1,0 +1,57 @@
+## @file
+#  EBC Debugger configuration application.
+#
+#  Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EdbCfg
+  MODULE_UNI_FILE                = EbcDebuggerConfig.uni
+  FILE_GUID                      = 8CFC5233-23C6-49e3-8A2D-7E581AB305BA
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeEbcDebuggerConfig
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  EbcDebugger/EbcDebuggerConfig.c
+  EbcDebugger/EdbCommon.h
+  EbcDebugger/EdbSupportString.c
+  EbcDebugger/EdbSupport.h
+  EbcDebugger/EdbCommand.h
+  EbcDebugger/EdbHook.h
+  EbcDebugger/Edb.h
+  EbcDebugger/EdbDisasmSupport.h
+  EbcDebugger/EdbDisasm.h
+  EbcDebugger/EdbSymbol.h
+  EbcDebuggerHook.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiLib
+  BaseLib
+  DebugLib
+  UefiApplicationEntryPoint
+
+[Protocols]
+  gEfiDebuggerConfigurationProtocolGuid     ## CONSUMES
+  gEfiShellParametersProtocolGuid           ## CONSUMES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  EbcDebuggerConfigExtra.uni

@@ -1,0 +1,43 @@
+## @file
+# UEFI application that tests EfiMpServiceProtocol in Shell.
+#
+# Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION     = 0x00010005
+  BASE_NAME       = MpProtocolUnitTest
+  FILE_GUID       = 4CEE6399-A22C-4FFD-B148-3A56B1DD83F1
+  MODULE_TYPE     = UEFI_APPLICATION
+  VERSION_STRING  = 1.0
+  ENTRY_POINT     = DxeEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  EfiMpServicesUnitTestCommom.c
+  EfiMpServicesUnitTestCommom.h
+  EfiMpServiceProtocolUnitTest.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UnitTestPersistenceLib
+  UnitTestLib
+
+[Protocols]
+  gEfiMpServiceProtocolGuid           ## CONSUMES

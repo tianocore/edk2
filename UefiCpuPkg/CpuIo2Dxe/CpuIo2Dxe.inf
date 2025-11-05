@@ -1,0 +1,47 @@
+## @file
+#  Produces the CPU I/O 2 Protocol by using the services of the I/O Library.
+#
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CpuIo2Dxe
+  MODULE_UNI_FILE                = CpuIo2Dxe.uni
+  FILE_GUID                      = A19B1FE7-C1BC-49F8-875F-54A5D542443F
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = CpuIo2Initialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  CpuIo2Dxe.c
+  CpuIo2Dxe.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+  IoLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiCpuIo2ProtocolGuid                         ## PRODUCES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  CpuIo2DxeExtra.uni

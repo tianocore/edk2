@@ -1,0 +1,79 @@
+## @file
+# FSP-M wrapper PEI Module
+#
+# This PEIM initialize FSP.
+# This will be invoked only once. It will call FspMemoryInit API,
+# register TemporaryRamDonePpi to call TempRamExit API, and register MemoryDiscoveredPpi
+# notify to call FspSiliconInit API.
+#
+#  Copyright (c) 2014 - 2024, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = FspmWrapperPeim
+  FILE_GUID                      = 9FAAD0FF-0E0C-4885-A738-BAB4E4FA1E66
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = PEIM
+  ENTRY_POINT                    = FspmWrapperPeimEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32
+#
+
+[LibraryClasses]
+  PeimEntryPoint
+  PeiServicesLib
+  PeiServicesTablePointerLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  HobLib
+  FspWrapperPlatformLib
+  FspWrapperHobProcessLib
+  CpuLib
+  PeCoffGetEntryPointLib
+  PeCoffExtraActionLib
+  PerformanceLib
+  TimerLib
+  FspWrapperApiLib
+  FspWrapperApiTestLib
+  FspMeasurementLib
+  FspWrapperMultiPhaseProcessLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  SecurityPkg/SecurityPkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+  IntelFsp2WrapperPkg/IntelFsp2WrapperPkg.dec
+
+[Pcd]
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress       ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmUpdDataAddress    ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspModeSelection      ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFsptBaseAddress       ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspMeasurementConfig  ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmUpdDataAddress64  ## CONSUMES
+
+[Sources]
+  FspmWrapperPeim.c
+
+[Guids]
+  gFspHobGuid                           ## PRODUCES ## HOB
+  gFspApiPerformanceGuid                ## SOMETIMES_CONSUMES ## GUID
+  gEdkiiMigratedFvInfoGuid              ## SOMETIMES_CONSUMES ## HOB
+
+[Ppis]
+  gEdkiiTcgPpiGuid                                       ## NOTIFY
+  gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid    ## PRODUCES
+
+[Depex]
+  gEfiPeiMasterBootModePpiGuid

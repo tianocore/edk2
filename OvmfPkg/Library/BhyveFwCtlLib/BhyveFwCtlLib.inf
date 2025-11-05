@@ -1,0 +1,40 @@
+## @file
+#
+#  Copyright (C) 2020, Rebecca Cran <rebecca@bsdio.com>
+#  Copyright (C) 2015 Nahanni Systems
+#  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = BhyveFwCtlLib
+  FILE_GUID                      = fd982666-67f9-11e5-a42a-0025908602f6
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BhyveFwCtlLib|PEIM DXE_DRIVER DXE_RUNTIME_DRIVER
+
+  CONSTRUCTOR                    = BhyveFwCtlInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  BhyveFwCtlLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  IntrinsicLib
+  IoLib
+  MemoryAllocationLib

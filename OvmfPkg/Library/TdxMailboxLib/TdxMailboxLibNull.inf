@@ -1,0 +1,34 @@
+#/** @file
+#
+#  Null instance of TdxMailboxLib
+#
+#  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2008, Apple Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TdxMailboxLibNull
+  FILE_GUID                      = 002a1265-a1a0-47cd-bc69-4342b147f57d
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TdxMailboxLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  TdxMailboxNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib

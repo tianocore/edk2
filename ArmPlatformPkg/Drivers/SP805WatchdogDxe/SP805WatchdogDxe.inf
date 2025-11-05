@@ -1,0 +1,46 @@
+## @file
+#
+#  Copyright (c) 2011 - 2020, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2018, Linaro Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SP805WatchdogDxe
+  FILE_GUID                      = ebd705fb-fa92-46a7-b32b-7f566d944614
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SP805Initialize
+
+[Sources.common]
+  SP805Watchdog.c
+  SP805Watchdog.h
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+
+[Pcd]
+  gArmPlatformTokenSpaceGuid.PcdSP805WatchdogBase
+  gArmPlatformTokenSpaceGuid.PcdSP805WatchdogClockFrequencyInHz
+  gArmPlatformTokenSpaceGuid.PcdSP805WatchdogInterrupt
+
+[Protocols]
+  gHardwareInterruptProtocolGuid          ## ALWAYS_CONSUMES
+  gEfiWatchdogTimerArchProtocolGuid       ## ALWAYS_PRODUCES
+
+[Depex]
+  gHardwareInterruptProtocolGuid

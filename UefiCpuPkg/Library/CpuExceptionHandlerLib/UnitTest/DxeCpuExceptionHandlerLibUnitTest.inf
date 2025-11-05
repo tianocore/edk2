@@ -1,0 +1,59 @@
+## @file
+# Unit tests of the DxeCpuExceptionHandlerLib instance.
+#
+# Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CpuExceptionHandlerDxeTest
+  FILE_GUID                      = D76BFD9C-0B6D-46BD-AD66-2BBB6FA7031A
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = CpuExceptionHandlerTestEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+[Sources.X64]
+  X64/ArchExceptionHandlerTestAsm.nasm
+  X64/ArchExceptionHandlerTest.c
+
+[Sources.common]
+  CpuExceptionHandlerTest.h
+  CpuExceptionHandlerTestCommon.c
+  DxeCpuExceptionHandlerUnitTest.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  UnitTestLib
+  MemoryAllocationLib
+  CpuExceptionHandlerLib
+  UefiDriverEntryPoint
+  HobLib
+  UefiBootServicesTableLib
+  CpuPageTableLib
+
+[Guids]
+  gEfiHobMemoryAllocStackGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard       ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize           ## CONSUMES
+
+[Protocols]
+  gEfiMpServiceProtocolGuid
+  gEfiTimerArchProtocolGuid
+
+[Depex]
+  gEfiMpServiceProtocolGuid

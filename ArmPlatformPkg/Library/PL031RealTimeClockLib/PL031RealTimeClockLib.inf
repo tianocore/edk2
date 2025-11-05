@@ -1,0 +1,46 @@
+#/** @file
+#
+# Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PL031RealTimeClockLib
+  FILE_GUID                      = 470DFB96-E205-4515-A75E-2E60F853E79D
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RealTimeClockLib|DXE_RUNTIME_DRIVER
+
+[Sources.common]
+  PL031RealTimeClock.h
+  PL031RealTimeClockLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+
+[LibraryClasses]
+  IoLib
+  UefiLib
+  DebugLib
+  PcdLib
+  DxeServicesTableLib
+  TimeBaseLib
+  UefiRuntimeLib
+
+[Guids]
+  gEfiEventVirtualAddressChangeGuid
+
+[Pcd]
+  gArmPlatformTokenSpaceGuid.PcdPL031RtcBase
+  gArmPlatformTokenSpaceGuid.PcdPL031RtcPpmAccuracy
+
+[Depex.common.DXE_RUNTIME_DRIVER]
+  gEfiCpuArchProtocolGuid

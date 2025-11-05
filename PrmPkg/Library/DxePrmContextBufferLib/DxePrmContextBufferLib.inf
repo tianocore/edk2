@@ -1,0 +1,35 @@
+## @file
+#  PRM Context Buffer Library
+#
+#  Provides a general abstraction for PRM context buffer management.
+#
+#  Copyright (c) Microsoft Corporation
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION         = 0x00010005
+  BASE_NAME           = DxePrmContextBufferLib
+  FILE_GUID           = 49828E93-29FA-4665-B8B1-19BA4059D140
+  MODULE_TYPE         = DXE_DRIVER
+  VERSION_STRING      = 1.0
+  LIBRARY_CLASS       = PrmContextBufferLib|DXE_DRIVER UEFI_DRIVER UEFI_APPLICATION
+
+[Sources]
+  DxePrmContextBufferLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  PrmPkg/PrmPkg.dec
+
+[Protocols]
+  gPrmConfigProtocolGuid
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  UefiBootServicesTableLib

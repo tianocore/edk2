@@ -1,0 +1,17 @@
+// /** @file
+// The UhciDxe driver is responsible for managing the behavior of UHCI controller.
+//
+// It implements the interfaces of monitoring the status of all ports and transferring
+// Control, Bulk, Interrupt and Isochronous requests to Usb1.x device
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Responsible for managing the behavior of the UHCI controller"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "It implements the interfaces of monitoring the status of all ports and transferring Control, Bulk, Interrupt and Isochronous requests to a Usb1.x device."
+

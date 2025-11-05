@@ -1,0 +1,56 @@
+## @file
+#  Instance of Debug Library using EFI_DEBUGPORT_PROTOCOL.
+#
+#  Debug Lib that sends messages to EFI_DEBUGPORT_PROTOCOL.Write.
+#
+#  Copyright (c) 2018, Microsoft Corporation
+#
+#  Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UefiDebugLibDebugPortProtocol
+  MODULE_UNI_FILE                = UefiDebugLibDebugPortProtocol.uni
+  FILE_GUID                      = 102287b4-6b12-4D41-91e1-ebee1f3aa614
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DebugLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+  CONSTRUCTOR                    = DxeDebugLibConstructor
+  DESTRUCTOR                     = DxeDebugLibDestructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+
+[Sources]
+  DebugLib.c
+  DebugLibConstructor.c
+
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+[LibraryClasses]
+  BaseMemoryLib
+  BaseLib
+  PcdLib
+  PrintLib
+  DebugPrintErrorLevelLib
+
+[Protocols]
+  gEfiDebugPortProtocolGuid                     ## CONSUMES
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue        ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask            ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel    ## CONSUMES
+

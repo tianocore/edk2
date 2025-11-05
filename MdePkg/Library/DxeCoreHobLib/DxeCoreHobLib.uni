@@ -1,0 +1,17 @@
+// /** @file
+// Instance of HOB Library for DXE Core.
+//
+// HOB Library implementation for the DXE Core. Does not have a constructor.
+// Uses gHobList defined in the DXE Core Entry Point Library.
+//
+// Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Instance of HOB Library for DXE Core"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "HOB Library implementation for the DXE Core. Does not have a constructor. Uses gHobList defined in the DXE Core Entry Point Library."
+

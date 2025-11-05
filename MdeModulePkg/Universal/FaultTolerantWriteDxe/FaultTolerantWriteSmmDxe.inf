@@ -1,0 +1,59 @@
+## @file
+# This module is the Runtime DXE part corresponding to SMM Fault Tolerant Write (FTW) module.
+#
+# It installs FTW protocol and works with SMM FTW module together.
+# The FTW protocol will not work after End Of Dxe because it will be not safe to expose
+# the related operations in SMM handler in SMM FTW module. You can use the FTW protocol
+# before End Of Dxe or use FaultTolerantWriteDxe module instead if you really want to.
+#
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FaultTolerantWriteSmmDxe
+  MODULE_UNI_FILE                = FaultTolerantWriteSmmDxe.uni
+  FILE_GUID                      = 98948C4A-70F2-4035-8E9F-5927493CFC07
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = FaultTolerantWriteSmmInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  FaultTolerantWriteSmmDxe.c
+  FaultTolerantWriteSmmDxe.h
+  FaultTolerantWriteSmmCommon.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiBootServicesTableLib
+  DebugLib
+  DxeServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiFaultTolerantWriteProtocolGuid            ## PRODUCES
+  gEfiMmCommunication2ProtocolGuid              ## CONSUMES
+  ## NOTIFY
+  ## UNDEFINED # Used to do smm communication
+  ## CONSUMES
+  gEfiSmmFaultTolerantWriteProtocolGuid
+  gEfiFirmwareVolumeBlockProtocolGuid           ## CONSUMES
+
+[Depex]
+  gEfiMmCommunication2ProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  FaultTolerantWriteSmmDxeExtra.uni

@@ -1,0 +1,37 @@
+## @file
+#  FSP Wrapper to handle platform specific actions for
+#  FSP MultiPhase (SeparatePhase) Initialization.
+#
+#  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseFspWrapperPlatformMultiPhaseLibNull
+  FILE_GUID                      = DB63E5AA-21C6-40BB-879A-CD1762C8427B
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FspWrapperPlatformMultiPhaseLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  FspWrapperPlatformMultiPhaseLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+  IntelFsp2WrapperPkg/IntelFsp2WrapperPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  BaseLib
+  PcdLib
+  PeiServicesLib

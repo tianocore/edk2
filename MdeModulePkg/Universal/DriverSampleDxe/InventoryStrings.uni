@@ -1,0 +1,60 @@
+// *++
+//
+// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Module Name:
+//
+//   InventoryStrings.uni
+//
+// Abstract:
+//
+//   String definitions for Inventory file.
+//
+// Revision History:
+//
+// --*/
+
+
+/=#
+
+#langdef en-US "English"
+#langdef fr-FR "Francais"
+
+
+#string STR_INV_FORM_SET_TITLE         #language en-US  "ABC Information Sample"
+                                       #language fr-FR  "Mi motor Español de arreglo"
+#string STR_INV_FORM_SET_HELP          #language en-US  "The ABC Network Controller version information, which includes Firmware versions as well as supported characteristics"
+                                       #language fr-FR  "The ABC Network Controller version information, which includes Firmware versions as well as supported characteristics"
+#string STR_INV_FORM1_TITLE            #language en-US  "ABC Network Controller Version Data"
+                                       #language fr-FR  "Mi Primero Arreglo Página"
+#string STR_INV_VERSION_TEXT           #language en-US  "Firmware Revision Date: 02/03/2002"
+                                       #language fr-FR  "Firmware Revision Date: 02/03/2002"
+#string STR_INV_VERSION_HELP           #language en-US  "The date of the revision of the Firmware being used."
+                                       #language fr-FR  "The date of the revision of the Firmware being used."
+#string STR_INV_VERSION_TEXT2          #language en-US  "Major Version: 6.32.5"
+                                       #language fr-FR  "Major Version: 6.32.5"
+#string STR_INV_VERSION_TEXT3          #language en-US  "Patch Version: 1.02.53"
+                                       #language fr-FR  "Patch Version: 1.02.53"
+#string STR_INV_VERSION_TEXT4          #language en-US  "Characteristics:  10/100 Mb/s"
+                                       #language fr-FR  "Characteristics:  10/100 Mb/s"
+#string STR_INV_VERSION_TEXT5          #language en-US  "                  3.3 V power usage"
+                                       #language fr-FR  "                  3.3 V power usage"
+#string STR_INV_VERSION_TEXT6          #language en-US  "                  3K Transmit FIFO"
+                                       #language fr-FR  "                  3K Transmit FIFO"
+#string STR_INV_VERSION_TEXT7          #language en-US  "                  3K Receive FIFO"
+                                       #language fr-FR  "                  3K Receive FIFO"
+#string STR_INV_VERSION_TEXT8          #language en-US  "                  TCP/UDP checksum offload"
+                                       #language fr-FR  "                  TCP/UDP checksum offload"
+#string STR_INV_VERSION_TEXT9          #language en-US  "                  128K Flash"
+                                       #language fr-FR  "                  128K Flash"
+#string STR_INV_VERSION_TEXT10         #language en-US  "                  32-bit PCI"
+                                       #language fr-FR  "                  32-bit PCI"
+#string STR_INV_VERSION_TEXT11         #language en-US  "                  Intel® 82540EM"
+                                       #language fr-FR  "                  Intel® 82540EM"
+#string STR_INV_VERSION_TEXT12         #language en-US  "Press ESC to exit."
+                                       #language fr-FR  "Press ESC to exit."
+#string STR_INV_EMPTY_STRING           #language en-US  ""
+                                       #language fr-FR  ""
+
+

@@ -1,0 +1,94 @@
+/** @file
+  Vfr file for IP4Dxe.
+
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+#include "Ip4NvData.h"
+
+#define EFI_NETWORK_DEVICE_CLASS  0x04
+
+formset
+  guid     = IP4_CONFIG2_NVDATA_GUID,
+  title    = STRING_TOKEN(STR_IP4_CONFIG2_FORM_TITLE),
+  help     = STRING_TOKEN(STR_IP4_CONFIG2_FORM_HELP),
+  class    = EFI_NETWORK_DEVICE_CLASS,
+  subclass = 0x03,
+
+  varstore IP4_CONFIG2_IFR_NVDATA,
+    name = IP4_CONFIG2_IFR_NVDATA,
+    guid = IP4_CONFIG2_NVDATA_GUID;
+
+  form formid = FORMID_MAIN_FORM,
+    title  = STRING_TOKEN(STR_IP4_DEVICE_FORM_TITLE);
+
+    checkbox varid = IP4_CONFIG2_IFR_NVDATA.Configure,
+            prompt = STRING_TOKEN(STR_IP4_CONFIGURE),
+            help   = STRING_TOKEN(STR_IP4_CONFIGURE_HELP),
+            flags  = INTERACTIVE,
+            key    = KEY_ENABLE,
+    endcheckbox;
+
+    suppressif ideqval IP4_CONFIG2_IFR_NVDATA.Configure == 0x00;
+
+      checkbox varid = IP4_CONFIG2_IFR_NVDATA.DhcpEnable,
+              prompt = STRING_TOKEN(STR_IP4_ENABLE_DHCP),
+              help   = STRING_TOKEN(STR_IP4_ENABLE_DHCP),
+              flags  = INTERACTIVE,
+              key    = KEY_DHCP_ENABLE,
+      endcheckbox;
+    endif;
+
+    suppressif ideqval IP4_CONFIG2_IFR_NVDATA.DhcpEnable == 0x01 OR ideqval IP4_CONFIG2_IFR_NVDATA.Configure == 0x00;
+
+      string  varid   = IP4_CONFIG2_IFR_NVDATA.StationAddress,
+              prompt  = STRING_TOKEN(STR_IP4_LOCAL_IP_ADDRESS),
+              help    = STRING_TOKEN(STR_IP4_IP_ADDRESS_HELP),
+              flags   = INTERACTIVE,
+              key     = KEY_LOCAL_IP,
+              minsize = IP_MIN_SIZE,
+              maxsize = IP_MAX_SIZE,
+      endstring;
+
+      string  varid   = IP4_CONFIG2_IFR_NVDATA.SubnetMask,
+              prompt  = STRING_TOKEN(STR_IP4_LOCAL_MASK),
+              help    = STRING_TOKEN(STR_IP4_MASK_HELP),
+              flags   = INTERACTIVE,
+              key     = KEY_SUBNET_MASK,
+              minsize = IP_MIN_SIZE,
+             maxsize = IP_MAX_SIZE,
+      endstring;
+
+      string  varid   = IP4_CONFIG2_IFR_NVDATA.GatewayAddress,
+              prompt  = STRING_TOKEN(STR_IP4_LOCAL_GATEWAY),
+              help    = STRING_TOKEN(STR_IP4_GATEWAY_HELP),
+              flags   = INTERACTIVE,
+              key     = KEY_GATE_WAY,
+              minsize = IP_MIN_SIZE,
+              maxsize = IP_MAX_SIZE,
+      endstring;
+
+      string  varid   = IP4_CONFIG2_IFR_NVDATA.DnsAddress,
+              prompt  = STRING_TOKEN(STR_IP4_LOCAL_DNS),
+              help    = STRING_TOKEN(STR_IP4_DNS_HELP),
+              flags   = INTERACTIVE,
+              key     = KEY_DNS,
+              minsize = IP_MIN_SIZE,
+              maxsize = ADDRESS_STR_MAX_SIZE,
+      endstring;
+
+    endif;
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    text
+      help   = STRING_TOKEN(STR_SAVE_CHANGES),
+      text   = STRING_TOKEN(STR_SAVE_CHANGES),
+      flags  = INTERACTIVE,
+      key    = KEY_SAVE_CHANGES;
+
+  endform;
+
+endformset;
+

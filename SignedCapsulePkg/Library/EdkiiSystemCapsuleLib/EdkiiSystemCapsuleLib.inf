@@ -1,0 +1,58 @@
+## @file
+#  EDKII System Capsule library.
+#
+#  EDKII System Capsule library instance for DXE/PEI post memory phase.
+#
+#  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EdkiiSystemCapsuleLib
+  MODULE_UNI_FILE                = EdkiiSystemCapsuleLib.uni
+  FILE_GUID                      = 109D5FC6-56E6-481A-88EF-0CB828FBE0F6
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = EdkiiSystemCapsuleLib
+  CONSTRUCTOR                    = EdkiiSystemCapsuleLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  EdkiiSystemCapsuleLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  SignedCapsulePkg/SignedCapsulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  PcdLib
+  MemoryAllocationLib
+  FmpAuthenticationLib
+
+[Pcd]
+  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiSystemFirmwareImageDescriptor    ## CONSUMES
+  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiSystemFirmwareFileGuid           ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdRsa2048Sha256PublicKeyBuffer               ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdPkcs7CertBuffer                            ## CONSUMES
+
+[Guids]
+  gEdkiiSystemFirmwareImageDescriptorFileGuid          ## SOMETIMES_CONSUMES   ## GUID
+  gEdkiiSystemFmpCapsuleConfigFileGuid                 ## SOMETIMES_CONSUMES   ## GUID
+  gEdkiiSystemFmpCapsuleDriverFvFileGuid               ## SOMETIMES_CONSUMES   ## GUID
+  gEfiCertPkcs7Guid                                    ## SOMETIMES_CONSUMES   ## GUID
+  gEfiCertTypeRsa2048Sha256Guid                        ## SOMETIMES_CONSUMES   ## GUID
+  gEfiSignedCapsulePkgTokenSpaceGuid                   ## SOMETIMES_CONSUMES   ## GUID
+  gZeroGuid                                            ## SOMETIMES_CONSUMES   ## GUID
+

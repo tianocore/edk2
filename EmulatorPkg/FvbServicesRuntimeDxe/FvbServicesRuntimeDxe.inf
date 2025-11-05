@@ -1,0 +1,75 @@
+## @file
+# Component description file for Emu Fimware Volume Block DXE driver module.
+#
+# This DXE runtime driver implements and produces the Fimware Volue Block Protocol on
+#  Emu emulator.
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2011, Apple Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FwBlockService
+  FILE_GUID                      = A01E498C-96E8-2A4C-95F4-85248F989753
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = FvbInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  FvbInfo.c
+  FWBlockService.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  HobLib
+  DebugLib
+  UefiRuntimeLib
+  DxeServicesTableLib
+  BaseLib
+  UefiDriverEntryPoint
+  UefiLib
+  DevicePathLib
+
+[Guids]
+  gEfiEventVirtualAddressChangeGuid             # ALWAYS_CONSUMED  Create Event: EVENT_GROUP_GUID
+
+[Protocols]
+  gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL ALWAYS_PRODUCED
+  gEfiDevicePathProtocolGuid                    # PROTOCOL SOMETIMES_PRODUCED
+
+[FixedPcd]
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareFdSize
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareBlockSize
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashFvRecoveryBase
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashFvRecoverySize
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageEventLogBase
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageEventLogSize
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
+
+[Depex]
+  TRUE
+

@@ -1,0 +1,548 @@
+## @file  UefiCpuPkg.dec
+# This Package provides UEFI compatible CPU modules and libraries.
+#
+# Copyright (c) 2007 - 2024, Intel Corporation. All rights reserved.<BR>
+# Copyright (C) 2023 - 2025, Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = UefiCpuPkg
+  PACKAGE_UNI_FILE               = UefiCpuPkg.uni
+  PACKAGE_GUID                   = 2171df9b-0d39-45aa-ac37-2de190010d23
+  PACKAGE_VERSION                = 0.90
+
+[Includes]
+  Include
+
+[LibraryClasses]
+  ##  @libraryclass  Defines some routines that are used to register/manage/program
+  ##                 CPU features.
+  ##
+  RegisterCpuFeaturesLib|Include/Library/RegisterCpuFeaturesLib.h
+
+  ##  @libraryclass  Defines some common architecture-level fundamental routines which
+  ##                 are supported at different architectures.
+  ##
+  UefiCpuBaseArchSupportLib|Include/Library/BaseArchLibSupport.h
+
+[LibraryClasses.IA32, LibraryClasses.X64]
+  ##  @libraryclass  Provides functions to manage MTRR settings on IA32 and X64 CPUs.
+  ##
+  MtrrLib|Include/Library/MtrrLib.h
+
+  ##  @libraryclass  Provides functions to manage the Local APIC on IA32 and X64 CPUs.
+  ##
+  LocalApicLib|Include/Library/LocalApicLib.h
+
+  ##  @libraryclass  Provides platform specific initialization functions in the SEC phase.
+  ##
+  PlatformSecLib|Include/Library/PlatformSecLib.h
+
+  ##  @libraryclass  Public include file for the SMM CPU Platform Hook Library.
+  ##
+  SmmCpuPlatformHookLib|Include/Library/SmmCpuPlatformHookLib.h
+
+  ##  @libraryclass  Provides the CPU specific programming for PiSmmCpuDxeSmm module.
+  ##
+  SmmCpuFeaturesLib|Include/Library/SmmCpuFeaturesLib.h
+
+  ##  @libraryclass  Provides functions to support MP services on CpuMpPei and CpuDxe module.
+  ##
+  MpInitLib|Include/Library/MpInitLib.h
+
+  ##  @libraryclass  Provides function to support CcExit processing.
+  CcExitLib|Include/Library/CcExitLib.h
+
+  ##  @libraryclass  Provides function to support AmdSvsm processing.
+  AmdSvsmLib|Include/Library/AmdSvsmLib.h
+
+  ##  @libraryclass  Provides function to get CPU cache information.
+  CpuCacheInfoLib|Include/Library/CpuCacheInfoLib.h
+
+  ##  @libraryclass  Provides function for loading microcode.
+  MicrocodeLib|Include/Library/MicrocodeLib.h
+
+  ##  @libraryclass  Provides function for manipulating x86 paging structures.
+  CpuPageTableLib|Include/Library/CpuPageTableLib.h
+
+  ## @libraryclass   Provides functions for manipulating smram savestate registers.
+  MmSaveStateLib|Include/Library/MmSaveStateLib.h
+
+  ## @libraryclass   Provides functions for SMM CPU Sync Operation.
+  SmmCpuSyncLib|Include/Library/SmmCpuSyncLib.h
+
+  ## @libraryclass   Provides functions for SMM Relocation Operation.
+  SmmRelocationLib|Include/Library/SmmRelocationLib.h
+
+## @libraryclass   Provides functions for AmdSysCallLib
+  AmdSysCallLib|Include/Library/AmdSysCallLib.h
+
+[LibraryClasses.RISCV64]
+  ##  @libraryclass  Provides functions to manage MMU features on RISCV64 CPUs.
+  ##
+  RiscVMmuLib|Include/Library/BaseRiscVMmuLib.h
+
+[LibraryClasses.LoongArch64]
+  ##  @libraryclass  Provides functions for the memory management unit.
+  CpuMmuLib|Include/Library/CpuMmuLib.h
+
+[LibraryClasses.AARCH64]
+  ##  @libraryclass  Provides a Mmu interface.
+  #
+  ArmMmuLib|Include/Library/ArmMmuLib.h
+
+[Guids]
+  gUefiCpuPkgTokenSpaceGuid      = { 0xac05bf33, 0x995a, 0x4ed4, { 0xaa, 0xb8, 0xef, 0x7a, 0xe8, 0xf, 0x5c, 0xb0 }}
+  gMsegSmramGuid                 = { 0x5802bce4, 0xeeee, 0x4e33, { 0xa1, 0x30, 0xeb, 0xad, 0x27, 0xf0, 0xe4, 0x39 }}
+
+  ## Include/Guid/CpuFeaturesSetDone.h
+  gEdkiiCpuFeaturesSetDoneGuid   = { 0xa82485ce, 0xad6b, 0x4101, { 0x99, 0xd3, 0xe1, 0x35, 0x8c, 0x9e, 0x7e, 0x37 }}
+
+  ## Include/Guid/CpuFeaturesInitDone.h
+  gEdkiiCpuFeaturesInitDoneGuid  = { 0xc77c3a41, 0x61ab, 0x4143, { 0x98, 0x3e, 0x33, 0x39, 0x28, 0x6, 0x28, 0xe5 }}
+
+  ## Include/Guid/MicrocodePatchHob.h
+  gEdkiiMicrocodePatchHobGuid    = { 0xd178f11d, 0x8716, 0x418e, { 0xa1, 0x31, 0x96, 0x7d, 0x2a, 0xc4, 0x28, 0x43 }}
+
+  ## Include/Guid/SmmBaseHob.h
+  gSmmBaseHobGuid      = { 0xc2217ba7, 0x03bb, 0x4f63, {0xa6, 0x47, 0x7c, 0x25, 0xc5, 0xfc, 0x9d, 0x73 }}
+
+  ## Include/Guid/MpInformation2.h
+  gMpInformation2HobGuid         = { 0x417a7f64, 0xf4e9, 0x4b32, {0x84, 0x6a, 0x5c, 0xc4, 0xd8, 0x62, 0x18, 0x79 }}
+
+  ## Include/Guid/ProcessorResourceHob.h
+  gProcessorResourceHobGuid      = { 0xb855c7fe, 0xa758, 0x701f, { 0xa7, 0x30, 0x87, 0xf3, 0x9c, 0x03, 0x46, 0x7e }}
+  #
+  ## Include/Guid/GhcbApicIds.h
+  gGhcbApicIdsGuid               = { 0xbc964338, 0xee39, 0x4fc8, { 0xa2, 0x24, 0x10, 0x10, 0x8b, 0x17, 0x80, 0x1b }}
+
+  ## Include/Guid/MmUnblockRegion.h
+  gMmUnblockRegionHobGuid        = { 0x7c316fb3, 0x849e, 0x4ee7, { 0x87, 0xfc, 0x16, 0x2d, 0x0b, 0x03, 0x42, 0xbf }}
+
+  ## Include/Guid/MmProfileData.h
+  gMmProfileDataHobGuid          = { 0x26ef081d, 0x19b0, 0x4c42, { 0xa2, 0x57, 0xa7, 0xf5, 0x9f, 0x8b, 0xd0, 0x38 }}
+
+  ## Include/Guid/MmCpuSyncConfig.h
+  gMmCpuSyncConfigHobGuid        = { 0x8b90bd26, 0xe4f9, 0x45c2, { 0x92, 0xa2, 0x9e, 0xac, 0xe6, 0x0e, 0x9d, 0xcc }}
+
+  # Include/Guid/MmAcpiS3Enable.h
+  gMmAcpiS3EnableHobGuid         = { 0xe7402821, 0x2654, 0x4c1b, { 0x99, 0x0e, 0x04, 0x8f, 0x8d, 0x82, 0xcf, 0x67 }}
+
+[Guids.AARCH64]
+  gArmMmuReplaceLiveTranslationEntryFuncGuid = { 0xa8b50ff3, 0x08ec, 0x4dd3, {0xbf, 0x04, 0x28, 0xbf, 0x71, 0x75, 0xc7, 0x4a} }
+
+[Protocols]
+  ## Include/Protocol/SmmCpuService.h
+  gEfiSmmCpuServiceProtocolGuid   = { 0x1d202cab, 0xc8ab, 0x4d5c, { 0x94, 0xf7, 0x3c, 0xfc, 0xc0, 0xd3, 0xd3, 0x35 }}
+  gEdkiiSmmCpuRendezvousProtocolGuid = { 0xaa00d50b, 0x4911, 0x428f, { 0xb9, 0x1a, 0xa5, 0x9d, 0xdb, 0x13, 0xe2, 0x4c }}
+
+  ## Include/Protocol/SmMonitorInit.h
+  gEfiSmMonitorInitProtocolGuid  = { 0x228f344d, 0xb3de, 0x43bb, { 0xa4, 0xd7, 0xea, 0x20, 0xb, 0x1b, 0x14, 0x82 }}
+
+[Protocols.RISCV64]
+  #
+  # Protocols defined for RISC-V systems
+  #
+  ## Include/Protocol/RiscVBootProtocol.h
+  gRiscVEfiBootProtocolGuid  = { 0xccd15fec, 0x6f73, 0x4eec, { 0x83, 0x95, 0x3e, 0x69, 0xe4, 0xb9, 0x40, 0xbf }}
+
+#
+# [Error.gUefiCpuPkgTokenSpaceGuid]
+#   0x80000001 | Invalid value provided.
+#
+
+[Ppis]
+  #
+  # The EDK II PEI MP Services 2 PPI has been replaced by the PEI MP Services 2 PPI
+  # in the MdePkg. The following definition is only present for backwards compatibility
+  # and will be removed in the future.
+  #
+  gEdkiiPeiMpServices2PpiGuid =    { 0x5cb9cb3d, 0x31a4, 0x480c, { 0x94, 0x98, 0x29, 0xd2, 0x69, 0xba, 0xcf, 0xba}}
+
+  ## Include/Ppi/ShadowMicrocode.h
+  gEdkiiPeiShadowMicrocodePpiGuid = { 0x430f6965, 0x9a69, 0x41c5, { 0x93, 0xed, 0x8b, 0xf0, 0x64, 0x35, 0xc1, 0xc6 }}
+
+  ## Include/Ppi/RepublishSecPpi.h
+  gRepublishSecPpiPpiGuid   = { 0x27a71b1e, 0x73ee, 0x43d6, { 0xac, 0xe3, 0x52, 0x1a, 0x2d, 0xc5, 0xd0, 0x92 }}
+
+[PcdsFeatureFlag]
+  ## Indicates if SMM Profile will be enabled.
+  #  If enabled, instruction executions in and data accesses to memory outside of SMRAM will be logged.
+  #  In X64 build, it could not be enabled when PcdCpuSmmRestrictedMemoryAccess is TRUE.
+  #  In IA32 build, the page table memory is not marked as read-only when it is enabled.
+  #  This PCD is only for validation purpose. It should be set to false in production.<BR><BR>
+  #   TRUE  - SMM Profile will be enabled.<BR>
+  #   FALSE - SMM Profile will be disabled.<BR>
+  # @Prompt Enable SMM Profile.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileEnable|FALSE|BOOLEAN|0x32132109
+
+  ## Indicates if the SMM profile log buffer is a ring buffer.
+  #  If disabled, no additional log can be done when the buffer is full.<BR><BR>
+  #   TRUE  - the SMM profile log buffer is a ring buffer.<BR>
+  #   FALSE - the SMM profile log buffer is a normal buffer.<BR>
+  # @Prompt The SMM profile log buffer is a ring buffer.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileRingBuffer|FALSE|BOOLEAN|0x3213210a
+
+  ## Indicates if SMM Startup AP in a blocking fashion.
+  #   TRUE  - SMM Startup AP in a blocking fashion.<BR>
+  #   FALSE - SMM Startup AP in a non-blocking fashion.<BR>
+  # @Prompt SMM Startup AP in a blocking fashion.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmBlockStartupThisAp|FALSE|BOOLEAN|0x32132108
+
+  ## Indicates if SMM Stack Guard will be enabled.
+  #  If enabled, stack overflow in SMM can be caught, preventing chaotic consequences.<BR><BR>
+  #   TRUE  - SMM Stack Guard will be enabled.<BR>
+  #   FALSE - SMM Stack Guard will be disabled.<BR>
+  # @Prompt Enable SMM Stack Guard.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackGuard|TRUE|BOOLEAN|0x1000001C
+
+  ## Indicates if BSP election in SMM will be enabled.
+  #  If enabled, a BSP will be dynamically elected among all processors in each SMI.
+  #  Otherwise, processor 0 is always as BSP in each SMI.<BR><BR>
+  #   TRUE  - BSP election in SMM will be enabled.<BR>
+  #   FALSE - BSP election in SMM will be disabled.<BR>
+  # @Prompt Enable BSP election in SMM.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmEnableBspElection|TRUE|BOOLEAN|0x32132106
+
+  ## Indicates if CPU SMM hot-plug will be enabled.<BR><BR>
+  #   TRUE  - SMM CPU hot-plug will be enabled.<BR>
+  #   FALSE - SMM CPU hot-plug will be disabled.<BR>
+  # @Prompt SMM CPU hot-plug.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugSupport|FALSE|BOOLEAN|0x3213210C
+
+  ## Indicates if SMM Debug will be enabled.
+  #  If enabled, hardware breakpoints in SMRAM can be set outside of SMM mode and take effect in SMM.<BR><BR>
+  #   TRUE  - SMM Debug will be enabled.<BR>
+  #   FALSE - SMM Debug will be disabled.<BR>
+  # @Prompt Enable SMM Debug.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmDebug|FALSE|BOOLEAN|0x1000001B
+
+  ## Indicates if lock SMM Feature Control MSR.<BR><BR>
+  #   TRUE  - SMM Feature Control MSR will be locked.<BR>
+  #   FALSE - SMM Feature Control MSR will not be locked.<BR>
+  # @Prompt Lock SMM Feature Control MSR.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmFeatureControlMsrLock|TRUE|BOOLEAN|0x3213210B
+
+  ## Indicates if SMRR will be enabled.<BR><BR>
+  #   TRUE  - SMRR will be enabled.<BR>
+  #   FALSE - SMRR will not be enabled.<BR>
+  # @Prompt Enable SMRR.
+  gUefiCpuPkgTokenSpaceGuid.PcdSmrrEnable|TRUE|BOOLEAN|0x3213210D
+
+  ## Indicates if SmmFeatureControl will be enabled.<BR><BR>
+  #   TRUE  - SmmFeatureControl will be enabled.<BR>
+  #   FALSE - SmmFeatureControl will not be enabled.<BR>
+  # @Prompt Support SmmFeatureControl.
+  gUefiCpuPkgTokenSpaceGuid.PcdSmmFeatureControlEnable|TRUE|BOOLEAN|0x32132110
+
+  ## Indicates if SMM perf logging in APs will be enabled.<BR><BR>
+  #   TRUE  - SMM perf logging in APs will be enabled.<BR>
+  #   FALSE - SMM perf logging in APs will not be enabled.<BR>
+  # @Prompt Enable SMM perf logging in APs.
+  gUefiCpuPkgTokenSpaceGuid.PcdSmmApPerfLogEnable|TRUE|BOOLEAN|0x32132114
+
+[PcdsFixedAtBuild]
+  ## List of exception vectors which need switching stack.
+  #  This PCD will only take into effect if PcdCpuStackGuard is enabled.
+  #  By default exception #DD(8), #PF(14) are supported.
+  # @Prompt Specify exception vectors which need switching stack.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuStackSwitchExceptionList|{0x08, 0x0E}|VOID*|0x30002000
+
+  ## Size of good stack for an exception.
+  #  This PCD will only take into effect if PcdCpuStackGuard is enabled.
+  # @Prompt Specify size of good stack of exception which need switching stack.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuKnownGoodStackSize|2048|UINT32|0x30002001
+
+  ## Count of pre allocated SMM MP tokens per chunk.
+  # @Prompt Specify the count of pre allocated SMM MP tokens per chunk.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmMpTokenCountPerChunk|64|UINT32|0x30002002
+
+  ## Area of memory where the SEV-ES work area block lives.
+  # @Prompt Configure the SEV-ES work area base
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase|0x0|UINT32|0x30002005
+
+  ## Size of teh area of memory where the SEV-ES work area block lives.
+  # @Prompt Configure the SEV-ES work area base
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaSize|0x0|UINT32|0x30002006
+
+  ## Determining APs' first-time wakeup by SIPI or INIT-SIPI-SIPI.
+  # Following a power-up or RESET of an MP system, The APs complete a
+  # minimal self-configuration, then wait for a startup signal (a SIPI
+  # message) from the BSP processor.
+  #
+  #   TRUE  - Broadcast SIPI.
+  #   FALSE - Broadcast INIT-SIPI-SIPI.
+  #
+  # @Prompt BSP Broadcast Method for the first-time wakeup of APs
+  gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi|TRUE|BOOLEAN|0x30002007
+
+  ## The max mapping address in page table before Temp Ram Exit.
+  # After physical memory is initialized and before Temp Ram Exit, the physical memory is in UC state.
+  # The PCD controls the page table max mapping address in physical memory before Temp Ram Exit
+  # because creating a big page table in UC physical memory to cover the entire memory space
+  # is slow. The value of 0xFFFFFFFFFFFFFFFF, then firmware will map entire physical address space.
+  # @Prompt Configure max mapping address in page table before Temp Ram Exit.
+  gUefiCpuPkgTokenSpaceGuid.PcdMaxMappingAddressBeforeTempRamExit|0xFFFFFFFFFFFFFFFF|UINT64|0x30002008
+
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+  ## This value is the CPU Local APIC base address, which aligns the address on a 4-KByte boundary.
+  # @Prompt Configure base address of CPU Local APIC
+  # @Expression  0x80000001 | (gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress & 0xfff) == 0
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress|0xfee00000|UINT32|0x00000001
+
+  ## Specifies delay value in microseconds after sending out an INIT IPI.
+  # @Prompt Configure delay value after send an INIT IPI
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuInitIpiDelayInMicroSeconds|10000|UINT32|0x30000002
+
+  ## This value specifies the Application Processor (AP) stack size, used for Mp Service, which must
+  ## aligns the address on a 4-KByte boundary.
+  # @Prompt Configure stack size for Application Processor (AP)
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize|0x8000|UINT32|0x00000003
+
+  ## Specifies stack size in the temporary RAM. 0 means half of TemporaryRamSize.
+  # @Prompt Stack size in the temporary RAM.
+  gUefiCpuPkgTokenSpaceGuid.PcdPeiTemporaryRamStackSize|0|UINT32|0x10001003
+
+  ## Specifies buffer size in bytes to save SMM profile data. The value should be a multiple of 4KB.
+  # @Prompt SMM profile data buffer size.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileSize|0x600000|UINT32|0x32132107
+
+  ## Specifies stack size in bytes for each processor in SMM.
+  # @Prompt Processor stack size in SMM.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackSize|0x2000|UINT32|0x32132105
+
+  ## Specifies shadow stack size in bytes for each processor in SMM.
+  # @Prompt Processor shadow stack size in SMM.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmShadowStackSize|0x2000|UINT32|0x3213210E
+
+  ## Indicates if SMM Code Access Check is enabled.
+  #  If enabled, the SMM handler cannot execute the code outside SMM regions.
+  #  This PCD is suggested to TRUE in production image.<BR><BR>
+  #   TRUE  - SMM Code Access Check will be enabled.<BR>
+  #   FALSE - SMM Code Access Check will be disabled.<BR>
+  # @Prompt SMM Code Access Check.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmCodeAccessCheckEnable|TRUE|BOOLEAN|0x60000013
+
+  ## Specifies the number of variable MTRRs reserved for OS use. The default number of
+  #  MTRRs reserved for OS use is 2.
+  # @Prompt Number of reserved variable MTRRs.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuNumberOfReservedVariableMtrrs|0x2|UINT32|0x00000015
+
+  ## Specifies buffer size in bytes for STM exception stack. The value should be a multiple of 4KB.
+  # @Prompt STM exception stack size.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStmExceptionStackSize|0x1000|UINT32|0x32132111
+
+  ## Specifies buffer size in bytes of MSEG. The value should be a multiple of 4KB.
+  # @Prompt MSEG size.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMsegSize|0x200000|UINT32|0x32132112
+
+  ## Specifies the supported CPU features bit in array.
+  # @Prompt Supported CPU features.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesSupport|{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}|VOID*|0x00000016
+
+  ## Specifies if CPU features will be initialized after SMM relocation.
+  # @Prompt If CPU features will be initialized after SMM relocation.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesInitAfterSmmRelocation|FALSE|BOOLEAN|0x0000001C
+
+  ## Specifies if CPU features will be initialized during S3 resume.
+  # @Prompt If CPU features will be initialized during S3 resume.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesInitOnS3Resume|TRUE|BOOLEAN|0x0000001D
+
+  ## Specifies CPUID Leaf 0x15 Time Stamp Counter and Nominal Core Crystal Clock Frequency.
+  # TSC Frequency = ECX (core crystal clock frequency) * EBX/EAX.
+  #   Intel Xeon Processor Scalable Family with CPUID signature 06_55H = 25000000 (25MHz)
+  #   6th and 7th generation Intel Core processors and Intel Xeon W Processor Family = 24000000 (24MHz)
+  #   Intel Atom processors based on Goldmont Microarchitecture with CPUID signature 06_5CH = 19200000 (19.2MHz)
+  # @Prompt This PCD is the nominal frequency of the core crystal clock in Hz as is CPUID Leaf 0x15:ECX
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuCoreCrystalClockFrequency|24000000|UINT64|0x32132113
+
+  ## Specifies the periodic interval value in microseconds for the status check
+  #  of APs for StartupAllAPs() and StartupThisAP() executed in non-blocking
+  #  mode in DXE phase.
+  # @Prompt Periodic interval value in microseconds for AP status check in DXE.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApStatusCheckIntervalInMicroSeconds|100000|UINT32|0x0000001E
+
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+  ## Specifies max supported number of Logical Processors.
+  # @Prompt Configure max supported number of Logical Processors
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber|64|UINT32|0x00000002
+  ## Specifies timeout value in microseconds for the BSP to detect all APs for the first time.
+  # @Prompt Timeout for the BSP to detect all APs for the first time.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds|50000|UINT32|0x00000004
+  ## Specifies the number of Logical Processors that are available in the
+  #  preboot environment after platform reset, including BSP and APs. Possible
+  #  values:<BR><BR>
+  #  zero (default) - PcdCpuBootLogicalProcessorNumber is ignored, and
+  #                   PcdCpuApInitTimeOutInMicroSeconds limits the initial AP
+  #                   detection by the BSP.<BR>
+  #  nonzero        - PcdCpuApInitTimeOutInMicroSeconds is ignored. The initial
+  #                   AP detection finishes only when the detected CPU count
+  #                   (BSP plus APs) reaches the value of
+  #                   PcdCpuBootLogicalProcessorNumber, regardless of how long
+  #                   that takes.<BR>
+  # @Prompt Number of Logical Processors available after platform reset.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuBootLogicalProcessorNumber|0|UINT32|0x00000008
+  ## Specifies the base address of the first microcode Patch in the microcode Region.
+  # @Prompt Microcode Region base address.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchAddress|0x0|UINT64|0x00000005
+  ## Specifies the size of the microcode Region.
+  # @Prompt Microcode Region size.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize|0x0|UINT64|0x00000006
+  ## Specifies the AP wait loop state during POST phase.
+  #  The value is defined as below.<BR><BR>
+  #  1: Place AP in the Hlt-Loop state.<BR>
+  #  2: Place AP in the Mwait-Loop state.<BR>
+  #  3: Place AP in the Run-Loop state.<BR>
+  # @Prompt The AP wait loop state.
+  # @ValidRange  0x80000001 | 1 - 3
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode|1|UINT8|0x60008006
+  ## Specifies the AP target C-state for Mwait during POST phase.
+  #  The default value 0 means C1 state.
+  #  The value is defined as below.<BR><BR>
+  # @Prompt The specified AP target C-state for Mwait.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApTargetCstate|0|UINT8|0x00000007
+
+  ## Specifies the 1st timeout value in microseconds for the BSP/AP in SMM to wait for one another to enter SMM.
+  # @Prompt The 1st BSP/AP synchronization timeout value in SMM.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout|1000000|UINT64|0x32132104
+
+  ## Specifies the 2nd timeout value in microseconds for the BSP/AP in SMM to wait for one another to enter SMM.
+  # @Prompt The 2nd BSP/AP synchronization timeout value in SMM.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout2|1000000|UINT64|0x32132115
+
+  ## Indicates the CPU synchronization method used when processing an SMI.
+  #   0x00  - Traditional CPU synchronization method.<BR>
+  #   0x01  - Relaxed CPU synchronization method.<BR>
+  # @Prompt SMM CPU Synchronization Method.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode|0x00|UINT8|0x60000014
+
+  ## Specifies the On-demand clock modulation duty cycle when ACPI feature is enabled.
+  # @Prompt The encoded values for target duty cycle modulation.
+  # @ValidRange  0x80000001 | 0 - 15
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuClockModulationDutyCycle|0x0|UINT8|0x0000001A
+
+  ## Indicates if the current boot is a power-on reset.<BR><BR>
+  #   TRUE  - Current boot is a power-on reset.<BR>
+  #   FALSE - Current boot is not a power-on reset.<BR>
+  # @Prompt Current boot is a power-on reset.
+  gUefiCpuPkgTokenSpaceGuid.PcdIsPowerOnReset|FALSE|BOOLEAN|0x0000001B
+
+  ## This PCD indicates whether CPU processor trace is enabled on BSP only when CPU processor trace is enabled.<BR><BR>
+  #  This PCD is ignored if CPU processor trace is disabled.<BR><BR>
+  #  TRUE  - CPU processor trace is enabled on BSP only.<BR>
+  #  FASLE - CPU processor trace is enabled on all CPU.<BR>
+  # @Prompt Enable CPU processor trace only on BSP.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceBspOnly|FALSE|BOOLEAN|0x60000019
+
+  ## This PCD indicates if enable performance collecting when CPU processor trace is enabled.<BR><BR>
+  #  CYC/TSC timing packets will be generated to collect performance data if this PCD is TRUE.
+  #  This PCD is ignored if CPU processor trace is disabled.<BR><BR>
+  #  TRUE  - Performance collecting will be enabled in processor trace.<BR>
+  #  FASLE - Performance collecting will be disabled in processor trace.<BR>
+  # @Prompt Enable performance collecting when processor trace is enabled.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTracePerformanceCollecting|FALSE|BOOLEAN|0x60000020
+
+[PcdsFixedAtBuild.X64, PcdsPatchableInModule.X64, PcdsDynamic.X64, PcdsDynamicEx.X64]
+  ## Indicate access to non-SMRAM memory is restricted to reserved, runtime and ACPI NVS type after SmmReadyToLock.
+  #  MMIO access is always allowed regardless of the value of this PCD.
+  #  Loose of such restriction is only required by RAS components in X64 platforms.
+  #  The PCD value is considered as constantly TRUE in IA32 platforms.
+  #  When the PCD value is TRUE, page table is initialized to cover all memory spaces
+  #  and the memory occupied by page table is protected by page table itself as read-only.
+  #  In X64 build, it cannot be enabled at the same time with SMM profile feature (PcdCpuSmmProfileEnable).
+  #  In X64 build, it could not be enabled also at the same time with heap guard feature for SMM
+  #  (PcdHeapGuardPropertyMask in MdeModulePkg).
+  #  In IA32 build, page table memory is not marked as read-only when either SMM profile feature (PcdCpuSmmProfileEnable)
+  #  or heap guard feature for SMM (PcdHeapGuardPropertyMask in MdeModulePkg) is enabled.
+  #   TRUE  - Access to non-SMRAM memory is restricted to reserved, runtime and ACPI NVS type after SmmReadyToLock.<BR>
+  #   FALSE - Access to any type of non-SMRAM memory after SmmReadyToLock is allowed.<BR>
+  # @Prompt Access to non-SMRAM memory is restricted to reserved, runtime and ACPI NVS type after SmmReadyToLock.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmRestrictedMemoryAccess|TRUE|BOOLEAN|0x3213210F
+
+[PcdsFixedAtBuild.RISCV64]
+  ## Indicate the maximum SATP mode allowed.
+  #  0 - Bare mode.
+  #  8 - 39bit mode.
+  #  9 - 48bit mode.
+  #  10 - 57bit mode.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuRiscVMmuMaxSatpMode|10|UINT32|0x60000021
+
+[PcdsFixedAtBuild.LOONGARCH64, PcdsPatchableInModule.LOONGARCH64, PcdsDynamic.LOONGARCH64, PcdsDynamicEx.LOONGARCH64]
+  ## This PCD Contains the pointer to a CPU exception vector base address.
+  # @Prompt The pointer to a CPU exception vector base address.
+  gUefiCpuPkgTokenSpaceGuid.PcdLoongArchExceptionVectorBaseAddress|0x0|UINT64|0x60000022
+
+[PcdsDynamic, PcdsDynamicEx]
+  ## Contains the pointer to a CPU S3 data buffer of structure ACPI_CPU_DATA.
+  # @Prompt The pointer to a CPU S3 data buffer.
+  # @ValidList   0x80000001 | 0
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuS3DataAddress|0x0|UINT64|0x60000010
+
+  ## Contains the pointer to a CPU Hot Plug Data structure if CPU hot-plug is supported.
+  # @Prompt The pointer to CPU Hot Plug Data.
+  # @ValidList   0x80000001 | 0
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugDataAddress|0x0|UINT64|0x60000011
+
+  ## Indicates processor feature capabilities, each bit corresponding to a specific feature.
+  # @Prompt Processor feature capabilities.
+  # @ValidList   0x80000001 | 0
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesCapability|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}|VOID*|0x00000018
+
+  ## As input, specifies user's desired settings for enabling/disabling processor features.
+  ## As output, specifies actual settings for processor features, each bit corresponding to a specific feature.
+  # @Prompt As input, specifies user's desired processor feature settings. As output, specifies actual processor feature settings.
+  # @ValidList   0x80000001 | 0
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesSetting|{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}|VOID*|0x00000019
+
+  ## Contains the size of memory required when CPU processor trace is enabled.<BR><BR>
+  #  Processor trace is enabled through set BIT44(CPU_FEATURE_PROC_TRACE) in PcdCpuFeaturesSetting.<BR><BR>
+  #  This PCD is ignored if CPU processor trace is disabled.<BR><BR>
+  #  Default value is 0x00 which means 4KB of memory is allocated if CPU processor trace is enabled.<BR>
+  #  0x0  -  4K.<BR>
+  #  0x1  -  8K.<BR>
+  #  0x2  -  16K.<BR>
+  #  0x3  -  32K.<BR>
+  #  0x4  -  64K.<BR>
+  #  0x5  -  128K.<BR>
+  #  0x6  -  256K.<BR>
+  #  0x7  -  512K.<BR>
+  #  0x8  -  1M.<BR>
+  #  0x9  -  2M.<BR>
+  #  0xA  -  4M.<BR>
+  #  0xB  -  8M.<BR>
+  #  0xC  -  16M.<BR>
+  #  0xD  -  32M.<BR>
+  #  0xE  -  64M.<BR>
+  #  0xF  -  128M.<BR>
+  # @Prompt The memory size used for processor trace if processor trace is enabled.
+  # @ValidRange  0x80000001 | 0 - 0xF
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceMemSize|0x0|UINT32|0x60000012
+
+  ## Contains the processor trace output scheme when CPU processor trace is enabled.<BR><BR>
+  #  Processor trace is enabled through set BIT44(CPU_FEATURE_PROC_TRACE) in PcdCpuFeaturesSetting.<BR><BR>
+  #  This PCD is ignored if CPU processor trace is disabled.<BR><BR>
+  #  Default value is 0 which means single range output scheme will be used if CPU processor trace is enabled.<BR>
+  #  0 - Single Range output scheme.<BR>
+  #  1 - ToPA(Table of physical address) scheme.<BR>
+  # @Prompt The processor trace output scheme used when processor trace is enabled.
+  # @ValidRange  0x80000001 | 0 - 1
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceOutputScheme|0x0|UINT8|0x60000015
+
+  ## This dynamic PCD indicates whether SEV-ES is enabled
+  #   TRUE  - SEV-ES is enabled
+  #   FALSE - SEV-ES is not enabled
+  # @Prompt SEV-ES Status
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled|FALSE|BOOLEAN|0x60000016
+
+  ## This dynamic PCD contains the hypervisor features value obtained through the GHCB HYPERVISOR
+  #  features VMGEXIT defined in the version 2 of GHCB spec.
+  # @Prompt GHCB Hypervisor Features
+  gUefiCpuPkgTokenSpaceGuid.PcdGhcbHypervisorFeatures|0x0|UINT64|0x60000018
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  UefiCpuPkgExtra.uni

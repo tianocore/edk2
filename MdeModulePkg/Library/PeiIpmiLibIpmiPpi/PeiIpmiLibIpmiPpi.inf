@@ -1,0 +1,37 @@
+## @file
+#  Instance of IPMI Library in PEI phase for SMS.
+#
+#  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiIpmiLibIpmiPpi
+  MODULE_UNI_FILE                = PeiIpmiLibIpmiPpi.uni
+  FILE_GUID                      = 43679142-87C4-44AD-AF02-B47F782D6CF3
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = IpmiLib|PEIM PEI_CORE
+
+#
+#  VALID_ARCHITECTURES          = IA32 X64
+#
+
+[Sources]
+  PeiIpmiLibIpmiPpi.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  BaseMemoryLib
+  PeiServicesLib
+
+[Ppis]
+  gPeiIpmiPpiGuid      ## SOMETIMES_CONSUMES

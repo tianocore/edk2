@@ -1,0 +1,59 @@
+#/** @file
+#
+#  Driver clears the encryption attribute from MMIO regions when SEV is enabled
+#
+#  Copyright (c) 2017 - 2020, AMD Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 1.25
+  BASE_NAME                      = AmdSevDxe
+  FILE_GUID                      = 2ec9da37-ee35-4de9-86c5-6d9a81dc38a7
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = AmdSevDxeEntryPoint
+
+[Sources]
+  AmdSevDxe.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DxeServicesTableLib
+  MemEncryptSevLib
+  MemoryAllocationLib
+  PcdLib
+  UefiDriverEntryPoint
+
+[Depex]
+  TRUE
+
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsSize
+
+[Protocols]
+  gEdkiiMemoryAcceptProtocolGuid
+  gOvmfSevMemoryAcceptanceProtocolGuid
+
+[Guids]
+  gConfidentialComputingSevSnpBlobGuid
+  gEfiEventBeforeExitBootServicesGuid
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId

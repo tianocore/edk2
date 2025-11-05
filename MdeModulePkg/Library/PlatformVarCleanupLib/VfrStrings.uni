@@ -1,0 +1,29 @@
+///** @file
+//  String definitions for platform variable cleanup.
+//
+//  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//**/
+
+/=#
+
+#langdef en-US "English"
+#langdef fr-FR "Francais"
+
+#string STR_ENTRY_TITLE                         #language en-US  "Platform Variable Cleanup Form"
+                                                #language fr-FR  "fr-FR: Platform Variable Cleanup Form"
+#string STR_TITLE                               #language en-US  "Platform Variable Cleanup"
+                                                #language fr-FR  "fr-FR: Platform Variable Cleanup"
+#string STR_TITLE_HELP                          #language en-US  "Select and cleanup variables"
+                                                #language fr-FR  "fr-FR: Select and cleanup variables"
+#string STR_SELECT_ALL_PROMPT                   #language en-US  "Select all"
+                                                #language fr-FR  "fr-FR: Select all"
+#string STR_SELECT_ALL_HELP                     #language en-US  "Select all, then all the listed user variables below will be deleted when Commit or Save."
+                                                #language fr-FR  "fr-FR: Select all, then all the listed user variables below will be deleted when Commit or Save."
+#string STR_NULL_STRING                         #language en-US  ""
+                                                #language fr-FR  ""
+#string STR_SAVE_AND_EXIT                       #language en-US  "Commit Changes and Exit"
+                                                #language fr-FR  "fr-FR: Commit Changes and Exit"
+#string STR_NO_SAVE_AND_EXIT                    #language en-US  "Discard Changes and Exit"
+                                                #language fr-FR  "fr-FR: Discard Changes and Exit"

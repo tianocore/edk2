@@ -1,0 +1,39 @@
+## @file
+#  Xenio FDT client protocol driver for xen,xen DT node
+#
+#  Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = XenioFdtDxe
+  FILE_GUID                      = 338695EA-CA84-4FA2-9DA8-5C4BB87905C6
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeXenioFdtDxe
+
+[Sources]
+  XenioFdtDxe.c
+
+[Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  XenIoMmioLib
+
+[Protocols]
+  gFdtClientProtocolGuid                                ## CONSUMES
+
+[Depex]
+  gFdtClientProtocolGuid

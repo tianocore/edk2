@@ -1,0 +1,36 @@
+# This workflow automatically applies labels to pull requests based on regular expression matches against the content
+# in the pull request.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+# For more information, see:
+# https://github.com/github/issue-labeler
+
+name: Apply Labels Based on Message Content
+
+on:
+  pull_request_target:
+    types:
+      - edited
+      - opened
+      - reopened
+      - synchronize
+  workflow_dispatch:
+
+jobs:
+  sync:
+    name: Label PR from Description
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Apply Labels Based on PR Description
+        uses: github/issue-labeler@v3.4
+        with:
+          configuration-path: .github/workflows/pr-labeler/regex.yml
+          enable-versioned-regex: 0
+          repo-token: ${{ secrets.GITHUB_TOKEN }}

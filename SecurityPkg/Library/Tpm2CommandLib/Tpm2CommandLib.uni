@@ -1,0 +1,16 @@
+// /** @file
+// Provides some TPM 2.0 commands
+//
+// This library is used by other modules to send TPM 2.0 command.
+//
+// Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Provides some TPM 2.0 command functions"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library is used by other modules to send TPM 2.0 command."
+

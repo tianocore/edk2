@@ -1,0 +1,104 @@
+## @file
+#  Capsule library instance for DXE_DRIVER.
+#
+#  Capsule library instance for DXE_DRIVER module types.
+#
+#  Copyright (c) 2016 - 2021, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeCapsuleLib
+  MODULE_UNI_FILE                = DxeCapsuleLib.uni
+  FILE_GUID                      = 534E35DE-8EB3-47b3-A4E0-72A571E50733
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CapsuleLib|DXE_DRIVER UEFI_APPLICATION
+  CONSTRUCTOR                    = DxeCapsuleLibConstructor
+  DESTRUCTOR                     = DxeCapsuleLibDestructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DxeCapsuleLib.c
+  DxeCapsuleProcessLib.c
+  DxeCapsuleReportLib.c
+  CapsuleOnDisk.c
+  CapsuleOnDisk.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  DxeServicesTableLib
+  UefiBootServicesTableLib
+  DevicePathLib
+  ReportStatusCodeLib
+  PrintLib
+  HobLib
+  BmpSupportLib
+  DisplayUpdateProgressLib
+  FileHandleLib
+  UefiBootManagerLib
+  VariablePolicyHelperLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleMax                               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSystemRebootAfterCapsuleProcessFlag      ## CONSUMES
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeSubClassCapsule                ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeProcessCapsulesBegin    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeProcessCapsulesEnd      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeUpdatingFirmware        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeUpdateFirmwareSuccess   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeUpdateFirmwareFailed    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeResettingSystem         ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleInRamSupport                      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleOnDiskSupport                     ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCodRelocationDevPath                     ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCoDRelocationFileName                    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleEmbeddedDriverSupport             ## CONSUMES
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset ## CONSUMES
+
+[Protocols]
+  gEsrtManagementProtocolGuid                   ## CONSUMES
+  gEfiFirmwareManagementProtocolGuid            ## CONSUMES
+  gEdkiiFirmwareManagementProgressProtocolGuid  ## SOMETIMES_CONSUMES
+  gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiBlockIoProtocolGuid                       ## CONSUMES
+  gEfiDiskIoProtocolGuid                        ## CONSUMES
+  gEdkiiVariablePolicyProtocolGuid              ## CONSUMES
+
+[Guids]
+  gEfiFmpCapsuleGuid                      ## SOMETIMES_CONSUMES ## GUID
+  gWindowsUxCapsuleGuid                   ## SOMETIMES_CONSUMES ## GUID
+  ## SOMETIMES_CONSUMES ## Variable:L"CapsuleMax"
+  ## SOMETIMES_PRODUCES ## Variable:L"CapsuleMax"
+  gEfiCapsuleReportGuid
+  gEfiCapsuleVendorGuid                   ## SOMETIMES_CONSUMES ## Variable:L"CapsuleUpdateData"
+  gEfiEndOfDxeEventGroupGuid              ## CONSUMES ## Event
+  gEfiPartTypeSystemPartGuid              ## SOMETIMES_CONSUMES
+  gEfiCapsuleVendorGuid                   ## SOMETIMES_CONSUMES ## Variable:L"CodRelocationInfo"
+  ## SOMETIMES_CONSUMES ## Variable:L"OsIndications"
+  ## SOMETIMES_PRODUCES ## Variable:L"OsIndications"
+  ## SOMETIMES_CONSUMES ## Variable:L"BootNext"
+  ## SOMETIMES_PRODUCES ## Variable:L"BootNext"
+  gEfiGlobalVariableGuid
+  gEdkiiCapsuleOnDiskNameGuid             ## SOMETIMES_CONSUMES ## GUID
+
+[Depex]
+  gEfiVariableWriteArchProtocolGuid

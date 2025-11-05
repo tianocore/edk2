@@ -1,0 +1,31 @@
+### @file
+#   NULL TPM Platform Hierarchy configuration library.
+#
+#   This library provides functions for customizing the TPM's Platform Hierarchy
+#   Authorization Value (platformAuth) and Platform Hierarchy Authorization
+#   Policy (platformPolicy) can be defined through this function.
+#
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 1.27
+  BASE_NAME                      = BasePlatform
+  FILE_GUID                      = 8947A3F2-BfB4-45EF-968D-5C40C1CE6A58
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TpmPlatformHierarchyLib|PEIM DXE_DRIVER
+
+[LibraryClasses]
+  BaseLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[Sources]
+  PeiDxeTpmPlatformHierarchyLib.c

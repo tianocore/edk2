@@ -1,0 +1,34 @@
+## @file
+#  SMM CPU Platform Hook NULL library instance.
+#
+#  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmCpuPlatformHookLibNull
+  MODULE_UNI_FILE                = SmmCpuPlatformHookLibNull.uni
+  FILE_GUID                      = D6494E1B-E06F-4ab5-B64D-48B25AA9EB33
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SmmCpuPlatformHookLib|DXE_SMM_DRIVER MM_STANDALONE MM_CORE_STANDALONE
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SmmCpuPlatformHookLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec

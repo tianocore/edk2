@@ -1,0 +1,60 @@
+## @file
+# Customize display library used by display engine.
+#
+#  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CustomizedDisplayLib
+  MODULE_UNI_FILE                = CustomizedDisplayLibModStrs.uni
+  FILE_GUID                      = 80B92017-EC64-4923-938D-94FAEE85832E
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CustomizedDisplayLib|DXE_DRIVER UEFI_APPLICATION
+  CONSTRUCTOR                    = CustomizedDisplayLibConstructor
+  DESTRUCTOR                     = CustomizedDisplayLibDestructor
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  CustomizedDisplayLib.c
+  Colors.h
+  CustomizedDisplayLibInternal.h
+  CustomizedDisplayLibInternal.c
+  CustomizedDisplayLib.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  PrintLib
+  HiiLib
+  DevicePathLib
+  PcdLib
+
+[Guids]
+  gEfiIfrTianoGuid  ## SOMETIMES_CONSUMES   ## UNDEFINED
+
+[Protocols]
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserSubtitleTextColor               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserFieldTextColor                  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserFieldTextHighlightColor         ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserFieldBackgroundHighlightColor   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFrontPageFormSetGuid                   ## CONSUMES

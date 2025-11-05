@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible">
+    <title>Build Tools Report</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css" />
+    <style>
+        div.attribution {
+            border: 1px solid #ddd;
+            background-color: #bbb;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <h1>Build Tools Report</h1>
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#tabs-1">Tools</a></li>
+            <li><a data-toggle="tab" href="#tabs-2">About</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="tabs-1" class="tab-pane fade in active">
+                <table id="modinfo" class="table table-striped table-bordered table-hover" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div id="tabs-2" class="tab-pane">
+                <div class="row">
+                    <div class="col-xs-7">
+                        <p></p>
+                        <p>
+                            Build Tools Report Template Version: <span id="ReportTemplateVersion">1.00</span><br />
+                            Build Tools Report Plugin Version: <span id='ReportToolVersion'></span><br />
+                        </p>
+                        <h3>License</h3>
+                        <hr />
+                        <div id="ToolLicenseContent">
+                            <p>
+                                <span class="copyright">Copyright (c) Microsoft Corporation.</span><br />
+                                <span class="license">
+                                    SPDX-License-Identifier: BSD-2-Clause-Patent
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div id="AttributionListWrapper" class="col-xs-5">
+                        <h3>External Licenses</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Javascript libraries -->
+    <script type="text/javascript" charset="utf8" src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
+
+    <script>
+        var EmbeddedJd = %TO_BE_FILLED_IN_BY_PYTHON_SCRIPT%;
+    </script>
+    <!-- Add javascript here -->
+    <script>
+        var MODULE_TABLE_OFFSET = 350;  //Space needed for other stuff besides the Table
+        $(document).ready(function () {
+            $('span#ReportToolVersion').text(EmbeddedJd.PluginVersion);
+            //To support tabs and correct column width we need this change
+            $('a[data-toggle="tab"][href="#tabs-1"]').on('shown.bs.tab', function (e) {
+                $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+            });
+            //table for modules
+            var mTable = $('table#modinfo').dataTable({
+                "aaData": EmbeddedJd.modules,
+                "paginate": false,
+                "autoWidth": false,
+                "scrollY": ($(window).height() - MODULE_TABLE_OFFSET) + "px",
+                "aaSorting": [[2, "asc"]],
+                "aoColumnDefs": [
+                    {
+                        "mData": "name",
+                        "aTargets": [0]
+                    },
+
+                    {
+                        "mData": "version",
+                        "aTargets": [1]
+                    },
+                    {
+                        "mData": "type",
+                        "aTargets": [2],
+                    }
+                ] //end of column def
+            }); //end of modules table
+
+            //
+            // Create Attribution List for all external libraries used
+            //
+            [
+                { Title: "JQuery", Copyright: "Copyright 2017 The jQuery Foundation", Version: $.fn.jquery, LicenseType: "MIT", LicenseLink: "https://jquery.org/license/" },
+                { Title: "DataTables", Copyright: "DataTables designed and created by SpryMedia Ltd Copyright 2007-2017", Version: $.fn.dataTable.version, LicenseType: "MIT", LicenseLink: "https://datatables.net/license/mit" },
+                { Title: "BootStrap", Copyright: "Code and documentation copyright 2011-2017 the Bootstrap Authors and Twitter, Inc.", Version: "3.3.7", LicenseType: "MIT", LicenseLink: "https://github.com/twbs/bootstrap/blob/master/LICENSE" }
+            ].forEach(function (element) {
+                $("<div class='attribution'><h4>" + element.Title + "</h4><p>Version: <span class='version'>" + element.Version + "</span><br /><span class='copyright'>" +
+                    element.Copyright + "</span><br />License: <a class='license' href='" + element.LicenseLink + "'>" + element.LicenseType + "</a></p></div>").appendTo("div#AttributionListWrapper");
+            });
+        });
+        $(window).resize(function() {
+            $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+        });
+
+
+    </script>
+</body>
+</html>

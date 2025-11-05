@@ -1,0 +1,17 @@
+// /** @file
+// This module collects performance data for SMM driver boot records and S3 Suspend Performance Record.
+//
+// This module registers report status code listener to collect performance data
+// for SMM boot performance records and S3 Suspend Performance Record.
+//
+// Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Collects performance data for SMM driver boot records and S3 Suspend Performance Record"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module registers report status code listener to collect performance data for SMM boot performance records and S3 Suspend Performance Record."
+

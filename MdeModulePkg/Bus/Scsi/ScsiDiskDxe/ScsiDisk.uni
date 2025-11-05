@@ -1,0 +1,16 @@
+// /** @file
+// The Scsi Disk driver is used to retrieve the media info in the attached SCSI disk.
+//
+// It detects the SCSI disk media and installs Block I/O Protocol on the device handle.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Used to retrieve the media information in the attached SCSI disk"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "It detects the SCSI disk media and installs Block I/O Protocol on the device handle."
+

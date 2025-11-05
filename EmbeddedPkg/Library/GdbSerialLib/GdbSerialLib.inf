@@ -1,0 +1,41 @@
+#/** @file
+# Component description file for Base PCI Cf8 Library.
+#
+# PCI CF8 Library that uses I/O ports 0xCF8 and 0xCFC to perform PCI Configuration cycles.
+#  Layers on top of an I/O Library instance.
+# Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = GdbSerialLib
+  FILE_GUID                      = 9999B4EE-081F-4501-AEDC-137A534BAF69
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = GdbSerialLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+  CONSTRUCTOR                    = GdbSerialLibConstructor
+
+
+[Sources.common]
+  GdbSerialLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  IoLib
+
+[FixedPcd.common]
+  gEmbeddedTokenSpaceGuid.PcdGdbBaudRate|115200
+  gEmbeddedTokenSpaceGuid.PcdGdbDataBits|8
+  gEmbeddedTokenSpaceGuid.PcdGdbParity|1
+  gEmbeddedTokenSpaceGuid.PcdGdbStopBits|1
+  gEmbeddedTokenSpaceGuid.PcdGdbUartPort

@@ -1,0 +1,79 @@
+## @file
+#  Produces a Firmware Management Protocol that supports updates to a firmware
+#  image stored in a firmware device with platform and firmware device specific
+#  information provided through PCDs and libraries.
+#
+#  Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
+#  Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FmpDxe
+  MODULE_UNI_FILE                = FmpDxe.uni
+  FILE_GUID                      = 78EF0A56-1CF0-4535-B5DA-F6FD2F405A11
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = FmpDxeEntryPoint
+  UNLOAD_IMAGE                   = UninstallFmpInstance
+
+[Sources]
+  FmpDxe.c
+  FmpDxe.h
+  DetectTestKey.c
+  VariableSupport.h
+  VariableSupport.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  CryptoPkg/CryptoPkg.dec
+  FmpDevicePkg/FmpDevicePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  DebugLib
+  BaseLib
+  BaseMemoryLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  PrintLib
+  UefiLib
+  BaseCryptLib
+  FmpAuthenticationLib
+  FmpDeviceLib
+  FmpPayloadHeaderLib
+  CapsuleUpdatePolicyLib
+  FmpDependencyLib
+  FmpDependencyCheckLib
+  FmpDependencyDeviceLib
+  VariablePolicyHelperLib
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+
+[Protocols]
+  gEfiFirmwareManagementProtocolGuid            ## PRODUCES
+  gEdkiiFirmwareManagementProgressProtocolGuid  ## PRODUCES
+  gEdkiiVariablePolicyProtocolGuid              ## CONSUMES
+
+[Pcd]
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceStorageAccessEnable              ## CONSUMES
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageIdName                      ## CONSUMES
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceBuildTimeLowestSupportedVersion  ## CONSUMES
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceLockEventGuid                    ## CONSUMES
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceProgressWatchdogTimeInSeconds    ## CONSUMES
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceProgressColor                    ## CONSUMES
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr               ## CONSUMES
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceTestKeySha256Digest              ## CONSUMES
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageTypeIdGuid                  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed                            ## SOMETIMES_PRODUCES
+
+[Depex]
+  gEfiVariableWriteArchProtocolGuid AND gEdkiiVariablePolicyProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  FmpDxeExtra.uni

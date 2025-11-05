@@ -1,0 +1,475 @@
+
+=== OVMF OVERVIEW ===
+
+The Open Virtual Machine Firmware (OVMF) project aims
+to support firmware for Virtual Machines using the edk2
+code base.  More information can be found at:
+
+http://www.tianocore.org/ovmf/
+
+=== STATUS ===
+
+Current capabilities:
+* X64 architecture (optionally with IA32 SEC/PEI)
+* QEMU (version 1.7.1 or later, with 1.7 or later machine types)
+  - Video, keyboard, IDE, CD-ROM, serial
+  - Runs UEFI shell
+  - Optional NIC support.
+* UEFI Linux boots
+* UEFI Windows 8 boots
+* UEFI Windows 7 & Windows 2008 Server boot (see important notes below!)
+
+=== FUTURE PLANS ===
+
+* Test/Stabilize UEFI Self-Certification Tests (SCT) results
+
+=== BUILDING OVMF ===
+
+Pre-requisites:
+* Build environment capable of build the edk2 MdeModulePkg.
+* A properly configured ASL compiler:
+  - Intel ASL compiler: Available from
+    https://www.intel.com/content/www/us/en/developer/topic-technology/open/acpica/download.html
+  - Microsoft ASL compiler: Available from
+    https://learn.microsoft.com/en-us/windows-hardware/drivers/bringup/microsoft-asl-compiler
+* NASM: https://www.nasm.us/
+
+Update Conf/target.txt ACTIVE_PLATFORM for OVMF:
+                             PEI arch   DXE arch   UEFI interfaces
+* OvmfPkg/OvmfPkgIa32X64.dsc   IA32       X64            X64
+* OvmfPkg/OvmfPkgX64.dsc       X64        X64            X64
+
+Update Conf/target.txt TARGET_ARCH based on the .dsc file:
+                             TARGET_ARCH
+* OvmfPkg/OvmfPkgIa32X64.dsc  IA32 X64
+* OvmfPkg/OvmfPkgX64.dsc      X64
+
+Following the edk2 build process, you will find the OVMF binaries
+under the $WORKSPACE/Build/*/*/FV directory.  The actual path will
+depend on how your build is configured.  You can expect to find
+these binary outputs:
+* OVMF.FD
+  - Please note!  This filename has changed.  Older releases used OVMF.Fv.
+* OvmfVideo.rom
+  - This file is not built separately any longer, starting with svn r13520.
+
+If you are new to building in edk2 or looking for the latest build
+instructions, visit https://github.com/tianocore/tianocore.github.io/wiki/Build-Instructions
+
+More OVMF-specific build information can be found at:
+
+https://github.com/tianocore/tianocore.github.io/wiki/How%20to%20build%20OVMF
+
+=== RUNNING OVMF on QEMU ===
+
+* Be sure to use qemu-system-x86_64, if you are using an X64 firmware.
+  (qemu-system-x86_64 works for the IA32 SEC/PEI as well, of course.)
+* Use OVMF for QEMU firmware (3 options available)
+  - Option 1: Use QEMU -pflash parameter
+    * QEMU/OVMF will use emulated flash, and fully support UEFI variables
+    * Run qemu with: -pflash path/to/OVMF.fd
+    * Note that this option is required for running SecureBoot-enabled builds
+      (-D SECURE_BOOT_ENABLE).
+  - Option 2: Use QEMU -bios parameter
+    * Note that UEFI variables will be partially emulated, and non-volatile
+      variables may lose their contents after a reboot
+    * Run qemu with: -bios path/to/OVMF.fd
+  - Option 3: Use QEMU -L parameter
+    * Note that UEFI variables will be partially emulated, and non-volatile
+      variables may lose their contents after a reboot
+    * Either copy, rename or symlink OVMF.fd => bios.bin
+    * Use the QEMU -L parameter to specify the directory where the bios.bin
+      file is located.
+* The EFI shell is built into OVMF builds at this time, so it should
+  run automatically if a UEFI boot application is not found on the
+  removable media.
+* On Linux, newer version of QEMU may enable KVM feature, and this might
+  cause OVMF to fail to boot.  The QEMU '-no-kvm' may allow OVMF to boot.
+* Capturing OVMF debug messages on qemu:
+  - The default OVMF build writes debug messages to IO port 0x402.  The
+    following qemu command line options save them in the file called
+    debug.log: '-debugcon file:debug.log -global isa-debugcon.iobase=0x402'.
+  - It is possible to revert to the original behavior, when debug messages were
+    written to the emulated serial port (potentially intermixing OVMF debug
+    output with UEFI serial console output).  For this the
+    '-D DEBUG_ON_SERIAL_PORT' option has to be passed to the build command (see
+    the next section), and in order to capture the serial output qemu needs to
+    be started with eg. '-serial file:serial.log'.
+  - Debug messages fall into several categories.  Logged vs. suppressed
+    categories are controlled at OVMF build time by the
+    'gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel' bitmask (an UINT32
+    value) in the selected .dsc file.  Individual bits of this bitmask are
+    defined in <MdePkg/Include/Library/DebugLib.h>.  One non-default bit (with
+    some performance impact) that is frequently set for debugging is 0x00400000
+    (DEBUG_VERBOSE).
+  - The RELEASE build target ('-b RELEASE' build option, see below) disables
+    all debug messages.  The default build target is DEBUG.
+
+=== Build Scripts ===
+
+On systems with the bash shell you can use OvmfPkg/build.sh to simplify
+building and running OVMF.
+
+So, for example, to build + run OVMF X64:
+$ OvmfPkg/build.sh -a X64
+$ OvmfPkg/build.sh -a X64 qemu
+
+And to run a 64-bit UEFI bootable ISO image:
+$ OvmfPkg/build.sh -a X64 qemu -cdrom /path/to/disk-image.iso
+
+=== Secure Boot ===
+
+Secure Boot is a security feature that ensures only trusted and digitally
+signed software is allowed to run during the boot process. This is achieved
+by storing Secure Boot keys in UEFI Variables, as result it can be easily
+bypassed by writing directly to the flash varstore. To avoid this situation,
+it's necessary to make the varstore with SB keys read-only and/or provide an
+isolated execution environment for flash access (such as SMM).
+
+* In order to support Secure Boot, OVMF must be built with the
+  "-D SECURE_BOOT_ENABLE" option.
+
+* By default, OVMF is not shipped with any SecureBoot keys installed. The user
+  need to install them with "Secure Boot Configuration" utility in the firmware
+  UI, or enroll the default UEFI keys using the OvmfPkg/EnrollDefaultKeys app.
+
+  For the EnrollDefaultKeys application, the hypervisor is expected to add a
+  string entry to the "OEM Strings" (Type 11) SMBIOS table. The string should
+  have the following format:
+
+    4e32566d-8e9e-4f52-81d3-5bb9715f9727:<Base64 X509 cert for PK and first KEK>
+
+  Such string can be generated with the following script, for example:
+
+    sed \
+      -e 's/^-----BEGIN CERTIFICATE-----$/4e32566d-8e9e-4f52-81d3-5bb9715f9727:/' \
+      -e '/^-----END CERTIFICATE-----$/d' \
+      PkKek1.pem \
+    | tr -d '\n' \
+    > PkKek1.oemstr
+
+  - Using QEMU 5.2 or later, the SMBIOS type 11 field can be specified from a
+    file:
+
+    -smbios type=11,path=PkKek1.oemstr \
+
+  - Using QEMU 5.1 or earlier, the string has to be passed as a value:
+
+    -smbios type=11,value="$(< PkKek1.oemstr)"
+
+=== SMM support ===
+
+Requirements:
+* SMM support requires QEMU 2.5.
+* The minimum required QEMU machine type is "pc-q35-2.5".
+* SMM with KVM requires Linux 4.4 (host).
+
+OVMF is capable of utilizing SMM if the underlying QEMU or KVM hypervisor
+emulates SMM. SMM is put to use in the S3 suspend and resume infrastructure,
+and in the UEFI variable driver stack. The purpose is (virtual) hardware
+separation between the runtime guest OS and the firmware (OVMF), with the
+intent to make Secure Boot actually secure, by preventing the runtime guest OS
+from tampering with the variable store and S3 areas.
+
+For SMM support, OVMF must be built with the "-D SMM_REQUIRE" option. The
+resultant firmware binary will check if QEMU actually provides SMM emulation;
+if it doesn't, then OVMF will log an error and trigger an assertion failure
+during boot (even in RELEASE builds). Both the naming of the flag (SMM_REQUIRE,
+instead of SMM_ENABLE), and this behavior are consistent with the goal
+described above: this is supposed to be a security feature, and fallbacks are
+not allowed. Similarly, a pflash-backed variable store is a requirement.
+
+QEMU should be started with the options listed below (in addition to any other
+guest-specific flags). The command line should be gradually composed from the
+hints below. '\' is used to extend the command line to multiple lines, and '^'
+can be used on Windows.
+
+* QEMU binary and options specific to 32-bit guests:
+
+  $ qemu-system-i386 -cpu coreduo,-nx \
+
+  or
+
+  $ qemu-system-x86_64 -cpu <MODEL>,-lm,-nx \
+
+* QEMU binary for running 64-bit guests (no particular options):
+
+  $ qemu-system-x86_64 \
+
+* Flags common to all SMM scenarios (only the Q35 machine type is supported):
+
+  -machine q35,smm=on,accel=(tcg|kvm) \
+  -m ... \
+  -smp ... \
+  -global driver=cfi.pflash01,property=secure,value=on \
+  -drive if=pflash,format=raw,unit=0,file=OVMF_CODE.fd,readonly=on \
+  -drive if=pflash,format=raw,unit=1,file=copy_of_OVMF_VARS.fd \
+
+* In order to disable S3, add:
+
+  -global ICH9-LPC.disable_s3=1 \
+
+=== Standalone MM Support ===
+
+Standalone MM (Management Mode) in UEFI is a secure execution environment
+provided by the CPU and related silicon, designed to improve security and
+portability compared to Traditional MM. It operates independently of the DXE
+(Driver Execution Environment) phase, ensuring better isolation and reducing
+vulnerabilities.
+
+Standalone MM leverages the same hardware capabilities as Traditional MM but
+revises the software model to address security challenges. It uses Management
+Mode RAM (MMRAM) for executing drivers and protocols securely, and its
+initialization and runtime phases are distinct from Traditional MM.
+
+Due to the nature of Standalone MM, there are some limitations, requirements and
+considerations when using it in OVMF:
+
+* The Standalone MM driver must be built with `-D STANDALONE_MM_ENABLE` flag.
+* For X64, Standalone MM does not currently support S3 resume or LockBox
+  functionality. While LockBox functionality could be supported in the future
+  with unblock memory enabled during the DXE phase, S3 resume support is not
+  planned.
+* On OVMF, Standalone MM does not support CPU hotplugging at this time; however,
+  this feature may be enabled in the future.
+* Similar to SMM, Standalone MM requires a pflash-backed variable store.
+* Standalone MM framework copies the entire Firmware Volume (FV) containing the
+  Standalone MM core into MMRAM. As a result, MMRAM must have sufficient
+  capacity to accommodate this operation alongside the runtime-loaded drivers.
+
+* Example QEMU launching command for Standalone MM based Q35 machine type:
+
+  $ qemu-system-x86_64 \
+  -debugcon stdio \
+  -smp 4 -cpu IvyBridge,+rdrand \
+  -machine q35,smm=on --accel tcg,thread=single \
+  -global driver=cfi.pflash01,property=secure,value=on \
+  -drive if=pflash,format=raw,unit=0,file=OVMF_CODE.fd,readonly=on \
+  -drive if=pflash,format=raw,unit=1,file=OVMF_VARS.fd \
+  -global ICH9-LPC.disable_s3=1 \
+  -global mch.extended-tseg-mbytes=32
+
+=== Network Support ===
+
+OVMF provides a UEFI network stack by default. Its lowest level driver is the
+NIC driver, higher levels are generic. In order to make DHCP, PXE Boot, and eg.
+socket test utilities from the StdLib edk2 package work, (1) qemu has to be
+configured to emulate a NIC, (2) a matching UEFI NIC driver must be available
+when OVMF boots.
+
+(If a NIC is configured for the virtual machine, and -- dependent on boot order
+-- PXE booting is attempted, but no DHCP server responds to OVMF's DHCP
+DISCOVER message at startup, the boot process may take approx. 3 seconds
+longer.)
+
+* For each NIC emulated by qemu, a GPLv2 licensed UEFI driver is available from
+  the iPXE project. The qemu source distribution contains prebuilt binaries of
+  these drivers (and of course allows one to rebuild them from source as well).
+  This is the recommended set of drivers.
+
+* Use the qemu -netdev and -device options, or the legacy -net option, to
+  enable NIC support: <http://wiki.qemu.org/Documentation/Networking>.
+
+* The iPXE drivers are automatically available to and configured for OVMF in
+  the default qemu installation.
+
+* Independently of the iPXE NIC drivers, the default OVMF build provides a
+  basic virtio-net driver, located in OvmfPkg/VirtioNetDxe.
+
+* Also independently of the iPXE NIC drivers, Intel's proprietary E1000 NIC
+  driver (from the BootUtil distribution) can be embedded in the OVMF image at
+  build time:
+
+  - Download BootUtil:
+    - Navigate to
+      https://downloadcenter.intel.com/download/19186/Ethernet-Intel-Ethernet-Connections-Boot-Utility-Preboot-Images-and-EFI-Drivers
+    - Click the download link for "PREBOOT.EXE".
+    - Accept the Intel Software License Agreement that appears.
+    - Unzip "PREBOOT.EXE" into a separate directory (this works with the
+      "unzip" utility on platforms different from Windows as well).
+    - Copy the "APPS/EFI/EFIx64/E3522X2.EFI" driver binary to
+      "Intel3.5/EFIX64/E3522X2.EFI" in your WORKSPACE.
+
+  - Include the driver in OVMF during the build:
+    - Add "-D E1000_ENABLE" to your build command (only when building
+      "OvmfPkg/OvmfPkgIa32X64.dsc" or "OvmfPkg/OvmfPkgX64.dsc").
+    - For example: "build -D E1000_ENABLE".
+
+* When a matching iPXE driver is configured for a NIC as described above, it
+  takes priority over other drivers that could possibly drive the card too:
+
+                         | e1000  ne2k_pci  pcnet  rtl8139  virtio-net-pci
+    ---------------------+------------------------------------------------
+    iPXE                 |   x       x        x       x           x
+    VirtioNetDxe         |                                        x
+    Intel BootUtil (X64) |   x
+
+=== HTTPS Boot ===
+
+HTTPS Boot is an alternative solution to PXE. It replaces the tftp server
+with a HTTPS server so the firmware can download the images through a trusted
+and encrypted connection.
+
+* To enable HTTPS Boot, you have to build OVMF with -D NETWORK_HTTP_BOOT_ENABLE
+  and -D NETWORK_TLS_ENABLE. The former brings in the HTTP stack from
+  NetworkPkg while the latter enables TLS support in both NetworkPkg and
+  CryptoPkg.
+
+  If you want to exclude the unsecured HTTP connection completely, OVMF has to
+  be built with -D NETWORK_ALLOW_HTTP_CONNECTIONS=FALSE so that only the HTTPS
+  connections will be accepted.
+
+* By default, there is no trusted certificate. The user has to import the
+  certificates either manually with "TLS Auth Configuration" utility in the
+  firmware UI or through the fw_cfg entry, etc/edk2/https/cacerts.
+
+  -fw_cfg name=etc/edk2/https/cacerts,file=<certdb>
+
+  The blob for etc/edk2/https/cacerts has to be in the format of Signature
+  Database(*1). You can use p11-kit(*2) or efisiglit(*3) to create the
+  certificate list.
+
+  If you want to create the certificate list based on the CA certificates
+  in your local host, p11-kit will be a good choice. Here is the command to
+  create the list:
+
+  p11-kit extract --format=edk2-cacerts --filter=ca-anchors \
+    --overwrite --purpose=server-auth <certdb>
+
+  If you only want to import one certificate, efisiglist is the tool for you:
+
+  efisiglist -a <cert file> -o <certdb>
+
+  Please note that the certificate has to be in the DER format.
+
+  You can also append a certificate to the existing list with the following
+  command:
+
+  efisiglist -i <old certdb> -a <cert file> -o <new certdb>
+
+  NOTE: You may need the patch to make efisiglist generate the correct header.
+  (https://github.com/rhboot/pesign/pull/40)
+
+* Besides the trusted certificates, it's also possible to configure the trusted
+  cipher suites for HTTPS through another fw_cfg entry: etc/edk2/https/ciphers.
+
+  OVMF expects a binary UINT16 array which comprises the cipher suites HEX
+  IDs(*4). If the cipher suite list is given, OVMF will choose the cipher
+  suite from the intersection of the given list and the built-in cipher
+  suites. Otherwise, OVMF just chooses whatever proper cipher suites from the
+  built-in ones.
+
+  - Using QEMU 5.2 or later, QEMU can expose the ordered list of permitted TLS
+    cipher suites from the host side to OVMF:
+
+  -object tls-cipher-suites,id=mysuite0,priority=@SYSTEM \
+  -fw_cfg name=etc/edk2/https/ciphers,gen_id=mysuite0
+
+  (Refer to the QEMU manual and to
+  <https://gnutls.org/manual/html_node/Priority-Strings.html> for more
+  information on the "priority" property.)
+
+  - Using QEMU 5.1 or earlier, the array has to be passed from a file:
+
+  -fw_cfg name=etc/edk2/https/ciphers,file=<cipher suites>
+
+  whose contents can be generated with the following script, for example:
+
+  export LC_ALL=C
+  openssl ciphers -V \
+  | sed -r -n \
+     -e 's/^ *0x([0-9A-F]{2}),0x([0-9A-F]{2}) - .*$/\\\\x\1 \\\\x\2/p' \
+  | xargs -r -- printf -- '%b' > ciphers.bin
+
+  This script creates ciphers.bin that contains all the cipher suite IDs
+  supported by openssl according to the local host configuration.
+
+  You may want to enable only a limited set of cipher suites. Then, you
+  should check the validity of your list first:
+
+  openssl ciphers -V <cipher list>
+
+  If all the cipher suites in your list map to the proper HEX IDs, go ahead
+  to modify the script and execute it:
+
+  export LC_ALL=C
+  openssl ciphers -V <cipher list> \
+  | sed -r -n \
+     -e 's/^ *0x([0-9A-F]{2}),0x([0-9A-F]{2}) - .*$/\\\\x\1 \\\\x\2/p' \
+  | xargs -r -- printf -- '%b' > ciphers.bin
+
+(*1) See "31.4.1 Signature Database" in UEFI specification 2.7 errata A.
+(*2) p11-kit: https://github.com/p11-glue/p11-kit/
+(*3) efisiglist: https://github.com/rhboot/pesign/blob/master/src/efisiglist.c
+(*4) https://wiki.mozilla.org/Security/Server_Side_TLS#Cipher_names_correspondence_table
+
+=== OVMF Flash Layout ===
+
+Like all current IA32/X64 system designs, OVMF's firmware device (rom/flash)
+appears in QEMU's physical address space just below 4GB (0x100000000).
+
+OVMF supports building a 1MB, 2MB or 4MB flash image (see the DSC files for the
+FD_SIZE_1MB, FD_SIZE_2MB, FD_SIZE_4MB build defines). The base address for the
+1MB image in QEMU physical memory is 0xfff00000. The base address for the 2MB
+image is 0xffe00000. The base address for the 4MB image is 0xffc00000.
+
+Using the 1MB or 2MB image, the layout of the firmware device in memory looks
+like:
+
++--------------------------------------- 4GB (0x100000000)
+| VTF0 (16-bit reset code) and OVMF SEC
+| (SECFV, 208KB/0x34000)
++--------------------------------------- varies based on flash size
+|
+| Compressed main firmware image
+| (FVMAIN_COMPACT)
+|
++--------------------------------------- base + 0x20000
+| Fault-tolerant write (FTW)
+| Spare blocks (64KB/0x10000)
++--------------------------------------- base + 0x10000
+| FTW Work block (4KB/0x1000)
++--------------------------------------- base + 0x0f000
+| Event log area (4KB/0x1000)
++--------------------------------------- base + 0x0e000
+| Non-volatile variable storage
+| area (56KB/0xe000)
++--------------------------------------- base address
+
+Using the 4MB image, the layout of the firmware device in memory looks like:
+
++--------------------------------------- base + 0x400000 (4GB/0x100000000)
+| VTF0 (16-bit reset code) and OVMF SEC
+| (SECFV, 208KB/0x34000)
++--------------------------------------- base + 0x3cc000
+|
+| Compressed main firmware image
+| (FVMAIN_COMPACT, 3360KB/0x348000)
+|
++--------------------------------------- base + 0x84000
+| Fault-tolerant write (FTW)
+| Spare blocks (264KB/0x42000)
++--------------------------------------- base + 0x42000
+| FTW Work block (4KB/0x1000)
++--------------------------------------- base + 0x41000
+| Event log area (4KB/0x1000)
++--------------------------------------- base + 0x40000
+| Non-volatile variable storage
+| area (256KB/0x40000)
++--------------------------------------- base address (0xffc00000)
+
+The code in SECFV locates FVMAIN_COMPACT, and decompresses the
+main firmware (MAINFV) into RAM memory at address 0x800000. The
+remaining OVMF firmware then uses this decompressed firmware
+volume image.
+
+=== UEFI Windows 7 & Windows 2008 Server ===
+
+* One of the '-vga std' and '-vga qxl' QEMU options should be used.
+* Only one video mode, 1024x768x32, is supported at OS runtime.
+* The '-vga qxl' QEMU option is recommended. After booting the installed
+  guest OS, select the video card in Device Manager, and upgrade its driver
+  to the QXL XDDM one. Download location:
+  <http://www.spice-space.org/download.html>, Guest | Windows binaries.
+  This enables further resolutions at OS runtime, and provides S3
+  (suspend/resume) capability.

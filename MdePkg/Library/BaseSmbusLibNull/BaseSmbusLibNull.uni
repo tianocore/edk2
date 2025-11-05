@@ -1,0 +1,16 @@
+// /** @file
+// Null implementation of the SMBUS Library.
+//
+// Null implementation of the SMBUS Library.
+//
+// Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Null implementation of the SMBUS Library."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Null implementation of the SMBUS Library."
+

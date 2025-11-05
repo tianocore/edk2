@@ -1,0 +1,18 @@
+// /** @file
+// PeiCdExpress recovery module.
+//
+// This module reads data from CDROM device by all installed block IO ppi and
+// finds whether there is Recovery data in the device. If it finds recovery
+// data, it will install Device Recovery Module PPI.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "PeiCdExpress recovery module"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module reads data from CDROM device by all installed block IO ppi and finds whether there is Recovery data in the device. If it finds recovery data, it will install Device Recovery Module PPI."
+

@@ -1,0 +1,130 @@
+## @file
+#  EFI_REGULAR_EXPRESSION_PROTOCOL Implementation
+#
+#  Copyright (c) 2018-2020, Intel Corporation. All rights reserved.<BR>
+#  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION     = 0x00010018
+  BASE_NAME       = RegularExpressionDxe
+  FILE_GUID       = 3E197E9C-D8DC-42D3-89CE-B04FA9833756
+  MODULE_TYPE     = UEFI_DRIVER
+  VERSION_STRING  = 1.0
+  ENTRY_POINT     = RegularExpressionDxeEntry
+
+[Sources]
+  RegularExpressionDxe.c
+  RegularExpressionDxe.h
+  OnigurumaUefiPort.h
+  OnigurumaUefiPort.c
+
+# Wrapper header files start #
+  stdio.h
+  stdarg.h
+  stddef.h
+  stdlib.h
+  string.h
+  config.h
+# Wrapper header files end #
+
+# Upstream Oniguruma code
+  oniguruma/src/onig_init.c
+  oniguruma/src/oniguruma.h
+  oniguruma/src/regcomp.c
+  oniguruma/src/regenc.c
+  oniguruma/src/regenc.h
+  oniguruma/src/regerror.c
+  oniguruma/src/regexec.c
+  oniguruma/src/oniggnu.h
+  oniguruma/src/reggnu.c
+  oniguruma/src/regint.h
+  oniguruma/src/regparse.c
+  oniguruma/src/regparse.h
+  oniguruma/src/regposerr.c
+  oniguruma/src/onigposix.h
+  oniguruma/src/regposix.c
+  oniguruma/src/regsyntax.c
+  oniguruma/src/regtrav.c
+  oniguruma/src/regversion.c
+  oniguruma/src/st.c
+  oniguruma/src/st.h
+
+# Supported Character Encodings
+  oniguruma/src/ascii.c
+  oniguruma/src/unicode.c
+  oniguruma/src/unicode_fold1_key.c
+  oniguruma/src/unicode_fold2_key.c
+  oniguruma/src/unicode_fold3_key.c
+  oniguruma/src/unicode_unfold_key.c
+  oniguruma/src/utf16_le.c
+  oniguruma/src/utf8.c
+  oniguruma/src/utf16_be.c
+  oniguruma/src/euc_jp.c
+  oniguruma/src/sjis.c
+  oniguruma/src/sjis_prop.c
+  oniguruma/src/euc_jp_prop.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  MemoryAllocationLib
+  BaseMemoryLib
+  DebugLib
+  PrintLib
+
+[Guids]
+  gEfiRegexSyntaxTypePosixExtendedGuid    ## CONSUMES  ## GUID
+  gEfiRegexSyntaxTypePerlGuid             ## CONSUMES  ## GUID
+
+[Protocols]
+  gEfiRegularExpressionProtocolGuid       ## PRODUCES
+
+[BuildOptions]
+  # Enable STDARG for variable arguments
+  *_*_*_CC_FLAGS = -DHAVE_STDARG_H -U_WIN32 -DONIG_VARIADIC_FUNC_ATTR=EFIAPI
+
+  # Override MSFT build option to remove /Oi and /GL
+  MSFT:*_*_*_CC_FLAGS          = /GL-
+  INTEL:*_*_*_CC_FLAGS         = /Oi-
+
+  # Oniguruma: potentially uninitialized local variable used
+  MSFT:*_*_*_CC_FLAGS = /wd4701 /wd4703
+
+  # Oniguruma: intrinsic function not declared
+  MSFT:*_*_*_CC_FLAGS = /wd4164
+
+  # Oniguruma: old style declaration in st.c
+  MSFT:*_*_*_CC_FLAGS = /wd4131
+  GCC:*_*_*_CC_FLAGS = -Wno-deprecated-non-prototype
+
+  # Oniguruma: 'type cast' : truncation from 'OnigUChar *' to 'unsigned int'
+  MSFT:*_*_*_CC_FLAGS = /wd4305 /wd4306
+
+  # Oniguruma: nameless union declared in regparse.h
+  MSFT:*_*_*_CC_FLAGS = /wd4201
+
+  # Oniguruma: 'type cast' : "int" to "OnigUChar", function pointer to "void *"
+  MSFT:*_*_*_CC_FLAGS = /wd4244 /wd4054
+
+  # Oniguruma: previous local declaration
+  MSFT:*_*_*_CC_FLAGS = /wd4456
+
+  # Oniguruma: signed and unsigned mismatch/cast
+  MSFT:*_*_*_CC_FLAGS = /wd4018 /wd4245 /wd4389 /wd4090
+
+  # Oniguruma: tag_end in parse_callout_of_name
+  GCC:*_*_*_CC_FLAGS = -Wno-error=maybe-uninitialized
+
+  # Oniguruma: implicit conversion from 'UINTN' (aka 'unsigned long long') to 'long'
+  GCC:*_CLANGPDB_*_CC_FLAGS = -Wno-error=constant-conversion
+
+  # Not add -Wno-error=maybe-uninitialized option for XCODE
+  # XCODE doesn't know this option
+  XCODE:*_*_*_CC_FLAGS =

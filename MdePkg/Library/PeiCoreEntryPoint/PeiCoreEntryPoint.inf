@@ -1,0 +1,34 @@
+## @file
+# Module entry point library for PEI core.
+#
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiCoreEntryPoint
+  MODULE_UNI_FILE                = PeiCoreEntryPoint.uni
+  FILE_GUID                      = b3b0654a-969d-4096-86cb-27e262a02083
+  MODULE_TYPE                    = PEI_CORE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PeiCoreEntryPoint|PEI_CORE
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC (EBC is for build only)
+#
+
+[Sources]
+  PeiCoreEntryPoint.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  StackCheckLib

@@ -1,0 +1,79 @@
+## @file
+#  Implements ReadOnly Variable Services required by PEIM and installs PEI ReadOnly Varaiable2 PPI.
+#
+#  This module implements ReadOnly Variable Services required by PEIM and installs PEI ReadOnly Varaiable2 PPI.
+#
+#  Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiVariable
+  MODULE_UNI_FILE                = PeiVariable.uni
+  FILE_GUID                      = 34C8C28F-B61C-45a2-8F2E-89E46BECC63B
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PeimInitializeVariableServices
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  Variable.c
+  Variable.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  PcdLib
+  HobLib
+  PeimEntryPoint
+  DebugLib
+  PeiServicesTablePointerLib
+  PeiServicesLib
+  SafeIntLib
+  VariableFlashInfoLib
+  MmUnblockMemoryLib
+  MemoryAllocationLib
+
+[Guids]
+  ## CONSUMES             ## GUID # Variable store header
+  ## SOMETIMES_CONSUMES   ## HOB
+  gEfiAuthenticatedVariableGuid
+  ## SOMETIMES_CONSUMES   ## GUID # Variable store header
+  ## SOMETIMES_CONSUMES   ## HOB
+  gEfiVariableGuid
+  ## SOMETIMES_PRODUCES   ## HOB
+  ## SOMETIMES_CONSUMES   ## HOB
+  gEfiVariableIndexTableGuid
+  gEfiSystemNvDataFvGuid            ## SOMETIMES_CONSUMES   ## GUID
+  ## SOMETIMES_CONSUMES   ## HOB
+  ## CONSUMES             ## GUID # Dependence
+  gEdkiiFaultTolerantWriteGuid
+  gEdkiiVariableRuntimeCacheInfoHobGuid
+
+[Ppis]
+  gEfiPeiReadOnlyVariable2PpiGuid   ## PRODUCES
+  gEfiPeiMemoryDiscoveredPpiGuid    ## CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable         ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache      ## CONSUMES
+
+[Depex]
+  gEdkiiFaultTolerantWriteGuid
+
+# [BootMode]
+# RECOVERY_FULL             ## SOMETIMES_CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  PeiVariableExtra.uni

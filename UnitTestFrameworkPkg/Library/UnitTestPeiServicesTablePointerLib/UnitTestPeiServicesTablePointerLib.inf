@@ -1,0 +1,37 @@
+## @file
+# Pei Services Table Pointer Lib for unit tests implementation.
+#
+# Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UnitTestPeiServicesTablePointerLib
+  MODULE_UNI_FILE                = UnitTestPeiServicesTablePointerLib.uni
+  FILE_GUID                      = 55F23CD2-9BB1-41EE-AB10-550B638210E1
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PeiServicesTablePointerLib
+
+  CONSTRUCTOR                    = UnitTestPeiServicesTablePointerLibConstructor
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  UnitTestPeiServicesTablePointerLib.h
+  UnitTestPeiServicesTablePointerLib.c
+  UnitTestPeiServicesTablePointerLibMisc.c
+  UnitTestPeiServicesTablePointerLibPpi.c
+  UnitTestPeiServicesTablePointerLibHob.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  UnitTestLib

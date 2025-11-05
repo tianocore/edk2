@@ -1,0 +1,88 @@
+#/** @file
+# Component description file for SmbiosMisc instance.
+#
+# Parses the MiscSubclassDataTable and reports any generated data to the DataHub.
+#  All .uni file who tagged with "ToolCode="DUMMY"" in following file list is included by
+#  MiscSubclassDriver.uni file, the StrGather tool will expand MiscSubclassDriver.uni file
+#  and parse all .uni file.
+#
+# Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
+# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015, Hisilicon Limited. All rights reserved.<BR>
+# Copyright (c) 2015, Linaro Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+# Based on files under Nt32Pkg/MiscSubClassPlatformDxe/
+#**/
+
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = SmbiosMiscDxe
+  FILE_GUID                      = 7e5e26d4-0be9-401f-b5e1-1c2bda7ca777
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SmbiosMiscEntryPoint
+
+[Sources]
+  SmbiosMisc.h
+  SmbiosMiscDataTable.c
+  SmbiosMiscEntryPoint.c
+  SmbiosMiscDxeStrings.uni
+  Type00/MiscBiosVendorData.c
+  Type00/MiscBiosVendorFunction.c
+  Type01/MiscSystemManufacturerData.c
+  Type01/MiscSystemManufacturerFunction.c
+  Type02/MiscBaseBoardManufacturerData.c
+  Type02/MiscBaseBoardManufacturerFunction.c
+  Type03/MiscChassisManufacturerData.c
+  Type03/MiscChassisManufacturerFunction.c
+  Type13/MiscNumberOfInstallableLanguagesData.c
+  Type13/MiscNumberOfInstallableLanguagesFunction.c
+  Type32/MiscBootInformationData.c
+  Type32/MiscBootInformationFunction.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  PcdLib
+  HiiLib
+  HobLib
+  MemoryAllocationLib
+  OemMiscLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gEfiSmbiosProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdFdSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVendor
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
+  gArmTokenSpaceGuid.PcdSystemBiosRelease
+  gArmTokenSpaceGuid.PcdEmbeddedControllerFirmwareRelease
+  gArmTokenSpaceGuid.PcdSystemProductName
+  gArmTokenSpaceGuid.PcdSystemVersion
+  gArmTokenSpaceGuid.PcdBaseBoardManufacturer
+  gArmTokenSpaceGuid.PcdBaseBoardProductName
+  gArmTokenSpaceGuid.PcdBaseBoardVersion
+
+[Guids]
+  gEfiGenericVariableGuid
+
+[Depex]
+  gEfiSmbiosProtocolGuid
+
+

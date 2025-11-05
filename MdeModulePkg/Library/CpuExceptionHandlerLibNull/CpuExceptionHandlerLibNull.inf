@@ -1,0 +1,31 @@
+## @file
+# Null instance of CPU Exception Handler Library with empty functions.
+#
+#  Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CpuExceptionHandlerLibNull
+  MODULE_UNI_FILE                = CpuExceptionHandlerLibNull.uni
+  FILE_GUID                      = 3175E6B9-4B01-496a-9A2B-64AF02D87E34
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CpuExceptionHandlerLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources.common]
+  CpuExceptionHandlerLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+

@@ -1,0 +1,43 @@
+## @file
+# Memory Allocation/Profile Library instance dedicated to DXE Core.
+# The implementation borrows the DxeCore Memory Allocation/profile services as the primitive
+# for memory allocation/profile instead of using UEFI boot services or memory profile protocol in an indirect way.
+# It is assumed that this library instance must be linked with DxeCore in this package.
+#
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeCoreMemoryAllocationProfileLib
+  MODULE_UNI_FILE                = DxeCoreMemoryAllocationProfileLib.uni
+  FILE_GUID                      = 7ADD7147-74E8-4583-BE34-B6BC45353BB5
+  MODULE_TYPE                    = DXE_CORE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MemoryAllocationLib|DXE_CORE
+  LIBRARY_CLASS                  = MemoryProfileLib|DXE_CORE
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  MemoryAllocationLib.c
+  DxeCoreMemoryAllocationServices.h
+  DxeCoreMemoryProfileLib.c
+  DxeCoreMemoryProfileServices.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  BaseMemoryLib
+

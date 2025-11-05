@@ -1,0 +1,16 @@
+// /** @file
+// The Usb Bus Peim driver is used to support recovery from usb device.
+//
+// The USB Bus PEIM driver is used to support recovery from USB devices.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Support recovery from USB devices"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "The USB Bus PEIM driver is used to support recovery from USB devices."
+

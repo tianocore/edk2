@@ -1,0 +1,16 @@
+// /** @file
+// Generic Timestamp driver producing Timestamp Protocol using UEFI APIs.
+//
+// A generic Timestamp driver producing Timestamp Protocol using UEFI APIs.
+//
+// Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Generic Timestamp driver producing Timestamp Protocol using UEFI APIs."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "A generic Timestamp driver producing Timestamp Protocol using UEFI APIs."
+

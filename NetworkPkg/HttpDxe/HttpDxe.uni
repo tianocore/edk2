@@ -1,0 +1,17 @@
+// /** @file
+// UEFI HTTP DXE Driver.
+//
+// This driver provides UEFI 2.5 HTTP protocols. It could work with an IPv4 or IPv6 stack.
+//
+//
+// Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "UEFI HTTP service"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver provides EFI HTTP Protocol and EFI HTTP Service Binding Protocol. It could work with an IPv4 or IPv6 stack."
+

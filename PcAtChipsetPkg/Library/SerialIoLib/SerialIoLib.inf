@@ -1,0 +1,27 @@
+## @file
+#   Library instance for SerialIo library class
+#
+#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PcAtSerialPortLib
+  MODULE_UNI_FILE                = PcAtSerialPortLib.uni
+  FILE_GUID                      = 1B25AF84-1EA8-4b52-894E-BFA6880B97FF
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SerialPortLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  IoLib
+
+[Sources]
+  SerialPortLib.c
+

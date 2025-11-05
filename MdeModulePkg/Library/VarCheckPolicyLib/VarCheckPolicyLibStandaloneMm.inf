@@ -1,0 +1,47 @@
+## @file VarCheckPolicyLibStandaloneMm.inf
+# This is an instance of a VarCheck lib that leverages the business logic behind
+# the VariablePolicy code to make its decisions.
+#
+#
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VarCheckPolicyLibStandaloneMm
+  FILE_GUID                      = 44B09E3D-5EDA-4673-ABCF-C8AE4560C8EC
+  MODULE_TYPE                    = MM_STANDALONE
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|MM_STANDALONE
+  CONSTRUCTOR                    = VarCheckPolicyLibStandaloneConstructor
+
+
+[Sources]
+  VarCheckPolicyLib.c
+  VarCheckPolicyLibStandaloneMm.c
+  VarCheckPolicyLib.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  MemLib
+  MemoryAllocationLib
+  VarCheckLib
+  VariablePolicyLib
+  VariablePolicyHelperLib
+  SafeIntLib
+  MmServicesTableLib
+
+[Guids]
+  gVarCheckPolicyLibMmiHandlerGuid        ## CONSUME ## Used to register for MM Communication events.

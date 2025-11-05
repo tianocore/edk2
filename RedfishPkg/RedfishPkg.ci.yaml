@@ -1,0 +1,110 @@
+## @file
+# CI configuration for NetworkPkg
+#
+# (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+# Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+    "PrEval": {
+        "DscPath": "RedfishPkg.dsc",
+    },
+    "LicenseCheck": {
+        "IgnoreFiles": []
+    },
+    "EccCheck": {
+        ## Exception sample looks like below:
+        ## "ExceptionList": [
+        ##     "<ErrorID>", "<KeyWord>"
+        ## ]
+        "ExceptionList": [
+        ],
+        ## Both file path and directory path are accepted.
+        "IgnoreFiles": [
+            ## Below are files incorporated with open source which are
+            ## not edk2 coding standard compliant.
+            ##
+            ## EDK2 CRT library which is not edk2 coding
+            ## standard compliant.
+            ## C runtime library for RedfishPkg modules
+            "PrivateInclude/Crt/sys",
+            "PrivateInclude/Crt/assert.h",
+            "PrivateInclude/Crt/errno.h",
+            "PrivateInclude/Crt/limits.h",
+            "PrivateInclude/Crt/math.h",
+            "PrivateInclude/Crt/stdarg.h",
+            "PrivateInclude/Crt/stddef.h",
+            "PrivateInclude/Crt/stdio.h",
+            "PrivateInclude/Crt/stdlib.h",
+            "PrivateInclude/Crt/string.h",
+            "PrivateInclude/Crt/time.h",
+            "PrivateLibrary/RedfishCrtLib/RedfishCrtLib.c",
+            "PrivateLibrary/RedfishCrtLib/Ia32/MathFtol.c",
+            "Include/Library/RedfishCrtLib.h",
+            ##
+            ## For jansson library open source
+            ## load.c is overrided from open source.
+            "Library/JsonLib/load.c",
+            "Library/JsonLib/jansson_config.h",
+            "Library/JsonLib/jansson_private_config.h",
+            ##
+            ## For libredfish open source
+            ## The files under edk2libredfish are cloned
+            ## from DMTF open source
+            "PrivateLibrary/RedfishLib/edk2libredfish/include/redfish.h",
+            "PrivateLibrary/RedfishLib/edk2libredfish/include/redfishPayload.h",
+            "PrivateLibrary/RedfishLib/edk2libredfish/include/redfishService.h",
+            "PrivateLibrary/RedfishLib/edk2libredfish/include/redpath.h",
+            "PrivateLibrary/RedfishLib/edk2libredfish/src/payload.c",
+            "PrivateLibrary/RedfishLib/edk2libredfish/src/redpath.c",
+            "PrivateLibrary/RedfishLib/edk2libredfish/src/service.c"
+        ]
+    },
+    "CompilerPlugin": {
+        "DscPath": "RedfishPkg.dsc"
+    },
+    "CharEncodingCheck": {
+        "IgnoreFiles": []
+    },
+    "DependencyCheck": {
+        "AcceptableDependencies": [
+            "MdePkg/MdePkg.dec",
+            "MdeModulePkg/MdeModulePkg.dec",
+            "NetworkPkg/NetworkPkg.dec",
+            "RedfishPkg/RedfishPkg.dec"
+        ],
+        # For host based unit tests
+        "AcceptableDependencies-HOST_APPLICATION":[],
+        # For UEFI shell based apps
+        "AcceptableDependencies-UEFI_APPLICATION":[
+            "ShellPkg/ShellPkg.dec"
+        ],
+        "IgnoreInf": []
+    },
+    "DscCompleteCheck": {
+        "DscPath": "RedfishPkg.dsc",
+        "IgnoreInf": []
+    },
+    "GuidCheck": {
+        "IgnoreGuidName": [],
+        "IgnoreGuidValue": [],
+        "IgnoreFoldersAndFiles": []
+    },
+    "LibraryClassCheck": {
+        "IgnoreHeaderFile": []
+    },
+
+    ## options defined ci/Plugin/SpellCheck
+    "SpellCheck": {
+        "AuditOnly": True,           # Fails test but run in AuditOnly mode to collect log
+        "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
+        "ExtendWords": [],           # words to extend to the dictionary for this package
+        "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
+        "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
+    },
+
+    "Defines": {
+        "BLD_*_CONTINUOUS_INTEGRATION": "TRUE",
+        "BLD_*_REDFISH_ENABLE": "TRUE"
+    }
+}

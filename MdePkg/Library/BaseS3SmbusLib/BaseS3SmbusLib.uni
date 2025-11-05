@@ -1,0 +1,17 @@
+// /** @file
+// Instance of S3 Smbus Library based on SmBus and S3 BootScript Library.
+//
+// S3 Smbus Library Services that do SMBus transactions and also enable the
+// operatation to be replayed during an S3 resume.
+//
+// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Instance of S3 SMBus Library based on SMBus and S3 BootScript Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "S3 SMBus Library Services that do SMBus transactions and also enable the operation to be replayed during an S3 resume."
+

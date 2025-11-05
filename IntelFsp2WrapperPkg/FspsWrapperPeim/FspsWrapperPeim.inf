@@ -1,0 +1,84 @@
+## @file
+# FSP-S wrapper PEI Module
+#
+# This PEIM initialize FSP.
+# This will be invoked only once. It will call FspMemoryInit API,
+# register TemporaryRamDonePpi to call TempRamExit API, and register MemoryDiscoveredPpi
+# notify to call FspSiliconInit API.
+#
+#  Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = FspsWrapperPeim
+  FILE_GUID                      = 0D244DF9-6CE3-4133-A1CF-53200AB663AC
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = PEIM
+  ENTRY_POINT                    = FspsWrapperPeimEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32
+#
+
+[LibraryClasses]
+  PeimEntryPoint
+  PeiServicesLib
+  PeiServicesTablePointerLib
+  BaseLib
+  BaseMemoryLib
+  TimerLib
+  DebugLib
+  HobLib
+  MemoryAllocationLib
+  FspWrapperPlatformLib
+  FspWrapperHobProcessLib
+  CpuLib
+  PeCoffGetEntryPointLib
+  PeCoffExtraActionLib
+  PerformanceLib
+  FspWrapperApiLib
+  FspWrapperApiTestLib
+  FspMeasurementLib
+  FspWrapperMultiPhaseProcessLib
+  PeCoffLib
+  FvLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  SecurityPkg/SecurityPkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+  IntelFsp2WrapperPkg/IntelFsp2WrapperPkg.dec
+
+[Ppis]
+  gTopOfTemporaryRamPpiGuid                              ## PRODUCES
+  gFspSiliconInitDonePpiGuid                             ## PRODUCES
+  gEfiEndOfPeiSignalPpiGuid                              ## PRODUCES
+  gEfiTemporaryRamDonePpiGuid                            ## PRODUCES
+  gEfiPeiMemoryDiscoveredPpiGuid                         ## NOTIFY
+  gEdkiiTcgPpiGuid                                       ## NOTIFY
+  gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid    ## PRODUCES
+
+[Pcd]
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress       ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsUpdDataAddress    ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspModeSelection      ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspMeasurementConfig  ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsUpdDataAddress64  ## CONSUMES
+
+[Guids]
+  gFspHobGuid                           ## CONSUMES ## HOB
+  gFspApiPerformanceGuid                ## SOMETIMES_CONSUMES ## GUID
+
+[Sources]
+  FspsWrapperPeim.c
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid

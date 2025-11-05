@@ -1,0 +1,88 @@
+## @file
+#  Component description file for QEMU Flash Firmware Volume Block DXE driver
+#  module.
+#
+#  This DXE runtime driver implements and produces the Firmware Volue Block
+#  Protocol for a QEMU flash device.
+#
+#  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FvbServicesRuntimeDxe
+  FILE_GUID                      = 733cbac2-b23f-4b92-bc8e-fb01ce5907b7
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = FvbInitialize
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  FvbInfo.c
+  FwBlockService.c
+  FwBlockService.h
+  FwBlockServiceDxe.c
+  QemuFlash.c
+  QemuFlash.h
+  QemuFlashDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  DxeServicesTableLib
+  MemEncryptSevLib
+  MemoryAllocationLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeLib
+  CcExitLib
+
+[Guids]
+  gEfiEventVirtualAddressChangeGuid   # ALWAYS_CONSUMED
+  # gEfiEventVirtualAddressChangeGuid # Create Event: EVENT_GROUP_GUID
+
+[Protocols]
+  gEfiFirmwareVolumeBlockProtocolGuid           # PROTOCOL SOMETIMES_PRODUCED
+  gEfiDevicePathProtocolGuid                    # PROTOCOL SOMETIMES_PRODUCED
+
+[FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageFtwWorkingBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageFtwSpareBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageEventLogSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareBlockSize
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable
+
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
+
+[Depex]
+  TRUE

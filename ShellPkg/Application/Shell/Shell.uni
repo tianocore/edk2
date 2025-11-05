@@ -1,0 +1,52 @@
+// *++
+//
+// (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
+// Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved. <BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Module Name:
+//
+// ShellStrings.uni
+//
+// Abstract:
+//
+// String definitions for the main UEFI Shell 2.0 application
+//
+// Revision History:
+//
+// --*/
+
+/=#
+
+#langdef   en-US "English"
+
+#string STR_SHELL_CURDIR              #language en-US "%E%s\> %N"
+#string STR_GEN_PROBLEM               #language en-US "The argument '%B%s%N' is incorrect.\r\n"
+#string STR_SHELL_SHELL               #language en-US "%EShell> %N"
+
+#string STR_SHELL_STARTUP_QUESTION    #language en-US "%NPress %HESC%N in %d seconds to skip %Estartup.nsh%N or any other key to continue."
+
+#string STR_SHELL_ENTER_TO_CONT       #language en-US "%NPress ENTER to continue:%E"
+#string STR_SHELL_QUIT_CONT           #language en-US "%NPress ENTER to continue or 'Q' break:%E"
+
+#string STR_SHELL_NOT_FOUND           #language en-US "%N'%E%s%N' is not recognized as an internal or external command, operable program, or script file.\r\n"
+
+#string STR_SHELL_CRLF                #language en-US "\r\n"
+
+#string STR_SHELL_ERROR               #language en-US  "%NCommand Error Status: %r\r\n"
+#string STR_SHELL_ERROR_SCRIPT        #language en-US  "%NScript Error Status: %r (line number %d)\r\n"
+
+#string STR_SHELL_INVALID_MAPPING     #language en-US "%N'%B%s%N' is not a valid mapping.\r\n"
+#string STR_SHELL_INVALID_SPLIT       #language en-US "Invalid use of pipe (%B|%N).\r\n"
+
+#string STR_SHELL_INVALID_REDIR       #language en-US "Unable to redirect file.\r\n"
+#string STR_SHELL_REDUNDA_REDIR       #language en-US "Redundant redirection specified.\r\n"
+
+#string STR_VER_OUTPUT_MAIN_SHELL     #language en-US "UEFI %s Shell v%d.%d\r\n"
+#string STR_VER_OUTPUT_MAIN_SUPPLIER  #language en-US "%s\r\n"
+#string STR_VER_OUTPUT_MAIN_UEFI      #language en-US "UEFI v%d.%02d (%s, 0x%08x)\r\n"
+
+#string STR_SHELL_NO_IN_EX            #language en-US "No SimpleTextInputEx was found. CTRL-based features are not usable.\r\n"
+
+#string STR_SHELL_IMAGE_NOT_APP       #language en-US "The image is not an application.\r\n"
+

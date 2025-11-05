@@ -1,0 +1,16 @@
+// /** @file
+// The Usb Bus Dxe driver is used to enumerate and manage all attached usb devices.
+//
+// The USB Bus DXE driver is used to enumerate and manage all attached USB devices.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Enumerates and manages attached USB devices"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "The USB Bus DXE driver is used to enumerate and manage all attached USB devices."
+

@@ -1,0 +1,42 @@
+## @file
+# SMBIOS Library
+#
+# Copyright (c) 2012, Apple Inc. All rights reserved.
+# Portions copyright (c) 2006 - 2010, Intel Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmbiosLib
+  FILE_GUID                      = 881863A2-09FD-3E44-8D62-7AE038D03747
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SmbiosLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER SMM_CORE UEFI_APPLICATION UEFI_DRIVER
+
+  CONSTRUCTOR                    = SmbiosLibConstructor
+
+
+[Sources]
+  SmbiosLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiLib
+
+[Protocols]
+  gEfiSmbiosProtocolGuid
+
+[Depex]
+  gEfiSmbiosProtocolGuid

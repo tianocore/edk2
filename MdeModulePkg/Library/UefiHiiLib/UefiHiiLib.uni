@@ -1,0 +1,16 @@
+// /** @file
+// HII Library implementation using UEFI HII protocols and services.
+//
+// HII Library implementation using UEFI HII protocols and services.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "HII Library implementation using UEFI HII protocols and services"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "HII Library implementation using UEFI HII protocols and services."
+

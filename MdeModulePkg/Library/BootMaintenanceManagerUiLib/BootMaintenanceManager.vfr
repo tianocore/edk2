@@ -1,0 +1,354 @@
+///** @file
+//  Boot Maintenance Utility Formset
+//
+//  Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//**/
+
+#include "FormGuid.h"
+
+formset
+  guid = BOOT_MAINT_FORMSET_GUID,
+  title = STRING_TOKEN(STR_FORM_MAIN_TITLE),
+  help = STRING_TOKEN(STR_BOOT_MAINT_MANAGER_HELP),
+  classguid = gEfiIfrFrontPageGuid,
+
+  varstore BMM_FAKE_NV_DATA,
+    varid = VARSTORE_ID_BOOT_MAINT,
+    name = BmmData,
+    guid = BOOT_MAINT_FORMSET_GUID;
+
+  form formid = FORM_MAIN_ID,
+       title = STRING_TOKEN(STR_FORM_MAIN_TITLE);
+       //
+       // Add this invisible text in order to indicate enter Boot Maintenance Manager form.
+       // To trigger the form open action.
+       //
+       suppressif TRUE;
+          text
+              help  = STRING_TOKEN(STR_NONE),
+              text  = STRING_TOKEN(STR_NONE),
+              flags = INTERACTIVE,
+              key   = KEY_VALUE_TRIGGER_FORM_OPEN_ACTION;
+       endif;
+
+    label LABEL_FORM_MAIN_START;
+    //
+    // This is where we will dynamically add a Action type op-code to show
+    // the platform information.
+    //
+    label LABEL_FORM_MAIN_END;
+
+  endform;
+
+  form formid = FORM_BOOT_SETUP_ID,
+       title = STRING_TOKEN(STR_FORM_BOOT_SETUP_TITLE);
+
+       goto FORM_MAIN_ID,
+            prompt = STRING_TOKEN(STR_FORM_GOTO_MAIN),
+            help = STRING_TOKEN(STR_FORM_GOTO_MAIN);
+            //flags = INTERACTIVE,
+            //key = FORM_MAIN_ID;
+
+       goto FORM_BOOT_SETUP_ID,
+            prompt = STRING_TOKEN(STR_FORM_BOOT_ADD_TITLE),
+            help = STRING_TOKEN(STR_FORM_BOOT_ADD_HELP),
+            flags = INTERACTIVE,
+            key = FORM_BOOT_ADD_ID;
+
+       goto FORM_BOOT_DEL_ID,
+            prompt = STRING_TOKEN(STR_FORM_BOOT_DEL_TITLE),
+            help = STRING_TOKEN(STR_FORM_BOOT_IMMEDIATE_HELP),
+            flags = INTERACTIVE,
+            key = FORM_BOOT_DEL_ID;
+
+       goto FORM_BOOT_CHG_ID,
+            prompt = STRING_TOKEN(STR_FORM_BOOT_CHG_TITLE),
+            help = STRING_TOKEN(STR_FORM_BOOT_IMMEDIATE_HELP),
+            flags = INTERACTIVE,
+            key = FORM_BOOT_CHG_ID;
+  endform;
+
+  form formid = FORM_DRIVER_SETUP_ID,
+       title = STRING_TOKEN(STR_FORM_DRIVER_SETUP_TITLE);
+
+       goto FORM_MAIN_ID,
+            prompt = STRING_TOKEN(STR_FORM_GOTO_MAIN),
+            help = STRING_TOKEN(STR_FORM_GOTO_MAIN);
+            //help = STRING_TOKEN(STR_FORM_GOTO_MAIN),
+            //flags = INTERACTIVE,
+            //key = FORM_MAIN_ID;
+
+       goto FORM_DRV_ADD_ID,
+            prompt = STRING_TOKEN(STR_FORM_DRV_ADD_TITLE),
+            help = STRING_TOKEN(STR_FORM_DRV_ADD_HELP),
+            flags = INTERACTIVE,
+            key = FORM_DRV_ADD_ID;
+
+       goto FORM_DRV_DEL_ID,
+            prompt = STRING_TOKEN(STR_FORM_DRV_DEL_TITLE),
+            help = STRING_TOKEN(STR_FORM_NEXT_BOOT_HELP),
+            flags = INTERACTIVE,
+            key = FORM_DRV_DEL_ID;
+
+       goto FORM_DRV_CHG_ID,
+            prompt = STRING_TOKEN(STR_FORM_DRV_CHG_TITLE),
+            help = STRING_TOKEN(STR_FORM_NEXT_BOOT_HELP),
+            flags = INTERACTIVE,
+            key = FORM_DRV_CHG_ID;
+  endform;
+
+   form formid = FORM_BOOT_ADD_ID,
+       title = STRING_TOKEN(STR_FORM_BOOT_ADD_DESC_TITLE);
+
+       label FORM_BOOT_ADD_ID;
+       label LABEL_END;
+
+       subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+       string    varid    = BmmData.BootDescriptionData,
+                 questionid = KEY_VALUE_BOOT_DESCRIPTION,
+                 prompt   = STRING_TOKEN(STR_LOAD_OPTION_DESC),
+                 help     = STRING_TOKEN(STR_NULL_STRING),
+                 flags    = INTERACTIVE,
+                 minsize  = 6,
+                 maxsize  = 75,
+       endstring;
+
+       string    varid    = BmmData.BootOptionalData,
+                 questionid = KEY_VALUE_BOOT_OPTION,
+                 prompt   = STRING_TOKEN(STR_OPTIONAL_DATA),
+                 help     = STRING_TOKEN(STR_NULL_STRING),
+                 flags    = INTERACTIVE,
+                 minsize  = 0,
+                 maxsize  = 120,
+       endstring;
+
+       subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+       text
+         help   = STRING_TOKEN(STR_SAVE_AND_EXIT),
+         text   = STRING_TOKEN(STR_SAVE_AND_EXIT),
+         flags  = INTERACTIVE,
+         key    = KEY_VALUE_SAVE_AND_EXIT_BOOT;
+
+       text
+         help   = STRING_TOKEN(STR_NO_SAVE_AND_EXIT),
+         text   = STRING_TOKEN(STR_NO_SAVE_AND_EXIT),
+         flags  = INTERACTIVE,
+         key    = KEY_VALUE_NO_SAVE_AND_EXIT_BOOT;
+
+  endform;
+
+  form formid = FORM_BOOT_DEL_ID,
+       title = STRING_TOKEN(STR_FORM_BOOT_DEL_TITLE);
+
+       label FORM_BOOT_DEL_ID;
+       label LABEL_END;
+  endform;
+
+  form formid = FORM_BOOT_CHG_ID,
+       title = STRING_TOKEN(STR_FORM_BOOT_CHG_TITLE);
+
+       label FORM_BOOT_CHG_ID;
+       label LABEL_END;
+
+  endform;
+
+  form formid = FORM_DRV_ADD_ID,
+       title = STRING_TOKEN(STR_FORM_DRV_ADD_TITLE);
+
+       goto FORM_MAIN_ID,
+            prompt = STRING_TOKEN(STR_FORM_GOTO_MAIN),
+            help = STRING_TOKEN(STR_FORM_GOTO_MAIN);
+            //flags = INTERACTIVE,
+            //key = FORM_MAIN_ID;
+
+       goto FORM_DRIVER_SETUP_ID,
+            prompt = STRING_TOKEN(STR_FORM_DRV_ADD_FILE_TITLE),
+            help = STRING_TOKEN(STR_FORM_DRV_ADD_FILE_TITLE),
+            flags = INTERACTIVE,
+            key = FORM_DRV_ADD_FILE_ID;
+
+  endform;
+
+  form formid = FORM_DRV_ADD_FILE_ID,
+       title = STRING_TOKEN(STR_FORM_DRV_ADD_DESC_TITLE);
+
+       label FORM_DRV_ADD_FILE_ID;
+       label LABEL_END;
+
+       subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+       string    varid    = BmmData.DriverDescriptionData,
+                 questionid = KEY_VALUE_DRIVER_DESCRIPTION,
+                 prompt   = STRING_TOKEN(STR_LOAD_OPTION_DESC),
+                 help     = STRING_TOKEN(STR_NULL_STRING),
+                 flags    = INTERACTIVE,
+                 minsize  = 6,
+                 maxsize  = 75,
+       endstring;
+
+       string    varid    = BmmData.DriverOptionalData,
+                 questionid = KEY_VALUE_DRIVER_OPTION,
+                 prompt   = STRING_TOKEN(STR_OPTIONAL_DATA),
+                 help     = STRING_TOKEN(STR_NULL_STRING),
+                 flags    = INTERACTIVE,
+                 minsize  = 0,
+                 maxsize  = 120,
+       endstring;
+
+       checkbox varid    = BmmData.ForceReconnect,
+               prompt   = STRING_TOKEN(STR_LOAD_OPTION_FORCE_RECON),
+               help     = STRING_TOKEN(STR_LOAD_OPTION_FORCE_RECON),
+               flags    = CHECKBOX_DEFAULT,
+               key      = 0,
+       endcheckbox;
+
+       subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+       text
+         help   = STRING_TOKEN(STR_SAVE_AND_EXIT),
+         text   = STRING_TOKEN(STR_SAVE_AND_EXIT),
+         flags  = INTERACTIVE,
+         key    = KEY_VALUE_SAVE_AND_EXIT_DRIVER;  //BUGBUB: allow duplicate key in one formset???
+
+       text
+         help   = STRING_TOKEN(STR_NO_SAVE_AND_EXIT),
+         text   = STRING_TOKEN(STR_NO_SAVE_AND_EXIT),
+         flags  = INTERACTIVE,
+         key    = KEY_VALUE_NO_SAVE_AND_EXIT_DRIVER;
+  endform;
+
+  form formid = FORM_DRV_DEL_ID,
+       title = STRING_TOKEN(STR_FORM_DRV_DEL_TITLE);
+
+       label FORM_DRV_DEL_ID;
+       label LABEL_END;
+
+  endform;
+
+  form formid = FORM_DRV_CHG_ID,
+       title = STRING_TOKEN(STR_FORM_DRV_CHG_TITLE);
+
+       label FORM_DRV_CHG_ID;
+       label LABEL_END;
+
+  endform;
+
+  form formid = FORM_CON_MAIN_ID,
+       title = STRING_TOKEN(STR_FORM_CON_MAIN_TITLE);
+
+       goto FORM_MAIN_ID,
+       prompt = STRING_TOKEN(STR_FORM_GOTO_MAIN),
+       help = STRING_TOKEN(STR_FORM_GOTO_MAIN);
+       //flags = INTERACTIVE,
+       //key = FORM_MAIN_ID;
+
+       goto FORM_CON_IN_ID,
+       prompt = STRING_TOKEN(STR_FORM_CON_IN_TITLE),
+       help = STRING_TOKEN(STR_FORM_CON_IN_HELP),
+       flags = INTERACTIVE,
+       key = FORM_CON_IN_ID;
+
+       goto FORM_CON_OUT_ID,
+       prompt = STRING_TOKEN(STR_FORM_CON_OUT_TITLE),
+       help = STRING_TOKEN(STR_FORM_CON_OUT_HELP),
+       flags = INTERACTIVE,
+       key = FORM_CON_OUT_ID;
+
+       goto FORM_CON_ERR_ID,
+       prompt = STRING_TOKEN(STR_FORM_STD_ERR_TITLE),
+       help = STRING_TOKEN(STR_FORM_STD_ERR_HELP),
+       flags = INTERACTIVE,
+       key = FORM_CON_ERR_ID;
+
+       goto FORM_CON_MODE_ID,
+       prompt = STRING_TOKEN(STR_FORM_MODE_TITLE),
+       help = STRING_TOKEN(STR_FORM_MODE_HELP),
+       flags = INTERACTIVE,
+       key = FORM_CON_MODE_ID;
+
+       goto FORM_CON_COM_ID,
+       prompt = STRING_TOKEN(STR_FORM_COM_TITLE),
+       help = STRING_TOKEN(STR_FORM_COM_HELP),
+       flags = INTERACTIVE,
+       key = FORM_CON_COM_ID;
+  endform;
+
+  form formid = FORM_CON_MODE_ID,
+       title = STRING_TOKEN(STR_FORM_MODE_TITLE);
+
+       label FORM_CON_MODE_ID;
+       label LABEL_END;
+  endform;
+
+  form formid = FORM_CON_COM_ID,
+       title = STRING_TOKEN(STR_FORM_COM_TITLE);
+
+       label FORM_CON_COM_ID;
+       label LABEL_END;
+  endform;
+
+  form formid = FORM_CON_COM_SETUP_ID,
+       title = STRING_TOKEN(STR_CON_COM_SETUP);
+
+       label FORM_CON_COM_SETUP_ID;
+       label LABEL_END;
+  endform;
+
+  form formid = FORM_FILE_SEEK_ID,
+       title = STRING_TOKEN(STR_FORM_BOOT_ADD_TITLE);
+
+       label FORM_FILE_SEEK_ID;
+       label LABEL_END;
+  endform;
+
+  form formid = FORM_FILE_NEW_SEEK_ID,
+       title = STRING_TOKEN(STR_FORM_BOOT_ADD_TITLE);
+
+       label FORM_FILE_NEW_SEEK_ID;
+       label LABEL_END;
+  endform;
+
+  form formid = FORM_DRV_ADD_HANDLE_ID,
+       title = STRING_TOKEN(STR_FORM_DRV_ADD_HANDLE_TITLE);
+
+       label FORM_DRV_ADD_HANDLE_ID;
+       label LABEL_END;
+  endform;
+
+  form formid = FORM_DRV_ADD_HANDLE_DESC_ID,
+       title = STRING_TOKEN(STR_FORM_DRV_ADD_DESC_TITLE);
+
+       label FORM_DRV_ADD_HANDLE_DESC_ID;
+       label LABEL_END;
+
+  endform;
+
+  form formid = FORM_CON_IN_ID,
+       title = STRING_TOKEN(STR_FORM_CON_IN_TITLE);
+
+       label FORM_CON_IN_ID;
+       label LABEL_END;
+
+  endform;
+
+  form formid = FORM_CON_OUT_ID,
+       title = STRING_TOKEN(STR_FORM_CON_OUT_TITLE);
+
+       label FORM_CON_OUT_ID;
+       label LABEL_END;
+
+  endform;
+
+  form formid = FORM_CON_ERR_ID,
+       title = STRING_TOKEN(STR_FORM_STD_ERR_TITLE);
+
+       label FORM_CON_ERR_ID;
+       label LABEL_END;
+
+  endform;
+
+endformset;

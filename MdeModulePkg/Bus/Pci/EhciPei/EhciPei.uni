@@ -1,0 +1,17 @@
+// /** @file
+// The EhcPeim driver is responsible for managing EHCI host controller at PEI phase.
+//
+// It produces gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid
+// which is used to enable recovery function from USB Drivers.
+//
+// Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Responsible for managing EHCI host controllers at the PEI phase"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "It produces gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid, which is used to enable recovery function from USB Drivers."
+

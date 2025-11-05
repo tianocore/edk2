@@ -1,0 +1,42 @@
+## @file
+#  Provides TPM 2.0 TIS functions
+#
+#  This library is TPM 2.0 device router. Platform can register multi TPM 2.0 instance to
+#  it via PcdTpmInstanceGuid. Platform need make choice that which one will be final one.
+#  At most one TPM 2.0 instance can be finally registered, and other will return unsupported.
+#
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Tpm2DeviceLibRouterDxe
+  MODULE_UNI_FILE                = Tpm2DeviceLibRouterDxe.uni
+  FILE_GUID                      = C3D69D87-5200-4aab-A6DB-2569BA1A92FC
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Tpm2DeviceLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  Tpm2DeviceLibRouterDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  PcdLib
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid           ## CONSUMES

@@ -1,0 +1,17 @@
+// /** @file
+// Client-side Mtftp6 service.
+//
+// This module produces EFI MTFTPv6 Protocol which provides basic services for
+// client-side unicast and/or multicast TFTP.
+//
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Client-side Mtftp6 service"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module produces EFI MTFTPv6 Protocol which provides basic services for client-side unicast and/or multicast TFTP."
+

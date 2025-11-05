@@ -1,0 +1,60 @@
+## @file
+#  This module install ACPI Boot Graphics Resource Table (BGRT).
+#
+#  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2016, Microsoft Corporation<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BootGraphicsResourceTableDxe
+  MODULE_UNI_FILE                = BootGraphicsResourceTableDxe.uni
+  FILE_GUID                      = B8E62775-BB0A-43f0-A843-5BE8B14F8CCD
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = BootGraphicsDxeEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  BootGraphicsResourceTableDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  DebugLib
+  PcdLib
+  SafeIntLib
+  BmpSupportLib
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                     ## CONSUMES
+  gEfiBootLogoProtocolGuid                      ## PRODUCES
+  gEdkiiBootLogo2ProtocolGuid                   ## PRODUCES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId            ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision  ## CONSUMES
+
+[Guids]
+  gEfiEventReadyToBootGuid                      ## CONSUMES ## Event
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  BootGraphicsResourceTableDxeExtra.uni

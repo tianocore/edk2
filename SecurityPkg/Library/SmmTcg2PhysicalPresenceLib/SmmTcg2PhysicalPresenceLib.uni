@@ -1,0 +1,21 @@
+// /** @file
+// Handle TPM 2.0 physical presence requests from OS.
+//
+// This library will handle TPM 2.0 physical presence request from OS.
+//
+// Caution: This module requires additional review when modified.
+// This driver will have external input - variable.
+// This external input must be validated carefully to avoid security issue.
+//
+// Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Handle TPM 2.0 physical presence requests from OS"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library will handle TPM 2.0 physical presence request from OS.\n"
+                                                        "Caution: This module requires additional review when modified. This driver will have external input - variable. This external input must be validated carefully to avoid security issue."
+

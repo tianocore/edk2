@@ -1,0 +1,41 @@
+## @file
+#  Library instance that implements Print Library class based on protocol gEfiPrint2ProtocolGuid.
+#
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxePrintLibPrint2Protocol
+  MODULE_UNI_FILE                = DxePrintLibPrint2Protocol.uni
+  FILE_GUID                      = 55D460DB-8FEA-415a-B95D-70145AE0675C
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PrintLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = PrintLibConstructor
+
+[Sources]
+  PrintLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  PcdLib
+
+[Protocols]
+  gEfiPrint2SProtocolGuid                        ## CONSUMES
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumAsciiStringLength     ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength   ## SOMETIMES_CONSUMES
+
+[Depex.common.DXE_DRIVER, Depex.common.DXE_RUNTIME_DRIVER, Depex.common.DXE_SMM_DRIVER]
+  gEfiPrint2SProtocolGuid

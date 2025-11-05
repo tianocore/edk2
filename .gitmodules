@@ -1,0 +1,37 @@
+[submodule "CryptoPkg/Library/OpensslLib/openssl"]
+	path = CryptoPkg/Library/OpensslLib/openssl
+	url = https://github.com/openssl/openssl
+[submodule "UnitTestFrameworkPkg/Library/CmockaLib/cmocka"]
+	path = UnitTestFrameworkPkg/Library/CmockaLib/cmocka
+	url = https://github.com/tianocore/edk2-cmocka.git
+[submodule "MdeModulePkg/Universal/RegularExpressionDxe/oniguruma"]
+	path = MdeModulePkg/Universal/RegularExpressionDxe/oniguruma
+	url = https://github.com/kkos/oniguruma
+[submodule "MdeModulePkg/Library/BrotliCustomDecompressLib/brotli"]
+	path = MdeModulePkg/Library/BrotliCustomDecompressLib/brotli
+	url = https://github.com/google/brotli
+[submodule "BaseTools/Source/C/BrotliCompress/brotli"]
+	path = BaseTools/Source/C/BrotliCompress/brotli
+	url = https://github.com/google/brotli
+	ignore = untracked
+[submodule "RedfishPkg/Library/JsonLib/jansson"]
+	path = RedfishPkg/Library/JsonLib/jansson
+	url = https://github.com/akheron/jansson
+[submodule "UnitTestFrameworkPkg/Library/GoogleTestLib/googletest"]
+	path = UnitTestFrameworkPkg/Library/GoogleTestLib/googletest
+	url = https://github.com/google/googletest.git
+[submodule "UnitTestFrameworkPkg/Library/SubhookLib/subhook"]
+	path = UnitTestFrameworkPkg/Library/SubhookLib/subhook
+	url = https://github.com/tianocore/edk2-subhook.git
+[submodule "MdePkg/Library/BaseFdtLib/libfdt"]
+	path = MdePkg/Library/BaseFdtLib/libfdt
+	url = https://github.com/devicetree-org/pylibfdt.git
+[submodule "MdePkg/Library/MipiSysTLib/mipisyst"]
+	path = MdePkg/Library/MipiSysTLib/mipisyst
+	url = https://github.com/MIPI-Alliance/public-mipi-sys-t.git
+[submodule "CryptoPkg/Library/MbedTlsLib/mbedtls"]
+	path = CryptoPkg/Library/MbedTlsLib/mbedtls
+	url = https://github.com/ARMmbed/mbedtls
+[submodule "SecurityPkg/DeviceSecurity/SpdmLib/libspdm"]
+	path = SecurityPkg/DeviceSecurity/SpdmLib/libspdm
+	url = https://github.com/DMTF/libspdm.git

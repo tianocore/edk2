@@ -1,0 +1,98 @@
+## @file
+#  MP Initialize Library instance for PEI driver.
+#
+#  Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
+#  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiMpInitLib
+  MODULE_UNI_FILE                = PeiMpInitLib.uni
+  FILE_GUID                      = B00F6090-7739-4830-B906-E0032D388987
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.1
+  LIBRARY_CLASS                  = MpInitLib|PEIM
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 LOONGARCH64
+#
+
+[Sources.IA32]
+  Ia32/AmdSev.c
+  Ia32/MpFuncs.nasm
+  Ia32/CreatePageTable.c
+
+[Sources.X64]
+  X64/AmdSev.c
+  X64/MpFuncs.nasm
+  X64/CreatePageTable.c
+
+[Sources.IA32, Sources.X64]
+  AmdSev.c
+  Microcode.c
+  MpEqu.inc
+  MpLib.c
+  MpLib.h
+  MpHandOff.h
+  PeiMpLib.c
+
+[Sources.LoongArch64]
+  LoongArch64/PeiMpLib.c
+  LoongArch64/MpLib.c
+  LoongArch64/MpLib.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  CpuLib
+  HobLib
+  MemoryAllocationLib
+  PcdLib
+  PeiServicesLib
+  SynchronizationLib
+
+[LibraryClasses.IA32, LibraryClasses.X64]
+  AmdSvsmLib
+  SafeIntLib
+  CcExitLib
+  LocalApicLib
+  MicrocodeLib
+  MtrrLib
+  CpuPageTableLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                       ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr       ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber        ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuBootLogicalProcessorNumber       ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds      ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize                      ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchAddress            ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize         ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode                       ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApTargetCstate                   ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase                   ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdGhcbHypervisorFeatures              ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi            ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuInitIpiDelayInMicroSeconds       ## SOMETIMES_CONSUMES
+
+[Ppis]
+  gEdkiiPeiShadowMicrocodePpiGuid        ## SOMETIMES_CONSUMES
+
+[Guids]
+  gEdkiiMicrocodePatchHobGuid
+  gGhcbApicIdsGuid                       ## SOMETIMES_CONSUMES
+  gEdkiiEndOfS3ResumeGuid
+
+[Guids.LoongArch64]
+  gProcessorResourceHobGuid              ## SOMETIMES_CONSUMES  ## HOB

@@ -1,0 +1,21 @@
+// /** @file
+// Module that lays Disk I/O protocol on every Block I/O protocol.
+//
+// This module produces Disk I/O protocol to abstract the block accesses
+// of the Block I/O protocol to a more general offset-length protocol
+// to provide byte-oriented access to block media. It adds this protocol
+// to any Block I/O interface that appears in the system that does not
+// already have a Disk I/O protocol. File systems and other disk access
+// code utilize the Disk I/O protocol.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Lays Disk I/O protocol on every Block I/O protocol"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module produces Disk I/O protocol to abstract the block accesses of the Block I/O protocol to a more general offset-length protocol to provide byte-oriented access to block media. It adds this protocol to any Block I/O interface that appears in the system that does not already have a Disk I/O protocol. File systems and other disk access code utilize the Disk I/O protocol."
+

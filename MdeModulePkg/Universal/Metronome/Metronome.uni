@@ -1,0 +1,24 @@
+// /** @file
+// This module produces the Metronome Architectural Protocol on top of Timer Library.
+//
+// This is a generic implementation of the Metronome Architectural Protocol that
+// layers on top of an instance of the Timer Library.  The Timer Library provides
+// functions for nanosecond and microsecond delays.  This generic implementation
+// produces a fixed TickPeriod of 100ns unit, and when the WaitForTick() service
+// is called, the number of ticks passed in is converted to either nanosecond or
+// microsecond units.  If the number of ticks is small, then nanoseconds are used.
+// If the number of ticks is large, then microseconds are used.  This prevents
+// overflows that could occur for long delays if only nanoseconds were used and also
+// provides the greatest accuracy for small delays.
+//
+// Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces the Metronome Architectural Protocol on top of Timer Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This is a generic implementation of the Metronome Architectural Protocol that layers on top of an instance of the Timer Library.  The Timer Library provides functions for nanosecond and microsecond delays.  This generic implementation produces a fixed TickPeriod of 100ns unit, and when the WaitForTick() service is called, the number of ticks passed in is converted to either nanosecond or microsecond units.  If the number of ticks is small, then nanoseconds are used. If the number of ticks is large, then microseconds are used.  This prevents overflows that could occur for long delays if only nanoseconds were used and also provides the greatest accuracy for small delays."
+

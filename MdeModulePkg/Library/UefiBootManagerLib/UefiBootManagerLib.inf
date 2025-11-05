@@ -1,0 +1,122 @@
+## @file
+#  Define and produce general Boot Manager related interfaces.
+#
+#  The implementation provides richful library functions supporting load option
+#  manipulation, hotkey registration, UEFI boot, connect/disconnect, console
+#  manipulation, driver health checking and etc.
+#
+#  Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UefiBootManagerLib
+  MODULE_UNI_FILE                = UefiBootManagerLib.uni
+  FILE_GUID                      = 8D4752BC-595E-49a2-B4AF-F3F57B601DE9
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = UefiBootManagerLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  BmConnect.c
+  BmMisc.c
+  BmConsole.c
+  BmBoot.c
+  BmBootDescription.c
+  BmLoadOption.c
+  BmHotkey.c
+  BmDriverHealth.c
+  InternalBm.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  HobLib
+  PcdLib
+  BaseLib
+  UefiLib
+  DebugLib
+  PrintLib
+  BaseMemoryLib
+  DevicePathLib
+  PerformanceLib
+  PeCoffGetEntryPointLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  DxeServicesTableLib
+  MemoryAllocationLib
+  DxeServicesLib
+  ReportStatusCodeLib
+  PerformanceLib
+  HiiLib
+  SortLib
+  VariablePolicyHelperLib
+
+[Guids]
+  ## SOMETIMES_CONSUMES ## SystemTable (The identifier of memory type information type in system table)
+  ## SOMETIMES_CONSUMES ## HOB (The hob holding memory type information)
+  ## SOMETIMES_CONSUMES ## Variable:L"MemoryTypeInformation."
+  ## SOMETIMES_PRODUCES ## Variable:L"MemoryTypeInformation."
+  gEfiMemoryTypeInformationGuid
+
+  ## SOMETIMES_PRODUCES ## Variable:L"BootCurrent" (The boot option of current boot)
+  ## SOMETIMES_CONSUMES ## Variable:L"BootXX" (Boot option variable)
+  ## SOMETIMES_CONSUMES ## Variable:L"BootOrder" (The boot option array)
+  ## SOMETIMES_CONSUMES ## Variable:L"DriverOrder" (The driver order list)
+  ## SOMETIMES_CONSUMES ## Variable:L"ConIn" (The device path of console in device)
+  ## SOMETIMES_CONSUMES ## Variable:L"ConOut" (The device path of console out device)
+  ## SOMETIMES_CONSUMES ## Variable:L"ErrOut" (The device path of error out device)
+  gEfiGlobalVariableGuid
+
+  gEdkiiStatusCodeDataTypeVariableGuid          ## SOMETIMES_CONSUMES ## GUID
+  gEfiDiskInfoAhciInterfaceGuid                 ## SOMETIMES_CONSUMES ## GUID
+  gEfiDiskInfoIdeInterfaceGuid                  ## SOMETIMES_CONSUMES ## GUID
+  gEfiDiskInfoScsiInterfaceGuid                 ## SOMETIMES_CONSUMES ## GUID
+  gEfiDiskInfoSdMmcInterfaceGuid                ## SOMETIMES_CONSUMES ## GUID
+  gEfiDiskInfoUfsInterfaceGuid                  ## SOMETIMES_CONSUMES ## GUID
+
+[Protocols]
+  gEfiPciRootBridgeIoProtocolGuid               ## CONSUMES
+  gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiLoadFileProtocolGuid                      ## SOMETIMES_CONSUMES
+  gEfiSimpleTextOutProtocolGuid                 ## SOMETIMES_CONSUMES
+  gEfiPciIoProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEfiLoadedImageProtocolGuid                   ## CONSUMES
+  gEfiSimpleNetworkProtocolGuid                 ## SOMETIMES_CONSUMES
+  gEfiSimpleTextInProtocolGuid                  ## SOMETIMES_CONSUMES
+  gEfiBlockIoProtocolGuid                       ## SOMETIMES_CONSUMES
+  gEfiFirmwareVolume2ProtocolGuid               ## SOMETIMES_CONSUMES
+  gEfiDevicePathProtocolGuid                    ## SOMETIMES_CONSUMES
+  gEfiBootLogoProtocolGuid                      ## SOMETIMES_CONSUMES
+  gEfiSimpleTextInputExProtocolGuid             ## SOMETIMES_CONSUMES
+  gEdkiiVariablePolicyProtocolGuid              ## SOMETIMES_CONSUMES ## NOTIFY
+  gEfiGraphicsOutputProtocolGuid                ## SOMETIMES_CONSUMES
+  gEfiUsbIoProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEfiNvmExpressPassThruProtocolGuid            ## SOMETIMES_CONSUMES
+  gEfiDiskInfoProtocolGuid                      ## SOMETIMES_CONSUMES
+  gEfiDriverHealthProtocolGuid                  ## SOMETIMES_CONSUMES
+  gEfiFormBrowser2ProtocolGuid                  ## SOMETIMES_CONSUMES
+  gEfiRamDiskProtocolGuid                       ## SOMETIMES_CONSUMES
+  gEfiDeferredImageLoadProtocolGuid             ## SOMETIMES_CONSUMES
+  gEdkiiPlatformBootManagerProtocolGuid         ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange      ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderLoad                ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderStart               ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdErrorCodeSetVariable                    ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile                     ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDriverHealthConfigureForm               ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxRepairCount                          ## CONSUMES

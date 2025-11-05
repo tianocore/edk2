@@ -1,0 +1,44 @@
+## @file
+# Unit test suite for the Dhcp6Dxe using Google Test
+#
+# Copyright (c) Microsoft Corporation.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = Dhcp6DxeGoogleTest
+  FILE_GUID           = 1D2A4C65-38C8-4C2F-BB60-B5FA49625AA9
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = HOST_APPLICATION
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+[Sources]
+  Dhcp6DxeGoogleTest.cpp
+  Dhcp6IoGoogleTest.cpp
+  Dhcp6IoGoogleTest.h
+  ../Dhcp6Io.c
+  ../Dhcp6Utility.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+  DebugLib
+  NetLib
+  PcdLib
+
+[Protocols]
+  gEfiDhcp6ServiceBindingProtocolGuid
+
+[Pcd]
+  gEfiNetworkPkgTokenSpaceGuid.PcdDhcp6UidType
+
+[Guids]
+  gZeroGuid

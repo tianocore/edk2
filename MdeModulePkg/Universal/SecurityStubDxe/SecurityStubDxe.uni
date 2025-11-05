@@ -1,0 +1,16 @@
+// /** @file
+// This driver produces security2 and security architectural protocol based on SecurityManagementLib.
+//
+// This driver produces security2 and security architectural protocol based on SecurityManagementLib.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces security2 and security architectural protocol based on SecurityManagementLib"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver produces security2 and security architectural protocol based on SecurityManagementLib."
+

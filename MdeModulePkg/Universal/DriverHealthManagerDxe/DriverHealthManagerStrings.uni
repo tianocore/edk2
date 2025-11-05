@@ -1,0 +1,34 @@
+///** @file
+//
+//    String definitions for the DriverHealthManager.
+//
+//  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+
+//**/
+
+/=#
+
+#langdef   en-US "English"
+#langdef   fr-FR "Français"
+
+#string STR_FORM_TITLE                 #language en-US  "Driver Health Manager"
+                                       #language fr-FR  "Driver Health Manager"
+#string STR_FORM_HELP                  #language en-US  "List all the Driver Health instances to manage"
+                                       #language fr-FR  "List all the Driver Health instances to manage"
+#string STR_NULL                       #language en-US  ""
+                                       #lauguage fr-FR  ""
+
+#string STR_REPAIR_REQUIRED            #language en-US  "Repair Required."
+                                       #language fr-FR  "Repair Required."
+#string STR_CONFIGURATION_REQUIRED     #language en-US  "Configuration Required."
+                                       #language fr-FR  "Configuration Required."
+#string STR_FAILED                     #language en-US  "Failed."
+                                       #language fr-FR  "Failed."
+#string STR_RECONNECT_REQUIRED         #language en-US  "Reconnect Required."
+                                       #language fr-FR  "Reconnect Required."
+#string STR_REBOOT_REQUIRED            #language en-US  "Reboot Required."
+                                       #language fr-FR  "Reboot Required."
+#string STR_HEALTHY                    #language en-US  "Healthy."
+                                       #language fr-FR  "Healthy."

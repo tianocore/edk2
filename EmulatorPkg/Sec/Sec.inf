@@ -1,0 +1,49 @@
+## @file
+# Entry Point of Emu Emulator
+#
+# Main executable file of Unix Emulator that loads PEI core after initialization finished.
+# Portions copyright (c) 2011, Apple Inc. All rights reserved.<BR>
+# Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = EmuSec
+  FILE_GUID                      = BCAF98C9-22B0-3B4F-9CBD-C8A6B4DBCEE9
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+
+
+[Sources]
+  Sec.c
+
+[Sources.X64]
+  X64/SwitchRam.asm
+  X64/SwitchRam.S
+
+[Sources.IA32]
+  Ia32/TempRam.c
+  Ia32/SwitchRam.asm
+  Ia32/SwitchRam.S
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  PeCoffGetEntryPointLib
+  PeiServicesLib
+  PpiListLib
+  BaseMemoryLib
+  StackCheckLib
+
+[Ppis]
+  gEfiTemporaryRamSupportPpiGuid
+
+[Pcd]
+  gEmulatorPkgTokenSpaceGuid.PcdPeiServicesTablePage

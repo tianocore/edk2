@@ -1,0 +1,40 @@
+## @file
+#  MTRR library provides APIs for MTRR operation.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MtrrLib
+  MODULE_UNI_FILE                = MtrrLib.uni
+  FILE_GUID                      = 6826b408-f4f3-47ee-917f-af7047f9d937
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MtrrLib
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  MtrrLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  BaseLib
+  CpuLib
+  DebugLib
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuNumberOfReservedVariableMtrrs   ## SOMETIMES_CONSUMES
+

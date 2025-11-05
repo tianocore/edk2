@@ -1,0 +1,45 @@
+## @file
+# SMBUS library that layers on top of the SMBUS2 PPI.
+#
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiSmbusLibSmbus2Ppi
+  MODULE_UNI_FILE                = PeiSmbusLibSmbus2Ppi.uni
+  FILE_GUID                      = 2A1E1C92-AABA-4d62-AC40-F3A4C3387356
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SmbusLib|PEIM SEC
+
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC (EBC is for build only)
+#
+
+[Sources]
+  SmbusLib.c
+  PeiSmbusLib.c
+  InternalSmbusLib.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+[LibraryClasses]
+  BaseMemoryLib
+  PeiServicesLib
+  DebugLib
+
+[Ppis]
+  gEfiPeiSmbus2PpiGuid                           ## CONSUMES
+
+[Depex.common.PEIM]
+  gEfiPeiSmbus2PpiGuid
+

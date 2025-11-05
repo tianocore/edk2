@@ -1,0 +1,45 @@
+## @file
+#  NULL Library class that reads Debug Mask variable and if it exists makes a
+#  HOB that contains the debug mask.
+#
+#  Copyright (c) 2011, Apple, Inc. All rights reserved.<BR>
+#  Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiDebugPrintHobLib
+  MODULE_UNI_FILE                = PeiDebugPrintHobLib.uni
+  FILE_GUID                      = EB0BDD73-DABB-E74B-BF51-62DC1DA521E1
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|PEIM
+  CONSTRUCTOR                    = PeiDebugPrintHobLibConstructor
+
+
+[Sources]
+  PeiDebugPrintHobLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PeiServicesLib
+  DebugLib
+
+[Ppis]
+  gEfiPeiReadOnlyVariable2PpiGuid   ## CONSUMES
+
+[Guids]
+  ## SOMETIMES_CONSUMES   ## Variable:L"EFIDebug"
+  ## SOMETIMES_PRODUCES   ## HOB
+  gEfiGenericVariableGuid
+
+[Depex]
+  gEfiPeiReadOnlyVariable2PpiGuid

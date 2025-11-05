@@ -1,0 +1,124 @@
+// /** @file
+// Public definitions for PcAtChipset package.
+//
+// This package is designed to public interfaces and implementation which follows
+// PcAt defacto standard.
+//
+// Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_PACKAGE_ABSTRACT            #language en-US "Public definitions for PcAtChipset package"
+
+#string STR_PACKAGE_DESCRIPTION         #language en-US "This package is designed to public interfaces and implementation which follows PcAt de facto standard."
+
+
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdHpetBaseAddress_PROMPT  #language en-US "HPET base address"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdHpetBaseAddress_HELP  #language en-US "This PCD specifies the base address of the HPET timer."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdHpetLocalApicVector_PROMPT  #language en-US "HPET local APIC vector"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdHpetLocalApicVector_HELP  #language en-US "This PCD specifies the Local APIC Interrupt Vector for the HPET Timer."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdHpetDefaultTimerPeriod_PROMPT  #language en-US "Default period of HPET timer"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdHpetDefaultTimerPeriod_HELP  #language en-US "This PCD specifies the default period of the HPET Timer in 100 ns units. The value of 100000 (in 100 ns units) is equal to 10 ms."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdIoApicBaseAddress_PROMPT  #language en-US "IO APIC base address"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdIoApicBaseAddress_HELP  #language en-US "This PCD specifies the base address of the IO APIC."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdAcpiIoPortBaseAddress_PROMPT  #language en-US "ACPI Timer IO Port Address"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdAcpiIoPortBaseAddress_HELP  #language en-US "Defines the ACPI register set base address. The invalid 0xFFFF is as its default value. It must be configured to the real value."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdAcpiIoPciBusNumber_PROMPT  #language en-US "ACPI Hardware PCI Bus Number"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdAcpiIoPciBusNumber_HELP  #language en-US "Defines the PCI Bus Number of the PCI device that contains the BAR and Enable for ACPI hardware registers."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdAcpiIoPciDeviceNumber_PROMPT  #language en-US "ACPI Hardware PCI Device Number"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdAcpiIoPciDeviceNumber_HELP  #language en-US "Defines the PCI Device Number of the PCI device that contains the BAR and Enable for ACPI hardware registers. The invalid 0xFF is as its default value. It must be configured to the real value."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdAcpiIoPciFunctionNumber_PROMPT  #language en-US "ACPI Hardware PCI Function Number"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdAcpiIoPciFunctionNumber_HELP  #language en-US "Defines the PCI Function Number of the PCI device that contains the BAR and Enable for ACPI hardware registers. The invalid 0xFF is as its default value. It must be configured to the real value."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdAcpiIoPciEnableRegisterOffset_PROMPT  #language en-US "ACPI Hardware PCI Register Offset"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdAcpiIoPciEnableRegisterOffset_HELP  #language en-US "Defines the PCI Register Offset of the PCI device that contains the Enable for ACPI hardware registers. The invalid 0xFFFF is as its default value. It must be configured to the real value."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdAcpiIoBarEnableMask_PROMPT  #language en-US "ACPI Hardware PCI Bar Enable BitMask"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdAcpiIoBarEnableMask_HELP  #language en-US "Defines the bit mask that must be set to enable the APIC hardware register BAR."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdAcpiIoPciBarRegisterOffset_PROMPT  #language en-US "ACPI Hardware PCI Bar Register Offset"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdAcpiIoPciBarRegisterOffset_HELP  #language en-US "Defines the PCI Register Offset of the PCI device that contains the BAR for ACPI hardware registers. The invalid 0xFFFF is as its default value. It must be configured to the real value."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdAcpiPm1TmrOffset_PROMPT  #language en-US "Offset to 32-bit Timer register in ACPI BAR"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdAcpiPm1TmrOffset_HELP  #language en-US "Defines the offset to the 32-bit Timer Value register that resides within the ACPI BAR."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdHpetMsiEnable_PROMPT  #language en-US "Configure HPET to use MSI"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdHpetMsiEnable_HELP  #language en-US "Indicates the HPET Timer will be configured to use MSI interrupts if the HPET timer supports them, or use I/O APIC interrupts.<BR><BR>\n"
+                                                                                 "TRUE  - Configures the HPET Timer to use MSI interrupts if the HPET Timer supports them.<BR>\n"
+                                                                                 "FALSE - Configures the HPET Timer to use I/O APIC interrupts.<BR>"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdMinimalValidYear_PROMPT  #language en-US "Minimal valid year in RTC"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdMinimalValidYear_HELP    #language en-US "This PCD specifies the minimal valid year in RTC."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdMaximalValidYear_PROMPT  #language en-US "Maximal valid year in RTC"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdMaximalValidYear_HELP    #language en-US "This PCD specifies the maximal valid year in RTC."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdRtcDefaultYear_PROMPT  #language en-US "Default year in RTC"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdRtcDefaultYear_HELP    #language en-US "This PCD specifies the RTC default year when the RTC is in an invalid state."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdAcpiIoPortBaseAddressMask_PROMPT   #language en-US  "ACPI IO Port Base Address Mask"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdAcpiIoPortBaseAddressMask_HELP     #language en-US  "Defines the bit mask to retrieve ACPI IO Port Base Address."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_ERR_80000001  #language en-US "Invalid value provided."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdResetControlRegister_PROMPT
+#language en-US
+"Reset Control Register address"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdResetControlRegister_HELP
+#language en-US
+"Reset Control Register address in I/O space."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdResetControlValueColdReset_PROMPT
+#language en-US
+"Reset Control Register value for cold reset"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdResetControlValueColdReset_HELP
+#language en-US
+"8bit Reset Control Register value for cold reset."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdInitialValueRtcRegisterA_PROMPT  #language en-US "Initial value for Register_A in RTC."
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdInitialValueRtcRegisterA_HELP    #language en-US "Specifies the initial value for Register_A in RTC."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdInitialValueRtcRegisterB_PROMPT  #language en-US "Initial value for Register_B in RTC."
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdInitialValueRtcRegisterB_HELP    #language en-US "Specifies the initial value for Register_B in RTC."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdInitialValueRtcRegisterD_PROMPT  #language en-US "Initial value for Register_D in RTC."
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdInitialValueRtcRegisterD_HELP    #language en-US "Specifies the initial value for Register_D in RTC."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdRtcIndexRegister_PROMPT          #language en-US "RTC Index Register address"
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdRtcIndexRegister_HELP            #language en-US "Specifies RTC Index Register address in I/O space."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdRtcTargetRegister_PROMPT         #language en-US "RTC Target Register address"
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdRtcTargetRegister_HELP           #language en-US "Specifies RTC Target Register address in I/O space."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdRealTimeClockUpdateTimeout_PROMPT #language en-US "RTC Update Timeout Value"
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdRealTimeClockUpdateTimeout_HELP   #language en-US "RTC Update Timeout Value(microsecond)."

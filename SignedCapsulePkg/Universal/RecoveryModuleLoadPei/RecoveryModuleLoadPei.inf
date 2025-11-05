@@ -1,0 +1,64 @@
+## @file
+# Recovery module.
+#
+# Load Recovery capsule and install FV.
+#
+# Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = RecoveryModuleLoadPei
+  MODULE_UNI_FILE                = RecoveryModuleLoadPei.uni
+  FILE_GUID                      = 4278A574-4769-4D60-B090-DD4916691590
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeRecoveryModule
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  RecoveryModuleLoadPei.h
+  RecoveryModuleLoadPei.c
+  ParseConfigProfile.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SignedCapsulePkg/SignedCapsulePkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  DebugLib
+  HobLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  EdkiiSystemCapsuleLib
+  IniParsingLib
+  PrintLib
+
+[Ppis]
+  gEfiPeiRecoveryModulePpiGuid            ## PRODUCES
+  gEfiPeiDeviceRecoveryModulePpiGuid      ## CONSUMES
+
+[Guids]
+  gEfiFmpCapsuleGuid                      ## SOMETIMES_CONSUMES ## GUID
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSystemFmpCapsuleImageTypeIdGuid  ## CONSUMES
+  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiSystemFirmwareFileGuid  ## CONSUMES
+
+[depex]
+  gEfiPeiBootInRecoveryModePpiGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  RecoveryModuleLoadPeiExtra.uni
+

@@ -1,0 +1,19 @@
+// /** @file
+// Driver Health Manager DXE driver.
+//
+// This module produces two driver health manager forms.
+// One will be used by BDS core to configure the Configured Required
+// driver health instances, the other will be automatically included by
+// firmware setup (UI).
+//
+// Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_PROPERTIES_MODULE_NAME
+#language en-US
+"Driver Health Manager DXE driver"
+
+

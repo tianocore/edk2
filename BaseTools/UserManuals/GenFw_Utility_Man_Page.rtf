@@ -1,0 +1,179 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1033\deflangfe1033\deftab360{\fonttbl{\f0\fswiss\fprq2\fcharset0 Verdana;}{\f1\froman\fprq2\fcharset0 Times New Roman;}{\f2\fmodern\fprq1\fcharset0 Courier New;}{\f3\fmodern\fprq1\fcharset0 Consolas;}}
+{\colortbl ;\red8\green96\blue168;\red0\green0\blue0;\red0\green127\blue127;\red128\green0\blue0;\red0\green0\blue255;}
+{\stylesheet{ Normal;}{\s1 heading 1;}{\s2 heading 2;}}
+{\*\generator Riched20 10.0.22621}{\*\mmathPr\mnaryLim0\mdispDef1\mwrapIndent1440 }\viewkind4\uc1 
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\cf1\b\f0\fs28 Name\par
+
+\pard\nowidctlpar\sb200\cf2\b0\fs18 GenFw.exe \endash  build a UEFI image or other image.\par
+
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\tx1440\cf1\b\fs28 Synopsis\par
+
+\pard\nowidctlpar\sb200\cf2\fs18 GenFw.exe -r | -o <OutputFile> [-e <EfiType>] [-c | -t | -l | -u | -b | -z | -s <TimeDate> | -m | -j | --hiipackage | --hiibinpackage | --nonxcompat] [-a] [-p] <InputFile>\par
+
+\pard\nowidctlpar GenFw.exe \endash h\par
+GenFw.exe --version\cf0\b0\fs24\par
+
+\pard\nowidctlpar\sb200\cf2\f1\fs18\par
+
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\cf1\b\f0\fs28 Description\par
+
+\pard\nowidctlpar\sb200\cf2\b0\fs18 Genfw is mainly used to process PE32 image to get the expected image data or image file. PE32 is a general-purpose image format that contains, among other information, data identifying the target environment for execution of the image. This utility can modify the standard PE32 image to create UEFI image with EFI subsystem type, PI Terse Executable image with the compact TE image header, zero its debug data or reset its time stamp. It can also extract PE32 image data to create bin file, extract PE32 image data section to create Acpi table image, or dump PI TE image header information. It can also parse the text MicroCode definition file to create the MicroCode binary image, merge (concatenate) several MicroCode binary images into a single file by pad value and alignment requirement. This tool also supports the override the input file with the output contents.\par
+
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\cf1\b\fs28 Options\par
+
+\pard\nowidctlpar\sb200\cf2\b0\fs18 If no options are specified, tool prints usage.\b\par
+Filename1 [FilenameN]\par
+
+\pard\nowidctlpar\li360\sb200\b0 Input PE/PE32+ image, or TE image, or MicroCode Txt file, or MicroCode bin file, or hii binary packages.\par
+
+\pard\nowidctlpar\sb200\b -o FileName, --outputfile FileName\par
+
+\pard\nowidctlpar\li360\sb200\b0 The EFI image, TeImage, AcpiImage, MicroBin, hii package lists file or other modified PE image will be created.\par
+
+\pard\nowidctlpar\sb200\b -e EFI_FILETYPE, --efiImage EFI_FILETYPE\par
+
+\pard\nowidctlpar\li360\sb200\b0 Create Efi Image. EFI_FILETYPE is one of BASE, SEC, PEI_CORE, PEIM, DXE_CORE, SMM_CORE, DXE_DRIVER, UEFI_APPLICATION, UEFI_DRIVER, DXE_RUNTIME_DRIVER, DXE_SMM_DRIVER, SECURITY_CORE, COMBINED_PEIM_DRIVER, PIC_PEIM, RELOCATABLE_PEIM, BS_DRIVER, RT_DRIVER, APPLICATION, to support all module types.\f1\par
+
+\pard\nowidctlpar\sb200\b\f0 -c, --acpi\par
+
+\pard\nowidctlpar\fi360\sb200\b0 Create Acpi table.\par
+
+\pard\nowidctlpar\sb200\b -t, --terse\par
+
+\pard\nowidctlpar\fi360\sb200\b0 Create Te Image.\par
+
+\pard\nowidctlpar\sb200\b -u, --dump\par
+
+\pard\nowidctlpar\fi360\sb200\b0 Dump TeImage Header.\par
+
+\pard\nowidctlpar\sb200\b -z, --zero\par
+
+\pard\nowidctlpar\fi360\sb200\b0 Zero the Debug Data Fields in the PE input image file. It also zeros the time stamp fields.\f1\par
+
+\pard\nowidctlpar\sb200\b\f0 -b, --exe2bin\par
+
+\pard\nowidctlpar\fi360\sb200\b0 Convert the input EXE to the output BIN file.\par
+
+\pard\nowidctlpar\sb200\b -l, --stripped\par
+
+\pard\nowidctlpar\fi360\sb200\b0 Strip off the relocation information data from PE or TE image.\f1\par
+
+\pard\nowidctlpar\sb200\b\f0 -s timedate, --stamp timedate\par
+
+\pard\nowidctlpar\li360\sb200\b0 timedate format is \ldblquote yyyy-mm-dd 00:00:00\rdblquote . If timedata is set to \ldblquote NOW\rdblquote , current system time is used. The support date scope is 1970-1-1 8:0:0 ~ 2038-1-19 3:14:07.\f1\par
+
+\pard\nowidctlpar\sb200\b\f0 -m, --mcifile\par
+
+\pard\nowidctlpar\fi360\sb200\b0 Convert input microcode txt definition file to microcode bin file.\par
+
+\pard\nowidctlpar\sb200\b -j, --join\par
+
+\pard\nowidctlpar\fi360\sb200\b0 Merge multiple microcode bin files to one file.\par
+
+\pard\nowidctlpar\sb200\b -a NUM, --align NUM\par
+
+\pard\nowidctlpar\li360\sb200\b0 NUM is one HEX or DEC format alignment value, which is used to combine multiple microcode bin files.\par
+
+\pard\nowidctlpar\sb200\b -p NUM, --pad NUM\par
+
+\pard\nowidctlpar\li360\sb200\b0 NUM is one HEX or DEC format padding value, which is used to combine multiple microcode bin files.\par
+
+\pard\nowidctlpar\sb200\b --keepexceptiontable\par
+
+\pard\nowidctlpar\fi360\sb200\b0 Don\rquote t clear exception table.\par
+
+\pard\nowidctlpar\sb200\b --keepzeropending\par
+
+\pard\nowidctlpar\fi360\sb200\b0 Don\rquote t strip zero pending of .reloc.\par
+
+\pard\nowidctlpar\sb200\b -r, --replace\par
+
+\pard\nowidctlpar\fi360\sb200\b0 Overwrite the input file with the output content.\par
+
+\pard\nowidctlpar\sb200\b -g HiiPackageListGuid, --hiiguid HiiPackageListGuid\par
+
+\pard\nowidctlpar\fi360\sb200\b0 Guid is used to specify hii package list guid.\f1\par
+\f0 Its format is xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\par
+
+\pard\nowidctlpar\sb200\b --hiipackage \f1\par
+
+\pard\nowidctlpar\fi360\sb200\b0\f0 Combine all input binary hii packages into a single package list as the text resource data file (RC file format).\par
+
+\pard\nowidctlpar\sb200\b --hiibinpackage \f1\par
+
+\pard\nowidctlpar\fi360\sb200\b0\f0 Combine all input binary hii packages into a single package list as the binary resource section.\par
+
+\pard\nowidctlpar\sb200\b --nonxcompat \f1\par
+\b0\f0 Do not set the IMAGE_DLLCHARACTERISTICS_NX_COMPAT bit of the optional header in the PE header even if the requirements are met.\par
+\b -v, --verbose\b0\par
+
+\pard\nowidctlpar\fi360\sb200 Turn on verbose output with informational messages.\par
+
+\pard\nowidctlpar\sb200\b -d, --debug level\par
+\b0\f1\tab\f0 Enable debug message with specified level.\par
+\b --version\par
+
+\pard\nowidctlpar\fi360\sb200\b0 Show program's version number and exit\par
+
+\pard\nowidctlpar\sb200\b -h, --help\par
+
+\pard\nowidctlpar\fi360\sb200\b0 Show this help message and exit\par
+
+\pard\keep\keepn\nowidctlpar\s2\fi-1440\sb400\sa60\sl-340\slmult0\tx1440\cf3\b\fs28 Status codes returned\par
+\trowd\trgaph10\trleft-118\trbrdrl\brdrs\brdrw10 \trbrdrt\brdrs\brdrw10 \trbrdrr\brdrs\brdrw10 \trbrdrb\brdrs\brdrw10 \trpaddl10\trpaddr10\trpaddfl3\trpaddfr3
+\clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs \cellx2852\clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs \cellx8702 
+\pard\intbl\widctlpar\ri20\sb60\sa60\sl-200\slmult0\cf4\kerning2\f2\fs18 STATUS_SUCCESS\cf2\kerning0\b0\f0\fs16  \cf4\kerning2\b\f2\fs18\tab 0\cf2\cell\kerning0\b0\f0\fs16 The action was completed as requested.\kerning2\cell\row\trowd\trgaph10\trleft-118\trbrdrl\brdrs\brdrw10 \trbrdrt\brdrs\brdrw10 \trbrdrr\brdrs\brdrw10 \trbrdrb\brdrs\brdrw10 \trpaddl10\trpaddr10\trpaddfl3\trpaddfr3
+\clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs \cellx2852\clbrdrl\brdrw10\brdrs\clbrdrt\brdrw10\brdrs\clbrdrr\brdrw10\brdrs\clbrdrb\brdrw10\brdrs \cellx8702 
+\pard\intbl\widctlpar\ri20\sb60\sa60\sl-200\slmult0\cf4\b\f2\fs18 STATUS_ERROR\cf2\kerning0\b0\f0\fs16  \cf4\kerning2\b\f2\fs18\tab\tab 2\cf0\kerning0\b0\f3\fs19\cell\cf2\kerning2\f0\fs16 The action failed.\cell\row 
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\cf1\kerning0\b\fs28 Example\par
+
+\pard\nowidctlpar\sb200\cf2\b0\fs18 1. Generate Efi image with the input PE image, module type and the output file name.\par
+\b GenFw \endash e PEI_CORE PeiMain.dll \endash o PeiMain.efi\par
+\b0 2. Generate Te image with the input PE image and the output file name.\par
+\b GenFw \endash t PeiMain.dll \endash o PeiMain.te\par
+\b0 3. Generate acpi table image with the input PE image and the output file name.\par
+\b GenFw \endash c Facs.dll \endash o Facs.acpi\par
+\b0 4. Dump TeImage Header with the input Te Image and the output file name.\par
+\b GenFw \endash u PeiMain.te \endash o PeiMain.teheader\par
+\b0 5. Modify PeImage by zero its debug data.\par
+\b GenFw \endash z PeiMain.dll \endash o Peimain.zero\par
+\b0 6. Modify PeImage by set new timestamp and override the input image without the output file name.\par
+\b GenFw \endash s \ldblquote 2007-8-16 16:06:32\rdblquote  PeiMain.dll \endash r\par
+\b0 7. Extract bin image from PeImage.\par
+\b GenFw \endash b PeiMain.dll \endash o PeiMain.bin\par
+\b0 8. Generate the microcode binary file from the micro code txt file.\par
+\b GenFw \endash m Mci.txt \endash o Mci.bin\par
+\b0 9. Merge the multiple mci binary files to one file.\par
+\b GenFw \endash j Mci.bin1 Mci.bin2 Mci.bin3 \endash a 32 \endash p 0xFF \endash o Mci.bin\par
+\b0 10. Generate the text resource file (RC format) based on all input binary HII packages and their package list guid.\par
+\b GenFw \endash o SampleHii.rc \endash g D49D2EB0-44D5-4621-9FD6-1A92C9109B99 \endash hiipackage SampleStr.hpk SampleVfr.hpk\f1\par
+\b0\f0 11. Generate the binary resource section based on all input binary HII packages and their package list guid.\f1\par
+\b\f0 GenFw \endash o SampleHii.bin \endash g D49D2EB0-44D5-4621-9FD6-1A92C9109B99 \endash hiibinpackage SampleStr.hpk SampleVfr.hpk\f1\par
+
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\cf1\f0\fs28 Bugs\par
+
+\pard\nowidctlpar\sb200\cf2\b0\fs18 No known bugs.\par
+Report bugs to \cf5\revised edk2-devel@lists.01.org\cf2\revised0\deleted edk2-buildtools-devel@lists.sourceforge.net\deleted0\f1\par
+
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\cf1\b\f0\fs28 Files\par
+
+\pard\nowidctlpar\sb200\cf2\b0\fs18 None\par
+
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\cf1\b\fs28 See also\par
+
+\pard\nowidctlpar\sb200\cf2\b0\fs18 None\par
+
+\pard\keep\keepn\nowidctlpar\s2\li-1440\sb400\sa60\sl-340\slmult0\cf1\b\fs28 License\par
+
+\pard\nowidctlpar\cf2\b0\fs18 Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.\par
+This program and the accompanying materials are licensed and made available \par
+under the terms and conditions of the BSD License which accompanies this \par
+distribution.  The full text of the license may be found at\par
+{{\field{\*\fldinst{HYPERLINK http://opensource.org/licenses/bsd-license.php }}{\fldrslt{http://opensource.org/licenses/bsd-license.php\ul0\cf0}}}}\f0\fs18\par
+\par
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,\par
+
+\pard\nowidctlpar\sb200 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.\par
+\cf0\f1\par
+}
+ 

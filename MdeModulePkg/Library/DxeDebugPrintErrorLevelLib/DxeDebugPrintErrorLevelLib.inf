@@ -1,0 +1,49 @@
+## @file
+#  Debug Print Error Level library instance that provide compatibility with the "err" shell command.
+#  This includes support for the Debug Mask Protocol supports for global debug print error level mask
+#  stored in an EFI Variable. This library instance only support DXE Phase modules.
+#
+#  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeDebugPrintErrorLevelLib
+  MODULE_UNI_FILE                = DxeDebugPrintErrorLevelLib.uni
+  FILE_GUID                      = 1D564EC9-9373-49a4-9E3F-E4D7B9974C84
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DebugPrintErrorLevelLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = DxeDebugPrintErrorLevelLibConstructor
+  DESTRUCTOR                     = DxeDebugPrintErrorLevelLibDestructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DxeDebugPrintErrorLevelLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PcdLib
+  HobLib
+
+[Protocols]
+  gEfiDebugMaskProtocolGuid     ## PRODUCES
+
+[Guids]
+  ## SOMETIMES_PRODUCES   ## Variable:L"EFIDebug"
+  ## SOMETIMES_CONSUMES   ## Variable:L"EFIDebug"
+  ## SOMETIMES_CONSUMES   ## HOB
+  gEfiGenericVariableGuid
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel  ## CONSUMES

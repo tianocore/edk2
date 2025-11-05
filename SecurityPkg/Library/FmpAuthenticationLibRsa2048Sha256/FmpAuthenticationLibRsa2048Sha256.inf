@@ -1,0 +1,44 @@
+## @file
+#  FMP Authentication RSA2048SHA256 handler.
+#
+# Instance of FmpAuthentication Library for DXE/PEI post memory phase.
+#
+#  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FmpAuthenticationLibRsa2048Sha256
+  MODULE_UNI_FILE                = FmpAuthenticationLibRsa2048Sha256.uni
+  FILE_GUID                      = 105FF0EA-A0C0-48A8-B8F7-E8B4D62A1019
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FmpAuthenticationLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  FmpAuthenticationLibRsa2048Sha256.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  BaseCryptLib
+
+[Guids]
+  gEfiCertTypeRsa2048Sha256Guid         ## SOMETIMES_CONSUMES   ## GUID # Unique ID for the type of the certificate.
+  gEfiHashAlgorithmSha256Guid           ## SOMETIMES_CONSUMES   ## GUID

@@ -1,0 +1,103 @@
+// /** @file
+//   String definitions for WiFi Connection Manager Forms.
+//
+//   Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+//   SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#langdef en-US "English"
+
+#string STR_WIFI_MGR_FORM_TITLE           #language en-US "Wi-Fi Configuration"
+#string STR_WIFI_MGR_FORM_HELP            #language en-US "Configure the Wi-Fi parameters."
+
+#string STR_WIFI_MAC_FORM_TITLE           #language en-US "MAC Selection"
+#string STR_WIFI_MAC_FORM_HELP            #language en-US "Select a Nic"
+
+#string STR_MAC_ADDRESS_TITLE             #language en-US "MAC Address"
+#string STR_MAC_ADDRESS                   #language en-US "88-88-88-88-88-87"
+#string STR_MAC_ADDRESS_HELP              #language en-US "MAC Address"
+#string STR_CONNECTION_INFO               #language en-US "Disconnected"
+#string STR_CONNECTED_SSID                #language en-US ""
+#string STR_NULL_STRING                   #language en-US ""
+
+#string STR_NETWORK_MANAGEMENT_TITLE      #language en-US "Wi-Fi Network Management"
+#string STR_NETWORK_LIST                  #language en-US "Wi-Fi Network List"
+#string STR_NETWORK_LIST_HELP             #language en-US "Available Network List"
+#string STR_NETWORK_CONFIGURATION         #language en-US "Wi-Fi Network Configuration"
+
+#string STR_SSID_TITLE                    #language en-US "SSID"
+#string STR_SSID                          #language en-US ""
+#string STR_SSID_HELP                     #language en-US "SSID Length: 1 - 32 characters"
+#string STR_SECURITY_TYPE_TITLE           #language en-US "Security"
+#string STR_SECURITY_TYPE                 #language en-US ""
+#string STR_SECURITY_TYPE_HELP            #language en-US "Network Security Type"
+
+#string STR_EAP_AUTH_METHOD               #language en-US "EAP Authentication Method"
+#string STR_EAP_AUTH_METHOD_HELP          #language en-US "EAP Authentication Method"
+#string STR_EAP_SEAUTH_METHOD             #language en-US "EAP Second Authentication Method"
+#string STR_EAP_SEAUTH_METHOD_HELP        #language en-US "EAP Second Authentication Method"
+#string STR_SECURITY_NONE                 #language en-US "Open"
+#string STR_SECURITY_WEP                  #language en-US "WEP"
+#string STR_SECURITY_WPA_PERSONAL         #language en-US "WPA-Personal"
+#string STR_SECURITY_WPA_ENTERPRISE       #language en-US "WPA-Enterprise"
+#string STR_SECURITY_WPA2_PERSONAL        #language en-US "WPA2-Personal"
+#string STR_SECURITY_WPA2_ENTERPRISE      #language en-US "WPA2-Enterprise"
+#string STR_SECURITY_UNKNOWN              #language en-US "Unknown"
+#string STR_EAP_AUTH_METHOD_TLS           #language en-US "EAPTLS"
+#string STR_EAP_AUTH_METHOD_TTLS          #language en-US "TTLS"
+#string STR_EAP_AUTH_METHOD_PEAP          #language en-US "PEAP"
+#string STR_EAP_SEAUTH_METHOD_MSCHAPV2    #language en-US "MSCHAPv2"
+#string STR_EAP_SEAUTH_METHOD_GTC         #language en-US "GTC"
+
+#string STR_PASSWORD                      #language en-US "Password"
+#string STR_PASSWORD_HELP                 #language en-US "Password Length: 8 - 63 characters"
+#string STR_CONNECT_STATUS_TITLE          #language en-US "Connection Status:"
+#string STR_CONNECT_STATUS_TITLE_HELP     #language en-US ""
+#string STR_CONNECT_STATUS                #language en-US ""
+#string STR_CONNECT_STATUS_HELP           #language en-US ""
+
+#string STR_CONNECT_NOW                   #language en-US "Connect to network now"
+#string STR_CONNECT_NOW_HELP              #language en-US ""
+#string STR_DISCONNECT_NOW                #language en-US "Disconnect from this network"
+#string STR_DISCONNECT_NOW_HELP           #language en-US ""
+#string STR_REFRESH_NETWORK_COUNT         #language en-US "Number of Networks"
+#string STR_REFRESH_NETWORK_COUNT_HELP    #language en-US "The number of current available networks around"
+
+#string STR_EAP_IDENTITY                  #language en-US "Identity"
+#string STR_EAP_IDENTITY_HELP             #language en-US "It is used to query the identity of the peer."
+#string STR_EAP_PASSWORD                  #language en-US "EAP Password"
+#string STR_EAP_PASSWORD_HELP             #language en-US "Password Length: 1 - 63 characters"
+
+#string STR_SAVE_EXIT                     #language en-US "Commit Changes and Exit"
+#string STR_SAVE_EXIT_HELP                #language en-US ""
+#string STR_NO_SAVE_EXIT                  #language en-US "Discard Changes and Exit"
+#string STR_NO_SAVE_EXIT_HELP             #language en-US ""
+
+#string STR_EAP_ENROLL_CERT                   #language en-US "Enroll Certificate"
+#string STR_EAP_ENROLL_CA_CERT                #language en-US "Enroll CA Cert"
+#string STR_EAP_ENROLL_CA_CERT_HELP           #language en-US ""
+#string STR_EAP_ENROLL_CLIENT_CERT            #language en-US "Enroll Client Cert"
+#string STR_EAP_ENROLL_CLIENT_CERT_HELP       #language en-US ""
+#string STR_EAP_ENROLL_CLIENT_KEY             #language en-US "Enroll Client Private Key"
+#string STR_EAP_ENROLL_CLIENT_KEY_HELP        #language en-US ""
+#string STR_EAP_ENROLL_CERT_FROM_FILE         #language en-US "Enroll Cert Using File"
+#string STR_EAP_ENROLL_CERT_FROM_FILE_HELP    #language en-US ""
+#string STR_EAP_ENROLL_KEY_FROM_FILE          #language en-US "Enroll Private Key Using File"
+#string STR_EAP_ENROLL_KEY_FROM_FILE_HELP     #language en-US ""
+#string STR_EAP_CLIENT_KEY_PASSWORD           #language en-US "Client Private Key Password"
+#string STR_EAP_ENROLLED_CERT_NAME            #language en-US ""
+#string STR_EAP_ENROLLED_PRIVATE_KEY_NAME     #language en-US ""
+
+#string STR_WIFI_SETTINGS_FORM_TITLE          #language en-US "Wi-Fi Settings"
+#string STR_WIFI_SETTINGS                     #language en-US "Wi-Fi Settings"
+#string STR_WIFI_SETTINGS_HELP                #language en-US ""
+
+#string STR_HIDDEN_NETWORK_FORM_TITLE         #language en-US "Hidden Network Configuration"
+#string STR_HIDDEN_NETWORK                    #language en-US "Hidden Network Configuration"
+#string STR_HIDDEN_NETWORK_HELP               #language en-US ""
+#string STR_ADD_HIDDEN_NETWORK_HELP           #language en-US "Hidden Network List won't be saved in Storage, they will be cleaned after Reset!"
+#string STR_ADD_HIDDEN_NETWORK                #language en-US "Add Hidden Network"
+#string STR_HIDDEN_NETWORK_LIST               #language en-US "Hidden Network List"
+#string STR_REMOVE_HIDDEN_NETWORK_HELP        #language en-US ""
+#string STR_REMOVE_HIDDEN_NETWORK             #language en-US "Remove Hidden Network"

@@ -1,0 +1,50 @@
+## @file
+#  Provides some TPM 2.0 commands
+#
+#  This library is used by other modules to send TPM 2.0 command.
+#
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Tpm2CommandLib
+  MODULE_UNI_FILE                = Tpm2CommandLib.uni
+  FILE_GUID                      = 2F572F32-8BE5-4868-BD1D-7438AD97DC27
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Tpm2CommandLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  Tpm2Capability.c
+  Tpm2Sequences.c
+  Tpm2Integrity.c
+  Tpm2Hierarchy.c
+  Tpm2NVStorage.c
+  Tpm2Startup.c
+  Tpm2Session.c
+  Tpm2Context.c
+  Tpm2EnhancedAuthorization.c
+  Tpm2Test.c
+  Tpm2DictionaryAttack.c
+  Tpm2Object.c
+  Tpm2Miscellaneous.c
+  Tpm2Help.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  Tpm2DeviceLib

@@ -1,0 +1,60 @@
+## @file
+# The XhcPeim driver is responsible for managing the behavior of XHCI controller at PEI phase.
+#
+# It produces gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid
+# which is used to enable recovery function from USB Drivers.
+#
+# Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = XhciPei
+  MODULE_UNI_FILE                = XhciPei.uni
+  FILE_GUID                      = 65E5746E-9C14-467d-B5B3-932A66D59F79
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = XhcPeimEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  XhcPeim.c
+  XhcPeim.h
+  XhciSched.c
+  UsbHcMem.c
+  DmaMem.c
+  XhciReg.h
+  XhciSched.h
+  UsbHcMem.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  IoLib
+  TimerLib
+  BaseMemoryLib
+  PeimEntryPoint
+  PeiServicesLib
+  MemoryAllocationLib
+
+[Ppis]
+  gPeiUsb2HostControllerPpiGuid                 ## PRODUCES
+  gPeiUsbControllerPpiGuid                      ## CONSUMES
+  gEdkiiIoMmuPpiGuid                            ## CONSUMES
+  gEfiEndOfPeiSignalPpiGuid                     ## CONSUMES
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid AND gPeiUsbControllerPpiGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  XhciPeiExtra.uni

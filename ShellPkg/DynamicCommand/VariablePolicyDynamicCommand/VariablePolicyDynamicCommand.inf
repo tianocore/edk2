@@ -1,0 +1,61 @@
+##  @file
+# A UEFI variable policy dynamic shell command that displays information
+# about UEFI variable policy configuration on the system.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                 = 1.27
+  BASE_NAME                   = VariablePolicyDynamicCommand
+  FILE_GUID                   = 17D0EF2A-5933-4007-8950-5749169D3DC5
+  MODULE_TYPE                 = DXE_DRIVER
+  VERSION_STRING              = 1.0
+  ENTRY_POINT                 = VariablePolicyDynamicCommandEntryPoint
+  UNLOAD_IMAGE                = VariablePolicyDynamicCommandUnload
+  UEFI_HII_RESOURCE_SECTION   = TRUE
+
+[Sources.common]
+  VariablePolicy.uni
+  VariablePolicy.h
+  VariablePolicy.c
+  VariablePolicyDynamicCommand.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HiiLib
+  MemoryAllocationLib
+  PrintLib
+  ShellLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiHiiServicesLib
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gEdkiiVariablePolicyProtocolGuid            ## SOMETIMES_CONSUMES
+  gEfiHiiPackageListProtocolGuid              ## CONSUMES
+  gEfiShellDynamicCommandProtocolGuid         ## PRODUCES
+
+[Guids]
+  ## SOMETIMES_CONSUMES ## Variables in Vendor Namespace
+  gEfiCapsuleReportGuid
+  gEfiCapsuleVendorGuid
+  gEfiGlobalVariableGuid
+  gEfiMemoryOverwriteRequestControlLockGuid
+  gEfiMemoryTypeInformationGuid
+  gMtcVendorGuid
+  gShellAliasGuid
+  gShellVariableGuid
+
+[DEPEX]
+  TRUE

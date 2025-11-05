@@ -1,0 +1,58 @@
+## @file
+# Emu Bus driver
+#
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2011, Apple Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EmuBusDriver
+  FILE_GUID                      = 9842073D-95D9-9F49-BD3F-2E29525125DF
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeEmuBusDriver
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  gEmuBusDriverBinding
+#  COMPONENT_NAME                =  gEmuBusDriverComponentName
+#
+
+[Sources]
+  ComponentName.c
+  EmuBusDriverDxe.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+
+[LibraryClasses]
+  DevicePathLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  PcdLib
+  UefiLib
+  UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+
+
+[Protocols]
+  gEfiDevicePathProtocolGuid                    # PROTOCOL TO_START
+  gEmuThunkProtocolGuid                         # PROTOCOL TO_START
+  gEmuIoThunkProtocolGuid                       # PROTOCOL BY_START
+
+
+

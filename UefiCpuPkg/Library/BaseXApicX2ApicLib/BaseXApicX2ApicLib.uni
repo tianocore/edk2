@@ -1,0 +1,17 @@
+// /** @file
+// The Local Apic library supports x2APIC capable processors which have xAPIC and x2APIC modes.
+//
+// Note: Local APIC library assumes local APIC is enabled. It does not handle cases
+// where local APIC is disabled.
+//
+// Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Supports x2APIC capable processors that have xAPIC and x2APIC modes"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Note: Local APIC library assumes local APIC is enabled. It does not handle cases where local APIC is disabled."
+

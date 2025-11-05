@@ -1,0 +1,72 @@
+#/** @file
+#
+#  DXE CPU driver
+#
+#  Copyright (c) 2009, Apple Inc. All rights reserved.<BR>
+#  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmCpuDxe
+  FILE_GUID                      = B8D9777E-D72A-451F-9BDB-BAFB52A68415
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = CpuDxeInitialize
+
+[Sources.Common]
+  CpuDxe.c
+  CpuDxe.h
+  CpuMmuCommon.c
+  Exception.c
+  MemoryAttribute.c
+
+[Sources.AARCH64]
+  AArch64/Mmu.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  ArmLib
+  ArmMmuLib
+  BaseMemoryLib
+  CacheMaintenanceLib
+  CpuLib
+  CpuExceptionHandlerLib
+  DebugLib
+  DefaultExceptionHandlerLib
+  DxeServicesTableLib
+  HobLib
+  MemoryAllocationLib
+  PeCoffGetEntryPointLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiCpuArchProtocolGuid
+  gEfiMemoryAttributeProtocolGuid
+  gHardwareInterruptProtocolGuid
+
+[Guids]
+  gEfiDebugImageInfoTableGuid
+  gArmMpCoreInfoGuid
+  gIdleLoopEventGuid
+  gEfiVectorHandoffTableGuid
+
+[Pcd.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy
+
+[FeaturePcd.common]
+  gArmTokenSpaceGuid.PcdRemapUnusedMemoryNx
+
+[Depex]
+  TRUE

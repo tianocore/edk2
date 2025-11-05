@@ -1,0 +1,43 @@
+## @file
+#  CPU Cache Info Library instance for DXE driver.
+#
+#  Provides cache info for each package, core type, cache level and cache type.
+#
+#  Copyright (c) 2020 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeCpuCacheInfoLib
+  FILE_GUID                      = B25C288F-C309-41F1-8325-37E64DC5EA3D
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CpuCacheInfoLib|DXE_DRIVER UEFI_APPLICATION
+  MODULE_UNI_FILE                = CpuCacheInfoLib.uni
+
+[Sources]
+  InternalCpuCacheInfoLib.h
+  CpuCacheInfoLib.c
+  DxeCpuCacheInfoLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiMpServiceProtocolGuid
+
+[Pcd]
+
+[Depex]
+  gEfiMpServiceProtocolGuid

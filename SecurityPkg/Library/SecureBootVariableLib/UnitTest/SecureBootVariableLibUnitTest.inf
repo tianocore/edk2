@@ -1,0 +1,36 @@
+## @file
+# Unit tests of the implementation of SecureBootVariableLib.
+#
+# Copyright (C) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = SecureBootVariableLibUnitTest
+  FILE_GUID                      = 71C5359E-08FB-450E-9766-BC70482DF66B
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SecureBootVariableLibUnitTest.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  SecureBootVariableLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  UefiLib
+  UnitTestLib

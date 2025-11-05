@@ -1,0 +1,27 @@
+## @file
+#
+#  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeMpInitLibUpDepLib
+  FILE_GUID                      = 95FA4B7B-930E-4755-A9B7-10F0716DA374
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+
+[LibraryClasses]
+  BaseLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Sources]
+  MpInitLibDepLib.c
+
+[Depex]
+  gEfiMpInitLibUpDepProtocolGuid

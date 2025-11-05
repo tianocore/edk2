@@ -1,0 +1,184 @@
+March 95
+Version 1.32 of pccts
+ 
+At the moment this file is available via anonymous FTP at
+ 
+        Node: marvin.ecn.purdue.edu
+        File: pub/pccts/1.32/NOTES.BCC
+ 
+Mail corrections or additions to David Seidel <71333.1575@compuserve.com>
+===============================================================================
+Notes on Building PCCTS 1.32 with Borland C++
+ 
+David Seidel, Innovative Data Concepts Incorporated
+CompuServe: 71333,1575
+Internet:   71333.1575@compuserve.com
+            dseidel@delphi.com
+ 
+I have gotten ANTLR and DLG to succesfully build with BCC 4.0, but have found
+from experience that ANTLR, in particular, is likely to run out of memory
+with grammars over a certain size, or with larger values for the -k and -ck
+options.  Now that BCC 4.02 and the new Borland Power Pack for DOS is now
+available, I feel that there is no excuse not to build these tools as
+32-bit executables, as they ought to be.
+ 
+For people without the Power Pack, the makefiles below should be fairly easily
+modified to build 16-bit real-mode executables, but I don't really recommend
+it.  As an alternative, you might consider the highly regarded DJGPP compiler
+(a DOS port of the Gnu GCC compiler, with a DOS extender included).  Hopefully
+some other PCCTS who has DJGPP can provode whatever advice is necessary.  The
+Watcom compiler is also an excellent possibility (albeit a commercial one),
+and I hope to make available Watcom makefiles in the near future.
+ 
+Here are the makefiles I am using.  Both makefiles use a compiler configuration
+file that contains compiler switches such as optimization settings.  I call
+this file bor32.cfg and keep a copy in both the ANTLR and DLG subdirectories.
+ 
+==== File: bor32.cfg (cut here) ===============================================
+-w-
+-RT-
+-x-
+-N-
+-k-
+-d
+-O2-e-l
+-Z
+-D__STDC__=1
+==== End of file bor32.cfg (cut here) =========================================
+ 
+==== File: antlr\bor32.mak (cut here) =========================================
+#
+#  ANTLR 1.32 Makefile for Borland C++ 4.02 with DPMI 32-bit DOS extender by
+#  David Seidel
+#  Innovative Data Concepts Incorporated
+#  71333.1575@compuserve.com (or) dseidel@delphi.com
+#
+#  Notes:   1. Compiler switches (optimization etc.) are contained in the
+#              file bor32.cfg.
+#           2. This makefile requires Borland C++ 4.02 or greater with
+#              the DOS Power Pack add-on package.
+#           3. Change the BCCDIR macro below to the topmost directory in
+#              which BCC is installed on your system.
+#
+ 
+BCCDIR   =  d:\bc4
+CC       =  bcc32
+SET      =  ..\support\set
+PCCTS_H  =  ..\h
+ANTLR    =  ..\bin\antlr
+DLG      =  ..\bin\dlg
+CFLAGS   =  -I$(BCCDIR)\include -I. -I$(SET) -I$(PCCTS_H) -DUSER_ZZSYN \
+ +bor32.cfg
+LIBS     =  dpmi32 cw32
+OBJ_EXT  =  obj
+OBJS     =  antlr.obj scan.obj err.obj bits.obj build.obj fset2.obj fset.obj \
+ gen.obj globals.obj hash.obj lex.obj main.obj misc.obj pred.obj dialog.obj \
+ set.obj
+ 
+.c.obj:
+      $(CC) -c $(CFLAGS) {$&.c }
+ 
+antlr.exe: $(OBJS)
+   tlink32 @&&|
+-Tpe -ax -c -s -L$(BCCDIR)\lib +
+$(BCCDIR)\lib\c0x32 $**
+$@
+ 
+$(LIBS)
+;
+|
+   copy *.exe ..\bin
+ 
+ 
+# *********** Target list of PC machines ***********
+#
+# Don't worry about the ambiguity messages coming from antlr
+# for making antlr.c etc...  [should be 10 of them, I think]
+#
+ 
+# leave this commented out for initial build!
+#antlr.c stdpccts.h parser.dlg tokens.h err.c : antlr.g
+#   $(ANTLR) antlr.g
+ 
+antlr.$(OBJ_EXT): antlr.c mode.h tokens.h
+ 
+scan.$(OBJ_EXT): scan.c mode.h tokens.h
+ 
+# leave this commented out for initial build!
+#scan.c mode.h: parser.dlg
+#   $(DLG) -C2 parser.dlg scan.c
+ 
+set.$(OBJ_EXT): $(SET)\set.c
+   $(CC) -c $(CFLAGS) $(SET)\set.c
+ 
+==== End of file antlr\bor32.mak (cut here) ===================================
+ 
+==== File: dlg\bor32.mak (cut here) ===========================================
+#
+#  DLG 1.32 Makefile for Borland C++ 4.02 with DPMI 32-bit DOS extender by
+#  David Seidel
+#  Innovative Data Concepts Incorporated
+#  71333.1575@compuserve.com (or) dseidel@delphi.com
+#
+#  Notes:   1. Compiler switches (optimization etc.) are contained in the
+#              file bor32.cfg.
+#           2. This makefile requires Borland C++ 4.02 or greater with
+#              the DOS Power Pack add-on package.
+#           3. Change the BCCDIR macro below to the topmost directory in
+#              which BCC is installed on your system.
+#
+ 
+ 
+BCCDIR   =  d:\bc4
+CC       =  bcc32
+SET      =  ..\support\set
+PCCTS_H  =  ..\h
+ANTLR    =  ..\bin\antlr
+DLG      =  ..\bin\dlg
+CFLAGS   =  -I$(BCCDIR)\include -I. -I$(SET) -I$(PCCTS_H) -DUSER_ZZSYN \
+ +bor32.cfg
+LIBS     =  dpmi32 cw32
+OBJ_EXT  =  obj
+OBJS     =  dlg_p.obj dlg_a.obj main.obj err.obj support.obj \
+ output.obj relabel.obj automata.obj set.obj
+ 
+.c.obj:
+      $(CC) -c $(CFLAGS) {$&.c }
+ 
+dlg.exe : $(OBJS)
+   tlink32 @&&|
+-Tpe -ax -c -s -L$(BCCDIR)\lib +
+c0x32 $**
+$@
+ 
+$(LIBS)
+;
+|
+   copy *.exe ..\bin
+ 
+dlg_p.obj:  dlg_p.c
+ 
+dlg_a.obj:  dlg_a.c
+ 
+main.obj:   main.c
+ 
+err.obj:    err.c
+ 
+support.obj:   support.c
+ 
+output.obj: output.c
+ 
+relabel.obj:   relabel.c
+ 
+automata.obj:  automata.c
+ 
+set.$(OBJ_EXT): $(SET)\set.c
+   $(CC) -c $(CFLAGS) $(SET)\set.c
+ 
+==== End of file dlg\bor32.mak (cut here) =====================================
+ 
+ 
+ 
+
+
+

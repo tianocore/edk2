@@ -1,0 +1,16 @@
+// /** @file
+// SMBUS library that layers on top of the SMBUS2 PPI.
+//
+// SMBUS library that layers on top of the SMBUS2 PPI.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "SMBUS library that layers on top of the SMBUS2 PPI"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "SMBUS library that layers on top of the SMBUS2 PPI."
+

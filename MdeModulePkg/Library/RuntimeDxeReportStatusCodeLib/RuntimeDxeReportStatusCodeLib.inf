@@ -1,0 +1,54 @@
+## @file
+#  Report status code library instance which supports logging message in DXE & runtime phase.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = RuntimeDxeReportStatusCodeLib
+  MODULE_UNI_FILE                = RuntimeDxeReportStatusCodeLib.uni
+  FILE_GUID                      = 07D25BBB-F832-41bb-BBA0-612E9F033067
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ReportStatusCodeLib|DXE_RUNTIME_DRIVER
+  CONSTRUCTOR                    = ReportStatusCodeLibConstructor
+  DESTRUCTOR                     = ReportStatusCodeLibDestructor
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  ReportStatusCodeLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  PcdLib
+  DevicePathLib
+  UefiRuntimeLib
+
+[Guids]
+  gEfiStatusCodeSpecificDataGuid                ## SOMETIMES_CONSUMES   ## UNDEFINED
+  gEfiStatusCodeDataTypeDebugGuid               ## SOMETIMES_CONSUMES   ## UNDEFINED
+  gEfiEventVirtualAddressChangeGuid             ## CONSUMES ## Event
+  gEfiEventExitBootServicesGuid                 ## CONSUMES ## Event
+
+[Protocols]
+  gEfiStatusCodeRuntimeProtocolGuid             ## CONSUMES
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask  ## CONSUMES
+

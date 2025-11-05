@@ -1,0 +1,78 @@
+## @file
+# Ps2 Keyboard Driver.
+#
+# Ps2 Keyboard Driver for UEFI. The keyboard type implemented follows IBM
+# compatible PS2 protocol using Scan Code Set 1.
+#
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Ps2KeyboardDxe
+  MODULE_UNI_FILE                = Ps2KeyboardDxe.uni
+  FILE_GUID                      = C4D1F932-821F-4744-BF06-6D30F7730F8D
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializePs2Keyboard
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#  DRIVER_BINDING                = gKeyboardControllerDriver;
+#  COMPONENT_NAME                = gPs2KeyboardComponentName;
+#  COMPONENT_NAME2               = gPs2KeyboardComponentName2;
+#
+
+[Sources]
+  ComponentName.c
+  Ps2Keyboard.h
+  Ps2KbdCtrller.c
+  Ps2KbdTextIn.c
+  Ps2Keyboard.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  UefiRuntimeServicesTableLib
+  DebugLib
+  ReportStatusCodeLib
+  UefiBootServicesTableLib
+  UefiLib
+  UefiDriverEntryPoint
+  BaseLib
+  BaseMemoryLib
+  TimerLib
+  PcdLib
+  IoLib
+
+[Protocols]
+  gEfiSimpleTextInProtocolGuid                  ## BY_START
+  gEfiSimpleTextInputExProtocolGuid             ## BY_START
+  gEfiPs2PolicyProtocolGuid                     ## SOMETIMES_CONSUMES
+  gEfiSioProtocolGuid                           ## TO_START
+  gEfiDevicePathProtocolGuid                    ## TO_START
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPs2KbdExtendedVerification   ## CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFastPS2Detection             ## SOMETIMES_CONSUMES
+
+#
+# [Event]
+#
+#   ##
+#   # Timer event used to read key strokes at a regular interval.
+#   #
+#   EVENT_TYPE_PERIODIC_TIMER   ## CONSUMES
+#
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  Ps2KeyboardDxeExtra.uni

@@ -1,0 +1,28 @@
+#/** @file
+#  Implement ArmGenericTimerCounterLib using the virtual timer
+#
+#  Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmGenericTimerVirtCounterLib
+  FILE_GUID                      = 3C0D77CC-4F27-49C8-B25C-2D01D81ED4D8
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmGenericTimerCounterLib
+
+[Sources]
+  ArmGenericTimerVirtCounterLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ArmPkg/ArmPkg.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseLib

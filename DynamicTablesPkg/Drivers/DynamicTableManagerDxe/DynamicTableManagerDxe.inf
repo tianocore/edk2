@@ -1,0 +1,64 @@
+## @file
+#  Module that drives the table generation and installation process.
+#
+#  Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.
+#  Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = DynamicTableManagerDxe
+  FILE_GUID                      = 89122868-BCFD-49E8-88A3-06635CB7B3CF
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DynamicTableManagerDxeInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64 AARCH64
+#
+
+[Sources]
+  DynamicTableManagerDxe.c
+  DynamicTableManagerDxe.h
+  SmbiosTableDispatcher.c
+  SmbiosTableDispatcher.h
+  AcpiTableBuilder.c
+  SmbiosTableBuilder.c
+
+[Sources.AARCH64]
+  Arm/ArmDynamicTableManager.c
+
+[Sources.X64]
+  X64/X64DynamicTableManager.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  MetadataHandlerLib
+  PrintLib
+  TableHelperLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol  ## CONSUMES
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+  gEfiAcpiSdtProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+  gEfiSmbiosProtocolGuid                        # PROTOCOL ALWAYS_CONSUMED
+  gEdkiiConfigurationManagerProtocolGuid        # PROTOCOL ALWAYS_CONSUMED
+  gEdkiiDynamicTableFactoryProtocolGuid         # PROTOCOL ALWAYS_CONSUMED
+
+[Depex]
+  gEdkiiConfigurationManagerProtocolGuid AND
+  gEdkiiDynamicTableFactoryProtocolGuid
+

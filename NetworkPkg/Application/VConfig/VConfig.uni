@@ -1,0 +1,16 @@
+// /** @file
+// Shell application VLAN configuration.
+//
+// It is shell application which is used to get and set VLAN configuration.
+//
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Shell application VLAN configuration"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "It is shell application which is used to get and set VLAN configuration."
+

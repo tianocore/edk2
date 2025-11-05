@@ -1,0 +1,17 @@
+// /** @file
+// Esrt DXE driver that manages cached ESRT repository & publishes ESRT table
+//
+// This driver produces EsrtManagement protocol to manage cache ESRT repository for FMP/Non-FMP instances.
+// ESRT table based on repository is published on gEfiEventReadyToBootGuid.
+//
+// Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Esrt DXE driver that manages cached ESRT repository & publishes ESRT table"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver produces EsrtManagement protocol to manage cache ESRT repository for FMP/Non-FMP instances.<BR><BR>\n"
+                                                        "ESRT table based on repository is published on EsrtReadyToBootEventNotify.<BR>"

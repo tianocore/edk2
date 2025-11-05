@@ -1,0 +1,43 @@
+## @file VarCheckPolicyLib.inf
+# This is an instance of a VarCheck lib that leverages the business logic behind
+# the VariablePolicy code to make its decisions.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VarCheckPolicyLib
+  FILE_GUID                      = 9C28A48F-C884-4B1F-8B95-DEF125448023
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_RUNTIME_DRIVER DXE_SMM_DRIVER
+  CONSTRUCTOR                    = VarCheckPolicyLibTraditionalConstructor
+
+
+[Sources]
+  VarCheckPolicyLib.c
+  VarCheckPolicyLibTraditional.c
+  VarCheckPolicyLib.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  VarCheckLib
+  VariablePolicyLib
+  VariablePolicyHelperLib
+  SafeIntLib
+  MmServicesTableLib
+
+
+[Guids]
+  gVarCheckPolicyLibMmiHandlerGuid        ## CONSUME ## Used to register for MM Communication events.

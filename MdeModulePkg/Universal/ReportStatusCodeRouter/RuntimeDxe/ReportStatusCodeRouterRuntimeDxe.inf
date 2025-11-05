@@ -1,0 +1,58 @@
+## @file
+#  Report Status Code Router Driver which produces Report Stataus Code Handler Protocol and Status Code Runtime Protocol.
+#
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ReportStatusCodeRouterRuntimeDxe
+  MODULE_UNI_FILE                = ReportStatusCodeRouterRuntimeDxe.uni
+  FILE_GUID                      = D93CE3D8-A7EB-4730-8C8E-CC466A9ECC3C
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = GenericStatusCodeRuntimeDxeEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  ReportStatusCodeRouterRuntimeDxe.c
+  ReportStatusCodeRouterRuntimeDxe.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiRuntimeLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  HobLib
+  DebugLib
+  BaseLib
+  SynchronizationLib
+  UefiLib
+
+[Guids]
+  gEfiEventVirtualAddressChangeGuid               ## CONSUMES ## Event
+
+[Protocols]
+  gEfiRscHandlerProtocolGuid                      ## PRODUCES
+  gEfiStatusCodeRuntimeProtocolGuid               ## PRODUCES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  ReportStatusCodeRouterRuntimeDxeExtra.uni

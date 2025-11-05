@@ -1,0 +1,110 @@
+## @file
+#  This module produces EFI IPv4 Protocol and EFI IPv4 Service Binding Protocol.
+#
+#  This module produces EFI IPv4 Protocol upon EFI MNP Protocol and EFI ARP Protocol,
+#  to provide basic network IPv4 packet I/O services, which includes support for a
+#  subset of the Internet Control Message Protocol (ICMP) and may include support for
+#  the Internet Group Management Protocol (IGMP).
+#
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Ip4Dxe
+  MODULE_UNI_FILE                = Ip4Dxe.uni
+  FILE_GUID                      = 9FB1A1F3-3B71-4324-B39A-745CBB015FFF
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Ip4DriverEntryPoint
+  UNLOAD_IMAGE                   = NetLibDefaultUnload
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  gIp4DriverBinding
+#  COMPONENT_NAME                =  gIp4ComponentName
+#  COMPONENT_NAME2               =  gIp4ComponentName2
+#
+
+[Sources]
+  Ip4Driver.c
+  Ip4Option.h
+  Ip4Route.h
+  Ip4If.c
+  Ip4Igmp.h
+  Ip4Output.c
+  Ip4Icmp.c
+  Ip4Igmp.c
+  Ip4Impl.c
+  Ip4Common.h
+  Ip4Impl.h
+  Ip4Driver.h
+  Ip4Common.c
+  Ip4If.h
+  Ip4Option.c
+  Ip4Output.h
+  ComponentName.c
+  Ip4Input.h
+  Ip4Route.c
+  Ip4Icmp.h
+  Ip4Input.c
+  Ip4Config2Impl.c
+  Ip4Config2Impl.h
+  Ip4Config2.vfr
+  Ip4DxeStrings.uni
+  Ip4NvData.h
+  Ip4Config2Nv.h
+  Ip4Config2Nv.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[LibraryClasses]
+  UefiLib
+  BaseLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  DebugLib
+  NetLib
+  DpcLib
+  HiiLib
+  PrintLib
+  DevicePathLib
+  UefiHiiServicesLib
+
+[Protocols]
+  ## BY_START
+  ## UNDEFINED # variable
+  gEfiIp4ServiceBindingProtocolGuid
+  gEfiIp4ProtocolGuid                           ## BY_START
+  gEfiManagedNetworkServiceBindingProtocolGuid  ## TO_START
+  gEfiManagedNetworkProtocolGuid                ## TO_START
+  gEfiArpServiceBindingProtocolGuid             ## TO_START
+  gEfiIp4Config2ProtocolGuid                    ## BY_START
+  gEfiArpProtocolGuid                           ## TO_START
+  gEfiDhcp4ServiceBindingProtocolGuid           ## TO_START
+  gEfiDhcp4ProtocolGuid                         ## TO_START
+  gEfiIpSec2ProtocolGuid                        ## SOMETIMES_CONSUMES
+  gEfiHiiConfigAccessProtocolGuid               ## BY_START
+  gEfiDevicePathProtocolGuid                    ## TO_START
+
+[Guids]
+  ## SOMETIMES_CONSUMES ## GUID # HiiIsConfigHdrMatch   EFI_NIC_IP4_CONFIG_VARIABLE
+  ## SOMETIMES_PRODUCES ## GUID # HiiConstructConfigHdr EFI_NIC_IP4_CONFIG_VARIABLE
+  ## SOMETIMES_PRODUCES ## GUID # HiiGetBrowserData     EFI_NIC_IP4_CONFIG_VARIABLE
+  ## SOMETIMES_CONSUMES ## HII
+  gIp4Config2NvDataGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  Ip4DxeExtra.uni
+

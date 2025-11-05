@@ -1,0 +1,63 @@
+## @file Udp6Dxe.inf
+#  UDP packet service based on IPv6 stack.
+#
+#  This module produces EFI UDPv6 Protocol which provides simple packet-oriented
+#  services to transmit and receive UDP packets.
+#
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Udp6Dxe
+  FILE_GUID                      = D912C7BC-F098-4367-92BA-E911083C7B0E
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = Udp6DriverEntryPoint
+  UNLOAD_IMAGE                   = NetLibDefaultUnload
+  MODULE_UNI_FILE                = Udp6Dxe.uni
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  Udp6Driver.h
+  Udp6Driver.c
+  Udp6Impl.c
+  Udp6Impl.h
+  ComponentName.c
+  Udp6Main.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  UefiLib
+  DebugLib
+  IpIoLib
+  NetLib
+  DpcLib
+
+
+[Protocols]
+  gEfiIp6ProtocolGuid                           ## TO_START
+  gEfiIp6ServiceBindingProtocolGuid             ## TO_START
+  gEfiUdp6ServiceBindingProtocolGuid            ## BY_START
+  gEfiUdp6ProtocolGuid                          ## BY_START
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  Udp6DxeExtra.uni

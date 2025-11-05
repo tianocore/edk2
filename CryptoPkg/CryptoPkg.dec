@@ -1,0 +1,115 @@
+## @file
+#  Package for cryptography modules.
+#
+#  This Package provides cryptographic-related libraries for UEFI security modules.
+#  It also provides a test application to test libraries.
+#
+#  Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = CryptoPkg
+  PACKAGE_UNI_FILE               = CryptoPkg.uni
+  PACKAGE_GUID                   = 36470E80-36F2-4ba0-8CC8-937C7D9FF888
+  PACKAGE_VERSION                = 0.98
+
+[Includes]
+  Include
+
+[Includes.Common.Private]
+  Private
+  Library/Include
+  Library/OpensslLib/openssl
+  Library/OpensslLib/openssl/include
+  Library/OpensslLib/openssl/providers/common/include
+  Library/OpensslLib/openssl/providers/fips/include
+  Library/OpensslLib/openssl/providers/implementations/include
+  Library/OpensslLib/OpensslGen/include
+  Library/OpensslLib/OpensslGen/providers/common/include
+  Library/MbedTlsLib/Include
+  Library/MbedTlsLib/mbedtls/include
+  Library/MbedTlsLib/mbedtls/include/mbedtls
+  Library/MbedTlsLib/mbedtls/library
+
+[LibraryClasses]
+  ##  @libraryclass  Provides basic library functions for cryptographic primitives.
+  ##
+  BaseCryptLib|Include/Library/BaseCryptLib.h
+
+  ##  @libraryclass  Provides TLS library functions for EFI TLS protocol.
+  ##
+  TlsLib|Include/Library/TlsLib.h
+
+  ##  @libraryclass  Provides Unified API for different hash implementations.
+  #
+  HashApiLib|Include/Library/HashApiLib.h
+
+[LibraryClasses.common.Private]
+  ##  @libraryclass  Provides library functions from the openssl project.
+  #
+  OpensslLib|Private/Library/OpensslLib.h
+  MbedTlsLib|Private/Library/MbedTlsLib.h
+
+  ##  @libraryclass  Provides compiler intrinsic functions required to link openssl project.
+  #
+  InstrinsicLib|Private/Library/IntrinsicLib.h
+
+[Protocols]
+  ## EDK II Crypto DXE protocol
+  # 2C2275C9-3A7B-426F-BE54-2D22BD9D1092
+  gEdkiiCryptoProtocolGuid =  { 0x2C2275C9, 0x3A7B, 0x426F, { 0xBE, 0x54, 0x2D, 0x22, 0xBD, 0x9D, 0x10, 0x92 }}
+
+  ## EDK II Crypto SMM protocol
+  # F46B2EB2-E0D7-4C96-A3B1-CB7C572EB300
+  gEdkiiSmmCryptoProtocolGuid =  { 0xF46B2EB2, 0xE0D7, 0x4C96, { 0xA3, 0xB1, 0xc, 0x61, 0xbb, 0x24, 0x5c, 0x42 }}
+
+[Ppis]
+  ## EDK II Crypto PPI
+  # 7DCE671B-C223-446A-A705-ED637AAF6771
+  gEdkiiCryptoPpiGuid =  { 0x7DCE671B, 0xC223, 0x446A, { 0xA7, 0x05, 0xED, 0x63, 0x7A, 0xAF, 0x67, 0x71 }}
+
+[Guids]
+  ## Crypto package token space guid.
+  gEfiCryptoPkgTokenSpaceGuid      = { 0x6bd7de60, 0x9ef7, 0x4899, { 0x97, 0xd0, 0xab, 0xff, 0xfd, 0xe9, 0x70, 0xf2 } }
+
+[PcdsFeatureFlag.IA32, PcdsFeatureFlag.X64]
+  ## Enable the use of NASM assembly source files when building an optimized
+  #  version of OpensslLib from generated assembly source files for IA32 and X64.
+  #  The generated NASM assembly source files only work with MSFT family of tool
+  #  chains or the CLANGPDB tool chain. All other tool chains must use the GAS
+  #  assembly source files. The default setting is to not use the NASM assembly
+  #  source files.
+  # @Prompt Use NASM assembly source files for optimized version of OpensslLib for IA32/X64
+  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm|FALSE|BOOLEAN|0x00000003
+
+[PcdsFixedAtBuild]
+  ## Enable/Disable the families and individual services produced by the
+  #  EDK II Crypto Protocols/PPIs.  The default is all services disabled.
+  #  This Structured PCD is associated with PCD_CRYPTO_SERVICE_FAMILY_ENABLE
+  #  structure that is defined in Include/Pcd/PcdCryptoServiceFamilyEnable.h.
+  # @Prompt Enable/Disable EDK II Crypto Protocol/PPI services
+  gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable|{0x00}|PCD_CRYPTO_SERVICE_FAMILY_ENABLE|0x00000002 {
+    <Packages>
+      CryptoPkg/CryptoPkg.dec
+    <HeaderFiles>
+      Pcd/PcdCryptoServiceFamilyEnable.h
+  }
+
+  ## This PCD indicates the HASH algorithm to calculate hash of data
+  #  Based on the value set, the required algorithm is chosen to calculate
+  #  the hash of data.<BR>
+  #  The default hashing algorithm for BaseHashApiLib is set to SHA256.<BR>
+  #     0x00000001    - HASH_ALG_SHA1.<BR>
+  #     0x00000002    - HASH_ALG_SHA256.<BR>
+  #     0x00000004    - HASH_ALG_SHA384.<BR>
+  #     0x00000008    - HASH_ALG_SHA512.<BR>
+  #     0x00000010    - HASH_ALG_SM3_256.<BR>
+  # @Prompt Set policy for hashing unsigned image for Secure Boot.
+  # @ValidList 0x80000001 | 0x00000001, 0x00000002, 0x00000004, 0x00000008, 0x00000010
+  gEfiCryptoPkgTokenSpaceGuid.PcdHashApiLibPolicy|0x00000002|UINT32|0x00000001
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  CryptoPkgExtra.uni

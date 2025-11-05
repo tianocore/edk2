@@ -1,0 +1,59 @@
+## @file
+#  SPDM library.
+#
+#  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SpdmRequesterLib
+  FILE_GUID                      = 8B6024A3-270A-410F-91AB-9E99F05C2A58
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SpdmRequesterLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  libspdm/library/spdm_requester_lib/libspdm_req_challenge.c
+  libspdm/library/spdm_requester_lib/libspdm_req_common.c
+  libspdm/library/spdm_requester_lib/libspdm_req_communication.c
+  libspdm/library/spdm_requester_lib/libspdm_req_encap_certificate.c
+  libspdm/library/spdm_requester_lib/libspdm_req_encap_challenge_auth.c
+  libspdm/library/spdm_requester_lib/libspdm_req_encap_digests.c
+  libspdm/library/spdm_requester_lib/libspdm_req_encap_error.c
+  libspdm/library/spdm_requester_lib/libspdm_req_encap_key_update.c
+  libspdm/library/spdm_requester_lib/libspdm_req_encap_request.c
+  libspdm/library/spdm_requester_lib/libspdm_req_end_session.c
+  libspdm/library/spdm_requester_lib/libspdm_req_finish.c
+  libspdm/library/spdm_requester_lib/libspdm_req_get_capabilities.c
+  libspdm/library/spdm_requester_lib/libspdm_req_get_certificate.c
+  libspdm/library/spdm_requester_lib/libspdm_req_get_digests.c
+  libspdm/library/spdm_requester_lib/libspdm_req_get_measurements.c
+  libspdm/library/spdm_requester_lib/libspdm_req_get_version.c
+  libspdm/library/spdm_requester_lib/libspdm_req_handle_error_response.c
+  libspdm/library/spdm_requester_lib/libspdm_req_heartbeat.c
+  libspdm/library/spdm_requester_lib/libspdm_req_key_exchange.c
+  libspdm/library/spdm_requester_lib/libspdm_req_key_update.c
+  libspdm/library/spdm_requester_lib/libspdm_req_negotiate_algorithms.c
+  libspdm/library/spdm_requester_lib/libspdm_req_psk_exchange.c
+  libspdm/library/spdm_requester_lib/libspdm_req_psk_finish.c
+  libspdm/library/spdm_requester_lib/libspdm_req_send_receive.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  SpdmCommonLib
+  SpdmSecuredMessageLib
+  PlatformLibWrapper
+  MemLibWrapper

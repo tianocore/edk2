@@ -1,0 +1,56 @@
+## @file
+# Instance of Device Path Library based on Device Path Utilities Protocol.
+#
+#  Device Path Library that layers on top of the UEFI 2.0 Device Path Utilities Protocol.
+#  This library is not available for EFI 1.10 modules.
+#
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UefiDevicePathLibDevicePathProtocol
+  MODULE_UNI_FILE                = UefiDevicePathLibDevicePathProtocol.uni
+  FILE_GUID                      = 050EB8C6-C12E-4b86-892B-40985E8B3137
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DevicePathLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER SMM_CORE
+
+  CONSTRUCTOR                    = DevicePathLibConstructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  UefiDevicePathLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  BaseLib
+  DebugLib
+  PcdLib
+
+[Protocols]
+  gEfiDevicePathProtocolGuid                    ## SOMETIMES_CONSUMES
+  gEfiDevicePathUtilitiesProtocolGuid           ## CONSUMES
+  gEfiDevicePathToTextProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiDevicePathFromTextProtocolGuid            ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumDevicePathNodeCount    ## SOMETIMES_CONSUMES
+
+[Depex.common.DXE_DRIVER, Depex.common.DXE_RUNTIME_DRIVER, Depex.common.DXE_SMM_DRIVER]
+  gEfiDevicePathUtilitiesProtocolGuid
+

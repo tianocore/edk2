@@ -1,0 +1,16 @@
+// /** @file
+// Initialized Debug Agent in one separated DXE driver.
+//
+// This DXE driver will invoke Debug Agent Library to initialize the debug agent.
+//
+// Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Initialized Debug Agent in one separated DXE driver"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This DXE driver will invoke Debug Agent Library to initialize the debug agent."
+

@@ -1,0 +1,44 @@
+## @file
+# This driver produces Extended SCSI Pass Thru Protocol instances for
+# LSI Fusion MPT SCSI devices.
+#
+# Copyright (C) 2020, Oracle and/or its affiliates.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = MptScsiDxe
+  FILE_GUID                      = 2B3DB5DD-B315-4961-8454-0AFF3C811B19
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = MptScsiEntryPoint
+
+[Sources]
+  MptScsi.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiExtScsiPassThruProtocolGuid        ## BY_START
+  gEfiPciIoProtocolGuid                  ## TO_START
+
+[FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdMptScsiMaxTargetLimit   ## CONSUMES
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdMptScsiStallPerPollUsec ## CONSUMES

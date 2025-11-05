@@ -1,0 +1,48 @@
+## @file
+#  CcExitLib Library.
+#
+#  Copyright (C) 2020 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  Copyright (C) 2020 - 2022, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CcExitLib
+  FILE_GUID                      = 0e923c25-13cd-430b-8714-ffe85652a97b
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CcExitLib|PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources.common]
+  CcExitLib.c
+  CcExitVcHandler.c
+  CcExitVcHandler.h
+  CcInstruction.c
+  PeiDxeCcExitVcHandler.c
+  CcExitVeHandler.c
+  X64/TdVmcallCpuid.nasm
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  LocalApicLib
+  MemEncryptSevLib
+  AmdSvsmLib
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidSize

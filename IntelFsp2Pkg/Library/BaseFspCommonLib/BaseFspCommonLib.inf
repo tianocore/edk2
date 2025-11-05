@@ -1,0 +1,31 @@
+## @file
+#  Instance of FspCommonLib
+#  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseFspCommonLib
+  FILE_GUID                      = 38BE57E8-902C-485A-AB5E-D5AEC613194D
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FspCommonLib
+
+[Sources]
+  FspCommonLib.c
+  ReturnStatus.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  FspSwitchStackLib
+
+[Pcd]
+  gIntelFsp2PkgTokenSpaceGuid.PcdGlobalDataPointerAddress      ## CONSUMES
+

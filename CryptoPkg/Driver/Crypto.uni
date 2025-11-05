@@ -1,0 +1,13 @@
+// /** @file
+// Module that produces the EDK II Crypto Protocol/PPI using the library
+// services from BaseCryptLib and TlsLib.
+//
+// Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "Module that produces the EDK II Crypto Protocol/PPI using the library services from BaseCryptLib and TlsLib"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Module that produces the EDK II Crypto Protocol/PPI using the library services from BaseCryptLib and TlsLib."

@@ -1,0 +1,123 @@
+## @file
+# CI configuration for MdeModulePkg
+#
+# Copyright (c) Microsoft Corporation
+# Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+# (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+    "PrEval": {
+        "DscPath": "MdeModulePkg.dsc",
+    },
+    ## options defined .pytool/Plugin/LicenseCheck
+    "LicenseCheck": {
+        "IgnoreFiles": []
+    },
+    "EccCheck": {
+        ## Exception sample looks like below:
+        ## "ExceptionList": [
+        ##     "<ErrorID>", "<KeyWord>"
+        ## ]
+        "ExceptionList": [
+            "8005", "UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGE.UID",
+            "8005", "UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGE.HID",
+            "8001", "UefiSortLibUnitTestMain",
+            "8001", "MediaSanitizeUnitTestMain",
+        ],
+        ## Both file path and directory path are accepted.
+        "IgnoreFiles": [
+            "Library/LzmaCustomDecompressLib",
+            "Library/BrotliCustomDecompressLib",
+            "Universal/RegularExpressionDxe"
+        ]
+    },
+    ## options defined ci/Plugin/CompilerPlugin
+    "CompilerPlugin": {
+        "DscPath": "MdeModulePkg.dsc"
+    },
+    ## options defined ci/Plugin/HostUnitTestCompilerPlugin
+    "HostUnitTestCompilerPlugin": {
+        "DscPath": "Test/MdeModulePkgHostTest.dsc"
+    },
+
+    ## options defined ci/Plugin/CharEncodingCheck
+    "CharEncodingCheck": {
+        "IgnoreFiles": [
+            "MdeModulePkg/Universal/RegularExpressionDxe/oniguruma/test/testc.c",
+            "MdeModulePkg/Universal/RegularExpressionDxe/oniguruma/windows/testc.c"
+        ]
+    },
+
+    ## options defined ci/Plugin/DependencyCheck
+    "DependencyCheck": {
+        "AcceptableDependencies": [
+            "MdePkg/MdePkg.dec",
+            "MdeModulePkg/MdeModulePkg.dec",
+            "StandaloneMmPkg/StandaloneMmPkg.dec"
+        ],
+        # For host based unit tests
+        "AcceptableDependencies-HOST_APPLICATION":[
+            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec"
+        ],
+        # For UEFI shell based apps
+        "AcceptableDependencies-UEFI_APPLICATION":[],
+        "IgnoreInf": []
+    },
+
+    ## options defined ci/Plugin/DscCompleteCheck
+    "DscCompleteCheck": {
+        "IgnoreInf": [],
+        "DscPath": "MdeModulePkg.dsc"
+    },
+    ## options defined ci/Plugin/HostUnitTestDscCompleteCheck
+    "HostUnitTestDscCompleteCheck": {
+        "IgnoreInf": [""],
+        "DscPath": "Test/MdeModulePkgHostTest.dsc"
+    },
+
+    ## options defined ci/Plugin/GuidCheck
+    "GuidCheck": {
+        "IgnoreGuidName": [],
+        "IgnoreGuidValue": ["00000000-0000-0000-0000-000000000000"],
+        "IgnoreFoldersAndFiles": [],
+        "IgnoreDuplicates": [
+            "gEfiPeiMmAccessPpiGuid=gPeiSmmAccessPpiGuid",
+            "gPeiSmmControlPpiGuid=gEfiPeiMmControlPpiGuid",
+            "gEfiPeiMmCommunicationPpiGuid=gEfiPeiSmmCommunicationPpiGuid",
+            "gUiAppFileGuid=UiApp",
+        ]
+    },
+
+    ## options defined ci/Plugin/LibraryClassCheck
+    "LibraryClassCheck": {
+        "IgnoreHeaderFile": []
+    },
+
+    ## options defined ci/Plugin/SpellCheck
+    "SpellCheck": {
+        "AuditOnly": True,           # Fails test but run in AuditOnly mode to collect log
+        "IgnoreStandardPaths": [     # Standard Plugin defined paths that should be ignore
+            "*.c", "*.asm", "*.h", "*.nasm", "*.s", "*.asl", "*.inf"
+        ],
+        "IgnoreFiles": [             # use gitignore syntax to ignore errors in matching files
+            "Library/LzmaCustomDecompressLib/Sdk/DOC/*"
+        ],
+        "ExtendWords": [           # words to extend to the dictionary for this package
+            "LIGHTGRAY",
+            "DARKGRAY",
+            "LIGHTBLUE",
+            "LIGHTGREEN",
+            "LIGHTCYAN",
+            "LIGHTRED",
+            "LIGHTMAGENTA",
+            "FVMAIN",
+            "VARCHECKPCD",
+            "Getxx",
+            "lzturbo",
+            "musthave",
+            "canthave"
+        ],
+        "AdditionalIncludePaths": [] # Additional paths to spell check relative to package root (wildcards supported)
+    }
+}

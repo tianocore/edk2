@@ -1,0 +1,81 @@
+## @file
+#  NULL class library to register var check handler and variable property set for UEFI defined variables.
+#
+#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VarCheckUefiLib
+  MODULE_UNI_FILE                = VarCheckUefiLib.uni
+  FILE_GUID                      = AC24A4C7-F845-4665-90E5-6431D6E28DC0
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_RUNTIME_DRIVER DXE_SMM_DRIVER MM_STANDALONE
+  CONSTRUCTOR                    = VarCheckUefiLibNullClassConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  VarCheckUefiLibNullClass.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  VarCheckLib
+
+[Guids]
+  ## SOMETIMES_CONSUMES   ## Variable:L"LangCodes"
+  ## SOMETIMES_CONSUMES   ## Variable:L"Lang"
+  ## SOMETIMES_CONSUMES   ## Variable:L"Timeout"
+  ## SOMETIMES_CONSUMES   ## Variable:L"PlatformLangCodes"
+  ## SOMETIMES_CONSUMES   ## Variable:L"PlatformLang"
+  ## SOMETIMES_CONSUMES   ## Variable:L"ConIn"
+  ## SOMETIMES_CONSUMES   ## Variable:L"ConOut"
+  ## SOMETIMES_CONSUMES   ## Variable:L"ErrOut"
+  ## SOMETIMES_CONSUMES   ## Variable:L"ConInDev"
+  ## SOMETIMES_CONSUMES   ## Variable:L"ConOutDev"
+  ## SOMETIMES_CONSUMES   ## Variable:L"ErrOutDev"
+  ## SOMETIMES_CONSUMES   ## Variable:L"BootOrder"
+  ## SOMETIMES_CONSUMES   ## Variable:L"BootNext"
+  ## SOMETIMES_CONSUMES   ## Variable:L"BootCurrent"
+  ## SOMETIMES_CONSUMES   ## Variable:L"BootOptionSupport"
+  ## SOMETIMES_CONSUMES   ## Variable:L"DriverOrder"
+  ## SOMETIMES_CONSUMES   ## Variable:L"SysPrepOrder"
+  ## SOMETIMES_CONSUMES   ## Variable:L"HwErrRecSupport"
+  ## SOMETIMES_CONSUMES   ## Variable:L"SetupMode"
+  ## SOMETIMES_CONSUMES   ## Variable:L"PK"
+  ## SOMETIMES_CONSUMES   ## Variable:L"KEK"
+  ## SOMETIMES_CONSUMES   ## Variable:L"SignatureSupport"
+  ## SOMETIMES_CONSUMES   ## Variable:L"SecureBoot"
+  ## SOMETIMES_CONSUMES   ## Variable:L"KEKDefault"
+  ## SOMETIMES_CONSUMES   ## Variable:L"PKDefault"
+  ## SOMETIMES_CONSUMES   ## Variable:L"dbDefault"
+  ## SOMETIMES_CONSUMES   ## Variable:L"dbxDefault"
+  ## SOMETIMES_CONSUMES   ## Variable:L"dbtDefault"
+  ## SOMETIMES_CONSUMES   ## Variable:L"OsIndicationsSupported"
+  ## SOMETIMES_CONSUMES   ## Variable:L"OsIndications"
+  ## SOMETIMES_CONSUMES   ## Variable:L"VendorKeys"
+  ## SOMETIMES_CONSUMES   ## Variable:L"Boot####"
+  ## SOMETIMES_CONSUMES   ## Variable:L"Driver####"
+  ## SOMETIMES_CONSUMES   ## Variable:L"SysPrep####"
+  ## SOMETIMES_CONSUMES   ## Variable:L"Key####"
+  gEfiGlobalVariableGuid
+  ## SOMETIMES_CONSUMES   ## Variable:L"DB"
+  ## SOMETIMES_CONSUMES   ## Variable:L"DBX"
+  ## SOMETIMES_CONSUMES   ## Variable:L"DBT"
+  gEfiImageSecurityDatabaseGuid
+  gEfiHardwareErrorVariableGuid  ## SOMETIMES_CONSUMES    ## Variable:L"HwErrRec####"

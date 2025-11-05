@@ -1,0 +1,146 @@
+## @file
+# Firmware Management Protocol Device Package
+#
+# This package provides an implementation of a Firmware Management Protocol
+# instance that supports the update of firmware storage devices using UEFI
+# Capsules.  The behavior of the Firmware Management Protocol instance is
+# customized using libraries and PCDs.
+#
+# Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
+# Copyright (c) 2018 - 2020, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION = 0x00010005
+  PACKAGE_NAME      = FmpDevicePkg
+  PACKAGE_UNI_FILE  = FmpDevicePkg.uni
+  PACKAGE_GUID      = 080b5b4f-27c6-11e8-84d1-f8597177a00a
+  PACKAGE_VERSION   = 0.1
+
+[Includes]
+  Include
+
+[Includes.Common.Private]
+  PrivateInclude
+
+[LibraryClasses]
+  ##  @libraryclass  Provides platform policy services used during a capsule
+  #                  update.
+  CapsuleUpdatePolicyLib|Include/Library/CapsuleUpdatePolicyLib.h
+
+  ##  @libraryclass  Provides firmware device specific services to support
+  #                  updates of a firmware image stored in a firmware device.
+  FmpDeviceLib|Include/Library/FmpDeviceLib.h
+
+  ##  @libraryclass  Provides generic services to support capsule dependency
+  #                  expression evaluation.
+  FmpDependencyLib|Include/Library/FmpDependencyLib.h
+
+  ##  @libraryclass  Provides platform specific services to support dependency
+  #                  check during update of firmware image.
+  FmpDependencyCheckLib|Include/Library/FmpDependencyCheckLib.h
+
+  ##  @libraryclass  Provides firmware device specific services to support
+  #                  saving dependency to firmware device and getting dependency
+  #                  from firmware device.
+  FmpDependencyDeviceLib|Include/Library/FmpDependencyDeviceLib.h
+
+[LibraryClasses.Common.Private]
+  ##  @libraryclass  Provides services to retrieve values from a capsule's FMP
+  #                  Payload Header.  The structure is not included in the
+  #                  library class.  Instead, services are provided to retrieve
+  #                  information from the FMP Payload Header.  If information is
+  #                  added to the FMP Payload Header, then new services may be
+  #                  added to this library class to retrieve the new information.
+  FmpPayloadHeaderLib|PrivateInclude/Library/FmpPayloadHeaderLib.h
+
+[Guids]
+  ## Firmware Management Protocol Device Package Token Space GUID
+  gFmpDevicePkgTokenSpaceGuid = { 0x40b2d964, 0xfe11, 0x40dc, { 0x82, 0x83, 0x2e, 0xfb, 0xda, 0x29, 0x53, 0x56 } }
+
+[Protocols.Common.Private]
+  ## Capsule Update Policy Protocol
+  gEdkiiCapsuleUpdatePolicyProtocolGuid = { 0x487784c5, 0x6299, 0x4ba6, { 0xb0, 0x96, 0x5c, 0xc5, 0x27, 0x7c, 0xf7, 0x57 } }
+
+[PcdsFeatureFlag]
+  ## Indicates if the Firmware Management Protocol supports access to
+  #  to a firmware storage device.  If set to FALSE, then only GetImageInfo()
+  #  is supported.  This is used by FMP drivers that require the smallest
+  #  possible Firmware Management Protocol implementation that supports
+  #  advertising the updatable firmware device in the ESRT.<BR>
+  #    TRUE  - All Firmware Management Protocol services supported.<BR>
+  #    FALSE - Firmware Management Protocol returns EFI_UNSUPPORTED for
+  #            all services except GetImageInfo().<BR>
+  # @Prompt Firmware Device Storage Access Enabled.
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceStorageAccessEnable|TRUE|BOOLEAN|0x40000011
+
+[PcdsFixedAtBuild]
+  ## The SHA-256 hash of a PKCS7 test key that is used to detect if a test key
+  #  is being used to authenticate capsules.  Test key detection is disabled by
+  #  setting the value to {0}.
+  # @Prompt SHA-256 hash of PKCS7 test key.
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceTestKeySha256Digest|{0x2E, 0x97, 0x89, 0x1B, 0xDB, 0xE7, 0x08, 0xAA,  0x8C, 0xB2, 0x8F, 0xAD, 0x20, 0xA9, 0x83, 0xC7,  0x84, 0x7D, 0x4F, 0xEE, 0x48, 0x25, 0xE9, 0x4D,  0x39, 0xFA, 0x34, 0x9A, 0xB8, 0xB1, 0xC4, 0x26}|VOID*|0x40000009
+
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+  ## The color of the progress bar during a firmware update.  Each firmware
+  #  device can set its own color.  The default color is white.<BR><BR>
+  #  Bits  7..0  - Red<BR>
+  #  Bits 15..8  - Green<BR>
+  #  Bits 23..16 - Blue<BR>
+  # @Prompt Firmware Device Progress Bar Color.
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceProgressColor|0x00FFFFFF|UINT32|0x40000004
+
+  ## The Null-terminated Unicode string used to fill in the ImageIdName field of
+  #  the EFI_FIRMWARE_IMAGE_DESCRIPTOR structure that is returned by the
+  #  GetImageInfo() service of the Firmware Management Protocol for the firmware
+  #  device.  An ImageIdName string must be provided for each firmware device.
+  #  The default value is an empty string.
+  # @Prompt Firmware Device ImageIdName string.
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageIdName|L""|VOID*|0x40000007
+
+  ## The build time value used to fill in the LowestSupportedVersion field of
+  #  the EFI_FIRMWARE_IMAGE_DESCRIPTOR structure that is returned by the
+  #  GetImageInfo() service of the Firmware Management Protocol.  This value is
+  #  only used if the firmware device does not provide a method to report the
+  #  lowest supported version value from the current firmware image and the
+  #  UEFI variable used to provide the lowest supported version value does not
+  #  exist.  The default value is 0.
+  # @Prompt Build Time Firmware Device Lowest Support Version.
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceBuildTimeLowestSupportedVersion|0x0|UINT32|0x4000000C
+
+  ## The time in seconds to arm a watchdog timer during the update of a firmware
+  #  device.  The watchdog is re-armed each time the FmpDeviceLib calls the
+  #  Progress() function passed into FmpDeviceSetImage() function.  The
+  #  FmpDeviceLib calls Progress() to update the percent completion of a
+  #  firmware update.  If the watchdog timer expires, the system reboots.  A
+  #  value of 0 disables the watchdog timer.  The default value is 0 (watchdog
+  #  disabled).
+  # @Prompt Firmware Device Watchdog Time in Seconds.
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceProgressWatchdogTimeInSeconds|0x0|UINT8|0x4000000D
+
+  ## The Image Type ID to use if one is not provided by FmpDeviceLib. If this
+  #  PCD is not a valid GUID value, then gEfiCallerIdGuid is used.
+  # @Prompt Firmware Device Image Type ID
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageTypeIdGuid|{0}|VOID*|0x40000010
+
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+  ## One or more PKCS7 certificates used to verify a firmware device capsule
+  #  update image.  Encoded using the Variable-Length Opaque Data format of RFC
+  #  4506 External Data Representation Standard (XDR).  The default value is
+  #  empty with 0 certificates.
+  # @Prompt One or more XDR encoded PKCS7 certificates used to verify firmware device capsule update images.
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr|{0x0}|VOID*|0x4000000E
+
+  ## An event GUID that locks the firmware device when the event is signaled.
+  #  If this PCD is not a valid GUID value, then the firmware device is locked
+  #  when gEfiEndOfDxeEventGroupGuid (End of DXE Phase) is signaled.  The
+  #  default value is empty, so by default the firmware device is locked at the
+  #  end of the DXE phase.
+  # @Prompt Firmware Device Lock Event GUID.
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceLockEventGuid|{0}|VOID*|0x4000000F
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  FmpDevicePkgExtra.uni

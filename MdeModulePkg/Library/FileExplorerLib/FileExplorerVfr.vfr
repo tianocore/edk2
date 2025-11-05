@@ -1,0 +1,79 @@
+///** @file
+//
+//    File Explorer Formset
+//
+//  Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//**/
+
+#include "FormGuid.h"
+
+formset
+  guid = EFI_FILE_EXPLORE_FORMSET_GUID,
+  title = STRING_TOKEN(STR_FILE_EXPLORER_TITLE),
+  help = STRING_TOKEN(STR_NULL_STRING),
+  classguid = EFI_FILE_EXPLORE_FORMSET_GUID,
+
+  form formid = FORM_FILE_EXPLORER_ID,
+       title = STRING_TOKEN(STR_FILE_EXPLORER_TITLE);
+
+       label FORM_FILE_EXPLORER_ID;
+       label LABEL_END;
+  endform;
+
+  form formid = FORM_ADD_NEW_FILE_ID,
+       title = STRING_TOKEN(STR_ADD_NEW_FILE_TITLE);
+
+      string
+          prompt   = STRING_TOKEN(STR_NEW_FILE_NAME_PROMPT),
+          help     = STRING_TOKEN(STR_NEW_FILE_NAME_HELP),
+          flags    = INTERACTIVE,
+          key      = NEW_FILE_NAME_ID,
+          minsize  = 2,
+          maxsize  = 20,
+      endstring;
+
+      subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+       text
+         help   = STRING_TOKEN(STR_CREATE_FILE_AND_EXIT),
+         text   = STRING_TOKEN(STR_CREATE_FILE_AND_EXIT),
+         flags  = INTERACTIVE,
+         key    = KEY_VALUE_CREATE_FILE_AND_EXIT;
+
+       text
+         help   = STRING_TOKEN(STR_NO_CREATE_FILE_AND_EXIT),
+         text   = STRING_TOKEN(STR_NO_CREATE_FILE_AND_EXIT),
+         flags  = INTERACTIVE,
+         key    = KEY_VALUE_NO_CREATE_FILE_AND_EXIT;
+  endform;
+
+  form formid = FORM_ADD_NEW_FOLDER_ID,
+      title = STRING_TOKEN(STR_ADD_NEW_FOLDER_TITLE);
+
+      string
+          prompt   = STRING_TOKEN(STR_NEW_FOLDER_NAME_PROMPT),
+          help     = STRING_TOKEN(STR_NEW_FOLDER_NAME_HELP),
+          flags    = INTERACTIVE,
+          key      = NEW_FOLDER_NAME_ID,
+          minsize  = 2,
+          maxsize  = 20,
+      endstring;
+
+      subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+      text
+        help   = STRING_TOKEN(STR_CREATE_FOLDER_AND_EXIT),
+        text   = STRING_TOKEN(STR_CREATE_FOLDER_AND_EXIT),
+        flags  = INTERACTIVE,
+        key    = KEY_VALUE_CREATE_FOLDER_AND_EXIT;
+
+      text
+        help   = STRING_TOKEN(STR_NO_CREATE_FOLDER_AND_EXIT),
+        text   = STRING_TOKEN(STR_NO_CREATE_FOLDER_AND_EXIT),
+        flags  = INTERACTIVE,
+        key    = KEY_VALUE_NO_CREATE_FOLDER_AND_EXIT;
+  endform;
+
+endformset;

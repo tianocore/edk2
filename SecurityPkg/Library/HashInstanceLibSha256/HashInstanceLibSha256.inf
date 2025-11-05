@@ -1,0 +1,41 @@
+## @file
+#  Provides BaseCrypto SHA256 hash service
+#
+#  This library can be registered to BaseCrypto router, to serve as hash engine.
+#
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = HashInstanceLibSha256
+  MODULE_UNI_FILE                = HashInstanceLibSha256.uni
+  FILE_GUID                      = 5810798A-ED30-4080-8DD7-B9667A748C02
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = HashInstanceLibSha256Constructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  HashInstanceLibSha256.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  Tpm2CommandLib
+  MemoryAllocationLib
+  BaseCryptLib

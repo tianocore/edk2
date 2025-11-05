@@ -1,0 +1,24 @@
+// /** @file
+// String definitions for BootManagerMenuApp.
+//
+// Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+/=#
+
+#langdef   en-US "English"
+#langdef   fr-FR "Français"
+
+#string STR_BOOT_POPUP_MENU_TITLE_STRING  #language    en-US    "Please select boot device:"
+                                          #language    fr-FR    "Please select boot device:"
+
+#string STR_BOOT_POPUP_MENU_HELP1_STRING  #language    en-US    "↑ and ↓ to move selection"
+                                          #language    fr-FR    "↑ and ↓ to move selection"
+
+#string STR_BOOT_POPUP_MENU_HELP2_STRING  #language    en-US    "ENTER to select boot device"
+                                          #language    fr-FR    "ENTER to select boot device"
+
+#string STR_BOOT_POPUP_MENU_HELP3_STRING  #language    en-US    "ESC to exit"
+                                          #language    fr-FR    "ESC to exit"

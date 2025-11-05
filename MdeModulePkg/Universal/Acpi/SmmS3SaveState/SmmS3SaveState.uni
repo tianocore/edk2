@@ -1,0 +1,16 @@
+// /** @file
+// S3 SMM Boot Script Save State driver.
+//
+// It will install S3 SMM Save State protocol to store or record various IO operations to be replayed during an S3 resume.
+//
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "S3 SMM Boot Script Save State driver"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "It will install the S3 SMM Save State protocol to store or record various IO operations to be replayed during an S3 resume."
+

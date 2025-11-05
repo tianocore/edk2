@@ -1,0 +1,46 @@
+## @file
+#  Base CPU Timer Library
+#
+#  Provides basic timer support.
+#
+#  In x86, using CPUID Leaf 0x15 XTAL frequency. The performance
+#  counter features are provided by the processors time stamp counter.
+#
+#  In LoongArch64, using CPUCFG 0x4 and 0x5 for Stable Counter frequency.
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseCpuTimerLib
+  FILE_GUID                      = F10B5B91-D15A-496C-B044-B5235721AA08
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TimerLib
+  MODULE_UNI_FILE                = BaseCpuTimerLib.uni
+
+[Sources.IA32, Sources.X64]
+  CpuTimerLib.c
+  BaseCpuTimerLib.c
+
+[Sources.LoongArch64]
+  LoongArch64/CpuTimerLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  PcdLib
+
+[LibraryClasses.LoongArch64]
+  SafeIntLib
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuCoreCrystalClockFrequency  ## CONSUMES

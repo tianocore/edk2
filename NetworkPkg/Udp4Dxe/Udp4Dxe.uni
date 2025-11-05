@@ -1,0 +1,17 @@
+// /** @file
+// This module produces EFI UDP Protocol and EFI UDPv4 Service Binding Protocol.
+//
+// This module produces EFI UDP(User Datagram Protocol) Protocol upon EFI IPv4
+// Protocol, to provide basic UDPv4 I/O services.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces EFI UDP Protocol and EFI UDPv4 Service Binding Protocol"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module produces EFI UDP(User Datagram Protocol) Protocol upon EFI IPv4 Protocol to provide basic UDPv4 I/O services."
+

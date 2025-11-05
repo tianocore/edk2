@@ -1,0 +1,42 @@
+## @file
+# Component Description File for NonDiscoverableDeviceRegistrationLib.
+#
+# Copyright (c) 2016, Linaro, Ltd. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = NonDiscoverableDeviceRegistrationLib
+  FILE_GUID                      = 8802ae41-8184-49cb-8aec-62627cd7ceb4
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NonDiscoverableDeviceRegistrationLib
+
+[Sources]
+  NonDiscoverableDeviceRegistrationLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEdkiiNonDiscoverableDeviceProtocolGuid    ## PRODUCES
+
+[Guids]
+  gEdkiiNonDiscoverableAhciDeviceGuid    ## CONSUMES   ## GUID
+  gEdkiiNonDiscoverableAmbaDeviceGuid    ## CONSUMES   ## GUID
+  gEdkiiNonDiscoverableEhciDeviceGuid    ## CONSUMES   ## GUID
+  gEdkiiNonDiscoverableNvmeDeviceGuid    ## CONSUMES   ## GUID
+  gEdkiiNonDiscoverableOhciDeviceGuid    ## CONSUMES   ## GUID
+  gEdkiiNonDiscoverableSdhciDeviceGuid   ## CONSUMES   ## GUID
+  gEdkiiNonDiscoverableUfsDeviceGuid     ## CONSUMES   ## GUID
+  gEdkiiNonDiscoverableUhciDeviceGuid    ## CONSUMES   ## GUID
+  gEdkiiNonDiscoverableXhciDeviceGuid    ## CONSUMES   ## GUID

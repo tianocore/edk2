@@ -1,0 +1,58 @@
+/** @file
+  VFR file used by the HTTP Boot configuration component.
+
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include "HttpBootConfigNVDataStruc.h"
+
+
+formset
+  guid   = HTTP_BOOT_CONFIG_GUID,
+  title  = STRING_TOKEN(STR_HTTP_BOOT_CONFIG_FORM_TITLE),
+  help   = STRING_TOKEN(STR_HTTP_BOOT_CONFIG_FORM_HELP),
+
+  varstore HTTP_BOOT_CONFIG_IFR_NVDATA,
+    name = HTTP_BOOT_CONFIG_IFR_NVDATA,
+    guid = HTTP_BOOT_CONFIG_GUID;
+
+  form formid = FORMID_MAIN_FORM,
+    title  = STRING_TOKEN(STR_HTTP_BOOT_CONFIG_FORM_TITLE);
+
+    string  varid   = HTTP_BOOT_CONFIG_IFR_NVDATA.Description,
+            prompt  = STRING_TOKEN(STR_BOOT_DESCRIPTION_PROMPT),
+            help    = STRING_TOKEN(STR_NULL_STRING),
+            minsize = DESCRIPTION_STR_MIN_SIZE,
+            maxsize = DESCRIPTION_STR_MAX_SIZE,
+    endstring;
+
+    oneof varid  = HTTP_BOOT_CONFIG_IFR_NVDATA.IpVersion,
+          prompt = STRING_TOKEN(STR_HTTP_BOOT_IP_VERSION_PROMPT),
+          help   = STRING_TOKEN(STR_HTTP_BOOT_IP_VERSION_HELP),
+          option text = STRING_TOKEN(STR_HTTP_BOOT_IP_VERSION_4),   value = HTTP_BOOT_IP_VERSION_4,   flags = DEFAULT;
+          option text = STRING_TOKEN(STR_HTTP_BOOT_IP_VERSION_6),   value = HTTP_BOOT_IP_VERSION_6,   flags = 0;
+    endoneof;
+
+    string  varid   = HTTP_BOOT_CONFIG_IFR_NVDATA.Uri,
+            prompt  = STRING_TOKEN(STR_BOOT_URI_PROMPT),
+            help    = STRING_TOKEN(STR_BOOT_URI_HELP),
+            flags   = INTERACTIVE,
+            key     = KEY_INITIATOR_URI,
+            minsize = URI_STR_MIN_SIZE,
+            maxsize = URI_STR_MAX_SIZE,
+    endstring;
+
+    string  varid   = HTTP_BOOT_CONFIG_IFR_NVDATA.ProxyUri,
+            prompt  = STRING_TOKEN(STR_BOOT_PROXY_URI_PROMPT),
+            help    = STRING_TOKEN(STR_BOOT_PROXY_URI_HELP),
+            flags   = INTERACTIVE,
+            key     = KEY_INITIATOR_PROXY_URI,
+            minsize = URI_STR_MIN_SIZE,
+            maxsize = URI_STR_MAX_SIZE,
+    endstring;
+  endform;
+
+endformset;

@@ -1,0 +1,16 @@
+// /** @file
+// This module produces the UEFI boot service GetNextMonotonicCount() and runtime service GetNextHighMonotonicCount().
+//
+// This module produces the UEFI boot service GetNextMonotonicCount() and runtime service GetNextHighMonotonicCount().
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces the UEFI boot service GetNextMonotonicCount() and runtime service GetNextHighMonotonicCount()"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module produces the UEFI boot service GetNextMonotonicCount() and runtime service GetNextHighMonotonicCount()."
+

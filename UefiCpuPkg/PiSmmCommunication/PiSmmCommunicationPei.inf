@@ -1,0 +1,64 @@
+## @file
+# PI SMM Communication PEIM which produces PEI SMM Communication PPI.
+#
+# This PEIM retrieves the SMM communication context and produces PEI SMM
+# Communication PPIin the S3 boot mode.
+#
+# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PiSmmCommunicationPei
+  MODULE_UNI_FILE                = PiSmmCommunicationPei.uni
+  FILE_GUID                      = 1C8B7F78-1699-40e6-AF33-9B995D16B043
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PiSmmCommunicationPeiEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  PiSmmCommunicationPei.c
+  PiSmmCommunicationPrivate.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  PeiServicesTablePointerLib
+  PeiServicesLib
+  BaseLib
+  BaseMemoryLib
+  HobLib
+  DebugLib
+
+[Guids]
+  gEfiAcpiVariableGuid               ## CONSUMES ## HOB
+
+[Ppis]
+  ## PRODUCES
+  ## UNDEFINED # HOB # SMM Configuration Table
+  gEfiPeiSmmCommunicationPpiGuid
+  gPeiSmmAccessPpiGuid               ## CONSUMES
+  gPeiSmmControlPpiGuid              ## CONSUMES
+
+# [BootMode]
+#   S3_RESUME                        ## CONSUMES
+
+[Depex]
+  gPeiSmmAccessPpiGuid AND
+  gPeiSmmControlPpiGuid AND
+  gEfiPeiMasterBootModePpiGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  PiSmmCommunicationPeiExtra.uni

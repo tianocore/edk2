@@ -1,0 +1,31 @@
+## @file
+#  Null instance of Serial Port Library with empty functions.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseSerialPortLibNull
+  MODULE_UNI_FILE                = BaseSerialPortLibNull.uni
+  FILE_GUID                      = E4541241-8897-411a-91F8-7D7E45837146
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SerialPortLib
+
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  BaseSerialPortLibNull.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+

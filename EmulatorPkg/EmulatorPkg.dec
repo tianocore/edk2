@@ -1,0 +1,124 @@
+## @file
+#
+# This is the Emu Emulation Environment Platform
+#
+# Copyright (c) 2008 - 2022, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2011, Apple Inc. All rights reserved.
+# (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = EmulatorPkg
+  PACKAGE_GUID                   = 36E48BD7-7D92-5A47-A2CD-513F072E3300
+  PACKAGE_VERSION                = 0.1
+
+
+[Includes]
+  Include
+
+
+[LibraryClasses]
+  ThunkPpiList|Include/Library/ThunkPpiList.h
+  ThunkProtocolList|Include/Library/ThunkProtocolList.h
+  EmuThunkLib|Include/Library/EmuThunkLib.h
+  KeyMap|Include/Library/KeyMapLib.h
+  PpiListLib|Include/Library/PpiListLib.h
+  SmbiosLib|Include/Library/SmbiosLib.h
+  EmuMagicPageLib|Include/Library/EmuMagicPageLib.h
+
+[Protocols]
+  gEmuThunkProtocolGuid          = { 0x5CF32E0B, 0x8EDF, 0x2E44, { 0x9C, 0xDA, 0x93, 0x20, 0x5E, 0x99, 0xEC, 0x1C } }
+  gEmuIoThunkProtocolGuid        = { 0x453368F6, 0x7C85, 0x434A, { 0xA9, 0x8A, 0x72, 0xD1, 0xB7, 0xFF, 0xA9, 0x26 } }
+  gEmuGraphicsWindowProtocolGuid = { 0x30FD316A, 0x6728, 0x2E41, { 0xA6, 0x90, 0x0D, 0x13, 0x33, 0xD8, 0xCA, 0xC1 } }
+  gEmuThreadThunkProtocolGuid    = { 0x3B1E4B7C, 0x09D8, 0x944F, { 0xA4, 0x08, 0x13, 0x09, 0xEB, 0x8B, 0x44, 0x27 } }
+  gEmuBlockIoProtocolGuid        = { 0x6888A4AE, 0xAFCE, 0xE84B, { 0x91, 0x02, 0xF7, 0xB9, 0xDA, 0xE6, 0xA0, 0x30 } }
+  gEmuSnpProtocolGuid            = { 0xFD5FBE54, 0x8C35, 0xB345, { 0x8A, 0x0F, 0x7A, 0xC8, 0xA5, 0xFD, 0x05, 0x21 } }
+
+[Ppis]
+  gEmuThunkPpiGuid               = { 0xE113F896, 0x75CF, 0xF640, { 0x81, 0x7F, 0xC8, 0x5A, 0x79, 0xE8, 0xAE, 0x67 } }
+
+[Guids]
+  gEmulatorPkgTokenSpaceGuid  = { 0x4F792E68, 0xE8C8, 0x794E, { 0xB1, 0xD8, 0x37, 0x03, 0xF3, 0xF2, 0xD5, 0xA5 } }
+  gEmuSystemConfigGuid       = { 0xF8626165, 0x6CEB, 0x924A, { 0xBA, 0xFC, 0xF1, 0x3A, 0xB9, 0xD6, 0x57, 0x28 } }
+  gEmuVirtualDisksGuid       = { 0xf2ba331a, 0x8985, 0x11db, { 0xa4, 0x06, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35 } }
+  gEmuPhysicalDisksGuid      = { 0xf2bdcc96, 0x8985, 0x11db, { 0x87, 0x19, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35 } }
+  gEmuRedfishServiceGuid     = { 0x3fb208ac, 0x2185, 0x498c, { 0xbf, 0x46, 0xdc, 0x23, 0xda, 0x58, 0x7b, 0x55 } }
+
+[PcdsFeatureFlag]
+  ## If TRUE, if symbols only load on breakpoints and gdb entry
+  gEmulatorPkgTokenSpaceGuid.PcdEmulatorLazyLoadSymbols|TRUE|BOOLEAN|0x00020000
+
+[PcdsFixedAtBuild]
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageVariableBase|0x0|UINT64|0x00001014
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwSpareBase|0x0|UINT64|0x00001015
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwWorkingBase|0x0|UINT64|0x00001016
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFdBaseAddress|0x0|UINT64|0x00001017
+
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageEventLogBase|0x0|UINT64|0x0000100e
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageEventLogSize|0x0|UINT32|0x0000100f
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashFvRecoveryBase|0x0|UINT64|0x00001010
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashFvRecoverySize|0x0|UINT32|0x00001011
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareFdSize|0x0|UINT32|0x00001012
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareBlockSize|0|UINT32|0x00001013
+
+  ## Number of Application Processors (APs) in the system 0 means Uniprocessor mode
+  gEmulatorPkgTokenSpaceGuid.PcdEmuApCount|L"0"|VOID*|0x00001019
+
+  ## Magic page to implement PEI Services Table Pointer Lib
+  gEmulatorPkgTokenSpaceGuid.PcdPeiServicesTablePage|0x1013000000|UINT64|0x0000101b
+
+  ## Size of the packet filter
+  gEmulatorPkgTokenSpaceGuid.PcdNetworkPacketFilterSize|524288|UINT32|0x0000101c
+
+  ## Platform level Redfish Service control PCD
+  # These PCDs are used to stop the Redfish sevice when secure boot is disabled
+  # or exit boot service.
+  gEmulatorPkgTokenSpaceGuid.PcdRedfishServiceStopIfSecureBootDisabled|TRUE|BOOLEAN|0x00001020
+  gEmulatorPkgTokenSpaceGuid.PcdRedfishServiceStopIfExitbootService|TRUE|BOOLEAN|0x00001021
+  ##
+  # edk2 Redfish implementation on Emulator package is designed to access
+  # to Redfish simulator.
+  # https://github.com/DMTF/Redfish-Profile-Simulator
+  # The user ID and password are fixed as below.
+  gEmulatorPkgTokenSpaceGuid.PcdRedfishServiceUserId|"admin"|VOID*|0x00001022
+  gEmulatorPkgTokenSpaceGuid.PcdRedfishServicePassword|"pwd123456"|VOID*|0x00001023
+  gEmulatorPkgTokenSpaceGuid.PcdPersistentMemorySize|0x4000000|UINT32|0x00001024
+
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+  gEmulatorPkgTokenSpaceGuid.PcdEmuBootMode|1|UINT32|0x00001006
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareVolume|L"..\\Fv\\Fv_Recovery.fd"|VOID*|0x00001009
+  gEmulatorPkgTokenSpaceGuid.PcdEmuMemorySize|L"64!64"|VOID*|0x0000100c
+
+  #
+  # filename[:[R|F][O|W]][:BlockSize]
+  # filename can be a device node, like /dev/disk1
+  # R - Removable Media F - Fixed Media
+  # O - Write protected W - Writable
+  #   Default is Fixed Media, Writable
+  # For a file the default BlockSize is 512, and can be overridden via BlockSize,
+  #  for example 2048 for an ISO CD image. The block size for a device comes from
+  #  the device and is not configurable.
+  # Device Size comes from file or device.
+  # On Mac OS X you can use Disk Utility to create .dmg files and mount them like disks
+  gEmulatorPkgTokenSpaceGuid.PcdEmuVirtualDisk|L"disk.dmg:FW"|VOID*|0x00001001
+
+  gEmulatorPkgTokenSpaceGuid.PcdEmuGop|L"GOP Window"|VOID*|0x00001018
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFileSystem|L"."|VOID*|0x00001004
+  gEmulatorPkgTokenSpaceGuid.PcdEmuSerialPort|L"/dev/ttyS0"|VOID*|0x00001002
+
+  #
+  # On Unix host, this is the network interface name on host system that will
+  #  be used in UEFI.
+  # On Win host, this is the network interface index number on Windows that
+  #  will be used in UEFI. For example, string L"0" is the first network
+  #  interface.
+  gEmulatorPkgTokenSpaceGuid.PcdEmuNetworkInterface|L"en0"|VOID*|0x0000100d
+
+  gEmulatorPkgTokenSpaceGuid.PcdEmuCpuModel|L"Intel(R) Processor Model"|VOID*|0x00001007
+  gEmulatorPkgTokenSpaceGuid.PcdEmuCpuSpeed|L"3000"|VOID*|0x00001008
+  gEmulatorPkgTokenSpaceGuid.PcdEmuMpServicesPollingInterval|0x100|UINT64|0x0000101a
+

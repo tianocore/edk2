@@ -1,0 +1,56 @@
+## @file
+#  A shell application that displays statistical information about variable usage.
+#
+#  This application can display statistical information about variable usage for SMM variable
+#  driver and non-SMM variable driver.
+#  Note that if Variable Dxe/Smm driver doesn't enable the feature by setting PcdVariableCollectStatistics
+#  as TRUE, the application will not display variable statistical information.
+#
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VariableInfo
+  MODULE_UNI_FILE                = VariableInfo.uni
+  FILE_GUID                      = 202A2922-8C27-4943-9855-26180BF9F113
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UefiMain
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  VariableInfo.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  MemoryAllocationLib
+
+[Protocols]
+  gEfiMmCommunication2ProtocolGuid   ## SOMETIMES_CONSUMES
+
+  ## UNDEFINED            # Used to do smm communication
+  ## SOMETIMES_CONSUMES
+  gEfiSmmVariableProtocolGuid
+
+[Guids]
+  gEfiAuthenticatedVariableGuid              ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiVariableGuid                           ## SOMETIMES_CONSUMES ## SystemTable
+  gEdkiiPiSmmCommunicationRegionTableGuid    ## SOMETIMES_CONSUMES ## SystemTable
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  VariableInfoExtra.uni

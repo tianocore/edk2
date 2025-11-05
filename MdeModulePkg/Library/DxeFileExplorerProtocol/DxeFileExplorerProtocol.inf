@@ -1,0 +1,36 @@
+## @file
+#  Library instance that implements File explorer Library class based on protocol gEfiFileExplorerProtocolGuid.
+#
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeFileExplorerProtocol
+  MODULE_UNI_FILE                = DxeFileExplorerProtocol.uni
+  FILE_GUID                      = 6806C45F-13C4-4274-B8A3-055EF641A060
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FileExplorerLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = FileExplorerConstructor
+
+[Sources]
+  DxeFileExplorerProtocol.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+
+[Protocols]
+  gEfiFileExplorerProtocolGuid                         ## CONSUMES
+
+[Depex.common.DXE_DRIVER, Depex.common.DXE_RUNTIME_DRIVER, Depex.common.DXE_SMM_DRIVER]
+  gEfiFileExplorerProtocolGuid

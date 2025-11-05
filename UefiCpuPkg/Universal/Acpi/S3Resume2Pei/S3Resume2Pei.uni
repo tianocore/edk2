@@ -1,0 +1,20 @@
+// /** @file
+// S3 Resume Module installs EFI_PEI_S3_RESUME2_PPI.
+//
+// This module works with StandAloneBootScriptExecutor to S3 resume to OS.
+// This module will excute the boot script saved during last boot and after that,
+// control is passed to OS waking up handler.
+//
+// Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "S3 Resume Module installs EFI_PEI_S3_RESUME2_PPI"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module works with StandAloneBootScriptExecutor to S3 resume to OS.\n"
+                                                        "This module will execute the boot script saved during last boot and after that,\n"
+                                                        "control is passed to the OS waking up handler."
+

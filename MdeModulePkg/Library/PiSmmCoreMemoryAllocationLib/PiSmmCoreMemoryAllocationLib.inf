@@ -1,0 +1,42 @@
+## @file
+# Memory Allocation Library instance dedicated to SMM Core.
+# The implementation borrows the SMM Core Memory Allocation services as the primitive
+# for memory allocation instead of using SMM System Table services in an indirect way.
+# It is assumed that this library instance must be linked with SMM Cre in this package.
+#
+# Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PiSmmCoreMemoryAllocationLib
+  MODULE_UNI_FILE                = PiSmmCoreMemoryAllocationLib.uni
+  FILE_GUID                      = B618E089-9ABA-4d97-AE80-57B5BCCDA51D
+  MODULE_TYPE                    = SMM_CORE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  LIBRARY_CLASS                  = MemoryAllocationLib|SMM_CORE
+  CONSTRUCTOR                    = PiSmmCoreMemoryAllocationLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  MemoryAllocationLib.c
+  PiSmmCoreMemoryAllocationServices.h
+  PiSmmCoreMemoryProfileLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  BaseMemoryLib
+  UefiBootServicesTableLib

@@ -1,0 +1,137 @@
+## @file
+# Core CI configuration for ArmVirtPkg
+#
+# ArmVirtPkg is part of Platform Ci for builds so this is only
+# used for code analysis.
+#
+# Copyright (c) Microsoft Corporation
+# Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2020 - 2022, ARM Limited. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+    ## options defined .pytool/Plugin/LicenseCheck
+    "LicenseCheck": {
+        "IgnoreFiles": []
+    },
+    "EccCheck": {
+        ## Exception sample looks like below:
+        ## "ExceptionList": [
+        ##     "<ErrorID>", "<KeyWord>"
+        ## ]
+        "ExceptionList": [
+        ],
+        ## Both file path and directory path are accepted.
+        "IgnoreFiles": [
+        ]
+    },
+    ## options defined .pytool/Plugin/CompilerPlugin
+    "CompilerPlugin": {
+        "DscPath": "" # Don't support this test
+    },
+
+    ## options defined .pytool/Plugin/HostUnitTestCompilerPlugin
+    "HostUnitTestCompilerPlugin": {
+        "DscPath": "" # Don't support this test
+    },
+
+    ## options defined .pytool/Plugin/CharEncodingCheck
+    "CharEncodingCheck": {
+        "IgnoreFiles": []
+    },
+
+    ## options defined .pytool/Plugin/DependencyCheck
+    "DependencyCheck": {
+        "AcceptableDependencies": [
+            "MdePkg/MdePkg.dec",
+            "MdeModulePkg/MdeModulePkg.dec",
+            "ArmVirtPkg/ArmVirtPkg.dec",
+            "DynamicTablesPkg/DynamicTablesPkg.dec",
+            "NetworkPkg/NetworkPkg.dec",
+            "ArmPkg/ArmPkg.dec",
+            "OvmfPkg/OvmfPkg.dec",
+            "EmbeddedPkg/EmbeddedPkg.dec",
+            "ArmPlatformPkg/ArmPlatformPkg.dec",
+            "PcAtChipsetPkg/PcAtChipsetPkg.dec",
+            "SecurityPkg/SecurityPkg.dec",
+            "UefiCpuPkg/UefiCpuPkg.dec",
+            "ShellPkg/ShellPkg.dec"  #Is this ok?
+        ],
+        # For host based unit tests
+        "AcceptableDependencies-HOST_APPLICATION":[
+            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec"
+        ],
+        # For UEFI shell based apps
+        "AcceptableDependencies-UEFI_APPLICATION":[
+
+        ],
+        "IgnoreInf": []
+    },
+
+    ## options defined .pytool/Plugin/DscCompleteCheck
+    "DscCompleteCheck": {
+        "IgnoreInf": [""],
+        "DscPath": ""  # Don't support this test
+    },
+
+    ## options defined .pytool/Plugin/HostUnitTestDscCompleteCheck
+    "HostUnitTestDscCompleteCheck": {
+        "IgnoreInf": [""],
+        "DscPath": "" # Don't support this test
+    },
+
+    ## options defined .pytool/Plugin/GuidCheck
+    "GuidCheck": {
+        "IgnoreGuidName": [],
+        "IgnoreGuidValue": [],
+        "IgnoreFoldersAndFiles": [],
+        "IgnoreDuplicates": [],
+    },
+
+    ## options defined .pytool/Plugin/LibraryClassCheck
+    "LibraryClassCheck": {
+        "IgnoreHeaderFile": []
+    },
+
+    ## options defined .pytool/Plugin/SpellCheck
+    "SpellCheck": {
+        "AuditOnly": True,
+        "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
+        "ExtendWords": [
+            "acpiview",
+            "armltd",
+            "ssdts",
+            "setjump",
+            "plong",
+            "lparam",
+            "lpdword",
+            "lpthread",
+            "lresult",
+            "bootable",
+            "bsymbolic",
+            "endiannness",
+            "fvmain",
+            "multiboot",
+            "qemu's",
+            "ramdisk",
+            "ramfb",
+            "unbootable",
+            "virt's",
+            "werror",
+            "xenio",
+            "kvmtool",
+            "cloudhv"
+        ],           # words to extend to the dictionary for this package
+        "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
+        "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
+    },
+
+    "DebugMacroCheck": {
+      "StringSubstitutions": {
+          # DynamicTablesPkg/Include/ConfigurationManagerObject.h
+          # Reason: Expansion of macro that contains a print specifier.
+          "FMT_CM_OBJECT_ID": "0x%lx"
+      }
+    }
+}

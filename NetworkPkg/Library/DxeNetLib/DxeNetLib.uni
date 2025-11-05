@@ -1,0 +1,16 @@
+// /** @file
+// This library instance provides the basic network services.
+//
+// This library instance provides the basic network services.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Provides the basic network services"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library instance provides the basic network services."
+

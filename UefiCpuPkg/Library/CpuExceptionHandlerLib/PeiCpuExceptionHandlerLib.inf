@@ -1,0 +1,66 @@
+## @file
+#  CPU Exception Handler library instance for PEI module.
+#
+#  Copyright (c) 2016 - 2022, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiCpuExceptionHandlerLib
+  MODULE_UNI_FILE                = PeiCpuExceptionHandlerLib.uni
+  FILE_GUID                      = 980DDA67-44A6-4897-99E6-275290B71F9E
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.1
+  LIBRARY_CLASS                  = CpuExceptionHandlerLib|PEI_CORE PEIM
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.Ia32]
+  Ia32/ArchExceptionHandler.c
+  Ia32/ArchInterruptDefs.h
+  Ia32/ExceptionHandlerAsm.nasm
+  Ia32/ExceptionTssEntryAsm.nasm
+
+[Sources.X64]
+  X64/ArchExceptionHandler.c
+  X64/ArchInterruptDefs.h
+  X64/SecPeiExceptionHandlerAsm.nasm
+
+[Sources.common]
+  CpuExceptionCommon.h
+  CpuExceptionCommon.c
+  PeiCpuException.c
+  PeiDxeSmmCpuException.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  CcExitLib
+  HobLib
+  LocalApicLib
+  MemoryAllocationLib
+  PeCoffGetEntryPointLib
+  PrintLib
+  SerialPortLib
+  SynchronizationLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard    # CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuKnownGoodStackSize
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuStackSwitchExceptionList
+
+[FeaturePcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackGuard                    ## CONSUMES
+
+[BuildOptions]
+  XCODE:*_*_X64_NASM_FLAGS = -D NO_ABSOLUTE_RELOCS_IN_TEXT

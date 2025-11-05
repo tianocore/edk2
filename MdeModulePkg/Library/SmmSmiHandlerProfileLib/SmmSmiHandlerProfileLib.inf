@@ -1,0 +1,43 @@
+## @file
+# SMM driver instance of SmiHandlerProfile Library.
+#
+# This library instance provides real functionality for SmmChildDispatcher module.
+#
+#  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmSmiHandlerProfileLib
+  MODULE_UNI_FILE                = SmmSmiHandlerProfileLib.uni
+  FILE_GUID                      = FC38CEAE-FB74-4049-A51C-68F0BA69DA7D
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SmiHandlerProfileLib|DXE_SMM_DRIVER
+  CONSTRUCTOR                    = SmmSmiHandlerProfileLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  MmSmiHandlerProfileLib.c
+  MmSmiHandlerProfileLib.h
+  SmmSmiHandlerProfileLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MmServicesTableLib
+
+[Guids]
+  gSmiHandlerProfileGuid  ## CONSUMES   ## GUID # Locate protocol
+

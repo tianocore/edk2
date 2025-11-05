@@ -1,0 +1,43 @@
+## @file
+# PeCoff extra action libary for Pei phase that run Emu emulator.
+#
+# Lib to provide memory journal status code reporting Routines
+# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2011, Apple Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiEmuPeCoffExtraActionLib
+  FILE_GUID                      = 79C4E72A-730B-F040-8129-95877B3A97A8
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PeCoffExtraActionLib|PEI_CORE PEIM
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32
+#
+
+[Sources]
+  PeiEmuPeCoffExtraActionLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PeiServicesLib
+  DebugLib
+
+[Ppis]
+  gEmuThunkPpiGuid                          # PPI ALWAYS_CONSUMED
+
+[Pcd]
+  gEmulatorPkgTokenSpaceGuid.PcdPeiServicesTablePage

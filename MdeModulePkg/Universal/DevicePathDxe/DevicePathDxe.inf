@@ -1,0 +1,54 @@
+## @file
+#  Device path driver that produces three UEFI device path protocols.
+#
+#  This driver produces Device Path Utilities protocol and optionally
+#  DevicePahtToText and DevicePathFromText protocols based on feature flags
+#  PcdDevicePathSupportDevicePathToText & PcdDevicePathSupportDevicePathFromText
+#  respectively.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DevicePathDxe
+  MODULE_UNI_FILE                = DevicePathDxe.uni
+  FILE_GUID                      = 9B680FCE-AD6B-4F3A-B60B-F59899003443
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DevicePathEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DevicePath.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DevicePathLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiDevicePathToTextProtocolGuid   | gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText ## SOMETIMES_PRODUCES
+  gEfiDevicePathFromTextProtocolGuid | gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText ## SOMETIMES_PRODUCES
+  gEfiDevicePathUtilitiesProtocolGuid ## PRODUCES
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathToText   ## CONSUMES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  DevicePathDxeExtra.uni

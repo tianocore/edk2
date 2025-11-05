@@ -1,0 +1,101 @@
+## @file
+# dec file for Dynamic Tables Framework.
+#
+# Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = DynamicTablesPkg
+  PACKAGE_GUID                   = 188EB346-8ABA-460E-A105-0F9D76F7324A
+  PACKAGE_VERSION                = 1.0
+
+[Includes]
+  Include
+  Test/Mock/Include
+
+[LibraryClasses]
+  ##  @libraryclass  Defines a set of Acpi helper methods
+  #   independent from the Dynamic Tables Framework.
+  AcpiHelperLib|Include/Library/AcpiHelperLib.h
+
+  ##  @libraryclass  Defines a set of APIs for Dynamic AML generation.
+  AmlLib|Include/Library/AmlLib/AmlLib.h
+
+  ## @libraryclass  Defines a set of APIs to help CmObj handling.
+  CmObjHelperLib|Include/Library/CmObjHelperLib.h
+
+  ##  @libraryclass  Defines a set of APIs to handle dynamically created CmObj.
+  DynamicPlatRepoLib|Include/Library/DynamicPlatRepoLib.h
+
+  ##  @libraryclass  Defines a set of APIs to a hardware information parser.
+  HwInfoParserLib|Include/Library/HwInfoParserLib.h
+
+  ##  @libraryclass Defines functions for customizing the generation of _OSC and slot info.
+  SsdtPcieSupportLib|Include/Library/SsdtPcieSupportLib.h
+
+  ##  @libraryclass  Defines a set of methods for fixing up a SSDT Serial Port.
+  SsdtSerialPortFixupLib|Include/Library/SsdtSerialPortFixupLib.h
+
+  ##  @libraryclass  Defines a set of helper methods.
+  TableHelperLib|Include/Library/TableHelperLib.h
+
+  ##  @libraryclass  Defines a set of SMBIOS string helper methods.
+  SmbiosStringTableLib|Include/Library/SmbiosStringTableLib.h
+
+  ##  @libraryclass  Defines a set of APIs to a handle Metadata around CmObj.
+  MetadataObjLib|Include/Library/MetadataObjLib.h
+
+  ##  @libraryclass  Defines a set of APIs to a handle Metadata generation/validation.
+  MetadataHandlerLib|Include/Library/MetadataHandlerLib.h
+
+  ##  @libraryclass  Defines a set of methods for generating Tpm2 Device Table method.
+  Tpm2DeviceTableLib|Include/Library/Tpm2DeviceTableLib.h
+
+  ##  @libraryclass  Defines a set of SMBIOS related SMC helper methods.
+  SmcbiosSmbLib|Include/Library/SmbiosSmcLib.h
+
+[LibraryClasses.AARCH64]
+  ##  @libraryclass  Defines a set of APIs to populate CmObj using SCMI.
+  DynamicTablesScmiInfoLib|Include/Library/DynamicTablesScmiInfoLib.h
+
+[Protocols]
+  # Configuration Manager Protocol GUID
+  gEdkiiConfigurationManagerProtocolGuid = { 0xd85a4835, 0x5a82, 0x4894, { 0xac, 0x2, 0x70, 0x6f, 0x43, 0xd5, 0x97, 0x8e } }
+
+  # Dynamic Table Factory Protocol GUID
+  gEdkiiDynamicTableFactoryProtocolGuid = { 0x91d1e327, 0xfe5a, 0x49b8, { 0xab, 0x65, 0xe, 0xce, 0x2d, 0xdb, 0x45, 0xec } }
+
+[PcdsFixedAtBuild]
+
+  # Maximum number of Custom ACPI Generators
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxCustomACPIGenerators|1|UINT16|0xC0000001
+
+  # Maximum number of Custom SMBIOS Generators
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxCustomSMBIOSGenerators|1|UINT16|0xC0000002
+
+  # Maximum number of Custom DT Generators
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxCustomDTGenerators|1|UINT16|0xC0000003
+
+  # Maximum number of Entries in the SMBIOS Handle Map
+  # Note that a larger value may degrade performance.
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdMaxSmbiosHandleMapEntries|255|UINT16|0xC0000004
+
+  # Non BSA Compliant 16550 Serial HID
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdNonBsaCompliant16550SerialHid|""|VOID*|0x40000008
+
+  # Use PCI segment numbers as UID
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdPciUseSegmentAsUid|FALSE|BOOLEAN|0x40000009
+
+  # Allow some relaxation on some specific points for the platforms that desire it.
+  #   BIT0: Allow the absence of some registers in the _CPC object.
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdDevelopmentPlatformRelaxations|0|UINT64|0x4000000A
+
+  # Generate Tpm2 device table when generate TPM2 acpi table together.
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdGenTpm2DeviceTable|FALSE|BOOLEAN|0x4000000B
+
+[Guids]
+  gEdkiiDynamicTablesPkgTokenSpaceGuid = { 0xab226e66, 0x31d8, 0x4613, { 0x87, 0x9d, 0xd2, 0xfa, 0xb6, 0x10, 0x26, 0x3c } }

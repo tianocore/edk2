@@ -1,0 +1,16 @@
+// /** @file
+// Library instance that implements Print Library class based on protocol gEfiPrint2SProtocolGuid.
+//
+// Library instance that implements Print Library class based on protocol gEfiPrint2SProtocolGuid.
+//
+// Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Implements Print Library class based on protocol gEfiPrint2SProtocolGuid"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Library instance that implements Print Library class based on protocol gEfiPrint2SProtocolGuid."
+

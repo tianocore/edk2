@@ -1,0 +1,70 @@
+## @file
+#  Client-side Mtftp6 service.
+#
+#  This module produces EFI MTFTPv6 Protocol which provides basic services for
+#  client-side unicast and/or multicast TFTP.
+#
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Mtftp6Dxe
+  FILE_GUID                      = 99F03B99-98D8-49dd-A8D3-3219D0FFE41E
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Mtftp6DriverEntryPoint
+  UNLOAD_IMAGE                   = NetLibDefaultUnload
+  MODULE_UNI_FILE                = Mtftp6Dxe.uni
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  gMtftp6DriverBinding
+#  COMPONENT_NAME                =  gMtftp6ComponentName
+#  COMPONENT_NAME2               =  gMtftp6ComponentName2
+#
+
+[Sources]
+  Mtftp6Driver.c
+  Mtftp6Driver.h
+  Mtftp6Impl.c
+  Mtftp6Impl.h
+  Mtftp6Option.c
+  Mtftp6Option.h
+  Mtftp6Support.h
+  Mtftp6Support.c
+  Mtftp6Rrq.c
+  Mtftp6Wrq.c
+  ComponentName.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+
+[LibraryClasses]
+  UefiLib
+  BaseLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+  DebugLib
+  NetLib
+  UdpIoLib
+
+
+[Protocols]
+  gEfiUdp6ServiceBindingProtocolGuid                ## TO_START
+  gEfiUdp6ProtocolGuid                              ## TO_START
+  gEfiMtftp6ServiceBindingProtocolGuid              ## BY_START
+  gEfiMtftp6ProtocolGuid                            ## BY_START
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  Mtftp6DxeExtra.uni

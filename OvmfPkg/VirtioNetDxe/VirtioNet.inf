@@ -1,0 +1,56 @@
+## @file
+#
+# This driver produces Simple Network Protocol instances for virtio-net
+# devices.
+#
+# Copyright (C) 2013, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VirtioNetDxe
+  FILE_GUID                      = A92CDB4B-82F1-4E0B-A516-8A655D371524
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = VirtioNetEntryPoint
+
+[Sources]
+  ComponentName.c
+  DriverBinding.c
+  EntryPoint.c
+  Events.c
+  SnpGetStatus.c
+  SnpInitialize.c
+  SnpMcastIpToMac.c
+  SnpReceive.c
+  SnpReceiveFilters.c
+  SnpSharedHelpers.c
+  SnpShutdown.c
+  SnpStart.c
+  SnpStop.c
+  SnpTransmit.c
+  SnpUnsupported.c
+  VirtioNet.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  OrderedCollectionLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+  VirtioLib
+
+[Protocols]
+  gEfiSimpleNetworkProtocolGuid  ## BY_START
+  gEfiDevicePathProtocolGuid     ## BY_START
+  gVirtioDeviceProtocolGuid      ## TO_START

@@ -1,0 +1,17 @@
+// /** @file
+// UEFI DNS DXE Driver.
+//
+// This driver provides UEFI 2.5 DNS protocols. It could work with an IPv4 and IPv6 stack.
+//
+//
+// Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "UEFI DNS service"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver provides EFI DNS4 Protocol, EFI DNS6 Protocol, EFI DNS4 Service Binding Protocol and EFI DNS6 Service Binding Protocol. It could work with an IPv4 and IPv6 stack."
+

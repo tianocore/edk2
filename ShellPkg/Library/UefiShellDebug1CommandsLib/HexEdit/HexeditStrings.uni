@@ -1,0 +1,70 @@
+// /**
+//
+// Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
+// (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Abstract:
+//
+// Additional string definitions for UEFI Shell 2.0 Debug1 profile Edit command
+//
+//
+// **/
+
+/=#
+
+#langdef   en-US "english"
+
+
+#string STR_HEXEDIT_USAGE                 #language en-US  "\n\n    %EHexEditor Usage%N\n"
+#string STR_HEXEDIT_FILENAME              #language en-US  "    %H[-f] Filename%N                                 Open File For Editing\n"
+#string STR_HEXEDIT_DISKNAME              #language en-US  "    %H-d   DiskName FirstBlockNo.   BlockNumber%N     Open Disk Block For Editing\n"
+#string STR_HEXEDIT_OFFSET_SIZE           #language en-US  "    %H-m   Offset   Size%N                            Open Memory Region For Editing\n"
+#string STR_HEXEDIT_FILE_NAME             #language en-US  "%Hhexedit%N: Invalid File Name\n"
+#string STR_HEXEDIT_LIBEDITOR_MAINEDITOR_TITLE      #language en-US  "%EMainEditor init failed on TitleBar init\n%N"
+#string STR_HEXEDIT_LIBEDITOR_MAINEDITOR_MAINMENU   #language en-US  "%EMainEditor init failed on MainMenu init\n%N"
+#string STR_HEXEDIT_LIBEDITOR_MAINEDITOR_STATUS     #language en-US  "%EMainEditor init failed on StatusBar init\n%N"
+#string STR_HEXEDIT_LIBEDITOR_MAINEDITOR_INPUTBAR   #language en-US  "%EMainEditor init failed on InputBar init\n%N"
+#string STR_HEXEDIT_LIBEDITOR_MAINEDITOR_BUFFERIMAGE  #language en-US  "%EMainEditor init failed on BufferImage init\n%N"
+#string STR_HEXEDIT_LIBEDITOR_MAINEDITOR_CLIPBOARD    #language en-US  "%EMainEditor init failed on ClipBoard init\n%N"
+#string STR_HEXEDIT_LIBEDITOR_TITLEBAR_CLEAN      #language en-US  "TitleBar cleanup failed\n"
+#string STR_HEXEDIT_LIBEDITOR_MENUBAR_CLEAN       #language en-US  "MenuBar cleanup failed\n"
+#string STR_HEXEDIT_LIBEDITOR_STATUSBAR_CLEAN     #language en-US  "StatusBar cleanup failed\n"
+#string STR_HEXEDIT_LIBEDITOR_INPUTBAR_CLEAN      #language en-US  "InputBar cleanup failed\n"
+#string STR_HEXEDIT_LIBEDITOR_BUFFERIMAGE_CLEAN   #language en-US  "BufferImage cleanup failed\n"
+#string STR_HEXEDIT_LIBEDITOR_CLIPBOARD_CLEAN     #language en-US  "ClipBoard cleanup failed\n"
+#string STR_HEXEDIT_LIBINPUTBAR_MAININPUTBAR      #language en-US  "%s"
+#string STR_HEXEDIT_LIBMENUBAR_OPEN_FILE          #language en-US  "Open File"
+#string STR_HEXEDIT_LIBMENUBAR_OPEN_DISK          #language en-US  "Open Disk"
+#string STR_HEXEDIT_LIBMENUBAR_OPEN_MEMORY        #language en-US  "Open Memory"
+#string STR_HEXEDIT_LIBMENUBAR_SAVE_BUFFER        #language en-US  "Save Buffer"
+#string STR_HEXEDIT_LIBMENUBAR_SELECT_START       #language en-US  "Select Start"
+#string STR_HEXEDIT_LIBMENUBAR_SELECT_END         #language en-US  "Select End"
+#string STR_HEXEDIT_LIBMENUBAR_CUT                #language en-US  "Cut"
+#string STR_HEXEDIT_LIBMENUBAR_PASTE              #language en-US  "Paste"
+#string STR_HEXEDIT_LIBMENUBAR_GO_TO_OFFSET       #language en-US  "Go To Offset"
+#string STR_HEXEDIT_LIBTITLEBAR_MAINEDITOR         #language en-US  "%s"
+#string STR_HEXEDIT_LIBTITLEBAR_MAINEDITOR_C       #language en-US  "%c"
+#string STR_HEXEDIT_LIBTITLEBAR_MAINEDITOR_TWOVARS    #language en-US  "( %X ~ %X )  "
+#string STR_HEXEDIT_LIBTITLEBAR_FILE          #language en-US  "   [FILE]"
+#string STR_HEXEDIT_LIBTITLEBAR_DISK          #language en-US  "   [DISK]"
+#string STR_HEXEDIT_LIBTITLEBAR_MEM           #language en-US  "    [MEM]"
+#string STR_HEXEDIT_HELP_TITLE                           #language en-US "Help                                                        \n"
+#string STR_HEXEDIT_HELP_BLANK                           #language en-US "                                                            \n"
+#string STR_HEXEDIT_HELP_LIST_TITLE                      #language en-US "Control Key   Function Key   Command                                      \n"
+#string STR_HEXEDIT_HELP_DIV                             #language en-US "-----------   ------------   -----------------                            \n"
+#string STR_HEXEDIT_HELP_GO_TO_OFFSET                    #language en-US "Ctrl-G        F1             Go To Offset                                 \n"
+#string STR_HEXEDIT_HELP_SAVE_BUFFER                     #language en-US "Ctrl-S        F2             Save Buffer                                  \n"
+#string STR_HEXEDIT_HELP_EXIT                            #language en-US "Ctrl-Q        F3             Exit                                         \n"
+#string STR_HEXEDIT_HELP_SELECT_START                    #language en-US "Ctrl-T        F4             Select Start                                 \n"
+#string STR_HEXEDIT_HELP_SELECT_END                      #language en-US "Ctrl-D        F5             Select End                                   \n"
+#string STR_HEXEDIT_HELP_CUT                             #language en-US "Ctrl-X        F6             Cut                                          \n"
+#string STR_HEXEDIT_HELP_PASTE                           #language en-US "Ctrl-V        F7             Paste                                        \n"
+#string STR_HEXEDIT_HELP_OPEN_FILE                       #language en-US "Ctrl-O        F8             Open File                                    \n"
+#string STR_HEXEDIT_HELP_OPEN_DISK                       #language en-US "Ctrl-I        F9             Open Disk                                    \n"
+#string STR_HEXEDIT_HELP_OPEN_MEMORY                     #language en-US "Ctrl-M        F10            Open Memory                                  \n"
+#string STR_HEXEDIT_HELP_EXIT_HELP                       #language en-US "Use Ctrl-W to exit this help                                \n"
+#string STR_HEXEDIT_INIT_FAILED               #language en-US  "%Hhexedit%N: Initialization failed\n"
+#string STR_HEXEDIT_ONE_VAR                   #language en-US  "%Hhexedit%N: %s\n"
+#string STR_HEXEDIT_UNKNOWN_EDITOR            #language en-US  "%Hhexedit%N: Unknown editor error\n"
+#string STR_HEXEDIT_NOREDIRECT                #language en-US  "%Hhexedit%N: Redirection is not allowed\n"

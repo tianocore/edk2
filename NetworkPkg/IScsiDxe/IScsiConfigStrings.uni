@@ -1,0 +1,96 @@
+// *++
+//
+// Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Module Name:
+//
+//   IScsiConfigStrings.uni
+//
+// Abstract:
+//
+//   String definitions for iSCSI configuration.
+//
+// Revision History:
+//
+// --*/
+
+/=#
+
+#langdef en-US "English"
+#langdef x-UEFI-ns "UefiNameSpace"
+
+#string STR_ISCSI_CONFIG_FORM_TITLE     #language en-US "iSCSI Configuration"
+#string STR_ISCSI_CONFIG_FORM_HELP      #language en-US "Configure the iSCSI parameters."
+#string STR_ISCSI_MAIN_FORM_TITLE       #language en-US "iSCSI Configuration"
+#string STR_ISCSI_MAC_FORM_TITLE        #language en-US "MAC Selection"
+#string STR_ISCSI_CONFIG_INIT_NAME      #language en-US "iSCSI Initiator Name"
+                                        #language x-UEFI-ns "iSCSIInitiatorName"
+#string STR_ISCSI_CONFIG_INIT_NAME_HELP #language en-US "The worldwide unique name of iSCSI Initiator. Only IQN format is accepted."
+#string STR_ISCSI_ATTEMPT_NAME          #language en-US "iSCSI Attempt Name"
+#string STR_ISCSI_ATTEMPT_NAME_HELP     #language en-US "The human name defined for this attempt."
+#string STR_ISCSI_CONFIG_RETRY          #language en-US "Connection Retry Count"
+#string STR_ISCSI_CONFIG_RETRY_HELP     #language en-US "The minimum value is 0 and the maximum is 16. 0 means no retry."
+#string STR_ISCSI_CONFIG_TIMEOUT        #language en-US "Connection Establishing Timeout"
+#string STR_ISCSI_CONFIG_TIMEOUT_HELP   #language en-US "The timeout value in milliseconds. The minimum value is 100 milliseconds and the maximum is 20 seconds."
+#string STR_ADD_ATTEMPT_ENTRY           #language en-US "Add an Attempt"
+#string STR_ISCSI_ATTEMPT_FORM_TITLE    #language en-US "Attempt Configuration"
+#string STR_DEL_ATTEMPT_ENTRY           #language en-US "Delete Attempts"
+#string STR_DEL_ATTEMPT_ENTRY_HELP      #language en-US "Delete one or more attempts"
+#string STR_ORDER_ATTEMPT_ENTRY         #language en-US "Change Attempt Order"
+#string STR_ISCSI_MODE_PROMPT           #language en-US "iSCSI Mode"
+#string STR_ISCSI_MODE_HELP             #language en-US "Disabled, Enabled, Enabled for MPIO"
+#string STR_ISCSI_MODE_DISABLED         #language en-US "Disabled"
+#string STR_ISCSI_MODE_ENABLED          #language en-US "Enabled"
+#string STR_ISCSI_MODE_ENABLED_FOR_MPIO #language en-US "Enabled for MPIO"
+#string STR_IP_MODE_PROMPT              #language en-US "Internet Protocol"
+#string STR_IP_MODE_HELP                #language en-US "Initiator IP address is system assigned in IP6 mode. In Autoconfigure mode, iSCSI driver will attempt to connect iSCSI target via IPv4 stack, if failed then attempt IPv6 stack."
+#string STR_IP_MODE_IP4                 #language en-US "IP4"
+#string STR_IP_MODE_IP6                 #language en-US "IP6"
+#string STR_IP_MODE_AUTOCONFIG          #language en-US "Autoconfigure"
+#string STR_AUTHEN_TYPE_PROMPT          #language en-US "Authentication Type"
+#string STR_AUTHEN_TYPE_HELP            #language en-US "Authentication method: CHAP, Kerberos, or None"
+#string STR_AUTHEN_TYPE_CHAP            #language en-US "CHAP"
+#string STR_AUTHEN_TYPE_KERBEROS        #language en-US "Kerberos"
+#string STR_AUTHEN_TYPE_NONE            #language en-US "None"
+#string STR_ISCSI_LOCAL_IP_ADDRESS      #language en-US "  Initiator IP Address"
+#string STR_ISCSI_LOCAL_MASK            #language en-US "  Initiator Subnet Mask"
+#string STR_ISCSI_LOCAL_GATEWAY         #language en-US "  Gateway"
+#string STR_ISCSI_IP_ADDRESS_HELP       #language en-US "Enter IP address in dotted-decimal notation."
+#string STR_ISCSI_TARGET_NAME           #language en-US "  Target Name"
+#string STR_ISCSI_TARGET_NAME_HELP      #language en-US "The worldwide unique name of the target. Only iqn. format is accepted."
+#string STR_ISCSI_TARGET_ADDRESS        #language en-US "  Target Address"
+#string STR_ISCSI_TARGET_ADDRESS_HELP   #language en-US "Enter Target address in IPv4,IPv6 or URL format.You need to configure DNS server address in advance if input a URL string."
+#string STR_ISCSI_TARGET_PORT           #language en-US "  Target Port"
+#string STR_ISCSI_BOOT_LUN              #language en-US "  Boot LUN"
+#string STR_ISCSI_BOOT_LUN_HELP         #language en-US "Hexadecimal representation of the LU number. Examples are: 4752-3A4F-6b7e-2F99, 6734-9-156f-127, 4186-9"
+#string STR_ISCSI_ENABLE_DHCP           #language en-US "Enable DHCP"
+#string STR_ISCSI_ENABLE_DHCP_ON_TARGET #language en-US "Get target info via DHCP"
+#string STR_CHAP_TYPE_PROMPT            #language en-US "  CHAP Type"
+#string STR_CHAP_TYPE_HELP              #language en-US "None, One way CHAP or mutual CHAP"
+#string STR_CHAP_TYPE_UNI               #language en-US "One way"
+#string STR_CHAP_TYPE_MUTUAL            #language en-US "Mutual"
+#string STR_ISCSI_CHAP_NAME             #language en-US "    CHAP Name"
+#string STR_ISCSI_CHAP_SECRET           #language en-US "    CHAP Secret"
+#string STR_ISCSI_CHAP_SECRET_HELP      #language en-US "The minimum length is 12 bytes and the maximum length is 16 bytes."
+#string STR_ISCSI_REVERSE_CHAP_NAME     #language en-US "    Reverse CHAP Name"
+#string STR_ISCSI_REVERSE_CHAP_SECRET   #language en-US "    Reverse CHAP Secret"
+#string STR_RETURN_MAIN_FORM            #language en-US "Back to Previous Page"
+#string STR_SAVE_CHANGES                #language en-US "Save Changes"
+#string STR_SAVE_CHANGES_HELP           #language en-US "Must reboot system manually for changes to take place."
+#string STR_NULL                        #language en-US ""
+#string STR_SAVE_AND_EXIT               #language en-US "Commit Changes and Exit"
+#string STR_NO_SAVE_AND_EXIT            #language en-US "Discard Changes and Exit"
+#string STR_ISCSI_CONFIG_ISID           #language en-US "ISID"
+#string STR_ISCSI_CONFIG_ISID_HELP      #language en-US "OUI-format ISID in 6 bytes, default value are derived from MAC address. Only last 3 bytes are configurable. Example: update 0ABBCCDDEEFF to 0ABBCCF07901 by input F07901."
+#string STR_ISCSI_MAC_PROMPT            #language en-US "Configure the mac address for the attempt"
+                                        #language x-UEFI-ns "iSCSIMacAddr"
+#string STR_ISCSI_ADD_ATTEMPTS          #language en-US "Add Attempts"
+                                        #language x-UEFI-ns "iSCSIAddAttempts"
+#string STR_ISCSI_DELETE_ATTEMPTS       #language en-US "Delete Attempts"
+                                        #language x-UEFI-ns "iSCSIDeleteAttempts"
+#string STR_ISCSI_DISPLAY_ATTEMPTS      #language en-US "Display Attempts"
+                                        #language x-UEFI-ns "iSCSIDisplayAttemptList"
+#string STR_ISCSI_ATTEMPT_ORDER         #language en-US "New Attempt Order"
+                                        #language x-UEFI-ns "iSCSIAttemptOrder"
+#string STR_ISCSI_ISID_HELP             #language en-US "The iSCSI ISID. Default value are derived from MAC address. Only last 3 bytes are configurable."

@@ -1,0 +1,86 @@
+#/** @file
+# Component description file for TDX Pre PI Library
+#
+# LIbrary helps you build a platform that skips PEI and loads DXE Core
+# directly. Helps building HOBs, reading data from the FV, and doing
+# decompression.
+#
+#  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2008, Apple Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeilessStartupLib
+  FILE_GUID                      = 8FA74135-F841-40A4-86C8-69C923D2E85F
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PeilessStartupLib|SEC
+
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  PeilessStartup.c
+  Hob.c
+  DxeLoad.c
+  X64/VirtualMemory.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  OvmfPkg/OvmfPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  CryptoPkg/CryptoPkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  PcdLib
+  CpuLib
+  DebugAgentLib
+  IoLib
+  LocalApicLib
+  SynchronizationLib
+  HobLib
+  TdxLib
+  MemoryAllocationLib
+  PrePiLib
+  QemuFwCfgLib
+  PlatformInitLib
+
+[Guids]
+  gEfiHobMemoryAllocModuleGuid
+  gEfiHobMemoryAllocStackGuid
+  gUefiOvmfPkgPlatformInfoGuid
+  gEfiMemoryTypeInformationGuid
+  gPcdDataBaseHobGuid
+  gCcEventEntryHobGuid
+  gEfiNonCcFvGuid
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataOffset
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable              ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy       ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported

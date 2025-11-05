@@ -1,0 +1,14 @@
+// /** @file
+// This module produces Boot Manager Policy protocol.
+//
+// Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_PROPERTIES_MODULE_NAME
+#language en-US
+"Boot Manager Policy DXE Driver"
+
+

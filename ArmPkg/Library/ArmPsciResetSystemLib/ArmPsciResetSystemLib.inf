@@ -1,0 +1,32 @@
+## @file
+#  Reset System lib using PSCI hypervisor or secure monitor calls
+#
+#  Copyright (c) 2008, Apple Inc. All rights reserved.<BR>
+#  Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
+#  Copyright (c) 2024, Google Llc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = ArmPsciResetSystemLib
+  FILE_GUID                      = 31db596f-cc80-47fd-849f-e6be5e9f7560
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ResetSystemLib
+  CONSTRUCTOR                    = ArmPsciResetSystemLibConstructor
+
+[Sources]
+  ArmPsciResetSystemLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmMonitorLib
+  BaseLib
+  DebugLib

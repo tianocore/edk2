@@ -1,0 +1,17 @@
+// /** @file
+// This driver produces Debug Port protocol to be used by debug agent to communicate with the remote debug host.
+//
+// This driver binds exclusively to a standard UART serial port on the controller handle,
+// and initializes serial Io interface, publishs Debug Port and Device Path Protocol.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces Debug Port protocol to be used by debug agent to communicate with the remote debug host and initializes serial Io interface, publishes Debug Port and Device Path Protocol."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver binds exclusively to a standard UART serial port on the controller handle, and initializes serial Io interface, publishes Debug Port and Device Path Protocol."
+

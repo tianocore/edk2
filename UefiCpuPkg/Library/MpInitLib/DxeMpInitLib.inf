@@ -1,0 +1,104 @@
+## @file
+#  MP Initialize Library instance for DXE driver.
+#
+#  Copyright (c) 2016 - 2023, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
+#  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeMpInitLib
+  MODULE_UNI_FILE                = DxeMpInitLib.uni
+  FILE_GUID                      = B88F7146-9834-4c55-BFAC-481CC0C33736
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.1
+  LIBRARY_CLASS                  = MpInitLib|DXE_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 LOONGARCH64
+#
+
+[Sources.IA32]
+  Ia32/AmdSev.c
+  Ia32/CreatePageTable.c
+  Ia32/MpFuncs.nasm
+
+[Sources.X64]
+  X64/AmdSev.c
+  X64/CreatePageTable.c
+  X64/MpFuncs.nasm
+
+[Sources.IA32, Sources.X64]
+  AmdSev.c
+  DxeMpLib.c
+  Microcode.c
+  MpEqu.inc
+  MpLib.c
+  MpLib.h
+  MpHandOff.h
+
+[Sources.LoongArch64]
+  LoongArch64/DxeMpLib.c
+  LoongArch64/MpLib.c
+  LoongArch64/MpLib.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  CpuLib
+  DebugAgentLib
+  HobLib
+  MemoryAllocationLib
+  PcdLib
+  SynchronizationLib
+  UefiBootServicesTableLib
+
+[LibraryClasses.IA32, LibraryClasses.X64]
+  AmdSvsmLib
+  SafeIntLib
+  CcExitLib
+  LocalApicLib
+  MicrocodeLib
+  MtrrLib
+
+[LibraryClasses.X64]
+  CpuPageTableLib
+
+[Protocols]
+  gEfiTimerArchProtocolGuid                     ## SOMETIMES_CONSUMES
+
+[Guids]
+  gEfiEventExitBootServicesGuid                 ## CONSUMES  ## Event
+  gEfiEventLegacyBootGuid                       ## SOMETIMES_CONSUMES  ## Event
+  gEdkiiMicrocodePatchHobGuid                   ## SOMETIMES_CONSUMES  ## HOB
+  gGhcbApicIdsGuid                              ## SOMETIMES_CONSUMES  ## HOB
+
+[Guids.LoongArch64]
+  gProcessorResourceHobGuid                     ## SOMETIMES_CONSUMES  ## HOB
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                           ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr           ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber            ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuBootLogicalProcessorNumber           ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds          ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize                          ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchAddress                ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize             ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode                           ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApTargetCstate                       ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApStatusCheckIntervalInMicroSeconds  ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdGhcbHypervisorFeatures                  ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase                       ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi                ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuInitIpiDelayInMicroSeconds           ## SOMETIMES_CONSUMES

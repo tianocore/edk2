@@ -1,0 +1,136 @@
+## @file
+# Provide EFI_SIMPLE_FILE_SYSTEM_PROTOCOL instances on virtio-fs devices.
+#
+# Copyright (C) 2020, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+# Permission Model of this driver:
+#
+# Regardless of the UID and GID values this driver send in the FUSE request
+# header, the daemon (that is, the Virtio Filesystem device) always acts with
+# root privileges on the host side. The only time the daemon considers said UID
+# and GID fields is when creating a new file or directory. Thus, the guest
+# driver cannot rely on the host for enforcing any file mode permissions,
+# regardless of the "personality" that the guest driver poses as, because
+# "root" on the host side ignores all file mode bits.
+#
+# Therefore the guest driver has to do its own permission checking, and use the
+# host-side file mode bits only as a kind of "metadata storage" or "reminder"
+# -- hopefully in a way that makes some sense on the host side too.
+#
+# The complete mapping between the EFI_FILE_PROTOCOL and the host-side file
+# mode bits is described below.
+#
+# - The guest driver poses as UID 0, GID 0, PID 1.
+#
+# - If and only if all "w" bits are missing from a file on the host side, then
+#   the file or directory is reported as EFI_FILE_READ_ONLY in the guest. When
+#   setting EFI_FILE_READ_ONLY in the guest, all "w" bits (0222) are cleared on
+#   the host; when clearing EFI_FILE_READ_ONLY in the guest, all "w" bits are
+#   set on the host. Viewed from the host side, this sort of reflects that an
+#   EFI_FILE_READ_ONLY file should not be written by anyone.
+#
+# - The attributes EFI_FILE_HIDDEN, EFI_FILE_SYSTEM, EFI_FILE_RESERVED, and
+#   EFI_FILE_ARCHIVE are never reported in the guest, and they are silently
+#   ignored when a SetInfo() call or a file-creating Open() call requests them.
+#
+# - On the host, files are created with 0666 file mode bits, directories are
+#   created with 0777 file mode bits.
+#
+# - In the guest, the EFI_FILE_READ_ONLY attribute only controls the permitted
+#   open mode. In particular, on directories, the EFI_FILE_READ_ONLY attribute
+#   does not prevent the creation or deletion of entries inside the directory;
+#   EFI_FILE_READ_ONLY only prevents the renaming, deleting, flushing (syncing)
+#   and touching of the directory itself (with "touching" meaning updating the
+#   timestamps). The fact that EFI_FILE_READ_ONLY being set on a directory is
+#   irrelevant in the guest with regard to entry creation/deletion, is
+#   well-mirrored by the fact that virtiofsd -- which runs as root, regardless
+#   of guest driver personality -- ignores the absence of "w" permissions on a
+#   host-side directory, when creating or removing entries in it.
+#
+# - When an EFI_FILE_PROTOCOL is opened read-only, then the Delete(), Write()
+#   and Flush() member functions are disabled for it. Additionally, SetInfo()
+#   is restricted to flipping the EFI_FILE_READ_ONLY bit (which takes effect at
+#   the next Open()).
+#
+# - As a consequence of the above, for deleting a directory, it must be
+#   presented in the guest as openable for writing.
+#
+# - We diverge from the UEFI spec, and permit Flush() on a directory that has
+#   been opened read-write; otherwise the only way to invoke FUSE_FSYNCDIR on a
+#   directory would be to Close() it.
+#
+# - OpenVolume() opens the root directory for read-only access. The Open()
+#   member function may open it for read-write access. While the root directory
+#   cannot be renamed or deleted, opening it for read-write access is useful
+#   for calling Flush(), according to the previous paragraph, or for updating
+#   the root directory's timestamps with SetInfo().
+##
+
+[Defines]
+  INF_VERSION                           = 1.29
+  BASE_NAME                             = VirtioFsDxe
+  FILE_GUID                             = 7BD9DDF7-8B83-488E-AEC9-24C78610289C
+  MODULE_TYPE                           = UEFI_DRIVER
+  ENTRY_POINT                           = VirtioFsEntryPoint
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Sources]
+  DriverBinding.c
+  FuseFlush.c
+  FuseForget.c
+  FuseFsync.c
+  FuseGetAttr.c
+  FuseInit.c
+  FuseLookup.c
+  FuseMkDir.c
+  FuseOpen.c
+  FuseOpenDir.c
+  FuseOpenOrCreate.c
+  FuseRead.c
+  FuseRelease.c
+  FuseRename.c
+  FuseSetAttr.c
+  FuseStatFs.c
+  FuseUnlink.c
+  FuseWrite.c
+  Helpers.c
+  SimpleFsClose.c
+  SimpleFsDelete.c
+  SimpleFsFlush.c
+  SimpleFsGetInfo.c
+  SimpleFsGetPosition.c
+  SimpleFsOpen.c
+  SimpleFsOpenVolume.c
+  SimpleFsRead.c
+  SimpleFsSetInfo.c
+  SimpleFsSetPosition.c
+  SimpleFsWrite.c
+  VirtioFsDxe.h
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  TimeBaseLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  VirtioLib
+
+[Protocols]
+  gEfiComponentName2ProtocolGuid        ## PRODUCES
+  gEfiDriverBindingProtocolGuid         ## PRODUCES
+  gEfiSimpleFileSystemProtocolGuid      ## BY_START
+  gVirtioDeviceProtocolGuid             ## TO_START
+
+[Guids]
+  gEfiFileInfoGuid
+  gEfiFileSystemInfoGuid
+  gEfiFileSystemVolumeLabelInfoIdGuid

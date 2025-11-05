@@ -1,0 +1,94 @@
+// /** @file
+// This package provides target side modules to support source level debug.
+//
+// This package provides target side modules to support source level debug.
+// The target side components includes the Debug Agent Library instance
+// to communicate with host side modules, Debug Communication Library and
+// instances to provide the communication I/O functions between Debug Agent
+// and host, PeCoffExtraActionLib instance to report symbol path information,
+// etc.
+//
+// Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_PACKAGE_ABSTRACT            #language en-US "This package provides target side modules to support source level debug."
+
+#string STR_PACKAGE_DESCRIPTION         #language en-US "The target side components includes the Debug Agent Library instance\n"
+                                                        "to communicate with host side modules, Debug Communication Library and\n"
+                                                        "instances to provide the communication I/O functions between Debug Agent\n"
+                                                        "and host, PeCoffExtraActionLib instance to report symbol path information,\n"
+                                                        "etc."
+
+
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdUsbDebugPortMemorySpaceBase_PROMPT  #language en-US "Configure USB debug port memory BAR"
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdUsbDebugPortMemorySpaceBase_HELP  #language en-US "The memory BAR of USB debug port, it may be different from the memory BAR of EHCI host controller.<BR>\n"
+                                                                                                       "Note that the memory BAR address is only used before PCI bus resource allocation."
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdUsbEhciMemorySpaceBase_PROMPT  #language en-US "Configure EHCI host controller memory BAR"
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdUsbEhciMemorySpaceBase_HELP  #language en-US "The memory BAR of EHCI host controller, in which USB debug feature is enabled.<BR>\n"
+                                                                                                  "Note that the memory BAR address is only used before PCI bus resource allocation."
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdUsbEhciPciAddress_PROMPT  #language en-US "Configure EHCI host controller PCI address"
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdUsbEhciPciAddress_HELP  #language en-US "The PCI address of EHCI host controller, in which USB debug feature is enabled.<BR>\n"
+                                                                                             "The format of PCI address is :<BR>\n"
+                                                                                             "-----------------------------------------------------------------------<BR>\n"
+                                                                                             "| Bits 28..31 | Bits 20..27 | Bits 15..19 | Bits 12..14 | Bits 00..11 |<BR>\n"
+                                                                                             "-----------------------------------------------------------------------<BR>\n"
+                                                                                             "|      0      |     Bus     |   Device    |   Function  |      0      |<BR>\n"
+                                                                                             "-----------------------------------------------------------------------<BR>\n"
+                                                                                             "For the value 0x000EF000, it means the PCI address at bus 0x0, device 0x1D, function 0x7."
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_ERR_80000001 #language en-US "Invalid value provided."
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdExceptionsIgnoredByDebugger_PROMPT  #language en-US "Configure exception numbers not to be hooked by Debug Agent"
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdExceptionsIgnoredByDebugger_HELP  #language en-US "The mask of exception numbers whose handlers would be ignored and cannot be replaced or\n"
+                                                                                                       "hooked by Debug Agent Library. Masking INT1/INT3 is invalid."
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdDebugLoadImageMethod_PROMPT  #language en-US "Select loading/unloading image break method"
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdDebugLoadImageMethod_HELP  #language en-US "The method to issue break point to Debug Agent Library when loading/unloading image.<BR><BR>\n"
+                                                                                                "1: Use I/O Port 84 to issue hardware break point<BR>\n"
+                                                                                                "2: Use INT3 to issue software break point<BR>"
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdDebugPortHandleBufferSize_PROMPT  #language en-US "Assign debug port buffer size"
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdDebugPortHandleBufferSize_HELP  #language en-US "The data buffer size used by debug port in debug communication library instances.\n"
+                                                                                                     "Its value is not suggested to be changed in platform DSC file."
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdUsbXhciMemorySpaceBase_PROMPT  #language en-US "Configure xhci host controller memory BAR."
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdUsbXhciMemorySpaceBase_HELP  #language en-US "The memory BAR of xhci host controller, in which usb debug feature is enabled.\n"
+                                                                                                  "Note that the memory BAR address is only used before Pci bus resource allocation."
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdUsbXhciPciAddress_PROMPT  #language en-US "Configure xhci host controller pci address."
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdUsbXhciPciAddress_HELP  #language en-US "The pci address of xhci host controller, in which usb debug feature is enabled.\n"
+                                                                                             "The format of pci address is :<BR>\n"
+                                                                                             "-----------------------------------------------------------------------<BR>\n"
+                                                                                             "| Bits 28..31 | Bits 20..27 | Bits 15..19 | Bits 12..14 | Bits 00..11 |<BR>\n"
+                                                                                             "-----------------------------------------------------------------------<BR>\n"
+                                                                                             "|      0      |     Bus     |   Device    |   Function  |      0      |<BR>\n"
+                                                                                             "-----------------------------------------------------------------------<BR>\n"
+                                                                                             "For the value 0x000A0000, it means the pci address at bus 0x0, device 0x14, function 0x0."
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdUsbXhciDebugDetectTimeout_PROMPT  #language en-US "Configure debug device detection timeout value."
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdUsbXhciDebugDetectTimeout_HELP  #language en-US "Per XHCI spec, software shall impose a timeout between the detection of the Debug Host\n"
+                                                                                                     "connection and the DbC Run transition to 1. This PCD specifies the timeout value in microsecond."
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdTransferProtocolRevision_PROMPT  #language en-US "Default revision of the debug agent transfer protocol."
+
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdTransferProtocolRevision_HELP  #language en-US "The upper 16 bits indicate the major revision and the lower 16 bits indicate\n"
+                                                                                                    "the minor revision.\n"
+                                                                                                    "For example, a value of 0x00000004 stands for revision 0.4.\n"
+                                                                                                    "Debug packet compression and decompression is supported since revision 0.4."
+

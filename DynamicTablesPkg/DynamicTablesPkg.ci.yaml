@@ -1,0 +1,156 @@
+## @file
+# CI configuration for DynamicTablesPkg
+#
+# Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
+# Copyright (C) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+    "PrEval": {
+        "DscPath": "DynamicTablesPkg.dsc",
+    },
+    "EccCheck": {
+        ## Exception sample looks like below:
+        ## "ExceptionList": [
+        ##     "<ErrorID>", "<KeyWord>"
+        ## ]
+        "ExceptionList": [
+        # "The #ifndef at the start of an include file should use
+        # both prefix and postfix underscore characters, '_'"
+        # This error is not triggered for the latest BaseTools code.
+        # @TODO The error should be re-enabled when the python packages
+        # containing the BaseTools are updated to the latest version.
+        "8003", "DISABLE_NEW_DEPRECATED_INTERFACES",
+        "9005", "@defgroup",      # Use extra Doxygen commands
+        "9005", "@ingroup",       # Use extra Doxygen commands
+        "9005", "@mainpage",      # Use extra Doxygen commands
+        "9005", "@ref",           # Use extra Doxygen commands
+        ],
+        ## Both file path and directory path are accepted.
+        "IgnoreFiles": [
+        ]
+    },
+
+    ## options defined .pytool/Plugin/CompilerPlugin
+    "CompilerPlugin": {
+        "DscPath": "DynamicTablesPkg.dsc"
+    },
+
+    ## options defined .pytool/Plugin/HostUnitTestCompilerPlugin
+    "HostUnitTestCompilerPlugin": {
+        "DscPath": "Test/DynamicTablesPkgHostTest.dsc"
+    },
+
+    ## options defined .pytool/Plugin/CharEncodingCheck
+    "CharEncodingCheck": {
+        "IgnoreFiles": []
+    },
+
+    ## options defined .pytool/Plugin/DependencyCheck
+    "DependencyCheck": {
+        "AcceptableDependencies": [
+            "ArmPkg/ArmPkg.dec",
+            "ArmPlatformPkg/ArmPlatformPkg.dec",
+            "EmbeddedPkg/EmbeddedPkg.dec",
+            "DynamicTablesPkg/DynamicTablesPkg.dec",
+            "MdeModulePkg/MdeModulePkg.dec",
+            "MdePkg/MdePkg.dec",
+            "SecurityPkg/SecurityPkg.dec"
+        ],
+        # For host based unit tests
+        "AcceptableDependencies-HOST_APPLICATION":[
+            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec"
+        ],
+        # For UEFI shell based apps
+        "AcceptableDependencies-UEFI_APPLICATION":[],
+        "IgnoreInf": []
+    },
+
+    ## options defined .pytool/Plugin/DscCompleteCheck
+    "DscCompleteCheck": {
+        "IgnoreInf": [],
+        "DscPath": "DynamicTablesPkg.dsc"
+    },
+
+    ## options defined .pytool/Plugin/HostUnitTestDscCompleteCheck
+    "HostUnitTestDscCompleteCheck": {
+        "IgnoreInf": [""],
+        "DscPath": "" # Don't support this test
+    },
+
+    ## options defined .pytool/Plugin/GuidCheck
+    "GuidCheck": {
+        "IgnoreGuidName": [],
+        "IgnoreGuidValue": [],
+        "IgnoreFoldersAndFiles": [],
+        "IgnoreDuplicates": [],
+    },
+
+    ## options defined .pytool/Plugin/LibraryClassCheck
+    "LibraryClassCheck": {
+        "IgnoreHeaderFile": []
+    },
+
+    ## options defined .pytool/Plugin/SpellCheck
+    "SpellCheck": {
+        "AuditOnly": False,
+        "IgnoreFiles": [],           # use gitignore syntax to ignore errors
+                                     # in matching files
+        "ExtendWords": [
+           "ARMHB",                  # ARMHB000
+           "ARMHC",                  # ARMHC600
+           "ARMLTD",
+           "AMLDBG",
+           "EISAID",
+           "cacheablity",
+           "CCIDX",
+           "CCSIDR",
+           "cfmws",
+           "countof",
+           "deviceid",
+           "EArch",
+           "edynamic",
+           "EOBJECT",
+           "invoc",
+           "ITARGETSR",
+           "GTBLOCK",
+           "lgreater",
+           "lless",
+           "MPIDR",
+           "NAMESPACEID",
+           "NUVIA",
+           "PASID",
+           "PERIPHBASE",
+           "phandle",
+           "pytool",
+           "Rdword",
+           "Roadmap",
+           "ROOTNODEBASE",
+           "sapic",
+           "ssdtcmn",
+           "ssdtserialporttemplate",
+           "SMCCC",
+           "SMMUV",
+           "ssdtpcieosctemplate",
+           "SSDTPC",
+           "standardised",
+           "TABLEEX",
+           "TNSID",
+           "Vatos",
+           "WBINVD",
+           "xapic"
+           ],           # words to extend to the dictionary for this package
+        "IgnoreStandardPaths": [],   # Standard Plugin defined paths that
+                                     # should be ignore
+        "AdditionalIncludePaths": [] # Additional paths to spell check
+                                     # (wildcards supported)
+    },
+
+    "DebugMacroCheck": {
+      "StringSubstitutions": {
+          # DynamicTablesPkg/Library/Common/TableHelperLib/ConfigurationManagerObjectParser.c
+          # Reason: Debug format strings are dynamically set.
+          "Parser[Index].Format": "%d"
+      }
+    }
+}

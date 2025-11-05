@@ -1,0 +1,52 @@
+## @file
+#  Report Status Code Router Driver which produces SMM Report Stataus Code Handler Protocol and SMM Status Code Protocol.
+#
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ReportStatusCodeRouterSmm
+  MODULE_UNI_FILE                = ReportStatusCodeRouterSmm.uni
+  FILE_GUID                      = A6885402-D022-4b0e-A509-4711B90F2A39
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = GenericStatusCodeTraditionalEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  ReportStatusCodeRouterCommon.c
+  ReportStatusCodeRouterCommon.h
+  ReportStatusCodeRouterTraditional.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MmServicesTableLib
+  UefiDriverEntryPoint
+  DebugLib
+  BaseLib
+  SynchronizationLib
+  MemoryAllocationLib
+
+[Protocols]
+  gEfiMmRscHandlerProtocolGuid               ## PRODUCES
+  gEfiMmStatusCodeProtocolGuid               ## PRODUCES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  ReportStatusCodeRouterSmmExtra.uni

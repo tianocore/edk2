@@ -1,0 +1,32 @@
+## @file
+# This is a unit test for the UefiSortLib.
+#
+# Copyright (C) Huawei Technologies Co., Ltd. All rights reserved
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = UefiSortLibUnitTest
+  FILE_GUID           = 271337A3-0D79-BA3E-BC03-714E518E3B1B
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = HOST_APPLICATION
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  UefiSortLibUnitTest.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  UnitTestLib
+  DebugLib
+  UefiSortLib

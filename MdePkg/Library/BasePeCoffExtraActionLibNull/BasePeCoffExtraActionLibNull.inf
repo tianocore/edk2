@@ -1,0 +1,33 @@
+## @file
+#  Null PE/Coff Extra Action library instances with empty functions.
+#
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeCoffExtraActionLibNull
+  MODULE_UNI_FILE                = PeCoffExtraActionLibNull.uni
+  FILE_GUID                      = 0EB84DA1-267A-40b4-8347-1F48694C8B47
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PeCoffExtraActionLib
+
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  PeCoffExtraActionLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
+

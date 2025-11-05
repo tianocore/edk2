@@ -1,0 +1,43 @@
+## @file
+# Section Extraction DXE Driver
+#
+# Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SectionExtractionDxe
+  FILE_GUID                      = A0E8E04C-9B5A-43be-8B7D-C98760492B68
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SectionExtractionDxeEntry
+  MODULE_UNI_FILE                = SectionExtractionDxe.uni
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SectionExtractionDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  ExtractGuidedSectionLib
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SectionExtractionDxeExtra.uni

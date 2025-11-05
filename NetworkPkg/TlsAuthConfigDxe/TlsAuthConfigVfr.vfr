@@ -1,0 +1,147 @@
+/** @file
+  VFR file used by TlsAuthConfigDxe driver.
+
+  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include "TlsAuthConfigNvData.h"
+
+formset
+  guid   = TLS_AUTH_CONFIG_GUID,
+  title  = STRING_TOKEN(STR_TLS_AUTH_CONFIG_TITLE),
+  help   = STRING_TOKEN(STR_TLS_AUTH_CONFIG_HELP),
+
+  varstore TLS_AUTH_CONFIG_IFR_NVDATA,
+    name = TLS_AUTH_CONFIG_IFR_NVDATA,
+    guid = TLS_AUTH_CONFIG_GUID;
+
+  //
+  // ##1 Form1: Main form for Tls Auth configuration
+  //
+  form formid = TLS_AUTH_CONFIG_FORMID1_FORM,
+    title  = STRING_TOKEN(STR_TLS_AUTH_CONFIG_TITLE);
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    //
+    // Display Server CA configuration
+    //
+    goto TLS_AUTH_CONFIG_FORMID2_FORM,
+         prompt = STRING_TOKEN(STR_TLS_AUTH_CONFIG_SERVER_CA),
+         help   = STRING_TOKEN(STR_TLS_AUTH_CONFIG_SERVER_CA_HELP),
+         flags  = INTERACTIVE,
+         key    = KEY_TLS_AUTH_CONFIG_SERVER_CA;
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    //
+    // Display Client cert configuration
+    //
+    grayoutif TRUE; /// Current unsupported.
+    goto TLS_AUTH_CONFIG_FORMID3_FORM,
+         prompt = STRING_TOKEN(STR_TLS_AUTH_CONFIG_CLIENT_CERT),
+         help   = STRING_TOKEN(STR_TLS_AUTH_CONFIG_CLIENT_CERT_HELP),
+         flags  = INTERACTIVE,
+         key    = KEY_TLS_AUTH_CONFIG_CLIENT_CERT;
+    endif;
+  endform;
+
+  //
+  // ##2 Form2: CA configuration
+  //
+  form formid = TLS_AUTH_CONFIG_FORMID2_FORM,
+    title  = STRING_TOKEN(STR_TLS_AUTH_CONFIG_SERVER_CA);
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    goto TLS_AUTH_CONFIG_FORMID4_FORM,
+         prompt = STRING_TOKEN(STR_TLS_AUTH_CONFIG_ENROLL_CERT),
+         help   = STRING_TOKEN(STR_TLS_AUTH_CONFIG_ENROLL_CERT_HELP),
+         flags  = INTERACTIVE,
+         key    = KEY_TLS_AUTH_CONFIG_ENROLL_CERT;
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    goto TLS_AUTH_CONFIG_FORMID5_FORM,
+         prompt = STRING_TOKEN(STR_TLS_AUTH_CONFIG_DELETE_CERT),
+         help   = STRING_TOKEN(STR_TLS_AUTH_CONFIG_DELETE_CERT_HELP),
+         flags  = INTERACTIVE,
+         key    = KEY_TLS_AUTH_CONFIG_DELETE_CERT;
+  endform;
+
+  //
+  // ##3 Form3 : Client cert configuration
+  //
+  form formid = TLS_AUTH_CONFIG_FORMID3_FORM,
+    title  = STRING_TOKEN(STR_TLS_AUTH_CONFIG_CLIENT_CERT);
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+  //
+  // TODO...
+  //
+  endform;
+
+  //
+  // ##4 Form4: Enroll cert for CA
+  //
+  form formid = TLS_AUTH_CONFIG_FORMID4_FORM,
+    title  = STRING_TOKEN(STR_TLS_AUTH_CONFIG_ENROLL_CERT);
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    goto TLS_AUTH_CONFIG_FORMID4_FORM,
+         prompt = STRING_TOKEN(STR_TLS_AUTH_CONFIG_ADD_CERT_FILE),
+         help = STRING_TOKEN(STR_TLS_AUTH_CONFIG_ADD_CERT_FILE),
+         flags = INTERACTIVE,
+         key = KEY_TLS_AUTH_CONFIG_ENROLL_CERT_FROM_FILE;
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+    label TLS_AUTH_CONFIG_FORMID4_FORM;
+    label LABEL_END;
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    string  varid   = TLS_AUTH_CONFIG_IFR_NVDATA.CertGuid,
+            prompt  = STRING_TOKEN(STR_TLS_AUTH_CONFIG_CERT_GUID),
+            help    = STRING_TOKEN(STR_TLS_AUTH_CONFIG_CERT_GUID_HELP),
+            flags   = INTERACTIVE,
+            key     = KEY_TLS_AUTH_CONFIG_CERT_GUID,
+            minsize = TLS_AUTH_CONFIG_GUID_SIZE,
+            maxsize = TLS_AUTH_CONFIG_GUID_SIZE,
+    endstring;
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    goto TLS_AUTH_CONFIG_FORMID1_FORM,
+         prompt = STRING_TOKEN(STR_TLS_AUTH_CONFIG_SAVE_AND_EXIT),
+         help   = STRING_TOKEN(STR_TLS_AUTH_CONFIG_SAVE_AND_EXIT),
+         flags  = INTERACTIVE,
+         key    = KEY_TLS_AUTH_CONFIG_VALUE_SAVE_AND_EXIT;
+
+    goto TLS_AUTH_CONFIG_FORMID1_FORM,
+         prompt = STRING_TOKEN(STR_TLS_AUTH_CONFIG_NO_SAVE_AND_EXIT),
+         help   = STRING_TOKEN(STR_TLS_AUTH_CONFIG_NO_SAVE_AND_EXIT),
+         flags  = INTERACTIVE,
+         key    = KEY_TLS_AUTH_CONFIG_VALUE_NO_SAVE_AND_EXIT;
+
+  endform;
+
+  //
+  // ##5 Form5: Delete cert for CA
+  //
+  form formid = TLS_AUTH_CONFIG_FORMID5_FORM,
+    title  = STRING_TOKEN(STR_TLS_AUTH_CONFIG_DELETE_CERT);
+
+    label LABEL_CA_DELETE;
+    label LABEL_END;
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+  endform;
+
+endformset;
+

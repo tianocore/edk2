@@ -1,0 +1,40 @@
+## @file
+#  Instance of Performance Library with empty functions.
+#
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BasePerformanceLibNull
+  MODULE_UNI_FILE                = BasePerformanceLibNull.uni
+  FILE_GUID                      = FC120ED3-40E1-46dc-8C9C-AAE3CA139ACF
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PerformanceLib
+
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  PerformanceLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+[LibraryClasses]
+  PcdLib
+  DebugLib
+
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask  ## CONSUMES
+

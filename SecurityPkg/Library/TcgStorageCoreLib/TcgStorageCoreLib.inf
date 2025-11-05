@@ -1,0 +1,33 @@
+## @file
+#  This is a Tcg Storage core library.
+#
+#  This module is used to provide API used by Opal password solution.
+#
+# Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = TcgStorageCoreLib
+  FILE_GUID                      = ad63b09b-1fc9-4789-af0c-5af8a3fb1f9c
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = BASE
+  LIBRARY_CLASS                  = TcgStorageCoreLib
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64
+#
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[Sources]
+  TcgStorageCore.c
+  TcgStorageUtil.c

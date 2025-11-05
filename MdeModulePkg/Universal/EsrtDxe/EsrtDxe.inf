@@ -1,0 +1,66 @@
+## @file
+#  Esrt DXE driver that manages cached ESRT repository & publishes ESRT table
+#
+#  This driver produces EsrtManagement protocol to manage cache ESRT repository for FMP/Non-FMP instances.
+#  ESRT table based on repository is published on gEfiEventReadyToBootGuid.
+#
+#  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EsrtDxe
+  MODULE_UNI_FILE                = EsrtDxe.uni
+  FILE_GUID                      = 999BD818-7DF7-4A9A-A502-9B75033E6A0F
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = EsrtDxeEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  EsrtImpl.h
+  EsrtImpl.c
+  EsrtDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  UefiLib
+  PcdLib
+  DebugLib
+  MemoryAllocationLib
+  DxeServicesTableLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+
+[Guids]
+  gEfiSystemResourceTableGuid             ## PRODUCES             ## SystemTable
+  gEfiEventReadyToBootGuid                ## CONSUMES             ## Event
+
+[Protocols]
+  gEfiFirmwareManagementProtocolGuid      ## SOMETIMES_CONSUMES
+  gEsrtManagementProtocolGuid             ## PRODUCES
+  gEdkiiVariableLockProtocolGuid          ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxFmpEsrtCacheNum                  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxNonFmpEsrtCacheNum               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSystemRebootAfterCapsuleProcessFlag ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSystemFmpCapsuleImageTypeIdGuid     ## CONSUMES
+
+[Depex]
+  gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  EsrtDxeExtra.uni

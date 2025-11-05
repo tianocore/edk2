@@ -1,0 +1,52 @@
+## @file
+# Emu Emulation Reset Architectural Protocol Driver as defined in PI
+#
+# This Reset module simulates system reset by process exit on Emulator.
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2011, Apple Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EmuReset
+  FILE_GUID                      = 50A18017-37AD-8743-BCF2-DF1A8FF12FAB
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeEmuReset
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  Reset.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  EmuThunkLib
+  UefiDriverEntryPoint
+  UefiLib
+  DebugLib
+  BaseLib
+
+
+[Protocols]
+  gEfiResetArchProtocolGuid                     # PROTOCOL ALWAYS_PRODUCED
+
+
+[Depex]
+  TRUE
+

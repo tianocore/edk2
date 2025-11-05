@@ -1,0 +1,13 @@
+// /** @file
+// This module produces Boot Manager Policy protocol.
+//
+// Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT    #language en-US "This module produces Boot Manager Policy protocol"
+
+#string STR_MODULE_DESCRIPTION #language en-US "This module produces Boot Manager Policy protocol, which is used by EFI Applications to request the UEFI Boot Manager to connect devices using platform policy."
+

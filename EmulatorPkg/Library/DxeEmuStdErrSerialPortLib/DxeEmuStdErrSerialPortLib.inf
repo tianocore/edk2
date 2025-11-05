@@ -1,0 +1,35 @@
+## @file
+#  Write only instance of Serial Port Library with empty functions.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Portions copyright (c) 2011, Apple Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeEmuStdErrSerialPortLib
+  FILE_GUID                      = 4EED5138-C512-9E4F-AB13-149B87D40453
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SerialPortLib| DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER SMM_CORE UEFI_APPLICATION UEFI_DRIVE
+
+
+[Sources]
+  DxeEmuStdErrSerialPortLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  EmuThunkLib
+
+
+
+
+

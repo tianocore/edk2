@@ -1,0 +1,16 @@
+// /** @file
+// BrotliCustomDecompressLib produces BROTLI custom decompression algorithm.
+//
+// It is based on the Brotli v0.5.2.
+// Brotli was released on the website https://github.com/google/brotli.
+//
+// Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "BrotliCustomDecompressLib produces BROTLI custom decompression algorithm"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "It is based on the Brotli v0.5.2. Brotli was released on the website https://github.com/google/brotli."

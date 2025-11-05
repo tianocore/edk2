@@ -1,0 +1,18 @@
+// /** @file
+// Set TPM device type
+//
+// This module initializes TPM device type based on variable and detection.
+// NOTE: This module is only for reference only, each platform should have its own setup page.
+//
+// Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Set TPM device type"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module initializes TPM device type based on variable and detection.\n"
+                                                        "NOTE: This module is only for reference only, each platform should have its own setup page."
+

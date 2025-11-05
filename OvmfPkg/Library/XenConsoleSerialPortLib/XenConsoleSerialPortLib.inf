@@ -1,0 +1,29 @@
+#/** @file
+#
+#  Component description file for XenConsoleSerialPortLib module
+#
+#  Copyright (c) 2015, Linaro Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = XenConsoleSerialPortLib
+  FILE_GUID                      = 401406DD-BCAC-4B91-9F4E-72A7FEBE4762
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SerialPortLib
+  CONSTRUCTOR                    = SerialPortInitialize
+
+[Sources.common]
+  XenConsoleSerialPortLib.c
+
+[LibraryClasses]
+  BaseLib
+  XenHypercallLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec

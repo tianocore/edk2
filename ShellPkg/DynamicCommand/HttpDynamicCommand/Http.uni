@@ -1,0 +1,117 @@
+// /**
+//
+// (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
+// Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved. <BR>
+// Copyright (c) 2020, Broadcom. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Module Name:
+//
+// Http.uni
+//
+// Abstract:
+//
+// String definitions for UEFI Shell HTTP command
+//
+//
+// **/
+
+/=#
+
+#langdef   en-US "english"
+
+#string STR_GEN_TOO_MANY           #language en-US "%H%s%N: Too many arguments. Try help http.\r\n"
+#string STR_GEN_TOO_FEW            #language en-US "%H%s%N: Too few arguments. Try help http.\r\n"
+#string STR_GEN_PARAM_INV          #language en-US "%H%s%N: Invalid argument - '%H%s%N'. Try help http.\r\n"
+#string STR_GEN_PROBLEM            #language en-US "%H%s%N: Unknown flag - '%H%s%N'. Try help http.\r\n"
+#string STR_GEN_FILE_OPEN_FAIL     #language en-US "%H%s%N: Cannot open file - '%H%s%N'\r\n"
+#string STR_GEN_CRLF               #language en-US "\r\n"
+
+#string STR_HTTP_ERR_NO_NIC        #language en-US "No network interface card found.\r\n"
+#string STR_HTTP_ERR_NIC_NAME      #language en-US "Failed to get the name of the network interface card number %d - %r\r\n"
+#string STR_HTTP_ERR_OPEN_PROTOCOL #language en-US "Unable to open HTTP protocol on '%H%s%N' - %r\r\n"
+#string STR_HTTP_ERR_CONFIGURE     #language en-US "Unable to configure HTTP protocol on '%H%s%N' - %r\r\n"
+#string STR_HTTP_ERR_DOWNLOAD      #language en-US "Unable to download the file '%H%s%N' on '%H%s%N' - %r\r\n"
+#string STR_HTTP_ERR_WRITE         #language en-US "Unable to write into file '%H%s%N' - %r\r\n"
+#string STR_HTTP_ERR_NIC_NOT_FOUND #language en-US "Network Interface Card '%H%s%N' not found.\r\n"
+#string STR_HTTP_ERR_STATUSCODE    #language en-US "\r'%H%s%N' reports '%s' for '%H%s%N' \r\n"
+#string STR_HTTP_DOWNLOADING       #language en-US "Downloading '%H%s%N'\r\n"
+
+#string STR_GET_HELP_HTTP          #language en-US ""
+".TH http 0 "Download a file from HTTP server."\r\n"
+".SH NAME\r\n"
+"Download a file from HTTP server.\r\n"
+".SH SYNOPSIS\r\n"
+" \r\n"
+"HTTP [-i interface] [-l port] [-t timeout] [-s size] [-m] [-k]\r\n"
+"      <URL> [localfilepath]\r\n"
+".SH OPTIONS\r\n"
+" \r\n"
+"  -i interface     - Specifies an adapter name, i.e., eth0.\r\n"
+"  -k                 Keep the downloaded file even if there was an error.\r\n"
+"                     If this parameter is not used, the file will be deleted.\r\n"
+"  -l port          - Specifies the local port number. Default value is 0\r\n"
+"                     and the port number is automatically assigned.\r\n"
+"  -m                 Measure and report download time (in seconds). \r\n"
+"  -s size            The size of the download buffer for a chunk, in bytes.\r\n"
+"                     Default is 32K. Note that larger buffer does not imply\r\n"
+"                     better speed.\r\n"
+"  -t timeout       - The number of seconds to wait for completion of\r\n"
+"                     requests and responses. Default is 0 which is 'automatic'.\r\n"
+"  %HURL%N\r\n"
+"  Two types of providing of URLs are supported:\r\n"
+"    1. tftp-like, where host and http_uri are separate parameters\r\n"
+"       (example: host /host_uri), and\r\n\"
+"    2. wget-like, where host and host_uri is one parameter.\r\n"
+"       (example: host/host_uri)\r\n"
+"\r\n"
+"    host             - Specifies HTTP Server address.\r\n
+                        Can be either IPv4 address or 'http (or https)://addr'\r\n
+                        Can use addresses resolvable by DNS as well. \r\n
+                        Port can be specified after ':' if needed. \r\n
+                        By default port 80 is used.\r\n"
+"    http_uri         - HTTP server URI to download the file.\r\n"
+"\r\n"
+"  localfilepath    - Local destination file path.\r\n"
+".SH DESCRIPTION\r\n"
+" \r\n"
+"NOTES:\r\n"
+"  1. The HTTP command allows geting of the file specified by its 'http_uri'\r\n"
+"     path from the HTTP server specified by its 'host' IPv4 address. If the\r\n"
+"     optional 'localfilepath' parameter is provided, the downloaded file is\r\n"
+"     stored locally using the provided file path. If the local file path is\r\n"
+"     not specified, the file is stored in the current directory using the file\r\n"
+"     server's name.\r\n"
+"  2. Before using the HTTP command, the network interface intended to be\r\n"
+"     used to retrieve the file must be configured. This configuration may be\r\n"
+"     done by means of the 'ifconfig' command.\r\n"
+"  3. If a network interface is defined with the '-i' option then only this\r\n"
+"     interface will be used to retrieve the remote file. Otherwise, all network\r\n"
+"     interfaces are tried in the order they have been discovered during the\r\n"
+"     DXE phase.\r\n"
+".SH EXAMPLES\r\n"
+" \r\n"
+"EXAMPLES:\r\n"
+"  * To get the file "dir1/file1.dat" from the HTTP server 192.168.1.1, port 8080, and\r\n"
+"    store it as file2.dat in the current directory (use tftp-like URL format) :\r\n"
+"    fs0:\> http 192.168.1.1:8080 dir1/file1.dat file2.dat\r\n"
+"  * To get the file /image.bin via HTTPS from server 192.168.1.1 at port 443 \r\n"
+"    (default HTTPS port), and store it in the current directory: \r\n"
+"    fs0:\> http https://192.168.1.1 image.bin\r\n"
+"    To get an index file from http://google.com and place it into the \r\n"
+"    current directory:\r\n"
+"    fs0:\> http google.com index.html\r\n"
+".SH RETURNVALUES\r\n"
+" \r\n"
+"RETURN VALUES:\r\n"
+"  SHELL_SUCCESS             The action was completed as requested.\r\n"
+"  SHELL_INVALID_PARAMETER   One of the passed-in parameters was incorrectly\r\n"
+"                            formatted or its value was out of bounds.\r\n"
+"  HTTP_ERROR                No EFI errors, but the server reported a status code\r\n"
+"                            which should be treated as an error. If an error body sent\r\n"
+"                            by the server, and -k parameter is on command line,
+"                            the file wil be saved either as localfilepath filename,\r\n"
+"                            or as an URI name in the current directory.\r\n"
+"                            If '/' is at the end of the URL, and no locafilepath filename\r\n"
+"                            is given on the command line, the file will be retrieved as\r\n"
+"                            index.html.\r\n"

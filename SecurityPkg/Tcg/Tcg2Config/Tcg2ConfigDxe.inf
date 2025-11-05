@@ -1,0 +1,88 @@
+## @file
+#  TPM device configuration for TPM 2.0
+#
+#  By this module, user may select TPM device, clear TPM state, etc.
+#  NOTE: This module is only for reference only, each platform should have its own setup page.
+#
+# Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Tcg2ConfigDxe
+  MODULE_UNI_FILE                = Tcg2ConfigDxe.uni
+  FILE_GUID                      = 4D9CBEF0-15A0-4D0C-83DB-5213E710C23F
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Tcg2ConfigDriverEntryPoint
+  UNLOAD_IMAGE                   = Tcg2ConfigDriverUnload
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  Tcg2ConfigDriver.c
+  Tcg2ConfigImpl.c
+  Tcg2ConfigImpl.h
+  Tcg2Config.vfr
+  Tcg2ConfigStrings.uni
+  Tcg2ConfigNvData.h
+  Tcg2Internal.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+  UefiHiiServicesLib
+  DebugLib
+  HiiLib
+  PcdLib
+  PrintLib
+  Tpm2DeviceLib
+  Tpm2CommandLib
+  Tcg2PhysicalPresenceLib
+  IoLib
+
+[Guids]
+  ## PRODUCES           ## HII
+  ## SOMETIMES_PRODUCES ## Variable:L"TCG2_CONFIGURATION"
+  ## SOMETIMES_CONSUMES ## Variable:L"TCG2_CONFIGURATION"
+  ## PRODUCES           ## Variable:L"TCG2_DEVICE_DETECTION"
+  ## SOMETIMES_CONSUMES ## Variable:L"TCG2_DEVICE_DETECTION"
+  gTcg2ConfigFormSetGuid
+
+[Protocols]
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
+  gEfiDevicePathProtocolGuid                    ## PRODUCES
+  gEdkiiVariableLockProtocolGuid                ## SOMETIMES_CONSUMES
+  gEfiTcg2ProtocolGuid                          ## CONSUMES
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid            ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcg2HashAlgorithmBitmap    ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress             ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer  ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev           ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdActiveTpmInterfaceType     ## CONSUMES
+
+[Depex]
+  gEfiTcg2ProtocolGuid              AND
+  gEfiHiiConfigRoutingProtocolGuid  AND
+  gEfiHiiDatabaseProtocolGuid       AND
+  gEfiVariableArchProtocolGuid      AND
+  gEfiVariableWriteArchProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  Tcg2ConfigDxeExtra.uni

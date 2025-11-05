@@ -1,0 +1,58 @@
+## @file
+#  NULL class library to register var check PCD handler.
+#
+#  In platform *.fdf, the example build rule for the driver this library linked to.
+#    [Rule.Common.DXE_RUNTIME_DRIVER.VARCHECKPCD]
+#      FILE DRIVER = $(NAMED_GUID) {
+#        RAW          BIN                     $(WORKSPACE)/$(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/FV/PcdVarCheck.bin
+#        DXE_DEPEX    DXE_DEPEX Optional      $(INF_OUTPUT)/$(MODULE_NAME).depex
+#        PE32         PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
+#        UI           STRING="$(MODULE_NAME)" Optional
+#        VERSION      STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+#      }
+#
+#    or
+#
+#    [Rule.Common.DXE_SMM_DRIVER.VARCHECKPCD]
+#      FILE SMM = $(NAMED_GUID) {
+#        RAW          BIN                     $(WORKSPACE)/$(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/FV/PcdVarCheck.bin
+#        DXE_DEPEX    DXE_DEPEX Optional      $(INF_OUTPUT)/$(MODULE_NAME).depex
+#        PE32         PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
+#        UI           STRING="$(MODULE_NAME)" Optional
+#        VERSION      STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+#      }
+#
+#  In platform *.dsc, also need add one line below to enable PcdVarCheck.bin generation by BaseTools.
+#    PCD_VAR_CHECK_GENERATION            = TRUE
+#
+#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VarCheckPcdLib
+  MODULE_UNI_FILE                = VarCheckPcdLib.uni
+  FILE_GUID                      = D4FA5311-5F1F-4B1E-9AC3-90C4DFC029F1
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_RUNTIME_DRIVER DXE_SMM_DRIVER
+  CONSTRUCTOR                    = VarCheckPcdLibNullClassConstructor
+
+[Sources]
+  VarCheckPcdLibNullClass.c
+  VarCheckPcdStructure.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  DxeServicesLib
+  MemoryAllocationLib
+  VarCheckLib

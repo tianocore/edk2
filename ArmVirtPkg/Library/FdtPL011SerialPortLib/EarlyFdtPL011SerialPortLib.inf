@@ -1,0 +1,41 @@
+#/** @file
+#
+#  Component description file for EarlyFdtPL011SerialPortLib module
+#
+#  Copyright (c) 2011-2015, ARM Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EarlyFdtPL011SerialPortLib
+  FILE_GUID                      = 0983616A-49BC-4732-B531-4AF98D2056F0
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SerialPortLib|SEC PEI_CORE PEIM
+
+[Sources.common]
+  EarlyFdtPL011SerialPortLib.c
+
+[LibraryClasses]
+  PL011UartLib
+  PcdLib
+  FdtSerialPortAddressLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
+  gArmPlatformTokenSpaceGuid.PL011UartClkInHz

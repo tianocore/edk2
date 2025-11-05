@@ -1,0 +1,59 @@
+// *++
+//
+// Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Module Name:
+//
+//   VfrStrings.vfr
+//
+// Abstract:
+//
+//   String definitions for platform driver override manager formset.
+//
+//
+// --*/
+
+
+/=#
+
+#langdef en-US "English"
+#langdef fr-FR "Francais"
+
+
+#string STR_ENTRY_TITLE                           #language en-US  "Platform Driver Override selection"
+                                                  #language fr-FR  "fr-FR: Platform Driver Override selection"
+#string STR_TITLE                                 #language en-US  " "
+                                                  #language fr-FR  " "
+#string STR_TITLE_HELP                            #language en-US  "Select driver connection order as platform policy for specific controller"
+                                                  #language fr-FR  "fr-FR: Select driver connection order as platform policy for specific controller"
+#string STR_TITLE_ORDER                           #language en-US  "Order Platform Override driver priority"
+                                                  #language fr-FR  "fr-FR: Order Platform Override driver priority"
+#string STR_TITLE_ORDER_HELP                      #language en-US  "Select the drivers you need to add as previous controller's override driver in the following check box, and go on to order them priority in this entry. '?' means you have not select the driver"
+                                                  #language fr-FR  "fr-FR: Select the drivers you need to add as previous controller's override driver in the following check box, and go on to order them priority in this entry. '?' means you have not select the driver"
+#string STR_FIRST_REFRESH                         #language en-US  "Please refresh page firstly"
+                                                  #language fr-FR  "fr-FR: Please Refresh page firstly"
+#string STR_FIRST_REFRESH_HELP                    #language en-US  "When enter the page at first time, refresh is needed to show all the controller device paths"
+                                                  #language fr-FR  "fr-FR: When enter the page at first time, refresh is needed to show all the controller device paths"
+#string STR_REFRESH                               #language en-US  "Refresh"
+                                                  #language fr-FR  "fr-FR: Refresh"
+#string STR_REFRESH_HELP                          #language en-US  "Refresh to show all the current controllers device paths"
+                                                  #language fr-FR  "fr-FR: Refresh to show all the current controllers device paths"
+#string STR_PCI_DEVICE_FILTER_PROMPT              #language en-US  "PCI device filter"
+                                                  #language fr-FR  "fr-FR: PCI device filter"
+#string STR_PCI_DEVICE_FILTER_HELP                #language en-US  "Only show the PCI device which has EFI driver in its option rom"
+                                                  #language fr-FR  "fr-FR: Only show the PCI device which has EFI driver in its option rom"
+#string STR_DRIVER_DEFAULT_NAME                   #language en-US  "Driver Default Name"
+                                                  #language fr-FR  "fr-FR: Driver Default Name"
+#string STR_GOTO_HELP_DRIVER                      #language en-US  "Select the controller device path which you need combine override drivers, '**' means you have saved its info before"
+                                                  #language fr-FR  "fr-FR: Select the controller device path which you need combine override drivers"
+#string STR_NULL_STRING                           #language en-US  ""
+                                                  #language fr-FR  ""
+#string STR_GOTO_PREVIOUS                         #language en-US  "Go to Previous Menu"
+                                                  #language fr-FR  "fr-FR: Go to Previous Menu"
+#string STR_SAVE_AND_EXIT                         #language en-US  "Commit Changes"
+                                                  #language fr-FR  "fr-FR: Commit Changes"
+#string STR_CLEAR_ALL                             #language en-US  "Clear all mapping record!"
+                                                  #language fr-FR  "fr-FR: Clear all mapping record!"
+#string STR_CLEAR_ALL_HELP                        #language en-US  "Deletes all environment variable(s) that contain the override mappings info"
+                                                  #language fr-FR  "fr-FR: Clear all mapping record!"

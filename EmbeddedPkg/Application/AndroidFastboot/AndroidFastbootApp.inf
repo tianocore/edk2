@@ -1,0 +1,53 @@
+#/** @file
+#
+#  Copyright (c) 2013-2015, ARM Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AndroidFastbootApp
+  FILE_GUID                      = 9588502a-5370-11e3-8631-d7c5951364c8
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = FastbootAppEntryPoint
+
+[Sources.common]
+  AndroidFastbootApp.c
+  AndroidBootImg.c
+
+[Sources.AARCH64]
+  Arm/BootAndroidBootImg.c
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  DxeServicesTableLib
+  MemoryAllocationLib
+  PcdLib
+  PrintLib
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gAndroidFastbootTransportProtocolGuid
+  gAndroidFastbootPlatformProtocolGuid
+  gEfiLoadedImageProtocolGuid
+  gEfiSimpleTextOutProtocolGuid
+  gEfiSimpleTextInProtocolGuid
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[Packages.AARCH64]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec

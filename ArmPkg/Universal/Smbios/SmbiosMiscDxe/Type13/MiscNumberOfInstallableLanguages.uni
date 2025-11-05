@@ -1,0 +1,43 @@
+/** @file
+  Based on files under Nt32Pkg/MiscSubClassPlatformDxe/
+
+  Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
+  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015, Hisilicon Limited. All rights reserved.<BR>
+  Copyright (c) 2015, Linaro Limited. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+/=#
+
+/=#
+//
+// Language String (Long Format)
+//
+#string STR_MISC_BIOS_LANGUAGES_ENG_LONG        #language en-US  "en|US|iso8859-1"
+#string STR_MISC_BIOS_LANGUAGES_FRA_LONG        #language en-US  "fr|CA|iso8859-1"
+#string STR_MISC_BIOS_LANGUAGES_CHN_LONG        #language en-US  "zh|TW|unicode"
+#string STR_MISC_BIOS_LANGUAGES_JPN_LONG        #language en-US  "ja|JP|unicode"
+#string STR_MISC_BIOS_LANGUAGES_ITA_LONG        #language en-US  "it|IT|iso8859-1"
+#string STR_MISC_BIOS_LANGUAGES_SPA_LONG        #language en-US  "es|ES|iso8859-1"
+#string STR_MISC_BIOS_LANGUAGES_GER_LONG        #language en-US  "de|DE|iso8859-1"
+#string STR_MISC_BIOS_LANGUAGES_POR_LONG        #language en-US  "pt|PT|iso8859-1"
+
+
+//
+// Language String (Abbreviated Format)
+//
+#string STR_MISC_BIOS_LANGUAGES_ENG_ABBREVIATE  #language en-US  "enUS"
+#string STR_MISC_BIOS_LANGUAGES_FRA_ABBREVIATE  #language en-US  "frCA"
+#string STR_MISC_BIOS_LANGUAGES_CHN_ABBREVIATE  #language en-US  "zhTW"
+#string STR_MISC_BIOS_LANGUAGES_JPN_ABBREVIATE  #language en-US  "jaJP"
+#string STR_MISC_BIOS_LANGUAGES_ITA_ABBREVIATE  #language en-US  "itIT"
+#string STR_MISC_BIOS_LANGUAGES_SPA_ABBREVIATE  #language en-US  "esES"
+#string STR_MISC_BIOS_LANGUAGES_GER_ABBREVIATE  #language en-US  "deDE"
+#string STR_MISC_BIOS_LANGUAGES_POR_ABBREVIATE  #language en-US  "ptPT"
+
+#string STR_MISC_BIOS_LANGUAGES_SIMPLECH_ABBREVIATE  #language en-US  "zhCN"
+#string STR_MISC_BIOS_LANGUAGES_SIMPLECH_LONG        #language en-US  "zh|CN|unicode"
+
+

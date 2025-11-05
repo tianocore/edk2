@@ -1,0 +1,11 @@
+## @file
+# Set this folder on the path for all linux builds
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "id": "binwrappers",
+  "scope": "global-nix",
+  "flags": ["set_path"]
+}

@@ -1,0 +1,22 @@
+## @file
+# File templates/spell-check-prereq-steps.yml
+#
+# template file used to install spell checking prerequisits
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+parameters:
+  none: ''
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '14.x'
+    #checkLatest: false # Optional
+  condition: and(gt(variables.pkg_count, 0), succeeded())
+
+- script: npm install -g cspell@5.20.0
+  displayName: 'Install cspell npm'
+  condition: and(gt(variables.pkg_count, 0), succeeded())

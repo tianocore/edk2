@@ -1,0 +1,75 @@
+## @file
+#  AtaAtapiPassThru driver to provide native IDE/AHCI mode support.
+#
+#  This driver installs AtaPassThru and ExtScsiPassThru protocol in each ide/sata controller
+#  to access to all attached Ata/Atapi devices.
+#
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AtaAtapiPassThruDxe
+  MODULE_UNI_FILE                = AtaAtapiPassThruDxe.uni
+  FILE_GUID                      = 5E523CB4-D397-4986-87BD-A6DD8B22F455
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeAtaAtapiPassThru
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  gAtaAtapiPassThruDriverBinding
+#  COMPONENT_NAME                =  gAtaAtapiPassThruComponentName
+#  COMPONENT_NAME2               =  gAtaAtapiPassThruComponentName2
+#
+#
+
+[Sources]
+  AtaAtapiPassThru.c
+  AtaAtapiPassThru.h
+  AhciMode.c
+  AhciMode.h
+  IdeMode.c
+  IdeMode.h
+  ComponentName.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DevicePathLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  UefiLib
+  BaseLib
+  UefiDriverEntryPoint
+  DebugLib
+  TimerLib
+  ReportStatusCodeLib
+  PcdLib
+
+[Protocols]
+  gEfiAtaPassThruProtocolGuid                   ## BY_START
+  gEfiExtScsiPassThruProtocolGuid               ## BY_START
+  gEfiIdeControllerInitProtocolGuid             ## TO_START
+  gEfiDevicePathProtocolGuid                    ## TO_START
+  gEfiPciIoProtocolGuid                         ## TO_START
+  gEdkiiAtaAtapiPolicyProtocolGuid              ## CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAtaSmartEnable          ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAhciCommandRetryCount   ## SOMETIMES_CONSUMES
+
+# [Event]
+# EVENT_TYPE_PERIODIC_TIMER ## SOMETIMES_CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  AtaAtapiPassThruDxeExtra.uni

@@ -1,0 +1,65 @@
+## @file
+#  Report Status Code Handler PEIM which produces general handlers and hook them onto the PEI status code router.
+#
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = StatusCodeHandlerPei
+  MODULE_UNI_FILE                = StatusCodeHandlerPei.uni
+  FILE_GUID                      = 9D225237-FA01-464C-A949-BAABC02D31D0
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = StatusCodeHandlerPeiEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC (EBC is only for build)
+#
+
+[Sources]
+  StatusCodeHandlerPei.c
+  StatusCodeHandlerPei.h
+  SerialStatusCodeWorker.c
+  MemoryStausCodeWorker.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  PeiServicesLib
+  PcdLib
+  HobLib
+  SerialPortLib
+  ReportStatusCodeLib
+  PrintLib
+  DebugLib
+  BaseMemoryLib
+
+[Guids]
+  ## SOMETIMES_PRODUCES   ## HOB
+  ## SOMETIMES_CONSUMES   ## HOB
+  gMemoryStatusCodeRecordGuid
+  gEfiStatusCodeDataTypeStringGuid              ## SOMETIMES_CONSUMES   ## UNDEFINED
+
+[Ppis]
+  gEfiPeiRscHandlerPpiGuid                      ## CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1|gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory    ## SOMETIMES_CONSUMES
+
+[Depex]
+  gEfiPeiRscHandlerPpiGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  StatusCodeHandlerPeiExtra.uni

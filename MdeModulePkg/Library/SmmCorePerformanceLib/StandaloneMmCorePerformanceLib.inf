@@ -1,0 +1,55 @@
+## @file
+# Performance library instance used by a Standalone MM Core or an early Standlaone MM module that
+# should install performance measurement services.
+#
+# Installs the MM performance measurement protocol and returns MM performance data via MM communicate.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = StandaloneMmCorePerformanceLib
+  FILE_GUID                      = 8585D462-DE63-4080-882A-A73974CE5609
+  MODULE_TYPE                    = MM_CORE_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = PerformanceLib|MM_CORE_STANDALONE MM_STANDALONE
+  CONSTRUCTOR                    = StandaloneMmCorePerformanceLibConstructor
+
+[Sources]
+  MmCorePerformanceLib.c
+  SmmCorePerformanceLibInternal.h
+  StandaloneMmCorePerformanceLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  MemLib
+  MmServicesTableLib
+  PcdLib
+  PeCoffGetEntryPointLib
+  SynchronizationLib
+  TimerLib
+
+[Protocols]
+  gEfiLoadedImageProtocolGuid                   ## CONSUMES
+
+[Guids]
+  gEfiFirmwarePerformanceGuid                   ## SOMETIMES_PRODUCES         # SmiHandlerRegister
+  gEdkiiSmmPerformanceMeasurementProtocolGuid   ## PRODUCES                   # Install protocol
+  gZeroGuid                                     ## SOMETIMES_CONSUMES ## GUID
+  gEfiEventExitBootServicesGuid                 ## CONSUMES ## NOTIFY
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEdkiiFpdtStringRecordEnableOnly ## CONSUMES

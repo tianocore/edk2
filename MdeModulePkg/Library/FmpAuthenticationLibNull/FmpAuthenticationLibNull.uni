@@ -1,0 +1,16 @@
+// /** @file
+// FmpAuthentication Library
+//
+// NULL Instance of FmpAuthentication Library.
+//
+// Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "FmpAuthentication Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "NULL Instance of FmpAuthentication Library."
+

@@ -1,0 +1,56 @@
+## @file
+#  Performance library instance used in PEI phase.
+#
+#  This library provides the performance measurement interfaces in PEI phase, it creates
+#  and consumes GUIDed HOB for performance logging. The GUIDed HOB is passed to DXE phase
+#  so that it can be taken over by DxeCorePerformanceLib.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+# (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiPerformanceLib
+  MODULE_UNI_FILE                = PeiPerformanceLib.uni
+  FILE_GUID                      = F72DE735-B24F-4ef6-897F-70A85D01A047
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PerformanceLib|PEIM PEI_CORE SEC
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC (EBC is for build only)
+#
+
+[Sources]
+  PeiPerformanceLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  BaseMemoryLib
+  PcdLib
+  TimerLib
+  BaseLib
+  HobLib
+  DebugLib
+
+
+[Guids]
+  ## PRODUCES ## HOB
+  ## CONSUMES ## HOB
+  gEdkiiFpdtExtendedFirmwarePerformanceGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries     ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPerformanceLogEntries16   ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEdkiiFpdtStringRecordEnableOnly ## CONSUMES

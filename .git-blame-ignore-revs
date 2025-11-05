@@ -1,0 +1,56 @@
+# PrmPkg: Apply uncrustify changes
+a298a84478053872ed9da660a75f182ce81b8ddc
+# UnitTestFrameworkPkg: Apply uncrustify changes
+7c0ad2c33810ead45b7919f8f8d0e282dae52e71
+# UefiPayloadPkg: Apply uncrustify changes
+e5efcf8be8a1bf59aa98875787475e3144ee4cef
+# UefiCpuPkg: Apply uncrustify changes
+053e878bfb5c9d5eca779789b62891add30b14ba
+# StandaloneMmPkg: Apply uncrustify changes
+91415a36ae7aaeabb2bbab3762f39544f9aed683
+# SourceLevelDebugPkg: Apply uncrustify changes
+c1e126b1196de75e0a4cda21e4551ea9bb05e059
+# SignedCapsulePkg: Apply uncrustify changes
+b87864896714cf3062a7bc6d577d8fbd62d105e5
+# ShellPkg: Apply uncrustify changes
+47d20b54f9a65b08aa602a1866c1b59a69088dfc
+# SecurityPkg: Apply uncrustify changes
+c411b485b63a671a1e276700cff025c73997233c
+# RedfishPkg: Apply uncrustify changes
+39de741e2dcb8f11e9b4438e37224797643d8451
+# PcAtChipsetPkg: Apply uncrustify changes
+5220bd211df890f2672c23c050082862cd1e82d6
+# OvmfPkg: Apply uncrustify changes
+ac0a286f4d747a4c6c603a7b225917293cbe1e9f
+# NetworkPkg: Apply uncrustify changes
+d1050b9dff1cace252aff86630bfdb59dff5f507
+# MdePkg: Apply uncrustify changes
+2f88bd3a1296c522317f1c21377876de63de5be7
+# MdeModulePkg: Apply uncrustify changes
+1436aea4d5707e672672a11bda72be2c63c936c3
+# IntelFsp2WrapperPkg: Apply uncrustify changes
+7c7184e201a90a1d2376e615e55e3f4074731468
+# IntelFsp2Pkg: Apply uncrustify changes
+111f2228ddf487b0ac3491e416bb3dcdcfa4f979
+# FmpDevicePkg: Apply uncrustify changes
+45ce0a67bb4ee80f27da93777c623f51f344f23b
+# FatPkg: Apply uncrustify changes
+bcdcc4160d7460c46c08c9395aae81be44ef23a9
+# EmulatorPkg: Apply uncrustify changes
+a550d468a6ca577d9e9c57a0eafcf2fc9fbb8c97
+# EmbeddedPkg: Apply uncrustify changes
+e7108d0e9655b1795c94ac372b0449f28dd907df
+# DynamicTablesPkg: Apply uncrustify changes
+731c67e1d77b7741a91762d17659fc9fbcb9e305
+# CryptoPkg: Apply uncrustify changes
+7c342378317039e632d9a1a5d4cf7c21aec8cb7a
+# ArmVirtPkg: Apply uncrustify changes
+2b16a4fb91b9b31c0d152588f5ac51080c6c0763
+# ArmPlatformPkg: Apply uncrustify changes
+40b0b23ed34f48c26d711d3e4613a4bb35eeadff
+# ArmPkg: Apply uncrustify changes
+429309e0c6b74792d679681a8edd0d5ae0ff850c
+# EmulatorPkg: Format with Uncrustify 73.0.8
+972e3b0b9d67ef2847c9c1c89e606e6074a7ddda
+# OvmfPkg: Format with Uncrustify 73.0.8
+0e9ce9146a6dc50a35488e3a4a7a2a4bbaf1eb1c

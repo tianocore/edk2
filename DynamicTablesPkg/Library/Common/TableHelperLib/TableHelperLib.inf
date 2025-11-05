@@ -1,0 +1,29 @@
+## @file
+#  Table Helper
+#
+#  Copyright (c) 2017 - 2021, ARM Limited. All rights reserved.
+#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = TableHelperLib
+  FILE_GUID      = E315C738-3A39-4D0D-A0AF-8EDFA770AB39
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = TableHelperLib
+
+[Sources]
+  ConfigurationManagerObjectParser.c
+  ConfigurationManagerObjectParser.h
+  TableHelper.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  AmlLib
+  BaseLib

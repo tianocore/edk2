@@ -1,0 +1,32 @@
+#/** @file
+# Memory Status Code Library for UEFI drivers
+#
+# Lib to provide memory journal status code reporting Routines
+# Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TemplateRealTimeClockLib
+  FILE_GUID                      = B661E02D-A90B-42AB-A5F9-CF841AAA43D9
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RealTimeClockLib
+
+
+[Sources.common]
+  RealTimeClockLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  IoLib
+  DebugLib

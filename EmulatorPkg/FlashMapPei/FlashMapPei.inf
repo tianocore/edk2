@@ -1,0 +1,63 @@
+## @file
+# Component description file for FlashMap PEI module
+#
+# This module installs FlashMap PPI which is used to get flash layout information.
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2011, Apple Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FlashMapPei
+  FILE_GUID                      = C9FAF091-57F8-A64C-A07A-445B124F0D93
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = PeimInitializeFlashMap
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  FlashMapPei.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  PcdLib
+  BaseMemoryLib
+  PeiServicesTablePointerLib
+  PeiServicesLib
+  HobLib
+  PeimEntryPoint
+  DebugLib
+
+
+[Ppis]
+  gEmuThunkPpiGuid                               # PPI ALWAYS_CONSUMED
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64
+
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwWorkingBase
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageFtwSpareBase
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageVariableBase
+
+[Depex]
+  gEmuThunkPpiGuid
+

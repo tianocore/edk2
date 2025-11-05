@@ -1,0 +1,25 @@
+// /** @file
+// USB Mouse Driver that manages USB mouse and produces Simple Pointer Protocol.
+//
+// USB Mouse Driver consumes USB I/O Protocol and Device Path Protocol, and produces
+// Simple Pointer Protocol on USB mouse devices.
+// It manages the USB mouse device via Asynchronous Interrupt Transfer of USB I/O Protocol,
+// and parses the data according to USB HID Specification.
+// This module refers to following specifications:
+// 1. Universal Serial Bus HID Firmware Specification, ver 1.11
+// 2. UEFI Specification, v2.1
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Manages USB mouse and produces Simple Pointer Protocol"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "USB Mouse Driver consumes USB I/O Protocol and Device Path Protocol, and produces Simple Pointer Protocol on USB mouse devices. It manages the USB mouse device via Asynchronous Interrupt Transfer of USB I/O Protocol, and parses the data according to USB HID Specification.<BR><BR>\n"
+                                                        "This module refers to following specifications:<BR>\n"
+                                                        "1. Universal Serial Bus HID Firmware Specification, ver 1.11<BR>\n"
+                                                        "2. UEFI Specification, v2.1<BR>"
+

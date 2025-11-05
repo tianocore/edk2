@@ -1,0 +1,60 @@
+## @file
+# Description file for the Embedded MMC (eMMC) Peim driver.
+#
+# Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EmmcBlockIoPei
+  MODULE_UNI_FILE                = EmmcBlockIoPei.uni
+  FILE_GUID                      = 7F06A90F-AE0D-4887-82C0-FEC7F4F68B29
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeEmmcBlockIoPeim
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  EmmcBlockIoPei.c
+  EmmcBlockIoPei.h
+  EmmcHci.c
+  EmmcHci.h
+  EmmcHcMem.c
+  EmmcHcMem.h
+  DmaMem.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  IoLib
+  TimerLib
+  BaseMemoryLib
+  PeimEntryPoint
+  PeiServicesLib
+  DebugLib
+
+[Ppis]
+  gEfiPeiVirtualBlockIoPpiGuid                  ## PRODUCES
+  gEfiPeiVirtualBlockIo2PpiGuid                 ## PRODUCES
+  gEdkiiPeiSdMmcHostControllerPpiGuid           ## CONSUMES
+  gEdkiiIoMmuPpiGuid                            ## CONSUMES
+  gEfiEndOfPeiSignalPpiGuid                     ## CONSUMES
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid AND gEdkiiPeiSdMmcHostControllerPpiGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  EmmcBlockIoPeiExtra.uni
+

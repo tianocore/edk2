@@ -1,0 +1,16 @@
+// /** @file
+// DXE report status code library.
+//
+// Retrieve status code and report status code in DXE phase.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "DXE report status code library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Retrieve status code and report status code in DXE phase."
+

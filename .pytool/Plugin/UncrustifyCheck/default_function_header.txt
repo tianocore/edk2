@@ -1,0 +1,15 @@
+/**
+  Brief description of this function's purpose.
+
+  Follow it immediately with the detailed description.
+
+  @param[in]      Arg1  Description of Arg1.
+  @param[in]      Arg2  Description of Arg2 This is complicated and requires
+                        multiple lines to describe.
+  @param[out]     Arg3  Description of Arg3.
+  @param[in, out] Arg4  Description of Arg4.
+
+  @retval VAL_ONE  Description of what VAL_ONE signifies.
+  @retval OTHER    This is the only other return value. If there were other
+                   return values, they would be listed.
+**/

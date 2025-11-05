@@ -1,0 +1,132 @@
+// /** @file
+// This package provides network modules that conform to UEFI 2.4 specification.
+//
+// This package provides network modules that conform to UEFI 2.4 specification.
+//
+// Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
+// (c) Copyright 2025 HP Development Company, L.P.
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_PACKAGE_ABSTRACT            #language en-US "This package provides network modules that conform to UEFI 2.4 specification."
+
+#string STR_PACKAGE_DESCRIPTION         #language en-US "This package provides network modules that conform to UEFI 2.4 specification."
+
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdMaxIScsiAttemptNumber_PROMPT  #language en-US "Max attempt number."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdMaxIScsiAttemptNumber_HELP  #language en-US "Max attempt number created by iSCSI."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecUefiCaFile_PROMPT  #language en-US "CA file."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecUefiCaFile_HELP  #language en-US "CA certificate used by IPsec."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecUefiCaFileSize_PROMPT  #language en-US "CA file's size."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecUefiCaFileSize_HELP  #language en-US "CA certificate file's size."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecUefiCertificate_PROMPT  #language en-US "Pubic Key for remote peer."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecUefiCertificate_HELP  #language en-US "X509 certificate as Public Key which is used by IPsec (DER format)"
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecUefiCertificateSize_PROMPT  #language en-US "Pubic Key's size."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecUefiCertificateSize_HELP  #language en-US "X509 certificate as Public Key's size."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecUefiCertificateKey_PROMPT  #language en-US "Private Key."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecUefiCertificateKey_HELP  #language en-US "Private Key used by IPsec (PEM format)."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecUefiCertificateKeySize_PROMPT  #language en-US "Private Key's size."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecUefiCertificateKeySize_HELP  #language en-US "Private Key's size."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdAllowHttpConnections_PROMPT  #language en-US "Indicates whether HTTP connections are permitted or not."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdAllowHttpConnections_HELP  #language en-US "Indicates whether HTTP connections are permitted or not.\n"
+                                                                                       "TRUE  - HTTP connections are allowed.\n"
+                                                                                       "FALSE - HTTP connections are denied."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdPxeTftpWindowSize_PROMPT  #language en-US "This setting is to specify the MTFTP windowsize used by UEFI PXE driver."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdPxeTftpWindowSize_HELP  #language en-US "Specify MTFTP windowsize used by UEFI PXE driver.\n"
+                                                                                    "A value of 0 indicates the default value of windowsize(1).\n"
+                                                                                    "A non-zero value will be used as windowsize."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecCertificateEnabled_PROMPT  #language en-US "Enable IPsec IKEv2 Certificate Authentication."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecCertificateEnabled_HELP  #language en-US "Indicates if the IPsec IKEv2 Certificate Authentication feature is enabled or not.<BR><BR>\n"
+                                                                                          "TRUE  - Certificate Authentication feature is enabled.<BR>\n"
+                                                                                          "FALSE - Does not support Certificate Authentication.<BR>"
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdSnpCreateExitBootServicesEvent_PROMPT  #language en-US "Indicates whether SnpDxe creates event for ExitBootServices() call."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdSnpCreateExitBootServicesEvent_HELP  #language en-US "Indicates whether SnpDxe driver will create an event that will be notified<BR><BR>\n"
+                                                                                                 "upon gBS->ExitBootServices() call.<BR>\n"
+                                                                                                 "TRUE - Event being triggered upon ExitBootServices call will be created<BR>\n"
+                                                                                                 "FALSE - Event being triggered upon ExitBootServices call will NOT be created<BR>"
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdDhcp6UidType_PROMPT  #language en-US "Type Value of Dhcp6 Unique Identifier (DUID)."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdDhcp6UidType_HELP  #language en-US "IPv6 DHCP Unique Identifier (DUID) Type configuration (From RFCs 3315 and 6355).\n"
+                                                                               "01 = DUID Based on Link-layer Address Plus Time [DUID-LLT]\n"
+                                                                               "04 = UUID-Based DHCPv6 Unique Identifier (DUID-UUID)\n"
+                                                                               "02 = DUID Assigned by Vendor Based on Enterprise Number [DUID-EN] (not supported)\n"
+                                                                               "03 = DUID Based on Link-layer Address [DUID-LL] (not supported)"
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIScsiAIPNetworkBootPolicy_PROMPT  #language en-US "Type Value of network boot policy used in iSCSI."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIScsiAIPNetworkBootPolicy_HELP  #language en-US "Network boot policy to stop UEFI iSCSI if applicable.\n"
+                                                                                            "0x00 = Always use UEFI iSCSI and ignore AIP.\n"
+                                                                                            "0x01 = Stop UEFI iSCSI if iSCSI HBA adapter produces AIP protocol with Network Boot.\n"
+                                                                                            "0x02 = Stop UEFI iSCSI if iSCSI HBA adapter supports booting from iSCSI IPv4 targets.\n"
+                                                                                            "0x04 = Stop UEFI iSCSI if iSCSI HBA adapter supports booting from iSCSI IPv6 targets.\n"
+                                                                                            "0x08 = Stop UEFI iSCSI if iSCSI HBA adapter supports an offload engine for iSCSI boot.\n"
+                                                                                            "0x10 = Stop UEFI iSCSI if iSCSI HBA adapter supports multipath I/O for iSCSI boot.\n"
+                                                                                            "0x20 = Stop UEFI iSCSI if iSCSI HBA adapter is currently configured to boot from iSCSI IPv4 targets.\n"
+                                                                                            "0x40 = Stop UEFI iSCSI if iSCSI HBA adapter is currently configured to boot from iSCSI IPv6 targets."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIPv4PXESupport_PROMPT  #language en-US "Enable IPV4 PXE Function."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIPv4PXESupport_HELP  #language en-US "Indicates IPV4 PXE Function is enabled or not.\n"
+                                                                                 "A value of 0 indicates the IPV4 PXE Function is disabled.\n"
+                                                                                 "A value of 1 indicates the IPV4 PXE Function is enabled."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIPv6PXESupport_PROMPT  #language en-US "Enable IPV6 PXE Function."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIPv6PXESupport_HELP  #language en-US "Indicates IPV6 PXE Function is enabled or not.\n"
+                                                                                 "A value of 0 indicates the IPV6 PXE Function is disabled.\n"
+                                                                                 "A value of 1 indicates the IPV6 PXE Function is enabled."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdTftpBlockSize_PROMPT  #language en-US "TFTP block size"
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdTftpBlockSize_HELP  #language en-US "This setting can override the default TFTP block size. A value of 0 computes "
+                                                                                  "the default from MTU information. A non-zero value will be used as block size "
+                                                                                  "in bytes."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdHttpIoTimeout_PROMPT  #language en-US "HTTP Boot Image Request and Response Timeout"
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdHttpIoTimeout_HELP  #language en-US "This value is used to configure the request and response timeout when getting "
+                                                                               "the recovery image from the remote source during an HTTP recovery boot."
+                                                                               "The default value set is 5 seconds."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdHttpDnsRetryInterval_PROMPT  #language en-US "Retry Interval of HTTP DNS"
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdHttpDnsRetryInterval_HELP  #language en-US "This value is used to configure the retry Interval of HTTP DNS."
+                                                                                "The default value set is 0 second. If the value is less than"
+                                                                                "DNS_DEFAULT_TIMEOUT, then use the DNS_DEFAULT_TIMEOUT."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdHttpDnsRetryCount_PROMPT  #language en-US "Retry Count of HTTP DNS"
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdHttpDnsRetryCount_HELP  #language en-US "This value is used to configure the Retry Count of HTTP DNS if "
+                                                                                "no DNS response received after Retry Interval. The default value set is 0."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdHttpTransferBufferSize_PROMPT  #language en-US "HTTP default transfer buffer size"
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdHttpTransferBufferSize_HELP  #language en-US "This value is used to configure the default transfer buffer size for HTTP."
+                                                                                     "The default value set is 2MB. Larger buffer sizes can improve performance "
+                                                                                     "for high-bandwidth connections. However, smaller buffer size can reduce packet loss "
+                                                                                     "in low-bandwidth scenarios."

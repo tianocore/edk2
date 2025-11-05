@@ -1,0 +1,42 @@
+## @file
+# This driver produces Extended SCSI Pass Thru Protocol instances for
+# virtio-scsi devices.
+#
+# Copyright (C) 2012, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VirtioScsiDxe
+  FILE_GUID                      = FAB5D4F4-83C0-4AAF-8480-442D11DF6CEA
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = VirtioScsiEntryPoint
+
+[Sources]
+  VirtioScsi.c
+  VirtioScsi.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+  VirtioLib
+
+[Protocols]
+  gEfiExtScsiPassThruProtocolGuid  ## BY_START
+  gVirtioDeviceProtocolGuid        ## TO_START
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdVirtioScsiMaxTargetLimit ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdVirtioScsiMaxLunLimit    ## CONSUMES

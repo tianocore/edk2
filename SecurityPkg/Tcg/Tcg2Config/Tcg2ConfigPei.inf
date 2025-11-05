@@ -1,0 +1,78 @@
+## @file
+#  Set TPM device type
+#
+#  This module initializes TPM device type based on variable and detection.
+#  NOTE: This module is only for reference only, each platform should have its own setup page.
+#
+# Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Tcg2ConfigPei
+  MODULE_UNI_FILE                = Tcg2ConfigPei.uni
+  FILE_GUID                      = EADD5061-93EF-4CCC-8450-F78A7F0820F0
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Tcg2ConfigPeimEntryPoint
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+# [BootMode]
+#   S3_RESUME                 ## SOMETIMES_CONSUMES
+#
+
+[Sources]
+  Tcg2ConfigPeim.c
+  Tcg2ConfigNvData.h
+  Tcg2Internal.h
+  TpmDetection.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  PeiServicesLib
+  PeimEntryPoint
+  DebugLib
+  PcdLib
+  TimerLib
+  Tpm12CommandLib
+  Tpm12DeviceLib
+  HobLib
+  MmUnblockMemoryLib
+
+[Guids]
+  ## SOMETIMES_CONSUMES ## Variable:L"TCG2_CONFIGURATION"
+  ## SOMETIMES_CONSUMES ## Variable:L"TCG2_DEVICE_DETECTION"
+  gTcg2ConfigFormSetGuid
+  gEfiTpmDeviceSelectedGuid           ## PRODUCES             ## GUID    # Used as a PPI GUID
+  gEfiTpmDeviceInstanceNoneGuid       ## SOMETIMES_CONSUMES   ## GUID    # TPM device identifier
+  gEdkiiTpmInstanceHobGuid
+  gEdkiiTcgPhysicalPresenceInterfaceVerHobGuid
+  gEdkiiTcg2AcpiCommunicateBufferHobGuid
+
+[Ppis]
+  gEfiPeiReadOnlyVariable2PpiGuid     ## CONSUMES
+  gPeiTpmInitializationDonePpiGuid    ## SOMETIMES_PRODUCES
+  gEfiPeiMemoryDiscoveredPpiGuid
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid                 ## PRODUCES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInitializationPolicy         ## PRODUCES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmAutoDetection                ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer
+
+[Depex]
+  gEfiPeiMasterBootModePpiGuid AND
+  gEfiPeiReadOnlyVariable2PpiGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  Tcg2ConfigPeiExtra.uni

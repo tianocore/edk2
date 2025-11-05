@@ -1,0 +1,45 @@
+## @file
+#  Produces the CPU I/O PPI by using the services of the I/O Library.
+#
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CpuIoPei
+  MODULE_UNI_FILE                = CpuIoPei.uni
+  FILE_GUID                      = AE265864-CF5D-41a8-913D-71C155E76442
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = CpuIoInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  CpuIoPei.c
+  CpuIoPei.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  BaseLib
+  DebugLib
+  IoLib
+  PeiServicesLib
+
+[Ppis]
+  gEfiPeiCpuIoPpiInstalledGuid                  ## PRODUCES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  CpuIoPeiExtra.uni

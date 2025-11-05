@@ -1,0 +1,91 @@
+## @file
+#  Provides authenticated variable services.
+#
+#  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2018, ARM Limited. All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AuthVariableLib
+  MODULE_UNI_FILE                = AuthVariableLib.uni
+  FILE_GUID                      = B23CF5FB-6FCC-4422-B145-D855DBC05457
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = AuthVariableLib|DXE_RUNTIME_DRIVER DXE_SMM_DRIVER MM_STANDALONE
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  AuthVariableLib.c
+  AuthService.c
+  AuthServiceInternal.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  BaseCryptLib
+  PlatformSecureLib
+  VariablePolicyLib
+
+[Guids]
+  ## CONSUMES            ## Variable:L"SetupMode"
+  ## PRODUCES            ## Variable:L"SetupMode"
+  ## SOMETIMES_CONSUMES  ## Variable:L"PK"
+  ## SOMETIMES_CONSUMES  ## Variable:L"KEK"
+  ## CONSUMES            ## Variable:L"SecureBoot"
+  ## PRODUCES            ## Variable:L"SecureBoot"
+  ## CONSUMES            ## Variable:L"SignatureSupport"
+  ## PRODUCES            ## Variable:L"SignatureSupport"
+  ## PRODUCES            ## Variable:L"VendorKeys"
+  gEfiGlobalVariableGuid
+
+  ## SOMETIMES_CONSUMES  ## Variable:L"DB"
+  ## SOMETIMES_CONSUMES  ## Variable:L"DBX"
+  ## SOMETIMES_CONSUMES  ## Variable:L"DBT"
+  gEfiImageSecurityDatabaseGuid
+
+  ## CONSUMES            ## Variable:L"SecureBootEnable"
+  ## PRODUCES            ## Variable:L"SecureBootEnable"
+  gEfiSecureBootEnableDisableGuid
+
+  ## CONSUMES            ## Variable:L"CustomMode"
+  ## PRODUCES            ## Variable:L"CustomMode"
+  gEfiCustomModeEnableGuid
+
+  ## CONSUMES            ## Variable:L"certdb"
+  ## CONSUMES            ## Variable:L"certdbv"
+  ## PRODUCES            ## Variable:L"certdb"
+  ## PRODUCES            ## Variable:L"certdbv"
+  gEfiCertDbGuid
+
+  ## CONSUMES            ## Variable:L"VendorKeysNv"
+  ## PRODUCES            ## Variable:L"VendorKeysNv"
+  gEfiVendorKeysNvGuid
+
+  ## CONSUMES            ## Variable:L"AuthVarKeyDatabase"
+  ## PRODUCES            ## Variable:L"AuthVarKeyDatabase"
+  gEfiAuthenticatedVariableGuid
+
+  gEfiCertTypeRsa2048Sha256Guid  ## SOMETIMES_CONSUMES   ## GUID  # Unique ID for the type of the certificate.
+  gEfiCertPkcs7Guid              ## SOMETIMES_CONSUMES   ## GUID  # Unique ID for the type of the certificate.
+  gEfiCertX509Guid               ## SOMETIMES_CONSUMES   ## GUID  # Unique ID for the type of the signature.
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRequireSelfSignedPk

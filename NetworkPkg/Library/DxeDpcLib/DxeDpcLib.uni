@@ -1,0 +1,16 @@
+// /** @file
+// This library instance provides DPC service by consuming EFI DPC Protocol.
+//
+// This library instance provides the DPC service by consuming EFI DPC Protocol.
+//
+// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Provides the DPC service by consuming EFI DPC Protocol"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library instance provides the DPC service by consuming EFI DPC Protocol."
+

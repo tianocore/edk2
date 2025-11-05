@@ -1,0 +1,33 @@
+## @file
+#  Null Platform Hook Library instance with dependency on gPeiSerialPortPpiGuid
+#
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformHookLibSerialPortPpi
+  FILE_GUID                      = 621734D8-8B5E-4c01-B330-9F89A1081710
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformHookLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER SMM_CORE PEIM SEC PEI_CORE UEFI_APPLICATION UEFI_DRIVER
+  MODULE_UNI_FILE                = PlatformHookLibSerialPortPpi.uni
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  PlatformHookLibSerialPortPpi.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Depex.common.PEIM]
+  gPeiSerialPortPpiGuid

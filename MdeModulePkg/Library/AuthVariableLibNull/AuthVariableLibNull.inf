@@ -1,0 +1,33 @@
+## @file
+#  Provides NULL authenticated variable services.
+#
+#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AuthVariableLibNull
+  MODULE_UNI_FILE                = AuthVariableLibNull.uni
+  FILE_GUID                      = 435CB0E4-7C9A-4BB7-9907-8FD4643E978A
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = AuthVariableLib|DXE_RUNTIME_DRIVER DXE_SMM_DRIVER MM_STANDALONE
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  AuthVariableLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DebugLib
