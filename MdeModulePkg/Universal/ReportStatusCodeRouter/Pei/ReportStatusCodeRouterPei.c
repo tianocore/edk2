@@ -57,6 +57,9 @@ CreateRscHandlerCallbackPacket (
                       sizeof (EFI_PEI_RSC_HANDLER_CALLBACK) * 64 + sizeof (UINTN)
                       );
   ASSERT (NumberOfEntries != NULL);
+  if (NumberOfEntries == NULL) {
+    return NumberOfEntries;
+  }
 
   *NumberOfEntries = 0;
 
@@ -135,6 +138,9 @@ Register (
 
   if (FreePacket == NULL) {
     FreePacket = CreateRscHandlerCallbackPacket ();
+    if (FreePacket == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
   }
 
   CallbackEntry                 = (EFI_PEI_RSC_HANDLER_CALLBACK *)(FreePacket + 1);
