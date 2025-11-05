@@ -277,16 +277,14 @@ longer.)
   basic virtio-net driver, located in OvmfPkg/VirtioNetDxe.
 
 * Also independently of the iPXE NIC drivers, Intel's proprietary E1000 NIC
-  driver (from the BootUtil distribution) can be embedded in the OVMF image at
-  build time:
+  driver can be embedded in the OVMF image at build time:
 
-  - Download BootUtil:
+  - Download Intel Ethernet Adapter Driver Pack:
     - Navigate to
-      https://downloadcenter.intel.com/download/19186/Ethernet-Intel-Ethernet-Connections-Boot-Utility-Preboot-Images-and-EFI-Drivers
-    - Click the download link for "PREBOOT.EXE".
+      https://www.intel.com/content/www/us/en/download/15084/intel-ethernet-adapter-complete-driver-pack.html
+    - Select version 23.5.2 and click the download link for "23_5_2.zip".
     - Accept the Intel Software License Agreement that appears.
-    - Unzip "PREBOOT.EXE" into a separate directory (this works with the
-      "unzip" utility on platforms different from Windows as well).
+    - Unzip "23_5_2.zip" into a separate directory.
     - Copy the "APPS/EFI/EFIx64/E3522X2.EFI" driver binary to
       "Intel3.5/EFIX64/E3522X2.EFI" in your WORKSPACE.
 
@@ -298,11 +296,11 @@ longer.)
 * When a matching iPXE driver is configured for a NIC as described above, it
   takes priority over other drivers that could possibly drive the card too:
 
-                         | e1000  ne2k_pci  pcnet  rtl8139  virtio-net-pci
-    ---------------------+------------------------------------------------
-    iPXE                 |   x       x        x       x           x
-    VirtioNetDxe         |                                        x
-    Intel BootUtil (X64) |   x
+                            | e1000  ne2k_pci  pcnet  rtl8139  virtio-net-pci
+    ------------------------+------------------------------------------------
+    iPXE                    |   x       x        x       x           x
+    VirtioNetDxe            |                                        x
+    Intel E3522X2.EFI (X64) |   x
 
 === HTTPS Boot ===
 
