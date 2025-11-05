@@ -162,9 +162,9 @@ MtrrLibIsMtrrSupported (
   MSR_IA32_MTRRCAP_REGISTER  MtrrCap;
 
   //
-  // MTRR is not supported in TD-Guest.
+  // MTRR is not supported in TD-Guest or any SEV guest.
   //
-  if (TdIsEnabled ()) {
+  if (TdIsEnabled () || SevGuestIsEnabled ()) {
     return FALSE;
   }
 

@@ -49,7 +49,9 @@
   brotli/c/dec/bit_reader.c
   brotli/c/dec/decode.c
   brotli/c/dec/huffman.c
+  brotli/c/dec/prefix.c
   brotli/c/dec/state.c
+  brotli/c/dec/static_init.c
   brotli/c/include/brotli/decode.h
   brotli/c/include/brotli/port.h
   brotli/c/include/brotli/types.h
