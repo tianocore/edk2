@@ -142,7 +142,12 @@ GetRootTableLevel (
   IN  UINTN  T0SZ
   )
 {
-  return (INTN)(T0SZ - MIN_T0SZ) / BITS_PER_LEVEL;
+  INTN  RootTableLevel;
+
+  RootTableLevel =  (T0SZ < MIN_T0SZ) ? -1 : (INTN)(T0SZ - MIN_T0SZ) / BITS_PER_LEVEL;
+  ASSERT (RootTableLevel >= 0 || ArmLpa2Enabled ());
+
+  return RootTableLevel;
 }
 
 STATIC
@@ -306,7 +311,7 @@ UpdateRegionMappingRecursive (
     // the MMU in order to update page table entries safely, so prefer page
     // mappings in that particular case.
     //
-    if ((Level == 0) || (((RegionStart | BlockEnd) & BlockMask) != 0) ||
+    if ((Level <= 0) || (((RegionStart | BlockEnd) & BlockMask) != 0) ||
         ((Level < 3) && (((UINT64)PageTable & ~BlockMask) == RegionStart)) ||
         IsTableEntry (*Entry, Level))
     {
@@ -616,7 +621,7 @@ ArmSetMemoryAttributes (
            PageAttributeMask,
            ArmGetTTBR0BaseAddress (),
            TRUE,
-           ArmGetTCR () & TCR_DS
+           ArmLpa2Enabled ()
            );
 }
 
@@ -680,7 +685,7 @@ ArmConfigureMmu (
     } else if (MaxAddress < SIZE_256TB) {
       TCR |= TCR_PS_256TB;
     } else if ((MaxAddress < SIZE_4PB) && ArmHas52BitTgran4 ()) {
-      TCR |= TCR_PS_4PB | TCR_DS;
+      TCR |= TCR_PS_4PB | TCR_DS_NVHE;
     } else {
       DEBUG ((
         DEBUG_ERROR,
@@ -764,7 +769,7 @@ ArmConfigureMmu (
   ZeroMem (TranslationTable, RootTableEntryCount * sizeof (UINT64));
 
   while (MemoryTable->Length != 0) {
-    Status = FillTranslationTable (TranslationTable, MemoryTable, TCR & TCR_DS);
+    Status = FillTranslationTable (TranslationTable, MemoryTable, ArmLpa2Enabled ());
     if (EFI_ERROR (Status)) {
       goto FreeTranslationTable;
     }
