@@ -1284,7 +1284,9 @@ NonCoherentPciIoMap (
   LIST_ENTRY                                   *Entry;
   UINTN                                        AlignMask;
   VOID                                         *AllocAddress;
+  UINTN                                        AllocSize;
   BOOLEAN                                      Bounce;
+  BOOLEAN                                      MappingIsUncached;
 
   if ((HostAddress   == NULL) ||
       (NumberOfBytes == NULL) ||
@@ -1301,7 +1303,102 @@ NonCoherentPciIoMap (
     return EFI_INVALID_PARAMETER;
   }
 
-  MapInfo = AllocatePool (sizeof *MapInfo);
+  Dev = NON_DISCOVERABLE_PCI_DEVICE_FROM_PCI_IO (This);
+
+  //
+  // A bounce buffer will be needed if this device does not support 64-bit DMA
+  // addressing and the HostAddress >= 4 GB.
+  //
+  Bounce = ((Dev->Attributes & EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE) == 0 &&
+            (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress + *NumberOfBytes > SIZE_4GB);
+
+  //
+  // Check whether the host address refers to an uncached mapping. This is
+  // required for common buffer mappings.
+  //
+  MappingIsUncached = FALSE;
+  EfiAcquireLock (&Dev->UncachedAllocationListLock);
+  for (Entry = Dev->UncachedAllocationList.ForwardLink;
+       Entry != &Dev->UncachedAllocationList;
+       Entry = Entry->ForwardLink)
+  {
+    Alloc = BASE_CR (Entry, NON_DISCOVERABLE_DEVICE_UNCACHED_ALLOCATION, List);
+
+    if ((Alloc->HostAddress <= HostAddress) &&
+        ((UINTN)Alloc->HostAddress + EFI_PAGES_TO_SIZE (Alloc->NumPages) >=
+         (UINTN)HostAddress + *NumberOfBytes))
+    {
+      MappingIsUncached = TRUE;
+      break;
+    }
+  }
+
+  EfiReleaseLock (&Dev->UncachedAllocationListLock);
+
+  if (MappingIsUncached) {
+    if (Bounce) {
+      //
+      // Bounce buffering from an uncached mapping is very inefficient, and
+      // should never be needed, given that NonCoherentPciIoAllocateBuffer ()
+      // will take the EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE attribute in
+      // account too.
+      //
+      ASSERT (!MappingIsUncached || !Bounce);
+      return EFI_DEVICE_ERROR;
+    }
+
+    //
+    // No bounce buffering or cache maintenance is needed for uncached mappings
+    // that are in DMA range for the device, regardless of the DMA direction.
+    //
+    *DeviceAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress;
+    *Mapping       = (VOID *)MAX_ADDRESS;
+    return EFI_SUCCESS;
+  }
+
+  switch (Operation) {
+    case EfiPciIoOperationBusMasterRead:
+      //
+      // Bounce buffering is never needed for streaming non-coherent outbound
+      // DMA involving cached memory, given that the bus master will only read
+      // from the region, and so there is no need for the potentially
+      // destructive cache invalidation that might otherwise result in
+      // corruption of unrelated adjacent memory.
+      //
+      break;
+
+    case EfiPciIoOperationBusMasterWrite:
+      //
+      // For streaming non-coherent inbound DMA involving cached memory, no
+      // bounce buffering is needed unless the buffer is misaligned wrt the
+      // CPU's DMA buffer alignment, as cache lines that are shared with
+      // unrelated adjacent data might be corrupted by the invalidation
+      // performed on unmap.
+      //
+      AlignMask = mCpu->DmaBufferAlignment - 1;
+      if ((((UINTN)HostAddress | *NumberOfBytes) & AlignMask) != 0) {
+        Bounce = TRUE;
+      }
+
+      break;
+
+    case EfiPciIoOperationBusMasterCommonBuffer:
+      // Non-coherent common buffer DMA requires uncached mappings.
+      ASSERT (MappingIsUncached);
+      return EFI_DEVICE_ERROR;
+
+    default:
+      ASSERT (FALSE);
+  }
+
+  AllocSize = sizeof *MapInfo;
+
+  if (Bounce) {
+    AllocSize += ALIGN_VALUE (*NumberOfBytes, mCpu->DmaBufferAlignment) +
+                 mCpu->DmaBufferAlignment - 8;
+  }
+
+  MapInfo = AllocatePool (AllocSize);
   if (MapInfo == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1310,78 +1407,31 @@ NonCoherentPciIoMap (
   MapInfo->Operation     = Operation;
   MapInfo->NumberOfBytes = *NumberOfBytes;
 
-  Dev = NON_DISCOVERABLE_PCI_DEVICE_FROM_PCI_IO (This);
-
-  //
-  // If this device does not support 64-bit DMA addressing, we need to allocate
-  // a bounce buffer and copy over the data in case HostAddress >= 4 GB.
-  //
-  Bounce = ((Dev->Attributes & EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE) == 0 &&
-            (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress + *NumberOfBytes > SIZE_4GB);
-
-  if (!Bounce) {
-    switch (Operation) {
-      case EfiPciIoOperationBusMasterRead:
-      case EfiPciIoOperationBusMasterWrite:
-        //
-        // For streaming DMA, it is sufficient if the buffer is aligned to
-        // the CPUs DMA buffer alignment.
-        //
-        AlignMask = mCpu->DmaBufferAlignment - 1;
-        if ((((UINTN)HostAddress | *NumberOfBytes) & AlignMask) == 0) {
-          break;
-        }
-
-      // fall through
-
-      case EfiPciIoOperationBusMasterCommonBuffer:
-        //
-        // Check whether the host address refers to an uncached allocation.
-        //
-        Bounce = TRUE;
-        EfiAcquireLock (&Dev->UncachedAllocationListLock);
-        for (Entry = Dev->UncachedAllocationList.ForwardLink;
-             Entry != &Dev->UncachedAllocationList;
-             Entry = Entry->ForwardLink)
-        {
-          Alloc = BASE_CR (Entry, NON_DISCOVERABLE_DEVICE_UNCACHED_ALLOCATION, List);
-
-          if ((Alloc->HostAddress <= HostAddress) &&
-              ((UINTN)Alloc->HostAddress + EFI_PAGES_TO_SIZE (Alloc->NumPages) >=
-               (UINTN)HostAddress + *NumberOfBytes))
-          {
-            Bounce = FALSE;
-            break;
-          }
-        }
-
-        EfiReleaseLock (&Dev->UncachedAllocationListLock);
-        break;
-
-      default:
-        ASSERT (FALSE);
-    }
-  }
-
   if (Bounce) {
-    if (Operation == EfiPciIoOperationBusMasterCommonBuffer) {
-      Status = EFI_DEVICE_ERROR;
-      goto FreeMapInfo;
-    }
-
-    Status = NonCoherentPciIoAllocateBuffer (
-               This,
-               AllocateAnyPages,
-               EfiBootServicesData,
-               EFI_SIZE_TO_PAGES (MapInfo->NumberOfBytes),
-               &AllocAddress,
-               EFI_PCI_ATTRIBUTE_MEMORY_WRITE_COMBINE
-               );
-    if (EFI_ERROR (Status)) {
-      goto FreeMapInfo;
-    }
-
+    AllocAddress          = ALIGN_POINTER (MapInfo + 1, mCpu->DmaBufferAlignment);
     MapInfo->AllocAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocAddress;
+
+    //
+    // Fall back to a page allocation if the pool allocation ends up above 4G
+    // and the device is not 64-bit DMA capable.
+    //
+    if ((MapInfo->AllocAddress > SIZE_4GB - *NumberOfBytes) &&
+        ((Dev->Attributes & EFI_PCI_IO_ATTRIBUTE_DUAL_ADDRESS_CYCLE) == 0))
+    {
+      MapInfo->AllocAddress = MAX_UINT32;
+      Status                = gBS->AllocatePages (
+                                     AllocateMaxAddress,
+                                     EfiBootServicesData,
+                                     EFI_SIZE_TO_PAGES (MapInfo->NumberOfBytes),
+                                     &MapInfo->AllocAddress
+                                     );
+      if (EFI_ERROR (Status)) {
+        goto FreeMapInfo;
+      }
+
+      AllocAddress = (VOID *)(UINTN)MapInfo->AllocAddress;
+    }
+
     if (Operation == EfiPciIoOperationBusMasterRead) {
       gBS->CopyMem (AllocAddress, HostAddress, *NumberOfBytes);
     }
@@ -1390,24 +1440,22 @@ NonCoherentPciIoMap (
   } else {
     MapInfo->AllocAddress = 0;
     *DeviceAddress        = (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress;
-
-    //
-    // We are not using a bounce buffer: the mapping is sufficiently
-    // aligned to allow us to simply flush the caches. Note that cleaning
-    // the caches is necessary for both data directions:
-    // - for bus master read, we want the latest data to be present
-    //   in main memory
-    // - for bus master write, we don't want any stale dirty cachelines that
-    //   may be written back unexpectedly, and clobber the data written to
-    //   main memory by the device.
-    //
-    mCpu->FlushDataCache (
-            mCpu,
-            (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress,
-            *NumberOfBytes,
-            EfiCpuFlushTypeWriteBack
-            );
   }
+
+  //
+  // Cleaning the caches is necessary for both data directions:
+  // - for bus master read, we want the latest data to be present in main
+  //   memory
+  // - for bus master write, we don't want any stale dirty cachelines that may
+  //   be written back unexpectedly, and clobber the data written to main
+  //   memory by the device.
+  //
+  mCpu->FlushDataCache (
+          mCpu,
+          *DeviceAddress,
+          ALIGN_VALUE (*NumberOfBytes, mCpu->DmaBufferAlignment),
+          EfiCpuFlushTypeWriteBack
+          );
 
   *Mapping = MapInfo;
   return EFI_SUCCESS;
@@ -1436,44 +1484,45 @@ NonCoherentPciIoUnmap (
   )
 {
   NON_DISCOVERABLE_PCI_DEVICE_MAP_INFO  *MapInfo;
+  VOID                                  *AllocAddress;
+  VOID                                  *BufferAddress;
 
   if (Mapping == NULL) {
     return EFI_DEVICE_ERROR;
   }
 
-  MapInfo = Mapping;
-  if (MapInfo->AllocAddress != 0) {
-    //
-    // We are using a bounce buffer: copy back the data if necessary,
-    // and free the buffer.
-    //
-    if (MapInfo->Operation == EfiPciIoOperationBusMasterWrite) {
-      gBS->CopyMem (
-             MapInfo->HostAddress,
-             (VOID *)(UINTN)MapInfo->AllocAddress,
-             MapInfo->NumberOfBytes
-             );
+  if (Mapping == (VOID *)MAX_ADDRESS) {
+    return EFI_SUCCESS;
+  }
+
+  MapInfo      = Mapping;
+  AllocAddress = (VOID *)(UINTN)MapInfo->AllocAddress;
+  if (MapInfo->Operation == EfiPciIoOperationBusMasterWrite) {
+    if (AllocAddress == NULL) {
+      BufferAddress = MapInfo->HostAddress;
+    } else {
+      BufferAddress = AllocAddress;
     }
 
-    NonCoherentPciIoFreeBuffer (
-      This,
-      EFI_SIZE_TO_PAGES (MapInfo->NumberOfBytes),
-      (VOID *)(UINTN)MapInfo->AllocAddress
-      );
-  } else {
-    //
-    // We are *not* using a bounce buffer: if this is a bus master write,
-    // we have to invalidate the caches so the CPU will see the uncached
-    // data written by the device.
-    //
-    if (MapInfo->Operation == EfiPciIoOperationBusMasterWrite) {
-      mCpu->FlushDataCache (
-              mCpu,
-              (EFI_PHYSICAL_ADDRESS)(UINTN)MapInfo->HostAddress,
-              MapInfo->NumberOfBytes,
-              EfiCpuFlushTypeInvalidate
-              );
+    mCpu->FlushDataCache (
+            mCpu,
+            (EFI_PHYSICAL_ADDRESS)(UINTN)BufferAddress,
+            ALIGN_VALUE (MapInfo->NumberOfBytes, mCpu->DmaBufferAlignment),
+            EfiCpuFlushTypeInvalidate
+            );
+
+    if (MapInfo->HostAddress != BufferAddress) {
+      gBS->CopyMem (MapInfo->HostAddress, BufferAddress, MapInfo->NumberOfBytes);
     }
+  }
+
+  if ((AllocAddress != NULL) &&
+      (AllocAddress != ALIGN_POINTER (MapInfo + 1, mCpu->DmaBufferAlignment)))
+  {
+    gBS->FreePages (
+           MapInfo->AllocAddress,
+           EFI_SIZE_TO_PAGES (MapInfo->NumberOfBytes)
+           );
   }
 
   FreePool (MapInfo);
