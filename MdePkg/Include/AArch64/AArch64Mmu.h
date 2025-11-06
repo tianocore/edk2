@@ -129,7 +129,8 @@
 #define TTBR_ASID_MASK   (0xFF << TTBR_ASID_FIELD)
 #define TTBR_BADDR_MASK  (0xFFFFFFFFFFFF )                     // The width of this field depends on the values in TxSZ. Addr occupies bottom 48bits
 
-#define TCR_DS  (1UL << 59)
+#define TCR_DS       (1UL << 59)
+#define TCR_DS_NVHE  (1UL << 32)
 
 #define TCR_EL1_T0SZ_FIELD   (0)
 #define TCR_EL1_EPD0_FIELD   (7)

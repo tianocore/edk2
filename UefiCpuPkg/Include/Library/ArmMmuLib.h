@@ -71,4 +71,17 @@ ArmSetMemoryAttributes (
   IN UINT64                AttributeMask
   );
 
+/**
+  Check whether a 52-bit output address can be described
+  by the translation tables (FEAT_LPA2).
+
+  @retval  TRUE    52-bit output address is enabled (LPA2 enabled).
+  @retval  FALSE   52-bit output address is disabled (LPA2 disabled).
+
+**/
+BOOLEAN
+ArmLpa2Enabled (
+  VOID
+  );
+
 #endif // ARM_MMU_LIB_H_
