@@ -811,6 +811,27 @@ FreeTranslationTable:
   return Status;
 }
 
+/**
+  Check whether a 52-bit output address can be described
+  by the translation tables (FEAT_LPA2).
+  @retval  TRUE    52-bit output address is enabled (LPA2 enabled).
+  @retval  FALSE   52-bit output address is disabled (LPA2 disabled).
+
+**/
+BOOLEAN
+ArmLpa2Enabled (
+  VOID
+  )
+{
+  UINT64  TCR;
+
+  TCR = ArmGetTCR ();
+
+  return !TranslationRegimeIsDual () ?
+         ((TCR & TCR_DS_NVHE) != 0) :
+         ((TCR & TCR_DS) != 0);
+}
+
 RETURN_STATUS
 EFIAPI
 ArmMmuBaseLibConstructor (
