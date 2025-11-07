@@ -157,6 +157,7 @@ CheckExistInStack (
                                    is valid
   @retval EFI_SUCCESS              Successfully updated the invalid DevicePath,
                                    and return the updated device path in DevicePath
+  @retval EFI_NOT_FOUND            The FileGuid was not found in any Fv.
 
 **/
 EFI_STATUS
@@ -879,7 +880,8 @@ GetOneItemNeededSize (
   Deletes all environment variable(s) that contain the override mappings from Controller Device Path to
   a set of Driver Device Paths.
 
-  @retval EFI_SUCCESS  Delete all variable(s) successfully.
+  @retval EFI_SUCCESS    Delete all variable(s) successfully.
+  @retval EFI_NOT_FOUND  The variable was not found;
 
 **/
 EFI_STATUS
