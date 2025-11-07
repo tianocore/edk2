@@ -616,6 +616,7 @@ GetDriverBindingHandleFromImageHandle (
   @param  FakeNvData     Pointer to PLAT_OVER_MNGR_DATA.
 
   @retval EFI_SUCCESS    Always returned.
+  @retval EFI_NOT_FOUND  Handles supporting loaded image protocol.
 
 **/
 EFI_STATUS
@@ -1341,7 +1342,10 @@ PlatOverMngrRouteConfig (
   @param  Value          A pointer to the data being sent to the original exporting driver.
   @param  ActionRequest  On return, points to the action requested by the callback function.
 
-  @retval EFI_SUCCESS    Always returned.
+  @retval EFI_SUCCESS           Changes were completed successfully.
+  @retval EFI_UNSUPPORTED       An action is being passed that is not supported.
+  @retval EFI_DEVICE_ERROR      Changed failed to be commited.
+  @retval EFI_NOT_FOUND         Unable to get data from Hii.
 
 **/
 EFI_STATUS
