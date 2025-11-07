@@ -125,7 +125,7 @@ AsmRelocateApResetVector:
 
 .prepareStack:
     ; The stack can then be used to switch from long mode to compatibility mode
-    mov rsp, STACK_TOP
+    lea rsp, [STACK_TOP]
 
 .loadGDT:
     cli
