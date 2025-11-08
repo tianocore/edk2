@@ -7,6 +7,7 @@
 **/
 
 #include "ReportStatusCodeRouterPei.h"
+#include <Library/BaseMemoryLib.h>
 
 EFI_PEI_RSC_HANDLER_PPI  mRscHandlerPpi = {
   Register,
@@ -47,7 +48,8 @@ CreateRscHandlerCallbackPacket (
   VOID
   )
 {
-  UINTN  *NumberOfEntries;
+  UINTN                         *NumberOfEntries;
+  EFI_PEI_RSC_HANDLER_CALLBACK  *CallbackEntry;
 
   //
   // Build GUID'ed HOB with PCD defined size.
@@ -57,8 +59,16 @@ CreateRscHandlerCallbackPacket (
                       sizeof (EFI_PEI_RSC_HANDLER_CALLBACK) * 64 + sizeof (UINTN)
                       );
   ASSERT (NumberOfEntries != NULL);
+  if (NumberOfEntries == NULL) {
+    return NumberOfEntries;
+  }
 
+  //
+  // Clear Hob Data.
+  //
   *NumberOfEntries = 0;
+  CallbackEntry    = (EFI_PEI_RSC_HANDLER_CALLBACK *)(NumberOfEntries + 1);
+  SetMem (CallbackEntry, 64 * sizeof (EFI_PEI_RSC_HANDLER_CALLBACK), 0);
 
   return NumberOfEntries;
 }
