@@ -68,7 +68,6 @@ BrFree (
   @param  Source      The source buffer containing the compressed data.
   @param  SourceSize  The size of source buffer.
   @param  Destination The destination buffer to store the decompressed data.
-  @param  DestSize    The destination buffer size.
   @param  BuffInfo    The pointer to the BROTLI_BUFF instance.
 
   @retval EFI_SUCCESS Decompression completed successfully, and
@@ -77,12 +76,12 @@ BrFree (
                       The source buffer specified by Source is corrupted
                       (not in a valid compressed format).
 **/
+STATIC
 EFI_STATUS
-BrotliDecompress (
+BrotliDecompressInternal (
   IN CONST VOID  *Source,
   IN UINTN       SourceSize,
   IN OUT VOID    *Destination,
-  IN OUT UINTN   DestSize,
   IN VOID        *BuffInfo
   )
 {
@@ -156,8 +155,6 @@ BrotliDecompress (
   if (NextOut != Output) {
     CopyMem (Temp, Output, (size_t)(NextOut - Output));
   }
-
-  DestSize = TotalOut;
 
   BrFree (BuffInfo, Input);
   BrFree (BuffInfo, Output);
@@ -276,7 +273,6 @@ BrotliUefiDecompress (
   IN OUT VOID    *Scratch
   )
 {
-  UINTN        DestSize = 0;
   EFI_STATUS   Status;
   BROTLI_BUFF  BroBuff;
   UINT64       GetSize;
@@ -288,11 +284,10 @@ BrotliUefiDecompress (
   BroBuff.Buff     = Scratch;
   BroBuff.BuffSize = (UINTN)GetSize;
 
-  Status = BrotliDecompress (
+  Status = BrotliDecompressInternal (
              (VOID *)((UINT8 *)Source + BROTLI_SCRATCH_MAX),
              SourceSize - BROTLI_SCRATCH_MAX,
              Destination,
-             DestSize,
              (VOID *)(&BroBuff)
              );
 
