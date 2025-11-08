@@ -153,6 +153,10 @@ if [[ "$ARCH_IA32" == "yes" && "$ARCH_X64" == "yes" ]]; then
   BUILD_OPTIONS="$BUILD_OPTIONS -a IA32 -a X64"
   PLATFORM_BUILD_DIR=Ovmf3264
   BUILD_ROOT_ARCH=X64
+elif [[ "$ARCH_IA32" == "yes" && "$ARCH_X64" == "no" ]]; then
+    echo "Unsupported architecture '-a IA32'"
+    echo "Only '-a IA32 -a X64' or '-a X64' are supported"
+    exit 1
 else
   PROCESSOR=X64
   Processor=X64
