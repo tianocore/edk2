@@ -511,13 +511,16 @@ ConvertMemoryPageAttributes (
 
   @param[in,out] Buffer  Pointer to private data buffer.
 **/
-VOID
+STATIC
+EFI_STATUS
 EFIAPI
 FlushTlbOnCurrentProcessor (
   IN OUT VOID  *Buffer
   )
 {
   CpuFlushTlb ();
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -530,7 +533,7 @@ FlushTlbForAll (
 {
   FlushTlbOnCurrentProcessor (NULL);
   InternalSmmStartupAllAPs (
-    (EFI_AP_PROCEDURE2)FlushTlbOnCurrentProcessor,
+    FlushTlbOnCurrentProcessor,
     0,
     NULL,
     NULL,
