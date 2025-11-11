@@ -7,6 +7,15 @@
 
 all: test
 
+ifeq (Windows, $(findstring Windows,$(OS)))
+  SHELL := cmd.exe
+  MAKEROOT := $(shell echo %CD%)
+  SEP:=$(shell echo \)
+else
+  MAKEROOT := .
+  SEP:=/
+endif
+
 ifndef PYTHON_COMMAND
   ifeq (Windows, $(findstring Windows,$(OS)))
     SHELL := cmd.exe
@@ -36,8 +45,6 @@ ifndef PYTHON_COMMAND
     endif
     undefine CHECK_PY
   else # UNIX
-    MAKEROOT := .
-    SEP:=/
     PYTHON_COMMAND := $(shell /usr/bin/env python3 -c "import sys; print(sys.executable)")
     ifdef (,$(wildcard $(PYTHON_COMMAND))) # Make sure the file exists
       PYTHON_COMMAND := $(shell /usr/bin/env python -c "import sys; print(sys.executable)")
