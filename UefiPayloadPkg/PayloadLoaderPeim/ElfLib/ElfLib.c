@@ -114,7 +114,7 @@ IsElfFormat (
 
   @retval EFI_INVALID_PARAMETER   ElfCt or SecPos is NULL.
   @retval EFI_NOT_FOUND           Could not find the section.
-  @retval EFI_SUCCESS             Section posistion was filled successfully.
+  @retval EFI_SUCCESS             Section position was filled successfully.
 **/
 EFI_STATUS
 CalculateElfFileSize (
@@ -167,7 +167,7 @@ CalculateElfFileSize (
 
   @retval EFI_INVALID_PARAMETER   ElfCt or SecPos is NULL.
   @retval EFI_NOT_FOUND           Could not find the section.
-  @retval EFI_SUCCESS             Section posistion was filled successfully.
+  @retval EFI_SUCCESS             Section position was filled successfully.
 **/
 EFI_STATUS
 GetElfSegmentInfo (
