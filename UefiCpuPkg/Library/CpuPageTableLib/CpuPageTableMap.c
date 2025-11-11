@@ -371,7 +371,7 @@ PageTableLibMapInLevel (
   RegionMask       = RegionLength - 1;
 
   //
-  // ParentPagingEntry ONLY is deferenced for checking Present and MustBeOne bits
+  // ParentPagingEntry ONLY is dereferenced for checking Present and MustBeOne bits
   // when Modify is FALSE.
   //
   if ((ParentPagingEntry->Pce.Present == 0) || IsPle (ParentPagingEntry, Level + 1)) {
@@ -396,7 +396,7 @@ PageTableLibMapInLevel (
 
     //
     // Check if the attribute, the physical address calculated by ParentPagingEntry is equal to
-    // the attribute, the physical address calculated by input Attribue and Mask.
+    // the attribute, the physical address calculated by input Attribute and Mask.
     //
     if ((IA32_MAP_ATTRIBUTE_ATTRIBUTES (&PleBAttribute) & IA32_MAP_ATTRIBUTE_ATTRIBUTES (Mask))
         == (IA32_MAP_ATTRIBUTE_ATTRIBUTES (Attribute) & IA32_MAP_ATTRIBUTE_ATTRIBUTES (Mask)))
