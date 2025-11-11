@@ -988,7 +988,7 @@ GetInitialVariableData (
   The function does the necessary initialization work for
   Firmware Volume Block Driver.
 
-  @retval     EFI_SUCCESS       This funtion always return EFI_SUCCESS.
+  @retval     EFI_SUCCESS       This function always return EFI_SUCCESS.
                                 It will ASSERT on errors.
 
 **/
