@@ -352,7 +352,7 @@ TestCaseManualChangeReadWrite (
 
   //
   // The latest PageTableMap call should change nothing.
-  // The memory should be identical before and after the funtion is called.
+  // The memory should be identical before and after the function is called.
   //
   UT_ASSERT_MEM_EQUAL (Buffer, BackupBuffer, BackupPageTableBufferSize);
 

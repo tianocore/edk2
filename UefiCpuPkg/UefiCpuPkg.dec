@@ -435,7 +435,7 @@
   ## This PCD indicates whether CPU processor trace is enabled on BSP only when CPU processor trace is enabled.<BR><BR>
   #  This PCD is ignored if CPU processor trace is disabled.<BR><BR>
   #  TRUE  - CPU processor trace is enabled on BSP only.<BR>
-  #  FASLE - CPU processor trace is enabled on all CPU.<BR>
+  #  FALSE - CPU processor trace is enabled on all CPU.<BR>
   # @Prompt Enable CPU processor trace only on BSP.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceBspOnly|FALSE|BOOLEAN|0x60000019
 
@@ -443,7 +443,7 @@
   #  CYC/TSC timing packets will be generated to collect performance data if this PCD is TRUE.
   #  This PCD is ignored if CPU processor trace is disabled.<BR><BR>
   #  TRUE  - Performance collecting will be enabled in processor trace.<BR>
-  #  FASLE - Performance collecting will be disabled in processor trace.<BR>
+  #  FALSE - Performance collecting will be disabled in processor trace.<BR>
   # @Prompt Enable performance collecting when processor trace is enabled.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTracePerformanceCollecting|FALSE|BOOLEAN|0x60000020
 

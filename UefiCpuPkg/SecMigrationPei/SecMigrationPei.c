@@ -72,7 +72,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_PEI_PPI_DESCRIPTOR  mSecPerformancePpiDescript
   Disables the use of Temporary RAM.
 
   If present, this service is invoked by the PEI Foundation after
-  the EFI_PEI_PERMANANT_MEMORY_INSTALLED_PPI is installed.
+  the EFI_PEI_PERMANENT_MEMORY_INSTALLED_PPI is installed.
 
   @retval EFI_SUCCESS  Dummy function, alway return this value.
 

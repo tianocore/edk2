@@ -139,7 +139,7 @@ STATIC CONST EFI_MM_SAVE_STATE_IO_TYPE  mSmmCpuIoType[] = {
                         from the save state.
 
   @retval EFI_SUCCESS           The register was read from Save State.
-  @retval EFI_INVALID_PARAMTER  Buffer is NULL.
+  @retval EFI_INVALID_PARAMETER Buffer is NULL.
   @retval EFI_UNSUPPORTED       This function does not support reading Register.
   @retval EFI_NOT_FOUND         If desired Register not found.
 **/
@@ -258,7 +258,7 @@ MmSaveStateReadRegister (
   @param[in] Buffer    Upon entry, this holds the new CPU register value.
 
   @retval EFI_SUCCESS           The register was written to Save State.
-  @retval EFI_INVALID_PARAMTER  Buffer is NULL.
+  @retval EFI_INVALID_PARAMETER Buffer is NULL.
   @retval EFI_UNSUPPORTED       This function does not support writing Register.
   @retval EFI_NOT_FOUND         If desired Register not found.
 **/
