@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Protocol/Capsule.h>
 #include <Protocol/DxeSmmReadyToLock.h>
-#include <Protocol/VariableLock.h>
+#include <Library/VariablePolicyHelperLib.h>
 
 #include <Guid/CapsuleVendor.h>
 #include <Guid/AcpiS3Context.h>
@@ -68,7 +68,7 @@ AllocateReservedMemoryBelow4G (
 }
 
 /**
-  Register callback function upon VariableLockProtocol
+  Register callback function upon VariablePolicyProtocol
   to lock EFI_CAPSULE_LONG_MODE_BUFFER_NAME variable to avoid malicious code to update it.
 
   @param[in] Event    Event whose notification function is being invoked.
@@ -81,15 +81,25 @@ VariableLockCapsuleLongModeBufferVariable (
   IN  VOID       *Context
   )
 {
-  EFI_STATUS                    Status;
-  EDKII_VARIABLE_LOCK_PROTOCOL  *VariableLock;
+  EFI_STATUS                         Status;
+  IN EDKII_VARIABLE_POLICY_PROTOCOL  *VariablePolicy;
 
   //
-  // Mark EFI_CAPSULE_LONG_MODE_BUFFER_NAME variable to read-only if the Variable Lock protocol exists
+  // Mark EFI_CAPSULE_LONG_MODE_BUFFER_NAME variable to read-only if the Variable Policy protocol exists
   //
-  Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **)&VariableLock);
+  Status = gBS->LocateProtocol (&gEdkiiVariablePolicyProtocolGuid, NULL, (VOID **)&VariablePolicy);
   if (!EFI_ERROR (Status)) {
-    Status = VariableLock->RequestToLock (VariableLock, EFI_CAPSULE_LONG_MODE_BUFFER_NAME, &gEfiCapsuleVendorGuid);
+    Status = RegisterBasicVariablePolicy (
+               VariablePolicy,
+               &gEfiCapsuleVendorGuid,
+               EFI_CAPSULE_LONG_MODE_BUFFER_NAME,
+               VARIABLE_POLICY_NO_MIN_SIZE,
+               VARIABLE_POLICY_NO_MAX_SIZE,
+               VARIABLE_POLICY_NO_MUST_ATTR,
+               VARIABLE_POLICY_NO_CANT_ATTR,
+               VARIABLE_POLICY_TYPE_LOCK_NOW
+               );
+    DEBUG ((DEBUG_INFO, "Status of RegisterBasicVariablePolicy for (%s) - %r\n", EFI_CAPSULE_LONG_MODE_BUFFER_NAME, Status));
     ASSERT_EFI_ERROR (Status);
   }
 }
@@ -177,11 +187,11 @@ PrepareContextForCapsulePei (
                   );
   if (!EFI_ERROR (Status)) {
     //
-    // Register callback function upon VariableLockProtocol
+    // Register callback function upon VariablePolicyProtocol
     // to lock EFI_CAPSULE_LONG_MODE_BUFFER_NAME variable to avoid malicious code to update it.
     //
     EfiCreateProtocolNotifyEvent (
-      &gEdkiiVariableLockProtocolGuid,
+      &gEdkiiVariablePolicyProtocolGuid,
       TPL_CALLBACK,
       VariableLockCapsuleLongModeBufferVariable,
       NULL,
