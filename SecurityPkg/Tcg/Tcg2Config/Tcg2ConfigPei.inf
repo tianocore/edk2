@@ -5,6 +5,7 @@
 #  NOTE: This module is only for reference only, each platform should have its own setup page.
 #
 # Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
+# Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -72,7 +73,8 @@
 
 [Depex]
   gEfiPeiMasterBootModePpiGuid AND
-  gEfiPeiReadOnlyVariable2PpiGuid
+  gEfiPeiReadOnlyVariable2PpiGuid AND
+  gEfiPeiMemoryDiscoveredPpiGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   Tcg2ConfigPeiExtra.uni
