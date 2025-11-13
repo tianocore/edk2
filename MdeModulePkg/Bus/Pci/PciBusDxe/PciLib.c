@@ -1874,7 +1874,7 @@ PciProgramResizableBar (
     // Bit 0 is set: supports operating with the BAR sized to 1 MB
     // Bit 1 is set: supports operating with the BAR sized to 2 MB
     // Bit n is set: supports operating with the BAR sized to (2^n) MB
-    // Platform may impose limitation on the BAR size it supports using PcdPcieResizableBarMaxSize.
+    // With PcdPcieResizableBarMaxSize platform may impose limitation on the BAR size it supports.
     //
     Capabilities = LShiftU64 (Entries[Index].ResizableBarControl.Bits.BarSizeCapability, 28)
                    | Entries[Index].ResizableBarCapability.Bits.BarSizeCapability;
