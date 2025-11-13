@@ -39,9 +39,11 @@
 **/
 #define IS_PCI_SATADPA(_p)  IS_CLASS2 (_p, PCI_CLASS_MASS_STORAGE, PCI_CLASS_MASS_STORAGE_SATADPA)
 
-///
-/// PCI Capability List IDs and records
-///
+//
+// Symbol EFI_PCI_CAPABILITY_ID_PCIEXP is obsolete, use PCI_EXPRESS_CAPABILITY_ID.
+// PCI_EXPRESS_CAPABILITY_ID is defined beside the capability registers structure
+// in PciExpress21.h. This ID is not EFI nor PCI symbol, but PCI Express.
+//
 #define EFI_PCI_CAPABILITY_ID_PCIEXP  0x10
 
 #pragma pack(1)
