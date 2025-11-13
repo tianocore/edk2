@@ -10,8 +10,8 @@
 
 **/
 
-#ifndef __USB_ASSOCIATION_H__
-#define __USB_ASSOCIATION_H__
+#ifndef USB_ASSOCIATION_H__
+#define USB_ASSOCIATION_H__
 
 #include <IndustryStandard/Usb.h>
 #include <Protocol/UsbIo.h>
