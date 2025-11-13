@@ -16,47 +16,79 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #pragma pack(1)
 
-/// Precision Time Management Extended Capability definitions.
-///
-/// Based on section 7.9.16 of PCI Express Base Specification 4.0.
-///@{
+//
+// Precision Time Measurement (PTM) Extended Capability.
+//
 #define PCI_EXPRESS_EXTENDED_CAPABILITY_PTM_ID    0x001F
 #define PCI_EXPRESS_EXTENDED_CAPABILITY_PTM_VER1  0x1
 
-#define PCI_EXPRESS_EXTENDED_CAPABILITIES_PTM_CAPABILITY_OFFSET  0x04
-#define PCI_EXPRESS_EXTENDED_CAPABILITIES_PTM_CONTROL_OFFSET     0x08
-
 typedef union {
   struct {
-    UINT32    PTMRequesterCapable                  : 1;
-    UINT32    PTMResponderCapable                  : 1;
-    UINT32    PTMRootCapable                       : 1;
-    UINT32    ePTMCapable                          : 1;
-    UINT32    PTMPropagationDelayAdaptationCapable : 1;
-    UINT32    Reserved                             : 3;
-    UINT32    LocalClockGranularity                : 8;
-    UINT32    Reserved2                            : 16;
+    UINT32    PtmRequesterCapable             : 1;    // [0]
+    UINT32    PtmResponderCapable             : 1;    // [1]
+    UINT32    PtmRootCapable                  : 1;    // [2]
+    UINT32    EPtmCapable                     : 1;    // [3]
+    UINT32    PtmPropatagionDelayAdaptCapable : 1;    // [4]
+    UINT32    Reserved0                       : 3;    // [7:5]
+    UINT32    LocalClockGranularity           : 8;    // [15:8]
+    UINT32    Reserved1                       : 16;   // [31:16]
   } Bits;
   UINT32    Uint32;
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_PTM_CAPABILITY;
 
 typedef union {
   struct {
-    UINT32    PTMEnable            : 1;
-    UINT32    RootSelect           : 1;
-    UINT32    Reserved             : 6;
-    UINT32    EffectiveGranularity : 8;
-    UINT32    Reserved2            : 16;
+    UINT32    PtmEnable            : 1;    // [0]
+    UINT32    RootSelect           : 1;    // [1]
+    UINT32    Reserved0            : 6;    // [7:2]
+    UINT32    EffectiveGranularity : 8;    // [15:8]
+    UINT32    Reserved1            : 16;   // [31:16]
   } Bits;
   UINT32    Uint32;
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_PTM_CONTROL;
 
 typedef struct {
   PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER            Header;
-  PCI_EXPRESS_EXTENDED_CAPABILITIES_PTM_CAPABILITY    Capability;
-  PCI_EXPRESS_EXTENDED_CAPABILITIES_PTM_CONTROL       Control;
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_PTM_CAPABILITY    Capability; // Offset 04h size 4
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_PTM_CONTROL       Control;    // Offset 08h size 4
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_PTM;
-///@}
+
+//
+// Data Link Feature (DLF) Extended Capability.
+//
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_DLF_ID  0x0025
+
+typedef union {
+  struct {
+    UINT32    LocalScaledFlowControlSupported : 1;    // [0]
+    UINT32    LocalImmediateReadiness         : 1;    // [1]
+    UINT32    LocalExtendedVcCount            : 3;    // [4:2]
+    UINT32    LocalL0pExitLatency             : 3;    // [7:5]
+    UINT32    Reserved0                       : 15;   // [22:8]
+    UINT32    Reserved1                       : 8;    // [30:23]
+    UINT32    DataLinkFeatureExchangeEnable   : 1;    // [31]
+  } Bits;
+  UINT32    Uint32;
+} PCI_EXPRESS_REG_DLF_CAPABILITY;
+
+typedef union {
+  struct {
+    UINT32    RemoteScaledFlowControlSupported : 1;    // [0]
+    UINT32    RemoteImmediateReadiness         : 1;    // [1]
+    UINT32    ExtendedVcCound                  : 3;    // [4:2]
+    UINT32    RemoteL0pExitLatency             : 3;    // [7:5]
+    UINT32    Reserved0                        : 15;   // [22:8]
+    UINT32    Reserved1                        : 8;    // [30:23]
+    UINT32    DataLinkFeatureStatusValid       : 1;    // [31]
+  } Bits;
+  UINT32    Uint32;
+} PCI_EXPRESS_REG_DLF_STATUS;
+
+typedef struct {
+  PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER    Header;
+  PCI_EXPRESS_REG_DLF_CAPABILITY              Capability;
+  PCI_EXPRESS_REG_DLF_STATUS                  Status;
+} PCI_EXPRESS_EXTENDED_CAPABILITIES_DLF;
 
 /// The Physical Layer PCI Express Extended Capability definitions.
 ///
