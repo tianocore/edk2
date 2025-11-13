@@ -61,3 +61,11 @@ getegid (
 }
 
 int  errno = 0;
+
+ms_time_t
+mbedtls_ms_time (
+  void
+  )
+{
+  return 0;
+}
