@@ -474,6 +474,7 @@ W: http://www.tianocore.org/ovmf/
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
+R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
 S: Maintained
 
 OvmfPkg: bhyve-related modules
