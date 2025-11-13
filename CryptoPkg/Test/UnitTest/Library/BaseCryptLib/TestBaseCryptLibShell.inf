@@ -41,6 +41,7 @@
   BnTests.c
   EcTests.c
   X509Tests.c
+  Pkcs7AttachedContentTest.c
 
 [Packages]
   MdePkg/MdePkg.dec
