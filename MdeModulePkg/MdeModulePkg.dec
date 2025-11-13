@@ -2059,8 +2059,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport|TRUE|BOOLEAN|0x10000045
 
   ## Indicates if the Multi Root I/O virtualization is supported.<BR><BR>
-  #   TRUE  - Multi Root I/O virtualization is supported.<BR>
-  #   FALSE - Multi Root I/O virtualization is not supported.<BR>
+  #   NOTE: MR-IOV is deprecated in PCIe 6.0 specification and PcdMrIovSupport shall not be used.
   # @Prompt Enable MRIOV support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport|FALSE|BOOLEAN|0x10000046
 

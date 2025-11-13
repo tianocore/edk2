@@ -94,7 +94,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize         ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport                ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport                  ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport                ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration    ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarSupport     ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarMaxSize     ## CONSUMES
