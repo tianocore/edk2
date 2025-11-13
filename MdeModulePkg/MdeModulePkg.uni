@@ -560,12 +560,6 @@
                                                                                "TRUE  - Alternative Routing-ID is supported.<BR>\n"
                                                                                "FALSE - Alternative Routing-ID is not supported.<BR>"
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMrIovSupport_PROMPT  #language en-US "Enable MRIOV support"
-
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMrIovSupport_HELP  #language en-US "Indicates if the Multi Root I/O virtualization is supported.<BR><BR>\n"
-                                                                                 "TRUE  - Multi Root I/O virtualization is supported.<BR>\n"
-                                                                                 "FALSE - Multi Root I/O virtualization is not supported.<BR>"
-
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSrIovSystemPageSize_PROMPT  #language en-US "SRIOV system page size"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSrIovSystemPageSize_HELP  #language en-US "Single root I/O virtualization virtual function memory BAR alignment.<BR><BR>\n"
