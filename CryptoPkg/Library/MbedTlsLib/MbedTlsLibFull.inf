@@ -48,7 +48,8 @@
   mbedtls/library/ssl_client.c
   mbedtls/library/ssl_debug_helpers_generated.c
   mbedtls/library/rsa_alt_helpers.c
-  mbedtls/library/hash_info.c
+  mbedtls/library/pk_ecc.c
+  mbedtls/library/x509write.c
   mbedtls/library/bignum_core.c
   mbedtls/library/constant_time.c
   mbedtls/library/memory_buffer_alloc.c
@@ -66,6 +67,7 @@
   mbedtls/library/ripemd160.c
   mbedtls/library/rsa.c
   mbedtls/library/sha1.c
+  mbedtls/library/sha3.c
   mbedtls/library/sha256.c
   mbedtls/library/sha512.c
   mbedtls/library/ssl_cache.c
@@ -105,9 +107,12 @@
   # warning C4245: '=': conversion from 'int' to 'mbedtls_mpi_uint', signed/unsigned mismatch
   # warning C4310: cast truncates constant value
   # warning C4204: nonstandard extension used
+  # warning C4389: signed/unsigned mismatch
+  # /U_WIN32     : Avoid redfineded with WIN API
   #
-  MSFT:*_*_IA32_CC_FLAGS   =  /DEFI32 /wd4244 /wd4132 /wd4245 /wd4310 /wd4204
-  MSFT:*_*_X64_CC_FLAGS   =  /DEFI32 /wd4244 /wd4132 /wd4245 /wd4310 /wd4204
+  MSFT:*_*_IA32_CC_FLAGS   = /U_WIN32 /DEFI32 /wd4244 /wd4132 /wd4245 /wd4310 /wd4204 /wd4389
+  MSFT:*_*_X64_CC_FLAGS   = /U_WIN32 /DEFI32 /wd4244 /wd4132 /wd4245 /wd4310 /wd4204 /wd4389
+
 
   #
   # Disable following Visual Studio 2015 compiler warnings brought by mbedtls source,
