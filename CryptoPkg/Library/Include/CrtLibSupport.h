@@ -100,6 +100,7 @@ typedef UINTN   intptr_t;
 typedef INTN    ptrdiff_t;
 typedef INTN    ssize_t;
 typedef INT64   time_t;
+typedef UINT64  ms_time_t;
 typedef UINT8   __uint8_t;
 typedef UINT8   sa_family_t;
 typedef UINT8   u_char;
@@ -448,4 +449,36 @@ strpbrk (
 #define offsetof(type, member)  OFFSET_OF(type,member)
 #define atoi(nptr)              AsciiStrDecimalToUintn(nptr)
 
+#ifndef _BYTESWAP_DEFINED
+#define _BYTESWAP_DEFINED
+#define _byteswap_ushort  SwapBytes16
+#define _byteswap_ulong   SwapBytes32
+#define _byteswap_uint64  SwapBytes64
+#endif
+
+#ifndef SecureZeroMemory
+#define SecureZeroMemory(ptr, sz)  memset((ptr), 0, (sz))
+#endif
+
+#ifndef INT64_MAX
+#define INT64_MAX  0x7FFFFFFFFFFFFFFFL
+#define INT64_MIN  (-0x7FFFFFFFFFFFFFFFL - 1)
+#endif
+
+#ifndef INT16_MAX
+#define INT16_MIN   (-32768)
+#define INT16_MAX   (32767)
+#define UINT16_MAX  (65535)
+#endif
+
+#ifndef UINT64_MAX
+#define UINT64_MAX  0xFFFFFFFFFFFFFFFFUL
+#endif
+
+#undef UINTPTR_MAX
+#if (UINT_MAX > 0xFFFFFFFFUL)
+#define UINTPTR_MAX  0xFFFFFFFFFFFFFFFFUL
+#else
+#define UINTPTR_MAX  0xFFFFFFFFUL
+#endif
 #endif
