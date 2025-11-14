@@ -24,7 +24,6 @@
 [Sources]
   FitUniversalPayloadEntry.c
   LoadDxeCore.c
-  MemoryAllocation.c
   PrintHob.c
   AcpiTable.c
 
@@ -67,6 +66,7 @@
   CustomFdtNodeParserLib
   PcdLib
   StackCheckLib
+  MemoryAllocationLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid

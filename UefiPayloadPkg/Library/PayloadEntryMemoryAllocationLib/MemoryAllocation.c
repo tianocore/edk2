@@ -3,15 +3,24 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "UefiPayloadEntry.h"
+#include <Uefi.h>
+#include <Pi/PiBootMode.h>
+#include <Pi/PiHob.h>
+
+#include <Library/HobLib.h>
+#include <Library/DebugLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/PayloadEntryHelperLib.h>
 
 /**
-  Allocates one or more pages of type EfiBootServicesData.
+  Allocates one or more pages of type MemoryType.
 
   Allocates the number of pages of MemoryType and returns a pointer to the
   allocated buffer.  The buffer returned is aligned on a 4KB boundary.
@@ -23,9 +32,10 @@
   @param   MemoryType            The MemoryType
   @return  A pointer to the allocated buffer or NULL if allocation fails.
 **/
+STATIC
 VOID *
 EFIAPI
-PayloadAllocatePages (
+InternalAllocatePages (
   IN UINTN            Pages,
   IN EFI_MEMORY_TYPE  MemoryType
   )
@@ -78,34 +88,29 @@ AllocatePages (
   IN UINTN  Pages
   )
 {
-  EFI_PEI_HOB_POINTERS        Hob;
-  EFI_PHYSICAL_ADDRESS        Offset;
-  EFI_HOB_HANDOFF_INFO_TABLE  *HobTable;
+  return InternalAllocatePages (Pages, EfiBootServicesData);
+}
 
-  Hob.Raw  = GetHobList ();
-  HobTable = Hob.HandoffInformationTable;
+/**
+  Allocates one or more 4KB pages of type EfiReservedMemoryType.
 
-  if (Pages == 0) {
-    return NULL;
-  }
+  Allocates the number of 4KB pages of type EfiReservedMemoryType and returns a pointer to the
+  allocated buffer.  The buffer returned is aligned on a 4KB boundary.  If Pages is 0, then NULL
+  is returned.  If there is not enough memory remaining to satisfy the request, then NULL is
+  returned.
 
-  // Make sure allocation address is page aligned.
-  Offset = HobTable->EfiFreeMemoryTop & EFI_PAGE_MASK;
-  if (Offset != 0) {
-    HobTable->EfiFreeMemoryTop -= Offset;
-  }
+  @param  Pages                 The number of 4 KB pages to allocate.
 
-  //
-  // Check available memory for the allocation
-  //
-  if (HobTable->EfiFreeMemoryTop - ((Pages * EFI_PAGE_SIZE) + sizeof (EFI_HOB_MEMORY_ALLOCATION)) < HobTable->EfiFreeMemoryBottom) {
-    return NULL;
-  }
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
-  HobTable->EfiFreeMemoryTop -= Pages * EFI_PAGE_SIZE;
-  BuildMemoryAllocationHob (HobTable->EfiFreeMemoryTop, Pages * EFI_PAGE_SIZE, EfiBootServicesData);
-
-  return (VOID *)(UINTN)HobTable->EfiFreeMemoryTop;
+**/
+VOID *
+EFIAPI
+AllocateReservedPages (
+  IN UINTN  Pages
+  )
+{
+  return InternalAllocatePages (Pages, EfiReservedMemoryType);
 }
 
 /**
