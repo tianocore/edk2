@@ -93,7 +93,7 @@ FtwGetLastWriteRecord (
   OUT EFI_FAULT_TOLERANT_WRITE_RECORD  **FtwWriteRecord
   )
 {
-  UINTN                            Index;
+  UINT64                           Index;
   EFI_FAULT_TOLERANT_WRITE_RECORD  *FtwRecord;
 
   *FtwWriteRecord = NULL;
@@ -260,7 +260,10 @@ PeimFaultTolerantWriteInitialize (
     }
 
     if (!EFI_ERROR (Status)) {
-      ASSERT (FtwLastWriteRecord != NULL);
+      if (FtwLastWriteRecord == NULL) {
+        goto End;
+      }
+
       if ((FtwLastWriteRecord->SpareComplete == FTW_VALID_STATE) && (FtwLastWriteRecord->DestinationComplete != FTW_VALID_STATE)) {
         //
         // If FTW last write was still in progress with SpareComplete set and DestinationComplete not set.
@@ -323,6 +326,7 @@ PeimFaultTolerantWriteInitialize (
     }
   }
 
+End:
   //
   // Install gEdkiiFaultTolerantWriteGuid PPI to inform the check for FTW last write data has been done.
   //
