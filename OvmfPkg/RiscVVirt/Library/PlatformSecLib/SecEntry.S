@@ -15,7 +15,7 @@ li    s0, 0
 li    a2, FixedPcdGet32 (PcdOvmfSecPeiTempRamBase)
 li    a3, FixedPcdGet32 (PcdOvmfSecPeiTempRamSize)
 
-/* Reserve region to store handoff data
+/* Reserve region to store handoff data */
 li    a4, SEC_HANDOFF_DATA_RESERVE_SIZE
 sub   a3, a3, a4
 
