@@ -21,10 +21,15 @@
   AcpiTimerLib.c
   AcpiTimerLib.h
   BaseAcpiTimerLibBhyve.c
+  TscTimerLib.c
+  TscTimerLib.h
 
 [Packages]
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
   IoLib
