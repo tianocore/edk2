@@ -93,6 +93,7 @@ UefiMain (
   EFI_IPv4_ADDRESS  RedfishServiceIpAddress;
   EFI_IPv4_ADDRESS  RedfishServiceIpMask;
   UINTN             RedfishServiceIpPort;
+  CHAR16            *EndPointer = NULL;
 
   Status = GetArg ();
   if (EFI_ERROR (Status)) {
@@ -136,7 +137,7 @@ UefiMain (
       return Status;
     }
 
-    ReturnStatus = StrDecimalToUintnS (Argv[6], NULL, &RedfishServiceIpPort);
+    ReturnStatus = StrDecimalToUintnS (Argv[6], &EndPointer, &RedfishServiceIpPort);
     if (RETURN_ERROR (ReturnStatus)) {
       PrintHelp ();
       return Status;
@@ -231,7 +232,7 @@ UefiMain (
       return Status;
     }
 
-    ReturnStatus = StrDecimalToUintnS (Argv[4], NULL, &RedfishServiceIpPort);
+    ReturnStatus = StrDecimalToUintnS (Argv[4], &EndPointer, &RedfishServiceIpPort);
     if (RETURN_ERROR (ReturnStatus)) {
       PrintHelp ();
       return Status;
