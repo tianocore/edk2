@@ -45,7 +45,7 @@ RiscvSetTimerPeriod (
 
   @retval EFI_SUCCESS            Timer Architectural Protocol created
   @retval EFI_OUT_OF_RESOURCES   Not enough resources available to initialize driver.
-  @retval EFI_DEVICE_ERROR       A device error occured attempting to initialize the driver.
+  @retval EFI_DEVICE_ERROR       A device error occurred attempting to initialize the driver.
 
 **/
 EFI_STATUS

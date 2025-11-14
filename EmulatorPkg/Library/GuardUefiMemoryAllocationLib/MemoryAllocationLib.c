@@ -196,7 +196,7 @@ InternalAllocateAlignedPages (
 
   if (Alignment > EFI_PAGE_SIZE) {
     //
-    // Caculate the total number of pages since alignment is larger than page size.
+    // Calculate the total number of pages since alignment is larger than page size.
     //
     AlignmentMask = Alignment - 1;
     RealPages     = Pages + EFI_SIZE_TO_PAGES (Alignment);

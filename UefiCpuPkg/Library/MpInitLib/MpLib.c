@@ -2151,7 +2151,7 @@ MpInitLibInitialize (
 
   BufferSize = ApStackSize * MaxLogicalProcessorNumber;
   //
-  // Allocate extra ApStackSize to let AP stack align on ApStackSize bounday
+  // Allocate extra ApStackSize to let AP stack align on ApStackSize boundary
   //
   BufferSize += ApStackSize;
   BufferSize += MonitorFilterSize * MaxLogicalProcessorNumber;
@@ -2510,7 +2510,7 @@ MpInitLibInitialize (
 
   @param[in]  ProcessorNumber       The handle number of processor.
                                     Lower 24 bits contains the actual processor number.
-                                    BIT24 indicates if the EXTENDED_PROCESSOR_INFORMATION will be retrived.
+                                    BIT24 indicates if the EXTENDED_PROCESSOR_INFORMATION will be retrieved.
   @param[out] ProcessorInfoBuffer   A pointer to the buffer where information for
                                     the requested processor is deposited.
   @param[out]  HealthData            Return processor health data.
