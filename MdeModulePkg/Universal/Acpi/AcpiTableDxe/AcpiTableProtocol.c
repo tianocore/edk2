@@ -2158,10 +2158,17 @@ InstallAcpiTableFromAcpiSiliconHob (
       //
       // According ACPI spec, if XDsdt field contains a nonzero value which can be used by the OSPM, then the Dsdt field must be ignored by the OSPM.
       //
+      NeedToInstallTable = NULL;
       if (((EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)SocEntryTable)->XDsdt != 0) {
         NeedToInstallTable = (VOID *)(UINTN)((EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)SocEntryTable)->XDsdt;
       } else if (((EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)SocEntryTable)->Dsdt != 0) {
         NeedToInstallTable = (VOID *)(UINTN)((EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)SocEntryTable)->Dsdt;
+      }
+
+      if (NeedToInstallTable == NULL) {
+        DEBUG ((DEBUG_ERROR, "InstallAcpiTableFromAcpiSiliconHob: Fail to add DSDT table at 0x%p\n", SocEntryTable));
+        ASSERT_EFI_ERROR (EFI_NOT_FOUND);
+        break;
       }
 
       //
