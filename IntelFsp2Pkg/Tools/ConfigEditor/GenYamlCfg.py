@@ -12,11 +12,61 @@ import marshal
 import string
 import operator as op
 import ast
+import tkinter.messagebox as messagebox
+import tkinter
 
 from datetime import date
 from collections import OrderedDict
 from CommonUtility import value_to_bytearray, value_to_bytes, \
       bytes_to_value, get_bits_from_bytes, set_bits_to_bytes
+
+# FFS file structure constants
+FFS_GUID_SIZE = 16
+FFS_HEADER_SIZE = 24
+FFS_SEARCH_RANGE = 4096  # Search within 4KB after GUID
+
+import uuid
+import struct
+
+# FSP UPD FFS GUID definitions
+FSP_T_UPD_FFS_GUID = uuid.UUID('70BCF6A5-FFB1-47D8-B1AE-EFE5508E23EA')
+FSP_M_UPD_FFS_GUID = uuid.UUID('D5B86AEA-6AF7-40D4-8014-982301BC3D89')
+FSP_S_UPD_FFS_GUID = uuid.UUID('E3CD9B18-998C-4F76-B65E-98B154E5446F')
+
+# UPD signature to GUID mapping
+def get_upd_guid(upd_signature):
+    """Get FFS GUID for a given UPD signature based on suffix"""
+    if upd_signature.endswith('UPD_T'):
+        return FSP_T_UPD_FFS_GUID
+    elif upd_signature.endswith('UPD_M'):
+        return FSP_M_UPD_FFS_GUID
+    elif upd_signature.endswith('UPD_S'):
+        return FSP_S_UPD_FFS_GUID
+    return None
+
+
+def guid_to_bytes(guid):
+    """Convert UUID to bytes in EFI GUID format (mixed endian)"""
+    # EFI GUID format: first 3 fields are little-endian, last 2 are big-endian
+    guid_struct = struct.pack('<IHH', guid.time_low, guid.time_mid, guid.time_hi_version)
+    guid_struct += struct.pack('>H', guid.clock_seq_hi_variant << 8 | guid.clock_seq_low)
+    guid_struct += guid.node.to_bytes(6, 'big')
+    return guid_struct
+
+
+def bytes_to_guid(data):
+    """Convert 16 bytes in EFI GUID format to UUID"""
+    if len(data) < FFS_GUID_SIZE:
+        return None
+    time_low = struct.unpack('<I', data[0:4])[0]
+    time_mid = struct.unpack('<H', data[4:6])[0]
+    time_hi_version = struct.unpack('<H', data[6:8])[0]
+    clock_seq = struct.unpack('>H', data[8:10])[0]
+    node = int.from_bytes(data[10:16], 'big')
+
+    return uuid.UUID(fields=(time_low, time_mid, time_hi_version,
+                            clock_seq >> 8, clock_seq & 0xFF, node))
+
 
 # Generated file copyright header
 __copyright_tmp__ = """/** @file
@@ -637,7 +687,6 @@ class CGenYamlCfg:
         self._macro_dict = {}
         self.binseg_dict = {}
         self.initialize()
-        self._tk = self.import_tkinter()
 
     def initialize(self):
         self._old_bin = None
@@ -1639,14 +1688,45 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
 
         return cfg_segs
 
-    def import_tkinter(self):
-        try:
-            import tkinter
-            import tkinter.messagebox
-            return tkinter
-        except ImportError:
-            print('tkinter is not supported under current OS')
-            return None
+    def find_upd_in_ffs_by_guid(self, bin_data, upd_signature, ffs_guid):
+        """
+        Find UPD signature within a specific FFS file identified by GUID.
+
+        Args:
+            bin_data: Binary data to search in
+            upd_signature: UPD signature string (e.g., 'XXXUPD_M')
+            ffs_guid: UUID of the FFS file to search in
+
+        Returns:
+            Position of UPD signature if found, -1 otherwise
+        """
+        if not ffs_guid:
+            return -1
+
+        # Convert GUID to bytes for searching
+        guid_bytes = guid_to_bytes(ffs_guid)
+        sig_bytes = upd_signature.encode()
+
+        # Search for all occurrences of the GUID
+        search_pos = 0
+        while True:
+            guid_pos = bin_data.find(guid_bytes, search_pos)
+            if guid_pos < 0:
+                break
+
+            # Search for UPD signature within FFS_SEARCH_RANGE after GUID
+            search_start = guid_pos
+            search_end = min(guid_pos + FFS_SEARCH_RANGE, len(bin_data))
+
+            sig_pos = bin_data.find(sig_bytes, search_start, search_end)
+            if sig_pos >= 0:
+                print(f"Found {upd_signature} at offset 0x{sig_pos:X} within FFS GUID {ffs_guid}")
+                return sig_pos
+
+            # Continue searching for next occurrence of this GUID
+            search_pos = guid_pos + FFS_GUID_SIZE
+
+        return -1
 
     def get_bin_segment(self, bin_data):
         cfg_segs = self.get_cfg_segment()
@@ -1656,25 +1736,36 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
             if key == 0:
                 bin_segs.append([seg[0], 0, len(bin_data)])
                 break
-            pos = bin_data.find(key)
-            if pos >= 0:
-                # ensure no other match for the key
-                next_pos = bin_data.find(key, pos + len(seg[0]))
-                if next_pos >= 0:
-                    if key == b'$SKLFSP$' or key == b'$BSWFSP$':
-                        string = ('Multiple matches for %s in '
-                                  'binary!\n\nA workaround applied to such '
-                                  'FSP 1.x binary to use second'
-                                  ' match instead of first match!' % key)
-                        if self._tk:
-                            self._tk.messagebox.showwarning('Warning: ', string)
+
+            pos = -1
+
+            # Check if this UPD signature has a corresponding FFS GUID
+            ffs_guid = get_upd_guid(seg[0])
+            if ffs_guid:
+                pos = self.find_upd_in_ffs_by_guid(bin_data, seg[0], ffs_guid)
+                if pos >= 0:
+                    print(f"Using GUID-based search: found {seg[0]} at 0x{pos:X}")
+
+            # Fallback to original search if GUID-based search fails
+            if pos < 0:
+                pos = bin_data.find(key)
+                if pos >= 0:
+                    # Check for multiple matches
+                    next_pos = bin_data.find(key, pos + len(seg[0]))
+                    if next_pos >= 0:
+                        if key == b'$SKLFSP$' or key == b'$BSWFSP$':
+                            string = ('Warning: Multiple matches for %s in '
+                                      'binary!\n\nA workaround applied to such '
+                                      'FSP 1.x binary to use second'
+                                      ' match instead of first match!' % key)
+                            messagebox.showwarning('Warning!', string)
+                            pos = next_pos
                         else:
-                            print('Warning: ', string)
-                        pos = next_pos
-                    else:
-                        print("Warning: Multiple matches for '%s' "
-                              "in binary, the 1st instance will be used !"
-                              % seg[0])
+                            print("Warning: Multiple matches for '%s' "
+                                  "in binary, the 1st instance will be used !"
+                                  % seg[0])
+
+            if pos >= 0:
                 bin_segs.append([seg[0], pos, seg[2]])
                 self.binseg_dict[seg[0]] = pos
             else:
@@ -1699,10 +1790,7 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
             else:
                 self.missing_fv.append(each[0])
                 string = each[0] + ' is not availabe.'
-                if self._tk:
-                    self._tk.messagebox.showinfo('', string)
-                else:
-                    print('warning: ', string)
+                messagebox.showinfo('', string)
                 cfg_bins.extend(bytearray(each[2]))
             Dummy_offset += each[2]
         return cfg_bins
@@ -1729,34 +1817,32 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
         return bin_data
 
     def show_data_difference(self, data_diff):
-        if self._tk is None:
-            return
         # Displays if any data difference detected in BSF and Binary file
         pop_up_text = 'There are differences in Config file and binary '\
             'data detected!\n'
         pop_up_text += data_diff
 
-        window = self._tk.Tk()
+        window = tkinter.Tk()
         window.title("Data Difference")
         window.resizable(1, 1)
         # Window Size
         window.geometry("800x400")
-        frame = self._tk.Frame(window, height=800, width=700)
-        frame.pack(side=self._tk.BOTTOM)
+        frame = tkinter.Frame(window, height=800, width=700)
+        frame.pack(side=tkinter.BOTTOM)
         # Vertical (y) Scroll Bar
-        scroll = self._tk.Scrollbar(window)
-        scroll.pack(side=self._tk.RIGHT, fill=self._tk.Y)
+        scroll = tkinter.Scrollbar(window)
+        scroll.pack(side=tkinter.RIGHT, fill=tkinter.Y)
 
-        text = self._tk.Text(window, wrap=self._tk.NONE,
+        text = tkinter.Text(window, wrap=tkinter.NONE,
                             yscrollcommand=scroll.set,
                             width=700, height=400)
-        text.insert(self._tk.INSERT, pop_up_text)
+        text.insert(tkinter.INSERT, pop_up_text)
         text.pack()
         # Configure the scrollbars
         scroll.config(command=text.yview)
-        exit_button = self._tk.Button(
+        exit_button = tkinter.Button(
             window, text="Close", command=window.destroy)
-        exit_button.pack(in_=frame, side=self._tk.RIGHT, padx=20, pady=10)
+        exit_button.pack(in_=frame, side=tkinter.RIGHT, padx=20, pady=10)
 
     def load_default_from_bin(self, bin_data):
         self._old_bin = bin_data
