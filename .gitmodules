@@ -35,3 +35,6 @@
 [submodule "SecurityPkg/DeviceSecurity/SpdmLib/libspdm"]
 	path = SecurityPkg/DeviceSecurity/SpdmLib/libspdm
 	url = https://github.com/DMTF/libspdm.git
+[submodule "ArmPkg/Library/ArmTransferListLib/libtl"]
+	path = ArmPkg/Library/ArmTransferListLib/libtl
+	url = https://review.trustedfirmware.org/shared/transfer-list-library.git
