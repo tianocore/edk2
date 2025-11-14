@@ -252,7 +252,7 @@
 // #define MBEDTLS_PLATFORM_VSNPRINTF_ALT
 // #define MBEDTLS_PLATFORM_NV_SEED_ALT
 // #define MBEDTLS_PLATFORM_SETUP_TEARDOWN_ALT
-// #define MBEDTLS_PLATFORM_MS_TIME_ALT
+#define MBEDTLS_PLATFORM_MS_TIME_ALT
 
 /**
  * Uncomment the macro to let Mbed TLS use your alternate implementation of
@@ -4410,3 +4410,11 @@ mbedtls_free (
 /** \} name SECTION: Module configuration options */
 
 #define MBEDTLS_ALLOW_PRIVATE_ACCESS
+
+/**
+ * \def MBEDTLS_TEST_SW_INET_PTON
+ *
+ * Enable to use inet_pton() software version
+ *
+ */
+#define MBEDTLS_TEST_SW_INET_PTON
