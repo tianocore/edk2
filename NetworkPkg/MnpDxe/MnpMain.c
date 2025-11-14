@@ -517,6 +517,8 @@ MnpTransmit (
   UINT32             PktLen;
   EFI_TPL            OldTpl;
 
+  PktBuf = NULL; // MU_CHANGE - CodeQL Change - conditionallyuninitializedvariable
+
   if ((This == NULL) || (Token == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
