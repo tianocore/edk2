@@ -1985,12 +1985,13 @@ InstallAcpiTableFromAcpiSiliconHob (
   //
   // Initial variable.
   //
-  SiAcpiHobRsdp     = NULL;
-  SiCommonAcpiTable = NULL;
-  AcpiSiliconHob    = GET_GUID_HOB_DATA (GuidHob);
-  Status            = EFI_SUCCESS;
-  Version           = PcdGet32 (PcdAcpiExposedTableVersions);
-  TableKey          = 0;
+  SiAcpiHobRsdp      = NULL;
+  SiCommonAcpiTable  = NULL;
+  AcpiSiliconHob     = GET_GUID_HOB_DATA (GuidHob);
+  Status             = EFI_SUCCESS;
+  Version            = PcdGet32 (PcdAcpiExposedTableVersions);
+  TableKey           = 0;
+  NeedToInstallTable = NULL;
 
   if (PcdGetBool (PcdNoACPIReclaimMemory)) {
     AcpiAllocateMemoryType = EfiACPIMemoryNVS;
@@ -2164,30 +2165,34 @@ InstallAcpiTableFromAcpiSiliconHob (
         NeedToInstallTable = (VOID *)(UINTN)((EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)SocEntryTable)->Dsdt;
       }
 
-      //
-      // if signature can not be found from the XDsdt / Dsdt field then skip it.
-      //
-      if (((EFI_ACPI_DESCRIPTION_HEADER *)NeedToInstallTable)->Signature == EFI_ACPI_3_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE) {
-        Status = AddTableToList (AcpiTableInstance, NeedToInstallTable, TRUE, Version, TRUE, &TableKey);
-        if (EFI_ERROR (Status)) {
-          DEBUG ((DEBUG_ERROR, "Fail to add DSDT in the DXE Table list!\n"));
-          ASSERT_EFI_ERROR (Status);
-          break;
-        } else {
-          Status = PublishTables (AcpiTableInstance, Version);
-          if (!EFI_ERROR (Status)) {
-            //
-            // Add a new table successfully, notify registed callback
-            //
-            if (FeaturePcdGet (PcdInstallAcpiSdtProtocol)) {
-              SdtNotifyAcpiList (AcpiTableInstance, Version, TableKey);
+      if (NeedToInstallTable != NULL) {
+        //
+        // if signature can not be found from the XDsdt / Dsdt field then skip it.
+        //
+        if (((EFI_ACPI_DESCRIPTION_HEADER *)NeedToInstallTable)->Signature == EFI_ACPI_3_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE) {
+          Status = AddTableToList (AcpiTableInstance, NeedToInstallTable, TRUE, Version, TRUE, &TableKey);
+          if (EFI_ERROR (Status)) {
+            DEBUG ((DEBUG_ERROR, "Fail to add DSDT in the DXE Table list!\n"));
+            ASSERT_EFI_ERROR (Status);
+            break;
+          } else {
+            Status = PublishTables (AcpiTableInstance, Version);
+            if (!EFI_ERROR (Status)) {
+              //
+              // Add a new table successfully, notify registed callback
+              //
+              if (FeaturePcdGet (PcdInstallAcpiSdtProtocol)) {
+                SdtNotifyAcpiList (AcpiTableInstance, Version, TableKey);
+              }
             }
-          }
 
-          DEBUG ((DEBUG_INFO, "Installed DSDT in the DXE Table list!\n"));
+            DEBUG ((DEBUG_INFO, "Installed DSDT in the DXE Table list!\n"));
+          }
+        } else {
+          DEBUG ((DEBUG_ERROR, "The DSDT content is not correct, then skip it!\n"));
         }
       } else {
-        DEBUG ((DEBUG_ERROR, "The DSDT content is not correct, then skip it!\n"));
+        DEBUG ((DEBUG_ERROR, "The DSDT Table not initialized during PEI phase yet.\n"));
       }
 
       //
@@ -2199,27 +2204,34 @@ InstallAcpiTableFromAcpiSiliconHob (
         NeedToInstallTable = (VOID *)(UINTN)((EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)SocEntryTable)->FirmwareCtrl;
       }
 
-      if (((EFI_ACPI_DESCRIPTION_HEADER *)NeedToInstallTable)->Signature == EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE) {
-        Status = AddTableToList (AcpiTableInstance, NeedToInstallTable, TRUE, Version, TRUE, &TableKey);
-        if (EFI_ERROR (Status)) {
-          DEBUG ((DEBUG_ERROR, "Fail to add FACS in the DXE Table list!\n"));
-          ASSERT_EFI_ERROR (Status);
-          break;
-        } else {
-          Status = PublishTables (AcpiTableInstance, Version);
-          if (!EFI_ERROR (Status)) {
-            //
-            // Add a new table successfully, notify registed callback
-            //
-            if (FeaturePcdGet (PcdInstallAcpiSdtProtocol)) {
-              SdtNotifyAcpiList (AcpiTableInstance, Version, TableKey);
+      if (NeedToInstallTable != NULL) {
+        //
+        // if signature can not be found from the XFirmwareCtrl / FirmwareCtrl field then skip it.
+        //
+        if (((EFI_ACPI_DESCRIPTION_HEADER *)NeedToInstallTable)->Signature == EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE) {
+          Status = AddTableToList (AcpiTableInstance, NeedToInstallTable, TRUE, Version, TRUE, &TableKey);
+          if (EFI_ERROR (Status)) {
+            DEBUG ((DEBUG_ERROR, "Fail to add FACS in the DXE Table list!\n"));
+            ASSERT_EFI_ERROR (Status);
+            break;
+          } else {
+            Status = PublishTables (AcpiTableInstance, Version);
+            if (!EFI_ERROR (Status)) {
+              //
+              // Add a new table successfully, notify registed callback
+              //
+              if (FeaturePcdGet (PcdInstallAcpiSdtProtocol)) {
+                SdtNotifyAcpiList (AcpiTableInstance, Version, TableKey);
+              }
             }
-          }
 
-          DEBUG ((DEBUG_INFO, "Installed FACS in the DXE Table list!\n"));
+            DEBUG ((DEBUG_INFO, "Installed FACS in the DXE Table list!\n"));
+          }
+        } else {
+          DEBUG ((DEBUG_ERROR, "The FACS content is not correct, then skip it!\n"));
         }
       } else {
-        DEBUG ((DEBUG_ERROR, "The FACS content is not correct, then skip it!\n"));
+        DEBUG ((DEBUG_ERROR, "The FACS Table not initialized during PEI phase yet.\n"));
       }
     }
   }
