@@ -166,7 +166,7 @@ GetFirstPageAttribute (
 }
 
 /**
-  This function recursively traverses the translation table heirarchy to
+  This function recursively traverses the translation table hierarchy to
   synchronise the GCD with the translation table.
 
   @param[in]        TableAddress        The address of the table being processed.
@@ -547,7 +547,7 @@ GetMemoryRegion (
 
   TranslationTable = ArmGetTTBR0BaseAddress ();
 
-  // Initialize the output parameters. These paramaters are only valid if the
+  // Initialize the output parameters. These parameters are only valid if the
   // result is EFI_SUCCESS.
   *RegionLength     = 0;
   *RegionAttributes = 0;
