@@ -1,10 +1,10 @@
 
 === HOW TO USE VTF0 ===
 Add this line to your DSC [Components.IA32] or [Components.X64] section:
-  UefiCpuPkg/ResetVector/Vtf0/ResetVector.inf
+  UefiCpuPkg/ResetVector/Vtf0/Vtf0.inf
 
 Add this line to your FDF FV section:
-  INF  RuleOverride=RESET_VECTOR UefiCpuPkg/ResetVector/Vtf0/ResetVector.inf
+  INF  RuleOverride=RESET_VECTOR UefiCpuPkg/ResetVector/Vtf0/Vtf0.inf
 
 In your FDF FFS file rules sections add:
   [Rule.Common.SEC.RESET_VECTOR]
