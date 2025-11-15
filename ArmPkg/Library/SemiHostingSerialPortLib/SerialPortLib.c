@@ -95,7 +95,7 @@ SerialPortWrite (
 }
 
 /**
-  Read data from serial device and save the datas in buffer.
+  Read data from serial device and save the data in buffer.
 
   @param  Buffer           Point of data buffer which need to be written.
   @param  NumberOfBytes    Number of output bytes which are cached in Buffer.
