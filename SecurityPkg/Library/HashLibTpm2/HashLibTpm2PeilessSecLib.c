@@ -559,7 +559,6 @@ HasLibTpm2PeilessSecLibConstructor (
   TRANSFER_LIST_HEADER             *TransferList;
   VOID                             *EventLog;
   UINTN                            EventLogSize;
-  TCG_PCR_EVENT                    *TcgPcrEvent;
   TCG_EfiSpecIDEventStruct         *TcgEfiSpecIdEventStruct;
   TCG_EfiSpecIdEventAlgorithmSize  *DigestSize;
   UINTN                            Idx;
@@ -585,7 +584,6 @@ HasLibTpm2PeilessSecLibConstructor (
     goto DisableHandler;
   }
 
-  TcgPcrEvent             = (TCG_PCR_EVENT *)EventLog;
   TcgEfiSpecIdEventStruct = (TCG_EfiSpecIDEventStruct *)
                             (EventLog + OFFSET_OF (TCG_PCR_EVENT, Event));
 
