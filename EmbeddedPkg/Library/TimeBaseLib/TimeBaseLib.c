@@ -10,6 +10,7 @@
 
 #include <Uefi/UefiBaseType.h>
 #include <Uefi/UefiSpec.h>
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/TimeBaseLib.h>
 
@@ -23,7 +24,7 @@
 VOID
 EFIAPI
 EpochToEfiTime (
-  IN  UINTN     EpochSeconds,
+  IN  UINT64    EpochSeconds,
   OUT EFI_TIME  *Time
   )
 {
@@ -44,7 +45,7 @@ EpochToEfiTime (
   UINTN  ss;
   UINTN  J;
 
-  J  = (EpochSeconds / 86400) + 2440588;
+  J  = (UINTN)DivU64x32 (EpochSeconds, 86400) + 2440588;
   j  = J + 32044;
   g  = j / 146097;
   dg = j % 146097;
@@ -62,8 +63,8 @@ EpochToEfiTime (
   Time->Month = ((m + 2) % 12) + 1;
   Time->Day   = (UINT8)(d + 1);
 
-  ss = EpochSeconds % 60;
-  a  = (EpochSeconds - ss) / 60;
+  ss = (UINTN)ModU64x32 (EpochSeconds, 60);
+  a  = (UINTN)DivU64x32 ((EpochSeconds - ss), 60);
   mm = a % 60;
   b  = (a - mm) / 60;
   hh = b % 24;
