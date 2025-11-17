@@ -59,7 +59,7 @@ typedef enum _EMMC_DEVICE_STATE {
   EMMC_SLP_STATE
 } EMMC_DEVICE_STATE;
 
-UINT32  mEmmcRcaCount = 0;
+UINT16  mEmmcRcaCount = 0;
 
 STATIC
 EFI_STATUS
@@ -166,7 +166,7 @@ EmmcIdentificationMode (
   }
 
   // Assign a relative address value to the card
-  MmcHostInstance->CardInfo.RCA = ++mEmmcRcaCount; // TODO: might need a more sophisticated way of doing this
+  MmcHostInstance->CardInfo.RCA = ++mEmmcRcaCount;  // TODO: might need a more sophisticated way of doing this
   RCA                           = MmcHostInstance->CardInfo.RCA << RCA_SHIFT_OFFSET;
   Status                        = Host->SendCommand (Host, MMC_CMD3, RCA);
   if (EFI_ERROR (Status)) {
@@ -350,7 +350,7 @@ InitializeSdMmcDevice (
   UINT32                 Response[4];
   UINT32                 Buffer[128];
   UINT32                 Speed;
-  UINTN                  BlockSize;
+  UINT32                 BlockSize;
   UINTN                  CardSize;
   UINTN                  NumBlocks;
   BOOLEAN                CccSwitch;
@@ -386,16 +386,16 @@ InitializeSdMmcDevice (
   if (MmcHostInstance->CardInfo.CardType == SD_CARD_2_HIGH) {
     CardSize  = HC_MMC_CSD_GET_DEVICESIZE (Response);
     NumBlocks = ((CardSize + 1) * 1024);
-    BlockSize = 1 << MMC_CSD_GET_READBLLEN (Response);
+    BlockSize = (UINT32)1 << MMC_CSD_GET_READBLLEN (Response);
   } else {
     CardSize  = MMC_CSD_GET_DEVICESIZE (Response);
-    NumBlocks = (CardSize + 1) * (1 << (MMC_CSD_GET_DEVICESIZEMULT (Response) + 2));
-    BlockSize = 1 << MMC_CSD_GET_READBLLEN (Response);
+    NumBlocks = (CardSize + 1) * ((UINTN)1 << (MMC_CSD_GET_DEVICESIZEMULT (Response) + 2));
+    BlockSize = (UINT32)1 << MMC_CSD_GET_READBLLEN (Response);
   }
 
   // For >=2G card, BlockSize may be 1K, but the transfer size is 512 bytes.
   if (BlockSize > 512) {
-    NumBlocks = MultU64x32 (NumBlocks, BlockSize / 512);
+    NumBlocks = (UINTN)MultU64x32 (NumBlocks, (UINT32)(BlockSize / 512));
     BlockSize = 512;
   }
 
@@ -546,7 +546,7 @@ MmcIdentificationMode (
   EFI_STATUS             Status;
   UINT32                 Response[4];
   UINTN                  Timeout;
-  UINTN                  CmdArg;
+  UINT32                 CmdArg;
   BOOLEAN                IsHCS;
   EFI_MMC_HOST_PROTOCOL  *MmcHost;
   OCR_RESPONSE           OcrResponse;
@@ -663,7 +663,7 @@ MmcIdentificationMode (
       }
 
       // Note: The first time CmdArg will be zero
-      CmdArg = ((UINTN *)&(MmcHostInstance->CardInfo.OCRData))[0];
+      CmdArg = ((UINT32 *)&(MmcHostInstance->CardInfo.OCRData))[0];
       if (IsHCS) {
         CmdArg |= BIT30;
       }
@@ -769,7 +769,7 @@ MmcIdentificationMode (
   if (MmcHostInstance->CardInfo.CardType != MMC_CARD) {
     MmcHostInstance->CardInfo.RCA = Response[0] >> 16;
   } else {
-    MmcHostInstance->CardInfo.RCA = CmdArg;
+    MmcHostInstance->CardInfo.RCA = (UINT16)CmdArg;
   }
 
   Status = MmcNotifyState (MmcHostInstance, MmcStandByState);
@@ -788,7 +788,7 @@ InitializeMmcDevice (
 {
   EFI_STATUS             Status;
   EFI_MMC_HOST_PROTOCOL  *MmcHost;
-  UINTN                  BlockCount;
+  UINT32                 BlockCount;
 
   BlockCount = 1;
   MmcHost    = MmcHostInstance->MmcHost;
