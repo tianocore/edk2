@@ -109,6 +109,35 @@ IoMmuCommonInitialise (
   );
 
 /**
+  Set IOMMU attributes for accessing system memory.
+
+  @param[in]  DeviceHandle      The device who initiates the DMA access request.
+  @param[in]  Mapping           The mapping value returned from Map().
+  @param[in]  IoMmuAccess       The IOMMU access.
+
+  @retval EFI_SUCCESS            The IoMmuAccess is set for the memory range specified by DeviceAddress and Length.
+  @retval EFI_DEVICE_ERROR       The IOMMU device reported an error while attempting the operation.
+
+**/
+EFI_STATUS
+RiscVIoMmuSetAttributeWorker (
+  IN RISCV_IOMMU_CONTEXT    *IoMmuContext,
+  IN RISCV_IOMMU_DEVICE_ID  *IoMmuDeviceId,
+  IN EFI_PHYSICAL_ADDRESS   DeviceAddress,
+  IN UINTN                  Length,
+  IN UINT64                 IoMmuAccess
+  );
+
+/**
+  Probe hardware driven queues for problems.
+
+**/
+EFI_STATUS
+ProbeHardwareQueuesForFaults (
+  IN RISCV_IOMMU_CONTEXT  *IoMmuContext
+  );
+
+/**
   Set IOMMU attribute for a system memory.
 
   If the IOMMU protocol exists, the system memory cannot be used

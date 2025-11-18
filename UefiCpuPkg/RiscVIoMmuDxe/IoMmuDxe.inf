@@ -22,6 +22,8 @@
   RiscVIoMmuDxe.c
   IoMmuDetection.c
   IoMmuProtocol.c
+  IoMmuDeviceContext.c
+  IoMmuQueues.c
   Utilities.c
   AsmUtilities.S
 
@@ -29,6 +31,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -39,6 +42,7 @@
   HobLib
   IoLib
   MemoryAllocationLib
+  RiscVMmuLib
   TimerLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
