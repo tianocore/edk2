@@ -3,7 +3,7 @@
 
   Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
   Copyright (c) 2016 - 2024, Arm Limited. All rights reserved.
-  Copyright (c) 2022, AMD Incorporated. All rights reserved.
+  Copyright (C) 2022 - 2026, Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -789,6 +789,27 @@ ParseAcpiFacs (
 VOID
 EFIAPI
 ParseAcpiFadt (
+  IN BOOLEAN  Trace,
+  IN UINT8    *Ptr,
+  IN UINT32   AcpiTableLength,
+  IN UINT8    AcpiTableRevision
+  );
+
+/**
+  This function parses the ACPI FPDT table.
+  This function parses the FPDT table and optionally traces the ACPI
+  table fields.
+
+  This function also performs validation of the ACPI table fields.
+
+  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] Ptr                Pointer to the start of the buffer.
+  @param [in] AcpiTableLength    Length of the ACPI table.
+  @param [in] AcpiTableRevision  Revision of the ACPI table.
+**/
+VOID
+EFIAPI
+ParseAcpiFpdt (
   IN BOOLEAN  Trace,
   IN UINT8    *Ptr,
   IN UINT32   AcpiTableLength,
