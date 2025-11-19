@@ -55,7 +55,9 @@ MemInfoCallbackMmio (
   //
   // Skip types already handled in MemInfoCallback
   //
-  if ((MemoryMapEntry->Type == E820_RAM) || (MemoryMapEntry->Type == E820_ACPI)) {
+  if ((MemoryMapEntry->Type == E820_RAM) || (MemoryMapEntry->Type == E820_ACPI) ||
+      (MemoryMapEntry->Type == E820_SOFT_RESERVED))
+  {
     return EFI_SUCCESS;
   }
 
@@ -298,7 +300,7 @@ MemInfoCallback (
   // It will be added later.
   //
   if ((MemoryMapEntry->Type != E820_RAM) && (MemoryMapEntry->Type != E820_ACPI) &&
-      (MemoryMapEntry->Type != E820_NVS))
+      (MemoryMapEntry->Type != E820_NVS) && (MemoryMapEntry->Type != E820_SOFT_RESERVED))
   {
     return RETURN_SUCCESS;
   }
@@ -314,6 +316,10 @@ MemInfoCallback (
               EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
               EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
               EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE;
+
+  if (MemoryMapEntry->Type == E820_SOFT_RESERVED) {
+    Attribute |= EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE;
+  }
 
   BuildResourceDescriptorHob (Type, Attribute, (EFI_PHYSICAL_ADDRESS)Base, Size);
   DEBUG ((DEBUG_INFO, "buildhob: base = 0x%lx, size = 0x%lx, type = 0x%x\n", Base, Size, Type));
