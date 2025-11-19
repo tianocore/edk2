@@ -20,6 +20,45 @@
 #include <Coreboot.h>
 
 /**
+  Map a coreboot memory type to the E820-style encoding used by UefiPayloadEntry.
+
+  The numeric values must stay in sync with the E820_* definitions in UefiPayloadEntry.h.
+
+**/
+STATIC
+UINT8
+CbMemTypeToE820Type (
+  IN UINT32  CbType
+  )
+{
+  switch (CbType) {
+    case CB_MEM_RAM:
+      return 1;  // E820_RAM
+    case CB_MEM_RESERVED:
+      return 2;  // E820_RESERVED
+    case CB_MEM_ACPI:
+      return 3;  // E820_ACPI
+    case CB_MEM_NVS:
+      return 4;  // E820_NVS
+    case CB_MEM_UNUSABLE:
+      return 5;  // E820_UNUSABLE
+    //
+    // Vendor-reserved and table ranges are still DRAM from coreboot's point of
+    // view and must not be treated as "disabled" memory. Describe them as
+    // reserved memory to the E820 consumer.
+    //
+    case CB_MEM_VENDOR_RSVD:
+    case CB_MEM_TABLE:
+      return 2;  // E820_RESERVED
+    default:
+      //
+      // Anything unknown should not be given to the OS as usable.
+      //
+      return 8;  // E820_UNDEFINED
+  }
+}
+
+/**
   Convert a packed value from cbuint64 to a UINT64 value.
 
   @param  val      The pointer to packed data.
@@ -400,7 +439,7 @@ ParseMemoryInfo (
     Range          = MEM_RANGE_PTR (Rec, Index);
     MemoryMap.Base = cb_unpack64 (Range->start);
     MemoryMap.Size = cb_unpack64 (Range->size);
-    MemoryMap.Type = (UINT8)Range->type;
+    MemoryMap.Type = CbMemTypeToE820Type (Range->type);
     MemoryMap.Flag = 0;
     MemInfoCallback (&MemoryMap, Params);
   }
