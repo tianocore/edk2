@@ -151,7 +151,13 @@ typedef struct {
 //
 // Macro that returns the byte offset of a field in a data structure.
 //
-#define OFFSET_OF(TYPE, Field) ((UINTN) &(((TYPE *)0)->Field))
+#if defined (__GNUC__) || defined (__clang__)
+#define OFFSET_OF(TYPE, Field)  ((UINTN) __builtin_offsetof(TYPE, Field))
+#endif
+
+#ifndef OFFSET_OF
+#define OFFSET_OF(TYPE, Field)  ((UINTN) &(((TYPE *)0)->Field))
+#endif
 
 ///
 ///  _CR - returns a pointer to the structure
