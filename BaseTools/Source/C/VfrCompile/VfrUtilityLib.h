@@ -116,7 +116,7 @@ struct SVfrDataField {
   CHAR8                     mFieldName[MAX_NAME_LEN];
   SVfrDataType              *mFieldType;
   UINT32                    mOffset;
-  UINT32                    mArrayNum;
+  UINT32                    mArrayNum; ///< Holds array length, or zero for non-array.
   BOOLEAN                   mIsBitField;
   UINT8                     mBitWidth;
   UINT32                    mBitOffset;
@@ -201,7 +201,7 @@ private:
   EFI_VFR_RETURN_CODE ExtractStructTypeName (IN CHAR8 *&, OUT CHAR8 *);
   EFI_VFR_RETURN_CODE GetTypeField (IN CONST CHAR8 *, IN SVfrDataType *, IN SVfrDataField *&);
   EFI_VFR_RETURN_CODE GetFieldOffset (IN SVfrDataField *, IN UINT32, OUT UINT32 &, IN BOOLEAN);
-  UINT8               GetFieldWidth (IN SVfrDataField *);
+  UINT8               GetFieldType (IN SVfrDataField *);
   UINT32              GetFieldSize (IN SVfrDataField *, IN UINT32, IN BOOLEAN);
 
 public:
@@ -220,7 +220,7 @@ public:
   EFI_VFR_RETURN_CODE GetDataFieldInfo (IN CHAR8 *, OUT UINT16 &, OUT UINT8 &, OUT UINT32 &, OUT BOOLEAN &);
 
   EFI_VFR_RETURN_CODE GetUserDefinedTypeNameList (OUT CHAR8 ***, OUT UINT32 *);
-  EFI_VFR_RETURN_CODE ExtractFieldNameAndArrary (IN CHAR8 *&, OUT CHAR8 *, OUT UINT32 &);
+  EFI_VFR_RETURN_CODE ExtractFieldNameAndArrayIdx (IN CHAR8 *&, OUT CHAR8 *, OUT UINT32 &);
   BOOLEAN             DataTypeHasBitField (IN  CHAR8 *);
   BOOLEAN             IsThisBitField (IN  CHAR8 *);
 
