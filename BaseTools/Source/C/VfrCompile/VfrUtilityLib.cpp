@@ -1201,6 +1201,20 @@ CVfrVarDataTypeDB::DataTypeAddBitField (
 
   mNewDataType->mAlign     = MIN (mPackAlign, MAX (pFieldType->mAlign, mNewDataType->mAlign));
   mNewDataType->mHasBitField = TRUE;
+
+  printf("+BIT pNewField=%p mFieldName=%s mBitWidth=%u mOffset=%u mArrayNum=%u mAlign=%u mPackAlign=%u: mNewDataType mTotalSize=%u mAlign=%u mHasBitField=%u\n",
+    pNewField,
+    pNewField->mFieldName,
+    pNewField->mIsBitField ? pNewField->mBitWidth : 0,
+    pNewField->mOffset,
+    pNewField->mArrayNum,
+    pFieldType->mAlign,
+    mPackAlign,
+    mNewDataType->mTotalSize,
+    mNewDataType->mAlign,
+    mNewDataType->mHasBitField
+  );
+
   return VFR_RETURN_SUCCESS;
 }
 
@@ -1266,6 +1280,19 @@ CVfrVarDataTypeDB::DataTypeAddField (
   } else {
     mNewDataType->mTotalSize = pNewField->mOffset + (pNewField->mFieldType->mTotalSize) * ((ArrayNum == 0) ? 1 : ArrayNum);
   }
+
+  printf("-BIT pNewField=%p mFieldName=%s mBitWidth=%u mOffset=%u mArrayNum=%u mAlign=%u mPackAlign=%u: mNewDataType mTotalSize=%u mAlign=%u mHasBitField=%u\n",
+    pNewField,
+    pNewField->mFieldName,
+    pNewField->mIsBitField ? pNewField->mBitWidth : 0,
+    pNewField->mOffset,
+    pNewField->mArrayNum,
+    pFieldType->mAlign,
+    mPackAlign,
+    mNewDataType->mTotalSize,
+    mNewDataType->mAlign,
+    mNewDataType->mHasBitField
+  );
 
   return VFR_RETURN_SUCCESS;
 }
@@ -1421,6 +1448,14 @@ CVfrVarDataTypeDB::GetDataFieldInfo (
     Type   = GetFieldType (pField);
     Size   = GetFieldSize (pField, ArrayIdx, BitField);
   }
+
+  printf("GetDataFieldInfo(%s) Offset=%u Type=%u Size=%u BitField=%u\n",
+    VarStrName,
+    Offset,
+    Type,
+    Size,
+    BitField
+  );
 
   return VFR_RETURN_SUCCESS;
 }
