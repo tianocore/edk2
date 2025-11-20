@@ -904,7 +904,7 @@ vfrExtensionData[UINT8 *DataBuff, UINT32 Size, CHAR8 *TypeName, UINT32 TypeSize,
                  Data_U8 = _STOU8(RD->getText(), RD->getLine());
                  if (BitField) {
                    //
-                   // Set the value to the bit fileds.
+                   // Set the value to the bit fields.
                    //
                    Value = *(UINT8*) (ByteOffset + Offset);
                    Data_U8 <<= PreBits;
