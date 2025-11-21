@@ -1403,22 +1403,25 @@ CVfrVarDataTypeDB::GetDataFieldInfo (
   //
   // if it is not struct data type
   //
-  Type  = pType->mType;
-  Size  = pType->mTotalSize;
-
-  while (*VarStr != '\0') {
-    CHECK_ERROR_RETURN(ExtractFieldNameAndArrary(VarStr, FName, ArrayIdx), VFR_RETURN_SUCCESS);
-    CHECK_ERROR_RETURN(GetTypeField (FName, pType, pField), VFR_RETURN_SUCCESS);
-    pType  = pField->mFieldType;
-    CHECK_ERROR_RETURN(GetFieldOffset (pField, ArrayIdx, Tmp, pField->mIsBitField), VFR_RETURN_SUCCESS);
-    if (BitField && !pField->mIsBitField) {
-      Offset = (UINT16) (Offset + Tmp * 8);
-    } else {
-      Offset = (UINT16) (Offset + Tmp);
+  if (*VarStr == '\0') {
+    Type  = pType->mType;
+    Size  = pType->mTotalSize;
+  } else {
+    while (*VarStr != '\0') {
+      CHECK_ERROR_RETURN(ExtractFieldNameAndArrary(VarStr, FName, ArrayIdx), VFR_RETURN_SUCCESS);
+      CHECK_ERROR_RETURN(GetTypeField (FName, pType, pField), VFR_RETURN_SUCCESS);
+      pType  = pField->mFieldType;
+      CHECK_ERROR_RETURN(GetFieldOffset (pField, ArrayIdx, Tmp, pField->mIsBitField), VFR_RETURN_SUCCESS);
+      if (BitField && !pField->mIsBitField) {
+        Offset = (UINT16) (Offset + Tmp * 8);
+      } else {
+        Offset = (UINT16) (Offset + Tmp);
+      }
     }
     Type   = GetFieldWidth (pField);
     Size   = GetFieldSize (pField, ArrayIdx, BitField);
   }
+
   return VFR_RETURN_SUCCESS;
 }
 
