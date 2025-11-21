@@ -57,7 +57,10 @@ BmDelPartMatchInstance (
       }
     }
 
-    FreePool (Instance);
+    if (Instance != NULL) {
+      FreePool (Instance);
+    }
+
     Instance      = GetNextDevicePathInstance (&Multi, &InstanceSize);
     InstanceSize -= END_DEVICE_PATH_LENGTH;
   }
