@@ -51,28 +51,17 @@ MapGcdMmioSpace (
 {
   EFI_STATUS  Status;
 
-  Status = gDS->AddMemorySpace (
+  Status = gDS->AddMemorySpaceV2 (                 // [CODE_FIRST] 11627
                   EfiGcdMemoryTypeMemoryMappedIo,
                   Base,
                   Size,
-                  EFI_MEMORY_UC
+                  EFI_MEMORY_UC,                   // [CODE_FIRST] 11627
+                  EFI_MEMORY_UC                    // [CODE_FIRST] 11627
                   );
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
       "%a: failed to add GCD memory space for region [0x%Lx+0x%Lx)\n",
-      __func__,
-      Base,
-      Size
-      ));
-    return Status;
-  }
-
-  Status = gDS->SetMemorySpaceAttributes (Base, Size, EFI_MEMORY_UC);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: failed to set memory space attributes for region [0x%Lx+0x%Lx)\n",
       __func__,
       Base,
       Size

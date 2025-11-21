@@ -417,6 +417,53 @@ EFI_STATUS
   IN UINT64                Capabilities
   );
 
+/**                                                                                                 // [CODE_FIRST] 11627
+  Adds reserved memory, system memory, or memory-mapped I/O resources to the                        // [CODE_FIRST] 11627
+  global coherency domain of the processor with the attributes specified.                           // [CODE_FIRST] 11627
+                                                                                                    // [CODE_FIRST] 11627
+  @param  GcdMemoryType    The type of memory resource being added.                                 // [CODE_FIRST] 11627
+  @param  BaseAddress      The physical address that is the start address                           // [CODE_FIRST] 11627
+                           of the memory resource being added.                                      // [CODE_FIRST] 11627
+  @param  Length           The size, in bytes, of the memory resource that                          // [CODE_FIRST] 11627
+                           is being added.                                                          // [CODE_FIRST] 11627
+  @param  Capabilities     The bit mask of attributes that the memory                               // [CODE_FIRST] 11627
+                           resource region supports.                                                // [CODE_FIRST] 11627
+  @param  Attributes       The bit mask of attributes to set for the memory region.                 // [CODE_FIRST] 11627
+                                                                                                    // [CODE_FIRST] 11627
+  @retval EFI_SUCCESS            The memory resource was added to the global                        // [CODE_FIRST] 11627
+                                 coherency domain of the processor.                                 // [CODE_FIRST] 11627
+  @retval EFI_INVALID_PARAMETER  GcdMemoryType is invalid.                                          // [CODE_FIRST] 11627
+  @retval EFI_INVALID_PARAMETER  Length is zero.                                                    // [CODE_FIRST] 11627
+  @retval EFI_OUT_OF_RESOURCES   There are not enough system resources to add                       // [CODE_FIRST] 11627
+                                 the memory resource to the global coherency                        // [CODE_FIRST] 11627
+                                 domain of the processor.                                           // [CODE_FIRST] 11627
+  @retval EFI_UNSUPPORTED        The processor does not support one or more bytes                   // [CODE_FIRST] 11627
+                                 of the memory resource range specified by                          // [CODE_FIRST] 11627
+                                 BaseAddress and Length.                                            // [CODE_FIRST] 11627
+  @retval EFI_ACCESS_DENIED      One or more bytes of the memory resource range                     // [CODE_FIRST] 11627
+                                 specified by BaseAddress and Length conflicts                      // [CODE_FIRST] 11627
+                                 with a memory resource range that was previously                   // [CODE_FIRST] 11627
+                                 added to the global coherency domain of the processor.             // [CODE_FIRST] 11627
+  @retval EFI_ACCESS_DENIED      One or more bytes of the memory resource range                     // [CODE_FIRST] 11627
+                                 specified by BaseAddress and Length was allocated                  // [CODE_FIRST] 11627
+                                 in a prior call to AllocateMemorySpace().                          // [CODE_FIRST] 11627
+  @retval EFI_UNSUPPORTED        The bit mask of attributes is not support for the memory resource  // [CODE_FIRST] 11627
+                                 range specified by BaseAddress and Length.                         // [CODE_FIRST] 11627
+  @retval EFI_ACCESS_DENIED      The attributes for the memory resource range specified by          // [CODE_FIRST] 11627
+                                 BaseAddress and Length cannot be modified.                         // [CODE_FIRST] 11627
+                                                                                                    // [CODE_FIRST] 11627
+**/// [CODE_FIRST] 11627
+typedef    // [CODE_FIRST] 11627
+EFI_STATUS // [CODE_FIRST] 11627
+(EFIAPI *EFI_ADD_MEMORY_SPACEV2)(
+                                 // [CODE_FIRST] 11627
+  IN EFI_GCD_MEMORY_TYPE   GcdMemoryType,                                                           // [CODE_FIRST] 11627
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,                                                             // [CODE_FIRST] 11627
+  IN UINT64                Length,                                                                  // [CODE_FIRST] 11627
+  IN UINT64                Capabilities,                                                            // [CODE_FIRST] 11627
+  IN UINT64                Attributes                                                               // [CODE_FIRST] 11627
+  );                                                                                                // [CODE_FIRST] 11627
+
 /**
   Returns a map of the memory resources in the global coherency domain of the
   processor.
@@ -733,6 +780,7 @@ typedef struct {
   // Extensions to Global Coherency Domain Services
   //
   EFI_SET_MEMORY_SPACE_CAPABILITIES    SetMemorySpaceCapabilities;
+  EFI_ADD_MEMORY_SPACEV2               AddMemorySpaceV2; // [CODE_FIRST] 11627
 } DXE_SERVICES;
 
 typedef DXE_SERVICES EFI_DXE_SERVICES;
