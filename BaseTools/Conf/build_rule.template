@@ -706,9 +706,13 @@
     <OutputFile.XCODE>
         $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc
 
-    <Command.MSFT, Command.INTEL, Command.CLANGPDB>
+    <Command.MSFT, Command.INTEL>
         "$(GENFW)" -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiipackage $(HII_BINARY_PACKAGES) $(GENFW_FLAGS)
         "$(RC)" /Fo${dst} $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc
+
+    <Command.CLANGPDB>
+        "$(GENFW)" -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiipackage $(HII_BINARY_PACKAGES) $(GENFW_FLAGS)
+        "$(RC)" /Fo${dst} -- $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc
 
     <Command.GCC>
         "$(GENFW)" -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiibinpackage $(HII_BINARY_PACKAGES) $(GENFW_FLAGS)
