@@ -1,5 +1,5 @@
 /** @file
-  Function to create page talbe.
+  Function to create page table.
   Only create page table for x64, and leave the CreatePageTable empty for Ia32.
   Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
