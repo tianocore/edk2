@@ -1,27 +1,27 @@
-#/** @file
+## @file
+#  Provides Payload Entry based Memory Allocation Library.
 #
 #  Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
-#
-#
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = HobLib
-  FILE_GUID                      = AD6B4D55-8DBE-48C8-88E3-CFDBB6E9D193
-  MODULE_TYPE                    = BASE
+  BASE_NAME                      = MemoryAllocationLib
+  FILE_GUID                      = F883AE99-22AB-4820-A4C3-45F8B91F1E38
+  MODULE_TYPE                    = SEC
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = HobLib
+  LIBRARY_CLASS                  = MemoryAllocationLib
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 [Sources.common]
-  Hob.c
+  MemoryAllocation.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -32,8 +32,5 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+  HobLib
   PayloadEntryHelperLib
-
-[Guids]
-  gEfiHobMemoryAllocModuleGuid
-  gEfiHobMemoryAllocStackGuid
