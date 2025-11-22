@@ -741,7 +741,7 @@ MpInitLibEnableDisableAP (
 }
 
 /**
-  This funtion will try to invoke platform specific microcode shadow logic to
+  This function will try to invoke platform specific microcode shadow logic to
   relocate microcode update patches into memory.
 
   @param[in, out] CpuMpData  The pointer to CPU MP Data structure.
