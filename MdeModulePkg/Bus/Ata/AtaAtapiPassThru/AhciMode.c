@@ -622,9 +622,10 @@ AhciWaitDeviceReady (
 
   //
   // According to SATA1.0a spec section 5.2, we need to wait for PxTFD.BSY and PxTFD.DRQ
-  // and PxTFD.ERR to be zero. The maximum wait time is 16s which is defined at ATA spec.
+  // and PxTFD.ERR to be zero. The maximum wait time is configurable and determined by
+  // PCD PcdSataDeviceReadyTimeout.
   //
-  PhyDetectDelay = 16 * 1000;
+  PhyDetectDelay = PcdGet8 (PcdSataDeviceReadyTimeout) * 1000;
   do {
     Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SERR;
     if (AhciReadReg (PciIo, Offset) != 0) {
