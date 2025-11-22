@@ -101,7 +101,7 @@ steps:
 #   are all resolved.
 - template: basetools-build-steps.yml
   parameters:
-    tool_chain_tag: ${{ parameters.tool_chain_tag }}
+    tool_chain_tag: GCC5
 
 # Potential Extra steps
 - ${{ parameters.extra_install_step }}

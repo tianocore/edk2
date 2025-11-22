@@ -84,7 +84,7 @@ steps:
 #   are all resolved.
 - template: basetools-build-steps.yml
   parameters:
-    tool_chain_tag: ${{ parameters.tool_chain_tag }}
+    tool_chain_tag: GCC5
 
 - task: CmdLine@1
   displayName: Build and Test ${{ parameters.build_pkgs }} ${{ parameters.build_archs}}
