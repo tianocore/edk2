@@ -19,7 +19,7 @@ variables:
 jobs:
 - template: templates/pr-gate-build-job.yml
   parameters:
-    tool_chain_tag: 'GCC5'
+    tool_chain_tag: 'CLANGDWARF'
     vm_image: 'ubuntu-24.04'
     container: ${{ variables.default_linux_image }}
     arch_list: "IA32,X64,AARCH64,RISCV64,LOONGARCH64"

@@ -199,7 +199,7 @@ jobs:
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
       parameters:
-        tool_chain_tag: GCC5
+        tool_chain_tag: CLANGPDB
         build_pkg: $(package)
         build_target: $(Build.Target)
         build_arch: $(Build.Arch)
