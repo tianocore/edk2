@@ -508,12 +508,16 @@ GetSupportedSchema (
   }
 
   if (Count == 0) {
+    FreePool (SupportedLanguages);
+
     return EFI_NOT_FOUND;
   }
 
   SupportedSchema->Count      = Count;
   SupportedSchema->SchemaList = AllocatePool (sizeof (CHAR8 *) * Count);
   if (SupportedSchema->SchemaList == NULL) {
+    FreePool (SupportedLanguages);
+
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -538,6 +542,8 @@ GetSupportedSchema (
 
     ++Index;
   }
+
+  FreePool (SupportedLanguages);
 
   return EFI_SUCCESS;
 }

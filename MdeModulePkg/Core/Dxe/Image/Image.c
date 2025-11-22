@@ -200,7 +200,9 @@ CoreInitializeImageServices (
       //
       // Find Dxe Core HOB
       //
-      break;
+      if (CompareGuid (&DxeCoreHob.MemoryAllocationModule->ModuleName, &gEfiCallerIdGuid)) {
+        break;
+      }
     }
 
     DxeCoreHob.Raw = GET_NEXT_HOB (DxeCoreHob);
@@ -627,7 +629,6 @@ CoreLoadPeImage (
       Image->ImageContext.ImageDataMemoryType = EfiBootServicesData;
       break;
     case EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER:
-    case EFI_IMAGE_SUBSYSTEM_SAL_RUNTIME_DRIVER:
       Image->ImageContext.ImageCodeMemoryType = EfiRuntimeServicesCode;
       Image->ImageContext.ImageDataMemoryType = EfiRuntimeServicesData;
       break;

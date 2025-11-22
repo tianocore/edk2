@@ -227,7 +227,7 @@ RendezvousFunnelProcEnd:
 AsmRelocateApLoopGenericStart:
     mov        eax, cr0
     btr        eax, 31             ; Clear CR0.PG
-    mov        cr0, eax            ; Disable paging since the page table might be unavailiable
+    mov        cr0, eax            ; Disable paging since the page table might be unavailable
 
     mov        eax, esp
     mov        esp, [eax + 12]     ; TopOfApStack

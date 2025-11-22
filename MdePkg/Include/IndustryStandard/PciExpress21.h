@@ -348,7 +348,8 @@ typedef union {
     UINT32    LowerSkpOsReception       : 7;
     UINT32    RetimerPresenceDetect     : 1;
     UINT32    TwoRetimersPresenceDetect : 1;
-    UINT32    Reserved2                 : 6;
+    UINT32    FRAPresenceDetect         : 1;
+    UINT32    Reserved2                 : 5;
     UINT32    DrsSupported              : 1;
   } Bits;
   UINT32    Uint32;

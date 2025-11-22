@@ -359,7 +359,7 @@ CheckX509Certificate (
   //
   Status = ReadFileContent (X509FileContext->FHandle, (VOID **)&X509Data, &X509DataSize, 0);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Error occured while reading the file.\n"));
+    DEBUG ((DEBUG_ERROR, "Error occurred while reading the file.\n"));
     goto ON_EXIT;
   }
 
@@ -367,7 +367,7 @@ CheckX509Certificate (
   // Parse the public key context.
   //
   if (RsaGetPublicKeyFromX509 (X509Data, X509DataSize, &X509PubKey) == FALSE) {
-    DEBUG ((DEBUG_ERROR, "Error occured while parsing the pubkey from certificate.\n"));
+    DEBUG ((DEBUG_ERROR, "Error occurred while parsing the pubkey from certificate.\n"));
     Status = EFI_INVALID_PARAMETER;
     *Error = Unsupported_Type;
     goto ON_EXIT;
