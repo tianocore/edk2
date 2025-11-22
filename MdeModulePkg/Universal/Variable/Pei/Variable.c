@@ -1433,7 +1433,6 @@ BuildVariableRuntimeCacheInfoHob (
 {
   VARIABLE_RUNTIME_CACHE_INFO  TempHobBuffer;
   VARIABLE_RUNTIME_CACHE_INFO  *VariableRuntimeCacheInfo;
-  EFI_STATUS                   Status;
   VOID                         *Buffer;
   UINTN                        BufferSize;
   BOOLEAN                      NvAuthFlag;
@@ -1442,18 +1441,11 @@ BuildVariableRuntimeCacheInfoHob (
   ZeroMem (&TempHobBuffer, sizeof (VARIABLE_RUNTIME_CACHE_INFO));
 
   //
-  // AllocateRuntimePages for CACHE_INFO_FLAG and unblock it.
+  // AllocatePages for CACHE_INFO_FLAG buffer (will be relocated to runtime by DXE).
   //
   Pages  = EFI_SIZE_TO_PAGES (sizeof (CACHE_INFO_FLAG));
-  Buffer = AllocateRuntimePages (Pages);
+  Buffer = AllocatePages (Pages);
   ASSERT (Buffer != NULL);
-  Status = MmUnblockMemoryRequest (
-             (EFI_PHYSICAL_ADDRESS)(UINTN)Buffer,
-             Pages
-             );
-  if ((Status != EFI_UNSUPPORTED) && EFI_ERROR (Status)) {
-    return Status;
-  }
 
   TempHobBuffer.CacheInfoFlagBuffer = (UINTN)Buffer;
   DEBUG ((
@@ -1464,20 +1456,13 @@ BuildVariableRuntimeCacheInfoHob (
     ));
 
   //
-  // AllocateRuntimePages for VolatileCache and unblock it.
+  // AllocatePages for VolatileCache buffer (will be relocated to runtime by DXE).
   //
   BufferSize = PcdGet32 (PcdVariableStoreSize);
   if (BufferSize > 0) {
     Pages  = EFI_SIZE_TO_PAGES (BufferSize);
-    Buffer = AllocateRuntimePages (Pages);
+    Buffer = AllocatePages (Pages);
     ASSERT (Buffer != NULL);
-    Status = MmUnblockMemoryRequest (
-               (EFI_PHYSICAL_ADDRESS)(UINTN)Buffer,
-               Pages
-               );
-    if ((Status != EFI_UNSUPPORTED) && EFI_ERROR (Status)) {
-      return Status;
-    }
 
     TempHobBuffer.RuntimeVolatileCacheBuffer = (UINTN)Buffer;
     TempHobBuffer.RuntimeVolatileCachePages  = Pages;
@@ -1491,20 +1476,13 @@ BuildVariableRuntimeCacheInfoHob (
     ));
 
   //
-  // AllocateRuntimePages for NVCache and unblock it.
+  // AllocatePages for NVCache buffer (will be relocated to runtime by DXE).
   //
   BufferSize = CalculateNvVariableCacheSize (&NvAuthFlag);
   if (BufferSize > 0) {
     Pages  = EFI_SIZE_TO_PAGES (BufferSize);
-    Buffer = AllocateRuntimePages (Pages);
+    Buffer = AllocatePages (Pages);
     ASSERT (Buffer != NULL);
-    Status = MmUnblockMemoryRequest (
-               (EFI_PHYSICAL_ADDRESS)(UINTN)Buffer,
-               Pages
-               );
-    if ((Status != EFI_UNSUPPORTED) && EFI_ERROR (Status)) {
-      return Status;
-    }
 
     TempHobBuffer.RuntimeNvCacheBuffer = (UINTN)Buffer;
     TempHobBuffer.RuntimeNvCachePages  = Pages;
@@ -1518,20 +1496,13 @@ BuildVariableRuntimeCacheInfoHob (
     ));
 
   //
-  // AllocateRuntimePages for HobCache and unblock it.
+  // AllocatePages for HobCache buffer (will be relocated to runtime by DXE).
   //
   BufferSize = CalculateHobVariableCacheSize (NvAuthFlag);
   if (BufferSize > 0) {
     Pages  = EFI_SIZE_TO_PAGES (BufferSize);
-    Buffer = AllocateRuntimePages (Pages);
+    Buffer = AllocatePages (Pages);
     ASSERT (Buffer != NULL);
-    Status = MmUnblockMemoryRequest (
-               (EFI_PHYSICAL_ADDRESS)(UINTN)Buffer,
-               Pages
-               );
-    if ((Status != EFI_UNSUPPORTED) && EFI_ERROR (Status)) {
-      return Status;
-    }
 
     TempHobBuffer.RuntimeHobCacheBuffer = (UINTN)Buffer;
     TempHobBuffer.RuntimeHobCachePages  = Pages;
