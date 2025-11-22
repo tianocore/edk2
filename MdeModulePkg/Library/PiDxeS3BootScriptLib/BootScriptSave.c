@@ -650,7 +650,7 @@ S3BootScriptLibDeinitialize (
 /**
   To get the start address from which a new boot time s3 boot script entry will write into.
   If the table is not exist, the functio will first allocate a buffer for the table
-  If the table buffer is not enough for the new entry, in non-smm mode, the funtion will
+  If the table buffer is not enough for the new entry, in non-smm mode, the function will
   invoke reallocate to enlarge buffer.
 
   @param EntryLength      the new entry length.
