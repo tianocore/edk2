@@ -55,6 +55,11 @@ steps:
 
 # trim the package list if this is a PR
 - task: CmdLine@1
+  displayName: pwd
+  inputs:
+    filename: pwd
+
+- task: CmdLine@1
   displayName: Check if ${{ parameters.build_pkgs }} need testing
   inputs:
     filename: stuart_pr_eval
@@ -66,11 +71,21 @@ steps:
 
 # Build repo
 - task: CmdLine@1
+  displayName: pwd
+  inputs:
+    filename: pwd
+
+- task: CmdLine@1
   displayName: Setup ${{ parameters.build_pkgs }} ${{ parameters.build_archs}}
   inputs:
     filename: stuart_setup
     arguments: -c .pytool/CISettings.py -p $(pkgs_to_build) -t ${{ parameters.build_targets}} -a ${{ parameters.build_archs}} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}}
   condition: and(gt(variables.pkg_count, 0), succeeded())
+
+- task: CmdLine@1
+  displayName: pwd
+  inputs:
+    filename: pwd
 
 - task: CmdLine@1
   displayName: Update ${{ parameters.build_pkgs }} ${{ parameters.build_archs}}
@@ -85,6 +100,11 @@ steps:
 - template: basetools-build-steps.yml
   parameters:
     tool_chain_tag: ${{ parameters.tool_chain_tag }}
+
+- task: CmdLine@1
+  displayName: pwd
+  inputs:
+    filename: pwd
 
 - task: CmdLine@1
   displayName: Build and Test ${{ parameters.build_pkgs }} ${{ parameters.build_archs}}

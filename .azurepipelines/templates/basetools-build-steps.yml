@@ -11,6 +11,11 @@ parameters:
 
 steps:
 - task: CmdLine@1
+  displayName: pwd
+  inputs:
+    filename: pwd
+
+- task: CmdLine@1
   displayName: Build Base Tools from source
   inputs:
     filename: python
