@@ -51,6 +51,8 @@ ArmFfaSecLibConstructor (
   EFI_STATUS                 Status;
   ARM_FFA_RX_TX_BUFFER_INFO  *BufferInfo;
   EFI_HOB_MEMORY_ALLOCATION  *RxTxBufferAllocationHob;
+  UINTN                      Property1;
+  UINTN                      Property2;
 
   Status = ArmFfaLibCommonInit ();
   if (EFI_ERROR (Status)) {
@@ -72,6 +74,26 @@ ArmFfaSecLibConstructor (
 
   Status = ArmFfaLibRxTxMap ();
   if (EFI_ERROR (Status)) {
+    if (Status != EFI_UNSUPPORTED) {
+      return Status;
+    }
+
+    /*
+     * When ARM_FID_FFA_PARTITION_INFO_GET_REGS is supported,
+     * Rx/Tx buffer might not be required to request service to
+     * secure partition.
+     * So, consider EFI_UNSUPPORTED for Rx/Tx buffer as SUCCESS.
+     */
+    Status = ArmFfaLibGetFeatures (
+               ARM_FID_FFA_PARTITION_INFO_GET_REGS,
+               0x00,
+               &Property1,
+               &Property2
+               );
+    if (!EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "%a Rx/Tx buffer doesn't support.\n", __func__));
+    }
+
     return Status;
   }
 
