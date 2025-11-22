@@ -130,7 +130,7 @@ UINT64
 
   @param[in]  TokenNumber The PCD token number.
 
-  @return The pointer to the buffer to be retrived.
+  @return The pointer to the buffer to be retrieved.
 
 **/
 typedef
