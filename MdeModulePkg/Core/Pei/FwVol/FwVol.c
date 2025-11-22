@@ -277,7 +277,7 @@ FindFileEx (
   EFI_FFS_FILE_HEADER             *FfsFileHeader;
   UINT32                          FileLength;
   UINT32                          FileOccupiedSize;
-  UINT32                          FileOffset;
+  UINT64                          FileOffset;
   UINT64                          FvLength;
   UINT8                           ErasePolarity;
   UINT8                           FileState;
@@ -335,8 +335,8 @@ FindFileEx (
     FfsFileHeader    = (EFI_FFS_FILE_HEADER *)((UINT8 *)*FileHeader + FileOccupiedSize);
   }
 
-  FileOffset = (UINT32)((UINT8 *)FfsFileHeader - (UINT8 *)FwVolHeader);
-  ASSERT (FileOffset <= 0xFFFFFFFF);
+  FileOffset = ((UINT8 *)FfsFileHeader - (UINT8 *)FwVolHeader);
+  ASSERT (FileOffset <= MAX_UINT32);
 
   while (FileOffset < (FvLength - sizeof (EFI_FFS_FILE_HEADER))) {
     //
@@ -817,7 +817,7 @@ ProcessSection (
 {
   EFI_STATUS                             Status;
   UINT32                                 SectionLength;
-  UINT32                                 ParsedLength;
+  UINTN                                  ParsedLength;
   EFI_PEI_GUIDED_SECTION_EXTRACTION_PPI  *GuidSectionPpi;
   EFI_PEI_DECOMPRESS_PPI                 *DecompressPpi;
   VOID                                   *PpiOutput;
