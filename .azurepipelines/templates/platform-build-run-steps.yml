@@ -73,27 +73,27 @@ steps:
   condition: eq(variables['Build.Reason'], 'PullRequest')
 
 # trim the package list if this is a PR
-- task: CmdLine@1
+- task: CmdLine@2
   displayName: Check if ${{ parameters.build_pkg }} need testing
   inputs:
-    filename: stuart_pr_eval
-    arguments: -c ${{ parameters.build_file }} -t ${{ parameters.build_target}} -a ${{ parameters.build_arch}} --pr-target origin/$(System.PullRequest.targetBranch) --output-count-format-string "##vso[task.setvariable variable=pkg_count;isOutpout=true]{pkgcount}"
+    script: |
+      stuart_pr_eval -c ${{ parameters.build_file }} -t ${{ parameters.build_target}} -a ${{ parameters.build_arch}} --pr-target origin/$(System.PullRequest.targetBranch) --output-count-format-string "##vso[task.setvariable variable=pkg_count;isOutpout=true]{pkgcount}"
   condition: eq(variables['Build.Reason'], 'PullRequest')
 
  # Setup repo
-- task: CmdLine@1
+- task: CmdLine@2
   displayName: Setup
   inputs:
-    filename: stuart_setup
-    arguments: -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} -t ${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}}
+    script: |
+      stuart_setup -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} -t ${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}}
   condition: and(gt(variables.pkg_count, 0), succeeded())
 
 # Stuart Update
-- task: CmdLine@1
+- task: CmdLine@2
   displayName: Update
   inputs:
-    filename: stuart_update
-    arguments: -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} -t ${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}}
+    script: |
+      stuart_update -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} -t ${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}}
   condition: and(gt(variables.pkg_count, 0), succeeded())
 
 # build basetools
@@ -107,19 +107,19 @@ steps:
 - ${{ parameters.extra_install_step }}
 
 # Build
-- task: CmdLine@1
+- task: CmdLine@2
   displayName: Build
   inputs:
-    filename: stuart_build
-    arguments: -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} TARGET=${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}}
+    script: |
+      stuart_build -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} TARGET=${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}}
   condition: and(gt(variables.pkg_count, 0), succeeded())
 
 # Run
-- task: CmdLine@1
+- task: CmdLine@2
   displayName: Run to shell
   inputs:
-    filename: stuart_build
-    arguments: -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} TARGET=${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}} ${{ parameters.run_flags }} --FlashOnly
+    script: |
+      stuart_build -c ${{ parameters.build_file }} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} TARGET=${{ parameters.build_target}} -a ${{ parameters.build_arch}} ${{ parameters.build_flags}} ${{ parameters.run_flags }} --FlashOnly
   condition: and(and(gt(variables.pkg_count, 0), succeeded()), eq(variables['Run'], true))
   timeoutInMinutes: 2
 
