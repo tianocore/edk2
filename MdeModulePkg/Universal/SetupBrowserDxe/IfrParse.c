@@ -430,8 +430,10 @@ CreateStorage (
   EFI_GUID         *StorageGuid;
   CHAR8            *StorageName;
 
-  UnicodeString = NULL;
-  StorageName   = NULL;
+  UnicodeString  = NULL;
+  StorageName    = NULL;
+  Storage        = NULL;
+  BrowserStorage = NULL;
   switch (StorageType) {
     case EFI_HII_VARSTORE_BUFFER:
       StorageGuid = (EFI_GUID *)(CHAR8 *)&((EFI_IFR_VARSTORE *)OpCodeData)->Guid;
