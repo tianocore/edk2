@@ -167,7 +167,7 @@ PcdDxeInit (
   // to lock the variables referenced by DynamicHii PCDs with RO property set in *.dsc.
   //
   EfiCreateProtocolNotifyEvent (
-    &gEdkiiVariableLockProtocolGuid,
+    &gEdkiiVariablePolicyProtocolGuid,
     TPL_CALLBACK,
     VariableLockCallBack,
     NULL,

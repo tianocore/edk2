@@ -25,7 +25,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Protocol/FirmwareManagement.h>
 #include <Protocol/EsrtManagement.h>
-#include <Protocol/VariableLock.h>
+#include <Library/VariablePolicyHelperLib.h>
 
 //
 // Name of  Variable for Non-FMP ESRT Repository
