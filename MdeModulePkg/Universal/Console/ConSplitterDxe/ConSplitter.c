@@ -1346,6 +1346,11 @@ ConSplitterConOutDriverBindingStart (
     FreePool (Info);
   }
 
+  Status = gST->ConOut->SetMode (gST->ConOut, 0);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   return Status;
 }
 
