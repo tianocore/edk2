@@ -681,7 +681,7 @@ public:
   }
 
   VOID SetClassGuid (IN EFI_GUID *Guid) {
-    memmove (&(mClassGuid[mFormSet->Flags++]), Guid, sizeof (EFI_GUID));
+    memmove ((VOID *) &(mClassGuid[mFormSet->Flags++]), Guid, sizeof (EFI_GUID));
   }
 
   UINT8 GetFlags() {
