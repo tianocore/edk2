@@ -795,6 +795,7 @@ CompareNameElementDefault (
 
   AppendString  = NULL;
   NvConfigExist = NULL;
+  Status        = EFI_OUT_OF_RESOURCES;
   //
   // Make NvConfigPtr point to the first <NvConfig> with AltConfigHdr in DefaultAltCfgResp.
   //
