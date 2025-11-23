@@ -143,7 +143,7 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscChassisManufacturer) {
 
   // ContainedElements
   ASSERT (ContainedElementCount < 2);
-  (VOID)CopyMem (SmbiosRecord + 1, &ContainedElements, ExtendLength);
+  (VOID)CopyMem (&ContainedElements, SmbiosRecord + 1, ExtendLength);
 
   // ChassisSkuNumber
   SkuNumberField = (UINT8 *)SmbiosRecord +
