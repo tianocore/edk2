@@ -163,7 +163,7 @@ ConvertPpiPointers (
   IN PEI_CORE_INSTANCE           *PrivateData
   )
 {
-  UINT8  Index;
+  UINTN  Index;
 
   //
   // Convert normal PPIs.
@@ -217,7 +217,7 @@ ConvertPpiPointersFv (
   IN  UINTN              FvSize
   )
 {
-  UINT8                             Index;
+  UINTN                             Index;
   UINTN                             Offset;
   BOOLEAN                           OffsetPositive;
   EFI_PEI_FIRMWARE_VOLUME_INFO_PPI  *FvInfoPpi;
