@@ -699,7 +699,6 @@ BdsEntry (
 
   HotkeyTriggered = NULL;
   Status          = EFI_SUCCESS;
-  BootSuccess     = FALSE;
 
   //
   // Insert the performance probe
@@ -1098,6 +1097,7 @@ BdsEntry (
       //
       // Retry to boot if any of the boot succeeds
       //
+      BootSuccess = FALSE;
       LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionTypeBoot);
       if (LoadOptions != NULL) {
         BootSuccess = BootBootOptions (LoadOptions, LoadOptionCount, (BootManagerMenuStatus != EFI_NOT_FOUND) ? &BootManagerMenu : NULL);
