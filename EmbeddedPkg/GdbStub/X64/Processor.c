@@ -474,7 +474,7 @@ GetBreakpointType (
   IA32_DR7    Dr7;
   BREAK_TYPE  Type = NotSupported; // Default is NotSupported type
 
-  Dr7.UintN = SystemContext.SystemContextIa32->Dr7;
+  Dr7.Uint32 = SystemContext.SystemContextIa32->Dr7;
 
   if (BreakpointNumber == 1) {
     Type = (BREAK_TYPE)Dr7.Bits.RW0;
@@ -499,9 +499,9 @@ GetBreakpointType (
   @retval Length  Appropriate converted values which DR7 LENn field accepts.
 
 **/
-UINTN
+UINT32
 ConvertLengthData (
-  IN     UINTN  Length
+  IN     UINT32  Length
   )
 {
   if (Length == 1) {
@@ -537,7 +537,7 @@ FindNextFreeDebugRegister (
 {
   IA32_DR7  Dr7;
 
-  Dr7.UintN = SystemContext.SystemContextIa32->Dr7;
+  Dr7.Uint32 = SystemContext.SystemContextIa32->Dr7;
 
   if (Dr7.Bits.G0 == 0) {
     *Register = 0;
@@ -561,6 +561,7 @@ FindNextFreeDebugRegister (
   @param  SystemContext   Register content at time of the exception
   @param  Register        Register value (0 - 3)
   @param  Address         Breakpoint address value
+  @param  Length          Breakpoint length in bytes
   @param  Type            Breakpoint type (Instruction, Data write,
                           Data read or write etc.)
 
@@ -571,9 +572,9 @@ EFI_STATUS
 EnableDebugRegister (
   IN  EFI_SYSTEM_CONTEXT  SystemContext,
   IN  UINTN               Register,
-  IN  UINTN               Address,
-  IN  UINTN               Length,
-  IN  UINTN               Type
+  IN  UINT32              Address,
+  IN  UINT32              Length,
+  IN  BREAK_TYPE          Type
   )
 {
   IA32_DR7  Dr7;
@@ -589,14 +590,14 @@ EnableDebugRegister (
 
   // Hardware doesn't support ReadWatch (z3 packet) type. GDB can handle
   // software breakpoint. We should send empty packet in both these cases.
-  if ((Type == (BREAK_TYPE)DataRead) ||
-      (Type == (BREAK_TYPE)SoftwareBreakpoint))
+  if ((Type == DataRead) ||
+      (Type == SoftwareBreakpoint))
   {
     return EFI_UNSUPPORTED;
   }
 
   // Read DR7 so appropriate Gn, RWn and LENn bits can be modified.
-  Dr7.UintN = SystemContext.SystemContextIa32->Dr7;
+  Dr7.Uint32 = SystemContext.SystemContextIa32->Dr7;
 
   if (Register == 0) {
     SystemContext.SystemContextIa32->Dr0 = Address;
@@ -623,7 +624,7 @@ EnableDebugRegister (
   }
 
   // Update Dr7 with appropriate Gn, RWn and LENn bits
-  SystemContext.SystemContextIa32->Dr7 = Dr7.UintN;
+  SystemContext.SystemContextIa32->Dr7 = (UINT32)Dr7.Uint32;
 
   return EFI_SUCCESS;
 }
@@ -647,9 +648,9 @@ EnableDebugRegister (
 EFI_STATUS
 FindMatchingDebugRegister (
   IN  EFI_SYSTEM_CONTEXT  SystemContext,
-  IN  UINTN               Address,
-  IN  UINTN               Length,
-  IN  UINTN               Type,
+  IN  UINT32              Address,
+  IN  UINT32              Length,
+  IN  BREAK_TYPE          Type,
   OUT UINTN               *Register
   )
 {
@@ -657,8 +658,8 @@ FindMatchingDebugRegister (
 
   // Hardware doesn't support ReadWatch (z3 packet) type. GDB can handle
   // software breakpoint. We should send empty packet in both these cases.
-  if ((Type == (BREAK_TYPE)DataRead) ||
-      (Type == (BREAK_TYPE)SoftwareBreakpoint))
+  if ((Type == DataRead) ||
+      (Type == SoftwareBreakpoint))
   {
     return EFI_UNSUPPORTED;
   }
@@ -666,29 +667,29 @@ FindMatchingDebugRegister (
   // Convert length data
   Length = ConvertLengthData (Length);
 
-  Dr7.UintN = SystemContext.SystemContextIa32->Dr7;
+  Dr7.Uint32 = SystemContext.SystemContextIa32->Dr7;
 
   if ((Dr7.Bits.G0 == 1) &&
       (Dr7.Bits.LEN0 == Length) &&
-      (Dr7.Bits.RW0 == Type) &&
+      (Dr7.Bits.RW0 == (UINT32)Type) &&
       (Address == SystemContext.SystemContextIa32->Dr0))
   {
     *Register = 0;
   } else if ((Dr7.Bits.G1 == 1) &&
              (Dr7.Bits.LEN1 == Length) &&
-             (Dr7.Bits.RW1 == Type) &&
+             (Dr7.Bits.RW1 == (UINT32)Type) &&
              (Address == SystemContext.SystemContextIa32->Dr1))
   {
     *Register = 1;
   } else if ((Dr7.Bits.G2 == 1) &&
              (Dr7.Bits.LEN2 == Length) &&
-             (Dr7.Bits.RW2 == Type) &&
+             (Dr7.Bits.RW2 == (UINT32)Type) &&
              (Address == SystemContext.SystemContextIa32->Dr2))
   {
     *Register = 2;
   } else if ((Dr7.Bits.G3 == 1) &&
              (Dr7.Bits.LEN3 == Length) &&
-             (Dr7.Bits.RW3 == Type) &&
+             (Dr7.Bits.RW3 == (UINT32)Type) &&
              (Address == SystemContext.SystemContextIa32->Dr3))
   {
     *Register = 3;
@@ -716,10 +717,10 @@ DisableDebugRegister (
   )
 {
   IA32_DR7  Dr7;
-  UINTN     Address = 0;
+  UINT32    Address = 0;
 
   // Read DR7 register so appropriate Gn, RWn and LENn bits can be turned off.
-  Dr7.UintN = SystemContext.SystemContextIa32->Dr7;
+  Dr7.Uint32 = SystemContext.SystemContextIa32->Dr7;
 
   if (Register == 0) {
     SystemContext.SystemContextIa32->Dr0 = Address;
@@ -746,7 +747,7 @@ DisableDebugRegister (
   }
 
   // Update DR7 register so appropriate Gn, RWn and LENn bits can be turned off.
-  SystemContext.SystemContextIa32->Dr7 = Dr7.UintN;
+  SystemContext.SystemContextIa32->Dr7 = (UINT32)Dr7.Uint32;
 
   return EFI_SUCCESS;
 }
@@ -820,7 +821,7 @@ InsertBreakPoint (
   }
 
   // Write Address, length data at particular DR register
-  Status = EnableDebugRegister (SystemContext, Register, Address, Length, (UINTN)BreakType);
+  Status = EnableDebugRegister (SystemContext, Register, (UINT32)Address, (UINT32)Length, (UINT32)BreakType);
   if (EFI_ERROR (Status)) {
     if (Status == EFI_UNSUPPORTED) {
       Print ((CHAR16 *)L"Not supported\n");
@@ -896,7 +897,7 @@ RemoveBreakPoint (
   }
 
   // Find matching debug register
-  Status = FindMatchingDebugRegister (SystemContext, Address, Length, (UINTN)BreakType, &Register);
+  Status = FindMatchingDebugRegister (SystemContext, (UINT32)Address, (UINT32)Length, (UINT32)BreakType, &Register);
   if (EFI_ERROR (Status)) {
     if (Status == EFI_UNSUPPORTED) {
       Print ((CHAR16 *)L"Not supported.\n");
