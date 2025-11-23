@@ -2045,6 +2045,7 @@ RELEASE_XCODE5_X64_CC_FLAGS   = -target x86_64-pc-win32-macho -c    -Os       -W
 ##################
 *_*_*_GENFW_PATH                   = GenFw
 *_*_*_GENFW_FLAGS                  =
+RELEASE_*_*_GENFW_FLAGS            = --no-debug
 
 ##################
 # Asl Compiler definitions
