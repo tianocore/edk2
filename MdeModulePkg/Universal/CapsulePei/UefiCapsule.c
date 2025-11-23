@@ -1277,7 +1277,7 @@ CreateState (
   UINTN                          Size;
   EFI_PHYSICAL_ADDRESS           NewBuffer;
   UINTN                          CapsuleNumber;
-  UINT32                         Index;
+  UINTN                          Index;
   EFI_PHYSICAL_ADDRESS           BaseAddress;
   UINT64                         Length;
 
