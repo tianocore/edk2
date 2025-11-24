@@ -920,3 +920,15 @@ TEST_DESC  mOaepTest[] = {
 };
 
 UINTN  mOaepTestNum = ARRAY_SIZE (mOaepTest);
+
+TEST_DESC  mOaepTestMbedTls[] = {
+  //
+  // -----Description--------------------------------------Class----------------------Function-----------------Pre---Post--Context
+  //
+  // Pkcs1v2Encrypt
+  { "Pkcs1v2Encrypt (Interface)", "CryptoPkg.BaseCryptLib.Pkcs1v2Encrypt.Interface", TestVerifyPkcs1v2EncryptInterface, NULL, NULL, &mTestVerifyPkcs1v2Msg1230         },
+  { "Pkcs1v2Encrypt (NoSeed)",    "CryptoPkg.BaseCryptLib.Pkcs1v2Encrypt.NoSeed",    TestVerifyEncrypt,                 NULL, NULL, &mTestVerifyPkcs1v2Msg1230         },
+  { "Pkcs1v2Encrypt (Seeded)",    "CryptoPkg.BaseCryptLib.Pkcs1v2Encrypt.Seeded",    TestVerifyEncrypt,                 NULL, NULL, &mTestVerifyPkcs1v2Msg1230PrngSeed },
+};
+
+UINTN  mOaepTestMbedTlsNum = ARRAY_SIZE (mOaepTestMbedTls);
