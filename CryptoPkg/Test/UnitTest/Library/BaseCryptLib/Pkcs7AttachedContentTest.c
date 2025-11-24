@@ -247,3 +247,13 @@ TEST_DESC  mPkcs7ContentTest[] = {
 };
 
 UINTN  mPkcs7ContentTestNum = ARRAY_SIZE (mPkcs7ContentTest);
+
+TEST_DESC  mPkcs7ContentTestMbedTls[] = {
+  //
+  // -----Description--------------------------------Class----------------------------Function------------------------------Pre---Post--Context
+  //
+  { "TestWithInvalidPkcs7()",      "CryptoPkg.BaseCryptLib.TestWithInvalidPkcs7",      TestWithInvalidPkcs7,      NULL, NULL, NULL },
+  { "TestWithInvalidParameters()", "CryptoPkg.BaseCryptLib.TestWithInvalidParameters", TestWithInvalidParameters, NULL, NULL, NULL },
+};
+
+UINTN  mPkcs7ContentTestMbedTlsNum = ARRAY_SIZE (mPkcs7ContentTestMbedTls);
