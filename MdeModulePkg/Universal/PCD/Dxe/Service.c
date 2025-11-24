@@ -170,7 +170,11 @@ GetPcdName (
     //
     NameSize = AsciiStrSize (TokenSpaceName) + AsciiStrSize (PcdName);
     Name     = AllocateZeroPool (NameSize);
-    ASSERT (Name != NULL);
+    if (Name == NULL) {
+      ASSERT (Name != NULL);
+      return NULL;
+    }
+
     //
     // Catenate TokenSpaceCName and PcdCName with a '.' to form the full PCD name.
     //
@@ -562,7 +566,10 @@ DxeRegisterCallBackWorker (
   }
 
   FnTableEntry = AllocatePool (sizeof (CALLBACK_FN_ENTRY));
-  ASSERT (FnTableEntry != NULL);
+  if (FnTableEntry == NULL) {
+    ASSERT (FnTableEntry != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   FnTableEntry->CallbackFn = CallBackFunction;
   InsertTailList (ListHead, &FnTableEntry->Node);
@@ -993,8 +1000,10 @@ GetHiiVariable (
   //
   if (Status == EFI_BUFFER_TOO_SMALL) {
     Buffer = (UINT8 *)AllocatePool (Size);
-
-    ASSERT (Buffer != NULL);
+    if (Buffer == NULL) {
+      ASSERT (Buffer != NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
 
     Status = gRT->GetVariable (
                     VariableName,
@@ -1500,7 +1509,10 @@ SetHiiVariable (
     }
 
     Buffer = AllocatePool (SetSize);
-    ASSERT (Buffer != NULL);
+    if (Buffer == NULL) {
+      ASSERT (Buffer != NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
 
     Status = gRT->GetVariable (
                     VariableName,
@@ -1538,7 +1550,11 @@ SetHiiVariable (
     //
     GetVariableSizeAndDataFromHiiPcd (VariableGuid, VariableName, &Size, NULL);
     Buffer = AllocateZeroPool (Size);
-    ASSERT (Buffer != NULL);
+    if (Buffer == NULL) {
+      ASSERT (Buffer != NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     GetVariableSizeAndDataFromHiiPcd (VariableGuid, VariableName, &Size, Buffer);
 
     //
