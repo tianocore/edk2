@@ -36,7 +36,6 @@
 
 **/
 SMBIOS_MISC_TABLE_FUNCTION (MiscChassisManufacturer) {
-  CHAR8               *OptionalStrStart;
   CHAR8               *StrStart;
   UINT8               *SkuNumberField;
   UINTN               RecordLength;
@@ -137,7 +136,7 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscChassisManufacturer) {
                  SerialNumStrLen + 1 +
                  AssertTagStrLen + 1 +
                  ChaNumStrLen    + 1 + 1;
-  SmbiosRecord = AllocateZeroPool (RecordLength);
+  SmbiosRecord = AllocatePool (RecordLength);
   if (SmbiosRecord == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
@@ -156,9 +155,9 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscChassisManufacturer) {
   // The string numbers in the fixed position portion of the record are populated in the input data.
   *SkuNumberField = 5;
 
-  OptionalStrStart = (CHAR8 *)((UINT8 *)SmbiosRecord + HdrLength);
-  UnicodeStrToAsciiStrS (Manufacturer, OptionalStrStart, ManuStrLen + 1);
-  StrStart = OptionalStrStart + ManuStrLen + 1;
+  StrStart = (CHAR8 *)((UINT8 *)SmbiosRecord + HdrLength);
+  UnicodeStrToAsciiStrS (Manufacturer, StrStart, ManuStrLen + 1);
+  StrStart += ManuStrLen + 1;
   UnicodeStrToAsciiStrS (Version, StrStart, VerStrLen + 1);
   StrStart += VerStrLen + 1;
   UnicodeStrToAsciiStrS (SerialNumber, StrStart, SerialNumStrLen + 1);
@@ -166,6 +165,8 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscChassisManufacturer) {
   UnicodeStrToAsciiStrS (AssertTag, StrStart, AssertTagStrLen + 1);
   StrStart += AssertTagStrLen + 1;
   UnicodeStrToAsciiStrS (ChassisSkuNumber, StrStart, ChaNumStrLen + 1);
+  StrStart += ChaNumStrLen + 1;
+  *StrStart = '\0';
 
   SmbiosRecord->BootupState        = OemGetChassisBootupState ();
   SmbiosRecord->PowerSupplyState   = OemGetChassisPowerSupplyState ();
