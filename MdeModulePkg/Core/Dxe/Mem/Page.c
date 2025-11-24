@@ -66,6 +66,26 @@ EFI_MEMORY_TYPE_STATISTICS  mMemoryTypeStatistics[EfiMaxMemoryType + 1] = {
   { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE }   // EfiMaxMemoryType
 };
 
+EFI_MEMORY_TYPE_STATISTICS  mMemoryTypeStatisticsSortedByAddress[EfiMaxMemoryType + 1] = {
+  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiReservedMemoryType,      TRUE,  FALSE },
+  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiLoaderCode,              FALSE, FALSE },
+  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiLoaderData,              FALSE, FALSE },
+  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiBootServicesCode,        FALSE, FALSE },
+  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiBootServicesData,        FALSE, FALSE },
+  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiRuntimeServicesCode,     TRUE,  TRUE  },
+  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiRuntimeServicesData,     TRUE,  TRUE  },
+  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiConventionalMemory,      FALSE, FALSE },
+  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiUnusableMemory,          FALSE, FALSE },
+  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiACPIReclaimMemory,       TRUE,  FALSE },
+  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiACPIMemoryNVS,           TRUE,  FALSE },
+  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMemoryMappedIO,          FALSE, FALSE },
+  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMemoryMappedIOPortSpace, FALSE, FALSE },
+  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiPalCode,                 TRUE,  TRUE  },
+  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiPersistentMemory,        FALSE, FALSE },
+  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiUnacceptedMemoryType,    TRUE,  FALSE },
+  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType,           FALSE, FALSE }
+};
+
 EFI_PHYSICAL_ADDRESS  mDefaultMaximumAddress = MAX_ALLOC_ADDRESS;
 EFI_PHYSICAL_ADDRESS  mDefaultBaseAddress    = MAX_ALLOC_ADDRESS;
 
@@ -142,6 +162,306 @@ RemoveMemoryMapEntry (
 }
 
 /**
+  Helper function to evaluate if memory regions intersect.
+
+  @param  Start1     The address of the first byte in the first memory region.
+  @param  End1       The address of the last byte in the first memory region.
+  @param  Start2     The address of the first byte in the second memory region.
+  @param  End2       The address of the last byte in the second memory region.
+
+  @return TRUE if the memory regions intersect, FALSE otherwise.
+**/
+STATIC
+BOOLEAN
+MemoryRegionsIntersect (
+  IN EFI_PHYSICAL_ADDRESS  Start1,
+  IN EFI_PHYSICAL_ADDRESS  End1,
+  IN EFI_PHYSICAL_ADDRESS  Start2,
+  IN EFI_PHYSICAL_ADDRESS  End2
+  )
+{
+  ASSERT (Start1 <= End1);
+  ASSERT (Start2 <= End2);
+
+  return ((Start1 < End2) && (Start2 < End1));
+}
+
+/**
+  Get the memory bin type for a given memory range.
+
+  @param  PhysicalStart  The address of the first byte in the memory region.
+  @param  PhysicalEnd    The address of the last byte in the memory region.
+
+  @return The memory type for the bin that contains the given physical address range.
+          If the address range does not match any special bin, it returns EfiMaxMemoryType.
+**/
+EFI_MEMORY_TYPE
+GetMemoryBinType (
+  IN EFI_PHYSICAL_ADDRESS  PhysicalStart,
+  IN EFI_PHYSICAL_ADDRESS  PhysicalEnd
+  )
+{
+  EFI_MEMORY_TYPE  BinType;
+
+  // Find the bin type for the incoming memory region.
+  for (BinType = (EFI_MEMORY_TYPE)0; BinType < EfiMaxMemoryType; BinType++) {
+    //
+    // If the number of pages for this memory type is not zero, the input region
+    // better be within the same bin. We only care about the special memory type
+    // here because we need these bins to remain consistent so that the OS resume
+    // logic can work properly. The same applies to the memory allocation logic.
+    //
+    if (mMemoryTypeStatistics[BinType].Special && (mMemoryTypeStatistics[BinType].NumberOfPages != 0)) {
+      if ((PhysicalStart >= mMemoryTypeStatistics[BinType].BaseAddress) &&
+          (PhysicalEnd <= mMemoryTypeStatistics[BinType].MaximumAddress))
+      {
+        break;
+      } else if (MemoryRegionsIntersect (
+                   PhysicalStart,
+                   PhysicalEnd,
+                   mMemoryTypeStatistics[BinType].BaseAddress,
+                   mMemoryTypeStatistics[BinType].MaximumAddress
+                   ))
+      {
+        // The start and end overlap the bin, but not fully inclusive. We should not allow this.
+        DEBUG ((
+          DEBUG_ERROR,
+          "%a: %lx-%lx intersects bin type %d (%lx-%lx).\n"
+          "The OS may attempt to repurpose these regions, leading to failed memory allocation and potentially preventing resume from hibernation or even system boot.\n",
+          __func__,
+          PhysicalStart,
+          PhysicalEnd,
+          BinType,
+          mMemoryTypeStatistics[BinType].BaseAddress,
+          mMemoryTypeStatistics[BinType].MaximumAddress
+          ));
+
+        ASSERT (FALSE);
+      }
+    }
+  }
+
+  // If we can find the bin type, use it to guide the merging logic below.
+  // Otherwise, we will not care about the bin type.
+  if (BinType >= EfiMaxMemoryType) {
+    DEBUG ((
+      DEBUG_PAGE,
+      "%a: defaulting to max for %lx -%lx\n",
+      __func__,
+      PhysicalStart,
+      PhysicalEnd
+      ));
+  }
+
+  return BinType;
+}
+
+/**
+  Internal function. Splits an incoming memory range into smaller ranges based
+  on the bin boundaries defined in mMemoryTypeStatistics[].
+
+  @param  Type                   The type of memory range to add
+  @param  Start                  The starting address in the memory range Must be
+                                 paged aligned
+  @param  End                    The last address in the range Must be the last
+                                 byte of a page
+  @param  Attribute              The attributes of the memory range to add
+  @param  MemoryDescriptors      Output array to hold the split memory descriptors
+  @param  MemoryDescriptorCount  On input, the size of the MemoryDescriptors array.
+                                 On output, the number of descriptors filled in.
+
+  @return EFI_SUCCESS if the operation was successful.
+          EFI_INVALID_PARAMETER if the input parameters are invalid.
+          EFI_BUFFER_TOO_SMALL if the output array is not large enough.
+**/
+EFI_STATUS
+SplitIncomingRange (
+  IN EFI_MEMORY_TYPE         Type,
+  IN EFI_PHYSICAL_ADDRESS    Start,
+  IN EFI_PHYSICAL_ADDRESS    End,
+  IN UINT64                  Attribute,
+  OUT EFI_MEMORY_DESCRIPTOR  *MemoryDescriptors,
+  IN OUT UINTN               *MemoryDescriptorCount
+  )
+{
+  EFI_STATUS            Status;
+  UINTN                 MemDescCount;
+  UINTN                 Index;
+  EFI_PHYSICAL_ADDRESS  Curr;
+
+  if (((Start & EFI_PAGE_MASK) != 0) || (End < Start) || (MemoryDescriptors == NULL) ||
+      (MemoryDescriptorCount == NULL) || (*MemoryDescriptorCount == 0))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  MemDescCount = 0;
+  Curr         = Start;
+  for (Index = 0; Index < EfiMaxMemoryType; Index++) {
+    //
+    // The idea is that we will break the incoming memory region into smaller pieces
+    // based on the bucket boundaries. This way, we can ensure that each memory
+    // region is fully contained within a bucket, which makes the merging logic below
+    // easier to handle.
+    //
+    if ((mMemoryTypeStatisticsSortedByAddress[Index].BaseAddress == 0) || (mMemoryTypeStatisticsSortedByAddress[Index].Special == FALSE)) {
+      // We have reached the end of the valid buckets
+      continue;
+    }
+
+    // Note that the mMemoryTypeStatisticsSortedByAddress[] array is sorted by BaseAddress
+    if (Curr < mMemoryTypeStatisticsSortedByAddress[Index].BaseAddress) {
+      if (End < mMemoryTypeStatisticsSortedByAddress[Index].BaseAddress) {
+        if (MemDescCount >= *MemoryDescriptorCount) {
+          Status = EFI_BUFFER_TOO_SMALL;
+          goto Done;
+        }
+
+        // The incoming region is before this bucket, so just add this region
+        MemoryDescriptors[MemDescCount].Type          = Type;
+        MemoryDescriptors[MemDescCount].PhysicalStart = Curr;
+        MemoryDescriptors[MemDescCount].NumberOfPages = EFI_SIZE_TO_PAGES ((UINTN)(End - Curr + 1));
+        MemoryDescriptors[MemDescCount].VirtualStart  = 0;
+        MemoryDescriptors[MemDescCount].Attribute     = Attribute;
+        MemDescCount++;
+
+        Curr = End + 1;
+        break;
+      } else if (End <= mMemoryTypeStatisticsSortedByAddress[Index].MaximumAddress) {
+        if (MemDescCount >= *MemoryDescriptorCount) {
+          Status = EFI_BUFFER_TOO_SMALL;
+          goto Done;
+        }
+
+        // The incoming region is fully contained within the bucket
+        MemoryDescriptors[MemDescCount].Type          = Type;
+        MemoryDescriptors[MemDescCount].PhysicalStart = Curr;
+        MemoryDescriptors[MemDescCount].NumberOfPages = EFI_SIZE_TO_PAGES ((UINTN)(mMemoryTypeStatisticsSortedByAddress[Index].BaseAddress - Curr));
+        MemoryDescriptors[MemDescCount].VirtualStart  = 0;
+        MemoryDescriptors[MemDescCount].Attribute     = Attribute;
+        MemDescCount++;
+
+        Curr = mMemoryTypeStatisticsSortedByAddress[Index].BaseAddress;
+        if (Curr == End) {
+          break;
+        }
+
+        if (MemDescCount >= *MemoryDescriptorCount) {
+          Status = EFI_BUFFER_TOO_SMALL;
+          goto Done;
+        }
+
+        MemoryDescriptors[MemDescCount].Type          = Type;
+        MemoryDescriptors[MemDescCount].PhysicalStart = Curr;
+        MemoryDescriptors[MemDescCount].NumberOfPages = EFI_SIZE_TO_PAGES ((UINTN)(End - Curr + 1));
+        MemoryDescriptors[MemDescCount].VirtualStart  = 0;
+        MemoryDescriptors[MemDescCount].Attribute     = Attribute;
+        MemDescCount++;
+
+        Curr = End + 1;
+
+        break;
+      } else {
+        if (MemDescCount >= ((*MemoryDescriptorCount) - 1)) {
+          Status = EFI_BUFFER_TOO_SMALL;
+          goto Done;
+        }
+
+        MemoryDescriptors[MemDescCount].Type          = Type;
+        MemoryDescriptors[MemDescCount].PhysicalStart = Curr;
+        MemoryDescriptors[MemDescCount].NumberOfPages = EFI_SIZE_TO_PAGES ((UINTN)(mMemoryTypeStatisticsSortedByAddress[Index].BaseAddress - Curr));
+        MemoryDescriptors[MemDescCount].VirtualStart  = 0;
+        MemoryDescriptors[MemDescCount].Attribute     = Attribute;
+        MemDescCount++;
+
+        // The incoming region overlaps the entire bucket
+        MemoryDescriptors[MemDescCount].Type          = Type;
+        MemoryDescriptors[MemDescCount].PhysicalStart = mMemoryTypeStatisticsSortedByAddress[Index].BaseAddress;
+        MemoryDescriptors[MemDescCount].NumberOfPages = mMemoryTypeStatisticsSortedByAddress[Index].NumberOfPages;
+        MemoryDescriptors[MemDescCount].VirtualStart  = 0;
+        MemoryDescriptors[MemDescCount].Attribute     = Attribute;
+        MemDescCount++;
+
+        Curr = mMemoryTypeStatisticsSortedByAddress[Index].MaximumAddress + 1;
+        if (Curr == End) {
+          break;
+        }
+      }
+    } else if ((Curr >= mMemoryTypeStatisticsSortedByAddress[Index].BaseAddress) &&
+               (Curr <= mMemoryTypeStatisticsSortedByAddress[Index].MaximumAddress))
+    {
+      // The incoming region is fully within the bucket, so just continue
+      if (End <= mMemoryTypeStatisticsSortedByAddress[Index].MaximumAddress) {
+        // The incoming region is fully contained within the bucket
+        // Check if curr == end to avoid an overflow in the calculation of number of pages
+        if (Curr == End) {
+          break;
+        }
+
+        if (MemDescCount >= *MemoryDescriptorCount) {
+          Status = EFI_BUFFER_TOO_SMALL;
+          goto Done;
+        }
+
+        MemoryDescriptors[MemDescCount].Type          = Type;
+        MemoryDescriptors[MemDescCount].PhysicalStart = Curr;
+        MemoryDescriptors[MemDescCount].NumberOfPages = EFI_SIZE_TO_PAGES ((UINTN)(End - Curr + 1));
+        MemoryDescriptors[MemDescCount].VirtualStart  = 0;
+        MemoryDescriptors[MemDescCount].Attribute     = Attribute;
+        MemDescCount++;
+
+        Curr = End + 1;
+
+        break;
+      } else {
+        if (MemDescCount >= *MemoryDescriptorCount) {
+          Status = EFI_BUFFER_TOO_SMALL;
+          goto Done;
+        }
+
+        // The incoming region overlaps the end of the bucket, so break it here
+        MemoryDescriptors[MemDescCount].Type          = Type;
+        MemoryDescriptors[MemDescCount].PhysicalStart = Curr;
+        MemoryDescriptors[MemDescCount].NumberOfPages = EFI_SIZE_TO_PAGES ((UINTN)(mMemoryTypeStatisticsSortedByAddress[Index].MaximumAddress - Curr + 1));
+        MemoryDescriptors[MemDescCount].VirtualStart  = 0;
+        MemoryDescriptors[MemDescCount].Attribute     = Attribute;
+        MemDescCount++;
+
+        Curr = mMemoryTypeStatisticsSortedByAddress[Index].MaximumAddress + 1;
+        if (Curr == End) {
+          break;
+        }
+      }
+    } else {
+      // The incoming region is beyond this bucket, so just continue
+      continue;
+    }
+  }
+
+  // If we have not processed the entire incoming region, add the remaining part as a single region
+  if (Curr <= End) {
+    if (MemDescCount >= *MemoryDescriptorCount) {
+      Status = EFI_BUFFER_TOO_SMALL;
+      goto Done;
+    }
+
+    MemoryDescriptors[MemDescCount].Type          = Type;
+    MemoryDescriptors[MemDescCount].PhysicalStart = Curr;
+    MemoryDescriptors[MemDescCount].NumberOfPages = EFI_SIZE_TO_PAGES ((UINTN)(End - Curr + 1));
+    MemoryDescriptors[MemDescCount].VirtualStart  = 0;
+    MemoryDescriptors[MemDescCount].Attribute     = Attribute;
+    MemDescCount++;
+  }
+
+  *MemoryDescriptorCount = MemDescCount;
+
+  Status = EFI_SUCCESS;
+
+Done:
+  return Status;
+}
+
+/**
   Internal function.  Adds a ranges to the memory map.
   The range must not already exist in the map.
 
@@ -161,13 +481,41 @@ CoreAddRange (
   IN UINT64                Attribute
   )
 {
-  LIST_ENTRY  *Link;
-  MEMORY_MAP  *Entry;
+  LIST_ENTRY             *Link;
+  MEMORY_MAP             *Entry;
+  EFI_MEMORY_TYPE        MergeType;
+  EFI_MEMORY_DESCRIPTOR  MemDesc[MAX_MAP_DEPTH]; // There is no need to exceed MAX_MAP_DEPTH given we will go through at most that many merges
+  UINTN                  Index;
+  UINTN                  MemDescCount;
+  EFI_STATUS             Status;
 
   ASSERT ((Start & EFI_PAGE_MASK) == 0);
   ASSERT (End > Start);
 
   ASSERT_LOCKED (&gMemoryLock);
+
+  // Find the bin type for the incoming memory region.
+  // Find the bucket type for the incoming memory region.
+  MemDescCount = ARRAY_SIZE (MemDesc);
+  Status       = SplitIncomingRange (Type, Start, End, Attribute, MemDesc, &MemDescCount);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: invalid range %lx - %lx - %r\n", __func__, Start, End, Status));
+    ASSERT_EFI_ERROR (Status);
+    return;
+  } else {
+    DEBUG_CODE_BEGIN ();
+    for (Index = 0; Index < MemDescCount; Index++) {
+      DEBUG ((
+        DEBUG_PAGE,
+        "%a: split %lx - %lx\n",
+        __func__,
+        MemDesc[Index].PhysicalStart,
+        MemDesc[Index].PhysicalStart + LShiftU64 (MemDesc[Index].NumberOfPages, EFI_PAGE_SHIFT) - 1
+        ));
+    }
+
+    DEBUG_CODE_END ();
+  }
 
   DEBUG ((DEBUG_PAGE, "AddRange: %lx-%lx to %d\n", Start, End, Type));
 
@@ -210,43 +558,54 @@ CoreAddRange (
   // and the same Attribute
   //
 
-  Link = gMemoryMap.ForwardLink;
-  while (Link != &gMemoryMap) {
-    Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
-    Link  = Link->ForwardLink;
+  for (Index = 0; Index < MemDescCount; Index++) {
+    Start = MemDesc[Index].PhysicalStart;
+    End   = Start + LShiftU64 (MemDesc[Index].NumberOfPages, EFI_PAGE_SHIFT) - 1;
 
-    if (Entry->Type != Type) {
-      continue;
+    MergeType = GetMemoryBinType (Start, End);
+    Link      = gMemoryMap.ForwardLink;
+    while (Link != &gMemoryMap) {
+      Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
+      Link  = Link->ForwardLink;
+
+      if (Entry->Type != Type) {
+        continue;
+      }
+
+      if (Entry->Attribute != Attribute) {
+        continue;
+      }
+
+      // We need to make sure we can only merge with the same type as the merge type
+      if (MergeType != GetMemoryBinType (Entry->Start, Entry->End)) {
+        continue;
+      }
+
+      if (Entry->End + 1 == Start) {
+        Start = Entry->Start;
+        RemoveMemoryMapEntry (Entry);
+      } else if (Entry->Start == End + 1) {
+        End = Entry->End;
+        RemoveMemoryMapEntry (Entry);
+      }
     }
 
-    if (Entry->Attribute != Attribute) {
-      continue;
-    }
+    //
+    // Add descriptor
+    //
 
-    if (Entry->End + 1 == Start) {
-      Start = Entry->Start;
-      RemoveMemoryMapEntry (Entry);
-    } else if (Entry->Start == End + 1) {
-      End = Entry->End;
-      RemoveMemoryMapEntry (Entry);
-    }
+    mMapStack[mMapDepth].Signature    = MEMORY_MAP_SIGNATURE;
+    mMapStack[mMapDepth].FromPages    = FALSE;
+    mMapStack[mMapDepth].Type         = Type;
+    mMapStack[mMapDepth].Start        = Start;
+    mMapStack[mMapDepth].End          = End;
+    mMapStack[mMapDepth].VirtualStart = 0;
+    mMapStack[mMapDepth].Attribute    = Attribute;
+    InsertTailList (&gMemoryMap, &mMapStack[mMapDepth].Link);
+
+    mMapDepth += 1;
+    ASSERT (mMapDepth < MAX_MAP_DEPTH);
   }
-
-  //
-  // Add descriptor
-  //
-
-  mMapStack[mMapDepth].Signature    = MEMORY_MAP_SIGNATURE;
-  mMapStack[mMapDepth].FromPages    = FALSE;
-  mMapStack[mMapDepth].Type         = Type;
-  mMapStack[mMapDepth].Start        = Start;
-  mMapStack[mMapDepth].End          = End;
-  mMapStack[mMapDepth].VirtualStart = 0;
-  mMapStack[mMapDepth].Attribute    = Attribute;
-  InsertTailList (&gMemoryMap, &mMapStack[mMapDepth].Link);
-
-  mMapDepth += 1;
-  ASSERT (mMapDepth < MAX_MAP_DEPTH);
 
   return;
 }
@@ -538,6 +897,49 @@ CoreLoadingFixedAddressHook (
 }
 
 /**
+  Comparison function to sort EFI_MEMORY_TYPE_STATISTICS by BaseAddress.
+  If NumberOfPages is 0, push it to the end of the list.
+
+  @param  A    Pointer to first EFI_MEMORY_TYPE_STATISTICS.
+  @param  B    Pointer to second EFI_MEMORY_TYPE_STATISTICS.
+
+  @return -1 if A < B
+          0  if A == B
+          1  if A > B
+**/
+INTN
+EFIAPI
+CompareMemoryTypeStats (
+  IN CONST VOID  *A,
+  IN CONST VOID  *B
+  )
+{
+  EFI_MEMORY_TYPE_STATISTICS  *StatsA;
+  EFI_MEMORY_TYPE_STATISTICS  *StatsB;
+
+  StatsA = (EFI_MEMORY_TYPE_STATISTICS *)A;
+  StatsB = (EFI_MEMORY_TYPE_STATISTICS *)B;
+
+  // If the number of pages is 0, push it to the end of the list
+  if ((StatsA->NumberOfPages == 0) && (StatsB->NumberOfPages == 0)) {
+    return 0;
+  } else if (StatsA->NumberOfPages == 0) {
+    return 1;
+  } else if (StatsB->NumberOfPages == 0) {
+    return -1;
+  }
+
+  // Otherwise, sort by base address
+  if (StatsA->BaseAddress < StatsB->BaseAddress) {
+    return -1;
+  } else if (StatsA->BaseAddress > StatsB->BaseAddress) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+/**
   Sets the preferred memory range to use for the Memory Type Information bins.
   This service must be called before fist call to CoreAddMemoryDescriptor().
 
@@ -554,10 +956,11 @@ CoreSetMemoryTypeInformationRange (
   IN UINT64                Length
   )
 {
-  EFI_PHYSICAL_ADDRESS  Top;
-  EFI_MEMORY_TYPE       Type;
-  UINTN                 Index;
-  UINTN                 Size;
+  EFI_PHYSICAL_ADDRESS        Top;
+  EFI_MEMORY_TYPE             Type;
+  UINTN                       Index;
+  UINTN                       Size;
+  EFI_MEMORY_TYPE_STATISTICS  Dummy;
 
   //
   // Return if Memory Type Information bin locations have already been set
@@ -636,6 +1039,22 @@ CoreSetMemoryTypeInformationRange (
     }
   }
 
+  // Copy into the sorted version of the statistics for later usage
+  CopyMem (
+    mMemoryTypeStatisticsSortedByAddress,
+    mMemoryTypeStatistics,
+    sizeof (mMemoryTypeStatistics)
+    );
+
+  // Sort the statistics by BaseAddress
+  QuickSort (
+    (VOID *)mMemoryTypeStatisticsSortedByAddress,
+    sizeof (mMemoryTypeStatisticsSortedByAddress) / sizeof (EFI_MEMORY_TYPE_STATISTICS),
+    sizeof (EFI_MEMORY_TYPE_STATISTICS),
+    CompareMemoryTypeStats,
+    &Dummy
+    );
+
   mMemoryTypeInformationInitialized = TRUE;
 }
 
@@ -662,10 +1081,11 @@ CoreAddMemoryDescriptor (
   IN UINT64                Attribute
   )
 {
-  EFI_PHYSICAL_ADDRESS  End;
-  EFI_STATUS            Status;
-  UINTN                 Index;
-  UINTN                 FreeIndex;
+  EFI_PHYSICAL_ADDRESS        End;
+  EFI_STATUS                  Status;
+  UINTN                       Index;
+  UINTN                       FreeIndex;
+  EFI_MEMORY_TYPE_STATISTICS  Dummy;
 
   if ((Start & EFI_PAGE_MASK) != 0) {
     return;
@@ -744,8 +1164,10 @@ CoreAddMemoryDescriptor (
               mMemoryTypeStatistics[Type].BaseAddress,
               gMemoryTypeInformation[FreeIndex].NumberOfPages
               );
-            mMemoryTypeStatistics[Type].BaseAddress    = 0;
-            mMemoryTypeStatistics[Type].MaximumAddress = MAX_ALLOC_ADDRESS;
+            mMemoryTypeStatistics[Type].BaseAddress                   = 0;
+            mMemoryTypeStatistics[Type].MaximumAddress                = MAX_ALLOC_ADDRESS;
+            mMemoryTypeStatisticsSortedByAddress[Type].BaseAddress    = 0;
+            mMemoryTypeStatisticsSortedByAddress[Type].MaximumAddress = MAX_ALLOC_ADDRESS;
           }
         }
 
@@ -758,6 +1180,14 @@ CoreAddMemoryDescriptor (
       mMemoryTypeStatistics[Type].MaximumAddress =
         mMemoryTypeStatistics[Type].BaseAddress +
         LShiftU64 (gMemoryTypeInformation[Index].NumberOfPages, EFI_PAGE_SHIFT) - 1;
+
+      //
+      // Save the same information in the sorted array
+      //
+      mMemoryTypeStatisticsSortedByAddress[Type].BaseAddress =
+        mMemoryTypeStatistics[Type].BaseAddress;
+      mMemoryTypeStatisticsSortedByAddress[Type].MaximumAddress =
+        mMemoryTypeStatistics[Type].MaximumAddress;
 
       //
       // If the current base address is the lowest address so far, then update the default
@@ -784,20 +1214,36 @@ CoreAddMemoryDescriptor (
     }
 
     if (gMemoryTypeInformation[Index].NumberOfPages != 0) {
+      mMemoryTypeStatistics[Type].NumberOfPages                = gMemoryTypeInformation[Index].NumberOfPages;
+      mMemoryTypeStatisticsSortedByAddress[Type].NumberOfPages = gMemoryTypeInformation[Index].NumberOfPages;
+      gMemoryTypeInformation[Index].NumberOfPages              = 0;
       CoreFreePages (
         mMemoryTypeStatistics[Type].BaseAddress,
-        gMemoryTypeInformation[Index].NumberOfPages
+        (UINTN)mMemoryTypeStatistics[Type].NumberOfPages
         );
-      mMemoryTypeStatistics[Type].NumberOfPages   = gMemoryTypeInformation[Index].NumberOfPages;
-      gMemoryTypeInformation[Index].NumberOfPages = 0;
     }
   }
+
+  QuickSort (
+    (VOID *)mMemoryTypeStatisticsSortedByAddress,
+    sizeof (mMemoryTypeStatisticsSortedByAddress) / sizeof (EFI_MEMORY_TYPE_STATISTICS),
+    sizeof (EFI_MEMORY_TYPE_STATISTICS),
+    CompareMemoryTypeStats,
+    &Dummy
+    );
 
   //
   // If the number of pages reserved for a memory type is 0, then all allocations for that type
   // should be in the default range.
   //
   for (Type = (EFI_MEMORY_TYPE)0; Type < EfiMaxMemoryType; Type++) {
+    if (mMemoryTypeStatisticsSortedByAddress[Type].NumberOfPages != 0) {
+      CoreFreePages (
+        mMemoryTypeStatisticsSortedByAddress[Type].BaseAddress,
+        (UINTN)mMemoryTypeStatisticsSortedByAddress[Type].NumberOfPages
+        );
+    }
+
     for (Index = 0; gMemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
       if (Type == (EFI_MEMORY_TYPE)gMemoryTypeInformation[Index].Type) {
         mMemoryTypeStatistics[Type].InformationIndex = Index;
@@ -2037,6 +2483,30 @@ CoreGetMemoryMap (
             (Entry->End   <= mMemoryTypeStatistics[Type].MaximumAddress))
         {
           MemoryMap->Type = Type;
+        } else if (mMemoryTypeStatistics[Type].Special &&
+                   (mMemoryTypeStatistics[Type].NumberOfPages > 0) &&
+                   MemoryRegionsIntersect (
+                     Entry->Start,
+                     Entry->End,
+                     mMemoryTypeStatistics[Type].BaseAddress,
+                     mMemoryTypeStatistics[Type].MaximumAddress
+                     ))
+        {
+          // There is partial overlap with a special memory type bin.
+          // This is not allowed, so we will not change the type.
+          DEBUG ((
+            DEBUG_ERROR,
+            "%a: Memory Map entry partially overlaps with a special memory type bin.\n"
+            "The OS may attempt to repurpose these regions, leading to failed memory allocation and potentially preventing resume from hibernation or even system boot.\n"
+            "Memory Bin Type %d, Entry Type %d, Start 0x%lx, End 0x%lx\n",
+            __func__,
+            Type,
+            Entry->Type,
+            Entry->Start,
+            Entry->End
+            ));
+
+          ASSERT (FALSE);
         }
       }
     }
