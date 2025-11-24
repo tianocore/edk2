@@ -322,19 +322,6 @@ PciIovParseVfBar (
   );
 
 /**
-  This routine is used to initialize the bar of a PCI device.
-
-  @param PciIoDevice Pci device instance.
-
-  @note It can be called typically when a device is going to be rejected.
-
-**/
-VOID
-InitializePciDevice (
-  IN PCI_IO_DEVICE  *PciIoDevice
-  );
-
-/**
   This routine is used to initialize the bar of a PCI-PCI Bridge device.
 
   @param  PciIoDevice PCI-PCI bridge device instance.
@@ -427,20 +414,6 @@ PciGetBusRange (
 EFI_STATUS
 StartManagingRootBridge (
   IN PCI_IO_DEVICE  *RootBridgeDev
-  );
-
-/**
-  This routine can be used to check whether a PCI device should be rejected when light enumeration.
-
-  @param PciIoDevice  Pci device instance.
-
-  @retval TRUE      This device should be rejected.
-  @retval FALSE     This device shouldn't be rejected.
-
-**/
-BOOLEAN
-IsPciDeviceRejected (
-  IN PCI_IO_DEVICE  *PciIoDevice
   );
 
 /**
