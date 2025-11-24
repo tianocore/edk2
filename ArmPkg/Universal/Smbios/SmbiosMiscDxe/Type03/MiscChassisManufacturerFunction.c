@@ -155,7 +155,7 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscChassisManufacturer) {
   // The string numbers in the fixed position portion of the record are populated in the input data.
   *SkuNumberField = 5;
 
-  StrStart = (CHAR8 *)((UINT8 *)SmbiosRecord + HdrLength);
+  StrStart = (CHAR8 *)((UINT8 *)SkuNumberField + sizeof (SMBIOS_TABLE_STRING));
   UnicodeStrToAsciiStrS (Manufacturer, StrStart, ManuStrLen + 1);
   StrStart += ManuStrLen + 1;
   UnicodeStrToAsciiStrS (Version, StrStart, VerStrLen + 1);
@@ -165,8 +165,10 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscChassisManufacturer) {
   UnicodeStrToAsciiStrS (AssertTag, StrStart, AssertTagStrLen + 1);
   StrStart += AssertTagStrLen + 1;
   UnicodeStrToAsciiStrS (ChassisSkuNumber, StrStart, ChaNumStrLen + 1);
-  StrStart += ChaNumStrLen + 1;
-  *StrStart = '\0';
+  StrStart   += ChaNumStrLen + 1;
+  *StrStart++ = '\0';
+
+  ASSERT ((UINT8 *)StrStart - (UINT8 *)SmbiosRecord == RecordLength);
 
   SmbiosRecord->BootupState        = OemGetChassisBootupState ();
   SmbiosRecord->PowerSupplyState   = OemGetChassisPowerSupplyState ();
