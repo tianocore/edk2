@@ -298,7 +298,6 @@ INF MdeModulePkg/Logo/LogoDxe.inf
 !endif
 
 INF  OvmfPkg/PlatformDxe/Platform.inf
-INF  OvmfPkg/AmdSevDxe/AmdSevDxe.inf
 INF  OvmfPkg/IoMmuDxe/IoMmuDxe.inf
 
 !if $(SMM_REQUIRE) == TRUE
