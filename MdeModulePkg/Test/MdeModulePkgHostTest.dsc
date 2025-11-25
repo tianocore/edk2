@@ -23,7 +23,6 @@
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
 
 [Components]
-  MdeModulePkg/Library/DxeResetSystemLib/UnitTest/MockUefiRuntimeServicesTableLib.inf
 
   #
   # Build MdeModulePkg HOST_APPLICATION Tests
@@ -31,7 +30,7 @@
   MdeModulePkg/Library/DxeResetSystemLib/UnitTest/DxeResetSystemLibUnitTestHost.inf {
     <LibraryClasses>
       ResetSystemLib|MdeModulePkg/Library/DxeResetSystemLib/DxeResetSystemLib.inf
-      UefiRuntimeServicesTableLib|MdeModulePkg/Library/DxeResetSystemLib/UnitTest/MockUefiRuntimeServicesTableLib.inf
+      UefiRuntimeServicesTableLib|MdePkg/Test/Mock/Library/Cmocka/MockUefiRuntimeServicesTableLib/MockUefiRuntimeServicesTableLib.inf
   }
 
   MdeModulePkg/Universal/Variable/RuntimeDxe/RuntimeDxeUnitTest/VariableLockRequestToLockUnitTest.inf {
@@ -90,3 +89,6 @@
   MdeModulePkg/Test/Mock/Library/GoogleTest/MockVariablePolicyHelperLib/MockVariablePolicyHelperLib.inf
   MdeModulePkg/Test/Mock/Library/GoogleTest/MockSecurityManagementLib/MockSecurityManagementLib.inf
   MdeModulePkg/Test/Mock/Library/GoogleTest/MockTpmMeasurementLib/MockTpmMeasurementLib.inf
+  MdeModulePkg/Test/Mock/Library/GoogleTest/MockPlatformHookLib/MockPlatformHookLib.inf
+  MdeModulePkg/Test/Mock/Library/GoogleTest/MockCapsuleLib/MockCapsuleLib.inf
+  MdeModulePkg/Test/Mock/Library/GoogleTest/MockUefiBootManagerLib/MockUefiBootManagerLib.inf
