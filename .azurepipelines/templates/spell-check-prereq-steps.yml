@@ -13,7 +13,7 @@ parameters:
 steps:
 - task: UseNode@1
   inputs:
-    version: '14.x'
+    version: '24.x'
     #checkLatest: false # Optional
   condition: and(gt(variables.pkg_count, 0), succeeded())
 
