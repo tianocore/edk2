@@ -170,7 +170,11 @@ GetPcdName (
     //
     NameSize = AsciiStrSize (TokenSpaceName) + AsciiStrSize (PcdName);
     Name     = AllocateZeroPool (NameSize);
-    ASSERT (Name != NULL);
+    if (Name == NULL) {
+      ASSERT (Name != NULL);
+      return NULL;
+    }
+
     //
     // Catenate TokenSpaceCName and PcdCName with a '.' to form the full PCD name.
     //
@@ -562,7 +566,10 @@ DxeRegisterCallBackWorker (
   }
 
   FnTableEntry = AllocatePool (sizeof (CALLBACK_FN_ENTRY));
-  ASSERT (FnTableEntry != NULL);
+  if (FnTableEntry == NULL) {
+    ASSERT (FnTableEntry != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   FnTableEntry->CallbackFn = CallBackFunction;
   InsertTailList (ListHead, &FnTableEntry->Node);
@@ -993,8 +1000,10 @@ GetHiiVariable (
   //
   if (Status == EFI_BUFFER_TOO_SMALL) {
     Buffer = (UINT8 *)AllocatePool (Size);
-
-    ASSERT (Buffer != NULL);
+    if (Buffer == NULL) {
+      ASSERT (Buffer != NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
 
     Status = gRT->GetVariable (
                     VariableName,
@@ -1500,7 +1509,10 @@ SetHiiVariable (
     }
 
     Buffer = AllocatePool (SetSize);
-    ASSERT (Buffer != NULL);
+    if (Buffer == NULL) {
+      ASSERT (Buffer != NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
 
     Status = gRT->GetVariable (
                     VariableName,
@@ -1538,7 +1550,11 @@ SetHiiVariable (
     //
     GetVariableSizeAndDataFromHiiPcd (VariableGuid, VariableName, &Size, NULL);
     Buffer = AllocateZeroPool (Size);
-    ASSERT (Buffer != NULL);
+    if (Buffer == NULL) {
+      ASSERT (Buffer != NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     GetVariableSizeAndDataFromHiiPcd (VariableGuid, VariableName, &Size, Buffer);
 
     //
@@ -1839,13 +1855,13 @@ SetPtrTypeSize (
 
   @param[in] IsPeiDb        If TRUE, the pcd entry is initialized in PEI phase,
                             If FALSE, the pcd entry is initialized in DXE phase.
-  @param[in] VariableLock   Pointer to VariableLockProtocol.
+  @param[in] VariableLock   Pointer to VariablePolicyProtocol.
 
 **/
 VOID
 VariableLockDynamicHiiPcd (
-  IN BOOLEAN                       IsPeiDb,
-  IN EDKII_VARIABLE_LOCK_PROTOCOL  *VariableLock
+  IN BOOLEAN                         IsPeiDb,
+  IN EDKII_VARIABLE_POLICY_PROTOCOL  *VariablePolicy
   )
 {
   EFI_STATUS         Status;
@@ -1890,7 +1906,17 @@ VariableLockDynamicHiiPcd (
         GuidTable   = (EFI_GUID *)((UINT8 *)Database + Database->GuidTableOffset);
         Guid        = GuidTable + VariableHead->GuidTableIndex;
         Name        = (UINT16 *)(StringTable + VariableHead->StringIndex);
-        Status      = VariableLock->RequestToLock (VariableLock, Name, Guid);
+        Status      = RegisterBasicVariablePolicy (
+                        VariablePolicy,
+                        Guid,
+                        Name,
+                        VARIABLE_POLICY_NO_MIN_SIZE,
+                        VARIABLE_POLICY_NO_MAX_SIZE,
+                        VARIABLE_POLICY_NO_MUST_ATTR,
+                        VARIABLE_POLICY_NO_CANT_ATTR,
+                        VARIABLE_POLICY_TYPE_LOCK_NOW
+                        );
+
         ASSERT_EFI_ERROR (Status);
       }
     }
@@ -1898,7 +1924,7 @@ VariableLockDynamicHiiPcd (
 }
 
 /**
-  VariableLockProtocol callback
+  VariablePolicyProtocol callback
   to lock the variables referenced by DynamicHii PCDs with RO property set in *.dsc.
 
   @param[in] Event      Event whose notification function is being invoked.
@@ -1912,12 +1938,12 @@ VariableLockCallBack (
   IN VOID       *Context
   )
 {
-  EFI_STATUS                    Status;
-  EDKII_VARIABLE_LOCK_PROTOCOL  *VariableLock;
+  EFI_STATUS                      Status;
+  EDKII_VARIABLE_POLICY_PROTOCOL  *VariablePolicy;
 
-  Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **)&VariableLock);
+  Status = gBS->LocateProtocol (&gEdkiiVariablePolicyProtocolGuid, NULL, (VOID **)&VariablePolicy);
   if (!EFI_ERROR (Status)) {
-    VariableLockDynamicHiiPcd (TRUE, VariableLock);
-    VariableLockDynamicHiiPcd (FALSE, VariableLock);
+    VariableLockDynamicHiiPcd (TRUE, VariablePolicy);
+    VariableLockDynamicHiiPcd (FALSE, VariablePolicy);
   }
 }
