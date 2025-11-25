@@ -668,3 +668,12 @@ TEST_DESC  mPkcs7Test[] = {
 };
 
 UINTN  mPkcs7TestNum = ARRAY_SIZE (mPkcs7Test);
+
+TEST_DESC  mPkcs7TestMbedTls[] = {
+  //
+  // -----Description--------------------------------------Class----------------------Function-----------------Pre---Post--Context
+  //
+  { "TestVerifyPkcs7SignVerify()", "CryptoPkg.BaseCryptLib.Pkcs7", TestVerifyPkcs7SignVerify, NULL, NULL, NULL },
+};
+
+UINTN  mPkcs7TestMbedTlsNum = ARRAY_SIZE (mPkcs7TestMbedTls);

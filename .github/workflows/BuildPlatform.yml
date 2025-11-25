@@ -61,7 +61,7 @@ jobs:
 
     runs-on: ${{ inputs.runs-on }}
     container:
-      image: ${{ startswith(inputs.runs-on, 'ubuntu') && 'ghcr.io/tianocore/containers/fedora-40-dev:latest' || '' }}
+      image: ${{ startswith(inputs.runs-on, 'ubuntu') && 'ghcr.io/tianocore/containers/fedora-43-v:latest' || '' }}
 
     steps:
       - name: Checkout

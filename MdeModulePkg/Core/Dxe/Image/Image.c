@@ -161,7 +161,10 @@ PeCoffEmuProtocolNotify (
     }
 
     Entry = AllocateZeroPool (sizeof (*Entry));
-    ASSERT (Entry != NULL);
+    if (Entry == NULL) {
+      ASSERT (Entry != NULL);
+      break;
+    }
 
     Entry->Emulator    = Emulator;
     Entry->MachineType = Entry->Emulator->MachineType;
@@ -200,7 +203,9 @@ CoreInitializeImageServices (
       //
       // Find Dxe Core HOB
       //
-      break;
+      if (CompareGuid (&DxeCoreHob.MemoryAllocationModule->ModuleName, &gEfiCallerIdGuid)) {
+        break;
+      }
     }
 
     DxeCoreHob.Raw = GET_NEXT_HOB (DxeCoreHob);
@@ -1253,6 +1258,11 @@ CoreLoadImageCommon (
         // LoadFile () may cause the device path of the Handle be updated.
         //
         OriginalFilePath = AppendDevicePath (DevicePathFromHandle (DeviceHandle), Node);
+        if (OriginalFilePath == NULL) {
+          Image  = NULL;
+          Status = EFI_OUT_OF_RESOURCES;
+          goto Done;
+        }
       }
     }
   }

@@ -20,6 +20,8 @@
 /**
   Fill Write Buffer with Opcode, Address, Dummy Bytes, and Data.
 
+  If WriteBytes is non-zero, WriteBuffer must be a valid buffer.
+
   @param[in]    Instance               The instance of SPI_NOR_FLASH
   @param[in]    Opcode                 Opcode for transaction
   @param[in]    DummyBytes             The dummy bytes send to SPI flash device

@@ -192,7 +192,7 @@ RegisterPeriodicCallback (
   IN EFI_PERIODIC_CALLBACK       PeriodicCallback
   )
 {
-  return ManageIdtEntryTable (PeriodicCallback, SYSTEM_TIMER_VECTOR);
+  return ManageIdtEntryTable ((CALLBACK_FUNC)PeriodicCallback, SYSTEM_TIMER_VECTOR);
 }
 
 /**
@@ -221,7 +221,7 @@ RegisterExceptionCallback (
   IN EFI_EXCEPTION_TYPE          ExceptionType
   )
 {
-  return ManageIdtEntryTable (ExceptionCallback, ExceptionType);
+  return ManageIdtEntryTable ((CALLBACK_FUNC)ExceptionCallback, ExceptionType);
 }
 
 /**

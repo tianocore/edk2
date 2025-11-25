@@ -224,7 +224,9 @@ INF MdeModulePkg/Logo/LogoDxe.inf
   }
 !endif
 !include NetworkPkg/Network.fdf.inc
+!if $(NETWORK_ENABLE) == TRUE
   INF  OvmfPkg/VirtioNetDxe/VirtioNet.inf
+!endif
 
 #
 # Usb Support

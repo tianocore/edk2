@@ -20,7 +20,7 @@
 /**
   Performs library initialization.
 
-  This initialization function contains common functionality shared betwen all
+  This initialization function contains common functionality shared between all
   library instance constructors.
 
 **/

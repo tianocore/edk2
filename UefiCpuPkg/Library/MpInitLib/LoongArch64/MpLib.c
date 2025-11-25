@@ -230,10 +230,10 @@ CollectProcessorCount (
   CpuMpData->ApLoopMode = ApInRunLoop;
 
   //
-  // Beacuse LoongArch does not have SIPI now, the APIC ID must be obtained before
+  // Because LoongArch does not have SIPI now, the APIC ID must be obtained before
   // calling IPI to wake up the APs. If NULL is obtained, NODE0 Core0 Mailbox0 is used
   // as the first broadcast method to wake up all APs, and all of APs will read NODE0
-  // Core0 Mailbox0 in an infinit loop.
+  // Core0 Mailbox0 in an infinite loop.
   //
   mProcessorResourceData = GetProcessorResourceDataFromGuidedHob ();
 
