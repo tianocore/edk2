@@ -36,26 +36,26 @@
 
 **/
 SMBIOS_MISC_TABLE_FUNCTION (MiscChassisManufacturer) {
-  CHAR8               *StrStart;
-  UINT8               *SkuNumberField;
-  UINTN               RecordLength;
-  UINTN               ManuStrLen;
-  UINTN               VerStrLen;
-  UINTN               AssertTagStrLen;
-  UINTN               SerialNumStrLen;
-  UINTN               ChaNumStrLen;
-  UINTN               BaseSize;
-  UINTN               ExtendLength;
-  UINTN               HdrLength;
-  EFI_STRING          Manufacturer;
-  EFI_STRING          Version;
-  EFI_STRING          SerialNumber;
-  EFI_STRING          AssertTag;
-  EFI_STRING          ChassisSkuNumber;
-  EFI_STRING_ID       TokenToGet;
-  SMBIOS_TABLE_TYPE3  *SmbiosRecord;
-  SMBIOS_TABLE_TYPE3  *InputData;
-  EFI_STATUS          Status;
+  CHAR8                *StrStart;
+  SMBIOS_TABLE_STRING  *SkuNumberField;
+  UINTN                RecordLength;
+  UINTN                ManuStrLen;
+  UINTN                VerStrLen;
+  UINTN                AssertTagStrLen;
+  UINTN                SerialNumStrLen;
+  UINTN                ChaNumStrLen;
+  UINTN                BaseSize;
+  UINTN                ExtendLength;
+  UINTN                HdrLength;
+  EFI_STRING           Manufacturer;
+  EFI_STRING           Version;
+  EFI_STRING           SerialNumber;
+  EFI_STRING           AssertTag;
+  EFI_STRING           ChassisSkuNumber;
+  EFI_STRING_ID        TokenToGet;
+  SMBIOS_TABLE_TYPE3   *SmbiosRecord;
+  SMBIOS_TABLE_TYPE3   *InputData;
+  EFI_STATUS           Status;
 
   //
   // First check for invalid parameters.
@@ -150,7 +150,7 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscChassisManufacturer) {
   SmbiosRecord->Type = OemGetChassisType ();
 
   // ChassisSkuNumber
-  SkuNumberField = (UINT8 *)SmbiosRecord + BaseSize + ExtendLength;
+  SkuNumberField = (SMBIOS_TABLE_STRING *)((UINT8 *)SmbiosRecord + BaseSize + ExtendLength);
 
   // The string numbers in the fixed position portion of the record are populated in the input data.
   *SkuNumberField = 5;
