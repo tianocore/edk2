@@ -699,6 +699,7 @@ BdsEntry (
 
   HotkeyTriggered = NULL;
   Status          = EFI_SUCCESS;
+  BootSuccess     = FALSE;
 
   //
   // Insert the performance probe

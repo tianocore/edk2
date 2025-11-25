@@ -111,6 +111,8 @@ CreateQuestion (
   NAME_VALUE_NODE          *NameValueNode;
   BOOLEAN                  Find;
 
+  Storage = NULL;
+
   Statement = CreateStatement (OpCodeData, FormSet, Form);
   if (Statement == NULL) {
     return NULL;
@@ -330,6 +332,8 @@ FindStorageInList (
   LIST_ENTRY       *Link;
   BROWSER_STORAGE  *BrowserStorage;
 
+  BrowserStorage = NULL;
+
   Link = GetFirstNode (&gBrowserStorageList);
   while (!IsNull (&gBrowserStorageList, Link)) {
     BrowserStorage = BROWSER_STORAGE_FROM_LINK (Link);
@@ -430,8 +434,11 @@ CreateStorage (
   EFI_GUID         *StorageGuid;
   CHAR8            *StorageName;
 
-  UnicodeString = NULL;
-  StorageName   = NULL;
+  UnicodeString  = NULL;
+  StorageName    = NULL;
+  BrowserStorage = NULL;
+  Storage        = NULL;
+
   switch (StorageType) {
     case EFI_HII_VARSTORE_BUFFER:
       StorageGuid = (EFI_GUID *)(CHAR8 *)&((EFI_IFR_VARSTORE *)OpCodeData)->Guid;
