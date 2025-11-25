@@ -1,4 +1,4 @@
-## @file
+## @file MockSafeIntLib.inf
 # Mock implementation of the SafeInt library
 #
 # Copyright (c) Microsoft Corporation.

@@ -231,6 +231,9 @@
             "screl",            # Cpucfg.h
             "sence",            # Atapi.h
             "sigle",            # SmBios.h
+            "smmbase",            # MockSmmBase2.h
+            "smmcpu",             # MockSmmCpu.h
+            "tagid",              # ArmTransferListLib
             "tlbrprmd",         # Csr.h
             "toleremce",        # IpmiNetFnStorage.h
             "unownered",        # TcgPhysicalPresence.h
