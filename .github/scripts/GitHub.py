@@ -232,8 +232,13 @@ def add_reviewers_to_pr(
     repo_collaborators = [c.login.strip().lower() for c in repo_gh.get_collaborators() if c]
     non_collaborators = [u for u in user_names if u.lower() not in repo_collaborators]
 
-    excluded_pr_reviewers = [pr_author] + current_pr_reviewers + non_collaborators
-    new_pr_reviewers = [u for u in user_names if u not in excluded_pr_reviewers]
+    excluded_pr_reviewers = {
+        e.lower()
+        for e in [pr_author] + current_pr_reviewers + non_collaborators
+    }
+    new_pr_reviewers = [
+        u for u in user_names if u.lower() not in excluded_pr_reviewers
+    ]
 
     # Notify the admins of the repository if non-collaborators are requested.
     if non_collaborators:
