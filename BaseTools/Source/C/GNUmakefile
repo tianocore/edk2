@@ -22,7 +22,6 @@ all: makerootdir subdirs
 	@echo Finished building BaseTools C Tools with HOST_ARCH=$(HOST_ARCH)
 
 LIBRARIES = Common
-VFRAUTOGEN = VfrCompile/VfrLexer.h
 APPLICATIONS = \
   BrotliCompress \
   VfrCompile \
@@ -40,7 +39,7 @@ APPLICATIONS = \
 SUBDIRS := $(LIBRARIES) $(APPLICATIONS)
 
 $(LIBRARIES): $(MAKEROOT)/libs
-$(APPLICATIONS): $(LIBRARIES) $(MAKEROOT)/bin $(VFRAUTOGEN)
+$(APPLICATIONS): $(LIBRARIES) $(MAKEROOT)/bin
 
 .PHONY: outputdirs
 makerootdir:
@@ -54,9 +53,6 @@ $(SUBDIRS):
 .PHONY: $(patsubst %,%-clean,$(sort $(SUBDIRS)))
 $(patsubst %,%-clean,$(sort $(SUBDIRS))):
 	-$(MAKE) -C $(@:-clean=) clean
-
-$(VFRAUTOGEN): VfrCompile/VfrSyntax.g
-	$(MAKE) -C VfrCompile VfrLexer.h
 
 clean:  $(patsubst %,%-clean,$(sort $(SUBDIRS)))
 
