@@ -942,9 +942,7 @@ def NewCreatePcdDatabasePhaseSpecificAutoGen(Platform, Phase):
     if DynamicPcdSet_Sku:
         for skuname, skuid in DynamicPcdSet_Sku:
             AdditionalAutoGenH, AdditionalAutoGenC, PcdDbBuffer, VarCheckTab = CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdSet_Sku[(skuname, skuid)], Phase)
-            final_data = ()
-            for item in range(len(PcdDbBuffer)):
-                final_data += unpack("B", PcdDbBuffer[item:item+1])
+            final_data = tuple(PcdDbBuffer)
             PcdDBData[(skuname, skuid)] = (PcdDbBuffer, final_data)
             PcdDriverAutoGenData[(skuname, skuid)] = (AdditionalAutoGenH, AdditionalAutoGenC)
             VarCheckTableData[(skuname, skuid)] = VarCheckTab
@@ -955,9 +953,7 @@ def NewCreatePcdDatabasePhaseSpecificAutoGen(Platform, Phase):
         AdditionalAutoGenH, AdditionalAutoGenC =  CreateAutoGen(PcdDriverAutoGenData)
     else:
         AdditionalAutoGenH, AdditionalAutoGenC, PcdDbBuffer, VarCheckTab = CreatePcdDatabasePhaseSpecificAutoGen (Platform, {}, Phase)
-        final_data = ()
-        for item in range(len(PcdDbBuffer)):
-            final_data += unpack("B", PcdDbBuffer[item:item + 1])
+        final_data = tuple(PcdDbBuffer)
         PcdDBData[(TAB_DEFAULT, "0")] = (PcdDbBuffer, final_data)
 
     return AdditionalAutoGenH, AdditionalAutoGenC, CreatePcdDataBase(PcdDBData)
