@@ -387,6 +387,7 @@
   RiscV64/SwitchStack.S             | GCC
   RiscV64/RiscVCpuBreakpoint.S      | GCC
   RiscV64/RiscVCpuPause.S           | GCC
+  RiscV64/RiscVEndianness.S         | GCC
   RiscV64/RiscVInterrupt.S          | GCC
   RiscV64/RiscVCacheMgmt.S          | GCC
   RiscV64/CpuScratch.S              | GCC
