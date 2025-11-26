@@ -15,6 +15,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "EfiVfr.h"
 #include "VfrError.h"
 
+#pragma pack(1)
+typedef struct {
+    EFI_GUID Guid;
+} PACKED_EFI_GUID;
+#pragma pack()
+
 static EFI_GUID gEdkiiIfrBitVarGuid = EDKII_IFR_BIT_VARSTORE_GUID;
 
 #define MAX_BIT_WIDTH                      32
