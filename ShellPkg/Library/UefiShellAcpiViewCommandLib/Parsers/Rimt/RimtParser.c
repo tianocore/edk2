@@ -18,15 +18,15 @@
 // Local variables
 STATIC UINT8                                               *mRimtNodeType;
 STATIC UINT16                                              *mRimtNodeLength;
-STATIC EFI_ACPI_6_6_RIMT_NODE_HEADER_STRUCTURE             mRimtNodeHeader;
-STATIC EFI_ACPI_6_6_RIMT_STRUCTURE                         mRimtInfo;
+extern EFI_ACPI_6_6_RIMT_NODE_HEADER_STRUCTURE             mRimtNodeHeader;
+extern EFI_ACPI_6_6_RIMT_STRUCTURE                         mRimtInfo;
 STATIC CONST UINT32                                        *mNumberOfRimtNodes;
 STATIC CONST UINT32                                        *mOffsetToRimtNodeArray;
-STATIC EFI_ACPI_6_6_RIMT_ID_MAPPING_STRUCTURE              mRimtIdMappingNode;
+extern EFI_ACPI_6_6_RIMT_ID_MAPPING_STRUCTURE              mRimtIdMappingNode;
 STATIC CONST UINT16                                        *mNumberOfIdMappings;
 STATIC UINT8                                               *mIdMappingArrayOffset;
-STATIC EFI_ACPI_6_6_RIMT_PCIE_ROOT_COMPLEX_NODE_STRUCTURE  mRimtPcieRootComplexNode;
-STATIC EFI_ACPI_6_6_RIMT_IOMMU_NODE_STRUCTURE              mRimtIommuNode;
+extern EFI_ACPI_6_6_RIMT_PCIE_ROOT_COMPLEX_NODE_STRUCTURE  mRimtPcieRootComplexNode;
+extern EFI_ACPI_6_6_RIMT_IOMMU_NODE_STRUCTURE              mRimtIommuNode;
 
 /**
   This function validates RIMT Node type.
