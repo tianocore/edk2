@@ -639,6 +639,65 @@ RomDecode (
 }
 
 /**
+  Scan the whole Option Rom and check if the native image exists.
+
+  @param PciDevice       Pci device instance.
+
+  @retval TRUE           The native Option Rom image exists.
+  @retval FALSE          The native Option Rom image does not exist.
+
+**/
+BOOLEAN
+FindNativeOpRom (
+  IN  PCI_IO_DEVICE  *PciDevice
+  )
+{
+  UINT8                         Indicator;
+  UINT32                        ImageSize;
+  VOID                          *RomBar;
+  UINT8                         *RomBarOffset;
+  EFI_PCI_EXPANSION_ROM_HEADER  *EfiRomHeader;
+  PCI_DATA_STRUCTURE            *Pcir;
+  BOOLEAN                       Found;
+
+  RomBar       = PciDevice->PciIo.RomImage;
+  RomBarOffset = (UINT8 *)RomBar;
+  Found        = FALSE;
+
+  do {
+    EfiRomHeader = (EFI_PCI_EXPANSION_ROM_HEADER *)RomBarOffset;
+    if (EfiRomHeader->Signature != PCI_EXPANSION_ROM_HEADER_SIGNATURE) {
+      RomBarOffset += 512;
+      continue;
+    }
+
+    Pcir = (PCI_DATA_STRUCTURE *)(RomBarOffset + EfiRomHeader->PcirOffset);
+    ASSERT (Pcir->Signature == PCI_DATA_STRUCTURE_SIGNATURE);
+    ImageSize = (UINT32)(Pcir->ImageLength * 512);
+    Indicator = Pcir->Indicator;
+
+    if (Pcir->CodeType != PCI_CODE_TYPE_EFI_IMAGE) {
+      goto NextImage;
+    }
+
+    //
+    // Find the native EFI PCI Option ROM image
+    //
+    if (EFI_IMAGE_MACHINE_TYPE_SUPPORTED (EfiRomHeader->EfiMachineType)) {
+      Found = TRUE;
+      break;
+    } else {
+      goto NextImage;
+    }
+
+NextImage:
+    RomBarOffset += ImageSize;
+  } while (((Indicator & 0x80) == 0x00) && (((UINTN)RomBarOffset - (UINTN)RomBar) < PciDevice->RomSize));
+
+  return Found;
+}
+
+/**
   Load and start the Option Rom image.
 
   @param PciDevice       Pci device instance.
@@ -665,8 +724,12 @@ ProcessOpRomImage (
   MEDIA_RELATIVE_OFFSET_RANGE_DEVICE_PATH  EfiOpRomImageNode;
   VOID                                     *Buffer;
   UINTN                                    BufferSize;
+  BOOLEAN                                  FoundNativeOpRom;
+  VOID                                     *PeCoffEmuProtocol;
 
-  Indicator = 0;
+  Indicator         = 0;
+  FoundNativeOpRom  = FALSE;
+  PeCoffEmuProtocol = NULL;
 
   //
   // Get the Address of the Option Rom image
@@ -680,6 +743,15 @@ ProcessOpRomImage (
   }
 
   ASSERT (((EFI_PCI_EXPANSION_ROM_HEADER *)RomBarOffset)->Signature == PCI_EXPANSION_ROM_HEADER_SIGNATURE);
+
+  Status = gBS->LocateProtocol (
+                  &gEdkiiPeCoffImageEmulatorProtocolGuid,
+                  NULL,
+                  (VOID **)&PeCoffEmuProtocol
+                  );
+  if (!EFI_ERROR (Status) && (PeCoffEmuProtocol != NULL)) {
+    FoundNativeOpRom = FindNativeOpRom (PciDevice);
+  }
 
   do {
     EfiRomHeader = (EFI_PCI_EXPANSION_ROM_HEADER *)RomBarOffset;
@@ -697,6 +769,14 @@ ProcessOpRomImage (
     // Skip the image if it is not an EFI PCI Option ROM image
     //
     if (Pcir->CodeType != PCI_CODE_TYPE_EFI_IMAGE) {
+      goto NextImage;
+    }
+
+    //
+    // Skip the EFI PCI Option ROM image if it's machine type is not supported
+    // and the native image is found.
+    //
+    if (!EFI_IMAGE_MACHINE_TYPE_SUPPORTED (EfiRomHeader->EfiMachineType) && FoundNativeOpRom) {
       goto NextImage;
     }
 
