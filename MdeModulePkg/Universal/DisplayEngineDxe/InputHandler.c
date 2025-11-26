@@ -1717,7 +1717,7 @@ TheKey:
             gUserInput->InputValue.BufferLen = Question->CurrentValue.BufferLen;
           }
         } else {
-          if (CurrentOption != NULL) {
+          if (CurrentOption == NULL) {
             ASSERT (CurrentOption != NULL);
             break;
           }

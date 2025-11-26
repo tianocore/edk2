@@ -2289,13 +2289,18 @@ CompareHiiValue (
   // Take types(date, time, ref, buffer) as buffer
   //
   if (IsTypeInBuffer (Value1) && IsTypeInBuffer (Value2)) {
-    Buf1    = GetBufferForValue (Value1);
-    Buf1Len = GetLengthForValue (Value1);
-    Buf2    = GetBufferForValue (Value2);
-    Buf2Len = GetLengthForValue (Value2);
-    if ((Buf1 == NULL) || (Buf2 == NULL)) {
+    Buf1 = GetBufferForValue (Value1);
+    if (Buf1 == NULL) {
       return EFI_INVALID_PARAMETER;
     }
+
+    Buf1Len = GetLengthForValue (Value1);
+    Buf2    = GetBufferForValue (Value2);
+    if (Buf2 == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    Buf2Len = GetLengthForValue (Value2);
 
     Len     = Buf1Len > Buf2Len ? Buf2Len : Buf1Len;
     *Result = CompareMem (Buf1, Buf2, Len);
@@ -2543,15 +2548,19 @@ GetQuestionValueFromForm (
   //
   // Get the question value.
   //
-  if (Question != NULL) {
-    Status = GetQuestionValue (FormSet, Form, Question, GetSetValueWithEditBuffer);
-    if (EFI_ERROR (Status)) {
-      GetTheVal = FALSE;
-      goto Done;
-    }
-
-    CopyMem (Value, &Question->HiiValue, sizeof (EFI_HII_VALUE));
+  if (Question == NULL) {
+    ASSERT (Question != NULL);
+    GetTheVal = FALSE;
+    goto Done;
   }
+
+  Status = GetQuestionValue (FormSet, Form, Question, GetSetValueWithEditBuffer);
+  if (EFI_ERROR (Status)) {
+    GetTheVal = FALSE;
+    goto Done;
+  }
+
+  CopyMem (Value, &Question->HiiValue, sizeof (EFI_HII_VALUE));
 
 Done:
   //

@@ -363,7 +363,7 @@ LoadAllHiiFormset (
     // Initilize FormSet Setting
     //
     LocalFormSet = AllocateZeroPool (sizeof (FORM_BROWSER_FORMSET));
-    if (LocalFormSet != NULL ) {
+    if (LocalFormSet == NULL ) {
       ASSERT (LocalFormSet != NULL);
       return;
     }
@@ -3291,7 +3291,7 @@ ConfirmNoSubmitFail (
   }
 
   StringBuffer = AllocateZeroPool (256 * sizeof (CHAR16));
-  if (StringBuffer != NULL) {
+  if (StringBuffer == NULL) {
     ASSERT (StringBuffer != NULL);
     return RetVal;
   }
@@ -4423,7 +4423,7 @@ ReGetDefault:
     if (!EFI_ERROR (Status)) {
       if (HiiValue->Type == EFI_IFR_TYPE_STRING) {
         NewString = GetToken (Question->HiiValue.Value.string, FormSet->HiiHandle);
-        if (NewString != NULL) {
+        if (NewString == NULL) {
           ASSERT (NewString != NULL);
           return EFI_NOT_FOUND;
         }

@@ -3269,7 +3269,7 @@ UiDisplayMenu (
             // If the screen has no menu items, and the user didn't select UiReset
             // ignore the selection and go back to reading keys.
             //
-            if (MenuOption != NULL ) {
+            if (MenuOption == NULL ) {
               ASSERT (MenuOption != NULL);
               break;
             }
@@ -3324,7 +3324,7 @@ UiDisplayMenu (
               break;
             }
 
-            if (MenuOption != NULL) {
+            if (MenuOption == NULL) {
               ASSERT (MenuOption != NULL);
               break;
             }
@@ -3413,7 +3413,7 @@ UiDisplayMenu (
 
       case CfUiSelect:
         ControlFlag = CfRepaint;
-        if (MenuOption != NULL ) {
+        if (MenuOption == NULL ) {
           ASSERT (MenuOption != NULL);
           break;
         }
@@ -3472,7 +3472,7 @@ UiDisplayMenu (
 
       case CfUiHotKey:
         ControlFlag = CfRepaint;
-        if (HotKey != NULL ) {
+        if (HotKey == NULL ) {
           ASSERT (HotKey != NULL);
           break;
         }
