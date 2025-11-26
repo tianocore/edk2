@@ -361,7 +361,7 @@ UpdateFvFileDevicePath (
     // Build the shell device path
     //
     NewDevicePath = DevicePathFromHandle (FoundFvHandle);
-    if (NewDevicePath != NULL) {
+    if (NewDevicePath == NULL) {
       return EFI_NOT_FOUND;
     }
 

@@ -2458,7 +2458,7 @@ ParseOpCodes (
         //
         // Insert to Option list of current Question
         //
-        if (ParentStatement != NULL) {
+        if (ParentStatement == NULL) {
           break;
         }
 
