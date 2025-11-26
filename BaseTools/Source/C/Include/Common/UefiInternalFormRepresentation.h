@@ -39,6 +39,21 @@ typedef UINT32  EFI_HII_FONT_STYLE;
 
 #pragma pack(1)
 
+//
+// Base types
+//
+
+//
+// We require an unaligned exact equivalent of EFI_GUID in order to avoid
+// the strictly undefined behaviour of maintaining unaligned pointers to
+// the original, aligned type, in contexts such as VfrCompile.
+//
+typedef struct {
+  UINT32  Data1;
+  UINT16  Data2;
+  UINT16  Data3;
+  UINT8   Data4[8];
+} UNALIGNED_EFI_GUID;
 
 //
 // HII package list
