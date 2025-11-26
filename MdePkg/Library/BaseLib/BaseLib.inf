@@ -375,7 +375,7 @@
 
 [Sources.RISCV64]
   Math64.c
-  Unaligned.c
+  RiscV64/Unaligned.c
   RiscV64/InternalSwitchStack.c
   RiscV64/CpuBreakpoint.c
   RiscV64/GetInterruptState.c
