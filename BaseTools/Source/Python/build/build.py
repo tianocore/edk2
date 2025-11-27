@@ -24,6 +24,7 @@ import time
 import platform
 import traceback
 import multiprocessing
+import errno
 from threading import Thread,Event,BoundedSemaphore
 import threading
 from linecache import getlines
@@ -871,6 +872,10 @@ class Build():
             if not rt:
                 err = UNKNOWN_ERROR
             return rt, err
+        except OSError as e:
+            if e.errno == errno.EMFILE:
+                EdkLogger.warn("build", RESOURCE_OVERFLOW, ExtraData="Reached file descriptor limit!\n")
+            raise
         except FatalError as e:
             return False, e.args[0]
         except:
@@ -2693,6 +2698,8 @@ def Main():
         # All job done, no error found and no exception raised
         #
         BuildError = False
+    except OSError as X:
+        ReturnCode = RESOURCE_UNKNOWN_ERROR
     except FatalError as X:
         if MyBuild is not None:
             # for multi-thread build exits safely
