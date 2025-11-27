@@ -61,12 +61,13 @@ MainCmdSet (
   //
   if (ShellCommandLineGetFlag (Package, L"-?")) {
     ASSERT (FALSE);
+    return ShellStatus;
   } else if (ShellCommandLineGetRawValue (Package, 3) != NULL) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"set");
-    ShellStatus = SHELL_INVALID_PARAMETER;
+    return SHELL_INVALID_PARAMETER;
   } else if ((ShellCommandLineGetRawValue (Package, 1) != NULL) && ShellCommandLineGetFlag (Package, L"-d")) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"set");
-    ShellStatus = SHELL_INVALID_PARAMETER;
+    return SHELL_INVALID_PARAMETER;
   } else if (ShellCommandLineGetFlag (Package, L"-d")) {
     //
     // delete a environment variable
@@ -82,42 +83,44 @@ MainCmdSet (
         ShellStatus = SHELL_DEVICE_ERROR;
       }
     }
+
+    return ShellStatus;
   } else if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
     //
     // print out all current environment variables
     //
     return (PrintAllShellEnvVars ());
+  }
+
+  //
+  // we are either printing one or assigning one
+  //
+  KeyName = ShellCommandLineGetRawValue (Package, 1);
+  Value   = ShellCommandLineGetRawValue (Package, 2);
+  if ((KeyName != NULL) && (Value != NULL)) {
+    //
+    // assigning one
+    //
+    Status = ShellSetEnvironmentVariable (KeyName, Value, ShellCommandLineGetFlag (Package, L"-v"));
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SET_ERROR_SET), gShellLevel2HiiHandle, L"set", KeyName);
+      ShellStatus = (SHELL_STATUS)(Status & (~MAX_BIT));
+    }
   } else {
-    //
-    // we are either printing one or assigning one
-    //
-    KeyName = ShellCommandLineGetRawValue (Package, 1);
-    Value   = ShellCommandLineGetRawValue (Package, 2);
-    if ((KeyName != NULL) && (Value != NULL)) {
+    if (KeyName != NULL) {
       //
-      // assigning one
+      // print out value for this one only.
       //
-      Status = ShellSetEnvironmentVariable (KeyName, Value, ShellCommandLineGetFlag (Package, L"-v"));
-      if (EFI_ERROR (Status)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SET_ERROR_SET), gShellLevel2HiiHandle, L"set", KeyName);
-        ShellStatus = (SHELL_STATUS)(Status & (~MAX_BIT));
+      Value = ShellGetEnvironmentVariable (KeyName);
+      if (Value == NULL) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SET_NF), gShellLevel2HiiHandle, L"set", KeyName);
+        ShellStatus = SHELL_SUCCESS;
+      } else {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SET_DISP), gShellLevel2HiiHandle, KeyName, Value);
+        ShellStatus = SHELL_SUCCESS;
       }
     } else {
-      if (KeyName != NULL) {
-        //
-        // print out value for this one only.
-        //
-        Value = ShellGetEnvironmentVariable (KeyName);
-        if (Value == NULL) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SET_NF), gShellLevel2HiiHandle, L"set", KeyName);
-          ShellStatus = SHELL_SUCCESS;
-        } else {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SET_DISP), gShellLevel2HiiHandle, KeyName, Value);
-          ShellStatus = SHELL_SUCCESS;
-        }
-      } else {
-        ASSERT (FALSE);
-      }
+      ASSERT (FALSE);
     }
   }
 
