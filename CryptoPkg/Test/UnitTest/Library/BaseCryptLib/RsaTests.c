@@ -340,3 +340,13 @@ TEST_DESC  mRsaTest[] = {
 };
 
 UINTN  mRsaTestNum = ARRAY_SIZE (mRsaTest);
+
+TEST_DESC  mRsaTestMbedTls[] = {
+  //
+  // -----Description--------------------------------------Class----------------------Function---------------------------------Pre---------------------Post---------Context
+  //
+  { "TestVerifyRsaSetGetKeyComponents()", "CryptoPkg.BaseCryptLib.Rsa", TestVerifyRsaSetGetKeyComponents, TestVerifyRsaPreReq, TestVerifyRsaCleanUp, NULL },
+  { "TestVerifyRsaPkcs1SignVerify()",     "CryptoPkg.BaseCryptLib.Rsa", TestVerifyRsaPkcs1SignVerify,     TestVerifyRsaPreReq, TestVerifyRsaCleanUp, NULL },
+};
+
+UINTN  mRsaTestMbedTlsNum = ARRAY_SIZE (mRsaTestMbedTls);

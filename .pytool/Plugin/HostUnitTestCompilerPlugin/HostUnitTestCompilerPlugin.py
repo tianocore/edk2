@@ -91,14 +91,19 @@ class HostUnitTestCompilerPlugin(ICiBuildPlugin):
             tc.LogStdError("DscPath not found in config file.  Nothing to compile for HostBasedUnitTests.")
             return -1
 
+        if pkgconfig["DscPath"].strip() == "":
+            tc.SetSkipped()
+            tc.LogStdError("Package HostBasedUnitTest Dsc not assigned.")
+            return -1
+
         AP = Edk2pathObj.GetAbsolutePathOnThisSystemFromEdk2RelativePath(packagename)
 
         APDSC = os.path.join(AP, pkgconfig["DscPath"].strip())
         AP_Path = Edk2pathObj.GetEdk2RelativePathFromAbsolutePath(APDSC)
         if AP is None or AP_Path is None or not os.path.isfile(APDSC):
-            tc.SetSkipped()
+            tc.SetFailed("Package HostBasedUnitTest Dsc not found: {0}".format(AP_Path), "FILE_NOT_FOUND")
             tc.LogStdError("Package HostBasedUnitTest Dsc not found.")
-            return -1
+            return 1
 
         logging.info("Building {0}".format(AP_Path))
         self._env.SetValue("ACTIVE_PLATFORM", AP_Path, "Set in Compiler Plugin")

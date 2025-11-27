@@ -215,16 +215,43 @@ SecTemporaryRamSupport (
   IN UINTN                   CopySize
   )
 {
-  IA32_DESCRIPTOR  IdtDescriptor;
-  VOID             *OldHeap;
-  VOID             *NewHeap;
-  VOID             *OldStack;
-  VOID             *NewStack;
-  UINTN            HeapSize;
-  UINTN            StackSize;
+  IA32_DESCRIPTOR       IdtDescriptor;
+  VOID                  *OldHeap;
+  VOID                  *NewHeap;
+  VOID                  *OldStack;
+  VOID                  *NewStack;
+  UINTN                 HeapSize;
+  UINTN                 StackSize;
+  IA32_DESCRIPTOR       Gdtr;
+  EFI_PHYSICAL_ADDRESS  GdtBuffer;
+  EFI_STATUS            Status;
+  UINTN                 CurrentStack;
+  UINTN                 FspStackBase;
 
-  UINTN  CurrentStack;
-  UINTN  FspStackBase;
+  //
+  // Migrates the Global Descriptor Table (GDT) to permanent memory.
+  //
+  AsmReadGdtr (&Gdtr);
+
+  //
+  // Allocate the permanent memory for GDT.
+  //
+  Status = (*PeiServices)->AllocatePages (
+                             PeiServices,
+                             EfiBootServicesCode,
+                             EFI_SIZE_TO_PAGES (Gdtr.Limit + 1),
+                             &GdtBuffer
+                             );
+
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  ASSERT ((VOID *)(UINTN)GdtBuffer != NULL);
+  CopyMem ((VOID *)(UINTN)GdtBuffer, (VOID *)Gdtr.Base, Gdtr.Limit + 1);
+  Gdtr.Base = (UINTN)GdtBuffer;
+  AsmWriteGdtr (&Gdtr);
 
   //
   // Override OnSeparateStack to 1 because this function will switch stack to permanent memory

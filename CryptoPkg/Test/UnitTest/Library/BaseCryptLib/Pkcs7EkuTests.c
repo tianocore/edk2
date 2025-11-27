@@ -541,3 +541,18 @@ TEST_DESC  mPkcs7EkuTest[] = {
 };
 
 UINTN  mPkcs7EkuTestNum = ARRAY_SIZE (mPkcs7EkuTest);
+
+TEST_DESC  mPkcs7EkuTestMbedTls[] = {
+  //
+  // -----Description--------------------------------Class----------------------------Function------------------------------Pre---Post--Context
+  //
+  { "TestVerifyEKUsWith1CertInSignature()",   "CryptoPkg.BaseCryptLib.Eku", TestVerifyEKUsWith1CertInSignature,   NULL, NULL, NULL },
+  { "TestVerifyEKUsWithMultipleEKUsInCert()", "CryptoPkg.BaseCryptLib.Eku", TestVerifyEKUsWithMultipleEKUsInCert, NULL, NULL, NULL },
+  { "TestEkusNotPresentInSignature()",        "CryptoPkg.BaseCryptLib.Eku", TestEkusNotPresentInSignature,        NULL, NULL, NULL },
+  { "TestProductId10001PresentInSignature()", "CryptoPkg.BaseCryptLib.Eku", TestProductId10001PresentInSignature, NULL, NULL, NULL },
+  { "TestOnlyOneEkuInListRequired()",         "CryptoPkg.BaseCryptLib.Eku", TestOnlyOneEkuInListRequired,         NULL, NULL, NULL },
+  { "TestInvalidParameters()",                "CryptoPkg.BaseCryptLib.Eku", TestInvalidParameters,                NULL, NULL, NULL },
+  { "TestEKUSubsetSupersetFails()",           "CryptoPkg.BaseCryptLib.Eku", TestEKUSubsetSupersetFails,           NULL, NULL, NULL },
+};
+
+UINTN  mPkcs7EkuTestMbedTlsNum = ARRAY_SIZE (mPkcs7EkuTestMbedTls);

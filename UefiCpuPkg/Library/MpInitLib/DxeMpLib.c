@@ -109,7 +109,7 @@ GetWakeupBuffer (
   // LegacyBios driver only reports warning when page allocation in range
   // [0x60000, 0x88000) fails.
   // This library is consumed by CpuDxe driver to produce CPU Arch protocol.
-  // LagacyBios driver depends on CPU Arch protocol which guarantees below
+  // LegacyBios driver depends on CPU Arch protocol which guarantees below
   // allocation runs earlier than LegacyBios driver.
   //
   if (ConfidentialComputingGuestHas (CCAttrAmdSevEs)) {
@@ -983,7 +983,7 @@ MpInitLibEnableDisableAP (
 }
 
 /**
-  This funtion will try to invoke platform specific microcode shadow logic to
+  This function will try to invoke platform specific microcode shadow logic to
   relocate microcode update patches into memory.
 
   @param[in, out] CpuMpData  The pointer to CPU MP Data structure.
