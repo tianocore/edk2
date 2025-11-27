@@ -67,6 +67,15 @@ typedef struct DynamicPlatformRepositoryInfo {
   /// This array is populated when the Repo is finalized.
   CM_OBJ_DESCRIPTOR      ArmCmObjArray[EArmObjMax];
 
+  /// Link lists of CmObj from the RiscVNameSpace
+  /// that are added in the Transient state.
+  LIST_ENTRY             RiscVCmObjList[ERiscVObjMax];
+
+  /// Structure Members used in Finalized state.
+  /// An array of CmObj Descriptors from the RiscVNameSpace
+  /// This array is populated when the Repo is finalized.
+  CM_OBJ_DESCRIPTOR      RiscVCmObjArray[ERiscVObjMax];
+
   /// Link lists of CmObj from the ArchCommon Namespace
   /// that are added in the Transient state.
   LIST_ENTRY             ArchCommonCmObjList[EArchCommonObjMax];
