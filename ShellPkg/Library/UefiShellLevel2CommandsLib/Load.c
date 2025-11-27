@@ -203,49 +203,50 @@ MainCmdLoad (
   //
   if (ShellCommandLineGetFlag (Package, L"-?")) {
     ASSERT (FALSE);
+    return ShellStatus;
   } else if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
     //
     // we didnt get a single file to load parameter
     //
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"load");
-    ShellStatus = SHELL_INVALID_PARAMETER;
-  } else {
-    for ( ParamCount = 1
-          ; ShellCommandLineGetRawValue (Package, ParamCount) != NULL
-          ; ParamCount++
-          )
-    {
-      Status = ShellOpenFileMetaArg ((CHAR16 *)ShellCommandLineGetRawValue (Package, ParamCount), EFI_FILE_MODE_READ, &ListHead);
-      if (!EFI_ERROR (Status)) {
-        for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&ListHead->Link)
-              ; !IsNull (&ListHead->Link, &Node->Link)
-              ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&ListHead->Link, &Node->Link)
-              )
-        {
-          //
-          // once we have an error preserve that value, but finish the loop.
-          //
-          if (EFI_ERROR (Status)) {
-            LoadDriver (Node->FullName, (BOOLEAN)(ShellCommandLineGetFlag (Package, L"-nc") == FALSE));
-          } else {
-            Status = LoadDriver (Node->FullName, (BOOLEAN)(ShellCommandLineGetFlag (Package, L"-nc") == FALSE));
-          }
-        } // for loop for multi-open
-
-        if (EFI_ERROR (Status)) {
-          ShellCloseFileMetaArg (&ListHead);
-        } else {
-          Status = ShellCloseFileMetaArg (&ListHead);
-        }
-      } else {
-        //
-        // no files found.
-        //
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"load", (CHAR16 *)ShellCommandLineGetRawValue (Package, ParamCount));
-        ShellStatus = SHELL_NOT_FOUND;
-      }
-    } // for loop for params
+    return SHELL_INVALID_PARAMETER;
   }
+
+  for ( ParamCount = 1
+        ; ShellCommandLineGetRawValue (Package, ParamCount) != NULL
+        ; ParamCount++
+        )
+  {
+    Status = ShellOpenFileMetaArg ((CHAR16 *)ShellCommandLineGetRawValue (Package, ParamCount), EFI_FILE_MODE_READ, &ListHead);
+    if (!EFI_ERROR (Status)) {
+      for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&ListHead->Link)
+            ; !IsNull (&ListHead->Link, &Node->Link)
+            ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&ListHead->Link, &Node->Link)
+            )
+      {
+        //
+        // once we have an error preserve that value, but finish the loop.
+        //
+        if (EFI_ERROR (Status)) {
+          LoadDriver (Node->FullName, (BOOLEAN)(ShellCommandLineGetFlag (Package, L"-nc") == FALSE));
+        } else {
+          Status = LoadDriver (Node->FullName, (BOOLEAN)(ShellCommandLineGetFlag (Package, L"-nc") == FALSE));
+        }
+      } // for loop for multi-open
+
+      if (EFI_ERROR (Status)) {
+        ShellCloseFileMetaArg (&ListHead);
+      } else {
+        Status = ShellCloseFileMetaArg (&ListHead);
+      }
+    } else {
+      //
+      // no files found.
+      //
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"load", (CHAR16 *)ShellCommandLineGetRawValue (Package, ParamCount));
+      ShellStatus = SHELL_NOT_FOUND;
+    }
+  } // for loop for params
 
   return ShellStatus;
 }
