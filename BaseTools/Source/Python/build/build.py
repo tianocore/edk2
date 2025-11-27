@@ -838,13 +838,22 @@ class Build():
         try:
             if SkipAutoGen:
                 return True,0
+            if sys.platform == "win32":
+                SafeThreadNumber = self.ThreadNumber
+            else:
+                import resource
+                soft = resource.getrlimit(resource.RLIMIT_NOFILE)[0]
+                SafeThreadNumber = min(self.ThreadNumber, soft // 3)
+                if SafeThreadNumber < self.ThreadNumber:
+                    EdkLogger.verbose("AutoGen workers limited to %d to avoid file descriptor exhaustion" % SafeThreadNumber)
             feedback_q = mp.Queue()
             error_event = mp.Event()
             FfsCmd = DataPipe.Get("FfsCommand")
             if FfsCmd is None:
                 FfsCmd = {}
             GlobalData.FfsCmd = FfsCmd
-            auto_workers = [AutoGenWorkerInProcess(mqueue,DataPipe.dump_file,feedback_q,GlobalData.file_lock,cqueue,self.log_q,error_event) for _ in range(self.ThreadNumber)]
+
+            auto_workers = [AutoGenWorkerInProcess(mqueue,DataPipe.dump_file,feedback_q,GlobalData.file_lock,cqueue,self.log_q,error_event) for _ in range(SafeThreadNumber)]
             self.AutoGenMgr = AutoGenManager(auto_workers,feedback_q,error_event)
             self.AutoGenMgr.start()
             for w in auto_workers:
