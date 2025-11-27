@@ -112,7 +112,7 @@ FspMultiPhaseSiInitApiHandler (
 BOOLEAN
 EFIAPI
 FspMultiPhasePlatformGetNumberOfPhases (
-  IN     UINTN   ApiIdx,
+  IN     UINT32  ApiIdx,
   IN OUT UINT32  *NumberOfPhasesSupported
   );
 
