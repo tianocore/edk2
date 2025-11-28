@@ -272,12 +272,24 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
             if ret != 0:
                 logging.error("UnitTest Coverage: Failed generate filtered coverage XML.")
                 return 1
-        # Merge all XML files
+        # Merge package coverage XML files
         ret = self.merge_cobertura_xml_files([f"{testFile}.coverage.xml" for testFile in testList], mergedCoverageXml)
+        if ret != 0:
+            logging.error("UnitTest Coverage: Failed to merge package coverage XML files.")
+            return 1
+
+        workspace = thebuilder.env.GetValue("WORKSPACE")
+        allCoverageXml = os.path.join(workspace, 'Build', 'coverage.xml')
+        testCoverageList = glob.glob(os.path.join(workspace, 'Build', "**", "*.coverage.xml"), recursive=True)
+
+        # Merge all coverage XML files
+        ret = self.merge_cobertura_xml_files(testCoverageList, allCoverageXml)
         if ret != 0:
             logging.error("UnitTest Coverage: Failed to merge coverage XML files.")
             return 1
+
         return 0
+
 
     def merge_cobertura_xml_files(self, xml_file_list, output_file):
         """
@@ -394,7 +406,7 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
                 logging.error("UnitTest Coverage: Failed to collect coverage data.")
                 return 1
 
-        # Generate and XML file if requested.by each package
+        # Generate and XML file if requested by each package
         ret = RunCmd(
             "OpenCppCoverage",
             f"--export_type cobertura:{os.path.join(buildOutputBase, 'coverage.xml')} " +
