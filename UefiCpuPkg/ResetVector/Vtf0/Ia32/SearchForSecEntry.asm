@@ -21,7 +21,7 @@ BITS    32
 Flat32SearchForSecEntryPoint:
 
     ;
-    ; Initialize EBP and ESI to 0
+    ; Initialize EBX and ESI to 0
     ;
     xor     ebx, ebx
     mov     esi, ebx

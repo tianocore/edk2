@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "mbedtls/asn1.h"
 #include "mbedtls/asn1write.h"
 #include "mbedtls/x509.h"
+#include "x509_internal.h"
 #include "mbedtls/x509_crt.h"
 
 ///

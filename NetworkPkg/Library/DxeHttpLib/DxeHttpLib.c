@@ -1634,7 +1634,7 @@ HttpGetFieldNameAndValue (
   }
 
   //
-  // Replace ':' with 0, then FieldName has been retrived from String.
+  // Replace ':' with 0, then FieldName has been retrieved from String.
   //
   *(FieldValueStr - 1) = 0;
 
