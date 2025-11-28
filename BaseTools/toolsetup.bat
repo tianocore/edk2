@@ -243,15 +243,15 @@ if /I "%1"=="/?" goto Usage
     ) else (
       set EDK_TOOLS_BIN=%EDK_TOOLS_PATH%\Bin\Win32
     )
-    if not defined FORCE_REBUILD (
-      if not defined REBUILD (
-        if not exist "%EDK_TOOLS_BIN%" (
-          echo.
-          echo !!! ERROR !!! Cannot find BaseTools Bin Win32!!!
-          echo Please check the directory %EDK_TOOLS_BIN%
-          echo Or configure EDK_TOOLS_BIN env to point to Bin directory.
-          echo.
-        )
+  )
+  if not defined FORCE_REBUILD (
+    if not defined REBUILD (
+      if not exist "%EDK_TOOLS_BIN%" (
+        echo.
+        echo !!! ERROR !!! Cannot find BaseTools Bin Win32!!!
+        echo Please check the directory %EDK_TOOLS_BIN%
+        echo Or configure EDK_TOOLS_BIN env to point to Bin directory.
+        echo.
       )
     )
   )
@@ -285,15 +285,15 @@ if /I "%1"=="/?" goto Usage
     ) else (
       set EDK_TOOLS_BIN=%EDK_TOOLS_PATH%\Bin\Win32
     )
-    if not defined FORCE_REBUILD (
-      if not defined REBUILD (
-        if not exist "%EDK_TOOLS_BIN%" (
-          echo.
-          echo !!! ERROR !!! Cannot find BaseTools Bin Win32!!!
-          echo Please check the directory %EDK_TOOLS_BIN%
-          echo Or configure EDK_TOOLS_BIN env to point to Bin directory.
-          echo.
-        )
+  )
+  if not defined FORCE_REBUILD (
+    if not defined REBUILD (
+      if not exist "%EDK_TOOLS_BIN%" (
+        echo.
+        echo !!! ERROR !!! Cannot find BaseTools Bin Win32!!!
+        echo Please check the directory %EDK_TOOLS_BIN%
+        echo Or configure EDK_TOOLS_BIN env to point to Bin directory.
+        echo.
       )
     )
   )
