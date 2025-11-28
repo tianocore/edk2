@@ -236,13 +236,17 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
         logging.info("Generating UnitTest code coverage")
 
         buildOutputBase = thebuilder.env.GetValue("BUILD_OUTPUT_BASE")
+        workspace = thebuilder.env.GetValue("WORKSPACE")
         if GetHostInfo().os.upper() == "LINUX":
             # Collect test executables with no file extension
             testList = glob.glob(os.path.join(buildOutputBase, "**", "*Test*"), recursive=True)
             testList = [f for f in testList if os.path.isfile(f) and os.path.splitext(f)[1] == ""]
+            allTestList = glob.glob(os.path.join(workspace, "**", "*Test*"), recursive=True)
+            allTestList = [f for f in allTestList if os.path.isfile(f) and os.path.splitext(f)[1] == ""]
         elif GetHostInfo().os.upper() == "WINDOWS":
             # Collect test executables with a .exe file extension
             testList = glob.glob(os.path.join(buildOutputBase, "**","*Test*.exe"), recursive=True)
+            allTestList = glob.glob(os.path.join(workspace, "**","*Test*.exe"), recursive=True)
         else:
             raise NotImplementedError("Unsupported Operating System")
         if not testList:
@@ -252,30 +256,83 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
         profrawlistFile = os.path.join(buildOutputBase, 'profrawlist.txt')
         mergedProfData = os.path.join(buildOutputBase, 'merged.profdata')
         mergedCoverageXml = os.path.join(buildOutputBase, 'coverage.xml')
+        mergedCoverageLcov = os.path.join(buildOutputBase, 'coverage.lcov')
 
-        with open(profrawlistFile, "w") as f:
-            f.write("\n".join(glob.glob(os.path.join(buildOutputBase, "**", "*.profraw"), recursive=True)))
-        # Generate coverage file
-        ret = RunCmd("llvm-profdata", f"merge -sparse --input-files {profrawlistFile} --output {mergedProfData}")
-        if ret != 0:
-            logging.error("UnitTest Coverage: Failed to merge coverage data.")
+        # Generate LCOV and XML file for each unit test executable
+        if self.clang_gen_profdata(buildOutputBase, profrawlistFile, mergedProfData) != 0:
             return 1
-        # Generate and LCOV and XML file for each unit test executable
         for testFile in testList:
-            lcovFile = f"{testFile}.lcov"
-            ret = RunCmd("llvm-cov", f"export -format=lcov --instr-profile={mergedProfData} {testFile} > {lcovFile} ")
-            if ret != 0:
-                logging.error("UnitTest Coverage: Failed to generate coverage data for " + testFile)
+            if self.clang_gen_lcov_xml(mergedProfData, [testFile], f"{testFile}.coverage.lcov", f"{testFile}.coverage.xml") != 0:
                 return 1
-            coveragexmlFile = f"{testFile}.coverage.xml"
-            ret = RunCmd("lcov_cobertura",f"{lcovFile} -o {coveragexmlFile}")
-            if ret != 0:
-                logging.error("UnitTest Coverage: Failed generate filtered coverage XML.")
-                return 1
-        # Merge all XML files
-        ret = self.merge_cobertura_xml_files([f"{testFile}.coverage.xml" for testFile in testList], mergedCoverageXml)
+
+        # Generate LCOV and XML for the package
+        if self.clang_gen_lcov_xml(mergedProfData, testList, mergedCoverageLcov, mergedCoverageXml) != 0:
+            return 1
+
+        allProfrawlistFile = os.path.join(workspace, 'Build', 'profrawlist.txt')
+        allMergedProfData = os.path.join(workspace, 'Build', 'merged.profdata')
+        allCoverageXml = os.path.join(workspace, 'Build', 'coverage.xml')
+        allCoverageLcov = os.path.join(workspace, 'Build', 'coverage.lcov')
+
+        for file in [allProfrawlistFile, allMergedProfData, allCoverageLcov, allCoverageXml]:
+            if os.path.isfile(file):
+                os.remove(file)
+
+        # Generate LCOV and XML for all packages
+        if self.clang_gen_profdata(workspace, allProfrawlistFile, allMergedProfData) != 0:
+            return 1
+        if self.clang_gen_lcov_xml(allMergedProfData, allTestList, allCoverageLcov, allCoverageXml) != 0:
+            return 1
+
+        return 0
+
+    def clang_gen_profdata(self, basepath, output_profrawlistfile, output_profdata):
+        """
+        Merge multiple LLVM profraw files into a single profdata file.
+        """
+        if not os.path.isdir(basepath):
+            logging.error(f"clang_gen_profdata: Base path {basepath} is not a directory.")
+            return 1
+        if not output_profrawlistfile:
+            logging.error("clang_gen_profdata: No profraw list file provided.")
+            return 1
+        if not output_profdata:
+            logging.error("clang_gen_profdata: No output profdata file provided.")
+            return 1
+
+        with open(output_profrawlistfile, "w") as f:
+            f.write("\n".join(glob.glob(os.path.join(basepath, "**", "*.profraw"), recursive=True)))
+        ret = RunCmd("llvm-profdata", f"merge -sparse --input-files {output_profrawlistfile} --output {output_profdata}")
         if ret != 0:
-            logging.error("UnitTest Coverage: Failed to merge coverage XML files.")
+            logging.error(f"clang_gen_profdata: Failed to merge coverage data for {basepath}.")
+            return 1
+        return 0
+
+    def clang_gen_lcov_xml(self, profdata, testfiles, output_lcov, output_xml):
+        """
+        Generate lcov coverage data from LLVM profdata and test files.
+        """
+        if not profdata or not os.path.isfile(profdata):
+            logging.error(f"clang_gen_lcov_xml: Invalid profdata file provided. {profdata}")
+            return 1
+        if not testfiles:
+            logging.error("clang_gen_lcov_xml: No test files provided.")
+            return 1
+        if not output_lcov:
+            logging.error("clang_gen_lcov_xml: No output lcov file provided.")
+            return 1
+        if not output_xml:
+            logging.error("clang_gen_lcov_xml: No output xml file provided.")
+            return 1
+
+        testfiles_str = ' -object '.join(testfiles)
+        ret = RunCmd("llvm-cov", f"export -format=lcov --instr-profile={profdata} {testfiles_str} > {output_lcov}")
+        if ret != 0:
+            logging.error(f"clang_gen_lcov_xml: Failed to generate coverage lcov. {output_lcov}")
+            return 1
+        ret = RunCmd("lcov_cobertura",f"{output_lcov} --excludes ^.*UnitTest\|^.*MU\|^.*Mock\|^.*DEBUG -o {output_xml}")
+        if ret != 0:
+            logging.error(f"clang_gen_lcov_xml: Failed generate filtered coverage XML. {output_xml}")
             return 1
         return 0
 
@@ -394,7 +451,7 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
                 logging.error("UnitTest Coverage: Failed to collect coverage data.")
                 return 1
 
-        # Generate and XML file if requested.by each package
+        # Generate XML file if requested by each package
         ret = RunCmd(
             "OpenCppCoverage",
             f"--export_type cobertura:{os.path.join(buildOutputBase, 'coverage.xml')} " +
