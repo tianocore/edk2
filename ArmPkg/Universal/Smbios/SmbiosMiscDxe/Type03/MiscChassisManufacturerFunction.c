@@ -36,30 +36,26 @@
 
 **/
 SMBIOS_MISC_TABLE_FUNCTION (MiscChassisManufacturer) {
-  CHAR8               *OptionalStrStart;
-  CHAR8               *StrStart;
-  UINT8               *SkuNumberField;
-  UINTN               RecordLength;
-  UINTN               ManuStrLen;
-  UINTN               VerStrLen;
-  UINTN               AssertTagStrLen;
-  UINTN               SerialNumStrLen;
-  UINTN               ChaNumStrLen;
-  EFI_STRING          Manufacturer;
-  EFI_STRING          Version;
-  EFI_STRING          SerialNumber;
-  EFI_STRING          AssertTag;
-  EFI_STRING          ChassisSkuNumber;
-  EFI_STRING_ID       TokenToGet;
-  SMBIOS_TABLE_TYPE3  *SmbiosRecord;
-  SMBIOS_TABLE_TYPE3  *InputData;
-  EFI_STATUS          Status;
-
-  UINT8              ContainedElementCount;
-  CONTAINED_ELEMENT  ContainedElements;
-  UINT8              ExtendLength;
-
-  ExtendLength = 0;
+  CHAR8                *StrStart;
+  SMBIOS_TABLE_STRING  *SkuNumberField;
+  UINTN                RecordLength;
+  UINTN                ManuStrLen;
+  UINTN                VerStrLen;
+  UINTN                AssertTagStrLen;
+  UINTN                SerialNumStrLen;
+  UINTN                ChaNumStrLen;
+  UINTN                BaseSize;
+  UINTN                ExtendLength;
+  UINTN                HdrLength;
+  EFI_STRING           Manufacturer;
+  EFI_STRING           Version;
+  EFI_STRING           SerialNumber;
+  EFI_STRING           AssertTag;
+  EFI_STRING           ChassisSkuNumber;
+  EFI_STRING_ID        TokenToGet;
+  SMBIOS_TABLE_TYPE3   *SmbiosRecord;
+  SMBIOS_TABLE_TYPE3   *InputData;
+  EFI_STATUS           Status;
 
   //
   // First check for invalid parameters.
@@ -116,46 +112,52 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscChassisManufacturer) {
   ChassisSkuNumber = HiiGetPackageString (&gEfiCallerIdGuid, TokenToGet, NULL);
   ChaNumStrLen     = StrLen (ChassisSkuNumber);
 
-  ContainedElementCount = InputData->ContainedElementCount;
-  ExtendLength          = ContainedElementCount * sizeof (CONTAINED_ELEMENT);
+  STATIC_ASSERT (OFFSET_OF (SMBIOS_TABLE_TYPE3, ContainedElements) == 0x15, "Base size of SMBIOS_TABLE_TYPE3 does not meet SMBIOS specification");
+
+  BaseSize     = OFFSET_OF (SMBIOS_TABLE_TYPE3, ContainedElements);
+  ExtendLength = (UINTN)InputData->ContainedElementCount * (UINTN)InputData->ContainedElementRecordLength;
 
   //
-  // Two zeros following the last string.
+  // Length of SMBIOS struct includes ContainedElements and SKUNumber.
   //
-  RecordLength = sizeof (SMBIOS_TABLE_TYPE3) +
-                 ExtendLength    + 1 +
+  HdrLength = BaseSize + ExtendLength + sizeof (SMBIOS_TABLE_STRING);
+  if (HdrLength > MAX_UINT8) {
+    ASSERT (HdrLength <= MAX_UINT8);
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
+
+  //
+  // Additional zero follows the last string.
+  //
+  RecordLength = HdrLength       +
                  ManuStrLen      + 1 +
                  VerStrLen       + 1 +
                  SerialNumStrLen + 1 +
                  AssertTagStrLen + 1 +
                  ChaNumStrLen    + 1 + 1;
-  SmbiosRecord = AllocateZeroPool (RecordLength);
+  SmbiosRecord = AllocatePool (RecordLength);
   if (SmbiosRecord == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
   }
 
-  (VOID)CopyMem (SmbiosRecord, InputData, sizeof (SMBIOS_TABLE_TYPE3));
+  // Copy base record plus ContainedElements.
+  (VOID)CopyMem (SmbiosRecord, InputData, BaseSize + ExtendLength);
 
-  SmbiosRecord->Hdr.Length = sizeof (SMBIOS_TABLE_TYPE3) + ExtendLength + 1;
+  SmbiosRecord->Hdr.Length = HdrLength;
 
   SmbiosRecord->Type = OemGetChassisType ();
 
-  // ContainedElements
-  ASSERT (ContainedElementCount < 2);
-  (VOID)CopyMem (SmbiosRecord + 1, &ContainedElements, ExtendLength);
-
   // ChassisSkuNumber
-  SkuNumberField = (UINT8 *)SmbiosRecord +
-                   sizeof (SMBIOS_TABLE_TYPE3) -
-                   sizeof (CONTAINED_ELEMENT) + ExtendLength;
+  SkuNumberField = (SMBIOS_TABLE_STRING *)((UINT8 *)SmbiosRecord + BaseSize + ExtendLength);
 
+  // The string numbers in the fixed position portion of the record are populated in the input data.
   *SkuNumberField = 5;
 
-  OptionalStrStart = (CHAR8 *)((UINT8 *)SmbiosRecord + sizeof (SMBIOS_TABLE_TYPE3) +
-                               ExtendLength + 1);
-  UnicodeStrToAsciiStrS (Manufacturer, OptionalStrStart, ManuStrLen + 1);
-  StrStart = OptionalStrStart + ManuStrLen + 1;
+  StrStart = (CHAR8 *)((UINT8 *)SkuNumberField + sizeof (SMBIOS_TABLE_STRING));
+  UnicodeStrToAsciiStrS (Manufacturer, StrStart, ManuStrLen + 1);
+  StrStart += ManuStrLen + 1;
   UnicodeStrToAsciiStrS (Version, StrStart, VerStrLen + 1);
   StrStart += VerStrLen + 1;
   UnicodeStrToAsciiStrS (SerialNumber, StrStart, SerialNumStrLen + 1);
@@ -163,6 +165,10 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscChassisManufacturer) {
   UnicodeStrToAsciiStrS (AssertTag, StrStart, AssertTagStrLen + 1);
   StrStart += AssertTagStrLen + 1;
   UnicodeStrToAsciiStrS (ChassisSkuNumber, StrStart, ChaNumStrLen + 1);
+  StrStart   += ChaNumStrLen + 1;
+  *StrStart++ = '\0';
+
+  ASSERT ((UINT8 *)StrStart - (UINT8 *)SmbiosRecord == RecordLength);
 
   SmbiosRecord->BootupState        = OemGetChassisBootupState ();
   SmbiosRecord->PowerSupplyState   = OemGetChassisPowerSupplyState ();
@@ -175,6 +181,10 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscChassisManufacturer) {
   // Now we have got the full smbios record, call smbios protocol to add this record.
   //
   Status = SmbiosMiscAddRecord ((UINT8 *)SmbiosRecord, NULL);
+
+  FreePool (SmbiosRecord);
+
+Exit:
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
@@ -185,9 +195,6 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscChassisManufacturer) {
       ));
   }
 
-  FreePool (SmbiosRecord);
-
-Exit:
   if (Manufacturer != NULL) {
     FreePool (Manufacturer);
   }
