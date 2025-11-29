@@ -647,6 +647,69 @@ UsbFindChild (
 }
 
 /**
+  Free a partially enumerated device and release its bus slot.
+
+  This helper is only used when retrying enumeration on the root hub.
+
+  @param  Child                The USB device to free.
+**/
+STATIC
+VOID
+UsbCleanupEnumDevice (
+  IN USB_DEVICE  *Child
+  )
+{
+  USB_BUS  *Bus;
+
+  if (Child == NULL) {
+    return;
+  }
+
+  Bus = Child->Bus;
+
+  if ((Child->Address != 0) && (Child->Address < Bus->MaxDevices) && (Bus->Devices[Child->Address] == Child)) {
+    Bus->Devices[Child->Address] = NULL;
+  }
+
+  UsbFreeDevice (Child);
+}
+
+/**
+  Toggle root port power to force a disconnect/reconnect sequence.
+
+  @param  HubIf                The root hub interface.
+  @param  Port                 The port to power cycle.
+
+  @retval EFI_SUCCESS          Port power was toggled.
+  @retval Others               Failed to toggle power.
+**/
+STATIC
+EFI_STATUS
+UsbRootHubPowerCyclePort (
+  IN USB_INTERFACE  *HubIf,
+  IN UINT8          Port
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = HubIf->HubApi->ClearPortFeature (HubIf, Port, EfiUsbPortPower);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  gBS->Stall (USB_SET_ROOT_PORT_RESET_STALL);
+
+  Status = HubIf->HubApi->SetPortFeature (HubIf, Port, EfiUsbPortPower);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  gBS->Stall (USB_WAIT_PORT_STABLE_STALL);
+
+  return EFI_SUCCESS;
+}
+
+/**
   Enumerate and configure the new device on the port of this HUB interface.
 
   @param  HubIf                 The HUB that has the device connected.
@@ -672,12 +735,17 @@ UsbEnumerateNewDev (
   EFI_USB_PORT_STATUS  PortState;
   UINTN                Address;
   UINT8                Config;
+  BOOLEAN              RetryPowerCycle;
   EFI_STATUS           Status;
 
-  Parent  = HubIf->Device;
-  Bus     = Parent->Bus;
-  HubApi  = HubIf->HubApi;
+  RetryPowerCycle = FALSE;
+
+  Parent = HubIf->Device;
+  Bus    = Parent->Bus;
+  HubApi = HubIf->HubApi;
+RetryEnum:
   Address = Bus->MaxDevices;
+  Child   = NULL;
 
   gBS->Stall (USB_WAIT_PORT_STABLE_STALL);
 
@@ -872,6 +940,30 @@ ON_ERROR:
   //
   // EDKII UHCI/EHCI doesn't get impacted as it's make sense to reserve s/w resource till it gets unplugged.
   //
+  if ((Status == EFI_TIMEOUT) && (HubIf->HubApi == &mUsbRootHubApi) && (HubIf->MaxSpeed == EFI_USB_SPEED_HIGH)) {
+    //
+    // EHCI-only recovery: power cycle once on timeout, then hand off to
+    // the companion controller if the retry also times out.
+    //
+    UsbCleanupEnumDevice (Child);
+
+    if (!RetryPowerCycle) {
+      RetryPowerCycle = TRUE;
+      ResetIsNeeded   = TRUE;
+
+      Status = UsbRootHubPowerCyclePort (HubIf, Port);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "UsbEnumerateNewDev: port %d power cycle failed - %r\n", Port, Status));
+      } else {
+        DEBUG ((DEBUG_WARN, "UsbEnumerateNewDev: retry enumeration on port %d after timeout\n", Port));
+        goto RetryEnum;
+      }
+    }
+
+    HubIf->HubApi->SetPortFeature (HubIf, Port, EfiUsbPortOwner);
+    Status = EFI_NOT_FOUND;
+  }
+
   return Status;
 }
 
