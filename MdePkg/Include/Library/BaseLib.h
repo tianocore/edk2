@@ -331,6 +331,16 @@ RiscVCpuCacheInvalCmoAsm (
   IN UINTN
   );
 
+/**
+  Get the byte order of RISC V64, 0 indicates little-endian.
+
+ **/
+UINT64
+EFIAPI
+RiscVGetSupervisorEndianness (
+  VOID
+  );
+
 #endif // defined (MDE_CPU_RISCV64)
 
 #if defined (MDE_CPU_LOONGARCH64)
