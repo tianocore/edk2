@@ -1607,11 +1607,15 @@ GetFullSmramRanges (
   UINTN                           MaxCount;
   BOOLEAN                         Rescan;
 
+  SmmConfiguration    = NULL;
+  TempSmramRanges     = NULL;
+  SmramReservedRanges = NULL;
+  SmramRanges         = NULL;
+
   //
   // Get SMM Configuration Protocol if it is present.
   //
-  SmmConfiguration = NULL;
-  Status           = gBS->LocateProtocol (&gEfiSmmConfigurationProtocolGuid, NULL, (VOID **)&SmmConfiguration);
+  Status = gBS->LocateProtocol (&gEfiSmmConfigurationProtocolGuid, NULL, (VOID **)&SmmConfiguration);
 
   //
   // Get SMRAM information.
