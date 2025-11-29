@@ -2606,8 +2606,8 @@ ScsiDiskInquiryDevice (
   EFI_SCSI_SENSE_DATA                    *SenseDataArray;
   UINTN                                  NumberOfSenseKeys;
   EFI_STATUS                             Status;
-  UINT8                                  MaxRetry;
-  UINT8                                  Index;
+  UINTN                                  MaxRetry;
+  UINTN                                  Index;
   EFI_SCSI_SUPPORTED_VPD_PAGES_VPD_PAGE  *SupportedVpdPages;
   EFI_SCSI_BLOCK_LIMITS_VPD_PAGE         *BlockLimits;
   UINTN                                  PageLength;
@@ -5922,27 +5922,15 @@ DetermineInstallBlockIo (
   IN  EFI_HANDLE  ChildHandle
   )
 {
-  EFI_SCSI_PASS_THRU_PROTOCOL      *ScsiPassThru;
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL  *ExtScsiPassThru;
 
   //
-  // Firstly, check if ExtScsiPassThru Protocol parent handle exists. If existence,
+  // Check if ExtScsiPassThru Protocol parent handle exists. If it does,
   // check its attribute, logic or physical.
   //
   ExtScsiPassThru = (EFI_EXT_SCSI_PASS_THRU_PROTOCOL *)GetParentProtocol (&gEfiExtScsiPassThruProtocolGuid, ChildHandle);
   if (ExtScsiPassThru != NULL) {
-    if ((ExtScsiPassThru->Mode->Attributes & EFI_SCSI_PASS_THRU_ATTRIBUTES_LOGICAL) != 0) {
-      return TRUE;
-    }
-  }
-
-  //
-  // Secondly, check if ScsiPassThru Protocol parent handle exists. If existence,
-  // check its attribute, logic or physical.
-  //
-  ScsiPassThru = (EFI_SCSI_PASS_THRU_PROTOCOL *)GetParentProtocol (&gEfiScsiPassThruProtocolGuid, ChildHandle);
-  if (ScsiPassThru != NULL) {
-    if ((ScsiPassThru->Mode->Attributes & EFI_SCSI_PASS_THRU_ATTRIBUTES_LOGICAL) != 0) {
+    if ((ExtScsiPassThru->Mode->Attributes & EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_LOGICAL) != 0) {
       return TRUE;
     }
   }

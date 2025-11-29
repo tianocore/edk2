@@ -511,7 +511,7 @@ PreSmmCpuRegisterTableWrite (
   @param[in]  RegisterType     Type of the register to program.
   @param[in]  Index            Index of the register to program.
   @param[in]  Type             The data type name of a register structure.
-  @param[in]  Field            The bit fiel name in register structure to write.
+  @param[in]  Field            The bit field name in register structure to write.
   @param[in]  Value            Value to write to the bit field.
 
   @note This service could be called by BSP only.
@@ -536,7 +536,7 @@ PreSmmCpuRegisterTableWrite (
   @param[in]  RegisterType     Type of the register to program.
   @param[in]  Index            Index of the register to program.
   @param[in]  Type             The data type name of a register structure.
-  @param[in]  Field            The bit fiel name in register structure to write.
+  @param[in]  Field            The bit field name in register structure to write.
   @param[in]  Value            Value to write to the bit field.
 
   @note This service could be called by BSP only.
@@ -595,7 +595,7 @@ PreSmmCpuRegisterTableWrite (
   @param[in]  RegisterType     Type of the register to program.
   @param[in]  Index            Index of the register to program.
   @param[in]  Type             The data type name of a register structure.
-  @param[in]  Field            The bit fiel name in register structure to write.
+  @param[in]  Field            The bit field name in register structure to write.
   @param[in]  Value            Value to write to the bit field.
 
   @note This service could be called by BSP only.

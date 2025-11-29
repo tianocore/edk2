@@ -101,7 +101,9 @@ READ_LOCK_STATUS   = TRUE
   # Platform Driver
   #
   INF OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
+!if $(NETWORK_ENABLE) == TRUE
   INF OvmfPkg/VirtioNetDxe/VirtioNet.inf
+!endif
   INF OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
   INF OvmfPkg/VirtioRngDxe/VirtioRng.inf
   INF OvmfPkg/VirtioSerialDxe/VirtioSerial.inf

@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <PiDxe.h>
 
 #include <Protocol/Tcg2Protocol.h>
-#include <Protocol/VariableLock.h>
+#include <Library/VariablePolicyHelperLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -918,20 +918,26 @@ Tcg2PhysicalPresenceLibProcessRequest (
   EFI_STATUS                        Status;
   UINTN                             DataSize;
   EFI_TCG2_PHYSICAL_PRESENCE        TcgPpData;
-  EDKII_VARIABLE_LOCK_PROTOCOL      *VariableLockProtocol;
+  EDKII_VARIABLE_POLICY_PROTOCOL    *VariablePolicyProtocol;
   EFI_TCG2_PHYSICAL_PRESENCE_FLAGS  PpiFlags;
 
   //
   // This flags variable controls whether physical presence is required for TPM command.
   // It should be protected from malicious software. We set it as read-only variable here.
   //
-  Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **)&VariableLockProtocol);
+  Status = gBS->LocateProtocol (&gEdkiiVariablePolicyProtocolGuid, NULL, (VOID **)&VariablePolicyProtocol);
   if (!EFI_ERROR (Status)) {
-    Status = VariableLockProtocol->RequestToLock (
-                                     VariableLockProtocol,
-                                     TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE,
-                                     &gEfiTcg2PhysicalPresenceGuid
-                                     );
+    Status = RegisterBasicVariablePolicy (
+               VariablePolicyProtocol,
+               &gEfiTcg2PhysicalPresenceGuid,
+               TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE,
+               VARIABLE_POLICY_NO_MIN_SIZE,
+               VARIABLE_POLICY_NO_MAX_SIZE,
+               VARIABLE_POLICY_NO_MUST_ATTR,
+               VARIABLE_POLICY_NO_CANT_ATTR,
+               VARIABLE_POLICY_TYPE_LOCK_NOW
+               );
+
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "[TPM2] Error when lock variable %s, Status = %r\n", TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE, Status));
       ASSERT_EFI_ERROR (Status);

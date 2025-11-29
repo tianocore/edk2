@@ -196,7 +196,7 @@ GetImageContext (
     // SectionLength is adjusted it is 4 byte aligned.
     // Go to the next section
     //
-    SectionLength = FFS_FILE_SIZE (FfsHeader);
+    SectionLength = SECTION_SIZE (Section);
     SectionLength = GET_OCCUPIED_SIZE (SectionLength, 4);
     ASSERT (SectionLength != 0);
     ParsedLength += SectionLength;

@@ -57,7 +57,6 @@
   ## TO_START
   ## BY_START
   gEfiDevicePathProtocolGuid
-  gEfiScsiPassThruProtocolGuid                  ## TO_START
   gEfiExtScsiPassThruProtocolGuid               ## TO_START
 
 [UserExtensions.TianoCore."ExtraFiles"]

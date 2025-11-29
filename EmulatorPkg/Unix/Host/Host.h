@@ -66,7 +66,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define _Bool  char  // for clang debug
   #endif
 #else
-  #include <termio.h>
   #include <sys/vfs.h>
   #include <linux/fs.h>
 #endif
