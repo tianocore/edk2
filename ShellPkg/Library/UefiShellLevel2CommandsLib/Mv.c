@@ -740,6 +740,121 @@ ValidateAndMoveFiles (
   return (ShellStatus);
 }
 
+/** Main function of the 'Mv' command.
+
+  @param[in] Package    List of input parameter for the command.
+**/
+STATIC
+SHELL_STATUS
+MainCmdMv (
+  LIST_ENTRY  *Package
+  )
+{
+  EFI_STATUS           Status;
+  CHAR16               *Cwd;
+  UINTN                CwdSize;
+  SHELL_STATUS         ShellStatus;
+  UINTN                ParamCount;
+  UINTN                LoopCounter;
+  EFI_SHELL_FILE_INFO  *FileList;
+  VOID                 *Response;
+
+  ShellStatus = SHELL_SUCCESS;
+  ParamCount  = 0;
+  FileList    = NULL;
+  Response    = NULL;
+
+  //
+  // check for "-?"
+  //
+  if (ShellCommandLineGetFlag (Package, L"-?")) {
+    ASSERT (FALSE);
+  }
+
+  switch (ParamCount = ShellCommandLineGetCount (Package)) {
+    case 0:
+    case 1:
+      //
+      // we have insufficient parameters
+      //
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"mv");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+      break;
+    case 2:
+      //
+      // must have valid CWD for single parameter...
+      //
+      if (ShellGetCurrentDir (NULL) == NULL) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"mv");
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      } else {
+        Status = ShellOpenFileMetaArg ((CHAR16 *)ShellCommandLineGetRawValue (Package, 1), EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
+        if ((FileList == NULL) || IsListEmpty (&FileList->Link) || EFI_ERROR (Status)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"mv", ShellCommandLineGetRawValue (Package, 1));
+          ShellStatus = SHELL_NOT_FOUND;
+        } else {
+          //
+          // ValidateAndMoveFiles will report errors to the screen itself
+          //
+          CwdSize = StrSize (ShellGetCurrentDir (NULL)) + sizeof (CHAR16);
+          Cwd     = AllocateZeroPool (CwdSize);
+          if (Cwd == NULL) {
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellLevel2HiiHandle, L"mv");
+            ShellStatus = SHELL_OUT_OF_RESOURCES;
+          } else {
+            StrCpyS (Cwd, CwdSize / sizeof (CHAR16), ShellGetCurrentDir (NULL));
+            StrCatS (Cwd, CwdSize / sizeof (CHAR16), L"\\");
+            ShellStatus = ValidateAndMoveFiles (FileList, &Response, Cwd);
+            FreePool (Cwd);
+          }
+        }
+      }
+
+      break;
+    default:
+      /// @todo make sure this works with error half way through and continues...
+      for (ParamCount--, LoopCounter = 1; LoopCounter < ParamCount; LoopCounter++) {
+        if (ShellGetExecutionBreakFlag ()) {
+          break;
+        }
+
+        Status = ShellOpenFileMetaArg ((CHAR16 *)ShellCommandLineGetRawValue (Package, LoopCounter), EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
+        if ((FileList == NULL) || IsListEmpty (&FileList->Link) || EFI_ERROR (Status)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"mv", ShellCommandLineGetRawValue (Package, LoopCounter));
+          ShellStatus = SHELL_NOT_FOUND;
+        } else {
+          //
+          // ValidateAndMoveFiles will report errors to the screen itself
+          // Only change ShellStatus if it's successful
+          //
+          if (ShellStatus == SHELL_SUCCESS) {
+            ShellStatus = ValidateAndMoveFiles (FileList, &Response, ShellCommandLineGetRawValue (Package, ParamCount));
+          } else {
+            ValidateAndMoveFiles (FileList, &Response, ShellCommandLineGetRawValue (Package, ParamCount));
+          }
+        }
+
+        if ((FileList != NULL) && !IsListEmpty (&FileList->Link)) {
+          Status = ShellCloseFileMetaArg (&FileList);
+          if (EFI_ERROR (Status) && (ShellStatus == SHELL_SUCCESS)) {
+            ShellStatus = SHELL_ACCESS_DENIED;
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_FILE), gShellLevel2HiiHandle, L"mv", ShellCommandLineGetRawValue (Package, 1), ShellStatus|MAX_BIT);
+          }
+        }
+      }
+
+      break;
+  } // switch on parameter count
+
+  if (FileList != NULL) {
+    ShellCloseFileMetaArg (&FileList);
+  }
+
+  SHELL_FREE_NON_NULL (Response);
+
+  return ShellStatus;
+}
+
 /**
   Function for 'mv' command.
 
@@ -753,22 +868,13 @@ ShellCommandRunMv (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS           Status;
-  LIST_ENTRY           *Package;
-  CHAR16               *ProblemParam;
-  CHAR16               *Cwd;
-  UINTN                CwdSize;
-  SHELL_STATUS         ShellStatus;
-  UINTN                ParamCount;
-  UINTN                LoopCounter;
-  EFI_SHELL_FILE_INFO  *FileList;
-  VOID                 *Response;
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
 
   ProblemParam = NULL;
   ShellStatus  = SHELL_SUCCESS;
-  ParamCount   = 0;
-  FileList     = NULL;
-  Response     = NULL;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -788,100 +894,16 @@ ShellCommandRunMv (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    //
-    // check for "-?"
-    //
-    if (ShellCommandLineGetFlag (Package, L"-?")) {
-      ASSERT (FALSE);
-    }
 
-    switch (ParamCount = ShellCommandLineGetCount (Package)) {
-      case 0:
-      case 1:
-        //
-        // we have insufficient parameters
-        //
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"mv");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        break;
-      case 2:
-        //
-        // must have valid CWD for single parameter...
-        //
-        if (ShellGetCurrentDir (NULL) == NULL) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"mv");
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        } else {
-          Status = ShellOpenFileMetaArg ((CHAR16 *)ShellCommandLineGetRawValue (Package, 1), EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
-          if ((FileList == NULL) || IsListEmpty (&FileList->Link) || EFI_ERROR (Status)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"mv", ShellCommandLineGetRawValue (Package, 1));
-            ShellStatus = SHELL_NOT_FOUND;
-          } else {
-            //
-            // ValidateAndMoveFiles will report errors to the screen itself
-            //
-            CwdSize = StrSize (ShellGetCurrentDir (NULL)) + sizeof (CHAR16);
-            Cwd     = AllocateZeroPool (CwdSize);
-            if (Cwd == NULL) {
-              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellLevel2HiiHandle, L"mv");
-              ShellStatus = SHELL_OUT_OF_RESOURCES;
-            } else {
-              StrCpyS (Cwd, CwdSize / sizeof (CHAR16), ShellGetCurrentDir (NULL));
-              StrCatS (Cwd, CwdSize / sizeof (CHAR16), L"\\");
-              ShellStatus = ValidateAndMoveFiles (FileList, &Response, Cwd);
-              FreePool (Cwd);
-            }
-          }
-        }
-
-        break;
-      default:
-        /// @todo make sure this works with error half way through and continues...
-        for (ParamCount--, LoopCounter = 1; LoopCounter < ParamCount; LoopCounter++) {
-          if (ShellGetExecutionBreakFlag ()) {
-            break;
-          }
-
-          Status = ShellOpenFileMetaArg ((CHAR16 *)ShellCommandLineGetRawValue (Package, LoopCounter), EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
-          if ((FileList == NULL) || IsListEmpty (&FileList->Link) || EFI_ERROR (Status)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"mv", ShellCommandLineGetRawValue (Package, LoopCounter));
-            ShellStatus = SHELL_NOT_FOUND;
-          } else {
-            //
-            // ValidateAndMoveFiles will report errors to the screen itself
-            // Only change ShellStatus if it's successful
-            //
-            if (ShellStatus == SHELL_SUCCESS) {
-              ShellStatus = ValidateAndMoveFiles (FileList, &Response, ShellCommandLineGetRawValue (Package, ParamCount));
-            } else {
-              ValidateAndMoveFiles (FileList, &Response, ShellCommandLineGetRawValue (Package, ParamCount));
-            }
-          }
-
-          if ((FileList != NULL) && !IsListEmpty (&FileList->Link)) {
-            Status = ShellCloseFileMetaArg (&FileList);
-            if (EFI_ERROR (Status) && (ShellStatus == SHELL_SUCCESS)) {
-              ShellStatus = SHELL_ACCESS_DENIED;
-              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_FILE), gShellLevel2HiiHandle, L"mv", ShellCommandLineGetRawValue (Package, 1), ShellStatus|MAX_BIT);
-            }
-          }
-        }
-
-        break;
-    } // switch on parameter count
-
-    if (FileList != NULL) {
-      ShellCloseFileMetaArg (&FileList);
-    }
-
-    //
-    // free the command line package
-    //
-    ShellCommandLineFreeVarList (Package);
+    return ShellStatus;
   }
 
-  SHELL_FREE_NON_NULL (Response);
+  ShellStatus = MainCmdMv (Package);
+
+  //
+  // free the command line package
+  //
+  ShellCommandLineFreeVarList (Package);
 
   if (ShellGetExecutionBreakFlag ()) {
     return (SHELL_ABORTED);
