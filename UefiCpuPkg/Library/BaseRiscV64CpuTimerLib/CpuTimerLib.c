@@ -262,3 +262,30 @@ GetTimeInNanoSecond (
 
   return NanoSeconds;
 }
+
+/**
+  Constructor function for the Timer Library.
+
+  This constructor function is called early during DXE phase to ensure that
+  GetPerformanceCounterProperties() is invoked and mTimeBase is initialized
+  before any code that depends on it.
+
+  @retval EFI_SUCCESS   The constructor always returns success.
+
+**/
+EFI_STATUS
+EFIAPI
+BaseRiscV64CpuTimerLibConstructor (
+  VOID
+  )
+{
+  //
+  // Initialize mTimeBase during DXE phase by calling
+  // GetPerformanceCounterProperties with NULL parameters.
+  // This ensures mTimeBase is set before virtual memory is enabled
+  // and before Runtime Services attempt to access it.
+  //
+  GetPerformanceCounterProperties (NULL, NULL);
+
+  return EFI_SUCCESS;
+}
