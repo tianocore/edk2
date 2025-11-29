@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "ParseInf.h"
 
 #define PROGRAM_NAME                       "VfrCompile"
-#define VFR_COMPILER_VERSION               " 2.01 (UEFI 2.4) "
+#define VFR_COMPILER_VERSION               " 2.02 (UEFI 2.4) "
 //
 // This is how we invoke the C preprocessor on the VFR source file
 // to resolve #defines, #includes, etc. To make C source files
