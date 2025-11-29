@@ -268,7 +268,7 @@ WifiMgrGetStrAKMList (
   IN  WIFI_MGR_NETWORK_PROFILE  *Profile
   )
 {
-  UINT8   Index;
+  UINT16  Index; // MU_CHANGE - CodeQL Change - comparison-with-wider-type
   UINT16  AKMSuiteCount;
   CHAR16  *AKMListDisplay;
   UINTN   Length;
@@ -327,7 +327,7 @@ WifiMgrGetStrCipherList (
   IN  WIFI_MGR_NETWORK_PROFILE  *Profile
   )
 {
-  UINT8   Index;
+  UINT16  Index; // MU_CHANGE - CodeQL Change - comparison-with-wider-type
   UINT16  CipherSuiteCount;
   CHAR16  *CipherListDisplay;
 

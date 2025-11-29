@@ -181,7 +181,14 @@ Ip6SendMldReport (
   // Fill a IPv6 Router Alert option in a Hop-by-Hop Options Header
   //
   Options = NetbufAllocSpace (Packet, (UINT32)OptionLen, FALSE);
-  ASSERT (Options != NULL);
+  // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+  if (Options == NULL) {
+    ASSERT (Options != NULL);
+    NetbufFree (Packet);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
   Status = Ip6FillHopByHop (Options, &OptionLen, IP6_ICMP);
   if (EFI_ERROR (Status)) {
     NetbufFree (Packet);
@@ -193,7 +200,14 @@ Ip6SendMldReport (
   // Fill in MLD message - Report
   //
   MldHead = (IP6_MLD_HEAD *)NetbufAllocSpace (Packet, sizeof (IP6_MLD_HEAD), FALSE);
-  ASSERT (MldHead != NULL);
+  // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+  if (MldHead == NULL) {
+    ASSERT (MldHead != NULL);
+    NetbufFree (Packet);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
   ZeroMem (MldHead, sizeof (IP6_MLD_HEAD));
   MldHead->Head.Type = ICMP_V6_LISTENER_REPORT;
   MldHead->Head.Code = 0;
@@ -285,7 +299,15 @@ Ip6SendMldDone (
   // Fill a IPv6 Router Alert option in a Hop-by-Hop Options Header
   //
   Options = NetbufAllocSpace (Packet, (UINT32)OptionLen, FALSE);
-  ASSERT (Options != NULL);
+  // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+  if (Options == NULL) {
+    ASSERT (Options != NULL);
+    NetbufFree (Packet);
+    Packet = NULL;
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
   Status = Ip6FillHopByHop (Options, &OptionLen, IP6_ICMP);
   if (EFI_ERROR (Status)) {
     NetbufFree (Packet);
@@ -297,7 +319,14 @@ Ip6SendMldDone (
   // Fill in MLD message - Done
   //
   MldHead = (IP6_MLD_HEAD *)NetbufAllocSpace (Packet, sizeof (IP6_MLD_HEAD), FALSE);
-  ASSERT (MldHead != NULL);
+  // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+  if (MldHead == NULL) {
+    ASSERT (MldHead != NULL);
+    NetbufFree (Packet);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
   ZeroMem (MldHead, sizeof (IP6_MLD_HEAD));
   MldHead->Head.Type = ICMP_V6_LISTENER_DONE;
   MldHead->Head.Code = 0;
