@@ -883,23 +883,20 @@ SecCoreStartupWithStack (
     //
     AsmWriteIdtr (&IdtDescriptor);
     InitializeCpuExceptionHandlers (NULL);
-  }
-
-  ProcessLibraryConstructorList ();
-
-  if (!SevEsIsEnabled ()) {
-    //
-    // For non SEV-ES guests, just load the IDTR.
-    //
-    AsmWriteIdtr (&IdtDescriptor);
-  } else {
     //
     // Under SEV-ES, the hypervisor can't modify CR0 and so can't enable
     // caching in order to speed up the boot. Enable caching early for
     // an SEV-ES guest.
     //
     AsmEnableCache ();
+  } else {
+    //
+    // For non SEV-ES guests, just load the IDTR.
+    //
+    AsmWriteIdtr (&IdtDescriptor);
   }
+
+  ProcessLibraryConstructorList ();
 
  #if defined (TDX_GUEST_SUPPORTED)
   if (CcProbe () == CcGuestTypeIntelTdx) {
