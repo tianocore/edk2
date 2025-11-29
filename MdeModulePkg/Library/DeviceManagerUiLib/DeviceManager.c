@@ -593,7 +593,10 @@ CreateDeviceManagerForm (
   // Get all the Hii handles
   //
   HiiHandles = HiiGetHiiHandles (NULL);
-  ASSERT (HiiHandles != NULL);
+  if (HiiHandles == NULL) {
+    ASSERT (HiiHandles != NULL);
+    return;
+  }
 
   //
   // Search for formset of each class type
