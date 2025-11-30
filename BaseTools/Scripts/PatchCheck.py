@@ -224,6 +224,9 @@ class CommitMessageCheck:
             elif num_found != len(updated_packages):
                 self.error("Subject line not in \"package,package: description\" format!")
 
+        if self.subject.endswith('.'):
+            self.error("Subject line should not end with a period")
+
     def check_signed_off_by(self):
         sob='Signed-off-by'
         if self.msg.find(sob) < 0:
