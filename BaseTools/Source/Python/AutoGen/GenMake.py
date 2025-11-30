@@ -774,7 +774,7 @@ cleanlib:
                                 SecDepsFileList.append(SecCmdList[index + 1])
                             index = index + 1
                         if CmdName == 'Trim':
-                            SecDepsFileList.append(os.path.join('$(DEBUG_DIR)', os.path.basename(OutputFile).replace('offset', 'efi')))
+                            SecDepsFileList.append(os.path.join('$(OUTPUT_DIR)', os.path.basename(OutputFile).replace('offset', 'efi')))
                         if OutputFile.endswith('.ui') or OutputFile.endswith('.ver'):
                             SecDepsFileList.append(os.path.join('$(MODULE_DIR)', '$(MODULE_FILE)'))
                         self.FfsOutputFileList.append((OutputFile, ' '.join(SecDepsFileList), SecCmdStr))
