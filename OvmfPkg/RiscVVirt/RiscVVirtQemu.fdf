@@ -283,6 +283,12 @@ INF  UefiCpuPkg/SecCore/SecCoreNative.inf
   INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
   INF  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
   INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+!if $(TPM2_ENABLE) == TRUE
+  INF SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
+!if $(TPM2_CONFIG_ENABLE) == TRUE
+  INF OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
+!endif
+!endif
 !endif
 
 FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
