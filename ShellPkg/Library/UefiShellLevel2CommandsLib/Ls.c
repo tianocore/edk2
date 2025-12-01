@@ -873,10 +873,6 @@ MainCmdLs (
     TheTime.TimeZone = EFI_UNSPECIFIED_TIMEZONE;
   }
 
-  if (ShellStatus != SHELL_SUCCESS) {
-    goto Exit;
-  }
-
   ShellStatus = PrintLsOutput (
                   ShellCommandLineGetFlag (Package, L"-r"),
                   RequiredAttributes,
@@ -900,7 +896,6 @@ MainCmdLs (
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"ls", FullPath);
   }
 
-Exit:
   //
   // Free memory allocated
   //
