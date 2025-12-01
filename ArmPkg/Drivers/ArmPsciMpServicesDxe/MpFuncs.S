@@ -20,6 +20,7 @@ GCC_ASM_IMPORT (gApStackSize)
 GCC_ASM_IMPORT (gTcr)
 GCC_ASM_IMPORT (gTtbr0)
 GCC_ASM_IMPORT (gMair)
+GCC_ASM_IMPORT (ArmEnableVFP)
 
 GCC_ASM_EXPORT (ApEntryPoint)
 
@@ -65,6 +66,7 @@ ASM_PFX(ApEntryPoint):
   mul x3, x2, x1              // x3 = (ProcessorIndex + 1) * gApStackSize
   add sp, x0, x3              // sp = gApStacksBase + x3
   mov x29, xzr
+  bl ArmEnableVFP             // Do not trap SIMD instructions
   bl ApProcedure              // doesn't return
 
 ProcessorNotFound:

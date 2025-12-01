@@ -586,9 +586,7 @@ HasLibTpm2PeilessSecLibConstructor (
   }
 
   TcgPcrEvent             = (TCG_PCR_EVENT *)EventLog;
-  TcgEfiSpecIdEventStruct = (TCG_EfiSpecIDEventStruct *)
-                            (EventLog + OFFSET_OF (TCG_PCR_EVENT, Event));
-
+  TcgEfiSpecIdEventStruct = (TCG_EfiSpecIDEventStruct *)TcgPcrEvent->Event;
   CopyMem (&NumberOfAlgorithms, TcgEfiSpecIdEventStruct + 1, sizeof (NumberOfAlgorithms));
   DigestSize = (TCG_EfiSpecIdEventAlgorithmSize *)((UINT8 *)TcgEfiSpecIdEventStruct + sizeof (*TcgEfiSpecIdEventStruct) + sizeof (NumberOfAlgorithms));
 
