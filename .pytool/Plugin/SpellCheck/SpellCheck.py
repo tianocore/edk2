@@ -163,12 +163,14 @@ class SpellCheck(ICiBuildPlugin):
         # result is a list of strings like this
         #  C:\src\sp-edk2\edk2\FmpDevicePkg\FmpDevicePkg.dec:53:9 - Unknown word (Capule)
         EasyFix = []
+        MisspelledWordFound = False
         results = self._check_spelling(cpsell_paths, config_file_path)
         for r in results:
             path, _, word = r.partition(" - Unknown word ")
             if len(word) == 0:
                 # didn't find pattern
                 continue
+            MisspelledWordFound = True
 
             pathinfo = path.rsplit(":", 2)  # remove the line no info
             if(ignore(pathinfo[0])):  # check against ignore list
@@ -178,6 +180,14 @@ class SpellCheck(ICiBuildPlugin):
             # real error
             EasyFix.append(word.strip().strip("()"))
             Errors.append(r)
+
+        # _check_spelling reported errors lines, but none of them were misspelled words
+        # This indicates a different kind of error occured, e.g. an error in running cspell
+        if len(results) > 0 and not MisspelledWordFound:
+            tc.LogStdError("Error running cspell. See output below:")
+            tc.LogStdError("\n".join(results))
+            tc.SetFailed(f"SpellCheck for {packagename} Failed to run cspell.", "CHECK_FAILED")
+            return -1
 
         # Log all errors tc StdError
         for l in Errors:
