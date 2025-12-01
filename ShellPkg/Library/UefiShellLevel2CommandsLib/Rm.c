@@ -321,41 +321,44 @@ MainCmdRm (
     }
   }
 
-  if (ShellStatus == SHELL_SUCCESS) {
-    //
-    // loop through the list and make sure we are not aborting...
-    //
-    for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&FileList->Link)
-          ; !IsNull (&FileList->Link, &Node->Link) && !ShellGetExecutionBreakFlag ()
-          ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&FileList->Link, &Node->Link)
-          )
-    {
-      //
-      // skip the directory traversing stuff...
-      //
-      if ((StrCmp (Node->FileName, L".") == 0) || (StrCmp (Node->FileName, L"..") == 0)) {
-        continue;
-      }
-
-      //
-      // do the deleting of nodes
-      //
-      if (EFI_ERROR (Node->Status)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_RM_LOG_DELETE_ERR2), gShellLevel2HiiHandle, Node->Status);
-        ShellStatus = SHELL_ACCESS_DENIED;
-        break;
-      }
-
-      if (!IsValidDeleteTarget (FileList, Node, Package)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_RM_LOG_DELETE_ERR3), gShellLevel2HiiHandle, Node->FullName);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        break;
-      }
-
-      ShellStatus = CascadeDelete (Node, ShellCommandLineGetFlag (Package, L"-q"));
-    }
+  if ((ShellStatus != SHELL_SUCCESS) || (FileList == NULL)) {
+    goto Exit;
   }
 
+  //
+  // loop through the list and make sure we are not aborting...
+  //
+  for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&FileList->Link)
+        ; !IsNull (&FileList->Link, &Node->Link) && !ShellGetExecutionBreakFlag ()
+        ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&FileList->Link, &Node->Link)
+        )
+  {
+    //
+    // skip the directory traversing stuff...
+    //
+    if ((StrCmp (Node->FileName, L".") == 0) || (StrCmp (Node->FileName, L"..") == 0)) {
+      continue;
+    }
+
+    //
+    // do the deleting of nodes
+    //
+    if (EFI_ERROR (Node->Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_RM_LOG_DELETE_ERR2), gShellLevel2HiiHandle, Node->Status);
+      ShellStatus = SHELL_ACCESS_DENIED;
+      break;
+    }
+
+    if (!IsValidDeleteTarget (FileList, Node, Package)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_RM_LOG_DELETE_ERR3), gShellLevel2HiiHandle, Node->FullName);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+      break;
+    }
+
+    ShellStatus = CascadeDelete (Node, ShellCommandLineGetFlag (Package, L"-q"));
+  }
+
+Exit:
   //
   // Free the fileList
   //
