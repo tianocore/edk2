@@ -473,6 +473,45 @@ IpmiGetSystemBootOptions (
   );
 
 /**
+  Write data to the IPMI boot initiator mailbox helper function.
+  This function calls the IpmiSetSystemBootOptions function with
+  parameter 7 to write a maximum of 16 bytes to a selector block
+  in the boot initiator mailbox.
+  @param[in] SetSelector    Set selector to write to
+  @param[in] Data           Data to write to the mailbox
+  @param[in] Size           Size of Data buffer in bytes
+  @retval EFI_SUCCESS   On successfull IPMI transaction
+  @retval EFI_INVALID   Data or Size is not valid
+  @retval Other         On failing IPMI transaction
+**/
+EFI_STATUS
+EFIAPI
+IpmiWriteBootInitiatorMailbox (
+  IN UINT8  SetSelector,
+  IN UINT8  *Data,
+  IN UINTN  Size
+  );
+
+/**
+  Read data from the IPMI boot initiator mailbox helper function.
+  This function calls the IpmiGetSystemBootOptions function with
+  parameter 7 to read a 16 byte selector block in the boot initiator
+  mailbox. ReadData is a 16 byte array and is required to be freed
+  by the caller.
+  @param[in]  SetSelector    Set selector to read from
+  @param[out] ReadData       Data read from the Boot Initiator Mailbox
+  @retval EFI_SUCCESS   On successfull IPMI transaction
+  @retval EFI_INVALID   ReadData is NULL
+  @retval Other         On failing IPMI transaction
+**/
+EFI_STATUS
+EFIAPI
+IpmiReadBootInitiatorMailbox (
+  IN  UINT8  SetSelector,
+  OUT UINT8  **ReadData
+  );
+
+/**
   This function gets FRU inventory area info.
 
   @param[in]  GetFruInventoryAreaInfoRequest    Get FRU inventory area command request.
