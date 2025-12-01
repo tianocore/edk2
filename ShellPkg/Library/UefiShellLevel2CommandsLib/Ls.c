@@ -801,8 +801,8 @@ MainCmdLs (
     //
     CurDir = gEfiShellProtocol->GetCurDir (NULL);
     if (CurDir == NULL) {
-      ShellStatus = SHELL_NOT_FOUND;
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"ls");
+      return SHELL_NOT_FOUND;
     }
 
     ListUnfiltered = TRUE;
@@ -820,50 +820,50 @@ MainCmdLs (
       //
       // If we got something and it doesnt have a fully qualified path, then we needed to have a CWD.
       //
-      ShellStatus = SHELL_NOT_FOUND;
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"ls");
-    } else {
-      //
-      // We got a valid fully qualified path or we have a CWD
-      //
-      ASSERT ((FullPath == NULL && Size == 0) || (FullPath != NULL));
-      if (StrStr (PathName, L":") == NULL) {
-        StrnCatGrow (&FullPath, &Size, gEfiShellProtocol->GetCurDir (NULL), 0);
-        if (FullPath == NULL) {
-          ShellCommandLineFreeVarList (Package);
-          return SHELL_OUT_OF_RESOURCES;
-        }
+      return SHELL_NOT_FOUND;
+    }
 
-        Size = FullPath != NULL ? StrSize (FullPath) : 0;
-        StrnCatGrow (&FullPath, &Size, L"\\", 0);
-      }
-
-      StrnCatGrow (&FullPath, &Size, PathName, 0);
+    //
+    // We got a valid fully qualified path or we have a CWD
+    //
+    ASSERT ((FullPath == NULL && Size == 0) || (FullPath != NULL));
+    if (StrStr (PathName, L":") == NULL) {
+      StrnCatGrow (&FullPath, &Size, gEfiShellProtocol->GetCurDir (NULL), 0);
       if (FullPath == NULL) {
         ShellCommandLineFreeVarList (Package);
         return SHELL_OUT_OF_RESOURCES;
       }
 
-      if (ShellIsDirectory (PathName) == EFI_SUCCESS) {
-        //
-        // is listing ends with a directory, then we list all files in that directory
-        //
-        ListUnfiltered = TRUE;
-        StrnCatGrow (&SearchString, NULL, L"*", 0);
-      } else {
-        //
-        // must split off the search part that applies to files from the end of the directory part
-        //
-        StrnCatGrow (&SearchString, NULL, FullPath, 0);
-        if (SearchString == NULL) {
-          FreePool (FullPath);
-          ShellCommandLineFreeVarList (Package);
-          return SHELL_OUT_OF_RESOURCES;
-        }
+      Size = FullPath != NULL ? StrSize (FullPath) : 0;
+      StrnCatGrow (&FullPath, &Size, L"\\", 0);
+    }
 
-        PathRemoveLastItem (FullPath);
-        CopyMem (SearchString, SearchString + StrLen (FullPath), StrSize (SearchString + StrLen (FullPath)));
+    StrnCatGrow (&FullPath, &Size, PathName, 0);
+    if (FullPath == NULL) {
+      ShellCommandLineFreeVarList (Package);
+      return SHELL_OUT_OF_RESOURCES;
+    }
+
+    if (ShellIsDirectory (PathName) == EFI_SUCCESS) {
+      //
+      // is listing ends with a directory, then we list all files in that directory
+      //
+      ListUnfiltered = TRUE;
+      StrnCatGrow (&SearchString, NULL, L"*", 0);
+    } else {
+      //
+      // must split off the search part that applies to files from the end of the directory part
+      //
+      StrnCatGrow (&SearchString, NULL, FullPath, 0);
+      if (SearchString == NULL) {
+        FreePool (FullPath);
+        ShellCommandLineFreeVarList (Package);
+        return SHELL_OUT_OF_RESOURCES;
       }
+
+      PathRemoveLastItem (FullPath);
+      CopyMem (SearchString, SearchString + StrLen (FullPath), StrSize (SearchString + StrLen (FullPath)));
     }
   }
 
