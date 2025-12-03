@@ -1413,9 +1413,9 @@ KeyGetchar (
         // alphabetic key is affected by CapsLock State
         //
         if (ConsoleIn->CapsLock) {
-          if ((KeyData.Key.UnicodeChar >= L'a') && (KeyData.Key.UnicodeChar <= L'z')) {
+          if (CharIsLowerAlpha (KeyData.Key.UnicodeChar)) {
             KeyData.Key.UnicodeChar = (UINT16)(KeyData.Key.UnicodeChar - L'a' + L'A');
-          } else if ((KeyData.Key.UnicodeChar >= L'A') && (KeyData.Key.UnicodeChar <= L'Z')) {
+          } else if (CharIsUpperAlpha (KeyData.Key.UnicodeChar)) {
             KeyData.Key.UnicodeChar = (UINT16)(KeyData.Key.UnicodeChar - L'A' + L'a');
           }
         }
