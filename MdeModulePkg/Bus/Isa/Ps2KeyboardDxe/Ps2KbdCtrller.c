@@ -1414,9 +1414,9 @@ KeyGetchar (
         //
         if (ConsoleIn->CapsLock) {
           if (CharIsLowerAlpha (KeyData.Key.UnicodeChar)) {
-            KeyData.Key.UnicodeChar = (UINT16)(KeyData.Key.UnicodeChar - L'a' + L'A');
+            KeyData.Key.UnicodeChar = CharToUpper (KeyData.Key.UnicodeChar);
           } else if (CharIsUpperAlpha (KeyData.Key.UnicodeChar)) {
-            KeyData.Key.UnicodeChar = (UINT16)(KeyData.Key.UnicodeChar - L'A' + L'a');
+            KeyData.Key.UnicodeChar = CharToLower (KeyData.Key.UnicodeChar);
           }
         }
 
