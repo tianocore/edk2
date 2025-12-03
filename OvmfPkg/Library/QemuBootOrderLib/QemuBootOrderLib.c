@@ -41,22 +41,6 @@
 #define REQUIRED_MMIO_OFW_NODES  1
 #define EXAMINED_OFW_NODES       6
 
-/**
-  Simple character classification routines, corresponding to POSIX class names
-  and ASCII encoding.
-**/
-STATIC
-BOOLEAN
-IsAlnum (
-  IN  CHAR8  Chr
-  )
-{
-  return (('0' <= Chr && Chr <= '9') ||
-          ('A' <= Chr && Chr <= 'Z') ||
-          ('a' <= Chr && Chr <= 'z')
-          );
-}
-
 STATIC
 BOOLEAN
 IsDriverNamePunct (
@@ -455,7 +439,7 @@ ParseOfwNode (
   OfwNode->DriverName.Ptr = *Ptr;
   OfwNode->DriverName.Len = 0;
   while (OfwNode->DriverName.Len < 32 &&
-         (IsAlnum (**Ptr) || IsDriverNamePunct (**Ptr))
+         (AsciiCharIsAlphaNum (**Ptr) || IsDriverNamePunct (**Ptr))
          )
   {
     ++*Ptr;
