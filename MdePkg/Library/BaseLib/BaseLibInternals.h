@@ -457,26 +457,6 @@ InternalHexCharToUintn (
   );
 
 /**
-  Check if a ASCII character is a hexadecimal character.
-
-  This internal function checks if a ASCII character is a
-  decimal character.  The valid hexadecimal character is
-  L'0' to L'9', L'a' to L'f', or L'A' to L'F'.
-
-
-  @param  Char  The character to check against.
-
-  @retval TRUE  If the Char is a hexadecmial character.
-  @retval FALSE If the Char is not a hexadecmial character.
-
-**/
-BOOLEAN
-EFIAPI
-InternalAsciiIsHexaDecimalDigitCharacter (
-  IN      CHAR8  Char
-  );
-
-/**
   Convert a ASCII character to numerical value.
 
   This internal function only deal with Unicode character

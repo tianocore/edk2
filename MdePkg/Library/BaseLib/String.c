@@ -526,31 +526,6 @@ StrHexToUint64 (
 }
 
 /**
-  Check if a ASCII character is a hexadecimal character.
-
-  This internal function checks if a ASCII character is a
-  decimal character.  The valid hexadecimal character is
-  L'0' to L'9', L'a' to L'f', or L'A' to L'F'.
-
-
-  @param  Char  The character to check against.
-
-  @retval TRUE  If the Char is a hexadecmial character.
-  @retval FALSE If the Char is not a hexadecmial character.
-
-**/
-BOOLEAN
-EFIAPI
-InternalAsciiIsHexaDecimalDigitCharacter (
-  IN      CHAR8  Char
-  )
-{
-  return (BOOLEAN)(AsciiCharIsNum (Char) ||
-                   (Char >= 'A' && Char <= 'F') ||
-                   (Char >= 'a' && Char <= 'f'));
-}
-
-/**
   Returns the length of a Null-terminated ASCII string.
 
   This function returns the number of ASCII characters in the Null-terminated
