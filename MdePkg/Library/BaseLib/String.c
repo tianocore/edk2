@@ -266,34 +266,6 @@ StrStr (
 }
 
 /**
-  Convert a Unicode character to upper case only if
-  it maps to a valid small-case ASCII character.
-
-  This internal function only deal with Unicode character
-  which maps to a valid small-case ASCII character, i.e.
-  L'a' to L'z'. For other Unicode character, the input character
-  is returned directly.
-
-  @param  Char  The character to convert.
-
-  @retval LowerCharacter   If the Char is with range L'a' to L'z'.
-  @retval Unchanged        Otherwise.
-
-**/
-CHAR16
-EFIAPI
-CharToUpper (
-  IN      CHAR16  Char
-  )
-{
-  if ((Char >= L'a') && (Char <= L'z')) {
-    return (CHAR16)(Char - (L'a' - L'A'));
-  }
-
-  return Char;
-}
-
-/**
   Convert a Unicode character to numerical value.
 
   This internal function only deal with Unicode character
@@ -636,28 +608,6 @@ AsciiStrCmp (
   }
 
   return *FirstString - *SecondString;
-}
-
-/**
-  Converts a lowercase Ascii character to upper one.
-
-  If Chr is lowercase Ascii character, then converts it to upper one.
-
-  If Value >= 0xA0, then ASSERT().
-  If (Value & 0x0F) >= 0x0A, then ASSERT().
-
-  @param  Chr   one Ascii character
-
-  @return The uppercase value of Ascii character
-
-**/
-CHAR8
-EFIAPI
-AsciiCharToUpper (
-  IN      CHAR8  Chr
-  )
-{
-  return (UINT8)((Chr >= 'a' && Chr <= 'z') ? Chr - ('a' - 'A') : Chr);
 }
 
 /**
@@ -2313,4 +2263,144 @@ StrnIsAlphaNum (
   }
 
   return TRUE;
+}
+
+/*
+ * Ascii String / Char conversion functions.
+ */
+
+/**
+  Converts a lowercase Ascii character to upper one.
+
+  @param  Chr   one Ascii character
+
+  @return The uppercase value of Ascii character
+
+**/
+CHAR8
+EFIAPI
+AsciiCharToUpper (
+  IN      CHAR8  Chr
+  )
+{
+  return (UINT8)((Chr >= 'a' && Chr <= 'z') ? Chr - ('a' - 'A') : Chr);
+}
+
+/**
+  Converts an uppercase Ascii character to lower one.
+
+  @param  Chr   one Ascii character
+
+  @return The lowercase value of Ascii character
+
+**/
+CHAR8
+EFIAPI
+AsciiCharToLower (
+  IN      CHAR8  Chr
+  )
+{
+  return (UINT8)((Chr >= 'A' && Chr <= 'Z') ? Chr - ('A' - 'a') : Chr);
+}
+
+/*
+ * Unicode String / Char conversion functions.
+ */
+
+/**
+  Converts a lowercase Unicode character to an upper one.
+
+  @param  Char  The character to convert.
+
+  @retval LowerCharacter   If the Char is with range L'a' to L'z'.
+  @retval Unchanged        Otherwise.
+
+**/
+CHAR16
+EFIAPI
+CharToUpper (
+  IN      CHAR16  Char
+  )
+{
+  if ((Char >= L'a') && (Char <= L'z')) {
+    return (CHAR16)(Char - (L'a' - L'A'));
+  }
+
+  return Char;
+}
+
+/**
+  Converts an uppercase Unicode character to lower one.
+
+  @param  Char  The character to convert.
+
+  @retval UpperCharacter   If the Char is with range L'A' to L'Z'.
+  @retval Unchanged        Otherwise.
+
+**/
+CHAR16
+EFIAPI
+CharToLower (
+  IN      CHAR16  Char
+  )
+{
+  if ((Char >= L'A') && (Char <= L'Z')) {
+    return (CHAR16)(Char - (L'A' - L'a'));
+  }
+
+  return Char;
+}
+
+/**
+  Converts a lowercase Unicode String to upper one.
+
+  @param[in] String       Pointer to the string to convert.
+  @param[in] MaxSize      Maximum number of characters to convert.
+**/
+VOID
+EFIAPI
+StrnCharToUpper (
+  IN CHAR16  *String,
+  IN UINTN   MaxSize
+  )
+{
+  UINTN  Count;
+
+  ASSERT (String != NULL);
+  ASSERT (MaxSize != 0);
+
+  if ((String == NULL) || (MaxSize == 0)) {
+    return;
+  }
+
+  for (Count = 0; Count < MaxSize && String[Count] != CHAR_NULL; Count++) {
+    String[Count] = CharToLower (String[Count]);
+  }
+}
+
+/**
+  Converts an uppercase Unicode String to lower one.
+
+  @param[in] String       Pointer to the string to convert.
+  @param[in] MaxSize      Maximum number of characters to convert.
+**/
+VOID
+EFIAPI
+StrnCharToLower (
+  IN CHAR16  *String,
+  IN UINTN   MaxSize
+  )
+{
+  UINTN  Count;
+
+  ASSERT (String != NULL);
+  ASSERT (MaxSize != 0);
+
+  if ((String == NULL) || (MaxSize == 0)) {
+    return;
+  }
+
+  for (Count = 0; Count < MaxSize && String[Count] != CHAR_NULL; Count++) {
+    String[Count] = CharToUpper (String[Count]);
+  }
 }

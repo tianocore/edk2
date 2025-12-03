@@ -2628,46 +2628,6 @@ AsciiStrnToUnicodeStrS (
   OUT     UINTN        *DestinationLength
   );
 
-/**
-  Convert a Unicode character to upper case only if
-  it maps to a valid small-case ASCII character.
-
-  This internal function only deal with Unicode character
-  which maps to a valid small-case ASCII character, i.e.
-  L'a' to L'z'. For other Unicode character, the input character
-  is returned directly.
-
-  @param  Char  The character to convert.
-
-  @retval LowerCharacter   If the Char is with range L'a' to L'z'.
-  @retval Unchanged        Otherwise.
-
-**/
-CHAR16
-EFIAPI
-CharToUpper (
-  IN      CHAR16  Char
-  );
-
-/**
-  Converts a lowercase Ascii character to upper one.
-
-  If Chr is lowercase Ascii character, then converts it to upper one.
-
-  If Value >= 0xA0, then ASSERT().
-  If (Value & 0x0F) >= 0x0A, then ASSERT().
-
-  @param  Chr   one Ascii character
-
-  @return The uppercase value of Ascii character
-
-**/
-CHAR8
-EFIAPI
-AsciiCharToUpper (
-  IN      CHAR8  Chr
-  );
-
 /*
  * Ascii String / Char checker functions.
  */
@@ -3066,6 +3026,98 @@ BOOLEAN
 StrnIsAlphaNum (
   IN CONST CHAR16  *String,
   IN       UINTN   MaxSize
+  );
+
+/*
+ * Ascii String / Char conversion functions.
+ */
+
+/**
+  Converts a lowercase Ascii character to upper one.
+
+  @param  Chr   one Ascii character
+
+  @return The uppercase value of Ascii character
+
+**/
+CHAR8
+EFIAPI
+AsciiCharToUpper (
+  IN      CHAR8  Chr
+  );
+
+/**
+  Converts an uppercase Ascii character to lower one.
+
+  @param  Chr   one Ascii character
+
+  @return The lowercase value of Ascii character
+
+**/
+CHAR8
+EFIAPI
+AsciiCharToLower (
+  IN      CHAR8  Chr
+  );
+
+/*
+ * Unicode String / Char conversion functions.
+ */
+
+/**
+  Converts a lowercase Unicode character to an upper one.
+
+  @param  Char  The character to convert.
+
+  @retval LowerCharacter   If the Char is with range L'a' to L'z'.
+  @retval Unchanged        Otherwise.
+
+**/
+CHAR16
+EFIAPI
+CharToUpper (
+  IN      CHAR16  Char
+  );
+
+/**
+  Converts an uppercase Unicode character to lower one.
+
+  @param  Char  The character to convert.
+
+  @retval UpperCharacter   If the Char is with range L'A' to L'Z'.
+  @retval Unchanged        Otherwise.
+
+**/
+CHAR16
+EFIAPI
+CharToLower (
+  IN      CHAR16  Char
+  );
+
+/**
+  Converts a lowercase Unicode String to upper one.
+
+  @param[in] String       Pointer to the string to convert.
+  @param[in] MaxSize      Maximum number of characters to convert.
+**/
+VOID
+EFIAPI
+StrnCharToUpper (
+  IN CHAR16  *String,
+  IN UINTN   MaxSize
+  );
+
+/**
+  Converts an uppercase Unicode String to lower one.
+
+  @param[in] String       Pointer to the string to convert.
+  @param[in] MaxSize      Maximum number of characters to convert.
+**/
+VOID
+EFIAPI
+StrnCharToLower (
+  IN CHAR16  *String,
+  IN UINTN   MaxSize
   );
 
 /**
