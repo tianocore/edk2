@@ -95,7 +95,7 @@ Mtftp6ParseMcastOption (
 
     ExtInfo->McastPort = (UINT16)Num;
 
-    while (NET_IS_DIGIT (*Str)) {
+    while (AsciiCharIsNum (*Str)) {
       Str++;
     }
   }
@@ -117,7 +117,7 @@ Mtftp6ParseMcastOption (
 
   ExtInfo->IsMaster = (BOOLEAN)(Num == 1);
 
-  while (NET_IS_DIGIT (*Str)) {
+  while (AsciiCharIsNum (*Str)) {
     Str++;
   }
 

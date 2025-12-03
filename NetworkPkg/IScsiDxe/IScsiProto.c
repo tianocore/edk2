@@ -1133,7 +1133,7 @@ IScsiUpdateTargetAddress (
     // The domainname can be specified as either a DNS host name, adotted-decimal IPv4 address,
     // or a bracketed IPv6 address as specified in [RFC2732].
     //
-    if (NET_IS_DIGIT (TargetAddress[0])) {
+    if (AsciiCharIsNum (TargetAddress[0])) {
       //
       // The domainname of the target is presented in a dotted-decimal IPv4 address format.
       //
@@ -2030,15 +2030,15 @@ IScsiNormalizeName (
   UINTN  Index;
 
   for (Index = 0; Index < Len; Index++) {
-    if (NET_IS_UPPER_CASE_CHAR (Name[Index])) {
+    if (AsciiCharIsUpperAlpha (Name[Index])) {
       //
       // Convert the upper-case characters to lower-case ones.
       //
       Name[Index] = (CHAR8)(Name[Index] - 'A' + 'a');
     }
 
-    if (!NET_IS_LOWER_CASE_CHAR (Name[Index]) &&
-        !NET_IS_DIGIT (Name[Index]) &&
+    if (!AsciiCharIsLowerAlpha (Name[Index]) &&
+        !AsciiCharIsNum (Name[Index]) &&
         (Name[Index] != '-') &&
         (Name[Index] != '.') &&
         (Name[Index] != ':')
