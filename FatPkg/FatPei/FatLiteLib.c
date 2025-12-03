@@ -12,29 +12,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define CHAR_FAT_VALID  0x01
 
 /**
-  Converts a union code character to upper case.
-  This functions converts a unicode character to upper case.
-  If the input Letter is not a lower-cased letter,
-  the original value is returned.
-
-  @param  Letter            The input unicode character.
-
-  @return The upper cased letter.
-
-**/
-CHAR16
-ToUpper (
-  IN CHAR16  Letter
-  )
-{
-  if (('a' <= Letter) && (Letter <= 'z')) {
-    Letter = (CHAR16)(Letter - 0x20);
-  }
-
-  return Letter;
-}
-
-/**
   Reads a block of data from the block device by calling
   underlying Block I/O service.
 
@@ -348,8 +325,8 @@ EngStriColl (
   CHAR16  UpperS1;
   CHAR16  UpperS2;
 
-  UpperS1 = ToUpper (*Str1);
-  UpperS2 = ToUpper (*Str2);
+  UpperS1 = CharToUpper (*Str1);
+  UpperS2 = CharToUpper (*Str2);
   while (*Str1 != 0) {
     if (UpperS1 != UpperS2) {
       return FALSE;
@@ -357,8 +334,8 @@ EngStriColl (
 
     Str1++;
     Str2++;
-    UpperS1 = ToUpper (*Str1);
-    UpperS2 = ToUpper (*Str2);
+    UpperS1 = CharToUpper (*Str1);
+    UpperS2 = CharToUpper (*Str2);
   }
 
   return (BOOLEAN)((*Str2 != 0) ? FALSE : TRUE);
