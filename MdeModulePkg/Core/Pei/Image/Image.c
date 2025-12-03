@@ -402,7 +402,7 @@ LoadAndRelocatePeCoffImage (
       if (ImageContext.SectionAlignment > EFI_PAGE_SIZE) {
         ImageContext.ImageAddress =
           (ImageContext.ImageAddress + ImageContext.SectionAlignment - 1) &
-          ~((UINTN)ImageContext.SectionAlignment - 1);
+          ~((EFI_PHYSICAL_ADDRESS)ImageContext.SectionAlignment - 1);
       }
 
       //
