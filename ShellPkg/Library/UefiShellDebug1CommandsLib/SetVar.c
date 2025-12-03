@@ -39,7 +39,7 @@ typedef union {
   @param[in] String  The CHAR16 string to check.
 
   @retval FALSE  A character has been found in String for which
-                 ShellIsHexaDecimalDigitCharacter() returned FALSE.
+                 CharIsHexNum() returned FALSE.
 
   @retval TRUE   Otherwise. (Note that this covers the case when String is
                  empty.)
@@ -52,7 +52,7 @@ IsStringOfHexNibbles (
   CONST CHAR16  *Pos;
 
   for (Pos = String; *Pos != L'\0'; ++Pos) {
-    if (!ShellIsHexaDecimalDigitCharacter (*Pos)) {
+    if (!CharIsHexNum (*Pos)) {
       return FALSE;
     }
   }
