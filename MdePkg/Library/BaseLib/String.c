@@ -1637,6 +1637,369 @@ BcdToDecimal8 (
 }
 
 /*
+ * Ascii String / Char checker functions.
+ */
+
+/**
+  Determine if a Ascii Char is a lowercase letter.
+
+  @param[in] Char         Char to analyze.
+
+  @retval TRUE            Ascii Char is a lowercase letter.
+  @retval FALSE           Otherwise.
+**/
+BOOLEAN
+AsciiCharIsLowerAlpha (
+  IN CHAR8  Char
+  )
+{
+  return (Char >= 'a') && (Char <= 'z');
+}
+
+/**
+  Determine if a Ascii Char is a uppercase letter.
+
+  @param[in] Char         Char to analyze.
+
+  @retval TRUE            Ascii Char is a uppercase letter.
+  @retval FALSE           Otherwise.
+**/
+BOOLEAN
+AsciiCharIsUpperAlpha (
+  IN CHAR8  Char
+  )
+{
+  return ((Char >= 'A') && (Char <= 'Z'));
+}
+
+/**
+  Determine if a Ascii Char is a letter.
+
+  @param[in] Char         Char to analyze.
+
+  @retval TRUE            Ascii Char is a letter.
+  @retval FALSE           Otherwise.
+**/
+BOOLEAN
+AsciiCharIsAlpha (
+  IN CHAR8  Char
+  )
+{
+  return ((Char >= 'a') && (Char <= 'z')) ||
+         ((Char >= 'A') && (Char <= 'Z'));
+}
+
+/**
+  Determine if a Ascii Char is a number.
+
+  @param[in] Char         Char to analyze.
+
+  @retval TRUE            Ascii Char is a number.
+  @retval FALSE           Otherwise.
+**/
+BOOLEAN
+AsciiCharIsNum (
+  IN CHAR8  Char
+  )
+{
+  return (Char >= '0') && (Char <= '9');
+}
+
+/**
+  Determine if a Ascii Char is a hexadecimal number.
+
+  @param[in] Char         Char to analyze.
+
+  @retval TRUE            Ascii Char is a hexadecimal number.
+  @retval FALSE           Otherwise.
+**/
+BOOLEAN
+AsciiCharIsHexNum (
+  IN CHAR8  Char
+  )
+{
+  return ((Char >= '0') && (Char <= '9')) ||
+         ((Char >= 'a') && (Char <= 'f')) ||
+         ((Char >= 'A') && (Char <= 'F'));
+}
+
+/**
+  Determine if a Ascii Char is an uppercase hexadecimal number.
+
+  @param[in] Char         Char to analyze.
+
+  @retval TRUE            Ascii Char is an uppercase hexadecimal number.
+  @retval FALSE           Otherwise.
+**/
+BOOLEAN
+AsciiCharIsUpperHexNum (
+  IN CHAR8  Char
+  )
+{
+  return ((Char >= '0') && (Char <= '9')) ||
+         ((Char >= 'A') && (Char <= 'F'));
+}
+
+/**
+  Determine if a Ascii Char is a letter or number.
+
+  @param[in] Char         Char to analyze.
+
+  @retval TRUE            Ascii Char is a letter or number.
+  @retval FALSE           Otherwise.
+**/
+BOOLEAN
+AsciiCharIsAlphaNum (
+  IN CHAR8  Char
+  )
+{
+  return ((Char >= 'a') && (Char <= 'z')) ||
+         ((Char >= 'A') && (Char <= 'Z')) ||
+         ((Char >= '0') && (Char <= '9'));
+}
+
+/**
+  Determine if a Ascii String has only lowercase letters.
+
+  @param[in] String       Pointer to the string to analyze.
+  @param[in] MaxSize      Maximum number of characters to analyze.
+
+  @retval TRUE            Ascii String has only lowercase letters.
+  @retval FALSE           Ascii String has at least one other character.
+**/
+BOOLEAN
+AsciiStrnIsLowerAlpha (
+  IN CONST CHAR8  *String,
+  IN       UINTN  MaxSize
+  )
+{
+  UINTN  Count;
+
+  ASSERT (String != NULL);
+  ASSERT (MaxSize != 0);
+
+  if ((String == NULL) || (MaxSize == 0)) {
+    return FALSE;
+  }
+
+  for (Count = 0; Count < MaxSize && String[Count] != CHAR_NULL; Count++) {
+    if (!((String[Count] >= 'a') && (String[Count] <= 'z'))) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+/**
+  Determine if a Ascii String has only uppercase letters.
+
+  @param[in] String       Pointer to the string to analyze.
+  @param[in] MaxSize      Maximum number of characters to analyze.
+
+  @retval TRUE            Ascii String has only uppercase letters.
+  @retval FALSE           Ascii String has at least one other character.
+**/
+BOOLEAN
+AsciiStrnIsUpperAlpha (
+  IN CONST CHAR8  *String,
+  IN       UINTN  MaxSize
+  )
+{
+  UINTN  Count;
+
+  ASSERT (String != NULL);
+  ASSERT (MaxSize != 0);
+
+  if ((String == NULL) || (MaxSize == 0)) {
+    return FALSE;
+  }
+
+  for (Count = 0; Count < MaxSize && String[Count] != CHAR_NULL; Count++) {
+    if (!((String[Count] >= 'A') && (String[Count] <= 'Z'))) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+/**
+  Determine if a Ascii String has only letters.
+
+  @param[in] String       Pointer to the string to analyze.
+  @param[in] MaxSize      Maximum number of characters to analyze.
+
+  @retval TRUE            Ascii String has only letters.
+  @retval FALSE           Ascii String has at least one other character.
+**/
+BOOLEAN
+AsciiStrnIsAlpha (
+  IN CONST CHAR8  *String,
+  IN       UINTN  MaxSize
+  )
+{
+  UINTN  Count;
+
+  ASSERT (String != NULL);
+  ASSERT (MaxSize != 0);
+
+  if ((String == NULL) || (MaxSize == 0)) {
+    return FALSE;
+  }
+
+  for (Count = 0; Count < MaxSize && String[Count] != CHAR_NULL; Count++) {
+    if (!(((String[Count] >= 'a') && (String[Count] <= 'z')) &&
+          ((String[Count] >= 'A') && (String[Count] <= 'Z'))))
+    {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+/**
+  Determine if a Ascii String has only numbers.
+
+  @param[in] String       Pointer to the string to analyze.
+  @param[in] MaxSize      Maximum number of characters to analyze.
+
+  @retval TRUE            Ascii String has only numbers.
+  @retval FALSE           Ascii String has at least one other character.
+**/
+BOOLEAN
+AsciiStrnIsNum (
+  IN CONST CHAR8  *String,
+  IN       UINTN  MaxSize
+  )
+{
+  UINTN  Count;
+
+  ASSERT (String != NULL);
+  ASSERT (MaxSize != 0);
+
+  if ((String == NULL) || (MaxSize == 0)) {
+    return FALSE;
+  }
+
+  for (Count = 0; Count < MaxSize && String[Count] != CHAR_NULL; Count++) {
+    if (!((String[Count] >= '0') && (String[Count] <= '9'))) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+/**
+  Determine if a Ascii String has only hexadecimal numbers.
+
+  @param[in] String       Pointer to the string to analyze.
+  @param[in] MaxSize      Maximum number of characters to analyze.
+
+  @retval TRUE            Ascii String has only hexadecimal numbers.
+  @retval FALSE           Ascii String has at least one other character.
+**/
+BOOLEAN
+AsciiStrnIsHexNum (
+  IN CONST CHAR8  *String,
+  IN       UINTN  MaxSize
+  )
+{
+  UINTN  Count;
+
+  ASSERT (String != NULL);
+  ASSERT (MaxSize != 0);
+
+  if ((String == NULL) || (MaxSize == 0)) {
+    return FALSE;
+  }
+
+  for (Count = 0; Count < MaxSize && String[Count] != CHAR_NULL; Count++) {
+    if (!(((String[Count] >= '0') && (String[Count] <= '9')) ||
+          ((String[Count] >= 'a') && (String[Count] <= 'f')) ||
+          ((String[Count] >= 'A') && (String[Count] <= 'F'))))
+    {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+/**
+  Determine if a Ascii String has only uppercase hexadecimal numbers.
+
+  @param[in] String       Pointer to the string to analyze.
+  @param[in] MaxSize      Maximum number of characters to analyze.
+
+  @retval TRUE            Ascii String has only uppercase hexadecimal numbers.
+  @retval FALSE           Ascii String has at least one other character.
+**/
+BOOLEAN
+AsciiStrnIsUpperHexNum (
+  IN CONST CHAR8  *String,
+  IN       UINTN  MaxSize
+  )
+{
+  UINTN  Count;
+
+  ASSERT (String != NULL);
+  ASSERT (MaxSize != 0);
+
+  if ((String == NULL) || (MaxSize == 0)) {
+    return FALSE;
+  }
+
+  for (Count = 0; Count < MaxSize && String[Count] != CHAR_NULL; Count++) {
+    if (!(((String[Count] >= '0') && (String[Count] <= '9')) ||
+          ((String[Count] >= 'A') && (String[Count] <= 'F'))))
+    {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+/**
+  Determine if a Ascii String has only letters or numbers.
+
+  @param[in] String       Pointer to the string to analyze.
+  @param[in] MaxSize      Maximum number of characters to analyze.
+
+  @retval TRUE            Ascii String has only letters or numbers.
+  @retval FALSE           Ascii String has at least one other character.
+**/
+BOOLEAN
+AsciiStrnIsAlphaNum (
+  IN CONST CHAR8  *String,
+  IN       UINTN  MaxSize
+  )
+{
+  UINTN  Count;
+
+  ASSERT (String != NULL);
+  ASSERT (MaxSize != 0);
+
+  if ((String == NULL) || (MaxSize == 0)) {
+    return FALSE;
+  }
+
+  for (Count = 0; Count < MaxSize && String[Count] != CHAR_NULL; Count++) {
+    if (!(((String[Count] >= 'a') && (String[Count] <= 'z')) ||
+          ((String[Count] >= 'A') && (String[Count] <= 'Z')) ||
+          ((String[Count] >= '0') && (String[Count] <= '9'))))
+    {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+/*
  * Unicode String / Char checker functions.
  */
 
