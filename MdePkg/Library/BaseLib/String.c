@@ -1682,3 +1682,168 @@ BcdToDecimal8 (
   ASSERT ((Value & 0xf) < 0xa);
   return (UINT8)((Value >> 4) * 10 + (Value & 0xf));
 }
+
+/*
+ * Unicode String / Char checker functions.
+ */
+
+/**
+  Determine if a Unicode Char is a number.
+
+  @param[in] Char         Char to analyze.
+
+  @retval TRUE            Unicode Char is a number.
+  @retval FALSE           Otherwise.
+**/
+BOOLEAN
+EFIAPI
+CharIsNum (
+  IN CHAR16  Char
+  )
+{
+  return (Char >= L'0') && (Char <= L'9');
+}
+
+/**
+  Determine if a Unicode Char is a hexadecimal number.
+
+  @param[in] Char         Char to analyze.
+
+  @retval TRUE            Unicode Char is a hexadecimal number.
+  @retval FALSE           Otherwise.
+**/
+BOOLEAN
+EFIAPI
+CharIsHexNum (
+  IN CHAR16  Char
+  )
+{
+  return ((Char >= L'0') && (Char <= L'9')) ||
+         ((Char >= L'a') && (Char <= L'f')) ||
+         ((Char >= L'A') && (Char <= L'F'));
+}
+
+/**
+  Determine if a Unicode Char is an uppercase hexadecimal number.
+
+  @param[in] Char         Char to analyze.
+
+  @retval TRUE            Unicode Char is an uppercase hexadecimal number.
+  @retval FALSE           Otherwise.
+**/
+BOOLEAN
+EFIAPI
+CharIsUpperHexNum (
+  IN CHAR16  Char
+  )
+{
+  return ((Char >= L'0') && (Char <= L'9')) ||
+         ((Char >= L'A') && (Char <= L'F'));
+}
+
+/**
+  Determine if a Unicode String has only numbers.
+
+  @param[in] String       Pointer to the string to analyze.
+  @param[in] MaxSize      Maximum number of characters to analyze.
+
+  @retval TRUE            Unicode String has only numbers.
+  @retval FALSE           Unicode String has at least one other character.
+**/
+BOOLEAN
+EFIAPI
+StrnIsNum (
+  IN CONST CHAR16  *String,
+  IN       UINTN   MaxSize
+  )
+{
+  UINTN  Count;
+
+  ASSERT (String != NULL);
+  ASSERT (MaxSize != 0);
+
+  if ((String == NULL) || (MaxSize == 0)) {
+    return FALSE;
+  }
+
+  for (Count = 0; Count < MaxSize && String[Count] != CHAR_NULL; Count++) {
+    if (!((String[Count] >= L'0') && (String[Count] <= L'9'))) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+/**
+  Determine if a Unicode String has only hexadecimal numbers.
+
+  @param[in] String       Pointer to the string to analyze.
+  @param[in] MaxSize      Maximum number of characters to analyze.
+
+  @retval TRUE            Unicode String has only hexadecimal numbers.
+  @retval FALSE           Unicode String has at least one other character.
+**/
+BOOLEAN
+EFIAPI
+StrnIsHexNum (
+  IN CONST CHAR16  *String,
+  IN       UINTN   MaxSize
+  )
+{
+  UINTN  Count;
+
+  ASSERT (String != NULL);
+  ASSERT (MaxSize != 0);
+
+  if ((String == NULL) || (MaxSize == 0)) {
+    return FALSE;
+  }
+
+  for (Count = 0; Count < MaxSize && String[Count] != CHAR_NULL; Count++) {
+    if (!(((String[Count] >= L'0') && (String[Count] <= L'9')) ||
+          ((String[Count] >= L'a') && (String[Count] <= L'f')) ||
+          ((String[Count] >= L'A') && (String[Count] <= L'F'))))
+    {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+/**
+  Determine if a Unicode String has only uppercase hexadecimal numbers.
+
+  @param[in] String       Pointer to the string to analyze.
+  @param[in] MaxSize      Maximum number of characters to analyze.
+
+  @retval TRUE            Unicode String has only uppercase hexadecimal numbers.
+  @retval FALSE           Unicode String has at least one other character.
+**/
+BOOLEAN
+EFIAPI
+StrnIsUpperHexNum (
+  IN CONST CHAR16  *String,
+  IN       UINTN   MaxSize
+  )
+{
+  UINTN  Count;
+
+  ASSERT (String != NULL);
+  ASSERT (MaxSize != 0);
+
+  if ((String == NULL) || (MaxSize == 0)) {
+    return FALSE;
+  }
+
+  for (Count = 0; Count < MaxSize && String[Count] != CHAR_NULL; Count++) {
+    if (!(((String[Count] >= L'0') && (String[Count] <= L'9')) ||
+          ((String[Count] >= L'A') && (String[Count] <= L'F'))))
+    {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
