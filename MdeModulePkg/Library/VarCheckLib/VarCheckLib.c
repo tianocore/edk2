@@ -90,29 +90,6 @@ VARIABLE_ENTRY_PROPERTY  mVarCheckVariableWithWildcardName[] = {
 };
 
 /**
-  Check if a Unicode character is an upper case hexadecimal character.
-
-  This function checks if a Unicode character is an upper case
-  hexadecimal character.  The valid upper case hexadecimal character is
-  L'0' to L'9', or L'A' to L'F'.
-
-
-  @param[in] Char       The character to check against.
-
-  @retval TRUE          If the Char is an upper case hexadecmial character.
-  @retval FALSE         If the Char is not an upper case hexadecmial character.
-
-**/
-BOOLEAN
-EFIAPI
-VarCheckInternalIsHexaDecimalDigitCharacter (
-  IN CHAR16  Char
-  )
-{
-  return (BOOLEAN)((Char >= L'0' && Char <= L'9') || (Char >= L'A' && Char <= L'F'));
-}
-
-/**
   Variable property get with wildcard name.
 
   @param[in] VariableName       Pointer to variable name.
@@ -138,10 +115,10 @@ VariablePropertyGetWithWildcardName (
       if (WildcardMatch) {
         if ((StrLen (VariableName) == StrLen (mVarCheckVariableWithWildcardName[Index].Name)) &&
             (StrnCmp (VariableName, mVarCheckVariableWithWildcardName[Index].Name, NameLength) == 0) &&
-            VarCheckInternalIsHexaDecimalDigitCharacter (VariableName[NameLength]) &&
-            VarCheckInternalIsHexaDecimalDigitCharacter (VariableName[NameLength + 1]) &&
-            VarCheckInternalIsHexaDecimalDigitCharacter (VariableName[NameLength + 2]) &&
-            VarCheckInternalIsHexaDecimalDigitCharacter (VariableName[NameLength + 3]))
+            CharIsUpperHexNum (VariableName[NameLength]) &&
+            CharIsUpperHexNum (VariableName[NameLength + 1]) &&
+            CharIsUpperHexNum (VariableName[NameLength + 2]) &&
+            CharIsUpperHexNum (VariableName[NameLength + 3]))
         {
           return &mVarCheckVariableWithWildcardName[Index].VariableProperty;
         }
