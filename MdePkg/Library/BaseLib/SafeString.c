@@ -2215,7 +2215,7 @@ AsciiStrDecimalToUintnS (
 
   *Data = 0;
 
-  while (InternalAsciiIsDecimalDigitCharacter (*String)) {
+  while (AsciiCharIsNum (*String)) {
     //
     // If the number represented by String overflows according to the range
     // defined by UINTN, then MAX_UINTN is stored in *Data and
@@ -2323,7 +2323,7 @@ AsciiStrDecimalToUint64S (
 
   *Data = 0;
 
-  while (InternalAsciiIsDecimalDigitCharacter (*String)) {
+  while (AsciiCharIsNum (*String)) {
     //
     // If the number represented by String overflows according to the range
     // defined by UINT64, then MAX_UINT64 is stored in *Data and
@@ -3333,7 +3333,7 @@ AsciiStrToIpv4Address (
   SAFE_STRING_CONSTRAINT_CHECK ((Address != NULL), RETURN_INVALID_PARAMETER);
 
   for (Pointer = (CHAR8 *)String, AddressIndex = 0; AddressIndex < ARRAY_SIZE (Address->Addr) + 1;) {
-    if (!InternalAsciiIsDecimalDigitCharacter (*Pointer)) {
+    if (!AsciiCharIsNum (*Pointer)) {
       //
       // D or P contains invalid characters.
       //

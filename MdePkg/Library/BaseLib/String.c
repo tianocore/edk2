@@ -526,28 +526,6 @@ StrHexToUint64 (
 }
 
 /**
-  Check if a ASCII character is a decimal character.
-
-  This internal function checks if a Unicode character is a
-  decimal character. The valid decimal character is from
-  '0' to '9'.
-
-  @param  Char  The character to check against.
-
-  @retval TRUE  If the Char is a decmial character.
-  @retval FALSE If the Char is not a decmial character.
-
-**/
-BOOLEAN
-EFIAPI
-InternalAsciiIsDecimalDigitCharacter (
-  IN      CHAR8  Char
-  )
-{
-  return (BOOLEAN)(Char >= '0' && Char <= '9');
-}
-
-/**
   Check if a ASCII character is a hexadecimal character.
 
   This internal function checks if a ASCII character is a
@@ -567,7 +545,7 @@ InternalAsciiIsHexaDecimalDigitCharacter (
   IN      CHAR8  Char
   )
 {
-  return (BOOLEAN)(InternalAsciiIsDecimalDigitCharacter (Char) ||
+  return (BOOLEAN)(AsciiCharIsNum (Char) ||
                    (Char >= 'A' && Char <= 'F') ||
                    (Char >= 'a' && Char <= 'f'));
 }
