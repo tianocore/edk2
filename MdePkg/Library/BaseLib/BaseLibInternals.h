@@ -438,25 +438,6 @@ InternalLongJump (
   );
 
 /**
-  Check if a Unicode character is a decimal character.
-
-  This internal function checks if a Unicode character is a
-  decimal character. The valid decimal character is from
-  L'0' to L'9'.
-
-  @param  Char  The character to check against.
-
-  @retval TRUE  If the Char is a decmial character.
-  @retval FALSE If the Char is not a decmial character.
-
-**/
-BOOLEAN
-EFIAPI
-InternalIsDecimalDigitCharacter (
-  IN      CHAR16  Char
-  );
-
-/**
   Convert a Unicode character to numerical value.
 
   This internal function only deal with Unicode character
