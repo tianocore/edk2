@@ -41,7 +41,7 @@ ShellIsValidForNumber (
     }
   }
 
-  if (!ShellIsDecimalDigitCharacter (*Number)) {
+  if (!CharIsNum (*Number)) {
     return (FALSE);
   }
 
