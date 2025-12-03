@@ -154,29 +154,6 @@ FullyQualifyPath (
 }
 
 /**
-  Check if a Unicode character is a decimal character.
-
-  This internal function checks if a Unicode character is a
-  decimal character.  The valid characters are
-  L'0' to L'9'.
-
-
-  @param  Char  The character to check against.
-
-  @retval TRUE  If the Char is a hexadecmial character.
-  @retval FALSE If the Char is not a hexadecmial character.
-
-**/
-BOOLEAN
-EFIAPI
-ShellIsDecimalDigitCharacter (
-  IN      CHAR16  Char
-  )
-{
-  return (BOOLEAN)(Char >= L'0' && Char <= L'9');
-}
-
-/**
   Helper function to find ShellEnvironment2 for constructor.
 
   @param[in] ImageHandle    A copy of the calling image's handle.
@@ -3889,7 +3866,7 @@ InternalShellIsHexOrDecimalNumber (
         return (FALSE);
       }
     } else {
-      if (!ShellIsDecimalDigitCharacter (*String)) {
+      if (!CharIsNum (*String)) {
         return (FALSE);
       }
     }
@@ -3947,7 +3924,7 @@ InternalShellHexCharToUintn (
   IN      CHAR16  Char
   )
 {
-  if (ShellIsDecimalDigitCharacter (Char)) {
+  if (CharIsNum (Char)) {
     return Char - L'0';
   }
 
@@ -4127,7 +4104,7 @@ InternalShellStrDecimalToUint64 (
     return (EFI_SUCCESS);
   }
 
-  while (ShellIsDecimalDigitCharacter (*String)) {
+  while (CharIsNum (*String)) {
     //
     // If the number represented by String overflows according
     // to the range defined by UINT64, then return EFI_DEVICE_ERROR.

@@ -309,12 +309,6 @@ struct MockShellLib {
     );
 
   MOCK_FUNCTION_DECLARATION (
-    BOOLEAN,
-    ShellIsDecimalDigitCharacter,
-    (IN CHAR16  Char)
-    );
-
-  MOCK_FUNCTION_DECLARATION (
     EFI_STATUS,
     ShellPromptForResponse,
     (IN     SHELL_PROMPT_REQUEST_TYPE  Type,

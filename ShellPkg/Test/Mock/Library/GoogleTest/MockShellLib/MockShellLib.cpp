@@ -56,7 +56,6 @@ MOCK_FUNCTION_DEFINITION (MockShellLib, ShellStrToUintn, 1, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockShellLib, ShellHexStrToUintn, 1, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockShellLib, StrnCatGrow, 4, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockShellLib, ShellCopySearchAndReplace, 7, EFIAPI);
-MOCK_FUNCTION_DEFINITION (MockShellLib, ShellIsDecimalDigitCharacter, 1, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockShellLib, ShellPromptForResponse, 3, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockShellLib, ShellPromptForResponseHii, 4, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockShellLib, ShellIsHexOrDecimalNumber, 3, EFIAPI);
