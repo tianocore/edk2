@@ -46,7 +46,7 @@ InternalIsTimeLikeString (
   //
   // the first char must be numeric.
   //
-  if (!ShellIsDecimalDigitCharacter (*String)) {
+  if (!CharIsNum (*String)) {
     return (FALSE);
   }
 
@@ -63,7 +63,7 @@ InternalIsTimeLikeString (
       continue;
     }
 
-    if (!ShellIsDecimalDigitCharacter (*String)) {
+    if (!CharIsNum (*String)) {
       return (FALSE);
     }
   }

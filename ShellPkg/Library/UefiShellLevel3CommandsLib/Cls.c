@@ -102,7 +102,7 @@ ShellCommandRunCls (
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
         if (BackColorStr != NULL) {
-          if ((ShellStrToUintn (BackColorStr) > 7) || (StrLen (BackColorStr) > 1) || (!ShellIsDecimalDigitCharacter (*BackColorStr))) {
+          if ((ShellStrToUintn (BackColorStr) > 7) || (StrLen (BackColorStr) > 1) || (!CharIsNum (*BackColorStr))) {
             ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"cls", BackColorStr);
             ShellStatus = SHELL_INVALID_PARAMETER;
           } else {
@@ -134,7 +134,7 @@ ShellCommandRunCls (
             }
 
             if (ForeColorStr != NULL) {
-              if ((ShellStrToUintn (ForeColorStr) > 15) || (StrLen (ForeColorStr) > 2) || (!ShellIsDecimalDigitCharacter (*ForeColorStr))) {
+              if ((ShellStrToUintn (ForeColorStr) > 15) || (StrLen (ForeColorStr) > 2) || (!CharIsNum (*ForeColorStr))) {
                 ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"cls", ForeColorStr);
                 ShellStatus = SHELL_INVALID_PARAMETER;
               } else {
