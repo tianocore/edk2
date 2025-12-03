@@ -60,7 +60,7 @@ SearchList (
       *TempSpot = CHAR_NULL;
     }
 
-    while (SkipTrailingNumbers && (ShellIsDecimalDigitCharacter (TempList[StrLen (TempList)-1]) || TempList[StrLen (TempList)-1] == L':')) {
+    while (SkipTrailingNumbers && (CharIsNum (TempList[StrLen (TempList)-1]) || TempList[StrLen (TempList)-1] == L':')) {
       TempList[StrLen (TempList)-1] = CHAR_NULL;
     }
 
