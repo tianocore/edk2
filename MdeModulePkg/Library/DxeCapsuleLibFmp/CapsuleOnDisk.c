@@ -114,31 +114,6 @@ ValidateCapsuleNameCapsuleIntegrity (
 }
 
 /**
-  This routine is called to upper case given unicode string.
-
-  @param[in]   Str              String to upper case
-
-  @retval upper cased string after process
-
-**/
-static
-CHAR16 *
-UpperCaseString (
-  IN CHAR16  *Str
-  )
-{
-  CHAR16  *Cptr;
-
-  for (Cptr = Str; *Cptr != L'\0'; Cptr++) {
-    if ((L'a' <= *Cptr) && (*Cptr <= L'z')) {
-      *Cptr = *Cptr - L'a' + L'A';
-    }
-  }
-
-  return Str;
-}
-
-/**
   This routine is used to return substring before period '.' or '\0'
   Caller should respsonsible of substr space allocation & free
 
@@ -753,8 +728,8 @@ GetFileInfoListInAlphabetFromDir (
     NewFileName          = NewFileInfoEntry->FileNameFirstPart;
     NewFileNameExtension = NewFileInfoEntry->FileNameSecondPart;
     SplitFileNameExtension (FileInfo->FileName, NewFileName, NewFileNameExtension);
-    UpperCaseString (NewFileName);
-    UpperCaseString (NewFileNameExtension);
+    StrnCharToUpper (NewFileName, StrLen (NewFileName));
+    StrnCharToUpper (NewFileNameExtension, StrLen (NewFileNameExtension));
 
     //
     // Insert capsule file in alphabetical ordered list
