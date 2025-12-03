@@ -320,31 +320,6 @@ InternalHexCharToUintn (
 }
 
 /**
-  Check if a Unicode character is a hexadecimal character.
-
-  This internal function checks if a Unicode character is a
-  decimal character.  The valid hexadecimal character is
-  L'0' to L'9', L'a' to L'f', or L'A' to L'F'.
-
-
-  @param  Char  The character to check against.
-
-  @retval TRUE  If the Char is a hexadecmial character.
-  @retval FALSE If the Char is not a hexadecmial character.
-
-**/
-BOOLEAN
-EFIAPI
-InternalIsHexaDecimalDigitCharacter (
-  IN      CHAR16  Char
-  )
-{
-  return (BOOLEAN)(CharIsNum (Char) ||
-                   (Char >= L'A' && Char <= L'F') ||
-                   (Char >= L'a' && Char <= L'f'));
-}
-
-/**
   Convert a Null-terminated Unicode decimal string to a value of
   type UINTN.
 
