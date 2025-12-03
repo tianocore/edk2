@@ -310,12 +310,6 @@ struct MockShellLib {
 
   MOCK_FUNCTION_DECLARATION (
     BOOLEAN,
-    ShellIsHexaDecimalDigitCharacter,
-    (IN CHAR16  Char)
-    );
-
-  MOCK_FUNCTION_DECLARATION (
-    BOOLEAN,
     ShellIsDecimalDigitCharacter,
     (IN CHAR16  Char)
     );
