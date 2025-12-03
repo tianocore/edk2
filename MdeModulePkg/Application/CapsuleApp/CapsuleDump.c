@@ -498,31 +498,6 @@ DumpCapsuleFromBuffer (
 }
 
 /**
-  This routine is called to upper case given unicode string.
-
-  @param[in]   Str              String to upper case
-
-  @retval upper cased string after process
-
-**/
-STATIC
-CHAR16 *
-UpperCaseString (
-  IN CHAR16  *Str
-  )
-{
-  CHAR16  *Cptr;
-
-  for (Cptr = Str; *Cptr != L'\0'; Cptr++) {
-    if ((L'a' <= *Cptr) && (*Cptr <= L'z')) {
-      *Cptr = *Cptr - L'a' + L'A';
-    }
-  }
-
-  return Str;
-}
-
-/**
   This routine is used to return substring before period '.' or '\0'
   Caller should respsonsible of substr space allocation & free
 
@@ -656,8 +631,8 @@ CompareFileNameInAlphabet (
   SplitFileNameExtension (FileInfo1->FileName, FileName1, FileExtension1);
   SplitFileNameExtension (FileInfo2->FileName, FileName2, FileExtension2);
 
-  UpperCaseString (FileName1);
-  UpperCaseString (FileName2);
+  StrnCharToUpper (FileName1, StrLen (FileName1));
+  StrnCharToUpper (FileName2, StrLen (FileName2));
 
   GetSubStringBeforePeriod (FileName1, TempSubStr1, &SubStrLen1);
   GetSubStringBeforePeriod (FileName2, TempSubStr2, &SubStrLen2);
@@ -679,8 +654,8 @@ CompareFileNameInAlphabet (
     return SubStrCmpResult;
   }
 
-  UpperCaseString (FileExtension1);
-  UpperCaseString (FileExtension2);
+  StrnCharToUpper (FileExtension1, StrLen (FileExtension1));
+  StrnCharToUpper (FileExtension2, StrLen (FileExtension2));
 
   return StrnCmp (FileExtension1, FileExtension2, MAX_FILE_NAME_LEN);
 }
