@@ -17,38 +17,6 @@
 #include <Library/SortLib.h>
 
 /**
-  Determine if a string has only numbers and letters.
-
-  This is useful for such things as Map names which can only be letters and numbers.
-
-  @param[in] String       pointer to the string to analyze,
-  @param[in] Len          Number of characters to analyze.
-
-  @retval TRUE            String has only numbers and letters
-  @retval FALSE           String has at least one other character.
-**/
-BOOLEAN
-IsNumberLetterOnly (
-  IN CONST CHAR16  *String,
-  IN CONST UINTN   Len
-  )
-{
-  UINTN  Count;
-
-  for (Count = 0; Count < Len && String != NULL && *String != CHAR_NULL; String++, Count++) {
-    if (!(((*String >= L'a') && (*String <= L'z')) ||
-          ((*String >= L'A') && (*String <= L'Z')) ||
-          ((*String >= L'0') && (*String <= L'9')))
-        )
-    {
-      return (FALSE);
-    }
-  }
-
-  return (TRUE);
-}
-
-/**
   Do a search in the Target delimited list.
 
   @param[in] List         The list to seatch in.
@@ -945,7 +913,7 @@ AddMappingFromMapping (
     }
   }
 
-  if (!IsNumberLetterOnly (NewSName, StrLen (NewSName)-1)) {
+  if (!StrnIsAlphaNum (NewSName, StrLen (NewSName)-1)) {
     FreePool (NewSName);
     return (SHELL_INVALID_PARAMETER);
   }
@@ -1003,7 +971,7 @@ AddMappingFromHandle (
     }
   }
 
-  if (!IsNumberLetterOnly (NewSName, StrLen (NewSName)-1)) {
+  if (!StrnIsAlphaNum (NewSName, StrLen (NewSName)-1)) {
     FreePool (NewSName);
     return (SHELL_INVALID_PARAMETER);
   }
@@ -1284,7 +1252,7 @@ MainCmdMap (
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
         TempStringLength = StrLen (SName);
-        if (!IsNumberLetterOnly (SName, TempStringLength-((SName[TempStringLength-1] == L':') ? 1 : 0))) {
+        if (!StrnIsAlphaNum (SName, TempStringLength-((SName[TempStringLength-1] == L':') ? 1 : 0))) {
           ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"map", SName);
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
