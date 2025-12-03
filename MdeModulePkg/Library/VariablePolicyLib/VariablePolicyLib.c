@@ -269,9 +269,7 @@ EvaluatePolicyMatch (
       // If this is a numerical wildcard, we can consider
       // it a match if we alter the priority.
       if ((PolicyName[Index] == L'#') &&
-          (((L'0' <= VariableName[Index]) && (VariableName[Index] <= L'9')) ||
-           ((L'A' <= VariableName[Index]) && (VariableName[Index] <= L'F')) ||
-           ((L'a' <= VariableName[Index]) && (VariableName[Index] <= L'f'))))
+          CharIsHexNum (VariableName[Index]))
       {
         if (CalculatedPriority < MATCH_PRIORITY_MIN) {
           CalculatedPriority++;
