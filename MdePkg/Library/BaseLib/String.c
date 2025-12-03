@@ -266,28 +266,6 @@ StrStr (
 }
 
 /**
-  Check if a Unicode character is a decimal character.
-
-  This internal function checks if a Unicode character is a
-  decimal character. The valid decimal character is from
-  L'0' to L'9'.
-
-  @param  Char  The character to check against.
-
-  @retval TRUE  If the Char is a decmial character.
-  @retval FALSE If the Char is not a decmial character.
-
-**/
-BOOLEAN
-EFIAPI
-InternalIsDecimalDigitCharacter (
-  IN      CHAR16  Char
-  )
-{
-  return (BOOLEAN)(Char >= L'0' && Char <= L'9');
-}
-
-/**
   Convert a Unicode character to upper case only if
   it maps to a valid small-case ASCII character.
 
@@ -334,7 +312,7 @@ InternalHexCharToUintn (
   IN      CHAR16  Char
   )
 {
-  if (InternalIsDecimalDigitCharacter (Char)) {
+  if (CharIsNum (Char)) {
     return Char - L'0';
   }
 
@@ -361,7 +339,7 @@ InternalIsHexaDecimalDigitCharacter (
   IN      CHAR16  Char
   )
 {
-  return (BOOLEAN)(InternalIsDecimalDigitCharacter (Char) ||
+  return (BOOLEAN)(CharIsNum (Char) ||
                    (Char >= L'A' && Char <= L'F') ||
                    (Char >= L'a' && Char <= L'f'));
 }
@@ -773,7 +751,7 @@ InternalAsciiHexCharToUintn (
   IN      CHAR8  Char
   )
 {
-  if (InternalIsDecimalDigitCharacter (Char)) {
+  if (CharIsNum (Char)) {
     return Char - '0';
   }
 
