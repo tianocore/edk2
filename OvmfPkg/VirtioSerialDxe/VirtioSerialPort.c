@@ -121,7 +121,6 @@ VirtioSerialIoSetControl (
   IN UINT32                  Control
   )
 {
-  DEBUG ((DEBUG_INFO, "%a:%d: Control 0x%x\n", __func__, __LINE__, Control));
   return EFI_SUCCESS;
 }
 
@@ -133,7 +132,6 @@ VirtioSerialIoGetControl (
   OUT UINT32                 *Control
   )
 {
-  DEBUG ((DEBUG_VERBOSE, "%a:%d: Control 0x%x\n", __func__, __LINE__, *Control));
   return EFI_SUCCESS;
 }
 
