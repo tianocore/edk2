@@ -2669,6 +2669,220 @@ AsciiCharToUpper (
   );
 
 /*
+ * Ascii String / Char checker functions.
+ */
+
+/**
+  Determine if a Ascii Char is a lowercase letter.
+
+  @param[in] Char         Char to analyze.
+
+  @retval TRUE            Ascii Char is a lowercase letter.
+  @retval FALSE           Otherwise.
+**/
+BOOLEAN
+EFIAPI
+AsciiCharIsLowerAlpha (
+  IN CHAR8  Char
+  );
+
+/**
+  Determine if a Ascii Char is a uppercase letter.
+
+  @param[in] Char         Char to analyze.
+
+  @retval TRUE            Ascii Char is a uppercase letter.
+  @retval FALSE           Otherwise.
+**/
+BOOLEAN
+EFIAPI
+AsciiCharIsUpperAlpha (
+  IN CHAR8  Char
+  );
+
+/**
+  Determine if a Ascii Char is a letter.
+
+  @param[in] Char         Char to analyze.
+
+  @retval TRUE            Ascii Char is a letter.
+  @retval FALSE           Otherwise.
+**/
+BOOLEAN
+EFIAPI
+AsciiCharIsAlpha (
+  IN CHAR8  Char
+  );
+
+/**
+  Determine if a Ascii Char is a number.
+
+  @param[in] Char         Char to analyze.
+
+  @retval TRUE            Ascii Char is a number.
+  @retval FALSE           Otherwise.
+**/
+BOOLEAN
+EFIAPI
+AsciiCharIsNum (
+  IN CHAR8  Char
+  );
+
+/**
+  Determine if a Ascii Char is a hexadecimal number.
+
+  @param[in] Char         Char to analyze.
+
+  @retval TRUE            Ascii Char is a hexadecimal number.
+  @retval FALSE           Otherwise.
+**/
+BOOLEAN
+EFIAPI
+AsciiCharIsHexNum (
+  IN CHAR8  Char
+  );
+
+/**
+  Determine if a Ascii Char is an uppercase hexadecimal number.
+
+  @param[in] Char         Char to analyze.
+
+  @retval TRUE            Ascii Char is an uppercase hexadecimal number.
+  @retval FALSE           Otherwise.
+**/
+BOOLEAN
+EFIAPI
+AsciiCharIsUpperHexNum (
+  IN CHAR8  Char
+  );
+
+/**
+  Determine if a Ascii Char is a letter or number.
+
+  @param[in] Char         Char to analyze.
+
+  @retval TRUE            Ascii Char is a letter or number.
+  @retval FALSE           Otherwise.
+**/
+BOOLEAN
+EFIAPI
+AsciiCharIsAlphaNum (
+  IN CHAR8  Char
+  );
+
+/**
+  Determine if a Ascii String has only lowercase letters.
+
+  @param[in] String       Pointer to the string to analyze.
+  @param[in] MaxSize      Maximum number of characters to analyze.
+
+  @retval TRUE            Ascii String has only lowercase letters.
+  @retval FALSE           Ascii String has at least one other character.
+**/
+BOOLEAN
+EFIAPI
+AsciiStrnIsLowerAlpha (
+  IN CONST CHAR8  *String,
+  IN       UINTN  MaxSize
+  );
+
+/**
+  Determine if a Ascii String has only uppercase letters.
+
+  @param[in] String       Pointer to the string to analyze.
+  @param[in] MaxSize      Maximum number of characters to analyze.
+
+  @retval TRUE            Ascii String has only uppercase letters.
+  @retval FALSE           Ascii String has at least one other character.
+**/
+BOOLEAN
+EFIAPI
+AsciiStrnIsUpperAlpha (
+  IN CONST CHAR8  *String,
+  IN       UINTN  MaxSize
+  );
+
+/**
+  Determine if a Ascii String has only letters.
+
+  @param[in] String       Pointer to the string to analyze.
+  @param[in] MaxSize      Maximum number of characters to analyze.
+
+  @retval TRUE            Ascii String has only letters.
+  @retval FALSE           Ascii String has at least one other character.
+**/
+BOOLEAN
+EFIAPI
+AsciiStrnIsAlpha (
+  IN CONST CHAR8  *String,
+  IN       UINTN  MaxSize
+  );
+
+/**
+  Determine if a Ascii String has only numbers.
+
+  @param[in] String       Pointer to the string to analyze.
+  @param[in] MaxSize      Maximum number of characters to analyze.
+
+  @retval TRUE            Ascii String has only numbers.
+  @retval FALSE           Ascii String has at least one other character.
+**/
+BOOLEAN
+EFIAPI
+AsciiStrnIsNum (
+  IN CONST CHAR8  *String,
+  IN       UINTN  MaxSize
+  );
+
+/**
+  Determine if a Ascii String has only hexadecimal numbers.
+
+  @param[in] String       Pointer to the string to analyze.
+  @param[in] MaxSize      Maximum number of characters to analyze.
+
+  @retval TRUE            Ascii String has only hexadecimal numbers.
+  @retval FALSE           Ascii String has at least one other character.
+**/
+BOOLEAN
+EFIAPI
+AsciiStrnIsHexNum (
+  IN CONST CHAR8  *String,
+  IN       UINTN  MaxSize
+  );
+
+/**
+  Determine if a Ascii String has only uppercase hexadecimal numbers.
+
+  @param[in] String       Pointer to the string to analyze.
+  @param[in] MaxSize      Maximum number of characters to analyze.
+
+  @retval TRUE            Ascii String has only uppercase hexadecimal numbers.
+  @retval FALSE           Ascii String has at least one other character.
+**/
+BOOLEAN
+EFIAPI
+AsciiStrnIsUpperHexNum (
+  IN CONST CHAR8  *String,
+  IN       UINTN  MaxSize
+  );
+
+/**
+  Determine if a Ascii String has only letters or numbers.
+
+  @param[in] String       Pointer to the string to analyze.
+  @param[in] MaxSize      Maximum number of characters to analyze.
+
+  @retval TRUE            Ascii String has only letters or numbers.
+  @retval FALSE           Ascii String has at least one other character.
+**/
+BOOLEAN
+EFIAPI
+AsciiStrnIsAlphaNum (
+  IN CONST CHAR8  *String,
+  IN       UINTN  MaxSize
+  );
+
+/*
  * Unicode String / Char checker functions.
  */
 
