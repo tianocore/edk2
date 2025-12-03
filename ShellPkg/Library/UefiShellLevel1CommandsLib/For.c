@@ -356,10 +356,8 @@ ShellCommandRunFor (
     //
     // Process the line.
     //
-    if (  (gEfiShellParametersProtocol->Argv[1][0] != L'%') || (gEfiShellParametersProtocol->Argv[1][2] != CHAR_NULL)
-       || !(  ((gEfiShellParametersProtocol->Argv[1][1] >= L'a') && (gEfiShellParametersProtocol->Argv[1][1] <= L'z'))
-           || ((gEfiShellParametersProtocol->Argv[1][1] >= L'A') && (gEfiShellParametersProtocol->Argv[1][1] <= L'Z')))
-          )
+    if ((gEfiShellParametersProtocol->Argv[1][0] != L'%') || (gEfiShellParametersProtocol->Argv[1][2] != CHAR_NULL) ||
+        !(CharIsAlpha (gEfiShellParametersProtocol->Argv[1][1])))
     {
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_VAR), gShellLevel1HiiHandle, gEfiShellParametersProtocol->Argv[1]);
       return (SHELL_INVALID_PARAMETER);
