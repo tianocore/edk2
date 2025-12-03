@@ -915,7 +915,7 @@ StrHexToUintnS (
 
   *Data = 0;
 
-  while (InternalIsHexaDecimalDigitCharacter (*String)) {
+  while (CharIsHexNum (*String)) {
     //
     // If the number represented by String overflows according to the range
     // defined by UINTN, then MAX_UINTN is stored in *Data and
@@ -1048,7 +1048,7 @@ StrHexToUint64S (
 
   *Data = 0;
 
-  while (InternalIsHexaDecimalDigitCharacter (*String)) {
+  while (CharIsHexNum (*String)) {
     //
     // If the number represented by String overflows according to the range
     // defined by UINT64, then MAX_UINT64 is stored in *Data and
@@ -1156,7 +1156,7 @@ StrToIpv6Address (
   SAFE_STRING_CONSTRAINT_CHECK ((Address != NULL), RETURN_INVALID_PARAMETER);
 
   for (Pointer = String, AddressIndex = 0; AddressIndex < ARRAY_SIZE (Address->Addr) + 1;) {
-    if (!InternalIsHexaDecimalDigitCharacter (*Pointer)) {
+    if (!CharIsHexNum (*Pointer)) {
       if (*Pointer != L':') {
         //
         // ":" or "/" should be followed by digit characters.
@@ -1201,7 +1201,7 @@ StrToIpv6Address (
       }
     }
 
-    if (!InternalIsHexaDecimalDigitCharacter (*Pointer)) {
+    if (!CharIsHexNum (*Pointer)) {
       if (*Pointer == L'/') {
         //
         // Might be optional "/P" after "::".
@@ -1650,7 +1650,7 @@ StrHexToBytes (
   // 5. String shall not contains invalid hexadecimal digits.
   //
   for (Index = 0; Index < Length; Index++) {
-    if (!InternalIsHexaDecimalDigitCharacter (String[Index])) {
+    if (!CharIsHexNum (String[Index])) {
       break;
     }
   }
