@@ -132,6 +132,7 @@ VirtioSerialIoGetControl (
   OUT UINT32                 *Control
   )
 {
+  *Control = 0;
   return EFI_SUCCESS;
 }
 
