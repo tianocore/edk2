@@ -22,7 +22,8 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
-            "Universal/Smbios/SmbiosMiscDxe"
+            "Universal/Smbios/SmbiosMiscDxe",
+            "Library/ArmTransferListLib/libtl"
         ]
     },
 
@@ -237,5 +238,12 @@
         ],
         "AdditionalIncludePaths": [] # Additional paths to spell check
                                      # (wildcards supported)
+    },
+
+    ## options defined in .pytool/Plugin/UncrustifyCheck
+    "UncrustifyCheck": {
+        "IgnoreFiles": [
+            "Library/ArmTransferListLib/libtl"
+        ]
     }
 }
