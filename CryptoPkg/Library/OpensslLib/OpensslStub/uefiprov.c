@@ -120,6 +120,9 @@ static const OSSL_ALGORITHM deflt_digests[] = {
     { PROV_NAMES_MD5, "provider=default", ossl_md5_functions },
 #endif /* OPENSSL_NO_MD5 */
 
+    { PROV_NAMES_SHAKE_128, "provider=default", ossl_shake_128_functions },
+    { PROV_NAMES_SHAKE_256, "provider=default", ossl_shake_256_functions },
+
     { PROV_NAMES_NULL, "provider=default", ossl_nullmd_functions },
     { NULL, NULL, NULL }
 };
