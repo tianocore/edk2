@@ -18,6 +18,42 @@ from collections import OrderedDict
 from CommonUtility import value_to_bytearray, value_to_bytes, \
       bytes_to_value, get_bits_from_bytes, set_bits_to_bytes
 
+# FFS file structure constants
+FFS_GUID_SIZE = 16
+FFS_HEADER_SIZE = 24
+FFS_SEARCH_RANGE = 4096  # Search within 4KB after GUID
+
+# FSP UPD FFS GUID definitions
+FSP_T_UPD_FFS_GUID = '70BCF6A5-FFB1-47D8-B1AE-EFE5508E23EA'
+FSP_M_UPD_FFS_GUID = 'D5B86AEA-6AF7-40D4-8014-982301BC3D89'
+FSP_S_UPD_FFS_GUID = 'E3CD9B18-998C-4F76-B65E-98B154E5446F'
+
+def guid_str_to_bytes(guid_str):
+    """Convert GUID string to bytes in EFI GUID format (mixed endian)"""
+    # Remove dashes and convert to bytes
+    guid_str = guid_str.replace('-', '')
+
+    # EFI GUID format: first 3 fields are little-endian, last 2 are big-endian
+    # Parse: DWORD-WORD-WORD-BYTE[2]-BYTE[6]
+    data1 = bytes.fromhex(guid_str[0:8])[::-1]    # DWORD (4 bytes) - little endian
+    data2 = bytes.fromhex(guid_str[8:12])[::-1]   # WORD (2 bytes) - little endian
+    data3 = bytes.fromhex(guid_str[12:16])[::-1]  # WORD (2 bytes) - little endian
+    data4 = bytes.fromhex(guid_str[16:20])        # BYTE[2] (2 bytes) - big endian
+    data5 = bytes.fromhex(guid_str[20:32])        # BYTE[6] (6 bytes) - big endian
+
+    return data1 + data2 + data3 + data4 + data5
+
+# UPD signature to GUID mapping
+def get_upd_guid(upd_signature):
+    """Get FFS GUID for a given UPD signature based on suffix"""
+    if upd_signature.endswith('UPD_T'):
+        return FSP_T_UPD_FFS_GUID
+    elif upd_signature.endswith('UPD_M'):
+        return FSP_M_UPD_FFS_GUID
+    elif upd_signature.endswith('UPD_S'):
+        return FSP_S_UPD_FFS_GUID
+    return None
+
 # Generated file copyright header
 __copyright_tmp__ = """/** @file
 
@@ -1639,6 +1675,46 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
 
         return cfg_segs
 
+    def find_upd_in_ffs_by_guid(self, bin_data, upd_signature, ffs_guid):
+        """
+        Find UPD signature within a specific FFS file identified by GUID.
+
+        Args:
+            bin_data: Binary data to search in
+            upd_signature: UPD signature string (e.g., 'XXXUPD_M')
+            ffs_guid: GUID string of the FFS file to search in
+
+        Returns:
+            Position of UPD signature if found, -1 otherwise
+        """
+        if not ffs_guid:
+            return -1
+
+        # Convert GUID string to bytes for searching
+        guid_bytes = guid_str_to_bytes(ffs_guid)
+        sig_bytes = upd_signature.encode()
+
+        # Search for all occurrences of the GUID
+        search_pos = 0
+        while True:
+            guid_pos = bin_data.find(guid_bytes, search_pos)
+            if guid_pos < 0:
+                break
+
+            # Search for UPD signature within FFS_SEARCH_RANGE after GUID
+            search_start = guid_pos
+            search_end = min(guid_pos + FFS_SEARCH_RANGE, len(bin_data))
+
+            sig_pos = bin_data.find(sig_bytes, search_start, search_end)
+            if sig_pos >= 0:
+                print(f"Found {upd_signature} at offset 0x{sig_pos:X} within FFS GUID {ffs_guid}")
+                return sig_pos
+
+            # Continue searching for next occurrence of this GUID
+            search_pos = guid_pos + FFS_GUID_SIZE
+
+        return -1
+
     def import_tkinter(self):
         try:
             import tkinter
@@ -1656,31 +1732,44 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
             if key == 0:
                 bin_segs.append([seg[0], 0, len(bin_data)])
                 break
-            pos = bin_data.find(key)
-            if pos >= 0:
-                # ensure no other match for the key
-                next_pos = bin_data.find(key, pos + len(seg[0]))
-                if next_pos >= 0:
-                    if key == b'$SKLFSP$' or key == b'$BSWFSP$':
-                        string = ('Multiple matches for %s in '
-                                  'binary!\n\nA workaround applied to such '
-                                  'FSP 1.x binary to use second'
-                                  ' match instead of first match!' % key)
-                        if self._tk:
-                            self._tk.messagebox.showwarning('Warning: ', string)
+
+            pos = -1
+
+            # Check if this UPD signature has a corresponding FFS GUID
+            ffs_guid = get_upd_guid(seg[0])
+            if ffs_guid:
+                pos = self.find_upd_in_ffs_by_guid(bin_data, seg[0], ffs_guid)
+                if pos >= 0:
+                    print(f"Using GUID-based search: found {seg[0]} at 0x{pos:X}")
+
+            # Fallback to original search if GUID-based search fails
+            if pos < 0:
+                pos = bin_data.find(key)
+                if pos >= 0:
+                    # Check for multiple matches
+                    next_pos = bin_data.find(key, pos + len(seg[0]))
+                    if next_pos >= 0:
+                        if key == b'$SKLFSP$' or key == b'$BSWFSP$':
+                            string = ('Warning: Multiple matches for %s in '
+                                      'binary!\n\nA workaround applied to such '
+                                      'FSP 1.x binary to use second'
+                                      ' match instead of first match!' % key)
+                            if self._tk:
+                                self._tk.messagebox.showwarning('Warning!', string)
+                            else:
+                                print('Warning: ', string)
+                            pos = next_pos
                         else:
-                            print('Warning: ', string)
-                        pos = next_pos
-                    else:
-                        print("Warning: Multiple matches for '%s' "
-                              "in binary, the 1st instance will be used !"
-                              % seg[0])
+                            print("Warning: Multiple matches for '%s' "
+                                  "in binary, the 1st instance will be used !"
+                                  % seg[0])
+
+            if pos >= 0:
                 bin_segs.append([seg[0], pos, seg[2]])
                 self.binseg_dict[seg[0]] = pos
             else:
                 bin_segs.append([seg[0], -1, seg[2]])
                 self.binseg_dict[seg[0]] = -1
-                continue
 
         return bin_segs
 
@@ -1698,7 +1787,7 @@ for '%s' !" % (act_cfg['value'], act_cfg['path']))
                 self.available_fv.append(each[0])
             else:
                 self.missing_fv.append(each[0])
-                string = each[0] + ' is not availabe.'
+                string = each[0] + ' is not available.'
                 if self._tk:
                     self._tk.messagebox.showinfo('', string)
                 else:
