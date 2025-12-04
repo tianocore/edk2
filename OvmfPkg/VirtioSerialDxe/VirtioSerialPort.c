@@ -157,7 +157,29 @@ VirtioSerialIoGetControl (
   OUT UINT32                 *Control
   )
 {
+  VIRTIO_SERIAL_IO_PROTOCOL  *SerialIo = (VIRTIO_SERIAL_IO_PROTOCOL *)This;
+  BOOLEAN                    HaveData  = FALSE;
+
+  VirtioSerialIoWriteFlush (This);
+
   *Control = 0;
+
+  if (SerialIo->ReadOffset < SerialIo->ReadSize) {
+    // have unread data in current buffer
+    HaveData = TRUE;
+  } else if (VirtioSerialRingHasBuffer (
+               SerialIo->Dev,
+               PortRx (SerialIo->PortId)
+               ))
+  {
+    // have unread buffers in rx ring
+    HaveData = TRUE;
+  }
+
+  if (!HaveData) {
+    *Control |=  EFI_SERIAL_INPUT_BUFFER_EMPTY;
+  }
+
   return EFI_SUCCESS;
 }
 
