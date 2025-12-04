@@ -320,7 +320,7 @@ UpdateRegionMappingRecursive (
   BlockMask  = MAX_ADDRESS >> (64 - BlockShift);
 
   DEBUG ((
-    DEBUG_VERBOSE,
+    DEBUG_INFO,
     "%a(%d): %LX - %LX set %LX clr %LX\n",
     __func__,
     Level,
