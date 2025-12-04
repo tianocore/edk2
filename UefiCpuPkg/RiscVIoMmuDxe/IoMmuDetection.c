@@ -25,22 +25,6 @@
 
 STATIC RISCV_IOMMU_CONTEXT  RiscVIoMmuContextTemplate = {
   .Signature = RISCV_IOMMU_CONTEXT_SIGNATURE,
-
-  .CommandQueue = {
-    .Type      = QUEUE_COMMAND,
-    .EntrySize = COMMAND_QUEUE_ENTRY_SIZE,
-    .Buffer    = NULL,
-  },
-  .FaultQueue = {
-    .Type      = QUEUE_FAULT,
-    .EntrySize = FAULT_QUEUE_ENTRY_SIZE,
-    .Buffer    = NULL,
-  },
-  .PageRequestQueue = {
-    .Type      = QUEUE_PAGE_REQUEST,
-    .EntrySize = PAGE_REQUEST_QUEUE_ENTRY_SIZE,
-    .Buffer    = NULL,
-  },
 };
 
 #define EFI_ACPI_RISCV_IO_MAPPING_TABLE_SIGNATURE  SIGNATURE_32('R', 'I', 'M', 'T')
@@ -89,7 +73,7 @@ OnPciEnumerationComplete (
   Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiPciIoProtocolGuid, NULL, &HandleCount, &HandleBuffer);
   ASSERT_EFI_ERROR (Status);
 
-  // TODO: Avoid continuing to iterate once all IOMMUs are initialised.
+  // TODO: Avoid continuing to iterate once all IOMMUs are initialised as a performance optimisation.
   for (Index = 0; Index < HandleCount; Index++) {
     Status = gBS->HandleProtocol (HandleBuffer[Index], &gEfiPciIoProtocolGuid, (VOID **)&PciIo);
     ASSERT_EFI_ERROR (Status);
@@ -335,7 +319,7 @@ IoMmuAcpiRimtDiscovery (
   RIMT_IOMMU_NODE            *RimtIoMmuNode;
   RIMT_PCIE_NODE             *RimtPcieNode;
   UINT16                     NumberOfIdMappings;
-  RIMT_PCIE_NODE_ID_MAPPING  *NodeMapping;
+  RIMT_ID_MAPPING            *NodeMapping;
   //RIMT_PLATFORM_DEVICE_NODE  *RimtPlatformNode;
   UINTN                      MappingIndex;
   LIST_ENTRY                 *Link;
@@ -420,7 +404,7 @@ IoMmuAcpiRimtDiscovery (
 
       IoMmuDownstreams->Signature = RISCV_IOMMU_DOWNSTREAMS_SIGNATURE;
       IoMmuDownstreams->MapMask   = -1;
-      CopyMem (&IoMmuDownstreams->NodeMapping, NodeMapping, sizeof (RIMT_PCIE_NODE_ID_MAPPING));
+      CopyMem (&IoMmuDownstreams->NodeMapping, NodeMapping, sizeof (RIMT_ID_MAPPING));
 
       NodeMapping++;
     }

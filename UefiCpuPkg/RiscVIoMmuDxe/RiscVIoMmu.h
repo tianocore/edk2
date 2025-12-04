@@ -14,7 +14,10 @@
 #include <Protocol/IoMmu.h>
 #include <IndustryStandard/RiscVIoMappingTable.h>
 #include "RiscVIoMmuRegisters.h"
-#include "RiscVIoMmuStructures.h"
+#include "IoMmuDeviceContext.h"
+#include "IoMmuQueues.h"
+
+// Global TODO: Function documentation.
 
 #define RISCV_IOMMU_DEBUG_LEVEL  DEBUG_INFO
 
@@ -35,15 +38,9 @@ typedef struct {
   UINT32      MapMask;
 
   // TODO: Extend this struct for platform devices, having some mechanism to correlate them later.
-  RIMT_PCIE_NODE_ID_MAPPING  NodeMapping;
+  RIMT_ID_MAPPING  NodeMapping;
 } RISCV_IOMMU_DOWNSTREAMS;
 #define RISCV_IOMMU_DOWNSTREAMS_FROM_LINK(a) CR (a, RISCV_IOMMU_DOWNSTREAMS, Link, RISCV_IOMMU_DOWNSTREAMS_SIGNATURE)
-
-typedef struct {
-  BOOLEAN  IsExtended;
-  UINT8    Levels;
-  VOID     *Buffer;
-} CONTEXT_WRAPPER;
 
 enum {
   QUEUE_COMMAND,
@@ -53,13 +50,6 @@ enum {
 
 #define QUEUE_NUMBER_OF_ENTRIES  128
 
-typedef struct {
-  UINT8  Type;
-  UINTN  EntrySize;
-  VOID   *Buffer;
-} QUEUE_WRAPPER;
-
-// TODO: Prune this struct, some fields remain unused after being set.
 #define RISCV_IOMMU_CONTEXT_SIGNATURE  SIGNATURE_32 ('R', 'V', 'I', 'C')
 typedef struct {
   UINT32           Signature;
@@ -75,12 +65,6 @@ typedef struct {
   UINT64           BaseAddress;
 
   LIST_ENTRY       DownstreamDevices;
-
-  CONTEXT_WRAPPER  DeviceContext;
-
-  QUEUE_WRAPPER    CommandQueue;
-  QUEUE_WRAPPER    FaultQueue;
-  QUEUE_WRAPPER    PageRequestQueue;
 } RISCV_IOMMU_CONTEXT;
 #define RISCV_IOMMU_CONTEXT_FROM_LINK(a) CR (a, RISCV_IOMMU_CONTEXT, Link, RISCV_IOMMU_CONTEXT_SIGNATURE)
 
@@ -129,11 +113,43 @@ RiscVIoMmuSetAttributeWorker (
   );
 
 /**
+  Invalidate the IOMMU's page table cache.
+  Call this after updating device page tables.
+
+**/
+EFI_STATUS
+IoMmuInvalidatePageTableCache (
+  IN RISCV_IOMMU_CONTEXT  *IoMmuContext,
+  IN EFI_PHYSICAL_ADDRESS  DeviceAddress
+  );
+
+/**
+  A fence operation for the IOMMU's command queue.
+  Call this after completing one full operation.
+
+**/
+EFI_STATUS
+IoMmuCommandQueueFence (
+  IN RISCV_IOMMU_CONTEXT  *IoMmuContext
+  );
+
+/**
+  Invalidate the IOMMU's device directory cache.
+  Call this after updating any level of the DDT.
+
+**/
+EFI_STATUS
+IoMmuInvalidateDeviceDirectoryCache (
+  IN RISCV_IOMMU_CONTEXT    *IoMmuContext,
+  IN RISCV_IOMMU_DEVICE_ID  *IoMmuDeviceId
+  );
+
+/**
   Probe hardware driven queues for problems.
 
 **/
 EFI_STATUS
-ProbeHardwareQueuesForFaults (
+ProbeHardwareQueuesForProblems (
   IN RISCV_IOMMU_CONTEXT  *IoMmuContext
   );
 
@@ -283,39 +299,9 @@ IoMmuFreeBuffer (
   );
 
 /**
-  Read a 32-bit IOMMU register.
-
-  @param[in]  IoMmuContext  The IOMMU context to operate on.
-  @param[in]  Offset        The register offset to read.
-  @ret        The value read from the register.
-
-**/
-UINT32
-IoMmuRead32 (
-  IN RISCV_IOMMU_CONTEXT  *IoMmuContext,
-  IN UINTN                Offset
-  );
-
-/**
-  Write a 32-bit IOMMU register.
-
-  @param[in]  IoMmuContext  The IOMMU context to operate on.
-  @param[in]  Offset        The register offset to write.
-  @param[in]  Value         The value to write to the register.
-
-**/
-VOID
-IoMmuWrite32 (
-  IN RISCV_IOMMU_CONTEXT  *IoMmuContext,
-  IN UINTN                Offset,
-  IN UINT32               Value
-  );
-
-/**
   Write a 32-bit IOMMU register and wait for a mask to be set/unset.
 
-  @param[in]  IoMmuContext  The IOMMU context to operate on.
-  @param[in]  Offset        The register offset to write.
+  @param[in]  Address       The register to write.
   @param[in]  Value         The value to write to the register.
   @param[in]  Mask          The bitmask to wait for.
   @param[in]  Set           Whether the mask should be set or unset.
@@ -323,47 +309,16 @@ IoMmuWrite32 (
 **/
 VOID
 IoMmuWriteAndWait32 (
-  IN RISCV_IOMMU_CONTEXT  *IoMmuContext,
-  IN UINTN                Offset,
-  IN UINT32               Value,
-  IN UINT32               Mask,
-  IN BOOLEAN              Set
-  );
-
-/**
-  Read a 64-bit IOMMU register.
-
-  @param[in]  IoMmuContext  The IOMMU context to operate on.
-  @param[in]  Offset        The register offset to read.
-  @ret        The value read from the register.
-
-**/
-UINT64
-IoMmuRead64 (
-  IN RISCV_IOMMU_CONTEXT  *IoMmuContext,
-  IN UINTN                Offset
-  );
-
-/**
-  Write a 64-bit IOMMU register.
-
-  @param[in]  IoMmuContext  The IOMMU context to operate on.
-  @param[in]  Offset        The register offset to write.
-  @param[in]  Value         The value to write to the register.
-
-**/
-VOID
-IoMmuWrite64 (
-  IN RISCV_IOMMU_CONTEXT  *IoMmuContext,
-  IN UINTN                Offset,
-  IN UINT64               Value
+  IN UINTN    Address,
+  IN UINT32   Value,
+  IN UINT32   Mask,
+  IN BOOLEAN  Set
   );
 
 /**
   Write a 64-bit IOMMU register and wait for a mask to be set/unset.
 
-  @param[in]  IoMmuContext  The IOMMU context to operate on.
-  @param[in]  Offset        The register offset to write.
+  @param[in]  Address       The register to write.
   @param[in]  Value         The value to write to the register.
   @param[in]  Mask          The bitmask to wait for.
   @param[in]  Set           Whether the mask should be set or unset.
@@ -371,11 +326,10 @@ IoMmuWrite64 (
 **/
 VOID
 IoMmuWriteAndWait64 (
-  IN RISCV_IOMMU_CONTEXT  *IoMmuContext,
-  IN UINTN                Offset,
-  IN UINT64               Value,
-  IN UINT64               Mask,
-  IN BOOLEAN              Set
+  IN UINTN    Address,
+  IN UINT64   Value,
+  IN UINT64   Mask,
+  IN BOOLEAN  Set
   );
 
 UINT64

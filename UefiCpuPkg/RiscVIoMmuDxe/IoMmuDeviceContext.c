@@ -12,8 +12,12 @@
 #include <Library/BaseRiscVMmuLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/IoLib.h>
 #include <Register/RiscV64/RiscVImpl.h>
 #include "RiscVIoMmu.h"
+
+#define RISCV_PG_R  BIT1
+#define RISCV_PG_W  BIT2
 
 /**
   Allocate a level of the DDT.
@@ -56,21 +60,26 @@ LocateDeviceContext (
   IN RISCV_IOMMU_DEVICE_ID  *IoMmuDeviceId
   )
 {
-  CONTEXT_WRAPPER                  *ContextWrapper;
+  RISCV_IOMMU_CAPABILITIES         Capabilities;
+  BOOLEAN                          ExtendedContext;
   RISCV_IOMMU_DDTP                 Ddtp;
   RISCV_IOMMU_DDT_NON_LEAF         *DdtEntry;
   UINT16                           Levels;
   UINT16                           Index;
   RISCV_IOMMU_DEVICE_CONTEXT_BASE  *DeviceContext;
 
-  ContextWrapper = &IoMmuContext->DeviceContext;
-
   DEBUG ((RISCV_IOMMU_DEBUG_LEVEL, "%a: IoMmuDeviceId=0x%x\n", __func__, IoMmuDeviceId->Uint32));
+
+  //
+  // Determine the format of the context struct.
+  //
+  Capabilities.Uint64 = MmioRead64 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_CAPABILITIES);
+  ExtendedContext = Capabilities.Bits.MSI_FLAT;
 
   //
   // Initialise non-leaf data.
   //
-  Ddtp.Uint64 = IoMmuRead64 (IoMmuContext, R_RISCV_IOMMU_DDTP);
+  Ddtp.Uint64 = MmioRead64 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_DDTP);
   DdtEntry = (VOID *)((UINT64)Ddtp.Bits.PPN << RISCV_MMU_PAGE_SHIFT);
 
   Levels = Ddtp.Bits.iommu_mode - V_RISCV_IOMMU_DDTP_IOMMU_MODE_BARE;
@@ -80,16 +89,13 @@ LocateDeviceContext (
   // Unrolling was the easiest approach with a union-of-structs.
   //
   if (Levels == 3) {
-    Index = ContextWrapper->IsExtended ? IoMmuDeviceId->ExtendedFormat.Ddi2 : IoMmuDeviceId->BaseFormat.Ddi2;
+    Index = ExtendedContext ? IoMmuDeviceId->ExtendedFormat.Ddi2 : IoMmuDeviceId->BaseFormat.Ddi2;
     DdtEntry += Index;
-
-    DEBUG ((DEBUG_INFO, "ATTN: DDI2 is 0x%x, this DDT entry is at 0x%x\n", Index, DdtEntry));
 
     //
     // Connect the next level.
     //
     if (!DdtEntry->Bits.V) {
-      DEBUG ((DEBUG_INFO, "ATTN: It's not valid\n"));
       AllocateDdtLevel (DdtEntry);
     }
 
@@ -97,20 +103,16 @@ LocateDeviceContext (
     // Continue exploring with the next level.
     //
     DdtEntry = (VOID *)((UINT64)DdtEntry->Bits.PPN << RISCV_MMU_PAGE_SHIFT);
-    DEBUG ((DEBUG_INFO, "ATTN: continuing search with DDT entry at 0x%x\n", DdtEntry));
   }
 
   if (Levels >= 2) {
-    Index = ContextWrapper->IsExtended ? IoMmuDeviceId->ExtendedFormat.Ddi1 : IoMmuDeviceId->BaseFormat.Ddi1;
+    Index = ExtendedContext ? IoMmuDeviceId->ExtendedFormat.Ddi1 : IoMmuDeviceId->BaseFormat.Ddi1;
     DdtEntry += Index;
-
-    DEBUG ((DEBUG_INFO, "ATTN: DDI1 is 0x%x, this DDT entry is at 0x%x\n", Index, DdtEntry));
 
     //
     // Connect the next level.
     //
     if (!DdtEntry->Bits.V) {
-      DEBUG ((DEBUG_INFO, "ATTN: It's not valid\n"));
       AllocateDdtLevel (DdtEntry);
     }
 
@@ -118,7 +120,6 @@ LocateDeviceContext (
     // Continue exploring with the next level.
     //
     DdtEntry = (VOID *)((UINT64)DdtEntry->Bits.PPN << RISCV_MMU_PAGE_SHIFT);
-    DEBUG ((DEBUG_INFO, "ATTN: continuing search with DDT entry at 0x%x\n", DdtEntry));
   }
 
   //
@@ -127,12 +128,11 @@ LocateDeviceContext (
   DeviceContext = (VOID *)DdtEntry;
 
   //
-  // This pointer math operates on the base format, while
-  // the extended format is twice as large, and therefore, twice as far.
+  // This pointer math operates on the base format, while the extended format
+  // is twice as large, and therefore, twice as far.
   //
-  Index = ContextWrapper->IsExtended ? IoMmuDeviceId->ExtendedFormat.Ddi0 * 2 : IoMmuDeviceId->BaseFormat.Ddi0;
+  Index = ExtendedContext ? IoMmuDeviceId->ExtendedFormat.Ddi0 * 2 : IoMmuDeviceId->BaseFormat.Ddi0;
   DeviceContext += Index;
-  DEBUG ((DEBUG_INFO, "ATTN: DDI0 is 0x%x, this DDT entry is at 0x%x\n", ContextWrapper->IsExtended ? IoMmuDeviceId->ExtendedFormat.Ddi0 * 2 : IoMmuDeviceId->BaseFormat.Ddi0, DeviceContext));
 
   return DeviceContext;
 }
@@ -141,9 +141,7 @@ LocateDeviceContext (
 extern UINTN mMaxRootTableLevel, mBitPerLevel, mTableEntryCount;
 
 /**
-  Set SATP mode.
-
-  @param  SatpMode  The SATP mode to be set.
+  Update a device-specific page table attached to a device context.
 
   @retval EFI_INVALID_PARAMETER   The SATP mode was not valid.
   @retval EFI_OUT_OF_RESOURCES    Not enough resource.
@@ -153,17 +151,55 @@ extern UINTN mMaxRootTableLevel, mBitPerLevel, mTableEntryCount;
 **/
 STATIC
 EFI_STATUS
-RiscVIoMmuSetSatpMode  (
+RiscVIoMmuUpdateDevicePageTable (
+  IN RISCV_IOMMU_CONTEXT              *IoMmuContext,
   IN RISCV_IOMMU_DEVICE_CONTEXT_BASE  *DeviceContext,
   IN EFI_PHYSICAL_ADDRESS             DeviceAddress,
   IN UINTN                            Length,
   IN UINT64                           IoMmuAccess
   )
 {
-  UINTN    SatpMode;
-  VOID     *TranslationTable;
-  BOOLEAN  InterruptState;
-  UINT64   Ppn;
+  EFI_STATUS  Status;
+
+  UpdateRegionMapping (
+    DeviceAddress,
+    Length,
+    IoMmuAccess,
+    PTE_ATTRIBUTES_MASK,
+    (VOID *)((UINT64)DeviceContext->FirstStageContext.Bits.PPN << RISCV_MMU_PAGE_SHIFT),
+    TRUE
+    );
+
+  Status = IoMmuInvalidatePageTableCache (IoMmuContext, DeviceAddress);
+  ASSERT_EFI_ERROR (Status);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Create a device-specific page table and attach it to the device context.
+
+  @retval EFI_INVALID_PARAMETER   The SATP mode was not valid.
+  @retval EFI_OUT_OF_RESOURCES    Not enough resource.
+  @retval EFI_DEVICE_ERROR        The SATP mode not supported by HW.
+  @retval EFI_SUCCESS             The operation succesfully.
+
+**/
+STATIC
+EFI_STATUS
+RiscVIoMmuInitialiseDevicePageTable (
+  IN RISCV_IOMMU_CONTEXT              *IoMmuContext,
+  IN RISCV_IOMMU_DEVICE_CONTEXT_BASE  *DeviceContext,
+  IN EFI_PHYSICAL_ADDRESS             DeviceAddress,
+  IN UINTN                            Length,
+  IN UINT64                           IoMmuAccess
+  )
+{
+  UINTN       SatpMode;
+  VOID        *TranslationTable;
+  BOOLEAN     InterruptState;
+  UINT64      Ppn;
+  EFI_STATUS  Status;
 
   SatpMode = (RiscVGetSupervisorAddressTranslationRegister () & SATP64_MODE) >> SATP64_MODE_SHIFT;
   if ((DeviceContext->TranslationControl.Bits.SXL) && (SatpMode > SATP_MODE_SV32)) {
@@ -218,7 +254,8 @@ RiscVIoMmuSetSatpMode  (
   DeviceContext->FirstStageContext.Bits.PPN  = Ppn;
   DeviceContext->FirstStageContext.Bits.MODE = SatpMode;
 
-  //RiscVLocalTlbFlushAll ();
+  Status = IoMmuInvalidatePageTableCache (IoMmuContext, DeviceAddress);
+  ASSERT_EFI_ERROR (Status);
 
   SetInterruptState (InterruptState);
 
@@ -255,34 +292,38 @@ RiscVIoMmuSetAttributeWorker (
 
   //
   // The IOMMU protocol's access bits map to the RISC-V Privileged spec (MMU),
-  // but first, the RISC-V spec defines BIT0 as 'valid.'
+  // but first, the RISC-V spec defines BIT0 as the 'valid' bit.
   //
   RiscVMmuAccessBits = IoMmuAccess << 1;
 
+  //
+  // Per the RISC-V Privileged spec (MMU), a writeable entry must be readable.
+  //
+  if (RiscVMmuAccessBits & RISCV_PG_W) {
+    RiscVMmuAccessBits |= RISCV_PG_R;
+  }
+
   DeviceContext = LocateDeviceContext (IoMmuContext, IoMmuDeviceId);
   if (DeviceContext->TranslationControl.Bits.V) {
-    UpdateRegionMapping (
-      DeviceAddress,
-      Length,
-      RiscVMmuAccessBits,
-      PTE_ATTRIBUTES_MASK,
-      (VOID *)((UINT64)DeviceContext->FirstStageContext.Bits.PPN << RISCV_MMU_PAGE_SHIFT),
-      TRUE
-      );
-    return EFI_SUCCESS;
+    Status = RiscVIoMmuUpdateDevicePageTable (IoMmuContext, DeviceContext, DeviceAddress, Length, RiscVMmuAccessBits);
+    ASSERT_EFI_ERROR (Status);
+
+    ASSERT_EFI_ERROR (ProbeHardwareQueuesForProblems (IoMmuContext));
+
+    return Status;
   }
 
   //
   // Copy global feature support/enablement across.
   //
-  FeatureControl.Uint32 = IoMmuRead32 (IoMmuContext, R_RISCV_IOMMU_FCTL);
+  FeatureControl.Uint32 = MmioRead32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_FCTL);
   DeviceContext->TranslationControl.Bits.SBE = FeatureControl.Bits.BE;
   DeviceContext->TranslationControl.Bits.SXL = FeatureControl.Bits.GXL;
 
   //
   // General IOMMU controls: update dependent bits together.
   //
-  Capabilities.Uint64 = IoMmuRead64 (IoMmuContext, R_RISCV_IOMMU_CAPABILITIES);
+  Capabilities.Uint64 = MmioRead64 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_CAPABILITIES);
   DeviceContext->TranslationControl.Bits.SADE = Capabilities.Bits.AMO_HWAD;
   //DeviceContext->TranslationControl.Bits.DTF  = 1;
 
@@ -309,7 +350,7 @@ RiscVIoMmuSetAttributeWorker (
   // TODO: IOMMU QoS IDs RCID and MCID.
   //
 
-  Status = RiscVIoMmuSetSatpMode (DeviceContext, DeviceAddress, Length, RiscVMmuAccessBits);
+  Status = RiscVIoMmuInitialiseDevicePageTable (IoMmuContext, DeviceContext, DeviceAddress, Length, RiscVMmuAccessBits);
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -318,7 +359,10 @@ RiscVIoMmuSetAttributeWorker (
   //
   DeviceContext->TranslationControl.Bits.V = 1;
 
-  ASSERT_EFI_ERROR (ProbeHardwareQueuesForFaults (IoMmuContext));
+  Status = IoMmuInvalidateDeviceDirectoryCache (IoMmuContext, IoMmuDeviceId);
+  ASSERT_EFI_ERROR (Status);
 
-  return EFI_SUCCESS;
+  ASSERT_EFI_ERROR (ProbeHardwareQdueuesForProblems (IoMmuContext));
+
+  return Status;
 }

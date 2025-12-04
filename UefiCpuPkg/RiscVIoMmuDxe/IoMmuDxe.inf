@@ -5,6 +5,8 @@
 # and their downstreams, providing DMA protection for the platform
 # using information provided in the FDT/ACPI RIMT.
 #
+# TODO: Globally, consider TPL levels (more than just in the protocol).
+#
 # Copyright (c) 2025, 9elements GmbH. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #

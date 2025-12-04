@@ -1,8 +1,6 @@
 /** @file
   RISC-V IOMMU protocol.
 
-  Global TODO: First, determine if endpoint is behind (this) IOMMU.
-
   Copyright (c) 2025, 9elements GmbH. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -14,6 +12,7 @@
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/IoLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/IoMmu.h>
@@ -45,24 +44,6 @@ EDKII_IOMMU_PROTOCOL  mRiscVIoMmuProtocol = {
   IoMmuFreeBuffer,
 };
 
-STATIC
-RISCV_IOMMU_CONTEXT *
-BUGBUG_MultipleIoMmuContext (
-  VOID
-)
-{
-  LIST_ENTRY           *Link;
-  RISCV_IOMMU_CONTEXT  *IoMmuContext;
-
-  Link = GetFirstNode (&mRiscVIoMmuContexts);
-  ASSERT (!IsNull (&mRiscVIoMmuContexts, Link));
-
-  IoMmuContext = RISCV_IOMMU_CONTEXT_FROM_LINK (Link);
-  ASSERT (IsNull (&mRiscVIoMmuContexts, GetNextNode (&mRiscVIoMmuContexts, Link)));
-
-  return IoMmuContext;
-}
-
 /**
   Returns the top of IOMMU addressable memory based on
   the HART's operating SATP mode and the IOMMU's GXL bit.
@@ -74,22 +55,43 @@ RiscVGetIoMmuMemoryTop (
   VOID
   )
 {
-  RISCV_IOMMU_FCTL  FeatureControl;
-  UINTN             HartSatpMode;
+  STATIC UINT64        IoMmuMemoryTop = 0;
+  LIST_ENTRY           *Link;
+  RISCV_IOMMU_CONTEXT  *IoMmuContext;
+  RISCV_IOMMU_FCTL     FeatureControl;
+  UINTN                HartSatpMode;
 
-  FeatureControl.Uint32 = IoMmuRead32 (BUGBUG_MultipleIoMmuContext (), R_RISCV_IOMMU_FCTL);
-  if (FeatureControl.Bits.GXL) {
-    DEBUG ((RISCV_IOMMU_DEBUG_LEVEL, "GXL bit is set, so buffer must be below 4G\n"));
-    return (1ULL << 32) - 1;
+  if (IoMmuMemoryTop != 0) {
+    return IoMmuMemoryTop;
+  }
+
+  //
+  // This function can be called to allocate the common buffer,
+  // which means that its result must be usable by all IOMMUs.
+  //
+  for (Link = GetFirstNode (&mRiscVIoMmuContexts)
+     ; !IsNull (&mRiscVIoMmuContexts, Link)
+     ; Link = GetNextNode (&mRiscVIoMmuContexts, Link)
+     ) {
+    IoMmuContext = RISCV_IOMMU_CONTEXT_FROM_LINK (Link);
+    FeatureControl.Uint32 = MmioRead32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_FCTL);
+    if (FeatureControl.Bits.GXL) {
+      DEBUG ((RISCV_IOMMU_DEBUG_LEVEL, "GXL bit is set, so buffer must be below 4G\n"));
+      IoMmuMemoryTop = (1ULL << 32) - 1;
+      return IoMmuMemoryTop;
+    }
   }
 
   HartSatpMode = (RiscVGetSupervisorAddressTranslationRegister () & SATP64_MODE) >> SATP64_MODE_SHIFT;
   if (HartSatpMode == SATP_MODE_SV39) {
-    return (1ULL << 39) - 1;
+    IoMmuMemoryTop = (1ULL << 39) - 1;
+    return IoMmuMemoryTop;
   } else if (HartSatpMode == SATP_MODE_SV48) {
-    return (1ULL << 48) - 1;
+    IoMmuMemoryTop = (1ULL << 48) - 1;
+    return IoMmuMemoryTop;
   } else if (HartSatpMode == SATP_MODE_SV57) {
-    return (1ULL << 57) - 1;
+    IoMmuMemoryTop = (1ULL << 57) - 1;
+    return IoMmuMemoryTop;
   }
 
   ASSERT (FALSE);
@@ -142,6 +144,7 @@ IoMmuSetAttribute (
   IN UINT64                IoMmuAccess
   )
 {
+  EFI_TPL                   OriginalTpl;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   MAP_INFO                  *MapInfo;
   EFI_PCI_IO_PROTOCOL       *PciIo;
@@ -151,7 +154,14 @@ IoMmuSetAttribute (
   UINTN                     Dev;
   UINTN                     Func;
   RISCV_IOMMU_DEVICE_ID     IoMmuDeviceId;
-  
+  LIST_ENTRY                *Link;
+  RISCV_IOMMU_CONTEXT       *IoMmuContext;
+  LIST_ENTRY                *DownstreamLink;
+  RISCV_IOMMU_DOWNSTREAMS   *IoMmuDownstreams;
+  RISCV_IOMMU_DEVICE_ID     MappedIoMmuDeviceId;
+
+  OriginalTpl = gBS->RaiseTPL (TPL_NOTIFY);
+
   DEBUG ((
     RISCV_IOMMU_DEBUG_LEVEL,
     "%a: DeviceHandle=0x%lx, Mapping=0x%lx, IoMmuAccess=0x%lx\n",
@@ -162,20 +172,23 @@ IoMmuSetAttribute (
     ));
 
   //
-  // Validate input arguments 
+  // Validate input arguments
   //
   if ((DeviceHandle == NULL) || (Mapping == NULL)) {
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Exit;
   }
-  
+
   DevicePath = DevicePathFromHandle (DeviceHandle);
   if (DevicePath == NULL) {
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Exit;
   }
 
   MapInfo = Mapping;
   if (MapInfo->Signature != MAP_INFO_SIGNATURE) {
-    return EFI_INVALID_PARAMETER;
+    Status = EFI_INVALID_PARAMETER;
+    goto Exit;
   }
 
   //
@@ -184,36 +197,76 @@ IoMmuSetAttribute (
   //
   if ((DevicePath->Type != HARDWARE_DEVICE_PATH) && (DevicePath->SubType != HW_PCI_DP)) {
     DEBUG ((DEBUG_ERROR, "%a: At this time, only PCI devices are supported by the IOMMU driver!\n", __func__));
-    return EFI_UNSUPPORTED;
+    Status = EFI_UNSUPPORTED;
+    goto Exit;
   }
 
-  if (IoMmuAccess != (EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE)) {
-    return EFI_INVALID_PARAMETER;
-  }
+  //
+  // Meta BUGBUG: This is called to erase mappings too. It doesn't need a complementary function.
+  // - However, we may want to be able to unload this, such as at EndOfFirmware? Follow a secure convention.
+  // - In reverting our mappings, see the comment in 4.1.2.
+  //
+  //if (IoMmuAccess == 0) {
+    //Status = EFI_SUCCESS;
+    //goto Exit;
+  //}
 
   //
   // Get device_id for this request.
   //
   Status = gBS->HandleProtocol (DeviceHandle, &gEfiPciIoProtocolGuid, (VOID **)&PciIo);
   if (EFI_ERROR (Status)) {
-    return EFI_UNSUPPORTED;
+    Status = EFI_UNSUPPORTED;
+    goto Exit;
   }
 
   Status = PciIo->GetLocation (PciIo, &Seg, &Bus, &Dev, &Func);
   if (EFI_ERROR (Status)) {
-    return EFI_UNSUPPORTED;
+    Status = EFI_UNSUPPORTED;
+    goto Exit;
   }
 
+  IoMmuDeviceId.PciBdf.Padding  = 0;
   IoMmuDeviceId.PciBdf.Segment  = (UINT8)Seg;
   IoMmuDeviceId.PciBdf.Bus      = (UINT8)Bus;
   IoMmuDeviceId.PciBdf.Device   = (UINT8)Dev;
   IoMmuDeviceId.PciBdf.Function = (UINT8)Func;
 
   //
-  // TODO: Discover which IOMMU this device_id is behind through the context's downstreams.
+  // Discover which IOMMU this device_id is behind through its context's downstreams.
+  // - TODO: MapMask handling.
   //
-  Status = EFI_DEVICE_ERROR;
+  for (Link = GetFirstNode (&mRiscVIoMmuContexts)
+     ; !IsNull (&mRiscVIoMmuContexts, Link)
+     ; Link = GetNextNode (&mRiscVIoMmuContexts, Link)
+     ) {
+    IoMmuContext = RISCV_IOMMU_CONTEXT_FROM_LINK (Link);
+    for (DownstreamLink = GetFirstNode (&IoMmuContext->DownstreamDevices)
+       ; !IsNull (&IoMmuContext->DownstreamDevices, DownstreamLink)
+       ; DownstreamLink = GetNextNode (&IoMmuContext->DownstreamDevices, DownstreamLink)
+       ) {
+      IoMmuDownstreams = RISCV_IOMMU_DOWNSTREAMS_FROM_LINK (DownstreamLink);
+      if ((IoMmuDeviceId.Uint32 >= IoMmuDownstreams->NodeMapping.SourceIdBase) && (IoMmuDeviceId.Uint32 < (IoMmuDownstreams->NodeMapping.SourceIdBase + IoMmuDownstreams->NodeMapping.NumberOfIds))) {
+        MappedIoMmuDeviceId.Uint32 = IoMmuDownstreams->NodeMapping.DestinationDeviceIdBase + (IoMmuDeviceId.Uint32 - IoMmuDownstreams->NodeMapping.SourceIdBase);
+        goto Work;
+      }
+    }
+  }
+
+  if (IsNull (&mRiscVIoMmuContexts, Link)) {
+    Status = EFI_UNSUPPORTED;
+    goto Exit;
+  }
+
+Work:
+  Status = RiscVIoMmuSetAttributeWorker (IoMmuContext, &MappedIoMmuDeviceId, MapInfo->DeviceAddress, MapInfo->NumberOfBytes, IoMmuAccess);
   ASSERT_EFI_ERROR (Status);
+
+  Status = IoMmuCommandQueueFence (IoMmuContext);
+  ASSERT_EFI_ERROR (Status);
+
+Exit:
+  gBS->RestoreTPL (OriginalTpl);
 
   return Status;
 }
@@ -307,7 +360,7 @@ IoMmuMap (
   // If this is a dedicated buffer, check that it can fit on a page table.
   //
   if (((Operation != EdkiiIoMmuOperationBusMasterCommonBuffer) &&
-       (Operation != EdkiiIoMmuOperationBusMasterCommonBuffer64)) && 
+       (Operation != EdkiiIoMmuOperationBusMasterCommonBuffer64)) &&
       ((PhysicalAddress != ALIGN_VALUE(PhysicalAddress, SIZE_4KB)) ||
        (*NumberOfBytes != ALIGN_VALUE(*NumberOfBytes, SIZE_4KB)))) {
     NeedRemap = TRUE;
@@ -407,11 +460,9 @@ IoMmuUnmap (
   IN  VOID                  *Mapping
   )
 {
-#if 0
-  EFI_TPL          OriginalTpl;
-#endif
   MAP_INFO         *MapInfo;
 #if 0
+  EFI_TPL          OriginalTpl;
   LIST_ENTRY       *Link;
   MAP_HANDLE_INFO  *MapHandleInfo;
 #endif

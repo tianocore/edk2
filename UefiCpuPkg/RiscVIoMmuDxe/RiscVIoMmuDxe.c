@@ -12,6 +12,7 @@
 #include <Library/DebugLib.h>
 #include <Library/FdtLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/IoLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/Cpu.h>
 #include <Register/RiscV64/RiscVImpl.h>
@@ -38,19 +39,19 @@ IoMmuIsReset (
   RISCV_IOMMU_DDTP                        Ddtp;
   RISCV_IOMMU_IPSR                        Ipsr;
 
-  SoftwareReqQueueCsr.Uint32 = IoMmuRead32 (IoMmuContext, R_RISCV_IOMMU_CQCSR);
+  SoftwareReqQueueCsr.Uint32 = MmioRead32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_CQCSR);
   if (SoftwareReqQueueCsr.Bits.qen || SoftwareReqQueueCsr.Bits.ie || SoftwareReqQueueCsr.Bits.qon ||
       SoftwareReqQueueCsr.Bits.busy) {
     return FALSE;
   }
 
-  HardwareReqQueueCsr.Uint32 = IoMmuRead32 (IoMmuContext, R_RISCV_IOMMU_FQCSR);
+  HardwareReqQueueCsr.Uint32 = MmioRead32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_FQCSR);
   if (HardwareReqQueueCsr.Bits.qen || HardwareReqQueueCsr.Bits.ie || HardwareReqQueueCsr.Bits.qon ||
       HardwareReqQueueCsr.Bits.busy) {
     return FALSE;
   }
 
-  HardwareReqQueueCsr.Uint32 = IoMmuRead32 (IoMmuContext, R_RISCV_IOMMU_PQCSR);
+  HardwareReqQueueCsr.Uint32 = MmioRead32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_PQCSR);
   if (HardwareReqQueueCsr.Bits.qen || HardwareReqQueueCsr.Bits.ie || HardwareReqQueueCsr.Bits.qon ||
       HardwareReqQueueCsr.Bits.busy) {
     return FALSE;
@@ -59,12 +60,12 @@ IoMmuIsReset (
   //
   // Translation request is a debug feature, and might not be present. Skipping.
   //
-  Ddtp.Uint64 = IoMmuRead64 (IoMmuContext, R_RISCV_IOMMU_DDTP);
+  Ddtp.Uint64 = MmioRead64 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_DDTP);
   if (Ddtp.Bits.busy) {
     return FALSE;
   }
 
-  Ipsr.Uint32 = IoMmuRead32 (IoMmuContext, R_RISCV_IOMMU_IPSR);
+  Ipsr.Uint32 = MmioRead32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_IPSR);
   if (Ipsr.Uint32) {
     return FALSE;
   }
@@ -84,41 +85,46 @@ IoMmuIsReset (
 /**
   Allocate a queue.
 
-  @param[in]  QueueStruct   Pointer to this queue's wrapping struct.
+  @param[in]  QueueType   The type of queue to be allocated.
 
 **/
 STATIC
 VOID
 AllocateQueue (
   IN RISCV_IOMMU_CONTEXT  *IoMmuContext,
-  IN QUEUE_WRAPPER        *QueueStruct
+  IN UINTN                QueueType
   )
 {
   UINTN                                   QueueBaseReg;
   UINTN                                   QueueHeadTailReg;
   UINTN                                   QueueCsrReg;
+  UINTN                                   EntrySize;
   UINTN                                   Log2Size;
   UINTN                                   NumberOfPages;
+  VOID                                    *QueueBuffer;
   RISCV_IOMMU_QUEUE_BASE                  QueueBase;
   RISCV_IOMMU_HARDWARE_REQUEST_QUEUE_CSR  HardwareReqQueueCsr;
   RISCV_IOMMU_SOFTWARE_REQUEST_QUEUE_CSR  SoftwareReqQueueCsr;
 
-  switch (QueueStruct->Type) {
+  switch (QueueType) {
     case QUEUE_COMMAND:
       QueueBaseReg     = R_RISCV_IOMMU_CQB;
       // Unlike the others, this is one we write requests into.
       QueueHeadTailReg = R_RISCV_IOMMU_CQT;
       QueueCsrReg      = R_RISCV_IOMMU_CQCSR;
+      EntrySize        = COMMAND_QUEUE_ENTRY_SIZE;
       break;
     case QUEUE_FAULT:
       QueueBaseReg     = R_RISCV_IOMMU_FQB;
       QueueHeadTailReg = R_RISCV_IOMMU_FQH;
       QueueCsrReg      = R_RISCV_IOMMU_FQCSR;
+      EntrySize        = FAULT_QUEUE_ENTRY_SIZE;
       break;
     case QUEUE_PAGE_REQUEST:
       QueueBaseReg     = R_RISCV_IOMMU_PQB;
       QueueHeadTailReg = R_RISCV_IOMMU_PQH;
       QueueCsrReg      = R_RISCV_IOMMU_PQCSR;
+      EntrySize        = PAGE_REQUEST_QUEUE_ENTRY_SIZE;
       break;
     default:
       ASSERT (FALSE);
@@ -135,24 +141,25 @@ AllocateQueue (
   //
   // Align the buffer to the specification's requirement.
   //
-  NumberOfPages       = EFI_SIZE_TO_PAGES (QUEUE_NUMBER_OF_ENTRIES * QueueStruct->EntrySize);
-  QueueStruct->Buffer = AllocateAlignedPages (NumberOfPages, MAX (SIZE_4KB, EFI_PAGES_TO_SIZE (NumberOfPages)));
-  ASSERT (QueueStruct->Buffer != NULL);
+  NumberOfPages       = EFI_SIZE_TO_PAGES (QUEUE_NUMBER_OF_ENTRIES * EntrySize);
+  QueueBuffer = AllocateAlignedPages (NumberOfPages, MAX (SIZE_4KB, EFI_PAGES_TO_SIZE (NumberOfPages)));
+  ASSERT (QueueBuffer != NULL);
 
-  QueueBase.Bits.PPN      = ((UINT64)QueueStruct->Buffer) >> RISCV_MMU_PAGE_SHIFT;
+  QueueBase.Bits.PPN      = ((UINT64)QueueBuffer) >> RISCV_MMU_PAGE_SHIFT;
   QueueBase.Bits.LOG2SZ_1 = Log2Size - 1;
-  IoMmuWrite64 (IoMmuContext, QueueBaseReg, QueueBase.Uint64);
-  IoMmuWrite32 (IoMmuContext, QueueHeadTailReg, 0);
+  MmioWrite64 (IoMmuContext->BaseAddress + QueueBaseReg, QueueBase.Uint64);
+  MmioWrite32 (IoMmuContext->BaseAddress + QueueHeadTailReg, 0);
+  MemoryFence ();
 
   //
   // Enable the queue.
   //
-  if (QueueStruct->Type == QUEUE_COMMAND) {
+  if (QueueType == QUEUE_COMMAND) {
     SoftwareReqQueueCsr.Bits.qen = 1;
-    IoMmuWriteAndWait32 (IoMmuContext, QueueCsrReg, SoftwareReqQueueCsr.Uint32, 1 << N_RISCV_IOMMU_QUEUE_CSR_QON, TRUE);
+    IoMmuWriteAndWait32 (IoMmuContext->BaseAddress + QueueCsrReg, SoftwareReqQueueCsr.Uint32, 1 << N_RISCV_IOMMU_QUEUE_CSR_QON, TRUE);
   } else {
     HardwareReqQueueCsr.Bits.qen = 1;
-    IoMmuWriteAndWait32 (IoMmuContext, QueueCsrReg, HardwareReqQueueCsr.Uint32, 1 << N_RISCV_IOMMU_QUEUE_CSR_QON, TRUE);
+    IoMmuWriteAndWait32 (IoMmuContext->BaseAddress + QueueCsrReg, HardwareReqQueueCsr.Uint32, 1 << N_RISCV_IOMMU_QUEUE_CSR_QON, TRUE);
   }
 }
 
@@ -165,16 +172,17 @@ AllocateQueue (
 STATIC
 BOOLEAN
 ProgramContextRoot (
-  IN RISCV_IOMMU_CONTEXT  *IoMmuContext,
-  IN CONTEXT_WRAPPER      *ContextStruct
+  IN RISCV_IOMMU_CONTEXT  *IoMmuContext
   )
 {
   UINT8                     DeviceIdSupportedWidth;
   RISCV_IOMMU_CAPABILITIES  Capabilities;
-  UINT8                     IoMmuMode;
-  RISCV_IOMMU_DDTP          Ddtp;
+  BOOLEAN                   ExtendedContext;
   UINT8                     OneLevelMaxWidth;
   UINT8                     TwoLevelMaxWidth;
+  UINT8                     IoMmuMode;
+  RISCV_IOMMU_DDTP          Ddtp;
+  VOID                      *ContextBuffer;
 
   //
   // Initialise the variable to silence a warning.
@@ -190,14 +198,14 @@ ProgramContextRoot (
   //
   // Determine the format of the context struct.
   //
-  Capabilities.Uint64 = IoMmuRead64 (IoMmuContext, R_RISCV_IOMMU_CAPABILITIES);
-  ContextStruct->IsExtended = Capabilities.Bits.MSI_FLAT;
+  Capabilities.Uint64 = MmioRead64 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_CAPABILITIES);
+  ExtendedContext = Capabilities.Bits.MSI_FLAT;
 
   //
   // Determine the needed IOMMU mode.
   //
-  OneLevelMaxWidth = ContextStruct->IsExtended ? N_RISCV_IOMMU_DEVICE_ID_EXTENDED_I1 : N_RISCV_IOMMU_DEVICE_ID_BASE_I1;
-  TwoLevelMaxWidth = ContextStruct->IsExtended ? N_RISCV_IOMMU_DEVICE_ID_EXTENDED_I2 : N_RISCV_IOMMU_DEVICE_ID_BASE_I2;
+  OneLevelMaxWidth = ExtendedContext ? N_RISCV_IOMMU_DEVICE_ID_EXTENDED_I1 : N_RISCV_IOMMU_DEVICE_ID_BASE_I1;
+  TwoLevelMaxWidth = ExtendedContext ? N_RISCV_IOMMU_DEVICE_ID_EXTENDED_I2 : N_RISCV_IOMMU_DEVICE_ID_BASE_I2;
 
   if (DeviceIdSupportedWidth <= OneLevelMaxWidth) {
     IoMmuMode = V_RISCV_IOMMU_DDTP_IOMMU_MODE_1LVL;
@@ -211,9 +219,9 @@ ProgramContextRoot (
   // Attempt to set the needed mode. NOTE: Could we attempt to upgrade if this mode fails?
   //
   Ddtp.Bits.iommu_mode = IoMmuMode;
-  IoMmuWriteAndWait64 (IoMmuContext, R_RISCV_IOMMU_DDTP, Ddtp.Uint64, 1 << N_RISCV_IOMMU_DDTP_BUSY, FALSE);
+  IoMmuWriteAndWait64 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_DDTP, Ddtp.Uint64, 1 << N_RISCV_IOMMU_DDTP_BUSY, FALSE);
 
-  Ddtp.Uint64 = IoMmuRead64 (IoMmuContext, R_RISCV_IOMMU_DDTP);
+  Ddtp.Uint64 = MmioRead64 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_DDTP);
   if (Ddtp.Bits.iommu_mode != IoMmuMode) {
     DEBUG ((DEBUG_ERROR, "Needed IOMMU mode 0x%x is not supported!\n", IoMmuMode));
     return FALSE;
@@ -222,20 +230,20 @@ ProgramContextRoot (
   //
   // Allocate the root of the context table.
   //
-  ContextStruct->Buffer = AllocatePages (1);
-  ASSERT (ContextStruct->Buffer != NULL);
+  ContextBuffer = AllocatePages (1);
+  ASSERT (ContextBuffer != NULL);
 
-  ZeroMem (ContextStruct->Buffer, SIZE_4KB);
+  ZeroMem (ContextBuffer, SIZE_4KB);
 
-  Ddtp.Bits.PPN = ((UINT64)ContextStruct->Buffer) >> RISCV_MMU_PAGE_SHIFT;
-  IoMmuWriteAndWait64 (IoMmuContext, R_RISCV_IOMMU_DDTP, Ddtp.Uint64, 1 << N_RISCV_IOMMU_DDTP_BUSY, FALSE);
+  Ddtp.Bits.PPN = ((UINT64)ContextBuffer) >> RISCV_MMU_PAGE_SHIFT;
+  IoMmuWriteAndWait64 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_DDTP, Ddtp.Uint64, 1 << N_RISCV_IOMMU_DDTP_BUSY, FALSE);
 
   DEBUG ((
     RISCV_IOMMU_DEBUG_LEVEL,
     "%a: Configured a %d level device table at 0x%x\n",
     __func__,
     IoMmuMode - V_RISCV_IOMMU_DDTP_IOMMU_MODE_BARE,
-    ContextStruct->Buffer
+    ContextBuffer
     ));
 
   return TRUE;
@@ -266,7 +274,7 @@ InitialiseRiscVIoMmu (
   // 1. Discover the capabilities of the IOMMU, and:
   // 2. Ensure its architectural version is supported.
   //
-  Capabilities.Uint64 = IoMmuRead64 (IoMmuContext, R_RISCV_IOMMU_CAPABILITIES);
+  Capabilities.Uint64 = MmioRead64 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_CAPABILITIES);
   if (Capabilities.Bits.version != V_RISCV_IOMMU_CAPABILITIES_VERSION_1_0) {
     DEBUG ((DEBUG_ERROR, "IOMMU version 0x%x is not supported by this driver!\n", Capabilities.Bits.version));
     return EFI_UNSUPPORTED;
@@ -279,7 +287,7 @@ InitialiseRiscVIoMmu (
   // 3. Read the feature control register, and:
   // 4. If changing the IOMMU's endianness is required, ensure that it's possible.
   //
-  FeatureControl.Uint32 = IoMmuRead32 (IoMmuContext, R_RISCV_IOMMU_FCTL);
+  FeatureControl.Uint32 = MmioRead32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_FCTL);
   if (HartIsBigEndian && !FeatureControl.Bits.BE && !Capabilities.Bits.END) {
     DEBUG ((DEBUG_ERROR, "HART is big-endian, which is not supported by the IOMMU!\n"));
     return EFI_UNSUPPORTED;
@@ -290,7 +298,7 @@ InitialiseRiscVIoMmu (
   //
   if (HartIsBigEndian && !FeatureControl.Bits.BE && Capabilities.Bits.END) {
     FeatureControl.Bits.BE = 1;
-    IoMmuWrite32 (IoMmuContext, R_RISCV_IOMMU_FCTL, FeatureControl.Uint32);
+    MmioWrite32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_FCTL, FeatureControl.Uint32);
   }
 
   //
@@ -313,7 +321,7 @@ InitialiseRiscVIoMmu (
 
   // Attempt to enable the needed group of paging modes.
   FeatureControl.Bits.GXL = HartSatpMode == SATP_MODE_SV32;
-  IoMmuWrite32 (IoMmuContext, R_RISCV_IOMMU_FCTL, FeatureControl.Uint32);
+  MmioWrite32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_FCTL, FeatureControl.Uint32);
 
   //
   // 9-11. Firmware is largely synchronous, so skip mapping interrupt causes to vectors.
@@ -322,17 +330,17 @@ InitialiseRiscVIoMmu (
   //
   // 12-14. Program the three queues.
   //
-  AllocateQueue (IoMmuContext, &IoMmuContext->CommandQueue);
-  AllocateQueue (IoMmuContext, &IoMmuContext->FaultQueue);
+  AllocateQueue (IoMmuContext, QUEUE_COMMAND);
+  AllocateQueue (IoMmuContext, QUEUE_FAULT);
   // TODO: Unlike on an OS kernel, device-driven operation is not expected (such as to VRAM).
   if (Capabilities.Bits.ATS) {
-    AllocateQueue (IoMmuContext, &IoMmuContext->PageRequestQueue);
+    AllocateQueue (IoMmuContext, QUEUE_PAGE_REQUEST);
   }
 
   //
   // 15. Program the DDT pointer.
   //
-  if (!ProgramContextRoot (IoMmuContext, &IoMmuContext->DeviceContext)) {
+  if (!ProgramContextRoot (IoMmuContext)) {
     DEBUG ((DEBUG_ERROR, "Failed to program the DDT root pointer!\n"));
     return EFI_UNSUPPORTED;
   }

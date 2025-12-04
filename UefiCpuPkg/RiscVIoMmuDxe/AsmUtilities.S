@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 //
-// RISC-V CSR read/write functions
+// RISC-V CSR helper functions
 //
 // Copyright (c) 2025, 9elements GmbH. All rights reserved.<BR>
 // SPDX-License-Identifier: BSD-2-Clause-Patent

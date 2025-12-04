@@ -16,6 +16,8 @@
 
 #include <PiDxe.h>
 
+#pragma pack (push, 1)
+
 #define R_RISCV_IOMMU_CAPABILITIES   0x00
 
 #define V_RISCV_IOMMU_CAPABILITIES_VERSION_1_0   0x10
@@ -273,5 +275,7 @@ typedef union {
 #define R_RISCV_IOMMU_MSI_CFG_TBL    0x300
 
 #define R_RISCV_IOMMU_RESERVED_2     0x400
+
+#pragma pack (pop)
 
 #endif
