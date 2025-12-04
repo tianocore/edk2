@@ -158,16 +158,16 @@ BUILD_OPTFLAGS = -O2 $(EXTRA_OPTFLAGS)
 
 ifeq ($(DARWIN),Darwin)
 # assume clang or clang compatible flags on OS X
-CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror \
+CFLAGS = -MD -fno-strict-aliasing -Wall -Werror \
 -Wno-deprecated-declarations -Wno-self-assign -Wno-unused-result -nostdlib -g
 else
 ifneq ($(CLANG),)
-CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
+CFLAGS = -MD -fno-strict-aliasing -fwrapv \
 -fno-delete-null-pointer-checks -Wall -Werror \
 -Wno-deprecated-declarations -Wno-self-assign \
 -Wno-unused-result -nostdlib -g
 else
-CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
+CFLAGS = -MD -fno-strict-aliasing -fwrapv \
 -fno-delete-null-pointer-checks -Wall -Werror \
 -Wno-deprecated-declarations -Wno-stringop-truncation -Wno-restrict \
 -Wno-unused-result -nostdlib -g
@@ -180,6 +180,12 @@ else
 LDFLAGS =
 CXXFLAGS = -Wno-unused-result
 endif
+
+CPPFLAGS += -fshort-wchar -flto -DUSING_LTO
+ifeq ($(HOST_ARCH), X64)
+  CPPFLAGS += "-DEFIAPI=__attribute__((ms_abi))"
+endif
+
 ifeq ($(HOST_ARCH), IA32)
 #
 # Snow Leopard  is a 32-bit and 64-bit environment. uname -m returns i386, but gcc defaults
