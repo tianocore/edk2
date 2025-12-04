@@ -767,7 +767,8 @@ typedef struct {
 
 #define EFI_ACPI_6_6_RINTC_STRUCTURE_VERSION  1
 
-#define EFI_ACPI_6_6_RINTC_FLAG_ENABLE  1
+#define EFI_ACPI_6_6_RINTC_FLAG_ENABLE          BIT0
+#define EFI_ACPI_6_6_RINTC_FLAG_ONLINE_CAPABLE  BIT1
 
 ///
 /// RISC-V Incoming MSI Controller (IMSIC)
@@ -787,6 +788,19 @@ typedef struct {
 } EFI_ACPI_6_6_IMSIC_STRUCTURE;
 
 #define EFI_ACPI_6_6_IMSIC_STRUCTURE_VERSION  1
+
+#define IMSIC_MIN_NUM_IDS            63
+#define IMSIC_MAX_NUM_IDS            2047
+#define IMSIC_MIN_NUM_GUEST_IDS      63
+#define IMSIC_MAX_NUM_GUEST_IDS      2047
+#define IMSIC_MIN_GUEST_INDEX_BITS   0
+#define IMSIC_MAX_GUEST_INDEX_BITS   7
+#define IMSIC_MIN_HART_INDEX_BITS    0
+#define IMSIC_MAX_HART_INDEX_BITS    15
+#define IMSIC_MIN_GROUP_INDEX_BITS   0
+#define IMSIC_MAX_GROUP_INDEX_BITS   7
+#define IMSIC_MIN_GROUP_INDEX_SHIFT  0
+#define IMSIC_MAX_GROUP_INDEX_SHIFT  55
 
 ///
 /// RISC-V APLIC
@@ -3132,7 +3146,7 @@ typedef struct {
 //
 // RHCT Flags
 //
-#define EFI_ACPI_6_6_RHCT_FLAG_TIMER_CANNOT_WAKEUP_CPU  1
+#define EFI_ACPI_6_6_RHCT_FLAG_TIMER_CANNOT_WAKEUP_CPU  BIT0
 
 //
 // RHCT subtables
@@ -3463,6 +3477,11 @@ typedef struct {
 /// "PHAT" Platform Health Assessment Table
 ///
 #define EFI_ACPI_6_6_PLATFORM_HEALTH_ASSESSMENT_TABLE_SIGNATURE  SIGNATURE_32('P', 'H', 'A', 'T')
+
+///
+/// "RIMT" RISC-V IO Mapping Table
+///
+#define EFI_ACPI_6_6_RIMT_TABLE_SIGNATURE  SIGNATURE_32('R', 'I', 'M', 'T')
 
 ///
 /// "RHCT" RISC-V Hart Capabilities Table (RHCT)

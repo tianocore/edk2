@@ -376,6 +376,7 @@ GeneratePrt (
       goto exit_handler;
     }
 
+ #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
     // Check that the interrupts flags are SPIs, level high.
     // Cf. Arm BSA v1.0, sE.6 "Legacy interrupts"
     if ((Index > 0)   &&
@@ -387,6 +388,8 @@ GeneratePrt (
       ASSERT_EFI_ERROR (Status);
       goto exit_handler;
     }
+
+ #endif
 
     // Add the device to the DeviceTable.
     MappingTableAdd (&Generator->DeviceTable, IrqMapInfo->PciDevice);
@@ -546,7 +549,7 @@ GenerateRootPortDevices (
       goto exit_handler;
     }
 
-    if (RpInfo[Index].Sun != MAX_UINT64) {
+    if (RpInfo[Index].Sun != MAX_UINT32) {
       // ASL: Name (_SUN, <Sun value>)
       Status = AmlCodeGenNameInteger (
                  "_SUN",

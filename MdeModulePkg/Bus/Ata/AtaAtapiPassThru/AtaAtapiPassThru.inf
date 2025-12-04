@@ -67,6 +67,7 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdAtaSmartEnable          ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAhciCommandRetryCount   ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSataDeviceReadyTimeout  ## CONSUMES
 
 # [Event]
 # EVENT_TYPE_PERIODIC_TIMER ## SOMETIMES_CONSUMES

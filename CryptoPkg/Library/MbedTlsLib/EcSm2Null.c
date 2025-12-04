@@ -493,3 +493,27 @@ mbedtls_ecdsa_sign (
   ASSERT (FALSE);
   return -1;
 }
+
+int
+mbedtls_ecp_write_key_ext (
+  const mbedtls_ecp_keypair  *key,
+  size_t                     *olen,
+  unsigned char              *buf,
+  size_t                     buflen
+  )
+{
+  ASSERT (FALSE);
+  return -1;
+}
+
+int
+mbedtls_ecp_read_key (
+  mbedtls_ecp_group_id  grp_id,
+  mbedtls_ecp_keypair   *key,
+  const unsigned char   *buf,
+  size_t                buflen
+  )
+{
+  ASSERT (FALSE);
+  return -1;
+}

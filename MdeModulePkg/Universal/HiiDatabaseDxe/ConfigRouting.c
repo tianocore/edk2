@@ -632,13 +632,28 @@ CompareBlockElementDefault (
   // Make BlockPtr point to the first <BlockConfig> with AltConfigHdr in DefaultAltCfgResp.
   //
   AltConfigHdrPtr = StrStr (DefaultAltCfgResp, AltConfigHdr);
-  ASSERT (AltConfigHdrPtr != NULL);
+  if (AltConfigHdrPtr == NULL ) {
+    ASSERT (AltConfigHdrPtr != NULL);
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
+
   BlockPtr = StrStr (AltConfigHdrPtr, L"&OFFSET=");
+  if (BlockPtr == NULL) {
+    ASSERT (BlockPtr != NULL);
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
+
   //
   // Make StringPtr point to the AltConfigHdr in ConfigAltResp.
   //
   StringPtr = StrStr (*ConfigAltResp, AltConfigHdr);
-  ASSERT (StringPtr != NULL);
+  if (StringPtr == NULL) {
+    ASSERT (StringPtr != NULL);
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
 
   while (BlockPtr != NULL) {
     //
@@ -684,6 +699,12 @@ CompareBlockElementDefault (
       //
       if (AppendString == NULL) {
         AppendString = (EFI_STRING)AllocateZeroPool (AppendSize + sizeof (CHAR16));
+        if (AppendString == NULL) {
+          ASSERT (AppendString != NULL);
+          Status = EFI_OUT_OF_RESOURCES;
+          goto Exit;
+        }
+
         StrnCatS (AppendString, AppendSize / sizeof (CHAR16) + 1, BlockPtrStart, AppendSize / sizeof (CHAR16));
       } else {
         TotalSize    = StrSize (AppendString) + AppendSize + sizeof (CHAR16);
@@ -774,19 +795,31 @@ CompareNameElementDefault (
 
   AppendString  = NULL;
   NvConfigExist = NULL;
+  Status        = EFI_OUT_OF_RESOURCES;
   //
   // Make NvConfigPtr point to the first <NvConfig> with AltConfigHdr in DefaultAltCfgResp.
   //
   NvConfigPtr = StrStr (DefaultAltCfgResp, AltConfigHdr);
-  ASSERT (NvConfigPtr != NULL);
+  if (NvConfigPtr == NULL) {
+    ASSERT (NvConfigPtr != NULL);
+    goto Exit;
+  }
+
   NvConfigPtr = StrStr (NvConfigPtr + StrLen (AltConfigHdr), L"&");
   //
   // Make StringPtr point to the first <NvConfig> with AltConfigHdr in ConfigAltResp.
   //
   StringPtr = StrStr (*ConfigAltResp, AltConfigHdr);
-  ASSERT (StringPtr != NULL);
+  if (StringPtr == NULL) {
+    ASSERT (StringPtr != NULL);
+    goto Exit;
+  }
+
   StringPtr = StrStr (StringPtr + StrLen (AltConfigHdr), L"&");
-  ASSERT (StringPtr != NULL);
+  if (StringPtr == NULL) {
+    ASSERT (StringPtr != NULL);
+    goto Exit;
+  }
 
   while (NvConfigPtr != NULL) {
     //
@@ -795,7 +828,11 @@ CompareNameElementDefault (
     //
     NvConfigStart    = NvConfigPtr;
     NvConfigValuePtr = StrStr (NvConfigPtr + 1, L"=");
-    ASSERT (NvConfigValuePtr != NULL);
+    if (NvConfigValuePtr == NULL) {
+      ASSERT (NvConfigValuePtr != NULL);
+      goto Exit;
+    }
+
     TempChar          = *NvConfigValuePtr;
     *NvConfigValuePtr = L'\0';
     //
@@ -924,7 +961,11 @@ CompareAndMergeDefaultString (
   // To find the <AltResp> with AltConfigHdr in DefaultAltCfgResp, ignore other <AltResp> which follow it.
   //
   AltConfigHdrPtr = StrStr (DefaultAltCfgResp, AltConfigHdr);
-  ASSERT (AltConfigHdrPtr != NULL);
+  if (AltConfigHdrPtr == NULL) {
+    ASSERT (AltConfigHdrPtr != NULL);
+    goto Exit;
+  }
+
   AltConfigHdrPtrNext = StrStr (AltConfigHdrPtr + 1, L"&GUID");
   if (AltConfigHdrPtrNext != NULL) {
     TempChar             = *AltConfigHdrPtrNext;
@@ -1946,9 +1987,10 @@ GetElementsFromRequest (
 
   TmpRequest = StrStr (ConfigRequest, L"PATH=");
   ASSERT (TmpRequest != NULL);
-
-  if ((StrStr (TmpRequest, L"&OFFSET=") != NULL) || (StrStr (TmpRequest, L"&") != NULL)) {
-    return TRUE;
+  if (TmpRequest != NULL) {
+    if ((StrStr (TmpRequest, L"&OFFSET=") != NULL) || (StrStr (TmpRequest, L"&") != NULL)) {
+      return TRUE;
+    }
   }
 
   return FALSE;
@@ -2863,7 +2905,7 @@ ParseIfrData (
           }
         } else {
           //
-          // When flag is not set, default value is FASLE.
+          // When flag is not set, default value is FALSE.
           //
           DefaultData.Type = DefaultValueFromDefault;
           if (QuestionReferBitField) {
@@ -3590,6 +3632,10 @@ GetNameElement (
   IFR_BLOCK_DATA  *RequestBlockArray;
   BOOLEAN         HasValue;
 
+  if (ConfigRequest == NULL) {
+    return NULL;
+  }
+
   StringPtr = ConfigRequest;
 
   //
@@ -3624,6 +3670,8 @@ GetNameElement (
       HasValue = TRUE;
     } else if ((NextTag = StrStr (StringPtr, L"&")) != NULL) {
       *NextTag = L'\0';
+    } else {
+      goto Done;
     }
 
     //
@@ -6457,12 +6505,21 @@ HiiGetAltCfg (
     );
   if (AltCfgId != NULL) {
     GenerateSubStr (L"ALTCFG=", sizeof (UINT16), (VOID *)AltCfgId, 3, &AltIdStr);
+    if (AltIdStr == NULL) {
+      ASSERT (AltIdStr != NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
   }
 
   if (Name != NULL) {
     GenerateSubStr (L"NAME=", StrLen (Name) * sizeof (CHAR16), (VOID *)Name, 2, &NameStr);
   } else {
     GenerateSubStr (L"NAME=", 0, NULL, 2, &NameStr);
+  }
+
+  if (NameStr == NULL) {
+    ASSERT (NameStr != NULL);
+    return EFI_OUT_OF_RESOURCES;
   }
 
   while (*StringPtr != 0) {
@@ -6555,6 +6612,12 @@ HiiGetAltCfg (
         // Return Current Setting when AltCfgId is NULL.
         //
         Status = OutputConfigBody (StringPtr, &Result);
+        goto Exit;
+      }
+
+      if (AltIdStr == NULL) {
+        ASSERT (AltIdStr != NULL);
+        Status = EFI_NOT_FOUND;
         goto Exit;
       }
 

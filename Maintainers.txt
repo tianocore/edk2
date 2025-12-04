@@ -175,6 +175,7 @@ M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 M: Guillermo Antonio Palomino Sosa <guillermo.a.palomino.sosa@intel.com> [gapalomi]
 R: Yuwei Chen <yuwei.chen@intel.com> [YuweiChen1110]
 R: Poncho Figueroa <poncho.figueroa.esqueda@intel.com> [ponchofigueroa]
+R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
 
 BaseTools: Plugins
 F: BaseTools/Plugin/
@@ -258,6 +259,7 @@ F: MdeModulePkg/Universal/Acpi/
 R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]
 R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
+R: George Liao <george.liao@intel.com> [GeorgeLiao012]
 
 MdeModulePkg: BDS modules
 F: MdeModulePkg/*BootManager*/
@@ -473,6 +475,7 @@ W: http://www.tianocore.org/ovmf/
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
+R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
 S: Maintained
 
 OvmfPkg: bhyve-related modules

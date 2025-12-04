@@ -268,6 +268,107 @@ Done:
   return (RetVal);
 }
 
+/** Main function of the 'Rm' command.
+
+  @param[in] Package    List of input parameter for the command.
+**/
+STATIC
+SHELL_STATUS
+MainCmdRm (
+  LIST_ENTRY  *Package
+  )
+{
+  EFI_STATUS           Status;
+  CONST CHAR16         *Param;
+  SHELL_STATUS         ShellStatus;
+  UINTN                ParamCount;
+  EFI_SHELL_FILE_INFO  *FileList;
+  EFI_SHELL_FILE_INFO  *Node;
+
+  ShellStatus = SHELL_SUCCESS;
+  ParamCount  = 0;
+  FileList    = NULL;
+
+  //
+  // check for "-?"
+  //
+  if (ShellCommandLineGetFlag (Package, L"-?")) {
+    ASSERT (FALSE);
+  }
+
+  if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
+    //
+    // we insufficient parameters
+    //
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"rm");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  //
+  // get a list with each file specified by parameters
+  // if parameter is a directory then add all the files below it to the list
+  //
+  for ( ParamCount = 1, Param = ShellCommandLineGetRawValue (Package, ParamCount)
+        ; Param != NULL
+        ; ParamCount++, Param = ShellCommandLineGetRawValue (Package, ParamCount)
+        )
+  {
+    Status = ShellOpenFileMetaArg ((CHAR16 *)Param, EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
+    if (EFI_ERROR (Status) || (FileList == NULL) || IsListEmpty (&FileList->Link)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"rm", (CHAR16 *)Param);
+      ShellStatus = SHELL_NOT_FOUND;
+      break;
+    }
+  }
+
+  if ((ShellStatus != SHELL_SUCCESS) || (FileList == NULL)) {
+    goto Exit;
+  }
+
+  //
+  // loop through the list and make sure we are not aborting...
+  //
+  for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&FileList->Link)
+        ; !IsNull (&FileList->Link, &Node->Link) && !ShellGetExecutionBreakFlag ()
+        ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&FileList->Link, &Node->Link)
+        )
+  {
+    //
+    // skip the directory traversing stuff...
+    //
+    if ((StrCmp (Node->FileName, L".") == 0) || (StrCmp (Node->FileName, L"..") == 0)) {
+      continue;
+    }
+
+    //
+    // do the deleting of nodes
+    //
+    if (EFI_ERROR (Node->Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_RM_LOG_DELETE_ERR2), gShellLevel2HiiHandle, Node->Status);
+      ShellStatus = SHELL_ACCESS_DENIED;
+      break;
+    }
+
+    if (!IsValidDeleteTarget (FileList, Node, Package)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_RM_LOG_DELETE_ERR3), gShellLevel2HiiHandle, Node->FullName);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+      break;
+    }
+
+    ShellStatus = CascadeDelete (Node, ShellCommandLineGetFlag (Package, L"-q"));
+  }
+
+Exit:
+  //
+  // Free the fileList
+  //
+  if (FileList != NULL) {
+    Status = ShellCloseFileMetaArg (&FileList);
+  }
+
+  return ShellStatus;
+}
+
 /**
   Function for 'rm' command.
 
@@ -281,19 +382,13 @@ ShellCommandRunRm (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS           Status;
-  LIST_ENTRY           *Package;
-  CHAR16               *ProblemParam;
-  CONST CHAR16         *Param;
-  SHELL_STATUS         ShellStatus;
-  UINTN                ParamCount;
-  EFI_SHELL_FILE_INFO  *FileList;
-  EFI_SHELL_FILE_INFO  *Node;
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
 
   ProblemParam = NULL;
   ShellStatus  = SHELL_SUCCESS;
-  ParamCount   = 0;
-  FileList     = NULL;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -313,88 +408,16 @@ ShellCommandRunRm (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    //
-    // check for "-?"
-    //
-    if (ShellCommandLineGetFlag (Package, L"-?")) {
-      ASSERT (FALSE);
-    }
 
-    if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
-      //
-      // we insufficient parameters
-      //
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"rm");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      //
-      // get a list with each file specified by parameters
-      // if parameter is a directory then add all the files below it to the list
-      //
-      for ( ParamCount = 1, Param = ShellCommandLineGetRawValue (Package, ParamCount)
-            ; Param != NULL
-            ; ParamCount++, Param = ShellCommandLineGetRawValue (Package, ParamCount)
-            )
-      {
-        Status = ShellOpenFileMetaArg ((CHAR16 *)Param, EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
-        if (EFI_ERROR (Status) || (FileList == NULL) || IsListEmpty (&FileList->Link)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"rm", (CHAR16 *)Param);
-          ShellStatus = SHELL_NOT_FOUND;
-          break;
-        }
-      }
-
-      if (ShellStatus == SHELL_SUCCESS) {
-        //
-        // loop through the list and make sure we are not aborting...
-        //
-        for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&FileList->Link)
-              ; !IsNull (&FileList->Link, &Node->Link) && !ShellGetExecutionBreakFlag ()
-              ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&FileList->Link, &Node->Link)
-              )
-        {
-          //
-          // skip the directory traversing stuff...
-          //
-          if ((StrCmp (Node->FileName, L".") == 0) || (StrCmp (Node->FileName, L"..") == 0)) {
-            continue;
-          }
-
-          //
-          // do the deleting of nodes
-          //
-          if (EFI_ERROR (Node->Status)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_RM_LOG_DELETE_ERR2), gShellLevel2HiiHandle, Node->Status);
-            ShellStatus = SHELL_ACCESS_DENIED;
-            break;
-          }
-
-          if (!IsValidDeleteTarget (FileList, Node, Package)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_RM_LOG_DELETE_ERR3), gShellLevel2HiiHandle, Node->FullName);
-            ShellStatus = SHELL_INVALID_PARAMETER;
-            break;
-          }
-
-          ShellStatus = CascadeDelete (Node, ShellCommandLineGetFlag (Package, L"-q"));
-        }
-      }
-
-      //
-      // Free the fileList
-      //
-      if (FileList != NULL) {
-        Status = ShellCloseFileMetaArg (&FileList);
-      }
-
-      FileList = NULL;
-    }
-
-    //
-    // free the command line package
-    //
-    ShellCommandLineFreeVarList (Package);
+    return ShellStatus;
   }
+
+  ShellStatus = MainCmdRm (Package);
+
+  //
+  // free the command line package
+  //
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }
