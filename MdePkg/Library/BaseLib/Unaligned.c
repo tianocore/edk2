@@ -8,6 +8,16 @@
 
 #include "BaseLibInternals.h"
 
+#pragma pack(1)
+typedef union {
+  UINT16    Val16;
+  UINT32    Val32;
+  UINT64    Val64;
+} MISALIGNED;
+#pragma pack()
+
+STATIC_ASSERT (ALIGNOF (MISALIGNED) == 1, "Alignment error");
+
 /**
   Reads a 16-bit value from memory that may be unaligned.
 
@@ -24,12 +34,16 @@
 UINT16
 EFIAPI
 ReadUnaligned16 (
-  IN CONST UINT16  *Buffer
+  IN CONST VOID  *Buffer
   )
 {
+  CONST MISALIGNED  *Misaligned;
+
   ASSERT (Buffer != NULL);
 
-  return *Buffer;
+  Misaligned = Buffer;
+
+  return Misaligned->Val16;
 }
 
 /**
@@ -50,13 +64,17 @@ ReadUnaligned16 (
 UINT16
 EFIAPI
 WriteUnaligned16 (
-  OUT UINT16  *Buffer,
+  OUT VOID    *Buffer,
   IN  UINT16  Value
   )
 {
+  MISALIGNED  *Misaligned;
+
   ASSERT (Buffer != NULL);
 
-  return *Buffer = Value;
+  Misaligned = Buffer;
+
+  return Misaligned->Val16 = Value;
 }
 
 /**
@@ -75,12 +93,16 @@ WriteUnaligned16 (
 UINT32
 EFIAPI
 ReadUnaligned32 (
-  IN CONST UINT32  *Buffer
+  IN CONST VOID  *Buffer
   )
 {
+  CONST MISALIGNED  *Misaligned;
+
   ASSERT (Buffer != NULL);
 
-  return *Buffer;
+  Misaligned = Buffer;
+
+  return Misaligned->Val32;
 }
 
 /**
@@ -101,13 +123,17 @@ ReadUnaligned32 (
 UINT32
 EFIAPI
 WriteUnaligned32 (
-  OUT UINT32  *Buffer,
+  OUT VOID    *Buffer,
   IN  UINT32  Value
   )
 {
+  MISALIGNED  *Misaligned;
+
   ASSERT (Buffer != NULL);
 
-  return *Buffer = Value;
+  Misaligned = Buffer;
+
+  return Misaligned->Val32 = Value;
 }
 
 /**
@@ -126,12 +152,16 @@ WriteUnaligned32 (
 UINT64
 EFIAPI
 ReadUnaligned64 (
-  IN CONST UINT64  *Buffer
+  IN CONST VOID  *Buffer
   )
 {
+  CONST MISALIGNED  *Misaligned;
+
   ASSERT (Buffer != NULL);
 
-  return *Buffer;
+  Misaligned = Buffer;
+
+  return Misaligned->Val64;
 }
 
 /**
@@ -152,11 +182,15 @@ ReadUnaligned64 (
 UINT64
 EFIAPI
 WriteUnaligned64 (
-  OUT UINT64  *Buffer,
+  OUT VOID    *Buffer,
   IN  UINT64  Value
   )
 {
+  MISALIGNED  *Misaligned;
+
   ASSERT (Buffer != NULL);
 
-  return *Buffer = Value;
+  Misaligned = Buffer;
+
+  return Misaligned->Val64 = Value;
 }
