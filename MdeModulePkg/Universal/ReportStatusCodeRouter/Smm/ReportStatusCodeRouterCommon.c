@@ -66,10 +66,7 @@ Register (
   }
 
   CallbackEntry = (MM_RSC_HANDLER_CALLBACK_ENTRY *)AllocatePool (sizeof (MM_RSC_HANDLER_CALLBACK_ENTRY));
-  if (CallbackEntry == NULL) {
-    ASSERT (CallbackEntry != NULL);
-    return EFI_OUT_OF_RESOURCES;
-  }
+  ASSERT (CallbackEntry != NULL);
 
   CallbackEntry->Signature          = MM_RSC_HANDLER_CALLBACK_ENTRY_SIGNATURE;
   CallbackEntry->RscHandlerCallback = Callback;

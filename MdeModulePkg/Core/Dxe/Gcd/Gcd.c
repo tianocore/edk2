@@ -161,10 +161,7 @@ CoreDumpGcdMemorySpaceMap (
   }
 
   Status = CoreGetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
-  if (!((Status == EFI_SUCCESS) && (MemorySpaceMap != NULL))) {
-    ASSERT ((Status == EFI_SUCCESS) && (MemorySpaceMap != NULL));
-    return;
-  }
+  ASSERT (Status == EFI_SUCCESS && MemorySpaceMap != NULL);
 
   if (InitialMap) {
     DEBUG ((DEBUG_GCD, "GCD:Initial GCD Memory Space Map\n"));
@@ -217,10 +214,7 @@ CoreDumpGcdIoSpaceMap (
   }
 
   Status = CoreGetIoSpaceMap (&NumberOfDescriptors, &IoSpaceMap);
-  if (!((Status == EFI_SUCCESS) && (IoSpaceMap != NULL))) {
-    ASSERT ((Status == EFI_SUCCESS) && (IoSpaceMap != NULL));
-    return;
-  }
+  ASSERT (Status == EFI_SUCCESS && IoSpaceMap != NULL);
 
   if (InitialMap) {
     DEBUG ((DEBUG_GCD, "GCD:Initial GCD I/O Space Map\n"));
@@ -776,14 +770,13 @@ CoreConvertSpace (
     Map = &mGcdIoSpaceMap;
   } else {
     ASSERT (FALSE);
-    return EFI_NOT_FOUND;
   }
 
   //
   // Search for the list of descriptors that cover the range BaseAddress to BaseAddress+Length
   //
   Status = CoreSearchGcdMapEntry (BaseAddress, Length, &StartLink, &EndLink, Map);
-  if (EFI_ERROR (Status) || ((StartLink == NULL) || (EndLink == NULL))) {
+  if (EFI_ERROR (Status)) {
     Status = EFI_UNSUPPORTED;
 
     goto Done;
@@ -1191,7 +1184,6 @@ CoreAllocateSpace (
     Map = &mGcdIoSpaceMap;
   } else {
     ASSERT (FALSE);
-    return EFI_NOT_FOUND;
   }
 
   Found     = FALSE;
@@ -1359,12 +1351,6 @@ CoreAllocateSpace (
   // Convert/Insert the list of descriptors from StartLink to EndLink
   //
   Link = StartLink;
-  if ((Link == NULL) || (EndLink == NULL)) {
-    ASSERT (Link != NULL);
-    ASSERT (EndLink != NULL);
-    goto Done;
-  }
-
   while (Link != EndLink->ForwardLink) {
     Entry = CR (Link, EFI_GCD_MAP_ENTRY, Link, EFI_GCD_MAP_SIGNATURE);
     CoreInsertGcdMapEntry (Link, Entry, *BaseAddress, Length, TopEntry, BottomEntry);
@@ -2665,11 +2651,7 @@ CoreInitializeGcdServices (
   // Get the number of address lines in the I/O and Memory space for the CPU
   //
   CpuHob = GetFirstHob (EFI_HOB_TYPE_CPU);
-  if (CpuHob == NULL) {
-    ASSERT (CpuHob != NULL);
-    return EFI_OUT_OF_RESOURCES;
-  }
-
+  ASSERT (CpuHob != NULL);
   SizeOfMemorySpace = CpuHob->SizeOfMemorySpace;
   SizeOfIoSpace     = CpuHob->SizeOfIoSpace;
 
@@ -2677,10 +2659,7 @@ CoreInitializeGcdServices (
   // Initialize the GCD Memory Space Map
   //
   Entry = AllocateCopyPool (sizeof (EFI_GCD_MAP_ENTRY), &mGcdMemorySpaceMapEntryTemplate);
-  if (Entry == NULL) {
-    ASSERT (Entry != NULL);
-    return EFI_OUT_OF_RESOURCES;
-  }
+  ASSERT (Entry != NULL);
 
   Entry->EndAddress = LShiftU64 (1, SizeOfMemorySpace) - 1;
 
@@ -2692,10 +2671,7 @@ CoreInitializeGcdServices (
   // Initialize the GCD I/O Space Map
   //
   Entry = AllocateCopyPool (sizeof (EFI_GCD_MAP_ENTRY), &mGcdIoSpaceMapEntryTemplate);
-  if (Entry == NULL) {
-    ASSERT (Entry != NULL);
-    return EFI_OUT_OF_RESOURCES;
-  }
+  ASSERT (Entry != NULL);
 
   Entry->EndAddress = LShiftU64 (1, SizeOfIoSpace) - 1;
 
@@ -2921,10 +2897,7 @@ CoreInitializeGcdServices (
                  (UINTN)PhitHob->EfiFreeMemoryBottom - (UINTN)(*HobStart),
                  *HobStart
                  );
-  if (NewHobList == NULL) {
-    ASSERT (NewHobList != NULL);
-    return EFI_OUT_OF_RESOURCES;
-  }
+  ASSERT (NewHobList != NULL);
 
   *HobStart = NewHobList;
   gHobList  = NewHobList;

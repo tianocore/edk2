@@ -626,10 +626,7 @@ CreateGuidedExtractionRpnEvent (
   // Allocate new event structure and context
   //
   Context = AllocatePool (sizeof (RPN_EVENT_CONTEXT));
-  if (Context == NULL) {
-    ASSERT (Context != NULL);
-    return;
-  }
+  ASSERT (Context != NULL);
 
   Context->ChildNode    = ChildNode;
   Context->ParentStream = ParentStream;

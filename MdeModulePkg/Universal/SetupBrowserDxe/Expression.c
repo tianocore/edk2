@@ -1173,19 +1173,10 @@ IfrToString (
       } else {
         SrcBuf = GetBufferForValue (&Value);
         SrcLen = GetLengthForValue (&Value);
-        if ((SrcBuf == NULL) || (SrcLen == 0)) {
-          ASSERT (SrcBuf != NULL);
-          ASSERT (SrcLen != 0);
-          return EFI_NOT_FOUND;
-        }
       }
 
       TmpBuf = AllocateZeroPool (SrcLen + 3);
-      if (TmpBuf == NULL) {
-        ASSERT (TmpBuf != NULL);
-        return EFI_OUT_OF_RESOURCES;
-      }
-
+      ASSERT (TmpBuf != NULL);
       if (Format == EFI_IFR_STRING_ASCII) {
         CopyMem (TmpBuf, SrcBuf, SrcLen);
         PrintFormat = L"%a";
@@ -1295,8 +1286,7 @@ IfrToUint (
   Evaluate opcode EFI_IFR_CATENATE.
 
   @param  FormSet                Formset which contains this opcode.
-  @param  Result                 Evaluation result for this opcode.  Result
-                                 will be NULL on a failure.
+  @param  Result                 Evaluation result for this opcode.
 
   @retval EFI_SUCCESS            Opcode evaluation success.
   @retval Other                  Opcode evaluation failed.
@@ -1360,11 +1350,6 @@ IfrCatenate (
     MaxLen    = (StrSize (String[1]) + Size) / sizeof (CHAR16);
     StringPtr = AllocatePool (MaxLen * sizeof (CHAR16));
     ASSERT (StringPtr != NULL);
-
-    if (StringPtr == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-
     StrCpyS (StringPtr, MaxLen, String[1]);
     StrCatS (StringPtr, MaxLen, String[0]);
 
@@ -1380,20 +1365,10 @@ IfrCatenate (
     ASSERT (Result->Buffer != NULL);
 
     TmpBuf = GetBufferForValue (&Value[0]);
-    if (TmpBuf == NULL) {
-      ASSERT (TmpBuf != NULL);
-      Status = EFI_OUT_OF_RESOURCES;
-      goto Done;
-    }
-
+    ASSERT (TmpBuf != NULL);
     CopyMem (Result->Buffer, TmpBuf, Length0);
     TmpBuf = GetBufferForValue (&Value[1]);
-    if (TmpBuf == NULL) {
-      ASSERT (TmpBuf != NULL);
-      Status = EFI_OUT_OF_RESOURCES;
-      goto Done;
-    }
-
+    ASSERT (TmpBuf != NULL);
     CopyMem (&Result->Buffer[Length0], TmpBuf, Length1);
   }
 
@@ -1416,10 +1391,6 @@ Done:
 
   if (StringPtr != NULL) {
     FreePool (StringPtr);
-  }
-
-  if (EFI_ERROR (Status) && (Result != NULL)) {
-    FreePool (Result);
   }
 
   return Status;
@@ -1590,11 +1561,7 @@ IfrMatch2 (
     goto Done;
   }
 
-  if (HandleBuffer == NULL) {
-    ASSERT (HandleBuffer != NULL);
-    goto Done;
-  }
-
+  ASSERT (HandleBuffer != NULL);
   for ( Index = 0; Index < BufferSize / sizeof (EFI_HANDLE); Index++) {
     Status = gBS->HandleProtocol (
                     HandleBuffer[Index],
@@ -1863,9 +1830,6 @@ IfrMid (
   } else {
     BufferLen = GetLengthForValue (&Value[2]);
     Buffer    = GetBufferForValue (&Value[2]);
-    if (Buffer == NULL) {
-      return EFI_INVALID_PARAMETER;
-    }
 
     Result->Type = EFI_IFR_TYPE_BUFFER;
     if ((Length == 0) || (Base >= BufferLen)) {
@@ -2293,9 +2257,6 @@ CompareHiiValue (
     Buf1Len = GetLengthForValue (Value1);
     Buf2    = GetBufferForValue (Value2);
     Buf2Len = GetLengthForValue (Value2);
-    if ((Buf1 == NULL) || (Buf2 == NULL)) {
-      return EFI_INVALID_PARAMETER;
-    }
 
     Len     = Buf1Len > Buf2Len ? Buf2Len : Buf1Len;
     *Result = CompareMem (Buf1, Buf2, Len);
@@ -2497,12 +2458,7 @@ GetQuestionValueFromForm (
   // Get the formset data include this question.
   //
   FormSet = AllocateZeroPool (sizeof (FORM_BROWSER_FORMSET));
-  if (FormSet == NULL) {
-    ASSERT (FormSet != NULL);
-    GetTheVal = FALSE;
-    goto Done;
-  }
-
+  ASSERT (FormSet != NULL);
   Status = InitializeFormSet (HiiHandle, FormSetGuid, FormSet);
   if (EFI_ERROR (Status)) {
     GetTheVal = FALSE;
@@ -2534,24 +2490,18 @@ GetQuestionValueFromForm (
     Form = NULL;
   }
 
-  if (Form == NULL ) {
-    ASSERT (Form != NULL);
-    GetTheVal = FALSE;
-    goto Done;
-  }
+  ASSERT (Form != NULL);
 
   //
   // Get the question value.
   //
-  if (Question != NULL) {
-    Status = GetQuestionValue (FormSet, Form, Question, GetSetValueWithEditBuffer);
-    if (EFI_ERROR (Status)) {
-      GetTheVal = FALSE;
-      goto Done;
-    }
-
-    CopyMem (Value, &Question->HiiValue, sizeof (EFI_HII_VALUE));
+  Status = GetQuestionValue (FormSet, Form, Question, GetSetValueWithEditBuffer);
+  if (EFI_ERROR (Status)) {
+    GetTheVal = FALSE;
+    goto Done;
   }
+
+  CopyMem (Value, &Question->HiiValue, sizeof (EFI_HII_VALUE));
 
 Done:
   //
@@ -3220,12 +3170,7 @@ EvaluateExpression (
             case EFI_HII_VARSTORE_NAME_VALUE:
               if (OpCode->ValueType != EFI_IFR_TYPE_STRING) {
                 NameValue = AllocateZeroPool ((OpCode->ValueWidth * 2 + 1) * sizeof (CHAR16));
-                if (NameValue == NULL) {
-                  ASSERT (NameValue != NULL);
-                  Status = EFI_OUT_OF_RESOURCES;
-                  goto Done;
-                }
-
+                ASSERT (NameValue != NULL);
                 //
                 // Convert Buffer to Hex String
                 //

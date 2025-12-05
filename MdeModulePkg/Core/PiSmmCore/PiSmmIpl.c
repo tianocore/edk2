@@ -1654,11 +1654,7 @@ GetFullSmramRanges (
     *FullSmramRangeCount = SmramRangeCount + AdditionSmramRangeCount;
     Size                 = (*FullSmramRangeCount) * sizeof (EFI_SMRAM_DESCRIPTOR);
     FullSmramRanges      = (EFI_SMRAM_DESCRIPTOR *)AllocateZeroPool (Size);
-    if (FullSmramRanges == NULL) {
-      ASSERT (FullSmramRanges != NULL);
-      Status = EFI_OUT_OF_RESOURCES;
-      goto Done;
-    }
+    ASSERT (FullSmramRanges != NULL);
 
     Status = mSmmAccess->GetCapabilities (mSmmAccess, &Size, FullSmramRanges);
     ASSERT_EFI_ERROR (Status);
@@ -1705,34 +1701,18 @@ GetFullSmramRanges (
 
   Size                = MaxCount * sizeof (EFI_SMM_RESERVED_SMRAM_REGION);
   SmramReservedRanges = (EFI_SMM_RESERVED_SMRAM_REGION *)AllocatePool (Size);
-
-  if (SmramReservedRanges == NULL) {
-    ASSERT (SmramReservedRanges != NULL);
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Done;
-  }
-
+  ASSERT (SmramReservedRanges != NULL);
   for (Index = 0; Index < SmramReservedCount; Index++) {
     CopyMem (&SmramReservedRanges[Index], &SmmConfiguration->SmramReservedRegions[Index], sizeof (EFI_SMM_RESERVED_SMRAM_REGION));
   }
 
   Size            = MaxCount * sizeof (EFI_SMRAM_DESCRIPTOR);
   TempSmramRanges = (EFI_SMRAM_DESCRIPTOR *)AllocatePool (Size);
-  if (TempSmramRanges == NULL) {
-    ASSERT (TempSmramRanges != NULL);
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Done;
-  }
-
+  ASSERT (TempSmramRanges != NULL);
   TempSmramRangeCount = 0;
 
   SmramRanges = (EFI_SMRAM_DESCRIPTOR *)AllocatePool (Size);
-  if (SmramRanges == NULL) {
-    ASSERT (SmramRanges != NULL);
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Done;
-  }
-
+  ASSERT (SmramRanges != NULL);
   Status = mSmmAccess->GetCapabilities (mSmmAccess, &Size, SmramRanges);
   ASSERT_EFI_ERROR (Status);
 
@@ -1789,12 +1769,7 @@ GetFullSmramRanges (
   // Sort the entries
   //
   FullSmramRanges = AllocateZeroPool ((TempSmramRangeCount + AdditionSmramRangeCount) * sizeof (EFI_SMRAM_DESCRIPTOR));
-  if (FullSmramRanges == NULL) {
-    ASSERT (FullSmramRanges != NULL);
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Done;
-  }
-
+  ASSERT (FullSmramRanges != NULL);
   *FullSmramRangeCount = 0;
   do {
     for (Index = 0; Index < TempSmramRangeCount; Index++) {
@@ -1818,22 +1793,9 @@ GetFullSmramRanges (
   ASSERT (*FullSmramRangeCount == TempSmramRangeCount);
   *FullSmramRangeCount += AdditionSmramRangeCount;
 
-Done:
-  if (SmramRanges != NULL) {
-    FreePool (SmramRanges);
-  }
-
-  if (SmramReservedRanges != NULL) {
-    FreePool (SmramReservedRanges);
-  }
-
-  if (TempSmramRanges != NULL) {
-    FreePool (TempSmramRanges);
-  }
-
-  if (EFI_ERROR (Status)) {
-    return NULL;
-  }
+  FreePool (SmramRanges);
+  FreePool (SmramReservedRanges);
+  FreePool (TempSmramRanges);
 
   return FullSmramRanges;
 }

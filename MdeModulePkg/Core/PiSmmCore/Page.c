@@ -165,11 +165,7 @@ CoreFreeMemoryMapStack (
     // Deque an memory map entry from mFreeMemoryMapEntryList
     //
     Entry = AllocateMemoryMapEntry ();
-    if (Entry == NULL) {
-      ASSERT (Entry);
-      mFreeMapStack -= 1;
-      return;
-    }
+    ASSERT (Entry);
 
     //
     // Update to proper entry

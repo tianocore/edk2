@@ -448,11 +448,7 @@ DiscoverPeimsAndOrderWithApriori (
         TempFileHandles = AllocatePool (
                             sizeof (EFI_PEI_FILE_HANDLE) * (Private->TempPeimCount + TEMP_FILE_GROWTH_STEP)
                             );
-        if (TempFileHandles == NULL) {
-          ASSERT (TempFileHandles != NULL);
-          return;
-        }
-
+        ASSERT (TempFileHandles != NULL);
         CopyMem (
           TempFileHandles,
           Private->TempFileHandles,
@@ -462,11 +458,7 @@ DiscoverPeimsAndOrderWithApriori (
         TempFileGuid             = AllocatePool (
                                      sizeof (EFI_GUID) * (Private->TempPeimCount + TEMP_FILE_GROWTH_STEP)
                                      );
-        if (TempFileGuid == NULL) {
-          ASSERT (TempFileGuid != NULL);
-          return;
-        }
-
+        ASSERT (TempFileGuid != NULL);
         CopyMem (
           TempFileGuid,
           Private->TempFileGuid,
@@ -1918,10 +1910,7 @@ PeiDispatcher (
 
     for (FvCount = Private->CurrentPeimFvCount; FvCount < Private->FvCount; FvCount++) {
       CoreFvHandle = FindNextCoreFvHandle (Private, FvCount);
-      if (CoreFvHandle == NULL) {
-        ASSERT (CoreFvHandle != NULL);
-        continue;
-      }
+      ASSERT (CoreFvHandle != NULL);
 
       //
       // If the FV has corresponding EFI_PEI_FIRMWARE_VOLUME_PPI instance, then dispatch it.
