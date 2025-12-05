@@ -306,10 +306,7 @@ Split2MPageTo4K (
   AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
 
   PageTableEntry = AllocatePageTableMemory (1);
-  if (PageTableEntry == NULL) {
-    ASSERT (PageTableEntry != NULL);
-    return;
-  }
+  ASSERT (PageTableEntry != NULL);
 
   //
   // Fill in 2M page entry.
@@ -391,10 +388,7 @@ Split1GPageTo2M (
   AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
 
   PageDirectoryEntry = AllocatePageTableMemory (1);
-  if (PageDirectoryEntry == NULL) {
-    ASSERT (PageDirectoryEntry != NULL);
-    return;
-  }
+  ASSERT (PageDirectoryEntry != NULL);
 
   //
   // Fill in 1G page entry.
@@ -523,10 +517,7 @@ SetPageTablePoolReadOnly (
       ASSERT (Level > 1);
 
       NewPageTable = AllocatePageTableMemory (1);
-      if (NewPageTable == NULL) {
-        ASSERT (NewPageTable != NULL);
-        return;
-      }
+      ASSERT (NewPageTable != NULL);
 
       PhysicalAddress = PageAttr & LevelMask[Level];
       for (EntryIndex = 0;
@@ -771,10 +762,7 @@ CreateIdentityMappingPageTables (
     ));
 
   BigPageAddress = (UINTN)AllocatePageTableMemory (TotalPagesNum);
-  if (BigPageAddress == 0) {
-    ASSERT (BigPageAddress != 0);
-    return 0;
-  }
+  ASSERT (BigPageAddress != 0);
 
   //
   // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.

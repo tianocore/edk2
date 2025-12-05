@@ -162,11 +162,7 @@ InstallIplPermanentMemoryPpis (
   //
   if (ExtractHandlerNumber > 0) {
     GuidPpi = (EFI_PEI_PPI_DESCRIPTOR *)AllocatePool (ExtractHandlerNumber * sizeof (EFI_PEI_PPI_DESCRIPTOR));
-    if (GuidPpi == NULL) {
-      ASSERT (GuidPpi != NULL);
-      return EFI_OUT_OF_RESOURCES;
-    }
-
+    ASSERT (GuidPpi != NULL);
     while (ExtractHandlerNumber-- > 0) {
       GuidPpi->Flags = EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
       GuidPpi->Ppi   = (VOID *)&mCustomGuidedSectionExtractionPpi;
