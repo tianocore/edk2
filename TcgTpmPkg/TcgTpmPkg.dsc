@@ -84,6 +84,7 @@
   #
   # Build verification of all library instances
   #
+  TcgTpmPkg/Library/TpmLib/TpmLib.inf
   TcgTpmPkg/Library/PlatformTpmNullLib/PlatformTpmNullLib.inf
 
 [BuildOptions]
