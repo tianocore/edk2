@@ -1300,6 +1300,7 @@ GetSelectionInputPopUp (
   BOOLEAN                        ShowUpArrow;
   UINTN                          DimensionsWidth;
   LIST_ENTRY                     *Link;
+  BOOLEAN                        OrderedList;
   UINT8                          *ValueArray;
   UINT8                          *ReturnValue;
   UINT8                          ValueType;
@@ -1326,16 +1327,18 @@ GetSelectionInputPopUp (
     OneOfOption = DISPLAY_QUESTION_OPTION_FROM_LINK (Link);
     ValueArray  = Question->CurrentValue.Buffer;
     ValueType   =  OneOfOption->OptionOpCode->Type;
+    OrderedList = TRUE;
     OrderList   = (EFI_IFR_ORDERED_LIST *)Question->OpCode;
   } else {
-    OrderList = NULL;
+    OrderedList = FALSE;
+    OrderList   = NULL;
   }
 
   //
   // Calculate Option count
   //
   PopUpMenuLines = 0;
-  if (OrderList != NULL) {
+  if (OrderedList) {
     AdjustOptionOrder (Question, &PopUpMenuLines);
   } else {
     Link = GetFirstNode (&Question->OptionListHead);
@@ -1363,7 +1366,7 @@ GetSelectionInputPopUp (
     FreePool (StringPtr);
     HiiValue.Type = OneOfOption->OptionOpCode->Type;
     SetValuesByType (&HiiValue.Value, &OneOfOption->OptionOpCode->Value, HiiValue.Type);
-    if ((OrderList == NULL) && (CompareHiiValue (&Question->CurrentValue, &HiiValue, &Result, NULL) == EFI_SUCCESS) && (Result == 0)) {
+    if (!OrderedList && (CompareHiiValue (&Question->CurrentValue, &HiiValue, &Result, NULL) == EFI_SUCCESS) && (Result == 0)) {
       //
       // Find current selected Option for OneOf
       //
@@ -1512,7 +1515,7 @@ GetSelectionInputPopUp (
 TheKey:
     switch (Key.UnicodeChar) {
       case '+':
-        if (OrderList != NULL) {
+        if (OrderedList) {
           if ((TopOptionIndex > 0) && (TopOptionIndex == HighlightOptionIndex)) {
             //
             // Highlight reaches the top of the popup window, scroll one menu item.
@@ -1527,11 +1530,8 @@ TheKey:
 
           if (HighlightOptionIndex > 0) {
             HighlightOptionIndex--;
-            if (CurrentOption == NULL) {
-              ASSERT (CurrentOption != NULL);
-              break;
-            }
 
+            ASSERT (CurrentOption != NULL);
             SwapListEntries (CurrentOption->Link.BackLink, &CurrentOption->Link);
           }
         }
@@ -1543,7 +1543,7 @@ TheKey:
         // If an ordered list op-code, we will allow for a popup of +/- keys
         // to create an ordered list of items
         //
-        if (OrderList != NULL) {
+        if (OrderedList) {
           if (((TopOptionIndex + MenuLinesInView) < PopUpMenuLines) &&
               (HighlightOptionIndex == (TopOptionIndex + MenuLinesInView - 1)))
           {
@@ -1561,11 +1561,7 @@ TheKey:
           if (HighlightOptionIndex < (PopUpMenuLines - 1)) {
             HighlightOptionIndex++;
 
-            if (CurrentOption == NULL) {
-              ASSERT (CurrentOption != NULL);
-              break;
-            }
-
+            ASSERT (CurrentOption != NULL);
             SwapListEntries (&CurrentOption->Link, CurrentOption->Link.ForwardLink);
           }
         }
@@ -1661,7 +1657,7 @@ TheKey:
             //
             // Restore link list order for orderedlist
             //
-            if (OrderList != NULL) {
+            if (OrderedList) {
               HiiValue.Type      = ValueType;
               HiiValue.Value.u64 = 0;
               for (Index = 0; Index < OrderList->MaxContainers; Index++) {
@@ -1692,7 +1688,7 @@ TheKey:
         //
         // return the current selection
         //
-        if (OrderList != NULL) {
+        if (OrderedList) {
           ReturnValue = AllocateZeroPool (Question->CurrentValue.BufferLen);
           ASSERT (ReturnValue != NULL);
           Index = 0;
@@ -1717,22 +1713,18 @@ TheKey:
             gUserInput->InputValue.BufferLen = Question->CurrentValue.BufferLen;
           }
         } else {
-          if (CurrentOption != NULL) {
-            ASSERT (CurrentOption != NULL);
-            break;
-          }
-
+          ASSERT (CurrentOption != NULL);
           gUserInput->InputValue.Type = CurrentOption->OptionOpCode->Type;
           if (IsValuesEqual (&Question->CurrentValue.Value, &CurrentOption->OptionOpCode->Value, gUserInput->InputValue.Type)) {
             return EFI_DEVICE_ERROR;
           } else {
             SetValuesByType (&gUserInput->InputValue.Value, &CurrentOption->OptionOpCode->Value, gUserInput->InputValue.Type);
           }
-
-          gST->ConOut->SetAttribute (gST->ConOut, SavedAttribute);
-
-          return EFI_SUCCESS;
         }
+
+        gST->ConOut->SetAttribute (gST->ConOut, SavedAttribute);
+
+        return EFI_SUCCESS;
 
       default:
         break;
