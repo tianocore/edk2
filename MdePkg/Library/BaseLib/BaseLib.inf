@@ -61,6 +61,7 @@
   LinkedList.c
   SafeString.c
   String.c
+  Unaligned.c
   FilePaths.c
   BaseLibInternals.h
 
@@ -194,7 +195,6 @@
   Ia32/InternalSwitchStack.c | MSFT
   Ia32/InternalSwitchStack.nasm | GCC
   Ia32/Non-existing.c
-  Unaligned.c
   X86WriteIdtr.c
   X86WriteGdtr.c
   X86Thunk.c
@@ -304,7 +304,6 @@
 
   X64/Non-existing.c
   Math64.c
-  Unaligned.c
   X86WriteIdtr.c
   X86WriteGdtr.c
   X86Thunk.c
@@ -339,14 +338,12 @@
   Ebc/SetJumpLongJump.c
   Ebc/SwitchStack.c
   Ebc/SpeculationBarrier.c
-  Unaligned.c
   Math64.c
   IntelTdxNull.c
   AmdSevNull.c
 
 [Sources.AARCH64]
   AArch64/InternalSwitchStack.c
-  AArch64/Unaligned.c
   Math64.c
 
   AArch64/MemoryFence.S             | GCC
@@ -375,7 +372,6 @@
 
 [Sources.RISCV64]
   Math64.c
-  Unaligned.c
   RiscV64/InternalSwitchStack.c
   RiscV64/CpuBreakpoint.c
   RiscV64/GetInterruptState.c
@@ -398,7 +394,6 @@
 
 [Sources.LOONGARCH64]
   Math64.c
-  Unaligned.c
   LoongArch64/Csr.c
   LoongArch64/InternalSwitchStack.c
   LoongArch64/AsmCsr.S              | GCC
