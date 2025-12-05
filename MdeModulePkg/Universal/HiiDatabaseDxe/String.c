@@ -1078,11 +1078,6 @@ SetStringWorker (
     return EFI_SUCCESS;
   }
 
-  if (GlobalFont == NULL ) {
-    ASSERT (GlobalFont != NULL);
-    return EFI_NOT_FOUND;
-  }
-
   OldBlockSize = StringPackage->StringPkgHdr->Header.Length - StringPackage->StringPkgHdr->HdrSize;
   BlockSize    = OldBlockSize + sizeof (EFI_HII_SIBT_FONT_BLOCK) - sizeof (CHAR16) +
                  StrSize (GlobalFont->FontInfo->FontName);
@@ -1098,10 +1093,6 @@ SetStringWorker (
   Ext2.Length           = (UINT16)(BlockSize - OldBlockSize);
   CopyMem (BlockPtr, &Ext2, sizeof (EFI_HII_SIBT_EXT2_BLOCK));
   BlockPtr += sizeof (EFI_HII_SIBT_EXT2_BLOCK);
-
-  if (LocalFont == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
 
   *BlockPtr = LocalFont->FontId;
   BlockPtr++;
@@ -1587,7 +1578,7 @@ Done:
       StringPackage              = CR (Link, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
       StringPackage->MaxStringId = *StringId;
     }
-  } else if (NewStringPackageCreated && (StringPackage != NULL)) {
+  } else if (NewStringPackageCreated) {
     //
     // Free the allocated new string Package when new string can't be added.
     //
