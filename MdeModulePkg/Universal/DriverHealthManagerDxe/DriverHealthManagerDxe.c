@@ -528,9 +528,8 @@ DriverHealthManagerRepairNotify (
   @param Handle         Handle to the HII package list.
   @param FormsetGuid    Return the formset GUID.
 
-  @retval EFI_SUCCESS           The formset is found successfully.
-  @retval EFI_NOT_FOUND         The formset cannot be found.
-  @retval EFI_OUT_OF_RESOURCES  Failed to find enough free memory
+  @retval EFI_SUCCESS   The formset is found successfully.
+  @retval EFI_NOT_FOUND The formset cannot be found.
 **/
 EFI_STATUS
 DriverHealthManagerGetFormsetId (
@@ -558,10 +557,7 @@ DriverHealthManagerGetFormsetId (
   Status         = mDriverHealthManagerDatabase->ExportPackageLists (mDriverHealthManagerDatabase, Handle, &BufferSize, HiiPackageList);
   if (Status == EFI_BUFFER_TOO_SMALL) {
     HiiPackageList = AllocatePool (BufferSize);
-    if (HiiPackageList == NULL) {
-      ASSERT (HiiPackageList != NULL);
-      return EFI_OUT_OF_RESOURCES;
-    }
+    ASSERT (HiiPackageList != NULL);
 
     Status = mDriverHealthManagerDatabase->ExportPackageLists (mDriverHealthManagerDatabase, Handle, &BufferSize, HiiPackageList);
   }
@@ -570,10 +566,7 @@ DriverHealthManagerGetFormsetId (
     return Status;
   }
 
-  if (HiiPackageList == NULL) {
-    ASSERT (HiiPackageList != NULL);
-    return EFI_NOT_FOUND;
-  }
+  ASSERT (HiiPackageList != NULL);
 
   //
   // Get Form package from this HII package List
@@ -614,7 +607,6 @@ DriverHealthManagerGetFormsetId (
   // Form package not found in this Package List
   //
   FreePool (HiiPackageList);
-
   return EFI_NOT_FOUND;
 }
 
@@ -898,10 +890,7 @@ DriverHealthManagerCleanDynamicString (
   FixedStringSize = *(UINT32 *)&STRING_ARRAY_NAME - sizeof (UINT32);
   BufferSize      = sizeof (EFI_HII_PACKAGE_LIST_HEADER) + FixedStringSize + sizeof (EFI_HII_PACKAGE_HEADER);
   HiiPackageList  = AllocatePool (BufferSize);
-  if (HiiPackageList == NULL) {
-    ASSERT (HiiPackageList != NULL);
-    return;
-  }
+  ASSERT (HiiPackageList != NULL);
 
   HiiPackageList->PackageLength = (UINT32)BufferSize;
   CopyMem (&HiiPackageList->PackageListGuid, &gEfiCallerIdGuid, sizeof (EFI_GUID));
