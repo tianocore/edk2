@@ -22,8 +22,25 @@
   Include
 
 [Includes.Common.Private]
+  Private/Include/Standard
+  Library/TpmLib/Include
+  Library/TpmLib/TPM/TPMCmd/tpm/include
+  Library/TpmLib/TPM/TPMCmd/tpm/include/tpm_public
+  Library/TpmLib/TPM/TPMCmd/tpm/include/tpm_public/prototypes
+  Library/TpmLib/TPM/TPMCmd/tpm/include/private
+  Library/TpmLib/TPM/TPMCmd/tpm/include/private/prototypes
+  Library/TpmLib/TPM/TPMCmd/tpm/include/platform_interface/prototypes
+  Library/TpmLib/TPM/TPMCmd/tpm/cryptolibs/Ossl/include
+  Library/TpmLib/TPM/TPMCmd/tpm/cryptolibs/common/include
+  Library/TpmLib/TPM/TPMCmd/tpm/cryptolibs/TpmBigNum/include
+  Library/TpmLib/TPM/TPMCmd/Platform/include
+  Library/TpmLib/TPM/TPMCmd/TpmConfiguration
 
 [LibraryClasses]
+  ##  @libraryclass  Provides some API for implement software Based vTPM.
+  #
+  TpmLib|Include/Library/TpmLib.h
+
   ##  @libraryclass  Provides platform specific APIs used by TpmLib.
   #
   PlatformTpmLib|Include/Library/PlatformTpmLib.h
