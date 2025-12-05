@@ -11,7 +11,16 @@
     "LicenseCheck": {
         "IgnoreFiles": [
             # These files and directories are copied from TCG TPM v2.0 reference libraries
-            "Library/TpmLib/Include/TpmConfiguration/TpmBuildSwitches.h"
+            "Library/TpmLib/Include/TpmConfiguration/TpmBuildSwitches.h",
+            "Library/TpmLib/Include/TpmConfiguration/TpmProfile_Common.h",
+            "Library/TpmLib/Include/TpmConfiguration/TpmProfile_Misc.h",
+            "Library/TpmLib/Include/Ossl/BnToOsslMath.h",
+            "Library/TpmLib/Include/Ossl/TpmToOsslHash.h",
+            "Library/TpmLib/Include/Ossl/TpmToOsslSym.h",
+            "Library/TpmLib/Ossl/BnToOsslMath.c",
+            "Library/TpmLib/Ossl/TpmToOsslSupport.c",
+            "Library/TpmLib/TPM",
+            "Private/Include"
         ]
     },
     "EccCheck": {
@@ -25,7 +34,17 @@
         "IgnoreFiles": [
             # These files and directories are related for TCG TPM v2.0 reference libraries
             "Library/TpmLib/Include/TpmConfiguration/TpmBuildSwitches.h",
-            "Library/TpmLib/TpmLibCompileOptions.h"
+            "Library/TpmLib/Include/TpmConfiguration/TpmProfile_Common.h",
+            "Library/TpmLib/Include/TpmConfiguration/TpmProfile_Misc.h",
+            "Library/TpmLib/Include/Ossl/BnToOsslMath.h",
+            "Library/TpmLib/Include/Ossl/TpmToOsslHash.h",
+            "Library/TpmLib/Include/Ossl/TpmToOsslSym.h",
+            "Library/TpmLib/Ossl/BnToOsslMath.c",
+            "Library/TpmLib/Ossl/TpmToOsslSupport.c",
+            "Library/TpmLib/TpmLibCompileOptions.h",
+            "Library/TpmLib/TpmPlatformFunctions.c",
+            "Library/TpmLib/TPM",
+            "Private/Include"
         ]
     },
     "CompilerPlugin": {
@@ -39,9 +58,10 @@
     },
     "DependencyCheck": {
         "AcceptableDependencies": [
+            "CryptoPkg/CryptoPkg.dec",
             "MdePkg/MdePkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
-            "CryptoPkg/CryptoPkg.dec",
+            "TcgTpmPkg/TcgTpmPkg.dec"
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[],
@@ -74,7 +94,46 @@
     # options defined in .pytool/Plugin/UncrustifyCheck
     "UncrustifyCheck": {
         "IgnoreFiles": [
-            "Library/TpmLib/Include/TpmConfiguration/TpmBuildSwitches.h"
+            # These files and directories are related for TCG TPM v2.0 reference libraries
+            "Library/TpmLib/Include/TpmConfiguration/TpmBuildSwitches.h",
+            "Library/TpmLib/Include/TpmConfiguration/TpmProfile_Common.h",
+            "Library/TpmLib/Include/TpmConfiguration/TpmProfile_Misc.h",
+            "Library/TpmLib/Include/Ossl/BnToOsslMath.h",
+            "Library/TpmLib/Include/Ossl/TpmToOsslHash.h",
+            "Library/TpmLib/Include/Ossl/TpmToOsslSym.h",
+            "Library/TpmLib/Ossl/BnToOsslMath.c",
+            "Library/TpmLib/Ossl/TpmToOsslSupport.c",
+            "Library/TpmLib/TpmLibCompileOptions.h",
+            "Library/TpmLib/TpmPlatformFunctions.c",
+            "Private/Include/Standard/CrtLibSupport.h",
+            "Private/Include/Standard/arpa/inet.h",
+            "Private/Include/Standard/arpa/nameser.h",
+            "Private/Include/Standard/assert.h",
+            "Private/Include/Standard/ctype.h",
+            "Private/Include/Standard/errno.h",
+            "Private/Include/Standard/fcntl.h",
+            "Private/Include/Standard/inttypes.h",
+            "Private/Include/Standard/limits.h",
+            "Private/Include/Standard/memory.h",
+            "Private/Include/Standard/netinet/in.h",
+            "Private/Include/Standard/stdarg.h",
+            "Private/Include/Standard/stddef.h",
+            "Private/Include/Standard/stdint.h",
+            "Private/Include/Standard/stdio.h",
+            "Private/Include/Standard/stdlib.h",
+            "Private/Include/Standard/string.h",
+            "Private/Include/Standard/strings.h",
+            "Private/Include/Standard/stubs-32.h",
+            "Private/Include/Standard/sys/param.h",
+            "Private/Include/Standard/sys/shm.h",
+            "Private/Include/Standard/sys/socket.h",
+            "Private/Include/Standard/sys/syscall.h",
+            "Private/Include/Standard/sys/time.h",
+            "Private/Include/Standard/sys/types.h",
+            "Private/Include/Standard/sys/utsname.h",
+            "Private/Include/Standard/syslog.h",
+            "Private/Include/Standard/time.h",
+            "Private/Include/Standard/unistd.h"
         ]
     }
 }
