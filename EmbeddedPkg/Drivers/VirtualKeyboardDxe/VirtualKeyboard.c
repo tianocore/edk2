@@ -725,13 +725,9 @@ VirtualKeyboardReadKeyStroke (
   // Convert the Ctrl+[a-z] to Ctrl+[1-26]
   //
   if ((KeyData.KeyState.KeyShiftState & (EFI_LEFT_CONTROL_PRESSED | EFI_RIGHT_CONTROL_PRESSED)) != 0) {
-    if ((KeyData.Key.UnicodeChar >= L'a') &&
-        (KeyData.Key.UnicodeChar <= L'z'))
-    {
+    if (CharIsLowerAlpha (KeyData.Key.UnicodeChar)) {
       KeyData.Key.UnicodeChar = (CHAR16)(KeyData.Key.UnicodeChar - L'a' + 1);
-    } else if ((KeyData.Key.UnicodeChar >= L'A') &&
-               (KeyData.Key.UnicodeChar <= L'Z'))
-    {
+    } else if (CharIsUpperAlpha (KeyData.Key.UnicodeChar)) {
       KeyData.Key.UnicodeChar = (CHAR16)(KeyData.Key.UnicodeChar - L'A' + 1);
     }
   }

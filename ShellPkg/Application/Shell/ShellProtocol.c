@@ -3473,30 +3473,6 @@ InternalEfiShellGetListAlias (
 }
 
 /**
-  Convert a null-terminated unicode string, in-place, to all lowercase.
-  Then return it.
-
-  @param  Str    The null-terminated string to be converted to all lowercase.
-
-  @return        The null-terminated string converted into all lowercase.
-**/
-CHAR16 *
-ToLower (
-  CHAR16  *Str
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Str[Index] != L'\0'; Index++) {
-    if ((Str[Index] >= L'A') && (Str[Index] <= L'Z')) {
-      Str[Index] -= (CHAR16)(L'A' - L'a');
-    }
-  }
-
-  return Str;
-}
-
-/**
   This function returns the command associated with a alias or a list of all
   alias'.
 
@@ -3535,7 +3511,7 @@ EfiShellGetAlias (
       return NULL;
     }
 
-    ToLower (AliasLower);
+    StrnCharToLower (AliasLower, StrLen (AliasLower));
 
     if (Volatile == NULL) {
       GetVariable2 (AliasLower, &gShellAliasGuid, (VOID **)&AliasVal, NULL);
@@ -3625,7 +3601,7 @@ InternalSetAlias (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  ToLower (AliasLower);
+  StrnCharToLower (AliasLower, StrLen (AliasLower));
 
   if (DeleteAlias) {
     Status = gRT->SetVariable (AliasLower, &gShellAliasGuid, 0, 0, NULL);
