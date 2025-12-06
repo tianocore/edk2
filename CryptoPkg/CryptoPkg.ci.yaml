@@ -55,7 +55,12 @@
             "Library/MbedTlsLib/EcSm2Null.c",
             "Library/MbedTlsLib/CrtWrapper.c",
             "Library/MbedTlsLib/Include/mbedtls/mbedtls_config.h",
-            "Library/BaseCryptLibMbedTls/SysCall"
+            "Library/BaseCryptLibMbedTls/SysCall",
+            # Tcg TPM2 reference library
+            "Library/TpmLib/TPM",
+            "Library/TpmLib/Include",
+            "Library/TpmLib/TpmLibCompileOptions.h",
+            "Library/TpmLib/TpmPlatformFunctions.c"
         ]
     },
     "CompilerPlugin": {
