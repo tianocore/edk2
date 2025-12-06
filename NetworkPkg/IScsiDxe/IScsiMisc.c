@@ -822,7 +822,8 @@ IScsiCreateAttempts (
   UINT8                        Index;
   EFI_STATUS                   Status;
 
-  for (Index = 1; Index <= AttemptNum; Index++) {
+  for (Index = 1; (UINTN)Index <= AttemptNum; Index++) {
+    // MU_CHANGE - CodeQL Change - comparison-with-wider-type
     //
     // Get the initialized attempt order. This is used to essure creating attempts by order.
     //
@@ -2219,7 +2220,13 @@ IScsiGetConfigData (
     //
 
     NicInfo = IScsiGetNicInfoByIndex (mPrivate->CurrentNic);
-    ASSERT (NicInfo != NULL);
+    // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+    if (NicInfo == NULL) {
+      ASSERT (NicInfo != NULL);
+      break;
+    }
+
+    // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
     IScsiMacAddrToStr (&NicInfo->PermanentAddress, NicInfo->HwAddressSize, NicInfo->VlanId, MacString);
     UnicodeSPrint (
       mPrivate->PortString,

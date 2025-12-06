@@ -621,7 +621,13 @@ MnpAnalysePacket (
   // Get the packet buffer.
   //
   BufPtr = NetbufGetByte (Nbuf, 0, NULL);
-  ASSERT (BufPtr != NULL);
+  // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+  if (BufPtr == NULL) {
+    ASSERT (BufPtr != NULL);
+    return;
+  }
+
+  // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
 
   //
   // Set the initial values.
@@ -873,7 +879,13 @@ MnpReceivePacket (
   Nbuf   = MnpDeviceData->RxNbufCache;
   BufLen = Nbuf->TotalSize;
   BufPtr = NetbufGetByte (Nbuf, 0, NULL);
-  ASSERT (BufPtr != NULL);
+  // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+  if (BufPtr == NULL) {
+    ASSERT (BufPtr != NULL);
+    return EFI_DEVICE_ERROR;
+  }
+
+  // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
 
   //
   // Receive packet through Snp.
