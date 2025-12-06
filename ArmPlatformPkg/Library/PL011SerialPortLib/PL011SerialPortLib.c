@@ -57,6 +57,16 @@ SerialPortInitialize (
     return Status;
   }
 
+  if (PcdGetBool (PcdSerialUseHardwareFlowControl)) {
+    Status = PL011UartSetControl (
+               (UINTN)PcdGet64 (PcdSerialRegisterBase),
+               EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
   while (SerialPortPoll ()) {
     SerialPortRead (&Scratch, sizeof (Scratch));
   }
