@@ -284,7 +284,7 @@ UpdateRegionMappingRecursive (
   BlockMask  = MAX_UINT64 >> BlockShift;
 
   DEBUG ((
-    DEBUG_VERBOSE,
+    DEBUG_PAGING,
     "%a(%d): %llx - %llx set %lx clr %lx\n",
     __func__,
     Level,
