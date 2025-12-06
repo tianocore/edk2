@@ -1964,18 +1964,21 @@ UfsDeviceDetection (
     LinkStartupCommand.Arg3   = 0;
     Status                    = UfsExecUicCommands (Private, &LinkStartupCommand);
     if (EFI_ERROR (Status)) {
-      return EFI_DEVICE_ERROR;
+      DEBUG ((DEBUG_ERROR, "[%a] UfsExecUicCommands failed with Status=%r\n", __func__, Status));
+      continue;
     }
 
     Status = UfsMmioRead32 (Private, UFS_HC_STATUS_OFFSET, &Data);
     if (EFI_ERROR (Status)) {
-      return EFI_DEVICE_ERROR;
+      DEBUG ((DEBUG_ERROR, "[%a] UfsMmioRead32 failed with Status=%r\n", __func__, Status));
+      continue;
     }
 
     if ((Data & UFS_HC_HCS_DP) == 0) {
       Status = UfsWaitMemSet (Private, UFS_HC_IS_OFFSET, UFS_HC_IS_ULSS, UFS_HC_IS_ULSS, UFS_TIMEOUT);
       if (EFI_ERROR (Status)) {
-        return EFI_DEVICE_ERROR;
+        DEBUG ((DEBUG_ERROR, "[%a] UfsWaitMemSet failed with Status=%r\n", __func__, Status));
+        continue;
       }
     } else {
       return EFI_SUCCESS;
