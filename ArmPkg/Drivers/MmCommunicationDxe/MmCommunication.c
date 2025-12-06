@@ -547,13 +547,7 @@ InitializeFfaCommunication (
   )
 {
   EFI_STATUS              Status;
-  VOID                    *TxBuffer;
-  UINT64                  TxBufferSize;
-  VOID                    *RxBuffer;
-  UINT64                  RxBufferSize;
-  EFI_FFA_PART_INFO_DESC  *StmmPartInfo;
-  UINT32                  Count;
-  UINT32                  Size;
+  EFI_FFA_PART_INFO_DESC  StmmPartInfo;
 
   Status = ArmFfaLibPartitionIdGet (&mPartId);
   if (EFI_ERROR (Status)) {
@@ -565,62 +559,26 @@ InitializeFfaCommunication (
     return Status;
   }
 
-  Status = ArmFfaLibGetRxTxBuffers (
-             &TxBuffer,
-             &TxBufferSize,
-             &RxBuffer,
-             &RxBufferSize
-             );
+  Status = ArmFfaLibGetPartitionInfo (&gEfiMmCommunication2ProtocolGuid, &StmmPartInfo);
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "Failed to get Rx/Tx Buffer. Status: %r\n",
-      Status
-      ));
-    return Status;
-  }
-
-  Status = ArmFfaLibPartitionInfoGet (
-             &gEfiMmCommunication2ProtocolGuid,
-             FFA_PART_INFO_FLAG_TYPE_DESC,
-             &Count,
-             &Size
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "Failed to get Stmm(%g) partition Info. Status: %r\n",
+      "Failed to get partition Info(%g). Status: %r\n",
       &gEfiMmCommunication2ProtocolGuid,
       Status
       ));
     return Status;
   }
 
-  if ((Count != 1) || (Size < sizeof (EFI_FFA_PART_INFO_DESC))) {
-    Status = EFI_INVALID_PARAMETER;
-    DEBUG ((
-      DEBUG_ERROR,
-      "Invalid partition Info(%g). Count: %d, Size: %d\n",
-      &gEfiMmCommunication2ProtocolGuid,
-      Count,
-      Size
-      ));
-    goto ErrorHandler;
-  }
-
-  StmmPartInfo = (EFI_FFA_PART_INFO_DESC *)RxBuffer;
-
-  if ((StmmPartInfo->PartitionProps & FFA_PART_PROP_RECV_DIRECT_REQ) == 0x00) {
+  if ((StmmPartInfo.PartitionProps & FFA_PART_PROP_RECV_DIRECT_REQ) == 0x00) {
     Status = EFI_UNSUPPORTED;
     DEBUG ((DEBUG_ERROR, "StandaloneMm doesn't receive DIRECT_MSG_REQ...\n"));
-    goto ErrorHandler;
+    return Status;
   }
 
-  mStMmPartId = StmmPartInfo->PartitionId;
+  mStMmPartId = StmmPartInfo.PartitionId;
 
-ErrorHandler:
-  ArmFfaLibRxRelease (mPartId);
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**
