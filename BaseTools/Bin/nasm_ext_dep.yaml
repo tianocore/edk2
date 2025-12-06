@@ -1,8 +1,16 @@
 ## @file
-# Download nasm x86 assembler executable tool from a nuget.org package
-# - package contains different binaries based on host
-# Put on the tool on the path
+# Download nasm from a NuGet feed.
 #
+# Note:
+# - The NuGet package contains different binaries for different host OSes.
+#
+# The versioning scheme for this nasm package is as follows:
+#
+# - Major version of the NuGet package encodes nasm's major and minor version (nasm_major * 10000 + nasm_minor).
+# - Minor version represents the nasm revision number.
+# - Revision tracks the NuGet package’s own revision (number of pushes).
+#
+# For example, nasm version 2.16.1 becomes 20016.1.x, where x increments with each push.
 #
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -12,7 +20,7 @@
   "scope": "edk2-build",
   "type": "nuget",
   "name": "mu_nasm",
-  "source": "https://api.nuget.org/v3/index.json",
-  "version": "2.15.5",
+  "source": "https://pkgs.dev.azure.com/projectmu/mu/_packaging/Basetools-Binary/nuget/v3/index.json",
+  "version": "20016.1.1",
   "flags": ["set_path", "host_specific"]
 }
