@@ -67,8 +67,8 @@ typedef struct {
   UINT32                              PCRBanksDesired;
 } TCG2_CONFIG_PRIVATE_DATA;
 
-extern TCG2_CONFIG_PRIVATE_DATA  mTcg2ConfigPrivateDateTemplate;
-extern TCG2_CONFIG_PRIVATE_DATA  *mTcg2ConfigPrivateDate;
+extern TCG2_CONFIG_PRIVATE_DATA  mTcg2ConfigPrivateDataTemplate;
+extern TCG2_CONFIG_PRIVATE_DATA  *mTcg2ConfigPrivateData;
 #define TCG2_CONFIG_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('T', 'r', 'E', 'D')
 #define TCG2_CONFIG_PRIVATE_DATA_FROM_THIS(a)  CR (a, TCG2_CONFIG_PRIVATE_DATA, ConfigAccess, TCG2_CONFIG_PRIVATE_DATA_SIGNATURE)
 
