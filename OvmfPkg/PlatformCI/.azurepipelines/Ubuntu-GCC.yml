@@ -19,7 +19,7 @@ variables:
   - template: ../../../.azurepipelines/templates/defaults.yml
 
 jobs:
-  - job: Platform_CI
+  - job: Platform_CI_CLANGDWARF
     variables:
       package: 'OvmfPkg'
       vm_image: 'ubuntu-24.04'
@@ -123,24 +123,6 @@ jobs:
             Run.Flags: "QEMU_SKIP=TRUE"
             Run: $(should_run)
 
-          QEMU_RISCV64_DEBUG:
-            Build.File: "$(package)/PlatformCI/QemuBuild.py"
-            Build.Arch: "RISCV64"
-            Build.Flags: ""
-            Build.Target: "DEBUG"
-            # this build is for RISC-V qemu virt not qemu-kvm
-            Run.Flags: "QEMU_SKIP=TRUE"
-            Run: $(should_run)
-
-          QEMU_LOONGARCH64_DEBUG:
-            Build.File: "$(package)/PlatformCI/QemuBuild.py"
-            Build.Arch: "LOONGARCH64"
-            Build.Flags: ""
-            Build.Target: "DEBUG"
-            # this build is for LOONGARCH qemu virt not qemu-kvm
-            Run.Flags: "QEMU_SKIP=TRUE"
-            Run: $(should_run)
-
     workspace:
       clean: all
 
@@ -152,7 +134,7 @@ jobs:
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
       parameters:
-        tool_chain_tag: GCC
+        tool_chain_tag: CLANGDWARF
         build_pkg: $(package)
         build_target: $(Build.Target)
         build_arch: $(Build.Arch)

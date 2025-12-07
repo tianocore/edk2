@@ -19,7 +19,7 @@ variables:
   - template: ../../../.azurepipelines/templates/defaults.yml
 
 jobs:
-  - job: Platform_CI
+  - job: Platform_CI_CLANGDWARF
     variables:
       package: 'ArmVirtPkg'
       vm_image: 'ubuntu-24.04'
@@ -110,7 +110,7 @@ jobs:
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
       parameters:
-        tool_chain_tag: GCC
+        tool_chain_tag: CLANGDWARF
         build_pkg: $(package)
         build_target: $(Build.Target)
         build_arch: $(Build.Arch)
