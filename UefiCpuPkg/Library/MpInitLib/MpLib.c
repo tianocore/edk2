@@ -1038,7 +1038,6 @@ FillExchangeInfoData (
   //
   Cr4.UintN                        = AsmReadCr4 ();
   ExchangeInfo->Enable5LevelPaging = (BOOLEAN)(Cr4.Bits.LA57 == 1);
-  DEBUG ((DEBUG_INFO, "%a: 5-Level Paging = %d\n", gEfiCallerBaseName, ExchangeInfo->Enable5LevelPaging));
 
   ExchangeInfo->SevEsIsEnabled        = CpuMpData->SevEsIsEnabled;
   ExchangeInfo->SevSnpIsEnabled       = CpuMpData->SevSnpIsEnabled;
