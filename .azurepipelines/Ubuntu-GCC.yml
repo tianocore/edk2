@@ -24,3 +24,6 @@ jobs:
     container: ${{ variables.default_linux_image }}
     arch_list: "IA32,X64,AARCH64,RISCV64,LOONGARCH64"
     usePythonVersion: ''  # use Python from the container image
+    extra_install_step:
+    - bash: dnf remove nasm
+      displayName: REMOVE NASM - TEST
