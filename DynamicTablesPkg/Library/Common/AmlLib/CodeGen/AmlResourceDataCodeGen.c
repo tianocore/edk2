@@ -1724,12 +1724,15 @@ AmlCodeGenRdIrq (
     return EFI_INVALID_PARAMETER;
   }
 
+ #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
   if ((IsEdgeTriggered && !IsActiveLow) ||
       (!IsEdgeTriggered && IsActiveLow))
   {
     ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
     return EFI_INVALID_PARAMETER;
   }
+
+ #endif
 
   if ((IrqList == NULL) || (IrqCount == 0) || (IrqCount > 16)) {
     ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
