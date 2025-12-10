@@ -89,6 +89,31 @@ VirtioSerialIoReset (
 }
 
 STATIC
+VOID
+VirtioSerialIoWriteFlush (
+  IN EFI_SERIAL_IO_PROTOCOL  *This
+  )
+{
+  VIRTIO_SERIAL_IO_PROTOCOL  *SerialIo = (VIRTIO_SERIAL_IO_PROTOCOL *)This;
+  EFI_TPL                    OldTpl;
+
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+  if (SerialIo->WriteOffset) {
+    DEBUG ((DEBUG_VERBOSE, "%a:%d: WriteFlush %d\n", __func__, __LINE__, SerialIo->WriteOffset));
+    VirtioSerialRingSendBuffer (
+      SerialIo->Dev,
+      PortTx (SerialIo->PortId),
+      SerialIo->WriteBuffer,
+      SerialIo->WriteOffset,
+      TRUE
+      );
+    SerialIo->WriteOffset = 0;
+  }
+
+  gBS->RestoreTPL (OldTpl);
+}
+
+STATIC
 EFI_STATUS
 EFIAPI
 VirtioSerialIoSetAttributes (
@@ -121,7 +146,6 @@ VirtioSerialIoSetControl (
   IN UINT32                  Control
   )
 {
-  DEBUG ((DEBUG_INFO, "%a:%d: Control 0x%x\n", __func__, __LINE__, Control));
   return EFI_SUCCESS;
 }
 
@@ -133,7 +157,29 @@ VirtioSerialIoGetControl (
   OUT UINT32                 *Control
   )
 {
-  DEBUG ((DEBUG_VERBOSE, "%a:%d: Control 0x%x\n", __func__, __LINE__, *Control));
+  VIRTIO_SERIAL_IO_PROTOCOL  *SerialIo = (VIRTIO_SERIAL_IO_PROTOCOL *)This;
+  BOOLEAN                    HaveData  = FALSE;
+
+  VirtioSerialIoWriteFlush (This);
+
+  *Control = 0;
+
+  if (SerialIo->ReadOffset < SerialIo->ReadSize) {
+    // have unread data in current buffer
+    HaveData = TRUE;
+  } else if (VirtioSerialRingHasBuffer (
+               SerialIo->Dev,
+               PortRx (SerialIo->PortId)
+               ))
+  {
+    // have unread buffers in rx ring
+    HaveData = TRUE;
+  }
+
+  if (!HaveData) {
+    *Control |=  EFI_SERIAL_INPUT_BUFFER_EMPTY;
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -195,26 +241,12 @@ VirtioSerialIoRead (
   VIRTIO_SERIAL_PORT         *Port     = SerialIo->Dev->Ports + SerialIo->PortId;
   BOOLEAN                    HasData;
   UINT32                     Length;
-  EFI_TPL                    OldTpl;
 
   if (!Port->DeviceOpen) {
     goto NoData;
   }
 
-  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
-  if (SerialIo->WriteOffset) {
-    DEBUG ((DEBUG_VERBOSE, "%a:%d: WriteFlush %d\n", __func__, __LINE__, SerialIo->WriteOffset));
-    VirtioSerialRingSendBuffer (
-      SerialIo->Dev,
-      PortTx (SerialIo->PortId),
-      SerialIo->WriteBuffer,
-      SerialIo->WriteOffset,
-      TRUE
-      );
-    SerialIo->WriteOffset = 0;
-  }
-
-  gBS->RestoreTPL (OldTpl);
+  VirtioSerialIoWriteFlush (This);
 
   if (SerialIo->ReadOffset == SerialIo->ReadSize) {
     HasData = VirtioSerialRingGetBuffer (
