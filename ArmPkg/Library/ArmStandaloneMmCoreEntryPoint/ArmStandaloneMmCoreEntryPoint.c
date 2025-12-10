@@ -453,6 +453,30 @@ GetServiceType (
 }
 
 /**
+  Check command buffer is belong to secure shared buffer.
+
+  @param  [in] CommBufferAddr   Address of the common buffer.
+
+  @retval   TRUE                    CommBufferAddr is in secure shared buffer
+  @retval   FALSE                   Other
+
+**/
+STATIC
+BOOLEAN
+IsSecureMmCommBufferAddr (
+  IN UINTN  CommBufferAddr
+  )
+{
+  if ((CommBufferAddr >= mSCommBuffer->PhysicalStart) &&
+      (CommBufferAddr < (mSCommBuffer->PhysicalStart + mSCommBuffer->PhysicalSize)))
+  {
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
   Perform bounds check for the Ns and Secure Communication buffer.
 
   NOTE: We do not need to validate the Misc Communication buffer as
@@ -485,9 +509,7 @@ ValidateMmCommBufferAddr (
       (CommBufferAddr < NsCommBufferEnd))
   {
     CommBufferEnd = NsCommBufferEnd;
-  } else if ((CommBufferAddr >= mSCommBuffer->PhysicalStart) &&
-             (CommBufferAddr < SCommBufferEnd))
-  {
+  } else if (IsSecureMmCommBufferAddr (CommBufferAddr)) {
     CommBufferEnd = SCommBufferEnd;
   } else {
     return EFI_ACCESS_DENIED;
