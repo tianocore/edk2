@@ -1,0 +1,35 @@
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DataplaneProtectDxe
+  FILE_GUID                      = 50926019-F35C-406A-8756-340D8C967285
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DataplaneProtectEntryPoint
+
+[Sources]
+  DataplaneProtectDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  DebugLib
+  PciLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  DevicePathLib
+
+[Protocols]
+  gEfiPciPlatformProtocolGuid    ## PRODUCES
+  gEfiPciIoProtocolGuid          ## CONSUMES
+
+[Guids]
+  gEfiGlobalVariableGuid
+
+[Depex]
+  TRUE
