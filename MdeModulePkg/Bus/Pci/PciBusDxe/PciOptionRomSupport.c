@@ -642,6 +642,7 @@ RomDecode (
   Load and start the Option Rom image.
 
   @param PciDevice       Pci device instance.
+  @param NativeOnly      Whether to consider only the native image.
 
   @retval EFI_SUCCESS    Successfully loaded and started PCI Option Rom image.
   @retval EFI_NOT_FOUND  Failed to process PCI Option Rom image.
@@ -649,7 +650,8 @@ RomDecode (
 **/
 EFI_STATUS
 ProcessOpRomImage (
-  IN  PCI_IO_DEVICE  *PciDevice
+  IN  PCI_IO_DEVICE  *PciDevice,
+  IN  BOOLEAN        NativeOnly
   )
 {
   UINT8                                    Indicator;
@@ -697,6 +699,14 @@ ProcessOpRomImage (
     // Skip the image if it is not an EFI PCI Option ROM image
     //
     if (Pcir->CodeType != PCI_CODE_TYPE_EFI_IMAGE) {
+      goto NextImage;
+    }
+
+    //
+    // Skip the EFI PCI Option ROM image if it's machine type is not supported
+    // and the native image is only considered.
+    //
+    if (!EFI_IMAGE_MACHINE_TYPE_SUPPORTED (EfiRomHeader->EfiMachineType) && (NativeOnly == TRUE)) {
       goto NextImage;
     }
 

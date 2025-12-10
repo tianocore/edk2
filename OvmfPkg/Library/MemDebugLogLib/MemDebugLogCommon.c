@@ -29,12 +29,12 @@ MemDebugLogLockInit (
 }
 
 STATIC
-VOID
+BOOLEAN
 MemDebugLogLockAcquire (
   IN volatile UINT64  *MemDebugLogLock
   )
 {
-  AcquireSpinLock ((SPIN_LOCK *)MemDebugLogLock);
+  return AcquireSpinLockOrFail ((SPIN_LOCK *)MemDebugLogLock);
 }
 
 STATIC
@@ -90,7 +90,9 @@ MemDebugLogWriteBuffer (
     return EFI_INVALID_PARAMETER;
   }
 
-  MemDebugLogLockAcquire (MemDebugLogLock);
+  if (!MemDebugLogLockAcquire (MemDebugLogLock)) {
+    return EFI_NOT_READY;
+  }
 
   BufStart = (CHAR8 *)(UINTN)(MemDebugLogBufAddr + MemDebugLogHdr->HeaderSize);
   BufEnd   = (CHAR8 *)(UINTN)(MemDebugLogBufAddr + MemDebugLogHdr->HeaderSize + MemDebugLogHdr->DebugLogSize) - 1;

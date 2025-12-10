@@ -1232,7 +1232,6 @@ PlatOverMngrExtractConfig (
     Size          = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
     ConfigRequest = AllocateZeroPool (Size);
     if (ConfigRequest == NULL) {
-      ASSERT (ConfigRequest != NULL);
       FreePool (ConfigRequestHdr);
       return EFI_OUT_OF_RESOURCES;
     }

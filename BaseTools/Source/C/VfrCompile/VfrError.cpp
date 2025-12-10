@@ -35,7 +35,7 @@ static SVFR_ERROR_HANDLE VFR_ERROR_HANDLE_TABLE [] = {
   { VFR_RETURN_GET_NVVARSTORE_ERROR, ": get name value varstore error" },
   { VFR_RETURN_QVAR_REUSE, ": variable reused by more than one question" },
   { VFR_RETURN_FLAGS_UNSUPPORTED, ": flags unsupported" },
-  { VFR_RETURN_ERROR_ARRARY_NUM, ": array number error, the valid value is in (0 ~ MAX_INDEX-1) for UEFI vfr and in (1 ~ MAX_INDEX) for Framework Vfr" },
+  { VFR_RETURN_ERROR_ARRAY_NUM, ": array number error, the valid value is in (0 ~ MAX_INDEX-1) for UEFI vfr and in (1 ~ MAX_INDEX) for Framework Vfr" },
   { VFR_RETURN_DATA_STRING_ERROR, ": data field string error or not support"},
   { VFR_RETURN_DEFAULT_VALUE_REDEFINED, ": default value re-defined with different value"},
   { VFR_RETURN_CONSTANT_ONLY, ": only constant is allowed in the expression"},

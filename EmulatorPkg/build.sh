@@ -98,7 +98,7 @@ case `uname` in
         TARGET_TOOLS=GCC49
         ;;
       *)
-        TARGET_TOOLS=GCC5
+        TARGET_TOOLS=GCC
         ;;
     esac
     ;;

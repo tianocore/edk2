@@ -86,8 +86,10 @@ per package configuration which comes from this file.
 
 The EDKII Tools environment (and by extension the ci) is designed to support
 easily and consistently running locally and in a cloud ci environment.  To do
-that a few steps should be followed.  Details of EDKII Tools can be found in the
-[docs folder here](https://github.com/tianocore/edk2-pytool-extensions/tree/master/docs)
+that a few steps should be followed. These steps are detailed on the
+[How to Build With Stuart](https://github.com/tianocore/tianocore.github.io/wiki/How-to-Build-With-Stuart)
+page. Details of EDKII Tools can be found in the
+[docs folder here](https://github.com/tianocore/edk2-pytool-extensions/tree/master/docs).
 
 ### Running CI
 

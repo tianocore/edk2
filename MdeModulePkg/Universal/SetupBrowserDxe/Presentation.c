@@ -1642,7 +1642,10 @@ ProcessUserInput (
   if (UserInput->Action != 0) {
     Status                       = ProcessAction (UserInput->Action, UserInput->DefaultId);
     gCurrentSelection->Statement = NULL;
-  } else if (Statement != NULL) {
+  } else if (Statement == NULL) {
+    ASSERT (Statement != NULL);
+    return EFI_NOT_FOUND;
+  } else {
     gCurrentSelection->Statement = Statement;
     switch (Statement->Operand) {
       case EFI_IFR_REF_OP:

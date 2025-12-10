@@ -742,7 +742,7 @@ CoreLoadPeImage (
   if (!Image->ImageContext.IsTeImage) {
     Image->ImageContext.ImageAddress =
       (Image->ImageContext.ImageAddress + Image->ImageContext.SectionAlignment - 1) &
-      ~((UINTN)Image->ImageContext.SectionAlignment - 1);
+      ~((EFI_PHYSICAL_ADDRESS)Image->ImageContext.SectionAlignment - 1);
   }
 
   //

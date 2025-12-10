@@ -853,7 +853,7 @@ CFormPkg::DeclarePendingQuestion (
       //
       // Get Question Info, framework vfr VarName == StructName
       //
-      ReturnCode = lCVfrVarDataTypeDB.ExtractFieldNameAndArrary (VarStr, FName, ArrayIdx);
+      ReturnCode = lCVfrVarDataTypeDB.ExtractFieldNameAndArrayIdx (VarStr, FName, ArrayIdx);
       if (ReturnCode != VFR_RETURN_SUCCESS) {
         gCVfrErrorHandle.PrintMsg (pNode->mLineNo, pNode->mKey, "Error", "Var string is not the valid C variable");
         return ReturnCode;

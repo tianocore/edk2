@@ -15,18 +15,16 @@
 #include "AcpiParser.h"
 #include "AcpiTableParser.h"
 
+#define SIZE_OF_T(TYPE, Field)  ((UINTN)sizeof(((TYPE *)0)->Field))
+
 // Local variables
-STATIC UINT8                                               *mRimtNodeType;
-STATIC UINT16                                              *mRimtNodeLength;
-STATIC EFI_ACPI_6_6_RIMT_NODE_HEADER_STRUCTURE             mRimtNodeHeader;
-STATIC EFI_ACPI_6_6_RIMT_STRUCTURE                         mRimtInfo;
-STATIC CONST UINT32                                        *mNumberOfRimtNodes;
-STATIC CONST UINT32                                        *mOffsetToRimtNodeArray;
-STATIC EFI_ACPI_6_6_RIMT_ID_MAPPING_STRUCTURE              mRimtIdMappingNode;
-STATIC CONST UINT16                                        *mNumberOfIdMappings;
-STATIC UINT8                                               *mIdMappingArrayOffset;
-STATIC EFI_ACPI_6_6_RIMT_PCIE_ROOT_COMPLEX_NODE_STRUCTURE  mRimtPcieRootComplexNode;
-STATIC EFI_ACPI_6_6_RIMT_IOMMU_NODE_STRUCTURE              mRimtIommuNode;
+STATIC UINT8                        *mRimtNodeType;
+STATIC UINT16                       *mRimtNodeLength;
+STATIC EFI_ACPI_6_6_RIMT_STRUCTURE  mRimtInfo;
+STATIC CONST UINT32                 *mNumberOfRimtNodes;
+STATIC CONST UINT32                 *mOffsetToRimtNodeArray;
+STATIC CONST UINT16                 *mNumberOfIdMappings;
+STATIC UINT8                        *mIdMappingArrayOffset;
 
 /**
   This function validates RIMT Node type.
@@ -94,7 +92,7 @@ RimtNodeTypeToStr (
 **/
 #define RIMT_PARSE_NODE_HEADER                                   \
   { L"Type",                                                     \
-    sizeof(mRimtNodeHeader.Type),                                \
+    SIZE_OF_T(EFI_ACPI_6_6_RIMT_NODE_HEADER_STRUCTURE, Type),    \
     OFFSET_OF(EFI_ACPI_6_6_RIMT_NODE_HEADER_STRUCTURE, Type),    \
     NULL,                                                        \
     RimtNodeTypeToStr,                                           \
@@ -103,7 +101,7 @@ RimtNodeTypeToStr (
     NULL                                                         \
   },                                                             \
   { L"Revision",                                                 \
-    sizeof(mRimtNodeHeader.Revision),                            \
+    SIZE_OF_T(EFI_ACPI_6_6_RIMT_NODE_HEADER_STRUCTURE, Revision),\
     OFFSET_OF(EFI_ACPI_6_6_RIMT_NODE_HEADER_STRUCTURE, Revision),\
     L"%d",                                                       \
     NULL,                                                        \
@@ -112,7 +110,7 @@ RimtNodeTypeToStr (
     NULL                                                         \
   },                                                             \
   { L"Length",                                                   \
-    sizeof(mRimtNodeHeader.Length),                              \
+    SIZE_OF_T(EFI_ACPI_6_6_RIMT_NODE_HEADER_STRUCTURE, Length),  \
     OFFSET_OF(EFI_ACPI_6_6_RIMT_NODE_HEADER_STRUCTURE, Length),  \
     L"%d",                                                       \
     NULL,                                                        \
@@ -121,7 +119,7 @@ RimtNodeTypeToStr (
     NULL                                                         \
   },                                                             \
   { L"Reserved",                                                 \
-    sizeof(mRimtNodeHeader.Reserved),                            \
+    SIZE_OF_T(EFI_ACPI_6_6_RIMT_NODE_HEADER_STRUCTURE, Reserved),\
     OFFSET_OF(EFI_ACPI_6_6_RIMT_NODE_HEADER_STRUCTURE, Reserved),\
     L"0x%x",                                                     \
     NULL,                                                        \
@@ -130,7 +128,7 @@ RimtNodeTypeToStr (
     NULL                                                         \
   },                                                             \
   { L"Id",                                                       \
-    sizeof(mRimtNodeHeader.Id),                                  \
+    SIZE_OF_T(EFI_ACPI_6_6_RIMT_NODE_HEADER_STRUCTURE, Id),      \
     OFFSET_OF(EFI_ACPI_6_6_RIMT_NODE_HEADER_STRUCTURE, Id),      \
     L"%d",                                                       \
     NULL,                                                        \
@@ -183,8 +181,8 @@ STATIC CONST ACPI_PARSER  mRimtParser[] = {
   PARSE_ACPI_HEADER (&mRimtInfo.Header),
   {
     L"Number of RIMT Nodes",
-    sizeof (mRimtInfo.NumberOfRimtNodes),
-    OFFSET_OF (EFI_ACPI_6_6_RIMT_STRUCTURE,  NumberOfRimtNodes),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_STRUCTURE,NumberOfRimtNodes),
+    OFFSET_OF (EFI_ACPI_6_6_RIMT_STRUCTURE,NumberOfRimtNodes),
     L"%d",
     NULL,
     (VOID **)&mNumberOfRimtNodes,
@@ -193,8 +191,8 @@ STATIC CONST ACPI_PARSER  mRimtParser[] = {
   },
   {
     L"Offset to RIMT Node Array",
-    sizeof (mRimtInfo.OffsetToRimtNodeArray),
-    OFFSET_OF (EFI_ACPI_6_6_RIMT_STRUCTURE,  OffsetToRimtNodeArray),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_STRUCTURE,OffsetToRimtNodeArray),
+    OFFSET_OF (EFI_ACPI_6_6_RIMT_STRUCTURE,OffsetToRimtNodeArray),
     L"0x%x",
     NULL,
     (VOID **)&mOffsetToRimtNodeArray,
@@ -203,8 +201,8 @@ STATIC CONST ACPI_PARSER  mRimtParser[] = {
   },
   {
     L"Reserved",
-    sizeof (mRimtInfo.Reserved),
-    OFFSET_OF (EFI_ACPI_6_6_RIMT_STRUCTURE,  Reserved),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_STRUCTURE,Reserved),
+    OFFSET_OF (EFI_ACPI_6_6_RIMT_STRUCTURE,Reserved),
     L"0x%x",
     NULL,
     NULL,
@@ -342,7 +340,7 @@ STATIC CONST ACPI_PARSER  RimtIommuNodeParser[] = {
   RIMT_PARSE_NODE_HEADER,
   {
     L"Hardware ID",
-    sizeof (mRimtIommuNode.HardwareId),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_IOMMU_NODE_STRUCTURE,    HardwareId),
     OFFSET_OF (EFI_ACPI_6_6_RIMT_IOMMU_NODE_STRUCTURE,    HardwareId),
     NULL,
     RimtHardwareIdToStr,
@@ -352,7 +350,7 @@ STATIC CONST ACPI_PARSER  RimtIommuNodeParser[] = {
   },
   {
     L"Base Address",
-    sizeof (mRimtIommuNode.BaseAddress),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_IOMMU_NODE_STRUCTURE,    BaseAddress),
     OFFSET_OF (EFI_ACPI_6_6_RIMT_IOMMU_NODE_STRUCTURE,    BaseAddress),
     L"0x%lx",
     NULL,
@@ -362,7 +360,7 @@ STATIC CONST ACPI_PARSER  RimtIommuNodeParser[] = {
   },
   {
     L"Flags",
-    sizeof (mRimtIommuNode.Flags),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_IOMMU_NODE_STRUCTURE,    Flags),
     OFFSET_OF (EFI_ACPI_6_6_RIMT_IOMMU_NODE_STRUCTURE,    Flags),
     NULL,
     RIMT_GET_NODE_FLAGS_PARSER_FUNC (RimtIommuFlagParser),
@@ -372,7 +370,7 @@ STATIC CONST ACPI_PARSER  RimtIommuNodeParser[] = {
   },
   {
     L"Proximity Domain",
-    sizeof (mRimtIommuNode.ProximityDomain),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_IOMMU_NODE_STRUCTURE,    ProximityDomain),
     OFFSET_OF (EFI_ACPI_6_6_RIMT_IOMMU_NODE_STRUCTURE,    ProximityDomain),
     L"%d",
     NULL,
@@ -382,7 +380,7 @@ STATIC CONST ACPI_PARSER  RimtIommuNodeParser[] = {
   },
   {
     L"PCIe Segment number",
-    sizeof (mRimtIommuNode.PcieSegmentNumber),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_IOMMU_NODE_STRUCTURE,    PcieSegmentNumber),
     OFFSET_OF (EFI_ACPI_6_6_RIMT_IOMMU_NODE_STRUCTURE,    PcieSegmentNumber),
     L"0x%x",
     NULL,
@@ -392,7 +390,7 @@ STATIC CONST ACPI_PARSER  RimtIommuNodeParser[] = {
   },
   {
     L"PCIe B/D/F",
-    sizeof (mRimtIommuNode.PcieBdf),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_IOMMU_NODE_STRUCTURE,    PcieBdf),
     OFFSET_OF (EFI_ACPI_6_6_RIMT_IOMMU_NODE_STRUCTURE,    PcieBdf),
     L"%d",
     NULL,
@@ -402,7 +400,7 @@ STATIC CONST ACPI_PARSER  RimtIommuNodeParser[] = {
   },
   {
     L"Number of interrupt wires",
-    sizeof (mRimtIommuNode.NumberOfInterruptWires),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_IOMMU_NODE_STRUCTURE,    NumberOfInterruptWires),
     OFFSET_OF (EFI_ACPI_6_6_RIMT_IOMMU_NODE_STRUCTURE,    NumberOfInterruptWires),
     L"0x%x",
     NULL,
@@ -412,7 +410,7 @@ STATIC CONST ACPI_PARSER  RimtIommuNodeParser[] = {
   },
   {
     L"Interrupt wire array offset",
-    sizeof (mRimtIommuNode.InterruptWireArrayOffset),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_IOMMU_NODE_STRUCTURE,    InterruptWireArrayOffset),
     OFFSET_OF (EFI_ACPI_6_6_RIMT_IOMMU_NODE_STRUCTURE,    InterruptWireArrayOffset),
     L"0x%x",
     NULL,
@@ -491,7 +489,7 @@ An ACPI_PARSER array describing the ID Mapping Node.
 STATIC CONST ACPI_PARSER  RimtIdMappingNodeParser[] = {
   {
     L"Source ID Base",
-    sizeof (mRimtIdMappingNode.SourceIdBase),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_ID_MAPPING_STRUCTURE, SourceIdBase),
     OFFSET_OF (EFI_ACPI_6_6_RIMT_ID_MAPPING_STRUCTURE, SourceIdBase),
     L"0x%x",
     NULL,
@@ -499,7 +497,7 @@ STATIC CONST ACPI_PARSER  RimtIdMappingNodeParser[] = {
   },
   {
     L"Number of IDs",
-    sizeof (mRimtIdMappingNode.NumberOfIDs),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_ID_MAPPING_STRUCTURE, NumberOfIDs),
     OFFSET_OF (EFI_ACPI_6_6_RIMT_ID_MAPPING_STRUCTURE, NumberOfIDs),
     L"%d",
     NULL,
@@ -507,7 +505,7 @@ STATIC CONST ACPI_PARSER  RimtIdMappingNodeParser[] = {
   },
   {
     L"Destination Device ID Base",
-    sizeof (mRimtIdMappingNode.DestinationDeviceIdBase),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_ID_MAPPING_STRUCTURE, DestinationDeviceIdBase),
     OFFSET_OF (EFI_ACPI_6_6_RIMT_ID_MAPPING_STRUCTURE, DestinationDeviceIdBase),
     L"%d",
     NULL,
@@ -515,7 +513,7 @@ STATIC CONST ACPI_PARSER  RimtIdMappingNodeParser[] = {
   },
   {
     L"Destination IOMMU Offset",
-    sizeof (mRimtIdMappingNode.DestinationIommuOffset),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_ID_MAPPING_STRUCTURE, DestinationIommuOffset),
     OFFSET_OF (EFI_ACPI_6_6_RIMT_ID_MAPPING_STRUCTURE, DestinationIommuOffset),
     L"0x%x",
     NULL,
@@ -523,7 +521,7 @@ STATIC CONST ACPI_PARSER  RimtIdMappingNodeParser[] = {
   },
   {
     L"Flags",
-    sizeof (mRimtIdMappingNode.Flags),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_ID_MAPPING_STRUCTURE, Flags),
     OFFSET_OF (EFI_ACPI_6_6_RIMT_ID_MAPPING_STRUCTURE, Flags),
     NULL,
     RIMT_GET_NODE_FLAGS_PARSER_FUNC (RimtIdMappingFlagParser),
@@ -610,7 +608,7 @@ STATIC CONST ACPI_PARSER  RimtPcieRcNodeParser[] = {
   RIMT_PARSE_NODE_HEADER,
   {
     L"Flags",
-    sizeof (mRimtPcieRootComplexNode.Flags),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_PCIE_ROOT_COMPLEX_NODE_STRUCTURE,Flags),
     OFFSET_OF (EFI_ACPI_6_6_RIMT_PCIE_ROOT_COMPLEX_NODE_STRUCTURE,Flags),
     NULL,
     RIMT_GET_NODE_FLAGS_PARSER_FUNC (RimtPcieRcFlagParser),
@@ -620,7 +618,7 @@ STATIC CONST ACPI_PARSER  RimtPcieRcNodeParser[] = {
   },
   {
     L"Reserved",
-    sizeof (mRimtPcieRootComplexNode.Reserved),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_PCIE_ROOT_COMPLEX_NODE_STRUCTURE,Reserved),
     OFFSET_OF (EFI_ACPI_6_6_RIMT_PCIE_ROOT_COMPLEX_NODE_STRUCTURE,Reserved),
     L"0x%lx",
     NULL,
@@ -630,7 +628,7 @@ STATIC CONST ACPI_PARSER  RimtPcieRcNodeParser[] = {
   },
   {
     L"PCIe Segment Number",
-    sizeof (mRimtPcieRootComplexNode.PcieSegmentNumber),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_PCIE_ROOT_COMPLEX_NODE_STRUCTURE,PcieSegmentNumber),
     OFFSET_OF (EFI_ACPI_6_6_RIMT_PCIE_ROOT_COMPLEX_NODE_STRUCTURE,PcieSegmentNumber),
     L"%d",
     NULL,
@@ -640,7 +638,7 @@ STATIC CONST ACPI_PARSER  RimtPcieRcNodeParser[] = {
   },
   {
     L"Id Mapping Array Offset",
-    sizeof (mRimtPcieRootComplexNode.IdMappingArrayOffset),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_PCIE_ROOT_COMPLEX_NODE_STRUCTURE,IdMappingArrayOffset),
     OFFSET_OF (EFI_ACPI_6_6_RIMT_PCIE_ROOT_COMPLEX_NODE_STRUCTURE,IdMappingArrayOffset),
     L"0x%x",
     NULL,
@@ -650,7 +648,7 @@ STATIC CONST ACPI_PARSER  RimtPcieRcNodeParser[] = {
   },
   {
     L"Number Of Id Mappings",
-    sizeof (mRimtPcieRootComplexNode.NumberOfIdMappings),
+    SIZE_OF_T (EFI_ACPI_6_6_RIMT_PCIE_ROOT_COMPLEX_NODE_STRUCTURE,NumberOfIdMappings),
     OFFSET_OF (EFI_ACPI_6_6_RIMT_PCIE_ROOT_COMPLEX_NODE_STRUCTURE,NumberOfIdMappings),
     L"%d",
     NULL,
