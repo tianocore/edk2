@@ -32,6 +32,30 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Coreboot.h>
 
+//
+// Minimal FMAP parsing to locate and compare the flash map before updating.
+//
+#define FMAP_SIGNATURE  "__FMAP__"
+
+#pragma pack(1)
+typedef struct {
+  CHAR8   Signature[8];
+  UINT8   VerMajor;
+  UINT8   VerMinor;
+  UINT64  Base;
+  UINT32  Size;
+  CHAR8   Name[32];
+  UINT16  AreaCount;
+} FMAP_HEADER;
+
+typedef struct {
+  UINT32  Offset;
+  UINT32  Size;
+  CHAR8   Name[32];
+  UINT16  Flags;
+} FMAP_AREA;
+#pragma pack()
+
 /**
   This function requests firmware information on the first call, caches it and
   returns on all calls afterwards.
@@ -68,6 +92,113 @@ GetFwInfo (
   }
 
   *Info = &Storage;
+  return EFI_SUCCESS;
+}
+
+/**
+  Locate an FMAP header within a memory buffer.
+
+  @param[in]  Image       Start of the buffer to scan.
+  @param[in]  ImageSize   Size of the buffer.
+  @param[out] FmapOffset  Offset of the FMAP header if found.
+  @param[out] FmapLength  Total length of the FMAP (header + areas).
+
+  @retval EFI_SUCCESS      FMAP was found and validated.
+  @retval EFI_NOT_FOUND    FMAP not present or malformed.
+**/
+STATIC
+EFI_STATUS
+LocateFmapInImage (
+  IN  CONST UINT8  *Image,
+  IN  UINTN        ImageSize,
+  OUT UINTN        *FmapOffset,
+  OUT UINTN        *FmapLength
+  )
+{
+  UINTN         Offset;
+  CONST UINTN   HeaderSize = sizeof (FMAP_HEADER);
+  CONST UINTN   AreaSize   = sizeof (FMAP_AREA);
+  CONST UINT32  MinAreas   = 1;
+
+  if ((Image == NULL) || (FmapOffset == NULL) || (FmapLength == NULL)) {
+    return EFI_NOT_FOUND;
+  }
+
+  if (ImageSize < HeaderSize) {
+    return EFI_NOT_FOUND;
+  }
+
+  for (Offset = 0; Offset + HeaderSize <= ImageSize; ++Offset) {
+    CONST FMAP_HEADER  *Hdr = (CONST FMAP_HEADER *)(Image + Offset);
+
+    if (CompareMem (Hdr->Signature, FMAP_SIGNATURE, sizeof (Hdr->Signature)) != 0) {
+      continue;
+    }
+
+    if (Hdr->AreaCount < MinAreas) {
+      continue;
+    }
+
+    //
+    // Validate that all areas fit in the buffer.
+    //
+    if (Offset + HeaderSize + (Hdr->AreaCount * AreaSize) > ImageSize) {
+      continue;
+    }
+
+    *FmapOffset = Offset;
+    *FmapLength = HeaderSize + (Hdr->AreaCount * AreaSize);
+    return EFI_SUCCESS;
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+/**
+  Read a range from flash via SmmStoreLibReadAnyBlock().
+
+  @param[in]  BlockSize   Flash block size.
+  @param[in]  FlashSize   Total flash size.
+  @param[in]  Offset      Flash offset to start reading from.
+  @param[in]  Length      Number of bytes to read.
+  @param[out] Buffer      Destination buffer. Must be at least Length bytes.
+
+  @retval EFI_SUCCESS           Read succeeded.
+  @retval EFI_INVALID_PARAMETER Offset/Length exceeds flash.
+  @retval EFI_DEVICE_ERROR      A read failed.
+**/
+STATIC
+EFI_STATUS
+ReadFlashRange (
+  IN  UINTN  BlockSize,
+  IN  UINTN  FlashSize,
+  IN  UINTN  Offset,
+  IN  UINTN  Length,
+  OUT UINT8  *Buffer
+  )
+{
+  EFI_STATUS  Status;
+
+  if ((Offset + Length) > FlashSize) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  while (Length > 0) {
+    UINTN  BlockOffset = Offset % BlockSize;
+    UINTN  Lba         = Offset / BlockSize;
+    UINTN  Chunk       = MIN (Length, BlockSize - BlockOffset);
+    UINTN  ReadSize    = Chunk;
+
+    Status = SmmStoreLibReadAnyBlock (Lba, BlockOffset, &ReadSize, Buffer);
+    if (EFI_ERROR (Status) || (ReadSize != Chunk)) {
+      return EFI_DEVICE_ERROR;
+    }
+
+    Offset  += Chunk;
+    Buffer  += Chunk;
+    Length  -= Chunk;
+  }
+
   return EFI_SUCCESS;
 }
 
