@@ -72,6 +72,7 @@ AuthenticodeVerify (
   UINT8        Asn1Byte;
   UINTN        ContentSize;
   CONST UINT8  *SpcIndirectDataOid;
+  UINTN        Asn1TagSize;
 
   //
   // Check input parameters.
@@ -130,9 +131,47 @@ AuthenticodeVerify (
   SpcIndirectDataContent = (UINT8 *)(Pkcs7->d.sign->contents->d.other->value.asn1_string->data);
 
   //
+  // SpcIndirectDataContent points to an ASN.1 SEQUENCE that wraps the
+  // Authenticode SpcIndirectDataContent structure. The layout is:
+  //
+  //   0         1           2 ...
+  //  +---------+-----------+---------------------+-------------------+
+  //  | 0x30    | Length    |  SEQUENCE Content   | (optional padding |
+  //  | (SEQUENCE tag)      |  (SpcIndirectData)  |  / inner fields)  |
+  //  +---------+-----------+---------------------+-------------------+
+  //
+  // The "Length" field itself is ASN.1 encoded and can take one of the
+  // following forms:
+  //
+  //   Short form (Length < 128):
+  //     Byte 0: 0x30 (SEQUENCE tag)
+  //     Byte 1: 0x00..0x7F (ContentSize)
+  //     Header size = 2 bytes (tag + 1 length octet)
+  //
+  //   Long form, 1 length octet (128 <= Length <= 255):
+  //     Byte 0: 0x30 (SEQUENCE tag)
+  //     Byte 1: 0x81
+  //     Byte 2: 0x80..0xFF (ContentSize)
+  //     Header size = 3 bytes (tag + 2 length octets)
+  //
+  //   Long form, 2 length octets (Length > 255):
+  //     Byte 0: 0x30 (SEQUENCE tag)
+  //     Byte 1: 0x82
+  //     Byte 2: high byte of ContentSize
+  //     Byte 3: low byte of ContentSize
+  //     Header size = 4 bytes (tag + 3 length octets)
+  //
   // Retrieve the SEQUENCE data size from ASN.1-encoded SpcIndirectDataContent.
   //
-  Asn1Byte = *(SpcIndirectDataContent + 1);
+  if (Pkcs7->d.sign->contents->d.other->value.asn1_string->length < 2) {
+    //
+    // No SEQUENCE tag in SpcIndirectDataContent
+    //
+    goto _Exit;
+  }
+
+  Asn1Byte    = *(SpcIndirectDataContent + 1);
+  Asn1TagSize = 0;
 
   if ((Asn1Byte & 0x80) == 0) {
     //
@@ -142,8 +181,11 @@ AuthenticodeVerify (
     //
     // Skip the SEQUENCE Tag;
     //
-    SpcIndirectDataContent += 2;
-  } else if ((Asn1Byte & 0x81) == 0x81) {
+    Asn1TagSize             = 2;
+    SpcIndirectDataContent += Asn1TagSize;
+  } else if ((Pkcs7->d.sign->contents->d.other->value.asn1_string->length > 2) &&
+             ((Asn1Byte & 0x81) == 0x81))
+  {
     //
     // Long Form of Length Encoding (128 <= Length < 255, Single Octet)
     //
@@ -151,8 +193,11 @@ AuthenticodeVerify (
     //
     // Skip the SEQUENCE Tag;
     //
-    SpcIndirectDataContent += 3;
-  } else if ((Asn1Byte & 0x82) == 0x82) {
+    Asn1TagSize             = 3;
+    SpcIndirectDataContent += Asn1TagSize;
+  } else if ((Pkcs7->d.sign->contents->d.other->value.asn1_string->length > 3) &&
+             ((Asn1Byte & 0x82) == 0x82))
+  {
     //
     // Long Form of Length Encoding (Length > 255, Two Octet)
     //
@@ -161,16 +206,27 @@ AuthenticodeVerify (
     //
     // Skip the SEQUENCE Tag;
     //
-    SpcIndirectDataContent += 4;
+    Asn1TagSize             = 4;
+    SpcIndirectDataContent += Asn1TagSize;
   } else {
+    goto _Exit;
+  }
+
+  if ((Asn1TagSize + ContentSize) != (UINTN)Pkcs7->d.sign->contents->d.other->value.asn1_string->length) {
     goto _Exit;
   }
 
   //
   // Compare the original file hash value to the digest retrieve from SpcIndirectDataContent
   // defined in Authenticode
-  // NOTE: Need to double-check HashLength here!
   //
+  if (ContentSize < HashSize) {
+    //
+    // Parsed content is smaller than expected hash size; avoid underflow/OOB read.
+    //
+    goto _Exit;
+  }
+
   if (CompareMem (SpcIndirectDataContent + ContentSize - HashSize, ImageHash, HashSize) != 0) {
     //
     // Un-matched PE/COFF Hash Value
