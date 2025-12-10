@@ -430,8 +430,11 @@ CreateStorage (
   EFI_GUID         *StorageGuid;
   CHAR8            *StorageName;
 
-  UnicodeString = NULL;
-  StorageName   = NULL;
+  UnicodeString  = NULL;
+  StorageName    = NULL;
+  BrowserStorage = NULL;
+  Storage        = NULL;
+
   switch (StorageType) {
     case EFI_HII_VARSTORE_BUFFER:
       StorageGuid = (EFI_GUID *)(CHAR8 *)&((EFI_IFR_VARSTORE *)OpCodeData)->Guid;
@@ -2451,7 +2454,8 @@ ParseOpCodes (
         //
         // Insert to Option list of current Question
         //
-        if (ParentStatement != NULL) {
+        if (ParentStatement == NULL) {
+          ASSERT (ParentStatement != NULL);
           break;
         }
 
