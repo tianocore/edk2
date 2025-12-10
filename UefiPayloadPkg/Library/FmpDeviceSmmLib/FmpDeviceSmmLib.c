@@ -56,6 +56,23 @@ typedef struct {
 } FMAP_AREA;
 #pragma pack()
 
+//
+// Simple manifest that lists FMAP region names to be flashed. The manifest is
+// appended at the end of the capsule payload and is ignored when absent.
+//
+#define REGION_MANIFEST_SIGNATURE  SIGNATURE_32('R','M','A','P')
+#define REGION_MANIFEST_VERSION    1
+
+typedef struct {
+  UINT32  Signature;
+  UINT16  Version;
+  UINT16  EntryCount;
+} REGION_MANIFEST_TRAILER;
+
+typedef struct {
+  CHAR8  RegionName[16];
+} REGION_MANIFEST_ENTRY;
+
 /**
   This function requests firmware information on the first call, caches it and
   returns on all calls afterwards.
@@ -155,51 +172,126 @@ LocateFmapInImage (
 }
 
 /**
-  Read a range from flash via SmmStoreLibReadAnyBlock().
+  Locate the manifest at the end of the image.
 
-  @param[in]  BlockSize   Flash block size.
-  @param[in]  FlashSize   Total flash size.
-  @param[in]  Offset      Flash offset to start reading from.
-  @param[in]  Length      Number of bytes to read.
-  @param[out] Buffer      Destination buffer. Must be at least Length bytes.
+  @param[in]  Image                 Capsule payload buffer.
+  @param[in]  ImageSize             Size of the payload buffer.
+  @param[out] EntryCount            Number of manifest entries.
+  @param[out] Entries               Pointer to the first manifest entry.
+  @param[out] FirmwareImageSize     Size of the firmware image excluding the manifest.
 
-  @retval EFI_SUCCESS           Read succeeded.
-  @retval EFI_INVALID_PARAMETER Offset/Length exceeds flash.
-  @retval EFI_DEVICE_ERROR      A read failed.
+  @retval EFI_SUCCESS     Manifest found and validated.
+  @retval EFI_NOT_FOUND   Manifest not present or malformed.
 **/
 STATIC
 EFI_STATUS
-ReadFlashRange (
-  IN  UINTN  BlockSize,
-  IN  UINTN  FlashSize,
-  IN  UINTN  Offset,
-  IN  UINTN  Length,
-  OUT UINT8  *Buffer
+LocateRegionManifest (
+  IN  CONST UINT8               *Image,
+  IN  UINTN                     ImageSize,
+  OUT UINTN                     *EntryCount,
+  OUT CONST REGION_MANIFEST_ENTRY  **Entries,
+  OUT UINTN                     *FirmwareImageSize
   )
 {
-  EFI_STATUS  Status;
+  CONST REGION_MANIFEST_TRAILER  *Trailer;
+  UINTN                          EntriesSize;
+  UINTN                          ManifestStart;
 
-  if ((Offset + Length) > FlashSize) {
-    return EFI_INVALID_PARAMETER;
+  if ((Image == NULL) || (EntryCount == NULL) || (Entries == NULL) || (FirmwareImageSize == NULL)) {
+    return EFI_NOT_FOUND;
   }
 
-  while (Length > 0) {
-    UINTN  BlockOffset = Offset % BlockSize;
-    UINTN  Lba         = Offset / BlockSize;
-    UINTN  Chunk       = MIN (Length, BlockSize - BlockOffset);
-    UINTN  ReadSize    = Chunk;
-
-    Status = SmmStoreLibReadAnyBlock (Lba, BlockOffset, &ReadSize, Buffer);
-    if (EFI_ERROR (Status) || (ReadSize != Chunk)) {
-      return EFI_DEVICE_ERROR;
-    }
-
-    Offset  += Chunk;
-    Buffer  += Chunk;
-    Length  -= Chunk;
+  if (ImageSize < sizeof (REGION_MANIFEST_TRAILER)) {
+    return EFI_NOT_FOUND;
   }
+
+  Trailer = (CONST REGION_MANIFEST_TRAILER *)(Image + ImageSize - sizeof (REGION_MANIFEST_TRAILER));
+  if ((Trailer->Signature != REGION_MANIFEST_SIGNATURE) || (Trailer->Version != REGION_MANIFEST_VERSION)) {
+    return EFI_NOT_FOUND;
+  }
+
+  EntriesSize   = (UINTN)Trailer->EntryCount * sizeof (REGION_MANIFEST_ENTRY);
+  ManifestStart = ImageSize - sizeof (REGION_MANIFEST_TRAILER) - EntriesSize;
+  if (ManifestStart > ImageSize) {
+    return EFI_NOT_FOUND;
+  }
+
+  *EntryCount        = Trailer->EntryCount;
+  *Entries           = (CONST REGION_MANIFEST_ENTRY *)(Image + ManifestStart);
+  *FirmwareImageSize = ManifestStart;
 
   return EFI_SUCCESS;
+}
+
+/**
+  Find an FMAP area by name.
+
+  @param[in]  FmapHeader     Pointer to FMAP header.
+  @param[in]  Areas          Pointer to the first FMAP area.
+  @param[in]  AreaCount      Number of FMAP areas.
+  @param[in]  Name           Region name to look for (16-byte, zero padded).
+  @param[out] RegionOffset   Flash offset of the region.
+  @param[out] RegionSize     Size of the region.
+
+  @retval EFI_SUCCESS     Region found.
+  @retval EFI_NOT_FOUND   Region not found.
+**/
+STATIC
+EFI_STATUS
+FindFmapRegion (
+  IN  CONST FMAP_HEADER  *FmapHeader,
+  IN  CONST FMAP_AREA    *Areas,
+  IN  UINTN              AreaCount,
+  IN  CONST CHAR8        Name[16],
+  OUT UINTN              *RegionOffset,
+  OUT UINTN              *RegionSize
+  )
+{
+  UINTN  Index;
+  UINTN  CharIndex;
+
+  for (Index = 0; Index < AreaCount; ++Index) {
+    //
+    // Manifest names are 16-byte, zero-padded strings, while FMAP uses 32-byte
+    // names. Compare the first 16 bytes, ensuring the FMAP name does not have
+    // additional non-zero characters beyond the manifest name.
+    //
+    for (CharIndex = 0; CharIndex < 16; ++CharIndex) {
+      if (Areas[Index].Name[CharIndex] != Name[CharIndex]) {
+        break;
+      }
+
+      if (Name[CharIndex] == 0) {
+        break;
+      }
+    }
+
+    if (CharIndex == 16) {
+      if (Areas[Index].Name[16] != 0) {
+        continue;
+      }
+    } else {
+      if (Areas[Index].Name[CharIndex] != 0) {
+        continue;
+      }
+
+      for (; CharIndex < 16; ++CharIndex) {
+        if (Name[CharIndex] != 0) {
+          break;
+        }
+      }
+
+      if (CharIndex != 16) {
+        continue;
+      }
+    }
+
+    *RegionOffset = (UINTN)FmapHeader->Base + Areas[Index].Offset;
+    *RegionSize   = Areas[Index].Size;
+    return EFI_SUCCESS;
+  }
+
+  return EFI_NOT_FOUND;
 }
 
 /**
@@ -705,6 +797,9 @@ FmpDeviceCheckImageWithStatus (
   EFI_STATUS  Status;
   UINTN       FwSize;
   UINTN       BlockSize;
+  UINTN       ManifestEntries;
+  UINTN       FirmwareImageSize;
+  CONST REGION_MANIFEST_ENTRY  *ManifestList;
 
   if ((Image == NULL) || (ImageUpdatable == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -719,15 +814,22 @@ FmpDeviceCheckImageWithStatus (
     return Status;
   }
 
+  FirmwareImageSize = ImageSize;
+  ManifestList      = NULL;
+  ManifestEntries   = 0;
+
   if (ImageSize != FwSize) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a(): image size (0x%x) doesn't match firmware size (0x%x)\n",
-      __func__,
-      ImageSize,
-      FwSize
-      ));
-    return EFI_ABORTED;
+    Status = LocateRegionManifest (Image, ImageSize, &ManifestEntries, &ManifestList, &FirmwareImageSize);
+    if (EFI_ERROR (Status) || (FirmwareImageSize != FwSize) || (ManifestEntries == 0)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a(): image size (0x%x) doesn't match firmware size (0x%x) and no valid manifest found\n",
+        __func__,
+        ImageSize,
+        FwSize
+        ));
+      return EFI_ABORTED;
+    }
   }
 
   Status = SmmStoreLibGetBlockSize (&BlockSize);
@@ -874,6 +976,138 @@ IncrementProgress (
     DEBUG ((DEBUG_WARN, "%a(): progress callback failed with: %r\n", __func__, Status));
     *ShouldReportProgress = FALSE;
   }
+}
+
+/**
+  Update a flash range using Image as the source.
+
+  This helper preserves bytes outside the requested range within any partially
+  covered flash block by read-modify-writing the full block.
+
+  @retval EFI_SUCCESS            The range was updated successfully.
+  @retval EFI_DEVICE_ERROR       A read/erase/write failed.
+  @retval EFI_INVALID_PARAMETER  Input parameters were invalid.
+**/
+STATIC
+EFI_STATUS
+UpdateFlashRangeFromImage (
+  IN      UINTN                                          BlockSize,
+  IN      CONST UINT8                                    *Image,
+  IN      UINTN                                          ImageSize,
+  IN      UINTN                                          RangeOffset,
+  IN      UINTN                                          RangeSize,
+  IN OUT  VOID                                           *BlockBuffer,
+  IN      EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  Progress OPTIONAL,
+  IN      UINTN                                          TotalSteps,
+  IN OUT  UINTN                                          *Step,
+  IN OUT  BOOLEAN                                        *ShouldReportProgress
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       Offset;
+  UINTN       RangeEnd;
+
+  if ((Image == NULL) || (BlockBuffer == NULL) || (Step == NULL) || (ShouldReportProgress == NULL) || (BlockSize == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (RangeSize == 0) {
+    return EFI_SUCCESS;
+  }
+
+  if ((RangeOffset + RangeSize) > ImageSize) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  RangeEnd = RangeOffset + RangeSize;
+
+  for (Offset = RangeOffset; Offset < RangeEnd; ) {
+    UINTN  Lba;
+    UINTN  BlockBase;
+    UINTN  StartInBlock;
+    UINTN  EndInBlock;
+    UINTN  SegmentLen;
+    UINTN  NumBytes;
+    UINT8  *FlashBlock;
+
+    Lba       = Offset / BlockSize;
+    BlockBase = Lba * BlockSize;
+
+    StartInBlock = Offset - BlockBase;
+    EndInBlock   = MIN (BlockSize, RangeEnd - BlockBase);
+    SegmentLen   = EndInBlock - StartInBlock;
+
+    FlashBlock = (UINT8 *)BlockBuffer;
+
+    if ((StartInBlock == 0) && (EndInBlock == BlockSize)) {
+      //
+      // Whole-block update: ignore read errors for the compare optimization.
+      //
+      NumBytes = BlockSize;
+      Status   = SmmStoreLibReadAnyBlock (Lba, 0, &NumBytes, FlashBlock);
+      if (!EFI_ERROR (Status) && (NumBytes == BlockSize)) {
+        if (CompareMem (FlashBlock, Image + BlockBase, BlockSize) == 0) {
+          IncrementProgress (Progress, TotalSteps, Step, ShouldReportProgress);
+          IncrementProgress (Progress, TotalSteps, Step, ShouldReportProgress);
+          Offset += SegmentLen;
+          continue;
+        }
+      }
+
+      Status = SmmStoreLibEraseAnyBlock (Lba);
+      if (EFI_ERROR (Status)) {
+        return EFI_DEVICE_ERROR;
+      }
+
+      IncrementProgress (Progress, TotalSteps, Step, ShouldReportProgress);
+
+      NumBytes = BlockSize;
+      Status   = SmmStoreLibWriteAnyBlock (Lba, 0, &NumBytes, (VOID *)(Image + BlockBase));
+      if (EFI_ERROR (Status) || (NumBytes != BlockSize)) {
+        return EFI_DEVICE_ERROR;
+      }
+
+      IncrementProgress (Progress, TotalSteps, Step, ShouldReportProgress);
+      Offset += SegmentLen;
+      continue;
+    }
+
+    //
+    // Partial-block update: must preserve the rest of the flash block.
+    //
+    NumBytes = BlockSize;
+    Status   = SmmStoreLibReadAnyBlock (Lba, 0, &NumBytes, FlashBlock);
+    if (EFI_ERROR (Status) || (NumBytes != BlockSize)) {
+      return EFI_DEVICE_ERROR;
+    }
+
+    if (CompareMem (FlashBlock + StartInBlock, Image + BlockBase + StartInBlock, SegmentLen) == 0) {
+      IncrementProgress (Progress, TotalSteps, Step, ShouldReportProgress);
+      IncrementProgress (Progress, TotalSteps, Step, ShouldReportProgress);
+      Offset += SegmentLen;
+      continue;
+    }
+
+    CopyMem (FlashBlock + StartInBlock, Image + BlockBase + StartInBlock, SegmentLen);
+
+    Status = SmmStoreLibEraseAnyBlock (Lba);
+    if (EFI_ERROR (Status)) {
+      return EFI_DEVICE_ERROR;
+    }
+
+    IncrementProgress (Progress, TotalSteps, Step, ShouldReportProgress);
+
+    NumBytes = BlockSize;
+    Status   = SmmStoreLibWriteAnyBlock (Lba, 0, &NumBytes, FlashBlock);
+    if (EFI_ERROR (Status) || (NumBytes != BlockSize)) {
+      return EFI_DEVICE_ERROR;
+    }
+
+    IncrementProgress (Progress, TotalSteps, Step, ShouldReportProgress);
+    Offset += SegmentLen;
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -1076,14 +1310,26 @@ FmpDeviceSetImageWithStatus (
   UINTN        BlockSize;
   UINTN        BlockCount;
   UINTN        Block;
+  UINTN        EntryIndex;
   UINTN        NumBytes;
   UINTN        TotalSteps;
   UINTN        Step;
   BOOLEAN      ShouldReportProgress;
   VOID         *ReadBuffer;
   CONST UINT8  *WriteNext;
+  UINTN        ManifestEntryCount;
+  CONST REGION_MANIFEST_ENTRY  *ManifestEntries;
+  UINTN        BaseImageSize;
+  BOOLEAN      UseManifest;
+  CONST FMAP_HEADER  *FmapHeader;
+  CONST FMAP_AREA    *FmapAreas;
+  UINTN              FmapOffset;
+  UINTN              FmapLength;
 
   *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
+  BlockCount         = 0;
+  Block              = 0;
+  ReadBuffer         = NULL;
 
   //
   // FmpDeviceCheckImageWithStatus() has already validated the image, so not
@@ -1102,60 +1348,158 @@ FmpDeviceSetImageWithStatus (
     return Status;
   }
 
+  //
+  // Discover optional manifest and FMAP. If anything looks off, fall back to
+  // legacy full-flash behavior.
+  //
+  BaseImageSize     = ImageSize;
+  ManifestEntryCount = 0;
+  ManifestEntries    = NULL;
+  UseManifest        = FALSE;
+  FmapHeader         = NULL;
+  FmapAreas          = NULL;
+  FmapOffset         = 0;
+  FmapLength         = 0;
+
+  Status = LocateRegionManifest (Image, ImageSize, &ManifestEntryCount, &ManifestEntries, &BaseImageSize);
+  if (!EFI_ERROR (Status) && (ManifestEntryCount > 0)) {
+    Status = LocateFmapInImage (Image, BaseImageSize, &FmapOffset, &FmapLength);
+    if (!EFI_ERROR (Status) && ((FmapOffset + FmapLength) <= BaseImageSize)) {
+      FmapHeader = (CONST FMAP_HEADER *)((CONST UINT8 *)Image + FmapOffset);
+      FmapAreas  = (CONST FMAP_AREA *)((CONST UINT8 *)FmapHeader + sizeof (FMAP_HEADER));
+      if (FmapHeader->AreaCount > 0) {
+        UseManifest = TRUE;
+      }
+    }
+  }
+
   ReadBuffer = AllocatePool (BlockSize);
   if (ReadBuffer == NULL) {
     DEBUG ((DEBUG_ERROR, "%a(): failed to allocate read buffer\n", __func__));
     return EFI_OUT_OF_RESOURCES;
   }
 
-  BlockCount = ImageSize / BlockSize;
-  DEBUG ((
-    DEBUG_INFO,
-    "%a(): 0x%x blocks of 0x%x bytes\n",
-    __func__,
-    BlockCount,
-    BlockSize
-    ));
+  if (UseManifest) {
+    //
+    // Validate manifest regions against the FMAP before flashing.
+    //
+    TotalSteps = 0;
+    for (EntryIndex = 0; EntryIndex < ManifestEntryCount; ++EntryIndex) {
+      UINTN  RegionOffset;
+      UINTN  RegionSize;
+
+      Status = FindFmapRegion (
+                 FmapHeader,
+                 FmapAreas,
+                 FmapHeader->AreaCount,
+                 ManifestEntries[EntryIndex].RegionName,
+                 &RegionOffset,
+                 &RegionSize
+                 );
+      if (EFI_ERROR (Status) || (RegionSize == 0) || ((RegionOffset + RegionSize) > BaseImageSize)) {
+        UseManifest = FALSE;
+        break;
+      }
+
+      TotalSteps += ((RegionOffset + RegionSize - 1) / BlockSize - (RegionOffset / BlockSize) + 1) * 2;
+    }
+  }
 
   ShouldReportProgress = TRUE;
-  TotalSteps           = BlockCount * 2; // Erase and write of each block.
   Step                 = 0;
-  WriteNext            = Image;
 
-  for (Block = 0; Block < BlockCount; Block++, WriteNext += BlockSize) {
-    //
-    // Save the flash and time by only writing a block if new contents differs
-    // from the old one.
-    //
-    // This is an optimization, so ignore read errors (if they are indicative of
-    // a serious problem, erasing or writing will fail as well).
-    //
-    NumBytes = BlockSize;
-    Status   = SmmStoreLibReadAnyBlock (Block, 0, &NumBytes, ReadBuffer);
-    if (!EFI_ERROR (Status) && (NumBytes == BlockSize)) {
-      if (CompareMem (ReadBuffer, WriteNext, BlockSize) == 0) {
-        // Erase step.
-        IncrementProgress (Progress, TotalSteps, &Step, &ShouldReportProgress);
-        // Write step.
-        IncrementProgress (Progress, TotalSteps, &Step, &ShouldReportProgress);
-        continue;
+  if (UseManifest && (TotalSteps == 0)) {
+    UseManifest = FALSE;
+  }
+
+  if (UseManifest) {
+    DEBUG ((DEBUG_INFO, "%a(): manifest-guided update over %u region(s)\n", __func__, (UINT32)ManifestEntryCount));
+
+    for (EntryIndex = 0; EntryIndex < ManifestEntryCount; ++EntryIndex) {
+      UINTN  RegionOffset;
+      UINTN  RegionSize;
+
+      Status = FindFmapRegion (
+                 FmapHeader,
+                 FmapAreas,
+                 FmapHeader->AreaCount,
+                 ManifestEntries[EntryIndex].RegionName,
+                 &RegionOffset,
+                 &RegionSize
+                 );
+      if (EFI_ERROR (Status) || ((RegionOffset + RegionSize) > BaseImageSize)) {
+        goto IoError;
+      }
+
+      Status = UpdateFlashRangeFromImage (
+                 BlockSize,
+                 (CONST UINT8 *)Image,
+                 BaseImageSize,
+                 RegionOffset,
+                 RegionSize,
+                 ReadBuffer,
+                 Progress,
+                 TotalSteps,
+                 &Step,
+                 &ShouldReportProgress
+                 );
+      if (EFI_ERROR (Status)) {
+        goto IoError;
       }
     }
+  }
 
-    Status = SmmStoreLibEraseAnyBlock (Block);
-    if (EFI_ERROR (Status)) {
-      goto IoError;
+  if (!UseManifest) {
+    //
+    // Legacy full-flash update path.
+    //
+    BlockCount = BaseImageSize / BlockSize;
+    DEBUG ((
+      DEBUG_INFO,
+      "%a(): 0x%x blocks of 0x%x bytes\n",
+      __func__,
+      BlockCount,
+      BlockSize
+      ));
+
+    TotalSteps = BlockCount * 2; // Erase and write of each block.
+    WriteNext  = Image;
+
+    for (Block = 0; Block < BlockCount; Block++, WriteNext += BlockSize) {
+      //
+      // Save the flash and time by only writing a block if new contents differs
+      // from the old one.
+      //
+      // This is an optimization, so ignore read errors (if they are indicative of
+      // a serious problem, erasing or writing will fail as well).
+      //
+      NumBytes = BlockSize;
+      Status   = SmmStoreLibReadAnyBlock (Block, 0, &NumBytes, ReadBuffer);
+      if (!EFI_ERROR (Status) && (NumBytes == BlockSize)) {
+        if (CompareMem (ReadBuffer, WriteNext, BlockSize) == 0) {
+          // Erase step.
+          IncrementProgress (Progress, TotalSteps, &Step, &ShouldReportProgress);
+          // Write step.
+          IncrementProgress (Progress, TotalSteps, &Step, &ShouldReportProgress);
+          continue;
+        }
+      }
+
+      Status = SmmStoreLibEraseAnyBlock (Block);
+      if (EFI_ERROR (Status)) {
+        goto IoError;
+      }
+
+      IncrementProgress (Progress, TotalSteps, &Step, &ShouldReportProgress);
+
+      NumBytes = BlockSize;
+      Status   = SmmStoreLibWriteAnyBlock (Block, 0, &NumBytes, (VOID *)WriteNext);
+      if (EFI_ERROR (Status) || (NumBytes != BlockSize)) {
+        goto IoError;
+      }
+
+      IncrementProgress (Progress, TotalSteps, &Step, &ShouldReportProgress);
     }
-
-    IncrementProgress (Progress, TotalSteps, &Step, &ShouldReportProgress);
-
-    NumBytes = BlockSize;
-    Status   = SmmStoreLibWriteAnyBlock (Block, 0, &NumBytes, (VOID *)WriteNext);
-    if (EFI_ERROR (Status) || (NumBytes != BlockSize)) {
-      goto IoError;
-    }
-
-    IncrementProgress (Progress, TotalSteps, &Step, &ShouldReportProgress);
   }
 
   FreePool (ReadBuffer);
