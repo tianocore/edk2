@@ -50,7 +50,10 @@ jobs:
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
         Build.Archlist: ${{ parameters.arch_list }}
       TARGET_OTHER:
-        Build.Pkgs: 'PcAtChipsetPkg,PrmPkg,ShellPkg,SourceLevelDebugPkg,StandaloneMmPkg,SignedCapsulePkg'
+        ${{ if eq(parameters.tool_chain_tag, 'CLANGDWARF') }}:
+          Build.Pkgs: 'PcAtChipsetPkg,PrmPkg,ShellPkg,SourceLevelDebugPkg,SignedCapsulePkg'
+        ${{ else }}:
+          Build.Pkgs: 'PcAtChipsetPkg,PrmPkg,ShellPkg,SourceLevelDebugPkg,StandaloneMmPkg,SignedCapsulePkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
         Build.Archlist: ${{ parameters.arch_list }}
       TARGET_FMP_FAT_TEST:
