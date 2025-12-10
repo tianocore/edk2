@@ -113,9 +113,9 @@ READ_LOCK_STATUS   = TRUE
 #  PEI Apriori file example, more PEIM module added later.
 #
 APRIORI PEI {
+  INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
   INF  MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf
   INF  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
-  INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
   }
 APRIORI DXE {
   INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf

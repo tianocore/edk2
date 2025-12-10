@@ -10,25 +10,49 @@
 #define __STATUS_CODE_HANDLER_PEI_H__
 
 #include <Ppi/ReportStatusCodeHandler.h>
-
+#include <Ppi/ExReportStatusCodeHandler.h>
 #include <Guid/MemoryStatusCodeRecord.h>
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Guid/StatusCodeDataTypeDebug.h>
+#include <Guid/StatusCodeDataTypeExDebug.h>
+#include <Guid/SerialPortConfig.h>
 
 #include <Library/DebugLib.h>
+#include <Library/DebugPrintErrorLevelLib.h>
 #include <Library/PrintLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
+#include <Library/ModuleAddrCalcLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/SemaphoreLib.h>
 
 //
 // Define the maximum message length
 //
 #define MAX_DEBUG_MESSAGE_LENGTH  0x100
+
+/**
+  Registers ExSerialStatusCodeReportWorker as callback function for ReportStatusCode() notification.
+
+
+  @param[in] PeiServices        Pointer to PEI Services Table.
+
+  @retval EFI_SUCCESS           Function was successfully registered.
+  @retval EFI_INVALID_PARAMETER The callback function was NULL.
+  @retval EFI_OUT_OF_RESOURCES  The internal buffer ran out of space. No more functions can be
+                                registered.
+  @retval EFI_ALREADY_STARTED   The function was already registered. It can't be registered again.
+
+**/
+EFI_STATUS
+EFIAPI
+RegisterExStatusCodeHandler (
+  IN CONST  EFI_PEI_SERVICES  **PeiServices
+  );
 
 /**
   Convert status code value and extended data to readable ASCII string, send string to serial I/O device.
@@ -55,7 +79,7 @@
 **/
 EFI_STATUS
 EFIAPI
-SerialStatusCodeReportWorker (
+ExSerialStatusCodeReportWorker (
   IN CONST  EFI_PEI_SERVICES     **PeiServices,
   IN EFI_STATUS_CODE_TYPE        CodeType,
   IN EFI_STATUS_CODE_VALUE       Value,
