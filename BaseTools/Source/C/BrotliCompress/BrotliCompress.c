@@ -407,8 +407,6 @@ int main(int argc, char** argv) {
   FILE *OutputHandle;
   int Quality;
   int Gap;
-  int OutputFileLength;
-  int InputFileLength;
   int Ret;
   size_t InputFileSize;
   uint8_t *Buffer;
@@ -440,87 +438,71 @@ int main(int argc, char** argv) {
     Version();
     return 0;
   }
-  while (argc > 1) {
-    if (strcmp(argv[1], "-e") == 0 || strcmp(argv[1], "--compress") == 0 ) {
+  int i = 1;
+  while (i < argc) {
+    const char* arg = argv[i];
+    if (strcmp(arg, "-e") == 0 || strcmp(arg, "--compress") == 0) {
       CompressBool = BROTLI_TRUE;
       if (DecompressBool) {
-        printf("Can't use -e/--compress with -d/--decompess on the same time\n");
+        fprintf(stderr, "Can't use -e/--compress with -d/--decompress at the same time\n");
         return 1;
       }
-      argc--;
-      argv++;
+      i++;
       continue;
     }
-    if (strcmp(argv[1], "-d") == 0 || strcmp(argv[1], "--decompress") == 0 ) {
+    if (strcmp(arg, "-d") == 0 || strcmp(arg, "--decompress") == 0) {
       DecompressBool = BROTLI_TRUE;
       if (CompressBool) {
-        printf("Can't use -e/--compress with -d/--decompess on the same time\n");
+        fprintf(stderr, "Can't use -e/--compress with -d/--decompress at the same time\n");
         return 1;
       }
-      argc--;
-      argv++;
+      i++;
       continue;
     }
-    if (strcmp(argv[1], "-o") == 0 || strncmp(argv[1], "--output", 8) == 0) {
-      if (strcmp(argv[1], "-o") == 0) {
-        OutputFileLength = strlen(argv[2]);
-        if (OutputFileLength > _MAX_PATH) {
-          printf ("The file path %s is too long\n", argv[2]);
-          return 1;
-        }
-        OutputFile = argv[2];
-        if (OutputFile == NULL) {
-          fprintf(stderr, "Input file can't be null\n");
-          return 1;
-        }
-        argc--;
-        argv++;
-      } else {
-        OutputFileLength = strlen(argv[1] - 9);
-        OutputFile = (char *)argv[1] + 9;
-      }
-      argc--;
-      argv++;
-      continue;
-    }
-    if (strcmp(argv[1], "-q") == 0 || strncmp(argv[1], "--quality", 9) == 0) {
-      if (strcmp(argv[1], "-q") == 0) {
-        Quality = strtol(argv[2], NULL, 16);
-        argc--;
-        argv++;
-      } else {
-        Quality = strtol((char *)argv[1] + 10, NULL, 16);
-      }
-      argc--;
-      argv++;
-      continue;
-    }
-    if (strcmp(argv[1], "-g") == 0 || strncmp(argv[1], "--gap", 5) == 0) {
-      if (strcmp(argv[1], "-g") == 0) {
-        Gap = strtol(argv[2], NULL, 16);
-        argc--;
-        argv++;
-      } else {
-        Gap = strtol((char *)argv[1] + 6, NULL, 16);
-      }
-      argc--;
-      argv++;
-      continue;
-    }
-    if (argc > 1) {
-      InputFileLength = strlen(argv[1]);
-      if (InputFileLength > _MAX_PATH - 1) {
-        printf ("The file path %s is too long\n", argv[2]);
+    if (strcmp(arg, "-o") == 0) {
+      if (i + 1 >= argc) {
+        fprintf(stderr, "-o requires an argument\n");
         return 1;
       }
-      InputFile = argv[1];
-      if (InputFile == NULL) {
-       printf("Input file can't be null\n");
-       return 1;
-      }
-      argc--;
-      argv++;
+      OutputFile = argv[i + 1];
+      i += 2;
+      continue;
     }
+    if (strncmp(arg, "--output=", 9) == 0) {
+      OutputFile = (char*)arg + 9;
+      i++;
+      continue;
+    }
+    if (strcmp(arg, "-q") == 0) {
+      if (i + 1 >= argc) {
+        fprintf(stderr, "-q requires an argument\n");
+        return 1;
+      }
+      Quality = strtol(argv[i + 1], NULL, 0);
+      i += 2;
+      continue;
+    }
+    if (strncmp(arg, "--quality=", 10) == 0) {
+      Quality = strtol(arg + 10, NULL, 0);
+      i++;
+      continue;
+    }
+    if (strcmp(arg, "-g") == 0) {
+      if (i + 1 >= argc) {
+        fprintf(stderr, "-g requires an argument\n");
+        return 1;
+      }
+      Gap = strtol(argv[i + 1], NULL, 0);
+      i += 2;
+      continue;
+    }
+    if (strncmp(arg, "--gap=", 6) == 0) {
+      Gap = strtol(arg + 6, NULL, 0);
+      i++;
+      continue;
+    }
+    InputFile = argv[i];
+    i++;
   }
 
   Buffer = (uint8_t*)malloc(kFileBufferSize * 2);
@@ -543,14 +525,12 @@ int main(int argc, char** argv) {
     //
     // Decompress file for get Outputfile size
     //
-    strcpy (OutputTmpFile, OutputFile);
-    if (strlen(InputFile) + strlen(".tmp") < _MAX_PATH) {
-      strcat(OutputTmpFile, ".tmp");
-    } else {
+    if (strlen(OutputFile) + strlen(".tmp") >= _MAX_PATH) {
       printf ("Output file path is too long[%s]\n", OutputFile);
       Ret = BROTLI_FALSE;
       goto Finish;
     }
+    snprintf(OutputTmpFile, _MAX_PATH, "%s.tmp", OutputFile);
     memset(Buffer, 0, kFileBufferSize*2);
     Ret = DecompressFile(OutputFile, InputBuffer, OutputTmpFile, OutputBuffer, Quality, Gap);
     if (!Ret) {
