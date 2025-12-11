@@ -43,7 +43,7 @@ steps:
     echo "##vso[task.prependpath]${HOME}/.local/bin"
     echo "new PATH=${PATH}"
   displayName: Set PATH
-  condition: eq('${{ parameters.tool_chain_tag }}', 'GCC5')
+  condition: eq('${{ parameters.tool_chain_tag }}', 'GCC')
 
 - checkout: self
   clean: true
