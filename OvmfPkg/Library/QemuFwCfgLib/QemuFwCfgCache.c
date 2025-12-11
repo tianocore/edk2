@@ -171,6 +171,5 @@ InternalQemuFwCfgCacheReadBytes (
   CopyMem (Buffer, (UINT8 *)CachedItem + sizeof (FW_CFG_CACHED_ITEM) + QemuFwCfgWorkArea->Offset, ReadSize);
   QemuFwCfgWorkArea->Offset += (UINT32)ReadSize;
 
-  DEBUG ((DEBUG_VERBOSE, "%a: found Item 0x%x in FwCfg Cache\n", __func__, QemuFwCfgWorkArea->FwCfgItem));
   return RETURN_SUCCESS;
 }
