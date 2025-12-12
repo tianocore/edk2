@@ -66,8 +66,11 @@ MemoryPeim (
   UINT64                        ResourceLength;
   EFI_PEI_HOB_POINTERS          NextHob;
   EFI_PHYSICAL_ADDRESS          FdTop;
+  EFI_PHYSICAL_ADDRESS          SystemMemoryBase;
   EFI_PHYSICAL_ADDRESS          SystemMemoryTop;
   EFI_PHYSICAL_ADDRESS          ResourceTop;
+  EFI_PHYSICAL_ADDRESS          MmBufferBase;
+  EFI_PHYSICAL_ADDRESS          MmBufferTop;
   BOOLEAN                       Found;
 
   // Get Virtual Memory Map from the Platform Library
@@ -89,14 +92,20 @@ MemoryPeim (
                         );
 
   //
+  // Use local variable to avoid multiple PcdGet64 calls
+  //
+  SystemMemoryBase = (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdSystemMemoryBase);
+  SystemMemoryTop  = SystemMemoryBase + (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdSystemMemorySize);
+
+  //
   // Check if the resource for the main system memory has been declared
   //
   Found       = FALSE;
   NextHob.Raw = GetHobList ();
   while ((NextHob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, NextHob.Raw)) != NULL) {
     if ((NextHob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) &&
-        (PcdGet64 (PcdSystemMemoryBase) >= NextHob.ResourceDescriptor->PhysicalStart) &&
-        (NextHob.ResourceDescriptor->PhysicalStart + NextHob.ResourceDescriptor->ResourceLength <= PcdGet64 (PcdSystemMemoryBase) + PcdGet64 (PcdSystemMemorySize)))
+        (SystemMemoryBase >= NextHob.ResourceDescriptor->PhysicalStart) &&
+        (NextHob.ResourceDescriptor->PhysicalStart + NextHob.ResourceDescriptor->ResourceLength <= SystemMemoryTop))
     {
       Found = TRUE;
       break;
@@ -107,25 +116,60 @@ MemoryPeim (
 
   if (!Found) {
     // Reserved the memory space occupied by the firmware volume
-    BuildResourceDescriptorHob (
-      EFI_RESOURCE_SYSTEM_MEMORY,
-      ResourceAttributes,
-      PcdGet64 (PcdSystemMemoryBase),
-      PcdGet64 (PcdSystemMemorySize)
-      );
+    MmBufferBase = PcdGet64 (PcdMmBufferBase);
+    MmBufferTop  = MmBufferBase + PcdGet64 (PcdMmBufferSize);
+
+    // But pay attention to the potential overlap with the mm communication buffer
+    if ((MmBufferBase >= SystemMemoryBase) && (MmBufferBase < SystemMemoryTop)) {
+      // The mm communication buffer is in the system memory range
+      if (MmBufferBase > SystemMemoryBase) {
+        // There is a gap between the start of system memory and the mm communication buffer
+        BuildResourceDescriptorHob (
+          EFI_RESOURCE_SYSTEM_MEMORY,
+          ResourceAttributes,
+          SystemMemoryBase,
+          MmBufferBase - SystemMemoryBase
+          );
+      }
+
+      if (MmBufferTop < SystemMemoryTop) {
+        // There is a gap between the end of mm communication buffer and the end of system memory
+        BuildResourceDescriptorHob (
+          EFI_RESOURCE_SYSTEM_MEMORY,
+          ResourceAttributes,
+          MmBufferTop,
+          SystemMemoryTop - MmBufferTop
+          );
+      }
+    } else if ((MmBufferTop > SystemMemoryBase) && (MmBufferTop <= SystemMemoryTop)) {
+      // The end of mm communication buffer is in the system memory rangeExpand commentComment on line R150ResolvedCode has comments. Press enter to view.
+      BuildResourceDescriptorHob (
+        EFI_RESOURCE_SYSTEM_MEMORY,
+        ResourceAttributes,
+        MmBufferTop,
+        SystemMemoryTop - MmBufferTop
+        );
+    } else {
+      // The mm communication buffer is out of the system memory range
+      BuildResourceDescriptorHob (
+        EFI_RESOURCE_SYSTEM_MEMORY,
+        ResourceAttributes,
+        SystemMemoryBase,
+        PcdGet64 (PcdSystemMemorySize)
+        );
+    }
   }
 
   //
   // Reserved the memory space occupied by the firmware volume
   //
 
-  SystemMemoryTop = (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdSystemMemoryBase) + (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdSystemMemorySize);
-  FdTop           = (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdFdBaseAddress) + (EFI_PHYSICAL_ADDRESS)PcdGet32 (PcdFdSize);
+  FdTop = (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdFdBaseAddress) + (EFI_PHYSICAL_ADDRESS)PcdGet32 (PcdFdSize);
 
   // EDK2 does not have the concept of boot firmware copied into DRAM. To avoid the DXE
   // core to overwrite this area we must create a memory allocation HOB for the region,
   // but this only works if we split off the underlying resource descriptor as well.
-  if ((PcdGet64 (PcdFdBaseAddress) >= PcdGet64 (PcdSystemMemoryBase)) && (FdTop <= SystemMemoryTop)) {
+  if ((PcdGet64 (PcdFdBaseAddress) >= SystemMemoryBase) && (FdTop <= SystemMemoryTop)) {
     Found = FALSE;
 
     // Search for System Memory Hob that contains the firmware
