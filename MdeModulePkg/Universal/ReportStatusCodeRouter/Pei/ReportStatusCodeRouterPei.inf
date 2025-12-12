@@ -37,6 +37,7 @@
   PeiServicesLib
   DebugLib
   HobLib
+  BaseMemoryLib
 
 [Guids]
   ## PRODUCES ## HOB
