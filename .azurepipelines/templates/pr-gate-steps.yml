@@ -84,7 +84,10 @@ steps:
 #   are all resolved.
 - template: basetools-build-steps.yml
   parameters:
-    tool_chain_tag: ${{ parameters.tool_chain_tag }}
+    ${{ if eq(parameters.tool_chain_tag, 'VS2022') }}:
+      tool_chain_tag: ${{ parameters.tool_chain_tag }}
+    ${{ else }}:
+      tool_chain_tag: GCC
 
 - task: CmdLine@2
   displayName: Build and Test ${{ parameters.build_pkgs }} ${{ parameters.build_archs}}
