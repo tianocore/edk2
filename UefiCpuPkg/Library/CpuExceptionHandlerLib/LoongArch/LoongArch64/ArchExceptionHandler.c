@@ -273,13 +273,6 @@ IpiInterruptHandler (
         SystemContext.SystemContextLoongArch64->PRMD &= ~((UINT64)BIT2); // Clean PIE
       } else if ((IpiStatus & SMP_CALL_FUNCTION) != 0) {
         //
-        // Confirm that the mail box message has arrived.
-        //
-        do {
-          Parameter = IoCsrRead32 (LOONGARCH_IOCSR_MBUF3);
-        } while (!Parameter);
-
-        //
         // Get the parameter if populated.
         //
         Parameter = IoCsrRead64 (LOONGARCH_IOCSR_MBUF3);
