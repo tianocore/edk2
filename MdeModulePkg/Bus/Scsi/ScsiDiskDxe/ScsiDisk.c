@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "ScsiDisk.h"
 
+#define CACHE_MODE_PAGE_LEN  28
+
 EFI_DRIVER_BINDING_PROTOCOL  gScsiDiskDriverBinding = {
   ScsiDiskDriverBindingSupported,
   ScsiDiskDriverBindingStart,
@@ -337,6 +339,7 @@ ScsiDiskDriverBindingStart (
   ScsiDiskDevice->UnmapInfo.MaxBlkDespCnt           = 1;
   ScsiDiskDevice->BlockLimitsVpdSupported           = FALSE;
   ScsiDiskDevice->Handle                            = Controller;
+  ScsiDiskDevice->WriteCacheMode                    = TRUE;
   InitializeListHead (&ScsiDiskDevice->AsyncTaskQueue);
 
   ScsiIo->GetDeviceType (ScsiIo, &(ScsiDiskDevice->DeviceType));
@@ -2537,6 +2540,18 @@ ScsiDiskDetectMedia (
     }
   }
 
+  //
+  // Get Write Cache Mode
+  //
+  for (Retry = 0; Retry < MaxRetry; Retry++) {
+    if (ScsiDiskDevice->DeviceType == EFI_SCSI_TYPE_DISK) {
+      Status = ScsiDiskWriteCacheMode (ScsiDiskDevice);
+      if (!EFI_ERROR (Status)) {
+        break;
+      }
+    }
+  }
+
   if (ScsiDiskDevice->BlkIo.Media->MediaId != OldMedia.MediaId) {
     //
     // Media change information got from the device
@@ -3707,8 +3722,10 @@ ScsiDiskWriteSectors (
   UINT8       Index;
   UINT8       MaxRetry;
   BOOLEAN     NeedRetry;
+  BOOLEAN     SetFUA;
 
   Status = EFI_SUCCESS;
+  SetFUA = TRUE;
 
   BlocksRemaining = NumberOfBlocks;
   BlockSize       = ScsiDiskDevice->BlkIo.Media->BlockSize;
@@ -3779,7 +3796,8 @@ ScsiDiskWriteSectors (
                    PtrBuffer,
                    &ByteCount,
                    (UINT32)Lba,
-                   SectorCount
+                   SectorCount,
+                   &SetFUA
                    );
       } else {
         Status = ScsiDiskWrite16 (
@@ -3789,7 +3807,8 @@ ScsiDiskWriteSectors (
                    PtrBuffer,
                    &ByteCount,
                    Lba,
-                   SectorCount
+                   SectorCount,
+                   &SetFUA
                    );
       }
 
@@ -4400,6 +4419,109 @@ BackOff:
 }
 
 /**
+  Check Cache Mode of the storage.
+
+  @param   ScsiDiskDevice    The pointer of SCSI_DISK_DEV.
+
+  @return  EFI_STATUS is returned by calling ScsiDiskWriteCacheMode().
+**/
+EFI_STATUS
+ScsiDiskWriteCacheMode (
+  IN     SCSI_DISK_DEV  *ScsiDiskDevice
+  )
+{
+  UINT8       HostAdapterStatus;
+  UINT8       TargetStatus;
+  UINT8       SenseDataLength;
+  UINT8       Buffer[CACHE_MODE_PAGE_LEN];
+  UINT32      BufferLength;
+  EFI_STATUS  ReturnStatus;
+
+  SenseDataLength = 0;
+  BufferLength    = CACHE_MODE_PAGE_LEN;
+  //
+  // Execute Mode Sense Command here to get write caching policy
+  // through Caching Page (08).
+  //
+  ReturnStatus = ScsiModeSense10Command (
+                   ScsiDiskDevice->ScsiIo,
+                   SCSI_DISK_TIMEOUT,
+                   NULL,
+                   &SenseDataLength,
+                   &HostAdapterStatus,
+                   &TargetStatus,
+                   Buffer,
+                   &BufferLength,
+                   1,                      // Not return any block descriptors
+                   0x10,                   // Default threshold values
+                   0x08                    // Caching Mode page (08h)
+                   );
+  if (ReturnStatus != EFI_SUCCESS) {
+    //
+    // Mode Sense Command fails
+    //
+    return EFI_DEVICE_ERROR;
+  } else {
+    //
+    // Page code locates at the byte 0(bit0 to bit5)
+    // following an 8 bytes length header
+    //
+    if ((Buffer[8] & 0x3F) != 0x08) {
+      //
+      // Return page is not right
+      //
+      return EFI_DEVICE_ERROR;
+    }
+
+    //
+    // Get page code locating at the byte 2(bit2)
+    // following an 8 bytes length header
+    //
+    if (!!(Buffer[10] & 0x04) == 1) {
+      //
+      // 'write back' cache is enabled.
+      //
+      return EFI_SUCCESS;
+    } else {
+      //
+      // 'write through' is enabled
+      //
+      ScsiDiskDevice->WriteCacheMode = FALSE;
+      return EFI_SUCCESS;
+    }
+  }
+}
+
+/**
+  Check if SCSI command fails with FUA being set
+
+  @param  ScsiDiskDevice     The pointer of ScsiDiskDevice
+
+  @return BOOLEAN is returned by calling ScsiDiskFailFUA().
+
+**/
+BOOLEAN
+ScsiDiskFailFUA (
+  IN     SCSI_DISK_DEV  *ScsiDiskDevice
+  )
+{
+  //
+  // Setting FUA bit sometimes causes SCSI commands to fail with
+  // ILLEGAL_REQUEST and INVALID_FIELD. Return the flag of resending
+  // the SCSI command without FUA bit.
+  //
+  if ((ScsiDiskDevice->SenseData->Sense_Key == EFI_SCSI_SK_ILLEGAL_REQUEST) &&
+      (ScsiDiskDevice->SenseData->Addnl_Sense_Code == EFI_SCSI_ASC_INVALID_FIELD))
+  {
+    if (!ScsiDiskDevice->WriteCacheMode) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
   Submit Write(10) Command.
 
   @param  ScsiDiskDevice     The pointer of ScsiDiskDevice
@@ -4409,6 +4531,7 @@ BackOff:
   @param  DataLength         The length of buffer
   @param  StartLba           The start logic block address
   @param  SectorCount        The number of blocks to write
+  @param  SetFUA             The pointer of flag indicates if FUA bit will be set
 
   @return  EFI_STATUS is returned by calling ScsiWrite10Command().
 
@@ -4421,7 +4544,8 @@ ScsiDiskWrite10 (
   IN     UINT8          *DataBuffer,
   IN OUT UINT32         *DataLength,
   IN     UINT32         StartLba,
-  IN     UINT32         SectorCount
+  IN     UINT32         SectorCount,
+  IN     BOOLEAN        *SetFUA
   )
 {
   EFI_STATUS  Status;
@@ -4453,7 +4577,8 @@ BackOff:
                       DataBuffer,
                       DataLength,
                       StartLba,
-                      SectorCount
+                      SectorCount,
+                      *SetFUA
                       );
   if ((ReturnStatus == EFI_NOT_READY) || (ReturnStatus == EFI_BAD_BUFFER_SIZE)) {
     *NeedRetry = TRUE;
@@ -4501,6 +4626,15 @@ BackOff:
       return EFI_DEVICE_ERROR;
     } else if (Action == ACTION_RETRY_WITH_BACKOFF_ALGO) {
       if (SectorCount <= 1) {
+        //
+        // Retry without FUA if needed.
+        //
+        if (ScsiDiskFailFUA (ScsiDiskDevice)) {
+          *NeedRetry = TRUE;
+          *SetFUA    = FALSE;
+          return EFI_DEVICE_ERROR;
+        }
+
         //
         // Jump out if the operation still fails with one sector transfer length.
         //
@@ -4656,6 +4790,7 @@ BackOff:
   @param  DataLength         The length of buffer
   @param  StartLba           The start logic block address
   @param  SectorCount        The number of blocks to write
+  @param  SetFUA             The pointer of flag indicates if the FUA bit will be set
 
   @return  EFI_STATUS is returned by calling ScsiWrite16Command().
 
@@ -4668,7 +4803,8 @@ ScsiDiskWrite16 (
   IN     UINT8          *DataBuffer,
   IN OUT UINT32         *DataLength,
   IN     UINT64         StartLba,
-  IN     UINT32         SectorCount
+  IN     UINT32         SectorCount,
+  IN     BOOLEAN        *SetFUA
   )
 {
   EFI_STATUS  Status;
@@ -4700,7 +4836,8 @@ BackOff:
                       DataBuffer,
                       DataLength,
                       StartLba,
-                      SectorCount
+                      SectorCount,
+                      *SetFUA
                       );
   if ((ReturnStatus == EFI_NOT_READY) || (ReturnStatus == EFI_BAD_BUFFER_SIZE)) {
     *NeedRetry = TRUE;
@@ -4748,6 +4885,15 @@ BackOff:
       return EFI_DEVICE_ERROR;
     } else if (Action == ACTION_RETRY_WITH_BACKOFF_ALGO) {
       if (SectorCount <= 1) {
+        //
+        // Retry without FUA if needed.
+        //
+        if (ScsiDiskFailFUA (ScsiDiskDevice)) {
+          *NeedRetry = TRUE;
+          *SetFUA    = FALSE;
+          return EFI_DEVICE_ERROR;
+        }
+
         //
         // Jump out if the operation still fails with one sector transfer length.
         //
