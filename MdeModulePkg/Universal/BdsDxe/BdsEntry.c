@@ -948,6 +948,8 @@ BdsEntry (
     Print (L"**  WARNING: Test Key is used.  **\n");
   }
 
+  EfiBootManagerConnectAll ();
+
   //
   // Boot to Boot Manager Menu when EFI_OS_INDICATIONS_BOOT_TO_FW_UI is set. Skip HotkeyBoot
   //
