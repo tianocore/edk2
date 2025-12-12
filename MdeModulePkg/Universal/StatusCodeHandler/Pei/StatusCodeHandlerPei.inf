@@ -42,19 +42,25 @@
   ReportStatusCodeLib
   PrintLib
   DebugLib
+  DebugPrintErrorLevelLib
   BaseMemoryLib
+  ModuleAddrCalcLib
 
 [Guids]
   ## SOMETIMES_PRODUCES   ## HOB
   ## SOMETIMES_CONSUMES   ## HOB
   gMemoryStatusCodeRecordGuid
   gEfiStatusCodeDataTypeStringGuid              ## SOMETIMES_CONSUMES   ## UNDEFINED
+  gStatusCodeDataTypeExDebugGuid                ## SOMETIMES_CONSUMES
+  gSerialPortConfigGuid                         ## SOMETIMES_CONSUMES
 
 [Ppis]
   gEfiPeiRscHandlerPpiGuid                      ## CONSUMES
+  gEfiPeiExStatusCodeHandlerPpiGuid             ## PRODUCES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMigrateTemporaryRamFirmwareVolumes  ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeMemorySize|1|gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory    ## SOMETIMES_CONSUMES
 
