@@ -294,6 +294,8 @@ Ip6SelectInterface (
   IP6_INTERFACE     *IpIf;
   BOOLEAN           Exist;
 
+  IpIf = NULL; // MU_CHANGE - CodeQL Change - conditionallyuninitializedvariable
+
   NET_CHECK_SIGNATURE (IpSb, IP6_SERVICE_SIGNATURE);
   ASSERT (Destination != NULL && Source != NULL);
 
@@ -609,7 +611,13 @@ Ip6Output (
       }
 
       IcmpHead = (IP6_ICMP_HEAD *)NetbufGetByte (Packet, 0, NULL);
-      ASSERT (IcmpHead != NULL);
+      // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+      if (IcmpHead == NULL) {
+        ASSERT (IcmpHead != NULL);
+        return EFI_INVALID_PARAMETER;
+      }
+
+      // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
       if (IcmpHead->Checksum == 0) {
         Checksum = &IcmpHead->Checksum;
       }
@@ -843,13 +851,27 @@ Ip6Output (
       // be fragmented below.
       //
       TmpPacket = NetbufGetFragment (Packet, 0, Packet->TotalSize, FragmentHdrsLen);
-      ASSERT (TmpPacket != NULL);
+      // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+      if (TmpPacket == NULL) {
+        ASSERT (TmpPacket != NULL);
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Error;
+      }
+
+      // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
 
       //
       // Allocate the space to contain the fragmentable hdrs and copy the data.
       //
       Buf = NetbufAllocSpace (TmpPacket, FragmentHdrsLen, TRUE);
-      ASSERT (Buf != NULL);
+      // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+      if (Buf == NULL) {
+        ASSERT (Buf != NULL);
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Error;
+      }
+
+      // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
       CopyMem (Buf, ExtHdrs + UnFragmentHdrsLen, FragmentHdrsLen);
 
       //
