@@ -1,0 +1,39 @@
+## @file
+#
+#  CxlDxe driver setup file
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = CxlDxe
+  FILE_GUID                      = 29e54f5e-365a-4235-ba62-c832d7660852
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = CxlDxeEntryPoint
+
+[Sources.common]
+  CxlDxe.c
+  CxlDxe.h
+  CxlDxeFwMgmt.c
+  CxlDxeUtil.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  DevicePathLib
+  DxeServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiPciIoProtocolGuid      ##CONSUMES
+  gEfiFirmwareManagementProtocolGuid  ## BY_START
+
+[Depex]
+  gEfiPciEnumerationCompleteProtocolGuid
+
