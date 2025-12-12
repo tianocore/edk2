@@ -180,14 +180,8 @@ IsValidEnvironmentVariableName (
   }
 
   for (Walker = BeginPercent + 1; Walker < EndPercent; Walker++) {
-    if (
-        ((*Walker >= L'0') && (*Walker <= L'9')) ||
-        ((*Walker >= L'A') && (*Walker <= L'Z')) ||
-        ((*Walker >= L'a') && (*Walker <= L'z')) ||
-        (*Walker == L'_')
-        )
-    {
-      if ((Walker == BeginPercent + 1) && ((*Walker >= L'0') && (*Walker <= L'9'))) {
+    if (CharIsAlphaNum (*Walker) || (*Walker == L'_')) {
+      if ((Walker == BeginPercent + 1) && (CharIsNum (*Walker))) {
         return FALSE;
       } else {
         continue;

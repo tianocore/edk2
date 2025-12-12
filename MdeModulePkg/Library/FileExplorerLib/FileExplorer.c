@@ -599,27 +599,6 @@ LibGetTypeFromName (
 }
 
 /**
-  Converts the unicode character of the string from uppercase to lowercase.
-  This is a internal function.
-
-  @param ConfigString  String to be converted
-
-**/
-VOID
-LibToLowerString (
-  IN CHAR16  *String
-  )
-{
-  CHAR16  *TmpStr;
-
-  for (TmpStr = String; *TmpStr != L'\0'; TmpStr++) {
-    if ((*TmpStr >= L'A') && (*TmpStr <= L'Z')) {
-      *TmpStr = (CHAR16)(*TmpStr - L'A' + L'a');
-    }
-  }
-}
-
-/**
 
   Check whether current FileName point to a valid
   Efi Image File.
@@ -653,7 +632,7 @@ LibIsSupportedFileType (
 
   TmpStr = AllocateCopyPool (StrSize (InputFileType), InputFileType);
   ASSERT (TmpStr != NULL);
-  LibToLowerString (TmpStr);
+  StrnCharToLower (TmpStr, StrLen (TmpStr));
 
   IsSupported = (StrStr (gFileExplorerPrivate.FileType, TmpStr) == NULL ? FALSE : TRUE);
 
@@ -1509,7 +1488,7 @@ ChooseFile (
   if (FileType != NULL) {
     gFileExplorerPrivate.FileType = AllocateCopyPool (StrSize (FileType), FileType);
     ASSERT (gFileExplorerPrivate.FileType != NULL);
-    LibToLowerString (gFileExplorerPrivate.FileType);
+    StrnCharToLower (gFileExplorerPrivate.FileType, StrLen (gFileExplorerPrivate.FileType));
   } else {
     gFileExplorerPrivate.FileType = NULL;
   }

@@ -79,7 +79,7 @@ NetStringToU32 (
 
   Num = 0;
 
-  for ( ; NET_IS_DIGIT (*Str); Str++) {
+  for ( ; AsciiCharIsNum (*Str); Str++) {
     Num = Num * 10 + (*Str - '0');
   }
 
@@ -110,7 +110,7 @@ NetStringToIp (
   Addr = 0;
 
   for (Index = 0; Index < 4; Index++) {
-    if (!NET_IS_DIGIT (*Str)) {
+    if (!AsciiCharIsNum (*Str)) {
       return EFI_INVALID_PARAMETER;
     }
 
@@ -125,7 +125,7 @@ NetStringToIp (
     //
     // Skip all the digitals and check whether the separator is the dot
     //
-    while (NET_IS_DIGIT (*Str)) {
+    while (AsciiCharIsNum (*Str)) {
       Str++;
     }
 
@@ -346,7 +346,7 @@ Mtftp4ExtractMcast (
 
     Option->McastPort = (UINT16)Num;
 
-    while (NET_IS_DIGIT (*Value)) {
+    while (AsciiCharIsNum (*Value)) {
       Value++;
     }
   }
@@ -368,7 +368,7 @@ Mtftp4ExtractMcast (
 
   Option->Master = (BOOLEAN)(Num == 1);
 
-  while (NET_IS_DIGIT (*Value)) {
+  while (AsciiCharIsNum (*Value)) {
     Value++;
   }
 

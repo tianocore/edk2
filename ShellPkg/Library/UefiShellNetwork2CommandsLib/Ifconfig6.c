@@ -698,7 +698,7 @@ IfConfig6ParseDadXmits (
   *Xmits = 0;
 
   while (*ValStr != L'\0') {
-    if ((*ValStr <= L'9') && (*ValStr >= L'0')) {
+    if (CharIsNum (*ValStr)) {
       *Xmits = (*Xmits * 10) + (*ValStr - L'0');
     } else {
       return EFI_INVALID_PARAMETER;

@@ -199,9 +199,9 @@ MenuBarDispatchControlHotKey (
     // For consoles that supports/reports shift state,
     // make sure only CONTROL is pressed.
     //
-    if ((KeyData->Key.UnicodeChar >= L'A') && (KeyData->Key.UnicodeChar <= L'Z')) {
+    if (CharIsUpperAlpha (KeyData->Key.UnicodeChar)) {
       ControlIndex = KeyData->Key.UnicodeChar - L'A' + 1;
-    } else if ((KeyData->Key.UnicodeChar >= L'a') && (KeyData->Key.UnicodeChar <= L'z')) {
+    } else if (CharIsLowerAlpha (KeyData->Key.UnicodeChar)) {
       ControlIndex = KeyData->Key.UnicodeChar - L'a' + 1;
     }
   }

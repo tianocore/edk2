@@ -2252,11 +2252,7 @@ SetQuestionValue (
     //
     // Convert to lower char.
     //
-    for (TemString = Value; *Value != L'\0'; Value++) {
-      if ((*Value >= L'A') && (*Value <= L'Z')) {
-        *Value = (CHAR16)(*Value - L'A' + L'a');
-      }
-    }
+    StrnCharToLower (Value, StrLen (Value));
 
     //
     // Submit Question Value to Configuration Driver

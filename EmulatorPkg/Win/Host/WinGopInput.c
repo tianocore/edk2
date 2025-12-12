@@ -271,10 +271,7 @@ GopPrivateAddKey (
   //
   // Unmask the Shift bit for printable char
   //
-  if (((KeyData.Key.UnicodeChar >= L'a') && (KeyData.Key.UnicodeChar <= L'z')) ||
-      ((KeyData.Key.UnicodeChar >= L'A') && (KeyData.Key.UnicodeChar <= L'Z'))
-      )
-  {
+  if (CharIsAlpha (KeyData.Key.UnicodeChar)) {
     KeyData.KeyState.KeyShiftState &= ~(EFI_LEFT_SHIFT_PRESSED | EFI_RIGHT_SHIFT_PRESSED);
   }
 
