@@ -88,6 +88,7 @@
   MemoryAllocationLib|EmbeddedPkg/Library/PrePiMemoryAllocationLib/PrePiMemoryAllocationLib.inf
   PrePiHobListPointerLib|ArmPlatformPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
   Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
+  Tpm2HelpLib|SecurityPkg/Library/Tpm2HelpLib/Tpm2HelpLib.inf
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibFfa/Tpm2DeviceSecLibFfa.inf
   HashLib|SecurityPkg/Library/HashLibTpm2/HashLibTpm2PeilessSecLib.inf
   PeilessSecMeasureLib|SecurityPkg/Library/PeilessSecMeasureLib/PeilessSecMeasureLib.inf
