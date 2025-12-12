@@ -25,5 +25,11 @@
   MdePkg/MdePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
+[Packages.AARCH64]
+  ArmPkg/ArmPkg.dec
+
 [LibraryClasses]
   BaseLib
+
+[LibraryClasses.AARCH64]
+  ArmLib
