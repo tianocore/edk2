@@ -1555,7 +1555,8 @@ UfsDeviceDetection (
   for (Retry = 0; Retry < 3; Retry++) {
     Status = UfsExecUicCommands (Private, UfsUicDmeLinkStartup, 0, 0, 0);
     if (EFI_ERROR (Status)) {
-      return EFI_DEVICE_ERROR;
+      DEBUG ((DEBUG_ERROR, "[%a] UfsExecUicCommands failed with Status=%r\n", __func__, Status));
+      continue;
     }
 
     //
@@ -1567,7 +1568,8 @@ UfsDeviceDetection (
       Address = Private->UfsHcBase + UFS_HC_IS_OFFSET;
       Status  = UfsWaitMemSet (Address, UFS_HC_IS_ULSS, UFS_HC_IS_ULSS, UFS_TIMEOUT);
       if (EFI_ERROR (Status)) {
-        return EFI_DEVICE_ERROR;
+        DEBUG ((DEBUG_ERROR, "[%a] UfsWaitMemSet failed with Status=%r\n", __func__, Status));
+        continue;
       }
     } else {
       DEBUG ((DEBUG_INFO, "UfsblockioPei: found a attached UFS device\n"));
