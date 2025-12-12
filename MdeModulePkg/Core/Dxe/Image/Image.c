@@ -321,7 +321,7 @@ CoreReadImageFile (
   //
   EndPosition = Offset + *ReadSize;
   if (EndPosition > FHand->SourceSize) {
-    *ReadSize = (UINT32)(FHand->SourceSize - Offset);
+    *ReadSize = (UINTN)(FHand->SourceSize - Offset);
   }
 
   if (Offset >= FHand->SourceSize) {
