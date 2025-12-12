@@ -35,6 +35,7 @@
   DEFINE STANDALONE_MM_ENABLE    = FALSE
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
   DEFINE CC_MEASUREMENT_ENABLE   = TRUE
+  DEFINE ENABLE_5LEVEL_PAGING    = FALSE
 
 !include OvmfPkg/Include/Dsc/OvmfTpmDefines.dsc.inc
 
@@ -685,6 +686,10 @@
   # broadcast INIT-SIPI-SIPI for the first time.
   #
   gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi|FALSE
+
+!if $(ENABLE_5LEVEL_PAGING) == TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse5LevelPageTable|TRUE
+!endif
 
 ################################################################################
 #

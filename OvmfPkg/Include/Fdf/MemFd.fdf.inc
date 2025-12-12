@@ -25,78 +25,78 @@ NumBlocks     = 0xF8
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesSize
 
 #
-# FIXME
+# SEV: page table, for 2M -> 4k split when mapping GHCB page
 #
 0x006000|0x001000
+gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableSize
+
+#
+# SEV: page table, for 2M -> 4k split when mapping APIC
+#
+0x007000|0x001000
+gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableSize
+
+#
+# FIXME
+#
+0x008000|0x001000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
 
 #
 # FIXME
 #
-0x007000|0x001000
+0x009000|0x001000
 gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress|gUefiOvmfPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
-
-#
-# SEV: page table, for 2M -> 4k split when mapping GHCB page
-#
-0x008000|0x001000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbPageTableSize
 
 #
 # SEV: GHCB page
 # TDX: TD HOB page
 #
-0x009000|0x002000
+0x00A000|0x002000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbSize
 
 #
 # Work Area Page, both TDX and SEV store some confidential guest state there.
 #
-0x00B000|0x001000
+0x00C000|0x001000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize
 
 #
-# SEV: FIXME
+# SEV: GHCB backup page for nested #VC handling
 # TDX: TD Mailbox at early boot.
 #
-0x00C000|0x001000
+0x00D000|0x001000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize
 
 #
 # SEV-SNP: secrets page
 #
-0x00D000|0x001000
+0x00E000|0x001000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsSize
 
 #
 # SEV-SNP: cpuid page
 #
-0x00E000|0x001000
+0x00F000|0x001000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidSize
 
 #
 # SEV-SNP: CAA page (for communication with SVSM)
 #
-0x00F000|0x001000
+0x010000|0x001000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecSvsmCaaBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecSvsmCaaSize
 
 #
 # SEV-SNP: pass secrets from host (qemu) to guest
 #
-0x010000|0x000C00
+0x011000|0x000C00
 gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretBase|gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretSize
 
 #
 # SEV-SNP: pass hashes for kernel/initrd/cmdline from host (qemu) to guest
 #
-0x010C00|0x000400
+0x011C00|0x000400
 gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableBase|gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableSize
-
-#
-# page table, for 2M -> 4k split when mapping APIC
-#
-0x011000|0x001000
-gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableSize
 
 #
 # IGVM parameter area
