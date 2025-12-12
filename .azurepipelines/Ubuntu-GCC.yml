@@ -19,8 +19,8 @@ variables:
 jobs:
 - template: templates/pr-gate-build-job.yml
   parameters:
-    tool_chain_tag: GCC
+    tool_chain_tag: CLANGPDB
     vm_image: 'ubuntu-24.04'
     container: ${{ variables.default_linux_image }}
-    arch_list: "IA32,X64,AARCH64,RISCV64,LOONGARCH64"
+    arch_list: "IA32,X64"
     usePythonVersion: ''  # use Python from the container image

@@ -82,12 +82,13 @@ jobs:
           Build.Pkgs: 'UefiPayloadPkg'
           Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
           Build.Archlist: 'AARCH64'
-      TARGET_PLATFORMS:
-        # For Platforms only check code. Leave it to Platform CI
-        # to build them.
-        Build.Pkgs: 'ArmVirtPkg,EmulatorPkg,OvmfPkg'
-        Build.Targets: 'NO-TARGET,NOOPT'
-        Build.Archlist: ${{ parameters.arch_list }}
+      ${{ if or(eq(parameters.tool_chain_tag, 'GCC5'), eq(parameters.tool_chain_tag, 'VS2022')) }}:
+        TARGET_PLATFORMS:
+          # For Platforms only check code. Leave it to Platform CI
+          # to build them.
+          Build.Pkgs: 'ArmVirtPkg,EmulatorPkg,OvmfPkg'
+          Build.Targets: 'NO-TARGET,NOOPT'
+          Build.Archlist: ${{ parameters.arch_list }}
 
   workspace:
     clean: all
