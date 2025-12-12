@@ -149,6 +149,7 @@
 !include MdePkg/MdeLibs.dsc.inc
 
 [LibraryClasses]
+  FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
   SmmRelocationLib|OvmfPkg/Library/SmmRelocationLib/SmmRelocationLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   TimerLib|OvmfPkg/Library/AcpiTimerLib/BaseAcpiTimerLib.inf
@@ -770,6 +771,7 @@
 #
 ################################################################################
 [Components]
+  OvmfPkg/Application/BootFit/BootFit.inf
   OvmfPkg/ResetVector/ResetVector.inf
 
   #

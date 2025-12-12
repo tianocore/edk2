@@ -1,0 +1,48 @@
+## @file
+#  BootFit - UEFI Application to boot a FIT Image.
+#
+#  Copyright (c) 2024, UEFI. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BootFit
+  FILE_GUID                      = 8F7D7B1E-0E1F-4F5D-8A7B-9C0D1E2F3A4B
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ShellCEntryLib
+
+[Sources]
+  BootFit.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ShellPkg/ShellPkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  UefiLib
+  UefiBootServicesTableLib
+  UefiApplicationEntryPoint
+  BaseMemoryLib
+  BaseLib
+  MemoryAllocationLib
+  DebugLib
+  FileHandleLib
+  ShellLib
+  FdtLib
+  ShellCEntryLib
+  UefiRuntimeServicesTableLib
+  DevicePathLib
+
+[Protocols]
+  gEfiLoadedImageProtocolGuid
+  gEfiLoadFile2ProtocolGuid
+  gEfiDevicePathProtocolGuid
+
+[Guids]
+  gLinuxEfiInitrdMediaGuid
