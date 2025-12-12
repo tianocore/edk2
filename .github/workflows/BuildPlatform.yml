@@ -103,7 +103,7 @@ jobs:
         name: 'Build Platform'
 
       - name: Upload Platform Build Logs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Platform Build Logs ${{ inputs.tool-chain }} ${{ inputs.target }} ${{ inputs.extra-build-args }}
           path: |

@@ -150,7 +150,7 @@ jobs:
       run: stuart_setup -c .pytool/CISettings.py -t DEBUG -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=VS2022
 
     - name: Upload Setup Log As An Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: (success() || failure()) && steps.get_ci_file_operations.outputs.setup_supported == 'true'
       with:
         name: ${{ matrix.Package }}-${{ steps.convert_arch_hyphen.outputs.arch_list }}-Setup-Log
@@ -164,7 +164,7 @@ jobs:
       run: stuart_ci_setup -c .pytool/CISettings.py -t DEBUG -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=VS2022
 
     - name: Upload CI Setup Log As An Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: (success() || failure()) && steps.get_ci_file_operations.outputs.ci_setup_supported == 'true'
       with:
         name: ${{ matrix.Package }}-${{ steps.convert_arch_hyphen.outputs.arch_list }}-CI-Setup-Log
@@ -177,7 +177,7 @@ jobs:
       run: stuart_update -c .pytool/CISettings.py -t DEBUG -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=VS2022
 
     - name: Upload Update Log As An Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: success() || failure()
       with:
         name: ${{ matrix.Package }}-${{ steps.convert_arch_hyphen.outputs.arch_list }}-Update-Log
@@ -293,7 +293,7 @@ jobs:
         delete_dirs(build_path)
 
     - name: Upload Build Logs As An Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: success() || failure()
       with:
         name: ${{ matrix.Package }}-${{ steps.convert_arch_hyphen.outputs.arch_list }}-Build-Logs
@@ -338,7 +338,7 @@ jobs:
                 print(f'upload_sarif_file=false', file=fh)
 
     - name: Upload CodeQL Results (SARIF) As An Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: steps.env_data.outputs.upload_sarif_file == 'true'
       with:
         name: ${{ matrix.Package }}-${{ steps.convert_arch_hyphen.outputs.arch_list }}-CodeQL-SARIF
