@@ -8,6 +8,7 @@
 
 #include <Base.h>
 #include <Library/BaseLib.h>
+#include <Library/PvPanicLib.h>
 
 static volatile UINTN  mDeadLoopComparator = 0;
 
@@ -27,6 +28,8 @@ CpuDeadLoop (
   )
 {
   volatile UINTN  Index;
+
+  PvPanicLibSendEventGuestPanicked ();
 
   for (Index = mDeadLoopComparator; Index == mDeadLoopComparator;) {
     CpuPause ();

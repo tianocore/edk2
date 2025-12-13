@@ -41,6 +41,7 @@
   PcdLib
   TimerLib
   XenHypercallLib
+  PvPanicLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId ## CONSUMES
