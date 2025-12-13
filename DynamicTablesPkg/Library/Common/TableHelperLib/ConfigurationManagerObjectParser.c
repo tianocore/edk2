@@ -994,6 +994,12 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonObjPciRootPortInfoParser[] = {
   { "Sun",              4,                        "0x%x", NULL }
 };
 
+/** A parser for EArchCommonObjMsctMaxPhysicalAddrInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonMsctMaxPhysicalAddrInfoParser[] = {
+  { "MaxPhysicalAddress", 8, "0x%llx", NULL }
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -1046,6 +1052,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjTpm2DeviceInfo,               CmArchCommonObjTpm2DeviceInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMcfgPciConfigSpaceInfo,       CmArchCommonPciConfigSpaceInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPciRootPortInfo,              CmArchCommonObjPciRootPortInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMsctMaxPhysicalAddrInfo,      CmArchCommonMsctMaxPhysicalAddrInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
