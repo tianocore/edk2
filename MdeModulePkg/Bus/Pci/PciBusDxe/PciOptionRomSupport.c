@@ -663,7 +663,7 @@ ProcessOpRomImage (
   EFI_STATUS                               RetStatus;
   EFI_PCI_EXPANSION_ROM_HEADER             *EfiRomHeader;
   PCI_DATA_STRUCTURE                       *Pcir;
-  EFI_DEVICE_PATH_PROTOCOL                 *PciOptionRomImageDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL                 *PciOptionRomImageDevicePath, *PreviousImageDevicePath;
   MEDIA_RELATIVE_OFFSET_RANGE_DEVICE_PATH  EfiOpRomImageNode;
   VOID                                     *Buffer;
   UINTN                                    BufferSize;
@@ -728,6 +728,16 @@ ProcessOpRomImage (
 
     PciOptionRomImageDevicePath = AppendDevicePathNode (PciDevice->DevicePath, &EfiOpRomImageNode.Header);
     ASSERT (PciOptionRomImageDevicePath != NULL);
+    PreviousImageDevicePath = PciOptionRomImageDevicePath;
+    //
+    // If device path is same as previous then it is already appended skip it. So, it doesn't
+    // corrupt the data structure. We stored previous pointer to skip iterating through entire nodes
+    // which is expensive.
+    //
+    if (EfiCompareDevicePath (PciOptionRomImageDevicePath, PreviousImageDevicePath)) {
+      FreePool (PciOptionRomImageDevicePath);
+      goto NextImage;
+    }
 
     //
     // load image and start image
