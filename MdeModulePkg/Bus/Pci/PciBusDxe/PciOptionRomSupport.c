@@ -706,7 +706,7 @@ ProcessOpRomImage (
     // Skip the EFI PCI Option ROM image if it's machine type is not supported
     // and the native image is only considered.
     //
-    if (!EFI_IMAGE_MACHINE_TYPE_SUPPORTED (EfiRomHeader->EfiMachineType) && (NativeOnly == TRUE)) {
+    if (EFI_IMAGE_MACHINE_TYPE_SUPPORTED (EfiRomHeader->EfiMachineType) ^ (NativeOnly == TRUE)) {
       goto NextImage;
     }
 
