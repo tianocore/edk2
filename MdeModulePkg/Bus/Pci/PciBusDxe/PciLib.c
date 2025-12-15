@@ -1025,7 +1025,7 @@ PciAllocateBusNumber (
 {
   PCI_IO_DEVICE                      *RootBridge;
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *BusNumberRanges;
-  UINT8                              NextNumber;
+  UINT16                             NextNumber;
   UINT64                             MaxNumberInRange;
 
   //
@@ -1043,18 +1043,18 @@ PciAllocateBusNumber (
   while (BusNumberRanges->Desc != ACPI_END_TAG_DESCRIPTOR) {
     MaxNumberInRange = BusNumberRanges->AddrRangeMin + BusNumberRanges->AddrLen - 1;
     if ((StartBusNumber >= BusNumberRanges->AddrRangeMin) && (StartBusNumber <=  MaxNumberInRange)) {
-      NextNumber = (UINT8)(StartBusNumber + NumberOfBuses);
+      NextNumber = (StartBusNumber + NumberOfBuses);
       while (NextNumber > MaxNumberInRange) {
         ++BusNumberRanges;
         if (BusNumberRanges->Desc == ACPI_END_TAG_DESCRIPTOR) {
           return EFI_OUT_OF_RESOURCES;
         }
 
-        NextNumber       = (UINT8)(NextNumber + (BusNumberRanges->AddrRangeMin - (MaxNumberInRange + 1)));
+        NextNumber       = (UINT16)(NextNumber + (BusNumberRanges->AddrRangeMin - (MaxNumberInRange + 1)));
         MaxNumberInRange = BusNumberRanges->AddrRangeMin + BusNumberRanges->AddrLen - 1;
       }
 
-      *NextBusNumber = NextNumber;
+      *NextBusNumber = (UINT8)NextNumber;
       return EFI_SUCCESS;
     }
 
