@@ -53,6 +53,7 @@
   gUefiPayloadPkgTokenSpaceGuid.PcdPciReservedPMemAbove4GBBase
   gUefiPayloadPkgTokenSpaceGuid.PcdPciReservedPMemAbove4GBLimit
   gUefiPayloadPkgTokenSpaceGuid.SizeOfIoSpace
+  gUefiPayloadPkgTokenSpaceGuid.PcdPciAllocateMemoryAbove4GB
 
 
 [BuildOptions]
