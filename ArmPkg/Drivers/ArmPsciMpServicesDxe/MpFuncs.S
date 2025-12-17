@@ -31,11 +31,14 @@ GCC_ASM_EXPORT (ApEntryPoint)
 //   );
 ASM_PFX(ApEntryPoint):
   // Configure the MMU and caches
-  ldr x0, gTcr
+  adrp x0, gTcr
+  ldr x0, [x0, :lo12:gTcr]
   bl ArmSetTCR
-  ldr x0, gTtbr0
+  adrp x0, gTtbr0
+  ldr x0, [x0, :lo12:gTtbr0]
   bl ArmSetTTBR0
-  ldr x0, gMair
+  adrp x0, gMair
+  ldr x0, [x0, :lo12:gMair]
   bl ArmSetMAIR
   bl ArmDisableAlignmentCheck
   bl ArmEnableStackAlignmentCheck
@@ -47,7 +50,8 @@ ASM_PFX(ApEntryPoint):
   // Mask the non-affinity bits
   bic x0, x0, 0x00ff000000
   and x0, x0, 0xffffffffff
-  ldr x1, gProcessorIDs
+  adrp x1, gProcessorIDs
+  ldr x1, [x1, :lo12:gProcessorIDs]
   mov x2, 0                   // x2 = processor index
 
 // Find index in gProcessorIDs for current processor
@@ -61,8 +65,10 @@ ASM_PFX(ApEntryPoint):
 
 // Calculate stack address
   // x2 contains the index for the current processor plus 1
-  ldr x0, gApStacksBase
-  ldr x1, gApStackSize
+  adrp x0, gApStacksBase
+  ldr x0, [x0, :lo12:gApStacksBase]
+  adrp x1, gApStackSize
+  ldr x1, [x1, :lo12:gApStackSize]
   mul x3, x2, x1              // x3 = (ProcessorIndex + 1) * gApStackSize
   add sp, x0, x3              // sp = gApStacksBase + x3
   mov x29, xzr
