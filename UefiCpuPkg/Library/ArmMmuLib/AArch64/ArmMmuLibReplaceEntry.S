@@ -80,7 +80,7 @@
 // Align this routine to a log2 upper bound of its size, so that it is
 // guaranteed not to cross a page or block boundary.
 ASM_FUNC_ALIGN(ArmReplaceLiveTranslationEntry, 0x200)
-
+0:
   // disable interrupts
   mrs   x4, daif
   msr   daifset, #0xf
@@ -97,10 +97,10 @@ ASM_FUNC_ALIGN(ArmReplaceLiveTranslationEntry, 0x200)
 ASM_GLOBAL ASM_PFX(ArmReplaceLiveTranslationEntrySize)
 
 ASM_PFX(ArmReplaceLiveTranslationEntrySize):
-  .long   . - ArmReplaceLiveTranslationEntry
+  .long   . - 0b
 
   // Double check that we did not overrun the assumed maximum size or cross a
   // 0x200 boundary (and thus implicitly not any larger power of two, including
   // the page size).
   .balign 0x200
-  .org    ArmReplaceLiveTranslationEntry + 0x200
+  .org    . - (. - 0b) + 0x200
