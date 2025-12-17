@@ -7,7 +7,7 @@
 #
 ##
 
-[PcdsFeatureFlag]
+[PcdsFeatureFlag.IA32, PcdsFeatureFlag.X64]
 #
 # Use Openssl NASM assembly source files that assume Windows calling convention
 # if the family is MSFT or the toolchain is CLANGPDB for Windows or Linux.
