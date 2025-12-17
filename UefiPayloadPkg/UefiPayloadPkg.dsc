@@ -189,7 +189,8 @@
   *_*_*_CC_FLAGS                 = $(APPEND_CC_FLAGS)
 
 [BuildOptions.AARCH64]
-  GCC:*_*_*_CC_FLAGS         = -mcmodel=tiny -mstrict-align
+  GCC:*_GCC_*_CC_FLAGS         = -mcmodel=tiny -mstrict-align
+  GCC:*_CLANGDWARF_*_CC_FLAGS  = -mcmodel=tiny -mstrict-align
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x1000
