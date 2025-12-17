@@ -29,8 +29,9 @@
 
 
 
-
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _bsaes_decrypt8,%function
+#endif // __ELF__
 .align  4
 // On entry:
 //   x9 -> key (previously expanded using _bsaes_key_convert)
@@ -459,10 +460,14 @@ _bsaes_decrypt8:
         eor     v1.16b, v1.16b, v10.16b
         eor     v0.16b, v0.16b, v10.16b
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _bsaes_decrypt8,.-_bsaes_decrypt8
+#endif // __ELF__
 
 .section        .rodata
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _bsaes_consts,%object
+#endif // __ELF__
 .align  6
 _bsaes_consts:
 // InvShiftRows constants
@@ -500,11 +505,15 @@ _bsaes_consts:
 .quad   0x090d01050c000408, 0x03070b0f060a0e02
 
 .align  6
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _bsaes_consts,.-_bsaes_consts
+#endif // __ELF__
 
-.previous
+.text
 
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _bsaes_encrypt8,%function
+#endif // __ELF__
 .align  4
 // On entry:
 //   x9 -> key (previously expanded using _bsaes_key_convert)
@@ -903,9 +912,13 @@ _bsaes_encrypt8_alt:
         eor     v1.16b, v1.16b, v10.16b
         eor     v0.16b, v0.16b, v10.16b
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _bsaes_encrypt8,.-_bsaes_encrypt8
+#endif // __ELF__
 
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _bsaes_key_convert,%function
+#endif // __ELF__
 .align  4
 // On entry:
 //   x9 -> input key (big-endian)
@@ -975,10 +988,14 @@ _bsaes_key_convert:
         add     x11, x11, #:lo12:.LM0_bigendian
 #endif
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _bsaes_key_convert,.-_bsaes_key_convert
+#endif // __ELF__
 
 .globl  ossl_bsaes_cbc_encrypt
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ossl_bsaes_cbc_encrypt,%function
+#endif // __ELF__
 .align  4
 // On entry:
 //   x0 -> input ciphertext
@@ -1230,10 +1247,14 @@ ossl_bsaes_cbc_encrypt:
         ldp     d10, d15, [sp, #32]
         ldp     x29, x30, [sp], #48
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ossl_bsaes_cbc_encrypt,.-ossl_bsaes_cbc_encrypt
+#endif // __ELF__
 
 .globl  ossl_bsaes_ctr32_encrypt_blocks
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ossl_bsaes_ctr32_encrypt_blocks,%function
+#endif // __ELF__
 .align  4
 // On entry:
 //   x0 -> input text (whole 16-byte blocks)
@@ -1435,10 +1456,14 @@ ossl_bsaes_ctr32_encrypt_blocks:
         ldp     x19, x20, [sp, #16]
         ldp     x29, x30, [sp], #96
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ossl_bsaes_ctr32_encrypt_blocks,.-ossl_bsaes_ctr32_encrypt_blocks
+#endif // __ELF__
 
 .globl  ossl_bsaes_xts_encrypt
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ossl_bsaes_xts_encrypt,%function
+#endif // __ELF__
 .align  4
 // On entry:
 //   x0 -> input plaintext
@@ -1875,7 +1900,9 @@ ossl_bsaes_xts_encrypt:
         ldp     d14, d15, [sp, #176]
         ldp     x29, x30, [sp], #192
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ossl_bsaes_xts_encrypt,.-ossl_bsaes_xts_encrypt
+#endif // __ELF__
 
 // The assembler doesn't seem capable of de-duplicating these when expressed
 // using `ldr qd,=` syntax, so assign a symbolic address
@@ -1884,7 +1911,9 @@ ossl_bsaes_xts_encrypt:
 .quad   1, 0x87, 0x4000000000000000, 0x4000000000000000
 
 .globl  ossl_bsaes_xts_decrypt
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ossl_bsaes_xts_decrypt,%function
+#endif // __ELF__
 .align  4
 // On entry:
 //   x0 -> input ciphertext
@@ -2352,4 +2381,6 @@ ossl_bsaes_xts_decrypt:
         ldp     d14, d15, [sp, #176]
         ldp     x29, x30, [sp], #192
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ossl_bsaes_xts_decrypt,.-ossl_bsaes_xts_decrypt
+#endif // __ELF__

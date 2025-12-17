@@ -5,7 +5,9 @@
 .align  8       // strategic alignment and padding that allows to use
                 // address value as loop termination condition...
 .quad   0,0,0,0,0,0,0,0
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   iotas,%object
+#endif
 iotas:
 .quad   0x0000000000000001
 .quad   0x0000000000008082
@@ -31,10 +33,14 @@ iotas:
 .quad   0x8000000000008080
 .quad   0x0000000080000001
 .quad   0x8000000080008008
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   iotas,.-iotas
+#endif
 .text
 
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   KeccakF1600_int,%function
+#endif
 .align  5
 KeccakF1600_int:
         AARCH64_SIGN_LINK_REGISTER
@@ -205,9 +211,13 @@ KeccakF1600_int:
         ldr     x30,[sp,#24]
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   KeccakF1600_int,.-KeccakF1600_int
+#endif
 
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   KeccakF1600,%function
+#endif
 .align  5
 KeccakF1600:
         AARCH64_SIGN_LINK_REGISTER
@@ -262,10 +272,14 @@ KeccakF1600:
         ldp     x29,x30,[sp],#128
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   KeccakF1600,.-KeccakF1600
+#endif
 
 .globl  SHA3_absorb
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   SHA3_absorb,%function
+#endif
 .align  5
 SHA3_absorb:
         AARCH64_SIGN_LINK_REGISTER
@@ -504,9 +518,13 @@ SHA3_absorb:
         ldp     x29,x30,[sp],#128
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   SHA3_absorb,.-SHA3_absorb
+#endif
 .globl  SHA3_squeeze
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   SHA3_squeeze,%function
+#endif
 .align  5
 SHA3_squeeze:
         AARCH64_SIGN_LINK_REGISTER
@@ -576,8 +594,12 @@ SHA3_squeeze:
         ldp     x29,x30,[sp],#48
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   SHA3_squeeze,.-SHA3_squeeze
+#endif
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   KeccakF1600_ce,%function
+#endif
 .align  5
 KeccakF1600_ce:
         mov     x9,#24
@@ -678,9 +700,13 @@ KeccakF1600_ce:
         bne     .Loop_ce
 
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   KeccakF1600_ce,.-KeccakF1600_ce
+#endif
 
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   KeccakF1600_cext,%function
+#endif
 .align  5
 KeccakF1600_cext:
         AARCH64_SIGN_LINK_REGISTER
@@ -726,9 +752,13 @@ KeccakF1600_cext:
         ldr     x29,[sp],#80
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   KeccakF1600_cext,.-KeccakF1600_cext
+#endif
 .globl  SHA3_absorb_cext
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   SHA3_absorb_cext,%function
+#endif
 .align  5
 SHA3_absorb_cext:
         AARCH64_SIGN_LINK_REGISTER
@@ -949,9 +979,13 @@ SHA3_absorb_cext:
         ldp     x29,x30,[sp],#80
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   SHA3_absorb_cext,.-SHA3_absorb_cext
+#endif
 .globl  SHA3_squeeze_cext
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   SHA3_squeeze_cext,%function
+#endif
 .align  5
 SHA3_squeeze_cext:
         AARCH64_SIGN_LINK_REGISTER
@@ -1012,6 +1046,8 @@ SHA3_squeeze_cext:
         ldr     x29,[sp],#16
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   SHA3_squeeze_cext,.-SHA3_squeeze_cext
+#endif
 .byte   75,101,99,99,97,107,45,49,54,48,48,32,97,98,115,111,114,98,32,97,110,100,32,115,113,117,101,101,122,101,32,102,111,114,32,65,82,77,118,56,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
 .align  2

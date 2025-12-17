@@ -7,7 +7,7 @@
 #
 ##
 
-[PcdsFeatureFlag]
+[PcdsFeatureFlag.IA32,PcdsFeatureFlag.X64]
 !if "$(FAMILY)" == "MSFT" || "$(TOOL_CHAIN_TAG)" == "CLANGPDB"
 gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm|TRUE
 !endif
