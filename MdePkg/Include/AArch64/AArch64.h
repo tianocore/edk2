@@ -152,7 +152,7 @@
 
 #define VECTOR_END(tbl)           \
   .org 0x800;                     \
-  .previous
+  .section .text
 
 VOID
 EFIAPI
