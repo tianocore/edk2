@@ -1,0 +1,53 @@
+## @file
+# MCTP Protocol DXE Driver.
+#
+# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001d
+  BASE_NAME                      = MctpDxe
+  FILE_GUID                      = 58AF169A-AA3F-462B-B0F1-25FBE6C97978
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DxeMctpEntry
+  UNLOAD_IMAGE                   = MctpUnloadImage
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  MctpProtocol.c
+  ../Common/MctpProtocolCommon.c
+  ../Common/MctpProtocolCommon.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ManageabilityPkg/ManageabilityPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  ManageabilityTransportHelperLib
+  ManageabilityTransportLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+
+[Guids]
+  gManageabilityProtocolMctpGuid
+
+[Protocols]
+  gEdkiiMctpProtocolGuid
+
+[FixedPcd]
+  gManageabilityPkgTokenSpaceGuid.PcdMctpKcsMemoryMappedIo
+  gManageabilityPkgTokenSpaceGuid.PcdMctpKcsBaseAddress
+  gManageabilityPkgTokenSpaceGuid.PcdMctpSourceEndpointId
+  gManageabilityPkgTokenSpaceGuid.PcdMctpDestinationEndpointId
+
+[Depex]
+  TRUE
