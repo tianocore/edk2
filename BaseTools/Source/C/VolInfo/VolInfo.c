@@ -39,6 +39,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "ParseInf.h"
 #include "PeCoffLib.h"
 
+#ifndef NATIVE_PATH_SEP
+#ifdef _WIN32
+#define NATIVE_PATH_SEP '\\'
+#else
+#define NATIVE_PATH_SEP '/'
+#endif
+#endif
+
 //
 // Utility global variables
 //
@@ -141,7 +149,8 @@ EFI_STATUS
 CombinePath (
   IN  CHAR8* DefaultPath,
   IN  CHAR8* AppendPath,
-  OUT CHAR8* NewPath
+  OUT CHAR8* NewPath,
+  IN  size_t NewPathLen
 );
 
 void
@@ -335,12 +344,18 @@ Returns:
         //
         // We add quotes to the Openssl Path in case it has space characters
         //
-        OpenSslPath = malloc(2+strlen(OpenSslEnv)+strlen(OpenSslCommand)+1);
+        size_t need = strlen(OpenSslEnv) + strlen(OpenSslCommand) + 1 /*sep*/ + 2 /*quotes*/ + 1 /*NUL*/;
+        OpenSslPath = malloc(need);
         if (OpenSslPath == NULL) {
           Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
           return GetUtilityStatus ();
         }
-        CombinePath(OpenSslEnv, OpenSslCommand, OpenSslPath);
+        if (CombinePath(OpenSslEnv, OpenSslCommand, OpenSslPath, need) != EFI_SUCCESS) {
+          free(OpenSslPath);
+          OpenSslPath = NULL;
+          Error (NULL, 0, 3001, "OpenSSL path combine failed", NULL);
+          return GetUtilityStatus();
+        }
       }
       if (OpenSslPath == NULL){
         Error (NULL, 0, 3000, "Open SSL command not available.  Please verify PATH or set OPENSSL_PATH.", NULL);
@@ -1665,29 +1680,21 @@ EFI_STATUS
 CombinePath (
   IN  CHAR8* DefaultPath,
   IN  CHAR8* AppendPath,
-  OUT CHAR8* NewPath
+  OUT CHAR8* NewPath,
+  IN  size_t NewPathLen
 )
 {
-  UINT32 DefaultPathLen;
-  UINT64 Index;
-  CHAR8  QuotesStr[] = "\"";
-  strcpy(NewPath, QuotesStr);
-  DefaultPathLen = strlen(DefaultPath);
-  strcat(NewPath, DefaultPath);
-  Index = 0;
-  for (; Index < DefaultPathLen + 1; Index ++) {
-    if (NewPath[Index] == '\\' || NewPath[Index] == '/') {
-      if (NewPath[Index + 1] != '\0') {
-        NewPath[Index] = '/';
-      }
-    }
+  if (NewPath == NULL || AppendPath == NULL) return EFI_INVALID_PARAMETER;
+  if (DefaultPath == NULL || DefaultPath[0] == '\0') {
+    if (snprintf(NewPath, NewPathLen, "%s", AppendPath) >= (int)NewPathLen) return EFI_ABORTED;
+    return EFI_SUCCESS;
   }
-  if (NewPath[Index -1] != '/') {
-    NewPath[Index] = '/';
-    NewPath[Index + 1] = '\0';
+  int needQuote = (strchr(DefaultPath, ' ') != NULL);
+  if (needQuote) {
+    if (snprintf(NewPath, NewPathLen, "\"%s%c%s\"", DefaultPath, NATIVE_PATH_SEP, AppendPath) >= (int)NewPathLen) return EFI_ABORTED;
+  } else {
+    if (snprintf(NewPath, NewPathLen, "%s%c%s", DefaultPath, NATIVE_PATH_SEP, AppendPath) >= (int)NewPathLen) return EFI_ABORTED;
   }
-  strcat(NewPath, AppendPath);
-  strcat(NewPath, QuotesStr);
   return EFI_SUCCESS;
 }
 
