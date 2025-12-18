@@ -616,10 +616,10 @@ ReportDebugCodeEnabled (
 /**
   Notification function called when the Status Code Runtime protocol is installed. Locates and caches the protocol.
 
-    @param    Event           Not Used.
-    @param    Context         Not Used.
+    @param[in]    Event           Not Used.
+    @param[in]    Context         Not Used.
 
-   @retval   none
+    @retval   none
  **/
 VOID
 EFIAPI
@@ -639,8 +639,8 @@ OnStatusCodeRuntimeProtocolInstalledNotification (
     The constructor attempts to locate and cache StatusCode Protocol. If not found, it will
     register a notify event triggered
 
-    @param  ImageHandle   The firmware allocated handle for the EFI image.
-    @param  SystemTable   A pointer to the EFI System Table.
+    @param[in]  ImageHandle   The firmware allocated handle for the EFI image.
+    @param[in]  SystemTable   A pointer to the EFI System Table.
 
     @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
@@ -690,8 +690,8 @@ ReportStatusCodeLibConstructor (
 /**
     Closes the protocol notification event, if still open, when the library is unloaded.
 
-    @param  ImageHandle   The firmware allocated handle for the EFI image.
-    @param  SystemTable   A pointer to the EFI System Table.
+    @param[in]  ImageHandle   The firmware allocated handle for the EFI image.
+    @param[in]  SystemTable   A pointer to the EFI System Table.
 
     @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
