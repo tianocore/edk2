@@ -1,0 +1,44 @@
+## @file
+# KCS instance of Manageability Transport Library
+#
+# Copyright (C) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = DxeManageabilityTransportKcs
+  MODULE_UNI_FILE                = ManageabilityTransportKcs.uni
+  FILE_GUID                      = FCCC8B34-145A-4927-9F08-553ADC579AF7
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ManageabilityTransportLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  ../ManageabilityTransportKcs.c
+  ../KcsCommon.c
+  ../ManageabilityTransportKcs.h
+
+[Packages]
+  ManageabilityPkg/ManageabilityPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  IoLib
+  TimerLib
+  MemoryAllocationLib
+
+[Guids]
+  gManageabilityTransportKcsGuid
+  gManageabilityProtocolMctpGuid
+  gManageabilityProtocolIpmiGuid
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress   # Used as default KCS I/O base adddress
+

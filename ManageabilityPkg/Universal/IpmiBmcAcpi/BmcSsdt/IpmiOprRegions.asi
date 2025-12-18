@@ -1,0 +1,58 @@
+/** @file
+  IPMI ACPI SSDT.
+
+Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+Device(IPMC)
+{
+    // Config DWord, modified during POST
+    // Bit definitions are the same as PPMFlags:
+    // [00]    = Plug and Play BMC Detection enabled in setup
+    // [31:01] = Reserved    = 0
+
+    Name(ECFL, 0x80000000)
+
+    // Return the interface specification revision
+    Method(_SRV)
+    {
+        // IPMI Specification Revision v2.0
+        Return(0x0200)
+    }
+
+    Method(_STA, 0)
+    {
+        //
+        // Assume OK
+        //
+          Store (0xF, Local0)
+
+        Return(Local0)
+
+        // Bit 0 - Set if the device is present.
+        // Bit 1 - Set if the device is enabled and decoding its resources.
+        // Bit 2 - Set if the device should be shown in the UI.
+        // Bit 3 - Set if the device is functioning properly (cleared if the device failed its diagnostics).
+        // Bit 4 - Set if the battery is present.
+        // Bit 5 - Reserved (must be cleared).
+    }   // end of _STA
+
+    // Return the x86 resources consumed by BMC
+    Name(_CRS, ResourceTemplate()
+    {
+        // Uses 8-bit ports 0xCA2-0xCA5
+        IO(Decode16, 0xCA2, 0xCA2, 0, 2)
+    })
+
+    Name(_HID, "IPI0001")           // IPMI device
+    Name(_IFT, 0x1)                 // KCS system interface type
+    Name(_STR, Unicode("IPMI_KCS"))
+
+    Name(_UID, 0)  // First interface.
+
+
+} // end of  Device(IPMC)
+
+

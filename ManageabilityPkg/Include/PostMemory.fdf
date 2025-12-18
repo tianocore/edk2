@@ -1,0 +1,57 @@
+## @file
+# Manageabilty Package post memory initialization firmware
+# volume description.
+#
+# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+!if gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiEnable == TRUE
+  INF ManageabilityPkg/Universal/IpmiProtocol/Dxe/IpmiProtocolDxe.inf
+!endif
+
+!if gManageabilityPkgTokenSpaceGuid.PcdManageabilitySmmIpmiEnable == TRUE
+  INF ManageabilityPkg/Universal/IpmiProtocol/Smm/IpmiProtocolSmm.inf
+!endif
+
+!if gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxePldmEnable == TRUE
+  INF ManageabilityPkg/Universal/PldmProtocol/Dxe/PldmProtocolDxe.inf
+!endif
+
+!if gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiSmbiosTransferEnable == TRUE
+  INF ManageabilityPkg/Universal/IpmiSmbiosTransferDxe/IpmiSmbiosTransferDxe.inf
+!endif
+
+!if gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxePldmSmbiosTransferEnable == TRUE
+  INF ManageabilityPkg/Universal/PldmSmbiosTransferDxe/PldmSmbiosTransferDxe.inf
+!endif
+
+!if gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeMctpEnable == TRUE
+  INF ManageabilityPkg/Universal/MctpProtocol/Dxe/MctpProtocolDxe.inf
+!endif
+
+!if gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiFru == TRUE
+  INF ManageabilityPkg/Universal/IpmiFru/IpmiFru.inf
+!endif
+
+!if gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiOsWdt == TRUE
+  INF ManageabilityPkg/Universal/IpmiOsWdt/OsWdt.inf
+!endif
+
+!if gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiSolStatus == TRUE
+  INF ManageabilityPkg/Universal/IpmiSolStatus/SolStatus.inf
+!endif
+
+!if gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiBmcElog == TRUE
+  INF ManageabilityPkg/Universal/IpmiBmcElog/BmcElog.inf
+!endif
+
+!if gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiFrb == TRUE
+  INF ManageabilityPkg/Universal/IpmiFrb/FrbDxe.inf
+!endif
+
+!if gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiBmcAcpi == TRUE
+  INF ManageabilityPkg/Universal/IpmiBmcAcpi/BmcAcpi.inf
+!endif

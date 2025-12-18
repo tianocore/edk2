@@ -1,0 +1,46 @@
+## @file
+# EDKII PLDM Pootocol module INF file.
+#
+# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001d
+  BASE_NAME                      = PldmProtocolDxe
+  FILE_GUID                      = DA83FBDC-ECFE-4094-9ED3-EAFD1342333F
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DxePldmProtocolEntry
+  UNLOAD_IMAGE                   = PldmProtocolUnloadImage
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  PldmProtocol.c
+  ../Common/PldmProtocolCommon.c
+  ../Common/PldmProtocolCommon.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ManageabilityPkg/ManageabilityPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  ManageabilityTransportHelperLib
+  ManageabilityTransportLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+
+[Guids]
+  gManageabilityTransportMctpGuid
+
+[Protocols]
+  gEdkiiPldmProtocolGuid
+
+[Depex]
+  TRUE

@@ -1,0 +1,12 @@
+// /** @file
+// Null instance of Platform BMC Ready Library
+//
+// Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "Null instance of Platform BMC Ready Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Platform BMC Ready Library provides functions to check whether BMC is ready for IPMI transaction or not."

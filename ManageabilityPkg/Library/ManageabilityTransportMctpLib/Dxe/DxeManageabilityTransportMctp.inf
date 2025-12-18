@@ -1,0 +1,44 @@
+## @file
+# MCTP instance of Manageability Transport Library
+#
+# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = DxeManageabilityTransportMctp
+  MODULE_UNI_FILE                = ManageabilityTransportMctp.uni
+  FILE_GUID                      = 7770FA0F-4808-47BD-89F4-717185332486
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ManageabilityTransportLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  ManageabilityTransportMctp.c
+  ManageabilityTransportMctp.h
+
+[Packages]
+  ManageabilityPkg/ManageabilityPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEdkiiMctpProtocolGuid
+
+[Guids]
+  gManageabilityProtocolPldmGuid
+  gManageabilityTransportMctpGuid
+
+[Depex]
+  gEdkiiMctpProtocolGuid  ## ALWAYS_CONSUMES
+
