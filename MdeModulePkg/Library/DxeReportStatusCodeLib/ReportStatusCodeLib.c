@@ -2,6 +2,7 @@
   Report Status Code Library for DXE Phase.
 
   Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -20,6 +21,7 @@
 #include <Guid/StatusCodeDataTypeDebug.h>
 
 EFI_STATUS_CODE_PROTOCOL  *mReportStatusCodeLibStatusCodeProtocol = NULL;
+EFI_EVENT                 mOnStatusCodeProtocolInstallEvent;
 
 /**
   Locate the report status code service.
@@ -86,9 +88,8 @@ InternalReportStatusCode (
       (ReportDebugCodeEnabled () && (((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_DEBUG_CODE)))
   {
     //
-    // If mReportStatusCodeLibStatusCodeProtocol is NULL, then check if Report Status Code Protocol is available in system.
+    // If mReportStatusCodeLibStatusCodeProtocol is NULL, the protocol has not yet been registered. Return immediately.
     //
-    InternalGetReportStatusCode ();
     if (mReportStatusCodeLibStatusCodeProtocol == NULL) {
       return EFI_UNSUPPORTED;
     }
@@ -610,4 +611,104 @@ ReportDebugCodeEnabled (
   )
 {
   return (BOOLEAN)((PcdGet8 (PcdReportStatusCodePropertyMask) & REPORT_STATUS_CODE_PROPERTY_DEBUG_CODE_ENABLED) != 0);
+}
+
+/**
+  Notification function called when the Status Code Runtime protocol is installed. Locates and caches the protocol.
+
+    @param    Event           Not Used.
+    @param    Context         Not Used.
+
+   @retval   none
+ **/
+VOID
+EFIAPI
+OnStatusCodeRuntimeProtocolInstalledNotification (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  InternalGetReportStatusCode ();
+
+  if (mReportStatusCodeLibStatusCodeProtocol != NULL) {
+    gBS->CloseEvent (mOnStatusCodeProtocolInstallEvent);
+  }
+}
+
+/**
+    The constructor attempts to locate and cache StatusCode Protocol. If not found, it will
+    register a notify event triggered
+
+    @param  ImageHandle   The firmware allocated handle for the EFI image.
+    @param  SystemTable   A pointer to the EFI System Table.
+
+    @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
+
+**/
+EFI_STATUS
+EFIAPI
+ReportStatusCodeLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS  Status;
+  VOID        *Registration;
+
+  InternalGetReportStatusCode ();
+
+  //
+  // Register for protocol installation notification if the protocol is not found
+  //
+  if ((mReportStatusCodeLibStatusCodeProtocol == NULL) && (gBS != NULL)) {
+    //
+    // Create the event
+    //
+    Status = gBS->CreateEvent (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    OnStatusCodeRuntimeProtocolInstalledNotification,
+                    NULL,
+                    &mOnStatusCodeProtocolInstallEvent
+                    );
+    ASSERT_EFI_ERROR (Status);
+
+    //
+    // Register for protocol notifications on this event
+    //
+    Status = gBS->RegisterProtocolNotify (
+                    &gEfiStatusCodeRuntimeProtocolGuid,
+                    mOnStatusCodeProtocolInstallEvent,
+                    &Registration
+                    );
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+    Closes the protocol notification event, if still open, when the library is unloaded.
+
+    @param  ImageHandle   The firmware allocated handle for the EFI image.
+    @param  SystemTable   A pointer to the EFI System Table.
+
+    @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
+
+**/
+EFI_STATUS
+EFIAPI
+ReportStatusCodeLibDestructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS  Status;
+
+  if (mReportStatusCodeLibStatusCodeProtocol == NULL) {
+    Status = gBS->CloseEvent (mOnStatusCodeProtocolInstallEvent);
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  return EFI_SUCCESS;
 }
