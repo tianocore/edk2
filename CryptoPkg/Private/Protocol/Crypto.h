@@ -20,7 +20,7 @@
 /// the EDK II Crypto Protocol is extended, this version define must be
 /// increased.
 ///
-#define EDKII_CRYPTO_VERSION  22
+#define EDKII_CRYPTO_VERSION  23
 
 ///
 /// EDK II Crypto Protocol forward declaration
@@ -5198,6 +5198,26 @@ VOID *
   );
 
 /**
+  Create a new EC_GROUP over a prime field GF(p).
+
+  @param[in] BnPrime    Group prime number.
+  @param[in] BnA        A coefficient.
+  @param[in] BnB        B coefficient.
+  @param[in] BnCtx      BN context.
+
+  @retval EcGroup object  On success.
+  @retval NULL            On failure.
+**/
+typedef
+VOID *
+(EFIAPI *EDKII_CRYPTO_EC_GROUP_INIT_GFP)(
+  IN VOID  *BnPrime,
+  IN VOID  *BnA,
+  IN VOID  *BnB,
+  IN VOID  *BnCtx        OPTIONAL
+  );
+
+/**
   Get EC curve parameters. While elliptic curve equation is Y^2 mod P = (X^3 + AX + B) Mod P.
   This function will set the provided Big Number objects  to the corresponding
   values. The caller needs to make sure all the "out" BigNumber parameters
@@ -5250,6 +5270,26 @@ typedef
 VOID
 (EFIAPI *EDKII_CRYPTO_EC_GROUP_FREE)(
   IN VOID *EcGroup
+  );
+
+/**
+  Set the generator for an EC_GROUP.
+
+  @param[in]  EcGroup           The EC_GROUP object.
+  @param[in]  EcPointGenerator  The generator point G.
+  @param[in]  BnOrder           The order of the generator.
+  @param[in]  BnCoFactor        The cofactor of the group.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_GROUP_SET_GENERATOR)(
+  IN VOID        *EcGroup,
+  IN CONST VOID  *EcPointGenerator,
+  IN CONST VOID  *BnOrder,
+  IN CONST VOID  *BnCoFactor            OPTIONAL
   );
 
 /**
@@ -5371,6 +5411,64 @@ BOOLEAN
   IN CONST VOID *EcPoint,
   IN CONST VOID *BnPScalar,
   IN VOID *BnCtx
+  );
+
+/**
+  Variable EC point multiplication. EcPointResult = G * BnGScalar + EcPoint * BnPScalar.
+
+  @param[in]  EcGroup          EC group object
+  @param[out] EcPointResult    EC point to hold the result. The point should
+                               be properly initialized.
+  @param[in]  BnGScalar        G Scalar
+  @param[in]  EcPoint          EC Point
+  @param[in]  BnPScalar        P Scalar
+  @param[in]  BnCtx            BN context, created with BigNumNewContext()
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_POINT_MUL2)(
+  IN CONST VOID *EcGroup,
+  OUT VOID *EcPointResult,
+  IN CONST VOID *BnGScalar,
+  IN CONST VOID *EcPoint,
+  IN CONST VOID *BnPScalar,
+  IN VOID *BnCtx
+  );
+
+/**
+  Compute a linear combination of multiple EC points.
+
+  This function calculates:
+    EcPointResult = BnGScalar * G + Σ (EcPoints[i] * BnPScalars[i])
+
+  where G is the generator of the EC_GROUP, and Q[i] are arbitrary points.
+
+  @param[in]  EcGroup          EC group object.
+  @param[out] EcPointResult    EC point to hold the result. The point should
+                               be properly initialized.
+  @param[in]  BnGScalar        G Scalar.
+                               May be NULL if not used.
+  @param[in]  Count            The number of EcPoints and P scalars.
+  @param[in]  EcPoints         EC Points.
+  @param[in]  BnPScalars       P Scalars.
+  @param[in]  BnCtx            BN context, created with BigNumNewContext().
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_EC_POINTS_MUL)(
+  IN CONST VOID  *EcGroup,
+  OUT VOID       *EcPointResult,
+  IN CONST VOID  *BnGScalar,
+  UINTN          Count,
+  IN CONST VOID  *EcPoints[],
+  IN CONST VOID  *BnPScalars[],
+  IN VOID        *BnCtx
   );
 
 /**
@@ -6018,6 +6116,11 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_BIGNUM_MUL                             BigNumMul;
   EDKII_CRYPTO_BIGNUM_GCD                             BigNumGcd;
   EDKII_CRYPTO_BIGNUM_DIV2                            BigNumDiv2;
+  /// Ec (Continued)
+  EDKII_CRYPTO_EC_GROUP_INIT_GFP                      EcGroupInitGFp;
+  EDKII_CRYPTO_EC_GROUP_SET_GENERATOR                 EcGroupSetGenerator;
+  EDKII_CRYPTO_EC_POINT_MUL2                          EcPointMul2;
+  EDKII_CRYPTO_EC_POINTS_MUL                          EcPointsMul;
 };
 
 extern GUID  gEdkiiCryptoProtocolGuid;

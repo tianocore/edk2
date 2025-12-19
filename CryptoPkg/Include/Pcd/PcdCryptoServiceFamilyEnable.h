@@ -434,6 +434,10 @@ typedef struct {
       UINT8    GetPrivateKeyFromPem          : 1;
       UINT8    DsaSign                       : 1;
       UINT8    DsaVerify                     : 1;
+      UINT8    GroupInitGFp                  : 1;
+      UINT8    GroupSetGenerator             : 1;
+      UINT8    PointMul2                     : 1;
+      UINT8    PointsMul                     : 1;
     } Services;
     UINT32    Family;
   } Ec;
