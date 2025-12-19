@@ -20,7 +20,7 @@
 /// the EDK II Crypto Protocol is extended, this version define must be
 /// increased.
 ///
-#define EDKII_CRYPTO_VERSION  21
+#define EDKII_CRYPTO_VERSION  22
 
 ///
 /// EDK II Crypto Protocol forward declaration
@@ -4779,6 +4779,26 @@ BOOLEAN
   );
 
 /**
+  Calculate BnRes = BnA * BnB.
+  Please note, all "out" Big number arguments should be properly initialized
+  by calling to BigNumInit() or BigNumFromBin() functions.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+  @param[out]  BnRes   The result of BnA * BnB.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_BIGNUM_MUL)(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
+  OUT VOID *BnRes
+  );
+
+/**
   Calculate remainder: BnRes = BnA % BnB.
 
   @param[in]   BnA     Big number.
@@ -4853,6 +4873,28 @@ BOOLEAN
   );
 
 /**
+  Divide two Big Numbers and obtain the quotient and the remainder.
+  Please note, all "out" Big number arguments should be properly initialized
+  by calling to BigNumInit() or BigNumFromBin() functions.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+  @param[out]  BnResQ  The result, such that BnA / BnB.
+  @param[out]  BnResR  The result, such that BnA % BnB.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_BIGNUM_DIV2)(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
+  OUT VOID *BnResQ,
+  OUT VOID *BnResR
+  );
+
+/**
   Multiply two Big Numbers modulo BnM.
 
   @param[in]   BnA     Big number.
@@ -4869,6 +4911,24 @@ BOOLEAN
   IN CONST VOID *BnA,
   IN CONST VOID *BnB,
   IN CONST VOID *BnM,
+  OUT VOID *BnRes
+  );
+
+/**
+  Computes the greatest common divisor (GCD) of two BIGNUM values.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+  @param[out]  BnRes   The result, such that GCD(BnA, BnB).
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_BIGNUM_GCD)(
+  IN CONST VOID *BnA,
+  IN CONST VOID *BnB,
   OUT VOID *BnRes
   );
 
@@ -5045,6 +5105,42 @@ VOID *
 typedef
 VOID
 (EFIAPI *EDKII_CRYPTO_BIGNUM_CONTEXT_FREE)(
+  IN VOID *BnCtx
+  );
+
+/**
+  Marks the start of a temporary BIGNUM allocation frame.
+  Must be paired with BigNumContextEnd().
+
+  @param[in]   BnCtx     Big number context.
+**/
+typedef
+VOID
+(EFIAPI *EDKII_CRYPTO_BIGNUM_CONTEXT_START)(
+  IN VOID *BnCtx
+  );
+
+/**
+  Ends the current BN_CTX allocation frame and releases all temporary BIGNUMs.
+
+  @param[in]   BnCtx     Big number context.
+**/
+typedef
+VOID
+(EFIAPI *EDKII_CRYPTO_BIGNUM_CONTEXT_END)(
+  IN VOID *BnCtx
+  );
+
+/**
+  Returns a temporary BIGNUM from the given BN_CTX.
+  The returned BIGNUM is managed by the context and must not be freed manually.
+  Must be called between BigNumContextStart() and BigNumContextEnd().
+
+  @param[in]   BnCtx     Big number context.
+**/
+typedef
+VOID *
+(EFIAPI *EDKII_CRYPTO_BIGNUM_CONTEXT_GET)(
   IN VOID *BnCtx
   );
 
@@ -5915,6 +6011,13 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_CAMELLIA_INIT                          CamelliaInit;
   EDKII_CRYPTO_CAMELLIA_ENCRYPT                       CamelliaEncrypt;
   EDKII_CRYPTO_CAMELLIA_DECRYPT                       CamelliaDecrypt;
+  /// BIGNUM (Continued)
+  EDKII_CRYPTO_BIGNUM_CONTEXT_START                   BigNumContextStart;
+  EDKII_CRYPTO_BIGNUM_CONTEXT_END                     BigNumContextEnd;
+  EDKII_CRYPTO_BIGNUM_CONTEXT_GET                     BigNumContextGet;
+  EDKII_CRYPTO_BIGNUM_MUL                             BigNumMul;
+  EDKII_CRYPTO_BIGNUM_GCD                             BigNumGcd;
+  EDKII_CRYPTO_BIGNUM_DIV2                            BigNumDiv2;
 };
 
 extern GUID  gEdkiiCryptoProtocolGuid;
