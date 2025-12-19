@@ -256,6 +256,8 @@ typedef struct {
       UINT8    EcbDecrypt     : 1;  // Deprecated
       UINT8    CbcEncrypt     : 1;
       UINT8    CbcDecrypt     : 1;
+      UINT8    Encrypt        : 1;
+      UINT8    Decrypt        : 1;
     } Services;
     UINT32    Family;
   } Aes;
