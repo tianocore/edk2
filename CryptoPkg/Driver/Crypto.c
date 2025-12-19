@@ -6048,6 +6048,29 @@ CryptoServiceBigNumSub (
 }
 
 /**
+  Calculate BnRes = BnA * BnB.
+  Please note, all "out" Big number arguments should be properly initialized
+  by calling to BigNumInit() or BigNumFromBin() functions.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+  @param[out]  BnRes   The result of BnA * BnB.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceBigNumMul (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnB,
+  OUT VOID       *BnRes
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.Mul, BigNumMul, (BnA, BnB, BnRes), FALSE);
+}
+
+/**
   Calculate remainder: BnRes = BnA % BnB.
   Please note, all "out" Big number arguments should be properly initialized
   by calling to BigNumInit() or BigNumFromBin() functions.
@@ -6142,6 +6165,31 @@ CryptoServiceBigNumDiv (
 }
 
 /**
+  Divide two Big Numbers and obtain the quotient and the remainder.
+  Please note, all "out" Big number arguments should be properly initialized
+  by calling to BigNumInit() or BigNumFromBin() functions.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+  @param[out]  BnResQ  The result, such that BnA / BnB.
+  @param[out]  BnResR  The result, such that BnA % BnB.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceBigNumDiv2 (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnB,
+  OUT VOID       *BnResQ,
+  OUT VOID       *BnResR
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.Div2, BigNumDiv2, (BnA, BnB, BnResQ, BnResR), FALSE);
+}
+
+/**
   Multiply two Big Numbers modulo BnM.
   Please note, all "out" Big number arguments should be properly initialized
   by calling to BigNumInit() or BigNumFromBin() functions.
@@ -6164,6 +6212,27 @@ CryptoServiceBigNumMulMod (
   )
 {
   return CALL_BASECRYPTLIB (Bn.Services.MulMod, BigNumMulMod, (BnA, BnB, BnM, BnRes), FALSE);
+}
+
+/**
+  Computes the greatest common divisor (GCD) of two BIGNUM values.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+  @param[out]  BnRes   The result, such that GCD(BnA, BnB).
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceBigNumGcd (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnB,
+  OUT VOID       *BnRes
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.Gcd, BigNumGcd, (BnA, BnB, BnRes), FALSE);
 }
 
 /**
@@ -6378,6 +6447,51 @@ CryptoServiceBigNumContextFree (
   )
 {
   CALL_VOID_BASECRYPTLIB (Bn.Services.ContextFree, BigNumContextFree, (BnCtx));
+}
+
+/**
+  Marks the start of a temporary BIGNUM allocation frame.
+  Must be paired with BigNumContextEnd().
+
+  @param[in]   BnCtx     Big number context.
+**/
+VOID
+EFIAPI
+CryptoServiceBigNumContextStart (
+  IN VOID  *BnCtx
+  )
+{
+  CALL_VOID_BASECRYPTLIB (Bn.Services.ContextStart, BigNumContextStart, (BnCtx));
+}
+
+/**
+  Ends the current BN_CTX allocation frame and releases all temporary BIGNUMs.
+
+  @param[in]   BnCtx     Big number context.
+**/
+VOID
+EFIAPI
+CryptoServiceBigNumContextEnd (
+  IN VOID  *BnCtx
+  )
+{
+  CALL_VOID_BASECRYPTLIB (Bn.Services.ContextEnd, BigNumContextEnd, (BnCtx));
+}
+
+/**
+  Returns a temporary BIGNUM from the given BN_CTX.
+  The returned BIGNUM is managed by the context and must not be freed manually.
+  Must be called between BigNumContextStart() and BigNumContextEnd().
+
+  @param[in]   BnCtx     Big number context.
+**/
+VOID *
+EFIAPI
+CryptoServiceBigNumContextGet (
+  IN VOID  *BnCtx
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.ContextGet, BigNumContextGet, (BnCtx), NULL);
 }
 
 /**
@@ -7347,4 +7461,11 @@ const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   CryptoServiceCamelliaInit,
   CryptoServiceCamelliaEncrypt,
   CryptoServiceCamelliaDecrypt,
+  /// BIGNUM (Continued)
+  CryptoServiceBigNumContextStart,
+  CryptoServiceBigNumContextEnd,
+  CryptoServiceBigNumContextGet,
+  CryptoServiceBigNumMul,
+  CryptoServiceBigNumGcd,
+  CryptoServiceBigNumDiv2,
 };
