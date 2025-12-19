@@ -20,7 +20,7 @@
 /// the EDK II Crypto Protocol is extended, this version define must be
 /// increased.
 ///
-#define EDKII_CRYPTO_VERSION  19
+#define EDKII_CRYPTO_VERSION  20
 
 ///
 /// EDK II Crypto Protocol forward declaration
@@ -3037,6 +3037,64 @@ BOOLEAN
   );
 
 /**
+  Performs AES encryption on single block (AES_BLOCK_SIZE)
+
+  This function performs AES encryption on single block pointed by Input.
+
+  Caller must perform padding, if necessary, to ensure single block size.
+  AesContext should be already correctly initialized by AesInit().
+  Behavior with invalid AES context is undefined.
+
+  If AesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
+
+  @param[in]   AesContext  Pointer to the AES context.
+  @param[in]   Input       Pointer to the buffer containing single block data
+  @param[out]  Output      Pointer to a buffer that receives the AES encryption output.
+
+  @retval TRUE   AES encryption succeeded.
+  @retval FALSE  AES encryption failed.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_AES_ENCRYPT)(
+  IN   VOID         *AesContext,
+  IN   CONST UINT8  *Input,
+  OUT  UINT8        *Output
+  );
+
+/**
+  Performs AES decryption on single block (AES_BLOCK_SIZE)
+
+  This function performs AES decryption on single block pointed by Input.
+
+  Caller must perform padding, if necessary, to ensure single block size.
+  AesContext should be already correctly initialized by AesInit().
+  Behavior with invalid AES context is undefined.
+
+  If AesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
+
+  @param[in]   AesContext  Pointer to the AES context.
+  @param[in]   Input       Pointer to the buffer containing single block encrpyted data.
+  @param[out]  Output      Pointer to a buffer that receives the AES decryption output.
+
+  @retval TRUE   AES decryption succeeded.
+  @retval FALSE  AES decryption failed.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_AES_DECRYPT)(
+  IN   VOID         *AesContext,
+  IN   CONST UINT8  *Input,
+  OUT  UINT8        *Output
+  );
+
+/**
   ARC4 is deprecated and unsupported any longer.
   Keep the function field for binary compability.
 
@@ -5750,6 +5808,9 @@ struct _EDKII_CRYPTO_PROTOCOL {
   /// TLS Set (Continued)
   EDKII_CRYPTO_TLS_SET_SERVER_NAME                    TlsSetServerName;
   EDKII_CRYPTO_TLS_SET_SECURITY_LEVEL                 TlsSetSecurityLevel;
+  /// AES (Continued)
+  EDKII_CRYPTO_AES_ENCRYPT                            AesEncrypt;
+  EDKII_CRYPTO_AES_DECRYPT                            AesDecrypt;
 };
 
 extern GUID  gEdkiiCryptoProtocolGuid;
