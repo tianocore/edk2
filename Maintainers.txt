@@ -661,6 +661,11 @@ R: Dun Tan <dun.tan@intel.com> [td36]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 R: Eduardo Cuevas Farfan <eduardo.cuevas.farfan@intel.com> [ecuevasf]
 
+TcgTpmPkg
+F: TcgTpmPkg/
+M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
+M: Yeoreum Yun <yeoreum.yun@arm.com> [LeviYeoReum]
+
 UefiCpuPkg
 F: UefiCpuPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/uefi_cpu_pkg.html
