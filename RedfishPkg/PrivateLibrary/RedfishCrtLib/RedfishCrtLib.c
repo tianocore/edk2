@@ -18,8 +18,13 @@
 int   errno            = 0;
 char  errnum_message[] = "We don't support to map errnum to the error message on edk2 Redfish\n";
 
-// This is required to keep VC++ happy if you use floating-point
-int  _fltused = 1;
+// This is required to keep MSVC-mode toolchains happy when you use floating-point.
+#if defined (__GNUC__) || defined (__clang__)
+#define GLOBAL_USED  __attribute__((used))
+#else
+#define GLOBAL_USED
+#endif
+int  GLOBAL_USED  _fltused;
 
 /**
   Determine if a particular character is an alphanumeric character
