@@ -117,7 +117,8 @@ CmockaUnitTestTeardownFunctionRunner (
     //
     printf ("UnitTest: %s - %s\n", UnitTest->Name, UnitTest->Description);
     printf ("Log Output Start\n");
-    printf (UnitTest->Log);
+    fwrite (UnitTest->Log, 1, strlen (UnitTest->Log), stdout);
+    fflush (stdout);
     printf ("Log Output End\n");
   }
 
