@@ -47,7 +47,7 @@ EMU_SYSTEM_MEMORY  *gSystemMemory;
 UINTN                        mImageContextModHandleArraySize = 0;
 IMAGE_CONTEXT_TO_MOD_HANDLE  *mImageContextModHandleArray    = NULL;
 
-EFI_PEI_PPI_DESCRIPTOR  *gPpiList;
+EFI_PEI_PPI_DESCRIPTOR  *mPpiList;
 
 int  gInXcode = 0;
 
@@ -166,7 +166,7 @@ main (
 
   // EmuSecLibConstructor ();
 
-  gPpiList = GetThunkPpiList ();
+  mPpiList = GetThunkPpiList ();
 
   //
   // Allocate space for gSystemMemory Array
@@ -602,7 +602,7 @@ SecLoadFromCore (
   PeiSwitchStacks (
     (SWITCH_STACK_ENTRY_POINT)(UINTN)PeiCoreEntryPoint,
     SecCoreData,
-    (VOID *)gPpiList,
+    (VOID *)mPpiList,
     TopOfStack
     );
   //
