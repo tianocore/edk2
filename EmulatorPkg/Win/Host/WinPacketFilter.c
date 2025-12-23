@@ -749,6 +749,7 @@ WinNtSnpReceive (
   WIN_NT_SNP_PRIVATE  *Private;
   INT32               ReturnValue;
   UINTN               BufSize;
+  UINT32              BufferSize32;
 
   Private = WIN_NT_SNP_PRIVATE_DATA_FROM_THIS (This);
 
@@ -756,11 +757,13 @@ WinNtSnpReceive (
 
   ASSERT (Private->NtNetUtilityTable.Receive != NULL);
 
-  ReturnValue = Private->NtNetUtilityTable.Receive (
-                                             Private->Instance.InterfaceInfo.InterfaceIndex,
-                                             BufferSize,
-                                             Buffer
-                                             );
+  BufferSize32 = (UINT32)(*BufferSize);
+  ReturnValue  = Private->NtNetUtilityTable.Receive (
+                                              Private->Instance.InterfaceInfo.InterfaceIndex,
+                                              &BufferSize32,
+                                              Buffer
+                                              );
+  *BufferSize = BufferSize32;
 
   if (ReturnValue < 0) {
     if (ReturnValue == -100) {
