@@ -8,26 +8,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __WIN_NT_INCLUDE_H__
 #define __WIN_NT_INCLUDE_H__
 
+#undef VOID
+
 #define GUID              _WINNT_DUP_GUID_____
 #define _LIST_ENTRY       _WINNT_DUP_LIST_ENTRY_FORWARD
 #define LIST_ENTRY        _WINNT_DUP_LIST_ENTRY
 #define RUNTIME_FUNCTION  _WINNT_DUP_RUNTIME_FUNCTION
-#if defined (MDE_CPU_IA32) && (_MSC_VER < 1800)
-#define InterlockedIncrement          _WINNT_DUP_InterlockedIncrement
-#define InterlockedDecrement          _WINNT_DUP_InterlockedDecrement
-#define InterlockedCompareExchange64  _WINNT_DUP_InterlockedCompareExchange64
-#endif
-#undef UNALIGNED
-#undef CONST
-#undef VOID
-#undef DEBUG_EVENT
-
-// WQBugBug: This typedef is to make "windows.h" buildable.
-//                   It should be removed after the root cause why
-//                   size_t is undefined when go into the line below is found.
-#if defined (MDE_CPU_IA32)
-typedef UINT32 size_t;
-#endif
 
 #include "windows.h"
 #include "windowsx.h"
@@ -36,20 +22,9 @@ typedef UINT32 size_t;
 #undef _LIST_ENTRY
 #undef LIST_ENTRY
 #undef RUNTIME_FUNCTION
-#undef InterlockedIncrement
-#undef InterlockedDecrement
-#undef InterlockedCompareExchange64
-#undef InterlockedCompareExchangePointer
-#undef CreateEventEx
-#undef IMAGE_FILE_MACHINE_ARM64
-
-#define VOID  void
-
 //
-// Prevent collisions with Windows API name macros that deal with Unicode/Not issues
+// Prevent collision with FAR field of EFI_SYSTEM_CONTEXT_AARCH64
 //
-#undef LoadImage
-#undef CreateEvent
 #undef FAR
 
 //
