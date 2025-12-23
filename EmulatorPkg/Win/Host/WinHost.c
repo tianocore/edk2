@@ -407,7 +407,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
-INTN
+int
 EFIAPI
 main (
   IN  INT    Argc,
@@ -460,7 +460,7 @@ Returns:
   //
   EmuMagicPage = (VOID *)(UINTN)(FixedPcdGet64 (PcdPeiServicesTablePage) & MAX_UINTN);
   if (EmuMagicPage != NULL) {
-    UINT64  Size;
+    UINTN  Size;
     Status = WinNtOpenFile (
                NULL,
                SIZE_4KB,
@@ -470,7 +470,7 @@ Returns:
                );
     if (EFI_ERROR (Status)) {
       SecPrint ("ERROR : Could not allocate PeiServicesTablePage @ %p\n\r", EmuMagicPage);
-      return EFI_DEVICE_ERROR;
+      exit (1);
     }
   }
 
@@ -554,7 +554,8 @@ Returns:
     gSystemMemory[Index].Size   = ((UINT64)_wtoi (MemorySizeStr)) * ((UINT64)SIZE_1MB);
     gSystemMemory[Index].Memory = (EFI_PHYSICAL_ADDRESS)(UINTN)VirtualAlloc (NULL, (SIZE_T)(gSystemMemory[Index].Size), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
     if (gSystemMemory[Index].Memory == 0) {
-      return EFI_OUT_OF_RESOURCES;
+      SecPrint ("ERROR : Can not allocate memory for %S.  Exiting.\n\r", MemorySizeStr);
+      exit (1);
     }
 
     //
