@@ -1,11 +1,7 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
-;
-; Module Name:
-;
-;   Stack.asm
 ;
 ; Abstract:
 ;
@@ -13,9 +9,7 @@
 ;
 ;------------------------------------------------------------------------------
 
-    .586p
-    .model  flat,C
-    .code
+    SECTION .text
 
 ;------------------------------------------------------------------------------
 ; VOID
@@ -25,7 +19,8 @@
 ;   UINT32   PermenentMemoryBase
 ;   );
 ;------------------------------------------------------------------------------
-SecSwitchStack   PROC
+global ASM_PFX(SecSwitchStack)
+ASM_PFX(SecSwitchStack):
     ;
     ; Save three register: eax, ebx, ecx
     ;
@@ -50,17 +45,17 @@ SecSwitchStack   PROC
     mov   eax, esp
     sub   eax, ebx
     add   eax, ecx
-    mov   edx, dword ptr [esp]         ; copy pushed register's value to permanent memory
-    mov   dword ptr [eax], edx
-    mov   edx, dword ptr [esp + 4]
-    mov   dword ptr [eax + 4], edx
-    mov   edx, dword ptr [esp + 8]
-    mov   dword ptr [eax + 8], edx
-    mov   edx, dword ptr [esp + 12]
-    mov   dword ptr [eax + 12], edx
-    mov   edx, dword ptr [esp + 16]    ; Update this function's return address into permanent memory
-    mov   dword ptr [eax + 16], edx
-    mov   esp, eax                     ; From now, esp is pointed to permanent memory
+    mov   edx, [esp]         ; copy pushed register's value to permanent memory
+    mov   [eax], edx
+    mov   edx, [esp + 4]
+    mov   [eax + 4], edx
+    mov   edx, [esp + 8]
+    mov   [eax + 8], edx
+    mov   edx, [esp + 12]
+    mov   [eax + 12], edx
+    mov   edx, [esp + 16]    ; Update this function's return address into permanent memory
+    mov   [eax + 16], edx
+    mov   esp, eax           ; From now, esp is pointed to permanent memory
 
     ;
     ; Fixup the ebp point to permanent memory
@@ -68,21 +63,18 @@ SecSwitchStack   PROC
     mov   eax, ebp
     sub   eax, ebx
     add   eax, ecx
-    mov   ebp, eax                ; From now, ebp is pointed to permanent memory
+    mov   ebp, eax           ; From now, ebp is pointed to permanent memory
 
     ;
     ; Fixup callee's ebp point for PeiDispatch
     ;
-    mov   eax, dword ptr [ebp]
+    mov   eax, [ebp]
     sub   eax, ebx
     add   eax, ecx
-    mov   dword ptr [ebp], eax    ; From now, Temporary's PPI caller's stack is in permanent memory
+    mov   [ebp], eax    ; From now, Temporary's PPI caller's stack is in permanent memory
 
     pop   edx
     pop   ecx
     pop   ebx
     pop   eax
     ret
-SecSwitchStack   ENDP
-
-    END
