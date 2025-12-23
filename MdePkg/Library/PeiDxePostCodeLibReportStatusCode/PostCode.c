@@ -27,7 +27,7 @@
 
 **/
 #define POST_CODE_TO_STATUS_CODE_VALUE(PostCode)  \
-  ((EFI_STATUS_CODE_VALUE) (((PostCode & 0x1f) << 16) | ((PostCode & 0x3) << 19)))
+  ((EFI_STATUS_CODE_VALUE) (((PostCode & 0x1f) << 16) | ((PostCode & 0xe0) << 19)))
 
 /**
   Sends an 32-bit value to a POST card.
