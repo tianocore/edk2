@@ -25,6 +25,7 @@
   AcpiHelperLib|DynamicTablesPkg/Library/Common/AcpiHelperLib/AcpiHelperLib.inf
   AcpiLib|EmbeddedPkg/Library/AcpiLib/AcpiLib.inf
   AmlLib|DynamicTablesPkg/Library/Common/AmlLib/AmlLib.inf
+  MetadataObjLib|DynamicTablesPkg/Library/Common/MetadataObjLib/MetadataObjLib.inf
   SsdtSerialPortFixupLib|DynamicTablesPkg/Library/Common/SsdtSerialPortFixupLib/SsdtSerialPortFixupLib.inf
   TableHelperLib|DynamicTablesPkg/Library/Common/TableHelperLib/TableHelperLib.inf
 
@@ -37,3 +38,13 @@
     <LibraryClasses>
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiCedtLib/AcpiCedtLib.inf
   }
+
+  #
+  # SSDT CPU Topology Generator Tests
+  #
+  # Architecture:
+  # - CommonSsdtCpuTopologyGoogleTest: Tests common code with mocked arch functions
+  #
+  # All tests compile sources directly and use host environment stubs
+  # HostEnvStubs.c provides stubs for MetadataHandlerGenerate, GetMetadataRoot, CheckAcpiTablePresent
+  DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib/GoogleTest/CommonSsdtCpuTopologyGoogleTest.inf

@@ -1,0 +1,56 @@
+## @file
+#  Unit tests for common SSDT CPU Topology Generator code.
+#
+#  Tests SsdtCpuTopologyGenerator.c with mocked architecture-specific functions.
+#  This validates the common logic: hierarchy traversal, _LPI, _STA, _CPC, _PSD,
+#  processor containers, and device naming.
+#
+#  Copyright (c) 2021-2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010017
+  BASE_NAME      = CommonSsdtCpuTopologyGoogleTest
+  FILE_GUID      = dc1de0a5-ed94-4d2f-aa51-22ba18ff1973
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = HOST_APPLICATION
+
+[Sources]
+  CommonSsdtCpuTopologyGoogleTest.cpp
+  MockArchFunctions.cpp
+  MockArchFunctions.h
+  AmlTestHelper.h
+  AmlTestHelper.cpp
+  SsdtCpuTopologyTestCommon.h
+  HostEnvStubs.c
+  ../../../../../Test/Mock/Library/GoogleTest/Protocol/MockConfigurationManagerProtocol.cpp
+  # Common code under test (no arch-specific code)
+  ../SsdtCpuTopologyGenerator.c
+  ../SsdtCpuTopologyGenerator.h
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PrintLib
+  TableHelperLib
+  AcpiHelperLib
+  AmlLib
+  # Note: CmObjHelperLib is NOT included - HostEnvStubs.c provides stubs
+  MetadataObjLib
+
+[Pcd]
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdDevelopmentPlatformRelaxations  ## SOMETIMES_CONSUMES
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /EHsc

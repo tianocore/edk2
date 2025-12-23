@@ -150,7 +150,9 @@
            "imsics",
            "plics",
            "rintc",
-           "smcbios"
+           "smcbios",
+           "pointee",
+           "streq"
            ],           # words to extend to the dictionary for this package
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that
                                      # should be ignore
