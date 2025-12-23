@@ -8,17 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef __WIN_NT_INCLUDE_H__
 #define __WIN_NT_INCLUDE_H__
 
-//
-// Win32 include files do not compile clean with /W4, so we use the warning
-// pragma to suppress the warnings for Win32 only. This way our code can still
-// compile at /W4 (highest warning level) with /WX (warnings cause build
-// errors).
-//
-#pragma warning(disable : 4115)
-#pragma warning(disable : 4201)
-#pragma warning(disable : 4028)
-#pragma warning(disable : 4133)
-
 #define GUID              _WINNT_DUP_GUID_____
 #define _LIST_ENTRY       _WINNT_DUP_LIST_ENTRY_FORWARD
 #define LIST_ENTRY        _WINNT_DUP_LIST_ENTRY
@@ -52,6 +41,7 @@ typedef UINT32 size_t;
 #undef InterlockedCompareExchange64
 #undef InterlockedCompareExchangePointer
 #undef CreateEventEx
+#undef IMAGE_FILE_MACHINE_ARM64
 
 #define VOID  void
 
@@ -63,9 +53,23 @@ typedef UINT32 size_t;
 #undef FAR
 
 //
-// Set the warnings back on as the EFI code must be /W4.
+// Windows SDKs define IMAGE_FILE_MACHINE_ARM64 as "0xAA64"
+// MdePkg defines EFI_IMAGE_FILE_MACHINE_ARM64 as "0xAA64"
+// Mingw ucrt winnt.h defines IMAGE_FILE_MACHINE_ARM64 as "0xaa64" which is not
+// the exact same string as "0xAA64". This generates a macro redefinition error
+// with Mingw clang builds.
 //
-#pragma warning(default : 4115)
-#pragma warning(default : 4201)
+// Redefining a macro to the exact same string is not flagged an error.
+//
+// If IMAGE_FILE_MACHINE_ARM64 is defined, check if it matches the unexpected
+// value of "0xaa64". If "0xaa64" is detected, then undefine and redefine to
+// "0xAA64" which is the same value used in Windows SDKs and MdePkg includes.
+//
+#if defined (IMAGE_FILE_MACHINE_ARM64)
+  #if IMAGE_FILE_MACHINE_ARM64 == 0xaa64
+    #undef IMAGE_FILE_MACHINE_ARM64
+#define IMAGE_FILE_MACHINE_ARM64  0xAA64
+  #endif
+#endif
 
 #endif
