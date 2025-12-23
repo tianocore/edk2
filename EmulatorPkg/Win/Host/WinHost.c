@@ -492,7 +492,7 @@ Returns:
   //
   // Determine the first thread available to this process.
   //
-  if (GetProcessAffinityMask (GetCurrentProcess (), &ProcessAffinityMask, &SystemAffinityMask)) {
+  if (GetProcessAffinityMask (GetCurrentProcess (), (PDWORD_PTR)&ProcessAffinityMask, (PDWORD_PTR)&SystemAffinityMask)) {
     LowBit = (INT32)LowBitSet32 ((UINT32)ProcessAffinityMask);
     if (LowBit != -1) {
       //
@@ -512,7 +512,7 @@ Returns:
 
   SecInitializeThunk ();
   //
-  // PPIs pased into PEI_CORE
+  // PPIs passed into PEI_CORE
   //
   SecEmuThunkPpi = AllocateZeroPool (sizeof (EMU_THUNK_PPI) + FixedPcdGet32 (PcdPersistentMemorySize));
   if (SecEmuThunkPpi == NULL) {
