@@ -302,12 +302,12 @@ WinNtBlockIoReadBlocks (
 
   if (EFI_ERROR (Status) || (DistanceToMove != DistanceMoved)) {
     DEBUG ((DEBUG_INIT, "ReadBlocks: SetFilePointer failed\n"));
-    return WinNtBlockIoError (Private->Media);
+    return WinNtBlockIoError (Private);
   }
 
   Flag = ReadFile (Private->NtHandle, Buffer, (DWORD)BufferSize, (LPDWORD)&BytesRead, NULL);
   if (!Flag || (BytesRead != BufferSize)) {
-    return WinNtBlockIoError (Private->Media);
+    return WinNtBlockIoError (Private);
   }
 
   Private->Media->MediaPresent = TRUE;
@@ -372,12 +372,12 @@ WinNtBlockIoWriteBlocks (
 
   if (EFI_ERROR (Status) || (DistanceToMove != DistanceMoved)) {
     DEBUG ((DEBUG_INIT, "WriteBlocks: SetFilePointer failed\n"));
-    return WinNtBlockIoError (Private->Media);
+    return WinNtBlockIoError (Private);
   }
 
   Success = WriteFile (Private->NtHandle, Buffer, (DWORD)BufferSize, &BytesWritten, NULL);
   if (!Success || (BytesWritten != BufferSize)) {
-    return WinNtBlockIoError (Private->Media);
+    return WinNtBlockIoError (Private);
   }
 
   //
