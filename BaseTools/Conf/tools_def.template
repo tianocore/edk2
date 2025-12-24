@@ -280,7 +280,8 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 *_VS2015_*_PP_FLAGS               = /nologo /E /TC /FIAutoGen.h
 *_VS2015_*_VFRPP_FLAGS            = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 *_VS2015_*_DLINK2_FLAGS           =
-*_VS2015_*_DEPS_FLAGS      = DEF(MSFT_DEPS_FLAGS)
+*_VS2015_*_DEPS_FLAGS             = DEF(MSFT_DEPS_FLAGS)
+*_VS2015_*_GENFWHII_FLAGS         = --hiipackage
 *_VS2015_*_ASM16_PATH             = DEF(VS2015_BIN)\ml.exe
 
 ##################
@@ -374,6 +375,7 @@ NOOPT_VS2015_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT
 *_VS2015x86_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 *_VS2015x86_*_DLINK2_FLAGS    =
 *_VS2015x86_*_DEPS_FLAGS      = DEF(MSFT_DEPS_FLAGS)
+*_VS2015x86_*_GENFWHII_FLAGS  = --hiipackage
 *_VS2015x86_*_ASM16_PATH      = DEF(VS2015x86_BIN)\ml.exe
 
 ##################
@@ -468,6 +470,7 @@ NOOPT_VS2015x86_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 *_VS2017_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 *_VS2017_*_DLINK2_FLAGS    = /WHOLEARCHIVE
 *_VS2017_*_ASM16_PATH      = DEF(VS2017_BIN_IA32)\ml.exe
+*_VS2017_*_GENFWHII_FLAGS  = --hiipackage
 *_VS2017_*_DEPS_FLAGS      = DEF(MSFT_DEPS_FLAGS)
 ##################
 # ASL definitions
@@ -583,6 +586,7 @@ NOOPT_VS2017_AARCH64_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 *_VS2019_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 *_VS2019_*_DLINK2_FLAGS    = /WHOLEARCHIVE
 *_VS2019_*_ASM16_PATH      = DEF(VS2019_BIN_IA32)\ml.exe
+*_VS2019_*_GENFWHII_FLAGS  = --hiipackage
 *_VS2019_*_DEPS_FLAGS      = DEF(MSFT_DEPS_FLAGS)
 ##################
 # ASL definitions
@@ -699,6 +703,7 @@ NOOPT_VS2019_AARCH64_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 *_VS2022_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 *_VS2022_*_DLINK2_FLAGS    = /WHOLEARCHIVE
 *_VS2022_*_ASM16_PATH      = DEF(VS2022_BIN_IA32)\ml.exe
+*_VS2022_*_GENFWHII_FLAGS  = --hiipackage
 *_VS2022_*_DEPS_FLAGS      = DEF(MSFT_DEPS_FLAGS)
 ##################
 # ASL definitions
@@ -957,6 +962,7 @@ DEFINE GCC5_LOONGARCH64_PP_FLAGS           = -mabi=lp64d -march=loongarch64 DEF(
 *_GCC48_*_ASL_FLAGS                    = DEF(IASL_FLAGS)
 *_GCC48_*_ASL_OUTFLAGS                 = DEF(IASL_OUTFLAGS)
 *_GCC48_*_DEPS_FLAGS                   = DEF(GCC_DEPS_FLAGS)
+*_GCC48_*_GENFWHII_FLAGS               = --hiibinpackage
 
 ##################
 # GCC48 IA32 definitions
@@ -1064,6 +1070,7 @@ RELEASE_GCC48_AARCH64_CC_FLAGS   = DEF(GCC48_AARCH64_CC_FLAGS) -Wno-unused-but-s
 *_GCC49_*_ASL_FLAGS                    = DEF(IASL_FLAGS)
 *_GCC49_*_ASL_OUTFLAGS                 = DEF(IASL_OUTFLAGS)
 *_GCC49_*_DEPS_FLAGS                   = DEF(GCC_DEPS_FLAGS)
+*_GCC49_*_GENFWHII_FLAGS               = --hiibinpackage
 
 ##################
 # GCC49 IA32 definitions
@@ -1178,6 +1185,7 @@ RELEASE_GCC49_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 *_GCCNOLTO_*_ASL_FLAGS                    = DEF(IASL_FLAGS)
 *_GCCNOLTO_*_ASL_OUTFLAGS                 = DEF(IASL_OUTFLAGS)
 *_GCCNOLTO_*_DEPS_FLAGS                   = DEF(GCC_DEPS_FLAGS)
+*_GCCNOLTO_*_GENFWHII_FLAGS               = --hiibinpackage
 
 ##################
 # GCCNOLTO IA32 definitions
@@ -1291,7 +1299,8 @@ RELEASE_GCCNOLTO_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 *_GCC5_*_APP_FLAGS               =
 *_GCC5_*_ASL_FLAGS               = DEF(IASL_FLAGS)
 *_GCC5_*_ASL_OUTFLAGS            = DEF(IASL_OUTFLAGS)
-*_GCC5_*_DEPS_FLAGS                   = DEF(GCC_DEPS_FLAGS)
+*_GCC5_*_DEPS_FLAGS              = DEF(GCC_DEPS_FLAGS)
+*_GCC5_*_GENFWHII_FLAGS          = --hiibinpackage
 
 ##################
 # GCC5 IA32 definitions
@@ -1475,7 +1484,8 @@ RELEASE_GCC5_LOONGARCH64_CC_FLAGS       = DEF(GCC5_LOONGARCH64_CC_FLAGS) -Wno-un
 *_GCC_*_APP_FLAGS               =
 *_GCC_*_ASL_FLAGS               = DEF(IASL_FLAGS)
 *_GCC_*_ASL_OUTFLAGS            = DEF(IASL_OUTFLAGS)
-*_GCC_*_DEPS_FLAGS                   = DEF(GCC_DEPS_FLAGS)
+*_GCC_*_DEPS_FLAGS              = DEF(GCC_DEPS_FLAGS)
+*_GCC_*_GENFWHII_FLAGS          = --hiibinpackage
 
 ##################
 # GCC IA32 definitions
@@ -1657,6 +1667,7 @@ RELEASE_GCC_LOONGARCH64_CC_FLAGS       = DEF(GCC5_LOONGARCH64_CC_FLAGS) -Wno-unu
 *_CLANGPDB_*_ASL_OUTFLAGS            = DEF(DEFAULT_WIN_ASL_OUTFLAGS)
 *_CLANGPDB_*_ASLDLINK_FLAGS          = DEF(MSFT_ASLDLINK_FLAGS)
 *_CLANGPDB_*_DEPS_FLAGS              = DEF(GCC_DEPS_FLAGS)
+*_CLANGPDB_*_GENFWHII_FLAGS          = --hiipackage
 
 DEFINE CLANGPDB_IA32_PREFIX          = ENV(CLANG_BIN)
 DEFINE CLANGPDB_X64_PREFIX           = ENV(CLANG_BIN)
@@ -1762,6 +1773,7 @@ NOOPT_CLANGPDB_X64_GENFW_FLAGS      = --keepexceptiontable
 *_CLANGDWARF_*_APP_FLAGS            =
 *_CLANGDWARF_*_ASL_FLAGS            = DEF(IASL_FLAGS)
 *_CLANGDWARF_*_ASL_OUTFLAGS         = DEF(IASL_OUTFLAGS)
+*_CLANGDWARF_*_GENFWHII_FLAGS       = --hiibinpackage
 
 DEFINE CLANGDWARF_IA32_PREFIX       = ENV(CLANG_BIN)
 DEFINE CLANGDWARF_X64_PREFIX        = ENV(CLANG_BIN)
