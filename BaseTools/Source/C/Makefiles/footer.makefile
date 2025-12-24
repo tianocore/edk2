@@ -7,24 +7,37 @@
 
 DEPFILES = $(OBJECTS:%.o=%.d)
 
-$(MAKEROOT)/libs-$(HOST_ARCH):
-	$(MD) $(MAKEROOT)/libs-$(HOST_ARCH)
+$(BUILDROOT)/libs-$(HOST_ARCH):
+	$(MD) $(BUILDROOT)/libs-$(HOST_ARCH)
 
 .PHONY: install
-install: $(MAKEROOT)/libs-$(HOST_ARCH) $(LIBRARY)
-	$(CP) $(LIBRARY) $(MAKEROOT)/libs-$(HOST_ARCH)
+install: $(BUILDROOT)/libs-$(HOST_ARCH) $(LIBRARY)
+	$(CP) $(LIBRARY) $(BUILDROOT)/libs-$(HOST_ARCH)
 
 $(LIBRARY): $(OBJECTS)
 	$(AR) crs $@ $^
 
-%.o : %.c
+$(OBJDIR)/%.o : %.c
+	@$(MD) $(@D)
 	$(CC)  -c $(CPPFLAGS) $(CFLAGS) $< -o $@
 
-%.o : %.cpp
+$(OBJDIR)/%.o : %.cpp
+	@$(MD) $(@D)
 	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $< -o $@
+
+$(OBJECTS): | $(OBJDIR)
+
+$(OBJDIR)/%.d : %.c
+	@set -e; rm -f $@; \
+		$(MD) $(@D); \
+		$(CC) -M $(CPPFLAGS) $< > $@.$$$$; \
+		sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+		rm -f $@.$$$$
 
 .PHONY: clean
 clean:
 	$(RM) $(OBJECTS) $(LIBRARY) $(DEPFILES)
 
+ifneq ($(MAKECMDGOALS), clean)
 -include $(DEPFILES)
+endif
