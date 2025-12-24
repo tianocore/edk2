@@ -1824,15 +1824,15 @@ NOOPT_CLANGDWARF_IA32_NASM_FLAGS       = -O0 -f elf32 -g
 *_CLANGDWARF_IA32_VFRPP_FLAGS          = DEF(GCC_VFRPP_FLAGS) DEF(CLANGDWARF_IA32_TARGET)
 
 DEBUG_CLANGDWARF_IA32_CC_FLAGS         = DEF(CLANGDWARF_ALL_CC_FLAGS) -fno-pic -fno-pie -m32 -Oz -flto -march=i586 DEF(CLANGDWARF_IA32_TARGET) -g -malign-double
-DEBUG_CLANGDWARF_IA32_DLINK_FLAGS      = DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -flto -Wl,-O3 -Wl,-melf_i386 -Wl,--oformat,elf32-i386
+DEBUG_CLANGDWARF_IA32_DLINK_FLAGS      = DEF(CLANGDWARF_IA32_TARGET) DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -flto -Wl,-O3 -Wl,-melf_i386 -Wl,--oformat,elf32-i386
 DEBUG_CLANGDWARF_IA32_DLINK2_FLAGS     = DEF(CLANGDWARF_IA32_DLINK2_FLAGS) -O3 -fuse-ld=lld -no-pie
 
 RELEASE_CLANGDWARF_IA32_CC_FLAGS       = DEF(CLANGDWARF_ALL_CC_FLAGS) -fno-pic -fno-pie -m32 -Oz -flto -march=i586 DEF(CLANGDWARF_IA32_TARGET) -malign-double
-RELEASE_CLANGDWARF_IA32_DLINK_FLAGS    = DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -flto -Wl,-O3 -Wl,-melf_i386 -Wl,--oformat,elf32-i386
+RELEASE_CLANGDWARF_IA32_DLINK_FLAGS    = DEF(CLANGDWARF_IA32_TARGET) DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -flto -Wl,-O3 -Wl,-melf_i386 -Wl,--oformat,elf32-i386
 RELEASE_CLANGDWARF_IA32_DLINK2_FLAGS   = DEF(CLANGDWARF_IA32_DLINK2_FLAGS) -O3 -fuse-ld=lld -no-pie
 
 NOOPT_CLANGDWARF_IA32_CC_FLAGS         = DEF(CLANGDWARF_ALL_CC_FLAGS) -fno-pic -fno-pie -m32 -O0 -march=i586 DEF(CLANGDWARF_IA32_TARGET) -g -malign-double
-NOOPT_CLANGDWARF_IA32_DLINK_FLAGS      = DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -Wl,-O0 -Wl,-melf_i386 -Wl,--oformat,elf32-i386
+NOOPT_CLANGDWARF_IA32_DLINK_FLAGS      = DEF(CLANGDWARF_IA32_TARGET) DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -Wl,-O0 -Wl,-melf_i386 -Wl,--oformat,elf32-i386
 NOOPT_CLANGDWARF_IA32_DLINK2_FLAGS     = DEF(CLANGDWARF_IA32_DLINK2_FLAGS) -O0 -fuse-ld=lld -no-pie
 
 ##########################
@@ -1865,15 +1865,15 @@ NOOPT_CLANGDWARF_X64_NASM_FLAGS       = -O0 -f elf64 -g
 *_CLANGDWARF_X64_VFRPP_FLAGS          = DEF(GCC_VFRPP_FLAGS) DEF(CLANGDWARF_X64_TARGET)
 
 DEBUG_CLANGDWARF_X64_CC_FLAGS         = DEF(CLANGDWARF_ALL_CC_FLAGS) -m64 "-DEFIAPI=__attribute__((ms_abi))" -mno-red-zone -mcmodel=small -fpie -fdirect-access-external-data -Oz -flto DEF(CLANGDWARF_X64_TARGET) -g
-DEBUG_CLANGDWARF_X64_DLINK_FLAGS      = DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -flto -Wl,-O3 -Wl,-melf_x86_64 -Wl,--oformat,elf64-x86-64 -Wl,-pie -mcmodel=small -Wl,--apply-dynamic-relocs
+DEBUG_CLANGDWARF_X64_DLINK_FLAGS      = DEF(CLANGDWARF_X64_TARGET) DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -flto -Wl,-O3 -Wl,-melf_x86_64 -Wl,--oformat,elf64-x86-64 -Wl,-pie -mcmodel=small -Wl,--apply-dynamic-relocs
 DEBUG_CLANGDWARF_X64_DLINK2_FLAGS     = DEF(CLANGDWARF_X64_DLINK2_FLAGS) -O3 -fuse-ld=lld
 
 RELEASE_CLANGDWARF_X64_CC_FLAGS       = DEF(CLANGDWARF_ALL_CC_FLAGS) -m64 "-DEFIAPI=__attribute__((ms_abi))" -mno-red-zone -mcmodel=small -fpie -fdirect-access-external-data -Oz -flto DEF(CLANGDWARF_X64_TARGET)
-RELEASE_CLANGDWARF_X64_DLINK_FLAGS    = DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -flto -Wl,-O3 -Wl,-melf_x86_64 -Wl,--oformat,elf64-x86-64 -Wl,-pie -mcmodel=small -Wl,--apply-dynamic-relocs
+RELEASE_CLANGDWARF_X64_DLINK_FLAGS    = DEF(CLANGDWARF_X64_TARGET) DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -flto -Wl,-O3 -Wl,-melf_x86_64 -Wl,--oformat,elf64-x86-64 -Wl,-pie -mcmodel=small -Wl,--apply-dynamic-relocs
 RELEASE_CLANGDWARF_X64_DLINK2_FLAGS   = DEF(CLANGDWARF_X64_DLINK2_FLAGS) -O3 -fuse-ld=lld
 
 NOOPT_CLANGDWARF_X64_CC_FLAGS         = DEF(CLANGDWARF_ALL_CC_FLAGS) -m64 "-DEFIAPI=__attribute__((ms_abi))" -mno-red-zone -mcmodel=small -fpie -fdirect-access-external-data -O0 DEF(CLANGDWARF_X64_TARGET) -g
-NOOPT_CLANGDWARF_X64_DLINK_FLAGS      = DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -Wl,-O0 -Wl,-melf_x86_64 -Wl,--oformat,elf64-x86-64 -Wl,-pie -mcmodel=small -Wl,--apply-dynamic-relocs
+NOOPT_CLANGDWARF_X64_DLINK_FLAGS      = DEF(CLANGDWARF_X64_TARGET) DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -Wl,-O0 -Wl,-melf_x86_64 -Wl,--oformat,elf64-x86-64 -Wl,-pie -mcmodel=small -Wl,--apply-dynamic-relocs
 NOOPT_CLANGDWARF_X64_DLINK2_FLAGS     = DEF(CLANGDWARF_X64_DLINK2_FLAGS) -O0 -fuse-ld=lld
 
 ##################
