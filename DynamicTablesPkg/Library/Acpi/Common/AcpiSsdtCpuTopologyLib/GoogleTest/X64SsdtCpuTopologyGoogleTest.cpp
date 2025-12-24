@@ -392,14 +392,14 @@ TEST_F (X64ArchSsdtCpuTopologyTest, CreateTopologyFromIntC_NoCpcPsdWhenNoToken) 
 /**
   @test CreateTopologyFromIntC_PropagatesCpuError
 
-  @brief Documents that X64 CreateTopologyFromIntC uses ASSERT on CreateAmlCpu failure.
+  @brief Validates error propagation when CreateAmlCpu fails.
 
   @spec API Contract: Errors from lower-level functions must be propagated
         to enable proper error handling by callers.
 
-  @note This test is disabled due to memory leaks when ASSERT is caught.
-        The X64 implementation ASSERTs on CreateAmlCpu failure, preventing cleanup.
-        Use ASAN-disabled builds to verify error handling behavior.
+  @note This test is disabled because ASSERT_EFI_ERROR throws an exception
+        in the test framework, preventing cleanup code from running.
+        The implementation fix (goto return_handler) is correct for production.
 **/
 TEST_F (X64ArchSsdtCpuTopologyTest, DISABLED_CreateTopologyFromIntC_PropagatesCpuError) {
   mApicInfo.resize (1);
@@ -425,13 +425,13 @@ TEST_F (X64ArchSsdtCpuTopologyTest, DISABLED_CreateTopologyFromIntC_PropagatesCp
 /**
   @test CreateTopologyFromIntC_PropagatesCpcError
 
-  @brief Documents that X64 CreateTopologyFromIntC leaks TokenTable on CPC error.
+  @brief Validates error propagation when CreateAmlCpcNode fails.
 
   @expected Error propagated when CPC creation fails
 
-  @note This test is disabled due to memory leak in X64 implementation.
-        When CreateAmlCpcNode fails, the function returns directly without
-        calling TokenTableFree. This is an implementation issue.
+  @note This test is disabled because ASSERT_EFI_ERROR throws an exception
+        in the test framework, preventing cleanup code from running.
+        The implementation fix (goto return_handler) is correct for production.
 **/
 TEST_F (X64ArchSsdtCpuTopologyTest, DISABLED_CreateTopologyFromIntC_PropagatesCpcError) {
   const CM_OBJECT_TOKEN  CpcToken = 5001;
@@ -461,13 +461,13 @@ TEST_F (X64ArchSsdtCpuTopologyTest, DISABLED_CreateTopologyFromIntC_PropagatesCp
 /**
   @test CreateTopologyFromIntC_PropagatesPsdError
 
-  @brief Documents that X64 CreateTopologyFromIntC leaks TokenTable on PSD error.
+  @brief Validates error propagation when CreateAmlPsdNode fails.
 
   @expected Error propagated when PSD creation fails
 
-  @note This test is disabled due to memory leak in X64 implementation.
-        When CreateAmlPsdNode fails, the function returns directly without
-        calling TokenTableFree. This is an implementation issue.
+  @note This test is disabled because ASSERT_EFI_ERROR throws an exception
+        in the test framework, preventing cleanup code from running.
+        The implementation fix (goto return_handler) is correct for production.
 **/
 TEST_F (X64ArchSsdtCpuTopologyTest, DISABLED_CreateTopologyFromIntC_PropagatesPsdError) {
   const CM_OBJECT_TOKEN  PsdToken = 6001;

@@ -829,7 +829,7 @@ CreateTopologyFromIntC (
       Status = CreateAmlPsdNode (Generator, CfgMgrProtocol, LocalApicX2ApicInfo[Index].PsdToken, CpuNode);
       if (EFI_ERROR (Status)) {
         ASSERT_EFI_ERROR (Status);
-        return Status;
+        goto return_handler;
       }
     }
 
@@ -837,7 +837,7 @@ CreateTopologyFromIntC (
       Status = CreateAmlCpcNode (Generator, CfgMgrProtocol, LocalApicX2ApicInfo[Index].CpcToken, CpuNode);
       if (EFI_ERROR (Status)) {
         ASSERT_EFI_ERROR (Status);
-        return Status;
+        goto return_handler;
       }
     }
 
@@ -850,7 +850,7 @@ CreateTopologyFromIntC (
                  );
       if (EFI_ERROR (Status)) {
         ASSERT_EFI_ERROR (Status);
-        return Status;
+        goto return_handler;
       }
 
       /// check STA bits
@@ -860,13 +860,14 @@ CreateTopologyFromIntC (
           "Unsupported STA bits set for processor %d\n",
           LocalApicX2ApicInfo[Index].AcpiProcessorUid
           ));
-        return EFI_UNSUPPORTED;
+        Status = EFI_UNSUPPORTED;
+        goto return_handler;
       }
 
       Status = AmlCodeGenMethodRetInteger ("_STA", StaInfo->DeviceStatus, 0, FALSE, 0, CpuNode, NULL);
       if (EFI_ERROR (Status)) {
         ASSERT_EFI_ERROR (Status);
-        return Status;
+        goto return_handler;
       }
     }
   }

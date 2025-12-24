@@ -259,20 +259,16 @@ TEST_F (ArmIntegrationTest, CpcToken_GeneratesCpcNode) {
 }
 
 /**
-  @test ArmIntegration_PsdToken_NotGeneratedInGiccPath
+  @test ArmIntegration_PsdToken_GeneratesPsdNode
 
-  @brief Integration test documenting _PSD NOT generated in GICC path.
+  @brief Integration test validating _PSD generation in GICC path.
 
-  @spec ARM Implementation Note: CreateTopologyFromIntC does NOT generate
-        _PSD objects. PsdToken is extracted but not used. _PSD is only
-        generated when using processor hierarchy with ProcHierarchyInfo.
+  @spec ACPI 6.5 Section 8.4.6.5: _PSD (P-State Dependency) object provides
+        information about P-state domain membership and coordination type.
 
-  @note This test documents current implementation behavior.
-        _PSD generation in GICC path would require implementation changes.
-
-  @expected CPU device created but _PSD NOT present (implementation limitation)
+  @expected CPU device created with _PSD present when PsdToken is set.
 **/
-TEST_F (ArmIntegrationTest, PsdToken_NotGeneratedInGiccPath) {
+TEST_F (ArmIntegrationTest, PsdToken_GeneratesPsdNode) {
   const CM_OBJECT_TOKEN  PsdToken = 9002;
 
   mGiccInfo.resize (1);
@@ -280,7 +276,6 @@ TEST_F (ArmIntegrationTest, PsdToken_NotGeneratedInGiccPath) {
   mGiccInfo[0].PsdToken = PsdToken;
   SetupGiccInfo (mGiccInfo.data (), 1);
 
-  // Set up PSD info (even though it won't be used in GICC path)
   mPsdInfo.resize (1);
   CreateSimplePsdInfo (&mPsdInfo[0], 0, 1);  // Domain 0, 1 processor
   SetupPsdInfo (&mPsdInfo[0], PsdToken);
@@ -301,13 +296,12 @@ TEST_F (ArmIntegrationTest, PsdToken_NotGeneratedInGiccPath) {
   EXPECT_EQ (AmlTestHelper::CountCpuDevices (RootNode, "\\_SB", &CpuCount), EFI_SUCCESS);
   EXPECT_GE (CpuCount, 1u) << "At least one CPU device should exist";
 
-  // Note: _PSD is NOT generated in CreateTopologyFromIntC path
-  // This documents current implementation behavior
+  // Verify _PSD is generated
   AML_NODE_HANDLE  CpuDevice;
 
   ASSERT_EQ (AmlTestHelper::FindDeviceByPath (RootNode, "\\_SB.C000", &CpuDevice), EFI_SUCCESS);
-  EXPECT_FALSE (AmlTestHelper::DeviceHasNamedObject (CpuDevice, "_PSD"))
-  << "ARM GICC path: _PSD not generated (implementation limitation)";
+  EXPECT_TRUE (AmlTestHelper::DeviceHasNamedObject (CpuDevice, "_PSD"))
+  << "CPU should have _PSD when PsdToken is set";
 
   AmlDeleteTree (RootNode);
   FreeSsdtCpuTopologyTable (Table, TableCount);
@@ -630,81 +624,29 @@ TEST_F (ArmIntegrationTest, CpcToken_ValidatesPackageStructure) {
 }
 
 /**
-  @test ArmIntegration_PsdToken_GiccPathLimitation
+  @test ArmIntegration_CpcWithPsdToken_BothGenerated
 
-  @brief Documents _PSD validation not possible in GICC path.
+  @brief Validates that both _CPC and _PSD are generated when both tokens set.
 
-  @spec ARM Implementation Note: _PSD is not generated in CreateTopologyFromIntC.
-        This test documents that _PSD validation tests should use processor
-        hierarchy path instead of GICC path.
+  @spec ACPI 6.5: Both _CPC and _PSD objects can be present on a CPU device
+        to describe performance control and P-state dependency respectively.
 
-  @note For _PSD testing, use common tests with processor hierarchy or
-        X64 tests where _PSD is generated via hierarchy.
-
-  @expected Test documents limitation - _PSD not available in GICC path
+  @expected Both _CPC and _PSD present when both tokens are set.
 **/
-TEST_F (ArmIntegrationTest, PsdToken_GiccPathLimitation) {
-  // This test documents that _PSD is NOT generated in ARM GICC path.
-  // The PsdToken field exists in CM_ARM_GICC_INFO but CreateTopologyFromIntC
-  // does not call CreateAmlPsdNode(). This would require implementation changes.
-  //
-  // To test _PSD:
-  // 1. Use processor hierarchy info (CM_ARCH_COMMON_PROC_HIERARCHY_INFO)
-  // 2. Use X64 tests which use hierarchy path
-  // 3. Or modify ARM implementation to generate _PSD in GICC path
-
-  mGiccInfo.resize (1);
-  CreateGiccInfo (&mGiccInfo[0], 0, 100, 0x0);
-  SetupGiccInfo (mGiccInfo.data (), 1);
-
-  EFI_ACPI_DESCRIPTION_HEADER  **Table    = nullptr;
-  UINTN                        TableCount = 0;
-
-  ASSERT_EQ (BuildSsdtCpuTopologyTable (&Table, &TableCount), EFI_SUCCESS);
-
-  AML_ROOT_NODE_HANDLE  RootNode;
-
-  ASSERT_EQ (AmlTestHelper::ParseSsdtTable (Table[0], &RootNode), EFI_SUCCESS);
-
-  AML_NODE_HANDLE  CpuDevice;
-
-  ASSERT_EQ (AmlTestHelper::FindDeviceByPath (RootNode, "\\_SB.C000", &CpuDevice), EFI_SUCCESS);
-
-  // Verify CPU exists but _PSD is not generated in GICC path
-  EXPECT_TRUE (AmlTestHelper::DeviceHasHid (CpuDevice, ACPI_HID_PROCESSOR_DEVICE))
-  << "CPU device should exist with correct HID";
-  EXPECT_FALSE (AmlTestHelper::DeviceHasNamedObject (CpuDevice, "_PSD"))
-  << "GICC path limitation: _PSD not generated";
-
-  AmlDeleteTree (RootNode);
-  FreeSsdtCpuTopologyTable (Table, TableCount);
-}
-
-/**
-  @test ArmIntegration_CpcWithPsdToken_OnlyCpcGenerated
-
-  @brief Validates that in GICC path, only _CPC is generated (not _PSD).
-
-  @spec ARM Implementation Note: CreateTopologyFromIntC only generates _CPC
-        when CpcToken is set. PsdToken is ignored in this code path.
-
-  @expected _CPC present, _PSD NOT present (GICC path limitation)
-**/
-TEST_F (ArmIntegrationTest, CpcWithPsdToken_OnlyCpcGenerated) {
+TEST_F (ArmIntegrationTest, CpcWithPsdToken_BothGenerated) {
   const CM_OBJECT_TOKEN  CpcToken = 9001;
   const CM_OBJECT_TOKEN  PsdToken = 9002;
 
   mGiccInfo.resize (1);
   CreateGiccInfo (&mGiccInfo[0], 0, 100, 0x0);
   mGiccInfo[0].CpcToken = CpcToken;
-  mGiccInfo[0].PsdToken = PsdToken;  // Set but not used in GICC path
+  mGiccInfo[0].PsdToken = PsdToken;
   SetupGiccInfo (mGiccInfo.data (), 1);
 
   mCpcInfo.resize (1);
   CreateSimpleCpcInfo (&mCpcInfo[0]);
   SetupCpcInfo (&mCpcInfo[0], CpcToken);
 
-  // PSD info setup - won't be used but included for completeness
   mPsdInfo.resize (1);
   CreateSimplePsdInfo (&mPsdInfo[0], 0, 1);
   SetupPsdInfo (&mPsdInfo[0], PsdToken);
@@ -722,13 +664,13 @@ TEST_F (ArmIntegrationTest, CpcWithPsdToken_OnlyCpcGenerated) {
 
   ASSERT_EQ (AmlTestHelper::FindDeviceByPath (RootNode, "\\_SB.C000", &CpuDevice), EFI_SUCCESS);
 
-  // _CPC should be present (CpcToken is used)
+  // _CPC should be present
   EXPECT_TRUE (AmlTestHelper::DeviceHasNamedObject (CpuDevice, "_CPC"))
   << "CPU should have _CPC when CpcToken is set";
 
-  // _PSD is NOT generated in GICC path (implementation limitation)
-  EXPECT_FALSE (AmlTestHelper::DeviceHasNamedObject (CpuDevice, "_PSD"))
-  << "GICC path: _PSD not generated even when PsdToken is set";
+  // _PSD should be present
+  EXPECT_TRUE (AmlTestHelper::DeviceHasNamedObject (CpuDevice, "_PSD"))
+  << "CPU should have _PSD when PsdToken is set";
 
   AmlDeleteTree (RootNode);
   FreeSsdtCpuTopologyTable (Table, TableCount);
