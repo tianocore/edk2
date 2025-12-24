@@ -9,16 +9,6 @@
 #ifndef GOOGLE_TEST_LIB_H_
 #define GOOGLE_TEST_LIB_H_
 
-//
-// For Windows/clang builds if _MSC_VER is not defined, then set to
-// Visual Studio 2015 value of 1900
-//
-#if defined (__clang__) && defined (_WIN32)
-  #ifndef _MSC_VER
-#define _MSC_VER  1900
-  #endif
-#endif
-
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <cstring>

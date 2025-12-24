@@ -8,7 +8,7 @@
 all: test
 
 ifndef PYTHON_COMMAND
-  ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+  ifeq (Windows, $(findstring Windows,$(OS)))
     SHELL := cmd.exe
     MAKEROOT := $(shell echo %CD%)
     SEP:=$(shell echo \)
