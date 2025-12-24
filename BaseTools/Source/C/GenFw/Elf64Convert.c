@@ -390,7 +390,8 @@ FindPrmHandler (
   PrmHandler = (PRM_HANDLER_EXPORT_DESCRIPTOR_STRUCT *)(PrmExport + 1);
 
   for (HandlerNum = 0; HandlerNum < PrmExport->NumberPrmHandlers; HandlerNum++) {
-    strcpy(mExportSymName[mExportSymNum], PrmHandler->PrmHandlerName);
+    snprintf(mExportSymName[mExportSymNum], PRM_HANDLER_NAME_MAXIMUM_LENGTH, "%s", PrmHandler->PrmHandlerName);
+
     mExportSymNum ++;
     PrmHandler += 1;
 
@@ -1057,7 +1058,8 @@ ScanSections64 (
           //
           FindPrmHandler(Sym->st_value);
 
-          strcpy(mExportSymName[mExportSymNum], (CHAR8*)SymName);
+          snprintf(mExportSymName[mExportSymNum], PRM_HANDLER_NAME_MAXIMUM_LENGTH, "%s", (CHAR8*)SymName);
+
           mExportRVA[mExportSymNum] = (UINT32)(Sym->st_value);
           mExportSize += 2 * EFI_IMAGE_EXPORT_ADDR_SIZE + EFI_IMAGE_EXPORT_ORDINAL_SIZE + strlen((CHAR8 *)SymName) + 1;
           mExportSymNum ++;

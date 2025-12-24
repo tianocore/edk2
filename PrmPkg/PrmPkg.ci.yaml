@@ -100,6 +100,12 @@
           "keepoptionalheader",
           "odule",                  # note: appears in buffer ascii dump in documentation
           "oemid",
+          "prmconfig",
+          "prmcontextbufferlib",
+          "prmexportdescriptor",
+          "prminfo",
+          "prmloader",
+          "prmmodulediscoverylib",
           "prmopreg",
           "prmpecofflib",
           "prmpkg",

@@ -244,6 +244,7 @@ IpiInterruptHandler (
   UINTN  ResumeVector = 0;
   UINTN  Parameter    = 0;
   UINTN  IpiStatus    = 0;
+  UINT8  RereadCount  = 10;
 
   IpiStatus = IoCsrRead32 (LOONGARCH_IOCSR_IPI_STATUS);
 
@@ -277,7 +278,7 @@ IpiInterruptHandler (
         //
         do {
           Parameter = IoCsrRead32 (LOONGARCH_IOCSR_MBUF3);
-        } while (!Parameter);
+        } while (!Parameter && --RereadCount);
 
         //
         // Get the parameter if populated.
