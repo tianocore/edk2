@@ -299,10 +299,16 @@ DxeMain (
   // Use the templates to initialize the contents of the EFI System Table and EFI Runtime Services Table
   //
   gDxeCoreST = AllocateRuntimeCopyPool (sizeof (EFI_SYSTEM_TABLE), &mEfiSystemTableTemplate);
-  ASSERT (gDxeCoreST != NULL);
-
   gDxeCoreRT = AllocateRuntimeCopyPool (sizeof (EFI_RUNTIME_SERVICES), &mEfiRuntimeServicesTableTemplate);
-  ASSERT (gDxeCoreRT != NULL);
+
+  //
+  // Even though we shouldn't return, this situation is catestrophic and we can't continue.
+  //
+  if ((gDxeCoreST == NULL) || (gDxeCoreRT == NULL)) {
+    ASSERT (gDxeCoreST != NULL);
+    ASSERT (gDxeCoreRT != NULL);
+    return;
+  }
 
   gDxeCoreST->RuntimeServices = gDxeCoreRT;
 

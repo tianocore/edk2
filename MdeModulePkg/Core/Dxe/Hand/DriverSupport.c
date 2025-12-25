@@ -91,7 +91,11 @@ CoreConnectController (
         HandleFilePathSize      = GetDevicePathSize (HandleFilePath) - sizeof (EFI_DEVICE_PATH_PROTOCOL);
         RemainingDevicePathSize = GetDevicePathSize (RemainingDevicePath);
         TempFilePath            = AllocateZeroPool (HandleFilePathSize + RemainingDevicePathSize);
-        ASSERT (TempFilePath != NULL);
+        if (TempFilePath == NULL) {
+          ASSERT (TempFilePath != NULL);
+          return EFI_OUT_OF_RESOURCES;
+        }
+
         CopyMem (TempFilePath, HandleFilePath, HandleFilePathSize);
         CopyMem ((UINT8 *)TempFilePath + HandleFilePathSize, RemainingDevicePath, RemainingDevicePathSize);
         FilePath = TempFilePath;

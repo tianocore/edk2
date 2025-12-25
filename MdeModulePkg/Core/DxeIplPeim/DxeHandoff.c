@@ -37,7 +37,10 @@ HandOffToDxeCore (
   // Allocate 128KB for the Stack
   //
   BaseOfStack = AllocatePages (EFI_SIZE_TO_PAGES (STACK_SIZE));
-  ASSERT (BaseOfStack != NULL);
+  if (BaseOfStack == NULL) {
+    ASSERT (BaseOfStack != NULL);
+    return;
+  }
 
   if (PcdGetBool (PcdSetNxForStack)) {
     Status = PeiServicesLocatePpi (
