@@ -231,6 +231,7 @@ also configured.
 | AeadAesGcm                      |     N      |     N     |             |             |      C       |             |                 |
 | Bn                              |     N      |     N     |             |             |      C       |             |                 |
 | Ec                              |     N      |     N     |             |             |    C-Full    |             |                 |
+| Camellia                        |     N      |     N     |             |             |    C-Full    |    C-Full   |                 |
 
 ## Platform Configuration of Cryptographic Services
 
