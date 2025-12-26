@@ -28,13 +28,20 @@
   UefiBootServicesTableLib|UnitTestFrameworkPkg/Library/UnitTestUefiBootServicesTableLib/UnitTestUefiBootServicesTableLib.inf
   PeiServicesTablePointerLib|UnitTestFrameworkPkg/Library/UnitTestPeiServicesTablePointerLib/UnitTestPeiServicesTablePointerLib.inf
   NULL|UnitTestFrameworkPkg/Library/UnitTestDebugAssertLib/UnitTestDebugAssertLibHost.inf
-  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNullHostApplication.inf
+  StackCheckLib|MdePkg/Library/StackCheckLibNull/StackCheckLibNullHostApplication.inf
 
 [BuildOptions]
   MSFT:*_*_*_CC_FLAGS     = /MTd /EHs
   GCC:*_*_*_CC_FLAGS      = -fno-pie
   CLANGPDB:*_*_*_CC_FLAGS = -fno-pie
   GCC:*_*_*_ASLCC_FLAGS   = -fpie
+
+  #
+  # Disable stack protector for unit tests because ASAN provides better coverage
+  #
+  GCC:*_*_*_CC_FLAGS             = -fno-stack-protector
+  CLANGPDB:*_*_*_CC_FLAGS        = -fno-stack-protector
+
 !if $(UNIT_TESTING_ADDRESS_SANITIZER_ENABLE)
   #
   # Enable Address Sanitizer for VS2019, VS2022, and GCC
