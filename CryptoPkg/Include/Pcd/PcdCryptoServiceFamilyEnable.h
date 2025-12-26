@@ -431,4 +431,13 @@ typedef struct {
     } Services;
     UINT32    Family;
   } Ec;
+  union {
+    struct {
+      UINT8    GetContextSize : 1;
+      UINT8    Init           : 1;
+      UINT8    Encrypt        : 1;
+      UINT8    Decrypt        : 1;
+    } Services;
+    UINT32    Family;
+  } Camellia;
 } PCD_CRYPTO_SERVICE_FAMILY_ENABLE;
