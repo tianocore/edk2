@@ -9,6 +9,16 @@
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgCommon.dsc.inc
 
 [Defines]
+  HOST_BASED_UNIT_TESTING_ENABLED = TRUE
+
+  #
+  # Host based unit test builds only support NOOPT build target
+  #
+  BUILD_TARGETS = NOOPT
+
+  #
+  # Always enable code coverage and address sanitizers
+  #
   UNIT_TESTING_CODE_COVERAGE_ENABLE     = TRUE
   UNIT_TESTING_ADDRESS_SANITIZER_ENABLE = TRUE
 
