@@ -1044,6 +1044,11 @@ PciAllocateBusNumber (
     MaxNumberInRange = BusNumberRanges->AddrRangeMin + BusNumberRanges->AddrLen - 1;
     if ((StartBusNumber >= BusNumberRanges->AddrRangeMin) && (StartBusNumber <=  MaxNumberInRange)) {
       NextNumber = (UINT8)(StartBusNumber + NumberOfBuses);
+      if (NextNumber < StartBusNumber) {
+        DEBUG ((DEBUG_ERROR, "%a: Bus number overflow. StartBusNumber: %d, NumberOfBuses: %d\n",  __func__, StartBusNumber, NumberOfBuses));
+        return EFI_OUT_OF_RESOURCES;
+      }
+
       while (NextNumber > MaxNumberInRange) {
         ++BusNumberRanges;
         if (BusNumberRanges->Desc == ACPI_END_TAG_DESCRIPTOR) {
