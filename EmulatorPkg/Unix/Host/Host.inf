@@ -14,7 +14,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = Host
   FILE_GUID                      = 8863C0AD-7724-C84B-88E5-A33B116D1485
-  MODULE_TYPE                    = USER_DEFINED
+  MODULE_TYPE                    = HOST_APPLICATION
   VERSION_STRING                 = 1.0
 
 #
@@ -111,28 +111,3 @@
 
 [FeaturePcd]
   gEmulatorPkgTokenSpaceGuid.PcdEmulatorLazyLoadSymbols
-
-
-[BuildOptions]
-  GCC:*_*_*_CC_FLAGS    == -g -fshort-wchar -fno-strict-aliasing -Wall -malign-double -idirafter/usr/include -c -include $(DEST_DIR_DEBUG)/AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
-  GCC:*_*_IA32_CC_FLAGS  = -m32
-  GCC:*_*_X64_CC_FLAGS   = -m64 "-DEFIAPI=__attribute__((ms_abi))" -flto -DUSING_LTO -Os
-
-  GCC:*_*_*_DLINK_FLAGS    == -o $(BIN_DIR)/Host -z noexecstack -L/usr/X11R6/lib
-  GCC:*_*_IA32_DLINK_FLAGS  = -m32
-  GCC:*_*_X64_DLINK_FLAGS   = -m64 -flto
-
-  GCC:*_*_*_DLINK2_FLAGS == -lpthread -ldl -lXext -lX11
-
-#
-# Need to do this link via gcc and not ld as the pathing to libraries changes from OS version to OS version
-#
-   XCODE:*_*_IA32_DLINK_PATH == gcc
-   XCODE:*_*_IA32_CC_FLAGS = -I$(WORKSPACE)/EmulatorPkg/Unix/Host/X11IncludeHack
-   XCODE:*_*_IA32_DLINK_FLAGS == -arch i386 -o $(BIN_DIR)/Host -L/usr/X11R6/lib -lXext -lX11 -framework Carbon
-   XCODE:*_*_IA32_ASM_FLAGS == -arch i386 -g
-
-   XCODE:*_*_X64_DLINK_PATH == gcc
-   XCODE:*_*_X64_DLINK_FLAGS == -o $(BIN_DIR)/Host -L/usr/X11R6/lib -lXext -lX11 -framework Carbon -Wl,-no_pie
-   XCODE:*_*_X64_ASM_FLAGS == -g
-   XCODE:*_*_X64_CC_FLAGS = -O0 -target x86_64-apple-darwin -I$(WORKSPACE)/EmulatorPkg/Unix/Host/X11IncludeHack "-DEFIAPI=__attribute__((ms_abi))"
