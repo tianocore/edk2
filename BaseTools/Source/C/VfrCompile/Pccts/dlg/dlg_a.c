@@ -56,8 +56,8 @@ int	lexMember = 0;		/* <<%%lexmemeber ...>>	   		MR1 */
 int	lexAction = 0;		/* <<%%lexaction ...>>			MR1 */
 int	parserClass = 0;	/* <<%%parserclass ...>>        MR1 */
 int	lexPrefix = 0;		/* <<%%lexprefix ...>>			MR1 */
-char	theClassName[100];						     /* MR11 */
-char	*pClassName=theClassName;					 /* MR11 */
+char	theClassName[128];						     /* MR11 */
+size_t	class_len=0;
 int	firstLexMember=1;					             /* MR1 */
 
 #ifdef __USE_PROTOS
@@ -67,9 +67,11 @@ void  xxputc(int c) {						/* MR1 */
   int	c;							/* MR1 */
   {								/* MR1 */
 #endif
-    if (parserClass) {						/* MR1 */
-      *pClassName++=c;						/* MR1 */
-      *pClassName=0;						/* MR1 */
+    if (parserClass) {
+      if (class_len < sizeof(theClassName) - 1) {
+        theClassName[class_len++] = c;
+        theClassName[class_len] = '\0';
+      }
     } else if (lexMember || lexPrefix) {				/* MR1 */
       if (class_stream != NULL) fputc(c,class_stream);		/* MR1 */
     } else {							/* MR1 */
@@ -155,6 +157,8 @@ static void act9()
 { 
 		NLA = PARSERCLASS;
     parserClass=1;				/* MR1 */
+    class_len = 0;
+    theClassName[0] = '\0';
     zzmode(ACT);					/* MR1 */
 	}
 
