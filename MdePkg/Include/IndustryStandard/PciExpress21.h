@@ -30,9 +30,17 @@
   (((Offset) & 0xfff) | (((Function) & 0x07) << 12) | (((Device) & 0x1f) << 15) | (((Bus) & 0xff) << 20))
 
 #pragma pack(1)
-///
-/// PCI Express Capability Structure
-///
+
+//
+// PCI Express Capability Structure version 2.
+// Mandatory for PCI Express devices. If not present it is not PCI Express device, thus no extended config space.
+// Version 1 ends at PCI_CAPABILITY_PCIEXP::RootStatus register.
+// Version 2 extends version 1 up to PCI_CAPABILITY_PCIEXP::SlotStatus2 register.
+//
+#define PCI_EXPRESS_CAPABILITY_ID    0x0010
+#define PCI_EXPRESS_CAPABILITY_VER1  0x1
+#define PCI_EXPRESS_CAPABILITY_VER2  0x2
+
 typedef union {
   struct {
     UINT16    Version                : 4;
@@ -410,7 +418,7 @@ typedef struct {
   PCI_REG_PCIE_SLOT_STATUS           SlotStatus;
   PCI_REG_PCIE_ROOT_CONTROL          RootControl;
   PCI_REG_PCIE_ROOT_CAPABILITY       RootCapability;
-  PCI_REG_PCIE_ROOT_STATUS           RootStatus;
+  PCI_REG_PCIE_ROOT_STATUS           RootStatus;                  // Offset 20 size 4 - Ver1 ends here
   PCI_REG_PCIE_DEVICE_CAPABILITY2    DeviceCapability2;
   PCI_REG_PCIE_DEVICE_CONTROL2       DeviceControl2;
   UINT16                             DeviceStatus2;
@@ -432,11 +440,14 @@ typedef struct {
 //
 // for SR-IOV
 //
-#define EFI_PCIE_CAPABILITY_ID_ARI    0x0E
-#define EFI_PCIE_CAPABILITY_ID_ATS    0x0F
-#define EFI_PCIE_CAPABILITY_ID_SRIOV  0x10
+#define EFI_PCIE_CAPABILITY_ID_ARI    PCI_EXPRESS_EXTENDED_CAPABILITY_ARI_CAPABILITY_ID
+#define EFI_PCIE_CAPABILITY_ID_ATS    PCI_EXPRESS_EXTENDED_CAPABILITY_ATS_ID
+#define EFI_PCIE_CAPABILITY_ID_SRIOV  PCI_EXPRESS_EXTENDED_CAPABILITY_SRIOV_ID
 #define EFI_PCIE_CAPABILITY_ID_MRIOV  0x11
 
+//
+// Single Root IO Virtualization (SR-IOV) Extended Capability Structure.
+//
 #define PCI_EXPRESS_EXTENDED_CAPABILITY_SRIOV_ID    0x0010
 #define PCI_EXPRESS_EXTENDED_CAPABILITY_SRIOV_VER1  0x1
 
@@ -740,10 +751,9 @@ typedef struct {
 
 #define GET_TPH_TABLE_SIZE(x)  ((x->TphRequesterCapability & 0x7FF0000)>>16) * sizeof(UINT16)
 
-/// Address Translation Services Extended Capability Structure
-///
-/// Based on section 5.1 of PCI Express Address Translation Services Specification 1.1
-///@{
+//
+// Address Translation Services (ATS) Extended Capability Structure.
+//
 #define PCI_EXPRESS_EXTENDED_CAPABILITY_ATS_ID    0x000F
 #define PCI_EXPRESS_EXTENDED_CAPABILITY_ATS_VER1  0x1
 
@@ -771,7 +781,6 @@ typedef struct {
   PCI_EXPRESS_EXTENDED_CAPABILITIES_ATS_CAPABILITY    Capability;
   PCI_EXPRESS_EXTENDED_CAPABILITIES_ATS_CONTROL       Control;
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_ATS;
-///@}
 
 #pragma pack()
 
