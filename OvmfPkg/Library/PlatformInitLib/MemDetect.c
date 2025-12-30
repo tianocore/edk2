@@ -1240,6 +1240,8 @@ PlatformQemuInitializeRam (
 
   DEBUG ((DEBUG_INFO, "%a called\n", __func__));
 
+  PlatformIgvmParamReserve ();
+
   //
   // Determine total memory size available
   //
