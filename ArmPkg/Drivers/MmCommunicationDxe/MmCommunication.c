@@ -763,13 +763,61 @@ MmCommunication2Initialize (
                   EFI_MEMORY_XP |
                   EFI_MEMORY_RUNTIME
                   );
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) && (Status != EFI_ACCESS_DENIED)) {
     DEBUG ((
       DEBUG_ERROR,
       "MmCommunicateInitialize: "
-      "Failed to add MM-NS Buffer Memory Space\n"
+      "Failed to add MM-NS Buffer Memory Space - %r\n",
+      Status
       ));
     goto ReturnErrorStatus;
+  } else if (Status == EFI_ACCESS_DENIED) {
+    Status = gDS->FreeMemorySpace (
+                    mNsCommBuffMemRegion.PhysicalBase,
+                    mNsCommBuffMemRegion.Length
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "MmCommunicateInitialize: "
+        "Failed to free existing MM-NS Buffer Memory Space - %r\n",
+        Status
+        ));
+      goto ReturnErrorStatus;
+    }
+
+    Status = gDS->RemoveMemorySpace (
+                    mNsCommBuffMemRegion.PhysicalBase,
+                    mNsCommBuffMemRegion.Length
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "MmCommunicateInitialize: "
+        "Failed to remove existing MM-NS Buffer Memory Space - %r\n",
+        Status
+        ));
+      goto ReturnErrorStatus;
+    }
+
+    // Try to add the memory space again
+    Status = gDS->AddMemorySpace (
+                    EfiGcdMemoryTypeReserved,
+                    mNsCommBuffMemRegion.PhysicalBase,
+                    mNsCommBuffMemRegion.Length,
+                    EFI_MEMORY_WB |
+                    EFI_MEMORY_XP |
+                    EFI_MEMORY_RUNTIME
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "MmCommunicateInitialize: "
+        "Failed to add MM-NS Buffer Memory Space (second attempt) - %r\n",
+        Status
+        ));
+      goto ReturnErrorStatus;
+    }
   }
 
   Status = gDS->SetMemorySpaceAttributes (
