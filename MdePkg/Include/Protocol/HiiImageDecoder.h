@@ -85,7 +85,7 @@ typedef struct _EFI_HII_IMAGE_DECODER_PNG_INFO {
 //
 typedef struct _EFI_HII_IMAGE_DECODER_OTHER_INFO {
   EFI_HII_IMAGE_DECODER_IMAGE_INFO_HEADER    Header;
-  CHAR16                                     ImageExtenion[1];
+  CHAR16                                     ImageExtenion[];
   //
   // Variable length of image file extension name.
   //

@@ -52,7 +52,7 @@ typedef struct {
 typedef struct {
   EFI_HANDLE              DriverHandle;
   UINT32                  AddressCount;
-  EFI_IP4_ADDRESS_PAIR    AddressPairs[1];
+  EFI_IP4_ADDRESS_PAIR    AddressPairs[];
 } EFI_IP4_VARIABLE_DATA;
 
 typedef struct {

@@ -1721,7 +1721,7 @@ typedef struct {
   ///
   /// Point to an array of capsules that contain the same CapsuleGuid value.
   ///
-  VOID      *CapsulePtr[1];
+  VOID      *CapsulePtr[];
 } EFI_CAPSULE_TABLE;
 
 #define CAPSULE_FLAGS_PERSIST_ACROSS_RESET   0x00010000

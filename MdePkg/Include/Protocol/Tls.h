@@ -154,7 +154,7 @@ typedef UINT8 EFI_TLS_COMPRESSION;
 typedef struct {
   UINT16    ExtensionType;
   UINT16    Length;
-  UINT8     Data[1];
+  UINT8     Data[];
 } EFI_TLS_EXTENSION;
 #pragma pack ()
 

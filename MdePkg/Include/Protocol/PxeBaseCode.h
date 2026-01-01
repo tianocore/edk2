@@ -181,7 +181,7 @@ typedef struct {
   BOOLEAN                      MustUseList;
   EFI_IP_ADDRESS               ServerMCastIp;
   UINT16                       IpCnt;
-  EFI_PXE_BASE_CODE_SRVLIST    SrvList[1];
+  EFI_PXE_BASE_CODE_SRVLIST    SrvList[];
 } EFI_PXE_BASE_CODE_DISCOVER_INFO;
 
 ///

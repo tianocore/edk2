@@ -505,7 +505,7 @@ typedef TPM_AUTHDATA TPM_ENCAUTH;
 ///
 typedef struct tdTPM_KEY_HANDLE_LIST {
   UINT16            loaded;
-  TPM_KEY_HANDLE    handle[1];
+  TPM_KEY_HANDLE    handle[];
 } TPM_KEY_HANDLE_LIST;
 
 //
@@ -660,7 +660,7 @@ typedef struct tdTPM_SIGN_INFO {
 ///
 typedef struct tdTPM_MSA_COMPOSITE {
   UINT32        MSAlist;
-  TPM_DIGEST    migAuthDigest[1];
+  TPM_DIGEST    migAuthDigest[];
 } TPM_MSA_COMPOSITE;
 
 ///

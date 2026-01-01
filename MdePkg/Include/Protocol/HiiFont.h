@@ -81,7 +81,7 @@ typedef UINT32 EFI_FONT_INFO_MASK;
 typedef struct {
   EFI_HII_FONT_STYLE    FontStyle;
   UINT16                FontSize;   ///< character cell height in pixels
-  CHAR16                FontName[1];
+  CHAR16                FontName[];
 } EFI_FONT_INFO;
 
 /**

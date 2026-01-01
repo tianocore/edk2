@@ -184,7 +184,7 @@ typedef struct {
 typedef struct {
   UINT8     Length;
   UINT8     DescriptorType;
-  CHAR16    String[1];
+  CHAR16    String[];
 } EFI_USB_STRING_DESCRIPTOR;
 
 #pragma pack()
@@ -389,7 +389,7 @@ typedef struct hid_descriptor {
   UINT16                          BcdHID;
   UINT8                           CountryCode;
   UINT8                           NumDescriptors;
-  EFI_USB_HID_CLASS_DESCRIPTOR    HidClassDesc[1];
+  EFI_USB_HID_CLASS_DESCRIPTOR    HidClassDesc[];
 } EFI_USB_HID_DESCRIPTOR;
 
 #pragma pack()

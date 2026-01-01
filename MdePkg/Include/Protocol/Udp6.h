@@ -73,7 +73,7 @@ typedef struct {
   ///
   /// List of address/port pairs that are currently in use.
   ///
-  EFI_UDP6_SERVICE_POINT    Services[1];
+  EFI_UDP6_SERVICE_POINT    Services[];
 } EFI_UDP6_VARIABLE_DATA;
 
 typedef struct _EFI_UDP6_PROTOCOL EFI_UDP6_PROTOCOL;
