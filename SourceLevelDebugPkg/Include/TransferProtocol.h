@@ -223,7 +223,7 @@ typedef struct {
   UINT64    Address;
   UINT8     Width;
   UINT16    Count;
-  UINT8     Data[1];                   // The actual length is (Width * Count)
+  UINT8     Data[];                   // The actual length is (Width * Count)
 } DEBUG_DATA_WRITE_MEMORY;
 
 //
@@ -235,7 +235,7 @@ typedef struct {
 } DEBUG_DATA_READ_IO;
 
 typedef struct {
-  UINT8    Data[1];                    // The actual length depends on the packet header
+  UINT8    Data[];                    // The actual length depends on the packet header
 } DEBUG_DATA_RESPONSE_READ_IO;
 
 //
@@ -244,7 +244,7 @@ typedef struct {
 typedef struct {
   UINT64    Port;
   UINT8     Width;
-  UINT8     Data[1];                   // The actual length is Width
+  UINT8     Data[];                   // The actual length is Width
 } DEBUG_DATA_WRITE_IO;
 
 //
@@ -260,7 +260,7 @@ typedef struct {
 typedef struct {
   UINT8    Index;                     // defined as SOFT_DEBUGGER_REGISTER_XX
   UINT8    Length;
-  UINT8    Data[1];                   // The actual length is Length
+  UINT8    Data[];                   // The actual length is Length
 } DEBUG_DATA_WRITE_REGISTER;
 
 //
@@ -357,7 +357,7 @@ typedef struct {
   UINT32     Alignment;
   BOOLEAN    Positive;                     // TRUE to search in higher address memory
   UINT8      DataLength;
-  UINT8      Data[1];
+  UINT8      Data[];
 } DEBUG_DATA_SEARCH_SIGNATURE;
 
 typedef struct {
