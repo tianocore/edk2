@@ -20,7 +20,7 @@ typedef struct {
   UINT8     SecurityFeaturesRequired[VIRT_HSTI_SECURITY_FEATURE_SIZE];
   UINT8     SecurityFeaturesImplemented[VIRT_HSTI_SECURITY_FEATURE_SIZE];
   UINT8     SecurityFeaturesVerified[VIRT_HSTI_SECURITY_FEATURE_SIZE];
-  CHAR16    ErrorString[1];
+  CHAR16    ErrorString[];
 } VIRT_ADAPTER_INFO_PLATFORM_SECURITY;
 
 VOID
