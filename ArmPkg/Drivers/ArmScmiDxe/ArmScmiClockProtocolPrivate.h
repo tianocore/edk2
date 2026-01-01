@@ -41,7 +41,7 @@ typedef struct {
   // NOTE: Since EDK2 does not allow flexible array member [] we declare
   // here array of 1 element length. However below is used as a variable
   // length array.
-  CLOCK_RATE_DWORD    Rates[1];
+  CLOCK_RATE_DWORD    Rates[];
 } CLOCK_DESCRIBE_RATES;
 
 #define CLOCK_SET_DEFAULT_FLAGS  0
