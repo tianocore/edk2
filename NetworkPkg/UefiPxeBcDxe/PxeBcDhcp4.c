@@ -364,7 +364,7 @@ PxeBcBuildDhcp4Options (
   if (Private->Nii != NULL) {
     CopyMem (OptEnt.Clid->InterfaceName, Private->Nii->StringId, sizeof (OptEnt.Clid->InterfaceName));
     PxeBcUintnToAscDecWithFormat (Private->Nii->MajorVer, OptEnt.Clid->UndiMajor, sizeof (OptEnt.Clid->UndiMajor));
-    PxeBcUintnToAscDecWithFormat (Private->Nii->MinorVer, OptEnt.Clid->UndiMinor, sizeof (OptEnt.Clid->UndiMinor));
+    PxeBcUintnToAscDecWithFormat (Private->Nii->MinorVer, OptEnt.Clid->UndiMinor, OFFSET_OF (PXEBC_DHCP4_OPTION_CLID, UndiMinor));
   }
 
   Index++;

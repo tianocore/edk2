@@ -94,7 +94,7 @@ typedef struct {
   LIST_ENTRY    WrapEntry;            // Link to FreeTxBufList
   LIST_ENTRY    AllEntry;             // Link to AllTxBufList
   BOOLEAN       InUse;
-  UINT8         TxBuf[1];
+  UINT8         TxBuf[];
 } MNP_TX_BUF_WRAP;
 
 /**

@@ -110,7 +110,7 @@ HttpBootBuildDhcp6Options (
     HttpBootUintnToAscDecWithFormat (
       Private->Nii->MinorVer,
       OptEnt.VendorClass->ClassId.UndiMinor,
-      sizeof (OptEnt.VendorClass->ClassId.UndiMinor)
+      OFFSET_OF (HTTP_BOOT_CLASS_ID, UndiMinor)
       );
   }
 

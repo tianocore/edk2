@@ -144,7 +144,7 @@ typedef struct {
   UINT32                    IaId;
   UINT16                    Checksum;
   UINT16                    DataRecordCount;
-  IP6_CONFIG_DATA_RECORD    DataRecord[1];
+  IP6_CONFIG_DATA_RECORD    DataRecord[];
 } IP6_CONFIG_VARIABLE;
 
 #pragma pack()
