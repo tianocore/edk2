@@ -40,7 +40,7 @@ typedef struct {
 
   /** Offset 0x00D0
   **/
-  UINT8     ReservedFspmUpd[4];
+  UINT8     ReservedFspmUpd[];
 } FSP_M_CONFIG;
 
 /** Fsp M UPD Configuration
