@@ -53,7 +53,7 @@ typedef struct _FV_HASH_INFO {
 struct _EDKII_PEI_FIRMWARE_VOLUME_INFO_STORED_HASH_FV_PPI {
   FV_HASH_INFO      HashInfo;
   UINTN             FvNumber;
-  HASHED_FV_INFO    FvInfo[1];
+  HASHED_FV_INFO    FvInfo[];
 };
 
 extern EFI_GUID  gEdkiiPeiFirmwareVolumeInfoStoredHashFvPpiGuid;

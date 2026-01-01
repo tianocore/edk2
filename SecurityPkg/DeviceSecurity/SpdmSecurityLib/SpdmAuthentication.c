@@ -47,7 +47,7 @@ MeasureVariable (
 
   VarNameLength = StrLen (VarName);
   VarLogSize    = (UINT32)(sizeof (*VarLog) + VarNameLength * sizeof (*VarName) + VarSize
-                           - sizeof (VarLog->UnicodeName) - sizeof (VarLog->VariableData));
+                           - sizeof (VarLog->UnicodeName) - OFFSET_OF (UEFI_VARIABLE_DATA, VariableData));
 
   VarLog = (UEFI_VARIABLE_DATA *)AllocateZeroPool (VarLogSize);
   if (VarLog == NULL) {
