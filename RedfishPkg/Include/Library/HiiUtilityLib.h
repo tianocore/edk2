@@ -757,7 +757,7 @@ typedef struct {
 typedef struct {
   UINTN             Signature;
   UINTN             Count;
-  HII_EXPRESSION    *Expression[1];    ///< Array[Count] of expressions
+  HII_EXPRESSION    *Expression[];    ///< Array[Count] of expressions
 } HII_EXPRESSION_LIST;
 
 #define HII_EXPRESSION_LIST_SIGNATURE  SIGNATURE_32 ('F', 'E', 'X', 'R')

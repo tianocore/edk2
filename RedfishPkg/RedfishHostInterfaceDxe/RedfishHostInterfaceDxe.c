@@ -128,7 +128,7 @@ RedfishCreateSmbiosTable42 (
       return Status;
     }
 
-    ProtocolDataSize        = sizeof (MC_HOST_INTERFACE_PROTOCOL_RECORD) - sizeof (ProtocolRecord->ProtocolTypeData) + ProtocolRecord->ProtocolTypeDataLen;
+    ProtocolDataSize        = sizeof (MC_HOST_INTERFACE_PROTOCOL_RECORD) - OFFSET_OF (MC_HOST_INTERFACE_PROTOCOL_RECORD, ProtocolTypeData) + ProtocolRecord->ProtocolTypeDataLen;
     NewProtocolsDataLength += ProtocolDataSize;
     if (ProtocolRecords == NULL) {
       ProtocolRecords = AllocateZeroPool (NewProtocolsDataLength);
