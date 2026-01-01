@@ -36,7 +36,7 @@ typedef struct {
 
 typedef struct {
   PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT_HEADER    Header;
-  PRM_HANDLER_EXPORT_DESCRIPTOR_STRUCT          PrmHandlerExportDescriptors[1];
+  PRM_HANDLER_EXPORT_DESCRIPTOR_STRUCT          PrmHandlerExportDescriptors[];
 } PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT;
 
 #pragma pack(pop)
