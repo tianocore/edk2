@@ -90,7 +90,7 @@ typedef struct {
   UINT8     InterleaveGapSize;
   UINT32    VolumeSequenceNumber;
   UINT8     FileIDLength;
-  UINT8     FileID[1];
+  UINT8     FileID[];
 } PEI_CD_EXPRESS_DIR_FILE_RECORD;
 
 /**
