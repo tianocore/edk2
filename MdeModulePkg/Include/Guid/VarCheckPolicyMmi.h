@@ -42,7 +42,7 @@ typedef struct _VAR_CHECK_POLICY_COMM_GET_INFO_PARAMS {
   UINT32                                  InputVariableNameSize;
   UINT32                                  OutputVariableNameSize;
   VAR_CHECK_POLICY_OUTPUT_POLICY_ENTRY    OutputPolicyEntry;
-  CHAR16                                  InputVariableName[1];
+  CHAR16                                  InputVariableName[];
 } VAR_CHECK_POLICY_COMM_GET_INFO_PARAMS;
 
 #pragma pack(pop)
