@@ -974,7 +974,7 @@ MeasureVariable (
   TcgEvent.PCRIndex  = PCRIndex;
   TcgEvent.EventType = EventType;
   TcgEvent.EventSize = (UINT32)(sizeof (*VarLog) + VarNameLength * sizeof (*VarName) + VarSize
-                                - sizeof (VarLog->UnicodeName) - sizeof (VarLog->VariableData));
+                                - sizeof (VarLog->UnicodeName) - OFFSET_OF (UEFI_VARIABLE_DATA, VariableData));
 
   VarLog = (EFI_VARIABLE_DATA *)AllocatePool (TcgEvent.EventSize);
   if (VarLog == NULL) {

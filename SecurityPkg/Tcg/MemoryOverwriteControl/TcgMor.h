@@ -30,7 +30,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 typedef struct  {
   UINT8    Reserved1[6];
   UINT8    SupportedSecurityListLength[2];
-  UINT8    SupportedSecurityProtocol[1];
+  UINT8    SupportedSecurityProtocol[];
 } SUPPORTED_SECURITY_PROTOCOLS_PARAMETER_DATA;
 
 #define SECURITY_PROTOCOL_TCG       0x02

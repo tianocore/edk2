@@ -24,7 +24,7 @@ extern EFI_GUID  gMeasuredFvHobGuid;
 
 typedef struct {
   UINT32                        Num;
-  EFI_PLATFORM_FIRMWARE_BLOB    MeasuredFvBuf[1];
+  EFI_PLATFORM_FIRMWARE_BLOB    MeasuredFvBuf[];
 } MEASURED_HOB_DATA;
 
 #endif
