@@ -818,7 +818,7 @@ typedef struct s_pxe_sw_undi {
   PXE_UINT64    EntryPoint;     ///< API entry point.
   PXE_UINT8     reserved2[3];   ///< zero, not used.
   PXE_UINT8     BusCnt;         ///< number of bustypes supported.
-  PXE_UINT32    BusType[1];     ///< list of supported bustypes.
+  PXE_UINT32    BusType[];      ///< list of supported bustypes.
 } PXE_SW_UNDI;
 
 typedef union u_pxe_undi {

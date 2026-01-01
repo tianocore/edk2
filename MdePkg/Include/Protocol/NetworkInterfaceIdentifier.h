@@ -101,7 +101,7 @@ struct undiconfig_table {
   struct {
     VOID    *NII_InterfacePointer;          ///< Pointer to the NII interface structure.
     VOID    *DevicePathPointer;             ///< Pointer to the device path for this NIC.
-  } NII_entry[1];
+  } NII_entry[];
 };
 
 extern EFI_GUID  gEfiNetworkInterfaceIdentifierProtocolGuid;

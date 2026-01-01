@@ -156,7 +156,7 @@ typedef struct {
   ///
   /// The data for the DHCPv6 option, stored in network order.
   ///
-  UINT8     Data[1];
+  UINT8     Data[];
 } EFI_DHCP6_PACKET_OPTION;
 
 ///

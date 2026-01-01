@@ -69,7 +69,7 @@ typedef struct {
 typedef struct {
   EFI_HANDLE                DriverHandle; ///< The handle of the driver that creates this entry.
   UINT32                    ServiceCount; ///< The number of address/port pairs following this data structure.
-  EFI_TCP6_SERVICE_POINT    Services[1];  ///< List of address/port pairs that are currently in use.
+  EFI_TCP6_SERVICE_POINT    Services[];   ///< List of address/port pairs that are currently in use.
 } EFI_TCP6_VARIABLE_DATA;
 
 ///

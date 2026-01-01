@@ -48,7 +48,7 @@ typedef struct {
 typedef struct {
   EFI_HANDLE                DriverHandle;
   UINT32                    ServiceCount;
-  EFI_TCP4_SERVICE_POINT    Services[1];
+  EFI_TCP4_SERVICE_POINT    Services[];
 } EFI_TCP4_VARIABLE_DATA;
 
 typedef struct {

@@ -774,7 +774,7 @@ typedef struct {
 
 typedef union {
   UINT16    Crc[1];
-  UINT8     Data8[2];
+  UINT8     Data8[];
 } SPD4_CYCLIC_REDUNDANCY_CODE;
 
 typedef struct {
