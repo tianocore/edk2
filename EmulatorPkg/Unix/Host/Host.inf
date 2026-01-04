@@ -116,7 +116,7 @@
 [BuildOptions]
   GCC:*_*_*_CC_FLAGS    == -g -fshort-wchar -fno-strict-aliasing -Wall -malign-double -idirafter/usr/include -c -include $(DEST_DIR_DEBUG)/AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
   GCC:*_*_IA32_CC_FLAGS  = -m32
-  GCC:*_*_X64_CC_FLAGS   = -m64 "-DEFIAPI=__attribute__((ms_abi))" -flto -DUSING_LTO -Os
+  GCC:*_*_X64_CC_FLAGS   = -m64 "-DEFIAPI=__attribute__((ms_abi))" -fno-lto -Os
 
   GCC:*_*_*_DLINK_FLAGS    == -o $(BIN_DIR)/Host -z noexecstack -L/usr/X11R6/lib
   GCC:*_*_IA32_DLINK_FLAGS  = -m32
