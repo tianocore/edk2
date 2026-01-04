@@ -909,7 +909,7 @@ DriverHealthManagerCleanDynamicString (
   PackageHeader = (EFI_HII_PACKAGE_HEADER *)(HiiPackageList + 1);
   CopyMem (PackageHeader, STRING_ARRAY_NAME + sizeof (UINT32), FixedStringSize);
 
-  PackageHeader         = (EFI_HII_PACKAGE_HEADER *)((UINT8 *)PackageHeader + PackageHeader->Length);
+  PackageHeader         = (EFI_HII_PACKAGE_HEADER *)((UINT8 *)PackageHeader + FixedStringSize);
   PackageHeader->Type   = EFI_HII_PACKAGE_END;
   PackageHeader->Length = sizeof (EFI_HII_PACKAGE_HEADER);
 
