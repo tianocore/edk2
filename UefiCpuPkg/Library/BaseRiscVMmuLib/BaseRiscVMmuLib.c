@@ -47,6 +47,8 @@ UINTN  mMaxRootTableLevel;
 UINTN  mBitPerLevel;
 UINTN  mTableEntryCount;
 
+#define RISCV_IOMMU_DEBUG_LEVEL  DEBUG_VERBOSE
+
 /**
   Determine if the MMU enabled or not.
 
@@ -320,7 +322,7 @@ UpdateRegionMappingRecursive (
   BlockMask  = MAX_ADDRESS >> (64 - BlockShift);
 
   DEBUG ((
-    DEBUG_INFO,
+    RISCV_IOMMU_DEBUG_LEVEL,
     "%a(%d): %LX - %LX set %LX clr %LX\n",
     __func__,
     Level,
@@ -441,8 +443,14 @@ UpdateRegionMappingRecursive (
       }
 
       EntryValue = SetPpnToPte (EntryValue, RegionStart);
+      DEBUG ((RISCV_IOMMU_DEBUG_LEVEL, "ATTN: PTE wanted 0x%x. IsTableEntry (*Entry) =%d\n", EntryValue, IsTableEntry (*Entry)));
       EntryValue = SetValidPte (EntryValue);
-      ReplaceTableEntry (Entry, EntryValue, RegionStart, TableIsLive);
+      if (AttributeSetMask == 0) {
+        DEBUG ((RISCV_IOMMU_DEBUG_LEVEL, "ATTN: Forcing entry to 0 (library wanted 0x%x)\n", EntryValue));
+        ReplaceTableEntry (Entry, 0, RegionStart, TableIsLive);
+      } else {
+        ReplaceTableEntry (Entry, EntryValue, RegionStart, TableIsLive);
+      }
     }
   }
 
