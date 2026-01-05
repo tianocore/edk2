@@ -137,7 +137,7 @@ LocateDeviceContext (
   return DeviceContext;
 }
 
-// TODO: Migrate into an MMU 'operating context' structure.
+// TODO: Migrate into an MMU 'operating context' structure. Would we have to set this up for each call?
 extern UINTN mMaxRootTableLevel, mBitPerLevel, mTableEntryCount;
 
 /**
@@ -163,11 +163,11 @@ RiscVIoMmuUpdateDevicePageTable (
 
   UpdateRegionMapping (
     DeviceAddress,
-    Length,
+    ALIGN_VALUE (Length, SIZE_4KB),
     IoMmuAccess,
     PTE_ATTRIBUTES_MASK,
     (VOID *)((UINT64)DeviceContext->FirstStageContext.Bits.PPN << RISCV_MMU_PAGE_SHIFT),
-    TRUE
+    FALSE /* These page tables aren't live on the MMU */
     );
 
   Status = IoMmuInvalidatePageTableCache (IoMmuContext, DeviceAddress);
@@ -239,7 +239,7 @@ RiscVIoMmuInitialiseDevicePageTable (
   // Default Read/Write attribute for memory mapped IO
   UpdateRegionMapping (
     DeviceAddress,
-    Length,
+    ALIGN_VALUE (Length, SIZE_4KB),
     IoMmuAccess,
     PTE_ATTRIBUTES_MASK,
     TranslationTable,
@@ -254,18 +254,16 @@ RiscVIoMmuInitialiseDevicePageTable (
   DeviceContext->FirstStageContext.Bits.PPN  = Ppn;
   DeviceContext->FirstStageContext.Bits.MODE = SatpMode;
 
+  SetInterruptState (InterruptState);
+
   Status = IoMmuInvalidatePageTableCache (IoMmuContext, DeviceAddress);
   ASSERT_EFI_ERROR (Status);
-
-  SetInterruptState (InterruptState);
 
   return EFI_SUCCESS;
 }
 
 /**
   Set IOMMU attributes for accessing system memory.
-
-  TODO: We also need the reverse of this.
 
   @param[in]  DeviceHandle      The device who initiates the DMA access request.
   @param[in]  Mapping           The mapping value returned from Map().
@@ -325,7 +323,6 @@ RiscVIoMmuSetAttributeWorker (
   //
   Capabilities.Uint64 = MmioRead64 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_CAPABILITIES);
   DeviceContext->TranslationControl.Bits.SADE = Capabilities.Bits.AMO_HWAD;
-  //DeviceContext->TranslationControl.Bits.DTF  = 1;
 
   //
   // If the IOMMU supports ATS, enable those device-generated requests.
@@ -362,7 +359,7 @@ RiscVIoMmuSetAttributeWorker (
   Status = IoMmuInvalidateDeviceDirectoryCache (IoMmuContext, IoMmuDeviceId);
   ASSERT_EFI_ERROR (Status);
 
-  ASSERT_EFI_ERROR (ProbeHardwareQdueuesForProblems (IoMmuContext));
+  ASSERT_EFI_ERROR (ProbeHardwareQueuesForProblems (IoMmuContext));
 
   return Status;
 }

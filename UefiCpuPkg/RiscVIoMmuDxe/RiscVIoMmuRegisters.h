@@ -1,11 +1,6 @@
 /** @file
   RISC-V IOMMU registers.
 
-  TODO: Continue detailed read of register dump from CQCSR onwards.
-
-  TODO: Capture attributes and description, if needed. Also, more N_* defines.
-  - Debug support, if desired.
-
   Copyright (c) 2025, 9elements GmbH. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -194,7 +189,7 @@ typedef union {
   UINT32  Uint32;
 } RISCV_IOMMU_IPSR;
 
-/* TODO: Performance monitoring registers */
+// TODO: Performance monitoring registers
 
 #define R_RISCV_IOMMU_IOCNTOVF       0x58
 
@@ -205,6 +200,8 @@ typedef union {
 #define R_RISCV_IOMMU_IOHPMCTR_1_31  0x68
 
 #define R_RISCV_IOMMU_IOHPMEVT_1_31  0x160
+
+// TODO: Implement debug support, if desired.
 
 #define R_RISCV_IOMMU_TR_REQ_IOVA    0x258
 
@@ -256,21 +253,9 @@ typedef union {
 
 #define R_RISCV_IOMMU_CUSTOM_2       0x2b0
 
+// Neither WSI-based vectors nor MSI-based table are in use
+
 #define R_RISCV_IOMMU_ICVEC          0x2f8
-
-typedef union {
-  struct {
-    UINT64  civ      : 4;
-    UINT64  fiv      : 4;
-    UINT64  pmiv     : 4;
-    UINT64  piv      : 4;
-    UINT64  Reserved : 16;
-    UINT64  Custom   : 32;
-  } Bits;
-  UINT64  Uint64;
-} RISCV_IOMMU_ICVEC;
-
-// TODO: MSI config table register
 
 #define R_RISCV_IOMMU_MSI_CFG_TBL    0x300
 

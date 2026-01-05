@@ -215,6 +215,12 @@ ProbeFaultQueue (
     return EFI_SUCCESS;
   }
 
+  //
+  // TODOs:
+  // - Handle cqmf, cmd_to and cmd_ill. fence_w_ip is not relevant.
+  // - Handle fqmf/pqmf and fqof/pqof.
+  // - Others.
+  //
   DEBUG ((DEBUG_WARN, "Faults (or events) have been reported!\n"));
 
   Index = 0;

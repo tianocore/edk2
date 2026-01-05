@@ -83,6 +83,22 @@ IoMmuIsReset (
 }
 
 /**
+  Reset the IOMMU.
+
+**/
+STATIC
+VOID
+IoMmuReset (
+  IN RISCV_IOMMU_CONTEXT  *IoMmuContext
+  )
+{
+  IoMmuWriteAndWait64 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_DDTP, 0, 1 << N_RISCV_IOMMU_DDTP_BUSY, FALSE);
+  IoMmuWriteAndWait32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_CQCSR, 0, 1 << N_RISCV_IOMMU_QUEUE_CSR_QON, FALSE);
+  IoMmuWriteAndWait32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_FQCSR, 0, 1 << N_RISCV_IOMMU_QUEUE_CSR_QON, FALSE);
+  IoMmuWriteAndWait32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_PQCSR, 0, 1 << N_RISCV_IOMMU_QUEUE_CSR_QON, FALSE);
+}
+
+/**
   Allocate a queue.
 
   @param[in]  QueueType   The type of queue to be allocated.
@@ -267,8 +283,9 @@ InitialiseRiscVIoMmu (
   RISCV_IOMMU_FCTL          FeatureControl;
   UINTN                     HartSatpMode;
 
-  // TODO: Handle this instead.
-  ASSERT (IoMmuIsReset (IoMmuContext));
+  if (!IoMmuIsReset (IoMmuContext)) {
+    IoMmuReset (IoMmuContext);
+  }
 
   //
   // 1. Discover the capabilities of the IOMMU, and:
@@ -400,18 +417,6 @@ IoMmuCommonInitialise (
   Status = InitialiseRiscVIoMmu (IoMmuContext);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Failed to initialise the IOMMU\n"));
-    return Status;
-  }
-
-  // TODO: This means that the services weren't called for PCI devices in the case of a PCI IOMMU?
-  if (mHandle == NULL) {
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                    &mHandle,
-                    &gEdkiiIoMmuProtocolGuid,
-                    &mRiscVIoMmuProtocol,
-                    NULL
-                    );
-    ASSERT_EFI_ERROR (Status);
   }
 
   return Status;
@@ -456,6 +461,20 @@ RiscVIoMmuDxeEntryPoint (
     }
 
     Status = IoMmuCommonInitialise (IoMmuContext);
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  //
+  // Even a PCI IOMMU must install the protocol here,
+  // or else consumers' callbacks might not trigger in time.
+  //
+  if (!IsListEmpty (&mRiscVIoMmuContexts)) {
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &mHandle,
+                    &gEdkiiIoMmuProtocolGuid,
+                    &mRiscVIoMmuProtocol,
+                    NULL
+                    );
     ASSERT_EFI_ERROR (Status);
   }
 
