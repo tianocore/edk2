@@ -94,6 +94,7 @@ R: Vishal Oliyil Kunnnil <vishalo@qti.qualcomm.com> [vishalo]
 
 RISCV64
 F: */RiscV64/
+F: */RiscV/
 M: Sunil V L <sunilvl@oss.qualcomm.com> [vlsunil]
 R: Andrei Warkentin <andyw@imsa.edu> [andreiw]
 
