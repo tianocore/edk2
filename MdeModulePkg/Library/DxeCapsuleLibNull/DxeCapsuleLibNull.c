@@ -118,6 +118,25 @@ CoDClearCapsuleOnDiskFlag (
 }
 
 /**
+  This routine is called to check if on-disk capsules should be handled during
+  this boot (i.e., no invocation of CoDRelocateCapsule()).  Depends on
+  CapsuleOnDisk flag being set in OsIndications Variable and
+  PcdCapsuleOnDiskImmediate being enabled.
+
+  @retval TRUE     Processing of disk capsules was requested and is permitted
+  @retval FALSE    At least one of the prerequisites isn't met
+
+**/
+BOOLEAN
+EFIAPI
+CoDShouldProcessThisBoot (
+  VOID
+  )
+{
+  return FALSE;
+}
+
+/**
   Relocate Capsule on Disk from EFI system partition.
 
   Two solution to deliver Capsule On Disk:
