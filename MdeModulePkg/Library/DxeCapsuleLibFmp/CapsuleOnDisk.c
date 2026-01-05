@@ -428,7 +428,7 @@ GetEfiSysPartitionFromDevPath (
 
 /**
   This routine is called to get Simple File System protocol on the first EFI system partition found in
-  active boot option. The boot option list is detemined in order by
+  active boot option. The boot option list is determined in order by
     1. "BootNext"
     2. "BootOrder"
 
@@ -563,7 +563,7 @@ GetEfiSysPartitionFromActiveBootOption (
           break;
         }
 
-        DEBUG ((DEBUG_ERROR, "GetEfiSysPartitionFromDevPath Loop %x\n", Status));
+        DEBUG ((DEBUG_ERROR, "GetEfiSysPartitionFromDevPath retry error: %r.\n", Status));
         //
         // Stall 100ms if connection failed to ensure USB stack is ready
         //
@@ -603,11 +603,11 @@ GetEfiSysPartitionFromActiveBootOption (
   if (*FsHandle != NULL) {
     DevicePathStr2 = ConvertDevicePathToText (CurFullPath, TRUE, TRUE);
     if (DevicePathStr2 != NULL) {
-      DEBUG ((DEBUG_INFO, "Found Active EFI System Partion on %s\n", DevicePathStr2));
+      DEBUG ((DEBUG_INFO, "Found Active EFI System Partition on %s\n", DevicePathStr2));
       FreePool (DevicePathStr2);
     }
   } else {
-    DEBUG ((DEBUG_INFO, "Failed to found Active EFI System Partion\n"));
+    DEBUG ((DEBUG_INFO, "Failed to find Active EFI System Partition\n"));
   }
 
   DEBUG_CODE_END ();
@@ -1020,7 +1020,7 @@ EXIT:
   *FileNum = FileCount;
 
   //
-  // FileInfo will be freed by Calller
+  // FileInfo will be freed by the caller
   //
   while (!IsListEmpty (&FileInfoList)) {
     Link = FileInfoList.ForwardLink;
@@ -1121,7 +1121,7 @@ EXIT:
 }
 
 /**
-  This routine is called to get all caspules from file. The capsule file image is
+  This routine is called to get all capsules from file. The capsule file image is
   copied to BS memory. Caller is responsible to free them.
 
   @param[in]    MaxRetry             Max Connection Retry. Stall 100ms between each connection try to ensure
@@ -1175,7 +1175,7 @@ GetAllCapsuleOnDisk (
                       0
                       );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "CodLibGetAllCapsuleOnDisk fail to open RootDir!\n"));
+    DEBUG ((DEBUG_ERROR, "GetAllCapsuleOnDisk fail to open RootDir!\n"));
     RootDir->Close (RootDir);
     return Status;
   }
@@ -1467,7 +1467,7 @@ RelocateCapsuleToDisk (
   //
   Status = GetAllCapsuleOnDisk (MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, &LoadOptionNumber);
   if (EFI_ERROR (Status) || (CapsuleOnDiskNum == 0) || (CapsuleOnDiskBuf == NULL)) {
-    DEBUG ((DEBUG_INFO, "RelocateCapsule: GetAllCapsuleOnDisk Status - 0x%x\n", Status));
+    DEBUG ((DEBUG_INFO, "RelocateCapsule: GetAllCapsuleOnDisk Status - %r\n", Status));
     return EFI_NOT_FOUND;
   }
 
@@ -1706,7 +1706,7 @@ EXIT:
 
   if (CapsuleOnDiskBuf != NULL) {
     //
-    // Free resources allocated by CodLibGetAllCapsuleOnDisk
+    // Free resources allocated by GetAllCapsuleOnDisk
     //
     for (Index = 0; Index < CapsuleOnDiskNum; Index++ ) {
       FreePool (CapsuleOnDiskBuf[Index].ImageAddress);
@@ -1774,7 +1774,7 @@ RelocateCapsuleToRam (
   //
   Status = GetAllCapsuleOnDisk (MaxRetry, &CapsuleOnDiskBuf, &CapsuleOnDiskNum, &Handle, NULL);
   if (EFI_ERROR (Status) || (CapsuleOnDiskNum == 0) || (CapsuleOnDiskBuf == NULL)) {
-    DEBUG ((DEBUG_ERROR, "GetAllCapsuleOnDisk Status - 0x%x\n", Status));
+    DEBUG ((DEBUG_ERROR, "GetAllCapsuleOnDisk Status - %r\n", Status));
     return EFI_NOT_FOUND;
   }
 
