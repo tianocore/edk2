@@ -1342,6 +1342,8 @@ SetSecureBootVariablesShouldStopWhenSecure (
   UINT8                     TargetMode = SECURE_BOOT_MODE_ENABLE;
   SECURE_BOOT_PAYLOAD_INFO  PayloadInfo;
 
+  ZeroMem (&PayloadInfo, sizeof (PayloadInfo));
+
   expect_memory (MockGetVariable, VariableName, EFI_SECURE_BOOT_MODE_NAME, sizeof (EFI_SECURE_BOOT_MODE_NAME));
   expect_value (MockGetVariable, VendorGuid, &gEfiGlobalVariableGuid);
   expect_value (MockGetVariable, *DataSize, 0);
