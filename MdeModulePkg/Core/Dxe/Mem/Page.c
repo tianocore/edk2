@@ -1772,7 +1772,9 @@ CoreFreePages (
     // free memory that is marked RO, which can crash the core if DebugClearMemory is enabled or can be passed out to a
     // driver in the next AllocatePages() call, which can cause a crash later on. It is deemed lower risk to leak the
     // memory than to attempt to fix up the attributes as that requires syncing the GCD and the page table.
-    if (EFI_ERROR (Status) || (Attributes & EFI_MEMORY_RO) || (Attributes & EFI_MEMORY_RP)) {
+    if ((Status == EFI_NO_MAPPING) ||
+        (!EFI_ERROR (Status) && ((Attributes & EFI_MEMORY_RO) || (Attributes & EFI_MEMORY_RP))))
+    {
       DEBUG ((
         DEBUG_WARN,
         "%a: Memory %llx for %llx Pages failed to get attributes with status %r or it is read-only or read-protected. "

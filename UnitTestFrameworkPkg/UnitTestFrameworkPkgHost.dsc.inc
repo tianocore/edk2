@@ -9,6 +9,16 @@
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgCommon.dsc.inc
 
 [Defines]
+  HOST_BASED_UNIT_TESTING_ENABLED = TRUE
+
+  #
+  # Host based unit test builds only support NOOPT build target
+  #
+  BUILD_TARGETS = NOOPT
+
+  #
+  # Always enable code coverage and address sanitizers
+  #
   UNIT_TESTING_CODE_COVERAGE_ENABLE     = TRUE
   UNIT_TESTING_ADDRESS_SANITIZER_ENABLE = TRUE
 
@@ -28,13 +38,20 @@
   UefiBootServicesTableLib|UnitTestFrameworkPkg/Library/UnitTestUefiBootServicesTableLib/UnitTestUefiBootServicesTableLib.inf
   PeiServicesTablePointerLib|UnitTestFrameworkPkg/Library/UnitTestPeiServicesTablePointerLib/UnitTestPeiServicesTablePointerLib.inf
   NULL|UnitTestFrameworkPkg/Library/UnitTestDebugAssertLib/UnitTestDebugAssertLibHost.inf
-  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNullHostApplication.inf
+  StackCheckLib|MdePkg/Library/StackCheckLibNull/StackCheckLibNullHostApplication.inf
 
 [BuildOptions]
   MSFT:*_*_*_CC_FLAGS     = /MTd /EHs
   GCC:*_*_*_CC_FLAGS      = -fno-pie
   CLANGPDB:*_*_*_CC_FLAGS = -fno-pie
   GCC:*_*_*_ASLCC_FLAGS   = -fpie
+
+  #
+  # Disable stack protector for unit tests because ASAN provides better coverage
+  #
+  GCC:*_*_*_CC_FLAGS             = -fno-stack-protector
+  CLANGPDB:*_*_*_CC_FLAGS        = -fno-stack-protector
+
 !if $(UNIT_TESTING_ADDRESS_SANITIZER_ENABLE)
   #
   # Enable Address Sanitizer for VS2019, VS2022, and GCC
