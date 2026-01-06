@@ -1,5 +1,5 @@
 ;***
-;lldiv.asm - signed long divide routine
+;lldiv.nasm - signed long divide routine
 ;
 ;       Copyright (c) Microsoft Corporation. All rights reserved.
 ;       SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -11,11 +11,7 @@
 ;Original Implemenation: MSVC 14.29.30133
 ;
 ;*******************************************************************************
-    .686
-    .model  flat,C
-    .code
-
-
+    SECTION .text
 
 ;***
 ;lldiv - signed long divide
@@ -39,10 +35,12 @@
 ;Exceptions:
 ;
 ;*******************************************************************************
-_alldiv PROC NEAR
 
-HIWORD  EQU     [4]             ;
-LOWORD  EQU     [0]
+global ASM_PFX(_alldiv)
+ASM_PFX(_alldiv):
+
+%define HIWORD(x)  [x + 4]
+%define LOWORD(x)  [x + 0]
 
         push    edi
         push    esi
@@ -73,8 +71,10 @@ LOWORD  EQU     [0]
 ;               -----------------
 ;
 
-DVND    equ     [esp + 16]      ; stack address of dividend (a)
-DVSR    equ     [esp + 24]      ; stack address of divisor (b)
+; stack address of dividend (a)
+%define DVND    esp + 16
+; stack address of divisor (b)
+%define DVSR    esp + 24
 
 
 ; Determine sign of the result (edi = 0 if result is positive, non-zero
@@ -151,7 +151,7 @@ L5:
 ; dividend is close to 2**64 and the quotient is off by 1.
 ;
 
-        mul     dword ptr HIWORD(DVSR) ; QUOT * HIWORD(DVSR)
+        mul     dword HIWORD(DVSR) ; QUOT * HIWORD(DVSR)
         mov     ecx,eax
         mov     eax,LOWORD(DVSR)
         mul     esi             ; QUOT * LOWORD(DVSR)
@@ -197,7 +197,3 @@ L8:
         pop     edi
 
         ret     16
-
-_alldiv ENDP
-
-end
