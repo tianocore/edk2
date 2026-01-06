@@ -244,7 +244,7 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
             self.WritePathEnvFile(self.OutputDir)
             return ret
 
-        elif self.tool_chain_tag.lower().startswith("gcc"):
+        elif self.tool_chain_tag.lower().startswith("gcc") or self.tool_chain_tag.lower().startswith("clang"):
             # Note: This HOST_ARCH is in respect to the BUILT base tools, not the host arch where
             # this script is BUILDING the base tools.
             HostInfo = GetHostInfo()
@@ -271,6 +271,12 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
                 self.target_arch = HostInfo.arch
                 TargetInfoArch = HostInfo.arch
             # Otherwise, the built binary arch will be consistent with the host system
+
+            make_command = 'make'
+            clang_bin = shell_env.get_shell_var("CLANG_BIN")
+            if clang_bin is not None:
+                if os.path.exists(os.path.join(clang_bin, "mingw32-make.exe")):
+                    make_command = 'mingw32-make'
 
             # Added logic to support cross compilation scenarios
             if TargetInfoArch != HostInfo.arch:
@@ -301,21 +307,21 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
                 if ret != 0:
                     raise Exception(f"Failed to configure the util-linux to build with our gcc {ret}")
 
-                ret = RunCmd("make", "", workingdir=unzip_dir)
+                ret = RunCmd(make_command, "", workingdir=unzip_dir)
                 if ret != 0:
                     raise Exception(f"Failed to build the libuuid with our gcc {ret}")
 
                 shell_environment.GetEnvironment().set_shell_var("CROSS_LIB_UUID", unzip_dir)
                 shell_environment.GetEnvironment().set_shell_var("CROSS_LIB_UUID_INC", os.path.join(unzip_dir, "libuuid", "src"))
 
-            ret = RunCmd("make", "clean", workingdir=shell_env.get_shell_var("EDK_TOOLS_PATH"))
+            ret = RunCmd(make_command, "clean", workingdir=shell_env.get_shell_var("EDK_TOOLS_PATH"))
             if ret != 0:
                 raise Exception("Failed to build.")
 
             cpu_count = self.GetCpuThreads()
 
             output_stream = edk2_logging.create_output_stream()
-            ret = RunCmd("make", f"-C .  -j {cpu_count}", workingdir=shell_env.get_shell_var("EDK_TOOLS_PATH"))
+            ret = RunCmd(make_command, f"-C .  -j {cpu_count}", workingdir=shell_env.get_shell_var("EDK_TOOLS_PATH"))
             edk2_logging.remove_output_stream(output_stream)
             problems = edk2_logging.scan_compiler_output(output_stream)
             for level, problem in problems:
