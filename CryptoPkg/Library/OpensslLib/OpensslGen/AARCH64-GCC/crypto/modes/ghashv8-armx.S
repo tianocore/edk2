@@ -4,7 +4,9 @@
 .arch   armv8-a+crypto
 .text
 .globl  gcm_init_v8
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   gcm_init_v8,%function
+#endif
 .align  4
 gcm_init_v8:
         AARCH64_VALID_CALL_TARGET
@@ -181,9 +183,13 @@ gcm_init_v8:
         ext     v30.16b,v16.16b,v17.16b,#8              //pack Karatsuba pre-processed
         st1     {v29.2d,v30.2d,v31.2d},[x0]             //store Htable[9..11]
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   gcm_init_v8,.-gcm_init_v8
+#endif
 .globl  gcm_gmult_v8
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   gcm_gmult_v8,%function
+#endif
 .align  4
 gcm_gmult_v8:
         AARCH64_VALID_CALL_TARGET
@@ -223,9 +229,13 @@ gcm_gmult_v8:
         st1     {v0.2d},[x0]            //write out Xi
 
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   gcm_gmult_v8,.-gcm_gmult_v8
+#endif
 .globl  gcm_ghash_v8
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   gcm_ghash_v8,%function
+#endif
 .align  4
 gcm_ghash_v8:
         AARCH64_VALID_CALL_TARGET
@@ -356,8 +366,12 @@ gcm_ghash_v8:
         st1     {v0.2d},[x0]            //write out Xi
 
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   gcm_ghash_v8,.-gcm_ghash_v8
+#endif
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   gcm_ghash_v8_4x,%function
+#endif
 .align  4
 gcm_ghash_v8_4x:
 .Lgcm_ghash_v8_4x:
@@ -636,7 +650,9 @@ gcm_ghash_v8_4x:
         st1     {v0.2d},[x0]            //write out Xi
 
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   gcm_ghash_v8_4x,.-gcm_ghash_v8_4x
+#endif
 .section        .rodata
 .byte   71,72,65,83,72,32,102,111,114,32,65,82,77,118,56,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
 .align  2

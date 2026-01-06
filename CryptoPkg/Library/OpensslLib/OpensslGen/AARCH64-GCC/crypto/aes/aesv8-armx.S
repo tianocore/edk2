@@ -9,9 +9,11 @@
 .long   0x01,0x01,0x01,0x01
 .long   0x0c0f0e0d,0x0c0f0e0d,0x0c0f0e0d,0x0c0f0e0d     // rotate-n-splat
 .long   0x1b,0x1b,0x1b,0x1b
-.previous
+.text
 .globl  aes_v8_set_encrypt_key
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   aes_v8_set_encrypt_key,%function
+#endif // __ELF__
 .align  5
 aes_v8_set_encrypt_key:
 .Lenc_key:
@@ -183,10 +185,15 @@ aes_v8_set_encrypt_key:
         mov     x0,x3                   // return value
         ldr     x29,[sp],#16
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   aes_v8_set_encrypt_key,.-aes_v8_set_encrypt_key
+#endif // __ELF__
+
 
 .globl  aes_v8_set_decrypt_key
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   aes_v8_set_decrypt_key,%function
+#endif // __ELF__
 .align  5
 aes_v8_set_decrypt_key:
         AARCH64_SIGN_LINK_REGISTER
@@ -225,9 +232,13 @@ aes_v8_set_decrypt_key:
         ldp     x29,x30,[sp],#16
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   aes_v8_set_decrypt_key,.-aes_v8_set_decrypt_key
+#endif // __ELF__
 .globl  aes_v8_encrypt
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   aes_v8_encrypt,%function
+#endif // __ELF__
 .align  5
 aes_v8_encrypt:
         AARCH64_VALID_CALL_TARGET
@@ -255,9 +266,13 @@ aes_v8_encrypt:
 
         st1     {v2.16b},[x1]
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   aes_v8_encrypt,.-aes_v8_encrypt
+#endif // __ELF__
 .globl  aes_v8_decrypt
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   aes_v8_decrypt,%function
+#endif // __ELF__
 .align  5
 aes_v8_decrypt:
         AARCH64_VALID_CALL_TARGET
@@ -285,9 +300,13 @@ aes_v8_decrypt:
 
         st1     {v2.16b},[x1]
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   aes_v8_decrypt,.-aes_v8_decrypt
+#endif // __ELF__
 .globl  aes_v8_ecb_encrypt
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   aes_v8_ecb_encrypt,%function
+#endif // __ELF__
 .align  5
 aes_v8_ecb_encrypt:
         AARCH64_VALID_CALL_TARGET
@@ -1032,9 +1051,13 @@ aes_v8_ecb_encrypt:
         ldr     x29,[sp],#16
 .Lecb_Final_abort:
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   aes_v8_ecb_encrypt,.-aes_v8_ecb_encrypt
+#endif // __ELF__
 .globl  aes_v8_cbc_encrypt
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   aes_v8_cbc_encrypt,%function
+#endif // __ELF__
 .align  5
 aes_v8_cbc_encrypt:
         AARCH64_VALID_CALL_TARGET
@@ -1509,9 +1532,13 @@ aes_v8_cbc_encrypt:
 .Lcbc_abort:
         ldr     x29,[sp],#16
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   aes_v8_cbc_encrypt,.-aes_v8_cbc_encrypt
+#endif // __ELF__
 .globl  aes_v8_ctr32_encrypt_blocks_unroll12_eor3
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   aes_v8_ctr32_encrypt_blocks_unroll12_eor3,%function
+#endif // __ELF__
 .align  5
 aes_v8_ctr32_encrypt_blocks_unroll12_eor3:
         AARCH64_VALID_CALL_TARGET
@@ -2232,9 +2259,13 @@ aes_v8_ctr32_encrypt_blocks_unroll12_eor3:
         ldp     d14,d15,[sp, #64]
         ldr     x29,[sp],#80
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   aes_v8_ctr32_encrypt_blocks_unroll12_eor3,.-aes_v8_ctr32_encrypt_blocks_unroll12_eor3
+#endif // __ELF__
 .globl  aes_v8_ctr32_encrypt_blocks
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   aes_v8_ctr32_encrypt_blocks,%function
+#endif // __ELF__
 .align  5
 aes_v8_ctr32_encrypt_blocks:
         AARCH64_VALID_CALL_TARGET
@@ -2583,9 +2614,13 @@ aes_v8_ctr32_encrypt_blocks:
 .Lctr32_done:
         ldr     x29,[sp],#16
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   aes_v8_ctr32_encrypt_blocks,.-aes_v8_ctr32_encrypt_blocks
+#endif // __ELF__
 .globl  aes_v8_xts_encrypt
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   aes_v8_xts_encrypt,%function
+#endif // __ELF__
 .align  5
 aes_v8_xts_encrypt:
         AARCH64_VALID_CALL_TARGET
@@ -3225,9 +3260,13 @@ aes_v8_xts_encrypt:
         ldp     x19,x20,[sp],#64
 .Lxts_enc_final_abort:
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   aes_v8_xts_encrypt,.-aes_v8_xts_encrypt
+#endif // __ELF__
 .globl  aes_v8_xts_decrypt
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   aes_v8_xts_decrypt,%function
+#endif // __ELF__
 .align  5
 aes_v8_xts_decrypt:
         AARCH64_VALID_CALL_TARGET
@@ -3912,5 +3951,7 @@ aes_v8_xts_decrypt:
 
 .Lxts_dec_final_abort:
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   aes_v8_xts_decrypt,.-aes_v8_xts_decrypt
+#endif // __ELF__
 #endif

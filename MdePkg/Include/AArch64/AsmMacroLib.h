@@ -23,13 +23,22 @@
         cbnz   SAFE_XREG, 1f        ;\
         b      .                    ;// We should never get here
 
+#ifdef __ELF__ // PE targets (i.e. building with CLANGPDB) do not support the ELF style .type directive
 #define _ASM_FUNC(Name, Section)    \
   .global   Name                  ; \
   .section  #Section, "ax"        ; \
   .type     Name, %function       ; \
   Name:                           ; \
   AARCH64_BTI(c)
+#else // __ELF__
+#define _ASM_FUNC(Name, Section)    \
+  .global   Name                  ; \
+  .section  #Section, "ax"        ; \
+  Name:                           ; \
+  AARCH64_BTI(c)
+#endif // __ELF__
 
+#ifdef __ELF__ // PE targets (i.e. building with CLANGPDB) do not support the ELF style .type directive
 #define _ASM_FUNC_ALIGN(Name, Section, Align)       \
   .global   Name                                  ; \
   .section  #Section, "ax"                        ; \
@@ -37,6 +46,14 @@
   .balign   Align                                 ; \
   Name:                                           ; \
   AARCH64_BTI(c)
+#else // __ELF__
+#define _ASM_FUNC_ALIGN(Name, Section, Align)       \
+  .global   Name                                  ; \
+  .section  #Section, "ax"                        ; \
+  .balign   Align                                 ; \
+  Name:                                           ; \
+  AARCH64_BTI(c)
+#endif // __ELF__
 
 #define ASM_FUNC(Name)  _ASM_FUNC(ASM_PFX(Name), .text. ## Name)
 

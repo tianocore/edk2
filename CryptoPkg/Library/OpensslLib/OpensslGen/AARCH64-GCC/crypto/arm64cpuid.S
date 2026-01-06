@@ -5,15 +5,21 @@
 
 .align  5
 .globl  _armv7_neon_probe
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _armv7_neon_probe,%function
+#endif
 _armv7_neon_probe:
         AARCH64_VALID_CALL_TARGET
         orr     v15.16b, v15.16b, v15.16b
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _armv7_neon_probe,.-_armv7_neon_probe
+#endif
 
 .globl  _armv7_tick
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _armv7_tick,%function
+#endif
 _armv7_tick:
         AARCH64_VALID_CALL_TARGET
 #ifdef  __APPLE__
@@ -22,98 +28,146 @@ _armv7_tick:
         mrs     x0, CNTVCT_EL0
 #endif
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _armv7_tick,.-_armv7_tick
+#endif
 
 .globl  _armv8_aes_probe
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _armv8_aes_probe,%function
+#endif
 _armv8_aes_probe:
         AARCH64_VALID_CALL_TARGET
         aese    v0.16b, v0.16b
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _armv8_aes_probe,.-_armv8_aes_probe
+#endif
 
 .globl  _armv8_sha1_probe
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _armv8_sha1_probe,%function
+#endif
 _armv8_sha1_probe:
         AARCH64_VALID_CALL_TARGET
         sha1h   s0, s0
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _armv8_sha1_probe,.-_armv8_sha1_probe
+#endif
 
 .globl  _armv8_sha256_probe
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _armv8_sha256_probe,%function
+#endif
 _armv8_sha256_probe:
         AARCH64_VALID_CALL_TARGET
         sha256su0       v0.4s, v0.4s
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _armv8_sha256_probe,.-_armv8_sha256_probe
+#endif
 
 .globl  _armv8_pmull_probe
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _armv8_pmull_probe,%function
+#endif
 _armv8_pmull_probe:
         AARCH64_VALID_CALL_TARGET
         pmull   v0.1q, v0.1d, v0.1d
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _armv8_pmull_probe,.-_armv8_pmull_probe
+#endif
 
 .globl  _armv8_sm4_probe
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _armv8_sm4_probe,%function
+#endif
 _armv8_sm4_probe:
         AARCH64_VALID_CALL_TARGET
 .inst   0xcec08400      // sm4e v0.4s, v0.4s
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _armv8_sm4_probe,.-_armv8_sm4_probe
+#endif
 
 .globl  _armv8_sha512_probe
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _armv8_sha512_probe,%function
+#endif
 _armv8_sha512_probe:
         AARCH64_VALID_CALL_TARGET
 .inst   0xcec08000      // sha512su0    v0.2d,v0.2d
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _armv8_sha512_probe,.-_armv8_sha512_probe
+#endif
 
 .globl  _armv8_eor3_probe
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _armv8_eor3_probe,%function
+#endif
 _armv8_eor3_probe:
         AARCH64_VALID_CALL_TARGET
 .inst   0xce010800      // eor3 v0.16b, v0.16b, v1.16b, v2.16b
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _armv8_eor3_probe,.-_armv8_eor3_probe
+#endif
 
 .globl  _armv8_sve_probe
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _armv8_sve_probe,%function
+#endif
 _armv8_sve_probe:
         AARCH64_VALID_CALL_TARGET
 .inst   0x04a03000      // eor z0.d,z0.d,z0.d
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _armv8_sve_probe,.-_armv8_sve_probe
+#endif
 
 .globl  _armv8_sve2_probe
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _armv8_sve2_probe,%function
+#endif
 _armv8_sve2_probe:
         AARCH64_VALID_CALL_TARGET
 .inst   0x04e03400      // xar z0.d,z0.d,z0.d
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _armv8_sve2_probe,.-_armv8_sve2_probe
+#endif
 
 .globl  _armv8_cpuid_probe
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _armv8_cpuid_probe,%function
+#endif
 _armv8_cpuid_probe:
         AARCH64_VALID_CALL_TARGET
         mrs     x0, midr_el1
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _armv8_cpuid_probe,.-_armv8_cpuid_probe
+#endif
 
 .globl  _armv8_sm3_probe
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _armv8_sm3_probe,%function
+#endif
 _armv8_sm3_probe:
         AARCH64_VALID_CALL_TARGET
 .inst   0xce63c004      // sm3partw1 v4.4s, v0.4s, v3.4s
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _armv8_sm3_probe,.-_armv8_sm3_probe
+#endif
 
 .globl  OPENSSL_cleanse
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   OPENSSL_cleanse,%function
+#endif
 .align  5
 OPENSSL_cleanse:
         AARCH64_VALID_CALL_TARGET
@@ -142,10 +196,14 @@ OPENSSL_cleanse:
         b.ne    .Laligned       // len>=8
         cbnz    x1,.Little      // len!=0?
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   OPENSSL_cleanse,.-OPENSSL_cleanse
+#endif
 
 .globl  CRYPTO_memcmp
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   CRYPTO_memcmp,%function
+#endif
 .align  4
 CRYPTO_memcmp:
         AARCH64_VALID_CALL_TARGET
@@ -176,22 +234,30 @@ CRYPTO_memcmp:
         neg     w0,w3
         lsr     w0,w0,#31
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   CRYPTO_memcmp,.-CRYPTO_memcmp
+#endif
 
 .globl  _armv8_rng_probe
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _armv8_rng_probe,%function
+#endif
 _armv8_rng_probe:
         AARCH64_VALID_CALL_TARGET
         mrs     x0, s3_3_c2_c4_0        // rndr
         mrs     x0, s3_3_c2_c4_1        // rndrrs
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _armv8_rng_probe,.-_armv8_rng_probe
+#endif
 // Fill buffer with Randomly Generated Bytes
 // inputs:  char * in x0 - Pointer to buffer
 //          size_t in x1 - Number of bytes to write to buffer
 // outputs: size_t in x0 - Number of bytes successfully written to buffer
 .globl  OPENSSL_rndr_asm
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   OPENSSL_rndr_asm,%function
+#endif
 .align  4
 OPENSSL_rndr_asm:
         AARCH64_VALID_CALL_TARGET
@@ -228,13 +294,17 @@ OPENSSL_rndr_asm:
 .rndr_done:
         mov     x0,x2
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   OPENSSL_rndr_asm,.-OPENSSL_rndr_asm
+#endif
 // Fill buffer with Randomly Generated Bytes
 // inputs:  char * in x0 - Pointer to buffer
 //          size_t in x1 - Number of bytes to write to buffer
 // outputs: size_t in x0 - Number of bytes successfully written to buffer
 .globl  OPENSSL_rndrrs_asm
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   OPENSSL_rndrrs_asm,%function
+#endif
 .align  4
 OPENSSL_rndrrs_asm:
         AARCH64_VALID_CALL_TARGET
@@ -271,4 +341,6 @@ OPENSSL_rndrrs_asm:
 .rndrrs_done:
         mov     x0,x2
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   OPENSSL_rndrrs_asm,.-OPENSSL_rndrrs_asm
+#endif

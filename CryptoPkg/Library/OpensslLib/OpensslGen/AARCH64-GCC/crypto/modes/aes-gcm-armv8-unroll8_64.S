@@ -4,7 +4,9 @@
 .arch   armv8-a+crypto
 .text
 .globl  unroll8_eor3_aes_gcm_enc_128_kernel
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   unroll8_eor3_aes_gcm_enc_128_kernel,%function
+#endif
 .align  4
 unroll8_eor3_aes_gcm_enc_128_kernel:
         AARCH64_VALID_CALL_TARGET
@@ -1306,9 +1308,13 @@ unroll8_eor3_aes_gcm_enc_128_kernel:
 .L128_enc_ret:
         mov     w0, #0x0
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   unroll8_eor3_aes_gcm_enc_128_kernel,.-unroll8_eor3_aes_gcm_enc_128_kernel
+#endif
 .globl  unroll8_eor3_aes_gcm_dec_128_kernel
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   unroll8_eor3_aes_gcm_dec_128_kernel,%function
+#endif
 .align  4
 unroll8_eor3_aes_gcm_dec_128_kernel:
         AARCH64_VALID_CALL_TARGET
@@ -2602,9 +2608,13 @@ unroll8_eor3_aes_gcm_dec_128_kernel:
 .L128_dec_ret:
         mov     w0, #0x0
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   unroll8_eor3_aes_gcm_dec_128_kernel,.-unroll8_eor3_aes_gcm_dec_128_kernel
+#endif
 .globl  unroll8_eor3_aes_gcm_enc_192_kernel
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   unroll8_eor3_aes_gcm_enc_192_kernel,%function
+#endif
 .align  4
 unroll8_eor3_aes_gcm_enc_192_kernel:
         AARCH64_VALID_CALL_TARGET
@@ -4017,9 +4027,13 @@ unroll8_eor3_aes_gcm_enc_192_kernel:
 .L192_enc_ret:
         mov     w0, #0x0
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   unroll8_eor3_aes_gcm_enc_192_kernel,.-unroll8_eor3_aes_gcm_enc_192_kernel
+#endif
 .globl  unroll8_eor3_aes_gcm_dec_192_kernel
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   unroll8_eor3_aes_gcm_dec_192_kernel,%function
+#endif
 .align  4
 unroll8_eor3_aes_gcm_dec_192_kernel:
         AARCH64_VALID_CALL_TARGET
@@ -5422,9 +5436,13 @@ unroll8_eor3_aes_gcm_dec_192_kernel:
 .L192_dec_ret:
         mov     w0, #0x0
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   unroll8_eor3_aes_gcm_dec_192_kernel,.-unroll8_eor3_aes_gcm_dec_192_kernel
+#endif
 .globl  unroll8_eor3_aes_gcm_enc_256_kernel
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   unroll8_eor3_aes_gcm_enc_256_kernel,%function
+#endif
 .align  4
 unroll8_eor3_aes_gcm_enc_256_kernel:
         AARCH64_VALID_CALL_TARGET
@@ -6953,9 +6971,13 @@ unroll8_eor3_aes_gcm_enc_256_kernel:
 .L256_enc_ret:
         mov     w0, #0x0
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   unroll8_eor3_aes_gcm_enc_256_kernel,.-unroll8_eor3_aes_gcm_enc_256_kernel
+#endif
 .globl  unroll8_eor3_aes_gcm_dec_256_kernel
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   unroll8_eor3_aes_gcm_dec_256_kernel,%function
+#endif
 .align  4
 unroll8_eor3_aes_gcm_dec_256_kernel:
         AARCH64_VALID_CALL_TARGET
@@ -8480,7 +8502,9 @@ unroll8_eor3_aes_gcm_dec_256_kernel:
 .L256_dec_ret:
         mov     w0, #0x0
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   unroll8_eor3_aes_gcm_dec_256_kernel,.-unroll8_eor3_aes_gcm_dec_256_kernel
+#endif
 .byte   65,69,83,32,71,67,77,32,109,111,100,117,108,101,32,102,111,114,32,65,82,77,118,56,44,32,83,80,68,88,32,66,83,68,45,51,45,67,108,97,117,115,101,32,98,121,32,60,120,105,97,111,107,97,110,103,46,113,105,97,110,64,97,114,109,46,99,111,109,62,0
 .align  2
 .align  2

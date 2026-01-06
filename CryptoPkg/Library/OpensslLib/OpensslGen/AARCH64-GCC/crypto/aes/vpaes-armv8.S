@@ -2,7 +2,11 @@
 
 .section        .rodata
 
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _vpaes_consts,%object
+#endif
+#endif
 .align  7       // totally strategic alignment
 _vpaes_consts:
 .Lk_mc_forward: //      mc_forward
@@ -90,7 +94,9 @@ _vpaes_consts:
 
 .byte   86,101,99,116,111,114,32,80,101,114,109,117,116,97,116,105,111,110,32,65,69,83,32,102,111,114,32,65,82,77,118,56,44,32,77,105,107,101,32,72,97,109,98,117,114,103,32,40,83,116,97,110,102,111,114,100,32,85,110,105,118,101,114,115,105,116,121,41,0
 .align  2
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _vpaes_consts,.-_vpaes_consts
+#endif
 .align  6
 
 .text
@@ -101,7 +107,11 @@ _vpaes_consts:
 //  Fills register %r10 -> .aes_consts (so you can -fPIC)
 //  and %xmm9-%xmm15 as specified below.
 //
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _vpaes_encrypt_preheat,%function
+#endif
+#endif
 .align  4
 _vpaes_encrypt_preheat:
         adrp    x10, .Lk_inv
@@ -111,7 +121,9 @@ _vpaes_encrypt_preheat:
         ld1     {v20.2d,v21.2d,v22.2d,v23.2d}, [x10],#64        // .Lk_ipt, .Lk_sbo
         ld1     {v24.2d,v25.2d,v26.2d,v27.2d}, [x10]            // .Lk_sb1, .Lk_sb2
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _vpaes_encrypt_preheat,.-_vpaes_encrypt_preheat
+#endif
 
 //
 //  _aes_encrypt_core
@@ -128,7 +140,9 @@ _vpaes_encrypt_preheat:
 //  Preserves %xmm6 - %xmm8 so you get some local vectors
 //
 //
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _vpaes_encrypt_core,%function
+#endif
 .align  4
 _vpaes_encrypt_core:
         mov     x9, x2
@@ -196,10 +210,16 @@ _vpaes_encrypt_core:
         eor     v0.16b, v0.16b, v4.16b          // vpxor        %xmm4,  %xmm0,  %xmm0   # 0 = A
         tbl     v0.16b, {v0.16b}, v1.16b        // vpshufb      %xmm1,  %xmm0,  %xmm0
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _vpaes_encrypt_core,.-_vpaes_encrypt_core
+#endif
 
 .globl  vpaes_encrypt
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   vpaes_encrypt,%function
+#endif
+#endif
 .align  4
 vpaes_encrypt:
         AARCH64_SIGN_LINK_REGISTER
@@ -214,9 +234,15 @@ vpaes_encrypt:
         ldp     x29,x30,[sp],#16
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   vpaes_encrypt,.-vpaes_encrypt
+#endif
 
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _vpaes_encrypt_2x,%function
+#endif
+#endif
 .align  4
 _vpaes_encrypt_2x:
         mov     x9, x2
@@ -320,9 +346,13 @@ _vpaes_encrypt_2x:
         tbl     v0.16b,  {v0.16b},v1.16b        // vpshufb      %xmm1,  %xmm0,  %xmm0
         tbl     v1.16b,  {v8.16b},v1.16b
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _vpaes_encrypt_2x,.-_vpaes_encrypt_2x
+#endif
 
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _vpaes_decrypt_preheat,%function
+#endif
 .align  4
 _vpaes_decrypt_preheat:
         adrp    x10, .Lk_inv
@@ -335,14 +365,18 @@ _vpaes_decrypt_preheat:
         ld1     {v24.2d,v25.2d,v26.2d,v27.2d}, [x11],#64        // .Lk_dsb9, .Lk_dsbd
         ld1     {v28.2d,v29.2d,v30.2d,v31.2d}, [x11]            // .Lk_dsbb, .Lk_dsbe
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _vpaes_decrypt_preheat,.-_vpaes_decrypt_preheat
+#endif
 
 //
 //  Decryption core
 //
 //  Same API as encryption core.
 //
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _vpaes_decrypt_core,%function
+#endif
 .align  4
 _vpaes_decrypt_core:
         mov     x9, x2
@@ -434,10 +468,14 @@ _vpaes_decrypt_core:
         eor     v0.16b, v1.16b, v4.16b          // vpxor        %xmm4,  %xmm1,  %xmm0   # 0 = A
         tbl     v0.16b, {v0.16b}, v2.16b        // vpshufb      %xmm2,  %xmm0,  %xmm0
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _vpaes_decrypt_core,.-_vpaes_decrypt_core
+#endif
 
 .globl  vpaes_decrypt
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   vpaes_decrypt,%function
+#endif
 .align  4
 vpaes_decrypt:
         AARCH64_SIGN_LINK_REGISTER
@@ -452,10 +490,14 @@ vpaes_decrypt:
         ldp     x29,x30,[sp],#16
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   vpaes_decrypt,.-vpaes_decrypt
+#endif
 
 // v14-v15 input, v0-v1 output
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _vpaes_decrypt_2x,%function
+#endif
 .align  4
 _vpaes_decrypt_2x:
         mov     x9, x2
@@ -589,13 +631,17 @@ _vpaes_decrypt_2x:
         tbl     v0.16b,  {v0.16b},v2.16b        // vpshufb      %xmm2,  %xmm0,  %xmm0
         tbl     v1.16b,  {v8.16b},v2.16b
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _vpaes_decrypt_2x,.-_vpaes_decrypt_2x
+#endif
 ////////////////////////////////////////////////////////
 //                                                    //
 //                  AES key schedule                  //
 //                                                    //
 ////////////////////////////////////////////////////////
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _vpaes_key_preheat,%function
+#endif
 .align  4
 _vpaes_key_preheat:
         adrp    x10, .Lk_inv
@@ -615,9 +661,13 @@ _vpaes_key_preheat:
         ld1     {v8.2d}, [x10]                  // .Lk_rcon
         ld1     {v9.2d}, [x11]                  // .Lk_mc_forward[0]
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _vpaes_key_preheat,.-_vpaes_key_preheat
+#endif
 
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _vpaes_schedule_core,%function
+#endif
 .align  4
 _vpaes_schedule_core:
         AARCH64_SIGN_LINK_REGISTER
@@ -790,7 +840,9 @@ _vpaes_schedule_core:
         ldp     x29, x30, [sp],#16
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _vpaes_schedule_core,.-_vpaes_schedule_core
+#endif
 
 //
 //  .aes_schedule_192_smear
@@ -806,7 +858,9 @@ _vpaes_schedule_core:
 //    %xmm6: b+c+d  b+c  0  0
 //    %xmm0: b+c+d  b+c  b  a
 //
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _vpaes_schedule_192_smear,%function
+#endif
 .align  4
 _vpaes_schedule_192_smear:
         movi    v1.16b, #0
@@ -819,7 +873,9 @@ _vpaes_schedule_192_smear:
         mov     v0.16b, v6.16b          // vmovdqa      %xmm6,  %xmm0
         ins     v6.d[0], v1.d[0]        // vmovhlps     %xmm1,  %xmm6,  %xmm6   # clobber low side with zeros
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _vpaes_schedule_192_smear,.-_vpaes_schedule_192_smear
+#endif
 
 //
 //  .aes_schedule_round
@@ -839,7 +895,9 @@ _vpaes_schedule_192_smear:
 //  Returns results in %xmm7 = %xmm0.
 //  Clobbers %xmm1-%xmm4, %r11.
 //
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _vpaes_schedule_round,%function
+#endif
 .align  4
 _vpaes_schedule_round:
         // extract rcon from xmm8
@@ -884,7 +942,9 @@ _vpaes_schedule_low_round:
         eor     v0.16b, v1.16b, v7.16b          // vpxor        %xmm7,  %xmm1,  %xmm0
         eor     v7.16b, v1.16b, v7.16b          // vmovdqa      %xmm0,  %xmm7
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _vpaes_schedule_round,.-_vpaes_schedule_round
+#endif
 
 //
 //  .aes_schedule_transform
@@ -895,7 +955,9 @@ _vpaes_schedule_low_round:
 //  Output in %xmm0
 //  Clobbers %xmm1, %xmm2
 //
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _vpaes_schedule_transform,%function
+#endif
 .align  4
 _vpaes_schedule_transform:
         and     v1.16b, v0.16b, v17.16b         // vpand        %xmm9,  %xmm0,  %xmm1
@@ -906,7 +968,9 @@ _vpaes_schedule_transform:
         tbl     v0.16b, {v21.16b}, v0.16b       // vpshufb      %xmm0,  %xmm1,  %xmm0
         eor     v0.16b, v0.16b, v2.16b          // vpxor        %xmm2,  %xmm0,  %xmm0
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _vpaes_schedule_transform,.-_vpaes_schedule_transform
+#endif
 
 //
 //  .aes_schedule_mangle
@@ -931,7 +995,9 @@ _vpaes_schedule_transform:
 //  Preserves xmm0
 //  Clobbers xmm1-xmm5
 //
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _vpaes_schedule_mangle,%function
+#endif
 .align  4
 _vpaes_schedule_mangle:
         mov     v4.16b, v0.16b                  // vmovdqa      %xmm0,  %xmm4   # save xmm0 for later
@@ -995,10 +1061,14 @@ _vpaes_schedule_mangle:
         and     x8, x8, #~(1<<6)                // and  $0x30,  %r8
         st1     {v3.2d}, [x2]                   // vmovdqu      %xmm3,  (%rdx)
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _vpaes_schedule_mangle,.-_vpaes_schedule_mangle
+#endif
 
 .globl  vpaes_set_encrypt_key
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   vpaes_set_encrypt_key,%function
+#endif
 .align  4
 vpaes_set_encrypt_key:
         AARCH64_SIGN_LINK_REGISTER
@@ -1019,10 +1089,14 @@ vpaes_set_encrypt_key:
         ldp     x29,x30,[sp],#16
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   vpaes_set_encrypt_key,.-vpaes_set_encrypt_key
+#endif
 
 .globl  vpaes_set_decrypt_key
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   vpaes_set_decrypt_key,%function
+#endif
 .align  4
 vpaes_set_decrypt_key:
         AARCH64_SIGN_LINK_REGISTER
@@ -1047,9 +1121,13 @@ vpaes_set_decrypt_key:
         ldp     x29,x30,[sp],#16
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   vpaes_set_decrypt_key,.-vpaes_set_decrypt_key
+#endif
 .globl  vpaes_cbc_encrypt
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   vpaes_cbc_encrypt,%function
+#endif
 .align  4
 vpaes_cbc_encrypt:
         AARCH64_SIGN_LINK_REGISTER
@@ -1082,9 +1160,13 @@ vpaes_cbc_encrypt:
 .Lcbc_abort:
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   vpaes_cbc_encrypt,.-vpaes_cbc_encrypt
+#endif
 
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   vpaes_cbc_decrypt,%function
+#endif
 .align  4
 vpaes_cbc_decrypt:
         // Not adding AARCH64_SIGN_LINK_REGISTER here because vpaes_cbc_decrypt is jumped to
@@ -1132,9 +1214,13 @@ vpaes_cbc_decrypt:
         ldp     x29,x30,[sp],#16
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   vpaes_cbc_decrypt,.-vpaes_cbc_decrypt
+#endif
 .globl  vpaes_ecb_encrypt
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   vpaes_ecb_encrypt,%function
+#endif
 .align  4
 vpaes_ecb_encrypt:
         AARCH64_SIGN_LINK_REGISTER
@@ -1173,10 +1259,14 @@ vpaes_ecb_encrypt:
         ldp     x29,x30,[sp],#16
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   vpaes_ecb_encrypt,.-vpaes_ecb_encrypt
+#endif
 
 .globl  vpaes_ecb_decrypt
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   vpaes_ecb_decrypt,%function
+#endif
 .align  4
 vpaes_ecb_decrypt:
         AARCH64_SIGN_LINK_REGISTER
@@ -1215,4 +1305,6 @@ vpaes_ecb_decrypt:
         ldp     x29,x30,[sp],#16
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   vpaes_ecb_decrypt,.-vpaes_ecb_decrypt
+#endif
