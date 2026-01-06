@@ -22,3 +22,13 @@ gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm|TRUE
 !if $(HOST_BASED_UNIT_TESTING_ENABLED) AND $(WIN_HOST_BUILD)
 gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm|TRUE
 !endif
+
+[PcdsFeatureFlag.AARCH64]
+#
+# Use the PE target assembly source files when building with the CLANGPDB
+# toolchain.
+# GCC and CLANGDWARF use the default PCD value of ELF target assembly source files.
+#
+!if "$(TOOL_CHAIN_TAG)" == "CLANGPDB"
+gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStylePe|TRUE
+!endif
