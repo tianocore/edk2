@@ -358,7 +358,7 @@ def main():
         defines = {}
         for asm in [ 'UEFI-IA32-MSFT', 'UEFI-IA32-GCC',
                      'UEFI-X64-MSFT', 'UEFI-X64-GCC',
-                     'UEFI-AARCH64-GCC']:
+                     'UEFI-AARCH64-GCC', 'UEFI-AARCH64-CLANGPDB']:
             (uefi, arch, cc) = asm.split('-')
             archcc = f'{arch}-{cc}'
 
@@ -371,7 +371,13 @@ def main():
 
             srclist = libcrypto_sources(cfg, archcc) + libssl_sources(cfg, archcc)
             if arch in ['AARCH64']:
-                sources[archcc] = list(map(lambda x: f'{x} | {cc}', filter(is_asm, srclist)))
+                if cc == 'GCC':
+                    # Generate AARCH64-GCC sources with "| GCC | GCC" tag to uniquely identify GCC vs GCC family (clang)
+                    sources[archcc] = list(map(lambda x: f'{x} | {cc} | {cc}', filter(is_asm, srclist)))
+                    # Also create CLANGDWARF variant for AARCH64-GCC sources
+                    sources[f'{archcc}-CLANGDWARF'] = list(map(lambda x: f'{x} | CLANGDWARF', filter(is_asm, srclist)))
+                else:
+                    sources[archcc] = list(map(lambda x: f'{x} | {cc}', filter(is_asm, srclist)))
             else:
                 featureflagexp = 'gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm'
                 if cc == 'GCC':
@@ -386,7 +392,7 @@ def main():
         x64accel = sources['X64'] + sources['X64-MSFT'] + sources['X64-GCC']
         update_inf(inf, ia32accel, 'IA32', defines['IA32'])
         update_inf(inf, x64accel, 'X64', defines['X64'])
-        aarch64accel = sources['AARCH64'] + sources['AARCH64-GCC']
+        aarch64accel = sources['AARCH64'] + sources['AARCH64-GCC'] + sources['AARCH64-GCC-CLANGDWARF'] + sources['AARCH64-CLANGPDB']
         update_inf(inf, aarch64accel, 'AARCH64', defines['AARCH64'])
 
     # noaccel - ec enabled
