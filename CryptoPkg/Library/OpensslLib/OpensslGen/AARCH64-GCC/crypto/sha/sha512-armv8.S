@@ -57,14 +57,17 @@
 // $flavour is the first argument if it doesn't look like a file
 #include "arm_arch.h"
 #ifndef __KERNEL__
-
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't support the ELF .hidden visibility directive
 .hidden OPENSSL_armcap_P
+#endif
 #endif
 
 .text
 
 .globl  sha512_block_data_order
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   sha512_block_data_order,%function
+#endif
 .align  6
 sha512_block_data_order:
         AARCH64_VALID_CALL_TARGET
@@ -1037,12 +1040,16 @@ sha512_block_data_order:
         ldp     x29,x30,[sp],#128
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   sha512_block_data_order,.-sha512_block_data_order
+#endif
 
 .section        .rodata
 
 .align  6
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   .LK512,%object
+#endif
 .LK512:
 .quad   0x428a2f98d728ae22,0x7137449123ef65cd
 .quad   0xb5c0fbcfec4d3b2f,0xe9b5dba58189dbbc
@@ -1085,14 +1092,18 @@ sha512_block_data_order:
 .quad   0x4cc5d4becb3e42b6,0x597f299cfc657e2a
 .quad   0x5fcb6fab3ad6faec,0x6c44198c4a475817
 .quad   0       // terminator
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   .LK512,.-.LK512
+#endif
 .byte   83,72,65,53,49,50,32,98,108,111,99,107,32,116,114,97,110,115,102,111,114,109,32,102,111,114,32,65,82,77,118,56,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
 .align  2
 .align  2
 
 .text
 #ifndef __KERNEL__
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   sha512_block_armv8,%function
+#endif
 .align  6
 sha512_block_armv8:
 .Lv8_entry:
@@ -1610,5 +1621,7 @@ sha512_block_armv8:
 
         ldr     x29,[sp],#16
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   sha512_block_armv8,.-sha512_block_armv8
+#endif
 #endif

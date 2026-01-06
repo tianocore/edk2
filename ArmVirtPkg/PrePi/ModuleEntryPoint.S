@@ -15,7 +15,8 @@ ASM_FUNC(_ModuleEntryPoint)
   // by the platform.
   //
   cbnz  x0, 0f
-  ldr   x0, PcdGet64 (PcdDeviceTreeInitialBaseAddress)
+  adrp  x0, PcdGet64 (PcdDeviceTreeInitialBaseAddress)
+  ldr   x0, [x0, #:lo12:PcdGet64 (PcdDeviceTreeInitialBaseAddress)]
 
 0:mov   x28, x0             // preserve DTB pointer
   mov   x27, x1             // preserve base of image pointer
@@ -36,13 +37,16 @@ ASM_FUNC(_ModuleEntryPoint)
 // at the top of the DRAM)
 _SetupStackPosition:
   // Compute Top of System Memory
-  ldr   x1, PcdGet64 (PcdSystemMemoryBase)
-  ldr   x2, PcdGet64 (PcdSystemMemorySize)
+  adrp  x1, PcdGet64 (PcdSystemMemoryBase)
+  ldr   x1, [x1, #:lo12:PcdGet64 (PcdSystemMemoryBase)]
+  adrp  x2, PcdGet64 (PcdSystemMemorySize)
+  ldr   x2, [x2, #:lo12:PcdGet64 (PcdSystemMemorySize)]
   sub   x2, x2, #1
   add   x1, x1, x2      // x1 = SystemMemoryTop = PcdSystemMemoryBase + PcdSystemMemorySize
 
   // Calculate Top of the Firmware Device
-  ldr   x2, PcdGet64 (PcdFdBaseAddress)
+  adrp  x2, PcdGet64 (PcdFdBaseAddress)
+  ldr   x2, [x2, #:lo12:PcdGet64 (PcdFdBaseAddress)]
   MOV32 (w3, FixedPcdGet32 (PcdFdSize) - 1)
   add   x3, x3, x2      // x3 = FdTop = PcdFdBaseAddress + PcdFdSize
 
@@ -120,7 +124,9 @@ ASM_PFX(DiscoverDramFromDt):
   // The base of the runtime image has been preserved in x27. Check whether
   // the expected magic number can be found in the header.
   //
-  ldr   w8, .LArm64LinuxMagic
+  adrp  x8, .LArm64LinuxMagic
+  add   x8, x8, #:lo12:.LArm64LinuxMagic
+  ldr   w8, [x8]
   ldr   w9, [x27, #0x38]
   cmp   w8, w9
   bne   .Lout

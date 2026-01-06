@@ -12,7 +12,9 @@
 #include "arm_arch.h"
 .text
 .globl  ossl_hwsm3_block_data_order
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ossl_hwsm3_block_data_order,%function
+#endif
 .align  5
 ossl_hwsm3_block_data_order:
         AARCH64_VALID_CALL_TARGET
@@ -496,13 +498,19 @@ ossl_hwsm3_block_data_order:
         ext     v6.16b, v6.16b, v6.16b, #8
         st1     {v5.4s,v6.4s}, [x0]
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ossl_hwsm3_block_data_order,.-ossl_hwsm3_block_data_order
+#endif
 .section        .rodata
 
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   _sm3_consts,%object
+#endif
 .align  3
 _sm3_consts:
 .Tj:
 .word   0x79cc4519, 0x9d8a7a87
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   _sm3_consts,.-_sm3_consts
-.previous
+#endif
+.text

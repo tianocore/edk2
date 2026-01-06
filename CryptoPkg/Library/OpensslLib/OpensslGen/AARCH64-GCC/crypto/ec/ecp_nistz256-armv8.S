@@ -2,7 +2,9 @@
 
 .section        .rodata
 .globl  ecp_nistz256_precomputed
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ecp_nistz256_precomputed,%object
+#endif
 .align  12
 ecp_nistz256_precomputed:
 .byte   0x3c,0x4d,0x27,0xcc,0xf5,0x4a,0x4f,0x8f,0xe8,0xc8,0x04,0x68,0x09,0x4a,0x5b,0x80,0x9d,0x7a,0xe8,0x31,0x08,0x76,0x68,0x19,0x9f,0x08,0xb4,0x1f,0x32,0x43,0x89,0xd8,0x34,0xd3,0xf5,0xb7,0xb5,0xee,0x42,0x3e,0x91,0x01,0x06,0x7c,0xbf,0xd9,0x97,0x12,0xd3,0x1a,0xc9,0x04,0x8d,0x53,0x83,0x14,0x28,0xf0,0x8e,0x19,0xcc,0x91,0xe5,0x80
@@ -2373,7 +2375,9 @@ ecp_nistz256_precomputed:
 .byte   0x44,0xbb,0x9b,0x51,0x5a,0x06,0x1d,0x2e,0xd7,0xef,0xd1,0x81,0xb6,0xec,0xc6,0x89,0xfb,0x13,0xc5,0x21,0xef,0x9a,0x1a,0x48,0xf2,0xf8,0xb3,0xa3,0xec,0x7f,0x85,0xc1,0xc6,0x8c,0x5f,0xa9,0x30,0x38,0x25,0x1e,0x8d,0xcf,0x18,0x24,0xef,0x5a,0x9a,0x14,0x31,0xc0,0x2c,0x88,0xa5,0x3f,0x50,0x8b,0xb1,0xda,0x5d,0x26,0xd9,0xd3,0x81,0xb1
 .byte   0xec,0xf0,0x42,0x88,0xd0,0x81,0x51,0xf9,0x1b,0xbc,0x43,0xa4,0x37,0xf1,0xd7,0x90,0x21,0x7e,0xa0,0x3e,0x63,0xfb,0x21,0xfa,0x12,0xfb,0xde,0xc7,0xbf,0xb3,0x58,0xe7,0x76,0x42,0x20,0x01,0x3d,0x66,0x80,0xf1,0xb8,0xaf,0xfa,0x7d,0x96,0x89,0x36,0x48,0x95,0xd9,0x6e,0x6d,0xe6,0x4f,0xff,0x2a,0x47,0x61,0xf2,0x04,0xb7,0x83,0x14,0xce
 .byte   0x0a,0x3c,0x73,0x17,0x50,0x88,0x03,0x25,0x4a,0xe3,0x13,0x55,0x8b,0x7e,0x50,0x38,0xfc,0x14,0x0b,0x04,0x8e,0xa8,0x5b,0xd6,0x72,0x20,0x60,0xe9,0xaa,0x22,0x82,0x11,0xc6,0xc4,0xd7,0xb9,0xc8,0x0c,0x7e,0x05,0xfb,0x90,0xe4,0x9c,0x28,0x89,0x29,0x99,0x63,0x4d,0xec,0x7b,0x50,0xbd,0xd8,0xa3,0x5b,0x50,0x77,0x19,0x81,0x92,0xce,0x82
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ecp_nistz256_precomputed,.-ecp_nistz256_precomputed
+#endif
 .align  5
 .Lpoly:
 .quad   0xffffffffffffffff,0x00000000ffffffff,0x0000000000000000,0xffffffff00000001
@@ -2394,7 +2398,9 @@ ecp_nistz256_precomputed:
 
 // void ecp_nistz256_to_mont(BN_ULONG x0[4],const BN_ULONG x1[4]);
 .globl  ecp_nistz256_to_mont
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ecp_nistz256_to_mont,%function
+#endif
 .align  6
 ecp_nistz256_to_mont:
         AARCH64_SIGN_LINK_REGISTER
@@ -2419,11 +2425,15 @@ ecp_nistz256_to_mont:
         ldp     x29,x30,[sp],#32
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ecp_nistz256_to_mont,.-ecp_nistz256_to_mont
+#endif
 
 // void ecp_nistz256_from_mont(BN_ULONG x0[4],const BN_ULONG x1[4]);
 .globl  ecp_nistz256_from_mont
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ecp_nistz256_from_mont,%function
+#endif
 .align  4
 ecp_nistz256_from_mont:
         AARCH64_SIGN_LINK_REGISTER
@@ -2447,12 +2457,16 @@ ecp_nistz256_from_mont:
         ldp     x29,x30,[sp],#32
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ecp_nistz256_from_mont,.-ecp_nistz256_from_mont
+#endif
 
 // void ecp_nistz256_mul_mont(BN_ULONG x0[4],const BN_ULONG x1[4],
 //                                           const BN_ULONG x2[4]);
 .globl  ecp_nistz256_mul_mont
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ecp_nistz256_mul_mont,%function
+#endif
 .align  4
 ecp_nistz256_mul_mont:
         AARCH64_SIGN_LINK_REGISTER
@@ -2474,11 +2488,15 @@ ecp_nistz256_mul_mont:
         ldp     x29,x30,[sp],#32
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ecp_nistz256_mul_mont,.-ecp_nistz256_mul_mont
+#endif
 
 // void ecp_nistz256_sqr_mont(BN_ULONG x0[4],const BN_ULONG x1[4]);
 .globl  ecp_nistz256_sqr_mont
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ecp_nistz256_sqr_mont,%function
+#endif
 .align  4
 ecp_nistz256_sqr_mont:
         AARCH64_SIGN_LINK_REGISTER
@@ -2499,12 +2517,16 @@ ecp_nistz256_sqr_mont:
         ldp     x29,x30,[sp],#32
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ecp_nistz256_sqr_mont,.-ecp_nistz256_sqr_mont
+#endif
 
 // void ecp_nistz256_add(BN_ULONG x0[4],const BN_ULONG x1[4],
 //                                      const BN_ULONG x2[4]);
 .globl  ecp_nistz256_add
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ecp_nistz256_add,%function
+#endif
 .align  4
 ecp_nistz256_add:
         AARCH64_SIGN_LINK_REGISTER
@@ -2525,11 +2547,15 @@ ecp_nistz256_add:
         ldp     x29,x30,[sp],#16
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ecp_nistz256_add,.-ecp_nistz256_add
+#endif
 
 // void ecp_nistz256_div_by_2(BN_ULONG x0[4],const BN_ULONG x1[4]);
 .globl  ecp_nistz256_div_by_2
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ecp_nistz256_div_by_2,%function
+#endif
 .align  4
 ecp_nistz256_div_by_2:
         AARCH64_SIGN_LINK_REGISTER
@@ -2548,11 +2574,15 @@ ecp_nistz256_div_by_2:
         ldp     x29,x30,[sp],#16
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ecp_nistz256_div_by_2,.-ecp_nistz256_div_by_2
+#endif
 
 // void ecp_nistz256_mul_by_2(BN_ULONG x0[4],const BN_ULONG x1[4]);
 .globl  ecp_nistz256_mul_by_2
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ecp_nistz256_mul_by_2,%function
+#endif
 .align  4
 ecp_nistz256_mul_by_2:
         AARCH64_SIGN_LINK_REGISTER
@@ -2575,11 +2605,15 @@ ecp_nistz256_mul_by_2:
         ldp     x29,x30,[sp],#16
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ecp_nistz256_mul_by_2,.-ecp_nistz256_mul_by_2
+#endif
 
 // void ecp_nistz256_mul_by_3(BN_ULONG x0[4],const BN_ULONG x1[4]);
 .globl  ecp_nistz256_mul_by_3
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ecp_nistz256_mul_by_3,%function
+#endif
 .align  4
 ecp_nistz256_mul_by_3:
         AARCH64_SIGN_LINK_REGISTER
@@ -2613,12 +2647,16 @@ ecp_nistz256_mul_by_3:
         ldp     x29,x30,[sp],#16
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ecp_nistz256_mul_by_3,.-ecp_nistz256_mul_by_3
+#endif
 
 // void ecp_nistz256_sub(BN_ULONG x0[4],const BN_ULONG x1[4],
 //                                      const BN_ULONG x2[4]);
 .globl  ecp_nistz256_sub
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ecp_nistz256_sub,%function
+#endif
 .align  4
 ecp_nistz256_sub:
         AARCH64_SIGN_LINK_REGISTER
@@ -2637,11 +2675,15 @@ ecp_nistz256_sub:
         ldp     x29,x30,[sp],#16
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ecp_nistz256_sub,.-ecp_nistz256_sub
+#endif
 
 // void ecp_nistz256_neg(BN_ULONG x0[4],const BN_ULONG x1[4]);
 .globl  ecp_nistz256_neg
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ecp_nistz256_neg,%function
+#endif
 .align  4
 ecp_nistz256_neg:
         AARCH64_SIGN_LINK_REGISTER
@@ -2663,11 +2705,15 @@ ecp_nistz256_neg:
         ldp     x29,x30,[sp],#16
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ecp_nistz256_neg,.-ecp_nistz256_neg
+#endif
 
 // note that __ecp_nistz256_mul_mont expects a[0-3] input pre-loaded
 // to x4-x7 and b[0] - to x3
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   __ecp_nistz256_mul_mont,%function
+#endif
 .align  4
 __ecp_nistz256_mul_mont:
         mul     x14,x4,x3               // a[0]*b[0]
@@ -2799,11 +2845,15 @@ __ecp_nistz256_mul_mont:
         stp     x16,x17,[x0,#16]
 
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   __ecp_nistz256_mul_mont,.-__ecp_nistz256_mul_mont
+#endif
 
 // note that __ecp_nistz256_sqr_mont expects a[0-3] input pre-loaded
 // to x4-x7
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   __ecp_nistz256_sqr_mont,%function
+#endif
 .align  4
 __ecp_nistz256_sqr_mont:
         //  |  |  |  |  |  |a1*a0|  |
@@ -2922,12 +2972,16 @@ __ecp_nistz256_sqr_mont:
         stp     x16,x17,[x0,#16]
 
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   __ecp_nistz256_sqr_mont,.-__ecp_nistz256_sqr_mont
+#endif
 
 // Note that __ecp_nistz256_add expects both input vectors pre-loaded to
 // x4-x7 and x8-x11. This is done because it's used in multiple
 // contexts, e.g. in multiplication by 2 and 3...
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   __ecp_nistz256_add,%function
+#endif
 .align  4
 __ecp_nistz256_add:
         adds    x14,x14,x8              // ret = a+b
@@ -2950,9 +3004,13 @@ __ecp_nistz256_add:
         stp     x16,x17,[x0,#16]
 
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   __ecp_nistz256_add,.-__ecp_nistz256_add
+#endif
 
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   __ecp_nistz256_sub_from,%function
+#endif
 .align  4
 __ecp_nistz256_sub_from:
         ldp     x8,x9,[x2]
@@ -2977,9 +3035,13 @@ __ecp_nistz256_sub_from:
         stp     x16,x17,[x0,#16]
 
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   __ecp_nistz256_sub_from,.-__ecp_nistz256_sub_from
+#endif
 
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   __ecp_nistz256_sub_morf,%function
+#endif
 .align  4
 __ecp_nistz256_sub_morf:
         ldp     x8,x9,[x2]
@@ -3004,9 +3066,13 @@ __ecp_nistz256_sub_morf:
         stp     x16,x17,[x0,#16]
 
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   __ecp_nistz256_sub_morf,.-__ecp_nistz256_sub_morf
+#endif
 
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   __ecp_nistz256_div_by_2,%function
+#endif
 .align  4
 __ecp_nistz256_div_by_2:
         subs    x8,x14,#1               // adds x8,x4,#-1 // tmp = a+modulus
@@ -3034,9 +3100,13 @@ __ecp_nistz256_div_by_2:
         stp     x16,x17,[x0,#16]
 
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   __ecp_nistz256_div_by_2,.-__ecp_nistz256_div_by_2
+#endif
 .globl  ecp_nistz256_point_double
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ecp_nistz256_point_double,%function
+#endif
 .align  5
 ecp_nistz256_point_double:
         AARCH64_SIGN_LINK_REGISTER
@@ -3178,9 +3248,13 @@ ecp_nistz256_point_double:
         ldp     x29,x30,[sp],#96
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ecp_nistz256_point_double,.-ecp_nistz256_point_double
+#endif
 .globl  ecp_nistz256_point_add
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ecp_nistz256_point_add,%function
+#endif
 .align  5
 ecp_nistz256_point_add:
         AARCH64_SIGN_LINK_REGISTER
@@ -3434,9 +3508,13 @@ ecp_nistz256_point_add:
         ldp     x29,x30,[sp],#96
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ecp_nistz256_point_add,.-ecp_nistz256_point_add
+#endif
 .globl  ecp_nistz256_point_add_affine
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ecp_nistz256_point_add_affine,%function
+#endif
 .align  5
 ecp_nistz256_point_add_affine:
         AARCH64_SIGN_LINK_REGISTER
@@ -3643,12 +3721,16 @@ ecp_nistz256_point_add_affine:
         ldp     x29,x30,[sp],#80
         AARCH64_VALIDATE_LINK_REGISTER
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ecp_nistz256_point_add_affine,.-ecp_nistz256_point_add_affine
+#endif
 ////////////////////////////////////////////////////////////////////////
 // void ecp_nistz256_ord_mul_mont(uint64_t res[4], uint64_t a[4],
 //                                uint64_t b[4]);
 .globl  ecp_nistz256_ord_mul_mont
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ecp_nistz256_ord_mul_mont,%function
+#endif
 .align  4
 ecp_nistz256_ord_mul_mont:
         AARCH64_VALID_CALL_TARGET
@@ -3853,13 +3935,17 @@ ecp_nistz256_ord_mul_mont:
         ldp     x23,x24,[sp,#48]
         ldr     x29,[sp],#64
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ecp_nistz256_ord_mul_mont,.-ecp_nistz256_ord_mul_mont
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 // void ecp_nistz256_ord_sqr_mont(uint64_t res[4], uint64_t a[4],
 //                                uint64_t rep);
 .globl  ecp_nistz256_ord_sqr_mont
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ecp_nistz256_ord_sqr_mont,%function
+#endif
 .align  4
 ecp_nistz256_ord_sqr_mont:
         AARCH64_VALID_CALL_TARGET
@@ -4046,11 +4132,15 @@ ecp_nistz256_ord_sqr_mont:
         ldp     x23,x24,[sp,#48]
         ldr     x29,[sp],#64
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ecp_nistz256_ord_sqr_mont,.-ecp_nistz256_ord_sqr_mont
+#endif
 // void ecp_nistz256_scatter_w5(void *x0,const P256_POINT *x1,
 //                                       int x2);
 .globl  ecp_nistz256_scatter_w5
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ecp_nistz256_scatter_w5,%function
+#endif
 .align  4
 ecp_nistz256_scatter_w5:
         AARCH64_VALID_CALL_TARGET
@@ -4109,12 +4199,16 @@ ecp_nistz256_scatter_w5:
 
         ldr     x29,[sp],#16
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ecp_nistz256_scatter_w5,.-ecp_nistz256_scatter_w5
+#endif
 
 // void ecp_nistz256_gather_w5(P256_POINT *x0,const void *x1,
 //                                            int x2);
 .globl  ecp_nistz256_gather_w5
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ecp_nistz256_gather_w5,%function
+#endif
 .align  4
 ecp_nistz256_gather_w5:
         AARCH64_VALID_CALL_TARGET
@@ -4188,12 +4282,16 @@ ecp_nistz256_gather_w5:
 
         ldr     x29,[sp],#16
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ecp_nistz256_gather_w5,.-ecp_nistz256_gather_w5
+#endif
 
 // void ecp_nistz256_scatter_w7(void *x0,const P256_POINT_AFFINE *x1,
 //                                       int x2);
 .globl  ecp_nistz256_scatter_w7
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ecp_nistz256_scatter_w7,%function
+#endif
 .align  4
 ecp_nistz256_scatter_w7:
         AARCH64_VALID_CALL_TARGET
@@ -4234,12 +4332,16 @@ ecp_nistz256_scatter_w7:
 
         ldr     x29,[sp],#16
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ecp_nistz256_scatter_w7,.-ecp_nistz256_scatter_w7
+#endif
 
 // void ecp_nistz256_gather_w7(P256_POINT_AFFINE *x0,const void *x1,
 //                                                   int x2);
 .globl  ecp_nistz256_gather_w7
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ecp_nistz256_gather_w7,%function
+#endif
 .align  4
 ecp_nistz256_gather_w7:
         AARCH64_VALID_CALL_TARGET
@@ -4285,4 +4387,6 @@ ecp_nistz256_gather_w7:
 
         ldr     x29,[sp],#16
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   ecp_nistz256_gather_w7,.-ecp_nistz256_gather_w7
+#endif

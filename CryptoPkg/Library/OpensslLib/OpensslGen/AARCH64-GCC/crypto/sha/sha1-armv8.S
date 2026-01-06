@@ -1,13 +1,16 @@
 #include "arm_arch.h"
 #ifndef __KERNEL__
-
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't support the ELF .hidden visibility directive
 .hidden OPENSSL_armcap_P
+#endif
 #endif
 
 .text
 
 .globl  sha1_block_data_order
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   sha1_block_data_order,%function
+#endif
 .align  6
 sha1_block_data_order:
         AARCH64_VALID_CALL_TARGET
@@ -1071,8 +1074,12 @@ sha1_block_data_order:
         ldp     x27,x28,[sp,#80]
         ldr     x29,[sp],#96
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   sha1_block_data_order,.-sha1_block_data_order
+#endif
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   sha1_block_armv8,%function
+#endif
 .align  6
 sha1_block_armv8:
 .Lv8_entry:
@@ -1203,7 +1210,9 @@ sha1_block_armv8:
 
         ldr     x29,[sp],#16
         ret
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .size directive
 .size   sha1_block_armv8,.-sha1_block_armv8
+#endif
 
 .section        .rodata
 

@@ -166,8 +166,8 @@
 #
 ###################################################################################################
 [BuildOptions.AARCH64]
-GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000 -march=armv8-a+nofp -mstrict-align
-GCC:*_*_*_CC_FLAGS = -mstrict-align
+GCC:*_GCC_*_DLINK_FLAGS = -z common-page-size=0x1000 -march=armv8-a+nofp -mstrict-align
+GCC:*_GCC_*_CC_FLAGS = -mstrict-align
 
 [BuildOptions.X64]
   MSFT:*_*_*_DLINK_FLAGS = /ALIGN:4096

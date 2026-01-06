@@ -2,7 +2,9 @@
 
 .text
 .globl  ossl_md5_block_asm_data_order
+#ifdef __ELF__  // PE targets (e.g. CLANGPDB) don't use the ELF style .type directive
 .type   ossl_md5_block_asm_data_order,@function
+#endif
 ossl_md5_block_asm_data_order:
         AARCH64_VALID_CALL_TARGET
         // Save all callee-saved registers
