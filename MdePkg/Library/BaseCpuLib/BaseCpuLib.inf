@@ -58,6 +58,7 @@
 [Sources.RISCV64]
   RiscV/Cpu.S             | GCC
   RiscV/InitializeFpu.S   | GCC
+  RiscV/InitializeVector.S  | GCC
 
 [Sources.LOONGARCH64]
   LoongArch/CpuFlushTlb.S   | GCC
