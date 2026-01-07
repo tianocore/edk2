@@ -49,7 +49,7 @@
 # +--------------------+--------+----------+------------+-----+----+--------+
 # | OS/Compiler        | VS2019 | CLANGPDB | CLANGDWARF |   GCC    | XCODE5 |
 # |                    | VS2022 |          |            |   GCC5   |        |
-# |                    |        |          |            | GCCNOLTO |        |
+# |                    | VS2026 |          |            | GCCNOLTO |        |
 # +--------------------+--------+----------+------------+----------+--------+
 # | Windows/VS         |IA32/X64|          |            |          |        |
 # | Windows/LLVM/VS    |        | IA32/X64 |            |          |        |
@@ -90,7 +90,7 @@
 # macOS/XCODE: macOS environment with XCODE5 installed.
 #
 !if $(WIN_MINGW32_BUILD)
-  !if $(TOOL_CHAIN_TAG) in "VS2019 VS2022"
+  !if $(TOOL_CHAIN_TAG) in "VS2019 VS2022 VS2026"
     !error Host-based Unit Tests not supported for Mingw/VS20xx builds
   !endif
   !if $(TOOL_CHAIN_TAG) in "CLANGPDB"
@@ -108,7 +108,7 @@
       !error Host-based Unit Tests not supported for Windows/CLANGDWARF builds
     !endif
   !else
-    !if $(TOOL_CHAIN_TAG) in "VS2019 VS2022"
+    !if $(TOOL_CHAIN_TAG) in "VS2019 VS2022 VS2026"
       !error Host-based Unit Tests not supported for Linux/VS20xx builds
     !endif
     !if $(TOOL_CHAIN_TAG) in "CLANGPDB"
@@ -149,10 +149,11 @@
 
 !if $(UNIT_TESTING_ADDRESS_SANITIZER_ENABLE)
   #
-  # Enable Address Sanitizer for VS2019, VS2022, and GCC
+  # Enable Address Sanitizer for VS2019, VS2022, VS2026, and GCC
   #
   MSFT:*_VS2019_*_CC_FLAGS = /fsanitize=address
   MSFT:*_VS2022_*_CC_FLAGS = /fsanitize=address
+  MSFT:*_VS2026_*_CC_FLAGS = /fsanitize=address
   GCC:*_*_*_CC_FLAGS       = -fsanitize=address
   CLANGPDB:*_*_*_CC_FLAGS  = -fsanitize=address
 !endif
