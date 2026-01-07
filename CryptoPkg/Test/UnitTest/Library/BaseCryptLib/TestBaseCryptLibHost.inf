@@ -44,6 +44,7 @@
   EcTests.c
   X509Tests.c
   SlhDsaTests.c
+  MlDsaTests.c
 
 [Packages]
   MdePkg/MdePkg.dec

@@ -31,6 +31,7 @@ SUITE_DESC  mSuiteDesc[] = {
   { "EC verify tests",               "CryptoPkg.BaseCryptLib", NULL, NULL, &mEcTestNum,             mEcTest             },
   { "X509 Verify tests",             "CryptoPkg.BaseCryptLib", NULL, NULL, &mX509TestNum,           mX509Test           },
   { "SLH DSA tests",                 "CryptoPkg.BaseCryptLib", NULL, NULL, &mSlhDsaTestNum,         mSlhDsaTest         },
+  { "ML DSA tests",                  "CryptoPkg.BaseCryptLib", NULL, NULL, &mMlDsaTestNum,          mMlDsaTest          },
 };
 
 EFI_STATUS

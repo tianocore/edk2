@@ -104,6 +104,9 @@ extern TEST_DESC  mX509Test[];
 extern UINTN      mSlhDsaTestNum;
 extern TEST_DESC  mSlhDsaTest[];
 
+extern UINTN      mMlDsaTestNum;
+extern TEST_DESC  mMlDsaTest[];
+
 /** Creates a framework you can use */
 EFI_STATUS
 EFIAPI
