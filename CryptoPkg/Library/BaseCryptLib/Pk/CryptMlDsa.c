@@ -455,8 +455,10 @@ MlDsaVerify (
   MlDsaCtx   *Ctx;
   UINTN       SigSizeRequired;
   EVP_MD_CTX  *MdCtx;
-  OSSL_PARAM  Params[2];
+  OSSL_PARAM  Params[3];
+  OSSL_PARAM  *P;
   BOOLEAN     Result;
+  UINT32      Encode;
 
   if ((SlhContext == NULL) || (Message == NULL) || (Signature == NULL)) {
     return FALSE;
@@ -488,16 +490,19 @@ MlDsaVerify (
     goto Exit;
   }
 
+  P = Params;
+  Encode = 0;
+  *P++ = OSSL_PARAM_construct_int(OSSL_SIGNATURE_PARAM_MESSAGE_ENCODING, &Encode);
   if (ContextSize > 0) {
-    Params[0] = OSSL_PARAM_construct_octet_string (
+    *P++ = OSSL_PARAM_construct_octet_string (
                     OSSL_SIGNATURE_PARAM_CONTEXT_STRING,
                     (VOID *)Context,
                     ContextSize
                     );
-    Params[1] = OSSL_PARAM_construct_end ();
-    if (EVP_PKEY_CTX_set_params (EVP_MD_CTX_pkey_ctx (MdCtx), Params) != 1) {
-      goto Exit;
-    }
+  }
+  *P++ = OSSL_PARAM_construct_end ();
+  if (EVP_PKEY_CTX_set_params (EVP_MD_CTX_pkey_ctx (MdCtx), Params) != 1) {
+    goto Exit;
   }
 
   if (EVP_DigestVerify (MdCtx, Signature, (UINT32)SigSize, Message, (UINT32)MessageSize) != 1) {

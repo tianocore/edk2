@@ -51,6 +51,7 @@
   Bn/CryptBn.c
   Pk/CryptEc.c
   Pk/CryptSlhDsa.c
+  Pk/CryptMlDsa.c
 
   SysCall/UnitTestHostCrtWrapper.c
 
