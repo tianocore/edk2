@@ -449,7 +449,7 @@ QemuLoadKernelImage (
                     &Enabled
                     );
       if (EFI_ERROR (RetStatus)) {
-        Enabled = TRUE;
+        Enabled = FALSE;
       }
 
       if (!Enabled) {

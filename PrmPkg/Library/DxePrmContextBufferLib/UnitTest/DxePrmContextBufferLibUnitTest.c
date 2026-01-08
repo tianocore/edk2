@@ -236,6 +236,9 @@ NullPointerArgumentsShouldFailGracefully (
   PRM_MODULE_CONTEXT_BUFFERS  ModuleContextBuffers;
   PRM_MODULE_CONTEXT_BUFFERS  *ModuleContextBuffersPtr;
 
+  ZeroMem (&ModuleContextBuffers, sizeof (ModuleContextBuffers));
+  ZeroMem (&Guid, sizeof (Guid));
+
   UT_ASSERT_EQUAL (FindContextBufferInModuleBuffers (NULL, NULL, NULL), EFI_INVALID_PARAMETER);
   UT_ASSERT_EQUAL (FindContextBufferInModuleBuffers (NULL, &ModuleContextBuffers, (CONST PRM_CONTEXT_BUFFER **)&ContextBufferPtr), EFI_INVALID_PARAMETER);
   UT_ASSERT_EQUAL (FindContextBufferInModuleBuffers (&Guid, NULL, (CONST PRM_CONTEXT_BUFFER **)&ContextBufferPtr), EFI_INVALID_PARAMETER);

@@ -647,6 +647,9 @@ UfsCreateDMCommandDesc (
     Trd->RuO = (UINT16)DivU64x32 ((UINT64)ROUNDUP8 (sizeof (UTP_QUERY_REQ_UPIU)), sizeof (UINT32));
   }
 
+  // UFS DM Command, PRDT Length must be Zero.
+  Trd->PrdtL = 0x00;
+
   return EFI_SUCCESS;
 }
 
