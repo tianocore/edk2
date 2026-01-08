@@ -68,6 +68,3 @@
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdEnforceSecureRngAlgorithms ## CONSUMES
-
-[Depex]
-  gEfiRngProtocolGuid

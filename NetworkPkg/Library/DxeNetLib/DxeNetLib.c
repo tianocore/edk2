@@ -910,6 +910,53 @@ Ip6Swap128 (
   return Ip6;
 }
 
+#define NET_RANDOM(Seed)  ((UINT32) ((UINT32) (Seed) * 1103515245UL + 12345) % 4294967295UL)
+
+/**
+  Initialize a random seed using current time and monotonic count.
+
+  Get current time and monotonic count first. Then initialize a random seed
+  based on some basic mathematics operation on the hour, day, minute, second,
+  nanosecond and year of the current time and the monotonic count value.
+
+  @param[out] Output - The buffer to store the random seed initialized with
+  current time.
+
+  @return Status code
+**/
+STATIC
+EFI_STATUS
+NetRandomInitSeed (
+  OUT UINT32  *Output
+  )
+{
+  EFI_TIME  Time;
+  UINT32    Seed;
+  UINT64    MonotonicCount;
+  EFI_STATUS      Status;
+
+  Status = gRT->GetTime (&Time, NULL);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a failed to call gRT->GetTime %r\n", __func__, Status));
+    return Status;
+  }
+
+  Seed  = (Time.Hour << 24 | Time.Day << 16 | Time.Minute << 8 | Time.Second);
+  Seed ^= Time.Nanosecond;
+  Seed ^= Time.Year << 7;
+
+  Status = gBS->GetNextMonotonicCount (&MonotonicCount);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a failed to call gBS->GetNextMonotonicCount %r\n", __func__, Status));
+    return Status;
+  }
+
+  Seed += (UINT32)MonotonicCount;
+  Seed = NET_RANDOM(Seed);
+  *Output = Seed;
+  return EFI_SUCCESS;
+}
+
 /**
   Generate a Random output data given a length.
 
@@ -941,8 +988,13 @@ PseudoRandom (
   Status = gBS->LocateProtocol (&gEfiRngProtocolGuid, NULL, (VOID **)&RngProtocol);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Failed to locate EFI_RNG_PROTOCOL: %r\n", Status));
-    ASSERT_EFI_ERROR (Status);
-    return Status;
+    Status = NetRandomInitSeed (Output);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a failed to call NetRandomInitSeed %r\n", __func__, Status));
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
+    return EFI_SUCCESS; 
   }
 
   if (PcdGetBool (PcdEnforceSecureRngAlgorithms)) {
