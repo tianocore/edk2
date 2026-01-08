@@ -142,3 +142,19 @@ indicates a formatting issue was found and the test is marked failed (unless `Au
 The test case log will contain a report of which files failed to format properly, allowing the user to run Uncrustify
 against the file locally to fix the issue. If the `OutputFileDiffs` configuration option is set to `True`, the plugin
 will output diff chunks for all code formatting issues in the test case log.
+
+## Disabling Uncrustify for Code Sections
+
+Due to the number of scenarios presented to Uncrustify, there may be cases when it simply does not format the code as
+expected. While the Uncrustify plugin allows the file to be ignored, in the case where only a small section of code
+needs to be ignored, the following comments can be used to disable Uncrustify processing for a section of code.
+
+```c
+// BEGIN_UNCRUSTIFY_DISABLE
+// Core ignored by Uncrustify...
+// END_UNCRUSTIFY_DISABLE
+```
+
+These marker values are defined in the Uncrustify configuration file used by this plugin.
+
+See: [.pytool/Plugin/UncrustifyCheck/uncrustify.cfg](https://github.com/tianocore/edk2/blob/master/.pytool/Plugin/UncrustifyCheck/uncrustify.cfg).
