@@ -2424,8 +2424,8 @@
   gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask|0|UINT8|0x00000009
 
   ## The mask is used to control PostCodeLib behavior.<BR><BR>
-  #  BIT0 - Enable Post Code.<BR>
-  #  BIT1 - Enable Post Code with Description.<BR>
+  #  BIT3 - Enable Post Code.<BR>
+  #  BIT4 - Enable Post Code with Description.<BR>
   # @Prompt Post Code Property.
   # @Expression  0x80000002 | (gEfiMdePkgTokenSpaceGuid.PcdPostCodePropertyMask & 0xFC) == 0
   gEfiMdePkgTokenSpaceGuid.PcdPostCodePropertyMask|0|UINT8|0x0000000b
