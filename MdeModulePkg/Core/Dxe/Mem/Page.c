@@ -66,8 +66,9 @@ EFI_MEMORY_TYPE_STATISTICS  mMemoryTypeStatistics[EfiMaxMemoryType + 1] = {
   { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE }   // EfiMaxMemoryType
 };
 
-EFI_PHYSICAL_ADDRESS  mDefaultMaximumAddress = MAX_ALLOC_ADDRESS;
-EFI_PHYSICAL_ADDRESS  mDefaultBaseAddress    = MAX_ALLOC_ADDRESS;
+EFI_PHYSICAL_ADDRESS  mDefaultHighMemoryBaseAddress = MAX_ALLOC_ADDRESS;
+EFI_PHYSICAL_ADDRESS  mDefaultMaximumAddress        = MAX_ALLOC_ADDRESS;
+EFI_PHYSICAL_ADDRESS  mDefaultBaseAddress           = MAX_ALLOC_ADDRESS;
 
 EFI_MEMORY_TYPE_INFORMATION  gMemoryTypeInformation[EfiMaxMemoryType + 1] = {
   { EfiReservedMemoryType,      0 },
@@ -608,10 +609,32 @@ CoreSetMemoryTypeInformationRange (
 
       //
       // If the current base address is the lowest address so far, then update
-      // the default maximum address
+      // the default maximum address with 1 page of guard space to guarantee
+      // memory region immediately below lowest bin can never merge with the
+      // lowest bin
       //
       if (mMemoryTypeStatistics[Type].BaseAddress < mDefaultMaximumAddress) {
-        mDefaultMaximumAddress = mMemoryTypeStatistics[Type].BaseAddress - 1;
+        mDefaultMaximumAddress = mMemoryTypeStatistics[Type].BaseAddress;
+        if (mDefaultMaximumAddress > EFI_PAGE_SIZE) {
+          mDefaultMaximumAddress = mDefaultMaximumAddress - EFI_PAGE_SIZE - 1;
+        } else {
+          mDefaultMaximumAddress = 0;
+        }
+      }
+
+      //
+      // If the current maximum address is the highest address so far, then
+      // update the default high memory base address with 1 page of guard space
+      // to guarantee the memory region immediately above the highest bin can
+      // never be merged with the highest bin.
+      //
+      if (mMemoryTypeStatistics[Type].MaximumAddress > mDefaultHighMemoryBaseAddress) {
+        mDefaultHighMemoryBaseAddress = mMemoryTypeStatistics[Type].MaximumAddress;
+        if (mDefaultHighMemoryBaseAddress < (MAX_ALLOC_ADDRESS - EFI_PAGE_SIZE)) {
+          mDefaultHighMemoryBaseAddress = mDefaultHighMemoryBaseAddress + 1 + EFI_PAGE_SIZE;
+        } else {
+          mDefaultHighMemoryBaseAddress = MAX_ALLOC_ADDRESS;
+        }
       }
 
       mMemoryTypeStatistics[Type].NumberOfPages   = gMemoryTypeInformation[Index].NumberOfPages;
@@ -760,11 +783,33 @@ CoreAddMemoryDescriptor (
         LShiftU64 (gMemoryTypeInformation[Index].NumberOfPages, EFI_PAGE_SHIFT) - 1;
 
       //
-      // If the current base address is the lowest address so far, then update the default
-      // maximum address
+      // If the current base address is the lowest address so far, then update
+      // the default maximum address with 1 page of guard space to guarantee
+      // memory region immediately below lowest bin can never merge with the
+      // lowest bin
       //
       if (mMemoryTypeStatistics[Type].BaseAddress < mDefaultMaximumAddress) {
-        mDefaultMaximumAddress = mMemoryTypeStatistics[Type].BaseAddress - 1;
+        mDefaultMaximumAddress = mMemoryTypeStatistics[Type].BaseAddress;
+        if (mDefaultMaximumAddress > EFI_PAGE_SIZE) {
+          mDefaultMaximumAddress = mDefaultMaximumAddress - EFI_PAGE_SIZE - 1;
+        } else {
+          mDefaultMaximumAddress = 0;
+        }
+      }
+
+      //
+      // If the current maximum address is the highest address so far, then
+      // update the default high memory base address with 1 page of guard space
+      // to guarantee the memory region immediately above the highest bin can
+      // never be merged with the highest bin.
+      //
+      if (mMemoryTypeStatistics[Type].MaximumAddress > mDefaultHighMemoryBaseAddress) {
+        mDefaultHighMemoryBaseAddress = mMemoryTypeStatistics[Type].MaximumAddress;
+        if (mDefaultHighMemoryBaseAddress < (MAX_ALLOC_ADDRESS - EFI_PAGE_SIZE)) {
+          mDefaultHighMemoryBaseAddress = mDefaultHighMemoryBaseAddress + 1 + EFI_PAGE_SIZE;
+        } else {
+          mDefaultHighMemoryBaseAddress = MAX_ALLOC_ADDRESS;
+        }
       }
     }
   }
@@ -1335,7 +1380,25 @@ FindFreePages (
   }
 
   //
-  // The allocation did not succeed in any of the prefered bins even after
+  // The allocation did not succeed in any of the preferred bins or below the
+  // default maximum address. Attempt to find free pages above the bins.
+  //
+  if (MaxAddress >= mDefaultHighMemoryBaseAddress) {
+    Start = CoreFindFreePagesI (
+              MaxAddress,
+              mDefaultHighMemoryBaseAddress,
+              NoPages,
+              NewType,
+              Alignment,
+              NeedGuard
+              );
+    if (Start != 0) {
+      return Start;
+    }
+  }
+
+  //
+  // The allocation did not succeed in any of the preferred bins even after
   // promoting resources. Attempt to find free pages anywhere is the requested
   // address range.  If this allocation fails, then there are not enough
   // resources anywhere to satisfy the request.
@@ -1394,13 +1457,12 @@ CoreInternalAllocatePages (
   IN BOOLEAN                   NeedGuard
   )
 {
-  EFI_STATUS       Status;
-  UINT64           Start;
-  UINT64           NumberOfBytes;
-  UINT64           End;
-  UINT64           MaxAddress;
-  UINTN            Alignment;
-  EFI_MEMORY_TYPE  CheckType;
+  EFI_STATUS  Status;
+  UINT64      Start;
+  UINT64      NumberOfBytes;
+  UINT64      End;
+  UINT64      MaxAddress;
+  UINTN       Alignment;
 
   if ((UINT32)Type >= MaxAllocateType) {
     return EFI_INVALID_PARAMETER;
@@ -1488,37 +1550,14 @@ CoreInternalAllocatePages (
       return EFI_NOT_FOUND;
     }
 
-    //
-    // A driver is allowed to call AllocatePages using an AllocateAddress type.  This type of
-    // AllocatePage request the exact physical address if it is not used.  The existing code
-    // will allow this request even in 'special' pages.  The problem with this is that the
-    // reason to have 'special' pages for OS hibernate/resume is defeated as memory is
-    // fragmented.
-    //
-
-    for (CheckType = (EFI_MEMORY_TYPE)0; CheckType < EfiMaxMemoryType; CheckType++) {
-      if ((MemoryType != CheckType) &&
-          mMemoryTypeStatistics[CheckType].Special &&
-          (mMemoryTypeStatistics[CheckType].NumberOfPages > 0))
-      {
-        if ((Start >= mMemoryTypeStatistics[CheckType].BaseAddress) &&
-            (Start <= mMemoryTypeStatistics[CheckType].MaximumAddress))
-        {
-          return EFI_NOT_FOUND;
-        }
-
-        if ((End >= mMemoryTypeStatistics[CheckType].BaseAddress) &&
-            (End <= mMemoryTypeStatistics[CheckType].MaximumAddress))
-        {
-          return EFI_NOT_FOUND;
-        }
-
-        if ((Start < mMemoryTypeStatistics[CheckType].BaseAddress) &&
-            (End   > mMemoryTypeStatistics[CheckType].MaximumAddress))
-        {
-          return EFI_NOT_FOUND;
-        }
-      }
+    if (((Start <  mDefaultMaximumAddress)        && (End > mDefaultMaximumAddress))        ||
+        ((Start <  mDefaultHighMemoryBaseAddress) && (End > mDefaultHighMemoryBaseAddress)) ||
+        ((Start >= mDefaultMaximumAddress)        && (End < mDefaultHighMemoryBaseAddress)))
+    {
+      //
+      // Allocation spans/overlaps memory type bin ranges, which is not allowed
+      //
+      return EFI_NOT_FOUND;
     }
   }
 
