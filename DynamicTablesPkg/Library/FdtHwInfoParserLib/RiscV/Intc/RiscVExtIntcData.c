@@ -42,7 +42,7 @@ STATIC LIST_ENTRY  mExtIntcList;
   @param [in]  ExtIntcNode      External interrupt controller node.
   @param [in]  GsiBase          GSI base of the interrupt controller.
 
-  @retval EFI_SUCCESS           External interript controller node is added in the list.
+  @retval EFI_SUCCESS           External interrupt controller node is added in the list.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory for the list.
 **/
 EFI_STATUS
