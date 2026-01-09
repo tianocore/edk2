@@ -61,6 +61,7 @@
   SafeIntLib
   PcdLib
   HobLib
+  MmUnblockMemoryLib
 
 [Protocols]
   gEfiVariableWriteArchProtocolGuid             ## PRODUCES
