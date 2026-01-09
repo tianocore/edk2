@@ -38,8 +38,9 @@
 [Sources.IA32, Sources.X64]
   X86StandaloneMmMemLibInternal.c
 
-[Sources.AARCH64]
-  ArmStandaloneMmMemLibInternal.c
+[Sources.AARCH64, Sources.RISCV64]
+  StandaloneMmMemLibInternalCommon.c
+
 
 [Packages]
   MdePkg/MdePkg.dec

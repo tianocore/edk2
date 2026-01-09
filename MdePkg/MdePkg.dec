@@ -309,6 +309,10 @@
   #
   StackCheckLib|Include/Library/StackCheckLib.h
 
+  ##  @libraryclass Provides the RAS agent client to retrieve error source informations.
+  #
+  DxeRasAgentClientLib|Include/Library/DxeRasAgentClient.h
+
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides services to generate random number.
   #
@@ -352,6 +356,7 @@
 [LibraryClasses.RISCV64]
   ##  @libraryclass  Provides function to make ecalls to SBI
   BaseRiscVSbiLib|Include/Library/BaseRiscVSbiLib.h
+  CommonRiscvMpxyLib|Include/Library/DxeRiscvMpxy.h
 
 [LibraryClasses.AARCH64]
   ##  @libraryclass  Provides an interface to Arm registers.
@@ -2498,6 +2503,10 @@
   #  This byte is 20h when the BMC is the responder (section 14.4.3).
   # @Prompt IPMI Serial responder Software ID
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialResponderAddress|0x20|UINT8|0x00000051
+
+  ## This option chooses between pass through and MM mode of communication.
+  # @Prompt Mode of transport for management service requests
+  gEfiMdePkgTokenSpaceGuid.PcdMMPassThroughEnable|TRUE|BOOLEAN|0x10000037
 
   ## This is requester's LUN for IPMI Serial.
   # @Prompt IPMI Serial requester LUN
