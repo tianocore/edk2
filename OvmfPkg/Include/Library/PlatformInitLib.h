@@ -27,11 +27,25 @@ typedef struct {
 } QEMU_FW_CFG_WORK_AREA;
 
 typedef struct {
+  //
+  // FirstNonAddress requires aligned access to prevent a Windows
+  // compiler warning (treated as an error):
+  //   "The result of the unary '&' operator may be unaligned"
+  //
+  // Because the structure is packed, ensure necessary padding is used when
+  // adding fields before FirstNonAddress.
+  //
+
   EFI_HOB_GUID_TYPE        GuidHeader;
   UINT16                   HostBridgeDevId;
 
   UINT64                   PcdConfidentialComputingGuestAttr;
+  UINT64                   SevEncryptionMask;
+  UINT8                    SevReducedPhysBits;
+  BOOLEAN                  SevIsEnabled;
   BOOLEAN                  SevEsIsEnabled;
+
+  UINT8                    Rsvd[6];
 
   UINT32                   BootMode;
   BOOLEAN                  S3Supported;

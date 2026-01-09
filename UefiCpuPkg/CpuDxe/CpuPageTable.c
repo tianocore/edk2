@@ -321,7 +321,7 @@ GetPageTableEntry (
         return NULL;
       }
 
-      L4PageTable = (UINT64 *)(UINTN)(L5PageTable[Index5] & ~AddressEncMask & PAGING_4K_ADDRESS_MASK_64);
+      L4PageTable = (UINT64 *)(UINTN)(L5PageTable[Index5] & PAGING_4K_ADDRESS_MASK_64);
     } else {
       L4PageTable = (UINT64 *)(UINTN)PagingContext->ContextData.X64.PageTableBase;
     }
@@ -331,7 +331,7 @@ GetPageTableEntry (
       return NULL;
     }
 
-    L3PageTable = (UINT64 *)(UINTN)(L4PageTable[Index4] & ~AddressEncMask & PAGING_4K_ADDRESS_MASK_64);
+    L3PageTable = (UINT64 *)(UINTN)(L4PageTable[Index4] & PAGING_4K_ADDRESS_MASK_64);
   } else {
     ASSERT ((PagingContext->ContextData.Ia32.Attributes & PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_PAE) != 0);
     L3PageTable = (UINT64 *)(UINTN)PagingContext->ContextData.Ia32.PageTableBase;
@@ -348,7 +348,7 @@ GetPageTableEntry (
     return &L3PageTable[Index3];
   }
 
-  L2PageTable = (UINT64 *)(UINTN)(L3PageTable[Index3] & ~AddressEncMask & PAGING_4K_ADDRESS_MASK_64);
+  L2PageTable = (UINT64 *)(UINTN)(L3PageTable[Index3] & PAGING_4K_ADDRESS_MASK_64);
   if (L2PageTable[Index2] == 0) {
     *PageAttribute = PageNone;
     return NULL;
@@ -361,7 +361,7 @@ GetPageTableEntry (
   }
 
   // 4k
-  L1PageTable = (UINT64 *)(UINTN)(L2PageTable[Index2] & ~AddressEncMask & PAGING_4K_ADDRESS_MASK_64);
+  L1PageTable = (UINT64 *)(UINTN)(L2PageTable[Index2] & PAGING_4K_ADDRESS_MASK_64);
   if ((L1PageTable[Index1] == 0) && (Address != 0)) {
     *PageAttribute = PageNone;
     return NULL;
@@ -556,6 +556,7 @@ SplitPage (
   )
 {
   UINT64  BaseAddress;
+  UINT64  BaseAttributes;
   UINT64  *NewPageEntry;
   UINTN   Index;
   UINT64  AddressEncMask;
@@ -580,12 +581,19 @@ SplitPage (
         return RETURN_OUT_OF_RESOURCES;
       }
 
-      BaseAddress = *PageEntry & ~AddressEncMask & PAGING_2M_ADDRESS_MASK_64;
-      for (Index = 0; Index < SIZE_4KB / sizeof (UINT64); Index++) {
-        NewPageEntry[Index] = (BaseAddress + SIZE_4KB * Index) | AddressEncMask | ((*PageEntry) & PAGE_PROGATE_BITS);
+      BaseAddress    = *PageEntry & PAGING_2M_ADDRESS_MASK_64;
+      BaseAttributes = ((*PageEntry) & PAGE_PROGATE_BITS);
+      if ((*PageEntry & AddressEncMask) != 0) {
+        BaseAttributes |= AddressEncMask;
       }
 
-      (*PageEntry) = (UINT64)(UINTN)NewPageEntry | AddressEncMask | PAGE_ATTRIBUTE_BITS_POST_SPLIT;
+      for (Index = 0; Index < SIZE_4KB / sizeof (UINT64); Index++) {
+        NewPageEntry[Index] = (BaseAddress + SIZE_4KB * Index) | BaseAttributes;
+      }
+
+      // Not a leaf entry so don't include the encryption mask
+      //
+      (*PageEntry) = (UINT64)(UINTN)NewPageEntry | PAGE_ATTRIBUTE_BITS_POST_SPLIT;
       return RETURN_SUCCESS;
     } else {
       return RETURN_UNSUPPORTED;
@@ -603,12 +611,19 @@ SplitPage (
         return RETURN_OUT_OF_RESOURCES;
       }
 
-      BaseAddress = *PageEntry & ~AddressEncMask  & PAGING_1G_ADDRESS_MASK_64;
-      for (Index = 0; Index < SIZE_4KB / sizeof (UINT64); Index++) {
-        NewPageEntry[Index] = (BaseAddress + SIZE_2MB * Index) | AddressEncMask | IA32_PG_PS | ((*PageEntry) & PAGE_PROGATE_BITS);
+      BaseAddress    = *PageEntry & PAGING_1G_ADDRESS_MASK_64;
+      BaseAttributes = IA32_PG_PS | ((*PageEntry) & PAGE_PROGATE_BITS);
+      if ((*PageEntry & AddressEncMask) != 0) {
+        BaseAttributes |= AddressEncMask;
       }
 
-      (*PageEntry) = (UINT64)(UINTN)NewPageEntry | AddressEncMask | PAGE_ATTRIBUTE_BITS_POST_SPLIT;
+      for (Index = 0; Index < SIZE_4KB / sizeof (UINT64); Index++) {
+        NewPageEntry[Index] = (BaseAddress + SIZE_2MB * Index) | BaseAttributes;
+      }
+
+      // Not a leaf entry so don't include the encryption mask
+      //
+      (*PageEntry) = (UINT64)(UINTN)NewPageEntry | PAGE_ATTRIBUTE_BITS_POST_SPLIT;
       return RETURN_SUCCESS;
     } else {
       return RETURN_UNSUPPORTED;
