@@ -178,6 +178,8 @@ ParseFfs (
   UINT8                   NumberofMatchingVfrBin;
   UINTN                   *VfrBinBaseAddress;
 
+  VfrBinBaseAddress = NULL;
+
   Status = Fv2->ReadFile (
                   Fv2,
                   DriverGuid,
