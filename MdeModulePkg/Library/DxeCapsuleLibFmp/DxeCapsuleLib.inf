@@ -70,6 +70,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdCodRelocationDevPath                     ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCoDRelocationFileName                    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleEmbeddedDriverSupport             ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSingleStageOnlyCapsuleUpdate             ## CONSUMES
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset ## CONSUMES
