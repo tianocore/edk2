@@ -27,6 +27,7 @@
 #define SSTATUS_SPIE        MSTATUS_SPIE
 #define SSTATUS_SPP_SHIFT   MSTATUS_SPP_SHIFT
 #define SSTATUS_SPP         MSTATUS_SPP
+#define SSTATUS_VS          0x00000600UL
 
 #define IRQ_S_SOFT    1
 #define IRQ_VS_SOFT   2
