@@ -1,0 +1,68 @@
+## @file
+#
+#  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#  @par Reference(s):
+#  - Platform Security Firmware Update for the A-profile Specification 1.0
+#    (https://developer.arm.com/documentation/den0118/latest)
+#
+#  @par Glossary:
+#    - FW    - Firmware
+#    - FWU   - Firmware Update
+#    - PSA   - Platform Security update for the A-profile specification
+#    - FMP   - Firmware Management Protocol Device.
+#
+##
+
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = PsaFwuLib
+  FILE_GUID                      = 200313EC-6C3F-11EE-9F0B-D769BEFFA745
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FmpDeviceLib|DXE_DRIVER DXE_RUNTIME_DRIVER
+  CONSTRUCTOR                    = FmpDevicePsaFwuLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources]
+  FmpDevicePsaFwuLib.c
+  PsaFwuLib.c
+  PsaFwuLib.h
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  FmpDevicePkg/FmpDevicePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmFfaLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gEfiMmCommunication2ProtocolGuid              ## CONSUMES
+
+[Guids]
+  gEfiEventVirtualAddressChangeGuid             ## CONSUMES             ## Event
+  gEfiEventReadyToBootGuid                      ## CONSUMES             ## Event
+  gPsaFwuUpdateAgentGuid                        ## CONSUMES
+  gPsaFwuImageDirectoryGuid                     ## CONSUMES
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdSystemFirmwareFmpLowestSupportedVersion
+  gArmTokenSpaceGuid.PcdSystemFirmwareFmpVersion
+  gArmTokenSpaceGuid.PcdSystemFirmwareFmpVersionString
+  gArmTokenSpaceGuid.PcdMmBufferBase
+  gArmTokenSpaceGuid.PcdMmBufferSize
