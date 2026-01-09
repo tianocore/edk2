@@ -1,0 +1,25 @@
+## @file
+#
+#  Copyright (c) 2025, Ventana Micro Systems Inc. All Rights Reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION         = 1.30
+  BASE_NAME           = ArmCompatSemiHostingLib
+  FILE_GUID           = 357168a8-ec03-4e74-bb04-d3f1f092bb44
+  MODULE_TYPE         = BASE
+  VERSION_STRING      = 1.0
+  LIBRARY_CLASS       = ArmCompatSemiHostingLib
+
+[Sources.common]
+  ArmCompatSemiHostingLib.c
+  SemiHostingPrivate.h
+
+[Sources.RISCV64]
+  RiscV/SemiHostingCall.S
+
+[Packages]
+  MdePkg/MdePkg.dec
