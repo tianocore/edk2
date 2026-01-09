@@ -1,0 +1,47 @@
+## @file
+#  For the x64 platform, qemu provides an error signalling
+#  interface via the ISA port. The library only supports
+#  the implementation of ISA (-device pvpanic) and MMIO,
+#  as PCI implementations cannot be used in the SEC/PEI
+#  stages. It require a separate DXE driver.
+#
+#  Copyright (C) 2025, Yandex. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PvPanicLib
+  FILE_GUID                      = 4B58B135-A54C-4871-893B-643CA8019BC5
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PvPanicLib|SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER SMM_CORE DXE_SMM_DRIVER MM_STANDALONE MM_CORE_STANDALONE
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  PvPanicLib.c
+
+[Sources.X64]
+  PvPanicLibISA.c
+
+[Sources.AARCH64]
+  PvPanicLibMMIO.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPvPanicIoPort            ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdPvPanicMmioAddr          ## CONSUMES
+
+[Guids]
