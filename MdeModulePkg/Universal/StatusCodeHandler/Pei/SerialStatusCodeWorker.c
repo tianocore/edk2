@@ -32,7 +32,7 @@
 **/
 EFI_STATUS
 EFIAPI
-SerialStatusCodeReportWorker (
+ExSerialStatusCodeReportWorker (
   IN CONST  EFI_PEI_SERVICES     **PeiServices,
   IN EFI_STATUS_CODE_TYPE        CodeType,
   IN EFI_STATUS_CODE_VALUE       Value,
@@ -41,19 +41,26 @@ SerialStatusCodeReportWorker (
   IN CONST EFI_STATUS_CODE_DATA  *Data OPTIONAL
   )
 {
-  CHAR8      *Filename;
-  CHAR8      *Description;
-  CHAR8      *Format;
-  CHAR8      Buffer[MAX_DEBUG_MESSAGE_LENGTH];
-  UINT32     ErrorLevel;
-  UINT32     LineNumber;
-  UINTN      CharCount;
-  BASE_LIST  Marker;
+  CHAR8          *Filename;
+  CHAR8          *Description;
+  CHAR8          *Format;
+  CHAR8          Buffer[MAX_EX_DEBUG_STR_LEN];
+  CHAR8          *BufferPtr;
+  UINT32         ErrorLevel;
+  UINT32         LineNumber;
+  UINTN          CharCount;
+  BASE_LIST      Marker;
+  EX_DEBUG_INFO  *ExDebugInfo = NULL;
 
   Buffer[0] = '\0';
+  CharCount = 0;
 
   if ((Data != NULL) &&
-      ReportStatusCodeExtractAssertInfo (CodeType, Value, Data, &Filename, &Description, &LineNumber))
+      CompareGuid (&Data->Type, &gStatusCodeDataTypeExDebugGuid))
+  {
+    ExDebugInfo = (EX_DEBUG_INFO *)(Data + 1);
+  } else if ((Data != NULL) &&
+             ReportStatusCodeExtractAssertInfo (CodeType, Value, Data, &Filename, &Description, &LineNumber))
   {
     //
     // Print ASSERT() information into output buffer.
@@ -155,9 +162,39 @@ SerialStatusCodeReportWorker (
   }
 
   //
-  // Call SerialPort Lib function to do print.
+  // No EX info, just call SerialPort Lib function to do print and exit.
   //
-  SerialPortWrite ((UINT8 *)Buffer, CharCount);
+  if (ExDebugInfo == NULL) {
+    SerialPortWrite ((UINT8 *)Buffer, CharCount);
+    return EFI_SUCCESS;
+  }
+
+  //
+  // EX handling here - point at correct string and then take action.
+  // Acquire print, process buffer, write to serial, release print.
+  // Skip any if not requested.
+  //
+  CharCount = ExDebugInfo->DebugStringLen;
+  BufferPtr = ExDebugInfo->DebugString;
+  if (ExDebugInfo->PrintSyncAcquire != NULL) {
+    ExDebugInfo->PrintSyncAcquire ();
+  }
+
+  if (ExDebugInfo->ProcessBuffer != NULL) {
+    BufferPtr = ExDebugInfo->ProcessBuffer (
+                               ExDebugInfo->ProcessDataPtr,
+                               Buffer,
+                               &CharCount
+                               );
+  }
+
+  if (BufferPtr != NULL) {
+    SerialPortWrite ((UINT8 *)BufferPtr, CharCount);
+  }
+
+  if ((ExDebugInfo != NULL) && (ExDebugInfo->PrintSyncRelease != NULL)) {
+    ExDebugInfo->PrintSyncRelease ();
+  }
 
   return EFI_SUCCESS;
 }
