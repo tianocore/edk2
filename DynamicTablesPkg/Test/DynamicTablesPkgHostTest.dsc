@@ -25,6 +25,7 @@
   AcpiHelperLib|DynamicTablesPkg/Library/Common/AcpiHelperLib/AcpiHelperLib.inf
   AcpiLib|EmbeddedPkg/Library/AcpiLib/AcpiLib.inf
   AmlLib|DynamicTablesPkg/Library/Common/AmlLib/AmlLib.inf
+  MetadataObjLib|DynamicTablesPkg/Library/Common/MetadataObjLib/MetadataObjLib.inf
   SsdtSerialPortFixupLib|DynamicTablesPkg/Library/Common/SsdtSerialPortFixupLib/SsdtSerialPortFixupLib.inf
   TableHelperLib|DynamicTablesPkg/Library/Common/TableHelperLib/TableHelperLib.inf
 
@@ -37,3 +38,25 @@
     <LibraryClasses>
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiCedtLib/AcpiCedtLib.inf
   }
+
+  #
+  # SSDT CPU Topology Generator Tests
+  #
+  # Architecture:
+  # - CommonSsdtCpuTopologyGoogleTest: Tests common code with mocked arch functions
+  # - ArmSsdtCpuTopologyGoogleTest: Tests Arm specific cpu topology functions
+  # - ArmSsdtCpuTopologyIntegrationGoogleTest: Tests Arm functions that require common APIs that can't be mocked
+  # - RiscVSsdtCpuTopologyGoogleTest: Tests RiscV specific cpu topology functions
+  # - RiscVSsdtCpuTopologyIntegrationGoogleTest: Tests RiscV functions that require common APIs that can't be mocked
+  # - X64SsdtCpuTopologyGoogleTest: Tests X64 specific cpu topology functions
+  # - X64SsdtCpuTopologyIntegrationGoogleTest: Tests X64 functions that require common APIs that can't be mocked
+  #
+  # All tests compile sources directly and use host environment stubs
+  # HostEnvStubs.c provides stubs for MetadataHandlerGenerate, GetMetadataRoot, CheckAcpiTablePresent
+  DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib/GoogleTest/CommonSsdtCpuTopologyGoogleTest.inf
+  DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib/GoogleTest/ArmSsdtCpuTopologyGoogleTest.inf
+  DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib/GoogleTest/ArmSsdtCpuTopologyIntegrationGoogleTest.inf
+  DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib/GoogleTest/RiscVSsdtCpuTopologyGoogleTest.inf
+  DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib/GoogleTest/RiscVSsdtCpuTopologyIntegrationGoogleTest.inf
+  DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib/GoogleTest/X64SsdtCpuTopologyGoogleTest.inf
+  DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib/GoogleTest/X64SsdtCpuTopologyIntegrationGoogleTest.inf
