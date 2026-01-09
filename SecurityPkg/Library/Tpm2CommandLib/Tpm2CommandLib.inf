@@ -37,7 +37,6 @@
   Tpm2DictionaryAttack.c
   Tpm2Object.c
   Tpm2Miscellaneous.c
-  Tpm2Help.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -48,3 +47,4 @@
   BaseMemoryLib
   DebugLib
   Tpm2DeviceLib
+  Tpm2HelpLib

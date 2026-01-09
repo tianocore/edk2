@@ -1,0 +1,29 @@
+## @file
+#  Provides helper functions for interfacing with TPM 2.0 data such
+#  as the Digest and AuthSession. Provides a place for common TPM 2.0
+#  functionality.
+#
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Tpm2HelpLib
+  FILE_GUID                      = DDFCEB08-9CE3-4CB8-ABBD-D32925E8CAAB
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Tpm2HelpLib
+
+[Sources]
+  Tpm2Help.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
