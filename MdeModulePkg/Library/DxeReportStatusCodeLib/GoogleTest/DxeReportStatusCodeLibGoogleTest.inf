@@ -1,0 +1,32 @@
+## @file
+# Host based Application that Unit Tests DxeReportStatusCodeLib
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION     = 0x00010017
+  BASE_NAME       = DxeReportStatusCodeLibGoogleTest
+  FILE_GUID       = D7F3EA2A-1868-4107-82AB-B737BF9FD6B0
+  MODULE_TYPE     = HOST_APPLICATION
+  VERSION_STRING  = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  DxeReportStatusCodeLibGoogleTest.cpp
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+  BaseLib
+  ReportStatusCodeLib
+  UefiBootServicesTableLib
