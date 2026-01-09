@@ -530,7 +530,11 @@ PeiInitializeFv (
   ASSERT_EFI_ERROR (Status);
 
   PrivateData->Fv = AllocateZeroPool (sizeof (PEI_CORE_FV_HANDLE) * FV_GROWTH_STEP);
-  ASSERT (PrivateData->Fv != NULL);
+  if (PrivateData->Fv == NULL) {
+    ASSERT (PrivateData->Fv != NULL);
+    return;
+  }
+
   PrivateData->MaxFvCount = FV_GROWTH_STEP;
 
   //
@@ -665,7 +669,11 @@ FirmwareVolumeInfoPpiNotifyCallback (
       TempPtr = AllocateZeroPool (
                   sizeof (PEI_CORE_FV_HANDLE) * (PrivateData->MaxFvCount + FV_GROWTH_STEP)
                   );
-      ASSERT (TempPtr != NULL);
+      if (TempPtr == NULL) {
+        ASSERT (TempPtr != NULL);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
       CopyMem (
         TempPtr,
         PrivateData->Fv,
@@ -2285,7 +2293,11 @@ AddUnknownFormatFvInfo (
     TempPtr = AllocateZeroPool (
                 sizeof (PEI_CORE_UNKNOW_FORMAT_FV_INFO) * (PrivateData->MaxUnknownFvInfoCount + FV_GROWTH_STEP)
                 );
-    ASSERT (TempPtr != NULL);
+    if (TempPtr == NULL) {
+      ASSERT (TempPtr != NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     CopyMem (
       TempPtr,
       PrivateData->UnknownFvInfo,
@@ -2439,7 +2451,11 @@ ThirdPartyFvPpiNotifyCallback (
       TempPtr = AllocateZeroPool (
                   sizeof (PEI_CORE_FV_HANDLE) * (PrivateData->MaxFvCount + FV_GROWTH_STEP)
                   );
-      ASSERT (TempPtr != NULL);
+      if (TempPtr == NULL) {
+        ASSERT (TempPtr != NULL);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
       CopyMem (
         TempPtr,
         PrivateData->Fv,
