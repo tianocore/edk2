@@ -5,6 +5,10 @@
 //
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
+//  @par Reference(s):
+//    - ARM Architecture Reference Manual Supplement Morello for A-profile Architecture
+//      [https://developer.arm.com/documentation/ddi0606/latest]
+//
 //------------------------------------------------------------------------------
 
 #include <AArch64/AArch64.h>
@@ -349,10 +353,22 @@ ASM_PFX(CommonExceptionEntry):
   isb
 
   EL1_OR_EL2(x28)
-1:msr      elr_el1, x29  // Exception Link Register
+1:
+#if !defined(ENABLE_MORELLO_CAP)
+  msr      elr_el1, x29  // Exception Link Register
+#else
+  cvtp     c29, x29
+  msr      celr_el1, c29
+#endif
   msr      spsr_el1, x30 // Saved Processor Status Register 32bit
   b        4f
-2:msr      elr_el2, x29  // Exception Link Register
+2:
+#if !defined(ENABLE_MORELLO_CAP)
+  msr      elr_el2, x29  // Exception Link Register
+#else
+  cvtp     c29, x29
+  msr      celr_el2, c29
+#endif
   msr      spsr_el2, x30 // Saved Processor Status Register 32bit
 4:
 
