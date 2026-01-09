@@ -92,7 +92,6 @@
   UINT64  Padding;0x328   // Required for stack alignment
 */
 
-GCC_ASM_EXPORT(ExceptionHandlersEnd)
 GCC_ASM_EXPORT(CommonCExceptionHandler)
 
 .text
@@ -243,9 +242,6 @@ ASM_PFX(SErrorA32):
   ExceptionEntry  EXCEPT_AARCH64_SERROR
 
 VECTOR_END(ExceptionHandlersStart)
-
-ASM_PFX(ExceptionHandlersEnd):
-
 
 ASM_PFX(CommonExceptionEntry):
 
