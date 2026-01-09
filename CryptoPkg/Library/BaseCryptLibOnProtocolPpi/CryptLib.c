@@ -1552,6 +1552,70 @@ AesCbcDecrypt (
   CALL_CRYPTO_SERVICE (AesCbcDecrypt, (AesContext, Input, InputSize, Ivec, Output), FALSE);
 }
 
+/**
+  Performs AES encryption on single block (AES_BLOCK_SIZE)
+
+  This function performs AES encryption on single block pointed by Input.
+
+  Caller must perform padding, if necessary, to ensure single block size.
+  AesContext should be already correctly initialized by AesInit().
+  Behavior with invalid AES context is undefined.
+
+  If AesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
+
+  @param[in]   AesContext  Pointer to the AES context.
+  @param[in]   Input       Pointer to the buffer containing single block data
+  @param[out]  Output      Pointer to a buffer that receives the AES encryption output.
+
+  @retval TRUE   AES encryption succeeded.
+  @retval FALSE  AES encryption failed.
+
+**/
+BOOLEAN
+EFIAPI
+AesEncrypt (
+  IN   VOID         *AesContext,
+  IN   CONST UINT8  *Input,
+  OUT  UINT8        *Output
+  )
+{
+  CALL_CRYPTO_SERVICE (AesEncrypt, (AesContext, Input, Output), FALSE);
+}
+
+/**
+  Performs AES decryption on single block (AES_BLOCK_SIZE)
+
+  This function performs AES decryption on single block pointed by Input.
+
+  Caller must perform padding, if necessary, to ensure single block size.
+  AesContext should be already correctly initialized by AesInit().
+  Behavior with invalid AES context is undefined.
+
+  If AesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
+
+  @param[in]   AesContext  Pointer to the AES context.
+  @param[in]   Input       Pointer to the buffer containing single block encrpyted data.
+  @param[out]  Output      Pointer to a buffer that receives the AES decryption output.
+
+  @retval TRUE   AES decryption succeeded.
+  @retval FALSE  AES decryption failed.
+
+**/
+BOOLEAN
+EFIAPI
+AesDecrypt (
+  IN   VOID         *AesContext,
+  IN   CONST UINT8  *Input,
+  OUT  UINT8        *Output
+  )
+{
+  CALL_CRYPTO_SERVICE (AesDecrypt, (AesContext, Input, Output), FALSE);
+}
+
 // =====================================================================================
 //    Authenticated Encryption with Associated Data (AEAD) Cryptography Primitive
 // =====================================================================================
@@ -1643,6 +1707,117 @@ AeadAesGcmDecrypt (
   )
 {
   CALL_CRYPTO_SERVICE (AeadAesGcmDecrypt, (Key, KeySize, Iv, IvSize, AData, ADataSize, DataIn, DataInSize, Tag, TagSize, DataOut, DataOutSize), FALSE);
+}
+
+/**
+  Retrieves the size, in bytes, of the context buffer required for CAMELLIA operations.
+
+  @return  The size, in bytes, of the context buffer required for CAMELLIA operations.
+
+**/
+UINTN
+EFIAPI
+CamelliaGetContextSize (
+  VOID
+  )
+{
+  CALL_CRYPTO_SERVICE (CamelliaGetContextSize, (), 0);
+}
+
+/**
+  Initializes user-supplied memory as Camellia context for subsequent use.
+
+  This function initializes user-supplied memory pointed by CamelliaContext as
+  CAMELLIA context.
+  In addition, it sets up all CAMELLIA key materials for subsequent
+  encryption and decryption operations.
+  There are 3 options for key length, 128 bits, 192 bits, and 256 bits.
+
+  If CamelliaContext is NULL, then return FALSE.
+  If Key is NULL, then return FALSE.
+  If KeyLength is not valid, then return FALSE.
+
+  @param[out]  CamelliaContext  Pointer to CAMELLIA context being initialized.
+  @param[in]   Key              Pointer to the user-supplied CAMELLIA key.
+  @param[in]   KeyLength        Length of CAMELLIA key in bits.
+
+  @retval TRUE   CAMELLIA context initialization succeeded.
+  @retval FALSE  CAMELLIA context initialization failed.
+
+**/
+BOOLEAN
+EFIAPI
+CamelliaInit (
+  OUT  VOID         *CamelliaContext,
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeyLength
+  )
+{
+  CALL_CRYPTO_SERVICE (CamelliaInit, (CamelliaContext, Key, KeyLength), FALSE);
+}
+
+/**
+  Performs CAMELLIA encryption on single block (128 bits)
+
+  This function performs CAMELLIA encryption on single block pointed by Input.
+
+  Caller must perform padding, if necessary, to ensure single block size.
+  CamelliaContext should be already correctly initialized by CamelliaInit().
+  Behavior with invalid Camellia context is undefined.
+
+  If CamelliaContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
+
+  @param[in]   CamelliaContext  Pointer to the CAMELLIA context.
+  @param[in]   Input            Pointer to the buffer containing single block data
+  @param[out]  Output           Pointer to a buffer that receives the CAMELLIA encryption output.
+
+  @retval TRUE   CAMELLIA encryption succeeded.
+  @retval FALSE  CAMELLIA encryption failed.
+
+**/
+BOOLEAN
+EFIAPI
+CamelliaEncrypt (
+  IN   VOID         *CamelliaContext,
+  IN   CONST UINT8  *Input,
+  OUT  UINT8        *Output
+  )
+{
+  CALL_CRYPTO_SERVICE (CamelliaEncrypt, (CamelliaContext, Input, Output), FALSE);
+}
+
+/**
+  Performs CAMELLIA decryption on single block (128 bits)
+
+  This function performs CAMELLIA decryption on single block pointed by Input.
+
+  Caller must perform padding, if necessary, to ensure single block size.
+  CamelliaContext should be already correctly initialized by CamelliaInit().
+  Behavior with invalid CAMELLIA context is undefined.
+
+  If CamelliaContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
+
+  @param[in]   CamelliaContext  Pointer to the CAMELLIA context.
+  @param[in]   Input            Pointer to the buffer containing single block encrpyted data.
+  @param[out]  Output           Pointer to a buffer that receives the CAMELLIA decryption output.
+
+  @retval TRUE   CAMELLIA decryption succeeded.
+  @retval FALSE  CAMELLIA decryption failed.
+
+**/
+BOOLEAN
+EFIAPI
+CamelliaDecrypt (
+  IN   VOID         *CamelliaContext,
+  IN   CONST UINT8  *Input,
+  OUT  UINT8        *Output
+  )
+{
+  CALL_CRYPTO_SERVICE (CamelliaDecrypt, (CamelliaContext, Input, Output), FALSE);
 }
 
 // =====================================================================================
@@ -4896,6 +5071,29 @@ BigNumSub (
 }
 
 /**
+  Calculate BnRes = BnA * BnB.
+  Please note, all "out" Big number arguments should be properly initialized
+  by calling to BigNumInit() or BigNumFromBin() functions.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+  @param[out]  BnRes   The result of BnA * BnB.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+BigNumMul (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnB,
+  OUT VOID       *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumMul, (BnA, BnB, BnRes), FALSE);
+}
+
+/**
   Calculate remainder: BnRes = BnA % BnB
   Please note, all "out" Big number arguments should be properly initialized
   by calling to BigNumInit() or BigNumFromBin() functions.
@@ -4990,6 +5188,31 @@ BigNumDiv (
 }
 
 /**
+  Divide two Big Numbers and obtain the quotient and the remainder.
+  Please note, all "out" Big number arguments should be properly initialized
+  by calling to BigNumInit() or BigNumFromBin() functions.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+  @param[out]  BnResQ  The result, such that BnA / BnB.
+  @param[out]  BnResR  The result, such that BnA % BnB.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+BigNumDiv2 (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnB,
+  OUT VOID       *BnResQ,
+  OUT VOID       *BnResR
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumDiv2, (BnA, BnB, BnResQ, BnResR), FALSE);
+}
+
+/**
   Multiply two Big Numbers modulo BnM.
   Please note, all "out" Big number arguments should be properly initialized
   by calling to BigNumInit() or BigNumFromBin() functions.
@@ -5012,6 +5235,27 @@ BigNumMulMod (
   )
 {
   CALL_CRYPTO_SERVICE (BigNumMulMod, (BnA, BnB, BnM, BnRes), FALSE);
+}
+
+/**
+  Computes the greatest common divisor (GCD) of two BIGNUM values.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+  @param[out]  BnRes   The result, such that GCD(BnA, BnB).
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+BigNumGcd (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnB,
+  OUT VOID       *BnRes
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumGcd, (BnA, BnB, BnRes), FALSE);
 }
 
 /**
@@ -5229,6 +5473,51 @@ BigNumContextFree (
 }
 
 /**
+  Marks the start of a temporary BIGNUM allocation frame.
+  Must be paired with BigNumContextEnd().
+
+  @param[in]   BnCtx     Big number context.
+**/
+VOID
+EFIAPI
+BigNumContextStart (
+  IN VOID  *BnCtx
+  )
+{
+  CALL_VOID_CRYPTO_SERVICE (BigNumContextStart, (BnCtx));
+}
+
+/**
+  Ends the current BN_CTX allocation frame and releases all temporary BIGNUMs.
+
+  @param[in]   BnCtx     Big number context.
+**/
+VOID
+EFIAPI
+BigNumContextEnd (
+  IN VOID  *BnCtx
+  )
+{
+  CALL_VOID_CRYPTO_SERVICE (BigNumContextEnd, (BnCtx));
+}
+
+/**
+  Returns a temporary BIGNUM from the given BN_CTX.
+  The returned BIGNUM is managed by the context and must not be freed manually.
+  Must be called between BigNumContextStart() and BigNumContextEnd().
+
+  @param[in]   BnCtx     Big number context.
+**/
+VOID *
+EFIAPI
+BigNumContextGet (
+  IN VOID  *BnCtx
+  )
+{
+  CALL_CRYPTO_SERVICE (BigNumContextGet, (BnCtx), NULL);
+}
+
+/**
   Set Big Number to a given value.
 
   @param[in]   Bn     Big number to set.
@@ -5288,6 +5577,29 @@ EcGroupInit (
   )
 {
   CALL_CRYPTO_SERVICE (EcGroupInit, (CryptoNid), NULL);
+}
+
+/**
+  Create a new EC_GROUP over a prime field GF(p).
+
+  @param[in] BnPrime    Group prime number.
+  @param[in] BnA        A coefficient.
+  @param[in] BnB        B coefficient.
+  @param[in] BnCtx      BN context.
+
+  @retval EcGroup object  On success.
+  @retval NULL            On failure.
+**/
+VOID *
+EFIAPI
+EcGroupInitGFp (
+  IN VOID  *BnPrime,
+  IN VOID  *BnA,
+  IN VOID  *BnB,
+  IN VOID  *BnCtx        OPTIONAL
+  )
+{
+  CALL_CRYPTO_SERVICE (EcGroupInitGFp, (BnPrime, BnA, BnB, BnCtx), NULL);
 }
 
 /**
@@ -5352,6 +5664,29 @@ EcGroupFree (
   )
 {
   CALL_VOID_CRYPTO_SERVICE (EcGroupFree, (EcGroup));
+}
+
+/**
+  Set the generator for an EC_GROUP.
+
+  @param[in]  EcGroup           The EC_GROUP object.
+  @param[in]  EcPointGenerator  The generator point G.
+  @param[in]  BnOrder           The order of the generator.
+  @param[in]  BnCoFactor        The cofactor of the group.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+EcGroupSetGenerator (
+  IN VOID        *EcGroup,
+  IN CONST VOID  *EcPointGenerator,
+  IN CONST VOID  *BnOrder,
+  IN CONST VOID  *BnCoFactor            OPTIONAL
+  )
+{
+  CALL_CRYPTO_SERVICE (EcGroupSetGenerator, (EcGroup, EcPointGenerator, BnOrder, BnCoFactor), FALSE);
 }
 
 /**
@@ -5491,6 +5826,70 @@ EcPointMul (
   )
 {
   CALL_CRYPTO_SERVICE (EcPointMul, (EcGroup, EcPointResult, EcPoint, BnPScalar, BnCtx), FALSE);
+}
+
+/**
+  Variable EC point multiplication. EcPointResult = BnGScalar * G + EcPoint * BnPScalar.
+
+  @param[in]  EcGroup          EC group object.
+  @param[out] EcPointResult    EC point to hold the result. The point should
+                               be properly initialized.
+  @param[in]  BnGScalar        G Scalar.
+  @param[in]  EcPoint          EC Point.
+  @param[in]  BnPScalar        P Scalar.
+  @param[in]  BnCtx            BN context, created with BigNumNewContext().
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+EcPointMul2 (
+  IN CONST VOID  *EcGroup,
+  OUT VOID       *EcPointResult,
+  IN CONST VOID  *BnGScalar,
+  IN CONST VOID  *EcPoint,
+  IN CONST VOID  *BnPScalar,
+  IN VOID        *BnCtx
+  )
+{
+  CALL_CRYPTO_SERVICE (EcPointMul2, (EcGroup, EcPointResult, BnGScalar, EcPoint, BnPScalar, BnCtx), FALSE);
+}
+
+/**
+  Compute a linear combination of multiple EC points.
+
+  This function calculates:
+    EcPointResult = BnGScalar * G + Σ (EcPoints[i] * BnPScalars[i])
+
+  where G is the generator of the EC_GROUP, and Q[i] are arbitrary points.
+
+  @param[in]  EcGroup          EC group object.
+  @param[out] EcPointResult    EC point to hold the result. The point should
+                               be properly initialized.
+  @param[in]  BnGScalar        G Scalar.
+                               May be NULL if not used.
+  @param[in]  Count            The number of EcPoints and P scalars.
+  @param[in]  EcPoints         EC Points.
+  @param[in]  BnPScalars       P Scalars.
+  @param[in]  BnCtx            BN context, created with BigNumNewContext().
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+EcPointsMul (
+  IN CONST VOID  *EcGroup,
+  OUT VOID       *EcPointResult,
+  IN CONST VOID  *BnGScalar,
+  UINTN          Count,
+  IN CONST VOID  *EcPoints[],
+  IN CONST VOID  *BnPScalars[],
+  IN VOID        *BnCtx
+  )
+{
+  CALL_CRYPTO_SERVICE (EcPointsMul, (EcGroup, EcPointResult, BnGScalar, Count, EcPoints, BnPScalars, BnCtx), FALSE);
 }
 
 /**
