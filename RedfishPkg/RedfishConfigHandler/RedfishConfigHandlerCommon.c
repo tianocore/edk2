@@ -13,9 +13,10 @@
 REDFISH_CONFIG_DRIVER_DATA  gRedfishConfigData;     // Only one Redfish service supported
                                                     // on platform for the BIOS
                                                     // Redfish configuration.
-EFI_EVENT                          gEndOfDxeEvent        = NULL;
-EFI_EVENT                          gExitBootServiceEvent = NULL;
-EDKII_REDFISH_CREDENTIAL_PROTOCOL  *gCredential          = NULL;
+EFI_EVENT                          gEndOfDxeEvent                 = NULL;
+EFI_EVENT                          gExitBootServiceEvent          = NULL;
+EFI_EVENT                          mgConfigHandlerDisconnectEvent = NULL;
+EDKII_REDFISH_CREDENTIAL_PROTOCOL  *gCredential                   = NULL;
 
 /**
   Callback function executed when the EndOfDxe event group is signaled.
@@ -65,6 +66,40 @@ RedfishConfigOnExitBootService (
   if (EFI_ERROR (Status) && (Status != EFI_UNSUPPORTED)) {
     DEBUG ((DEBUG_ERROR, "Redfish credential protocol failed to stop service on ExitBootService: %r", Status));
   }
+}
+
+/**
+  Disconnect the interface communication with REST EX protocol.
+
+  @param[in]   Event    Event whose notification function is being invoked.
+  @param[out]  Context  Pointer to the Context buffer
+
+**/
+VOID
+EFIAPI
+RedfishConfigDisconnection (
+  IN  EFI_EVENT  Event,
+  OUT VOID       *Context
+  )
+{
+  EFI_STATUS            Status;
+  EFI_REST_EX_PROTOCOL  *RestEx;
+
+  Status = gBS->HandleProtocol (
+                  gRedfishConfigData.RedfishServiceInfo.RedfishServiceRestExHandle,
+                  &gEfiRestExProtocolGuid,
+                  (VOID **)&RestEx
+                  );
+  if (!EFI_ERROR (Status)) {
+    Status = RestEx->Configure (RestEx, NULL);
+    DEBUG ((DEBUG_INFO, "%a: RestEx instance for Redfish service is released.\n", __func__));
+    return;
+  }
+
+  DEBUG ((DEBUG_ERROR, "%a: Failed to release RestEx instance: %r\n", __func__, Status));
+  //
+  // We do not close event here, as ConfigHandler may be launched again.
+  //
 }
 
 /**
@@ -157,6 +192,27 @@ RedfishConfigCommonInit (
     gBS->CloseEvent (gEndOfDxeEvent);
     gEndOfDxeEvent = NULL;
     DEBUG ((DEBUG_ERROR, "%a: Fail to register Exit Boot Service event.", __func__));
+    return Status;
+  }
+
+  //
+  // Create Stop Redfish connection event
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  RedfishConfigDisconnection,
+                  NULL,
+                  &gEdkIIRedfisEventRedfishInterfaceDisconnectionGuid,
+                  &mgConfigHandlerDisconnectEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    gBS->CloseEvent (gEndOfDxeEvent);
+    gBS->CloseEvent (gExitBootServiceEvent);
+    gEndOfDxeEvent                 = NULL;
+    gExitBootServiceEvent          = NULL;
+    mgConfigHandlerDisconnectEvent = NULL;
+    DEBUG ((DEBUG_ERROR, "%a: Fail to register Redfish transport interface disconnection event.", __func__));
     return Status;
   }
 
