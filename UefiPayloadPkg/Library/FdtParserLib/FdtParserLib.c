@@ -774,7 +774,7 @@ ParsePciRootBridge (
       mPciRootBridgeInfo->RootBridge[RbIndex].PMem.Limit           = PcdGet32 (PcdPciReservedPMemLimit);
       mPciRootBridgeInfo->RootBridge[RbIndex].UID                  = RbIndex;
       mPciRootBridgeInfo->RootBridge[RbIndex].HID                  = EISA_PNP_ID (0x0A03);
-      mPciRootBridgeInfo->RootBridge[RbIndex].DmaAbove4G           = FALSE;
+      mPciRootBridgeInfo->RootBridge[RbIndex].DmaAbove4G           = PcdGetBool (PcdPciAllocateMemoryAbove4GB);
 
       Data32 = (UINT32 *)(PropertyPtr->Data);
       for (Base = 0; Base < TempLen / sizeof (UINT32); Base = Base + DWORDS_TO_NEXT_ADDR_TYPE) {
