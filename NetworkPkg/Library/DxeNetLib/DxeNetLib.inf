@@ -64,10 +64,8 @@
   gEfiComponentNameProtocolGuid                 ## SOMETIMES_CONSUMES
   gEfiComponentName2ProtocolGuid                ## SOMETIMES_CONSUMES
   gEfiAdapterInformationProtocolGuid            ## SOMETIMES_CONSUMES
-  gEfiRngProtocolGuid                           ## CONSUMES
+  gEfiRngProtocolGuid                           ## SOMETIMES_CONSUMES
 
 [FixedPcd]
-  gEfiMdePkgTokenSpaceGuid.PcdEnforceSecureRngAlgorithms ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdEnforceSecureRngAlgorithms ## SOMETIMES_CONSUMES
 
-[Depex]
-  gEfiRngProtocolGuid

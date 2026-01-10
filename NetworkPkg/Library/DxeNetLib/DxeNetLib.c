@@ -996,6 +996,53 @@ PseudoRandom (
 }
 
 /**
+  Initialize a random seed using current time and monotonic count.
+
+  Get current time and monotonic count first. Then initialize a random seed
+  based on some basic mathematics operation on the hour, day, minute, second,
+  nanosecond and year of the current time and the monotonic count value.
+
+  @param[out] Output - The buffer to store the random seed initialized with
+  current time.
+
+  @return Status code
+**/
+STATIC
+EFI_STATUS
+NetRandomInitSeed (
+  OUT UINT32  *Output
+  )
+{
+  EFI_TIME  Time;
+  UINT32    Seed;
+  UINT64    MonotonicCount;
+  EFI_STATUS      Status;
+
+  Status = gRT->GetTime (&Time, NULL);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a failed to call gRT->GetTime %r\n", __func__, Status));
+    return Status;
+  }
+
+  Seed  = (Time.Hour << 24 | Time.Day << 16 | Time.Minute << 8 | Time.Second);
+  Seed ^= Time.Nanosecond;
+  Seed ^= Time.Year << 7;
+
+  Status = gBS->GetNextMonotonicCount (&MonotonicCount);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a failed to call gBS->GetNextMonotonicCount %r\n", __func__, Status));
+    return Status;
+  }
+
+  Seed += (UINT32)MonotonicCount;
+
+  *Output = Seed;
+  return EFI_SUCCESS;
+}
+
+#define NET_RANDOM(Seed)  ((UINT32) ((UINT32) (Seed) * 1103515245UL + 12345) % 4294967295UL)
+
+/**
   Generate a 32-bit pseudo-random number.
 
   @param[out] Output - The buffer to store the generated random number.
@@ -1012,7 +1059,19 @@ PseudoRandomU32 (
   OUT UINT32  *Output
   )
 {
-  return PseudoRandom (Output, sizeof (*Output));
+  EFI_STATUS    Status;
+  Status = PseudoRandom (Output, sizeof (*Output));
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a failed to call PseudoRandom %r\n", __func__, Status));
+    Status = NetRandomInitSeed (Output);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a failed to call NetRandomInitSeed %r\n", __func__, Status));
+      return Status;
+    }
+    *Output = NET_RANDOM (*Output);
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
