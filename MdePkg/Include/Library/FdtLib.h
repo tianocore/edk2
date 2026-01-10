@@ -181,7 +181,16 @@ typedef struct {
 
 #define FdtGetHeader(Fdt, Field) \
   (Fdt32ToCpu (((const FDT_HEADER *)(Fdt))->Field))
-#define FdtTotalSize(Fdt)  (FdtGetHeader ((Fdt), TotalSize))
+#define FdtMagic(Fdt)            (FdtGetHeader ((Fdt), Magic))
+#define FdtTotalSize(Fdt)        (FdtGetHeader ((Fdt), TotalSize))
+#define FdtOffsetDtStruct(Fdt)   (FdtGetHeader ((Fdt), OffsetDtStruct))
+#define FdtOffsetDtStrings(Fdt)  (FdtGetHeader ((Fdt), OffsetDtStrings))
+#define FdtOffsetMemRsvmap(Fdt)  (FdtGetHeader ((Fdt), OffsetMemRsvmap))
+#define FdtVersion(Fdt)          (FdtGetHeader ((Fdt), Version))
+#define FdtLastCompVersion(Fdt)  (FdtGetHeader ((Fdt), LastCompVersion))
+#define FdtBootCpuidPhys(Fdt)    (FdtGetHeader ((Fdt), BootCpuidPhys))
+#define FdtSizeDtStrings(Fdt)    (FdtGetHeader ((Fdt), SizeDtStrings))
+#define FdtSizeDtStruct(Fdt)     (FdtGetHeader ((Fdt), SizeDtStruct))
 
 #define FdtForEachSubnode(Node, Fdt, Parent) \
   for (Node = FdtFirstSubnode (Fdt, Parent); \
@@ -190,6 +199,9 @@ typedef struct {
 
 #define FdtSetPropString(Fdt, NodeOffset, Name, String) \
   FdtSetProp ((Fdt), (NodeOffset), (Name), (String), AsciiStrLen (String) + 1)
+
+#define FdtSetPropEmpty(Fdt, NodeOffset, Name) \
+  FdtSetProp ((Fdt), (NodeOffset), (Name), NULL, 0)
 
 /**
   Convert UINT16 data of the FDT blob to little-endian
@@ -958,6 +970,21 @@ EFIAPI
 FdtGetPhandle (
   IN CONST VOID  *Fdt,
   IN INT32       NodeOffset
+  );
+
+/**
+  Applies a DT overlay on a base DT.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] Fdto           The pointer to FDT overlay blob.
+
+  @return 0 on success, or negative error code.
+**/
+INT32
+EFIAPI
+FdtOverlayApply (
+  IN VOID  *Fdt,
+  IN VOID  *Fdto
   );
 
 /* Debug functions. */
