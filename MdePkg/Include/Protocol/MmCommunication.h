@@ -30,7 +30,7 @@ typedef struct {
   ///
   /// Designates an array of bytes that is MessageLength in size.
   ///
-  UINT8       Data[1];
+  UINT8       Data[];
 } EFI_MM_COMMUNICATE_HEADER;
 
 #pragma pack()

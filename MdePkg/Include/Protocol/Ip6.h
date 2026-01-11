@@ -70,7 +70,7 @@ typedef struct {
   ///
   /// List of IPv6 address pairs that are currently in use.
   ///
-  EFI_IP6_ADDRESS_PAIR    AddressPairs[1];
+  EFI_IP6_ADDRESS_PAIR    AddressPairs[];
 } EFI_IP6_VARIABLE_DATA;
 
 ///

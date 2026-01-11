@@ -154,7 +154,7 @@ typedef struct {
   //
   // DefaultInfo arrays those have the same default setting.
   //
-  PCD_DEFAULT_INFO    DefaultInfo[1];
+  PCD_DEFAULT_INFO    DefaultInfo[];
   //
   // Default data is stored as variable storage or the array of DATA_DELTA.
   //

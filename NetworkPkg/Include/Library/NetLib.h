@@ -1584,7 +1584,7 @@ typedef struct {
   UINT32                 Len;    // Total length of the associated BLOCKs
 
   UINT32                 BlockNum;
-  NET_BLOCK              Block[1];
+  NET_BLOCK              Block[];
 } NET_VECTOR;
 
 //
@@ -1624,11 +1624,11 @@ typedef struct {
   EFI_UDP_HEADER    *Udp;                      // User Datagram Protocol header
   UINT8             ProtoData[NET_PROTO_DATA]; // Protocol specific data
 
-  NET_VECTOR        *Vector;                 // The vector containing the packet
+  NET_VECTOR        *Vector;                // The vector containing the packet
 
-  UINT32            BlockOpNum;              // Total number of BlockOp in the buffer
-  UINT32            TotalSize;               // Total size of the actual packet
-  NET_BLOCK_OP      BlockOp[1];              // Specify the position of actual packet
+  UINT32            BlockOpNum;             // Total number of BlockOp in the buffer
+  UINT32            TotalSize;              // Total size of the actual packet
+  NET_BLOCK_OP      BlockOp[];              // Specify the position of actual packet
 } NET_BUF;
 
 //

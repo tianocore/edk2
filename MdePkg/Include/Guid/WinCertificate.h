@@ -81,7 +81,7 @@ typedef struct {
   /// If CertType is EFI_CERT_TYPE_RSA2048_SHA256_GUID,
   /// the CertData will be EFI_CERT_BLOCK_RSA_2048_SHA256 structure.
   ///
-  UINT8              CertData[1];
+  UINT8              CertData[];
 } WIN_CERTIFICATE_UEFI_GUID;
 
 ///

@@ -110,7 +110,7 @@ typedef struct {
   //
   // Array of supported capabilities.
   //
-  EFI_BLOCK_IO_CRYPTO_CAPABILITY    Capabilities[1];
+  EFI_BLOCK_IO_CRYPTO_CAPABILITY    Capabilities[];
 } EFI_BLOCK_IO_CRYPTO_CAPABILITIES;
 
 typedef struct {

@@ -117,7 +117,7 @@ typedef struct {
   UINT32                                                           FirstRetimerDataParityMismatchStatus;
   UINT32                                                           SecondRetimerDataParityMismatchStatus;
   UINT32                                                           Reserved;
-  PCI_EXPRESS_REG_PHYSICAL_LAYER_16_0_LANE_EQUALIZATION_CONTROL    LaneEqualizationControl[1];
+  PCI_EXPRESS_REG_PHYSICAL_LAYER_16_0_LANE_EQUALIZATION_CONTROL    LaneEqualizationControl[];
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_PHYSICAL_LAYER_16_0;
 ///@}
 
@@ -148,7 +148,7 @@ typedef struct {
   PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER           Header;
   PCI_EXPRESS_DESIGNATED_VENDOR_SPECIFIC_HEADER_1    DesignatedVendorSpecificHeader1;
   PCI_EXPRESS_DESIGNATED_VENDOR_SPECIFIC_HEADER_2    DesignatedVendorSpecificHeader2;
-  UINT8                                              DesignatedVendorSpecific[1];
+  UINT8                                              DesignatedVendorSpecific[];
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_DESIGNATED_VENDOR_SPECIFIC;
 ///@}
 
