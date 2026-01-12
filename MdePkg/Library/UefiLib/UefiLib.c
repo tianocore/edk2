@@ -12,6 +12,8 @@
 
 #include "UefiLibInternal.h"
 
+#define ISO_639_3_LANG_CODE_LEN  3
+
 /**
   Empty constructor function that is required to resolve dependencies between
   libraries.
@@ -50,13 +52,7 @@ CompareIso639LanguageCode (
   IN CONST CHAR8  *Language2
   )
 {
-  UINT32  Name1;
-  UINT32  Name2;
-
-  Name1 = ReadUnaligned24 ((CONST UINT32 *)Language1);
-  Name2 = ReadUnaligned24 ((CONST UINT32 *)Language2);
-
-  return (BOOLEAN)(Name1 == Name2);
+  return (CompareMem (Language1, Language2, ISO_639_3_LANG_CODE_LEN) == 0);
 }
 
 /**

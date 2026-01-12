@@ -14,6 +14,9 @@
   MODULE_TYPE    = DXE_DRIVER
   LIBRARY_CLASS  = HwInfoParserLib
 
+[Defines.RISCV64]
+  DESTRUCTOR     = RiscVExtIntcDataDestructor
+
 [Sources]
   CmObjectDescUtility.c
   CmObjectDescUtility.h
@@ -50,7 +53,15 @@
   Arm/Iort/RootComplexParser.c
   Arm/Iort/SmmuV3Parser.c
 
-[Packages.AARCH64]
+[Sources.RISCV64]
+  RiscV/RiscVFdtInterrupt.c
+  RiscV/RiscVFdtHwInfoParser.c
+  RiscV/Intc/RiscVIntcParser.c
+  RiscV/Intc/RiscVIntcParser.h
+  RiscV/Intc/RiscVExtIntcData.c
+  RiscV/HartInfo/RiscVTimerDispatcher.c
+
+[Packages.ARM, Packages.AARCH64]
   ArmPkg/ArmPkg.dec
 
 [Packages]

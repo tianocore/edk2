@@ -153,16 +153,19 @@ without EFI stub.  If you are using kernels that old secure boot
 support is the least of your problems though ...
 
 The linux kernel is typically signed by the distro secure boot keys
-and is verified by the distro `shim.efi` binary.  qemu release 10.0
-(ETA ~ March 2025) will get support for passing the shim binary
+and is verified by the distro `shim.efi` binary.  qemu version 10.0
+(released in April 2025) got support for passing the shim binary
 (additionally to kernel + initrd) to the firmware, so the usual secure
 boot verification can work with direct kernel load too.
 
-For now the legacy loader is enabled by default.  Once the new qemu
-release is available in most linux distros the defaut will be flipped
-to disabled.
+In edk2-stable202502 and newer the EnableLegacyLoader config option is
+available and enabled by default.
 
-Usage (qemu 10.0+):
+In edk2-stable202602 and newer the EnableLegacyLoader config option is
+disabled by default.
+
+Here is the qemu command line for direct kernel boot with secure boot
+verification:
 
 ```
 qemu-system-x86_64 \

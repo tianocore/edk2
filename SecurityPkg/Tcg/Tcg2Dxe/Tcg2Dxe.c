@@ -79,8 +79,17 @@ typedef struct {
   UINTN                        Next800155EventOffset;
 } TCG_EVENT_LOG_AREA_STRUCT;
 
+// Mapping of TPM return status to BIOS/OS TPM support and related flags (TPMPresentFlag, TpmUpdateFlag)
+// +-------------------+---------------------+-------------------+----------------+---------------+
+// | TPM Return Status | Support TPM in BIOS | Support TPM in OS | TPMPresentFlag | TpmUpdateFlag |
+// |-------------------|---------------------|-------------------|----------------|---------------|
+// | SUCCESS           | YES                 | YES               | TRUE           | FALSE         |
+// | FIELD_UPGRADE     | YES                 | NO                | FALSE          | TRUE          |
+// | Other FAIL        | NO                  | NO                | FALSE          | FALSE         |
+// +-------------------+---------------------+-------------------+----------------+---------------+
 typedef struct _TCG_DXE_DATA {
   EFI_TCG2_BOOT_SERVICE_CAPABILITY    BsCap;
+  BOOLEAN                             TpmUpdateFlag;
   TCG_EVENT_LOG_AREA_STRUCT           EventLogAreaStruct[TCG_EVENT_LOG_AREA_COUNT_MAX];
   BOOLEAN                             GetEventLogCalled[TCG_EVENT_LOG_AREA_COUNT_MAX];
   TCG_EVENT_LOG_AREA_STRUCT           FinalEventLogAreaStruct[TCG_EVENT_LOG_AREA_COUNT_MAX];
@@ -101,6 +110,7 @@ TCG_DXE_DATA  mTcgDxeData = {
     0,                                         // NumberOfPCRBanks
     0,                                         // ActivePcrBanks
   },
+  FALSE,
 };
 
 UINTN   mBootAttempts  = 0;
@@ -1407,16 +1417,14 @@ Tcg2SubmitCommand (
   )
 {
   EFI_STATUS  Status;
+  TPM_RC      ResponseCode;
+  UINT32      CurrentOutputBlockSize;
 
   if ((This == NULL) ||
       (InputParameterBlockSize == 0) || (InputParameterBlock == NULL) ||
       (OutputParameterBlockSize == 0) || (OutputParameterBlock == NULL))
   {
     return EFI_INVALID_PARAMETER;
-  }
-
-  if (!mTcgDxeData.BsCap.TPMPresentFlag) {
-    return EFI_DEVICE_ERROR;
   }
 
   if (InputParameterBlockSize > mTcgDxeData.BsCap.MaxCommandSize) {
@@ -1427,13 +1435,53 @@ Tcg2SubmitCommand (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = Tpm2SubmitCommand (
-             InputParameterBlockSize,
-             InputParameterBlock,
-             &OutputParameterBlockSize,
-             OutputParameterBlock
-             );
-  return Status;
+  //
+  // Always attempt to submit the command, but if the TPM is already flagged
+  // as not present, we expect it to fail other than the capsule update scenario.
+  //
+  CurrentOutputBlockSize = OutputParameterBlockSize;
+  Status                 = Tpm2SubmitCommand (
+                             InputParameterBlockSize,
+                             InputParameterBlock,
+                             &CurrentOutputBlockSize,
+                             OutputParameterBlock
+                             );
+  if (EFI_ERROR (Status)) {
+    return mTcgDxeData.BsCap.TPMPresentFlag ? Status : EFI_DEVICE_ERROR;
+  }
+
+  if (CurrentOutputBlockSize < sizeof (TPM2_RESPONSE_HEADER)) {
+    DEBUG ((DEBUG_ERROR, "%a: Response buffer too small!\n", __func__));
+    return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // Correctly read the response code and swap bytes from Big-Endian to Host order.
+  // The responseCode field is at offset 6 of the response header.
+  //
+  ResponseCode = SwapBytes32 (ReadUnaligned32 ((UINT32 *)(OutputParameterBlock + 6)));
+  DEBUG ((DEBUG_ERROR, "Response code is %x", ResponseCode));
+  // If the response code ever equals to TPM_RC_UPGRADE, it means the TPM is in field
+  // upgrade mode, we set TpmUpdateFlag to TRUE.
+  if (ResponseCode == TPM_RC_UPGRADE) {
+    DEBUG ((DEBUG_INFO, "TPM response code TPM_RC_UPDATE received. Setting flag.\n"));
+    mTcgDxeData.TpmUpdateFlag = TRUE;
+  }
+
+  // Now that we have set the TPMPresentFlag, it should be able to reflect the actual TPM presence
+  // as long as the device is not in field update mode.
+  if ((mTcgDxeData.BsCap.TPMPresentFlag == FALSE) && (mTcgDxeData.TpmUpdateFlag == FALSE)) {
+    DEBUG ((DEBUG_WARN, "%a: TPMPresentFlag is FALSE. Expecting command to fail.\n", __func__));
+    return EFI_DEVICE_ERROR;
+  }
+
+  // If the response code is not TPM_RC_SUCCESS and the device is not in field update mode, return error.
+  if ((ResponseCode != TPM_RC_SUCCESS) && (mTcgDxeData.TpmUpdateFlag == FALSE)) {
+    DEBUG ((DEBUG_ERROR, "%a: Command failed with response code 0x%x\n", __func__, ResponseCode));
+    return EFI_DEVICE_ERROR;
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**

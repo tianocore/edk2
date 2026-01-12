@@ -10,11 +10,11 @@ parameters:
   tool_chain_tag: ''
 
 steps:
-- task: CmdLine@1
+- task: CmdLine@2
   displayName: Build Base Tools from source
   inputs:
-    filename: python
-    arguments: BaseTools/Edk2ToolsBuild.py -t ${{ parameters.tool_chain_tag }}
+    script: |
+      python BaseTools/Edk2ToolsBuild.py -t ${{ parameters.tool_chain_tag }}
   condition: and(gt(variables.pkg_count, 0), succeeded())
 
 - task: CopyFiles@2

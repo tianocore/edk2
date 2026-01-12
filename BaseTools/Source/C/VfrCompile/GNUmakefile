@@ -46,7 +46,7 @@ all: $(MAKEROOT)/bin $(APPLICATION)
 
 $(APPLICATION): $(OBJECTS)
 	$(LINKER) -o $(APPLICATION) $(VFR_LFLAGS) $(OBJECTS) -L$(MAKEROOT)/libs $(LIBS)
-ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+ifeq (Windows, $(findstring Windows,$(OS)))
 	$(CP) $(APPLICATION).exe $(BIN_PATH)
 endif
 
@@ -84,6 +84,6 @@ localClean:
 	$(MAKE) -C Pccts/antlr clean
 	$(MAKE) -C Pccts/dlg clean
 	$(RM) $(EXTRA_CLEAN_OBJECTS)
-ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+ifeq (Windows, $(findstring Windows,$(OS)))
 	$(RM) $(BIN_PATH)/$(APPNAME).exe
 endif

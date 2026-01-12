@@ -649,6 +649,126 @@ STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
   { NULL,  TypeMax  }
 };
 
+/** Main function of the 'Cp' command.
+
+  @param[in] Package    List of input parameter for the command.
+**/
+STATIC
+SHELL_STATUS
+MainCmdCp (
+  LIST_ENTRY  *Package
+  )
+{
+  EFI_STATUS           Status;
+  SHELL_STATUS         ShellStatus;
+  UINTN                ParamCount;
+  UINTN                LoopCounter;
+  EFI_SHELL_FILE_INFO  *FileList;
+  BOOLEAN              SilentMode;
+  BOOLEAN              RecursiveMode;
+  CONST CHAR16         *Cwd;
+  CHAR16               *FullCwd;
+
+  ShellStatus = SHELL_SUCCESS;
+  ParamCount  = 0;
+  FileList    = NULL;
+
+  //
+  // check for "-?"
+  //
+  if (ShellCommandLineGetFlag (Package, L"-?")) {
+    ASSERT (FALSE);
+  }
+
+  //
+  // Initialize SilentMode and RecursiveMode
+  //
+  if (gEfiShellProtocol->BatchIsActive ()) {
+    SilentMode = TRUE;
+  } else {
+    SilentMode = ShellCommandLineGetFlag (Package, L"-q");
+  }
+
+  RecursiveMode = ShellCommandLineGetFlag (Package, L"-r");
+
+  switch (ParamCount = ShellCommandLineGetCount (Package)) {
+    case 0:
+    case 1:
+      //
+      // we have insufficient parameters
+      //
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"cp");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+      break;
+    case 2:
+      //
+      // must have valid CWD for single parameter...
+      //
+      Cwd = ShellGetCurrentDir (NULL);
+      if (Cwd == NULL) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"cp");
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      } else {
+        Status = ShellOpenFileMetaArg ((CHAR16 *)ShellCommandLineGetRawValue (Package, 1), EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
+        if ((FileList == NULL) || IsListEmpty (&FileList->Link) || EFI_ERROR (Status)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"cp", ShellCommandLineGetRawValue (Package, 1));
+          ShellStatus = SHELL_NOT_FOUND;
+        } else {
+          FullCwd = AllocateZeroPool (StrSize (Cwd) + sizeof (CHAR16));
+          if (FullCwd == NULL) {
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellLevel2HiiHandle, L"cp");
+            ShellStatus = SHELL_OUT_OF_RESOURCES;
+          } else {
+            StrCpyS (FullCwd, StrSize (Cwd) / sizeof (CHAR16) + 1, Cwd);
+            ShellStatus = ProcessValidateAndCopyFiles (FileList, FullCwd, SilentMode, RecursiveMode);
+            FreePool (FullCwd);
+          }
+        }
+      }
+
+      break;
+    default:
+      //
+      // Make a big list of all the files...
+      //
+      for (ParamCount--, LoopCounter = 1; LoopCounter < ParamCount && ShellStatus == SHELL_SUCCESS; LoopCounter++) {
+        if (ShellGetExecutionBreakFlag ()) {
+          break;
+        }
+
+        Status = ShellOpenFileMetaArg ((CHAR16 *)ShellCommandLineGetRawValue (Package, LoopCounter), EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
+        if (EFI_ERROR (Status) || (FileList == NULL) || IsListEmpty (&FileList->Link)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"cp", ShellCommandLineGetRawValue (Package, LoopCounter));
+          ShellStatus = SHELL_NOT_FOUND;
+        }
+      }
+
+      if (ShellStatus != SHELL_SUCCESS) {
+        Status = ShellCloseFileMetaArg (&FileList);
+      } else {
+        //
+        // now copy them all...
+        //
+        if ((FileList != NULL) && !IsListEmpty (&FileList->Link)) {
+          ShellStatus = ProcessValidateAndCopyFiles (FileList, PathCleanUpDirectories ((CHAR16 *)ShellCommandLineGetRawValue (Package, ParamCount)), SilentMode, RecursiveMode);
+          Status      = ShellCloseFileMetaArg (&FileList);
+          if (EFI_ERROR (Status) && (ShellStatus == SHELL_SUCCESS)) {
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_FILE), gShellLevel2HiiHandle, L"cp", ShellCommandLineGetRawValue (Package, ParamCount), ShellStatus|MAX_BIT);
+            ShellStatus = SHELL_ACCESS_DENIED;
+          }
+        }
+      }
+
+      break;
+  } // switch on parameter count
+
+  if (FileList != NULL) {
+    ShellCloseFileMetaArg (&FileList);
+  }
+
+  return ShellStatus;
+}
+
 /**
   Function for 'cp' command.
 
@@ -662,22 +782,13 @@ ShellCommandRunCp (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS           Status;
-  LIST_ENTRY           *Package;
-  CHAR16               *ProblemParam;
-  SHELL_STATUS         ShellStatus;
-  UINTN                ParamCount;
-  UINTN                LoopCounter;
-  EFI_SHELL_FILE_INFO  *FileList;
-  BOOLEAN              SilentMode;
-  BOOLEAN              RecursiveMode;
-  CONST CHAR16         *Cwd;
-  CHAR16               *FullCwd;
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
 
   ProblemParam = NULL;
   ShellStatus  = SHELL_SUCCESS;
-  ParamCount   = 0;
-  FileList     = NULL;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -700,105 +811,16 @@ ShellCommandRunCp (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    //
-    // check for "-?"
-    //
-    if (ShellCommandLineGetFlag (Package, L"-?")) {
-      ASSERT (FALSE);
-    }
 
-    //
-    // Initialize SilentMode and RecursiveMode
-    //
-    if (gEfiShellProtocol->BatchIsActive ()) {
-      SilentMode = TRUE;
-    } else {
-      SilentMode = ShellCommandLineGetFlag (Package, L"-q");
-    }
-
-    RecursiveMode = ShellCommandLineGetFlag (Package, L"-r");
-
-    switch (ParamCount = ShellCommandLineGetCount (Package)) {
-      case 0:
-      case 1:
-        //
-        // we have insufficient parameters
-        //
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"cp");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        break;
-      case 2:
-        //
-        // must have valid CWD for single parameter...
-        //
-        Cwd = ShellGetCurrentDir (NULL);
-        if (Cwd == NULL) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"cp");
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        } else {
-          Status = ShellOpenFileMetaArg ((CHAR16 *)ShellCommandLineGetRawValue (Package, 1), EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
-          if ((FileList == NULL) || IsListEmpty (&FileList->Link) || EFI_ERROR (Status)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"cp", ShellCommandLineGetRawValue (Package, 1));
-            ShellStatus = SHELL_NOT_FOUND;
-          } else {
-            FullCwd = AllocateZeroPool (StrSize (Cwd) + sizeof (CHAR16));
-            if (FullCwd == NULL) {
-              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellLevel2HiiHandle, L"cp");
-              ShellStatus = SHELL_OUT_OF_RESOURCES;
-            } else {
-              StrCpyS (FullCwd, StrSize (Cwd) / sizeof (CHAR16) + 1, Cwd);
-              ShellStatus = ProcessValidateAndCopyFiles (FileList, FullCwd, SilentMode, RecursiveMode);
-              FreePool (FullCwd);
-            }
-          }
-        }
-
-        break;
-      default:
-        //
-        // Make a big list of all the files...
-        //
-        for (ParamCount--, LoopCounter = 1; LoopCounter < ParamCount && ShellStatus == SHELL_SUCCESS; LoopCounter++) {
-          if (ShellGetExecutionBreakFlag ()) {
-            break;
-          }
-
-          Status = ShellOpenFileMetaArg ((CHAR16 *)ShellCommandLineGetRawValue (Package, LoopCounter), EFI_FILE_MODE_WRITE|EFI_FILE_MODE_READ, &FileList);
-          if (EFI_ERROR (Status) || (FileList == NULL) || IsListEmpty (&FileList->Link)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel2HiiHandle, L"cp", ShellCommandLineGetRawValue (Package, LoopCounter));
-            ShellStatus = SHELL_NOT_FOUND;
-          }
-        }
-
-        if (ShellStatus != SHELL_SUCCESS) {
-          Status = ShellCloseFileMetaArg (&FileList);
-        } else {
-          //
-          // now copy them all...
-          //
-          if ((FileList != NULL) && !IsListEmpty (&FileList->Link)) {
-            ShellStatus = ProcessValidateAndCopyFiles (FileList, PathCleanUpDirectories ((CHAR16 *)ShellCommandLineGetRawValue (Package, ParamCount)), SilentMode, RecursiveMode);
-            Status      = ShellCloseFileMetaArg (&FileList);
-            if (EFI_ERROR (Status) && (ShellStatus == SHELL_SUCCESS)) {
-              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_ERR_FILE), gShellLevel2HiiHandle, L"cp", ShellCommandLineGetRawValue (Package, ParamCount), ShellStatus|MAX_BIT);
-              ShellStatus = SHELL_ACCESS_DENIED;
-            }
-          }
-        }
-
-        break;
-    } // switch on parameter count
-
-    if (FileList != NULL) {
-      ShellCloseFileMetaArg (&FileList);
-    }
-
-    //
-    // free the command line package
-    //
-    ShellCommandLineFreeVarList (Package);
+    return ShellStatus;
   }
+
+  ShellStatus = MainCmdCp (Package);
+
+  //
+  // free the command line package
+  //
+  ShellCommandLineFreeVarList (Package);
 
   if (ShellGetExecutionBreakFlag ()) {
     return (SHELL_ABORTED);

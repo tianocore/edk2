@@ -11,9 +11,9 @@ parameters:
   none: ''
 
 steps:
-- task: NodeTool@0
+- task: UseNode@1
   inputs:
-    versionSpec: '14.x'
+    version: '24.x'
     #checkLatest: false # Optional
   condition: and(gt(variables.pkg_count, 0), succeeded())
 

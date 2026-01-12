@@ -39,6 +39,94 @@ PrintAllShellEnvVars (
   return (SHELL_SUCCESS);
 }
 
+/** Main function of the 'Set' command.
+
+  @param[in] Package    List of input parameter for the command.
+**/
+STATIC
+SHELL_STATUS
+MainCmdSet (
+  LIST_ENTRY  *Package
+  )
+{
+  EFI_STATUS    Status;
+  CONST CHAR16  *KeyName;
+  CONST CHAR16  *Value;
+  SHELL_STATUS  ShellStatus;
+
+  ShellStatus = SHELL_SUCCESS;
+
+  //
+  // check for "-?"
+  //
+  if (ShellCommandLineGetFlag (Package, L"-?")) {
+    ASSERT (FALSE);
+    return ShellStatus;
+  } else if (ShellCommandLineGetRawValue (Package, 3) != NULL) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"set");
+    return SHELL_INVALID_PARAMETER;
+  } else if ((ShellCommandLineGetRawValue (Package, 1) != NULL) && ShellCommandLineGetFlag (Package, L"-d")) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"set");
+    return SHELL_INVALID_PARAMETER;
+  } else if (ShellCommandLineGetFlag (Package, L"-d")) {
+    //
+    // delete a environment variable
+    //
+    KeyName = ShellCommandLineGetValue (Package, L"-d");
+    if (KeyName == NULL) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellLevel2HiiHandle, L"set", L"-d");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      Status = ShellSetEnvironmentVariable (KeyName, L"", ShellCommandLineGetFlag (Package, L"-v"));
+      if (EFI_ERROR (Status)) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SET_ND), gShellLevel2HiiHandle, L"set", KeyName);
+        ShellStatus = SHELL_DEVICE_ERROR;
+      }
+    }
+
+    return ShellStatus;
+  } else if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
+    //
+    // print out all current environment variables
+    //
+    return (PrintAllShellEnvVars ());
+  }
+
+  //
+  // we are either printing one or assigning one
+  //
+  KeyName = ShellCommandLineGetRawValue (Package, 1);
+  Value   = ShellCommandLineGetRawValue (Package, 2);
+  if ((KeyName != NULL) && (Value != NULL)) {
+    //
+    // assigning one
+    //
+    Status = ShellSetEnvironmentVariable (KeyName, Value, ShellCommandLineGetFlag (Package, L"-v"));
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SET_ERROR_SET), gShellLevel2HiiHandle, L"set", KeyName);
+      ShellStatus = (SHELL_STATUS)(Status & (~MAX_BIT));
+    }
+  } else {
+    if (KeyName != NULL) {
+      //
+      // print out value for this one only.
+      //
+      Value = ShellGetEnvironmentVariable (KeyName);
+      if (Value == NULL) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SET_NF), gShellLevel2HiiHandle, L"set", KeyName);
+        ShellStatus = SHELL_SUCCESS;
+      } else {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SET_DISP), gShellLevel2HiiHandle, KeyName, Value);
+        ShellStatus = SHELL_SUCCESS;
+      }
+    } else {
+      ASSERT (FALSE);
+    }
+  }
+
+  return ShellStatus;
+}
+
 STATIC CONST SHELL_PARAM_ITEM  SetParamList[] = {
   { L"-d", TypeValue },
   { L"-v", TypeFlag  },
@@ -60,8 +148,6 @@ ShellCommandRunSet (
 {
   EFI_STATUS    Status;
   LIST_ENTRY    *Package;
-  CONST CHAR16  *KeyName;
-  CONST CHAR16  *Value;
   CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
 
@@ -92,72 +178,11 @@ ShellCommandRunSet (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    //
-    // check for "-?"
-    //
-    if (ShellCommandLineGetFlag (Package, L"-?")) {
-      ASSERT (FALSE);
-    } else if (ShellCommandLineGetRawValue (Package, 3) != NULL) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"set");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if ((ShellCommandLineGetRawValue (Package, 1) != NULL) && ShellCommandLineGetFlag (Package, L"-d")) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"set");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (ShellCommandLineGetFlag (Package, L"-d")) {
-      //
-      // delete a environment variable
-      //
-      KeyName = ShellCommandLineGetValue (Package, L"-d");
-      if (KeyName == NULL) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellLevel2HiiHandle, L"set", L"-d");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        Status = ShellSetEnvironmentVariable (KeyName, L"", ShellCommandLineGetFlag (Package, L"-v"));
-        if (EFI_ERROR (Status)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SET_ND), gShellLevel2HiiHandle, L"set", KeyName);
-          ShellStatus = SHELL_DEVICE_ERROR;
-        }
-      }
-    } else if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
-      //
-      // print out all current environment variables
-      //
-      return (PrintAllShellEnvVars ());
-    } else {
-      //
-      // we are either printing one or assigning one
-      //
-      KeyName = ShellCommandLineGetRawValue (Package, 1);
-      Value   = ShellCommandLineGetRawValue (Package, 2);
-      if ((KeyName != NULL) && (Value != NULL)) {
-        //
-        // assigning one
-        //
-        Status = ShellSetEnvironmentVariable (KeyName, Value, ShellCommandLineGetFlag (Package, L"-v"));
-        if (EFI_ERROR (Status)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SET_ERROR_SET), gShellLevel2HiiHandle, L"set", KeyName);
-          ShellStatus = (SHELL_STATUS)(Status & (~MAX_BIT));
-        }
-      } else {
-        if (KeyName != NULL) {
-          //
-          // print out value for this one only.
-          //
-          Value = ShellGetEnvironmentVariable (KeyName);
-          if (Value == NULL) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SET_NF), gShellLevel2HiiHandle, L"set", KeyName);
-            ShellStatus = SHELL_SUCCESS;
-          } else {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SET_DISP), gShellLevel2HiiHandle, KeyName, Value);
-            ShellStatus = SHELL_SUCCESS;
-          }
-        } else {
-          ASSERT (FALSE);
-        }
-      }
-    }
+
+    return ShellStatus;
   }
+
+  ShellStatus = MainCmdSet (Package);
 
   //
   // free the command line package
