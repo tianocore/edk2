@@ -1,0 +1,47 @@
+name: OVMF Build (Secure + Standard)
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Optional git tag (leave empty for Top Of Trunk)'
+        required: false
+        default: ''
+
+jobs:
+  ovmf-build:
+    name: Build OVMF using EDK2
+    runs-on: ubuntu-latest
+
+    # Run the job INSIDE the tianocore ubuntu-24 container
+    container:
+      image: ghcr.io/tianocore/containers/ubuntu-24-test:latest
+      options: --user 1001:1001
+
+    env:
+      # Optional tag passed from UI
+      GIT_TAG: ${{ github.event.inputs.tag }}
+
+      # Artifactory credentials (stored as secrets)
+      ARTIFACTORY_URL: ${{ secrets.ARTIFACTORY_URL }}
+      ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
+      ARTIFACTORY_API_KEY: ${{ secrets.ARTIFACTORY_API_KEY }}
+
+      # Required for git inside container
+      HOME: /workspace
+
+    steps:
+      - name: Checkout EDK2 repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # required for tags
+          submodules: recursive  # initial submodule fetch
+
+      - name: Make CI scripts executable
+        run: |
+          chmod +x ci/build-ovmf-inner.sh
+          chmod +x ci/upload-to-artifactory.sh
+
+      - name: Run OVMF build (Secure + Standard)
+        run: |
+          ci/build-ovmf-inner.sh
