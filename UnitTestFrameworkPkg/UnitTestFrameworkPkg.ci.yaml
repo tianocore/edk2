@@ -44,7 +44,8 @@
     "DependencyCheck": {
         "AcceptableDependencies": [
             "MdePkg/MdePkg.dec",
-            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec"
+            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec",
+            "CryptoPkg/CryptoPkg.dec"
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[],

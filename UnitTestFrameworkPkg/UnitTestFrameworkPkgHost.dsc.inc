@@ -9,8 +9,6 @@
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgCommon.dsc.inc
 
 [Defines]
-  HOST_BASED_UNIT_TESTING_ENABLED = TRUE
-
   #
   # Host based unit test builds only support NOOPT build target
   #
@@ -21,6 +19,17 @@
   #
   UNIT_TESTING_CODE_COVERAGE_ENABLE     = TRUE
   UNIT_TESTING_ADDRESS_SANITIZER_ENABLE = TRUE
+
+[PcdsFeatureFlag]
+!if $(WIN_HOST_BUILD)
+  #
+  # When WIN_HOST_BUILD is set, the default compiler calling convention is set
+  # to Windows calling convention for building a Windows application. Set
+  # PcdOpensslLibAssemblySourceStyleNasm to TRUE to use Openssl NASM source
+  # files that assume a Windows calling convention.
+  #
+  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm|TRUE
+!endif
 
 [LibraryClasses.common.HOST_APPLICATION]
   BaseLib|MdePkg/Library/BaseLib/UnitTestHostBaseLib.inf

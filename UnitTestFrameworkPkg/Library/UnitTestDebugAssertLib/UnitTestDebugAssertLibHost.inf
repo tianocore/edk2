@@ -21,10 +21,21 @@
 [Packages]
   MdePkg/MdePkg.dec
   UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+  CryptoPkg/CryptoPkg.dec
 
 [LibraryClasses]
   BaseLib
   UnitTestLib
+
+[FeaturePcd]
+  #
+  # PcdOpensslLibAssemblySourceStyleNasm is not used by this library
+  #
+  # Add reference to PcdOpensslLibAssemblySourceStyleNasm in this NULL library
+  # instance that is included in every host-based unit test build to support
+  # setting PcdOpensslLibAssemblySourceStyleNasm in UnitTestFrameworkPkgHost.dsc.inc
+  #
+  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
 
 [BuildOptions]
   MSFT:*_*_*_CC_FLAGS   == /c /Zi /Od
