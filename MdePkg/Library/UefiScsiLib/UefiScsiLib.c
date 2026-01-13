@@ -1028,7 +1028,8 @@ ScsiWrite10Command (
   IN OUT VOID                  *DataBuffer   OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     UINT32                StartLba,
-  IN     UINT32                SectorSize
+  IN     UINT32                SectorSize,
+  IN     BOOLEAN               SetFUA
   )
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET  CommandPacket;
@@ -1053,7 +1054,10 @@ ScsiWrite10Command (
   // Fill Cdb for Write (10) Command
   //
   Cdb[0] = EFI_SCSI_OP_WRITE10;
-  Cdb[1] = EFI_SCSI_BLOCK_FUA;
+  if (SetFUA) {
+    Cdb[1] = EFI_SCSI_BLOCK_FUA;
+  }
+
   WriteUnaligned32 ((UINT32 *)&Cdb[2], SwapBytes32 (StartLba));
   WriteUnaligned16 ((UINT16 *)&Cdb[7], SwapBytes16 ((UINT16)SectorSize));
 
@@ -1202,6 +1206,7 @@ ScsiRead16Command (
   @param[in, out] DataLength           The length of data buffer.
   @param[in]      StartLba             The start address of LBA.
   @param[in]      SectorSize           The number of contiguous logical blocks of data that shall be transferred.
+  @param[in]      SetFUA               If TRUE, the FUA bit will be set.
 
   @retval  EFI_SUCCESS                 Command is executed successfully.
   @retval  EFI_BAD_BUFFER_SIZE         The SCSI Request Packet was executed, but the entire DataBuffer could
@@ -1227,7 +1232,8 @@ ScsiWrite16Command (
   IN OUT VOID                  *DataBuffer   OPTIONAL,
   IN OUT UINT32                *DataLength,
   IN     UINT64                StartLba,
-  IN     UINT32                SectorSize
+  IN     UINT32                SectorSize,
+  IN     BOOLEAN               SetFUA
   )
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET  CommandPacket;
@@ -1252,7 +1258,10 @@ ScsiWrite16Command (
   // Fill Cdb for Write (16) Command
   //
   Cdb[0] = EFI_SCSI_OP_WRITE16;
-  Cdb[1] = EFI_SCSI_BLOCK_FUA;
+  if (SetFUA) {
+    Cdb[1] = EFI_SCSI_BLOCK_FUA;
+  }
+
   WriteUnaligned64 ((UINT64 *)&Cdb[2], SwapBytes64 (StartLba));
   WriteUnaligned32 ((UINT32 *)&Cdb[10], SwapBytes32 (SectorSize));
 
@@ -1830,7 +1839,8 @@ ScsiWrite10CommandEx (
              DataBuffer,
              DataLength,
              StartLba,
-             SectorSize
+             SectorSize,
+             TRUE
              );
   }
 
@@ -2196,7 +2206,8 @@ ScsiWrite16CommandEx (
              DataBuffer,
              DataLength,
              StartLba,
-             SectorSize
+             SectorSize,
+             TRUE
              );
   }
 
