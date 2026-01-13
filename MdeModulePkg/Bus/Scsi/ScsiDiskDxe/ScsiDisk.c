@@ -4553,7 +4553,8 @@ BackOff:
                       DataBuffer,
                       DataLength,
                       StartLba,
-                      SectorCount
+                      SectorCount,
+                      ScsiDiskDevice->FuaMode
                       );
   if ((ReturnStatus == EFI_NOT_READY) || (ReturnStatus == EFI_BAD_BUFFER_SIZE)) {
     *NeedRetry = TRUE;
@@ -4800,7 +4801,8 @@ BackOff:
                       DataBuffer,
                       DataLength,
                       StartLba,
-                      SectorCount
+                      SectorCount,
+                      ScsiDiskDevice->FuaMode
                       );
   if ((ReturnStatus == EFI_NOT_READY) || (ReturnStatus == EFI_BAD_BUFFER_SIZE)) {
     *NeedRetry = TRUE;
