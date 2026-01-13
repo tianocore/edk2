@@ -39,7 +39,7 @@ class CompilerPlugin(ICiBuildPlugin):
         return ("Compile " + packagename + " " + target, packagename + ".Compiler." + target)
 
     def RunsOnTargetList(self):
-        return ["DEBUG", "RELEASE"]
+        return ["DEBUG", "RELEASE", "NOOPT"]
 
     ##
     # External function of plugin.  This function is used to perform the task of the ICiBuildPlugin Plugin
