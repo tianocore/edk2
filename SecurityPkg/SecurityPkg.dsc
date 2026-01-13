@@ -278,14 +278,13 @@
   SecurityPkg/Library/TcgPpVendorLibNull/TcgPpVendorLibNull.inf
   SecurityPkg/Library/TcgEventLogRecordLib/TcgEventLogRecordLib.inf
 
-[Components.IA32, Components.X64, Components.AARCH64]
+[Components.IA32, Components.X64, Components.AARCH64, Components.LOONGARCH64]
   SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
   SecurityPkg/Library/SecureBootVariableLib/SecureBootVariableLib.inf
   SecurityPkg/Library/SecureBootVariableProvisionLib/SecureBootVariableProvisionLib.inf
   SecurityPkg/EnrollFromDefaultKeysApp/EnrollFromDefaultKeysApp.inf
   SecurityPkg/VariableAuthenticated/SecureBootDefaultKeysDxe/SecureBootDefaultKeysDxe.inf
 
-[Components.IA32, Components.X64, Components.AARCH64]
   #
   # Random Number Generator
   #
