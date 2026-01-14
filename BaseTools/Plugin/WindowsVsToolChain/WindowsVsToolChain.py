@@ -403,6 +403,15 @@ class WindowsVsToolChain(IUefiBuildPlugin):
                 for (k, v) in vs_vars.items():
                     shell_env.set_shell_var(k, v)
 
+                # Add path to IA32 toolchain DLLs for unit test execution
+                vc_tools_install_dir = shell_env.get_shell_var("VCToolsInstallDir")
+                if vc_tools_install_dir:
+                    ia32_dll_path = os.path.join(vc_tools_install_dir, 'bin', 'Hostx64', 'x86')
+                    if os.path.exists (ia32_dll_path):
+                        shell_env.append_path(os.path.join (vc_tools_install_dir, 'bin', 'Hostx64', 'x86'))
+                    else:
+                        self.Logger.warning("IA32 toolchain DLLs not found in expected path %s. IA32 unit tests may fail to run." % ia32_dll_path)
+
                 ##
                 # If environment already has CLANG_HOST_BIN set then user has already
                 # set the path to the mingw32 make utility
