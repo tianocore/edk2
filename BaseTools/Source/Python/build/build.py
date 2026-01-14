@@ -2627,6 +2627,11 @@ def Main():
 
     if platform.platform().find("Windows") >= 0:
         GlobalData.gIsWindows = True
+        GlobalData.gCommandLineDefines['WIN_HOST_BUILD'] = 'TRUE'
+        clang_bin = os.getenv("CLANG_BIN")
+        if clang_bin:
+            if os.path.exists(os.path.join(clang_bin, "mingw32-make.exe")):
+                GlobalData.gCommandLineDefines['WIN_MINGW32_BUILD'] = 'TRUE'
     else:
         GlobalData.gIsWindows = False
 
