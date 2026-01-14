@@ -89,6 +89,14 @@ class CompilerPlugin(ICiBuildPlugin):
                 tc.LogStdError("No supported architectures to build")
                 return -1
 
+        if "BUILD_TARGETS" in dp.LocalVars:
+            BUILD_TARGETS = dp.LocalVars["BUILD_TARGETS"].split('|')
+            # Skip if build_target is not in BUILD_TARGETS
+            if build_target not in BUILD_TARGETS:
+                tc.SetSkipped()
+                tc.LogStdError("No supported targets to build")
+                return -1
+
         uefiBuilder = UefiBuilder()
         # do all the steps
         # WorkSpace, PackagesPath, PInHelper, PInManager
