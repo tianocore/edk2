@@ -652,7 +652,7 @@
   #
   GCC:*_CLANGDWARF_*_GENFWHII_FLAGS == --hiipackage
   GCC:*_CLANGDWARF_*_RC_PATH         = llvm-rc
-  GCC:*_CLANGDWARF_*_RC_FLAGS       ==
+  GCC:*_CLANGDWARF_*_RC_FLAGS       == --
 
   #
   # Must override DLINK to use options compatible with Mingw CLANG that is
