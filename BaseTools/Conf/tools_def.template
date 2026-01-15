@@ -24,8 +24,9 @@
 # 3.02 - Enable stack cookies for IA32, X64, ARM, and AARCH64 builds for GCC and MSVC
 # 3.03 - Drop ARM32 Support
 # 3.04 - Add toolchain for VS2026
+# 3.05 - Add CLANGPDB AARCH64 Support
 #
-#!VERSION=3.04
+#!VERSION=3.05
 
 IDENTIFIER = Default TOOL_CHAIN_CONF
 
@@ -1783,9 +1784,11 @@ RELEASE_GCC_LOONGARCH64_CC_FLAGS       = DEF(GCC5_LOONGARCH64_CC_FLAGS) -Wno-unu
 
 DEFINE CLANGPDB_IA32_PREFIX          = ENV(CLANG_BIN)
 DEFINE CLANGPDB_X64_PREFIX           = ENV(CLANG_BIN)
+DEFINE CLANGPDB_AARCH64_PREFIX       = ENV(CLANG_BIN)
 
 DEFINE CLANGPDB_IA32_TARGET          = -target i686-pc-windows-msvc
 DEFINE CLANGPDB_X64_TARGET           = -target x86_64-pc-windows-msvc
+DEFINE CLANGPDB_AARCH64_TARGET       = -target aarch64-unknown-windows-msvc
 
 DEFINE CLANGPDB_WARNING_OVERRIDES    = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body -Wno-unused-const-variable -Wno-varargs -Wno-unknown-warning-option -Wno-unused-but-set-variable -Wno-unused-const-variable -Wno-unaligned-access -Wno-microsoft-enum-forward-reference
 DEFINE CLANGPDB_ALL_CC_FLAGS         = DEF(GCC48_ALL_CC_FLAGS) DEF(CLANGPDB_WARNING_OVERRIDES) -fno-stack-protector -funsigned-char -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -Wno-address -Wno-shift-negative-value -Wno-unknown-pragmas -Wno-incompatible-library-redeclaration -Wno-null-dereference -mno-implicit-float -mms-bitfields -mno-stack-arg-probe -fno-omit-frame-pointer -D __GNUC__=4 -D __GNUC_MINOR__=2 -D __GNUC_PATCHLEVEL__=1 -D __MINGW32__=1
@@ -1868,6 +1871,47 @@ NOOPT_CLANGPDB_X64_CC_FLAGS         = DEF(CLANGPDB_ALL_CC_FLAGS) -m64 "-DEFIAPI=
 NOOPT_CLANGPDB_X64_DLINK_FLAGS      = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /ALIGN:32 /DRIVER /FILEALIGN:32 /Machine:X64 /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DEBUG:GHASH /MLLVM:-exception-model=wineh /lldmap
 NOOPT_CLANGPDB_X64_DLINK2_FLAGS     =
 NOOPT_CLANGPDB_X64_GENFW_FLAGS      = --keepexceptiontable
+
+##########################
+# CLANGPDB AARCH64 definitions
+##########################
+*_CLANGPDB_AARCH64_CC_PATH              = DEF(CLANGPDB_AARCH64_PREFIX)clang
+*_CLANGPDB_AARCH64_SLINK_PATH           = DEF(CLANGPDB_AARCH64_PREFIX)llvm-lib
+*_CLANGPDB_AARCH64_DLINK_PATH           = DEF(CLANGPDB_AARCH64_PREFIX)lld-link
+*_CLANGPDB_AARCH64_ASLDLINK_PATH        = DEF(CLANGPDB_AARCH64_PREFIX)lld-link
+*_CLANGPDB_AARCH64_ASM_PATH             = DEF(CLANGPDB_AARCH64_PREFIX)clang
+*_CLANGPDB_AARCH64_PP_PATH              = DEF(CLANGPDB_AARCH64_PREFIX)clang
+*_CLANGPDB_AARCH64_VFRPP_PATH           = DEF(CLANGPDB_AARCH64_PREFIX)clang
+*_CLANGPDB_AARCH64_ASLCC_PATH           = DEF(CLANGPDB_AARCH64_PREFIX)clang
+*_CLANGPDB_AARCH64_ASLPP_PATH           = DEF(CLANGPDB_AARCH64_PREFIX)clang
+*_CLANGPDB_AARCH64_RC_PATH              = DEF(CLANGPDB_AARCH64_PREFIX)llvm-rc
+
+*_CLANGPDB_AARCH64_ASLCC_FLAGS          = DEF(GCC_ASLCC_FLAGS) -m64 -fno-lto DEF(CLANGPDB_AARCH64_TARGET)
+*_CLANGPDB_AARCH64_ASM_FLAGS            = DEF(GCC_ASM_FLAGS) -m64 DEF(CLANGPDB_AARCH64_TARGET)
+*_CLANGPDB_AARCH64_OBJCOPY_FLAGS        =
+*_CLANGPDB_AARCH64_NASM_FLAGS           = -f win64
+*_CLANGPDB_AARCH64_PP_FLAGS             = DEF(GCC_PP_FLAGS) DEF(CLANGPDB_AARCH64_TARGET)
+*_CLANGPDB_AARCH64_ASLPP_FLAGS          = DEF(GCC_ASLPP_FLAGS) DEF(CLANGPDB_AARCH64_TARGET)
+*_CLANGPDB_AARCH64_VFRPP_FLAGS          = DEF(GCC_VFRPP_FLAGS) DEF(CLANGPDB_AARCH64_TARGET)
+*_CLANGPDB_AARCH64_CC_XIPFLAGS          = -mstrict-align
+
+DEBUG_CLANGPDB_AARCH64_CC_FLAGS         = DEF(CLANGPDB_ALL_CC_FLAGS) -m64 -mcmodel=small -Oz -flto DEF(CLANGPDB_AARCH64_TARGET) -gcodeview  -funwind-tables -Wno-unused-but-set-variable -Wno-deprecated-non-prototype -Wno-constant-conversion -Werror
+DEBUG_CLANGPDB_AARCH64_DLINK_FLAGS      = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /WX /OPT:REF /OPT:ICF=10 /ALIGN:4096 /Machine:ARM64 /DLL /DRIVER /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DEBUG:GHASH /MLLVM:-exception-model=wineh /lldmap
+DEBUG_CLANGPDB_AARCH64_DLINK2_FLAGS     =
+DEBUG_CLANGPDB_AARCH64_GENFW_FLAGS      = --keepexceptiontable
+
+RELEASE_CLANGPDB_AARCH64_CC_FLAGS       = DEF(CLANGPDB_ALL_CC_FLAGS) -m64 -mcmodel=small -Oz -flto DEF(CLANGPDB_AARCH64_TARGET) -fno-unwind-tables -Wno-unused-but-set-variable -Wno-deprecated-non-prototype -Wno-constant-conversion -Werror
+RELEASE_CLANGPDB_AARCH64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /WX /OPT:REF /OPT:ICF=10 /ALIGN:4096 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:ARM64 /DLL /DRIVER /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /MERGE:.rdata=.data /MLLVM:-exception-model=wineh /lldmap
+RELEASE_CLANGPDB_AARCH64_DLINK2_FLAGS   =
+
+NOOPT_CLANGPDB_AARCH64_CC_FLAGS         = DEF(CLANGPDB_ALL_CC_FLAGS) -m64 -mcmodel=small -O0 DEF(CLANGPDB_AARCH64_TARGET) -gcodeview -funwind-tables -Wno-unused-but-set-variable -Wno-deprecated-non-prototype -Wno-constant-conversion -Werror
+NOOPT_CLANGPDB_AARCH64_DLINK_FLAGS      = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /WX /OPT:REF /OPT:ICF=10 /ALIGN:4096 /Machine:ARM64 /DLL /DRIVER /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DEBUG:GHASH /MLLVM:-exception-model=wineh /lldmap
+NOOPT_CLANGPDB_AARCH64_DLINK2_FLAGS     =
+NOOPT_CLANGPDB_AARCH64_GENFW_FLAGS      = --keepexceptiontable
+
+# BaseTools cannot handle XIP modules with different section and file alignment and CLANGPDB AArch64 is restricted to
+# 4KB section alignment due to an LLVM bug: https://github.com/llvm/llvm-project/issues/172660
+*_CLANGPDB_AARCH64_DLINK_XIPFLAGS    = /FILEALIGN:4096
 
 ####################################################################################
 #
