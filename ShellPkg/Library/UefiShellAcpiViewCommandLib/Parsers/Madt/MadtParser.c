@@ -84,7 +84,7 @@ ValidateSpeOverflowInterrupt (
     IncrementErrorCount ();
     Print (
       L"\nERROR: SPE Overflow Interrupt ID of %d is not in the allowed PPI ID "
-      L"ranges of %d-%d or %d-%d (for GICv3.1 or later).",
+      L"ranges of %d-%d or %d-%d (for GICv3.1 - 4).",                                            // [CODE_FIRST] 11148
       SpeOverflowInterrupt,
       ARM_PPI_ID_MIN,
       ARM_PPI_ID_MAX,
@@ -136,7 +136,7 @@ ValidateTrbeInterrupt (
     IncrementErrorCount ();
     Print (
       L"\nERROR: TRBE Interrupt ID of %d is not in the allowed PPI ID "
-      L"ranges of %d-%d or %d-%d (for GICv3.1 or later).",
+      L"ranges of %d-%d or %d-%d (for GICv3.1 - 4).",                                             // [CODE_FIRST] 11148
       TrbeInterrupt,
       ARM_PPI_ID_MIN,
       ARM_PPI_ID_MAX,
@@ -238,7 +238,9 @@ STATIC CONST ACPI_PARSER  GicCParser[] = {
   { L"SPE overflow Interrupt",           2, 78, L"0x%x",  NULL,          NULL,
     ValidateSpeOverflowInterrupt, NULL },
   { L"TRBE Interrupt",                   2, 80, L"0x%x",  NULL,          NULL,
-    ValidateTrbeInterrupt, NULL }
+    ValidateTrbeInterrupt, NULL },                                                                // [CODE_FIRST] 11148
+  { L"IAFFID",                           2, 82, L"0x%x",  NULL,          NULL, NULL, NULL },      // [CODE_FIRST] 11148
+  { L"IrsID",                            4, 84, L"0x%x",  NULL,          NULL, NULL, NULL },      // [CODE_FIRST] 11148
 };
 
 /**
@@ -485,6 +487,55 @@ STATIC CONST ACPI_PARSER  LpcPic[] = {
   { L"Cascade vector", 2, 13, L"0x%x",  NULL, NULL, NULL, NULL }
 };
 
+/**                                                                                               // [CODE_FIRST] 11148
+  An ACPI_PARSER array describing the GIC IRS Interrupt Controller Structure.                     // [CODE_FIRST] 11148
+**/// [CODE_FIRST] 11148
+STATIC CONST ACPI_PARSER  GicIrsParser[] = {
+  // [CODE_FIRST] 11148
+  { L"Type",                   1, 0,  L"0x%x",  NULL, NULL, NULL, NULL },                         // [CODE_FIRST] 11148
+  { L"Length",                 1, 1,  L"%d",    NULL, NULL, NULL, NULL },                         // [CODE_FIRST] 11148
+  { L"GIC Version",            1, 2,  L"%d",    NULL, NULL, NULL, NULL },                         // [CODE_FIRST] 11148
+  { L"Reserved",               1, 3,  L"0x%x",  NULL, NULL, NULL, NULL },                         // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  { L"GIC IRS ID",             4, 4,  L"0x%x",  NULL, NULL, NULL, NULL },                         // [CODE_FIRST] 11148
+  { L"Flags",                  4, 8,  L"0x%x",  NULL, NULL, NULL, NULL },                         // [CODE_FIRST] 11148
+  { L"Reserved",               4, 12, L"0x%x",  NULL, NULL, NULL, NULL },                         // [CODE_FIRST] 11148
+  { L"IRS Config Frame Base",  8, 16, L"0x%lx", NULL, NULL, NULL, NULL },                         // [CODE_FIRST] 11148
+  { L"IRS Set LPI Frame Base", 8, 24, L"0x%lx", NULL, NULL, NULL, NULL }                          // [CODE_FIRST] 11148
+};                                                                                                // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+
+/**                                                                                               // [CODE_FIRST] 11148
+  An ACPI_PARSER array describing the GIC ITSv5 Interrupt Controller Structure.                   // [CODE_FIRST] 11148
+**/// [CODE_FIRST] 11148
+STATIC CONST ACPI_PARSER  GicItsV5Parser[] = {
+  // [CODE_FIRST] 11148
+  { L"Type",                  1, 0, L"0x%x",  NULL, NULL, NULL, NULL },                           // [CODE_FIRST] 11148
+  { L"Length",                1, 1, L"%d",    NULL, NULL, NULL, NULL },                           // [CODE_FIRST] 11148
+  { L"Flags",                 1, 2, L"0x%x",  NULL, NULL, NULL, NULL },                           // [CODE_FIRST] 11148
+  { L"Reserved",              1, 3, L"0x%x",  NULL, NULL, NULL, NULL },                           // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  { L"GIC ITS ID",            4, 4, L"0x%x",  NULL, NULL, NULL, NULL },                           // [CODE_FIRST] 11148
+  { L"Physical Base Address", 8, 8, L"0x%lx", NULL, NULL, NULL, NULL },                           // [CODE_FIRST] 11148
+};                                                                                                // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+
+/**                                                                                               // [CODE_FIRST] 11148
+  An ACPI_PARSER array describing the GIC ITSv5 Translate Frame Structure.                        // [CODE_FIRST] 11148
+**/// [CODE_FIRST] 11148
+STATIC CONST ACPI_PARSER  GicItsV5TranslateFrameParser[] = {
+  // [CODE_FIRST] 11148
+  { L"Type",                             1, 0,  L"0x%x",  NULL, NULL, NULL, NULL },               // [CODE_FIRST] 11148
+  { L"Length",                           1, 1,  L"%d",    NULL, NULL, NULL, NULL },               // [CODE_FIRST] 11148
+  { L"Reserved",                         2, 2,  L"0x%x",  NULL, NULL, NULL, NULL },               // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  { L"Linked GIC ITS ID",                4, 4,  L"0x%x",  NULL, NULL, NULL, NULL },               // [CODE_FIRST] 11148
+  { L"ITS Translate Frame ID",           4, 8,  L"0x%x",  NULL, NULL, NULL, NULL },               // [CODE_FIRST] 11148
+  { L"Reserved",                         4, 12, L"0x%x",  NULL, NULL, NULL, NULL },               // [CODE_FIRST] 11148
+  { L"ITS Translate Frame Base Address", 8, 16, L"0x%lx", NULL, NULL, NULL, NULL }                // [CODE_FIRST] 11148
+};                                                                                                // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+
 /**
   An ACPI_PARSER array describing the ACPI MADT Table.
 **/
@@ -517,6 +568,9 @@ STATIC CONST ACPI_PARSER  MadtInterruptControllerHeaderParser[] = {
     - GIC MSI Frame
     - GICR
     - GIC ITS
+    - GIC IRS                                                                                     // [CODE_FIRST] 11148
+    - GIC ITSv5                                                                                   // [CODE_FIRST] 11148
+    - GIC ITSv5 translate frame                                                                   // [CODE_FIRST] 11148
 
   This function also performs validation of the ACPI table fields.
 
@@ -823,6 +877,51 @@ ParseAcpiMadt (
         break;
       }
 
+      case EFI_ACPI_6_7_GIC_IRS:                                                                  // [CODE_FIRST] 11148
+      {
+        // [CODE_FIRST] 11148
+        ParseAcpi (
+          // [CODE_FIRST] 11148
+          TRUE,                                                                                   // [CODE_FIRST] 11148
+          2,                                                                                      // [CODE_FIRST] 11148
+          "GIC IRS",                                                                              // [CODE_FIRST] 11148
+          InterruptContollerPtr,                                                                  // [CODE_FIRST] 11148
+          *MadtInterruptControllerLength,                                                         // [CODE_FIRST] 11148
+          PARSER_PARAMS (GicIrsParser)                                                            // [CODE_FIRST] 11148
+          );                                                                                      // [CODE_FIRST] 11148
+        break;                                                                                    // [CODE_FIRST] 11148
+      }                                                                                           // [CODE_FIRST] 11148
+      // [CODE_FIRST] 11148
+      case EFI_ACPI_6_7_GIC_ITSV5:                                                                // [CODE_FIRST] 11148
+      {
+        // [CODE_FIRST] 11148
+        ParseAcpi (
+          // [CODE_FIRST] 11148
+          TRUE,                                                                                   // [CODE_FIRST] 11148
+          2,                                                                                      // [CODE_FIRST] 11148
+          "GIC ITSv5",                                                                            // [CODE_FIRST] 11148
+          InterruptContollerPtr,                                                                  // [CODE_FIRST] 11148
+          *MadtInterruptControllerLength,                                                         // [CODE_FIRST] 11148
+          PARSER_PARAMS (GicItsV5Parser)                                                          // [CODE_FIRST] 11148
+          );                                                                                      // [CODE_FIRST] 11148
+        break;                                                                                    // [CODE_FIRST] 11148
+      }                                                                                           // [CODE_FIRST] 11148
+      // [CODE_FIRST] 11148
+      case EFI_ACPI_6_7_GIC_ITSV5_TRANSLATE_FRAME:                                                // [CODE_FIRST] 11148
+      {
+        // [CODE_FIRST] 11148
+        ParseAcpi (
+          // [CODE_FIRST] 11148
+          TRUE,                                                                                   // [CODE_FIRST] 11148
+          2,                                                                                      // [CODE_FIRST] 11148
+          "GIC ITSv5 Translate Frame",                                                            // [CODE_FIRST] 11148
+          InterruptContollerPtr,                                                                  // [CODE_FIRST] 11148
+          *MadtInterruptControllerLength,                                                         // [CODE_FIRST] 11148
+          PARSER_PARAMS (GicItsV5TranslateFrameParser)                                            // [CODE_FIRST] 11148
+          );                                                                                      // [CODE_FIRST] 11148
+        break;                                                                                    // [CODE_FIRST] 11148
+      }                                                                                           // [CODE_FIRST] 11148
+      // [CODE_FIRST] 11148
       default:
       {
         IncrementErrorCount ();

@@ -56,12 +56,38 @@ GET_OBJECT_LIST (
   CM_ARM_GIC_ITS_INFO
   );
 
+/** This macro expands to a function that retrieves the GIC                                       // [CODE_FIRST] 11148
+    Interrupt Translation Service v5 Information from the                                         // [CODE_FIRST] 11148
+    Configuration Manager.                                                                        // [CODE_FIRST] 11148
+*/// [CODE_FIRST] 11148
+GET_OBJECT_LIST (
+  // [CODE_FIRST] 11148
+  EObjNameSpaceArm,                                                                               // [CODE_FIRST] 11148
+  EArmObjGicItsV5Info,                                                                            // [CODE_FIRST] 11148
+  CM_ARM_GIC_ITSV5_INFO                                                                           // [CODE_FIRST] 11148
+  );                                                                                              // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+
+/** This macro expands to a function that retrieves the GIC                                       // [CODE_FIRST] 11148
+    Interrupt Routing Service Information from the                                                // [CODE_FIRST] 11148
+    Configuration Manager.                                                                        // [CODE_FIRST] 11148
+*/// [CODE_FIRST] 11148
+GET_OBJECT_LIST (
+  // [CODE_FIRST] 11148
+  EObjNameSpaceArm,                                                                               // [CODE_FIRST] 11148
+  EArmObjGicIrsInfo,                                                                              // [CODE_FIRST] 11148
+  CM_ARM_GIC_IRS_INFO                                                                             // [CODE_FIRST] 11148
+  );                                                                                              // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+
 /** Enum of the Arm specific CM objects required to
     build the arch specific information of the SRAT table.
 */
 typedef enum ArmSratSubTableType {
   EArmGicCSubTableType,
   EArmGicItsSubTableType,
+  EArmGicItsV5SubTableType,                                                                       // [CODE_FIRST] 11148
+  EArmGicIrsSubTableType,                                                                         // [CODE_FIRST] 11148
   EArmSubTableTypeMax,
 } EARM_SRAT_SUB_TABLE_TYPE;
 
@@ -146,16 +172,70 @@ ArchReserveOffsets (
     return Status;
   }
 
+  Status = GetEArmObjGicItsV5Info (
+                                                                                        // [CODE_FIRST] 11148
+             CfgMgrProtocol,                                                            // [CODE_FIRST] 11148
+             CM_NULL_TOKEN,                                                             // [CODE_FIRST] 11148
+             (CM_ARM_GIC_ITSV5_INFO **)&mSratSubTable[EArmGicItsV5SubTableType].CmInfo, // [CODE_FIRST] 11148
+             &mSratSubTable[EArmGicItsV5SubTableType].Count                             // [CODE_FIRST] 11148
+             );                                                                         // [CODE_FIRST] 11148
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    // [CODE_FIRST] 11148
+    DEBUG ((
+      // [CODE_FIRST] 11148
+      DEBUG_ERROR,                                                                                // [CODE_FIRST] 11148
+      "ERROR: SRAT: Failed to get GIC ITSv5 Info. Status = %r\n",                                 // [CODE_FIRST] 11148
+      Status                                                                                      // [CODE_FIRST] 11148
+      ));                                                                                         // [CODE_FIRST] 11148
+    return Status;                                                                                // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
+  Status = GetEArmObjGicIrsInfo (
+                                                                                    // [CODE_FIRST] 11148
+             CfgMgrProtocol,                                                        // [CODE_FIRST] 11148
+             CM_NULL_TOKEN,                                                         // [CODE_FIRST] 11148
+             (CM_ARM_GIC_IRS_INFO **)&mSratSubTable[EArmGicIrsSubTableType].CmInfo, // [CODE_FIRST] 11148
+             &mSratSubTable[EArmGicIrsSubTableType].Count                           // [CODE_FIRST] 11148
+             );                                                                     // [CODE_FIRST] 11148
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    // [CODE_FIRST] 11148
+    DEBUG ((
+      // [CODE_FIRST] 11148
+      DEBUG_ERROR,                                                                                // [CODE_FIRST] 11148
+      "ERROR: SRAT: Failed to get GIC IRS Info. Status = %r\n",                                   // [CODE_FIRST] 11148
+      Status                                                                                      // [CODE_FIRST] 11148
+      ));                                                                                         // [CODE_FIRST] 11148
+    return Status;                                                                                // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
   mSratSubTable[EArmGicCSubTableType].Offset = *ArchOffset;
   *ArchOffset                               += (sizeof (EFI_ACPI_6_3_GICC_AFFINITY_STRUCTURE) *
                                                 mSratSubTable[EArmGicCSubTableType].Count);
 
   if (mSratSubTable[EArmGicItsSubTableType].Count != 0) {
     mSratSubTable[EArmGicItsSubTableType].Offset = *ArchOffset;
-    *ArchOffset                                 += (sizeof (EFI_ACPI_6_3_GIC_ITS_AFFINITY_STRUCTURE) *
+    *ArchOffset                                 += (sizeof (EFI_ACPI_6_5_GIC_ITS_AFFINITY_STRUCTURE) *    // [CODE_FIRST] 11148
                                                     mSratSubTable[EArmGicItsSubTableType].Count);
   }
 
+  if (mSratSubTable[EArmGicItsV5SubTableType].Count != 0) {
+    // [CODE_FIRST] 11148
+    mSratSubTable[EArmGicItsV5SubTableType].Offset = *ArchOffset;                                         // [CODE_FIRST] 11148
+    *ArchOffset                                   += (sizeof (EFI_ACPI_6_5_GIC_ITS_AFFINITY_STRUCTURE) *  // [CODE_FIRST] 11148
+                                                      mSratSubTable[EArmGicItsV5SubTableType].Count);     // [CODE_FIRST] 11148
+  }                                                                                                       // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
+  if (mSratSubTable[EArmGicIrsSubTableType].Count != 0) {
+    // [CODE_FIRST] 11148
+    mSratSubTable[EArmGicIrsSubTableType].Offset = *ArchOffset;                                           // [CODE_FIRST] 11148
+    *ArchOffset                                 += (sizeof (EFI_ACPI_6_7_GIC_IRS_AFFINITY_STRUCTURE) *    // [CODE_FIRST] 11148
+                                                    mSratSubTable[EArmGicIrsSubTableType].Count);         // [CODE_FIRST] 11148
+  }                                                                                                       // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
   return EFI_SUCCESS;
 }
 
@@ -222,36 +302,61 @@ AddGICCAffinity (
   @param [in]  CfgMgrProtocol   Pointer to the Configuration Manager
                                 Protocol Interface.
   @param [in]  Srat             Pointer to the SRAT Table.
+  @param [in]  ItsType          EArmGicItsSubTableType or EArmGicItsV5SubTableType.               // [CODE_FIRST] 11148
 **/
 STATIC
 VOID
 EFIAPI
 AddGICItsAffinity (
   IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         *CONST  CfgMgrProtocol,
-  IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat
+  IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat,                             // [CODE_FIRST] 11148
+  IN EARM_SRAT_SUB_TABLE_TYPE                            CONST  ItsType                           // [CODE_FIRST] 11148
   )
 {
   EFI_STATUS                               Status;
-  EFI_ACPI_6_3_GIC_ITS_AFFINITY_STRUCTURE  *GicItsAff;
+  EFI_ACPI_6_7_GIC_ITS_AFFINITY_STRUCTURE  *GicItsAff;                                            // [CODE_FIRST] 11148
   CM_ARM_GIC_ITS_INFO                      *GicItsInfo;
+  CM_ARM_GIC_ITSV5_INFO                    *GicItsV5Info;                                         // [CODE_FIRST] 11148
+  UINT32                                   ProximityDomain;                                       // [CODE_FIRST] 11148
+  CM_OBJECT_TOKEN                          ProximityDomainToken;                                  // [CODE_FIRST] 11148
 
-  GicItsInfo = mSratSubTable[EArmGicItsSubTableType].CmInfo;
-  GicItsAff  = (EFI_ACPI_6_3_GIC_ITS_AFFINITY_STRUCTURE *)((UINT8 *)Srat +
-                                                           mSratSubTable[EArmGicItsSubTableType].Offset);
+  if (ItsType == EArmGicItsSubTableType) {
+    // [CODE_FIRST] 11148
+    GicItsInfo = mSratSubTable[ItsType].CmInfo;                                                   // [CODE_FIRST] 11148
+  } else {
+    // [CODE_FIRST] 11148
+    GicItsV5Info = mSratSubTable[ItsType].CmInfo;                                                 // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
 
-  while (mSratSubTable[EArmGicItsSubTableType].Count-- != 0) {
+  GicItsAff = (EFI_ACPI_6_7_GIC_ITS_AFFINITY_STRUCTURE *)((UINT8 *)Srat +                         // [CODE_FIRST] 11148
+                                                          mSratSubTable[ItsType].Offset);         // [CODE_FIRST] 11148
+
+  while (mSratSubTable[ItsType].Count-- != 0) {
+    // [CODE_FIRST] 11148
     DEBUG ((DEBUG_INFO, "SRAT: GicItsAff = 0x%p\n", GicItsAff));
 
-    GicItsAff->Type        = EFI_ACPI_6_3_GIC_ITS_AFFINITY;
-    GicItsAff->Length      = sizeof (EFI_ACPI_6_3_GIC_ITS_AFFINITY_STRUCTURE);
+    if (ItsType == EArmGicItsSubTableType) {
+      // [CODE_FIRST] 11148
+      ProximityDomain      = GicItsInfo->ProximityDomain;                                         // [CODE_FIRST] 11148
+      ProximityDomainToken = GicItsInfo->ProximityDomainToken;                                    // [CODE_FIRST] 11148
+      GicItsAff->ItsId     = GicItsInfo->GicItsId;                                                // [CODE_FIRST] 11148
+    } else {
+      // [CODE_FIRST] 11148
+      ProximityDomain      = GicItsV5Info->ProximityDomain;                                       // [CODE_FIRST] 11148
+      ProximityDomainToken = GicItsV5Info->ProximityDomainToken;                                  // [CODE_FIRST] 11148
+      GicItsAff->ItsId     = GicItsV5Info->GicItsId;                                              // [CODE_FIRST] 11148
+    }                                                                                             // [CODE_FIRST] 11148
+
+    // [CODE_FIRST] 11148
+    GicItsAff->Type        = EFI_ACPI_6_7_GIC_ITS_AFFINITY;                                       // [CODE_FIRST] 11148
+    GicItsAff->Length      = sizeof (EFI_ACPI_6_7_GIC_ITS_AFFINITY_STRUCTURE);                    // [CODE_FIRST] 11148
     GicItsAff->Reserved[0] = EFI_ACPI_RESERVED_BYTE;
     GicItsAff->Reserved[1] = EFI_ACPI_RESERVED_BYTE;
-    GicItsAff->ItsId       = GicItsInfo->GicItsId;
 
     Status = GetProximityDomainId (
                CfgMgrProtocol,
-               GicItsInfo->ProximityDomain,
-               GicItsInfo->ProximityDomainToken,
+               ProximityDomain,                                                                   // [CODE_FIRST] 11148
+               ProximityDomainToken,                                                              // [CODE_FIRST] 11148
                &GicItsAff->ProximityDomain
                );
     if (EFI_ERROR (Status)) {
@@ -264,6 +369,50 @@ AddGICItsAffinity (
     GicItsInfo++;
   }// while
 }
+
+/** Add the GIC IRS Affinity Structures in the SRAT Table.                                        // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  @param [in]  CfgMgrProtocol   Pointer to the Configuration Manager                              // [CODE_FIRST] 11148
+                                Protocol Interface.                                               // [CODE_FIRST] 11148
+  @param [in]  Srat             Pointer to the SRAT Table.                                        // [CODE_FIRST] 11148
+**/// [CODE_FIRST] 11148
+STATIC                                                                                            // [CODE_FIRST] 11148
+VOID                                                                                              // [CODE_FIRST] 11148
+EFIAPI
+// [CODE_FIRST] 11148
+AddGICIrsAffinity (
+  // [CODE_FIRST] 11148
+  IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         *CONST  CfgMgrProtocol,                   // [CODE_FIRST] 11148
+  IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat                              // [CODE_FIRST] 11148
+  )                                                                                               // [CODE_FIRST] 11148
+{
+  // [CODE_FIRST] 11148
+  EFI_ACPI_6_7_GIC_IRS_AFFINITY_STRUCTURE  *GicIrsAff;                                            // [CODE_FIRST] 11148
+  CM_ARM_GIC_IRS_INFO                      *GicIrsInfo;                                           // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
+  GicIrsInfo = mSratSubTable[EArmGicIrsSubTableType].CmInfo;                                              // [CODE_FIRST] 11148
+  GicIrsAff  = (EFI_ACPI_6_7_GIC_IRS_AFFINITY_STRUCTURE *)((UINT8 *)Srat +                                // [CODE_FIRST] 11148
+                                                           mSratSubTable[EArmGicIrsSubTableType].Offset); // [CODE_FIRST] 11148
+  // [CODE_FIRST] 11148
+  while (mSratSubTable[EArmGicIrsSubTableType].Count-- != 0) {
+    // [CODE_FIRST] 11148
+    DEBUG ((DEBUG_INFO, "SRAT: GicIrsAff = 0x%p\n", GicIrsAff));                                  // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+    GicIrsAff->Type            = EFI_ACPI_6_7_GIC_IRS_AFFINITY;                                   // [CODE_FIRST] 11148
+    GicIrsAff->Length          = sizeof (EFI_ACPI_6_7_GIC_IRS_AFFINITY_STRUCTURE);                // [CODE_FIRST] 11148
+    GicIrsAff->Reserved        = EFI_ACPI_RESERVED_WORD;                                          // [CODE_FIRST] 11148
+    GicIrsAff->ProximityDomain = GicIrsInfo->ProximityDomain;                                     // [CODE_FIRST] 11148
+    GicIrsAff->IrsId           = GicIrsInfo->GicIrsId;                                            // [CODE_FIRST] 11148
+    GicIrsAff->Reserved2       = EFI_ACPI_RESERVED_DWORD;                                         // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+    // Next                                                                                       // [CODE_FIRST] 11148
+    GicIrsAff++;                                                                                  // [CODE_FIRST] 11148
+    GicIrsInfo++;                                                                                 // [CODE_FIRST] 11148
+  }// while                                                                                       // [CODE_FIRST] 11148
+}                                                                                                 // [CODE_FIRST] 11148
+
+// [CODE_FIRST] 11148
 
 /** Add the arch specific sub-tables to the SRAT table.
 
@@ -287,9 +436,22 @@ AddArchObjects (
 
   AddGICCAffinity (CfgMgrProtocol, Srat);
 
-  if (mSratSubTable[EArmGicCSubTableType].Count != 0) {
-    AddGICItsAffinity (CfgMgrProtocol, Srat);
-  }
+  if (mSratSubTable[EArmGicItsSubTableType].Count != 0) {
+    // [CODE_FIRST] 11148
+    AddGICItsAffinity (CfgMgrProtocol, Srat, EArmGicItsSubTableType);                             // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
+  if (mSratSubTable[EArmGicItsV5SubTableType].Count != 0) {
+    // [CODE_FIRST] 11148
+    AddGICItsAffinity (CfgMgrProtocol, Srat, EArmGicItsV5SubTableType);                           // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
+  if (mSratSubTable[EArmGicIrsSubTableType].Count != 0) {
+    // [CODE_FIRST] 11148
+    AddGICIrsAffinity (CfgMgrProtocol, Srat);                                                     // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
 
   return EFI_SUCCESS;
 }

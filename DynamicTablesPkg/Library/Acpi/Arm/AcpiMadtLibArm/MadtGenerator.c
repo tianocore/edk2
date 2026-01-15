@@ -81,8 +81,138 @@ GET_OBJECT_LIST (
   CM_ARM_GIC_ITS_INFO
   );
 
+/** This macro expands to a function that retrieves the GIC                                       // [CODE_FIRST] 11148
+    IRS Information from the Configuration Manager.                                               // [CODE_FIRST] 11148
+*/// [CODE_FIRST] 11148
+GET_OBJECT_LIST (
+  // [CODE_FIRST] 11148
+  EObjNameSpaceArm,                                                                               // [CODE_FIRST] 11148
+  EArmObjGicIrsInfo,                                                                              // [CODE_FIRST] 11148
+  CM_ARM_GIC_IRS_INFO                                                                             // [CODE_FIRST] 11148
+  );                                                                                              // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+
+/** This macro expands to a function that retrieves the GIC                                       // [CODE_FIRST] 11148
+    Interrupt Translation Service v5 Information from the                                         // [CODE_FIRST] 11148
+    Configuration Manager.                                                                        // [CODE_FIRST] 11148
+*/// [CODE_FIRST] 11148
+GET_OBJECT_LIST (
+  // [CODE_FIRST] 11148
+  EObjNameSpaceArm,                                                                               // [CODE_FIRST] 11148
+  EArmObjGicItsV5Info,                                                                            // [CODE_FIRST] 11148
+  CM_ARM_GIC_ITSV5_INFO                                                                           // [CODE_FIRST] 11148
+  );                                                                                              // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+
+/** This macro expands to a function that retrieves the GIC                                       // [CODE_FIRST] 11148
+    ITS v5 Translate Frame Information from the                                                   // [CODE_FIRST] 11148
+    Configuration Manager.                                                                        // [CODE_FIRST] 11148
+*/// [CODE_FIRST] 11148
+GET_OBJECT_LIST (
+  // [CODE_FIRST] 11148
+  EObjNameSpaceArm,                                                                               // [CODE_FIRST] 11148
+  EArmObjGicItsV5TranslateFrameInfo,                                                              // [CODE_FIRST] 11148
+  CM_ARM_GIC_ITSV5_TRANSLATE_FRAME_INFO                                                           // [CODE_FIRST] 11148
+  );                                                                                              // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+STATIC                                                                                            // [CODE_FIRST] 11148
+VOID
+// [CODE_FIRST] 11148
+AddGICInterruptRoutingService (
+  // [CODE_FIRST] 11148
+  IN        EFI_ACPI_6_7_GIC_IRS_STRUCTURE  *CONST  GicIrs,                                       // [CODE_FIRST] 11148
+  IN  CONST CM_ARM_GIC_IRS_INFO             *CONST  GicIrsInfo                                    // [CODE_FIRST] 11148
+  )                                                                                               // [CODE_FIRST] 11148
+{
+  // [CODE_FIRST] 11148
+  ASSERT (GicIrs != NULL);                                                                        // [CODE_FIRST] 11148
+  ASSERT (GicIrsInfo != NULL);                                                                    // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  // UINT8 Type                                                                                   // [CODE_FIRST] 11148
+  GicIrs->Type = EFI_ACPI_6_7_GIC_IRS;                                                            // [CODE_FIRST] 11148
+  // UINT8 Length                                                                                 // [CODE_FIRST] 11148
+  GicIrs->Length = sizeof (EFI_ACPI_6_7_GIC_IRS_STRUCTURE);                                       // [CODE_FIRST] 11148
+  // UINT8 GicVersion                                                                             // [CODE_FIRST] 11148
+  GicIrs->GicVersion = EFI_ACPI_6_7_GIC_V5;                                                       // [CODE_FIRST] 11148
+  // UINT8 Reserved                                                                               // [CODE_FIRST] 11148
+  GicIrs->Reserved = EFI_ACPI_RESERVED_BYTE;                                                      // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  // UINT32 IrsId                                                                                 // [CODE_FIRST] 11148
+  GicIrs->IrsId = GicIrsInfo->GicIrsId;                                                           // [CODE_FIRST] 11148
+  // UINT32 Flags                                                                                 // [CODE_FIRST] 11148
+  GicIrs->Flags = GicIrsInfo->Flags;                                                              // [CODE_FIRST] 11148
+  // UINT32 Reserved2                                                                             // [CODE_FIRST] 11148
+  GicIrs->Reserved2 = EFI_ACPI_RESERVED_DWORD;                                                    // [CODE_FIRST] 11148
+  // UINT32 IrsConfigFrameBase                                                                    // [CODE_FIRST] 11148
+  GicIrs->IrsConfigFrameBase = GicIrsInfo->ConfigFrameBase;                                       // [CODE_FIRST] 11148
+  // UINT32 IrsSetLpiFrameBase                                                                    // [CODE_FIRST] 11148
+  GicIrs->IrsSetLpiFrameBase = GicIrsInfo->SetLpiFrameBase;                                       // [CODE_FIRST] 11148
+}                                                                                                 // [CODE_FIRST] 11148
+
+// [CODE_FIRST] 11148
+STATIC                                                                                            // [CODE_FIRST] 11148
+VOID
+// [CODE_FIRST] 11148
+AddGICInterruptTranslationServiceV5 (
+  // [CODE_FIRST] 11148
+  IN        EFI_ACPI_6_7_GIC_ITSV5_STRUCTURE  *CONST  GicItsV5,                                   // [CODE_FIRST] 11148
+  IN  CONST CM_ARM_GIC_ITSV5_INFO             *CONST  GicItsV5Info                                // [CODE_FIRST] 11148
+  )                                                                                               // [CODE_FIRST] 11148
+{
+  // [CODE_FIRST] 11148
+  ASSERT (GicItsV5 != NULL);                                                                      // [CODE_FIRST] 11148
+  ASSERT (GicItsV5Info != NULL);                                                                  // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  // UINT8 Type                                                                                   // [CODE_FIRST] 11148
+  GicItsV5->Type = EFI_ACPI_6_7_GIC_ITSV5;                                                        // [CODE_FIRST] 11148
+  // UINT8 Length                                                                                 // [CODE_FIRST] 11148
+  GicItsV5->Length = sizeof (EFI_ACPI_6_7_GIC_ITSV5_STRUCTURE);                                   // [CODE_FIRST] 11148
+  // UINT8 Flags                                                                                  // [CODE_FIRST] 11148
+  GicItsV5->Flags = GicItsV5Info->Flags;                                                          // [CODE_FIRST] 11148
+  // UINT8 Reserved                                                                               // [CODE_FIRST] 11148
+  GicItsV5->Reserved = EFI_ACPI_RESERVED_BYTE;                                                    // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  // UINT32 GicItsId                                                                              // [CODE_FIRST] 11148
+  GicItsV5->GicItsId = GicItsV5Info->GicItsId;                                                    // [CODE_FIRST] 11148
+  // UINT64 PhysicalBaseAddress                                                                   // [CODE_FIRST] 11148
+  GicItsV5->PhysicalBaseAddress = GicItsV5Info->PhysicalBaseAddress;                              // [CODE_FIRST] 11148
+}                                                                                                 // [CODE_FIRST] 11148
+
+// [CODE_FIRST] 11148
+STATIC                                                                                            // [CODE_FIRST] 11148
+VOID
+// [CODE_FIRST] 11148
+AddGICInterruptTranslationServiceV5TranslateFrame (
+  // [CODE_FIRST] 11148
+  IN        EFI_ACPI_6_7_GIC_ITSV5_TRANSLATE_FRAME_STRUCTURE  *CONST  GicItsV5TranslateFrame,     // [CODE_FIRST] 11148
+  IN  CONST CM_ARM_GIC_ITSV5_TRANSLATE_FRAME_INFO             *CONST  GicItsV5TransFrameInfo      // [CODE_FIRST] 11148
+  )                                                                                               // [CODE_FIRST] 11148
+{
+  // [CODE_FIRST] 11148
+  ASSERT (GicItsV5TranslateFrame != NULL);                                                        // [CODE_FIRST] 11148
+  ASSERT (GicItsV5TransFrameInfo != NULL);                                                        // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  // UINT8 Type                                                                                   // [CODE_FIRST] 11148
+  GicItsV5TranslateFrame->Type = EFI_ACPI_6_7_GIC_ITSV5_TRANSLATE_FRAME;                          // [CODE_FIRST] 11148
+  // UINT8 Length                                                                                 // [CODE_FIRST] 11148
+  GicItsV5TranslateFrame->Length = sizeof (EFI_ACPI_6_7_GIC_ITSV5_TRANSLATE_FRAME_STRUCTURE);     // [CODE_FIRST] 11148
+  // UINT16 Reserved                                                                              // [CODE_FIRST] 11148
+  GicItsV5TranslateFrame->Reserved = EFI_ACPI_RESERVED_WORD;                                      // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  // UINT32 LinkedGicItsId                                                                        // [CODE_FIRST] 11148
+  GicItsV5TranslateFrame->LinkedGicItsId = GicItsV5TransFrameInfo->LinkedGicItsId;                // [CODE_FIRST] 11148
+  // UINT32 ItsTranslateId                                                                        // [CODE_FIRST] 11148
+  GicItsV5TranslateFrame->ItsTranslateId = GicItsV5TransFrameInfo->ItsTranslateId;                // [CODE_FIRST] 11148
+  // UINT32 Reserved2                                                                             // [CODE_FIRST] 11148
+  GicItsV5TranslateFrame->Reserved2 = EFI_ACPI_RESERVED_DWORD;                                    // [CODE_FIRST] 11148
+  // UINT32 ItsTranslateFrameBase                                                                 // [CODE_FIRST] 11148
+  GicItsV5TranslateFrame->ItsTranslateFrameBase = GicItsV5TransFrameInfo->ItsTranslateFrameBase;  // [CODE_FIRST] 11148
+}                                                                                                 // [CODE_FIRST] 11148
+
+// [CODE_FIRST] 11148
+
 /** This function updates the GIC CPU Interface Information in the
-    EFI_ACPI_6_5_GIC_STRUCTURE structure.
+    EFI_ACPI_6_7_GIC_STRUCTURE structure.                                                         // [CODE_FIRST] 11148
 
   @param [in]  Gicc         Pointer to GIC CPU Interface structure.
   @param [in]  GicCInfo     Pointer to the GIC CPU Interface Information.
@@ -92,7 +222,7 @@ GET_OBJECT_LIST (
 STATIC
 VOID
 AddGICC (
-  IN        EFI_ACPI_6_5_GIC_STRUCTURE  *CONST  Gicc,
+  IN        EFI_ACPI_6_7_GIC_STRUCTURE  *CONST  Gicc,                                             // [CODE_FIRST] 11148
   IN  CONST CM_ARM_GICC_INFO            *CONST  GicCInfo,
   IN  CONST UINT8                               MadtRev,
   IN  CONST BOOLEAN                             GicRPresent
@@ -102,9 +232,9 @@ AddGICC (
   ASSERT (GicCInfo != NULL);
 
   // UINT8 Type
-  Gicc->Type = EFI_ACPI_6_5_GIC;
+  Gicc->Type = EFI_ACPI_6_7_GIC;                                                                  // [CODE_FIRST] 11148
   // UINT8 Length
-  Gicc->Length = sizeof (EFI_ACPI_6_5_GIC_STRUCTURE);
+  Gicc->Length = sizeof (EFI_ACPI_6_7_GIC_STRUCTURE);                                             // [CODE_FIRST] 11148
   // UINT16 Reserved
   Gicc->Reserved = EFI_ACPI_RESERVED_WORD;
 
@@ -159,6 +289,12 @@ AddGICC (
   if (MadtRev > EFI_ACPI_6_4_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION) {
     Gicc->TrbeInterrupt = GicCInfo->TrbeInterrupt;
   }
+
+  if (MadtRev >= EFI_ACPI_6_6_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION) {
+    // [CODE_FIRST] 11148
+    Gicc->IAffId = GicCInfo->IAffId;                                                              // [CODE_FIRST] 11148
+    Gicc->IrsId  = GicCInfo->IrsId;                                                               // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
 }
 
 /**
@@ -227,7 +363,7 @@ IsAcpiUidEqual (
 STATIC
 EFI_STATUS
 AddGICCList (
-  IN  EFI_ACPI_6_5_GIC_STRUCTURE  *Gicc,
+  IN  EFI_ACPI_6_7_GIC_STRUCTURE  *Gicc,                                                          // [CODE_FIRST] 11148
   IN  CONST CM_ARM_GICC_INFO      *GicCInfo,
   IN        UINT32                GicCCount,
   IN  CONST UINT8                 MadtRev,
@@ -434,6 +570,99 @@ AddGICItsList (
   }
 }
 
+/** Add the GIC Interrupt Routing Service Information                                             // [CODE_FIRST] 11148
+    to the MADT Table.                                                                            // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  @param [in]  GicIrs       Pointer to GIC IRS structure list.                                    // [CODE_FIRST] 11148
+  @param [in]  GicIrsInfo   Pointer to the GIC IRS list.                                          // [CODE_FIRST] 11148
+  @param [in]  GicIrsCount  Count of GIC IRS.                                                     // [CODE_FIRST] 11148
+**/// [CODE_FIRST] 11148
+STATIC                                                                                            // [CODE_FIRST] 11148
+VOID
+// [CODE_FIRST] 11148
+AddGICIrsList (
+  // [CODE_FIRST] 11148
+  IN  EFI_ACPI_6_7_GIC_IRS_STRUCTURE  *GicIrs,                                                    // [CODE_FIRST] 11148
+  IN  CONST CM_ARM_GIC_IRS_INFO       *GicIrsInfo,                                                // [CODE_FIRST] 11148
+  IN        UINT32                    GicIrsCount                                                 // [CODE_FIRST] 11148
+  )                                                                                               // [CODE_FIRST] 11148
+{
+  // [CODE_FIRST] 11148
+  ASSERT (GicIrs != NULL);                                                                        // [CODE_FIRST] 11148
+  ASSERT (GicIrsInfo != NULL);                                                                    // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  while (GicIrsCount-- != 0) {
+    // [CODE_FIRST] 11148
+    AddGICInterruptRoutingService (GicIrs++, GicIrsInfo++);                                       // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
+}                                                                                                 // [CODE_FIRST] 11148
+
+// [CODE_FIRST] 11148
+
+/** Add the GICv5 Interrupt Translation Service Information                                       // [CODE_FIRST] 11148
+    to the MADT Table.                                                                            // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  @param [in]  GicItsV5       Pointer to GIC ITSv5 structure list.                                // [CODE_FIRST] 11148
+  @param [in]  GicItsV5Info   Pointer to the GIC ITSv5 list.                                      // [CODE_FIRST] 11148
+  @param [in]  GicItsV5Count  Count of GIC ITSv5.                                                 // [CODE_FIRST] 11148
+**/// [CODE_FIRST] 11148
+STATIC                                                                                            // [CODE_FIRST] 11148
+VOID
+// [CODE_FIRST] 11148
+AddGICItsV5List (
+  // [CODE_FIRST] 11148
+  IN  EFI_ACPI_6_7_GIC_ITSV5_STRUCTURE  *GicItsV5,                                                // [CODE_FIRST] 11148
+  IN  CONST CM_ARM_GIC_ITSV5_INFO       *GicItsV5Info,                                            // [CODE_FIRST] 11148
+  IN        UINT32                      GicItsV5Count                                             // [CODE_FIRST] 11148
+  )                                                                                               // [CODE_FIRST] 11148
+{
+  // [CODE_FIRST] 11148
+  ASSERT (GicItsV5 != NULL);                                                                      // [CODE_FIRST] 11148
+  ASSERT (GicItsV5Info != NULL);                                                                  // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  while (GicItsV5Count-- != 0) {
+    // [CODE_FIRST] 11148
+    AddGICInterruptTranslationServiceV5 (GicItsV5++, GicItsV5Info++);                             // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
+}                                                                                                 // [CODE_FIRST] 11148
+
+// [CODE_FIRST] 11148
+
+/** Add the GICv5 Interrupt Translation Service Translate Frame Information                       // [CODE_FIRST] 11148
+    to the MADT Table.                                                                            // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  @param [in]  GicItsV5TranslateFrame   Pointer to GIC ITSv5 Translate frame                      // [CODE_FIRST] 11148
+                                        structure list.                                           // [CODE_FIRST] 11148
+  @param [in]  GicItsV5TransFrameInfo   Pointer to the GIC ITSv5                                  // [CODE_FIRST] 11148
+                                        Translate frame list.                                     // [CODE_FIRST] 11148
+  @param [in]  GicItsV5TransFrameCount  Count of GIC ITSv5.Translate frame.                       // [CODE_FIRST] 11148
+**/// [CODE_FIRST] 11148
+STATIC                                                                                            // [CODE_FIRST] 11148
+VOID
+// [CODE_FIRST] 11148
+AddGICItsV5TranslateFrameList (
+  // [CODE_FIRST] 11148
+  IN  EFI_ACPI_6_7_GIC_ITSV5_TRANSLATE_FRAME_STRUCTURE  *GicItsV5TranslateFrame,                  // [CODE_FIRST] 11148
+  IN  CONST CM_ARM_GIC_ITSV5_TRANSLATE_FRAME_INFO       *GicItsV5TransFrameInfo,                  // [CODE_FIRST] 11148
+  IN        UINT32                                      GicItsV5TransFrameCount                   // [CODE_FIRST] 11148
+  )                                                                                               // [CODE_FIRST] 11148
+{
+  // [CODE_FIRST] 11148
+  ASSERT (GicItsV5TranslateFrame != NULL);                                                        // [CODE_FIRST] 11148
+  ASSERT (GicItsV5TransFrameInfo != NULL);                                                        // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  while (GicItsV5TransFrameCount-- != 0) {
+    // [CODE_FIRST] 11148
+    AddGICInterruptTranslationServiceV5TranslateFrame (
+      // [CODE_FIRST] 11148
+      GicItsV5TranslateFrame++,                                                                   // [CODE_FIRST] 11148
+      GicItsV5TransFrameInfo++                                                                    // [CODE_FIRST] 11148
+      );                                                                                          // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
+}                                                                                                 // [CODE_FIRST] 11148
+
+// [CODE_FIRST] 11148
+
 /** Construct the MADT ACPI table.
 
   This function invokes the Configuration Manager protocol interface
@@ -466,25 +695,34 @@ BuildMadtTable (
   OUT       EFI_ACPI_DESCRIPTION_HEADER          **CONST  Table
   )
 {
-  EFI_STATUS                 Status;
-  UINT32                     TableSize;
-  UINT32                     GicCCount;
-  UINT32                     GicDCount;
-  UINT32                     GicMSICount;
-  UINT32                     GicRedistCount;
-  UINT32                     GicItsCount;
-  CM_ARM_GICC_INFO           *GicCInfo;
-  CM_ARM_GICD_INFO           *GicDInfo;
-  CM_ARM_GIC_MSI_FRAME_INFO  *GicMSIInfo;
-  CM_ARM_GIC_REDIST_INFO     *GicRedistInfo;
-  CM_ARM_GIC_ITS_INFO        *GicItsInfo;
-  UINT32                     GicCOffset;
-  UINT32                     GicDOffset;
-  UINT32                     GicMSIOffset;
-  UINT32                     GicRedistOffset;
-  UINT32                     GicItsOffset;
+  EFI_STATUS                             Status;                                                  // [CODE_FIRST] 11148
+  UINT32                                 TableSize;                                               // [CODE_FIRST] 11148
+  UINT32                                 GicCCount;                                               // [CODE_FIRST] 11148
+  UINT32                                 GicDCount;                                               // [CODE_FIRST] 11148
+  UINT32                                 GicMSICount;                                             // [CODE_FIRST] 11148
+  UINT32                                 GicRedistCount;                                          // [CODE_FIRST] 11148
+  UINT32                                 GicItsCount;                                             // [CODE_FIRST] 11148
+  UINT32                                 GicIrsCount;                                             // [CODE_FIRST] 11148
+  UINT32                                 GicItsV5Count;                                           // [CODE_FIRST] 11148
+  UINT32                                 GicItsV5TransFrameCount;                                 // [CODE_FIRST] 11148
+  CM_ARM_GICC_INFO                       *GicCInfo;                                               // [CODE_FIRST] 11148
+  CM_ARM_GICD_INFO                       *GicDInfo;                                               // [CODE_FIRST] 11148
+  CM_ARM_GIC_MSI_FRAME_INFO              *GicMSIInfo;                                             // [CODE_FIRST] 11148
+  CM_ARM_GIC_REDIST_INFO                 *GicRedistInfo;                                          // [CODE_FIRST] 11148
+  CM_ARM_GIC_ITS_INFO                    *GicItsInfo;                                             // [CODE_FIRST] 11148
+  CM_ARM_GIC_IRS_INFO                    *GicIrsInfo;                                             // [CODE_FIRST] 11148
+  CM_ARM_GIC_ITSV5_INFO                  *GicItsV5Info;                                           // [CODE_FIRST] 11148
+  CM_ARM_GIC_ITSV5_TRANSLATE_FRAME_INFO  *GicItsV5TransFrameInfo;                                 // [CODE_FIRST] 11148
+  UINT32                                 GicCOffset;                                              // [CODE_FIRST] 11148
+  UINT32                                 GicDOffset;                                              // [CODE_FIRST] 11148
+  UINT32                                 GicMSIOffset;                                            // [CODE_FIRST] 11148
+  UINT32                                 GicRedistOffset;                                         // [CODE_FIRST] 11148
+  UINT32                                 GicItsOffset;                                            // [CODE_FIRST] 11148
+  UINT32                                 GicIrsOffset;                                            // [CODE_FIRST] 11148
+  UINT32                                 GicItsV5Offset;                                          // [CODE_FIRST] 11148
+  UINT32                                 GicItsV5TranslateFrameOffset;                            // [CODE_FIRST] 11148
 
-  EFI_ACPI_6_5_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER  *Madt;
+  EFI_ACPI_6_7_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER  *Madt;                                     // [CODE_FIRST] 11148
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -540,22 +778,16 @@ BuildMadtTable (
              &GicDInfo,
              &GicDCount
              );
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) &&                                                                           // [CODE_FIRST] 11148
+      ((AcpiTableInfo->AcpiTableRevision < EFI_ACPI_6_7_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION) ||  // [CODE_FIRST] 11148
+       (Status != EFI_NOT_FOUND)))                                                                    // [CODE_FIRST] 11148
+  {
+    // [CODE_FIRST] 11148
     DEBUG ((
       DEBUG_ERROR,
       "ERROR: MADT: Failed to get GICD Info. Status = %r\n",
       Status
       ));
-    goto error_handler;
-  }
-
-  if (GicDCount == 0) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: MADT: GIC Distributor information not provided.\n"
-      ));
-    ASSERT (GicDCount != 0);
-    Status = EFI_INVALID_PARAMETER;
     goto error_handler;
   }
 
@@ -616,10 +848,95 @@ BuildMadtTable (
     goto error_handler;
   }
 
-  TableSize = sizeof (EFI_ACPI_6_5_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER);
+  Status = GetEArmObjGicIrsInfo (
+                             // [CODE_FIRST] 11148
+             CfgMgrProtocol, // [CODE_FIRST] 11148
+             CM_NULL_TOKEN,  // [CODE_FIRST] 11148
+             &GicIrsInfo,    // [CODE_FIRST] 11148
+             &GicIrsCount    // [CODE_FIRST] 11148
+             );              // [CODE_FIRST] 11148
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    // [CODE_FIRST] 11148
+    DEBUG ((
+      // [CODE_FIRST] 11148
+      DEBUG_ERROR,                                                                                // [CODE_FIRST] 11148
+      "ERROR: MADT: Failed to get GIC IRS Info. Status = %r\n",                                   // [CODE_FIRST] 11148
+      Status                                                                                      // [CODE_FIRST] 11148
+      ));                                                                                         // [CODE_FIRST] 11148
+    goto error_handler;                                                                           // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
+  Status = GetEArmObjGicItsV5Info (
+                             // [CODE_FIRST] 11148
+             CfgMgrProtocol, // [CODE_FIRST] 11148
+             CM_NULL_TOKEN,  // [CODE_FIRST] 11148
+             &GicItsV5Info,  // [CODE_FIRST] 11148
+             &GicItsV5Count  // [CODE_FIRST] 11148
+             );              // [CODE_FIRST] 11148
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    // [CODE_FIRST] 11148
+    DEBUG ((
+      // [CODE_FIRST] 11148
+      DEBUG_ERROR,                                                                                // [CODE_FIRST] 11148
+      "ERROR: MADT: Failed to get GIC ITSv5 Info. Status = %r\n",                                 // [CODE_FIRST] 11148
+      Status                                                                                      // [CODE_FIRST] 11148
+      ));                                                                                         // [CODE_FIRST] 11148
+    goto error_handler;                                                                           // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
+  Status = GetEArmObjGicItsV5TranslateFrameInfo (
+                                      // [CODE_FIRST] 11148
+             CfgMgrProtocol,          // [CODE_FIRST] 11148
+             CM_NULL_TOKEN,           // [CODE_FIRST] 11148
+             &GicItsV5TransFrameInfo, // [CODE_FIRST] 11148
+             &GicItsV5TransFrameCount // [CODE_FIRST] 11148
+             );                       // [CODE_FIRST] 11148
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    // [CODE_FIRST] 11148
+    DEBUG ((
+      // [CODE_FIRST] 11148
+      DEBUG_ERROR,                                                                                // [CODE_FIRST] 11148
+      "ERROR: MADT: Failed to get GIC ITSv5 Info. Status = %r\n",                                 // [CODE_FIRST] 11148
+      Status                                                                                      // [CODE_FIRST] 11148
+      ));                                                                                         // [CODE_FIRST] 11148
+    goto error_handler;                                                                           // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
+  if (((GicIrsCount == 0) && (GicDCount == 0)) ||                                                 // [CODE_FIRST] 11148
+      ((GicIrsCount > 0) && (GicDCount > 0)))                                                     // [CODE_FIRST] 11148
+  {
+    // [CODE_FIRST] 11148
+    Status = EFI_INVALID_PARAMETER;                                                               // [CODE_FIRST] 11148
+    DEBUG ((
+      // [CODE_FIRST] 11148
+      DEBUG_ERROR,                                                                                // [CODE_FIRST] 11148
+      "ERROR: MADT: No GicIrs and GicD Info or have both. Status = %r\n",                         // [CODE_FIRST] 11148
+      Status                                                                                      // [CODE_FIRST] 11148
+      ));                                                                                         // [CODE_FIRST] 11148
+    goto error_handler;                                                                           // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
+  if ((GicItsV5Count != 0) && (GicItsV5Count > GicItsV5TransFrameCount)) {
+    // [CODE_FIRST] 11148
+    Status = EFI_INVALID_PARAMETER;                                                               // [CODE_FIRST] 11148
+    DEBUG ((
+      // [CODE_FIRST] 11148
+      DEBUG_ERROR,                                                                                // [CODE_FIRST] 11148
+      "ERROR: MADT: Each GicItsV5 should have at least 1 Translate Frame. Status = %r\n",         // [CODE_FIRST] 11148
+      Status                                                                                      // [CODE_FIRST] 11148
+      ));                                                                                         // [CODE_FIRST] 11148
+    goto error_handler;                                                                           // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
+  TableSize = sizeof (EFI_ACPI_6_7_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER);                       // [CODE_FIRST] 11148
 
   GicCOffset = TableSize;
-  TableSize += (sizeof (EFI_ACPI_6_5_GIC_STRUCTURE) * GicCCount);
+  TableSize += (sizeof (EFI_ACPI_6_7_GIC_STRUCTURE) * GicCCount);                                 // [CODE_FIRST] 11148
 
   GicDOffset = TableSize;
   TableSize += (sizeof (EFI_ACPI_6_5_GIC_DISTRIBUTOR_STRUCTURE) * GicDCount);
@@ -633,6 +950,16 @@ BuildMadtTable (
   GicItsOffset = TableSize;
   TableSize   += (sizeof (EFI_ACPI_6_5_GIC_ITS_STRUCTURE) * GicItsCount);
 
+  GicIrsOffset = TableSize;                                                                       // [CODE_FIRST] 11148
+  TableSize   += (sizeof (EFI_ACPI_6_7_GIC_IRS_STRUCTURE) * GicIrsCount);                         // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  GicItsV5Offset = TableSize;                                                                     // [CODE_FIRST] 11148
+  TableSize     += (sizeof (EFI_ACPI_6_7_GIC_ITSV5_STRUCTURE) * GicItsV5Count);                   // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
+  GicItsV5TranslateFrameOffset = TableSize;                                                       // [CODE_FIRST] 11148
+  TableSize                   += (sizeof (EFI_ACPI_6_7_GIC_ITSV5_TRANSLATE_FRAME_STRUCTURE) *     // [CODE_FIRST] 11148
+                                  GicItsV5TransFrameCount);                                       // [CODE_FIRST] 11148
+                                                                                                  // [CODE_FIRST] 11148
   // Allocate the Buffer for MADT table
   *Table = (EFI_ACPI_DESCRIPTION_HEADER *)AllocateZeroPool (TableSize);
   if (*Table == NULL) {
@@ -647,7 +974,7 @@ BuildMadtTable (
     goto error_handler;
   }
 
-  Madt = (EFI_ACPI_6_5_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER *)*Table;
+  Madt = (EFI_ACPI_6_7_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER *)*Table;                           // [CODE_FIRST] 11148
 
   DEBUG ((
     DEBUG_INFO,
@@ -673,7 +1000,7 @@ BuildMadtTable (
   }
 
   Status = AddGICCList (
-             (EFI_ACPI_6_5_GIC_STRUCTURE *)((UINT8 *)Madt + GicCOffset),
+             (EFI_ACPI_6_7_GIC_STRUCTURE *)((UINT8 *)Madt + GicCOffset),                          // [CODE_FIRST] 11148
              GicCInfo,
              GicCCount,
              Madt->Header.Revision,
@@ -688,10 +1015,14 @@ BuildMadtTable (
     goto error_handler;
   }
 
-  AddGICD (
-    (EFI_ACPI_6_5_GIC_DISTRIBUTOR_STRUCTURE *)((UINT8 *)Madt + GicDOffset),
-    GicDInfo
-    );
+  if (GicDCount != 0) {
+    // [CODE_FIRST] 11148
+    AddGICD (
+      // [CODE_FIRST] 11148
+      (EFI_ACPI_6_5_GIC_DISTRIBUTOR_STRUCTURE *)((UINT8 *)Madt + GicDOffset),                     // [CODE_FIRST] 11148
+      GicDInfo                                                                                    // [CODE_FIRST] 11148
+      );                                                                                          // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
 
   if (GicMSICount != 0) {
     AddGICMsiFrameInfoList (
@@ -717,6 +1048,39 @@ BuildMadtTable (
       );
   }
 
+  if (GicIrsCount != 0) {
+    // [CODE_FIRST] 11148
+    AddGICIrsList (
+      // [CODE_FIRST] 11148
+      (EFI_ACPI_6_7_GIC_IRS_STRUCTURE *)((UINT8 *)Madt + GicIrsOffset),                           // [CODE_FIRST] 11148
+      GicIrsInfo,                                                                                 // [CODE_FIRST] 11148
+      GicIrsCount                                                                                 // [CODE_FIRST] 11148
+      );                                                                                          // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
+  if (GicItsV5Count != 0) {
+    // [CODE_FIRST] 11148
+    AddGICItsV5List (
+      // [CODE_FIRST] 11148
+      (EFI_ACPI_6_7_GIC_ITSV5_STRUCTURE *)((UINT8 *)Madt + GicItsV5Offset),                       // [CODE_FIRST] 11148
+      GicItsV5Info,                                                                               // [CODE_FIRST] 11148
+      GicItsV5Count                                                                               // [CODE_FIRST] 11148
+      );                                                                                          // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
+  if (GicItsV5TransFrameCount != 0) {
+    // [CODE_FIRST] 11148
+    AddGICItsV5TranslateFrameList (
+      // [CODE_FIRST] 11148
+      (EFI_ACPI_6_7_GIC_ITSV5_TRANSLATE_FRAME_STRUCTURE *)((UINT8 *)Madt + GicItsV5TranslateFrameOffset), // [CODE_FIRST] 11148
+      GicItsV5TransFrameInfo,                                                                             // [CODE_FIRST] 11148
+      GicItsV5TransFrameCount                                                                             // [CODE_FIRST] 11148
+      );                                                                                                  // [CODE_FIRST] 11148
+  }                                                                                               // [CODE_FIRST] 11148
+
+  // [CODE_FIRST] 11148
   return EFI_SUCCESS;
 
 error_handler:
@@ -779,9 +1143,9 @@ ACPI_TABLE_GENERATOR  MadtGenerator = {
   // Generator Description
   L"ACPI.STD.MADT.GENERATOR",
   // ACPI Table Signature
-  EFI_ACPI_6_5_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE,
+  EFI_ACPI_6_7_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE,                                         // [CODE_FIRST] 11148
   // ACPI Table Revision supported by this Generator
-  EFI_ACPI_6_5_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION,
+  EFI_ACPI_6_7_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION,                                          // [CODE_FIRST] 11148
   // Minimum supported ACPI Table Revision
   EFI_ACPI_6_2_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION,
   // Creator ID
