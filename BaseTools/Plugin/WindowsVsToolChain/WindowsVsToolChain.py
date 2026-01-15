@@ -28,7 +28,7 @@ class WindowsVsToolChain(IUefiBuildPlugin):
         self.Logger = logging.getLogger("WindowsVsToolChain")
         interesting_keys = ["ExtensionSdkDir", "INCLUDE", "LIB", "LIBPATH", "UniversalCRTSdkDir",
                             "UCRTVersion", "WindowsLibPath", "WindowsSdkBinPath", "WindowsSdkDir", "WindowsSdkVerBinPath",
-                            "WindowsSDKVersion", "VCToolsInstallDir", "Path"]
+                            "WindowsSDKVersion", "WindowsSDKLibVersion", "VCToolsInstallDir", "Path"]
 
         #
         # VS2017 - Follow VS2017 where there is potential for many versions of the tools.
