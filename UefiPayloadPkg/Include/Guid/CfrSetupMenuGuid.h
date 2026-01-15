@@ -36,20 +36,23 @@ extern EFI_GUID gEfiCfrSetupMenuFormGuid;
  */
 enum cfr_option_flags {
   CFR_OPTFLAG_READONLY  = 1 << 0,
-  CFR_OPTFLAG_GRAYOUT   = 1 << 1,
+  CFR_OPTFLAG_INACTIVE  = 1 << 1,
   CFR_OPTFLAG_SUPPRESS  = 1 << 2,
   CFR_OPTFLAG_VOLATILE  = 1 << 3,
+  CFR_OPTFLAG_RUNTIME   = 1 << 4,
 };
 
 #define CB_TAG_CFR_VARCHAR_OPT_NAME     0x0007
 #define CB_TAG_CFR_VARCHAR_UI_NAME      0x0008
 #define CB_TAG_CFR_VARCHAR_UI_HELPTEXT  0x0009
 #define CB_TAG_CFR_VARCHAR_DEF_VALUE    0x000a
+#define CB_TAG_CFR_DEP_VALUES           0x000c
 #pragma pack (1)
 typedef struct {
   UINT32  tag;          /*
                          * CFR_TAG_VARCHAR_OPT_NAME, CFR_TAG_VARCHAR_UI_NAME,
-                         * CFR_TAG_VARCHAR_UI_HELPTEXT or CFR_TAG_VARCHAR_DEF_VALUE
+                         * CFR_TAG_VARCHAR_UI_HELPTEXT, CFR_TAG_VARCHAR_DEF_VALUE
+                         * or CFR_TAG_DEP_VALUES
                          */
   UINT32  size;         /* Length of the entire structure */
   UINT32  data_length;  /* Length of data, including NULL terminator for strings */
@@ -91,6 +94,7 @@ typedef struct {
    * CFR_VARCHAR_OPT_NAME     opt_name
    * CFR_VARCHAR_UI_NAME      ui_name
    * CFR_VARCHAR_UI_HELPTEXT  ui_helptext (Optional)
+   * CFR_DEP_VALUES           dependency_values (Optional)
    * CFR_ENUM_VALUE           enum_values[]
    */
 } CFR_OPTION_NUMERIC;
@@ -106,6 +110,7 @@ typedef struct {
    * CFR_OPT_NAME     opt_name
    * CFR_UI_NAME      ui_name
    * CFR_UI_HELPTEXT  ui_helptext (Optional)
+   * CFR_DEP_VALUES   dependency_values (Optional)
    * CFR_VARCHAR      default_value
    */
 } CFR_OPTION_VARCHAR;
@@ -125,6 +130,7 @@ typedef struct {
   /*
    * CFR_UI_NAME      ui_name
    * CFR_UI_HELPTEXT  ui_helptext (Optional)
+   * CFR_DEP_VALUES   dependency_values (Optional)
    */
 } CFR_OPTION_COMMENT;
 
@@ -138,6 +144,7 @@ typedef struct {
   UINT32                flags;            /* enum cfr_option_flags */
   /*
    * CFR_UI_NAME        ui_name
+   * CFR_DEP_VALUES     dependency_values (Optional)
    * <T in CFR_OPTION>  options[]
    */
 } CFR_OPTION_FORM;
