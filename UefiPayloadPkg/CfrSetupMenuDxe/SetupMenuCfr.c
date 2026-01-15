@@ -61,6 +61,25 @@ CfrConvertVarBinaryToStrings (
 }
 
 /**
+  CFR_VARBINARY records are used to store a list of dependency values.
+  Get a pointer to an array of enum values and its length.
+**/
+STATIC
+VOID
+EFIAPI
+CfrConvertVarBinaryToUint32Array (
+  IN     CFR_VARBINARY  *CfrList,
+  IN OUT UINT32         **Array,
+     OUT UINT32         *ArrayLength
+  )
+{
+  ASSERT ((CfrList != NULL) && (Array != NULL) && (ArrayLength != NULL));
+
+  *Array = (UINT32 *)CfrList->data;
+  *ArrayLength = CfrList->data_length / sizeof (UINT32);
+}
+
+/**
   Produce unconditional HII `*_IF` for CFR flags.
 
   Caller to close each `*_IF` with `HiiCreateEndOpCode()`.
@@ -108,6 +127,101 @@ CfrProduceHiiForFlags (
 }
 
 /**
+  Produce conditional HII `SUPPRESS_IF` based on a dependency:
+
+  Caller to close each `SUPPRESS_IF` with `HiiCreateEndOpCode()`.
+
+**/
+STATIC
+VOID
+EFIAPI
+CfrProduceHiiForDependency (
+  IN VOID    *StartOpCodeHandle,
+  IN UINTN   DependencyId,
+  IN UINT32  *DepValues,
+  IN UINT32  NumDepValues
+  )
+{
+  EFI_IFR_OP_HEADER       OpHeader;
+  UINT8                   *TempHiiBuffer;
+  UINTN                   EqIdValListSize;
+  EFI_IFR_EQ_ID_VAL_LIST  *EqIdValList;
+  EFI_IFR_EQ_ID_VAL       EqIdVal;
+  UINTN                   Index;
+
+  OpHeader.OpCode = EFI_IFR_SUPPRESS_IF_OP;
+  OpHeader.Length = sizeof (EFI_IFR_OP_HEADER);
+  OpHeader.Scope = 1;
+
+  TempHiiBuffer = HiiCreateRawOpCodes (
+                    StartOpCodeHandle,
+                    (UINT8 *)&OpHeader,
+                    sizeof (EFI_IFR_OP_HEADER)
+                    );
+  ASSERT (TempHiiBuffer != NULL);
+
+  if (NumDepValues != 0) {
+    EqIdValListSize = sizeof (EFI_IFR_EQ_ID_VAL_LIST) + ((NumDepValues - 1) * sizeof (UINT16));
+    EqIdValList = AllocatePool (EqIdValListSize);
+    ASSERT (EqIdValList != NULL);
+
+    EqIdValList->Header.OpCode = EFI_IFR_EQ_ID_VAL_LIST_OP;
+    EqIdValList->Header.Length = EqIdValListSize;
+    EqIdValList->Header.Scope = 1;
+
+    EqIdValList->QuestionId = DependencyId;
+    EqIdValList->ListLength = NumDepValues;
+    for (Index = 0; Index < NumDepValues; Index++) {
+      EqIdValList->ValueList[Index] = (UINT16)*DepValues++;
+    }
+
+    TempHiiBuffer = HiiCreateRawOpCodes (
+                      StartOpCodeHandle,
+                      (UINT8 *)EqIdValList,
+                      EqIdValListSize
+                      );
+    ASSERT (TempHiiBuffer != NULL);
+
+    FreePool (EqIdValList);
+
+    OpHeader.OpCode = EFI_IFR_NOT_OP;
+    OpHeader.Length = sizeof (EFI_IFR_OP_HEADER);
+    OpHeader.Scope = 0;
+
+    TempHiiBuffer = HiiCreateRawOpCodes (
+                      StartOpCodeHandle,
+                      (UINT8 *)&OpHeader,
+                      sizeof (EFI_IFR_OP_HEADER)
+                      );
+    ASSERT (TempHiiBuffer != NULL);
+  } else {
+    EqIdVal.Header.OpCode = EFI_IFR_EQ_ID_VAL_OP;
+    EqIdVal.Header.Length = sizeof (EFI_IFR_EQ_ID_VAL);
+    EqIdVal.Header.Scope = 1;
+    EqIdVal.QuestionId = DependencyId;
+    EqIdVal.Value = 0;
+
+    TempHiiBuffer = HiiCreateRawOpCodes (
+                      StartOpCodeHandle,
+                      (UINT8 *)&EqIdVal,
+                      sizeof (EFI_IFR_EQ_ID_VAL)
+                      );
+    ASSERT (TempHiiBuffer != NULL);
+  }
+
+  OpHeader.OpCode = EFI_IFR_END_OP;
+  OpHeader.Length = sizeof (EFI_IFR_OP_HEADER);
+  OpHeader.Scope = 0;
+
+  TempHiiBuffer = HiiCreateRawOpCodes (
+                    StartOpCodeHandle,
+                    (UINT8 *)&OpHeader,
+                    sizeof (EFI_IFR_OP_HEADER)
+                    );
+  ASSERT (TempHiiBuffer != NULL);
+}
+
+/**
   Produce variable and VARSTORE for CFR option name.
 
 **/
@@ -143,6 +257,9 @@ CfrProduceStorageForOption (
   VariableAttributes = EFI_VARIABLE_BOOTSERVICE_ACCESS;
   if (!(OptionFlags & CFR_OPTFLAG_VOLATILE)) {
     VariableAttributes |= EFI_VARIABLE_NON_VOLATILE;
+  }
+  if (OptionFlags & CFR_OPTFLAG_RUNTIME) {
+    VariableAttributes |= EFI_VARIABLE_RUNTIME_ACCESS;
   }
 
   DataSize = 0;
@@ -240,6 +357,9 @@ CfrProcessFormOption (
   )
 {
   CFR_VARBINARY       *CfrFormName;
+  UINT32              *DepValues;
+  UINT32              NumDepValues;
+  CFR_VARBINARY       *CfrDepValues;
   CHAR16              *HiiFormNameString;
   EFI_STRING_ID       HiiFormNameStringId;
   UINT8               *TempHiiBuffer;
@@ -251,6 +371,15 @@ CfrProcessFormOption (
   CfrFormName = CfrExtractVarBinary ((UINT8 *)Option, ProcessedLength, CB_TAG_CFR_VARCHAR_UI_NAME);
   ASSERT (CfrFormName != NULL);
 
+  // Dependency values are optional
+  DepValues = NULL;
+  NumDepValues = 0;
+  CfrDepValues = CfrExtractVarBinary ((UINT8 *)Option, ProcessedLength, CB_TAG_CFR_DEP_VALUES);
+  if (CfrDepValues != NULL) {
+    ASSERT (CfrDepValues->tag == CB_TAG_CFR_DEP_VALUES);
+    CfrConvertVarBinaryToUint32Array (CfrDepValues, &DepValues, &NumDepValues);
+  }
+
   DEBUG ((
     DEBUG_INFO,
     "CFR: Processing form \"%a\", size 0x%x\n",
@@ -260,6 +389,15 @@ CfrProcessFormOption (
 
   CfrConvertVarBinaryToStrings (CfrFormName, &HiiFormNameString, &HiiFormNameStringId);
   FreePool (HiiFormNameString);
+
+  if (Option->dependency_id) {
+    CfrProduceHiiForDependency (
+      StartOpCodeHandle,
+      CFR_COMPONENT_START + Option->dependency_id,
+      DepValues,
+      NumDepValues
+      );
+  }
 
   if (Option->flags & CFR_OPTFLAG_SUPPRESS) {
     CfrProduceHiiForFlags (StartOpCodeHandle, EFI_IFR_SUPPRESS_IF_OP);
@@ -285,6 +423,11 @@ CfrProcessFormOption (
     TempHiiBuffer = HiiCreateEndOpCode (StartOpCodeHandle);
     ASSERT (TempHiiBuffer != NULL);
   }
+
+  if (Option->dependency_id) {
+    TempHiiBuffer = HiiCreateEndOpCode (StartOpCodeHandle);
+    ASSERT (TempHiiBuffer != NULL);
+  }
 }
 
 /**
@@ -304,6 +447,9 @@ CfrProcessNumericOption (
   CFR_VARBINARY   *CfrOptionName;
   CFR_VARBINARY   *CfrDisplayName;
   CFR_VARBINARY   *CfrHelpText;
+  UINT32          *DepValues;
+  UINT32          NumDepValues;
+  CFR_VARBINARY   *CfrDepValues;
   UINTN           QuestionIdVarStoreId;
   UINT8           QuestionFlags;
   VOID            *DefaultOpCodeHandle;
@@ -334,6 +480,15 @@ CfrProcessNumericOption (
     ASSERT (CfrHelpText->tag == CB_TAG_CFR_VARCHAR_UI_HELPTEXT);
   }
 
+  // Dependency values are optional
+  DepValues = NULL;
+  NumDepValues = 0;
+  CfrDepValues = CfrExtractVarBinary ((UINT8 *)Option, &OptionProcessedLength, CB_TAG_CFR_DEP_VALUES);
+  if (CfrDepValues != NULL) {
+    ASSERT (CfrDepValues->tag == CB_TAG_CFR_DEP_VALUES);
+    CfrConvertVarBinaryToUint32Array (CfrDepValues, &DepValues, &NumDepValues);
+  }
+
   DEBUG ((
     DEBUG_INFO,
     "CFR: Processing option \"%a\", size 0x%x\n",
@@ -357,6 +512,15 @@ CfrProcessNumericOption (
   QuestionFlags = EFI_IFR_FLAG_RESET_REQUIRED;
   if (Option->flags & CFR_OPTFLAG_READONLY) {
     QuestionFlags |= EFI_IFR_FLAG_READ_ONLY;
+  }
+
+  if (Option->dependency_id) {
+    CfrProduceHiiForDependency (
+      StartOpCodeHandle,
+      CFR_COMPONENT_START + Option->dependency_id,
+      DepValues,
+      NumDepValues
+      );
   }
 
   if (Option->flags & CFR_OPTFLAG_SUPPRESS) {
@@ -472,6 +636,11 @@ CfrProcessNumericOption (
     ASSERT (TempHiiBuffer != NULL);
   }
 
+  if (Option->dependency_id) {
+    TempHiiBuffer = HiiCreateEndOpCode (StartOpCodeHandle);
+    ASSERT (TempHiiBuffer != NULL);
+  }
+
   if (OptionOpCodeHandle != NULL) {
     HiiFreeOpCodeHandle (OptionOpCodeHandle);
   }
@@ -499,6 +668,9 @@ CfrProcessCharacterOption (
   CFR_VARBINARY   *CfrDisplayName;
   CFR_VARBINARY   *CfrHelpText;
   CFR_VARBINARY   *CfrDefaultValue;
+  UINT32          *DepValues;
+  UINT32          NumDepValues;
+  CFR_VARBINARY   *CfrDepValues;
   UINTN           QuestionIdVarStoreId;
   CHAR16          *HiiDefaultValue;
   EFI_STRING_ID   HiiDefaultValueId;
@@ -542,6 +714,15 @@ CfrProcessCharacterOption (
     ASSERT (CfrHelpText->tag == CB_TAG_CFR_VARCHAR_UI_HELPTEXT);
   }
 
+  // Dependency values are optional
+  DepValues = NULL;
+  NumDepValues = 0;
+  CfrDepValues = CfrExtractVarBinary ((UINT8 *)Option, &OptionProcessedLength, CB_TAG_CFR_DEP_VALUES);
+  if (CfrDepValues != NULL) {
+    ASSERT (CfrDepValues->tag == CB_TAG_CFR_DEP_VALUES);
+    CfrConvertVarBinaryToUint32Array (CfrDepValues, &DepValues, &NumDepValues);
+  }
+
   DEBUG ((
     DEBUG_INFO,
     "CFR: Processing option \"%a\", size 0x%x\n",
@@ -576,6 +757,15 @@ CfrProcessCharacterOption (
     if (HiiDefaultValue != NULL) {
       FreePool (HiiDefaultValue);
     }
+  }
+
+  if (Option->dependency_id) {
+    CfrProduceHiiForDependency (
+      StartOpCodeHandle,
+      CFR_COMPONENT_START + Option->dependency_id,
+      DepValues,
+      NumDepValues
+      );
   }
 
   if (Option->flags & CFR_OPTFLAG_SUPPRESS) {
@@ -647,6 +837,11 @@ CfrProcessCharacterOption (
     ASSERT (TempHiiBuffer != NULL);
   }
   if (Option->flags & CFR_OPTFLAG_SUPPRESS) {
+    TempHiiBuffer = HiiCreateEndOpCode (StartOpCodeHandle);
+    ASSERT (TempHiiBuffer != NULL);
+  }
+
+  if (Option->dependency_id) {
     TempHiiBuffer = HiiCreateEndOpCode (StartOpCodeHandle);
     ASSERT (TempHiiBuffer != NULL);
   }
