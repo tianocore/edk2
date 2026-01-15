@@ -850,6 +850,143 @@ InitializeMiscMmCommunicateBuffer (
 }
 
 /**
+  Parse SPM-MM request from EventCompleteSvcArgs.
+
+  @param  [in]  EventCompleteSvcArgs   Pointer to the event completion arguments.
+  @param  [out] MmHandlerContext       MmHandlerContext.
+  @param  [out] CommBufferAddr         Request buffer address.
+
+  @retval EFI_SUCCESS                  Success.
+  @retval EFI_INVALID_PARAMETER        Invalid request.
+
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+ParseSpmMmSvcRequest (
+  IN ARM_SVC_ARGS             *EventCompleteSvcArgs,
+  OUT ARM_MM_HANDLER_CONTEXT  *MmHandlerContext,
+  UINTN                       *CommBufferAddr
+  )
+{
+  SPM_MM_MSG_INFO  *SpmMmInfo;
+
+  /*
+   * Register Convention for SPM_MM
+   *   Arg0: ARM_SMC_ID_MM_COMMUNICATE
+   *   Arg1: Communication Buffer
+   *   Arg2: Size of Communication Buffer
+   *   Arg3: Cpu number where StandaloneMm running on.
+   *
+   *   See tf-a/services/std_svc/spm/spm_mm/spm_mm_main.c
+   */
+  if (EventCompleteSvcArgs->Arg0 != ARM_SMC_ID_MM_COMMUNICATE) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Error: Unrecognized SPM_MM Id: 0x%x\n",
+      EventCompleteSvcArgs->Arg0
+      ));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  SpmMmInfo                = &MmHandlerContext->CtxData.SpmMmInfo;
+  *CommBufferAddr          = EventCompleteSvcArgs->Arg1;
+  SpmMmInfo->ServiceType   = ServiceTypeMmCommunication;
+  SpmMmInfo->SecureRequest = IsSecureMmCommBufferAddr (*CommBufferAddr);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Parse FF-A request from EventCompleteSvcArgs.
+
+  @param  [in]  EventCompleteSvcArgs   Pointer to the event completion arguments.
+  @param  [out] MmHandlerContext       MmHandlerContext.
+  @param  [out] CommBufferAddr         Request buffer address.
+
+  @retval EFI_SUCCESS                  Success.
+  @retval EFI_INVALID_PARAMETER        Invalid FF-A request.
+
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+ParseFfaSvcRequest (
+  IN ARM_SVC_ARGS             *EventCompleteSvcArgs,
+  OUT ARM_MM_HANDLER_CONTEXT  *MmHandlerContext,
+  UINTN                       *CommBufferAddr
+  )
+{
+  FFA_MSG_INFO  *FfaMsgInfo;
+  SERVICE_TYPE  ServiceType;
+  EFI_GUID      ServiceGuid;
+  UINT64        Uuid[2];
+
+  MmHandlerContext->CommProtocol = CommProtocolFfa;
+
+  /*
+   * Register Convention for FF-A
+   *   Arg0: ARM_FID_FFA_MSG_SEND_DIRECT_REQ/REQ2
+   *   Arg1: Sender and Receiver endpoint IDs.
+   *   Arg2: Message Flags for ARM_FID_FFA_MSG_SEND_DIRECT_REQ
+   *         Low 8 bytes of UUID for ARM_FID_FFA_MSG_SEND_DIRECT_REQ2
+   *   Arg3: Implementation Defined for ARM_FID_FFA_MSG_SEND_DIRECT_REQ
+   *         High 8 bytes of UUID for ARM_FID_FFA_MSG_SEND_DIRECT_REQ2
+   *   Others: Implementation Defined.
+   *
+   *   See Arm Firmware Framework for Arm A-Profile for detail.
+   */
+
+  FfaMsgInfo               = &MmHandlerContext->CtxData.FfaMsgInfo;
+  FfaMsgInfo->SourcePartId = GET_SOURCE_PARTITION_ID (EventCompleteSvcArgs->Arg1);
+  FfaMsgInfo->DestPartId   = GET_DEST_PARTITION_ID (EventCompleteSvcArgs->Arg1);
+
+  if (EventCompleteSvcArgs->Arg0 == ARM_FID_FFA_MSG_SEND_DIRECT_REQ) {
+    FfaMsgInfo->DirectMsgVersion = DirectMsgV1;
+    ServiceType                  = ServiceTypeMmCommunication;
+  } else if (EventCompleteSvcArgs->Arg0 == ARM_FID_FFA_MSG_SEND_DIRECT_REQ2) {
+    FfaMsgInfo->DirectMsgVersion = DirectMsgV2;
+    Uuid[0]                      = EventCompleteSvcArgs->Arg2;
+    Uuid[1]                      = EventCompleteSvcArgs->Arg3;
+    ConvertUuidToGuid ((GUID *)Uuid, &ServiceGuid);
+    ServiceType = GetServiceType (&ServiceGuid);
+  } else {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Error: Unrecognized FF-A Id: 0x%x\n",
+      EventCompleteSvcArgs->Arg0
+      ));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  FfaMsgInfo->ServiceType = ServiceType;
+
+  if (ServiceType == ServiceTypeMmCommunication) {
+    if (FfaMsgInfo->DirectMsgVersion == DirectMsgV1) {
+      *CommBufferAddr = EventCompleteSvcArgs->Arg3;
+    } else {
+      *CommBufferAddr = EventCompleteSvcArgs->Arg4;
+    }
+  } else if (ServiceType == ServiceTypeMisc) {
+    /*
+     * In case of Misc service, generate mm communication header
+     * to dispatch service via StandaloneMmCore.
+     */
+    InitializeMiscMmCommunicateBuffer (
+      EventCompleteSvcArgs,
+      &ServiceGuid,
+      mMiscMmCommunicateBuffer
+      );
+    *CommBufferAddr = (UINTN)mMiscMmCommunicateBuffer;
+  } else {
+    DEBUG ((DEBUG_ERROR, "Error: Invalid FF-A Service...\n"));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   A loop to delegate events from SPMC.
   DelegatedEventLoop() calls ArmCallSvc() to exit to SPMC.
   When an event is delegated to StandaloneMm the SPMC returns control
@@ -870,14 +1007,10 @@ DelegatedEventLoop (
   )
 {
   EFI_STATUS              Status;
-  UINT64                  Uuid[2];
   VOID                    *CommData;
-  EFI_GUID                ServiceGuid;
   SERVICE_TYPE            ServiceType;
   UINTN                   CommBufferAddr;
   ARM_MM_HANDLER_CONTEXT  MmHandlerContext;
-  FFA_MSG_INFO            *FfaMsgInfo;
-  SPM_MM_MSG_INFO         *SpmMmInfo;
 
   CommData = NULL;
 
@@ -899,91 +1032,28 @@ DelegatedEventLoop (
     MmHandlerContext.CommProtocol = CommProtocol;
 
     if (CommProtocol == CommProtocolFfa) {
-      /*
-       * Register Convention for FF-A
-       *   Arg0: ARM_FID_FFA_MSG_SEND_DIRECT_REQ/REQ2
-       *   Arg1: Sender and Receiver endpoint IDs.
-       *   Arg2: Message Flags for ARM_FID_FFA_MSG_SEND_DIRECT_REQ
-       *         Low 8 bytes of UUID for ARM_FID_FFA_MSG_SEND_DIRECT_REQ2
-       *   Arg3: Implementation Defined for ARM_FID_FFA_MSG_SEND_DIRECT_REQ
-       *         High 8 bytes of UUID for ARM_FID_FFA_MSG_SEND_DIRECT_REQ2
-       *   Others: Implementation Defined.
-       *
-       *   See Arm Firmware Framework for Arm A-Profile for detail.
-       */
-      FfaMsgInfo               = &MmHandlerContext.CtxData.FfaMsgInfo;
-      FfaMsgInfo->SourcePartId = GET_SOURCE_PARTITION_ID (EventCompleteSvcArgs->Arg1);
-      FfaMsgInfo->DestPartId   = GET_DEST_PARTITION_ID (EventCompleteSvcArgs->Arg1);
-      CommData                 = FfaMsgInfo;
-
-      if (EventCompleteSvcArgs->Arg0 == ARM_FID_FFA_MSG_SEND_DIRECT_REQ) {
-        FfaMsgInfo->DirectMsgVersion = DirectMsgV1;
-        ServiceType                  = ServiceTypeMmCommunication;
-      } else if (EventCompleteSvcArgs->Arg0 == ARM_FID_FFA_MSG_SEND_DIRECT_REQ2) {
-        FfaMsgInfo->DirectMsgVersion = DirectMsgV2;
-        Uuid[0]                      = EventCompleteSvcArgs->Arg2;
-        Uuid[1]                      = EventCompleteSvcArgs->Arg3;
-        ConvertUuidToGuid ((GUID *)Uuid, &ServiceGuid);
-        ServiceType = GetServiceType (&ServiceGuid);
-      } else {
-        Status = EFI_INVALID_PARAMETER;
-        DEBUG ((
-          DEBUG_ERROR,
-          "Error: Unrecognized FF-A Id: 0x%x\n",
-          EventCompleteSvcArgs->Arg0
-          ));
+      Status = ParseFfaSvcRequest (
+                 EventCompleteSvcArgs,
+                 &MmHandlerContext,
+                 &CommBufferAddr
+                 );
+      if (EFI_ERROR (Status)) {
         goto ExitHandler;
       }
 
-      FfaMsgInfo->ServiceType = ServiceType;
-
-      if (ServiceType == ServiceTypeMmCommunication) {
-        if (FfaMsgInfo->DirectMsgVersion == DirectMsgV1) {
-          CommBufferAddr = EventCompleteSvcArgs->Arg3;
-        } else {
-          CommBufferAddr = EventCompleteSvcArgs->Arg4;
-        }
-      } else if (ServiceType == ServiceTypeMisc) {
-        /*
-         * In case of Misc service, generate mm communication header
-         * to dispatch service via StandaloneMmCore.
-         */
-        InitializeMiscMmCommunicateBuffer (
-          EventCompleteSvcArgs,
-          &ServiceGuid,
-          mMiscMmCommunicateBuffer
-          );
-        CommBufferAddr = (UINTN)mMiscMmCommunicateBuffer;
-      } else {
-        Status = EFI_INVALID_PARAMETER;
-        DEBUG ((DEBUG_ERROR, "Error: Invalid FF-A Service...\n"));
-        goto ExitHandler;
-      }
+      ServiceType = MmHandlerContext.CtxData.FfaMsgInfo.ServiceType;
+      CommData    = &MmHandlerContext.CtxData.FfaMsgInfo;
     } else if (CommProtocol == CommProtocolSpmMm) {
-      /*
-       * Register Convention for SPM_MM
-       *   Arg0: ARM_SMC_ID_MM_COMMUNICATE
-       *   Arg1: Communication Buffer
-       *   Arg2: Size of Communication Buffer
-       *   Arg3: Cpu number where StandaloneMm running on.
-       *
-       *   See tf-a/services/std_svc/spm/spm_mm/spm_mm_main.c
-       */
-      if (EventCompleteSvcArgs->Arg0 != ARM_SMC_ID_MM_COMMUNICATE) {
-        Status = EFI_INVALID_PARAMETER;
-        DEBUG ((
-          DEBUG_ERROR,
-          "Error: Unrecognized SPM_MM Id: 0x%x\n",
-          EventCompleteSvcArgs->Arg0
-          ));
+      Status = ParseSpmMmSvcRequest (
+                 EventCompleteSvcArgs,
+                 &MmHandlerContext,
+                 &CommBufferAddr
+                 );
+      if (EFI_ERROR (Status)) {
         goto ExitHandler;
       }
 
-      SpmMmInfo                = &MmHandlerContext.CtxData.SpmMmInfo;
-      ServiceType              = ServiceTypeMmCommunication;
-      CommBufferAddr           = EventCompleteSvcArgs->Arg1;
-      SpmMmInfo->ServiceType   = ServiceType;
-      SpmMmInfo->SecureRequest = IsSecureMmCommBufferAddr (CommBufferAddr);
+      ServiceType = MmHandlerContext.CtxData.SpmMmInfo.ServiceType;
     }
 
     if (ServiceType == ServiceTypeMmCommunication) {
