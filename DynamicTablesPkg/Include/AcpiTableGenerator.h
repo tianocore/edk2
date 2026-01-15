@@ -84,6 +84,9 @@ The Dynamic Tables Framework implements the following ACPI table generators:
             Configuration Manager and builds the CEDT table.
   - SLIT  : The SLIT generator collates the SLIT information from the
             Configuration Manager and builds the SLIT table.
+  - MSCT  : The MSCT (Maximum System Characteristics Table) generator collates
+            the Maximum System Characteristics information from the
+            Configuration Manager and builds the MSCT table.
 */
 
 /** The ACPI_TABLE_GENERATOR_ID type describes ACPI table generator ID.
@@ -122,6 +125,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdCedt,                          ///< CEDT Generator
   EStdAcpiTableIdSlit,                          ///< SLIT Generator
   EStdAcpiTableIdRhct,                          ///< RHCT Generator
+  EStdAcpiTableIdMsct,                          ///< MSCT Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 

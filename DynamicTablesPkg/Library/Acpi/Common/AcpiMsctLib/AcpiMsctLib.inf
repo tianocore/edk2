@@ -1,0 +1,38 @@
+## @file
+# ACPI Maximum System Characteristics Table (MSCT) Generator
+#
+# Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 1.30
+  BASE_NAME      = AcpiMsctLib
+  FILE_GUID      = D4F5A6B7-C8D9-4E0A-B1C2-3D4E5F607182
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiMsctLibConstructor
+  DESTRUCTOR     = AcpiMsctLibDestructor
+
+[Sources]
+  MsctGenerator.c
+  MsctGenerator.h
+
+[Sources.x64]
+  X64/X64MsctGenerator.c
+
+[Sources.AARCH64]
+  Arm/ArmMsctGenerator.c
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  CmObjHelperLib
+  SortLib
+
