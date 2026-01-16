@@ -29,7 +29,7 @@ cd "$EDK2_DIR"
 # --------------------------------------------------
 log "Git preparation"
 
-git config --global --add safe.directory "$EDK2_DIR"
+#git config --global --add safe.directory "$EDK2_DIR"
 
 if [[ -n "$GIT_TAG" ]]; then
   echo "Using tag: $GIT_TAG"
