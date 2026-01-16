@@ -1,0 +1,56 @@
+name: OVMF Build (Secure + Standard) - Harbor
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Optional git tag (leave empty for Top Of Trunk)'
+        required: false
+        default: ''
+
+jobs:
+  ovmf-build:
+    runs-on: ubuntu-latest
+
+    container:
+      image: ghcr.io/tianocore/containers/ubuntu-24-test:latest
+      options: --user 1001:1001
+
+    env:
+      GIT_TAG: ${{ github.event.inputs.tag }}
+
+      # Harbor (reusing Artifactory-named secrets)
+      ARTIFACTORY_URL: ${{ secrets.ARTIFACTORY_URL }}
+      ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
+      ARTIFACTORY_API_KEY: ${{ secrets.ARTIFACTORY_API_KEY }}
+      HARBOR_PROJECT: ${{ secrets.HARBOR_PROJECT }}
+
+      HOME: /workspace
+
+    steps:
+      - name: Checkout EDK2 repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Install ORAS
+        run: |
+          curl -LO https://github.com/oras-project/oras/releases/download/v1.1.0/oras_1.1.0_linux_amd64.tar.gz
+          tar -xzf oras_1.1.0_linux_amd64.tar.gz
+          mv oras /usr/local/bin/
+
+      - name: Login to Harbor
+        run: |
+          oras login ${ARTIFACTORY_URL#https://} \
+            -u "$ARTIFACTORY_USER" \
+            -p "$ARTIFACTORY_API_KEY"
+
+      - name: Make CI scripts executable
+        run: |
+          chmod +x ci/build-ovmf-inner.sh
+          chmod +x ci/upload-to-harbor.sh
+
+      - name: Run OVMF build (Secure + Standard)
+        run: |
+          ci/build-ovmf-inner.sh
