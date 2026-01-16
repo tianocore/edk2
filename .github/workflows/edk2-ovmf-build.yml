@@ -34,7 +34,7 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-          
+
       - name: Make CI scripts executable
         run: |
           chmod +x ci/build-ovmf-inner.sh
@@ -43,6 +43,7 @@ jobs:
       - name: Run OVMF build (Secure + Standard)
         run: |
           ci/build-ovmf-inner.sh
+        
       - name: Install curl
         run: |
           sudo apt-get update

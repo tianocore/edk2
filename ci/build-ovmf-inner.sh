@@ -6,8 +6,8 @@ log() {
 }
 
 # --------------------------------------------------
-# Paths and variables
-EDK2_DIR="/workspace"
+# Resolve workspace safely (GitHub Actions / local / container)
+EDK2_DIR="${GITHUB_WORKSPACE:-$(pwd)}"
 BUILD_DIR="$EDK2_DIR/Build"
 OUT_DIR="$BUILD_DIR/OvmfX64/RELEASE_GCC5/FV"
 
@@ -17,12 +17,19 @@ GIT_TAG="${GIT_TAG:-}"
 HARBOR_PROJECT="${HARBOR_PROJECT:-ovmf-build}"
 REPO_NAME="ovmf"
 
+# --------------------------------------------------
+# Sanity check
+if [[ ! -d "$EDK2_DIR" ]]; then
+  echo "ERROR: Workspace directory does not exist: $EDK2_DIR"
+  exit 1
+fi
+
 cd "$EDK2_DIR"
 
 # --------------------------------------------------
 log "Git preparation"
 
-git config --global --add safe.directory /workspace
+git config --global --add safe.directory "$EDK2_DIR"
 
 if [[ -n "$GIT_TAG" ]]; then
   echo "Using tag: $GIT_TAG"
@@ -42,7 +49,7 @@ make -C BaseTools
 # --------------------------------------------------
 log "Setting up EDK2 environment"
 
-export WORKSPACE=/workspace
+export WORKSPACE="$EDK2_DIR"
 export PYTHON_COMMAND=python3
 
 # EDK2 setup scripts are not nounset-safe
