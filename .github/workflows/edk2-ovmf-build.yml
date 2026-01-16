@@ -1,6 +1,7 @@
 name: OVMF Build (Secure + Standard) - Harbor
 
 on:
+  push:    
   workflow_dispatch:
     inputs:
       tag:
@@ -33,6 +34,11 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+
+      - name: Install curl
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl
 
       - name: Install ORAS
         run: |
