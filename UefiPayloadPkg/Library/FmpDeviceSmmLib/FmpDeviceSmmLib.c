@@ -1321,6 +1321,9 @@ FmpDeviceSetImageWithStatus (
   CONST REGION_MANIFEST_ENTRY  *ManifestEntries;
   UINTN        BaseImageSize;
   BOOLEAN      UseManifest;
+  BOOLEAN      UseBiosRegion;
+  UINTN        BiosOffset;
+  UINTN        BiosSize;
   CONST FMAP_HEADER  *FmapHeader;
   CONST FMAP_AREA    *FmapAreas;
   UINTN              FmapOffset;
@@ -1356,19 +1359,40 @@ FmpDeviceSetImageWithStatus (
   ManifestEntryCount = 0;
   ManifestEntries    = NULL;
   UseManifest        = FALSE;
+  UseBiosRegion      = FALSE;
+  BiosOffset         = 0;
+  BiosSize           = 0;
   FmapHeader         = NULL;
   FmapAreas          = NULL;
   FmapOffset         = 0;
   FmapLength         = 0;
 
   Status = LocateRegionManifest (Image, ImageSize, &ManifestEntryCount, &ManifestEntries, &BaseImageSize);
-  if (!EFI_ERROR (Status) && (ManifestEntryCount > 0)) {
-    Status = LocateFmapInImage (Image, BaseImageSize, &FmapOffset, &FmapLength);
-    if (!EFI_ERROR (Status) && ((FmapOffset + FmapLength) <= BaseImageSize)) {
-      FmapHeader = (CONST FMAP_HEADER *)((CONST UINT8 *)Image + FmapOffset);
-      FmapAreas  = (CONST FMAP_AREA *)((CONST UINT8 *)FmapHeader + sizeof (FMAP_HEADER));
-      if (FmapHeader->AreaCount > 0) {
-        UseManifest = TRUE;
+  if (EFI_ERROR (Status)) {
+    BaseImageSize      = ImageSize;
+    ManifestEntryCount = 0;
+    ManifestEntries    = NULL;
+  }
+
+  Status = LocateFmapInImage (Image, BaseImageSize, &FmapOffset, &FmapLength);
+  if (!EFI_ERROR (Status) && ((FmapOffset + FmapLength) <= BaseImageSize)) {
+    FmapHeader = (CONST FMAP_HEADER *)((CONST UINT8 *)Image + FmapOffset);
+    FmapAreas  = (CONST FMAP_AREA *)((CONST UINT8 *)FmapHeader + sizeof (FMAP_HEADER));
+  }
+
+  if ((ManifestEntryCount > 0) && (FmapHeader != NULL) && (FmapHeader->AreaCount > 0)) {
+    UseManifest = TRUE;
+  } else if ((ManifestEntryCount == 0) && (FmapHeader != NULL)) {
+    //
+    // No manifest; attempt BIOS-only update using FMAP region. On Intel
+    // platforms this typically corresponds to the IFD BIOS region exposed
+    // to firmware as "SI_BIOS".
+    //
+    CONST CHAR8  SiBiosName[16] = "SI_BIOS";
+
+    if (!EFI_ERROR (FindFmapRegion (FmapHeader, FmapAreas, FmapHeader->AreaCount, SiBiosName, &BiosOffset, &BiosSize))) {
+      if ((BiosSize != 0) && ((BiosOffset + BiosSize) <= BaseImageSize)) {
+        UseBiosRegion = TRUE;
       }
     }
   }
@@ -1449,7 +1473,35 @@ FmpDeviceSetImageWithStatus (
     }
   }
 
-  if (!UseManifest) {
+  if (UseBiosRegion && !UseManifest) {
+    //
+    // BIOS-only fallback using FMAP when no manifest is present.
+    //
+    DEBUG ((DEBUG_INFO, "%a(): FMAP-guided BIOS-only update\n", __func__));
+
+    TotalSteps = ((BiosOffset + BiosSize - 1) / BlockSize - (BiosOffset / BlockSize) + 1) * 2;
+    if (TotalSteps == 0) {
+      goto IoError;
+    }
+
+    Status = UpdateFlashRangeFromImage (
+               BlockSize,
+               (CONST UINT8 *)Image,
+               BaseImageSize,
+               BiosOffset,
+               BiosSize,
+               ReadBuffer,
+               Progress,
+               TotalSteps,
+               &Step,
+               &ShouldReportProgress
+               );
+    if (EFI_ERROR (Status)) {
+      goto IoError;
+    }
+  }
+
+  if (!UseManifest && !UseBiosRegion) {
     //
     // Legacy full-flash update path.
     //
