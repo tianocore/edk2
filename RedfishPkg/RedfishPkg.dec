@@ -128,6 +128,7 @@
     MdeModulePkg/MdeModulePkg.dec
     RedfishPkg/RedfishPkg.dec
   }
+
   #
   # This PCD indicates the EFI REST EX access mode to Redfish service.
   # Default is set to out of band access.
