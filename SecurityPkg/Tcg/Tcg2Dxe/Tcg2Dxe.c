@@ -46,8 +46,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
 
-#define PERF_ID_TCG2_DXE  0x3120
-
 typedef struct {
   CHAR16      *VariableName;
   EFI_GUID    *VendorGuid;
@@ -2519,7 +2517,7 @@ OnReadyToBoot (
   EFI_STATUS    Status;
   TPM_PCRINDEX  PcrIndex;
 
-  PERF_START_EX (mImageHandle, "EventRec", "Tcg2Dxe", 0, PERF_ID_TCG2_DXE);
+  PERF_FUNCTION_BEGIN ();
   if (mBootAttempts == 0) {
     //
     // Measure handoff tables.
@@ -2600,7 +2598,7 @@ OnReadyToBoot (
   // Increase boot attempt counter.
   //
   mBootAttempts++;
-  PERF_END_EX (mImageHandle, "EventRec", "Tcg2Dxe", 0, PERF_ID_TCG2_DXE + 1);
+  PERF_FUNCTION_END ();
 }
 
 /**
