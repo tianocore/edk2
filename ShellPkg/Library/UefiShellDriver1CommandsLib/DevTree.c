@@ -131,22 +131,17 @@ DoDevTreeForHandle (
   return (ShellStatus);
 }
 
-/**
-  Function for 'devtree' command.
+/** Main function of the 'DevTree' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunDevTree (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdDevTree (
+  LIST_ENTRY  *Package
   )
 {
   EFI_STATUS    Status;
-  LIST_ENTRY    *Package;
-  CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
   CHAR8         *Language;
   CONST CHAR16  *Lang;
@@ -162,34 +157,8 @@ ShellCommandRunDevTree (
   Status      = EFI_SUCCESS;
   Language    = NULL;
 
-  //
-  // initialize the shell lib (we must be in non-auto-init...)
-  //
-  Status = ShellInitialize ();
-  ASSERT_EFI_ERROR (Status);
-
-  Status = CommandInit ();
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // parse the command line
-  //
-  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"devtree", ProblemParam);
-      FreePool (ProblemParam);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  }
-
   if (ShellCommandLineGetCount (Package) > 2) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"devtree");
-    ShellCommandLineFreeVarList (Package);
     return (SHELL_INVALID_PARAMETER);
   }
 
@@ -198,7 +167,6 @@ ShellCommandRunDevTree (
     Language = AllocateZeroPool (StrSize (Lang));
     if (Language == NULL) {
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"devtree");
-      ShellCommandLineFreeVarList (Package);
       return (SHELL_OUT_OF_RESOURCES);
     }
 
@@ -210,7 +178,6 @@ ShellCommandRunDevTree (
   } else {
     ASSERT (Language == NULL);
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"devtree", L"-l");
-    ShellCommandLineFreeVarList (Package);
     return (SHELL_INVALID_PARAMETER);
   }
 
@@ -222,7 +189,6 @@ ShellCommandRunDevTree (
   if (HiiString == NULL) {
     ASSERT (HiiString != NULL);
     SHELL_FREE_NON_NULL (Language);
-    ShellCommandLineFreeVarList (Package);
     return (SHELL_INVALID_PARAMETER);
   }
 
@@ -282,6 +248,56 @@ ShellCommandRunDevTree (
   }
 
   SHELL_FREE_NON_NULL (Language);
+  return ShellStatus;
+}
+
+/**
+  Function for 'devtree' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunDevTree (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+
+  ShellStatus = SHELL_SUCCESS;
+  Status      = EFI_SUCCESS;
+
+  //
+  // initialize the shell lib (we must be in non-auto-init...)
+  //
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
+  Status = CommandInit ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // parse the command line
+  //
+  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"devtree", ProblemParam);
+      FreePool (ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  }
+
+  ShellStatus = MainCmdDevTree (Package);
   ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);

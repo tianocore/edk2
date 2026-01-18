@@ -332,22 +332,17 @@ STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
   { NULL,  TypeMax   }
 };
 
-/**
-  Function for 'drvdiag' command.
+/** Main function of the 'DrvDiag' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunDrvDiag (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdDrvDiag (
+  LIST_ENTRY  *Package
   )
 {
   EFI_STATUS          Status;
-  LIST_ENTRY          *Package;
-  CHAR16              *ProblemParam;
   SHELL_STATUS        ShellStatus;
   DRV_DIAG_TEST_MODE  Mode;
   CHAR8               *Language;
@@ -361,33 +356,9 @@ ShellCommandRunDrvDiag (
   UINT64              Intermediate;
 
   ShellStatus = SHELL_SUCCESS;
+  Status      = EFI_SUCCESS;
   Mode        = TestModeMax;
   Language    = NULL;
-
-  //
-  // initialize the shell lib (we must be in non-auto-init...)
-  //
-  Status = ShellInitialize ();
-  ASSERT_EFI_ERROR (Status);
-
-  Status = CommandInit ();
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // parse the command line
-  //
-  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"drvdiag", ProblemParam);
-      FreePool (ProblemParam);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  }
 
   //
   // if more than 3 'value' parameters (plus the name one) or we have any 2 mode flags
@@ -431,13 +402,11 @@ ShellCommandRunDrvDiag (
   if (ShellCommandLineGetFlag (Package, L"-l") && (Lang == NULL)) {
     ASSERT (Language == NULL);
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"drvdiag", L"-l");
-    ShellCommandLineFreeVarList (Package);
     return (SHELL_INVALID_PARAMETER);
   } else if (Lang != NULL) {
     Language = AllocateZeroPool (StrSize (Lang));
     if (Language == NULL) {
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"drvdiag");
-      ShellCommandLineFreeVarList (Package);
       return (SHELL_OUT_OF_RESOURCES);
     }
 
@@ -475,9 +444,6 @@ ShellCommandRunDrvDiag (
              Handle3
              );
 
-  SHELL_FREE_NON_NULL (Language);
-  ShellCommandLineFreeVarList (Package);
-
   if (ShellStatus == SHELL_SUCCESS) {
     if (Status == EFI_SECURITY_VIOLATION) {
       ShellStatus = SHELL_SECURITY_VIOLATION;
@@ -489,6 +455,59 @@ ShellCommandRunDrvDiag (
       ShellStatus = SHELL_NOT_FOUND;
     }
   }
+
+  SHELL_FREE_NON_NULL (Language);
+  return ShellStatus;
+}
+
+/**
+  Function for 'drvdiag' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunDrvDiag (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+
+  ShellStatus = SHELL_SUCCESS;
+
+  //
+  // initialize the shell lib (we must be in non-auto-init...)
+  //
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
+  Status = CommandInit ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // parse the command line
+  //
+  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"drvdiag", ProblemParam);
+      FreePool (ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  }
+
+  ShellStatus = MainCmdDrvDiag (Package);
+
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }

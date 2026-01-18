@@ -1145,22 +1145,19 @@ STATIC CONST SHELL_PARAM_ITEM  ParamListPreHii[] = {
   { NULL,  TypeMax   }
 };
 
-/**
-  Function for 'drvcfg' command.
+/** Main function of the 'DrvCfg' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
+  @param[in] UseHii     TRUE to check for Hii and DPC, FALSE for DCP only.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunDrvCfg (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdDrvCfg (
+  LIST_ENTRY  *Package,
+  BOOLEAN     UseHii
   )
 {
   EFI_STATUS    Status;
-  LIST_ENTRY    *Package;
-  CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
   CHAR8         *Language;
   CONST CHAR16  *Lang;
@@ -1174,7 +1171,6 @@ ShellCommandRunDrvCfg (
   BOOLEAN       InFromFile;
   BOOLEAN       OutToFile;
   BOOLEAN       AllChildren;
-  BOOLEAN       UseHii;
   UINT32        ForceType;
   UINT64        Intermediate;
   EFI_HANDLE    Handle1;
@@ -1182,64 +1178,26 @@ ShellCommandRunDrvCfg (
   EFI_HANDLE    Handle3;
   CONST CHAR16  *FileName;
 
-  ShellStatus  = SHELL_SUCCESS;
-  Status       = EFI_SUCCESS;
-  Language     = NULL;
-  UseHii       = TRUE;
-  ProblemParam = NULL;
-
-  //
-  // initialize the shell lib (we must be in non-auto-init...)
-  //
-  Status = ShellInitialize ();
-  ASSERT_EFI_ERROR (Status);
-
-  Status = CommandInit ();
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // parse the command line
-  //
-  Status = ShellCommandLineParse (ParamListHii, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR (Status) || (ShellCommandLineGetCount (Package) > 2)) {
-    UseHii = FALSE;
-    if (Package != NULL) {
-      ShellCommandLineFreeVarList (Package);
-    }
-
-    SHELL_FREE_NON_NULL (ProblemParam);
-    Status = ShellCommandLineParse (ParamListPreHii, &Package, &ProblemParam, TRUE);
-    if (EFI_ERROR (Status)) {
-      if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"drvcfg", ProblemParam);
-        FreePool (ProblemParam);
-        return SHELL_INVALID_PARAMETER;
-      }
-
-      ASSERT (FALSE);
-      return ShellStatus;
-    }
-  }
+  ShellStatus = SHELL_SUCCESS;
+  Status      = EFI_SUCCESS;
+  Language    = NULL;
 
   if (ShellCommandLineGetCount (Package) > 4) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"drvcfg");
-    ShellStatus = SHELL_INVALID_PARAMETER;
-    goto Done;
+    return SHELL_INVALID_PARAMETER;
   }
 
   Lang = ShellCommandLineGetValue (Package, L"-l");
   if (Lang != NULL) {
     Language = AllocateZeroPool (StrSize (Lang));
     if (Language == NULL) {
-      ShellStatus = SHELL_OUT_OF_RESOURCES;
-      goto Done;
+      return SHELL_OUT_OF_RESOURCES;
     }
 
     AsciiSPrint (Language, StrSize (Lang), "%S", Lang);
   } else if (ShellCommandLineGetFlag (Package, L"-l")) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"drvcfg", L"-l");
-    ShellStatus = SHELL_INVALID_PARAMETER;
-    goto Done;
+    return SHELL_INVALID_PARAMETER;
   }
 
   Set             = ShellCommandLineGetFlag (Package, L"-s");
@@ -1437,7 +1395,69 @@ ShellCommandRunDrvCfg (
   }
 
 Done:
-  ShellCommandLineFreeVarList (Package);
   SHELL_FREE_NON_NULL (Language);
+  return ShellStatus;
+}
+
+/**
+  Function for 'drvcfg' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunDrvCfg (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+  BOOLEAN       UseHii;
+
+  ShellStatus  = SHELL_SUCCESS;
+  Status       = EFI_SUCCESS;
+  ProblemParam = NULL;
+  UseHii       = TRUE;
+
+  //
+  // initialize the shell lib (we must be in non-auto-init...)
+  //
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
+  Status = CommandInit ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // parse the command line
+  //
+  Status = ShellCommandLineParse (ParamListHii, &Package, &ProblemParam, TRUE);
+  if (EFI_ERROR (Status) || (ShellCommandLineGetCount (Package) > 2)) {
+    UseHii = FALSE;
+    if (Package != NULL) {
+      ShellCommandLineFreeVarList (Package);
+    }
+
+    SHELL_FREE_NON_NULL (ProblemParam);
+    Status = ShellCommandLineParse (ParamListPreHii, &Package, &ProblemParam, TRUE);
+    if (EFI_ERROR (Status)) {
+      if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"drvcfg", ProblemParam);
+        FreePool (ProblemParam);
+        return SHELL_INVALID_PARAMETER;
+      }
+
+      ASSERT (FALSE);
+      return ShellStatus;
+    }
+  }
+
+  ShellStatus = MainCmdDrvCfg (Package, UseHii);
+  ShellCommandLineFreeVarList (Package);
+
   return (ShellStatus);
 }

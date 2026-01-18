@@ -256,22 +256,17 @@ GetImageNameFromHandle (
   return ImageName;
 }
 
-/**
-  Function for 'drivers' command.
+/** Main function of the 'Drivers' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunDrivers (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdDrivers (
+  LIST_ENTRY  *Package
   )
 {
   EFI_STATUS    Status;
-  LIST_ENTRY    *Package;
-  CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
   CHAR8         *Language;
   CONST CHAR16  *Lang;
@@ -297,31 +292,6 @@ ShellCommandRunDrivers (
   FormatString = NULL;
   SfoFlag      = FALSE;
 
-  //
-  // initialize the shell lib (we must be in non-auto-init...)
-  //
-  Status = ShellInitialize ();
-  ASSERT_EFI_ERROR (Status);
-
-  Status = CommandInit ();
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // parse the command line
-  //
-  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"drivers", ProblemParam);
-      FreePool (ProblemParam);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  }
-
   if (ShellCommandLineGetCount (Package) > 1) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"drivers");
     ShellStatus = SHELL_INVALID_PARAMETER;
@@ -332,7 +302,6 @@ ShellCommandRunDrivers (
         Language = AllocateZeroPool (StrSize (Lang));
         if (Language == NULL) {
           ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"drivers");
-          ShellCommandLineFreeVarList (Package);
           return (SHELL_OUT_OF_RESOURCES);
         }
 
@@ -340,7 +309,6 @@ ShellCommandRunDrivers (
       } else {
         ASSERT (Language == NULL);
         ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"drivers", L"-l");
-        ShellCommandLineFreeVarList (Package);
         return (SHELL_INVALID_PARAMETER);
       }
     }
@@ -376,7 +344,6 @@ ShellCommandRunDrivers (
     if (FormatString == NULL) {
       // Assume the string is present because it is hard-coded and report out of memory
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"drivers");
-      ShellCommandLineFreeVarList (Package);
       return (SHELL_OUT_OF_RESOURCES);
     }
 
@@ -400,7 +367,6 @@ ShellCommandRunDrivers (
         TruncatedDriverName = AllocateZeroPool ((MAX_LEN_DRIVER_NAME + 1) * sizeof (CHAR16));
         if (TruncatedDriverName == NULL) {
           ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"drivers");
-          ShellCommandLineFreeVarList (Package);
           return (SHELL_OUT_OF_RESOURCES);
         }
 
@@ -455,8 +421,59 @@ ShellCommandRunDrivers (
   }
 
   SHELL_FREE_NON_NULL (Language);
-  ShellCommandLineFreeVarList (Package);
   SHELL_FREE_NON_NULL (FormatString);
+
+  return (ShellStatus);
+}
+
+/**
+  Function for 'drivers' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunDrivers (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+
+  ShellStatus = SHELL_SUCCESS;
+  Status      = EFI_SUCCESS;
+
+  //
+  // initialize the shell lib (we must be in non-auto-init...)
+  //
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
+  Status = CommandInit ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // parse the command line
+  //
+  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"drivers", ProblemParam);
+      FreePool (ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  }
+
+  ShellStatus = MainCmdDrivers (Package);
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }

@@ -480,22 +480,17 @@ ConnectFromEfiVariable (
   return RetStatus;
 }
 
-/**
-  Function for 'connect' command.
+/** Main function of the 'Connect' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunConnect (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdConnect (
+  LIST_ENTRY  *Package
   )
 {
   EFI_STATUS    Status;
-  LIST_ENTRY    *Package;
-  CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
   CONST CHAR16  *Param1;
   CONST CHAR16  *Param2;
@@ -505,30 +500,6 @@ ShellCommandRunConnect (
   UINT64        Intermediate;
 
   ShellStatus = SHELL_SUCCESS;
-  //
-  // initialize the shell lib (we must be in non-auto-init...)
-  //
-  Status = ShellInitialize ();
-  ASSERT_EFI_ERROR (Status);
-
-  Status = CommandInit ();
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // parse the command line
-  //
-  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"connect", ProblemParam);
-      FreePool (ProblemParam);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  }
 
   //
   // if more than 2 'value' parameters (plus the name one) or either -r or -c with any value parameters we have too many parameters
@@ -566,12 +537,7 @@ ShellCommandRunConnect (
       Status = ShellConvertStringToUint64 (Param1, &Intermediate, TRUE, FALSE);
       if (EFI_ERROR (Status)) {
         ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"connect", Param1);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-        if (Package != NULL) {
-          ShellCommandLineFreeVarList (Package);
-        }
-
-        return (ShellStatus);
+        return SHELL_INVALID_PARAMETER;
       }
 
       Handle1 = ConvertHandleIndexToHandle ((UINTN)Intermediate);
@@ -610,6 +576,55 @@ ShellCommandRunConnect (
       }
     }
   }
+
+  return ShellStatus;
+}
+
+/**
+  Function for 'connect' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunConnect (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+
+  ShellStatus = SHELL_SUCCESS;
+  //
+  // initialize the shell lib (we must be in non-auto-init...)
+  //
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
+  Status = CommandInit ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // parse the command line
+  //
+  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"connect", ProblemParam);
+      FreePool (ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  }
+
+  ShellStatus = MainCmdConnect (Package);
 
   ShellCommandLineFreeVarList (Package);
 
