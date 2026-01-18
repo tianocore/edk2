@@ -40,14 +40,10 @@ jobs:
           chmod +x ci/build-ovmf-inner.sh
           chmod +x ci/upload-to-harbor.sh
 
-      - name: Run OVMF build (Secure + Standard)
-        run: |
-          ci/build-ovmf-inner.sh
-        
       - name: Install curl
         run: |
-          sudo apt-get update
-          sudo apt-get install -y curl
+          apt-get update
+          apt-get install -y curl
 
       - name: Install ORAS
         run: |
@@ -60,4 +56,9 @@ jobs:
           oras login ${ARTIFACTORY_URL#https://} \
             -u "$ARTIFACTORY_USER" \
             -p "$ARTIFACTORY_API_KEY"
+                
+      - name: Run OVMF build (Secure + Standard)
+        run: |
+          ci/build-ovmf-inner.sh
+        
 
