@@ -1166,6 +1166,24 @@ UsbRootHubResetPort (
   //
   gBS->Stall (USB_SET_ROOT_PORT_RESET_STALL);
 
+  for (Index = 0; Index < Bus->MaxDevices; Index++) {
+    if (  (Bus->Devices[Index] != NULL)
+       && (Bus->Devices[Index]->ParentPort == Port)
+       && (Bus->Devices[Index]->ParentIf == RootIf))
+    {
+      if (  (Bus->Usb2Hc != NULL)
+         && (Bus->Usb2Hc->MajorRevision >= 0x3)
+         && (Bus->Devices[Index]->IsSSDev)
+         && (Bus->Devices[Index]->Speed < EFI_USB_SPEED_SUPER)
+         && (Bus->Devices[Index]->DevDesc->Desc.DeviceClass != USB_HUB_CLASS_CODE))
+      {
+        DEBUG ((DEBUG_INFO, "Found the device matched, Index = %d, Port = %X, ParentIf = %X\n", Index, Port, RootIf));
+        DEBUG ((DEBUG_INFO, "This is a USB 3 device and it need a longer waiting time for super speed.\n"));
+        gBS->Stall (USB_WAIT_PORT_STABLE_STALL);
+      }
+    }
+  }
+
   Status = UsbHcClearRootHubPortFeature (Bus, Port, EfiUsbPortReset);
 
   if (EFI_ERROR (Status)) {
