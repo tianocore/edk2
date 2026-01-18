@@ -353,8 +353,8 @@ ConvertMemoryPageAttributes (
   ASSERT (Attributes != 0);
   ASSERT ((Attributes & ~EFI_MEMORY_ATTRIBUTE_MASK) == 0);
 
-  ASSERT ((BaseAddress & (SIZE_4KB - 1)) == 0);
-  ASSERT ((Length & (SIZE_4KB - 1)) == 0);
+  ASSERT (IS_ALIGNED (BaseAddress, SIZE_4KB));
+  ASSERT (IS_ALIGNED (Length, SIZE_4KB));
   ASSERT (PageTableBase != 0);
 
   if (Length == 0) {
@@ -1264,8 +1264,8 @@ GenSmmPageTable (
   // 2. Gen NonMmram MemoryRegion PageTable
   //
   for (Index = 0; Index < MemoryRegionCount; Index++) {
-    ASSERT (MemoryRegion[Index].Base % SIZE_4KB == 0);
-    ASSERT (MemoryRegion[Index].Length % EFI_PAGE_SIZE == 0);
+    ASSERT (IS_ALIGNED (MemoryRegion[Index].Base, SIZE_4KB));
+    ASSERT (IS_ALIGNED (MemoryRegion[Index].Length, EFI_PAGE_SIZE));
 
     //
     // Set the MapAttribute
@@ -1304,8 +1304,8 @@ GenSmmPageTable (
   // 3. Gen MMRAM Range PageTable
   //
   for (Index = 0; Index < mSmmCpuSmramRangeCount; Index++) {
-    ASSERT (mSmmCpuSmramRanges[Index].CpuStart % SIZE_4KB == 0);
-    ASSERT (mSmmCpuSmramRanges[Index].PhysicalSize % EFI_PAGE_SIZE == 0);
+    ASSERT (IS_ALIGNED (mSmmCpuSmramRanges[Index].CpuStart, SIZE_4KB));
+    ASSERT (IS_ALIGNED (mSmmCpuSmramRanges[Index].PhysicalSize, EFI_PAGE_SIZE));
 
     //
     // Set the MapAttribute
