@@ -173,103 +173,105 @@ ShellCommandRunDevices (
     } else {
       ASSERT (FALSE);
     }
+
+    return ShellStatus;
+  }
+
+  //
+  // if more than 0 'value' parameters  we have too many parameters
+  //
+  if (ShellCommandLineGetRawValue (Package, 1) != NULL) {
+    //
+    // error for too many parameters
+    //
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"devices");
+    ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
     //
-    // if more than 0 'value' parameters  we have too many parameters
+    // get the language if necessary
     //
-    if (ShellCommandLineGetRawValue (Package, 1) != NULL) {
-      //
-      // error for too many parameters
-      //
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"devices");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      //
-      // get the language if necessary
-      //
-      Lang = ShellCommandLineGetValue (Package, L"-l");
-      if (Lang != NULL) {
-        Language = AllocateZeroPool (StrSize (Lang));
-        if (Language == NULL) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"devices");
-          ShellCommandLineFreeVarList (Package);
-          return (SHELL_OUT_OF_RESOURCES);
-        }
-
-        AsciiSPrint (Language, StrSize (Lang), "%S", Lang);
-      } else if (!ShellCommandLineGetFlag (Package, L"-l")) {
-        ASSERT (Language == NULL);
-        //        Language = AllocateZeroPool(10);
-        //        AsciiSPrint(Language, 10, "en-us");
-      } else {
-        ASSERT (Language == NULL);
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"devices", L"-l");
+    Lang = ShellCommandLineGetValue (Package, L"-l");
+    if (Lang != NULL) {
+      Language = AllocateZeroPool (StrSize (Lang));
+      if (Language == NULL) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"devices");
         ShellCommandLineFreeVarList (Package);
-        return (SHELL_INVALID_PARAMETER);
+        return (SHELL_OUT_OF_RESOURCES);
       }
 
-      //
-      // Print Header
+      AsciiSPrint (Language, StrSize (Lang), "%S", Lang);
+    } else if (!ShellCommandLineGetFlag (Package, L"-l")) {
+      ASSERT (Language == NULL);
+      //        Language = AllocateZeroPool(10);
+      //        AsciiSPrint(Language, 10, "en-us");
+    } else {
+      ASSERT (Language == NULL);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"devices", L"-l");
+      ShellCommandLineFreeVarList (Package);
+      return (SHELL_INVALID_PARAMETER);
+    }
 
+    //
+    // Print Header
+
+    //
+    if (ShellCommandLineGetFlag (Package, L"-sfo")) {
+      ShellPrintHiiEx (-1, -1, Language, STRING_TOKEN (STR_GEN_SFO_HEADER), gShellDriver1HiiHandle, L"devices");
+      SfoFlag = TRUE;
+    } else {
+      ShellPrintHiiEx (-1, -1, Language, STRING_TOKEN (STR_DEVICES_HEADER_LINES), gShellDriver1HiiHandle);
+    }
+
+    //
+    // loop through each handle
+    //
+    HandleList = GetHandleListByProtocol (NULL);
+    ASSERT (HandleList != NULL);
+    for (HandleListWalker = HandleList
+         ; HandleListWalker != NULL && *HandleListWalker != NULL  /*&& !EFI_ERROR(Status)*/
+         ; HandleListWalker++
+         )
+    {
       //
-      if (ShellCommandLineGetFlag (Package, L"-sfo")) {
-        ShellPrintHiiEx (-1, -1, Language, STRING_TOKEN (STR_GEN_SFO_HEADER), gShellDriver1HiiHandle, L"devices");
-        SfoFlag = TRUE;
-      } else {
-        ShellPrintHiiEx (-1, -1, Language, STRING_TOKEN (STR_DEVICES_HEADER_LINES), gShellDriver1HiiHandle);
+      // get all the info on each handle
+      //
+      Name   = NULL;
+      Status = GetDeviceHandleInfo (*HandleListWalker, &Type, &Cfg, &Diag, &Parents, &Devices, &Children, &Name, Language);
+      if ((Name != NULL) && ((Parents != 0) || (Devices != 0) || (Children != 0))) {
+        ShellPrintHiiEx (
+          -1,
+          -1,
+          Language,
+          SfoFlag ? STRING_TOKEN (STR_DEVICES_ITEM_LINE_SFO) : STRING_TOKEN (STR_DEVICES_ITEM_LINE),
+          gShellDriver1HiiHandle,
+          ConvertHandleToHandleIndex (*HandleListWalker),
+          Type,
+          Cfg ? (SfoFlag ? L'Y' : L'X') : (SfoFlag ? L'N' : L'-'),
+          Diag ? (SfoFlag ? L'Y' : L'X') : (SfoFlag ? L'N' : L'-'),
+          Parents,
+          Devices,
+          Children,
+          Name != NULL ? Name : L"<UNKNOWN>"
+          );
       }
 
-      //
-      // loop through each handle
-      //
-      HandleList = GetHandleListByProtocol (NULL);
-      ASSERT (HandleList != NULL);
-      for (HandleListWalker = HandleList
-           ; HandleListWalker != NULL && *HandleListWalker != NULL /*&& !EFI_ERROR(Status)*/
-           ; HandleListWalker++
-           )
-      {
-        //
-        // get all the info on each handle
-        //
-        Name   = NULL;
-        Status = GetDeviceHandleInfo (*HandleListWalker, &Type, &Cfg, &Diag, &Parents, &Devices, &Children, &Name, Language);
-        if ((Name != NULL) && ((Parents != 0) || (Devices != 0) || (Children != 0))) {
-          ShellPrintHiiEx (
-            -1,
-            -1,
-            Language,
-            SfoFlag ? STRING_TOKEN (STR_DEVICES_ITEM_LINE_SFO) : STRING_TOKEN (STR_DEVICES_ITEM_LINE),
-            gShellDriver1HiiHandle,
-            ConvertHandleToHandleIndex (*HandleListWalker),
-            Type,
-            Cfg ? (SfoFlag ? L'Y' : L'X') : (SfoFlag ? L'N' : L'-'),
-            Diag ? (SfoFlag ? L'Y' : L'X') : (SfoFlag ? L'N' : L'-'),
-            Parents,
-            Devices,
-            Children,
-            Name != NULL ? Name : L"<UNKNOWN>"
-            );
-        }
-
-        if (Name != NULL) {
-          FreePool (Name);
-        }
-
-        if (ShellGetExecutionBreakFlag ()) {
-          ShellStatus = SHELL_ABORTED;
-          break;
-        }
+      if (Name != NULL) {
+        FreePool (Name);
       }
 
-      if (HandleList != NULL) {
-        FreePool (HandleList);
+      if (ShellGetExecutionBreakFlag ()) {
+        ShellStatus = SHELL_ABORTED;
+        break;
       }
     }
 
-    SHELL_FREE_NON_NULL (Language);
-    ShellCommandLineFreeVarList (Package);
+    if (HandleList != NULL) {
+      FreePool (HandleList);
+    }
   }
+
+  SHELL_FREE_NON_NULL (Language);
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }

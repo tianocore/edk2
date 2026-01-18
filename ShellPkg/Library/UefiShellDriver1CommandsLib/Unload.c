@@ -89,44 +89,46 @@ ShellCommandRunUnload (
     } else {
       ASSERT (FALSE);
     }
+
+    return ShellStatus;
+  }
+
+  if (ShellCommandLineGetCount (Package) > 2) {
+    //
+    // error for too many parameters
+    //
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"unload");
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  } else if (ShellCommandLineGetCount (Package) < 2) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDriver1HiiHandle, L"unload");
+    ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
-    if (ShellCommandLineGetCount (Package) > 2) {
-      //
-      // error for too many parameters
-      //
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"unload");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (ShellCommandLineGetCount (Package) < 2) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDriver1HiiHandle, L"unload");
+    Param1 = ShellCommandLineGetRawValue (Package, 1);
+    if (Param1 != NULL) {
+      Status    = ShellConvertStringToUint64 (Param1, &Value, TRUE, FALSE);
+      TheHandle = ConvertHandleIndexToHandle ((UINTN)Value);
+    }
+
+    if (EFI_ERROR (Status) || (Param1 == NULL) || (TheHandle == NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"unload", Param1);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
-      Param1 = ShellCommandLineGetRawValue (Package, 1);
-      if (Param1 != NULL) {
-        Status    = ShellConvertStringToUint64 (Param1, &Value, TRUE, FALSE);
-        TheHandle = ConvertHandleIndexToHandle ((UINTN)Value);
+      ASSERT (TheHandle != NULL);
+      if (ShellCommandLineGetFlag (Package, L"-v") || ShellCommandLineGetFlag (Package, L"-verbose")) {
+        DumpLoadedImageProtocolInfo (TheHandle);
       }
 
-      if (EFI_ERROR (Status) || (Param1 == NULL) || (TheHandle == NULL)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"unload", Param1);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        ASSERT (TheHandle != NULL);
-        if (ShellCommandLineGetFlag (Package, L"-v") || ShellCommandLineGetFlag (Package, L"-verbose")) {
-          DumpLoadedImageProtocolInfo (TheHandle);
-        }
-
-        if (!ShellCommandLineGetFlag (Package, L"-n")) {
-          Status = ShellPrintHiiDefaultEx (STRING_TOKEN (STR_UNLOAD_CONF), gShellDriver1HiiHandle, (UINTN)TheHandle);
-          Status = ShellPromptForResponse (ShellPromptResponseTypeYesNo, NULL, (VOID **)&Resp);
-        }
-
-        if (ShellCommandLineGetFlag (Package, L"-n") || ((Resp != NULL) && (*Resp == ShellPromptResponseYes))) {
-          Status = gBS->UnloadImage (TheHandle);
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HANDLE_RESULT), gShellDriver1HiiHandle, L"Unload", (UINTN)TheHandle, Status);
-        }
-
-        SHELL_FREE_NON_NULL (Resp);
+      if (!ShellCommandLineGetFlag (Package, L"-n")) {
+        Status = ShellPrintHiiDefaultEx (STRING_TOKEN (STR_UNLOAD_CONF), gShellDriver1HiiHandle, (UINTN)TheHandle);
+        Status = ShellPromptForResponse (ShellPromptResponseTypeYesNo, NULL, (VOID **)&Resp);
       }
+
+      if (ShellCommandLineGetFlag (Package, L"-n") || ((Resp != NULL) && (*Resp == ShellPromptResponseYes))) {
+        Status = gBS->UnloadImage (TheHandle);
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HANDLE_RESULT), gShellDriver1HiiHandle, L"Unload", (UINTN)TheHandle, Status);
+      }
+
+      SHELL_FREE_NON_NULL (Resp);
     }
   }
 
@@ -140,9 +142,6 @@ ShellCommandRunUnload (
     }
   }
 
-  if (Package != NULL) {
-    ShellCommandLineFreeVarList (Package);
-  }
-
+  ShellCommandLineFreeVarList (Package);
   return (ShellStatus);
 }
