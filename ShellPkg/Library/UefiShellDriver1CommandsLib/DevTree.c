@@ -183,104 +183,106 @@ ShellCommandRunDevTree (
     } else {
       ASSERT (FALSE);
     }
+
+    return ShellStatus;
+  }
+
+  if (ShellCommandLineGetCount (Package) > 2) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"devtree");
+    ShellCommandLineFreeVarList (Package);
+    return (SHELL_INVALID_PARAMETER);
+  }
+
+  Lang = ShellCommandLineGetValue (Package, L"-l");
+  if (Lang != NULL) {
+    Language = AllocateZeroPool (StrSize (Lang));
+    if (Language == NULL) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"devtree");
+      ShellCommandLineFreeVarList (Package);
+      return (SHELL_OUT_OF_RESOURCES);
+    }
+
+    AsciiSPrint (Language, StrSize (Lang), "%S", Lang);
+  } else if (!ShellCommandLineGetFlag (Package, L"-l")) {
+    ASSERT (Language == NULL);
+    //      Language = AllocateZeroPool(10);
+    //      AsciiSPrint(Language, 10, "en-us");
   } else {
-    if (ShellCommandLineGetCount (Package) > 2) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"devtree");
-      ShellCommandLineFreeVarList (Package);
-      return (SHELL_INVALID_PARAMETER);
-    }
+    ASSERT (Language == NULL);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"devtree", L"-l");
+    ShellCommandLineFreeVarList (Package);
+    return (SHELL_INVALID_PARAMETER);
+  }
 
-    Lang = ShellCommandLineGetValue (Package, L"-l");
-    if (Lang != NULL) {
-      Language = AllocateZeroPool (StrSize (Lang));
-      if (Language == NULL) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"devtree");
-        ShellCommandLineFreeVarList (Package);
-        return (SHELL_OUT_OF_RESOURCES);
-      }
+  FlagD = ShellCommandLineGetFlag (Package, L"-d");
 
-      AsciiSPrint (Language, StrSize (Lang), "%S", Lang);
-    } else if (!ShellCommandLineGetFlag (Package, L"-l")) {
-      ASSERT (Language == NULL);
-      //      Language = AllocateZeroPool(10);
-      //      AsciiSPrint(Language, 10, "en-us");
-    } else {
-      ASSERT (Language == NULL);
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"devtree", L"-l");
-      ShellCommandLineFreeVarList (Package);
-      return (SHELL_INVALID_PARAMETER);
-    }
+  Lang      = ShellCommandLineGetRawValue (Package, 1);
+  HiiString = HiiGetString (gShellDriver1HiiHandle, STRING_TOKEN (STR_DEV_TREE_OUTPUT), Language);
 
-    FlagD = ShellCommandLineGetFlag (Package, L"-d");
-
-    Lang      = ShellCommandLineGetRawValue (Package, 1);
-    HiiString = HiiGetString (gShellDriver1HiiHandle, STRING_TOKEN (STR_DEV_TREE_OUTPUT), Language);
-
-    if (HiiString == NULL) {
-      ASSERT (HiiString != NULL);
-      SHELL_FREE_NON_NULL (Language);
-      ShellCommandLineFreeVarList (Package);
-      return (SHELL_INVALID_PARAMETER);
-    }
-
-    if (Lang == NULL) {
-      for (LoopVar = 1; ; LoopVar++) {
-        TheHandle = ConvertHandleIndexToHandle (LoopVar);
-        if (TheHandle == NULL) {
-          break;
-        }
-
-        //
-        // Skip handles that do not have device path protocol
-        //
-        Status = gBS->OpenProtocol (
-                        TheHandle,
-                        &gEfiDevicePathProtocolGuid,
-                        NULL,
-                        NULL,
-                        NULL,
-                        EFI_OPEN_PROTOCOL_TEST_PROTOCOL
-                        );
-        if (EFI_ERROR (Status)) {
-          continue;
-        }
-
-        //
-        // Skip handles that do have parents
-        //
-        ParentControllerHandleBuffer = NULL;
-        Status                       = PARSE_HANDLE_DATABASE_PARENTS (
-                                         TheHandle,
-                                         &ParentControllerHandleCount,
-                                         &ParentControllerHandleBuffer
-                                         );
-        SHELL_FREE_NON_NULL (ParentControllerHandleBuffer);
-        if (ParentControllerHandleCount > 0) {
-          continue;
-        }
-
-        //
-        // Start a devtree from TheHandle that has a device path and no parents
-        //
-        ShellStatus = DoDevTreeForHandle (TheHandle, Language, FlagD, 0, HiiString);
-      }
-    } else {
-      Status = ShellConvertStringToUint64 (Lang, &Intermediate, TRUE, FALSE);
-      if (EFI_ERROR (Status) || (ConvertHandleIndexToHandle ((UINTN)Intermediate) == NULL)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"devtree", Lang);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        ShellStatus = DoDevTreeForHandle (ConvertHandleIndexToHandle ((UINTN)Intermediate), Language, FlagD, 0, HiiString);
-      }
-    }
-
-    if (HiiString != NULL) {
-      FreePool (HiiString);
-    }
-
+  if (HiiString == NULL) {
+    ASSERT (HiiString != NULL);
     SHELL_FREE_NON_NULL (Language);
     ShellCommandLineFreeVarList (Package);
+    return (SHELL_INVALID_PARAMETER);
   }
+
+  if (Lang == NULL) {
+    for (LoopVar = 1; ; LoopVar++) {
+      TheHandle = ConvertHandleIndexToHandle (LoopVar);
+      if (TheHandle == NULL) {
+        break;
+      }
+
+      //
+      // Skip handles that do not have device path protocol
+      //
+      Status = gBS->OpenProtocol (
+                      TheHandle,
+                      &gEfiDevicePathProtocolGuid,
+                      NULL,
+                      NULL,
+                      NULL,
+                      EFI_OPEN_PROTOCOL_TEST_PROTOCOL
+                      );
+      if (EFI_ERROR (Status)) {
+        continue;
+      }
+
+      //
+      // Skip handles that do have parents
+      //
+      ParentControllerHandleBuffer = NULL;
+      Status                       = PARSE_HANDLE_DATABASE_PARENTS (
+                                       TheHandle,
+                                       &ParentControllerHandleCount,
+                                       &ParentControllerHandleBuffer
+                                       );
+      SHELL_FREE_NON_NULL (ParentControllerHandleBuffer);
+      if (ParentControllerHandleCount > 0) {
+        continue;
+      }
+
+      //
+      // Start a devtree from TheHandle that has a device path and no parents
+      //
+      ShellStatus = DoDevTreeForHandle (TheHandle, Language, FlagD, 0, HiiString);
+    }
+  } else {
+    Status = ShellConvertStringToUint64 (Lang, &Intermediate, TRUE, FALSE);
+    if (EFI_ERROR (Status) || (ConvertHandleIndexToHandle ((UINTN)Intermediate) == NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"devtree", Lang);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ShellStatus = DoDevTreeForHandle (ConvertHandleIndexToHandle ((UINTN)Intermediate), Language, FlagD, 0, HiiString);
+    }
+  }
+
+  if (HiiString != NULL) {
+    FreePool (HiiString);
+  }
+
+  SHELL_FREE_NON_NULL (Language);
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }

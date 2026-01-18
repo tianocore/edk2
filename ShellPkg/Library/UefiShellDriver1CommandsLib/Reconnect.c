@@ -75,19 +75,21 @@ ShellCommandRunReconnect (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    ShellStatus = ShellCommandRunDisconnect (ImageHandle, SystemTable);
-    if (ShellStatus == SHELL_SUCCESS) {
-      if (ShellCommandLineGetFlag (Package, L"-r")) {
-        ConnectAllConsoles ();
-      }
 
-      ShellStatus = ShellCommandRunConnect (ImageHandle, SystemTable);
-    }
-
-    ShellCommandLineFreeVarList (Package);
+    gInReconnect = FALSE;
+    return ShellStatus;
   }
 
+  ShellStatus = ShellCommandRunDisconnect (ImageHandle, SystemTable);
+  if (ShellStatus == SHELL_SUCCESS) {
+    if (ShellCommandLineGetFlag (Package, L"-r")) {
+      ConnectAllConsoles ();
+    }
+
+    ShellStatus = ShellCommandRunConnect (ImageHandle, SystemTable);
+  }
+
+  ShellCommandLineFreeVarList (Package);
   gInReconnect = FALSE;
 
   return (ShellStatus);
