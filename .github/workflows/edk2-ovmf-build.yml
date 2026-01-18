@@ -15,7 +15,7 @@ jobs:
 
     container:
       image: ghcr.io/tianocore/containers/ubuntu-24-test:latest
-      options: --user 1001:1001
+      options: --user 0:0
 
     env:
       GIT_TAG: ${{ github.event.inputs.tag }}
@@ -56,7 +56,7 @@ jobs:
           oras login ${ARTIFACTORY_URL#https://} \
             -u "$ARTIFACTORY_USER" \
             -p "$ARTIFACTORY_API_KEY"
-                
+
       - name: Run OVMF build (Secure + Standard)
         run: |
           ci/build-ovmf-inner.sh
