@@ -73,6 +73,27 @@ typedef struct {
   CHAR8  RegionName[16];
 } REGION_MANIFEST_ENTRY;
 
+STATIC
+EFI_STATUS
+ReadFlashRange (
+  IN  UINTN  BlockSize,
+  IN  UINTN  FlashSize,
+  IN  UINTN  Offset,
+  IN  UINTN  Length,
+  OUT UINT8  *Buffer
+  );
+
+STATIC
+EFI_STATUS
+FindFmapRegion (
+  IN  CONST FMAP_HEADER  *FmapHeader,
+  IN  CONST FMAP_AREA    *Areas,
+  IN  UINTN              AreaCount,
+  IN  CONST CHAR8        Name[16],
+  OUT UINTN              *RegionOffset,
+  OUT UINTN              *RegionSize
+  );
+
 /**
   This function requests firmware information on the first call, caches it and
   returns on all calls afterwards.
@@ -169,6 +190,89 @@ LocateFmapInImage (
   }
 
   return EFI_NOT_FOUND;
+}
+
+/**
+  Load the current flash FMAP using the capsule's FMAP "FMAP" area as a hint.
+
+  This is used to detect layout changes between the image being flashed and the
+  currently running firmware image.
+
+  @param[in]  BlockSize           Flash block size.
+  @param[in]  FlashSize           Total flash size.
+  @param[in]  CapsuleFmapHeader   Pointer to FMAP header from the capsule image.
+  @param[in]  CapsuleFmapAreas    Pointer to FMAP areas from the capsule image.
+  @param[out] FlashFmapHeader     Pointer to FMAP header parsed from flash.
+  @param[out] FlashFmapAreas      Pointer to FMAP areas parsed from flash.
+  @param[out] FlashFmapBuffer     Allocated buffer that backs FlashFmapHeader/Areas.
+
+  @retval EFI_SUCCESS            Flash FMAP was loaded and parsed successfully.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate required buffers.
+  @retval EFI_NOT_FOUND          Flash FMAP could not be located/parsed.
+  @retval EFI_DEVICE_ERROR       Flash read failed.
+  @retval EFI_INVALID_PARAMETER  Invalid input parameters.
+**/
+STATIC
+EFI_STATUS
+LoadFlashFmap (
+  IN  UINTN              BlockSize,
+  IN  UINTN              FlashSize,
+  IN  CONST FMAP_HEADER  *CapsuleFmapHeader,
+  IN  CONST FMAP_AREA    *CapsuleFmapAreas,
+  OUT FMAP_HEADER        **FlashFmapHeader,
+  OUT FMAP_AREA          **FlashFmapAreas,
+  OUT VOID               **FlashFmapBuffer
+  )
+{
+  EFI_STATUS    Status;
+  CONST CHAR8   FmapAreaName[16] = "FMAP";
+  UINTN         FmapAreaOffset;
+  UINTN         FmapAreaSize;
+  VOID          *Buffer;
+  UINTN         FoundOffset;
+  UINTN         FoundLength;
+
+  if ((CapsuleFmapHeader == NULL) || (CapsuleFmapAreas == NULL) || (FlashFmapHeader == NULL) || (FlashFmapAreas == NULL) || (FlashFmapBuffer == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *FlashFmapHeader = NULL;
+  *FlashFmapAreas  = NULL;
+  *FlashFmapBuffer = NULL;
+
+  Status = FindFmapRegion (
+             CapsuleFmapHeader,
+             CapsuleFmapAreas,
+             CapsuleFmapHeader->AreaCount,
+             FmapAreaName,
+             &FmapAreaOffset,
+             &FmapAreaSize
+             );
+  if (EFI_ERROR (Status) || (FmapAreaSize < sizeof (FMAP_HEADER))) {
+    return EFI_NOT_FOUND;
+  }
+
+  Buffer = AllocatePool (FmapAreaSize);
+  if (Buffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = ReadFlashRange (BlockSize, FlashSize, FmapAreaOffset, FmapAreaSize, Buffer);
+  if (EFI_ERROR (Status)) {
+    FreePool (Buffer);
+    return EFI_DEVICE_ERROR;
+  }
+
+  Status = LocateFmapInImage (Buffer, FmapAreaSize, &FoundOffset, &FoundLength);
+  if (EFI_ERROR (Status) || ((FoundOffset + FoundLength) > FmapAreaSize)) {
+    FreePool (Buffer);
+    return EFI_NOT_FOUND;
+  }
+
+  *FlashFmapHeader = (FMAP_HEADER *)((UINT8 *)Buffer + FoundOffset);
+  *FlashFmapAreas  = (FMAP_AREA *)((UINT8 *)(*FlashFmapHeader) + sizeof (FMAP_HEADER));
+  *FlashFmapBuffer = Buffer;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -979,6 +1083,65 @@ IncrementProgress (
 }
 
 /**
+  Read an arbitrary flash range into a buffer.
+
+  @retval EFI_SUCCESS            The range was read successfully.
+  @retval EFI_DEVICE_ERROR       A read failed.
+  @retval EFI_INVALID_PARAMETER  Input parameters were invalid.
+**/
+STATIC
+EFI_STATUS
+ReadFlashRange (
+  IN  UINTN  BlockSize,
+  IN  UINTN  FlashSize,
+  IN  UINTN  Offset,
+  IN  UINTN  Length,
+  OUT UINT8  *Buffer
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       Remaining;
+  UINTN       Cursor;
+
+  if ((Buffer == NULL) || (BlockSize == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Length == 0) {
+    return EFI_SUCCESS;
+  }
+
+  if ((Offset >= FlashSize) || (Length > (FlashSize - Offset))) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Remaining = Length;
+  Cursor    = 0;
+
+  while (Remaining > 0) {
+    UINTN  Lba;
+    UINTN  OffsetInBlock;
+    UINTN  Chunk;
+    UINTN  NumBytes;
+
+    Lba           = (Offset + Cursor) / BlockSize;
+    OffsetInBlock = (Offset + Cursor) % BlockSize;
+    Chunk         = MIN (Remaining, BlockSize - OffsetInBlock);
+
+    NumBytes = Chunk;
+    Status   = SmmStoreLibReadAnyBlock (Lba, OffsetInBlock, &NumBytes, Buffer + Cursor);
+    if (EFI_ERROR (Status) || (NumBytes != Chunk)) {
+      return EFI_DEVICE_ERROR;
+    }
+
+    Cursor    += Chunk;
+    Remaining -= Chunk;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Update a flash range using Image as the source.
 
   This helper preserves bytes outside the requested range within any partially
@@ -1328,6 +1491,9 @@ FmpDeviceSetImageWithStatus (
   CONST FMAP_AREA    *FmapAreas;
   UINTN              FmapOffset;
   UINTN              FmapLength;
+  VOID               *FlashFmapBuffer;
+  FMAP_HEADER        *FlashFmapHeader;
+  FMAP_AREA          *FlashFmapAreas;
 
   *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
   BlockCount         = 0;
@@ -1366,6 +1532,9 @@ FmpDeviceSetImageWithStatus (
   FmapAreas          = NULL;
   FmapOffset         = 0;
   FmapLength         = 0;
+  FlashFmapBuffer    = NULL;
+  FlashFmapHeader    = NULL;
+  FlashFmapAreas     = NULL;
 
   Status = LocateRegionManifest (Image, ImageSize, &ManifestEntryCount, &ManifestEntries, &BaseImageSize);
   if (EFI_ERROR (Status)) {
@@ -1407,10 +1576,29 @@ FmpDeviceSetImageWithStatus (
     //
     // Validate manifest regions against the FMAP before flashing.
     //
+    BOOLEAN     LayoutMismatch;
+    EFI_STATUS  FlashFmapStatus;
+
+    LayoutMismatch = FALSE;
+    FlashFmapStatus = LoadFlashFmap (
+                        BlockSize,
+                        BaseImageSize,
+                        FmapHeader,
+                        FmapAreas,
+                        &FlashFmapHeader,
+                        &FlashFmapAreas,
+                        &FlashFmapBuffer
+                        );
+    if (EFI_ERROR (FlashFmapStatus)) {
+      LayoutMismatch = TRUE;
+    }
+
     TotalSteps = 0;
     for (EntryIndex = 0; EntryIndex < ManifestEntryCount; ++EntryIndex) {
       UINTN  RegionOffset;
       UINTN  RegionSize;
+      UINTN  FlashRegionOffset;
+      UINTN  FlashRegionSize;
 
       Status = FindFmapRegion (
                  FmapHeader,
@@ -1425,7 +1613,43 @@ FmpDeviceSetImageWithStatus (
         break;
       }
 
+      if (!LayoutMismatch) {
+        Status = FindFmapRegion (
+                   FlashFmapHeader,
+                   FlashFmapAreas,
+                   FlashFmapHeader->AreaCount,
+                   ManifestEntries[EntryIndex].RegionName,
+                   &FlashRegionOffset,
+                   &FlashRegionSize
+                   );
+        if (EFI_ERROR (Status) || (FlashRegionOffset != RegionOffset) || (FlashRegionSize != RegionSize)) {
+          LayoutMismatch = TRUE;
+        }
+      }
+
       TotalSteps += ((RegionOffset + RegionSize - 1) / BlockSize - (RegionOffset / BlockSize) + 1) * 2;
+    }
+
+    if (FlashFmapBuffer != NULL) {
+      FreePool (FlashFmapBuffer);
+      FlashFmapBuffer = NULL;
+    }
+
+    if (UseManifest && LayoutMismatch) {
+      //
+      // Manifest regions no longer match the current flash layout; fall back to
+      // flashing the full BIOS region from the new image.
+      //
+      CONST CHAR8  SiBiosName[16] = "SI_BIOS";
+
+      UseManifest   = FALSE;
+      UseBiosRegion = FALSE;
+
+      if (!EFI_ERROR (FindFmapRegion (FmapHeader, FmapAreas, FmapHeader->AreaCount, SiBiosName, &BiosOffset, &BiosSize))) {
+        if ((BiosSize != 0) && ((BiosOffset + BiosSize) <= BaseImageSize)) {
+          UseBiosRegion = TRUE;
+        }
+      }
     }
   }
 
