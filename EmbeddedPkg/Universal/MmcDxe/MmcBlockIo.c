@@ -28,7 +28,7 @@ MmcGetCardStatus (
 {
   EFI_STATUS             Status;
   UINT32                 Response[4];
-  UINTN                  CmdArg;
+  UINT32                 CmdArg;
   EFI_MMC_HOST_PROTOCOL  *MmcHost;
 
   Status  = EFI_SUCCESS;
@@ -136,7 +136,7 @@ MmcTransferBlock (
   )
 {
   EFI_STATUS             Status;
-  UINTN                  CmdArg;
+  UINT32                 CmdArg;
   INTN                   Timeout;
   UINT32                 Response[4];
   MMC_HOST_INSTANCE      *MmcHostInstance;
@@ -150,22 +150,22 @@ MmcTransferBlock (
     // if 0 : SDSC card
     // if 1 : SDXC/SDHC
     if (MmcHostInstance->CardInfo.OCRData.AccessMode & SD_CARD_CAPACITY) {
-      CmdArg = Lba;
+      CmdArg = (UINT32)Lba;
     } else {
-      CmdArg = MultU64x32 (Lba, This->Media->BlockSize);
+      CmdArg = (UINT32)MultU64x32 (Lba, This->Media->BlockSize);
     }
   } else {
     // Set command argument based on the card access mode (Byte mode or Block mode)
     if ((MmcHostInstance->CardInfo.OCRData.AccessMode & MMC_OCR_ACCESS_MASK) ==
         MMC_OCR_ACCESS_SECTOR)
     {
-      CmdArg = Lba;
+      CmdArg = (UINT32)Lba;
     } else {
-      CmdArg = MultU64x32 (Lba, This->Media->BlockSize);
+      CmdArg = (UINT32)MultU64x32 (Lba, This->Media->BlockSize);
     }
   }
 
-  Status = MmcHost->SendCommand (MmcHost, Cmd, CmdArg);
+  Status = MmcHost->SendCommand (MmcHost, (MMC_CMD)Cmd, CmdArg);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a(MMC_CMD%d): Error %r\n", __func__, Cmd, Status));
     return Status;
@@ -242,7 +242,7 @@ MmcIoBlocks (
 {
   UINT32                 Response[4];
   EFI_STATUS             Status;
-  UINTN                  CmdArg;
+  UINT32                 CmdArg;
   INTN                   Timeout;
   UINTN                  Cmd;
   MMC_HOST_INSTANCE      *MmcHostInstance;
