@@ -51,11 +51,17 @@ jobs:
           tar -xzf oras_1.1.0_linux_amd64.tar.gz
           mv oras /usr/local/bin/
 
+      - name: Debug ARTIFACTORY_URL
+        run: |
+          echo "|${ARTIFACTORY_URL}|"
+          printf "%q\n" "$ARTIFACTORY_URL"  
+
       - name: Login to Harbor
         run: |
-          oras login ${ARTIFACTORY_URL#https://} \
-            -u "$ARTIFACTORY_USER" \
-            -p "$ARTIFACTORY_API_KEY"
+          echo "$ARTIFACTORY_API_KEY" | oras login \
+          "$ARTIFACTORY_URL" \
+          -u "$ARTIFACTORY_USER" \
+          --password-stdin
 
       - name: Run OVMF build (Secure + Standard)
         run: |
