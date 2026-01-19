@@ -1446,42 +1446,25 @@ Tcg2SubmitCommand (
                              &CurrentOutputBlockSize,
                              OutputParameterBlock
                              );
-  if (EFI_ERROR (Status)) {
-    return mTcgDxeData.BsCap.TPMPresentFlag ? Status : EFI_DEVICE_ERROR;
-  }
+  if (!mTcgDxeData.BsCap.TPMPresentFlag) {
+    // Special handling when TPM is thought to be absent
+    if ((CurrentOutputBlockSize >= sizeof (TPM2_RESPONSE_HEADER)) && !EFI_ERROR (Status)) {
+      // Command succeeded, check if it's actually TPM in update mode
+      ResponseCode = SwapBytes32 (ReadUnaligned32 ((UINT32 *)(OutputParameterBlock + 6)));
+      if (ResponseCode == TPM_RC_UPGRADE) {
+        // TPM is present but in update mode!
+        mTcgDxeData.TpmUpdateFlag        = TRUE;
+        mTcgDxeData.BsCap.TPMPresentFlag = TRUE;
+        return Status;        // Return success
+      }
+    }
 
-  if (CurrentOutputBlockSize < sizeof (TPM2_RESPONSE_HEADER)) {
-    DEBUG ((DEBUG_ERROR, "%a: Response buffer too small!\n", __func__));
+    // TPM is actually absent, return device error
     return EFI_DEVICE_ERROR;
   }
 
-  //
-  // Correctly read the response code and swap bytes from Big-Endian to Host order.
-  // The responseCode field is at offset 6 of the response header.
-  //
-  ResponseCode = SwapBytes32 (ReadUnaligned32 ((UINT32 *)(OutputParameterBlock + 6)));
-  DEBUG ((DEBUG_ERROR, "Response code is %x", ResponseCode));
-  // If the response code ever equals to TPM_RC_UPGRADE, it means the TPM is in field
-  // upgrade mode, we set TpmUpdateFlag to TRUE.
-  if (ResponseCode == TPM_RC_UPGRADE) {
-    DEBUG ((DEBUG_INFO, "TPM response code TPM_RC_UPDATE received. Setting flag.\n"));
-    mTcgDxeData.TpmUpdateFlag = TRUE;
-  }
-
-  // Now that we have set the TPMPresentFlag, it should be able to reflect the actual TPM presence
-  // as long as the device is not in field update mode.
-  if ((mTcgDxeData.BsCap.TPMPresentFlag == FALSE) && (mTcgDxeData.TpmUpdateFlag == FALSE)) {
-    DEBUG ((DEBUG_WARN, "%a: TPMPresentFlag is FALSE. Expecting command to fail.\n", __func__));
-    return EFI_DEVICE_ERROR;
-  }
-
-  // If the response code is not TPM_RC_SUCCESS and the device is not in field update mode, return error.
-  if ((ResponseCode != TPM_RC_SUCCESS) && (mTcgDxeData.TpmUpdateFlag == FALSE)) {
-    DEBUG ((DEBUG_ERROR, "%a: Command failed with response code 0x%x\n", __func__, ResponseCode));
-    return EFI_DEVICE_ERROR;
-  }
-
-  return EFI_SUCCESS;
+  // Normal path: TPM is present, return whatever Tpm2SubmitCommand returned
+  return Status;
 }
 
 /**
