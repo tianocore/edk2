@@ -10,6 +10,7 @@
 
 #include <Base.h>                   // BIT13
 
+#include <IndustryStandard/Xen/sched.h>
 #include <Library/BaseLib.h>        // CpuDeadLoop()
 #include <Library/DebugLib.h>       // ASSERT()
 #include <Library/IoLib.h>          // IoOr16()
