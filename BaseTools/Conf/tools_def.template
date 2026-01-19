@@ -23,8 +23,10 @@
 # 3.01 - Add toolchain for VS2022
 # 3.02 - Enable stack cookies for IA32, X64, ARM, and AARCH64 builds for GCC and MSVC
 # 3.03 - Drop ARM32 Support
+# 3.04 - Add toolchain for VS2026
+# 3.05 - Add CLANGPDB AARCH64 Support
 #
-#!VERSION=3.03
+#!VERSION=3.05
 
 IDENTIFIER = Default TOOL_CHAIN_CONF
 
@@ -57,6 +59,12 @@ DEFINE VS2022_BIN_IA32    = DEF(VS2022_BIN)\HostDEF(VS_HOST)\x86
 DEFINE VS2022_BIN_X64     = DEF(VS2022_BIN)\HostDEF(VS_HOST)\x64
 DEFINE VS2022_BIN_AARCH64 = DEF(VS2022_BIN)\HostDEF(VS_HOST)\arm64
 
+DEFINE VS2026_BIN         = ENV(VS2026_PREFIX)bin
+DEFINE VS2026_BIN_HOST    = DEF(VS2026_BIN)\HostDEF(VS_HOST)\DEF(VS_HOST)
+DEFINE VS2026_BIN_IA32    = DEF(VS2026_BIN)\HostDEF(VS_HOST)\x86
+DEFINE VS2026_BIN_X64     = DEF(VS2026_BIN)\HostDEF(VS_HOST)\x64
+DEFINE VS2026_BIN_AARCH64 = DEF(VS2026_BIN)\HostDEF(VS_HOST)\arm64
+
 #
 # Resource compiler
 #
@@ -69,7 +77,7 @@ DEFINE WINSDKx86_BIN        = ENV(WINSDKx86_PREFIX)
 DEFINE WINSDK81_BIN         = ENV(WINSDK81_PREFIX)x64
 DEFINE WINSDK81x86_BIN      = ENV(WINSDK81x86_PREFIX)x86
 
-# Microsoft Visual Studio 2017/2019/2022 Professional Edition
+# Microsoft Visual Studio 2017/2019/2022/2026 Professional Edition
 DEFINE WINSDK10_BIN         = ENV(WINSDK10_PREFIX)DEF(VS_HOST)
 
 # These defines are needed for certain Microsoft Visual Studio tools that
@@ -170,6 +178,8 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                        Optional:
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
+#   VS2026      -win32,win64-  Requires:
+#                             Microsoft Visual Studio 2026 version 18.0 or later
 #   GCCNOLTO    -Linux,Windows-  Requires:
 #                             GCC 4.9 targeting x86_64-linux-gnu or aarch64-linux-gnu
 #                        Optional:
@@ -280,7 +290,8 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 *_VS2015_*_PP_FLAGS               = /nologo /E /TC /FIAutoGen.h
 *_VS2015_*_VFRPP_FLAGS            = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 *_VS2015_*_DLINK2_FLAGS           =
-*_VS2015_*_DEPS_FLAGS      = DEF(MSFT_DEPS_FLAGS)
+*_VS2015_*_DEPS_FLAGS             = DEF(MSFT_DEPS_FLAGS)
+*_VS2015_*_GENFWHII_FLAGS         = --hiipackage
 *_VS2015_*_ASM16_PATH             = DEF(VS2015_BIN)\ml.exe
 
 ##################
@@ -374,6 +385,7 @@ NOOPT_VS2015_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT
 *_VS2015x86_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 *_VS2015x86_*_DLINK2_FLAGS    =
 *_VS2015x86_*_DEPS_FLAGS      = DEF(MSFT_DEPS_FLAGS)
+*_VS2015x86_*_GENFWHII_FLAGS  = --hiipackage
 *_VS2015x86_*_ASM16_PATH      = DEF(VS2015x86_BIN)\ml.exe
 
 ##################
@@ -468,6 +480,7 @@ NOOPT_VS2015x86_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 *_VS2017_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 *_VS2017_*_DLINK2_FLAGS    = /WHOLEARCHIVE
 *_VS2017_*_ASM16_PATH      = DEF(VS2017_BIN_IA32)\ml.exe
+*_VS2017_*_GENFWHII_FLAGS  = --hiipackage
 *_VS2017_*_DEPS_FLAGS      = DEF(MSFT_DEPS_FLAGS)
 ##################
 # ASL definitions
@@ -583,6 +596,7 @@ NOOPT_VS2017_AARCH64_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 *_VS2019_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 *_VS2019_*_DLINK2_FLAGS    = /WHOLEARCHIVE
 *_VS2019_*_ASM16_PATH      = DEF(VS2019_BIN_IA32)\ml.exe
+*_VS2019_*_GENFWHII_FLAGS  = --hiipackage
 *_VS2019_*_DEPS_FLAGS      = DEF(MSFT_DEPS_FLAGS)
 ##################
 # ASL definitions
@@ -699,6 +713,7 @@ NOOPT_VS2019_AARCH64_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 *_VS2022_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 *_VS2022_*_DLINK2_FLAGS    = /WHOLEARCHIVE
 *_VS2022_*_ASM16_PATH      = DEF(VS2022_BIN_IA32)\ml.exe
+*_VS2022_*_GENFWHII_FLAGS  = --hiipackage
 *_VS2022_*_DEPS_FLAGS      = DEF(MSFT_DEPS_FLAGS)
 ##################
 # ASL definitions
@@ -815,6 +830,109 @@ NOOPT_VS2022_AARCH64_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:
 
 # BaseTools cannot handle XIP modules with different section and file alignment
 *_VS2022_AARCH64_DLINK_XIPFLAGS    = /ALIGN:64
+
+####################################################################################
+#   VS2026       - Microsoft Visual Studio 2026 with Intel ASL
+#   ASL          - Intel ACPI Source Language Compiler (iasl.exe)
+####################################################################################
+#   VS2026           - Microsoft Visual Studio 2026 with Intel ASL
+*_VS2026_*_*_FAMILY        = MSFT
+*_VS2026_*_*_DLL           = DEF(VS2026_BIN_HOST)
+
+*_VS2026_*_MAKE_PATH       = DEF(VS2026_BIN_HOST)\nmake.exe
+*_VS2026_*_MAKE_FLAG       = /nologo
+*_VS2026_*_RC_PATH         = DEF(RC_PATH)
+
+*_VS2026_*_MAKE_FLAGS      = /nologo
+*_VS2026_*_SLINK_FLAGS     = /NOLOGO /LTCG
+*_VS2026_*_APP_FLAGS       = /nologo /E /TC
+*_VS2026_*_PP_FLAGS        = /nologo /E /TC /FIAutoGen.h
+*_VS2026_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
+*_VS2026_*_DLINK2_FLAGS    = /WHOLEARCHIVE
+*_VS2026_*_ASM16_PATH      = DEF(VS2026_BIN_IA32)\ml.exe
+*_VS2026_*_DEPS_FLAGS      = DEF(MSFT_DEPS_FLAGS)
+##################
+# ASL definitions
+##################
+*_VS2026_*_ASL_PATH        = DEF(WIN_IASL_BIN)
+*_VS2026_*_ASL_FLAGS       = DEF(DEFAULT_WIN_ASL_FLAGS)
+*_VS2026_*_ASL_OUTFLAGS    = DEF(DEFAULT_WIN_ASL_OUTFLAGS)
+*_VS2026_*_ASLCC_FLAGS     = DEF(MSFT_ASLCC_FLAGS)
+*_VS2026_*_ASLPP_FLAGS     = DEF(MSFT_ASLPP_FLAGS)
+*_VS2026_*_ASLDLINK_FLAGS  = DEF(MSFT_ASLDLINK_FLAGS)
+
+##################
+# IA32 definitions
+##################
+*_VS2026_IA32_CC_PATH      = DEF(VS2026_BIN_IA32)\cl.exe
+*_VS2026_IA32_VFRPP_PATH   = DEF(VS2026_BIN_IA32)\cl.exe
+*_VS2026_IA32_ASLCC_PATH   = DEF(VS2026_BIN_IA32)\cl.exe
+*_VS2026_IA32_ASLPP_PATH   = DEF(VS2026_BIN_IA32)\cl.exe
+*_VS2026_IA32_SLINK_PATH   = DEF(VS2026_BIN_IA32)\lib.exe
+*_VS2026_IA32_DLINK_PATH   = DEF(VS2026_BIN_IA32)\link.exe
+*_VS2026_IA32_ASLDLINK_PATH= DEF(VS2026_BIN_IA32)\link.exe
+*_VS2026_IA32_APP_PATH     = DEF(VS2026_BIN_IA32)\cl.exe
+*_VS2026_IA32_PP_PATH      = DEF(VS2026_BIN_IA32)\cl.exe
+*_VS2026_IA32_ASM_PATH     = DEF(VS2026_BIN_IA32)\ml.exe
+
+      *_VS2026_IA32_MAKE_FLAGS  = /nologo
+  DEBUG_VS2026_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Z7 /Gw
+RELEASE_VS2026_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gw
+NOOPT_VS2026_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Z7 /Od
+
+  DEBUG_VS2026_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+RELEASE_VS2026_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
+NOOPT_VS2026_IA32_ASM_FLAGS     = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+
+  DEBUG_VS2026_IA32_NASM_FLAGS  = -Ox -f win32 -g
+RELEASE_VS2026_IA32_NASM_FLAGS  = -Ox -f win32
+NOOPT_VS2026_IA32_NASM_FLAGS    = -O0 -f win32 -g
+
+# Linker warning 4210 is disabled globally, because it checks if static initializers are present and the VCRuntime is
+# linked. We do not link the VCRuntime (except for HOST_APPLICATIONs) so this warning can be generated erroneously
+# whenever there are static initializers, because we will always fail the VCRuntime linking check
+  DEBUG_VS2026_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG /WX /IGNORE:4210
+RELEASE_VS2026_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.rdata=.data /WX /IGNORE:4210
+NOOPT_VS2026_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG /WX /IGNORE:4210
+
+# BaseTools cannot handle XIP modules with different section and file alignment
+*_VS2026_IA32_DLINK_XIPFLAGS    = /ALIGN:32
+
+##################
+# X64 definitions
+##################
+*_VS2026_X64_CC_PATH       = DEF(VS2026_BIN_X64)\cl.exe
+*_VS2026_X64_PP_PATH       = DEF(VS2026_BIN_X64)\cl.exe
+*_VS2026_X64_APP_PATH      = DEF(VS2026_BIN_X64)\cl.exe
+*_VS2026_X64_VFRPP_PATH    = DEF(VS2026_BIN_X64)\cl.exe
+*_VS2026_X64_ASLCC_PATH    = DEF(VS2026_BIN_X64)\cl.exe
+*_VS2026_X64_ASLPP_PATH    = DEF(VS2026_BIN_X64)\cl.exe
+*_VS2026_X64_ASM_PATH      = DEF(VS2026_BIN_X64)\ml64.exe
+*_VS2026_X64_SLINK_PATH    = DEF(VS2026_BIN_X64)\lib.exe
+*_VS2026_X64_DLINK_PATH    = DEF(VS2026_BIN_X64)\link.exe
+*_VS2026_X64_ASLDLINK_PATH = DEF(VS2026_BIN_X64)\link.exe
+
+  DEBUG_VS2026_X64_CC_FLAGS     = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Z7 /Gw /volatileMetadata-
+RELEASE_VS2026_X64_CC_FLAGS     = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Gw /volatileMetadata-
+NOOPT_VS2026_X64_CC_FLAGS       = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Z7 /Od /volatileMetadata-
+
+  DEBUG_VS2026_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
+RELEASE_VS2026_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
+NOOPT_VS2026_X64_ASM_FLAGS      = /nologo /c /WX /W3 /Cx /Zd /Zi
+
+  DEBUG_VS2026_X64_NASM_FLAGS   = -Ox -f win64 -g
+RELEASE_VS2026_X64_NASM_FLAGS   = -Ox -f win64
+NOOPT_VS2026_X64_NASM_FLAGS     = -O0 -f win64 -g
+
+# Linker warning 4210 is disabled globally, because it checks if static initializers are present and the VCRuntime is
+# linked. We do not link the VCRuntime (except for HOST_APPLICATIONs) so this warning can be generated erroneously
+# whenever there are static initializers, because we will always fail the VCRuntime linking check
+  DEBUG_VS2026_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4281 /OPT:REF /OPT:ICF=10 /MAP /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG /ALIGN:4096 /DLL /WX /IGNORE:4210
+RELEASE_VS2026_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4281 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.rdata=.data /ALIGN:4096 /DLL /WX /IGNORE:4210
+NOOPT_VS2026_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4281 /OPT:REF /OPT:ICF=10 /MAP /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG /ALIGN:4096 /DLL /WX /IGNORE:4210
+
+# BaseTools cannot handle XIP modules with different section and file alignment
+*_VS2026_X64_DLINK_XIPFLAGS     = /ALIGN:32
 
 ####################################################################################
 # GCC Common
@@ -957,6 +1075,7 @@ DEFINE GCC5_LOONGARCH64_PP_FLAGS           = -mabi=lp64d -march=loongarch64 DEF(
 *_GCC48_*_ASL_FLAGS                    = DEF(IASL_FLAGS)
 *_GCC48_*_ASL_OUTFLAGS                 = DEF(IASL_OUTFLAGS)
 *_GCC48_*_DEPS_FLAGS                   = DEF(GCC_DEPS_FLAGS)
+*_GCC48_*_GENFWHII_FLAGS               = --hiibinpackage
 
 ##################
 # GCC48 IA32 definitions
@@ -1064,6 +1183,7 @@ RELEASE_GCC48_AARCH64_CC_FLAGS   = DEF(GCC48_AARCH64_CC_FLAGS) -Wno-unused-but-s
 *_GCC49_*_ASL_FLAGS                    = DEF(IASL_FLAGS)
 *_GCC49_*_ASL_OUTFLAGS                 = DEF(IASL_OUTFLAGS)
 *_GCC49_*_DEPS_FLAGS                   = DEF(GCC_DEPS_FLAGS)
+*_GCC49_*_GENFWHII_FLAGS               = --hiibinpackage
 
 ##################
 # GCC49 IA32 definitions
@@ -1178,6 +1298,7 @@ RELEASE_GCC49_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 *_GCCNOLTO_*_ASL_FLAGS                    = DEF(IASL_FLAGS)
 *_GCCNOLTO_*_ASL_OUTFLAGS                 = DEF(IASL_OUTFLAGS)
 *_GCCNOLTO_*_DEPS_FLAGS                   = DEF(GCC_DEPS_FLAGS)
+*_GCCNOLTO_*_GENFWHII_FLAGS               = --hiibinpackage
 
 ##################
 # GCCNOLTO IA32 definitions
@@ -1291,7 +1412,8 @@ RELEASE_GCCNOLTO_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 *_GCC5_*_APP_FLAGS               =
 *_GCC5_*_ASL_FLAGS               = DEF(IASL_FLAGS)
 *_GCC5_*_ASL_OUTFLAGS            = DEF(IASL_OUTFLAGS)
-*_GCC5_*_DEPS_FLAGS                   = DEF(GCC_DEPS_FLAGS)
+*_GCC5_*_DEPS_FLAGS              = DEF(GCC_DEPS_FLAGS)
+*_GCC5_*_GENFWHII_FLAGS          = --hiibinpackage
 
 ##################
 # GCC5 IA32 definitions
@@ -1475,7 +1597,8 @@ RELEASE_GCC5_LOONGARCH64_CC_FLAGS       = DEF(GCC5_LOONGARCH64_CC_FLAGS) -Wno-un
 *_GCC_*_APP_FLAGS               =
 *_GCC_*_ASL_FLAGS               = DEF(IASL_FLAGS)
 *_GCC_*_ASL_OUTFLAGS            = DEF(IASL_OUTFLAGS)
-*_GCC_*_DEPS_FLAGS                   = DEF(GCC_DEPS_FLAGS)
+*_GCC_*_DEPS_FLAGS              = DEF(GCC_DEPS_FLAGS)
+*_GCC_*_GENFWHII_FLAGS          = --hiibinpackage
 
 ##################
 # GCC IA32 definitions
@@ -1657,12 +1780,15 @@ RELEASE_GCC_LOONGARCH64_CC_FLAGS       = DEF(GCC5_LOONGARCH64_CC_FLAGS) -Wno-unu
 *_CLANGPDB_*_ASL_OUTFLAGS            = DEF(DEFAULT_WIN_ASL_OUTFLAGS)
 *_CLANGPDB_*_ASLDLINK_FLAGS          = DEF(MSFT_ASLDLINK_FLAGS)
 *_CLANGPDB_*_DEPS_FLAGS              = DEF(GCC_DEPS_FLAGS)
+*_CLANGPDB_*_GENFWHII_FLAGS          = --hiipackage
 
 DEFINE CLANGPDB_IA32_PREFIX          = ENV(CLANG_BIN)
 DEFINE CLANGPDB_X64_PREFIX           = ENV(CLANG_BIN)
+DEFINE CLANGPDB_AARCH64_PREFIX       = ENV(CLANG_BIN)
 
 DEFINE CLANGPDB_IA32_TARGET          = -target i686-pc-windows-msvc
 DEFINE CLANGPDB_X64_TARGET           = -target x86_64-pc-windows-msvc
+DEFINE CLANGPDB_AARCH64_TARGET       = -target aarch64-unknown-windows-msvc
 
 DEFINE CLANGPDB_WARNING_OVERRIDES    = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body -Wno-unused-const-variable -Wno-varargs -Wno-unknown-warning-option -Wno-unused-but-set-variable -Wno-unused-const-variable -Wno-unaligned-access -Wno-microsoft-enum-forward-reference
 DEFINE CLANGPDB_ALL_CC_FLAGS         = DEF(GCC48_ALL_CC_FLAGS) DEF(CLANGPDB_WARNING_OVERRIDES) -fno-stack-protector -funsigned-char -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -Wno-address -Wno-shift-negative-value -Wno-unknown-pragmas -Wno-incompatible-library-redeclaration -Wno-null-dereference -mno-implicit-float -mms-bitfields -mno-stack-arg-probe -fno-omit-frame-pointer -D __GNUC__=4 -D __GNUC_MINOR__=2 -D __GNUC_PATCHLEVEL__=1 -D __MINGW32__=1
@@ -1684,7 +1810,11 @@ DEFINE CLANGPDB_ALL_CC_FLAGS         = DEF(GCC48_ALL_CC_FLAGS) DEF(CLANGPDB_WARN
 *_CLANGPDB_IA32_ASLCC_FLAGS          = DEF(GCC_ASLCC_FLAGS) -m32 -fno-lto DEF(CLANGPDB_IA32_TARGET)
 *_CLANGPDB_IA32_ASM_FLAGS            = DEF(GCC_ASM_FLAGS) -m32 -march=i386 DEF(CLANGPDB_IA32_TARGET)
 *_CLANGPDB_IA32_OBJCOPY_FLAGS        =
-*_CLANGPDB_IA32_NASM_FLAGS           = -f win32
+
+  DEBUG_CLANGPDB_IA32_NASM_FLAGS     = -Ox -f win32 -g
+RELEASE_CLANGPDB_IA32_NASM_FLAGS     = -Ox -f win32
+NOOPT_CLANGPDB_IA32_NASM_FLAGS       = -O0 -f win32 -g
+
 *_CLANGPDB_IA32_PP_FLAGS             = DEF(GCC_PP_FLAGS) DEF(CLANGPDB_IA32_TARGET)
 *_CLANGPDB_IA32_ASLPP_FLAGS          = DEF(GCC_ASLPP_FLAGS) DEF(CLANGPDB_IA32_TARGET)
 *_CLANGPDB_IA32_VFRPP_FLAGS          = DEF(GCC_VFRPP_FLAGS) DEF(CLANGPDB_IA32_TARGET)
@@ -1718,7 +1848,11 @@ NOOPT_CLANGPDB_IA32_DLINK2_FLAGS     =
 *_CLANGPDB_X64_ASLCC_FLAGS          = DEF(GCC_ASLCC_FLAGS) -m64 -fno-lto DEF(CLANGPDB_X64_TARGET)
 *_CLANGPDB_X64_ASM_FLAGS            = DEF(GCC_ASM_FLAGS) -m64 DEF(CLANGPDB_X64_TARGET)
 *_CLANGPDB_X64_OBJCOPY_FLAGS        =
-*_CLANGPDB_X64_NASM_FLAGS           = -f win64
+
+  DEBUG_CLANGPDB_X64_NASM_FLAGS     = -Ox -f win64 -g
+RELEASE_CLANGPDB_X64_NASM_FLAGS     = -Ox -f win64
+NOOPT_CLANGPDB_X64_NASM_FLAGS       = -O0 -f win64 -g
+
 *_CLANGPDB_X64_PP_FLAGS             = DEF(GCC_PP_FLAGS) DEF(CLANGPDB_X64_TARGET)
 *_CLANGPDB_X64_ASLPP_FLAGS          = DEF(GCC_ASLPP_FLAGS) DEF(CLANGPDB_X64_TARGET)
 *_CLANGPDB_X64_VFRPP_FLAGS          = DEF(GCC_VFRPP_FLAGS) DEF(CLANGPDB_X64_TARGET)
@@ -1738,6 +1872,47 @@ NOOPT_CLANGPDB_X64_DLINK_FLAGS      = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:RE
 NOOPT_CLANGPDB_X64_DLINK2_FLAGS     =
 NOOPT_CLANGPDB_X64_GENFW_FLAGS      = --keepexceptiontable
 
+##########################
+# CLANGPDB AARCH64 definitions
+##########################
+*_CLANGPDB_AARCH64_CC_PATH              = DEF(CLANGPDB_AARCH64_PREFIX)clang
+*_CLANGPDB_AARCH64_SLINK_PATH           = DEF(CLANGPDB_AARCH64_PREFIX)llvm-lib
+*_CLANGPDB_AARCH64_DLINK_PATH           = DEF(CLANGPDB_AARCH64_PREFIX)lld-link
+*_CLANGPDB_AARCH64_ASLDLINK_PATH        = DEF(CLANGPDB_AARCH64_PREFIX)lld-link
+*_CLANGPDB_AARCH64_ASM_PATH             = DEF(CLANGPDB_AARCH64_PREFIX)clang
+*_CLANGPDB_AARCH64_PP_PATH              = DEF(CLANGPDB_AARCH64_PREFIX)clang
+*_CLANGPDB_AARCH64_VFRPP_PATH           = DEF(CLANGPDB_AARCH64_PREFIX)clang
+*_CLANGPDB_AARCH64_ASLCC_PATH           = DEF(CLANGPDB_AARCH64_PREFIX)clang
+*_CLANGPDB_AARCH64_ASLPP_PATH           = DEF(CLANGPDB_AARCH64_PREFIX)clang
+*_CLANGPDB_AARCH64_RC_PATH              = DEF(CLANGPDB_AARCH64_PREFIX)llvm-rc
+
+*_CLANGPDB_AARCH64_ASLCC_FLAGS          = DEF(GCC_ASLCC_FLAGS) -m64 -fno-lto DEF(CLANGPDB_AARCH64_TARGET)
+*_CLANGPDB_AARCH64_ASM_FLAGS            = DEF(GCC_ASM_FLAGS) -m64 DEF(CLANGPDB_AARCH64_TARGET)
+*_CLANGPDB_AARCH64_OBJCOPY_FLAGS        =
+*_CLANGPDB_AARCH64_NASM_FLAGS           = -f win64
+*_CLANGPDB_AARCH64_PP_FLAGS             = DEF(GCC_PP_FLAGS) DEF(CLANGPDB_AARCH64_TARGET)
+*_CLANGPDB_AARCH64_ASLPP_FLAGS          = DEF(GCC_ASLPP_FLAGS) DEF(CLANGPDB_AARCH64_TARGET)
+*_CLANGPDB_AARCH64_VFRPP_FLAGS          = DEF(GCC_VFRPP_FLAGS) DEF(CLANGPDB_AARCH64_TARGET)
+*_CLANGPDB_AARCH64_CC_XIPFLAGS          = -mstrict-align
+
+DEBUG_CLANGPDB_AARCH64_CC_FLAGS         = DEF(CLANGPDB_ALL_CC_FLAGS) -m64 -mcmodel=small -Oz -flto DEF(CLANGPDB_AARCH64_TARGET) -gcodeview  -funwind-tables -Wno-unused-but-set-variable -Wno-deprecated-non-prototype -Wno-constant-conversion -Werror
+DEBUG_CLANGPDB_AARCH64_DLINK_FLAGS      = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /WX /OPT:REF /OPT:ICF=10 /ALIGN:4096 /Machine:ARM64 /DLL /DRIVER /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DEBUG:GHASH /MLLVM:-exception-model=wineh /lldmap
+DEBUG_CLANGPDB_AARCH64_DLINK2_FLAGS     =
+DEBUG_CLANGPDB_AARCH64_GENFW_FLAGS      = --keepexceptiontable
+
+RELEASE_CLANGPDB_AARCH64_CC_FLAGS       = DEF(CLANGPDB_ALL_CC_FLAGS) -m64 -mcmodel=small -Oz -flto DEF(CLANGPDB_AARCH64_TARGET) -fno-unwind-tables -Wno-unused-but-set-variable -Wno-deprecated-non-prototype -Wno-constant-conversion -Werror
+RELEASE_CLANGPDB_AARCH64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /WX /OPT:REF /OPT:ICF=10 /ALIGN:4096 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:ARM64 /DLL /DRIVER /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /MERGE:.rdata=.data /MLLVM:-exception-model=wineh /lldmap
+RELEASE_CLANGPDB_AARCH64_DLINK2_FLAGS   =
+
+NOOPT_CLANGPDB_AARCH64_CC_FLAGS         = DEF(CLANGPDB_ALL_CC_FLAGS) -m64 -mcmodel=small -O0 DEF(CLANGPDB_AARCH64_TARGET) -gcodeview -funwind-tables -Wno-unused-but-set-variable -Wno-deprecated-non-prototype -Wno-constant-conversion -Werror
+NOOPT_CLANGPDB_AARCH64_DLINK_FLAGS      = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /WX /OPT:REF /OPT:ICF=10 /ALIGN:4096 /Machine:ARM64 /DLL /DRIVER /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DEBUG:GHASH /MLLVM:-exception-model=wineh /lldmap
+NOOPT_CLANGPDB_AARCH64_DLINK2_FLAGS     =
+NOOPT_CLANGPDB_AARCH64_GENFW_FLAGS      = --keepexceptiontable
+
+# BaseTools cannot handle XIP modules with different section and file alignment and CLANGPDB AArch64 is restricted to
+# 4KB section alignment due to an LLVM bug: https://github.com/llvm/llvm-project/issues/172660
+*_CLANGPDB_AARCH64_DLINK_XIPFLAGS    = /FILEALIGN:4096
+
 ####################################################################################
 #
 # CLANGDWARF - This configuration is used to compile under Windows/Linux/Mac to produce
@@ -1754,6 +1929,7 @@ NOOPT_CLANGPDB_X64_GENFW_FLAGS      = --keepexceptiontable
 *_CLANGDWARF_*_APP_FLAGS            =
 *_CLANGDWARF_*_ASL_FLAGS            = DEF(IASL_FLAGS)
 *_CLANGDWARF_*_ASL_OUTFLAGS         = DEF(IASL_OUTFLAGS)
+*_CLANGDWARF_*_GENFWHII_FLAGS       = --hiibinpackage
 
 DEFINE CLANGDWARF_IA32_PREFIX       = ENV(CLANG_BIN)
 DEFINE CLANGDWARF_X64_PREFIX        = ENV(CLANG_BIN)
@@ -1777,6 +1953,7 @@ DEFINE CLANGDWARF_ALL_CC_FLAGS         = DEF(GCC48_ALL_CC_FLAGS) DEF(CLANGDWARF_
 ###########################
 # CLANGDWARF IA32 definitions
 ###########################
+*_CLANGDWARF_IA32_OBJCOPY_PATH         = ENV(CLANGDWARF_IA32_PREFIX)llvm-objcopy
 *_CLANGDWARF_IA32_CC_PATH              = DEF(CLANGDWARF_IA32_PREFIX)clang
 *_CLANGDWARF_IA32_SLINK_PATH           = DEF(CLANGDWARF_IA32_PREFIX)llvm-ar
 *_CLANGDWARF_IA32_DLINK_PATH           = DEF(CLANGDWARF_IA32_PREFIX)clang
@@ -1793,26 +1970,31 @@ DEFINE CLANGDWARF_ALL_CC_FLAGS         = DEF(GCC48_ALL_CC_FLAGS) DEF(CLANGDWARF_
 *_CLANGDWARF_IA32_ASM_FLAGS            = DEF(GCC5_ASM_FLAGS) -m32 -march=i386 DEF(CLANGDWARF_IA32_TARGET)
 *_CLANGDWARF_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
 *_CLANGDWARF_IA32_OBJCOPY_FLAGS        =
-*_CLANGDWARF_IA32_NASM_FLAGS           = -f elf32
+
+  DEBUG_CLANGDWARF_IA32_NASM_FLAGS     = -Ox -f elf32 -g
+RELEASE_CLANGDWARF_IA32_NASM_FLAGS     = -Ox -f elf32
+NOOPT_CLANGDWARF_IA32_NASM_FLAGS       = -O0 -f elf32 -g
+
 *_CLANGDWARF_IA32_PP_FLAGS             = DEF(GCC_PP_FLAGS) DEF(CLANGDWARF_IA32_TARGET)
 *_CLANGDWARF_IA32_ASLPP_FLAGS          = DEF(GCC_ASLPP_FLAGS) DEF(CLANGDWARF_IA32_TARGET)
 *_CLANGDWARF_IA32_VFRPP_FLAGS          = DEF(GCC_VFRPP_FLAGS) DEF(CLANGDWARF_IA32_TARGET)
 
 DEBUG_CLANGDWARF_IA32_CC_FLAGS         = DEF(CLANGDWARF_ALL_CC_FLAGS) -fno-pic -fno-pie -m32 -Oz -flto -march=i586 DEF(CLANGDWARF_IA32_TARGET) -g -malign-double
-DEBUG_CLANGDWARF_IA32_DLINK_FLAGS      = DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -flto -Wl,-O3 -Wl,-melf_i386 -Wl,--oformat,elf32-i386
+DEBUG_CLANGDWARF_IA32_DLINK_FLAGS      = DEF(CLANGDWARF_IA32_TARGET) DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -flto -Wl,-O3 -Wl,-melf_i386 -Wl,--oformat,elf32-i386
 DEBUG_CLANGDWARF_IA32_DLINK2_FLAGS     = DEF(CLANGDWARF_IA32_DLINK2_FLAGS) -O3 -fuse-ld=lld -no-pie
 
 RELEASE_CLANGDWARF_IA32_CC_FLAGS       = DEF(CLANGDWARF_ALL_CC_FLAGS) -fno-pic -fno-pie -m32 -Oz -flto -march=i586 DEF(CLANGDWARF_IA32_TARGET) -malign-double
-RELEASE_CLANGDWARF_IA32_DLINK_FLAGS    = DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -flto -Wl,-O3 -Wl,-melf_i386 -Wl,--oformat,elf32-i386
+RELEASE_CLANGDWARF_IA32_DLINK_FLAGS    = DEF(CLANGDWARF_IA32_TARGET) DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -flto -Wl,-O3 -Wl,-melf_i386 -Wl,--oformat,elf32-i386
 RELEASE_CLANGDWARF_IA32_DLINK2_FLAGS   = DEF(CLANGDWARF_IA32_DLINK2_FLAGS) -O3 -fuse-ld=lld -no-pie
 
 NOOPT_CLANGDWARF_IA32_CC_FLAGS         = DEF(CLANGDWARF_ALL_CC_FLAGS) -fno-pic -fno-pie -m32 -O0 -march=i586 DEF(CLANGDWARF_IA32_TARGET) -g -malign-double
-NOOPT_CLANGDWARF_IA32_DLINK_FLAGS      = DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -Wl,-O0 -Wl,-melf_i386 -Wl,--oformat,elf32-i386
+NOOPT_CLANGDWARF_IA32_DLINK_FLAGS      = DEF(CLANGDWARF_IA32_TARGET) DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -Wl,-O0 -Wl,-melf_i386 -Wl,--oformat,elf32-i386
 NOOPT_CLANGDWARF_IA32_DLINK2_FLAGS     = DEF(CLANGDWARF_IA32_DLINK2_FLAGS) -O0 -fuse-ld=lld -no-pie
 
 ##########################
 # CLANGDWARF X64 definitions
 ##########################
+*_CLANGDWARF_X64_OBJCOPY_PATH         = ENV(CLANGDWARF_X64_PREFIX)llvm-objcopy
 *_CLANGDWARF_X64_CC_PATH              = DEF(CLANGDWARF_X64_PREFIX)clang
 *_CLANGDWARF_X64_SLINK_PATH           = DEF(CLANGDWARF_X64_PREFIX)llvm-ar
 *_CLANGDWARF_X64_DLINK_PATH           = DEF(CLANGDWARF_X64_PREFIX)clang
@@ -1829,21 +2011,25 @@ NOOPT_CLANGDWARF_IA32_DLINK2_FLAGS     = DEF(CLANGDWARF_IA32_DLINK2_FLAGS) -O0 -
 *_CLANGDWARF_X64_ASM_FLAGS            = DEF(GCC5_ASM_FLAGS) -m64 DEF(CLANGDWARF_X64_TARGET)
 *_CLANGDWARF_X64_RC_FLAGS             = DEF(GCC_X64_RC_FLAGS)
 *_CLANGDWARF_X64_OBJCOPY_FLAGS        =
-*_CLANGDWARF_X64_NASM_FLAGS           = -f elf64
+
+  DEBUG_CLANGDWARF_X64_NASM_FLAGS     = -Ox -f elf64 -g
+RELEASE_CLANGDWARF_X64_NASM_FLAGS     = -Ox -f elf64
+NOOPT_CLANGDWARF_X64_NASM_FLAGS       = -O0 -f elf64 -g
+
 *_CLANGDWARF_X64_PP_FLAGS             = DEF(GCC_PP_FLAGS) DEF(CLANGDWARF_X64_TARGET)
 *_CLANGDWARF_X64_ASLPP_FLAGS          = DEF(GCC_ASLPP_FLAGS) DEF(CLANGDWARF_X64_TARGET)
 *_CLANGDWARF_X64_VFRPP_FLAGS          = DEF(GCC_VFRPP_FLAGS) DEF(CLANGDWARF_X64_TARGET)
 
 DEBUG_CLANGDWARF_X64_CC_FLAGS         = DEF(CLANGDWARF_ALL_CC_FLAGS) -m64 "-DEFIAPI=__attribute__((ms_abi))" -mno-red-zone -mcmodel=small -fpie -fdirect-access-external-data -Oz -flto DEF(CLANGDWARF_X64_TARGET) -g
-DEBUG_CLANGDWARF_X64_DLINK_FLAGS      = DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -flto -Wl,-O3 -Wl,-melf_x86_64 -Wl,--oformat,elf64-x86-64 -Wl,-pie -mcmodel=small -Wl,--apply-dynamic-relocs
+DEBUG_CLANGDWARF_X64_DLINK_FLAGS      = DEF(CLANGDWARF_X64_TARGET) DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -flto -Wl,-O3 -Wl,-melf_x86_64 -Wl,--oformat,elf64-x86-64 -Wl,-pie -mcmodel=small -Wl,--apply-dynamic-relocs
 DEBUG_CLANGDWARF_X64_DLINK2_FLAGS     = DEF(CLANGDWARF_X64_DLINK2_FLAGS) -O3 -fuse-ld=lld
 
 RELEASE_CLANGDWARF_X64_CC_FLAGS       = DEF(CLANGDWARF_ALL_CC_FLAGS) -m64 "-DEFIAPI=__attribute__((ms_abi))" -mno-red-zone -mcmodel=small -fpie -fdirect-access-external-data -Oz -flto DEF(CLANGDWARF_X64_TARGET)
-RELEASE_CLANGDWARF_X64_DLINK_FLAGS    = DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -flto -Wl,-O3 -Wl,-melf_x86_64 -Wl,--oformat,elf64-x86-64 -Wl,-pie -mcmodel=small -Wl,--apply-dynamic-relocs
+RELEASE_CLANGDWARF_X64_DLINK_FLAGS    = DEF(CLANGDWARF_X64_TARGET) DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -flto -Wl,-O3 -Wl,-melf_x86_64 -Wl,--oformat,elf64-x86-64 -Wl,-pie -mcmodel=small -Wl,--apply-dynamic-relocs
 RELEASE_CLANGDWARF_X64_DLINK2_FLAGS   = DEF(CLANGDWARF_X64_DLINK2_FLAGS) -O3 -fuse-ld=lld
 
 NOOPT_CLANGDWARF_X64_CC_FLAGS         = DEF(CLANGDWARF_ALL_CC_FLAGS) -m64 "-DEFIAPI=__attribute__((ms_abi))" -mno-red-zone -mcmodel=small -fpie -fdirect-access-external-data -O0 DEF(CLANGDWARF_X64_TARGET) -g
-NOOPT_CLANGDWARF_X64_DLINK_FLAGS      = DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -Wl,-O0 -Wl,-melf_x86_64 -Wl,--oformat,elf64-x86-64 -Wl,-pie -mcmodel=small -Wl,--apply-dynamic-relocs
+NOOPT_CLANGDWARF_X64_DLINK_FLAGS      = DEF(CLANGDWARF_X64_TARGET) DEF(CLANGDWARF_IA32_X64_DLINK_FLAGS) -Wl,-O0 -Wl,-melf_x86_64 -Wl,--oformat,elf64-x86-64 -Wl,-pie -mcmodel=small -Wl,--apply-dynamic-relocs
 NOOPT_CLANGDWARF_X64_DLINK2_FLAGS     = DEF(CLANGDWARF_X64_DLINK2_FLAGS) -O0 -fuse-ld=lld
 
 ##################
@@ -1860,6 +2046,7 @@ DEFINE CLANGDWARF_AARCH64_DLINK_FLAGS  = DEF(CLANGDWARF_AARCH64_TARGET) DEF(GCC_
 *_CLANGDWARF_AARCH64_ASL_OUTFLAGS   = DEF(IASL_OUTFLAGS)
 *_CLANGDWARF_AARCH64_DTCPP_FLAGS    = DEF(GCC_DTCPP_FLAGS)
 
+*_CLANGDWARF_AARCH64_OBJCOPY_PATH   = ENV(CLANGDWARF_BIN)llvm-objcopy
 *_CLANGDWARF_AARCH64_CC_PATH        = ENV(CLANGDWARF_BIN)clang
 *_CLANGDWARF_AARCH64_ASM_PATH       = ENV(CLANGDWARF_BIN)clang
 *_CLANGDWARF_AARCH64_PP_PATH        = ENV(CLANGDWARF_BIN)clang
@@ -1912,6 +2099,7 @@ DEFINE CLANGDWARF_RISCV64_DLINK_FLAGS       = DEF(CLANGDWARF_RISCV64_TARGET) DEF
 *_CLANGDWARF_RISCV64_DTCPP_FLAGS    = DEF(GCC_DTCPP_FLAGS)
 *_CLANGDWARF_RISCV64_DEPS_FLAGS     = DEF(GCC_DEPS_FLAGS)
 
+*_CLANGDWARF_RISCV64_OBJCOPY_PATH   = ENV(CLANGDWARF_BIN)llvm-objcopy
 *_CLANGDWARF_RISCV64_CC_PATH        = ENV(CLANGDWARF_BIN)clang
 *_CLANGDWARF_RISCV64_ASM_PATH       = ENV(CLANGDWARF_BIN)clang
 *_CLANGDWARF_RISCV64_PP_PATH        = ENV(CLANGDWARF_BIN)clang
