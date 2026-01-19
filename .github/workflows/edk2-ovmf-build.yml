@@ -23,11 +23,6 @@ jobs:
       NO_PROXY:    127.0.0.1,localhost,16.182.104.0/21,10.0.0.0/8,172.0.0.0/8,192.168.0.0/16,.svc,.cluster.local,.nimblestorage.com
       no_proxy:    127.0.0.1,localhost,16.182.104.0/21,10.0.0.0/8,172.0.0.0/8,192.168.0.0/16,.svc,.cluster.local,.nimblestorage.com
 
-    container:
-      image: ghcr.io/tianocore/containers/ubuntu-24-test:latest
-      options: --user 0:0
-
-    env:
       GIT_TAG: ${{ github.event.inputs.tag }}
 
       # Harbor (reusing Artifactory-named secrets)
@@ -37,6 +32,10 @@ jobs:
       HARBOR_PROJECT: ${{ secrets.HARBOR_PROJECT }}
 
       HOME: /workspace
+
+    container:
+      image: ghcr.io/tianocore/containers/ubuntu-24-test:latest
+      options: --user 0:0
 
     steps:
       - name: Checkout EDK2 repository
