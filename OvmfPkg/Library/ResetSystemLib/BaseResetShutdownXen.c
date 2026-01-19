@@ -54,7 +54,7 @@ ResetShutdown (
       XEN_SCHED_SHUTDOWN  ShutdownOp = {
         .Reason = XEN_SHED_SHUTDOWN_POWEROFF,
       };
-      ReturnCode = XenHypercallSchedOp (XEN_SCHEDOP_SHUTDOWN, ShutdownOp);
+      ReturnCode = XenHypercallSchedOp (XEN_SCHEDOP_SHUTDOWN, &ShutdownOp);
       ASSERT (ReturnCode == 0);
       CpuDeadLoop ();
     }
