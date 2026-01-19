@@ -53,8 +53,7 @@ jobs:
 
       - name: Debug ARTIFACTORY_URL
         run: |
-          echo "|${ARTIFACTORY_URL}|"
-          printf "%q\n" "$ARTIFACTORY_URL"  
+          echo "ARTIFACTORY_URL=|${ARTIFACTORY_URL}|"   
 
       - name: Login to Harbor
         run: |
