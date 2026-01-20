@@ -14,7 +14,7 @@
   FILE_GUID                      = EEAF8A01-167A-4222-A647-80EB16AEEC69
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = MemDebugLogLib|PEI_CORE
+  LIBRARY_CLASS                  = MemDebugLogLib|PEI_CORE PEIM
 
 
 [Sources]
