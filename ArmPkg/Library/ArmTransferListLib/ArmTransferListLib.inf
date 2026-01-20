@@ -25,6 +25,8 @@
 
 [LibraryClasses]
   BaseLib
+  DebugLib
+  HobLib
 
 [Guids]
   gArmTransferListHobGuid
