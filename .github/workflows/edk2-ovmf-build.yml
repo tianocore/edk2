@@ -1,7 +1,6 @@
 name: OVMF Build (Selectable)
 
 on:
-  push:
   workflow_dispatch:
     inputs:
       tag:
