@@ -23,7 +23,7 @@
   LIBRARY_CLASS                  = UnitTestHostBaseLib|HOST_APPLICATION
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
 #
 
 [Sources]
@@ -183,7 +183,7 @@
 
 [Sources.AARCH64]
   AArch64/InternalSwitchStack.c
-  AArch64/Unaligned.c
+  Unaligned.c
   Math64.c
 
   AArch64/MemoryFence.S             | GCC
@@ -197,6 +197,7 @@
   AArch64/SetJumpLongJump.asm       | MSFT
   AArch64/CpuBreakpoint.asm         | MSFT
   AArch64/SpeculationBarrier.asm    | MSFT
+  AArch64UnitTestHost.c
 
 [Sources.RISCV64]
   Math64.c
