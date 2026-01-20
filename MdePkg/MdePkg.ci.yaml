@@ -111,13 +111,17 @@
             "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec"
         ],
         # For UEFI shell based apps
-        "AcceptableDependencies-UEFI_APPLICATION":[],
+        "AcceptableDependencies-UEFI_APPLICATION":[
+            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec" # TCBZ3519 MU_CHANGE
+        ],
         "IgnoreInf": []
     },
 
     ## options defined ci/Plugin/DscCompleteCheck
     "DscCompleteCheck": {
-        "IgnoreInf": [""],
+        "IgnoreInf": [
+            "MdePkg/Library/FltUsedLib/FltUsedLib.inf" # MU_CHANGE this isn't compilable since it has no code
+        ],
         "DscPath": "MdePkg.dsc"
     },
 
@@ -195,5 +199,11 @@
             "Library/BaseFdtLib/string.h",
             "mipi_syst.h"
         ]
+    },
+
+    ## options defined .pytool/Plugin/MarkdownLintCheck
+    "MarkdownLintCheck": {
+        "IgnoreFiles": [ "Library/MipiSysTLib/mipisyst"  # submodule outside of control
+        ]            # package root relative file, folder, or glob pattern to ignore
     }
 }
