@@ -1,6 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+###############################################################################
+# Usage:
+#   ci/build-ovmf-inner.sh secure
+#   ci/build-ovmf-inner.sh standard
+###############################################################################
+
+MODE="${1:-}"
+
+if [[ "$MODE" != "secure" && "$MODE" != "standard" ]]; then
+  echo "ERROR: Invalid build mode"
+  echo "Usage: $0 <secure|standard>"
+  exit 1
+fi
+
 log() {
   echo -e "\n==== $1 ====\n"
 }
@@ -13,10 +27,6 @@ OUT_DIR="$BUILD_DIR/OvmfX64/RELEASE_GCC5/FV"
 
 GIT_TAG="${GIT_TAG:-}"
 
-# Harbor configuration
-HARBOR_PROJECT="${HARBOR_PROJECT:-ovmf-build}"
-REPO_NAME="ovmf"
-
 # --------------------------------------------------
 # Sanity check
 if [[ ! -d "$EDK2_DIR" ]]; then
@@ -28,8 +38,6 @@ cd "$EDK2_DIR"
 
 # --------------------------------------------------
 log "Git preparation"
-
-#git config --global --add safe.directory "$EDK2_DIR"
 
 if [[ -n "$GIT_TAG" ]]; then
   echo "Using tag: $GIT_TAG"
@@ -58,65 +66,48 @@ set +u
 set -u
 
 # --------------------------------------------------
-log "Secure Boot build"
+if [[ "$MODE" == "secure" ]]; then
+  log "Secure Boot build"
 
-build -a X64 -t GCC5 -b RELEASE \
-  -p OvmfPkg/OvmfPkgX64.dsc \
-  -D SECURE_BOOT_ENABLE=TRUE \
-  -D TPM2_ENABLE=TRUE \
-  -D HTTP_BOOT_ENABLE=TRUE \
-  -D PXE_BOOT_ENABLE=TRUE \
-  -D NETWORK_ENABLE=TRUE \
-  -D SMM_REQUIRE=TRUE \
-  -D FD_SIZE_4MB=TRUE \
-  -D DEBUG_ON_SERIAL_PORT=FALSE
+  build -a X64 -t GCC5 -b RELEASE \
+    -p OvmfPkg/OvmfPkgX64.dsc \
+    -D SECURE_BOOT_ENABLE=TRUE \
+    -D TPM2_ENABLE=TRUE \
+    -D HTTP_BOOT_ENABLE=TRUE \
+    -D PXE_BOOT_ENABLE=TRUE \
+    -D NETWORK_ENABLE=TRUE \
+    -D SMM_REQUIRE=TRUE \
+    -D FD_SIZE_4MB=TRUE \
+    -D DEBUG_ON_SERIAL_PORT=FALSE
 
-# --------------------------------------------------
-log "Renaming Secure Boot outputs"
+  log "Renaming Secure Boot outputs"
 
-for f in OVMF.fd OVMF_CODE.fd OVMF_VARS.fd; do
-  src="$OUT_DIR/$f"
-  dst="$OUT_DIR/sec_$f"
+  for f in OVMF.fd OVMF_CODE.fd OVMF_VARS.fd; do
+    src="$OUT_DIR/$f"
+    dst="$OUT_DIR/sec_$f"
 
-  if [[ -f "$src" ]]; then
-    mv -f "$src" "$dst"
-    echo "Renamed $f → sec_$f"
-  else
-    echo "WARNING: $src not found"
-  fi
-done
+    if [[ -f "$src" ]]; then
+      mv -f "$src" "$dst"
+      echo "Renamed $f → sec_$f"
+    else
+      echo "WARNING: $src not found"
+    fi
+  done
 
-# --------------------------------------------------
-log "Uploading Secure Boot artifacts to Harbor"
+  log "Secure Boot build completed successfully"
+  echo "Artifacts available under:"
+  echo "  $OUT_DIR"
 
-ID="${GIT_TAG:-$(git rev-parse --short HEAD)}"
-
-./ci/upload-to-harbor.sh \
-  "$HARBOR_PROJECT/$REPO_NAME" \
-  "${ID}-secure" \
-  "$OUT_DIR/sec_OVMF.fd" \
-  "$OUT_DIR/sec_OVMF_CODE.fd" \
-  "$OUT_DIR/sec_OVMF_VARS.fd"
+fi
 
 # --------------------------------------------------
-log "Cleaning Build directory"
-rm -rf "$BUILD_DIR"
+if [[ "$MODE" == "standard" ]]; then
+  log "Standard Release build"
 
-# --------------------------------------------------
-log "Standard Release build"
+  build -a X64 -t GCC5 -b RELEASE \
+    -p OvmfPkg/OvmfPkgX64.dsc
 
-build -a X64 -t GCC5 -b RELEASE \
-  -p OvmfPkg/OvmfPkgX64.dsc
-
-# --------------------------------------------------
-log "Uploading Standard Release artifacts to Harbor"
-
-./ci/upload-to-harbor.sh \
-  "$HARBOR_PROJECT/$REPO_NAME" \
-  "${ID}-standard" \
-  "$OUT_DIR/OVMF.fd" \
-  "$OUT_DIR/OVMF_CODE.fd" \
-  "$OUT_DIR/OVMF_VARS.fd"
-
-# --------------------------------------------------
-log "OVMF build completed successfully"
+  log "Standard Release build completed successfully"
+  echo "Artifacts available under:"
+  echo "  $OUT_DIR"
+fi
