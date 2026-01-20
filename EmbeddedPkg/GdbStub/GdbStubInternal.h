@@ -175,7 +175,7 @@ typedef union {
     UINT32    RW3        : 2; // Read/Write field
     UINT32    LEN3       : 2; // Length field
   } Bits;
-  UINTN    UintN;
+  UINT32    Uint32;
 } IA32_DR7;
 
 #endif /* if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64) */
@@ -661,9 +661,9 @@ GetBreakpointType (
   IN  UINTN               BreakpointNumber
   );
 
-UINTN
+UINT32
 ConvertLengthData (
-  IN  UINTN  Length
+  IN  UINT32  Length
   );
 
 EFI_STATUS
@@ -676,17 +676,17 @@ EFI_STATUS
 EnableDebugRegister (
   IN  EFI_SYSTEM_CONTEXT  SystemContext,
   IN  UINTN               Register,
-  IN  UINTN               Address,
-  IN  UINTN               Length,
-  IN  UINTN               Type
+  IN  UINT32              Address,
+  IN  UINT32              Length,
+  IN  BREAK_TYPE          Type
   );
 
 EFI_STATUS
 FindMatchingDebugRegister (
   IN  EFI_SYSTEM_CONTEXT  SystemContext,
-  IN  UINTN               Address,
-  IN  UINTN               Length,
-  IN  UINTN               Type,
+  IN  UINT32              Address,
+  IN  UINT32              Length,
+  IN  BREAK_TYPE          Type,
   OUT UINTN               *Register
   );
 

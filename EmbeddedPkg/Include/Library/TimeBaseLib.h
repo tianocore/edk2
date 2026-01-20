@@ -144,7 +144,7 @@ IsTimeValid (
 VOID
 EFIAPI
 EpochToEfiTime (
-  IN  UINTN     EpochSeconds,
+  IN  UINT64    EpochSeconds,
   OUT EFI_TIME  *Time
   );
 

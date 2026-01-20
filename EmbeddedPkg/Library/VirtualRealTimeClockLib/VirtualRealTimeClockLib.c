@@ -53,7 +53,7 @@ LibGetTime (
   UINT64      Freq;
   UINT64      Counter;
   UINT64      Remainder;
-  UINTN       EpochSeconds;
+  UINT64      EpochSeconds;
   UINTN       Size;
 
   if (Time == NULL) {
@@ -67,7 +67,7 @@ LibGetTime (
   }
 
   // Get the epoch time from non-volatile storage
-  Size         = sizeof (UINTN);
+  Size         = sizeof (EpochSeconds);
   EpochSeconds = 0;
   Status       = EfiGetVariable (
                    (CHAR16 *)mEpochVariableName,
@@ -241,7 +241,7 @@ LibSetTime (
   UINT64      Freq;
   UINT64      Counter;
   UINT64      Remainder;
-  UINTN       EpochSeconds;
+  UINT64      EpochSeconds;
 
   if (!IsTimeValid (Time)) {
     return EFI_INVALID_PARAMETER;
