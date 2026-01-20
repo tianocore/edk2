@@ -62,7 +62,7 @@ export PYTHON_COMMAND=python3
 
 # EDK2 setup scripts are not nounset-safe
 set +u
-. edksetup.sh
+. edksetup.sh --reconfig
 set -u
 
 # --------------------------------------------------
