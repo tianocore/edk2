@@ -3,7 +3,7 @@
 # It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
 # and libraries instances, which are used for those modules.
 #
-# Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
+# Copyright (c) 2019 - 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
 # Copyright (c) 2007 - 2024, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 # (C) Copyright 2016 - 2019 Hewlett Packard Enterprise Development LP<BR>
@@ -2307,6 +2307,18 @@
   #  If PcdFfaLibConduitSvc == FALSE, conduit = SVC
   # @Prompt Conduit to use in ArmFfaLib.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc|TRUE|BOOLEAN|0x10000029
+
+  ## PCIe Configuration Request Retry Status (CRS) retry interval in microseconds.
+  #  When a PCIe device returns CRS during enumeration, the PCI bus driver will wait
+  #  this interval before retrying. Default is 10000us (10ms) to match Linux kernel.
+  # @Prompt PCI CRS retry interval in microseconds.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciCrsRetryIntervalUs|10000|UINT32|0x1000002A
+
+  ## PCIe Configuration Request Retry Status (CRS) timeout in seconds.
+  #  Maximum time to wait for a device returning CRS to become ready.
+  #  Default is 60 seconds to match Linux kernel CRS_TIMEOUT.
+  # @Prompt PCI CRS timeout in seconds.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciCrsTimeoutSeconds|60|UINT32|0x1000002B
 
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when

@@ -2,6 +2,7 @@
 #  The PCI bus driver will probe all PCI devices and allocate MMIO and IO space for these devices.
 #  Please use PCD feature flag PcdPciBusHotplugDeviceSupport to enable hot plug supporting.
 #
+#  Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
 #  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -97,6 +98,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport                ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration    ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarSupport     ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciCrsRetryIntervalUs       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciCrsTimeoutSeconds        ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   PciBusDxeExtra.uni
