@@ -19,6 +19,7 @@
 
 [Sources]
   MemDebugLogPei.c
+  MemDebugLogPeiCore.c
   MemDebugLogCommon.c
 
 [Packages]
