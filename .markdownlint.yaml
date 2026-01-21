@@ -1,0 +1,15 @@
+## @file
+# markdownlint configuration
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+# Rules can be found here: https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+# Config info: https://github.com/DavidAnson/markdownlint#configuration
+
+{
+  "default": true,
+  "MD013": {"line_length": 120, "code_blocks": false, "tables": false},
+  "MD033": {"allowed_elements": ["br"]}
+}
