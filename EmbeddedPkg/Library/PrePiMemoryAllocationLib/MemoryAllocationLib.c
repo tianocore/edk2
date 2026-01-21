@@ -27,8 +27,25 @@ InternalAllocatePages (
 
   Hob.Raw = GetHobList ();
 
+  if (Pages == 0) {
+    return NULL;
+  }
+
   NewTop  = Hob.HandoffInformationTable->EfiFreeMemoryTop & ~(EFI_PHYSICAL_ADDRESS)EFI_PAGE_MASK;
   NewTop -= Pages * EFI_PAGE_SIZE;
+
+  switch (MemoryType) {
+    case EfiReservedMemoryType:
+    case EfiRuntimeServicesCode:
+    case EfiRuntimeServicesData:
+    case EfiACPIMemoryNVS:
+      NewTop &= ~(EFI_PHYSICAL_ADDRESS)(RUNTIME_PAGE_ALLOCATION_GRANULARITY - 1);
+      Pages   = ALIGN_VALUE (Pages, EFI_SIZE_TO_PAGES (RUNTIME_PAGE_ALLOCATION_GRANULARITY));
+      break;
+
+    default:
+      break;
+  }
 
   //
   // Verify that there is sufficient memory to satisfy the allocation
@@ -80,9 +97,9 @@ AllocatePages (
   Allocates one or more 4KB pages of type EfiRuntimeServicesData.
 
   Allocates the number of 4KB pages of type EfiRuntimeServicesData and returns a pointer to the
-  allocated buffer.  The buffer returned is aligned on a 4KB boundary.  If Pages is 0, then NULL
-  is returned.  If there is not enough memory remaining to satisfy the request, then NULL is
-  returned.
+  allocated buffer.  The buffer returned is aligned on a RUNTIME_PAGE_ALLOCATION_GRANULARITY boundary.
+  If Pages is 0, then NULL is returned.  If there is not enough memory remaining to satisfy the request,
+  then NULL is returned.
 
   @param  Pages                 The number of 4 KB pages to allocate.
 
@@ -101,10 +118,10 @@ AllocateRuntimePages (
 /**
   Allocates one or more 4KB pages of type EfiReservedMemoryType.
 
-  Allocates the number of 4KB pages of type EfiReservedMemoryTypes and returns a pointer to the
-  allocated buffer.  The buffer returned is aligned on a 4KB boundary.  If Pages is 0, then NULL
-  is returned.  If there is not enough memory remaining to satisfy the request, then NULL is
-  returned.
+  Allocates the number of 4KB pages of type EfiReservedMemoryType and returns a pointer to the
+  allocated buffer.  The buffer returned is aligned on a RUNTIME_PAGE_ALLOCATION_GRANULARITY boundary.
+  If Pages is 0, then NULL is returned.  If there is not enough memory remaining to satisfy the request,
+  then NULL is returned.
 
   @param  Pages                 The number of 4 KB pages to allocate.
 
