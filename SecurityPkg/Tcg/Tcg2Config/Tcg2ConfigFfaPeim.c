@@ -115,14 +115,8 @@ Tcg2ConfigFfaPeimEntryPoint (
 {
   EFI_STATUS                    Status;
   UINTN                         Size;
-  UINT16                        PartId;
   UINT16                        TpmPartId;
-  EFI_FFA_PART_INFO_DESC        *TpmPartInfo;
-  VOID                          *TxBuffer;
-  UINT64                        TxBufferSize;
-  VOID                          *RxBuffer;
-  UINT64                        RxBufferSize;
-  UINT32                        Count;
+  EFI_FFA_PART_INFO_DESC        TpmPartInfo;
   CONST EFI_PEI_PPI_DESCRIPTOR  *PpiList;
   GUID                          *TpmInstanceGuid;
 
@@ -131,44 +125,13 @@ Tcg2ConfigFfaPeimEntryPoint (
   TpmInstanceGuid = &gEfiTpmDeviceInstanceNoneGuid;
   PpiList         = &mTpmInitializationDonePpiList;
 
-  Status = ArmFfaLibPartitionIdGet (&PartId);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Failed to get partition-id. Status: %r\n", Status));
-    goto Cleanup;
-  }
-
-  Status = ArmFfaLibGetRxTxBuffers (
-             &TxBuffer,
-             &TxBufferSize,
-             &RxBuffer,
-             &RxBufferSize
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Failed to get Rx/Tx Buffer. Status: %r\n", Status));
-    goto Cleanup;
-  }
-
-  Status = ArmFfaLibPartitionInfoGet (
-             &gTpm2ServiceFfaGuid,
-             FFA_PART_INFO_FLAG_TYPE_DESC,
-             &Count,
-             (UINT32 *)&Size
-             );
+  Status = ArmFfaLibGetPartitionInfo (&gTpm2ServiceFfaGuid, &TpmPartInfo);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Failed to get Tpm2 partition info. Status: %r\n", Status));
     goto Cleanup;
   }
 
-  if ((Count != 1) || (Size < sizeof (EFI_FFA_PART_INFO_DESC))) {
-    Status = EFI_INVALID_PARAMETER;
-    DEBUG ((DEBUG_ERROR, "Invalid partition Info(%g). Count: %d, Size: %d\n", &gTpm2ServiceFfaGuid, Count, Size));
-    ArmFfaLibRxRelease (PartId);
-    goto Cleanup;
-  }
-
-  TpmPartInfo = (EFI_FFA_PART_INFO_DESC *)RxBuffer;
-  TpmPartId   = TpmPartInfo->PartitionId;
-  ArmFfaLibRxRelease (PartId);
+  TpmPartId = TpmPartInfo.PartitionId;
 
   Status = Tpm2FfaCheckInterfaceVersion (TpmPartId);
   if (EFI_ERROR (Status)) {

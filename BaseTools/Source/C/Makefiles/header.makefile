@@ -8,7 +8,7 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 
 # Set SEP to the platform specific path separator
-ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+ifeq (Windows, $(findstring Windows,$(OS)))
   SHELL := cmd.exe
   SEP:=$(shell echo \)
 else
@@ -17,7 +17,7 @@ endif
 
 EDK2_PATH ?= $(MAKEROOT)/../../..
 ifndef PYTHON_COMMAND
-  ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+  ifeq (Windows, $(findstring Windows,$(OS)))
     #
     # Try using the Python Launcher for Windows to find an interpreter.
     #
@@ -71,7 +71,7 @@ ifndef HOST_ARCH
   # try to figure out the appropriate HOST_ARCH.
   #
   GET_GNU_HOST_ARCH_PY:=$(MAKEROOT)$(SEP)Makefiles$(SEP)GnuMakeUtils.py get_host_arch
-  ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+  ifeq (Windows, $(findstring Windows,$(OS)))
     HOST_ARCH:=$(shell if defined PYTHON_COMMAND $(PYTHON_COMMAND) $(GET_GNU_HOST_ARCH_PY))
   else
     HOST_ARCH:=$(shell if command -v $(PYTHON_COMMAND) >/dev/null 1; then $(PYTHON_COMMAND) $(GET_GNU_HOST_ARCH_PY); else python $(GET_GNU_HOST_ARCH_PY); fi)
@@ -90,7 +90,7 @@ ifndef HOST_ARCH
 endif
 
 #Set up BaseTools binary path for Windows builds
-ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+ifeq (Windows, $(findstring Windows,$(OS)))
   ifndef BIN_PATH
     BIN_PATH_BASE=$(MAKEROOT)/../../Bin
     ifeq ($(HOST_ARCH),X64)
@@ -211,6 +211,6 @@ $(MAKEROOT)/libs:
 
 $(MAKEROOT)/bin:
 	$(MD) $(MAKEROOT)/bin
-ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+ifeq (Windows, $(findstring Windows,$(OS)))
 	$(MD) $(BIN_PATH)
 endif

@@ -171,7 +171,11 @@ def _get_win32_parent_processes():
     pid = GetCurrentProcessId()
     parent_processes = []
     found_parent = True
+    seen_pids = set()
     while found_parent:
+        if pid in seen_pids:
+            break
+        seen_pids.add(pid)
         found_parent = False
         for process in process_list:
             if process.process_id == pid:

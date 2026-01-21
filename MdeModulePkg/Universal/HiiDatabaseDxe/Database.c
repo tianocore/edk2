@@ -1085,7 +1085,10 @@ UpdateDefaultSettingInFormPackage (
         //
         if (EfiVarStoreIndex < EfiVarStoreNumber) {
           for (Index = 0; Index < DefaultIdNumber; Index++) {
-            if (DefaultIdList != NULL) {
+            if (DefaultIdList == NULL) {
+              ASSERT (DefaultIdList != NULL);
+              break;
+            } else {
               if (DefaultIdList[Index] == EFI_HII_DEFAULT_CLASS_STANDARD) {
                 Status = FindQuestionDefaultSetting (EFI_HII_DEFAULT_CLASS_STANDARD, EfiVarStoreList[EfiVarStoreIndex], IfrQuestionHdr, &IfrValue, Width, QuestionReferBitField);
                 if (!EFI_ERROR (Status)) {

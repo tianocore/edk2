@@ -290,13 +290,6 @@ FixupCmObjectSelfToken (
   }
 
   // Only support Arm and RISC-V objects for now.
-  if ((GET_CM_NAMESPACE_ID (CmObjDesc->ObjectId) != EObjNameSpaceArm) &&
-      (GET_CM_NAMESPACE_ID (CmObjDesc->ObjectId) != EObjNameSpaceRiscV))
-  {
-    ASSERT (0);
-    return EFI_UNSUPPORTED;
-  }
-
   if (GET_CM_NAMESPACE_ID (CmObjDesc->ObjectId) == EObjNameSpaceArm) {
     ArmNamespaceObjId = GET_CM_OBJECT_ID (CmObjDesc->ObjectId);
     if (ArmNamespaceObjId >= EArmObjMax) {
@@ -315,6 +308,12 @@ FixupCmObjectSelfToken (
 
     // Fixup self-token if necessary.
     TokenFixerFunc = RiscVTokenFixer[RiscVNamespaceObjId];
+  } else {
+    ASSERT (
+      (GET_CM_NAMESPACE_ID (CmObjDesc->ObjectId) == EObjNameSpaceArm) ||
+      (GET_CM_NAMESPACE_ID (CmObjDesc->ObjectId) == EObjNameSpaceRiscV)
+      );
+    return EFI_UNSUPPORTED;
   }
 
   if (TokenFixerFunc != NULL) {

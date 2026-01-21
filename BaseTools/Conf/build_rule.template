@@ -342,6 +342,8 @@
         "$(DLINK)" -o ${dst} $(DLINK_FLAGS) $(DLINK_XIPFLAGS) -Wl,--start-group,@$(STATIC_LIBRARY_FILES_LIST),--end-group $(CC_FLAGS) $(CC_XIPFLAGS) $(DLINK2_FLAGS)
         "$(OBJCOPY)" $(OBJCOPY_FLAGS) ${dst}
 
+    <Command.CLANGPDB>
+        "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST) $(DLINK2_FLAGS) $(DLINK_XIPFLAGS)
 
 [Static-Library-File.USER_DEFINED]
     <InputFile>
@@ -403,16 +405,7 @@
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
         -$(CP) $(DEBUG_DIR)(+)*.pdb $(OUTPUT_DIR) 
 
-    <Command.CLANGDWARF>
-        $(CP) ${src} $(DEBUG_DIR)(+)$(MODULE_NAME).debug
-        -$(CP) $(DEBUG_DIR)(+)$(MODULE_NAME).debug $(BIN_DIR)(+)$(MODULE_NAME_GUID).debug
-
-        "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} ${src} $(GENFW_FLAGS)
-        $(CP) ${dst} $(DEBUG_DIR)
-        $(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).efi
-        -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
-
-    <Command.GCC>
+    <Command.GCC, Command.CLANGDWARF>
         $(CP) ${src} $(DEBUG_DIR)(+)$(MODULE_NAME).debug
         "$(OBJCOPY)" $(OBJCOPY_STRIPFLAG) ${src}
 
@@ -426,6 +419,7 @@
         $(CP) ${dst} $(DEBUG_DIR)
         $(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).efi
         -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
+        -$(CP) $(DEBUG_DIR)(+)*.pdb $(OUTPUT_DIR)
         
     <Command.XCODE>
         # tool to convert Mach-O to PE/COFF
@@ -700,18 +694,40 @@
     <InputFile>
         *.hpk
 
-    <OutputFile.MSFT, OutputFile.INTEL, OutputFile.GCC, OutputFile.CLANGPDB>
+    <OutputFile.MSFT, OutputFile.INTEL, OutputFile.GCC, OutputFile.CLANGPDB, OutputFile.CLANGDWARF>
         $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.lib
 
     <OutputFile.XCODE>
         $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc
 
-    <Command.MSFT, Command.INTEL, Command.CLANGPDB>
-        "$(GENFW)" -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiipackage $(HII_BINARY_PACKAGES) $(GENFW_FLAGS)
-        "$(RC)" /Fo${dst} $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc
+    #
+    # RC tool for MSFT and CLANGPDB is typically rc or llvm-rc:
+    #     rc [options] .RC input file
+    #     llvm-rc [options] file...
+    #
+    # RC tool for GCC and CLANGDWARF is typically objcopy:
+    #     objcopy [option(s)] in-file [out-file]
+    #
+    # In the objcopy form, the [out-file] is optional. If it is not provided
+    # then the input file is used as the output file.
+    #
+    # In the rc form, if /FO option is not provided then the output is generated
+    # in the same file path as the input file with a .res extension.
+    #
+    # There are cases where CLANGDWARF needs to use llvm-rc, so the same rule
+    # must be compatible with objcopy, rc, and llvm-rc. The common form does
+    # not specify an output file and the default output file behavior is used.
+    #
+    # In order to generate the final {dst} in all cases, a copy command that
+    # is allowed to fail without error is used to copy the .res file to the
+    # .rc file so when the rc or llvm-rc command is used the result is the same
+    # as objcopy. Finally, the .rc file produced in all cases is copied to {dst}.
+    #
+    <Command.MSFT, Command.INTEL, Command.GCC, Command.CLANGPDB, Command.CLANGDWARF>
+        "$(GENFW)" -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) $(GENFWHII_FLAGS) $(HII_BINARY_PACKAGES) $(GENFW_FLAGS)
+        "$(RC)" $(RC_FLAGS) $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc
+        -$(CP) $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.res $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc
+        $(CP) $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc ${dst}
 
-    <Command.GCC>
-        "$(GENFW)" -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiibinpackage $(HII_BINARY_PACKAGES) $(GENFW_FLAGS)
-        "$(RC)" $(RC_FLAGS) $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc ${dst}
     <Command.XCODE>
         "$(GENFW)" -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiibinpackage $(HII_BINARY_PACKAGES) $(GENFW_FLAGS)

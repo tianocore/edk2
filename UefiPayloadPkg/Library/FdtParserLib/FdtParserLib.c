@@ -841,21 +841,9 @@ ParsePciRootBridge (
       UINT32  TripletCells = ChildAddrCells + ParentAddrCells + SizeCells;
 
       for (Base = 0; Base < TempLen / sizeof (UINT32); Base = Base + TripletCells) {
-        UINT64  ChildBusAddress  = 0;
         UINT64  ParentBusAddress = 0;
         UINT64  DmaRangeSize     = 0;
-
-        if (ChildAddrCells == 3) {
-          ChildBusAddress = (UINT64)Fdt32ToCpu (*(Data32 + Base + 1)) << 32 |
-                            (UINT64)Fdt32ToCpu (*(Data32 + Base + 2));
-        } else if (ChildAddrCells == 2) {
-          ChildBusAddress = (UINT64)Fdt32ToCpu (*(Data32 + Base)) << 32 |
-                            (UINT64)Fdt32ToCpu (*(Data32 + Base + 1));
-        } else if (ChildAddrCells == 1) {
-          ChildBusAddress = Fdt32ToCpu (*(Data32 + Base));
-        }
-
-        UINT32  ParentBase = Base + ChildAddrCells;
+        UINT32  ParentBase       = Base + ChildAddrCells;
         if (ParentAddrCells == 2) {
           ParentBusAddress = (UINT64)Fdt32ToCpu (*(Data32 + ParentBase)) << 32 |
                              (UINT64)Fdt32ToCpu (*(Data32 + ParentBase + 1));

@@ -114,7 +114,7 @@ PCCTS_H=../h
 #
 #   UNIX
 #
-ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+ifeq (Windows, $(findstring Windows,$(OS)))
   SHELL := cmd.exe
   SEP := $(shell echo \)
   RM := del /f /q
