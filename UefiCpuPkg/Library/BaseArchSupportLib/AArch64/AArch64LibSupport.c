@@ -9,6 +9,12 @@
 #include <Base.h>
 #include <Library/ArmLib.h>
 
+UINTN
+EFIAPI
+ArmArchLibGetPhysicalAddressBits (
+  VOID
+  );
+
 VOID
 EFIAPI
 InitializeFloatingPointUnits (
@@ -23,5 +29,5 @@ ArchGetPhysicalAddressBits (
   VOID
   )
 {
-  return ArmGetPhysicalAddressBits ();
+  return ArmArchLibGetPhysicalAddressBits ();
 }

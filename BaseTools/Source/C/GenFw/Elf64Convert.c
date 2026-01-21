@@ -390,7 +390,8 @@ FindPrmHandler (
   PrmHandler = (PRM_HANDLER_EXPORT_DESCRIPTOR_STRUCT *)(PrmExport + 1);
 
   for (HandlerNum = 0; HandlerNum < PrmExport->NumberPrmHandlers; HandlerNum++) {
-    strcpy(mExportSymName[mExportSymNum], PrmHandler->PrmHandlerName);
+    snprintf(mExportSymName[mExportSymNum], PRM_HANDLER_NAME_MAXIMUM_LENGTH, "%s", PrmHandler->PrmHandlerName);
+
     mExportSymNum ++;
     PrmHandler += 1;
 
@@ -1057,7 +1058,8 @@ ScanSections64 (
           //
           FindPrmHandler(Sym->st_value);
 
-          strcpy(mExportSymName[mExportSymNum], (CHAR8*)SymName);
+          snprintf(mExportSymName[mExportSymNum], PRM_HANDLER_NAME_MAXIMUM_LENGTH, "%s", (CHAR8*)SymName);
+
           mExportRVA[mExportSymNum] = (UINT32)(Sym->st_value);
           mExportSize += 2 * EFI_IMAGE_EXPORT_ADDR_SIZE + EFI_IMAGE_EXPORT_ORDINAL_SIZE + strlen((CHAR8 *)SymName) + 1;
           mExportSymNum ++;
@@ -1405,16 +1407,14 @@ WriteSections64 (
             SymName = (const UINT8 *)"<unknown>";
           }
 
-          if (mEhdr->e_machine == EM_X86_64) {
-            //
-            // For x86_64, we can ignore R_X86_64_NONE relocations.
-            // They are used to indicate that the symbol is not defined
-            // in the current module, but in a shared library that may be
-            // used when building modules for inclusion in host-based unit tests.
-            //
-            if (ELF_R_TYPE(Rel->r_info) == R_X86_64_NONE) {
-              continue;
-            }
+          //
+          // We can ignore R_*_NONE relocations (which always have numeric
+          // value 0x0).  They are used to indicate that the symbol is not
+          // defined in the current module, but in a shared library that may be
+          // used when building modules for inclusion in host-based unit tests.
+          //
+          if (ELF_R_TYPE(Rel->r_info) == 0x0) {
+            continue;
           }
 
           //
@@ -1998,6 +1998,7 @@ WriteRelocations64 (
           } else if (mEhdr->e_machine == EM_AARCH64) {
 
             switch (ELF_R_TYPE(Rel->r_info)) {
+            case R_AARCH64_NONE:
             case R_AARCH64_ADR_PREL_LO21:
             case R_AARCH64_CONDBR19:
             case R_AARCH64_LD_PREL_LO19:

@@ -112,7 +112,8 @@
           "stosq",
           "ttach",
           "urb's",
-          "xhc's"
+          "xhc's",
+          "usbsts"
         ],
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)

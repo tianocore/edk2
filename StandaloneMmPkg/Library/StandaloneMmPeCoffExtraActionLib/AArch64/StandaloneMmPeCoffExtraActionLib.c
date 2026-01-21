@@ -164,7 +164,15 @@ UpdatePeCoffPermissions (
 
     Base = TmpContext.ImageAddress + SectionHeader.VirtualAddress;
 
-    if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_MEM_EXECUTE) == 0) {
+    if (SectionHeader.Misc.VirtualSize == 0) {
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: Skipping section %d of image at 0x%lx with size 0\n",
+        __func__,
+        Index,
+        Base
+        ));
+    } else if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_MEM_EXECUTE) == 0) {
       if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_MEM_WRITE) == 0) {
         DEBUG ((
           DEBUG_INFO,
