@@ -235,7 +235,7 @@
   CLANGPDB:*_*_*_DLINK_FLAGS    = /DEBUG /pdb:"$(BIN_DIR)\$(MODULE_NAME_GUID).pdb"
 !if $(UNIT_TESTING_ADDRESS_SANITIZER_ENABLE)
   #
-  # Remove default library clang_rt.profile.lib that is not includes with Visual Studio
+  # Remove default library clang_rt.profile.lib that is not included with Visual Studio
   #
   CLANGPDB:*_*_IA32_DLINK_FLAGS = /NODEFAULTLIB:clang_rt.profile.lib
   #
@@ -248,14 +248,14 @@
   #
   # Set GCC HOST_APPLICATION options
   #
-  GCC:*_*_*_CC_FLAGS           =  -Wno-write-strings -fpie
-  GCC:*_*_IA32_DLINK_FLAGS     == -o $(BIN_DIR)/$(MODULE_NAME_GUID) -m32
-  GCC:*_*_X64_DLINK_FLAGS      == -o $(BIN_DIR)/$(MODULE_NAME_GUID) -m64
+  GCC:*_*_*_CC_FLAGS =  -Wno-write-strings -fpie
 !if $(WIN_MINGW32_BUILD)
-  GCC:*_CLANGDWARF_*_DLINK_FLAGS = -Wl,--pdb,$(BIN_DIR)\$(MODULE_NAME_GUID).pdb -g3
+  GCC:*_CLANGDWARF_*_DLINK_FLAGS == -o $(BIN_DIR)/$(MODULE_NAME_GUID).exe -Wl,--pdb,$(BIN_DIR)\$(MODULE_NAME_GUID).pdb -g3
 !else
-  GCC:*_*_*_DLINK_FLAGS = -z noexecstack
+  GCC:*_*_*_DLINK_FLAGS          == -o $(BIN_DIR)/$(MODULE_NAME_GUID) -z noexecstack
 !endif
+  GCC:*_*_IA32_DLINK_FLAGS = -m32
+  GCC:*_*_X64_DLINK_FLAGS  = -m64
 
 !if $(UNIT_TESTING_ADDRESS_SANITIZER_ENABLE)
   #
