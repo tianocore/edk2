@@ -2,6 +2,7 @@
   MM IPL that load the MM Core into MMRAM at PEI stage
 
   Copyright (c) 2024 - 2025, Intel Corporation. All rights reserved.<BR>
+  Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -467,9 +468,6 @@ CreateMmHobList (
                         MmProfileDataHob,
                         Block
                         );
-  if (PlatformHobSize != 0) {
-    FreePages (PlatformHobList, EFI_SIZE_TO_PAGES (PlatformHobSize));
-  }
 
   ASSERT (Status == RETURN_BUFFER_TOO_SMALL);
   ASSERT (FoundationHobSize != 0);
@@ -493,10 +491,12 @@ CreateMmHobList (
   CreateMmHobHandoffInfoTable (HobList, HobEnd);
 
   //
-  // Get platform HOBs
+  // Copy platform HOBs
   //
-  Status = CreateMmPlatformHob ((UINT8 *)HobList + PhitHobSize, &PlatformHobSize);
-  ASSERT_EFI_ERROR (Status);
+  if (PlatformHobSize != 0) {
+    CopyMem ((VOID *)((UINT8 *)HobList + PhitHobSize), PlatformHobList, PlatformHobSize);
+    FreePages (PlatformHobList, EFI_SIZE_TO_PAGES (PlatformHobSize));
+  }
 
   //
   // Get foundation HOBs
