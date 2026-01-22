@@ -1211,6 +1211,14 @@
   # @Prompt FFA TX/RX Buffer Page Count
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaTxRxPageCount|1|UINT64|0x30001062
 
+  ## Some platforms require that all EfiLoadOptions are retried until one of the options
+  # boots. When True, this Pcd will force Bds to retry all the valid EfiLoadOptions
+  # indefinitely until one of the options boots.
+  #   TRUE  - Efi boot options will be retried indefinitely.
+  #   FALSE - Efi boot options will not be retried.
+  # @Prompt Enable infinite retries during BDS.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportInfiniteBootRetries|FALSE|BOOLEAN|0x40000152
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicates the maximum number of callback function
