@@ -64,6 +64,7 @@
   BaseLib
   UefiDriverEntryPoint
   DebugLib
+  TimerLib
 
 [Protocols]
   gEfiPciHotPlugRequestProtocolGuid               ## SOMETIMES_PRODUCES
