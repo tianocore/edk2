@@ -489,6 +489,9 @@ class Symbols:
             fullSym = "%s:%s" % (moduleName, symbol)
             if not fullSym in self.dictSymbolAddress:
                 self.dictSymbolAddress[fullSym] = "0x00%08x" % (baseOffset+ int(modSymbols[symbol], 16))
+
+        # Support pseudo symbol for image base: _IMAGE_BASE_<moduleName>_
+        self.dictVariable['_IMAGE_BASE_%s_' % moduleName] = self.dictModBase['%s:BASE' % moduleName]
         return 0
 
     #
