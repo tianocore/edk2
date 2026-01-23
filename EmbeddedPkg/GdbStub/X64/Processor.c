@@ -404,13 +404,13 @@ GetBreakpointDataAddress (
   UINTN  Address;
 
   if (BreakpointNumber == 1) {
-    Address = SystemContext.SystemContextIa32->Dr0;
+    Address = SystemContext.SystemContextX64->Dr0;
   } else if (BreakpointNumber == 2) {
-    Address = SystemContext.SystemContextIa32->Dr1;
+    Address = SystemContext.SystemContextX64->Dr1;
   } else if (BreakpointNumber == 3) {
-    Address = SystemContext.SystemContextIa32->Dr2;
+    Address = SystemContext.SystemContextX64->Dr2;
   } else if (BreakpointNumber == 4) {
-    Address = SystemContext.SystemContextIa32->Dr3;
+    Address = SystemContext.SystemContextX64->Dr3;
   } else {
     Address = 0;
   }
@@ -437,7 +437,7 @@ GetBreakpointDetected (
   IA32_DR6  Dr6;
   UINTN     BreakpointNumber;
 
-  Dr6.UintN = SystemContext.SystemContextIa32->Dr6;
+  Dr6.UintN = SystemContext.SystemContextX64->Dr6;
 
   if (Dr6.Bits.B0 == 1) {
     BreakpointNumber = 1;
@@ -474,7 +474,7 @@ GetBreakpointType (
   IA32_DR7    Dr7;
   BREAK_TYPE  Type = NotSupported; // Default is NotSupported type
 
-  Dr7.UintN = SystemContext.SystemContextIa32->Dr7;
+  Dr7.UintN = SystemContext.SystemContextX64->Dr7;
 
   if (BreakpointNumber == 1) {
     Type = (BREAK_TYPE)Dr7.Bits.RW0;
@@ -537,7 +537,7 @@ FindNextFreeDebugRegister (
 {
   IA32_DR7  Dr7;
 
-  Dr7.UintN = SystemContext.SystemContextIa32->Dr7;
+  Dr7.UintN = SystemContext.SystemContextX64->Dr7;
 
   if (Dr7.Bits.G0 == 0) {
     *Register = 0;
@@ -596,35 +596,34 @@ EnableDebugRegister (
   }
 
   // Read DR7 so appropriate Gn, RWn and LENn bits can be modified.
-  Dr7.UintN = SystemContext.SystemContextIa32->Dr7;
+  Dr7.UintN = SystemContext.SystemContextX64->Dr7;
 
   if (Register == 0) {
-    SystemContext.SystemContextIa32->Dr0 = Address;
-    Dr7.Bits.G0                          = 1;
-    Dr7.Bits.RW0                         = Type;
-    Dr7.Bits.LEN0                        = Length;
+    SystemContext.SystemContextX64->Dr0 = Address;
+    Dr7.Bits.G0                         = 1;
+    Dr7.Bits.RW0                        = (UINT32)Type;
+    Dr7.Bits.LEN0                       = (UINT32)Length;
   } else if (Register == 1) {
-    SystemContext.SystemContextIa32->Dr1 = Address;
-    Dr7.Bits.G1                          = 1;
-    Dr7.Bits.RW1                         = Type;
-    Dr7.Bits.LEN1                        = Length;
+    SystemContext.SystemContextX64->Dr1 = Address;
+    Dr7.Bits.G1                         = 1;
+    Dr7.Bits.RW1                        = (UINT32)Type;
+    Dr7.Bits.LEN1                       = (UINT32)Length;
   } else if (Register == 2) {
-    SystemContext.SystemContextIa32->Dr2 = Address;
-    Dr7.Bits.G2                          = 1;
-    Dr7.Bits.RW2                         = Type;
-    Dr7.Bits.LEN2                        = Length;
+    SystemContext.SystemContextX64->Dr2 = Address;
+    Dr7.Bits.G2                         = 1;
+    Dr7.Bits.RW2                        = (UINT32)Type;
+    Dr7.Bits.LEN2                       = (UINT32)Length;
   } else if (Register == 3) {
-    SystemContext.SystemContextIa32->Dr3 = Address;
-    Dr7.Bits.G3                          = 1;
-    Dr7.Bits.RW3                         = Type;
-    Dr7.Bits.LEN3                        = Length;
+    SystemContext.SystemContextX64->Dr3 = Address;
+    Dr7.Bits.G3                         = 1;
+    Dr7.Bits.RW3                        = (UINT32)Type;
+    Dr7.Bits.LEN3                       = (UINT32)Length;
   } else {
     return EFI_INVALID_PARAMETER;
   }
 
   // Update Dr7 with appropriate Gn, RWn and LENn bits
-  SystemContext.SystemContextIa32->Dr7 = Dr7.UintN;
-
+  SystemContext.SystemContextX64->Dr7 = Dr7.UintN;
   return EFI_SUCCESS;
 }
 
@@ -666,30 +665,30 @@ FindMatchingDebugRegister (
   // Convert length data
   Length = ConvertLengthData (Length);
 
-  Dr7.UintN = SystemContext.SystemContextIa32->Dr7;
+  Dr7.UintN = SystemContext.SystemContextX64->Dr7;
 
   if ((Dr7.Bits.G0 == 1) &&
       (Dr7.Bits.LEN0 == Length) &&
       (Dr7.Bits.RW0 == Type) &&
-      (Address == SystemContext.SystemContextIa32->Dr0))
+      (Address == SystemContext.SystemContextX64->Dr0))
   {
     *Register = 0;
   } else if ((Dr7.Bits.G1 == 1) &&
              (Dr7.Bits.LEN1 == Length) &&
              (Dr7.Bits.RW1 == Type) &&
-             (Address == SystemContext.SystemContextIa32->Dr1))
+             (Address == SystemContext.SystemContextX64->Dr1))
   {
     *Register = 1;
   } else if ((Dr7.Bits.G2 == 1) &&
              (Dr7.Bits.LEN2 == Length) &&
              (Dr7.Bits.RW2 == Type) &&
-             (Address == SystemContext.SystemContextIa32->Dr2))
+             (Address == SystemContext.SystemContextX64->Dr2))
   {
     *Register = 2;
   } else if ((Dr7.Bits.G3 == 1) &&
              (Dr7.Bits.LEN3 == Length) &&
              (Dr7.Bits.RW3 == Type) &&
-             (Address == SystemContext.SystemContextIa32->Dr3))
+             (Address == SystemContext.SystemContextX64->Dr3))
   {
     *Register = 3;
   } else {
@@ -719,35 +718,34 @@ DisableDebugRegister (
   UINTN     Address = 0;
 
   // Read DR7 register so appropriate Gn, RWn and LENn bits can be turned off.
-  Dr7.UintN = SystemContext.SystemContextIa32->Dr7;
+  Dr7.UintN = SystemContext.SystemContextX64->Dr7;
 
   if (Register == 0) {
-    SystemContext.SystemContextIa32->Dr0 = Address;
-    Dr7.Bits.G0                          = 0;
-    Dr7.Bits.RW0                         = 0;
-    Dr7.Bits.LEN0                        = 0;
+    SystemContext.SystemContextX64->Dr0 = Address;
+    Dr7.Bits.G0                         = 0;
+    Dr7.Bits.RW0                        = 0;
+    Dr7.Bits.LEN0                       = 0;
   } else if (Register == 1) {
-    SystemContext.SystemContextIa32->Dr1 = Address;
-    Dr7.Bits.G1                          = 0;
-    Dr7.Bits.RW1                         = 0;
-    Dr7.Bits.LEN1                        = 0;
+    SystemContext.SystemContextX64->Dr1 = Address;
+    Dr7.Bits.G1                         = 0;
+    Dr7.Bits.RW1                        = 0;
+    Dr7.Bits.LEN1                       = 0;
   } else if (Register == 2) {
-    SystemContext.SystemContextIa32->Dr2 = Address;
-    Dr7.Bits.G2                          = 0;
-    Dr7.Bits.RW2                         = 0;
-    Dr7.Bits.LEN2                        = 0;
+    SystemContext.SystemContextX64->Dr2 = Address;
+    Dr7.Bits.G2                         = 0;
+    Dr7.Bits.RW2                        = 0;
+    Dr7.Bits.LEN2                       = 0;
   } else if (Register == 3) {
-    SystemContext.SystemContextIa32->Dr3 = Address;
-    Dr7.Bits.G3                          = 0;
-    Dr7.Bits.RW3                         = 0;
-    Dr7.Bits.LEN3                        = 0;
+    SystemContext.SystemContextX64->Dr3 = Address;
+    Dr7.Bits.G3                         = 0;
+    Dr7.Bits.RW3                        = 0;
+    Dr7.Bits.LEN3                       = 0;
   } else {
     return EFI_INVALID_PARAMETER;
   }
 
   // Update DR7 register so appropriate Gn, RWn and LENn bits can be turned off.
-  SystemContext.SystemContextIa32->Dr7 = Dr7.UintN;
-
+  SystemContext.SystemContextX64->Dr7 = Dr7.UintN;
   return EFI_SUCCESS;
 }
 
