@@ -79,6 +79,87 @@ ON_EXIT:
 }
 
 /**
+  Create a REDFISH_SERVICE with explicit credentials.
+
+  This function creates a Redfish service with user-provided credentials instead
+  of using the credential protocol. This is useful when the caller needs to use
+  different credentials than the system default, such as for BMC management
+  operations that require administrative access.
+
+  The service enumerator will handle the authentication flow automatically
+  using the provided credentials for HTTP basic auth or Redfish session login.
+
+  Callers are responsible for freeing the returned service by RedfishCleanupService().
+
+  @param[in]  RedfishConfigServiceInfo Redfish service information the EFI Redfish
+                                       feature driver communicates with.
+  @param[in]  AuthMethod               None, HTTP basic auth, or Redfish session login.
+  @param[in]  UserId                   User name for authentication.
+  @param[in]  Password                 Password for authentication.
+
+  @return     New created Redfish Service, or NULL if error happens.
+
+**/
+REDFISH_SERVICE
+EFIAPI
+RedfishCreateServiceWithCredential (
+  IN  REDFISH_CONFIG_SERVICE_INFORMATION  *RedfishConfigServiceInfo,
+  IN  EDKII_REDFISH_AUTH_METHOD           AuthMethod,
+  IN  CHAR8                               *UserId,
+  IN  CHAR8                               *Password
+  )
+{
+  //
+  // Check Input Parameters.
+  //
+  if (RedfishConfigServiceInfo == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: RedfishConfigServiceInfo is NULL\n", __func__));
+    return NULL;
+  }
+
+  //
+  // Validate AuthMethod is within the valid range.
+  //
+  if (AuthMethod >= AuthMethodMax) {
+    DEBUG ((DEBUG_ERROR, "%a: Invalid AuthMethod %d\n", __func__, AuthMethod));
+    return NULL;
+  }
+
+  //
+  // For authentication methods that require credentials, ensure UserId and Password are provided.
+  //
+  if ((AuthMethod == AuthMethodHttpBasic) || (AuthMethod == AuthMethodRedfishSession)) {
+    if (UserId == NULL) {
+      DEBUG ((DEBUG_ERROR, "%a: UserId is NULL for AuthMethod %d\n", __func__, AuthMethod));
+      return NULL;
+    }
+
+    if (Password == NULL) {
+      DEBUG ((DEBUG_ERROR, "%a: Password is NULL for AuthMethod %d\n", __func__, AuthMethod));
+      return NULL;
+    }
+
+    //
+    // Check for empty username (empty password might be valid in some cases).
+    //
+    if (AsciiStrLen (UserId) == 0) {
+      DEBUG ((DEBUG_ERROR, "%a: UserId is empty string for AuthMethod %d\n", __func__, AuthMethod));
+      return NULL;
+    }
+  }
+
+  //
+  // Create a redfish service node with the provided credentials.
+  //
+  return RedfishCreateLibredfishService (
+           RedfishConfigServiceInfo,
+           AuthMethod,
+           UserId,
+           Password
+           );
+}
+
+/**
   Free the Service and all its related resources.
 
   @param[in]    RedfishService     The Service to access the Redfish resources.
