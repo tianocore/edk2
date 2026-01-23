@@ -32,20 +32,16 @@ extern EDKII_DEVICE_SECURITY_PROTOCOL  *mDeviceSecurityProtocol;
 #define PCI_CRS_DEFAULT_RETRY_INTERVAL_US  10000
 
 //
-// Maximum number of CRS pending devices per bus for deferred rescan
-// 32 devices * 8 functions = 256 maximum possible slots per bus
-//
-#define MAX_CRS_PENDING_PER_BUS  256
-
-//
-// Structure to track devices that returned CRS during initial bus scan
+// Structure to track devices that returned CRS across entire PCI topology
 //
 typedef struct {
-  UINT8      Device;             // PCI device number
-  UINT8      Func;               // PCI function number
-  UINT64     FirstCrsTimeUs;     // Timestamp when CRS was first detected
-  BOOLEAN    Func0ReturnedCrs;   // TRUE if this is Func 0 that returned CRS
-} CRS_PENDING_SLOT;
+  PCI_IO_DEVICE    *ParentBridge;   // Parent bridge for this device
+  UINT8            Bus;             // PCI bus number
+  UINT8            Device;          // PCI device number
+  UINT8            Func;            // PCI function number
+  UINT64           FirstCrsTimeUs;  // Timestamp when CRS was first detected
+  BOOLEAN          Processed;       // TRUE if already processed or timed out
+} CRS_PENDING_GLOBAL;
 
 /**
   Get current time in microseconds for CRS timeout tracking.
@@ -403,14 +399,167 @@ PciPciDeviceInfoCollectorBlocking (
 }
 
 /**
+  Scan a single PCI bus without blocking on CRS devices.
+
+  This helper function scans all devices on a bus, adding CRS devices to the
+  global pending list for later retry. Ready bridges are immediately recursed
+  into, allowing topology discovery to proceed in parallel with CRS waits.
+
+  @param Bridge           Parent bridge instance.
+  @param StartBusNumber   Bus number to scan.
+  @param CrsPendingList   Global array to collect CRS devices across topology.
+  @param CrsPendingCount  Pointer to current count of pending CRS devices.
+  @param CrsMaxEntries    Maximum entries in CrsPendingList.
+
+  @retval EFI_SUCCESS     Bus scan completed successfully.
+  @retval other           Some error occurred during bus scan.
+
+**/
+STATIC
+EFI_STATUS
+PciScanBusNonBlocking (
+  IN     PCI_IO_DEVICE       *Bridge,
+  IN     UINT8               StartBusNumber,
+  IN OUT CRS_PENDING_GLOBAL  *CrsPendingList,
+  IN OUT UINTN               *CrsPendingCount,
+  IN     UINTN               CrsMaxEntries
+  )
+{
+  EFI_STATUS           Status;
+  PCI_TYPE00           Pci;
+  UINT8                Device;
+  UINT8                Func;
+  UINT8                SecBus;
+  PCI_IO_DEVICE        *PciIoDevice;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+
+  for (Device = 0; Device <= PCI_MAX_DEVICE; Device++) {
+    for (Func = 0; Func <= PCI_MAX_FUNC; Func++) {
+      //
+      // Check if PCI device is present (non-blocking)
+      //
+      Status = PciDevicePresentNonBlocking (
+                 Bridge->PciRootBridgeIo,
+                 &Pci,
+                 StartBusNumber,
+                 (UINT8)Device,
+                 (UINT8)Func
+                 );
+
+      if (Status == EFI_NOT_READY) {
+        //
+        // Device returned CRS - add to global pending list for later retry
+        //
+        if (*CrsPendingCount < CrsMaxEntries) {
+          CrsPendingList[*CrsPendingCount].ParentBridge   = Bridge;
+          CrsPendingList[*CrsPendingCount].Bus            = StartBusNumber;
+          CrsPendingList[*CrsPendingCount].Device         = Device;
+          CrsPendingList[*CrsPendingCount].Func           = Func;
+          CrsPendingList[*CrsPendingCount].FirstCrsTimeUs = GetTimeInMicroseconds ();
+          CrsPendingList[*CrsPendingCount].Processed      = FALSE;
+          (*CrsPendingCount)++;
+
+          DEBUG ((
+            DEBUG_INFO,
+            "PCI %02x:%02x.%x returned CRS, added to global pending list\n",
+            StartBusNumber,
+            Device,
+            Func
+            ));
+        } else {
+          DEBUG ((
+            DEBUG_WARN,
+            "PCI %02x:%02x.%x returned CRS but global list full, skipping\n",
+            StartBusNumber,
+            Device,
+            Func
+            ));
+        }
+
+        //
+        // If Func 0 returns CRS, we can't determine if this is a multi-function
+        // device yet. Continue probing other functions in case they respond.
+        //
+        continue;
+      }
+
+      if (EFI_ERROR (Status) && (Func == 0)) {
+        //
+        // No Function 0 present, skip to next device
+        //
+        break;
+      }
+
+      if (!EFI_ERROR (Status)) {
+        //
+        // Device is ready - process it immediately
+        //
+        PreprocessController (Bridge, StartBusNumber, Device, Func, EfiPciBeforeResourceCollection);
+
+        Status = PciSearchDevice (
+                   Bridge,
+                   &Pci,
+                   StartBusNumber,
+                   Device,
+                   Func,
+                   &PciIoDevice
+                   );
+
+        //
+        // If this is a bridge, immediately recurse into subordinate bus
+        // This allows topology discovery to proceed in parallel with CRS waits
+        //
+        if (!EFI_ERROR (Status) && (IS_PCI_BRIDGE (&Pci) || IS_CARDBUS_BRIDGE (&Pci))) {
+          PciIo = &(PciIoDevice->PciIo);
+
+          Status = PciIo->Pci.Read (
+                                PciIo,
+                                EfiPciIoWidthUint8,
+                                PCI_BRIDGE_SECONDARY_BUS_REGISTER_OFFSET,
+                                1,
+                                &SecBus
+                                );
+
+          if (!EFI_ERROR (Status) && (SecBus > StartBusNumber)) {
+            //
+            // Get resource padding for PPB
+            //
+            GetResourcePaddingPpb (PciIoDevice);
+
+            //
+            // Recursively scan subordinate bus (may add more CRS devices to global list)
+            //
+            PciScanBusNonBlocking (
+              PciIoDevice,
+              SecBus,
+              CrsPendingList,
+              CrsPendingCount,
+              CrsMaxEntries
+              );
+          }
+        }
+
+        //
+        // Skip remaining functions if this is not a multi-function device
+        //
+        if ((Func == 0) && !IS_PCI_MULTI_FUNC (&Pci)) {
+          Func = PCI_MAX_FUNC;
+        }
+      }
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Collect all the resource information under this root bridge.
 
-  This implementation uses deferred CRS (Configuration Request Retry Status)
-  handling to improve boot time. When a device returns CRS, instead of blocking
-  and retrying immediately, the function continues scanning other devices on
-  the same bus. After all devices on the bus have been scanned, it retries the
-  CRS devices. This allows multiple slow devices on the same bus to initialize
-  in parallel, reducing total boot time.
+  This implementation uses full-topology deferred CRS (Configuration Request
+  Retry Status) handling to improve boot time. CRS devices across the entire
+  PCI hierarchy are collected into a global list and rescanned in parallel,
+  allowing maximum parallelism for slow devices regardless of which bus they
+  are on.
 
   A database that records all the information about pci device subject to this
   root bridge will then be created.
@@ -436,59 +585,33 @@ PciPciDeviceInfoCollector (
   PCI_IO_DEVICE        *PciIoDevice;
   EFI_PCI_IO_PROTOCOL  *PciIo;
   UINTN                Index;
+  UINTN                PendingCount;
+  BOOLEAN              AnyStillPending;
+  CRS_PENDING_GLOBAL   *CrsPendingList;
+  UINTN                CrsPendingCount;
+  UINTN                CrsMaxPendingDevices;
+  UINT32               CrsRetryIntervalUs;
+  UINT32               CrsTimeoutSeconds;
+  UINT64               CrsTimeoutUs;
+  UINT64               CurrentTimeUs;
 
   //
-  // Heap-allocated arrays to avoid stack overflow in deep PCIe topologies
+  // Get CRS configuration from PCDs
   //
-  CRS_PENDING_SLOT  *CrsPending;
-  UINTN             CrsPendingCount;
-  PCI_IO_DEVICE     **BridgeList;
-  UINTN             BridgeCount;
-
-  //
-  // CRS timing parameters
-  //
-  UINT32  CrsRetryIntervalUs;
-  UINT32  CrsTimeoutSeconds;
-  UINT64  CrsTimeoutUs;
-  UINT64  CurrentTimeUs;
-
-  CrsPendingCount = 0;
-  BridgeCount     = 0;
+  CrsRetryIntervalUs   = PcdGet32 (PcdPciCrsRetryIntervalUs);
+  CrsTimeoutSeconds    = PcdGet32 (PcdPciCrsTimeoutSeconds);
+  CrsMaxPendingDevices = PcdGet32 (PcdPciCrsMaxPendingDevices);
 
   //
-  // Allocate working arrays from heap to avoid stack overflow
-  // during deep recursion in complex PCIe topologies
+  // If MaxPendingDevices is 0, deferred CRS is disabled - use blocking enumeration
   //
-  CrsPending = AllocatePool (MAX_CRS_PENDING_PER_BUS * sizeof (CRS_PENDING_SLOT));
-  BridgeList = AllocatePool ((PCI_MAX_DEVICE + 1) * sizeof (PCI_IO_DEVICE *));
-
-  if ((CrsPending == NULL) || (BridgeList == NULL)) {
-    //
-    // Allocation failed - fall back to original blocking behavior
-    //
-    DEBUG ((
-      DEBUG_WARN,
-      "PCI Bus %02x: Memory allocation failed for deferred CRS, using blocking scan\n",
-      StartBusNumber
-      ));
-
-    if (CrsPending != NULL) {
-      FreePool (CrsPending);
-    }
-
-    if (BridgeList != NULL) {
-      FreePool (BridgeList);
-    }
-
+  if (CrsMaxPendingDevices == 0) {
+    DEBUG ((DEBUG_INFO, "PCI: Deferred CRS disabled (PcdPciCrsMaxPendingDevices=0), using blocking enumeration\n"));
     return PciPciDeviceInfoCollectorBlocking (Bridge, StartBusNumber);
   }
 
-  CrsRetryIntervalUs = PcdGet32 (PcdPciCrsRetryIntervalUs);
-  CrsTimeoutSeconds  = PcdGet32 (PcdPciCrsTimeoutSeconds);
-
   //
-  // Validate CRS PCDs - if invalid, fall back to blocking enumeration
+  // Validate other CRS PCDs - if invalid, fall back to blocking enumeration
   //
   if ((CrsRetryIntervalUs == 0) || (CrsTimeoutSeconds == 0)) {
     DEBUG ((
@@ -497,140 +620,94 @@ PciPciDeviceInfoCollector (
       CrsRetryIntervalUs,
       CrsTimeoutSeconds
       ));
-    FreePool (CrsPending);
-    FreePool (BridgeList);
     return PciPciDeviceInfoCollectorBlocking (Bridge, StartBusNumber);
   }
+
+  //
+  // Allocate global CRS pending list from heap
+  // This list collects CRS devices across the entire PCI topology
+  //
+  CrsPendingList = AllocateZeroPool (CrsMaxPendingDevices * sizeof (CRS_PENDING_GLOBAL));
+
+  if (CrsPendingList == NULL) {
+    //
+    // Allocation failed - fall back to original blocking behavior
+    //
+    DEBUG ((
+      DEBUG_WARN,
+      "PCI: Memory allocation failed for global CRS list (%u bytes), using blocking scan\n",
+      CrsMaxPendingDevices * sizeof (CRS_PENDING_GLOBAL)
+      ));
+
+    return PciPciDeviceInfoCollectorBlocking (Bridge, StartBusNumber);
+  }
+
+  CrsPendingCount = 0;
 
   CrsTimeoutUs = (UINT64)CrsTimeoutSeconds * MICROSECONDS_PER_SECOND;
 
   //
-  // Phase 1: Quick scan of all devices on this bus
-  // Devices returning CRS are added to pending list for later retry
+  // Phase 1: Initial topology scan
+  // Scan entire reachable topology, adding CRS devices to global list
+  // Ready bridges are immediately recursed into
   //
-  for (Device = 0; Device <= PCI_MAX_DEVICE; Device++) {
-    for (Func = 0; Func <= PCI_MAX_FUNC; Func++) {
-      //
-      // Check if PCI device is present (non-blocking)
-      //
-      Status = PciDevicePresentNonBlocking (
-                 Bridge->PciRootBridgeIo,
-                 &Pci,
-                 (UINT8)StartBusNumber,
-                 (UINT8)Device,
-                 (UINT8)Func
-                 );
+  DEBUG ((DEBUG_INFO, "PCI: Starting full-topology scan from bus %02x\n", StartBusNumber));
 
-      if (Status == EFI_NOT_READY) {
-        //
-        // Device returned CRS - add to pending list for later retry
-        //
-        if (CrsPendingCount < MAX_CRS_PENDING_PER_BUS) {
-          CrsPending[CrsPendingCount].Device           = Device;
-          CrsPending[CrsPendingCount].Func             = Func;
-          CrsPending[CrsPendingCount].FirstCrsTimeUs   = GetTimeInMicroseconds ();
-          CrsPending[CrsPendingCount].Func0ReturnedCrs = (Func == 0);
-          CrsPendingCount++;
+  Status = PciScanBusNonBlocking (
+             Bridge,
+             StartBusNumber,
+             CrsPendingList,
+             &CrsPendingCount,
+             CrsMaxPendingDevices
+             );
 
-          if (CrsPendingCount == 1) {
-            DEBUG ((
-              DEBUG_INFO,
-              "PCI Bus %02x: Device %02x.%x returned CRS, deferring retry\n",
-              StartBusNumber,
-              Device,
-              Func
-              ));
-          }
-        }
-
-        //
-        // If Func 0 returns CRS, we can't determine if this is a multi-function
-        // device yet. Continue probing other functions in case they respond.
-        //
-        if (Func == 0) {
-          continue;
-        }
-
-        continue;
-      }
-
-      if (EFI_ERROR (Status) && (Func == 0)) {
-        //
-        // No Function 0 present, skip to next device
-        //
-        break;
-      }
-
-      if (!EFI_ERROR (Status)) {
-        //
-        // Device is ready - process it immediately
-        //
-        PreprocessController (Bridge, (UINT8)StartBusNumber, Device, Func, EfiPciBeforeResourceCollection);
-
-        Status = PciSearchDevice (
-                   Bridge,
-                   &Pci,
-                   (UINT8)StartBusNumber,
-                   Device,
-                   Func,
-                   &PciIoDevice
-                   );
-
-        //
-        // If this is a bridge, save it for later recursion (after CRS devices resolved)
-        //
-        if (!EFI_ERROR (Status) && (IS_PCI_BRIDGE (&Pci) || IS_CARDBUS_BRIDGE (&Pci))) {
-          if (BridgeCount <= PCI_MAX_DEVICE) {
-            BridgeList[BridgeCount++] = PciIoDevice;
-          }
-        }
-
-        //
-        // Skip remaining functions if this is not a multi-function device
-        //
-        if ((Func == 0) && !IS_PCI_MULTI_FUNC (&Pci)) {
-          Func = PCI_MAX_FUNC;
-        }
-      }
-    }
+  if (CrsPendingCount == 0) {
+    //
+    // No CRS devices found - topology scan complete
+    //
+    DEBUG ((DEBUG_INFO, "PCI: Topology scan complete, no CRS devices found\n"));
+    FreePool (CrsPendingList);
+    return EFI_SUCCESS;
   }
 
   //
-  // Phase 2: Rescan devices that returned CRS
-  // Retry until all devices are ready or timeout
+  // Phase 2: Global CRS rescan loop
+  // All CRS devices across the entire topology wait in parallel
   //
-  if (CrsPendingCount > 0) {
-    DEBUG ((
-      DEBUG_INFO,
-      "PCI Bus %02x: %d device(s) returned CRS, starting deferred rescan (timeout %ds)\n",
-      StartBusNumber,
-      CrsPendingCount,
-      PcdGet32 (PcdPciCrsTimeoutSeconds)
-      ));
-  }
+  DEBUG ((
+    DEBUG_INFO,
+    "PCI: %d device(s) returned CRS across topology, starting global rescan (timeout %ds)\n",
+    CrsPendingCount,
+    CrsTimeoutSeconds
+    ));
 
-  while (CrsPendingCount > 0) {
+  do {
     //
     // Wait before retry
     //
     gBS->Stall ((UINTN)CrsRetryIntervalUs);
 
+    AnyStillPending = FALSE;
+    CurrentTimeUs   = GetTimeInMicroseconds ();
+
     //
     // Retry each pending device
     //
-    for (Index = 0; Index < CrsPendingCount;) {
-      Device = CrsPending[Index].Device;
-      Func   = CrsPending[Index].Func;
+    for (Index = 0; Index < CrsPendingCount; Index++) {
+      if (CrsPendingList[Index].Processed) {
+        continue;
+      }
+
+      Device = CrsPendingList[Index].Device;
+      Func   = CrsPendingList[Index].Func;
 
       Status = PciDevicePresentNonBlocking (
-                 Bridge->PciRootBridgeIo,
+                 CrsPendingList[Index].ParentBridge->PciRootBridgeIo,
                  &Pci,
-                 (UINT8)StartBusNumber,
-                 (UINT8)Device,
-                 (UINT8)Func
+                 CrsPendingList[Index].Bus,
+                 Device,
+                 Func
                  );
-
-      CurrentTimeUs = GetTimeInMicroseconds ();
 
       if (!EFI_ERROR (Status)) {
         //
@@ -639,107 +716,124 @@ PciPciDeviceInfoCollector (
         DEBUG ((
           DEBUG_INFO,
           "PCI %02x:%02x.%x ready after CRS wait (%d ms)\n",
-          StartBusNumber,
+          CrsPendingList[Index].Bus,
           Device,
           Func,
-          DivU64x32 (CurrentTimeUs - CrsPending[Index].FirstCrsTimeUs, MICROSECONDS_PER_MILLISECOND)
+          DivU64x32 (CurrentTimeUs - CrsPendingList[Index].FirstCrsTimeUs, MICROSECONDS_PER_MILLISECOND)
           ));
 
-        PreprocessController (Bridge, (UINT8)StartBusNumber, Device, Func, EfiPciBeforeResourceCollection);
+        PreprocessController (
+          CrsPendingList[Index].ParentBridge,
+          CrsPendingList[Index].Bus,
+          Device,
+          Func,
+          EfiPciBeforeResourceCollection
+          );
 
         Status = PciSearchDevice (
-                   Bridge,
+                   CrsPendingList[Index].ParentBridge,
                    &Pci,
-                   (UINT8)StartBusNumber,
+                   CrsPendingList[Index].Bus,
                    Device,
                    Func,
                    &PciIoDevice
                    );
 
+        //
+        // If this is a bridge, scan its subordinate bus now
+        // This may discover more devices (including more CRS devices)
+        //
         if (!EFI_ERROR (Status) && (IS_PCI_BRIDGE (&Pci) || IS_CARDBUS_BRIDGE (&Pci))) {
-          if (BridgeCount <= PCI_MAX_DEVICE) {
-            BridgeList[BridgeCount++] = PciIoDevice;
+          PciIo = &(PciIoDevice->PciIo);
+
+          Status = PciIo->Pci.Read (
+                                PciIo,
+                                EfiPciIoWidthUint8,
+                                PCI_BRIDGE_SECONDARY_BUS_REGISTER_OFFSET,
+                                1,
+                                &SecBus
+                                );
+
+          if (!EFI_ERROR (Status) && (SecBus > CrsPendingList[Index].Bus)) {
+            //
+            // Get resource padding for PPB
+            //
+            GetResourcePaddingPpb (PciIoDevice);
+
+            //
+            // Scan the subordinate bus (may add more CRS devices to global list)
+            //
+            DEBUG ((
+              DEBUG_INFO,
+              "PCI: CRS bridge %02x:%02x.%x ready, scanning subordinate bus %02x\n",
+              CrsPendingList[Index].Bus,
+              Device,
+              Func,
+              SecBus
+              ));
+
+            PciScanBusNonBlocking (
+              PciIoDevice,
+              SecBus,
+              CrsPendingList,
+              &CrsPendingCount,
+              CrsMaxPendingDevices
+              );
           }
         }
 
         //
-        // Remove from pending list (swap with last element for O(1) removal)
+        // Mark as processed
         //
-        CrsPending[Index] = CrsPending[--CrsPendingCount];
-        continue;  // Don't increment Index - check the swapped element
+        CrsPendingList[Index].Processed = TRUE;
+        continue;
       }
 
       //
       // Check for per-device timeout
       //
-      if ((CurrentTimeUs - CrsPending[Index].FirstCrsTimeUs) > CrsTimeoutUs) {
+      if ((CurrentTimeUs - CrsPendingList[Index].FirstCrsTimeUs) > CrsTimeoutUs) {
         DEBUG ((
           DEBUG_ERROR,
           "PCI %02x:%02x.%x CRS timeout after %d seconds - device not ready\n",
-          StartBusNumber,
+          CrsPendingList[Index].Bus,
           Device,
           Func,
-          PcdGet32 (PcdPciCrsTimeoutSeconds)
+          CrsTimeoutSeconds
           ));
 
         //
-        // Remove from pending list
+        // Mark as processed (timed out)
         //
-        CrsPending[Index] = CrsPending[--CrsPendingCount];
+        CrsPendingList[Index].Processed = TRUE;
         continue;
       }
 
       //
-      // Device still returning CRS, keep in list and check next
+      // Device still returning CRS
       //
-      Index++;
-    }
-  }
-
-  //
-  // Phase 3: Recurse into bridges found on this bus
-  // This happens after all CRS devices on this bus have been resolved
-  //
-  for (Index = 0; Index < BridgeCount; Index++) {
-    PciIoDevice = BridgeList[Index];
-    PciIo       = &(PciIoDevice->PciIo);
-
-    Status = PciIo->Pci.Read (
-                          PciIo,
-                          EfiPciIoWidthUint8,
-                          PCI_BRIDGE_SECONDARY_BUS_REGISTER_OFFSET,
-                          1,
-                          &SecBus
-                          );
-
-    if (EFI_ERROR (Status)) {
-      continue;
+      AnyStillPending = TRUE;
     }
 
     //
-    // Ensure secondary bus number is greater than the primary bus number
-    // to avoid potential dead loop when PcdPciDisableBusEnumeration is TRUE
+    // Count remaining pending devices (may have grown if bridges became ready)
     //
-    if (SecBus <= StartBusNumber) {
-      continue;
+    PendingCount = 0;
+    for (Index = 0; Index < CrsPendingCount; Index++) {
+      if (!CrsPendingList[Index].Processed) {
+        PendingCount++;
+      }
     }
 
-    //
-    // Get resource padding for PPB
-    //
-    GetResourcePaddingPpb (PciIoDevice);
+    AnyStillPending = (PendingCount > 0);
+  } while (AnyStillPending);
 
-    //
-    // Deep enumerate the next level bus
-    //
-    PciPciDeviceInfoCollector (PciIoDevice, (UINT8)SecBus);
-  }
+  DEBUG ((DEBUG_INFO, "PCI: Full-topology CRS rescan complete\n"));
 
   //
-  // Cleanup heap allocations
+  // Cleanup
   //
-  FreePool (CrsPending);
-  FreePool (BridgeList);
+  FreePool (CrsPendingList);
 
   return EFI_SUCCESS;
 }

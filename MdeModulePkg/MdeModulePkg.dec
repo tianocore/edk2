@@ -2320,6 +2320,14 @@
   # @Prompt PCI CRS timeout in seconds.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciCrsTimeoutSeconds|60|UINT32|0x1000002B
 
+  ## Maximum number of PCI devices that can return CRS during topology scan.
+  #  This limits the size of the global CRS pending list used for deferred
+  #  CRS rescan across the entire PCI topology. Default is 4096 to support
+  #  complex multi-socket server topologies (~100KB memory usage).
+  #  Set to 0 to disable deferred CRS and use blocking enumeration.
+  # @Prompt Maximum PCI CRS pending devices.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciCrsMaxPendingDevices|4096|UINT32|0x1000002C
+
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
   #  Loading Module at Fixed Address feature is enabled.
