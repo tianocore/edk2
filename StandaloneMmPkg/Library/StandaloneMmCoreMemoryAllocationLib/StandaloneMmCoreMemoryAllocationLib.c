@@ -38,6 +38,8 @@ InternalAllocatePages (
   EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  Memory;
 
+  Memory = 0;
+
   if (Pages == 0) {
     return NULL;
   }
@@ -178,6 +180,8 @@ InternalAllocateAlignedPages (
   UINTN                 AlignmentMask;
   UINTN                 UnalignedPages;
   UINTN                 RealPages;
+
+  Memory = 0;
 
   //
   // Alignment must be a power of two or zero.
