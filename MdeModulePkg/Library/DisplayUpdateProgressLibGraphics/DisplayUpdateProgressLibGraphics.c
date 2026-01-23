@@ -34,7 +34,17 @@ EFI_GRAPHICS_OUTPUT_PROTOCOL  *mGop = NULL;
 //
 // Set to 100 percent so it is reset on first call.
 //
-UINTN  mPreviousProgress = 100;
+UINTN  mGraphicsPreviousProgress = 100;
+
+//
+// Set to 100 percent so it is reset on first call.
+//
+UINTN  mTextPreviousProgress = 100;
+
+//
+// Text foreground color of progress bar
+//
+UINTN  mTextProgressBarForegroundColor;
 
 //
 // Display coordinates for the progress bar.
@@ -100,6 +110,119 @@ const EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  mProgressBarDefaultColor = {
 // bar fits under the boot logo using the current graphics mode.
 //
 BOOLEAN  mGraphicsGood = FALSE;
+
+STATIC
+EFI_STATUS
+EFIAPI
+DisplayUpdateProgressTextFallback (
+  IN UINTN                                Completion,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  *Color       OPTIONAL
+  )
+{
+  UINTN  Index;
+  UINTN  CurrentAttribute;
+
+  if ((gST == NULL) || (gST->ConOut == NULL) || (gST->ConOut->Mode == NULL)) {
+    mTextPreviousProgress = Completion;
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Check to see if this Completion percentage has already been displayed
+  //
+  if (Completion == mTextPreviousProgress) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Do special init on first call of each progress session
+  //
+  if (mTextPreviousProgress == 100) {
+    Print (L"\n");
+
+    //
+    // Convert pixel color to text foreground color
+    //
+    if (Color == NULL) {
+      mTextProgressBarForegroundColor = EFI_WHITE;
+    } else {
+      mTextProgressBarForegroundColor = EFI_BLACK;
+      if (Color->Pixel.Blue >= 0x40) {
+        mTextProgressBarForegroundColor |= EFI_BLUE;
+      }
+
+      if (Color->Pixel.Green >= 0x40) {
+        mTextProgressBarForegroundColor |= EFI_GREEN;
+      }
+
+      if (Color->Pixel.Red >= 0x40) {
+        mTextProgressBarForegroundColor |= EFI_RED;
+      }
+
+      if ((Color->Pixel.Blue >= 0xC0) || (Color->Pixel.Green >= 0xC0) || (Color->Pixel.Red >= 0xC0)) {
+        mTextProgressBarForegroundColor |= EFI_BRIGHT;
+      }
+
+      if (mTextProgressBarForegroundColor == EFI_BLACK) {
+        mTextProgressBarForegroundColor = EFI_WHITE;
+      }
+    }
+
+    //
+    // Clear previous
+    //
+    mTextPreviousProgress = 0;
+  }
+
+  //
+  // Can not update progress bar if Completion is less than previous
+  //
+  if (Completion < mTextPreviousProgress) {
+    DEBUG ((DEBUG_WARN, "WARNING: Completion (%d) should not be lesss than Previous (%d)!!!\n", Completion, mTextPreviousProgress));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Save current text color
+  //
+  CurrentAttribute = (UINTN)gST->ConOut->Mode->Attribute;
+
+  //
+  // Print progress percentage
+  //
+  Print (L"\rUpdate Progress - %3d%% ", Completion);
+
+  //
+  // Set progress bar color
+  //
+  gST->ConOut->SetAttribute (
+                 gST->ConOut,
+                 EFI_TEXT_ATTR (mTextProgressBarForegroundColor, EFI_BLACK)
+                 );
+
+  //
+  // Print completed portion of progress bar
+  //
+  for (Index = 0; Index < Completion / 2; Index++) {
+    Print (L"%c", BLOCKELEMENT_FULL_BLOCK);
+  }
+
+  //
+  // Restore text color
+  //
+  gST->ConOut->SetAttribute (gST->ConOut, CurrentAttribute);
+
+  //
+  // Print remaining portion of progress bar
+  //
+  for ( ; Index < 50; Index++) {
+    Print (L"%c", BLOCKELEMENT_LIGHT_SHADE);
+  }
+
+  mTextPreviousProgress = Completion;
+
+  return EFI_SUCCESS;
+}
 
 /**
   Internal function used to find the bounds of the white logo (on black or
@@ -351,13 +474,6 @@ DisplayUpdateProgress (
   }
 
   //
-  // Check to see if this Completion percentage has already been displayed
-  //
-  if (Completion == mPreviousProgress) {
-    return EFI_SUCCESS;
-  }
-
-  //
   // Find Graphics Output Protocol if not already set.  1 time.
   //
   if (mGop == NULL) {
@@ -371,7 +487,7 @@ DisplayUpdateProgress (
       if (EFI_ERROR (Status)) {
         mGop = NULL;
         DEBUG ((DEBUG_ERROR, "Show Progress Function could not locate GOP.  Status = %r\n", Status));
-        return EFI_NOT_READY;
+        return DisplayUpdateProgressTextFallback (Completion, Color);
       }
     }
 
@@ -386,13 +502,20 @@ DisplayUpdateProgress (
   //
   if (!mGraphicsGood) {
     DEBUG ((DEBUG_INFO, "Graphics Not Good.  Not doing any onscreen visual display\n"));
-    return EFI_NOT_READY;
+    return DisplayUpdateProgressTextFallback (Completion, Color);
+  }
+
+  //
+  // Check to see if this Completion percentage has already been displayed
+  //
+  if (Completion == mGraphicsPreviousProgress) {
+    return EFI_SUCCESS;
   }
 
   //
   // Do special init on first call of each progress session
   //
-  if (mPreviousProgress == 100) {
+  if (mGraphicsPreviousProgress == 100) {
     //
     // Draw progress bar background
     //
@@ -427,19 +550,19 @@ DisplayUpdateProgress (
     //
     // Clear previous
     //
-    mPreviousProgress = 0;
+    mGraphicsPreviousProgress = 0;
   }
 
   //
   // Can not update progress bar if Completion is less than previous
   //
-  if (Completion < mPreviousProgress) {
-    DEBUG ((DEBUG_WARN, "WARNING: Completion (%d) should not be lesss than Previous (%d)!!!\n", Completion, mPreviousProgress));
+  if (Completion < mGraphicsPreviousProgress) {
+    DEBUG ((DEBUG_WARN, "WARNING: Completion (%d) should not be lesss than Previous (%d)!!!\n", Completion, mGraphicsPreviousProgress));
     return EFI_INVALID_PARAMETER;
   }
 
-  PreX = ((mPreviousProgress * mBlockWidth) + mStartX);
-  for (Index = 0; Index < (Completion - mPreviousProgress); Index++) {
+  PreX = ((mGraphicsPreviousProgress * mBlockWidth) + mStartX);
+  for (Index = 0; Index < (Completion - mGraphicsPreviousProgress); Index++) {
     //
     // Show progress by coloring new area
     //
@@ -458,7 +581,7 @@ DisplayUpdateProgress (
     PreX += mBlockWidth;
   }
 
-  mPreviousProgress = Completion;
+  mGraphicsPreviousProgress = Completion;
 
   return EFI_SUCCESS;
 }
