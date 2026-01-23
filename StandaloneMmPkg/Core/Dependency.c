@@ -222,6 +222,7 @@ MmIsSchedulable (
         //
         DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unexpected BEFORE or AFTER opcode)\n"));
         ASSERT (FALSE);
+        return FALSE;
 
       case EFI_DEP_PUSH:
         //
