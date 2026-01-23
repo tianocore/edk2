@@ -40,7 +40,7 @@ RedfishPlatformConfigGetValue (
   @param[in]   Schema              The Redfish schema to query.
   @param[in]   Version             The Redfish version to query.
   @param[in]   ConfigureLang       The target value which match this configure Language.
-  @param[in]   Value               The value to set.
+  @param[in]   Value               Pointer to the Redfish value to set.
 
   @retval EFI_SUCCESS              Value is returned successfully.
   @retval EFI_NOT_READY            Redfish Platform Config protocol is not ready.
@@ -52,7 +52,7 @@ RedfishPlatformConfigSetValue (
   IN     CHAR8                *Schema,
   IN     CHAR8                *Version,
   IN     EFI_STRING           ConfigureLang,
-  IN     EDKII_REDFISH_VALUE  Value
+  IN     EDKII_REDFISH_VALUE  *Value
   );
 
 /**
