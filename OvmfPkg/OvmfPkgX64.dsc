@@ -185,6 +185,7 @@
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsicSev.inf
   OemHookStatusCodeLib|MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   SerialPortLib|PcAtChipsetPkg/Library/SerialIoLib/SerialIoLib.inf
+  HardwareSemaphoreLib|MdeModulePkg/Library/HardwareSemaphoreLibNull/HardwareSemaphoreLibNull.inf
   MtrrLib|UefiCpuPkg/Library/MtrrLib/MtrrLib.inf
   MicrocodeLib|UefiCpuPkg/Library/MicrocodeLib/MicrocodeLib.inf
   CpuPageTableLib|UefiCpuPkg/Library/CpuPageTableLib/CpuPageTableLib.inf
@@ -336,6 +337,7 @@
   MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
   ReportStatusCodeLib|MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
+  ModuleAddrCalcLib|MdeModulePkg/Library/ModuleAddrCalcLibNull/ModuleAddrCalcLibNull.inf
   OemHookStatusCodeLib|MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
 !ifdef $(DEBUG_ON_SERIAL_PORT)
@@ -604,7 +606,6 @@
 !endif
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|TRUE
 
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
@@ -760,6 +761,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
 
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock|1000000000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
 
 [PcdsDynamicHii]
 !include OvmfPkg/Include/Dsc/OvmfTpmPcdsHii.dsc.inc
@@ -797,10 +799,7 @@
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
-  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf {
-    <LibraryClasses>
-      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  }
+  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
   OvmfPkg/PlatformPei/PlatformPei.inf

@@ -281,6 +281,7 @@
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
   DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/SecPeiDebugAgentLib.inf
 !endif
+  ModuleAddrCalcLib|MdeModulePkg/Library/ModuleAddrCalcLibNull/ModuleAddrCalcLibNull.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/PeiCpuExceptionHandlerLib.inf
   MpInitLib|UefiCpuPkg/Library/MpInitLib/PeiMpInitLib.inf
   QemuFwCfgS3Lib|OvmfPkg/Library/QemuFwCfgS3Lib/PeiQemuFwCfgS3LibFwCfg.inf
@@ -393,7 +394,6 @@
 !endif
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|TRUE
 
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
@@ -486,6 +486,7 @@
 
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock|100000000
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
 
   # Set video resolution for text setup.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|640
@@ -536,10 +537,7 @@
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
-  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf {
-    <LibraryClasses>
-      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  }
+  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
   OvmfPkg/XenPlatformPei/XenPlatformPei.inf

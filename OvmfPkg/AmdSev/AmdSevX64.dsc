@@ -264,6 +264,7 @@
 !else
   DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformRomDebugLibIoPort.inf
 !endif
+  ModuleAddrCalcLib|MdeModulePkg/Library/ModuleAddrCalcLibNull/ModuleAddrCalcLibNull.inf
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   ResourcePublicationLib|MdePkg/Library/PeiResourcePublicationLib/PeiResourcePublicationLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
@@ -407,7 +408,6 @@
 !endif
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|TRUE
 
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
@@ -507,6 +507,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size|0x800000000
 
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|FALSE
 
   # Set video resolution for text setup.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|640
@@ -574,10 +575,7 @@
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
-  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf {
-    <LibraryClasses>
-      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  }
+  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
   OvmfPkg/PlatformPei/PlatformPei.inf
