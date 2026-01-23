@@ -100,6 +100,12 @@ ON_EXIT:
   @return     New created Redfish Service, or NULL if error happens.
 
 **/
+//
+// Maximum credential length for security validation.
+// This is a reasonable limit for HTTP Basic Auth credentials.
+//
+#define REDFISH_CREDENTIAL_MAX_LENGTH  256
+
 REDFISH_SERVICE
 EFIAPI
 RedfishCreateServiceWithCredential (
@@ -109,11 +115,21 @@ RedfishCreateServiceWithCredential (
   IN  CHAR8                               *Password
   )
 {
+  REDFISH_SERVICE  Service;
+
   //
   // Check Input Parameters.
   //
   if (RedfishConfigServiceInfo == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: RedfishConfigServiceInfo is NULL\n", __func__));
+    return NULL;
+  }
+
+  //
+  // Validate critical structure members to prevent undefined behavior.
+  //
+  if (RedfishConfigServiceInfo->RedfishServiceRestExHandle == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: RedfishServiceRestExHandle is NULL\n", __func__));
     return NULL;
   }
 
@@ -146,17 +162,37 @@ RedfishCreateServiceWithCredential (
       DEBUG ((DEBUG_ERROR, "%a: UserId is empty string for AuthMethod %d\n", __func__, AuthMethod));
       return NULL;
     }
+
+    //
+    // Validate credential lengths to prevent buffer overflows in downstream functions.
+    // Use AsciiStrnLenS to safely handle potentially non-null-terminated strings.
+    //
+    if (AsciiStrnLenS (UserId, REDFISH_CREDENTIAL_MAX_LENGTH + 1) > REDFISH_CREDENTIAL_MAX_LENGTH) {
+      DEBUG ((DEBUG_ERROR, "%a: UserId exceeds maximum length (%d)\n", __func__, REDFISH_CREDENTIAL_MAX_LENGTH));
+      return NULL;
+    }
+
+    if (AsciiStrnLenS (Password, REDFISH_CREDENTIAL_MAX_LENGTH + 1) > REDFISH_CREDENTIAL_MAX_LENGTH) {
+      DEBUG ((DEBUG_ERROR, "%a: Password exceeds maximum length (%d)\n", __func__, REDFISH_CREDENTIAL_MAX_LENGTH));
+      return NULL;
+    }
   }
 
   //
   // Create a redfish service node with the provided credentials.
   //
-  return RedfishCreateLibredfishService (
-           RedfishConfigServiceInfo,
-           AuthMethod,
-           UserId,
-           Password
-           );
+  Service = RedfishCreateLibredfishService (
+              RedfishConfigServiceInfo,
+              AuthMethod,
+              UserId,
+              Password
+              );
+
+  if (Service == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Failed to create Redfish service\n", __func__));
+  }
+
+  return Service;
 }
 
 /**
