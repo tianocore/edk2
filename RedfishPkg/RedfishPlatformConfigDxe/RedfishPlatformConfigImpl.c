@@ -2,7 +2,7 @@
   The implementation of EDKII Redfish Platform Config Protocol.
 
   (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP<BR>
-  Copyright (c) 2022-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2022-2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
   Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -1641,8 +1641,14 @@ LoadFormset (
   //
   ZeroMem (&ZeroGuid, sizeof (ZeroGuid));
   Status = CreateFormSetFromHiiHandle (HiiHandle, &ZeroGuid, HiiFormSet);
-  if (EFI_ERROR (Status) || IsListEmpty (&HiiFormSet->FormListHead)) {
-    DEBUG ((DEBUG_ERROR, "%a: Formset not found by HII handle - %g\n", __func__, FormsetPrivate->Guid));
+  if (EFI_ERROR (Status)) {
+    if (Status != EFI_NOT_FOUND) {
+      DEBUG ((DEBUG_ERROR, "%a: Cannot create formset from HII handle (0x%x): %r\n", __func__, HiiHandle, Status));
+    }
+
+    goto ErrorExit;
+  } else if (IsListEmpty (&HiiFormSet->FormListHead)) {
+    DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: there is no form in HII handle: 0x%x\n", __func__, HiiHandle));
     Status = EFI_NOT_FOUND;
     goto ErrorExit;
   }
@@ -1840,7 +1846,10 @@ LoadFormsetList (
   //
   Status = LoadFormset (HiiHandle, FormsetPrivate);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Formset is not loaded for edk2 redfish: %r\n", __func__, Status));
+    if (Status != EFI_NOT_FOUND) {
+      DEBUG ((DEBUG_ERROR, "%a: Formset is not loaded for edk2 redfish: %r\n", __func__, Status));
+    }
+
     FreePool (FormsetPrivate);
     return Status;
   }
@@ -2117,7 +2126,9 @@ ProcessPendingList (
       Status = LoadFormsetList (Target->HiiHandle, FormsetList);
       if (EFI_ERROR (Status)) {
         if (Status == EFI_UNSUPPORTED) {
-          DEBUG ((DEBUG_ERROR, "  The formset has no x-UEFI-redfish configurations.\n"));
+          DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "  The formset has no x-UEFI-redfish configurations.\n"));
+        } else if (Status == EFI_NOT_FOUND) {
+          DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "  There is no formset or form on HII handle: 0x%x.\n", Target->HiiHandle));
         } else {
           DEBUG ((DEBUG_ERROR, "  load formset from HII handle: 0x%x failed: %r\n", Target->HiiHandle, Status));
         }
