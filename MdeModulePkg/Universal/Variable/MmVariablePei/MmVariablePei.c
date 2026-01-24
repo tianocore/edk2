@@ -145,7 +145,8 @@ PopulateHeaderAndCommunicate (
     Status = MmCommunicationPpi->Communicate (MmCommunicationPpi, CommunicateBuffer, &CommunicateBufferSize);
   } else {
     // We should never reach here, but just in case
-    Status = EFI_UNSUPPORTED;
+    MmVarCommsHeader = NULL;
+    Status           = EFI_UNSUPPORTED;
     DEBUG ((DEBUG_ERROR, "%a: No MM Communication PPI found!\n", __func__));
   }
 
