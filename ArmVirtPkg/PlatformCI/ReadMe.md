@@ -6,7 +6,7 @@ to use the same Pytools based build infrastructure locally.
 ## Supported Configuration Details
 
 This solution for building and running ArmVirtPkg has been validated with Fedora
-37 Linux and the GCC5 toolchain. The following different firmware builds are
+37 Linux and the GCC toolchain. The following different firmware builds are
 supported.
 
 | Configuration name      | Architecture       | DSC File               | Additional Flags |
