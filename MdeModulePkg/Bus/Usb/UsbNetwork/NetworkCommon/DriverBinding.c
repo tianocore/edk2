@@ -226,7 +226,6 @@ NetworkCommonDriverStart (
 
   // for alignment adjustment
   if (gPxe == NULL) {
-    TmpPxePointer = NULL;
     TmpPxePointer = AllocateZeroPool (sizeof (PXE_SW_UNDI) + 16);
     if (!TmpPxePointer) {
       if (NicDevice != NULL) {
@@ -277,6 +276,8 @@ NetworkCommonDriverStart (
 
       PxeStructInit (gPxe);
     }
+  } else {
+    TmpPxePointer = NULL;
   }
 
   NicDevice->NiiProtocol.Id    = (UINT64)(UINTN)(gPxe);
