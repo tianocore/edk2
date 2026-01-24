@@ -71,7 +71,7 @@ on IA32 with the unique UEFI configuration required.
 > later in this document and dump the PRMT table in the OS to check if your PRM module is represented as expected.
 
 * AArch64
-    ``build -p PrmPkg/PrmPkg.dsc -a AARCH64 -t GCC5``
+    ``build -p PrmPkg/PrmPkg.dsc -a AARCH64 -t GCC``
 
 ### PRM Platform GUID
 
