@@ -331,12 +331,17 @@ GetEraseTypeRecord (
   *EraseTypeRecord = NULL;
 
   //
-  // Initial the comapre value.
+  // Initial the compare value.
   //
   switch (SearchType) {
     case SearchEraseTypeByType:
     case SearchEraseTypeByCommand:
     case SearchEraseTypeBySize:
+      //
+      // Although ValueToCompare is not used for these types, it must be
+      // initialized to avoid "variable may be used uninitialized" compiler warning.
+      //
+      ValueToCompare = 0;
       break;
     case SearchEraseTypeBySmallestSize:
       ValueToCompare = (UINT32)-1;
@@ -1502,6 +1507,7 @@ SpiReadSfdpPtp (
   UINT32      MaximumTransferBytes;
   UINT32      TransactionBufferLength;
 
+  Status               = EFI_SUCCESS;
   Length               = 0;
   MaximumTransferBytes = Instance->SpiIo->MaximumTransferBytes;
   CurrentBuffer        = (UINT8 *)DestBuffer;
