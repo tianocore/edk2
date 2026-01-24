@@ -19,7 +19,7 @@
 #      - Add support for ARM and AARCH64 to CLANGDWARF
 #      - Remove VS2008, VS2010, VS2012, VS2013, CLANG35, CLANG38, EBC
 #      - Add GCC and GCCNOLTO
-#      - Deprecate GCC48, GCC49 and GCC5.
+#      - Deprecate GCC48, GCC49 and GCC5
 # 3.01 - Add toolchain for VS2022
 # 3.02 - Enable stack cookies for IA32, X64, ARM, and AARCH64 builds for GCC and MSVC
 # 3.03 - Drop ARM32 Support
