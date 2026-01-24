@@ -22,13 +22,13 @@ which supports separate pflash devices for EDK2 code and variable storage.
 **Prerequisite**: RISC-V GNU compiler toolchain should be installed.
 
     export WORKSPACE=`pwd`
-    export GCC5_RISCV64_PREFIX=riscv64-linux-gnu-
+    export GCC_RISCV64_PREFIX=riscv64-linux-gnu-
     export PACKAGES_PATH=$WORKSPACE/edk2
     export EDK_TOOLS_PATH=$WORKSPACE/edk2/BaseTools
     source edk2/edksetup.sh --reconfig
     make -C edk2/BaseTools
     source edk2/edksetup.sh BaseTools
-    build -a RISCV64 --buildtarget RELEASE -p OvmfPkg/RiscVVirt/RiscVVirtQemu.dsc -t GCC5
+    build -a RISCV64 --buildtarget RELEASE -p OvmfPkg/RiscVVirt/RiscVVirtQemu.dsc -t GCC
 
 ### Using CLANGDWARF toolchain (clang + lld)
 **Prerequisite**: LLVM toolchain with clang and lld should be installed.
