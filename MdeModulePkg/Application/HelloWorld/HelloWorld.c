@@ -11,6 +11,8 @@
 #include <Library/PcdLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiApplicationEntryPoint.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Protocol/GraphicsOutput.h>
 
 //
 // String token ID of help message text.
@@ -40,7 +42,11 @@ UefiMain (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  UINT32  Index;
+  UINT32                           Index;
+  EFI_STATUS                       Status;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL     *GraphicsOutput;
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *ModeInfo;
+  UINTN                            SizeOfInfo;
 
   Index = 0;
 
@@ -53,6 +59,39 @@ UefiMain (
       // Use UefiLib Print API to print string to UEFI console
       //
       Print ((CHAR16 *)PcdGetPtr (PcdHelloWorldPrintString));
+    }
+  }
+
+  //
+  // Get current screen resolution
+  //
+  Status = gBS->LocateProtocol(
+                  &gEfiGraphicsOutputProtocolGuid,
+                  NULL,
+                  (VOID **)&GraphicsOutput
+                  );
+  
+  if (EFI_ERROR(Status)) {
+    Print(L"Failed to locate Graphics Output Protocol: %r\n", Status);
+  } else {
+    // Get current mode information
+    Status = GraphicsOutput->QueryMode(
+                               GraphicsOutput,
+                               GraphicsOutput->Mode->Mode,
+                               &SizeOfInfo,
+                               &ModeInfo
+                               );
+    
+    if (EFI_ERROR(Status)) {
+      Print(L"Failed to query current mode: %r\n", Status);
+    } else {
+      // Print current screen resolution
+      Print(L"Current Screen Resolution: %dx%d\n", 
+            ModeInfo->HorizontalResolution, 
+            ModeInfo->VerticalResolution);
+      
+      // Free the buffer allocated by QueryMode
+      gBS->FreePool(ModeInfo);
     }
   }
 
