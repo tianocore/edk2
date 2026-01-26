@@ -193,8 +193,8 @@ DebugBPrint (
 
   Print a message of the form "ASSERT <FileName>(<LineNumber>): <Description>\n"
   to the debug output device.  If DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED bit of
-  PcdDebugProperyMask is set then CpuBreakpoint() is called. Otherwise, if
-  DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED bit of PcdDebugProperyMask is set then
+  PcdDebugPropertyMask is set then CpuBreakpoint() is called. Otherwise, if
+  DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED bit of PcdDebugPropertyMask is set then
   CpuDeadLoop() is called.  If neither of these bits are set, then this function
   returns immediately after the message is printed to the debug output device.
   DebugAssert() must actively prevent recursion.  If DebugAssert() is called while
@@ -242,10 +242,10 @@ DebugClearMemory (
   Returns TRUE if ASSERT() macros are enabled.
 
   This function returns TRUE if the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of
-  PcdDebugProperyMask is set.  Otherwise, FALSE is returned.
+  PcdDebugPropertyMask is set.  Otherwise, FALSE is returned.
 
-  @retval  TRUE    The DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is set.
-  @retval  FALSE   The DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is clear.
+  @retval  TRUE    The DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugPropertyMask is set.
+  @retval  FALSE   The DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugPropertyMask is clear.
 
 **/
 BOOLEAN
@@ -258,10 +258,10 @@ DebugAssertEnabled (
   Returns TRUE if DEBUG() macros are enabled.
 
   This function returns TRUE if the DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of
-  PcdDebugProperyMask is set.  Otherwise, FALSE is returned.
+  PcdDebugPropertyMask is set.  Otherwise, FALSE is returned.
 
-  @retval  TRUE    The DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of PcdDebugProperyMask is set.
-  @retval  FALSE   The DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of PcdDebugProperyMask is clear.
+  @retval  TRUE    The DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of PcdDebugPropertyMask is set.
+  @retval  FALSE   The DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of PcdDebugPropertyMask is clear.
 
 **/
 BOOLEAN
@@ -274,10 +274,10 @@ DebugPrintEnabled (
   Returns TRUE if DEBUG_CODE() macros are enabled.
 
   This function returns TRUE if the DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of
-  PcdDebugProperyMask is set.  Otherwise, FALSE is returned.
+  PcdDebugPropertyMask is set.  Otherwise, FALSE is returned.
 
-  @retval  TRUE    The DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is set.
-  @retval  FALSE   The DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is clear.
+  @retval  TRUE    The DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugPropertyMask is set.
+  @retval  FALSE   The DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugPropertyMask is clear.
 
 **/
 BOOLEAN
@@ -290,10 +290,10 @@ DebugCodeEnabled (
   Returns TRUE if DEBUG_CLEAR_MEMORY() macro is enabled.
 
   This function returns TRUE if the DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of
-  PcdDebugProperyMask is set.  Otherwise, FALSE is returned.
+  PcdDebugPropertyMask is set.  Otherwise, FALSE is returned.
 
-  @retval  TRUE    The DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is set.
-  @retval  FALSE   The DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is clear.
+  @retval  TRUE    The DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of PcdDebugPropertyMask is set.
+  @retval  FALSE   The DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of PcdDebugPropertyMask is clear.
 
 **/
 BOOLEAN
@@ -392,7 +392,7 @@ UnitTestDebugAssert (
   Macro that calls DebugAssert() if an expression evaluates to FALSE.
 
   If MDEPKG_NDEBUG is not defined and the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED
-  bit of PcdDebugProperyMask is set, then this macro evaluates the Boolean
+  bit of PcdDebugPropertyMask is set, then this macro evaluates the Boolean
   expression specified by Expression.  If Expression evaluates to FALSE, then
   DebugAssert() is called passing in the source filename, source line number,
   and Expression.
@@ -423,7 +423,7 @@ UnitTestDebugAssert (
   Macro that calls DebugPrint().
 
   If MDEPKG_NDEBUG is not defined and the DEBUG_PROPERTY_DEBUG_PRINT_ENABLED
-  bit of PcdDebugProperyMask is set, then this macro passes Expression to
+  bit of PcdDebugPropertyMask is set, then this macro passes Expression to
   DebugPrint().
 
   @param  Expression  Expression containing an error level, a format string,
@@ -451,7 +451,7 @@ UnitTestDebugAssert (
   Macro that calls DebugAssert() if an EFI_STATUS evaluates to an error code.
 
   If MDEPKG_NDEBUG is not defined and the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED
-  bit of PcdDebugProperyMask is set, then this macro evaluates the EFI_STATUS
+  bit of PcdDebugPropertyMask is set, then this macro evaluates the EFI_STATUS
   value specified by StatusParameter.  If StatusParameter is an error code,
   then DebugAssert() is called passing in the source filename, source line
   number, and StatusParameter.
@@ -482,7 +482,7 @@ UnitTestDebugAssert (
   Macro that calls DebugAssert() if a RETURN_STATUS evaluates to an error code.
 
   If MDEPKG_NDEBUG is not defined and the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED
-  bit of PcdDebugProperyMask is set, then this macro evaluates the
+  bit of PcdDebugPropertyMask is set, then this macro evaluates the
   RETURN_STATUS value specified by StatusParameter.  If StatusParameter is an
   error code, then DebugAssert() is called passing in the source filename,
   source line number, and StatusParameter.
@@ -515,7 +515,7 @@ UnitTestDebugAssert (
   handle database.
 
   If MDEPKG_NDEBUG is defined or the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit
-  of PcdDebugProperyMask is clear, then return.
+  of PcdDebugPropertyMask is clear, then return.
 
   If Handle is NULL, then a check is made to see if the protocol specified by Guid
   is present on any handle in the handle database.  If Handle is not NULL, then
@@ -556,7 +556,7 @@ UnitTestDebugAssert (
 /**
   Macro that marks the beginning of debug source code.
 
-  If the DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is set,
+  If the DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugPropertyMask is set,
   then this macro marks the beginning of source code that is included in a module.
   Otherwise, the source lines between DEBUG_CODE_BEGIN() and DEBUG_CODE_END()
   are not included in a module.
@@ -570,7 +570,7 @@ UnitTestDebugAssert (
 /**
   The macro that marks the end of debug source code.
 
-  If the DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is set,
+  If the DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugPropertyMask is set,
   then this macro marks the end of source code that is included in a module.
   Otherwise, the source lines between DEBUG_CODE_BEGIN() and DEBUG_CODE_END()
   are not included in a module.
@@ -583,7 +583,7 @@ UnitTestDebugAssert (
 /**
   The macro that declares a section of debug source code.
 
-  If the DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is set,
+  If the DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugPropertyMask is set,
   then the source code specified by Expression is included in a module.
   Otherwise, the source specified by Expression is not included in a module.
 
@@ -596,7 +596,7 @@ UnitTestDebugAssert (
 /**
   The macro that calls DebugClearMemory() to clear a buffer to a default value.
 
-  If the DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is set,
+  If the DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED bit of PcdDebugPropertyMask is set,
   then this macro calls DebugClearMemory() passing in Address and Length.
 
   @param  Address  The pointer to a buffer.
@@ -619,7 +619,7 @@ UnitTestDebugAssert (
   public data structure to retrieve a pointer to the private data structure.
 
   If MDEPKG_NDEBUG is defined or the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit
-  of PcdDebugProperyMask is clear, then this macro computes the offset, in bytes,
+  of PcdDebugPropertyMask is clear, then this macro computes the offset, in bytes,
   of the field specified by Field from the beginning of the data structure specified
   by TYPE.  This offset is subtracted from Record, and is used to compute a pointer
   to a data structure of the type specified by TYPE.  The Signature field of the
@@ -629,7 +629,7 @@ UnitTestDebugAssert (
   signify that the passed in data structure is invalid.
 
   If MDEPKG_NDEBUG is not defined and the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit
-  of PcdDebugProperyMask is set, then this macro computes the offset, in bytes,
+  of PcdDebugPropertyMask is set, then this macro computes the offset, in bytes,
   of field specified by Field from the beginning of the data structure specified
   by TYPE.  This offset is subtracted from Record, and is used to compute a pointer
   to a data structure of the type specified by TYPE.  The Signature field of the
