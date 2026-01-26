@@ -151,7 +151,6 @@ SmiManage (
   EFI_STATUS   Status;
 
   PERF_FUNCTION_BEGIN ();
-  mSmiManageCallingDepth++;
   WillReturn   = FALSE;
   Status       = EFI_NOT_FOUND;
   ReturnStatus = Status;
@@ -175,6 +174,7 @@ SmiManage (
   }
 
   Head = &SmiEntry->SmiHandlers;
+  mSmiManageCallingDepth++;
 
   for (Link = Head->ForwardLink; Link != Head; Link = Link->ForwardLink) {
     SmiHandler = CR (Link, SMI_HANDLER, Link, SMI_HANDLER_SIGNATURE);
