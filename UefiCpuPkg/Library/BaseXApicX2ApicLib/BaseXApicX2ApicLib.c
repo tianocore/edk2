@@ -244,7 +244,7 @@ SetLocalApicBaseAddress (
 {
   MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
 
-  ASSERT ((BaseAddress & (SIZE_4KB - 1)) == 0);
+  ASSERT (IS_ALIGNED (BaseAddress, SIZE_4KB));
 
   if (!LocalApicBaseAddressMsrSupported ()) {
     //

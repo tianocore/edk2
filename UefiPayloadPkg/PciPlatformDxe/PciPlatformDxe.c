@@ -166,7 +166,7 @@ PciGetPciRom (
   //
   Status = PciIo->Pci.Read (
                         PciIo,
-                        EfiPciWidthUint32,
+                        EfiPciIoWidthUint32,
                         RomBarIndex,
                         1,
                         &Buffer
@@ -182,7 +182,7 @@ PciGetPciRom (
 
   Status = PciIo->Pci.Write (
                         PciIo,
-                        EfiPciWidthUint32,
+                        EfiPciIoWidthUint32,
                         RomBarIndex,
                         1,
                         &AllOnes
@@ -196,7 +196,7 @@ PciGetPciRom (
   //
   Status = PciIo->Pci.Read (
                         PciIo,
-                        EfiPciWidthUint32,
+                        EfiPciIoWidthUint32,
                         RomBarIndex,
                         1,
                         &AllOnes
@@ -222,7 +222,7 @@ PciGetPciRom (
   RomBar = Buffer | 1;
   Status = PciIo->Pci.Write (
                         PciIo,
-                        EfiPciWidthUint32,
+                        EfiPciIoWidthUint32,
                         RomBarIndex,
                         1,
                         &RomBar
@@ -386,7 +386,7 @@ RestoreBar:
   //
   PciIo->Pci.Write (
                PciIo,
-               EfiPciWidthUint32,
+               EfiPciIoWidthUint32,
                RomBarIndex,
                1,
                &RomBar
