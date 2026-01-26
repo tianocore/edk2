@@ -15,8 +15,10 @@ typedef struct _EDKII_REDFISH_PLATFORM_CONFIG_PROTOCOL EDKII_REDFISH_PLATFORM_CO
 
 //
 // Redfish Platform Config Protocol interface version.
+// On Version 1.1, we change EDKII_REDFISH_PLATFORM_CONFIG_SET_VALUE protocol interface
+// to use value reference instead of value structure of the parameter "Value".
 //
-#define REDFISH_PLATFORM_CONFIG_VERSION  0x00010000
+#define REDFISH_PLATFORM_CONFIG_VERSION  0x00010001
 
 ///
 /// Definition of EDKII_REDFISH_TYPE_VALUE
@@ -163,7 +165,7 @@ EFI_STATUS
   @param[in]   Schema              The Redfish schema to query.
   @param[in]   Version             The Redfish version to query.
   @param[in]   ConfigureLang       The target value which match this configure Language.
-  @param[in]   Value               The value to set.
+  @param[in]   RedfishValue        Pointer to the Redfish value to set.
 
   @retval EFI_SUCCESS              Value is returned successfully.
   @retval Others                   Some error happened.
@@ -176,7 +178,7 @@ EFI_STATUS
   IN     CHAR8                                  *Schema,
   IN     CHAR8                                  *Version,
   IN     EFI_STRING                             ConfigureLang,
-  IN     EDKII_REDFISH_VALUE                    Value
+  IN     EDKII_REDFISH_VALUE                    *Value
   );
 
 /**

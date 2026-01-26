@@ -722,14 +722,14 @@ PageTableMap (
     return RETURN_INVALID_PARAMETER;
   }
 
-  if (*BufferSize % SIZE_4KB != 0) {
+  if (!IS_ALIGNED (*BufferSize, SIZE_4KB)) {
     //
     // BufferSize should be multiple of 4K.
     //
     return RETURN_INVALID_PARAMETER;
   }
 
-  if (((UINTN)LinearAddress % SIZE_4KB != 0) || ((UINTN)Length % SIZE_4KB != 0)) {
+  if (!IS_ALIGNED ((UINTN)LinearAddress, SIZE_4KB) || !IS_ALIGNED ((UINTN)Length, SIZE_4KB)) {
     //
     // LinearAddress and Length should be multiple of 4K.
     //

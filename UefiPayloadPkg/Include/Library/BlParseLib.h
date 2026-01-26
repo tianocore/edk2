@@ -28,7 +28,7 @@ typedef RETURN_STATUS \
   );
 
 typedef VOID \
-(*BL_CAPSULE_CALLBACK) (
+(EFIAPI *BL_CAPSULE_CALLBACK)(
   EFI_PHYSICAL_ADDRESS  BaseAddress,
   UINT64                Length
   );

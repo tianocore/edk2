@@ -24,7 +24,7 @@
   CONSTRUCTOR                    = BaseRngLibConstructor
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64 LOONGARCH64
 #
 
 [Sources]
@@ -41,6 +41,10 @@
   AArch64/ArmRng.S           | GCC
 
   AArch64/ArmRng.asm         | MSFT
+
+[Sources.LOONGARCH64]
+  LoongArch64/Rng.c
+  LoongArch64/AsmRdRng.S     | GCC
 
 [Guids.AARCH64]
   gEfiRngAlgorithmArmRndr
