@@ -112,9 +112,9 @@ PostCodeWithDescription (
   bit of PcdPostCodePropertyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE   The POST_CODE_PROPERTY_POST_CODE_ENABLED bit of
-                  PcdPostCodeProperyMask is set.
+                  PcdPostCodePropertyMask is set.
   @retval  FALSE  The POST_CODE_PROPERTY_POST_CODE_ENABLED bit of
-                  PcdPostCodeProperyMask is clear.
+                  PcdPostCodePropertyMask is clear.
 
 **/
 BOOLEAN
@@ -133,9 +133,9 @@ PostCodeEnabled (
   bit of PcdPostCodePropertyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE   The POST_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED bit of
-                  PcdPostCodeProperyMask is set.
+                  PcdPostCodePropertyMask is set.
   @retval  FALSE  The POST_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED bit of
-                  PcdPostCodeProperyMask is clear.
+                  PcdPostCodePropertyMask is clear.
 
 **/
 BOOLEAN
