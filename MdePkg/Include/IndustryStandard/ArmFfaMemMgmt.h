@@ -270,6 +270,17 @@ typedef struct {
 #define FFA_MEMORY_REGION_FLAG_BYPASS_BORROWERS_CHECK  (0x1U << 10)
 
 /**
+  FFA_FEATURES input properties for FFA_MEM_RETRIEVE_REQ.
+
+  This corresponds to section 1.10.4.1.1 of the FF-A Memory Management v1.3 APL1,
+  "Discovery of NS bit usage". Bit[1] in the Input properties parameter indicates
+  NS bit usage support. FF-A v1.1+ Secure Partitions must set this bit when
+  querying FFA_MEM_RETRIEVE_REQ features to indicate support for interpreting
+  the NS bit in FFA_MEM_RETRIEVE_RESP invocations.
+**/
+#define FFA_FEATURES_MEM_RETRIEVE_REQ_NS_SUPPORT  (0x1U << 1)
+
+/**
   Information about a set of pages which are being shared.
 
   This corresponds to table 1.20 of the FF-A Memory Management v1.3 APL1, "Memory
