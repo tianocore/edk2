@@ -40,9 +40,9 @@ one of the dynamic stack cookie entry points when possible.
 
 `StackCheckLib` provides the stack cookie checking functionality per architecture and
 toolchain. The currently supported pairs are IA32{GCC,MSVC}, X64{GCC, MSVC},
-and AARCH64{GCC, MSVC}. `StackCheckLib` is agnostic as to whether the stack cookie was
-updated during build time or run time; it simply checks the cookie in the MSVC case and
-in both GCC and MSVC responds to stack cookie checking failures.
+AARCH64{GCC, MSVC} and RISCV64{GCC}. `StackCheckLib` is agnostic as to whether the stack
+cookie was updated during build time or run time; it simply checks the cookie in the MSVC
+case and in both GCC and MSVC responds to stack cookie checking failures.
 
 To add support for other architectures/toolchains, additional assembly files
 should be added to `StackCheckLib.inf` and scoped to that architecture/toolchain.
@@ -60,9 +60,9 @@ Each EntryPoint lib under `MdePkg/DynamicStackCookieEntryPointLib/` is an instan
 that module type entry point lib which updates the stack cookie value for the module at
 runtime. This is the preferred method for stack cookie initialization as it provides
 improved security. The stack cookie value is initialized at runtime in `_ModuleEntryPoint`
-by calling `rdrand` on x86 and `RNDR` on AARCH64. If the random number generator is not
-supported on that platform or otherwise returns an error, then the value will still have
-the build-time randomized value to fall back on.
+by calling `rdrand` on x86, `RNDR` on AARCH64 and `Zkr` on RISCV64. If the random number
+generator is not supported on that platform or otherwise returns an error, then the value
+will still have the build-time randomized value to fall back on.
 
 Typically, dynamic cookies cannot be used for SEC, PEI_CORE, and PEIM modules, due to
 the lack of the ability to write to globals for many architectures. If a given platform
@@ -105,6 +105,9 @@ Interrupt Descriptor Table.
 of PcdStackCookieExceptionVector. This value can similarly be retrieved by the
 handler to determine if the interrupt was triggered by the stack cookie check. Reference:
 [Arm A64 Instruction Set Architecture Version 2024-3](https://developer.arm.com/documentation/ddi0602/2024-03/Base-Instructions/SVC--Supervisor-Call-?lang=en)
+- On RISCV64 platforms, raise an breakpoint exception, ensuring the a0 register carries the
+  constant defined by PcdStackCookieExceptionVector. This value can similarly be retrieved
+  by the handler to determine if the exception was triggered by the stack cookie check.
 
 ## Debugging Stack Cookie Check Failures
 
