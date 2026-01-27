@@ -26,18 +26,16 @@
 
 #include "Tpm2DeviceLibFfa.h"
 
-UINT16  mFfaTpm2PartitionId = TPM2_FFA_PARTITION_ID_INVALID;
-
 /**
   Check the return status from the FF-A call and returns EFI_STATUS
 
-  @param EFI_LOAD_ERROR  FF-A status code returned in x0
+  @param TpmReturnStatus  FF-A status code returned in x0
 
   @retval EFI_SUCCESS    The entry point is executed successfully.
 **/
 EFI_STATUS
 TranslateTpmReturnStatus (
-  UINTN  TpmReturnStatus
+  IN UINTN  TpmReturnStatus
   )
 {
   EFI_STATUS  Status;
@@ -142,27 +140,25 @@ Tpm2GetInterfaceVersion (
 {
   EFI_STATUS       Status;
   DIRECT_MSG_ARGS  FfaDirectReq2Args;
+  UINT16           FfaTpm2PartitionId;
 
   if (Version == NULL) {
-    Status = EFI_INVALID_PARAMETER;
-    goto Exit;
+    return EFI_INVALID_PARAMETER;
   }
 
-  if (mFfaTpm2PartitionId == TPM2_FFA_PARTITION_ID_INVALID) {
-    GetTpmServicePartitionId (&mFfaTpm2PartitionId);
-  }
+  GetTpmServicePartitionId (&FfaTpm2PartitionId);
 
   ZeroMem (&FfaDirectReq2Args, sizeof (DIRECT_MSG_ARGS));
   FfaDirectReq2Args.Arg0 = TPM2_FFA_GET_INTERFACE_VERSION;
 
-  Status = ArmFfaLibMsgSendDirectReq2 (mFfaTpm2PartitionId, &gTpm2ServiceFfaGuid, &FfaDirectReq2Args);
+  Status = ArmFfaLibMsgSendDirectReq2 (FfaTpm2PartitionId, &gTpm2ServiceFfaGuid, &FfaDirectReq2Args);
   while (Status == EFI_INTERRUPT_PENDING) {
     // We are assuming vCPU0 of the TPM SP since it is UP.
     Status = ArmFfaLibRun (GET_SOURCE_PARTITION_ID (FfaDirectReq2Args.Header.x1), 0x00, &FfaDirectReq2Args);
   }
 
   if (EFI_ERROR (Status)) {
-    goto Exit;
+    return Status;
   }
 
   Status = TranslateTpmReturnStatus (FfaDirectReq2Args.Arg0);
@@ -171,7 +167,6 @@ Tpm2GetInterfaceVersion (
     *Version = FfaDirectReq2Args.Arg1;
   }
 
-Exit:
   return Status;
 }
 
@@ -193,34 +188,29 @@ Tpm2GetFeatureInfo (
 {
   EFI_STATUS       Status;
   DIRECT_MSG_ARGS  FfaDirectReq2Args;
+  UINT16           FfaTpm2PartitionId;
 
   if (FeatureInfo == NULL) {
-    Status = EFI_INVALID_PARAMETER;
-    goto Exit;
+    return EFI_INVALID_PARAMETER;
   }
 
-  if (mFfaTpm2PartitionId == TPM2_FFA_PARTITION_ID_INVALID) {
-    GetTpmServicePartitionId (&mFfaTpm2PartitionId);
-  }
+  GetTpmServicePartitionId (&FfaTpm2PartitionId);
 
   ZeroMem (&FfaDirectReq2Args, sizeof (DIRECT_MSG_ARGS));
   FfaDirectReq2Args.Arg0 = TPM2_FFA_GET_FEATURE_INFO;
   FfaDirectReq2Args.Arg1 = TPM_SERVICE_FEATURE_SUPPORT_NOTIFICATION;
 
-  Status = ArmFfaLibMsgSendDirectReq2 (mFfaTpm2PartitionId, &gTpm2ServiceFfaGuid, &FfaDirectReq2Args);
+  Status = ArmFfaLibMsgSendDirectReq2 (FfaTpm2PartitionId, &gTpm2ServiceFfaGuid, &FfaDirectReq2Args);
   while (Status == EFI_INTERRUPT_PENDING) {
     // We are assuming vCPU0 of the TPM SP since it is UP.
     Status = ArmFfaLibRun (GET_SOURCE_PARTITION_ID (FfaDirectReq2Args.Header.x1), 0x00, &FfaDirectReq2Args);
   }
 
   if (EFI_ERROR (Status)) {
-    goto Exit;
+    return Status;
   }
 
-  Status = TranslateTpmReturnStatus (FfaDirectReq2Args.Arg0);
-
-Exit:
-  return Status;
+  return TranslateTpmReturnStatus (FfaDirectReq2Args.Arg0);
 }
 
 /**
@@ -241,30 +231,26 @@ Tpm2ServiceStart (
 {
   EFI_STATUS       Status;
   DIRECT_MSG_ARGS  FfaDirectReq2Args;
+  UINT16           FfaTpm2PartitionId;
 
-  if (mFfaTpm2PartitionId == TPM2_FFA_PARTITION_ID_INVALID) {
-    GetTpmServicePartitionId (&mFfaTpm2PartitionId);
-  }
+  GetTpmServicePartitionId (&FfaTpm2PartitionId);
 
   ZeroMem (&FfaDirectReq2Args, sizeof (DIRECT_MSG_ARGS));
   FfaDirectReq2Args.Arg0 = TPM2_FFA_START;
   FfaDirectReq2Args.Arg1 = (FuncQualifier & 0xFF);
   FfaDirectReq2Args.Arg2 = (LocalityQualifier & 0xFF);
 
-  Status = ArmFfaLibMsgSendDirectReq2 (mFfaTpm2PartitionId, &gTpm2ServiceFfaGuid, &FfaDirectReq2Args);
+  Status = ArmFfaLibMsgSendDirectReq2 (FfaTpm2PartitionId, &gTpm2ServiceFfaGuid, &FfaDirectReq2Args);
   while (Status == EFI_INTERRUPT_PENDING) {
     // We are assuming vCPU0 of the TPM SP since it is UP.
     Status = ArmFfaLibRun (GET_SOURCE_PARTITION_ID (FfaDirectReq2Args.Header.x1), 0x00, &FfaDirectReq2Args);
   }
 
   if (EFI_ERROR (Status)) {
-    goto Exit;
+    return Status;
   }
 
-  Status = TranslateTpmReturnStatus (FfaDirectReq2Args.Arg0);
-
-Exit:
-  return Status;
+  return TranslateTpmReturnStatus (FfaDirectReq2Args.Arg0);
 }
 
 /**
@@ -286,30 +272,26 @@ Tpm2RegisterNotification (
 {
   EFI_STATUS       Status;
   DIRECT_MSG_ARGS  FfaDirectReq2Args;
+  UINT16           FfaTpm2PartitionId;
 
-  if (mFfaTpm2PartitionId == TPM2_FFA_PARTITION_ID_INVALID) {
-    GetTpmServicePartitionId (&mFfaTpm2PartitionId);
-  }
+  GetTpmServicePartitionId (&FfaTpm2PartitionId);
 
   ZeroMem (&FfaDirectReq2Args, sizeof (DIRECT_MSG_ARGS));
   FfaDirectReq2Args.Arg0 = TPM2_FFA_REGISTER_FOR_NOTIFICATION;
   FfaDirectReq2Args.Arg1 = (NotificationTypeQualifier << 16 | vCpuId);
   FfaDirectReq2Args.Arg2 = (NotificationId & 0xFF);
 
-  Status = ArmFfaLibMsgSendDirectReq2 (mFfaTpm2PartitionId, &gTpm2ServiceFfaGuid, &FfaDirectReq2Args);
+  Status = ArmFfaLibMsgSendDirectReq2 (FfaTpm2PartitionId, &gTpm2ServiceFfaGuid, &FfaDirectReq2Args);
   while (Status == EFI_INTERRUPT_PENDING) {
     // We are assuming vCPU0 of the TPM SP since it is UP.
     Status = ArmFfaLibRun (GET_SOURCE_PARTITION_ID (FfaDirectReq2Args.Header.x1), 0x00, &FfaDirectReq2Args);
   }
 
   if (EFI_ERROR (Status)) {
-    goto Exit;
+    return Status;
   }
 
-  Status = TranslateTpmReturnStatus (FfaDirectReq2Args.Arg0);
-
-Exit:
-  return Status;
+  return TranslateTpmReturnStatus (FfaDirectReq2Args.Arg0);
 }
 
 /**
@@ -325,28 +307,24 @@ Tpm2UnregisterNotification (
 {
   EFI_STATUS       Status;
   DIRECT_MSG_ARGS  FfaDirectReq2Args;
+  UINT16           FfaTpm2PartitionId;
 
-  if (mFfaTpm2PartitionId == TPM2_FFA_PARTITION_ID_INVALID) {
-    GetTpmServicePartitionId (&mFfaTpm2PartitionId);
-  }
+  GetTpmServicePartitionId (&FfaTpm2PartitionId);
 
   ZeroMem (&FfaDirectReq2Args, sizeof (DIRECT_MSG_ARGS));
   FfaDirectReq2Args.Arg0 = TPM2_FFA_UNREGISTER_FROM_NOTIFICATION;
 
-  Status = ArmFfaLibMsgSendDirectReq2 (mFfaTpm2PartitionId, &gTpm2ServiceFfaGuid, &FfaDirectReq2Args);
+  Status = ArmFfaLibMsgSendDirectReq2 (FfaTpm2PartitionId, &gTpm2ServiceFfaGuid, &FfaDirectReq2Args);
   while (Status == EFI_INTERRUPT_PENDING) {
     // We are assuming vCPU0 of the TPM SP since it is UP.
     Status = ArmFfaLibRun (GET_SOURCE_PARTITION_ID (FfaDirectReq2Args.Header.x1), 0x00, &FfaDirectReq2Args);
   }
 
   if (EFI_ERROR (Status)) {
-    goto Exit;
+    return Status;
   }
 
-  Status = TranslateTpmReturnStatus (FfaDirectReq2Args.Arg0);
-
-Exit:
-  return Status;
+  return TranslateTpmReturnStatus (FfaDirectReq2Args.Arg0);
 }
 
 /**
@@ -362,26 +340,22 @@ Tpm2FinishNotified (
 {
   EFI_STATUS       Status;
   DIRECT_MSG_ARGS  FfaDirectReq2Args;
+  UINT16           FfaTpm2PartitionId;
 
-  if (mFfaTpm2PartitionId == TPM2_FFA_PARTITION_ID_INVALID) {
-    GetTpmServicePartitionId (&mFfaTpm2PartitionId);
-  }
+  GetTpmServicePartitionId (&FfaTpm2PartitionId);
 
   ZeroMem (&FfaDirectReq2Args, sizeof (DIRECT_MSG_ARGS));
   FfaDirectReq2Args.Arg0 = TPM2_FFA_FINISH_NOTIFIED;
 
-  Status = ArmFfaLibMsgSendDirectReq2 (mFfaTpm2PartitionId, &gTpm2ServiceFfaGuid, &FfaDirectReq2Args);
+  Status = ArmFfaLibMsgSendDirectReq2 (FfaTpm2PartitionId, &gTpm2ServiceFfaGuid, &FfaDirectReq2Args);
   while (Status == EFI_INTERRUPT_PENDING) {
     // We are assuming vCPU0 of the TPM SP since it is UP.
     Status = ArmFfaLibRun (GET_SOURCE_PARTITION_ID (FfaDirectReq2Args.Header.x1), 0x00, &FfaDirectReq2Args);
   }
 
   if (EFI_ERROR (Status)) {
-    goto Exit;
+    return Status;
   }
 
-  Status = TranslateTpmReturnStatus (FfaDirectReq2Args.Arg0);
-
-Exit:
-  return Status;
+  return TranslateTpmReturnStatus (FfaDirectReq2Args.Arg0);
 }
