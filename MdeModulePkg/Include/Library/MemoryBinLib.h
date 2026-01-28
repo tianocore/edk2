@@ -102,9 +102,9 @@ UpdateMemoryStatistics (
   IN UINTN                 NumberOfPages
   );
 
-extern EFI_MEMORY_TYPE_INFORMATION  gMemoryTypeInformation[EfiMaxMemoryType + 1];
-extern EFI_MEMORY_TYPE_STATISTICS   mMemoryTypeStatistics[EfiMaxMemoryType + 1];
-extern BOOLEAN                      mMemoryTypeInformationInitialized;
-extern EFI_PHYSICAL_ADDRESS         mDefaultMaximumAddress;
-extern EFI_PHYSICAL_ADDRESS         mDefaultBaseAddress;
+extern EFI_MEMORY_TYPE_INFORMATION        gMemoryTypeInformation[EfiMaxMemoryType + 1];
+extern EFI_MEMORY_TYPE_STATISTICS_HEADER  mMemoryTypeStatistics;
+extern BOOLEAN                            mMemoryTypeInformationInitialized;
+extern EFI_PHYSICAL_ADDRESS               mDefaultMaximumAddress;
+extern EFI_PHYSICAL_ADDRESS               mDefaultBaseAddress;
 #endif // MEMORY_BIN_LIB_

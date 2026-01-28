@@ -37,11 +37,22 @@ typedef struct {
 typedef struct {
   EFI_PHYSICAL_ADDRESS    BaseAddress;
   EFI_PHYSICAL_ADDRESS    MaximumAddress;
-  UINT64                  CurrentNumberOfPages;
-  UINT64                  NumberOfPages;
+  UINT64                  CurrentNumberOfPagesInBin;
+  UINT64                  CurrentNumberOfPagesOutOfBin;
+  UINT64                  BinNumberOfPages;
   UINTN                   InformationIndex;
   BOOLEAN                 Special;
   BOOLEAN                 Runtime;
+  BOOLEAN                 DefaultBin;
+  EFI_MEMORY_TYPE         Type;
 } EFI_MEMORY_TYPE_STATISTICS;
+
+typedef struct {
+  UINT32                        Version;
+  UINT32                        NumEntries;
+  EFI_MEMORY_TYPE_STATISTICS    Statistics[EfiMaxMemoryType + 1];
+} EFI_MEMORY_TYPE_STATISTICS_HEADER;
+
+#define CURRENT_MEMORY_TYPE_STATISTICS_VERSION  1
 
 #endif

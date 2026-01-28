@@ -664,7 +664,7 @@ CoreConvertPagesEx (
         Entry->Type,
         NewType,
         Start,
-        NumberOfPages
+        (UINTN)NumberOfPages
         );
     }
 
@@ -1005,10 +1005,10 @@ FindFreePages (
   //
   // Attempt to find free pages in the preferred bin based on the requested memory type
   //
-  if (((UINT32)NewType < EfiMaxMemoryType) && (MaxAddress >= mMemoryTypeStatistics[NewType].MaximumAddress)) {
+  if ((NewType < EfiMaxMemoryType) && (MaxAddress >= mMemoryTypeStatistics.Statistics[NewType].MaximumAddress)) {
     Start = CoreFindFreePagesI (
-              mMemoryTypeStatistics[NewType].MaximumAddress,
-              mMemoryTypeStatistics[NewType].BaseAddress,
+              mMemoryTypeStatistics.Statistics[NewType].MaximumAddress,
+              mMemoryTypeStatistics.Statistics[NewType].BaseAddress,
               NoPages,
               NewType,
               Alignment,
@@ -1204,23 +1204,23 @@ CoreInternalAllocatePages (
 
     for (CheckType = (EFI_MEMORY_TYPE)0; CheckType < EfiMaxMemoryType; CheckType++) {
       if ((MemoryType != CheckType) &&
-          mMemoryTypeStatistics[CheckType].Special &&
-          (mMemoryTypeStatistics[CheckType].NumberOfPages > 0))
+          mMemoryTypeStatistics.Statistics[CheckType].Special &&
+          (mMemoryTypeStatistics.Statistics[CheckType].BinNumberOfPages > 0))
       {
-        if ((Start >= mMemoryTypeStatistics[CheckType].BaseAddress) &&
-            (Start <= mMemoryTypeStatistics[CheckType].MaximumAddress))
+        if ((Start >= mMemoryTypeStatistics.Statistics[CheckType].BaseAddress) &&
+            (Start <= mMemoryTypeStatistics.Statistics[CheckType].MaximumAddress))
         {
           return EFI_NOT_FOUND;
         }
 
-        if ((End >= mMemoryTypeStatistics[CheckType].BaseAddress) &&
-            (End <= mMemoryTypeStatistics[CheckType].MaximumAddress))
+        if ((End >= mMemoryTypeStatistics.Statistics[CheckType].BaseAddress) &&
+            (End <= mMemoryTypeStatistics.Statistics[CheckType].MaximumAddress))
         {
           return EFI_NOT_FOUND;
         }
 
-        if ((Start < mMemoryTypeStatistics[CheckType].BaseAddress) &&
-            (End   > mMemoryTypeStatistics[CheckType].MaximumAddress))
+        if ((Start < mMemoryTypeStatistics.Statistics[CheckType].BaseAddress) &&
+            (End   > mMemoryTypeStatistics.Statistics[CheckType].MaximumAddress))
         {
           return EFI_NOT_FOUND;
         }
@@ -1626,7 +1626,7 @@ SetEfiMemoryDescriptorType (
     return;
   }
 
-  if (mMemoryTypeStatistics[MemoryMap->Type].Runtime) {
+  if (mMemoryTypeStatistics.Statistics[MemoryMap->Type].Runtime) {
     MemoryMap->Attribute |= EFI_MEMORY_RUNTIME;
   } else {
     MemoryMap->Attribute &= ~EFI_MEMORY_RUNTIME;
@@ -1749,8 +1749,8 @@ CoreGetMemoryMap (
   // requires an extra entry below the bin and an extra entry above the bin.
   //
   for (Type = (EFI_MEMORY_TYPE)0; Type < EfiMaxMemoryType; Type++) {
-    if (mMemoryTypeStatistics[Type].Special &&
-        (mMemoryTypeStatistics[Type].NumberOfPages > 0))
+    if (mMemoryTypeStatistics.Statistics[Type].Special &&
+        (mMemoryTypeStatistics.Statistics[Type].BinNumberOfPages > 0))
     {
       BufferSize += 2 * Size;
     }
@@ -1797,16 +1797,16 @@ CoreGetMemoryMap (
     //
     // If memory bin is empty or not special, then no split or conversion is required
     //
-    if (mMemoryTypeStatistics[Type].NumberOfPages == 0) {
+    if (mMemoryTypeStatistics.Statistics[Type].BinNumberOfPages == 0) {
       continue;
     }
 
-    if (!mMemoryTypeStatistics[Type].Special) {
+    if (!mMemoryTypeStatistics.Statistics[Type].Special) {
       continue;
     }
 
-    BinStart = mMemoryTypeStatistics[Type].BaseAddress;
-    BinEnd   = mMemoryTypeStatistics[Type].MaximumAddress;
+    BinStart = mMemoryTypeStatistics.Statistics[Type].BaseAddress;
+    BinEnd   = mMemoryTypeStatistics.Statistics[Type].MaximumAddress;
 
     Modified = TRUE;
     while (Modified) {
@@ -2199,9 +2199,9 @@ CoreAllocatePoolPages (
     DEBUG ((DEBUG_ERROR | DEBUG_PAGE, "AllocatePoolPages: failed to allocate %d pages\n", (UINT32)NumberOfPages));
   } else {
     if (NeedGuard) {
-      CoreConvertPagesWithGuard (Start, NumberOfPages, PoolType);
+      CoreConvertPagesWithGuard (Start, NumberOfPages, PoolType, TRUE);
     } else {
-      CoreConvertPages (Start, NumberOfPages, PoolType);
+      CoreConvertPages (Start, NumberOfPages, PoolType, TRUE);
     }
   }
 
@@ -2258,7 +2258,7 @@ CoreTerminateMemoryMap (
     for (Link = gMemoryMap.ForwardLink; Link != &gMemoryMap; Link = Link->ForwardLink) {
       Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
       if (Entry->Type < EfiMaxMemoryType) {
-        if (mMemoryTypeStatistics[Entry->Type].Runtime) {
+        if (mMemoryTypeStatistics.Statistics[Entry->Type].Runtime) {
           ASSERT (Entry->Type != EfiACPIReclaimMemory);
           ASSERT (Entry->Type != EfiACPIMemoryNVS);
           if ((Entry->Start & (RUNTIME_PAGE_ALLOCATION_GRANULARITY - 1)) != 0) {
