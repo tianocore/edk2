@@ -142,6 +142,31 @@ RemoveMemoryMapEntry (
 }
 
 /**
+  Helper function to evaluate if memory regions intersect.
+
+  @param  Start1     The address of the first byte in the first memory region.
+  @param  End1       The address of the last byte in the first memory region.
+  @param  Start2     The address of the first byte in the second memory region.
+  @param  End2       The address of the last byte in the second memory region.
+
+  @return TRUE if the memory regions intersect, FALSE otherwise.
+**/
+STATIC
+BOOLEAN
+MemoryRegionsIntersect (
+  IN EFI_PHYSICAL_ADDRESS  Start1,
+  IN EFI_PHYSICAL_ADDRESS  End1,
+  IN EFI_PHYSICAL_ADDRESS  Start2,
+  IN EFI_PHYSICAL_ADDRESS  End2
+  )
+{
+  ASSERT (Start1 <= End1);
+  ASSERT (Start2 <= End2);
+
+  return ((Start1 < End2) && (Start2 < End1));
+}
+
+/**
   Internal function.  Adds a ranges to the memory map.
   The range must not already exist in the map.
 
@@ -2487,6 +2512,66 @@ CoreGetMemoryMap (
 
   MergeMemoryMap (MemoryMapStart, &BufferSize, Size);
   MemoryMapEnd = (EFI_MEMORY_DESCRIPTOR *)((UINT8 *)MemoryMapStart + BufferSize);
+
+  DEBUG_CODE_BEGIN ();
+  MemoryMap = MemoryMapStart;
+  while (MemoryMap < MemoryMapEnd) {
+    // Verify that any memory map entry that overlaps with a special memory type
+    // bin must be completely contained within the bin and have the same type as
+    // the bin.
+    EntryStart = MemoryMap->PhysicalStart;
+    EntryEnd = EntryStart + EFI_PAGES_TO_SIZE (MemoryMap->NumberOfPages) - 1;
+    for (Type = (EFI_MEMORY_TYPE)0; Type < EfiMaxMemoryType; Type++) {
+      // Check if this memory map entry overlaps with a special memory type bin.
+      if (mMemoryTypeStatistics[Type].Special &&
+          (mMemoryTypeStatistics[Type].NumberOfPages > 0) &&
+          MemoryRegionsIntersect (
+            EntryStart,
+            EntryEnd,
+            mMemoryTypeStatistics[Type].BaseAddress,
+            mMemoryTypeStatistics[Type].MaximumAddress
+            )
+         )
+      {
+        // Verify that it is completely contained within the bin.
+        if ((EntryStart < mMemoryTypeStatistics[Type].BaseAddress) ||
+            (EntryEnd > mMemoryTypeStatistics[Type].MaximumAddress)) {
+          DEBUG ((
+            DEBUG_ERROR,
+            "%a: Memory Map entry (Type %d, Start 0x%lx, End 0x%lx) fit within special memory type bin (Type %d, Start 0x%lx, End 0x%lx).\n",
+            __func__,
+            MemoryMap->Type,
+            EntryStart,
+            EntryEnd,
+            Type,
+            mMemoryTypeStatistics[Type].BaseAddress,
+            mMemoryTypeStatistics[Type].MaximumAddress
+            ));
+
+          ASSERT (FALSE);
+        }
+
+        // It is contained within the bin, the type must match the bin type.
+        if (MemoryMap->Type != Type) {
+          DEBUG ((
+            DEBUG_ERROR,
+            "%a: Memory Map entry type does not match special memory type bin. Bin Type %d, Type %d, Start 0x%lx, End 0x%lx\n",
+            __func__,
+            Type,
+            MemoryMap->Type,
+            EntryStart,
+            EntryEnd
+            ));
+
+          ASSERT (FALSE);
+        }
+      }
+    }
+
+    MemoryMap = NEXT_MEMORY_DESCRIPTOR (MemoryMap, *DescriptorSize);
+  }
+
+  DEBUG_CODE_END ();
 
   Status = EFI_SUCCESS;
 
