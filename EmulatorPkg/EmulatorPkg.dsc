@@ -50,6 +50,8 @@
 
 !include MdePkg/MdeLibs.dsc.inc
 !include CryptoPkg/CryptoPkgFeatureFlagPcds.dsc.inc
+!include RedfishPkg/Redfish.dsc.inc
+!include NetworkPkg/Network.dsc.inc
 
 [LibraryClasses]
   #
@@ -112,6 +114,8 @@
   !if $(REDFISH_ENABLE) == TRUE
     RedfishPlatformHostInterfaceLib|EmulatorPkg/Library/RedfishPlatformHostInterfaceLib/RedfishPlatformHostInterfaceLib.inf
     RedfishPlatformCredentialLib|EmulatorPkg/Library/RedfishPlatformCredentialLib/RedfishPlatformCredentialLib.inf
+    RedfishPlatformWantedDeviceLib|RedfishPkg/Library/RedfishPlatformWantedDeviceLibNull/RedfishPlatformWantedDeviceLibNull.inf
+    RedfishContentCodingLib|RedfishPkg/Library/RedfishContentCodingLibNull/RedfishContentCodingLibNull.inf
   !endif
   #
   # Misc
@@ -134,8 +138,9 @@
   ImagePropertiesRecordLib|MdeModulePkg/Library/ImagePropertiesRecordLib/ImagePropertiesRecordLib.inf
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+  TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   PlatformSecureLib|SecurityPkg/Library/PlatformSecureLibNull/PlatformSecureLibNull.inf
@@ -297,17 +302,15 @@
   gEmulatorPkgTokenSpaceGuid.PcdRedfishServiceStopIfSecureBootDisabled|False
   gEmulatorPkgTokenSpaceGuid.PcdRedfishServiceStopIfExitbootService|False
 
-  gEfiRedfishClientPkgTokenSpaceGuid.PcdRedfishServiceEtagSupported|False
-
   #
   # Redfish Debug enablement
   #
   # 0x0000000000000001  RedfishPlatformConfigDxe driver debug enabled.
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDebugCategory|0
-  #   0x00000001  x-uefi-redfish string database message enabled
+  #   0x00000001  x-UEFI-redfish string database message enabled
   #   0x00000002  Debug Message for dumping formset
-  #   0x00000004  Debug Message for x-uefi-redfish searching result
-  #   0x00000008  Debug Message for x-uefi-redfish Regular Expression searching result
+  #   0x00000004  Debug Message for x-UEFI-redfish searching result
+  #   0x00000008  Debug Message for x-UEFI-redfish Regular Expression searching result
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishPlatformConfigDebugProperty|0
 
   # Redfish Platform Configure DXE driver feature enablement
@@ -520,12 +523,10 @@
 
 !endif
 
-!include NetworkPkg/Network.dsc.inc
 
 !if $(REDFISH_ENABLE) == TRUE
   EmulatorPkg/Application/RedfishPlatformConfig/RedfishPlatformConfig.inf
 !endif
-!include RedfishPkg/Redfish.dsc.inc
 
 #
 # Fail with error message if the OS/Compiler combination is not supported

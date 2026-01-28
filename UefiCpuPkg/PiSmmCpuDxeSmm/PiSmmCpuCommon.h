@@ -972,7 +972,7 @@ SetMemMapAttributes (
 **/
 EFI_PHYSICAL_ADDRESS
 GetSmmProfileData (
-  IN OUT  UINT64  *Size
+  IN OUT  UINTN  *Size
   );
 
 /**
