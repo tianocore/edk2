@@ -1,0 +1,37 @@
+## @file
+#  Memory Bin Library
+#
+#  Shared logic between cores to work with memory bins for S4 resume stability.
+#
+#  Copyright (c) Microsoft Corporation.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MemoryBinLib
+  MODULE_UNI_FILE                = MemoryBinLib.uni
+  FILE_GUID                      = A88C1999-DC07-46D7-9A7F-532951FE2A13
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MemoryBinLib | DXE_CORE
+
+[Sources]
+  BaseMemoryBinLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  MemoryAllocationLib
+
+[Guids]
+  gEfiMemoryTypeInformationGuid  ## CONSUMES

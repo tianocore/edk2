@@ -29,3 +29,16 @@ typedef struct {
   UINT32    Type;           ///< EFI memory type defined in UEFI specification.
   UINT32    NumberOfPages;  ///< The pages of this type memory.
 } EFI_MEMORY_TYPE_INFORMATION;
+
+//
+// Entry in an array that keeps track of memory type statistics per memory bin
+//
+typedef struct {
+  EFI_PHYSICAL_ADDRESS    BaseAddress;
+  EFI_PHYSICAL_ADDRESS    MaximumAddress;
+  UINT64                  CurrentNumberOfPages;
+  UINT64                  NumberOfPages;
+  UINTN                   InformationIndex;
+  BOOLEAN                 Special;
+  BOOLEAN                 Runtime;
+} EFI_MEMORY_TYPE_STATISTICS;

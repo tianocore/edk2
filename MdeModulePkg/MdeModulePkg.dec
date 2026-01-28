@@ -186,6 +186,10 @@
   #
   RealTimeClockLib|Include/Library/RealTimeClockLib.h
 
+  ## @libraryclass  Provides shared logic for memory bin manipulation for S4 resume stability.
+  #
+  MemoryBinLib|Include/Library/MemoryBinLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
