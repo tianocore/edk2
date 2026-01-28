@@ -258,6 +258,10 @@ extern EFI_GUID                   *gDxeCoreFileName;
 extern EFI_LOADED_IMAGE_PROTOCOL  *gDxeCoreLoadedImage;
 
 extern EFI_MEMORY_TYPE_INFORMATION  gMemoryTypeInformation[EfiMaxMemoryType + 1];
+extern BOOLEAN                      mMemoryTypeInformationInitialized;
+extern EFI_MEMORY_TYPE_STATISTICS   mMemoryTypeStatistics[EfiMaxMemoryType + 1];
+extern EFI_PHYSICAL_ADDRESS         mDefaultMaximumAddress;
+extern EFI_PHYSICAL_ADDRESS         mDefaultBaseAddress;
 
 extern BOOLEAN                    gDispatcherRunning;
 extern EFI_RUNTIME_ARCH_PROTOCOL  gRuntimeTemplate;
@@ -277,12 +281,6 @@ extern BOOLEAN                                     gLoadFixedAddressCodeMemoryRe
 VOID
 CoreInitializePool (
   VOID
-  );
-
-VOID
-CoreSetMemoryTypeInformationRange (
-  IN EFI_PHYSICAL_ADDRESS  Start,
-  IN UINT64                Length
   );
 
 /**
