@@ -48,6 +48,7 @@
   Mem/Page.c
   Mem/MemData.c
   Mem/Imem.h
+  Mem/MemoryBin.c
   Mem/MemoryProfileRecord.c
   Mem/HeapGuard.c
   Mem/HeapGuard.h
