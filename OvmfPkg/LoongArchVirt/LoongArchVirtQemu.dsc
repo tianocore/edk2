@@ -160,6 +160,7 @@
   PciHostBridgeUtilityLib          | OvmfPkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
   FileExplorerLib                  | MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
   ImagePropertiesRecordLib         | MdeModulePkg/Library/ImagePropertiesRecordLib/ImagePropertiesRecordLib.inf
+  MemoryBinLib                     | MdeModulePkg/Library/BaseMemoryBinLib/BaseMemoryBinLib.inf
 
   #
   # CryptoPkg libraries needed by multiple firmware features
