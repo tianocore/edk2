@@ -75,7 +75,7 @@ GetMemoryTypeInformationResourceHob (
                                             the size of the memory bins.
   @param  MemoryTypeInformationInitialized  A pointer to a boolean that indicates whether the memory type
                                             information bins have been initialized.
-  @param  MemoryTypeStatistics              The memory type statistics array to be updated with the memory bin
+  @param  MemoryTypeStatistics              The memory type statistics header to be updated with the memory bin
                                             information if the provided range is used.
   @param  DefaultMaximumAddress             A pointer to the default maximum address to be updated if the
                                             provided range is used.
@@ -83,12 +83,12 @@ GetMemoryTypeInformationResourceHob (
 VOID
 EFIAPI
 CoreSetMemoryTypeInformationRange (
-  IN EFI_PHYSICAL_ADDRESS         Start,
-  IN UINT64                       Length,
-  IN EFI_MEMORY_TYPE_INFORMATION  *MemoryTypeInformation,
-  IN BOOLEAN                      *MemoryTypeInformationInitialized,
-  IN EFI_MEMORY_TYPE_STATISTICS   *MemoryTypeStatistics,
-  IN EFI_PHYSICAL_ADDRESS         *DefaultMaximumAddress
+  IN EFI_PHYSICAL_ADDRESS               Start,
+  IN UINT64                             Length,
+  IN EFI_MEMORY_TYPE_INFORMATION        *MemoryTypeInformation,
+  IN BOOLEAN                            *MemoryTypeInformationInitialized,
+  IN EFI_MEMORY_TYPE_STATISTICS_HEADER  *MemoryTypeStatistics,
+  IN EFI_PHYSICAL_ADDRESS               *DefaultMaximumAddress
   );
 
 /**
@@ -102,7 +102,7 @@ CoreSetMemoryTypeInformationRange (
                                             information bins have been initialized.
   @param  MemoryTypeInformation             The memory type information array to be used to determine
                                             the size of the memory bins.
-  @param  MemoryTypeStatistics              The memory type statistics array to be updated with the memory bin
+  @param  MemoryTypeStatistics              The memory type statistics header to be updated with the memory bin
                                             information if the provided range is used.
   @param  DefaultMaximumAddress             A pointer to the default maximum address to be updated if the
                                             provided range is used.
@@ -110,10 +110,10 @@ CoreSetMemoryTypeInformationRange (
 VOID
 EFIAPI
 AllocateMemoryTypeInformationBins (
-  IN BOOLEAN                      *MemoryTypeInformationInitialized,
-  IN EFI_MEMORY_TYPE_INFORMATION  *MemoryTypeInformation,
-  IN EFI_MEMORY_TYPE_STATISTICS   *MemoryTypeStatistics,
-  IN EFI_PHYSICAL_ADDRESS         *DefaultMaximumAddress
+  IN BOOLEAN                            *MemoryTypeInformationInitialized,
+  IN EFI_MEMORY_TYPE_INFORMATION        *MemoryTypeInformation,
+  IN EFI_MEMORY_TYPE_STATISTICS_HEADER  *MemoryTypeStatistics,
+  IN EFI_PHYSICAL_ADDRESS               *DefaultMaximumAddress
   );
 
 /**
@@ -127,23 +127,19 @@ AllocateMemoryTypeInformationBins (
                                           outside the bin.
   @param MemoryTypeInformationInitialized A pointer to a boolean that indicates whether the memory type
                                           information bins have been initialized.
-  @param MemoryTypeStatistics             The memory type statistics array to be updated.
+  @param MemoryTypeStatistics             The memory type statistics header to be updated.
   @param MemoryTypeInformation            The memory type information array to be updated.
-  @param DefaultBaseAddress               Default bin base address.
-  @param DefaultMaximumAddress            Default bin maximum address.
 **/
 VOID
 EFIAPI
 UpdateMemoryStatistics (
-  IN EFI_MEMORY_TYPE              OldType,
-  IN EFI_MEMORY_TYPE              NewType,
-  IN EFI_PHYSICAL_ADDRESS         Start,
-  IN UINTN                        NumberOfPages,
-  IN BOOLEAN                      *MemoryTypeInformationInitialized,
-  IN EFI_MEMORY_TYPE_STATISTICS   *MemoryTypeStatistics,
-  IN EFI_MEMORY_TYPE_INFORMATION  *MemoryTypeInformation,
-  IN EFI_PHYSICAL_ADDRESS         DefaultBaseAddress,
-  IN EFI_PHYSICAL_ADDRESS         DefaultMaximumAddress
+  IN EFI_MEMORY_TYPE                    OldType,
+  IN EFI_MEMORY_TYPE                    NewType,
+  IN EFI_PHYSICAL_ADDRESS               Start,
+  IN UINT32                             NumberOfPages,
+  IN BOOLEAN                            *MemoryTypeInformationInitialized,
+  IN EFI_MEMORY_TYPE_STATISTICS_HEADER  *MemoryTypeStatistics,
+  IN EFI_MEMORY_TYPE_INFORMATION        *MemoryTypeInformation
   );
 
 #endif // MEMORY_BIN_LIB_

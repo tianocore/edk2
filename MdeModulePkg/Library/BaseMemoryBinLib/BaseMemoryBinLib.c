@@ -246,7 +246,7 @@ GetMemoryTypeInformationResourceHob (
                                             the size of the memory bins.
   @param  MemoryTypeInformationInitialized  A pointer to a boolean that indicates whether the memory type
                                             information bins have been initialized.
-  @param  MemoryTypeStatistics              The memory type statistics array to be updated with the memory bin
+  @param  MemoryTypeStatistics              The memory type statistics header to be updated with the memory bin
                                             information if the provided range is used.
   @param  DefaultMaximumAddress             A pointer to the default maximum address to be updated if the
                                             provided range is used.
@@ -254,12 +254,12 @@ GetMemoryTypeInformationResourceHob (
 VOID
 EFIAPI
 CoreSetMemoryTypeInformationRange (
-  IN EFI_PHYSICAL_ADDRESS         Start,
-  IN UINT64                       Length,
-  IN EFI_MEMORY_TYPE_INFORMATION  *MemoryTypeInformation,
-  IN BOOLEAN                      *MemoryTypeInformationInitialized,
-  IN EFI_MEMORY_TYPE_STATISTICS   *MemoryTypeStatistics,
-  IN EFI_PHYSICAL_ADDRESS         *DefaultMaximumAddress
+  IN EFI_PHYSICAL_ADDRESS               Start,
+  IN UINT64                             Length,
+  IN EFI_MEMORY_TYPE_INFORMATION        *MemoryTypeInformation,
+  IN BOOLEAN                            *MemoryTypeInformationInitialized,
+  IN EFI_MEMORY_TYPE_STATISTICS_HEADER  *MemoryTypeStatistics,
+  IN EFI_PHYSICAL_ADDRESS               *DefaultMaximumAddress
   )
 {
   EFI_PHYSICAL_ADDRESS  Top;
@@ -309,20 +309,20 @@ CoreSetMemoryTypeInformationRange (
     }
 
     if (MemoryTypeInformation[Index].NumberOfPages != 0) {
-      MemoryTypeStatistics[Type].MaximumAddress = Top - 1;
-      Top                                      -= LShiftU64 (MemoryTypeInformation[Index].NumberOfPages, EFI_PAGE_SHIFT);
-      MemoryTypeStatistics[Type].BaseAddress    = Top;
+      MemoryTypeStatistics->Statistics[Type].MaximumAddress = Top - 1;
+      Top                                                  -= LShiftU64 (MemoryTypeInformation[Index].NumberOfPages, EFI_PAGE_SHIFT);
+      MemoryTypeStatistics->Statistics[Type].BaseAddress    = Top;
 
       //
       // If the current base address is the lowest address so far, then update
       // the default maximum address
       //
-      if (MemoryTypeStatistics[Type].BaseAddress < *DefaultMaximumAddress) {
-        *DefaultMaximumAddress = MemoryTypeStatistics[Type].BaseAddress - 1;
+      if (MemoryTypeStatistics->Statistics[Type].BaseAddress < *DefaultMaximumAddress) {
+        *DefaultMaximumAddress = MemoryTypeStatistics->Statistics[Type].BaseAddress - 1;
       }
 
-      MemoryTypeStatistics[Type].NumberOfPages   = MemoryTypeInformation[Index].NumberOfPages;
-      MemoryTypeInformation[Index].NumberOfPages = 0;
+      MemoryTypeStatistics->Statistics[Type].BinNumberOfPages = MemoryTypeInformation[Index].NumberOfPages;
+      MemoryTypeInformation[Index].NumberOfPages              = 0;
     }
   }
 
@@ -333,13 +333,15 @@ CoreSetMemoryTypeInformationRange (
   for (Type = (EFI_MEMORY_TYPE)0; Type < EfiMaxMemoryType; Type++) {
     for (Index = 0; MemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
       if (Type == (EFI_MEMORY_TYPE)MemoryTypeInformation[Index].Type) {
-        MemoryTypeStatistics[Type].InformationIndex = Index;
+        MemoryTypeStatistics->Statistics[Type].InformationIndex = Index;
       }
     }
 
-    MemoryTypeStatistics[Type].CurrentNumberOfPages = 0;
-    if (MemoryTypeStatistics[Type].MaximumAddress == MAX_ALLOC_ADDRESS) {
-      MemoryTypeStatistics[Type].MaximumAddress = *DefaultMaximumAddress;
+    MemoryTypeStatistics->Statistics[Type].CurrentNumberOfPagesInBin    = 0;
+    MemoryTypeStatistics->Statistics[Type].CurrentNumberOfPagesOutOfBin = 0;
+    if (MemoryTypeStatistics->Statistics[Type].MaximumAddress == MAX_ALLOC_ADDRESS) {
+      MemoryTypeStatistics->Statistics[Type].MaximumAddress = *DefaultMaximumAddress;
+      MemoryTypeStatistics->Statistics[Type].DefaultBin     = TRUE;
     }
   }
 
@@ -357,7 +359,7 @@ CoreSetMemoryTypeInformationRange (
                                             information bins have been initialized.
   @param  MemoryTypeInformation             The memory type information array to be used to determine
                                             the size of the memory bins.
-  @param  MemoryTypeStatistics              The memory type statistics array to be updated with the memory bin
+  @param  MemoryTypeStatistics              The memory type statistics header to be updated with the memory bin
                                             information if the provided range is used.
   @param  DefaultMaximumAddress             A pointer to the default maximum address to be updated if the
                                             provided range is used.
@@ -365,10 +367,10 @@ CoreSetMemoryTypeInformationRange (
 VOID
 EFIAPI
 AllocateMemoryTypeInformationBins (
-  IN BOOLEAN                      *MemoryTypeInformationInitialized,
-  IN EFI_MEMORY_TYPE_INFORMATION  *MemoryTypeInformation,
-  IN EFI_MEMORY_TYPE_STATISTICS   *MemoryTypeStatistics,
-  IN EFI_PHYSICAL_ADDRESS         *DefaultMaximumAddress
+  IN BOOLEAN                            *MemoryTypeInformationInitialized,
+  IN EFI_MEMORY_TYPE_INFORMATION        *MemoryTypeInformation,
+  IN EFI_MEMORY_TYPE_STATISTICS_HEADER  *MemoryTypeStatistics,
+  IN EFI_PHYSICAL_ADDRESS               *DefaultMaximumAddress
   )
 {
   UINTN                 Index;
@@ -432,9 +434,9 @@ AllocateMemoryTypeInformationBins (
     }
 
     if (MemoryTypeInformation[Index].NumberOfPages != 0) {
-      MemoryTypeStatistics[Type].BaseAddress    = LastBinAddress - LShiftU64 (MemoryTypeInformation[Index].NumberOfPages, EFI_PAGE_SHIFT);
-      MemoryTypeStatistics[Type].MaximumAddress = LastBinAddress - 1;
-      LastBinAddress                            = MemoryTypeStatistics[Type].BaseAddress;
+      MemoryTypeStatistics->Statistics[Type].BaseAddress    = LastBinAddress - LShiftU64 (MemoryTypeInformation[Index].NumberOfPages, EFI_PAGE_SHIFT);
+      MemoryTypeStatistics->Statistics[Type].MaximumAddress = LastBinAddress - 1;
+      LastBinAddress                                        = MemoryTypeStatistics->Statistics[Type].BaseAddress;
     }
   }
 
@@ -457,8 +459,8 @@ AllocateMemoryTypeInformationBins (
     }
 
     if (MemoryTypeInformation[Index].NumberOfPages != 0) {
-      MemoryTypeStatistics[Type].NumberOfPages   = MemoryTypeInformation[Index].NumberOfPages;
-      MemoryTypeInformation[Index].NumberOfPages = 0;
+      MemoryTypeStatistics->Statistics[Type].BinNumberOfPages = MemoryTypeInformation[Index].NumberOfPages;
+      MemoryTypeInformation[Index].NumberOfPages              = 0;
     }
   }
 
@@ -469,13 +471,15 @@ AllocateMemoryTypeInformationBins (
   for (Type = (EFI_MEMORY_TYPE)0; Type < EfiMaxMemoryType; Type++) {
     for (Index = 0; MemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
       if (Type == (EFI_MEMORY_TYPE)MemoryTypeInformation[Index].Type) {
-        MemoryTypeStatistics[Type].InformationIndex = Index;
+        MemoryTypeStatistics->Statistics[Type].InformationIndex = Index;
       }
     }
 
-    MemoryTypeStatistics[Type].CurrentNumberOfPages = 0;
-    if (MemoryTypeStatistics[Type].MaximumAddress == MAX_ALLOC_ADDRESS) {
-      MemoryTypeStatistics[Type].MaximumAddress = *DefaultMaximumAddress;
+    MemoryTypeStatistics->Statistics[Type].CurrentNumberOfPagesInBin    = 0;
+    MemoryTypeStatistics->Statistics[Type].CurrentNumberOfPagesOutOfBin = 0;
+    if (MemoryTypeStatistics->Statistics[Type].MaximumAddress == MAX_ALLOC_ADDRESS) {
+      MemoryTypeStatistics->Statistics[Type].MaximumAddress = *DefaultMaximumAddress;
+      MemoryTypeStatistics->Statistics[Type].DefaultBin     = TRUE;
     }
   }
 
@@ -493,23 +497,19 @@ AllocateMemoryTypeInformationBins (
                                           outside the bin.
   @param MemoryTypeInformationInitialized A pointer to a boolean that indicates whether the memory type
                                           information bins have been initialized.
-  @param MemoryTypeStatistics             The memory type statistics array to be updated.
+  @param MemoryTypeStatistics             The memory type statistics header to be updated.
   @param MemoryTypeInformation            The memory type information array to be updated.
-  @param DefaultBaseAddress               Default bin base address.
-  @param DefaultMaximumAddress            Default bin maximum address.
 **/
 VOID
 EFIAPI
 UpdateMemoryStatistics (
-  IN EFI_MEMORY_TYPE              OldType,
-  IN EFI_MEMORY_TYPE              NewType,
-  IN EFI_PHYSICAL_ADDRESS         Start,
-  IN UINTN                        NumberOfPages,
-  IN BOOLEAN                      *MemoryTypeInformationInitialized,
-  IN EFI_MEMORY_TYPE_STATISTICS   *MemoryTypeStatistics,
-  IN EFI_MEMORY_TYPE_INFORMATION  *MemoryTypeInformation,
-  IN EFI_PHYSICAL_ADDRESS         DefaultBaseAddress,
-  IN EFI_PHYSICAL_ADDRESS         DefaultMaximumAddress
+  IN EFI_MEMORY_TYPE                    OldType,
+  IN EFI_MEMORY_TYPE                    NewType,
+  IN EFI_PHYSICAL_ADDRESS               Start,
+  IN UINT32                             NumberOfPages,
+  IN BOOLEAN                            *MemoryTypeInformationInitialized,
+  IN EFI_MEMORY_TYPE_STATISTICS_HEADER  *MemoryTypeStatistics,
+  IN EFI_MEMORY_TYPE_INFORMATION        *MemoryTypeInformation
   )
 {
   if ((MemoryTypeInformationInitialized == NULL) ||
@@ -526,30 +526,48 @@ UpdateMemoryStatistics (
   }
 
   //
-  // Update counters for the number of pages allocated to each memory type
+  // Update counters for the number of pages allocated to each memory type. We only count an allocation as in a bin
+  // if the entire allocation is within the bin range.
   //
-  if ((UINT32)OldType < EfiMaxMemoryType) {
-    if (((Start >= MemoryTypeStatistics[OldType].BaseAddress) && (Start <= MemoryTypeStatistics[OldType].MaximumAddress)) ||
-        ((Start >= DefaultBaseAddress) && (Start <= DefaultMaximumAddress)))
+  if (OldType < EfiMaxMemoryType) {
+    if ((Start >=
+         MemoryTypeStatistics->Statistics[OldType].BaseAddress) &&
+        (Start + NumberOfPages * EFI_PAGE_SIZE <=
+         MemoryTypeStatistics->Statistics[OldType].MaximumAddress + 1))
     {
-      if (NumberOfPages > MemoryTypeStatistics[OldType].CurrentNumberOfPages) {
-        MemoryTypeStatistics[OldType].CurrentNumberOfPages = 0;
+      // The old type was in the memory bin
+      if (NumberOfPages > MemoryTypeStatistics->Statistics[OldType].CurrentNumberOfPagesInBin) {
+        MemoryTypeStatistics->Statistics[OldType].CurrentNumberOfPagesInBin = 0;
       } else {
-        MemoryTypeStatistics[OldType].CurrentNumberOfPages -= NumberOfPages;
+        MemoryTypeStatistics->Statistics[OldType].CurrentNumberOfPagesInBin -= NumberOfPages;
+      }
+    } else {
+      // The old type was outside the memory bin
+      if (NumberOfPages > MemoryTypeStatistics->Statistics[OldType].CurrentNumberOfPagesOutOfBin) {
+        MemoryTypeStatistics->Statistics[OldType].CurrentNumberOfPagesOutOfBin = 0;
+      } else {
+        MemoryTypeStatistics->Statistics[OldType].CurrentNumberOfPagesOutOfBin -= NumberOfPages;
       }
     }
   }
 
-  if ((UINT32)NewType < EfiMaxMemoryType) {
-    if (((Start >= MemoryTypeStatistics[NewType].BaseAddress) && (Start <= MemoryTypeStatistics[NewType].MaximumAddress)) ||
-        ((Start >= DefaultBaseAddress) && (Start <= DefaultMaximumAddress)))
+  if (NewType < EfiMaxMemoryType) {
+    if ((Start >=
+         MemoryTypeStatistics->Statistics[NewType].BaseAddress) &&
+        (Start + NumberOfPages * EFI_PAGE_SIZE <=
+         MemoryTypeStatistics->Statistics[NewType].MaximumAddress + 1))
     {
-      MemoryTypeStatistics[NewType].CurrentNumberOfPages += NumberOfPages;
-      if ((MemoryTypeStatistics[NewType].InformationIndex < (UINTN)EfiMaxMemoryType) &&
-          (MemoryTypeStatistics[NewType].CurrentNumberOfPages > MemoryTypeInformation[MemoryTypeStatistics[NewType].InformationIndex].NumberOfPages))
-      {
-        MemoryTypeInformation[MemoryTypeStatistics[NewType].InformationIndex].NumberOfPages = (UINT32)MemoryTypeStatistics[NewType].CurrentNumberOfPages;
-      }
+      // The new type is in the memory bin
+      MemoryTypeStatistics->Statistics[NewType].CurrentNumberOfPagesInBin += NumberOfPages;
+    } else {
+      // The new type is outside the memory bin
+      MemoryTypeStatistics->Statistics[NewType].CurrentNumberOfPagesOutOfBin += NumberOfPages;
+    }
+
+    if ((MemoryTypeStatistics->Statistics[NewType].InformationIndex < EfiMaxMemoryType) &&
+        (MemoryTypeStatistics->Statistics[NewType].CurrentNumberOfPagesInBin + MemoryTypeStatistics->Statistics[NewType].CurrentNumberOfPagesOutOfBin > MemoryTypeInformation[MemoryTypeStatistics->Statistics[NewType].InformationIndex].NumberOfPages))
+    {
+      MemoryTypeInformation[MemoryTypeStatistics->Statistics[NewType].InformationIndex].NumberOfPages = MemoryTypeStatistics->Statistics[NewType].CurrentNumberOfPagesInBin + MemoryTypeStatistics->Statistics[NewType].CurrentNumberOfPagesOutOfBin;
     }
   }
 }

@@ -33,25 +33,31 @@ UINTN       mFreeMapStack = 0;
 LIST_ENTRY  mFreeMemoryMapEntryList           = INITIALIZE_LIST_HEAD_VARIABLE (mFreeMemoryMapEntryList);
 BOOLEAN     mMemoryTypeInformationInitialized = FALSE;
 
-EFI_MEMORY_TYPE_STATISTICS  mMemoryTypeStatistics[EfiMaxMemoryType + 1] = {
-  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, TRUE,  FALSE },  // EfiReservedMemoryType
-  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiLoaderCode
-  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiLoaderData
-  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiBootServicesCode
-  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiBootServicesData
-  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, TRUE,  TRUE  },  // EfiRuntimeServicesCode
-  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, TRUE,  TRUE  },  // EfiRuntimeServicesData
-  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiConventionalMemory
-  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiUnusableMemory
-  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, TRUE,  FALSE },  // EfiACPIReclaimMemory
-  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, TRUE,  FALSE },  // EfiACPIMemoryNVS
-  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiMemoryMappedIO
-  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiMemoryMappedIOPortSpace
-  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, TRUE,  TRUE  },  // EfiPalCode
-  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE },  // EfiPersistentMemory
-  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, TRUE,  FALSE },  // EfiUnacceptedMemoryType
-  { 0, MAX_ALLOC_ADDRESS, 0, 0, EfiMaxMemoryType, FALSE, FALSE }   // EfiMaxMemoryType
+// Uncrustify adds large spaces in the array, so disable it for the initialization of mMemoryTypeStatistics
+// BEGIN_UNCRUSTIFY_DISABLE
+EFI_MEMORY_TYPE_STATISTICS_HEADER  mMemoryTypeStatistics = {
+  CURRENT_MEMORY_TYPE_STATISTICS_VERSION,
+  {
+    { 0, MAX_ALLOC_ADDRESS,  0, 0, 0, EfiMaxMemoryType, TRUE,  FALSE, FALSE, EfiReservedMemoryType      },
+    { 0, MAX_ALLOC_ADDRESS,  0, 0, 0, EfiMaxMemoryType, FALSE, FALSE, FALSE, EfiLoaderCode              },
+    { 0, MAX_ALLOC_ADDRESS,  0, 0, 0, EfiMaxMemoryType, FALSE, FALSE, FALSE, EfiLoaderData              },
+    { 0, MAX_ALLOC_ADDRESS,  0, 0, 0, EfiMaxMemoryType, FALSE, FALSE, FALSE, EfiBootServicesCode        },
+    { 0, MAX_ALLOC_ADDRESS,  0, 0, 0, EfiMaxMemoryType, FALSE, FALSE, FALSE, EfiBootServicesData        },
+    { 0, MAX_ALLOC_ADDRESS,  0, 0, 0, EfiMaxMemoryType, TRUE,  TRUE,  FALSE, EfiRuntimeServicesCode     },
+    { 0, MAX_ALLOC_ADDRESS,  0, 0, 0, EfiMaxMemoryType, TRUE,  TRUE,  FALSE, EfiRuntimeServicesData     },
+    { 0, MAX_ALLOC_ADDRESS,  0, 0, 0, EfiMaxMemoryType, FALSE, FALSE, FALSE, EfiConventionalMemory      },
+    { 0, MAX_ALLOC_ADDRESS,  0, 0, 0, EfiMaxMemoryType, FALSE, FALSE, FALSE, EfiUnusableMemory          },
+    { 0, MAX_ALLOC_ADDRESS,  0, 0, 0, EfiMaxMemoryType, TRUE,  FALSE, FALSE, EfiACPIReclaimMemory       },
+    { 0, MAX_ALLOC_ADDRESS,  0, 0, 0, EfiMaxMemoryType, TRUE,  FALSE, FALSE, EfiACPIMemoryNVS           },
+    { 0, MAX_ALLOC_ADDRESS,  0, 0, 0, EfiMaxMemoryType, FALSE, FALSE, FALSE, EfiMemoryMappedIO          },
+    { 0, MAX_ALLOC_ADDRESS,  0, 0, 0, EfiMaxMemoryType, FALSE, FALSE, FALSE, EfiMemoryMappedIOPortSpace },
+    { 0, MAX_ALLOC_ADDRESS,  0, 0, 0, EfiMaxMemoryType, TRUE,  TRUE,  FALSE, EfiPalCode                 },
+    { 0, MAX_ALLOC_ADDRESS,  0, 0, 0, EfiMaxMemoryType, FALSE, FALSE, FALSE, EfiPersistentMemory        },
+    { 0, MAX_ALLOC_ADDRESS,  0, 0, 0, EfiMaxMemoryType, TRUE,  FALSE, FALSE, EfiUnacceptedMemoryType    },
+    { 0, MAX_ALLOC_ADDRESS,  0, 0, 0, EfiMaxMemoryType, FALSE, FALSE, FALSE, EfiMaxMemoryType           }
+  }
 };
+// END_UNCRUSTIFY_DISABLE
 
 EFI_PHYSICAL_ADDRESS  mDefaultMaximumAddress = MAX_ALLOC_ADDRESS;
 EFI_PHYSICAL_ADDRESS  mDefaultBaseAddress    = MAX_ALLOC_ADDRESS;
@@ -581,7 +587,7 @@ CoreAddMemoryDescriptor (
   AllocateMemoryTypeInformationBins (
     &mMemoryTypeInformationInitialized,
     gMemoryTypeInformation,
-    mMemoryTypeStatistics,
+    &mMemoryTypeStatistics,
     &mDefaultMaximumAddress
     );
 }
@@ -712,12 +718,10 @@ CoreConvertPagesEx (
         Entry->Type,
         NewType,
         Start,
-        (UINTN)NumberOfPages,
+        (UINT32)NumberOfPages,
         &mMemoryTypeInformationInitialized,
-        mMemoryTypeStatistics,
-        gMemoryTypeInformation,
-        mDefaultBaseAddress,
-        mDefaultMaximumAddress
+        &mMemoryTypeStatistics,
+        gMemoryTypeInformation
         );
     }
 
@@ -1058,10 +1062,10 @@ FindFreePages (
   //
   // Attempt to find free pages in the preferred bin based on the requested memory type
   //
-  if (((UINT32)NewType < EfiMaxMemoryType) && (MaxAddress >= mMemoryTypeStatistics[NewType].MaximumAddress)) {
+  if ((NewType < EfiMaxMemoryType) && (MaxAddress >= mMemoryTypeStatistics.Statistics[NewType].MaximumAddress)) {
     Start = CoreFindFreePagesI (
-              mMemoryTypeStatistics[NewType].MaximumAddress,
-              mMemoryTypeStatistics[NewType].BaseAddress,
+              mMemoryTypeStatistics.Statistics[NewType].MaximumAddress,
+              mMemoryTypeStatistics.Statistics[NewType].BaseAddress,
               NoPages,
               NewType,
               Alignment,
@@ -1257,23 +1261,23 @@ CoreInternalAllocatePages (
 
     for (CheckType = (EFI_MEMORY_TYPE)0; CheckType < EfiMaxMemoryType; CheckType++) {
       if ((MemoryType != CheckType) &&
-          mMemoryTypeStatistics[CheckType].Special &&
-          (mMemoryTypeStatistics[CheckType].NumberOfPages > 0))
+          mMemoryTypeStatistics.Statistics[CheckType].Special &&
+          (mMemoryTypeStatistics.Statistics[CheckType].BinNumberOfPages > 0))
       {
-        if ((Start >= mMemoryTypeStatistics[CheckType].BaseAddress) &&
-            (Start <= mMemoryTypeStatistics[CheckType].MaximumAddress))
+        if ((Start >= mMemoryTypeStatistics.Statistics[CheckType].BaseAddress) &&
+            (Start <= mMemoryTypeStatistics.Statistics[CheckType].MaximumAddress))
         {
           return EFI_NOT_FOUND;
         }
 
-        if ((End >= mMemoryTypeStatistics[CheckType].BaseAddress) &&
-            (End <= mMemoryTypeStatistics[CheckType].MaximumAddress))
+        if ((End >= mMemoryTypeStatistics.Statistics[CheckType].BaseAddress) &&
+            (End <= mMemoryTypeStatistics.Statistics[CheckType].MaximumAddress))
         {
           return EFI_NOT_FOUND;
         }
 
-        if ((Start < mMemoryTypeStatistics[CheckType].BaseAddress) &&
-            (End   > mMemoryTypeStatistics[CheckType].MaximumAddress))
+        if ((Start < mMemoryTypeStatistics.Statistics[CheckType].BaseAddress) &&
+            (End   > mMemoryTypeStatistics.Statistics[CheckType].MaximumAddress))
         {
           return EFI_NOT_FOUND;
         }
@@ -1679,7 +1683,7 @@ SetEfiMemoryDescriptorType (
     return;
   }
 
-  if (mMemoryTypeStatistics[MemoryMap->Type].Runtime) {
+  if (mMemoryTypeStatistics.Statistics[MemoryMap->Type].Runtime) {
     MemoryMap->Attribute |= EFI_MEMORY_RUNTIME;
   } else {
     MemoryMap->Attribute &= ~EFI_MEMORY_RUNTIME;
@@ -1802,8 +1806,8 @@ CoreGetMemoryMap (
   // requires an extra entry below the bin and an extra entry above the bin.
   //
   for (Type = (EFI_MEMORY_TYPE)0; Type < EfiMaxMemoryType; Type++) {
-    if (mMemoryTypeStatistics[Type].Special &&
-        (mMemoryTypeStatistics[Type].NumberOfPages > 0))
+    if (mMemoryTypeStatistics.Statistics[Type].Special &&
+        (mMemoryTypeStatistics.Statistics[Type].BinNumberOfPages > 0))
     {
       BufferSize += 2 * Size;
     }
@@ -1850,16 +1854,16 @@ CoreGetMemoryMap (
     //
     // If memory bin is empty or not special, then no split or conversion is required
     //
-    if (mMemoryTypeStatistics[Type].NumberOfPages == 0) {
+    if (mMemoryTypeStatistics.Statistics[Type].BinNumberOfPages == 0) {
       continue;
     }
 
-    if (!mMemoryTypeStatistics[Type].Special) {
+    if (!mMemoryTypeStatistics.Statistics[Type].Special) {
       continue;
     }
 
-    BinStart = mMemoryTypeStatistics[Type].BaseAddress;
-    BinEnd   = mMemoryTypeStatistics[Type].MaximumAddress;
+    BinStart = mMemoryTypeStatistics.Statistics[Type].BaseAddress;
+    BinEnd   = mMemoryTypeStatistics.Statistics[Type].MaximumAddress;
 
     Modified = TRUE;
     while (Modified) {
@@ -2311,7 +2315,7 @@ CoreTerminateMemoryMap (
     for (Link = gMemoryMap.ForwardLink; Link != &gMemoryMap; Link = Link->ForwardLink) {
       Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
       if (Entry->Type < EfiMaxMemoryType) {
-        if (mMemoryTypeStatistics[Entry->Type].Runtime) {
+        if (mMemoryTypeStatistics.Statistics[Entry->Type].Runtime) {
           ASSERT (Entry->Type != EfiACPIReclaimMemory);
           ASSERT (Entry->Type != EfiACPIMemoryNVS);
           if ((Entry->Start & (RUNTIME_PAGE_ALLOCATION_GRANULARITY - 1)) != 0) {

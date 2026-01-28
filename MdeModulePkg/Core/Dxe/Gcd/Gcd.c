@@ -2531,7 +2531,7 @@ CoreInitializeMemoryServices (
       MemoryTypeInformationResourceHob->ResourceLength,
       gMemoryTypeInformation,
       &mMemoryTypeInformationInitialized,
-      mMemoryTypeStatistics,
+      &mMemoryTypeStatistics,
       &mDefaultMaximumAddress
       );
   }
