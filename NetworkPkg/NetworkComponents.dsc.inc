@@ -48,7 +48,9 @@
 
   !if $(NETWORK_TLS_ENABLE) == TRUE
     NetworkPkg/TlsDxe/TlsDxe.inf
-    NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf
+    !if $(NETWORK_TLS_AUTH_CONFIG_ENABLE) == TRUE
+      NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf
+    !endif
   !endif
 
   !if ($(NETWORK_HTTP_BOOT_ENABLE) == TRUE) OR ($(NETWORK_HTTP_ENABLE) == TRUE)
