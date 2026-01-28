@@ -218,6 +218,8 @@ ArmFfaLibRxTxUnmap (
   PcdSet64S (PcdFfaTxBuffer, 0x00);
   PcdSet64S (PcdFfaRxBuffer, 0x00);
 
+  UnmapCallback ();
+
   return EFI_SUCCESS;
 }
 

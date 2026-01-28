@@ -261,3 +261,33 @@ IsFfaSupported (
 
   return TRUE;
 }
+
+/**
+  Callback for when Unmap is called to handle any post unmap
+  functionality. In PEI the Rx/Tx buffer HOB needs to be
+  invalidated.
+
+**/
+VOID
+EFIAPI
+UnmapCallback (
+  IN VOID
+  )
+{
+  EFI_HOB_MEMORY_ALLOCATION  *RxTxBufferAllocationHob;
+
+  /*
+   * Rx/Tx buffers are allocated with continuous pages.
+   * See ArmFfaLibRxTxMap(). If HOB is not found, the Rx/Tx
+   * buffers were not successfully mapped.
+   */
+  RxTxBufferAllocationHob = FindRxTxBufferAllocationHob (TRUE);
+  if (RxTxBufferAllocationHob == NULL) {
+    return;
+  }
+
+  /*
+   * Invalidate the HOB.
+   */
+  ZeroMem (RxTxBufferAllocationHob, sizeof (ARM_FFA_RX_TX_BUFFER_INFO));
+}

@@ -321,6 +321,8 @@ ArmFfaLibRxTxUnmap (
     FreePages (Buffers, (PcdGet64 (PcdFfaTxRxPageCount) * 2));
   }
 
+  UnmapCallback ();
+
   return EFI_SUCCESS;
 }
 

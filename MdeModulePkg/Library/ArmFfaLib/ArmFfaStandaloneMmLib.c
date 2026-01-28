@@ -128,3 +128,17 @@ IsFfaSupported (
 {
   return mIsFfaSupported;
 }
+
+/**
+  Callback for when Unmap is called to handle any post unmap
+  functionality.
+
+**/
+VOID
+EFIAPI
+UnmapCallback (
+  IN VOID
+  )
+{
+  // Do nothing
+}

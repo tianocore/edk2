@@ -96,4 +96,15 @@ RemapFfaRxTxBuffer (
   IN OUT ARM_FFA_RX_TX_BUFFER_INFO  *BufferInfo
   );
 
+/**
+  Callback for when Unmap is called to handle any post unmap
+  functionality.
+
+**/
+VOID
+EFIAPI
+UnmapCallback (
+  IN VOID
+  );
+
 #endif
