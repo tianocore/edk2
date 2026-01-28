@@ -2,7 +2,7 @@
   AML Lib.
 
   Copyright (c) 2019 - 2023, Arm Limited. All rights reserved.<BR>
-  Copyright (C) 2023 - 2025, Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (C) 2023 - 2026, Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -150,6 +150,17 @@ typedef struct {
   AML_METHOD_PARAM_DATA    Data;
   UINTN                    DataSize;
 } AML_METHOD_PARAM;
+
+/** structure to hold Notify method parameter types.
+  NotifyObject -  Notify Object parameter.
+                  Only NameString, Local and Arg types are supported.
+  NotifyValue  -  Notify Value parameter.
+                  Must be an integer value.
+**/
+typedef struct {
+  AML_METHOD_PARAM    NotifyObject;
+  UINT8               NotifyValue;
+} AML_NOTIFY_PARAM;
 
 /** Parse the definition block.
 
@@ -2222,6 +2233,75 @@ AmlCodeGenRdUartSerialBusV2 (
   IN  UINT16                  VendorDefinedDataLength,
   IN  AML_OBJECT_NODE_HANDLE  NameOpNode OPTIONAL,
   OUT AML_DATA_NODE_HANDLE    *NewRdNode OPTIONAL
+  );
+
+/** AML code generation to create a method with Notify call.
+
+  Example 1:
+    AmlCodeGenMethodNotifyList ("_L01", FALSE, 0, 0, NULL, ParentNode, NewObjectNode);
+    is equivalent to the following ASL code:
+    Method (_L01, 0, NotSerialize)
+    {
+    }
+
+  Example 2:
+    AML_METHOD_PARAM  Notify[2];
+    Notify[0].NotifyObject.Type = AmlMethodParamTypeString;
+    Notify[0].NotifyObject.Data.Buffer = (VOID*)"XCD0";
+    Notify[0].NotifyObject.DataSize = 4;
+    Notify[0].NotifyValue = 2;
+    Notify[1].NotifyObject.Type = AmlMethodParamTypeString;
+    Notify[1].NotifyObject.Data.Buffer = (VOID*)"XCD1";
+    Notify[1].NotifyObject.DataSize = 4;
+    Notify[1].NotifyValue = 2;
+    AmlCodeGenMethodNotifyList ("_L02", FALSE, 0, 2, Notify, ParentNode, NewObjectNode);
+
+    is equivalent to the following ASL code:
+    Method (_L02, 0, NotSerialize)
+    {
+      Notify ("XCD0", 2)
+      Notify ("XCD1", 2)
+    }
+
+  Ref : ACPI 6.6, s19.6.95 Notify (Notify Object of Event):
+  Object must be a reference to a device, processor, or thermal zone object.
+
+  Note:
+  This code cannot validate whether the referenced object is a valid device,
+  processor, or thermal zone object.
+  It assumes that NameString, Local, and Arg objects reference valid device,
+  processor, or thermal zone objects.
+
+  @param [in]  MethodNameString     The new Method's name.
+                                    Must be a NULL-terminated ASL NameString
+                                    e.g.: "MET0", "_SB.MET0", etc.
+                                    The input string is copied.
+  @param [in]  IsSerialized         TRUE is equivalent to Serialized.
+                                    FALSE is equivalent to NotSerialized.
+                                    Default is NotSerialized in ASL spec.
+  @param [in]  SyncLevel            Synchronization level for the method.
+                                    Must be 0 <= SyncLevel <= 15.
+                                    Default is 0 in ASL.
+  @param [in]  NotifyParamCount     Number of Notify parameters
+  @param [in]  NotifyParameters     Array of Notify parameters
+  @param [in]  ParentNode           If provided, set ParentNode as the parent
+                                    of the node created.
+  @param [out] NewObjectNode        If success, contains the created node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenMethodNotifyList (
+  IN  CONST CHAR8             *MethodNameString,
+  IN  BOOLEAN                 IsSerialized,
+  IN  UINT8                   SyncLevel,
+  IN  UINT32                  NotifyParamCount,
+  IN  AML_NOTIFY_PARAM        *NotifyParameters  OPTIONAL,
+  IN  AML_NODE_HANDLE         ParentNode        OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewObjectNode    OPTIONAL
   );
 
 #endif // AML_LIB_H_
