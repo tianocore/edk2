@@ -31,7 +31,7 @@
 [Components]
   DynamicTablesPkg/Library/Acpi/Common/AcpiDbg2Lib/GoogleTest/Dbg2GeneratorGoogleTest.inf {
     <LibraryClasses>
-      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiDbg2Lib/AcpiDbg2Lib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiDbg2Lib/AcpiDbg2LibHostTest.inf
   }
   DynamicTablesPkg/Library/Acpi/Common/AcpiCedtLib/GoogleTest/CedtGeneratorGoogleTest.inf {
     <LibraryClasses>
