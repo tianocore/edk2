@@ -24,6 +24,9 @@
 #include "ArmFfaCommon.h"
 #include "ArmFfaRxTxMap.h"
 
+STATIC UINT16   mPartId;
+STATIC BOOLEAN  mIsFfaSupported;
+
 /**
   ArmFfaLib Constructor.
 
@@ -43,7 +46,10 @@ ArmFfaStandaloneMmLibConstructor (
 {
   EFI_STATUS  Status;
 
-  Status = ArmFfaLibCommonInit ();
+  mPartId         = 0xFFFF;
+  mIsFfaSupported = FALSE;
+
+  Status = ArmFfaLibCommonInit (&mPartId, &mIsFfaSupported);
   if (Status == EFI_UNSUPPORTED) {
     /*
      * EFI_UNSUPPORTED means FF-A interface isn't available.
@@ -85,4 +91,40 @@ ArmFfaStandaloneMmLibConstructor (
   }
 
   return Status;
+}
+
+/**
+  Return partition or VM ID
+
+  @retval EFI_SUCCESS
+  @retval Others       Errors
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibGetPartId (
+  IN UINT16  *PartId
+  )
+{
+  if (PartId != NULL) {
+    *PartId = mPartId;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Check FF-A support or not.
+
+  @retval TRUE                   Supported
+  @retval FALSE                  Not supported
+
+**/
+BOOLEAN
+EFIAPI
+IsFfaSupported (
+  IN VOID
+  )
+{
+  return mIsFfaSupported;
 }

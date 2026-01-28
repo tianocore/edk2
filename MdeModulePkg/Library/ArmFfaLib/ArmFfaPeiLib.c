@@ -102,8 +102,10 @@ ArmFfaPeiLibConstructor (
   EFI_HOB_MEMORY_ALLOCATION  *RxTxBufferAllocationHob;
   UINTN                      Property1;
   UINTN                      Property2;
+  UINT16                     PartId;
+  BOOLEAN                    IsFfaSupported;
 
-  Status = ArmFfaLibCommonInit ();
+  Status = ArmFfaLibCommonInit (&PartId, &IsFfaSupported);
   if (EFI_ERROR (Status)) {
     if (Status == EFI_UNSUPPORTED) {
       /*
@@ -219,4 +221,43 @@ ArmFfaPeiLibConstructor (
   }
 
   return EFI_SUCCESS;
+}
+
+/**
+  Return partition or VM ID
+
+  @retval EFI_SUCCESS
+  @retval Others       Errors
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibGetPartId (
+  IN UINT16  *PartId
+  )
+{
+  return ArmFfaLibPartitionIdGet (PartId);
+}
+
+/**
+  Check FF-A support or not.
+
+  @retval TRUE                   Supported
+  @retval FALSE                  Not supported
+
+**/
+BOOLEAN
+EFIAPI
+IsFfaSupported (
+  IN VOID
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = ArmFfaLibIsFfaSupported ();
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  return TRUE;
 }
