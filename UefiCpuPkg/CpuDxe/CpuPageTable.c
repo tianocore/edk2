@@ -495,8 +495,8 @@ ConvertPageEntryAttribute (
   *PageEntry = NewPageEntry;
   if (CurrentPageEntry != NewPageEntry) {
     *IsModified = TRUE;
-    DEBUG ((DEBUG_VERBOSE, "ConvertPageEntryAttribute 0x%lx", CurrentPageEntry));
-    DEBUG ((DEBUG_VERBOSE, "->0x%lx\n", NewPageEntry));
+    DEBUG ((DEBUG_PAGING, "ConvertPageEntryAttribute 0x%lx", CurrentPageEntry));
+    DEBUG ((DEBUG_PAGING, "->0x%lx\n", NewPageEntry));
   } else {
     *IsModified = FALSE;
   }
@@ -575,7 +575,7 @@ SplitPage (
     ASSERT (SplitAttribute == Page4K);
     if (SplitAttribute == Page4K) {
       NewPageEntry = AllocatePagesFunc (1);
-      DEBUG ((DEBUG_VERBOSE, "Split - 0x%x\n", NewPageEntry));
+      DEBUG ((DEBUG_PAGING, "Split - 0x%x\n", NewPageEntry));
       if (NewPageEntry == NULL) {
         return RETURN_OUT_OF_RESOURCES;
       }
@@ -598,7 +598,7 @@ SplitPage (
     ASSERT (SplitAttribute == Page2M || SplitAttribute == Page4K);
     if (((SplitAttribute == Page2M) || (SplitAttribute == Page4K))) {
       NewPageEntry = AllocatePagesFunc (1);
-      DEBUG ((DEBUG_VERBOSE, "Split - 0x%x\n", NewPageEntry));
+      DEBUG ((DEBUG_PAGING, "Split - 0x%x\n", NewPageEntry));
       if (NewPageEntry == NULL) {
         return RETURN_OUT_OF_RESOURCES;
       }
@@ -1085,7 +1085,7 @@ RefreshGcdMemoryAttributesFromPaging (
                         );
         ASSERT_EFI_ERROR (Status);
         DEBUG ((
-          DEBUG_VERBOSE,
+          DEBUG_PAGING,
           "Updated memory space attribute: [%lu] %016lx - %016lx (%016lx -> %016lx)\r\n",
           (UINT64)Index,
           BaseAddress,
@@ -1487,7 +1487,7 @@ EfiSetMemoryAttributes (
   BOOLEAN        IsModified;
   BOOLEAN        IsSplitted;
 
-  DEBUG ((DEBUG_VERBOSE, "%a: 0x%lx - 0x%lx (0x%lx)\n", __func__, BaseAddress, Length, Attributes));
+  DEBUG ((DEBUG_PAGING, "%a: 0x%lx - 0x%lx (0x%lx)\n", __func__, BaseAddress, Length, Attributes));
 
   if (Attributes == 0) {
     DEBUG ((DEBUG_ERROR, "%a: Error - Attributes == 0\n", __func__));
@@ -1563,7 +1563,7 @@ EfiClearMemoryAttributes (
   BOOLEAN        IsModified;
   BOOLEAN        IsSplitted;
 
-  DEBUG ((DEBUG_VERBOSE, "%a: 0x%lx - 0x%lx (0x%lx)\n", __func__, BaseAddress, Length, Attributes));
+  DEBUG ((DEBUG_PAGING, "%a: 0x%lx - 0x%lx (0x%lx)\n", __func__, BaseAddress, Length, Attributes));
 
   if (Attributes == 0) {
     DEBUG ((DEBUG_ERROR, "%a: Error - Attributes == 0\n", __func__));
@@ -1708,7 +1708,7 @@ EfiGetMemoryAttributes (
     MemAttr = *Attributes;
   } while (Size > 0);
 
-  DEBUG ((DEBUG_VERBOSE, "%a: Attributes is 0x%lx\n", __func__, *Attributes));
+  DEBUG ((DEBUG_PAGING, "%a: Attributes is 0x%lx\n", __func__, *Attributes));
 
   return EFI_SUCCESS;
 }
