@@ -363,6 +363,9 @@ CoreSetMemoryTypeInformationRange (
                                             information if the provided range is used.
   @param  DefaultMaximumAddress             A pointer to the default maximum address to be updated if the
                                             provided range is used.
+  @param  CreateHob                         TRUE to create Memory Type Information Resource HOB after successful
+                                            allocation. This is used for PEI Core to report the bins to DXE Core.
+                                            FALSE if HOB creation is not needed.
 **/
 VOID
 EFIAPI
@@ -370,7 +373,8 @@ AllocateMemoryTypeInformationBins (
   IN BOOLEAN                            *MemoryTypeInformationInitialized,
   IN EFI_MEMORY_TYPE_INFORMATION        *MemoryTypeInformation,
   IN EFI_MEMORY_TYPE_STATISTICS_HEADER  *MemoryTypeStatistics,
-  IN EFI_PHYSICAL_ADDRESS               *DefaultMaximumAddress
+  IN EFI_PHYSICAL_ADDRESS               *DefaultMaximumAddress,
+  IN BOOLEAN                            CreateHob
   )
 {
   UINTN                 Index;
@@ -481,6 +485,19 @@ AllocateMemoryTypeInformationBins (
       MemoryTypeStatistics->Statistics[Type].MaximumAddress = *DefaultMaximumAddress;
       MemoryTypeStatistics->Statistics[Type].DefaultBin     = TRUE;
     }
+  }
+
+  if (CreateHob) {
+    //
+    // Create a Resource Descriptor HOB to report the Memory Type Information bins to DXE Core
+    //
+    BuildResourceDescriptorWithOwnerHob (
+      EFI_RESOURCE_SYSTEM_MEMORY,
+      TESTED_MEMORY_ATTRIBUTES,
+      BaseAddress,
+      RequiredSize,
+      &gEfiMemoryTypeInformationGuid
+      );
   }
 
   *MemoryTypeInformationInitialized = TRUE;
