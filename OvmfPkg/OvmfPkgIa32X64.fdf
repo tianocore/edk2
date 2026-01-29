@@ -132,14 +132,14 @@ INF  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
 !if $(DEBUG_TO_MEM)
 INF  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
 !endif
-INF  OvmfPkg/PlatformPei/PlatformPei.inf
-INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
-INF  UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
 !if $(SMM_REQUIRE) == TRUE
 INF  MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
 INF  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
 INF  OvmfPkg/SmmAccess/SmmAccessPei.inf
 !endif
+INF  OvmfPkg/PlatformPei/PlatformPei.inf
+INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+INF  UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
 INF  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 
 !include OvmfPkg/Include/Fdf/OvmfTpmPei.fdf.inc
