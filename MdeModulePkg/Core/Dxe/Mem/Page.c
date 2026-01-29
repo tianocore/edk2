@@ -11,6 +11,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "HeapGuard.h"
 #include <Pi/PiDxeCis.h>
 
+// Flag types for the ChangingType parameter of CoreConvertPagesEx
+#define CHANGING_TYPE_TRUE_FLAG               0x1
+#define CHANGING_TYPE_UPDATE_STATISTICS_FLAG  0x2
+
 //
 // MemoryMap - The current memory map
 //
@@ -618,7 +622,7 @@ EFI_STATUS
 CoreConvertPagesEx (
   IN UINT64           Start,
   IN UINT64           NumberOfPages,
-  IN BOOLEAN          ChangingType,
+  IN UINT64           ChangingTypeFlags,
   IN EFI_MEMORY_TYPE  NewType,
   IN BOOLEAN          ChangingAttributes,
   IN UINT64           NewAttributes
@@ -640,7 +644,7 @@ CoreConvertPagesEx (
   ASSERT ((Start & EFI_PAGE_MASK) == 0);
   ASSERT (End > Start);
   ASSERT_LOCKED (&gMemoryLock);
-  ASSERT ((ChangingType == FALSE) || (ChangingAttributes == FALSE));
+  ASSERT ((ChangingTypeFlags == 0) || (ChangingAttributes == FALSE));
 
   if ((NumberOfPages == 0) || ((Start & EFI_PAGE_MASK) != 0) || (Start >= End)) {
     return EFI_INVALID_PARAMETER;
@@ -672,7 +676,7 @@ CoreConvertPagesEx (
     // another type, we have to ensure that the entire range is covered by a
     // single entry.
     //
-    if (ChangingType && (NewType != EfiConventionalMemory)) {
+    if ((ChangingTypeFlags & CHANGING_TYPE_TRUE_FLAG) && (NewType != EfiConventionalMemory)) {
       if (Entry->End < End) {
         DEBUG ((DEBUG_ERROR | DEBUG_PAGE, "ConvertPages: range %lx - %lx covers multiple entries\n", Start, End));
         return EFI_NOT_FOUND;
@@ -693,7 +697,7 @@ CoreConvertPagesEx (
       RangeEnd = Entry->End;
     }
 
-    if (ChangingType) {
+    if (ChangingTypeFlags & CHANGING_TYPE_TRUE_FLAG) {
       DEBUG ((DEBUG_PAGE, "ConvertRange: %lx-%lx to type %d\n", Start, RangeEnd, NewType));
     }
 
@@ -701,7 +705,7 @@ CoreConvertPagesEx (
       DEBUG ((DEBUG_PAGE, "ConvertRange: %lx-%lx to attr %lx\n", Start, RangeEnd, NewAttributes));
     }
 
-    if (ChangingType) {
+    if (ChangingTypeFlags & CHANGING_TYPE_TRUE_FLAG) {
       //
       // Debug code - verify conversion is allowed
       //
@@ -716,15 +720,18 @@ CoreConvertPagesEx (
         return EFI_NOT_FOUND;
       }
 
-      UpdateMemoryStatistics (
-        Entry->Type,
-        NewType,
-        Start,
-        (UINT32)NumberOfPages,
-        &mMemoryTypeInformationInitialized,
-        &mMemoryTypeStatistics,
-        gMemoryTypeInformation
-        );
+      // Only update the statistics if the allocator told us to
+      if ((ChangingTypeFlags & CHANGING_TYPE_UPDATE_STATISTICS_FLAG) != 0) {
+        UpdateMemoryStatistics (
+          Entry->Type,
+          NewType,
+          Start,
+          (UINT32)NumberOfPages,
+          &mMemoryTypeInformationInitialized,
+          &mMemoryTypeStatistics,
+          gMemoryTypeInformation
+          );
+      }
     }
 
     //
@@ -773,7 +780,7 @@ CoreConvertPagesEx (
     // The new range inherits the same Attribute as the Entry
     // it is being cut out of unless attributes are being changed
     //
-    if (ChangingType) {
+    if (ChangingTypeFlags & CHANGING_TYPE_TRUE_FLAG) {
       Attribute = Entry->Attribute;
       MemType   = NewType;
     } else {
@@ -794,13 +801,13 @@ CoreConvertPagesEx (
     // guard is enabled.
     //
     if (!IsHeapGuardEnabled (GUARD_HEAP_TYPE_FREED) ||
-        !ChangingType ||
+        !(ChangingTypeFlags & CHANGING_TYPE_TRUE_FLAG) ||
         (MemType != EfiConventionalMemory))
     {
       CoreAddRange (MemType, Start, RangeEnd, Attribute);
     }
 
-    if (ChangingType && (MemType == EfiConventionalMemory)) {
+    if ((ChangingTypeFlags & CHANGING_TYPE_TRUE_FLAG) && (MemType == EfiConventionalMemory)) {
       //
       // Avoid calling DEBUG_CLEAR_MEMORY() for an address of 0 because this
       // macro will ASSERT() if address is 0.  Instead, CoreAddRange() guarantees
@@ -841,6 +848,8 @@ CoreConvertPagesEx (
                                  aligned
   @param  NumberOfPages          The number of pages to convert
   @param  NewType                The new type for the memory range
+  @param  UpdateStatistics       Boolean indicating whether to update memory
+                                 statistics
 
   @retval EFI_INVALID_PARAMETER  Invalid parameter
   @retval EFI_NOT_FOUND          Could not find a descriptor cover the specified
@@ -853,10 +862,14 @@ EFI_STATUS
 CoreConvertPages (
   IN UINT64           Start,
   IN UINT64           NumberOfPages,
-  IN EFI_MEMORY_TYPE  NewType
+  IN EFI_MEMORY_TYPE  NewType,
+  IN BOOLEAN          UpdateStatistics
   )
 {
-  return CoreConvertPagesEx (Start, NumberOfPages, TRUE, NewType, FALSE, 0);
+  UINT64  ChangingTypeFlags;
+
+  ChangingTypeFlags = CHANGING_TYPE_TRUE_FLAG | (UpdateStatistics ? CHANGING_TYPE_UPDATE_STATISTICS_FLAG : 0);
+  return CoreConvertPagesEx (Start, NumberOfPages, ChangingTypeFlags, NewType, FALSE, 0);
 }
 
 /**
@@ -1166,6 +1179,7 @@ CoreInternalAllocatePages (
   UINT64           MaxAddress;
   UINTN            Alignment;
   EFI_MEMORY_TYPE  CheckType;
+  BOOLEAN          UpdateStatistics;
 
   if ((UINT32)Type >= MaxAllocateType) {
     return EFI_INVALID_PARAMETER;
@@ -1311,12 +1325,26 @@ CoreInternalAllocatePages (
   }
 
   //
+  // If this is an allocate any pages or allocate max address and the max address is above the bin start + length,
+  // update the memory statistics. Otherwise, this allocation is treated like a static allocation and is not
+  // tracked against bin usage.
+  //
+  if ((Type == AllocateAnyPages) ||
+      ((MemoryType < EfiMaxMemoryType) && (Type == AllocateMaxAddress) &&
+       (MaxAddress > mMemoryTypeStatistics.Statistics[MemoryType].BaseAddress + EFI_PAGES_TO_SIZE (NumberOfPages))))
+  {
+    UpdateStatistics = TRUE;
+  } else {
+    UpdateStatistics = FALSE;
+  }
+
+  //
   // Convert pages from FreeMemory to the requested type
   //
   if (NeedGuard) {
-    Status = CoreConvertPagesWithGuard (Start, NumberOfPages, MemoryType);
+    Status = CoreConvertPagesWithGuard (Start, NumberOfPages, MemoryType, UpdateStatistics);
   } else {
-    Status = CoreConvertPages (Start, NumberOfPages, MemoryType);
+    Status = CoreConvertPages (Start, NumberOfPages, MemoryType, UpdateStatistics);
   }
 
   if (EFI_ERROR (Status)) {
@@ -1326,9 +1354,9 @@ CoreInternalAllocatePages (
     //
     if (PromoteMemoryResource ()) {
       if (NeedGuard) {
-        Status = CoreConvertPagesWithGuard (Start, NumberOfPages, MemoryType);
+        Status = CoreConvertPagesWithGuard (Start, NumberOfPages, MemoryType, UpdateStatistics);
       } else {
-        Status = CoreConvertPages (Start, NumberOfPages, MemoryType);
+        Status = CoreConvertPages (Start, NumberOfPages, MemoryType, UpdateStatistics);
       }
     }
   }
@@ -1488,10 +1516,11 @@ CoreInternalFreePages (
     Status = CoreConvertPagesWithGuard (
                Memory,
                NumberOfPages,
-               EfiConventionalMemory
+               EfiConventionalMemory,
+               TRUE
                );
   } else {
-    Status = CoreConvertPages (Memory, NumberOfPages, EfiConventionalMemory);
+    Status = CoreConvertPages (Memory, NumberOfPages, EfiConventionalMemory, TRUE);
   }
 
 Done:
@@ -2258,9 +2287,9 @@ CoreAllocatePoolPages (
     DEBUG ((DEBUG_ERROR | DEBUG_PAGE, "AllocatePoolPages: failed to allocate %d pages\n", (UINT32)NumberOfPages));
   } else {
     if (NeedGuard) {
-      CoreConvertPagesWithGuard (Start, NumberOfPages, PoolType);
+      CoreConvertPagesWithGuard (Start, NumberOfPages, PoolType, TRUE);
     } else {
-      CoreConvertPages (Start, NumberOfPages, PoolType);
+      CoreConvertPages (Start, NumberOfPages, PoolType, TRUE);
     }
   }
 
@@ -2280,7 +2309,7 @@ CoreFreePoolPages (
   IN UINTN                 NumberOfPages
   )
 {
-  CoreConvertPages (Memory, NumberOfPages, EfiConventionalMemory);
+  CoreConvertPages (Memory, NumberOfPages, EfiConventionalMemory, TRUE);
 }
 
 /**
