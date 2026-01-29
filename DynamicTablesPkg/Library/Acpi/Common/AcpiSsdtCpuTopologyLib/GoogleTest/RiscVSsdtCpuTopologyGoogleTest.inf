@@ -1,0 +1,49 @@
+## @file
+#  Unit tests for RISC-V SSDT CPU Topology Generator code.
+#
+#  Tests RiscVSsdtCpuTopologyGenerator.c functions:
+#  - GetIntCInfo: RINTC-based CPU info retrieval
+#  - CreateTopologyFromIntC: Flat topology from RINTC
+#  - AddArchAmlCpuInfo: No-op for RISC-V
+#
+#  Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010017
+  BASE_NAME      = RiscVSsdtCpuTopologyGoogleTest
+  FILE_GUID      = 27228ffc-0f82-4b38-bc2a-0ee5839a467d
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = HOST_APPLICATION
+
+[Sources]
+  RiscVSsdtCpuTopologyGoogleTest.cpp
+  AmlTestHelper.h
+  AmlTestHelper.cpp
+  SsdtCpuTopologyTestCommon.h
+  MockCommonFunctions.cpp
+  MockCommonFunctions.h
+  ../../../../../Test/Mock/Library/GoogleTest/Protocol/MockConfigurationManagerProtocol.cpp
+  # RISC-V arch-specific code under test (NOT the common SsdtCpuTopologyGenerator.c)
+  ../RiscV/RiscVSsdtCpuTopologyGenerator.c
+  ../SsdtCpuTopologyGenerator.h
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PrintLib
+  AmlLib
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /EHsc
