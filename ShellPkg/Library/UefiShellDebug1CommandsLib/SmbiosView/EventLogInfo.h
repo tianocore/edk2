@@ -22,7 +22,7 @@ typedef struct {
   UINT8    Hour;
   UINT8    Minute;
   UINT8    Second;
-  UINT8    LogVariableData[1];
+  UINT8    LogVariableData[];
 } LOG_RECORD_FORMAT;
 
 typedef struct {

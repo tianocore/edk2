@@ -23,7 +23,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 typedef struct {
   UINTN         Function;
   EFI_STATUS    ReturnStatus;
-  UINT8         Data[1];
+  UINT8         Data[];
 } SMM_FTW_COMMUNICATE_FUNCTION_HEADER;
 
 ///
@@ -53,7 +53,7 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS    FvbBaseAddress;
   EFI_FVB_ATTRIBUTES_2    FvbAttributes;
   UINTN                   Length;
-  UINT8                   Data[1];
+  UINT8                   Data[];
 } SMM_FTW_WRITE_HEADER;
 
 typedef struct {
@@ -68,7 +68,7 @@ typedef struct {
   UINTN       Length;
   UINTN       PrivateDataSize;
   BOOLEAN     Complete;
-  UINT8       Data[1];
+  UINT8       Data[];
 } SMM_FTW_GET_LAST_WRITE_HEADER;
 
 /**

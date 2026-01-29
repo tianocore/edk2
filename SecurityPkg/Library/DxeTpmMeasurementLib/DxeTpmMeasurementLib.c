@@ -199,7 +199,7 @@ CcMeasureAndLogData (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  EfiCcEvent->Size                 = (UINT32)LogLen + sizeof (EFI_CC_EVENT) - sizeof (EfiCcEvent->Event);
+  EfiCcEvent->Size                 = (UINT32)LogLen + sizeof (EFI_CC_EVENT) - OFFSET_OF (EFI_CC_EVENT, Event);
   EfiCcEvent->Header.HeaderSize    = sizeof (EFI_CC_EVENT_HEADER);
   EfiCcEvent->Header.HeaderVersion = EFI_CC_EVENT_HEADER_VERSION;
   EfiCcEvent->Header.MrIndex       = MrIndex;

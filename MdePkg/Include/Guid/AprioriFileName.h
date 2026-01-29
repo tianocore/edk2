@@ -28,7 +28,7 @@ typedef struct {
   /// An array of zero or more EFI_GUID type entries that match the file names of PEIM
   /// modules in the same Firmware Volume. The maximum number of entries.
   ///
-  EFI_GUID    FileNamesWithinVolume[1];
+  EFI_GUID    FileNamesWithinVolume[];
 } PEI_APRIORI_FILE_CONTENTS;
 
 extern EFI_GUID  gPeiAprioriFileNameGuid;

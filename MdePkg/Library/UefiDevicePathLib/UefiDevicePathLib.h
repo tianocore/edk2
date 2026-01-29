@@ -105,19 +105,19 @@ typedef struct {
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL    Header;
   EFI_GUID                    Guid;
-  UINT8                       VendorDefinedData[1];
+  UINT8                       VendorDefinedData[];
 } VENDOR_DEFINED_HARDWARE_DEVICE_PATH;
 
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL    Header;
   EFI_GUID                    Guid;
-  UINT8                       VendorDefinedData[1];
+  UINT8                       VendorDefinedData[];
 } VENDOR_DEFINED_MESSAGING_DEVICE_PATH;
 
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL    Header;
   EFI_GUID                    Guid;
-  UINT8                       VendorDefinedData[1];
+  UINT8                       VendorDefinedData[];
 } VENDOR_DEFINED_MEDIA_DEVICE_PATH;
 
 typedef struct {
@@ -134,13 +134,13 @@ typedef struct {
   UINT16                      LoginOption;
   UINT64                      Lun;
   UINT16                      TargetPortalGroupTag;
-  CHAR8                       TargetName[1];
+  CHAR8                       TargetName[];
 } ISCSI_DEVICE_PATH_WITH_NAME;
 
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL    Header;
   EFI_GUID                    Guid;
-  UINT8                       VendorDefinedData[1];
+  UINT8                       VendorDefinedData[];
 } VENDOR_DEVICE_PATH_WITH_DATA;
 
 #pragma pack()

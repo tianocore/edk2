@@ -31,7 +31,7 @@ typedef struct {
   // NOTE: Since EDK2 does not allow flexible array member [] we declare
   // here array of 1 element length. However below is used as a variable
   // length array.
-  SCMI_PERFORMANCE_LEVEL    PerfLevel[1]; // Offset to array of performance levels
+  SCMI_PERFORMANCE_LEVEL    PerfLevel[]; // Offset to array of performance levels
 } PERF_DESCRIBE_LEVELS;
 
 /** Initialize performance management protocol and install on a given Handle.

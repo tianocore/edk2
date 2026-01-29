@@ -14,7 +14,7 @@ typedef struct {
   BOOLEAN    IsEncrypted;
   CHAR16     EncryptPassword[PASSWORD_STORAGE_SIZE];
   UINTN      KeySize;
-  UINT8      KeyData[1];
+  UINT8      KeyData[];
 } EFI_EAP_PRIVATE_KEY;
 
 #endif

@@ -295,7 +295,7 @@ typedef struct {
   ///
   /// Description of the I2C operation
   ///
-  EFI_I2C_OPERATION    Operation[1];
+  EFI_I2C_OPERATION    Operation[];
 } EFI_I2C_REQUEST_PACKET;
 
 #endif //  __PI_I2C_H__
