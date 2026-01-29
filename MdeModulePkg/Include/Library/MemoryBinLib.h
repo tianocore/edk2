@@ -78,11 +78,14 @@ CoreSetMemoryTypeInformationRange (
   If all the memory types cannot be allocated, then all previously allocated
   memory types are freed and the function returns. If this function fails, it will log and expect to be called
   again when more memory is added to the system.
+
+  @param  CreateHob   TRUE to create Memory Type Information Resource HOB after successful allocation. This is used
+                      for PEI Core to report the bins to DXE Core. FALSE if HOB creation is not needed.
 **/
 VOID
 EFIAPI
 AllocateMemoryTypeInformationBins (
-  VOID
+  BOOLEAN  CreateHob
   );
 
 /**

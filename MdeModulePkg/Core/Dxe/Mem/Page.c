@@ -535,7 +535,8 @@ CoreAddMemoryDescriptor (
   }
 
   // Check if we need to allocate the memory bins. This function will immediately return if we have already done so.
-  AllocateMemoryTypeInformationBins ();
+  // Pass FALSE to indicate that we do not need to create the resource HOB.
+  AllocateMemoryTypeInformationBins (FALSE);
 }
 
 /**
