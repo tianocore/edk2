@@ -46,7 +46,7 @@ follows:
 ./cloud-hypervisor \
     --cpus boot=1 \
     --memory size=1G \
-    --kernel Build/CloudHvX64/DEBUG_GCC5/FV/CLOUDHV.fd \
+    --kernel Build/CloudHvX64/DEBUG_GCC/FV/CLOUDHV.fd \
     --disk path=/path/to/disk.raw
 
 Releases
