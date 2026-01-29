@@ -233,9 +233,15 @@ MmInstallProtocolInterfaceNotify (
   }
 
   //
-  // Print debug message
+  // Print debug message unless installing MM entry/exit notify protocol as that spams the log
   //
-  DEBUG ((DEBUG_LOAD | DEBUG_INFO, "MmInstallProtocolInterface: %g %p\n", Protocol, Interface));
+  if (!CompareGuid (Protocol, &gEfiMmEntryNotifyProtocolGuid) &&
+      !CompareGuid (Protocol, &gEfiMmExitNotifyProtocolGuid))
+  {
+    DEBUG ((DEBUG_LOAD | DEBUG_INFO, "MmInstallProtocolInterface: Installing non-entry/exit protocol %g %p\n", Protocol, Interface));
+  } else {
+    DEBUG ((DEBUG_VERBOSE, "MmInstallProtocolInterface: Installing entry/exit protocol %g %p\n", Protocol, Interface));
+  }
 
   Status = EFI_OUT_OF_RESOURCES;
   Prot   = NULL;

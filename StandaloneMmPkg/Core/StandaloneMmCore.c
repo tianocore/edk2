@@ -512,8 +512,6 @@ MmEntryPoint (
   UINTN                         CommGuidOffset;
   UINTN                         CommHeaderSize;
 
-  DEBUG ((DEBUG_INFO, "MmEntryPoint ...\n"));
-
   //
   // Update MMST using the context
   //
@@ -642,8 +640,6 @@ MmEntryPoint (
   //
   // TBD: Do not use private data structure ?
   //
-
-  DEBUG ((DEBUG_INFO, "MmEntryPoint Done\n"));
 }
 
 /** Register the MM Entry Point provided by the MM Core with the
