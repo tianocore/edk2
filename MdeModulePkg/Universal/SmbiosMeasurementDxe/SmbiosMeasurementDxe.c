@@ -218,14 +218,12 @@ GetSmbiosStringById (
   OUT  UINTN                    *StringLen
   )
 {
-  UINTN  Size;
   UINTN  StrLen;
   CHAR8  *CharInStr;
   UINTN  StringsNumber;
   CHAR8  *String;
 
   CharInStr     = (CHAR8 *)Head + Head->Length;
-  Size          = Head->Length;
   StringsNumber = 0;
   StrLen        = 0;
   //
@@ -234,7 +232,6 @@ GetSmbiosStringById (
   String = NULL;
   while (*CharInStr != 0 || *(CharInStr+1) != 0) {
     if (*CharInStr == 0) {
-      Size += 1;
       CharInStr++;
     }
 
@@ -256,7 +253,6 @@ GetSmbiosStringById (
     // forward the pointer
     //
     CharInStr     += StrLen;
-    Size          += StrLen;
     StringsNumber += 1;
     if (StringsNumber == StringId) {
       break;

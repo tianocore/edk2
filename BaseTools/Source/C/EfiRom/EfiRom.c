@@ -38,13 +38,13 @@ Returns:
 
 --*/
 {
-  CHAR8     *Ext;
-  FILE      *FptrOut;
-  UINT32    Status;
-  FILE_LIST *FList;
-  UINT32    TotalSize;
-  UINT32    Size;
-  CHAR8     *Ptr0;
+  CHAR8       *Ext;
+  FILE        *FptrOut;
+  UINT32      Status;
+  FILE_LIST   *FList;
+  UINT32      TotalSize;
+  UINT32      Size;
+  CONST CHAR8 *Ptr0;
 
   SetUtilityName(UTILITY_NAME);
 
