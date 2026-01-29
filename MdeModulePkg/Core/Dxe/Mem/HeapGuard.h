@@ -175,13 +175,15 @@ typedef struct {
   The range must exist in the memory map.
 
   @param  Start                  The first address of the range Must be page
-                                 aligned.
-  @param  NumberOfPages          The number of pages to convert.
-  @param  NewType                The new type for the memory range.
+                                 aligned
+  @param  NumberOfPages          The number of pages to convert
+  @param  NewType                The new type for the memory range
+  @param  UpdateStatistics       Boolean indicating whether to update memory
+                                 statistics
 
   @retval EFI_INVALID_PARAMETER  Invalid parameter.
   @retval EFI_NOT_FOUND          Could not find a descriptor cover the specified
-                                 range or convertion not allowed.
+                                 range or conversion not allowed.
   @retval EFI_SUCCESS            Successfully converts the memory range to the
                                  specified type.
 
@@ -190,15 +192,17 @@ EFI_STATUS
 CoreConvertPages (
   IN UINT64           Start,
   IN UINT64           NumberOfPages,
-  IN EFI_MEMORY_TYPE  NewType
+  IN EFI_MEMORY_TYPE  NewType,
+  IN BOOLEAN          UpdateStatistics
   );
 
 /**
   Allocate or free guarded memory.
 
-  @param[in]  Start           Start address of memory to allocate or free.
-  @param[in]  NumberOfPages   Memory size in pages.
-  @param[in]  NewType         Memory type to convert to.
+  @param[in]  Start            Start address of memory to allocate or free.
+  @param[in]  NumberOfPages    Memory size in pages.
+  @param[in]  NewType          Memory type to convert to.
+  @param[in]  UpdateStatistics Boolean flag to indicate whether to update memory statistics.
 
   @return VOID.
 **/
@@ -206,7 +210,8 @@ EFI_STATUS
 CoreConvertPagesWithGuard (
   IN UINT64           Start,
   IN UINTN            NumberOfPages,
-  IN EFI_MEMORY_TYPE  NewType
+  IN EFI_MEMORY_TYPE  NewType,
+  IN BOOLEAN          UpdateStatistics
   );
 
 /**
