@@ -723,6 +723,37 @@ ReleaseKeyboardLayoutResources (
 }
 
 /**
+  Receive Ctrl + Alt + Del key event
+
+  This function is the event handler for Ctrl + Alt + Del key combination.
+  It runs at TPL_CALLBACK to avoid calling ResetSystem at TPL_NOTIFY level,
+  which could cause issues with SCM (System Context Manager) or other
+  runtime services that expect to run at lower TPL levels.
+
+  @param  Event                   Event being signaled.
+  @param  Context                 Points to USB_KB_DEV instance.
+
+  @retval None                    This function does not return on success
+                                  as it triggers a system reset.
+**/
+VOID
+EFIAPI
+CtrlAltDelKeyEvent (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  USB_KB_DEV  *UsbKeyboardDevice;
+
+  UsbKeyboardDevice = (USB_KB_DEV *)Context;
+  if (UsbKeyboardDevice->Signature != USB_KB_DEV_SIGNATURE) {
+    return;
+  }
+
+  gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
+}
+
+/**
   Initialize USB keyboard layout.
 
   This function initializes Key Convertion Table for the USB keyboard device.
@@ -926,6 +957,23 @@ InitUSBKeyboard (
          USBKeyboardRecoveryHandler,
          UsbKeyboardDevice,
          &UsbKeyboardDevice->DelayedRecoveryEvent
+         );
+
+  //
+  // Create event for CtrlAltDel key event, which deals with ResetSystem
+  // using TPL_CALLBACK
+  //
+  if (UsbKeyboardDevice->CtrlAltDelEvent != NULL) {
+    gBS->CloseEvent (UsbKeyboardDevice->CtrlAltDelEvent);
+    UsbKeyboardDevice->CtrlAltDelEvent = NULL;
+  }
+
+  gBS->CreateEvent (
+         EVT_NOTIFY_SIGNAL,
+         TPL_CALLBACK,
+         CtrlAltDelKeyEvent,
+         UsbKeyboardDevice,
+         &UsbKeyboardDevice->CtrlAltDelEvent
          );
 
   return EFI_SUCCESS;
@@ -1465,7 +1513,9 @@ USBParseKey (
     //
     if (KeyDescriptor->Modifier == EFI_DELETE_MODIFIER) {
       if ((UsbKeyboardDevice->CtrlOn) && (UsbKeyboardDevice->AltOn)) {
-        gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
+        if (UsbKeyboardDevice->CtrlAltDelEvent != NULL) {
+          gBS->SignalEvent (UsbKeyboardDevice->CtrlAltDelEvent);
+        }
       }
     }
 
