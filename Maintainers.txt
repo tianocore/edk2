@@ -248,6 +248,12 @@ R: Star Zeng <star.zeng@intel.com> [lzeng14]
 R: Ted Kuo <ted.kuo@intel.com> [tedkuo1]
 R: Ashraf Ali S <ashraf.ali.s@intel.com> [AshrafAliS]
 
+ManageabilityPkg
+F: ManageabilityPkg/
+M: Abner Chang <abner.chang@amd.com> [changab]
+R: Abdul Lateef Attar <AbdulLateef.Attar@amd.com> [abdattar]
+R: Nickle Wang <nicklew@nvidia.com> [nicklela]
+
 MdeModulePkg
 F: MdeModulePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdeModulePkg
