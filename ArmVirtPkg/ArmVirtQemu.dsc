@@ -238,7 +238,7 @@
   gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|0x20000
 
   # Shadowing PEI modules is absolutely pointless when the NOR flash is emulated
-  gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnBoot|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnBoot|TRUE
 
   # System Memory Size -- 128 MB initially, actual size will be fetched from DT
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x8000000
