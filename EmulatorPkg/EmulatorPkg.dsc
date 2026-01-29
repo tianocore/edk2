@@ -49,9 +49,26 @@
   0|DEFAULT
 
 !include MdePkg/MdeLibs.dsc.inc
-!include CryptoPkg/CryptoPkgFeatureFlagPcds.dsc.inc
 !include RedfishPkg/Redfish.dsc.inc
 !include NetworkPkg/Network.dsc.inc
+
+#
+# Do not reference CryptoPkg PCDs if features are not enabled that depend on the
+# CryptoPkg libraries or modules. Otherwise a build error for a reference to an
+# unused PCD is generated.
+#
+!if $(SECURE_BOOT_ENABLE) == TRUE || $(NETWORK_ENABLE) == TRUE
+!include CryptoPkg/CryptoPkgFeatureFlagPcds.dsc.inc
+!if $(WIN_MINGW32_BUILD)
+[PcdsFeatureFlag]
+  #
+  # When WIN_MINGW32_BUILD is set, -target is set to build Windows application.
+  # Set PcdOpensslLibAssemblySourceStyleNasm to TRUE to use Openssl NASM
+  # source files that assume a Windows calling convention.
+  #
+  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm|TRUE
+!endif
+!endif
 
 [LibraryClasses]
   #
@@ -227,14 +244,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables|FALSE
   gEmulatorPkgTokenSpaceGuid.PcdEmulatorLazyLoadSymbols|FALSE
-!if $(WIN_MINGW32_BUILD)
-  #
-  # When WIN_MINGW32_BUILD is set, -target is set to build Windows application.
-  # Set PcdOpensslLibAssemblySourceStyleNasm to TRUE to use Openssl NASM
-  # source files that assume a Windows calling convention.
-  #
-  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm|TRUE
-!endif
 
 [PcdsFixedAtBuild]
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy|0x00000000
@@ -421,7 +430,9 @@
   #
   # Hash2 Protocol producer
   #
+!if $(NETWORK_ENABLE) == TRUE
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+!endif
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
