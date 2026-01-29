@@ -1,0 +1,63 @@
+## @file
+# Description file for the Universal Flash Storage (UFS) Pass Thru driver.
+#
+# Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UfsPassThruDxe
+  MODULE_UNI_FILE                = UfsPassThru.uni
+  FILE_GUID                      = E7F1DFF9-DAB6-498A-9ADF-57F344EDDF57
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeUfsPassThru
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  gUfsPassThruDriverBinding
+#  COMPONENT_NAME                =  gUfsPassThruComponentName
+#
+
+[Sources]
+  ComponentName.c
+  UfsDevConfigProtocol.c
+  UfsPassThru.c
+  UfsPassThru.h
+  UfsPassThruHci.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  UefiLib
+  BaseLib
+  UefiDriverEntryPoint
+  DebugLib
+  DevicePathLib
+  PcdLib
+  TimerLib
+
+[Protocols]
+  gEfiExtScsiPassThruProtocolGuid               ## BY_START
+  gEfiUfsDeviceConfigProtocolGuid               ## BY_START
+  gEdkiiUfsHostControllerProtocolGuid           ## TO_START
+  gEdkiiUfsHcPlatformProtocolGuid               ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUfsInitialCompletionTimeout  ## CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  UfsPassThruExtra.uni

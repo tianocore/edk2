@@ -1,0 +1,63 @@
+## @file
+# A PEIM with the following responsibilities:
+#
+# - provide SMRAM access by producing PEI_SMM_ACCESS_PPI,
+# - verify & configure the Q35 TSEG in the entry point.
+#
+# Copyright (C) 2013, 2015, Red Hat, Inc.
+# Copyright (c) 2024 Intel Corporation.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmAccessPei
+  FILE_GUID                      = 6C0E75B4-B0B9-44D1-8210-3377D7B4E066
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SmmAccessPeiEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SmmAccessPei.c
+  SmramInternal.c
+  SmramInternal.h
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  IoLib
+  PcdLib
+  PciLib
+  PeiServicesLib
+  PeimEntryPoint
+
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase
+  gUefiOvmfPkgTokenSpaceGuid.PcdQ35TsegMbytes
+
+[Guids]
+  gEfiSmmSmramMemoryGuid             # ALWAYS_CONSUMED
+
+[Ppis]
+  gPeiSmmAccessPpiGuid           ## PRODUCES
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid

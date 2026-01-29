@@ -1,0 +1,100 @@
+// *++
+//
+// Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Module Name:
+//
+//   Vfr.vfr
+//
+// Abstract:
+//
+//   Platform driver Override manager formset
+//
+//
+// --*/
+
+#include "PlatOverMngr.h"
+
+#define EFI_DISK_DEVICE_CLASS          0x01
+
+formset
+  guid     = PLAT_OVER_MNGR_GUID,
+  title    = STRING_TOKEN(STR_ENTRY_TITLE),
+  help     = STRING_TOKEN(STR_TITLE_HELP),
+
+  varstore PLAT_OVER_MNGR_DATA,
+    varid = VARSTORE_ID_PLAT_OVER_MNGR,
+    name  = Data,
+    guid  = PLAT_OVER_MNGR_GUID;
+
+  form formid = FORM_ID_DEVICE,
+       title = STRING_TOKEN(STR_TITLE);
+
+    text
+      help   = STRING_TOKEN(STR_FIRST_REFRESH_HELP),
+      text   = STRING_TOKEN(STR_FIRST_REFRESH),
+      flags  = INTERACTIVE,
+      key    = KEY_VALUE_DEVICE_REFRESH;
+
+    checkbox varid = Data.PciDeviceFilter,
+      prompt   = STRING_TOKEN(STR_PCI_DEVICE_FILTER_PROMPT),
+      help     = STRING_TOKEN(STR_PCI_DEVICE_FILTER_HELP),
+      flags    = INTERACTIVE,
+      key      = KEY_VALUE_DEVICE_FILTER,
+    endcheckbox;
+
+    label FORM_ID_DEVICE;
+    label LABEL_END;
+
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+    goto FORM_ID_DEVICE,
+      prompt  = STRING_TOKEN(STR_CLEAR_ALL),
+      help    = STRING_TOKEN(STR_CLEAR_ALL_HELP),
+      flags   = INTERACTIVE | RESET_REQUIRED,
+      key     = KEY_VALUE_DEVICE_CLEAR;
+  endform;
+
+  form formid = FORM_ID_DRIVER,
+       title = STRING_TOKEN(STR_TITLE);
+
+    goto FORM_ID_DEVICE,
+      prompt  = STRING_TOKEN(STR_GOTO_PREVIOUS),
+      help    = STRING_TOKEN(STR_NULL_STRING),
+      flags   = INTERACTIVE,
+      key     = KEY_VALUE_DRIVER_GOTO_PREVIOUS;
+
+    goto FORM_ID_ORDER,
+      prompt  = STRING_TOKEN(STR_TITLE_ORDER),
+      help    = STRING_TOKEN(STR_TITLE_ORDER_HELP),
+      flags   = INTERACTIVE,
+      key     = KEY_VALUE_DRIVER_GOTO_ORDER;
+
+    label FORM_ID_DRIVER;
+    label LABEL_END;
+
+  endform;
+
+  form formid = FORM_ID_ORDER,
+       title = STRING_TOKEN(STR_TITLE);
+
+    goto FORM_ID_DRIVER,
+      prompt  = STRING_TOKEN(STR_GOTO_PREVIOUS),
+      help    = STRING_TOKEN(STR_NULL_STRING),
+      flags   = INTERACTIVE,
+      key     = KEY_VALUE_ORDER_GOTO_PREVIOUS;
+
+    label FORM_ID_ORDER;
+    label LABEL_END;
+
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+    text
+      help   = STRING_TOKEN (STR_NULL_STRING),
+      text   = STRING_TOKEN (STR_SAVE_AND_EXIT),
+      flags  = INTERACTIVE | RESET_REQUIRED,
+      key    = KEY_VALUE_ORDER_SAVE_AND_EXIT;
+  endform;
+
+endformset;

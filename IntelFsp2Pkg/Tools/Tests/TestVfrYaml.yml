@@ -1,0 +1,233 @@
+## DO NOT REMOVE -- YAML Mode
+Bluetooth Connection Manager:
+  formset:
+    guid:  {0x4f4ef7f0, 0xaa29, 0x4ce9, { 0xba, 0x41, 0x64, 0x3e, 0x1, 0x23, 0xa9, 0x9f}}
+    help:  Config the Bluetooth parameter
+    title:  Bluetooth Configuration
+    component:
+    - form:
+        formid:  2
+        title:  Bluetooth Host Controller Management
+        component:
+        - text:
+            help:  Address of the bluetooth host controller
+            prompt:  Address
+            text:  Address
+        - string:
+            questionid:  24578
+            varstoreid:  0  #  Optional Input
+            varname:  65535  # Question VarName
+            varoffset:  65535  # Question VarOffset
+            questionflags:  4 # Optional Input
+            prompt:  Local Name
+            help:  Name for the host controller, valid length from 2 to 19
+            opcodeflags:  0x0  # optional input
+            minsize: 2
+            maxsize: 19
+        - numeric:
+            questionid:  4114
+            varstoreid:  4099  #  Optional Input
+            varname:  0  # Question VarName
+            varoffset:  0  # Question VarOffset
+            questionflags:  0 # Optional Input
+            prompt:  Host Id
+            help:  Shows the Host Controller Id
+            opcodeflags:  0x11  # optional input
+            maximum: 65535 # Optional Input
+            minimum: 0 # Optional Input
+            step: 0 # Optional Input
+            component:
+            - default:
+                defaultId: 0
+                type: 1
+                value: 5
+        - goto:
+            questionid:  24577
+            varstoreid:  0  #  Optional Input
+            varname:  65535  # Question VarName
+            varoffset:  65535  # Question VarOffset
+            questionflags:  4 # Optional Input
+            prompt:  Device Management
+            help:  Goto Device Management form
+            formid:  0x3
+            question: 0x6001 # Optional Input
+        - numeric:
+            questionid:  4114
+            varstoreid:  4099  #  Optional Input
+            varname:  0  # Question VarName
+            varoffset:  0  # Question VarOffset
+            questionflags:  0 # Optional Input
+            prompt:  Device Count
+            help:  Shows the number of devices
+            opcodeflags:  0x11  # optional input
+            maximum: 65535 # Optional Input
+            minimum: 0 # Optional Input
+            step: 0 # Optional Input
+            component:
+            - default:
+                defaultId: 0
+                type: 1
+                value: 3
+    - form:
+        formid:  3
+        title:  Bluetooth Management - Device Management
+        component:
+        - label:
+            prompt: Device Management
+            number: 0x1500  # Number
+        - subtitle:
+            prompt: Active Device
+            flags:  0  # Optional Input
+        - subtitle:
+            prompt: Paired Device
+            flags:  0  # Optional Input
+        - numeric:
+            questionid:  4114
+            varstoreid:  4099  #  Optional Input
+            varname:  0  # Question VarName
+            varoffset:  0  # Question VarOffset
+            questionflags:  0 # Optional Input
+            prompt:  Paired Device Count
+            help:  Lists the Number of Paired Devices
+            opcodeflags:  0x11  # optional input
+            maximum: 65535 # Optional Input
+            minimum: 0 # Optional Input
+            step: 0 # Optional Input
+            component:
+            - default:
+                defaultId: 0
+                type: 1
+                value: 2
+        - action:
+            questionid:  24579
+            varstoreid:  0  #  Optional Input
+            varname:  65535  # Question VarName
+            varoffset:  65535  # Question VarOffset
+            questionflags:  4 # Optional Input
+            prompt:  Address
+            help:  Address
+            config:  4  # QuestionConfig
+            component:
+            - refreshguid:
+                guid:  {0xf5e655d9, 0x2a6, 0x46f2, { 0x9e, 0x76, 0xb8, 0xbe, 0x8e, 0x60, 0xab, 0x22}}
+        - subtitle:
+            prompt: Available Device
+            flags:  0  # Optional Input
+        - numeric:
+            questionid:  4114
+            varstoreid:  4099  #  Optional Input
+            varname:  0  # Question VarName
+            varoffset:  0  # Question VarOffset
+            questionflags:  0 # Optional Input
+            prompt:  Available Device Count
+            help:  List the number of Available devices
+            opcodeflags:  0x11  # optional input
+            maximum: 65535 # Optional Input
+            minimum: 0 # Optional Input
+            step: 0 # Optional Input
+            component:
+            - default:
+                defaultId: 0
+                type: 1
+                value: 4
+    - form:
+        formid:  4
+        title:  Remote Device Info
+        component:
+        - numeric:
+            questionid:  4114
+            varstoreid:  4099  #  Optional Input
+            varname:  0  # Question VarName
+            varoffset:  0  # Question VarOffset
+            questionflags:  0 # Optional Input
+            prompt:  Device Count
+            help:  Lists the Device Count
+            opcodeflags:  0x11  # optional input
+            maximum: 65535 # Optional Input
+            minimum: 0 # Optional Input
+            step: 0 # Optional Input
+            component:
+            - default:
+                defaultId: 0
+                type: 1
+                value: 3
+        - text:
+            condition:  grayoutif TRUE
+            help:  Address for this bluetooth host controller
+            prompt:  Address
+            text:  Address
+        - subtitle:
+            condition:  grayoutif TRUE
+            prompt: Remote Device
+            flags:  0  # Optional Input
+        - numeric:
+            questionid:  4114
+            varstoreid:  4099  #  Optional Input
+            varname:  0  # Question VarName
+            varoffset:  0  # Question VarOffset
+            questionflags:  0 # Optional Input
+            prompt:  Available Devices
+            help:  Lists the available devices
+            opcodeflags:  0x11  # optional input
+            maximum: 65535 # Optional Input
+            minimum: 0 # Optional Input
+            step: 0 # Optional Input
+            component:
+            - default:
+                defaultId: 0
+                type: 1
+                value: 5
+        - text:
+            condition:  grayoutif TRUE
+            help:  Available Services for the remote device
+            prompt:  Available Services
+        - oneof:
+            questionid:  4130
+            varstoreid:  4096  #  Optional Input
+            varname:  5  # Question VarName
+            varoffset:  5  # Question VarOffset
+            questionflags:  0 # Optional Input
+            prompt:  Active Device
+            help:  0x0015
+            opcodeflags:  0x10  # optional input
+            maximum: 3 # Optional Input
+            minimum: 0 # Optional Input
+            step: 0x0 # Optional Input
+            component:
+            - option:
+                text: 0x0016
+                flags: 16 # Optional Input
+                type: 0x0000 # Optional Input
+                value: 0x0
+            - option:
+                text: 0x0017
+                flags: 0 # Optional Input
+                type: 0x0000 # Optional Input
+                value: 0x1
+            - option:
+                text: 0x0018
+                flags: 0 # Optional Input
+                type: 0x0000 # Optional Input
+                value: 0x2
+            - option:
+                text: 0x0019
+                flags: 0 # Optional Input
+                type: 0x0000 # Optional Input
+                value: 0x3
+        - numeric:
+            questionid:  4114
+            varstoreid:  4099  #  Optional Input
+            varname:  0  # Question VarName
+            varoffset:  0  # Question VarOffset
+            questionflags:  0 # Optional Input
+            prompt:  Paired device count
+            help:  Lists the number of devices paired
+            opcodeflags:  0x11  # optional input
+            maximum: 65535 # Optional Input
+            minimum: 0 # Optional Input
+            step: 0 # Optional Input
+            component:
+            - default:
+                defaultId: 0
+                type: 1
+                value: 3

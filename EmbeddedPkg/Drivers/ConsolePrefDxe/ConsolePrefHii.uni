@@ -1,0 +1,21 @@
+/** @file
+*
+*  Copyright (c) 2017, Linaro, Ltd. All rights reserved.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+#langdef en-US  "English"
+
+#string STR_FORM_SET_TITLE             #language en-US "Console Preference Selection"
+#string STR_FORM_SET_TITLE_HELP        #language en-US "Press <Enter> to choose between graphical and serial console."
+
+#string STR_MAIN_FORM_TITLE            #language en-US "Console Preference Selection"
+#string STR_NULL_STRING                #language en-US ""
+
+#string STR_CONSOLE_PREF_SELECT_PROMPT #language en-US "Preferred console"
+#string STR_CONSOLE_PREF_SELECT_HELP   #language en-US "Select the preferred console if both graphical and serial are available."
+
+#string STR_CONSOLE_PREF_GRAPHICAL     #language en-US "Graphical"
+#string STR_CONSOLE_PREF_SERIAL        #language en-US "Serial"

@@ -1,0 +1,17 @@
+// /** @file
+// Instance of PCI CF8 Library using I/O ports 0xCF8 and 0xCFC.
+//
+// PCI CF8 Library that uses I/O ports 0xCF8 and 0xCFC to perform PCI Configuration cycles.
+// Layers on top of an I/O Library instance.
+//
+// Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Instance of PCI CF8 Library using I/O ports 0xCF8 and 0xCFC"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "PCI CF8 Library that uses I/O ports 0xCF8 and 0xCFC to perform PCI Configuration cycles. Layers on top of an I/O Library instance."
+

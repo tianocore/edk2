@@ -1,0 +1,57 @@
+## @file
+#  This library doesn't produce any library class. The constructor function uses
+#  ExtractGuidedSectionLib service to register an RSA 2048 SHA 256 guided section handler
+#  that parses RSA 2048 SHA 256 encapsulation section and extracts raw data.
+#
+#  It uses the BaseCryptLib based on OpenSSL to authenticate the signature.
+#
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeRsa2048Sha256GuidedSectionExtractLib
+  FILE_GUID                      = 0AD6C423-4732-4cf3-9CE3-0A5416D634A5
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = DxeRsa2048Sha256GuidedSectionExtractLibConstructor
+  MODULE_UNI_FILE                = DxeRsa2048Sha256GuidedSectionExtractLib.uni
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  DxeRsa2048Sha256GuidedSectionExtractLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  ExtractGuidedSectionLib
+  UefiBootServicesTableLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  BaseCryptLib
+  PcdLib
+  PerformanceLib
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdRsa2048Sha256PublicKeyBuffer    ## SOMETIMES_CONSUMES
+
+[Protocols]
+  gEfiSecurityPolicyProtocolGuid                   ## SOMETIMES_CONSUMES (Set platform override AUTH status if exist)
+
+[Guids]
+  gEfiCertTypeRsa2048Sha256Guid  ## PRODUCES       ## UNDEFINED  # Specifies RSA 2048 SHA 256 authentication algorithm.
+  gEfiHashAlgorithmSha256Guid    ## SOMETIMES_CONSUMES ## UNDEFINED
+

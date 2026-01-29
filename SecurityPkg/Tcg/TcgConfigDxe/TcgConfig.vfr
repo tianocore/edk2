@@ -1,0 +1,72 @@
+/** @file
+  VFR file used by the TCG configuration component.
+
+Copyright (c) 2011 - 2019, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include "TcgConfigNvData.h"
+
+formset
+  guid      = TCG_CONFIG_FORM_SET_GUID,
+  title     = STRING_TOKEN(STR_TPM_TITLE),
+  help      = STRING_TOKEN(STR_TPM_HELP),
+  classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
+
+  varstore TCG_CONFIGURATION,
+    varid = TCG_CONFIGURATION_VARSTORE_ID,
+    name  = TCG_CONFIGURATION,
+    guid  = TCG_CONFIG_FORM_SET_GUID;
+
+  form formid = TCG_CONFIGURATION_FORM_ID,
+    title = STRING_TOKEN(STR_TPM_TITLE);
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    text
+      help   = STRING_TOKEN(STR_TPM_STATE_HELP),
+      text   = STRING_TOKEN(STR_TPM_STATE_PROMPT),
+        text   = STRING_TOKEN(STR_TPM_STATE_CONTENT);
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    oneof varid  = TCG_CONFIGURATION.TpmOperation,
+          questionid = KEY_TPM_ACTION,
+          prompt = STRING_TOKEN(STR_TPM_OPERATION),
+          help   = STRING_TOKEN(STR_TPM_OPERATION_HELP),
+          flags  = INTERACTIVE | RESET_REQUIRED,
+          //
+          // Default the form to NO ACTION to allow toggling other options
+          //
+          option text = STRING_TOKEN(STR_NO_ACTION), value = PHYSICAL_PRESENCE_NO_ACTION, flags = DEFAULT;
+          //
+          // Disable (TPM_ORD_PhysicalDisable) command is not available when disabled.
+          // Activate/deactivate (TPM_ORD_physicalSetDeactivated) command is not available when disabled.
+          //
+          suppressif ideqval TCG_CONFIGURATION.TpmEnable == 0;
+            option text = STRING_TOKEN(STR_DISABLE), value = PHYSICAL_PRESENCE_DISABLE, flags = 0;
+            option text = STRING_TOKEN(STR_TPM_ACTIVATE), value = PHYSICAL_PRESENCE_ACTIVATE, flags = 0;
+            option text = STRING_TOKEN(STR_TPM_DEACTIVATE), value = PHYSICAL_PRESENCE_DEACTIVATE, flags = 0;
+            option text = STRING_TOKEN(STR_TPM_DEACTIVATE_DISABLE), value = PHYSICAL_PRESENCE_DEACTIVATE_DISABLE, flags = 0;
+          endif
+          //
+          // Clear (TPM_ORD_ForceClear) command is not available when disabled or deactivated.
+          //
+          suppressif ideqval TCG_CONFIGURATION.TpmEnable == 0 OR
+                     ideqval TCG_CONFIGURATION.TpmActivate == 0;
+            option text = STRING_TOKEN(STR_TPM_CLEAR), value = PHYSICAL_PRESENCE_CLEAR, flags = 0;
+            option text = STRING_TOKEN(STR_TPM_CLEAR_ENABLE_ACTIVATE), value = PHYSICAL_PRESENCE_CLEAR_ENABLE_ACTIVATE, flags = 0;
+          endif
+
+          option text = STRING_TOKEN(STR_ENABLE), value = PHYSICAL_PRESENCE_ENABLE, flags = 0;
+          option text = STRING_TOKEN(STR_TPM_ENABLE_ACTIVATE), value = PHYSICAL_PRESENCE_ENABLE_ACTIVATE, flags = 0;
+          option text = STRING_TOKEN(STR_TPM_ENABLE_ACTIVATE_CLEAR), value = PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR, flags = 0;
+          option text = STRING_TOKEN(STR_TPM_ENABLE_ACTIVATE_CLEAR_E_A), value = PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE, flags = 0;
+    endoneof;
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+  endform;
+
+endformset;

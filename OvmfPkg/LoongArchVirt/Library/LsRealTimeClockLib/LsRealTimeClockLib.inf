@@ -1,0 +1,44 @@
+## @file
+#  LoongArch64 CPU Real Time Clock DXE Phase Library.
+#
+# Copyright (c) 2024 Loongson Technology Corporation Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = LsRealTimeClockLib
+  FILE_GUID                      = 9793a3da-1869-4fdf-88b1-c6484341f50b
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RealTimeClockLib
+
+#
+#  VALID_ARCHITECTURES           = LOONGARCH64
+#
+
+[Sources]
+  LsRealTimeClockLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  DxeServicesTableLib
+  HobLib
+  IoLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiRuntimeLib
+
+[Guids]
+  gEfiEventVirtualAddressChangeGuid
+  gRtcRegisterBaseAddressHobGuid
+
+[Depex]
+  TRUE

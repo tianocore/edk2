@@ -1,0 +1,17 @@
+// /** @file
+// Pcat SingleSegmentPciCfg2Pei Pei Module.
+//
+// It installs SingleSegmentPciConfiguration2 PPI to provide read, write and modify access to Pci configuration space in PEI phase.
+// To follow PI specification, these services also support access to the unaligned Pci address.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Pcat SingleSegmentPciCfg2Pei Pei Module."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "It installs SingleSegmentPciConfiguration2 PPI to provide read, write, and modify access to PCI configuration space in the PEI phase. These services also support access to the unaligned PCI address."
+

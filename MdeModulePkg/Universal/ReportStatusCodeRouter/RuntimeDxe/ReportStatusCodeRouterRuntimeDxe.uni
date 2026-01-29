@@ -1,0 +1,16 @@
+// /** @file
+// Report Status Code Router Driver which produces Report Stataus Code Handler Protocol and Status Code Runtime Protocol.
+//
+// Report Status Code Router Driver that produces Report Status Code Handler Protocol and Status Code Runtime Protocol.
+//
+// Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces Report Status Code Handler Protocol and Status Code Runtime Protocol"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Report Status Code Router Driver that produces Report Status Code Handler Protocol and Status Code Runtime Protocol."
+

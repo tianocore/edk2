@@ -1,0 +1,39 @@
+## @file
+#  PEI Services Table Pointer Library.
+#
+#  Store PEI Services Table pointer via gEmulatorPkgTokenSpaceGuid.PcdPeiServicesTablePage.
+#  This emulates a platform SRAM. The PI mechaism does not work in the emulator due to
+#  lack of privledge.
+#
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2011, Apple Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EmulatorPkgPeiServicesTablePointerLib
+  FILE_GUID                      = 7488FC06-370A-1C41-B05C-7395559A535A
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PeiServicesTablePointerLib|PEIM PEI_CORE SEC
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC (EBC is for build only)
+#
+
+[Sources]
+  PeiServicesTablePointer.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  DebugLib
+
+[Pcd]
+  gEmulatorPkgTokenSpaceGuid.PcdPeiServicesTablePage

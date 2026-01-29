@@ -1,0 +1,16 @@
+// /** @file
+// Status Code Handler Driver which produces general handlers and hook them onto the SMM status code router.
+//
+// This is the Status Code Handler Driver that produces general handlers and hooks them onto the SMM status code router.
+//
+// Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces general handlers and hooks them onto the SMM status code router"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This is the Status Code Handler Driver that produces general handlers and hooks them onto the SMM status code router."
+

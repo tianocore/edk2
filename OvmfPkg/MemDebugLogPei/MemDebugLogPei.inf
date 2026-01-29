@@ -1,0 +1,58 @@
+#/** @file
+#
+#  Memory Debug Log PEIM
+#
+#  Copyright (C) 2025, Oracle and/or its affiliates.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MemDebugLogPei
+  FILE_GUID                      = 2e501046-26ae-406b-9935-084b61a12e15
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = MemDebugLogEntry
+
+#
+#  For reference only:
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  MemDebugLog.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  MemoryAllocationLib
+  PeiServicesLib
+  PeiServicesTablePointerLib
+  PeimEntryPoint
+  PcdLib
+  MemDebugLogLib
+
+[Ppis]
+  gEfiPeiMemoryDiscoveredPpiGuid        ## CONSUMES
+
+[Guids]
+  gMemDebugLogHobGuid
+
+[Pcd]
+
+[FeaturePcd]
+
+[FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogBase  ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogSize  ## CONSUMES
+
+[Depex]
+  TRUE

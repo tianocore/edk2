@@ -1,0 +1,18 @@
+// /** @file
+// Define and produce general Boot Manager related interfaces.
+//
+// The implementation provides richful library functions supporting load option
+// manipulation, hotkey registration, UEFI boot, connect/disconnect, console
+// manipulation, driver health checking and etc.
+//
+// Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Define and produce general Boot Manager related interfaces"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "The implementation provides richful library functions supporting load option manipulation, hotkey registration, UEFI boot, connect/disconnect, console manipulation, driver health checking and etc."
+

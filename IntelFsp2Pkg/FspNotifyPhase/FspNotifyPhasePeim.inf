@@ -1,0 +1,43 @@
+## @file
+# Component information file for the FSP notify phase PEI module.
+#
+#  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FspNotifyPhasePeim
+  FILE_GUID                      = 29CBB005-C972-49F3-960F-292E2202CECD
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = FspNotifyPhasePeimEntryPoint
+
+[Sources]
+  FspNotifyPhasePeim.h
+  FspNotifyPhasePeim.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  DebugLib
+  FspPlatformLib
+  FspCommonLib
+  FspSwitchStackLib
+
+[Ppis]
+  gEfiDxeIplPpiGuid                       ## PRODUCES
+  gEfiEndOfPeiSignalPpiGuid               ## PRODUCES
+  gFspReadyForNotifyPhasePpiGuid          ## PRODUCES
+
+[Protocols]
+  gEfiPciEnumerationCompleteProtocolGuid  ## PRODUCES
+
+[Guids]
+  gEfiEventReadyToBootGuid                ## PRODUCES ## Event
+
+[Depex]
+  gEfiDxeIplPpiGuid

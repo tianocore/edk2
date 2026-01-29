@@ -1,0 +1,36 @@
+## @file
+# Dependabot configuration file to enable GitHub services for managing and updating
+# dependencies.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+# Please see the documentation for all configuration options:
+# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+##
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "pip"
+    reviewers:
+      - "makubacki"
+      - "mdkinney"
+      - "spbrogan"
+    rebase-strategy: "disabled"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "GitHub Action"
+    reviewers:
+      - "makubacki"
+      - "mdkinney"
+      - "spbrogan"
+    rebase-strategy: "disabled"

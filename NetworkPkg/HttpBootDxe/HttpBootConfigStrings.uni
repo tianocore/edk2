@@ -1,0 +1,23 @@
+/** @file
+  String definitions for HTTP Boot configuration.
+
+  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#langdef en-US "English"
+
+#string STR_HTTP_BOOT_CONFIG_FORM_TITLE       #language en-US "HTTP Boot Configuration"
+#string STR_HTTP_BOOT_CONFIG_FORM_HELP        #language en-US "Configure HTTP Boot parameters."
+#string STR_HTTP_BOOT_IP_VERSION_PROMPT       #language en-US "Internet Protocol"
+#string STR_HTTP_BOOT_IP_VERSION_HELP         #language en-US "Select the version of Internet Protocol."
+#string STR_HTTP_BOOT_IP_VERSION_4            #language en-US "IP4"
+#string STR_HTTP_BOOT_IP_VERSION_6            #language en-US "IP6"
+#string STR_BOOT_URI_PROMPT                   #language en-US "Boot URI"
+#string STR_BOOT_URI_HELP                     #language en-US "A new Boot Option will be created according to this Boot URI."
+#string STR_BOOT_DESCRIPTION_PROMPT           #language en-US "Input the description"
+#string STR_BOOT_PROXY_URI_PROMPT             #language en-US "Proxy URI"
+#string STR_BOOT_PROXY_URI_HELP               #language en-US "Proxy URI through which to connect to Boot URI"
+#string STR_NULL_STRING                       #language en-US ""

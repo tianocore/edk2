@@ -1,0 +1,37 @@
+## @file
+# Instance of Resource Publication Library using PEI Services.
+#
+# Resource Publication Library that uses PEI Services to publish system memory.
+#
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiResourcePublicationLib
+  MODULE_UNI_FILE                = PeiResourcePublicationLib.uni
+  FILE_GUID                      = e8d6390d-e190-4957-9ab6-d47d51b01336
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ResourcePublicationLib|PEIM SEC
+
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC (EBC is for build only)
+#
+
+[Sources]
+  PeiResourcePublicationLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  PeiServicesLib
+

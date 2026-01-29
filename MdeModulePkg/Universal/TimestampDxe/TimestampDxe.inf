@@ -1,0 +1,46 @@
+## @file
+# Generic Timestamp driver producing Timestamp Protocol using UEFI APIs.
+#
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TimestampDxe
+  MODULE_UNI_FILE                = TimestampDxe.uni
+  FILE_GUID                      = C10194E7-DEB2-4AF4-9EEE-BFFDE4D7D4C7
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = TimestampDriverInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[Sources]
+  TimestampDxe.c
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  TimerLib
+  BaseMemoryLib
+  DebugLib
+
+[Protocols]
+  gEfiTimestampProtocolGuid             ## PRODUCES
+
+[depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  TimestampDxeExtra.uni

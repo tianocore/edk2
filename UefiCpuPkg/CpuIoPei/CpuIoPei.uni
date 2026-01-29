@@ -1,0 +1,16 @@
+// /** @file
+// Produces the CPU I/O PPI by using the services of the I/O Library.
+//
+// Produces the CPU I/O PPI by using the services of the I/O Library.
+//
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces the CPU I/O PPI by using the services of the I/O Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Produces the CPU I/O PPI by using the services of the I/O Library."
+

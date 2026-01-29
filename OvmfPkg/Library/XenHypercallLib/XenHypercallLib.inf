@@ -1,0 +1,50 @@
+## @file
+#  Xen Hypercall abstraction lib for Intel and ARM architectures
+#
+#  Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = XenHypercallLib
+  FILE_GUID                      = B5EE9A32-CA5A-49A8-82E3-ADA4CCB77C7C
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  CONSTRUCTOR                    = XenHypercallLibConstruct
+  LIBRARY_CLASS                  = XenHypercallLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64 AARCH64
+#
+
+[Sources.X64]
+  X86XenHypercall.c
+
+[Sources.X64]
+  X64/hypercall.nasm
+
+[Sources.AARCH64]
+  ArmXenHypercall.c
+
+[Sources.AARCH64]
+  AArch64/Hypercall.S
+
+[Sources]
+  XenHypercall.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses.X64]
+  CpuLib
+  BaseLib
+  HobLib
+  DebugLib
+
+[Guids.X64]
+  gEfiXenInfoGuid

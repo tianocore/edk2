@@ -1,0 +1,106 @@
+## @file
+#  This modules produce the Load File Protocol for UEFI HTTP boot.
+#
+#  Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
+#  (C) Copyright 2020 Hewlett-Packard Development Company, L.P.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION               = 0x00010005
+  BASE_NAME                 = HttpBootDxe
+  FILE_GUID                 = ecebcb00-d9c8-11e4-af3d-8cdcd426c973
+  MODULE_TYPE               = UEFI_DRIVER
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = HttpBootDxeDriverEntryPoint
+  UNLOAD_IMAGE              = NetLibDefaultUnload
+  MODULE_UNI_FILE           = HttpBootDxe.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[Sources]
+  HttpBootConfigNVDataStruc.h
+  HttpBootDxe.h
+  HttpBootDxe.c
+  HttpBootConfig.h
+  HttpBootConfig.c
+  HttpBootComponentName.h
+  HttpBootComponentName.c
+  HttpBootImpl.h
+  HttpBootImpl.c
+  HttpBootDhcp4.h
+  HttpBootDhcp4.c
+  HttpBootDhcp6.h
+  HttpBootDhcp6.c
+  HttpBootSupport.h
+  HttpBootSupport.c
+  HttpBootClient.h
+  HttpBootClient.c
+  HttpBootConfigVfr.vfr
+  HttpBootConfigStrings.uni
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseLib
+  UefiLib
+  DevicePathLib
+  DebugLib
+  NetLib
+  HttpLib
+  HttpIoLib
+  HiiLib
+  PrintLib
+  DpcLib
+  UefiHiiServicesLib
+  UefiBootManagerLib
+
+[Protocols]
+  ## TO_START
+  ## BY_START
+  gEfiDevicePathProtocolGuid
+
+  gEfiLoadFileProtocolGuid                        ## BY_START
+  gEfiHttpServiceBindingProtocolGuid              ## CONSUMES
+  gEfiHttpProtocolGuid                            ## CONSUMES
+  gEfiDhcp4ServiceBindingProtocolGuid             ## TO_START
+  gEfiDhcp4ProtocolGuid                           ## TO_START
+  gEfiIp4Config2ProtocolGuid                      ## TO_START
+  gEfiDhcp6ServiceBindingProtocolGuid             ## TO_START
+  gEfiDhcp6ProtocolGuid                           ## TO_START
+  gEfiDns6ServiceBindingProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiDns6ProtocolGuid                            ## SOMETIMES_CONSUMES
+  gEfiIp6ServiceBindingProtocolGuid               ## TO_START
+  gEfiIp6ProtocolGuid                             ## TO_START
+  gEfiIp6ConfigProtocolGuid                       ## TO_START
+  gEfiNetworkInterfaceIdentifierProtocolGuid_31   ## SOMETIMES_CONSUMES
+  gEfiRamDiskProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEfiHiiConfigAccessProtocolGuid                 ## BY_START
+  gEfiHttpBootCallbackProtocolGuid                ## SOMETIMES_PRODUCES
+  gEfiAdapterInformationProtocolGuid              ## SOMETIMES_CONSUMES
+
+[Guids]
+  ## SOMETIMES_CONSUMES ## GUID # HiiIsConfigHdrMatch   mHttpBootConfigStorageName
+  ## SOMETIMES_PRODUCES ## GUID # HiiConstructConfigHdr mHttpBootConfigStorageName
+  ## SOMETIMES_PRODUCES ## GUID # HiiGetBrowserData     mHttpBootConfigStorageName
+  ## SOMETIMES_CONSUMES ## HII
+  gHttpBootConfigGuid
+  gEfiVirtualCdGuid            ## SOMETIMES_CONSUMES ## GUID
+  gEfiVirtualDiskGuid          ## SOMETIMES_CONSUMES ## GUID
+  gEfiAdapterInfoUndiIpv6SupportGuid             ## SOMETIMES_CONSUMES ## GUID
+
+[Pcd]
+  gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections           ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout                  ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdMaxHttpResumeRetries           ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpDelayBetweenResumeRetries  ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv4HttpSupport                ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv6HttpSupport                ## CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  HttpBootDxeExtra.uni

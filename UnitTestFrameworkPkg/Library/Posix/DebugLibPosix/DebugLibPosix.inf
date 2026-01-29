@@ -1,0 +1,35 @@
+## @file
+#  Instance of Debug Library based on POSIX APIs
+#
+#  Uses Print Library to produce formatted output strings sent to printf().
+#
+#  Copyright (c) 2018 - 2020, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION     = 0x00010005
+  BASE_NAME       = DebugLibPosix
+  MODULE_UNI_FILE = DebugLibPosix.uni
+  FILE_GUID       = 6A77CE89-C1B6-4A6B-9561-07D7127514A7
+  MODULE_TYPE     = BASE
+  VERSION_STRING  = 1.0
+  LIBRARY_CLASS   = DebugLib|HOST_APPLICATION
+
+[Sources]
+  DebugLibPosix.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  PcdLib
+  PrintLib
+  BaseLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue     ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask         ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel ## CONSUMES

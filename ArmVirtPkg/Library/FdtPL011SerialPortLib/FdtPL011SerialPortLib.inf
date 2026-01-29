@@ -1,0 +1,43 @@
+#/** @file
+#
+#  Component description file for PL011SerialPortLib module
+#
+#  Copyright (c) 2011-2015, ARM Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FdtPL011SerialPortLib
+  FILE_GUID                      = CB768406-7DE6-49B6-BC2C-F324E110DE5A
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SerialPortLib|DXE_CORE DXE_DRIVER UEFI_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION
+  CONSTRUCTOR                    = SerialPortInitialize
+
+[Sources.common]
+  FdtPL011SerialPortLib.c
+
+[LibraryClasses]
+  PL011UartLib
+  HobLib
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
+  ArmPkg/ArmPkg.dec
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
+  gArmPlatformTokenSpaceGuid.PL011UartClkInHz
+
+[Guids]
+  gEarlyPL011BaseAddressGuid

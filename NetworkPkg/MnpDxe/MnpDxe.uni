@@ -1,0 +1,18 @@
+// /** @file
+// This module produces EFI MNP Protocol, EFI MNP Service Binding Protocol and EFI VLAN Protocol.
+//
+// This module produces EFI Managed Network Protocol upon EFI Simple Network Protocol,
+// to provide raw asynchronous network I/O services. It also produces EFI VLAN Protocol
+// to provide manageability interface for VLAN configuration.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces EFI MNP Protocol, EFI MNP Service Binding Protocol and EFI VLAN Protocol"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module produces EFI Managed Network Protocol upon EFI Simple Network Protocol to provide raw asynchronous network I/O services. It also produces EFI VLAN Protocol to provide manageability interface for VLAN configuration."
+

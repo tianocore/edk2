@@ -1,0 +1,16 @@
+// /** @file
+// Reset Vector
+//
+// This VTF requires build time fixups in order to find the SEC entry point.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Reset Vector"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This VTF requires build time fixups in order to find the SEC entry point"
+

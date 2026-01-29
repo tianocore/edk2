@@ -1,0 +1,50 @@
+## @file
+#  Component Description File For Universal Flash Storage Pci Host Controller Module.
+#
+#  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UfsPciHcDxe
+  MODULE_UNI_FILE                = UfsPciHcDxe.uni
+  FILE_GUID                      = AF43E178-C2E9-4712-A7CD-08BFDAC7482C
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 0.9
+  ENTRY_POINT                    = UfsHcDriverEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  gUfsHcDriverBinding
+#  COMPONENT_NAME                =  gUfsHcComponentName
+#  COMPONENT_NAME2               =  gUfsHcComponentName2
+
+[Sources]
+  ComponentName.c
+  UfsPciHcDxe.c
+  UfsPciHcDxe.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+
+[Protocols]
+  gEfiPciIoProtocolGuid                       ## TO_START
+  gEfiDevicePathProtocolGuid                  ## TO_START
+  gEdkiiUfsHostControllerProtocolGuid         ## BY_START
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  UfsPciHcDxeExtra.uni

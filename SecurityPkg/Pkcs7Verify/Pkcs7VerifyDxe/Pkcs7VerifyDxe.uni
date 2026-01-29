@@ -1,0 +1,19 @@
+// /** @file
+// Produces the UEFI PKCS7 Verification Protocol.
+//
+// PKCS7 is a general-purpose Cryptographic Message Syntax Standard (RFC2315,
+// http://tools.ietf.org/html/rfc2315). This module will produce the UEFI PKCS7
+// Verification Protocol which is used to verify data signed using PKCS#7
+// structure. The PKCS#7 data to be verified must be ASN.1 (DER) encoded.
+//
+// Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces UEFI PKCS7 Verification Protocol"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module will produce UEFI PKCS7 Verification Protocol."
+

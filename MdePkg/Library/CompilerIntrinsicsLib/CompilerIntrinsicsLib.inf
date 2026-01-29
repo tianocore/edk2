@@ -1,0 +1,37 @@
+#/** @file
+#  Base Library implementation.
+#
+#  Copyright (c) 2009, Apple Inc. All rights reserved.<BR>
+#  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = CompilerIntrinsicsLib
+  FILE_GUID                      = 2A6B451F-B99D-47B1-8F29-D805433C62E0
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CompilerIntrinsicsLib
+
+[Sources]
+  memcpy.c             | GCC
+  memset.c             | GCC
+
+  memcpy_ms.c          | MSFT
+  memset_ms.c          | MSFT
+  memcmp_ms.c          | MSFT
+  memmove_ms.c         | MSFT
+
+[Sources.AARCH64]
+  AArch64/Atomics.S    | GCC
+  AArch64/ashlti3.S    | GCC
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /GL-

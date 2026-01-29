@@ -1,0 +1,44 @@
+#/** @file
+#
+#  Generic non-coherent implementation of DmaLib.h
+#
+#  Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+#  Copyright (c) 2015 - 2017, Linaro, Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                 = 0x00010019
+  BASE_NAME                   = NonCoherentDmaLib
+  FILE_GUID                   = 43ad4920-db15-4e24-9889-2db568431fbd
+  MODULE_TYPE                 = DXE_DRIVER
+  VERSION_STRING              = 1.0
+  LIBRARY_CLASS               = DmaLib
+  CONSTRUCTOR                 = NonCoherentDmaLibConstructor
+
+[Sources]
+  NonCoherentDmaLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  DxeServicesTableLib
+  IoLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiCpuArchProtocolGuid
+
+[Pcd]
+  gEmbeddedTokenSpaceGuid.PcdDmaDeviceOffset
+  gEmbeddedTokenSpaceGuid.PcdDmaDeviceLimit
+
+[Depex]
+  gEfiCpuArchProtocolGuid

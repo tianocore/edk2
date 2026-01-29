@@ -1,0 +1,18 @@
+// /** @file
+// Provides TPM 2.0 TIS functions
+//
+// This library is TPM 2.0 device router. Platform can register multi TPM 2.0 instance to
+// it via PcdTpmInstanceGuid. Platform need make choice that which one will be final one.
+// At most one TPM 2.0 instance can be finally registered, and other will return unsupported.
+//
+// Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Provides TPM 2.0 TIS functions"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library is TPM 2.0 device router. Platform can register multi TPM 2.0 instance to it via PcdTpmInstanceGuid. Platform need make choice that which one will be final one. At most one TPM 2.0 instance can be finally registered, and other will return unsupported."
+

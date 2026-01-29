@@ -1,0 +1,297 @@
+// /** @file
+// Provides security features that conform to TCG/UEFI industry standards
+//
+// The security features include secure boot, measured boot and user identification.
+// It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
+// and libraries instances, which are used for those features.
+//
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_PACKAGE_ABSTRACT            #language en-US "Provides security features that conform to TCG/UEFI industry standards"
+
+#string STR_PACKAGE_DESCRIPTION         #language en-US "The security features include secure boot, measured boot and user identification. It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes) and libraries instances, which are used for those features."
+
+
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdOptionRomImageVerificationPolicy_PROMPT  #language en-US "Set policy for the image from OptionRom."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdOptionRomImageVerificationPolicy_HELP  #language en-US "Image verification policy for OptionRom. Only following values are valid:<BR><BR>\n"
+                                                                                                    "NOTE: Do NOT use 0x5 and 0x2 since it violates the UEFI specification and has been removed.<BR>\n"
+                                                                                                    "0x00000000      Always trust the image.<BR>\n"
+                                                                                                    "0x00000001      Never trust the image.<BR>\n"
+                                                                                                    "0x00000002      Allow execution when there is security violation.<BR>\n"
+                                                                                                    "0x00000003      Defer execution when there is security violation.<BR>\n"
+                                                                                                    "0x00000004      Deny execution when there is security violation.<BR>\n"
+                                                                                                    "0x00000005      Query user when there is security violation.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_ERR_80000001 #language en-US "Invalid value provided."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdRemovableMediaImageVerificationPolicy_PROMPT  #language en-US "Set policy for the image from removable media."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdRemovableMediaImageVerificationPolicy_HELP  #language en-US "Image verification policy for removable media which includes CD-ROM, Floppy, USB and network. Only following values are valid:<BR><BR>\n"
+                                                                                                         "NOTE: Do NOT use 0x5 and 0x2 since it violates the UEFI specification and has been removed.<BR>\n"
+                                                                                                         "0x00000000      Always trust the image.<BR>\n"
+                                                                                                         "0x00000001      Never trust the image.<BR>\n"
+                                                                                                         "0x00000002      Allow execution when there is security violation.<BR>\n"
+                                                                                                         "0x00000003      Defer execution when there is security violation.<BR>\n"
+                                                                                                         "0x00000004      Deny execution when there is security violation.<BR>\n"
+                                                                                                         "0x00000005      Query user when there is security violation.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdFixedMediaImageVerificationPolicy_PROMPT  #language en-US "Set policy for the image from fixed media."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdFixedMediaImageVerificationPolicy_HELP  #language en-US "Image verification policy for fixed media which includes hard disk. Only following values are valid:<BR><BR>\n"
+                                                                                                     "NOTE: Do NOT use 0x5 and 0x2 since it violates the UEFI specification and has been removed.<BR>\n"
+                                                                                                     "0x00000000      Always trust the image.<BR>\n"
+                                                                                                     "0x00000001      Never trust the image.<BR>\n"
+                                                                                                     "0x00000002      Allow execution when there is security violation.<BR>\n"
+                                                                                                     "0x00000003      Defer execution when there is security violation.<BR>\n"
+                                                                                                     "0x00000004      Deny execution when there is security violation.<BR>\n"
+                                                                                                     "0x00000005      Query user when there is security violation.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdDeferImageLoadPolicy_PROMPT  #language en-US "Set policy whether trust image before user identification."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdDeferImageLoadPolicy_HELP  #language en-US "Defer Image Load policy settings. The policy is bitwise. If a bit is set, the image from corresponding device will be trusted when loading. Or the image will be deferred. The deferred image will be checked after user is identified.<BR><BR>\n"
+                                                                                        "BIT0       - Image from unknown device. <BR>\n"
+                                                                                        "BIT1       - Image from firmware volume.<BR>\n"
+                                                                                        "BIT2       - Image from OptionRom.<BR>\n"
+                                                                                        "BIT3       - Image from removable media which includes CD-ROM, Floppy, USB and network.<BR>\n"
+                                                                                        "BIT4       - Image from fixed media device which includes hard disk.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_ERR_80000002 #language en-US "Reserved bits must be set to zero."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdFixedUsbCredentialProviderTokenFileName_PROMPT  #language en-US "File name to save credential."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdFixedUsbCredentialProviderTokenFileName_HELP  #language en-US "Null-terminated Unicode string of the file name that is the default name to save USB credential. The specified file should be saved at the root directory of USB storage disk."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdMaxAppendVariableSize_PROMPT  #language en-US "Max variable size for append operation."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdMaxAppendVariableSize_HELP  #language en-US "The size of Append variable buffer. This buffer is reserved for runtime use, OS can append data into one existing variable. Note: This PCD is not been used."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpmPlatformClass_PROMPT  #language en-US "Select platform type."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpmPlatformClass_HELP  #language en-US "Specifies the type of TCG platform that contains TPM chip.<BR><BR>\n"
+                                                                                    "If 0, TCG platform type is PC client.<BR>\n"
+                                                                                    "If 1, TCG platform type is PC server.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpmPhysicalPresence_PROMPT  #language en-US "Physical presence of the platform operator."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpmPhysicalPresence_HELP  #language en-US "Indicates the presence or absence of the platform operator during firmware booting. If platform operator is not physical presence during boot. TPM will be locked and the TPM commands that required operator physical presence can not run.<BR><BR>\n"
+                                                                                       "TRUE  - The platform operator is physically present.<BR>\n"
+                                                                                       "FALSE - The platform operator is not physically present.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdPhysicalPresenceLifetimeLock_PROMPT  #language en-US "Lock TPM physical presence asserting method."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdPhysicalPresenceLifetimeLock_HELP  #language en-US "Indicates whether TPM physical presence is locked during platform initialization. Once it is locked, it can not be unlocked for TPM life time.<BR><BR>\n"
+                                                                                                "TRUE  - Lock TPM physical presence asserting method.<BR>\n"
+                                                                                                "FALSE - Not lock TPM physical presence asserting method.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdPhysicalPresenceCmdEnable_PROMPT  #language en-US "Enable software method of asserting physical presence."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdPhysicalPresenceCmdEnable_HELP  #language en-US "Indicates whether the platform supports the software method of asserting physical presence.<BR><BR>\n"
+                                                                                             "TRUE  - Supports the software method of asserting physical presence.<BR>\n"
+                                                                                             "FALSE - Does not support the software method of asserting physical presence.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdPhysicalPresenceHwEnable_PROMPT  #language en-US "Enable hardware method of asserting physical presence."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdPhysicalPresenceHwEnable_HELP  #language en-US "Indicates whether the platform supports the hardware method of asserting physical presence.<BR><BR>\n"
+                                                                                            "TRUE  - Supports the hardware method of asserting physical presence.<BR>\n"
+                                                                                            "FALSE - Does not support the hardware method of asserting physical presence.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdFirmwareDebuggerInitialized_PROMPT  #language en-US "Firmware debugger status."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdFirmwareDebuggerInitialized_HELP  #language en-US "This PCD indicates if debugger exists. <BR><BR>\n"
+                                                                                               "TRUE  - Firmware debugger exists.<BR>\n"
+                                                                                               "FALSE - Firmware debugger doesn't exist.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2InitializationPolicy_PROMPT  #language en-US "TPM 2.0 device initialization policy.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2InitializationPolicy_HELP  #language en-US "This PCD indicates the initialization policy for TPM 2.0.<BR><BR>\n"
+                                                                                            "If 0, no initialization needed - most likely used for chipset SRTM solution, in which TPM is already initialized.<BR>\n"
+                                                                                            "If 1, initialization needed.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpmInitializationPolicy_PROMPT  #language en-US "TPM 1.2 device initialization policy."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpmInitializationPolicy_HELP  #language en-US "This PCD indicates the initialization policy for TPM 1.2.<BR><BR>\n"
+                                                                                           "If 0, no initialization needed - most likely used for chipset SRTM solution, in which TPM is already initialized.<BR>\n"
+                                                                                           "If 1, initialization needed.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2SelfTestPolicy_PROMPT  #language en-US "TPM 2.0 device selftest."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2SelfTestPolicy_HELP  #language en-US "This PCD indicates the TPM 2.0 SelfTest policy.<BR><BR>\n"
+                                                                                      "if 0, no SelfTest needed - most likely used for fTPM, because it might already be tested.<BR>\n"
+                                                                                      "if 1, SelfTest needed.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2ScrtmPolicy_PROMPT  #language en-US "SCRTM policy setting for TPM 2.0 device."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2ScrtmPolicy_HELP  #language en-US "This PCD indicates Static Core Root of Trust for Measurement (SCRTM) policy using TPM 2.0.<BR><BR>\n"
+                                                                                   "if 0, no SCRTM measurement needed - In this case, it is already done.<BR>\n"
+                                                                                   "if 1, SCRTM measurement done by BIOS.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpmScrtmPolicy_PROMPT  #language en-US "SCRTM policy setting for TPM 1.2 device"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpmScrtmPolicy_HELP  #language en-US "This PCD indicates Static Core Root of Trust for Measurement (SCRTM) policy using TPM 1.2.<BR><BR>\n"
+                                                                                  "if 0, no SCRTM measurement needed - In this case, it is already done.<BR>\n"
+                                                                                  "if 1, SCRTM measurement done by BIOS.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpmInstanceGuid_PROMPT  #language en-US "TPM device type identifier"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpmInstanceGuid_HELP  #language en-US "Guid name to identify TPM instance.<BR><BR>\n"
+                                                                                   "TPM_DEVICE_INTERFACE_NONE means disable.<BR>\n"
+                                                                                   "TPM_DEVICE_INTERFACE_TPM12 means TPM 1.2 DTPM.<BR>\n"
+                                                                                   "TPM_DEVICE_INTERFACE_DTPM2 means TPM 2.0 DTPM.<BR>\n"
+                                                                                   "Other GUID value means other TPM 2.0 device.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2HashMask_PROMPT  #language en-US "Hash mask for TPM 2.0"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2HashMask_HELP  #language en-US "This PCD indicates Hash mask for TPM 2.0.<BR><BR>\n"
+                                                                                "If this bit is set, that means this algorithm is needed to extend to PCR.<BR>\n"
+                                                                                "If this bit is clear, that means this algorithm is NOT needed to extend to PCR.<BR>\n"
+                                                                                "BIT0  -  SHA1.<BR>\n"
+                                                                                "BIT1  -  SHA256.<BR>\n"
+                                                                                "BIT2  -  SHA384.<BR>\n"
+                                                                                "BIT3  -  SHA512.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpmAutoDetection_PROMPT  #language en-US "TPM type detection."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpmAutoDetection_HELP  #language en-US "This PCD indicates if BIOS auto detect TPM1.2 or dTPM2.0.<BR><BR>\n"
+                                                                                    "FALSE - No auto detection.<BR>\n"
+                                                                                    "TRUE  - Auto detection.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpmBaseAddress_PROMPT  #language en-US "TPM device address."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpmBaseAddress_HELP  #language en-US "This PCD indicates TPM base address.<BR><BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdStatusCodeSubClassTpmDevice_PROMPT  #language en-US "Status Code for TPM device definitions"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdStatusCodeSubClassTpmDevice_HELP  #language en-US "Progress Code for TPM device subclass definitions.<BR><BR>\n"
+                                                                                               "EFI_PERIPHERAL_TPM  = (EFI_PERIPHERAL | 0x000E0000) = 0x010E0000<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdRsa2048Sha256PublicKeyBuffer_PROMPT  #language en-US "One or more SHA 256 Hashes of RSA 2048 bit public keys used to verify Recovery and Capsule Update images"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdRsa2048Sha256PublicKeyBuffer_HELP  #language en-US "Provides one or more SHA 256 Hashes of the RSA 2048 public keys used to verify Recovery and Capsule Update images\n"
+                                                                                                "WARNING: The default value is treated as test key. Please do not use default value in the production."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2NumberOfPCRBanks_PROMPT  #language en-US "OEM configured number of PCR banks."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2NumberOfPCRBanks_HELP  #language en-US "This PCR means the OEM configured number of PCR banks.\n"
+                                                                                        "0 means dynamic get from supported HASH algorithm"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2HashAlgorithmBitmap_PROMPT  #language en-US "Hash Algorithm bitmap."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2HashAlgorithmBitmap_HELP  #language en-US "This PCD indicated final BIOS supported Hash mask.\n"
+                                                                                           "Bios may choose to register a subset of PcdTpm2HashMask.\n"
+                                                                                           "So this PCD is final value of how many hash algo is extended to PCR.\n"
+                                                                                           "If software HashLib(HashLibBaseCryptoRouter) solution is chosen, this PCD\n"
+                                                                                           "has no need to be configured in platform dsc and will be set to correct\n"
+                                                                                           "value by the HashLib instance according to the HashInstanceLib instances\n"
+                                                                                           "linked, and the value of this PCD should be got in module entrypoint."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcgLogAreaMinLen_PROMPT  #language en-US "Minimum length(in bytes) of the system preboot TCG event log area(LAML)."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcgLogAreaMinLen_HELP  #language en-US "This PCD defines minimum length(in bytes) of the system preboot TCG event log area(LAML).\n"
+                                                                                    "For PC Client Implementation spec up to and including 1.2 the minimum log size is 64KB."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2FinalLogAreaLen_PROMPT  #language en-US "Length(in bytes) of the TCG2 Final event log area."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2FinalLogAreaLen_HELP  #language en-US "This PCD defines length(in bytes) of the TCG2 Final event log area."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcgPhysicalPresenceInterfaceVer_PROMPT  #language en-US "Version of Physical Presence interface supported by platform."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcgPhysicalPresenceInterfaceVer_HELP  #language en-US "Null-terminated string of the Version of Physical Presence interface supported by platform.<BR><BR>\n"
+                                                                                                   "To support configuring from setup page, this PCD can be DynamicHii type and map to a setup option.<BR>\n"
+                                                                                                   "For example, map to TCG2_VERSION.PpiVersion to be configured by Tcg2ConfigDxe driver.<BR>\n"
+                                                                                                   "gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer|L\"TCG2_VERSION\"|gTcg2ConfigFormSetGuid|0x0|\"1.3\"|NV,BS<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdUserPhysicalPresence_PROMPT
+#language en-US
+"A physical presence user status"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdUserPhysicalPresence_HELP
+#language en-US
+"Indicate whether a physical presence user exist. "
+"When it is configured to Dynamic or DynamicEx, it can be set through detection using "
+"a platform-specific method (e.g. Button pressed) in a actual platform in early boot phase.<BR><BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdPkcs7CertBuffer_PROMPT  #language en-US "One PKCS7 cert used to verify Recovery and Capsule Update images"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdPkcs7CertBuffer_HELP  #language en-US "Provides one PKCS7 cert used to verify Recovery and Capsule Update images\n"
+                                                                                   "WARNING: The default value is treated as test key. Please do not use default value in the production."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2PhysicalPresenceFlags_PROMPT  #language en-US " Initial setting of TCG2 Persistent Firmware Management Flags"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTcg2PhysicalPresenceFlags_HELP  #language en-US "This PCD defines initial setting of TCG2 Persistent Firmware Management Flags\n"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2AcpiTableRev_PROMPT  #language en-US "The revision of TPM2 ACPI table"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2AcpiTableRev_HELP  #language en-US "This PCD defines initial revision of TPM2 ACPI table\n"
+                                                                                    "To support configuring from setup page, this PCD can be DynamicHii type and map to a setup option.<BR>\n"
+                                                                                    "For example, map to TCG2_VERSION.Tpm2AcpiTableRev to be configured by Tcg2ConfigDxe driver.<BR>\n"
+                                                                                    "gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev|L\"TCG2_VERSION\"|gTcg2ConfigFormSetGuid|0x8|3|NV,BS<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2CurrentIrqNum_PROMPT  #language en-US "Current TPM2 device interrupt number"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2CurrentIrqNum_HELP  #language en-US "This PCD defines current TPM2 device interrupt number reported by _CRS. If set to 0, interrupt is disabled."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2PossibleIrqNumBuf_PROMPT  #language en-US "Possible TPM2 device interrupt number buffer"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2PossibleIrqNumBuf_HELP  #language en-US "This PCD defines possible TPM2 interrupt number in a platform reported by _PRS control method.\n"
+                                                                                         "If PcdTpm2CurrentIrqNum set to 0, _PRS will not report any possible TPM2 interrupt numbers."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdSkipOpalDxeUnlock_PROMPT  #language en-US "Skip Opal DXE driver unlock device flow."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdSkipOpalDxeUnlock_HELP  #language en-US "Indicates if Opal DXE driver skip unlock device flow.<BR><BR>\n"
+                                                                                     "TRUE  - Skip unlock device flow.<BR>\n"
+                                                                                     "FALSE - Does not skip unlock device flow.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdActiveTpmInterfaceType_PROMPT  #language en-US "Current active TPM interface type"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdActiveTpmInterfaceType_HELP  #language en-US "This PCD indicates current active TPM interface type.\n"
+                                                                                          "0x00 - FIFO interface as defined in TIS 1.3 is active.<BR>\n"
+                                                                                          "0x01 - FIFO interface as defined in PTP for TPM 2.0 is active.<BR>\n"
+                                                                                          "0x02 - CRB interface is active.<BR>\n"
+                                                                                          "0xFF - Contains no current active TPM interface type<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdCRBIdleByPass_PROMPT  #language en-US "IdleBypass status supported by current active TPM interface."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdCRBIdleByPass_HELP  #language en-US "This PCD records IdleBypass status supported by current active TPM interface.\n"
+                                                                                          "According to TCG PTP spec 1.3, TPM with CRB interface can skip idle state and directly move to CmdReady state. <BR>"
+                                                                                          "0x01 - Do not support IdleByPass.<BR>\n"
+                                                                                          "0x02 - Support IdleByPass.<BR>\n"
+                                                                                          "0xFF - IdleByPass State is not synced with TPM hardware.<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdStatusCodeFvVerificationPass_PROMPT  #language en-US "Status Code for FV verification pass."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdStatusCodeFvVerificationPass_HELP  #language en-US "Progress Code for FV verification result.\n"
+                                                                                                "  (EFI_SOFTWARE_PEI_MODULE | EFI_SUBCLASS_SPECIFIC | 00A).\n"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdStatusCodeFvVerificationFail_PROMPT  #language en-US "Status Code for FV verification failure."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdStatusCodeFvVerificationFail_HELP  #language en-US "Progress Code for FV verification result.\n"
+                                                                                                "  (EFI_SOFTWARE_PEI_MODULE | EFI_SUBCLASS_SPECIFIC | 00B).\n"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdSkipOpalPasswordPrompt_PROMPT  #language en-US "Skip Opal DXE driver password prompt."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdSkipOpalPasswordPrompt_HELP  #language en-US "Indicates if Opal DXE driver skip password prompt.\n\n"
+                                                                                          "  TRUE  - Skip password prompt.\n"
+                                                                                          "  FALSE - Does not skip password prompt.\n"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdSkipHddPasswordPrompt_PROMPT  #language en-US "Skip Hdd Password prompt."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdSkipHddPasswordPrompt_HELP  #language en-US "Indicates if Hdd Password driver skip password prompt.\n\n"
+                                                                                          "  TRUE  - Skip password prompt.\n"
+                                                                                          "  FALSE - Does not skip password prompt.\n"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2AcpiTableLaml_PROMPT  #language en-US "The LAML of TPM2 ACPI table"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2AcpiTableLaml_HELP  #language en-US "This PCD defines LAML of TPM2 ACPI table\n\n"
+                                                                                     "0 means this field is unsupported\n"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2AcpiTableLasa_PROMPT  #language en-US "The LASA of TPM2 ACPI table"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2AcpiTableLasa_HELP  #language en-US "This PCD defines LASA of TPM2 ACPI table\n\n"
+                                                                                     "0 means this field is unsupported\n"

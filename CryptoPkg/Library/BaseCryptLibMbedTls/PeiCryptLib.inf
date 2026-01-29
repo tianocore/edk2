@@ -1,0 +1,105 @@
+## @file
+#  Cryptographic Library Instance for PEIM.
+#
+#  Caution: This module requires additional review when modified.
+#  This library will have external input - signature.
+#  This external input must be validated carefully to avoid security issues such as
+#  buffer overflow or integer overflow.
+#
+#  Note:
+#  HMAC-SHA256 functions, AES functions, RSA external
+#  functions, PKCS#7 SignedData sign functions, Diffie-Hellman functions, X.509
+#  certificate handler functions, authenticode signature verification functions,
+#  PEM handler functions, and pseudorandom number generator functions are not
+#  supported in this instance.
+#
+#  Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiCryptLib
+  MODULE_UNI_FILE                = PeiCryptLib.uni
+  FILE_GUID                      = 91E0A3C3-37A7-4AEE-8689-C5B0AD2C8E63
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BaseCryptLib|PEIM PEI_CORE
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  InternalCryptLib.h
+  Hash/CryptMd5.c
+  Hash/CryptSha1.c
+  Hash/CryptSha256.c
+  Hash/CryptSha512.c
+  Hash/CryptParallelHashNull.c
+  Hash/CryptSm3.c
+  Hmac/CryptHmac.c
+  Kdf/CryptHkdf.c
+  Cipher/CryptAes.c
+  Cipher/CryptAeadAesGcmNull.c
+  Pk/CryptRsaBasic.c
+  Pk/CryptRsaExtNull.c
+  Pk/CryptPkcs1OaepNull.c
+  Pk/CryptPkcs5Pbkdf2Null.c
+  Pk/CryptPkcs7SignNull.c
+  Pk/CryptPkcs7VerifyCommon.c
+  Pk/CryptPkcs7VerifyBase.c
+  Pk/CryptPkcs7VerifyEku.c
+  Pk/CryptDhNull.c
+  Pk/CryptX509Null.c
+  Pk/CryptAuthenticodeNull.c
+  Pk/CryptTsNull.c
+  Pk/CryptRsaPss.c
+  Pk/CryptRsaPssSignNull.c
+  Pk/CryptEcNull.c
+  Pem/CryptPemNull.c
+  Rand/CryptRandNull.c
+  Bn/CryptBnNull.c
+
+  SysCall/CrtWrapper.c
+  SysCall/DummyOpensslSupport.c
+  SysCall/BaseMemAllocation.c
+  SysCall/ConstantTimeClock.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  MbedTlsLib
+  OpensslLib
+  IntrinsicLib
+  PrintLib
+  PeiServicesTablePointerLib
+  PeiServicesLib
+  SynchronizationLib
+
+[Ppis]
+  gEfiPeiMpServicesPpiGuid
+#
+# Remove these [BuildOptions] after this library is cleaned up
+#
+[BuildOptions]
+  #
+  # suppress the following warnings so we do not break the build with warnings-as-errors:
+  # C4090: 'function' : different 'const' qualifiers
+  # C4718: 'function call' : recursive call has no side effects, deleting
+  #
+  MSFT:*_*_*_CC_FLAGS = /wd4090 /wd4718
+
+  GCC:*_CLANGDWARF_*_CC_FLAGS = -std=gnu99
+  GCC:*_CLANGPDB_*_CC_FLAGS = -std=c99 -Wno-error=incompatible-pointer-types
+
+  XCODE:*_*_*_CC_FLAGS = -std=c99

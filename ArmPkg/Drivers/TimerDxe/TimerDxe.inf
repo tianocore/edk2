@@ -1,0 +1,54 @@
+#/** @file
+#
+#    Component description file for Timer DXE module
+#
+#  Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmTimerDxe
+  FILE_GUID                      = 49ea041e-6752-42ca-b0b1-7344fe2546b7
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = TimerInitialize
+
+[Sources.common]
+  TimerDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  UefiDriverEntryPoint
+  IoLib
+  ArmGenericTimerCounterLib
+
+[Guids]
+
+[Protocols]
+  gEfiTimerArchProtocolGuid
+  gHardwareInterruptProtocolGuid
+
+[Pcd.common]
+  gEmbeddedTokenSpaceGuid.PcdTimerPeriod
+  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum
+
+[Depex]
+  gHardwareInterruptProtocolGuid

@@ -1,0 +1,136 @@
+## @file
+# CI configuration for SecurityPkg
+#
+# Copyright (c) Microsoft Corporation
+# Copyright (c) 2020 - 2024, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+    "PrEval": {
+        "DscPath": "SecurityPkg.dsc",
+    },
+    "LicenseCheck": {
+        "IgnoreFiles": [
+            "DeviceSecurity/SpdmLib/Include",
+        ]
+    },
+    "EccCheck": {
+        ## Exception sample looks like below:
+        ## "ExceptionList": [
+        ##     "<ErrorID>", "<KeyWord>"
+        ## ]
+        "ExceptionList": [
+            "8005", "gRT",
+            "8001", "DxeTpm2MeasureBootLibUnitTestMain",
+            "8001", "DxeTpmMeasureBootLibUnitTestMain"
+        ],
+        ## Both file path and directory path are accepted.
+        "IgnoreFiles": [
+            "Library/TcgStorageCoreLib/TcgStorageUtil.c",
+            "Library/TcgStorageCoreLib/TcgStorageCore.c",
+            "Library/Tpm2CommandLib/Tpm2NVStorage.c",
+            "DeviceSecurity/SpdmLib/Include",
+            "DeviceSecurity/SpdmLib/libspdm",
+            "DeviceSecurity/OsStub"
+        ]
+    },
+    "CompilerPlugin": {
+        "DscPath": "SecurityPkg.dsc"
+    },
+    ## options defined .pytool/Plugin/HostUnitTestCompilerPlugin
+    "HostUnitTestCompilerPlugin": {
+        "DscPath": "Test/SecurityPkgHostTest.dsc"
+    },
+    "CharEncodingCheck": {
+        "IgnoreFiles": []
+    },
+    "DependencyCheck": {
+        "AcceptableDependencies": [
+            "ArmPkg/ArmPkg.dec",
+            "EmbeddedPkg/EmbeddedPkg.dec",
+            "MdePkg/MdePkg.dec",
+            "MdeModulePkg/MdeModulePkg.dec",
+            "UefiCpuPkg/UefiCpuPkg.dec",
+            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec",
+            "SecurityPkg/SecurityPkg.dec",
+            "StandaloneMmPkg/StandaloneMmPkg.dec",
+            "CryptoPkg/CryptoPkg.dec"
+        ],
+        # For host based unit tests
+        "AcceptableDependencies-HOST_APPLICATION":[],
+        # For UEFI shell based apps
+        "AcceptableDependencies-UEFI_APPLICATION":[],
+        "IgnoreInf": []
+    },
+    "DscCompleteCheck": {
+        "DscPath": "SecurityPkg.dsc",
+        "IgnoreInf": []
+    },
+    ## options defined .pytool/Plugin/HostUnitTestDscCompleteCheck
+    "HostUnitTestDscCompleteCheck": {
+        "IgnoreInf": [""],
+        "DscPath": "Test/SecurityPkgHostTest.dsc"
+    },
+    "GuidCheck": {
+        "IgnoreGuidName": [],
+        "IgnoreGuidValue": ["00000000-0000-0000-0000-000000000000"],
+        "IgnoreFoldersAndFiles": [],
+        "IgnoreDuplicates": [
+            "Tpm2InstanceLibDTpm=gEfiTpmDeviceInstanceTpm20DtpmGuid", #  by design
+        ]
+    },
+    "LibraryClassCheck": {
+        "IgnoreHeaderFile": [
+            "DeviceSecurity/SpdmLib/Include/library",
+            "DeviceSecurity/SpdmLib/libspdm/include/library",
+        ],
+        "skip": True
+    },
+
+    ## options defined ci/Plugin/SpellCheck
+    "SpellCheck": {
+        "AuditOnly": True,           # Fails test but run in AuditOnly mode to collect log
+        "ExtendWords": [             # words to extend to the dictionary for this package
+            "shortformed", # tpm acpi
+            "autodetect",
+            "blocksid",
+            "comid",
+            "cpinsidpin", #OpalSScV2
+            "ecdsa", # TPM
+            "ecschnorr", # TPM
+            "eisaid", # ACPI
+            "harddisk",
+            "hashall",
+            "hashto",
+            "kek's",
+            "lfanew", # PE/COFF
+            "pcrindex",
+            "pkglength",
+            "ppuser",
+            "preos",
+            "stclear",
+            "toctou",
+            "tpm's",
+            "tpmcmdbuflength",
+            "tpmcommlib",
+            "tpmnvvaluelength",
+            "wrlocked",
+            "xored"
+        ],
+        "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
+        "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
+    },
+
+    "Defines": {
+        "BLD_*_CONTINUOUS_INTEGRATION": "TRUE",
+    },
+
+    "DebugMacroCheck": {
+      "StringSubstitutions": {
+          # SecurityPkg/IntelTdx/TdTcg2Dxe/TdTcg2Dxe.c
+          # Reason: Acknowledging use of two format specifiers in string with one argument
+          #         Replace ternary operator in debug string with single specifier
+          'Index == COLUME_SIZE/2 ? " | %02x" : " %02x"': "%d"
+      }
+    }
+}

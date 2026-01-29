@@ -1,0 +1,17 @@
+// /** @file
+// Platform console driver manages console devices.
+//
+// Console Platfrom DXE Driver that specifies whether device can be used as console
+// input/output device or error output device and update global variables accordingly.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Manages console devices"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Console Platform DXE Driver that specifies whether a device can be used as console input/output device or error output device and updates global variables accordingly."
+

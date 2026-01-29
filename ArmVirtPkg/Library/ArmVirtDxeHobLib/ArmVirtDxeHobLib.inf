@@ -1,0 +1,35 @@
+## @file
+# Instance of HOB Library using HOB list from EFI Configuration Table, with
+# DebugLib dependency removed
+#
+# HOB Library implementation that retrieves the HOB List
+#  from the System Configuration Table in the EFI System Table.
+#
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmVirtDxeHobLib
+  FILE_GUID                      = 3CD90EEC-EBF3-425D-AAE8-B16215AC4F50
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = HobLib|DXE_DRIVER DXE_RUNTIME_DRIVER SMM_CORE DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = HobLibConstructor
+
+[Sources]
+  HobLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+
+[Guids]
+  gEfiHobListGuid                               ## CONSUMES  ## SystemTable

@@ -1,0 +1,43 @@
+## @file
+#  Runtime DXE part corresponding to StandaloneMM Tcg2 module.
+#
+#  This module installs gTcg2MmSwSmiRegisteredGuid to notify readiness of
+#  StandaloneMM Tcg2 module.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = Tcg2MmDependencyDxe
+  FILE_GUID                      = 94C210EA-3113-4563-ADEB-76FE759C2F46
+  MODULE_TYPE                    = DXE_DRIVER
+  ENTRY_POINT                    = Tcg2MmDependencyDxeEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+#
+
+[Sources]
+  Tcg2MmDependencyDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Guids]
+  gTcg2MmSwSmiRegisteredGuid         ## PRODUCES             ## GUID # Install protocol
+
+[Depex]
+  gEfiMmCommunication2ProtocolGuid

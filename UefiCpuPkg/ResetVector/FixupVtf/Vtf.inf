@@ -1,0 +1,33 @@
+## @file
+#  Reset Vector
+#
+#  This VTF requires build time fixups in order to find the SEC entry point.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ResetVector
+  FILE_GUID                      = 1BA0062E-C779-4582-8566-336AE8F78F09
+  MODULE_TYPE                    = USER_DEFINED
+  VERSION_STRING                 = 1.1
+  MODULE_UNI_FILE                = ResetVector.uni
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  Vtf.nasmb
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  ResetVectorExtra.uni

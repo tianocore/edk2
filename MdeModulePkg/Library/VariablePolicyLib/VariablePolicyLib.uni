@@ -1,0 +1,12 @@
+// /** @file
+// VariablePolicyLib.uni
+//
+// Copyright (c) Microsoft Corporation.
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Library containing the business logic for the VariablePolicy engine"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Library containing the business logic for the VariablePolicy engine"

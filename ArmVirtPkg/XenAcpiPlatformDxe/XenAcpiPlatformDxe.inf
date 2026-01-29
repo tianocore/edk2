@@ -1,0 +1,45 @@
+## @file
+#  Xen ARM ACPI Platform Driver using Xen ARM multiboot protocol
+#
+#  Copyright (C) 2016, Linaro Ltd. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = XenAcpiPlatformDxe
+  FILE_GUID                      = 0efc6282-f1e5-469a-8a70-194a8761f9aa
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = XenAcpiPlatformEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources]
+  XenAcpiPlatformDxe.c
+
+[Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                     ## PROTOCOL ALWAYS_CONSUMED
+  gFdtClientProtocolGuid                        ## CONSUMES
+
+[Depex]
+  gFdtClientProtocolGuid    AND
+  gEfiAcpiTableProtocolGuid

@@ -1,0 +1,71 @@
+## @file
+# Module entry point library for DXE core.
+#
+# Copyright (c) 2024, Arm Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = ArmStandaloneMmCoreEntryPoint
+  FILE_GUID                      = 16d7b2e4-a025-11ef-8931-6b032fa329a6
+  MODULE_TYPE                    = MM_CORE_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = StandaloneMmCoreEntryPoint|MM_CORE_STANDALONE
+
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources]
+  ArmStandaloneMmCoreEntryPoint.c
+  SetPermissions.c
+
+[Sources.AARCH64]
+  AArch64/ModuleEntryPoint.S
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  StandaloneMmMmuLib
+  ArmSvcLib
+  ArmTransferListLib
+  ArmFfaLib
+  StackCheckLib
+  HobLib
+
+[Guids]
+  gMpInformationHobGuid
+  gEfiMmPeiMmramMemoryReserveGuid
+  gEfiStandaloneMmNonSecureBufferGuid
+  gEfiHobListGuid
+
+[Protocols]
+  gEdkiiPiMmCpuDriverEpProtocolGuid
+  gEfiMmCommunication2ProtocolGuid
+  gEfiMmCommunication3ProtocolGuid
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdStMmStackSize
+
+# Standalone MM Core can be used as an OP-TEE trusted application and needs to do runtime^M
+# relocation in that scenario. It needs to be built as a position independent executable (PIE)^M
+# for this use case. However, PE targets do not support PIE, so only ELF targets^M
+# are built with these flags and support this scenario.
+[BuildOptions]
+  GCC:*_GCC_AARCH64_CC_FLAGS = -fpie
+  CLANGDWARF:*_CLANGDWARF_AARCH64_CC_FLAGS = -fpie

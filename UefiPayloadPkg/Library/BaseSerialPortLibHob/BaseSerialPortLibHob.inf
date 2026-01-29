@@ -1,0 +1,45 @@
+## @file
+#  SerialPortLib instance for UART information retrieved from bootloader.
+#
+#  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseSerialPortLibHob
+  FILE_GUID                      = d8d22930-e8ec-469f-8184-5a069149b2ff
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SerialPortLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PcdLib
+  IoLib
+  HobLib
+  TimerLib
+
+[Sources]
+  BaseSerialPortLibHob.c
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialLineControl
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialFifoControl
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialExtendedTxFifoSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseHardwareFlowControl
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio                 ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase            ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate                ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride          ## CONSUMES
+
+
+
+[Guids]
+  gUniversalPayloadSerialPortInfoGuid

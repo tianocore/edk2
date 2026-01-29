@@ -1,0 +1,20 @@
+// /** @file
+// PCI Library that layers on top of the PCI CFG2 PPI.
+//
+// This library produces the APIs from the PCI Library and implements
+// these APIs by calling into the EFI_PEI_PCI CFG2 PPI. One or more EFI_PEI_PCI CFG2
+// PPIs are typically produced by a chipset specific PEIM. This library only uses
+// the first PPI found, so this library instance should only be used platforms
+// with a single PCI segment.
+//
+// Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "PCI Library that layers on top of the PCI CFG2 PPI"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library produces the APIs from the PCI Library, and implements these APIs by calling into the EFI_PEI_PCI CFG2 PPI. One or more EFI_PEI_PCI CFG2 PPIs are typically produced by a chipset-specific PEIM. This library only uses the first PPI found, so this library instance should only be used on platforms with a single PCI segment."
+

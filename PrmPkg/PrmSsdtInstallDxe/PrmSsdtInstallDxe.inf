@@ -1,0 +1,52 @@
+## @file
+#  PRM SSDT Installation Driver
+#
+#  This driver installs the PRM SSDT.
+#  * Not all PRM implementations may need this support and if it is not needed, the driver
+#    can simply be removed from the platform build.
+#  * The platform may also choose to use this driver but modify the ASL file.
+#
+#  Copyright (c) Microsoft Corporation
+#  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PrmSsdtInstallDxe
+  FILE_GUID                      = B0423E2F-3B2C-4A36-BF98-3EB3B4B7CB0E
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PrmSsdtInstallEntryPoint
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  PrmSsdtInstallDxe.c
+  Prm.asl
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  PrmPkg/PrmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DxeServicesLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId            ## CONSUMES
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid
+
+[Depex]
+  gEfiAcpiTableProtocolGuid

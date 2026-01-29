@@ -1,0 +1,66 @@
+## @file
+#  SdDxe driver is used to manage the SD memory card device.
+#
+#  It produces BlockIo and BlockIo2 protocols to allow upper layer
+#  access the SD memory card device.
+#
+#  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SdDxe
+  MODULE_UNI_FILE                = SdDxe.uni
+  FILE_GUID                      = 430AC2F7-EEC6-4093-94F7-9F825A7C1C40
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeSdDxe
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  gSdDxeDriverBinding
+#  COMPONENT_NAME                =  gSdDxeComponentName
+#  COMPONENT_NAME2               =  gSdDxeComponentName2
+#
+
+[Sources.common]
+  ComponentName.c
+  SdDxe.c
+  SdDxe.h
+  SdBlockIo.c
+  SdBlockIo.h
+  SdDiskInfo.c
+  SdDiskInfo.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DevicePathLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  UefiLib
+  BaseLib
+  UefiDriverEntryPoint
+  DebugLib
+
+[Protocols]
+  gEfiSdMmcPassThruProtocolGuid                ## TO_START
+  gEfiBlockIoProtocolGuid                      ## BY_START
+  gEfiBlockIo2ProtocolGuid                     ## BY_START
+  gEfiEraseBlockProtocolGuid                   ## BY_START
+  gEfiDiskInfoProtocolGuid                     ## BY_START
+  ## TO_START
+  ## BY_START
+  gEfiDevicePathProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SdDxeExtra.uni

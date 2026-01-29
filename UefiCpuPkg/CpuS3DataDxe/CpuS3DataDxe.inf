@@ -1,0 +1,67 @@
+## @file
+#  ACPI CPU Data initialization module
+#
+#  This module initializes the ACPI_CPU_DATA structure and registers the address
+#  of this structure in the PcdCpuS3DataAddress PCD.  This is a generic/simple
+#  version of this module.  It does not provide a machine check handler or CPU
+#  register initialization tables for ACPI S3 resume.  It also only supports the
+#  number of CPUs reported by the MP Services Protocol, so this module does not
+#  support hot plug CPUs.  This module can be copied into a CPU specific package
+#  and customized if these additional features are required.
+#
+#  Copyright (c) 2013-2024, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2015, Red Hat, Inc.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CpuS3DataDxe
+  MODULE_UNI_FILE                = CpuS3DataDxe.uni
+  FILE_GUID                      = 4D2E57EE-0E3F-44DD-93C4-D3B57E96945D
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = CpuS3DataInitialize
+
+# The following information is for reference only and not required by the build
+# tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+
+[Sources]
+  CpuS3Data.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  BaseLib
+  MtrrLib
+  MemoryAllocationLib
+  LockBoxLib
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid         ## CONSUMES   ## Event
+  gEdkiiS3MtrrSettingGuid
+
+[Protocols]
+  gEfiMpServiceProtocolGuid          ## CONSUMES
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize    ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuS3DataAddress  ## PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable ## CONSUMES
+
+[Depex]
+  gEfiMpServiceProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  CpuS3DataDxeExtra.uni

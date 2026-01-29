@@ -1,0 +1,16 @@
+// /** @file
+// NULL LockBox library instance.
+//
+// NULL LockBox library instance.
+//
+// Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "NULL LockBox library instance"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "NULL LockBox library instance."
+

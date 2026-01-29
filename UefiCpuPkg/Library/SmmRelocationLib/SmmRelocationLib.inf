@@ -1,0 +1,61 @@
+## @file
+# SMM Relocation Lib for each processor.
+#
+# This Lib produces the SMM_BASE_HOB in HOB database which tells
+# the PiSmmCpuDxeSmm driver (runs at a later phase) about the new
+# SMBASE for each processor. PiSmmCpuDxeSmm driver installs the
+# SMI handler at the SMM_BASE_HOB.SmBase[Index]+0x8000 for processor
+# Index.
+#
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmRelocationLib
+  FILE_GUID                      = 853E97B3-790C-4EA3-945C-8F622FC47FE8
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SmmRelocationLib
+
+[Sources]
+  InternalSmmRelocationLib.h
+  SmramSaveStateConfig.c
+  SmmRelocationLib.c
+
+[Sources.Ia32]
+  Ia32/Semaphore.c
+  Ia32/SmmInit.nasm
+
+[Sources.X64]
+  X64/Semaphore.c
+  X64/SmmInit.nasm
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  CpuExceptionHandlerLib
+  CpuLib
+  DebugLib
+  HobLib
+  LocalApicLib
+  MemoryAllocationLib
+  PcdLib
+  PeiServicesLib
+
+[Guids]
+  gSmmBaseHobGuid                               ## HOB ALWAYS_PRODUCED
+  gEfiSmmSmramMemoryGuid                        ## CONSUMES
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber
+
+[FeaturePcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugSupport                        ## CONSUMES

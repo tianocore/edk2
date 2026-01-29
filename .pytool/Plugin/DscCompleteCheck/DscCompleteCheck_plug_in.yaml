@@ -1,0 +1,12 @@
+## @file
+# CiBuildPlugin used to confirm all INFs are listed in
+# the components section of package dsc
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "cibuild",
+  "name": "Dsc Complete Check Test",
+  "module": "DscCompleteCheck"
+}

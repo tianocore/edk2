@@ -1,0 +1,67 @@
+## @file
+#  This module provides one way to configurate VALN setting.
+#
+#  This module produces EFI HII Configuration Access Protocol to provide one way to
+#  configurate VALN setting
+#
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VlanConfigDxe
+  MODULE_UNI_FILE                = VlanConfigDxe.uni
+  FILE_GUID                      = E4F61863-FE2C-4b56-A8F4-08519BC439DF
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = VlanConfigDriverEntryPoint
+  UNLOAD_IMAGE                   = NetLibDefaultUnload
+
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  ComponentName.c
+  VlanConfigDriver.c
+  VlanConfigImpl.c
+  VlanConfigImpl.h
+  VlanConfig.vfr
+  VlanConfigStrings.uni
+  VlanConfigNvData.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  DebugLib
+  NetLib
+  HiiLib
+
+[Guids]
+  gEfiIfrTianoGuid                              ## SOMETIMES_PRODUCES ## UNDEFINED
+  ## SOMETIMES_CONSUMES ## UNDEFINED # HiiIsConfigHdrMatch   mVlanStorageName
+  ## SOMETIMES_PRODUCES ## UNDEFINED # HiiConstructConfigHdr mVlanStorageName
+  ## SOMETIMES_PRODUCES ## UNDEFINED # HiiGetBrowserData     mVlanStorageName
+  ## SOMETIMES_CONSUMES ## UNDEFINED # HiiSetBrowserData     mVlanStorageName
+  ## SOMETIMES_CONSUMES ## HII
+  gVlanConfigFormSetGuid
+
+[Protocols]
+  gEfiHiiConfigAccessProtocolGuid               ## BY_START
+  gEfiHiiConfigRoutingProtocolGuid              ## CONSUMES
+  gEfiVlanConfigProtocolGuid                    ## TO_START
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  VlanConfigDxeExtra.uni

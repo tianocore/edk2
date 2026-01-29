@@ -1,0 +1,10 @@
+// /** @file
+//
+// Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_PROPERTIES_MODULE_NAME
+#language en-US   "SPI host controller driver"

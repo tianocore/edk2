@@ -1,0 +1,32 @@
+#
+#  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DebugAgentSymbolsBaseLib
+  FILE_GUID                      = 9055e2e0-9b33-11e0-a7d7-0002a5d5c51b
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DebugAgentLib
+
+[Sources.common]
+  DebugAgentSymbolsBaseLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPkg/ArmPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  PcdLib
+  PeCoffExtraActionLib
+  PeCoffLib
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdSecureFvBaseAddress
+  gArmTokenSpaceGuid.PcdFvBaseAddress

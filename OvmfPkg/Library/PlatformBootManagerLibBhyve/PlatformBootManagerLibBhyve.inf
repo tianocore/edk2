@@ -1,0 +1,76 @@
+## @file
+#  Platform BDS customizations library.
+#
+#  Copyright (c) 2020, Rebecca Cran <rebecca@bsdio.com>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformBootManagerLibBhyve
+  FILE_GUID                      = b0de5f0d-f676-42da-8d00-86997ee0dbb4
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformBootManagerLib|DXE_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64 EBC
+#
+
+[Sources]
+  BdsPlatform.c
+  PlatformData.c
+  BdsPlatform.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SourceLevelDebugPkg/SourceLevelDebugPkg.dec
+  OvmfPkg/OvmfPkg.dec
+  SecurityPkg/SecurityPkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  PcdLib
+  UefiBootManagerLib
+  BootLogoLib
+  DevicePathLib
+  PciLib
+  QemuBootOrderLib
+  NvVarsFileLib
+  ReportStatusCodeLib
+  UefiLib
+  PlatformBmPrintScLib
+  Tcg2PhysicalPresenceLib
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+
+[Pcd.X64]
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock
+
+[Protocols]
+  gEfiDecompressProtocolGuid
+  gEfiPciRootBridgeIoProtocolGuid
+  gEfiS3SaveStateProtocolGuid                   # PROTOCOL SOMETIMES_CONSUMED
+  gEfiDxeSmmReadyToLockProtocolGuid             # PROTOCOL SOMETIMES_PRODUCED
+  gEfiLoadedImageProtocolGuid                   # PROTOCOL SOMETIMES_PRODUCED
+  gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL SOMETIMES_CONSUMED
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+  gRootBridgesConnectedEventGroupGuid
+  gUefiShellFileGuid

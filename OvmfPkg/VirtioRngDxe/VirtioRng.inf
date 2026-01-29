@@ -1,0 +1,40 @@
+## @file
+# This driver produces EFI_RNG_PROTOCOL instances for virtio-rng devices.
+#
+# Copyright (C) 2016, Linaro Ltd.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VirtioRngDxe
+  FILE_GUID                      = 58E26F0D-CBAC-4BBA-B70F-18221415665A
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = VirtioRngEntryPoint
+
+[Sources]
+  VirtioRng.c
+  VirtioRng.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+  VirtioLib
+
+[Protocols]
+  gEfiRngProtocolGuid              ## BY_START
+  gVirtioDeviceProtocolGuid        ## TO_START
+
+[Guids]
+  gEfiRngAlgorithmRaw

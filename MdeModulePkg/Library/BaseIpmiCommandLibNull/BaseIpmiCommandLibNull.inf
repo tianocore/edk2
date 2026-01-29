@@ -1,0 +1,34 @@
+## @file
+# NULL instance of IpmiCommandLib
+#
+# Component description file for IPMI Command Library.
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseIpmiCommandLibNull
+  FILE_GUID                      = 63F06EF8-B78A-4E7E-823E-D11A21059669
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = IpmiCommandLib
+
+[sources]
+  IpmiCommandLibNetFnApp.c
+  IpmiCommandLibNetFnTransport.c
+  IpmiCommandLibNetFnChassis.c
+  IpmiCommandLibNetFnStorage.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+

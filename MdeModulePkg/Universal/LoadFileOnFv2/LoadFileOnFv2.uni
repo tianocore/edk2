@@ -1,0 +1,18 @@
+// /** @file
+// LoadFileOnFv2 Localized Abstract and Description Content
+//
+// Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT
+#language en-US
+"Allows system to load files from an FV2-based firmware volume"
+
+#string STR_MODULE_DESCRIPTION
+#language en-US
+"This module allows the system to load a file from an FV2-based firmware "
+"volume. This version of the module only supports loading of files for the "
+"purpose of booting from a file."

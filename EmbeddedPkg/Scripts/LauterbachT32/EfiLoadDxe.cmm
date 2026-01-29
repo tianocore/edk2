@@ -1,0 +1,74 @@
+;
+; Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
+; Copyright (c) 2011, Hewlett-Packard Company. All rights reserved.<BR>
+; 
+; SPDX-License-Identifier: BSD-2-Clause-Patent
+; 
+
+  PARAMETERS &systbl
+
+  gosub FindDebugInfo &systbl
+  enddo
+
+FindDebugInfo:
+  LOCAL   &SystemTable &CfgTableEntries &ConfigTable &i &offset &dbghdr &dbgentries &dbgptr &dbginfo &loadedimg
+  ENTRY   &SystemTable
+  
+  &dbgentries=0
+  &CfgTableEntries=Data.Long(a:&SystemTable+0x68)
+  &ConfigTable=Data.Long(a:&SystemTable+0x70)
+  
+  print "config table is at &ConfigTable (&CfgTableEntries entries)"
+  
+  ; now search for debug info entry with guid 49152E77-1ADA-4764-B7A2-7AFEFED95E8B
+  ;	0x49152E77	0x47641ADA	0xFE7AA2B7	0x8B5ED9FE
+  &i=0
+  while &i<&CfgTableEntries
+  (
+    &offset=&ConfigTable+(&i*0x18)
+    if Data.Long(a:&offset)==0x49152E77
+    (
+      if Data.Long(a:&offset+4)==0x47641ADA
+      (
+        if Data.Long(a:&offset+8)==0xFE7AA2B7
+        (
+          if Data.Long(a:&offset+0xc)==0x8B5ED9FE
+          (
+            &dbghdr=Data.Long(a:&offset+0x10)
+            &dbgentries=Data.Long(a:&dbghdr+4)
+            &dbgptr=Data.Long(a:&dbghdr+8)
+          )
+        )
+      )
+    )
+    
+    &i=&i+1
+  )
+  
+  if &dbgentries==0
+  (
+    print "no debug entries found"
+    return
+  )
+  
+  print "debug table at &dbgptr (&dbgentries entries)"
+  
+  symbol.reset
+  
+  &i=0
+  while &i<&dbgentries
+  (
+    &dbginfo=Data.Long(a:&dbgptr+(&i*4))
+    if &dbginfo!=0
+    (
+      if Data.Long(a:&dbginfo)==1 ; normal debug info type
+      (
+        &loadedimg=Data.Long(a:&dbginfo+8)
+        &imagebaseptr=&loadedimg+0x40
+        &imagebase=Data.Long(a:&imagebaseptr)
+        do ~~~~/EfiProcessPeImage.cmm "&imagebase"
+      )
+    )
+    &i=&i+1
+  )
+  return

@@ -1,0 +1,31 @@
+## @file
+# SMM Core SMM Services Table Library.
+#
+# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PiSmmCoreSmmServicesTableLib
+  MODULE_UNI_FILE                = PiSmmCoreSmmServicesTableLib.uni
+  FILE_GUID                      = C427146A-2EF2-4af9-A85A-E09EA65EE47D
+  MODULE_TYPE                    = SMM_CORE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SmmServicesTableLib|SMM_CORE
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  CONSTRUCTOR                    = SmmCoreSmmServicesTableLibConstructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  PiSmmCoreSmmServicesTableLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+

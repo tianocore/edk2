@@ -1,0 +1,86 @@
+## @file
+#  Implementation of EFI HTTP protocol interfaces.
+#
+#  Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
+# (c) Copyright 2025 HP Development Company, L.P.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION               = 0x00010005
+  BASE_NAME                 = HttpDxe
+  FILE_GUID                 = 2366c20f-e15a-11e3-8bf1-e4115b28bc50
+  MODULE_TYPE               = UEFI_DRIVER
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = HttpDxeDriverEntryPoint
+  UNLOAD_IMAGE              = NetLibDefaultUnload
+  MODULE_UNI_FILE           = HttpDxe.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[Sources]
+  ComponentName.h
+  ComponentName.c
+  HttpDns.h
+  HttpDns.c
+  HttpDriver.h
+  HttpDriver.c
+  HttpImpl.h
+  HttpImpl.c
+  HttpProto.h
+  HttpProto.c
+  HttpsSupport.h
+  HttpsSupport.c
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  MemoryAllocationLib
+  BaseLib
+  UefiLib
+  DebugLib
+  NetLib
+  HttpLib
+  DpcLib
+  PrintLib
+  PcdLib
+
+[Protocols]
+  gEfiHttpServiceBindingProtocolGuid               ## BY_START
+  gEfiHttpProtocolGuid                             ## BY_START
+  gEfiHttpUtilitiesProtocolGuid                    ## CONSUMES
+  gEfiTcp4ServiceBindingProtocolGuid               ## TO_START
+  gEfiTcp4ProtocolGuid                             ## TO_START
+  gEfiTcp6ServiceBindingProtocolGuid               ## TO_START
+  gEfiTcp6ProtocolGuid                             ## TO_START
+  gEfiDns4ServiceBindingProtocolGuid               ## SOMETIMES_CONSUMES
+  gEfiDns4ProtocolGuid                             ## SOMETIMES_CONSUMES
+  gEfiDns6ServiceBindingProtocolGuid               ## SOMETIMES_CONSUMES
+  gEfiDns6ProtocolGuid                             ## SOMETIMES_CONSUMES
+  gEfiIp4Config2ProtocolGuid                       ## SOMETIMES_CONSUMES
+  gEfiIp6ConfigProtocolGuid                        ## SOMETIMES_CONSUMES
+  gEfiTlsServiceBindingProtocolGuid                ## SOMETIMES_CONSUMES
+  gEfiTlsProtocolGuid                              ## SOMETIMES_CONSUMES
+  gEfiTlsConfigurationProtocolGuid                 ## SOMETIMES_CONSUMES
+  gEdkiiHttpCallbackProtocolGuid                   ## SOMETIMES_CONSUMES
+
+[Guids]
+  gEfiTlsCaCertificateGuid                         ## SOMETIMES_CONSUMES  ## Variable:L"TlsCaCertificate"
+  gEdkiiHttpTlsCipherListGuid                      ## SOMETIMES_CONSUMES  ## Variable:L"HttpTlsCipherList"
+  gEfiCertX509Guid                                 ## SOMETIMES_CONSUMES  ## GUID  # Check the cert type
+
+[Pcd]
+  gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections       ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout              ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpDnsRetryInterval       ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpDnsRetryCount          ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpTransferBufferSize     ## CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  HttpDxeExtra.uni

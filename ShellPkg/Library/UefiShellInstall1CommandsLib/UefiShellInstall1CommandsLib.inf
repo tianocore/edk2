@@ -1,0 +1,46 @@
+##  @file
+#  Provides shell install1 functions
+#
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved. <BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = UefiShellInstall1CommandsLib
+  FILE_GUID                      = D250E364-51C6-49ed-AEBF-6D83F5130F74
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = ShellInstall1CommandsLibConstructor
+  DESTRUCTOR                     = ShellInstall1CommandsLibDestructor
+
+[Sources.common]
+  UefiShellInstall1CommandsLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  ShellCommandLib
+  ShellLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  SortLib
+  PrintLib
+  BcfgCommandLib
+
+[Pcd]
+  gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask ## CONSUMES
+
+[Guids]
+  gShellInstall1HiiGuid                         ## UNDEFINED

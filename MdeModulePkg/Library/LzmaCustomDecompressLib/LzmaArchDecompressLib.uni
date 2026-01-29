@@ -1,0 +1,18 @@
+// /** @file
+// LzmaArchCustomDecompressLib produces LZMA custom decompression algorithm with the converter for the different arch code.
+//
+// It is based on the LZMA SDK 4.65.
+// LZMA SDK 4.65 was placed in the public domain on 2009-02-03.
+// It was released on the http://www.7-zip.org/sdk.html website.
+//
+// Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "LzmaArchCustomDecompressLib produces LZMA custom decompression algorithm with the converter for the different arch code."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "It is based on the LZMA SDK 4.65. LZMA SDK 4.65 was placed in the public domain on 2009-02-03. It was released on the website http://www.7-zip.org/sdk.html ."
+

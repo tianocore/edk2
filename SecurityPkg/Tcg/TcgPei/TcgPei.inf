@@ -1,0 +1,89 @@
+## @file
+#  Initializes TPM device and measures FVs in PEI phase
+#
+#  This module will initialize TPM device, measure reported FVs and BIOS version.
+#  This module may also lock TPM physical presence and physicalPresenceLifetimeLock.
+#
+# Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TcgPei
+  MODULE_UNI_FILE                = TcgPei.uni
+  FILE_GUID                      = 2BE1E4A6-6505-43b3-9FFC-A3C8330E0432
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PeimEntryMA
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+# [BootMode]
+#   S3_RESUME                 ## SOMETIMES_CONSUMES
+#
+
+[Sources]
+  TcgPei.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  CryptoPkg/CryptoPkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  HobLib
+  PeimEntryPoint
+  PeiServicesLib
+  BaseMemoryLib
+  DebugLib
+  BaseCryptLib
+  Tpm12DeviceLib
+  TimerLib
+  PeiServicesTablePointerLib
+  BaseLib
+  PcdLib
+  MemoryAllocationLib
+  ReportStatusCodeLib
+  Tpm12CommandLib
+  PerformanceLib
+
+[Guids]
+  gTcgEventEntryHobGuid                                               ## PRODUCES               ## HOB
+  gTpmErrorHobGuid                                                    ## SOMETIMES_PRODUCES     ## HOB
+  gMeasuredFvHobGuid                                                  ## PRODUCES               ## HOB
+  gEfiTpmDeviceInstanceTpm12Guid                                      ## PRODUCES               ## GUID       # TPM device identifier
+  gEdkiiMigratedFvInfoGuid                                            ## SOMETIMES_CONSUMES     ## HOB
+
+[Ppis]
+  gPeiLockPhysicalPresencePpiGuid                                     ## SOMETIMES_CONSUMES     ## NOTIFY
+  gEfiPeiFirmwareVolumeInfoPpiGuid                                    ## SOMETIMES_CONSUMES     ## NOTIFY
+  gEfiPeiFirmwareVolumeInfo2PpiGuid                                   ## SOMETIMES_CONSUMES     ## NOTIFY
+  gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid                 ## SOMETIMES_CONSUMES
+  gPeiTpmInitializedPpiGuid                                           ## SOMETIMES_PRODUCES
+  gPeiTpmInitializationDonePpiGuid                                    ## PRODUCES
+  gEfiEndOfPeiSignalPpiGuid                                           ## SOMETIMES_CONSUMES     ## NOTIFY
+  gEdkiiTcgPpiGuid                                                    ## PRODUCES
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdPhysicalPresenceLifetimeLock       ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdPhysicalPresenceCmdEnable          ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdPhysicalPresenceHwEnable           ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString             ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid                    ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInitializationPolicy            ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmScrtmPolicy                     ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeSubClassTpmDevice        ## SOMETIMES_CONSUMES
+
+[Depex]
+  gEfiPeiMasterBootModePpiGuid AND
+  gEfiTpmDeviceSelectedGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  TcgPeiExtra.uni
+

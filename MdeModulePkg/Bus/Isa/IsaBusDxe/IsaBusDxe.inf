@@ -1,0 +1,60 @@
+## @file
+#  ISA Bus driver to manage the child devices attached to the ISA Host Controller.
+#
+#  This driver follows UEFI driver model and layers on ISA HC protocol defined
+#  in PI spec 1.2.1. It consumes the ISA Host Controller protocol produced by
+#  the ISA Host Controller and installs the ISA Host Controller Service Binding
+#  protocol on the ISA Host Controller's handle.
+#
+#  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = IsaBusDxe
+  MODULE_UNI_FILE                = IsaBusDxe.uni
+  FILE_GUID                      = DCBE6D66-D928-4138-8041-358F35CBCF80
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeIsaBus
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  gIsaBusDriverBinding
+#  COMPONENT_NAME                =  gIsaBusComponentName
+#  COMPONENT_NAME2               =  gIsaBusComponentName2
+#
+
+[Sources]
+  IsaBusDxe.h
+  IsaBusDxe.c
+  ComponentName.h
+  ComponentName.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiLib
+  DebugLib
+
+[Protocols]
+  ## CONSUMES
+  ## PRODUCES
+  gEfiIsaHcProtocolGuid
+  gEfiIsaHcServiceBindingProtocolGuid   ## PRODUCES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  IsaBusDxeExtra.uni

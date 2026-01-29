@@ -1,0 +1,76 @@
+## @file
+#  Provides ACPI methods for TPM 2.0 support
+#
+#  Spec Compliance Info:
+#     "TCG ACPI Specification Version 1.2 Revision 8"
+#     "Physical Presence Interface Specification Version 1.30 Revision 00.52"
+#       along with
+#     "Errata Version 0.4 for TCG PC Client Platform Physical Presence Interface Specification"
+#     "Platform Reset Attack Mitigation Specification Version 1.00"
+#    TPM2.0 ACPI device object
+#     "TCG PC Client Platform Firmware Profile Specification for TPM Family 2.0 Level 00 Revision 1.03 v51"
+#       along with
+#     "Errata for PC Client Specific Platform Firmware Profile Specification Version 1.0 Revision 1.03"
+#
+#  This driver implements TPM 2.0 definition block in ACPI table and
+#  registers SMI callback functions for Tcg2 physical presence and
+#  MemoryClear to handle the requests from ACPI method.
+#
+#  Caution: This module requires additional review when modified.
+#  This driver will have external input - variable and ACPINvs data in SMM mode.
+#  This external input must be validated carefully to avoid security issue.
+#
+# Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Tcg2StandaloneMm
+  FILE_GUID                      = D40F321F-5349-4724-B667-131670587861
+  MODULE_TYPE                    = MM_STANDALONE
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeTcgStandaloneMm
+
+[Sources]
+  Tcg2Smm.h
+  Tcg2Smm.c
+  Tcg2StandaloneMm.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  StandaloneMmDriverEntryPoint
+  MmServicesTableLib
+  DebugLib
+  Tcg2PhysicalPresenceLib
+  PcdLib
+  MemLib
+  HobLib
+
+[Guids]
+  ## SOMETIMES_PRODUCES ## Variable:L"MemoryOverwriteRequestControl"
+  ## SOMETIMES_CONSUMES ## Variable:L"MemoryOverwriteRequestControl"
+  gEfiMemoryOverwriteControlDataGuid
+
+  gEfiTpmDeviceInstanceTpm20DtpmGuid                            ## PRODUCES           ## GUID       # TPM device identifier
+  gTpmNvsMmGuid                                                 ## CONSUMES
+  gEdkiiTpmInstanceHobGuid
+
+[Protocols]
+  gEfiSmmSwDispatch2ProtocolGuid                                ## CONSUMES
+  gEfiSmmVariableProtocolGuid                                   ## CONSUMES
+  gEfiMmReadyToLockProtocolGuid                                 ## CONSUMES
+
+[Depex]
+  gEfiSmmSwDispatch2ProtocolGuid AND
+  gEfiSmmVariableProtocolGuid

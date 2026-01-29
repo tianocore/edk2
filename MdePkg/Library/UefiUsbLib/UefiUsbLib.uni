@@ -1,0 +1,17 @@
+// /** @file
+// Uefi Usb Library instance.
+//
+// This library instance provides most usb APIs to support the Hid requests defined in
+// Usb Hid 1.1 spec and the standard requests defined in Usb 1.1 spec.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "UEFI USB Library instance"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library instance provides most USB APIs to support the HID requests defined in the USB HID 1.1 specification and the standard requests defined in the USB 1.1 specification."
+

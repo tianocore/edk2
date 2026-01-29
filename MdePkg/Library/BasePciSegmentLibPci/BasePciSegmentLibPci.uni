@@ -1,0 +1,16 @@
+// /** @file
+// Instance of PCI Segment Library based on PCI Library.
+//
+// PCI Segment Library that layers on top of the PCI Library which only
+//  supports segment 0 PCI configuration access.
+//
+// Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Instance of PCI Segment Library based on PCI Library."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "PCI Segment Library that layers on top of the PCI Library which only supports segment 0 PCI configuration access."

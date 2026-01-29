@@ -1,0 +1,53 @@
+## @file
+# This driver produces GraphicsOutput protocol based on the GraphicsInfo HOB information.
+#
+# Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = GraphicsOutputDxe
+  FILE_GUID                      = 20830080-CC28-4169-9836-7F42B8D0C8C9
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeGraphicsOutput
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.common]
+  GraphicsOutput.h
+  GraphicsOutput.c
+  ComponentName.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DxeServicesTableLib
+  DebugLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  DevicePathLib
+  FrameBufferBltLib
+  UefiLib
+  HobLib
+
+[Guids]
+  gEfiGraphicsInfoHobGuid                       ## CONSUMES ## HOB
+  gEfiGraphicsDeviceInfoHobGuid                 ## CONSUMES ## HOB
+
+[Protocols]
+  gEfiGraphicsOutputProtocolGuid                ## BY_START
+  gEfiDevicePathProtocolGuid                    ## BY_START
+  gEfiPciIoProtocolGuid                         ## TO_START

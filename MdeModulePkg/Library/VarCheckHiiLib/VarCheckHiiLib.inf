@@ -1,0 +1,53 @@
+## @file
+#  VarCheckHiiLib library to register var check HII handler.
+#
+#  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VarCheckHiiLib
+  MODULE_UNI_FILE                = VarCheckHiiLib.uni
+  FILE_GUID                      = A34FBDD0-05D3-4AF7-A720-560E91AC8CDF
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_RUNTIME_DRIVER DXE_SMM_DRIVER
+  CONSTRUCTOR                    = VarCheckHiiLibConstructor
+
+[Sources]
+  VarCheckHiiLib.c
+  VarCheckHii.h
+  VarCheckHiiGenFromFv.c
+  VarCheckHiiGenFromHii.c
+  VarCheckHiiGen.c
+  VarCheckHiiGen.h
+  InternalVarCheckStructure.h
+  VarCheckHiiLibCommon.c
+  VarCheckHiiLibCommon.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  PcdLib
+  VarCheckLib
+
+[Guids]
+  gEdkiiIfrBitVarstoreGuid                  ## SOMETIMES_CONSUMES  ## GUID
+
+[Protocols]
+  gEfiFirmwareVolume2ProtocolGuid           ## SOMETIMES_CONSUMES
+  gEfiFirmwareVolumeBlock2ProtocolGuid      ## SOMETIMES_CONSUMES
+  gEfiHiiDatabaseProtocolGuid               ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVarCheckVfrDriverGuidArray   ## SOMETIMES_CONSUMES

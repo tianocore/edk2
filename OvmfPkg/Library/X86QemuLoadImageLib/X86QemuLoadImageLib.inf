@@ -1,0 +1,49 @@
+## @file
+#  X86 specific implementation of QemuLoadImageLib library class interface
+#  with support for loading mixed mode images and non-EFI stub images
+#
+#  Note that this implementation reads the cmdline (and possibly kernel, setup
+#  data, and initrd in the legacy boot mode) from fw_cfg directly.
+#
+#  Copyright (c) 2020, ARM Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.27
+  BASE_NAME                      = X86QemuLoadImageLib
+  FILE_GUID                      = 2304df80-e21d-4170-9c3c-113c878f7ac0
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = QemuLoadImageLib|DXE_DRIVER
+
+[Sources]
+  X86QemuLoadImageLib.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  MemoryAllocationLib
+  LoadLinuxLib
+  PrintLib
+  QemuFwCfgLib
+  QemuFwCfgSimpleParserLib
+  ReportStatusCodeLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiDevicePathProtocolGuid
+  gEfiLoadedImageProtocolGuid
+  gOvmfLoadedX86LinuxKernelProtocolGuid
+
+[Guids]
+  gQemuKernelLoaderFsMediaGuid
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr

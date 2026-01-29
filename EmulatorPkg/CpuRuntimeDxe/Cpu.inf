@@ -1,0 +1,67 @@
+## @file
+# Component description file for Cpu module.
+#
+# This CPU module abstracts the interrupt subsystem of a platform and the CPU-specific setjump-long pair.
+#
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Cpu
+  FILE_GUID                      = f3794b60-8985-11db-8e53-0040d02b1835
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeCpu
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  CpuIo.c
+  Cpu.c
+  CpuDriver.h
+  MpService.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  UefiDriverEntryPoint
+  UefiLib
+  HiiLib
+  DebugLib
+  BaseLib
+  EmuThunkLib
+  PcdLib
+
+[Protocols]
+  gEmuIoThunkProtocolGuid                       # PROTOCOL_NOTIFY SOMETIMES_CONSUMED
+  gEfiSmbiosProtocolGuid                        # PROTOCOL SOMETIMES_CONSUMED
+  gEfiCpuIo2ProtocolGuid                        # PROTOCOL ALWAYS_PRODUCED
+  gEfiCpuArchProtocolGuid                       # PROTOCOL ALWAYS_PRODUCED
+  gEmuThreadThunkProtocolGuid
+  gEfiMpServiceProtocolGuid
+
+[Guids]
+  gIdleLoopEventGuid                            ## CONSUMES ## GUID
+
+[Pcd]
+  gEmulatorPkgTokenSpaceGuid.PcdEmuMpServicesPollingInterval
+
+[Depex]
+  gEfiSmbiosProtocolGuid

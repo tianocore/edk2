@@ -1,0 +1,16 @@
+// /** @file
+// Library instance for I/O APIC library class
+//
+// Library instance for I/O APIC library class.
+//
+// Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Library instance for I/O APIC library class"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Library instance for I/O APIC library class."
+

@@ -1,0 +1,20 @@
+// /** @file
+// Instance of UEFI Library.
+//
+// The UEFI Library provides functions and macros that simplify the development of
+// UEFI Drivers and UEFI Applications.  These functions and macros help manage EFI
+// events, build simple locks utilizing EFI Task Priority Levels (TPLs), install
+// EFI Driver Model related protocols, manage Unicode string tables for UEFI Drivers,
+// and print messages on the console output and standard error devices.
+//
+// Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Instance of UEFI Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "The UEFI Library provides functions and macros that simplify the development of UEFI Drivers and UEFI Applications.  These functions and macros help manage EFI events, build simple locks utilizing EFI Task Priority Levels (TPLs), install EFI Driver Model related protocols, manage Unicode string tables for UEFI Drivers, and print messages on the console output and standard error devices."
+

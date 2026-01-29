@@ -1,0 +1,12 @@
+// /** @file
+// BaseCryptLib and TlsLib using the services of the EDK II Crypto Protocol/PPI.
+//
+// Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "BaseCryptLib and TlsLib using the services of the EDK II Crypto Protocol/PPI"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "BaseCryptLib and TlsLib using the services of the EDK II Crypto Protocol/PPI."

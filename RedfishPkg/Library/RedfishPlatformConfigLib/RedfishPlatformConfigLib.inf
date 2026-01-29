@@ -1,0 +1,41 @@
+##  @file
+#   Library for Redfish Platform Config Protocol
+#
+#   (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+#   SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = RedfishPlatformConfigLib
+  FILE_GUID                      = C920FD62-21AC-4638-B9F5-9612942290F6
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RedfishPlatformConfigLib| DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = RedfishPlatformConfigLibConstructor
+  DESTRUCTOR                     = RedfishPlatformConfigLibDestructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC RISCV64
+#
+
+[Sources]
+  RedfishPlatformConfigLib.c
+  RedfishPlatformConfigInternal.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  RedfishPkg/RedfishPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiLib
+
+[Protocols]
+  gEdkIIRedfishPlatformConfigProtocolGuid

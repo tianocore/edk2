@@ -1,0 +1,55 @@
+## @file
+#  Report Status Code Router PEIM which produces Report Stataus Code Handler PPI and Status Code PPI.
+#
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ReportStatusCodeRouterPei
+  MODULE_UNI_FILE                = ReportStatusCodeRouterPei.uni
+  FILE_GUID                      = A3610442-E69F-4DF3-82CA-2360C4031A23
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = GenericStatusCodePeiEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC (EBC is only for build)
+#
+
+[Sources]
+  ReportStatusCodeRouterPei.c
+  ReportStatusCodeRouterPei.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  PeiServicesLib
+  DebugLib
+  HobLib
+
+[Guids]
+  ## PRODUCES ## HOB
+  ## CONSUMES ## HOB
+  gStatusCodeCallbackGuid
+
+[Ppis]
+  gEfiPeiRscHandlerPpiGuid                      ## PRODUCES
+  gEfiPeiStatusCodePpiGuid                      ## PRODUCES
+
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  ReportStatusCodeRouterPeiExtra.uni

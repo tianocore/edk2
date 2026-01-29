@@ -1,0 +1,51 @@
+## @file
+#  Component Description File For Universal Flash Storage Pci Host Controller Pei Module.
+#
+#  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UfsPciHcPei
+  MODULE_UNI_FILE                = UfsPciHcPei.uni
+  FILE_GUID                      = 905DC1AD-C44D-4965-98AC-B6B4444BFD65
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 0.9
+
+  ENTRY_POINT                    = InitializeUfsHcPeim
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  UfsPciHcPei.c
+  UfsPciHcPei.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PciLib
+  DebugLib
+  PeiServicesLib
+  MemoryAllocationLib
+  PeimEntryPoint
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUfsPciHostControllerMmioBase   ## CONSUMES
+
+[Ppis]
+  gEdkiiPeiUfsHostControllerPpiGuid         ## PRODUCES
+
+[Depex]
+  gEfiPeiMasterBootModePpiGuid AND gEfiPeiMemoryDiscoveredPpiGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  UfsPciHcPeiExtra.uni

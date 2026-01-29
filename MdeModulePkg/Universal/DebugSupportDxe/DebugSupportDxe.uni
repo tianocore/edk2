@@ -1,0 +1,19 @@
+// /** @file
+// This driver installs Debug Support protocol for the selected processor.
+//
+// This driver provides the capabilities for debug-agent to gain control of the machine
+// when certain types of events occur, i.e. breakpoint, processor execptions, etc. It also
+// provides debug-agent to periodically gain control during operation of the machine to
+// check for asynchronous commands form the host.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Installs Debug Support protocol for the selected processor"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver provides the capabilities for debug-agent to gain control of the machine when certain types of events occur, i.e. breakpoint, processor exceptions, etc. It also provides debug-agent to periodically gain control during operation of the machine to check for asynchronous commands from the host."
+

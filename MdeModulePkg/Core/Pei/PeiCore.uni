@@ -1,0 +1,22 @@
+// /** @file
+// PeiMain module is core module in PEI phase.
+//
+// It takes responsibilities of:
+// 1) Initialize memory, PPI, image services etc, to establish PEIM runtime environment.
+// 2) Dispatch PEIM from discovered FV.
+// 3) Handoff control to DxeIpl to load DXE core and enter DXE phase.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Core module in PEI phase"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "It takes responsibilities of:<BR>\n"
+                                                        "1) Initializing memory, PPI, image services etc., to establish the PEIM runtime environment.<BR>\n"
+                                                        "2) Dispatches PEIM from discovered FV.<BR>\n"
+                                                        "3) Handsoff control to DxeIpl to load DXE core and enters DXE phase.<BR>"
+

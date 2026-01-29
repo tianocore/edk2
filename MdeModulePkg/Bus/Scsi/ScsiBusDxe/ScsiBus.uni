@@ -1,0 +1,17 @@
+// /** @file
+// The SCSI bus driver scans all SCSI devices and creates a device handle for each of them.
+//
+// Note that the driver will install the Device Path Protocol and SCSI I/O Protocol on
+// these handles.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Scans all SCSI devices; Creates a device handle for each device"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Note that the driver will install the Device Path Protocol and SCSI I/O Protocol on these handles."
+

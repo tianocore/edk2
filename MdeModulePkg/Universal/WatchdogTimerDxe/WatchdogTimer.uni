@@ -1,0 +1,16 @@
+// /** @file
+// Generic watchdog timer driver producing Watchdog Timer Architectural Protocol using UEFI APIs.
+//
+// A generic watchdog timer driver producing Watchdog Timer Architectural Protocol using UEFI APIs.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Generic watchdog timer driver producing Watchdog Timer Architectural Protocol using UEFI APIs"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "A generic watchdog timer driver producing Watchdog Timer Architectural Protocol using UEFI APIs."
+

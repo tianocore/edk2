@@ -1,0 +1,16 @@
+// /** @file
+// This driver measures SMBIOS table to TPM.
+//
+// This driver calculates SMBIOS table based on default policy and calls TPM interface to measure the updated SMBIOS table.
+//
+// Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "This driver measures SMBIOS table to TPM."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver calculates SMBIOS table based on default policy and calls TPM interface to measure the updated SMBIOS table."
+

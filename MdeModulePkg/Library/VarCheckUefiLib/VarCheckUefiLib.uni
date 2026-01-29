@@ -1,0 +1,16 @@
+// /** @file
+// NULL library class to register var check handler and variable property set for UEFI defined variables.
+//
+// NULL library class to register var check handler and variable property set for UEFI defined variables.
+//
+// Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "NULL library class to register var check handler and variable property set for UEFI defined variables"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "NULL library class to register var check handler and variable property set for UEFI defined variables."
+

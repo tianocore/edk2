@@ -1,0 +1,19 @@
+## @file
+#  FAT Package
+#
+#  FAT 32 Driver
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = FatPkg
+  PACKAGE_UNI_FILE               = FatPkg.uni
+  PACKAGE_GUID                   = 8EA68A2C-99CB-4332-85C6-DD5864EAA674
+  PACKAGE_VERSION                = 0.3
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  FatPkgExtra.uni

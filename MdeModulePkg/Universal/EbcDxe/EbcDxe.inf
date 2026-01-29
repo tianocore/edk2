@@ -1,0 +1,81 @@
+## @file
+#  Module that produces EBC Interpreter and EBC Debug Support protocols.
+#
+#  This module implements EFI Byte Code (EBC) Virtual Machine that can provide
+#  platform and processor-independent mechanisms for loading and executing EFI
+#  device drivers.
+#
+#  Copyright (c) 2015, The Linux Foundation. All rights reserved.
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EbcDxe
+  MODULE_UNI_FILE                = EbcDxe.uni
+  FILE_GUID                      = 13AC6DD0-73D0-11D4-B06B-00AA00BD6DE7
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeEbcDriver
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  EbcDebuggerHook.h
+  EbcDebuggerHook.c
+  EbcExecute.h
+  EbcExecute.c
+  EbcInt.h
+  EbcInt.c
+
+[Sources.Ia32]
+  Ia32/EbcSupport.c
+  Ia32/EbcLowLevel.nasm
+
+[Sources.X64]
+  X64/EbcSupport.c
+  X64/EbcLowLevel.nasm
+
+[Sources.AARCH64]
+  AArch64/EbcSupport.c
+  AArch64/EbcLowLevel.S
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  CacheMaintenanceLib
+  MemoryAllocationLib
+  PeCoffLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  UefiDriverEntryPoint
+  DebugLib
+  BaseLib
+
+
+[Protocols]
+  gEfiDebugSupportProtocolGuid                  ## PRODUCES
+  gEfiEbcProtocolGuid                           ## PRODUCES
+  gEdkiiPeCoffImageEmulatorProtocolGuid         ## PRODUCES
+  gEfiEbcVmTestProtocolGuid                     ## SOMETIMES_PRODUCES
+  gEfiEbcSimpleDebuggerProtocolGuid             ## SOMETIMES_CONSUMES
+
+[Depex]
+  TRUE
+
+# [Event]
+#
+# Periodic timer event to support EFI debug support protocol for EBC image.
+#
+# EVENT_TYPE_PERIODIC_TIMER ## CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  EbcDxeExtra.uni

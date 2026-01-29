@@ -1,0 +1,56 @@
+## @file
+#  This driver measures microcode patches to TPM.
+#
+#  This driver consumes gEdkiiMicrocodePatchHobGuid, packs all unique
+#  microcode patch found in gEdkiiMicrocodePatchHobGuid to a binary blob,
+#  and measures the binary blob to TPM.
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MicrocodeMeasurementDxe
+  MODULE_UNI_FILE                = MicrocodeMeasurementDxe.uni
+  FILE_GUID                      = 0A32A803-ACDF-4C89-8293-91011548CD91
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = MicrocodeMeasurementDriverEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  MicrocodeMeasurementDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  UefiLib
+  UefiDriverEntryPoint
+  DebugLib
+  HobLib
+  MicrocodeLib
+  TpmMeasurementLib
+
+[Guids]
+  gEdkiiMicrocodePatchHobGuid           ## CONSUMES ## HOB
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  MicrocodeMeasurementDxeExtra.uni
+
+[Depex]
+  TRUE

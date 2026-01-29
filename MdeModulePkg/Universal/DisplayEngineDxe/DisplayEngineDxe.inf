@@ -1,0 +1,62 @@
+## @file
+# The DXE driver produces FORM DISPLAY ENGIEN protocol.
+#
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DisplayEngine
+  MODULE_UNI_FILE                = DisplayEngine.uni
+  FILE_GUID                      = E660EA85-058E-4b55-A54B-F02F83A24707
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeDisplayEngine
+  UNLOAD_IMAGE                   = UnloadDisplayEngine
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  FormDisplayStr.uni
+  FormDisplay.c
+  FormDisplay.h
+  ProcessOptions.c
+  InputHandler.c
+  Popup.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DebugLib
+  BaseMemoryLib
+  BaseLib
+  PrintLib
+  HiiLib
+  MemoryAllocationLib
+  CustomizedDisplayLib
+
+[Protocols]
+  gEdkiiFormDisplayEngineProtocolGuid   ## PRODUCES
+  gEdkiiFormBrowserEx2ProtocolGuid      ## CONSUMES
+  gEfiHiiPopupProtocolGuid              ## PRODUCES
+
+[Depex]
+  gEfiHiiDatabaseProtocolGuid AND gEfiHiiConfigRoutingProtocolGuid AND gEdkiiFormBrowserEx2ProtocolGuid
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBrowserGrayOutTextStatement     ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBrowerGrayOutReadOnlyMenu       ## CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  DisplayEngineExtra.uni

@@ -1,0 +1,42 @@
+##  @file
+#  Provides shell install1 functions
+#
+#  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved. <BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = UefiShellBcfgCommandLib
+  FILE_GUID                      = F6A3BF5D-4095-4E4F-9670-408770C2DBDF
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.1
+  LIBRARY_CLASS                  = BcfgCommandLib|UEFI_APPLICATION UEFI_DRIVER
+
+[Sources.common]
+  UefiShellBcfgCommandLib.c
+  UefiShellBcfgCommandLib.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  ShellCommandLib
+  ShellLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  SortLib
+  PrintLib
+  UefiBootManagerLib
+
+[Guids]
+  gShellBcfgHiiGuid             ## SOMETIMES_CONSUMES ## HII

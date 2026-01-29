@@ -1,0 +1,46 @@
+## @file
+# A hook-in library for:
+# - MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
+# - MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+# - MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf
+#
+# Plugging this library instance into one of the above modules makes that
+# variable service backend wait for another platform module to dynamically
+# initialize or verify EFI_FIRMWARE_VOLUME_HEADER and VARIABLE_STORE_HEADER in
+# the non-volatile variable store FVB device. The initialization / verification
+# is signaled by installing gEdkiiNvVarStoreFormattedGuid into the
+# phase-matching PPI or protocol database, with a NULL interface. (Note that
+# installing gEdkiiNvVarStoreFormattedGuid into either the DXE or the MM
+# protocol database will unblock VariableSmm -- refer to EFI_SECTION_MM_DEPEX
+# in the PI spec.)
+#
+# Copyright (C) 2018, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.27
+  BASE_NAME                      = NvVarStoreFormattedLib
+  FILE_GUID                      = 78f76ae8-ae62-4455-8148-c3a7ebaaa3f3
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NvVarStoreFormattedLib|PEIM DXE_RUNTIME_DRIVER DXE_DRIVER DXE_SMM_DRIVER
+  CONSTRUCTOR                    = NvVarStoreFormattedInitialize
+
+[Sources]
+  NvVarStoreFormattedLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+#
+# The matching DEPEX section below will generate the EFI_SECTION_PEI_DEPEX,
+# EFI_SECTION_DXE_DEPEX or EFI_SECTION_MM_DEPEX leaf section for the PEIM
+# (EFI_FV_FILETYPE_PEIM), DXE_RUNTIME_DRIVER/DXE_DRIVER (EFI_FV_FILETYPE_DRIVER), or
+# DXE_SMM_DRIVER (EFI_FV_FILETYPE_MM) module, respectively.
+#
+[Depex.common.PEIM, Depex.common.DXE_RUNTIME_DRIVER, Depex.common.DXE_DRIVER, Depex.common.DXE_SMM_DRIVER]
+  gEdkiiNvVarStoreFormattedGuid

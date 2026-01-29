@@ -1,0 +1,78 @@
+## @file
+#  Produces EFI_RAM_DISK_PROTOCOL and provides the capability to
+#  create/remove RAM disks in a setup browser.
+#
+#  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION               = 0x00010005
+  BASE_NAME                 = RamDiskDxe
+  MODULE_UNI_FILE           = RamDiskDxe.uni
+  FILE_GUID                 = 28A03FF4-12B3-4305-A417-BB1A4F94081E
+  MODULE_TYPE               = DXE_DRIVER
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = RamDiskDxeEntryPoint
+  UNLOAD_IMAGE              = RamDiskDxeUnload
+
+[Sources]
+  RamDiskDriver.c
+  RamDiskImpl.c
+  RamDiskBlockIo.c
+  RamDiskProtocol.c
+  RamDiskFileExplorer.c
+  RamDiskImpl.h
+  RamDiskHii.vfr
+  RamDiskHiiStrings.uni
+  RamDiskNVData.h
+  RamDisk.asl
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  UefiLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiHiiServicesLib
+  MemoryAllocationLib
+  HiiLib
+  FileExplorerLib
+  DevicePathLib
+  PrintLib
+  PcdLib
+  DxeServicesLib
+
+[Guids]
+  gEfiIfrTianoGuid                               ## PRODUCES            ## GUID  # HII opcode
+  ## PRODUCES                ## HII
+  ## CONSUMES                ## HII
+  gRamDiskFormSetGuid
+  gEfiVirtualDiskGuid                            ## SOMETIMES_CONSUMES  ## GUID
+  gEfiFileInfoGuid                               ## SOMETIMES_CONSUMES  ## GUID  # Indicate the information type
+
+[Protocols]
+  gEfiRamDiskProtocolGuid                        ## PRODUCES
+  gEfiHiiConfigAccessProtocolGuid                ## PRODUCES
+  gEfiDevicePathProtocolGuid                     ## PRODUCES
+  gEfiBlockIoProtocolGuid                        ## PRODUCES
+  gEfiBlockIo2ProtocolGuid                       ## PRODUCES
+  gEfiAcpiTableProtocolGuid                      ## SOMETIMES_CONSUMES
+  gEfiAcpiSdtProtocolGuid                        ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId            ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId       ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision      ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId        ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision  ## SOMETIMES_CONSUMES
+
+[Depex]
+  gEfiHiiConfigRoutingProtocolGuid  AND
+  gEfiHiiDatabaseProtocolGuid

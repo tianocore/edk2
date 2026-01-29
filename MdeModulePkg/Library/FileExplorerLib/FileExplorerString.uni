@@ -1,0 +1,55 @@
+///** @file
+//
+// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Module Name:
+//
+//   FileExplorerString.uni
+//
+// Abstract:
+//
+//   String definitions for file explorer library.
+//
+// Revision History:
+//
+// --*/
+/=#
+
+#langdef   en-US "English"
+#langdef   fr-FR "Français"
+
+#string STR_NULL_STRING                #language en-US  " "
+                                       #language fr-FR  " "
+#string STR_FILE_EXPLORER_TITLE        #language en-US  "File Explorer"
+                                       #language fr-FR  "File Explorer"
+#string STR_NEW_FILE                   #language en-US  "***NEW FILE***"
+                                       #language fr-FR  "***NEW FILE***"
+#string STR_NEW_FILE_HELP              #language en-US  "This menu used to create a new file in current directory, jump to next page to name the new file"
+                                       #language fr-FR  "This menu used to create a new file in current directory, jump to next page to name the new file"
+#string STR_ADD_NEW_FILE_TITLE         #language en-US  "Create a new file"
+                                       #language fr-FR  "Create a new file"
+#string STR_ADD_NEW_FOLDER_TITLE       #language en-US  "Create a new folder"
+                                       #language fr-FR  "Create a new folder"
+#string STR_NEW_FILE_NAME_PROMPT       #language en-US  "File Name"
+                                       #language fr-FR  "File Name"
+#string STR_NEW_FILE_NAME_HELP         #language en-US  "Please input a name for the new file"
+                                       #language fr-FR  "Please input a name for the new file"
+#string STR_CREATE_FILE_AND_EXIT       #language en-US  "Create File and Exit"
+                                       #language fr-FR  "Create File and Exit"
+#string STR_NO_CREATE_FILE_AND_EXIT    #language en-US  "Discard Create and Exit"
+                                       #language fr-FR  "Discard Create and Exit"
+#string STR_NEW_FOLDER                 #language en-US  "***NEW FOLDER***"
+                                       #language fr-FR  "***NEW FOLDER***"
+#string STR_NEW_FOLDER_HELP            #language en-US  "This menu used to create a new folder in current directory, jump to next page to name the new folder"
+                                       #language fr-FR  "This menu used to create a new folder in current directory, jump to next page to name the new folder"
+#string STR_ADD_NEW_FOLDER_TITLE       #language en-US  "Create a new folder"
+                                       #language fr-FR  "Create a new folder"
+#string STR_NEW_FOLDER_NAME_PROMPT     #language en-US  "Folder Name"
+                                       #language fr-FR  "Folder Name"
+#string STR_NEW_FOLDER_NAME_HELP       #language en-US  "Please input a name for the new folder"
+                                       #language fr-FR  "Please input a name for the new folder"
+#string STR_CREATE_FOLDER_AND_EXIT     #language en-US  "Create Folder and Exit"
+                                       #language fr-FR  "Create Folder and Exit"
+#string STR_NO_CREATE_FOLDER_AND_EXIT  #language en-US  "Discard Create and Exit"
+                                       #language fr-FR  "Discard Create and Exit"

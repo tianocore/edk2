@@ -1,0 +1,99 @@
+## @file
+#  Boot Maintenance Manager Library used by UiApp.
+#
+#  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BootMaintenanceManagerUiLib
+  MODULE_UNI_FILE                = BootMaintenanceManagerUiLib.uni
+  FILE_GUID                      = CA9E4824-4198-4715-AA22-E2935E703A07
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER UEFI_APPLICATION
+  CONSTRUCTOR                    = BootMaintenanceManagerUiLibConstructor
+  DESTRUCTOR                     = BootMaintenanceManagerUiLibDestructor
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  BootMaintenanceManager.h
+  BootMaintenanceManager.vfr
+  BootMaintenanceManagerStrings.uni
+  BootMaintenance.c
+  FormGuid.h
+  BootOption.c
+  ConsoleOption.c
+  Data.c
+  Variable.c
+  UpdatePage.c
+  BmLib.c
+  BootMaintenanceManagerCustomizedUi.c
+  BootMaintenanceManagerCustomizedUi.h
+  BootMaintenanceManagerCustomizedUiSupport.c
+  BootMaintenanceManagerCustomizedUiSupport.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DevicePathLib
+  BaseLib
+  UefiRuntimeServicesTableLib
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  PrintLib
+  HiiLib
+  UefiHiiServicesLib
+  UefiBootManagerLib
+  FileExplorerLib
+
+[Guids]
+  gEfiGlobalVariableGuid                        ## SOMETIMES_PRODUCES ## Variable:L"BootNext" (The number of next boot option)
+                                                ## SOMETIMES_PRODUCES ## Variable:L"BootXX" (Boot option variable)
+                                                ## SOMETIMES_PRODUCES ## Variable:L"PlatformLang" (Platform supported languange in Rfc4646 format)
+                                                ## SOMETIMES_PRODUCES ## Variable:L"Lang" (Platform supported languange in Iso639 format)
+                                                ## SOMETIMES_PRODUCES ## Variable:L"KeyXX" (Hotkey option variable)
+                                                ## PRODUCES           ## Variable:L"HwErrRecSupport" (The level of platform supported hardware Error Record Persistence)
+                                                ## SOMETIMES_PRODUCES ## Variable:L"BootOptionSupport" (The feature supported in boot option menu, value could be: EFI_BOOT_OPTION_SUPPORT_KEY, EFI_BOOT_OPTION_SUPPORT_APP
+                                                ## SOMETIMES_PRODUCES (not PcdUefiVariableDefaultLangDeprecate)## Variable:L"LangCodes" (Value of PcdUefiVariableDefaultLangCodes)
+                                                ## PRODUCES           ## Variable:L"PlatformLangCodes" (Value of PcdUefiVariableDefaultPlatformLangCodes)
+                                                ## PRODUCES           ## Variable:L"Timeout" (The time out value in second of showing progress bar)
+                                                ## SOMETIMES_PRODUCES ## Variable:L"BootOrder" (The boot option array)
+                                                ## SOMETIMES_PRODUCES ## Variable:L"DriverOrder" (The driver order list)
+                                                ## SOMETIMES_CONSUMES ## Variable:L"ConIn" (The device path of console in device)
+                                                ## SOMETIMES_CONSUMES ## Variable:L"ConOut" (The device path of console out device)
+                                                ## SOMETIMES_CONSUMES ## Variable:L"ErrOut" (The device path of error out device)
+  gEfiIfrTianoGuid                              ## SOMETIMES_CONSUMES ## GUID (Extended IFR Guid Opcode)
+  gEfiIfrFrontPageGuid                          ## CONSUMES ## GUID
+  gEfiIfrBootMaintenanceGuid                    ## CONSUMES ## GUID
+
+[Protocols]
+  gEfiSimpleFileSystemProtocolGuid              ## CONSUMES
+  gEfiLoadFileProtocolGuid                      ## CONSUMES
+  gEfiHiiConfigAccessProtocolGuid               ## CONSUMES
+  gEfiSerialIoProtocolGuid                      ## CONSUMES
+  gEfiDevicePathToTextProtocolGuid              ## CONSUMES
+  gEdkiiFormBrowserEx2ProtocolGuid              ## CONSUMES
+
+[FeaturePcd]
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow                  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn               ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut              ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutColumn          ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutRow             ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution      ## CONSUMES

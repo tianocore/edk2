@@ -1,0 +1,22 @@
+// /** @file
+// Performance library instance mainly for DxeCore usage.
+//
+// This library provides the performance measurement interfaces and initializes performance
+// logging for DXE phase. It first initializes its private global data structure for
+// performance logging and saves the performance GUIDed HOB passed from PEI phase.
+// It initializes DXE phase performance logging by publishing the Performance and PerformanceEx Protocol,
+// which is consumed by DxePerformanceLib to logging performance data in DXE phase.
+// This library is mainly used by DxeCore to start performance logging to ensure that
+// Performance and PerformanceEx Protocol are installed at the very beginning of DXE phase.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Performance library instance mainly for DxeCore usage"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library provides the performance measurement interfaces and initializes performance logging for DXE phase. It first initializes its private global data structure for performance logging and saves the performance GUIDed HOB passed from the PEI phase. It initializes DXE phase performance logging by publishing the Performance and PerformanceEx Protocol, which is consumed by DxePerformanceLib to logging performance data in DXE phase. This library is mainly used by DxeCore to start performance logging to ensure that Performance and PerformanceEx Protocol are installed at the very beginning of DXE phase."
+

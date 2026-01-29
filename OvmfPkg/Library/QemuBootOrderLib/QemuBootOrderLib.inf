@@ -1,0 +1,56 @@
+## @file
+#  Rewrite the BootOrder NvVar based on QEMU's "bootorder" fw_cfg file.
+#
+#  Copyright (C) 2012 - 2014, Red Hat, Inc.
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = QemuBootOrderLib
+  FILE_GUID                      = 1D677A58-C753-4AF1-B552-EFE142DF8F57
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = QemuBootOrderLib|DXE_DRIVER
+
+[Sources]
+  ExtraRootBusMap.c
+  ExtraRootBusMap.h
+  QemuBootOrderLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  QemuFwCfgLib
+  DebugLib
+  MemoryAllocationLib
+  UefiBootManagerLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseLib
+  PrintLib
+  DevicePathLib
+  BaseMemoryLib
+  OrderedCollectionLib
+
+[Guids]
+  gEfiGlobalVariableGuid
+  gVirtioMmioTransportGuid
+  gVMMBootOrderGuid
+
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+
+[Protocols]
+  gEfiDevicePathProtocolGuid                            ## CONSUMES
+  gEfiPciRootBridgeIoProtocolGuid                       ## CONSUMES

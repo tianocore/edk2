@@ -1,0 +1,12 @@
+// /** @file
+// Variable Flash Information Library
+//
+// Copyright (c) Microsoft Corporation<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT     #language en-US "UEFI variable flash information library"
+
+#string STR_MODULE_DESCRIPTION  #language en-US "Provides services to access UEFI variable flash information."

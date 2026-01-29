@@ -1,0 +1,49 @@
+## @file
+# Memory Allocation/Profile Library instance dedicated to SMM Core.
+# The implementation borrows the SMM Core Memory Allocation/Profile services as the primitive
+# for memory allocation/profile instead of using SMM System Table servces or SMM memory profile protocol in an indirect way.
+# It is assumed that this library instance must be linked with SMM Cre in this package.
+#
+# Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PiSmmCoreMemoryAllocationProfileLib
+  MODULE_UNI_FILE                = PiSmmCoreMemoryAllocationProfileLib.uni
+  FILE_GUID                      = D55E42AD-3E63-4536-8281-82C0F1098C5E
+  MODULE_TYPE                    = SMM_CORE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  LIBRARY_CLASS                  = MemoryAllocationLib|SMM_CORE
+  CONSTRUCTOR                    = PiSmmCoreMemoryAllocationLibConstructor
+  LIBRARY_CLASS                  = MemoryProfileLib|SMM_CORE
+  CONSTRUCTOR                    = PiSmmCoreMemoryProfileLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  MemoryAllocationLib.c
+  PiSmmCoreMemoryAllocationServices.h
+  PiSmmCoreMemoryProfileLib.c
+  PiSmmCoreMemoryProfileServices.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  BaseMemoryLib
+  UefiBootServicesTableLib
+
+[Guids]
+  gEdkiiMemoryProfileGuid   ## SOMETIMES_CONSUMES   ## GUID # Locate protocol
+

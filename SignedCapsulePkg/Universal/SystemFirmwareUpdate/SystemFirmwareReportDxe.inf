@@ -1,0 +1,62 @@
+## @file
+# SystemFirmware FMP report driver.
+#
+# Produce FMP instance to report system firmware EFI_FIRMWARE_IMAGE_DESCRIPTOR.
+#
+#  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SystemFirmwareReportDxe
+  MODULE_UNI_FILE                = SystemFirmwareReportDxe.uni
+  FILE_GUID                      = BC1A046C-7DBD-41F2-94E5-D7595554CAF4
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SystemFirmwareReportMainDxe
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  SystemFirmwareDxe.h
+  SystemFirmwareCommonDxe.c
+  SystemFirmwareReportDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SignedCapsulePkg/SignedCapsulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiLib
+  BaseMemoryLib
+  DebugLib
+  PcdLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  HobLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+  DxeServicesTableLib
+  EdkiiSystemCapsuleLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSystemFmpCapsuleImageTypeIdGuid  ## CONSUMES
+  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiSystemFirmwareImageDescriptor    ## CONSUMES
+
+[Protocols]
+  gEfiFirmwareManagementProtocolGuid     ## PRODUCES
+
+[Depex]
+  gEfiVariableArchProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SystemFirmwareReportDxeExtra.uni
+

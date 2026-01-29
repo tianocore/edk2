@@ -1,0 +1,17 @@
+// /** @file
+// Instance of I/O Library using CPU I/O PPI.
+//
+// I/O Library implementation that uses the CPU I/O PPI for I/O
+// and MMIO operations.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Instance of I/O Library using CPU I/O PPI"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "I/O Library implementation that uses the CPU I/O PPI for I/O and MMIO operations."
+

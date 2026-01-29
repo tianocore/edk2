@@ -1,0 +1,89 @@
+## @file
+# PcRtc driver to install EFI_REAL_TIME_CLOCK_ARCH_PROTOCOL.
+#
+# This driver provides GetTime, SetTime, GetWakeupTime, SetWakeupTime services to Runtime Service Table.
+# It will install a tagging protocol with gEfiRealTimeClockArchProtocolGuid.
+#
+# Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
+# Copyright (c) 2018 - 2020, ARM Limited. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PcRtc
+  MODULE_UNI_FILE                = PcRtc.uni
+  FILE_GUID                      = 378D7B65-8DA9-4773-B6E4-A47826A833E1
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializePcRtc
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  PcRtcEntry.c
+  PcRtc.c
+  PcRtc.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  PcAtChipsetPkg/PcAtChipsetPkg.dec
+
+[LibraryClasses]
+  UefiRuntimeServicesTableLib
+  UefiRuntimeLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  TimerLib
+  IoLib
+  BaseMemoryLib
+  UefiLib
+  DebugLib
+  BaseLib
+  PcdLib
+  ReportStatusCodeLib
+
+[Protocols]
+  gEfiRealTimeClockArchProtocolGuid             ## PRODUCES
+
+[Guids]
+  ## SOMETIMES_CONSUMES ## Event
+  ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiAcpi10TableGuid
+
+  ## SOMETIMES_CONSUMES ## Event
+  ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiAcpiTableGuid
+
+  gEfiEventVirtualAddressChangeGuid
+
+[FeaturePcd]
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcUseMmio                   ## CONSUMES
+
+[FixedPcd]
+  gPcAtChipsetPkgTokenSpaceGuid.PcdInitialValueRtcRegisterA     ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdInitialValueRtcRegisterB     ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdInitialValueRtcRegisterD     ## CONSUMES
+
+[Pcd]
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout   ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdMinimalValidYear             ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdMaximalValidYear             ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcDefaultYear               ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister             ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister            ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister64           ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister64          ## CONSUMES
+
+[Depex]
+  gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  PcRtcExtra.uni

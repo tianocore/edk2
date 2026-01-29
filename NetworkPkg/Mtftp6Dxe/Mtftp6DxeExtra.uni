@@ -1,0 +1,14 @@
+// /** @file
+// Mtftp6Dxe Localized Strings and Content
+//
+// Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_PROPERTIES_MODULE_NAME
+#language en-US
+"MTFTP6 DXE"
+
+

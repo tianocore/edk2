@@ -1,0 +1,70 @@
+## @file
+# PS2 Mouse Driver.
+#
+# This driver provides support for PS2 based mice.
+#
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Ps2MouseDxe
+  MODULE_UNI_FILE                = Ps2MouseDxe.uni
+  FILE_GUID                      = 08464531-4C99-4C4C-A887-8D8BA4BBB063
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializePs2Mouse
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#  DRIVER_BINDING                = gPS2MouseDriver;
+#  COMPONENT_NAME                = gPs2MouseComponentName;
+#  COMPONENT_NAME2               = gPs2MouseComponentName2;
+#
+
+[Sources]
+  ComponentName.c
+  CommPs2.h
+  CommPs2.c
+  Ps2Mouse.h
+  Ps2Mouse.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  ReportStatusCodeLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  UefiLib
+  UefiDriverEntryPoint
+  DebugLib
+  PcdLib
+  IoLib
+  DevicePathLib
+
+[Protocols]
+  gEfiSioProtocolGuid                           ## TO_START
+  gEfiSimplePointerProtocolGuid                 ## BY_START
+  gEfiDevicePathProtocolGuid                    ## TO_START
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPs2MouseExtendedVerification   ## CONSUMES
+
+#
+# [Event]
+#
+#   ##
+#   # Timer event used to check the mouse state at a regular interval.
+#   #
+#   EVENT_TYPE_PERIODIC_TIMER   ## CONSUMES
+#
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  Ps2MouseDxeExtra.uni

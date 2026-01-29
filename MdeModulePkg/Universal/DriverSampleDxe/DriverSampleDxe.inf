@@ -1,0 +1,96 @@
+## @file
+# This is a sample HII driver.
+#
+# This driver shows how HII protocol, VFR and UNI files are used to create a HII
+# driver which can be displayed and configured by a UEFI HII Form Browser.
+#
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DriverSample
+  MODULE_UNI_FILE                = DriverSample.uni
+  FILE_GUID                      = FE3542FE-C1D3-4EF8-657C-8048606FF671
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DriverSampleInit
+  UNLOAD_IMAGE                   = DriverSampleUnload
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DriverSample.c
+  InventoryStrings.uni
+  NVDataStruc.h
+  VfrStrings.uni
+  DriverSample.h
+  Inventory.vfr
+  Vfr.vfr
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  BaseLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  HiiLib
+  PrintLib
+  UefiLib
+  DevicePathLib
+
+[Guids]
+  gEfiIfrTianoGuid                              ## PRODUCES ## UNDEFINED
+  gDriverSampleInventoryGuid                    ## CONSUMES ## HII
+  ## SOMETIMES_PRODUCES ## Event
+  ## CONSUMES ## Event
+  gEfiIfrRefreshIdOpGuid
+  ## CONSUMES ## HII
+  ## PRODUCES ## Variable:L"MyIfrNVData"
+  ## SOMETIMES_CONSUMES ## Variable:L"MyIfrNVData"
+  ## PRODUCES ## Variable:L"MyEfiVar"
+  ## SOMETIMES_CONSUMES ## Variable:L"MyEfiVar"
+  ## PRODUCES ## GUID  # HiiConstructConfigHdr MyEfiVar
+  ## PRODUCES ## GUID  # HiiConstructConfigHdr MyIfrNVData
+  ## SOMETIMES_CONSUMES ## GUID  # HiiIsConfigHdrMatch MyEfiVar
+  ## SOMETIMES_CONSUMES ## GUID  # HiiIsConfigHdrMatch MyIfrNVData
+  ## SOMETIMES_PRODUCES ## GUID  # HiiGetBrowserData MyIfrNVData
+  ## SOMETIMES_CONSUMES ## GUID  # HiiSetBrowserData MyIfrNVData
+  ## SOMETIMES_PRODUCES ## GUID  # HiiGetBrowserData MyEfiVar
+  ## SOMETIMES_CONSUMES ## GUID  # HiiSetBrowserData MyEfiVar
+  gDriverSampleFormSetGuid
+
+[Protocols]
+  ## PRODUCES # DriverSampleFormSet
+  ## PRODUCES # DriverSampleInventory
+  gEfiDevicePathProtocolGuid
+  gEfiHiiStringProtocolGuid                     ## CONSUMES
+  gEfiHiiConfigRoutingProtocolGuid              ## CONSUMES
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
+  gEfiFormBrowser2ProtocolGuid                  ## CONSUMES
+  gEfiHiiDatabaseProtocolGuid                   ## CONSUMES
+  gEfiSimpleTextInputExProtocolGuid             ## SOMETIMES_CONSUMES
+  gEdkiiFormBrowserExProtocolGuid               ## CONSUMES
+  gEfiConfigKeywordHandlerProtocolGuid          ## CONSUMES
+  gEfiHiiPopupProtocolGuid                      ## CONSUMES
+
+[Depex]
+  gEfiSimpleTextOutProtocolGuid AND gEfiHiiDatabaseProtocolGuid AND gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  DriverSampleExtra.uni

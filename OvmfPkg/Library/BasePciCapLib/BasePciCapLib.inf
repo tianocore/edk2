@@ -1,0 +1,32 @@
+## @file
+# Work with PCI capabilities in PCI config space.
+#
+# Provides functions to parse capabilities lists, and to locate, describe, read
+# and write capabilities. PCI config space access is abstracted away.
+#
+# Copyright (C) 2018, Red Hat, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 1.27
+  BASE_NAME      = BasePciCapLib
+  FILE_GUID      = 6957540D-F7B5-4D5B-BEE4-FC14114DCD3C
+  MODULE_TYPE    = BASE
+  VERSION_STRING = 1.0
+  LIBRARY_CLASS  = PciCapLib
+
+[Sources]
+  BasePciCapLib.h
+  BasePciCapLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  OrderedCollectionLib

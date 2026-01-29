@@ -1,0 +1,43 @@
+## @file
+# DXE instance of Hsti Library.
+#
+# Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeHstiLib
+  MODULE_UNI_FILE                = DxeHstiLib.uni
+  FILE_GUID                      = 7DE1C620-F587-4116-A36D-40F3467B9A0C
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = HstiLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+[Sources]
+  HstiAip.c
+  HstiDxe.c
+  HstiDxe.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  UefiBootServicesTableLib
+
+[Guids]
+## SOMETIMES_PRODUCES ## GUID
+## SOMETIMES_CONSUMES ## GUID
+  gAdapterInfoPlatformSecurityGuid
+
+[Protocols]
+## SOMETIMES_PRODUCES
+## SOMETIMES_CONSUMES
+  gEfiAdapterInformationProtocolGuid
+

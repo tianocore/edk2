@@ -1,0 +1,73 @@
+## @file
+#  Performance library instance used by SMM Core.
+#
+#  This library provides the performance measurement interfaces and initializes performance
+#  logging for the SMM phase.
+#  It initializes SMM phase performance logging by publishing the SMM Performance and PerformanceEx Protocol,
+#  which is consumed by SmmPerformanceLib to logging performance data in SMM phase.
+#  This library is mainly used by SMM Core to start performance logging to ensure that
+#  SMM Performance and PerformanceEx Protocol are installed at the very beginning of SMM phase.
+#
+#  Copyright (c) 2011 - 2023, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = SmmCorePerformanceLib
+  MODULE_UNI_FILE                = SmmCorePerformanceLib.uni
+  FILE_GUID                      = 36290D10-0F47-42c1-BBCE-E191C7928DCF
+  MODULE_TYPE                    = SMM_CORE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = PerformanceLib|SMM_CORE
+
+  CONSTRUCTOR                    = SmmCorePerformanceLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  MmCorePerformanceLib.c
+  SmmCorePerformanceLibInternal.h
+  SmmCorePerformanceLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DxeServicesLib
+  MemoryAllocationLib
+  PcdLib
+  PeCoffGetEntryPointLib
+  SmmMemLib
+  SmmServicesTableLib
+  SynchronizationLib
+  TimerLib
+  UefiBootServicesTableLib
+  UefiLib
+
+[Protocols]
+  gEfiSmmBase2ProtocolGuid                  ## CONSUMES
+  gEdkiiSmmExitBootServicesProtocolGuid     ## CONSUMES ## NOTIFY
+  gEfiLoadedImageProtocolGuid               ## CONSUMES
+
+[Guids]
+  ## PRODUCES ## SystemTable
+  gPerformanceProtocolGuid
+  gZeroGuid                                 ## SOMETIMES_CONSUMES ## GUID
+  gEdkiiSmmPerformanceMeasurementProtocolGuid             ## PRODUCES ## UNDEFINED # Install protocol
+  gEfiFirmwarePerformanceGuid               ## SOMETIMES_PRODUCES ## UNDEFINED # SmiHandlerRegister
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEdkiiFpdtStringRecordEnableOnly ## CONSUMES

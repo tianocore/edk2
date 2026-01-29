@@ -1,0 +1,13 @@
+// /** @file
+// Null instance of FmpDependencyCheckLib as an option to skip the dependency
+// check when updating the firmware image of a FMP device.
+//
+// Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT     #language en-US  "FMP Dependency Check Library NULL instance"
+
+#string STR_MODULE_DESCRIPTION  #language en-US  "Null instance of FmpDependencyCheckLib as an option to skip the dependency check when updating the firmware image of a FMP device."

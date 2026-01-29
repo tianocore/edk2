@@ -1,0 +1,56 @@
+## @file
+# S3 SMM Boot Script Save State driver.
+#
+# It will install S3 SMM Save State protocol to store or record various IO operations to be replayed during an S3 resume.
+#
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmS3SaveState
+  MODULE_UNI_FILE                = SmmS3SaveState.uni
+  FILE_GUID                      = 2D59F041-53A4-40d0-A6CD-844DC0DFEF17
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+
+  ENTRY_POINT                    = InitializeSmmS3SaveState
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  SmmS3SaveState.c
+  InternalSmmSaveState.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  SmmServicesTableLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  BaseLib
+  S3BootScriptLib
+  PcdLib
+
+[Protocols]
+  gEfiS3SmmSaveStateProtocolGuid                ## PRODUCES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable     ## CONSUMES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SmmS3SaveStateExtra.uni

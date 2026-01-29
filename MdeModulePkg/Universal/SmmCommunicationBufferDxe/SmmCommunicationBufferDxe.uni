@@ -1,0 +1,18 @@
+// /** @file
+// A driver allocates common SMM communication buffer in EfiReservedMemoryType.
+//
+// This driver allocates common SMM communication buffer in EfiReservedMemoryType,
+// then it publishes the information to EFI configuration table with
+// gEdkiiPiSmmCommunicationRegionTableGuid.
+// Any other driver or application can get the table and know the common
+// communication buffer.
+//
+// Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "A driver allocates common SMM communication buffer in EfiReservedMemoryType."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver allocates common SMM communication buffer in EfiReservedMemoryType, then it publishes the information to EFI configuration table with gEdkiiPiSmmCommunicationRegionTableGuid. Any other driver or application can get the table and know the common communication buffer."

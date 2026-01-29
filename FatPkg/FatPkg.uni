@@ -1,0 +1,20 @@
+// /** @file
+// Module implementations for FAT file system, FAT 32 UEFI Driver and FAT PEI Module
+//
+// FAT Package
+//
+// FAT 32 Driver
+//
+// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_PACKAGE_ABSTRACT            #language en-US "Module implementations for FAT file system, FAT 32 UEFI Driver and FAT PEI Module"
+
+#string STR_PACKAGE_DESCRIPTION         #language en-US "This Package contains module implementation about FAT file system, FAT 32 UEFI Driver and FAT PEI Module."
+
+
+

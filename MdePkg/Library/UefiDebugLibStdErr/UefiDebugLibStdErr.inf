@@ -1,0 +1,51 @@
+## @file
+#  Instance of Debug Library using the Standard Error Device.
+#
+#  Debug Lib that sends messages to the the Standard Error Device in the EFI System Table.
+#
+#  Copyright (c) 2018, Microsoft Corporation
+#
+#  Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UefiDebugLibStdErr
+  MODULE_UNI_FILE                = UefiDebugLibStdErr.uni
+  FILE_GUID                      = b57a1df6-ffdb-4247-a3df-3a562176751a
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DebugLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+  CONSTRUCTOR                    = DxeDebugLibConstructor
+  DESTRUCTOR                     = DxeDebugLibDestructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DebugLib.c
+  DebugLibConstructor.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+[LibraryClasses]
+  BaseMemoryLib
+  BaseLib
+  PcdLib
+  PrintLib
+  DebugPrintErrorLevelLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue   ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask       ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel ## CONSUMES
+

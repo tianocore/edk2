@@ -1,0 +1,36 @@
+## @file
+# Module entry point library for UEFI Application.
+#
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UefiApplicationEntryPoint
+  MODULE_UNI_FILE                = UefiApplicationEntryPoint.uni
+  FILE_GUID                      = DADE8301-CB29-4fd5-8148-56FD246C5B88
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = UefiApplicationEntryPoint|UEFI_APPLICATION
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  ApplicationEntryPoint.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  DebugLib
+  BaseLib
+  StackCheckLib
+

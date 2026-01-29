@@ -1,0 +1,44 @@
+## @file
+#  Pei Crc32 Guided Section Extract library.
+#
+#  This library doesn't produce any library class. The constructor function uses
+#  ExtractGuidedSectionLib service to register CRC32 guided section handler
+#  that parses CRC32 encapsulation section and extracts raw data.
+#
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiCrc32GuidedSectionExtractLib
+  FILE_GUID                      = 1EBE57F5-BE42-45f0-A1F9-FA3DC633910B
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|PEI_CORE PEIM
+  CONSTRUCTOR                    = PeiCrc32GuidedSectionExtractLibConstructor
+  MODULE_UNI_FILE                = PeiCrc32GuidedSectionExtractLib.uni
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC (EBC is for build only)
+#
+
+[Sources]
+  PeiCrc32GuidedSectionExtractLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  ExtractGuidedSectionLib
+  DebugLib
+  BaseMemoryLib
+  BaseLib
+
+[Guids]
+  gEfiCrc32GuidedSectionExtractionGuid             ## PRODUCES ## UNDEFINED

@@ -1,0 +1,43 @@
+## @file
+#  Provides TPM 1.2 TIS functions
+#
+#  This library implements TIS (TPM Interface Specification) functions which is
+#  used for every TPM 1.2 command. Choosing this library means platform uses and
+#  only uses TPM 1.2 device.
+#
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Tpm12DeviceLibDTpm
+  MODULE_UNI_FILE                = Tpm12DeviceLibDTpm.uni
+  FILE_GUID                      = BC2B7672-A48B-4d58-B39E-AEE3707B5A23
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Tpm12DeviceLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  Tpm12Tis.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  IoLib
+  TimerLib
+  DebugLib
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress               ## CONSUMES

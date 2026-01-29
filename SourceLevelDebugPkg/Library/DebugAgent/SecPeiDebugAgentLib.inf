@@ -1,0 +1,86 @@
+## @file
+#  Debug Agent library instance for SEC Core and PEI modules.
+#
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecPeiDebugAgentLib
+  MODULE_UNI_FILE                = SecPeiDebugAgentLib.uni
+  FILE_GUID                      = 508B7D59-CD4E-4a6b-A45B-6D3B2D90111E
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 0.8
+  LIBRARY_CLASS                  = DebugAgentLib|SEC PEIM
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.common]
+  SecPeiDebugAgent/SecPeiDebugAgentLib.c
+  SecPeiDebugAgent/SecPeiDebugAgentLib.h
+  DebugAgentCommon/DebugAgent.c
+  DebugAgentCommon/DebugAgent.h
+  DebugAgentCommon/DebugTimer.c
+  DebugAgentCommon/DebugTimer.h
+  DebugAgentCommon/DebugMp.c
+  DebugAgentCommon/DebugMp.h
+
+[Sources.Ia32]
+  DebugAgentCommon/Ia32/AsmFuncs.nasm
+  DebugAgentCommon/Ia32/ArchDebugSupport.h
+  DebugAgentCommon/Ia32/ArchDebugSupport.c
+  DebugAgentCommon/Ia32/DebugException.h
+
+[Sources.X64]
+  DebugAgentCommon/X64/AsmFuncs.nasm
+  DebugAgentCommon/X64/ArchDebugSupport.h
+  DebugAgentCommon/X64/ArchDebugSupport.c
+  DebugAgentCommon/X64/DebugException.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  SourceLevelDebugPkg/SourceLevelDebugPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  ResetSystemLib
+  IoLib
+  HobLib
+  PcdLib
+  DebugCommunicationLib
+  SynchronizationLib
+  LocalApicLib
+  DebugLib
+  TimerLib
+  PrintLib
+  PeiServicesLib
+  MemoryAllocationLib
+  PeCoffGetEntryPointLib
+  PeCoffExtraActionLib
+
+[Ppis]
+  gEfiPeiMemoryDiscoveredPpiGuid                ## NOTIFY
+  gEfiVectorHandoffInfoPpiGuid                  ## PRODUCES
+
+[Guids]
+  ## PRODUCES ## HOB
+  ## CONSUMES ## HOB
+  gEfiDebugAgentGuid
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock                                  ## SOMETIMES_CONSUMES
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdExceptionsIgnoredByDebugger  ## SOMETIMES_CONSUMES
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugPortHandleBufferSize    ## SOMETIMES_CONSUMES
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdTransferProtocolRevision     ## CONSUMES
+

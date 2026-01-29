@@ -1,0 +1,18 @@
+// /** @file
+// UEFI HTTP boot service.
+//
+// This driver provides EFI Load File Protocol which is used to download
+// the boot image from HTTP server. It could work with an IPv4 or IPv6 stack.
+//
+//
+// Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "UEFI HTTP boot service"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver provides EFI Load File Protocol which is used to download the boot image from HTTP server. It could work with an IPv4 or IPv6 stack."
+

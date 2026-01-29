@@ -1,0 +1,17 @@
+// /** @file
+// Instance of Post Code Library based on Debug Library.
+//
+// Post Code Library that uses DebugLib service to send PostCode.
+// It layers on top of a Debug Library instance.
+//
+// Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Instance of Post Code Library based on Debug Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Post Code Library that uses the DebugLib service to send PostCode. It layers on top of a Debug Library instance."
+

@@ -1,0 +1,20 @@
+// /** @file
+// Basic IPv6 packet I/O Service.
+//
+// This module provides basic network IPv6 packet I/O services which includes support for
+// Neighbor Discovery Protocol (ND), Multicast Listener Discovery Protocol (MLD),
+// and a subset of the Internet Control Message Protocol (ICMPv6). This driver
+// also provides the mechanism to set and get various types of configurations for
+// the EFI IPv6 network stack.
+//
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Basic IPv6 packet I/O Service"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module provides basic network IPv6 packet I/O services which includes support for Neighbor Discovery Protocol (ND), Multicast Listener Discovery Protocol (MLD), and a subset of the Internet Control Message Protocol (ICMPv6). This driver also provides the mechanism to set and get various types of configurations for the EFI IPv6 network stack."
+

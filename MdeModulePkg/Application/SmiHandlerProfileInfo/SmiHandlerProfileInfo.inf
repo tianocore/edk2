@@ -1,0 +1,58 @@
+## @file
+#  Shell application to dump SMI handler profile information.
+#
+# Note that if the feature is not enabled by setting PcdSmiHandlerProfilePropertyMask,
+# the application will not display SMI handler profile information.
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmiHandlerProfileInfo
+  MODULE_UNI_FILE                = SmiHandlerProfileInfo.uni
+  FILE_GUID                      = 611EA796-8DF8-4BB6-91FE-6540ED70DC66
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SmiHandlerProfileInfoEntrypoint
+
+[Sources]
+  SmiHandlerProfileInfo.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+  PrintLib
+  DevicePathLib
+  DxeServicesLib
+
+[Protocols]
+  gEfiSmmCommunicationProtocolGuid             ## CONSUMES
+  gEfiSmmSwDispatch2ProtocolGuid               ## SOMETIMES_CONSUMES
+  gEfiSmmSxDispatch2ProtocolGuid               ## SOMETIMES_CONSUMES
+  gEfiSmmPowerButtonDispatch2ProtocolGuid      ## SOMETIMES_CONSUMES
+  gEfiSmmStandbyButtonDispatch2ProtocolGuid    ## SOMETIMES_CONSUMES
+  gEfiSmmPeriodicTimerDispatch2ProtocolGuid    ## SOMETIMES_CONSUMES
+  gEfiSmmGpiDispatch2ProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiSmmIoTrapDispatch2ProtocolGuid           ## SOMETIMES_CONSUMES
+  gEfiSmmUsbDispatch2ProtocolGuid              ## SOMETIMES_CONSUMES
+
+[Guids]
+  gEdkiiPiSmmCommunicationRegionTableGuid  ## CONSUMES  ## SystemTable
+  gSmiHandlerProfileGuid                   ## SOMETIMES_CONSUMES   ## GUID # SmiHandlerRegister
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SmiHandlerProfileInfoExtra.uni
+

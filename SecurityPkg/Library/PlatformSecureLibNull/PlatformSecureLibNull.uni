@@ -1,0 +1,19 @@
+// /** @file
+// NULL platform secure library instance that always returns TRUE for a user physical present
+//
+// NULL PlatformSecureLib instance does NOT really detect whether a physical present
+// user exists but returns TRUE directly. This instance can be used to verify security
+// related features during platform enabling and development. It should be replaced
+// by a platform-specific method(e.g. Button pressed) in a real platform for product.
+//
+// Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "NULL platform secure library instance that always returns TRUE for a user physical present"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "NULL PlatformSecureLib instance does NOT really detect whether a physical present user exists but returns TRUE directly. This instance can be used to verify security related features during platform enabling and development. It should be replaced by a platform-specific method(e.g. Button pressed) in a real platform for product."
+

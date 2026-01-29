@@ -1,0 +1,68 @@
+## @file
+#  Migrates SEC structures after permanent memory is installed.
+#
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecMigrationPei
+  MODULE_UNI_FILE                = SecMigrationPei.uni
+  FILE_GUID                      = 58B35361-8922-41BC-B313-EF7ED9ADFDF7
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SecMigrationPeiInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  SecMigrationPei.c
+  SecMigrationPei.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  MemoryAllocationLib
+  PeimEntryPoint
+  PeiServicesLib
+  PeiServicesTablePointerLib
+
+[Ppis]
+  ## PRODUCES
+  gRepublishSecPpiPpiGuid
+
+  ## SOMETIMES_PRODUCES
+  gEfiTemporaryRamDonePpiGuid
+
+  ## SOMETIME_PRODUCES
+  gEfiTemporaryRamSupportPpiGuid
+
+  ## SOMETIMES_PRODUCES
+  gPeiSecPerformancePpiGuid
+
+  ## SOMETIMES_CONSUMES
+  ## PRODUCES
+  gEfiSecPlatformInformationPpiGuid
+
+  ## SOMETIMES_CONSUMES
+  ## SOMETIMES_PRODUCES
+  gEfiSecPlatformInformation2PpiGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMigrateTemporaryRamFirmwareVolumes      ## CONSUMES
+
+[Depex]
+  TRUE

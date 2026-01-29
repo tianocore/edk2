@@ -1,0 +1,38 @@
+## @file
+# This driver produces the VirtIo Device Protocol instances for VirtIo PCI
+# Device
+#
+# Copyright (C) 2013, ARM Ltd
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = VirtioPciDeviceDxe
+  FILE_GUID                      = 83dd3b39-7caf-4fac-a542-e050b767e3a7
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = VirtioPciDeviceEntryPoint
+
+[Sources]
+  VirtioPciDevice.c
+  VirtioPciDevice.h
+  VirtioPciFunctions.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiPciIoProtocolGuid     ## TO_START
+  gVirtioDeviceProtocolGuid ## BY_START

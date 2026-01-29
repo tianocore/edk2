@@ -1,0 +1,16 @@
+// /** @file
+// NULL Dxe Capsule library instance.
+//
+// It can make core modules pass package level build.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "NULL DXE Capsule library instance"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "It can make core modules pass package level build."
+

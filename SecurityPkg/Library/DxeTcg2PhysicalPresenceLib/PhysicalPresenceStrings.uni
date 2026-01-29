@@ -1,0 +1,55 @@
+/** @file
+  String definitions for TPM 2.0 physical presence confirm text.
+
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#langdef en-US "English"
+
+#string TPM_HEAD_STR                  #language en-US    "A configuration change was requested to %s this computer's TPM (Trusted Platform Module)\n\n"
+#string TPM_PPI_HEAD_STR              #language en-US    "A configuration change was requested to allow the Operating System to %s the computer's TPM (Trusted Platform Module) without asking for user confirmation in the future.\n\n"
+
+#string TPM_ACCEPT_KEY                #language en-US    "Press F10 "
+#string TPM_CAUTION_KEY               #language en-US    "Press F12 "
+#string TPM_REJECT_KEY                #language en-US    "to %s the TPM \nPress ESC to reject this change request and continue\n"
+
+#string TPM_ENABLE                    #language en-US    "enable"
+#string TPM_DISABLE                   #language en-US    "disable"
+#string TPM_CLEAR                     #language en-US    "clear"
+#string TPM_SET_PCR_BANKS                       #language en-US    "change the boot measurements to use PCR bank(s) of"
+#string TPM_CHANGE_EPS                          #language en-US    "clear and change identity of"
+#string TPM_DISABLE_ENDORSEMENT_ENABLE_STORAGE  #language en-US    "disable access to some secrets stored in"
+
+#string TPM_NO_PPI_MAINTAIN           #language en-US    "maintain"
+#string TPM_NO_PPI_TURN_ON            #language en-US    "turn on"
+#string TPM_NO_PPI_TURN_OFF           #language en-US    "turn off"
+#string TPM_NO_PPI_INFO               #language en-US    "to approve future Operating System requests "
+
+#string TPM_WARNING_DISABLE           #language en-US    "WARNING: Doing so might prevent security applications that rely on the TPM from functioning as expected.\n\n"
+#string TPM_WARNING_CLEAR             #language en-US    "WARNING: Clearing erases information stored on the TPM. You will lose all created keys and access to data encrypted by these keys. "
+#string TPM_NOTE_CLEAR                #language en-US    "NOTE: This action does not clear the TPM, but by approving this configuration change, future actions to clear the TPM will not require user confirmation.\n\n"
+#string TPM_WARNING_SET_PCR_BANKS_1                     #language en-US    "WARNING: Changing the PCR bank(s) of the boot measurements may prevent the Operating System from properly processing the measurements. Please check if your Operating System supports the new PCR bank(s).\n\n"
+#string TPM_WARNING_SET_PCR_BANKS_2                     #language en-US    "WARNING: Secrets in the TPM that are bound to the boot state of your machine may become unusable.\n\n"
+#string TPM_WARNING_CHANGE_EPS_1                        #language en-US    "WARNING: Clearing erases information stored on the TPM. You will lose all created keys and access to data encrypted with these keys.\n\n"
+#string TPM_WARNING_CHANGE_EPS_2                        #language en-US    "WARNING: Changing the identity of the TPM may require additional steps to establish trust into the new identity.\n\n"
+#string TPM_WARNING_PP_CHANGE_PCRS_FALSE                #language en-US    "WARNING: Allowing future changes to format of the boot measurement log may affect the Operating System.\n\n"
+#string TPM_WARNING_PP_CHANGE_EPS_FALSE_1               #language en-US    "WARNING: Allowing future changes to the TPM's firmware may affect the operation of the TPM and may erase information stored on the TPM.\n\n"
+#string TPM_WARNING_PP_CHANGE_EPS_FALSE_2               #language en-US    "You may lose all created keys and access to data encrypted by these keys.\n\n"
+#string TPM_WARNING_DISABLE_ENDORSEMENT_ENABLE_STORAGE  #language en-US    "WARNING: Doing so might prevent security applications that rely on the TPM from functioning as expected.\n\n"
+
+#string TCG_STORAGE_HEAD_STR                  #language en-US    "A configuration change was requested to %s on subsequent boots\n\n"
+#string TCG_STORAGE_PPI_HEAD_STR              #language en-US    "A configuration change was requested to allow the Operating System to %s without asking for user confirmation in the future.\n\n"
+
+#string TCG_STORAGE_ACCEPT_KEY                #language en-US    "Press F10 "
+#string TCG_STORAGE_CAUTION_KEY               #language en-US    "Press F12 "
+#string TCG_STORAGE_REJECT_KEY                #language en-US    "to %s\nPress ESC to reject this change request and continue\n"
+
+#string TCG_STORAGE_NO_PPI_INFO               #language en-US    "to approve future Operating System requests "
+
+#string TCG_STORAGE_ENABLE_BLOCK_SID          #language en-US    "issue a Block SID authentication command"
+#string TCG_STORAGE_DISABLE_BLOCK_SID         #language en-US    "disable issuing a Block SID authentication command"
+
+#string TCG_STORAGE_PP_ENABLE_BLOCK_SID       #language en-US    "enable blocking SID authentication"
+#string TCG_STORAGE_PP_DISABLE_BLOCK_SID      #language en-US    "disable blocking SID authentication"

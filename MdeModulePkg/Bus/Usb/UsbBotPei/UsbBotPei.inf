@@ -1,0 +1,62 @@
+## @file
+# The Usb mass storage device Peim driver is used to support recovery from USB device.
+#
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UsbBotPei
+  MODULE_UNI_FILE                = UsbBotPei.uni
+  FILE_GUID                      = 8401A046-6F70-4505-8471-7015B40355E3
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = PeimInitializeUsbBot
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  PeiUsbLib.c
+  PeiAtapi.c
+  BotPeim.c
+  UsbBotPeim.c
+  UsbPeim.h
+  UsbBotPeim.h
+  PeiUsbLib.h
+  BotPeim.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  BaseMemoryLib
+  PeiServicesLib
+  PeimEntryPoint
+  DebugLib
+  PcdLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUsbTransferTimeoutValue  ## CONSUMES
+
+[Ppis]
+  gEfiPeiVirtualBlockIoPpiGuid                  ## PRODUCES
+  gEfiPeiVirtualBlockIo2PpiGuid                 ## PRODUCES
+  ## CONSUMES
+  ## NOTIFY
+  gPeiUsbIoPpiGuid
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid AND gPeiUsbIoPpiGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  UsbBotPeiExtra.uni

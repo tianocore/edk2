@@ -1,0 +1,49 @@
+## @file
+#  Base ACPI Timer Library
+#
+#  Provides basic timer support using the ACPI timer hardware.  The performance
+#  counter features are provided by the processors time stamp counter.
+#
+#  Note: The implementation uses the lower 24-bits of the ACPI timer and
+#  is compatible with both 24-bit and 32-bit ACPI timers.
+#
+#  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseAcpiTimerLib
+  FILE_GUID                      = 564DE85F-049E-4481-BF7A-CA04D2788CF9
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TimerLib|SEC PEI_CORE PEIM
+  CONSTRUCTOR                    = AcpiTimerLibConstructor
+  MODULE_UNI_FILE                = BaseAcpiTimerLib.uni
+
+[Sources]
+  AcpiTimerLib.c
+  BaseAcpiTimerLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  PcAtChipsetPkg/PcAtChipsetPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  PciLib
+  IoLib
+  DebugLib
+
+[Pcd]
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPciBusNumber             ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPciDeviceNumber          ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPciFunctionNumber        ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPciEnableRegisterOffset  ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoBarEnableMask            ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPciBarRegisterOffset     ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPortBaseAddress          ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiPm1TmrOffset               ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPortBaseAddressMask      ## CONSUMES

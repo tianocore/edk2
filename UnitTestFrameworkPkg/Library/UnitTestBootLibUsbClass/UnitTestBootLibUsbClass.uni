@@ -1,0 +1,12 @@
+// /** @file
+// Library to support booting to USB on the next boot
+// This instance uses the industry standard usb class boot option.
+//
+// Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "Library to support booting to USB on the next boot"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This instance uses the industry standard usb class boot option.."

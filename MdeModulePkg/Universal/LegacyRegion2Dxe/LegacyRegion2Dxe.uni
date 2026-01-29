@@ -1,0 +1,24 @@
+// /** @file
+// Produces the Legacy Region 2 Protocol.
+//
+// This generic implementation of the Legacy Region 2 Protocol does not actually
+// perform any lock/unlock operations.  This module may be used on platforms
+// that do not provide HW locking of the legacy memory regions.  It can also
+// be used as a template driver for implementing the Legacy Region 2 Protocol on
+// a platform that does support HW locking of the legacy memory regions.
+//
+// Note: This module does not fully comply with PI Specification of Legacy Region 2
+// Protocol. For Lock/UnLock/Decode, EFI_SUCCESS is returned although the region's
+// attributes were not actually modified.
+//
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces the Legacy Region 2 Protocol"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This generic implementation of the Legacy Region 2 Protocol does not actually perform any lock/unlock operations.  This module may be used on platforms that do not provide HW locking of the legacy memory regions.  It can also be used as a template driver for implementing the Legacy Region 2 Protocol on a platform that does support HW locking of the legacy memory regions. Note: This module does not fully comply with PI Specification of Legacy Region 2 Protocol. For Lock/UnLock/Decode, EFI_SUCCESS is returned although the region's attributes were not actually modified."
+

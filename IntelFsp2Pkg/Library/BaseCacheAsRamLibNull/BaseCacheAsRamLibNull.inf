@@ -1,0 +1,26 @@
+## @file
+#  NULL instance of Base cache as RAM.
+#
+#  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseCacheAsRamLibNull
+  FILE_GUID                      = 630AEB10-2106-4234-9DB3-836A3663F50D
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CacheAsRamLib
+
+[Sources.common]
+  DisableCacheAsRamNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+
+[LibraryClasses]
+

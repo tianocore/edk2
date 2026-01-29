@@ -1,0 +1,28 @@
+## @file
+#  FrameBufferBltLib - Library to perform blt operations on a frame buffer.
+#
+#  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FrameBufferBltLib
+  FILE_GUID                      = 243D3E8C-2780-4A25-9693-A410475BFCEC
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FrameBufferBltLib
+
+[Sources.common]
+  FrameBufferBltLib.c
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec

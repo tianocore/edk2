@@ -1,0 +1,78 @@
+## @file
+#  Capsule library instance for DXE_RUNTIME_DRIVER.
+#
+#  Capsule library instance for DXE_RUNTIME_DRIVER module types.
+#
+#  Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeRuntimeCapsuleLib
+  MODULE_UNI_FILE                = DxeRuntimeCapsuleLib.uni
+  FILE_GUID                      = 19BE1E4B-1A9A-44c1-8F12-32DD0470516A
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CapsuleLib|DXE_RUNTIME_DRIVER
+  CONSTRUCTOR                    = DxeCapsuleLibConstructor
+  CONSTRUCTOR                    = DxeRuntimeCapsuleLibConstructor
+  DESTRUCTOR                     = DxeCapsuleLibDestructor
+  DESTRUCTOR                     = DxeRuntimeCapsuleLibDestructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DxeCapsuleLib.c
+  DxeCapsuleProcessLibNull.c
+  DxeCapsuleReportLibNull.c
+  DxeCapsuleRuntime.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  DxeServicesTableLib
+  UefiBootServicesTableLib
+  DevicePathLib
+  ReportStatusCodeLib
+  PrintLib
+  HobLib
+  BmpSupportLib
+
+
+[Protocols]
+  gEsrtManagementProtocolGuid                   ## CONSUMES
+  gEfiFirmwareManagementProtocolGuid            ## CONSUMES
+  gEdkiiVariableLockProtocolGuid                ## SOMETIMES_CONSUMES
+  gEdkiiFirmwareManagementProgressProtocolGuid  ## SOMETIMES_CONSUMES
+
+[Guids]
+  gEfiFmpCapsuleGuid                      ## SOMETIMES_CONSUMES ## GUID
+  gWindowsUxCapsuleGuid                   ## SOMETIMES_CONSUMES ## GUID
+  gEfiSystemResourceTableGuid             ## SOMETIMES_CONSUMES ## GUID
+  ## SOMETIMES_CONSUMES ## Variable:L"CapsuleMax"
+  ## SOMETIMES_PRODUCES ## Variable:L"CapsuleMax"
+  gEfiCapsuleReportGuid
+  gEfiCapsuleVendorGuid                   ## SOMETIMES_CONSUMES ## Variable:L"CapsuleUpdateData"
+  gEfiEndOfDxeEventGroupGuid              ## CONSUMES ## Event
+  gEfiEventExitBootServicesGuid           ## CONSUMES ## Event
+  gEfiEventVirtualAddressChangeGuid       ## CONSUMES ## Event
+  gEdkiiCapsuleOnDiskNameGuid             ## SOMETIMES_CONSUMES ## GUID
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleEmbeddedDriverSupport             ## CONSUMES
+
+[Depex]
+  gEfiVariableWriteArchProtocolGuid

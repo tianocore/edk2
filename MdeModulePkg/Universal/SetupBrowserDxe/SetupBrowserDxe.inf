@@ -1,0 +1,79 @@
+## @file
+# The DXE driver produces FORM BROWSER2 protocol defined in UEFI specification.
+#
+# It also produces FormBrowserEx(2) protocol to let user register the different Hot key service.
+#
+# Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SetupBrowser
+  MODULE_UNI_FILE                = SetupBrowser.uni
+  FILE_GUID                      = EBf342FE-B1D3-4EF8-957C-8048606FF671
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 2.0
+  ENTRY_POINT                    = InitializeSetup
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  Setup.c
+  Setup.h
+  IfrParse.c
+  Expression.c
+  Presentation.c
+  Expression.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  PrintLib
+  HiiLib
+  DevicePathLib
+  PcdLib
+  UefiLib
+
+[Guids]
+  gEfiHiiPlatformSetupFormsetGuid               ## SOMETIMES_CONSUMES  ## GUID
+  gEfiHiiStandardFormGuid                       ## SOMETIMES_CONSUMES  ## GUID
+  gZeroGuid                                     ## SOMETIMES_CONSUMES  ## GUID
+  gEdkiiIfrBitVarstoreGuid                      ## SOMETIMES_CONSUMES  ## GUID
+
+[Protocols]
+  gEfiHiiConfigAccessProtocolGuid               ## SOMETIMES_CONSUMES
+  gEfiFormBrowser2ProtocolGuid                  ## PRODUCES
+  gEdkiiFormBrowserEx2ProtocolGuid              ## PRODUCES
+  gEfiHiiConfigRoutingProtocolGuid              ## CONSUMES
+  gEfiHiiDatabaseProtocolGuid                   ## CONSUMES
+  gEfiUnicodeCollation2ProtocolGuid             ## SOMETIMES_CONSUMES
+  gEfiUserManagerProtocolGuid                   ## SOMETIMES_CONSUMES
+  gEfiDevicePathFromTextProtocolGuid            ## SOMETIMES_CONSUMES
+  ## CONSUMES
+  ## NOTIFY
+  gEdkiiFormDisplayEngineProtocolGuid
+  gEdkiiFormBrowserExProtocolGuid               ## PRODUCES
+  gEfiRegularExpressionProtocolGuid             ## SOMETIMES_CONSUMES
+
+[Depex]
+  gEfiHiiDatabaseProtocolGuid AND gEfiHiiConfigRoutingProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SetupBrowserExtra.uni

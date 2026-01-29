@@ -1,0 +1,16 @@
+// /** @file
+// This driver first constructs the non-tested memory range, then performs the R/W/V memory test.
+//
+// This driver first constructs the non-tested memory range, then performs the R/W/V memory test.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Constructs the non-tested memory range, then performs the R/W/V memory test"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver first constructs the non-tested memory range, then performs the R/W/V memory test."
+

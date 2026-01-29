@@ -1,0 +1,24 @@
+// /** @file
+// The EhciDxe driver is responsible for managing the behavior of EHCI controller.
+//
+// It implements the interfaces of monitoring the status of all ports and transferring
+// Control, Bulk, Interrupt and Isochronous requests to Usb2.0 device.
+//
+// Note that EhciDxe driver is enhanced to guarantee that the EHCI controller get attached
+// to the EHCI controller before the UHCI driver attaches to the companion UHCI controller.
+// This way avoids the control transfer on a shared port between EHCI and companion host
+// controller when UHCI gets attached earlier than EHCI and a USB 2.0 device inserts.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Responsible for managing the behavior of EHCI controller"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Implements the interfaces for monitoring the status of all ports and transferring\n"
+                                                        "Control, Bulk, Interrupt and Isochronous requests to Usb2.0 device.<BR><BR>\n"
+                                                        "Note that EhciDxe driver is enhanced to guarantee that the EHCI controller get attached to the EHCI controller before the UHCI driver attaches to the companion UHCI controller. This method avoids the control transfer on a shared port between EHCI and a companion host controller when UHCI attaches earlier than EHCI and a USB 2.0 device inserts.<BR>"
+

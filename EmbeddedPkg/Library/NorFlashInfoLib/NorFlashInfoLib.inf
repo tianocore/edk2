@@ -1,0 +1,27 @@
+/** @file
+*
+*  Copyright (c) 2017 Marvell International Ltd.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = NorFlashInfoLib
+  FILE_GUID                      = 6b639c7e-9b53-4e9f-89a3-2e711729709c
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NorFlashInfoLib
+
+[Sources]
+  NorFlashInfoLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib

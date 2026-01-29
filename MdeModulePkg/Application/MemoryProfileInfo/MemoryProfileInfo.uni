@@ -1,0 +1,17 @@
+// /** @file
+// Shell application to dump UEFI memory and SMRAM profile information.
+//
+// Note that if the feature is not enabled by setting PcdMemoryProfilePropertyMask,
+// the application will not display memory profile information.
+//
+// Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Shell application to dump UEFI memory and SMRAM profile information."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Note that if the feature is not enabled by setting PcdMemoryProfilePropertyMask, the application will not display memory profile information."
+

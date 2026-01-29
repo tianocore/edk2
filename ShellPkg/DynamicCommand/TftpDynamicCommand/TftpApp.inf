@@ -1,0 +1,55 @@
+##  @file
+# Provides Shell 'tftp' standalone application.
+#
+# Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved. <BR>
+# Copyright (c) 2015, ARM Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = tftp
+  FILE_GUID                      = 8DC58D0D-67F5-4B97-9DFC-E442BB9A5648
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = TftpAppInitialize
+#
+#  This flag specifies whether HII resource section is generated into PE image.
+#
+  UEFI_HII_RESOURCE_SECTION      = TRUE
+
+[Sources.common]
+  Tftp.uni
+  Tftp.h
+  Tftp.c
+  TftpApp.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  ShellLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  UefiApplicationEntryPoint
+  UefiHiiServicesLib
+  HiiLib
+  FileHandleLib
+  NetLib
+
+[Protocols]
+  gEfiManagedNetworkServiceBindingProtocolGuid   ## CONSUMES
+  gEfiMtftp4ServiceBindingProtocolGuid           ## CONSUMES
+  gEfiMtftp4ProtocolGuid                         ## CONSUMES
+  gEfiHiiPackageListProtocolGuid                 ## CONSUMES

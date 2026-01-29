@@ -1,0 +1,48 @@
+## @file
+#  CPU Features DXE driver.
+#
+#  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CpuFeaturesDxe
+  MODULE_UNI_FILE                = CpuFeaturesDxe.uni
+  FILE_GUID                      = 63EB1B62-10C9-4693-88AC-AE0999EA87F8
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = CpuFeaturesDxeInitialize
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  RegisterCpuFeaturesLib
+  HobLib
+
+[Sources]
+  CpuFeaturesDxe.c
+
+[Guids]
+  gEdkiiCpuFeaturesInitDoneGuid                       ## PRODUCES ## UNDEFINED # protocol GUID installed
+
+[Protocols]
+  gEfiSmmConfigurationProtocolGuid                                ## NOTIFY
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesInitAfterSmmRelocation  ## CONSUMES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  CpuFeaturesDxeExtra.uni

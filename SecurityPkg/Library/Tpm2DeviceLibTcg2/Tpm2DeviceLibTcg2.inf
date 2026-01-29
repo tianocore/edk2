@@ -1,0 +1,41 @@
+## @file
+#  Provides function interfaces to communicate with TPM 2.0 device
+#
+#  This library helps to use TPM 2.0 device in library function API
+#  based on TPM2 protocol.
+#
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Tpm2DeviceLibTcg2
+  MODULE_UNI_FILE                = Tpm2DeviceLibTcg2.uni
+  FILE_GUID                      = A1B0B230-67DC-431E-A94A-A96AF1EBE637
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Tpm2DeviceLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  Tpm2DeviceLibTcg2.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiTcg2ProtocolGuid                           ## CONSUMES

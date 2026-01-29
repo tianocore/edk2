@@ -1,0 +1,105 @@
+## @file
+#  Platform PEI driver
+#
+#  This module provides platform specific function to detect boot mode.
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2019, Citrix Systems, Inc.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = XenPlatformPei
+  FILE_GUID                      = f112a6ee-993a-4f0b-8295-e52029d9b4ba
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeXenPlatform
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  AmdSev.c
+  ClearCache.c
+  Cmos.c
+  Cmos.h
+  Fv.c
+  MemDetect.c
+  Platform.c
+  Platform.h
+  Xen.c
+  Xen.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Guids]
+  gEfiMemoryTypeInformationGuid
+  gEfiXenInfoGuid
+
+[LibraryClasses]
+  BaseLib
+  CacheMaintenanceLib
+  DebugLib
+  HobLib
+  IoLib
+  LocalApicLib
+  PciLib
+  ResourcePublicationLib
+  PeiServicesLib
+  PeimEntryPoint
+  QemuFwCfgS3Lib
+  MtrrLib
+  MemEncryptSevLib
+  PcdLib
+  SafeIntLib
+  XenHypercallLib
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfLockBoxStorageSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciIoBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciIoSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Base
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Size
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Base
+  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size
+  gUefiOvmfPkgTokenSpaceGuid.PcdQ35TsegMbytes
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock
+  gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuLocalApicBaseAddress
+
+  gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtr
+  gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtrSize
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+
+[Ppis]
+  gEfiPeiMasterBootModePpiGuid
+  gEfiPeiMpServicesPpiGuid
+
+[Depex]
+  TRUE
+

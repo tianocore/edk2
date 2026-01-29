@@ -1,0 +1,137 @@
+## @file
+#  Last PEIM executed in PEI phase to load DXE Core from a Firmware Volume.
+#
+#  This module produces a special PPI named the DXE Initial Program Load (IPL)
+#  PPI to discover and dispatch the DXE Foundation and components that are
+#  needed to run the DXE Foundation.
+#
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+#  Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#  Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeIpl
+  MODULE_UNI_FILE                = DxeIpl.uni
+  FILE_GUID                      = 86D70125-BAA3-4296-A62F-602BEBBB9081
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = PeimInitializeDxeIpl
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC (EBC is for build only) AARCH64 RISCV64 LOONGARCH64
+#
+
+[Sources]
+  DxeIpl.h
+  DxeLoad.c
+
+[Sources.Ia32]
+  X64/VirtualMemory.h
+  X64/VirtualMemory.c
+  Ia32/DxeLoadFunc.c
+  Ia32/IdtVectorAsm.nasm
+
+[Sources.X64]
+  X64/VirtualMemory.h
+  X64/VirtualMemory.c
+  X64/DxeLoadFunc.c
+
+[Sources.LOONGARCH64,Sources.RISCV64,Sources.EBC,Sources.AARCH64]
+  DxeHandoff.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PcdLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  ExtractGuidedSectionLib
+  UefiDecompressLib
+  ReportStatusCodeLib
+  PeiServicesLib
+  HobLib
+  BaseLib
+  PeimEntryPoint
+  DebugLib
+  DebugAgentLib
+  PeiServicesTablePointerLib
+  PerformanceLib
+
+[Ppis]
+  gEfiDxeIplPpiGuid                      ## PRODUCES
+  gEfiPeiDecompressPpiGuid               ## PRODUCES
+  gEfiEndOfPeiSignalPpiGuid              ## SOMETIMES_PRODUCES # Not produced on S3 boot path
+  gEfiPeiReadOnlyVariable2PpiGuid        ## SOMETIMES_CONSUMES
+  gEfiPeiLoadFilePpiGuid                 ## SOMETIMES_CONSUMES
+  gEfiPeiS3Resume2PpiGuid                ## SOMETIMES_CONSUMES # Consumed on S3 boot path
+  gEfiPeiRecoveryModulePpiGuid           ## SOMETIMES_CONSUMES # Consumed on recovery boot path
+  ## SOMETIMES_CONSUMES
+  ## UNDEFINED # HOB
+  gEfiVectorHandoffInfoPpiGuid
+  gEfiPeiMemoryDiscoveredPpiGuid         ## SOMETIMES_CONSUMES
+  gEdkiiPeiBootInCapsuleOnDiskModePpiGuid  ## SOMETIMES_CONSUMES
+  gEdkiiPeiCapsuleOnDiskPpiGuid            ## SOMETIMES_CONSUMES # Consumed on firmware update boot path
+  gEdkiiMemoryAttributePpiGuid             ## SOMETIMES_CONSUMES
+
+[Guids]
+  ## SOMETIMES_CONSUMES ## Variable:L"MemoryTypeInformation"
+  ## SOMETIMES_PRODUCES ## HOB
+  gEfiMemoryTypeInformationGuid
+
+[FeaturePcd.IA32]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES
+
+[FeaturePcd.X64]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables       ## CONSUMES
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSupportUefiDecompress ## CONSUMES
+
+[Pcd.IA32,Pcd.X64]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable                      ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse5LevelPageTable                  ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                            ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbSize                            ## CONSUMES
+
+[Pcd.IA32,Pcd.X64,Pcd.AARCH64]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy       ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack               ## SOMETIMES_CONSUMES
+
+[Depex]
+  gEfiPeiLoadFilePpiGuid AND gEfiPeiMasterBootModePpiGuid
+
+#
+# [BootMode]
+#  S3_RESUME                        ## SOMETIMES_CONSUMES
+#  RECOVERY_FULL                    ## SOMETIMES_CONSUMES
+#
+#
+# [Hob]
+# MEMORY_ALLOCATION                 ## SOMETIMES_PRODUCES # MEMORY_ALLOCATION_MODULE for DxeCore
+# MEMORY_ALLOCATION                 ## SOMETIMES_PRODUCES # New Stack HoB
+# MEMORY_ALLOCATION                 ## SOMETIMES_PRODUCES # Old Stack HOB
+#
+# [Hob.IPF]
+# MEMORY_ALLOCATION                 ## SOMETIMES_PRODUCES # MEMORY_ALLOCATION_BSP_STORE
+#
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  DxeIplExtra.uni

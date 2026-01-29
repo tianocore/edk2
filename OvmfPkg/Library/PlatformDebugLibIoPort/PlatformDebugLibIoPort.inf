@@ -1,0 +1,50 @@
+## @file
+#  Instance of Debug Library for the QEMU debug console port.
+#  It uses Print Library to produce formatted output strings.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2012, Red Hat, Inc.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformDebugLibIoPort
+  FILE_GUID                      = DF934DA3-CD31-49FE-AF50-B3C87C79325F
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DebugLib|PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER SMM_CORE DXE_SMM_DRIVER UEFI_DRIVER UEFI_APPLICATION MM_CORE_STANDALONE MM_STANDALONE
+  CONSTRUCTOR                    = PlatformDebugLibIoPortConstructor
+
+#
+#  VALID_ARCHITECTURES           = X64 EBC
+#
+
+[Sources]
+  DebugIoPortQemu.c
+  DebugLib.c
+  DebugLibDetect.c
+  DebugLibDetect.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  IoLib
+  PcdLib
+  PrintLib
+  BaseLib
+  DebugPrintErrorLevelLib
+  MemDebugLogLib
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdDebugIoPort                ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue        ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask            ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel    ## CONSUMES
+

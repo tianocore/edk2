@@ -1,0 +1,55 @@
+## @file
+# PI SMM Communication SMM driver that saves SMM communication context
+# for use by SMM Communication PEIM in the S3 boot mode.
+#
+# Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PiSmmCommunicationSmm
+  MODULE_UNI_FILE                = PiSmmCommunicationSmm.uni
+  FILE_GUID                      = E21F35A8-42FF-4050-82D6-93F7CDFA7073
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  ENTRY_POINT                    = PiSmmCommunicationSmmEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  PiSmmCommunicationSmm.c
+  PiSmmCommunicationPrivate.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  SmmServicesTableLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  SmmMemLib
+
+[Ppis]
+  gEfiPeiSmmCommunicationPpiGuid     ## UNDEFINED # SMM Configuration Table
+
+[Protocols]
+  gEfiSmmSwDispatch2ProtocolGuid     ## CONSUMES
+
+[Depex]
+  gEfiSmmSwDispatch2ProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  PiSmmCommunicationSmmExtra.uni

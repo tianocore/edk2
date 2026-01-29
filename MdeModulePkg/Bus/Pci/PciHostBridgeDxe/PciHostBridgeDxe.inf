@@ -1,0 +1,52 @@
+## @file
+#   Generic PCI Host Bridge driver.
+#
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PciHostBridgeDxe
+  FILE_GUID                      = 128FB770-5E79-4176-9E51-9BB268A17DD1
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializePciHostBridge
+
+[Sources]
+  PciHostBridge.h
+  PciRootBridge.h
+  PciHostBridge.c
+  PciRootBridgeIo.c
+  PciHostResource.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DebugLib
+  DxeServicesTableLib
+  DevicePathLib
+  BaseMemoryLib
+  BaseLib
+  PciSegmentLib
+  UefiLib
+  PciHostBridgeLib
+  TimerLib
+
+[Protocols]
+  gEfiCpuIo2ProtocolGuid                          ## CONSUMES
+  gEfiDevicePathProtocolGuid                      ## BY_START
+  gEfiPciRootBridgeIoProtocolGuid                 ## BY_START
+  gEfiPciHostBridgeResourceAllocationProtocolGuid ## BY_START
+  gEdkiiIoMmuProtocolGuid                         ## SOMETIMES_CONSUMES
+
+[Depex]
+  gEfiCpuIo2ProtocolGuid AND
+  gEfiCpuArchProtocolGuid

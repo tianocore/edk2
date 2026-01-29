@@ -1,0 +1,16 @@
+// /** @file
+// Fault Tolerant Write PEI Driver.
+//
+// This module installs gEdkiiFaultTolerantWriteGuid PPI to inform the check for FTW last write data has been done.
+//
+// Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "This module installs gEdkiiFaultTolerantWriteGuid PPI to inform the check for FTW last write data has been done."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module installs gEdkiiFaultTolerantWriteGuid PPI to inform the check for FTW last write data has been done."
+

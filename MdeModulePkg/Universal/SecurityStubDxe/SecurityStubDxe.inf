@@ -1,0 +1,54 @@
+## @file
+#  This driver produces security2 and security architectural protocol based on SecurityManagementLib.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecurityStubDxe
+  MODULE_UNI_FILE                = SecurityStubDxe.uni
+  FILE_GUID                      = F80697E9-7FD6-4665-8646-88E33EF71DFC
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SecurityStubInitialize
+
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  SecurityStub.c
+  Defer3rdPartyImageLoad.c
+  Defer3rdPartyImageLoad.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DebugLib
+  SecurityManagementLib
+  ReportStatusCodeLib
+  UefiLib
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid                    ## CONSUMES ## Event
+
+[Protocols]
+  gEfiSecurityArchProtocolGuid                  ## PRODUCES
+  gEfiSecurity2ArchProtocolGuid                 ## PRODUCES
+  gEfiDeferredImageLoadProtocolGuid             ## PRODUCES
+  gEfiDxeSmmReadyToLockProtocolGuid             ## NOTIFY
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SecurityStubDxeExtra.uni

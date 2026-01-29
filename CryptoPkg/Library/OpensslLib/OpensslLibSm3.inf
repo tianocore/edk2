@@ -1,0 +1,30 @@
+## @file
+#  Minimal OpensslLib implementation that only provides SM3 and nothing else.
+#  Needed by MbedTlsLib.
+#
+#  Copyright (c) 2024, Google LLC. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = OpensslLibSm3
+  FILE_GUID                      = 96469bab-9c3f-4a60-a583-71a8bda64ec9
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = OpensslLib
+
+  DEFINE OPENSSL_PATH            = openssl
+
+[Sources]
+  $(OPENSSL_PATH)/crypto/sm3/sm3.c
+  OpensslStub/OpensslCleanse.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib

@@ -1,0 +1,17 @@
+// /** @file
+// File Explorer DXE driver that produces Print2 Protocol.
+//
+// This driver produces File Explorer protocol layered on top of the File Explorer library
+// from the MdeModulePkg.
+//
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "File Explorer DXE driver that produces File Explorer Protocol"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver produces file explorer protocol layered on top of the FileExplorerLib from the MdeModulePkg."
+

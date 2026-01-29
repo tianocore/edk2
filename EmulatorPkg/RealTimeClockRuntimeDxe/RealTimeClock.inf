@@ -1,0 +1,52 @@
+## @file
+# Emu Real time clock Architectural Protocol Driver as defined in PI
+#
+# This real time clock module simulates virtual device by time WinAPI.
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2011, Apple Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = RealTimeClock
+  FILE_GUID                      = f3552032-8985-11db-8429-0040d02b1835
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeRealTimeClock
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  RealTimeClock.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  EmuThunkLib
+  UefiDriverEntryPoint
+  UefiLib
+  DebugLib
+  BaseLib
+
+
+[Protocols]
+  gEfiRealTimeClockArchProtocolGuid             # PROTOCOL ALWAYS_PRODUCED
+
+
+[Depex]
+  TRUE
+

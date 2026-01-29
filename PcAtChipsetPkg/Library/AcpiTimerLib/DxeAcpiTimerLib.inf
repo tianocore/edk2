@@ -1,0 +1,52 @@
+## @file
+#  DXE ACPI Timer Library
+#
+#  Provides basic timer support using the ACPI timer hardware.  The performance
+#  counter features are provided by the processors time stamp counter.
+#
+#  Note: The implementation uses the lower 24-bits of the ACPI timer and
+#  is compatible with both 24-bit and 32-bit ACPI timers.
+#
+#  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeAcpiTimerLib
+  FILE_GUID                      = E624B98C-845A-4b94-9B50-B20475D552B9
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TimerLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER SMM_CORE
+  CONSTRUCTOR                    = DxeAcpiTimerLibConstructor
+  MODULE_UNI_FILE                = DxeAcpiTimerLib.uni
+
+[Sources]
+  AcpiTimerLib.c
+  DxeAcpiTimerLib.c
+  DxeStandaloneMmAcpiTimerLib.c
+  DxeStandaloneMmAcpiTimerLib.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  PcAtChipsetPkg/PcAtChipsetPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  PciLib
+  IoLib
+  DebugLib
+  HobLib
+
+[Pcd]
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPciBusNumber             ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPciDeviceNumber          ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPciFunctionNumber        ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPciEnableRegisterOffset  ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoBarEnableMask            ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPciBarRegisterOffset     ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPortBaseAddress          ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiPm1TmrOffset               ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPortBaseAddressMask      ## CONSUMES

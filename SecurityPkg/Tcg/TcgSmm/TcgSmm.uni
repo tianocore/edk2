@@ -1,0 +1,22 @@
+// /** @file
+// Implements ACPI methods for the TCG feature
+//
+// This driver implements TPM definition block in ACPI table and registers SMI
+// callback functions for physical presence and MemoryClear to handle the requests
+// from ACPI method.
+//
+// Caution: This module requires additional review when modified.
+// This driver will have external input - variable and ACPINvs data in SMM mode.
+// This external input must be validated carefully to avoid security issue.
+//
+// Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Implements ACPI methods for the TCG feature"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver implements TPM definition block in ACPI table and registers SMI callback functions for physical presence and MemoryClear to handle the requests from ACPI method. Caution: This module requires additional review when modified. This driver will have external input - variable and ACPINvs data in SMM mode. This external input must be validated carefully to avoid security issues."
+

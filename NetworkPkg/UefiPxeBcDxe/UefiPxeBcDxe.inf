@@ -1,0 +1,109 @@
+## @file
+#  Access PXE-compatible devices for network access and network booting.
+#
+#  This driver provides PXE Base Code Protocol which is used to accessing
+#  PXE-compatible device for network access or booting. This driver supports
+#  both IPv4 and IPv6 network stack.
+#
+#  Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UefiPxeBcDxe
+  FILE_GUID                      = B95E9FDA-26DE-48d2-8807-1F9107AC5E3A
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PxeBcDriverEntryPoint
+  UNLOAD_IMAGE                   = NetLibDefaultUnload
+  MODULE_UNI_FILE                = UefiPxeBcDxe.uni
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  ComponentName.c
+  PxeBcDriver.c
+  PxeBcDriver.h
+  PxeBcImpl.c
+  PxeBcImpl.h
+  PxeBcBoot.c
+  PxeBcBoot.h
+  PxeBcDhcp6.c
+  PxeBcDhcp6.h
+  PxeBcDhcp4.c
+  PxeBcDhcp4.h
+  PxeBcMtftp.c
+  PxeBcMtftp.h
+  PxeBcSupport.c
+  PxeBcSupport.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+
+[LibraryClasses]
+  BaseLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  NetLib
+  DpcLib
+  DevicePathLib
+  PcdLib
+  ReportStatusCodeLib
+
+[Protocols]
+  ## TO_START
+  ## SOMETIMES_CONSUMES
+  gEfiDevicePathProtocolGuid
+  gEfiNetworkInterfaceIdentifierProtocolGuid_31        ## SOMETIMES_CONSUMES
+  gEfiArpServiceBindingProtocolGuid                    ## TO_START
+  gEfiArpProtocolGuid                                  ## TO_START
+  gEfiIp4ServiceBindingProtocolGuid                    ## TO_START
+  gEfiIp4ProtocolGuid                                  ## TO_START
+  gEfiIp4Config2ProtocolGuid                           ## TO_START
+  gEfiIp6ServiceBindingProtocolGuid                    ## TO_START
+  gEfiIp6ProtocolGuid                                  ## TO_START
+  gEfiIp6ConfigProtocolGuid                            ## TO_START
+  gEfiUdp4ServiceBindingProtocolGuid                   ## TO_START
+  gEfiUdp4ProtocolGuid                                 ## TO_START
+  gEfiMtftp4ServiceBindingProtocolGuid                 ## TO_START
+  gEfiMtftp4ProtocolGuid                               ## TO_START
+  gEfiDhcp4ServiceBindingProtocolGuid                  ## TO_START
+  gEfiDhcp4ProtocolGuid                                ## TO_START
+  gEfiUdp6ServiceBindingProtocolGuid                   ## TO_START
+  gEfiUdp6ProtocolGuid                                 ## TO_START
+  gEfiMtftp6ServiceBindingProtocolGuid                 ## TO_START
+  gEfiMtftp6ProtocolGuid                               ## TO_START
+  gEfiDhcp6ServiceBindingProtocolGuid                  ## TO_START
+  gEfiDhcp6ProtocolGuid                                ## TO_START
+  gEfiDns6ServiceBindingProtocolGuid                   ## SOMETIMES_CONSUMES
+  gEfiDns6ProtocolGuid                                 ## SOMETIMES_CONSUMES
+  gEfiPxeBaseCodeCallbackProtocolGuid                  ## SOMETIMES_PRODUCES
+  gEfiPxeBaseCodeProtocolGuid                          ## BY_START
+  gEfiLoadFileProtocolGuid                             ## BY_START
+  gEfiAdapterInformationProtocolGuid                   ## SOMETIMES_CONSUMES
+
+[Guids]
+  gEfiAdapterInfoUndiIpv6SupportGuid                   ## SOMETIMES_CONSUMES ## GUID
+
+[Pcd]
+  gEfiNetworkPkgTokenSpaceGuid.PcdTftpBlockSize        ## SOMETIMES_CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeTftpWindowSize    ## SOMETIMES_CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport       ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport       ## CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  UefiPxeBcDxeExtra.uni

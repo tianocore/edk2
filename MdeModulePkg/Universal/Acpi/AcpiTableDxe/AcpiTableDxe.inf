@@ -1,0 +1,82 @@
+## @file
+#  ACPI Table Protocol Driver
+#
+#  This driver initializes ACPI tables (Rsdp, Rsdt and Xsdt) and produces UEFI/PI
+#  services to install/uninstall/manage ACPI tables.
+#
+#  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AcpiTableDxe
+  MODULE_UNI_FILE                = AcpiTableDxe.uni
+  FILE_GUID                      = 9622E42C-8E38-4a08-9E8F-54F784652F6B
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeAcpiTableDxe
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  AcpiTableProtocol.c
+  AcpiTable.h
+  AcpiTable.c
+  AcpiSdt.h
+  AcpiSdt.c
+  Aml.c
+  AmlString.c
+  AmlOption.c
+  AmlChild.c
+  AmlNamespace.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  UefiLib
+  DebugLib
+  BaseLib
+  PcdLib
+  HobLib
+
+[Guids]
+  gEfiAcpi10TableGuid                           ## PRODUCES           ## SystemTable
+  gEfiAcpiTableGuid                             ## PRODUCES           ## SystemTable
+  gUniversalPayloadAcpiTableGuid                ## SOMETIMES_CONSUMES ## HOB
+  gAcpiTableHobGuid                             ## SOMETIMES_CONSUMES ## HOB
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol  ## CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId            ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId       ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNoACPIReclaimMemory         ## CONSUMES
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                     ## PRODUCES
+  gEfiAcpiSdtProtocolGuid                       ## PRODUCES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  AcpiTableDxeExtra.uni

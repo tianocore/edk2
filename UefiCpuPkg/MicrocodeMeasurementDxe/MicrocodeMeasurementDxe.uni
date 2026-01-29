@@ -1,0 +1,15 @@
+// /** @file
+// This driver measures microcode patches to TPM.
+//
+// This driver consumes gEdkiiMicrocodePatchHobGuid, packs all uniquemicrocode patch found in gEdkiiMicrocodePatchHobGuid to a binary blob, and measures the binary blob to TPM.
+//
+// Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "This driver measures Microcode Patches to TPM."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver consumes gEdkiiMicrocodePatchHobGuid, packs all microcode patch found in gEdkiiMicrocodePatchHobGuid to a binary blob, and measure the binary blob to TPM."

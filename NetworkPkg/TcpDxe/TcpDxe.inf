@@ -1,0 +1,95 @@
+## @file
+#  TCPv4 I/O and TCPv6 I/O services.
+#
+#  This module provides EFI TCPv4 Protocol and EFI TCPv6 Protocol to send and receive data stream.
+#  It might provide TCPv4 Protocol or TCPv6 Protocol or both of them that depends on which network
+#  stack has been loaded in system. This driver supports both IPv4 and IPv6 network stack.
+#
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TcpDxe
+  FILE_GUID                      = 1A7E4468-2F55-4a56-903C-01265EB7622B
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = TcpDriverEntryPoint
+  UNLOAD_IMAGE                   = NetLibDefaultUnload
+  MODULE_UNI_FILE                = TcpDxe.uni
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  TcpDriver.c
+  SockImpl.c
+  SockInterface.c
+  TcpDispatcher.c
+  TcpOutput.c
+  TcpMain.c
+  SockImpl.h
+  TcpMisc.c
+  TcpProto.h
+  TcpOption.c
+  TcpInput.c
+  TcpFunc.h
+  TcpOption.h
+  TcpTimer.c
+  TcpMain.h
+  Socket.h
+  ComponentName.c
+  TcpIo.c
+  TcpDriver.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DevicePathLib
+  DebugLib
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  DpcLib
+  NetLib
+  IpIoLib
+
+[Protocols]
+  ## SOMETIMES_CONSUMES
+  ## SOMETIMES_PRODUCES
+  gEfiDevicePathProtocolGuid
+  gEfiIp4ProtocolGuid                           ## TO_START
+  gEfiIp4ServiceBindingProtocolGuid             ## TO_START
+  gEfiTcp4ProtocolGuid                          ## BY_START
+  gEfiTcp4ServiceBindingProtocolGuid            ## BY_START
+  gEfiIp6ProtocolGuid                           ## TO_START
+  gEfiIp6ServiceBindingProtocolGuid             ## TO_START
+  gEfiTcp6ProtocolGuid                          ## BY_START
+  gEfiTcp6ServiceBindingProtocolGuid            ## BY_START
+  gEfiHash2ProtocolGuid                         ## BY_START
+  gEfiHash2ServiceBindingProtocolGuid           ## BY_START
+
+[Guids]
+  gEfiHashAlgorithmMD5Guid                      ## CONSUMES
+  gEfiHashAlgorithmSha256Guid                   ## CONSUMES
+
+[Depex]
+  gEfiHash2ServiceBindingProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  TcpDxeExtra.uni

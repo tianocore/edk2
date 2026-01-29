@@ -1,0 +1,43 @@
+## @file
+#  Sample UEFI Application Reference EDKII Module.
+#
+#  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+# (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001000b
+  BASE_NAME                      = RedfishPlatformConfig
+  FILE_GUID                      = C02B67BB-3D19-4ACC-A080-1BDB575F8F36
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UefiMain
+
+[Sources]
+  RedfishPlatformConfig.c
+
+[Packages]
+  EmulatorPkg/EmulatorPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
+  RedfishPkg/RedfishPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  NetLib
+  UefiApplicationEntryPoint
+  UefiLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gEfiShellParametersProtocolGuid        ## CONSUMES
+  gEfiShellProtocolGuid                  ## CONSUMES
+
+[Guids]
+  gEmuRedfishServiceGuid

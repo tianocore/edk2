@@ -1,0 +1,50 @@
+## @file
+# Simple filesystem driver
+#
+# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2011, Apple Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EmuSimpleFileSystem
+  FILE_GUID                      = 35B72237-3926-CF4A-A7F3-1449F9E0E4BD
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeEmuSimpleFileSystem
+
+
+[Sources]
+  ComponentName.c
+  EmuSimpleFileSystem.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  UefiLib
+  UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+
+
+[Guids]
+  gEfiFileSystemVolumeLabelInfoIdGuid           # SOMETIMES_CONSUMED
+  gEfiFileInfoGuid                              # SOMETIMES_CONSUMED
+  gEfiFileSystemInfoGuid                        # SOMETIMES_CONSUMED
+
+
+[Protocols]
+  gEfiSimpleFileSystemProtocolGuid               # PROTOCOL BY_START
+  gEmuIoThunkProtocolGuid                        # PROTOCOL TO_START
+

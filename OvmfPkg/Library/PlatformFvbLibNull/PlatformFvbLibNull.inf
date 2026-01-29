@@ -1,0 +1,34 @@
+## @file
+#  NULL PlatformFvbLib library instance
+#
+#  This library handles hooks for the EMU Variable FVB driver.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformFvbLibNull
+  FILE_GUID                      = 79263F9A-1701-4382-98C2-573F3558E6C8
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformFvbLib|DXE_RUNTIME_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64 EBC
+#
+
+[Sources]
+  PlatformFvbLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+

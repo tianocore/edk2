@@ -1,0 +1,48 @@
+## @file
+#  Produce the Capsule Update Policy Protocol using the services of the Capsule
+#  Update Policy Library.
+#
+#  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION     = 0x00010005
+  BASE_NAME       = CapsuleUpdatePolicyDxe
+  MODULE_UNI_FILE = CapsuleUpdatePolicyDxe.uni
+  FILE_GUID       = 86F67A12-2E32-44FC-8D6C-7901E2B5649A
+  MODULE_TYPE     = DXE_DRIVER
+  VERSION_STRING  = 1.0
+  ENTRY_POINT     = CapsuleUpdatePolicyInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  CapsuleUpdatePolicyDxe.c
+  CapsuleUpdatePolicyDxe.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  FmpDevicePkg/FmpDevicePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+  CapsuleUpdatePolicyLib
+
+[Protocols]
+  gEdkiiCapsuleUpdatePolicyProtocolGuid  ## PRODUCES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  CapsuleUpdatePolicyDxeExtra.uni

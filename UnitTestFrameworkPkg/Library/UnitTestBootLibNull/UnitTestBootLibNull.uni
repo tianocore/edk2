@@ -1,0 +1,11 @@
+// /** @file
+// NULL library for UnitTestBootUsb
+//
+// Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "NULL library for UnitTestBootUsb"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "NULL library for UnitTestBootUsb."

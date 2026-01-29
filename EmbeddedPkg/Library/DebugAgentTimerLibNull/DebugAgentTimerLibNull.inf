@@ -1,0 +1,32 @@
+#/** @file
+# Component description file for Base PCI Cf8 Library.
+#
+# PCI CF8 Library that uses I/O ports 0xCF8 and 0xCFC to perform PCI Configuration cycles.
+#  Layers on top of an I/O Library instance.
+# Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DebugAgentTimerLibNull
+  FILE_GUID                      = 02f04694-2c0a-4f1e-b0ce-64be25890b03
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DebugAgentTimerLib|SEC BASE DXE_CORE
+
+
+[Sources.common]
+  DebugAgentTimerLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  IoLib
+

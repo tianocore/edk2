@@ -1,0 +1,11 @@
+ren aparser.c aparser.cpp
+ren astbase.c astbase.cpp
+ren atokenbu.c atokbuf.cpp
+ren atokenbu.h atokbuf.h
+ren atokenst.h atokstr.h
+ren dlexerba.c dlexbase.cpp
+ren dlexerba.h dlexbase.h
+ren dlexer.c dlexer.cpp
+ren list.c list.cpp
+ren pblackbo.h pblckbox.h
+ren pcctsast.c pcctsast.cpp

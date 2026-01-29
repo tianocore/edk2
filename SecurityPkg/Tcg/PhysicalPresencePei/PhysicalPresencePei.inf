@@ -1,0 +1,59 @@
+## @file
+#  Produces a PPI to indicate whether to lock TPM in PEI phase
+#
+#  This module produces PEI_LOCK_PHYSICAL_PRESENCE_PPI to indicate whether
+#  TPM physical presence needs to be locked. It can be replaced by a
+#  platform specific module.
+#
+# Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PhysicalPresencePei
+  MODULE_UNI_FILE                = PhysicalPresencePei.uni
+  FILE_GUID                      = 4FE772E8-FE3E-4086-B638-8C493C490488
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = PeimEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  PhysicalPresencePei.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  PeiServicesLib
+
+[Ppis]
+  gPeiLockPhysicalPresencePpiGuid                       ## PRODUCES
+  gEfiPeiReadOnlyVariable2PpiGuid                       ## CONSUMES
+
+[Guids]
+  gEfiPhysicalPresenceGuid                              ## SOMETIMES_CONSUMES    ## Variable:L"PhysicalPresence"
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmPhysicalPresence  ## SOMETIMES_CONSUMES
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid AND
+  gEfiPeiReadOnlyVariable2PpiGuid AND
+  gPeiTpmInitializedPpiGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  PhysicalPresencePeiExtra.uni
+

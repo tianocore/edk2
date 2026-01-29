@@ -1,0 +1,39 @@
+## @file
+#  Sample PRM Configuration Library Instance
+#
+#  The PRM configuration library instance is responsible for initializing and setting the corresponding
+#  PRM module's configuration in the boot environment.
+#
+#  Copyright (c) Microsoft Corporation
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION         = 0x00010005
+  BASE_NAME           = DxeContextBufferModuleConfigLib
+  FILE_GUID           = FFB56F09-65E3-4462-A799-2F0D1930D38C
+  MODULE_TYPE         = DXE_DRIVER
+  VERSION_STRING      = 1.0
+  LIBRARY_CLASS       = NULL |DXE_DRIVER
+  CONSTRUCTOR         = ContextBufferModuleConfigLibConstructor
+
+[Sources]
+  DxeContextBufferModuleConfigLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  PrmPkg/PrmPkg.dec
+
+[Protocols]
+  gPrmConfigProtocolGuid
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint

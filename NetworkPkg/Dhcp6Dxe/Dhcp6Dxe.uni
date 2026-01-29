@@ -1,0 +1,17 @@
+// /** @file
+// Client-side DHCPv6 services.
+//
+// This driver produces EFI DHCPv6 Protocol which is used to get IPv6 addresses
+// and other configuration parameters from DHCPv6 servers.
+//
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Client-side DHCPv6 services"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver produces EFI DHCPv6 Protocol which is used to get IPv6 addresses and other configuration parameters from DHCPv6 servers."
+

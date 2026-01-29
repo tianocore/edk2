@@ -1,0 +1,36 @@
+## @file
+#  Instance of SMM IPMI Library.
+#
+#  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmIpmiLibSmmIpmiProtocol
+  MODULE_UNI_FILE                = SmmIpmiLibSmmIpmiProtocol.uni
+  FILE_GUID                      = B422FB70-E835-448D-A921-EBA460E105B6
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = IpmiLib|DXE_SMM_DRIVER SMM_CORE
+
+#
+#  VALID_ARCHITECTURES          = IA32 X64
+#
+
+[Sources]
+  SmmIpmiLibSmmIpmiProtocol.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  SmmServicesTableLib
+
+[Protocols]
+  gSmmIpmiProtocolGuid      ## SOMETIMES_CONSUMES

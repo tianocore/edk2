@@ -1,0 +1,17 @@
+// /** @file
+// Initialized Debug Agent in PEI phase.
+//
+// This PEIM will invoke Debug Agent Library to initialize the debug agent in
+// whole PEI phase.
+//
+// Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Initialized Debug Agent in PEI phase"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This PEIM will invoke Debug Agent Library to initialize the debug agent throughout the whole PEI phase."
+

@@ -1,0 +1,108 @@
+## @file
+#  EFI Byte Code (EBC) Debugger.
+#
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EbcDebugger
+  MODULE_UNI_FILE                = EbcDebugger.uni
+  FILE_GUID                      = 8296AF37-D183-4416-B3B6-19D2A80AD4A8
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeEbcDriver
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  EbcDebuggerHook.h
+  EbcInt.c
+  EbcInt.h
+  EbcExecute.c
+  EbcExecute.h
+  EbcDebugger/Edb.c
+  EbcDebugger/Edb.h
+  EbcDebugger/EdbCommon.h
+  EbcDebugger/EdbCmdBranch.c
+  EbcDebugger/EdbCmdBreak.c
+  EbcDebugger/EdbCmdBreakpoint.c
+  EbcDebugger/EdbCmdGo.c
+  EbcDebugger/EdbCmdHelp.c
+  EbcDebugger/EdbCmdMemory.c
+  EbcDebugger/EdbCmdRegister.c
+  EbcDebugger/EdbCmdQuit.c
+  EbcDebugger/EdbCmdScope.c
+  EbcDebugger/EdbCmdStep.c
+  EbcDebugger/EdbCmdSymbol.c
+  EbcDebugger/EdbCmdExtIo.c
+  EbcDebugger/EdbCmdExtPci.c
+  EbcDebugger/EdbCommand.c
+  EbcDebugger/EdbCommand.h
+  EbcDebugger/EdbDisasm.c
+  EbcDebugger/EdbDisasm.h
+  EbcDebugger/EdbDisasmSupport.c
+  EbcDebugger/EdbDisasmSupport.h
+  EbcDebugger/EdbSymbol.c
+  EbcDebugger/EdbSymbol.h
+  EbcDebugger/EdbHook.c
+  EbcDebugger/EdbHook.h
+  EbcDebugger/EdbSupport.h
+  EbcDebugger/EdbSupportUI.c
+  EbcDebugger/EdbSupportString.c
+  EbcDebugger/EdbSupportFile.c
+
+[Sources.Ia32]
+  Ia32/EbcSupport.c
+  Ia32/EbcLowLevel.nasm
+
+[Sources.X64]
+  X64/EbcSupport.c
+  X64/EbcLowLevel.nasm
+
+[Sources.AARCH64]
+  AArch64/EbcSupport.c
+  AArch64/EbcLowLevel.S
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  DebugLib
+  BaseLib
+  CacheMaintenanceLib
+  PeCoffLib
+
+[Protocols]
+  gEfiDebugSupportProtocolGuid                  ## PRODUCES
+  gEfiEbcProtocolGuid                           ## PRODUCES
+  gEfiDebuggerConfigurationProtocolGuid         ## PRODUCES
+  gEfiEbcVmTestProtocolGuid                     ## SOMETIMES_PRODUCES
+  gEfiEbcSimpleDebuggerProtocolGuid             ## SOMETIMES_CONSUMES
+  gEfiPciRootBridgeIoProtocolGuid               ## SOMETIMES_CONSUMES
+  gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
+  gEdkiiPeCoffImageEmulatorProtocolGuid         ## PRODUCES
+
+[Guids]
+  gEfiFileInfoGuid                              ## SOMETIMES_CONSUMES ## GUID
+  gEfiDebugImageInfoTableGuid                   ## SOMETIMES_CONSUMES ## GUID
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  EbcDebuggerExtra.uni

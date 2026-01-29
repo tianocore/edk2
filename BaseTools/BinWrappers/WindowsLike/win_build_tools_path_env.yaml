@@ -1,0 +1,11 @@
+## @file
+# Add this folder to the path on Windows
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "id": "binwrappers",
+  "scope": "global-win",
+  "flags": ["set_path"]
+}

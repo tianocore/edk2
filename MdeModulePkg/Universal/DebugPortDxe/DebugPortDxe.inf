@@ -1,0 +1,66 @@
+## @file
+# This driver produces Debug Port protocol to be used by debug agent to communicate with the remote debug host.
+#
+# This driver binds exclusively to a standard UART serial port on the controller handle,
+# and initializes serial Io interface, publishs Debug Port and Device Path Protocol.
+#
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DebugPortDxe
+  MODULE_UNI_FILE                = DebugPortDxe.uni
+  FILE_GUID                      = 73E9457A-CEA1-4917-9A9C-9F1F0F0FD322
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeDebugPortDriver
+  UNLOAD_IMAGE                   = ImageUnloadHandler
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  gDebugPortDriverBinding
+#  COMPONENT_NAME                =  gDebugPortComponentName
+#  COMPONENT_NAME2               =  gDebugPortComponentName2
+#  Variable Guid C Name: gEfiDebugPortProtocolGuid Variable Name: L"DEBUGPORT"
+#
+#
+
+[Sources]
+  ComponentName.c
+  DebugPort.c
+  DebugPort.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+[LibraryClasses]
+  DevicePathLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  UefiLib
+  UefiDriverEntryPoint
+  DebugLib
+
+[Guids]
+  gEfiDebugPortVariableGuid                     ## SOMETIMES_CONSUMES   ## Variable:L"DEBUGPORT"
+  gEfiDebugPortDevicePathGuid                   ## SOMETIMES_CONSUMES   ## UNDEFINED # Device path
+
+[Protocols]
+  gEfiSerialIoProtocolGuid                      ## TO_START
+  gEfiDevicePathProtocolGuid                    ## BY_START
+  gEfiDebugPortProtocolGuid                     ## BY_START
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  DebugPortDxeExtra.uni

@@ -1,0 +1,75 @@
+## @file
+# Instance of Device Path Library based on Memory Allocation Library.
+#
+# Device Path Library that layers on top of the Memory Allocation Library.
+#
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UefiDevicePathLib
+  MODULE_UNI_FILE                = UefiDevicePathLib.uni
+  FILE_GUID                      = 91c1677a-e57f-4191-8b8e-eb7711a716e0
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DevicePathLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER SMM_CORE
+
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DevicePathUtilities.c
+  DevicePathUtilitiesDxeSmm.c
+  DevicePathToText.c
+  DevicePathFromText.c
+  UefiDevicePathLib.c
+  UefiDevicePathLib.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+[LibraryClasses]
+  BaseLib
+  MemoryAllocationLib
+  DebugLib
+  BaseMemoryLib
+  PcdLib
+  PrintLib
+
+[Guids]
+  ## SOMETIMES_CONSUMES  ## GUID
+  gEfiVTUTF8Guid
+  ## SOMETIMES_CONSUMES  ## GUID
+  gEfiVT100Guid
+  ## SOMETIMES_CONSUMES  ## GUID
+  gEfiVT100PlusGuid
+  ## SOMETIMES_CONSUMES  ## GUID
+  gEfiPcAnsiGuid
+  ## SOMETIMES_CONSUMES  ## GUID
+  gEfiUartDevicePathGuid
+  ## SOMETIMES_CONSUMES  ## GUID
+  gEfiSasDevicePathGuid
+  ## SOMETIMES_CONSUMES  ## GUID
+  gEfiVirtualDiskGuid
+  ## SOMETIMES_CONSUMES  ## GUID
+  gEfiVirtualCdGuid
+  ## SOMETIMES_CONSUMES  ## GUID
+  gEfiPersistentVirtualDiskGuid
+  ## SOMETIMES_CONSUMES  ## GUID
+  gEfiPersistentVirtualCdGuid
+
+[Protocols]
+  gEfiDevicePathProtocolGuid                    ## SOMETIMES_CONSUMES
+  gEfiDebugPortProtocolGuid                     ## UNDEFINED
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumDevicePathNodeCount    ## SOMETIMES_CONSUMES
+

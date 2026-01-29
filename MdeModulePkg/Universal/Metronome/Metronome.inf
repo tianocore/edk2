@@ -1,0 +1,54 @@
+## @file
+# This module produces the Metronome Architectural Protocol on top of Timer Library.
+#
+# This is a generic implementation of the Metronome Architectural Protocol that
+# layers on top of an instance of the Timer Library.  The Timer Library provides
+# functions for nanosecond and microsecond delays.  This generic implementation
+# produces a fixed TickPeriod of 100ns unit, and when the WaitForTick() service
+# is called, the number of ticks passed in is converted to either nanosecond or
+# microsecond units.  If the number of ticks is small, then nanoseconds are used.
+# If the number of ticks is large, then microseconds are used.  This prevents
+# overflows that could occur for long delays if only nanoseconds were used and also
+# provides the greatest accuracy for small delays.
+#
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Metronome
+  MODULE_UNI_FILE                = Metronome.uni
+  FILE_GUID                      = C8339973-A563-4561-B858-D8476F9DEFC4
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InstallMetronome
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  TimerLib
+  DebugLib
+
+[Sources]
+  Metronome.c
+  Metronome.h
+
+[Protocols]
+  gEfiMetronomeArchProtocolGuid      ## PRODUCES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  MetronomeExtra.uni

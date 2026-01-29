@@ -1,0 +1,37 @@
+## @file
+# This driver produces the VirtIo Device Protocol instances for VirtIo Mmio
+# Device
+#
+# Copyright (C) 2013, ARM Ltd
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = VirtioMmioDeviceLib
+  FILE_GUID                      = 3b6ed966-b5d1-46a8-965b-867ff22d9c89
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = VirtioMmioDeviceLib
+
+[Sources]
+  VirtioMmioDevice.c
+  VirtioMmioDevice.h
+  VirtioMmioDeviceFunctions.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  IoLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiLib
+
+[Protocols]
+  gVirtioDeviceProtocolGuid		## PRODUCES

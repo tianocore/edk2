@@ -1,0 +1,47 @@
+#
+#  Copyright (c) 2013-2021, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010016
+  BASE_NAME                      = GenericWatchdogDxe
+  FILE_GUID                      = 0619f5c2-4858-4caa-a86a-73a21a18df6b
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = GenericWatchdogEntry
+
+[Sources.common]
+  GenericWatchdog.h
+  GenericWatchdogDxe.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmGenericTimerCounterLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  IoLib
+  PcdLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+
+[Pcd.common]
+  gArmTokenSpaceGuid.PcdGenericWatchdogControlBase
+  gArmTokenSpaceGuid.PcdGenericWatchdogRefreshBase
+  gArmTokenSpaceGuid.PcdGenericWatchdogEl2IntrNum
+
+[Protocols]
+  gEfiWatchdogTimerArchProtocolGuid       ## ALWAYS_PRODUCES
+  gHardwareInterrupt2ProtocolGuid         ## ALWAYS_CONSUMES
+
+[Depex]
+  gHardwareInterrupt2ProtocolGuid

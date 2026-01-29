@@ -1,0 +1,13 @@
+// /** @file
+// Publishes ESRT table from Firmware Management Protocol instances
+//
+// Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "Publishes ESRT table from Firmware Management Protocol instances"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver publishes the ESRT table from Firmware Management Protocol instances.<BR><BR>\n"
+                                                        "The ESRT table is published when the Ready To Boot event is signaled.<BR>"

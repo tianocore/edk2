@@ -1,0 +1,56 @@
+## @file
+#  Produces the UEFI HASH2 protocol
+#
+#  This module will use EDKII crypto library to HASH2 protocol.
+#
+#  (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
+#  Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Hash2DxeCrypto
+  FILE_GUID                      = 63E3BDCF-2AC7-4ac0-9B92-03A7541422FF
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Hash2DriverEntryPoint
+  MODULE_UNI_FILE                = Hash2DxeCrypto.uni
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.common]
+  Hash2DxeCrypto.c
+  Driver.h
+  Driver.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  BaseLib
+  BaseMemoryLib
+  BaseCryptLib
+  MemoryAllocationLib
+  UefiDriverEntryPoint
+  DebugLib
+  UefiLib
+
+[Guids]
+  gEfiHashAlgorithmSha256Guid           ## CONSUMES               ## GUID
+  gEfiHashAlgorithmSha384Guid           ## CONSUMES               ## GUID
+  gEfiHashAlgorithmSha512Guid           ## CONSUMES               ## GUID
+
+[Protocols]
+  gEfiHash2ProtocolGuid                 ## PRODUCES
+  gEfiHash2ServiceBindingProtocolGuid   ## PRODUCES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  Hash2DxeCryptoExtra.uni

@@ -1,0 +1,68 @@
+##  @file
+# Provides shell driver1 profile functions
+#
+# Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = UefiShellDriver1CommandsLib
+  FILE_GUID                      = 313D3674-3ED4-48fd-BF97-7DB35D4190D1
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = UefiShellDriver1CommandsLibConstructor
+  DESTRUCTOR                     = UefiShellDriver1CommandsLibDestructor
+
+[Sources]
+  Connect.c
+  Devices.c
+  OpenInfo.c
+  Disconnect.c
+  Reconnect.c
+  Unload.c
+  DrvDiag.c
+  Dh.c
+  Drivers.c
+  DevTree.c
+  DrvCfg.c
+  UefiShellDriver1CommandsLib.c
+  UefiShellDriver1CommandsLib.h
+  UefiShellDriver1CommandsLib.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  ShellCommandLib
+  ShellLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  SortLib
+  PrintLib
+  PeCoffGetEntryPointLib
+
+[Pcd]
+  gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask  ## CONSUMES
+
+[Protocols]
+  gEfiDriverHealthProtocolGuid                    ## UNDEFINED
+  gEfiDriverFamilyOverrideProtocolGuid            ## UNDEFINED
+  gEfiHiiConfigAccessProtocolGuid                 ## SOMETIMES_CONSUMES
+  gEfiHiiDatabaseProtocolGuid                     ## CONSUMES
+
+[Guids]
+  gEfiGlobalVariableGuid                          ## SOMETIMES_CONSUMES ## GUID
+  gEfiConsoleInDeviceGuid                         ## CONSUMES ## GUID
+  gEfiConsoleOutDeviceGuid                        ## CONSUMES ## GUID
+  gShellDriver1HiiGuid                            ## PRODUCES ## HII

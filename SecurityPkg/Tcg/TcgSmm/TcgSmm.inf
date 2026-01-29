@@ -1,0 +1,82 @@
+## @file
+#  Implements ACPI methods for the TCG feature
+#
+#  This driver implements TPM definition block in ACPI table and registers SMI
+#  callback functions for physical presence and MemoryClear to handle the requests
+#  from ACPI method.
+#
+#  Caution: This module requires additional review when modified.
+#  This driver will have external input - variable and ACPINvs data in SMM mode.
+#  This external input must be validated carefully to avoid security issue.
+#
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TcgSmm
+  MODULE_UNI_FILE                = TcgSmm.uni
+  FILE_GUID                      = 42293093-76B9-4482-8C02-3BEFDEA9B35D
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeTcgSmm
+
+[Sources]
+  TcgSmm.c
+  TcgSmm.h
+  Tpm.asl
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  UefiDriverEntryPoint
+  SmmServicesTableLib
+  UefiBootServicesTableLib
+  DebugLib
+  DxeServicesLib
+  TpmMeasurementLib
+  PcdLib
+  TcgPpVendorLib
+
+[Guids]
+  ## SOMETIMES_PRODUCES ## Variable:L"PhysicalPresence"
+  ## SOMETIMES_CONSUMES ## Variable:L"PhysicalPresence"
+  ## SOMETIMES_CONSUMES ## Variable:L"PhysicalPresenceFlags"
+  gEfiPhysicalPresenceGuid
+
+  ## SOMETIMES_PRODUCES ## Variable:L"MemoryOverwriteRequestControl"
+  ## SOMETIMES_CONSUMES ## Variable:L"MemoryOverwriteRequestControl"
+  gEfiMemoryOverwriteControlDataGuid
+
+  gEfiTpmDeviceInstanceTpm12Guid                        ## PRODUCES           ## GUID       # TPM device identifier
+
+[Protocols]
+  gEfiSmmSwDispatch2ProtocolGuid                        ## CONSUMES
+  gEfiSmmVariableProtocolGuid                           ## CONSUMES
+  gEfiAcpiTableProtocolGuid                             ## CONSUMES
+
+[FixedPcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdSmiCommandIoPort     ## CONSUMES
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId    ## SOMETIMES_CONSUMES
+
+[Depex]
+  gEfiAcpiTableProtocolGuid AND
+  gEfiSmmSwDispatch2ProtocolGuid AND
+  gEfiSmmVariableProtocolGuid AND
+  gEfiTcgProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  TcgSmmExtra.uni
+

@@ -1,0 +1,43 @@
+## @file
+#  UEFI Application to display CPUID leaf information.
+#
+#  This UEFI application displays the registers values returned by CPUID for
+#  all the CPUID leafs and sub-leafs that a CPU supports.  It also displays
+#  the values of all the bit fields in the registers returned by each CPUID
+#  leaf and sub-leaf.
+#
+#  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Cpuid
+  MODULE_UNI_FILE                = Cpuid.uni
+  FILE_GUID                      = 4AE7E1E8-9DFE-4e3e-85B4-A5F6ABD470FB
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 0.5
+  ENTRY_POINT                    = UefiMain
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  Cpuid.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  BaseLib
+  UefiLib
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  CpuidExtra.uni

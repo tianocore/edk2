@@ -1,0 +1,17 @@
+// /** @file
+// Instance of PCD Library without support of dynamic PCD entries.
+//
+// PCD Library that only provides access to Feature Flag, Fixed At Build,
+// and Binary Patch typed PCD entries. Access to Dynamic PCD entries is ignored.
+//
+// Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Instance of PCD Library without support of dynamic PCD entries"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "PCD Library that only provides access to Feature Flag, Fixed At Build, and Binary Patch typed PCD entries. Access to Dynamic PCD entries is ignored."
+

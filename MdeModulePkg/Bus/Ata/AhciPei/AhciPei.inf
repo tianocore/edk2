@@ -1,0 +1,73 @@
+## @file
+#  The AhciPei driver is used to manage ATA hard disk device working under AHCI
+#  mode at PEI phase.
+#
+#  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AhciPei
+  MODULE_UNI_FILE                = AhciPei.uni
+  FILE_GUID                      = 79E5CA15-7A2D-4F37-A63B-D1C7BBCA47AD
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = AtaAhciPeimEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  AhciPei.c
+  AhciPei.h
+  AhciPeiBlockIo.c
+  AhciPeiBlockIo.h
+  AhciPeiPassThru.c
+  AhciPeiPassThru.h
+  AhciPeiS3.c
+  AhciPeiStorageSecurity.c
+  AhciPeiStorageSecurity.h
+  AhciMode.c
+  DevicePath.c
+  DmaMem.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  PeiServicesLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  IoLib
+  TimerLib
+  LockBoxLib
+  PeimEntryPoint
+  DevicePathLib
+
+[Ppis]
+  gEdkiiPeiAtaAhciHostControllerPpiGuid          ## CONSUMES
+  gEdkiiIoMmuPpiGuid                             ## CONSUMES
+  gEfiEndOfPeiSignalPpiGuid                      ## CONSUMES
+  gEdkiiPeiPciDevicePpiGuid                      ## CONSUMES
+  gEdkiiPeiAtaPassThruPpiGuid                    ## SOMETIMES_PRODUCES
+  gEfiPeiVirtualBlockIoPpiGuid                   ## SOMETIMES_PRODUCES
+  gEfiPeiVirtualBlockIo2PpiGuid                  ## SOMETIMES_PRODUCES
+  gEdkiiPeiStorageSecurityCommandPpiGuid         ## SOMETIMES_PRODUCES
+
+[Guids]
+  gS3StorageDeviceInitListGuid                   ## SOMETIMES_CONSUMES ## UNDEFINED
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid AND
+  gEfiPeiMasterBootModePpiGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  AhciPeiExtra.uni

@@ -1,0 +1,171 @@
+;------------------------------------------------------------------------------
+; @file
+; This file includes all other code files to assemble the reset vector code
+;
+; Copyright (c) 2008 - 2013, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2020 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
+; SPDX-License-Identifier: BSD-2-Clause-Patent
+;
+;------------------------------------------------------------------------------
+
+;
+; If neither ARCH_IA32 nor ARCH_X64 are defined, then try to include
+; Base.h to use the C pre-processor to determine the architecture.
+;
+%ifndef ARCH_IA32
+  %ifndef ARCH_X64
+    #include <Base.h>
+    #if defined (MDE_CPU_IA32)
+      %define ARCH_IA32
+    #elif defined (MDE_CPU_X64)
+      %define ARCH_X64
+    #endif
+  %endif
+%endif
+
+%ifdef ARCH_IA32
+  %ifdef ARCH_X64
+    %error "Only one of ARCH_IA32 or ARCH_X64 can be defined."
+  %endif
+%elifdef ARCH_X64
+%else
+  %error "Either ARCH_IA32 or ARCH_X64 must be defined."
+%endif
+
+%include "CommonMacros.inc"
+
+%include "PostCodes.inc"
+
+%ifdef DEBUG_PORT80
+  %include "Port80Debug.asm"
+%elifdef DEBUG_SERIAL
+  %include "SerialDebug.asm"
+%elif 0
+; Set ^ this to 1 to enable postcodes on the qemu debug console.
+; Disabled by default because it is incompatible with SEV-ES/SEV-SNP and TDX.
+  %include "QemuDebugCon.asm"
+%else
+  %include "DebugDisabled.asm"
+%endif
+
+%include "Ia32/SearchForBfvBase.asm"
+%include "Ia32/SearchForSecEntry.asm"
+
+%define WORK_AREA_GUEST_TYPE          (FixedPcdGet32 (PcdOvmfWorkAreaBase))
+%define PT_ADDR(Offset)               (FixedPcdGet32 (PcdOvmfSecPageTablesBase) + (Offset))
+%define PG_5_LEVEL                    (FixedPcdGetBool (PcdUse5LevelPageTable))
+
+%define GHCB_PT_ADDR                  (FixedPcdGet32 (PcdOvmfSecGhcbPageTableBase))
+%define GHCB_BASE                     (FixedPcdGet32 (PcdOvmfSecGhcbBase))
+%define GHCB_SIZE                     (FixedPcdGet32 (PcdOvmfSecGhcbSize))
+%define SEV_ES_WORK_AREA              (FixedPcdGet32 (PcdSevEsWorkAreaBase))
+%define SEV_ES_WORK_AREA_SIZE         25
+%define SEV_ES_WORK_AREA_STATUS_MSR   (FixedPcdGet32 (PcdSevEsWorkAreaBase))
+%define SEV_ES_WORK_AREA_RDRAND       (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 8)
+%define SEV_ES_WORK_AREA_ENC_MASK     (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 16)
+%define SEV_ES_WORK_AREA_FLAGS        (FixedPcdGet32 (PcdSevEsWorkAreaBase) + 24)
+%define SEV_ES_WORK_AREA_FLAG_VC      0x01
+%define SEV_ES_WORK_AREA_FLAG_CSFW_NO 0x02
+%define SEV_ES_VC_TOP_OF_STACK        (FixedPcdGet32 (PcdOvmfSecPeiTempRamBase) + FixedPcdGet32 (PcdOvmfSecPeiTempRamSize))
+%define SEV_SNP_SECRETS_BASE          (FixedPcdGet32 (PcdOvmfSnpSecretsBase))
+%define SEV_SNP_SECRETS_SIZE          (FixedPcdGet32 (PcdOvmfSnpSecretsSize))
+%define CPUID_BASE                    (FixedPcdGet32 (PcdOvmfCpuidBase))
+%define CPUID_SIZE                    (FixedPcdGet32 (PcdOvmfCpuidSize))
+%define SVSM_CAA_BASE                 (FixedPcdGet32 (PcdOvmfSecSvsmCaaBase))
+%define SVSM_CAA_SIZE                 (FixedPcdGet32 (PcdOvmfSecSvsmCaaSize))
+%if (FixedPcdGet32 (PcdSevLaunchSecretBase) > 0)
+  ; There's a reserved page for SEV secrets and hashes; the VMM will fill and
+  ; validate the page, or mark it as a zero page.
+  %define SEV_SNP_KERNEL_HASHES_BASE    (FixedPcdGet32 (PcdSevLaunchSecretBase))
+  %define SEV_SNP_KERNEL_HASHES_SIZE    (FixedPcdGet32 (PcdSevLaunchSecretSize) + FixedPcdGet32 (PcdQemuHashTableSize))
+%else
+  %define SEV_SNP_KERNEL_HASHES_BASE    0
+  %define SEV_SNP_KERNEL_HASHES_SIZE    0
+%endif
+%define SNP_SEC_MEM_BASE_DESC_1       (FixedPcdGet32 (PcdOvmfSecPageTablesBase))
+%define SNP_SEC_MEM_SIZE_DESC_1       (FixedPcdGet32 (PcdOvmfSecGhcbBase) - SNP_SEC_MEM_BASE_DESC_1)
+;
+; The PcdOvmfSecGhcbBase reserves two GHCB pages. The first page is used
+; as GHCB shared page and second is used for bookkeeping to support the
+; nested GHCB in SEC phase. The bookkeeping page is mapped private. The VMM
+; does not need to validate the shared page but it need to validate the
+; bookkeeping page.
+;
+%define SNP_SEC_MEM_BASE_DESC_2       (GHCB_BASE + 0x1000)
+%define SNP_SEC_MEM_SIZE_DESC_2       (SEV_SNP_SECRETS_BASE - SNP_SEC_MEM_BASE_DESC_2)
+%define SNP_SEC_MEM_BASE_DESC_3       (SVSM_CAA_BASE + SVSM_CAA_SIZE + SEV_SNP_KERNEL_HASHES_SIZE)
+%define SNP_SEC_MEM_SIZE_DESC_3       (FixedPcdGet32 (PcdOvmfPeiMemFvBase) - SNP_SEC_MEM_BASE_DESC_3)
+
+%ifdef ARCH_X64
+  #include <AutoGen.h>
+
+  %if (FixedPcdGet32 (PcdOvmfSecPageTablesSize) != 0x6000)
+    %error "This implementation inherently depends on PcdOvmfSecPageTablesSize"
+  %endif
+
+  %if (FixedPcdGet32 (PcdOvmfSecGhcbPageTableSize) != 0x1000)
+    %error "This implementation inherently depends on PcdOvmfSecGhcbPageTableSize"
+  %endif
+
+  %if (FixedPcdGet32 (PcdOvmfSecGhcbSize) != 0x2000)
+    %error "This implementation inherently depends on PcdOvmfSecGhcbSize"
+  %endif
+
+  %if ((FixedPcdGet32 (PcdOvmfSecGhcbBase) >> 21) != \
+       ((FixedPcdGet32 (PcdOvmfSecGhcbBase) + FixedPcdGet32 (PcdOvmfSecGhcbSize) - 1) >> 21))
+    %error "This implementation inherently depends on PcdOvmfSecGhcbBase not straddling a 2MB boundary"
+  %endif
+
+  %define TDX_BFV_RAW_DATA_OFFSET   FixedPcdGet32 (PcdBfvRawDataOffset)
+  %define TDX_BFV_RAW_DATA_SIZE     FixedPcdGet32 (PcdBfvRawDataSize)
+  %define TDX_BFV_MEMORY_BASE       FixedPcdGet32 (PcdBfvBase)
+  %define TDX_BFV_MEMORY_SIZE       FixedPcdGet32 (PcdBfvRawDataSize)
+
+  %define TDX_CFV_RAW_DATA_OFFSET   FixedPcdGet32 (PcdCfvRawDataOffset)
+  %define TDX_CFV_RAW_DATA_SIZE     FixedPcdGet32 (PcdCfvRawDataSize)
+  %define TDX_CFV_MEMORY_BASE       FixedPcdGet32 (PcdCfvBase),
+  %define TDX_CFV_MEMORY_SIZE       FixedPcdGet32 (PcdCfvRawDataSize),
+
+  %define TDX_HEAP_STACK_BASE       FixedPcdGet32 (PcdOvmfSecPeiTempRamBase)
+  %define TDX_HEAP_STACK_SIZE       FixedPcdGet32 (PcdOvmfSecPeiTempRamSize)
+
+  %define TDX_HOB_MEMORY_BASE       FixedPcdGet32 (PcdOvmfSecGhcbBase)
+  %define TDX_HOB_MEMORY_SIZE       FixedPcdGet32 (PcdOvmfSecGhcbSize)
+
+  %define TDX_INIT_MEMORY_BASE      FixedPcdGet32 (PcdOvmfWorkAreaBase)
+  %define TDX_INIT_MEMORY_SIZE      (FixedPcdGet32 (PcdOvmfWorkAreaSize) + FixedPcdGet32 (PcdOvmfSecGhcbBackupSize))
+
+  %define OVMF_PAGE_TABLE_BASE      FixedPcdGet32 (PcdOvmfSecPageTablesBase)
+  %define OVMF_PAGE_TABLE_SIZE      FixedPcdGet32 (PcdOvmfSecPageTablesSize)
+
+  %define TDX_WORK_AREA_PGTBL_READY (FixedPcdGet32 (PcdOvmfWorkAreaBase) + 4)
+  %define TDX_WORK_AREA_GPAW        (FixedPcdGet32 (PcdOvmfWorkAreaBase) + 8)
+
+  %define IGVM_PARAM_START          (FixedPcdGet32 (PcdOvmfIgvmParamBase))
+  %define IGVM_PARAM_SIZE           (FixedPcdGet32 (PcdOvmfIgvmParamSize))
+
+  %define IGVM_HOB_START            (FixedPcdGet32 (PcdOvmfIgvmHobBase))
+  %define IGVM_HOB_SIZE             (FixedPcdGet32 (PcdOvmfIgvmHobSize))
+
+  %include "X64/IntelTdxMetadata.asm"
+  %include "Ia32/Flat32ToFlat64.asm"
+  %include "Ia32/PageTables64.asm"
+  %include "Ia32/IntelTdx.asm"
+  %include "X64/OvmfSevMetadata.asm"
+  %include "X64/IgvmMetadata.asm"
+%endif
+
+%include "Ia32/AmdSev.asm"
+
+%include "Ia16/Real16ToFlat32.asm"
+%include "Ia16/Init16.asm"
+
+%include "Main.asm"
+
+  %define SEV_ES_AP_RESET_IP  FixedPcdGet32 (PcdSevEsWorkAreaBase)
+  %define SEV_LAUNCH_SECRET_BASE  FixedPcdGet32 (PcdSevLaunchSecretBase)
+  %define SEV_LAUNCH_SECRET_SIZE  FixedPcdGet32 (PcdSevLaunchSecretSize)
+  %define SEV_FW_HASH_BLOCK_BASE  FixedPcdGet32 (PcdQemuHashTableBase)
+  %define SEV_FW_HASH_BLOCK_SIZE  FixedPcdGet32 (PcdQemuHashTableSize)
+%include "Ia16/ResetVectorVtf0.asm"
+

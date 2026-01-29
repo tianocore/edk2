@@ -1,0 +1,18 @@
+// /** @file
+// SecCore module that implements the SEC phase.
+//
+// This is the first module taking control of the platform upon power-on/reset.
+// It implements the first phase of the security phase. The entry point function is
+// _ModuleEntryPoint in PlatformSecLib. The entry point function will switch to
+// protected mode, setup flat memory model, enable temporary memory and
+// call into SecStartup().
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "SecCore module that implements the SEC phase"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This is the first module taking control of the platform upon power-on/reset. It implements the first phase of the security phase. The entry point function is _ModuleEntryPoint in PlatformSecLib. The entry point function will switch to protected mode, will setup flat memory model, will enable temporary memory and will call into SecStartup()."

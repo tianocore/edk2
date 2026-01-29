@@ -1,0 +1,16 @@
+// /** @file
+// Null Platform Hook Library instance with dependency on gPeiSerialPortPpiGuid
+//
+// Provides platform-specific implementations to support core functionality. Currently this provides a hook to initialize the serial port with dependency on gPeiSerialPortPpiGuid.
+//
+// Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Platform Hook Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Provides platform-specific implementations to support core functionality. Currently this provides a hook to initialize the serial port with dependency on gPeiSerialPortPpiGuid."
+

@@ -1,0 +1,35 @@
+## @file
+# SMM CPU Rendezvous service lib.
+#
+# This is SMM CPU rendezvous service lib that wait for all
+# APs to enter SMM mode.
+#
+# Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmCpuRendezvousLib
+  FILE_GUID                      = 1509Bb36-9Ba4-438B-B195-Ac5914Db14E2
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  LIBRARY_CLASS                  = SmmCpuRendezvousLib|MM_STANDALONE DXE_SMM_DRIVER
+
+[Sources]
+  SmmCpuRendezvousLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MmServicesTableLib
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout                 ## CONSUMES
+
+[Protocols]
+  gEdkiiSmmCpuRendezvousProtocolGuid

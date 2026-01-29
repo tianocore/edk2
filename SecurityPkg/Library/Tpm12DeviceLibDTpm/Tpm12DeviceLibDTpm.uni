@@ -1,0 +1,18 @@
+// /** @file
+// Provides TPM 1.2 TIS functions
+//
+// This library implements TIS (TPM Interface Specification) functions which is
+// used for every TPM 1.2 command. Choosing this library means platform uses and
+// only uses TPM 1.2 device.
+//
+// Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Provides TPM 1.2 TIS functions"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library implements TIS (TPM Interface Specification) functions which is used for every TPM 1.2 command. Choosing this library means platform uses and only uses TPM 1.2 device."
+

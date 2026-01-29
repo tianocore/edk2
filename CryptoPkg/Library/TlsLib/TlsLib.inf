@@ -1,0 +1,38 @@
+## @file
+#  SSL/TLS Wrapper Library Instance based on OpenSSL.
+#
+#  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+#  (C) Copyright 2016-2020 Hewlett Packard Enterprise Development LP<BR>
+#  Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TlsLib
+  MODULE_UNI_FILE                = TlsLib.uni
+  FILE_GUID                      = CC729DC5-4E21-0B36-1A00-3A8E1B86A155
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TlsLib|DXE_DRIVER DXE_CORE UEFI_APPLICATION UEFI_DRIVER
+
+[Sources]
+  InternalTlsLib.h
+  TlsInit.c
+  TlsConfig.c
+  TlsProcess.c
+  SysCall/inet_pton.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseCryptLib
+  BaseMemoryLib
+  DebugLib
+  IntrinsicLib
+  MemoryAllocationLib
+  OpensslLib
+  SafeIntLib

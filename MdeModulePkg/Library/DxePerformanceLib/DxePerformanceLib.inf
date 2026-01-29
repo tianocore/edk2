@@ -1,0 +1,50 @@
+## @file
+#  Performance library instance used in DXE phase.
+#
+#  This library instance provides infrastructure for DXE phase drivers to log performance
+#  data. It consumes PerformanceEx or Performance Protocol published by DxeCorePerformanceLib
+#  to log performance data. If both PerformanceEx and Performance Protocol are not available,
+#  it does not log any performance information.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxePerformanceLib
+  MODULE_UNI_FILE                = DxePerformanceLib.uni
+  FILE_GUID                      = 8B8B4CCC-65FC-41a5-8067-308B8E42CCF2
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PerformanceLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  DxePerformanceLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+
+[LibraryClasses]
+  PcdLib
+  UefiBootServicesTableLib
+  DebugLib
+
+
+[Guids]
+  gEdkiiPerformanceMeasurementProtocolGuid    ## SOMETIMES_CONSUMES   ## UNDEFINED # Locate protocol
+
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask    ## CONSUMES
+

@@ -1,0 +1,39 @@
+#/** @file
+# Semihosting JTAG lib
+#
+# Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+# Copyright (c) 2011 - 2021, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SemihostLib
+  FILE_GUID                      = C40D08BA-DB7B-4F07-905A-C5FE4B5AF987
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SemihostLib
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+[Sources.common]
+  SemihostLib.c
+  SemihostPrivate.h
+
+[Sources.AARCH64]
+  AArch64/GccSemihost.S
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ArmPkg/ArmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+

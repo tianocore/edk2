@@ -1,0 +1,14 @@
+// /** @file
+// This module provides Cmocka Library implementation.
+//
+// This module provides Cmocka Library implementation.
+//
+// Copyright (c) 2019 - 2020, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "Cmocka Library implementation"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module provides Cmocka Library implementation."

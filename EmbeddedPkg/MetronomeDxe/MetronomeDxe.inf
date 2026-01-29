@@ -1,0 +1,44 @@
+#/** @file
+#
+#    Component description file for Bds module
+#
+#  Copyright (c) 2008, Apple Inc. All rights reserved.
+#  Copyright (c) 2012, ARM Ltd. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MetronomeDxe
+  FILE_GUID                      = 4C6E0267-C77D-410D-8100-1495911A989D
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = MetronomeInitialize
+
+[Sources.common]
+  Metronome.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiLib
+  UefiBootServicesTableLib
+  DebugLib
+  PrintLib
+  UefiDriverEntryPoint
+  TimerLib
+
+[FixedPcd]
+  gEmbeddedTokenSpaceGuid.PcdMetronomeTickPeriod
+
+[Protocols]
+  gEfiMetronomeArchProtocolGuid
+
+[depex]
+  TRUE

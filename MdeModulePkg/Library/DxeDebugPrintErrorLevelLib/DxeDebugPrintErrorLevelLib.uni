@@ -1,0 +1,17 @@
+// /** @file
+// Debug Print Error Level library instance that provide compatibility with the "err" shell command.
+//
+// This includes support for the Debug Mask Protocol supports for global debug print error level mask
+// stored in an EFI Variable. This library instance only support DXE Phase modules.
+//
+// Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Debug Print Error Level library instance that provide compatibility with the \"err\" shell command"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This includes support for the Debug Mask Protocol supports for global debug print error level mask stored in an EFI Variable. This library instance only support DXE Phase modules."
+

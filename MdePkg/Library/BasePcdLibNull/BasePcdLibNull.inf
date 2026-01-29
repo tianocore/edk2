@@ -1,0 +1,37 @@
+## @file
+#  Instance of PCD Library without support of dynamic PCD entries.
+#
+#  PCD Library that only provides access to Feature Flag, Fixed At Build,
+#  and Binary Patch typed PCD entries. Access to Dynamic PCD entries is ignored.
+#
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BasePcdLibNull
+  MODULE_UNI_FILE                = BasePcdLibNull.uni
+  FILE_GUID                      = 40096a3a-5c2a-4fbc-aef7-5475dd7ab334
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PcdLib
+
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  PcdLib.c
+
+[LibraryClasses]
+  DebugLib
+  BaseMemoryLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+

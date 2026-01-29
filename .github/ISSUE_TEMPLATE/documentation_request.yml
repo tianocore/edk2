@@ -1,0 +1,78 @@
+# TianoCore edk2 GitHub Documentation Request Template
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+name: 📖 Documentation Request
+description: Request a documentation change
+title: "[Documentation]: <title>"
+labels: ["type:documentation-request", "state:needs-triage"]
+
+body:
+  - type: markdown
+    attributes:
+      value: >
+        👋 Thanks for taking the time to help us improve our documentation!
+
+
+        This form is used to request documentation changes that should be contributed to the **edk2** repository.
+
+
+        For example, to improve API documentation in a library class header file or add a markdown file to sit
+        alongside the code implementation of a particularly complex feature or module.
+
+
+        - To file an issue for a TianoCore specification, refer to [these instructions](https://github.com/tianocore-docs/edk2-TemplateSpecification/wiki/TianoCore-Documents-GitBook-Overview)
+        and reference the specifications In the [TianoCore Docs organization](https://github.com/tianocore-docs).
+
+        - For UEFI specifications, refer to the [UEFI Forum](https://uefi.org/specifications) website.
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+
+  - type: textarea
+    id: request_description
+    attributes:
+      label: Request Description
+      description: |
+        A clear and concise description of what needs to change (*insert images or attachments if relevant*)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: request_owner
+    attributes:
+      label: Are you going to make the change?
+      description: Indicate if you are going to make this change or requesting someone else make it.
+      multiple: false
+      options:
+        - I will make the change
+        - Someone else needs to make the change
+    validations:
+      required: true
+
+  - type: dropdown
+    id: needs_maintainer_feedback
+    attributes:
+      label: Do you need maintainer feedback?
+      description: Indicate if you would like a maintainer to provide feedback on this submission.
+      multiple: false
+      options:
+        - No maintainer feedback needed
+        - Maintainer feedback requested
+    validations:
+      required: true
+
+  - type: textarea
+    id: anything_else
+    attributes:
+      label: Anything else?
+      description: |
+        Links? References? Anything that will give us more context about the request.
+
+        Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
+    validations:
+      required: false

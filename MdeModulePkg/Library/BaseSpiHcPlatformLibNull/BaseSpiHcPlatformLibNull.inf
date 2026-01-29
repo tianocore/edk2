@@ -1,0 +1,33 @@
+## @file
+#  NULL library for platform SPI Host controller, which should be provided
+#  by the OEM.
+#
+#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+[Defines]
+  INF_VERSION               = 1.27
+  BASE_NAME                 = BaseSpiHcPlatformLibNull
+  FILE_GUID                 = 3C230948-6DF5-4802-8177-967A190579CF
+  MODULE_TYPE               = BASE
+  VERSION_STRING            = 0.1
+  PI_SPECIFICATION_VERSION  = 0x0001000A
+  LIBRARY_CLASS             = SpiHcPlatformLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DevicePathLib
+  UefiLib
+
+[Sources]
+  BaseSpiHcPlatformLibNull.c
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  BaseSpiHcPlatformLibNull.uni

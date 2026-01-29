@@ -1,0 +1,46 @@
+## @file
+#
+#  Copyright (c) 2011 - 2020, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PL061GpioDxe
+  FILE_GUID                      = 5c1997d7-8d45-4f21-af3c-2206b8ed8bec
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = PL061InstallProtocol
+[Sources.common]
+  PL061Gpio.c
+  PL061Gpio.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  IoLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+[Pcd]
+  gArmPlatformTokenSpaceGuid.PcdPL061GpioBase
+
+[Protocols]
+  gEmbeddedGpioProtocolGuid
+  gPlatformGpioProtocolGuid
+
+[Depex]
+  TRUE

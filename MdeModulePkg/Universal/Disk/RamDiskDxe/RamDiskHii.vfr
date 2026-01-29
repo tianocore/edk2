@@ -1,0 +1,94 @@
+///** @file
+//  VFR file used by the RamDiskDxe driver.
+//
+//  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+//  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//**/
+
+#include "RamDiskNVData.h"
+
+formset
+  guid      = RAM_DISK_FORM_SET_GUID,
+  title     = STRING_TOKEN(STR_FORM_SET_TITLE),
+  help      = STRING_TOKEN(STR_FORM_SET_TITLE_HELP),
+  classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
+
+  //
+  // Form #1 "Main Form - Add/Remove/Show RAM Disks"
+  //
+  form formid = MAIN_FORM_ID,
+    title  = STRING_TOKEN(STR_MAIN_FORM_TITLE);
+
+    oneof
+      questionid  = CREATE_RAW_MEMORY_TYPE_QUESTION_ID,
+        prompt      = STRING_TOKEN(STR_MEMORY_TYPE_PROMPT),
+        help        = STRING_TOKEN(STR_MEMORY_TYPE_HELP),
+        flags       = NUMERIC_SIZE_1 | INTERACTIVE,
+        option text = STRING_TOKEN(STR_RAM_DISK_BOOT_SERVICE_DATA_MEMORY), value = RAM_DISK_BOOT_SERVICE_DATA_MEMORY, flags = DEFAULT;
+        option text = STRING_TOKEN(STR_RAM_DISK_RESERVED_MEMORY), value = RAM_DISK_RESERVED_MEMORY, flags = 0;
+    endoneof;
+
+    subtitle text = STRING_TOKEN(STR_RAM_DISK_NULL_STRING);
+
+    goto CREATE_RAW_RAM_DISK_FORM_ID,
+      prompt = STRING_TOKEN(STR_GOTO_ADD_RAW_FORM),
+      help   = STRING_TOKEN(STR_GOTO_ADD_RAW_FORM_HELP);
+
+    goto MAIN_FORM_ID,
+      prompt = STRING_TOKEN(STR_GOTO_ADD_FROM_FILE_FORM),
+      help   = STRING_TOKEN(STR_GOTO_ADD_FROM_FILE_FORM_HELP),
+      flags  = INTERACTIVE,
+      key    = MAIN_GOTO_FILE_EXPLORER_ID;
+
+    subtitle text = STRING_TOKEN(STR_RAM_DISK_NULL_STRING);
+    subtitle text = STRING_TOKEN(STR_RAM_DISK_LIST_TEXT);
+
+    label MAIN_LABEL_LIST_START;
+    label MAIN_LABEL_LIST_END;
+
+    subtitle text = STRING_TOKEN(STR_RAM_DISK_NULL_STRING);
+
+    text
+      help   = STRING_TOKEN(STR_REMOVE_SEL_HELP),
+      text   = STRING_TOKEN(STR_REMOVE_SEL_TEXT),
+      flags  = INTERACTIVE,
+      key    = MAIN_REMOVE_RD_QUESTION_ID;
+
+  endform;
+
+  //
+  // Form #2 "Add New Raw RAM Disk"
+  //
+  form formid = CREATE_RAW_RAM_DISK_FORM_ID,
+    title  = STRING_TOKEN(STR_ADD_RAW_FORM_TITLE);
+
+    subtitle text = STRING_TOKEN(STR_RAM_DISK_NULL_STRING);
+
+    numeric
+      questionid = CREATE_RAW_SIZE_QUESTION_ID,
+      prompt  = STRING_TOKEN(STR_SIZE_PROMPT),
+      help    = STRING_TOKEN(STR_SIZE_HELP),
+      flags   = NUMERIC_SIZE_8 | DISPLAY_UINT_HEX | INTERACTIVE,
+      minimum = 1,
+      maximum = 0xFFFFFFFFFFFFFFFF,
+    endnumeric;
+
+    subtitle text = STRING_TOKEN(STR_RAM_DISK_NULL_STRING);
+
+    text
+      help   = STRING_TOKEN(STR_CREATE_AND_EXIT_HELP),
+      text   = STRING_TOKEN(STR_CREATE_AND_EXIT_PROMPT),
+      flags  = INTERACTIVE,
+      key    = CREATE_RAW_SUBMIT_QUESTION_ID;
+
+    text
+      help   = STRING_TOKEN(STR_DISCARD_AND_EXIT_HELP),
+      text   = STRING_TOKEN(STR_DISCARD_AND_EXIT_PROMPT),
+      flags  = INTERACTIVE,
+      key    = CREATE_RAW_DISCARD_QUESTION_ID;
+
+  endform;
+
+endformset;

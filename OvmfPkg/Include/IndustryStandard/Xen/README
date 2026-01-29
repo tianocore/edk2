@@ -1,0 +1,35 @@
+The headers in this directory have been imported from the Xen Project with few
+modification that are described in this README.
+
+The modifications that needed to be done are:
+- Use of ZeroMem() or SetMem() instead of memset().
+- Drop any i386 references as OVMF Xen support is only for x64.
+- Replace the types with the ones used in UEFI.
+
+
+* Command to run to change types:
+find OvmfPkg/Include/IndustryStandard/Xen -type f -name '*.h' -exec sed --regexp-extended --file=fix_type_in_xen_includes.sed --in-place {} \;
+
+$ cat fix_type_in_xen_includes.sed
+# Avoid changing the 'long' that is not a type.
+/as long as/b
+
+s/([^a-zA-Z0-9_]|^)uint8_t([^a-zA-Z0-9_]|$)/\1UINT8\2/g
+s/([^a-zA-Z0-9_]|^)uint16_t([^a-zA-Z0-9_]|$)/\1UINT16\2/g
+s/([^a-zA-Z0-9_]|^)uint32_t([^a-zA-Z0-9_]|$)/\1UINT32\2/g
+s/([^a-zA-Z0-9_]|^)uint64_t([^a-zA-Z0-9_]|$)/\1UINT64\2/g
+
+s/([^a-zA-Z0-9_]|^)int8_t([^a-zA-Z0-9_]|$)/\1INT8\2/g
+s/([^a-zA-Z0-9_]|^)int16_t([^a-zA-Z0-9_]|$)/\1INT16\2/g
+s/([^a-zA-Z0-9_]|^)int32_t([^a-zA-Z0-9_]|$)/\1INT32\2/g
+s/([^a-zA-Z0-9_]|^)int64_t([^a-zA-Z0-9_]|$)/\1INT64\2/g
+
+s/([^a-zA-Z0-9_]|^)void([^a-zA-Z0-9_]|$)/\1VOID\2/g
+s/([^a-zA-Z0-9_]|^)unsigned int([^a-zA-Z0-9_]|$)/\1UINT32\2/g
+s/([^a-zA-Z0-9_]|^)int([^a-zA-Z0-9_]|$)/\1INT32\2/g
+s/([^a-zA-Z0-9_]|^)unsigned char([^a-zA-Z0-9_]|$)/\1UINT8\2/g
+s/([^a-zA-Z0-9_]|^)char([^a-zA-Z0-9_]|$)/\1CHAR8\2/g
+s/([^a-zA-Z0-9_]|^)unsigned long([^a-zA-Z0-9_]|$)/\1UINTN\2/g
+s/([^a-zA-Z0-9_]|^)long([^a-zA-Z0-9_]|$)/\1INTN\2/g
+
+s/__x86_64__/MDE_CPU_X64/g

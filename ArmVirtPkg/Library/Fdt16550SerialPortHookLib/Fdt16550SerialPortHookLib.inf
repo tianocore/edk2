@@ -1,0 +1,38 @@
+## @file
+#  Platform Hook Library instance for 16550 Uart.
+#
+#  Copyright (c) 2020, ARM Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = Fdt16550SerialPortHookLib
+  MODULE_UNI_FILE                = Fdt16550SerialPortHookLib.uni
+  FILE_GUID                      = C6DFD3F0-179D-4376-89A5-F641A2E7EFB5
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformHookLib|DXE_CORE DXE_DRIVER UEFI_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION
+  CONSTRUCTOR                    = PlatformHookSerialPortInitialize
+
+[Sources]
+  Fdt16550SerialPortHookLib.c
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  HobLib
+
+[Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
+
+[Guids]
+  gEarly16550UartBaseAddressGuid

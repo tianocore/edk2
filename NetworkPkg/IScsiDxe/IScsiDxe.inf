@@ -1,0 +1,141 @@
+## @file
+#  Client-side iSCSI service.
+#
+#  The iSCSI driver provides iSCSI service in the preboot environment and supports
+#  booting over iSCSI. This driver supports both IPv4 and IPv6 network stack.
+#
+# Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = IScsiDxe
+  FILE_GUID                      = 86CDDF93-4872-4597-8AF9-A35AE4D3725F
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = IScsiDriverEntryPoint
+  UNLOAD_IMAGE                   = IScsiUnload
+  MODULE_UNI_FILE                = IScsiDxe.uni
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+#  DRIVER_BINDING                =  gIScsiDriverBinding
+#  COMPONENT_NAME                =  gIScsiComponentName
+#  COMPONENT_NAME2               =  gIScsiComponentName2
+#
+
+
+[Sources]
+  ComponentName.c
+  IScsiAuthenticationInfo.c
+  IScsiCHAP.h
+  IScsiCHAP.c
+  IScsiConfig.c
+  IScsiConfig.h
+  IScsiConfigNVDataStruc.h
+  IScsiConfigStrings.uni
+  IScsiConfigVfr.vfr
+  IScsiDhcp.c
+  IScsiDhcp.h
+  IScsiDhcp6.c
+  IScsiDhcp6.h
+  IScsiDns.c
+  IScsiDns.h
+  IScsiDriver.c
+  IScsiDriver.h
+  IScsiExtScsiPassThru.c
+  IScsiIbft.c
+  IScsiIbft.h
+  IScsiInitiatorName.c
+  IScsiImpl.h
+  IScsiMisc.c
+  IScsiMisc.h
+  IScsiProto.c
+  IScsiProto.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  CryptoPkg/CryptoPkg.dec
+  NetworkPkg/NetworkPkg.dec
+
+[LibraryClasses]
+  BaseCryptLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  HiiLib
+  MemoryAllocationLib
+  NetLib
+  PrintLib
+  SafeIntLib
+  TcpIoLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiHiiServicesLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                     ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiDriverBindingProtocolGuid                 ## SOMETIMES_PRODUCES
+  gEfiPciIoProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEfiDhcp4ProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEfiDhcp6ProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEfiDhcp4ServiceBindingProtocolGuid           ## SOMETIMES_CONSUMES
+  gEfiDhcp6ServiceBindingProtocolGuid           ## SOMETIMES_CONSUMES
+  gEfiDns4ServiceBindingProtocolGuid            ## SOMETIMES_CONSUMES
+  gEfiDns4ProtocolGuid                          ## SOMETIMES_CONSUMES
+  gEfiDns6ServiceBindingProtocolGuid            ## SOMETIMES_CONSUMES
+  gEfiDns6ProtocolGuid                          ## SOMETIMES_CONSUMES
+  gEfiIp4Config2ProtocolGuid                    ## SOMETIMES_CONSUMES
+  gEfiIp6ConfigProtocolGuid                     ## SOMETIMES_CONSUMES
+  gEfiTcp4ProtocolGuid                          ## TO_START
+  gEfiTcp6ProtocolGuid                          ## TO_START
+  gEfiTcp4ServiceBindingProtocolGuid            ## TO_START
+  gEfiTcp6ServiceBindingProtocolGuid            ## TO_START
+  gEfiExtScsiPassThruProtocolGuid               ## BY_START
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
+  ## TO_START
+  ## PRODUCES
+  gEfiDevicePathProtocolGuid
+  ## PRODUCES
+  ## UNDEFINED # Variable
+  gEfiIScsiInitiatorNameProtocolGuid
+  ## PRODUCES
+  gEfiAuthenticationInfoProtocolGuid
+  ## SOMETIMES_CONSUMES
+  gEfiAdapterInformationProtocolGuid
+  gEfiNetworkInterfaceIdentifierProtocolGuid_31 ## SOMETIMES_CONSUMES
+
+[Guids]
+  gEfiEventExitBootServicesGuid                 ## SOMETIMES_CONSUMES ## Event
+  gEfiIfrTianoGuid                              ## SOMETIMES_PRODUCES ## UNDEFINED
+  gEfiAcpiTableGuid                             ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiAcpi10TableGuid                           ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiAdapterInfoNetworkBootGuid                ## SOMETIMES_CONSUMES ## UNDEFINED
+  gEfiAdapterInfoUndiIpv6SupportGuid            ## SOMETIMES_CONSUMES ## GUID
+
+  ## SOMETIMES_PRODUCES ## Variable:L"AttemptOrder"
+  ## SOMETIMES_CONSUMES ## Variable:L"AttemptOrder"
+  ## SOMETIMES_PRODUCES ## Variable:L"InitialAttemptOrder"
+  ## SOMETIMES_CONSUMES ## Variable:L"InitialAttemptOrder"
+  ## SOMETIMES_CONSUMES ## UNDEFINED # HiiIsConfigHdrMatch   mVendorStorageName
+  ## SOMETIMES_PRODUCES ## UNDEFINED # HiiConstructConfigHdr mVendorStorageName
+  ## SOMETIMES_PRODUCES ## UNDEFINED # HiiGetBrowserData     mVendorStorageName
+  ## SOMETIMES_CONSUMES ## UNDEFINED # HiiSetBrowserData     mVendorStorageName
+  ## SOMETIMES_CONSUMES ## HII
+  gIScsiConfigGuid
+
+[Pcd]
+  gEfiNetworkPkgTokenSpaceGuid.PcdIScsiAIPNetworkBootPolicy ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdMaxIScsiAttemptNumber     ## CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  IScsiDxeExtra.uni

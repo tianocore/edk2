@@ -1,0 +1,40 @@
+## @file
+# Instance of FspPlatformLib
+#
+#  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseFspPlatformLib
+  FILE_GUID                      = B6380BFB-7140-4C52-AC42-8C966C9A3F34
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FspPlatformLib
+
+[Sources]
+  FspPlatformMemory.c
+  FspPlatformNotify.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  MemoryAllocationLib
+  FspCommonLib
+  PerformanceLib
+  ReportStatusCodeLib
+
+[Guids]
+  gFspPerformanceDataGuid                                   ## CONSUMES ## GUID
+  gFspEventEndOfFirmwareGuid                                ## PRODUCES ## GUID
+  gEfiEventReadyToBootGuid                                  ## CONSUMES ## Event
+
+[Protocols]
+  gEfiPciEnumerationCompleteProtocolGuid                    ## CONSUMES
+

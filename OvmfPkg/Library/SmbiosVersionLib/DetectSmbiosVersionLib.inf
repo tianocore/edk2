@@ -1,0 +1,40 @@
+## @file
+#
+# A hook-in library for MdeModulePkg/Universal/SmbiosDxe, in order to set
+# gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion (and possibly other PCDs)
+# just before SmbiosDxe consumes them.
+#
+# Copyright (C) 2013, 2015, Red Hat, Inc.
+# Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DetectSmbiosVersionLib
+  FILE_GUID                      = 6c633bb2-ae33-49ae-9f89-b5aa999fe3ae
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SmbiosVersionLib|DXE_DRIVER
+  CONSTRUCTOR                    = DetectSmbiosVersion
+
+[Sources]
+  DetectSmbiosVersionLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  PcdLib
+  QemuFwCfgLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuSmbiosValidated

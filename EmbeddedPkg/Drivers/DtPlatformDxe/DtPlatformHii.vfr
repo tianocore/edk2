@@ -1,0 +1,38 @@
+/** @file
+*
+*  Copyright (c) 2017, Linaro, Ltd. All rights reserved.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+#include <Uefi/UefiMultiPhase.h>
+#include "DtPlatformDxe.h"
+
+formset
+  guid      = DT_PLATFORM_FORMSET_GUID,
+  title     = STRING_TOKEN(STR_FORM_SET_TITLE),
+  help      = STRING_TOKEN(STR_FORM_SET_TITLE_HELP),
+  classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
+
+  efivarstore DT_ACPI_VARSTORE_DATA,
+    attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,  // EFI variable attributes
+    name  = DtAcpiPref,
+    guid  = DT_PLATFORM_FORMSET_GUID;
+
+  form formid = 0x1000,
+    title  = STRING_TOKEN(STR_MAIN_FORM_TITLE);
+
+    oneof varid = DtAcpiPref.Pref,
+        prompt      = STRING_TOKEN(STR_DT_ACPI_SELECT_PROMPT),
+        help        = STRING_TOKEN(STR_DT_ACPI_SELECT_HELP),
+        flags       = NUMERIC_SIZE_1 | INTERACTIVE | RESET_REQUIRED,
+        option text = STRING_TOKEN(STR_DT_ACPI_SELECT_DT), value = DT_ACPI_SELECT_DT, flags = DEFAULT;
+        option text = STRING_TOKEN(STR_DT_ACPI_SELECT_ACPI), value = DT_ACPI_SELECT_ACPI, flags = 0;
+    endoneof;
+
+    subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+  endform;
+
+endformset;

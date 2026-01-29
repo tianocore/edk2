@@ -1,0 +1,68 @@
+## @file
+# DXE S3 boot script Library.
+#
+# Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeS3BootScriptLib
+  MODULE_UNI_FILE                = DxeS3BootScriptLib.uni
+  FILE_GUID                      = 57F9967B-26CD-4262-837A-55B8AA158254
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = S3BootScriptLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_DRIVER UEFI_APPLICATION
+
+
+  CONSTRUCTOR                    = S3BootScriptLibInitialize
+  DESTRUCTOR                     = S3BootScriptLibDeinitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  BootScriptSave.c
+  BootScriptExecute.c
+  InternalBootScriptLib.h
+  BootScriptInternalFormat.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  BaseLib
+  BaseMemoryLib
+  TimerLib
+  DebugLib
+  PcdLib
+  UefiLib
+  SmbusLib
+  PciSegmentLib
+  IoLib
+  LockBoxLib
+
+[Protocols]
+  gEfiSmmBase2ProtocolGuid                      ## SOMETIMES_CONSUMES
+  gEfiDxeSmmReadyToLockProtocolGuid             ## NOTIFY
+  gEfiSmmReadyToLockProtocolGuid                ## NOTIFY
+  gEdkiiSmmExitBootServicesProtocolGuid         ## NOTIFY
+  gEdkiiSmmLegacyBootProtocolGuid               ## NOTIFY
+
+[Pcd]
+  ## CONSUMES
+  ## SOMETIMES_PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptTablePrivateDataPtr
+  ## CONSUMES
+  ## SOMETIMES_PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptTablePrivateSmmDataPtr
+  gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptRuntimeTableReservePageNumber   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                                ## CONSUMES

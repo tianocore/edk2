@@ -1,0 +1,62 @@
+## @file
+# FSP DXE Module
+#
+# This driver will register two callbacks to call fsp's notifies.
+#
+#  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FspWrapperNotifyDxe
+  FILE_GUID                      = AD61999A-507E-47E6-BA28-79CC609FA1A4
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = FspWrapperNotifyDxeEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  FspWrapperNotifyDxe.c
+  LoadBelow4G.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+  IntelFsp2WrapperPkg/IntelFsp2WrapperPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DebugLib
+  BaseMemoryLib
+  UefiLib
+  FspWrapperApiLib
+  PeCoffLib
+  CacheMaintenanceLib
+  DxeServicesLib
+  PerformanceLib
+  HobLib
+  FspWrapperPlatformLib
+
+[Protocols]
+  gEfiPciEnumerationCompleteProtocolGuid            ## CONSUMES
+  gAddPerfRecordProtocolGuid                        ## SOMETIMES_CONSUMES
+
+[Guids]
+  gFspApiPerformanceGuid                            ## SOMETIMES_CONSUMES ## GUID
+  gEfiEventExitBootServicesGuid                     ## CONSUMES ## Event
+  gFspHobGuid                                       ## CONSUMES ## HOB
+
+[Pcd]
+  gIntelFsp2WrapperTokenSpaceGuid.PcdSkipFspApi       ## CONSUMES
+
+[Depex]
+  TRUE

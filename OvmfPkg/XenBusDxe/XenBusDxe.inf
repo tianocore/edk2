@@ -1,0 +1,64 @@
+## @file
+#  This driver produces a XenBus protocol for every Xen PV devices found.
+#
+#  Copyright (C) 2014, Citrix Ltd.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION               = 0x00010005
+  BASE_NAME                 = XenBusDxe
+  FILE_GUID                 = 565ec8ba-a484-11e3-802b-b8ac6f7d65e6
+  MODULE_TYPE               = UEFI_DRIVER
+
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = XenBusDxeDriverEntryPoint
+  UNLOAD_IMAGE              = XenBusDxeUnload
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Sources]
+  XenBusDxe.h
+  XenBusDxe.c
+  DriverBinding.h
+  ComponentName.c
+  ComponentName.h
+  GrantTable.c
+  GrantTable.h
+  EventChannel.c
+  EventChannel.h
+  XenStore.c
+  XenStore.h
+  XenBus.c
+  XenBus.h
+  Helpers.c
+  TestAndClearBit.c
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  UefiLib
+  DevicePathLib
+  DebugLib
+  XenHypercallLib
+  SynchronizationLib
+  PrintLib
+  PcdLib
+
+[Protocols]
+  gEfiDriverBindingProtocolGuid
+  gEfiComponentName2ProtocolGuid
+  gEfiComponentNameProtocolGuid
+  gXenBusProtocolGuid
+  gXenIoProtocolGuid
+
+[FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdXenGrantFrames

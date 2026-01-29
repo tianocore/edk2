@@ -1,0 +1,17 @@
+// /** @file
+// Ps2 Keyboard Driver.
+//
+// Ps2 Keyboard Driver for UEFI. The keyboard type implemented follows IBM
+// compatible PS2 protocol using Scan Code Set 1.
+//
+// Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Ps2 Keyboard Driver"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Ps2 Keyboard Driver for UEFI. The keyboard type implemented follows IBM compatible PS2 protocol using Scan Code Set 1."
+

@@ -1,0 +1,43 @@
+#/** @file
+#  Real Time Clock Architectural Protocol Driver as defined in PI
+#
+#  Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2017, Linaro, Ltd. All rights reserved.<BR>
+#  Copyright (c) 2021, Ampere Computing LLC. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = RealTimeClock
+  FILE_GUID                      = B336F62D-4135-4A55-AE4E-4971BBF0885D
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeRealTimeClock
+
+[Sources.common]
+  RealTimeClock.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  RealTimeClockLib
+  TimeBaseLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeLib
+
+[Protocols]
+  gEfiRealTimeClockArchProtocolGuid
+
+[Depex]
+  gEfiVariableArchProtocolGuid
+

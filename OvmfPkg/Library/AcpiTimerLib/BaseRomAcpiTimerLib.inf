@@ -1,0 +1,31 @@
+## @file
+#  BaseRom ACPI Timer Library Instance.
+#
+#  Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION    = 0x00010005
+  BASE_NAME      = BaseRomAcpiTimerLib
+  FILE_GUID      = CDD9D74F-213E-4c28-98F7-8B4A167DB936
+  MODULE_TYPE    = BASE
+  VERSION_STRING = 1.0
+  LIBRARY_CLASS  = TimerLib|SEC
+  CONSTRUCTOR    = AcpiTimerLibConstructor
+
+[Sources]
+  AcpiTimerLib.c
+  AcpiTimerLib.h
+  BaseRomAcpiTimerLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PciLib
+  IoLib

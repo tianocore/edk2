@@ -1,0 +1,17 @@
+// /** @file
+// Capsule Runtime Driver produces two UEFI capsule runtime services: (UpdateCapsule, QueryCapsuleCapabilities).
+//
+// It installs the Capsule Architectural Protocol defined in PI1.0a to signify
+// the capsule runtime services are ready.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces two UEFI capsule runtime services: (UpdateCapsule, QueryCapsuleCapabilities)"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "It installs the Capsule Architectural Protocol defined in PI1.0a to signify the capsule runtime services are ready."
+

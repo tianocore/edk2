@@ -1,0 +1,45 @@
+## @file
+#  DXE LockBox library instance.
+#
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmLockBoxDxeLib
+  MODULE_UNI_FILE                = SmmLockBoxDxeLib.uni
+  FILE_GUID                      = 4A0054B4-3CA8-4e1b-9339-9B58D5FBB7D2
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = LockBoxLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_DRIVER UEFI_APPLICATION
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SmmLockBoxDxeLib.c
+  SmmLockBoxLibPrivate.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  UefiLib
+
+[Guids]
+  gEfiSmmLockBoxCommunicationGuid            ## SOMETIMES_CONSUMES ## GUID # Used to do smm communication
+  gEdkiiPiSmmCommunicationRegionTableGuid    ## SOMETIMES_CONSUMES ## SystemTable
+
+[Protocols]
+  gEfiSmmCommunicationProtocolGuid      ## SOMETIMES_CONSUMES

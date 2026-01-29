@@ -1,0 +1,14 @@
+// /** @file
+// The UfsPciHcDxe driver is used by upper layer to retrieve mmio base address of managed pci-based Ufs host controller.
+//
+// Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Providing interface for upper layer to retrieve mmio base address of managed pci-based Ufs host controller."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "It implements the interface of getting mmio base address of managed pci-based Ufs host controller."
+

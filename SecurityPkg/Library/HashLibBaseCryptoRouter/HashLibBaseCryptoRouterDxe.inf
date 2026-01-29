@@ -1,0 +1,51 @@
+## @file
+#  Provides hash service by registered hash handler
+#
+#  This library is BaseCrypto router. It will redirect hash request to each individual
+#  hash handler registered, such as SHA1, SHA256. Platform can use PcdTpm2HashMask to
+#  mask some hash engines.
+#
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = HashLibBaseCryptoRouterDxe
+  MODULE_UNI_FILE                = HashLibBaseCryptoRouterDxe.uni
+  FILE_GUID                      = 158DC712-F15A-44dc-93BB-1675045BE066
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = HashLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = HashLibBaseCryptoRouterDxeConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  HashLibBaseCryptoRouterCommon.h
+  HashLibBaseCryptoRouterCommon.c
+  HashLibBaseCryptoRouterDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  Tpm2CommandLib
+  MemoryAllocationLib
+  PcdLib
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask             ## CONSUMES
+  ## SOMETIMES_CONSUMES
+  ## SOMETIMES_PRODUCES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcg2HashAlgorithmBitmap
+

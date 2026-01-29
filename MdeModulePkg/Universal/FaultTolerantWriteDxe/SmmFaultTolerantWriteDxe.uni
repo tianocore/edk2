@@ -1,0 +1,19 @@
+// /** @file
+// Fault Tolerant Write Smm Driver.
+//
+// This driver installs SMM Fault Tolerant Write (FTW) protocol, which provides fault
+// tolerant write capability in SMM environment for block devices. Its implementation
+// depends on the full functionality SMM FVB protocol that support read, write/erase
+// flash access.
+//
+// Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Fault Tolerant Write Smm Driver."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Installs SMM Fault Tolerant Write (FTW) protocol, which provides fault tolerant write capability in SMM environment for block devices. Its implementation depends on the full functionality SMM FVB protocol that support read, write/erase flash access."
+

@@ -1,0 +1,55 @@
+## @file
+# Component description file for EmuFwh module
+#
+# This PEIM will produce the HOB to describe Firmware Volume, Firmware Devices
+#  on the Emu emulator.
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2011, Apple Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FirmwareVolumePei
+  FILE_GUID                      = 6DB075DE-449E-2644-96D0-CC5A1B4C3B2A
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PeimInitializeFirmwareVolumePei
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  FirmwareVolumePei.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  PeiServicesTablePointerLib
+  PeiServicesLib
+  HobLib
+  PeimEntryPoint
+  DebugLib
+
+[Pcd]
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageEventLogSize
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFlashNvStorageVariableBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+
+[Ppis]
+  gEmuThunkPpiGuid                               # PPI ALWAYS_CONSUMED
+
+[Depex]
+  gEmuThunkPpiGuid AND gEfiPeiMemoryDiscoveredPpiGuid
+

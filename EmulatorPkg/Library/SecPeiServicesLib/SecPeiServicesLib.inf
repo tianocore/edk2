@@ -1,0 +1,44 @@
+## @file
+# PEI Services Library implementation.
+#
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecPeiServicesLib
+  FILE_GUID                      = E3E4A441-8465-0F41-8AF4-F67EBE984099
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PeiServicesLib|SEC PEIM PEI_CORE
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC (EBC is for build only)
+#
+
+[Sources]
+  PeiServicesLib.c
+  FwVol.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  BaseMemoryLib
+  PpiListLib
+
+[Pcd]
+  gEmulatorPkgTokenSpaceGuid.PcdPeiServicesTablePage
+
+
+
+
+

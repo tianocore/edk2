@@ -1,0 +1,53 @@
+## @file
+#  SMM LockBox library instance.
+#
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmLockBoxStandaloneMmLib
+  FILE_GUID                      = 3C05978B-30CA-4544-9C5A-AB99265EFC31
+  MODULE_TYPE                    = MM_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = LockBoxLib|MM_STANDALONE
+  CONSTRUCTOR                    = SmmLockBoxStandaloneMmConstructor
+  DESTRUCTOR                     = SmmLockBoxStandaloneMmDestructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SmmLockBoxStandaloneMmLib.c
+  SmmLockBoxMmLib.c
+  SmmLockBoxLibPrivate.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  MmServicesTableLib
+  BaseLib
+  DebugLib
+
+[Protocols]
+  gEfiMmReadyToLockProtocolGuid    ## NOTIFY
+  gEfiMmEndOfDxeProtocolGuid       ## NOTIFY
+  gEfiMmSxDispatchProtocolGuid     ## NOTIFY
+
+[Guids]
+  ## SOMETIMES_CONSUMES   ## UNDEFINED # SmmSystemTable
+  ## SOMETIMES_PRODUCES   ## UNDEFINED # SmmSystemTable
+  gEfiSmmLockBoxCommunicationGuid
+  ## CONSUMES             ## UNDEFINED # Protocol notify
+  gEdkiiEndOfS3ResumeGuid
+

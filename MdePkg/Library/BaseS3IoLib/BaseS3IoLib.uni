@@ -1,0 +1,17 @@
+// /** @file
+// Instance of S3 I/O Library based on I/O and S3 BootScript Library.
+//
+// S3 I/O and MMIO Library Services that do I/O and also
+// enable the I/O operatation to be replayed during an S3 resume.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Instance of S3 I/O Library based on I/O and S3 BootScript Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "S3 I/O and MMIO Library Services that do I/O and also enable the I/O operation to be replayed during an S3 resume."
+

@@ -1,0 +1,64 @@
+## @file
+# Block Io driver
+#
+# Produce block IO abstractions for real devices on your PC using Unix APIs.
+#  The configuration of what devices to mount or emulate comes from
+#  environment variables.
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EmuBlockIo
+  FILE_GUID                      = C6760651-A38D-5F4F-AEAF-F6661549DF75
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeEmuBlockIo
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  gUnixBlockIoDriverBinding
+#  COMPONENT_NAME                =  gUnixBlockIoComponentName
+#  DRIVER_DIAG                   =  gUnixBlockIoDriverDiagnostics
+#
+
+[Sources]
+  DriverDiagnostics.c
+  DriverConfiguration.c
+  ComponentName.c
+  EmuBlockIo.c
+  EmuBlockIo.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  UefiLib
+  UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+
+
+[Guids]
+  gEmuPhysicalDisksGuid                    # SOMETIMES_CONSUMED
+  gEmuVirtualDisksGuid                     # ALWAYS_CONSUMED
+
+
+[Protocols]
+  gEfiBlockIoProtocolGuid                     # PROTOCOL BY_START
+  gEfiBlockIo2ProtocolGuid                    # PROTOCOL BY_START
+  gEmuIoThunkProtocolGuid                     # PROTOCOL TO_START
+  gEmuBlockIoProtocolGuid                     # PROTOCOL BY_START

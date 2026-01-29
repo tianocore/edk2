@@ -1,0 +1,16 @@
+// /** @file
+// SMBUS Library that layers on top of the SMBUS Protocol.
+//
+// SMBUS Library that layers on top of the SMBUS Protocol.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "SMBUS Library that layers on top of the SMBUS Protocol"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "SMBUS Library that layers on top of the SMBUS Protocol."
+

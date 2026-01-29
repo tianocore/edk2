@@ -1,0 +1,40 @@
+## @file
+#  Stable timer driver that provides Timer Arch protocol.
+#
+#  Copyright (c) 2024 Loongson Technology Corporation Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = Timer
+  MODULE_UNI_FILE                = Timer.uni
+  FILE_GUID                      = AEBE2648-47A9-40FA-83FD-06AA88443BB2
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = StableTimerDriverInitialize
+
+#
+#  VALID_ARCHITECTURES           = LOONGARCH64
+#
+
+[Sources]
+  Timer.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  TimerLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiCpuArchProtocolGuid       ## CONSUMES
+  gEfiTimerArchProtocolGuid     ## PRODUCES
+
+[depex]
+  gEfiCpuArchProtocolGuid

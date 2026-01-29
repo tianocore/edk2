@@ -1,0 +1,90 @@
+## @file
+#  CPU Exception Handler library instance for DXE modules.
+#
+#  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeCpuExceptionHandlerLib
+  MODULE_UNI_FILE                = DxeCpuExceptionHandlerLib.uni
+  FILE_GUID                      = B6E9835A-EDCF-4748-98A8-27D3C722E02D
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.1
+  LIBRARY_CLASS                  = CpuExceptionHandlerLib|DXE_CORE DXE_DRIVER UEFI_APPLICATION
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 LOONGARCH64 RISCV64
+#
+
+[Sources.Ia32]
+  Ia32/ArchExceptionHandler.c
+  Ia32/ArchInterruptDefs.h
+  Ia32/ExceptionHandlerAsm.nasm
+  Ia32/ExceptionTssEntryAsm.nasm
+
+[Sources.X64]
+  X64/ArchExceptionHandler.c
+  X64/ArchInterruptDefs.h
+  X64/ExceptionHandlerAsm.nasm
+
+[Sources.Ia32, Sources.X64]
+  CpuExceptionCommon.h
+  CpuExceptionCommon.c
+  DxeException.c
+  PeiDxeSmmCpuException.c
+
+[Sources.LoongArch64]
+  LoongArch/DxeExceptionLib.c
+  LoongArch/ExceptionCommon.h
+  LoongArch/ExceptionCommon.c
+  LoongArch/LoongArch64/ArchExceptionHandler.c
+  LoongArch/LoongArch64/ExceptionHandlerAsm.S | GCC
+
+[Sources.RISCV64]
+  RiscV/Backtrace.h
+  RiscV/Backtrace.c
+  RiscV/BacktraceHelper.c
+  RiscV/ExceptionLib.c
+  RiscV/ExceptionHandler.h
+  RiscV/ExceptionHandlerAsm.S | GCC
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuStackSwitchExceptionList
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuKnownGoodStackSize
+
+[FeaturePcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackGuard                    ## CONSUMES
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses.common]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  PeCoffGetEntryPointLib
+  PrintLib
+  SerialPortLib
+  SynchronizationLib
+
+[LibraryClasses.Ia32, LibraryClasses.X64]
+  CcExitLib
+  LocalApicLib
+
+[LibraryClasses.LoongArch64]
+  CpuLib
+
+[Guids.RISCV64]
+  gEfiDebugImageInfoTableGuid
+
+[BuildOptions]
+  XCODE:*_*_X64_NASM_FLAGS = -D NO_ABSOLUTE_RELOCS_IN_TEXT

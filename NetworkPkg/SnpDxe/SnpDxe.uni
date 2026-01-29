@@ -1,0 +1,17 @@
+// /** @file
+// This module produces EFI SNP Protocol.
+//
+// This module produces Simple Network Protocol upon EFI Network Interface
+// Identifier Protocol, to provide a packet level interface to a network adapter.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces EFI SNP Protocol"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module produces Simple Network Protocol upon EFI Network Interface Identifier Protocol to provide a packet level interface to a network adapter."
+

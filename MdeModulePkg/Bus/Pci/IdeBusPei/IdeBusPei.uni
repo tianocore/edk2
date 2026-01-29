@@ -1,0 +1,19 @@
+// /** @file
+// PEIM to produce gEfiPeiVirtualBlockIoPpiGuid PPI for ATA controllers in the platform.
+//
+// This PPI can be consumed by PEIM which produce gEfiPeiDeviceRecoveryModulePpiGuid
+// for Atapi CD ROM device.
+//
+// This module discovers CDROM devices in Legacy and native mode and installs block IO ppis for them.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "PEIM to produce gEfiPeiVirtualBlockIoPpiGuid PPI for ATA controllers in the platform"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This PPI can be consumed by PEIM, which produces gEfiPeiDeviceRecoveryModulePpiGuid for an Atapi CD ROM device. This module discovers CDROM devices in Legacy and native mode and installs block IO ppis for them."
+

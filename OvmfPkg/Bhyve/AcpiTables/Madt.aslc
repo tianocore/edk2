@@ -1,0 +1,145 @@
+/** @file
+  MADT Table
+
+  This file contains a structure definition for the ACPI 1.0 Multiple APIC
+  Description Table (MADT).
+
+  Copyright (c) 2020, Rebecca Cran <rebecca@bsdio.com>
+  Copyright (c) 2014, Pluribus Networks, Inc.
+  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include <IndustryStandard/Acpi.h>
+#include <Platform.h>
+
+#define EFI_ACPI_OEM_TABLE_ID                      SIGNATURE_64('B','V','M','A','D','T',' ',' ')
+
+//
+// Local APIC address
+//
+#define EFI_ACPI_LOCAL_APIC_ADDRESS 0xFEE00000
+
+//
+// Multiple APIC Flags are defined in AcpiX.0.h
+//
+#define EFI_ACPI_1_0_MULTIPLE_APIC_FLAGS (EFI_ACPI_1_0_PCAT_COMPAT)
+
+//
+// Define the number of each table type.
+// This is where the table layout is modified.
+//
+#define EFI_ACPI_PROCESSOR_LOCAL_APIC_COUNT           1
+#define EFI_ACPI_INTERRUPT_SOURCE_OVERRIDE_COUNT      1
+#define EFI_ACPI_IO_APIC_COUNT                        1
+
+//
+// Ensure proper structure formats
+//
+#pragma pack (1)
+
+//
+// ACPI 1.0 MADT structure
+//
+typedef struct {
+  EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER   Header;
+
+#if EFI_ACPI_PROCESSOR_LOCAL_APIC_COUNT > 0
+  EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC_STRUCTURE           LocalApic[EFI_ACPI_PROCESSOR_LOCAL_APIC_COUNT];
+#endif
+
+#if EFI_ACPI_INTERRUPT_SOURCE_OVERRIDE_COUNT > 0
+  EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE      Iso[EFI_ACPI_INTERRUPT_SOURCE_OVERRIDE_COUNT];
+#endif
+
+#if EFI_ACPI_IO_APIC_COUNT > 0
+  EFI_ACPI_1_0_IO_APIC_STRUCTURE                        IoApic[EFI_ACPI_IO_APIC_COUNT];
+#endif
+
+} EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE;
+
+#pragma pack ()
+
+//
+// Multiple APIC Description Table
+//
+EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE Madt = {
+  {
+    {
+      EFI_ACPI_1_0_APIC_SIGNATURE,
+      sizeof (EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE),
+      EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION,
+      0x00,                                                     // Checksum will be updated at runtime
+      {EFI_ACPI_OEM_ID},
+      EFI_ACPI_OEM_TABLE_ID,
+      EFI_ACPI_OEM_REVISION,
+      EFI_ACPI_CREATOR_ID,
+      EFI_ACPI_CREATOR_REVISION
+    },
+
+    //
+    // MADT specific fields
+    //
+    EFI_ACPI_LOCAL_APIC_ADDRESS,
+    EFI_ACPI_1_0_MULTIPLE_APIC_FLAGS,
+  },
+
+  //
+  // Processor Local APIC Structure
+  //
+  {
+    {
+      EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC,                        // Type
+      sizeof (EFI_ACPI_1_0_PROCESSOR_LOCAL_APIC_STRUCTURE),     // Length
+      0x00,                                                     // Processor ID
+      0x00,                                                     // Local APIC ID
+      0x00000001                                                // Flags - Enabled by default
+    }
+  },
+
+  //
+  // Interrupt Source Override Structure
+  //
+  {
+    {
+      //
+      // IRQ0=>IRQ2 Interrupt Source Override Structure
+      //
+      EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE,                   // Type
+      sizeof (EFI_ACPI_1_0_INTERRUPT_SOURCE_OVERRIDE_STRUCTURE),// Length
+      0x00,                                                     // Bus - ISA
+      0x00,                                                     // Source - IRQ0
+      0x00000002,                                               // Global System Interrupt - IRQ2
+      0x0005                                                    // Flags - Conforms to specifications of the bus
+    },
+  },
+
+  //
+  // IO APIC Structure
+  //
+  {
+    {
+      EFI_ACPI_1_0_IO_APIC,                                     // Type
+      sizeof (EFI_ACPI_1_0_IO_APIC_STRUCTURE),                  // Length
+      0x01,                                                     // IO APIC ID
+      EFI_ACPI_RESERVED_BYTE,                                   // Reserved
+      0xFEC00000,                                               // IO APIC Address (physical)
+      0x00000000                                                // Global System Interrupt Base
+    }
+  },
+};
+
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from removing the
+  // data structure from the exeutable
+  //
+  return (VOID*)&Madt;
+}

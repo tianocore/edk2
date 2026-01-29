@@ -1,0 +1,16 @@
+// /** @file
+// Section Extraction PEI Module
+//
+// Produce one or more Section Extraction PPIs.
+//
+// Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Section Extraction PEI Module"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Produces the Section Extraction PPI required to load modules from firmware volumes that may use compression, signing, or encryption."
+

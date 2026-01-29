@@ -1,0 +1,21 @@
+// /** @file
+// Performance library instance used by SMM Core.
+//
+// This library provides the performance measurement interfaces and initializes performance
+// logging for the SMM phase.
+// It initializes SMM phase performance logging by publishing the SMM Performance and PerformanceEx Protocol,
+// which is consumed by SmmPerformanceLib to logging performance data in SMM phase.
+// This library is mainly used by SMM Core to start performance logging to ensure that
+// SMM Performance and PerformanceEx Protocol are installed at the very beginning of SMM phase.
+//
+// Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Performance library instance used by SMM Core"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library provides the performance measurement interfaces and initializes performance logging for the SMM phase. It initializes SMM phase performance logging by publishing the SMM Performance and PerformanceEx Protocol, which is consumed by SmmPerformanceLib to logging performance data in the SMM phase. This library is mainly used by SMM Core to start performance logging to ensure that SMM Performance and PerformanceEx Protocol are installed at the very beginning of the SMM phase."
+

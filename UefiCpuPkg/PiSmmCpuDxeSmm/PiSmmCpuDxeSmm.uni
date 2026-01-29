@@ -1,0 +1,15 @@
+// /** @file
+// CPU SMM driver.
+//
+// This SMM driver performs SMM initialization, deploy SMM Entry Vector,
+// provides CPU specific services in SMM.
+//
+// Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "CPU SMM driver"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This SMM driver performs SMM initialization, deploys SMM Entry Vector, and provides CPU-specific services in SMM."

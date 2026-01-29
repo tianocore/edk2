@@ -1,0 +1,203 @@
+## @file
+# Network Package.
+#
+# This package provides network modules that conform to UEFI 2.4 specification.
+#
+# Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
+# (C) Copyright 2015-2020 Hewlett Packard Enterprise Development LP<BR>
+# Copyright (c) Microsoft Corporation
+# (c) Copyright 2025 HP Development Company, L.P.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = NetworkPkg
+  PACKAGE_GUID                   = 947988BE-8D5C-471a-893D-AD181C46BEBB
+  PACKAGE_VERSION                = 0.98
+  PACKAGE_UNI_FILE               = NetworkPkg.uni
+
+[Includes]
+  Include
+
+[LibraryClasses]
+  ##  @libraryclass  IpIo layer upon EFI IP4 Protocol.
+  #   This library is only intended to be used by UEFI network stack modules.
+  IpIoLib|Include/Library/IpIoLib.h
+
+  ##  @libraryclass  Basic function for UEFI network stack.
+  #   This library is only intended to be used by UEFI network stack modules.
+  NetLib|Include/Library/NetLib.h
+
+  ##  @libraryclass  The helper routines to access UDP service.
+  #   This library is only intended to be used by UEFI network stack modules.
+  UdpIoLib|Include/Library/UdpIoLib.h
+
+  ##  @libraryclass  The helper routines to access TCP service.
+  #   This library is only intended to be used by UEFI network stack modules.
+  TcpIoLib|Include/Library/TcpIoLib.h
+
+  ##  @libraryclass  The helper routines to access HTTP service.
+  #   This library is only intended to be used by UEFI network stack modules.
+  HttpLib|Include/Library/HttpLib.h
+
+  ##  @libraryclass  Http IO helper routines for HTTP transfer.
+  #   This library is only intended to be used by UEFI network stack modules.
+  HttpIoLib|Include/Library/HttpIoLib.h
+
+  ##  @libraryclass  Library for Deferred Procedure Calls.
+  DpcLib|Include/Library/DpcLib.h
+
+[Guids]
+  ## Network package token space guid.
+  # Include/Guid/NetworkPkgTokenSpace.h
+  gEfiNetworkPkgTokenSpaceGuid  = { 0x40e064b2, 0x0ae0, 0x48b1, { 0xa0, 0x7d, 0xf8, 0xcf, 0x1e, 0x1a, 0x23, 0x10}}
+
+  # Include/Guid/Ip6ConfigHii.h
+  gIp6ConfigNvDataGuid          = { 0x2eea107, 0x98db, 0x400e, { 0x98, 0x30, 0x46, 0xa, 0x15, 0x42, 0xd7, 0x99}}
+
+  # Include/Guid/IscsiConfigHii.h
+  gIScsiConfigGuid              = { 0x4b47d616, 0xa8d6, 0x4552, { 0x9d, 0x44, 0xcc, 0xad, 0x2e, 0xf, 0x4c, 0xf9}}
+
+  # Include/Guid/HttpBootConfigHii.h
+  gHttpBootConfigGuid           = { 0x4d20583a, 0x7765, 0x4e7a, { 0x8a, 0x67, 0xdc, 0xde, 0x74, 0xee, 0x3e, 0xc5 }}
+
+  # Include/Guid/TlsAuthConfigHii.h
+  gTlsAuthConfigGuid            = { 0xb0eae4f8, 0x9a04, 0x4c6d, { 0xa7, 0x48, 0x79, 0x3d, 0xaa, 0xf, 0x65, 0xdf }}
+
+  # Include/Guid/TlsAuthentication.h
+  gEfiTlsCaCertificateGuid      = { 0xfd2340D0, 0x3dab, 0x4349, { 0xa6, 0xc7, 0x3b, 0x4f, 0x12, 0xb4, 0x8e, 0xae }}
+
+  # Include/Guid/HttpTlsCipherList.h
+  gEdkiiHttpTlsCipherListGuid   = { 0x46ddb415, 0x5244, 0x49c7, { 0x93, 0x74, 0xf0, 0xe2, 0x98, 0xe7, 0xd3, 0x86 }}
+
+  # Include/Guid/WifiConnectionManagerConfigHii.h
+  gWifiConfigGuid               = { 0x9f94d327, 0x0b18, 0x4245, { 0x8f, 0xf2, 0x83, 0x2e, 0x30, 0xd, 0x2c, 0xef }}
+
+  ## Include/Guid/Ip4Config2Hii.h
+  gIp4Config2NvDataGuid              = { 0x9b942747, 0x154e, 0x4d29, { 0xa4, 0x36, 0xbf, 0x71, 0x0, 0xc8, 0xb5, 0x3b }}
+
+  ## Include/Guid/VlanConfigHii.h
+  gVlanConfigFormSetGuid             = { 0xd79df6b0, 0xef44, 0x43bd, { 0x97, 0x97, 0x43, 0xe9, 0x3b, 0xcf, 0x5f, 0xa8 }}
+
+  ## Include/Guid/Ip4IScsiConfigHii.h
+  gIp4IScsiConfigGuid                = { 0x6456ed61, 0x3579, 0x41c9, { 0x8a, 0x26, 0x0a, 0x0b, 0xd6, 0x2b, 0x78, 0xfc }}
+  gIScsiCHAPAuthInfoGuid             = { 0x786ec0ac, 0x65ae, 0x4d1b, { 0xb1, 0x37, 0xd, 0x11, 0xa, 0x48, 0x37, 0x97 }}
+
+[Protocols]
+  ## Include/Protocol/Dpc.h
+  gEfiDpcProtocolGuid           = {0x480f8ae9, 0xc46, 0x4aa9,  { 0xbc, 0x89, 0xdb, 0x9f, 0xba, 0x61, 0x98, 0x6 }}
+
+  ## Include/Protocol/HttpCallback.h
+  gEdkiiHttpCallbackProtocolGuid  = {0x611114f1, 0xa37b, 0x4468, {0xa4, 0x36, 0x5b, 0xdd, 0xa1, 0x6a, 0xa2, 0x40}}
+
+  ## Include/Protocol/WiFiProfileSyncProtocol.h
+  gEdkiiWiFiProfileSyncProtocolGuid = {0x399a2b8a, 0xc267, 0x44aa, {0x9a, 0xb4, 0x30, 0x58, 0x8c, 0xd2, 0x2d, 0xcc}}
+
+[PcdsFixedAtBuild]
+  ## The max attempt number will be created by iSCSI driver.
+  # @Prompt Max attempt number.
+  gEfiNetworkPkgTokenSpaceGuid.PcdMaxIScsiAttemptNumber|0x08|UINT8|0x0000000D
+
+  ## The maximum size of total HTTP chunk transfer.
+  # @Prompt Max size of total HTTP chunk transfer. the default value is 12MB.
+  gEfiNetworkPkgTokenSpaceGuid.PcdMaxHttpChunkTransfer|0x0C00000|UINT32|0x0000000E
+
+  ## The maximum number of retries while attempting to resume an
+  # interrupted HTTP download using a HTTP Range request header.
+  # @Prompt Max number of HTTP download resume retries. Default value is 5.
+  gEfiNetworkPkgTokenSpaceGuid.PcdMaxHttpResumeRetries|0x00000005|UINT32|0x00000012
+
+  ## Delay in seconds between each attempt to resume an
+  # interrupted HTTP download.
+  # @Prompt Delay in seconds between each HTTP resume retry. Default value is 2s.
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpDelayBetweenResumeRetries|0x00000002|UINT32|0x00000013
+
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+  ## Indicates whether HTTP connections (i.e., unsecured) are permitted or not.
+  # TRUE  - HTTP connections are allowed. Both the "https://" and "http://" URI schemes are permitted.
+  # FALSE - HTTP connections are denied. Only the "https://" URI scheme is permitted.
+  # @Prompt Indicates whether HTTP connections are permitted or not.
+  gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections|FALSE|BOOLEAN|0x00000008
+
+  ## This setting is to specify the MTFTP windowsize used by UEFI PXE driver.
+  # A value of 0 indicates the default value of windowsize(1).
+  # A non-zero value will be used as windowsize.
+  # @Prompt PXE TFTP windowsize.
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeTftpWindowSize|0x4|UINT64|0x10000008
+
+
+  ## This setting can override the default TFTP block size. A value of 0 computes
+  # the default from MTU information. A non-zero value will be used as block size
+  # in bytes.
+  # @Prompt TFTP block size.
+  gEfiNetworkPkgTokenSpaceGuid.PcdTftpBlockSize|0x0|UINT64|0x1000000B
+
+  ## Indicates whether SnpDxe driver will create an event that will be notified
+  # upon gBS->ExitBootServices() call.
+  # TRUE - Event being triggered upon ExitBootServices call will be created
+  # FALSE - Event being triggered upon ExitBootServices call will NOT be created
+  # @Prompt Indicates whether SnpDxe creates event for ExitBootServices() call.
+  gEfiNetworkPkgTokenSpaceGuid.PcdSnpCreateExitBootServicesEvent|TRUE|BOOLEAN|0x1000000C
+
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+  ## IPv6 DHCP Unique Identifier (DUID) Type configuration (From RFCs 3315 and 6355).
+  # 01 = DUID Based on Link-layer Address Plus Time [DUID-LLT]
+  # 04 = UUID-Based DHCPv6 Unique Identifier (DUID-UUID)
+  # 02 = DUID Assigned by Vendor Based on Enterprise Number [DUID-EN] (not supported)
+  # 03 = DUID Based on Link-layer Address [DUID-LL] (not supported)
+  # @Prompt Type Value of Dhcp6 Unique Identifier (DUID).
+  gEfiNetworkPkgTokenSpaceGuid.PcdDhcp6UidType|4|UINT8|0x10000001
+
+  ## Network boot policy to stop UEFI iSCSI if applicable.
+  # 0x00 = Always use UEFI iSCSI and ignore iSCSI HBA.
+  # 0x01 = Stop UEFI iSCSI if iSCSI HBA adapter produces AIP protocol with Network Boot.
+  # 0x02 = Stop UEFI iSCSI if iSCSI HBA adapter supports booting from iSCSI IPv4 targets.
+  # 0x04 = Stop UEFI iSCSI if iSCSI HBA adapter supports booting from iSCSI IPv6 targets.
+  # 0x08 = Stop UEFI iSCSI if iSCSI HBA adapter supports an offload engine for iSCSI boot.
+  # 0x10 = Stop UEFI iSCSI if iSCSI HBA adapter supports multipath I/O for iSCSI boot.
+  # 0x20 = Stop UEFI iSCSI if iSCSI HBA adapter is currently configured to boot from iSCSI IPv4 targets.
+  # 0x40 = Stop UEFI iSCSI if iSCSI HBA adapter is currently configured to boot from iSCSI IPv6 targets.
+  # 0xFF = Always use iSCSI HBA and ignore UEFI iSCSI.
+  # @Prompt Type Value of network boot policy used in iSCSI.
+  gEfiNetworkPkgTokenSpaceGuid.PcdIScsiAIPNetworkBootPolicy|0x08|UINT8|0x10000007
+
+  ## IPv4 PXE support
+  # 0x01 = PXE Enabled
+  # 0x00 = PXE Disabled
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport|0x01|UINT8|0x10000009
+
+  ## IPv6 PXE support
+  # 0x01 = PXE Enabled
+  # 0x00 = PXE Disabled
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport|0x01|UINT8|0x1000000a
+
+  ## The Timeout value of HTTP IO.
+  # @Prompt The Timeout value of HTTP Io. Default value is 5000.
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout|5000|UINT32|0x0000000F
+
+  ## The Retry Interval of HTTP DNS in seconds. If the Retry Interval is less than
+  # DNS_DEFAULT_TIMEOUT, then use the DNS_DEFAULT_TIMEOUT.
+  # @Prompt The value of Retry Interval. Default value is 0
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpDnsRetryInterval|0|UINT32|0x00000010
+
+  ## The Retry Count of HTTP DNS if no DNS response received after Retry Interval.
+  # @Prompt The value of Retry Count,  Default value is 0.
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpDnsRetryCount|0|UINT32|0x00000011
+
+  ## IPv4 HTTP support
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv4HttpSupport|TRUE|BOOLEAN|0x10000012
+
+  ## IPv6 HTTP support
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv6HttpSupport|TRUE|BOOLEAN|0x10000013
+
+  ## The default size of the HTTP transfer data buffer in bytes.
+  # This size is used for HTTP transfers, with a default value of 2MB.
+  # Increasing the buffer size can enhance performance for high-bandwidth connections.
+  # However, reducing the buffer size can reduce packet loss in low-bandwidth scenarios.
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpTransferBufferSize|0x200000|UINT32|0x00000014
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  NetworkPkgExtra.uni

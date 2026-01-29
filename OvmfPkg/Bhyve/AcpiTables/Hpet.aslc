@@ -1,0 +1,72 @@
+/*
+ * Copyright (c) 2020, Rebecca Cran <rebecca@bsdio.com>
+ * Copyright (c) 2014, Pluribus Networks, Inc.
+ *
+ * SPDX-License-Identifier: BSD-2-Clause-Patent
+ */
+
+#include <IndustryStandard/HighPrecisionEventTimerTable.h>
+
+#include "Platform.h"
+
+#define EFI_ACPI_HPET_DESCRIPTION_TABLE_SIGNATURE  SIGNATURE_32('H', 'P', 'E', 'T')
+#define EFI_ACPI_OEM_TABLE_ID                      SIGNATURE_64('B','V','H','P','E','T',' ',' ')
+
+//
+// Ensure proper structure formats
+//
+#pragma pack (1)
+
+//
+// ACPI HPET structure
+//
+typedef struct {
+  EFI_ACPI_HIGH_PRECISION_EVENT_TIMER_TABLE_HEADER  Header;
+} EFI_ACPI_HIGH_PRECISION_EVENT_TIMER_DESCRIPTION_TABLE;
+
+#pragma pack ()
+
+//
+// HPET Description Table
+//
+EFI_ACPI_HIGH_PRECISION_EVENT_TIMER_DESCRIPTION_TABLE Hpet = {
+  {
+    {
+      EFI_ACPI_HPET_DESCRIPTION_TABLE_SIGNATURE,
+      sizeof (EFI_ACPI_HIGH_PRECISION_EVENT_TIMER_DESCRIPTION_TABLE),
+      EFI_ACPI_HIGH_PRECISION_EVENT_TIMER_TABLE_REVISION,
+      0x00,                              // Checksum will be updated at runtime
+      {EFI_ACPI_OEM_ID},
+      EFI_ACPI_OEM_TABLE_ID,
+      EFI_ACPI_OEM_REVISION,
+      EFI_ACPI_CREATOR_ID,
+      EFI_ACPI_CREATOR_REVISION
+    },
+
+    //
+    // HPET specific fields
+    //
+    0x0000A400,                          // EventTimerBlockId
+    {
+      EFI_ACPI_2_0_SYSTEM_MEMORY,
+      0,
+      0,
+      EFI_ACPI_RESERVED_BYTE,
+      0xFED00000,
+    },
+    0                                    // HpetNumber
+  }
+};
+
+
+VOID*
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from removing the
+  // data structure from the exeutable
+  //
+  return (VOID*)&Hpet;
+}

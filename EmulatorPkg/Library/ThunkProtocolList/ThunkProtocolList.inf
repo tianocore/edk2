@@ -1,0 +1,31 @@
+## @file
+#
+# Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2011, Apple Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ThunkProtocolList
+  FILE_GUID                      = 7833616E-AE0D-594F-870C-80E68682D587
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MemoryAllocationLib|BASE SEC USER_DEFINED
+
+[Sources]
+  ThunkProtocolList.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+
+
+

@@ -1,0 +1,18 @@
+// /** @file
+// TCPv4 I/O and TCPv6 I/O services.
+//
+// This module provides EFI TCPv4 Protocol and EFI TCPv6 Protocol to send and receive data stream.
+// It might provide TCPv4 Protocol or TCPv6 Protocol or both of them that depends on
+// which network stack has been loaded in system.
+//
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "TCPv4 I/O and TCPv6 I/O services"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module provides EFI TCPv4 Protocol and EFI TCPv6 Protocol to send and receive data stream. It might provide TCPv4 Protocol or TCPv6 Protocol or both of them that depends on which network stack has been loaded in system."
+

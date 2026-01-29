@@ -1,0 +1,65 @@
+## @file
+#  Sample platform variable cleanup library instance.
+#
+#  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                   = 0x00010005
+  BASE_NAME                     = PlatformVarCleanupLib
+  MODULE_UNI_FILE               = PlatformVarCleanupLib.uni
+  FILE_GUID                     = 9C9623EB-4EF3-44e0-A931-F3A340D1A0F9
+  MODULE_TYPE                   = DXE_DRIVER
+  VERSION_STRING                = 1.0
+  LIBRARY_CLASS                 = PlatformVarCleanupLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                   = PlatformVarCleanupLibConstructor
+  DESTRUCTOR                    = PlatformVarCleanupLibDestructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES          = IA32 X64
+#
+
+[Sources.common]
+  PlatVarCleanupLib.c
+  PlatVarCleanup.h
+  PlatVarCleanupHii.h
+  PlatVarCleanup.vfr
+  VfrStrings.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  PrintLib
+  MemoryAllocationLib
+  HiiLib
+
+[Guids]
+  gEfiIfrTianoGuid                  ## SOMETIMES_PRODUCES   ## GUID
+  gEdkiiVarErrorFlagGuid            ## CONSUMES             ## Variable:L"VarErrorFlag"
+  gEfiEndOfDxeEventGroupGuid        ## CONSUMES             ## Event
+  gEfiCertPkcs7Guid                 ## SOMETIMES_CONSUMES   ## GUID
+  gEfiCertTypeRsa2048Sha256Guid     ## SOMETIMES_CONSUMES   ## GUID
+
+[Protocols]
+  gEfiVariableArchProtocolGuid      ## CONSUMES
+  gEdkiiVarCheckProtocolGuid        ## CONSUMES
+  gEfiDevicePathProtocolGuid        ## SOMETIMES_PRODUCES
+  gEfiFormBrowser2ProtocolGuid      ## SOMETIMES_CONSUMES
+  gEfiHiiConfigAccessProtocolGuid   ## SOMETIMES_PRODUCES
+  gEfiHiiConfigRoutingProtocolGuid  ## SOMETIMES_CONSUMES
+
+[Depex]
+  gEfiVariableArchProtocolGuid
+

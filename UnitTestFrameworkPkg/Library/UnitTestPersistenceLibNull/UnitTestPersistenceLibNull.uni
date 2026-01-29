@@ -1,0 +1,11 @@
+// /** @file
+// NULL library for Unit Test Persistence Lib.
+//
+// Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "NULL library for Unit Test Persistence Lib"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "NULL library for Unit Test Persistence Lib."

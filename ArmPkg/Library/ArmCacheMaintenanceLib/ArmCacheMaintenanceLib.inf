@@ -1,0 +1,28 @@
+#/** @file
+#  Implement CacheMaintenanceLib for ARM architectures
+#
+#  Copyright (c) 2008, Apple Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmCacheMaintenanceLib
+  FILE_GUID                      = 1A20BE1F-33AD-450C-B49A-7123FCA8B7F9
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CacheMaintenanceLib
+
+[Sources.common]
+  ArmCacheMaintenanceLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseLib

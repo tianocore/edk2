@@ -1,0 +1,62 @@
+## @file
+# This driver measures SMBIOS table to TPM.
+#
+# This driver is a sample driver to follow TCG platform specification to
+# filter some fields in SMBIOS table.
+#   - Platform configuration information that is automatically updated,
+#     such as clock registers, and system unique information, such as
+#     asset numbers or serial numbers, MUST NOT be measured into PCR [1],
+#     or any other PCR.
+# The OEM types are skipped and platform code can measure them by self if required.
+#
+# A platform may use its own policy to filter some fields in SMBIOS table.
+#
+# Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmbiosMeasurementDxe
+  MODULE_UNI_FILE                = SmbiosMeasurementDxe.uni
+  FILE_GUID                      = D27FED59-ABB4-4FED-BEAD-2A878C7E4A7E
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SmbiosMeasurementDriverEntryPoint
+
+[Sources]
+  SmbiosMeasurementDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  UefiLib
+  UefiDriverEntryPoint
+  DebugLib
+  PcdLib
+  TpmMeasurementLib
+
+[Protocols]
+  gEfiSmbiosProtocolGuid                            ## CONSUMES
+
+[Guids]
+  gEfiSmbiosTableGuid                               ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiSmbios3TableGuid                              ## SOMETIMES_CONSUMES ## SystemTable
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTcgPfpMeasurementRevision            ## CONSUMES
+
+[Depex]
+  gEfiSmbiosProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SmbiosMeasurementDxeExtra.uni

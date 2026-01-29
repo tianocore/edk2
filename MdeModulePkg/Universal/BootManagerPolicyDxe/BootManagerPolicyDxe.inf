@@ -1,0 +1,56 @@
+## @file
+#  This module produces Boot Manager Policy protocol.
+#
+#  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BootManagerPolicyDxe
+  MODULE_UNI_FILE                = BootManagerPolicyDxe.uni
+  FILE_GUID                      = E622443C-284E-4b47-A984-FD66B482DAC0
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = BootManagerPolicyInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  BootManagerPolicyDxe.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiLib
+  DevicePathLib
+  DebugLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiBootManagerLib
+
+[Guids]
+  gEfiBootManagerPolicyConnectAllGuid           ## CONSUMES ## GUID
+  gEfiBootManagerPolicyNetworkGuid              ## CONSUMES ## GUID
+  gEfiBootManagerPolicyConsoleGuid              ## CONSUMES ## GUID
+
+[Protocols]
+  gEfiManagedNetworkServiceBindingProtocolGuid  ## CONSUMES
+  gEfiBootManagerPolicyProtocolGuid             ## PRODUCES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  BootManagerPolicyDxeExtra.uni

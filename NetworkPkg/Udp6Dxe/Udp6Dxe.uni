@@ -1,0 +1,17 @@
+// /** @file
+// UDP packet service based on IPv6 stack.
+//
+// This module produces EFI UDPv6 Protocol which provides simple packet-oriented
+// services to transmit and receive UDP packets.
+//
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "UDP packet service based on IPv6 stack"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module produces EFI UDPv6 Protocol which provides simple packet-oriented services to transmit and receive UDP packets."
+

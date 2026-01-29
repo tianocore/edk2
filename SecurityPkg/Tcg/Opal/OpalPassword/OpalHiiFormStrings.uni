@@ -1,0 +1,80 @@
+// /** @file
+//
+//   String definitions for Setup formset.
+//
+// Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+/=#
+/////////////////////////////////   GENERIC DEFINITIONS   /////////////////////////////////
+#langdef en-US                                  "English"
+#string STR_NULL                                #language en-US " "
+
+/////////////////////////////////   FORM SET   /////////////////////////////////
+#string STR_FORM_SET_HELP                        #language en-US "Select to manage"
+
+/////////////////////////////////   MULTIPLE FORMS   /////////////////////////////////
+#string STR_OPAL                                 #language en-US "TCG Drive Management"
+
+/////////////////////////////////   MAIN MENU FORM   /////////////////////////////////
+#string STR_MAIN_PHY_DISKS_LBL                   #language en-US "Physical Disks:"
+#string STR_MAIN_OPAL_TITLE_LBL                  #language en-US "Allows user to choose drive to configure drive security. User can also set storage action policy for use of the TCG Block SID authentication feature."
+
+#string STR_MAIN_GOTO_DISK_INFO_0                #language en-US " "
+#string STR_MAIN_GOTO_DISK_INFO_1                #language en-US " "
+#string STR_MAIN_GOTO_DISK_INFO_2                #language en-US " "
+#string STR_MAIN_GOTO_DISK_INFO_3                #language en-US " "
+#string STR_MAIN_GOTO_DISK_INFO_4                #language en-US " "
+#string STR_MAIN_GOTO_DISK_INFO_5                #language en-US " "
+
+#string STR_MAIN_GOTO_DISK_INFO_HELP             #language en-US "Select disk to see actions"
+
+#string STR_MAIN_NO_DISKS_PRESENT_LBL            #language en-US "No disks connected to system"
+#string STR_MAIN_NO_DISKS_PRESENT_LBL_HELP       #language en-US "The storage needs to be connected before EndOfDxe"
+
+/////////////////////////////////   DISK INFO MENU FORM   /////////////////////////////////
+#string STR_DISK_INFO_SELECTED_DISK_NAME         #language en-US " "
+#string STR_DISK_INFO_TITLE_LBL                  #language en-US "Allows user to set and modify password; perform secure erase; and perform revert functions on drive."
+
+#string STR_DISK_INFO_LOCK                       #language en-US "Lock"
+#string STR_DISK_INFO_UNLOCK                     #language en-US "Unlock"
+#string STR_DISK_INFO_SET_ADMIN_PSWD             #language en-US "Update Drive Admin Password"
+#string STR_DISK_INFO_SET_USER_PSWD              #language en-US "Set Drive User Password"
+#string STR_DISK_INFO_SECURE_ERASE               #language en-US "Secure Erase User Data"
+#string STR_DISK_INFO_PSID_REVERT                #language en-US "PSID Revert to factory default"
+#string STR_DISK_INFO_REVERT                     #language en-US "Admin Revert to factory default and Disable"
+#string STR_DISK_INFO_DISABLE_USER               #language en-US "Disable User"
+#string STR_DISK_INFO_ENABLE_FEATURE             #language en-US "Enable Feature"
+#string STR_DISK_INFO_ENABLE_BLOCKSID            #language en-US "TCG Storage Action"
+#string STR_ENABLED                              #language en-US "Enable BlockSID"
+#string STR_DISABLED                             #language en-US "Disable BlockSID"
+
+#string STR_NONE                                 #language en-US "None"
+#string STR_DISK_INFO_ENABLE_BLOCKSID_TRUE       #language en-US "Require physical presence when remote enable BlockSID"
+#string STR_DISK_INFO_ENABLE_BLOCKSID_FALSE      #language en-US "Not require physical presence when remote enable BlockSID"
+#string STR_DISK_INFO_DISABLE_BLOCKSID_TRUE      #language en-US "Require physical presence when remote disable BlockSID"
+#string STR_DISK_INFO_DISABLE_BLOCKSID_FALSE     #language en-US "Not require physical presence when remote disable BlockSID"
+
+#string STR_BLOCKSID_STATUS_HELP                 #language en-US "BlockSID action change status"
+#string STR_BLOCKSID_STATUS                      #language en-US "Current BlockSID Status:"
+#string STR_BLOCKSID_STATUS1                     #language en-US ""
+#string STR_BLOCKSID_STATUS2                     #language en-US ""
+#string STR_BLOCKSID_STATUS3                     #language en-US ""
+
+#string STR_OPAL_REQUESTS_LBL                    #language en-US "Options:"
+#string STR_DISK_INFO_LOCK_HELP                  #language en-US "Lock the disk"
+#string STR_DISK_INFO_UNLOCK_HELP                #language en-US "Unlock the disk"
+#string STR_DISK_INFO_SET_ADMIN_PSWD_HELP        #language en-US "Set password for the administrator, reset is required for the request to be processed in next boot"
+#string STR_DISK_INFO_SET_USER_PSWD_HELP         #language en-US "Set password for User 1, reset is required for the request to be processed in next boot"
+#string STR_DISK_INFO_SECURE_ERASE_HELP          #language en-US "Securely erase the disk, reset is required for the request to be processed in next boot"
+#string STR_DISK_INFO_REVERT_HELP                #language en-US "Revert the disk to factory defaults, reset is required for the request to be processed in next boot"
+#string STR_DISK_INFO_PSID_REVERT_HELP           #language en-US "Revert the disk to factory defaults, PSID is a 32 character case sensitive value, reset is required for the request to be processed in next boot"
+#string STR_DISK_INFO_DISABLE_USER_HELP          #language en-US "Disable User, reset is required for the request to be processed in next boot"
+#string STR_DISK_INFO_ENABLE_FEATURE_HELP        #language en-US "Enable Feature, reset is required for the request to be processed in next boot"
+#string STR_KEEP_USER_DATA_PROMPT                #language en-US "  Keep User Data"
+#string STR_KEEP_USER_DATA_HELP                  #language en-US "Check to keep user data, otherwise data will be lost"
+
+#string STR_DISK_INFO_ENABLE_BLOCKSID_HELP       #language en-US "Change BlockSID actions, includes enable or disable BlockSID, Require or not require physical presence when remote enable or disable BlockSID"

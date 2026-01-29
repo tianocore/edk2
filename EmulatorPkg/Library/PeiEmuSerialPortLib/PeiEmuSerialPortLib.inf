@@ -1,0 +1,40 @@
+## @file
+#  Write only instance of Serial Port Library with empty functions.
+#
+#  Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
+#  Portions copyright (c) 2011, Apple Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiEmuSerialPortLibNull
+  FILE_GUID                      = 76003416-0373-4C3C-BC4C-87E367FD4BD1
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SerialPortLib| PEI_CORE PEIM SEC
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  PeiEmuSerialPortLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  PeiServicesLib
+
+[Ppis]
+  gEmuThunkPpiGuid                       # PPI ALWAYS_CONSUMED
+
+
+
+

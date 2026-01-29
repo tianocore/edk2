@@ -1,0 +1,57 @@
+/*
+ * Copyright (c) 2020, Rebecca Cran <rebecca@bsdio.com>
+ * Copyright (c) 2015, Nahanni Systems, Inc.
+ *
+ * SPDX-License-Identifier: BSD-2-Clause-Patent
+ */
+
+#include "Platform.h"
+
+#define EFI_ACPI_OEM_TABLE_ID                      SIGNATURE_64('B','V','M','C','F','G',' ',' ')
+
+#pragma pack(1)
+
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER   Header;
+  UINT64                        Reserved0;
+  UINT64                        BaseAddress;
+  UINT16                        PciSegmentGroupNumber;
+  UINT8                         StartBusNumber;
+  UINT8                         EndBusNumber;
+  UINT32                        Reserved1;
+} EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE;
+
+#pragma pack()
+
+EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE MCFG = {
+  {
+    EFI_ACPI_2_0_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_SIGNATURE,
+    sizeof (EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE),
+    EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_REVISION,
+    0,                          // to make sum of entire table == 0
+    {EFI_ACPI_OEM_ID},          // OEMID is a 6 bytes long field
+    EFI_ACPI_OEM_TABLE_ID,      // OEM table identification(8 bytes long)
+    EFI_ACPI_OEM_REVISION,      // OEM revision number
+    EFI_ACPI_CREATOR_ID,        // ASL compiler vendor ID
+    EFI_ACPI_CREATOR_REVISION   // ASL compiler revision number
+  },
+  0,                            // Reserved
+  0x00000000E0000000,           // BaseAddress
+  0x0000,                       // PciSegmentGroupNumber
+  0,                            // StartBusNumber
+  255,                          // EndBusNumber
+  0                             // Reserved
+};
+
+
+VOID *
+ReferenceAcpiTable (
+  VOID
+  )
+{
+  //
+  // Reference the table being generated to prevent the optimizer from removing the
+  // data structure from the exeutable
+  //
+  return (VOID*)&MCFG;
+}

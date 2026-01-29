@@ -1,0 +1,58 @@
+## @file
+#  Handle TPM 2.0 physical presence requests from OS.
+#
+#  This library will handle TPM 2.0 physical presence request from OS.
+#
+#  Caution: This module requires additional review when modified.
+#  This driver will have external input - variable.
+#  This external input must be validated carefully to avoid security issue.
+#
+# Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmTcg2PhysicalPresenceLib
+  MODULE_UNI_FILE                = SmmTcg2PhysicalPresenceLib.uni
+  FILE_GUID                      = AAE02741-858B-4964-9887-CA870489D944
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Tcg2PhysicalPresenceLib|DXE_SMM_DRIVER
+  CONSTRUCTOR                    = Tcg2PhysicalPresenceLibTraditionalConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  SmmTcg2PhysicalPresenceLib.c
+  MmTcg2PhysicalPresenceLibCommon.c
+  MmTcg2PhysicalPresenceLibCommon.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  Tcg2PpVendorLib
+  MmServicesTableLib
+  BaseMemoryLib
+
+[Guids]
+  ## SOMETIMES_PRODUCES ## Variable:L"PhysicalPresence"
+  ## SOMETIMES_CONSUMES ## Variable:L"PhysicalPresence"
+  ## SOMETIMES_CONSUMES ## Variable:L"PhysicalPresenceFlags"
+  gEfiTcg2PhysicalPresenceGuid
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer  ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcg2PhysicalPresenceFlags        ## SOMETIMES_CONSUMES
+
+[Depex]
+  gEfiSmmVariableProtocolGuid

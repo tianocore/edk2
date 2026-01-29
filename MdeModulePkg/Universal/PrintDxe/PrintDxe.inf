@@ -1,0 +1,47 @@
+## @file
+#  Print DXE driver that produces Print2 Protocols.
+#
+#  This driver produces Print2 protocols layered on top of the PrintLib from the MdePkg.
+#
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PrintDxe
+  MODULE_UNI_FILE                = PrintDxe.uni
+  FILE_GUID                      = 79E4A61C-ED73-4312-94FE-E3E7563362A9
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PrintEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  Print.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  PrintLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  DebugLib
+
+[Protocols]
+  gEfiPrint2ProtocolGuid    ## PRODUCES
+  gEfiPrint2SProtocolGuid   ## PRODUCES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  PrintDxeExtra.uni

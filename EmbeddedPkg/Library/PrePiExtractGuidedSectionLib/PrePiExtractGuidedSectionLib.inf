@@ -1,0 +1,30 @@
+#/** @file
+#
+#  Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PrePiExtractGuidedSectionLib
+  FILE_GUID                      = 36F6E94E-6E8E-488E-89A4-7AD911C5AFB1
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ExtractGuidedSectionLib
+
+  CONSTRUCTOR                    = ExtractGuidedSectionLibConstructor
+
+[Sources.common]
+  PrePiExtractGuidedSectionLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+
+[FixedPcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdMaximumGuidedExtractHandler

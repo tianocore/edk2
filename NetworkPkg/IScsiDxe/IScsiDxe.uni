@@ -1,0 +1,17 @@
+// /** @file
+// Client-side iSCSI service.
+//
+// The iSCSI driver provides iSCSI service in the preboot environment and supports
+// booting over iSCSI.
+//
+// Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Client-side iSCSI service"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "The iSCSI driver provides iSCSI service in the preboot environment and supports booting over iSCSI."
+

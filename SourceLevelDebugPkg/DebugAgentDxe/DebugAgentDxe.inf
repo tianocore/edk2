@@ -1,0 +1,46 @@
+## @file
+#  Initialized Debug Agent in one separated DXE driver.
+#
+#  This DXE driver will invoke Debug Agent Library to initialize the debug agent.
+#
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DebugAgentDxe
+  MODULE_UNI_FILE                = DebugAgentDxe.uni
+  FILE_GUID                      = 9727502C-034E-472b-8E1B-67BB28C6CFDB
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DebugAgentDxeInitialize
+  UNLOAD_IMAGE                   = DebugAgentDxeUnload
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  DebugAgentDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DebugAgentLib
+
+[Guids]
+  gEfiEventExitBootServicesGuid                 ## SOMETIMES_CONSUMES ## Event
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  DebugAgentDxeExtra.uni

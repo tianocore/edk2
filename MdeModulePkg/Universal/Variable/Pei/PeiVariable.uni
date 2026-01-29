@@ -1,0 +1,16 @@
+// /** @file
+// Implements ReadOnly Variable Services required by PEIM and installs PEI ReadOnly Varaiable2 PPI.
+//
+// This module implements ReadOnly Variable Services required by PEIM and installs PEI ReadOnly Varaiable2 PPI.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Implements ReadOnly Variable Services required by PEIM and installs PEI ReadOnly Varaiable2 PPI"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module implements ReadOnly Variable Services required by PEIM and installs PEI ReadOnly Varaiable2 PPI."
+

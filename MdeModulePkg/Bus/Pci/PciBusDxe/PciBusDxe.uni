@@ -1,0 +1,16 @@
+// /** @file
+// The PCI bus driver will probe all PCI devices and allocate MMIO and IO space for these devices.
+//
+// Please use PCD feature flag PcdPciBusHotplugDeviceSupport to enable hot plug supporting.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Probes all PCI devices and allocate MMIO and IO space for these devices"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Please use PCD feature flag PcdPciBusHotplugDeviceSupport to enable hot plug supporting."
+

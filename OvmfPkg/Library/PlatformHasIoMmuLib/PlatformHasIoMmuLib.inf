@@ -1,0 +1,32 @@
+## @file
+# A hook-in library for MdeModulePkg/Bus/Pci/PciHostBridgeDxe.
+#
+#  Plugging this library instance into PciHostBridgeDxe makes
+#  PciHostBridgeDxe depend on the platform's dynamic decision whether
+#  to provide IOMMU implementation (usually through IoMmuDxe driver).
+#
+# Copyright (C) 2017, Red Hat, Inc.
+# Copyright (C) 2017, AMD, Inc.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.25
+  BASE_NAME                      = PlatformHasIoMmuLib
+  FILE_GUID                      = 49b4b018-0558-448b-1e1a-12226342877d
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformHasIoMmuLib|DXE_DRIVER
+  CONSTRUCTOR                    = PlatformHasIoMmuInitialize
+
+[Sources]
+  PlatformHasIoMmuLib.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Depex]
+  gEdkiiIoMmuProtocolGuid OR gIoMmuAbsentProtocolGuid

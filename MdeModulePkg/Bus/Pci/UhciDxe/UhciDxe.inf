@@ -1,0 +1,70 @@
+## @file
+#  The UhciDxe driver is responsible for managing the behavior of UHCI controller.
+#  It implements the interfaces of monitoring the status of all ports and transferring
+#  Control, Bulk, Interrupt and Isochronous requests to Usb1.x device
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UhciDxe
+  MODULE_UNI_FILE                = UhciDxe.uni
+  FILE_GUID                      = 2FB92EFA-2EE0-4bae-9EB6-7464125E1EF7
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = UhciDriverEntryPoint
+
+[Sources]
+  UhciSched.c
+  UhciDebug.c
+  UsbHcMem.h
+  UhciDebug.h
+  UhciQueue.c
+  UhciReg.c
+  UsbHcMem.c
+  UhciQueue.h
+  Uhci.c
+  Uhci.h
+  UhciReg.h
+  UhciSched.h
+  ComponentName.c
+  ComponentName.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport  ## CONSUMES
+
+[LibraryClasses]
+  MemoryAllocationLib
+  BaseLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  DebugLib
+  PcdLib
+  ReportStatusCodeLib
+
+[Guids]
+  gEfiEventExitBootServicesGuid                 ## SOMETIMES_CONSUMES ## Event
+
+[Protocols]
+  gEfiPciIoProtocolGuid                         ## TO_START
+  gEfiUsb2HcProtocolGuid                        ## BY_START
+
+# [Event]
+# EVENT_TYPE_PERIODIC_TIMER       ## CONSUMES
+#
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  UhciDxeExtra.uni

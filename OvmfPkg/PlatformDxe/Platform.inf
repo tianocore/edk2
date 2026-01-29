@@ -1,0 +1,69 @@
+## @file
+#  This driver effectuates OVMF's platform configuration settings and exposes
+#  them via HII.
+#
+#  Copyright (C) 2014, Red Hat, Inc.
+#  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformDxe
+  FILE_GUID                      = D9DCC5DF-4007-435E-9098-8970935504B2
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PlatformInit
+  UNLOAD_IMAGE                   = PlatformUnload
+
+[Sources]
+  Platform.c
+  Platform.h
+  Platform.uni
+  PlatformConfig.c
+  PlatformConfig.h
+  PlatformForms.vfr
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  HiiLib
+  HobLib
+  MemoryAllocationLib
+  PrintLib
+  UefiBootServicesTableLib
+  UefiHiiServicesLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution
+  gUefiOvmfPkgTokenSpaceGuid.PcdVideoResolutionSource
+
+[Protocols]
+  gEfiDevicePathProtocolGuid      ## PRODUCES
+  gEfiGraphicsOutputProtocolGuid  ## CONSUMES
+  gEfiHiiConfigAccessProtocolGuid ## PRODUCES
+
+[Guids]
+  gEfiIfrTianoGuid
+  gOvmfPlatformConfigGuid
+  gMemDebugLogHobGuid
+
+[Depex]
+  gEfiHiiConfigRoutingProtocolGuid  AND
+  gEfiHiiDatabaseProtocolGuid       AND
+  gEfiVariableArchProtocolGuid      AND
+  gEfiVariableWriteArchProtocolGuid

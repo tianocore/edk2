@@ -1,0 +1,74 @@
+## @file
+#  Debug Communication Library instance based on usb3 debug port.
+#
+#  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DebugCommunicationLibUsb3Dxe
+  MODULE_UNI_FILE                = DebugCommunicationLibUsb3Dxe.uni
+  FILE_GUID                      = C41F8C82-B3E6-47e0-A61D-0F9E429E6996
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DebugCommunicationLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER SMM_CORE
+  CONSTRUCTOR                    = DebugCommunicationUsb3DxeConstructor
+  DESTRUCTOR                     = DebugCommunicationUsb3DxeDestructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  DebugCommunicationLibUsb3Dxe.c
+  DebugCommunicationLibUsb3Transfer.c
+  DebugCommunicationLibUsb3Common.c
+  DebugCommunicationLibUsb3Internal.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SourceLevelDebugPkg/SourceLevelDebugPkg.dec
+
+[Pcd]
+  # The memory BAR of ehci host controller, in which usb debug feature is enabled.
+  # Note that the memory BAR address is only used before Pci bus resource allocation.
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbXhciMemorySpaceBase          ## SOMETIMES_CONSUMES
+
+  # The pci address of ehci host controller, in which usb debug feature is enabled.
+  # The format of pci address please refer to SourceLevelDebugPkg.dec
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbXhciPciAddress               ## CONSUMES
+
+  # Per XHCI spec, software shall impose a timeout between the detection of the Debug Host
+  # connection and the DbC Run transition to 1. This PCD specifies the timeout value in microsecond.
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbXhciDebugDetectTimeout       ## SOMETIMES_CONSUMES
+
+  # The value of data buffer size used for USB debug port handle.
+  # It should be equal to sizeof (USB3_DEBUG_PORT_HANDLE).
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugPortHandleBufferSize|249   ## SOMETIMES_CONSUMES
+
+[Protocols]
+   ## NOTIFY
+   ## SOMETIMES_CONSUMES
+  gEfiPciIoProtocolGuid
+  gEdkiiIoMmuProtocolGuid               ## SOMETIMES_CONSUMES
+   ## NOTIFY
+   ## SOMETIMES_CONSUMES
+  gEfiDxeSmmReadyToLockProtocolGuid
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  IoLib
+  PciLib
+  TimerLib
+  UefiBootServicesTableLib
+  UefiLib
+  BaseMemoryLib
+  HobLib

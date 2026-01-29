@@ -1,0 +1,19 @@
+// /** @file
+// Firmware Performance Pei Module.
+//
+// In S3 resume boot mode, it updates S3 Resume Performance Record in ACPI Firmware Performance Data Table.
+//
+// This module register report status code listener to collect performance data
+// for S3 Resume Performance Record on S3 resume boot path.
+//
+// Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Firmware Performance Pei Module."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "In S3 resume boot mode, it updates S3 Resume Performance Record in ACPI Firmware Performance Data Table. This module register report status code listener to collect performance data for S3 Resume Performance Record on S3 resume boot path."
+

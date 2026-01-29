@@ -1,0 +1,35 @@
+## @file
+#  CPU Memory Map Unit Initialization library instance.
+#
+#  Copyright (c) 2024 Loongson Technology Corporation Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = CpuMmuInitLib
+  MODULE_UNI_FILE                = CpuMmuInitLib.uni
+  FILE_GUID                      = F67EB983-AC2A-7550-AB69-3BC51A1C895B
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CpuMmuInitLib
+
+#
+#  VALID_ARCHITECTURES           = LOONGARCH64
+#
+
+[Sources]
+  CpuMmuInit.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  CacheMaintenanceLib
+  CpuMmuLib
+  DebugLib

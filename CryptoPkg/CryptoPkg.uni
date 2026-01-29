@@ -1,0 +1,32 @@
+// /** @file
+// Package for cryptography modules.
+//
+// This Package provides cryptographic-related libraries for UEFI security modules.
+// It also provides a test application to test libraries.
+//
+// Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_PACKAGE_ABSTRACT            #language en-US "Provides cryptographic-related libraries for UEFI security modules"
+
+#string STR_PACKAGE_DESCRIPTION         #language en-US "This Package provides cryptographic-related libraries for UEFI security modules."
+
+#string STR_gEfiCryptoPkgTokenSpaceGuid_PcdHashApiLibPolicy_PROMPT  #language en-US "HASH algorithm to calculate hash"
+
+#string STR_gEfiCryptoPkgTokenSpaceGuid_PcdHashApiLibPolicy_HELP  #language en-US "This PCD indicates the HASH algorithm to calculate hash of data.<BR><BR>\n"
+                                                                                        "Based on the value set, the required algorithm is chosen to calculate\n"
+                                                                                        "the hash of data.<BR>\n"
+                                                                                        "The default hashing algorithm for BaseHashApiLib is set to SHA256.<BR>\n"
+                                                                                        "0x00000001  -  HASH_ALG_SHA1.<BR>\n"
+                                                                                        "0x00000002  -  HASH_ALG_SHA256.<BR>\n"
+                                                                                        "0x00000004  -  HASH_ALG_SHA384.<BR>\n"
+                                                                                        "0x00000008  -  HASH_ALG_SHA512.<BR>\n"
+                                                                                        "0x00000010  -  HASH_ALG_SM3.<BR>"
+
+#string STR_gEfiCryptoPkgTokenSpaceGuid_PcdCryptoServiceFamilyEnable_PROMPT  #language en-US "Enable/Disable EDK II Crypto Protocol/PPI services"
+
+#string STR_gEfiCryptoPkgTokenSpaceGuid_PcdCryptoServiceFamilyEnable_HELP  #language en-US "Enable/Disable the families and individual services produced by the EDK II Crypto Protocols/PPIs.  The default is all services disabled.  This Structured PCD is associated with PCD_CRYPTO_SERVICE_FAMILY_ENABLE structure that is defined in Include/Pcd/PcdCryptoServiceFamilyEnable.h."

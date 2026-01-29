@@ -1,0 +1,47 @@
+## @file
+#  Provides below measurement functions:
+#    1. TPM measurement functions for TPM1.2 and TPM 2.0
+#    2. Confidential Computing (CC) measurement functions
+#
+#  This library provides TpmMeasureAndLogData() to measure and log data, and
+#  extend the measurement result into a specific PCR.
+#
+# Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeTpmMeasurementLib
+  FILE_GUID                      = 30930D10-AF5B-4abf-80E6-EB4FFC0AE9D1
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TpmMeasurementLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  MODULE_UNI_FILE                = DxeTpmMeasurementLib.uni
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  DxeTpmMeasurementLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiTcgProtocolGuid               ## SOMETIMES_CONSUMES
+  gEfiTcg2ProtocolGuid              ## SOMETIMES_CONSUMES
+  gEfiCcMeasurementProtocolGuid     ## SOMETIMES_CONSUMES

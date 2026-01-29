@@ -1,0 +1,54 @@
+## @file
+#  Produces the Legacy Region 2 Protocol.
+#
+#  This generic implementation of the Legacy Region 2 Protocol does not actually
+#  perform any lock/unlock operations.  This module may be used on platforms
+#  that do not provide HW locking of the legacy memory regions.  It can also
+#  be used as a template driver for implementing the Legacy Region 2 Protocol on
+#  a platform that does support HW locking of the legacy memory regions.
+#
+#  Note: This module does not fully comply with PI Specification of Legacy Region 2
+#  Protocol. For Lock/UnLock/Decode, EFI_SUCCESS is returned although the region's
+#  attributes were not actually modified.
+#
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = LegacyRegion2Dxe
+  MODULE_UNI_FILE                = LegacyRegion2Dxe.uni
+  FILE_GUID                      = EC2BEECA-E84A-445B-869B-F7A73C96F58A
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = LegacyRegion2Install
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  LegacyRegion2.c
+  LegacyRegion2.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  DebugLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiLegacyRegion2ProtocolGuid                 ## PRODUCES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  LegacyRegion2DxeExtra.uni

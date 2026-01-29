@@ -1,0 +1,17 @@
+// /** @file
+// Initializes TPM device and measures FVs in PEI phase
+//
+// This module will initialize TPM device, measure reported FVs and BIOS version.
+// This module may also lock TPM physical presence and physicalPresenceLifetimeLock.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Initializes TPM device and measures FVs in PEI phase"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module will initialize TPM device, measure reported FVs and BIOS version. This module may also lock TPM physical presence and physicalPresenceLifetimeLock."
+

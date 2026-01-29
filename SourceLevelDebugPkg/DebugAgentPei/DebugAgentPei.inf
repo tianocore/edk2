@@ -1,0 +1,42 @@
+## @file
+#  Initialized Debug Agent in PEI phase.
+#
+#  This PEIM will invoke Debug Agent Library to initialize the debug agent in
+#  whole PEI phase.
+#
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DebugAgentPei
+  MODULE_UNI_FILE                = DebugAgentPei.uni
+  FILE_GUID                      = D9D114EF-F40B-4d48-AAA0-A3DC99C9F5BD
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DebugAgentPeiInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  DebugAgentPei.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  DebugAgentLib
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  DebugAgentPeiExtra.uni

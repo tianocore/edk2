@@ -1,0 +1,36 @@
+## @file
+#  DXE ACPI Timer Library Instance.
+#
+#  Copyright (C) 2014, Gabriel L. Somlo <somlo@cmu.edu>
+#  Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION    = 0x00010005
+  BASE_NAME      = DxeAcpiTimerLib
+  FILE_GUID      = 52DECA02-2EE8-4EAA-8EAD-1AB83F8A5955
+  MODULE_TYPE    = BASE
+  VERSION_STRING = 1.0
+  LIBRARY_CLASS  = TimerLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_DRIVER UEFI_APPLICATION SMM_CORE MM_CORE_STANDALONE MM_STANDALONE
+  CONSTRUCTOR    = AcpiTimerLibConstructor
+
+[Sources]
+  AcpiTimerLib.c
+  AcpiTimerLib.h
+  DxeAcpiTimerLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PciLib
+  IoLib
+  HobLib
+
+[Guids]
+  gUefiOvmfPkgPlatformInfoGuid                      ## CONSUMES

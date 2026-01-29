@@ -1,0 +1,74 @@
+## @file
+#  Driver Health Manager DXE driver.
+#
+#  This module produces two driver health manager forms.
+#  One will be used by BDS core to configure the Configured Required
+#  driver health instances, the other will be automatically included by
+#  firmware setup (UI).
+#
+#  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DriverHealthManagerDxe
+  MODULE_UNI_FILE                = DriverHealthManagerDxe.uni
+  FILE_GUID                      = EBF8ED7C-0DD1-4787-84F1-F48D537DCACF
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeDriverHealthManager
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+
+[Sources.common]
+  DriverHealthManagerDxe.h
+  DriverHealthManagerDxe.c
+  DriverHealthManagerStrings.uni
+  DriverHealthManagerVfr.Vfr
+  DriverHealthManagerVfr.h
+  DriverHealthConfigureVfr.Vfr
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  UefiLib
+  UefiDriverEntryPoint
+  DebugLib
+  HiiLib
+  UefiBootManagerLib
+  PcdLib
+  DevicePathLib
+
+[Protocols]
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
+
+[Guids]
+  gEfiHiiDriverHealthFormsetGuid                ## CONSUMES ## GUID
+  gEfiIfrTianoGuid                              ## CONSUMES ## HII
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDriverHealthConfigureForm      ## CONSUMES
+
+[Depex]
+  gEfiHiiDatabaseProtocolGuid AND gEfiFormBrowser2ProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  DriverHealthManagerDxeExtra.uni

@@ -1,0 +1,84 @@
+## @file
+# Thirty party Jansson library for JSON operations.
+#
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+# (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001b
+  BASE_NAME                      = JsonLib
+  FILE_GUID                      = F5E36815-305A-4C5A-9D75-4F2149E45255
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = JsonLib|DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = JsonLibConstructor
+
+[Sources]
+  #
+  # Below are the source code of third
+  # party jansson library.
+  #
+  jansson/src/dump.c
+  jansson/src/error.c
+  jansson/src/hashtable.c
+  jansson/src/hashtable_seed.c
+  jansson/src/memory.c
+  jansson/src/pack_unpack.c
+  jansson/src/strbuffer.c
+  jansson/src/strconv.c
+  jansson/src/utf.c
+  jansson/src/value.c
+  jansson/src/version.c
+  #
+  # Below are the source of edk2 JsonLib.
+  #
+  JsonLib.c
+  jansson_config.h
+  jansson_private_config.h
+  #
+  # Below is the source code override to fix the build issue.
+  # Add code in load.c to conditionally use stdin according
+  # to HAVE_UNISTD_H macro. The PR is submitted to jansson
+  # open source community.
+  # https://github.com/akheron/jansson/pull/558
+  #
+  load.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  RedfishPkg/RedfishPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  Ucs2Utf8Lib
+  RedfishCrtLib
+  DebugLib
+  MemoryAllocationLib
+  PrintLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+
+[BuildOptions]
+  #
+  # Disables the following Visual Studio compiler warnings
+  # so we do not break the build with /WX option:
+  #   C4090: 'function' : different 'const' qualifiers
+  #   C4244: conversion from type1 to type2, possible loss of data
+  #   C4334: 32-bit shift implicitly converted to 64-bit
+  #   C4204: nonstandard extension used: non-constant aggregate initializer
+  #   C4706: assignment within conditional expression
+  #
+  # Define macro HAVE_CONFIG_H to include jansson_private_config.h to build.
+  # Undefined _WIN32, WIN64, _MSC_VER macros
+  # On GCC, no error on the unused-function and unused-but-set-variable.
+  #
+  MSFT:*_*_X64_CC_FLAGS = /wd4204 /wd4244 /wd4090 /wd4334 /wd4706 /DHAVE_CONFIG_H=1 /U_WIN32 /UWIN64 /U_MSC_VER
+  MSFT:*_*_IA32_CC_FLAGS = /wd4204 /wd4244 /wd4090 /wd4706 /DHAVE_CONFIG_H=1 /U_WIN32 /UWIN64 /U_MSC_VER
+  GCC:*_*_*_CC_FLAGS = -Wno-unused-function -Wno-unused-but-set-variable -DHAVE_CONFIG_H=1 -UWIN32 -U_WIN32 -UWIN64 -U_MSC_VER
+  GCC:*_*_X64_CC_FLAGS = -DNO_MSABI_VA_FUNCS

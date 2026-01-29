@@ -1,0 +1,42 @@
+## @file
+#  The CPU specific programming for PiSmmCpuDxeSmm module.
+#
+#  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (C) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AmdSmmCpuFeaturesLib
+  MODULE_UNI_FILE                = SmmCpuFeaturesLib.uni
+  FILE_GUID                      = 5849E964-78EC-428E-8CBD-848A7E359134
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SmmCpuFeaturesLib
+  CONSTRUCTOR                    = SmmCpuFeaturesLibConstructor
+
+[Sources]
+  SmmCpuFeaturesLib.c
+  SmmCpuFeaturesLibCommon.c
+  AmdSmmCpuFeaturesLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  MemoryAllocationLib
+  DebugLib
+  MmSaveStateLib
+  HobLib
+
+[Guids]
+  gSmmBaseHobGuid                ## CONSUMES
+
+[FeaturePcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdSmrrEnable               ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdSmmFeatureControlEnable  ## CONSUMES

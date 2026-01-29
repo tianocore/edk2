@@ -1,0 +1,40 @@
+## @file
+# Implementation of EFI REST JSON Structure Protocol.
+#
+#  (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION               = 0x00010005
+  BASE_NAME                 = RestJsonStructureDxe
+  FILE_GUID                 = 83FAAFBF-FC4B-469F-892A-798E66A6F50A
+  MODULE_TYPE               = DXE_DRIVER
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = RestJsonStructureEntryPoint
+  UNLOAD_IMAGE              = RestJsonStructureUnload
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Sources]
+  RestJsonStructureDxe.c
+  RestJsonStructureInternal.h
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiRestJsonStructureProtocolGuid    ## Producing
+
+[Depex]
+  TRUE
+

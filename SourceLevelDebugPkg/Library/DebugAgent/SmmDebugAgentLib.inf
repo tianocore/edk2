@@ -1,0 +1,81 @@
+## @file
+#  Debug Agent library instance for SMM modules.
+#
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmDebugAgentLib
+  MODULE_UNI_FILE                = SmmDebugAgentLib.uni
+  FILE_GUID                      = CB07D74C-598F-4268-A5D1-644FB4A481E8
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 0.8
+  LIBRARY_CLASS                  = DebugAgentLib|DXE_SMM_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.common]
+  SmmDebugAgent/SmmDebugAgentLib.c
+  SmmDebugAgent/SmmDebugAgentLib.h
+  DebugAgentCommon/DebugAgent.c
+  DebugAgentCommon/DebugAgent.h
+  DebugAgentCommon/DebugTimer.c
+  DebugAgentCommon/DebugTimer.h
+  DebugAgentCommon/DebugMp.c
+  DebugAgentCommon/DebugMp.h
+
+[Sources.Ia32]
+  DebugAgentCommon/Ia32/AsmFuncs.nasm
+  DebugAgentCommon/Ia32/ArchDebugSupport.h
+  DebugAgentCommon/Ia32/ArchDebugSupport.c
+  DebugAgentCommon/Ia32/DebugException.h
+
+[Sources.X64]
+  DebugAgentCommon/X64/AsmFuncs.nasm
+  DebugAgentCommon/X64/ArchDebugSupport.h
+  DebugAgentCommon/X64/ArchDebugSupport.c
+  DebugAgentCommon/X64/DebugException.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  SourceLevelDebugPkg/SourceLevelDebugPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  ResetSystemLib
+  IoLib
+  DebugCommunicationLib
+  UefiLib
+  PcdLib
+  SynchronizationLib
+  LocalApicLib
+  TimerLib
+  PrintLib
+  PeCoffExtraActionLib
+  PeCoffGetEntryPointLib
+  SmmServicesTableLib
+
+[Guids]
+  ## CONSUMES ## SystemTable
+  ## CONSUMES ## HOB
+  gEfiDebugAgentGuid
+  gEfiVectorHandoffTableGuid            ## PRODUCES ## GUID # SMM Configuration Table
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock                                             ## SOMETIMES_CONSUMES
+  # Skip Page Fault exception (14) by default in SMM
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdExceptionsIgnoredByDebugger|0x00004000  ## SOMETIMES_CONSUMES
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdTransferProtocolRevision                ## CONSUMES
+

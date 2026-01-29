@@ -1,0 +1,62 @@
+## @file
+#  The Usb Bus Dxe driver is used to enumerate and manage all attached usb devices.
+#
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UsbBusDxe
+  MODULE_UNI_FILE                = UsbBusDxe.uni
+  FILE_GUID                      = 240612B7-A063-11d4-9A3A-0090273FC14D
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = UsbBusDriverEntryPoint
+
+[Sources]
+  UsbDesc.c
+  UsbEnumer.c
+  UsbEnumer.h
+  UsbBus.c
+  UsbHub.c
+  ComponentName.c
+  UsbUtility.h
+  UsbHub.h
+  UsbUtility.c
+  UsbDesc.h
+  UsbBus.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+[LibraryClasses]
+  MemoryAllocationLib
+  DevicePathLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  DebugLib
+  ReportStatusCodeLib
+
+
+[Protocols]
+  gEfiUsbIoProtocolGuid                         ## BY_START
+  ## TO_START
+  ## BY_START
+  gEfiDevicePathProtocolGuid
+  gEfiUsb2HcProtocolGuid                        ## TO_START
+
+# [Event]
+#
+# EVENT_TYPE_PERIODIC_TIMER       ## CONSUMES
+#
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  UsbBusDxeExtra.uni

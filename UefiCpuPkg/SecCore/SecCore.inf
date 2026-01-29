@@ -1,0 +1,91 @@
+## @file
+#  SecCore module that implements the SEC phase.
+#
+#  This is the first module taking control of the platform upon power-on/reset.
+#  It implements the first phase of the security phase. The entry point function is
+#  _ModuleEntryPoint in PlatformSecLib. The entry point function will switch to
+#  protected mode, setup flat memory model, enable temporary memory and
+#  call into SecStartup().
+#
+#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = SecCore
+  MODULE_UNI_FILE                = SecCore.uni
+  FILE_GUID                      = 1BA0062E-C779-4582-8566-336AE8F78F09
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  SecMain.c
+  SecMain.h
+  FindPeiCore.c
+
+[Sources.IA32]
+  Ia32/ResetVec.nasmb
+
+[Sources.IA32, Sources.X64]
+  SecBist.c
+  SecTemporaryRamDone.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  PlatformSecLib
+  PcdLib
+  DebugAgentLib
+  CpuLib
+  PeCoffGetEntryPointLib
+  PeCoffExtraActionLib
+  CpuExceptionHandlerLib
+  ReportStatusCodeLib
+  PeiServicesLib
+  PeiServicesTablePointerLib
+  HobLib
+  StackCheckLib
+
+[LibraryClasses.IA32, LibraryClasses.X64]
+  CpuPageTableLib
+
+[Ppis]
+  ## SOMETIMES_CONSUMES
+  ## PRODUCES
+  gEfiSecPlatformInformationPpiGuid
+  ## SOMETIMES_CONSUMES
+  ## SOMETIMES_PRODUCES
+  gEfiSecPlatformInformation2PpiGuid
+  gEfiTemporaryRamDonePpiGuid                          ## PRODUCES
+  ## NOTIFY
+  ## SOMETIMES_CONSUMES
+  gPeiSecPerformancePpiGuid
+  gEfiPeiCoreFvLocationPpiGuid
+  ## CONSUMES
+  gRepublishSecPpiPpiGuid
+
+[Guids]
+  ## SOMETIMES_PRODUCES   ## HOB
+  gEfiFirmwarePerformanceGuid
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdPeiTemporaryRamStackSize  ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdMaxMappingAddressBeforeTempRamExit  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMigrateTemporaryRamFirmwareVolumes  ## CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SecCoreExtra.uni

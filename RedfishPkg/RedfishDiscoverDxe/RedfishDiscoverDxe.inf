@@ -1,0 +1,57 @@
+## @file
+#  Implementation of EFI_REDFISH_DISCOVER_PROTOCOL interfaces.
+#
+#  (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+#  Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION               = 0x0001001b
+  BASE_NAME                 = RedfishDiscoverDxe
+  FILE_GUID                 = 28A76FE5-43D7-48A3-9714-C1B7BDD6DFB6
+  MODULE_TYPE               = UEFI_DRIVER
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = RedfishDiscoverEntryPoint
+  UNLOAD_IMAGE              = RedfishDiscoverUnload
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
+  RedfishPkg/RedfishPkg.dec
+
+[Sources]
+  ComponentName.c
+  RedfishDiscoverDxe.c
+  RedfishSmbiosHostInterface.c
+  RedfishDiscoverInternal.h
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PrintLib
+  RedfishDebugLib
+  RestExLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiRestExServiceBindingProtocolGuid            ## Consuming
+  gEfiRestExProtocolGuid                          ## Consuming
+  gEfiTcp4ServiceBindingProtocolGuid              ## Consuming
+  gEfiTcp4ProtocolGuid                            ## Consuming
+  gEfiTcp6ServiceBindingProtocolGuid              ## Consuming
+  gEfiTcp6ProtocolGuid                            ## Consuming
+  gEfiRedfishDiscoverProtocolGuid                 ## Prodcuing
+  gEfiSmbiosProtocolGuid                          ## Consuming
+  gEfiDriverBindingProtocolGuid                   ## Consuming
+
+[Pcd]
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDiscoverAccessModeInBand ## CONSUMES
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishSendReceiveTimeout       ## CONSUEMS

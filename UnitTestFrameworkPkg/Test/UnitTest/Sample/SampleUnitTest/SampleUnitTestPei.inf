@@ -1,0 +1,39 @@
+## @file
+# Sample UnitTest built for execution in PEI.
+#
+# Copyright (c) Microsoft Corporation.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010006
+  BASE_NAME      = SampleUnitTestPei
+  FILE_GUID      = B9BD9451-3DC8-48EA-A6F0-55753BF186F1
+  MODULE_TYPE    = PEIM
+  VERSION_STRING = 1.0
+  ENTRY_POINT    = PeiEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SampleUnitTest.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  BaseLib
+  DebugLib
+  UnitTestLib
+  PrintLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid

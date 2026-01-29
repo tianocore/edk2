@@ -1,0 +1,54 @@
+## @file
+#  OVMF ACPI Platform Driver
+#
+#  Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = QemuFwCfgAcpiPlatform
+  FILE_GUID                      = 17985e6f-e778-4d94-aefa-c5dd2b77e186
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = AcpiPlatformEntryPoint
+
+[Sources]
+  AcpiPlatform.c
+  AcpiPlatform.h
+  CloudHvAcpi.c
+  EntryPoint.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  AcpiPlatformLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  OrderedCollectionLib
+  QemuFwCfgLib
+  UefiDriverEntryPoint
+  HobLib
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+  gEfiPciIoProtocolGuid                         # PROTOCOL SOMETIMES_CONSUMED
+
+[Guids]
+  gRootBridgesConnectedEventGroupGuid
+  gUefiOvmfPkgTdxAcpiHobGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtr
+  gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtrSize
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
+
+[Depex]
+  gEfiAcpiTableProtocolGuid

@@ -1,0 +1,13 @@
+// /** @file
+// SSL/TLS Wrapper Library Instance based on OpenSSL.
+//
+// Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "SSL/TLS Wrapper Library Instance"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module provides SSL/TLS Wrapper Library Instance."

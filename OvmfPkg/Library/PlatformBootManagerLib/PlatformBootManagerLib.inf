@@ -1,0 +1,92 @@
+## @file
+#  Platform BDS customizations library.
+#
+#  Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformBootManagerLib
+  FILE_GUID                      = FB65006C-AC9F-4992-AD80-184B2BDBBD83
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformBootManagerLib|DXE_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64 EBC
+#
+
+[Sources]
+  BdsPlatform.c
+  PlatformData.c
+  QemuKernel.c
+  BdsPlatform.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SourceLevelDebugPkg/SourceLevelDebugPkg.dec
+  OvmfPkg/OvmfPkg.dec
+  SecurityPkg/SecurityPkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  PcdLib
+  UefiBootManagerLib
+  BootLogoLib
+  DevicePathLib
+  PciLib
+  NvVarsFileLib
+  QemuFwCfgLib
+  QemuFwCfgS3Lib
+  QemuLoadImageLib
+  QemuBootOrderLib
+  ReportStatusCodeLib
+  UefiLib
+  PlatformBmPrintScLib
+  Tcg2PhysicalPresenceLib
+  XenPlatformLib
+  QemuFwCfgSimpleParserLib
+  PlatformBootManagerCommonLib
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gUefiOvmfPkgTokenSpaceGuid.PcdBootRestrictToFirmware
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate         ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits         ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity           ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits         ## CONSUMES
+
+[Pcd.X64]
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock
+
+[Protocols]
+  gEfiDecompressProtocolGuid
+  gEfiPciRootBridgeIoProtocolGuid
+  gVirtioDeviceProtocolGuid
+  gEfiS3SaveStateProtocolGuid                   # PROTOCOL SOMETIMES_CONSUMED
+  gEfiDxeSmmReadyToLockProtocolGuid             # PROTOCOL SOMETIMES_PRODUCED
+  gEfiLoadedImageProtocolGuid                   # PROTOCOL SOMETIMES_PRODUCED
+  gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL SOMETIMES_CONSUMED
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+  gEfiGlobalVariableGuid
+  gRootBridgesConnectedEventGroupGuid
+  gUefiShellFileGuid
+  gGrubFileGuid
+  gUiAppFileGuid

@@ -1,0 +1,16 @@
+// /** @file
+// Instance of Post Code Library based on Report Status Code Library.
+//
+// Post Code Library that layers on top of a Report Status Code Library instance.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Instance of Post Code Library based on Report Status Code Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "The Post Code Library that layers on top of a Report Status Code Library instance."
+

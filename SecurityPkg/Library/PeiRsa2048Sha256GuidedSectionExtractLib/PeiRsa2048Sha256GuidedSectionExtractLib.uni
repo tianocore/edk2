@@ -1,0 +1,19 @@
+// /** @file
+// This library doesn't produce any library class. The constructor function uses
+//
+// ExtractGuidedSectionLib service to register an RSA 2048 SHA 256 guided section handler
+// that parses RSA 2048 SHA 256 encapsulation section and extracts raw data.
+//
+// It uses the BaseCryptLib based on OpenSSL to authenticate the signature.
+//
+// Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Provides security service of RSA 2048 SHA 256 guided section verification"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library doesn't produce any library class. The constructor function uses ExtractGuidedSectionLib service to register an RSA 2048 SHA 256 guided section handler that parses RSA2048 SHA256 encapsulation section and extracts raw data. It uses the BaseCryptLib based on OpenSSL to authenticate the signature."
+

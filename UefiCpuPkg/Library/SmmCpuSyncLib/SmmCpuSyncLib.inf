@@ -1,0 +1,34 @@
+## @file
+# SMM CPU Synchronization lib.
+#
+# This is SMM CPU Synchronization lib used for SMM CPU sync operations.
+#
+# Copyright (c) 2023 - 2024, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmCpuSyncLib
+  FILE_GUID                      = 1ca1bc1a-16a4-46ef-956a-ca500fd3381f
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  LIBRARY_CLASS                  = SmmCpuSyncLib|DXE_SMM_DRIVER MM_STANDALONE
+
+[Sources]
+  SmmCpuSyncLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  SafeIntLib
+  SynchronizationLib
+
+[Pcd]
+
+[Protocols]

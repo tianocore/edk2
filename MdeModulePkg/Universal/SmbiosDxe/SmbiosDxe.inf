@@ -1,0 +1,58 @@
+## @file
+# This driver initializes and installs the SMBIOS protocol, constructs SMBIOS table into system configuration table.
+#
+# Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmbiosDxe
+  MODULE_UNI_FILE                = SmbiosDxe.uni
+  FILE_GUID                      = F9D88642-0737-49bc-81B5-6889CD57D9EA
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = SmbiosDriverEntryPoint
+
+[Sources]
+  SmbiosDxe.h
+  SmbiosDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  UefiLib
+  UefiDriverEntryPoint
+  DebugLib
+  PcdLib
+  HobLib
+
+[Protocols]
+  gEfiSmbiosProtocolGuid                            ## PRODUCES
+
+[Guids]
+  gEfiSmbiosTableGuid                               ## SOMETIMES_PRODUCES ## SystemTable
+  gEfiSmbios3TableGuid                              ## SOMETIMES_PRODUCES ## SystemTable
+  gUniversalPayloadSmbios3TableGuid                 ## CONSUMES           ## HOB
+  gUniversalPayloadSmbiosTableGuid                  ## SOMETIMES_CONSUMES ## HOB
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion   ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev    ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosEntryPointProvideMethod   ## CONSUMES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SmbiosDxeExtra.uni

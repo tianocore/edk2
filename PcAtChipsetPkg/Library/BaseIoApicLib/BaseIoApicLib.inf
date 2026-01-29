@@ -1,0 +1,34 @@
+## @file
+#  Library instance for I/O APIC library class
+#
+#  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseIoApicLib
+  MODULE_UNI_FILE                = BaseIoApicLib.uni
+  FILE_GUID                      = 58ED6E5A-E36A-462a-9ED6-6E62C9A26DF8
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = IoApicLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  PcAtChipsetPkg/PcAtChipsetPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  IoLib
+  PcdLib
+  LocalApicLib
+
+[Sources]
+  IoApicLib.c
+
+[Pcd]
+  gPcAtChipsetPkgTokenSpaceGuid.PcdIoApicBaseAddress    ## CONSUMES
+

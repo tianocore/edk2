@@ -1,0 +1,90 @@
+## @file
+# CI configuration for UefiCpuPkg
+#
+# Copyright (c) Microsoft Corporation
+# Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+    "PrEval": {
+        "DscPath": "UefiCpuPkg.dsc",
+    },
+    "LicenseCheck": {
+        "IgnoreFiles": []
+    },
+    "EccCheck": {
+        ## Exception sample looks like below:
+        ## "ExceptionList": [
+        ##     "<ErrorID>", "<KeyWord>"
+        ## ]
+        "ExceptionList": [
+          "8006", "main",
+          "8005", "GENERAL_REGISTER.R8",
+          "8005", "GENERAL_REGISTER.R9",
+          "8005", "GENERAL_REGISTER.R10",
+          "8005", "GENERAL_REGISTER.R11",
+          "8005", "GENERAL_REGISTER.R12",
+          "8005", "GENERAL_REGISTER.R13",
+          "8005", "GENERAL_REGISTER.R14",
+          "8005", "GENERAL_REGISTER.R15"
+        ],
+        ## Both file path and directory path are accepted.
+        "IgnoreFiles": [
+        ]
+    },
+    "CompilerPlugin": {
+        "DscPath": "UefiCpuPkg.dsc"
+    },
+    ## options defined ci/Plugin/HostUnitTestCompilerPlugin
+    "HostUnitTestCompilerPlugin": {
+        "DscPath": "Test/UefiCpuPkgHostTest.dsc"
+    },
+    "CharEncodingCheck": {
+        "IgnoreFiles": []
+    },
+    "DependencyCheck": {
+        "AcceptableDependencies": [
+            "MdePkg/MdePkg.dec",
+            "MdeModulePkg/MdeModulePkg.dec",
+            "UefiCpuPkg/UefiCpuPkg.dec"
+        ],
+        # For host based unit tests
+        "AcceptableDependencies-HOST_APPLICATION":[
+            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec",
+            "CryptoPkg/CryptoPkg.dec"
+        ],
+        # For UEFI shell based apps
+        "AcceptableDependencies-UEFI_APPLICATION":[],
+        "IgnoreInf": []
+    },
+    "DscCompleteCheck": {
+        "DscPath": "UefiCpuPkg.dsc",
+        "IgnoreInf": [
+            "UefiCpuPkg/ResetVector/FixupVtf/Vtf.inf",
+            "UefiCpuPkg/ResetVector/Vtf0/Vtf0.inf",
+            "UefiCpuPkg/ResetVector/Vtf0/Bin/ResetVector1G.inf"
+        ]
+    },
+    "HostUnitTestDscCompleteCheck": {
+        "IgnoreInf": [""],
+        "DscPath": "Test/UefiCpuPkgHostTest.dsc"
+    },
+    "GuidCheck": {
+        "IgnoreGuidName": ["SecCore", "ResetVector"], # Expected duplication for gEfiFirmwareVolumeTopFileGuid
+        "IgnoreGuidValue": [],
+        "IgnoreFoldersAndFiles": [],
+        "IgnoreDuplicates": ["gEdkiiPeiMpServices2PpiGuid=gEfiPeiMpServices2PpiGuid"]
+    },
+    "LibraryClassCheck": {
+        "IgnoreHeaderFile": []
+    },
+
+    ## options defined ci/Plugin/SpellCheck
+    "SpellCheck": {
+        "AuditOnly": True,           # Fails test but run in AuditOnly mode to collect log
+        "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
+        "ExtendWords": [],           # words to extend to the dictionary for this package
+        "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
+        "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
+    }
+}

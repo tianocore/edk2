@@ -1,0 +1,60 @@
+## @file
+#  This module produces EFI TLS Protocol, EFI TLS Service Binding Protocol and
+#  EFI TLS Configuration Protocol.
+#
+#  This module produces EFI TLS (Transport Layer Security) Protocol and EFI TLS
+#  Service Binding Protocol, to provide TLS services.
+#
+#  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION               = 0x00010005
+  BASE_NAME                 = TlsDxe
+  FILE_GUID                 = 3aceb0c0-3c72-11e4-9a56-74d435052646
+  MODULE_TYPE               = UEFI_DRIVER
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = TlsDriverEntryPoint
+  UNLOAD_IMAGE              = TlsUnload
+  MODULE_UNI_FILE           = TlsDxe.uni
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Packages]
+  MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[Sources]
+  TlsDriver.h
+  TlsDriver.c
+  TlsProtocol.c
+  TlsConfigProtocol.c
+  TlsImpl.h
+  TlsImpl.c
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  UefiLib
+  DebugLib
+  BaseCryptLib
+  TlsLib
+
+[Protocols]
+  gEfiTlsServiceBindingProtocolGuid          ## PRODUCES
+  gEfiTlsProtocolGuid                        ## PRODUCES
+  gEfiTlsConfigurationProtocolGuid           ## PRODUCES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  TlsDxeExtra.uni
+

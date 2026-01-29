@@ -1,0 +1,18 @@
+// /** @file
+// ATA Bus driver to enumerate and identify ATA devices.
+//
+// This driver follows UEFI driver model and layers on ATA Pass Thru protocol defined
+// in UEFI spec 2.2. It installs Block IO and Disk Info protocol for each ATA device
+// it enumerates and identifies successfully.
+//
+// Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "ATA Bus driver to enumerate and identify ATA devices"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver follows the UEFI driver model and layers on the ATA Pass Thru protocol defined in UEFI Specification 2.2. It installs Block IO and Disk Info protocols for each ATA device it enumerates and identifies successfully."
+

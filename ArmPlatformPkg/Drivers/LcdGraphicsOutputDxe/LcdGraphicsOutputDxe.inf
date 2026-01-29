@@ -1,0 +1,50 @@
+#/** @file
+#
+#  Component description file for LcdGraphicsOutputDxe module
+#
+#  Copyright (c) 2011 - 2020, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = LcdGraphicsOutputDxe
+  FILE_GUID                      = 89464DAE-8DAA-41FE-A4C8-40D2175AF1E9
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = LcdGraphicsOutputDxeInitialize
+
+[Sources.common]
+  LcdGraphicsOutputBlt.c
+  LcdGraphicsOutputDxe.c
+  LcdGraphicsOutputDxe.h
+
+[Packages]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  LcdHwLib
+  LcdPlatformLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiCpuArchProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEfiGraphicsOutputProtocolGuid
+
+[FeaturePcd]
+  gArmPlatformTokenSpaceGuid.PcdGopDisableOnExitBootServices
+
+[Depex]
+  TRUE

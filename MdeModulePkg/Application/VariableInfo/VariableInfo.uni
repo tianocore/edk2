@@ -1,0 +1,19 @@
+// /** @file
+// A shell application that displays statistical information about variable usage.
+//
+// This application can display statistical information about variable usage for SMM variable
+// driver and non-SMM variable driver.
+// Note that if Variable Dxe/Smm driver doesn't enable the feature by setting PcdVariableCollectStatistics
+// as TRUE, the application will not display variable statistical information.
+//
+// Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "A shell application that displays statistical information about variable usage"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This application can display statistical information about variable usage for SMM variable driver and non-SMM variable driver. Note that if Variable DXE/SMM driver doesn't enable the feature by setting PcdVariableCollectStatistics as TRUE, the application will not display variable statistical information."
+

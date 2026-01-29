@@ -1,0 +1,104 @@
+## @file
+# S3 Resume Module installs EFI_PEI_S3_RESUME2_PPI.
+#
+# This module works with StandAloneBootScriptExecutor to S3 resume to OS.
+# This module will excute the boot script saved during last boot and after that,
+# control is passed to OS waking up handler.
+#
+# Copyright (c) 2010 - 2024, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = S3Resume2Pei
+  MODULE_UNI_FILE                = S3Resume2Pei.uni
+  FILE_GUID                      = 89E549B0-7CFE-449d-9BA3-10D8B2312D71
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PeimS3ResumeEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+#
+# This module is not always workable in IA32 and X64 mode. It has below result:
+# when it works with SMM mode:
+# ===============================
+#           SMM:used  SMM:unused
+# PEI:IA32   works      works
+# PEI:X64    fails      works
+# ===============================
+#
+
+[Sources]
+  S3Resume.c
+
+[Sources.IA32]
+  Ia32/AsmFuncs.nasm
+
+[Sources.X64]
+  X64/AsmFuncs.nasm
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  PeiServicesTablePointerLib
+  PerformanceLib
+  HobLib
+  PeiServicesLib
+  PeimEntryPoint
+  BaseLib
+  DebugLib
+  PcdLib
+  IoLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugAgentLib
+  LocalApicLib
+  ReportStatusCodeLib
+  LockBoxLib
+  MtrrLib
+
+[Guids]
+  gEfiBootScriptExecutorVariableGuid            ## SOMETIMES_CONSUMES ## UNDEFINED # LockBox
+  gEfiBootScriptExecutorContextGuid             ## SOMETIMES_CONSUMES ## UNDEFINED # LockBox
+  ## SOMETIMES_CONSUMES ## HOB
+  ## SOMETIMES_CONSUMES ## UNDEFINED # LockBox
+  gEfiAcpiVariableGuid
+  gEfiAcpiS3ContextGuid                         ## SOMETIMES_CONSUMES ## UNDEFINED # LockBox
+  gEdkiiEndOfS3ResumeGuid                       ## SOMETIMES_CONSUMES ## UNDEFINED # Used to do smm communication
+  ## SOMETIMES_PRODUCES ## UNDEFINED # Install PPI
+  ## SOMETIMES_CONSUMES ## UNDEFINED # Used to do smm communication
+  gEdkiiS3SmmInitDoneGuid
+  gEdkiiS3MtrrSettingGuid
+
+[Ppis]
+  gEfiPeiS3Resume2PpiGuid                       ## PRODUCES
+  gPeiSmmAccessPpiGuid                          ## SOMETIMES_CONSUMES
+  gPeiPostScriptTablePpiGuid                    ## SOMETIMES_PRODUCES
+  gEfiEndOfPeiSignalPpiGuid                     ## SOMETIMES_PRODUCES
+  gEfiPeiSmmCommunicationPpiGuid                ## SOMETIMES_CONSUMES
+  gEfiPeiMpServices2PpiGuid                     ## SOMETIMES_CONSUMES
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode         ## CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable  ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  S3Resume2PeiExtra.uni

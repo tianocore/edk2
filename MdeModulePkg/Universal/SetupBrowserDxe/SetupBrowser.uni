@@ -1,0 +1,16 @@
+// /** @file
+// The DXE driver produces FORM BROWSER2 protocol defined in UEFI specification.
+//
+// It also produces FormBrowserEx(2) protocol to let user register the different Hot key service.
+//
+// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces the FORM BROWSER2 protocol defined in the UEFI Specification"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver produces text display service. It can show HII Form package and interact with user. It also produces FormBrowserEx protocol to let user register the different Hot key service."
+

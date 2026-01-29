@@ -1,0 +1,51 @@
+## @file
+#  Debug Communication Library instance based on usb debug port.
+#
+#  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DebugCommunicationLibUsb
+  MODULE_UNI_FILE                = DebugCommunicationLibUsb.uni
+  FILE_GUID                      = 87438836-AD8D-4e3e-9249-895120A67240
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 0.7
+  LIBRARY_CLASS                  = DebugCommunicationLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.common]
+  DebugCommunicationLibUsb.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SourceLevelDebugPkg/SourceLevelDebugPkg.dec
+
+[Pcd]
+  # The memory BAR of usb debug port, it may be different with the memory bar of ehci host controller.
+  # Note that the memory BAR address is only used before Pci bus resource allocation.
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbDebugPortMemorySpaceBase    ## SOMETIMES_CONSUMES
+  # The memory BAR of ehci host controller, in which usb debug feature is enabled.
+  # Note that the memory BAR address is only used before Pci bus resource allocation.
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbEhciMemorySpaceBase         ## SOMETIMES_CONSUMES
+  # The pci address of ehci host controller, in which usb debug feature is enabled.
+  # The format of pci address please refer to SourceLevelDebugPkg.dec
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbEhciPciAddress              ## CONSUMES
+  # The value of data buffer size used for USB debug port handle.
+  # It should be equal to sizeof (USB_DEBUG_PORT_HANDLE).
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugPortHandleBufferSize|25   ## SOMETIMES_CONSUMES
+
+[LibraryClasses]
+  TimerLib
+  IoLib
+  PciLib
+  PcdLib
+  DebugLib
+

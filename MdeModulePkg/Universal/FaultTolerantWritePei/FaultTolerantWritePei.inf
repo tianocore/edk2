@@ -1,0 +1,56 @@
+## @file
+# Fault Tolerant Write PEI Driver.
+#
+# This module installs gEdkiiFaultTolerantWriteGuid PPI to inform the check for FTW last write data has been done.
+#
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FaultTolerantWritePei
+  MODULE_UNI_FILE                = FaultTolerantWritePei.uni
+  FILE_GUID                      = AAC33064-9ED0-4b89-A5AD-3EA767960B22
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PeimFaultTolerantWriteInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  FaultTolerantWritePei.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  PeiServicesLib
+  BaseLib
+  DebugLib
+  HobLib
+  BaseMemoryLib
+  PcdLib
+  SafeIntLib
+  VariableFlashInfoLib
+
+[Guids]
+  ## SOMETIMES_PRODUCES   ## HOB
+  ## PRODUCES             ## GUID # Install ppi
+  gEdkiiFaultTolerantWriteGuid
+  gEdkiiWorkingBlockSignatureGuid               ## SOMETIMES_CONSUMES   ## GUID
+  gEfiSystemNvDataFvGuid                        ## SOMETIMES_CONSUMES   ## GUID
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  FaultTolerantWritePeiExtra.uni

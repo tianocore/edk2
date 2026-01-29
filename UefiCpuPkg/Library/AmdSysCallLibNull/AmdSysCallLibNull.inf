@@ -1,0 +1,27 @@
+## @file
+#  Base Library implementation.
+#
+#  Copyright (c) 2025, AMD Incorporated. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = AmdSysCallLibNull
+  FILE_GUID                      = 0AF486C8-EF8C-4BD9-99AC-F11277861771
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 0.1
+  LIBRARY_CLASS                  = AmdSysCallLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  AmdSysCallLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec

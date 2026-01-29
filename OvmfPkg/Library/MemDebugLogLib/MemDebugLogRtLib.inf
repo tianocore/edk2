@@ -1,0 +1,38 @@
+## @file
+#  Instance of MemDebugLog Library for Runtime
+#
+#  Copyright (C) 2025, Oracle and/or its affiliates.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MemDebugLogLib
+  FILE_GUID                      = BE0D0FFD-206C-48F3-9910-C32467567C44
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MemDebugLogLib|DXE_RUNTIME_DRIVER
+
+
+[Sources]
+  MemDebugLogRt.c
+  MemDebugLogCommon.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  HobLib
+  UefiRuntimeLib
+  SynchronizationLib
+
+[Guids]
+  gMemDebugLogHobGuid                      ## CONSUMES
+
+[FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString ## CONSUMES

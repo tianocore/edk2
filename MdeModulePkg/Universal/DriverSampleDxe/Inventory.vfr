@@ -1,0 +1,111 @@
+///** @file
+//
+//    Sample Inventory Data
+//
+//  Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//**/
+
+#include "NVDataStruc.h"
+
+formset
+  guid     = DRIVER_SAMPLE_INVENTORY_GUID,
+  title    = STRING_TOKEN(STR_INV_FORM_SET_TITLE),
+  help     = STRING_TOKEN(STR_INV_FORM_SET_HELP),
+
+  form formid = 1,
+       title  = STRING_TOKEN(STR_INV_FORM1_TITLE);  // note formid is a variable (for readability) (UINT16) - also added Form to the line to signify the Op-Code
+
+    text
+      help   = STRING_TOKEN(STR_INV_VERSION_HELP),
+      text   = STRING_TOKEN(STR_INV_VERSION_TEXT),
+      text   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      flags  = 0,
+      key    = 0;
+
+    text
+      help   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      text   = STRING_TOKEN(STR_INV_VERSION_TEXT2),
+      text   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      flags  = 0,
+      key    = 0;
+
+    text
+      help   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      text   = STRING_TOKEN(STR_INV_VERSION_TEXT3),
+      text   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      flags  = 0,
+      key    = 0;
+
+    text
+      help   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      text   = STRING_TOKEN(STR_INV_VERSION_TEXT4),
+      text   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      flags  = 0,
+      key    = 0;
+
+    subtitle text = STRING_TOKEN(STR_INV_EMPTY_STRING);
+
+    text
+      help   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      text   = STRING_TOKEN(STR_INV_VERSION_TEXT5),
+      text   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      flags  = 0,
+      key    = 0;
+
+    text
+      help   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      text   = STRING_TOKEN(STR_INV_VERSION_TEXT6),
+      text   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      flags  = 0,
+      key    = 0;
+
+    text
+      help   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      text   = STRING_TOKEN(STR_INV_VERSION_TEXT7),
+      text   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      flags  = 0,
+      key    = 0;
+
+    text
+      help   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      text   = STRING_TOKEN(STR_INV_VERSION_TEXT8),
+      text   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      flags  = 0,
+      key    = 0;
+
+    text
+      help   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      text   = STRING_TOKEN(STR_INV_VERSION_TEXT9),
+      text   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      flags  = 0,
+      key    = 0;
+
+    text
+      help   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      text   = STRING_TOKEN(STR_INV_VERSION_TEXT10),
+      text   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      flags  = 0,
+      key    = 0;
+
+    text
+      help   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      text   = STRING_TOKEN(STR_INV_VERSION_TEXT11),
+      text   = STRING_TOKEN(STR_INV_EMPTY_STRING),
+      flags  = 0,
+      key    = 0;
+
+    text
+      help   = STRING_TOKEN(STR_CHECK_KEYWORD_SUPPORT),
+      text   = STRING_TOKEN(STR_CHECK_KEYWORD_SUPPORT),
+      flags  = INTERACTIVE,
+      key    = 0x1231;
+
+    subtitle text = STRING_TOKEN(STR_INV_EMPTY_STRING);
+
+    subtitle text = STRING_TOKEN(STR_INV_VERSION_TEXT12);
+
+  endform;
+
+endformset;

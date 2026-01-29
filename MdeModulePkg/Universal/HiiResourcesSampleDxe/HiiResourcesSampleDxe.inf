@@ -1,0 +1,54 @@
+## @file
+#  This is a sample HII resource driver.
+#
+#  This driver show how a HII driver retrieve HII data using HII Package List protocol
+#  and publish the HII data.
+#
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = HiiResourcesSample
+  MODULE_UNI_FILE                = HiiResourcesSample.uni
+  FILE_GUID                      = D49D2EB0-44D5-4621-9FD6-1A92C9109B99
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = HiiResourcesSampleInit
+  UNLOAD_IMAGE                   = HiiResourcesSampleUnload
+#
+#  This flag specifies whether HII resource section is generated into PE image.
+#
+  UEFI_HII_RESOURCE_SECTION      = TRUE
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  HiiResourcesSample.c
+  SampleStrings.uni
+  Sample.vfr
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiHiiServicesLib
+  HiiLib
+
+[Protocols]
+  gEfiHiiPackageListProtocolGuid    ## CONSUMES
+  gEfiDevicePathProtocolGuid        ## PRODUCES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  HiiResourcesSampleExtra.uni

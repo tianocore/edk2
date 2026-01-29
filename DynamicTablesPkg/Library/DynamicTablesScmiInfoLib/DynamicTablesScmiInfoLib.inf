@@ -1,0 +1,31 @@
+## @file
+#  Arm SCMI Info Library.
+#
+#  Copyright (c) 2022 - 2023, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = DynamicTablesScmiInfoLib
+  FILE_GUID      = 1A7CDB04-9FFC-40DA-A87C-A5ACADAF8136
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = DynamicTablesScmiInfoLib
+  CONSTRUCTOR    = DynamicTablesScmiInfoLibConstructor
+
+[Sources]
+  DynamicTablesScmiInfoLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[Protocols]
+  gArmScmiPerformanceProtocolGuid   ## CONSUMES
+
+[Depex]
+  gArmScmiPerformanceProtocolGuid

@@ -1,0 +1,16 @@
+// /** @file
+// Produces TCG protocol and measures boot environment
+//
+// This module will produce TCG protocol and measure boot environment.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces TCG protocol and measures boot environment"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module will produce TCG protocol and measure boot environment."
+

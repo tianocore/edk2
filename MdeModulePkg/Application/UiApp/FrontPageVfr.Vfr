@@ -1,0 +1,80 @@
+///** @file
+//
+//  Front page formset.
+//
+//  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//**/
+
+#define FORMSET_GUID  { 0x9e0c30bc, 0x3f06, 0x4ba6, 0x82, 0x88, 0x9, 0x17, 0x9b, 0x85, 0x5d, 0xbe }
+
+#define FRONT_PAGE_FORM_ID             0x1000
+
+#define LABEL_FRONTPAGE_INFORMATION    0x1000
+#define LABEL_END                      0xffff
+
+formset
+  guid     = FORMSET_GUID,
+  title    = STRING_TOKEN(STR_FRONT_PAGE_TITLE),
+  help     = STRING_TOKEN(STR_EMPTY_STRING ),
+  classguid = FORMSET_GUID,
+
+  form formid = FRONT_PAGE_FORM_ID,
+       title  = STRING_TOKEN(STR_FRONT_PAGE_TITLE);
+
+    banner
+      title = STRING_TOKEN(STR_FRONT_PAGE_COMPUTER_MODEL),
+      line  1,
+      align left;
+
+    banner
+      title = STRING_TOKEN(STR_FRONT_PAGE_CPU_MODEL),
+      line  2,
+      align left;
+
+    banner
+      title = STRING_TOKEN(STR_FRONT_PAGE_CPU_SPEED),
+      line  2,
+      align right;
+
+    banner
+      title = STRING_TOKEN(STR_FRONT_PAGE_BIOS_VERSION),
+      line  3,
+      align left;
+
+    banner
+      title = STRING_TOKEN(STR_FRONT_PAGE_MEMORY_SIZE),
+      line  3,
+      align right;
+
+    banner
+      title = STRING_TOKEN(STR_CUSTOMIZE_BANNER_LINE4_LEFT),
+      line  4,
+      align left;
+
+    banner
+      title = STRING_TOKEN(STR_CUSTOMIZE_BANNER_LINE4_RIGHT),
+      line  4,
+      align right;
+
+    banner
+      title = STRING_TOKEN(STR_CUSTOMIZE_BANNER_LINE5_LEFT),
+      line  5,
+      align left;
+
+    banner
+      title = STRING_TOKEN(STR_CUSTOMIZE_BANNER_LINE5_RIGHT),
+      line  5,
+      align right;
+
+    label LABEL_FRONTPAGE_INFORMATION;
+    //
+    // This is where we will dynamically add a Action type op-code to show
+    // the platform information.
+    //
+    label LABEL_END;
+
+  endform;
+
+endformset;

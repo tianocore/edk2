@@ -1,0 +1,35 @@
+#/** @file
+#
+#  Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = EmbeddedMonotonicCounter
+  FILE_GUID                      = FCABE6A7-7953-4A84-B7EC-D29E89B62E87
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = MonotonicCounterDriverInitialize
+
+[Sources.common]
+  EmbeddedMonotonicCounter.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gEfiMonotonicCounterArchProtocolGuid
+
+[Depex]
+  TRUE
+

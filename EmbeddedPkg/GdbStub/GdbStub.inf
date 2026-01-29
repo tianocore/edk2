@@ -1,0 +1,69 @@
+#/** @file
+# UEFI GDB stub
+#
+# This is a shell application that will display Hello World.
+# Copyright (c) 2008, Apple Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = GdbStub
+  FILE_GUID                      = 1F2CCB4F-D817-404E-98E7-80E4851FB33E
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = GdbStubEntry
+
+[Sources.common]
+  GdbStub.c
+  SerialIo.c
+
+[Sources.IA32]
+  Ia32/Processor.c
+
+[Sources.X64]
+  X64/Processor.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DevicePathLib
+  PcdLib
+  GdbSerialLib
+  PrintLib
+  CacheMaintenanceLib
+
+
+[Protocols]
+  gEfiDebugSupportProtocolGuid
+  gEfiDebugPortProtocolGuid
+  gEfiSerialIoProtocolGuid
+
+[Guids]
+  gEfiDebugImageInfoTableGuid
+
+[FeaturePcd.common]
+  gEmbeddedTokenSpaceGuid.PcdGdbSerial
+
+[FixedPcd.common]
+  gEmbeddedTokenSpaceGuid.PcdGdbMaxPacketRetryCount

@@ -1,0 +1,108 @@
+# Defines the mappings between GitHub issue responses and labels applied to the issue.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+# For more information, see:
+# https://github.com/redhat-plumbers-in-action/advanced-issue-labeler
+
+policy:
+  - section:
+
+    # Issue Template - Urgency Dropdown
+    - id: ['urgency']
+      block-list: []
+      label:
+        - name: 'priority:low'
+          keys: ['Low']
+        - name: 'priority:medium'
+          keys: ['Medium']
+        - name: 'priority:high'
+          keys: ['High']
+
+    # Issue Template - Fix Owner Dropdown
+    - id: ['fix_owner', 'request_owner']
+      block-list: []
+      label:
+        - name: 'state:needs-owner'
+          keys: [
+            'Someone else needs to fix it',
+            'Someone else needs to make the change',
+            'Someone else needs to implement the feature'
+            ]
+        - name: 'state:needs-triage'
+          keys: [
+            'Someone else needs to fix it',
+            'Someone else needs to make the change',
+            'Someone else needs to implement the feature'
+            ]
+
+    # Issue Template - Needs Maintainer Feedback Dropdown
+    - id: ['needs_maintainer_feedback']
+      block-list: []
+      label:
+        - name: 'state:needs-maintainer-feedback'
+          keys: ['Maintainer feedback requested']
+
+    # Issue Template - Packages Impacted
+    - id: ['packages_impacted']
+      block-list: []
+      label:
+        - name: 'package:armpkg'
+          keys: ['ArmPkg']
+        - name: 'package:armplatformpkg'
+          keys: ['ArmPlatformPkg']
+        - name: 'package:armvirtpkg'
+          keys: ['ArmVirtPkg']
+        - name: 'package:basetools'
+          keys: ['BaseTools']
+        - name: 'package:build-or-ci-code'
+          keys: ['Build or CI Code']
+        - name: 'package:cryptopkg'
+          keys: ['CryptoPkg']
+        - name: 'package:dynamictablespkg'
+          keys: ['DynamicTablesPkg']
+        - name: 'package:embeddedpkg'
+          keys: ['EmbeddedPkg']
+        - name: 'package:emulatorpkg'
+          keys: ['EmulatorPkg']
+        - name: 'package:fatpkg'
+          keys: ['FatPkg']
+        - name: 'package:fmpdevicepkg'
+          keys: ['FmpDevicePkg']
+        - name: 'package:intelfsp2pkg'
+          keys: ['IntelFsp2Pkg']
+        - name: 'package:intelfsp2wrapperpkg'
+          keys: ['IntelFsp2WrapperPkg']
+        - name: 'package:mdemodulepkg'
+          keys: ['MdeModulePkg']
+        - name: 'package:mdepkg'
+          keys: ['MdePkg']
+        - name: 'package:networkpkg'
+          keys: ['NetworkPkg']
+        - name: 'package:ovmfpkg'
+          keys: ['OvmfPkg']
+        - name: 'package:pcatchipsetpkg'
+          keys: ['PcAtChipsetPkg']
+        - name: 'package:prmpkg'
+          keys: ['PrmPkg']
+        - name: 'package:redfishpkg'
+          keys: ['RedfishPkg']
+        - name: 'package:securitypkg'
+          keys: ['SecurityPkg']
+        - name: 'package:shellpkg'
+          keys: ['ShellPkg']
+        - name: 'package:signedcapsulepkg'
+          keys: ['SignedCapsulePkg']
+        - name: 'package:sourceleveldebugpkg'
+          keys: ['SourceLevelDebugPkg']
+        - name: 'package:standalonemmpkg'
+          keys: ['StandaloneMmPkg']
+        - name: 'package:ueficpupkg'
+          keys: ['UefiCpuPkg']
+        - name: 'package:uefipayloadpkg'
+          keys: ['UefiPayloadPkg']
+        - name: 'package:unittestframeworkpkg'
+          keys: ['UnitTestFrameworkPkg']
+        - name: 'package:other'
+          keys: ['Other']

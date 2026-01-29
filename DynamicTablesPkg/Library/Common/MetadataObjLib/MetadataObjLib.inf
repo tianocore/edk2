@@ -1,0 +1,26 @@
+## @file
+#  Metadata Object Library
+#
+#  Copyright (c) 2025, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = MetadataObjLib
+  FILE_GUID      = 7E8E422A-1A2B-4152-9A14-68C24A57E98A
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = MetadataObjLib
+
+[Sources]
+  MetadataObj.c
+  MetadataObj.h
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib

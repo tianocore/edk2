@@ -1,0 +1,41 @@
+## @file
+#  Component description for the SPI BUS DXE module
+#
+#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+[Defines]
+  INF_VERSION               = 1.27
+  BASE_NAME                 = SpiBusDxe
+  FILE_GUID                 = 25CE038C-5C3A-4A9B-A111-90DF5897E058
+  MODULE_TYPE               = DXE_DRIVER
+  VERSION_STRING            = 0.1
+  PI_SPECIFICATION_VERSION  = 0x0001000A
+  ENTRY_POINT               = SpiBusEntry
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Sources]
+  SpiBusDxe.c
+  SpiBus.c
+  SpiBus.h
+
+[Protocols]
+  gEfiSpiConfigurationProtocolGuid              ## CONSUMES
+  gEfiSpiHcProtocolGuid                         ## CONSUMES
+
+[Depex]
+  gEfiSpiConfigurationProtocolGuid AND
+  gEfiSpiHcProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SpiBus.uni

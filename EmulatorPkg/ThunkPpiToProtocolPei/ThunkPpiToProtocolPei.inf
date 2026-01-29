@@ -1,0 +1,50 @@
+## @file
+# Stuff driver
+#
+# Tiano PEIM to abstract construction of firmware volume in a Emu environment.
+# Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Portions copyright (c) 2011, Apple Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ThunkPpiToProtocolPei
+  FILE_GUID                      = C32A66D5-D8B7-2640-B768-082C8F083C37
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = PeiInitialzeThunkPpiToProtocolPei
+
+
+[Sources]
+  ThunkPpiToProtocolPei.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+
+[LibraryClasses]
+  PeiServicesTablePointerLib
+  PeiServicesLib
+  HobLib
+  PeimEntryPoint
+  DebugLib
+
+
+[Protocols]
+  gEmuThunkProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+
+
+[Ppis]
+  gEmuThunkPpiGuid                          # PPI ALWAYS_CONSUMED
+
+
+[Depex]
+  gEmuThunkPpiGuid AND gEfiPeiMemoryDiscoveredPpiGuid
+

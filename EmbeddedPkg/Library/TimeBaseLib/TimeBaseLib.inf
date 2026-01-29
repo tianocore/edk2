@@ -1,0 +1,28 @@
+#/** @file
+#
+#    Copyright (c) 2016, Hisilicon Limited. All rights reserved.
+#    Copyright (c) 2016, Linaro Limited. All rights reserved.
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TimeBaseLib
+  FILE_GUID                      = B1B07E01-6896-448C-8E75-F0E119ABDF49
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TimeBaseLib
+
+[Sources.common]
+  TimeBaseLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
+
+[Pcd]

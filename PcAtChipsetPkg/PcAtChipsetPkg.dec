@@ -1,0 +1,168 @@
+## @file
+# Public definitions for PcAtChipset package.
+#
+# This package is designed to public interfaces and implementation which follows
+# PcAt defacto standard.
+#
+# Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
+# Copyright (c) 2018 - 2020, ARM Limited. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = PcAtChipsetPkg
+  PACKAGE_UNI_FILE               = PcAtChipsetPkg.uni
+  PACKAGE_GUID                   = B728689A-52D3-4b8c-AE89-2CE5514CC6DC
+  PACKAGE_VERSION                = 0.3
+
+[Includes]
+  Include
+
+[LibraryClasses]
+  ##  @libraryclass  Provides functions to manage I/O APIC Redirection Table Entries.
+  #
+  IoApicLib|Include/Library/IoApicLib.h
+
+[Guids]
+  gPcAtChipsetPkgTokenSpaceGuid = { 0x326ae723, 0xae32, 0x4589, { 0x98, 0xb8, 0xca, 0xc2, 0x3c, 0xdc, 0xc1, 0xb1 } }
+
+#
+# [Error.gPcAtChipsetPkgTokenSpaceGuid]
+#   0x80000001 | Invalid value provided.
+#
+
+[PcdsFeatureFlag]
+  ## Indicates the HPET Timer will be configured to use MSI interrupts if the HPET timer supports them, or use I/O APIC interrupts.<BR><BR>
+  #   TRUE  - Configures the HPET Timer to use MSI interrupts if the HPET Timer supports them.<BR>
+  #   FALSE - Configures the HPET Timer to use I/O APIC interrupts.<BR>
+  # @Prompt Configure HPET to use MSI.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetMsiEnable|TRUE|BOOLEAN|0x00001000
+
+  ## Indicates the RTC port registers are in MMIO space, or in I/O space.
+  #  Default is I/O space.<BR><BR>
+  #   TRUE  - RTC port registers are in MMIO space.<BR>
+  #   FALSE - RTC port registers are in I/O space.<BR>
+  # @Prompt RTC port registers use MMIO.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcUseMmio|FALSE|BOOLEAN|0x00000021
+
+[PcdsFixedAtBuild, PcdsDynamic, PcdsDynamicEx, PcdsPatchableInModule]
+  ## This PCD specifies the base address of the HPET timer.
+  # @Prompt HPET base address.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetBaseAddress|0xFED00000|UINT32|0x00000009
+
+  ## This PCD specifies the Local APIC Interrupt Vector for the HPET Timer.
+  # @Prompt HPET local APIC vector.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetLocalApicVector|0x40|UINT8|0x0000000A
+
+  ## This PCD specifies the default period of the HPET Timer in 100 ns units.
+  #  The default value of 100000 100 ns units is the same as 10 ms.
+  # @Prompt Default period of HPET timer.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetDefaultTimerPeriod|100000|UINT64|0x0000000B
+
+  ## This PCD specifies the base address of the IO APIC.
+  # @Prompt IO APIC base address.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdIoApicBaseAddress|0xFEC00000|UINT32|0x0000000C
+
+  ## This PCD specifies the minimal valid year in RTC.
+  # @Prompt Minimal valid year in RTC.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdMinimalValidYear|1998|UINT16|0x0000000D
+
+  ## This PCD specifies the maximal valid year in RTC.
+  # @Prompt Maximal valid year in RTC.
+  # @Expression 0x80000001 | gPcAtChipsetPkgTokenSpaceGuid.PcdMaximalValidYear < gPcAtChipsetPkgTokenSpaceGuid.PcdMinimalValidYear + 100
+  gPcAtChipsetPkgTokenSpaceGuid.PcdMaximalValidYear|2097|UINT16|0x0000000E
+
+  ## This PCD specifies the RTC default year when the RTC is in an invalid state.
+  # @Prompt Default year in RTC.
+  # @Expression 0x80000001 | gPcAtChipsetPkgTokenSpaceGuid.PcdRtcDefaultYear >= gPcAtChipsetPkgTokenSpaceGuid.PcdMinimalValidYear
+  # @Expression 0x80000001 | gPcAtChipsetPkgTokenSpaceGuid.PcdRtcDefaultYear <= gPcAtChipsetPkgTokenSpaceGuid.PcdMaximalValidYear
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcDefaultYear|gPcAtChipsetPkgTokenSpaceGuid.PcdMinimalValidYear|UINT16|0x0000000F
+
+  ## Specifies RTC Index Register address in MMIO space.
+  # @Prompt RTC Index Register address
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister64|0x0|UINT64|0x00000022
+
+  ## Specifies RTC Target Register address in MMIO space.
+  # @Prompt RTC Target Register address
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister64|0x0|UINT64|0x00000023
+
+  ## Specifies RTC Index Register address in I/O space.
+  # @Prompt RTC Index Register address
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister|0x70|UINT8|0x0000001E
+
+  ## Specifies RTC Target Register address in I/O space.
+  # @Prompt RTC Target Register address
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister|0x71|UINT8|0x0000001F
+
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+  ## Defines the ACPI register set base address.
+  #  The invalid 0xFFFF is as its default value. It must be configured to the real value.
+  # @Prompt ACPI Timer IO Port Address
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPortBaseAddress         |0xFFFF|UINT16|0x00000010
+
+  ## Defines the PCI Bus Number of the PCI device that contains the BAR and Enable for ACPI hardware registers.
+  # @Prompt ACPI Hardware PCI Bus Number
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPciBusNumber            |  0x00| UINT8|0x00000011
+
+  ## Defines the PCI Device Number of the PCI device that contains the BAR and Enable for ACPI hardware registers.
+  #  The invalid 0xFF is as its default value. It must be configured to the real value.
+  # @Prompt ACPI Hardware PCI Device Number
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPciDeviceNumber         |  0xFF| UINT8|0x00000012
+
+  ## Defines the PCI Function Number of the PCI device that contains the BAR and Enable for ACPI hardware registers.
+  #  The invalid 0xFF is as its default value. It must be configured to the real value.
+  # @Prompt ACPI Hardware PCI Function Number
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPciFunctionNumber       |  0xFF| UINT8|0x00000013
+
+  ## Defines the PCI Register Offset of the PCI device that contains the Enable for ACPI hardware registers.
+  #  The invalid 0xFFFF is as its default value. It must be configured to the real value.
+  # @Prompt ACPI Hardware PCI Register Offset
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPciEnableRegisterOffset |0xFFFF|UINT16|0x00000014
+
+  ## Defines the bit mask that must be set to enable the APIC hardware register BAR.
+  # @Prompt ACPI Hardware PCI Bar Enable BitMask
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoBarEnableMask           |  0x00| UINT8|0x00000015
+
+  ## Defines the PCI Register Offset of the PCI device that contains the BAR for ACPI hardware registers.
+  #  The invalid 0xFFFF is as its default value. It must be configured to the real value.
+  # @Prompt ACPI Hardware PCI Bar Register Offset
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPciBarRegisterOffset    |0xFFFF|UINT16|0x00000016
+
+  ## Defines the offset to the 32-bit Timer Value register that resides within the ACPI BAR.
+  # @Prompt Offset to 32-bit Timer register in ACPI BAR
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiPm1TmrOffset              |0x0008|UINT16|0x00000017
+
+  ## Defines the bit mask to retrieve ACPI IO Port Base Address
+  # @Prompt ACPI IO Port Base Address Mask
+  gPcAtChipsetPkgTokenSpaceGuid.PcdAcpiIoPortBaseAddressMask     |0xFFFE|UINT16|0x00000018
+
+  ## Reset Control Register address in I/O space.
+  # @Prompt Reset Control Register address
+  gPcAtChipsetPkgTokenSpaceGuid.PcdResetControlRegister|0x64|UINT64|0x00000019
+
+  ## 8bit Reset Control Register value for cold reset.
+  # @Prompt Reset Control Register value for cold reset
+  gPcAtChipsetPkgTokenSpaceGuid.PcdResetControlValueColdReset|0xFE|UINT8|0x0000001A
+
+  ## Specifies the initial value for Register_A in RTC.
+  # @Prompt Initial value for Register_A in RTC.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdInitialValueRtcRegisterA|0x26|UINT8|0x0000001B
+
+  ## Specifies the initial value for Register_B in RTC.
+  # @Prompt Initial value for Register_B in RTC.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdInitialValueRtcRegisterB|0x02|UINT8|0x0000001C
+
+  ## Specifies the initial value for Register_D in RTC.
+  # @Prompt Initial value for Register_D in RTC.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdInitialValueRtcRegisterD|0x00|UINT8|0x0000001D
+
+  ## RTC Update Timeout Value(microsecond).
+  # @Prompt RTC Update Timeout Value.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout|100000|UINT32|0x00000020
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  PcAtChipsetPkgExtra.uni

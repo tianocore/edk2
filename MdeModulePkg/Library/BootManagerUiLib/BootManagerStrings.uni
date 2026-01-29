@@ -1,0 +1,36 @@
+///** @file
+//
+// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Module Name:
+//
+//   BootManagerStrings.uni
+//
+// Abstract:
+//
+//   String definitions for Boot Manager formset.
+//
+// Revision History:
+//
+// --*/
+
+/=#
+#langdef   en-US "English"
+#langdef   fr-FR "Français"
+
+#string STR_BM_BANNER                  #language en-US  "Boot Manager"
+                                       #language fr-FR  "Boot Manager"
+#string STR_BOOT_MANAGER_HELP          #language en-US  "This selection will take you to the Boot Manager"
+                                       #language fr-FR  "This selection will take you to the Boot Manager"
+#string STR_HELP_FOOTER                #language en-US  "Use the <↑> and <↓> keys to choose a boot option, the <Enter> key to select a boot option, and the <Esc> key to exit the Boot Manager Menu."
+                                       #language fr-FR  "<↑> pour <↓> changer l'option, <ENTRER> choisir une option, <ESC> pour sortir"
+#string STR_AND                        #language en-US  " and "
+                                       #language fr-FR  " et "
+#string STR_BOOT_OPTION_BANNER         #language en-US  "Boot Manager Menu"
+                                       #language fr-FR  "le Menu d'Option de Botte"
+#string STR_ANY_KEY_CONTINUE           #language en-US  "Press any key to continue..."
+                                       #language fr-FR  "Appuie n'importe quelle pour continuer..."
+#string STR_LAST_STRING                #language en-US  ""
+                                       #language fr-FR  ""
+

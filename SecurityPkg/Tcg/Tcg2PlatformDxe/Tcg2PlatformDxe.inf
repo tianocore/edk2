@@ -1,0 +1,43 @@
+## @file
+# Platform specific TPM2 component.
+#
+# Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = Tcg2PlatformDxe
+  FILE_GUID                      = 5CAB08D5-AD8F-4d8b-B828-D17A8D9FE977
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = DXE_DRIVER
+  ENTRY_POINT                    = Tcg2PlatformDxeEntryPoint
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64 IPF
+#
+
+[LibraryClasses]
+  BaseLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  DebugLib
+  UefiLib
+  TpmPlatformHierarchyLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[Sources]
+  Tcg2PlatformDxe.c
+
+[Protocols]
+  gEfiDxeSmmReadyToLockProtocolGuid             ## SOMETIMES_CONSUMES ## NOTIFY
+
+[Depex]
+  gEfiTcg2ProtocolGuid

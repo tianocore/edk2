@@ -1,0 +1,52 @@
+// /**
+//
+// Copyright (c) 2020, Arm, Ltd. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Module Name:
+//
+// LinuxInitrdDynamicShellCommand.uni
+//
+// Abstract:
+//
+// String definitions for 'initrd' UEFI Shell command
+//
+// **/
+
+/=#
+
+#langdef   en-US "english"
+
+#string STR_GEN_PROBLEM           #language en-US "%H%s%N: Unknown flag - '%H%s%N'\r\n"
+#string STR_GEN_ALREADY_INSTALLED #language en-US "%H%s%N: Linux initrd already provided by platform\r\n"
+#string STR_GEN_TOO_MANY          #language en-US "%H%s%N: Too many arguments.\r\n"
+#string STR_GEN_TOO_FEW           #language en-US "%H%s%N: Too few arguments.\r\n"
+#string STR_GEN_FIND_FAIL         #language en-US "%H%s%N: File not found - '%H%s%N'\r\n"
+#string STR_GEN_FILE_OPEN_FAIL    #language en-US "%H%s%N: Cannot open file - '%H%s%N'\r\n"
+
+#string STR_GET_HELP_INITRD       #language en-US ""
+".TH initrd 0 "Registers or unregisters a file as Linux initrd."\r\n"
+".SH NAME\r\n"
+"Registers or unregisters a file as Linux initrd.\r\n"
+".SH SYNOPSIS\r\n"
+" \r\n"
+"initrd <FileName>\r\n"
+"initrd -u\r\n"
+".SH OPTIONS\r\n"
+" \r\n"
+"  FileName    - Specifies a file to register as initrd.\r\n"
+"  -u          - Unregisters any previously registered initrd files.\r\n"
+".SH DESCRIPTION\r\n"
+" \r\n"
+"NOTES:\r\n"
+"  1. Only a single file can be loaded as initrd at any given time. Using the\r\n"
+"     command twice with a <FileName> option will result in the first file to\r\n"
+"     be unloaded again, regardless of whether the second invocation succeeded\r\n"
+"     or not.\r\n"
+"  2. The initrd is not unloaded when the shell exits, and will remain active\r\n"
+"     until it is unloaded again by a different invocation of the shell.\r\n"
+"     Consumers of the LoadFile2 protocol on the LINUX_EFI_INITRD_MEDIA_GUID\r\n"
+"     device path that are started via means other than the shell will be able\r\n"
+"     to locate the protocol and invoke it.\r\n"
+"  3. Exposing an initrd using this command is only supported if no initrd is\r\n"
+"     already being exposed by another driver on the platform.\r\n"

@@ -1,0 +1,16 @@
+// /** @file
+// Print DXE driver that produces Print2 Protocols.
+//
+// This driver produces Print2 protocols layered on top of the PrintLib from the MdePkg.
+//
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Print DXE driver that produces Print2 Protocols"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver produces Print2 protocols layered on top of the PrintLib from the MdePkg."
+

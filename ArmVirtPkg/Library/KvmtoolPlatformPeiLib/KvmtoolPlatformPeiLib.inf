@@ -1,0 +1,49 @@
+## @file
+#  Kvmtool platform PEI library.
+#
+#  Copyright (c) 2020, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = PlatformPeiLib
+  FILE_GUID                      = 21073FB3-BA6F-43EB-83F0-4A840C648165
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = KvmtoolPlatformPeiLib
+
+[Sources]
+  KvmtoolPlatformPeiLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  HobLib
+  FdtLib
+  PcdLib
+  PeiServicesLib
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdFvSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeAllocationPadding
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdFvBaseAddress
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
+
+[Guids]
+  gFdtHobGuid
+  gEarly16550UartBaseAddressGuid
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid

@@ -1,0 +1,14 @@
+// /** @file
+// This driver implements Reset2, ResetFilter and ResetHandler PPIs.
+//
+// Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Implements Reset2, ResetFilter and ResetHandler PPIs"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver implements Reset2, ResetFilter and ResetHandler PPIs."
+

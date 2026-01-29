@@ -1,0 +1,16 @@
+// /** @file
+// CPU driver installs CPU Architecture Protocol and CPU MP Protocol.
+//
+// CPU driver installs CPU Architecture Protocol and CPU MP Protocol.
+//
+// Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "CPU driver installs CPU Architecture Protocol and CPU MP Protocol."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "CPU driver installs CPU Architecture Protocol and CPU MP Protocol."
+

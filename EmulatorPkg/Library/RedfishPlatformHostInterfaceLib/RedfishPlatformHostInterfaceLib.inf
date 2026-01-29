@@ -1,0 +1,47 @@
+## @file
+#  NULL instance of RedfishPlatformHostInterfaceLib
+#
+#  (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001000b
+  BASE_NAME                      = RedfishPlatformHostInterfaceLib
+  FILE_GUID                      = D5ECB7F2-4906-94E2-45B1-31BF4FD90122
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RedfishPlatformHostInterfaceLib
+  CONSTRUCTOR                    = RedfishPlatformHostInterfaceConstructor
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  RedfishPlatformHostInterfaceLib.c
+
+[Packages]
+  EmulatorPkg/EmulatorPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  RedfishPkg/RedfishPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PcdLib
+  UefiLib
+
+[Pcd]
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExServiceDevicePath         ## CONSUMES
+
+[Guids]
+  gEmuRedfishServiceGuid
+
+[Depex]
+  gEfiVariableArchProtocolGuid AND
+  gEfiVariableWriteArchProtocolGuid

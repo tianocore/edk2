@@ -1,0 +1,19 @@
+// /** @file
+// Device path driver that produces three UEFI device path protocols.
+//
+// This driver produces Device Path Utilities protocol and optionally
+// DevicePahtToText and DevicePathFromText protocols based on feature flags
+// PcdDevicePathSupportDevicePathToText & PcdDevicePathSupportDevicePathFromText
+// respectively.
+//
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Produces three UEFI device path protocols"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver produces Device Path Utilities protocol and optionally DevicePahtToText and DevicePathFromText protocols based on feature flags PcdDevicePathSupportDevicePathToText & PcdDevicePathSupportDevicePathFromText respectively."
+

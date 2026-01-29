@@ -1,0 +1,72 @@
+## @file
+#  Sample to provide FSP wrapper hob process related function.
+#
+#  Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiFspWrapperHobProcessLibSample
+  FILE_GUID                      = 864693E2-EDE8-4DF8-8871-38C0BAA157EB
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FspWrapperHobProcessLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources]
+  FspWrapperHobProcessLibSample.c
+
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+  IntelFsp2WrapperPkg/IntelFsp2WrapperPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  HobLib
+  DebugLib
+  FspWrapperPlatformLib
+  PeiServicesLib
+  PeiServicesTablePointerLib
+
+[Pcd]
+  gIntelFsp2WrapperTokenSpaceGuid.PcdPeiMinMemSize          ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdPeiRecoveryMinMemSize  ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspModeSelection       ## CONSUMES
+
+[Guids]
+  gFspReservedMemoryResourceHobGuid                       ## CONSUMES ## HOB
+  gEfiMemoryTypeInformationGuid                           ## CONSUMES ## GUID
+  gPcdDataBaseHobGuid                                     ## CONSUMES ## HOB
+
+[Ppis]
+  gEfiPeiCapsulePpiGuid                                   ## CONSUMES

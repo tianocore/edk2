@@ -1,0 +1,16 @@
+// /** @file
+// IDE Controller Init module that will produce IDE_CONTROLLER_INIT protocol
+//
+// Component description file for the IDE Controller Init module.
+//
+// Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "IDE Controller Init module that will produce IDE_CONTROLLER_INIT protocol"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "IDE Controller Init module that will produce IDE_CONTROLLER_INIT protocol."
+

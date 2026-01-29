@@ -1,0 +1,149 @@
+## @file
+# Provides drivers and definitions to support fsp in EDKII bios.
+#
+# Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = IntelFsp2WrapperPkg
+  PACKAGE_GUID                   = FAFE06D4-7245-42D7-9FD2-E5D5E36AB0A0
+  PACKAGE_VERSION                = 0.1
+
+[Includes]
+  Include
+
+[LibraryClasses]
+  ##  @libraryclass  Provide FSP API related function.
+  FspWrapperApiLib|Include/Library/FspWrapperApiLib.h
+  FspWrapperApiTestLib|Include/Library/FspWrapperApiTestLib.h
+
+  ##  @libraryclass  Provide FSP hob process related function.
+  FspWrapperHobProcessLib|Include/Library/FspWrapperHobProcessLib.h
+
+  ##  @libraryclass  Provide FSP platform related function.
+  FspWrapperPlatformLib|Include/Library/FspWrapperPlatformLib.h
+
+  ##  @libraryclass  Provide FSP TPM measurement related function.
+  FspMeasurementLib|Include/Library/FspMeasurementLib.h
+
+  ##  @libraryclass  Provide MultiPhase handling related functions.
+  FspWrapperMultiPhaseProcessLib|Include/Library/FspWrapperMultiPhaseProcessLib.h
+
+  ##  @libraryclass  Provide MultiPhase platform actions related functions.
+  FspWrapperPlatformMultiPhaseLib|Include/Library/FspWrapperPlatformMultiPhaseLib.h
+
+
+[Guids]
+  #
+  # GUID defined in package
+  #
+  gIntelFsp2WrapperTokenSpaceGuid       = { 0xa34cf082, 0xf50, 0x4f0d,  { 0x89, 0x8a, 0x3d, 0x39, 0x30, 0x2b, 0xc5, 0x1e } }
+  gFspApiPerformanceGuid                = { 0xc9122295, 0x56ed, 0x4d4e, { 0x06, 0xa6, 0x50, 0x8d, 0x89, 0x4d, 0x3e, 0x40 } }
+  gFspHobGuid                           = { 0x6d86fb36, 0xba90, 0x472c, { 0xb5, 0x83, 0x3f, 0xbe, 0xd3, 0xfb, 0x20, 0x9a } }
+
+[Ppis]
+  gFspSiliconInitDonePpiGuid            = { 0x4eb6e09c, 0xd256, 0x4e1e, { 0xb5, 0x0a, 0x87, 0x4b, 0xd2, 0x84, 0xb3, 0xde } }
+  gTopOfTemporaryRamPpiGuid             = { 0x2f3962b2, 0x57c5, 0x44ec, { 0x9e, 0xfc, 0xa6, 0x9f, 0xd3, 0x02, 0x03, 0x2b } }
+
+[Protocols]
+  gAddPerfRecordProtocolGuid            = { 0xc4a58d6d, 0x3677, 0x49cb, { 0xa0, 0x0a, 0x94, 0x70, 0x76, 0x5f, 0xb5, 0x5e } }
+
+################################################################################
+#
+# PCD Declarations section - list of all PCDs Declared by this Package
+#                            Only this package should be providing the
+#                            declaration, other packages should not.
+#
+################################################################################
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+  ## Provides the memory mapped base address of the BIOS CodeCache Flash Device.
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFlashCodeCacheAddress|0xFFE00000|UINT32|0x10000001
+  ## Provides the size of the BIOS Flash Device.
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFlashCodeCacheSize|0x00200000|UINT32|0x10000002
+
+  ## Indicate the PEI memory size platform want to report
+  gIntelFsp2WrapperTokenSpaceGuid.PcdPeiMinMemSize|0x1800000|UINT32|0x40000004
+  ## Indicate the PEI memory size platform want to report
+  gIntelFsp2WrapperTokenSpaceGuid.PcdPeiRecoveryMinMemSize|0x3000000|UINT32|0x40000005
+
+  ## This is the base address of FSP-T
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFsptBaseAddress|0x00000000|UINT32|0x00000300
+
+  ## This PCD indicates if FSP APIs are skipped from FSP wrapper.<BR><BR>
+  #  If a bit is set, that means this FSP API is skipped.<BR>
+  #  If a bit is clear, that means this FSP API is NOT skipped.<BR>
+  #  NOTE: Only NotifyPhase Post PCI enumeration (BIT16) is implemented.<BR>
+  #  BIT[15:0] is for function:<BR>
+  #    BIT0    - Skip TempRamInit<BR>
+  #    BIT1    - Skip MemoryInit<BR>
+  #    BIT2    - Skip TempRamExit<BR>
+  #    BIT3    - Skip SiliconInit<BR>
+  #    BIT4    - Skip NotifyPhase<BR>
+  #  BIT[32:16] is for sub-function:<BR>
+  #    BIT16   - Skip NotifyPhase (AfterPciEnumeration)<BR>
+  #    BIT17   - Skip NotifyPhase (ReadyToBoot)<BR>
+  #    BIT18   - Skip NotifyPhase (EndOfFirmware)<BR>
+  #  Any undefined BITs are reserved for future use.<BR>
+  # @Prompt Skip FSP API from FSP wrapper.
+  gIntelFsp2WrapperTokenSpaceGuid.PcdSkipFspApi|0x00000000|UINT32|0x40000009
+
+[PcdsFixedAtBuild, PcdsPatchableInModule,PcdsDynamic,PcdsDynamicEx]
+  ## This PCD decides how Wrapper code utilizes FSP
+  # 0: DISPATCH mode (FSP Wrapper will load PeiCore from FSP without calling FSP API)
+  # 1: API mode (FSP Wrapper will call FSP API)
+  #
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspModeSelection|0x00000001|UINT8|0x4000000A
+
+  #
+  ## These are the base address of FSP-M/S/I
+  #
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress|0x00000000|UINT32|0x00001000
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress|0x00000000|UINT32|0x00001001
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspiBaseAddress|0x00000000|UINT32|0x00001002
+  #
+  # To provide flexibility for platform to pre-allocate FSP UPD buffer
+  #
+  # The PCDs define the pre-allocated FSPM and FSPS UPD Data Buffer Address.
+  # 0x00000000 - Platform will not pre-allocate UPD buffer before FspWrapper module
+  # non-zero   - Platform will pre-allocate UPD buffer and patch this value to
+  #              buffer address before FspWrapper module executing.
+  #
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmUpdDataAddress|0x00000000|UINT32|0x50000000
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsUpdDataAddress|0x00000000|UINT32|0x50000001
+  #
+  # Non-0 means PcdFspmUpdDataAddress will be ignored, otherwise PcdFspmUpdDataAddress will be used.
+  #
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmUpdDataAddress64|0x00000000|UINT64|0x50000002
+  #
+  # Non-0 means PcdFspsUpdDataAddress will be ignored, otherwise PcdFspsUpdDataAddress will be used.
+  #
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsUpdDataAddress64|0x00000000|UINT64|0x50000003
+
+  ## This PCD decides how FSP is measured
+  # 1) The BootGuard ACM may already measured the FSP component, such as FSPT/FSPM.
+  # We need a flag (PCD) to indicate if there is need to do such FSP measurement or NOT.
+  # 2) The FSP binary includes FSP code and FSP UPD region. The UPD region is considered
+  # as configuration block, and it may be updated by OEM by design.
+  # This flag (PCD) is to indicate if we need isolate the UPD region from the FSP code region.
+  # BIT0: Need measure FSP. (for FSP1.x) - reserved in FSP2.
+  # BIT1: Need measure FSPT. (for FSP 2.x)
+  # BIT2: Need measure FSPM. (for FSP 2.x)
+  # BIT3: Need measure FSPS. (for FSP 2.x)
+  # BIT4~30: reserved.
+  # BIT31: Need isolate UPD region measurement.
+    #0: measure FSP[T|M|S] as one binary in one record (PCR0).
+    #1: measure FSP UPD region in one record (PCR1), the FSP code without UPD in another record (PCR0).
+  #
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspMeasurementConfig|0x00000000|UINT32|0x50000004
+  #
+  # To provide flexibility for platform to pre-allocate FSP UPD buffer
+  #
+  # The PCDs define the pre-allocated FSPI UPD Data Buffer Address.
+  # 0x00000000 - Platform will not pre-allocate UPD buffer before FspWrapper module
+  # non-zero   - Platform will pre-allocate UPD buffer and patch this value to
+  #              buffer address before FspWrapper module executing.
+  #
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspiUpdDataAddress|0x00000000|UINT64|0x50000005

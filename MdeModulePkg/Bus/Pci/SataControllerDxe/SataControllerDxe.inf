@@ -1,0 +1,42 @@
+## @file
+#  SataController driver to manage SATA compliance IDE/AHCI host controllers.
+#
+#  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SataController
+  MODULE_UNI_FILE                = SataControllerDxe.uni
+  FILE_GUID                      = 820C59BB-274C-43B2-83EA-DAC673035A59
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeSataControllerDriver
+
+[Sources]
+  ComponentName.c
+  SataController.c
+  SataController.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  DebugLib
+  UefiLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiPciIoProtocolGuid                     ## TO_START
+  gEfiIdeControllerInitProtocolGuid         ## BY_START
+  gEfiDevicePathProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SataControllerDxeExtra.uni
+

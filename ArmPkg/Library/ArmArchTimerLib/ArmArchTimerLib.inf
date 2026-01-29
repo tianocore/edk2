@@ -1,0 +1,30 @@
+#/** @file
+#
+#  Copyright (c) 2011 - 2014, ARM Limited. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmArchTimerLib
+  FILE_GUID                      = 82da1b44-d2d6-4a7d-bbf0-a0cb67964034
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TimerLib
+
+[Sources.common]
+  ArmArchTimerLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  ArmLib
+  BaseLib
+  ArmGenericTimerCounterLib
+
+[Pcd]

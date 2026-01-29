@@ -1,0 +1,36 @@
+## @file
+#  Instance of BaseFspSwitchStackLib
+#
+#  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseFspSwitchStackLib
+  FILE_GUID                      = 68E79161-F7CE-4A61-8C72-F4DF6FF35CAA
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FspSwitchStackLib
+
+[Sources]
+  FspSwitchStackLib.c
+
+[Sources.IA32]
+  Ia32/Stack.nasm
+
+[Sources.X64]
+  X64/Stack.nasm
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+
+[LibraryClasses]
+  BaseLib
+  IoLib
+
+[Pcd]
+  gIntelFsp2PkgTokenSpaceGuid.PcdFspSaveRestorePageTableEnable

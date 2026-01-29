@@ -1,0 +1,48 @@
+## @file
+#  PRM Configuration Driver
+#
+#  This driver configures PRM Module settings during the boot services environment.
+#
+#  Copyright (c) Microsoft Corporation
+#  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION           = 0x00010005
+  BASE_NAME             = PrmConfigDxe
+  FILE_GUID             = 18D93D57-0B00-4213-B0A2-A2FF5EC214E4
+  MODULE_TYPE           = DXE_RUNTIME_DRIVER
+  VERSION_STRING        = 1.0
+  ENTRY_POINT           = PrmConfigEntryPoint
+
+[Sources]
+  PrmConfigDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  PrmPkg/PrmPkg.dec
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+  gEfiEventVirtualAddressChangeGuid
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DxeServicesTableLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  UefiLib
+
+[Protocols]
+  gPrmConfigProtocolGuid
+
+[Depex]
+  TRUE

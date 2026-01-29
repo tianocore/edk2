@@ -1,0 +1,31 @@
+## @file
+#  Provides definitions and functionality for manipulating
+#  IMAGE_PROPERTIES_RECORD.
+#
+#  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ImagePropertiesRecordLib
+  FILE_GUID                      = 5CCA36C1-C430-4A90-8BF7-23D2719D5928
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ImagePropertiesRecordLib
+
+[Sources.common]
+  ImagePropertiesRecordLib.c
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PeCoffGetEntryPointLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec

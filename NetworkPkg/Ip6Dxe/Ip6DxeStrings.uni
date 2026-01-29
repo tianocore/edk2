@@ -1,0 +1,55 @@
+/** @file
+  String definitions for IP6 configuration.
+
+  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#langdef en-US "English"
+
+#string STR_IP6_CONFIG_FORM_TITLE       #language en-US "IPv6 Network Configuration"
+#string STR_IP6_CONFIG_FORM_HELP        #language en-US "Configure IPv6 network parameters."
+#string STR_IP6_DEVICE_FORM_TITLE       #language en-US "IPv6 Current Setting"
+#string STR_IP6_DEVICE_FORM_HELP        #language en-US "Display IPv6 network parameters."
+#string STR_IP6_INTERFACE_NAME          #language en-US "Interface Name    :"
+#string STR_IP6_INTERFACE_NAME_HELP     #language en-US "The name of the interface."
+#string STR_IP6_INTERFACE_NAME_CONTENT  #language en-US ""
+#string STR_IP6_INTERFACE_TYPE          #language en-US "Interface Type    :"
+#string STR_IP6_INTERFACE_TYPE_HELP     #language en-US "The interface type of the network interface, defined in RFC1700."
+#string STR_IP6_INTERFACE_TYPE_CONTENT  #language en-US ""
+#string STR_IP6_MAC_ADDRESS             #language en-US "MAC address       :"
+#string STR_IP6_MAC_ADDRESS_HELP        #language en-US "The hardware address of the network interface."
+#string STR_IP6_MAC_ADDRESS_CONTENT     #language en-US ""
+#string STR_IP6_HOST_ADDRESS            #language en-US "Host addresses    :"
+#string STR_IP6_HOST_ADDRESS_HELP       #language en-US "The address list which contain the local IPv6 addresses and the corresponding prefix length information."
+#string STR_IP6_ROUTE_TABLE             #language en-US "Route Table       :"
+#string STR_IP6_ROUTE_TABLE_HELP        #language en-US "The route table of the IPv6 network stack runs on this interface."
+#string STR_IP6_GATEWAY_ADDRESS         #language en-US "Gateway addresses :"
+#string STR_IP6_GATEWAY_ADDRESS_HELP    #language en-US "Current gateway IPv6 addresses."
+#string STR_IP6_DNS_ADDRESS             #language en-US "DNS addresses     :"
+#string STR_IP6_DNS_ADDRESS_HELP        #language en-US "Current DNS server list."
+#string STR_IP6_INTERFACE_ID            #language en-US "Interface ID"
+#string STR_IP6_INTERFACE_ID_HELP       #language en-US "The 64 bit alternative interface ID for the device. The string is colon separated. e.g. ff:dd:88:66:cc:1:2:3"
+#string STR_IP6_DAD_TRANSMIT_COUNT      #language en-US "DAD Transmit Count"
+#string STR_IP6_DAD_TRANSMIT_COUNT_HELP #language en-US "The number of consecutive Neighbor Solicitation messages sent while performing Duplicate Address Detection on a tentative address. A value of zero indicates that Duplicate Address Detection is not performed."
+#string STR_POLICY_TYPE_PROMPT          #language en-US "Policy"
+#string STR_POLICY_TYPE_HELP            #language en-US "automatic or manual"
+#string STR_POLICY_TYPE_AUTO            #language en-US "automatic"
+#string STR_POLICY_TYPE_MANUAL          #language en-US "manual"
+#string STR_IP6_AD_CONFIG_FORM          #language en-US "Advanced Configuration"
+#string STR_IP6_AD_CONFIG_FORM_HELP     #language en-US "Configure the interface manually. IP address, gateway address, and DNS server address can be configured."
+#string STR_IP6_MANUAL_ADDRESS          #language en-US "New IPv6 address"
+#string STR_IP6_MANUAL_ADDRESS_HELP     #language en-US "Manual IP address can only be configured under manual policy. Separate the IP address with blank space to configure more than one address. e.g. 2002::1/64 2002::2/64"
+#string STR_IP6_NEW_GATEWAY_ADDRESS     #language en-US "New Gateway addresses"
+#string STR_IP6_NEW_GATEWAY_ADDR_HELP   #language en-US "Gateway IP address can only be configured under manual policy. e.g. 2002::3. Separate the IP address with blank space to configure more than one address."
+#string STR_IP6_NEW_DNS_ADDRESS         #language en-US "New DNS addresses"
+#string STR_IP6_NEW_DNS_ADDRESS_HELP    #language en-US "DNS addresses can only be configured under manual policy. e.g. 2002::4. Separate the IP address with blank space to configure more than one address."
+#string STR_SAVE_CHANGES                #language en-US "Save Changes and Exit"
+#string STR_SAVE_CHANGES_HELP           #language en-US "Save Changes for interface ID, DAD transmit count, policy, and data in advanced configuration."
+#string STR_SAVE_AND_EXIT               #language en-US "Commit Changes and Exit"
+#string STR_NO_SAVE_AND_EXIT            #language en-US "Discard Changes and Exit"
+#string STR_NULL                        #language en-US ""
+#string STR_GET_CURRENT_SETTING         #language en-US "Enter Configuration Menu"
+#string STR_GET_CURRENT_SETTING_HELP    #language en-US "Press ENTER to enter configuration menu for IPv6 configuration."

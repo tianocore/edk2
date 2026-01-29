@@ -1,0 +1,12 @@
+// /** @file
+// This module provides OpenSSL Library implementation with TLS features.
+//
+// Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "OpenSSL Library implementation with TLS features."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module provides OpenSSL Library implementation with TLS features."

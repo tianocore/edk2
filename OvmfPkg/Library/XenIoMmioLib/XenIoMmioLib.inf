@@ -1,0 +1,35 @@
+## @file
+#  Manage XenBus device path and I/O handles
+#
+#  Copyright (c) 2015, Linaro Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = XenIoMmioLib
+  FILE_GUID                      = de9bdc19-8434-47bb-be3c-7f28f2101fd0
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = XenIoMmioLib
+
+[Sources]
+  XenIoMmioLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  MemoryAllocationLib
+
+[Guids]
+  gXenBusRootDeviceGuid
+
+[Protocols]
+  gEfiDevicePathProtocolGuid
+  gXenIoProtocolGuid

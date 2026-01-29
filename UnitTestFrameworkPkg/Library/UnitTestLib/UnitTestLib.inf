@@ -1,0 +1,37 @@
+## @file
+# Library to support Unit Testing from PEI, DXE, SMM, and UEFI Applications.
+#
+# Copyright (c) Microsoft Corporation.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION     = 0x00010017
+  BASE_NAME       = UnitTestLib
+  MODULE_UNI_FILE = UnitTestLib.uni
+  FILE_GUID       = 98CEF9CA-15CE-40A3-ADE8-C299953CD0F6
+  VERSION_STRING  = 1.0
+  MODULE_TYPE     = UEFI_DRIVER
+  LIBRARY_CLASS   = UnitTestLib|PEI_CORE PEIM DXE_CORE MM_STANDALONE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER SMM_CORE UEFI_DRIVER UEFI_APPLICATION
+
+[Sources]
+  UnitTestLib.c
+  RunTests.c
+  Assert.c
+  Log.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  PcdLib
+  DebugLib
+  MemoryAllocationLib
+  UnitTestPersistenceLib
+  UnitTestResultReportLib
+
+[Pcd]
+  gUnitTestFrameworkPkgTokenSpaceGuid.PcdUnitTestLogLevel  ## CONSUMES

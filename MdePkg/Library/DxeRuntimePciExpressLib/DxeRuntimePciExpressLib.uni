@@ -1,0 +1,21 @@
+// /** @file
+// Instance of PCI Express Library using the 256 MB PCI Express MMIO window that
+//
+// is safe for runtime use.
+//
+// PCI Express Library that uses the 256 MB PCI Express MMIO window to perform
+// PCI Configuration cycles. Layers on top of an I/O Library instance.  A table of
+// PCI devices that are registered for for runtime access is maintained so the
+// proper virtual address is used to perform the PCI Express Configuration cycle.
+//
+// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "PCI Express Support Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "The PCI Express Library uses a 256 MB PCI Express MMIO window to perform PCI Configuration cycles. This library layers on top of an I/O Library instance.  A table of PCI devices that are registered for runtime access is maintained so that the proper virtual address is used to perform the PCI Express Configuration cycle."
+

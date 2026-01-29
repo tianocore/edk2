@@ -1,0 +1,53 @@
+## @file
+# This driver first constructs the non-tested memory range, then performs the R/W/V memory test.
+#
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = GenericMemoryTestDxe
+  MODULE_UNI_FILE                = GenericMemoryTestDxe.uni
+  FILE_GUID                      = 9C1080EE-D02E-487f-9432-F3BF086EC180
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = GenericMemoryTestEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  LightMemoryTest.h
+  LightMemoryTest.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  ReportStatusCodeLib
+  DxeServicesTableLib
+  HobLib
+  UefiDriverEntryPoint
+  DebugLib
+
+[Protocols]
+  gEfiCpuArchProtocolGuid                       ## CONSUMES
+  gEfiGenericMemTestProtocolGuid                ## PRODUCES
+
+[Depex]
+  gEfiCpuArchProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  GenericMemoryTestDxeExtra.uni

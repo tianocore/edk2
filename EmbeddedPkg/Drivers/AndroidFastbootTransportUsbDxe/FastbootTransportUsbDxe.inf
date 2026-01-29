@@ -1,0 +1,41 @@
+#/** @file
+#
+#  Copyright (c) 2013-2014, ARM Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FastbootTransportUsbDxe
+  FILE_GUID                      = f6bec3fe-88fb-11e3-ae84-e73b77561c35
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = FastbootTransportUsbEntryPoint
+
+[Sources.common]
+  FastbootTransportUsb.c
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiDriverBindingProtocolGuid
+  gUsbDeviceProtocolGuid
+  gAndroidFastbootTransportProtocolGuid
+  gEfiSimpleTextOutProtocolGuid
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[FixedPcd]
+  gEmbeddedTokenSpaceGuid.PcdAndroidFastbootUsbVendorId
+  gEmbeddedTokenSpaceGuid.PcdAndroidFastbootUsbProductId

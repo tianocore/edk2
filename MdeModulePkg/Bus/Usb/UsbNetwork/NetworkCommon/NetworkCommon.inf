@@ -1,0 +1,48 @@
+## @file
+#   This is Usb Network Common driver for DXE phase.
+#
+# Copyright (c) 2023, American Megatrends International LLC. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = NetworkCommon
+  FILE_GUID                      = ca6eb4f4-f1d6-4375-97d6-18856871e1bf
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = NetworkCommonEntry
+
+[Sources]
+  DriverBinding.c
+  DriverBinding.h
+  ComponentName.c
+  PxeFunction.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+  DebugLib
+  UefiUsbLib
+  MemoryAllocationLib
+  BaseMemoryLib
+
+[Protocols]
+  gEfiNetworkInterfaceIdentifierProtocolGuid_31
+  gEfiUsbIoProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEfiDriverBindingProtocolGuid
+  gEdkIIUsbEthProtocolGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableUsbNetworkRateLimiting
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUsbNetworkRateLimitingCredit
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUsbNetworkRateLimitingFactor
+
+[Depex]
+  TRUE

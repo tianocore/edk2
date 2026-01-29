@@ -1,0 +1,222 @@
+## @file
+# Redfish Package
+#
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+# (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+# Copyright (c) 2023, American Megatrends International LLC.
+# Copyright (c) 2023-2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  DEC_SPECIFICATION = 0x0001001b
+  PACKAGE_NAME      = RedfishPkg
+  PACKAGE_GUID      = c432b76e-5232-11e7-9010-005056c00008
+  PACKAGE_VERSION   = 1.0
+
+[Includes]
+  Include
+
+[Includes.Common.Private]
+  PrivateInclude/Crt            # Private header files for C RTL.
+  Library/JsonLib               # Private header files for jansson
+                                # configuration files.
+                                #  - jansson_config.h
+                                #  - jansson_private_config.h
+                                # jansson.h refers to above two configuration
+                                # files for building platform jansson library.
+  Library/JsonLib/jansson/src   # For referring to jannson.h
+
+[LibraryClasses]
+  ##  @libraryclass Platform Redfish Host Interface Library
+  #   Platform implementation-specific Redfish Host Interface.
+  RedfishPlatformHostInterfaceLib|Include/Library/RedfishHostInterfaceLib.h
+
+  ##  @libraryclass  This library provides UCS2 to UTF8 manipulation
+  #   functions.
+  #
+  Ucs2Utf8Lib|Include/Library/BaseUcs2Utf8Lib.h
+
+  ##  @libraryclass Platform Redfish Credential Library
+  #   Platform implementation-specific Redfish Credential Interface.
+  RedfishPlatformCredentialLib|Include/Library/RedfishCredentialLib.h
+
+  ##  @libraryclass  The helper routines to access REST EX service.
+  #   This library is only intended to be used by UEFI network stack modules.
+  RestExLib|Include/Library/RestExLib.h
+
+  ##  @libraryclass  Provides the library functions based on third party
+  #  jansson library to manipulate JSON data structure.
+  #
+  JsonLib|Include/Library/JsonLib.h
+
+  ##  @libraryclass  Provides the library functions to encode/decode
+  #   Redfish packet.
+  #
+  RedfishContentCodingLib|Include/Library/RedfishContentCodingLib.h
+
+  ##  @libraryclass Redfish Debug Library
+  #   Library provides Redfish debug functions.
+  RedfishDebugLib|Include/Library/RedfishDebugLib.h
+
+  ##  @libraryclass  Provides the library functions to parse IFR binary data.
+  #
+  HiiUtilityLib|Include/Library/HiiUtilityLib.h
+
+  ##  @libraryclass  Provides the library functions to access Redfish Platform
+  #   Config protocol.
+  #
+  RedfishPlatformConfigLib|Include/Library/RedfishPlatformConfigLib.h
+
+  ##  @libraryclass  Provides the library functions to access Redfish HTTP
+  #   protocol.
+  #
+  RedfishHttpLib|Include/Library/RedfishHttpLib.h
+
+  ##  @libraryclass  Provides the library functions for platform to decide
+  #   if this is the device platform supported.
+  #
+  RedfishPlatformWantedDeviceLib|Include/Library/RedfishPlatformWantedDeviceLib.h
+
+[LibraryClasses.Common.Private]
+  ##  @libraryclass  Provides the private C runtime library functions.
+  #   CRT library is currently used by edk2 JsonLib (open source
+  #   jansson project) and edk2 RedfishLib (libredfish open source
+  #   project).
+  RedfishCrtLib|Include/Library/RedfishCrtLib.h
+
+  ##  @libraryclass Redfish Helper Library
+  #   Library provides Redfish helper functions.
+  RedfishLib|Include/Library/RedfishLib.h
+
+[Protocols]
+  ## Include/Protocol/EdkIIRedfishCredential.h
+  gEdkIIRedfishCredentialProtocolGuid = { 0x8804377, 0xaf7a, 0x4496, { 0x8a, 0x7b, 0x17, 0x59, 0x0, 0xe9, 0xab, 0x46 } }
+
+  ## Include/Protocol/EdkIIRedfishCredential.h
+  gEdkIIRedfishCredential2ProtocolGuid = { 0x936b81dc, 0x348c, 0x42e3, { 0x9e, 0x82, 0x2, 0x91, 0x4f, 0xd3, 0x48, 0x86 } }
+
+  ## Include/Protocol/Edk2RedfishConfigHandler.h
+  gEdkIIRedfishConfigHandlerProtocolGuid = { 0xbc0fe6bb, 0x2cc9, 0x463e, { 0x90, 0x82, 0xfa, 0x11, 0x76, 0xfc, 0x67, 0xde } }
+
+  ## Include/Protocol/EdkIIRedfishPlatformConfig.h
+  gEdkIIRedfishPlatformConfigProtocolGuid = { 0X4D94A7C7, 0X4CE4, 0X4A84, { 0X88, 0XC1, 0X33, 0X0C, 0XD4, 0XA3, 0X47, 0X67 } }
+
+  # Redfish Host Interface ready notification protocol
+  gEdkIIRedfishHostInterfaceReadyProtocolGuid = { 0xC3F6D062, 0x3D38, 0x4EA4, { 0x92, 0xB1, 0xE8, 0xF8, 0x02, 0x27, 0x63, 0xDF } }
+
+  ## Include/Protocol/EdkIIRedfishHttpProtocol.h
+  gEdkIIRedfishHttpProtocolGuid = { 0x58a0f47e, 0xf45f, 0x4d44, { 0x89, 0x5b, 0x2a, 0xfe, 0xb0, 0x80, 0x15, 0xe2 } }
+
+[Guids]
+  gEfiRedfishPkgTokenSpaceGuid      = { 0x4fdbccb7, 0xe829, 0x4b4c, { 0x88, 0x87, 0xb2, 0x3f, 0xd7, 0x25, 0x4b, 0x85 }}
+
+  # Redfish variable guid
+  gEfiRedfishVariableGuid           = { 0x85ef8dd3, 0xe606, 0x4b89, { 0x8b, 0xbd, 0x93, 0xbf, 0x5c, 0xbe, 0x1c, 0x18 } }
+
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+  #
+  # This PCD is the UEFI device path which is used as the Redfish host interface.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExServiceDevicePath|{0x0}|REST_EX_SERVICE_DEVICE_PATH_DATA|0x00001000 {
+  <HeaderFiles>
+    Pcd/RestExServiceDevicePath.h
+  <Packages>
+    MdePkg/MdePkg.dec
+    MdeModulePkg/MdeModulePkg.dec
+    RedfishPkg/RedfishPkg.dec
+  }
+  #
+  # This PCD indicates the EFI REST EX access mode to Redfish service.
+  # Default is set to out of band access.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExServiceAccessModeInBand|FALSE|BOOLEAN|0x00001001
+  #
+  # This PCD indicates the access mode EFI Discover protocol uses to look for the proper EFI REST EX
+  # protocol instance.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDiscoverAccessModeInBand|FALSE|BOOLEAN|0x00001002
+  #
+  # This PCD indicates if the EFI REST EX sends chunk request to Redfish service.
+  # Default is set to non chunk mode.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExChunkRequestMode|FALSE|BOOLEAN|0x00001003
+  #
+  # This PCD indicates if the EFI REST EX adds Expect header to the POST, PATCH, PUT requests to Redfish service.
+  # Default is set to not add.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExAddingExpect|FALSE|BOOLEAN|0x00001004
+  #
+  # Use PCD to declare the Redfish host nmae becasue there is no
+  # specification for that.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishHostName|"Redfish service"|VOID*|0x00001005
+  #
+  # Use PCD to declare the Redfish service UUID becasue there is no
+  # specification for that.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishServiceUuid|L"00000000-0000-0000-0000-000000000000"|VOID*|0x00001006
+  # Use PCD to declare the Redfish service port, default set to port 443.
+  # Platform can overide this value in platform DSC file.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishServicePort|443|UINT16|0x00001007
+  #
+  # This PCD indicates that if BMC bootstrap credential service will be disabled by BIOS or not.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDisableBootstrapCredentialService|FALSE|BOOLEAN|0x00001008
+  #
+  # The EFI_REST_EX_HTTP_CONFIG_DATA.SendReceiveTimeout value that RedfishDiscoverDxe driver
+  # set to EFI_REST_EX_PROTOCOL.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishSendReceiveTimeout|5000|UINT32|0x00001009
+  #
+  # This PCD string is introduced for platform developer to set the encoding method supported by BMC Redfish.
+  # Currently only "None" and "gzip" are supported.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishServiceContentEncoding|"None"|VOID*|0x0000100A
+  #
+  # Use below PCDs to control Redfhs HTTP protocol.
+  #
+  ## The number of retry when HTTP GET request failed. If the value is 0, there is no retry enabled.
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpGetRetry|0|UINT16|0x0000100B
+  ## The number of retry when HTTP PUT request failed. If the value is 0, there is no retry enabled.
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpPutRetry|0|UINT16|0x0000100C
+  ## The number of retry when HTTP PATCH request failed. If the value is 0, there is no retry enabled.
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpPatchRetry|0|UINT16|0x0000100D
+  ## The number of retry when HTTP POST request failed. If the value is 0, there is no retry enabled.
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpPostRetry|0|UINT16|0x0000100E
+  ## The number of retry when HTTP DELETE request failed. If the value is 0, there is no retry enabled.
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpDeleteRetry|0|UINT16|0x0000100F
+  ## The number of second to wait before driver retry HTTP request. If the value is 0, there is no wait before next retry.
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpRetryWaitInSecond|1|UINT16|0x00001010
+  ## This is used to disable Redfish HTTP cache function and every request will be sent to Redfish service.
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpCacheDisabled|FALSE|BOOLEAN|0x00001011
+  #
+  # Redfish debug catagories
+  # To enable the debug message for the entire edk2 Redfish implementation, below PCDs must be set.
+  # DEBUG_MANAGEABILITY must be set PcdDebugPrintErrorLevel.
+  #
+  #   0x0000000000000001  RedfishPlatformConfigDxe driver debug enabled.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDebugCategory|0|UINT64|0x00001012
+  #
+  # Redfish RedfishPlatformConfigDxe Debug Properties
+  #   0x00000001  x-UEFI-redfish string database message enabled
+  #   0x00000002  Debug Message for dumping formset
+  #   0x00000004  Debug Message for x-UEFI-redfish searching result
+  #   0x00000008  Debug Message for x-UEFI-redfish Regular Expression searching result
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishPlatformConfigDebugProperty|0|UINT32|0x00001013
+  #
+  # RedfishPlatformConfigDxe feature enablement
+  #   0x00000001  Enable building Redfish Attribute Registry menu path.
+  #   0x00000002  Allow supressed HII option to be exposed on Redfish.
+  #
+  # Redfish RedfishPlatformConfigDxe feature Properties
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishPlatformConfigFeatureProperty|0|UINT32|0x00001014
+  ## This is used to disable a deletion of the bootstrap account.
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishCredentialDeleteAccount|TRUE|BOOLEAN|0x00001015
+  ## Default Redfish version string
+  gEfiRedfishPkgTokenSpaceGuid.PcdDefaultRedfishVersion|L"v1"|VOID*|0x00001016

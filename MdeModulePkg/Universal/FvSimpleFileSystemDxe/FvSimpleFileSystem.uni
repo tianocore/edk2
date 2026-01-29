@@ -1,0 +1,16 @@
+// /** @file
+// Module that lays Simple File System protocol on every FirmwareVolume2 protocol.
+//
+// This module produces Simple File System protocol to provide the accesses to the files in FVs.
+//
+// Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Lays Simple File System protocol on every FirmwareVolume2 protocol"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module produces Simple File System protocol to provide the accesses to the files in FVs."
+

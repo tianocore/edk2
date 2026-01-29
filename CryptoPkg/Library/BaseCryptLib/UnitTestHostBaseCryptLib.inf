@@ -1,0 +1,84 @@
+## @file
+#  Cryptographic Library Instance for host based unit tests
+#
+#  Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseCryptLib
+  FILE_GUID                      = c97d34aa-caf8-42cd-8261-8705f46304b3
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BaseCryptLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  InternalCryptLib.h
+  Hash/CryptMd5.c
+  Hash/CryptSha1.c
+  Hash/CryptSha256.c
+  Hash/CryptSha512.c
+  Hash/CryptSm3.c
+  Hash/CryptParallelHashNull.c
+  Hmac/CryptHmac.c
+  Kdf/CryptHkdf.c
+  Cipher/CryptAes.c
+  Cipher/CryptAeadAesGcm.c
+  Pk/CryptRsaBasic.c
+  Pk/CryptRsaExt.c
+  Pk/CryptPkcs1Oaep.c
+  Pk/CryptPkcs5Pbkdf2.c
+  Pk/CryptPkcs7Sign.c
+  Pk/CryptPkcs7VerifyCommon.c
+  Pk/CryptPkcs7VerifyBase.c
+  Pk/CryptPkcs7VerifyEku.c
+  Pk/CryptDh.c
+  Pk/CryptX509.c
+  Pk/CryptAuthenticode.c
+  Pk/CryptTs.c
+  Pem/CryptPem.c
+  Pk/CryptRsaPss.c
+  Pk/CryptRsaPssSign.c
+  Bn/CryptBn.c
+  Pk/CryptEc.c
+
+  SysCall/UnitTestHostCrtWrapper.c
+
+[Sources.Ia32]
+  Rand/CryptRandTsc.c
+
+[Sources.X64]
+  Rand/CryptRandTsc.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  OpensslLib
+  PrintLib
+
+#
+# Remove these [BuildOptions] after this library is cleaned up
+#
+[BuildOptions]
+  #
+  # suppress the following warnings so we do not break the build with warnings-as-errors:
+  #
+  GCC:*_CLANGDWARF_*_CC_FLAGS = -std=c99 -Wno-error=incompatible-pointer-types
+  GCC:*_CLANGPDB_*_CC_FLAGS = -std=c99 -Wno-error=incompatible-pointer-types
+
+  XCODE:*_*_*_CC_FLAGS = -std=c99

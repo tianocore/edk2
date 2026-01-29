@@ -1,0 +1,46 @@
+## @file
+# This driver produces Extended SCSI Pass Thru Protocol instances for
+# LSI 53C895A SCSI devices.
+#
+# Copyright (C) 2020, SUSE LLC.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = LsiScsiDxe
+  FILE_GUID                      = EB4EB21F-5A3D-40BE-8BD2-F1B0E38E5744
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = LsiScsiEntryPoint
+
+[Sources]
+  LsiScsi.c
+  LsiScsi.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiExtScsiPassThruProtocolGuid        ## BY_START
+  gEfiPciIoProtocolGuid                  ## TO_START
+
+[FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdLsiScsiMaxTargetLimit   ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdLsiScsiMaxLunLimit      ## CONSUMES
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdLsiScsiStallPerPollUsec ## CONSUMES

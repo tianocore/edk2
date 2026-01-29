@@ -1,0 +1,44 @@
+## @file
+#  Instance of MemDebugLog Library for PEI phase
+#
+#  Copyright (C) 2025, Oracle and/or its affiliates.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MemDebugLogLib
+  FILE_GUID                      = D473DE36-0D8A-4F6B-9FA0-126185F36D9D
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MemDebugLogLib|PEIM
+
+
+[Sources]
+  MemDebugLogPei.c
+  MemDebugLogCommon.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  SynchronizationLib
+  PcdLib
+  QemuFwCfgSimpleParserLib
+
+[Guids]
+  gMemDebugLogHobGuid
+
+[Ppis]
+
+[FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdMemDebugLogPages
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfEarlyMemDebugLogSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString ## CONSUMES
+

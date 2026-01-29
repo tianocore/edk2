@@ -1,0 +1,185 @@
+## @file
+# Security Fixes for SecurityPkg
+#
+# Copyright (c) Microsoft Corporation
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+CVE_2023_45229:
+  commit_titles:
+    - "NetworkPkg: Dhcp6Dxe: SECURITY PATCH CVE-2023-45229 Patch"
+    - "NetworkPkg: Dhcp6Dxe: SECURITY PATCH CVE-2023-45229 Unit Tests"
+    - "NetworkPkg: Dhcp6Dxe: SECURITY PATCH CVE-2023-45229 Related Patch"
+  cve: CVE-2023-45229
+  date_reported: 2023-08-28 13:56 UTC
+  description: "Bug 01 - edk2/NetworkPkg: Out-of-bounds read when processing IA_NA/IA_TA options in a DHCPv6 Advertise message"
+  note:
+  files_impacted:
+    - NetworkPkg\Dhcp6Dxe\Dhcp6Io.c
+    - NetworkPkg\Dhcp6Dxe\Dhcp6Impl.h
+  links:
+    - https://bugzilla.tianocore.org/show_bug.cgi?id=4534
+    - https://nvd.nist.gov/vuln/detail/CVE-2023-45229
+    - http://www.openwall.com/lists/oss-security/2024/01/16/2
+    - http://packetstormsecurity.com/files/176574/PixieFail-Proof-Of-Concepts.html
+    - https://blog.quarkslab.com/pixiefail-nine-vulnerabilities-in-tianocores-edk-ii-ipv6-network-stack.html
+CVE_2023_45230:
+  commit_titles:
+    - "NetworkPkg: Dhcp6Dxe: SECURITY PATCH CVE-2023-45230 Patch"
+    - "NetworkPkg: Dhcp6Dxe: SECURITY PATCH CVE-2023-45230 Unit Tests"
+  cve: CVE-2023-45230
+  date_reported: 2023-08-28 13:56 UTC
+  description: "Bug 02 - edk2/NetworkPkg: Buffer overflow in the DHCPv6 client via a long Server ID option"
+  note:
+  files_impacted:
+    - NetworkPkg\Dhcp6Dxe\Dhcp6Io.c
+    - NetworkPkg\Dhcp6Dxe\Dhcp6Impl.h
+  links:
+    - https://bugzilla.tianocore.org/show_bug.cgi?id=4535
+    - https://nvd.nist.gov/vuln/detail/CVE-2023-45230
+    - http://www.openwall.com/lists/oss-security/2024/01/16/2
+    - http://packetstormsecurity.com/files/176574/PixieFail-Proof-Of-Concepts.html
+    - https://blog.quarkslab.com/pixiefail-nine-vulnerabilities-in-tianocores-edk-ii-ipv6-network-stack.html
+CVE_2023_45231:
+  commit_titles:
+    - "NetworkPkg: Dhcp6Dxe: SECURITY PATCH CVE-2023-45231 Patch"
+    - "NetworkPkg: Dhcp6Dxe: SECURITY PATCH CVE-2023-45231 Unit Tests"
+  cve: CVE-2023-45231
+  date_reported: 2023-08-28 13:56 UTC
+  description: "Bug 03 - edk2/NetworkPkg: Out-of-bounds read when handling a ND Redirect message with truncated options"
+  note:
+  files_impacted:
+    - NetworkPkg/Ip6Dxe/Ip6Option.c
+  links:
+    - https://bugzilla.tianocore.org/show_bug.cgi?id=4536
+    - https://nvd.nist.gov/vuln/detail/CVE-2023-45231
+    - http://www.openwall.com/lists/oss-security/2024/01/16/2
+    - http://packetstormsecurity.com/files/176574/PixieFail-Proof-Of-Concepts.html
+    - https://blog.quarkslab.com/pixiefail-nine-vulnerabilities-in-tianocores-edk-ii-ipv6-network-stack.html
+CVE_2023_45232:
+  commit_titles:
+    - "NetworkPkg: Dhcp6Dxe: SECURITY PATCH CVE-2023-45232 Patch"
+    - "NetworkPkg: Dhcp6Dxe: SECURITY PATCH CVE-2023-45232 Unit Tests"
+  cve: CVE-2023-45232
+  date_reported: 2023-08-28 13:56 UTC
+  description: "Bug 04 - edk2/NetworkPkg: Infinite loop when parsing unknown options in the Destination Options header"
+  note:
+  files_impacted:
+    - NetworkPkg/Ip6Dxe/Ip6Option.c
+    - NetworkPkg/Ip6Dxe/Ip6Option.h
+  links:
+    - https://bugzilla.tianocore.org/show_bug.cgi?id=4537
+    - https://nvd.nist.gov/vuln/detail/CVE-2023-45232
+    - http://www.openwall.com/lists/oss-security/2024/01/16/2
+    - http://packetstormsecurity.com/files/176574/PixieFail-Proof-Of-Concepts.html
+    - https://blog.quarkslab.com/pixiefail-nine-vulnerabilities-in-tianocores-edk-ii-ipv6-network-stack.html
+CVE_2023_45233:
+  commit_titles:
+    - "NetworkPkg: Dhcp6Dxe: SECURITY PATCH CVE-2023-45232 Patch"
+    - "NetworkPkg: Dhcp6Dxe: SECURITY PATCH CVE-2023-45232 Unit Tests"
+  cve: CVE-2023-45233
+  date_reported: 2023-08-28 13:56 UTC
+  description: "Bug 05 - edk2/NetworkPkg: Infinite loop when parsing a PadN option in the Destination Options header "
+  note: This was fixed along with CVE-2023-45233
+  files_impacted:
+    - NetworkPkg/Ip6Dxe/Ip6Option.c
+    - NetworkPkg/Ip6Dxe/Ip6Option.h
+  links:
+    - https://bugzilla.tianocore.org/show_bug.cgi?id=4538
+    - https://nvd.nist.gov/vuln/detail/CVE-2023-45233
+    - http://www.openwall.com/lists/oss-security/2024/01/16/2
+    - http://packetstormsecurity.com/files/176574/PixieFail-Proof-Of-Concepts.html
+    - https://blog.quarkslab.com/pixiefail-nine-vulnerabilities-in-tianocores-edk-ii-ipv6-network-stack.html
+CVE_2023_45234:
+  commit_titles:
+    - "NetworkPkg: Dhcp6Dxe: SECURITY PATCH CVE-2023-45234 Patch"
+    - "NetworkPkg: Dhcp6Dxe: SECURITY PATCH CVE-2023-45234 Unit Tests"
+  cve: CVE-2023-45234
+  date_reported: 2023-08-28 13:56 UTC
+  description: "Bug 06 - edk2/NetworkPkg: Buffer overflow when processing DNS Servers option in a DHCPv6 Advertise message"
+  note:
+  files_impacted:
+    - NetworkPkg/UefiPxeBcDxe/PxeBcDhcp6.c
+  links:
+    - https://bugzilla.tianocore.org/show_bug.cgi?id=4539
+    - https://nvd.nist.gov/vuln/detail/CVE-2023-45234
+    - http://www.openwall.com/lists/oss-security/2024/01/16/2
+    - http://packetstormsecurity.com/files/176574/PixieFail-Proof-Of-Concepts.html
+    - https://blog.quarkslab.com/pixiefail-nine-vulnerabilities-in-tianocores-edk-ii-ipv6-network-stack.html
+CVE_2023_45235:
+  commit_titles:
+    - "NetworkPkg: Dhcp6Dxe: SECURITY PATCH CVE-2023-45235 Patch"
+    - "NetworkPkg: Dhcp6Dxe: SECURITY PATCH CVE-2023-45235 Unit Tests"
+  cve: CVE-2023-45235
+  date_reported: 2023-08-28 13:56 UTC
+  description: "Bug 07 - edk2/NetworkPkg: Buffer overflow when handling Server ID option from a DHCPv6 proxy Advertise message"
+  note:
+  files_impacted:
+    - NetworkPkg/UefiPxeBcDxe/PxeBcDhcp6.c
+    - NetworkPkg/UefiPxeBcDxe/PxeBcDhcp6.h
+  links:
+    - https://bugzilla.tianocore.org/show_bug.cgi?id=4540
+    - https://nvd.nist.gov/vuln/detail/CVE-2023-45235
+    - http://www.openwall.com/lists/oss-security/2024/01/16/2
+    - http://packetstormsecurity.com/files/176574/PixieFail-Proof-Of-Concepts.html
+    - https://blog.quarkslab.com/pixiefail-nine-vulnerabilities-in-tianocores-edk-ii-ipv6-network-stack.html
+CVE_2023_45236:
+  commit_titles:
+    - "NetworkPkg: TcpDxe: SECURITY PATCH CVE-2023-45236 Patch"
+  cve: CVE-2023-45236
+  date_reported: 2023-08-28 13:56 UTC
+  description: "Bug 08 - edk2/NetworkPkg: Predictable TCP Initial Sequence Numbers"
+  note:
+  files_impacted:
+    - NetworkPkg/Include/Library/NetLib.h
+    - NetworkPkg/TcpDxe/TcpDriver.c
+    - NetworkPkg/TcpDxe/TcpDxe.inf
+    - NetworkPkg/TcpDxe/TcpFunc.h
+    - NetworkPkg/TcpDxe/TcpInput.c
+    - NetworkPkg/TcpDxe/TcpMain.h
+    - NetworkPkg/TcpDxe/TcpMisc.c
+    - NetworkPkg/TcpDxe/TcpTimer.c
+  links:
+    - https://bugzilla.tianocore.org/show_bug.cgi?id=4541
+    - https://nvd.nist.gov/vuln/detail/CVE-2023-45236
+    - http://www.openwall.com/lists/oss-security/2024/01/16/2
+    - http://packetstormsecurity.com/files/176574/PixieFail-Proof-Of-Concepts.html
+    - https://blog.quarkslab.com/pixiefail-nine-vulnerabilities-in-tianocores-edk-ii-ipv6-network-stack.html
+CVE_2023_45237:
+  commit_titles:
+    - "NetworkPkg:: SECURITY PATCH CVE 2023-45237"
+  cve: CVE-2023-45237
+  date_reported: 2023-08-28 13:56 UTC
+  description: "Bug 09 - Use of a Weak PseudoRandom Number Generator"
+  note:
+  files_impacted:
+    - NetworkPkg/Dhcp4Dxe/Dhcp4Driver.c
+    - NetworkPkg/Dhcp6Dxe/Dhcp6Driver.c
+    - NetworkPkg/DnsDxe/DnsDhcp.c
+    - NetworkPkg/DnsDxe/DnsImpl.c
+    - NetworkPkg/HttpBootDxe/HttpBootDhcp6.c
+    - NetworkPkg/IScsiDxe/IScsiCHAP.c
+    - NetworkPkg/IScsiDxe/IScsiMisc.c
+    - NetworkPkg/IScsiDxe/IScsiMisc.h
+    - NetworkPkg/Include/Library/NetLib.h
+    - NetworkPkg/Ip4Dxe/Ip4Driver.c
+    - NetworkPkg/Ip6Dxe/Ip6ConfigImpl.c
+    - NetworkPkg/Ip6Dxe/Ip6Driver.c
+    - NetworkPkg/Ip6Dxe/Ip6If.c
+    - NetworkPkg/Ip6Dxe/Ip6Mld.c
+    - NetworkPkg/Ip6Dxe/Ip6Nd.c
+    - NetworkPkg/Ip6Dxe/Ip6Nd.h
+    - NetworkPkg/Library/DxeNetLib/DxeNetLib.c
+    - NetworkPkg/Library/DxeNetLib/DxeNetLib.inf
+    - NetworkPkg/NetworkPkg.dec
+    - NetworkPkg/TcpDxe/TcpDriver.c
+    - NetworkPkg/Udp4Dxe/Udp4Driver.c
+    - NetworkPkg/Udp6Dxe/Udp6Driver.c
+    - NetworkPkg/UefiPxeBcDxe/PxeBcDhcp4.c
+    - NetworkPkg/UefiPxeBcDxe/PxeBcDhcp6.c
+    - NetworkPkg/UefiPxeBcDxe/PxeBcDriver.c
+  links:
+    - https://bugzilla.tianocore.org/show_bug.cgi?id=4542
+    - https://nvd.nist.gov/vuln/detail/CVE-2023-45237
+    - http://www.openwall.com/lists/oss-security/2024/01/16/2
+    - http://packetstormsecurity.com/files/176574/PixieFail-Proof-Of-Concepts.html
+    - https://blog.quarkslab.com/pixiefail-nine-vulnerabilities-in-tianocores-edk-ii-ipv6-network-stack.html

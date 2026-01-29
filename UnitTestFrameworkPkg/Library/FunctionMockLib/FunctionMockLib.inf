@@ -1,0 +1,31 @@
+## @file
+#  This module provides FunctionMockLib Library implementation.
+#
+#  Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION     = 0x00010018
+  BASE_NAME       = FunctionMockLib
+  MODULE_UNI_FILE = FunctionMockLib.uni
+  FILE_GUID       = DF1CAF2F-D584-4EC1-9ABF-07E8B10AD560
+  MODULE_TYPE     = HOST_APPLICATION
+  VERSION_STRING  = 0.1
+  LIBRARY_CLASS   = FunctionMockLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  FunctionMockLib.c
+
+[LibraryClasses]
+  GoogleTestLib
+  SubhookLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec

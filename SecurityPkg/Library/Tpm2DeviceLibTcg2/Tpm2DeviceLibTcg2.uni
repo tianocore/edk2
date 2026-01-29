@@ -1,0 +1,17 @@
+// /** @file
+// Provides function interfaces to communicate with TPM 2.0 device
+//
+// This library helps to use TPM 2.0 device in library function API
+// based on TCG2 protocol.
+//
+// Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Provides function interfaces to communicate with TPM 2.0 device"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library helps to use TPM 2.0 device in library function API based on TCG2 protocol."
+

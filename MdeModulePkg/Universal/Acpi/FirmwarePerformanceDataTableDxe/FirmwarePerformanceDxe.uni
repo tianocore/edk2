@@ -1,0 +1,18 @@
+// /** @file
+// This module installs ACPI Firmware Performance Data Table (FPDT).
+//
+// This module registers report status code listener to collect performance data
+// for Firmware Basic Boot Performance Record and other boot performance records,
+// and install FPDT to ACPI table.
+//
+// Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Installs ACPI Firmware Performance Data Table (FPDT)"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This module registers report status code listener to collect performance data for Firmware Basic Boot Performance Record and other boot performance records, and installs FPDT to the ACPI table."
+

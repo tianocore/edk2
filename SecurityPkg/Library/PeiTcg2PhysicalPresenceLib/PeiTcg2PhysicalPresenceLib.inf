@@ -1,0 +1,50 @@
+## @file
+#  Get TPM 2.0 physical presence information.
+#
+#  This library will get TPM 2.0 physical presence information.
+#
+# Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiTcg2PhysicalPresenceLib
+  MODULE_UNI_FILE                = PeiTcg2PhysicalPresenceLib.uni
+  FILE_GUID                      = AB82E7BE-0970-480b-93EB-3D332B89F99E
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Tcg2PhysicalPresenceLib|PEIM
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  PeiTcg2PhysicalPresenceLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  PeiServicesLib
+  PeiServicesTablePointerLib
+
+[Guids]
+  ## SOMETIMES_CONSUMES ## Variable:L"PhysicalPresenceFlags"
+  gEfiTcg2PhysicalPresenceGuid
+
+[Ppis]
+  gEfiPeiReadOnlyVariable2PpiGuid       ## CONSUMES
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcg2PhysicalPresenceFlags       ## SOMETIMES_CONSUMES
+
+[Depex]
+  gEfiPeiReadOnlyVariable2PpiGuid

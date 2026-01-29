@@ -1,0 +1,43 @@
+## @file
+# Instance of HOB Library using HOB list from EFI Configuration Table.
+#
+# HOB Library implementation that retrieves the HOB List
+#  from the System Configuration Table in the EFI System Table.
+#
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeHobLib
+  MODULE_UNI_FILE                = DxeHobLib.uni
+  FILE_GUID                      = f12b59c9-76d0-4661-ad7c-f04d1bef0558
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = HobLib|DXE_DRIVER DXE_RUNTIME_DRIVER SMM_CORE DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = HobLibConstructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  HobLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  UefiLib
+
+[Guids]
+  gEfiHobListGuid                               ## CONSUMES  ## SystemTable
+
