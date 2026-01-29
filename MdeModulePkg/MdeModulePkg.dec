@@ -595,6 +595,9 @@
   ## Include/Ppi/MigrateTempRam.h
   gEdkiiPeiMigrateTempRamPpiGuid            = { 0xc79dc53b, 0xafcd, 0x4a6a, { 0xad, 0x94, 0xa7, 0x6a, 0x3f, 0xa9, 0xe9, 0xc2 } }
 
+  ## Include/Ppi/InstallPeiMemoryBins.h
+  gInstallPeiMemoryBinsPpiGuid = {0x24fd4e27, 0x6f4b, 0x4460, {0xb7, 0xa7, 0x21, 0x8b, 0xe8, 0xc3, 0x50, 0xc7 } }
+
 [Protocols]
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
   #  Include/Protocol/LoadPe32Image.h
