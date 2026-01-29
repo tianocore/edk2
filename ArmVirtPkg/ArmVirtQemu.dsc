@@ -114,7 +114,7 @@
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
   QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgMmioPeiLib.inf
 !if $(DEBUG_TO_MEM)
-  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogPeiLib.inf
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogPeiCoreLib.inf
 !else
   MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogLibNull.inf
 !endif
@@ -367,7 +367,10 @@
   ArmPkg/Drivers/CpuPei/CpuPei.inf
 
 !if $(DEBUG_TO_MEM)
-  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
+  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf {
+    <LibraryClasses>
+      MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogPeiLib.inf
+  }
 !endif
 
 !if $(TPM2_ENABLE) == TRUE
