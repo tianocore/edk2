@@ -105,3 +105,69 @@ AesCbcDecrypt (
   ASSERT (FALSE);
   return FALSE;
 }
+
+/**
+  Performs AES encryption on single block (AES_BLOCK_SIZE)
+
+  This function performs AES encryption on single block pointed by Input.
+
+  Caller must perform padding, if necessary, to ensure single block size.
+  AesContext should be already correctly initialized by AesInit().
+  Behavior with invalid AES context is undefined.
+
+  If AesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
+
+  @param[in]   AesContext  Pointer to the AES context.
+  @param[in]   Input       Pointer to the buffer containing single block data
+  @param[out]  Output      Pointer to a buffer that receives the AES encryption output.
+
+  @retval TRUE   AES encryption succeeded.
+  @retval FALSE  AES encryption failed.
+
+**/
+BOOLEAN
+EFIAPI
+AesEncrypt (
+  IN   VOID         *AesContext,
+  IN   CONST UINT8  *Input,
+  OUT  UINT8        *Output
+  )
+{
+  ASSERT (FALSE);
+  return FALSE;
+}
+
+/**
+  Performs AES decryption on single block (AES_BLOCK_SIZE)
+
+  This function performs AES decryption on single block pointed by Input.
+
+  Caller must perform padding, if necessary, to ensure single block size.
+  AesContext should be already correctly initialized by AesInit().
+  Behavior with invalid AES context is undefined.
+
+  If AesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
+
+  @param[in]   AesContext  Pointer to the AES context.
+  @param[in]   Input       Pointer to the buffer containing single block encrpyted data.
+  @param[out]  Output      Pointer to a buffer that receives the AES decryption output.
+
+  @retval TRUE   AES decryption succeeded.
+  @retval FALSE  AES decryption failed.
+
+**/
+BOOLEAN
+EFIAPI
+AesDecrypt (
+  IN   VOID         *AesContext,
+  IN   CONST UINT8  *Input,
+  OUT  UINT8        *Output
+  )
+{
+  ASSERT (FALSE);
+  return FALSE;
+}
