@@ -8,8 +8,6 @@
 
 #include "MmVariablePei.h"
 
-#define MM_VARIABLE_COMM_BUFFER_OFFSET  (SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE)
-
 //
 // Module globals
 //
@@ -45,23 +43,38 @@ PeiMmVariableInitialize (
 }
 
 /**
-  Helper function to populate MM communicate header and variable communicate header
-  and then communicate to PEI.
+  Initialize the communicate buffer using DataSize and Function.
 
-  @param[in, out] CommunicateBuffer       Size of the variable name.
-  @param[in]      CommunicateBufferSize   The entire buffer size to be sent to MM.
-  @param[in]      Function                The MM variable function value.
+  This function will locate the PEI MM Communication PPI v3 or v1, and populate
+  the corresponding header data and return the located PPI stub.
 
-  @retval EFI_INVALID_PARAMETER      Invalid parameter.
-  @retval EFI_SUCCESS                Find the specified variable.
-  @retval Others                     Errors returned by MM communicate or variable service.
+  The communicate size is: SMM_COMMUNICATE_HEADER_SIZE(_V3) + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE +
+  DataSize.
+
+  Caution: This function may receive untrusted input.
+  The data size external input, so this function will validate it carefully to avoid buffer overflow.
+
+  @param[out]      DataPtr                  Points to the data in the communicate buffer.
+  @param[in]       DataSize                 The data size to send to MM.
+  @param[in]       Function                 The function number to initialize the communicate header.
+  @param[out]      DataBuffer               The allocated communicate buffer to be used for communication.
+  @param[out]      BufferPageSize           The size of the allocated communicate buffer in pages.
+  @param[out]      MmCommunicationPpiStub   The located PEI MM Communication PPI stub.
+  @param[out]      MmCommunicationPpiV3Stub The located PEI MM Communication3 PPI stub.
+
+  @retval EFI_INVALID_PARAMETER     The data size is too big.
+  @retval EFI_SUCCESS               Find the specified variable.
 
 **/
 EFI_STATUS
-PopulateHeaderAndCommunicate (
-  IN OUT  UINT8  *CommunicateBuffer,
-  IN UINTN       CommunicateBufferSize,
-  IN UINTN       Function
+InitCommunicateBuffer (
+  OUT     VOID                       **DataPtr OPTIONAL,
+  IN      UINTN                      DataSize,
+  IN      UINTN                      Function,
+  OUT     VOID                       **DataBuffer,
+  OUT     UINTN                      *BufferPageSize,
+  OUT EFI_PEI_MM_COMMUNICATION_PPI   **MmCommunicationPpiStub OPTIONAL,
+  OUT EFI_PEI_MM_COMMUNICATION3_PPI  **MmCommunicationPpiV3Stub OPTIONAL
   )
 {
   EFI_STATUS                       Status;
@@ -69,27 +82,29 @@ PopulateHeaderAndCommunicate (
   EFI_PEI_MM_COMMUNICATION3_PPI    *MmCommunicationPpiV3;
   EFI_MM_COMMUNICATE_HEADER        *MmCommunicateHeader;
   EFI_MM_COMMUNICATE_HEADER_V3     *MmCommunicateHeaderV3;
-  SMM_VARIABLE_COMMUNICATE_HEADER  *MmVarCommsHeader;
-
-  // Minimal sanity check
-  if ((CommunicateBuffer == NULL) ||
-      (CommunicateBufferSize < MM_VARIABLE_COMM_BUFFER_OFFSET))
-  {
-    Status = EFI_INVALID_PARAMETER;
-    DEBUG ((DEBUG_ERROR, "%a: Invalid incoming parameters: %p and 0x%x\n", __func__, CommunicateBuffer, CommunicateBufferSize));
-    goto Exit;
-  }
-
-  if ((Function != SMM_VARIABLE_FUNCTION_GET_NEXT_VARIABLE_NAME) &&
-      (Function != SMM_VARIABLE_FUNCTION_GET_VARIABLE))
-  {
-    Status = EFI_INVALID_PARAMETER;
-    DEBUG ((DEBUG_ERROR, "%a: Invalid function value: 0x%x\n", __func__, Function));
-    goto Exit;
-  }
+  SMM_VARIABLE_COMMUNICATE_HEADER  *MmVariableFunctionHeader;
+  UINT8                            *MmCommunicateBuffer;
+  UINTN                            RequiredPages;
 
   MmCommunicationPpiV3 = NULL;
   MmCommunicationPpi   = NULL;
+
+  // Should not both stubs be NULL
+  if ((MmCommunicationPpiStub == NULL) && (MmCommunicationPpiV3Stub == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (DataBuffer == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (MmCommunicationPpiStub != NULL) {
+    *MmCommunicationPpiStub = NULL;
+  }
+
+  if (MmCommunicationPpiV3Stub != NULL) {
+    *MmCommunicationPpiV3Stub = NULL;
+  }
 
   Status = PeiServicesLocatePpi (&gEfiPeiMmCommunication3PpiGuid, 0, NULL, (VOID **)&MmCommunicationPpiV3);
   if (EFI_ERROR (Status)) {
@@ -98,77 +113,125 @@ PopulateHeaderAndCommunicate (
     Status = PeiServicesLocatePpi (&gEfiPeiMmCommunicationPpiGuid, 0, NULL, (VOID **)&MmCommunicationPpi);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "%a: Failed to locate PEI MM Communication PPI: %r\n", __func__, Status));
-      goto Exit;
+      return Status;
     }
   }
 
   if (MmCommunicationPpiV3 != NULL) {
-    // Zero the entire Communication Buffer Header
-    MmCommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommunicateBuffer;
-
-    ZeroMem (MmCommunicateHeaderV3, SMM_COMMUNICATE_HEADER_SIZE_V3);
-
-    // Use gEfiSmmVariableProtocolGuid to request the MM variable service in Standalone MM
-    CopyMem ((VOID *)&MmCommunicateHeaderV3->HeaderGuid, &gEfiMmCommunicateHeaderV3Guid, sizeof (GUID));
-    MmCommunicateHeaderV3->BufferSize = CommunicateBufferSize;
-
-    CopyMem ((VOID *)&MmCommunicateHeaderV3->MessageGuid, &gEfiSmmVariableProtocolGuid, sizeof (GUID));
-
-    // Program the MM header size
-    MmCommunicateHeaderV3->MessageSize = CommunicateBufferSize - SMM_COMMUNICATE_HEADER_SIZE_V3;
-
-    MmVarCommsHeader = (SMM_VARIABLE_COMMUNICATE_HEADER *)(MmCommunicateHeaderV3->MessageData);
-
-    // We are only supporting GetVariable and GetNextVariableName
-    MmVarCommsHeader->Function = Function;
-
-    // Send the MM request using MmCommunicationPei
-    Status = MmCommunicationPpiV3->Communicate (MmCommunicationPpiV3, CommunicateBuffer);
-  } else if (MmCommunicationPpi != NULL) {
-    // Zero the entire Communication Buffer Header
-    MmCommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)CommunicateBuffer;
-
-    ZeroMem (MmCommunicateHeader, SMM_COMMUNICATE_HEADER_SIZE);
-
-    // Use gEfiSmmVariableProtocolGuid to request the MM variable service in Standalone MM
-    CopyMem ((VOID *)&MmCommunicateHeader->HeaderGuid, &gEfiSmmVariableProtocolGuid, sizeof (GUID));
-
-    // Program the MM header size
-    MmCommunicateHeader->MessageLength = CommunicateBufferSize - SMM_COMMUNICATE_HEADER_SIZE;
-
-    MmVarCommsHeader = (SMM_VARIABLE_COMMUNICATE_HEADER *)(CommunicateBuffer + SMM_COMMUNICATE_HEADER_SIZE);
-
-    // We are only supporting GetVariable and GetNextVariableName
-    MmVarCommsHeader->Function = Function;
-
-    // Send the MM request using MmCommunicationPei
-    Status = MmCommunicationPpi->Communicate (MmCommunicationPpi, CommunicateBuffer, &CommunicateBufferSize);
-  } else {
-    // We should never reach here, but just in case
-    Status = EFI_UNSUPPORTED;
-    DEBUG ((DEBUG_ERROR, "%a: No MM Communication PPI found!\n", __func__));
-  }
-
-  if (EFI_ERROR (Status)) {
-    // Received an error from MM interface.
-    DEBUG ((DEBUG_ERROR, "%a - MM Interface Error: %r\n", __func__, Status));
-    goto Exit;
-  }
-
-  // MM request was successfully handled by the framework.
-  // Set status to the Variable Service Status Code
-  Status = MmVarCommsHeader->ReturnStatus;
-  if (EFI_ERROR (Status)) {
-    // We received an error from Variable Service.
-    // We cant do anymore so return Status
-    if (Status != EFI_BUFFER_TOO_SMALL) {
-      DEBUG ((DEBUG_ERROR, "%a - Variable Service Error: %r\n", __func__, Status));
+    RequiredPages       = EFI_SIZE_TO_PAGES (DataSize + SMM_COMMUNICATE_HEADER_SIZE_V3 + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE);
+    MmCommunicateBuffer = (UINT8 *)AllocatePages (RequiredPages);
+    if (MmCommunicateBuffer == NULL) {
+      DEBUG ((DEBUG_ERROR, "%a: Failed to allocate memory: %r\n", __func__, Status));
+      return EFI_OUT_OF_RESOURCES;
     }
 
-    goto Exit;
+    ZeroMem (MmCommunicateBuffer, RequiredPages * EFI_PAGE_SIZE);
+    MmCommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)MmCommunicateBuffer;
+    CopyGuid (&MmCommunicateHeaderV3->HeaderGuid, &gEfiMmCommunicateHeaderV3Guid);
+    MmCommunicateHeaderV3->BufferSize = RequiredPages * EFI_PAGE_SIZE;
+    CopyGuid (&MmCommunicateHeaderV3->MessageGuid, &gEfiSmmVariableProtocolGuid);
+    MmCommunicateHeaderV3->MessageSize = DataSize + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE;
+    MmVariableFunctionHeader           = (SMM_VARIABLE_COMMUNICATE_HEADER *)MmCommunicateHeaderV3->MessageData;
+    if (MmCommunicationPpiV3Stub != NULL) {
+      *MmCommunicationPpiV3Stub = MmCommunicationPpiV3;
+    } else {
+      DEBUG ((DEBUG_ERROR, "%a: System supports MM Communication v3 PPI, but caller does not want it...\n", __func__));
+      ASSERT (FALSE);
+      FreePages (MmCommunicateBuffer, RequiredPages);
+      return EFI_UNSUPPORTED;
+    }
+  } else {
+    // Use v1 communication header, if v3 protocol is not available.
+    RequiredPages       = EFI_SIZE_TO_PAGES (DataSize + SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE);
+    MmCommunicateBuffer = (UINT8 *)AllocatePages (RequiredPages);
+    if (MmCommunicateBuffer == NULL) {
+      DEBUG ((DEBUG_ERROR, "%a: Failed to allocate memory: %r\n", __func__, Status));
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    ZeroMem (MmCommunicateBuffer, RequiredPages * EFI_PAGE_SIZE);
+    MmCommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)MmCommunicateBuffer;
+    CopyGuid (&MmCommunicateHeader->HeaderGuid, &gEfiSmmVariableProtocolGuid);
+    MmCommunicateHeader->MessageLength = DataSize + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE;
+    MmVariableFunctionHeader           = (SMM_VARIABLE_COMMUNICATE_HEADER *)MmCommunicateHeader->Data;
+    if (MmCommunicationPpiStub != NULL) {
+      *MmCommunicationPpiStub = MmCommunicationPpi;
+    } else {
+      DEBUG ((DEBUG_ERROR, "%a: System supports only MM Communication v1 PPI, but caller does not want it...\n", __func__));
+      ASSERT (FALSE);
+      FreePages (MmCommunicateBuffer, RequiredPages);
+      return EFI_UNSUPPORTED;
+    }
   }
 
-Exit:
+  *DataBuffer     = MmCommunicateBuffer;
+  *BufferPageSize = RequiredPages;
+
+  MmVariableFunctionHeader->Function = Function;
+  if (DataPtr != NULL) {
+    *DataPtr = MmVariableFunctionHeader->Data;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  This function will use the provided PEI MM Communication PPI v3 or v1 to send
+  the communicate buffer to MM.
+
+  @param[in]   MmCommunicationPpi     The PEI MM Communication PPI stub.
+  @param[in]   MmCommunicationPpiV3   The PEI MM Communication3 PPI stub.
+  @param[in]   DataBuffer             The communicate buffer to send to MM.
+  @param[in]   DataSize               This size of the function header and the data.
+
+  @retval      EFI_SUCCESS            Success is returned from the function in MM.
+  @retval      Others                 Failure is returned from the function in MM.
+
+**/
+EFI_STATUS
+SendCommunicateBuffer (
+  IN EFI_PEI_MM_COMMUNICATION_PPI   *MmCommunicationPpi,
+  IN EFI_PEI_MM_COMMUNICATION3_PPI  *MmCommunicationPpiV3,
+  IN VOID                           *DataBuffer,
+  IN      UINTN                     DataSize
+  )
+{
+  EFI_STATUS                       Status;
+  UINTN                            CommSize;
+  EFI_MM_COMMUNICATE_HEADER        *MmCommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER_V3     *MmCommunicateHeaderV3;
+  SMM_VARIABLE_COMMUNICATE_HEADER  *MmVariableFunctionHeader;
+
+  if ((MmCommunicationPpi == NULL) && (MmCommunicationPpiV3 == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (MmCommunicationPpiV3 != NULL) {
+    Status = MmCommunicationPpiV3->Communicate (
+                                     MmCommunicationPpiV3,
+                                     DataBuffer
+                                     );
+    ASSERT_EFI_ERROR (Status);
+
+    MmCommunicateHeaderV3    = (EFI_MM_COMMUNICATE_HEADER_V3 *)DataBuffer;
+    MmVariableFunctionHeader = (SMM_VARIABLE_COMMUNICATE_HEADER *)MmCommunicateHeaderV3->MessageData;
+
+    Status = MmVariableFunctionHeader->ReturnStatus;
+  } else {
+    CommSize = DataSize + SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE;
+    Status   = MmCommunicationPpi->Communicate (
+                                     MmCommunicationPpi,
+                                     DataBuffer,
+                                     &CommSize
+                                     );
+    ASSERT_EFI_ERROR (Status);
+
+    MmCommunicateHeader      = (EFI_MM_COMMUNICATE_HEADER *)DataBuffer;
+    MmVariableFunctionHeader = (SMM_VARIABLE_COMMUNICATE_HEADER *)MmCommunicateHeader->Data;
+
+    Status = MmVariableFunctionHeader->ReturnStatus;
+  }
+
   return Status;
 }
 
@@ -212,9 +275,11 @@ PeiMmGetVariable (
 {
   EFI_STATUS                                Status;
   UINTN                                     MessageSize;
+  UINTN                                     RequiredPages;
   SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE  *MmVarAccessHeader;
   UINT8                                     *MmCommunicateBuffer;
-  UINTN                                     RequiredPages;
+  EFI_PEI_MM_COMMUNICATION_PPI              *MmCommunicationPpi;
+  EFI_PEI_MM_COMMUNICATION3_PPI             *MmCommunicationPpiV3;
 
   // Check input parameters
   if ((VariableName == NULL) || (VariableGuid == NULL) || (DataSize == NULL)) {
@@ -230,26 +295,22 @@ PeiMmGetVariable (
   }
 
   // Allocate required pages to send MM request
-  MessageSize = MM_VARIABLE_COMM_BUFFER_OFFSET +
-                OFFSET_OF (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE, Name) +
+  MessageSize = OFFSET_OF (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE, Name) +
                 StrSize (VariableName) + *DataSize;
 
-  RequiredPages       = EFI_SIZE_TO_PAGES (MessageSize);
-  MmCommunicateBuffer = (UINT8 *)AllocatePages (RequiredPages);
-
-  if (MmCommunicateBuffer == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    DEBUG ((DEBUG_ERROR, "%a: Failed to allocate memory: %r\n", __func__, Status));
-    return Status;
+  Status = InitCommunicateBuffer (
+             (VOID **)&MmVarAccessHeader,
+             MessageSize,
+             SMM_VARIABLE_FUNCTION_GET_VARIABLE,
+             (VOID **)&MmCommunicateBuffer,
+             &RequiredPages,
+             &MmCommunicationPpi,
+             &MmCommunicationPpiV3
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: InitCommunicateBuffer failed: %r\n", __func__, Status));
+    goto Exit;
   }
-
-  // Zero the entire Communication Buffer
-  ZeroMem (MmCommunicateBuffer, (RequiredPages * EFI_PAGE_SIZE));
-
-  //
-  // Program all payload structure contents
-  //
-  MmVarAccessHeader = (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE *)(MmCommunicateBuffer + MM_VARIABLE_COMM_BUFFER_OFFSET);
 
   // Variable GUID
   CopyMem ((VOID *)&MmVarAccessHeader->Guid, VariableGuid, sizeof (GUID));
@@ -263,11 +324,11 @@ PeiMmGetVariable (
   // Populate incoming variable name
   CopyMem ((VOID *)&MmVarAccessHeader->Name, VariableName, MmVarAccessHeader->NameSize);
 
-  Status = PopulateHeaderAndCommunicate (MmCommunicateBuffer, MessageSize, SMM_VARIABLE_FUNCTION_GET_VARIABLE);
+  Status = SendCommunicateBuffer (MmCommunicationPpi, MmCommunicationPpiV3, MmCommunicateBuffer, MessageSize);
   if (EFI_ERROR (Status)) {
     // We received an error from either communicate or Variable Service.
     if (Status != EFI_BUFFER_TOO_SMALL) {
-      DEBUG ((DEBUG_ERROR, "%a - Communite to MM for variable service errored: %r\n", __func__, Status));
+      DEBUG ((DEBUG_ERROR, "%a - Communicate to MM for getting variable errored: %r\n", __func__, Status));
     }
 
     goto Exit;
@@ -340,9 +401,11 @@ PeiMmGetNextVariableName (
 {
   EFI_STATUS                                       Status;
   UINTN                                            MessageSize;
+  UINTN                                            RequiredPages;
   UINT8                                            *MmCommunicateBuffer;
   SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME  *MmVarGetNextVarHeader;
-  UINTN                                            RequiredPages;
+  EFI_PEI_MM_COMMUNICATION_PPI                     *MmCommunicationPpi;
+  EFI_PEI_MM_COMMUNICATION3_PPI                    *MmCommunicationPpiV3;
 
   // Check input parameters
   if ((VariableName == NULL) ||
@@ -354,26 +417,23 @@ PeiMmGetNextVariableName (
   }
 
   // Allocate required pages to send MM request
-  MessageSize = MM_VARIABLE_COMM_BUFFER_OFFSET +
-                OFFSET_OF (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE, Name) +
+  MessageSize = OFFSET_OF (SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE, Name) +
                 StrSize (VariableName) + *VariableNameSize;
 
-  RequiredPages       = EFI_SIZE_TO_PAGES (MessageSize);
-  MmCommunicateBuffer = (UINT8 *)AllocatePages (RequiredPages);
-
-  if (MmCommunicateBuffer == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    DEBUG ((DEBUG_ERROR, "%a: Failed to allocate memory: %r\n", __func__, Status));
-    return Status;
+  Status = InitCommunicateBuffer (
+             (VOID **)&MmVarGetNextVarHeader,
+             MessageSize,
+             SMM_VARIABLE_FUNCTION_GET_NEXT_VARIABLE_NAME,
+             (VOID **)&MmCommunicateBuffer,
+             &RequiredPages,
+             &MmCommunicationPpi,
+             &MmCommunicationPpiV3
+             );
+  if (EFI_ERROR (Status)) {
+    goto Exit;
   }
 
-  // Zero the entire Communication Buffer
-  ZeroMem (MmCommunicateBuffer, (RequiredPages * EFI_PAGE_SIZE));
-
-  //
-  // Program all payload structure contents
-  //
-  MmVarGetNextVarHeader = (SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME *)(MmCommunicateBuffer + MM_VARIABLE_COMM_BUFFER_OFFSET);
+  ASSERT (MmVarGetNextVarHeader != NULL);
 
   // Variable GUID
   CopyMem ((VOID *)&MmVarGetNextVarHeader->Guid, VariableGuid, sizeof (GUID));
@@ -385,11 +445,11 @@ PeiMmGetNextVariableName (
   CopyMem ((VOID *)&MmVarGetNextVarHeader->Name, VariableName, MmVarGetNextVarHeader->NameSize);
 
   // Send the MM request using MmCommunicationPei
-  Status = PopulateHeaderAndCommunicate (MmCommunicateBuffer, MessageSize, SMM_VARIABLE_FUNCTION_GET_NEXT_VARIABLE_NAME);
+  Status = SendCommunicateBuffer (MmCommunicationPpi, MmCommunicationPpiV3, MmCommunicateBuffer, MessageSize);
   if (EFI_ERROR (Status)) {
     // We received an error from either communicate or Variable Service.
     if (Status != EFI_BUFFER_TOO_SMALL) {
-      DEBUG ((DEBUG_ERROR, "%a - Communite to MM for variable service errored: %r\n", __func__, Status));
+      DEBUG ((DEBUG_ERROR, "%a - Communicate to MM for next variable name errored: %r\n", __func__, Status));
     }
 
     goto Exit;
