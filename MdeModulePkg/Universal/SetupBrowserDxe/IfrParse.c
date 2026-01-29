@@ -1691,7 +1691,7 @@ ParseOpCodes (
           //
           // This is DisableIf expression for Form, it should be a constant expression
           //
-          if (CurrentForm != NULL) {
+          if (CurrentExpression != NULL) {
             Status = EvaluateExpression (FormSet, CurrentForm, CurrentExpression);
             if (EFI_ERROR (Status)) {
               return Status;
