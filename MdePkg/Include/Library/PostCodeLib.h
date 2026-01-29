@@ -74,9 +74,9 @@ PostCodeWithDescription (
   bit of PcdPostCodePropertyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE   The POST_CODE_PROPERTY_POST_CODE_ENABLED bit of
-                  PcdPostCodeProperyMask is set.
+                  PcdPostCodePropertyMask is set.
   @retval  FALSE  The POST_CODE_PROPERTY_POST_CODE_ENABLED bit of
-                  PcdPostCodeProperyMask is clear.
+                  PcdPostCodePropertyMask is clear.
 
 **/
 BOOLEAN
@@ -92,9 +92,9 @@ PostCodeEnabled (
   bit of PcdPostCodePropertyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE   The POST_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED bit of
-                  PcdPostCodeProperyMask is set.
+                  PcdPostCodePropertyMask is set.
   @retval  FALSE  The POST_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED bit of
-                  PcdPostCodeProperyMask is clear.
+                  PcdPostCodePropertyMask is clear.
 
 **/
 BOOLEAN
@@ -106,7 +106,7 @@ PostCodeDescriptionEnabled (
 /**
   Sends a 32-bit value to a POST card.
 
-  If POST codes are enabled in PcdPostCodeProperyMask, then call PostCode()
+  If POST codes are enabled in PcdPostCodePropertyMask, then call PostCode()
   passing in Value.  Value is returned.
 
   @param  Value  The 32-bit value to write to the POST card.
@@ -120,7 +120,7 @@ PostCodeDescriptionEnabled (
   Sends a 32-bit value to a POST and associated ASCII string.
 
   If POST codes and POST code descriptions are enabled in
-  PcdPostCodeProperyMask, then call PostCodeWithDescription() passing in
+  PcdPostCodePropertyMask, then call PostCodeWithDescription() passing in
   Value and Description.  If only POST codes are enabled, then call PostCode()
   passing in Value.  Value is returned.
 

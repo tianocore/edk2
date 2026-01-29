@@ -298,12 +298,12 @@ ReportStatusCodeEx (
   Returns TRUE if status codes of type EFI_PROGRESS_CODE are enabled
 
   This function returns TRUE if the REPORT_STATUS_CODE_PROPERTY_PROGRESS_CODE_ENABLED
-  bit of PcdReportStatusCodeProperyMask is set.  Otherwise FALSE is returned.
+  bit of PcdReportStatusCodePropertyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE   The REPORT_STATUS_CODE_PROPERTY_PROGRESS_CODE_ENABLED bit of
-                  PcdReportStatusCodeProperyMask is set.
+                  PcdReportStatusCodePropertyMask is set.
   @retval  FALSE  The REPORT_STATUS_CODE_PROPERTY_PROGRESS_CODE_ENABLED bit of
-                  PcdReportStatusCodeProperyMask is clear.
+                  PcdReportStatusCodePropertyMask is clear.
 
 **/
 BOOLEAN
@@ -316,12 +316,12 @@ ReportProgressCodeEnabled (
   Returns TRUE if status codes of type EFI_ERROR_CODE are enabled
 
   This function returns TRUE if the REPORT_STATUS_CODE_PROPERTY_ERROR_CODE_ENABLED
-  bit of PcdReportStatusCodeProperyMask is set.  Otherwise, FALSE is returned.
+  bit of PcdReportStatusCodePropertyMask is set.  Otherwise, FALSE is returned.
 
   @retval  TRUE   The REPORT_STATUS_CODE_PROPERTY_ERROR_CODE_ENABLED bit of
-                  PcdReportStatusCodeProperyMask is set.
+                  PcdReportStatusCodePropertyMask is set.
   @retval  FALSE  The REPORT_STATUS_CODE_PROPERTY_ERROR_CODE_ENABLED bit of
-                  PcdReportStatusCodeProperyMask is clear.
+                  PcdReportStatusCodePropertyMask is clear.
 
 **/
 BOOLEAN
@@ -334,12 +334,12 @@ ReportErrorCodeEnabled (
   Returns TRUE if status codes of type EFI_DEBUG_CODE are enabled
 
   This function returns TRUE if the REPORT_STATUS_CODE_PROPERTY_DEBUG_CODE_ENABLED
-  bit of PcdReportStatusCodeProperyMask is set.  Otherwise FALSE is returned.
+  bit of PcdReportStatusCodePropertyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE   The REPORT_STATUS_CODE_PROPERTY_DEBUG_CODE_ENABLED bit of
-                  PcdReportStatusCodeProperyMask is set.
+                  PcdReportStatusCodePropertyMask is set.
   @retval  FALSE  The REPORT_STATUS_CODE_PROPERTY_DEBUG_CODE_ENABLED bit of
-                  PcdReportStatusCodeProperyMask is clear.
+                  PcdReportStatusCodePropertyMask is clear.
 
 **/
 BOOLEAN
@@ -352,7 +352,7 @@ ReportDebugCodeEnabled (
   Reports a status code with minimal parameters if the status code type is enabled.
 
   If the status code type specified by Type is enabled in
-  PcdReportStatusCodeProperyMask, then call ReportStatusCode() passing in Type
+  PcdReportStatusCodePropertyMask, then call ReportStatusCode() passing in Type
   and Value.
 
   @param  Type   The status code type.
@@ -377,7 +377,7 @@ ReportDebugCodeEnabled (
   status code type is enabled.
 
   If the status code type specified by Type is enabled in
-  PcdReportStatusCodeProperyMask, then call ReportStatusCodeWithDevicePath()
+  PcdReportStatusCodePropertyMask, then call ReportStatusCodeWithDevicePath()
   passing in Type, Value, and DevicePath.
 
   @param  Type        The status code type.
@@ -407,7 +407,7 @@ ReportDebugCodeEnabled (
   is enabled.
 
   If the status code type specified by Type is enabled in
-  PcdReportStatusCodeProperyMask, then call ReportStatusCodeWithExtendedData()
+  PcdReportStatusCodePropertyMask, then call ReportStatusCodeWithExtendedData()
   passing in Type, Value, ExtendedData, and ExtendedDataSize.
 
   @param  Type              The status code type.
@@ -438,7 +438,7 @@ ReportDebugCodeEnabled (
   Reports a status code specifying all parameters if the status code type is enabled.
 
   If the status code type specified by Type is enabled in
-  PcdReportStatusCodeProperyMask, then call ReportStatusCodeEx() passing in Type,
+  PcdReportStatusCodePropertyMask, then call ReportStatusCodeEx() passing in Type,
   Value, Instance, CallerId, ExtendedDataGuid, ExtendedData, and ExtendedDataSize.
 
   @param  Type              The status code type.

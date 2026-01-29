@@ -2,7 +2,7 @@
   The implementation of EDKII Redfish Platform Config Protocol.
 
   (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP<BR>
-  Copyright (c) 2022-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2022-2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
   Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -2570,7 +2570,9 @@ HiiDatabaseProtocolInstalled (
   IN  VOID       *Context
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS      Status;
+  UINTN           Index;
+  EFI_HII_HANDLE  *HiiHandles;
 
   //
   // Locate HII database protocol.
@@ -2583,6 +2585,21 @@ HiiDatabaseProtocolInstalled (
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "%a: locate EFI_HII_DATABASE_PROTOCOL failure: %r\n", __func__, Status));
     return;
+  }
+
+  //
+  // Add Hii handles that installed before this driver.
+  //
+  HiiHandles = HiiGetHiiHandles (NULL);
+  if (HiiHandles != NULL) {
+    for (Index = 0; HiiHandles[Index] != NULL; Index++) {
+      Status = NotifyFormsetUpdate (HiiHandles[Index], &mRedfishPlatformConfigPrivate->PendingList);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_WARN, "%a: failed to add formset of HII handle: 0x%x\n", __func__, HiiHandles[Index]));
+      }
+    }
+
+    FreePool (HiiHandles);
   }
 
   //
