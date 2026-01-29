@@ -333,12 +333,12 @@
     <OutputFile>
         $(DEBUG_DIR)(+)$(MODULE_NAME).dll
 
-    <Command.MSFT>
+    <Command.MSFT, Command.CLANGPDB>
         "$(DLINK)" /OUT:${dst}.wtemp $(DLINK_FLAGS) $(DLINK2_FLAGS) $(DLINK_XIPFLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
         $(RM) ${dst}.wtemp
         "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK_XIPFLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
 
-    <Command.GCC>
+    <Command.GCC, Command.CLANGDWARF>
         "$(DLINK)" -o ${dst} $(DLINK_FLAGS) $(DLINK_XIPFLAGS) -Wl,--start-group,@$(STATIC_LIBRARY_FILES_LIST),--end-group $(CC_FLAGS) $(CC_XIPFLAGS) $(DLINK2_FLAGS)
         "$(OBJCOPY)" $(OBJCOPY_FLAGS) ${dst}
 
