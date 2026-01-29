@@ -1,0 +1,43 @@
+## @file
+# DBG2 Table Generator
+#
+#  Copyright (c) 2017 - 2020, Arm Limited. All rights reserved.<BR>
+#  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010019
+  BASE_NAME      = AcpiDbg2Lib
+  FILE_GUID      = A9C39504-531B-49E1-B639-25A86B85DAA1
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|HOST_APPLICATION
+  CONSTRUCTOR    = AcpiDbg2LibConstructor
+  DESTRUCTOR     = AcpiDbg2LibDestructor
+
+[Sources]
+  Dbg2Generator.c
+  Dbg2Generator.h
+  Dbg2GeneratorNull.c
+
+[Packages.ARM, Packages.AARCH64]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PrintLib
+  SsdtSerialPortFixupLib
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits

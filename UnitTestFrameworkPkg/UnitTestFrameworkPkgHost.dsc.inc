@@ -29,8 +29,6 @@
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLibNull/BaseCacheMaintenanceLibNull.inf
   CmockaLib|UnitTestFrameworkPkg/Library/CmockaLib/CmockaLib.inf
   GoogleTestLib|UnitTestFrameworkPkg/Library/GoogleTestLib/GoogleTestLib.inf
-  SubhookLib|UnitTestFrameworkPkg/Library/SubhookLib/SubhookLib.inf
-  FunctionMockLib|UnitTestFrameworkPkg/Library/FunctionMockLib/FunctionMockLib.inf
   UnitTestLib|UnitTestFrameworkPkg/Library/UnitTestLib/UnitTestLibCmocka.inf
   DebugLib|UnitTestFrameworkPkg/Library/Posix/DebugLibPosix/DebugLibPosix.inf
   MemoryAllocationLib|UnitTestFrameworkPkg/Library/Posix/MemoryAllocationLibPosix/MemoryAllocationLibPosix.inf
@@ -46,19 +44,19 @@
 # Operating System and Compiler Compatibility Matrix for Host-based unit tests
 # NOTE: Only NOOPT build target is supported for unit test builds
 #
-# +--------------------+--------+----------+------------+-----+----+--------+
-# | OS/Compiler        | VS2019 | CLANGPDB | CLANGDWARF |   GCC    | XCODE5 |
-# |                    | VS2022 |          |            |   GCC5   |        |
-# |                    | VS2026 |          |            | GCCNOLTO |        |
-# +--------------------+--------+----------+------------+----------+--------+
-# | Windows/VS         |IA32/X64|          |            |          |        |
-# | Windows/LLVM/VS    |        | IA32/X64 |            |          |        |
-# | Windows/LLVM/MSYS2 |        |          |    X64     |          |        |
-# | Windows/LLVM/MINGW |        |          |  IA32/X64  |          |        |
-# | Linux/LLVM         |        |          |  IA32/X64  |          |        |
-# | Linux/GCC          |        |          |            | IA32/X64 |        |
-# | macOS/XCODE5       |        |          |            |          |IA32/X64|
-# +--------------------+--------+----------+------------+----------+--------+
+# +--------------------+--------+----------+------------+------------------+--------+
+# | OS/Compiler        | VS2019 | CLANGPDB | CLANGDWARF |       GCC        | XCODE5 |
+# |                    | VS2022 |          |            |       GCC5       |        |
+# |                    | VS2026 |          |            |     GCCNOLTO     |        |
+# +--------------------+--------+----------+------------+------------------+--------+
+# | Windows/VS         |IA32/X64|          |            |                  |        |
+# | Windows/LLVM/VS    |        | IA32/X64 |            |                  |        |
+# | Windows/LLVM/MSYS2 |        |          |    X64     |                  |        |
+# | Windows/LLVM/MINGW |        |          |  IA32/X64  |                  |        |
+# | Linux/LLVM         |        |          |  IA32/X64  |                  |        |
+# | Linux/GCC          |        |          |            | IA32/X64/AARCH64 |        |
+# | macOS/XCODE5       |        |          |            |                  |IA32/X64|
+# +--------------------+--------+----------+------------+------------------+--------+
 #
 # * Windows/VS: Windows environment with Visual Studio installed
 # * Windows/LLVM/VS: Windows environment with Visual Studio and LLVM 20.1.8 or
@@ -116,6 +114,10 @@
     !endif
   !endif
 !endif
+
+[LibraryClasses.IA32.HOST_APPLICATION, LibraryClasses.X64.HOST_APPLICATION]
+  SubhookLib|UnitTestFrameworkPkg/Library/SubhookLib/SubhookLib.inf
+  FunctionMockLib|UnitTestFrameworkPkg/Library/FunctionMockLib/FunctionMockLib.inf
 
 [BuildOptions]
 !if $(WIN_MINGW32_BUILD)

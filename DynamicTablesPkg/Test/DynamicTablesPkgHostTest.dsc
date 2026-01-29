@@ -15,7 +15,7 @@
   PLATFORM_VERSION        = 0.1
   DSC_SPECIFICATION       = 0x00010005
   OUTPUT_DIRECTORY        = Build/DynamicTablesPkg/HostTest
-  SUPPORTED_ARCHITECTURES = X64
+  SUPPORTED_ARCHITECTURES = X64|AARCH64
   BUILD_TARGETS           = NOOPT
   SKUID_IDENTIFIER        = DEFAULT
 
@@ -31,7 +31,7 @@
 [Components]
   DynamicTablesPkg/Library/Acpi/Common/AcpiDbg2Lib/GoogleTest/Dbg2GeneratorGoogleTest.inf {
     <LibraryClasses>
-      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiDbg2Lib/AcpiDbg2Lib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiDbg2Lib/AcpiDbg2LibHostTest.inf
   }
   DynamicTablesPkg/Library/Acpi/Common/AcpiCedtLib/GoogleTest/CedtGeneratorGoogleTest.inf {
     <LibraryClasses>
