@@ -44,6 +44,7 @@
     },
     "DependencyCheck": {
         "AcceptableDependencies": [
+            "ArmPkg/ArmPkg.dec",
             "MdePkg/MdePkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
             "UefiCpuPkg/UefiCpuPkg.dec"
