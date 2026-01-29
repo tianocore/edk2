@@ -414,14 +414,20 @@ BootBootOptions (
     EfiBootManagerBoot (&BootOptions[Index]);
 
     //
-    // If the boot via Boot#### returns with a status of EFI_SUCCESS, platform firmware
-    // supports boot manager menu, and if firmware is configured to boot in an
-    // interactive mode, the boot manager will stop processing the BootOrder variable and
-    // present a boot manager menu to the user.
+    // If infinite retries is enabled, do not break out of the loop.
+    // This allows all boot options to be attempted on each iteration.
     //
-    if ((BootManagerMenu != NULL) && (BootOptions[Index].Status == EFI_SUCCESS)) {
-      EfiBootManagerBoot (BootManagerMenu);
-      break;
+    if (!PcdGetBool (PcdSupportInfiniteBootRetries)) {
+      //
+      // If the boot via Boot#### returns with a status of EFI_SUCCESS, platform firmware
+      // supports boot manager menu, and if firmware is configured to boot in an
+      // interactive mode, the boot manager will stop processing the BootOrder variable and
+      // present a boot manager menu to the user.
+      //
+      if ((BootManagerMenu != NULL) && (BootOptions[Index].Status == EFI_SUCCESS)) {
+        EfiBootManagerBoot (BootManagerMenu);
+        break;
+      }
     }
   }
 
@@ -1103,7 +1109,8 @@ BdsEntry (
 
     do {
       //
-      // Retry to boot if any of the boot succeeds
+      // Retry to boot if any of the boot succeeds.
+      // If infinite retries is enabled, always retry. This allows a continuous loop over all boot options.
       //
       BootSuccess = FALSE;
       LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionTypeBoot);
@@ -1111,7 +1118,7 @@ BdsEntry (
         BootSuccess = BootBootOptions (LoadOptions, LoadOptionCount, (BootManagerMenuStatus != EFI_NOT_FOUND) ? &BootManagerMenu : NULL);
         EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
       }
-    } while (BootSuccess);
+    } while (BootSuccess || PcdGetBool (PcdSupportInfiniteBootRetries));
   }
 
   if (BootManagerMenuStatus != EFI_NOT_FOUND) {
