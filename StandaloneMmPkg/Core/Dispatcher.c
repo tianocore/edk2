@@ -37,6 +37,7 @@
 **/
 
 #include "StandaloneMmCore.h"
+#include <Library/FvLib.h>
 
 //
 // MM Dispatcher Data structures
@@ -763,6 +764,67 @@ MmAddToDriverList (
   gRequestDispatch = TRUE;
 
   return EFI_SUCCESS;
+}
+
+/**
+  Schedule a driver for immediate dispatch.
+
+**/
+VOID
+MmOrderDriversWithApriori (
+  IN EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader
+  )
+{
+  EFI_FFS_FILE_HEADER  *FileHeader;
+  EFI_GUID             *AprioriFile;
+  UINTN                SizeOfBuffer;
+  EFI_STATUS           Status;
+  UINTN                AprioriEntryCount;
+  UINTN                AprioriIndex;
+  LIST_ENTRY           *Link;
+  EFI_MM_DRIVER_ENTRY  *DriverEntry;
+
+  FileHeader  = NULL;
+  AprioriFile = NULL;
+
+  //
+  // Read the array of GUIDs from the Apriori file if it is present in the firmware volume
+  //
+  while (!EFI_ERROR (FfsFindNextFile (EFI_FV_FILETYPE_FREEFORM, FwVolHeader, &FileHeader))) {
+    if (!CompareGuid (&gAprioriGuid, &FileHeader->Name)) {
+      continue;
+    }
+
+    Status = FfsFindSectionData (EFI_SECTION_RAW, FileHeader, (VOID **)&AprioriFile, &SizeOfBuffer);
+    ASSERT_EFI_ERROR (Status);
+    break;
+  }
+
+  if (AprioriFile == NULL) {
+    return;
+  }
+
+  //
+  // Put drivers on Apriori List on the Scheduled queue. The Discovered List includes
+  // drivers not in the current FV and these must be skipped since the a priori list
+  // is only valid for the FV that it resided in.
+  //
+  AprioriEntryCount = SizeOfBuffer / sizeof (EFI_GUID);
+  for (AprioriIndex = 0; AprioriIndex < AprioriEntryCount; AprioriIndex++) {
+    for (Link = mDiscoveredList.ForwardLink; Link != &mDiscoveredList; Link = Link->ForwardLink) {
+      DriverEntry = CR (Link, EFI_MM_DRIVER_ENTRY, Link, EFI_MM_DRIVER_ENTRY_SIGNATURE);
+      if (CompareGuid (&DriverEntry->FileName, &AprioriFile[AprioriIndex]) &&
+          (FwVolHeader == DriverEntry->FwVolHeader))
+      {
+        DriverEntry->Dependent = FALSE;
+        DriverEntry->Scheduled = TRUE;
+        InsertTailList (&mScheduledQueue, &DriverEntry->ScheduledLink);
+        DEBUG ((DEBUG_DISPATCH, "Evaluate MM DEPEX for FFS(%g)\n", &DriverEntry->FileName));
+        DEBUG ((DEBUG_DISPATCH, "  RESULT = TRUE (Apriori)\n"));
+        break;
+      }
+    }
+  }
 }
 
 /**
