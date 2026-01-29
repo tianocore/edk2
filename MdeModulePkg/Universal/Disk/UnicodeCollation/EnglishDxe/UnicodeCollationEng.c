@@ -106,7 +106,7 @@ InitializeUnicodeCollationEng (
     mEngLowerMap[Index] = (CHAR8)Index;
     mEngInfoMap[Index]  = 0;
 
-    if (((Index >= 'a') && (Index <= 'z')) || ((Index >= 0xe0) && (Index <= 0xf6)) || ((Index >= 0xf8) && (Index <= 0xfe))) {
+    if (AsciiCharIsLowerAlpha ((CHAR8)Index) || ((Index >= 0xe0) && (Index <= 0xf6)) || ((Index >= 0xf8) && (Index <= 0xfe))) {
       Index2               = Index - 0x20;
       mEngUpperMap[Index]  = (CHAR8)Index2;
       mEngLowerMap[Index2] = (CHAR8)Index;

@@ -64,38 +64,6 @@ typedef struct {
 } INI_PARSING_LIB_CONTEXT;
 
 /**
-  Return if the digital char is valid.
-
-  @param[in] DigitalChar    The digital char to be checked.
-  @param[in] IncludeHex     If it include HEX char.
-
-  @retval TRUE   The digital char is valid.
-  @retval FALSE  The digital char is invalid.
-**/
-BOOLEAN
-IsValidDigitalChar (
-  IN CHAR8    DigitalChar,
-  IN BOOLEAN  IncludeHex
-  )
-{
-  if ((DigitalChar >= '0') && (DigitalChar <= '9')) {
-    return TRUE;
-  }
-
-  if (IncludeHex) {
-    if ((DigitalChar >= 'a') && (DigitalChar <= 'f')) {
-      return TRUE;
-    }
-
-    if ((DigitalChar >= 'A') && (DigitalChar <= 'F')) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
-}
-
-/**
   Return if the name char is valid.
 
   @param[in] NameChar    The name char to be checked.
@@ -144,15 +112,11 @@ IsValidDigital (
   IN BOOLEAN  IncludeHex
   )
 {
-  UINTN  Index;
-
-  for (Index = 0; Index < Length; Index++) {
-    if (!IsValidDigitalChar (Digital[Index], IncludeHex)) {
-      return FALSE;
-    }
+  if (IncludeHex) {
+    return AsciiStrnIsHexNum (Digital, Length);
   }
 
-  return TRUE;
+  return AsciiStrnIsNum (Digital, Length);
 }
 
 /**

@@ -685,29 +685,6 @@ EFI_GUID  *mUefiDefinedGuid[] = {
 };
 
 /**
-  Check if a Unicode character is an upper case hexadecimal character.
-
-  This function checks if a Unicode character is an upper case
-  hexadecimal character.  The valid upper case hexadecimal character is
-  L'0' to L'9', or L'A' to L'F'.
-
-
-  @param[in] Char       The character to check against.
-
-  @retval TRUE          If the Char is an upper case hexadecmial character.
-  @retval FALSE         If the Char is not an upper case hexadecmial character.
-
-**/
-BOOLEAN
-EFIAPI
-VarCheckUefiIsHexaDecimalDigitCharacter (
-  IN CHAR16  Char
-  )
-{
-  return (BOOLEAN)((Char >= L'0' && Char <= L'9') || (Char >= L'A' && Char <= L'F'));
-}
-
-/**
 
   This code checks if variable is hardware error record variable or not.
 
@@ -731,10 +708,10 @@ IsHwErrRecVariable (
   if (!CompareGuid (VendorGuid, &gEfiHardwareErrorVariableGuid) ||
       (StrLen (VariableName) != StrLen (L"HwErrRec####")) ||
       (StrnCmp (VariableName, L"HwErrRec", StrLen (L"HwErrRec")) != 0) ||
-      !VarCheckUefiIsHexaDecimalDigitCharacter (VariableName[0x8]) ||
-      !VarCheckUefiIsHexaDecimalDigitCharacter (VariableName[0x9]) ||
-      !VarCheckUefiIsHexaDecimalDigitCharacter (VariableName[0xA]) ||
-      !VarCheckUefiIsHexaDecimalDigitCharacter (VariableName[0xB]))
+      !CharIsUpperHexNum (VariableName[0x8]) ||
+      !CharIsUpperHexNum (VariableName[0x9]) ||
+      !CharIsUpperHexNum (VariableName[0xA]) ||
+      !CharIsUpperHexNum (VariableName[0xB]))
   {
     return FALSE;
   }
@@ -780,10 +757,10 @@ GetUefiDefinedVarCheckFunction (
     for (Index = 0; Index < sizeof (mGlobalVariableList2)/sizeof (mGlobalVariableList2[0]); Index++) {
       if ((StrLen (VariableName) == StrLen (mGlobalVariableList2[Index].Name)) &&
           (StrnCmp (VariableName, mGlobalVariableList2[Index].Name, NameLength) == 0) &&
-          VarCheckUefiIsHexaDecimalDigitCharacter (VariableName[NameLength]) &&
-          VarCheckUefiIsHexaDecimalDigitCharacter (VariableName[NameLength + 1]) &&
-          VarCheckUefiIsHexaDecimalDigitCharacter (VariableName[NameLength + 2]) &&
-          VarCheckUefiIsHexaDecimalDigitCharacter (VariableName[NameLength + 3]))
+          CharIsUpperHexNum (VariableName[NameLength]) &&
+          CharIsUpperHexNum (VariableName[NameLength + 1]) &&
+          CharIsUpperHexNum (VariableName[NameLength + 2]) &&
+          CharIsUpperHexNum (VariableName[NameLength + 3]))
       {
         *VariableProperty = &(mGlobalVariableList2[Index].VariableProperty);
         return mGlobalVariableList2[Index].CheckFunction;

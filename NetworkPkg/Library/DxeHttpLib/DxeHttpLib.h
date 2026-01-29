@@ -26,11 +26,6 @@ Header file for HttpLib.
 #define HTTP_VERSION_CRLF_STR  " HTTP/1.1\r\n"
 #define EMPTY_SPACE            " "
 
-#define NET_IS_HEX_CHAR(Ch)   \
-  ((('0' <= (Ch)) && ((Ch) <= '9')) ||  \
-   (('A' <= (Ch)) && ((Ch) <= 'F')) ||  \
-   (('a' <= (Ch)) && ((Ch) <= 'f')))
-
 //
 // Field index of the HTTP URL parse result.
 //
