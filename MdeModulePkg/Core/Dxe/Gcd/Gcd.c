@@ -2776,6 +2776,16 @@ CoreInitializeGcdServices (
             RShiftU64 (MemoryHob->AllocDescriptor.MemoryLength, EFI_PAGE_SHIFT),
             Descriptor.Capabilities & (~EFI_MEMORY_RUNTIME)
             );
+
+          // if this Memory Allocation HOB came from PEI, update the memory bin statistics
+          if (CompareGuid (&MemoryHob->AllocDescriptor.Name, &gEfiMemoryTypeInformationGuid)) {
+            UpdateMemoryStatistics (
+              EfiConventionalMemory,
+              MemoryHob->AllocDescriptor.MemoryType,
+              MemoryHob->AllocDescriptor.MemoryBaseAddress,
+              (UINTN)EFI_SIZE_TO_PAGES ((UINTN)MemoryHob->AllocDescriptor.MemoryLength)
+              );
+          }
         }
       }
     }
