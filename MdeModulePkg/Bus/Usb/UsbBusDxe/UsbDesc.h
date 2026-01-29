@@ -69,6 +69,7 @@ typedef struct {
 typedef struct {
   EFI_USB_DEVICE_DESCRIPTOR    Desc;
   USB_CONFIG_DESC              **Configs;
+  EFI_USB_BOS_DESCRIPTOR       *BosDesc;
 } USB_DEVICE_DESC;
 
 /**
