@@ -98,6 +98,15 @@ extern TEST_DESC  mBnTest[];
 extern UINTN      mEcTestNum;
 extern TEST_DESC  mEcTest[];
 
+extern UINTN      mEdTestNum;
+extern TEST_DESC  mEdTest[];
+
+extern UINTN      mMlTestNum;
+extern TEST_DESC  mMlTest[];
+
+extern UINTN      mSlhTestNum;
+extern TEST_DESC  mSlhTest[];
+
 extern UINTN      mX509TestNum;
 extern TEST_DESC  mX509Test[];
 

@@ -211,9 +211,6 @@ extern "C" {
 # ifndef OPENSSL_NO_MDC2
 #  define OPENSSL_NO_MDC2
 # endif
-# ifndef OPENSSL_NO_ML_DSA
-#  define OPENSSL_NO_ML_DSA
-# endif
 # ifndef OPENSSL_NO_ML_KEM
 #  define OPENSSL_NO_ML_KEM
 # endif
@@ -282,9 +279,6 @@ extern "C" {
 # endif
 # ifndef OPENSSL_NO_SIV
 #  define OPENSSL_NO_SIV
-# endif
-# ifndef OPENSSL_NO_SLH_DSA
-#  define OPENSSL_NO_SLH_DSA
 # endif
 # ifndef OPENSSL_NO_SM2
 #  define OPENSSL_NO_SM2
