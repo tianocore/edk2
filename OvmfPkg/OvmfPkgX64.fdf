@@ -135,14 +135,14 @@ INF  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
 !if $(CC_MEASUREMENT_ENABLE) == TRUE
   INF  OvmfPkg/Tcg/TdTcg2Pei/TdTcg2Pei.inf
 !endif
-INF  OvmfPkg/PlatformPei/PlatformPei.inf
-INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
-INF  UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
 !if $(SMM_REQUIRE) == TRUE
 INF  MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
 INF  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
 INF  OvmfPkg/SmmAccess/SmmAccessPei.inf
 !endif
+INF  OvmfPkg/PlatformPei/PlatformPei.inf
+INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+INF  UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
 INF  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 INF  FILE_GUID = $(UP_CPU_PEI_GUID) UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 
