@@ -8,8 +8,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #langdef en-US "English"
 
-#string STR_TPM_TITLE                      #language en-US "TCG Configuration"
-#string STR_TPM_HELP                       #language en-US "Press <Enter> to select TCG Setup options."
+#string STR_TPM_TITLE                      #language en-US "TPM 1.2 Configuration"
+#string STR_TPM_HELP                       #language en-US "Press <Enter> to select TPM Setup options."
 #string STR_TPM_STATE_PROMPT               #language en-US "Current TPM State"
 #string STR_TPM_STATE_HELP                 #language en-US "Current TPM device state: enabled or disabled; activated or deactivated."
 #string STR_TPM_STATE_CONTENT              #language en-US ""
