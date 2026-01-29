@@ -395,7 +395,8 @@ HOB_PRINT_HANDLER_TABLE  mHobHandles[] = {
   { EFI_HOB_TYPE_MEMORY_POOL,         "EFI_HOB_TYPE_MEMORY_POOL",         PrintMemoryPoolHob         },
   { EFI_HOB_TYPE_FV2,                 "EFI_HOB_TYPE_FV2",                 PrintFv2Hob                },
   { EFI_HOB_TYPE_UEFI_CAPSULE,        "EFI_HOB_TYPE_UEFI_CAPSULE",        PrintCapsuleHob            },
-  { EFI_HOB_TYPE_FV3,                 "EFI_HOB_TYPE_FV3",                 PrintFv3Hob                }
+  { EFI_HOB_TYPE_FV3,                 "EFI_HOB_TYPE_FV3",                 PrintFv3Hob                },
+  { EFI_HOB_TYPE_UNUSED,              "EFI_HOB_TYPE_UNUSED",              NULL                       }
 };
 
 /**
@@ -454,9 +455,11 @@ PrintHobList (
     //
     if ((PrintHandler == NULL) || EFI_ERROR (Status)) {
       if (Index < ARRAY_SIZE (mHobHandles)) {
-        mHobHandles[Index].PrintHandler (Hob.Raw, Hob.Header->HobLength);
+        if (mHobHandles[Index].PrintHandler != NULL) {
+          mHobHandles[Index].PrintHandler (Hob.Raw, Hob.Header->HobLength);
+        }
       } else {
-        DEBUG ((DEBUG_INFO, "   Unkown Hob type, full hex dump in below:\n"));
+        DEBUG ((DEBUG_INFO, "   Unknown Hob type, full hex dump in below:\n"));
         PrintHex (DEBUG_INFO, Hob.Raw, Hob.Header->HobLength);
       }
     }
