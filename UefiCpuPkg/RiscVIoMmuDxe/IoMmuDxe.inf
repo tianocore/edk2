@@ -6,7 +6,6 @@
 # using information provided in the FDT/ACPI RIMT.
 #
 # TODO: Globally, consider TPL levels (more than just in the protocol).
-# - Consider what to do upon ExitBootServices.
 #
 # Copyright (c) 2025, 9elements GmbH. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -55,14 +54,13 @@
   gEdkiiPlatformHasAcpiGuid                   ## CONSUMES
   gEdkiiPlatformHasDeviceTreeGuid             ## CONSUMES
   gFdtTableGuid
-  #gEfiEventExitBootServicesGuid   ## CONSUMES ## Event
+  gEfiEventExitBootServicesGuid               ## CONSUMES ## Event
 
 [Protocols]
   gEdkiiIoMmuProtocolGuid                     ## PRODUCES
   gEfiCpuArchProtocolGuid                     ## CONSUMES
   gEfiPciEnumerationCompleteProtocolGuid      ## CONSUMES
   gEfiPciIoProtocolGuid                       ## CONSUMES
-  #gEfiPciRootBridgeIoProtocolGuid             ## CONSUMES
 
 [Depex]
   gEfiCpuArchProtocolGuid AND

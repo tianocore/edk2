@@ -13,11 +13,17 @@
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/IoLib.h>
+#include <Protocol/PciIo.h>
 #include <Register/RiscV64/RiscVImpl.h>
 #include "RiscVIoMmu.h"
 
 #define RISCV_PG_R  BIT1
 #define RISCV_PG_W  BIT2
+
+//
+// Detecting ATS capability on downstream PCI devices requires PciBus internals.
+//
+#include <Bus/Pci/PciBusDxe/PciBus.h>
 
 /**
   Allocate a level of the DDT.
@@ -32,8 +38,7 @@ AllocateDdtLevel (
   VOID  *Buffer;
 
   //
-  // Any combination of base/extended format and leaf/non-leaf level
-  // fits in one page.
+  // Any combination of base/extended format and leaf/non-leaf level fits in one page.
   //
   Buffer = AllocatePages (1);
   ASSERT (Buffer != NULL);
@@ -68,7 +73,7 @@ LocateDeviceContext (
   UINT16                           Index;
   RISCV_IOMMU_DEVICE_CONTEXT_BASE  *DeviceContext;
 
-  DEBUG ((RISCV_IOMMU_DEBUG_LEVEL, "%a: IoMmuDeviceId=0x%x\n", __func__, IoMmuDeviceId->Uint32));
+  DEBUG ((RISCV_IOMMU_DEBUG_LEVEL, "%a: IoMmuDeviceId=0x%x on the IOMMU at 0x%lx\n", __func__, IoMmuDeviceId->Uint32, IoMmuContext->BaseAddress));
 
   //
   // Determine the format of the context struct.
@@ -86,15 +91,19 @@ LocateDeviceContext (
   ASSERT ((Levels >= 1) && (Levels <= 3));
 
   //
-  // Unrolling was the easiest approach with a union-of-structs.
+  // Traverse the tree until a leaf.
   //
-  if (Levels == 3) {
-    Index = ExtendedContext ? IoMmuDeviceId->ExtendedFormat.Ddi2 : IoMmuDeviceId->BaseFormat.Ddi2;
-    DdtEntry += Index;
+  while (Levels > 1) {
+    if (Levels == 3) {
+      Index = ExtendedContext ? IoMmuDeviceId->ExtendedFormat.Ddi2 : IoMmuDeviceId->BaseFormat.Ddi2;
+    } else if (Levels == 2) {
+      Index = ExtendedContext ? IoMmuDeviceId->ExtendedFormat.Ddi1 : IoMmuDeviceId->BaseFormat.Ddi1;
+    }
 
     //
     // Connect the next level.
     //
+    DdtEntry += Index;
     if (!DdtEntry->Bits.V) {
       AllocateDdtLevel (DdtEntry);
     }
@@ -103,23 +112,7 @@ LocateDeviceContext (
     // Continue exploring with the next level.
     //
     DdtEntry = (VOID *)((UINT64)DdtEntry->Bits.PPN << RISCV_MMU_PAGE_SHIFT);
-  }
-
-  if (Levels >= 2) {
-    Index = ExtendedContext ? IoMmuDeviceId->ExtendedFormat.Ddi1 : IoMmuDeviceId->BaseFormat.Ddi1;
-    DdtEntry += Index;
-
-    //
-    // Connect the next level.
-    //
-    if (!DdtEntry->Bits.V) {
-      AllocateDdtLevel (DdtEntry);
-    }
-
-    //
-    // Continue exploring with the next level.
-    //
-    DdtEntry = (VOID *)((UINT64)DdtEntry->Bits.PPN << RISCV_MMU_PAGE_SHIFT);
+    Levels--;
   }
 
   //
@@ -133,6 +126,8 @@ LocateDeviceContext (
   //
   Index = ExtendedContext ? IoMmuDeviceId->ExtendedFormat.Ddi0 * 2 : IoMmuDeviceId->BaseFormat.Ddi0;
   DeviceContext += Index;
+
+  DEBUG ((RISCV_IOMMU_DEBUG_LEVEL, "%a: DeviceContext=0x%lx\n", __func__, DeviceContext));
 
   return DeviceContext;
 }
@@ -153,6 +148,7 @@ STATIC
 EFI_STATUS
 RiscVIoMmuUpdateDevicePageTable (
   IN RISCV_IOMMU_CONTEXT              *IoMmuContext,
+  IN RISCV_IOMMU_DEVICE_ID            *IoMmuDeviceId,
   IN RISCV_IOMMU_DEVICE_CONTEXT_BASE  *DeviceContext,
   IN EFI_PHYSICAL_ADDRESS             DeviceAddress,
   IN UINTN                            Length,
@@ -173,6 +169,11 @@ RiscVIoMmuUpdateDevicePageTable (
   Status = IoMmuInvalidatePageTableCache (IoMmuContext, DeviceAddress);
   ASSERT_EFI_ERROR (Status);
 
+  if (DeviceContext->TranslationControl.Bits.EN_ATS) {
+    Status = IoMmuInvalidateDownstreamDevAtc (IoMmuContext, IoMmuDeviceId, DeviceAddress);
+    ASSERT_EFI_ERROR (Status);
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -189,6 +190,7 @@ STATIC
 EFI_STATUS
 RiscVIoMmuInitialiseDevicePageTable (
   IN RISCV_IOMMU_CONTEXT              *IoMmuContext,
+  IN RISCV_IOMMU_DEVICE_ID            *IoMmuDeviceId,
   IN RISCV_IOMMU_DEVICE_CONTEXT_BASE  *DeviceContext,
   IN EFI_PHYSICAL_ADDRESS             DeviceAddress,
   IN UINTN                            Length,
@@ -259,7 +261,97 @@ RiscVIoMmuInitialiseDevicePageTable (
   Status = IoMmuInvalidatePageTableCache (IoMmuContext, DeviceAddress);
   ASSERT_EFI_ERROR (Status);
 
+  if (DeviceContext->TranslationControl.Bits.EN_ATS) {
+    Status = IoMmuInvalidateDownstreamDevAtc (IoMmuContext, IoMmuDeviceId, DeviceAddress);
+    ASSERT_EFI_ERROR (Status);
+  }
+
   return EFI_SUCCESS;
+}
+
+/**
+  Locate PciExpress capability register block per capability ID.
+
+  @param PciIoDevice       A pointer to the PCI_IO_DEVICE.
+  @param CapId             The capability ID.
+  @param Offset            A pointer to the offset returned.
+  @param NextRegBlock      A pointer to the next block returned.
+
+  @retval EFI_SUCCESS      Successfully located capability register block.
+  @retval EFI_UNSUPPORTED  Pci device does not support capability.
+  @retval EFI_NOT_FOUND    Pci device support but can not find register block.
+
+**/
+EFI_STATUS
+LocatePciExpressCapabilityRegBlock (
+  IN     PCI_IO_DEVICE  *PciIoDevice,
+  IN     UINT16         CapId,
+  IN OUT UINT32         *Offset,
+  OUT UINT32            *NextRegBlock OPTIONAL
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      CapabilityPtr;
+  UINT32      CapabilityEntry;
+  UINT16      CapabilityID;
+
+  //
+  // To check the capability of this device supports
+  //
+  if (!PciIoDevice->IsPciExp) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if (*Offset != 0) {
+    CapabilityPtr = *Offset;
+  } else {
+    CapabilityPtr = EFI_PCIE_CAPABILITY_BASE_OFFSET;
+  }
+
+  while (CapabilityPtr != 0) {
+    //
+    // Mask it to DWORD alignment per PCI spec
+    //
+    CapabilityPtr &= 0xFFC;
+    Status         = PciIoDevice->PciIo.Pci.Read (
+                                              &PciIoDevice->PciIo,
+                                              EfiPciIoWidthUint32,
+                                              CapabilityPtr,
+                                              1,
+                                              &CapabilityEntry
+                                              );
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+
+    if (CapabilityEntry == MAX_UINT32) {
+      DEBUG ((
+        DEBUG_WARN,
+        "%a: [%02x|%02x|%02x] failed to access config space at offset 0x%x\n",
+        __func__,
+        PciIoDevice->BusNumber,
+        PciIoDevice->DeviceNumber,
+        PciIoDevice->FunctionNumber,
+        CapabilityPtr
+        ));
+      break;
+    }
+
+    CapabilityID = (UINT16)CapabilityEntry;
+
+    if (CapabilityID == CapId) {
+      *Offset = CapabilityPtr;
+      if (NextRegBlock != NULL) {
+        *NextRegBlock = (CapabilityEntry >> 20) & 0xFFF;
+      }
+
+      return EFI_SUCCESS;
+    }
+
+    CapabilityPtr = (CapabilityEntry >> 20) & 0xFFF;
+  }
+
+  return EFI_NOT_FOUND;
 }
 
 /**
@@ -279,13 +371,15 @@ RiscVIoMmuSetAttributeWorker (
   IN RISCV_IOMMU_DEVICE_ID  *IoMmuDeviceId,
   IN EFI_PHYSICAL_ADDRESS   DeviceAddress,
   IN UINTN                  Length,
-  IN UINT64                 IoMmuAccess
+  IN UINT64                 IoMmuAccess,
+  IN EFI_PCI_IO_PROTOCOL    *PciIo
   )
 {
   UINT64                           RiscVMmuAccessBits;
   RISCV_IOMMU_DEVICE_CONTEXT_BASE  *DeviceContext;
   RISCV_IOMMU_FCTL                 FeatureControl;
   RISCV_IOMMU_CAPABILITIES         Capabilities;
+  UINT32                           PciCapOffset;
   EFI_STATUS                       Status;
 
   //
@@ -303,10 +397,11 @@ RiscVIoMmuSetAttributeWorker (
 
   DeviceContext = LocateDeviceContext (IoMmuContext, IoMmuDeviceId);
   if (DeviceContext->TranslationControl.Bits.V) {
-    Status = RiscVIoMmuUpdateDevicePageTable (IoMmuContext, DeviceContext, DeviceAddress, Length, RiscVMmuAccessBits);
+    Status = RiscVIoMmuUpdateDevicePageTable (IoMmuContext, IoMmuDeviceId, DeviceContext, DeviceAddress, Length, RiscVMmuAccessBits);
     ASSERT_EFI_ERROR (Status);
 
-    ASSERT_EFI_ERROR (ProbeHardwareQueuesForProblems (IoMmuContext));
+    Status = ProbeHardwareQueuesForProblems (IoMmuContext);
+    ASSERT_EFI_ERROR (Status);
 
     return Status;
   }
@@ -325,16 +420,27 @@ RiscVIoMmuSetAttributeWorker (
   DeviceContext->TranslationControl.Bits.SADE = Capabilities.Bits.AMO_HWAD;
 
   //
-  // If the IOMMU supports ATS, enable those device-generated requests.
+  // If the IOMMU and device support ATS, enable it.
   // This can improve performance via the DevATC.
   //
-  if (Capabilities.Bits.ATS) {
-    DeviceContext->TranslationControl.Bits.EN_ATS = 1;
-    // TODO: Unlike on an OS kernel, device-driven operation is not expected (such as to VRAM).
-    DeviceContext->TranslationControl.Bits.EN_PRI = 0;
-    //DeviceContext->TranslationControl.Bits.PRPR   = 1;
-    // Without a hypervisor involved, they may be translated directly to an SPA.
-    DeviceContext->TranslationControl.Bits.T2GPA  = 0;
+  if (Capabilities.Bits.ATS && (PciIo != NULL)) {
+    PciCapOffset = 0;
+    Status = LocatePciExpressCapabilityRegBlock (
+               PCI_IO_DEVICE_FROM_PCI_IO_THIS (PciIo),
+               EFI_PCIE_CAPABILITY_ID_ATS,
+               &PciCapOffset,
+               NULL
+              );
+    if (!EFI_ERROR (Status)) {
+      DeviceContext->TranslationControl.Bits.EN_ATS = 1;
+      // TODO: Unlike on an OS kernel, device-driven operation is not expected (such as to VRAM).
+      DeviceContext->TranslationControl.Bits.EN_PRI = 0;
+      //DeviceContext->TranslationControl.Bits.PRPR   = 1;
+      // Without a hypervisor involved, they may be translated directly to an SPA.
+      DeviceContext->TranslationControl.Bits.T2GPA  = 0;
+
+      DEBUG ((RISCV_IOMMU_DEBUG_LEVEL, "Enabled ATS\n"));
+    }
   }
 
   //
@@ -347,7 +453,7 @@ RiscVIoMmuSetAttributeWorker (
   // TODO: IOMMU QoS IDs RCID and MCID.
   //
 
-  Status = RiscVIoMmuInitialiseDevicePageTable (IoMmuContext, DeviceContext, DeviceAddress, Length, RiscVMmuAccessBits);
+  Status = RiscVIoMmuInitialiseDevicePageTable (IoMmuContext, IoMmuDeviceId, DeviceContext, DeviceAddress, Length, RiscVMmuAccessBits);
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -359,7 +465,8 @@ RiscVIoMmuSetAttributeWorker (
   Status = IoMmuInvalidateDeviceDirectoryCache (IoMmuContext, IoMmuDeviceId);
   ASSERT_EFI_ERROR (Status);
 
-  ASSERT_EFI_ERROR (ProbeHardwareQueuesForProblems (IoMmuContext));
+  Status = ProbeHardwareQueuesForProblems (IoMmuContext);
+  ASSERT_EFI_ERROR (Status);
 
   return Status;
 }

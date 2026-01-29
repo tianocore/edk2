@@ -22,16 +22,16 @@
 
 #define MAP_INFO_SIGNATURE  SIGNATURE_32 ('D', 'M', 'A', 'P')
 typedef struct {
-  UINT32                                    Signature;
+  UINT32                 Signature;
 #if 0
-  LIST_ENTRY                                Link;
+  LIST_ENTRY             Link;
 #endif
-  EDKII_IOMMU_OPERATION                     Operation;
-  EFI_PHYSICAL_ADDRESS                      HostAddress;
-  UINTN                                     NumberOfBytes;
-  EFI_PHYSICAL_ADDRESS                      DeviceAddress;
+  EDKII_IOMMU_OPERATION  Operation;
+  EFI_PHYSICAL_ADDRESS   HostAddress;
+  UINTN                  NumberOfBytes;
+  EFI_PHYSICAL_ADDRESS   DeviceAddress;
 #if 0
-  LIST_ENTRY                                HandleList;
+  LIST_ENTRY             HandleList;
 #endif
 } MAP_INFO;
 
@@ -202,16 +202,6 @@ IoMmuSetAttribute (
   }
 
   //
-  // Meta BUGBUG: This is called to erase mappings too. It doesn't need a complementary function.
-  // - However, we may want to be able to unload this, such as at EndOfFirmware? Follow a secure convention.
-  // - In reverting our mappings, see the comment in 4.1.2.
-  //
-  //if (IoMmuAccess == 0) {
-    //Status = EFI_SUCCESS;
-    //goto Exit;
-  //}
-
-  //
   // Get device_id for this request.
   //
   Status = gBS->HandleProtocol (DeviceHandle, &gEfiPciIoProtocolGuid, (VOID **)&PciIo);
@@ -259,7 +249,7 @@ IoMmuSetAttribute (
   }
 
 Work:
-  Status = RiscVIoMmuSetAttributeWorker (IoMmuContext, &MappedIoMmuDeviceId, MapInfo->DeviceAddress, MapInfo->NumberOfBytes, IoMmuAccess);
+  Status = RiscVIoMmuSetAttributeWorker (IoMmuContext, &MappedIoMmuDeviceId, MapInfo->DeviceAddress, MapInfo->NumberOfBytes, IoMmuAccess, PciIo);
   ASSERT_EFI_ERROR (Status);
 
   Status = IoMmuCommandQueueFence (IoMmuContext);
@@ -393,7 +383,7 @@ IoMmuMap (
   MapInfo->NumberOfBytes     = *NumberOfBytes;
   MapInfo->DeviceAddress     = DmaMemoryTop;
 #if 0
-  InitializeListHead(&MapInfo->HandleList);
+  InitializeListHead (&MapInfo->HandleList);
 #endif
 
   //

@@ -14,6 +14,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/IoLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Guid/EventGroup.h>
 #include <Protocol/Cpu.h>
 #include <Register/RiscV64/RiscVImpl.h>
 #include "RiscVIoMmu.h"
@@ -148,7 +149,7 @@ AllocateQueue (
   }
 
   //
-  // The specification defines that the 'buffer size' register is `LOG2SZ-1`.
+  // The specification defines that the 'buffer size' field is `LOG2SZ-1`.
   //
   ASSERT ((QUEUE_NUMBER_OF_ENTRIES != 0) && (QUEUE_NUMBER_OF_ENTRIES % 2 == 0));
   Log2Size = HighBitSet32 (QUEUE_NUMBER_OF_ENTRIES);
@@ -157,8 +158,8 @@ AllocateQueue (
   //
   // Align the buffer to the specification's requirement.
   //
-  NumberOfPages       = EFI_SIZE_TO_PAGES (QUEUE_NUMBER_OF_ENTRIES * EntrySize);
-  QueueBuffer = AllocateAlignedPages (NumberOfPages, MAX (SIZE_4KB, EFI_PAGES_TO_SIZE (NumberOfPages)));
+  NumberOfPages = EFI_SIZE_TO_PAGES (QUEUE_NUMBER_OF_ENTRIES * EntrySize);
+  QueueBuffer   = AllocateAlignedPages (NumberOfPages, MAX (SIZE_4KB, EFI_PAGES_TO_SIZE (NumberOfPages)));
   ASSERT (QueueBuffer != NULL);
 
   QueueBase.Bits.PPN      = ((UINT64)QueueBuffer) >> RISCV_MMU_PAGE_SHIFT;
@@ -177,6 +178,87 @@ AllocateQueue (
     HardwareReqQueueCsr.Bits.qen = 1;
     IoMmuWriteAndWait32 (IoMmuContext->BaseAddress + QueueCsrReg, HardwareReqQueueCsr.Uint32, 1 << N_RISCV_IOMMU_QUEUE_CSR_QON, TRUE);
   }
+}
+
+/**
+  Free a queue.
+
+  @param[in]  QueueType   The type of queue to be freed.
+
+**/
+STATIC
+VOID
+FreeQueue (
+  IN RISCV_IOMMU_CONTEXT  *IoMmuContext,
+  IN UINTN                QueueType
+  )
+{
+  UINTN                   QueueBaseReg;
+  UINTN                   QueueCsrReg;
+  UINTN                   EntrySize;
+  RISCV_IOMMU_QUEUE_BASE  QueueBase;
+  VOID                    *QueueBuffer;
+  UINTN                   NumberOfPages;
+
+  switch (QueueType) {
+    case QUEUE_COMMAND:
+      QueueBaseReg = R_RISCV_IOMMU_CQB;
+      QueueCsrReg  = R_RISCV_IOMMU_CQCSR;
+      EntrySize    = COMMAND_QUEUE_ENTRY_SIZE;
+      break;
+    case QUEUE_FAULT:
+      QueueBaseReg = R_RISCV_IOMMU_FQB;
+      QueueCsrReg  = R_RISCV_IOMMU_FQCSR;
+      EntrySize    = FAULT_QUEUE_ENTRY_SIZE;
+      break;
+    case QUEUE_PAGE_REQUEST:
+      QueueBaseReg = R_RISCV_IOMMU_PQB;
+      QueueCsrReg  = R_RISCV_IOMMU_PQCSR;
+      EntrySize    = PAGE_REQUEST_QUEUE_ENTRY_SIZE;
+      break;
+    default:
+      ASSERT (FALSE);
+      return;
+  }
+
+  QueueBase.Uint64 = MmioRead64 (IoMmuContext->BaseAddress + QueueBaseReg);
+  QueueBuffer      = (VOID *)((UINT64)QueueBase.Bits.PPN << RISCV_MMU_PAGE_SHIFT);
+
+  ASSERT (QUEUE_NUMBER_OF_ENTRIES != 0);
+  NumberOfPages = EFI_SIZE_TO_PAGES (QUEUE_NUMBER_OF_ENTRIES * EntrySize);
+
+  //
+  // TODO: Consider if any additional steps are warranted,
+  // such as search the FQ/PQ. The command queue is used synchronously.
+  //
+  IoMmuWriteAndWait32 (IoMmuContext->BaseAddress + QueueCsrReg, 0, 1 << N_RISCV_IOMMU_QUEUE_CSR_QON, FALSE);
+
+  FreeAlignedPages (QueueBuffer, NumberOfPages);
+  MmioWrite64 (IoMmuContext->BaseAddress + QueueBaseReg, 0);
+}
+
+/**
+  Determine the supported device_id width.
+
+**/
+UINT8
+NeededIoMmuDeviceIdWidth (
+  VOID
+  )
+{
+  STATIC UINT8  NeededWidth = 0xFF;
+
+  if (NeededWidth != 0xFF) {
+    return NeededWidth;
+  }
+
+  //
+  // FIXME: Do they mean *needed* width? If so, iterate the downstream objects, and consider looking at PciIo.
+  //
+  NeededWidth = 16;
+
+  DEBUG ((RISCV_IOMMU_DEBUG_LEVEL, "%a: %d\n", __func__, NeededWidth));
+  return NeededWidth;
 }
 
 /**
@@ -205,11 +287,7 @@ ProgramContextRoot (
   //
   IoMmuMode = V_RISCV_IOMMU_DDTP_IOMMU_MODE_BARE;
 
-  //
-  // Determine the supported device_id width.
-  // - FIXME: Do they mean *needed* width? Probably not (ours here it's the PCI routing ID with one bus). Consider it?
-  //
-  DeviceIdSupportedWidth = 16;
+  DeviceIdSupportedWidth = NeededIoMmuDeviceIdWidth ();
 
   //
   // Determine the format of the context struct.
@@ -239,7 +317,7 @@ ProgramContextRoot (
 
   Ddtp.Uint64 = MmioRead64 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_DDTP);
   if (Ddtp.Bits.iommu_mode != IoMmuMode) {
-    DEBUG ((DEBUG_ERROR, "Needed IOMMU mode 0x%x is not supported!\n", IoMmuMode));
+    DEBUG ((DEBUG_ERROR, "%a: Needed IOMMU mode 0x%x is not supported!\n", __func__, IoMmuMode));
     return FALSE;
   }
 
@@ -256,13 +334,40 @@ ProgramContextRoot (
 
   DEBUG ((
     RISCV_IOMMU_DEBUG_LEVEL,
-    "%a: Configured a %d level device table at 0x%x\n",
+    "%a: Configured a %d level device table of %a contexts at 0x%x\n",
     __func__,
     IoMmuMode - V_RISCV_IOMMU_DDTP_IOMMU_MODE_BARE,
+    ExtendedContext ? "extended" : "base",
     ContextBuffer
     ));
 
   return TRUE;
+}
+
+/**
+  Clear the root of a context table from the IOMMU.
+
+  @param[in]  ContextStruct  Pointer to a context table's wrapping struct.
+
+**/
+STATIC
+VOID
+ClearContextRoot (
+  IN RISCV_IOMMU_CONTEXT  *IoMmuContext
+  )
+{
+  RISCV_IOMMU_DDTP  Ddtp;
+  VOID              *ContextBuffer;
+
+  Ddtp.Uint64   = MmioRead64 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_DDTP);
+  ContextBuffer = (VOID *)((UINT64)Ddtp.Bits.PPN << RISCV_MMU_PAGE_SHIFT);
+
+  //
+  // TODO: Rather than leaking non-root levels and device page tables,
+  // walk the tree here and perform full cleanup.
+  //
+  IoMmuWriteAndWait64 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_DDTP, 0, 1 << N_RISCV_IOMMU_DDTP_BUSY, FALSE);
+  FreePages (ContextBuffer, 1);
 }
 
 /**
@@ -349,10 +454,6 @@ InitialiseRiscVIoMmu (
   //
   AllocateQueue (IoMmuContext, QUEUE_COMMAND);
   AllocateQueue (IoMmuContext, QUEUE_FAULT);
-  // TODO: Unlike on an OS kernel, device-driven operation is not expected (such as to VRAM).
-  if (Capabilities.Bits.ATS) {
-    AllocateQueue (IoMmuContext, QUEUE_PAGE_REQUEST);
-  }
 
   //
   // 15. Program the DDT pointer.
@@ -423,6 +524,59 @@ IoMmuCommonInitialise (
 }
 
 /**
+  ExitBootServices callback function.
+
+  @param[in]  Event    The event handle.
+  @param[in]  Context  The event content.
+
+**/
+STATIC
+VOID
+EFIAPI
+OnExitBootServices (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  LIST_ENTRY                *Link;
+  RISCV_IOMMU_CONTEXT       *IoMmuContext;
+  LIST_ENTRY                *DownstreamLink;
+  RISCV_IOMMU_DOWNSTREAMS   *IoMmuDownstreams;
+
+  //
+  // TODO: Consider the risk of DMA after we've shut down.
+  // - Also, make this optional?
+  //
+  DEBUG ((DEBUG_INFO, "%a: Reclaiming resources and shutting down the IOMMUs\n", __func__));
+
+  for (Link = GetFirstNode (&mRiscVIoMmuContexts)
+     ; !IsNull (&mRiscVIoMmuContexts, Link)
+     ;
+     ) {
+    IoMmuContext = RISCV_IOMMU_CONTEXT_FROM_LINK (Link);
+    for (DownstreamLink = GetFirstNode (&IoMmuContext->DownstreamDevices)
+       ; !IsNull (&IoMmuContext->DownstreamDevices, DownstreamLink)
+       ;
+       ) {
+      IoMmuDownstreams = RISCV_IOMMU_DOWNSTREAMS_FROM_LINK (DownstreamLink);
+
+      DownstreamLink = RemoveEntryList (DownstreamLink);
+      FreePool (IoMmuDownstreams);
+    }
+
+    ClearContextRoot (IoMmuContext);
+
+    FreeQueue (IoMmuContext, QUEUE_COMMAND);
+    FreeQueue (IoMmuContext, QUEUE_FAULT);
+
+    Link = RemoveEntryList (Link);
+    FreePool (IoMmuContext);
+  }
+
+  gBS->CloseEvent (Event);
+}
+
+/**
   Initialise the RISC-V IOMMU driver.
 
   @param[in]  ImageHandle  ImageHandle of the loaded driver
@@ -442,6 +596,7 @@ RiscVIoMmuDxeEntryPoint (
   LIST_ENTRY           *Link;
   RISCV_IOMMU_CONTEXT  *IoMmuContext;
   EFI_STATUS           Status;
+  EFI_EVENT            ExitBootServicesEvent;
 
   DetectRiscVIoMmus ();
 
@@ -468,12 +623,30 @@ RiscVIoMmuDxeEntryPoint (
   // Even a PCI IOMMU must install the protocol here,
   // or else consumers' callbacks might not trigger in time.
   //
+  // Unlike Intel's VTd driver, which did initially inspire
+  // some elements here, there is no need to store requests
+  // until we can fulfill them: the reset state of RISC-V IOMMUs
+  // blocks DMA.
+  // - However, this implies passing back failures to callers early.
+  // - A related issue: the protocol is only installed after ACPI/FDT.
+  // - TODO: Confirm this, and consider the effect of a reboot.
+  //
   if (!IsListEmpty (&mRiscVIoMmuContexts)) {
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &mHandle,
                     &gEdkiiIoMmuProtocolGuid,
                     &mRiscVIoMmuProtocol,
                     NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
+
+    Status = gBS->CreateEventEx (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    OnExitBootServices,
+                    NULL,
+                    &gEfiEventExitBootServicesGuid,
+                    &ExitBootServicesEvent
                     );
     ASSERT_EFI_ERROR (Status);
   }

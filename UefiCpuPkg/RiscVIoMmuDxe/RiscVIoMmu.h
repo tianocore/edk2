@@ -12,6 +12,7 @@
 #include <PiDxe.h>
 #include <Library/DebugLib.h>
 #include <Protocol/IoMmu.h>
+#include <Protocol/PciIo.h>
 #include <IndustryStandard/RiscVIoMappingTable.h>
 #include "RiscVIoMmuRegisters.h"
 #include "IoMmuDeviceContext.h"
@@ -84,6 +85,15 @@ DetectRiscVIoMmus (
   );
 
 /**
+  Determine the supported device_id width.
+
+**/
+UINT8
+NeededIoMmuDeviceIdWidth (
+  VOID
+  );
+
+/**
   Initialisation worker function.
 
 **/
@@ -109,7 +119,8 @@ RiscVIoMmuSetAttributeWorker (
   IN RISCV_IOMMU_DEVICE_ID  *IoMmuDeviceId,
   IN EFI_PHYSICAL_ADDRESS   DeviceAddress,
   IN UINTN                  Length,
-  IN UINT64                 IoMmuAccess
+  IN UINT64                 IoMmuAccess,
+  IN EFI_PCI_IO_PROTOCOL    *PciIo
   );
 
 /**
@@ -121,6 +132,18 @@ EFI_STATUS
 IoMmuInvalidatePageTableCache (
   IN RISCV_IOMMU_CONTEXT  *IoMmuContext,
   IN EFI_PHYSICAL_ADDRESS  DeviceAddress
+  );
+
+/**
+  Invalidate a downstream's DevATC.
+  Call this after updating device page tables.
+
+**/
+EFI_STATUS
+IoMmuInvalidateDownstreamDevAtc (
+  IN RISCV_IOMMU_CONTEXT    *IoMmuContext,
+  IN RISCV_IOMMU_DEVICE_ID  *IoMmuDeviceId,
+  IN EFI_PHYSICAL_ADDRESS   DeviceAddress
   );
 
 /**

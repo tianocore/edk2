@@ -75,7 +75,7 @@ IoMmuInvalidatePageTableCache (
   Command.func3  = FUNC_RISCV_IOMMU_IOTINVAL_VMA;
 
   //
-  // As a non-virtualised OS, neither process contexts nor second-level translation are in use.
+  // As a non-virtualised firmware, neither process contexts nor second-level translation are in use.
   //
   Command.PSCV = 0;
   Command.GV   = 0;
@@ -87,6 +87,51 @@ IoMmuInvalidatePageTableCache (
   Command.ADDR = DeviceAddress;
 
   // TODO: NL and S bits.
+  Status = IoMmuQueueCommand (IoMmuContext, (VOID *)&Command);
+  ASSERT_EFI_ERROR (Status);
+
+  return Status;
+}
+
+/**
+  Invalidate a downstream's DevATC.
+  Call this after updating device page tables.
+
+**/
+EFI_STATUS
+IoMmuInvalidateDownstreamDevAtc (
+  IN RISCV_IOMMU_CONTEXT    *IoMmuContext,
+  IN RISCV_IOMMU_DEVICE_ID  *IoMmuDeviceId,
+  IN EFI_PHYSICAL_ADDRESS   DeviceAddress
+  )
+{
+  RISCV_IOMMU_ATS_INVAL  Command;
+  EFI_STATUS             Status;
+
+  ZeroMem ((VOID *)&Command, sizeof (RISCV_IOMMU_ATS_INVAL));
+
+  Command.opcode = OP_RISCV_IOMMU_ATS;
+  Command.func3  = FUNC_RISCV_IOMMU_ATS_INVAL;
+
+  //
+  // As a non-virtualised firmware, process contexts are not in use, so there is no PASID.
+  //
+  Command.PV = 0;
+
+  //
+  // If the needed width is sufficiently high, since this is a PCI device,
+  // it needs the segment number passed across too.
+  //
+  if (NeededIoMmuDeviceIdWidth () > 16) {
+    Command.DSV  = 1;
+    Command.DSEG = IoMmuDeviceId->PciBdf.Segment;
+  }
+
+  Command.RID = IoMmuDeviceId->Uint32 & 0xFFFF;
+
+  // TODO: G and S bits.
+  Command.PAYLOAD.Bits.Address = DeviceAddress;
+
   Status = IoMmuQueueCommand (IoMmuContext, (VOID *)&Command);
   ASSERT_EFI_ERROR (Status);
 
@@ -149,7 +194,7 @@ IoMmuCommandQueueFence (
   }
 
   if (Timeout) {
-    DEBUG ((DEBUG_ERROR, "IOMMU command execution timed out!\n"));
+    DEBUG ((DEBUG_WARN, "IOMMU command execution timed out!\n"));
     Status = EFI_TIMEOUT;
   }
 
@@ -188,6 +233,134 @@ IoMmuInvalidateDeviceDirectoryCache (
 }
 
 /**
+  Handle the queue CSRs at the start of probing the fault queue.
+
+**/
+STATIC
+VOID
+PreFaultQueueCsrHandling (
+  IN RISCV_IOMMU_CONTEXT  *IoMmuContext
+  )
+{
+  RISCV_IOMMU_SOFTWARE_REQUEST_QUEUE_CSR  CqCsr;
+  RISCV_IOMMU_QUEUE_BASE                  CommandQueueBaseReg;
+  VOID                                    *CommandQueueBuffer;
+  RISCV_IOMMU_QUEUE_POINTER               CommandQueueTail;
+  RISCV_IOMMU_IOFENCE                     *CommandRecord;
+
+  //
+  // We do not expect to encounter illegal commands.
+  // Therefore, if the IOMMU reports one, print it, handle it, and halt.
+  //
+  CqCsr.Uint32 = MmioRead32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_CQCSR);
+  if (CqCsr.Bits.cmd_ill) {
+    CommandQueueBaseReg.Uint64 = MmioRead64 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_CQB);
+
+    CommandQueueBuffer = (VOID *)((UINT64)CommandQueueBaseReg.Bits.PPN << RISCV_MMU_PAGE_SHIFT);
+    ASSERT (CommandQueueBuffer != NULL);
+
+    CommandQueueTail.Uint32 = MmioRead32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_CQT);
+
+    CommandRecord = (VOID *)((UINT8 *)CommandQueueBuffer + (CommandQueueTail.Bits.index * COMMAND_QUEUE_ENTRY_SIZE));
+    DEBUG ((DEBUG_ERROR, "Command with (opcode 0x%x, func3 0x%x) was rejected as illegal\n", CommandRecord->opcode, CommandRecord->func3));
+
+    CqCsr.Bits.cmd_ill = 0;
+    MmioWrite32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_CQCSR, CqCsr.Uint32);
+    ASSERT (FALSE);
+  }
+}
+
+/**
+  Dump some debug information about the fault.
+
+**/
+STATIC
+VOID
+DumpFaultInformation (
+  IN RISCV_IOMMU_FAULT_RECORD  *FaultRecord
+  )
+{
+  switch (FaultRecord->CAUSE) {
+    case RISCV_IOMMU_FAULT_CAUSE_INSTR_ACCESS_FAULT:
+    case RISCV_IOMMU_FAULT_CAUSE_READ_ACCESS_FAULT:
+    case RISCV_IOMMU_FAULT_CAUSE_WRITE_ACCESS_FAULT:
+      DEBUG ((DEBUG_INFO, "Transaction triggered an access fault, please report this!\n"));
+      break;
+    case RISCV_IOMMU_FAULT_CAUSE_READ_ADDR_MISALIGNED:
+    case RISCV_IOMMU_FAULT_CAUSE_WRITE_ADDR_MISALIGNED:
+      DEBUG ((DEBUG_INFO, "Address is misaligned. Please check your device's driver.\n"));
+      break;
+    case RISCV_IOMMU_FAULT_CAUSE_DMA_DISABLED:
+      DEBUG ((DEBUG_INFO, "DMA is disabled. Please report this!\n"));
+      break;
+    case RISCV_IOMMU_FAULT_CAUSE_DDT_LOAD_FAULT:
+    case RISCV_IOMMU_FAULT_CAUSE_DDT_INVALID:
+    case RISCV_IOMMU_FAULT_CAUSE_DDT_MISCONFIGURED:
+    case RISCV_IOMMU_FAULT_CAUSE_DDT_CORRUPTED:
+      DEBUG ((DEBUG_INFO, "Device Directory Table cannot be read/parsed, please report this!\n"));
+      break;
+    case RISCV_IOMMU_FAULT_CAUSE_TTYP_DISALLOWED:
+      DEBUG ((DEBUG_INFO, "Transaction type disallowed, please report this!\n"));
+      break;
+    case RISCV_IOMMU_FAULT_CAUSE_INTERNAL_PATH_ERROR:
+      DEBUG ((DEBUG_INFO, "Internal IOMMU error, please report this!\n"));
+      break;
+    case RISCV_IOMMU_FAULT_CAUSE_PT_CORRUPTED:
+      DEBUG ((DEBUG_INFO, "Device page table corrupted, please report this!\n"));
+      break;
+    case RISCV_IOMMU_FAULT_CAUSE_MSI_LOAD_FAULT:
+    case RISCV_IOMMU_FAULT_CAUSE_MSI_INVALID:
+    case RISCV_IOMMU_FAULT_CAUSE_MSI_MISCONFIGURED:
+    case RISCV_IOMMU_FAULT_CAUSE_MRIF_ACCESS_FAULT:
+    case RISCV_IOMMU_FAULT_CAUSE_MSI_PT_CORRUPTED:
+    case RISCV_IOMMU_FAULT_CAUSE_MRIF_CORRUPTED:
+    case RISCV_IOMMU_FAULT_CAUSE_MSI_WRITE_FAULT:
+      DEBUG ((DEBUG_WARN, "(unhandled; MSIs weren't configured)\n"));
+      break;
+    case RISCV_IOMMU_FAULT_CAUSE_PDT_LOAD_FAULT:
+    case RISCV_IOMMU_FAULT_CAUSE_PDT_INVALID:
+    case RISCV_IOMMU_FAULT_CAUSE_PDT_MISCONFIGURED:
+    case RISCV_IOMMU_FAULT_CAUSE_PDT_CORRUPTED:
+      DEBUG ((DEBUG_WARN, "(unhandled; process contexts aren't needed by firmware)\n"));
+      break;
+    case RISCV_IOMMU_FAULT_CAUSE_INSTR_PAGE_FAULT_1:
+    case RISCV_IOMMU_FAULT_CAUSE_READ_PAGE_FAULT_1:
+    case RISCV_IOMMU_FAULT_CAUSE_WRITE_PAGE_FAULT_1:
+    case RISCV_IOMMU_FAULT_CAUSE_INSTR_PAGE_FAULT_2:
+    case RISCV_IOMMU_FAULT_CAUSE_READ_PAGE_FAULT_2:
+    case RISCV_IOMMU_FAULT_CAUSE_WRITE_PAGE_FAULT_2:
+      DEBUG ((DEBUG_WARN, "(unhandled; page tables aren't needed for ATS)\n"));
+      break;
+    default:
+      DEBUG ((DEBUG_WARN, "(unknown)\n"));
+      break;
+  }
+}
+
+/**
+  Handle the queue CSRs at the end of probing the fault queue.
+
+**/
+STATIC
+VOID
+PostFaultQueueCsrHandling (
+  IN RISCV_IOMMU_CONTEXT  *IoMmuContext
+  )
+{
+  RISCV_IOMMU_HARDWARE_REQUEST_QUEUE_CSR  FqCsr;
+
+  //
+  // Implement end-of-queue error handling.
+  //
+  FqCsr.Uint32 = MmioRead32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_FQCSR);
+  if (FqCsr.Bits.qof) {
+    DEBUG ((DEBUG_WARN, "Fault queue overflowed!\n"));
+    FqCsr.Bits.qof = 0;
+    MmioWrite32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_FQCSR, FqCsr.Uint32);
+  }
+}
+
+/**
   Probe fault queue for errors.
 
 **/
@@ -217,16 +390,19 @@ ProbeFaultQueue (
 
   //
   // TODOs:
-  // - Handle cqmf, cmd_to and cmd_ill. fence_w_ip is not relevant.
-  // - Handle fqmf/pqmf and fqof/pqof.
-  // - Others.
+  // - Handle cqmf/fqmf and cmd_to.
+  // - Handle fault causes?
   //
   DEBUG ((DEBUG_WARN, "Faults (or events) have been reported!\n"));
 
+  PreFaultQueueCsrHandling (IoMmuContext);
+
   Index = 0;
   while (QueueHead.Bits.index != QueueTail.Bits.index) {
-    DEBUG ((DEBUG_INFO, "Fault record %d:\n", Index++));
+    DEBUG ((DEBUG_INFO, "\nFault record %d:\n", Index++));
     FaultRecord = (VOID *)((UINT8 *)QueueBuffer + (QueueHead.Bits.index * FAULT_QUEUE_ENTRY_SIZE));
+
+    DumpFaultInformation (FaultRecord);
 
     DEBUG ((DEBUG_INFO, "  Cause: %d\n", FaultRecord->CAUSE));
     DEBUG ((DEBUG_INFO, "  PID: 0x%x\n", FaultRecord->PID));
@@ -248,6 +424,8 @@ ProbeFaultQueue (
     MmioWrite32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_FQH, QueueHead.Bits.index);
   }
 
+  PostFaultQueueCsrHandling (IoMmuContext);
+
   return EFI_DEVICE_ERROR;
 }
 
@@ -260,24 +438,13 @@ ProbeHardwareQueuesForProblems (
   IN RISCV_IOMMU_CONTEXT  *IoMmuContext
   )
 {
-  EFI_STATUS                 Status;
-  RISCV_IOMMU_QUEUE_POINTER  QueueHead;
-  RISCV_IOMMU_QUEUE_POINTER  QueueTail;
+  EFI_STATUS  Status;
 
   //
-  // The fault queue is the most obvious indicator of problems.
+  // The fault queue is the most obvious indicator of problems,
+  // and we don't expect to receive page requests, so, it isn't even enabled.
   //
   Status = ProbeFaultQueue (IoMmuContext);
 
-  //
-  // We don't expect to handle page requests.
-  //
-  QueueHead.Uint32 = MmioRead32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_PQH);
-  QueueTail.Uint32 = MmioRead32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_PQT);
-  if (QueueHead.Bits.index != QueueTail.Bits.index) {
-    DEBUG ((DEBUG_WARN, "A page request has been received\n"));
-    Status = EFI_DEVICE_ERROR;
-  }
-
-  return Status;
+  return EFI_SUCCESS;
 }
