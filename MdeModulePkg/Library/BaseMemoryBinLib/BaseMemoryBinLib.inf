@@ -17,7 +17,7 @@
   FILE_GUID                      = A88C1999-DC07-46D7-9A7F-532951FE2A13
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = MemoryBinLib | DXE_CORE
+  LIBRARY_CLASS                  = MemoryBinLib | PEI_CORE DXE_CORE
 
 [Sources]
   BaseMemoryBinLib.c
