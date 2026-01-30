@@ -150,6 +150,11 @@ CustomFdtNodeParser (
     }
   }
 
+  // return if not found.
+  if (CHobList == (UINTN)HobList) {
+    return CHobList;
+  }
+
   Hob.Raw = (UINT8 *)CHobList;
 
   //
