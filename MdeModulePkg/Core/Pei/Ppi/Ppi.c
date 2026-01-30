@@ -493,7 +493,11 @@ InternalPeiInstallPpi (
       TempPtr = AllocateZeroPool (
                   sizeof (PEI_PPI_LIST_POINTERS) * (PpiListPointer->MaxCount + PPI_GROWTH_STEP)
                   );
-      ASSERT (TempPtr != NULL);
+      if (TempPtr == NULL) {
+        ASSERT (TempPtr != NULL);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
       CopyMem (
         TempPtr,
         PpiListPointer->PpiPtrs,
@@ -782,7 +786,11 @@ InternalPeiNotifyPpi (
         TempPtr = AllocateZeroPool (
                     sizeof (PEI_PPI_LIST_POINTERS) * (CallbackNotifyListPointer->MaxCount + CALLBACK_NOTIFY_GROWTH_STEP)
                     );
-        ASSERT (TempPtr != NULL);
+        if (TempPtr == NULL) {
+          ASSERT (TempPtr != NULL);
+          return EFI_OUT_OF_RESOURCES;
+        }
+
         CopyMem (
           TempPtr,
           CallbackNotifyListPointer->NotifyPtrs,
@@ -803,7 +811,11 @@ InternalPeiNotifyPpi (
         TempPtr = AllocateZeroPool (
                     sizeof (PEI_PPI_LIST_POINTERS) * (DispatchNotifyListPointer->MaxCount + DISPATCH_NOTIFY_GROWTH_STEP)
                     );
-        ASSERT (TempPtr != NULL);
+        if (TempPtr == NULL) {
+          ASSERT (TempPtr != NULL);
+          return EFI_OUT_OF_RESOURCES;
+        }
+
         CopyMem (
           TempPtr,
           DispatchNotifyListPointer->NotifyPtrs,
