@@ -164,5 +164,3 @@
   ArmPkg/Drivers/ArmGicDxe/ArmGicV3Dxe.inf
   ArmPkg/Drivers/ArmPsciMpServicesDxe/ArmPsciMpServicesDxe.inf
   ArmPkg/Drivers/MmCommunicationDxe/MmCommunication.inf
-
-  ArmPkg/Library/StandaloneMmMmuLib/ArmMmuStandaloneMmLib.inf

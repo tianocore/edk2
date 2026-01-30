@@ -68,10 +68,6 @@
   #
   SemihostLib|Include/Library/SemihostLib.h
 
-  ##  @libraryclass  Provides an interface for a StandaloneMm Mmu.
-  #
-  StandaloneMmMmuLib|Include/Library/StandaloneMmMmuLib.h
-
   ##  @libraryclass  Provides an interface for a Arm Transfer List.
   #
   ArmTransferListLib|Include/Library/ArmTransferListLib.h
