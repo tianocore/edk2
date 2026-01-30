@@ -31,21 +31,24 @@ InternalAllocatePages (
     return NULL;
   }
 
-  NewTop  = Hob.HandoffInformationTable->EfiFreeMemoryTop & ~(EFI_PHYSICAL_ADDRESS)EFI_PAGE_MASK;
-  NewTop -= Pages * EFI_PAGE_SIZE;
-
+  //
+  // Calculate the new top of memory based on the memory type
+  //
   switch (MemoryType) {
     case EfiReservedMemoryType:
     case EfiRuntimeServicesCode:
     case EfiRuntimeServicesData:
     case EfiACPIMemoryNVS:
-      NewTop &= ~(EFI_PHYSICAL_ADDRESS)(RUNTIME_PAGE_ALLOCATION_GRANULARITY - 1);
-      Pages   = ALIGN_VALUE (Pages, EFI_SIZE_TO_PAGES (RUNTIME_PAGE_ALLOCATION_GRANULARITY));
+      Pages  = ALIGN_VALUE (Pages, EFI_SIZE_TO_PAGES (RUNTIME_PAGE_ALLOCATION_GRANULARITY));
+      NewTop = Hob.HandoffInformationTable->EfiFreeMemoryTop & ~(EFI_PHYSICAL_ADDRESS)(RUNTIME_PAGE_ALLOCATION_GRANULARITY - 1);
       break;
 
     default:
+      NewTop = Hob.HandoffInformationTable->EfiFreeMemoryTop & ~(EFI_PHYSICAL_ADDRESS)EFI_PAGE_MASK;
       break;
   }
+
+  NewTop -= Pages * EFI_PAGE_SIZE;
 
   //
   // Verify that there is sufficient memory to satisfy the allocation
