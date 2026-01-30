@@ -24,6 +24,13 @@
 #include <Library/ArmFfaMemMgmtLib.h>
 #include <Library/BaseMemoryLib.h>
 
+// The single-receiver descriptor has a fixed layout with 16-byte alignment.
+#define SINGLE_RECEIVER_OFFSET   ALIGN_VALUE (sizeof (FFA_MEMORY_TRANSACTION_DESCRIPTOR), 16U)
+#define SINGLE_COMPOSITE_OFFSET  ALIGN_VALUE (SINGLE_RECEIVER_OFFSET + sizeof (FFA_ENDPOINT_MEMORY_ACCESS_DESCRIPTOR), 16U)
+#define SINGLE_DESCRIPTOR_SIZE   (SINGLE_COMPOSITE_OFFSET + sizeof (FFA_COMPOSITE_MEMORY_REGION) + sizeof (FFA_MEMORY_REGION_CONSTITUENT))
+
+STATIC_ASSERT (SINGLE_DESCRIPTOR_SIZE <= MAX_UINT32, "FF-A descriptor offsets must fit in 32 bits");
+
 /**
   Starts a transaction to transfer of ownership of a memory region from a Sender
   endpoint to a Receiver endpoint.
@@ -305,6 +312,142 @@ ArmFfaMemLibShareRxTx (
   )
 {
   return ArmFfaMemLibShare (TotalLength, FragmentLength, NULL, 0, Handle);
+}
+
+/**
+  @brief      Builds and sends an FF-A memory transaction descriptor using the
+              Rx/Tx buffer to share a memory region with a receiver endpoint.
+
+              This helper builds a single-receiver transaction descriptor in
+              the FF-A Tx buffer, then invokes the FFA_MEM_SHARE ABI using the
+              Rx/Tx buffer calling convention.
+
+              The region is described in 4 KiB pages. RegionPhysBase must be
+              4 KiB aligned and RegionSizeBytes is rounded up to a whole number
+              of pages.
+
+  @param[in]  ReceiverId       FF-A receiver endpoint/partition ID.
+  @param[in]  RegionPhysBase   Physical base address of the memory region to
+                               share. Must be 4 KiB aligned.
+  @param[in]  RegionSizeBytes  Size in bytes of the memory region to share.
+  @param[in]  Attributes       Memory attributes to use for the receiver mapping.
+                               Security must be 0 (reserved for FFA_MEM_* ABIs).
+  @param[in]  Permissions      Access permissions to request for the receiver.
+  @param[out] Handle           Globally unique handle to identify the memory
+                               region upon successful transmission.
+
+  @retval EFI_SUCCESS            The region was shared and Handle is valid.
+  @retval EFI_INVALID_PARAMETER  A parameter is NULL/invalid, or alignment checks fail.
+  @retval EFI_BUFFER_TOO_SMALL   The Tx buffer cannot fit the descriptor.
+  @retval Others                 Error returned by the FF-A library functions.
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaMemLibShareRxTxSingleRegion (
+  IN UINT16                               ReceiverId,
+  IN EFI_PHYSICAL_ADDRESS                 RegionPhysBase,
+  IN UINTN                                RegionSizeBytes,
+  IN CONST FFA_MEMORY_ATTRIBUTES          *Attributes,
+  IN CONST FFA_MEMORY_ACCESS_PERMISSIONS  *Permissions,
+  OUT UINT64                              *Handle
+  )
+{
+  EFI_STATUS  Status;
+  VOID        *TxBuffer;
+  UINT64      TxBufferSize;
+  UINT16      SenderId;
+  UINTN       RegionPageCountN;
+  UINT32      RegionPageCount;
+
+  FFA_MEMORY_TRANSACTION_DESCRIPTOR      *TxDesc;
+  FFA_ENDPOINT_MEMORY_ACCESS_DESCRIPTOR  *AccessDesc;
+  FFA_COMPOSITE_MEMORY_REGION            *CompDesc;
+
+  if ((Handle == NULL) || (Attributes == NULL) || (Permissions == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *Handle = 0;
+  if (RegionSizeBytes == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((Attributes->Security != FFA_MEMORY_SECURITY_SECURE) ||
+      (Attributes->Reserved != 0) ||
+      (Permissions->Reservd != 0))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // FF-A constituent regions are described in 4 KiB pages, so the base address
+  // must be 4 KiB aligned.
+  //
+  if (!IS_ALIGNED (RegionPhysBase, EFI_PAGE_SIZE)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  RegionPageCountN = EFI_SIZE_TO_PAGES (RegionSizeBytes);
+  if ((RegionPageCountN == 0) || (RegionPageCountN > MAX_UINT32)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  RegionPageCount = (UINT32)RegionPageCountN;
+
+  Status = ArmFfaLibPartitionIdGet (&SenderId);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (ReceiverId == SenderId) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = ArmFfaLibGetRxTxBuffers (
+             &TxBuffer,
+             &TxBufferSize,
+             NULL,
+             NULL
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (TxBufferSize < SINGLE_DESCRIPTOR_SIZE) {
+    return EFI_BUFFER_TOO_SMALL;
+  }
+
+  ZeroMem (TxBuffer, SINGLE_DESCRIPTOR_SIZE);
+
+  TxDesc           = (FFA_MEMORY_TRANSACTION_DESCRIPTOR *)TxBuffer;
+  TxDesc->SenderId = SenderId;
+
+  TxDesc->Attributes = *Attributes;
+
+  TxDesc->Flags                = 0;
+  TxDesc->Handle               = 0;
+  TxDesc->Tag                  = 0;
+  TxDesc->MemoryAccessDescSize = sizeof (FFA_ENDPOINT_MEMORY_ACCESS_DESCRIPTOR);
+  TxDesc->ReceiverCount        = 1;
+  TxDesc->ReceiversOffset      = SINGLE_RECEIVER_OFFSET;
+
+  AccessDesc = (FFA_ENDPOINT_MEMORY_ACCESS_DESCRIPTOR *)((UINT8 *)TxBuffer + SINGLE_RECEIVER_OFFSET);
+
+  AccessDesc->ReceiverPermissions.ReceiverId  = ReceiverId;
+  AccessDesc->ReceiverPermissions.Permissions = *Permissions;
+  AccessDesc->ReceiverPermissions.Flags       = 0;
+  AccessDesc->CompositeMemoryRegionOffset     = SINGLE_COMPOSITE_OFFSET;
+
+  CompDesc = (FFA_COMPOSITE_MEMORY_REGION *)((UINT8 *)TxBuffer + SINGLE_COMPOSITE_OFFSET);
+
+  CompDesc->TotalPageCount            = RegionPageCount;
+  CompDesc->ConstituentCount          = 1;
+  CompDesc->Reserved                  = 0;
+  CompDesc->Constituents[0].Address   = (UINT64)RegionPhysBase;
+  CompDesc->Constituents[0].PageCount = RegionPageCount;
+  CompDesc->Constituents[0].Reserved  = 0;
+
+  return ArmFfaMemLibShareRxTx (SINGLE_DESCRIPTOR_SIZE, SINGLE_DESCRIPTOR_SIZE, Handle);
 }
 
 /**

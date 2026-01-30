@@ -1,7 +1,7 @@
 /** @file
   Library definition for FF-A memory management protocol.
 
-  Copyright (c) 2020 - 2022, Arm Ltd. All rights reserved.<BR>
+  Copyright (c) 2020 - 2026, Arm Ltd. All rights reserved.<BR>
   Copyright (c), Microsoft Corporation.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -10,6 +10,7 @@
 #pragma once
 
 #include <Uefi.h>
+#include <IndustryStandard/ArmFfaMemMgmt.h>
 
 /**
   Starts a transaction to transfer of ownership of a memory region from a Sender
@@ -153,6 +154,38 @@ ArmFfaMemLibShareRxTx (
   IN UINT32   TotalLength,
   IN UINT32   FragmentLength,
   OUT UINT64  *Handle
+  );
+
+/**
+  @brief      Builds and sends an FF-A memory transaction descriptor using the
+              Rx/Tx buffer to share a memory region with a receiver endpoint.
+
+              This helper builds a single-receiver memory transaction descriptor
+              in the FF-A Tx buffer and then invokes the FFA_MEM_SHARE ABI.
+
+  @param[in]  ReceiverId       FF-A receiver endpoint/partition ID.
+  @param[in]  RegionPhysBase   Physical base address of the memory region to
+                               share. Must be 4K aligned.
+  @param[in]  RegionSizeBytes  Size in bytes of the memory region to share.
+                               Rounded up to a whole number of 4 KiB pages.
+  @param[in]  Attributes       Memory attributes to use for the receiver mapping.
+                               Security must be 0 (reserved for FFA_MEM_* ABIs).
+  @param[in]  Permissions      Access permissions to request for the receiver.
+  @param[out] Handle           Globally unique handle to identify the memory
+                               region upon successful transmission.
+
+  @retval EFI_SUCCESS          Success.
+  @retval Others               Failure.
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaMemLibShareRxTxSingleRegion (
+  IN UINT16                               ReceiverId,
+  IN EFI_PHYSICAL_ADDRESS                 RegionPhysBase,
+  IN UINTN                                RegionSizeBytes,
+  IN CONST FFA_MEMORY_ATTRIBUTES          *Attributes,
+  IN CONST FFA_MEMORY_ACCESS_PERMISSIONS  *Permissions,
+  OUT UINT64                              *Handle
   );
 
 /**
