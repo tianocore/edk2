@@ -3,6 +3,7 @@
 #  Component description file for ArmFfaMemMgmtLib module
 #
 #  Copyright (c), Microsoft Corporation.
+#  Copyright (c) 2026, Arm Limited. All rights reserved.
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #**/
@@ -22,5 +23,6 @@
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
+  BaseMemoryLib
   DebugLib
   ArmFfaLib
