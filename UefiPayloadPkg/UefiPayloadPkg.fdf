@@ -186,6 +186,12 @@ INF MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntime
 
   INF OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
   INF OvmfPkg/PlatformDxe/Platform.inf
+!elseif "RISCV64" IN "$(ARCH)"
+  INF UefiCpuPkg/CpuTimerDxeRiscV64/CpuTimerDxeRiscV64.inf
+  INF UefiCpuPkg/CpuDxeRiscV64/CpuDxeRiscV64.inf
+  INF Platform/RISC-V/PlatformPkg/Drivers/PlatformHasAcpiDtDxe/PlatformHasAcpiDtDxe.inf
+  INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
+  INF EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
 !endif
 
 !if $(SECURITY_STUB_ENABLE) == TRUE
@@ -251,7 +257,10 @@ INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 INF MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
 INF MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
 INF MdeModulePkg/Universal/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
+!if "RISCV64" in "$(ARCH)"
+!else
 INF MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
+!endif
 INF UefiPayloadPkg/BlSupportDxe/BlSupportDxe.inf
 
 INF MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
