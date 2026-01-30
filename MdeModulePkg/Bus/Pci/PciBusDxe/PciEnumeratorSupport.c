@@ -1,6 +1,7 @@
 /** @file
   PCI emumeration support functions implementation for PCI Bus module.
 
+Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
 Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
@@ -17,6 +18,11 @@ extern EDKII_DEVICE_SECURITY_PROTOCOL  *mDeviceSecurityProtocol;
 #define EVEN_ALIGN   0xFFFFFFFFFFFFFFFEULL
 #define SQUAD_ALIGN  0xFFFFFFFFFFFFFFFDULL
 #define DQUAD_ALIGN  0xFFFFFFFFFFFFFFFCULL
+
+//
+// Microseconds per second for time conversions
+//
+#define MICROSECONDS_PER_SECOND  1000000
 
 /**
   This routine is used to check whether the pci device is present.
@@ -42,34 +48,45 @@ PciDevicePresent (
 {
   UINT64      Address;
   EFI_STATUS  Status;
+  UINTN       CrsRetryCount;
+  UINTN       CrsRetryIntervalUs;
+  UINTN       CrsMaxRetries;
+
+  //
+  // Get CRS retry parameters from PCDs
+  //
+  CrsRetryIntervalUs = PcdGet32 (PcdPciCrsRetryIntervalUs);
+  CrsMaxRetries      = (PcdGet32 (PcdPciCrsTimeoutSeconds) * MICROSECONDS_PER_SECOND) / CrsRetryIntervalUs;
 
   //
   // Create PCI address map in terms of Bus, Device and Func
   //
   Address = EFI_PCI_ADDRESS (Bus, Device, Func, 0);
 
-  //
-  // Read the Vendor ID register
-  //
-  Status = PciRootBridgeIo->Pci.Read (
-                                  PciRootBridgeIo,
-                                  EfiPciWidthUint32,
-                                  Address,
-                                  1,
-                                  Pci
-                                  );
+  CrsRetryCount = 0;
 
-  //
-  // The host bridge may be programmed to accept Configuration Retry Status (CRS).  If the PCI device
-  // is slow, and CRS is enabled, the VendorId may read as 0x0001 when not ready.
-  // This behavior is defined in PCI spec that VendorId is 0x0001.
-  // PCI EXPRESS BASE SPECIFICATION, REV. 3.1 section 2.3.1.
-  // Skip the device, as all the other data read will be invalid.
-  //
-  if (!EFI_ERROR (Status)) {
-    if (((Pci->Hdr).VendorId != 0xffff) && ((Pci->Hdr).VendorId != 0x0001)) {
+  do {
+    //
+    // Read the Vendor ID register
+    //
+    Status = PciRootBridgeIo->Pci.Read (
+                                    PciRootBridgeIo,
+                                    EfiPciWidthUint32,
+                                    Address,
+                                    1,
+                                    Pci
+                                    );
+
+    if (EFI_ERROR (Status)) {
+      return EFI_NOT_FOUND;
+    }
+
+    //
+    // Check for valid device (not 0xFFFF and not CRS 0x0001)
+    //
+    if (((Pci->Hdr).VendorId != 0xFFFF) && ((Pci->Hdr).VendorId != 0x0001)) {
       //
-      // Read the entire config header for the device
+      // Valid device found - read the entire config header
       //
       Status = PciRootBridgeIo->Pci.Read (
                                       PciRootBridgeIo,
@@ -79,11 +96,65 @@ PciDevicePresent (
                                       Pci
                                       );
 
+      if (CrsRetryCount > 0) {
+        DEBUG ((
+          DEBUG_INFO,
+          "PCI %02x:%02x.%x ready after %d CRS retries (%d ms)\n",
+          Bus,
+          Device,
+          Func,
+          CrsRetryCount,
+          (CrsRetryCount * CrsRetryIntervalUs) / 1000
+          ));
+      }
+
       return EFI_SUCCESS;
-    } else if ((Pci->Hdr).VendorId == 0x0001) {
-      DEBUG ((DEBUG_WARN, "CRS response detected.  Devices that return a CRS response during enumeration are currently ignored\n"));
     }
-  }
+
+    //
+    // Check for no device present (0xFFFF)
+    //
+    if ((Pci->Hdr).VendorId == 0xFFFF) {
+      return EFI_NOT_FOUND;
+    }
+
+    //
+    // CRS detected (Vendor ID = 0x0001)
+    // The host bridge may be programmed to accept Configuration Retry Status (CRS).
+    // If the PCI device is slow, and CRS is enabled, the VendorId reads as 0x0001.
+    // This behavior is defined in PCI EXPRESS BASE SPECIFICATION, REV. 3.1 section 2.3.1.
+    // Retry the configuration read per PCIe specification.
+    //
+    if (CrsRetryCount == 0) {
+      DEBUG ((
+        DEBUG_INFO,
+        "PCI %02x:%02x.%x returned CRS, waiting for device ready (timeout %d s)...\n",
+        Bus,
+        Device,
+        Func,
+        PcdGet32 (PcdPciCrsTimeoutSeconds)
+        ));
+    }
+
+    CrsRetryCount++;
+
+    //
+    // Stall before retry
+    //
+    gBS->Stall (CrsRetryIntervalUs);
+  } while (CrsRetryCount < CrsMaxRetries);
+
+  //
+  // CRS timeout - device never became ready
+  //
+  DEBUG ((
+    DEBUG_ERROR,
+    "PCI %02x:%02x.%x CRS timeout after %d seconds - device not ready\n",
+    Bus,
+    Device,
+    Func,
+    PcdGet32 (PcdPciCrsTimeoutSeconds)
+    ));
 
   return EFI_NOT_FOUND;
 }
