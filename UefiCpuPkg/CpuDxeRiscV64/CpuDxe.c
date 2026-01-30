@@ -363,6 +363,11 @@ InitializeCpu (
   InitializeFloatingPointUnits ();
 
   //
+  // Initialize Vector
+  //
+  InitializeVectorUnits ();
+
+  //
   // Install Boot protocol
   //
   Status = gBS->InstallProtocolInterface (
