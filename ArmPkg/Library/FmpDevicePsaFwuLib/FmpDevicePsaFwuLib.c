@@ -1,6 +1,6 @@
 /**
 
-  Copyright (c) 2024, Arm Ltd. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, Arm Ltd. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -185,12 +185,12 @@ CheckFwuSupport (
   mFwuFlags       = FwuInfo->Flags;
   mMaxPayloadSize = FwuInfo->MaxPayloadSize;
 
-  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: ServiceStatus: %d\n", FwuInfo->ServiceStatus));
-  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: VersionMajor: %d\n", FwuInfo->VersionMajor));
-  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: VersionMinor: %d\n", FwuInfo->VersionMinor));
-  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: Flags: %d\n", FwuInfo->Flags));
-  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: VendorSpecificFlags: %d\n", FwuInfo->VendorSpecificFlags));
-  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: MaxPayloadSize: %d\n", FwuInfo->MaxPayloadSize));
+  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: ServiceStatus: %u\n", (UINT32)FwuInfo->ServiceStatus));
+  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: VersionMajor: %u\n", (UINT32)FwuInfo->VersionMajor));
+  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: VersionMinor: %u\n", (UINT32)FwuInfo->VersionMinor));
+  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: Flags: 0x%08x\n", FwuInfo->Flags));
+  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: VendorSpecificFlags: 0x%08x\n", FwuInfo->VendorSpecificFlags));
+  DEBUG ((DEBUG_INFO, "FmpPsaFwuLib: MaxPayloadSize: %lu\n", FwuInfo->MaxPayloadSize));
 
   return EFI_SUCCESS;
 }
@@ -223,7 +223,7 @@ GetFwuImageDirectory (
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "FmpPsaFwuLib: FwuOpen failed for Image Directory: %d\n",
+      "FmpPsaFwuLib: FwuOpen failed for Image Directory: %r\n",
       Status
       ));
     return Status;
