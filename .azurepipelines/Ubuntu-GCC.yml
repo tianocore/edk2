@@ -6,9 +6,17 @@
 # Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
-trigger:
-- master
-- stable/*
+trigger: none
+
+schedules:
+- cron: "0 7 * * *"
+  displayName: Daily Build
+  branches:
+    include:
+    - master
+    - stable/*
+  always: true
+
 pr:
 - master
 - stable/*

@@ -25,21 +25,32 @@ jobs:
   strategy:
     matrix:
       ${{ if eq(parameters.tool_chain_tag, 'GCC') }}:
+        TARGET_GCC_ONLY_UNIT_TEST:
+          Build.Pkgs: 'EmbeddedPkg'
+          Build.Targets: 'NOOPT'
+          Build.Archlist: 'X64'
+          Build.ExtraStuartArgs: '--disable-all HostUnitTestCompilerPlugin=run HostBasedUnitTestRunner=run'
+      TARGET_UNIT_TEST:
+        Build.Pkgs: 'ArmPkg,ArmPlatformPkg,MdePkg,UefiCpuPkg,MdeModulePkg,NetworkPkg,RedfishPkg,PcAtChipsetPkg,PrmPkg,ShellPkg,SourceLevelDebugPkg,StandaloneMmPkg,SignedCapsulePkg,FmpDevicePkg,FatPkg,UnitTestFrameworkPkg,DynamicTablesPkg,CryptoPkg,IntelFsp2Pkg,IntelFsp2WrapperPkg,SecurityPkg,ArmVirtPkg,EmulatorPkg,OvmfPkg,UefiPayloadPkg'
+        Build.Targets: 'NOOPT'
+        Build.Archlist: 'X64'
+        Build.ExtraStuartArgs: '--disable-all HostUnitTestCompilerPlugin=run HostBasedUnitTestRunner=run'
+      ${{ if eq(parameters.tool_chain_tag, 'GCC') }}:
         TARGET_GCC_ONLY:
           Build.Pkgs: 'EmbeddedPkg'
-          Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+          Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
           Build.Archlist: ${{ parameters.arch_list }}
       TARGET_ARM_ARMPLATFORM:
         Build.Pkgs: 'ArmPkg,ArmPlatformPkg'
-        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
         Build.Archlist: ${{ parameters.arch_list }}
       TARGET_MDE_CPU:
         Build.Pkgs: 'MdePkg,UefiCpuPkg'
-        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
         Build.Archlist: ${{ parameters.arch_list }}
       TARGET_MDEMODULE_DEBUG:
         Build.Pkgs: 'MdeModulePkg'
-        Build.Targets: 'DEBUG,NOOPT'
+        Build.Targets: 'DEBUG'
         Build.Archlist: ${{ parameters.arch_list }}
       TARGET_MDEMODULE_RELEASE:
         Build.Pkgs: 'MdeModulePkg'
@@ -47,19 +58,19 @@ jobs:
         Build.Archlist: ${{ parameters.arch_list }}
       TARGET_NETWORK:
         Build.Pkgs: 'NetworkPkg,RedfishPkg'
-        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
         Build.Archlist: ${{ parameters.arch_list }}
       TARGET_OTHER:
         Build.Pkgs: 'PcAtChipsetPkg,PrmPkg,ShellPkg,SourceLevelDebugPkg,StandaloneMmPkg,SignedCapsulePkg'
-        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
         Build.Archlist: ${{ parameters.arch_list }}
       TARGET_FMP_FAT_TEST:
         Build.Pkgs: 'FmpDevicePkg,FatPkg,UnitTestFrameworkPkg,DynamicTablesPkg'
-        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
         Build.Archlist: ${{ parameters.arch_list }}
       TARGET_CRYPTO_DEBUG:
         Build.Pkgs: 'CryptoPkg'
-        Build.Targets: 'DEBUG,NOOPT'
+        Build.Targets: 'DEBUG'
         Build.Archlist: ${{ parameters.arch_list }}
       TARGET_CRYPTO_RELEASE:
         Build.Pkgs: 'CryptoPkg'
@@ -67,26 +78,26 @@ jobs:
         Build.Archlist: ${{ parameters.arch_list }}
       TARGET_FSP:
         Build.Pkgs: 'IntelFsp2Pkg,IntelFsp2WrapperPkg'
-        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
         Build.Archlist: ${{ parameters.arch_list }}
       TARGET_SECURITY:
         Build.Pkgs: 'SecurityPkg'
-        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
         Build.Archlist: ${{ parameters.arch_list }}
       TARGET_UEFIPAYLOAD_IA32_X64:
         Build.Pkgs: 'UefiPayloadPkg'
-        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
         Build.Archlist: 'IA32,X64'
       ${{ if eq(parameters.tool_chain_tag, 'GCC') }}:
         TARGET_UEFIPAYLOAD_AARCH64_GCC_ONLY:
           Build.Pkgs: 'UefiPayloadPkg'
-          Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+          Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
           Build.Archlist: 'AARCH64'
       TARGET_PLATFORMS:
         # For Platforms only check code. Leave it to Platform CI
         # to build them.
         Build.Pkgs: 'ArmVirtPkg,EmulatorPkg,OvmfPkg'
-        Build.Targets: 'NO-TARGET,NOOPT'
+        Build.Targets: 'NO-TARGET'
         Build.Archlist: ${{ parameters.arch_list }}
 
   workspace:
@@ -105,6 +116,7 @@ jobs:
       build_pkgs: $(Build.Pkgs)
       build_targets: $(Build.Targets)
       build_archs: $(Build.Archlist)
+      build_extra_stuart_args: $(Build.ExtraStuartArgs)
       usePythonVersion: ${{ parameters.usePythonVersion }}
       extra_install_step: ${{ parameters.extra_install_step }}
 

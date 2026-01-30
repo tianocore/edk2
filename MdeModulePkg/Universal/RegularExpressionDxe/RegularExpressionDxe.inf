@@ -67,6 +67,9 @@
   oniguruma/src/sjis_prop.c
   oniguruma/src/euc_jp_prop.c
 
+[Sources.IA32]
+  Ia32/MathLlmul.asm        | MSFT
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec

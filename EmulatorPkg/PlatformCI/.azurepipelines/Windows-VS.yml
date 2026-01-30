@@ -9,9 +9,17 @@
 # Copyright (c) 2020, Intel Corporation. All rights reserved.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
-trigger:
-  - master
-  - stable/*
+trigger: none
+
+schedules:
+- cron: "0 2 * * *"
+  displayName: Daily Build
+  branches:
+    include:
+    - master
+    - stable/*
+  always: true
+
 pr:
   - master
   - stable/*
