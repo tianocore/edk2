@@ -42,7 +42,7 @@
 
 [Sources.RISCV64]
   RiscV64/DxeLoadFunc.c
-  RiscV64/DxeLoadFuncFit.c
+  RiscV64/DxeLoadFuncFit.S | GCC
 
 [Sources.AARCH64]
   AArch64/DxeHandoff.c
