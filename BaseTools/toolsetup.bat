@@ -49,6 +49,12 @@ if /I "%1"=="/?" goto Usage
     set BASETOOLS_MINGW_BUILD=TRUE
     goto loop
   )
+  if /I "%1"=="VS2026" (
+    shift
+    set VS2026=TRUE
+    set VSTool=VS2026
+    goto loop
+  )
   if /I "%1"=="VS2022" (
     shift
     set VS2022=TRUE
@@ -320,7 +326,9 @@ IF NOT exist "%EDK_TOOLS_PATH%\set_vsprefix_envs.bat" (
   @echo.
   goto end
 )
-if defined VS2022 (
+if defined VS2026 (
+  call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat VS2026
+) else if defined VS2022 (
   call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat VS2022
 ) else if defined VS2019 (
   call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat VS2019
@@ -582,7 +590,7 @@ endlocal
 
 :Usage
   @echo.
-  @echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [ Rebuild | ForceRebuild ] [Reconfig] [Mingw-w64] [base_tools_path [edk_tools_path]] [VS2022] [VS2019] [VS2017] [VS2015]"
+  @echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [ Rebuild | ForceRebuild ] [Reconfig] [Mingw-w64] [base_tools_path [edk_tools_path]] [VS2026] [VS2022] [VS2019] [VS2017] [VS2015]"
   @echo.
   @echo         base_tools_path   BaseTools project path, BASE_TOOLS_PATH will be set to this path.
   @echo         edk_tools_path    EDK_TOOLS_PATH will be set to this path.
@@ -596,12 +604,14 @@ endlocal
   @echo         VS2017            Set the env for VS2017 build.
   @echo         VS2019            Set the env for VS2019 build.
   @echo         VS2022            Set the env for VS2022 build.
+  @echo         VS2026            Set the env for VS2026 build.
   @echo.
 
 :end
 set REBUILD=
 set FORCE_REBUILD=
 set RECONFIG=
+set VS2026=
 set VS2022=
 set VS2019=
 set VS2017=

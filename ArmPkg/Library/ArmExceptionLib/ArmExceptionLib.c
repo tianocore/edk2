@@ -26,11 +26,6 @@ ExceptionHandlersStart (
   VOID
   );
 
-VOID
-ExceptionHandlersEnd (
-  VOID
-  );
-
 RETURN_STATUS
 ArchVectorConfig (
   IN  UINTN  VectorBaseAddress

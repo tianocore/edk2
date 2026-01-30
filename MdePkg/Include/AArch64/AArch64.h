@@ -140,19 +140,27 @@
 
 #define ID_AA64PFR2_EL1  S3_0_C0_C4_2
 
-#define VECTOR_BASE(tbl)          \
+// This macro defines a vector table
+// It is intended to be used as follows:
+//
+// #define MY_VECTOR
+//  VECTOR_ENTRY(MY_VECTOR, <some_offset>)
+//  <custom instructions for this entry>
+//  <more VECTOR_ENTRY(...) as needed>
+//
+// VECTOR_TABLE (MY_VECTOR_TABLE_NAME, MY_VECTOR)
+#define VECTOR_TABLE(tbl, entries) \
   .section .text.##tbl##,"ax";    \
   .align 11;                      \
   .org 0x0;                       \
   GCC_ASM_EXPORT(tbl);            \
   ASM_PFX(tbl):                   \
+  entries                         \
+  .org 0x800;                     \
+  .section .text
 
 #define VECTOR_ENTRY(tbl, off)    \
-  .org off
-
-#define VECTOR_END(tbl)           \
-  .org 0x800;                     \
-  .previous
+  .org off;
 
 VOID
 EFIAPI

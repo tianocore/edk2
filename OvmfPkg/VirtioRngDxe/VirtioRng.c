@@ -136,6 +136,7 @@ VirtioRngGetRNG (
   EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  DeviceAddress;
   VOID                  *Mapping;
+  EFI_TPL               CurrentTpl;
 
   if ((This == NULL) || (RNGValueLength == 0) || (RNGValue == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -177,6 +178,8 @@ VirtioRngGetRNG (
     goto FreeBuffer;
   }
 
+  CurrentTpl = gBS->RaiseTPL (TPL_NOTIFY);
+
   //
   // The Virtio RNG device may return less data than we asked it to, and can
   // only return MAX_UINT32 bytes per invocation. So loop as long as needed to
@@ -198,12 +201,15 @@ VirtioRngGetRNG (
         EFI_SUCCESS)
     {
       Status = EFI_DEVICE_ERROR;
+      gBS->RestoreTPL (CurrentTpl);
       goto UnmapBuffer;
     }
 
     ASSERT (Len > 0);
     ASSERT (Len <= BufferSize);
   }
+
+  gBS->RestoreTPL (CurrentTpl);
 
   //
   // Unmap the device buffer before accessing it.

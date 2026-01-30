@@ -607,6 +607,3 @@ EMU_THUNK_PROTOCOL  gEmuThunkProtocol = {
   SecSetTimer,
   GetNextThunkProtocol
 };
-
-#pragma warning(default : 4996)
-#pragma warning(default : 4232)

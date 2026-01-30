@@ -27,7 +27,7 @@
 
 **/
 #define POST_CODE_TO_STATUS_CODE_VALUE(PostCode)  \
-  ((EFI_STATUS_CODE_VALUE) (((PostCode & 0x1f) << 16) | ((PostCode & 0x3) << 19)))
+  ((EFI_STATUS_CODE_VALUE) (((PostCode & 0x1f) << 16) | ((PostCode & 0xe0) << 19)))
 
 /**
   Sends an 32-bit value to a POST card.
@@ -112,9 +112,9 @@ PostCodeWithDescription (
   bit of PcdPostCodePropertyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE   The POST_CODE_PROPERTY_POST_CODE_ENABLED bit of
-                  PcdPostCodeProperyMask is set.
+                  PcdPostCodePropertyMask is set.
   @retval  FALSE  The POST_CODE_PROPERTY_POST_CODE_ENABLED bit of
-                  PcdPostCodeProperyMask is clear.
+                  PcdPostCodePropertyMask is clear.
 
 **/
 BOOLEAN
@@ -133,9 +133,9 @@ PostCodeEnabled (
   bit of PcdPostCodePropertyMask is set.  Otherwise FALSE is returned.
 
   @retval  TRUE   The POST_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED bit of
-                  PcdPostCodeProperyMask is set.
+                  PcdPostCodePropertyMask is set.
   @retval  FALSE  The POST_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED bit of
-                  PcdPostCodeProperyMask is clear.
+                  PcdPostCodePropertyMask is clear.
 
 **/
 BOOLEAN

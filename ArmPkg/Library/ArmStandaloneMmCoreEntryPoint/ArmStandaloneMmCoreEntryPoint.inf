@@ -62,11 +62,10 @@
 [Pcd]
   gArmTokenSpaceGuid.PcdStMmStackSize
 
-#
-# This configuration fails for CLANGPDB, which does not support PIE in the GCC
-# sense. Such however is required for ARM family StandaloneMmCore
-# self-relocation, and thus the CLANGPDB toolchain is unsupported for AARCH64
-# for this module.
-#
+# Standalone MM Core can be used as an OP-TEE trusted application and needs to do runtime^M
+# relocation in that scenario. It needs to be built as a position independent executable (PIE)^M
+# for this use case. However, PE targets do not support PIE, so only ELF targets^M
+# are built with these flags and support this scenario.
 [BuildOptions]
-  GCC:*_*_AARCH64_CC_FLAGS = -fpie
+  GCC:*_GCC_AARCH64_CC_FLAGS = -fpie
+  CLANGDWARF:*_CLANGDWARF_AARCH64_CC_FLAGS = -fpie

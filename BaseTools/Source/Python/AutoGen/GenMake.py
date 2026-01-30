@@ -98,10 +98,18 @@ class BuildFile(object):
 #
     '''
 
+    ## Fixed header string for makefile
+    _GMAKE_MAKEFILE_HEADER = '''
+ifeq (Windows, $(findstring Windows,$(OS)))
+  SHELL := cmd.exe
+endif
+    '''
+
+
     ## Header string for each type of build file
     _FILE_HEADER_ = {
         NMAKE_FILETYPE :   _MAKEFILE_HEADER % _FILE_NAME_[NMAKE_FILETYPE],
-        GMAKE_FILETYPE :   _MAKEFILE_HEADER % _FILE_NAME_[GMAKE_FILETYPE]
+        GMAKE_FILETYPE :   (_MAKEFILE_HEADER + _GMAKE_MAKEFILE_HEADER) % _FILE_NAME_[GMAKE_FILETYPE]
     }
 
     ## shell commands which can be used in build file in the form of macro
