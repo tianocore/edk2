@@ -70,6 +70,9 @@
   StackCheckLib
   MemoryAllocationLib
 
+[LibraryClasses.RISCV64]
+  UefiCpuBaseArchSupportLib
+
 [Guids]
   gEfiMemoryTypeInformationGuid
   gEfiFirmwareFileSystem2Guid
@@ -116,6 +119,9 @@
   gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData
   gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode
   gUefiPayloadPkgTokenSpaceGuid.PcdFDTPageSize
+
+[Pcd.RISCV64]
+  gUefiPayloadPkgTokenSpaceGuid.SizeOfIoSpace
 
 [BuildOptions]
   MSFT:*_*_*_CC_FLAGS = /wd4244 /wd4305
