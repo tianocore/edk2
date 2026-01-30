@@ -603,8 +603,9 @@ ParseSerialPort (
   Serial->RegisterStride  = 1;
   Serial->UseMmio         = TRUE;
 
-  PropertyPtr = FdtGetProperty (Fdt, SubNode, "current-speed", &TempLen);
-  ASSERT (TempLen > 0);
+  // Set to 0 to use the default baud rate 115200
+  Serial->BaudRate = 0;
+  PropertyPtr      = FdtGetProperty (Fdt, SubNode, "current-speed", &TempLen);
   if (TempLen > 0) {
     Data32           = (UINT32 *)(PropertyPtr->Data);
     Serial->BaudRate = Fdt32ToCpu (*Data32);
