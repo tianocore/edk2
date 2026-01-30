@@ -19,8 +19,22 @@
 
 #include <Library/ArmFfaLib.h>
 
-extern BOOLEAN  gFfaSupported;
-extern UINT16   gPartId;
+/**
+  Get my FF-A partiton id.
+  If there is cached informatio via ArmCommonInit() use it
+  Otherwise, Get it with ArmFfaLibPartitionIdGet().
+
+  @param [out]    PartId            Partition id.
+
+  @retval  EFI_SUCCESS
+  @retval  Others                   Failed to get partition id.
+
+**/
+EFI_STATUS
+EFIAPI
+GetFfaPartitionId (
+  OUT UINT16  *PartId
+  );
 
 /**
   Convert FfArgs to EFI_STATUS.
