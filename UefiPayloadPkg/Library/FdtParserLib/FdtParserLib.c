@@ -268,7 +268,7 @@ ParseReservedMemory (
       BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiMemoryMappedIO);
     } else {
       PropertyPtr = FdtGetProperty (Fdt, SubNode, "compatible", &TempLen);
-      TempStr     = (CHAR8 *)(PropertyPtr->Data);
+      TempStr     = TempLen > 0 ? (CHAR8 *)(PropertyPtr->Data) : "";
       DEBUG ((DEBUG_INFO, "compatible:  %a\n", TempStr));
       if (AsciiStrnCmp (TempStr, "boot-code", AsciiStrLen ("boot-code")) == 0) {
         DEBUG ((DEBUG_INFO, "  boot-code\n"));
