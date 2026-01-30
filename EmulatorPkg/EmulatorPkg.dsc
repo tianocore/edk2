@@ -49,7 +49,26 @@
   0|DEFAULT
 
 !include MdePkg/MdeLibs.dsc.inc
+!include RedfishPkg/Redfish.dsc.inc
+!include NetworkPkg/Network.dsc.inc
+
+#
+# Do not reference CryptoPkg PCDs if features are not enabled that depend on the
+# CryptoPkg libraries or modules. Otherwise a build error for a reference to an
+# unused PCD is generated.
+#
+!if $(SECURE_BOOT_ENABLE) == TRUE || $(NETWORK_ENABLE) == TRUE
 !include CryptoPkg/CryptoPkgFeatureFlagPcds.dsc.inc
+!if $(WIN_MINGW32_BUILD)
+[PcdsFeatureFlag]
+  #
+  # When WIN_MINGW32_BUILD is set, -target is set to build Windows application.
+  # Set PcdOpensslLibAssemblySourceStyleNasm to TRUE to use Openssl NASM
+  # source files that assume a Windows calling convention.
+  #
+  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm|TRUE
+!endif
+!endif
 
 [LibraryClasses]
   #
@@ -112,6 +131,8 @@
   !if $(REDFISH_ENABLE) == TRUE
     RedfishPlatformHostInterfaceLib|EmulatorPkg/Library/RedfishPlatformHostInterfaceLib/RedfishPlatformHostInterfaceLib.inf
     RedfishPlatformCredentialLib|EmulatorPkg/Library/RedfishPlatformCredentialLib/RedfishPlatformCredentialLib.inf
+    RedfishPlatformWantedDeviceLib|RedfishPkg/Library/RedfishPlatformWantedDeviceLibNull/RedfishPlatformWantedDeviceLibNull.inf
+    RedfishContentCodingLib|RedfishPkg/Library/RedfishContentCodingLibNull/RedfishContentCodingLibNull.inf
   !endif
   #
   # Misc
@@ -134,8 +155,9 @@
   ImagePropertiesRecordLib|MdeModulePkg/Library/ImagePropertiesRecordLib/ImagePropertiesRecordLib.inf
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+  TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   PlatformSecureLib|SecurityPkg/Library/PlatformSecureLibNull/PlatformSecureLibNull.inf
@@ -222,14 +244,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables|FALSE
   gEmulatorPkgTokenSpaceGuid.PcdEmulatorLazyLoadSymbols|FALSE
-!if $(WIN_MINGW32_BUILD)
-  #
-  # When WIN_MINGW32_BUILD is set, -target is set to build Windows application.
-  # Set PcdOpensslLibAssemblySourceStyleNasm to TRUE to use Openssl NASM
-  # source files that assume a Windows calling convention.
-  #
-  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm|TRUE
-!endif
 
 [PcdsFixedAtBuild]
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy|0x00000000
@@ -297,17 +311,15 @@
   gEmulatorPkgTokenSpaceGuid.PcdRedfishServiceStopIfSecureBootDisabled|False
   gEmulatorPkgTokenSpaceGuid.PcdRedfishServiceStopIfExitbootService|False
 
-  gEfiRedfishClientPkgTokenSpaceGuid.PcdRedfishServiceEtagSupported|False
-
   #
   # Redfish Debug enablement
   #
   # 0x0000000000000001  RedfishPlatformConfigDxe driver debug enabled.
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDebugCategory|0
-  #   0x00000001  x-uefi-redfish string database message enabled
+  #   0x00000001  x-UEFI-redfish string database message enabled
   #   0x00000002  Debug Message for dumping formset
-  #   0x00000004  Debug Message for x-uefi-redfish searching result
-  #   0x00000008  Debug Message for x-uefi-redfish Regular Expression searching result
+  #   0x00000004  Debug Message for x-UEFI-redfish searching result
+  #   0x00000008  Debug Message for x-UEFI-redfish Regular Expression searching result
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishPlatformConfigDebugProperty|0
 
   # Redfish Platform Configure DXE driver feature enablement
@@ -418,7 +430,9 @@
   #
   # Hash2 Protocol producer
   #
+!if $(NETWORK_ENABLE) == TRUE
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+!endif
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
@@ -520,12 +534,10 @@
 
 !endif
 
-!include NetworkPkg/Network.dsc.inc
 
 !if $(REDFISH_ENABLE) == TRUE
   EmulatorPkg/Application/RedfishPlatformConfig/RedfishPlatformConfig.inf
 !endif
-!include RedfishPkg/Redfish.dsc.inc
 
 #
 # Fail with error message if the OS/Compiler combination is not supported
@@ -652,7 +664,7 @@
   #
   GCC:*_CLANGDWARF_*_GENFWHII_FLAGS == --hiipackage
   GCC:*_CLANGDWARF_*_RC_PATH         = llvm-rc
-  GCC:*_CLANGDWARF_*_RC_FLAGS       ==
+  GCC:*_CLANGDWARF_*_RC_FLAGS       == --
 
   #
   # Must override DLINK to use options compatible with Mingw CLANG that is
@@ -690,15 +702,10 @@
   # families that must use Visual Studio specific defines and libraries when
   # building modules of type HOST_APPLICATION
   #
-!if $(ARCH) in "X64"
-  DEFINE VS_ARCH_DIR = x64
-!endif
-!if $(ARCH) in "IA32"
-  DEFINE VS_ARCH_DIR = x86
-!endif
-  DEFINE VISUAL_STUDIO_DEFINES   = -D UNICODE -D _CRT_SECURE_NO_WARNINGS -D _CRT_SECURE_NO_DEPRECATE
-  DEFINE VISUAL_STUDIO_LIB_PATHS = /LIBPATH:"%VCToolsInstallDir%lib\$(VS_ARCH_DIR)" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\$(VS_ARCH_DIR)" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%um\$(VS_ARCH_DIR)"
-  DEFINE VISUAL_STUDIO_LIBS      = Kernel32.lib MSVCRTD.lib vcruntimed.lib ucrtd.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib
+  DEFINE VISUAL_STUDIO_DEFINES        = -D UNICODE -D _CRT_SECURE_NO_WARNINGS -D _CRT_SECURE_NO_DEPRECATE
+  DEFINE VISUAL_STUDIO_IA32_LIB_PATHS = /LIBPATH:"%VCToolsInstallDir%lib\x86" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%um\x86"
+  DEFINE VISUAL_STUDIO_X64_LIB_PATHS  = /LIBPATH:"%VCToolsInstallDir%lib\X64" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\X64" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%um\X64"
+  DEFINE VISUAL_STUDIO_LIBS           = Kernel32.lib MSVCRTD.lib vcruntimed.lib ucrtd.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib
 
 [BuildOptions.common.EDKII.HOST_APPLICATION]
   MSFT:*_*_*_CC_FLAGS        = $(VISUAL_STUDIO_DEFINES)
@@ -706,7 +713,8 @@
   # Must ovveride DLINK_FLAGS to remove /DLL when linking .exe
   #
   MSFT:*_*_*_DLINK_FLAGS    == /out:"$(BIN_DIR)\$(BASE_NAME).exe" /NOLOGO /SUBSYSTEM:CONSOLE /IGNORE:4086 /MAP /OPT:REF /LTCG
-  MSFT:*_*_*_DLINK_FLAGS     = $(VISUAL_STUDIO_LIB_PATHS) $(VISUAL_STUDIO_LIBS)
+  MSFT:*_*_IA32_DLINK_FLAGS  = $(VISUAL_STUDIO_IA32_LIB_PATHS) $(VISUAL_STUDIO_LIBS)
+  MSFT:*_*_X64_DLINK_FLAGS   = $(VISUAL_STUDIO_X64_LIB_PATHS)  $(VISUAL_STUDIO_LIBS)
   MSFT:DEBUG_*_*_DLINK_FLAGS = /DEBUG /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb"
   MSFT:NOOPT_*_*_DLINK_FLAGS = /DEBUG /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb"
 
@@ -715,7 +723,8 @@
   # Must ovveride DLINK_FLAGS to remove /DLL when linking .exe
   #
   CLANGPDB:*_*_*_DLINK_FLAGS    == /OUT:"$(BIN_DIR)\$(BASE_NAME).exe" /NOLOGO /SUBSYSTEM:CONSOLE /IGNORE:4086 /OPT:REF /LLDMAP
-  CLANGPDB:*_*_*_DLINK_FLAGS     = $(VISUAL_STUDIO_LIB_PATHS) $(VISUAL_STUDIO_LIBS)
+  CLANGPDB:*_*_IA32_DLINK_FLAGS  = $(VISUAL_STUDIO_IA32_LIB_PATHS) $(VISUAL_STUDIO_LIBS)
+  CLANGPDB:*_*_X64_DLINK_FLAGS   = $(VISUAL_STUDIO_X64_LIB_PATHS)  $(VISUAL_STUDIO_LIBS)
   CLANGPDB:DEBUG_*_*_DLINK_FLAGS = /DEBUG /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb"
   CLANGPDB:NOOPT_*_*_DLINK_FLAGS = /DEBUG /pdb:"$(BIN_DIR)\$(BASE_NAME).pdb"
 

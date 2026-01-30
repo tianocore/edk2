@@ -888,7 +888,9 @@
   #
   # Hash2 Protocol producer
   #
+!if $(NETWORK_ENABLE) == TRUE
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+!endif
 
   #
   # Network Support
