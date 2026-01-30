@@ -1034,7 +1034,39 @@ NvmeShutdownAllControllers (
         if (EFI_ERROR (Status)) {
           continue;
         }
+      }
+    }
+  }
 
+  // Another cycle to polling every disk to check the shutdown status, can save time
+  for (HandleIndex = 0; HandleIndex < HandleCount; HandleIndex++) {
+    Status = gBS->OpenProtocolInformation (
+                    Handles[HandleIndex],
+                    &gEfiPciIoProtocolGuid,
+                    &OpenInfos,
+                    &OpenInfoCount
+                    );
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    for (OpenInfoIndex = 0; OpenInfoIndex < OpenInfoCount; OpenInfoIndex++) {
+      if (((OpenInfos[OpenInfoIndex].Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) != 0) &&
+          (OpenInfos[OpenInfoIndex].AgentHandle == gImageHandle))
+      {
+        Status = gBS->OpenProtocol (
+                        OpenInfos[OpenInfoIndex].ControllerHandle,
+                        &gEfiNvmExpressPassThruProtocolGuid,
+                        (VOID **)&NvmePassThru,
+                        NULL,
+                        NULL,
+                        EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                        );
+        if (EFI_ERROR (Status)) {
+          continue;
+        }
+
+        Private = NVME_CONTROLLER_PRIVATE_DATA_FROM_PASS_THRU (NvmePassThru);
         //
         // The controller indicates when shutdown processing is completed by updating the
         // Shutdown Status (CSTS.SHST) field to 10b.
@@ -1043,7 +1075,7 @@ NvmeShutdownAllControllers (
         for (Index = 0; Index < NVME_SHUTDOWN_PROCESS_TIMEOUT * 100; Index++) {
           Status = ReadNvmeControllerStatus (Private, &Csts);
           if (!EFI_ERROR (Status) && (Csts.Shst == NVME_CSTS_SHST_SHUTDOWN_COMPLETED)) {
-            DEBUG ((DEBUG_INFO, "NvmeShutdownController: shutdown processing is completed after %dms.\n", Index * 10));
+            DEBUG ((DEBUG_INFO, "NvmeShutdownController: disk %d shutdown processing is completed after %dms.\n", OpenInfoIndex, Index * 10));
             break;
           }
 
@@ -1054,7 +1086,7 @@ NvmeShutdownAllControllers (
         }
 
         if (Index == NVME_SHUTDOWN_PROCESS_TIMEOUT * 100) {
-          DEBUG ((DEBUG_ERROR, "NvmeShutdownController: shutdown processing is timed out\n"));
+          DEBUG ((DEBUG_ERROR, "NvmeShutdownController: disk %d shutdown processing is timed out\n", OpenInfoIndex));
         }
       }
     }
