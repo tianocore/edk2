@@ -1439,6 +1439,7 @@ CpuidExit (
   UINT32   Ecx;
   UINT32   Edx;
 
+  XCr0  = 0;
   EaxIn = (UINT32)(UINTN)Regs->Rax;
   EcxIn = (UINT32)(UINTN)Regs->Rcx;
 
