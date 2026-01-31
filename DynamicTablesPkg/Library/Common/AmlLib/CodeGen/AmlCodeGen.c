@@ -5239,6 +5239,9 @@ AmlCodeGenNotify (
 {
   AML_OBJECT_NODE  *NotifyObjectNode;
   AML_OBJECT_NODE  *ValueObjectNode;
+  AML_DATA_NODE    *DataNode;
+  CHAR8            *AmlNameString;
+  UINT32           AmlNameStringSize;
   EFI_STATUS       Status;
 
   if ((ParentNode == NULL) && (NewObjectNode == NULL)) {
@@ -5256,6 +5259,8 @@ AmlCodeGenNotify (
 
   ValueObjectNode  = NULL;
   NotifyObjectNode = NULL;
+  DataNode         = NULL;
+  AmlNameString    = NULL;
 
   switch (NotifyObject.Type) {
     case AmlMethodParamTypeString:
@@ -5265,15 +5270,32 @@ AmlCodeGenNotify (
         goto exit_handler;
       }
 
-      Status = AmlCodeGenString (
-                 NotifyObject.Data.Buffer,
-                 &NotifyObjectNode
-                 );
+      Status = ConvertAslNameToAmlName (NotifyObject.Data.Buffer, &AmlNameString);
       if (EFI_ERROR (Status)) {
         ASSERT_EFI_ERROR (Status);
         goto exit_handler;
       }
 
+      Status = AmlGetNameStringSize (AmlNameString, &AmlNameStringSize);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        goto exit_handler;
+      }
+
+      Status = AmlCreateDataNode (
+                 EAmlNodeDataTypeNameString,
+                 (UINT8 *)AmlNameString,
+                 AmlNameStringSize,
+                 &DataNode
+                 );
+      FreePool (AmlNameString);
+      AmlNameString = NULL;
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        goto exit_handler;
+      }
+
+      NotifyObjectNode = (AML_OBJECT_NODE *)DataNode;
       break;
     case AmlMethodParamTypeArg:
       if (NotifyObject.Data.Arg > (UINT8)(AML_ARG6 - AML_ARG0)) {
@@ -5354,6 +5376,10 @@ exit_handler:
 
   if (ValueObjectNode != NULL) {
     AmlDeleteTree ((AML_NODE_HEADER *)ValueObjectNode);
+  }
+
+  if (AmlNameString != NULL) {
+    FreePool (AmlNameString);
   }
 
   return Status;
