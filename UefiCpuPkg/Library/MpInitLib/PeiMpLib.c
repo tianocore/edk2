@@ -75,6 +75,8 @@ SaveCpuMpData (
   MP_HAND_OFF_CONFIG  MpHandOffConfig;
   UINTN               MpHandOffSize;
 
+  HobBase       = 0;
+  MpHandOff     = NULL;
   MaxCpusPerHob = (0xFFF8 - sizeof (EFI_HOB_GUID_TYPE) - sizeof (MP_HAND_OFF)) / sizeof (PROCESSOR_HAND_OFF);
 
   //
