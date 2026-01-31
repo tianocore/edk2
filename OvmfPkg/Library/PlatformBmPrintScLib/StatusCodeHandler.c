@@ -24,6 +24,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PrintLib.h>
+#include <Library/PvPanicLib.h>
 #include <Library/UefiBootManagerLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
@@ -91,6 +92,17 @@ HandleStatusCode (
   EFI_BOOT_MANAGER_LOAD_OPTION  BmBootOption;
   BOOLEAN                       DevPathStringIsDynamic;
   CHAR16                        *DevPathString;
+
+  // All events come to this function regardless of their status. It is
+  // useful to receive events about errors that may not be critical but
+  // affect the system. For example, events related to RejectPciDevice
+  // or image verification errors.
+  if (((CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE) ||
+      (((CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_PROGRESS_CODE) &&
+       ((Value    & EFI_STATUS_CODE_OPERATION_MASK) == EFI_IOB_EC_RESOURCE_CONFLICT)))
+  {
+    PvPanicLibSendEventGuestCrashLoaded ();
+  }
 
   //
   // Ignore all status codes that are irrelevant for LoadImage() and
