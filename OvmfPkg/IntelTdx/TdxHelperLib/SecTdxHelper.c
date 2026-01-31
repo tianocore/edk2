@@ -369,6 +369,7 @@ AcceptMemoryForAPsStack (
   Status            = EFI_SUCCESS;
   Hob.Raw           = (UINT8 *)VmmHobList;
   MemoryRegionFound = FALSE;
+  PhysicalEnd       = 0;
 
   DEBUG ((DEBUG_INFO, "AcceptMemoryForAPsStack with APsStackSize=0x%x\n", APsStackSize));
 
@@ -760,7 +761,8 @@ ProcessHobList (
   EFI_PHYSICAL_ADDRESS  PhysicalEnd;
   EFI_PHYSICAL_ADDRESS  APsStackStartAddress;
 
-  CpusNum = GetCpusNum ();
+  PhysicalEnd = 0;
+  CpusNum     = GetCpusNum ();
 
   //
   // If there are mutli-vCPU in a TDX guest, accept memory is split into 2 phases.
@@ -777,7 +779,6 @@ ProcessHobList (
     ASSERT (Status == EFI_SUCCESS);
     APsStackStartAddress = PhysicalEnd - APS_STACK_SIZE (CpusNum);
   } else {
-    PhysicalEnd          = 0;
     APsStackStartAddress = 0;
   }
 
