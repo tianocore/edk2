@@ -32,6 +32,8 @@ MemoryStateToGhcbOp (
 {
   UINTN  Cmd;
 
+  Cmd = 0;
+
   switch (State) {
     case SevSnpPageShared: Cmd = SNP_PAGE_STATE_SHARED;
       break;
