@@ -4,7 +4,7 @@
   primitives (Hash Serials, HMAC, RSA, Diffie-Hellman, etc) for UEFI security
   functionality enabling.
 
-Copyright (c) 2009 - 2022, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2026, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation. All rights reserved.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -27,6 +27,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define CRYPTO_NID_SECP384R1        0x0205
 #define CRYPTO_NID_SECP521R1        0x0206
 #define CRYPTO_NID_BRAINPOOLP512R1  0x03A5
+
+// EdDSA
+#define CRYPTO_NID_ED448  0x0440
+
+// ML-DSA
+#define CRYPTO_NID_ML_DSA_87  0x0503
+
+// SLH-DSA
+#define CRYPTO_NID_SLH_DSA_SHAKE_256S  0x040B
 
 ///
 /// MD5 digest size in bytes
@@ -4301,6 +4310,198 @@ EcDsaVerify (
   IN  UINTN        HashSize,
   IN  CONST UINT8  *Signature,
   IN  UINTN        SigSize
+  );
+
+/**
+  Creates a new EdDSA public key object.
+
+  If A is NULL, then return FALSE.
+  If Pkey is NULL, then return FALSE.
+
+  @param[in]      A      Pointer to EdDSA Raw public key.
+  @param[in]      Nid    Crypto NID of the EdDSA curve.
+  @param[in][out] Pkey   Pointer to new EdDSA public key object.
+
+  @retval  TRUE   EdDSA public key object created successfully.
+  @retval  FALSE  Invalid input or unsupported Crypto NID.
+**/
+BOOLEAN
+EFIAPI
+EdDsaCreatePublicKeyObject (
+  IN     UINT8  *A,
+  IN     UINTN  Nid,
+  IN OUT VOID   **Pkey
+  );
+
+/**
+   Free EdDSA public key object.
+
+   If Pkey is NULL, then return.
+
+   @param[in]  Pkey   Pointer to EdDSA public key object.
+**/
+VOID
+EdDsaFreePublicKeyObject (
+  IN VOID  *Pkey
+  );
+
+/**
+  Verifies the EdDSA signature. EdDSA signatures are verified via 'pure' implementation.
+  Meaning message digest cannot be computed ahead of time. Data is passed into the verification function
+
+  If Pkey is NULL, then return FALSE.
+  If Data is NULL, then return FALSE.
+  If DataSize is 0, then return FALSE.
+  If Sig is NULL, then return FALSE.
+  If SigSize is 0, then return FALSE.
+
+  @param[in]  Pkey       Pointer to EdDSA public key object.
+  @param[in]  Data       Pointer to data being verified.
+  @param[in]  DataSize   Size of data.
+  @param[in]  Signature  Pointer to EdDSA signature.
+  @param[in]  SigSize    Size of EdDSA signature.
+
+  @retval  TRUE   Valid signature encoded in EdDSA.
+  @retval  FALSE  Invalid signature or invalid input.
+**/
+BOOLEAN
+EFIAPI
+EdDsaVerify (
+  IN       VOID   *Pkey,
+  IN CONST UINT8  *Data,
+  IN CONST UINTN  DataSize,
+  IN CONST UINT8  *Signature,
+  IN CONST UINTN  SigSize
+  );
+
+/**
+  Create the ML-DSA EVP_PKEY public key object from raw public key bytes.
+
+  If Pkey is NULL, then return FALSE.
+  If RawPublicKey is NULL, then return FALSE.
+  If Nid is not NID_ML_DSA_87, then return FALSE.
+
+  @param[in]  RawPublicKey  Pointer to raw public key bytes.
+  @param[out] Pkey          Pointer to the ML-DSA EVP_PKEY object created.
+  @param[in]  Nid           Nid for ML-DSA Category
+
+  @retval TRUE   ML-DSA EVP_PKEY public key object created successfully.
+  @retval FALSE  Invalid input or ML-DSA EVP_PKEY public key object creation failed.
+**/
+BOOLEAN
+EFIAPI
+MlDsaCreatePublicKeyObject (
+  IN     UINT8        *RawPublicKey,
+  IN OUT VOID         **Pkey,
+  IN     CONST UINTN  Nid
+  );
+
+/**
+   Free the ML-DSA EVP_PKEY object
+
+   If Pkey is NULL, then return.
+
+   @param[in]  Pkey  Pointer to the MLDSA EVP_PKEY object to be freed.
+**/
+VOID
+MlDsaFreePublicKeyObject (
+  IN VOID  *Pkey
+  );
+
+/**
+   Verifies the ML-DSA signature.
+
+   If Pkey is NULL, then return FALSE.
+   If Data is NULL, then return FALSE.
+   If DataLen is 0, then return FALSE.
+   If Sig is NULL, then return FALSE.
+   If SigLen is 0, then return FALSE.
+
+   @param[in]  Pkey       Pointer to ML-DSA EVP_PKEY object.
+   @param[in]  Data       Pointer to data being verified.
+   @param[in]  DataLen    Length of data.
+   @param[in]  Signature  Pointer to ML-DSA signature.
+   @param[in]  SigLen     Length of ML-DSA signature.
+   @param[in]  Nid        Nid for ML-DSA Category
+
+   @retval  TRUE   Valid signature.
+   @retval  FALSE  Invalid signature or invalid input.
+
+**/
+BOOLEAN
+EFIAPI
+MlDsaVerify (
+  IN     CONST VOID   *Pkey,
+  IN     CONST UINT8  *Data,
+  IN     CONST UINTN  DataLen,
+  IN     CONST UINT8  *Signature,
+  IN     CONST UINTN  SigLen,
+  IN     CONST UINTN  Nid
+  );
+
+/**
+ Create the SLH-DSA EVP_PKEY public key object from raw public key bytes.
+
+  If Pkey is NULL, then return FALSE.
+  If RawPublicKey is NULL, then return FALSE.
+  If Nid is not NID_SLHDSASHAKE256S, then return FALSE.
+
+  @param[in]  RawPublicKey  Pointer to raw public key bytes.
+  @param[out] Pkey          Pointer to the SLH-DSA EVP_PKEY object created.
+  @param[in]  Nid           Nid for SLH-DSA Category
+
+  @retval TRUE   SLH-DSA EVP_PKEY public key object created successfully.
+  @retval FALSE  Invalid input or SLH-DSA EVP_PKEY public key object creation failed.
+**/
+BOOLEAN
+EFIAPI
+SlhDsaCreatePublicKeyObject (
+  IN     UINT8        *RawPublicKey,
+  IN OUT VOID         **Pkey,
+  IN     CONST UINTN  Nid
+  );
+
+/**
+  Free the SLH-DSA EVP_PKEY object
+
+  If Pkey is NULL, then return.
+
+  @param[in]  Pkey  Pointer to the SLHDSA EVP_PKEY object to be freed.
+**/
+VOID
+SlhDsaFreePublicKeyObject (
+  IN VOID  *Pkey
+  );
+
+/**
+   Verifies the SLH-DSA signature.
+
+   If Pkey is NULL, then return FALSE.
+   If Data is NULL, then return FALSE.
+   If DataLen is 0, then return FALSE.
+   If Sig is NULL, then return FALSE.
+   If SigLen is 0, then return FALSE.
+
+   @param[in]  Pkey       Pointer to SLH-DSA EVP_PKEY object.
+   @param[in]  Data       Pointer to data being verified.
+   @param[in]  DataLen    Length of data.
+   @param[in]  Signature  Pointer to SLH-DSA signature.
+   @param[in]  SigLen     Length of SLH-DSA signature.
+   @param[in]  Nid        Nid for SLH-DSA Category
+
+   @retval  TRUE   Valid signature.
+   @retval  FALSE  Invalid signature or invalid input.
+
+**/
+BOOLEAN
+EFIAPI
+SlhDsaVerify (
+  IN     CONST VOID   *Pkey,
+  IN     CONST UINT8  *Data,
+  IN     CONST UINTN  DataLen,
+  IN     CONST UINT8  *Signature,
+  IN     CONST UINTN  SigLen,
+  IN     CONST UINTN  Nid
   );
 
 #endif // __BASE_CRYPT_LIB_H__

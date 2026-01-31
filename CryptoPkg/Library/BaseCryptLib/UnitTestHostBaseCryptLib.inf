@@ -50,6 +50,9 @@
   Pk/CryptRsaPssSign.c
   Bn/CryptBn.c
   Pk/CryptEc.c
+  Pk/CryptEd.c
+  Pk/CryptMl.c
+  Pk/CryptSlh.c
 
   SysCall/UnitTestHostCrtWrapper.c
 
