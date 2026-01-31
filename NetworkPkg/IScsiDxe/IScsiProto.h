@@ -254,7 +254,7 @@ typedef struct _ISCSI_BASIC_HEADER {
 typedef struct _ISCSI_ADDTIONAL_HEADER {
   UINT16    Length;
   UINT8     Type;
-  UINT8     TypeSpecific[1];
+  UINT8     TypeSpecific[];
 } ISCSI_ADDITIONAL_HEADER;
 
 typedef struct _ISCSI_BI_EXP_READ_DATA_LEN_AHS {

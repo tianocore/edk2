@@ -45,7 +45,7 @@ typedef struct {
   UINT32      AdditionalDynamicMemorySize;
   STM_FEAT    StmFeatures;
   UINT32      NumberOfRevIDs;
-  UINT32      StmSmmRevID[1];
+  UINT32      StmSmmRevID[];
   ///
   /// The total STM_HEADER should be 4K.
   ///

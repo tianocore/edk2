@@ -29,7 +29,7 @@ typedef struct {
   UINT64    Signature;
   UINT64    CapsuleAllImageSize;
   UINT64    CapsuleNumber;
-  UINT64    CapsuleOffset[1];
+  UINT64    CapsuleOffset[];
 } EFI_CAPSULE_PEIM_PRIVATE_DATA;
 #pragma pack()
 

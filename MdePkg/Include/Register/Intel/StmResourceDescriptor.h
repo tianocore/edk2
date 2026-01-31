@@ -145,7 +145,7 @@ typedef struct {
   UINT16                      Length;
   UINT8                       OriginatingBusNumber;
   UINT8                       LastNodeIndex;
-  STM_PCI_DEVICE_PATH_NODE    PciDevicePath[1];
+  STM_PCI_DEVICE_PATH_NODE    PciDevicePath[];
   // STM_PCI_DEVICE_PATH_NODE  PciDevicePath[LastNodeIndex + 1];
 } STM_RSC_PCI_CFG_DESC;
 

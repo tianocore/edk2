@@ -43,7 +43,7 @@ typedef struct {
   ///
   /// The beginning of data immediately follows the header.
   ///
-  UINT8                     Data[1];
+  UINT8                     Data[];
 } PRM_DATA_BUFFER;
 
 #pragma pack(pop)

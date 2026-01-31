@@ -22,7 +22,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 typedef struct {
   UINTN         Function;
   EFI_STATUS    ReturnStatus;
-  UINT8         Data[1];
+  UINT8         Data[];
 } SMM_FVB_COMMUNICATE_FUNCTION_HEADER;
 
 ///

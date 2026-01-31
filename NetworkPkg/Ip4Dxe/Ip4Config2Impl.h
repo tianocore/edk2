@@ -139,7 +139,7 @@ typedef struct {
 typedef struct {
   UINT16                     Checksum;
   UINT16                     DataRecordCount;
-  IP4_CONFIG2_DATA_RECORD    DataRecord[1];
+  IP4_CONFIG2_DATA_RECORD    DataRecord[];
 } IP4_CONFIG2_VARIABLE;
 
 #pragma pack()

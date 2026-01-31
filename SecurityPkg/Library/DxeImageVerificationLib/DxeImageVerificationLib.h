@@ -79,7 +79,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 typedef struct {
   WIN_CERTIFICATE    Hdr;
-  UINT8              CertData[1];
+  UINT8              CertData[];
 } WIN_CERTIFICATE_EFI_PKCS;
 
 /**

@@ -243,7 +243,7 @@ typedef struct {
   UINT32                            OverflowInterruptGsiv;
   UINT32                            NodeReference;
   UINT64                            Page1Base;
-  // EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE      OverflowInterruptMsiMapping[1];
+  // EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE      OverflowInterruptMsiMapping[];
 } EFI_ACPI_6_0_IO_REMAPPING_PMCG_NODE;
 
 ///
@@ -277,7 +277,7 @@ typedef struct {
   /// Offset of the memory range descriptor array.
   UINT32                            MemRangeDescRef;
   // EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE         IdMapping[1];
-  // EFI_ACPI_6_0_IO_REMAPPING_MEM_RANGE_DESC   MemRangeDesc[1];
+  // EFI_ACPI_6_0_IO_REMAPPING_MEM_RANGE_DESC   MemRangeDesc[];
 } EFI_ACPI_6_0_IO_REMAPPING_RMR_NODE;
 
 #pragma pack()

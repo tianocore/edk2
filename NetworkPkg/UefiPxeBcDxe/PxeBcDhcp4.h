@@ -187,7 +187,7 @@ typedef struct {
   UINT8    InterfaceName[4];
   UINT8    Lit4[1];
   UINT8    UndiMajor[3];
-  UINT8    UndiMinor[3];
+  UINT8    UndiMinor[];
 } PXEBC_DHCP4_OPTION_CLID;
 
 typedef struct {
@@ -216,18 +216,18 @@ typedef union {
 typedef struct {
   UINT16              Type;
   UINT8               IpCnt;
-  EFI_IPv4_ADDRESS    IpAddr[1];
+  EFI_IPv4_ADDRESS    IpAddr[];
 } PXEBC_BOOT_SVR_ENTRY;
 
 typedef struct {
   UINT16    Type;
   UINT8     DescLen;
-  UINT8     DescStr[1];
+  UINT8     DescStr[];
 } PXEBC_BOOT_MENU_ENTRY;
 
 typedef struct {
   UINT8    Timeout;
-  UINT8    Prompt[1];
+  UINT8    Prompt[];
 } PXEBC_MENU_PROMPT;
 #pragma pack()
 

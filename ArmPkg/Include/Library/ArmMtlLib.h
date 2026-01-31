@@ -28,7 +28,7 @@ typedef struct {
   // NOTE: Since EDK2 does not allow flexible array member [] we declare
   // here array of 1 element length. However below is used as a variable
   // length array.
-  UINT32    Payload[1]; // size less object gives offset to payload.
+  UINT32    Payload[]; // size less object gives offset to payload.
 } MTL_MAILBOX;
 
 #pragma pack()

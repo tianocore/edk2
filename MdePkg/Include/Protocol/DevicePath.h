@@ -1101,7 +1101,7 @@ typedef struct {
   ///
   /// A NULL-terminated Path string including directory and file names.
   ///
-  CHAR16                      PathName[1];
+  CHAR16                      PathName[];
 } FILEPATH_DEVICE_PATH;
 
 #define SIZE_OF_FILEPATH_DEVICE_PATH  OFFSET_OF(FILEPATH_DEVICE_PATH,PathName)
@@ -1253,7 +1253,7 @@ typedef struct {
   ///
   /// Null-terminated ASCII string that describes the boot device to a user.
   ///
-  CHAR8                       String[1];
+  CHAR8                       String[];
 } BBS_BBS_DEVICE_PATH;
 
 //

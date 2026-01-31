@@ -22,7 +22,7 @@ typedef struct {
   // NOTE: Since EDK2 does not allow flexible array member [] we declare
   // here array of 1 element length. However below is used as a variable
   // length array.
-  UINT8     Protocols[1];
+  UINT8     Protocols[];
 } BASE_DISCOVER_LIST;
 
 /** Initialize Base protocol and install protocol on a given handle.

@@ -50,7 +50,7 @@ typedef struct _EFI_FIRMWARE_MANAGEMENT_PROTOCOL EFI_FIRMWARE_MANAGEMENT_PROTOCO
 /// Image Attribute - Dependency
 ///
 typedef struct {
-  UINT8    Dependencies[1];
+  UINT8    Dependencies[];
 } EFI_FIRMWARE_IMAGE_DEP;
 
 ///

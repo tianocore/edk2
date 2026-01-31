@@ -22,7 +22,7 @@ typedef struct {
 //
 typedef struct {
   UINT32                                                  Count;
-  EFI_PEI_FIRMWARE_VOLUME_INFO_MEASUREMENT_EXCLUDED_FV    Fv[1];
+  EFI_PEI_FIRMWARE_VOLUME_INFO_MEASUREMENT_EXCLUDED_FV    Fv[];
 } EFI_PEI_FIRMWARE_VOLUME_INFO_MEASUREMENT_EXCLUDED_PPI;
 
 extern EFI_GUID  gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid;

@@ -411,7 +411,7 @@ typedef struct {
   UINT16                      ChassisHandle;
   UINT8                       BoardType;            ///< The enumeration value from BASE_BOARD_TYPE.
   UINT8                       NumberOfContainedObjectHandles;
-  UINT16                      ContainedObjectHandles[1];
+  UINT16                      ContainedObjectHandles[];
 } SMBIOS_TABLE_TYPE2;
 
 ///
@@ -534,7 +534,7 @@ typedef struct {
   //
   // Can have 0 to (ContainedElementCount * ContainedElementRecordLength) contained elements
   //
-  CONTAINED_ELEMENT      ContainedElements[1];
+  CONTAINED_ELEMENT      ContainedElements[];
   //
   // Add for smbios 2.7
   //
@@ -1149,7 +1149,7 @@ typedef struct {
   UINT16                             SupportMemoryType;
   UINT8                              MemoryModuleVoltage;
   UINT8                              AssociatedMemorySlotNum;
-  UINT16                             MemoryModuleConfigHandles[1];
+  UINT16                             MemoryModuleConfigHandles[];
 } SMBIOS_TABLE_TYPE5;
 
 ///
@@ -1662,7 +1662,7 @@ typedef struct {
   //
   UINT8                         DataBusWidth;
   UINT8                         PeerGroupingCount;
-  MISC_SLOT_PEER_GROUP          PeerGroups[1];
+  MISC_SLOT_PEER_GROUP          PeerGroups[];
   //
   // Since PeerGroups has a variable number of entries, must not define new
   // fields in the structure. Remaining fields can be referenced using
@@ -1723,7 +1723,7 @@ typedef struct {
 ///
 typedef struct {
   SMBIOS_STRUCTURE    Hdr;
-  DEVICE_STRUCT       Device[1];
+  DEVICE_STRUCT       Device[];
 } SMBIOS_TABLE_TYPE10;
 
 ///
@@ -1777,7 +1777,7 @@ typedef struct {
 typedef struct {
   SMBIOS_STRUCTURE       Hdr;
   SMBIOS_TABLE_STRING    GroupName;
-  GROUP_STRUCT           Group[1];
+  GROUP_STRUCT           Group[];
 } SMBIOS_TABLE_TYPE14;
 
 ///
@@ -1855,7 +1855,7 @@ typedef struct {
   UINT8               LogHeaderFormat;
   UINT8               NumberOfSupportedLogTypeDescriptors;
   UINT8               LengthOfLogTypeDescriptor;
-  EVENT_LOG_TYPE      EventLogTypeDescriptors[1];
+  EVENT_LOG_TYPE      EventLogTypeDescriptors[];
 } SMBIOS_TABLE_TYPE15;
 
 ///
@@ -2653,7 +2653,7 @@ typedef struct {
   UINT8               ChannelType;
   UINT8               MaximumChannelLoad;
   UINT8               MemoryDeviceCount;
-  MEMORY_DEVICE       MemoryDevice[1];
+  MEMORY_DEVICE       MemoryDevice[];
 } SMBIOS_TABLE_TYPE37;
 
 ///
@@ -2794,7 +2794,7 @@ typedef struct {
 typedef struct {
   UINT8    ProtocolType;
   UINT8    ProtocolTypeDataLen;
-  UINT8    ProtocolTypeData[1];
+  UINT8    ProtocolTypeData[];
 } MC_HOST_INTERFACE_PROTOCOL_RECORD;
 
 ///

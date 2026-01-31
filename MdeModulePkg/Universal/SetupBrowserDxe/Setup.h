@@ -239,7 +239,7 @@ typedef struct {
 typedef struct {
   UINTN              Signature;
   UINTN              Count;
-  FORM_EXPRESSION    *Expression[1];     // Array[Count] of expressions
+  FORM_EXPRESSION    *Expression[];     // Array[Count] of expressions
 } FORM_EXPRESSION_LIST;
 
 #define QUESTION_DEFAULT_SIGNATURE  SIGNATURE_32 ('Q', 'D', 'F', 'T')

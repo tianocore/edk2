@@ -113,11 +113,11 @@ typedef TPM_DIGEST    TCG_DIGEST;
 /// Event Log Entry Structure Definition
 ///
 typedef struct tdTCG_PCR_EVENT {
-  TCG_PCRINDEX     PCRIndex;                   ///< PCRIndex event extended to
-  TCG_EVENTTYPE    EventType;                  ///< TCG EFI event type
-  TCG_DIGEST       Digest;                     ///< Value extended into PCRIndex
-  UINT32           EventSize;                  ///< Size of the event data
-  UINT8            Event[1];                   ///< The event data
+  TCG_PCRINDEX     PCRIndex;                  ///< PCRIndex event extended to
+  TCG_EVENTTYPE    EventType;                 ///< TCG EFI event type
+  TCG_DIGEST       Digest;                    ///< Value extended into PCRIndex
+  UINT32           EventSize;                 ///< Size of the event data
+  UINT8            Event[];                   ///< The event data
 } TCG_PCR_EVENT;
 
 #define TSS_EVENT_DATA_MAX_SIZE  256
@@ -178,7 +178,7 @@ typedef struct tdEFI_IMAGE_LOAD_EVENT {
   UINTN                       ImageLengthInMemory;
   UINTN                       ImageLinkTimeAddress;
   UINTN                       LengthOfDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL    DevicePath[1];
+  EFI_DEVICE_PATH_PROTOCOL    DevicePath[];
 } EFI_IMAGE_LOAD_EVENT;
 
 ///
@@ -192,7 +192,7 @@ typedef struct tdUEFI_IMAGE_LOAD_EVENT {
   UINT64                      ImageLengthInMemory;
   UINT64                      ImageLinkTimeAddress;
   UINT64                      LengthOfDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL    DevicePath[1];
+  EFI_DEVICE_PATH_PROTOCOL    DevicePath[];
 } UEFI_IMAGE_LOAD_EVENT;
 
 ///
@@ -214,7 +214,7 @@ typedef struct tdEFI_HANDOFF_TABLE_POINTERS {
 ///
 typedef struct tdUEFI_HANDOFF_TABLE_POINTERS {
   UINT64                     NumberOfTables;
-  EFI_CONFIGURATION_TABLE    TableEntry[1];
+  EFI_CONFIGURATION_TABLE    TableEntry[];
 } UEFI_HANDOFF_TABLE_POINTERS;
 
 ///
@@ -243,7 +243,7 @@ typedef struct tdEFI_VARIABLE_DATA {
   UINTN       UnicodeNameLength;
   UINTN       VariableDataLength;
   CHAR16      UnicodeName[1];
-  INT8        VariableData[1];                        ///< Driver or platform-specific data
+  INT8        VariableData[];                        ///< Driver or platform-specific data
 } EFI_VARIABLE_DATA;
 
 ///
@@ -259,7 +259,7 @@ typedef struct tdUEFI_VARIABLE_DATA {
   UINT64      UnicodeNameLength;
   UINT64      VariableDataLength;
   CHAR16      UnicodeName[1];
-  INT8        VariableData[1];                        ///< Driver or platform-specific data
+  INT8        VariableData[];                        ///< Driver or platform-specific data
 } UEFI_VARIABLE_DATA;
 
 //
@@ -270,19 +270,19 @@ typedef struct {
   UINT64      UnicodeNameLength;                         // The TCG Definition used UINTN
   UINT64      VariableDataLength;                        // The TCG Definition used UINTN
   CHAR16      UnicodeName[1];
-  INT8        VariableData[1];
+  INT8        VariableData[];
 } EFI_VARIABLE_DATA_TREE;
 
 typedef struct tdEFI_GPT_DATA {
   EFI_PARTITION_TABLE_HEADER    EfiPartitionHeader;
   UINTN                         NumberOfPartitions;
-  EFI_PARTITION_ENTRY           Partitions[1];
+  EFI_PARTITION_ENTRY           Partitions[];
 } EFI_GPT_DATA;
 
 typedef struct tdUEFI_GPT_DATA {
   EFI_PARTITION_TABLE_HEADER    EfiPartitionHeader;
   UINT64                        NumberOfPartitions;
-  EFI_PARTITION_ENTRY           Partitions[1];
+  EFI_PARTITION_ENTRY           Partitions[];
 } UEFI_GPT_DATA;
 
 #define TCG_DEVICE_SECURITY_EVENT_DATA_SIGNATURE  "SPDM Device Sec"
@@ -347,7 +347,7 @@ typedef struct tdTCG_PCR_EVENT2 {
   TCG_EVENTTYPE         EventType;
   TPML_DIGEST_VALUES    Digest;
   UINT32                EventSize;
-  UINT8                 Event[1];
+  UINT8                 Event[];
 } TCG_PCR_EVENT2;
 
 //

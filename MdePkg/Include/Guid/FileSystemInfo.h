@@ -40,7 +40,7 @@ typedef struct {
   ///
   /// The Null-terminated string that is the volume's label.
   ///
-  CHAR16     VolumeLabel[1];
+  CHAR16     VolumeLabel[];
 } EFI_FILE_SYSTEM_INFO;
 
 ///

@@ -40,7 +40,7 @@ typedef struct {
   /// The CPU location would be the local APIC ID
   ///
   UINT32                              NumberOfCpus;
-  EFI_SEC_PLATFORM_INFORMATION_CPU    CpuInstance[1];
+  EFI_SEC_PLATFORM_INFORMATION_CPU    CpuInstance[];
 } EFI_SEC_PLATFORM_INFORMATION_RECORD2;
 
 /**

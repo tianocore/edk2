@@ -67,7 +67,7 @@ typedef struct {
   ///
   /// Network Access Server Secret (OPTIONAL).
   ///
-  UINT8               NasSecret[1];
+  UINT8               NasSecret[];
 
   ///
   /// CHAP Initiator Secret Length in bytes on offset NasSecret + NasSecretLength.
@@ -120,7 +120,7 @@ typedef struct {
   ///
   /// User Secret.
   ///
-  UINT8               UserSecret[1];
+  UINT8               UserSecret[];
 
   ///
   /// User Name Length in bytes on offset UserSecret + UserSecretLength.

@@ -37,7 +37,7 @@ typedef struct {
   ///
   /// The beginning of the runtime memory range data.
   ///
-  PRM_RUNTIME_MMIO_RANGE    Range[1];
+  PRM_RUNTIME_MMIO_RANGE    Range[];
 } PRM_RUNTIME_MMIO_RANGES;
 
 #pragma pack(pop)

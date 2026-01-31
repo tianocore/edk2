@@ -86,7 +86,7 @@ typedef struct {
   UINT8    InterfaceName[4];
   UINT8    Lit4[1];
   UINT8    UndiMajor[3];
-  UINT8    UndiMinor[3];
+  UINT8    UndiMinor[];
 } PXEBC_CLASS_ID;
 
 typedef struct {
