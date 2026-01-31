@@ -36,6 +36,9 @@
 [Sources.AARCH64]
   AArch64/DynamicCookieGcc.S | GCC
 
+[Sources.RISCV64]
+  RiscV64/DynamicCookieGcc.S | GCC
+
 [Packages]
   MdePkg/MdePkg.dec
 
