@@ -280,6 +280,7 @@ SevSnpCreateAP (
   GHCB_APIC_IDS                  *GhcbApicIds;
   volatile MP_CPU_EXCHANGE_INFO  *ExchangeInfo;
 
+  GhcbApicIds = NULL;
   ASSERT (CpuMpData->MpCpuExchangeInfo->BufferStart < 0x100000);
 
   ExchangeInfo = CpuMpData->MpCpuExchangeInfo;
