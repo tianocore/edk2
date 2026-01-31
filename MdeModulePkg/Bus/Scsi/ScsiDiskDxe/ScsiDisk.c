@@ -337,6 +337,7 @@ ScsiDiskDriverBindingStart (
   ScsiDiskDevice->UnmapInfo.MaxBlkDespCnt           = 1;
   ScsiDiskDevice->BlockLimitsVpdSupported           = FALSE;
   ScsiDiskDevice->Handle                            = Controller;
+  ScsiDiskDevice->FuaMode                           = TRUE;
   InitializeListHead (&ScsiDiskDevice->AsyncTaskQueue);
 
   ScsiIo->GetDeviceType (ScsiIo, &(ScsiDiskDevice->DeviceType));
@@ -2537,6 +2538,18 @@ ScsiDiskDetectMedia (
     }
   }
 
+  //
+  // Get FUA Mode
+  //
+  for (Retry = 0; Retry < MaxRetry; Retry++) {
+    if (ScsiDiskDevice->DeviceType == EFI_SCSI_TYPE_DISK) {
+      Status = ScsiDiskFuaMode (ScsiDiskDevice);
+      if (!EFI_ERROR (Status)) {
+        break;
+      }
+    }
+  }
+
   if (ScsiDiskDevice->BlkIo.Media->MediaId != OldMedia.MediaId) {
     //
     // Media change information got from the device
@@ -4400,6 +4413,93 @@ BackOff:
 }
 
 /**
+  Get FUA Mode for the storage.
+
+  @param   ScsiDiskDevice    The pointer of SCSI_DISK_DEV.
+
+  @return  EFI_STATUS is returned by calling ScsiDiskFuaMode().
+**/
+EFI_STATUS
+ScsiDiskFuaMode (
+  IN     SCSI_DISK_DEV  *ScsiDiskDevice
+  )
+{
+  UINT8       HostAdapterStatus;
+  UINT8       TargetStatus;
+  UINT8       SenseDataLength;
+  UINT8       Buffer[CACHE_MODE_PAGE_LEN];
+  UINT32      BufferLength;
+  EFI_STATUS  ReturnStatus;
+  BOOLEAN     DpoFua       = TRUE;
+  BOOLEAN     WriteCaching = TRUE;
+
+  SenseDataLength = 0;
+  BufferLength    = CACHE_MODE_PAGE_LEN;
+  //
+  // Execute Mode Sense Command here to get the support of FUA
+  // through Mode page. FUA support locates in Mode parameter
+  // header that can be gotten through any Mode page.
+  // Here, Caching Mode Page (08) is used.
+  //
+  ReturnStatus = ScsiModeSense10Command (
+                   ScsiDiskDevice->ScsiIo,
+                   SCSI_DISK_TIMEOUT,
+                   NULL,
+                   &SenseDataLength,
+                   &HostAdapterStatus,
+                   &TargetStatus,
+                   Buffer,
+                   &BufferLength,
+                   1,                      // Not return any block descriptors
+                   0x10,                   // Default threshold values
+                   0x08                    // Caching Mode Page (08h)
+                   );
+  if (ReturnStatus != EFI_SUCCESS) {
+    //
+    // Mode Sense Command fails
+    //
+    return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // Page code locates at the byte 8(bit0 to bit5),
+  // byte 0 after the 8 bytes Mode parameter header(10).
+  //
+  if ((Buffer[8] & 0x08) != 0x08) {
+    //
+    // Return page is not right
+    //
+    return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // DPOFUA locates at the byte 3(bit4) in
+  // the Mode parameter header(10).
+  //
+  if ((Buffer[3] & 0x10) == 0x00) {
+    //
+    // 'DPOFUA' is disabled
+    //
+    DpoFua = FALSE;
+  }
+
+  //
+  // Caching Mode locates at the byte 10(bit2),
+  // byte 2 after the 8 bytes Mode parameter header(10).
+  //
+  if ((Buffer[10] & 0x04) == 0x00) {
+    //
+    // 'write through' cache is enabled.
+    //
+    WriteCaching = FALSE;
+  }
+
+  ScsiDiskDevice->FuaMode = DpoFua || WriteCaching;
+
+  return EFI_SUCCESS;
+}
+
+/**
   Submit Write(10) Command.
 
   @param  ScsiDiskDevice     The pointer of ScsiDiskDevice
@@ -4453,7 +4553,8 @@ BackOff:
                       DataBuffer,
                       DataLength,
                       StartLba,
-                      SectorCount
+                      SectorCount,
+                      ScsiDiskDevice->FuaMode
                       );
   if ((ReturnStatus == EFI_NOT_READY) || (ReturnStatus == EFI_BAD_BUFFER_SIZE)) {
     *NeedRetry = TRUE;
@@ -4700,7 +4801,8 @@ BackOff:
                       DataBuffer,
                       DataLength,
                       StartLba,
-                      SectorCount
+                      SectorCount,
+                      ScsiDiskDevice->FuaMode
                       );
   if ((ReturnStatus == EFI_NOT_READY) || (ReturnStatus == EFI_BAD_BUFFER_SIZE)) {
     *NeedRetry = TRUE;
