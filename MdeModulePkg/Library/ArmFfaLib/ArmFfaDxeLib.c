@@ -34,6 +34,8 @@
 #include "ArmFfaRxTxMap.h"
 
 STATIC EFI_EVENT  mFfaExitBootServiceEvent;
+STATIC UINT16     mPartId;
+STATIC BOOLEAN    mIsFfaSupported;
 
 /**
   Unmap RX/TX buffer on Exit Boot Service.
@@ -78,7 +80,7 @@ ArmFfaDxeLibConstructor (
   UINTN                      Property1;
   UINTN                      Property2;
 
-  Status = ArmFfaLibCommonInit ();
+  Status = ArmFfaLibCommonInit (&mPartId, &mIsFfaSupported);
   if (EFI_ERROR (Status)) {
     if (Status == EFI_UNSUPPORTED) {
       /*
@@ -193,4 +195,54 @@ ErrorHandler:
   }
 
   return Status;
+}
+
+/**
+  Return partition or VM ID
+
+  @retval EFI_SUCCESS
+  @retval Others       Errors
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibGetPartId (
+  IN UINT16  *PartId
+  )
+{
+  if (PartId != NULL) {
+    *PartId = mPartId;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Check FF-A support or not.
+
+  @retval TRUE                   Supported
+  @retval FALSE                  Not supported
+
+**/
+BOOLEAN
+EFIAPI
+IsFfaSupported (
+  IN VOID
+  )
+{
+  return mIsFfaSupported;
+}
+
+/**
+  Callback for when Unmap is called to handle any post unmap
+  functionality.
+
+**/
+VOID
+EFIAPI
+UnmapCallback (
+  IN VOID
+  )
+{
+  // Do nothing
 }
