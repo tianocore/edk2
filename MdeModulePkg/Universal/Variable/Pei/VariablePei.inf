@@ -41,7 +41,6 @@
   PeiServicesLib
   SafeIntLib
   VariableFlashInfoLib
-  MmUnblockMemoryLib
   MemoryAllocationLib
 
 [Guids]
