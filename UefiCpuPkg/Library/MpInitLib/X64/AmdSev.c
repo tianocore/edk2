@@ -281,7 +281,7 @@ SevSnpCreateAP (
   volatile MP_CPU_EXCHANGE_INFO  *ExchangeInfo;
 
   ASSERT (CpuMpData->MpCpuExchangeInfo->BufferStart < 0x100000);
-
+  GhcbApicIds  = NULL;
   ExchangeInfo = CpuMpData->MpCpuExchangeInfo;
   CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
 
@@ -323,6 +323,7 @@ SevSnpCreateAP (
         CpuData = &CpuMpData->CpuData[Index];
 
         if (CpuMpData->InitFlag == ApInitConfig) {
+          ASSERT (GhcbApicIds != NULL);
           ApicId = GhcbApicIds->ApicIds[Index];
 
           //
