@@ -110,6 +110,8 @@ InternalAllocPoolByIndex (
   FREE_POOL_HEADER      *Hdr;
   EFI_PHYSICAL_ADDRESS  Address;
 
+  Address = 0;
+
   ASSERT (PoolIndex <= MAX_POOL_INDEX);
   Status = EFI_SUCCESS;
   Hdr    = NULL;
@@ -199,6 +201,8 @@ MmInternalAllocatePool (
   EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  Address;
   UINTN                 PoolIndex;
+
+  Address = 0;
 
   if ((PoolType != EfiRuntimeServicesCode) &&
       (PoolType != EfiRuntimeServicesData))

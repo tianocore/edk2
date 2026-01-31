@@ -444,6 +444,7 @@ MmCorePrepareCommunicationBuffer (
 
   mMmCommunicationBuffer  = NULL;
   mInternalCommBufferCopy = NULL;
+  Buffer                  = 0;
 
   GuidHob = GetFirstGuidHob (&gMmCommBufferHobGuid);
   if (GuidHob == NULL) {
