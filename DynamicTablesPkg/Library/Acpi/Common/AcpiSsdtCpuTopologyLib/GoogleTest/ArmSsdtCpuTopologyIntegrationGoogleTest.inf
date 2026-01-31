@@ -1,0 +1,60 @@
+## @file
+#  Integration test for ARM SSDT CPU Topology Generator.
+#
+#  Tests full ARM CPU topology generation through BuildSsdtCpuTopologyTable.
+#  Validates generated AML output against ACPI 6.6 specification.
+#
+#  Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010017
+  BASE_NAME      = ArmSsdtCpuTopologyIntegrationGoogleTest
+  FILE_GUID      = b4182282-e5d3-4264-8eb6-d26cdd70afe4
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = HOST_APPLICATION
+
+[Sources]
+  ArmSsdtCpuTopologyIntegrationGoogleTest.cpp
+  AmlTestHelper.h
+  AmlTestHelper.cpp
+  SsdtCpuTopologyTestCommon.h
+  HostEnvStubs.c
+  ../../../../../Test/Mock/Library/GoogleTest/Protocol/MockConfigurationManagerProtocol.cpp
+  # Common code
+  ../SsdtCpuTopologyGenerator.c
+  ../SsdtCpuTopologyGenerator.h
+  # ARM arch-specific code
+  ../Arm/ArmSsdtCpuTopologyGenerator.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PrintLib
+  TableHelperLib
+  AcpiHelperLib
+  AmlLib
+  MetadataObjLib
+
+[Pcd]
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdDevelopmentPlatformRelaxations  ## SOMETIMES_CONSUMES
+
+[Protocols]
+  gEdkiiConfigurationManagerProtocolGuid  ## CONSUMES
+
+[BuildOptions]
+  # Include paths for arch-specific source and force Uefi.h for C sources
+  MSFT:*_*_*_CC_FLAGS = /EHsc /I$(WORKSPACE)/DynamicTablesPkg/Library/Common/AmlLib /I$(WORKSPACE)/DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib /FI$(WORKSPACE)/MdePkg/Include/Uefi.h
+  GCC:*_*_*_CC_FLAGS = -I$(WORKSPACE)/DynamicTablesPkg/Library/Common/AmlLib -I$(WORKSPACE)/DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib -include $(WORKSPACE)/MdePkg/Include/Uefi.h
+
