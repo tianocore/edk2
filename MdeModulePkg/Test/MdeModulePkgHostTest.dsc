@@ -72,6 +72,11 @@
       UefiBootServicesTableLib|MdePkg/Test/Mock/Library/GoogleTest/MockUefiBootServicesTableLib/MockUefiBootServicesTableLib.inf
   }
 
+  MdeModulePkg/Library/BaseMemoryBinLib/GoogleTest/BaseMemoryBinLibGoogleTestHost.inf {
+    <LibraryClasses>
+      HobLib|MdePkg/Test/Mock/Library/GoogleTest/MockHobLib/MockHobLib.inf
+  }
+
   #
   # Build HOST_APPLICATION Libraries
   #

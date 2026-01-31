@@ -269,6 +269,8 @@
 !include OvmfPkg/Include/Dsc/ShellLibs.dsc.inc
 !include OvmfPkg/Include/Dsc/OvmfTlsLibs.dsc.inc
 
+MemoryBinLib|MdeModulePkg/Library/BaseMemoryBinLib/BaseMemoryBinLib.inf
+
 [LibraryClasses.common]
   AmdSvsmLib|OvmfPkg/Library/AmdSvsmLib/AmdSvsmLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf

@@ -186,6 +186,10 @@
   #
   RealTimeClockLib|Include/Library/RealTimeClockLib.h
 
+  ## @libraryclass  Provides shared logic for memory bin manipulation for S4 resume stability.
+  #
+  MemoryBinLib|Include/Library/MemoryBinLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
@@ -234,6 +238,7 @@
   ## Hob and Variable guid specify the platform memory type information.
   #  Include/Guid/MemoryTypeInformation.h
   gEfiMemoryTypeInformationGuid  = { 0x4C19049F, 0x4137, 0x4DD3, { 0x9C, 0x10, 0x8B, 0x97, 0xA8, 0x3F, 0xFD, 0xFA }}
+  gMemoryTypeInformationStatisticsGuid = { 0x1a684878, 0xf466, 0x4d88, { 0x81, 0xc2, 0x80, 0x7e, 0x7d, 0xe6, 0x67, 0x9f }}
 
   ## Capsule update hob and variable guid
   #  Include/Guid/CapsuleVendor.h
@@ -590,6 +595,9 @@
 
   ## Include/Ppi/MigrateTempRam.h
   gEdkiiPeiMigrateTempRamPpiGuid            = { 0xc79dc53b, 0xafcd, 0x4a6a, { 0xad, 0x94, 0xa7, 0x6a, 0x3f, 0xa9, 0xe9, 0xc2 } }
+
+  ## Include/Ppi/InstallPeiMemoryBins.h
+  gInstallPeiMemoryBinsPpiGuid = {0x24fd4e27, 0x6f4b, 0x4460, {0xb7, 0xa7, 0x21, 0x8b, 0xe8, 0xc3, 0x50, 0xc7 } }
 
 [Protocols]
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.

@@ -51,5 +51,8 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode
 
+[Ppis]
+  gInstallPeiMemoryBinsPpiGuid
+
 [Depex]
   TRUE
