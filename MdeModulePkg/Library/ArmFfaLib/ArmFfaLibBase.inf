@@ -1,0 +1,46 @@
+## @file
+#  This file is originally sourced from ArmFfaStandaloneMmLib, with
+#  Rx/Tx-related APIs removed to focus exclusively on FFA primitives.
+#  Provides FF-A ABI Library used in all environments.
+#
+#  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = ArmFfaLibBase
+  FILE_GUID                      = D79FF75E-AD0A-4074-A335-2084533744AF
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = ArmFfaLib
+  CONSTRUCTOR                    = ArmFfaLibBaseConstructor
+
+[Sources]
+  ArmFfaCommon.h
+  ArmFfaCommon.c
+  ArmFfaLibBase.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  ArmSmcLib
+  ArmSvcLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  PcdLib
+  MemoryAllocationLib
+  TimerLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaTxRxPageCount
+
+[Guids]
+  gArmFfaRxTxBufferInfoGuid
