@@ -359,7 +359,7 @@ AcceptMemoryForAPsStack (
 {
   EFI_STATUS            Status;
   EFI_PEI_HOB_POINTERS  Hob;
-  EFI_PHYSICAL_ADDRESS  PhysicalEnd;
+  EFI_PHYSICAL_ADDRESS  PhysicalEnd = 0;
   EFI_PHYSICAL_ADDRESS  PhysicalStart;
   UINT64                ResourceLength;
   BOOLEAN               MemoryRegionFound;
@@ -369,6 +369,7 @@ AcceptMemoryForAPsStack (
   Status            = EFI_SUCCESS;
   Hob.Raw           = (UINT8 *)VmmHobList;
   MemoryRegionFound = FALSE;
+  PhysicalEnd       = 0;
 
   DEBUG ((DEBUG_INFO, "AcceptMemoryForAPsStack with APsStackSize=0x%x\n", APsStackSize));
 
@@ -760,6 +761,7 @@ ProcessHobList (
   EFI_PHYSICAL_ADDRESS  PhysicalEnd;
   EFI_PHYSICAL_ADDRESS  APsStackStartAddress;
 
+  PhysicalEnd = 0;
   CpusNum = GetCpusNum ();
 
   //
@@ -777,7 +779,6 @@ ProcessHobList (
     ASSERT (Status == EFI_SUCCESS);
     APsStackStartAddress = PhysicalEnd - APS_STACK_SIZE (CpusNum);
   } else {
-    PhysicalEnd          = 0;
     APsStackStartAddress = 0;
   }
 
