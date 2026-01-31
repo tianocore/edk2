@@ -72,7 +72,7 @@ gIncludedAslFile = []
 # @param  Target    File to store the trimmed content
 # @param  Convert   If True, convert standard HEX format to MASM format
 #
-def TrimPreprocessedFile(Source, Target, ConvertHex, TrimLong):
+def TrimPreprocessedFile(Source, Target, ConvertHex, TrimLong, FileFormat):
     CreateDirectory(os.path.dirname(Target))
     try:
         with open(Source, "r") as File:
@@ -104,6 +104,12 @@ def TrimPreprocessedFile(Source, Target, ConvertHex, TrimLong):
                 # The first injected file must be the preprocessed file itself
                 if PreprocessedFile == "":
                     PreprocessedFile = InjectedFile
+                if PreprocessedFile == InjectedFile:
+                    # If this is a NASM source file, then keep the current
+                    # #line statement replacing #line with NASM syntax %line to
+                    # allow source debug to resolve to the NASM source file.
+                    if FileFormat == 'NASM':
+                        NewLines.append(Line.replace('#line', '%line', 1))
             LineControlDirectiveFound = True
             continue
         elif PreprocessedFile == "" or InjectedFile != PreprocessedFile:
@@ -529,6 +535,8 @@ def Options():
     OptionList = [
         make_option("-s", "--source-code", dest="FileType", const="SourceCode", action="store_const",
                           help="The input file is preprocessed source code, including C or assembly code"),
+        make_option("-f", "--source-code-format", dest="FileFormat", type="choice", choices=["C", "NASM", "VFR", "ASL", "ASM"], default="C",
+                          help="The format of the input file(C, NASM, VFR, ASL, ASM)"),
         make_option("-r", "--vfr-file", dest="FileType", const="Vfr", action="store_const",
                           help="The input file is preprocessed VFR file"),
         make_option("--Vfr-Uni-Offset", dest="FileType", const="VfrOffsetBin", action="store_const",
@@ -620,7 +628,7 @@ def Main():
         else :
             if CommandOptions.OutputFile is None:
                 CommandOptions.OutputFile = os.path.splitext(InputFile)[0] + '.iii'
-            TrimPreprocessedFile(InputFile, CommandOptions.OutputFile, CommandOptions.ConvertHex, CommandOptions.TrimLong)
+            TrimPreprocessedFile(InputFile, CommandOptions.OutputFile, CommandOptions.ConvertHex, CommandOptions.TrimLong, CommandOptions.FileFormat)
     except FatalError as X:
         import platform
         import traceback

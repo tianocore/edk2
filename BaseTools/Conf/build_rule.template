@@ -243,7 +243,7 @@
     <Command>
         Trim --asm-file -o ${d_path}(+)${s_base}.i -i $(INC_LIST) ${src}
         "$(PP)" $(DEPS_FLAGS) $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.ii
-        Trim --trim-long --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.ii
+        Trim --trim-long --source-code --source-code-format=NASM -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.ii
         "$(NASM)" -I${s_path}(+) $(NASM_INC) $(NASM_FLAGS) -o $dst ${d_path}(+)${s_base}.iii
 
 [Device-Tree-Source-File]
@@ -585,7 +585,7 @@
     <Command>
         Trim --asm-file -o ${d_path}(+)${s_base}.i -i $(INC_LIST) ${src}
         "$(PP)" $(DEPS_FLAGS) $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.ii
-        Trim --source-code --convert-hex -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.ii
+        Trim --source-code --source-code-format=NASM --convert-hex -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.ii
         "$(NASM)" -I${s_path}(+) -l ${d_path}(+)${s_base}.lst $(NASMB_FLAGS) $(NASM_INC) -o $dst ${d_path}(+)${s_base}.iii
         # copy the output file with .com postfix that be same to the output file of .asm16
         $(CP) ${dst} $(OUTPUT_DIR)(+)${s_base}.com
