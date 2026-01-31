@@ -27,7 +27,6 @@
   AArch64/StandaloneMmPeCoffExtraActionLib.c
 
 [Packages]
-  ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
   StandaloneMmPkg/StandaloneMmPkg.dec
 

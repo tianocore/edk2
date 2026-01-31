@@ -24,6 +24,10 @@
   ##                 MM Memory Operation.
   MemLib|Include/Library/StandaloneMmMemLib.h
 
+  ##  @libraryclass  Provides an interface for a StandaloneMm Mmu.
+  #
+  StandaloneMmMmuLib|Include/Library/StandaloneMmMmuLib.h
+
 [LibraryClasses.X64.PEIM]
   MmPlatformHobProducerLib|Include/Library/MmPlatformHobProducerLib.h
 

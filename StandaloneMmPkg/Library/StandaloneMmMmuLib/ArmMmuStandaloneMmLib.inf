@@ -20,12 +20,10 @@
   ArmMmuStandaloneMmLib.c
 
 [Packages]
-  ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
-  ArmLib
   ArmFfaLib
   CacheMaintenanceLib
   MemoryAllocationLib
