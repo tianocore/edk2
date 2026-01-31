@@ -32,8 +32,90 @@
 
 #include "ArmFfaCommon.h"
 
-BOOLEAN  gFfaSupported;
-UINT16   gPartId;
+STATIC BOOLEAN  mFfaSupported;
+STATIC UINT16   mPartId;
+STATIC BOOLEAN  mUseCachedInfo = FALSE;
+
+/**
+  Check FF-A version. UEFI requires FF-A version >= 1.2.
+
+  @retval  EFI_SUCCESS              FF-A version >= 1.2.
+  @retval  EFI_UNSUPPORTED          FF-A suported or version < 1.2.
+
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+CheckFfaVersion (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+  UINT16      CurrentMajorVersion;
+  UINT16      CurrentMinorVersion;
+
+  Status = ArmFfaLibGetVersion (
+             ARM_FFA_MAJOR_VERSION,
+             ARM_FFA_MINOR_VERSION,
+             &CurrentMajorVersion,
+             &CurrentMinorVersion
+             );
+  if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  if ((ARM_FFA_MAJOR_VERSION != CurrentMajorVersion) ||
+      (ARM_FFA_MINOR_VERSION > CurrentMinorVersion))
+  {
+    DEBUG ((
+      DEBUG_INFO,
+      "Incompatible FF-A Versions.\n" \
+      "Request Version: Major=0x%x, Minor=0x%x.\n" \
+      "Current Version: Major=0x%x, Minor>=0x%x.\n",
+      ARM_FFA_MAJOR_VERSION,
+      ARM_FFA_MINOR_VERSION,
+      CurrentMajorVersion,
+      CurrentMinorVersion
+      ));
+    return EFI_UNSUPPORTED;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Get my FF-A partiton id.
+  If there is cached informatio via ArmFfaLibCommonInit() use it
+  Otherwise, Get it with ArmFfaLibPartitionIdGet().
+
+  @param [out]    PartId            Partition id.
+
+  @retval  EFI_SUCCESS
+  @retval  Others                   Failed to get partition id.
+
+**/
+EFI_STATUS
+EFIAPI
+GetFfaPartitionId (
+  OUT UINT16  *PartId
+  )
+{
+  if (PartId == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!mUseCachedInfo) {
+    return ArmFfaLibPartitionIdGet (PartId);
+  }
+
+  if (!IsFfaSupported ()) {
+    return EFI_UNSUPPORTED;
+  }
+
+  *PartId = mPartId;
+
+  return EFI_SUCCESS;
+}
 
 /**
   Convert EFI_STATUS to FFA return code.
@@ -184,7 +266,18 @@ IsFfaSupported (
   IN VOID
   )
 {
-  return gFfaSupported;
+  EFI_STATUS  Status;
+
+  if (mUseCachedInfo) {
+    return mFfaSupported;
+  }
+
+  Status = CheckFfaVersion ();
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  return TRUE;
 }
 
 /**
@@ -775,15 +868,21 @@ ArmFfaLibMsgSendDirectReq (
 {
   EFI_STATUS    Status;
   ARM_FFA_ARGS  FfaArgs;
+  UINT16        PartId;
 
-  if ((DestPartId == gPartId) || (ImpDefArgs == NULL)) {
+  Status = GetFfaPartitionId (&PartId);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if ((DestPartId == PartId) || (ImpDefArgs == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
   FfaArgs.Arg0 = ARM_FID_FFA_MSG_SEND_DIRECT_REQ;
-  FfaArgs.Arg1 = PACK_PARTITION_ID_INFO (gPartId, DestPartId);
+  FfaArgs.Arg1 = PACK_PARTITION_ID_INFO (PartId, DestPartId);
   FfaArgs.Arg2 = Flags;
   FfaArgs.Arg3 = ImpDefArgs->Arg0;
   FfaArgs.Arg4 = ImpDefArgs->Arg1;
@@ -830,6 +929,7 @@ ArmFfaLibMsgSendDirectReq2 (
   EFI_STATUS    Status;
   UINT64        Uuid[2];
   ARM_FFA_ARGS  FfaArgs;
+  UINT16        PartId;
 
   /*
    * Direct message request 2 is only supported on AArch64.
@@ -838,7 +938,12 @@ ArmFfaLibMsgSendDirectReq2 (
     return EFI_UNSUPPORTED;
   }
 
-  if ((DestPartId == gPartId) || (ImpDefArgs == NULL)) {
+  Status = GetFfaPartitionId (&PartId);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if ((DestPartId == PartId) || (ImpDefArgs == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -851,7 +956,7 @@ ArmFfaLibMsgSendDirectReq2 (
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
   FfaArgs.Arg0  = ARM_FID_FFA_MSG_SEND_DIRECT_REQ2;
-  FfaArgs.Arg1  = PACK_PARTITION_ID_INFO (gPartId, DestPartId);
+  FfaArgs.Arg1  = PACK_PARTITION_ID_INFO (PartId, DestPartId);
   FfaArgs.Arg2  = Uuid[0];
   FfaArgs.Arg3  = Uuid[1];
   FfaArgs.Arg4  = ImpDefArgs->Arg0;
@@ -909,43 +1014,21 @@ ArmFfaLibCommonInit (
   )
 {
   EFI_STATUS  Status;
-  UINT16      CurrentMajorVersion;
-  UINT16      CurrentMinorVersion;
 
-  gFfaSupported = FALSE;
+  mUseCachedInfo = TRUE;
+  mFfaSupported  = FALSE;
 
-  Status = ArmFfaLibGetVersion (
-             ARM_FFA_MAJOR_VERSION,
-             ARM_FFA_MINOR_VERSION,
-             &CurrentMajorVersion,
-             &CurrentMinorVersion
-             );
-  if (EFI_ERROR (Status)) {
-    return EFI_UNSUPPORTED;
-  }
-
-  if ((ARM_FFA_MAJOR_VERSION != CurrentMajorVersion) ||
-      (ARM_FFA_MINOR_VERSION > CurrentMinorVersion))
-  {
-    DEBUG ((
-      DEBUG_INFO,
-      "Incompatible FF-A Versions.\n" \
-      "Request Version: Major=0x%x, Minor=0x%x.\n" \
-      "Current Version: Major=0x%x, Minor>=0x%x.\n",
-      ARM_FFA_MAJOR_VERSION,
-      ARM_FFA_MINOR_VERSION,
-      CurrentMajorVersion,
-      CurrentMinorVersion
-      ));
-    return EFI_UNSUPPORTED;
-  }
-
-  Status = ArmFfaLibPartitionIdGet (&gPartId);
+  Status = CheckFfaVersion ();
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  gFfaSupported = TRUE;
+  Status = ArmFfaLibPartitionIdGet (&mPartId);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  mFfaSupported = TRUE;
 
   return EFI_SUCCESS;
 }
@@ -981,6 +1064,12 @@ ArmFfaLibGetPartitionInfo (
   UINT64      RxBufferSize;
   UINT32      Count;
   UINT32      Size;
+  UINT16      PartId;
+
+  Status = GetFfaPartitionId (&PartId);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   if (PartDesc == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1020,12 +1109,12 @@ ArmFfaLibGetPartitionInfo (
   }
 
   if ((Size < sizeof (EFI_FFA_PART_INFO_DESC))) {
-    ArmFfaLibRxRelease (gPartId);
+    ArmFfaLibRxRelease (PartId);
     return EFI_INVALID_PARAMETER;
   }
 
   CopyMem (PartDesc, RxBuffer, sizeof (EFI_FFA_PART_INFO_DESC));
-  ArmFfaLibRxRelease (gPartId);
+  ArmFfaLibRxRelease (PartId);
 
   return EFI_SUCCESS;
 }

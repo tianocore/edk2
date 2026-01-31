@@ -103,23 +103,38 @@ ArmFfaPeiLibConstructor (
   UINTN                      Property1;
   UINTN                      Property2;
 
-  Status = ArmFfaLibCommonInit ();
-  if (EFI_ERROR (Status)) {
-    if (Status == EFI_UNSUPPORTED) {
-      /*
-       * EFI_UNSUPPORTED return from ArmFfaLibCommonInit() means
-       * FF-A interface doesn't support.
-       * However, It doesn't make failure of loading driver/library instance
-       * (i.e) ArmPkg's MmCommunication Dxe/PEI Driver uses as well as SpmMm.
-       * So If FF-A is not supported the the MmCommunication Dxe/PEI falls
-       * back to SpmMm.
-       * For this case, return EFI_SUCCESS.
-
-       */
-      return EFI_SUCCESS;
-    }
-
+  Status = (**PeiServices).RegisterForShadow (FileHandle);
+  if (Status == EFI_NOT_FOUND) {
     return Status;
+  }
+
+  /*
+   * ArmFfaLibCommonInit() caches several pieces of information in global variables.
+   * Therefore, this function should only be called when the PEIM is running in
+   * permanent memory. Otherwise, all ArmFfaLib* functions will perform
+   * the necessary FF-A requests themselves at runtime to obtain the required information.
+   */
+  if (Status == EFI_ALREADY_STARTED) {
+    Status = ArmFfaLibCommonInit ();
+    if (EFI_ERROR (Status)) {
+      if (Status == EFI_UNSUPPORTED) {
+        /*
+         * EFI_UNSUPPORTED return from ArmFfaLibCommonInit() means
+         * FF-A interface doesn't support.
+         * However, It doesn't make failure of loading driver/library instance
+         * (i.e) ArmPkg's MmCommunication Dxe/PEI Driver uses as well as SpmMm.
+         * So If FF-A is not supported the the MmCommunication Dxe/PEI falls
+         * back to SpmMm.
+         * For this case, return EFI_SUCCESS.
+         */
+        return EFI_SUCCESS;
+      }
+
+      return Status;
+    }
+  } else if (!IsFfaSupported ()) {
+    // For FFA_VERESION negotiation, IsFfaSupported() should be called first.
+    return EFI_UNSUPPORTED;
   }
 
   RxTxBufferHob = GetFirstGuidHob (&gArmFfaRxTxBufferInfoGuid);
