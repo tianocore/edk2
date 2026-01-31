@@ -189,6 +189,7 @@ F: CryptoPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/CryptoPkg
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
 M: Yi Li <yi1.li@intel.com> [liyi77]
+M: Doug Flick <dougflick@microsoft.com> [flickdm]
 
 DynamicTablesPkg
 F: DynamicTablesPkg/
