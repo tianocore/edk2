@@ -204,6 +204,7 @@ AmdSevDxeEntryPoint (
   UINTN                                     Index;
   CONFIDENTIAL_COMPUTING_SNP_BLOB_LOCATION  *SnpBootDxeTable;
 
+  SnpBootDxeTable = NULL;
   //
   // Do nothing when SEV is not enabled
   //
