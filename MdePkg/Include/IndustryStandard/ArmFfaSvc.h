@@ -11,7 +11,7 @@
     - FF-A - Firmware Framework for Arm A-profile
 
   @par Reference(s):
-    - FF-A Version 1.2 [https://developer.arm.com/documentation/den0077/latest/]
+    - FF-A Version 1.3 [https://developer.arm.com/documentation/den0077/latest/]
     - FF-A Memory Management Protocol Version 1.2 [https://developer.arm.com/documentation/den0140/latest]
 
 **/
@@ -50,6 +50,9 @@
 #define ARM_FID_FFA_MSG_SEND_DIRECT_RESP_AARCH64  0xC4000070
 #define ARM_FID_FFA_MSG_SEND_DIRECT_REQ2          0xC400008D
 #define ARM_FID_FFA_MSG_SEND_DIRECT_RESP2         0xC400008E
+
+/* ARM FF-A v1.3 IDs */
+#define ARM_FID_FFA_NS_RES_INFO_GET  0xC400008F
 
 #define ARM_FID_FFA_NOTIFICATION_BITMAP_CREATE     0x8400007D
 #define ARM_FID_FFA_NOTIFICATION_BITMAP_DESTROY    0x8400007E
