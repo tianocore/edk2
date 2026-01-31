@@ -722,6 +722,7 @@
   OpensslStub/EncoderNull.c
   OpensslStub/SslStatServNull.c
   OpensslStub/SslExtServNull.c
+  OpensslStub/CamelliaNull.c
 
 [Packages]
   MdePkg/MdePkg.dec
