@@ -395,9 +395,11 @@ HttpBootGetBootFileCaller (
         }
 
         //
-        // Load the boot file into Buffer
+        // Load the boot file into Buffer.
         //
-        for (Retries = 1; Retries <= PcdGet32 (PcdMaxHttpResumeRetries); Retries++) {
+        ASSERT (PcdGet32 (PcdMaxHttpResumeRetries) > 0);
+        Retries = 1;
+        do {
           Status = HttpBootGetBootFile (
                      Private,
                      FALSE,
@@ -426,7 +428,8 @@ HttpBootGetBootFileCaller (
 
           DEBUG ((DEBUG_WARN | DEBUG_INFO, "HttpBootGetBootFileCaller: NBP file download interrupted, will try to resume the operation.\n"));
           gBS->Stall (1000 * 1000 * PcdGet32 (PcdHttpDelayBetweenResumeRetries));
-        }
+          Retries++;
+        } while (Retries <= PcdGet32 (PcdMaxHttpResumeRetries));
 
         if (EFI_ERROR (Status) && (Retries >= PcdGet32 (PcdMaxHttpResumeRetries))) {
           DEBUG ((DEBUG_ERROR, "HttpBootGetBootFileCaller: Error downloading NBP file, even after trying to resume %d times.\n", Retries));
