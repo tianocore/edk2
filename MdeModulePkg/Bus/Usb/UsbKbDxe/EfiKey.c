@@ -563,6 +563,7 @@ USBKeyboardDriverBindingStop (
   gBS->CloseEvent (UsbKeyboardDevice->SimpleInput.WaitForKey);
   gBS->CloseEvent (UsbKeyboardDevice->SimpleInputEx.WaitForKeyEx);
   gBS->CloseEvent (UsbKeyboardDevice->KeyNotifyProcessEvent);
+  gBS->CloseEvent (UsbKeyboardDevice->CtrlAltDelEvent);
   KbdFreeNotifyList (&UsbKeyboardDevice->NotifyList);
 
   ReleaseKeyboardLayoutResources (UsbKeyboardDevice);

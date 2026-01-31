@@ -153,6 +153,9 @@ typedef struct {
   USB_NS_KEY                           *CurrentNsKey;
   EFI_KEY_DESCRIPTOR                   *KeyConvertionTable;
   EFI_EVENT                            KeyboardLayoutEvent;
+
+  // Event to handle Ctrl + Alt + Del key
+  EFI_EVENT                            CtrlAltDelEvent;
 } USB_KB_DEV;
 
 //
