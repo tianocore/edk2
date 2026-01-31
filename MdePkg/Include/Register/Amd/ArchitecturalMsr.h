@@ -7,7 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
-  AMD64 Architecture Programmer’s Manual, Volumes 2
+  AMD64 Architecture Programmer's Manual, Volumes 2
   Rev. 3.37, Volume 2: System Programming
 
 **/
@@ -30,7 +30,7 @@
   SMM_ADDR Contains the base address of protected
   memory for the SMM Handler.
 
-  Specific usage, see AMD64 Architecture Programmer’s Manual,
+  Specific usage, see AMD64 Architecture Programmer's Manual,
   Volumes 2 (Rev. 3.37), Section 10.2.5
 
   Reset value: 0000_0000_0000_0000h
@@ -44,7 +44,7 @@
   SMM_MASK Contains a mask which determines the size of
   the protected area for the SMM handler.
 
-  Specific usage, see AMD64 Architecture Programmer’s Manual,
+  Specific usage, see AMD64 Architecture Programmer's Manual,
   Volumes 2 (Rev. 3.37), Section 10.2.5
 
   Reset value: 0000_0000_0000_0000h

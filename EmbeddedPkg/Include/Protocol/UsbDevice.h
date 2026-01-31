@@ -83,7 +83,7 @@ EFI_STATUS
                                 first interface descriptor. If there are
                                 additional interfaces, their interface
                                 descriptor and endpoint descriptors follow the
-                                first interface’s endpoint descriptors".
+                                first interface's endpoint descriptors".
 
                                 The size of each buffer is the TotalLength
                                 member of the Configuration Descriptor.

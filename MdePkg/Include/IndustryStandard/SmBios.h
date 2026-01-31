@@ -32,7 +32,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 ///
 /// Reference SMBIOS 3.6, chapter 6.1.2.
-/// Unless otherwise specified, when referring to another structure’s handle, the value
+/// Unless otherwise specified, when referring to another structure's handle, the value
 /// 0FFFFh is used to indicate that the referenced handle is not applicable or does not
 /// exist.
 ///
