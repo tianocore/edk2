@@ -63,6 +63,11 @@
     "SpellCheck": {
         "ExtendWords": [
             "FMPSTATE",
+            "loongarch",
+            # MU_CHANGE - Start
+            "loongson",
+            "fstack"
+            # MU_CHANGE - End
         ]
     },
     "Defines": {
