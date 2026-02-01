@@ -25,6 +25,11 @@ CHAR16                 mPopUpString[100];
 
 OPAL_DRIVER  mOpalDriver;
 
+VOID
+BuildOpalDeviceInfo (
+  VOID
+  );
+
 //
 // Globals
 //
@@ -195,6 +200,10 @@ OpalSupportUpdatePassword (
 {
   CopyMem (OpalDisk->Password, Password, PasswordLength);
   OpalDisk->PasswordLength = (UINT8)PasswordLength;
+
+  if (mOpalEndOfDxe) {
+    BuildOpalDeviceInfo ();
+  }
 }
 
 /**
@@ -395,6 +404,15 @@ BuildOpalDeviceInfo (
              DevInfo,
              TotalDevInfoLength
              );
+  if (Status == EFI_ALREADY_STARTED) {
+    Status = UpdateLockBox (
+               &mOpalDeviceLockBoxGuid,
+               0,
+               DevInfo,
+               TotalDevInfoLength
+               );
+  }
+
   ASSERT_EFI_ERROR (Status);
 
   Status = SetLockBoxAttributes (
@@ -418,6 +436,15 @@ BuildOpalDeviceInfo (
                S3InitDevices,
                S3InitDevicesLength
                );
+    if (Status == EFI_ALREADY_STARTED) {
+      Status = UpdateLockBox (
+                 &gS3StorageDeviceInitListGuid,
+                 0,
+                 S3InitDevices,
+                 S3InitDevicesLength
+                 );
+    }
+
     ASSERT_EFI_ERROR (Status);
 
     Status = SetLockBoxAttributes (
