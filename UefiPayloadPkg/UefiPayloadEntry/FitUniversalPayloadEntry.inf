@@ -42,7 +42,7 @@
 
 [Sources.RISCV64]
   RiscV64/DxeLoadFunc.c
-  RiscV64/DxeLoadFuncFit.c
+  RiscV64/DxeLoadFuncFit.S | GCC
 
 [Sources.AARCH64]
   AArch64/DxeHandoff.c
@@ -69,6 +69,9 @@
   PcdLib
   StackCheckLib
   MemoryAllocationLib
+
+[LibraryClasses.RISCV64]
+  UefiCpuBaseArchSupportLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid
@@ -116,6 +119,9 @@
   gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData
   gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode
   gUefiPayloadPkgTokenSpaceGuid.PcdFDTPageSize
+
+[Pcd.RISCV64]
+  gUefiPayloadPkgTokenSpaceGuid.SizeOfIoSpace
 
 [BuildOptions]
   MSFT:*_*_*_CC_FLAGS = /wd4244 /wd4305

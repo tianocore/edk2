@@ -15,6 +15,9 @@
   VERSION_STRING      = 1.0
   LIBRARY_CLASS       = UefiCpuBaseArchSupportLib
 
+[Sources.RISCV64]
+  RiscV64/RiscV64LibSupport.c
+
 [Sources.AARCH64]
   AArch64/AArch64LibSupport.c
   AArch64/GetPhysicalAddressBits.S
