@@ -535,6 +535,7 @@ SetOrClearSharedBit (
 
   MapGpaRetryAddr = 0;
   RetryCount      = 0;
+  Status          = EFI_SUCCESS;
 
   AddressEncMask = GetMemEncryptionAddressMask ();
 
