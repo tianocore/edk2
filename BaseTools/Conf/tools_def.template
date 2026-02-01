@@ -850,6 +850,7 @@ NOOPT_VS2022_AARCH64_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:
 *_VS2026_*_VFRPP_FLAGS     = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
 *_VS2026_*_DLINK2_FLAGS    = /WHOLEARCHIVE
 *_VS2026_*_ASM16_PATH      = DEF(VS2026_BIN_IA32)\ml.exe
+*_VS2026_*_GENFWHII_FLAGS  = --hiipackage
 *_VS2026_*_DEPS_FLAGS      = DEF(MSFT_DEPS_FLAGS)
 ##################
 # ASL definitions
@@ -2325,3 +2326,4 @@ RELEASE_XCODE5_X64_CC_FLAGS   = -target x86_64-pc-win32-macho -c    -Os       -W
 # Build rule order
 #################
 *_*_*_*_BUILDRULEORDER = nasm asm Asm ASM S s nasmb asm16
+
