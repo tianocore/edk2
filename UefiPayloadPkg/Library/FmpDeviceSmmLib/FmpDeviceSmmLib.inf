@@ -23,6 +23,7 @@
   FmpDeviceSmmLib.c
 
 [LibraryClasses]
+  BaseLib
   BaseMemoryLib
   DebugLib
   HobLib
