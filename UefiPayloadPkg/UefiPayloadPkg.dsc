@@ -520,6 +520,9 @@
 [LibraryClasses.X64.DXE_DRIVER]
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   MpInitLib|UefiCpuPkg/Library/MpInitLib/DxeMpInitLib.inf
+!if $(BOOTLOADER) == "COREBOOT" && $(OPAL_PASSWORD_ENABLE) == TRUE
+  LockBoxLib|UefiPayloadPkg/Library/LockBoxLibApmsmi/LockBoxLibApmsmi.inf
+!endif
 !if $(SOURCE_DEBUG_ENABLE)
   DebugAgentLib|SourceLevelDebugPkg/Library/DebugAgent/DxeDebugAgentLib.inf
 !endif
