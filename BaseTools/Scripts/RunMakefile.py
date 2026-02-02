@@ -149,6 +149,8 @@ if __name__ == '__main__':
   CommandLine.append(gArgs.BuildType)
   if sys.platform == "win32":
     CommandLine = 'nmake /f %s' % (' '.join(CommandLine))
+  if 'bsd' in sys.platform:
+    CommandLine = 'gmake -f %s' % (' '.join(CommandLine))
   else:
     CommandLine = 'make -f %s' % (' '.join(CommandLine))
 
