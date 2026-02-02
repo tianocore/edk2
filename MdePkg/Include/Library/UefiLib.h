@@ -317,7 +317,7 @@ EfiInitializeLock (
   Macro that calls DebugAssert() if an EFI_LOCK structure is not in the locked state.
 
   If MDEPKG_NDEBUG is not defined and the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED
-  bit of PcdDebugProperyMask is set, then this macro evaluates the EFI_LOCK
+  bit of PcdDebugPropertyMask is set, then this macro evaluates the EFI_LOCK
   structure specified by Lock.  If Lock is not in the locked state, then
   DebugAssert() is called passing in the source filename, source line number,
   and Lock.
