@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __PRE_PI_LIB_H__
-#define __PRE_PI_LIB_H__
+#pragma once
 
 #include <Guid/ExtractSection.h>
 #include <Pi/PiPeiCis.h>
@@ -787,5 +786,3 @@ EFIAPI
 DecompressFirstFv (
   VOID
   );
-
-#endif

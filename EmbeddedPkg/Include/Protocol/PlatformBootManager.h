@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __PLATFORM_BOOT_MANAGER_PROTOCOL_H__
-#define __PLATFORM_BOOT_MANAGER_PROTOCOL_H__
+#pragma once
 
 //
 // Protocol interface structure
@@ -76,5 +75,3 @@ struct _PLATFORM_BOOT_MANAGER_PROTOCOL {
 };
 
 extern EFI_GUID  gPlatformBootManagerProtocolGuid;
-
-#endif /* __PLATFORM_BOOT_MANAGER_PROTOCOL_H__ */
