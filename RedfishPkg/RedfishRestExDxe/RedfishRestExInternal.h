@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef EFI_REDFISH_RESTEX_INTERNAL_H_
-#define EFI_REDFISH_RESTEX_INTERNAL_H_
+#pragma once
 
 ///
 /// Libraries classes
@@ -623,5 +622,3 @@ RedfishRestExServiceBindingDestroyChild (
   IN EFI_SERVICE_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                    ChildHandle
   );
-
-#endif

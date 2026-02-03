@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef EDKII_REDFISH_PLATFORM_CONFIG_H_
-#define EDKII_REDFISH_PLATFORM_CONFIG_H_
+#pragma once
 
 typedef struct _EDKII_REDFISH_PLATFORM_CONFIG_PROTOCOL EDKII_REDFISH_PLATFORM_CONFIG_PROTOCOL;
 
@@ -260,5 +259,3 @@ struct _EDKII_REDFISH_PLATFORM_CONFIG_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkIIRedfishPlatformConfigProtocolGuid;
-
-#endif
