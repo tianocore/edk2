@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _EDKII_STORAGE_SECURITY_COMMAND_PPI_H_
-#define _EDKII_STORAGE_SECURITY_COMMAND_PPI_H_
+#pragma once
 
 #include <Protocol/DevicePath.h>
 
@@ -272,5 +271,3 @@ struct _EDKII_PEI_STORAGE_SECURITY_CMD_PPI {
 };
 
 extern EFI_GUID  gEdkiiPeiStorageSecurityCommandPpiGuid;
-
-#endif

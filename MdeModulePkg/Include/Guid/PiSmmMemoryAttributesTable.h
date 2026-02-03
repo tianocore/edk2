@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PI_SMM_MEMORY_ATTRIBUTES_TABLE_H_
-#define _PI_SMM_MEMORY_ATTRIBUTES_TABLE_H_
+#pragma once
 
 #define EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE_GUID  {\
   0x6b9fd3f7, 0x16df, 0x45e8, {0xbd, 0x39, 0xb9, 0x4a, 0x66, 0x54, 0x1a, 0x5d} \
@@ -41,5 +40,3 @@ typedef struct {
 #define EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE_VERSION  0x00000001
 
 extern EFI_GUID  gEdkiiPiSmmMemoryAttributesTableGuid;
-
-#endif

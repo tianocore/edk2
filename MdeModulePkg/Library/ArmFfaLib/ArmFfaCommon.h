@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef ARM_FFA_COMMON_LIB_H_
-#define ARM_FFA_COMMON_LIB_H_
+#pragma once
 
 #include <Library/ArmFfaLib.h>
 
@@ -114,5 +113,3 @@ EFIAPI
 ArmFfaLibGetPartId (
   OUT UINT16  *PartId
   );
-
-#endif

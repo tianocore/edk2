@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __PEI_CAPSULE_ON_DISK_PPI_H__
-#define __PEI_CAPSULE_ON_DISK_PPI_H__
+#pragma once
 
 #define EDKII_PEI_CAPSULE_ON_DISK_PPI_GUID \
   { \
@@ -51,5 +50,3 @@ extern EFI_GUID  gEdkiiPeiCapsuleOnDiskPpiGuid;
   }
 
 extern EFI_GUID  gEdkiiPeiBootInCapsuleOnDiskModePpiGuid;
-
-#endif

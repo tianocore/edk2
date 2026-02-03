@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_USBMASS_DISKINFO_H_
-#define _EFI_USBMASS_DISKINFO_H_
+#pragma once
 
 /**
   Initialize the installation of DiskInfo protocol.
@@ -117,5 +116,3 @@ UsbDiskInfoWhichIde (
   OUT UINT32                  *IdeChannel,
   OUT UINT32                  *IdeDevice
   );
-
-#endif

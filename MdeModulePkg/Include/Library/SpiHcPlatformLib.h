@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef PLATFORM_SPI_HC_H_
-#define PLATFORM_SPI_HC_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 #include <Protocol/SpiHc.h>
@@ -144,5 +143,3 @@ PlatformSpiHcTransaction (
   IN CONST EFI_SPI_HC_PROTOCOL  *This,
   IN EFI_SPI_BUS_TRANSACTION    *BusTransaction
   );
-
-#endif // PLATFORM_SPI_HC_SMM_PROTOCOL_H_

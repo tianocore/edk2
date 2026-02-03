@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_PCI_HOST_BRIDGE_LIB_H_
-#define MOCK_PCI_HOST_BRIDGE_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -36,5 +35,3 @@ struct MockPciHostBridgeLib {
      VOID        *Configuration)
     );
 };
-
-#endif

@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _SD_HCI_H_
-#define _SD_HCI_H_
+#pragma once
 
 //
 // SD Host Controller MMIO Register Offset
@@ -345,5 +344,3 @@ VOID
 SdPeimFreeTrb (
   IN SD_TRB  *Trb
   );
-
-#endif

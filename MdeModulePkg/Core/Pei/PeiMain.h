@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PEI_MAIN_H_
-#define _PEI_MAIN_H_
+#pragma once
 
 #include <PiPei.h>
 #include <Ppi/DxeIpl.h>
@@ -2095,5 +2094,3 @@ PeiDelayedDispatchWaitOnEvent (
   IN  EFI_DELAYED_DISPATCH_PPI  *This,
   IN  EFI_GUID                  DelayedGroupId
   );
-
-#endif

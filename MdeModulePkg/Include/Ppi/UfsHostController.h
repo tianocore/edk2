@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EDKII_PEI_UFS_HOST_CONTROLLER_PPI_H_
-#define _EDKII_PEI_UFS_HOST_CONTROLLER_PPI_H_
+#pragma once
 
 ///
 /// Global ID for the EDKII_UFS_HOST_CONTROLLER_PPI.
@@ -49,5 +48,3 @@ struct _EDKII_UFS_HOST_CONTROLLER_PPI {
 };
 
 extern EFI_GUID  gEdkiiPeiUfsHostControllerPpiGuid;
-
-#endif
