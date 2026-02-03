@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EDKII_CRYPTO_PROTOCOL_H__
-#define __EDKII_CRYPTO_PROTOCOL_H__
+#pragma once
 
 #include <Base.h>
 #include <Library/BaseCryptLib.h>
@@ -5754,5 +5753,3 @@ struct _EDKII_CRYPTO_PROTOCOL {
 };
 
 extern GUID  gEdkiiCryptoProtocolGuid;
-
-#endif

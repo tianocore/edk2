@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __CRT_LIB_SUPPORT_H__
-#define __CRT_LIB_SUPPORT_H__
+#pragma once
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -484,5 +483,4 @@ strpbrk (
 #define UINTPTR_MAX  0xFFFFFFFFFFFFFFFFUL
 #else
 #define UINTPTR_MAX  0xFFFFFFFFUL
-#endif
 #endif

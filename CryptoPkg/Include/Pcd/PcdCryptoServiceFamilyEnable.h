@@ -28,8 +28,7 @@
 
 **/
 
-#ifndef __PCD_CRYPTO_SERVICE_FAMILY_ENABLE_H__
-#define __PCD_CRYPTO_SERVICE_FAMILY_ENABLE_H__
+#pragma once
 
 ///
 /// Define used to enable all the crypto services in a family
@@ -431,5 +430,3 @@ typedef struct {
     UINT32    Family;
   } Ec;
 } PCD_CRYPTO_SERVICE_FAMILY_ENABLE;
-
-#endif
