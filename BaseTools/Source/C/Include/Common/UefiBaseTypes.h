@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __UEFI_BASETYPE_H__
-#define __UEFI_BASETYPE_H__
+#pragma once
 
 #include <Common/BaseTypes.h>
 
@@ -164,5 +163,3 @@ typedef union {
 
 
 #define EFI_MAX_BIT               MAX_BIT
-
-#endif
