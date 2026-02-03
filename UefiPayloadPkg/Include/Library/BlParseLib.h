@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef BOOTLOADER_PARSE_LIB_
-#define BOOTLOADER_PARSE_LIB_
+#pragma once
 
 #include <PiPei.h>
 #include <Guid/GraphicsInfoHob.h>
@@ -183,5 +182,3 @@ EFIAPI
 ParseCapsules (
   IN BL_CAPSULE_CALLBACK  CapsuleCallback
   );
-
-#endif
