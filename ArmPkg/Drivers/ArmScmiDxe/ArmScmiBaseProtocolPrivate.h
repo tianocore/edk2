@@ -9,8 +9,7 @@
     DEN0056A_System_Control_and_Management_Interface.pdf
 **/
 
-#ifndef ARM_SCMI_BASE_PROTOCOL_PRIVATE_H_
-#define ARM_SCMI_BASE_PROTOCOL_PRIVATE_H_
+#pragma once
 
 // Return values of BASE_DISCOVER_LIST_PROTOCOLS command.
 typedef struct {
@@ -36,5 +35,3 @@ EFI_STATUS
 ScmiBaseProtocolInit (
   IN OUT EFI_HANDLE  *Handle
   );
-
-#endif /* ARM_SCMI_BASE_PROTOCOL_PRIVATE_H_ */
