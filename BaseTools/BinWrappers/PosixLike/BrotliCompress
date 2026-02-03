@@ -36,17 +36,16 @@ do
 done
 
 
-if [ -n "$WORKSPACE" ] && [ -e "$WORKSPACE/Conf/BaseToolsCBinaries" ]
+if [ -n "$WORKSPACE" ] && [ -e "$WORKSPACE/BaseTools/Build/Source/C/bin" ]
 then
-  exec "$WORKSPACE/Conf/BaseToolsCBinaries/$cmd"
-elif [ -n "$WORKSPACE" ] && [ -e "$EDK_TOOLS_PATH/Source/C" ]
-then
-  if [ ! -e "$EDK_TOOLS_PATH/Source/C/bin/$cmd" ]
+  if [ -e "$WORKSPACE/BaseTools/Build/Source/C/bin/$cmd" ]
   then
-    echo "BaseTools C Tool binary was not found ($cmd)"
-    echo "You may need to run:"
-    echo "  make -C $EDK_TOOLS_PATH/Source/C"
-  else
+    exec "$WORKSPACE/BaseTools/Build/Source/C/bin/$cmd" $QLT $ARGS
+  fi
+eif [ -n "$EDK_TOOLS_PATH" ] && [ -e "$EDK_TOOLS_PATH/Source/C/bin" ]
+then
+  if [ -e "$EDK_TOOLS_PATH/Source/C/bin/$cmd" ]
+  then
     exec "$EDK_TOOLS_PATH/Source/C/bin/$cmd" $QLT $ARGS
   fi
 elif [ -e "$dir/../../Source/C/bin/$cmd" ]

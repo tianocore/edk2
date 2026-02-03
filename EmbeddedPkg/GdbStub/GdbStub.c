@@ -1149,8 +1149,8 @@ GdbExceptionHandler (
           AsciiSPrint (gOutBuffer, MAX_BUF_SIZE, "qXfer:libraries:read+;PacketSize=%d", MAX_BUF_SIZE);
           SendPacket (gOutBuffer);
         } else if (AsciiStrnCmp (gInBuffer, "qXfer:libraries:read::", 22) == 0) {
-          // ‘qXfer:libraries:read::offset,length
-          // gInBuffer[22] is offset string, ++Ptr is length string’
+          // 'qXfer:libraries:read::offset,length
+          // gInBuffer[22] is offset string, ++Ptr is length string'
           for (Ptr = &gInBuffer[22]; *Ptr != ','; Ptr++) {
           }
 
