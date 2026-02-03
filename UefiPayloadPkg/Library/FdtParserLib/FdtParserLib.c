@@ -973,8 +973,9 @@ ParseDtb (
   for (Node = FdtNextNode (Fdt, 0, &Depth); Node >= 0; Node = FdtNextNode (Fdt, Node, &Depth)) {
     NodePtr = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + Node + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
     DEBUG ((DEBUG_INFO, "\n   Node(%08x)  %a   Depth %x\n", Node, NodePtr->Name, Depth));
+    NodeType = CheckNodeType (NodePtr->Name, Depth);
     // memory node
-    if (AsciiStrnCmp (NodePtr->Name, "memory@", AsciiStrLen ("memory@")) == 0) {
+    if (NodeType == Memory) {
       for (Property = FdtFirstPropertyOffset (Fdt, Node); Property >= 0; Property = FdtNextPropertyOffset (Fdt, Property)) {
         PropertyPtr = FdtGetPropertyByOffset (Fdt, Property, &TempLen);
         TempStr     = FdtGetString (Fdt, Fdt32ToCpu (PropertyPtr->NameOffset), NULL);
@@ -1007,16 +1008,8 @@ ParseDtb (
           }
         }
       }
-    } else {
-      PropertyPtr = FdtGetProperty (Fdt, Node, "compatible", &TempLen);
-      if (PropertyPtr == NULL) {
-        continue;
-      }
-
-      TempStr = (CHAR8 *)(PropertyPtr->Data);
-      if (AsciiStrnCmp (TempStr, "pci-rb", AsciiStrLen ("pci-rb")) == 0) {
-        RootBridgeCount++;
-      }
+    } else if (NodeType == PciRootBridge) {
+      RootBridgeCount++;
     }
   }
 
