@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef PRM_MMIO_H_
-#define PRM_MMIO_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -41,5 +40,3 @@ typedef struct {
 } PRM_RUNTIME_MMIO_RANGES;
 
 #pragma pack(pop)
-
-#endif
