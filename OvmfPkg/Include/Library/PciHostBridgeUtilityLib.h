@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __PCI_HOST_BRIDGE_UTILITY_LIB_H__
-#define __PCI_HOST_BRIDGE_UTILITY_LIB_H__
+#pragma once
 
 #include <Library/PciHostBridgeLib.h>
 
@@ -174,5 +173,3 @@ EFIAPI
 PciHostBridgeUtilityResourceConflict (
   IN VOID  *Configuration
   );
-
-#endif // __PCI_HOST_BRIDGE_UTILITY_LIB_H__

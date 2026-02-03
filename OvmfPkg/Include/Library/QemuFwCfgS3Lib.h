@@ -10,8 +10,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __FW_CFG_S3_LIB__
-#define __FW_CFG_S3_LIB__
+#pragma once
 
 #include <Base.h>
 
@@ -345,5 +344,3 @@ QemuFwCfgS3ScriptCheckValue (
   IN UINT64  ValueMask,
   IN UINT64  Value
   );
-
-#endif
