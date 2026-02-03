@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _UEFI_HANDLE_PARSING_LIB_INTERNAL_H_
-#define _UEFI_HANDLE_PARSING_LIB_INTERNAL_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -282,5 +281,3 @@ typedef struct _GUID_INFO_BLOCK {
   EFI_GUID              *GuidId;
   DUMP_PROTOCOL_INFO    DumpInfo;
 } GUID_INFO_BLOCK;
-
-#endif

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __SHELL_LIB__
-#define __SHELL_LIB__
+#pragma once
 
 #include <Uefi.h>
 #include <Guid/FileInfo.h>
@@ -1437,5 +1436,3 @@ ShellPrintHelp (
   IN CONST CHAR16  *SectionToGetHelpOn,
   IN BOOLEAN       PrintCommandText
   );
-
-#endif // __SHELL_LIB__
