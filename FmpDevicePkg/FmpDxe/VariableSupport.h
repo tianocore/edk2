@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __VARIABLE_SUPPORT_H__
-#define __VARIABLE_SUPPORT_H__
+#pragma once
 
 ///
 /// Default values for FMP Controller State information
@@ -234,5 +233,3 @@ EFI_STATUS
 LockAllFmpVariables (
   IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
   );
-
-#endif
