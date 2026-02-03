@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef EDKII_HTTP_CALLBACK_H_
-#define EDKII_HTTP_CALLBACK_H_
+#pragma once
 
 #define EDKII_HTTP_CALLBACK_PROTOCOL_GUID \
   { \
@@ -93,5 +92,3 @@ struct _EDKII_HTTP_CALLBACK_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkiiHttpCallbackProtocolGuid;
-
-#endif /* EDKII_HTTP_CALLBACK_H_ */

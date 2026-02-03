@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __DPC_H__
-#define __DPC_H__
+#pragma once
 
 //
 // DPC Protocol GUID value
@@ -92,5 +91,3 @@ struct _EFI_DPC_PROTOCOL {
 /// DPC Protocol GUID variable.
 ///
 extern EFI_GUID  gEfiDpcProtocolGuid;
-
-#endif
