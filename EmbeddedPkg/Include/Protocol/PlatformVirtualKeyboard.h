@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __PLATFORM_VIRTUAL_KEYBOARD_H__
-#define __PLATFORM_VIRTUAL_KEYBOARD_H__
+#pragma once
 
 //
 // Protocol interface structure
@@ -55,5 +54,3 @@ struct _PLATFORM_VIRTUAL_KBD_PROTOCOL {
 };
 
 extern EFI_GUID  gPlatformVirtualKeyboardProtocolGuid;
-
-#endif /* __PLATFORM_VIRTUAL_KEYBOARD_H__ */
