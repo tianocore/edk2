@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef WIN_INCLUDE_H_
-#define WIN_INCLUDE_H_
+#pragma once
 
 #define GUID         _WINNT_DUP_GUID_____
 #define _LIST_ENTRY  _WINNT_DUP_LIST_ENTRY_FORWARD
@@ -24,5 +23,3 @@
 #undef _LIST_ENTRY
 #undef LIST_ENTRY
 #define VOID  void
-
-#endif
