@@ -193,14 +193,14 @@ EfiPxeBcStart (
     //
     // Create event and set status for token to capture ICMP error message.
     //
-    Private->Icmp6Token.Status = EFI_NOT_READY;
-    Status                     = gBS->CreateEvent (
-                                        EVT_NOTIFY_SIGNAL,
-                                        TPL_NOTIFY,
-                                        PxeBcIcmpErrorUpdate,
-                                        Private,
-                                        &Private->IcmpToken.Event
-                                        );
+    Private->IcmpToken.Status = EFI_NOT_READY;
+    Status                    = gBS->CreateEvent (
+                                       EVT_NOTIFY_SIGNAL,
+                                       TPL_NOTIFY,
+                                       PxeBcIcmpErrorUpdate,
+                                       Private,
+                                       &Private->IcmpToken.Event
+                                       );
     if (EFI_ERROR (Status)) {
       goto ON_ERROR;
     }
