@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _HDD_PASSWORD_DXE_H_
-#define _HDD_PASSWORD_DXE_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -131,5 +130,3 @@ typedef struct {
   UINT32                      Address;
   S3_BOOT_SCRIPT_LIB_WIDTH    Width;
 } HDD_HC_PCI_REGISTER_SAVE;
-
-#endif
