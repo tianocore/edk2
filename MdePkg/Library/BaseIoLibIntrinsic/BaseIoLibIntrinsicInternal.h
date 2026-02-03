@@ -7,8 +7,7 @@
    SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __BASEIOLIB_INTRINSIC_INTERNAL_H_
-#define __BASEIOLIB_INTRINSIC_INTERNAL_H_
+#pragma once
 
 #include <Base.h>
 
@@ -16,5 +15,3 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/RegisterFilterLib.h>
-
-#endif

@@ -21,8 +21,7 @@
 
 **/
 
-#ifndef ARM_FFA_PART_INFO_H_
-#define ARM_FFA_PART_INFO_H_
+#pragma once
 
 /** Partition info flags used in FFA_PARTITION_INFO_GET
  *  See FF-A spec chapter 13.8 FFA_PARTITION_INFO_GET
@@ -97,5 +96,3 @@ typedef struct {
   /// UUID of partition
   UINT32          PartitionUuid[4];
 } EFI_FFA_PART_INFO_DESC;
-
-#endif

@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _WATCHDOG_ACTION_TABLE_H_
-#define _WATCHDOG_ACTION_TABLE_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -85,5 +84,3 @@ typedef struct {
 #define EFI_ACPI_WDAT_1_0_WATCHDOG_INSTRUCTION_WRITE_VALUE        0x2
 #define EFI_ACPI_WDAT_1_0_WATCHDOG_INSTRUCTION_WRITE_COUNTDOWN    0x3
 #define EFI_ACPI_WDAT_1_0_WATCHDOG_INSTRUCTION_PRESERVE_REGISTER  0x80
-
-#endif

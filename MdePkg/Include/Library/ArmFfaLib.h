@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef ARM_FFA_LIB_H_
-#define ARM_FFA_LIB_H_
+#pragma once
 
 #include <IndustryStandard/ArmFfaSvc.h>
 #include <IndustryStandard/ArmFfaBootInfo.h>
@@ -424,5 +423,3 @@ ArmFfaLibGetPartitionInfo (
   IN EFI_GUID                 *ServiceGuid,
   OUT EFI_FFA_PART_INFO_DESC  *PartDesc
   );
-
-#endif // ARM_FFA_LIB_H_

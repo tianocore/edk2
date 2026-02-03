@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef __I2C_BUS_CONFIGURATION_MANAGEMENT_H__
-#define __I2C_BUS_CONFIGURATION_MANAGEMENT_H__
+#pragma once
 
 #define EFI_I2C_BUS_CONFIGURATION_MANAGEMENT_PROTOCOL_GUID \
   { 0x55b71fb5, 0x17c6, 0x410e, { 0xb5, 0xbd, 0x5f, 0xa2, 0xe3, 0xd4, 0x46, 0x6b }}
@@ -160,5 +159,3 @@ struct _EFI_I2C_BUS_CONFIGURATION_MANAGEMENT_PROTOCOL {
 /// Reference to variable defined in the .DEC file
 ///
 extern EFI_GUID  gEfiI2cBusConfigurationManagementProtocolGuid;
-
-#endif //  __I2C_BUS_CONFIGURATION_MANAGEMENT_H__

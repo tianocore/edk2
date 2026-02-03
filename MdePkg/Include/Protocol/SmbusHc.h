@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __SMBUS_HC_H__
-#define __SMBUS_HC_H__
+#pragma once
 
 #include <IndustryStandard/SmBus.h>
 
@@ -278,5 +277,3 @@ struct _EFI_SMBUS_HC_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiSmbusHcProtocolGuid;
-
-#endif

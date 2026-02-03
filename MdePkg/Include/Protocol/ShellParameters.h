@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __EFI_SHELL_PARAMETERS_PROTOCOL_H__
-#define __EFI_SHELL_PARAMETERS_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/Shell.h>
 
@@ -50,5 +49,3 @@ typedef struct _EFI_SHELL_PARAMETERS_PROTOCOL {
 } EFI_SHELL_PARAMETERS_PROTOCOL;
 
 extern EFI_GUID  gEfiShellParametersProtocolGuid;
-
-#endif

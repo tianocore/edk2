@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TCG_PHYSICAL_PRESENCE_H_
-#define _TCG_PHYSICAL_PRESENCE_H_
+#pragma once
 
 //
 // TCG PP definition for physical presence ACPI function
@@ -119,5 +118,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_DISABLE_BLOCK_SID_FUNC_FALSE  101
 
 #define TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION  128
-
-#endif

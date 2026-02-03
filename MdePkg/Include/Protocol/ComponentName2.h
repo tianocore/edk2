@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __EFI_COMPONENT_NAME2_H__
-#define __EFI_COMPONENT_NAME2_H__
+#pragma once
 
 ///
 /// Global ID for the Component Name Protocol
@@ -160,5 +159,3 @@ struct _EFI_COMPONENT_NAME2_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiComponentName2ProtocolGuid;
-
-#endif

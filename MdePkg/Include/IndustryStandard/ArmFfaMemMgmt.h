@@ -16,8 +16,7 @@
 
 **/
 
-#ifndef ARM_FFA_MEM_MGMT_H_
-#define ARM_FFA_MEM_MGMT_H_
+#pragma once
 
 /**
   Data access attributes in a memory access permission descriptor. This corresponds
@@ -321,5 +320,3 @@ typedef struct {
   UINT32    EndpointCount;
   UINT16    Endpoints[];
 } FFA_MEM_RELINQUISH_DESCRIPTOR;
-
-#endif

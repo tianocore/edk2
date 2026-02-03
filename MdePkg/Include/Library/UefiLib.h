@@ -18,8 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __UEFI_LIB_H__
-#define __UEFI_LIB_H__
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -1745,5 +1744,3 @@ EFIAPI
 EfiLocateFirstAcpiTable (
   IN UINT32  Signature
   );
-
-#endif

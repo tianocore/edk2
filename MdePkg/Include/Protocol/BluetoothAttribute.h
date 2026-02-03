@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __EFI_BLUETOOTH_ATTRIBUTE_H__
-#define __EFI_BLUETOOTH_ATTRIBUTE_H__
+#pragma once
 
 #define EFI_BLUETOOTH_ATTRIBUTE_SERVICE_BINDING_PROTOCOL_GUID \
   { \
@@ -270,5 +269,3 @@ struct _EFI_BLUETOOTH_ATTRIBUTE_PROTOCOL {
 
 extern EFI_GUID  gEfiBluetoothAttributeProtocolGuid;
 extern EFI_GUID  gEfiBluetoothAttributeServiceBindingProtocolGuid;
-
-#endif
