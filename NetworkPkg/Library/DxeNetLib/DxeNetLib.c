@@ -2701,7 +2701,7 @@ NetLibDetectMediaWaitTimeout (
     return EFI_INVALID_PARAMETER;
   }
 
-  *MediaState = EFI_SUCCESS;
+  *MediaState = EFI_NOT_READY;
   MediaInfo   = NULL;
 
   //
