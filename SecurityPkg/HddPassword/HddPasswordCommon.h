@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _HDD_PASSWORD_COMMON_H_
-#define _HDD_PASSWORD_COMMON_H_
+#pragma once
 
 //
 // The payload length of HDD related ATA commands
@@ -50,5 +49,3 @@ typedef struct {
   UINT32                      DevicePathLength;
   EFI_DEVICE_PATH_PROTOCOL    DevicePath[];
 } HDD_PASSWORD_DEVICE_INFO;
-
-#endif // _HDD_PASSWORD_COMMON_H_

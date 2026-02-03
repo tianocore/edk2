@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TPMCOMMLIB_COMMON_HEADER_H_
-#define _TPMCOMMLIB_COMMON_HEADER_H_
+#pragma once
 
 #include <PiPei.h>
 #include <IndustryStandard/Tpm12.h>
@@ -19,5 +18,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseCryptLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
-
-#endif
