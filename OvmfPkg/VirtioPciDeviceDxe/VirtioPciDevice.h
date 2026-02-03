@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _VIRTIO_PCI_DEVICE_DXE_H_
-#define _VIRTIO_PCI_DEVICE_DXE_H_
+#pragma once
 
 #include <Protocol/ComponentName.h>
 #include <Protocol/DriverBinding.h>
@@ -184,5 +183,3 @@ VirtioPciUnmapSharedBuffer (
   IN  VIRTIO_DEVICE_PROTOCOL  *This,
   IN  VOID                    *Mapping
   );
-
-#endif // _VIRTIO_PCI_DEVICE_DXE_H_

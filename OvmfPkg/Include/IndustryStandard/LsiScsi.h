@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _LSI_SCSI_H_
-#define _LSI_SCSI_H_
+#pragma once
 
 //
 // Device ID
@@ -101,5 +100,3 @@
 
 #define LSI_INS_TC_SCSIP_DAT_OUT  0x00000000
 #define LSI_INS_TC_SCSIP_MSG_IN   (BIT24 | BIT25 | BIT26)
-
-#endif // _LSI_SCSI_H_

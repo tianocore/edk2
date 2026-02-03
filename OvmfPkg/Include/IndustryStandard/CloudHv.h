@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef __CLOUDHV_H__
-#define __CLOUDHV_H__
+#pragma once
 
 //
 // Host Bridge Device ID
@@ -37,5 +36,3 @@
 // SMBIOS address
 //
 #define CLOUDHV_SMBIOS_ADDRESS  0xf0000
-
-#endif // __CLOUDHV_H__

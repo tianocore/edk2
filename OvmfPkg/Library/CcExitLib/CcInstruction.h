@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef CC_INSTRUCTION_H_
-#define CC_INSTRUCTION_H_
+#pragma once
 
 #include <Base.h>
 #include <Uefi.h>
@@ -193,5 +192,3 @@ CcInitInstructionData (
   IN     GHCB                    *Ghcb,
   IN     EFI_SYSTEM_CONTEXT_X64  *Regs
   );
-
-#endif

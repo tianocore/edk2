@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef _XEN_PLATFORM_LIB_H_
-#define _XEN_PLATFORM_LIB_H_
+#pragma once
 
 #include <Guid/XenInfo.h>
 
@@ -49,5 +48,3 @@ EFIAPI
 XenGetInfoHOB (
   VOID
   );
-
-#endif
