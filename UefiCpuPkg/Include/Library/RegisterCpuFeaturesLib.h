@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __REGISTER_CPU_FEATURES_LIB_H__
-#define __REGISTER_CPU_FEATURES_LIB_H__
+#pragma once
 
 #include <AcpiCpuData.h>
 #include <Register/Intel/Cpuid.h>
@@ -607,5 +606,3 @@ PreSmmCpuRegisterTableWrite (
     ((Type *)(&ValueMask))->Field = 0;                                                                   \
     PreSmmCpuRegisterTableWrite (ProcessorNumber, RegisterType, Index, ~ValueMask, Value);                \
   } while(FALSE);
-
-#endif

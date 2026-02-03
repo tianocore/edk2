@@ -5,9 +5,6 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _STM_API_H_
-#define _STM_API_H_
+#pragma once
 
 #include <Register/Intel/StmApi.h>
-
-#endif

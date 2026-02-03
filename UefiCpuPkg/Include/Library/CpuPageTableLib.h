@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef PAGE_TABLE_LIB_H_
-#define PAGE_TABLE_LIB_H_
+#pragma once
 
 typedef union {
   struct {
@@ -140,5 +139,3 @@ PageTableParse (
   IN     IA32_MAP_ENTRY  *Map,
   IN OUT UINTN           *MapCount
   );
-
-#endif

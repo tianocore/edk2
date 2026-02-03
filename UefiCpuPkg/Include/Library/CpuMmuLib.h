@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef CPU_MMU_LIB_H_
-#define CPU_MMU_LIB_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -37,5 +36,3 @@ MemoryRegionMap (
   IN     UINT64                Attributes,
   IN     UINT64                AttributeMask
   );
-
-#endif // CPU_MMU_LIB_H_

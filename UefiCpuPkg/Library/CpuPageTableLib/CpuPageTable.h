@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef CPU_PAGE_TABLE_H_
-#define CPU_PAGE_TABLE_H_
+#pragma once
 
 #include <Base.h>
 #include <Library/BaseLib.h>
@@ -229,5 +228,3 @@ PageTableLibGetPnleMapAttribute (
   IN IA32_PAGE_NON_LEAF_ENTRY  *Pnle,
   IN IA32_MAP_ATTRIBUTE        *ParentMapAttribute
   );
-
-#endif
