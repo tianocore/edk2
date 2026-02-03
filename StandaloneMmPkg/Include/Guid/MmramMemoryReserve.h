@@ -18,8 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_MM_PEI_MMRAM_MEMORY_RESERVE_H_
-#define _EFI_MM_PEI_MMRAM_MEMORY_RESERVE_H_
+#pragma once
 
 #define EFI_MM_PEI_MMRAM_MEMORY_RESERVE \
   { \
@@ -51,5 +50,3 @@ typedef struct {
 } EFI_MMRAM_HOB_DESCRIPTOR_BLOCK;
 
 extern EFI_GUID  gEfiMmPeiSmramMemoryReserveGuid;
-
-#endif
