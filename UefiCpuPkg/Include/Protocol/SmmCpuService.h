@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SMM_CPU_SERVICE_PROTOCOL_H_
-#define _SMM_CPU_SERVICE_PROTOCOL_H_
+#pragma once
 
 //
 // Share some definitions with MP Services and CPU Arch Protocol
@@ -233,5 +232,3 @@ struct _EDKII_SMM_CPU_RENDEZVOUS_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkiiSmmCpuRendezvousProtocolGuid;
-
-#endif

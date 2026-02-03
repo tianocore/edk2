@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __MP_INIT_LIB_H__
-#define __MP_INIT_LIB_H__
+#pragma once
 
 #include <Ppi/SecPlatformInformation.h>
 #include <Protocol/MpService.h>
@@ -379,5 +378,3 @@ MpInitLibStartupAllCPUs (
   IN  UINTN             TimeoutInMicroseconds,
   IN  VOID              *ProcedureArgument      OPTIONAL
   );
-
-#endif
