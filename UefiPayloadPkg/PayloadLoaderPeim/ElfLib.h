@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef ELF_LIB_H_
-#define ELF_LIB_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -118,5 +117,3 @@ GetElfSectionPos (
   OUT UINTN              *Offset,
   OUT UINTN              *Size
   );
-
-#endif /* ELF_LIB_H_ */
