@@ -44,7 +44,6 @@
   DxeServicesLib
   TpmMeasurementLib
   Tpm2CommandLib
-  Tcg2PhysicalPresenceLib
   PcdLib
 
 [Guids]
