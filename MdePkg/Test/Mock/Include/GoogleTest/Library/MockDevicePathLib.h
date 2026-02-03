@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_DEVICE_PATH_LIB_LIB_H_
-#define MOCK_DEVICE_PATH_LIB_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -175,5 +174,3 @@ struct MockDevicePathLib {
     (IN CONST CHAR16  *TextDevicePath)
     );
 };
-
-#endif // MOCK_DEVICE_PATH_LIB_H_

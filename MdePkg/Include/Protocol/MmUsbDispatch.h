@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef _MM_USB_DISPATCH_H_
-#define _MM_USB_DISPATCH_H_
+#pragma once
 
 #include <Pi/PiMmCis.h>
 
@@ -119,5 +118,3 @@ struct _EFI_MM_USB_DISPATCH_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiMmUsbDispatchProtocolGuid;
-
-#endif

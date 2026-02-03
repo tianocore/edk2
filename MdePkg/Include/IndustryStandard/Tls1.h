@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __TLS_1_H__
-#define __TLS_1_H__
+#pragma once
 
 #pragma pack(1)
 
@@ -134,5 +133,3 @@ typedef enum {
 } TLS_EC_NAMED_CURVE;
 
 #pragma pack()
-
-#endif

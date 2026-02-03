@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __HII_POPUP_H__
-#define __HII_POPUP_H__
+#pragma once
 
 #define EFI_HII_POPUP_PROTOCOL_GUID \
   {0x4311edc0, 0x6054, 0x46d4, {0x9e, 0x40, 0x89, 0x3e, 0xa9, 0x52, 0xfc, 0xcc}}
@@ -73,5 +72,3 @@ struct _EFI_HII_POPUP_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiHiiPopupProtocolGuid;
-
-#endif

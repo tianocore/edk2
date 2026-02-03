@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __ISCSI_INITIATOR_NAME_H__
-#define __ISCSI_INITIATOR_NAME_H__
+#pragma once
 
 #define EFI_ISCSI_INITIATOR_NAME_PROTOCOL_GUID \
 { \
@@ -74,5 +73,3 @@ struct _EFI_ISCSI_INITIATOR_NAME_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiIScsiInitiatorNameProtocolGuid;
-
-#endif

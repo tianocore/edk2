@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __SPI_HC_PROTOCOL_H__
-#define __SPI_HC_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/SpiConfiguration.h>
 #include <Protocol/SpiIo.h>
@@ -198,5 +197,3 @@ struct _EFI_SPI_HC_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiSpiHcProtocolGuid;
-
-#endif // __SPI_HC_PROTOCOL_H__

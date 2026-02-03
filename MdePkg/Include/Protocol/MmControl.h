@@ -16,8 +16,7 @@
 
 **/
 
-#ifndef _MM_CONTROL_H_
-#define _MM_CONTROL_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -95,5 +94,3 @@ struct _EFI_MM_CONTROL_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiMmControlProtocolGuid;
-
-#endif

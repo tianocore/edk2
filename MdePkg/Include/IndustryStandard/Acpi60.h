@@ -8,8 +8,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _ACPI_6_0_H_
-#define _ACPI_6_0_H_
+#pragma once
 
 #include <IndustryStandard/Acpi51.h>
 
@@ -2416,5 +2415,3 @@ typedef struct {
 #define EFI_ACPI_6_0_XEN_PROJECT_TABLE_SIGNATURE  SIGNATURE_32('X', 'E', 'N', 'V')
 
 #pragma pack()
-
-#endif

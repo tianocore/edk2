@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __AUTHENTICATION_INFO_H__
-#define __AUTHENTICATION_INFO_H__
+#pragma once
 
 #define EFI_AUTHENTICATION_INFO_PROTOCOL_GUID \
   { \
@@ -227,5 +226,3 @@ struct _EFI_AUTHENTICATION_INFO_PROTOCOL {
 extern EFI_GUID  gEfiAuthenticationInfoProtocolGuid;
 extern EFI_GUID  gEfiAuthenticationChapRadiusGuid;
 extern EFI_GUID  gEfiAuthenticationChapLocalGuid;
-
-#endif

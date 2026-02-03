@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __UFS_DEVICE_CONFIG_PROTOCOL_H__
-#define __UFS_DEVICE_CONFIG_PROTOCOL_H__
+#pragma once
 
 //
 // EFI UFS Device Config Protocol GUID value
@@ -133,5 +132,3 @@ struct _EFI_UFS_DEVICE_CONFIG_PROTOCOL {
 /// UFS Device Config Protocol GUID variable.
 ///
 extern EFI_GUID  gEfiUfsDeviceConfigProtocolGuid;
-
-#endif

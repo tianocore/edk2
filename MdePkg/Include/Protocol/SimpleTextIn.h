@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __SIMPLE_TEXT_IN_PROTOCOL_H__
-#define __SIMPLE_TEXT_IN_PROTOCOL_H__
+#pragma once
 
 #define EFI_SIMPLE_TEXT_INPUT_PROTOCOL_GUID \
   { \
@@ -124,5 +123,3 @@ struct _EFI_SIMPLE_TEXT_INPUT_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiSimpleTextInProtocolGuid;
-
-#endif

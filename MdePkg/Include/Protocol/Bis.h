@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __BIS_H__
-#define __BIS_H__
+#pragma once
 
 #define EFI_BIS_PROTOCOL_GUID \
   { \
@@ -438,5 +437,3 @@ struct _EFI_BIS_PROTOCOL {
 
 extern EFI_GUID  gEfiBisProtocolGuid;
 extern EFI_GUID  gBootObjectAuthorizationParmsetGuid;
-
-#endif

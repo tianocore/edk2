@@ -14,8 +14,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _IPMI_NET_FN_SENSOR_EVENT_H_
-#define _IPMI_NET_FN_SENSOR_EVENT_H_
+#pragma once
 
 #pragma pack(1)
 //
@@ -89,4 +88,3 @@ typedef struct _IPMI_SENSOR_GET_SENSOR_THRESHOLD_RESPONSE_DATA {
 } IPMI_SENSOR_GET_SENSOR_THRESHOLD_RESPONSE_DATA;
 
 #pragma pack()
-#endif

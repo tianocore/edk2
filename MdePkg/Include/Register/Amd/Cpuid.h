@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __AMD_CPUID_H__
-#define __AMD_CPUID_H__
+#pragma once
 
 /**
 CPUID Signature Information
@@ -755,5 +754,3 @@ typedef union {
   ///
   UINT32    Uint32;
 } CPUID_MEMORY_ENCRYPTION_INFO_EDX;
-
-#endif
