@@ -18,6 +18,7 @@
 #include <Library/PeiServicesLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/HobLib.h>
+#include <Library/SafeIntLib.h>
 
 #include <Guid/SmmVariableCommon.h>
 
