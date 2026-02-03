@@ -10,8 +10,7 @@
     - Std or STD - Standard
 **/
 
-#ifndef RHCT_GENERATOR_H_
-#define RHCT_GENERATOR_H_
+#pragma once
 
 #pragma pack(1)
 
@@ -40,5 +39,3 @@ typedef struct AcpiRhctGenerator {
 } ACPI_RHCT_GENERATOR;
 
 #pragma pack()
-
-#endif // RHCT_GENERATOR_H_

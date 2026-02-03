@@ -10,8 +10,7 @@
     - Std or STD - Standard
 **/
 
-#ifndef ARM_NAMESPACE_OBJECTS_H_
-#define ARM_NAMESPACE_OBJECTS_H_
+#pragma once
 
 #include <AcpiObjects.h>
 #include <StandardNameSpaceObjects.h>
@@ -779,5 +778,3 @@ typedef struct CmArmEtInfo {
 } CM_ARM_ET_INFO;
 
 #pragma pack()
-
-#endif // ARM_NAMESPACE_OBJECTS_H_
