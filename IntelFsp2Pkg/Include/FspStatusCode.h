@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _FSP_STATUS_CODE_H_
-#define _FSP_STATUS_CODE_H_
+#pragma once
 
 //
 // FSP API - 4 BITS
@@ -37,5 +36,3 @@
 //
 #define FSP_STATUS_CODE_API_ENTRY  0x0000
 #define FSP_STATUS_CODE_API_EXIT   0x007F
-
-#endif
