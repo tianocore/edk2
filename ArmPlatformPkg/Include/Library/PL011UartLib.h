@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __PL011_UART_LIB_H__
-#define __PL011_UART_LIB_H__
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -179,5 +178,3 @@ EFIAPI
 PL011UartPoll (
   IN  UINTN  UartBase
   );
-
-#endif
