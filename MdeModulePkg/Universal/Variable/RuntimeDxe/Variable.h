@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _VARIABLE_H_
-#define _VARIABLE_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Protocol/VariableWrite.h>
@@ -841,5 +840,3 @@ EFIAPI
 VariableExLibAtRuntime (
   VOID
   );
-
-#endif

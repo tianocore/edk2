@@ -14,8 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _VIRTUAL_MEMORY_H_
-#define _VIRTUAL_MEMORY_H_
+#pragma once
 
 #define SYS_CODE64_SEL  0x38
 
@@ -312,5 +311,3 @@ VOID *
 AllocatePageTableMemory (
   IN UINTN  Pages
   );
-
-#endif

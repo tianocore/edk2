@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __BMP_SUPPORT_LIB_H__
-#define __BMP_SUPPORT_LIB_H__
+#pragma once
 
 #include <Protocol/GraphicsOutput.h>
 
@@ -85,5 +84,3 @@ TranslateGopBltToBmp (
   IN OUT VOID                           **BmpImage,
   IN OUT UINT32                         *BmpImageSize
   );
-
-#endif

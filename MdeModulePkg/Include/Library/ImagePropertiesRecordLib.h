@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef IMAGE_PROPERTIES_RECORD_SUPPORT_LIB_H_
-#define IMAGE_PROPERTIES_RECORD_SUPPORT_LIB_H_
+#pragma once
 
 #define IMAGE_PROPERTIES_RECORD_CODE_SECTION_SIGNATURE  SIGNATURE_32 ('I','P','R','C')
 
@@ -230,5 +229,3 @@ EFIAPI
 DeleteImagePropertiesRecord (
   IN  IMAGE_PROPERTIES_RECORD  *ImageRecord
   );
-
-#endif

@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef __NON_DISCOVERABLE_DEVICE_REGISTRATION_LIB_H__
-#define __NON_DISCOVERABLE_DEVICE_REGISTRATION_LIB_H__
+#pragma once
 
 #include <Protocol/NonDiscoverableDevice.h>
 
@@ -54,5 +53,3 @@ RegisterNonDiscoverableMmioDevice (
   IN      UINTN                             NumMmioResources,
   ...
   );
-
-#endif

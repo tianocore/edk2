@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EDKII_MIGRATED_FV_INFO_GUID_H__
-#define __EDKII_MIGRATED_FV_INFO_GUID_H__
+#pragma once
 
 //
 // FLAGS_FV_RAW_DATA_COPY indicates FV raw data will be copied to permanent memory
@@ -58,5 +57,3 @@ typedef struct {
 
 extern EFI_GUID  gEdkiiMigrationInfoGuid;
 extern EFI_GUID  gEdkiiMigratedFvInfoGuid;
-
-#endif // #ifndef __EDKII_MIGRATED_FV_INFO_GUID_H__

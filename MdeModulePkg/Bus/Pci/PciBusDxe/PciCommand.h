@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_PCI_COMMAND_H_
-#define _EFI_PCI_COMMAND_H_
+#pragma once
 
 //
 // The PCI Command register bits owned by PCI Bus driver.
@@ -226,5 +225,3 @@ LocatePciExpressCapabilityRegBlock (
 **/
 #define PCI_DISABLE_BRIDGE_CONTROL_REGISTER(a, b) \
         PciOperateRegister (a, b, PCI_BRIDGE_CONTROL_REGISTER_OFFSET, EFI_DISABLE_REGISTER, NULL)
-
-#endif

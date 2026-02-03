@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef IPMI_COMMAND_LIB_H_
-#define IPMI_COMMAND_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 #include <IndustryStandard/Ipmi.h>
@@ -696,5 +695,3 @@ IpmiGetSdr (
   OUT IPMI_GET_SDR_RESPONSE  *GetSdrResponse,
   IN OUT UINT32              *GetSdrResponseSize
   );
-
-#endif

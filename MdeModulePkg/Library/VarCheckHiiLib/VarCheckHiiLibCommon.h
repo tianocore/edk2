@@ -4,8 +4,7 @@ Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef VAR_CHECK_HII_LIB_GUID_H_
-#define VAR_CHECK_HII_LIB_GUID_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Library/DebugLib.h>
@@ -39,5 +38,3 @@ CheckHiiVariableCommon (
   IN UINTN                          DataSize,
   IN VOID                           *Data
   );
-
-#endif

@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef ARM_FFA_RX_TX_MAP_LIB_H_
-#define ARM_FFA_RX_TX_MAP_LIB_H_
+#pragma once
 
 #include <Guid/ArmFfaRxTxBufferInfo.h>
 
@@ -106,5 +105,3 @@ EFIAPI
 UnmapCallback (
   IN VOID
   );
-
-#endif
