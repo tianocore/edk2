@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef ARM_MONITOR_LIB_H_
-#define ARM_MONITOR_LIB_H_
+#pragma once
 
 /** The size of the SMC arguments is different between AArch64 and AArch32.
 
@@ -48,5 +47,3 @@ EFIAPI
 ArmMonitorCall (
   IN OUT ARM_MONITOR_ARGS  *Args
   );
-
-#endif // ARM_MONITOR_LIB_H_
