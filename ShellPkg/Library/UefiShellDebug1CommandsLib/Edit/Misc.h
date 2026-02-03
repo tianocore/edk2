@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _LIB_MISC_H_
-#define _LIB_MISC_H_
+#pragma once
 
 #include "TextEditorTypes.h"
 
@@ -33,5 +32,3 @@ EFI_EDITOR_LINE *
 LineDup (
   IN  EFI_EDITOR_LINE  *Src
   );
-
-#endif
