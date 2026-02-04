@@ -29,11 +29,12 @@ IsStatusCodeUsingSerialPort (
   MM_STATUS_CODE_USE_SERIAL  *StatusCodeUseSerialHob;
 
   Hob = GetFirstGuidHob (&gMmStatusCodeUseSerialHobGuid);
-  ASSERT (Hob != NULL);
+  if (Hob != NULL) {
+    StatusCodeUseSerialHob = (MM_STATUS_CODE_USE_SERIAL *)GET_GUID_HOB_DATA (Hob);
+    return StatusCodeUseSerialHob->StatusCodeUseSerial;
+  }
 
-  StatusCodeUseSerialHob = (MM_STATUS_CODE_USE_SERIAL *)GET_GUID_HOB_DATA (Hob);
-
-  return StatusCodeUseSerialHob->StatusCodeUseSerial;
+  return FALSE;
 }
 
 /**

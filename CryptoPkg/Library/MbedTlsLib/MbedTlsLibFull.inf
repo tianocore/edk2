@@ -134,7 +134,7 @@
   #
   GCC:*_*_IA32_CC_FLAGS    = -U_WIN32 -U_WIN64 -U_MSC_VER -Wno-error=maybe-uninitialized -Wno-error=unused-but-set-variable
   GCC:*_*_X64_CC_FLAGS     = -U_WIN32 -U_WIN64 -U_MSC_VER -Wno-error=maybe-uninitialized -Wno-error=format -Wno-format -Wno-error=unused-but-set-variable -DNO_MSABI_VA_FUNCS
-  GCC:*_*_AARCH64_CC_FLAGS =  -Wno-error=maybe-uninitialized -Wno-format -Wno-error=unused-but-set-variable -Wno-error=format
+  GCC:*_*_AARCH64_CC_FLAGS = -U_WIN32 -U_WIN64 -U_MSC_VER -Wno-error=maybe-uninitialized -Wno-format -Wno-error=unused-but-set-variable -Wno-error=format
   GCC:*_*_RISCV64_CC_FLAGS =  -Wno-error=maybe-uninitialized -Wno-format -Wno-error=unused-but-set-variable
   GCC:*_*_LOONGARCH64_CC_FLAGS =  -Wno-error=maybe-uninitialized -Wno-format -Wno-error=unused-but-set-variable
   GCC:*_CLANGDWARF_*_CC_FLAGS = -std=gnu99 -Wno-error=uninitialized

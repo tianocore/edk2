@@ -20,7 +20,7 @@
   .set      BLOCK_MEM, TT_TYPE_BLOCK | TT_MT_MEM | TT_AF | TT_XN | TT_NG
 
   .globl    idmap
-  .section  ".rodata.idmap", "a", %progbits
+  .section  ".rodata.idmap", "a"
   .align    12
 
 idmap:      /* level 0 */

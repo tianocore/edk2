@@ -7,7 +7,7 @@
 #
 ##
 
-[PcdsFeatureFlag]
+[PcdsFeatureFlag.IA32, PcdsFeatureFlag.X64]
 #
 # Use Openssl NASM assembly source files that assume Windows calling convention
 # if the family is MSFT or the toolchain is CLANGPDB for Windows or Linux.
@@ -21,4 +21,14 @@ gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm|TRUE
 !endif
 !if $(HOST_BASED_UNIT_TESTING_ENABLED) AND $(WIN_HOST_BUILD)
 gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm|TRUE
+!endif
+
+[PcdsFeatureFlag.AARCH64]
+#
+# Use the PE target assembly source files when building with the CLANGPDB
+# toolchain.
+# GCC and CLANGDWARF use the default PCD value of ELF target assembly source files.
+#
+!if "$(TOOL_CHAIN_TAG)" == "CLANGPDB"
+gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStylePe|TRUE
 !endif
