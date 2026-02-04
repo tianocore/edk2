@@ -1,0 +1,27 @@
+--- a/MdeModulePkg/Bus/Pci/SdMmcPciHcDxe/SdMmcPciHcDxe.c
++++ b/MdeModulePkg/Bus/Pci/SdMmcPciHcDxe/SdMmcPciHcDxe.c
+@@ -485,6 +485,15 @@ SdMmcPciHcDriverBindingSupported (
+   //
+   // Examine SD PCI Host Controller PCI Configuration table fields.
+   //
++  // First check for standard SD Host Controller class codes
+   if ((PciData.Hdr.ClassCode[2] == PCI_CLASS_SYSTEM_PERIPHERAL) &&
+       (PciData.Hdr.ClassCode[1] == PCI_SUBCLASS_SD_HOST_CONTROLLER) &&
+       ((PciData.Hdr.ClassCode[0] == 0x00) || (PciData.Hdr.ClassCode[0] == 0x01)))
+@@ -492,6 +501,18 @@ SdMmcPciHcDriverBindingSupported (
+     return EFI_SUCCESS;
+   }
+ 
++  //
++  // Also check for QEMU sdhci-pci device which might use different class codes
++  // This is a workaround for QEMU compatibility
++  //
++  if ((PciData.Hdr.VendorId == 0x1b36) &&  // Red Hat vendor ID used by QEMU
++      (PciData.Hdr.DeviceId == 0x0007))     // QEMU sdhci-pci device ID
++  {
++    DEBUG ((DEBUG_INFO, "SdMmcPciHc: Found QEMU sdhci-pci device\n"));
++    return EFI_SUCCESS;
++  }
++
+   return EFI_UNSUPPORTED;
+ }

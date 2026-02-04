@@ -284,6 +284,7 @@
   SecurityPkg/Library/SecureBootVariableProvisionLib/SecureBootVariableProvisionLib.inf
   SecurityPkg/EnrollFromDefaultKeysApp/EnrollFromDefaultKeysApp.inf
   SecurityPkg/VariableAuthenticated/SecureBootDefaultKeysDxe/SecureBootDefaultKeysDxe.inf
+  SecurityPkg/VariableAuthenticated/PqcTransitionDxe/PqcTransitionDxe.inf
 
 [Components.IA32, Components.X64, Components.AARCH64]
   #

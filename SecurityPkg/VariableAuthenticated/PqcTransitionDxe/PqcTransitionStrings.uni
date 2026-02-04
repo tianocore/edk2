@@ -1,0 +1,92 @@
+/** @file
+  String definitions for PQC Transition Configuration.
+
+  Copyright (c) 2025, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+/=#
+
+#langdef en-US "English"
+
+// Main Form Strings
+#string STR_PQC_TRANSITION_TITLE              #language en-US "Post-Quantum Cryptography Transition"
+#string STR_PQC_TRANSITION_HELP               #language en-US "Configure Post-Quantum Cryptography transition settings for UEFI firmware"
+#string STR_PQC_TRANSITION_FORM_TITLE         #language en-US "PQC Transition Configuration"
+#string STR_PQC_TRANSITION_SUBTITLE           #language en-US "Prepare for Post-Quantum Cryptography Migration (2030 Deadline)"
+
+// Timeline Information
+#string STR_PQC_TIMELINE_LABEL                #language en-US "PQC Transition Timeline:"
+#string STR_PQC_TIMELINE_VALUE                #language en-US "Today: Legacy only | <2030: Hybrid | =2030: PQC only"
+#string STR_PQC_TIMELINE_HELP                 #language en-US "NIST PQC transition timeline showing current phase and future requirements"
+#string STR_PQC_DEADLINE_LABEL                #language en-US "Transition Deadline:"
+#string STR_PQC_DEADLINE_VALUE                #language en-US "2030 (CNSA 2.0 Requirement)"
+#string STR_PQC_DEADLINE_HELP                 #language en-US "Mandatory deadline for PQC-only mode as per CNSA 2.0"
+
+// Transition Mode
+#string STR_PQC_TRANSITION_MODE_PROMPT        #language en-US "PQC Transition Mode"
+#string STR_PQC_TRANSITION_MODE_HELP          #language en-US "Select the current cryptographic algorithm mode for the system"
+#string STR_PQC_MODE_TRADITIONAL              #language en-US "Traditional Only (RSA/ECDSA)"
+#string STR_PQC_MODE_HYBRID                   #language en-US "Hybrid (Traditional + PQC)"
+#string STR_PQC_MODE_PQC_ONLY                 #language en-US "PQC Only (Post-Quantum)"
+
+// Navigation
+#string STR_PQC_READINESS_CHECK_PROMPT        #language en-US "PQC Readiness Check"
+#string STR_PQC_READINESS_CHECK_HELP          #language en-US "Check if the system is ready for PQC-only mode transition"
+#string STR_PQC_ALGORITHM_STATUS_PROMPT       #language en-US "PQC Algorithm Status"
+#string STR_PQC_ALGORITHM_STATUS_HELP         #language en-US "View the status of supported PQC algorithms"
+
+// Advanced Options
+#string STR_PQC_FORCE_SWITCH_PROMPT           #language en-US "Force PQC-Only Switch"
+#string STR_PQC_FORCE_SWITCH_HELP             #language en-US "WARNING: Force switch to PQC-only mode bypassing readiness checks"
+#string STR_PQC_CLEANUP_TRADITIONAL_PROMPT    #language en-US "Cleanup Traditional Algorithms"
+#string STR_PQC_CLEANUP_TRADITIONAL_HELP      #language en-US "Remove traditional cryptographic certificates from signature databases"
+#string STR_PQC_RECOVERY_MODE_PROMPT          #language en-US "Enable Recovery Mode"
+#string STR_PQC_RECOVERY_MODE_HELP            #language en-US "Enable recovery mechanism in case of boot failure after PQC transition"
+
+// Readiness Check Form
+#string STR_PQC_READINESS_CHECK_FORM_TITLE    #language en-US "PQC Readiness Check"
+#string STR_PQC_READINESS_CHECK_SUBTITLE      #language en-US "System Readiness for Post-Quantum Cryptography Transition"
+
+// Readiness Status Labels
+#string STR_PQC_PK_STATUS_LABEL               #language en-US "Platform Key (PK) PQC Status:"
+#string STR_PQC_PK_STATUS_HELP                #language en-US "Indicates if Platform Key contains PQC certificates"
+#string STR_PQC_KEK_STATUS_LABEL              #language en-US "Key Exchange Key (KEK) PQC Status:"
+#string STR_PQC_KEK_STATUS_HELP               #language en-US "Indicates if Key Exchange Key database contains PQC certificates"
+#string STR_PQC_DB_STATUS_LABEL               #language en-US "Signature Database (DB) PQC Status:"
+#string STR_PQC_DB_STATUS_HELP                #language en-US "Indicates if Signature Database contains PQC certificates"
+#string STR_PQC_OROM_STATUS_LABEL             #language en-US "Option ROM PQC Signature Status:"
+#string STR_PQC_OROM_STATUS_HELP              #language en-US "Indicates if Option ROMs are signed with PQC algorithms"
+#string STR_PQC_LOADER_STATUS_LABEL           #language en-US "OS Loader PQC Signature Status:"
+#string STR_PQC_LOADER_STATUS_HELP            #language en-US "Indicates if OS Loaders are signed with PQC algorithms"
+#string STR_PQC_TLS_STATUS_LABEL              #language en-US "TLS/HTTPS PQC Support Status:"
+#string STR_PQC_TLS_STATUS_HELP               #language en-US "Indicates if TLS/HTTPS boot supports PQC algorithms"
+#string STR_PQC_FWUPDATE_STATUS_LABEL         #language en-US "Firmware Update PQC Status:"
+#string STR_PQC_FWUPDATE_STATUS_HELP          #language en-US "Indicates if firmware update mechanism supports PQC algorithms"
+#string STR_PQC_OVERALL_STATUS_LABEL          #language en-US "Overall System Readiness:"
+#string STR_PQC_OVERALL_STATUS_HELP           #language en-US "Overall system readiness for PQC-only mode transition"
+#string STR_PQC_OVERALL_STATUS_VALUE          #language en-US "Not Ready"
+
+// Algorithm Status Form
+#string STR_PQC_ALGORITHM_STATUS_FORM_TITLE   #language en-US "PQC Algorithm Status"
+#string STR_PQC_ALGORITHM_STATUS_SUBTITLE     #language en-US "Post-Quantum Cryptographic Algorithm Support Status"
+
+// Algorithm Labels
+#string STR_PQC_DILITHIUM_LABEL               #language en-US "Dilithium (Digital Signature):"
+#string STR_PQC_DILITHIUM_HELP                #language en-US "NIST-standardized lattice-based digital signature algorithm"
+#string STR_PQC_FALCON_LABEL                  #language en-US "Falcon (Digital Signature):"
+#string STR_PQC_FALCON_HELP                   #language en-US "NIST-standardized lattice-based digital signature algorithm (compact)"
+#string STR_PQC_SPHINCS_LABEL                 #language en-US "SPHINCS+ (Digital Signature):"
+#string STR_PQC_SPHINCS_HELP                  #language en-US "NIST-standardized hash-based digital signature algorithm"
+#string STR_PQC_KYBER_LABEL                   #language en-US "Kyber (Key Encapsulation):"
+#string STR_PQC_KYBER_HELP                    #language en-US "NIST-standardized lattice-based key encapsulation mechanism"
+#string STR_PQC_NTRU_LABEL                    #language en-US "NTRU (Key Encapsulation):"
+#string STR_PQC_NTRU_HELP                     #language en-US "Lattice-based key encapsulation mechanism"
+
+// Status Values
+#string STR_PQC_STATUS_VALUE                  #language en-US "Not Available"
+#string STR_PQC_ALGORITHM_STATUS_VALUE        #language en-US "Not Supported"
+
+// Common
+#string STR_NULL                              #language en-US ""

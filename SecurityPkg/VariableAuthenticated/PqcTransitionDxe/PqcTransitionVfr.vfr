@@ -1,0 +1,265 @@
+/** @file
+  VFR file used by the PQC Transition configuration component.
+
+  Copyright (c) 2025, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include "PqcTransitionNvData.h"
+
+formset
+  guid      = PQC_TRANSITION_CONFIG_FORM_SET_GUID,
+  title     = STRING_TOKEN(STR_PQC_TRANSITION_TITLE),
+  help      = STRING_TOKEN(STR_PQC_TRANSITION_HELP),
+  classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
+
+  varstore PQC_TRANSITION_CONFIGURATION,
+    varid = 0x1234,
+    name  = PqcTransitionConfig,
+    guid  = PQC_TRANSITION_CONFIG_FORM_SET_GUID;
+
+  //
+  // Main PQC Transition Configuration Form
+  //
+  form formid = PQC_TRANSITION_FORM_ID,
+    title  = STRING_TOKEN(STR_PQC_TRANSITION_FORM_TITLE);
+
+    subtitle text = STRING_TOKEN(STR_PQC_TRANSITION_SUBTITLE);
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    //
+    // PQC Transition Timeline Information
+    //
+    text
+      help   = STRING_TOKEN(STR_PQC_TIMELINE_HELP),
+      text   = STRING_TOKEN(STR_PQC_TIMELINE_LABEL),
+      text   = STRING_TOKEN(STR_PQC_TIMELINE_VALUE),
+      flags  = 0,
+      key    = 0;
+
+    text
+      help   = STRING_TOKEN(STR_PQC_DEADLINE_HELP),
+      text   = STRING_TOKEN(STR_PQC_DEADLINE_LABEL),
+      text   = STRING_TOKEN(STR_PQC_DEADLINE_VALUE),
+      flags  = 0,
+      key    = 0;
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    //
+    // Current PQC Transition Mode
+    //
+    oneof varid   = PqcTransitionConfig.PqcTransitionMode,
+      prompt      = STRING_TOKEN(STR_PQC_TRANSITION_MODE_PROMPT),
+      help        = STRING_TOKEN(STR_PQC_TRANSITION_MODE_HELP),
+      flags       = NUMERIC_SIZE_1 | INTERACTIVE,
+      key         = KEY_PQC_TRANSITION_MODE,
+      option text = STRING_TOKEN(STR_PQC_MODE_TRADITIONAL), value = PQC_MODE_TRADITIONAL_ONLY, flags = 0;
+      option text = STRING_TOKEN(STR_PQC_MODE_HYBRID), value = PQC_MODE_HYBRID, flags = DEFAULT;
+      option text = STRING_TOKEN(STR_PQC_MODE_PQC_ONLY), value = PQC_MODE_PQC_ONLY, flags = 0;
+    endoneof;
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    //
+    // PQC Readiness Check Button
+    //
+    goto PQC_READINESS_CHECK_FORM_ID,
+      prompt = STRING_TOKEN(STR_PQC_READINESS_CHECK_PROMPT),
+      help   = STRING_TOKEN(STR_PQC_READINESS_CHECK_HELP),
+      flags  = INTERACTIVE,
+      key    = KEY_PQC_READINESS_CHECK;
+
+    //
+    // PQC Algorithm Status Button
+    //
+    goto PQC_ALGORITHM_STATUS_FORM_ID,
+      prompt = STRING_TOKEN(STR_PQC_ALGORITHM_STATUS_PROMPT),
+      help   = STRING_TOKEN(STR_PQC_ALGORITHM_STATUS_HELP),
+      flags  = INTERACTIVE,
+      key    = 0;
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    //
+    // Advanced Options
+    //
+    checkbox varid   = PqcTransitionConfig.ForceSwitch,
+      prompt         = STRING_TOKEN(STR_PQC_FORCE_SWITCH_PROMPT),
+      help           = STRING_TOKEN(STR_PQC_FORCE_SWITCH_HELP),
+      flags          = CHECKBOX_DEFAULT_MFG | INTERACTIVE,
+      key            = KEY_PQC_FORCE_SWITCH,
+    endcheckbox;
+
+    checkbox varid   = PqcTransitionConfig.CleanupTraditional,
+      prompt         = STRING_TOKEN(STR_PQC_CLEANUP_TRADITIONAL_PROMPT),
+      help           = STRING_TOKEN(STR_PQC_CLEANUP_TRADITIONAL_HELP),
+      flags          = INTERACTIVE,
+      key            = KEY_PQC_CLEANUP_TRADITIONAL,
+    endcheckbox;
+
+    checkbox varid   = PqcTransitionConfig.RecoveryMode,
+      prompt         = STRING_TOKEN(STR_PQC_RECOVERY_MODE_PROMPT),
+      help           = STRING_TOKEN(STR_PQC_RECOVERY_MODE_HELP),
+      flags          = INTERACTIVE,
+      key            = KEY_PQC_RECOVERY_MODE,
+    endcheckbox;
+
+  endform;
+
+  //
+  // PQC Readiness Check Form
+  //
+  form formid = PQC_READINESS_CHECK_FORM_ID,
+    title  = STRING_TOKEN(STR_PQC_READINESS_CHECK_FORM_TITLE);
+
+    subtitle text = STRING_TOKEN(STR_PQC_READINESS_CHECK_SUBTITLE);
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    //
+    // PK Status
+    //
+    text
+      help   = STRING_TOKEN(STR_PQC_PK_STATUS_HELP),
+      text   = STRING_TOKEN(STR_PQC_PK_STATUS_LABEL),
+      text   = STRING_TOKEN(STR_PQC_STATUS_VALUE),
+      flags  = 0,
+      key    = 0;
+
+    //
+    // KEK Status
+    //
+    text
+      help   = STRING_TOKEN(STR_PQC_KEK_STATUS_HELP),
+      text   = STRING_TOKEN(STR_PQC_KEK_STATUS_LABEL),
+      text   = STRING_TOKEN(STR_PQC_STATUS_VALUE),
+      flags  = 0,
+      key    = 0;
+
+    //
+    // DB Status
+    //
+    text
+      help   = STRING_TOKEN(STR_PQC_DB_STATUS_HELP),
+      text   = STRING_TOKEN(STR_PQC_DB_STATUS_LABEL),
+      text   = STRING_TOKEN(STR_PQC_STATUS_VALUE),
+      flags  = 0,
+      key    = 0;
+
+    //
+    // Option ROM Status
+    //
+    text
+      help   = STRING_TOKEN(STR_PQC_OROM_STATUS_HELP),
+      text   = STRING_TOKEN(STR_PQC_OROM_STATUS_LABEL),
+      text   = STRING_TOKEN(STR_PQC_STATUS_VALUE),
+      flags  = 0,
+      key    = 0;
+
+    //
+    // OS Loader Status
+    //
+    text
+      help   = STRING_TOKEN(STR_PQC_LOADER_STATUS_HELP),
+      text   = STRING_TOKEN(STR_PQC_LOADER_STATUS_LABEL),
+      text   = STRING_TOKEN(STR_PQC_STATUS_VALUE),
+      flags  = 0,
+      key    = 0;
+
+    //
+    // TLS/HTTPS Status
+    //
+    text
+      help   = STRING_TOKEN(STR_PQC_TLS_STATUS_HELP),
+      text   = STRING_TOKEN(STR_PQC_TLS_STATUS_LABEL),
+      text   = STRING_TOKEN(STR_PQC_STATUS_VALUE),
+      flags  = 0,
+      key    = 0;
+
+    //
+    // Firmware Update Status
+    //
+    text
+      help   = STRING_TOKEN(STR_PQC_FWUPDATE_STATUS_HELP),
+      text   = STRING_TOKEN(STR_PQC_FWUPDATE_STATUS_LABEL),
+      text   = STRING_TOKEN(STR_PQC_STATUS_VALUE),
+      flags  = 0,
+      key    = 0;
+
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    //
+    // Overall System Readiness
+    //
+    text
+      help   = STRING_TOKEN(STR_PQC_OVERALL_STATUS_HELP),
+      text   = STRING_TOKEN(STR_PQC_OVERALL_STATUS_LABEL),
+      text   = STRING_TOKEN(STR_PQC_OVERALL_STATUS_VALUE),
+      flags  = 0,
+      key    = 0;
+
+  endform;
+
+  //
+  // PQC Algorithm Status Form
+  //
+  form formid = PQC_ALGORITHM_STATUS_FORM_ID,
+    title  = STRING_TOKEN(STR_PQC_ALGORITHM_STATUS_FORM_TITLE);
+
+    subtitle text = STRING_TOKEN(STR_PQC_ALGORITHM_STATUS_SUBTITLE);
+    subtitle text = STRING_TOKEN(STR_NULL);
+
+    //
+    // Dilithium Status
+    //
+    text
+      help   = STRING_TOKEN(STR_PQC_DILITHIUM_HELP),
+      text   = STRING_TOKEN(STR_PQC_DILITHIUM_LABEL),
+      text   = STRING_TOKEN(STR_PQC_ALGORITHM_STATUS_VALUE),
+      flags  = 0,
+      key    = 0;
+
+    //
+    // Falcon Status
+    //
+    text
+      help   = STRING_TOKEN(STR_PQC_FALCON_HELP),
+      text   = STRING_TOKEN(STR_PQC_FALCON_LABEL),
+      text   = STRING_TOKEN(STR_PQC_ALGORITHM_STATUS_VALUE),
+      flags  = 0,
+      key    = 0;
+
+    //
+    // SPHINCS+ Status
+    //
+    text
+      help   = STRING_TOKEN(STR_PQC_SPHINCS_HELP),
+      text   = STRING_TOKEN(STR_PQC_SPHINCS_LABEL),
+      text   = STRING_TOKEN(STR_PQC_ALGORITHM_STATUS_VALUE),
+      flags  = 0,
+      key    = 0;
+
+    //
+    // Kyber Status
+    //
+    text
+      help   = STRING_TOKEN(STR_PQC_KYBER_HELP),
+      text   = STRING_TOKEN(STR_PQC_KYBER_LABEL),
+      text   = STRING_TOKEN(STR_PQC_ALGORITHM_STATUS_VALUE),
+      flags  = 0,
+      key    = 0;
+
+    //
+    // NTRU Status
+    //
+    text
+      help   = STRING_TOKEN(STR_PQC_NTRU_HELP),
+      text   = STRING_TOKEN(STR_PQC_NTRU_LABEL),
+      text   = STRING_TOKEN(STR_PQC_ALGORITHM_STATUS_VALUE),
+      flags  = 0,
+      key    = 0;
+
+  endform;
+
+endformset;
