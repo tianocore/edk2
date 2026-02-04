@@ -1,0 +1,81 @@
+## @file
+#  Post-Quantum Cryptography (PQC) Transition Manager for UEFI
+#
+#  This driver provides PQC transition functionality for UEFI firmware,
+#  allowing controlled migration from traditional cryptographic algorithms
+#  to post-quantum cryptographic algorithms in preparation for the 2030 deadline.
+#
+#  Copyright (c) 2025, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PqcTransitionDxe
+  MODULE_UNI_FILE                = PqcTransitionDxe.uni
+  FILE_GUID                      = 8F4B8F4B-8F4B-4F4B-8F4B-8F4B8F4B8F4B
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PqcTransitionEntryPoint
+  UNLOAD_IMAGE                   = PqcTransitionUnload
+
+[Sources]
+  PqcTransitionDxe.c
+  PqcTransitionDxe.h
+  PqcTransitionConfig.c
+  PqcTransitionNvData.h
+  PqcTransitionVfr.vfr
+  PqcTransitionStrings.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  HiiLib
+  UefiHiiServicesLib
+  PrintLib
+  BaseCryptLib
+  SecureBootVariableLib
+  PlatformSecureLib
+  UefiLib
+
+[Guids]
+  gEfiIfrTianoGuid                              ## CONSUMES ## GUID (Extended IFR Guid Opcode)
+  gEfiImageSecurityDatabaseGuid                 ## CONSUMES ## GUID
+  gEfiGlobalVariableGuid                        ## CONSUMES ## GUID
+  gEfiSecureBootEnableDisableGuid               ## CONSUMES ## GUID
+  gEfiCustomModeEnableGuid                      ## CONSUMES ## GUID
+  gEfiCertX509Guid                              ## CONSUMES ## GUID
+  gEfiCertRsa2048Guid                           ## CONSUMES ## GUID
+  gEfiCertPkcs7Guid                             ## CONSUMES ## GUID
+  gPqcTransitionConfigFormSetGuid               ## PRODUCES ## GUID
+
+[Protocols]
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
+  gEfiHiiConfigRoutingProtocolGuid              ## CONSUMES
+  gEfiSimpleFileSystemProtocolGuid              ## CONSUMES
+  gEfiBlockIoProtocolGuid                       ## CONSUMES
+  gEfiDevicePathProtocolGuid                    ## CONSUMES
+  gEfiPciIoProtocolGuid                         ## CONSUMES
+  gEfiTlsProtocolGuid                           ## CONSUMES
+  gEfiFirmwareManagementProtocolGuid            ## CONSUMES
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdUserPhysicalPresence  ## CONSUMES
+
+[Depex]
+  gEfiHiiConfigRoutingProtocolGuid  AND
+  gEfiHiiDatabaseProtocolGuid       AND
+  gEfiVariableArchProtocolGuid      AND
+  gEfiVariableWriteArchProtocolGuid

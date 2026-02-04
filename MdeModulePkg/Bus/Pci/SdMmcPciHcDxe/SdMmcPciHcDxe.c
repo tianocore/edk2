@@ -494,6 +494,19 @@ SdMmcPciHcDriverBindingSupported (
     return EFI_SUCCESS;
   }
 
+  //
+  // Also check for QEMU sdhci-pci device which might use different class codes
+  // This is a workaround for QEMU compatibility where the device may not
+  // present standard SD Host Controller class codes
+  //
+  if (PciData.Hdr.VendorId == 0x1b36) {  // Red Hat vendor ID used by QEMU
+    DEBUG ((DEBUG_INFO, "SdMmcPciHc: Found QEMU device (VendorId=0x%04x, DeviceId=0x%04x)\n", 
+            PciData.Hdr.VendorId, PciData.Hdr.DeviceId));
+    DEBUG ((DEBUG_INFO, "SdMmcPciHc: Class codes: Base=0x%02x, Sub=0x%02x, PI=0x%02x\n",
+            PciData.Hdr.ClassCode[2], PciData.Hdr.ClassCode[1], PciData.Hdr.ClassCode[0]));
+    return EFI_SUCCESS;
+  }
+
   return EFI_UNSUPPORTED;
 }
 
