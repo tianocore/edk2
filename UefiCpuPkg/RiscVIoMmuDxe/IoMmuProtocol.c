@@ -236,7 +236,7 @@ IoMmuSetAttribute (
        ; DownstreamLink = GetNextNode (&IoMmuContext->DownstreamDevices, DownstreamLink)
        ) {
       IoMmuDownstreams = RISCV_IOMMU_DOWNSTREAMS_FROM_LINK (DownstreamLink);
-      if ((IoMmuDeviceId.Uint32 >= IoMmuDownstreams->NodeMapping.SourceIdBase) && (IoMmuDeviceId.Uint32 < (IoMmuDownstreams->NodeMapping.SourceIdBase + IoMmuDownstreams->NodeMapping.NumberOfIds))) {
+      if ((IoMmuDeviceId.Uint32 >= IoMmuDownstreams->NodeMapping.SourceIdBase) && (IoMmuDeviceId.Uint32 < (IoMmuDownstreams->NodeMapping.SourceIdBase + IoMmuDownstreams->NodeMapping.NumberOfIDs))) {
         MappedIoMmuDeviceId.Uint32 = IoMmuDownstreams->NodeMapping.DestinationDeviceIdBase + (IoMmuDeviceId.Uint32 - IoMmuDownstreams->NodeMapping.SourceIdBase);
         goto Work;
       }
@@ -249,6 +249,17 @@ IoMmuSetAttribute (
   }
 
 Work:
+  if (IoMmuContext->DriverState != STATE_INITIALISED) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "The %a IOMMU at 0x%lx is not ready! Please report this.\n",
+      IoMmuContext->IoMmuIsPciDevice ? "PCI" : "system",
+      IoMmuContext->BaseAddress
+      ));
+    Status = EFI_NOT_READY;
+    goto Exit;
+  }
+
   Status = RiscVIoMmuSetAttributeWorker (IoMmuContext, &MappedIoMmuDeviceId, MapInfo->DeviceAddress, MapInfo->NumberOfBytes, IoMmuAccess, PciIo);
   ASSERT_EFI_ERROR (Status);
 

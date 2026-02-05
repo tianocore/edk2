@@ -39,7 +39,7 @@ typedef struct {
   UINT32      MapMask;
 
   // TODO: Extend this struct for platform devices, having some mechanism to correlate them later.
-  RIMT_ID_MAPPING  NodeMapping;
+  EFI_ACPI_6_6_RIMT_ID_MAPPING_STRUCTURE  NodeMapping;
 } RISCV_IOMMU_DOWNSTREAMS;
 #define RISCV_IOMMU_DOWNSTREAMS_FROM_LINK(a) CR (a, RISCV_IOMMU_DOWNSTREAMS, Link, RISCV_IOMMU_DOWNSTREAMS_SIGNATURE)
 
@@ -85,7 +85,9 @@ DetectRiscVIoMmus (
   );
 
 /**
-  Determine the supported device_id width.
+  Determine the needed device_id width.
+
+  @retval  NeededWidth
 
 **/
 UINT8
@@ -95,6 +97,8 @@ NeededIoMmuDeviceIdWidth (
 
 /**
   Initialisation worker function.
+
+  @param[in]  IoMmuContext  The context struct of an IOMMU.
 
 **/
 EFI_STATUS

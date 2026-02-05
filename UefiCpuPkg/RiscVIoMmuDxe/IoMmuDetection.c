@@ -79,7 +79,7 @@ OnPciEnumerationComplete (
     ASSERT_EFI_ERROR (Status);
 
     //
-    // Read the basics of the PCI config space.
+    // Read the basics of the PCI location.
     //
     Status = PciIo->GetLocation (PciIo, &Seg, &Bus, &Dev, &Func);
     ASSERT_EFI_ERROR (Status);
@@ -286,9 +286,9 @@ NextIoMmuNode:
       IoMmuDownstreams->Signature = RISCV_IOMMU_DOWNSTREAMS_SIGNATURE;
       IoMmuDownstreams->MapMask   = IoMmuMapMask;
       IoMmuDownstreams->NodeMapping.SourceIdBase            = Fdt32ToCpu (ReadUnaligned32 (Data32 + Index));
-      IoMmuDownstreams->NodeMapping.NumberOfIds             = MapLength;
+      IoMmuDownstreams->NodeMapping.NumberOfIDs             = MapLength;
       IoMmuDownstreams->NodeMapping.DestinationDeviceIdBase = Fdt32ToCpu (ReadUnaligned32 (Data32 + Index + 2));
-      //IoMmuDownstreams->NodeMapping.DestinationIoMmuOffset  = MapPhandle;
+      //IoMmuDownstreams->NodeMapping.DestinationIommuOffset  = MapPhandle;
       IoMmuDownstreams->NodeMapping.Flags                   = 0;
     }
 
@@ -312,18 +312,18 @@ IoMmuAcpiRimtDiscovery (
   VOID
   )
 {
-  EFI_ACPI_RIMT_HEADER       *AcpiRimtTable;
-  RIMT_NODE_HEADER           *RimtNodeHeader;
-  UINTN                      NodeIndex;
-  RISCV_IOMMU_CONTEXT        *IoMmuContext;
-  RIMT_IOMMU_NODE            *RimtIoMmuNode;
-  RIMT_PCIE_NODE             *RimtPcieNode;
-  UINT16                     NumberOfIdMappings;
-  RIMT_ID_MAPPING            *NodeMapping;
-  //RIMT_PLATFORM_DEVICE_NODE  *RimtPlatformNode;
-  UINTN                      MappingIndex;
-  LIST_ENTRY                 *Link;
-  RISCV_IOMMU_DOWNSTREAMS    *IoMmuDownstreams;
+  EFI_ACPI_6_6_RIMT_STRUCTURE                         *AcpiRimtTable;
+  EFI_ACPI_6_6_RIMT_NODE_HEADER_STRUCTURE             *RimtNodeHeader;
+  UINTN                                               NodeIndex;
+  RISCV_IOMMU_CONTEXT                                 *IoMmuContext;
+  EFI_ACPI_6_6_RIMT_IOMMU_NODE_STRUCTURE              *RimtIoMmuNode;
+  EFI_ACPI_6_6_RIMT_PCIE_ROOT_COMPLEX_NODE_STRUCTURE  *RimtPcieNode;
+  UINT16                                              NumberOfIdMappings;
+  EFI_ACPI_6_6_RIMT_ID_MAPPING_STRUCTURE              *NodeMapping;
+  //EFI_ACPI_6_6_RIMT_PLATFORM_DEVICE_NODE_STRUCTURE    *RimtPlatformNode;
+  UINTN                                               MappingIndex;
+  LIST_ENTRY                                          *Link;
+  RISCV_IOMMU_DOWNSTREAMS                             *IoMmuDownstreams;
 
   AcpiRimtTable = (VOID *)EfiLocateFirstAcpiTable (EFI_ACPI_RISCV_IO_MAPPING_TABLE_SIGNATURE);
   if (AcpiRimtTable == NULL) {
@@ -333,9 +333,9 @@ IoMmuAcpiRimtDiscovery (
   //
   // Gather all the IOMMUs.
   //
-  RimtNodeHeader = (VOID *)((UINT8 *)AcpiRimtTable + AcpiRimtTable->OffsetToNodeArray);
-  for (NodeIndex = 0; NodeIndex < AcpiRimtTable->NumberOfNodes; NodeIndex++) {
-    if (RimtNodeHeader->Type == RISCV_IOMMU_NODE_TYPE) {
+  RimtNodeHeader = (VOID *)((UINT8 *)AcpiRimtTable + AcpiRimtTable->OffsetToRimtNodeArray);
+  for (NodeIndex = 0; NodeIndex < AcpiRimtTable->NumberOfRimtNodes; NodeIndex++) {
+    if (RimtNodeHeader->Type == RimtNodeIommu) {
       IoMmuContext = AllocateCopyPool (sizeof (RISCV_IOMMU_CONTEXT), &RiscVIoMmuContextTemplate);
       ASSERT (IoMmuContext != NULL);
       InitializeListHead (&IoMmuContext->DownstreamDevices);
@@ -344,7 +344,7 @@ IoMmuAcpiRimtDiscovery (
       IoMmuContext->TempHandle = (UINT8 *)RimtNodeHeader - (UINT8 *)AcpiRimtTable;
 
       RimtIoMmuNode = (VOID *)RimtNodeHeader;
-      if (RimtIoMmuNode->Flags & IOMMU_NODE_FLAG_PCIE_DEVICE) {
+      if (RimtIoMmuNode->Flags & (1 << RIMT_IOMMU_FLAGS_TYPE_BIT_OFFSET)) {
         IoMmuContext->DriverState      = STATE_DETECTED;
         IoMmuContext->IoMmuIsPciDevice = TRUE;
         IoMmuContext->BaseAddress      = RimtIoMmuNode->PcieBdf;
@@ -365,19 +365,19 @@ IoMmuAcpiRimtDiscovery (
   //
   // Now, gather all the downstreams. Perform this separately to avoid excessive nesting.
   //
-  RimtNodeHeader = (VOID *)((UINT8 *)AcpiRimtTable + AcpiRimtTable->OffsetToNodeArray);
-  for (NodeIndex = 0; NodeIndex < AcpiRimtTable->NumberOfNodes; NodeIndex++) {
-    if ((RimtNodeHeader->Type != PCIE_ROOT_COMPLEX_NODE_TYPE) && (RimtNodeHeader->Type != PLATFORM_DEVICE_NODE_TYPE)) {
+  RimtNodeHeader = (VOID *)((UINT8 *)AcpiRimtTable + AcpiRimtTable->OffsetToRimtNodeArray);
+  for (NodeIndex = 0; NodeIndex < AcpiRimtTable->NumberOfRimtNodes; NodeIndex++) {
+    if ((RimtNodeHeader->Type != RimtNodePcieRc) && (RimtNodeHeader->Type != RimtNodePlatform)) {
       goto NodeEnd;
     }
 
-    if (RimtNodeHeader->Type == PCIE_ROOT_COMPLEX_NODE_TYPE) {
+    if (RimtNodeHeader->Type == RimtNodePcieRc) {
       RimtPcieNode       = (VOID *)RimtNodeHeader;
       NumberOfIdMappings = RimtPcieNode->NumberOfIdMappings;
       NodeMapping        = (VOID *)((UINT8 *)RimtPcieNode + RimtPcieNode->IdMappingArrayOffset);
     } else {
       // TODO: Look for platform devices properly.
-      ASSERT (FALSE);
+      goto NodeEnd;
 #if 0
       RimtPlatformNode   = (VOID *)RimtNodeHeader;
       NumberOfIdMappings = RimtPlatformNode->NumberOfIdMappings;
@@ -391,7 +391,7 @@ IoMmuAcpiRimtDiscovery (
          ; Link = GetNextNode (&mRiscVIoMmuContexts, Link)
          ) {
         IoMmuContext = RISCV_IOMMU_CONTEXT_FROM_LINK (Link);
-        if (NodeMapping->DestinationIoMmuOffset == IoMmuContext->TempHandle) {
+        if (NodeMapping->DestinationIommuOffset == IoMmuContext->TempHandle) {
           break;
         }
       }
@@ -404,7 +404,7 @@ IoMmuAcpiRimtDiscovery (
 
       IoMmuDownstreams->Signature = RISCV_IOMMU_DOWNSTREAMS_SIGNATURE;
       IoMmuDownstreams->MapMask   = -1;
-      CopyMem (&IoMmuDownstreams->NodeMapping, NodeMapping, sizeof (RIMT_ID_MAPPING));
+      CopyMem (&IoMmuDownstreams->NodeMapping, NodeMapping, sizeof (EFI_ACPI_6_6_RIMT_ID_MAPPING_STRUCTURE));
 
       NodeMapping++;
     }

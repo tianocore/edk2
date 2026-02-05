@@ -59,6 +59,7 @@ AllocateDdtLevel (
   @retval DeviceContext
 
 **/
+STATIC
 RISCV_IOMMU_DEVICE_CONTEXT_BASE *
 LocateDeviceContext (
   IN RISCV_IOMMU_CONTEXT    *IoMmuContext,
@@ -69,8 +70,8 @@ LocateDeviceContext (
   BOOLEAN                          ExtendedContext;
   RISCV_IOMMU_DDTP                 Ddtp;
   RISCV_IOMMU_DDT_NON_LEAF         *DdtEntry;
-  UINT16                           Levels;
-  UINT16                           Index;
+  UINT8                            Levels;
+  UINTN                            Index;
   RISCV_IOMMU_DEVICE_CONTEXT_BASE  *DeviceContext;
 
   DEBUG ((RISCV_IOMMU_DEBUG_LEVEL, "%a: IoMmuDeviceId=0x%x on the IOMMU at 0x%lx\n", __func__, IoMmuDeviceId->Uint32, IoMmuContext->BaseAddress));

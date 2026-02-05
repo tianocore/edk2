@@ -9,6 +9,7 @@
 #include <PiDxe.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/BaseRiscVMmuLib.h>
 #include <Library/DebugLib.h>
 #include <Library/FdtLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -25,8 +26,10 @@ LIST_ENTRY  mRiscVIoMmuContexts = INITIALIZE_LIST_HEAD_VARIABLE (mRiscVIoMmuCont
 /**
   Determine if the IOMMU is in a reset state.
 
-  @retval TRUE   The IOMMU is reset.
-  @retval FALSE  The IOMMU is active.
+  @param[in]  IoMmuContext  The context struct of an IOMMU.
+
+  @retval     TRUE          The IOMMU is reset.
+  @retval     FALSE         The IOMMU is active.
 
 **/
 STATIC
@@ -76,15 +79,13 @@ IoMmuIsReset (
     return FALSE;
   }
 
-  //
-  // The caches must be empty/invalid on reset. Since the command queue is disabled, we can't invalidate them though.
-  // Assume it's a requirement for the hardware; we handle invalidations after basic initialisation.
-  //
   return TRUE;
 }
 
 /**
   Reset the IOMMU.
+
+  @param[in]  IoMmuContext  The context struct of an IOMMU.
 
 **/
 STATIC
@@ -93,6 +94,10 @@ IoMmuReset (
   IN RISCV_IOMMU_CONTEXT  *IoMmuContext
   )
 {
+  //
+  // The caches must be empty/invalid on reset. Since the command queue is disabled, we can't invalidate them though.
+  // Assume it's a requirement for the hardware; we handle invalidations after basic initialisation.
+  //
   IoMmuWriteAndWait64 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_DDTP, 0, 1 << N_RISCV_IOMMU_DDTP_BUSY, FALSE);
   IoMmuWriteAndWait32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_CQCSR, 0, 1 << N_RISCV_IOMMU_QUEUE_CSR_QON, FALSE);
   IoMmuWriteAndWait32 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_FQCSR, 0, 1 << N_RISCV_IOMMU_QUEUE_CSR_QON, FALSE);
@@ -102,7 +107,8 @@ IoMmuReset (
 /**
   Allocate a queue.
 
-  @param[in]  QueueType   The type of queue to be allocated.
+  @param[in]  IoMmuContext  The context struct of an IOMMU.
+  @param[in]  QueueType     The type of queue to be allocated.
 
 **/
 STATIC
@@ -183,7 +189,8 @@ AllocateQueue (
 /**
   Free a queue.
 
-  @param[in]  QueueType   The type of queue to be freed.
+  @param[in]  IoMmuContext  The context struct of an IOMMU.
+  @param[in]  QueueType     The type of queue to be freed.
 
 **/
 STATIC
@@ -223,6 +230,7 @@ FreeQueue (
 
   QueueBase.Uint64 = MmioRead64 (IoMmuContext->BaseAddress + QueueBaseReg);
   QueueBuffer      = (VOID *)((UINT64)QueueBase.Bits.PPN << RISCV_MMU_PAGE_SHIFT);
+  ASSERT (QueueBuffer != NULL);
 
   ASSERT (QUEUE_NUMBER_OF_ENTRIES != 0);
   NumberOfPages = EFI_SIZE_TO_PAGES (QUEUE_NUMBER_OF_ENTRIES * EntrySize);
@@ -233,12 +241,14 @@ FreeQueue (
   //
   IoMmuWriteAndWait32 (IoMmuContext->BaseAddress + QueueCsrReg, 0, 1 << N_RISCV_IOMMU_QUEUE_CSR_QON, FALSE);
 
-  FreeAlignedPages (QueueBuffer, NumberOfPages);
   MmioWrite64 (IoMmuContext->BaseAddress + QueueBaseReg, 0);
+  FreeAlignedPages (QueueBuffer, NumberOfPages);
 }
 
 /**
-  Determine the supported device_id width.
+  Determine the needed device_id width.
+
+  @retval  NeededWidth
 
 **/
 UINT8
@@ -246,16 +256,51 @@ NeededIoMmuDeviceIdWidth (
   VOID
   )
 {
-  STATIC UINT8  NeededWidth = 0xFF;
+  STATIC UINT8         NeededWidth = 0xFF;
+#if 0
+  UINTN                HandleCount;
+  EFI_HANDLE           *HandleBuffer;
+  EFI_STATUS           Status;
+  UINTN                Index;
+  EFI_PCI_IO_PROTOCOL  *PciIo;
+  UINTN                Seg;
+  UINTN                Bus;
+  UINTN                Dev;
+  UINTN                Func;
+#endif
 
   if (NeededWidth != 0xFF) {
     return NeededWidth;
   }
 
   //
-  // FIXME: Do they mean *needed* width? If so, iterate the downstream objects, and consider looking at PciIo.
+  // TODO: Support platform devices. This will require iterating the downstream objects.
+  // - Also, consider mapped device_id ranges there.
   //
   NeededWidth = 16;
+
+#if 0 // FIXME: Dependencies.
+  Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiPciIoProtocolGuid, NULL, &HandleCount, &HandleBuffer);
+  ASSERT_EFI_ERROR (Status);
+
+  for (Index = 0; Index < HandleCount; Index++) {
+    Status = gBS->HandleProtocol (HandleBuffer[Index], &gEfiPciIoProtocolGuid, (VOID **)&PciIo);
+    ASSERT_EFI_ERROR (Status);
+
+    Status = PciIo->GetLocation (PciIo, &Seg, &Bus, &Dev, &Func);
+    ASSERT_EFI_ERROR (Status);
+
+    //
+    // Use the next device_id increment.
+    //
+    if (Seg >= 1) {
+      NeededWidth = 24;
+      break;
+    }
+  }
+
+  FreePool (HandleBuffer);
+#endif
 
   DEBUG ((RISCV_IOMMU_DEBUG_LEVEL, "%a: %d\n", __func__, NeededWidth));
   return NeededWidth;
@@ -264,7 +309,10 @@ NeededIoMmuDeviceIdWidth (
 /**
   Program the root of a context table into the IOMMU.
 
-  @param[in]  ContextStruct  Pointer to a context table's wrapping struct.
+  @param[in]  IoMmuContext  The context struct of an IOMMU.
+
+  @retval     TRUE          The context table was successfully configured.
+  @retval     FALSE         The context table could not be configured.
 
 **/
 STATIC
@@ -322,7 +370,7 @@ ProgramContextRoot (
   }
 
   //
-  // Allocate the root of the context table.
+  // Allocate the root of the context table and enable the DDT.
   //
   ContextBuffer = AllocatePages (1);
   ASSERT (ContextBuffer != NULL);
@@ -344,37 +392,150 @@ ProgramContextRoot (
   return TRUE;
 }
 
-/**
-  Clear the root of a context table from the IOMMU.
+// TODO: Migrate into an MMU 'operating context' structure. Would we have to set this up for each call?
+extern UINTN mMaxRootTableLevel, mBitPerLevel, mTableEntryCount;
 
-  @param[in]  ContextStruct  Pointer to a context table's wrapping struct.
+/**
+  Reclaim a leaf level of a context table.
+
+  @param[in]  IoMmuContext  The context struct of an IOMMU.
+  @param[in]  LeafLevel     A leaf level of the table.
 
 **/
 STATIC
 VOID
-ClearContextRoot (
+ReclaimContexts (
+  IN RISCV_IOMMU_CONTEXT              *IoMmuContext,
+  IN RISCV_IOMMU_DEVICE_CONTEXT_BASE  *LeafLevel
+  )
+{
+  RISCV_IOMMU_CAPABILITIES         Capabilities;
+  BOOLEAN                          ExtendedContext;
+  UINTN                            ContextSize;
+  RISCV_IOMMU_DEVICE_CONTEXT_BASE  *DeviceContext;
+  VOID                             *DevicePageTable;
+
+  //
+  // Determine the format of the context struct.
+  //
+  Capabilities.Uint64 = MmioRead64 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_CAPABILITIES);
+  ExtendedContext = Capabilities.Bits.MSI_FLAT;
+
+  ContextSize = sizeof (RISCV_IOMMU_DEVICE_CONTEXT_BASE);
+  if (ExtendedContext) {
+    ContextSize *= 2;
+  }
+
+  //
+  // Any combination of base/extended format and leaf/non-leaf level fits in one page.
+  //
+  DeviceContext = LeafLevel;
+  while ((UINTN)DeviceContext < (UINTN)LeafLevel + SIZE_4KB) {
+    if (DeviceContext->TranslationControl.Bits.V) {
+      //
+      // Explicitly disable the context so that
+      // re-enabling the IOMMU doesn't result in stale data.
+      //
+      DeviceContext->TranslationControl.Bits.V = 0;
+
+      //
+      // Now, free the device page table.
+      //
+      DevicePageTable = (VOID *)((UINT64)DeviceContext->FirstStageContext.Bits.PPN << RISCV_MMU_PAGE_SHIFT);
+      FreePageTablesRecursive (DevicePageTable, mMaxRootTableLevel);
+    }
+
+    DeviceContext = (VOID *)((UINT8 *)DeviceContext + ContextSize);
+  }
+
+  FreePages (LeafLevel, 1);
+}
+
+/**
+  Reclaim a level of the table.
+
+  @param[in]  IoMmuContext  The context struct of an IOMMU.
+  @param[in]  Buffer        A level of the table.
+  @param[in]  Level         The current level number.
+
+**/
+STATIC
+VOID
+FreeContextTableRecursive (
+  IN RISCV_IOMMU_CONTEXT  *IoMmuContext,
+  IN VOID                 *Buffer,
+  IN UINTN                Level
+  )
+{
+  RISCV_IOMMU_DDT_NON_LEAF  *DdtLevel;
+  VOID                      *NextBuffer;
+
+  if (Level == 1) {
+    return ReclaimContexts (IoMmuContext, Buffer);
+  }
+
+  //
+  // Any combination of base/extended format and leaf/non-leaf level fits in one page.
+  //
+  DdtLevel = Buffer;
+  while ((UINTN)DdtLevel < (UINTN)Buffer + SIZE_4KB) {
+    if (!DdtLevel->Bits.V) {
+      goto NextNode;
+    }
+
+    NextBuffer = (VOID *)((UINT64)DdtLevel->Bits.PPN << RISCV_MMU_PAGE_SHIFT);
+    FreeContextTableRecursive (IoMmuContext, NextBuffer, Level - 1);
+
+    DdtLevel->Bits.V = 0;
+
+NextNode:
+    DdtLevel = (VOID *)((UINT8 *)DdtLevel + sizeof (RISCV_IOMMU_DDT_NON_LEAF));
+  }
+
+  FreePages (Buffer, 1);
+}
+
+/**
+  Reclaim and disable a table of contexts.
+
+  @param[in]  IoMmuContext  The context struct of an IOMMU.
+
+**/
+STATIC
+VOID
+FreeContextTable (
   IN RISCV_IOMMU_CONTEXT  *IoMmuContext
   )
 {
   RISCV_IOMMU_DDTP  Ddtp;
   VOID              *ContextBuffer;
+  UINT8             Levels;
 
   Ddtp.Uint64   = MmioRead64 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_DDTP);
   ContextBuffer = (VOID *)((UINT64)Ddtp.Bits.PPN << RISCV_MMU_PAGE_SHIFT);
+  ASSERT (ContextBuffer != NULL);
+
+  Levels = Ddtp.Bits.iommu_mode - V_RISCV_IOMMU_DDTP_IOMMU_MODE_BARE;
+  ASSERT ((Levels >= 1) && (Levels <= 3));
 
   //
-  // TODO: Rather than leaking non-root levels and device page tables,
-  // walk the tree here and perform full cleanup.
+  // First, disable the DDT.
   //
   IoMmuWriteAndWait64 (IoMmuContext->BaseAddress + R_RISCV_IOMMU_DDTP, 0, 1 << N_RISCV_IOMMU_DDTP_BUSY, FALSE);
-  FreePages (ContextBuffer, 1);
+
+  //
+  // Then, walk the tree, disabling and reclaiming the nodes and the device page tables.
+  //
+  FreeContextTableRecursive (IoMmuContext, ContextBuffer, Levels);
 }
 
 /**
   Initialise the IOMMU hardware.
 
-  @retval  EFI_SUCCESS      The hardware is initialised.
-  @retval  EFI_UNSUPPORTED  The detected IOMMU is not supported by this driver.
+  @param[in]  IoMmuContext     The context struct of an IOMMU.
+
+  @retval     EFI_SUCCESS      The hardware is initialised.
+  @retval     EFI_UNSUPPORTED  The detected IOMMU is not supported by this driver.
 
 **/
 STATIC
@@ -476,6 +637,8 @@ InitialiseRiscVIoMmu (
 /**
   Initialisation worker function.
 
+  @param[in]  IoMmuContext  The context struct of an IOMMU.
+
 **/
 EFI_STATUS
 IoMmuCommonInitialise (
@@ -544,7 +707,7 @@ OnExitBootServices (
   RISCV_IOMMU_DOWNSTREAMS   *IoMmuDownstreams;
 
   //
-  // TODO: Consider the risk of DMA after we've shut down.
+  // TODO: Consider the risk of attempted DMA after we've shut down.
   // - Also, make this optional?
   //
   DEBUG ((DEBUG_INFO, "%a: Reclaiming resources and shutting down the IOMMUs\n", __func__));
@@ -564,7 +727,7 @@ OnExitBootServices (
       FreePool (IoMmuDownstreams);
     }
 
-    ClearContextRoot (IoMmuContext);
+    FreeContextTable (IoMmuContext);
 
     FreeQueue (IoMmuContext, QUEUE_COMMAND);
     FreeQueue (IoMmuContext, QUEUE_FAULT);
