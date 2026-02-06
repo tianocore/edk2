@@ -31,9 +31,6 @@
 #include "ArmFfaCommon.h"
 #include "ArmFfaRxTxMap.h"
 
-STATIC VOID  *mTxBuffer;
-STATIC VOID  *mRxBuffer;
-
 /**
   Get mapped Rx/Tx buffers.
 
@@ -55,24 +52,34 @@ ArmFfaLibGetRxTxBuffers (
   OUT UINT64  *RxBufferSize OPTIONAL
   )
 {
-  if ((mTxBuffer == NULL) || (mRxBuffer == NULL)) {
+  EFI_HOB_MEMORY_ALLOCATION  *RxTxBufferAllocationHob;
+  UINT64                     BufferSize;
+
+  /*
+   * Attempt to find the allocation HOB, if it exists then the
+   * Rx/Tx buffers have already been mapped.
+   */
+  RxTxBufferAllocationHob = FindRxTxBufferAllocationHob (TRUE);
+  if (RxTxBufferAllocationHob == NULL) {
     return EFI_NOT_READY;
   }
 
+  BufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+
   if (TxBuffer != NULL) {
-    *TxBuffer = mTxBuffer;
+    *TxBuffer = (VOID *)RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress;
   }
 
   if (TxBufferSize != NULL) {
-    *TxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+    *TxBufferSize = BufferSize;
   }
 
   if (RxBuffer != NULL) {
-    *RxBuffer = mRxBuffer;
+    *RxBuffer = (VOID *)RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress + BufferSize;
   }
 
   if (RxBufferSize != NULL) {
-    *RxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+    *RxBufferSize = BufferSize;
   }
 
   return EFI_SUCCESS;
@@ -96,21 +103,25 @@ ArmFfaLibRxTxMap (
   IN VOID
   )
 {
-  EFI_STATUS    Status;
-  ARM_FFA_ARGS  FfaArgs;
-  UINTN         Property1;
-  UINTN         Property2;
-  UINTN         MinSizeAndAlign;
-  UINTN         MaxSize;
-  VOID          *Buffers;
-  VOID          *TxBuffer;
-  VOID          *RxBuffer;
+  EFI_STATUS                 Status;
+  ARM_FFA_ARGS               FfaArgs;
+  UINTN                      Property1;
+  UINTN                      Property2;
+  UINTN                      MinSizeAndAlign;
+  UINTN                      MaxSize;
+  VOID                       *Buffers;
+  VOID                       *TxBuffer;
+  VOID                       *RxBuffer;
+  ARM_FFA_RX_TX_BUFFER_INFO  *BufferInfo;
+  EFI_HOB_MEMORY_ALLOCATION  *RxTxBufferAllocationHob;
+  UINT16                     PartId;
 
   /*
-   * If someone already mapped Rx/Tx Buffers, return EFI_ALREADY_STARTED.
-   * return EFI_ALREADY_STARTED.
+   * Attempt to find the allocation HOB, if it exists then the
+   * Rx/Tx buffers have already been mapped.
    */
-  if ((mTxBuffer != NULL) && (mRxBuffer != NULL)) {
+  RxTxBufferAllocationHob = FindRxTxBufferAllocationHob (TRUE);
+  if (RxTxBufferAllocationHob != NULL) {
     return EFI_ALREADY_STARTED;
   }
 
@@ -205,10 +216,60 @@ ArmFfaLibRxTxMap (
     goto ErrorHandler;
   }
 
-  mTxBuffer = TxBuffer;
-  mRxBuffer = RxBuffer;
+  BufferInfo = BuildGuidHob (&gArmFfaRxTxBufferInfoGuid, sizeof (ARM_FFA_RX_TX_BUFFER_INFO));
+  if (BufferInfo == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Failed to create Rx/Tx Buffer Info Hob\n", __func__));
+    goto Unmap;
+  }
+
+  RxTxBufferAllocationHob = GetRxTxBufferAllocationHob ((EFI_PHYSICAL_ADDRESS)((UINTN)TxBuffer), PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE * 2, FALSE);
+  if (RxTxBufferAllocationHob == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Failed to acquire RxTxBufferAllocationHob\n", __func__));
+    goto Unmap;
+  }
+
+  /*
+   * Set then Name with gArmFfaRxTxBufferInfoGuid, so that ArmFfaPeiLib or
+   * ArmFfaDxeLib can find the Rx/Tx buffer allocation area.
+   */
+  CopyGuid (&RxTxBufferAllocationHob->AllocDescriptor.Name, &gArmFfaRxTxBufferInfoGuid);
+
+  BufferInfo->TxBufferAddr  = (UINTN)RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress;
+  BufferInfo->TxBufferSize  = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+  BufferInfo->RxBufferAddr  = (UINTN)RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress + BufferInfo->TxBufferSize;
+  BufferInfo->RxBufferSize  = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+  BufferInfo->RemapOffset   = (UINTN)(BufferInfo->TxBufferAddr - RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress);
+  BufferInfo->RemapRequired = TRUE;
 
   return EFI_SUCCESS;
+
+Unmap:
+  Status = ArmFfaLibPartitionIdGet (&PartId);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a, Failed to acquire partition ID. Status: %r\n", __func__, Status));
+    goto ErrorHandler;
+  }
+
+  ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
+
+  FfaArgs.Arg0 = ARM_FID_FFA_RXTX_UNMAP;
+  FfaArgs.Arg1 = (PartId << ARM_FFA_SOURCE_EP_SHIFT);
+
+  ArmCallFfa (&FfaArgs);
+
+  Status = FfaArgsToEfiStatus (&FfaArgs);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a, Failed to unmap Rx/Tx buffer. Status: %r\n", __func__, Status));
+    goto ErrorHandler;
+  }
+
+  /*
+   * If we successfully unmap, we only got here if we were
+   * unable to build the HOB or find the allocation HOB. Due
+   * to Status being overwritten we still need to indicate a
+   * failure occurred.
+   */
+  Status = EFI_OUT_OF_RESOURCES;
 
 ErrorHandler:
   FreePages (Buffers, (PcdGet64 (PcdFfaTxRxPageCount) * 2));
@@ -232,10 +293,21 @@ ArmFfaLibRxTxUnmap (
   IN VOID
   )
 {
-  EFI_STATUS    Status;
-  ARM_FFA_ARGS  FfaArgs;
-  VOID          *Buffers;
-  UINT16        PartId;
+  EFI_STATUS                 Status;
+  ARM_FFA_ARGS               FfaArgs;
+  VOID                       *Buffers;
+  UINT16                     PartId;
+  EFI_HOB_MEMORY_ALLOCATION  *RxTxBufferAllocationHob;
+
+  /*
+   * Rx/Tx buffers are allocated with continuous pages.
+   * See ArmFfaLibRxTxMap(). If HOB is not found, the Rx/Tx
+   * buffers were not successfully mapped.
+   */
+  RxTxBufferAllocationHob = FindRxTxBufferAllocationHob (TRUE);
+  if (RxTxBufferAllocationHob == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   Status = ArmFfaLibPartitionIdGet (&PartId);
   if (EFI_ERROR (Status)) {
@@ -255,18 +327,10 @@ ArmFfaLibRxTxUnmap (
     return Status;
   }
 
-  /*
-   * Rx/Tx Buffer are allocated with continuous pages.
-   * and start address of these pages is set on PcdFfaTxBuffer.
-   * See ArmFfaLibRxTxMap().
-   */
-  Buffers = mTxBuffer;
+  Buffers = (VOID *)RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress;
   if (Buffers != NULL) {
     FreePages (Buffers, (PcdGet64 (PcdFfaTxRxPageCount) * 2));
   }
-
-  mTxBuffer = NULL;
-  mRxBuffer = NULL;
 
   return EFI_SUCCESS;
 }
@@ -283,10 +347,20 @@ UpdateRxTxBufferInfo (
   OUT ARM_FFA_RX_TX_BUFFER_INFO  *BufferInfo
   )
 {
-  BufferInfo->TxBufferAddr = (UINTN)mTxBuffer;
-  BufferInfo->TxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
-  BufferInfo->RxBufferAddr = (UINTN)mRxBuffer;
-  BufferInfo->RxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+  EFI_HOB_MEMORY_ALLOCATION  *RxTxBufferAllocationHob;
+
+  /*
+   * Attempt to find the HOB containing the Rx/Tx buffer information.
+   * If it is not found, the Rx/Tx buffers were not successfully mapped.
+   */
+  RxTxBufferAllocationHob = FindRxTxBufferAllocationHob (TRUE);
+
+  if ((RxTxBufferAllocationHob != NULL) && (BufferInfo != NULL)) {
+    BufferInfo->TxBufferAddr = (UINTN)RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress;
+    BufferInfo->TxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+    BufferInfo->RxBufferAddr = (UINTN)RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress + BufferInfo->TxBufferSize;
+    BufferInfo->RxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+  }
 }
 
 /**
@@ -304,13 +378,14 @@ FindRxTxBufferAllocationHob (
   IN BOOLEAN  UseGuid
   )
 {
-  EFI_PHYSICAL_ADDRESS  BufferBase;
-  UINT64                BufferSize;
+  (void)UseGuid;
 
-  BufferBase = (EFI_PHYSICAL_ADDRESS)((UINTN)mTxBuffer);
-  BufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE * 2;
-
-  return GetRxTxBufferAllocationHob (BufferBase, BufferSize, UseGuid);
+  /*
+   * Mapping the Rx/Tx buffer should have generated the HOB, if not,
+   * then the allocation HOB will not be found and NULL will be returned.
+   * Note that BufferAddr and BufferSize are ignored when UseGuid is TRUE.
+   */
+  return GetRxTxBufferAllocationHob (0, 0, TRUE);
 }
 
 /**
