@@ -151,7 +151,7 @@ UINT64
 EFIAPI
 GetPerformanceCounterProperties (
   OUT      UINT64 *StartValue, OPTIONAL
-  OUT      UINT64                    *EndValue     OPTIONAL
+  OUT      UINT64   *EndValue     OPTIONAL
   )
 {
   VOID                    *Hob;
@@ -165,7 +165,7 @@ GetPerformanceCounterProperties (
   }
 
   if (EndValue != NULL) {
-    *EndValue = 32 - 1;
+    *EndValue = MAX_UINT64;
   }
 
   if (mTimeBase != 0) {
