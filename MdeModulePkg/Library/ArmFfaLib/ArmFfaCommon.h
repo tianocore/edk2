@@ -86,4 +86,16 @@ GetRxTxBufferMinSizeAndAlign (
   OUT UINTN  *MinSizeAndAlign
   );
 
+/**
+  Determine if FF-A is supported
+
+  @retval TRUE if FF-A is supported, FALSE otherwise.
+
+**/
+BOOLEAN
+EFIAPI
+ArmFfaLibIsFfaSupported (
+  IN VOID
+  );
+
 #endif
