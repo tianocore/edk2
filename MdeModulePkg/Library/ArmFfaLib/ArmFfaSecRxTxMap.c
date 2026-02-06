@@ -64,7 +64,7 @@ ArmFfaLibGetRxTxBuffers (
     return EFI_NOT_READY;
   }
 
-  BufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+  BufferSize = EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount));
 
   if (TxBuffer != NULL) {
     *TxBuffer = (VOID *)RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress;
@@ -170,8 +170,8 @@ ArmFfaLibRxTxMap (
 
   MaxSize = ((MaxSize == 0) ? MAX_UINTN : (MaxSize * MinSizeAndAlign));
 
-  if ((MinSizeAndAlign > (PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE)) ||
-      (MaxSize < (PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE)))
+  if ((MinSizeAndAlign > (EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount)))) ||
+      (MaxSize < (EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount)))))
   {
     DEBUG ((
       DEBUG_ERROR,
@@ -190,7 +190,7 @@ ArmFfaLibRxTxMap (
   }
 
   TxBuffer = Buffers;
-  RxBuffer = Buffers + (PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE);
+  RxBuffer = Buffers + (EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount)));
 
   FfaArgs.Arg0 = ARM_FID_FFA_RXTX_MAP;
   FfaArgs.Arg1 = (UINTN)TxBuffer;
@@ -222,7 +222,7 @@ ArmFfaLibRxTxMap (
     goto Unmap;
   }
 
-  RxTxBufferAllocationHob = GetRxTxBufferAllocationHob ((EFI_PHYSICAL_ADDRESS)((UINTN)TxBuffer), PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE * 2, FALSE);
+  RxTxBufferAllocationHob = GetRxTxBufferAllocationHob ((EFI_PHYSICAL_ADDRESS)((UINTN)TxBuffer), EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount)) * 2, FALSE);
   if (RxTxBufferAllocationHob == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: Failed to acquire RxTxBufferAllocationHob\n", __func__));
     goto Unmap;
@@ -235,9 +235,9 @@ ArmFfaLibRxTxMap (
   CopyGuid (&RxTxBufferAllocationHob->AllocDescriptor.Name, &gArmFfaRxTxBufferInfoGuid);
 
   BufferInfo->TxBufferAddr  = (UINTN)RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress;
-  BufferInfo->TxBufferSize  = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+  BufferInfo->TxBufferSize  = EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount));
   BufferInfo->RxBufferAddr  = (UINTN)RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress + BufferInfo->TxBufferSize;
-  BufferInfo->RxBufferSize  = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+  BufferInfo->RxBufferSize  = EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount));
   BufferInfo->RemapOffset   = (UINTN)(BufferInfo->TxBufferAddr - RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress);
   BufferInfo->RemapRequired = TRUE;
 
@@ -357,9 +357,9 @@ UpdateRxTxBufferInfo (
 
   if ((RxTxBufferAllocationHob != NULL) && (BufferInfo != NULL)) {
     BufferInfo->TxBufferAddr = (UINTN)RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress;
-    BufferInfo->TxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+    BufferInfo->TxBufferSize = EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount));
     BufferInfo->RxBufferAddr = (UINTN)RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress + BufferInfo->TxBufferSize;
-    BufferInfo->RxBufferSize = PcdGet64 (PcdFfaTxRxPageCount) * EFI_PAGE_SIZE;
+    BufferInfo->RxBufferSize = EFI_PAGES_TO_SIZE (PcdGet64 (PcdFfaTxRxPageCount));
   }
 }
 
