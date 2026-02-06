@@ -1172,3 +1172,48 @@ GetRxTxBufferMinSizeAndAlign (
 
   return EFI_SUCCESS;
 }
+
+/**
+  Determine if FF-A is supported
+
+  @retval TRUE if FF-A is supported, FALSE otherwise.
+
+**/
+BOOLEAN
+EFIAPI
+ArmFfaLibIsFfaSupported (
+  IN VOID
+  )
+{
+  EFI_STATUS  Status;
+  UINT16      CurrentMajorVersion;
+  UINT16      CurrentMinorVersion;
+
+  Status = ArmFfaLibGetVersion (
+             ARM_FFA_MAJOR_VERSION,
+             ARM_FFA_MINOR_VERSION,
+             &CurrentMajorVersion,
+             &CurrentMinorVersion
+             );
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  if ((ARM_FFA_MAJOR_VERSION != CurrentMajorVersion) ||
+      (ARM_FFA_MINOR_VERSION > CurrentMinorVersion))
+  {
+    DEBUG ((
+      DEBUG_INFO,
+      "Incompatible FF-A Versions.\n" \
+      "Request Version: Major=0x%x, Minor=0x%x.\n" \
+      "Current Version: Major=0x%x, Minor>=0x%x.\n",
+      ARM_FFA_MAJOR_VERSION,
+      ARM_FFA_MINOR_VERSION,
+      CurrentMajorVersion,
+      CurrentMinorVersion
+      ));
+    return FALSE;
+  }
+
+  return TRUE;
+}
