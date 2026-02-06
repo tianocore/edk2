@@ -53,10 +53,12 @@ ArmFfaSecLibConstructor (
   EFI_HOB_MEMORY_ALLOCATION  *RxTxBufferAllocationHob;
   UINTN                      Property1;
   UINTN                      Property2;
+  UINT16                     PartId;
+  BOOLEAN                    IsFfaSupported;
 
-  Status = ArmFfaLibCommonInit ();
+  Status = ArmFfaLibCommonInit (&PartId, &IsFfaSupported);
   if (EFI_ERROR (Status)) {
-    if (Status == EFI_UNSUPPORTED) {
+    if (!IsFfaSupported) {
       /*
        * EFI_UNSUPPORTED return from ArmFfaLibCommonInit() means
        * FF-A interface doesn't support.
@@ -126,4 +128,38 @@ ArmFfaSecLibConstructor (
   BufferInfo->RemapRequired = TRUE;
 
   return EFI_SUCCESS;
+}
+
+/**
+  Return partition or VM ID
+
+  @param[out] PartId  The partition or VM ID
+
+  @retval EFI_SUCCESS  Partition ID or VM ID returned
+  @retval Others       Errors
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibGetPartId (
+  OUT UINT16  *PartId
+  )
+{
+  return ArmFfaLibPartitionIdGet (PartId);
+}
+
+/**
+  Check FF-A support or not.
+
+  @retval TRUE                   Supported
+  @retval FALSE                  Not supported
+
+**/
+BOOLEAN
+EFIAPI
+IsFfaSupported (
+  IN VOID
+  )
+{
+  return ArmFfaLibIsFfaSupported ();
 }

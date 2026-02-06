@@ -235,11 +235,18 @@ ArmFfaLibRxTxUnmap (
   EFI_STATUS    Status;
   ARM_FFA_ARGS  FfaArgs;
   VOID          *Buffers;
+  UINT16        PartId;
+
+  Status = ArmFfaLibPartitionIdGet (&PartId);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a, Failed to acquire partition ID. Status: %r\n", __func__, Status));
+    return EFI_INVALID_PARAMETER;
+  }
 
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
   FfaArgs.Arg0 = ARM_FID_FFA_RXTX_UNMAP;
-  FfaArgs.Arg1 = (gPartId << ARM_FFA_SOURCE_EP_SHIFT);
+  FfaArgs.Arg1 = (PartId << ARM_FFA_SOURCE_EP_SHIFT);
 
   ArmCallFfa (&FfaArgs);
 
