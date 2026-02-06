@@ -48,13 +48,11 @@ ArmFfaSecLibConstructor (
   IN VOID
   )
 {
-  EFI_STATUS                 Status;
-  ARM_FFA_RX_TX_BUFFER_INFO  *BufferInfo;
-  EFI_HOB_MEMORY_ALLOCATION  *RxTxBufferAllocationHob;
-  UINTN                      Property1;
-  UINTN                      Property2;
-  UINT16                     PartId;
-  BOOLEAN                    IsFfaSupported;
+  EFI_STATUS  Status;
+  UINTN       Property1;
+  UINTN       Property2;
+  UINT16      PartId;
+  BOOLEAN     IsFfaSupported;
 
   Status = ArmFfaLibCommonInit (&PartId, &IsFfaSupported);
   if (EFI_ERROR (Status)) {
@@ -98,34 +96,6 @@ ArmFfaSecLibConstructor (
 
     return Status;
   }
-
-  BufferInfo = BuildGuidHob (
-                 &gArmFfaRxTxBufferInfoGuid,
-                 sizeof (ARM_FFA_RX_TX_BUFFER_INFO)
-                 );
-  if (BufferInfo == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Failed to create Rx/Tx Buffer Info Hob\n", __func__));
-    ArmFfaLibRxTxUnmap ();
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  RxTxBufferAllocationHob = FindRxTxBufferAllocationHob (FALSE);
-  ASSERT (RxTxBufferAllocationHob != NULL);
-
-  /*
-   * Set then Name with gArmFfaRxTxBufferInfoGuid, so that ArmFfaPeiLib or
-   * ArmFfaDxeLib can find the Rx/Tx buffer allocation area.
-   */
-  CopyGuid (
-    &RxTxBufferAllocationHob->AllocDescriptor.Name,
-    &gArmFfaRxTxBufferInfoGuid
-    );
-
-  UpdateRxTxBufferInfo (BufferInfo);
-  BufferInfo->RemapOffset =
-    (UINTN)(BufferInfo->TxBufferAddr -
-            RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress);
-  BufferInfo->RemapRequired = TRUE;
 
   return EFI_SUCCESS;
 }
