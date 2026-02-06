@@ -262,3 +262,24 @@ GetTimeInNanoSecond (
 
   return NanoSeconds;
 }
+
+/**
+  Constructor function for the Timer Library.
+
+  This constructor function is called early during booting to ensure that
+  GetPerformanceCounterProperties() is invoked and mTimeBase is initialized
+  before any code that depends on it.
+
+  @retval EFI_SUCCESS   The constructor always returns success.
+
+**/
+EFI_STATUS
+EFIAPI
+BaseRiscV64CpuTimerLibConstructor (
+  VOID
+  )
+{
+  GetPerformanceCounterProperties (NULL, NULL);
+
+  return EFI_SUCCESS;
+}
