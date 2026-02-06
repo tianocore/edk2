@@ -11,6 +11,8 @@
 #include <Library/BaseLib.h>
 #include <Library/CpuLib.h>
 #include <Register/LoongArch64/Csr.h>
+#include <Protocol/DebugSupport.h>
+#include "ExceptionCommon.h"
 
 #define RSIZE                 8           // 64 bit mode register size
 #define GP_REG_CONTEXT_SIZE   32 * RSIZE  // General-purpose registers size
@@ -250,7 +252,7 @@ ASM_PFX(ExceptionEntryStart):
 
   csrrd   $t0, LOONGARCH_CSR_EUEN
   andi    $t0, $t0, CSR_EUEN_FPEN
-  beqz    $t0, EntryConmmonHanlder
+  beqz    $t0, ExcVectorDispatcher
 
   fst.d  $fa0, $sp, 0 * RSIZE
   fst.d  $fa1, $sp, 1 * RSIZE
@@ -312,7 +314,129 @@ ASM_PFX(ExceptionEntryStart):
   // Push exception context down
   //
 
-EntryConmmonHanlder:
+ExcVectorDispatcher:
+  csrrd     $t0, LOONGARCH_CSR_ESTAT
+  li.d      $t1, CSR_ESTAT_EXC
+  and       $t1, $t0, $t1
+  srli.d    $t1, $t1, CSR_ESTAT_EXC_SHIFT
+  beqz      $t1, IntVectorDispatcher // If Ecode is 0, it indicates that an interrupt has occurred.
+  b         EntryCommonHandler       // Currently, other exception should be handled using C code.
+
+IntVectorDispatcher:
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_TIMER
+  andi      $t1, $t1, BIT0
+  bnez      $t1, TimerVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_IPI
+  andi      $t1, $t1, BIT0
+  bnez      $t1, IpiVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_PMC
+  andi      $t1, $t1, BIT0
+  bnez      $t1, PmcVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_IP7
+  andi      $t1, $t1, BIT0
+  bnez      $t1, HwIpVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_IP6
+  andi      $t1, $t1, BIT0
+  bnez      $t1, HwIpVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_IP5
+  andi      $t1, $t1, BIT0
+  bnez      $t1, HwIpVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_IP4
+  andi      $t1, $t1, BIT0
+  bnez      $t1, HwIpVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_IP3
+  andi      $t1, $t1, BIT0
+  bnez      $t1, HwIpVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_IP2
+  andi      $t1, $t1, BIT0
+  bnez      $t1, HwIpVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_IP1
+  andi      $t1, $t1, BIT0
+  bnez      $t1, HwIpVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_IP0
+  andi      $t1, $t1, BIT0
+  bnez      $t1, HwIpVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_SIP1
+  andi      $t1, $t1, BIT0
+  bnez      $t1, SwIpVector
+
+  srli.d    $t1, $t0, EXCEPT_LOONGARCH_INT_SIP0
+  andi      $t1, $t1, BIT0
+  bnez      $t1, SwIpVector
+
+  b         EntryCommonHandler // Never shouldn't be here, go to the C code to dump the context.
+
+TimerVector:
+PmcVector:
+HwIpVector:
+SwIpVector:
+  b         EntryCommonHandler // Timer, PMC, HWINT, SWINT should be handled using C code.
+
+IpiVector:
+  //
+  // Get the IPI vector.
+  //
+  li.d      $t0, LOONGARCH_IOCSR_IPI_STATUS
+  iocsrrd.w $t1, $t0
+
+  //
+  // SMP_BOOT_CPU vector, fast path.
+  //
+  andi      $t1, $t1, SMP_BOOT_CPU
+  beqz      $t1, EntryCommonHandler
+
+  //
+  // Clear current IPI interrupt bit.
+  //
+  li.d      $t0, LOONGARCH_IOCSR_IPI_CLEAR
+  iocsrwr.w $t1, $t0
+
+  //
+  // Get the resume vector.
+  //
+TryReadResumeVector:
+  li.d      $t0, LOONGARCH_IOCSR_MBUF0
+  iocsrrd.w $a0, $t0
+  bnez      $a0, ReadRealResumeVector
+  b         TryReadResumeVector
+ReadRealResumeVector:
+  iocsrrd.d $a0, $t0
+
+  //
+  // Clean up current processor mailbox 0.
+  //
+  li.d      $t0, LOONGARCH_IOCSR_MBUF0
+  iocsrwr.d $zero, $t0
+
+  //
+  // The SMP_BOOT_CPU vector should never be returned. Clean up the PIE and ensure that
+  // global interrupts are turned off for the current processor for handover.
+  //
+  csrwr     $a0, LOONGARCH_CSR_ERA         // Update ERA
+  li.w      $t0, BIT2                      // IE
+  csrxchg   $zero, $t0, LOONGARCH_CSR_PRMD // Clean PIE
+
+  //
+  // Use ERA to jump to next stage.
+  //
+  ertn
+
+  //
+  // End of IpiVector fast path.
+  //
+
+EntryCommonHandler:
   addi.d  $sp, $sp, -(GP_REG_CONTEXT_SIZE + CSR_REG_CONTEXT_SIZE)
   move    $a0, $sp
   la.abs  $ra, ExceptionEntry
