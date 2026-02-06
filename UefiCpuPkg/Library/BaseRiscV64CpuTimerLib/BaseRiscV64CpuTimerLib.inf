@@ -16,7 +16,6 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = TimerLib
   MODULE_UNI_FILE                = BaseRisV64CpuTimerLib.uni
-  CONSTRUCTOR                    = BaseRiscV64CpuTimerLibConstructor
 
 [Sources]
   CpuTimerLib.c
