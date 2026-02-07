@@ -49,7 +49,7 @@ ArmFfaStandaloneMmLibConstructor (
   Status = ArmFfaLibCommonInit (&mPartId, &mIsFfaSupported);
   if (!mIsFfaSupported) {
     /*
-     * EFI_UNSUPPORTED means FF-A interface isn't available.
+     * Unsupported means FF-A interface isn't available.
      * However, for Standalone MM modules, FF-A availability is not required.
      * i.e. Standalone MM could use SpmMm as a legitimate protocol.
      * Thus, returning EFI_SUCCESS here to avoid the entrypoint to assert.

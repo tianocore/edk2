@@ -58,12 +58,9 @@ ArmFfaSecLibConstructor (
   if (EFI_ERROR (Status)) {
     if (!IsFfaSupported) {
       /*
-       * EFI_UNSUPPORTED return from ArmFfaLibCommonInit() means
-       * FF-A interface doesn't support.
-       * However, It doesn't make failure of loading driver/library instance
-       * (i.e) ArmPkg's MmCommunication Dxe/PEI Driver uses as well as SpmMm.
-       * So If FF-A is not supported the the MmCommunication Dxe/PEI falls
-       * back to SpmMm.
+       * FF-A being unsupported doesn't mean a failure of loading the driver/library
+       * instance (i.e) ArmPkg's MmCommunication Dxe/PEI Driver uses as well as SpmMm.
+       * So If FF-A is not supported the the MmCommunication Dxe/PEI falls back to SpmMm.
        * For this case, return EFI_SUCCESS.
        */
       return EFI_SUCCESS;
@@ -78,6 +75,8 @@ ArmFfaSecLibConstructor (
       return Status;
     }
 
+    DEBUG ((DEBUG_INFO, "%a Rx/Tx buffer isn't supported.\n", __func__));
+
     /*
      * When ARM_FID_FFA_PARTITION_INFO_GET_REGS is supported,
      * Rx/Tx buffer might not be required to request service to
@@ -91,7 +90,7 @@ ArmFfaSecLibConstructor (
                &Property2
                );
     if (!EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_INFO, "%a Rx/Tx buffer doesn't support.\n", __func__));
+      DEBUG ((DEBUG_INFO, "%a PARTITION_INFO_GET_REGS is available as an alternative to Rx/Tx buffer.\n", __func__));
     }
 
     return Status;

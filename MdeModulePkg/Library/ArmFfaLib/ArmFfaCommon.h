@@ -34,7 +34,7 @@ FfaArgsToEfiStatus (
   );
 
 /**
-  Common ArmFfaLib Constructor.
+  Common ArmFfaLib init.
 
   @param [out] PartId            PartitionId
   @param [out] IsFfaSupported    FF-A supported flag

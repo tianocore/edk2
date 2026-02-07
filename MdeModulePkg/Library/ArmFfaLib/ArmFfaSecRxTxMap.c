@@ -134,7 +134,7 @@ ArmFfaLibRxTxMap (
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "%a: Failed to get RX/TX buffer property... Status: %r\n",
+      "%a: Failed to get Rx/Tx buffer property... Status: %r\n",
       __func__,
       Status
       ));
@@ -283,8 +283,8 @@ ErrorHandler:
   Rx/Tx buffer is registered only once per partition.
 
   @retval EFI_SUCCESS
-  @retval EFI_INVALID_PARAMETERS               Already unregistered
-  @retval EFI_UNSUPPORTED                      Not supported
+  @retval EFI_INVALID_PARAMETER  Already unregistered
+  @retval EFI_UNSUPPORTED        Not supported
 
 **/
 EFI_STATUS
@@ -336,9 +336,9 @@ ArmFfaLibRxTxUnmap (
 }
 
 /**
-  Update Rx/TX buffer information.
+  Update Rx/Tx buffer information.
 
-  @param  BufferInfo            Rx/Tx buffer information.
+  @param  BufferInfo  Rx/Tx buffer information.
 
 **/
 VOID
@@ -364,7 +364,7 @@ UpdateRxTxBufferInfo (
 }
 
 /**
-  Find Rx/TX buffer memory allocation hob.
+  Find Rx/Tx buffer memory allocation hob.
 
   @param  UseGuid             Find MemoryAllocationHob using Guid.
 
@@ -389,7 +389,7 @@ FindRxTxBufferAllocationHob (
 }
 
 /**
-  Remap Rx/TX buffer with converted Rx/Tx Buffer address after
+  Remap Rx/Tx buffer with converted Rx/Tx Buffer address after
   using permanent memory.
 
   @param[out] BufferInfo    BufferInfo
