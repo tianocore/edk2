@@ -84,12 +84,9 @@ ArmFfaDxeLibConstructor (
   if (EFI_ERROR (Status)) {
     if (!mIsFfaSupported) {
       /*
-       * EFI_UNSUPPORTED return from ArmFfaLibCommonInit() means
-       * FF-A interface doesn't support.
-       * However, It doesn't make failure of loading driver/library instance
-       * (i.e) ArmPkg's MmCommunication Dxe/PEI Driver uses as well as SpmMm.
-       * So If FF-A is not supported the the MmCommunication Dxe/PEI falls
-       * back to SpmMm.
+       * FF-A being unsupported doesn't mean a failure of loading the driver/library
+       * instance (i.e) ArmPkg's MmCommunication Dxe/PEI Driver uses as well as SpmMm.
+       * So If FF-A is not supported the the MmCommunication Dxe/PEI falls back to SpmMm.
        * For this case, return EFI_SUCCESS.
        */
       return EFI_SUCCESS;
