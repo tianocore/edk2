@@ -87,6 +87,7 @@
   PeCoffExtraActionLib
   ExtractGuidedSectionLib
   MemoryAllocationLib
+  MemoryBinLib
   UefiBootServicesTableLib
   DevicePathLib
   ReportStatusCodeLib
