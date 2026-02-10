@@ -29,6 +29,9 @@ SUITE_DESC  mSuiteDesc[] = {
   { "Aead AES Gcm tests",            "CryptoPkg.BaseCryptLib", NULL, NULL, &mAeadAesGcmTestNum,     mAeadAesGcmTest     },
   { "Bn verify tests",               "CryptoPkg.BaseCryptLib", NULL, NULL, &mBnTestNum,             mBnTest             },
   { "EC verify tests",               "CryptoPkg.BaseCryptLib", NULL, NULL, &mEcTestNum,             mEcTest             },
+  { "ED verify tests",               "CryptoPkg.BaseCryptLib", NULL, NULL, &mEdTestNum,             mEdTest             },
+  { "ML verify tests",               "CryptoPkg.BaseCryptLib", NULL, NULL, &mMlTestNum,             mMlTest             },
+  { "SLH verify tests",              "CryptoPkg.BaseCryptLib", NULL, NULL, &mSlhTestNum,            mSlhTest            },
   { "X509 Verify tests",             "CryptoPkg.BaseCryptLib", NULL, NULL, &mX509TestNum,           mX509Test           },
   { "PKCS7 Attach Content tests",    "CryptoPkg.BaseCryptLib", NULL, NULL, &mPkcs7ContentTestNum,   mPkcs7ContentTest   },
 };

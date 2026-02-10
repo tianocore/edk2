@@ -4,7 +4,7 @@
   primitives (Hash Serials, HMAC, RSA, Diffie-Hellman, etc) for UEFI security
   functionality enabling.
 
-Copyright (c) 2009 - 2022, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2026, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation. All rights reserved.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -27,6 +27,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define CRYPTO_NID_SECP384R1        0x0205
 #define CRYPTO_NID_SECP521R1        0x0206
 #define CRYPTO_NID_BRAINPOOLP512R1  0x03A5
+
+// EdDSA
+#define CRYPTO_NID_ED448  0x0440
+
+// ML-DSA
+#define CRYPTO_NID_ML_DSA_87  0x0503
+
+// SLH-DSA
+#define CRYPTO_NID_SLH_DSA_SHAKE_256S  0x040B
 
 ///
 /// MD5 digest size in bytes
@@ -4301,6 +4310,183 @@ EcDsaVerify (
   IN  UINTN        HashSize,
   IN  CONST UINT8  *Signature,
   IN  UINTN        SigSize
+  );
+
+/**
+  Creates a new EdDSA public key object.
+
+  If A is NULL, then return FALSE.
+
+  @param[in]      A             Pointer to EdDSA Raw public key.
+  @param[in]      Nid           Crypto NID of the EdDSA curve.
+
+  @retval Pointer to new EdDSA public key object.
+**/
+VOID *
+EFIAPI
+EdDsaCreatePublicKeyObject (
+  IN     UINT8  *A,
+  IN     UINTN  Nid
+  );
+
+/**
+   Free EdDSA public key object.
+
+   If Pkey is NULL, then return.
+
+   @param[in]  PkeyContext   Pointer to EdDSA public key object.
+**/
+VOID
+EFIAPI
+EdDsaFreePublicKeyObject (
+  IN VOID  *PkeyContext
+  );
+
+/**
+  Verifies the EdDSA signature. EdDSA signatures are verified via 'pure' implementation.
+  Meaning message digest cannot be computed ahead of time. Data is passed into the verification function
+
+  If PkeyContext is NULL, then return FALSE.
+  If Data is NULL, then return FALSE.
+  If DataSize is 0, then return FALSE.
+  If Sig is NULL, then return FALSE.
+  If SigSize is 0, then return FALSE.
+
+  @param[in]  PkeyContext       Pointer to EdDSA public key object.
+  @param[in]  Data              Pointer to data being verified.
+  @param[in]  DataSize          Size of data.
+  @param[in]  Signature         Pointer to EdDSA signature.
+  @param[in]  SigSize           Size of EdDSA signature.
+
+  @retval  TRUE   Valid signature encoded in EdDSA.
+  @retval  FALSE  Invalid signature or invalid input.
+**/
+BOOLEAN
+EFIAPI
+EdDsaVerify (
+  IN VOID         *PkeyContext,
+  IN CONST UINT8  *Data,
+  IN UINTN        DataSize,
+  IN CONST UINT8  *Signature,
+  IN UINTN        SigSize
+  );
+
+/**
+  Create the ML-DSA EVP_PKEY public key object from raw public key bytes.
+
+  If Nid is not NID_ML_DSA_87, then return FALSE.
+
+  @param[in]  RawPublicKey      Pointer to raw public key bytes.
+  @param[in]  Nid               Nid for ML-DSA Category
+
+  @retval Pointer to new ML-DSA public key object.
+**/
+VOID *
+EFIAPI
+MlDsaCreatePublicKeyObject (
+  IN UINT8        *RawPublicKey,
+  IN CONST UINTN  Nid
+  );
+
+/**
+   Free the ML-DSA EVP_PKEY object
+
+   @param[in]  PkeyContext  Pointer to the MLDSA EVP_PKEY object to be freed.
+**/
+VOID
+EFIAPI
+MlDsaFreePublicKeyObject (
+  IN VOID  *PkeyContext
+  );
+
+/**
+   Verifies the ML-DSA signature.
+
+   If PkeyContext is NULL, then return FALSE.
+   If Data is NULL, then return FALSE.
+   If DataSize is 0, then return FALSE.
+   If Sig is NULL, then return FALSE.
+   If SigSize is 0, then return FALSE.
+
+   @param[in]  PkeyContext    Pointer to ML-DSA EVP_PKEY object.
+   @param[in]  Nid            Nid for ML-DSA Category
+   @param[in]  Data           Pointer to data being verified.
+   @param[in]  DataSize        Length of data.
+   @param[in]  Signature      Pointer to ML-DSA signature.
+   @param[in]  SigSize        Length of ML-DSA signature.
+
+   @retval  TRUE   Valid signature.
+   @retval  FALSE  Invalid signature or invalid input.
+
+**/
+BOOLEAN
+EFIAPI
+MlDsaVerify (
+  IN  CONST VOID   *PkeyContext,
+  IN  UINTN        Nid,
+  IN  CONST UINT8  *Data,
+  IN  UINTN        DataSize,
+  IN  CONST UINT8  *Signature,
+  IN  UINTN        SigSize
+  );
+
+/**
+ Create the SLH-DSA EVP_PKEY public key object from raw public key bytes.
+
+  If Nid is not NID_SLHDSASHAKE256S, then return FALSE.
+
+  @param[in]  RawPublicKey  Pointer to raw public key bytes.
+  @param[in]  Nid           Nid for SLH-DSA Category
+
+  @retval     Pointer to the SLH-DSA EVP_PKEY object created.
+**/
+VOID *
+EFIAPI
+SlhDsaCreatePublicKeyObject (
+  IN UINT8        *RawPublicKey,
+  IN CONST UINTN  Nid
+  );
+
+/**
+  Free the SLH-DSA EVP_PKEY object
+
+  @param[in]  PkeyContext  Pointer to the SLHDSA EVP_PKEY object to be freed.
+**/
+VOID
+EFIAPI
+SlhDsaFreePublicKeyObject (
+  IN VOID  *PkeyContext
+  );
+
+/**
+   Verifies the SLH-DSA signature.
+
+   If PkeyContext is NULL, then return FALSE.
+   If Data is NULL, then return FALSE.
+   If DataSize is 0, then return FALSE.
+   If Sig is NULL, then return FALSE.
+   If SigSize is 0, then return FALSE.
+
+   @param[in]  PkeyContext   Pointer to SLH-DSA EVP_PKEY object.
+   @param[in]  Nid           Nid for SLH-DSA Category
+   @param[in]  Data          Pointer to data being verified.
+   @param[in]  DataSize      Length of data.
+   @param[in]  Signature     Pointer to SLH-DSA signature.
+   @param[in]  SigSize       Length of SLH-DSA signature.
+
+   @retval  TRUE   Valid signature.
+   @retval  FALSE  Invalid signature or invalid input.
+
+**/
+BOOLEAN
+EFIAPI
+SlhDsaVerify (
+  IN CONST VOID   *PkeyContext,
+  IN UINTN        Nid,
+  IN CONST UINT8  *Data,
+  IN UINTN        DataSize,
+  IN CONST UINT8  *Signature,
+  IN UINTN        SigSize
   );
 
 #endif // __BASE_CRYPT_LIB_H__
