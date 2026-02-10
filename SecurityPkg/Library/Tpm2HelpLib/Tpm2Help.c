@@ -28,6 +28,35 @@ STATIC INTERNAL_HASH_INFO  mHashInfo[] = {
 };
 
 /**
+  Check if DigestList has an entry for HashAlg.
+
+  @param DigestList         Digest list.
+  @param HashAlg            Hash algorithm id.
+
+  @retval TRUE  Match found.
+  @retval FALSE No match found.
+**/
+STATIC
+BOOLEAN
+CheckDigestListForHashAlg (
+  IN TPML_DIGEST_VALUES  *DigestList,
+  IN TPM_ALG_ID          HashAlg
+  )
+{
+  UINT32  Index;
+
+  for (Index = 0; Index < DigestList->count; Index++) {
+    if (DigestList->digests[Index].hashAlg == HashAlg) {
+      DEBUG ((DEBUG_INFO, "Hash alg 0x%x found in DigestList.\n", HashAlg));
+      return TRUE;
+    }
+  }
+
+  DEBUG ((DEBUG_INFO, "Hash alg 0x%x not found in DigestList.\n", HashAlg));
+  return FALSE;
+}
+
+/**
   Return size of digest.
 
   @param[in] HashAlgo  Hash algorithm
@@ -458,4 +487,58 @@ Tpm2GetDigestFromDigestList (
   }
 
   return EFI_NOT_FOUND;
+}
+
+/**
+  Check if all hash algorithms supported in HashAlgorithmMask are
+  present in the DigestList.
+
+  @param DigestList         Digest list.
+  @param HashAlgorithmMask  Bitfield of allowed hash algorithms.
+
+  @retval TRUE  All hash algorithms present.
+  @retval FALSE Some hash algorithms not present.
+**/
+BOOLEAN
+EFIAPI
+Tpm2IsDigestListInSyncWithHashAlgorithmMask (
+  IN TPML_DIGEST_VALUES  *DigestList,
+  IN UINT32              HashAlgorithmMask
+  )
+{
+  if (DigestList == NULL) {
+    return FALSE;
+  }
+
+  if ((HashAlgorithmMask & HASH_ALG_SHA1) != 0) {
+    if (!CheckDigestListForHashAlg (DigestList, TPM_ALG_SHA1)) {
+      return FALSE;
+    }
+  }
+
+  if ((HashAlgorithmMask & HASH_ALG_SHA256) != 0) {
+    if (!CheckDigestListForHashAlg (DigestList, TPM_ALG_SHA256)) {
+      return FALSE;
+    }
+  }
+
+  if ((HashAlgorithmMask & HASH_ALG_SHA384) != 0) {
+    if (!CheckDigestListForHashAlg (DigestList, TPM_ALG_SHA384)) {
+      return FALSE;
+    }
+  }
+
+  if ((HashAlgorithmMask & HASH_ALG_SHA512) != 0) {
+    if (!CheckDigestListForHashAlg (DigestList, TPM_ALG_SHA512)) {
+      return FALSE;
+    }
+  }
+
+  if ((HashAlgorithmMask & HASH_ALG_SM3_256) != 0) {
+    if (!CheckDigestListForHashAlg (DigestList, TPM_ALG_SM3_256)) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
 }
