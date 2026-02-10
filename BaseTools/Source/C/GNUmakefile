@@ -13,8 +13,8 @@ else
   MAKEROOT := .
 endif
 
-ifneq ($(WORKSPACE),)
-  BUILDROOT=$(WORKSPACE)/BaseTools/Build/Source/C
+ifneq ($(EDK_TOOLS_BUILD_PATH),)
+  BUILDROOT=$(EDK_TOOLS_BUILD_PATH)/Source/C
 else
   BUILDROOT=$(abspath $(MAKEROOT))
 endif
