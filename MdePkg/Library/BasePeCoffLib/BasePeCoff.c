@@ -1146,6 +1146,11 @@ PeCoffLoaderRelocateImage (
             break;
 
           case EFI_IMAGE_REL_BASED_HIGH:
+            if ((UINTN)Fixup > (UINTN)ImageContext->ImageAddress + ImageContext->ImageSize - sizeof (UINT16)) {
+              ImageContext->ImageError = IMAGE_ERROR_FAILED_RELOCATION;
+              return RETURN_LOAD_ERROR;
+            }
+
             Fixup16  = (UINT16 *)Fixup;
             *Fixup16 = (UINT16)(*Fixup16 + ((UINT16)((UINT32)Adjust >> 16)));
             if (FixupData != NULL) {
@@ -1156,6 +1161,11 @@ PeCoffLoaderRelocateImage (
             break;
 
           case EFI_IMAGE_REL_BASED_LOW:
+            if ((UINTN)Fixup > (UINTN)ImageContext->ImageAddress + ImageContext->ImageSize - sizeof (UINT16)) {
+              ImageContext->ImageError = IMAGE_ERROR_FAILED_RELOCATION;
+              return RETURN_LOAD_ERROR;
+            }
+
             Fixup16  = (UINT16 *)Fixup;
             *Fixup16 = (UINT16)(*Fixup16 + (UINT16)Adjust);
             if (FixupData != NULL) {
@@ -1166,6 +1176,11 @@ PeCoffLoaderRelocateImage (
             break;
 
           case EFI_IMAGE_REL_BASED_HIGHLOW:
+            if ((UINTN)Fixup > (UINTN)ImageContext->ImageAddress + ImageContext->ImageSize - sizeof (UINT32)) {
+              ImageContext->ImageError = IMAGE_ERROR_FAILED_RELOCATION;
+              return RETURN_LOAD_ERROR;
+            }
+
             Fixup32  = (UINT32 *)Fixup;
             *Fixup32 = *Fixup32 + (UINT32)Adjust;
             if (FixupData != NULL) {
@@ -1177,6 +1192,11 @@ PeCoffLoaderRelocateImage (
             break;
 
           case EFI_IMAGE_REL_BASED_DIR64:
+            if ((UINTN)Fixup > (UINTN)ImageContext->ImageAddress + ImageContext->ImageSize - sizeof (UINT64)) {
+              ImageContext->ImageError = IMAGE_ERROR_FAILED_RELOCATION;
+              return RETURN_LOAD_ERROR;
+            }
+
             Fixup64  = (UINT64 *)Fixup;
             *Fixup64 = *Fixup64 + (UINT64)Adjust;
             if (FixupData != NULL) {
