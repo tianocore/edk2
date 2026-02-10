@@ -80,7 +80,7 @@ HashStart (
   ASSERT (HashCtx != NULL);
 
   for (Index = 0; Index < mHashInterfaceCount; Index++) {
-    HashMask = Tpm2GetHashMaskFromAlgo (&mHashInterface[Index].HashGuid);
+    HashMask = Tpm2GetHashMaskFromGuid (&mHashInterface[Index].HashGuid);
     if ((HashMask & PcdGet32 (PcdTpm2HashMask)) != 0) {
       mHashInterface[Index].HashInit (&HashCtx[Index]);
     }
@@ -121,7 +121,7 @@ HashUpdate (
   HashCtx = (HASH_HANDLE *)HashHandle;
 
   for (Index = 0; Index < mHashInterfaceCount; Index++) {
-    HashMask = Tpm2GetHashMaskFromAlgo (&mHashInterface[Index].HashGuid);
+    HashMask = Tpm2GetHashMaskFromGuid (&mHashInterface[Index].HashGuid);
     if ((HashMask & PcdGet32 (PcdTpm2HashMask)) != 0) {
       mHashInterface[Index].HashUpdate (HashCtx[Index], DataToHash, DataToHashLen);
     }
@@ -215,7 +215,7 @@ HashCompleteAndExtend (
   ZeroMem (DigestList, sizeof (*DigestList));
 
   for (Index = 0; Index < mHashInterfaceCount; Index++) {
-    HashMask = Tpm2GetHashMaskFromAlgo (&mHashInterface[Index].HashGuid);
+    HashMask = Tpm2GetHashMaskFromGuid (&mHashInterface[Index].HashGuid);
     if ((HashMask & PcdGet32 (PcdTpm2HashMask)) != 0) {
       mHashInterface[Index].HashUpdate (HashCtx[Index], DataToHash, DataToHashLen);
       mHashInterface[Index].HashFinal (HashCtx[Index], &Digest);
@@ -309,7 +309,7 @@ RegisterHashInterfaceLib (
   //
   // Check allow
   //
-  HashMask     = Tpm2GetHashMaskFromAlgo (&HashInterface->HashGuid);
+  HashMask     = Tpm2GetHashMaskFromGuid (&HashInterface->HashGuid);
   Tpm2HashMask = PcdGet32 (PcdTpm2HashMask);
 
   if ((Tpm2HashMask != 0) &&
