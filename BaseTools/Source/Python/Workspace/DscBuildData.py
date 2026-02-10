@@ -2815,7 +2815,8 @@ class DscBuildData(PlatformBuildClassObject):
                 "PcdFieldValueFromComm": Pcd.PcdFieldValueFromComm,
                 "PcdFieldValueFromFdf": Pcd.PcdFieldValueFromFdf,
                 "DefaultFromDSC": Pcd.DefaultFromDSC,
-                "PcdFiledValueFromDscComponent": Pcd.PcdFiledValueFromDscComponent
+                "PcdFiledValueFromDscComponent": Pcd.PcdFiledValueFromDscComponent,
+                "SkuOverrideValues": Pcd.SkuOverrideValues
             }
 
         # Store the CC Flags
