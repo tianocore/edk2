@@ -2,6 +2,7 @@
   This is BaseCrypto router support function definition.
 
 Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
+Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -9,7 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #pragma once
 
 /**
-  The function get hash mask info from algorithm.
+  The function get hash mask info from GUID.
 
   @param HashGuid Hash Guid
 
@@ -17,7 +18,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 UINT32
 EFIAPI
-Tpm2GetHashMaskFromAlgo (
+Tpm2GetHashMaskFromGuid (
   IN EFI_GUID  *HashGuid
   );
 
