@@ -320,8 +320,8 @@ CoreReadImageFile (
   // Move data from our local copy of the file
   //
   EndPosition = Offset + *ReadSize;
-  if (EndPosition > FHand->SourceSize) {
-    *ReadSize = (UINTN)(FHand->SourceSize - Offset);
+  if (EndPosition > (UINTN)FHand->SourceSize) {
+    *ReadSize = (UINTN)((UINTN)FHand->SourceSize - (UINTN)Offset);
   }
 
   if (Offset >= FHand->SourceSize) {

@@ -536,6 +536,24 @@ PeCoffLoaderGetPeHeader (
     }
 
     //
+    // Check if the section is within the image.
+    //
+    if (!ImageContext->IsTeImage) {
+      UINT64  ImageSize;
+
+      if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+        ImageSize = Hdr.Pe32->OptionalHeader.SizeOfImage;
+      } else {
+        ImageSize = Hdr.Pe32Plus->OptionalHeader.SizeOfImage;
+      }
+
+      if ((UINT64)SectionHeader.VirtualAddress + SectionHeader.Misc.VirtualSize > ImageSize) {
+        ImageContext->ImageError = IMAGE_ERROR_INVALID_IMAGE_SIZE;
+        return RETURN_UNSUPPORTED;
+      }
+    }
+
+    //
     // Check next section.
     //
     SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
