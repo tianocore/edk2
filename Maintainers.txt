@@ -189,6 +189,7 @@ F: CryptoPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/CryptoPkg
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
 M: Yi Li <yi1.li@intel.com> [liyi77]
+M: Doug Flick <dougflick@microsoft.com> [flickdm]
 
 DynamicTablesPkg
 F: DynamicTablesPkg/
@@ -647,6 +648,7 @@ F: StandaloneMmPkg/
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
+M: Kun Qin <kun.qin@microsoft.com> [kuqin12]
 R: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
 R: Dun Tan <dun.tan@intel.com> [td36]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]

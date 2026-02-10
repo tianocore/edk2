@@ -189,7 +189,7 @@ Communicate3 (
     //
     // Check if the HeaderGuid is valid
     //
-    if (CompareGuid (&CommunicateHeader->HeaderGuid, &gEfiMmCommunicateHeaderV3Guid)) {
+    if (CompareGuid (&CommunicateHeader->HeaderGuid, &gEfiMmCommunicateHeaderV3Guid) == FALSE) {
       DEBUG ((DEBUG_ERROR, "HeaderGuid is not valid!\n"));
       return EFI_INVALID_PARAMETER;
     }

@@ -6,16 +6,20 @@
 #
 
 MAKEROOT ?= ../..
+BUILDROOT ?= $(MAKEROOT)
+OBJDIR ?= .
 
 include $(MAKEROOT)/Makefiles/header.makefile
 
-APPLICATION = $(MAKEROOT)/bin/$(APPNAME)
+OBJECTS := $(addprefix $(OBJDIR)$(SEP),$(OBJECTS))
+
+APPLICATION = $(BUILDROOT)/bin/$(APPNAME)
 
 .PHONY:all
-all: $(MAKEROOT)/bin $(APPLICATION)
+all: $(BUILDROOT)/bin $(APPLICATION)
 
 $(APPLICATION): $(OBJECTS)
-	$(LINKER) -o $(APPLICATION) $(LDFLAGS) $(OBJECTS) -L$(MAKEROOT)/libs $(LIBS)
+	$(LINKER) -o $(APPLICATION) $(LDFLAGS) $(OBJECTS) -L$(BUILDROOT)/libs $(LIBS)
 ifeq (Windows, $(findstring Windows,$(OS)))
 	$(CP) $(APPLICATION).exe $(BIN_PATH)
 endif

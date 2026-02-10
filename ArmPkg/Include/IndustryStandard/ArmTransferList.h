@@ -20,7 +20,7 @@
 #include <Base.h>
 #include <Uefi.h>
 
-#define ARM_FW_HANDOFF_PROTOCOL_VERSION  1
+#define ARM_FW_HANDOFF_PROTOCOL_VERSION  2
 
 #define TRANSFER_LIST_ALIGNMENT     8             // 8 byte alignment
 #define TRANSFER_LIST_SIGNATURE_64  (0x4a0fb10b)

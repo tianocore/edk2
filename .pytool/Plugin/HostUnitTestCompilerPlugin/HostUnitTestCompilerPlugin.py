@@ -62,6 +62,10 @@ class HostUnitTestCompilerPlugin(ICiBuildPlugin):
             ## change once IA32 issues resolved host.append("IA32")
             if GetHostInfo().bit == '64':
                 host.append("X64")
+                # VS20xx IA32 builds have known issues using OpenCppCoverage
+                # Only enable IA32 builds on 64bit hosts when using clang or gcc
+                if not environment.GetValue("TOOL_CHAIN_TAG").startswith('VS'):
+                    host.append("IA32")
         elif GetHostInfo().arch == 'ARM':
             if GetHostInfo().bit == '64':
                 host.append("AARCH64")
