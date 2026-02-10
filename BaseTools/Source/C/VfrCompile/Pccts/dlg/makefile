@@ -114,7 +114,7 @@ PCCTS_H=../h
 #
 #   UNIX
 #
-ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+ifeq (Windows, $(findstring Windows,$(OS)))
   SHELL := cmd.exe
   SEP := $(shell echo \)
   RM := del /f /q
@@ -137,6 +137,7 @@ OBJ_EXT=o
 OUT_OBJ = -o
 OBJ = dlg_p.o dlg_a.o main.o err.o set.o support.o output.o \
         relabel.o automata.o
+OBJ := $(addprefix $(OBJDIR)/,$(OBJ))
 
 $(BIN_DIR)/dlg : $(OBJ) $(SRC)
 		$(CC) $(CFLAGS) -o $(BIN_DIR)/dlg $(OBJ)
@@ -150,19 +151,19 @@ SRC = dlg_p.c dlg_a.c main.c err.c $(SET)/set.c support.c output.c \
 #dlg_a.c mode.h : parser.dlg
 #	$(DLG) -C2 parser.dlg dlg_a.c
 
-dlg_p.$(OBJ_EXT) : dlg_p.c dlg.h tokens.h mode.h
-	$(CC) $(CFLAGS) -c dlg_p.c
+$(OBJDIR)/dlg_p.$(OBJ_EXT) : dlg_p.c dlg.h tokens.h mode.h
+	$(CC) $(CFLAGS) -o $@ -c dlg_p.c
 
-dlg_a.$(OBJ_EXT) : dlg_a.c dlg.h tokens.h mode.h
-	$(CC) $(CFLAGS) -c dlg_a.c
+$(OBJDIR)/dlg_a.$(OBJ_EXT) : dlg_a.c dlg.h tokens.h mode.h
+	$(CC) $(CFLAGS) -o $@ -c dlg_a.c
 
-main.$(OBJ_EXT) : main.c dlg.h
-	$(CC) $(CFLAGS) -c main.c
+$(OBJDIR)/main.$(OBJ_EXT) : main.c dlg.h
+	$(CC) $(CFLAGS) -o $@ -c main.c
 
-set.$(OBJ_EXT) : $(SET)/set.c
-	$(CC) -c $(CFLAGS) $(SET)/set.c
+$(OBJDIR)/set.$(OBJ_EXT) : $(SET)/set.c
+	$(CC) -c $(CFLAGS) -o $@ $(SET)/set.c
 
-%.o : %.c 
+$(OBJDIR)/%.o : %.c
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 lint:
@@ -170,4 +171,4 @@ lint:
 
 #clean up all the intermediate files
 clean:
-	$(RM) $(BIN_DIR)$(SEP)dlg *.$(OBJ_EXT) core
+	$(RM) $(BIN_DIR)$(SEP)dlg $(OBJDIR)$(SEP)*.$(OBJ_EXT) core

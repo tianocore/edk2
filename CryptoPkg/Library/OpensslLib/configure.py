@@ -358,7 +358,7 @@ def main():
         defines = {}
         for asm in [ 'UEFI-IA32-MSFT', 'UEFI-IA32-GCC',
                      'UEFI-X64-MSFT', 'UEFI-X64-GCC',
-                     'UEFI-AARCH64-GCC']:
+                     'UEFI-AARCH64-ELF', 'UEFI-AARCH64-PE']:
             (uefi, arch, cc) = asm.split('-')
             archcc = f'{arch}-{cc}'
 
@@ -371,12 +371,12 @@ def main():
 
             srclist = libcrypto_sources(cfg, archcc) + libssl_sources(cfg, archcc)
             if arch in ['AARCH64']:
-                sources[archcc] = list(map(lambda x: f'{x} | {cc}', filter(is_asm, srclist)))
+                featureflagexp = 'gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStylePe'
             else:
                 featureflagexp = 'gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm'
-                if cc == 'GCC':
-                    featureflagexp = '!' + featureflagexp
-                sources[archcc] = list(map(lambda x: f'{x} ||||{featureflagexp}', filter(is_asm, srclist)))
+            if cc == 'GCC' or cc == 'ELF':
+                featureflagexp = '!' + featureflagexp
+            sources[archcc] = list(map(lambda x: f'{x} ||||{featureflagexp}', filter(is_asm, srclist)))
             update_MSFT_asm_format(archcc, sources[archcc])
             sources[arch] = list(filter(lambda x: not is_asm(x), srclist))
             defines[arch] = cfg['unified_info']['defines']['libcrypto']
@@ -386,7 +386,7 @@ def main():
         x64accel = sources['X64'] + sources['X64-MSFT'] + sources['X64-GCC']
         update_inf(inf, ia32accel, 'IA32', defines['IA32'])
         update_inf(inf, x64accel, 'X64', defines['X64'])
-        aarch64accel = sources['AARCH64'] + sources['AARCH64-GCC']
+        aarch64accel = sources['AARCH64'] + sources['AARCH64-ELF'] + sources['AARCH64-PE']
         update_inf(inf, aarch64accel, 'AARCH64', defines['AARCH64'])
 
     # noaccel - ec enabled

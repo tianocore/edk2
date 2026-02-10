@@ -75,6 +75,33 @@ PlatformIgvmMemoryMapFind (
   return Map;
 }
 
+VOID
+EFIAPI
+PlatformIgvmParamReserve (
+  VOID
+  )
+{
+  UINT64  Base;
+  UINT64  Size;
+
+  Base = FixedPcdGet64 (PcdOvmfIgvmParamBase);
+  Size = FixedPcdGet64 (PcdOvmfIgvmParamSize);
+
+  if (Base && Size) {
+    //
+    // Reserve igvm parameter area as runtime data, to make sure the OS isn't
+    // going to use it, otherwise we can get corrupted IGVM parameters after
+    // guest reboot.
+    //
+    DEBUG ((DEBUG_INFO, "%a: 0x%x +0x%x\n", __func__, Base, Size));
+    BuildMemoryAllocationHob (
+      Base,
+      Size,
+      EfiRuntimeServicesData
+      );
+  }
+}
+
 BOOLEAN
 EFIAPI
 PlatformIgvmMemoryMapCheck (

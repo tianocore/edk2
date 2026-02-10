@@ -1034,7 +1034,7 @@ file. This provides the default defines and library class mappings requires for 
 Lastly, in the case that the test build has specific dependent libraries associated with it,
 they should be added in the \<LibraryClasses\> sub-section for the INF file in the
 `[Components]` section of the DSC file. Note that it is within this sub-section where you can
-control whether the design or mock version of a component is linked into the test exectuable.
+control whether the design or mock version of a component is linked into the test executable.
 
 See this example in `SecurityPkgHostTest.dsc` where the `SecureBootVariableLib` design is
 being tested using mock versions of `UefiRuntimeServicesTableLib`, `PlatformPKProtectionLib`,
@@ -1263,7 +1263,7 @@ uses the same test fixture and makes use of its `RtServicesMock`, `Status`, and
 `SecureBootMode` variables.
 
 ```cpp
-TEST_F(SetSecureBootModeTest, PropogateModeToSetVar) {
+TEST_F(SetSecureBootModeTest, PropagateModeToSetVar) {
   EXPECT_CALL(RtServicesMock,
     gRT_SetVariable(
       Char16StrEq(EFI_CUSTOM_MODE_NAME),

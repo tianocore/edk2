@@ -1,5 +1,5 @@
 ;***
-;ullrem.asm - unsigned long remainder routine
+;ullrem.nasm - unsigned long remainder routine
 ;
 ;       Copyright (c) Microsoft Corporation. All rights reserved.
 ;       SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -11,10 +11,7 @@
 ;Original Implemenation: MSVC 14.29.30133
 ;
 ;*******************************************************************************
-    .686
-    .model  flat,C
-    .code
-
+    SECTION .text
 
 ;***
 ;ullrem - unsigned long remainder
@@ -38,10 +35,12 @@
 ;Exceptions:
 ;
 ;*******************************************************************************
-_aullrem        PROC NEAR
 
-HIWORD  EQU     [4]             ;
-LOWORD  EQU     [0]
+global ASM_PFX(_aullrem)
+ASM_PFX(_aullrem):
+
+%define HIWORD(x)  [x + 4]
+%define LOWORD(x)  [x + 0]
 
         push    ebx
 
@@ -66,8 +65,10 @@ LOWORD  EQU     [0]
 ;               -----------------
 ;
 
-DVND    equ     [esp + 8]       ; stack address of dividend (a)
-DVSR    equ     [esp + 16]      ; stack address of divisor (b)
+; stack address of dividend (a)
+%define DVND    esp + 8
+; stack address of divisor (b)
+%define DVSR    esp + 16
 
 ; Now do the divide.  First look to see if the divisor is less than 4194304K.
 ; If so, then we can use a simple algorithm with word divides, otherwise
@@ -113,9 +114,9 @@ L3:
 ;
 
         mov     ecx,eax         ; save a copy of quotient in ECX
-        mul     dword ptr HIWORD(DVSR)
+        mul     dword HIWORD(DVSR)
         xchg    ecx,eax         ; put partial product in ECX, get quotient in EAX
-        mul     dword ptr LOWORD(DVSR)
+        mul     dword LOWORD(DVSR)
         add     edx,ecx         ; EDX:EAX = QUOT * DVSR
         jc      short L4        ; carry means Quotient is off by 1
 
@@ -157,7 +158,3 @@ L2:
         pop     ebx
 
         ret     16
-
-_aullrem        ENDP
-
-        end

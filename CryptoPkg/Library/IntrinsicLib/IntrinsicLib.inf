@@ -35,8 +35,8 @@
   Ia32/MathLlshr.asm        | MSFT
   Ia32/MathUlldiv.nasm      | MSFT
   Ia32/MathUlldvrm.asm      | MSFT
-  Ia32/MathLldiv.asm        | MSFT
-  Ia32/MathUllrem.asm       | MSFT
+  Ia32/MathLldiv.nasm       | MSFT
+  Ia32/MathUllrem.nasm      | MSFT
 
   Ia32/MathLShiftS64.c      | INTEL
   Ia32/MathRShiftU64.c      | INTEL
@@ -50,6 +50,9 @@
   Ia32/MathModU64x64.c      | GCC
 
   Ia32/MathUlldiv.nasm      | CLANGPDB
+  Ia32/MathLldiv.nasm       | CLANGPDB
+  Ia32/MathUllrem.nasm      | CLANGPDB
+
 [Sources.X64]
   CopyMem.c
   Math.c                    | GCC

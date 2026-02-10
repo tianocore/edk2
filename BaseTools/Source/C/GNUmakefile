@@ -6,11 +6,17 @@
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
-ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+ifeq (Windows, $(findstring Windows,$(OS)))
   SHELL := cmd.exe
   MAKEROOT := $(shell echo %CD%)
 else
   MAKEROOT := .
+endif
+
+ifneq ($(WORKSPACE),)
+  BUILDROOT=$(WORKSPACE)/BaseTools/Build/Source/C
+else
+  BUILDROOT=$(abspath $(MAKEROOT))
 endif
 
 include Makefiles/header.makefile
@@ -22,7 +28,6 @@ all: makerootdir subdirs
 	@echo Finished building BaseTools C Tools with HOST_ARCH=$(HOST_ARCH)
 
 LIBRARIES = Common
-VFRAUTOGEN = VfrCompile/VfrLexer.h
 APPLICATIONS = \
   BrotliCompress \
   VfrCompile \
@@ -39,31 +44,29 @@ APPLICATIONS = \
 
 SUBDIRS := $(LIBRARIES) $(APPLICATIONS)
 
-$(LIBRARIES): $(MAKEROOT)/libs
-$(APPLICATIONS): $(LIBRARIES) $(MAKEROOT)/bin $(VFRAUTOGEN)
+$(LIBRARIES): $(BUILDROOT)/libs
+$(APPLICATIONS): $(LIBRARIES) $(BUILDROOT)/bin
 
 .PHONY: outputdirs
 makerootdir:
-	-$(MD) $(MAKEROOT)
+	-$(MD) $(BUILDROOT)
 
 .PHONY: subdirs $(SUBDIRS)
 subdirs: $(SUBDIRS)
 $(SUBDIRS):
-	$(MAKE) -C $@
+	-$(MD) $(BUILDROOT)/$@
+	$(MAKE) OBJDIR=$(BUILDROOT)/$@ BUILDROOT=$(BUILDROOT) -C $@
 
 .PHONY: $(patsubst %,%-clean,$(sort $(SUBDIRS)))
 $(patsubst %,%-clean,$(sort $(SUBDIRS))):
-	-$(MAKE) -C $(@:-clean=) clean
-
-$(VFRAUTOGEN): VfrCompile/VfrSyntax.g
-	$(MAKE) -C VfrCompile VfrLexer.h
+	-$(MAKE) OBJDIR=$(BUILDROOT)/$(@:-clean=) BUILDROOT=$(BUILDROOT) -C $(@:-clean=) clean
 
 clean:  $(patsubst %,%-clean,$(sort $(SUBDIRS)))
 
 clean: localClean
 
 localClean:
-	$(RM) $(MAKEROOT)/bin/*
-	-$(RD) $(MAKEROOT)/libs $(MAKEROOT)/bin
+	$(RM) $(BUILDROOT)/bin/*
+	-$(RD) $(BUILDROOT)/libs $(BUILDROOT)/bin
 
 include Makefiles/footer.makefile

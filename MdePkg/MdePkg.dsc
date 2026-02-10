@@ -159,7 +159,7 @@
   MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLibSmm.inf
   MdePkg/Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLibUefiShell.inf
 
-[Components.IA32, Components.X64, Components.AARCH64]
+[Components.IA32, Components.X64, Components.AARCH64, Components.LOONGARCH64]
   MdePkg/Library/BaseRngLib/BaseRngLib.inf
 
 [Components.IA32, Components.X64]

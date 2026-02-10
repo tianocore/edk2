@@ -3,6 +3,8 @@
 
   Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
   Copyright (c) 2016 - 2023, Arm Limited. All rights reserved.<BR>
+  Copyright (C) 2025 - 2026 Advanced Micro Devices, Inc. All rights reserved.
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -60,6 +62,7 @@ ACPI_TABLE_PARSER  ParserList[] = {
   { EFI_ACPI_6_4_ERROR_RECORD_SERIALIZATION_TABLE_SIGNATURE,                                             ParseAcpiErst },
   { EFI_ACPI_6_3_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE,                                              ParseAcpiFacs },
   { EFI_ACPI_6_2_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,                                                 ParseAcpiFadt },
+  { EFI_ACPI_6_5_FIRMWARE_PERFORMANCE_DATA_TABLE_SIGNATURE,                                              ParseAcpiFpdt },
   { EFI_ACPI_6_4_GENERIC_TIMER_DESCRIPTION_TABLE_SIGNATURE,                                              ParseAcpiGtdt },
   { EFI_ACPI_6_5_HARDWARE_ERROR_SOURCE_TABLE_SIGNATURE,                                                  ParseAcpiHest },
   { EFI_ACPI_6_4_HETEROGENEOUS_MEMORY_ATTRIBUTE_TABLE_SIGNATURE,                                         ParseAcpiHmat },

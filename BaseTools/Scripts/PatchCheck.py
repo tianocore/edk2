@@ -126,7 +126,7 @@ class CommitMessageCheck:
                 self.check_change_id_format()
         self.report_message_result()
 
-    url = 'https://github.com/tianocore/tianocore.github.io/wiki/Commit-Message-Format'
+    url = 'https://www.tianocore.org/tianocore-wiki.github.io/development/contribution-guides/commit_message_format.html'
 
     def report_message_result(self):
         if Verbose.level < Verbose.NORMAL:
@@ -223,6 +223,9 @@ class CommitMessageCheck:
                     self.error("Subject line does not start with 'Global:' for > 3 package multi-package commit!")
             elif num_found != len(updated_packages):
                 self.error("Subject line not in \"package,package: description\" format!")
+
+        if self.subject.endswith('.'):
+            self.error("Subject line should not end with a period")
 
     def check_signed_off_by(self):
         sob='Signed-off-by'

@@ -30,12 +30,14 @@
 [Sources.Ia32]
   X64/VirtualMemory.h
   X64/VirtualMemory.c
+  Ia32/DxeLoadFunc.c
   Ia32/DxeLoadFuncFit.c
   Ia32/IdtVectorAsm.nasm
 
 [Sources.X64]
   X64/VirtualMemory.h
   X64/VirtualMemory.c
+  X64/DxeLoadFunc.c
   X64/DxeLoadFuncFit.c
 
 [Sources.RISCV64]

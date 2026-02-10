@@ -244,60 +244,53 @@ IpiInterruptHandler (
   UINTN  ResumeVector = 0;
   UINTN  Parameter    = 0;
   UINTN  IpiStatus    = 0;
+  UINT8  RereadCount  = 10;
 
   IpiStatus = IoCsrRead32 (LOONGARCH_IOCSR_IPI_STATUS);
 
-  //
-  // Clear interrupt.
-  //
-  IoCsrWrite32 (LOONGARCH_IOCSR_IPI_CLEAR, IpiStatus);
-
   if ((IpiStatus & SMP_RESCHEDULE) != 0) {
+    //
+    // Clear current IPI interrupt bit.
+    //
+    IoCsrWrite32 (LOONGARCH_IOCSR_IPI_CLEAR, (IpiStatus & SMP_RESCHEDULE));
+
     MemoryFence ();
     return;
-  } else {
-    if (((IpiStatus & SMP_BOOT_CPU) != 0) || ((IpiStatus & SMP_CALL_FUNCTION) != 0)) {
-      //
-      // Confirm that the mail box message has arrived.
-      //
-      do {
-        ResumeVector = IoCsrRead32 (LOONGARCH_IOCSR_MBUF0);
-      } while (!ResumeVector);
+  } else if ((IpiStatus & SMP_CALL_FUNCTION) != 0) {
+    //
+    // Clear current IPI interrupt bit.
+    //
+    IoCsrWrite32 (LOONGARCH_IOCSR_IPI_CLEAR, (IpiStatus & SMP_CALL_FUNCTION));
 
-      //
-      // Get the resume vector if populated.
-      //
-      ResumeVector = IoCsrRead64 (LOONGARCH_IOCSR_MBUF0);
+    //
+    // Confirm that the mail box message has arrived.
+    //
+    do {
+      ResumeVector = IoCsrRead32 (LOONGARCH_IOCSR_MBUF0);
+    } while (!ResumeVector);
 
-      if ((IpiStatus & SMP_BOOT_CPU) != 0) {
-        SystemContext.SystemContextLoongArch64->PRMD &= ~((UINT64)BIT2); // Clean PIE
-      } else if ((IpiStatus & SMP_CALL_FUNCTION) != 0) {
-        //
-        // Confirm that the mail box message has arrived.
-        //
-        do {
-          Parameter = IoCsrRead32 (LOONGARCH_IOCSR_MBUF3);
-        } while (!Parameter);
+    //
+    // Get the resume vector if populated.
+    //
+    ResumeVector = IoCsrRead64 (LOONGARCH_IOCSR_MBUF0);
 
-        //
-        // Get the parameter if populated.
-        //
-        Parameter = IoCsrRead64 (LOONGARCH_IOCSR_MBUF3);
+    //
+    // Confirm that the mail box message has arrived.
+    //
+    do {
+      Parameter = IoCsrRead32 (LOONGARCH_IOCSR_MBUF3);
+    } while (!Parameter && --RereadCount);
 
-        //
-        // Set $a0 as APIC ID and $a1 as parameter value.
-        //
-        SystemContext.SystemContextLoongArch64->R4 = CsrRead (LOONGARCH_CSR_CPUID);
-        SystemContext.SystemContextLoongArch64->R5 = Parameter;
-      }
-    } else {
-      InternalPrintMessage (
-        "Core %d: Should never be here, IPI Status = %d.\n",
-        CsrRead (LOONGARCH_CSR_CPUID),
-        IpiStatus
-        );
-      DefaultExceptionHandler (EXCEPT_LOONGARCH_INT, SystemContext);
-    }
+    //
+    // Get the parameter if populated.
+    //
+    Parameter = IoCsrRead64 (LOONGARCH_IOCSR_MBUF3);
+
+    //
+    // Set $a0 as APIC ID and $a1 as parameter value.
+    //
+    SystemContext.SystemContextLoongArch64->R4 = CsrRead (LOONGARCH_CSR_CPUID);
+    SystemContext.SystemContextLoongArch64->R5 = Parameter;
 
     //
     // Clean up current processor mailbox 0 and mailbox 3.
@@ -309,6 +302,13 @@ IpiInterruptHandler (
     // Set the ERA to the resume vector sent by caller.
     //
     SystemContext.SystemContextLoongArch64->ERA = ResumeVector;
+  } else {
+    InternalPrintMessage (
+      "Core %d: Should never be here, IPI Status = %d.\n",
+      CsrRead (LOONGARCH_CSR_CPUID),
+      IpiStatus
+      );
+    DefaultExceptionHandler (EXCEPT_LOONGARCH_INT, SystemContext);
   }
 
   MemoryFence ();

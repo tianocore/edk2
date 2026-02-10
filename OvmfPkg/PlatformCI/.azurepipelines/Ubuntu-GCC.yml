@@ -8,9 +8,17 @@
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
-trigger:
-  - master
-  - stable/*
+trigger: none
+
+schedules:
+- cron: "0 5 * * *"
+  displayName: Daily Build
+  branches:
+    include:
+    - master
+    - stable/*
+  always: true
+
 pr:
   - master
   - stable/*
@@ -152,7 +160,7 @@ jobs:
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
       parameters:
-        tool_chain_tag: GCC5
+        tool_chain_tag: GCC
         build_pkg: $(package)
         build_target: $(Build.Target)
         build_arch: $(Build.Arch)

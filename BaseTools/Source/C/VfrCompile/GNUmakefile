@@ -8,14 +8,16 @@
 MAKEROOT ?= ..
 
 APPNAME = VfrCompile
+BUILDROOT ?= $(MAKEROOT)
+OBJDIR ?= $(abspath .)
 
 LIBS = -lCommon
 
 TOOL_INCLUDE = -I Pccts/h
 
-#OBJECTS = VfrSyntax.o VfrServices.o DLGLexer.o EfiVfrParser.o ATokenBuffer.o DLexerBase.o AParser.o
 OBJECTS = AParser.o DLexerBase.o ATokenBuffer.o EfiVfrParser.o VfrLexer.o VfrSyntax.o \
           VfrFormPkg.o VfrError.o VfrUtilityLib.o VfrCompiler.o
+OBJECTS := $(addprefix $(OBJDIR)/,$(OBJECTS))
 CLANG := $(findstring clang,$(shell $(CC) --version))
 ifneq ($(CLANG),)
 VFR_CPPFLAGS = -Wno-deprecated-register -std=c++14 -DPCCTS_USE_NAMESPACE_STD $(CPPFLAGS)
@@ -30,23 +32,19 @@ VFR_LFLAGS = $(EXTRA_LDFLAGS)
 
 LINKER = $(CXX)
 
-EXTRA_CLEAN_OBJECTS = EfiVfrParser.cpp EfiVfrParser.h VfrParser.dlg VfrTokens.h VfrLexer.cpp VfrLexer.h VfrSyntax.cpp tokens.h
-
-MAKEROOT ?= ../..
-
 include $(MAKEROOT)/Makefiles/header.makefile
 
-APPLICATION = $(MAKEROOT)/bin/$(APPNAME)
+APPLICATION = $(BUILDROOT)/bin/$(APPNAME)
 
-BIN_DIR=.
+BIN_DIR=$(OBJDIR)
 export BIN_DIR
 
 .PHONY:all
-all: $(MAKEROOT)/bin $(APPLICATION)
+all: $(BUILDROOT)/bin $(APPLICATION)
 
 $(APPLICATION): $(OBJECTS)
-	$(LINKER) -o $(APPLICATION) $(VFR_LFLAGS) $(OBJECTS) -L$(MAKEROOT)/libs $(LIBS)
-ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+	$(LINKER) -o $(APPLICATION) $(VFR_LFLAGS) $(OBJECTS) -L$(BUILDROOT)/libs $(LIBS)
+ifeq (Windows, $(findstring Windows,$(OS)))
 	$(CP) $(APPLICATION).exe $(BIN_PATH)
 endif
 
@@ -54,36 +52,43 @@ VfrCompiler.o: ../Include/Common/BuildVersion.h
 
 include $(MAKEROOT)/Makefiles/footer.makefile
 
-VfrSyntax.cpp EfiVfrParser.cpp EfiVfrParser.h VfrParser.dlg VfrTokens.h: Pccts/antlr/antlr VfrSyntax.g
-	Pccts/antlr/antlr -CC -e3 -ck 3 -k 2 -fl VfrParser.dlg -ft VfrTokens.h -o . VfrSyntax.g
+GEN_SYNTAX_FILES := $(addprefix $(OBJDIR)/,VfrSyntax.cpp EfiVfrParser.cpp EfiVfrParser.h VfrParser.dlg VfrTokens.h)
+$(GEN_SYNTAX_FILES): $(OBJDIR)/antlr VfrSyntax.g
+	$(OBJDIR)/antlr -CC -e3 -ck 3 -k 2 -fl VfrParser.dlg -ft VfrTokens.h -o $(OBJDIR) VfrSyntax.g
 
-VfrLexer.cpp VfrLexer.h: Pccts/dlg/dlg VfrParser.dlg
-	Pccts/dlg/dlg -C2 -i -CC -cl VfrLexer -o . VfrParser.dlg
+GEN_LEXER_FILES := $(addprefix $(OBJDIR)/,VfrLexer.cpp VfrLexer.h)
+$(GEN_LEXER_FILES): $(OBJDIR)/dlg $(OBJDIR)/VfrParser.dlg
+	$(OBJDIR)/dlg -C2 -i -CC -cl VfrLexer -o $(OBJDIR) $(OBJDIR)/VfrParser.dlg
 
-Pccts/antlr/antlr:
-	$(MAKE) -C Pccts/antlr
+EXTRA_CLEAN_OBJECTS = $(GEN_SYNTAX_FILES) $(GEN_LEXER_FILES)
 
-Pccts/dlg/dlg:
-	$(MAKE) -C Pccts/dlg
+$(OBJDIR)/Pccts/antlr $(OBJDIR)/Pccts/dlg:
+	$(MD) $@
 
-ATokenBuffer.o: Pccts/h/ATokenBuffer.cpp
+$(OBJDIR)/antlr: | $(OBJDIR)/Pccts/antlr
+	$(MAKE) OBJDIR=$(OBJDIR)/Pccts/antlr -C Pccts/antlr
+
+$(OBJDIR)/dlg: | $(OBJDIR)/Pccts/dlg
+	$(MAKE) OBJDIR=$(OBJDIR)/Pccts/dlg -C Pccts/dlg
+
+$(OBJDIR)/ATokenBuffer.o: Pccts/h/ATokenBuffer.cpp
 	$(CXX) -c $(VFR_CPPFLAGS) $(INC) $(VFR_CXXFLAGS) $? -o $@
 
-DLexerBase.o: Pccts/h/DLexerBase.cpp
+$(OBJDIR)/DLexerBase.o: Pccts/h/DLexerBase.cpp
 	$(CXX) -c $(VFR_CPPFLAGS) $(INC) $(VFR_CXXFLAGS) $? -o $@
 
-AParser.o: Pccts/h/AParser.cpp
+$(OBJDIR)/AParser.o: Pccts/h/AParser.cpp
 	$(CXX) -c $(VFR_CPPFLAGS) $(INC) $(VFR_CXXFLAGS) $? -o $@
 
-VfrSyntax.o: VfrSyntax.cpp
+$(OBJDIR)/VfrSyntax.o: $(OBJDIR)/VfrSyntax.cpp
 	$(CXX) -c $(VFR_CPPFLAGS) $(INC) $(VFR_CXXFLAGS) $? -o $@
 
 clean: localClean
 
 localClean:
-	$(MAKE) -C Pccts/antlr clean
-	$(MAKE) -C Pccts/dlg clean
+	$(MAKE) OBJDIR=$(OBJDIR)/Pccts/antlr -C Pccts/antlr clean
+	$(MAKE) OBJDIR=$(OBJDIR)/Pccts/dlg -C Pccts/dlg clean
 	$(RM) $(EXTRA_CLEAN_OBJECTS)
-ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+ifeq (Windows, $(findstring Windows,$(OS)))
 	$(RM) $(BIN_PATH)/$(APPNAME).exe
 endif

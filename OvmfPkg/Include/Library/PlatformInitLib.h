@@ -321,4 +321,10 @@ PlatformIgvmVpCount (
   VOID
   );
 
+VOID
+EFIAPI
+PlatformIgvmParamReserve (
+  VOID
+  );
+
 #endif // PLATFORM_INIT_LIB_H_

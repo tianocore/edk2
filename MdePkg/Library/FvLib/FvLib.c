@@ -2,6 +2,7 @@
 
 Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.<BR>
+Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -253,14 +254,18 @@ FindFfsSectionInSections (
   //
   // Loop through the FFS file sections
   //
-  EndOfSection  = (EFI_PHYSICAL_ADDRESS)(UINTN)Sections;
-  EndOfSections = EndOfSection + SizeOfSections;
+  EndOfSection   = (EFI_PHYSICAL_ADDRESS)(UINTN)Sections;
+  EndOfSections  = EndOfSection + SizeOfSections;
+  CurrentAddress = EndOfSection;
+
   for ( ; ;) {
     if (EndOfSection == EndOfSections) {
       break;
     }
 
-    CurrentAddress = EndOfSection;
+    if (CurrentAddress >= EndOfSections) {
+      return EFI_VOLUME_CORRUPTED;
+    }
 
     Section = (EFI_COMMON_SECTION_HEADER *)(UINTN)CurrentAddress;
 
@@ -274,7 +279,8 @@ FindFfsSectionInSections (
       return EFI_VOLUME_CORRUPTED;
     }
 
-    Size = GET_OCCUPIED_SIZE (Size, 4);
+    Size           = GET_OCCUPIED_SIZE (Size, 4);
+    CurrentAddress = CurrentAddress + Size;
 
     //
     // Look for the requested section type
