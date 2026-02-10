@@ -2858,6 +2858,8 @@ class DscBuildData(PlatformBuildClassObject):
         if SkipPcdValueInit:
             return self.GetStructurePcdSet(PcdRecordOutputValueFile)
 
+        CurrStructuredPcdsData = json.loads(json.dumps(StructuredPcdsData, indent=2))
+
         InitByteValue = ""
         CApp = PcdMainCHeader
 
@@ -3011,9 +3013,9 @@ class DscBuildData(PlatformBuildClassObject):
         SearchPathList.append(os.path.normpath(mws.join(GlobalData.gGlobalDefines["EDK_TOOLS_PATH"], "BaseTools/Source/C/Common")))
         SearchPathList.extend(str(item) for item in IncSearchList)
         IncFileList = GetDependencyList(IncludeFileFullPaths, SearchPathList)
-        StructuredPcdsData["OBJECTS"] = {}
+        CurrStructuredPcdsData["OBJECTS"] = {}
         for include_file in IncFileList:
-            StructuredPcdsData["OBJECTS"][include_file] = os.path.getmtime(include_file)
+            CurrStructuredPcdsData["OBJECTS"][include_file] = os.path.getmtime(include_file)
             MakeApp += "$(OBJECTS) : %s\n" % include_file
         if sys.platform == "win32":
             PcdValueCommonPath = os.path.normpath(mws.join(GlobalData.gGlobalDefines["EDK_TOOLS_PATH"], "Source\\C\\Common\\PcdValueCommon.c"))
@@ -3123,7 +3125,7 @@ class DscBuildData(PlatformBuildClassObject):
         # update the record as PCD Input has been changed if its incremental build
         #
         with open(StructuredPcdsDataPath, 'w') as file:
-            json.dump(StructuredPcdsData, file, indent=2)
+            json.dump(CurrStructuredPcdsData, file, indent=2)
 
         # Copy update output file for each Arch
         shutil.copyfile(OutputValueFile, PcdRecordOutputValueFile)
