@@ -116,7 +116,7 @@ Tpm2PcrExtend (
   Buffer = (UINT8 *)&Cmd.AuthSessionPcr;
 
   // sessionInfoSize
-  SessionInfoSize       = CopyAuthSessionCommand (NULL, Buffer);
+  SessionInfoSize       = Tpm2CopyAuthSessionCommand (NULL, Buffer);
   Buffer               += SessionInfoSize;
   Cmd.AuthorizationSize = SwapBytes32 (SessionInfoSize);
 
@@ -128,7 +128,7 @@ Tpm2PcrExtend (
   for (Index = 0; Index < Digests->count; Index++) {
     WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Digests->digests[Index].hashAlg));
     Buffer    += sizeof (UINT16);
-    DigestSize = GetHashSizeFromAlgo (Digests->digests[Index].hashAlg);
+    DigestSize = Tpm2GetHashSizeFromAlgo (Digests->digests[Index].hashAlg);
     if (DigestSize == 0) {
       DEBUG ((DEBUG_ERROR, "Unknown hash algorithm %d\r\n", Digests->digests[Index].hashAlg));
       return EFI_DEVICE_ERROR;
@@ -248,7 +248,7 @@ Tpm2PcrEvent (
   Buffer = (UINT8 *)&Cmd.AuthSessionPcr;
 
   // sessionInfoSize
-  SessionInfoSize       = CopyAuthSessionCommand (NULL, Buffer);
+  SessionInfoSize       = Tpm2CopyAuthSessionCommand (NULL, Buffer);
   Buffer               += SessionInfoSize;
   Cmd.AuthorizationSize = SwapBytes32 (SessionInfoSize);
 
@@ -305,7 +305,7 @@ Tpm2PcrEvent (
   for (Index = 0; Index < Digests->count; Index++) {
     Digests->digests[Index].hashAlg = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
     Buffer                         += sizeof (UINT16);
-    DigestSize                      = GetHashSizeFromAlgo (Digests->digests[Index].hashAlg);
+    DigestSize                      = Tpm2GetHashSizeFromAlgo (Digests->digests[Index].hashAlg);
     if (DigestSize == 0) {
       DEBUG ((DEBUG_ERROR, "Unknown hash algorithm %d\r\n", Digests->digests[Index].hashAlg));
       return EFI_DEVICE_ERROR;
@@ -508,7 +508,7 @@ Tpm2PcrAllocate (
   Buffer = (UINT8 *)&Cmd.AuthSession;
 
   // sessionInfoSize
-  SessionInfoSize     = CopyAuthSessionCommand (AuthSession, Buffer);
+  SessionInfoSize     = Tpm2CopyAuthSessionCommand (AuthSession, Buffer);
   Buffer             += SessionInfoSize;
   Cmd.AuthSessionSize = SwapBytes32 (SessionInfoSize);
 

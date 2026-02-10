@@ -21,7 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 UINT16
 EFIAPI
-GetHashSizeFromAlgo (
+Tpm2GetHashSizeFromAlgo (
   IN TPMI_ALG_HASH  HashAlgo
   );
 
@@ -34,7 +34,7 @@ GetHashSizeFromAlgo (
 **/
 UINT32
 EFIAPI
-GetHashMaskFromAlgo (
+Tpm2GetHashMaskFromAlgo (
   IN TPMI_ALG_HASH  HashAlgo
   );
 
@@ -48,7 +48,7 @@ GetHashMaskFromAlgo (
 **/
 UINT32
 EFIAPI
-CopyAuthSessionCommand (
+Tpm2CopyAuthSessionCommand (
   IN      TPMS_AUTH_COMMAND  *AuthSessionIn  OPTIONAL,
   OUT     UINT8              *AuthSessionOut
   );
@@ -63,7 +63,7 @@ CopyAuthSessionCommand (
 **/
 UINT32
 EFIAPI
-CopyAuthSessionResponse (
+Tpm2CopyAuthSessionResponse (
   IN      UINT8               *AuthSessionIn,
   OUT     TPMS_AUTH_RESPONSE  *AuthSessionOut OPTIONAL
   );
@@ -79,7 +79,7 @@ CopyAuthSessionResponse (
 **/
 BOOLEAN
 EFIAPI
-IsHashAlgSupportedInHashAlgorithmMask (
+Tpm2IsHashAlgSupportedInHashAlgorithmMask (
   IN TPMI_ALG_HASH  HashAlg,
   IN UINT32         HashAlgorithmMask
   );
@@ -95,7 +95,7 @@ IsHashAlgSupportedInHashAlgorithmMask (
 **/
 VOID *
 EFIAPI
-CopyDigestListToBuffer (
+Tpm2CopyDigestListToBuffer (
   IN OUT VOID            *Buffer,
   IN TPML_DIGEST_VALUES  *DigestList,
   IN UINT32              HashAlgorithmMask
@@ -117,7 +117,7 @@ CopyDigestListToBuffer (
 **/
 EFI_STATUS
 EFIAPI
-CopyBufferToDigestList (
+Tpm2CopyBufferToDigestList (
   IN     VOID                *Buffer,
   IN     UINT32              BufferSize,
   IN OUT TPML_DIGEST_VALUES  *DigestList
@@ -132,7 +132,7 @@ CopyBufferToDigestList (
 **/
 UINT32
 EFIAPI
-GetDigestListSize (
+Tpm2GetDigestListSize (
   IN TPML_DIGEST_VALUES  *DigestList
   );
 
@@ -145,7 +145,7 @@ GetDigestListSize (
 **/
 UINT32
 EFIAPI
-GetDigestListSizeFromHashAlgorithmMask (
+Tpm2GetDigestListSizeFromHashAlgorithmMask (
   IN UINT32  HashAlgorithmMask
   );
 
@@ -162,7 +162,7 @@ GetDigestListSizeFromHashAlgorithmMask (
 **/
 EFI_STATUS
 EFIAPI
-GetDigestFromDigestList (
+Tpm2GetDigestFromDigestList (
   IN TPMI_ALG_HASH       HashAlg,
   IN TPML_DIGEST_VALUES  *DigestList,
   OUT VOID               *Digest

@@ -208,7 +208,7 @@ Tpm2SequenceUpdate (
   BufferPtr = (UINT8 *)&Cmd.AuthSessionSeq;
 
   // sessionInfoSize
-  SessionInfoSize       = CopyAuthSessionCommand (NULL, BufferPtr);
+  SessionInfoSize       = Tpm2CopyAuthSessionCommand (NULL, BufferPtr);
   BufferPtr            += SessionInfoSize;
   Cmd.AuthorizationSize = SwapBytes32 (SessionInfoSize);
 
@@ -313,11 +313,11 @@ Tpm2EventSequenceComplete (
   BufferPtr = (UINT8 *)&Cmd.AuthSessionPcr;
 
   // sessionInfoSize
-  SessionInfoSize = CopyAuthSessionCommand (NULL, BufferPtr);
+  SessionInfoSize = Tpm2CopyAuthSessionCommand (NULL, BufferPtr);
   BufferPtr      += SessionInfoSize;
 
   // sessionInfoSize
-  SessionInfoSize2      = CopyAuthSessionCommand (NULL, BufferPtr);
+  SessionInfoSize2      = Tpm2CopyAuthSessionCommand (NULL, BufferPtr);
   BufferPtr            += SessionInfoSize2;
   Cmd.AuthorizationSize = SwapBytes32 (SessionInfoSize + SessionInfoSize2);
 
@@ -381,7 +381,7 @@ Tpm2EventSequenceComplete (
     Results->digests[Index].hashAlg = SwapBytes16 (ReadUnaligned16 ((UINT16 *)BufferPtr));
     BufferPtr                      += sizeof (UINT16);
 
-    DigestSize = GetHashSizeFromAlgo (Results->digests[Index].hashAlg);
+    DigestSize = Tpm2GetHashSizeFromAlgo (Results->digests[Index].hashAlg);
     if (DigestSize == 0) {
       DEBUG ((DEBUG_ERROR, "EventSequenceComplete: Unknown hash algorithm %d\r\n", Results->digests[Index].hashAlg));
       return EFI_DEVICE_ERROR;
@@ -440,7 +440,7 @@ Tpm2SequenceComplete (
   BufferPtr = (UINT8 *)&Cmd.AuthSessionSeq;
 
   // sessionInfoSize
-  SessionInfoSize       = CopyAuthSessionCommand (NULL, BufferPtr);
+  SessionInfoSize       = Tpm2CopyAuthSessionCommand (NULL, BufferPtr);
   BufferPtr            += SessionInfoSize;
   Cmd.AuthorizationSize = SwapBytes32 (SessionInfoSize);
 

@@ -329,7 +329,7 @@ Tpm2NvDefineSpace (
   Buffer = (UINT8 *)&SendBuffer.AuthSession;
 
   // sessionInfoSize
-  SessionInfoSize            = CopyAuthSessionCommand (AuthSession, Buffer);
+  SessionInfoSize            = Tpm2CopyAuthSessionCommand (AuthSession, Buffer);
   Buffer                    += SessionInfoSize;
   SendBuffer.AuthSessionSize = SwapBytes32 (SessionInfoSize);
 
@@ -466,7 +466,7 @@ Tpm2NvUndefineSpace (
   Buffer = (UINT8 *)&SendBuffer.AuthSession;
 
   // sessionInfoSize
-  SessionInfoSize            = CopyAuthSessionCommand (AuthSession, Buffer);
+  SessionInfoSize            = Tpm2CopyAuthSessionCommand (AuthSession, Buffer);
   Buffer                    += SessionInfoSize;
   SendBuffer.AuthSessionSize = SwapBytes32 (SessionInfoSize);
 
@@ -577,7 +577,7 @@ Tpm2NvRead (
   Buffer = (UINT8 *)&SendBuffer.AuthSession;
 
   // sessionInfoSize
-  SessionInfoSize            = CopyAuthSessionCommand (AuthSession, Buffer);
+  SessionInfoSize            = Tpm2CopyAuthSessionCommand (AuthSession, Buffer);
   Buffer                    += SessionInfoSize;
   SendBuffer.AuthSessionSize = SwapBytes32 (SessionInfoSize);
 
@@ -724,7 +724,7 @@ Tpm2NvWrite (
   Buffer = (UINT8 *)&SendBuffer.AuthSession;
 
   // sessionInfoSize
-  SessionInfoSize            = CopyAuthSessionCommand (AuthSession, Buffer);
+  SessionInfoSize            = Tpm2CopyAuthSessionCommand (AuthSession, Buffer);
   Buffer                    += SessionInfoSize;
   SendBuffer.AuthSessionSize = SwapBytes32 (SessionInfoSize);
 
@@ -853,7 +853,7 @@ Tpm2NvReadLock (
   Buffer = (UINT8 *)&SendBuffer.AuthSession;
 
   // sessionInfoSize
-  SessionInfoSize            = CopyAuthSessionCommand (AuthSession, Buffer);
+  SessionInfoSize            = Tpm2CopyAuthSessionCommand (AuthSession, Buffer);
   Buffer                    += SessionInfoSize;
   SendBuffer.AuthSessionSize = SwapBytes32 (SessionInfoSize);
 
@@ -941,7 +941,7 @@ Tpm2NvWriteLock (
   Buffer = (UINT8 *)&SendBuffer.AuthSession;
 
   // sessionInfoSize
-  SessionInfoSize            = CopyAuthSessionCommand (AuthSession, Buffer);
+  SessionInfoSize            = Tpm2CopyAuthSessionCommand (AuthSession, Buffer);
   Buffer                    += SessionInfoSize;
   SendBuffer.AuthSessionSize = SwapBytes32 (SessionInfoSize);
 
@@ -1026,7 +1026,7 @@ Tpm2NvGlobalWriteLock (
   Buffer = (UINT8 *)&SendBuffer.AuthSession;
 
   // sessionInfoSize
-  SessionInfoSize            = CopyAuthSessionCommand (AuthSession, Buffer);
+  SessionInfoSize            = Tpm2CopyAuthSessionCommand (AuthSession, Buffer);
   Buffer                    += SessionInfoSize;
   SendBuffer.AuthSessionSize = SwapBytes32 (SessionInfoSize);
 
@@ -1116,7 +1116,7 @@ Tpm2NvExtend (
   Buffer = (UINT8 *)&SendBuffer.AuthSession;
 
   // sessionInfoSize
-  SessionInfoSize            = CopyAuthSessionCommand (AuthSession, Buffer);
+  SessionInfoSize            = Tpm2CopyAuthSessionCommand (AuthSession, Buffer);
   Buffer                    += SessionInfoSize;
   SendBuffer.AuthSessionSize = SwapBytes32 (SessionInfoSize);
 

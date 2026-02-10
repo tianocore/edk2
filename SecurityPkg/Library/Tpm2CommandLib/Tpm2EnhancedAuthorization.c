@@ -122,7 +122,7 @@ Tpm2PolicySecret (
   Buffer = (UINT8 *)&SendBuffer.AuthSession;
 
   // sessionInfoSize
-  SessionInfoSize            = CopyAuthSessionCommand (AuthSession, Buffer);
+  SessionInfoSize            = Tpm2CopyAuthSessionCommand (AuthSession, Buffer);
   Buffer                    += SessionInfoSize;
   SendBuffer.AuthSessionSize = SwapBytes32 (SessionInfoSize);
 

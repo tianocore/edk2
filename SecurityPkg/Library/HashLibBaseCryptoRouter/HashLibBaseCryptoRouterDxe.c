@@ -235,7 +235,7 @@ HashCompleteAndExtend (
     ASSERT_EFI_ERROR (Status);
     ActivePcrBanks = ActivePcrBanks & mSupportedHashMaskCurrent;
     ZeroMem (&TcgPcrEvent2Digest, sizeof (TcgPcrEvent2Digest));
-    BufferPtr         = CopyDigestListToBuffer (&TcgPcrEvent2Digest, DigestList, ActivePcrBanks);
+    BufferPtr         = Tpm2CopyDigestListToBuffer (&TcgPcrEvent2Digest, DigestList, ActivePcrBanks);
     DigestListBinSize = (UINT32)((UINT8 *)BufferPtr - (UINT8 *)&TcgPcrEvent2Digest);
 
     //

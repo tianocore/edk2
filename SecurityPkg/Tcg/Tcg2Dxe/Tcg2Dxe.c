@@ -208,35 +208,35 @@ InitNoActionEvent (
   if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA1) != 0) {
     HashAlgId = TPM_ALG_SHA1;
     CopyMem (DigestBuffer, &HashAlgId, sizeof (TPMI_ALG_HASH));
-    DigestBuffer += sizeof (TPMI_ALG_HASH) + GetHashSizeFromAlgo (HashAlgId);
+    DigestBuffer += sizeof (TPMI_ALG_HASH) + Tpm2GetHashSizeFromAlgo (HashAlgId);
     DigestListCount++;
   }
 
   if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA256) != 0) {
     HashAlgId = TPM_ALG_SHA256;
     CopyMem (DigestBuffer, &HashAlgId, sizeof (TPMI_ALG_HASH));
-    DigestBuffer += sizeof (TPMI_ALG_HASH) + GetHashSizeFromAlgo (HashAlgId);
+    DigestBuffer += sizeof (TPMI_ALG_HASH) + Tpm2GetHashSizeFromAlgo (HashAlgId);
     DigestListCount++;
   }
 
   if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA384) != 0) {
     HashAlgId = TPM_ALG_SHA384;
     CopyMem (DigestBuffer, &HashAlgId, sizeof (TPMI_ALG_HASH));
-    DigestBuffer += sizeof (TPMI_ALG_HASH) + GetHashSizeFromAlgo (HashAlgId);
+    DigestBuffer += sizeof (TPMI_ALG_HASH) + Tpm2GetHashSizeFromAlgo (HashAlgId);
     DigestListCount++;
   }
 
   if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA512) != 0) {
     HashAlgId = TPM_ALG_SHA512;
     CopyMem (DigestBuffer, &HashAlgId, sizeof (TPMI_ALG_HASH));
-    DigestBuffer += sizeof (TPMI_ALG_HASH) + GetHashSizeFromAlgo (HashAlgId);
+    DigestBuffer += sizeof (TPMI_ALG_HASH) + Tpm2GetHashSizeFromAlgo (HashAlgId);
     DigestListCount++;
   }
 
   if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SM3_256) != 0) {
     HashAlgId = TPM_ALG_SM3_256;
     CopyMem (DigestBuffer, &HashAlgId, sizeof (TPMI_ALG_HASH));
-    DigestBuffer += sizeof (TPMI_ALG_HASH) + GetHashSizeFromAlgo (HashAlgId);
+    DigestBuffer += sizeof (TPMI_ALG_HASH) + Tpm2GetHashSizeFromAlgo (HashAlgId);
     DigestListCount++;
   }
 
@@ -555,7 +555,7 @@ DumpEvent2 (
   for (DigestIndex = 0; DigestIndex < DigestCount; DigestIndex++) {
     DEBUG ((DEBUG_SECURITY, "      HashAlgo : 0x%04x\n", HashAlgo));
     DEBUG ((DEBUG_SECURITY, "      Digest(%d): ", DigestIndex));
-    DigestSize = GetHashSizeFromAlgo (HashAlgo);
+    DigestSize = Tpm2GetHashSizeFromAlgo (HashAlgo);
     for (Index = 0; Index < DigestSize; Index++) {
       DEBUG ((DEBUG_SECURITY, "%02x ", DigestBuffer[Index]));
     }
@@ -601,7 +601,7 @@ GetPcrEvent2Size (
   HashAlgo     = TcgPcrEvent2->Digest.digests[0].hashAlg;
   DigestBuffer = (UINT8 *)&TcgPcrEvent2->Digest.digests[0].digest;
   for (DigestIndex = 0; DigestIndex < DigestCount; DigestIndex++) {
-    DigestSize = GetHashSizeFromAlgo (HashAlgo);
+    DigestSize = Tpm2GetHashSizeFromAlgo (HashAlgo);
     //
     // Prepare next
     //
@@ -1059,7 +1059,7 @@ GetDigestListBinSize (
     TotalSize    += sizeof (HashAlg);
     DigestListBin = (UINT8 *)DigestListBin + sizeof (HashAlg);
 
-    DigestSize    = GetHashSizeFromAlgo (HashAlg);
+    DigestSize    = Tpm2GetHashSizeFromAlgo (HashAlg);
     TotalSize    += DigestSize;
     DigestListBin = (UINT8 *)DigestListBin + DigestSize;
   }
@@ -1102,15 +1102,15 @@ CopyDigestListBinToBuffer (
   for (Index = 0; Index < Count; Index++) {
     HashAlg       = ReadUnaligned16 (DigestListBin);
     DigestListBin = (UINT8 *)DigestListBin + sizeof (HashAlg);
-    DigestSize    = GetHashSizeFromAlgo (HashAlg);
+    DigestSize    = Tpm2GetHashSizeFromAlgo (HashAlg);
 
-    if (IsHashAlgSupportedInHashAlgorithmMask (HashAlg, HashAlgorithmMask)) {
+    if (Tpm2IsHashAlgSupportedInHashAlgorithmMask (HashAlg, HashAlgorithmMask)) {
       CopyMem (Buffer, &HashAlg, sizeof (HashAlg));
       Buffer = (UINT8 *)Buffer + sizeof (HashAlg);
       CopyMem (Buffer, DigestListBin, DigestSize);
       Buffer = (UINT8 *)Buffer + DigestSize;
       DigestListCount++;
-      (*HashAlgorithmMaskCopied) |= GetHashMaskFromAlgo (HashAlg);
+      (*HashAlgorithmMaskCopied) |= Tpm2GetHashMaskFromAlgo (HashAlg);
     } else {
       DEBUG ((DEBUG_ERROR, "WARNING: CopyDigestListBinToBuffer Event log has HashAlg unsupported by PCR bank (0x%x)\n", HashAlg));
     }
@@ -1153,7 +1153,7 @@ TcgDxeLogHashEvent (
     if ((mTcgDxeData.BsCap.SupportedEventLogs & mTcg2EventInfo[Index].LogFormat) != 0) {
       switch (mTcg2EventInfo[Index].LogFormat) {
         case EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2:
-          Status = GetDigestFromDigestList (TPM_ALG_SHA1, DigestList, &NewEventHdr->Digest);
+          Status = Tpm2GetDigestFromDigestList (TPM_ALG_SHA1, DigestList, &NewEventHdr->Digest);
           if (!EFI_ERROR (Status)) {
             //
             // Enter critical region
@@ -1182,7 +1182,7 @@ TcgDxeLogHashEvent (
           TcgPcrEvent2.PCRIndex  = NewEventHdr->PCRIndex;
           TcgPcrEvent2.EventType = NewEventHdr->EventType;
           DigestBuffer           = (UINT8 *)&TcgPcrEvent2.Digest;
-          EventSizePtr           = CopyDigestListToBuffer (DigestBuffer, DigestList, mTcgDxeData.BsCap.ActivePcrBanks);
+          EventSizePtr           = Tpm2CopyDigestListToBuffer (DigestBuffer, DigestList, mTcgDxeData.BsCap.ActivePcrBanks);
           CopyMem (EventSizePtr, &NewEventHdr->EventSize, sizeof (NewEventHdr->EventSize));
 
           //
