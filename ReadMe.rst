@@ -10,7 +10,7 @@ environment for the UEFI and PI specifications from www.uefi.org.
 
 It is recommended to install this Python version to run the full set of scripts that enable CI in the project.
 
-Other Python requirements for build can be found in the `EDK II Build Instructions <https://github.com/tianocore/tianocore.github.io/wiki/Build-Instructions/>`__.
+Other Python requirements for build can be found in the `EDK II Build Instructions <https://www.tianocore.org/tianocore-wiki.github.io/build-tooling/build-workflows/edk_ii_tools_list.html>`__.
 
 Core CI Build Status
 --------------------
@@ -106,15 +106,15 @@ Resources
 
 -  `TianoCore <http://www.tianocore.org>`__
 -  `EDK
-   II <https://github.com/tianocore/tianocore.github.io/wiki/EDK-II>`__
+   II <https://www.tianocore.org/tianocore-wiki.github.io>`__
 -  `Getting Started with EDK
-   II <https://github.com/tianocore/tianocore.github.io/wiki/Getting-Started-with-EDK-II>`__
+   II <https://www.tianocore.org/tianocore-wiki.github.io/development/tutorials-howto/getting_started_with_edk_ii.html>`__
 -  `Mailing
-   Lists <https://github.com/tianocore/tianocore.github.io/wiki/Mailing-Lists>`__
+   Lists <https://www.tianocore.org/tianocore-wiki.github.io/community/communications/mailing_lists.html>`__
 -  `How To
-   Contribute <https://github.com/tianocore/tianocore.github.io/wiki/How-To-Contribute>`__
+   Contribute <https://www.tianocore.org/tianocore-wiki.github.io/development/contribution-guides/how_to_contribute.html>`__
 -  `Release
-   Planning <https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Release-Planning>`__
+   Planning <https://www.tianocore.org/tianocore-wiki.github.io/releases-history/planning-roadmaps/edk_ii_release_planning.html>`__
 
 Code Contributions
 ------------------

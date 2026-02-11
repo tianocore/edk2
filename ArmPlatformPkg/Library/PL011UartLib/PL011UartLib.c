@@ -22,10 +22,22 @@
 #define FRACTION_PART_MASK          ((1 << FRACTION_PART_SIZE_IN_BITS) - 1)
 
 //
-// EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE is the only
-// control bit that is not supported.
+// Per UEFI spec, only these control bits are allowed to be set.
 //
-STATIC CONST UINT32  mInvalidControlBits = EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE;
+STATIC CONST UINT32  mAllowedControlBits =
+  EFI_SERIAL_CLEAR_TO_SEND |
+  EFI_SERIAL_DATA_SET_READY |
+  EFI_SERIAL_RING_INDICATE |
+  EFI_SERIAL_CARRIER_DETECT |
+  EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE |
+  EFI_SERIAL_OUTPUT_BUFFER_EMPTY |
+  EFI_SERIAL_INPUT_BUFFER_EMPTY;
+
+//
+// platform-specific bits that are not supported by this device.
+//
+STATIC CONST UINT32  mPlatformInvalidControlBits =
+  EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE;
 
 /**
 
@@ -274,7 +286,11 @@ PL011UartSetControl (
 {
   UINT32  Bits;
 
-  if ((Control & mInvalidControlBits) != 0) {
+  if ((Control & ~mAllowedControlBits) != 0) {
+    return RETURN_UNSUPPORTED;
+  }
+
+  if ((Control & mPlatformInvalidControlBits) != 0) {
     return RETURN_UNSUPPORTED;
   }
 
