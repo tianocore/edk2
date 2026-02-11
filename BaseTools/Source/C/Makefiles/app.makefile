@@ -8,10 +8,9 @@
 MAKEROOT ?= ../..
 BUILDROOT ?= $(MAKEROOT)
 OBJDIR ?= .
+OBJECTS := $(addprefix $(OBJDIR)/,$(OBJECTS))
 
 include $(MAKEROOT)/Makefiles/header.makefile
-
-OBJECTS := $(addprefix $(OBJDIR)$(SEP),$(OBJECTS))
 
 APPLICATION = $(BUILDROOT)/bin/$(APPNAME)
 
