@@ -17,6 +17,7 @@
 #include <Protocol/DevicePath.h>
 #include <Protocol/IoMmu.h>
 #include <Protocol/PciIo.h>
+#include <Protocol/RiscVIoMmuPlatformPolicy.h>
 #include <Register/RiscV64/RiscVImpl.h>
 #include "RiscVIoMmu.h"
 
@@ -34,6 +35,8 @@ typedef struct {
   LIST_ENTRY             HandleList;
 #endif
 } MAP_INFO;
+
+EDKII_RISC_V_IO_MMU_PLATFORM_POLICY_PROTOCOL *mEdkiiRiscVIoMmuPlatformPolicyProtocol = NULL;
 
 EDKII_IOMMU_PROTOCOL  mRiscVIoMmuProtocol = {
   EDKII_IOMMU_PROTOCOL_REVISION,
@@ -149,6 +152,7 @@ IoMmuSetAttribute (
   MAP_INFO                  *MapInfo;
   EFI_PCI_IO_PROTOCOL       *PciIo;
   EFI_STATUS                Status;
+  EFI_PHYSICAL_ADDRESS      IoMmuBaseAddress;
   UINTN                     Seg;
   UINTN                     Bus;
   UINTN                     Dev;
@@ -192,11 +196,33 @@ IoMmuSetAttribute (
   }
 
   //
-  // FIXME: Implement this for MMIO devices against FDT/ACPI.
-  // - So, the remaining is PCI-specific.
+  // Use the platform policy protocol, if present.
   //
+  PciIo = NULL;
+  if (mEdkiiRiscVIoMmuPlatformPolicyProtocol == NULL) {
+    Status = gBS->LocateProtocol (&gEdkiiRiscVIoMmuPlatformPolicyProtocolGuid, NULL, (VOID **)&mEdkiiRiscVIoMmuPlatformPolicyProtocol);
+  }
+
+  if (mEdkiiRiscVIoMmuPlatformPolicyProtocol != NULL) {
+    Status = mEdkiiRiscVIoMmuPlatformPolicyProtocol->GetDeviceId (mEdkiiRiscVIoMmuPlatformPolicyProtocol, DeviceHandle, &MappedIoMmuDeviceId.Uint32, &IoMmuBaseAddress);
+    if (!EFI_ERROR (Status)) {
+      //
+      // If the platform specifies an invalid IOMMU, fall through.
+      //
+      for (Link = GetFirstNode (&mRiscVIoMmuContexts)
+         ; !IsNull (&mRiscVIoMmuContexts, Link)
+         ; Link = GetNextNode (&mRiscVIoMmuContexts, Link)
+         ) {
+        IoMmuContext = RISCV_IOMMU_CONTEXT_FROM_LINK (Link);
+        if (IoMmuContext->BaseAddress == IoMmuBaseAddress) {
+          goto Work;
+        }
+      }
+    }
+  }
+
   if ((DevicePath->Type != HARDWARE_DEVICE_PATH) && (DevicePath->SubType != HW_PCI_DP)) {
-    DEBUG ((DEBUG_ERROR, "%a: At this time, only PCI devices are supported by the IOMMU driver!\n", __func__));
+    DEBUG ((DEBUG_ERROR, "%a: Without platform assistance, the IOMMU driver only supports PCI devices!\n", __func__));
     Status = EFI_UNSUPPORTED;
     goto Exit;
   }

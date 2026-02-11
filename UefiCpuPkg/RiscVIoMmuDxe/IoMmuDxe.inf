@@ -58,6 +58,7 @@
 
 [Protocols]
   gEdkiiIoMmuProtocolGuid                     ## PRODUCES
+  gEdkiiRiscVIoMmuPlatformPolicyProtocolGuid  ## SOMETIMES_CONSUMES
   gEfiCpuArchProtocolGuid                     ## CONSUMES
   gEfiPciEnumerationCompleteProtocolGuid      ## CONSUMES
   gEfiPciIoProtocolGuid                       ## CONSUMES
