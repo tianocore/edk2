@@ -1,0 +1,38 @@
+### @file
+# Component description file for IPMI Serial Over LAN (SOL) driver.
+#
+# Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION              = 0x00010005
+  BASE_NAME                = SolStatus
+  FILE_GUID                = 1AF7E6C4-7678-4A6D-9240-E8BA17C3B772
+  MODULE_TYPE              = DXE_DRIVER
+  PI_SPECIFICATION_VERSION = 0x0001000A
+  VERSION_STRING           = 1.0
+  ENTRY_POINT              = SolStatusEntryPoint
+
+[Sources]
+  SolStatus.c
+
+[Packages]
+  ManageabilityPkg/ManageabilityPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[Pcd]
+  gManageabilityPkgTokenSpaceGuid.PcdMaxSolChannels
+
+[LibraryClasses]
+  DebugLib
+  IpmiCommandLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Depex]
+  TRUE

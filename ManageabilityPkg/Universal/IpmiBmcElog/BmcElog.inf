@@ -1,0 +1,34 @@
+### @file
+# Component description file for BMC ELOG.
+#
+# Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION              = 0x00010005
+  BASE_NAME                = BmcElog
+  FILE_GUID                = A0FF2235-B652-45E3-B3D2-B20F3E714E6F
+  MODULE_TYPE              = DXE_DRIVER
+  PI_SPECIFICATION_VERSION = 0x0001000A
+  VERSION_STRING           = 1.0
+  ENTRY_POINT              = InitializeBmcElogLayer
+
+[Sources]
+  BmcElog.c
+
+[Packages]
+  ManageabilityPkg/ManageabilityPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  IpmiCommandLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Depex]
+  TRUE

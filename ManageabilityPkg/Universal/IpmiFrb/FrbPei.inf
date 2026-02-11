@@ -1,0 +1,38 @@
+### @file
+# Component description file for IPMI FRB PEIM.
+#
+# Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[defines]
+  INF_VERSION          = 0x00010005
+  BASE_NAME            = FrbPei
+  FILE_GUID            = 7CAAE1A7-0B37-4EEA-A432-2F203DA6F288
+  MODULE_TYPE          = PEIM
+  VERSION_STRING       = 1.0
+  ENTRY_POINT          = InitializeFrbPei
+
+[Sources]
+  FrbPei.c
+
+[Packages]
+  ManageabilityPkg/ManageabilityPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  IpmiCommandLib
+  PcdLib
+  PeimEntryPoint
+
+[Pcd]
+  gManageabilityPkgTokenSpaceGuid.PcdFRB2EnabledFlag
+  gManageabilityPkgTokenSpaceGuid.PcdFRBTimeoutValue
+
+[Depex]
+  TRUE

@@ -1,0 +1,16 @@
+## @file
+# Manageabilty Package pre-memory initialization firmware
+# volume description.
+#
+# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+!if gManageabilityPkgTokenSpaceGuid.PcdManageabilityPeiIpmiEnable == TRUE
+  INF  ManageabilityPkg/Universal/IpmiProtocol/Pei/IpmiPpiPei.inf
+!endif
+
+!if gManageabilityPkgTokenSpaceGuid.PcdManageabilityPeiIpmiFrb == TRUE
+  INF ManageabilityPkg/Universal/IpmiFrb/FrbPei.inf
+!endif

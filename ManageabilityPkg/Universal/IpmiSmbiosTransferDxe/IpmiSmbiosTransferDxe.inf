@@ -1,0 +1,55 @@
+## @file
+#  A simple implementation to transfer SMBIOS tables to a BMC
+
+#  SPDX-FileCopyrightText: copyright (c) 2022-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = IpmiSmbiosTransfer
+  FILE_GUID                      = 1e2f6b56-4675-446b-9c0a-1eb66e50c840
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = IpmiSmbiosTransferEntry
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC AARCH64
+#
+
+[Sources]
+  IpmiSmbiosTransferDxe.c
+
+[LibraryClasses]
+  BaseCryptLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  ReportStatusCodeLib
+  TimerLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+  UefiDriverEntryPoint
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  CryptoPkg/CryptoPkg.dec
+  ManageabilityPkg/ManageabilityPkg.dec
+
+[Pcd]
+  gManageabilityPkgTokenSpaceGuid.PcdBmcSmbiosBlobTransferId
+  gManageabilityPkgTokenSpaceGuid.PcdSendSmbiosOnChanged
+
+[Guids]
+  gEfiSmbios3TableGuid                    ## CONSUMES ## SystemTable
+  gEfiEventReadyToBootGuid                ## CONSUMES ## Event
+  gManageabilityVariableGuid              ## CONSUMES ## Variable
+
+[Protocols]
+  gEdkiiIpmiBlobTransferProtocolGuid    ## CONSUMES
+
+[Depex]
+  gEdkiiIpmiBlobTransferProtocolGuid

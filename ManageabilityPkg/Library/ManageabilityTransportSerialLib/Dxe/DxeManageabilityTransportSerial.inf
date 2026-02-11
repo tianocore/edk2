@@ -1,0 +1,51 @@
+## @file
+# Serial instance of Manageability Transport Library
+#
+# Copyright (c) 2024, ARM Limited. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = DxeManageabilityTransportSerial
+  MODULE_UNI_FILE                = ManageabilityTransportSerial.uni
+  FILE_GUID                      = 7F1C4318-BBA2-4886-8E85-E3AD1943DEC1
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ManageabilityTransportLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  ManageabilityTransportSerial.c
+  ../Common/SerialCommon.c
+  ../Common/ManageabilityTransportSerial.h
+
+[Packages]
+  ManageabilityPkg/ManageabilityPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  IoLib
+  TimerLib
+  MemoryAllocationLib
+  SerialPortLib
+
+[Guids]
+  gManageabilityTransportSerialGuid
+  gManageabilityProtocolMctpGuid
+  gManageabilityProtocolIpmiGuid
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequesterAddress
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialResponderAddress
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequesterLun
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialResponderLun
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequestRetryCount
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequestRetryInterval
+
