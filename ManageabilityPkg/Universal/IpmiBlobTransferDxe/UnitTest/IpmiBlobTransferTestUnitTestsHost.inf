@@ -1,0 +1,40 @@
+## @file
+# Unit tests of the Ipmi blob transfer driver that are run from a host environment.
+#
+# Copyright (c) 2020-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = IpmiBlobTransferDxeUnitTestsHost
+  FILE_GUID                      = 1f5d4095-ea52-432c-b078-86097fef6004
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+
+#
+# The following information is for reference only
+# and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  IpmiBlobTransferTestUnitTests.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ManageabilityPkg/ManageabilityPkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  UnitTestLib
+  IpmiLib
+
+[Protocols]
+  gEdkiiIpmiBlobTransferProtocolGuid
