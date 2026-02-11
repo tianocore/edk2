@@ -184,7 +184,6 @@ CPPFLAGS=
 #CFLAGS= -O -I. -I$(SET) -I$(PCCTS_H) -DUSER_ZZSYN -woff 3262
 OBJ=antlr.o scan.o err.o bits.o build.o fset2.o fset.o gen.o  \
         globals.o hash.o lex.o main.o misc.o set.o pred.o egman.o mrhoist.o fcache.o
-OBJ := $(addprefix $(OBJDIR)/,$(OBJ))
 
 $(BIN_DIR)/antlr : $(OBJ) $(SRC)
 		$(CC) $(CFLAGS) -o $(BIN_DIR)/antlr $(OBJ)
@@ -202,17 +201,17 @@ SRC=antlr.c scan.c err.c bits.c build.c fset2.c fset.c gen.c globals.c \
 #antlr.c stdpccts.h parser.dlg tokens.h err.c : antlr.g
 #	$(ANTLR) -gh antlr.g
 
-$(OBJDIR)/antlr.o : antlr.c mode.h tokens.h
+antlr.o : antlr.c mode.h tokens.h
 
-$(OBJDIR)/scan.o : scan.c mode.h tokens.h
+scan.o : scan.c mode.h tokens.h
 
 #scan.c mode.h: parser.dlg
 #	$(DLG) -C2 parser.dlg scan.c
 
-$(OBJDIR)/set.o : $(SET)/set.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+set.o : $(SET)/set.c
+	$(CC) $(CFLAGS) -c -o set.o $(SET)/set.c
 
-$(OBJDIR)/%.o : %.c
+%.o : %.c
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 #
@@ -221,7 +220,7 @@ $(OBJDIR)/%.o : %.c
 
 #clean up all the intermediate files
 clean:
-	$(RM) $(BIN_DIR)$(SEP)antlr $(OBJDIR)$(SEP)*.$(OBJ_EXT) core
+	$(RM) $(BIN_DIR)$(SEP)antlr *.$(OBJ_EXT) core
 
 #remove everything in clean plus the PCCTS files generated
 scrub:

@@ -13,12 +13,6 @@ else
   MAKEROOT := .
 endif
 
-ifneq ($(WORKSPACE),)
-  BUILDROOT=$(WORKSPACE)/BaseTools/Build/Source/C
-else
-  BUILDROOT=$(abspath $(MAKEROOT))
-endif
-
 include Makefiles/header.makefile
 
 export PYTHON_COMMAND
@@ -44,29 +38,28 @@ APPLICATIONS = \
 
 SUBDIRS := $(LIBRARIES) $(APPLICATIONS)
 
-$(LIBRARIES): $(BUILDROOT)/libs
-$(APPLICATIONS): $(LIBRARIES) $(BUILDROOT)/bin
+$(LIBRARIES): $(MAKEROOT)/libs
+$(APPLICATIONS): $(LIBRARIES) $(MAKEROOT)/bin
 
 .PHONY: outputdirs
 makerootdir:
-	-$(MD) $(BUILDROOT)
+	-$(MD) $(MAKEROOT)
 
 .PHONY: subdirs $(SUBDIRS)
 subdirs: $(SUBDIRS)
 $(SUBDIRS):
-	-$(MD) $(BUILDROOT)/$@
-	$(MAKE) OBJDIR=$(BUILDROOT)/$@ BUILDROOT=$(BUILDROOT) -C $@
+	$(MAKE) -C $@
 
 .PHONY: $(patsubst %,%-clean,$(sort $(SUBDIRS)))
 $(patsubst %,%-clean,$(sort $(SUBDIRS))):
-	-$(MAKE) OBJDIR=$(BUILDROOT)/$(@:-clean=) BUILDROOT=$(BUILDROOT) -C $(@:-clean=) clean
+	-$(MAKE) -C $(@:-clean=) clean
 
 clean:  $(patsubst %,%-clean,$(sort $(SUBDIRS)))
 
 clean: localClean
 
 localClean:
-	$(RM) $(BUILDROOT)/bin/*
-	-$(RD) $(BUILDROOT)/libs $(BUILDROOT)/bin
+	$(RM) $(MAKEROOT)/bin/*
+	-$(RD) $(MAKEROOT)/libs $(MAKEROOT)/bin
 
 include Makefiles/footer.makefile
