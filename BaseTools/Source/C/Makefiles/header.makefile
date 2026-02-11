@@ -206,16 +206,11 @@ LDFLAGS += $(EXTRA_LDFLAGS)
 
 all:
 
-$(BUILDROOT)/libs:
-	$(MD) $(BUILDROOT)/libs
+$(MAKEROOT)/libs:
+	$(MD) $(MAKEROOT)/libs
 
-$(BUILDROOT)/bin:
-	$(MD) $(BUILDROOT)/bin
+$(MAKEROOT)/bin:
+	$(MD) $(MAKEROOT)/bin
 ifeq (Windows, $(findstring Windows,$(OS)))
 	$(MD) $(BIN_PATH)
-endif
-
-ifdef OBJDIR
-$(OBJDIR):
-	$(MD) $(OBJDIR)
 endif
