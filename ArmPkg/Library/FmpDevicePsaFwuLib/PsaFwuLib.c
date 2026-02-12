@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -255,7 +255,7 @@ STATIC
 EFI_STATUS
 EFIAPI
 FwuStatusToEfiStatus (
-  IN UINT32  FwuStatus
+  IN INT32  FwuStatus
   )
 {
   switch (FwuStatus) {
@@ -308,7 +308,7 @@ FwuCommunicate (
 {
   EFI_STATUS           Status;
   PSA_MM_FWU_CMD_DATA  *RespMsg;
-  UINT32               FwuStatus;
+  INT32                FwuStatus;
   UINTN                RespDataSize;
 
   if (RespData != NULL) {
