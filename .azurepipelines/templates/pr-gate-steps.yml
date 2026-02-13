@@ -21,7 +21,7 @@ steps:
     echo "##vso[task.prependpath]${HOME}/.local/bin"
     echo "new PATH=${PATH}"
   displayName: Set PATH
-  condition: eq('${{ parameters.tool_chain_tag }}', 'GCC')
+  condition: in('${{ parameters.tool_chain_tag }}', 'GCC', 'CLANGDWARF', 'CLANGPDB')
 
 - checkout: self
   clean: true
@@ -45,6 +45,16 @@ steps:
 - bash: |
     echo "##vso[task.setvariable variable=pkgs_to_build]${{ parameters.build_pkgs }}"
     echo "##vso[task.setvariable variable=pkg_count]${{ 1 }}"
+
+# Strip test targets for CI toolchains other than GCC and VS2022, as these
+# cannot run them and would be duplicating work during CI if they could.
+# Note: Within PR gate CI, NOOPT is only used for building tests.
+- ${{ if in(parameters.tool_chain_tag, 'GCC', 'VS2022') }}:
+  - bash: |
+      echo "##vso[task.setvariable variable=targets_to_build]${{ parameters.build_targets }}"
+- ${{ else }}:
+  - bash: |
+      echo "##vso[task.setvariable variable=targets_to_build]$(sed 's/,NOOPT//; s/,NO-TARGET//' <<< '${{ parameters.build_targets }}')"
 
 # Fetch the target branch so that pr_eval can diff them.
 # Seems like azure pipelines/github changed checkout process in nov 2020.
@@ -70,14 +80,14 @@ steps:
   displayName: Setup ${{ parameters.build_pkgs }} ${{ parameters.build_archs}}
   inputs:
     script: |
-      stuart_setup -c .pytool/CISettings.py -p $(pkgs_to_build) -t ${{ parameters.build_targets}} -a ${{ parameters.build_archs}} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}}
+      stuart_setup -c .pytool/CISettings.py -p $(pkgs_to_build) -t $(targets_to_build) -a ${{ parameters.build_archs}} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}}
   condition: and(gt(variables.pkg_count, 0), succeeded())
 
 - task: CmdLine@2
   displayName: Update ${{ parameters.build_pkgs }} ${{ parameters.build_archs}}
   inputs:
     script: |
-      stuart_update -c .pytool/CISettings.py -p $(pkgs_to_build) -t ${{ parameters.build_targets}} -a ${{ parameters.build_archs}} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}}
+      stuart_update -c .pytool/CISettings.py -p $(pkgs_to_build) -t $(targets_to_build) -a ${{ parameters.build_archs}} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}}
   condition: and(gt(variables.pkg_count, 0), succeeded())
 
 # build basetools
@@ -85,13 +95,16 @@ steps:
 #   are all resolved.
 - template: basetools-build-steps.yml
   parameters:
-    tool_chain_tag: ${{ parameters.tool_chain_tag }}
+    ${{ if eq(parameters.tool_chain_tag, 'VS2022') }}:
+      tool_chain_tag: ${{ parameters.tool_chain_tag }}
+    ${{ else }}:
+      tool_chain_tag: GCC
 
 - task: CmdLine@2
   displayName: Build and Test ${{ parameters.build_pkgs }} ${{ parameters.build_archs}}
   inputs:
     script: |
-      stuart_ci_build -c .pytool/CISettings.py -p $(pkgs_to_build) -t ${{ parameters.build_targets}} -a ${{ parameters.build_archs}} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} ${{ parameters.build_extra_stuart_args }}
+      stuart_ci_build -c .pytool/CISettings.py -p $(pkgs_to_build) -t $(targets_to_build) -a ${{ parameters.build_archs}} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} ${{ parameters.build_extra_stuart_args }}
   condition: and(gt(variables.pkg_count, 0), succeeded())
 
 # Publish Test Results to Azure Pipelines/TFS
