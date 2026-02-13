@@ -13,6 +13,14 @@ the package maintainer should send the patch to update Maintainers.txt
 with new maintainer, and the new maintainer should follow up with
 an Acked-by or a Reviewed-by.
 
+Maintainers Wanted:
+
+  The following packages are currently in need of additional maintainers.
+
+  - NetworkPkg
+  - SecurityPkg
+  - ShellPkg
+
 Descriptions of section entries:
 
   L: Mailing list that is relevant to this area (default is edk2-devel)
@@ -74,11 +82,11 @@ M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
 
 Responsible Disclosure, Reporting Security Issues
 -------------------------------------------------
-W: https://github.com/tianocore/tianocore.github.io/wiki/Security
+W: https://www.tianocore.org/tianocore-wiki.github.io/reference/external-resources/security.html
 
 EDK II Releases:
 ----------------
-W: https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Release-Planning
+W: https://www.tianocore.org/tianocore-wiki.github.io/releases-history/planning-roadmaps/edk_ii_release_planning.html
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
 EDK II Architectures:
@@ -147,7 +155,7 @@ EDK II Packages:
 ----------------
 ArmPkg
 F: ArmPkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPkg
+W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/arm_pkg.html
 M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
@@ -155,14 +163,14 @@ R: Vishal Oliyil Kunnnil <vishalo@qti.qualcomm.com> [vishalo]
 
 ArmPlatformPkg
 F: ArmPlatformPkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPlatformPkg
+W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/arm_platform_pkg.html
 M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 
 ArmVirtPkg
 F: ArmVirtPkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/ArmVirtPkg
+W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/arm_virt_pkg.html
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 R: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
@@ -170,7 +178,7 @@ R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 
 BaseTools
 F: BaseTools/
-W: https://github.com/tianocore/tianocore.github.io/wiki/BaseTools
+W: https://www.tianocore.org/tianocore-wiki.github.io/build-tooling/build-workflows/base_tools.html
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 M: Guillermo Antonio Palomino Sosa <guillermo.a.palomino.sosa@intel.com> [gapalomi]
 R: Yuwei Chen <yuwei.chen@intel.com> [YuweiChen1110]
@@ -186,27 +194,26 @@ R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
 CryptoPkg
 F: CryptoPkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/CryptoPkg
+W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/crypto_pkg.html
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
 M: Yi Li <yi1.li@intel.com> [liyi77]
 M: Doug Flick <dougflick@microsoft.com> [flickdm]
 
 DynamicTablesPkg
 F: DynamicTablesPkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/DynamicTablesPkg
 M: Sami Mujawar <Sami.Mujawar@arm.com> [samimujawar]
 M: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
 
 EmbeddedPkg
 F: EmbeddedPkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/EmbeddedPkg
+W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/embedded_pkg.html
 M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Abner Chang <abner.chang@amd.com> [changab]
 
 EmulatorPkg
 F: EmulatorPkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/EmulatorPkg
+W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/platform-ports/emulator_pkg.html
 M: Oliver Smith-Denny <osde@microsoft.com> [os-d]
 M: Andrew Fish <afish@apple.com> [ajfish]
 M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
@@ -219,21 +226,21 @@ M: Nickle Wang <nicklew@nvidia.com> [nicklela]
 
 FatPkg
 F: FatPkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/Edk2-fat-driver
+W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/component-guides/edk2_fat_driver.html
 M: Oliver Smith-Denny <osde@microsoft.com> [os-d]
 T: svn - https://svn.code.sf.net/p/edk2-fatdriver2/code/trunk/EnhancedFat
 T: git - https://github.com/tianocore/edk2-FatPkg.git
 
 FmpDevicePkg
 F: FmpDevicePkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/FmpDevicePkg
+W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/fmp_device_pkg.html
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 M: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
 R: Wei6 Xu <wei6.xu@intel.com> [xuweiintel]
 
 IntelFsp2Pkg
 F: IntelFsp2Pkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFsp2Pkg
+W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/intel_fsp2_pkg.html
 M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
@@ -242,7 +249,7 @@ R: Ashraf Ali S <ashraf.ali.s@intel.com> [AshrafAliS]
 
 IntelFsp2WrapperPkg
 F: IntelFsp2WrapperPkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFsp2WrapperPkg
+W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/intel_fsp2_wrapper_pkg.html
 M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
@@ -251,7 +258,7 @@ R: Ashraf Ali S <ashraf.ali.s@intel.com> [AshrafAliS]
 
 MdeModulePkg
 F: MdeModulePkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/MdeModulePkg
+W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/mde_module_pkg.html
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
 MdeModulePkg: ACPI modules
@@ -414,7 +421,7 @@ R: Kun Qin <kun.qin@microsoft.com> [kuqin12]
 
 MdePkg
 F: MdePkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/MdePkg
+W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/mde_pkg.html
 M: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
@@ -466,7 +473,7 @@ R: Kun Qin <kun.qin@microsoft.com> [kuqin12]
 
 NetworkPkg
 F: NetworkPkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/NetworkPkg
+W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/network_pkg.html
 R: Saloni Kasbekar <saloni.kasbekar@intel.com> [SaloniKasbekar]
 R: Zachary Clark-williams <zachary.clark-williams@intel.com> [Zclarkwilliams]
 
@@ -586,7 +593,7 @@ R: Xianglai Li <lixianglai@loongson.cn> [lixianglai]
 
 PcAtChipsetPkg
 F: PcAtChipsetPkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/PcAtChipsetPkg
+W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/pc_at_chipset_pkg.html
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 
 PrmPkg
@@ -607,7 +614,7 @@ R: Igor Kulchytskyy <igork@ami.com> [igorkulchytskyy]
 
 SecurityPkg
 F: SecurityPkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/SecurityPkg
+W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/security_pkg.html
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
 
 SecurityPkg: Secure boot related modules
@@ -632,16 +639,16 @@ R: Kun Qin <kun.qin@microsoft.com> [kuqin12]
 
 ShellPkg
 F: ShellPkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
+W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/shell_pkg.html
 R: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
 
 SignedCapsulePkg
 F: SignedCapsulePkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/SignedCapsulePkg
+W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/signed_capsule_pkg.html
 
 SourceLevelDebugPkg
 F: SourceLevelDebugPkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/SourceLevelDebugPkg
+W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/source_level_debug_pkg.html
 
 StandaloneMmPkg
 F: StandaloneMmPkg/
@@ -656,7 +663,7 @@ R: Eduardo Cuevas Farfan <eduardo.cuevas.farfan@intel.com> [ecuevasf]
 
 UefiCpuPkg
 F: UefiCpuPkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
+W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/uefi_cpu_pkg.html
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 M: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
 R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]
@@ -674,7 +681,7 @@ R: Abner Chang <abner.chang@amd.com> [changab]
 
 UefiPayloadPkg
 F: UefiPayloadPkg/
-W: https://github.com/tianocore/tianocore.github.io/wiki/UefiPayloadPkg
+W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/uefi_payload_pkg.html
 M: Guo Dong <guo.dong@intel.com> [gdong1]
 M: Sean Rhodes <sean@starlabs.systems> [Sean-StarLabs]
 M: James Lu <james.lu@intel.com> [jameslu8]
