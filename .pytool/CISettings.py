@@ -74,6 +74,7 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
                 "IntelFsp2Pkg",
                 "IntelFsp2WrapperPkg",
                 "MdePkg",
+                "ManageabilityPkg",
                 "MdeModulePkg",
                 "NetworkPkg",
                 "PcAtChipsetPkg",
