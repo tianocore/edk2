@@ -60,6 +60,7 @@ body:
         - FmpDevicePkg
         - IntelFsp2Pkg
         - IntelFsp2WrapperPkg
+        - ManageabilityPkg
         - MdeModulePkg
         - MdePkg
         - NetworkPkg
