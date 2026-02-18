@@ -175,7 +175,7 @@ RemoveRejectedPciDevices (
       //
       // Skip rejection for all PPBs, while detect rejection for others
       //
-      if (IsPciDeviceRejected (Temp)) {
+      if (Temp->Rejected) {
         //
         // For P2C, remove all devices on it
         //

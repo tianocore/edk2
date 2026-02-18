@@ -752,7 +752,7 @@ RejectPciDevice (
   while (CurrentLink != NULL && CurrentLink != &Bridge->ChildList) {
     Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
     if (Temp == PciDevice) {
-      InitializePciDevice (Temp);
+      Temp->Rejected = TRUE;
       RemoveEntryList (CurrentLink);
       return EFI_SUCCESS;
     }

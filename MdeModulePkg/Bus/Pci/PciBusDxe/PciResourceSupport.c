@@ -1296,6 +1296,8 @@ ProgramBar (
 
   ASSERT (Node->Bar < PCI_MAX_BAR);
 
+  Node->PciDev->Rejected = FALSE;
+
   //
   // Check VF BAR
   //
