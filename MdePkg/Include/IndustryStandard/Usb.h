@@ -119,6 +119,24 @@ typedef struct {
 } USB_DEVICE_DESCRIPTOR;
 
 ///
+/// Binary Device Object Store (BOS)
+/// USB 3.0 spec, Section 9.6.2
+///
+typedef struct {
+  UINT8     Length;
+  UINT8     DescriptorType;
+  UINT16    TotalLength;
+  UINT8     NumDeviceCaps;
+} USB_BOS_DESCRIPTOR;
+
+typedef struct {
+  UINT8    Length;
+  UINT8    DescriptorType;
+  UINT8    DevCapabilityType;
+  UINT8    CapData[1];
+} USB_DEV_CAP_DESCRIPTOR;
+
+///
 /// Standard Configuration Descriptor
 /// USB 2.0 spec, Section 9.6.3
 ///
@@ -230,10 +248,19 @@ typedef enum {
   USB_DESC_TYPE_INTERFACE             = 0x04,
   USB_DESC_TYPE_ENDPOINT              = 0x05,
   USB_DESC_TYPE_INTERFACE_ASSOCIATION = 0x0b,
+  USB_DESC_TYPE_BOS                   = 0x0f,
+  USB_DESC_TYPE_DEV_CAP               = 0x10,
   USB_DESC_TYPE_HID                   = 0x21,
   USB_DESC_TYPE_REPORT                = 0x22,
   USB_DESC_TYPE_CS_INTERFACE          = 0x24,
   USB_DESC_TYPE_CS_ENDPOINT           = 0x25,
+
+  //
+  // Device Capability Type Codes
+  //
+  USB_DEV_CAP_WIRELESS_USB    = 0x01,
+  USB_DEV_CAP_USB20_EXTENSION = 0x02,
+  USB_DEV_CAP_SUPPERSPEED_USB = 0x03,
 
   //
   // Features to be cleared by CLEAR_FEATURE requests
