@@ -1,6 +1,7 @@
 /** @file
   Header files and data structures needed by PCI Bus module.
 
+Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
 Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -38,6 +39,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/PcdLib.h>
+#include <Library/TimerLib.h>
 
 #include <IndustryStandard/Pci.h>
 #include <IndustryStandard/PeImage.h>
