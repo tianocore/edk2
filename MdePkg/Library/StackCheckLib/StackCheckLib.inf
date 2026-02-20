@@ -14,19 +14,24 @@
   LIBRARY_CLASS                  = StackCheckLib
 
 [Sources]
-  StackCheckLibCommonMsvc.c | MSFT
-  StackCheckLibCommonGcc.c  | GCC
+  StackCheckLibCommonMsvc.c ||||gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking
+  StackCheckLibCommonGcc.c  ||||!gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking
 
 [Sources.IA32]
-  IA32/CheckCookieMsvc.nasm | MSFT
+  IA32/CheckCookieMsvc.nasm ||||gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking
   IA32/StackCookieInterrupt.nasm
 
 [Sources.X64]
-  X64/CheckCookieMsvc.nasm | MSFT
+  X64/CheckCookieMsvc.nasm ||||gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking
   X64/StackCookieInterrupt.nasm
 
 [Sources.AARCH64]
-  AArch64/StackCookieInterrupt.S   |GCC
+  AArch64/StackCookieInterrupt.S
+  AArch64/CheckCookieMsvc.S        ||||gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking
+
+[LibraryClasses]
+  # StackCheckLib must not have any dependencies due to the unique nature of when compilers may
+  # insert stack cookies and link this library. See the README for more details.
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -42,3 +47,6 @@
   # the stack cookie variable has been optimized away, as it looks to GCC like the variable is not used, because
   # the compiler inserts the usage.
   GCC:*_*_*_CC_FLAGS = -fno-lto
+
+[FeaturePcd]
+  gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking
