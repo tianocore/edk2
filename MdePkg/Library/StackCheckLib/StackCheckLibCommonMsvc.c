@@ -8,7 +8,6 @@
 
 #include <Base.h>
 
-#include <Library/BaseLib.h>
 #include <Uefi/UefiBaseType.h>
 #include <Library/StackCheckLib.h>
 

@@ -10,20 +10,17 @@
 
 extern ASM_PFX(StackCheckFailure)
 extern ASM_PFX(__security_cookie)
-extern ASM_PFX(CpuDeadLoop)
 
 ; Called when a buffer check fails. This functionality is dependent on MSVC
 ; C runtime libraries and so is unsupported in UEFI.
 global ASM_PFX(__report_rangecheckfailure)
 ASM_PFX(__report_rangecheckfailure):
-    jmp ASM_PFX(CpuDeadLoop)
     ret
 
 ; The GS handler is for checking the stack cookie during SEH or
 ; EH exceptions and is unsupported in UEFI.
 global ASM_PFX(__GSHandlerCheck)
 ASM_PFX(__GSHandlerCheck):
-    jmp ASM_PFX(CpuDeadLoop)
     ret
 
 ;------------------------------------------------------------------------------
