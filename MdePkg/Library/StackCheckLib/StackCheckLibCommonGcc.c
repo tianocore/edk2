@@ -11,7 +11,6 @@
 
 #include <Library/BaseLib.h>
 #include <Library/StackCheckLib.h>
-#include <Library/StackCheckFailureHookLib.h>
 
 /**
   Triggers an interrupt using the stack cookie exception vector.
@@ -35,6 +34,5 @@ __stack_chk_fail (
   VOID
   )
 {
-  StackCheckFailureHook (RETURN_ADDRESS (0));
   TriggerStackCookieInterrupt ((EFI_PHYSICAL_ADDRESS)(UINTN)RETURN_ADDRESS (0));
 }

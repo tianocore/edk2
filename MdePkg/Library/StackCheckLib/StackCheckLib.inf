@@ -32,9 +32,6 @@
 [Packages]
   MdePkg/MdePkg.dec
 
-[LibraryClasses]
-  StackCheckFailureHookLib
-
 [BuildOptions]
   # We cannot build the MSVC version with /GL (whole program optimization) because we run into linker error
   # LNK1237, which is a failure to link against a symbol from a library compiled with /GL. The whole program

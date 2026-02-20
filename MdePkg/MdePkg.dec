@@ -301,10 +301,6 @@
   #
   TraceHubDebugSysTLib|Include/Library/TraceHubDebugSysTLib.h
 
-  ##  @libraryclass  Provides a hook called when a stack cookie check fails.
-  #
-  StackCheckFailureHookLib|Include/Library/StackCheckFailureHookLib.h
-
   ##  @libraryclass  Provides stack cookie checking functionality
   #
   StackCheckLib|Include/Library/StackCheckLib.h
