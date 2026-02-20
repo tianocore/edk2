@@ -30,15 +30,16 @@
   MdePkg/MdePkg.dec
 
 [Sources.IA32]
-  IA32/DynamicCookieGcc.nasm  | GCC
-  IA32/DynamicCookieMsvc.nasm | MSFT
+  IA32/DynamicCookieGcc.nasm  ||||!gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking
+  IA32/DynamicCookieMsvc.nasm ||||gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking
 
 [Sources.X64]
-  X64/DynamicCookieGcc.nasm   | GCC
-  X64/DynamicCookieMsvc.nasm  | MSFT
+  X64/DynamicCookieGcc.nasm   ||||!gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking
+  X64/DynamicCookieMsvc.nasm  ||||gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking
 
 [Sources.AARCH64]
-  AArch64/DynamicCookieGcc.S | GCC
+  AArch64/DynamicCookieGcc.S  ||||!gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking
+  AArch64/DynamicCookieMsvc.S ||||gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking
 
 [LibraryClasses]
   UefiBootServicesTableLib
@@ -66,3 +67,6 @@
   gEfiVariableWriteArchProtocolGuid AND
   gEfiVariableArchProtocolGuid AND
   gEfiWatchdogTimerArchProtocolGuid
+
+[FeaturePcd]
+  gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking

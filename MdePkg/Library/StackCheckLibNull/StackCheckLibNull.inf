@@ -16,14 +16,17 @@
   LIBRARY_CLASS                  = StackCheckLib
 
 [Sources]
-  StackCheckLibNullGcc.c  | GCC
-  StackCheckLibNullMsvc.c | MSFT
+  StackCheckLibNullGcc.c  ||||!gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking
+  StackCheckLibNullMsvc.c ||||gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking
 
 [Sources.IA32]
-  IA32/StackCheckFunctionsMsvc.nasm | MSFT
+  IA32/StackCheckFunctionsMsvc.nasm ||||gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking
 
 [Sources.X64]
-  X64/StackCheckFunctionsMsvc.nasm | MSFT
+  X64/StackCheckFunctionsMsvc.nasm ||||gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking
+
+[Sources.AARCH64]
+  AArch64/StackCheckFunctionsMsvc.S ||||gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -39,3 +42,6 @@
   # the stack cookie variable has been optimized away, as it looks to GCC like the variable is not used, because
   # the compiler inserts the usage.
   GCC:*_*_*_CC_FLAGS = -fno-lto
+
+[FeaturePcd]
+  gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking

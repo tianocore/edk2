@@ -79,3 +79,10 @@
   # definitions for the intrinsic functions.
   #
   NULL|MdePkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
+
+[PcdsFeatureFlag]
+  !if "$(FAMILY)" == "MSFT" || "$(TOOL_CHAIN_TAG)" == "CLANGPDB"
+    # By default, GCC style stack checking is used. MSFT FAMILY and CLANGPDB need to set this to MSVC style stack
+    # checking.
+    gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking|TRUE
+  !endif
