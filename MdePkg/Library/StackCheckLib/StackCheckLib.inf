@@ -27,7 +27,6 @@
 
 [Sources.AARCH64]
   AArch64/StackCookieInterrupt.S   |GCC
-  AArch64/StackCookieInterrupt.asm |MSFT
 
 [Packages]
   MdePkg/MdePkg.dec
