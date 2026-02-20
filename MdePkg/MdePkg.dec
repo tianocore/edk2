@@ -2305,9 +2305,6 @@
   # @Prompt Speculation Barrier Type.
   gEfiMdePkgTokenSpaceGuid.PcdSpeculationBarrierType|0x01|UINT8|0x30001018
 
-  ## This PCD specifies the interrupt vector for stack cookie check failures
-  gEfiMdePkgTokenSpaceGuid.PcdStackCookieExceptionVector|0x42|UINT8|0x30001019
-
   ## Enforces the use of Secure UEFI spec defined RNG algorithms.
   # TRUE  - Enforce the use of Secure UEFI spec defined RNG algorithms.
   # FALSE - Do not enforce and depend on the default implementation of RNG algorithm from the provider.
