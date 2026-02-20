@@ -303,6 +303,13 @@ DumpCpuContext (
     InternalPrintMessage ("\n");
   }
 
+  if (ExceptionType == STACK_CHECK_ERROR_HANDLER_VECTOR) {
+    InternalPrintMessage (
+      "\nStack Check Exception occurred at address 0x%016lx\n\n",
+      SystemContext.SystemContextX64->Rcx
+      );
+  }
+
   InternalPrintMessage (
     "RIP  - %016lx, CS  - %016lx, RFLAGS - %016lx\n",
     SystemContext.SystemContextX64->Rip,
