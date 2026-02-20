@@ -33,11 +33,10 @@ SECTION .text
 
 ALIGN   8
 
-; Generate 32 IDT vectors.
-; 32 IDT vectors are enough because interrupts (32+) are not enabled in SEC and PEI phase.
+; Generate 256 IDT vectors.
 AsmIdtVectorBegin:
 %assign Vector 0
-%rep  32
+%rep  256
     push    byte %[Vector]
     push    rax
     mov     rax, ASM_PFX(CommonInterruptEntry)
@@ -390,7 +389,7 @@ global ASM_PFX(AsmGetTemplateAddressMap)
 ASM_PFX(AsmGetTemplateAddressMap):
     lea     rax, [AsmIdtVectorBegin]
     mov     qword [rcx], rax
-    mov     qword [rcx + 0x8],  (AsmIdtVectorEnd - AsmIdtVectorBegin) / 32
+    mov     qword [rcx + 0x8],  (AsmIdtVectorEnd - AsmIdtVectorBegin) / 256
     lea     rax, [HookAfterStubHeaderBegin]
     mov     qword [rcx + 0x10], rax
     ret
