@@ -55,7 +55,6 @@
 #define UNIT_TEST_APP_NAME     "Cpu Exception Handler Lib Unit Tests"
 #define UNIT_TEST_APP_VERSION  "1.0"
 
-#define  CPU_INTERRUPT_NUM       256
 #define  SPEC_MAX_EXCEPTION_NUM  22
 #define  CR4_RESERVED_BIT        BIT15
 
