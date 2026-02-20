@@ -19,12 +19,11 @@
 
 [Sources.IA32]
   IA32/CheckCookieMsvc.nasm | MSFT
+  IA32/StackCookieInterrupt.nasm
 
 [Sources.X64]
   X64/CheckCookieMsvc.nasm | MSFT
-
-[Sources.IA32, Sources.X64]
-  IA32/StackCookieInterrupt.nasm
+  X64/StackCookieInterrupt.nasm
 
 [Sources.AARCH64]
   AArch64/StackCookieInterrupt.S   |GCC
@@ -35,9 +34,6 @@
 
 [LibraryClasses]
   StackCheckFailureHookLib
-
-[FixedPcd]
-  gEfiMdePkgTokenSpaceGuid.PcdStackCookieExceptionVector
 
 [BuildOptions]
   # We cannot build the MSVC version with /GL (whole program optimization) because we run into linker error
