@@ -26,8 +26,9 @@
   StandaloneMmCore/X64/StandaloneMmCoreEntryPoint.c
 
 [Sources.X64]
-  X64/DynamicCookieGcc.nasm   | GCC
+  X64/DynamicCookieGcc.nasm   | GCC | GCC
   X64/DynamicCookieMsvc.nasm  | MSFT
+  X64/DynamicCookieMsvc.nasm  | CLANGPDB
 
 [Packages]
   MdePkg/MdePkg.dec

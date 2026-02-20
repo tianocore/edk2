@@ -22,7 +22,8 @@
 
 [Sources]
   StackCheckLibHostApplicationMsvc.c | MSFT
-  StackCheckLibNullGcc.c             | GCC
+  StackCheckLibHostApplicationMsvc.c | CLANGPDB
+  StackCheckLibNullGcc.c             | GCC | GCC
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -31,4 +32,4 @@
   # We cannot build the GCC version with LTO (link time optimization) because we run into linker errors where
   # the stack cookie variable has been optimized away, as it looks to GCC like the variable is not used, because
   # the compiler inserts the usage. We do not worry about the MSVC version here as it is a no-op.
-  GCC:*_*_*_CC_FLAGS = -fno-lto
+  GCC:*_GCC_*_CC_FLAGS = -fno-lto

@@ -25,15 +25,18 @@
   UefiApplication/ApplicationEntryPoint.c
 
 [Sources.IA32]
-  IA32/DynamicCookieGcc.nasm  | GCC
+  IA32/DynamicCookieGcc.nasm  | GCC | GCC
   IA32/DynamicCookieMsvc.nasm | MSFT
+  IA32/DynamicCookieMsvc.nasm | CLANGPDB
 
 [Sources.X64]
-  X64/DynamicCookieGcc.nasm   | GCC
+  X64/DynamicCookieGcc.nasm   | GCC | GCC
   X64/DynamicCookieMsvc.nasm  | MSFT
+  X64/DynamicCookieMsvc.nasm  | CLANGPDB
 
 [Sources.AARCH64]
-  AArch64/DynamicCookieGcc.S | GCC
+  AArch64/DynamicCookieGcc.S | GCC | GCC
+  AArch64/DynamicCookieMsvc.S | CLANGPDB
 
 [Packages]
   MdePkg/MdePkg.dec
