@@ -134,7 +134,7 @@ CommonExceptionHandlerWorker (
       (ExternalInterruptHandler[ExceptionType] != NULL))
   {
     (ExternalInterruptHandler[ExceptionType])(ExceptionType, SystemContext);
-  } else if (ExceptionType < CPU_EXCEPTION_NUM) {
+  } else if (ExceptionType < CPU_INTERRUPT_NUM) {
     //
     // Get Spinlock to display CPU information
     //
@@ -271,7 +271,7 @@ InitializeCpuExceptionHandlersWorker (
 
   //
   // Setup the exception handlers according to IDT size, but no more than
-  //   ExceptionHandlerData->IdtEntryCount (32 in PEI and SMM, 256 in DXE) handlers.
+  //   ExceptionHandlerData->IdtEntryCount (256) handlers.
   //
   AsmReadIdtr (&IdtDescriptor);
   IdtEntryCount                       = (IdtDescriptor.Limit + 1) / sizeof (IA32_IDT_GATE_DESCRIPTOR);

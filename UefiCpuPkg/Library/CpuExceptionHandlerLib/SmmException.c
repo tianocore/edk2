@@ -11,10 +11,10 @@
 
 CONST UINTN  mDoFarReturnFlag = 1;
 
-RESERVED_VECTORS_DATA      mReservedVectorsData[CPU_EXCEPTION_NUM];
-EFI_CPU_INTERRUPT_HANDLER  mExternalInterruptHandlerTable[CPU_EXCEPTION_NUM];
+RESERVED_VECTORS_DATA      mReservedVectorsData[CPU_INTERRUPT_NUM];
+EFI_CPU_INTERRUPT_HANDLER  mExternalInterruptHandlerTable[CPU_INTERRUPT_NUM];
 EXCEPTION_HANDLER_DATA     mExceptionHandlerData = {
-  CPU_EXCEPTION_NUM,
+  CPU_INTERRUPT_NUM,
   0,                     // To be fixed
   mReservedVectorsData,
   mExternalInterruptHandlerTable

@@ -243,7 +243,7 @@ ArchSetupExceptionStack (
     // Fixup TSS
     //
     Vector = StackSwitchExceptions[Index];
-    if ((Vector >= CPU_EXCEPTION_NUM) ||
+    if ((Vector >= CPU_INTERRUPT_NUM) ||
         (Vector >= (Idtr.Limit + 1) / sizeof (IA32_IDT_GATE_DESCRIPTOR)))
     {
       continue;

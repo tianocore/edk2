@@ -12,7 +12,7 @@
 
 #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 
-#define SEC_IDT_ENTRY_COUNT  34
+#define SEC_IDT_ENTRY_COUNT  256
 
 typedef struct _SEC_IDT_TABLE {
   //

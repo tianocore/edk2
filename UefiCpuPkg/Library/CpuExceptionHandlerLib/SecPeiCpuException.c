@@ -108,7 +108,7 @@ InitializeCpuExceptionHandlers (
   )
 {
   EFI_STATUS                      Status;
-  RESERVED_VECTORS_DATA           ReservedVectorData[CPU_EXCEPTION_NUM];
+  RESERVED_VECTORS_DATA           ReservedVectorData[CPU_INTERRUPT_NUM];
   IA32_DESCRIPTOR                 IdtDescriptor;
   UINTN                           IdtEntryCount;
   UINT16                          CodeSegment;
@@ -118,8 +118,8 @@ InitializeCpuExceptionHandlers (
   UINTN                           InterruptHandler;
 
   if (VectorInfo != NULL) {
-    SetMem ((VOID *)ReservedVectorData, sizeof (RESERVED_VECTORS_DATA) * CPU_EXCEPTION_NUM, 0xff);
-    Status = ReadAndVerifyVectorInfo (VectorInfo, ReservedVectorData, CPU_EXCEPTION_NUM);
+    SetMem ((VOID *)ReservedVectorData, sizeof (RESERVED_VECTORS_DATA) * CPU_INTERRUPT_NUM, 0xff);
+    Status = ReadAndVerifyVectorInfo (VectorInfo, ReservedVectorData, CPU_INTERRUPT_NUM);
     if (EFI_ERROR (Status)) {
       return EFI_INVALID_PARAMETER;
     }
@@ -130,11 +130,11 @@ InitializeCpuExceptionHandlers (
   //
   AsmReadIdtr (&IdtDescriptor);
   IdtEntryCount = (IdtDescriptor.Limit + 1) / sizeof (IA32_IDT_GATE_DESCRIPTOR);
-  if (IdtEntryCount > CPU_EXCEPTION_NUM) {
+  if (IdtEntryCount > CPU_INTERRUPT_NUM) {
     //
-    // CPU exception library only setup CPU_EXCEPTION_NUM exception handler at most
+    // CPU exception library only setup CPU_INTERRUPT_NUM exception handler at most
     //
-    IdtEntryCount = CPU_EXCEPTION_NUM;
+    IdtEntryCount = CPU_INTERRUPT_NUM;
   }
 
   //

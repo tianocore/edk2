@@ -168,7 +168,7 @@ InitializeCpuExceptionHandlers (
   EXCEPTION_HANDLER_DATA  *ExceptionHandlerData;
   RESERVED_VECTORS_DATA   *ReservedVectors;
 
-  ReservedVectors = AllocatePool (sizeof (RESERVED_VECTORS_DATA) * CPU_EXCEPTION_NUM);
+  ReservedVectors = AllocatePool (sizeof (RESERVED_VECTORS_DATA) * CPU_INTERRUPT_NUM);
   if (ReservedVectors == NULL) {
     ASSERT (ReservedVectors != NULL);
     return EFI_OUT_OF_RESOURCES;
@@ -181,7 +181,7 @@ InitializeCpuExceptionHandlers (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  ExceptionHandlerData->IdtEntryCount            = CPU_EXCEPTION_NUM;
+  ExceptionHandlerData->IdtEntryCount            = CPU_INTERRUPT_NUM;
   ExceptionHandlerData->ReservedVectors          = ReservedVectors;
   ExceptionHandlerData->ExternalInterruptHandler = AllocateZeroPool (sizeof (EFI_CPU_INTERRUPT_HANDLER) * ExceptionHandlerData->IdtEntryCount);
   InitializeSpinLock (&ExceptionHandlerData->DisplayMessageSpinLock);
