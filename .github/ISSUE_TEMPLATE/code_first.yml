@@ -13,7 +13,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        👋 Only use this issue form for changes following the "code first" process described in [EDK II Code First Process](https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Code-First-Process).
+        👋 Only use this issue form for changes following the "code first" process described in
+           [EDK II Code First Process](https://www.tianocore.org/tianocore-wiki.github.io/development/contribution-guides/edk_ii_code_first_process.html).
 
         **Read that document before filing this issue.**
 

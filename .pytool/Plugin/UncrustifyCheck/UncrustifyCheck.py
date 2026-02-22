@@ -577,7 +577,7 @@ class UncrustifyCheck(ICiBuildPlugin):
             logging.warning(
                 "Visit the following instructions to learn "
                 "more about uncrustify setup instructions and CI:"
-                "https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Code-Formatting\n")
+                "https://www.tianocore.org/tianocore-wiki.github.io/development/coding-standards/edk_ii_code_formatting.html\n")
 
             if self._output_file_diffs:
                 logging.info("Calculating file diffs. This might take a while...")
