@@ -53,6 +53,7 @@
   PcdLib
   CcExitLib
   AmdSvsmLib
+  CpuPageTableLib
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
