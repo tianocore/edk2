@@ -1194,3 +1194,49 @@ ArmFfaLibIsFfaSupported (
 
   return TRUE;
 }
+
+/**
+  Send FF-A Non-secure Resoure Info Get Command
+
+  @param [in]   TargetId         Partition ID to query info from
+  @param [in]   Flags            Additional flags
+  @param [out]  WrittenSize      How much data was written in the transaction
+  @param [out]  RemainingSize    How much data remains to be read
+
+  @retval EFI_SUCCESS               Success, info returned in Rx/Tx buffer
+  @retval EFI_INVALID PARAMETER     Invalid parameter(s)
+  @retval Others                    Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibFfaNsResInfoGet (
+  IN UINT16   TargetId,
+  IN UINT64   Flags,
+  OUT UINT32  *WrittenSize,
+  OUT UINT32  *RemainingSize
+  )
+{
+  EFI_STATUS    Status;
+  ARM_FFA_ARGS  FfaArgs = { 0 };
+
+  if ((WrittenSize == NULL) || (RemainingSize == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  FfaArgs.Arg0 = ARM_FID_FFA_NS_RES_INFO_GET;
+  FfaArgs.Arg1 = TargetId;
+  FfaArgs.Arg2 = Flags;
+
+  ArmCallFfa (&FfaArgs);
+
+  Status = FfaArgsToEfiStatus (&FfaArgs);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  *WrittenSize   = FfaArgs.Arg2 >> 32;
+  *RemainingSize = FfaArgs.Arg2;
+
+  return EFI_SUCCESS;
+}
