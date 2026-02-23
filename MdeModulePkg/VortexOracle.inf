@@ -1,0 +1,35 @@
+## @file
+# VortexOracle UEFI Driver - CTT Temporal Resonance Implementation
+#
+# Copyright (c) 2026, Americo Simoes. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VortexOracle
+  FILE_GUID                      = 7ce398d8-b276-4b5c-9e02-14e747986ce8
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = VortexOracleEntryPoint
+
+[Sources]
+  VortexOracle.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DebugLib
+  BaseLib
+  PrintLib
+
+[BuildOptions]
+  GCC:*_*_*_CC_FLAGS = -std=c99 
+
+[Depex]
+  TRUE
