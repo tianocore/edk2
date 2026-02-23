@@ -529,6 +529,8 @@
   MdeModulePkg/Library/TraceHubDebugSysTLib/PeiTraceHubDebugSysTLib.inf
   MdeModulePkg/Library/TraceHubDebugSysTLib/DxeSmmTraceHubDebugSysTLib.inf
   MdeModulePkg/Library/BaseSpiHcPlatformLibNull/BaseSpiHcPlatformLibNull.inf
+  MdeModulePkg/Universal/VortexOracle/VortexOracle.inf
+  MdeModulePkg/Applications/VortexTest/VortexTest.inf
 
 [Components.X64]
   MdeModulePkg/Universal/CapsulePei/CapsuleX64.inf
