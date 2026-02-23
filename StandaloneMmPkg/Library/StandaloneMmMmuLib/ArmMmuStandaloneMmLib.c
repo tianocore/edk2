@@ -19,7 +19,6 @@
 #include <IndustryStandard/ArmMmSvc.h>
 #include <IndustryStandard/ArmFfaSvc.h>
 
-#include <Library/ArmLib.h>
 #include <Library/ArmMmuLib.h>
 #include <Library/ArmFfaLib.h>
 #include <Library/ArmSvcLib.h>
