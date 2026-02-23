@@ -6858,6 +6858,212 @@ CryptoServiceEcDsaVerify (
   return CALL_BASECRYPTLIB (Ec.Services.DsaVerify, EcDsaVerify, (EcContext, HashNid, MessageHash, HashSize, Signature, SigSize), FALSE);
 }
 
+/**
+  Creates a new EdDSA public key object.
+
+  If A is NULL, then return FALSE.
+
+  @param[in]      A             Pointer to EdDSA Raw public key.
+  @param[in]      Nid           Crypto NID of the EdDSA curve.
+
+  @retval Pointer to new EdDSA public key object.
+**/
+VOID *
+EFIAPI
+CryptoServiceEdDsaCreatePublicKeyObject (
+  IN     UINT8  *A,
+  IN     UINTN  Nid
+  )
+{
+  return CALL_BASECRYPTLIB (Ed.Services.DsaCreatePublicKeyObject, EdDsaCreatePublicKeyObject, (A, Nid), FALSE);
+}
+
+/**
+  Free EdDSA public key object.
+
+  If PkeyContext is NULL, then return.
+
+  @param[in]  PkeyContext   Pointer to EdDSA public key object.
+**/
+VOID
+EFIAPI
+CryptoServiceEdDsaFreePublicKeyObject (
+  IN VOID  *PkeyContext
+  )
+{
+  return CALL_BASECRYPTLIB (Ed.Services.DsaFreePublicKeyObject, EdDsaFreePublicKeyObject, (PkeyContext), FALSE);
+}
+
+/**
+  Verifies the EdDSA signature. EdDSA signatures are verified via 'pure' implementation.
+  Meaning message digest cannot be computed ahead of time. Data is passed into the verification function
+
+  If PkeyContext is NULL, then return FALSE.
+  If Data is NULL, then return FALSE.
+  If DataSize is 0, then return FALSE.
+  If Sig is NULL, then return FALSE.
+  If SigSize is 0, then return FALSE.
+
+  @param[in]  PkeyContext       Pointer to EdDSA public key object.
+  @param[in]  Data              Pointer to data being verified.
+  @param[in]  DataSize          Size of data.
+  @param[in]  Signature         Pointer to EdDSA signature.
+  @param[in]  SigSize           Size of EdDSA signature.
+
+  @retval  TRUE   Valid signature encoded in EdDSA.
+  @retval  FALSE  Invalid signature or invalid input.
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceEdDsaVerify (
+  IN VOID         *PkeyContext,
+  IN CONST UINT8  *Data,
+  IN UINTN        DataSize,
+  IN CONST UINT8  *Signature,
+  IN UINTN        SigSize
+  )
+{
+  return CALL_BASECRYPTLIB (Ed.Services.DsaVerify, EdDsaVerify, (PkeyContext, Data, DataSize, Signature, SigSize), FALSE);
+}
+
+/**
+   Create the ML-DSA EVP_PKEY public key object from raw public key bytes.
+
+   If Nid is not NID_ML_DSA_87, then return FALSE.
+
+   @param[in]  RawPublicKey      Pointer to raw public key bytes.
+   @param[in]  Nid               Nid for ML-DSA Category
+
+   @retval Pointer to new ML-DSA public key object.
+**/
+VOID *
+EFIAPI
+CryptoServiceMlDsaCreatePublicKeyObject (
+  IN     UINT8        *RawPublicKey,
+  IN     CONST UINTN  Nid
+  )
+{
+  return CALL_BASECRYPTLIB (Ml.Services.DsaCreatePublicKeyObject, MlDsaCreatePublicKeyObject, (RawPublicKey, Nid), FALSE);
+}
+
+/**
+   Free the ML-DSA EVP_PKEY object
+
+   @param[in]  PkeyContext  Pointer to the MLDSA EVP_PKEY object to be freed.
+
+   @retval VOID
+**/
+VOID
+EFIAPI
+CryptoServiceMlDsaFreePublicKeyObject (
+  IN VOID  *PkeyContext
+  )
+{
+  return CALL_BASECRYPTLIB (Ml.Services.DsaFreePublicKeyObject, MlDsaFreePublicKeyObject, (PkeyContext), FALSE);
+}
+
+/**
+   Verifies the ML-DSA signature.
+
+   If PkeyContext is NULL, then return FALSE.
+   If Data is NULL, then return FALSE.
+   If DataSize is 0, then return FALSE.
+   If Sig is NULL, then return FALSE.
+   If SigSize is 0, then return FALSE.
+
+   @param[in]  PkeyContext    Pointer to ML-DSA EVP_PKEY object.
+   @param[in]  Nid            Nid for ML-DSA Category
+   @param[in]  Data           Pointer to data being verified.
+   @param[in]  DataSize        Length of data.
+   @param[in]  Signature      Pointer to ML-DSA signature.
+   @param[in]  SigSize        Length of ML-DSA signature.
+
+   @retval  TRUE   Valid signature.
+   @retval  FALSE  Invalid signature or invalid input.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceMlDsaVerify (
+  IN  CONST VOID   *PkeyContext,
+  IN  UINTN        Nid,
+  IN  CONST UINT8  *Data,
+  IN  UINTN        DataSize,
+  IN  CONST UINT8  *Signature,
+  IN  UINTN        SigSize
+  )
+{
+  return CALL_BASECRYPTLIB (Ml.Services.DsaVerify, MlDsaVerify, (PkeyContext, Nid, Data, DataSize, Signature, SigSize), FALSE);
+}
+
+/**
+ Create the SLH-DSA EVP_PKEY public key object from raw public key bytes.
+
+  If Nid is not NID_SLHDSASHAKE256S, then return FALSE.
+
+  @param[in]  RawPublicKey  Pointer to raw public key bytes.
+  @param[in]  Nid           Nid for SLH-DSA Category
+
+  @retval     Pointer to the SLH-DSA EVP_PKEY object created.
+**/
+VOID *
+EFIAPI
+CryptoServiceSlhDsaCreatePublicKeyObject (
+  IN UINT8        *RawPublicKey,
+  IN CONST UINTN  Nid
+  )
+{
+  return CALL_BASECRYPTLIB (Slh.Services.DsaCreatePublicKeyObject, SlhDsaCreatePublicKeyObject, (RawPublicKey, Nid), FALSE);
+}
+
+/**
+  Free the SLH-DSA EVP_PKEY object
+
+  @param[in]  PkeyContext  Pointer to the SLHDSA EVP_PKEY object to be freed.
+**/
+VOID
+EFIAPI
+CryptoServiceSlhDsaFreePublicKeyObject (
+  IN VOID  *PkeyContext
+  )
+{
+  return CALL_BASECRYPTLIB (Slh.Services.DsaFreePublicKeyObject, SlhDsaFreePublicKeyObject, (PkeyContent), FALSE);
+}
+
+/**
+   Verifies the SLH-DSA signature.
+
+   If PkeyContext is NULL, then return FALSE.
+   If Data is NULL, then return FALSE.
+   If DataSize is 0, then return FALSE.
+   If Sig is NULL, then return FALSE.
+   If SigSize is 0, then return FALSE.
+
+   @param[in]  PkeyContext   Pointer to SLH-DSA EVP_PKEY object.
+   @param[in]  Nid           Nid for SLH-DSA Category
+   @param[in]  Data          Pointer to data being verified.
+   @param[in]  DataSize      Length of data.
+   @param[in]  Signature     Pointer to SLH-DSA signature.
+   @param[in]  SigSize       Length of SLH-DSA signature.
+
+   @retval  TRUE   Valid signature.
+   @retval  FALSE  Invalid signature or invalid input.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceSlhDsaVerify (
+  IN CONST VOID   *PkeyContext,
+  IN UINTN        Nid,
+  IN CONST UINT8  *Data,
+  IN UINTN        DataSize,
+  IN CONST UINT8  *Signature,
+  IN UINTN        SigSize
+  )
+{
+  return CALL_BASECRYPTLIB (Slh.Services.DsaVerify, SlhDsaVerify, (PkeyContext, Nid, Data, DataSize, Signature, SigSize), FALSE);
+}
+
 const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   /// Version
   CryptoServiceGetCryptoVersion,
@@ -7130,6 +7336,18 @@ const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   CryptoServiceEcGenerateKey,
   CryptoServiceEcGetPubKey,
   CryptoServiceEcDhComputeKey,
+  /// ED
+  CryptoServiceEdDsaCreatePublicKeyObject,
+  CryptoServiceEdDsaFreePublicKeyObject,
+  CryptoServiceEdDsaVerify,
+  /// ML
+  CryptoServiceMlDsaCreatePublicKeyObject,
+  CryptoServiceMlDsaFreePublicKeyObject,
+  CryptoServiceMlDsaVerify,
+  /// SLH
+  CryptoServiceSlhDsaCreatePublicKeyObject,
+  CryptoServiceSlhDsaFreePublicKeyObject,
+  CryptoServiceSlhDsaVerify,
   /// TLS (continued)
   CryptoServiceTlsShutdown,
   /// TLS Set (continued)
