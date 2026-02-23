@@ -1,0 +1,33 @@
+## @file MockBaseCryptLib.inf
+# Google Test mocks for BaseCryptLib
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MockBaseCryptLib
+  FILE_GUID                      = CA6B18C8-FD79-4FED-9B81-EB7BC7C37E3B
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BaseCryptLib
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  MockBaseCryptLib.cpp
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /EHsc /bigobj
