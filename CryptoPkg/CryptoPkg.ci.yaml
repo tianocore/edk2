@@ -73,6 +73,7 @@
             "MdePkg/MdePkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
             "CryptoPkg/CryptoPkg.dec",
+            "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec",
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[],
