@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __BASE_CRYPT_LIB_H__
-#define __BASE_CRYPT_LIB_H__
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -4302,5 +4301,3 @@ EcDsaVerify (
   IN  CONST UINT8  *Signature,
   IN  UINTN        SigSize
   );
-
-#endif // __BASE_CRYPT_LIB_H__

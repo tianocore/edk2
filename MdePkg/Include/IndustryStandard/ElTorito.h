@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _ELTORITO_H_
-#define _ELTORITO_H_
+#pragma once
 
 //
 // CDROM_VOLUME_DESCRIPTOR.Types, defined in ISO 9660
@@ -134,5 +133,3 @@ typedef union {
 } ELTORITO_CATALOG;
 
 #pragma pack()
-
-#endif

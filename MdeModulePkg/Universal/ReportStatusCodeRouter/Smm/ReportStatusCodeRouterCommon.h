@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __REPORT_STATUS_CODE_ROUTER_COMMON_H__
-#define __REPORT_STATUS_CODE_ROUTER_COMMON_H__
+#pragma once
 
 #include <Protocol/MmReportStatusCodeHandler.h>
 #include <Protocol/MmStatusCode.h>
@@ -111,5 +110,3 @@ EFI_STATUS
 GenericStatusCodeCommonEntry (
   VOID
   );
-
-#endif

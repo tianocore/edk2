@@ -1,8 +1,7 @@
 /* 7zTypes.h -- Basic types
 2018-08-04 : Igor Pavlov : Public domain */
 
-#ifndef __7Z_TYPES_H
-#define __7Z_TYPES_H
+#pragma once
 
 #ifdef _WIN32
 /* #include <windows.h> */
@@ -444,5 +443,3 @@ struct ISzAlloc {
 #endif
 
 EXTERN_C_END
-
-#endif

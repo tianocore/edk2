@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PS2KEYBOARD_H_
-#define _PS2KEYBOARD_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -561,5 +560,3 @@ InitializeKeyState (
   IN  KEYBOARD_CONSOLE_IN_DEV  *ConsoleIn,
   OUT EFI_KEY_STATE            *KeyState
   );
-
-#endif

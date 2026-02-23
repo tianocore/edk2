@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef CRYPTO_CRT_STDIO_H_
-#define CRYPTO_CRT_STDIO_H_
+#pragma once
+
 #include <CrtLibSupport.h>
 
 //
@@ -23,6 +23,4 @@ typedef UINT32  uint32_t;
 typedef INT64   int64_t;
 typedef UINT64  uint64_t;
 typedef UINTN   uintptr_t;
-#endif
-
 #endif

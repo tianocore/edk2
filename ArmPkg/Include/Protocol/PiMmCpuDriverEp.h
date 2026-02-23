@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef PI_MM_CPU_DRIVER_EP_H_
-#define PI_MM_CPU_DRIVER_EP_H_
+#pragma once
 
 #include <PiMm.h>
 #include <Library/ArmMmHandlerContext.h>
@@ -57,5 +56,3 @@ struct _EDKII_PI_MM_CPU_DRIVER_EP_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkiiPiMmCpuDriverEpProtocolGuid;
-
-#endif

@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef EDKII_PCI_DEVICE_PPI_H_
-#define EDKII_PCI_DEVICE_PPI_H_
+#pragma once
 
 #include <Protocol/PciIo.h>
 #include <Protocol/DevicePath.h>
@@ -28,5 +27,3 @@ typedef struct {
 } EDKII_PCI_DEVICE_PPI;
 
 extern EFI_GUID  gEdkiiPeiPciDevicePpiGuid;
-
-#endif // EDKII_PCI_DEVICE_PPI_H_

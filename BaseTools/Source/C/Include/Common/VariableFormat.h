@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __VARIABLE_FORMAT_H__
-#define __VARIABLE_FORMAT_H__
+#pragma once
 
 #define VARIABLE_DATA                     0x55AA
 
@@ -40,5 +39,3 @@ typedef struct {
 } VARIABLE_HEADER;
 
 #pragma pack()
-
-#endif // _EFI_VARIABLE_H_

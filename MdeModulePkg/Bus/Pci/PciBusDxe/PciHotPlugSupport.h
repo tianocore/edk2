@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_PCI_HOT_PLUG_SUPPORT_H_
-#define _EFI_PCI_HOT_PLUG_SUPPORT_H_
+#pragma once
 
 //
 // stall 1 second, its unit is 100ns
@@ -201,5 +200,3 @@ VOID
 GetResourcePaddingForHpb (
   IN PCI_IO_DEVICE  *PciIoDevice
   );
-
-#endif

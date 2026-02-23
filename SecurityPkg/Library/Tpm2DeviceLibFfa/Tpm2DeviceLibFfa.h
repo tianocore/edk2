@@ -31,8 +31,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef TPM2_DEVICE_LIB_FFA_H_
-#define TPM2_DEVICE_LIB_FFA_H_
+#pragma once
 
 #define TPM2_FFA_INTERFACE_TYPE_UNKNOWN  0xFF
 #define TPM2_FFA_PARTITION_ID_INVALID    0x0000
@@ -259,5 +258,3 @@ EFIAPI
 GetTpmServicePartitionId (
   OUT UINT16  *PartitionId
   );
-
-#endif /* _TPM2_DEVICE_LIB_SMC_H_ */

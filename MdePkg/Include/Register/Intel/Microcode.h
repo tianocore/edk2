@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef __INTEL_MICROCODE_H__
-#define __INTEL_MICROCODE_H__
+#pragma once
 
 ///
 /// CPU Microcode Date in BCD format
@@ -190,5 +189,3 @@ typedef struct {
 } CPU_MICROCODE_EXTENDED_TABLE;
 
 #pragma pack ()
-
-#endif

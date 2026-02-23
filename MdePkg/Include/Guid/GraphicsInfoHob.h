@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _GRAPHICS_INFO_HOB_GUID_H_
-#define _GRAPHICS_INFO_HOB_GUID_H_
+#pragma once
 
 #include <Protocol/GraphicsOutput.h>
 
@@ -41,5 +40,3 @@ typedef struct {
 
 extern EFI_GUID  gEfiGraphicsInfoHobGuid;
 extern EFI_GUID  gEfiGraphicsDeviceInfoHobGuid;
-
-#endif

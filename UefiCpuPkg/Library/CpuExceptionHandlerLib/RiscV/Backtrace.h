@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef BACKTRACE_H_
-#define BACKTRACE_H_
+#pragma once
 
 #include <PiPei.h>
 #include <Uefi.h>
@@ -53,5 +52,3 @@ EFIAPI
 DumpCpuBacktrace (
   IN EFI_SYSTEM_CONTEXT  SystemContext
   );
-
-#endif // BACKTRACE_H_

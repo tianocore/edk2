@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _IMEM_H_
-#define _IMEM_H_
+#pragma once
 
 //
 // MEMORY_MAP_ENTRY
@@ -153,4 +152,3 @@ CoreInternalAllocatePages (
 extern EFI_LOCK    gMemoryLock;
 extern LIST_ENTRY  gMemoryMap;
 extern LIST_ENTRY  mGcdMemorySpaceMap;
-#endif

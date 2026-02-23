@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_WIFI_EAP_CONTEXT_H__
-#define __EFI_WIFI_EAP_CONTEXT_H__
+#pragma once
 
 typedef struct {
   BOOLEAN    IsEncrypted;
@@ -16,5 +15,3 @@ typedef struct {
   UINTN      KeySize;
   UINT8      KeyData[1];
 } EFI_EAP_PRIVATE_KEY;
-
-#endif

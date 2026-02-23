@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _ATAPI_H_
-#define _ATAPI_H_
+#pragma once
 
 #pragma pack(1)
 
@@ -846,5 +845,3 @@ typedef union {
 //
 #define ATA_CTLREG_SRST   BIT2                                ///< Software Reset.
 #define ATA_CTLREG_IEN_L  BIT1                                ///< Interrupt Enable #.
-
-#endif

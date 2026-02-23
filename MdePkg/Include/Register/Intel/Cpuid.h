@@ -17,8 +17,7 @@
 
 **/
 
-#ifndef __INTEL_CPUID_H__
-#define __INTEL_CPUID_H__
+#pragma once
 
 /**
   CPUID Signature Information
@@ -4079,5 +4078,3 @@ typedef union {
   ///
   UINT32    Uint32;
 } CPUID_VIR_PHY_ADDRESS_SIZE_EAX;
-
-#endif

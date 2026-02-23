@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef OVMF_INTEL_TDX_H_
-#define OVMF_INTEL_TDX_H_
+#pragma once
 
 #include <PiPei.h>
 #include <Library/BaseLib.h>
@@ -67,5 +66,3 @@ typedef struct {
 } MP_RELOCATION_MAP;
 
 #pragma pack()
-
-#endif

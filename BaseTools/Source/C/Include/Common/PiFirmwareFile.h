@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __PI_FIRMWARE_FILE_H__
-#define __PI_FIRMWARE_FILE_H__
+#pragma once
 
 #pragma pack(1)
 //
@@ -345,6 +344,3 @@ typedef union {
   EFI_FREEFORM_SUBTYPE_GUID_SECTION2 *FreeformSubtypeSection2;
   EFI_RAW_SECTION2                   *RawSection2;
 } EFI_FILE_SECTION_POINTER;
-
-#endif
-

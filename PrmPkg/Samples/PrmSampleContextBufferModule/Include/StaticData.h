@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef PRM_STATIC_DATA_SAMPLE_CONTEXT_BUFFER_MODULE_H_
-#define PRM_STATIC_DATA_SAMPLE_CONTEXT_BUFFER_MODULE_H_
+#pragma once
 
 #include <Base.h>
 
@@ -20,5 +19,3 @@ typedef struct {
   BOOLEAN    Policy2Enabled;
   UINT8      SomeValueArray[SOME_VALUE_ARRAY_MAX_VALUES];
 } STATIC_DATA_SAMPLE_CONTEXT_BUFFER_MODULE;
-
-#endif

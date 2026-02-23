@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_DHCP4_IO_H__
-#define __EFI_DHCP4_IO_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -183,5 +182,3 @@ DhcpOnPacketSent (
   EFI_STATUS     IoStatus,
   VOID           *Context
   );
-
-#endif

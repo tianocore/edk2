@@ -10,8 +10,7 @@
     - Arm Server Base System Architecture 5.0
 **/
 
-#ifndef MADT_PARSER_H_
-#define MADT_PARSER_H_
+#pragma once
 
 ///
 /// Level 3 base server system Private Peripheral Inerrupt (PPI) ID assignments
@@ -36,5 +35,3 @@
 #define ARM_PPI_ID_MIN           16
 #define ARM_PPI_ID_EXTENDED_MAX  1119
 #define ARM_PPI_ID_EXTENDED_MIN  1056
-
-#endif // MADT_PARSER_H_

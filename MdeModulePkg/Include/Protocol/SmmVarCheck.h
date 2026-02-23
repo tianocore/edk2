@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __SMM_VAR_CHECK_H__
-#define __SMM_VAR_CHECK_H__
+#pragma once
 
 #include <Protocol/VarCheck.h>
 
@@ -25,5 +24,3 @@ struct _EDKII_SMM_VAR_CHECK_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkiiSmmVarCheckProtocolGuid;
-
-#endif

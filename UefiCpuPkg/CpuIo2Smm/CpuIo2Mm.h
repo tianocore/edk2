@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _CPU_IO2_SMM_H_
-#define _CPU_IO2_SMM_H_
+#pragma once
 
 #include <PiSmm.h>
 
@@ -164,5 +163,3 @@ EFI_STATUS
 CommonCpuIo2Initialize (
   VOID
   );
-
-#endif

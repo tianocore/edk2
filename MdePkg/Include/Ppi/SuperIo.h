@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __EFI_SUPER_IO_PPI_H__
-#define __EFI_SUPER_IO_PPI_H__
+#pragma once
 
 #include <Protocol/SuperIo.h>
 
@@ -179,5 +178,3 @@ struct _EFI_SIO_PPI {
 };
 
 extern EFI_GUID  gEfiSioPpiGuid;
-
-#endif

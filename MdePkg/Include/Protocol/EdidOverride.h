@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __EDID_OVERRIDE_H__
-#define __EDID_OVERRIDE_H__
+#pragma once
 
 #define EFI_EDID_OVERRIDE_PROTOCOL_GUID \
   { \
@@ -57,5 +56,3 @@ struct _EFI_EDID_OVERRIDE_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiEdidOverrideProtocolGuid;
-
-#endif

@@ -5,12 +5,9 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef ARM_IORT_PARSER_H_
-#define ARM_IORT_PARSER_H_
+#pragma once
 
 UINT16
 EFIAPI
 GetNextIortIdentifier (
   );
-
-#endif // ARM_IORT_PARSER_H_

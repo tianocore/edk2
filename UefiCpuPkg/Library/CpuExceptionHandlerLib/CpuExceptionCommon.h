@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _CPU_EXCEPTION_COMMON_H_
-#define _CPU_EXCEPTION_COMMON_H_
+#pragma once
 
 #include <Ppi/VectorHandoffInfo.h>
 #include <Protocol/Cpu.h>
@@ -320,5 +319,3 @@ EFIAPI
 AsmGetTssTemplateMap (
   OUT EXCEPTION_HANDLER_TEMPLATE_MAP  *AddressMap
   );
-
-#endif

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __REPORT_STATUS_CODE_LIB_H__
-#define __REPORT_STATUS_CODE_LIB_H__
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 #include <Pi/PiStatusCode.h>
@@ -470,5 +469,3 @@ ReportDebugCodeEnabled (
   (ReportDebugCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_DEBUG_CODE)                   ?  \
   ReportStatusCodeEx(Type,Value,Instance,CallerId,ExtendedDataGuid,ExtendedData,ExtendedDataSize)        :  \
   EFI_UNSUPPORTED
-
-#endif

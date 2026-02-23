@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __AUTHENTICATED_VARIABLE_FORMAT_H__
-#define __AUTHENTICATED_VARIABLE_FORMAT_H__
+#pragma once
 
 #include <Guid/VariableFormat.h>
 
@@ -65,5 +64,3 @@ extern EFI_GUID  gEfiVendorKeysNvGuid;
 #define EFI_VENDOR_KEYS_NV_VARIABLE_NAME  L"VendorKeysNv"
 #define VENDOR_KEYS_VALID                 1
 #define VENDOR_KEYS_MODIFIED              0
-
-#endif // __AUTHENTICATED_VARIABLE_FORMAT_H__

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __UEFI_ACPI_DATA_TABLE_H__
-#define __UEFI_ACPI_DATA_TABLE_H__
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -18,5 +17,3 @@ typedef struct {
   UINT16                         DataOffset;
 } EFI_ACPI_DATA_TABLE;
 #pragma pack()
-
-#endif

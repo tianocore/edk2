@@ -8,8 +8,7 @@
     SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __DELAYED_DISPATCH_PPI_H__
-#define __DELAYED_DISPATCH_PPI_H__
+#pragma once
 
 ///
 /// Global ID for EFI_DELAYED_DISPATCH_PPI_GUID
@@ -98,5 +97,3 @@ struct _EFI_DELAYED_DISPATCH_PPI {
 };
 
 extern EFI_GUID  gEfiPeiDelayedDispatchPpiGuid;
-
-#endif

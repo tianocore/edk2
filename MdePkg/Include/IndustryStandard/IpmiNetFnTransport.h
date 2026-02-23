@@ -15,8 +15,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _IPMI_NET_FN_TRANSPORT_H_
-#define _IPMI_NET_FN_TRANSPORT_H_
+#pragma once
 
 #pragma pack(1)
 //
@@ -913,4 +912,3 @@ typedef struct {
 } IPMI_GET_SOL_CONFIGURATION_PARAMETERS_RESPONSE;
 
 #pragma pack()
-#endif

@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef BUILD_FDT_LIB_H_
-#define BUILD_FDT_LIB_H_
+#pragma once
 
 /**
   It will build FDT for UPL consumed.
@@ -18,5 +17,3 @@ EFI_STATUS
 BuildFdtForUPL (
   IN     VOID  *FdtBase
   );
-
-#endif

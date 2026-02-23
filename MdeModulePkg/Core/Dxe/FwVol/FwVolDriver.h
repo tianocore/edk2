@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __FW_VOL_DRIVER_H_
-#define __FW_VOL_DRIVER_H_
+#pragma once
 
 #define FV2_DEVICE_SIGNATURE  SIGNATURE_32 ('_', 'F', 'V', '2')
 
@@ -383,5 +382,3 @@ IsValidFfsFile (
   IN UINT8                ErasePolarity,
   IN EFI_FFS_FILE_HEADER  *FfsHeader
   );
-
-#endif

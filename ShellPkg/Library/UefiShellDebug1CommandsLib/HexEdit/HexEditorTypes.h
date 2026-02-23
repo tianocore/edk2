@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _HEDITOR_TYPE_H_
-#define _HEDITOR_TYPE_H_
+#pragma once
 
 #include "UefiShellDebug1CommandsLib.h"
 #include "EditTitleBar.h"
@@ -113,5 +112,3 @@ typedef struct {
   UINTN                                SelectStart;       // starting from 1
   UINTN                                SelectEnd;         // starting from 1
 } HEFI_EDITOR_GLOBAL_EDITOR;
-
-#endif

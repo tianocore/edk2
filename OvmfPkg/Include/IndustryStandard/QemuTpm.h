@@ -9,8 +9,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __QEMU_TPM_H__
-#define __QEMU_TPM_H__
+#pragma once
 
 #include <Base.h>
 
@@ -59,5 +58,3 @@ typedef struct {
 
 #define QEMU_TPM_PPI_VERSION_NONE  0
 #define QEMU_TPM_PPI_VERSION_1_30  1
-
-#endif

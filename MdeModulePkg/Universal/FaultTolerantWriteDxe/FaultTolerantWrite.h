@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_FAULT_TOLERANT_WRITE_H_
-#define _EFI_FAULT_TOLERANT_WRITE_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -788,5 +787,3 @@ FtwCalculateCrc32 (
   IN  VOID   *Buffer,
   IN  UINTN  Length
   );
-
-#endif

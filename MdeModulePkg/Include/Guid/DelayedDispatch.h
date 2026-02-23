@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef DELAYED_DISPATCH_H_
-#define DELAYED_DISPATCH_H_
+#pragma once
 
 // Delayed Dispatch table GUID
 #define EFI_DELAYED_DISPATCH_TABLE_GUID  {\
@@ -38,5 +37,3 @@ typedef struct {
 #pragma pack (pop)
 
 extern EFI_GUID  gEfiDelayedDispatchTableGuid;
-
-#endif

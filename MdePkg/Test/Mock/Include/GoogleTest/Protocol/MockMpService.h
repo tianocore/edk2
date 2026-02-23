@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_MP_SERVICE_H_
-#define MOCK_MP_SERVICE_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -120,5 +119,3 @@ static EFI_MP_SERVICES_PROTOCOL  MP_SERVICE_PROTOCOL_INSTANCE = {
 extern "C" {
   EFI_MP_SERVICES_PROTOCOL  *gMpServiceProtocol = &MP_SERVICE_PROTOCOL_INSTANCE;
 }
-
-#endif // MOCK_MP_SERVICE_H_

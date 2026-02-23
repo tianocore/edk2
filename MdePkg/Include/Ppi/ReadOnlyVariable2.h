@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PEI_READ_ONLY_VARIABLE2_PPI_H__
-#define __PEI_READ_ONLY_VARIABLE2_PPI_H__
+#pragma once
 
 #define EFI_PEI_READ_ONLY_VARIABLE2_PPI_GUID \
   { 0x2ab86ef5, 0xecb5, 0x4134, { 0xb5, 0x56, 0x38, 0x54, 0xca, 0x1f, 0xe1, 0xb4 } }
@@ -105,5 +104,3 @@ struct _EFI_PEI_READ_ONLY_VARIABLE2_PPI {
 };
 
 extern EFI_GUID  gEfiPeiReadOnlyVariable2PpiGuid;
-
-#endif

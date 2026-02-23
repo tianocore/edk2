@@ -26,8 +26,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _OPAL_CORE_H_
-#define _OPAL_CORE_H_
+#pragma once
 
 #include <IndustryStandard/TcgStorageOpal.h>
 
@@ -879,5 +878,3 @@ OpalUtilGetDataRemovalMechanismLists (
   IN  OPAL_SESSION  *Session,
   OUT UINT32        *RemovalMechanismLists
   );
-
-#endif // _OPAL_CORE_H_
