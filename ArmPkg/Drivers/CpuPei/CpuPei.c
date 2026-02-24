@@ -134,9 +134,6 @@ InitializeCpuPeim (
   UINTN                 ArmCoreCount;
   ARM_CORE_INFO         *ArmCoreInfoTable;
 
-  // Enable program flow prediction, if supported.
-  ArmEnableBranchPrediction ();
-
   // Publish the CPU memory and io spaces sizes
   BuildCpuHob (ArmGetPhysicalAddressBits (), PcdGet8 (PcdPrePiCpuIoSize));
 
