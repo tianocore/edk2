@@ -364,18 +364,6 @@ ArmMmuEnabled (
 
 VOID
 EFIAPI
-ArmEnableBranchPrediction (
-  VOID
-  );
-
-VOID
-EFIAPI
-ArmDisableBranchPrediction (
-  VOID
-  );
-
-VOID
-EFIAPI
 ArmSetLowVectors (
   VOID
   );
