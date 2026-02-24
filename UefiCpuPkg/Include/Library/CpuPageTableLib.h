@@ -9,6 +9,8 @@
 #ifndef PAGE_TABLE_LIB_H_
 #define PAGE_TABLE_LIB_H_
 
+#include <Register/X86/CpuPageTable.h>
+
 typedef union {
   struct {
     UINT32    Present                  : 1;  // 0 = Not present in memory, 1 = Present in memory
