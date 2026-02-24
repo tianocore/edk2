@@ -1,0 +1,41 @@
+## @file
+#  VortexAI - EFI AI Inference Engine
+#
+#  Copyright (c) 2026, Americo Simoes. All rights reserved.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VortexAI
+  FILE_GUID                      = a1b2c3d4-e5f6-7890-abcd-ef1234567890
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UefiMain
+
+[Sources]
+  VortexAI.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiLib
+  UefiBootServicesTableLib
+  BaseLib
+  DebugLib
+  PrintLib
+  MemoryAllocationLib
+  FileHandleLib
+  ShellLib
+
+[BuildOptions]
+  GCC:*_*_*_CC_FLAGS = -std=c99 -ffreestanding
+  MSFT:*_*_*_CC_FLAGS = /GS- /MT
+
+[Depex]
+  TRUE

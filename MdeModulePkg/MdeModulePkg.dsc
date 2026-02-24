@@ -31,6 +31,7 @@
   DxeCoreEntryPoint|MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
+
   #
   # Basic
   #
@@ -46,6 +47,7 @@
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   SortLib|MdeModulePkg/Library/BaseSortLib/BaseSortLib.inf
+
   #
   # UEFI & PI
   #
@@ -63,6 +65,12 @@
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
+
+  #
+  # Shell Library (Required for VortexAI)
+  #
+  ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
+
   #
   # Generic Modules
   #
@@ -75,6 +83,7 @@
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
   FrameBufferBltLib|MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
+
   #
   # Misc
   #
@@ -208,6 +217,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryFileName|L"FVMAIN.FV"
 
 [Components]
+  MdeModulePkg/Applications/VortexAI/VortexAI.inf
+  MdeModulePkg/Applications/VortexAI/VortexAITest.inf
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
   MdeModulePkg/Application/DumpDynPcd/DumpDynPcd.inf
   MdeModulePkg/Application/MemoryProfileInfo/MemoryProfileInfo.inf
@@ -543,4 +554,3 @@
   MdeModulePkg/Library/ArmFfaLib/ArmFfaStandaloneMmLib.inf
 
 [BuildOptions]
-

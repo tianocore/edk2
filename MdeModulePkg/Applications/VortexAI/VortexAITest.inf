@@ -1,0 +1,37 @@
+## @file
+#  Unit tests for VortexAI
+#
+#  Copyright (c) 2026, Americo Simoes. All rights reserved.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VortexAITest
+  FILE_GUID                      = b2c3d4e5-f6a7-8901-bcde-f23456789012
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = VortexAITestMain
+
+[Sources]
+  VortexAITest.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiLib
+  UefiBootServicesTableLib
+  BaseLib
+  DebugLib
+  PrintLib
+  MemoryAllocationLib
+
+[BuildOptions]
+  GCC:*_*_*_CC_FLAGS = -std=c99 -ffreestanding
+
+[Depex]
+  TRUE
