@@ -214,3 +214,4 @@ VortexOracleEntryPoint (
 // CI cache breaker Tue 24 Feb 19:01:16 +08 2026
 // CI trigger Tue 24 Feb 19:17:54 +08 2026
  (MdeModulePkg/VortexOracle: Force CI to show real uncrustify requirements)
+// Final cleanup Tue 24 Feb 19:39:42 +08 2026
