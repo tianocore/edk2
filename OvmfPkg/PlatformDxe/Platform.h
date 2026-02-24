@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _PLATFORM_H_
-#define _PLATFORM_H_
+#pragma once
 
 //
 // Macro and type definitions that connect the form with the HII driver code.
@@ -33,5 +32,3 @@ typedef struct {
   UINT16    CurrentPreferredResolution[MAXSIZE_RES_CUR];
   UINT32    NextPreferredResolution;
 } MAIN_FORM_STATE;
-
-#endif // _PLATFORM_H_

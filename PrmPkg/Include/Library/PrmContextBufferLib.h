@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef PRM_CONTEXT_BUFFER_LIB_H_
-#define PRM_CONTEXT_BUFFER_LIB_H_
+#pragma once
 
 #include <Base.h>
 #include <PrmContextBuffer.h>
@@ -95,5 +94,3 @@ GetContextBuffer (
   IN  CONST PRM_MODULE_CONTEXT_BUFFERS  *PrmModuleContextBuffers  OPTIONAL,
   OUT CONST PRM_CONTEXT_BUFFER          **PrmContextBuffer
   );
-
-#endif

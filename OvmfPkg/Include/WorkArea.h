@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __OVMF_WORK_AREA_H__
-#define __OVMF_WORK_AREA_H__
+#pragma once
 
 #include <ConfidentialComputingGuestAttr.h>
 #include <IndustryStandard/Tpm20.h>
@@ -121,5 +120,3 @@ typedef union {
   SEV_WORK_AREA                              SevWorkArea;
   TDX_WORK_AREA                              TdxWorkArea;
 } OVMF_WORK_AREA;
-
-#endif

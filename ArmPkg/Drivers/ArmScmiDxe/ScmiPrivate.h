@@ -9,8 +9,7 @@
     DEN0056A_System_Control_and_Management_Interface.pdf
 **/
 
-#ifndef SCMI_PRIVATE_H_
-#define SCMI_PRIVATE_H_
+#pragma once
 
 // SCMI protocol IDs.
 typedef enum {
@@ -165,5 +164,3 @@ ScmiGetProtocolMessageAttributes (
   IN  SCMI_PROTOCOL_ID  ProtocolId,
   OUT UINT32            **ReturnValues
   );
-
-#endif /* SCMI_PRIVATE_H_ */

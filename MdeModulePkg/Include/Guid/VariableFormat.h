@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __VARIABLE_FORMAT_H__
-#define __VARIABLE_FORMAT_H__
+#pragma once
 
 #define EFI_VARIABLE_GUID \
   { 0xddcf3616, 0x3275, 0x4164, { 0x98, 0xb6, 0xfe, 0x85, 0x70, 0x7f, 0xfe, 0x7d } }
@@ -217,5 +216,3 @@ struct _VARIABLE_INFO_ENTRY {
   UINT32                 CacheCount;  ///< Number of times that cache hits this variable.
   BOOLEAN                Volatile;    ///< TRUE if volatile, FALSE if non-volatile.
 };
-
-#endif // _EFI_VARIABLE_H_

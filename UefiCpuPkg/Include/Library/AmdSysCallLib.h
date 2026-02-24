@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef AMD_SYS_CALL_LIB_H_
-#define AMD_SYS_CALL_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -60,5 +59,3 @@ SysCall (
   UINTN  Arg2,
   UINTN  Arg3
   );
-
-#endif

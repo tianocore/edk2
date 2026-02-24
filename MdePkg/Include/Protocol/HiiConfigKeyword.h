@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_CONFIG_KEYWORD_HANDLER_H__
-#define __EFI_CONFIG_KEYWORD_HANDLER_H__
+#pragma once
 
 #define EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL_GUID \
 { \
@@ -193,5 +192,3 @@ struct _EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiConfigKeywordHandlerProtocolGuid;
-
-#endif

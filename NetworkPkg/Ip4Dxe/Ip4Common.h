@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_IP4_COMMON_H__
-#define __EFI_IP4_COMMON_H__
+#pragma once
 
 typedef struct _IP4_INTERFACE  IP4_INTERFACE;
 typedef struct _IP4_PROTOCOL   IP4_PROTOCOL;
@@ -212,5 +211,3 @@ Ip4StationAddressValid (
   IN IP4_ADDR  Ip,
   IN IP4_ADDR  Netmask
   );
-
-#endif

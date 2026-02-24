@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _VIRTIO_GPU_DXE_H_
-#define _VIRTIO_GPU_DXE_H_
+#pragma once
 
 #include <IndustryStandard/VirtioGpu.h>
 #include <Library/BaseMemoryLib.h>
@@ -411,5 +410,3 @@ ReleaseGopResources (
 // Template for initializing VGPU_GOP.Gop.
 //
 extern CONST EFI_GRAPHICS_OUTPUT_PROTOCOL  mGopTemplate;
-
-#endif // _VIRTIO_GPU_DXE_H_

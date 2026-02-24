@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __PCI_ROOT_BRIDGE_IO_H__
-#define __PCI_ROOT_BRIDGE_IO_H__
+#pragma once
 
 #include <Library/BaseLib.h>
 
@@ -432,5 +431,3 @@ struct _EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiPciRootBridgeIoProtocolGuid;
-
-#endif

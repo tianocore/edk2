@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef ACPI_BOARD_INFO_GUID_H_
-#define ACPI_BOARD_INFO_GUID_H_
+#pragma once
 
 ///
 /// Board information GUID
@@ -26,5 +25,3 @@ typedef struct {
   UINT64    PcieBaseAddress;
   UINT64    PcieBaseSize;
 } ACPI_BOARD_INFO;
-
-#endif

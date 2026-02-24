@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef _MM_COMMUNICATION2_H_
-#define _MM_COMMUNICATION2_H_
+#pragma once
 
 #include <Protocol/MmCommunication.h>
 
@@ -65,5 +64,3 @@ struct _EFI_MM_COMMUNICATION2_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiMmCommunication2ProtocolGuid;
-
-#endif

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _ISCSI_IMPL_H_
-#define _ISCSI_IMPL_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -198,5 +197,3 @@ struct _ISCSI_DRIVER_DATA {
   EFI_HANDLE                         ChildHandle;
   ISCSI_SESSION                      *Session;
 };
-
-#endif

@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SMBIOS_STANDARD_H__
-#define __SMBIOS_STANDARD_H__
+#pragma once
 
 ///
 /// Reference SMBIOS 2.6, chapter 3.1.2.
@@ -3098,5 +3097,3 @@ typedef union {
 } SMBIOS_STRUCTURE_POINTER;
 
 #pragma pack()
-
-#endif

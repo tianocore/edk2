@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _INTERNAL_CPU_CACHE_INFO_LIB_H_
-#define _INTERNAL_CPU_CACHE_INFO_LIB_H_
+#pragma once
 
 #include <PiPei.h>
 #include <Register/Cpuid.h>
@@ -192,5 +191,3 @@ UINT32
 CpuCacheInfoGetNumberOfProcessors (
   IN MP_SERVICES  MpServices
   );
-
-#endif

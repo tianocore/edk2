@@ -17,8 +17,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef WIFI_PROFILE_SYNC_PROTOCOL_H_
-#define WIFI_PROFILE_SYNC_PROTOCOL_H_
+#pragma once
 
 #include <WifiConnectionManagerDxe/WifiConnectionMgrConfig.h>
 
@@ -89,5 +88,3 @@ typedef struct {
   Revision 1:   Initial version
 **/
 #define EDKII_WIFI_PROFILE_SYNC_PROTOCOL_REVISION  1
-
-#endif //  WIFI_PROFILE_SYNC_PROTOCOL_H_

@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TCP_IO_H_
-#define _TCP_IO_H_
+#pragma once
 
 #include <Protocol/Tcp4.h>
 #include <Protocol/Tcp6.h>
@@ -239,5 +238,3 @@ TcpIoReceive (
   IN     BOOLEAN    AsyncMode,
   IN     EFI_EVENT  Timeout       OPTIONAL
   );
-
-#endif

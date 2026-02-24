@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _CPU_MP_H_
-#define _CPU_MP_H_
+#pragma once
 
 /**
   Initialize Multi-processor support.
@@ -465,5 +464,3 @@ WhoAmI (
   IN EFI_MP_SERVICES_PROTOCOL  *This,
   OUT UINTN                    *ProcessorNumber
   );
-
-#endif // _CPU_MP_H_

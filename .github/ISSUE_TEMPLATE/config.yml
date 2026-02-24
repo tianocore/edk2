@@ -10,7 +10,7 @@
 
 contact_links:
   - name: Reporting Security Issues
-    url: https://github.com/tianocore/tianocore.github.io/wiki/Reporting-Security-Issues
+    url: https://www.tianocore.org/tianocore-wiki.github.io/security/processes/reporting_security_issues.html
     about: Read the wiki page that describes the process here
   - name: EDK II Development Mailing List
     url: https://edk2.groups.io/g/devel

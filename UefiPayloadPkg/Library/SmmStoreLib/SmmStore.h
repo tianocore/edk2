@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef COREBOOT_SMMSTORE_H_
-#define COREBOOT_SMMSTORE_H_
+#pragma once
 
 #define SMMSTORE_RET_SUCCESS      0
 #define SMMSTORE_RET_FAILURE      1
@@ -82,5 +81,3 @@ TriggerSmi (
   IN UINTN  Arg,
   IN UINTN  Retry
   );
-
-#endif // COREBOOT_SMMSTORE_H_

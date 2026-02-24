@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef METADATA_OBJ_H_
-#define METADATA_OBJ_H_
+#pragma once
 
 #include <Library/MetadataObjLib.h>
 
@@ -55,5 +54,3 @@ typedef struct MetadataRoot {
   /// Array of METADATA_LIST. One entry for each MetadataType.
   METADATA_LIST    MetadataList[MetadataTypeMax];
 } METADATA_ROOT;
-
-#endif // METADATA_OBJ_H_

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __PL031_REAL_TIME_CLOCK_H__
-#define __PL031_REAL_TIME_CLOCK_H__
+#pragma once
 
 // PL031 Registers
 #define PL031_RTC_DR_DATA_REGISTER                  0x000
@@ -34,5 +33,3 @@
 #define PL031_CLEAR_IRQ      0x00000001
 
 #define PL031_COUNTS_PER_SECOND  1
-
-#endif

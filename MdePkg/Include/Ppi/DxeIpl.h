@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __DXE_IPL_H__
-#define __DXE_IPL_H__
+#pragma once
 
 #define EFI_DXE_IPL_PPI_GUID \
   { \
@@ -62,5 +61,3 @@ struct _EFI_DXE_IPL_PPI {
 };
 
 extern EFI_GUID  gEfiDxeIplPpiGuid;
-
-#endif

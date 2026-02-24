@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef UEFI_BOOT_SERVICES_TABLE_LIB_UNIT_TEST_PROTOCOL_H_
-#define UEFI_BOOT_SERVICES_TABLE_LIB_UNIT_TEST_PROTOCOL_H_
+#pragma once
 
 #include "UnitTestUefiBootServicesTableLib.h"
 
@@ -116,5 +115,3 @@ IHANDLE *
   IN OUT LOCATE_POSITION  *Position,
   OUT VOID                **Interface
   );
-
-#endif

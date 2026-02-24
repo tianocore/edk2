@@ -35,7 +35,8 @@ firmware flash map.
 
 To build `PrmPkg` as a standalone package:
 
-1. If new to EDK II, follow the directions in [Getting Started with EDK II](https://github.com/tianocore/tianocore.github.io/wiki/Getting-Started-with-EDK-II)
+1. If new to EDK II, follow the directions in
+   [Getting Started with EDK II](https://www.tianocore.org/tianocore-wiki.github.io/development/tutorials-howto/getting_started_with_edk_ii.html)
 
 2. Clone the *master* branch on the edk2 repository locally \
    ``git clone https://github.com/tianocore/edk2.git``

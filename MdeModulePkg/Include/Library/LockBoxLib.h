@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _LOCK_BOX_LIB_H_
-#define _LOCK_BOX_LIB_H_
+#pragma once
 
 /**
   This function will save confidential information to lockbox.
@@ -133,5 +132,3 @@ EFIAPI
 RestoreAllLockBoxInPlace (
   VOID
   );
-
-#endif

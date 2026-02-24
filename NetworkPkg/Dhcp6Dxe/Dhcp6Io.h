@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_DHCP6_IO_H__
-#define __EFI_DHCP6_IO_H__
+#pragma once
 
 /**
   Clean up the specific nodes in the retry list.
@@ -238,5 +237,3 @@ Dhcp6SeekInnerOptionSafe (
   OUT UINT8   **IaInnerOpt,
   OUT UINT16  *IaInnerLen
   );
-
-#endif

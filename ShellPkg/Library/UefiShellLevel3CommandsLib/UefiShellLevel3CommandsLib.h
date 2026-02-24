@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _UEFI_SHELL_LEVEL3_COMMANDS_LIB_H_
-#define _UEFI_SHELL_LEVEL3_COMMANDS_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -150,5 +149,3 @@ ShellCommandRunHelp (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
-
-#endif

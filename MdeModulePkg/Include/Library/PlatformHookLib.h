@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PLATFORM_HOOK_LIB__
-#define __PLATFORM_HOOK_LIB__
+#pragma once
 
 /**
   Performs platform specific initialization required for the CPU to access
@@ -27,5 +26,3 @@ EFIAPI
 PlatformHookSerialPortInitialize (
   VOID
   );
-
-#endif // __PLATFORM_HOOK_LIB__

@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __DXE_SERVICES_LIB_H__
-#define __DXE_SERVICES_LIB_H__
+#pragma once
 
 /**
   Searches all the available firmware volumes and returns the first matching FFS section.
@@ -318,5 +317,3 @@ AllocatePeiAccessiblePages (
   IN EFI_MEMORY_TYPE  MemoryType,
   IN UINTN            Pages
   );
-
-#endif

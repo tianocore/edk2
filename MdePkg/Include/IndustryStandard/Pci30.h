@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __PCI30_H__
-#define __PCI30_H__
+#pragma once
 
 #include <IndustryStandard/Pci23.h>
 
@@ -68,5 +67,3 @@ typedef struct {
 } PCI_3_0_DATA_STRUCTURE;
 
 #pragma pack()
-
-#endif

@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef PCCT_PARSER_H_
-#define PCCT_PARSER_H_
+#pragma once
 
 /**
   Minimum value for the 'length' field in subspaces of types 0, 1 and 2.
@@ -29,5 +28,3 @@
 #define PCC_SUBSPACE_HEADER()                                             \
   {L"Type", 1, 0, L"0x%x", NULL, (VOID**)&PccSubspaceType, NULL, NULL},   \
   {L"Length", 1, 1, L"%u", NULL, (VOID**)&PccSubspaceLength, NULL, NULL}
-
-#endif // PCCT_PARSER_H_

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _MSEG_SMRAM_H_
-#define _MSEG_SMRAM_H_
+#pragma once
 
 #define MSEG_SMRAM_GUID \
   { \
@@ -20,5 +19,3 @@ extern EFI_GUID  gMsegSmramGuid;
 //
 // The data portion of this HOB is type EFI_SMRAM_DESCRIPTOR
 //
-
-#endif

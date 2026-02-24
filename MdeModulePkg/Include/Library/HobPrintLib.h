@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef HOB_PRINT_LIB_H_
-#define HOB_PRINT_LIB_H_
+#pragma once
 
 /**
   HOB Print Handler to print HOB information.
@@ -42,5 +41,3 @@ PrintHobList (
   IN CONST VOID         *HobStart,
   IN HOB_PRINT_HANDLER  PrintHandler OPTIONAL
   );
-
-#endif

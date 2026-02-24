@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __SKYLAKE_MSR_H__
-#define __SKYLAKE_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -3729,5 +3728,3 @@ typedef union {
   ///
   UINT64    Uint64;
 } MSR_SKYLAKE_IA32_L3_QOS_MASK_REGISTER;
-
-#endif

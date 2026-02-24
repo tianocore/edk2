@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __SMM_MEMORYATTRIBUTE_H__
-#define __SMM_MEMORYATTRIBUTE_H__
+#pragma once
 
 // {69B792EA-39CE-402D-A2A6-F721DE351DFE}
 #define EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL_GUID \
@@ -123,5 +122,3 @@ struct _EDKII_SMM_MEMORY_ATTRIBUTE_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkiiSmmMemoryAttributeProtocolGuid;
-
-#endif

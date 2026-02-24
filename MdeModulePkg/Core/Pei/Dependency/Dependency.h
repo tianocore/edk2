@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PEI_DEPENDENCY_H_
-#define _PEI_DEPENDENCY_H_
+#pragma once
 
 #define MAX_GRAMMAR_SIZE  64
 
@@ -21,5 +20,3 @@ typedef struct {
   BOOLEAN    Result;
   VOID       *Operator;
 } EVAL_STACK_ENTRY;
-
-#endif

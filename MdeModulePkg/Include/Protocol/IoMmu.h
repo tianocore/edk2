@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __IOMMU_H__
-#define __IOMMU_H__
+#pragma once
 
 //
 // IOMMU Protocol GUID value
@@ -248,5 +247,3 @@ struct _EDKII_IOMMU_PROTOCOL {
 /// IOMMU Protocol GUID variable.
 ///
 extern EFI_GUID  gEdkiiIoMmuProtocolGuid;
-
-#endif

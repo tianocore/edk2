@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __LZMA_DECOMPRESS_GUID_H__
-#define __LZMA_DECOMPRESS_GUID_H__
+#pragma once
 
 ///
 /// The Global ID used to identify a section of an FFS file of type
@@ -25,5 +24,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 extern GUID  gLzmaCustomDecompressGuid;
 extern GUID  gLzmaF86CustomDecompressGuid;
-
-#endif

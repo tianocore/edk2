@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _DXE_MM_READY_TO_LOCK_H_
-#define _DXE_MM_READY_TO_LOCK_H_
+#pragma once
 
 #define EFI_DXE_MM_READY_TO_LOCK_PROTOCOL_GUID \
   { \
@@ -15,5 +14,3 @@
   }
 
 extern EFI_GUID  gEfiDxeMmReadyToLockProtocolGuid;
-
-#endif

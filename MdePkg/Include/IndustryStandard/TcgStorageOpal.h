@@ -20,8 +20,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TCG_STORAGE_OPAL_H_
-#define _TCG_STORAGE_OPAL_H_
+#pragma once
 
 #include <IndustryStandard/TcgStorageCore.h>
 
@@ -237,5 +236,3 @@ typedef union {
 } OPAL_LEVEL0_FEATURE_DESCRIPTOR;
 
 #pragma pack()
-
-#endif // _OPAL_H_

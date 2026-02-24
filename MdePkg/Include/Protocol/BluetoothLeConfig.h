@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __EFI_BLUETOOTH_LE_CONFIG_H__
-#define __EFI_BLUETOOTH_LE_CONFIG_H__
+#pragma once
 
 #include <Protocol/BluetoothConfig.h>
 #include <Protocol/BluetoothAttribute.h>
@@ -625,5 +624,3 @@ struct _EFI_BLUETOOTH_LE_CONFIG_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiBluetoothLeConfigProtocolGuid;
-
-#endif

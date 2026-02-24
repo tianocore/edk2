@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef __I2C_HOST_H__
-#define __I2C_HOST_H__
+#pragma once
 
 #include <Pi/PiI2c.h>
 
@@ -141,5 +140,3 @@ struct _EFI_I2C_HOST_PROTOCOL {
 /// Reference to variable defined in the .DEC file
 ///
 extern EFI_GUID  gEfiI2cHostProtocolGuid;
-
-#endif //  __I2C_HOST_H__

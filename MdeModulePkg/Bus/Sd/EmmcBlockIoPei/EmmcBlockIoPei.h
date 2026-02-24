@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _EMMC_BLOCK_IO_PEI_H_
-#define _EMMC_BLOCK_IO_PEI_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -510,5 +509,3 @@ EmmcBlockIoPeimEndOfPei (
   IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
   IN VOID                       *Ppi
   );
-
-#endif

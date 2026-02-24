@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef EDKII_REDFISH_HTTP_DXE_H_
-#define EDKII_REDFISH_HTTP_DXE_H_
+#pragma once
 
 #include <Uefi.h>
 #include <RedfishCommon.h>
@@ -40,5 +39,3 @@
 #define REDFISH_HTTP_CACHE_DEBUG          DEBUG_MANAGEABILITY
 #define REDFISH_HTTP_CACHE_DEBUG_DUMP     DEBUG_MANAGEABILITY
 #define REDFISH_HTTP_CACHE_DEBUG_REQUEST  DEBUG_MANAGEABILITY
-
-#endif

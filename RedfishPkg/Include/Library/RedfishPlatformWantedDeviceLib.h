@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef REDFISH_PLATFORM_WANTED_DEVICE_LIB_H_
-#define REDFISH_PLATFORM_WANTED_DEVICE_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -33,5 +32,3 @@ IsPlatformWantedDevice (
   IN EFI_HANDLE                ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL  *RemainingDevicePath OPTIONAL
   );
-
-#endif

@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MM_UNBLOCK_REGION_H_
-#define MM_UNBLOCK_REGION_H_
+#pragma once
 
 ///
 /// The GUID of the UnblockRegion GUIDed HOB.
@@ -38,5 +37,3 @@ typedef struct {
 } MM_UNBLOCK_REGION;
 
 extern EFI_GUID  gMmUnblockRegionHobGuid;
-
-#endif
