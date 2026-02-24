@@ -99,6 +99,11 @@ jobs:
         Build.Pkgs: 'ArmVirtPkg,EmulatorPkg,OvmfPkg'
         Build.Targets: 'NO-TARGET'
         Build.Archlist: ${{ parameters.arch_list }}
+      ${{ if eq(parameters.tool_chain_tag, 'GCC') }}:
+        TARGET_TCGTPM_AARCH64_GCC_ONLY:
+          Build.Pkgs: 'TcgTpmPkg'
+          Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+          Build.Archlist: 'AARCH64'
 
   workspace:
     clean: all

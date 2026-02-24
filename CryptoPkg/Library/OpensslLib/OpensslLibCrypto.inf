@@ -672,6 +672,7 @@
   OpensslStub/EcSm2Null.c
   OpensslStub/uefiprov.c
   OpensslStub/EncoderNull.c
+  OpensslStub/CamelliaNull.c
 
 [Packages]
   MdePkg/MdePkg.dec
