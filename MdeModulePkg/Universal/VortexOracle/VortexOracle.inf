@@ -1,0 +1,24 @@
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VortexOracle
+  FILE_GUID                      = 7e756573-d126-4a9b-88b3-61427288b361
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = VortexOracleEntryPoint
+
+[Sources]
+  VortexOracle.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gVortexOracleProtocolGuid       ## PRODUCES
+
+[Depex]
+  TRUE

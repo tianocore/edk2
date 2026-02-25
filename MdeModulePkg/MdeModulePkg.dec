@@ -592,6 +592,7 @@
   gEdkiiPeiMigrateTempRamPpiGuid            = { 0xc79dc53b, 0xafcd, 0x4a6a, { 0xad, 0x94, 0xa7, 0x6a, 0x3f, 0xa9, 0xe9, 0xc2 } }
 
 [Protocols]
+  gVortexOracleProtocolGuid = { 0x7ce398d8, 0xb276, 0x4b5c, { 0x9e, 0x02, 0x14, 0xe7, 0x47, 0x98, 0x6c, 0xe8 } }
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
   #  Include/Protocol/LoadPe32Image.h
   #  This protocol is deprecated. Native EDKII module should NOT use this protocol to load/unload image.

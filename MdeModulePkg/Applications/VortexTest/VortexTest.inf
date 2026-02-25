@@ -1,0 +1,33 @@
+## @file
+# VortexTest UEFI Application - Tests the VortexOracle driver
+#
+# Copyright (c) 2026, Americo Simoes. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VortexTest
+  FILE_GUID                      = 87654321-4321-8765-4321-876543218765
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UefiMain
+
+[Sources]
+  VortexTest.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  UefiLib
+  UefiBootServicesTableLib
+  BaseLib
+  DebugLib
+  PrintLib
+
+[Protocols]
+  gVortexOracleProtocolGuid       ## CONSUMES
