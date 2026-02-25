@@ -1,0 +1,62 @@
+## @file
+#  CPU Exception Handler library instance for DXE modules.
+#  This is a TDX-aware override of UefiCpuPkg DxeCpuExceptionHandlerLib.
+#  IST-based separate exception stacks are skipped for TDX guests because
+#  LTR is not permitted inside a TDX guest and TR.Base is always 0 at entry.
+#
+#  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TdxDxeCpuExceptionHandlerLib
+  FILE_GUID                      = 53CF3DC8-5A73-4B0A-A1BA-C7E8DC4DD26B
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.1
+  LIBRARY_CLASS                  = CpuExceptionHandlerLib|DXE_CORE DXE_DRIVER UEFI_APPLICATION
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources.X64]
+  ../../../UefiCpuPkg/Library/CpuExceptionHandlerLib/X64/ArchExceptionHandler.c
+  ../../../UefiCpuPkg/Library/CpuExceptionHandlerLib/X64/ArchInterruptDefs.h
+  ../../../UefiCpuPkg/Library/CpuExceptionHandlerLib/X64/ExceptionHandlerAsm.nasm
+
+[Sources]
+  ../../../UefiCpuPkg/Library/CpuExceptionHandlerLib/CpuExceptionCommon.h
+  ../../../UefiCpuPkg/Library/CpuExceptionHandlerLib/CpuExceptionCommon.c
+  ../../../UefiCpuPkg/Library/CpuExceptionHandlerLib/PeiDxeSmmCpuException.c
+  DxeException.c
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuStackSwitchExceptionList
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuKnownGoodStackSize
+
+[FeaturePcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackGuard                    ## CONSUMES
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses.common]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  PeCoffGetEntryPointLib
+  PrintLib
+  SerialPortLib
+  SynchronizationLib
+
+[LibraryClasses.X64]
+  CcExitLib
+  LocalApicLib
