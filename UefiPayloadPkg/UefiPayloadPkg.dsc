@@ -293,8 +293,8 @@
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeCapsuleLib.inf
   BmpSupportLib|MdeModulePkg/Library/BaseBmpSupportLib/BaseBmpSupportLib.inf
     !if $(BOOTSPLASH_IMAGE)
-    # Note, however, that DisplayUpdateProgressLibGraphics aborts firmware
-    # update if GOP is missing, so text progress works in more environments.
+    # Use graphics when BOOTSPLASH_IMAGE is enabled. If GOP is not available
+    # at runtime, DisplayUpdateProgressLibGraphics falls back to text output.
     DisplayUpdateProgressLib|MdeModulePkg/Library/DisplayUpdateProgressLibGraphics/DisplayUpdateProgressLibGraphics.inf
     !else
     DisplayUpdateProgressLib|MdeModulePkg/Library/DisplayUpdateProgressLibText/DisplayUpdateProgressLibText.inf
