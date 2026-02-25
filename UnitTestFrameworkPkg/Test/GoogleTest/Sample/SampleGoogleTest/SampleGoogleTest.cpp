@@ -431,7 +431,12 @@ TEST (SanitizerTests, DivideByZeroDeathTest) {
   //
   // Divide by 0 should be caught by address sanitizer, log details, and exit
   //
+ #if !defined (MDE_CPU_AARCH64) || !defined (__GNUC__)
   EXPECT_DEATH (DivideWithNoParameterChecking (10, 0), "ERROR: AddressSanitizer: ");
+ #else
+  UINTN  Ret = DivideWithNoParameterChecking (10, 0);
+  ASSERT_EQ (Ret, (UINTN)0);
+ #endif
 }
 
 /**

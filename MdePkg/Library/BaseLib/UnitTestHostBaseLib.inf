@@ -63,6 +63,7 @@
   SafeString.c
   String.c
   FilePaths.c
+  Unaligned.c
   BaseLibInternals.h
   UnitTestHost.c
   UnitTestHost.h
@@ -121,7 +122,6 @@
   Ia32/InternalSwitchStack.c | MSFT
   Ia32/InternalSwitchStack.nasm | GCC
   Ia32/Non-existing.c
-  Unaligned.c
   X86MemoryFence.c | MSFT
   X86FxSave.c
   X86FxRestore.c
@@ -160,7 +160,6 @@
   X64/ReadEflags.nasm| MSFT
   X64/Non-existing.c
   Math64.c
-  Unaligned.c
   X86MemoryFence.c | MSFT
   X86FxSave.c
   X86FxRestore.c
@@ -178,12 +177,10 @@
   Ebc/SetJumpLongJump.c
   Ebc/SwitchStack.c
   Ebc/SpeculationBarrier.c
-  Unaligned.c
   Math64.c
 
 [Sources.AARCH64]
   AArch64/InternalSwitchStack.c
-  AArch64/Unaligned.c
   Math64.c
 
   AArch64/MemoryFence.S             | GCC
@@ -197,10 +194,10 @@
   AArch64/SetJumpLongJump.asm       | MSFT
   AArch64/CpuBreakpoint.asm         | MSFT
   AArch64/SpeculationBarrier.asm    | MSFT
+  AArch64UnitTestHost.c
 
 [Sources.RISCV64]
   Math64.c
-  Unaligned.c
   RiscV64/InternalSwitchStack.c
   RiscV64/CpuBreakpoint.c
   RiscV64/CpuPause.c

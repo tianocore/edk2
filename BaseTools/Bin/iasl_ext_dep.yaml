@@ -16,6 +16,6 @@
   "type": "nuget",
   "name": "edk2-acpica-iasl",
   "source": "https://pkgs.dev.azure.com/projectmu/acpica/_packaging/mu_iasl/nuget/v3/index.json",
-  "version": "20200717.0.0",
+  "version": "20230628.0.1",
   "flags": ["set_path", "host_specific"]
 }
