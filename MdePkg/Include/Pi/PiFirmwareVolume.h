@@ -11,6 +11,9 @@
 
 #pragma once
 
+#ifndef __PI_FIRMWAREVOLUME_H__
+#define __PI_FIRMWAREVOLUME_H__
+
 ///
 /// EFI_FV_FILE_ATTRIBUTES
 ///
@@ -242,3 +245,5 @@ typedef struct {
   ///
   UINT32                           UsedSize;
 } EFI_FIRMWARE_VOLUME_EXT_ENTRY_USED_SIZE_TYPE;
+
+#endif
