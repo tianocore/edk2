@@ -485,6 +485,46 @@ FitBuildHobs (
   return EFI_SUCCESS;
 }
 
+#ifdef __riscv
+  #include <Guid/RiscVSecHobData.h>
+  #include <Library/BaseArchLibSupport.h>
+
+unsigned long  _RiscV64BootHartID;
+
+VOID
+BuildRiscV64Hob (
+  VOID  *Fdt
+  )
+{
+  EFI_HOB_CPU             *Hob;
+  UINT8                   *GuidHob;
+  UINT8                   PhysicalAddressBits;
+  RISCV_SEC_HANDOFF_DATA  SecData;
+  EFI_GUID                SecHobDataGuid = RISCV_SEC_HANDOFF_HOB_GUID;
+
+  GuidHob = GetFirstGuidHob (&gUniversalPayloadDeviceTreeGuid);
+  if (GuidHob) {
+    Fdt =  (UNIVERSAL_PAYLOAD_DEVICE_TREE *)GET_GUID_HOB_DATA (GuidHob);
+  }
+
+  SecData.BootHartId = _RiscV64BootHartID;
+  SecData.FdtPointer = Fdt;
+
+  BuildGuidDataHob (
+    &SecHobDataGuid,
+    &SecData,
+    sizeof (SecData)
+    );
+
+  Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
+  if (!Hob) {
+    PhysicalAddressBits = ArchGetPhysicalAddressBits ();
+    BuildCpuHob (PhysicalAddressBits, PcdGet8 (SizeOfIoSpace));
+  }
+}
+
+#endif
+
 /**
   Entry point to the C language phase of UEFI payload.
   @param[in]   BootloaderParameter  The starting address of FDT .
@@ -543,6 +583,10 @@ FitUplEntryPoint (
 
   // Build HOB based on information from Bootloader
   Status = FitBuildHobs ((UINTN)FdtBaseResvd, &DxeFv);
+
+ #ifdef __riscv
+  BuildRiscV64Hob ((VOID *)BootloaderParameter);
+ #endif
 
   // Call constructor for all libraries again since hobs were built
   ProcessLibraryConstructorList ();

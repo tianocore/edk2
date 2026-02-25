@@ -33,6 +33,9 @@
 [Sources.AARCH64]
   AArch64/BlSupport.c
 
+[Sources.RISCV64]
+  RiscV64/BlSupport.c
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec

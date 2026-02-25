@@ -150,7 +150,7 @@ CheckNodeType (
     return SerialPort;
   } else if (AsciiStrnCmp (NodeString, "reserved-memory", AsciiStrLen ("reserved-memory")) == 0) {
     return ReservedMemory;
-  } else if (AsciiStrnCmp (NodeString, "memory@", AsciiStrLen ("memory@")) == 0) {
+  } else if (AsciiStrnCmp (NodeString, "memory", AsciiStrLen ("memory")) == 0) {
     return Memory;
   } else if (AsciiStrnCmp (NodeString, "framebuffer@", AsciiStrLen ("framebuffer@")) == 0) {
     return FrameBuffer;
@@ -175,35 +175,26 @@ ParseMemory (
   IN INT32  Node
   )
 {
-  UINT32              Attribute;
-  UINT8               ECCAttribute;
-  UINT32              ECCData, ECCData2;
-  INT32               Property;
-  CONST FDT_PROPERTY  *PropertyPtr;
-  INT32               TempLen;
-  CONST CHAR8         *TempStr;
-  UINT64              *Data64;
-  UINT32              *Data32;
-  UINT64              StartAddress;
-  UINT64              NumberOfBytes;
+  UINT32  Attribute;
+  UINT8   ECCAttribute;
+  UINT32  ECCData, ECCData2;
+  INT32   TempLen;
+  UINT64  *Data64;
+  UINT32  *Data32;
+  UINT64  StartAddress;
+  UINT64  NumberOfBytes;
 
   Attribute    = MEMORY_ATTRIBUTE_DEFAULT;
   ECCAttribute = 0;
   ECCData      = ECCData2 = 0;
-  for (Property = FdtFirstPropertyOffset (Fdt, Node); Property >= 0; Property = FdtNextPropertyOffset (Fdt, Property)) {
-    PropertyPtr = FdtGetPropertyByOffset (Fdt, Property, &TempLen);
-    TempStr     = FdtGetString (Fdt, Fdt32ToCpu (PropertyPtr->NameOffset), NULL);
-    if (AsciiStrCmp (TempStr, "reg") == 0) {
-      Data64        = (UINT64 *)(PropertyPtr->Data);
-      StartAddress  = Fdt64ToCpu (ReadUnaligned64 (Data64));
-      NumberOfBytes = Fdt64ToCpu (ReadUnaligned64 (Data64 + 1));
-    } else if (AsciiStrCmp (TempStr, "ecc-detection-bits") == 0) {
-      Data32  = (UINT32 *)(PropertyPtr->Data);
-      ECCData = Fdt32ToCpu (*Data32);
-    } else if (AsciiStrCmp (TempStr, "ecc-correction-bits") == 0) {
-      Data32   = (UINT32 *)(PropertyPtr->Data);
-      ECCData2 = Fdt32ToCpu (*Data32);
-    }
+  Data32       = (UINT32 *)FdtGetProp (Fdt, Node, "ecc-detection-bits", &TempLen);
+  if (Data32) {
+    ECCData = Fdt32ToCpu (*Data32);
+  }
+
+  Data32 = (UINT32 *)FdtGetProp (Fdt, Node, "ecc-correction-bits", &TempLen);
+  if (Data32) {
+    ECCData2 = Fdt32ToCpu (*Data32);
   }
 
   if (ECCData == ECCData2) {
@@ -218,7 +209,13 @@ ParseMemory (
     Attribute |= ECCAttribute;
   }
 
-  BuildResourceDescriptorHob (EFI_RESOURCE_SYSTEM_MEMORY, Attribute, StartAddress, NumberOfBytes);
+  Data64 = (UINT64 *)FdtGetProp (Fdt, Node, "reg", &TempLen);
+  while (TempLen > 2 * sizeof (UINT64)) {
+    StartAddress  = Fdt64ToCpu (ReadUnaligned64 (Data64++));
+    NumberOfBytes = Fdt64ToCpu (ReadUnaligned64 (Data64++));
+    TempLen      -= 2 * sizeof (UINT64);
+    BuildResourceDescriptorHob (EFI_RESOURCE_SYSTEM_MEMORY, Attribute, StartAddress, NumberOfBytes);
+  }
 }
 
 /**
@@ -268,7 +265,7 @@ ParseReservedMemory (
       BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiMemoryMappedIO);
     } else {
       PropertyPtr = FdtGetProperty (Fdt, SubNode, "compatible", &TempLen);
-      TempStr     = (CHAR8 *)(PropertyPtr->Data);
+      TempStr     = TempLen > 0 ? (CHAR8 *)(PropertyPtr->Data) : "";
       DEBUG ((DEBUG_INFO, "compatible:  %a\n", TempStr));
       if (AsciiStrnCmp (TempStr, "boot-code", AsciiStrLen ("boot-code")) == 0) {
         DEBUG ((DEBUG_INFO, "  boot-code\n"));
@@ -606,8 +603,9 @@ ParseSerialPort (
   Serial->RegisterStride  = 1;
   Serial->UseMmio         = TRUE;
 
-  PropertyPtr = FdtGetProperty (Fdt, SubNode, "current-speed", &TempLen);
-  ASSERT (TempLen > 0);
+  // Set to 0 to use the default baud rate 115200
+  Serial->BaudRate = 0;
+  PropertyPtr      = FdtGetProperty (Fdt, SubNode, "current-speed", &TempLen);
   if (TempLen > 0) {
     Data32           = (UINT32 *)(PropertyPtr->Data);
     Serial->BaudRate = Fdt32ToCpu (*Data32);
@@ -973,50 +971,46 @@ ParseDtb (
   for (Node = FdtNextNode (Fdt, 0, &Depth); Node >= 0; Node = FdtNextNode (Fdt, Node, &Depth)) {
     NodePtr = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + Node + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
     DEBUG ((DEBUG_INFO, "\n   Node(%08x)  %a   Depth %x\n", Node, NodePtr->Name, Depth));
+    NodeType = CheckNodeType (NodePtr->Name, Depth);
     // memory node
-    if (AsciiStrnCmp (NodePtr->Name, "memory@", AsciiStrLen ("memory@")) == 0) {
+    if (NodeType == Memory) {
       for (Property = FdtFirstPropertyOffset (Fdt, Node); Property >= 0; Property = FdtNextPropertyOffset (Fdt, Property)) {
         PropertyPtr = FdtGetPropertyByOffset (Fdt, Property, &TempLen);
         TempStr     = FdtGetString (Fdt, Fdt32ToCpu (PropertyPtr->NameOffset), NULL);
         if (AsciiStrCmp (TempStr, "reg") == 0) {
-          Data64        = (UINT64 *)(PropertyPtr->Data);
-          StartAddress  = Fdt64ToCpu (ReadUnaligned64 (Data64));
-          NumberOfBytes = Fdt64ToCpu (ReadUnaligned64 (Data64 + 1));
-          DEBUG ((DEBUG_INFO, "\n         Property(%08X)  %a", Property, TempStr));
-          DEBUG ((DEBUG_INFO, "  %016lX  %016lX", StartAddress, NumberOfBytes));
-          // If parent node type is reserved-memory we are looking at special-purpose memory. Ignore it.
-          ParentNode = FdtParentOffset (Fdt, Node);
-          NodePtr    = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + ParentNode + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
-          NodeType   = CheckNodeType (NodePtr->Name, Depth);
-          if (!IsHobConstructed && (NodeType != ReservedMemory)) {
-            if (NumberOfBytes > MinimalNeededSize) {
-              MemoryBottom     = StartAddress + NumberOfBytes - MinimalNeededSize;
-              FreeMemoryBottom = MemoryBottom;
-              FreeMemoryTop    = StartAddress + NumberOfBytes;
-              MemoryTop        = FreeMemoryTop;
+          Data64 = (UINT64 *)(PropertyPtr->Data);
+          while (TempLen > 2 * sizeof (UINT64)) {
+            TempLen      -= 2 * sizeof (UINT64);
+            StartAddress  = Fdt64ToCpu (ReadUnaligned64 (Data64++));
+            NumberOfBytes = Fdt64ToCpu (ReadUnaligned64 (Data64++));
+            DEBUG ((DEBUG_INFO, "\n         Property(%08X)  %a", Property, TempStr));
+            DEBUG ((DEBUG_INFO, "  %016lX  %016lX", StartAddress, NumberOfBytes));
+            // If parent node type is reserved-memory we are looking at special-purpose memory. Ignore it.
+            ParentNode = FdtParentOffset (Fdt, Node);
+            NodePtr    = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + ParentNode + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
+            NodeType   = CheckNodeType (NodePtr->Name, Depth);
+            if (!IsHobConstructed && (NodeType != ReservedMemory)) {
+              if (NumberOfBytes > MinimalNeededSize) {
+                MemoryBottom     = StartAddress + NumberOfBytes - MinimalNeededSize;
+                FreeMemoryBottom = MemoryBottom;
+                FreeMemoryTop    = StartAddress + NumberOfBytes;
+                MemoryTop        = FreeMemoryTop;
 
-              DEBUG ((DEBUG_INFO, "MemoryBottom :0x%llx\n", MemoryBottom));
-              DEBUG ((DEBUG_INFO, "FreeMemoryBottom :0x%llx\n", FreeMemoryBottom));
-              DEBUG ((DEBUG_INFO, "FreeMemoryTop :0x%llx\n", FreeMemoryTop));
-              DEBUG ((DEBUG_INFO, "MemoryTop :0x%llx\n", MemoryTop));
-              mHobList         = HobConstructor ((VOID *)(UINTN)MemoryBottom, (VOID *)(UINTN)MemoryTop, (VOID *)(UINTN)FreeMemoryBottom, (VOID *)(UINTN)FreeMemoryTop);
-              IsHobConstructed = TRUE;
-              NewHobList       = (UINTN)mHobList;
-              break;
+                DEBUG ((DEBUG_INFO, "MemoryBottom :0x%llx\n", MemoryBottom));
+                DEBUG ((DEBUG_INFO, "FreeMemoryBottom :0x%llx\n", FreeMemoryBottom));
+                DEBUG ((DEBUG_INFO, "FreeMemoryTop :0x%llx\n", FreeMemoryTop));
+                DEBUG ((DEBUG_INFO, "MemoryTop :0x%llx\n", MemoryTop));
+                mHobList         = HobConstructor ((VOID *)(UINTN)MemoryBottom, (VOID *)(UINTN)MemoryTop, (VOID *)(UINTN)FreeMemoryBottom, (VOID *)(UINTN)FreeMemoryTop);
+                IsHobConstructed = TRUE;
+                NewHobList       = (UINTN)mHobList;
+                break;
+              }
             }
           }
         }
       }
-    } else {
-      PropertyPtr = FdtGetProperty (Fdt, Node, "compatible", &TempLen);
-      if (PropertyPtr == NULL) {
-        continue;
-      }
-
-      TempStr = (CHAR8 *)(PropertyPtr->Data);
-      if (AsciiStrnCmp (TempStr, "pci-rb", AsciiStrLen ("pci-rb")) == 0) {
-        RootBridgeCount++;
-      }
+    } else if (NodeType == PciRootBridge) {
+      RootBridgeCount++;
     }
   }
 
