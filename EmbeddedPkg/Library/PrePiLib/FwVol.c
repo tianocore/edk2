@@ -394,19 +394,17 @@ FfsProcessSection (
 
       return EFI_SUCCESS;
     } else if ((Section->Type == EFI_SECTION_COMPRESSION) || (Section->Type == EFI_SECTION_GUID_DEFINED)) {
-      CHAR8   *CompressedData;
-      UINT32  CompressionSectionHeaderSize;
       VOID    *ScratchBuffer;
       UINT32  ScratchBufferSize;
 
       if (Section->Type == EFI_SECTION_COMPRESSION) {
+        CHAR8   *CompressedData;
         UINT32  CompressedDataLength;
 
-        CompressionSectionHeaderSize = GetCompressionSectionNHeaderSize (Section);
-        SectionLength                = GetSectionNSize (Section);
+        SectionLength = GetSectionNSize (Section);
 
-        CompressedData       = (CHAR8 *)((UINTN)(Section) + CompressionSectionHeaderSize);
-        CompressedDataLength = SectionLength - CompressionSectionHeaderSize;
+        CompressedData       = (CHAR8 *)((UINTN)(Section) + GetCompressionSectionNHeaderSize (Section));
+        CompressedDataLength = SectionLength - GetCompressionSectionNHeaderSize (Section);
 
         if (GetSectionNCompressionType (Section) != EFI_STANDARD_COMPRESSION) {
           return EFI_UNSUPPORTED;
@@ -464,7 +462,9 @@ FfsProcessSection (
       // Call decompress function
       //
       if (Section->Type == EFI_SECTION_COMPRESSION) {
-        CompressedData = (CHAR8 *)((UINTN)(Section) + CompressionSectionHeaderSize);
+        CHAR8  *CompressedData;
+
+        CompressedData = (CHAR8 *)((UINTN)(Section) + GetCompressionSectionNHeaderSize (Section));
 
         Status = UefiDecompress (
                    CompressedData,

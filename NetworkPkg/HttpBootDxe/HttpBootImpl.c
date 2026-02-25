@@ -318,6 +318,8 @@ HttpBootGetBootFileCaller (
   EFI_STATUS                Status;
   UINT32                    Retries;
 
+  Status = EFI_UNSUPPORTED;
+
   if (Private->BootFileSize == 0) {
     if (Private->ProxyUri != NULL) {
       State = ConnectToProxy;
