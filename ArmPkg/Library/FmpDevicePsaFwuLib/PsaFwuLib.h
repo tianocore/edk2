@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef PSA_FWU_LIB_H_
-#define PSA_FWU_LIB_H_
+#pragma once
 
 #include <IndustryStandard/PsaMmFwUpdate.h>
 
@@ -269,5 +268,3 @@ PsaFwuVirtualAddressChangeEvent (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   );
-
-#endif // PSA_FWU_LIB_H_

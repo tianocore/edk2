@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SMM_CORE_PLATFORM_HOOK_LIB__
-#define __SMM_CORE_PLATFORM_HOOK_LIB__
+#pragma once
 
 /**
   Performs platform specific tasks before invoking registered SMI handlers.
@@ -39,5 +38,3 @@ EFIAPI
 PlatformHookAfterSmmDispatch (
   VOID
   );
-
-#endif

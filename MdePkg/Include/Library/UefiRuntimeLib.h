@@ -6,8 +6,7 @@ Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __UEFI_RUNTIME_LIB__
-#define __UEFI_RUNTIME_LIB__
+#pragma once
 
 /**
   This function allows the caller to determine if UEFI ExitBootServices() has been called.
@@ -611,5 +610,3 @@ EfiQueryVariableInfo (
   OUT UINT64  *RemainingVariableStorageSize,
   OUT UINT64  *MaximumVariableSize
   );
-
-#endif

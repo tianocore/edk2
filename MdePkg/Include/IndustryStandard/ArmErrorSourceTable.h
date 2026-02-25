@@ -15,8 +15,7 @@
     - Id  : Identifier
 **/
 
-#ifndef ARM_ERROR_SOURCE_TABLE_H_
-#define ARM_ERROR_SOURCE_TABLE_H_
+#pragma once
 
 ///
 /// "AEST" Arm Error Source Table
@@ -353,5 +352,3 @@ typedef struct {
 #define EFI_ACPI_AEST_GIC_INTERFACE_TYPE_GITS  0x3
 
 #pragma pack()
-
-#endif // ARM_ERROR_SOURCE_TABLE_H_

@@ -573,7 +573,6 @@ class Check(object):
 
     # Include file checking
     def IncludeFileCheck(self):
-        self.IncludeFileCheckIfndef()
         self.IncludeFileCheckData()
         self.IncludeFileCheckSameName()
 
@@ -602,19 +601,6 @@ class Check(object):
                         Path = mws.relpath(Item[1], EccGlobalData.gWorkspace)
                         if not EccGlobalData.gException.IsException(ERROR_INCLUDE_FILE_CHECK_NAME, Path):
                             EccGlobalData.gDb.TblReport.Insert(ERROR_INCLUDE_FILE_CHECK_NAME, OtherMsg="The file name for [%s] is duplicate" % Path, BelongsToTable='File', BelongsToItem=Item[0])
-
-    # Check whether all include file contents is guarded by a #ifndef statement.
-    def IncludeFileCheckIfndef(self):
-        if EccGlobalData.gConfig.IncludeFileCheckIfndefStatement == '1' or EccGlobalData.gConfig.IncludeFileCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
-            EdkLogger.quiet("Checking header file ifndef ...")
-
-#            for Dirpath, Dirnames, Filenames in self.WalkTree():
-#                for F in Filenames:
-#                    if os.path.splitext(F)[1] in ('.h'):
-#                        FullName = os.path.join(Dirpath, F)
-#                        MsgList = c.CheckHeaderFileIfndef(FullName)
-            for FullName in EccGlobalData.gHFileList:
-                MsgList = c.CheckHeaderFileIfndef(FullName)
 
     # Check whether include files NOT contain code or define data variables
     def IncludeFileCheckData(self):
@@ -1352,7 +1338,6 @@ class Check(object):
     def NamingConventionCheck(self):
         if EccGlobalData.gConfig.NamingConventionCheckDefineStatement == '1' \
         or EccGlobalData.gConfig.NamingConventionCheckTypedefStatement == '1' \
-        or EccGlobalData.gConfig.NamingConventionCheckIfndefStatement == '1' \
         or EccGlobalData.gConfig.NamingConventionCheckVariableName == '1' \
         or EccGlobalData.gConfig.NamingConventionCheckSingleCharacterVariable == '1' \
         or EccGlobalData.gConfig.NamingConventionCheckAll == '1'\
@@ -1369,8 +1354,6 @@ class Check(object):
                         self.NamingConventionCheckTypedefStatement(FileTable)
                         self.NamingConventionCheckVariableName(FileTable)
                         self.NamingConventionCheckSingleCharacterVariable(FileTable)
-                        if os.path.splitext(F)[1] in ('.h'):
-                            self.NamingConventionCheckIfndefStatement(FileTable)
 
         self.NamingConventionCheckPathName()
         self.NamingConventionCheckFunctionName()
@@ -1409,21 +1392,6 @@ class Check(object):
                     if Name.upper() != Name:
                         if not EccGlobalData.gException.IsException(ERROR_NAMING_CONVENTION_CHECK_TYPEDEF_STATEMENT, Name):
                             EccGlobalData.gDb.TblReport.Insert(ERROR_NAMING_CONVENTION_CHECK_TYPEDEF_STATEMENT, OtherMsg="The #typedef name [%s] does not follow the rules" % (Name), BelongsToTable=FileTable, BelongsToItem=Record[0])
-
-    # Check whether the #ifndef at the start of an include file uses both prefix and postfix underscore characters, '_'.
-    def NamingConventionCheckIfndefStatement(self, FileTable):
-        if EccGlobalData.gConfig.NamingConventionCheckIfndefStatement == '1' or EccGlobalData.gConfig.NamingConventionCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
-            EdkLogger.quiet("Checking naming convention of #ifndef statement ...")
-
-            SqlCommand = """select ID, Value from %s where Model = %s""" % (FileTable, MODEL_IDENTIFIER_MACRO_IFNDEF)
-            RecordSet = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
-            if RecordSet:
-                # Only check the first ifndef statement of the file
-                FirstDefine = sorted(RecordSet, key=lambda Record: Record[0])[0]
-                Name = FirstDefine[1].replace('#ifndef', '').strip()
-                if Name[0] == '_' or Name[-1] != '_' or Name[-2] == '_':
-                    if not EccGlobalData.gException.IsException(ERROR_NAMING_CONVENTION_CHECK_IFNDEF_STATEMENT, Name):
-                        EccGlobalData.gDb.TblReport.Insert(ERROR_NAMING_CONVENTION_CHECK_IFNDEF_STATEMENT, OtherMsg="The #ifndef name [%s] does not follow the rules" % (Name), BelongsToTable=FileTable, BelongsToItem=FirstDefine[0])
 
     # Rule for path name, variable name and function name
     # 1. First character should be upper case

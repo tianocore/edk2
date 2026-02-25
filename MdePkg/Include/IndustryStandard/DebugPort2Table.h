@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _DEBUG_PORT_2_TABLE_H_
-#define _DEBUG_PORT_2_TABLE_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -70,5 +69,3 @@ typedef struct {
 // DBG2 Revision (defined in spec)
 //
 #define EFI_ACPI_DEBUG_PORT_2_TABLE_REVISION  0x00
-
-#endif

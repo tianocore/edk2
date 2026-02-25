@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __SEC_MIGRATION_H__
-#define __SEC_MIGRATION_H__
+#pragma once
 
 #include <Base.h>
 
@@ -154,5 +153,3 @@ typedef struct {
   FIRMWARE_SEC_PERFORMANCE            FirmwareSecPerformance;
   SEC_PLATFORM_INFORMATION_CONTEXT    Context;
 } SEC_PLATFORM_INFORMATION_CONTEXT_HOB;
-
-#endif

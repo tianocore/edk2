@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_MTFTP6_SUPPORT_H__
-#define __EFI_MTFTP6_SUPPORT_H__
+#pragma once
 
 //
 // The structure representing a range of block numbers, [Start, End].
@@ -332,5 +331,3 @@ Mtftp6RrqStart (
   IN MTFTP6_INSTANCE  *Instance,
   IN UINT16           Operation
   );
-
-#endif

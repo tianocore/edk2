@@ -8,8 +8,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _DHCP_H_
-#define _DHCP_H_
+#pragma once
 
 ///
 /// Dynamic Host Configuration Protocol for IPv4 (DHCPv4)
@@ -283,5 +282,3 @@ typedef enum {
 #define HTTP_CLIENT_ARCH_RISCV128     0x001E          /// RISC-V uefi 128 boot from http
 #define HTTP_CLIENT_ARCH_LOONGARCH32  0x0026          /// LoongArch uefi 32 boot from http
 #define HTTP_CLIENT_ARCH_LOONGARCH64  0x0028          /// LoongArch uefi 64 boot from http
-
-#endif

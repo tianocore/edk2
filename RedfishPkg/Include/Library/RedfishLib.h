@@ -67,8 +67,7 @@
 
 **/
 
-#ifndef REDFISH_LIB_H_
-#define REDFISH_LIB_H_
+#pragma once
 
 #include <RedfishServiceData.h>
 #include <Library/JsonLib.h>
@@ -736,5 +735,3 @@ RedfishBuildRedpathUseId (
   IN  CHAR8  *Id,
   OUT CHAR8  **Redpath
   );
-
-#endif

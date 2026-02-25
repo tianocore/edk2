@@ -14,8 +14,7 @@
   - Generic ACPI for Arm Components 1.0 Platform Design Document
 **/
 
-#ifndef SSDT_CMN600_GENERATOR_H_
-#define SSDT_CMN600_GENERATOR_H_
+#pragma once
 
 /** PeriphBase maximum address length is 256MB (0x10000000)
     for a (X >= 4) || (Y >= 4) dimensions mesh.
@@ -47,5 +46,3 @@
 
 */
 #define MAX_CMN600_DEVICES_SUPPORTED  16
-
-#endif // SSDT_CMN600_GENERATOR_H_

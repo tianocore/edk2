@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __FIRMWARE_FILE_SYSTEM2_GUID_H__
-#define __FIRMWARE_FILE_SYSTEM2_GUID_H__
+#pragma once
 
 ///
 /// The firmware volume header contains a data field for
@@ -29,5 +28,3 @@
 
 extern EFI_GUID  gEfiFirmwareFileSystem2Guid;
 extern EFI_GUID  gEfiFirmwareVolumeTopFileGuid;
-
-#endif

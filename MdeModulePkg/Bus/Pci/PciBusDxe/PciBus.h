@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_PCI_BUS_H_
-#define _EFI_PCI_BUS_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -388,5 +387,3 @@ PciBusDriverBindingStop (
   IN  UINTN                        NumberOfChildren,
   IN  EFI_HANDLE                   *ChildHandleBuffer
   );
-
-#endif

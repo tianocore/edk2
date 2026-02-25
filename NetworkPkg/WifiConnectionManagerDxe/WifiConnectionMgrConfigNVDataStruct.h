@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _WIFI_NVDATASTRUC_H_
-#define _WIFI_NVDATASTRUC_H_
+#pragma once
 
 #include <Guid/WifiConnectionManagerConfigHii.h>
 #include "WifiConnectionMgrConfigHii.h"
@@ -148,5 +147,3 @@ typedef struct _WIFI_MANAGER_IFR_NVDATA {
   UINT8     HiddenNetworkList[HIDDEN_NETWORK_LIST_COUNT_MAX];
 } WIFI_MANAGER_IFR_NVDATA;
 #pragma pack()
-
-#endif

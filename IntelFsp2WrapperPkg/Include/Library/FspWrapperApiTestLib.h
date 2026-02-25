@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __FSP_WRAPPER_API_TEST_LIB_H__
-#define __FSP_WRAPPER_API_TEST_LIB_H__
+#pragma once
 
 #include <PiPei.h>
 
@@ -64,5 +63,3 @@ EFIAPI
 TestFspSmmInitApiOutput (
   IN  VOID  *FspiUpdDataPtr
   );
-
-#endif

@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __PARTITION_INFO_PROTOCOL_H__
-#define __PARTITION_INFO_PROTOCOL_H__
+#pragma once
 
 #include <IndustryStandard/Mbr.h>
 #include <Uefi/UefiGpt.h>
@@ -63,5 +62,3 @@ typedef struct {
 /// Partition Information Protocol GUID variable.
 ///
 extern EFI_GUID  gEfiPartitionInfoProtocolGuid;
-
-#endif

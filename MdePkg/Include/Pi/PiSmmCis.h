@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _PI_SMMCIS_H_
-#define _PI_SMMCIS_H_
+#pragma once
 
 #include <Pi/PiMmCis.h>
 #include <Protocol/SmmCpuIo2.h>
@@ -196,5 +195,3 @@ struct _EFI_SMM_SYSTEM_TABLE2 {
   EFI_SMM_INTERRUPT_REGISTER          SmiHandlerRegister;
   EFI_SMM_INTERRUPT_UNREGISTER        SmiHandlerUnRegister;
 };
-
-#endif

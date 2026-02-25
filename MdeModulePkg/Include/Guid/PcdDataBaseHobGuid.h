@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PCD_DATABASE_HOB_GUID_H_
-#define _PCD_DATABASE_HOB_GUID_H_
+#pragma once
 
 #define PCD_DATABASE_HOB_GUID \
   { \
@@ -15,5 +14,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   }
 
 extern EFI_GUID  gPcdDataBaseHobGuid;
-
-#endif

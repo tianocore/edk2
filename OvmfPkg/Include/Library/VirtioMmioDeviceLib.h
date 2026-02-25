@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _VIRTIO_MMIO_DEVICE_LIB_H_
-#define _VIRTIO_MMIO_DEVICE_LIB_H_
+#pragma once
 
 /**
 
@@ -56,5 +55,3 @@ EFI_STATUS
 VirtioMmioUninstallDevice (
   IN EFI_HANDLE  Handle
   );
-
-#endif // _VIRTIO_MMIO_DEVICE_LIB_H_

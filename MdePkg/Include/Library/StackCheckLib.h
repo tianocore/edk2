@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef STACK_CHECK_LIB_H_
-#define STACK_CHECK_LIB_H_
+#pragma once
 
 #include <Base.h>
 
@@ -74,5 +73,3 @@ __security_check_cookie (
   );
 
 #endif // Compiler type
-
-#endif // STACK_CHECK_LIB_H_

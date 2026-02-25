@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __VARIABLE_LOCK_H__
-#define __VARIABLE_LOCK_H__
+#pragma once
 
 #define EDKII_VARIABLE_LOCK_PROTOCOL_GUID \
   { \
@@ -52,5 +51,3 @@ struct _EDKII_VARIABLE_LOCK_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkiiVariableLockProtocolGuid;
-
-#endif

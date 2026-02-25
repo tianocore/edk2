@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PCD_DATABASE_SIGNATURE_GUID_H_
-#define _PCD_DATABASE_SIGNATURE_GUID_H_
+#pragma once
 
 #define PCD_DATA_BASE_SIGNATURE_GUID \
 { 0x3c7d193c, 0x682c, 0x4c14, { 0xa6, 0x8f, 0x55, 0x2d, 0xea, 0x4f, 0x43, 0x7e } }
@@ -222,5 +221,3 @@ typedef struct {
 // +---------------------------------+
 //
 #pragma pack()
-
-#endif

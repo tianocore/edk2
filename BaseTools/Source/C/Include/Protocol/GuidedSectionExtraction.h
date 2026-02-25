@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL_H__
-#define __EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL_H__
+#pragma once
 
 //
 // Forward reference for pure ANSI compatibility
@@ -141,5 +140,3 @@ struct _EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL {
 // may add other GUID here
 //
 extern EFI_GUID gEfiCrc32GuidedSectionExtractionProtocolGuid;
-
-#endif

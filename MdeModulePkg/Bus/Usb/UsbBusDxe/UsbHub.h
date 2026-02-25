@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _USB_HUB_H_
-#define _USB_HUB_H_
+#pragma once
 
 #include <IndustryStandard/Usb.h>
 
@@ -172,4 +171,3 @@ UsbHubAckHubStatus (
 
 extern USB_HUB_API  mUsbHubApi;
 extern USB_HUB_API  mUsbRootHubApi;
-#endif

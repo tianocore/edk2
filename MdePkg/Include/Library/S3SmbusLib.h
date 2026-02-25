@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __S3_SMBUS_LIB_H__
-#define __S3_SMBUS_LIB_H__
+#pragma once
 
 /**
   Executes an SMBUS quick read command, and saves the value in the S3 script to be replayed
@@ -444,5 +443,3 @@ S3SmBusBlockProcessCall (
   OUT VOID           *ReadBuffer,
   OUT RETURN_STATUS  *Status        OPTIONAL
   );
-
-#endif

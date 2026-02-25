@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef TLB_EXCEPTION_HANDLE_H_
-#define TLB_EXCEPTION_HANDLE_H_
+#pragma once
 
 /**
   TLB refill handler start.
@@ -32,5 +31,3 @@ VOID
 HandleTlbRefillEnd (
   VOID
   );
-
-#endif // TLB_EXCEPTION_HANDLE_H_

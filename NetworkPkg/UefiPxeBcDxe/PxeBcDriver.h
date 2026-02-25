@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_PXEBC_DRIVER_H__
-#define __EFI_PXEBC_DRIVER_H__
+#pragma once
 
 extern EFI_COMPONENT_NAME_PROTOCOL   gPxeBcComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gPxeBcComponentName2;
@@ -170,5 +169,3 @@ PxeBcIp6DriverBindingStop (
   IN UINTN                        NumberOfChildren,
   IN EFI_HANDLE                   *ChildHandleBuffer
   );
-
-#endif

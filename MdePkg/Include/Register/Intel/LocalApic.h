@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __INTEL_LOCAL_APIC_H__
-#define __INTEL_LOCAL_APIC_H__
+#pragma once
 
 //
 // Definition for Local APIC registers and related values
@@ -178,5 +177,3 @@ typedef union {
   } Bits;
   UINT64    Uint64;
 } LOCAL_APIC_MSI_DATA;
-
-#endif

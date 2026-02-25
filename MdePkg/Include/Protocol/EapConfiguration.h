@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __EFI_EAP_CONFIGURATION_PROTOCOL_H__
-#define __EFI_EAP_CONFIGURATION_PROTOCOL_H__
+#pragma once
 
 ///
 /// EFI EAP Configuration protocol provides a way to set and get EAP configuration.
@@ -149,5 +148,3 @@ struct _EFI_EAP_CONFIGURATION_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiEapConfigurationProtocolGuid;
-
-#endif

@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _SMM_PCI_ROOT_BRIDGE_IO_H_
-#define _SMM_PCI_ROOT_BRIDGE_IO_H_
+#pragma once
 
 #include <Protocol/MmPciRootBridgeIo.h>
 
@@ -23,5 +22,3 @@
 typedef EFI_MM_PCI_ROOT_BRIDGE_IO_PROTOCOL EFI_SMM_PCI_ROOT_BRIDGE_IO_PROTOCOL;
 
 extern EFI_GUID  gEfiSmmPciRootBridgeIoProtocolGuid;
-
-#endif

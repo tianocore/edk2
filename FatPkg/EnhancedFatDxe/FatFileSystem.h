@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _FATFILESYSTEM_H_
-#define _FATFILESYSTEM_H_
+#pragma once
 
 #pragma pack(1)
 //
@@ -203,5 +202,3 @@ typedef struct {
 } FAT_DIRECTORY_LFN;
 
 #pragma pack()
-
-#endif

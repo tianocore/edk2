@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef _PCI_OVERRIDE_H_
-#define _PCI_OVERRIDE_H_
+#pragma once
 
 ///
 /// EFI_PCI_OVERRIDE_PROTOCOL has the same structure with EFI_PCI_PLATFORM_PROTOCOL
@@ -35,5 +34,3 @@
 typedef EFI_PCI_PLATFORM_PROTOCOL EFI_PCI_OVERRIDE_PROTOCOL;
 
 extern EFI_GUID  gEfiPciOverrideProtocolGuid;
-
-#endif

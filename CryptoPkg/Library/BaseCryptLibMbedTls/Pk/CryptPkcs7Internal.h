@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef CRYPT_PKCS7_INTERNAL_H_
-#define CRYPT_PKCS7_INTERNAL_H_
+#pragma once
 
 #include "InternalCryptLib.h"
 
@@ -85,5 +84,3 @@ typedef struct MbedtlsPkcs7 {
         else                                            \
             (g) += Ret;                                 \
     } while( 0 )
-
-#endif

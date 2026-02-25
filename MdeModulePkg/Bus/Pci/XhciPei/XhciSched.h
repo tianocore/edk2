@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_PEI_XHCI_SCHED_H_
-#define _EFI_PEI_XHCI_SCHED_H_
+#pragma once
 
 //
 // Transfer types, used in URB to identify the transfer type
@@ -1293,5 +1292,3 @@ VOID
 XhcPeiFreeSched (
   IN PEI_XHC_DEV  *Xhc
   );
-
-#endif

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_PCI_DEVICE_SUPPORT_H_
-#define _EFI_PCI_DEVICE_SUPPORT_H_
+#pragma once
 
 /**
   Initialize the PCI devices pool.
@@ -260,5 +259,3 @@ VOID
 FreePciDevice (
   IN PCI_IO_DEVICE  *PciIoDevice
   );
-
-#endif

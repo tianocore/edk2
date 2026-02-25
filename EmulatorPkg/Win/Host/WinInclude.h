@@ -5,8 +5,7 @@ Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __WIN_NT_INCLUDE_H__
-#define __WIN_NT_INCLUDE_H__
+#pragma once
 
 #undef VOID
 
@@ -45,6 +44,4 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     #undef IMAGE_FILE_MACHINE_ARM64
 #define IMAGE_FILE_MACHINE_ARM64  0xAA64
   #endif
-#endif
-
 #endif

@@ -17,8 +17,7 @@
 
 **/
 
-#ifndef _MM_GPI_DISPATCH_H_
-#define _MM_GPI_DISPATCH_H_
+#pragma once
 
 #include <Pi/PiMmCis.h>
 
@@ -114,5 +113,3 @@ struct _EFI_MM_GPI_DISPATCH_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiMmGpiDispatchProtocolGuid;
-
-#endif

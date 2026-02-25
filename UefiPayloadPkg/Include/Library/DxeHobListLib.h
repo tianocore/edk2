@@ -15,12 +15,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef DXE_HOB_LIST_LIB_H_
-#define DXE_HOB_LIST_LIB_H_
+#pragma once
 
 ///
 /// Cache copy of the start of HOB list
 ///
 extern VOID  *gHobList;
-
-#endif

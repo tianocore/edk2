@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _MTRR_SUPPORT_H_
-#define _MTRR_SUPPORT_H_
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -193,5 +192,3 @@ GenerateRandomNumbers (
   CHAR8  *FilePath,
   UINTN  Count
   );
-
-#endif

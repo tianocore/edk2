@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _ISA_BUS_COMPONENT_NAME_H_
-#define _ISA_BUS_COMPONENT_NAME_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Protocol/ComponentName.h>
@@ -140,5 +139,3 @@ IsaBusComponentNameGetControllerName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **ControllerName
   );
-
-#endif

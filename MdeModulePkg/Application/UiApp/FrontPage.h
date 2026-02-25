@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _FRONT_PAGE_H_
-#define _FRONT_PAGE_H_
+#pragma once
 
 #include "String.h"
 #include "Ui.h"
@@ -206,5 +205,3 @@ CHAR16 *
 ExtractDevicePathFromHiiHandle (
   IN      EFI_HII_HANDLE  Handle
   );
-
-#endif // _FRONT_PAGE_H_

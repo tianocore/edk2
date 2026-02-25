@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _FSP_COMMON_LIB_H_
-#define _FSP_COMMON_LIB_H_
+#pragma once
 
 #include <FspGlobalData.h>
 #include <FspMeasurePointId.h>
@@ -314,5 +313,3 @@ EFIAPI
 FspApiReturnStatusReset (
   IN EFI_STATUS  FspResetType
   );
-
-#endif

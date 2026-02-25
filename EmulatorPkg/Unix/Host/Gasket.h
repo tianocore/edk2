@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _GASKET_H_
-#define _GASKET_H_
+#pragma once
 
 //
 // EMU_THUNK_PROTOCOL gaskets (EFIAPI to UNIX ABI)
@@ -621,5 +620,3 @@ GasketSnpReceive (
   OUT EFI_MAC_ADDRESS  *DestAddr   OPTIONAL,
   OUT UINT16           *Protocol   OPTIONAL
   );
-
-#endif

@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef _SYSTEM_RESOURCE_TABLE_H__
-#define _SYSTEM_RESOURCE_TABLE_H__
+#pragma once
 
 #define EFI_SYSTEM_RESOURCE_TABLE_GUID \
   { \
@@ -128,5 +127,3 @@ typedef struct {
 } EFI_SYSTEM_RESOURCE_TABLE;
 
 extern EFI_GUID  gEfiSystemResourceTableGuid;
-
-#endif

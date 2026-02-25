@@ -49,8 +49,7 @@
 
 **/
 
-#ifndef _EFI_PCI_HOT_PLUG_INIT_H_
-#define _EFI_PCI_HOT_PLUG_INIT_H_
+#pragma once
 
 ///
 /// Global ID for the EFI_PCI_HOT_PLUG_INIT_PROTOCOL
@@ -268,5 +267,3 @@ struct _EFI_PCI_HOT_PLUG_INIT_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiPciHotPlugInitProtocolGuid;
-
-#endif

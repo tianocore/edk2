@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _PCIEXPRESS21_H_
-#define _PCIEXPRESS21_H_
+#pragma once
 
 #include <IndustryStandard/Pci30.h>
 
@@ -787,5 +786,3 @@ typedef struct {
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_ATS;
 
 #pragma pack()
-
-#endif

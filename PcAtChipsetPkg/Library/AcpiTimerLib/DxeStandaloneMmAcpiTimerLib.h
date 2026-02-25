@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _DXE_STANDALONE_MM_ACPI_TIMER_LIB_H_
-#define _DXE_STANDALONE_MM_ACPI_TIMER_LIB_H_
+#pragma once
 
 /**
   The constructor function enables ACPI IO space, and caches PerformanceCounterFrequency.
@@ -19,5 +18,3 @@ EFI_STATUS
 CommonAcpiTimerLibConstructor (
   VOID
   );
-
-#endif

@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _VIRTIO_SERIAL_DXE_H_
-#define _VIRTIO_SERIAL_DXE_H_
+#pragma once
 
 #include <Protocol/ComponentName.h>
 #include <Protocol/DriverBinding.h>
@@ -222,5 +221,3 @@ VirtioSerialPortRemove (
   IN OUT VIRTIO_SERIAL_DEV  *Dev,
   IN     UINT32             PortId
   );
-
-#endif

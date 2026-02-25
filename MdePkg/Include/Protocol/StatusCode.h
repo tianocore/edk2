@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __STATUS_CODE_RUNTIME_PROTOCOL_H__
-#define __STATUS_CODE_RUNTIME_PROTOCOL_H__
+#pragma once
 
 #define EFI_STATUS_CODE_RUNTIME_PROTOCOL_GUID  \
 { 0xd2b2b828, 0x826, 0x48a7,  { 0xb3, 0xdf, 0x98, 0x3c, 0x0, 0x60, 0x24, 0xf0 } }
@@ -49,5 +48,3 @@ typedef struct _EFI_STATUS_CODE_PROTOCOL {
 } EFI_STATUS_CODE_PROTOCOL;
 
 extern EFI_GUID  gEfiStatusCodeRuntimeProtocolGuid;
-
-#endif
