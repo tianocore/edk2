@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef REGISTER_FILTER_LIB_H_
-#define REGISTER_FILTER_LIB_H_
+#pragma once
 
 typedef enum {
   FilterWidth8,
@@ -240,5 +239,3 @@ FilterAfterMsrWrite (
   IN UINT32  Index,
   IN UINT64  *Value
   );
-
-#endif // REGISTER_FILTER_LIB_H_

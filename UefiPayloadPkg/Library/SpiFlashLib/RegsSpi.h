@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef REGS_SPI_H_
-#define REGS_SPI_H_
+#pragma once
 
 #define R_SPI_BASE                        0x10         ///< 32-bit Memory Base Address Register
 #define B_SPI_BAR0_MASK                   0x0FFF
@@ -117,5 +116,3 @@
 //
 #define R_SPI_FCBA_FLCOMP        0x00          ///< Flash Components Register
 #define B_SPI_FLCOMP_COMP1_MASK  0x0F          ///< Flash Component 1 Density
-
-#endif

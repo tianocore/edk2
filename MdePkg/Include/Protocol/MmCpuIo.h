@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _MM_CPU_IO_H_
-#define _MM_CPU_IO_H_
+#pragma once
 
 #define EFI_MM_CPU_IO_PROTOCOL_GUID \
   { \
@@ -86,5 +85,3 @@ struct _EFI_MM_CPU_IO_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiMmCpuIoProtocolGuid;
-
-#endif

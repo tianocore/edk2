@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __DEBUG_IMAGE_INFO_GUID_H__
-#define __DEBUG_IMAGE_INFO_GUID_H__
+#pragma once
 
 #include <Protocol/LoadedImage.h>
 
@@ -70,5 +69,3 @@ typedef struct {
 } EFI_DEBUG_IMAGE_INFO_TABLE_HEADER;
 
 extern EFI_GUID  gEfiDebugImageInfoTableGuid;
-
-#endif

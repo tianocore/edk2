@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_SHELL_PROTOCOL_H__
-#define __EFI_SHELL_PROTOCOL_H__
+#pragma once
 
 #include <Guid/FileInfo.h>
 
@@ -1257,5 +1256,3 @@ enum ShellVersion {
   SHELL_MAJOR_VERSION = 2,
   SHELL_MINOR_VERSION = 2
 };
-
-#endif

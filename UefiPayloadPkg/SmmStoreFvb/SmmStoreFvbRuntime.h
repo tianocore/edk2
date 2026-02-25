@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef SMM_STORE_DXE_H_
-#define SMM_STORE_DXE_H_
+#pragma once
 
 #include <Base.h>
 #include <PiDxe.h>
@@ -107,5 +106,3 @@ FvbEraseBlocks (
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *This,
   ...
   );
-
-#endif // SMM_STORE_DXE_H_

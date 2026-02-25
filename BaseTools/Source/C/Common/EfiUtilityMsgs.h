@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_UTILITY_MSGS_H_
-#define _EFI_UTILITY_MSGS_H_
+#pragma once
 
 #include <Common/UefiBaseTypes.h>
 
@@ -160,5 +159,3 @@ SetPrintLimits (
 #ifdef __cplusplus
 }
 #endif
-
-#endif // #ifndef _EFI_UTILITY_MSGS_H_

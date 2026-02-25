@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _DEBUG_TIMER_H_
-#define _DEBUG_TIMER_H_
+#pragma once
 
 /**
   Initialize CPU local APIC timer.
@@ -40,5 +39,3 @@ IsDebugTimerTimeout (
   IN UINT32  Timer,
   IN UINT32  TimeoutTicker
   );
-
-#endif

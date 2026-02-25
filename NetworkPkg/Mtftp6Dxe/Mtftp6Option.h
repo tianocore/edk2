@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_MTFTP6_OPTION_H__
-#define __EFI_MTFTP6_OPTION_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -139,5 +138,3 @@ Mtftp6ParseStart (
   IN OUT UINT32             *OptionCount,
   OUT EFI_MTFTP6_OPTION     **OptionList          OPTIONAL
   );
-
-#endif

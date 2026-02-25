@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef PRM_MODULE_DISCOVERY_LIB_H_
-#define PRM_MODULE_DISCOVERY_LIB_H_
+#pragma once
 
 #include <Base.h>
 #include <PrmContextBuffer.h>
@@ -56,5 +55,3 @@ DiscoverPrmModules (
   OUT UINTN  *ModuleCount    OPTIONAL,
   OUT UINTN  *HandlerCount   OPTIONAL
   );
-
-#endif

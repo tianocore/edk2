@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _CXL11_H_
-#define _CXL11_H_
+#pragma once
 
 #include <IndustryStandard/Pci.h>
 //
@@ -654,5 +653,3 @@ CXL_11_SIZE_ASSERT (CXL_RCRB_BASE, 0x8);
 #define CXL_PORT_RCRB_MEMBAR0_LOW_OFFSET               0x010
 #define CXL_PORT_RCRB_MEMBAR0_HIGH_OFFSET              0x014
 #define CXL_PORT_RCRB_EXTENDED_CAPABILITY_BASE_OFFSET  0x100
-
-#endif

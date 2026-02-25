@@ -13,8 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __BASE_LIB__
-#define __BASE_LIB__
+#pragma once
 
 //
 // Definitions for architecture-specific types
@@ -8145,4 +8144,3 @@ PatchInstructionX86 (
   );
 
 #endif // defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
-#endif // !defined (__BASE_LIB__)

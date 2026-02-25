@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef SEC_H_
-#define SEC_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -51,5 +50,3 @@ PeiCommonExceptionEntry (
   IN UINT32  Entry,
   IN UINTN   LR
   );
-
-#endif

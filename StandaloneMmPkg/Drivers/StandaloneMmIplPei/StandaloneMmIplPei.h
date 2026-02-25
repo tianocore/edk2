@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef STANDALONE_MM_IPL_PEI_H_
-#define STANDALONE_MM_IPL_PEI_H_
+#pragma once
 
 #include <StandaloneMm.h>
 #include <Guid/MmCommBuffer.h>
@@ -176,5 +175,3 @@ CreateMmHobHandoffInfoTable (
   IN EFI_HOB_HANDOFF_INFO_TABLE  *Hob,
   IN VOID                        *HobEnd
   );
-
-#endif

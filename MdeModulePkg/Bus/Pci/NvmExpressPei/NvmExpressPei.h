@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _NVM_EXPRESS_PEI_H_
-#define _NVM_EXPRESS_PEI_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -398,5 +397,3 @@ NvmeHostControllerPpiInstallationCallback (
   IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
   IN VOID                       *Ppi
   );
-
-#endif

@@ -1,8 +1,7 @@
 /* CpuArch.h -- CPU specific code
 2018-02-18 : Igor Pavlov : Public domain */
 
-#ifndef __CPU_ARCH_H
-#define __CPU_ARCH_H
+#pragma once
 
 #include "7zTypes.h"
 
@@ -332,5 +331,3 @@ CPU_IsSupported_PageGB (
 #endif
 
 EXTERN_C_END
-
-#endif

@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __INTEL_MSR_H__
-#define __INTEL_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 #include <Register/Intel/Msr/Core2Msr.h>
@@ -40,5 +39,3 @@
 #include <Register/Intel/Msr/PentiumMMsr.h>
 #include <Register/Intel/Msr/P6Msr.h>
 #include <Register/Intel/Msr/PentiumMsr.h>
-
-#endif

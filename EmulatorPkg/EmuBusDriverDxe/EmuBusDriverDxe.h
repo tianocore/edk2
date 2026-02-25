@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EMU_BUS_DRIVER_H__
-#define __EMU_BUS_DRIVER_H__
+#pragma once
 
 #include <PiDxe.h>
 
@@ -99,5 +98,3 @@ EmuBusCreateDevicePath (
   IN  EFI_GUID                  *Guid,
   IN  UINT16                    InstanceNumber
   );
-
-#endif

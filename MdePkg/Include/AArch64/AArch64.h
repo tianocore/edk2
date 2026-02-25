@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef AARCH64_H_
-#define AARCH64_H_
+#pragma once
 
 #include <AArch64/AArch64Mmu.h>
 
@@ -264,5 +263,3 @@ VOID
 ArmWriteCntHctl (
   IN UINT32  CntHctl
   );
-
-#endif // AARCH64_H_

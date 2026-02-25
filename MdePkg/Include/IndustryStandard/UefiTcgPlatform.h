@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __UEFI_TCG_PLATFORM_H__
-#define __UEFI_TCG_PLATFORM_H__
+#pragma once
 
 #include <IndustryStandard/Tpm12.h>
 #include <IndustryStandard/Tpm20.h>
@@ -717,5 +716,3 @@ typedef struct {
 } TCG_NV_INDEX_DYNAMIC_EVENT_LOG_STRUCT_SPDM_MEASUREMENTS;
 
 #pragma pack()
-
-#endif

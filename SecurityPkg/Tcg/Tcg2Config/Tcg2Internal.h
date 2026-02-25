@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __TCG2_INTERNAL_H__
-#define __TCG2_INTERNAL_H__
+#pragma once
 
 #define EFI_TCG2_EVENT_LOG_FORMAT_DEFAULT  EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2
 #define EFI_TCG2_EVENT_LOG_FORMAT_ALL      (EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2 | EFI_TCG2_EVENT_LOG_FORMAT_TCG_2)
@@ -22,5 +21,3 @@ typedef struct {
   GUID     TpmInstanceGuid;
   UINT8    TpmDevice;
 } TPM_INSTANCE_ID;
-
-#endif

@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __HASH_API_LIB_H_
-#define __HASH_API_LIB_H_
+#pragma once
 
 typedef VOID *HASH_API_CONTEXT;
 
@@ -106,5 +105,3 @@ HashApiHashAll (
   IN  UINTN       DataToHashLen,
   OUT UINT8       *Digest
   );
-
-#endif

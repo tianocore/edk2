@@ -59,27 +59,6 @@ jobs:
             Build.Target: "NOOPT"
             Run.Flags: $(run_flags)
             Run: $(should_run)
-          EmulatorPkg_IA32_DEBUG:
-            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
-            Build.Arch: "IA32 "
-            Build.Flags: "BLD_*_NO_PLATFORM_BOOT_DELAYS"
-            Build.Target: "DEBUG"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
-          EmulatorPkg_IA32_RELEASE:
-            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
-            Build.Arch: "IA32 "
-            Build.Flags: "BLD_*_NO_PLATFORM_BOOT_DELAYS"
-            Build.Target: "RELEASE"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
-          EmulatorPkg_IA32_NOOPT:
-            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
-            Build.Arch: "IA32 "
-            Build.Flags: "BLD_*_NO_PLATFORM_BOOT_DELAYS"
-            Build.Target: "NOOPT"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
           EmulatorPkg_X64_FULL_DEBUG:
             Build.File: "$(package)/PlatformCI/PlatformBuild.py"
             Build.Arch: "X64"
@@ -97,27 +76,6 @@ jobs:
           EmulatorPkg_X64_FULL_NOOPT:
             Build.File: "$(package)/PlatformCI/PlatformBuild.py"
             Build.Arch: "X64"
-            Build.Flags: "BLD_*_SECURE_BOOT_ENABLE=TRUE BLD_*_NO_PLATFORM_BOOT_DELAYS"
-            Build.Target: "NOOPT"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
-          EmulatorPkg_IA32_FULL_DEBUG:
-            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
-            Build.Arch: "IA32"
-            Build.Flags: "BLD_*_SECURE_BOOT_ENABLE=TRUE BLD_*_NO_PLATFORM_BOOT_DELAYS"
-            Build.Target: "DEBUG"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
-          EmulatorPkg_IA32_FULL_RELEASE:
-            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
-            Build.Arch: "IA32"
-            Build.Flags: "BLD_*_SECURE_BOOT_ENABLE=TRUE BLD_*_NO_PLATFORM_BOOT_DELAYS"
-            Build.Target: "RELEASE"
-            Run.Flags: $(run_flags)
-            Run: $(should_run)
-          EmulatorPkg_IA32_FULL_NOOPT:
-            Build.File: "$(package)/PlatformCI/PlatformBuild.py"
-            Build.Arch: "IA32"
             Build.Flags: "BLD_*_SECURE_BOOT_ENABLE=TRUE BLD_*_NO_PLATFORM_BOOT_DELAYS"
             Build.Target: "NOOPT"
             Run.Flags: $(run_flags)

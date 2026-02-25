@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef METADATA_HELPER_H_
-#define METADATA_HELPER_H_
+#pragma once
 
 #include <Library/MetadataHandlerLib.h>
 
@@ -23,5 +22,3 @@ EFIAPI
 GetMetadataRoot (
   VOID
   );
-
-#endif // METADATA_HELPER_H_

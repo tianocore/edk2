@@ -6,8 +6,7 @@
 *
 **/
 
-#ifndef __DT_PLATFORM_DXE_H__
-#define __DT_PLATFORM_DXE_H__
+#pragma once
 
 #include <Guid/HiiPlatformSetupFormset.h>
 #include <Guid/DtPlatformFormSet.h>
@@ -21,5 +20,3 @@ typedef struct {
   UINT8    Pref;
   UINT8    Reserved[3];
 } DT_ACPI_VARSTORE_DATA;
-
-#endif

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __UEFI_PAYLOAD_ENTRY_H__
-#define __UEFI_PAYLOAD_ENTRY_H__
+#pragma once
 
 #include <PiPei.h>
 
@@ -282,5 +281,3 @@ EFIAPI
 InitializeFloatingPointUnits (
   VOID
   );
-
-#endif

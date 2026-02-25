@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef PLATFORM_BM_H_
-#define PLATFORM_BM_H_
+#pragma once
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -49,5 +48,3 @@ EFI_STATUS
 DisableQuietBoot (
   VOID
   );
-
-#endif // PLATFORM_BM_H_

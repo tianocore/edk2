@@ -10,8 +10,7 @@
     - Std or STD - Standard
 **/
 
-#ifndef IORT_GENERATOR_H_
-#define IORT_GENERATOR_H_
+#pragma once
 
 #pragma pack(1)
 
@@ -43,5 +42,3 @@ typedef struct AcpiIortGenerator {
 } ACPI_IORT_GENERATOR;
 
 #pragma pack()
-
-#endif // IORT_GENERATOR_H_

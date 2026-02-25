@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _SMBUS_H_
-#define _SMBUS_H_
+#pragma once
 
 ///
 /// UDID of SMBUS device.
@@ -69,5 +68,3 @@ typedef enum _EFI_SMBUS_OPERATION {
 /// EFI_SMBUS_DEVICE_COMMAND
 ///
 typedef UINTN EFI_SMBUS_DEVICE_COMMAND;
-
-#endif

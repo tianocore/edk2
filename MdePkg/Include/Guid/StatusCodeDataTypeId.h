@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __PI_STATUS_CODE_DATA_TYPE_ID_GUID_H__
-#define __PI_STATUS_CODE_DATA_TYPE_ID_GUID_H__
+#pragma once
 
 #include <PiDxe.h>
 #include <Protocol/DebugSupport.h>
@@ -805,5 +804,3 @@ typedef struct {
 } EFI_RETURN_STATUS_EXTENDED_DATA;
 
 extern EFI_GUID  gEfiStatusCodeSpecificDataGuid;
-
-#endif

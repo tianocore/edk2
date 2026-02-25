@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _IP6_CONFIGNV_H_
-#define _IP6_CONFIGNV_H_
+#pragma once
 
 #include "Ip6NvData.h"
 #include "Ip6ConfigImpl.h"
@@ -58,5 +57,3 @@ VOID
 Ip6ConfigFormUnload (
   IN OUT IP6_CONFIG_INSTANCE  *Instance
   );
-
-#endif

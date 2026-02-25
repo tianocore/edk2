@@ -229,8 +229,9 @@ also configured.
 | RsaPss.Verify                   |     N      |     N     |             |      C      |      C       |      C      |                 |
 | ParallelHash                    |     N      |     N     |             |             |              |      C      |                 |
 | AeadAesGcm                      |     N      |     N     |             |             |      C       |             |                 |
-| Bn                              |     N      |     N     |             |             |      C       |             |                 |
-| Ec                              |     N      |     N     |             |             |    C-Full    |             |                 |
+| Bn                              |     N      |     N     |             |             |      C       |      C      |                 |
+| Ec                              |     N      |     N     |             |             |    C-Full    |    C-Full   |                 |
+| Camellia                        |     N      |     N     |             |             |    C-Full    |    C-Full   |                 |
 
 ## Platform Configuration of Cryptographic Services
 

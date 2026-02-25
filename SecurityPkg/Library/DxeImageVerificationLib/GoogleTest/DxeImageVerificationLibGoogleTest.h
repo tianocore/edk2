@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef DXE_IMAGE_VERIFICATION_LIB_GOOGLE_TEST_H
-#define DXE_IMAGE_VERIFICATION_LIB_GOOGLE_TEST_H
+#pragma once
 
 /**
   Provide verification service for signed images, which include both signature validation
@@ -75,5 +74,3 @@ DxeImageVerificationHandler (
 //
 #define ALWAYS_EXECUTE  0x00000000
 #define NEVER_EXECUTE   0x00000001
-
-#endif // DXE_IMAGE_VERIFICATION_LIB_GOOGLE_TEST_H

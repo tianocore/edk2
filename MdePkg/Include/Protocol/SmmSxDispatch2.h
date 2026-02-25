@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _SMM_SX_DISPATCH2_H_
-#define _SMM_SX_DISPATCH2_H_
+#pragma once
 
 #include <Protocol/MmSxDispatch.h>
 
@@ -28,5 +27,3 @@ typedef EFI_MM_SX_REGISTER EFI_SMM_SX_REGISTER2;
 typedef EFI_MM_SX_UNREGISTER EFI_SMM_SX_UNREGISTER2;
 
 extern EFI_GUID  gEfiSmmSxDispatch2ProtocolGuid;
-
-#endif

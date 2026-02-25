@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _SOCKET_H_
-#define _SOCKET_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -913,5 +912,3 @@ SockRoute (
   IN SOCKET  *Sock,
   IN VOID    *RouteInfo
   );
-
-#endif

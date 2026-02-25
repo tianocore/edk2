@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef _FRAMEWORK_HII_H_
-#define _FRAMEWORK_HII_H_
+#pragma once
 
 //#include <PiDxe.h>
 
@@ -890,5 +889,3 @@ struct _EFI_HII_PROTOCOL {
 };
 
 extern EFI_GUID gEfiHiiProtocolGuid;
-
-#endif

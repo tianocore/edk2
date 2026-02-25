@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _CAPSULE_PEIM_H_
-#define _CAPSULE_PEIM_H_
+#pragma once
 
 #include <PiPei.h>
 #include <Uefi/UefiSpec.h>
@@ -117,7 +116,5 @@ EFI_STATUS
   SWITCH_32_TO_64_CONTEXT  *EntrypointContext,
   SWITCH_64_TO_32_CONTEXT  *ReturnContext
   );
-
-#endif
 
 #endif

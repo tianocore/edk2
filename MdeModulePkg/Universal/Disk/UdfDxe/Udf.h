@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _UDF_H_
-#define _UDF_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Base.h>
@@ -1212,5 +1211,3 @@ UdfComponentNameGetControllerName (
   IN   CHAR8                        *Language,
   OUT  CHAR16                       **ControllerName
   );
-
-#endif // _UDF_H_
