@@ -23,7 +23,13 @@
 
 [Sources]
   Common.c
-  StandaloneMmCoreHobLib.c
+
+[Sources.RISCV64]
+  Riscv/StandaloneMmCoreHobLibInternal.c
+  Riscv/StandaloneMmCoreHobLib.c
+
+[Sources.X64]
+  X64/StandaloneMmCoreHobLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
