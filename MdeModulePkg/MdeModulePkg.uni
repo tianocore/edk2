@@ -1352,3 +1352,8 @@
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPcieResizableBarSupport_HELP #language en-US "Indicates if the PCIe Resizable BAR Capability Supported.<BR><BR>\n"
                                                                                             "TRUE  - PCIe Resizable BAR Capability is supported.<BR>\n"
                                                                                             "FALSE - PCIe Resizable BAR Capability is not supported.<BR>"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPcieResizableBarMaxSize_PROMPT #language en-US "Define Resizable BAR Max Size Constraint"
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPcieResizableBarMaxSize_HELP   #language en-US "Set platform limit for max size to pick from Resizable BAR Capability register.<BR><BR>\n"
+                                                                                             "Decimal value 'n' is interpreted as 2^(n+20), which means 0=>1MB, 1=>2MB, 2=>4MB, 3=>8MB, etc.<BR>\n"
+                                                                                             "Maximum reasonable size to set is half of processor address with, i.e. address width - 1.<BR>\n"

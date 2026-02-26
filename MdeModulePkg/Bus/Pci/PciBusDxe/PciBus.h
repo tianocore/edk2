@@ -50,7 +50,6 @@ typedef struct _PCI_BAR        PCI_BAR;
 
 #define     EFI_PCI_IOV_POLICY_ARI    0x0001
 #define     EFI_PCI_IOV_POLICY_SRIOV  0x0002
-#define     EFI_PCI_IOV_POLICY_MRIOV  0x0004
 
 typedef enum {
   PciBarTypeUnknown = 0,
@@ -268,7 +267,6 @@ struct _PCI_IO_DEVICE {
   UINT8                                        PciExpressCapabilityOffset;
   UINT32                                       AriCapabilityOffset;
   UINT32                                       SrIovCapabilityOffset;
-  UINT32                                       MrIovCapabilityOffset;
   PCI_BAR                                      VfPciBar[PCI_MAX_BAR];
   UINT32                                       SystemPageSize;
   UINT16                                       InitialVFs;
