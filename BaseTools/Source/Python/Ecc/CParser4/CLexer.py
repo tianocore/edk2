@@ -21,6 +21,8 @@ import sys
 import Ecc.CodeFragment as CodeFragment
 import Ecc.FileProfile as FileProfile
 
+
+
 def serializedATN():
     with StringIO() as buf:
         buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\2k")
@@ -590,34 +592,34 @@ class CLexer(Lexer):
 
 
 
-    def printTokenInfo(self,line,offset,tokenText):
+    def printTokenInfo(self, line, offset, tokenText):
         print(str(line)+ ',' + str(offset) + ':' + str(tokenText))
 
-    def StorePredicateExpression(self,StartLine,StartOffset,EndLine,EndOffset,Text):
+    def StorePredicateExpression(self, StartLine, StartOffset, EndLine, EndOffset, Text):
         PredExp = CodeFragment.PredicateExpression(Text, (StartLine, StartOffset), (EndLine, EndOffset))
         FileProfile.PredicateExpressionList.append(PredExp)
 
-    def StoreEnumerationDefinition(self,StartLine,StartOffset,EndLine,EndOffset,Text):
+    def StoreEnumerationDefinition(self, StartLine, StartOffset, EndLine, EndOffset, Text):
         EnumDef = CodeFragment.EnumerationDefinition(Text, (StartLine, StartOffset), (EndLine, EndOffset))
         FileProfile.EnumerationDefinitionList.append(EnumDef)
 
-    def StoreStructUnionDefinition(self,StartLine,StartOffset,EndLine,EndOffset,Text):
+    def StoreStructUnionDefinition(self, StartLine, StartOffset, EndLine, EndOffset, Text):
         SUDef = CodeFragment.StructUnionDefinition(Text, (StartLine, StartOffset), (EndLine, EndOffset))
         FileProfile.StructUnionDefinitionList.append(SUDef)
 
-    def StoreTypedefDefinition(self,StartLine,StartOffset,EndLine,EndOffset,FromText,ToText):
+    def StoreTypedefDefinition(self, StartLine, StartOffset, EndLine, EndOffset, FromText, ToText):
         Tdef = CodeFragment.TypedefDefinition(FromText, ToText, (StartLine, StartOffset), (EndLine, EndOffset))
         FileProfile.TypedefDefinitionList.append(Tdef)
 
-    def StoreFunctionDefinition(self,StartLine,StartOffset,EndLine,EndOffset,ModifierText,DeclText,LeftBraceLine,LeftBraceOffset,DeclLine,DeclOffset):
+    def StoreFunctionDefinition(self, StartLine, StartOffset, EndLine, EndOffset, ModifierText, DeclText, LeftBraceLine, LeftBraceOffset, DeclLine, DeclOffset):
         FuncDef = CodeFragment.FunctionDefinition(ModifierText, DeclText, (StartLine, StartOffset), (EndLine, EndOffset), (LeftBraceLine, LeftBraceOffset), (DeclLine, DeclOffset))
         FileProfile.FunctionDefinitionList.append(FuncDef)
 
-    def StoreVariableDeclaration(self,StartLine,StartOffset,EndLine,EndOffset,ModifierText,DeclText):
+    def StoreVariableDeclaration(self, StartLine, StartOffset, EndLine, EndOffset, ModifierText, DeclText):
         VarDecl = CodeFragment.VariableDeclaration(ModifierText, DeclText, (StartLine, StartOffset), (EndLine, EndOffset))
         FileProfile.VariableDeclarationList.append(VarDecl)
 
-    def StoreFunctionCalling(self,StartLine,StartOffset,EndLine,EndOffset,FuncName,ParamList):
+    def StoreFunctionCalling(self, StartLine, StartOffset, EndLine, EndOffset, FuncName, ParamList):
         FuncCall = CodeFragment.FunctionCalling(FuncName, ParamList, (StartLine, StartOffset), (EndLine, EndOffset))
         FileProfile.FunctionCallingList.append(FuncCall)
 
