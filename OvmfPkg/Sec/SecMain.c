@@ -33,7 +33,7 @@
 #include <Register/Intel/Cpuid.h>
 #include "AmdSev.h"
 
-#define SEC_IDT_ENTRY_COUNT  34
+#define SEC_IDT_ENTRY_COUNT  256
 
 typedef struct _SEC_IDT_TABLE {
   EFI_PEI_SERVICES            *PeiService;
@@ -889,9 +889,10 @@ SecCoreStartupWithStack (
 
   if (!SevEsIsEnabled ()) {
     //
-    // For non SEV-ES guests, just load the IDTR.
+    // For non SEV-ES guests, now load the IDTR and initialize the exception handlers.
     //
     AsmWriteIdtr (&IdtDescriptor);
+    InitializeCpuExceptionHandlers (NULL);
   } else {
     //
     // Under SEV-ES, the hypervisor can't modify CR0 and so can't enable

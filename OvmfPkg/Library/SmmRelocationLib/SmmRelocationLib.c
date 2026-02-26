@@ -274,10 +274,10 @@ InitSmmIdt (
   CONST EFI_PEI_SERVICES  **PeiServices;
 
   //
-  // There are 32 (not 255) entries in it since only processor
-  // generated exceptions will be handled.
+  // Populate 255 entries to ensure that a known state occurs
+  // for all possible exception vectors.
   //
-  gcSmmInitIdtr.Limit = (sizeof (IA32_IDT_GATE_DESCRIPTOR) * 32) - 1;
+  gcSmmInitIdtr.Limit = (sizeof (IA32_IDT_GATE_DESCRIPTOR) * 256) - 1;
 
   //
   // Allocate for IDT.
