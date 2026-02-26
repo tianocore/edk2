@@ -1,6 +1,7 @@
-# Generated from C.g4 by ANTLR 4.7.1
+# Generated from C.g4 by ANTLR 4.9
 from antlr4 import *
 from io import StringIO
+from typing.io import TextIO
 import sys
 
 
@@ -580,10 +581,9 @@ class CLexer(Lexer):
 
     grammarFileName = "C.g4"
 
-    # @param  output= sys.stdout Type: TextIO
-    def __init__(self,input=None,output= sys.stdout):
+    def __init__(self, input=None, output:TextIO = sys.stdout):
         super().__init__(input, output)
-        self.checkVersion("4.7.1")
+        self.checkVersion("4.9")
         self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
         self._actions = None
         self._predicates = None
