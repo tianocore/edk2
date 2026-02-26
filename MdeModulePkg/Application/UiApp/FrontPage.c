@@ -514,13 +514,18 @@ UpdateFrontPageBannerStrings (
   SMBIOS_TABLE_TYPE0       *Type0Record;
   SMBIOS_TABLE_TYPE1       *Type1Record;
   SMBIOS_TABLE_TYPE4       *Type4Record;
+  SMBIOS_TABLE_TYPE17      *Type17Record;
   SMBIOS_TABLE_TYPE19      *Type19Record;
   EFI_SMBIOS_TABLE_HEADER  *Record;
+  UINT16                   MemorySize;
+  UINT32                   ExtendedMemorySize;
   UINT64                   InstalledMemory;
+  UINT64                   Type17TotalMemory;
   BOOLEAN                  FoundCpu;
 
-  InstalledMemory = 0;
-  FoundCpu        = 0;
+  InstalledMemory   = 0;
+  Type17TotalMemory = 0;
+  FoundCpu          = 0;
 
   //
   // Update default banner string.
@@ -632,6 +637,28 @@ UpdateFrontPageBannerStrings (
       }
     }
 
+    if ( Record->Type == SMBIOS_TYPE_MEMORY_DEVICE ) {
+      Type17Record       = (SMBIOS_TABLE_TYPE17 *)Record;
+      MemorySize         = Type17Record->Size;
+      ExtendedMemorySize = Type17Record->ExtendedSize;
+
+      // Calculate memory size for this Type 17 record and accumulate
+      // (sum all Type 17 records as fallback if Type 19 is not available)
+      if ( MemorySize != 0xFFFF ) {
+        // 0xFFFF means "unknown/not installed"
+        if ( MemorySize == 0x7FFF ) {
+          // There is more than (32GiB - 1MiB) of memory. The size is given in MiB.
+          Type17TotalMemory += ExtendedMemorySize;
+        } else if ( MemorySize & 0x8000 ) {
+          // The size is given in KiB.
+          Type17TotalMemory += RShiftU64 (MemorySize & ~0x8000U, 10);
+        } else {
+          // The size is given in MiB.
+          Type17TotalMemory += MemorySize;
+        }
+      }
+    }
+
     if ( Record->Type == SMBIOS_TYPE_MEMORY_ARRAY_MAPPED_ADDRESS ) {
       Type19Record = (SMBIOS_TABLE_TYPE19 *)Record;
       if (Type19Record->StartingAddress != 0xFFFFFFFF ) {
@@ -650,6 +677,13 @@ UpdateFrontPageBannerStrings (
     }
 
     Status = Smbios->GetNext (Smbios, &SmbiosHandle, NULL, &Record, NULL);
+  }
+
+  //
+  // Use Type 17 as fallback if Type 19 didn't provide memory information
+  //
+  if (InstalledMemory == 0) {
+    InstalledMemory = Type17TotalMemory;
   }
 
   //
