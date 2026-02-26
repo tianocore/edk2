@@ -157,8 +157,13 @@ PlatformGetFirstNonAddressCB (
 }
 
 /**
-  Store the low (below 4G) memory size in
-  PlatformInfoHob->LowMemory
+  Store the low memory size in PlatformInfoHob->LowMemory.
+
+  The first memory block with base address zero is considered "low memory".
+  Traditionally this has been all memory below 4G.  When running under SVSM
+  there are multiple memory blocks below 4G though, because SVSM caves out a
+  chunk of memory for itself.  Only the first of these blocks is considered
+  low memory.
 **/
 STATIC
 VOID
@@ -167,21 +172,16 @@ PlatformGetLowMemoryCB (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  UINT64  Candidate;
-
   if (E820Entry->Type != EfiAcpiAddressRangeMemory) {
     return;
   }
 
-  Candidate = E820Entry->BaseAddr + E820Entry->Length;
-  if (Candidate >= BASE_4GB) {
+  if (E820Entry->BaseAddr != 0) {
     return;
   }
 
-  if (PlatformInfoHob->LowMemory < Candidate) {
-    DEBUG ((DEBUG_INFO, "%a: LowMemory=0x%Lx\n", __func__, Candidate));
-    PlatformInfoHob->LowMemory = (UINT32)Candidate;
-  }
+  DEBUG ((DEBUG_INFO, "%a: LowMemory=0x%Lx\n", __func__, E820Entry->Length));
+  PlatformInfoHob->LowMemory = (UINT32)E820Entry->Length;
 }
 
 /**
@@ -201,7 +201,9 @@ PlatformAddHobCB (
 
   switch (E820Entry->Type) {
     case EfiAcpiAddressRangeMemory:
-      if (Base >= BASE_4GB) {
+      if (End <= PlatformInfoHob->LowMemory) {
+        // nothing, handled by PlatformGetLowMemoryCB()
+      } else {
         //
         // Round up the start address, and round down the end address.
         //
