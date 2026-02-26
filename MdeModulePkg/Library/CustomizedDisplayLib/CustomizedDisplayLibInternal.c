@@ -99,13 +99,19 @@ PrintBannerInfo (
 
         case 1:
           //
-          // Handle center column
+          // Handle center column - center based on string length
           //
-          PrintStringAt (
-            gScreenDimensions.LeftColumn + (gScreenDimensions.RightColumn - gScreenDimensions.LeftColumn) / 3,
-            Line,
-            StrFrontPageBanner
-            );
+          {
+            UINTN  StringWidth;
+
+            StringWidth = StrLen (StrFrontPageBanner);
+            // Center the string within the available width
+            PrintStringAt (
+              gScreenDimensions.LeftColumn + (gScreenDimensions.RightColumn - gScreenDimensions.LeftColumn - StringWidth) / 2,
+              Line,
+              StrFrontPageBanner
+              );
+          }
           break;
 
         case 2:
