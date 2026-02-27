@@ -332,6 +332,8 @@
   X64/XSetBv.nasm
   X64/VmgExit.nasm
   X64/VmgExitSvsm.nasm
+  X64/ReadFsBase.nasm
+  X64/WriteFsBase.nasm
 
 [Sources.EBC]
   Ebc/CpuBreakpoint.c
