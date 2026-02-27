@@ -4,13 +4,19 @@
 ;
 ; Module Name:
 ;
-;   ExceptionHandlerAsm.Asm
+;   ExceptionHandlerAsm.nasm
 ;
 ; Abstract:
 ;
 ;   x64 CPU Exception Handler
 ;
 ; Notes:
+;
+; This module supports XCODE which does not permit absolute references in
+; .text sections. This must be handled differently in SEC/PEI vs SMM/DXE. In
+; SEC/PEI we emit the IDT vectors in .data because the entire image is R+X.
+; In SMM/DXE, we patch the .text section at runtime because .data is not executable,
+; but it requires a writeable .text section (which SEC/PEI does not have).
 ;
 ;------------------------------------------------------------------------------
 %include "Nasm.inc"
@@ -49,7 +55,9 @@ extern ASM_PFX(CommonExceptionHandler)
 SECTION .data
 
 DEFAULT REL
+%ifndef SEC_PEI_NO_ABSOLUTE_RELOCS_IN_TEXT
 SECTION .text
+%endif
 
 ALIGN   8
 
@@ -59,7 +67,7 @@ AsmIdtVectorBegin:
 %rep  256
     push    strict qword %[Vector]
     push    rax
-%ifdef NO_ABSOLUTE_RELOCS_IN_TEXT
+%ifdef SMM_DXE_NO_ABSOLUTE_RELOCS_IN_TEXT
     mov     rax, strict qword 0    ; mov     rax, ASM_PFX(CommonInterruptEntry)
 %else
     mov     rax, ASM_PFX(CommonInterruptEntry)
@@ -73,13 +81,18 @@ HookAfterStubHeaderBegin:
     push    strict qword 0      ; 0 will be fixed
 VectorNum:
     push    rax
-%ifdef NO_ABSOLUTE_RELOCS_IN_TEXT
+%ifdef SMM_DXE_NO_ABSOLUTE_RELOCS_IN_TEXT
     mov     rax, strict qword 0 ;     mov     rax, HookAfterStubHeaderEnd
 JmpAbsoluteAddress:
 %else
     mov     rax, HookAfterStubHeaderEnd
 %endif
     jmp     rax
+
+%ifdef SEC_PEI_NO_ABSOLUTE_RELOCS_IN_TEXT
+SECTION .text
+%endif
+
 HookAfterStubHeaderEnd:
     mov     rax, rsp
     and     sp,  0xfff0        ; make sure 16-byte aligned for exception context
@@ -465,7 +478,7 @@ ASM_PFX(AsmGetTemplateAddressMap):
     lea     rax, [HookAfterStubHeaderBegin]
     mov     qword [rcx + 0x10], rax
 
-%ifdef NO_ABSOLUTE_RELOCS_IN_TEXT
+%ifdef SMM_DXE_NO_ABSOLUTE_RELOCS_IN_TEXT
 ; Fix up CommonInterruptEntry address
     lea    rax, [ASM_PFX(CommonInterruptEntry)]
     lea    rcx, [AsmIdtVectorBegin]
