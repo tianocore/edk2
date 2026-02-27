@@ -2248,8 +2248,6 @@
   GCC:*_*_X64_CC_FLAGS     = -U_WIN32 -UWIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_FLAGS_X64) -Wno-error=maybe-uninitialized -Wno-error=format -Wno-format -Wno-error=unused-but-set-variable -DNO_MSABI_VA_FUNCS
   GCC:*_CLANGDWARF_*_CC_FLAGS = -std=gnu99 -Wno-error=uninitialized -Wno-error=incompatible-pointer-types -Wno-error=pointer-sign -Wno-error=implicit-function-declaration -Wno-error=ignored-pragma-optimize
   GCC:*_CLANGPDB_*_CC_FLAGS = -U_WIN32 -UWIN32 -U_WIN64 -U_MSC_VER -std=c99 -Wno-error=uninitialized -Wno-error=incompatible-pointer-types -Wno-error=pointer-sign -Wno-error=implicit-function-declaration -Wno-error=ignored-pragma-optimize -Wno-error=unused-function
-  # Revisit after switching to 3.0 branch
-  GCC:*_GCC5_*_CC_FLAGS    = -Wno-unused-but-set-variable
 
   # suppress the following warnings in openssl so we don't break the build with warnings-as-errors:
   # 1295: Deprecated declaration <entity> - give arg types

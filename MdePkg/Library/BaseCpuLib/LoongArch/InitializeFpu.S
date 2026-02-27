@@ -11,7 +11,7 @@ ASM_GLOBAL ASM_PFX(InitializeFloatingPointUnits)
 
 ASM_PFX(InitializeFloatingPointUnits):
   li.d        $t0, 0x0      // RNE mode
-  movgr2fcsr  $r0, $t0
+  movgr2fcsr  $fcsr0, $t0
   li.d        $t1, -1       // SNaN
 
   movgr2fr.d  $f0, $t1
