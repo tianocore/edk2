@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _OPAL_PASSWORD_PEI_H_
-#define _OPAL_PASSWORD_PEI_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -54,5 +53,3 @@ typedef struct {
   CR (a, OPAL_PEI_DEVICE, Sscp, OPAL_PEI_DEVICE_SIGNATURE)
 
 #pragma pack()
-
-#endif // _OPAL_PASSWORD_PEI_H_

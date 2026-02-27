@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _STRING_H_
-#define _STRING_H_
+#pragma once
 
 extern EFI_HII_HANDLE  gStringPackHandle;
 
@@ -67,5 +66,3 @@ EFI_HII_HANDLE
 ExportFonts (
   VOID
   );
-
-#endif // _STRING_H_

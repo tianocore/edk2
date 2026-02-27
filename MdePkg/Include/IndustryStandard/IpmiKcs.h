@@ -10,8 +10,7 @@
   https://www.intel.com/content/www/us/en/products/docs/servers/ipmi/ipmi-second-gen-interface-spec-v2-rev1-1.html
 **/
 
-#ifndef IPMI_KCS_H_
-#define IPMI_KCS_H_
+#pragma once
 
 #define IPMI_KCS_STATUS_REGISTER_OFFSET    1
 #define IPMI_KCS_COMMAND_REGISTER_OFFSET   1
@@ -73,4 +72,3 @@ typedef struct {
   UINT8    NetFunc;
   UINT8    Command;
 } IPMI_KCS_RESPONSE_HEADER;
-#endif

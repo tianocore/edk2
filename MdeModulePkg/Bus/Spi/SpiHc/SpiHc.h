@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef SPI_HC_H_
-#define SPI_HC_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Library/BaseLib.h>
@@ -113,5 +112,3 @@ Transaction (
   IN CONST EFI_SPI_HC_PROTOCOL  *This,
   IN EFI_SPI_BUS_TRANSACTION    *BusTransaction
   );
-
-#endif //SPI_HC_H_

@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _LEGACY_BIOS_MPTABLE_H_
-#define _LEGACY_BIOS_MPTABLE_H_
+#pragma once
 
 #define EFI_LEGACY_MP_TABLE_REV_1_4  0x04
 
@@ -284,5 +283,3 @@ typedef struct {
 } EFI_LEGACY_MP_TABLE_ENTRY_EXT_COMPAT_BUS_ADDR_SPACE_MODIFIER;
 
 #pragma pack()
-
-#endif

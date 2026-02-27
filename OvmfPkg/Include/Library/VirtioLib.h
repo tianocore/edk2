@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _VIRTIO_LIB_H_
-#define _VIRTIO_LIB_H_
+#pragma once
 
 #include <Protocol/VirtioDevice.h>
 
@@ -306,5 +305,3 @@ VirtioMapAllBytesInSharedBuffer (
   OUT EFI_PHYSICAL_ADDRESS    *DeviceAddress,
   OUT VOID                    **Mapping
   );
-
-#endif // _VIRTIO_LIB_H_

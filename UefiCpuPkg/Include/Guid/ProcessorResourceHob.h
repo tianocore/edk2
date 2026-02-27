@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef PROCESSOR_RESOURCE_HOB_H_
-#define PROCESSOR_RESOURCE_HOB_H_
+#pragma once
 
 #define PROCESSOR_RESOURCE_HOB_GUID \
   { \
@@ -25,5 +24,3 @@ typedef struct {
 } PROCESSOR_RESOURCE_DATA;
 
 extern EFI_GUID  gProcessorResourceHobGuid;
-
-#endif

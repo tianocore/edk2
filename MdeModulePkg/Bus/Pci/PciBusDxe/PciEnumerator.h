@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_PCI_ENUMERATOR_H_
-#define _EFI_PCI_ENUMERATOR_H_
+#pragma once
 
 #include "PciResourceSupport.h"
 
@@ -511,5 +510,3 @@ EFI_STATUS
 AddHostBridgeEnumerator (
   IN EFI_HANDLE  HostBridgeHandle
   );
-
-#endif

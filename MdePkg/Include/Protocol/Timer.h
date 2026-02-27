@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __ARCH_PROTOCOL_TIMER_H__
-#define __ARCH_PROTOCOL_TIMER_H__
+#pragma once
 
 ///
 /// Global ID for the Timer Architectural Protocol
@@ -169,5 +168,3 @@ struct _EFI_TIMER_ARCH_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiTimerArchProtocolGuid;
-
-#endif

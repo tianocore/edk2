@@ -28,8 +28,8 @@
   DEFINE OPENSSL_PATH            = openssl
   DEFINE OPENSSL_GEN_PATH        = OpensslGen
   DEFINE OPENSSL_FLAGS           = -DL_ENDIAN -DOPENSSL_SMALL_FOOTPRINT -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -D OPENSSL_NO_INLINE_ASM
-  DEFINE OPENSSL_FLAGS_IA32      = -DAES_ASM -DGHASH_ASM -DMD5_ASM -DOPENSSL_CPUID_OBJ -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DVPAES_ASM
-  DEFINE OPENSSL_FLAGS_X64       = -DAES_ASM -DBSAES_ASM -DGHASH_ASM -DKECCAK1600_ASM -DMD5_ASM -DOPENSSL_CPUID_OBJ -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DVPAES_ASM
+  DEFINE OPENSSL_FLAGS_IA32      = -DAES_ASM -DCMLL_ASM -DGHASH_ASM -DMD5_ASM -DOPENSSL_CPUID_OBJ -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DVPAES_ASM
+  DEFINE OPENSSL_FLAGS_X64       = -DAES_ASM -DBSAES_ASM -DCMLL_ASM -DGHASH_ASM -DKECCAK1600_ASM -DMD5_ASM -DOPENSSL_CPUID_OBJ -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DVPAES_ASM
   DEFINE OPENSSL_FLAGS_AARCH64   = -DBSAES_ASM -DKECCAK1600_ASM -DMD5_ASM -DOPENSSL_CPUID_OBJ -DOPENSSL_SM3_ASM -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DVPAES_ASM
 
 #
@@ -191,6 +191,11 @@
   $(OPENSSL_PATH)/crypto/bn/bn_x931p.c
   $(OPENSSL_PATH)/crypto/buffer/buf_err.c
   $(OPENSSL_PATH)/crypto/buffer/buffer.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_cfb.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_ctr.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_ecb.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_ofb.c
+  $(OPENSSL_PATH)/crypto/cmac/cmac.c
   $(OPENSSL_PATH)/crypto/comp/c_brotli.c
   $(OPENSSL_PATH)/crypto/comp/c_zlib.c
   $(OPENSSL_PATH)/crypto/comp/c_zstd.c
@@ -295,6 +300,7 @@
   $(OPENSSL_PATH)/crypto/evp/e_aes_cbc_hmac_sha256.c
   $(OPENSSL_PATH)/crypto/evp/e_aria.c
   $(OPENSSL_PATH)/crypto/evp/e_bf.c
+  $(OPENSSL_PATH)/crypto/evp/e_camellia.c
   $(OPENSSL_PATH)/crypto/evp/e_cast.c
   $(OPENSSL_PATH)/crypto/evp/e_chacha20_poly1305.c
   $(OPENSSL_PATH)/crypto/evp/e_des.c
@@ -654,6 +660,8 @@
   $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_aes_xts.c
   $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_aes_xts_fips.c
   $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_aes_xts_hw.c
+  $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_camellia.c
+  $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_camellia_hw.c
   $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_cts.c
   $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_null.c
   $(OPENSSL_PATH)/providers/implementations/digests/md5_prov.c
@@ -696,6 +704,7 @@
   $(OPENSSL_PATH)/providers/implementations/keymgmt/kdf_legacy_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/mac_legacy_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/rsa_kmgmt.c
+  $(OPENSSL_PATH)/providers/implementations/macs/cmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/gmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/hmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/kmac_prov.c
@@ -790,6 +799,7 @@
   $(OPENSSL_GEN_PATH)/IA32-MSFT/crypto/aes/aes-586.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/IA32-MSFT/crypto/aes/aesni-x86.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/IA32-MSFT/crypto/aes/vpaes-x86.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
+  $(OPENSSL_GEN_PATH)/IA32-MSFT/crypto/camellia/cmll-x86.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/IA32-MSFT/crypto/x86cpuid.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/IA32-MSFT/crypto/md5/md5-586.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/IA32-MSFT/crypto/modes/ghash-x86.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
@@ -799,6 +809,7 @@
   $(OPENSSL_GEN_PATH)/IA32-GCC/crypto/aes/aes-586.S ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/IA32-GCC/crypto/aes/aesni-x86.S ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/IA32-GCC/crypto/aes/vpaes-x86.S ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
+  $(OPENSSL_GEN_PATH)/IA32-GCC/crypto/camellia/cmll-x86.S ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/IA32-GCC/crypto/x86cpuid.S ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/IA32-GCC/crypto/md5/md5-586.S ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/IA32-GCC/crypto/modes/ghash-x86.S ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
@@ -948,6 +959,12 @@
   $(OPENSSL_PATH)/crypto/bn/rsaz_exp_x2.c
   $(OPENSSL_PATH)/crypto/buffer/buf_err.c
   $(OPENSSL_PATH)/crypto/buffer/buffer.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_cfb.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_ctr.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_ecb.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_misc.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_ofb.c
+  $(OPENSSL_PATH)/crypto/cmac/cmac.c
   $(OPENSSL_PATH)/crypto/comp/c_brotli.c
   $(OPENSSL_PATH)/crypto/comp/c_zlib.c
   $(OPENSSL_PATH)/crypto/comp/c_zstd.c
@@ -1052,6 +1069,7 @@
   $(OPENSSL_PATH)/crypto/evp/e_aes_cbc_hmac_sha256.c
   $(OPENSSL_PATH)/crypto/evp/e_aria.c
   $(OPENSSL_PATH)/crypto/evp/e_bf.c
+  $(OPENSSL_PATH)/crypto/evp/e_camellia.c
   $(OPENSSL_PATH)/crypto/evp/e_cast.c
   $(OPENSSL_PATH)/crypto/evp/e_chacha20_poly1305.c
   $(OPENSSL_PATH)/crypto/evp/e_des.c
@@ -1410,6 +1428,8 @@
   $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_aes_xts.c
   $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_aes_xts_fips.c
   $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_aes_xts_hw.c
+  $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_camellia.c
+  $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_camellia_hw.c
   $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_cts.c
   $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_null.c
   $(OPENSSL_PATH)/providers/implementations/digests/md5_prov.c
@@ -1452,6 +1472,7 @@
   $(OPENSSL_PATH)/providers/implementations/keymgmt/kdf_legacy_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/mac_legacy_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/rsa_kmgmt.c
+  $(OPENSSL_PATH)/providers/implementations/macs/cmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/gmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/hmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/kmac_prov.c
@@ -1551,6 +1572,7 @@
   $(OPENSSL_GEN_PATH)/X64-MSFT/crypto/aes/aesni-xts-avx512.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/X64-MSFT/crypto/aes/bsaes-x86_64.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/X64-MSFT/crypto/aes/vpaes-x86_64.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
+  $(OPENSSL_GEN_PATH)/X64-MSFT/crypto/camellia/cmll-x86_64.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/X64-MSFT/crypto/x86_64cpuid.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/X64-MSFT/crypto/md5/md5-x86_64.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/X64-MSFT/crypto/modes/aes-gcm-avx512.nasm ||||gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
@@ -1570,6 +1592,7 @@
   $(OPENSSL_GEN_PATH)/X64-GCC/crypto/aes/aesni-xts-avx512.s ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/X64-GCC/crypto/aes/bsaes-x86_64.s ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/X64-GCC/crypto/aes/vpaes-x86_64.s ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
+  $(OPENSSL_GEN_PATH)/X64-GCC/crypto/camellia/cmll-x86_64.s ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/X64-GCC/crypto/x86_64cpuid.s ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/X64-GCC/crypto/md5/md5-x86_64.s ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
   $(OPENSSL_GEN_PATH)/X64-GCC/crypto/modes/aes-gcm-avx512.s ||||!gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm
@@ -1725,6 +1748,14 @@
   $(OPENSSL_PATH)/crypto/bn/bn_x931p.c
   $(OPENSSL_PATH)/crypto/buffer/buf_err.c
   $(OPENSSL_PATH)/crypto/buffer/buffer.c
+  $(OPENSSL_PATH)/crypto/camellia/camellia.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_cbc.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_cfb.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_ctr.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_ecb.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_misc.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_ofb.c
+  $(OPENSSL_PATH)/crypto/cmac/cmac.c
   $(OPENSSL_PATH)/crypto/comp/c_brotli.c
   $(OPENSSL_PATH)/crypto/comp/c_zlib.c
   $(OPENSSL_PATH)/crypto/comp/c_zstd.c
@@ -1829,6 +1860,7 @@
   $(OPENSSL_PATH)/crypto/evp/e_aes_cbc_hmac_sha256.c
   $(OPENSSL_PATH)/crypto/evp/e_aria.c
   $(OPENSSL_PATH)/crypto/evp/e_bf.c
+  $(OPENSSL_PATH)/crypto/evp/e_camellia.c
   $(OPENSSL_PATH)/crypto/evp/e_cast.c
   $(OPENSSL_PATH)/crypto/evp/e_chacha20_poly1305.c
   $(OPENSSL_PATH)/crypto/evp/e_des.c
@@ -2187,6 +2219,8 @@
   $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_aes_xts.c
   $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_aes_xts_fips.c
   $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_aes_xts_hw.c
+  $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_camellia.c
+  $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_camellia_hw.c
   $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_cts.c
   $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_null.c
   $(OPENSSL_PATH)/providers/implementations/digests/md5_prov.c
@@ -2229,6 +2263,7 @@
   $(OPENSSL_PATH)/providers/implementations/keymgmt/kdf_legacy_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/mac_legacy_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/rsa_kmgmt.c
+  $(OPENSSL_PATH)/providers/implementations/macs/cmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/gmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/hmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/kmac_prov.c
@@ -2408,8 +2443,6 @@
   GCC:*_*_X64_CC_FLAGS     = -U_WIN32 -UWIN32 -U_WIN64 -U_MSC_VER $(OPENSSL_FLAGS) $(OPENSSL_FLAGS_X64) -Wno-error=maybe-uninitialized -Wno-error=format -Wno-format -Wno-error=unused-but-set-variable -DNO_MSABI_VA_FUNCS
   GCC:*_CLANGDWARF_*_CC_FLAGS = -std=gnu99 -Wno-error=uninitialized -Wno-error=incompatible-pointer-types -Wno-error=pointer-sign -Wno-error=implicit-function-declaration -Wno-error=ignored-pragma-optimize
   GCC:*_CLANGPDB_*_CC_FLAGS = -U_WIN32 -UWIN32 -U_WIN64 -U_MSC_VER -std=c99 -Wno-error=uninitialized -Wno-error=incompatible-pointer-types -Wno-error=pointer-sign -Wno-error=implicit-function-declaration -Wno-error=ignored-pragma-optimize -Wno-error=unused-function
-  # Revisit after switching to 3.0 branch
-  GCC:*_GCC5_*_CC_FLAGS    = -Wno-unused-but-set-variable
 
   # suppress the following warnings in openssl so we don't break the build with warnings-as-errors:
   # 1295: Deprecated declaration <entity> - give arg types

@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef RISCV_SBI_LIB_H_
-#define RISCV_SBI_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -128,5 +127,3 @@ RiscVSbiEcall (
   IN UINTN      Fid,
   IN UINTN      Ext
   );
-
-#endif

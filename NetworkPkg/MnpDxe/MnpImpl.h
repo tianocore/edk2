@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _MNP_IMPL_H_
-#define _MNP_IMPL_H_
+#pragma once
 
 #include "MnpDriver.h"
 
@@ -894,5 +893,3 @@ EFI_STATUS
 MnpConfigReceiveFilters (
   IN MNP_DEVICE_DATA  *MnpDeviceData
   );
-
-#endif

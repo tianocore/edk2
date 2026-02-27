@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __INT_SAFE_LIB_H__
-#define __INT_SAFE_LIB_H__
+#pragma once
 
 //
 // It is common for -1 to be used as an error value
@@ -3009,5 +3008,3 @@ SafeInt64Mult (
   IN  INT64  Multiplier,
   OUT INT64  *Result
   );
-
-#endif // __INT_SAFE_LIB_H__

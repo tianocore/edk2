@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef EFI_REDFISH_DISCOVER_INTERNAL_H_
-#define EFI_REDFISH_DISCOVER_INTERNAL_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -263,4 +262,3 @@ RedfishGetHostInterfaceProtocolData (
 extern EFI_GUID  gRedfishDiscoverTcp4Instance;
 extern EFI_GUID  gRedfishDiscoverTcp6Instance;
 extern EFI_GUID  gRedfishDiscoverRestEXInstance;
-#endif

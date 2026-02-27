@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef ARM_FFA_MEM_MGMT_LIB_H_
-#define ARM_FFA_MEM_MGMT_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -61,7 +60,7 @@ ArmFfaMemLibDonateRxTx (
   );
 
 /**
-  @brief      Starts a transaction to transfer an Owner’s access to a memory
+  @brief      Starts a transaction to transfer an Owner's access to a memory
               region and  grant access to it to one or more Borrowers.
 
   @param[in]  TotalLength     Total length of the memory transaction descriptor
@@ -89,7 +88,7 @@ ArmFfaMemLibLend (
   );
 
 /**
-  @brief      Starts a transaction to transfer an Owner’s access to a memory
+  @brief      Starts a transaction to transfer an Owner's access to a memory
               region and  grant access to it to one or more Borrowers through
               Rx/Tx buffer.
 
@@ -285,5 +284,3 @@ ArmFfaMemLibPermSet (
   IN UINT32      PageCount,
   IN UINT32      MemoryPerm
   );
-
-#endif // ARM_FFA_MEM_MGMT_LIB_H_

@@ -10,8 +10,7 @@
     - DT     - Device Tree
 **/
 
-#ifndef DYNAMIC_TABLE_FACTORY_PROTOCOL_H_
-#define DYNAMIC_TABLE_FACTORY_PROTOCOL_H_
+#pragma once
 
 #include <AcpiTableGenerator.h>
 #include <SmbiosTableGenerator.h>
@@ -278,5 +277,3 @@ typedef struct DynamicTableFactoryProtocol {
 extern EFI_GUID  gEdkiiDynamicTableFactoryProtocolGuid;
 
 #pragma pack()
-
-#endif // DYNAMIC_TABLE_FACTORY_PROTOCOL_H_

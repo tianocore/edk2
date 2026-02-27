@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __HTTP_11_H__
-#define __HTTP_11_H__
+#pragma once
 
 #pragma pack(1)
 
@@ -277,5 +276,3 @@
 #define HTTP_HEADER_IF_UNMODIFIED_SINCE  "If-Unmodified-Since"
 
 #pragma pack()
-
-#endif

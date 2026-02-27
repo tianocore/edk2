@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _VARIABLE_CHECK_LIB_H_
-#define _VARIABLE_CHECK_LIB_H_
+#pragma once
 
 #include <Protocol/VarCheck.h>
 
@@ -170,5 +169,3 @@ VarCheckLibSetVariableCheck (
   IN VOID                      *Data,
   IN VAR_CHECK_REQUEST_SOURCE  RequestSource
   );
-
-#endif

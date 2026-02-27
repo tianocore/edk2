@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PLATFORM_LOGO_H__
-#define __PLATFORM_LOGO_H__
+#pragma once
 
 #include <Protocol/HiiImage.h>
 
@@ -61,5 +60,3 @@ struct _EDKII_PLATFORM_LOGO_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkiiPlatformLogoProtocolGuid;
-
-#endif

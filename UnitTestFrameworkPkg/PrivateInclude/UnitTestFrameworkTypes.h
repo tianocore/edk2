@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __UNIT_TEST_TYPES_H__
-#define __UNIT_TEST_TYPES_H__
+#pragma once
 
 #include <Library/UnitTestLib.h>
 
@@ -174,5 +173,3 @@ UNIT_TEST_FRAMEWORK_HANDLE
 GetActiveFrameworkHandle (
   VOID
   );
-
-#endif

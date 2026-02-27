@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _LIB_EDITOR_H_
-#define _LIB_EDITOR_H_
+#pragma once
 
 #include "TextEditorTypes.h"
 
@@ -62,5 +61,3 @@ EFI_STATUS
 MainEditorBackup (
   VOID
   );
-
-#endif

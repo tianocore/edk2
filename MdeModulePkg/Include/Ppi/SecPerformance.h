@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PEI_SEC_PERFORMANCE_PPI_H_
-#define _PEI_SEC_PERFORMANCE_PPI_H_
+#pragma once
 
 #define PEI_SEC_PERFORMANCE_PPI_GUID \
   { \
@@ -56,5 +55,3 @@ struct _PEI_SEC_PERFORMANCE_PPI {
 };
 
 extern EFI_GUID  gPeiSecPerformancePpiGuid;
-
-#endif

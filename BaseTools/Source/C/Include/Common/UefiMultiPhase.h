@@ -9,6 +9,8 @@
 
 **/
 
+#pragma once
+
 #ifndef __UEFI_MULTIPHASE_H__
 #define __UEFI_MULTIPHASE_H__
 
@@ -236,4 +238,3 @@ typedef struct {
 } EFI_VARIABLE_AUTHENTICATION;
 
 #endif
-

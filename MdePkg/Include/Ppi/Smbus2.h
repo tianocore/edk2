@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __PEI_SMBUS2_PPI_H__
-#define __PEI_SMBUS2_PPI_H__
+#pragma once
 
 #include <IndustryStandard/SmBus.h>
 
@@ -192,5 +191,3 @@ struct _EFI_PEI_SMBUS2_PPI {
 };
 
 extern EFI_GUID  gEfiPeiSmbus2PpiGuid;
-
-#endif

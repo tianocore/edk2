@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef SPDM_SECURITY_LIB_H_
-#define SPDM_SECURITY_LIB_H_
+#pragma once
 
 #include <Protocol/DeviceSecurity.h>
 #include <Protocol/DeviceSecurityPolicy.h>
@@ -433,5 +432,3 @@ EFIAPI
 IsDeviceAuthBootEnabled (
   VOID
   );
-
-#endif

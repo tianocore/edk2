@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __DEBUGPORT_H__
-#define __DEBUGPORT_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -384,5 +383,3 @@ EFIAPI
 DebugPortPoll (
   IN EFI_DEBUGPORT_PROTOCOL  *This
   );
-
-#endif

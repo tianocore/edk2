@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __SORT_LIB_H__
-#define __SORT_LIB_H__
+#pragma once
 
 /**
   Prototype for comparison function for any two element types.
@@ -103,5 +102,3 @@ StringCompare (
   IN  CONST VOID  *Buffer1,
   IN  CONST VOID  *Buffer2
   );
-
-#endif //__SORT_LIB_H__

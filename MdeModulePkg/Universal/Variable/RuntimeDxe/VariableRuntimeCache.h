@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _VARIABLE_RUNTIME_CACHE_H_
-#define _VARIABLE_RUNTIME_CACHE_H_
+#pragma once
 
 #include "Variable.h"
 
@@ -47,5 +46,3 @@ SynchronizeRuntimeVariableCache (
   IN  UINTN                   Offset,
   IN  UINTN                   Length
   );
-
-#endif

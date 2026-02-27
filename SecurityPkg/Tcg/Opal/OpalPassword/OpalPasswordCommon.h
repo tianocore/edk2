@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _OPAL_PASSWORD_COMMON_H_
-#define _OPAL_PASSWORD_COMMON_H_
+#pragma once
 
 #define OPAL_MAX_PASSWORD_SIZE  32
 
@@ -34,5 +33,3 @@ typedef struct {
 } OPAL_DEVICE_LOCKBOX_DATA;
 
 #define OPAL_DEVICE_LOCKBOX_GUID  { 0x56a77f0d, 0x6f05, 0x4d47, { 0xb9, 0x11, 0x4f, 0xd, 0xec, 0x5c, 0x58, 0x61 } }
-
-#endif // _OPAL_PASSWORD_COMMON_H_

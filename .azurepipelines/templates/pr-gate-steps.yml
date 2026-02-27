@@ -12,6 +12,7 @@ parameters:
   build_pkgs: ''
   build_targets: ''
   build_archs: ''
+  build_extra_stuart_args: ''
   usePythonVersion: ''
   extra_install_step: []
 
@@ -90,7 +91,7 @@ steps:
   displayName: Build and Test ${{ parameters.build_pkgs }} ${{ parameters.build_archs}}
   inputs:
     script: |
-      stuart_ci_build -c .pytool/CISettings.py -p $(pkgs_to_build) -t ${{ parameters.build_targets}} -a ${{ parameters.build_archs}} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}}
+      stuart_ci_build -c .pytool/CISettings.py -p $(pkgs_to_build) -t ${{ parameters.build_targets}} -a ${{ parameters.build_archs}} TOOL_CHAIN_TAG=${{ parameters.tool_chain_tag}} ${{ parameters.build_extra_stuart_args }}
   condition: and(gt(variables.pkg_count, 0), succeeded())
 
 # Publish Test Results to Azure Pipelines/TFS

@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __SERIAL_PORT_LIB_VENDOR_H__
-#define __SERIAL_PORT_LIB_VENDOR_H__
+#pragma once
 
 #define EDKII_SERIAL_PORT_LIB_VENDOR_GUID  {\
           0xD3987D4B, 0x971A, 0x435F, \
@@ -15,5 +14,3 @@
           }
 
 extern EFI_GUID  gEdkiiSerialPortLibVendorGuid;
-
-#endif // __SERIAL_PORT_LIB_VENDOR_H__

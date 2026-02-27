@@ -6,9 +6,6 @@
 
 **/
 
-#ifndef __MSR_H__
-#define __MSR_H__
+#pragma once
 
 #include <Register/Intel/Msr.h>
-
-#endif

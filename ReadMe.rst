@@ -10,7 +10,7 @@ environment for the UEFI and PI specifications from www.uefi.org.
 
 It is recommended to install this Python version to run the full set of scripts that enable CI in the project.
 
-Other Python requirements for build can be found in the `EDK II Build Instructions <https://github.com/tianocore/tianocore.github.io/wiki/Build-Instructions/>`__.
+Other Python requirements for build can be found in the `EDK II Build Instructions <https://www.tianocore.org/tianocore-wiki.github.io/build-tooling/build-workflows/edk_ii_tools_list.html>`__.
 
 Core CI Build Status
 --------------------
@@ -97,6 +97,7 @@ that are covered by additional licenses.
 -  `MdePkg/Library/BaseFdtLib/libfdt <https://github.com/devicetree-org/pylibfdt/blob/f39368a217496d32c4091a2dba4045b60649e3a5/BSD-2-Clause>`__
 -  `MdePkg/Library/MipiSysTLib/mipisyst <https://github.com/MIPI-Alliance/public-mipi-sys-t/blob/aae857d0d05ac65152ed24992a4acd834a0a107c/LICENSE>`__
 -  `SecurityPkg/DeviceSecurity/SpdmLib/libspdm <https://github.com/DMTF/libspdm/blob/main/LICENSE.md>`__
+-  `TcgTpmPkg/Library/TpmLib/TPM <https://github.com/TrustedComputingGroup/TPM/blob/main/LICENSE>`__
 
 The EDK II Project is composed of packages. The maintainers for each package
 are listed in `Maintainers.txt <Maintainers.txt>`__.
@@ -106,15 +107,15 @@ Resources
 
 -  `TianoCore <http://www.tianocore.org>`__
 -  `EDK
-   II <https://github.com/tianocore/tianocore.github.io/wiki/EDK-II>`__
+   II <https://www.tianocore.org/tianocore-wiki.github.io>`__
 -  `Getting Started with EDK
-   II <https://github.com/tianocore/tianocore.github.io/wiki/Getting-Started-with-EDK-II>`__
+   II <https://www.tianocore.org/tianocore-wiki.github.io/development/tutorials-howto/getting_started_with_edk_ii.html>`__
 -  `Mailing
-   Lists <https://github.com/tianocore/tianocore.github.io/wiki/Mailing-Lists>`__
+   Lists <https://www.tianocore.org/tianocore-wiki.github.io/community/communications/mailing_lists.html>`__
 -  `How To
-   Contribute <https://github.com/tianocore/tianocore.github.io/wiki/How-To-Contribute>`__
+   Contribute <https://www.tianocore.org/tianocore-wiki.github.io/development/contribution-guides/how_to_contribute.html>`__
 -  `Release
-   Planning <https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Release-Planning>`__
+   Planning <https://www.tianocore.org/tianocore-wiki.github.io/releases-history/planning-roadmaps/edk_ii_release_planning.html>`__
 
 Code Contributions
 ------------------

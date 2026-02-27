@@ -16,8 +16,7 @@
 
 **/
 
-#ifndef _SMM_ACCESS2_H_
-#define _SMM_ACCESS2_H_
+#pragma once
 
 #include <Protocol/MmAccess.h>
 
@@ -33,5 +32,3 @@ typedef EFI_MM_LOCK EFI_SMM_LOCK2;
 
 typedef EFI_MM_CAPABILITIES EFI_SMM_CAPABILITIES2;
 extern EFI_GUID  gEfiSmmAccess2ProtocolGuid;
-
-#endif

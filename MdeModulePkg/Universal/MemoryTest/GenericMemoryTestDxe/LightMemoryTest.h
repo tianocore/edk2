@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _GENERIC_MEMORY_TEST_H_
-#define _GENERIC_MEMORY_TEST_H_
+#pragma once
 
 #include <Guid/StatusCodeDataTypeId.h>
 #include <Protocol/GenericMemoryTest.h>
@@ -329,5 +328,3 @@ GenCompatibleRangeTest (
   IN  EFI_PHYSICAL_ADDRESS             StartAddress,
   IN  UINT64                           Length
   );
-
-#endif

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef  _HAND_H_
-#define  _HAND_H_
+#pragma once
 
 #define EFI_HANDLE_SIGNATURE  SIGNATURE_32('h','n','d','l')
 
@@ -248,5 +247,3 @@ CoreValidateHandle (
 extern EFI_LOCK    gProtocolDatabaseLock;
 extern LIST_ENTRY  gHandleList;
 extern UINT64      gHandleDatabaseKey;
-
-#endif

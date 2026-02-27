@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SMM_PROFILE_ARCH_H_
-#define _SMM_PROFILE_ARCH_H_
+#pragma once
 
 #pragma pack (1)
 
@@ -152,5 +151,3 @@ SetAccNum (
   IN OUT UINT64  *Entry,
   IN     UINT64  Acc
   );
-
-#endif // _SMM_PROFILE_ARCH_H_

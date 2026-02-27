@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EDKII_UFS_HC_PLATFORM_PROTOCOL_H__
-#define __EDKII_UFS_HC_PLATFORM_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/UfsHostController.h>
 
@@ -138,5 +137,3 @@ struct _EDKII_UFS_HC_PLATFORM_PROTOCOL {
   ///
   BOOLEAN                                   SkipLinkStartup;
 };
-
-#endif

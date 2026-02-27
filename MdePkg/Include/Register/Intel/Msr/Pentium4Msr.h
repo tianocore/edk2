@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __PENTIUM_4_MSR_H__
-#define __PENTIUM_4_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -2620,5 +2619,3 @@ typedef union {
   @note MSR_PENTIUM_4_EMON_L3_CTR_CTL7 is defined as MSR_EMON_L3_CTR_CTL7 in SDM.
 **/
 #define MSR_PENTIUM_4_EMON_L3_CTR_CTL7  0x000107D3
-
-#endif

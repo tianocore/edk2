@@ -7,6 +7,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
+#pragma once
+
 #ifndef __VARIABLE_FORMAT_H__
 #define __VARIABLE_FORMAT_H__
 
@@ -28,11 +30,11 @@ extern EFI_GUID  gEfiAuthenticatedVariableGuid;
 //
 // GET_PAD_SIZE calculates the miminal pad bytes needed to make the current pad size satisfy the alignment requirement.
 //
-#if (ALIGNMENT == 1)
+  #if (ALIGNMENT == 1)
 #define GET_PAD_SIZE(a)  (0)
-#else
+  #else
 #define GET_PAD_SIZE(a)  (((~a) + 1) & (ALIGNMENT - 1))
-#endif
+  #endif
 
 ///
 /// Alignment of Variable Data Header in Variable Store region.
@@ -50,7 +52,7 @@ typedef enum {
   EfiUnknown
 } VARIABLE_STORE_STATUS;
 
-#pragma pack(1)
+  #pragma pack(1)
 
 #define VARIABLE_STORE_SIGNATURE                EFI_VARIABLE_GUID
 #define AUTHENTICATED_VARIABLE_STORE_SIGNATURE  EFI_AUTHENTICATED_VARIABLE_GUID
@@ -197,7 +199,7 @@ typedef struct {
   UINTN       VariableSize;
 } VARIABLE_ENTRY_CONSISTENCY;
 
-#pragma pack()
+  #pragma pack()
 
 typedef struct _VARIABLE_INFO_ENTRY VARIABLE_INFO_ENTRY;
 

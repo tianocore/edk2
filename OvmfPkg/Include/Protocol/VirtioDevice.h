@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __VIRTIO_DEVICE_H__
-#define __VIRTIO_DEVICE_H__
+#pragma once
 
 #include <IndustryStandard/Virtio.h>
 
@@ -516,5 +515,3 @@ struct _VIRTIO_DEVICE_PROTOCOL {
 };
 
 extern EFI_GUID  gVirtioDeviceProtocolGuid;
-
-#endif

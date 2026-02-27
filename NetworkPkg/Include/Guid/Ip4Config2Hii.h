@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __IP4_CONFIG2_HII_GUID_H__
-#define __IP4_CONFIG2_HII_GUID_H__
+#pragma once
 
 #define IP4_CONFIG2_NVDATA_GUID \
   { \
@@ -15,5 +14,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   }
 
 extern EFI_GUID  gIp4Config2NvDataGuid;
-
-#endif

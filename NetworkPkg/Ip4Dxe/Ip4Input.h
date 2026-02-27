@@ -5,8 +5,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_IP4_INPUT_H__
-#define __EFI_IP4_INPUT_H__
+#pragma once
 
 #define IP4_MIN_HEADLEN  20
 #define IP4_MAX_HEADLEN  60
@@ -242,5 +241,3 @@ Ip4IpSecProcessPacket (
   IN     EFI_IPSEC_TRAFFIC_DIR  Direction,
   IN     VOID                   *Context
   );
-
-#endif

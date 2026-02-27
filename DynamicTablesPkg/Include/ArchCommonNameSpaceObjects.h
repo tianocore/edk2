@@ -12,8 +12,7 @@
     - Std or STD - Standard
 **/
 
-#ifndef ARCH_COMMON_NAMESPACE_OBJECTS_H_
-#define ARCH_COMMON_NAMESPACE_OBJECTS_H_
+#pragma once
 
 #include <AcpiObjects.h>
 #include <StandardNameSpaceObjects.h>
@@ -1134,5 +1133,3 @@ typedef struct CmArchCommonObjSpcrInfo {
 } CM_ARCH_COMMON_SPCR_INFO;
 
 #pragma pack()
-
-#endif // ARCH_COMMON_NAMESPACE_OBJECTS_H_

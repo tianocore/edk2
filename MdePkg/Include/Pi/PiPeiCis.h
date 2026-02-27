@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PI_PEICIS_H__
-#define __PI_PEICIS_H__
+#pragma once
 
 #include <Uefi/UefiMultiPhase.h>
 #include <Pi/PiMultiPhase.h>
@@ -1052,5 +1051,3 @@ VOID
   IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData,
   IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList
   );
-
-#endif

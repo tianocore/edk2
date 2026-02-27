@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_GEN_FV_INTERNAL_LIB_H
-#define _EFI_GEN_FV_INTERNAL_LIB_H
+#pragma once
 
 //
 // Include files
@@ -398,5 +397,3 @@ Returns:
 
 --*/
 ;
-
-#endif

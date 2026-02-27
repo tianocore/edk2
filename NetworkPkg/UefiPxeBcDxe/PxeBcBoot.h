@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_PXEBC_BOOT_H__
-#define __EFI_PXEBC_BOOT_H__
+#pragma once
 
 #define PXEBC_DISPLAY_MAX_LINE            70
 #define PXEBC_DEFAULT_UDP_OVERHEAD_SIZE   8
@@ -87,5 +86,3 @@ PxeBcLoadBootFile (
   IN OUT UINTN               *BufferSize,
   IN     VOID                *Buffer         OPTIONAL
   );
-
-#endif

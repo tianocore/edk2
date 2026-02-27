@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _SMM_COMMUNICATION_H_
-#define _SMM_COMMUNICATION_H_
+#pragma once
 
 #include <Protocol/MmCommunication.h>
 
@@ -21,5 +20,3 @@ typedef EFI_MM_COMMUNICATE_HEADER EFI_SMM_COMMUNICATE_HEADER;
 typedef EFI_MM_COMMUNICATION_PROTOCOL EFI_SMM_COMMUNICATION_PROTOCOL;
 
 extern EFI_GUID  gEfiSmmCommunicationProtocolGuid;
-
-#endif
