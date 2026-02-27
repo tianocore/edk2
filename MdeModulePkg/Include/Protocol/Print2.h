@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PPRINT2_H__
-#define __PPRINT2_H__
+#pragma once
 
 #define EFI_PRINT2_PROTOCOL_GUID  \
   { 0xf05976ef, 0x83f1, 0x4f3d, { 0x86, 0x19, 0xf7, 0x59, 0x5d, 0x41, 0xe5, 0x38 } }
@@ -652,5 +651,3 @@ struct _EFI_PRINT2S_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiPrint2SProtocolGuid;
-
-#endif

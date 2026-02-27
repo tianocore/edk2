@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __EFI_DHCP6_PROTOCOL_H__
-#define __EFI_DHCP6_PROTOCOL_H__
+#pragma once
 
 #define EFI_DHCP6_PROTOCOL_GUID \
   { \
@@ -776,5 +775,3 @@ struct _EFI_DHCP6_PROTOCOL {
 
 extern EFI_GUID  gEfiDhcp6ProtocolGuid;
 extern EFI_GUID  gEfiDhcp6ServiceBindingProtocolGuid;
-
-#endif

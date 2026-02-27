@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EDKII_SYSTEM_CAPSULE_LIB_H__
-#define __EDKII_SYSTEM_CAPSULE_LIB_H__
+#pragma once
 
 #include <Guid/EdkiiSystemFmpCapsule.h>
 
@@ -142,5 +141,3 @@ CapsuleAuthenticateSystemFirmware (
   OUT VOID    **AuthenticatedImage,
   OUT UINTN   *AuthenticatedImageSize
   );
-
-#endif

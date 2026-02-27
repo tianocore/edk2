@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef HW_INFO_PARSER_LIB_H_
-#define HW_INFO_PARSER_LIB_H_
+#pragma once
 
 #include <ConfigurationManagerObject.h>
 
@@ -98,5 +97,3 @@ EFIAPI
 HwInfoParserShutdown (
   IN  HW_INFO_PARSER_HANDLE  ParserHandle
   );
-
-#endif // HW_INFO_PARSER_LIB_H_

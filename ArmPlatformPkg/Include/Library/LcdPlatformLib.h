@@ -5,8 +5,7 @@
 
  **/
 
-#ifndef LCD_PLATFORM_LIB_H_
-#define LCD_PLATFORM_LIB_H_
+#pragma once
 
 #include <Protocol/GraphicsOutput.h>
 
@@ -323,5 +322,3 @@ LcdPlatformGetBpp (
   IN  UINT32   ModeNumber,
   OUT LCD_BPP  *Bpp
   );
-
-#endif /* LCD_PLATFORM_LIB_H_ */

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __USB_DEVICE_PROTOCOL_H__
-#define __USB_DEVICE_PROTOCOL_H__
+#pragma once
 
 #include <IndustryStandard/Usb.h>
 
@@ -108,5 +107,3 @@ struct _USB_DEVICE_PROTOCOL {
 };
 
 typedef struct _USB_DEVICE_PROTOCOL USB_DEVICE_PROTOCOL;
-
-#endif //ifndef __USB_DEVICE_PROTOCOL_H__

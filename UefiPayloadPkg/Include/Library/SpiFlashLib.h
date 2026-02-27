@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef SPI_FLASH_LIB_H_
-#define SPI_FLASH_LIB_H_
+#pragma once
 
 /**
   Flash Region Type
@@ -209,5 +208,3 @@ SpiGetRegionAddress (
   OUT    UINT32             *BaseAddress  OPTIONAL,
   OUT    UINT32             *RegionSize OPTIONAL
   );
-
-#endif

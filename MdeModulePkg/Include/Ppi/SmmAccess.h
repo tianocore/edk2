@@ -17,8 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SMM_ACCESS_PPI_H_
-#define _SMM_ACCESS_PPI_H_
+#pragma once
 
 #define PEI_SMM_ACCESS_PPI_GUID \
   { 0x268f33a9, 0xcccd, 0x48be, { 0x88, 0x17, 0x86, 0x5, 0x3a, 0xc3, 0x2e, 0xd6 }}
@@ -135,5 +134,3 @@ struct _PEI_SMM_ACCESS_PPI {
 };
 
 extern EFI_GUID  gPeiSmmAccessPpiGuid;
-
-#endif

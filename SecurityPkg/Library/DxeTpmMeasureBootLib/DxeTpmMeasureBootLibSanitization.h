@@ -17,8 +17,7 @@
 
 **/
 
-#ifndef DXE_TPM_MEASURE_BOOT_LIB_VALIDATION_
-#define DXE_TPM_MEASURE_BOOT_LIB_VALIDATION_
+#pragma once
 
 #include <Uefi.h>
 #include <Uefi/UefiSpec.h>
@@ -133,5 +132,3 @@ TpmSanitizePeImageEventSize (
   IN  UINT32  FilePathSize,
   OUT UINT32  *EventSize
   );
-
-#endif // DXE_TPM_MEASURE_BOOT_LIB_VALIDATION_

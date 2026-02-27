@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef PEILESSSEC_H_
-#define PEILESSSEC_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -75,5 +74,3 @@ VOID
 ArchInitialize (
   VOID
   );
-
-#endif /* PEILESSSEC_H_ */

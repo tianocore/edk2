@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef EFI_DEVICE_AUTHENTICATION_GUID_H_
-#define EFI_DEVICE_AUTHENTICATION_GUID_H_
+#pragma once
 
 /**
   This is a signature database for device authentication, instead of image authentication.
@@ -57,5 +56,3 @@ extern EFI_GUID  gEfiDeviceSignatureDatabaseGuid;
   (xxx = 256, 384, 512)
 
 **/
-
-#endif

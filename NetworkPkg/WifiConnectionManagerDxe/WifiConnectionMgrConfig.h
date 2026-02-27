@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _WIFI_MGR_CONFIG_H_
-#define _WIFI_MGR_CONFIG_H_
+#pragma once
 
 #include "WifiConnectionMgrConfigNVDataStruct.h"
 
@@ -64,5 +63,3 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL    End;
 } HII_VENDOR_DEVICE_PATH;
 #pragma pack()
-
-#endif

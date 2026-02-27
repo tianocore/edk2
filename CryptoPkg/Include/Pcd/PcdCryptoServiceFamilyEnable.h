@@ -28,8 +28,7 @@
 
 **/
 
-#ifndef __PCD_CRYPTO_SERVICE_FAMILY_ENABLE_H__
-#define __PCD_CRYPTO_SERVICE_FAMILY_ENABLE_H__
+#pragma once
 
 ///
 /// Define used to enable all the crypto services in a family
@@ -257,6 +256,8 @@ typedef struct {
       UINT8    EcbDecrypt     : 1;  // Deprecated
       UINT8    CbcEncrypt     : 1;
       UINT8    CbcDecrypt     : 1;
+      UINT8    Encrypt        : 1;
+      UINT8    Decrypt        : 1;
     } Services;
     UINT32    Family;
   } Aes;
@@ -373,31 +374,37 @@ typedef struct {
   } AeadAesGcm;
   union {
     struct {
-      UINT8    Init        : 1;
-      UINT8    FromBin     : 1;
-      UINT8    ToBin       : 1;
-      UINT8    Free        : 1;
-      UINT8    Add         : 1;
-      UINT8    Sub         : 1;
-      UINT8    Mod         : 1;
-      UINT8    ExpMod      : 1;
-      UINT8    InverseMod  : 1;
-      UINT8    Div         : 1;
-      UINT8    MulMod      : 1;
-      UINT8    Cmp         : 1;
-      UINT8    Bits        : 1;
-      UINT8    Bytes       : 1;
-      UINT8    IsWord      : 1;
-      UINT8    IsOdd       : 1;
-      UINT8    Copy        : 1;
-      UINT8    ValueOne    : 1;
-      UINT8    RShift      : 1;
-      UINT8    ConstTime   : 1;
-      UINT8    SqrMod      : 1;
-      UINT8    NewContext  : 1;
-      UINT8    ContextFree : 1;
-      UINT8    SetUint     : 1;
-      UINT8    AddMod      : 1;
+      UINT8    Init         : 1;
+      UINT8    FromBin      : 1;
+      UINT8    ToBin        : 1;
+      UINT8    Free         : 1;
+      UINT8    Add          : 1;
+      UINT8    Sub          : 1;
+      UINT8    Mod          : 1;
+      UINT8    ExpMod       : 1;
+      UINT8    InverseMod   : 1;
+      UINT8    Div          : 1;
+      UINT8    MulMod       : 1;
+      UINT8    Cmp          : 1;
+      UINT8    Bits         : 1;
+      UINT8    Bytes        : 1;
+      UINT8    IsWord       : 1;
+      UINT8    IsOdd        : 1;
+      UINT8    Copy         : 1;
+      UINT8    ValueOne     : 1;
+      UINT8    RShift       : 1;
+      UINT8    ConstTime    : 1;
+      UINT8    SqrMod       : 1;
+      UINT8    NewContext   : 1;
+      UINT8    ContextFree  : 1;
+      UINT8    SetUint      : 1;
+      UINT8    AddMod       : 1;
+      UINT8    ContextStart : 1;
+      UINT8    ContextEnd   : 1;
+      UINT8    ContextGet   : 1;
+      UINT8    Mul          : 1;
+      UINT8    Gcd          : 1;
+      UINT8    Div2         : 1;
     } Services;
     UINT32    Family;
   } Bn;
@@ -427,9 +434,20 @@ typedef struct {
       UINT8    GetPrivateKeyFromPem          : 1;
       UINT8    DsaSign                       : 1;
       UINT8    DsaVerify                     : 1;
+      UINT8    GroupInitGFp                  : 1;
+      UINT8    GroupSetGenerator             : 1;
+      UINT8    PointMul2                     : 1;
+      UINT8    PointsMul                     : 1;
     } Services;
     UINT32    Family;
   } Ec;
+  union {
+    struct {
+      UINT8    GetContextSize : 1;
+      UINT8    Init           : 1;
+      UINT8    Encrypt        : 1;
+      UINT8    Decrypt        : 1;
+    } Services;
+    UINT32    Family;
+  } Camellia;
 } PCD_CRYPTO_SERVICE_FAMILY_ENABLE;
-
-#endif

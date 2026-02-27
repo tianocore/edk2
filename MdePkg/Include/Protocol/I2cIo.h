@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef __I2C_IO_H__
-#define __I2C_IO_H__
+#pragma once
 
 #include <Pi/PiI2c.h>
 
@@ -161,5 +160,3 @@ struct _EFI_I2C_IO_PROTOCOL {
 /// Reference to variable defined in the .DEC file
 ///
 extern EFI_GUID  gEfiI2cIoProtocolGuid;
-
-#endif //  __I2C_IO_H__

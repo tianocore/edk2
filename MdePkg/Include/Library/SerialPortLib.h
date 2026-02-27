@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SERIAL_PORT_LIB__
-#define __SERIAL_PORT_LIB__
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 #include <Protocol/SerialIo.h>
@@ -169,5 +168,3 @@ SerialPortSetAttributes (
   IN OUT UINT8               *DataBits,
   IN OUT EFI_STOP_BITS_TYPE  *StopBits
   );
-
-#endif

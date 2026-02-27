@@ -1,5 +1,4 @@
-#ifndef __FSPMUPD_H__
-#define __FSPMUPD_H__
+#pragma once
 
 #include <FspUpd.h>
 
@@ -68,5 +67,3 @@ typedef struct {
 } FSPM_UPD;
 
 #pragma pack()
-
-#endif

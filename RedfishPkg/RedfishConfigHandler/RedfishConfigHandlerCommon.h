@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef EFI_REDFISH_CONFIG_HANDLER_COMMON_H_
-#define EFI_REDFISH_CONFIG_HANDLER_COMMON_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -97,5 +96,3 @@ VOID
 RedfishConfigHandlerInitialization (
   VOID
   );
-
-#endif

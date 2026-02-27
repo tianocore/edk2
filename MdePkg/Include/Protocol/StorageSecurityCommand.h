@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __STORAGE_SECURITY_COMMAND_H__
-#define __STORAGE_SECURITY_COMMAND_H__
+#pragma once
 
 #define EFI_STORAGE_SECURITY_COMMAND_PROTOCOL_GUID \
   { \
@@ -206,5 +205,3 @@ struct _EFI_STORAGE_SECURITY_COMMAND_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiStorageSecurityCommandProtocolGuid;
-
-#endif

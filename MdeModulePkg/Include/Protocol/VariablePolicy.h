@@ -6,8 +6,7 @@ Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __EDKII_VARIABLE_POLICY_PROTOCOL__
-#define __EDKII_VARIABLE_POLICY_PROTOCOL__
+#pragma once
 
 #define EDKII_VARIABLE_POLICY_PROTOCOL_REVISION  0x0000000000020000
 
@@ -272,5 +271,3 @@ typedef struct {
 typedef _EDKII_VARIABLE_POLICY_PROTOCOL EDKII_VARIABLE_POLICY_PROTOCOL;
 
 extern EFI_GUID  gEdkiiVariablePolicyProtocolGuid;
-
-#endif

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _BMP_H_
-#define _BMP_H_
+#pragma once
 
 #pragma pack(1)
 
@@ -38,5 +37,3 @@ typedef struct {
 } BMP_IMAGE_HEADER;
 
 #pragma pack()
-
-#endif

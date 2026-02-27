@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef PEI_FIRMWARE_VOLUME_SHADOW_PPI_H_
-#define PEI_FIRMWARE_VOLUME_SHADOW_PPI_H_
+#pragma once
 
 //
 // Firmware Volume Shadow PPI GUID value
@@ -57,5 +56,3 @@ typedef struct {
 } EDKII_PEI_FIRMWARE_VOLUME_SHADOW_PPI;
 
 extern EFI_GUID  gEdkiiPeiFirmwareVolumeShadowPpiGuid;
-
-#endif

@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PEI_CD_EXPRESS_H_
-#define _PEI_CD_EXPRESS_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -283,5 +282,3 @@ StringCmp (
   );
 
 #pragma pack()
-
-#endif

@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __LEGACY_REGION2_H__
-#define __LEGACY_REGION2_H__
+#pragma once
 
 #define EFI_LEGACY_REGION2_PROTOCOL_GUID \
 { \
@@ -221,5 +220,3 @@ struct _EFI_LEGACY_REGION2_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiLegacyRegion2ProtocolGuid;
-
-#endif

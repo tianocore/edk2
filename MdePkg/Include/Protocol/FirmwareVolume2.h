@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef __FIRMWARE_VOLUME2_H__
-#define __FIRMWARE_VOLUME2_H__
+#pragma once
 
 #define EFI_FIRMWARE_VOLUME2_PROTOCOL_GUID \
   { 0x220e73b6, 0x6bdb, 0x4413, { 0x84, 0x5, 0xb9, 0x74, 0xb1, 0x8, 0x61, 0x9a } }
@@ -743,5 +742,3 @@ struct _EFI_FIRMWARE_VOLUME2_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiFirmwareVolume2ProtocolGuid;
-
-#endif

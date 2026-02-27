@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _CPU_FEATURES_INIT_DONE_H_
-#define _CPU_FEATURES_INIT_DONE_H_
+#pragma once
 
 #define EDKII_CPU_FEATURES_INIT_DONE_GUID \
   { \
@@ -16,5 +15,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   }
 
 extern EFI_GUID  gEdkiiCpuFeaturesInitDoneGuid;
-
-#endif

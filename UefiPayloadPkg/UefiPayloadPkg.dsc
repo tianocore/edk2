@@ -784,9 +784,9 @@
 [PcdsDynamicExDefault]
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|$(DEFAULT_TERMINAL_TYPE)
   gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarSupport|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarMaxSize|43
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize|0x1
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds|50000
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode|1

@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef __END_OF_PEI_PHASE_PPI_H__
-#define __END_OF_PEI_PHASE_PPI_H__
+#pragma once
 
 #define EFI_PEI_END_OF_PEI_PHASE_PPI_GUID \
   { \
@@ -21,5 +20,3 @@
   }
 
 extern EFI_GUID  gEfiEndOfPeiSignalPpiGuid;
-
-#endif

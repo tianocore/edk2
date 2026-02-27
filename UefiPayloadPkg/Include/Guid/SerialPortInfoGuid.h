@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef SERIAL_PORT_INFO_GUID_H_
-#define SERIAL_PORT_INFO_GUID_H_
+#pragma once
 
 ///
 /// Serial Port Information GUID
@@ -27,5 +26,3 @@ typedef struct {
   UINT32    InputHertz;
   UINT32    UartPciAddr;
 } SERIAL_PORT_INFO;
-
-#endif

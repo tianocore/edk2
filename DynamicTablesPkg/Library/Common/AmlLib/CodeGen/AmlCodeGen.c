@@ -5216,7 +5216,7 @@ error_handler:
     It assumes that NameString, Local, and Arg objects reference valid device,
     processor, or thermal zone objects.
 
-  @param [in] NotifyObject        Object to be notified.
+  @param [in] NotifyObjectParam   Object to be notified.
   @param [in] NotifyValue         Notification value.
   @param [in] ParentNode          If provided, set ParentNode as the parent
                                   of the node created.
@@ -5231,14 +5231,17 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlCodeGenNotify (
-  IN  AML_METHOD_PARAM  NotifyObject,
+  IN  AML_METHOD_PARAM  NotifyObjectParam,
   IN  UINT8             NotifyValue,
   IN  AML_NODE_HEADER   *ParentNode      OPTIONAL,
   OUT AML_OBJECT_NODE   **NewObjectNode   OPTIONAL
   )
 {
-  AML_OBJECT_NODE  *NotifyObjectNode;
+  AML_NODE_HEADER  *NotifyObject;
   AML_OBJECT_NODE  *ValueObjectNode;
+  AML_DATA_NODE    *DataNode;
+  CHAR8            *AmlNameString;
+  UINT32           AmlNameStringSize;
   EFI_STATUS       Status;
 
   if ((ParentNode == NULL) && (NewObjectNode == NULL)) {
@@ -5246,37 +5249,56 @@ AmlCodeGenNotify (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((NotifyObject.Type != AmlMethodParamTypeString) &&
-      (NotifyObject.Type != AmlMethodParamTypeArg) &&
-      (NotifyObject.Type != AmlMethodParamTypeLocal))
+  if ((NotifyObjectParam.Type != AmlMethodParamTypeString) &&
+      (NotifyObjectParam.Type != AmlMethodParamTypeArg) &&
+      (NotifyObjectParam.Type != AmlMethodParamTypeLocal))
   {
     ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
     return EFI_INVALID_PARAMETER;
   }
 
-  ValueObjectNode  = NULL;
-  NotifyObjectNode = NULL;
+  ValueObjectNode = NULL;
+  NotifyObject    = NULL;
+  DataNode        = NULL;
+  AmlNameString   = NULL;
 
-  switch (NotifyObject.Type) {
+  switch (NotifyObjectParam.Type) {
     case AmlMethodParamTypeString:
-      if (NotifyObject.Data.Buffer == NULL) {
+      if (NotifyObjectParam.Data.Buffer == NULL) {
         ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
         Status = EFI_INVALID_PARAMETER;
         goto exit_handler;
       }
 
-      Status = AmlCodeGenString (
-                 NotifyObject.Data.Buffer,
-                 &NotifyObjectNode
-                 );
+      Status = ConvertAslNameToAmlName (NotifyObjectParam.Data.Buffer, &AmlNameString);
       if (EFI_ERROR (Status)) {
         ASSERT_EFI_ERROR (Status);
         goto exit_handler;
       }
 
+      Status = AmlGetNameStringSize (AmlNameString, &AmlNameStringSize);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        goto exit_handler;
+      }
+
+      Status = AmlCreateDataNode (
+                 EAmlNodeDataTypeNameString,
+                 (UINT8 *)AmlNameString,
+                 AmlNameStringSize,
+                 &DataNode
+                 );
+      FreePool (AmlNameString);
+      AmlNameString = NULL;
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        goto exit_handler;
+      }
+
+      NotifyObject = (AML_NODE_HEADER *)DataNode;
       break;
     case AmlMethodParamTypeArg:
-      if (NotifyObject.Data.Arg > (UINT8)(AML_ARG6 - AML_ARG0)) {
+      if (NotifyObjectParam.Data.Arg > (UINT8)(AML_ARG6 - AML_ARG0)) {
         ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
         Status = EFI_INVALID_PARAMETER;
         goto exit_handler;
@@ -5284,11 +5306,11 @@ AmlCodeGenNotify (
 
       Status = AmlCreateObjectNode (
                  AmlGetByteEncodingByOpCode (
-                   AML_ARG0 + NotifyObject.Data.Arg,
+                   AML_ARG0 + NotifyObjectParam.Data.Arg,
                    0
                    ),
                  0,
-                 &NotifyObjectNode
+                 (AML_OBJECT_NODE **)&NotifyObject
                  );
       if (EFI_ERROR (Status)) {
         ASSERT_EFI_ERROR (Status);
@@ -5297,7 +5319,7 @@ AmlCodeGenNotify (
 
       break;
     case AmlMethodParamTypeLocal:
-      if (NotifyObject.Data.Local > (UINT8)(AML_LOCAL7 - AML_LOCAL0)) {
+      if (NotifyObjectParam.Data.Local > (UINT8)(AML_LOCAL7 - AML_LOCAL0)) {
         ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
         Status = EFI_INVALID_PARAMETER;
         goto exit_handler;
@@ -5305,11 +5327,11 @@ AmlCodeGenNotify (
 
       Status = AmlCreateObjectNode (
                  AmlGetByteEncodingByOpCode (
-                   AML_LOCAL0 + NotifyObject.Data.Local,
+                   AML_LOCAL0 + NotifyObjectParam.Data.Local,
                    0
                    ),
                  0,
-                 &NotifyObjectNode
+                 (AML_OBJECT_NODE **)&NotifyObject
                  );
       if (EFI_ERROR (Status)) {
         ASSERT_EFI_ERROR (Status);
@@ -5333,7 +5355,7 @@ AmlCodeGenNotify (
   }
 
   Status = AmlCodeGenNotifyNode (
-             (AML_NODE_HEADER *)NotifyObjectNode,
+             NotifyObject,
              (AML_NODE_HEADER *)ValueObjectNode,
              ParentNode,
              NewObjectNode
@@ -5343,17 +5365,21 @@ AmlCodeGenNotify (
     goto exit_handler;
   }
 
-  NotifyObjectNode = NULL;
-  ValueObjectNode  = NULL;
+  NotifyObject    = NULL;
+  ValueObjectNode = NULL;
 
 exit_handler:
 
-  if (NotifyObjectNode != NULL) {
-    AmlDeleteTree ((AML_NODE_HEADER *)NotifyObjectNode);
+  if (NotifyObject != NULL) {
+    AmlDeleteTree (NotifyObject);
   }
 
   if (ValueObjectNode != NULL) {
     AmlDeleteTree ((AML_NODE_HEADER *)ValueObjectNode);
+  }
+
+  if (AmlNameString != NULL) {
+    FreePool (AmlNameString);
   }
 
   return Status;

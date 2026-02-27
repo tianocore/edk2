@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __UEFI_MULTIPHASE_H__
-#define __UEFI_MULTIPHASE_H__
+#pragma once
 
 ///
 /// Attributes of variable.
@@ -245,5 +244,3 @@ typedef struct {
   WIN_CERTIFICATE_UEFI_GUID    AuthInfo;
 } EFI_VARIABLE_AUTHENTICATION_2;
 #endif // VFRCOMPILE
-
-#endif

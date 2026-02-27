@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef PRM_MODULE_IMAGE_CONTEXT_H_
-#define PRM_MODULE_IMAGE_CONTEXT_H_
+#pragma once
 
 #include <IndustryStandard/PeImage.h>
 #include <Library/PeCoffLib.h>
@@ -24,5 +23,3 @@ typedef struct {
 } PRM_MODULE_IMAGE_CONTEXT;
 
 #pragma pack(pop)
-
-#endif

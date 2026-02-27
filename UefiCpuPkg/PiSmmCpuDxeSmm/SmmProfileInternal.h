@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SMM_PROFILE_INTERNAL_H_
-#define _SMM_PROFILE_INTERNAL_H_
+#pragma once
 
 #include <Protocol/SmmReadyToLock.h>
 #include <Library/CpuLib.h>
@@ -165,5 +164,3 @@ VOID
 ClearTrapFlag (
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   );
-
-#endif // _SMM_PROFILE_H_

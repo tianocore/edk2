@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __ATA_ATAPI_POLICY_H__
-#define __ATA_ATAPI_POLICY_H__
+#pragma once
 
 #define EDKII_ATA_ATAPI_POLICY_PROTOCOL_GUID \
   { \
@@ -48,5 +47,3 @@ typedef struct {
 #define EDKII_ATA_ATAPI_POLICY_VERSION  0x00010000
 
 extern EFI_GUID  gEdkiiAtaAtapiPolicyProtocolGuid;
-
-#endif

@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef _PCI22_H_
-#define _PCI22_H_
+#pragma once
 
 #define PCI_MAX_BUS     255
 #define PCI_MAX_DEVICE  31
@@ -874,5 +873,3 @@ typedef union {
 } EFI_PCI_ROM_HEADER;
 
 #pragma pack()
-
-#endif

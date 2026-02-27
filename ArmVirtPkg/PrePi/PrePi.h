@@ -6,8 +6,7 @@
 *
 **/
 
-#ifndef _PREPI_H_
-#define _PREPI_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -53,5 +52,3 @@ VOID
 ArchInitialize (
   VOID
   );
-
-#endif /* _PREPI_H_ */

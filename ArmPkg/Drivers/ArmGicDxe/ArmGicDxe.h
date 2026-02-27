@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 --*/
 
-#ifndef ARM_GIC_DXE_H_
-#define ARM_GIC_DXE_H_
+#pragma once
 
 #include <Library/ArmGicLib.h>
 #include <Library/ArmLib.h>
@@ -193,5 +192,3 @@ VOID
 ArmGicV3SetControlRegister (
   IN UINTN  Value
   );
-
-#endif // ARM_GIC_DXE_H_

@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __S3_STALL_LIB_H__
-#define __S3_STALL_LIB_H__
+#pragma once
 
 /**
   Stalls the CPU for at least the given number of microseconds and saves
@@ -28,5 +27,3 @@ EFIAPI
 S3Stall (
   IN UINTN  MicroSeconds
   );
-
-#endif

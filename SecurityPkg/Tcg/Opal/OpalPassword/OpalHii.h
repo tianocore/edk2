@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _OPAL_HII_H_
-#define _OPAL_HII_H_
+#pragma once
 
 #include <Protocol/HiiConfigAccess.h>
 
@@ -371,5 +370,3 @@ EFI_STATUS
 OpalDiskUpdateOwnerShip (
   OPAL_DISK  *OpalDisk
   );
-
-#endif // _HII_H_

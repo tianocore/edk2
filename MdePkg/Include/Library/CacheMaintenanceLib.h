@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __CACHE_MAINTENANCE_LIB__
-#define __CACHE_MAINTENANCE_LIB__
+#pragma once
 
 /**
   Invalidates the entire instruction cache in cache coherency domain of the
@@ -202,5 +201,3 @@ InvalidateDataCacheRange (
   IN      VOID   *Address,
   IN      UINTN  Length
   );
-
-#endif

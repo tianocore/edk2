@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _SHELL_PROTOCOL_HEADER_
-#define _SHELL_PROTOCOL_HEADER_
+#pragma once
 
 #include "Shell.h"
 
@@ -934,5 +933,3 @@ EFIAPI
 NotificationFunction (
   IN EFI_KEY_DATA  *KeyData
   );
-
-#endif //_SHELL_PROTOCOL_HEADER_

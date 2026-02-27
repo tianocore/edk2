@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_DHCP6_UTILITY_H__
-#define __EFI_DHCP6_UTILITY_H__
+#pragma once
 
 #define  DHCP6_10_BIT_MASK           0x3ff
 #define  DHCP6_DAD_ADDITIONAL_DELAY  30000000   // 3 seconds
@@ -364,5 +363,3 @@ Dhcp6GetMappingTimeOut (
   IN  EFI_IP6_CONFIG_PROTOCOL  *Ip6Cfg,
   OUT UINTN                    *TimeOut
   );
-
-#endif

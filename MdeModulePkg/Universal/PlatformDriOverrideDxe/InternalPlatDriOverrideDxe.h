@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _INTERNAL_PLATFORM_DRIVER_OVERRIDE_H_
-#define _INTERNAL_PLATFORM_DRIVER_OVERRIDE_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -207,5 +206,3 @@ DeleteDriverImage (
   IN     LIST_ENTRY                *MappingDataBase
   )
 ;
-
-#endif

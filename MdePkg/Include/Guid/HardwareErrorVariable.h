@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _HARDWARE_ERROR_VARIABLE_GUID_H_
-#define _HARDWARE_ERROR_VARIABLE_GUID_H_
+#pragma once
 
 #define EFI_HARDWARE_ERROR_VARIABLE \
   { \
@@ -18,5 +17,3 @@
   }
 
 extern EFI_GUID  gEfiHardwareErrorVariableGuid;
-
-#endif

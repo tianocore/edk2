@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __RT_PROPERTIES_TABLE_GUID_H__
-#define __RT_PROPERTIES_TABLE_GUID_H__
+#pragma once
 
 //
 // Table, defined here, should be published by a platform if it no longer supports all EFI runtime
@@ -62,5 +61,3 @@ typedef struct {
 #define EFI_RT_SUPPORTED_QUERY_VARIABLE_INFO            0x2000
 
 extern EFI_GUID  gEfiRtPropertiesTableGuid;
-
-#endif

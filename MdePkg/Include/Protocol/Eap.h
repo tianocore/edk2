@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef __EFI_EAP_PROTOCOL_H__
-#define __EFI_EAP_PROTOCOL_H__
+#pragma once
 
 #define EFI_EAP_PROTOCOL_GUID \
   { \
@@ -150,5 +149,3 @@ struct _EFI_EAP_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiEapProtocolGuid;
-
-#endif

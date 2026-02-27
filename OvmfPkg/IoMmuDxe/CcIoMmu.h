@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef _AMD_SEV_IOMMU_H_
-#define _AMD_SEV_IOMMU_H_
+#pragma once
 
 #include <Protocol/IoMmu.h>
 
@@ -34,5 +33,3 @@ EFIAPI
 InstallIoMmuProtocol (
   VOID
   );
-
-#endif
