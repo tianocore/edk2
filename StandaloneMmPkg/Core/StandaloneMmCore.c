@@ -265,7 +265,9 @@ MmReadyToLockHandler (
   // Display any drivers that were not dispatched because dependency expression
   // evaluated to false if this is a debug build
   //
-  // MmDisplayDiscoveredNotDispatched ();
+  DEBUG_CODE_BEGIN ();
+  MmDisplayDiscoveredNotDispatched ();
+  DEBUG_CODE_END ();
 
   return Status;
 }
@@ -455,7 +457,7 @@ MmCorePrepareCommunicationBuffer (
   mMmCommunicationBuffer = (MM_COMM_BUFFER *)GET_GUID_HOB_DATA (GuidHob);
   DEBUG ((
     DEBUG_INFO,
-    "MM Communication Buffer is at %x, number of pages is %x\n",
+    "MM Communication Buffer is at 0x%x, number of pages is %d\n",
     mMmCommunicationBuffer->PhysicalStart,
     mMmCommunicationBuffer->NumberOfPages
     ));
@@ -511,8 +513,6 @@ MmEntryPoint (
   EFI_GUID                      *CommGuid;
   UINTN                         CommGuidOffset;
   UINTN                         CommHeaderSize;
-
-  DEBUG ((DEBUG_INFO, "MmEntryPoint ...\n"));
 
   //
   // Update MMST using the context
@@ -642,8 +642,6 @@ MmEntryPoint (
   //
   // TBD: Do not use private data structure ?
   //
-
-  DEBUG ((DEBUG_INFO, "MmEntryPoint Done\n"));
 }
 
 /** Register the MM Entry Point provided by the MM Core with the

@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __USB_DXE_LIB_H__
-#define __USB_DXE_LIB_H__
+#pragma once
 
 #include <Protocol/UsbIo.h>
 
@@ -682,5 +681,3 @@ UsbGetCsEndpointDescriptor (
   IN OUT UINTN             *BufferSize,
   OUT VOID                 *Buffer
   );
-
-#endif

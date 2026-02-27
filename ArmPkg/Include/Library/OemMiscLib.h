@@ -9,8 +9,7 @@
 *
 **/
 
-#ifndef OEM_MISC_LIB_H_
-#define OEM_MISC_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 #include <IndustryStandard/SmBios.h>
@@ -267,5 +266,3 @@ EFIAPI
 OemGetEmbeddedControllerFirmwareRelease (
   VOID
   );
-
-#endif // OEM_MISC_LIB_H_

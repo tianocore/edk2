@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_MTFTP4_DRIVER_H__
-#define __EFI_MTFTP4_DRIVER_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -125,5 +124,3 @@ Mtftp4ServiceBindingDestroyChild (
   IN EFI_SERVICE_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                    ChildHandle
   );
-
-#endif

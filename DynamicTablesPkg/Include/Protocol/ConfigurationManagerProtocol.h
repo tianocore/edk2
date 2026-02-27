@@ -9,8 +9,7 @@
     - Obj or OBJ - Object
 **/
 
-#ifndef CONFIGURATION_MANAGER_PROTOCOL_H_
-#define CONFIGURATION_MANAGER_PROTOCOL_H_
+#pragma once
 
 #include <ConfigurationManagerObject.h>
 
@@ -118,5 +117,3 @@ typedef struct ConfigurationManagerProtocol {
 extern EFI_GUID  gEdkiiConfigurationManagerProtocolGuid;
 
 #pragma pack()
-
-#endif // CONFIGURATION_MANAGER_PROTOCOL_H_

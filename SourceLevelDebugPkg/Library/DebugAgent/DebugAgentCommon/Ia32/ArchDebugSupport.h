@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _ARCH_DEBUG_SUPPORT_H_
-#define _ARCH_DEBUG_SUPPORT_H_
+#pragma once
 
 #include "ProcessorContext.h"
 #include "TransferProtocol.h"
@@ -17,5 +16,3 @@
 
 typedef DEBUG_DATA_IA32_FX_SAVE_STATE   DEBUG_DATA_FX_SAVE_STATE;
 typedef DEBUG_DATA_IA32_SYSTEM_CONTEXT  DEBUG_CPU_CONTEXT;
-
-#endif

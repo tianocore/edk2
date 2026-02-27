@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _ISCSI_CHAP_H_
-#define _ISCSI_CHAP_H_
+#pragma once
 
 #define ISCSI_AUTH_METHOD_CHAP  "CHAP"
 
@@ -164,5 +163,3 @@ VOID
 IScsiCHAPInitHashList (
   VOID
   );
-
-#endif

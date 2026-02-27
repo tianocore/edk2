@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef PRM_EXPORT_DESCRIPTOR_H_
-#define PRM_EXPORT_DESCRIPTOR_H_
+#pragma once
 
 #include <Prm.h>
 
@@ -106,4 +105,3 @@ typedef struct {
     { __VA_ARGS__ }                                                                                       \
   }                                                                                                       \
 
-#endif

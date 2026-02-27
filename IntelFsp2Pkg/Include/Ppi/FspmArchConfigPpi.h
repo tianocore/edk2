@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _FSPM_ARCH_CONFIG_PPI_H_
-#define _FSPM_ARCH_CONFIG_PPI_H_
+#pragma once
 
 #define FSPM_ARCH_CONFIG_PPI_REVISION  0x1
 
@@ -43,5 +42,3 @@ typedef struct {
 } FSPM_ARCH_CONFIG_PPI;
 
 extern EFI_GUID  gFspmArchConfigPpiGuid;
-
-#endif // _FSPM_ARCH_CONFIG_PPI_H_

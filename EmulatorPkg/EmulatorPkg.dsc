@@ -49,9 +49,26 @@
   0|DEFAULT
 
 !include MdePkg/MdeLibs.dsc.inc
-!include CryptoPkg/CryptoPkgFeatureFlagPcds.dsc.inc
 !include RedfishPkg/Redfish.dsc.inc
 !include NetworkPkg/Network.dsc.inc
+
+#
+# Do not reference CryptoPkg PCDs if features are not enabled that depend on the
+# CryptoPkg libraries or modules. Otherwise a build error for a reference to an
+# unused PCD is generated.
+#
+!if $(SECURE_BOOT_ENABLE) == TRUE || $(NETWORK_ENABLE) == TRUE
+!include CryptoPkg/CryptoPkgFeatureFlagPcds.dsc.inc
+!if $(WIN_MINGW32_BUILD)
+[PcdsFeatureFlag]
+  #
+  # When WIN_MINGW32_BUILD is set, -target is set to build Windows application.
+  # Set PcdOpensslLibAssemblySourceStyleNasm to TRUE to use Openssl NASM
+  # source files that assume a Windows calling convention.
+  #
+  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm|TRUE
+!endif
+!endif
 
 [LibraryClasses]
   #
@@ -227,14 +244,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables|FALSE
   gEmulatorPkgTokenSpaceGuid.PcdEmulatorLazyLoadSymbols|FALSE
-!if $(WIN_MINGW32_BUILD)
-  #
-  # When WIN_MINGW32_BUILD is set, -target is set to build Windows application.
-  # Set PcdOpensslLibAssemblySourceStyleNasm to TRUE to use Openssl NASM
-  # source files that assume a Windows calling convention.
-  #
-  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm|TRUE
-!endif
 
 [PcdsFixedAtBuild]
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy|0x00000000
@@ -319,6 +328,10 @@
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishPlatformConfigFeatureProperty|0
 !endif
 
+!ifdef NO_PLATFORM_BOOT_DELAYS
+  gEfiShellPkgTokenSpaceGuid.PcdShellDefaultDelay|0
+!endif
+
 [PcdsDynamicDefault.common.DEFAULT]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0
@@ -327,7 +340,11 @@
 [PcdsDynamicHii.common.DEFAULT]
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|L"Setup"|gEmuSystemConfigGuid|0x0|80
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|L"Setup"|gEmuSystemConfigGuid|0x4|25
+!ifdef NO_PLATFORM_BOOT_DELAYS
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|0
+!else
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|10
+!endif
 
 [Components]
 !if "IA32" in $(ARCH) || "X64" in $(ARCH)
@@ -421,7 +438,9 @@
   #
   # Hash2 Protocol producer
   #
+!if $(NETWORK_ENABLE) == TRUE
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+!endif
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
@@ -535,8 +554,7 @@
 #
 # +--------------------+--------+----------+------------+-----+----+--------+
 # | OS/Compiler        | VS2019 | CLANGPDB | CLANGDWARF |   GCC    | XCODE5 |
-# |                    | VS2022 |          |            |   GCC5   |        |
-# |                    |        |          |            | GCCNOLTO |        |
+# |                    | VS2022 |          |            | GCCNOLTO |        |
 # +--------------------+--------+----------+------------+----------+--------+
 # | Windows/VS         |IA32/X64|          |            |          |        |
 # | Windows/LLVM/VS    |        | IA32/X64 |            |          |        |
@@ -583,12 +601,12 @@
   !if $(TOOL_CHAIN_TAG) in "CLANGPDB"
     !error EmulatorPkg not supported for Mingw/CLANGPDB builds
   !endif
-  !if $(TOOL_CHAIN_TAG) in "GCC GCC5 GCCNOLTO"
+  !if $(TOOL_CHAIN_TAG) in "GCC GCCNOLTO"
     !error EmulatorPkg not supported for Mingw/GCC builds
   !endif
 !else
   !if $(WIN_HOST_BUILD)
-    !if $(TOOL_CHAIN_TAG) in "GCC GCC5 GCCNOLTO"
+    !if $(TOOL_CHAIN_TAG) in "GCC GCCNOLTO"
       !error EmulatorPkg not supported for Windows/GCC builds
     !endif
     !if $(TOOL_CHAIN_TAG) in "CLANGDWARF"

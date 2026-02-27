@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef MM_CORE_FV_LOCATION_PPI_H_
-#define MM_CORE_FV_LOCATION_PPI_H_
+#pragma once
 
 #pragma pack(1)
 
@@ -30,5 +29,3 @@ typedef struct {
 extern EFI_GUID  gMmCoreFvLocationPpiGuid;
 
 #pragma pack()
-
-#endif

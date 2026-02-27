@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PLATFORM_BM_H
-#define _PLATFORM_BM_H
+#pragma once
 
 #include <PiDxe.h>
 
@@ -85,5 +84,3 @@ VOID
 PlatformBdsConnectSequence (
   VOID
   );
-
-#endif // _PLATFORM_BM_H

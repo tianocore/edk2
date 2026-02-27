@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _SD_BLOCK_IO_PEI_H_
-#define _SD_BLOCK_IO_PEI_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -506,5 +505,3 @@ SdBlockIoPeimEndOfPei (
   IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
   IN VOID                       *Ppi
   );
-
-#endif

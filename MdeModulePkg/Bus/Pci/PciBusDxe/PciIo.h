@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_PCI_IO_PROTOCOL_H_
-#define _EFI_PCI_IO_PROTOCOL_H_
+#pragma once
 
 /**
   Initializes a PCI I/O Instance.
@@ -655,5 +654,3 @@ PciDevicesOnTheSamePath (
   IN PCI_IO_DEVICE  *PciDevice1,
   IN PCI_IO_DEVICE  *PciDevice2
   );
-
-#endif

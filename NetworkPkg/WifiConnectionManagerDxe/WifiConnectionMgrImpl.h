@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_WIFI_IMPL__
-#define __EFI_WIFI_IMPL__
+#pragma once
 
 /**
   Start scan operation, and send out a token to collect available networks.
@@ -95,5 +94,3 @@ WifiMgrOnTimerTick (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   );
-
-#endif

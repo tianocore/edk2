@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __SIO_BUS_DXE_H__
-#define __SIO_BUS_DXE_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -318,5 +317,3 @@ SioBusDriverBindingStop (
   IN  UINTN                        NumberOfChildren,
   IN  EFI_HANDLE                   *ChildHandleBuffer
   );
-
-#endif // __SIO_BUS_DXE_H__

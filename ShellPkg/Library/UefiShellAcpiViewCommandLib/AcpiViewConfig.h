@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef ACPI_VIEW_CONFIG_H_
-#define ACPI_VIEW_CONFIG_H_
+#pragma once
 
 /**
   This function returns the colour highlighting status.
@@ -173,5 +172,3 @@ EFIAPI
 AcpiConfigSetDefaults (
   VOID
   );
-
-#endif // ACPI_VIEW_CONFIG_H_

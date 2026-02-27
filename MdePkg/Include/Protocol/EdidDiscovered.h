@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __EDID_DISCOVERED_H__
-#define __EDID_DISCOVERED_H__
+#pragma once
 
 #define EFI_EDID_DISCOVERED_PROTOCOL_GUID \
   { \
@@ -40,5 +39,3 @@ typedef struct {
 } EFI_EDID_DISCOVERED_PROTOCOL;
 
 extern EFI_GUID  gEfiEdidDiscoveredProtocolGuid;
-
-#endif

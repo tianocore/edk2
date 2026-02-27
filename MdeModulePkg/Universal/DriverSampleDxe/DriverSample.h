@@ -15,8 +15,7 @@ Revision History
 
 **/
 
-#ifndef _DRIVER_SAMPLE_H_
-#define _DRIVER_SAMPLE_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -118,5 +117,3 @@ typedef struct {
 } HII_VENDOR_DEVICE_PATH;
 
 #pragma pack()
-
-#endif

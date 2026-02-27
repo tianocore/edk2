@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __SERIALIZE_VARIABLES_LIB_INSTANCE__
-#define __SERIALIZE_VARIABLES_LIB_INSTANCE__
+#pragma once
 
 #include <Uefi.h>
 
@@ -28,5 +27,3 @@ typedef struct {
   UINTN     BufferSize;
   UINTN     DataSize;
 } SV_INSTANCE;
-
-#endif

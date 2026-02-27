@@ -145,7 +145,7 @@ BasicReadRegister (
   return OutBufPtr;
 }
 
-/** ‘p n’
+/** 'p n'
  Reads the n-th register's value into an output buffer and sends it as a packet
  @param   SystemContext   Register content at time of the exception
  @param   InBuffer      Pointer to the input buffer received from gdb server
@@ -174,7 +174,7 @@ ReadNthRegister (
   SendPacket (OutBuffer);
 }
 
-/** ‘g’
+/** 'g'
  Reads the general registers into an output buffer  and sends it as a packet
 
  @param   SystemContext     Register content at time of the exception
@@ -244,7 +244,7 @@ BasicWriteRegister (
   return InBufPtr;
 }
 
-/** ‘P n...=r...’
+/** 'P n...=r...'
  Writes the new value of n-th register received into the input buffer to the n-th register
 
  @param   SystemContext   Register content at time of the exception
@@ -283,7 +283,7 @@ WriteNthRegister (
   SendSuccess ();
 }
 
-/** ‘G XX...’
+/** 'G XX...'
  Writes the new values received into the input buffer to the general registers
 
  @param   SystemContext       Register content at time of the exception
@@ -346,7 +346,7 @@ RemoveSingleStep (
   SystemContext.SystemContextX64->Rflags &= ~TF_BIT;  // clearing the TF bit.
 }
 
-/** ‘c [addr ]’
+/** 'c [addr ]'
  Continue. addr is Address to resume. If addr is omitted, resume at current
  Address.
 
@@ -364,7 +364,7 @@ ContinueAtAddress (
   }
 }
 
-/** ‘s [addr ]’
+/** 's [addr ]'
  Single step. addr is the Address at which to resume. If addr is omitted, resume
  at same Address.
 
@@ -750,10 +750,10 @@ DisableDebugRegister (
 }
 
 /**
-  ‘Z1, [addr], [length]’
-  ‘Z2, [addr], [length]’
-  ‘Z3, [addr], [length]’
-  ‘Z4, [addr], [length]’
+  'Z1, [addr], [length]'
+  'Z2, [addr], [length]'
+  'Z3, [addr], [length]'
+  'Z4, [addr], [length]'
 
   Insert hardware breakpoint/watchpoint at address addr of size length
 
@@ -835,10 +835,10 @@ InsertBreakPoint (
 }
 
 /**
-  ‘z1, [addr], [length]’
-  ‘z2, [addr], [length]’
-  ‘z3, [addr], [length]’
-  ‘z4, [addr], [length]’
+  'z1, [addr], [length]'
+  'z2, [addr], [length]'
+  'z3, [addr], [length]'
+  'z4, [addr], [length]'
 
   Remove hardware breakpoint/watchpoint at address addr of size length
 

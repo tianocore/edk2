@@ -16,8 +16,7 @@
 
 **/
 
-#ifndef ARM_FFA_SVC_H_
-#define ARM_FFA_SVC_H_
+#pragma once
 
 #define ARM_FID_FFA_ERROR            0x84000060
 #define ARM_FID_FFA_SUCCESS_AARCH32  0x84000061
@@ -240,5 +239,3 @@
 
 /** Query notifications features. */
 #define ARM_FFA_FEATURE_NOTIFICATIONS  0x4U
-
-#endif // ARM_FFA_SVC_H_

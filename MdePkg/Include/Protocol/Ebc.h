@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __EFI_EBC_PROTOCOL_H__
-#define __EFI_EBC_PROTOCOL_H__
+#pragma once
 
 #define EFI_EBC_INTERPRETER_PROTOCOL_GUID \
   { \
@@ -304,5 +303,3 @@ struct _EFI_EBC_PROTOCOL {
 // Extern the global EBC protocol GUID
 //
 extern EFI_GUID  gEfiEbcProtocolGuid;
-
-#endif

@@ -5,8 +5,7 @@
    SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef IOLIB_SEV_H_
-#define IOLIB_SEV_H_
+#pragma once
 
 #include <Base.h>
 
@@ -162,5 +161,3 @@ SevIoWriteFifo32 (
   IN      UINTN  Count,
   IN      VOID   *Buffer
   );
-
-#endif

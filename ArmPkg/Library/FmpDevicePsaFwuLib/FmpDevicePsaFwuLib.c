@@ -458,7 +458,7 @@ FmpDeviceGetImageTypeIdGuidPtr (
 
   @retval EFI_SUCCESS            The attributes supported by the firmware
                                  device were returned.
-  @retval EFI_INVALID_PARAMETER  One of the parameters — Settings or Supported — is NULL.
+  @retval EFI_INVALID_PARAMETER  One of the parameters - Settings or Supported - is NULL.
 
 **/
 EFI_STATUS

@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _PI_SMM_CORE_MEMORY_PROFILE_SERVICES_H_
-#define _PI_SMM_CORE_MEMORY_PROFILE_SERVICES_H_
+#pragma once
 
 /**
   Update SMRAM profile information.
@@ -44,5 +43,3 @@ SmmCoreUpdateProfile (
   IN VOID                   *Buffer,
   IN CHAR8                  *ActionString OPTIONAL
   );
-
-#endif

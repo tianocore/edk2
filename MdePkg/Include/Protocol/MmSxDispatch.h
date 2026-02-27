@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _MM_SX_DISPATCH_H_
-#define _MM_SX_DISPATCH_H_
+#pragma once
 
 #include <Pi/PiMmCis.h>
 
@@ -121,5 +120,3 @@ struct _EFI_MM_SX_DISPATCH_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiMmSxDispatchProtocolGuid;
-
-#endif

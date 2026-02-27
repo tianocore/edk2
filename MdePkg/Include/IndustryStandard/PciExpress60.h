@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef PCIEXPRESS60_H_
-#define PCIEXPRESS60_H_
+#pragma once
 
 #include <IndustryStandard/PciExpress50.h>
 
@@ -180,5 +179,3 @@ typedef struct {
 ///@}
 
 #pragma pack()
-
-#endif

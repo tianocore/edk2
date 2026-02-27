@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _HW_ERR_REC_SUPPORT_H_
-#define _HW_ERR_REC_SUPPORT_H_
+#pragma once
 
 #include "Bds.h"
 
@@ -22,5 +21,3 @@ VOID
 InitializeHwErrRecSupport (
   VOID
   );
-
-#endif

@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __MEMORY_STATUS_CODE_RECORD_H__
-#define __MEMORY_STATUS_CODE_RECORD_H__
+#pragma once
 
 ///
 /// Global ID used to identify GUIDed HOBs that start with a structure of type
@@ -93,5 +92,3 @@ typedef struct {
 } MEMORY_STATUSCODE_RECORD;
 
 extern EFI_GUID  gMemoryStatusCodeRecordGuid;
-
-#endif

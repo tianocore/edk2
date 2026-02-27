@@ -9,8 +9,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _VIRTIO_NET_DXE_H_
-#define _VIRTIO_NET_DXE_H_
+#pragma once
 
 #include <IndustryStandard/VirtioNet.h>
 #include <Library/DebugLib.h>
@@ -326,5 +325,3 @@ VirtioNetExitBoot (
   IN  EFI_EVENT  Event,
   IN  VOID       *Context
   );
-
-#endif // _VIRTIO_NET_DXE_H_

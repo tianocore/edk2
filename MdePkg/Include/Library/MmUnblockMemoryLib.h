@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef MM_UNBLOCK_MEMORY_LIB_H_
-#define MM_UNBLOCK_MEMORY_LIB_H_
+#pragma once
 
 /**
   This API provides a way to unblock certain data pages to be accessible inside MM environment.
@@ -40,5 +39,3 @@ MmUnblockMemoryRequest (
   IN PHYSICAL_ADDRESS  UnblockAddress,
   IN UINT64            NumberOfPages
   );
-
-#endif // MM_UNBLOCK_MEMORY_LIB_H_

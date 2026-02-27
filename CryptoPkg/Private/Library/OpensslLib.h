@@ -6,9 +6,6 @@
 
 **/
 
-#ifndef OPENSSL_LIB_H_
-#define OPENSSL_LIB_H_
+#pragma once
 
 #include <openssl/opensslv.h>
-
-#endif

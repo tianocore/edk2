@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __LOAD_FILE_PPI_H__
-#define __LOAD_FILE_PPI_H__
+#pragma once
 
 #define EFI_PEI_LOAD_FILE_PPI_GUID \
   { 0xb9e0abfe, 0x5979, 0x4914, { 0x97, 0x7f, 0x6d, 0xee, 0x78, 0xc2, 0x78, 0xa6 } }
@@ -66,5 +65,3 @@ struct _EFI_PEI_LOAD_FILE_PPI {
 };
 
 extern EFI_GUID  gEfiPeiLoadFilePpiGuid;
-
-#endif

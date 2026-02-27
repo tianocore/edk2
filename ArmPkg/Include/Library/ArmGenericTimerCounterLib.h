@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef ARM_GENERIC_TIMER_COUNTER_LIB_H_
-#define ARM_GENERIC_TIMER_COUNTER_LIB_H_
+#pragma once
 
 VOID
 EFIAPI
@@ -81,5 +80,3 @@ EFIAPI
 ArmGenericTimerSetCompareVal (
   IN   UINT64  Value
   );
-
-#endif // ARM_GENERIC_TIMER_COUNTER_LIB_H_

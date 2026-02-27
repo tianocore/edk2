@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_UDP4_PROTOCOL_H__
-#define __EFI_UDP4_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/Ip4.h>
 //
@@ -433,5 +432,3 @@ struct _EFI_UDP4_PROTOCOL {
 
 extern EFI_GUID  gEfiUdp4ServiceBindingProtocolGuid;
 extern EFI_GUID  gEfiUdp4ProtocolGuid;
-
-#endif

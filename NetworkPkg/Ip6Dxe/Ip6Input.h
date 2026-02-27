@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_IP6_INPUT_H__
-#define __EFI_IP6_INPUT_H__
+#pragma once
 
 #define IP6_MIN_HEADLEN  40
 #define IP6_MAX_HEADLEN  120
@@ -223,5 +222,3 @@ VOID
 Ip6PacketTimerTicking (
   IN IP6_SERVICE  *IpSb
   );
-
-#endif

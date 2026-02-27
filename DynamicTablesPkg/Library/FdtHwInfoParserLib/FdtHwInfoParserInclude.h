@@ -5,11 +5,8 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef FDT_HW_INFO_PARSER_INCLUDE_H_
-#define FDT_HW_INFO_PARSER_INCLUDE_H_
+#pragma once
 
 #include <Base.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
-
-#endif // FDT_HW_INFO_PARSER_INCLUDE_H_

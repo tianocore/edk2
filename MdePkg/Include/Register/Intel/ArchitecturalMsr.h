@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __INTEL_ARCHITECTURAL_MSR_H__
-#define __INTEL_ARCHITECTURAL_MSR_H__
+#pragma once
 
 /**
   See Section 2.22, "MSRs in Pentium Processors.". Pentium Processor (05_01H).
@@ -6535,5 +6534,3 @@ typedef union {
   ///
   UINT64    Uint64;
 } MSR_IA32_TSC_AUX_REGISTER;
-
-#endif

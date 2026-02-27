@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __DISK_IO_H__
-#define __DISK_IO_H__
+#pragma once
 
 #define EFI_DISK_IO_PROTOCOL_GUID \
   { \
@@ -107,5 +106,3 @@ struct _EFI_DISK_IO_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiDiskIoProtocolGuid;
-
-#endif

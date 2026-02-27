@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _DEBUG_AGENT_H_
-#define _DEBUG_AGENT_H_
+#pragma once
 
 #include <Register/LocalApic.h>
 #include <Guid/DebugAgentGuid.h>
@@ -492,5 +491,3 @@ DebugAgentReadBuffer (
   IN     UINTN              NumberOfBytes,
   IN     UINTN              Timeout
   );
-
-#endif

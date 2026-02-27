@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _SOCK_IMPL_H_
-#define _SOCK_IMPL_H_
+#pragma once
 
 #include "Socket.h"
 #include "TcpMain.h"
@@ -111,5 +110,3 @@ VOID
 SockDestroy (
   IN OUT SOCKET  *Sock
   );
-
-#endif
