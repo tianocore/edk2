@@ -227,6 +227,7 @@ Ip6ConfigStartStatefulAutoConfig (
 
   if (Instance->Dhcp6SbNotifyEvent != NULL) {
     gBS->CloseEvent (Instance->Dhcp6SbNotifyEvent);
+    Instance->Dhcp6SbNotifyEvent = NULL;
   }
 
   Status = gBS->OpenProtocol (
