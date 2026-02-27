@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _BTT_H_
-#define _BTT_H_
+#pragma once
 
 ///
 /// The BTT layout and behavior is described by the GUID as below.
@@ -218,5 +217,3 @@ typedef struct _EFI_BTT_FLOG {
 } EFI_BTT_FLOG;
 
 extern GUID  gEfiBttAbstractionGuid;
-
-#endif //_BTT_H_

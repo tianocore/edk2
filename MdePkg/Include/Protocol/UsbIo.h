@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __USB_IO_H__
-#define __USB_IO_H__
+#pragma once
 
 #include <IndustryStandard/Usb.h>
 
@@ -501,5 +500,3 @@ struct _EFI_USB_IO_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiUsbIoProtocolGuid;
-
-#endif

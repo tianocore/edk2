@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __ISCSI_CONFIG_HII_GUID_H__
-#define __ISCSI_CONFIG_HII_GUID_H__
+#pragma once
 
 #define ISCSI_CONFIG_GUID \
   { \
@@ -16,5 +15,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   }
 
 extern EFI_GUID  gIScsiConfigGuid;
-
-#endif

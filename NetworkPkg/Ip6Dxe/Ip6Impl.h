@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __EFI_IP6_IMPL_H__
-#define __EFI_IP6_IMPL_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -744,5 +743,3 @@ EFIAPI
 EfiIp6Poll (
   IN EFI_IP6_PROTOCOL  *This
   );
-
-#endif

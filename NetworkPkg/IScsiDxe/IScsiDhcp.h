@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _ISCSI_DHCP_H_
-#define _ISCSI_DHCP_H_
+#pragma once
 
 #define ISCSI_ROOT_PATH_ID               "iscsi:"
 #define ISCSI_ROOT_PATH_FIELD_DELIMITER  ':'
@@ -45,5 +44,3 @@ IScsiDoDhcp (
   IN     EFI_HANDLE                   Controller,
   IN OUT ISCSI_ATTEMPT_CONFIG_NVDATA  *ConfigData
   );
-
-#endif

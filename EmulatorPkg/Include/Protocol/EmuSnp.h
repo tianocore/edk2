@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EMU_SNP_H__
-#define __EMU_SNP_H__
+#pragma once
 
 #include <Protocol/SimpleNetwork.h>
 
@@ -447,5 +446,3 @@ struct _EMU_SNP_PROTOCOL {
 };
 
 extern EFI_GUID  gEmuSnpProtocolGuid;
-
-#endif

@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef __MASTER_BOOT_MODE_PPI_H__
-#define __MASTER_BOOT_MODE_PPI_H__
+#pragma once
 
 #define EFI_PEI_MASTER_BOOT_MODE_PEIM_PPI \
   { \
@@ -22,5 +21,3 @@
   }
 
 extern EFI_GUID  gEfiPeiMasterBootModePpiGuid;
-
-#endif

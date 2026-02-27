@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __BROADWELL_MSR_H__
-#define __BROADWELL_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -347,5 +346,3 @@ typedef union {
   @note MSR_BROADWELL_PP0_ENERGY_STATUS is defined as MSR_PP0_ENERGY_STATUS in SDM.
 **/
 #define MSR_BROADWELL_PP0_ENERGY_STATUS  0x00000639
-
-#endif

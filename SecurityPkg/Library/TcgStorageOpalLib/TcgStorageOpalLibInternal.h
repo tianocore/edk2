@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _OPAL_INTERNAL_H_
-#define _OPAL_INTERNAL_H_
+#pragma once
 
 #include <Library/TcgStorageOpalLib.h>
 
@@ -86,5 +85,3 @@ OpalPyrite2AdminRevert (
   UINT8         *MethodStatus,
   UINT32        EstimateTimeCost
   );
-
-#endif // _OPAL_CORE_H_

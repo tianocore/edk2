@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _ACPI_AML_H_
-#define _ACPI_AML_H_
+#pragma once
 
 //
 // ACPI AML definition
@@ -180,5 +179,3 @@
 // AML Name segment definitions
 //
 #define AML_NAME_SEG_SIZE  4
-
-#endif

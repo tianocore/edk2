@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef _SMM_STANDBY_BUTTON_DISPATCH2_H_
-#define _SMM_STANDBY_BUTTON_DISPATCH2_H_
+#pragma once
 
 #include <Protocol/MmStandbyButtonDispatch.h>
 
@@ -31,5 +30,3 @@ typedef EFI_MM_STANDBY_BUTTON_REGISTER EFI_SMM_STANDBY_BUTTON_REGISTER2;
 typedef EFI_MM_STANDBY_BUTTON_UNREGISTER EFI_SMM_STANDBY_BUTTON_UNREGISTER2;
 
 extern EFI_GUID  gEfiSmmStandbyButtonDispatch2ProtocolGuid;
-
-#endif

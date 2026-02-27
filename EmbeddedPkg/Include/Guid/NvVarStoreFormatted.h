@@ -18,8 +18,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __EDKII_NV_VAR_STORE_FORMATTED_H__
-#define __EDKII_NV_VAR_STORE_FORMATTED_H__
+#pragma once
 
 #define EDKII_NV_VAR_STORE_FORMATTED_GUID \
   { \
@@ -28,5 +27,3 @@
   }
 
 extern EFI_GUID  gEdkiiNvVarStoreFormattedGuid;
-
-#endif

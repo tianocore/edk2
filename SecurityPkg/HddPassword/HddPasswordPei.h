@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _HDD_PASSWORD_PEI_H_
-#define _HDD_PASSWORD_PEI_H_
+#pragma once
 
 #include <PiPei.h>
 #include <IndustryStandard/Atapi.h>
@@ -30,5 +29,3 @@
 // Time out value for ATA PassThru PPI
 //
 #define ATA_TIMEOUT  30000000
-
-#endif

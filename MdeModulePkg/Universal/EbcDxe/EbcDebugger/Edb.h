@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_EDB_H_
-#define _EFI_EDB_H_
+#pragma once
 
 #include "EdbCommon.h"
 
@@ -56,5 +55,3 @@ extern EFI_DEBUGGER_PRIVATE_DATA  mDebuggerPrivate;
 #include "EdbDisasmSupport.h"
 #include "EdbSymbol.h"
 #include "EdbHook.h"
-
-#endif

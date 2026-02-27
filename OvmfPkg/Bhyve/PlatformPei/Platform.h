@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _PLATFORM_PEI_H_INCLUDED_
-#define _PLATFORM_PEI_H_INCLUDED_
+#pragma once
 
 #include <IndustryStandard/E820.h>
 
@@ -133,5 +132,3 @@ extern UINT16  mHostBridgeDevId;
 extern BOOLEAN  mQ35SmramAtDefaultSmbase;
 
 extern UINT32  mQemuUc32Base;
-
-#endif // _PLATFORM_PEI_H_INCLUDED_

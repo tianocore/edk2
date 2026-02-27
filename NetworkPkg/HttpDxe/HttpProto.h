@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_HTTP_PROTO_H__
-#define __EFI_HTTP_PROTO_H__
+#pragma once
 
 #define DEF_BUF_LEN  2048
 
@@ -634,5 +633,3 @@ HttpNotify (
   IN  EDKII_HTTP_CALLBACK_EVENT  Event,
   IN  EFI_STATUS                 EventStatus
   );
-
-#endif

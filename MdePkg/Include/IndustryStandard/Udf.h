@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __UDF_H__
-#define __UDF_H__
+#pragma once
 
 #define UDF_BEA_IDENTIFIER   "BEA01"
 #define UDF_NSR2_IDENTIFIER  "NSR02"
@@ -137,5 +136,3 @@ typedef struct {
 } UDF_LOGICAL_VOLUME_DESCRIPTOR;
 
 #pragma pack()
-
-#endif

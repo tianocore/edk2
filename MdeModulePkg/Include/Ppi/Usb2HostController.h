@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PEI_USB2_HOST_CONTROLLER_PPI_H_
-#define _PEI_USB2_HOST_CONTROLLER_PPI_H_
+#pragma once
 
 #include <Protocol/Usb2HostController.h>
 
@@ -257,5 +256,3 @@ struct _PEI_USB2_HOST_CONTROLLER_PPI {
 };
 
 extern EFI_GUID  gPeiUsb2HostControllerPpiGuid;
-
-#endif

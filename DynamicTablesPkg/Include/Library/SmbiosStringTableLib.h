@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef SMBIOS_STRING_TABLE_H_
-#define SMBIOS_STRING_TABLE_H_
+#pragma once
 
 /** A structure representing a string in the string table.
 */
@@ -115,5 +114,3 @@ EFIAPI
 StringTableFree (
   IN STRING_TABLE *CONST  StrTable
   );
-
-#endif // SMBIOS_STRING_TABLE_H_

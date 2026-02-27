@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef EDKII_REDFISH_HTTP_OPERATION_H_
-#define EDKII_REDFISH_HTTP_OPERATION_H_
+#pragma once
 
 #include "RedfishHttpDxe.h"
 
@@ -73,5 +72,3 @@ HttpSendReceive (
   IN  REDFISH_REQUEST   *Request  OPTIONAL,
   OUT REDFISH_RESPONSE  *Response
   );
-
-#endif

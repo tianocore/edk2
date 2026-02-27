@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _EFI_SHELL_PCI_H_
-#define _EFI_SHELL_PCI_H_
+#pragma once
 
 typedef enum {
   PciDevice,
@@ -54,5 +53,3 @@ typedef struct {
 } PCI_CONFIG_SPACE;
 
 #pragma pack()
-
-#endif // _PCI_H_

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _EMMC_DISKINFO_H_
-#define _EMMC_DISKINFO_H_
+#pragma once
 
 /**
   Provides inquiry information for the controller type.
@@ -105,5 +104,3 @@ EmmcDiskInfoWhichIde (
   OUT UINT32                  *IdeChannel,
   OUT UINT32                  *IdeDevice
   );
-
-#endif

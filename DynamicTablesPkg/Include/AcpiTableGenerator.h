@@ -12,8 +12,7 @@
     - Std or STD - Standard
 **/
 
-#ifndef ACPI_TABLE_GENERATOR_H_
-#define ACPI_TABLE_GENERATOR_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -409,5 +408,3 @@ DeregisterAcpiTableGenerator (
   );
 
 #pragma pack()
-
-#endif // ACPI_TABLE_GENERATOR_H_

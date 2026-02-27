@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _AHCI_PEI_PASSTHRU_H_
-#define _AHCI_PEI_PASSTHRU_H_
+#pragma once
 
 /**
   Sends an ATA command to an ATA device that is attached to the ATA controller.
@@ -173,5 +172,3 @@ AhciAtaPassThruGetDevicePath (
   OUT UINTN                        *DevicePathLength,
   OUT EFI_DEVICE_PATH_PROTOCOL     **DevicePath
   );
-
-#endif

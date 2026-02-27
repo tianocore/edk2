@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _HTTP_LIB_H_
-#define _HTTP_LIB_H_
+#pragma once
 
 #include <Protocol/Http.h>
 
@@ -529,5 +528,3 @@ HttpIoSetHeader (
   IN  CHAR8           *FieldName,
   IN  CHAR8           *FieldValue
   );
-
-#endif

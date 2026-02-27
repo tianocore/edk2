@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef EXCEPTION_HANDLER_H_
-#define EXCEPTION_HANDLER_H_
+#pragma once
 
 #include <Register/RiscV64/RiscVImpl.h>
 
@@ -107,5 +106,3 @@ typedef struct {
   UINT64    stval;
 } SMODE_TRAP_REGISTERS;
 #pragma pack()
-
-#endif /* EXCEPTION_HANDLER_H_ */

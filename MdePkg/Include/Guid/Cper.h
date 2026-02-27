@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __CPER_GUID_H__
-#define __CPER_GUID_H__
+#pragma once
 
 #pragma pack(1)
 
@@ -1342,7 +1341,5 @@ extern EFI_GUID  gEfiIa32X64ErrorTypeCacheCheckGuid;
 extern EFI_GUID  gEfiIa32X64ErrorTypeTlbCheckGuid;
 extern EFI_GUID  gEfiIa32X64ErrorTypeBusCheckGuid;
 extern EFI_GUID  gEfiIa32X64ErrorTypeMsCheckGuid;
-
-#endif
 
 #endif

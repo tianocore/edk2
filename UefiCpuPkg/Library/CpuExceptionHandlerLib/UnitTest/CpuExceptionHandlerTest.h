@@ -32,8 +32,7 @@
 
 **/
 
-#ifndef CPU_EXCEPTION_HANDLER_TEST_H_
-#define CPU_EXCEPTION_HANDLER_TEST_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Library/BaseLib.h>
@@ -341,5 +340,3 @@ CpuStackGuardExceptionHandler (
   IN EFI_EXCEPTION_TYPE  ExceptionType,
   IN EFI_SYSTEM_CONTEXT  SystemContext
   );
-
-#endif

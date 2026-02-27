@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef REST_EX_LIB_H_
-#define REST_EX_LIB_H_
+#pragma once
 
 #include <Protocol/RestEx.h>
 
@@ -41,5 +40,3 @@ RestExLibCreateChild (
   IN EFI_REST_EX_SERVICE_TYPE         ServiceType,
   OUT EFI_HANDLE                      *ChildInstanceHandle
   );
-
-#endif

@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __PE_COFF_EXTRA_ACTION_LIB_H__
-#define __PE_COFF_EXTRA_ACTION_LIB_H__
+#pragma once
 
 #include <Library/PeCoffLib.h>
 
@@ -43,5 +42,3 @@ EFIAPI
 PeCoffLoaderUnloadImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   );
-
-#endif

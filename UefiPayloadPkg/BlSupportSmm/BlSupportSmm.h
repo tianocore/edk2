@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef BL_SUPPORT_SMM_H_
-#define BL_SUPPORT_SMM_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Library/BaseLib.h>
@@ -37,5 +36,3 @@ typedef struct {
   UINT32    Base;
   UINT32    Mask;
 } SMRR_BASE_MASK;
-
-#endif

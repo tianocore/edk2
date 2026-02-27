@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef _EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL_H_
-#define _EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL_H_
+#pragma once
 
 ///
 /// Global ID for the Bus Specific Driver Override Protocol
@@ -62,5 +61,3 @@ struct _EFI_BUS_SPECIFIC_DRIVER_OVERRIDE_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiBusSpecificDriverOverrideProtocolGuid;
-
-#endif

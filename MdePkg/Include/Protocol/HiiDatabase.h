@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __HII_DATABASE_H__
-#define __HII_DATABASE_H__
+#pragma once
 
 #define EFI_HII_DATABASE_PROTOCOL_GUID \
   { 0xef9fc172, 0xa1b2, 0x4693, { 0xb3, 0x27, 0x6d, 0x32, 0xfc, 0x41, 0x60, 0x42 } }
@@ -514,5 +513,3 @@ struct _EFI_HII_DATABASE_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiHiiDatabaseProtocolGuid;
-
-#endif

@@ -10,8 +10,7 @@
   PI Version 1.2.1 Vol 3.
 **/
 
-#ifndef __PI_PCD_INFO_H__
-#define __PI_PCD_INFO_H__
+#pragma once
 
 extern EFI_GUID  gEfiGetPcdInfoProtocolGuid;
 
@@ -72,5 +71,3 @@ struct _EFI_GET_PCD_INFO_PROTOCOL {
   ///
   EFI_GET_PCD_INFO_PROTOCOL_GET_SKU     GetSku;
 };
-
-#endif

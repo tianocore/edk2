@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef AML_STRING_H_
-#define AML_STRING_H_
+#pragma once
 
 /* This header file does not include internal Node definition,
    i.e. AML_ROOT_NODE, AML_OBJECT_NODE, etc. The node definitions
@@ -397,5 +396,3 @@ AmlGetFirstNameSeg (
   IN         UINT32  Root,
   IN         UINT32  ParentPrefix
   );
-
-#endif // AML_STRING_H_

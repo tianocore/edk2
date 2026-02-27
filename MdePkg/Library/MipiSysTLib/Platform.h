@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef MIPI_SYST_PLATFORM_H_
-#define MIPI_SYST_PLATFORM_H_
+#pragma once
 
 typedef struct {
   UINT64    MmioAddr;
@@ -134,5 +133,3 @@ MipiSystWriteFlag (
   #endif
 #define MIPI_SYST_OUTPUT_FLAG(MipiSystHandle)  MipiSystWriteFlag ((MipiSystHandle))
 #endif
-
-#endif // MIPI_SYST_PLATFORM_H_

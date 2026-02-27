@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PEI_PCD_SERVICE_H_
-#define _PEI_PCD_SERVICE_H_
+#pragma once
 
 #include <PiPei.h>
 #include <Ppi/ReadOnlyVariable2.h>
@@ -1078,5 +1077,3 @@ SetPtrTypeSize (
   IN    OUT   UINTN             *CurrentSize,
   IN          PEI_PCD_DATABASE  *Database
   );
-
-#endif

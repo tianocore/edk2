@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _UEFI_SHELL_LEVEL1_COMMANDS_LIB_H_
-#define _UEFI_SHELL_LEVEL1_COMMANDS_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -197,5 +196,3 @@ MoveToTag (
   IN CONST BOOLEAN          FindOnly,
   IN CONST BOOLEAN          WrapAroundScript
   );
-
-#endif

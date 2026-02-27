@@ -24,6 +24,9 @@
 #include "ArmFfaCommon.h"
 #include "ArmFfaRxTxMap.h"
 
+STATIC UINT16   mPartId;
+STATIC BOOLEAN  mIsFfaSupported;
+
 /**
   ArmFfaLib Constructor.
 
@@ -43,10 +46,10 @@ ArmFfaStandaloneMmLibConstructor (
 {
   EFI_STATUS  Status;
 
-  Status = ArmFfaLibCommonInit ();
-  if (Status == EFI_UNSUPPORTED) {
+  Status = ArmFfaLibCommonInit (&mPartId, &mIsFfaSupported);
+  if (!mIsFfaSupported) {
     /*
-     * EFI_UNSUPPORTED means FF-A interface isn't available.
+     * Unsupported means FF-A interface isn't available.
      * However, for Standalone MM modules, FF-A availability is not required.
      * i.e. Standalone MM could use SpmMm as a legitimate protocol.
      * Thus, returning EFI_SUCCESS here to avoid the entrypoint to assert.
@@ -85,4 +88,56 @@ ArmFfaStandaloneMmLibConstructor (
   }
 
   return Status;
+}
+
+/**
+  Return partition or VM ID
+
+  @param[out] PartId  The partition or VM ID
+
+  @retval EFI_SUCCESS  Partition ID or VM ID returned
+  @retval Others       Errors
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibGetPartId (
+  OUT UINT16  *PartId
+  )
+{
+  if (PartId != NULL) {
+    *PartId = mPartId;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Check FF-A support or not.
+
+  @retval TRUE                   Supported
+  @retval FALSE                  Not supported
+
+**/
+BOOLEAN
+EFIAPI
+IsFfaSupported (
+  IN VOID
+  )
+{
+  return mIsFfaSupported;
+}
+
+/**
+  Callback for when Unmap is called to handle any post unmap
+  functionality.
+
+**/
+VOID
+EFIAPI
+UnmapCallback (
+  IN VOID
+  )
+{
+  // Do nothing
 }

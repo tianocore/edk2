@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __LEGACY_SPI_CONTROLLER_PROTOCOL_H__
-#define __LEGACY_SPI_CONTROLLER_PROTOCOL_H__
+#pragma once
 
 ///
 /// Note: The UEFI PI 1.6 specification uses the character 'l' in the GUID
@@ -255,5 +254,3 @@ struct _EFI_LEGACY_SPI_CONTROLLER_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiLegacySpiControllerProtocolGuid;
-
-#endif // __LEGACY_SPI_CONTROLLER_PROTOCOL_H__

@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __UEFI_INTERNAL_FORMREPRESENTATION_H__
-#define __UEFI_INTERNAL_FORMREPRESENTATION_H__
+#pragma once
 
 #include <Guid/HiiFormMapMethodGuid.h>
 
@@ -2132,5 +2131,3 @@ typedef struct _EFI_HII_AIBT_SKIP2_BLOCK {
 /// here for the easy access by C files and VFR source files.
 ///
 #define IMAGE_TOKEN(t)  t
-
-#endif

@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __FIRMWARE_FILE_SYSTEM2_GUID_H__
-#define __FIRMWARE_FILE_SYSTEM2_GUID_H__
+#pragma once
 
 //
 // GUIDs defined by the PI specification.
@@ -35,5 +34,3 @@
 extern EFI_GUID gEfiFirmwareFileSystem2Guid;
 extern EFI_GUID gEfiFirmwareFileSystem3Guid;
 extern EFI_GUID gEfiFirmwareVolumeTopFileGuid;
-
-#endif

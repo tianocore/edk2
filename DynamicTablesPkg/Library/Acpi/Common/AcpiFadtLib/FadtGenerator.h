@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef FADT_GENERATOR_H_
-#define FADT_GENERATOR_H_
+#pragma once
 
 /** Updates the Architecture specific information in the FADT Table.
 
@@ -31,5 +30,3 @@ FadtArchUpdate (
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
   IN   OUT EFI_ACPI_6_5_FIXED_ACPI_DESCRIPTION_TABLE      *Fadt
   );
-
-#endif // FADT_GENERATOR_H_

@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __EFI_WIFI_PROTOCOL_H__
-#define __EFI_WIFI_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/WiFi2.h>
 
@@ -1119,5 +1118,3 @@ struct _EFI_WIRELESS_MAC_CONNECTION_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiWiFiProtocolGuid;
-
-#endif

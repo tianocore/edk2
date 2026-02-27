@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TCG_STORAGE_CORE_H_
-#define _TCG_STORAGE_CORE_H_
+#pragma once
 
 #include <Base.h>
 
@@ -383,5 +382,3 @@ typedef struct {
 #define TCG_UID_METHOD_CREATE_LOG         TCG_TO_UID(0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x0A, 0x02)
 #define TCG_UID_METHOD_CLEAR_LOG          TCG_TO_UID(0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x0A, 0x03)
 #define TCG_UID_METHOD_FLUSH_LOG          TCG_TO_UID(0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x0A, 0x04)
-
-#endif // TCG_H_

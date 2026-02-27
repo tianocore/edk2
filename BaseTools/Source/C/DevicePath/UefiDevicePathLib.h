@@ -5,8 +5,8 @@ Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
-#ifndef _UEFI_DEVICE_PATH_LIB_H_
-#define _UEFI_DEVICE_PATH_LIB_H_
+
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -435,5 +435,3 @@ EFI_DEVICE_PATH_PROTOCOL *
 ConvertTextToDevicePath (
    CONST CHAR16 *TextDevicePath
   );
-
-#endif

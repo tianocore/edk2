@@ -9,8 +9,7 @@
   - linux/Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.yaml
 **/
 
-#ifndef ARM_GIC_DISPATCHER_H_
-#define ARM_GIC_DISPATCHER_H_
+#pragma once
 
 #include <FdtHwInfoParserInclude.h>
 #include "FdtUtility.h"
@@ -68,5 +67,3 @@ ArmGicDispatcher (
   IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
   IN        INT32                      FdtBranch
   );
-
-#endif // ARM_GIC_DISPATCHER_H_

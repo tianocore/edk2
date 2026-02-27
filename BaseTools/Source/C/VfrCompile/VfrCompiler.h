@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _VFRCOMPILER_H_
-#define _VFRCOMPILER_H_
+#pragma once
 
 #include "Common/UefiBaseTypes.h"
 #include "EfiVfr.h"
@@ -104,5 +103,3 @@ public:
   VOID                GenRecordListFile (VOID);
   VOID                DebugError (IN CHAR8*, IN UINT32, IN UINT32, IN CONST CHAR8*, IN CONST CHAR8*, ...);
 };
-
-#endif
