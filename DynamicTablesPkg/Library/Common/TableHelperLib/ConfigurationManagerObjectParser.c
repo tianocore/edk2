@@ -439,6 +439,20 @@ STATIC CONST CM_OBJ_PARSER  AcpiGenericAddressParser[] = {
   { "Address",           8, "0x%llx", NULL },
 };
 
+/** A parser for the EFI_ACPI_6_6_HARDWARE_ERROR_NOTIFICATION_STRUCTURE structure.
+*/
+STATIC CONST CM_OBJ_PARSER  AcpiHwErrNotificationParser[] = {
+  { "Type",                           1, "0x%x", NULL },
+  { "Length",                         1, "0x%x", NULL },
+  { "ConfigurationWriteEnable",       2, "0x%x", NULL },
+  { "PollInterval",                   4, "0x%x", NULL },
+  { "Vector",                         4, "0x%x", NULL },
+  { "SwitchToPollingThresholdValue",  4, "0x%x", NULL },
+  { "SwitchToPollingThresholdWindow", 4, "0x%x", NULL },
+  { "ErrorThresholdValue",            4, "0x%x", NULL },
+  { "ErrorThresholdWindow",           4, "0x%x", NULL },
+};
+
 /** A parser for EArchCommonObjLpiInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonLpiInfoParser[] = {
@@ -1009,6 +1023,98 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonObjPciRootPortInfoParser[] = {
   { "Sun",              4,                        "0x%x", NULL }
 };
 
+/** A parser for ERROR_SOURCE_COMMON_INFO
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonErrSourceCommonInfoParser[] = {
+  { "Token",                        sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "Flags",                        1,                        "0x%x", NULL },
+  { "Enabled",                      1,                        "0x%x", NULL },
+  { "NumberOfRecordsToPreAllocate", 4,                        "0x%x", NULL },
+  { "MaxSectionPerRecord",          4,                        "0x%x", NULL },
+};
+
+/** A parser for PCI_ERROR_SOURCE_COMMON_INFO
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonPciErrSourceCommonInfoParser[] = {
+  { "Common",                   sizeof (ERROR_SOURCE_COMMON_INFO),
+    NULL, NULL, CmArchCommonErrSourceCommonInfoParser,
+    ARRAY_SIZE (CmArchCommonErrSourceCommonInfoParser) },
+  { "Bus",                      4,                                "0x%x",  NULL },
+  { "Device",                   2,                                "0x%x",  NULL },
+  { "Function",                 2,                                "0x%x",  NULL },
+  { "DeviceControl",            2,                                "0x%x",  NULL },
+  { "UncorrectableErrMask",     4,                                "0x%x",  NULL },
+  { "UncorrectableErrSeverity", 4,                                "0x%x",  NULL },
+  { "CorrectableErrMask",       4,                                "0x%x",  NULL },
+  { "AdvancedErrCapAndControl", 4,                                "0x%x",  NULL },
+};
+
+/** A parser for GHES_COMMON_INFO
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonGhesCommonInfoParser[] = {
+  { "Common",                 sizeof (ERROR_SOURCE_COMMON_INFO),
+    NULL, NULL, CmArchCommonErrSourceCommonInfoParser,
+    ARRAY_SIZE (CmArchCommonErrSourceCommonInfoParser) },
+  { "RelatedSourceToken",     sizeof (CM_OBJECT_TOKEN),                                   "0x%p",  NULL },
+  { "MaxRawDataLength",       4,                                                          "0x%x",  NULL },
+  { "ErrorStatusAddress",     sizeof (EFI_ACPI_6_6_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) },
+  { "NotificationStructure",  sizeof (EFI_ACPI_6_6_HARDWARE_ERROR_NOTIFICATION_STRUCTURE),
+    NULL, NULL, AcpiHwErrNotificationParser,
+    ARRAY_SIZE (AcpiHwErrNotificationParser) },
+  { "ErrorStatusBlockLength", 4,                                                          "0x%x",  NULL },
+};
+
+/** A parser for CmArchCommonObjErrSourcePciRootPortInfo
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonObjErrSourcePciRootPortInfoParser[] = {
+  { "PciCommon",    sizeof (PCI_ERROR_SOURCE_COMMON_INFO),
+    NULL, NULL, CmArchCommonPciErrSourceCommonInfoParser,
+    ARRAY_SIZE (CmArchCommonPciErrSourceCommonInfoParser) },
+  { "RootErrorCmd", 4,                                    "0x%x",NULL },
+};
+
+/** A parser for CmArchCommonObjErrSourcePciDeviceInfo
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonObjErrSourcePciDeviceInfoParser[] = {
+  { "PciCommon", sizeof (PCI_ERROR_SOURCE_COMMON_INFO),
+    NULL, NULL, CmArchCommonPciErrSourceCommonInfoParser,
+    ARRAY_SIZE (CmArchCommonPciErrSourceCommonInfoParser) },
+};
+
+/** A parser for CmArchCommonObjErrSourcePciRootPortInfo
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonObjErrSourcePciBridgeInfoParser[] = {
+  { "PciCommon",                         sizeof (PCI_ERROR_SOURCE_COMMON_INFO),
+    NULL, NULL, CmArchCommonPciErrSourceCommonInfoParser,
+    ARRAY_SIZE (CmArchCommonPciErrSourceCommonInfoParser) },
+  { "SecondaryUncorrectableErrMask",     4,                                    "0x%x",  NULL },
+  { "SecondaryUncorrectableErrSeverity", 4,                                    "0x%x",  NULL },
+  { "SecondaryAdvancedCapAndControl",    4,                                    "0x%x",  NULL },
+};
+
+/** A parser for CmArchCommonObjErrSourceGenericHwInfo
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonObjErrSourceGenericHwInfoParser[] = {
+  { "GhesCommon", sizeof (GHES_COMMON_INFO),
+    NULL, NULL, CmArchCommonGhesCommonInfoParser,
+    ARRAY_SIZE (CmArchCommonGhesCommonInfoParser) },
+};
+
+/** A parser for CmArchCommonObjErrSourceGenericHwVer2Info
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonObjErrSourceGenericHwVer2InfoParser[] = {
+  { "GhesCommon",      sizeof (GHES_COMMON_INFO),
+    NULL, NULL, CmArchCommonGhesCommonInfoParser,
+    ARRAY_SIZE (CmArchCommonGhesCommonInfoParser) },
+  { "ReadAckRegister", sizeof (EFI_ACPI_6_6_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) },
+  { "ReadAckPreserve", 8,                                              "0x%llx",  NULL },
+  { "ReadAckWrite",    8,                                              "0x%llx",  NULL },
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -1061,6 +1167,11 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjTpm2DeviceInfo,               CmArchCommonObjTpm2DeviceInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMcfgPciConfigSpaceInfo,       CmArchCommonPciConfigSpaceInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPciRootPortInfo,              CmArchCommonObjPciRootPortInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourcePciRootPortInfo,     CmArchCommonObjErrSourcePciRootPortInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourcePciDeviceInfo,       CmArchCommonObjErrSourcePciDeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourcePciBridgeInfo,       CmArchCommonObjErrSourcePciBridgeInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourceGenericHwInfo,       CmArchCommonObjErrSourceGenericHwInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourceGenericHwVer2Info,   CmArchCommonObjErrSourceGenericHwVer2InfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
