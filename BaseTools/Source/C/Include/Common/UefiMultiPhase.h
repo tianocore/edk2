@@ -11,6 +11,9 @@
 
 #pragma once
 
+#ifndef __UEFI_MULTIPHASE_H__
+#define __UEFI_MULTIPHASE_H__
+
 //
 // Enumeration of memory types introduced in UEFI.
 // +---------------------------------------------------+
@@ -233,3 +236,5 @@ typedef struct {
   UINT64                      MonotonicCount;
   WIN_CERTIFICATE_UEFI_GUID   AuthInfo;
 } EFI_VARIABLE_AUTHENTICATION;
+
+#endif
