@@ -1,0 +1,281 @@
+## @file
+#  This module for building TPM Reference Library for fTPM.
+#
+#  Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TpmLib
+  MODULE_UNI_FILE                = TpmLib.uni
+  FILE_GUID                      = fb2db358-1da3-11ef-8859-2f704f58e30f
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TpmLib
+  CONSTRUCTOR                    = TpmLibConstructor
+
+  DEFINE TPM_LIB_PATH            =  TPM/TPMCmd/tpm/src
+  DEFINE TPM_CRYPTOLIB_PATH      =  TPM/TPMCmd/tpm/cryptolibs
+  DEFINE TPM_PLAT_PATH           =  TPM/TPMCmd/Platform/src
+  DEFINE TPM_CONF_PATH           =  TPM/TPMCmd/TpmConfiguration
+  DEFINE TPM_LIB_OPTIONS_INCLUDE = -include ./TpmLibCompileOptions.h
+  DEFINE TPM_LIB_WARNING_SUPRESS_GCC = -Wno-unused-function -Wno-implicit-fallthrough -Wno-cast-align -Wno-cast-function-type -Wno-missing-braces -Wno-sign-compare -Wno-suggest-attribute=noreturn -Wno-switch-default -Wno-implicit-function-declaration -Wno-unused-value
+
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources]
+  Include/TpmConfiguration/TpmBuildSwitches.h
+  Include/TpmConfiguration/TpmProfile_Common.h
+  Include/TpmConfiguration/TpmProfile_Misc.h
+  Ossl/BnToOsslMath.c
+  Ossl/TpmToOsslSupport.c
+  TpmLibCompileOptions.h
+  TpmLib.c
+  TpmPlatformFunctions.c
+  $(TPM_LIB_PATH)/X509/X509_ECC.c
+  $(TPM_LIB_PATH)/X509/X509_RSA.c
+  $(TPM_LIB_PATH)/X509/TpmASN1.c
+  $(TPM_LIB_PATH)/X509/X509_spt.c
+  $(TPM_LIB_PATH)/command/Asymmetric/ECC_Decrypt.c
+  $(TPM_LIB_PATH)/command/Asymmetric/ECC_Encrypt.c
+  $(TPM_LIB_PATH)/command/Asymmetric/ECC_Parameters.c
+  $(TPM_LIB_PATH)/command/Asymmetric/ECDH_KeyGen.c
+  $(TPM_LIB_PATH)/command/Asymmetric/ECDH_ZGen.c
+  $(TPM_LIB_PATH)/command/Asymmetric/EC_Ephemeral.c
+  $(TPM_LIB_PATH)/command/Asymmetric/RSA_Decrypt.c
+  $(TPM_LIB_PATH)/command/Asymmetric/RSA_Encrypt.c
+  $(TPM_LIB_PATH)/command/Asymmetric/ZGen_2Phase.c
+  $(TPM_LIB_PATH)/command/AttachedComponent/AC_GetCapability.c
+  $(TPM_LIB_PATH)/command/AttachedComponent/AC_Send.c
+  $(TPM_LIB_PATH)/command/AttachedComponent/AC_spt.c
+  $(TPM_LIB_PATH)/command/AttachedComponent/Policy_AC_SendSelect.c
+  $(TPM_LIB_PATH)/command/Attestation/Attest_spt.c
+  $(TPM_LIB_PATH)/command/Attestation/Certify.c
+  $(TPM_LIB_PATH)/command/Attestation/CertifyCreation.c
+  $(TPM_LIB_PATH)/command/Attestation/CertifyX509.c
+  $(TPM_LIB_PATH)/command/Attestation/GetCommandAuditDigest.c
+  $(TPM_LIB_PATH)/command/Attestation/GetSessionAuditDigest.c
+  $(TPM_LIB_PATH)/command/Attestation/GetTime.c
+  $(TPM_LIB_PATH)/command/Attestation/Quote.c
+  $(TPM_LIB_PATH)/command/Capability/GetCapability.c
+  $(TPM_LIB_PATH)/command/Capability/SetCapability.c
+  $(TPM_LIB_PATH)/command/Capability/TestParms.c
+  $(TPM_LIB_PATH)/command/ClockTimer/ACT_SetTimeout.c
+  $(TPM_LIB_PATH)/command/ClockTimer/ACT_spt.c
+  $(TPM_LIB_PATH)/command/ClockTimer/ClockRateAdjust.c
+  $(TPM_LIB_PATH)/command/ClockTimer/ClockSet.c
+  $(TPM_LIB_PATH)/command/ClockTimer/ReadClock.c
+  $(TPM_LIB_PATH)/command/CommandAudit/SetCommandCodeAuditStatus.c
+  $(TPM_LIB_PATH)/command/Context/ContextLoad.c
+  $(TPM_LIB_PATH)/command/Context/ContextSave.c
+  $(TPM_LIB_PATH)/command/Context/Context_spt.c
+  $(TPM_LIB_PATH)/command/Context/EvictControl.c
+  $(TPM_LIB_PATH)/command/Context/FlushContext.c
+  $(TPM_LIB_PATH)/command/DA/DictionaryAttackParameters.c
+  $(TPM_LIB_PATH)/command/DA/DictionaryAttackLockReset.c
+  $(TPM_LIB_PATH)/command/Duplication/Duplicate.c
+  $(TPM_LIB_PATH)/command/Duplication/Import.c
+  $(TPM_LIB_PATH)/command/Duplication/Rewrap.c
+  $(TPM_LIB_PATH)/command/EA/PolicyAuthValue.c
+  $(TPM_LIB_PATH)/command/EA/PolicyAuthorize.c
+  $(TPM_LIB_PATH)/command/EA/PolicyAuthorizeNV.c
+  $(TPM_LIB_PATH)/command/EA/PolicyCapability.c
+  $(TPM_LIB_PATH)/command/EA/PolicyCommandCode.c
+  $(TPM_LIB_PATH)/command/EA/PolicyCounterTimer.c
+  $(TPM_LIB_PATH)/command/EA/PolicyCpHash.c
+  $(TPM_LIB_PATH)/command/EA/PolicyDuplicationSelect.c
+  $(TPM_LIB_PATH)/command/EA/PolicyGetDigest.c
+  $(TPM_LIB_PATH)/command/EA/PolicyLocality.c
+  $(TPM_LIB_PATH)/command/EA/PolicyNV.c
+  $(TPM_LIB_PATH)/command/EA/PolicyNameHash.c
+  $(TPM_LIB_PATH)/command/EA/PolicyNvWritten.c
+  $(TPM_LIB_PATH)/command/EA/PolicyOR.c
+  $(TPM_LIB_PATH)/command/EA/PolicyPCR.c
+  $(TPM_LIB_PATH)/command/EA/PolicyParameters.c
+  $(TPM_LIB_PATH)/command/EA/PolicyPassword.c
+  $(TPM_LIB_PATH)/command/EA/PolicyPhysicalPresence.c
+  $(TPM_LIB_PATH)/command/EA/PolicySecret.c
+  $(TPM_LIB_PATH)/command/EA/PolicySigned.c
+  $(TPM_LIB_PATH)/command/EA/PolicyTemplate.c
+  $(TPM_LIB_PATH)/command/EA/PolicyTicket.c
+  $(TPM_LIB_PATH)/command/EA/PolicyTransportSPDM.c
+  $(TPM_LIB_PATH)/command/EA/Policy_spt.c
+  $(TPM_LIB_PATH)/command/Ecdaa/Commit.c
+  $(TPM_LIB_PATH)/command/FieldUpgrade/FieldUpgradeData.c
+  $(TPM_LIB_PATH)/command/FieldUpgrade/FieldUpgradeStart.c
+  $(TPM_LIB_PATH)/command/FieldUpgrade/FirmwareRead.c
+  $(TPM_LIB_PATH)/command/HashHMAC/EventSequenceComplete.c
+  $(TPM_LIB_PATH)/command/HashHMAC/HMAC_Start.c
+  $(TPM_LIB_PATH)/command/HashHMAC/HashSequenceStart.c
+  $(TPM_LIB_PATH)/command/HashHMAC/MAC_Start.c
+  $(TPM_LIB_PATH)/command/HashHMAC/SequenceComplete.c
+  $(TPM_LIB_PATH)/command/HashHMAC/SequenceUpdate.c
+  $(TPM_LIB_PATH)/command/Hierarchy/ChangeEPS.c
+  $(TPM_LIB_PATH)/command/Hierarchy/ChangePPS.c
+  $(TPM_LIB_PATH)/command/Hierarchy/Clear.c
+  $(TPM_LIB_PATH)/command/Hierarchy/HierarchyControl.c
+  $(TPM_LIB_PATH)/command/Hierarchy/CreatePrimary.c
+  $(TPM_LIB_PATH)/command/Hierarchy/HierarchyChangeAuth.c
+  $(TPM_LIB_PATH)/command/Hierarchy/ClearControl.c
+  $(TPM_LIB_PATH)/command/Hierarchy/ReadOnlyControl.c
+  $(TPM_LIB_PATH)/command/Hierarchy/SetPrimaryPolicy.c
+  $(TPM_LIB_PATH)/command/Misc/PP_Commands.c
+  $(TPM_LIB_PATH)/command/Misc/SetAlgorithmSet.c
+  $(TPM_LIB_PATH)/command/NVStorage/NV_Certify.c
+  $(TPM_LIB_PATH)/command/NVStorage/NV_ChangeAuth.c
+  $(TPM_LIB_PATH)/command/NVStorage/NV_DefineSpace.c
+  $(TPM_LIB_PATH)/command/NVStorage/NV_DefineSpace2.c
+  $(TPM_LIB_PATH)/command/NVStorage/NV_Extend.c
+  $(TPM_LIB_PATH)/command/NVStorage/NV_GlobalWriteLock.c
+  $(TPM_LIB_PATH)/command/NVStorage/NV_Increment.c
+  $(TPM_LIB_PATH)/command/NVStorage/NV_Read.c
+  $(TPM_LIB_PATH)/command/NVStorage/NV_ReadLock.c
+  $(TPM_LIB_PATH)/command/NVStorage/NV_ReadPublic.c
+  $(TPM_LIB_PATH)/command/NVStorage/NV_ReadPublic2.c
+  $(TPM_LIB_PATH)/command/NVStorage/NV_SetBits.c
+  $(TPM_LIB_PATH)/command/NVStorage/NV_UndefineSpace.c
+  $(TPM_LIB_PATH)/command/NVStorage/NV_UndefineSpaceSpecial.c
+  $(TPM_LIB_PATH)/command/NVStorage/NV_Write.c
+  $(TPM_LIB_PATH)/command/NVStorage/NV_WriteLock.c
+  $(TPM_LIB_PATH)/command/NVStorage/NV_spt.c
+  $(TPM_LIB_PATH)/command/Object/ActivateCredential.c
+  $(TPM_LIB_PATH)/command/Object/Create.c
+  $(TPM_LIB_PATH)/command/Object/CreateLoaded.c
+  $(TPM_LIB_PATH)/command/Object/Load.c
+  $(TPM_LIB_PATH)/command/Object/LoadExternal.c
+  $(TPM_LIB_PATH)/command/Object/MakeCredential.c
+  $(TPM_LIB_PATH)/command/Object/ObjectChangeAuth.c
+  $(TPM_LIB_PATH)/command/Object/Object_spt.c
+  $(TPM_LIB_PATH)/command/Object/ReadPublic.c
+  $(TPM_LIB_PATH)/command/Object/Unseal.c
+  $(TPM_LIB_PATH)/command/PCR/PCR_Allocate.c
+  $(TPM_LIB_PATH)/command/PCR/PCR_Event.c
+  $(TPM_LIB_PATH)/command/PCR/PCR_Extend.c
+  $(TPM_LIB_PATH)/command/PCR/PCR_Read.c
+  $(TPM_LIB_PATH)/command/PCR/PCR_Reset.c
+  $(TPM_LIB_PATH)/command/PCR/PCR_SetAuthValue.c
+  $(TPM_LIB_PATH)/command/PCR/PCR_SetAuthPolicy.c
+  $(TPM_LIB_PATH)/command/Random/GetRandom.c
+  $(TPM_LIB_PATH)/command/Random/StirRandom.c
+  $(TPM_LIB_PATH)/command/Session/PolicyRestart.c
+  $(TPM_LIB_PATH)/command/Session/StartAuthSession.c
+  $(TPM_LIB_PATH)/command/Signature/Sign.c
+  $(TPM_LIB_PATH)/command/Signature/VerifySignature.c
+  $(TPM_LIB_PATH)/command/Startup/Shutdown.c
+  $(TPM_LIB_PATH)/command/Startup/Startup.c
+  $(TPM_LIB_PATH)/command/Symmetric/EncryptDecrypt.c
+  $(TPM_LIB_PATH)/command/Symmetric/EncryptDecrypt2.c
+  $(TPM_LIB_PATH)/command/Symmetric/EncryptDecrypt_spt.c
+  $(TPM_LIB_PATH)/command/Symmetric/HMAC.c
+  $(TPM_LIB_PATH)/command/Symmetric/Hash.c
+  $(TPM_LIB_PATH)/command/Symmetric/MAC.c
+  $(TPM_LIB_PATH)/command/Testing/GetTestResult.c
+  $(TPM_LIB_PATH)/command/Testing/IncrementalSelfTest.c
+  $(TPM_LIB_PATH)/command/Testing/SelfTest.c
+  $(TPM_LIB_PATH)/crypt/AlgorithmTests.c
+  $(TPM_LIB_PATH)/crypt/CryptCmac.c
+  $(TPM_LIB_PATH)/crypt/CryptEccCrypt.c
+  $(TPM_LIB_PATH)/crypt/CryptEccData.c
+  $(TPM_LIB_PATH)/crypt/CryptEccKeyExchange.c
+  $(TPM_LIB_PATH)/crypt/CryptEccMain.c
+  $(TPM_LIB_PATH)/crypt/CryptEccSignature.c
+  $(TPM_LIB_PATH)/crypt/CryptHash.c
+  $(TPM_LIB_PATH)/crypt/CryptPrime.c
+  $(TPM_LIB_PATH)/crypt/CryptPrimeSieve.c
+  $(TPM_LIB_PATH)/crypt/CryptRand.c
+  $(TPM_LIB_PATH)/crypt/CryptRsa.c
+  $(TPM_LIB_PATH)/crypt/CryptSelfTest.c
+  $(TPM_LIB_PATH)/crypt/CryptSmac.c
+  $(TPM_LIB_PATH)/crypt/CryptSym.c
+  $(TPM_LIB_PATH)/crypt/CryptUtil.c
+  $(TPM_LIB_PATH)/crypt/RsaKeyCache.c
+  $(TPM_LIB_PATH)/crypt/PrimeData.c
+  $(TPM_LIB_PATH)/crypt/Ticket.c
+  $(TPM_LIB_PATH)/crypt/ecc/TpmEcc_Signature_ECDAA.c
+  $(TPM_LIB_PATH)/crypt/ecc/TpmEcc_Signature_ECDSA.c
+  $(TPM_LIB_PATH)/crypt/ecc/TpmEcc_Signature_SM2.c
+  $(TPM_LIB_PATH)/crypt/ecc/TpmEcc_Signature_Schnorr.c
+  $(TPM_LIB_PATH)/crypt/ecc/TpmEcc_Signature_Util.c
+  $(TPM_LIB_PATH)/crypt/ecc/TpmEcc_Util.c
+  $(TPM_LIB_PATH)/crypt/math/TpmMath_Debug.c
+  $(TPM_LIB_PATH)/crypt/math/TpmMath_Util.c
+  $(TPM_LIB_PATH)/events/_TPM_Hash_Data.c
+  $(TPM_LIB_PATH)/events/_TPM_Hash_End.c
+  $(TPM_LIB_PATH)/events/_TPM_Hash_Start.c
+  $(TPM_LIB_PATH)/events/_TPM_Init.c
+  $(TPM_LIB_PATH)/main/CommandDispatcher.c
+  $(TPM_LIB_PATH)/main/ExecCommand.c
+  $(TPM_LIB_PATH)/main/SessionProcess.c
+  $(TPM_LIB_PATH)/subsystem/CommandAudit.c
+  $(TPM_LIB_PATH)/subsystem/DA.c
+  $(TPM_LIB_PATH)/subsystem/Hierarchy.c
+  $(TPM_LIB_PATH)/subsystem/NvDynamic.c
+  $(TPM_LIB_PATH)/subsystem/NvReserved.c
+  $(TPM_LIB_PATH)/subsystem/Object.c
+  $(TPM_LIB_PATH)/subsystem/PCR.c
+  $(TPM_LIB_PATH)/subsystem/PP.c
+  $(TPM_LIB_PATH)/subsystem/Session.c
+  $(TPM_LIB_PATH)/subsystem/Time.c
+  $(TPM_LIB_PATH)/support/AlgorithmCap.c
+  $(TPM_LIB_PATH)/support/Bits.c
+  $(TPM_LIB_PATH)/support/CommandCodeAttributes.c
+  $(TPM_LIB_PATH)/support/Entity.c
+  $(TPM_LIB_PATH)/support/Global.c
+  $(TPM_LIB_PATH)/support/Handle.c
+  $(TPM_LIB_PATH)/support/IoBuffers.c
+  $(TPM_LIB_PATH)/support/Locality.c
+  $(TPM_LIB_PATH)/support/Manufacture.c
+  $(TPM_LIB_PATH)/support/Marshal.c
+  $(TPM_LIB_PATH)/support/MathOnByteBuffers.c
+  $(TPM_LIB_PATH)/support/Memory.c
+  $(TPM_LIB_PATH)/support/Power.c
+  $(TPM_LIB_PATH)/support/PropertyCap.c
+  $(TPM_LIB_PATH)/support/Response.c
+  $(TPM_LIB_PATH)/support/ResponseCodeProcessing.c
+  $(TPM_LIB_PATH)/support/SecChannel.c
+  $(TPM_LIB_PATH)/support/TableDrivenMarshal.c
+  $(TPM_LIB_PATH)/support/TableMarshalData.c
+  $(TPM_LIB_PATH)/support/TpmFail.c
+  $(TPM_LIB_PATH)/support/TpmSizeChecks.c
+
+  $(TPM_CONF_PATH)/TpmVendorCommandHandlers/Vendor_TCG_Test.c
+
+  $(TPM_CRYPTOLIB_PATH)/TpmBigNum/BnConvert.c
+  $(TPM_CRYPTOLIB_PATH)/TpmBigNum/BnEccConstants.c
+  $(TPM_CRYPTOLIB_PATH)/TpmBigNum/BnMath.c
+  $(TPM_CRYPTOLIB_PATH)/TpmBigNum/BnMemory.c
+  $(TPM_CRYPTOLIB_PATH)/TpmBigNum/BnUtil.c
+  $(TPM_CRYPTOLIB_PATH)/TpmBigNum/TpmBigNumThunks.c
+
+  # using some plat functions as they are.
+  $(TPM_PLAT_PATH)/Cancel.c
+  $(TPM_PLAT_PATH)/Init.c
+  $(TPM_PLAT_PATH)/LocalityPlat.c
+  $(TPM_PLAT_PATH)/NVVirtual.c
+  $(TPM_PLAT_PATH)/PPPlat.c
+  $(TPM_PLAT_PATH)/PlatformACT.c
+  $(TPM_PLAT_PATH)/PlatformData.c
+  $(TPM_PLAT_PATH)/PlatformPcr.c
+  $(TPM_PLAT_PATH)/PowerPlat.c
+  $(TPM_PLAT_PATH)/SelfTest.c
+
+[Packages]
+  CryptoPkg/CryptoPkg.dec
+  MdePkg/MdePkg.dec
+  TcgTpmPkg/TcgTpmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseCryptLib
+  DebugLib
+  RngLib
+  OpensslLib
+  PlatformTpmLib
+
+[BuildOptions]
+  GCC:*_*_*_CC_FLAGS = -DGCC
+  GCC:*_*_*_CC_FLAGS = $(TPM_LIB_OPTIONS_INCLUDE) $(TPM_LIB_WARNING_SUPRESS_GCC)
