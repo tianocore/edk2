@@ -9,6 +9,7 @@
   Implementation based off NVMe spec revision 1.4c.
 
   Copyright (c) Microsoft Corporation.<BR>
+  Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -435,10 +436,15 @@ NvmExpressMediaPurge (
   }
 
   Device       = NVME_DEVICE_PRIVATE_DATA_FROM_MEDIA_SANITIZE (This);
-  NamespaceId  = Device->NamespaceId;
   Media        = &Device->Media;
   SaniCap      = Device->Controller->ControllerData->Sanicap;
   NoDeallocate = 0;
+
+  //
+  // NSID field is not used for sanitize command
+  // Clear to 0 as per spec 1.4c section 4.2 - figure 106:NSID (07:04)
+  //
+  NamespaceId = 0;
 
   if ((MediaId != Media->MediaId) || (!Media->MediaPresent)) {
     return EFI_MEDIA_CHANGED;
