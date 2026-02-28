@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SMBIOS_STANDARD_H__
-#define __SMBIOS_STANDARD_H__
+#pragma once
 
 ///
 /// Reference SMBIOS 2.6, chapter 3.1.2.
@@ -32,7 +31,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 ///
 /// Reference SMBIOS 3.6, chapter 6.1.2.
-/// Unless otherwise specified, when referring to another structure’s handle, the value
+/// Unless otherwise specified, when referring to another structure's handle, the value
 /// 0FFFFh is used to indicate that the referenced handle is not applicable or does not
 /// exist.
 ///
@@ -3098,5 +3097,3 @@ typedef union {
 } SMBIOS_STRUCTURE_POINTER;
 
 #pragma pack()
-
-#endif

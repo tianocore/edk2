@@ -42,8 +42,8 @@ PLATFORMFILE=
 LAST_ARG=
 RUN_EMULATOR=no
 CLEAN_TYPE=none
-TARGET_TOOLS=GCC48
-NETWORK_SUPPORT=
+TARGET_TOOLS=GCC
+NETWORK_SUPPORT=-D NETWORK_ENABLE=FALSE
 BUILD_NEW_SHELL=
 BUILD_FAT=
 HOST_PROCESSOR=X64
@@ -87,15 +87,9 @@ case `uname` in
 
     gcc_version=$(gcc -v 2>&1 | tail -1 | awk '{print $3}')
     case $gcc_version in
-      [1-3].*|4.[0-7].*)
-        echo EmulatorPkg requires GCC4.8 or later
+      [1-7].*)
+        echo EmulatorPkg requires GCC8 or later
         exit 1
-        ;;
-      4.8.*)
-        TARGET_TOOLS=GCC48
-        ;;
-      4.9.*|6.[0-2].*)
-        TARGET_TOOLS=GCC49
         ;;
       *)
         TARGET_TOOLS=GCC
@@ -163,30 +157,6 @@ fi
 
 BUILD_OUTPUT_DIR=$WORKSPACE/Build/Emulator$PROCESSOR
 
-case $PROCESSOR in
-  IA32)
-    ARCH_SIZE=32
-    LIB_NAMES="ld-linux.so.2 libdl.so.2 crt1.o crti.o crtn.o"
-    LIB_SEARCH_PATHS="/usr/lib/i386-linux-gnu /usr/lib32 /lib32 /usr/lib /lib"
-    ;;
-  X64)
-    ARCH_SIZE=64
-    LIB_NAMES="ld-linux-x86-64.so.2 libdl.so.2 crt1.o crti.o crtn.o"
-    LIB_SEARCH_PATHS="/usr/lib/x86_64-linux-gnu /usr/lib64 /lib64 /usr/lib /lib"
-    ;;
-esac
-
-for libname in $LIB_NAMES
-do
-  for dirname in $LIB_SEARCH_PATHS
-  do
-    if [ -e $dirname/$libname ]; then
-      export HOST_DLINK_PATHS="$HOST_DLINK_PATHS $dirname/$libname"
-      break
-    fi
-  done
-done
-
 PLATFORMFILE=$WORKSPACE/EmulatorPkg/EmulatorPkg.dsc
 BUILD_DIR="$BUILD_OUTPUT_DIR/${BUILDTARGET}_$TARGET_TOOLS"
 BUILD_ROOT_ARCH=$BUILD_DIR/$PROCESSOR
@@ -242,10 +212,10 @@ esac
 # Build the edk2 EmulatorPkg
 #
 if [[ $HOST_TOOLS == $TARGET_TOOLS ]]; then
-  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc $BUILD_OPTIONS -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS -D BUILD_$ARCH_SIZE $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3
+  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc $BUILD_OPTIONS -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3
 else
-  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc $BUILD_OPTIONS -a $PROCESSOR -b $BUILDTARGET -t $HOST_TOOLS  -D BUILD_$ARCH_SIZE -D SKIP_MAIN_BUILD -n 3 modules
-  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc $BUILD_OPTIONS -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS -D BUILD_$ARCH_SIZE $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3
+  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc $BUILD_OPTIONS -a $PROCESSOR -b $BUILDTARGET -t $HOST_TOOLS  -D SKIP_MAIN_BUILD -n 3 modules
+  build -p $WORKSPACE/EmulatorPkg/EmulatorPkg.dsc $BUILD_OPTIONS -a $PROCESSOR -b $BUILDTARGET -t $TARGET_TOOLS $NETWORK_SUPPORT $BUILD_NEW_SHELL $BUILD_FAT -n 3
   cp "$BUILD_OUTPUT_DIR/${BUILDTARGET}_$HOST_TOOLS/$PROCESSOR/Host" $BUILD_ROOT_ARCH
 fi
 exit $?

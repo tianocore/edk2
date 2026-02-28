@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _MDEPKG_TOKEN_SPACE_GUID_H_
-#define _MDEPKG_TOKEN_SPACE_GUID_H_
+#pragma once
 
 #define MDEPKG_TOKEN_SPACE_GUID \
   { \
@@ -15,5 +14,3 @@
   }
 
 extern EFI_GUID  gEfiMdePkgTokenSpaceGuid;
-
-#endif

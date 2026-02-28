@@ -34,6 +34,8 @@
 #include "ArmFfaRxTxMap.h"
 
 STATIC EFI_EVENT  mFfaExitBootServiceEvent;
+STATIC UINT16     mPartId;
+STATIC BOOLEAN    mIsFfaSupported;
 
 /**
   Unmap RX/TX buffer on Exit Boot Service.
@@ -78,16 +80,13 @@ ArmFfaDxeLibConstructor (
   UINTN                      Property1;
   UINTN                      Property2;
 
-  Status = ArmFfaLibCommonInit ();
+  Status = ArmFfaLibCommonInit (&mPartId, &mIsFfaSupported);
   if (EFI_ERROR (Status)) {
-    if (Status == EFI_UNSUPPORTED) {
+    if (!mIsFfaSupported) {
       /*
-       * EFI_UNSUPPORTED return from ArmFfaLibCommonInit() means
-       * FF-A interface doesn't support.
-       * However, It doesn't make failure of loading driver/library instance
-       * (i.e) ArmPkg's MmCommunication Dxe/PEI Driver uses as well as SpmMm.
-       * So If FF-A is not supported the the MmCommunication Dxe/PEI falls
-       * back to SpmMm.
+       * FF-A being unsupported doesn't mean a failure of loading the driver/library
+       * instance (i.e) ArmPkg's MmCommunication Dxe/PEI Driver uses as well as SpmMm.
+       * So If FF-A is not supported the the MmCommunication Dxe/PEI falls back to SpmMm.
        * For this case, return EFI_SUCCESS.
        */
       return EFI_SUCCESS;
@@ -193,4 +192,56 @@ ErrorHandler:
   }
 
   return Status;
+}
+
+/**
+  Return partition or VM ID
+
+  @param[out] PartId  The partition or VM ID
+
+  @retval EFI_SUCCESS  Partition ID or VM ID returned
+  @retval Others       Errors
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibGetPartId (
+  OUT UINT16  *PartId
+  )
+{
+  if (PartId != NULL) {
+    *PartId = mPartId;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Check FF-A support or not.
+
+  @retval TRUE                   Supported
+  @retval FALSE                  Not supported
+
+**/
+BOOLEAN
+EFIAPI
+IsFfaSupported (
+  IN VOID
+  )
+{
+  return mIsFfaSupported;
+}
+
+/**
+  Callback for when Unmap is called to handle any post unmap
+  functionality.
+
+**/
+VOID
+EFIAPI
+UnmapCallback (
+  IN VOID
+  )
+{
+  // Do nothing
 }

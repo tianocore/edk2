@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef RNG_ALGORITHM_GUID_H_
-#define RNG_ALGORITHM_GUID_H_
+#pragma once
 
 ///
 /// The implementation of a Random Number Generator might be unsafe, when using
@@ -19,5 +18,3 @@
   }
 
 extern EFI_GUID  gEdkiiRngAlgorithmUnSafe;
-
-#endif // #ifndef RNG_ALGORITHM_GUID_H_

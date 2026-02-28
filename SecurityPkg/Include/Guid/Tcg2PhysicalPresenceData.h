@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __TCG2_PHYSICAL_PRESENCE_DATA_GUID_H__
-#define __TCG2_PHYSICAL_PRESENCE_DATA_GUID_H__
+#pragma once
 
 #define EFI_TCG2_PHYSICAL_PRESENCE_DATA_GUID \
   { \
@@ -36,5 +35,3 @@ typedef struct {
 } EFI_TCG2_PHYSICAL_PRESENCE_FLAGS;
 
 extern EFI_GUID  gEfiTcg2PhysicalPresenceGuid;
-
-#endif

@@ -7,11 +7,8 @@
 
 **/
 
-#ifndef __GUID_HOB_FSP_EAS_GUID__
-#define __GUID_HOB_FSP_EAS_GUID__
+#pragma once
 
 extern EFI_GUID  gFspBootLoaderTolumHobGuid;
 extern EFI_GUID  gFspReservedMemoryResourceHobGuid;
 extern EFI_GUID  gFspNonVolatileStorageHobGuid;
-
-#endif

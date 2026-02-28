@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef __DISPLAY_PROGRESS_LIB__
-#define __DISPLAY_PROGRESS_LIB__
+#pragma once
 
 #include <Protocol/GraphicsOutput.h>
 
@@ -44,5 +43,3 @@ DisplayUpdateProgress (
   IN UINTN                                Completion,
   IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  *Color       OPTIONAL
   );
-
-#endif

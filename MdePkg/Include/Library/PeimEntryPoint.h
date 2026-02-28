@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __MODULE_ENTRY_POINT_H__
-#define __MODULE_ENTRY_POINT_H__
+#pragma once
 
 ///
 /// Declare the EFI/UEFI Specification Revision to which this driver is implemented
@@ -97,5 +96,3 @@ ProcessModuleEntryPointList (
   IN EFI_PEI_FILE_HANDLE     FileHandle,
   IN CONST EFI_PEI_SERVICES  **PeiServices
   );
-
-#endif

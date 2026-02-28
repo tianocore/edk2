@@ -1,13 +1,12 @@
 /** @file
   Public include file for PageTableLib library.
 
-  Copyright (c) 2022 - 2023, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2022 - 2026, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef PAGE_TABLE_LIB_H_
-#define PAGE_TABLE_LIB_H_
+#pragma once
 
 typedef union {
   struct {
@@ -137,8 +136,6 @@ EFIAPI
 PageTableParse (
   IN     UINTN           PageTable,
   IN     PAGING_MODE     PagingMode,
-  IN     IA32_MAP_ENTRY  *Map,
+  OUT    IA32_MAP_ENTRY  *Map,
   IN OUT UINTN           *MapCount
   );
-
-#endif

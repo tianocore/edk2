@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef SPDM_LIB_CONFIG_H
-#define SPDM_LIB_CONFIG_H
+#pragma once
 
 /* Enables assertions and debug printing. When `LIBSPDM_DEBUG_ENABLE` is defined it overrides or
  * sets the values of `LIBSPDM_DEBUG_PRINT_ENABLE`, `LIBSPDM_DEBUG_ASSERT_ENABLE`, and
@@ -390,5 +389,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef LIBSPDM_CHECK_SPDM_CONTEXT
 #define LIBSPDM_CHECK_SPDM_CONTEXT  1
 #endif
-
-#endif /* SPDM_LIB_CONFIG_H */

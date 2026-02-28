@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __INTERNAL_SMBUS_LIB_H_
-#define __INTERNAL_SMBUS_LIB_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -75,5 +74,3 @@ SmbusLibConstructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
-
-#endif

@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __PEI_MP_SERVICES_PPI_H__
-#define __PEI_MP_SERVICES_PPI_H__
+#pragma once
 
 #include <Protocol/MpService.h>
 
@@ -273,5 +272,3 @@ struct _EFI_PEI_MP_SERVICES_PPI {
 };
 
 extern EFI_GUID  gEfiPeiMpServicesPpiGuid;
-
-#endif

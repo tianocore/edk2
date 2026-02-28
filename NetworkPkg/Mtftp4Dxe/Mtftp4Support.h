@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_MTFTP4_SUPPORT_H__
-#define __EFI_MTFTP4_SUPPORT_H__
+#pragma once
 
 //
 // The structure representing a range of block numbers, [Start, End].
@@ -193,5 +192,3 @@ Mtftp4OnTimerTick (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   );
-
-#endif

@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __HII_FONT_H__
-#define __HII_FONT_H__
+#pragma once
 
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/HiiImage.h>
@@ -460,5 +459,3 @@ struct _EFI_HII_FONT_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiHiiFontProtocolGuid;
-
-#endif

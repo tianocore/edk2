@@ -3,9 +3,8 @@
 # Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
-# In Unix-like environment, the build tools's source is required and need to be compiled
-# firstly, please reference https://github.com/tianocore/tianocore.github.io/wiki/SourceForge-to-Github-Quick-Start
-# to get how to setup build tool.
+# Reference https://www.tianocore.org/tianocore-wiki.github.io/build-tooling/environment-setup/buildtool_setup_guide.html
+# to understand how tools are setup.
 #
 # Setup the environment for unix-like systems running a bash-like shell.
 # This file must be "sourced" not merely executed. For example: ". edksetup.sh"

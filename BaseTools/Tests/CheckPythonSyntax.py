@@ -10,6 +10,7 @@
 # Import Modules
 #
 import os
+import tempfile
 import unittest
 import py_compile
 
@@ -22,7 +23,9 @@ class Tests(TestTools.BaseToolsTest):
 
     def SingleFileTest(self, filename):
         try:
-            py_compile.compile(filename, doraise=True)
+            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                py_compile.compile(filename, cfile=temp_file.name, doraise=True)
+                os.unlink(temp_file.name)
         except Exception as e:
             self.fail('syntax error: %s, Error is %s' % (filename, str(e)))
 

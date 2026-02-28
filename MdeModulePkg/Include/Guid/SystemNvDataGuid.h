@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SYSTEM_NV_DATA_GUID_H__
-#define __SYSTEM_NV_DATA_GUID_H__
+#pragma once
 
 #define EFI_SYSTEM_NV_DATA_FV_GUID \
   {0xfff12b8d, 0x7696, 0x4c8b, {0xa9, 0x85, 0x27, 0x47, 0x7, 0x5b, 0x4f, 0x50} }
@@ -107,5 +106,3 @@ typedef struct {
       sizeof (EFI_FAULT_TOLERANT_WRITE_HEADER) + (UINTN) (NumberOfWrites) * \
       (sizeof (EFI_FAULT_TOLERANT_WRITE_RECORD) + (UINTN) PrivateDataSize) \
     )
-
-#endif

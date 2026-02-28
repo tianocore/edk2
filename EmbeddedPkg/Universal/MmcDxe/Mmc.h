@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __MMC_H
-#define __MMC_H
+#pragma once
 
 #include <Uefi.h>
 
@@ -518,5 +517,3 @@ VOID
 PrintCID (
   IN UINT32  *Cid
   );
-
-#endif

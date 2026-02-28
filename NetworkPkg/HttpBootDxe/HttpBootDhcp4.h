@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_UEFI_HTTP_BOOT_DHCP4_H__
-#define __EFI_UEFI_HTTP_BOOT_DHCP4_H__
+#pragma once
 
 #define HTTP_BOOT_DHCP4_OPTION_MAX_NUM   16
 #define HTTP_BOOT_DHCP4_OPTION_MAX_SIZE  312
@@ -250,5 +249,3 @@ HttpBootRegisterIp4Dns (
   IN UINTN                   DataLength,
   IN VOID                    *DnsServerData
   );
-
-#endif

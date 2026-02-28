@@ -171,6 +171,14 @@
   $(OPENSSL_PATH)/crypto/bn/bn_x931p.c
   $(OPENSSL_PATH)/crypto/buffer/buf_err.c
   $(OPENSSL_PATH)/crypto/buffer/buffer.c
+  $(OPENSSL_PATH)/crypto/camellia/camellia.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_cbc.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_cfb.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_ctr.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_ecb.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_misc.c
+  $(OPENSSL_PATH)/crypto/camellia/cmll_ofb.c
+  $(OPENSSL_PATH)/crypto/cmac/cmac.c
   $(OPENSSL_PATH)/crypto/comp/c_brotli.c
   $(OPENSSL_PATH)/crypto/comp/c_zlib.c
   $(OPENSSL_PATH)/crypto/comp/c_zstd.c
@@ -275,6 +283,7 @@
   $(OPENSSL_PATH)/crypto/evp/e_aes_cbc_hmac_sha256.c
   $(OPENSSL_PATH)/crypto/evp/e_aria.c
   $(OPENSSL_PATH)/crypto/evp/e_bf.c
+  $(OPENSSL_PATH)/crypto/evp/e_camellia.c
   $(OPENSSL_PATH)/crypto/evp/e_cast.c
   $(OPENSSL_PATH)/crypto/evp/e_chacha20_poly1305.c
   $(OPENSSL_PATH)/crypto/evp/e_des.c
@@ -635,6 +644,8 @@
   $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_aes_xts.c
   $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_aes_xts_fips.c
   $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_aes_xts_hw.c
+  $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_camellia.c
+  $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_camellia_hw.c
   $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_cts.c
   $(OPENSSL_PATH)/providers/implementations/ciphers/cipher_null.c
   $(OPENSSL_PATH)/providers/implementations/digests/md5_prov.c
@@ -677,6 +688,7 @@
   $(OPENSSL_PATH)/providers/implementations/keymgmt/kdf_legacy_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/mac_legacy_kmgmt.c
   $(OPENSSL_PATH)/providers/implementations/keymgmt/rsa_kmgmt.c
+  $(OPENSSL_PATH)/providers/implementations/macs/cmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/gmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/hmac_prov.c
   $(OPENSSL_PATH)/providers/implementations/macs/kmac_prov.c
@@ -837,8 +849,6 @@
   GCC:*_*_LOONGARCH64_CC_FLAGS = $(OPENSSL_FLAGS) -Wno-error=maybe-uninitialized -Wno-format -Wno-error=unused-but-set-variable
   GCC:*_CLANGDWARF_*_CC_FLAGS = -std=c99 -Wno-error=uninitialized -Wno-error=incompatible-pointer-types -Wno-error=pointer-sign -Wno-error=implicit-function-declaration -Wno-error=ignored-pragma-optimize
   GCC:*_CLANGPDB_*_CC_FLAGS = -U_WIN32 -UWIN32 -U_WIN64 -U_MSC_VER -std=c99 -Wno-error=uninitialized -Wno-error=incompatible-pointer-types -Wno-error=pointer-sign -Wno-error=implicit-function-declaration -Wno-error=ignored-pragma-optimize -Wno-error=unused-function
-  # Revisit after switching to 3.0 branch
-  GCC:*_GCC5_*_CC_FLAGS    = -Wno-unused-but-set-variable
 
   # suppress the following warnings in openssl so we don't break the build with warnings-as-errors:
   # 1295: Deprecated declaration <entity> - give arg types

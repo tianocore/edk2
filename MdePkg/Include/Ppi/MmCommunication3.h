@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef MM_COMMUNICATION3_PPI_H_
-#define MM_COMMUNICATION3_PPI_H_
+#pragma once
 
 #include <Pi/PiMultiPhase.h>
 
@@ -50,5 +49,3 @@ struct _EFI_PEI_MM_COMMUNICATION3_PPI {
 };
 
 extern EFI_GUID  gEfiPeiMmCommunication3PpiGuid;
-
-#endif

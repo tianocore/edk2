@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef PEILESS_STARTUP_LIB_H_
-#define PEILESS_STARTUP_LIB_H_
+#pragma once
 
 #include <Library/BaseLib.h>
 #include <Uefi/UefiBaseType.h>
@@ -30,5 +29,3 @@ EFIAPI
 PeilessStartup (
   IN VOID  *Context
   );
-
-#endif

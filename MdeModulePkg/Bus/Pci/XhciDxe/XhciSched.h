@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_XHCI_SCHED_H_
-#define _EFI_XHCI_SCHED_H_
+#pragma once
 
 #define XHC_URB_SIG                   SIGNATURE_32 ('U', 'S', 'B', 'R')
 #define XHC_INIT_DEVICE_SLOT_RETRIES  1
@@ -1479,5 +1478,3 @@ XhcCreateTransferTrb (
   IN USB_XHCI_INSTANCE  *Xhc,
   IN URB                *Urb
   );
-
-#endif

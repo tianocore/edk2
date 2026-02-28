@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __PRINT_LIB_INTERNAL_H__
-#define __PRINT_LIB_INTERNAL_H__
+#pragma once
 
 #include <Base.h>
 #include <Library/PrintLib.h>
@@ -266,5 +265,3 @@ BasePrintLibConvertValueToStringS (
   IN UINTN      Width,
   IN UINTN      Increment
   );
-
-#endif

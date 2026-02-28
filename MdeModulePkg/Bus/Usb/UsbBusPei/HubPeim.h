@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PEI_HUB_PEIM_H_
-#define _PEI_HUB_PEIM_H_
+#pragma once
 
 //
 // Hub feature numbers
@@ -251,5 +250,3 @@ PeiResetHubPort (
   IN PEI_USB_IO_PPI    *UsbIoPpi,
   IN UINT8             PortNum
   );
-
-#endif

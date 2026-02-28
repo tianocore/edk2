@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _NVME_HCI_H_
-#define _NVME_HCI_H_
+#pragma once
 
 #define NVME_BAR  0
 
@@ -65,5 +64,3 @@ NvmeIdentifyNamespace (
   IN UINT32                        NamespaceId,
   IN VOID                          *Buffer
   );
-
-#endif

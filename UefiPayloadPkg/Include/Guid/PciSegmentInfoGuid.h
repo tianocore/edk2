@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef UPL_PCI_SEGMENT_INFO_GUID_H_
-#define UPL_PCI_SEGMENT_INFO_GUID_H_
+#pragma once
 
 ///
 /// UPL Pcie Segment Information Hob GUID
@@ -28,5 +27,3 @@ typedef struct {
 #pragma pack()
 
 #define UNIVERSAL_PAYLOAD_PCI_SEGMENT_INFO_REVISION  1
-
-#endif

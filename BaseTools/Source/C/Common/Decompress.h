@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_DECOMPRESS_H
-#define _EFI_DECOMPRESS_H
+#pragma once
 
 #include <Common/UefiBaseTypes.h>
 
@@ -131,5 +130,3 @@ Extract (
      OUT  UINT32  *DstSize,
   IN      UINTN   Algorithm
   );
-
-#endif

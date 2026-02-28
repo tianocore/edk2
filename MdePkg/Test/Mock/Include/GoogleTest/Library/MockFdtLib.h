@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_FDT_LIB_H_
-#define MOCK_FDT_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -174,5 +173,3 @@ struct MockFdtLib {
      IN UINT32  BufferSize)
     );
 };
-
-#endif

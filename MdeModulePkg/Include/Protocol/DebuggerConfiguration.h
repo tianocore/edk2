@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_DEBUGGER_CONFIGURATION_H__
-#define __EFI_DEBUGGER_CONFIGURATION_H__
+#pragma once
 
 #define EFI_DEBUGGER_CONFIGURATION_PROTOCOL_GUID \
   { 0x577d959c, 0xe967, 0x4546, 0x86, 0x20, 0xc7, 0x78, 0xfa, 0xe5, 0xda, 0x5 }
@@ -21,5 +20,3 @@ typedef struct _EFI_DEBUGGER_CONFIGURATION_PROTOCOL {
 } EFI_DEBUGGER_CONFIGURATION_PROTOCOL;
 
 extern EFI_GUID  gEfiDebuggerConfigurationProtocolGuid;
-
-#endif

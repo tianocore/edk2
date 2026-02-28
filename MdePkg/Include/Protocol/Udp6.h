@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __EFI_UDP6_PROTOCOL_H__
-#define __EFI_UDP6_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/Ip6.h>
 
@@ -570,5 +569,3 @@ struct _EFI_UDP6_PROTOCOL {
 
 extern EFI_GUID  gEfiUdp6ServiceBindingProtocolGuid;
 extern EFI_GUID  gEfiUdp6ProtocolGuid;
-
-#endif

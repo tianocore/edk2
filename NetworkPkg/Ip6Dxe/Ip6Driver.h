@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_IP6_DRIVER_H__
-#define __EFI_IP6_DRIVER_H__
+#pragma once
 
 extern EFI_DRIVER_BINDING_PROTOCOL   gIp6DriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL   gIp6ComponentName;
@@ -182,5 +181,3 @@ Ip6ServiceBindingDestroyChild (
   IN EFI_SERVICE_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                    ChildHandle
   );
-
-#endif

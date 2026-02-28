@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef VIRT_NOR_FLASH_DEVICE_LIB_H
-#define VIRT_NOR_FLASH_DEVICE_LIB_H
+#pragma once
 
 // Each command must be sent simultaneously to both chips,
 // i.e. at the lower 16 bits AND at the higher 16 bits
@@ -122,5 +121,3 @@ EFIAPI
 NorFlashReset (
   IN  UINTN  DeviceBaseAddress
   );
-
-#endif /* VIRT_NOR_FLASH_DEVICE_LIB_H */

@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _GRAPHICS_OUTPUT_DXE_H_
-#define _GRAPHICS_OUTPUT_DXE_H_
+#pragma once
+
 #include <PiDxe.h>
 
 #include <IndustryStandard/Pci.h>
@@ -51,4 +51,3 @@ typedef struct {
 
 extern EFI_COMPONENT_NAME_PROTOCOL   mGraphicsOutputComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  mGraphicsOutputComponentName2;
-#endif

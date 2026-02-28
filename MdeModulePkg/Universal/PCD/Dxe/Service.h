@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PCD_DXE_SERVICE_H_
-#define _PCD_DXE_SERVICE_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Guid/PcdDataBaseHobGuid.h>
@@ -1189,5 +1188,3 @@ extern  EFI_GUID  **TmpTokenSpaceBuffer;
 extern  UINTN     TmpTokenSpaceBufferCount;
 
 extern EFI_LOCK  mPcdDatabaseLock;
-
-#endif

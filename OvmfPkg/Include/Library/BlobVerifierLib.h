@@ -10,8 +10,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef BLOB_VERIFIER_LIB_H_
-#define BLOB_VERIFIER_LIB_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 #include <Base.h>
@@ -37,5 +36,3 @@ VerifyBlob (
   IN  UINT32        BufSize,
   IN  EFI_STATUS    FetchStatus
   );
-
-#endif

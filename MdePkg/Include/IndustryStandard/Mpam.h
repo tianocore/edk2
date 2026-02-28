@@ -18,8 +18,7 @@
     - SMMU - Arm System Memory Management Unit
  **/
 
-#ifndef MPAM_H_
-#define MPAM_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -242,5 +241,3 @@ typedef struct {
 } EFI_ACPI_MPAM_FUNCTIONAL_DEPENDENCY_DESCRIPTOR;
 
 #pragma pack()
-
-#endif

@@ -9,8 +9,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef ONIGURUMA_UEFI_PORT_H
-#define ONIGURUMA_UEFI_PORT_H
+#pragma once
 
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PrintLib.h>
@@ -128,5 +127,3 @@ free (
   );
 
 #define exit(n)  ASSERT(FALSE);
-
-#endif // !ONIGURUMA_UEFI_PORT_H

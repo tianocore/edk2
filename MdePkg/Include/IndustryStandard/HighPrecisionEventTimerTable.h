@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _HIGH_PRECISION_EVENT_TIMER_TABLE_H_
-#define _HIGH_PRECISION_EVENT_TIMER_TABLE_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -57,5 +56,3 @@ typedef struct {
 #define EFI_ACPI_64KB_PAGE_PROTECTION  2
 
 #pragma pack()
-
-#endif

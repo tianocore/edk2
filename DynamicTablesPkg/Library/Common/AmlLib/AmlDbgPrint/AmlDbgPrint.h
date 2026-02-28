@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef AML_PRINT_H_
-#define AML_PRINT_H_
+#pragma once
 
 /* This header file does not include internal Node definition,
    i.e. AML_ROOT_NODE, AML_OBJECT_NODE, etc. The node definitions
@@ -174,5 +173,3 @@ AmlDbgPrintNameSpace (
 #define AMLDBG_PRINT_NAMESPACE(RootNode)
 
 #endif // MDEPKG_NDEBUG
-
-#endif // AML_PRINT_H_

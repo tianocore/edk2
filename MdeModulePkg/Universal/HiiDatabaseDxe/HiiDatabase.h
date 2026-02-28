@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __HII_DATABASE_PRIVATE_H__
-#define __HII_DATABASE_PRIVATE_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -2336,5 +2335,3 @@ FindQuestionDefaultSetting (
 //
 extern EFI_EVENT  gHiiKeyboardLayoutChanged;
 extern BOOLEAN    gExportAfterReadyToBoot;
-
-#endif
