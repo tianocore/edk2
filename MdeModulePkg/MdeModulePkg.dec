@@ -712,6 +712,10 @@
   ## Include/Protocol/NonDiscoverableDevice.h
   gEdkiiNonDiscoverableDeviceProtocolGuid = { 0x0d51905b, 0xb77e, 0x452a, {0xa2, 0xc0, 0xec, 0xa0, 0xcc, 0x8d, 0x51, 0x4a } }
 
+  ## Include/Protocol/NonDiscoverableDeviceUniqueId.h
+  # This protocol allows platforms to configure a UniqueId for the GetLocation implementation for NonDiscoverablePciDeviceDxe
+  gEdkiiNonDiscoverableDeviceUniqueIdProtocolGuid = { 0xD60D0E74, 0x5C4E, 0x4D45, { 0x9F, 0xE0, 0x2A, 0x3E, 0x4F, 0x9D, 0x55, 0xC1 } }
+
   ## Include/Protocol/IoMmu.h
   gEdkiiIoMmuProtocolGuid = { 0x4e939de9, 0xd948, 0x4b0f, { 0x88, 0xed, 0xe6, 0xe1, 0xce, 0x51, 0x7c, 0x1e } }
 

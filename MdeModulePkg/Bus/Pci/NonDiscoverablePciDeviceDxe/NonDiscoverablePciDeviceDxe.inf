@@ -38,6 +38,7 @@
   gEfiPciIoProtocolGuid                         ## BY_START
   gEdkiiNonDiscoverableDeviceProtocolGuid       ## TO_START
   gEfiCpuArchProtocolGuid                       ## CONSUMES
+  gEdkiiNonDiscoverableDeviceUniqueIdProtocolGuid
 
 [Guids]
   gEdkiiNonDiscoverableAhciDeviceGuid       ## CONSUMES ## GUID
