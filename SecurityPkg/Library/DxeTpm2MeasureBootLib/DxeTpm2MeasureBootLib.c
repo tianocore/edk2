@@ -33,6 +33,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/FirmwareVolumeBlock.h>
 
 #include <Guid/MeasuredFvHob.h>
+#include <Ppi/FirmwareVolumeInfoMeasurementExcluded.h>
+#include <Guid/ExcludedFvHob.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -65,6 +67,7 @@ UINTN    mTcg2ImageSize;
 //
 EFI_HANDLE         mTcg2CacheMeasuredHandle = NULL;
 MEASURED_HOB_DATA  *mTcg2MeasuredHobData    = NULL;
+EXCLUDED_HOB_DATA  *mExcludedFvHobData      = NULL;
 
 /**
   Reads contents of a PE/COFF image in memory buffer.
@@ -780,6 +783,20 @@ DxeTpm2MeasureBootHandler (
           break;
         }
       }
+
+      // Was not found in measured list. Now check exclude list.
+      if ((ApplicationRequired == FALSE) && (mExcludedFvHobData != NULL)) {
+        for (Index = 0; Index < mExcludedFvHobData->Num; Index++) {
+          if (mExcludedFvHobData->ExcludedFvs[Index].FvBase == FvAddress) {
+            //
+            // Cache measured FV for next measurement
+            //
+            mTcg2CacheMeasuredHandle = Handle;
+            ApplicationRequired      = TRUE;
+            break;
+          }
+        }
+      }
     }
   }
 
@@ -891,6 +908,13 @@ DxeTpm2MeasureBootLibConstructor (
 
   if (GuidHob != NULL) {
     mTcg2MeasuredHobData = GET_GUID_HOB_DATA (GuidHob);
+  }
+
+  // Get excluded fv list if present
+  GuidHob = GetFirstGuidHob (&gExcludedFvHobGuid);
+
+  if (GuidHob != NULL) {
+    mExcludedFvHobData = GET_GUID_HOB_DATA (GuidHob);
   }
 
   return RegisterSecurity2Handler (

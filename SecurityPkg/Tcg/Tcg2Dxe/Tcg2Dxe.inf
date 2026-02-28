@@ -64,6 +64,7 @@
   ReportStatusCodeLib
   Tcg2PhysicalPresenceLib
   PeCoffLib
+  PcdLib
 
 [Guids]
   ## SOMETIMES_CONSUMES     ## Variable:L"SecureBoot"
@@ -108,7 +109,8 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLaml                        ## PRODUCES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLasa                        ## PRODUCES
   gEfiMdeModulePkgTokenSpaceGuid.PcdTcgPfpMeasurementRevision               ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableSpdmDeviceAuthentication           ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableSpdmDeviceAuthentication          ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.TcgMeasureBootStringsInPcr4                 ## CONSUMES
 
 [Depex]
   # According to PcdTpm2AcpiTableRev definition in SecurityPkg.dec
