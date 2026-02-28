@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _FW_FAULT_TOLERANT_WRITE_PROTOCOL_H_
-#define _FW_FAULT_TOLERANT_WRITE_PROTOCOL_H_
+#pragma once
 
 #define EFI_FAULT_TOLERANT_WRITE_PROTOCOL_GUID \
   { \
@@ -197,5 +196,3 @@ struct _EFI_FAULT_TOLERANT_WRITE_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiFaultTolerantWriteProtocolGuid;
-
-#endif

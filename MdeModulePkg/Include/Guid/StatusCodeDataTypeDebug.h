@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _STATUS_CODE_DATA_TYPE_DEBUG_H_
-#define _STATUS_CODE_DATA_TYPE_DEBUG_H_
+#pragma once
 
 #include <Pi/PiStatusCode.h>
 
@@ -47,5 +46,3 @@ typedef struct {
 } EFI_DEBUG_INFO;
 
 extern EFI_GUID  gEfiStatusCodeDataTypeDebugGuid;
-
-#endif // _STATUS_CODE_DATA_TYPE_DEBUG_H_

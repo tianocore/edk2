@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef SMBIOS_MISC_H_
-#define SMBIOS_MISC_H_
+#pragma once
 
 #include <Protocol/Smbios.h>
 #include <IndustryStandard/SmBios.h>
@@ -126,5 +125,3 @@ extern SMBIOS_MISC_DATA_TABLE  mSmbiosMiscDataTable[];
 //
 extern UINTN  mSmbiosMiscDataTableEntries;
 extern UINT8  mSmbiosMiscDxeStrings[];
-
-#endif // SMBIOS_MISC_H_

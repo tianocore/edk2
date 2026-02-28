@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef _UEFI_SHELL_LEVEL2_COMMANDS_LIB_H_
-#define _UEFI_SHELL_LEVEL2_COMMANDS_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -358,5 +357,3 @@ CascadeDelete (
   IN EFI_SHELL_FILE_INFO  *Node,
   IN CONST BOOLEAN        Quiet
   );
-
-#endif

@@ -5,8 +5,7 @@
    SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __UEFI_LIB_INTERNAL_H_
-#define __UEFI_LIB_INTERNAL_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Protocol/DriverBinding.h>
@@ -33,5 +32,3 @@
 #include <Library/PcdLib.h>
 #include <Library/PrintLib.h>
 #include <Library/DevicePathLib.h>
-
-#endif

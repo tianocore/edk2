@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __WIFI_CONFIG_HII_GUID_H__
-#define __WIFI_CONFIG_HII_GUID_H__
+#pragma once
 
 // {36AF7790-0C2F-4055-9D3D-DB72A44953CB}
 #define WIFI_CONFIG_NETWORK_LIST_REFRESH_GUID \
@@ -25,5 +24,3 @@
   { \
     0xde609972, 0xcbcc, 0x4e82, { 0x8b, 0x3e, 0x6a, 0xc5, 0xcf, 0x56, 0x73, 0x8d } \
   }
-
-#endif

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_HTTP_BOOT_IMPL_H__
-#define __EFI_HTTP_BOOT_IMPL_H__
+#pragma once
 
 #define HTTP_BOOT_CHECK_MEDIA_WAITING_TIME  EFI_TIMER_PERIOD_SECONDS(20)
 
@@ -53,5 +52,3 @@ HttpBootStop (
   );
 
 extern EFI_HTTP_BOOT_CALLBACK_PROTOCOL  gHttpBootDxeHttpBootCallback;
-
-#endif

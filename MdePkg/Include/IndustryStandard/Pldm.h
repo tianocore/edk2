@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef PLDM_H_
-#define PLDM_H_
+#pragma once
 
 #pragma pack(1)
 
@@ -80,4 +79,3 @@ typedef struct {
 
 #define PLDM_TRANSFER_OPERATION_FLAG_GET_NEXT_PART   0x00
 #define PLDM_TRANSFER_OPERATION_FLAG_GET_FIRST_PART  0x01
-#endif // PLDM_H_

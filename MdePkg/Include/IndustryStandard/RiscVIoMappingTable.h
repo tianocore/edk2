@@ -12,8 +12,7 @@
     (https://uefi.org/specs/ACPI/6.6/)
 **/
 
-#ifndef RISCV_IO_MAPPING_TABLE_H_
-#define RISCV_IO_MAPPING_TABLE_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -144,4 +143,3 @@ typedef enum {
 #define RIMT_PCIERC_FLAGS_ATS_BIT_COUNT   1
 #define RIMT_PCIERC_FLAGS_PRI_BIT_OFFSET  1
 #define RIMT_PCIERC_FLAGS_PRI_BIT_COUNT   1
-#endif

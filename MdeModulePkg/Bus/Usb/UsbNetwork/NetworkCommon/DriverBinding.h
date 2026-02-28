@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef DRIVER_BINDING_H_
-#define DRIVER_BINDING_H_
+#pragma once
 
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -262,5 +261,3 @@ Statistics (
   IN UINT64    DbAddr,
   IN UINT16    DbSize
   );
-
-#endif

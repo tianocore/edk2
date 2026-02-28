@@ -12,8 +12,7 @@
   SPDX-License-Identifier: MIT
 **/
 
-#ifndef _XEN_XENSTORE_XENSTOREVAR_H
-#define _XEN_XENSTORE_XENSTOREVAR_H
+#pragma once
 
 #include "XenBusDxe.h"
 
@@ -358,5 +357,3 @@ XenBusUnregisterWatch (
   IN XENBUS_PROTOCOL  *This,
   IN VOID             *Token
   );
-
-#endif /* _XEN_XENSTORE_XENSTOREVAR_H */

@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SD_MMC_PCI_HC_DXE_H_
-#define _SD_MMC_PCI_HC_DXE_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -864,5 +863,3 @@ SdMmcHcInitHost (
   IN SD_MMC_HC_PRIVATE_DATA  *Private,
   IN UINT8                   Slot
   );
-
-#endif

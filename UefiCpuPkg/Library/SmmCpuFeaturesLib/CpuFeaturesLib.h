@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef CPU_FEATURES_LIB_H_
-#define CPU_FEATURES_LIB_H_
+#pragma once
 
 #include <Guid/SmmBaseHob.h>
 #include <Library/SmmCpuFeaturesLib.h>
@@ -52,5 +51,3 @@ UINT32
 GetCpuMaxLogicalProcessorNumber (
   VOID
   );
-
-#endif

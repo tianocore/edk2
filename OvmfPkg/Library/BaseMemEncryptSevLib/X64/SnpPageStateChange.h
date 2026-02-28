@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef SNP_PAGE_STATE_INTERNAL_H_
-#define SNP_PAGE_STATE_INTERNAL_H_
+#pragma once
 
 //
 // SEV-SNP Page states
@@ -33,5 +32,3 @@ VOID
 SnpPageStateFailureTerminate (
   VOID
   );
-
-#endif

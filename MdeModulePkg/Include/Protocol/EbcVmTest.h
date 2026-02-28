@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EBC_VM_TEST_PROTOCOL_H_
-#define _EBC_VM_TEST_PROTOCOL_H_
+#pragma once
 
 //
 // Define a protocol for an EBC VM test interface.
@@ -180,5 +179,3 @@ struct _EFI_EBC_VM_TEST_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiEbcVmTestProtocolGuid;
-
-#endif

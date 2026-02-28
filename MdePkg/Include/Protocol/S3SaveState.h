@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef __S3_SAVE_STATE_H__
-#define __S3_SAVE_STATE_H__
+#pragma once
 
 #define EFI_S3_SAVE_STATE_PROTOCOL_GUID \
     { 0xe857caf6, 0xc046, 0x45dc, { 0xbe, 0x3f, 0xee, 0x7, 0x65, 0xfb, 0xa8, 0x87 }}
@@ -165,5 +164,3 @@ struct _EFI_S3_SAVE_STATE_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiS3SaveStateProtocolGuid;
-
-#endif // __S3_SAVE_STATE_H__

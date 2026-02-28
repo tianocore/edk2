@@ -11,12 +11,9 @@
 
 **/
 
-#ifndef __EVENT_LEGACY_BIOS_GUID_H__
-#define __EVENT_LEGACY_BIOS_GUID_H__
+#pragma once
 
 #define EFI_EVENT_LEGACY_BOOT_GUID \
    { 0x2a571201, 0x4966, 0x47f6, {0x8b, 0x86, 0xf3, 0x1e, 0x41, 0xf3, 0x2f, 0x10 } }
 
 extern EFI_GUID  gEfiEventLegacyBootGuid;
-
-#endif

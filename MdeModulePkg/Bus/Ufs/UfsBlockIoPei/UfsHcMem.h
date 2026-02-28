@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _UFS_PEIM_MEM_H_
-#define _UFS_PEIM_MEM_H_
+#pragma once
 
 #define UFS_PEIM_MEM_BIT(a)  ((UINTN)(1 << (a)))
 
@@ -51,5 +50,3 @@ typedef struct _UFS_PEIM_MEM_POOL {
               (Bit) = 0;      \
             }                 \
           } while (0)
-
-#endif

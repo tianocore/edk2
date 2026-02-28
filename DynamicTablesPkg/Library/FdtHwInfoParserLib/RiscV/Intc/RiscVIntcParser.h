@@ -8,8 +8,7 @@
   @par Reference(s):
 **/
 
-#ifndef RISCV_RINTC_PARSER_H_
-#define RISCV_RINTC_PARSER_H_
+#pragma once
 
 #include <FdtHwInfoParserInclude.h>
 
@@ -43,5 +42,3 @@ RiscVIntcDispatcher (
   IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
   IN        INT32                      FdtBranch
   );
-
-#endif // RISCV_RINTC_PARSER_H_

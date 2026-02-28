@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef _S3_BOOT_SCRIPT_LIB_H_
-#define _S3_BOOT_SCRIPT_LIB_H_
+#pragma once
 
 #include <Library/BaseLib.h>
 #include <IndustryStandard/SmBus.h>
@@ -597,5 +596,3 @@ S3BootScriptCompare (
   IN  UINT8  *Position2,
   OUT UINTN  *RelativePosition
   );
-
-#endif

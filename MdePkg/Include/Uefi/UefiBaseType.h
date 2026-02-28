@@ -10,10 +10,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
+#pragma once
+
 #ifndef __UEFI_BASETYPE_H__
 #define __UEFI_BASETYPE_H__
 
-#include <Base.h>
+  #include <Base.h>
 
 //
 // Basic data type definitions introduced in UEFI.
@@ -250,42 +252,42 @@ typedef union {
 #define EFI_IMAGE_MACHINE_LOONGARCH32  0x6232
 #define EFI_IMAGE_MACHINE_LOONGARCH64  0x6264
 
-#if !defined (EFI_IMAGE_MACHINE_TYPE_VALUE) && !defined (EFI_IMAGE_MACHINE_CROSS_TYPE_VALUE)
-  #if   defined (MDE_CPU_IA32)
+  #if !defined (EFI_IMAGE_MACHINE_TYPE_VALUE) && !defined (EFI_IMAGE_MACHINE_CROSS_TYPE_VALUE)
+    #if   defined (MDE_CPU_IA32)
 
 #define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) \
   ((Machine) == EFI_IMAGE_MACHINE_IA32)
 
 #define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine)  ((Machine) == EFI_IMAGE_MACHINE_X64)
 
-  #elif defined (MDE_CPU_X64)
+    #elif defined (MDE_CPU_X64)
 
 #define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) \
   ((Machine) == EFI_IMAGE_MACHINE_X64)
 
 #define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine)  ((Machine) == EFI_IMAGE_MACHINE_IA32)
 
-  #elif defined (MDE_CPU_AARCH64)
+    #elif defined (MDE_CPU_AARCH64)
 
 #define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) \
   ((Machine) == EFI_IMAGE_MACHINE_AARCH64)
 
 #define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine)  (FALSE)
 
-  #elif defined (MDE_CPU_RISCV64)
+    #elif defined (MDE_CPU_RISCV64)
 #define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) \
   ((Machine) == EFI_IMAGE_MACHINE_RISCV64)
 
 #define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine)  (FALSE)
 
-  #elif defined (MDE_CPU_LOONGARCH64)
+    #elif defined (MDE_CPU_LOONGARCH64)
 
 #define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) \
     ((Machine) == EFI_IMAGE_MACHINE_LOONGARCH64)
 
 #define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine)  (FALSE)
 
-  #elif defined (MDE_CPU_EBC)
+    #elif defined (MDE_CPU_EBC)
 
 ///
 /// This is just to make sure you can cross compile with the EBC compiler.
@@ -295,20 +297,20 @@ typedef union {
 
 #define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine)  (FALSE)
 
+    #else
+      #error Unknown Processor Type
+    #endif
   #else
-    #error Unknown Processor Type
-  #endif
-#else
-  #if defined (EFI_IMAGE_MACHINE_TYPE_VALUE)
+    #if defined (EFI_IMAGE_MACHINE_TYPE_VALUE)
 #define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine)  ((Machine) == EFI_IMAGE_MACHINE_TYPE_VALUE)
-  #else
+    #else
 #define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine)  (FALSE)
-  #endif
-  #if defined (EFI_IMAGE_MACHINE_CROSS_TYPE_VALUE)
+    #endif
+    #if defined (EFI_IMAGE_MACHINE_CROSS_TYPE_VALUE)
 #define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine)  ((Machine) == EFI_IMAGE_MACHINE_CROSS_TYPE_VALUE)
-  #else
+    #else
 #define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine)  (FALSE)
+    #endif
   #endif
-#endif
 
 #endif

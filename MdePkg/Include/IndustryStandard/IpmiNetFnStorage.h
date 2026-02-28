@@ -15,8 +15,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _IPMI_NET_FN_STORAGE_H_
-#define _IPMI_NET_FN_STORAGE_H_
+#pragma once
 
 #pragma pack(1)
 //
@@ -781,4 +780,3 @@ typedef struct {
 #define IPMI_SENSOR_SPECIFIC_DATA  0x03
 
 #pragma pack()
-#endif

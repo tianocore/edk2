@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef _MM_MEM_LIB_H_
-#define _MM_MEM_LIB_H_
+#pragma once
 
 /**
   This function check if the buffer is valid per processor architecture and not overlap with MMRAM.
@@ -130,5 +129,3 @@ MmSetMem (
   IN UINTN  Length,
   IN UINT8  Value
   );
-
-#endif

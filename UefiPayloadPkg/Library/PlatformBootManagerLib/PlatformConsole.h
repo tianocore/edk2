@@ -5,8 +5,7 @@ Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef PLATFORM_CONSOLE_H_
-#define PLATFORM_CONSOLE_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <IndustryStandard/Pci.h>
@@ -64,5 +63,3 @@ EFIAPI
 PlatformConsoleInit (
   VOID
   );
-
-#endif

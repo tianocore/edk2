@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _AHCI_PEI_H_
-#define _AHCI_PEI_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -751,5 +750,3 @@ AhciS3GetEumeratePorts (
   IN  UINTN                     HcDevicePathLength,
   OUT UINT32                    *PortBitMap
   );
-
-#endif

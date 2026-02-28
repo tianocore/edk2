@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __EFI_PEI_MP_SERVICES2_PPI_H__
-#define __EFI_PEI_MP_SERVICES2_PPI_H__
+#pragma once
 
 #include <Ppi/MpServices.h>
 
@@ -288,5 +287,3 @@ extern EFI_GUID  gEfiPeiMpServices2PpiGuid;
 #define EDKII_PEI_MP_SERVICES2_PPI_GUID  EFI_PEI_MP_SERVICES2_PPI_GUID
 
 typedef EFI_PEI_MP_SERVICES2_PPI EDKII_PEI_MP_SERVICES2_PPI;
-
-#endif

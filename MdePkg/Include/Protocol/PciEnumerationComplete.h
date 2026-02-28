@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef _PCI_ENUMERATION_COMPLETE_H_
-#define _PCI_ENUMERATION_COMPLETE_H_
+#pragma once
 
 #define EFI_PCI_ENUMERATION_COMPLETE_GUID \
   {  \
@@ -20,5 +19,3 @@
   }
 
 extern EFI_GUID  gEfiPciEnumerationCompleteProtocolGuid;
-
-#endif

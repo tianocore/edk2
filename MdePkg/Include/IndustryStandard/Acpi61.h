@@ -8,8 +8,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _ACPI_6_1_H_
-#define _ACPI_6_1_H_
+#pragma once
 
 #include <IndustryStandard/Acpi60.h>
 
@@ -841,8 +840,8 @@ typedef struct {
 ///
 /// ACPI RASF Platform RAS Capabilities
 ///
-#define EFI_ACPI_6_1_RASF_PLATFORM_RAS_CAPABILITY_HARDWARE_BASED_PATROL_SCRUB_SUPPOTED                          0x01
-#define EFI_ACPI_6_1_RASF_PLATFORM_RAS_CAPABILITY_HARDWARE_BASED_PATROL_SCRUB_SUPPOTED_AND_EXPOSED_TO_SOFTWARE  0x02
+#define EFI_ACPI_6_1_RASF_PLATFORM_RAS_CAPABILITY_HARDWARE_BASED_PATROL_SCRUB_SUPPORTED                          BIT0
+#define EFI_ACPI_6_1_RASF_PLATFORM_RAS_CAPABILITY_HARDWARE_BASED_PATROL_SCRUB_SUPPORTED_AND_EXPOSED_TO_SOFTWARE  BIT1
 
 ///
 /// ACPI RASF Parameter Block structure for PATROL_SCRUB
@@ -2449,5 +2448,3 @@ typedef struct {
 #define EFI_ACPI_6_1_XEN_PROJECT_TABLE_SIGNATURE  SIGNATURE_32('X', 'E', 'N', 'V')
 
 #pragma pack()
-
-#endif

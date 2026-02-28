@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _CONSOLE_LOGGER_HEADER_
-#define _CONSOLE_LOGGER_HEADER_
+#pragma once
 
 #include "Shell.h"
 
@@ -312,5 +311,3 @@ EFI_STATUS
 ConsoleLoggerResetBuffers (
   IN CONSOLE_LOGGER_PRIVATE_DATA  *ConsoleInfo
   );
-
-#endif //_CONSOLE_LOGGER_HEADER_
