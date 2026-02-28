@@ -168,13 +168,14 @@ UpdateBlocksAndVolumes (
   EFI_PEI_SERVICES                **PeiServices;
 
   IndexBlockDevice = 0;
-  BlockIo2Ppi      = NULL;
-  BlockIoPpi       = NULL;
+
   //
   // Find out all Block Io Ppi instances within the system
   // Assuming all device Block Io Peims are dispatched already
   //
   for (BlockIoPpiInstance = 0; BlockIoPpiInstance < PEI_CD_EXPRESS_MAX_BLOCK_IO_PPI; BlockIoPpiInstance++) {
+    BlockIo2Ppi = NULL;
+    BlockIoPpi  = NULL;
     if (BlockIo2) {
       Status = PeiServicesLocatePpi (
                  &gEfiPeiVirtualBlockIo2PpiGuid,
@@ -199,13 +200,13 @@ UpdateBlocksAndVolumes (
     }
 
     PeiServices = (EFI_PEI_SERVICES  **)GetPeiServicesTablePointer ();
-    if (BlockIo2) {
+    if (BlockIo2Ppi != NULL) {
       Status = BlockIo2Ppi->GetNumberOfBlockDevices (
                               PeiServices,
                               BlockIo2Ppi,
                               &NumberBlockDevices
                               );
-    } else {
+    } else if (BlockIoPpi != NULL) {
       Status = BlockIoPpi->GetNumberOfBlockDevices (
                              PeiServices,
                              BlockIoPpi,
@@ -221,7 +222,7 @@ UpdateBlocksAndVolumes (
     // Just retrieve the first block, should emulate all blocks.
     //
     for (IndexBlockDevice = 1; IndexBlockDevice <= NumberBlockDevices && PrivateData->CapsuleCount < PEI_CD_EXPRESS_MAX_CAPSULE_NUMBER; IndexBlockDevice++) {
-      if (BlockIo2) {
+      if (BlockIo2Ppi != NULL) {
         Status = BlockIo2Ppi->GetBlockDeviceMediaInfo (
                                 PeiServices,
                                 BlockIo2Ppi,
@@ -240,7 +241,7 @@ UpdateBlocksAndVolumes (
         DEBUG ((DEBUG_INFO, "PeiCdExpress InterfaceType is %d\n", Media2.InterfaceType));
         DEBUG ((DEBUG_INFO, "PeiCdExpress MediaPresent is %d\n", Media2.MediaPresent));
         DEBUG ((DEBUG_INFO, "PeiCdExpress BlockSize is  0x%x\n", Media2.BlockSize));
-      } else {
+      } else if (BlockIoPpi != NULL) {
         Status = BlockIoPpi->GetBlockDeviceMediaInfo (
                                PeiServices,
                                BlockIoPpi,
@@ -265,9 +266,9 @@ UpdateBlocksAndVolumes (
 
       DEBUG ((DEBUG_INFO, "IndexBlockDevice is %d\n", IndexBlockDevice));
       PrivateData->CapsuleData[PrivateData->CapsuleCount].IndexBlock = IndexBlockDevice;
-      if (BlockIo2) {
+      if (BlockIo2Ppi != NULL) {
         PrivateData->CapsuleData[PrivateData->CapsuleCount].BlockIo2 = BlockIo2Ppi;
-      } else {
+      } else if (BlockIoPpi != NULL) {
         PrivateData->CapsuleData[PrivateData->CapsuleCount].BlockIo = BlockIoPpi;
       }
 

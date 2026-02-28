@@ -997,10 +997,13 @@ DiskIo2ReadWriteDisk (
   //
   if (!Blocking && IsListEmpty (SubtasksPtr)) {
     EfiAcquireLock (&Instance->TaskQueueLock);
-    RemoveEntryList (&Task->Link);
+    if (Task != NULL) {
+      RemoveEntryList (&Task->Link);
+    }
+
     EfiReleaseLock (&Instance->TaskQueueLock);
 
-    if (!EFI_ERROR (Status) && (Task->Token != NULL)) {
+    if (!EFI_ERROR (Status) && (Task != NULL) && (Task->Token != NULL)) {
       //
       // Task->Token should be set to NULL by the DiskIo2OnReadWriteComplete
       // It it's not, that means the non-blocking request was downgraded to blocking request.
