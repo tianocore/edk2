@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __FUSION_MPT_SCSI_H__
-#define __FUSION_MPT_SCSI_H__
+#pragma once
 
 //
 // Device offsets and constants
@@ -156,5 +155,3 @@ typedef union {
   MPT_SCSI_REQUEST_WITH_SG    Data;
   UINT64                      Uint64; // 8 byte alignment required by HW
 } MPT_SCSI_REQUEST_ALIGNED;
-
-#endif // __FUSION_MPT_SCSI_H__

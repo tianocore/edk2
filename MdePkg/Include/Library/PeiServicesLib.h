@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PEI_SERVICES_LIB_H__
-#define __PEI_SERVICES_LIB_H__
+#pragma once
 
 /**
   This service enables a given PEIM to register an interface into the PEI Foundation.
@@ -552,5 +551,3 @@ PeiServicesResetSystem2 (
   IN UINTN           DataSize,
   IN VOID            *ResetData OPTIONAL
   );
-
-#endif

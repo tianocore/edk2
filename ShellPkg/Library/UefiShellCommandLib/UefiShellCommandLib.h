@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _UEFI_COMMAND_LIB_INTERNAL_HEADER_
-#define _UEFI_COMMAND_LIB_INTERNAL_HEADER_
+#pragma once
 
 #include <Uefi.h>
 
@@ -79,5 +78,3 @@ typedef struct {
   //
   LIST_ENTRY      SameNameList;
 } SHELL_SORT_UNIQUE_NAME;
-
-#endif //_UEFI_COMMAND_LIB_INTERNAL_HEADER_

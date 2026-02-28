@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __DEBUG_PORT_H__
-#define __DEBUG_PORT_H__
+#pragma once
 
 ///
 /// DebugPortIo protocol {EBA4E8D2-3858-41EC-A281-2647BA9660D0}
@@ -135,5 +134,3 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL    Header;
   EFI_GUID                    Guid;
 } DEBUGPORT_DEVICE_PATH;
-
-#endif

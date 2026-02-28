@@ -24,11 +24,40 @@ InternalAllocatePages (
 {
   EFI_PEI_HOB_POINTERS  Hob;
   EFI_PHYSICAL_ADDRESS  NewTop;
+  UINTN                 PagesSize;
 
   Hob.Raw = GetHobList ();
 
-  NewTop  = Hob.HandoffInformationTable->EfiFreeMemoryTop & ~(EFI_PHYSICAL_ADDRESS)EFI_PAGE_MASK;
-  NewTop -= Pages * EFI_PAGE_SIZE;
+  if (Pages == 0) {
+    return NULL;
+  }
+
+  //
+  // Calculate the new top of memory based on the memory type
+  //
+  switch (MemoryType) {
+    case EfiReservedMemoryType:
+    case EfiRuntimeServicesCode:
+    case EfiRuntimeServicesData:
+    case EfiACPIMemoryNVS:
+      PagesSize = ALIGN_VALUE (Pages, EFI_SIZE_TO_PAGES (RUNTIME_PAGE_ALLOCATION_GRANULARITY)) * EFI_PAGE_SIZE;
+      NewTop    = Hob.HandoffInformationTable->EfiFreeMemoryTop & ~(EFI_PHYSICAL_ADDRESS)(RUNTIME_PAGE_ALLOCATION_GRANULARITY - 1);
+      break;
+
+    default:
+      PagesSize = Pages * EFI_PAGE_SIZE;
+      NewTop    = Hob.HandoffInformationTable->EfiFreeMemoryTop & ~(EFI_PHYSICAL_ADDRESS)EFI_PAGE_MASK;
+      break;
+  }
+
+  //
+  // Verify that the subtraction does not underflow NewTop
+  //
+  if (PagesSize > NewTop) {
+    return NULL;
+  }
+
+  NewTop -= PagesSize;
 
   //
   // Verify that there is sufficient memory to satisfy the allocation
@@ -47,7 +76,7 @@ InternalAllocatePages (
   //
   BuildMemoryAllocationHob (
     Hob.HandoffInformationTable->EfiFreeMemoryTop,
-    Pages * EFI_PAGE_SIZE,
+    PagesSize,
     MemoryType
     );
 
@@ -80,9 +109,9 @@ AllocatePages (
   Allocates one or more 4KB pages of type EfiRuntimeServicesData.
 
   Allocates the number of 4KB pages of type EfiRuntimeServicesData and returns a pointer to the
-  allocated buffer.  The buffer returned is aligned on a 4KB boundary.  If Pages is 0, then NULL
-  is returned.  If there is not enough memory remaining to satisfy the request, then NULL is
-  returned.
+  allocated buffer.  The buffer returned is aligned on a RUNTIME_PAGE_ALLOCATION_GRANULARITY boundary.
+  If Pages is 0, then NULL is returned.  If there is not enough memory remaining to satisfy the request,
+  then NULL is returned.
 
   @param  Pages                 The number of 4 KB pages to allocate.
 
@@ -101,10 +130,10 @@ AllocateRuntimePages (
 /**
   Allocates one or more 4KB pages of type EfiReservedMemoryType.
 
-  Allocates the number of 4KB pages of type EfiReservedMemoryTypes and returns a pointer to the
-  allocated buffer.  The buffer returned is aligned on a 4KB boundary.  If Pages is 0, then NULL
-  is returned.  If there is not enough memory remaining to satisfy the request, then NULL is
-  returned.
+  Allocates the number of 4KB pages of type EfiReservedMemoryType and returns a pointer to the
+  allocated buffer.  The buffer returned is aligned on a RUNTIME_PAGE_ALLOCATION_GRANULARITY boundary.
+  If Pages is 0, then NULL is returned.  If there is not enough memory remaining to satisfy the request,
+  then NULL is returned.
 
   @param  Pages                 The number of 4 KB pages to allocate.
 

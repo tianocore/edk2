@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_WIFI_MGR_DXE_H__
-#define __EFI_WIFI_MGR_DXE_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -330,5 +329,3 @@ typedef struct {
 #include "WifiConnectionMgrHiiConfigAccess.h"
 #include "WifiConnectionMgrMisc.h"
 #include "WifiConnectionMgrFileUtil.h"
-
-#endif

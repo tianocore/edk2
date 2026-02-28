@@ -53,6 +53,7 @@
   gEfiMmPeiMmramMemoryReserveGuid
   gEfiStandaloneMmNonSecureBufferGuid
   gEfiHobListGuid
+  gEfiMmCommunicateHeaderV3Guid
 
 [Protocols]
   gEdkiiPiMmCpuDriverEpProtocolGuid

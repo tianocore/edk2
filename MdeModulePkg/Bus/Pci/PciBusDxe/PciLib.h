@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_PCI_LIB_H_
-#define _EFI_PCI_LIB_H_
+#pragma once
 
 typedef struct {
   EFI_HANDLE    Handle;
@@ -175,5 +174,3 @@ PciProgramResizableBar (
   IN PCI_IO_DEVICE                *PciIoDevice,
   IN PCI_RESIZABLE_BAR_OPERATION  ResizableBarOp
   );
-
-#endif

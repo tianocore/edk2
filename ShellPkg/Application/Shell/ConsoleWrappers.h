@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _SHELL_CONSOLE_WRAPPERS_HEADER_
-#define _SHELL_CONSOLE_WRAPPERS_HEADER_
+#pragma once
 
 /**
   Function to create a EFI_SIMPLE_TEXT_INPUT_PROTOCOL on top of a
@@ -69,5 +68,3 @@ EFI_STATUS
 CloseSimpleTextOutOnFile (
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *SimpleTextOut
   );
-
-#endif //_SHELL_CONSOLE_WRAPPERS_HEADER_

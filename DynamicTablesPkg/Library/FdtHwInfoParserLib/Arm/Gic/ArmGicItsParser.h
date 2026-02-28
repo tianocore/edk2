@@ -8,8 +8,7 @@
   - linux/Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.yaml
 **/
 
-#ifndef ARM_GIC_ITS_PARSER_H_
-#define ARM_GIC_ITS_PARSER_H_
+#pragma once
 
 /** CM_ARM_GIC_ITS_INFO parser function.
 
@@ -56,5 +55,3 @@ ArmGicItsInfoParser (
   IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
   IN        INT32                      FdtBranch
   );
-
-#endif // ARM_GIC_ITS_PARSER_H_

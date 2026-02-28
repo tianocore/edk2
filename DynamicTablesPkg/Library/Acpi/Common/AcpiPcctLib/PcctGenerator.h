@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef PCCT_GENERATOR_H_
-#define PCCT_GENERATOR_H_
+#pragma once
 
 #pragma pack(1)
 
@@ -40,5 +39,3 @@ typedef struct AcpiPcctGenerator {
 } ACPI_PCCT_GENERATOR;
 
 #pragma pack()
-
-#endif // PCCT_GENERATOR_H_

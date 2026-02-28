@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PERIODIC_SMI_LIB_H__
-#define __PERIODIC_SMI_LIB_H__
+#pragma once
 
 #define PERIODIC_SMI_LIBRARY_ANY_CPU  0xffffffff
 
@@ -174,5 +173,3 @@ EFIAPI
 PeriodicSmiDisable (
   IN EFI_HANDLE  DispatchHandle    OPTIONAL
   );
-
-#endif

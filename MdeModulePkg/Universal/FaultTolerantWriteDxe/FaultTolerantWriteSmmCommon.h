@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SMM_FTW_COMMON_H__
-#define __SMM_FTW_COMMON_H__
+#pragma once
 
 #include <Protocol/SmmFirmwareVolumeBlock.h>
 #include <Protocol/SmmFaultTolerantWrite.h>
@@ -106,5 +105,3 @@ VOID
 FtwNotifySmmReady (
   VOID
   );
-
-#endif

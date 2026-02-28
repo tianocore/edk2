@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _VIRTIO_SERIAL_H_
-#define _VIRTIO_SERIAL_H_
+#pragma once
 
 #include <IndustryStandard/Virtio095.h>
 #include <IndustryStandard/Virtio10.h>
@@ -60,5 +59,3 @@ typedef struct {
 #define VIRTIO_SERIAL_RESIZE         5
 #define VIRTIO_SERIAL_PORT_OPEN      6
 #define VIRTIO_SERIAL_PORT_NAME      7
-
-#endif /* _VIRTIO_SERIAL_H_ */

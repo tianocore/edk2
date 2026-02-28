@@ -11,8 +11,7 @@
     - X64 or x64 - X64 Architecture
 **/
 
-#ifndef CONFIGURATION_MANAGER_OBJECT_H_
-#define CONFIGURATION_MANAGER_OBJECT_H_
+#pragma once
 
 #include <ArchCommonNameSpaceObjects.h>
 #include <ArmNameSpaceObjects.h>
@@ -205,5 +204,3 @@ typedef struct CmObjDescriptor {
 **/
 #define CREATE_CM_X64_OBJECT_ID(ObjectId) \
           (CREATE_CM_OBJECT_ID (EObjNameSpaceX64, ObjectId))
-
-#endif // CONFIGURATION_MANAGER_OBJECT_H_

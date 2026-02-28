@@ -1379,15 +1379,15 @@ After that, the following commands will set up the build and run the host-based 
 
 ```bash
 # Setup repo for building
-# stuart_setup -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC5, VS2022, etc.>
+# stuart_setup -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC, VS2022, etc.>
 stuart_setup -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2022
 
 # Update all binary dependencies
-# stuart_update -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC5, VS2022, etc.>
+# stuart_update -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC, VS2022, etc.>
 stuart_update -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2022
 
 # Build and run the tests
-# stuart_ci_build -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC5, VS2022, etc.> -t NOOPT [-p <Package Name>]
+# stuart_ci_build -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=<GCC, VS2022, etc.> -t NOOPT [-p <Package Name>]
 stuart_ci_build -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2022 -t NOOPT -p MdePkg
 ```
 
@@ -1561,7 +1561,7 @@ lcov linux tool, and parsed using the lcov_cobertura python tool to parse it to 
   ```bash
   sudo apt-get install -y lcov
   python -m pip install --upgrade -r ./pip-requirements.txt
-  stuart_ci_build -c .pytool/CISettings.py  -t NOOPT TOOL_CHAIN_TAG=GCC5 -p MdeModulePkg
+  stuart_ci_build -c .pytool/CISettings.py  -t NOOPT TOOL_CHAIN_TAG=GCC -p MdeModulePkg
   Open Build/coverage.xml
   ```
   - How to see code coverage data on IDE Visual Studio Code

@@ -16,8 +16,7 @@
 
 **/
 
-#ifndef __PEI_S3_RESUME_PPI_H__
-#define __PEI_S3_RESUME_PPI_H__
+#pragma once
 
 ///
 /// Global ID for EFI_PEI_S3_RESUME2_PPI
@@ -82,5 +81,3 @@ struct _EFI_PEI_S3_RESUME2_PPI {
 };
 
 extern EFI_GUID  gEfiPeiS3Resume2PpiGuid;
-
-#endif

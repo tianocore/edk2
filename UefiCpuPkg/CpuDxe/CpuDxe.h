@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _CPU_DXE_H_
-#define _CPU_DXE_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -295,5 +294,3 @@ PageFaultExceptionHandler (
 
 extern BOOLEAN  mIsAllocatingPageTable;
 extern UINTN    mNumberOfProcessors;
-
-#endif

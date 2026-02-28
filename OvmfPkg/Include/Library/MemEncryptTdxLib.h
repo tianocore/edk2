@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef MEM_ENCRYPT_TDX_LIB_H_
-#define MEM_ENCRYPT_TDX_LIB_H_
+#pragma once
 
 #include <Base.h>
 
@@ -77,5 +76,3 @@ MemEncryptTdxClearPageSharedBit (
   IN PHYSICAL_ADDRESS  BaseAddress,
   IN UINTN             NumPages
   );
-
-#endif // _MEM_ENCRYPT_TDX_LIB_H_

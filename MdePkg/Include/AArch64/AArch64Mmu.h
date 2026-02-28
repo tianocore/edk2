@@ -6,8 +6,7 @@
 *
 **/
 
-#ifndef AARCH64_MMU_H_
-#define AARCH64_MMU_H_
+#pragma once
 
 //
 // Memory Attribute Indirection register Definitions
@@ -207,5 +206,3 @@
 #define INPUT_ADDRESS_SIZE_TO_TXSZ(a)  (64 - a)
 
 // Uses LPAE Page Table format
-
-#endif // AARCH64_MMU_H_

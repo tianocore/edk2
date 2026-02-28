@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _RECOVERY_MODULE_LOAD_PEI_H_
-#define _RECOVERY_MODULE_LOAD_PEI_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -33,5 +32,3 @@ typedef struct {
   UINTN       Length;
   UINTN       ImageOffset;
 } RECOVERY_CONFIG_DATA;
-
-#endif

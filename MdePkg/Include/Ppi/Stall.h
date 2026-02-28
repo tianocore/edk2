@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __STALL_PPI_H__
-#define __STALL_PPI_H__
+#pragma once
 
 #define EFI_PEI_STALL_PPI_GUID \
   { 0x1f4c6f90, 0xb06b, 0x48d8, {0xa2, 0x01, 0xba, 0xe5, 0xf1, 0xcd, 0x7d, 0x56 } }
@@ -52,5 +51,3 @@ struct _EFI_PEI_STALL_PPI {
 };
 
 extern EFI_GUID  gEfiPeiStallPpiGuid;
-
-#endif

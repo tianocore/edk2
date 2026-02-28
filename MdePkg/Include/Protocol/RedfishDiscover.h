@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef EFI_REDFISH_DISCOVER_PROTOCOL_H_
-#define EFI_REDFISH_DISCOVER_PROTOCOL_H_
+#pragma once
 
 //
 // GUID definitions
@@ -190,4 +189,3 @@ struct _EFI_REDFISH_DISCOVER_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiRedfishDiscoverProtocolGuid;
-#endif

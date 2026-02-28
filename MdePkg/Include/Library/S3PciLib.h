@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __S3_PCI_LIB_H__
-#define __S3_PCI_LIB_H__
+#pragma once
 
 /**
   Macro that converts PCI Bus, PCI Device, PCI Function and PCI Register to an
@@ -1041,5 +1040,3 @@ S3PciWriteBuffer (
   IN UINTN  Size,
   IN VOID   *Buffer
   );
-
-#endif

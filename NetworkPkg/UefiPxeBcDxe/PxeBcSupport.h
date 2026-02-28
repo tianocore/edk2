@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_PXEBC_SUPPORT_H__
-#define __EFI_PXEBC_SUPPORT_H__
+#pragma once
 
 #define ICMP_DEST_UNREACHABLE   3
 #define ICMP_SOURCE_QUENCH      4
@@ -488,5 +487,3 @@ EFI_HANDLE
 PxeBcGetNicByIp6Children (
   IN EFI_HANDLE  ControllerHandle
   );
-
-#endif

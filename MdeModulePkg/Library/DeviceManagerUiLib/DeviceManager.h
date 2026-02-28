@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _DEVICE_MANAGER_H_
-#define _DEVICE_MANAGER_H_
+#pragma once
 
 #include <Guid/MdeModuleHii.h>
 #include <Guid/HiiPlatformSetupFormset.h>
@@ -185,5 +184,3 @@ DeviceManagerCallback (
   IN  EFI_IFR_TYPE_VALUE                    *Value,
   OUT EFI_BROWSER_ACTION_REQUEST            *ActionRequest
   );
-
-#endif

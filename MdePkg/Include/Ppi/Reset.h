@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef __RESET_PPI_H__
-#define __RESET_PPI_H__
+#pragma once
 
 #define EFI_PEI_RESET_PPI_GUID \
   { \
@@ -34,5 +33,3 @@ typedef struct {
 } EFI_PEI_RESET_PPI;
 
 extern EFI_GUID  gEfiPeiResetPpiGuid;
-
-#endif

@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _AHCI_PEI_STORAGE_SECURITY_H_
-#define _AHCI_PEI_STORAGE_SECURITY_H_
+#pragma once
 
 /**
   Gets the count of storage security devices that one specific driver detects.
@@ -236,5 +235,3 @@ AhciStorageSecuritySendData (
   IN UINTN                               PayloadBufferSize,
   IN VOID                                *PayloadBuffer
   );
-
-#endif

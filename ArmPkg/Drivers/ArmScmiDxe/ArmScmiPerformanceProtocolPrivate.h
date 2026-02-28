@@ -9,8 +9,7 @@
     DEN0056A_System_Control_and_Management_Interface.pdf
 **/
 
-#ifndef ARM_SCMI_PERFORMANCE_PROTOCOL_PRIVATE_H_
-#define ARM_SCMI_PERFORMANCE_PROTOCOL_PRIVATE_H_
+#pragma once
 
 #include <Protocol/ArmScmiPerformanceProtocol.h>
 
@@ -45,5 +44,3 @@ EFI_STATUS
 ScmiPerformanceProtocolInit (
   IN EFI_HANDLE  *Handle
   );
-
-#endif /* ARM_SCMI_PERFORMANCE_PROTOCOL_PRIVATE_H_ */

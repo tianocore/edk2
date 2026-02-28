@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __EFI_HTTP_UTILITIES_PROTOCOL_H__
-#define __EFI_HTTP_UTILITIES_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/Http.h>
 
@@ -112,5 +111,3 @@ struct _EFI_HTTP_UTILITIES_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiHttpUtilitiesProtocolGuid;
-
-#endif

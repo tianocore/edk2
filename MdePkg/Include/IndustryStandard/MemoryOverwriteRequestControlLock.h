@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_H__
-#define __MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_H__
+#pragma once
 
 #define MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_GUID \
   { \
@@ -33,5 +32,3 @@
 //
 
 extern EFI_GUID  gEfiMemoryOverwriteRequestControlLockGuid;
-
-#endif

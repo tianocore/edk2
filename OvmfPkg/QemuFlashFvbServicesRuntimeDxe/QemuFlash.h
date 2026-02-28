@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __QEMU_FLASH_H__
-#define __QEMU_FLASH_H__
+#pragma once
 
 #include <Protocol/FirmwareVolumeBlock.h>
 
@@ -97,5 +96,3 @@ QemuFlashPtrWrite (
   IN        volatile UINT8  *Ptr,
   IN        UINT8           Value
   );
-
-#endif

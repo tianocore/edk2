@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _PLATFORM_BM_H_
-#define _PLATFORM_BM_H_
+#pragma once
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -41,5 +40,3 @@ EFIAPI
 TryRunningQemuKernel (
   VOID
   );
-
-#endif // _PLATFORM_BM_H_

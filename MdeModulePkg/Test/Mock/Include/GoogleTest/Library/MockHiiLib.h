@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_HII_LIB_H_
-#define MOCK_HII_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -352,5 +351,3 @@ struct MockHiiLib {
      IN VOID            *EndOpCodeHandle OPTIONAL)
     );
 };
-
-#endif

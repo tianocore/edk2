@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef _VIRTIO_0_9_5_H_
-#define _VIRTIO_0_9_5_H_
+#pragma once
 
 #include <Base.h>
 
@@ -161,5 +160,3 @@ typedef struct {
 #define VIRTIO_F_NOTIFY_ON_EMPTY     BIT24
 #define VIRTIO_F_RING_INDIRECT_DESC  BIT28
 #define VIRTIO_F_RING_EVENT_IDX      BIT29
-
-#endif // _VIRTIO_0_9_5_H_

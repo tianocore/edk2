@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __IO_APIC_LIB_H__
-#define __IO_APIC_LIB_H__
+#pragma once
 
 /**
   Read a 32-bit I/O APIC register.
@@ -97,5 +96,3 @@ IoApicConfigureInterrupt (
   IN BOOLEAN  LevelTriggered,
   IN BOOLEAN  AssertionLevel
   );
-
-#endif

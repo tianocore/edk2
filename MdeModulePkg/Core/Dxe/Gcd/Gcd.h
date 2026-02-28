@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _GCD_H_
-#define _GCD_H_
+#pragma once
 
 //
 // GCD Operations
@@ -36,5 +35,3 @@ typedef struct {
   UINT64     Capability;
   BOOLEAN    Memory;
 } GCD_ATTRIBUTE_CONVERSION_ENTRY;
-
-#endif

@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __TEMPORARY_RAM_SUPPORT_H__
-#define __TEMPORARY_RAM_SUPPORT_H__
+#pragma once
 
 ///
 /// Note: The GUID name EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI_GUID is different from the current
@@ -55,5 +54,3 @@ typedef struct {
 } EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI;
 
 extern EFI_GUID  gEfiTemporaryRamSupportPpiGuid;
-
-#endif

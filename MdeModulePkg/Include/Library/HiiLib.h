@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __HII_LIB_H__
-#define __HII_LIB_H__
+#pragma once
 
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
@@ -1143,5 +1142,3 @@ HiiUpdateForm (
   IN VOID            *StartOpCodeHandle,
   IN VOID            *EndOpCodeHandle     OPTIONAL
   );
-
-#endif

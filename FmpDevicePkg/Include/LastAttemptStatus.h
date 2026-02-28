@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __LAST_ATTEMPT_STATUS_H__
-#define __LAST_ATTEMPT_STATUS_H__
+#pragma once
 
 ///
 /// Last Attempt Status Unsuccessful Vendor Range Map
@@ -77,5 +76,3 @@
 /// The maximum value allowed for FMP device library errors.
 ///
 #define LAST_ATTEMPT_STATUS_DEVICE_LIBRARY_MAX_ERROR_CODE_VALUE  0x1FFF
-
-#endif

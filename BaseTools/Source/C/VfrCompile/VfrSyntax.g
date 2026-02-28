@@ -267,7 +267,7 @@ vfrProgram > [UINT8 Return] :
      mConstantOnlyInExpression = FALSE;
   >>
   (
-      vfrPragmaPackDefinition
+      vfrPragmaDefinition
     | vfrDataStructDefinition
     | vfrDataUnionDefinition
   )*
@@ -308,14 +308,18 @@ pragmaPackNumber :
                                                     << gCVfrVarDataTypeDB.Pack (LineNum, VFR_PACK_ASSIGN, NULL, PackNumber); >>
   ;
 
-vfrPragmaPackDefinition :
-  "\#pragma" "pack" "\("
-  {
-      pragmaPackShowDef
-    | pragmaPackStackDef
-    | pragmaPackNumber
-  }
-  "\)"
+vfrPragmaDefinition :
+  "\#pragma"
+  (
+    "pack" "\("
+    {
+        pragmaPackShowDef
+      | pragmaPackStackDef
+      | pragmaPackNumber
+    }
+    "\)"
+  | "once"                                          // Skip '#pragma once' in preprocessed output
+  )
   ;
 
   vfrDataUnionDefinition :

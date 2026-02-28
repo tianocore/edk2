@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef BinderFuncs_h_INCLUDED
-#define BinderFuncs_h_INCLUDED
+#pragma once
 
 #include "Common/UefiBaseTypes.h"
 
@@ -56,6 +55,3 @@ CommonLibBinderCompareGuid (
   IN EFI_GUID *Guid1,
   IN EFI_GUID *Guid2
   );
-
-#endif // #ifndef CommonLibs_h_INCLUDED
-

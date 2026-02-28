@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __HARDWARE_INFO_TYPES_LIB_H__
-#define __HARDWARE_INFO_TYPES_LIB_H__
+#pragma once
 
 // Specific hardware types:
 #include "HardwareInfoPciHostBridgeLib.h"
@@ -66,5 +65,3 @@ typedef struct {
 
 #define HARDWARE_INFO_FROM_LINK(a) \
   BASE_CR (a, HARDWARE_INFO, Link)
-
-#endif // __HARDWARE_INFO_TYPES_LIB_H__

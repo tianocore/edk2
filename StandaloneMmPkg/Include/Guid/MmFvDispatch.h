@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __MM_FV_DISPATCH_H__
-#define __MM_FV_DISPATCH_H__
+#pragma once
 
 #define MM_FV_DISPATCH_GUID \
   { 0xb65694cc, 0x9e3, 0x4c3b, { 0xb5, 0xcd, 0x5, 0xf4, 0x4d, 0x3c, 0xdb, 0xff }}
@@ -29,5 +28,3 @@ typedef struct {
   EFI_MM_COMMUNICATE_FV_DISPATCH_DATA    Data;
 } EFI_MM_COMMUNICATE_FV_DISPATCH;
 #pragma pack()
-
-#endif

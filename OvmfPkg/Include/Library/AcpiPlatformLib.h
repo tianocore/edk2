@@ -4,8 +4,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef ACPI_PLATFORM_LIB_H_
-#define ACPI_PLATFORM_LIB_H_
+#pragma once
 
 #include <Protocol/AcpiTable.h>
 #include <Protocol/PciIo.h>
@@ -101,5 +100,3 @@ EFI_STATUS
 TransferS3ContextToBootScript (
   IN S3_CONTEXT  *S3Context
   );
-
-#endif
