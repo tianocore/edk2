@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef LS_REAL_TIME_CLOCK_H_
-#define LS_REAL_TIME_CLOCK_H_
+#pragma once
 
 #define TOY_WRITE0_REG  0x24
 #define TOY_WRITE1_REG  0x28
@@ -36,5 +35,3 @@
 #define TOY_HOUR_SHIFT  16
 #define TOY_MIN_SHIFT   10
 #define TOY_SEC_SHIFT   4
-
-#endif // LS_REAL_TIME_CLOCK_H_

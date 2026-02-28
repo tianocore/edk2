@@ -5,14 +5,10 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
-BUILDROOT ?= $(MAKEROOT)
-OBJDIR ?= .
-OBJECTS := $(addprefix $(OBJDIR)/,$(OBJECTS))
-
 include $(MAKEROOT)/Makefiles/header.makefile
 
-LIBRARY = $(BUILDROOT)/libs/lib$(LIBNAME).a
+LIBRARY = $(MAKEROOT)/libs/lib$(LIBNAME).a
 
-all: $(BUILDROOT)/libs $(LIBRARY)
+all: $(MAKEROOT)/libs $(LIBRARY)
 
 include $(MAKEROOT)/Makefiles/footer.makefile

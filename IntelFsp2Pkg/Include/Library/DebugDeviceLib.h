@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef __DEBUG_DEVICE_LIB_H__
-#define __DEBUG_DEVICE_LIB_H__
+#pragma once
 
 /**
   Returns the debug print device enable state.
@@ -19,5 +18,3 @@ EFIAPI
 GetDebugPrintDeviceEnable (
   VOID
   );
-
-#endif

@@ -13,8 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _BOOT_LOGO2_H_
-#define _BOOT_LOGO2_H_
+#pragma once
 
 #include <Protocol/GraphicsOutput.h>
 
@@ -97,5 +96,3 @@ struct _EDKII_BOOT_LOGO2_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkiiBootLogo2ProtocolGuid;
-
-#endif

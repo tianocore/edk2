@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef USB_ETHERNET_PROTOCOL_H_
-#define USB_ETHERNET_PROTOCOL_H_
+#pragma once
 
 #define EDKII_USB_ETHERNET_PROTOCOL_GUID \
     {0x8d8969cc, 0xfeb0, 0x4303, {0xb2, 0x1a, 0x1f, 0x11, 0x6f, 0x38, 0x56, 0x43}}
@@ -876,5 +875,3 @@ struct _EDKII_USB_ETHERNET_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkIIUsbEthProtocolGuid;
-
-#endif

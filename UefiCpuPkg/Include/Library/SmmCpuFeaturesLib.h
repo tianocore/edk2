@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SMM_FEATURES_LIB_H__
-#define __SMM_FEATURES_LIB_H__
+#pragma once
 
 #include <Protocol/MpService.h>
 #include <Protocol/SmmCpu.h>
@@ -333,5 +332,3 @@ EFIAPI
 SmmCpuFeaturesCompleteSmmReadyToLock (
   VOID
   );
-
-#endif

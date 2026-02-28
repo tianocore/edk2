@@ -150,7 +150,7 @@ VaListToBaseList (
     // Parse Flags and Width
     //
     for (Format++; TRUE; Format++) {
-      if ((*Format == '.') || (*Format == '-') || (*Format == '+') || (*Format == ' ')) {
+      if ((*Format == '.') || (*Format == '-') || (*Format == '+') || (*Format == ' ') || (*Format == ',')) {
         //
         // These characters in format field are omitted.
         //

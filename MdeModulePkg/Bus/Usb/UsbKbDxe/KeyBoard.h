@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_KEYBOARD_H_
-#define _EFI_KEYBOARD_H_
+#pragma once
 
 #include "EfiKey.h"
 
@@ -317,5 +316,3 @@ InitializeKeyState (
   IN  USB_KB_DEV     *UsbKeyboardDevice,
   OUT EFI_KEY_STATE  *KeyState
   );
-
-#endif

@@ -19,8 +19,7 @@
 
 **/
 
-#ifndef _PEI_DEVICE_RECOVERY_MODULE_PPI_H_
-#define _PEI_DEVICE_RECOVERY_MODULE_PPI_H_
+#pragma once
 
 #define EFI_PEI_DEVICE_RECOVERY_MODULE_PPI_GUID \
   { \
@@ -134,5 +133,3 @@ struct _EFI_PEI_DEVICE_RECOVERY_MODULE_PPI {
 };
 
 extern EFI_GUID  gEfiPeiDeviceRecoveryModulePpiGuid;
-
-#endif /* _PEI_DEVICE_RECOVERY_MODULE_PPI_H_ */

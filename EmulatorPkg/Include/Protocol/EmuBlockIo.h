@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __EMU_BLOCK_IO_H__
-#define __EMU_BLOCK_IO_H__
+#pragma once
 
 #include <Protocol/BlockIo.h>
 #include <Protocol/BlockIo2.h>
@@ -177,5 +176,3 @@ struct _EMU_BLOCK_IO_PROTOCOL  {
 };
 
 extern EFI_GUID  gEmuBlockIoProtocolGuid;
-
-#endif

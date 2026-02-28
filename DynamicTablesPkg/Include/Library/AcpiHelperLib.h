@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef ACPI_HELPER_LIB_H_
-#define ACPI_HELPER_LIB_H_
+#pragma once
 
 /** Is a character upper case
 */
@@ -89,5 +88,3 @@ AmlGetEisaIdFromString (
   IN  CONST CHAR8   *EisaIdStr,
   OUT       UINT32  *EisaIdInt
   );
-
-#endif // ACPI_HELPER_LIB_H_

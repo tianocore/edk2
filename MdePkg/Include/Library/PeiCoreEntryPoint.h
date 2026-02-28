@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __MODULE_ENTRY_POINT_H__
-#define __MODULE_ENTRY_POINT_H__
+#pragma once
 
 /**
   The entry point of PE/COFF Image for the PEI Core.
@@ -127,5 +126,3 @@ ProcessModuleEntryPointList (
   IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList,
   IN VOID                           *Context
   );
-
-#endif

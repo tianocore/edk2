@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef CPU_PAGE_TABLE_SUPPORT_H_
-#define CPU_PAGE_TABLE_SUPPORT_H_
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -113,5 +112,3 @@ UINT64
 GetMaxAddress (
   IN PAGING_MODE  Mode
   );
-
-#endif

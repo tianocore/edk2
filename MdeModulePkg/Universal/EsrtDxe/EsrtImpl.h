@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _DXE_ESRT_IMPL_H_
-#define _DXE_ESRT_IMPL_H_
+#pragma once
 
 #include <Guid/EventGroup.h>
 #include <Guid/SystemResourceTable.h>
@@ -232,5 +231,3 @@ EFIAPI
 EsrtDxeLockEsrtRepository (
   VOID
   );
-
-#endif // #ifndef _EFI_ESRT_IMPL_H_

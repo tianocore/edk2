@@ -8,8 +8,7 @@
   - linux/Documentation/devicetree/bindings/pci/host-generic-pci.yaml
 **/
 
-#ifndef ROOT_COMPLEX_PARSER_H_
-#define ROOT_COMPLEX_PARSER_H_
+#pragma once
 
 /** CM_ARM_ROOT_COMPLEX_NODE parser function.
 
@@ -52,5 +51,3 @@ ArmPciRootComplexParser (
   IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
   IN        INT32                      FdtBranch
   );
-
-#endif // ROOT_COMPLEX_PARSER_H_

@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef TPM2_DEVICE_TABLE_LIB_H_
-#define TPM2_DEVICE_TABLE_LIB_H_
+#pragma once
 
 /** Build a SSDT table describing the TPM2 device.
 
@@ -46,5 +45,3 @@ EFIAPI
 FreeTpm2DeviceTable (
   IN EFI_ACPI_DESCRIPTION_HEADER  *Table
   );
-
-#endif // TPM2_DEVICE_TABLE_LIB_H_

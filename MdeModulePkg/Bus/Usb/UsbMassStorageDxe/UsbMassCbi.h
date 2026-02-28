@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_USBMASS_CBI_H_
-#define _EFI_USBMASS_CBI_H_
+#pragma once
 
 extern USB_MASS_TRANSPORT  mUsbCbi0Transport;
 extern USB_MASS_TRANSPORT  mUsbCbi1Transport;
@@ -130,5 +129,3 @@ EFI_STATUS
 UsbCbiCleanUp (
   IN  VOID  *Context
   );
-
-#endif

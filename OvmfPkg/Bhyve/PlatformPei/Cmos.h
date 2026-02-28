@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _CMOS_H_
-#define _CMOS_H_
+#pragma once
 
 /**
   Reads 8-bits of CMOS data.
@@ -44,5 +43,3 @@ CmosWrite8 (
   IN      UINTN  Index,
   IN      UINT8  Value
   );
-
-#endif /* _CMOS_H_ */

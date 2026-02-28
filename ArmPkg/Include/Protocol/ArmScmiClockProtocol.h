@@ -9,8 +9,7 @@
     DEN0056A_System_Control_and_Management_Interface.pdf
 **/
 
-#ifndef ARM_SCMI_CLOCK_PROTOCOL_H_
-#define ARM_SCMI_CLOCK_PROTOCOL_H_
+#pragma once
 
 #include <Protocol/ArmScmi.h>
 
@@ -213,5 +212,3 @@ typedef struct _SCMI_CLOCK_PROTOCOL {
   SCMI_CLOCK_RATE_GET                RateGet;
   SCMI_CLOCK_RATE_SET                RateSet;
 } SCMI_CLOCK_PROTOCOL;
-
-#endif /* ARM_SCMI_CLOCK_PROTOCOL_H_ */

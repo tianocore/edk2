@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _RECOVERY_DEVICE_H_
-#define _RECOVERY_DEVICE_H_
+#pragma once
 
 ///
 /// The Global ID used to identify a recovery capsule that was loaded from a CD/DVD device.
@@ -58,5 +57,3 @@ extern EFI_GUID  gRecoveryOnFatFloppyDiskGuid;
 extern EFI_GUID  gRecoveryOnFatIdeDiskGuid;
 extern EFI_GUID  gRecoveryOnFatUsbDiskGuid;
 extern EFI_GUID  gRecoveryOnFatNvmeDiskGuid;
-
-#endif

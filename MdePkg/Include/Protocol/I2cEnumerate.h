@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __I2C_ENUMERATE_H__
-#define __I2C_ENUMERATE_H__
+#pragma once
 
 #include <Pi/PiI2c.h>
 
@@ -100,5 +99,3 @@ struct _EFI_I2C_ENUMERATE_PROTOCOL {
 /// Reference to variable defined in the .DEC file
 ///
 extern EFI_GUID  gEfiI2cEnumerateProtocolGuid;
-
-#endif //  __I2C_ENUMERATE_H__

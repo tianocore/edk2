@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __IMAGEVERIFICATIONLIB_H__
-#define __IMAGEVERIFICATIONLIB_H__
+#pragma once
 
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/DebugLib.h>
@@ -194,5 +193,3 @@ typedef struct {
   //
   HASH_FINAL               HashFinal;
 } HASH_TABLE;
-
-#endif

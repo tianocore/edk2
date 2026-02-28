@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __CORE2_MSR_H__
-#define __CORE2_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -1043,5 +1042,3 @@ typedef union {
   @note MSR_CORE2_EMON_L3_GL_CTL is defined as MSR_EMON_L3_GL_CTL in SDM.
 **/
 #define MSR_CORE2_EMON_L3_GL_CTL  0x000107D8
-
-#endif

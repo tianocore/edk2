@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef EDKII_REDFISH_PLATFORM_CONFIG_IMPL_H_
-#define EDKII_REDFISH_PLATFORM_CONFIG_IMPL_H_
+#pragma once
 
 #include <Uefi.h>
 #include <RedfishCommon.h>
@@ -445,5 +444,3 @@ BOOLEAN
 RedfishPlatformConfigFeatureProp (
   IN UINT64  FeatureProp
   );
-
-#endif

@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __XEON_5600_MSR_H__
-#define __XEON_5600_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -190,5 +189,3 @@ typedef union {
   @note MSR_XEON_5600_IA32_ENERGY_PERF_BIAS is defined as IA32_ENERGY_PERF_BIAS in SDM.
 **/
 #define MSR_XEON_5600_IA32_ENERGY_PERF_BIAS  0x000001B0
-
-#endif

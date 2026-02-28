@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __RESOURCE_PUBLICATION_LIB__
-#define __RESOURCE_PUBLICATION_LIB__
+#pragma once
 
 /**
   Declares the presence of permanent system memory in the platform.
@@ -32,5 +31,3 @@ PublishSystemMemory (
   IN PHYSICAL_ADDRESS  MemoryBegin,
   IN UINT64            MemoryLength
   );
-
-#endif

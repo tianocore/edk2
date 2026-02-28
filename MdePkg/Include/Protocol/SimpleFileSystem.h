@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SIMPLE_FILE_SYSTEM_H__
-#define __SIMPLE_FILE_SYSTEM_H__
+#pragma once
 
 #define EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID \
   { \
@@ -549,5 +548,3 @@ struct _EFI_FILE_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiSimpleFileSystemProtocolGuid;
-
-#endif

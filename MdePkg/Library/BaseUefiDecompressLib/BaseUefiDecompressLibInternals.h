@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __BASE_UEFI_DECOMPRESS_LIB_INTERNALS_H__
-#define __BASE_UEFI_DECOMPRESS_LIB_INTERNALS_H__
+#pragma once
 
 #include <Base.h>
 #include <Library/BaseLib.h>
@@ -245,5 +244,3 @@ UefiTianoDecompress (
   IN OUT VOID    *Scratch,
   IN UINT32      Version
   );
-
-#endif

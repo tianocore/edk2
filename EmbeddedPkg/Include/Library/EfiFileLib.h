@@ -29,8 +29,7 @@
 
 **/
 
-#ifndef __EFI_FILE_LIB_H__
-#define __EFI_FILE_LIB_H__
+#pragma once
 
 #include <PiDxe.h>
 #include <Protocol/FirmwareVolume2.h>
@@ -328,5 +327,3 @@ CHAR8 *
 EfiGetCwd (
   VOID
   );
-
-#endif

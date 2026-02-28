@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef AML_HELPER_H_
-#define AML_HELPER_H_
+#pragma once
 
 #include <AmlNodeDefines.h>
 #include <ResourceData/AmlResourceData.h>
@@ -89,5 +88,3 @@ AmlNodeHasRdDataType (
   IN  AML_DATA_NODE_HANDLE  RdNode,
   IN  AML_RD_HEADER         RdDataType
   );
-
-#endif // AML_HELPER_H_

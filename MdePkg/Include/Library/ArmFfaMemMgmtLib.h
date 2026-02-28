@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef ARM_FFA_MEM_MGMT_LIB_H_
-#define ARM_FFA_MEM_MGMT_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -285,5 +284,3 @@ ArmFfaMemLibPermSet (
   IN UINT32      PageCount,
   IN UINT32      MemoryPerm
   );
-
-#endif // ARM_FFA_MEM_MGMT_LIB_H_

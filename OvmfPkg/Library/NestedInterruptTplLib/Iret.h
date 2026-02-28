@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _IRET_H_
-#define _IRET_H_
+#pragma once
 
 #include <Protocol/DebugSupport.h>
 
@@ -15,5 +14,3 @@ VOID
 DisableInterruptsOnIret (
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   );
-
-#endif // _IRET_H_

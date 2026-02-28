@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _IPMI_LIB_H_
-#define _IPMI_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 #include <IndustryStandard/Ipmi.h>
@@ -40,5 +39,3 @@ IpmiSubmitCommand (
   OUT UINT8      *ResponseData,
   IN OUT UINT32  *ResponseDataSize
   );
-
-#endif

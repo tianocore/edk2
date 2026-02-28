@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __PPI_SHADOW_MICROCODE_H__
-#define __PPI_SHADOW_MICROCODE_H__
+#pragma once
 
 #define EDKII_PEI_SHADOW_MICROCODE_PPI_GUID \
   { \
@@ -61,5 +60,3 @@ struct _EDKII_PEI_SHADOW_MICROCODE_PPI {
 };
 
 extern EFI_GUID  gEdkiiPeiShadowMicrocodePpiGuid;
-
-#endif

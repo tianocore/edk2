@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef SMM_FVB_COMMON_H_
-#define SMM_FVB_COMMON_H_
+#pragma once
 
 #include <Protocol/SmmFirmwareVolumeBlock.h>
 
@@ -64,5 +63,3 @@ typedef struct {
   EFI_LBA                               StartLba;
   UINTN                                 NumOfLba;
 } SMM_FVB_BLOCKS_HEADER;
-
-#endif

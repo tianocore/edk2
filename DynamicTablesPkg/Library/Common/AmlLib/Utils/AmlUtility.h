@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef AML_UTILITY_H_
-#define AML_UTILITY_H_
+#pragma once
 
 #include <AmlNodeDefines.h>
 
@@ -138,5 +137,3 @@ AmlSetRdListCheckSum (
   IN  AML_OBJECT_NODE  *BufferOpNode,
   IN  UINT8            CheckSum
   );
-
-#endif // AML_UTILITY_H_

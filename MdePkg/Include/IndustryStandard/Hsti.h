@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __HSTI_H__
-#define __HSTI_H__
+#pragma once
 
 #pragma pack(1)
 
@@ -72,5 +71,3 @@ typedef struct {
 #pragma pack()
 
 extern EFI_GUID  gAdapterInfoPlatformSecurityGuid;
-
-#endif

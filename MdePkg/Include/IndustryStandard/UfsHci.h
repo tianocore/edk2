@@ -12,8 +12,7 @@
   https://www.jedec.org/system/files/docs/JESD223C.pdf
 --*/
 
-#ifndef __UFS_HCI_H__
-#define __UFS_HCI_H__
+#pragma once
 
 #include <Base.h>
 
@@ -529,5 +528,3 @@ typedef struct {
 } UTP_TMRD;
 
 #pragma pack()
-
-#endif

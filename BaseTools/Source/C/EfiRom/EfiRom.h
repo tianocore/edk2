@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_ROM_H__
-#define __EFI_ROM_H__
+#pragma once
 
 #include <stdio.h>
 #include <string.h>
@@ -348,5 +347,3 @@ Returns:
 
 --*/
 ;
-
-#endif

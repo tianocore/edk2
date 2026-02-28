@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __HARDWARE_INTERRUPT2_H__
-#define __HARDWARE_INTERRUPT2_H__
+#pragma once
 
 #include <Protocol/HardwareInterrupt.h>
 
@@ -168,5 +167,3 @@ struct _EFI_HARDWARE_INTERRUPT2_PROTOCOL {
 };
 
 extern EFI_GUID  gHardwareInterrupt2ProtocolGuid;
-
-#endif

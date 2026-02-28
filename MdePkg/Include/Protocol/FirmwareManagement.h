@@ -17,8 +17,7 @@
 
 **/
 
-#ifndef __EFI_FIRMWARE_MANAGEMENT_PROTOCOL_H__
-#define __EFI_FIRMWARE_MANAGEMENT_PROTOCOL_H__
+#pragma once
 
 #define EFI_FIRMWARE_MANAGEMENT_PROTOCOL_GUID \
   { \
@@ -558,5 +557,3 @@ struct _EFI_FIRMWARE_MANAGEMENT_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiFirmwareManagementProtocolGuid;
-
-#endif

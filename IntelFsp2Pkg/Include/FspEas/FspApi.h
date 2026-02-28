@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _FSP_API_H_
-#define _FSP_API_H_
+#pragma once
 
 #include <Pi/PiStatusCode.h>
 #include <Base.h>
@@ -755,5 +754,3 @@ EFI_STATUS
 (EFIAPI *FSP_MULTI_PHASE_INIT)(
   IN FSP_MULTI_PHASE_PARAMS     *MultiPhaseInitParamPtr
   );
-
-#endif

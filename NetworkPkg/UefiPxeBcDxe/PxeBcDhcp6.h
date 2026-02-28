@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_PXEBC_DHCP6_H__
-#define __EFI_PXEBC_DHCP6_H__
+#pragma once
 
 #define PXEBC_DHCP6_OPTION_MAX_NUM     16
 #define PXEBC_DHCP6_OPTION_MAX_SIZE    312
@@ -271,5 +270,3 @@ PxeBcDhcp6Sarr (
   IN PXEBC_PRIVATE_DATA  *Private,
   IN EFI_DHCP6_PROTOCOL  *Dhcp6
   );
-
-#endif

@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef MM_SAVE_STATE_LIB_H_
-#define MM_SAVE_STATE_LIB_H_
+#pragma once
 
 #include <Protocol/MmCpu.h>
 #include <Uefi/UefiBaseType.h>
@@ -70,5 +69,3 @@ MmSaveStateWriteRegister (
   IN UINTN                       Width,
   IN CONST VOID                  *Buffer
   );
-
-#endif

@@ -10,8 +10,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _IPMI_H_
-#define _IPMI_H_
+#pragma once
 
 #include <IndustryStandard/IpmiNetFnChassis.h>
 #include <IndustryStandard/IpmiNetFnBridge.h>
@@ -69,4 +68,3 @@
 #define IPMI_CHANNEL_NUMBER_IMPLEMENTATION_RESERVED_13  0x0D
 #define IPMI_CHANNEL_NUMBER_PRIMARY_PRESENT_IF          0x0E
 #define IPMI_CHANNEL_NUMBER_PRIMARY_SYSTEM_INTERFACE    0x0F
-#endif

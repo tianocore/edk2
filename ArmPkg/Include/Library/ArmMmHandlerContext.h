@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef ARM_MM_HANDLER_CONTEXT_H_
-#define ARM_MM_HANDLER_CONTEXT_H_
+#pragma once
 
 /*
  * Communication ABI protocol to communicate between normal/secure partition.
@@ -115,5 +114,3 @@ typedef struct {
   /// Context Data according to CommProtocol
   ARM_MM_HANDLER_CTX_DATA    CtxData;
 } ARM_MM_HANDLER_CONTEXT;
-
-#endif // ARM_MM_HANDLER_CONTEXT_H_

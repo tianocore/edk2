@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef SMMSTORE_GUID_H_
-#define SMMSTORE_GUID_H_
+#pragma once
 
 ///
 /// System Table Information GUID
@@ -22,5 +21,3 @@ typedef struct {
   UINT64    MmioAddress;
   UINT8     ApmCmd;
 } SMMSTORE_INFO;
-
-#endif // SMMSTORE_GUID_H_

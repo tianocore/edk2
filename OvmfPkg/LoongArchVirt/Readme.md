@@ -43,13 +43,13 @@ Note: Please refer to QEMU compilation rules, located in qemu/doc/system/loongar
 #### Building LoongArch QEMU virt FW with GCC
 
     export WORKSPACE=`pwd`
-    export GCC5_LOONGARCH64_PREFIX=loongarch64-unknown-linux-gnu-
+    export GCC_LOONGARCH64_PREFIX=loongarch64-unknown-linux-gnu-
     export PACKAGES_PATH=$WORKSPACE/edk2
     export EDK_TOOLS_PATH=$WORKSPACE/edk2/BaseTools
     source edk2/edksetup.sh --reconfig
     make -C edk2/BaseTools
     source edk2/edksetup.sh BaseTools
-    build -b RELEASE -t GCC5 -a LOONGARCH64 -p OvmfPkg/LoongArchVirt/LoongArchVirtQemu.dsc
+    build -b RELEASE -t GCC -a LOONGARCH64 -p OvmfPkg/LoongArchVirt/LoongArchVirtQemu.dsc
 
 ## Test LoongArch QEMU virtual machine firmware
     qemu-system-loongarch64 \
@@ -57,7 +57,7 @@ Note: Please refer to QEMU compilation rules, located in qemu/doc/system/loongar
     -M virt \
     -smp 2 \
     -cpu la464 \
-    -bios Build/LoongArchVirtQemu/RELEASE_GCC5/FV/QEMU_EFI.fd \
+    -bios Build/LoongArchVirtQemu/RELEASE_GCC/FV/QEMU_EFI.fd \
     -serial stdio
 
 ## Test LoongArch QEMU virtual machine OS

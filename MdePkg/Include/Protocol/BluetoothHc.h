@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __EFI_BLUETOOTH_HC_PROTOCOL_H__
-#define __EFI_BLUETOOTH_HC_PROTOCOL_H__
+#pragma once
 
 #define EFI_BLUETOOTH_HC_PROTOCOL_GUID \
   { \
@@ -413,5 +412,3 @@ struct _EFI_BLUETOOTH_HC_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiBluetoothHcProtocolGuid;
-
-#endif
