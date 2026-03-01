@@ -15,6 +15,7 @@
 #   DEFINE NETWORK_IP4_ENABLE             = TRUE
 #   DEFINE NETWORK_IP6_ENABLE             = TRUE
 #   DEFINE NETWORK_TLS_ENABLE             = TRUE
+#   DEFINE NETWORK_TLS_AUTH_CONFIG_ENABLE = TRUE
 #   DEFINE NETWORK_HTTP_ENABLE            = FALSE
 #   DEFINE NETWORK_HTTP_BOOT_ENABLE       = TRUE
 #   DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS = FALSE
@@ -75,6 +76,18 @@
   #       The OpensslLib.inf library instance should be used since libssl is required.
   #
   DEFINE NETWORK_TLS_ENABLE = TRUE
+!endif
+
+!ifndef NETWORK_TLS_AUTH_CONFIG_ENABLE
+  #
+  # This flag is to enable or disable TLS AUTH CONFIG feature.
+  #
+  # Note: This feature depends on the OpenSSL building. To enable this feature, please
+  #       follow the instructions found in the file "OpenSSL-HOWTO.txt" located in
+  #       CryptoPkg\Library\OpensslLib to enable the OpenSSL building first.
+  #       The OpensslLib.inf library instance should be used since libssl is required.
+  #
+  DEFINE NETWORK_TLS_AUTH_CONFIG_ENABLE = TRUE
 !endif
 
 !ifndef NETWORK_HTTP_ENABLE
