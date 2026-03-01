@@ -1401,28 +1401,95 @@ STATIC CONST CM_OBJ_PARSER  CmX64LocalApicX2ApicAffinityInfo[] = {
   { "ClockDomainToken",     sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
 };
 
+/** A parser for CmX64Ia32MachineCheckBankInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64Ia32MachineCheckBankInfoParser[] = {
+  { "ClearOnInit",         1, "0x%x",   NULL },
+  { "StatusDataFormat",    1, "0x%x",   NULL },
+  { "ControlMSRegAddress", 4, "0x%x",   NULL },
+  { "ControlInitData",     8, "0x%llx", NULL },
+  { "StatusMSRegAddress",  4, "0x%x",   NULL },
+  { "AddrMSRegAddress",    4, "0x%x",   NULL },
+  { "MiscMSRegAddress",    4, "0x%x",   NULL },
+};
+
+/** A parser for MACHINE_CHECK_ERROR_SOURCE_COMMON_INFO
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64Ia32ErrSourceMachineCheckCommonInfoParser[] = {
+  { "Common",                    sizeof (ERROR_SOURCE_COMMON_INFO),
+    NULL, NULL, CmArchCommonErrSourceCommonInfoParser,
+    ARRAY_SIZE (CmArchCommonErrSourceCommonInfoParser) },
+  { "MachineBankInfoTokenArray", sizeof (CM_ARCH_COMMON_OBJ_REF),  "0x%p",NULL },
+};
+
+/** A parser for CmX64Ia32ErrSourceMachineCheckExceptionInfo
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64Ia32ErrSourceMachineCheckExceptionInfoParser[] = {
+  { "MachineCheckCommon",    sizeof (MACHINE_CHECK_ERROR_SOURCE_COMMON_INFO),
+    NULL, NULL, CmX64Ia32ErrSourceMachineCheckCommonInfoParser,
+    ARRAY_SIZE (CmX64Ia32ErrSourceMachineCheckCommonInfoParser), },
+  { "GlobalCapInitData",     8,                                              "0x%llx",  NULL },
+  { "GlobalControlInitData", 8,                                              "0x%llx",  NULL },
+};
+
+/** A parser for EX64ObjErrSourceIa32CorrectedMachineCheckInfo
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64Ia32ErrSourceCorrectedMachineCheckInfoParser[] = {
+  { "MachineCheckCommon", sizeof (MACHINE_CHECK_ERROR_SOURCE_COMMON_INFO),
+    NULL, NULL, CmX64Ia32ErrSourceMachineCheckCommonInfoParser,
+    ARRAY_SIZE (CmX64Ia32ErrSourceMachineCheckCommonInfoParser), },
+  { "NotificationInfo",   sizeof (EFI_ACPI_6_6_HARDWARE_ERROR_NOTIFICATION_STRUCTURE),
+    NULL, NULL, AcpiHwErrNotificationParser,
+    ARRAY_SIZE (AcpiHwErrNotificationParser) },
+};
+
+/** A parser for CmX64Ia32ErrSourceDeferredMachineCheckInfo
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64Ia32ErrSourceDeferredMachineCheckInfoParser[] = {
+  { "MachineCheckCommon", sizeof (MACHINE_CHECK_ERROR_SOURCE_COMMON_INFO),
+    NULL, NULL, CmX64Ia32ErrSourceMachineCheckCommonInfoParser,
+    ARRAY_SIZE (CmX64Ia32ErrSourceMachineCheckCommonInfoParser), },
+  { "NotificationInfo",   sizeof (EFI_ACPI_6_6_HARDWARE_ERROR_NOTIFICATION_STRUCTURE),
+    NULL, NULL, AcpiHwErrNotificationParser,
+    ARRAY_SIZE (AcpiHwErrNotificationParser) },
+};
+
+/** A parser for CmX64Ia32ErrSourceNmiInfo
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64Ia32ErrSourceNmiInfoParser[] = {
+  { "Common",           sizeof (ERROR_SOURCE_COMMON_INFO),
+    NULL, NULL, CmArchCommonErrSourceCommonInfoParser,
+    ARRAY_SIZE (CmArchCommonErrSourceCommonInfoParser) },
+  { "MaxRawDataLength", 4,                                "0x%x",NULL },
+};
+
 /** A parser for X64 namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  X64NamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT_RESERVED (EX64ObjReserved),
-  CM_PARSER_ADD_OBJECT (EX64ObjFadtSciInterrupt,           CmX64ObjFadtSciInterruptParser),
-  CM_PARSER_ADD_OBJECT (EX64ObjFadtSciCmdInfo,             CmX64ObjFadtSciCmdInfoParser),
-  CM_PARSER_ADD_OBJECT (EX64ObjFadtPmBlockInfo,            CmX64ObjFadtPmBlockInfoParser),
-  CM_PARSER_ADD_OBJECT (EX64ObjFadtGpeBlockInfo,           CmX64ObjFadtGpeBlockInfoParser),
-  CM_PARSER_ADD_OBJECT (EX64ObjFadtXpmBlockInfo,           CmX64ObjFadtXpmBlockInfoParser),
-  CM_PARSER_ADD_OBJECT (EX64ObjFadtXgpeBlockInfo,          CmX64ObjFadtXgpeBlockInfoParser),
-  CM_PARSER_ADD_OBJECT (EX64ObjFadtSleepBlockInfo,         CmX64ObjFadtSleepBlockInfoParser),
-  CM_PARSER_ADD_OBJECT (EX64ObjFadtResetBlockInfo,         CmX64ObjFadtResetBlockInfoParser),
-  CM_PARSER_ADD_OBJECT (EX64ObjFadtMiscInfo,               CmX64ObjFadtMiscInfoParser),
-  CM_PARSER_ADD_OBJECT (EX64ObjWsmtFlagsInfo,              CmX64ObjWsmtFlagsInfoParser),
-  CM_PARSER_ADD_OBJECT (EX64ObjHpetInfo,                   CmX64ObjHpetInfoParser),
-  CM_PARSER_ADD_OBJECT (EX64ObjMadtInfo,                   CmX64ObjMadtInfoParser),
-  CM_PARSER_ADD_OBJECT (EX64ObjLocalApicX2ApicInfo,        CmX64ObjLocalApicX2ApicInfoParser),
-  CM_PARSER_ADD_OBJECT (EX64ObjIoApicInfo,                 CmX64IoApicInfoParser),
-  CM_PARSER_ADD_OBJECT (EX64ObjIntrSourceOverrideInfo,     CmX64IntrSourceOverrideInfoParser),
-  CM_PARSER_ADD_OBJECT (EX64ObjLocalApicX2ApicNmiInfo,     CmX64LocalApicNmiInfo),
-  CM_PARSER_ADD_OBJECT (EX64ObjFacsInfo,                   CmX64ObjFacsInfoParser),
-  CM_PARSER_ADD_OBJECT (EX64ObjLocalApicX2ApicAffinityInfo,CmX64LocalApicX2ApicAffinityInfo),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtSciInterrupt,                      CmX64ObjFadtSciInterruptParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtSciCmdInfo,                        CmX64ObjFadtSciCmdInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtPmBlockInfo,                       CmX64ObjFadtPmBlockInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtGpeBlockInfo,                      CmX64ObjFadtGpeBlockInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtXpmBlockInfo,                      CmX64ObjFadtXpmBlockInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtXgpeBlockInfo,                     CmX64ObjFadtXgpeBlockInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtSleepBlockInfo,                    CmX64ObjFadtSleepBlockInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtResetBlockInfo,                    CmX64ObjFadtResetBlockInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtMiscInfo,                          CmX64ObjFadtMiscInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjWsmtFlagsInfo,                         CmX64ObjWsmtFlagsInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjHpetInfo,                              CmX64ObjHpetInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjMadtInfo,                              CmX64ObjMadtInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjLocalApicX2ApicInfo,                   CmX64ObjLocalApicX2ApicInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjIoApicInfo,                            CmX64IoApicInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjIntrSourceOverrideInfo,                CmX64IntrSourceOverrideInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjLocalApicX2ApicNmiInfo,                CmX64LocalApicNmiInfo),
+  CM_PARSER_ADD_OBJECT (EX64ObjFacsInfo,                              CmX64ObjFacsInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjLocalApicX2ApicAffinityInfo,           CmX64LocalApicX2ApicAffinityInfo),
+  CM_PARSER_ADD_OBJECT (EX64ObjIa32MachineCheckBankInfo,              CmX64Ia32MachineCheckBankInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjErrSourceIa32MachineCheckExceptionInfo,CmX64Ia32ErrSourceMachineCheckExceptionInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjErrSourceIa32CorrectedMachineCheckInfo,CmX64Ia32ErrSourceCorrectedMachineCheckInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjErrSourceIa32DeferredMachineCheckInfo, CmX64Ia32ErrSourceDeferredMachineCheckInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjErrSourceIa32NmiInfo,                  CmX64Ia32ErrSourceNmiInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EX64ObjMax)
 };
 
