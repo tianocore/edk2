@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2017 - 2026, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
   Copyright (C) 2024 - 2025 Advanced Micro Devices, Inc. All rights reserved.
 
@@ -126,6 +126,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdSlit,                          ///< SLIT Generator
   EStdAcpiTableIdRhct,                          ///< RHCT Generator
   EStdAcpiTableIdSsdtDmc620Pmu,                 ///< SSDT DMC620 PMU Generator
+  EStdAcpiTableIdHest,                          ///< Hest Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 
