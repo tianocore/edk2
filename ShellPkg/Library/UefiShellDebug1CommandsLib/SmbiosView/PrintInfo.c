@@ -1282,6 +1282,11 @@ SmbiosPrintStructure (
     // Management Controller Host Interface (Type 42)
     //
     case 42:
+      MC_HOST_INTERFACE_PROTOCOL_RECORD  *MCHostInterfaceProtocolRecord;
+      UINT8                              *RecordsPointer;
+      UINT8                              MCHostInterfaceProtocolNumber;
+      UINT8                              ProtocolTypeDataLen;
+
       DisplayMCHostInterfaceType (Struct->Type42->InterfaceType, Option);
       if (AE_SMBIOS_VERSION (0x3, 0x2)) {
         UINT32  DataValue = 0;
@@ -1320,6 +1325,40 @@ SmbiosPrintStructure (
             // The decoding is not defined for these values in SMBIOS 3.8.0. The value is dumped
             PRINT_BIT_FIELD (Struct, Type42, InterfaceTypeSpecificData, Struct->Type42->InterfaceTypeSpecificDataLength);
             break;
+        }
+
+        RecordsPointer                = (UINT8 *)(&Struct->Type42->InterfaceTypeSpecificData[0] + Struct->Type42->InterfaceTypeSpecificDataLength);
+        MCHostInterfaceProtocolNumber = *RecordsPointer;
+        ShellPrintDefaultEx (L"MCHostInterfaceProtocol Number: %d\n", MCHostInterfaceProtocolNumber);
+        MCHostInterfaceProtocolRecord = (MC_HOST_INTERFACE_PROTOCOL_RECORD *)(RecordsPointer + 1);
+
+        for (Index = 0; Index < MCHostInterfaceProtocolNumber; Index++) {
+          ProtocolTypeDataLen = MCHostInterfaceProtocolRecord->ProtocolTypeDataLen;
+          ShellPrintDefaultEx (L"#%d MCHostInterfaceProtocolType: ", Index);
+          switch (MCHostInterfaceProtocolRecord->ProtocolType) {
+            case MCHostInterfaceProtocolTypeIPMI:
+              ShellPrintDefaultEx (L"IPMI\n");
+              break;
+
+            case MCHostInterfaceProtocolTypeMCTP:
+              ShellPrintDefaultEx (L"MCTP\n");
+              break;
+
+            case MCHostInterfaceProtocolTypeRedfishOverIP:
+              ShellPrintDefaultEx (L"RedfishOverIP\n");
+              break;
+
+            case MCHostInterfaceProtocolTypeOemDefined:
+              ShellPrintDefaultEx (L"OemDefined\n");
+              break;
+
+            default:
+              ShellPrintDefaultEx (L"Reserved\n");
+              break;
+          }
+
+          PRINT_SMBIOS_BIT_FIELD (Struct, MCHostInterfaceProtocolRecord->ProtocolTypeData, ProtocolTypeData, ProtocolTypeDataLen);
+          MCHostInterfaceProtocolRecord = (MC_HOST_INTERFACE_PROTOCOL_RECORD *)((UINT8 *)MCHostInterfaceProtocolRecord + ProtocolTypeDataLen);
         }
       }
 
