@@ -1,0 +1,47 @@
+### @file
+# Component description file for BMC ACPI.
+#
+# Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                   = 0x00010005
+  BASE_NAME                     = BmcAcpi
+  FILE_GUID                     = 09E3B4BE-F731-4903-AAE6-BD5D573B6140
+  MODULE_TYPE                   = DXE_DRIVER
+  VERSION_STRING                = 1.0
+  ENTRY_POINT                   = BmcAcpiEntryPoint
+
+[Sources]
+  BmcAcpi.c
+  BmcSsdt/BmcSsdt.asl
+
+[Packages]
+  ManageabilityPkg/ManageabilityPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiFirmwareVolume2ProtocolGuid
+  gEfiAcpiTableProtocolGuid
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId
+
+[Depex]
+  gEfiAcpiTableProtocolGuid
+
+[BuildOptions]
+  *_*_*_ASL_FLAGS = -oi

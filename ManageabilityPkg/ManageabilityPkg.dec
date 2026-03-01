@@ -1,0 +1,123 @@
+## @file
+# Manageabilty Package
+# This is the package provides the edk2 drivers and libraries
+# those are related to the platform management.
+#
+# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
+# Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION = 0x0001001d
+  PACKAGE_NAME      = ManageabilityPkg
+  PACKAGE_GUID      = 36310119-4FB2-4BA3-959D-74C16B849F9E
+  PACKAGE_VERSION   = 1.0
+
+[Includes]
+  Include
+
+[LibraryClasses]
+  ##  @libraryclass IPMI command library
+  #   Provide the help functions to send IPMI commands.
+  IpmiCommandLib|Include/Library/IpmiCommandLib.h
+
+  ##  @libraryclass Manageability Transport Library
+  #   Manageability Transport Library definitions
+  ManageabilityTransportLib|Include/Library/ManageabilityTransportLib.h
+
+  ##  @libraryclass Manageability Transport Helper Library
+  #   Provide the help functions to use ManageabilityTransportLib
+  ManageabilityTransportHelperLib|Include/Library/ManageabilityTransportHelperLib.h
+
+  ##  @libraryclass Platform BMC Ready Library
+  #   Provide the help functions to check the BMC state
+  PlatformBmcReadyLib|Include/Library/PlatformBmcReadyLib.h
+
+[Guids]
+  gManageabilityPkgTokenSpaceGuid   = { 0xBDEFFF48, 0x1C31, 0x49CD, { 0xA7, 0x6D, 0x92, 0x9E, 0x60, 0xDB, 0xB9, 0xF8 } }
+
+  # Manageability Transport Interface type
+  #
+  # Manageability Transport KCS
+  gManageabilityTransportKcsGuid      = { 0x5A6E64E9, 0xFD47, 0x4086, { 0xAA, 0xB0, 0x7A, 0x5F, 0xD7, 0x6B, 0x02, 0x2E } }
+  # Manageability Transport SMBUS I2C
+  gManageabilityTransportSmbusI2cGuid = { 0x5B174658, 0x8263, 0x4CB8, { 0xA0, 0x0F, 0xD6, 0x82, 0xE6, 0xBC, 0x74, 0x93 } }
+  # Manageability Transport PCI VDM
+  gManageabilityTransportPciVdmGuid   = { 0x388021A7, 0xFB59, 0x4811, { 0x9D, 0xA7, 0xD5, 0x63, 0x7D, 0x04, 0xA7, 0x2F } }
+  # Manageability Transport MCTP
+  gManageabilityTransportMctpGuid     = { 0x6798448D, 0x1200, 0x4577, { 0x82, 0x50, 0xA9, 0x83, 0xBA, 0x2B, 0x45, 0xD9 } }
+  # Manageability Transport SERIAL
+  gManageabilityTransportSerialGuid   = { 0xEF437878, 0x34DD, 0x4879, { 0x8F, 0xD3, 0xB6, 0x0A, 0x40, 0x3C, 0xD0, 0x63 } }
+
+  # Manageability Protocol Specification
+  #
+  # Manageability Protocol IPMI
+  gManageabilityProtocolIpmiGuid    = { 0x36ACA47C, 0xCC80, 0x473B, { 0xAB, 0xEC, 0xF3, 0x98, 0xFF, 0x87, 0x74, 0x5B } }
+  # Manageability Protocol MCTP
+  #  MCTP is a transport interface but also a protocol that can be trasmitted over other transport interfaces.
+  gManageabilityProtocolMctpGuid    = { 0x76FED8F1, 0x0BE5, 0x4269, { 0xA3, 0x1A, 0x38, 0x0F, 0x54, 0xF1, 0xA1, 0x8A } }
+  # Manageability Protocol PLDM
+  gManageabilityProtocolPldmGuid    = { 0x3958090D, 0x69DD, 0x4868, { 0x9C, 0x41, 0xC9, 0xAC, 0x31, 0xB5, 0x25, 0xC5 } }
+
+  # Manageability variable Guid
+  gManageabilityVariableGuid        = { 0xac4cf43f, 0x3f64, 0x416a, { 0x96, 0x1d, 0x03, 0x1b, 0x53, 0x5b, 0x91, 0x5f } }
+
+[Protocols]
+  gEdkiiPldmProtocolGuid                = { 0x60997616, 0xDB70, 0x4B5F, { 0x86, 0xA4, 0x09, 0x58, 0xA3, 0x71, 0x47, 0xB4 } }
+  gEdkiiPldmSmbiosTransferProtocolGuid  = { 0xFA431C3C, 0x816B, 0x4B32, { 0xA3, 0xE0, 0xAD, 0x9B, 0x7F, 0x64, 0x27, 0x2E } }
+  gEdkiiMctpProtocolGuid                = { 0xE93465C1, 0x9A31, 0x4C96, { 0x92, 0x56, 0x22, 0x0A, 0xE1, 0x80, 0xB4, 0x1B } }
+  ## Include/Protocol/IpmiBlobTransfer.h
+  gEdkiiIpmiBlobTransferProtocolGuid    = { 0x05837c75, 0x1d65, 0x468b, { 0xb1, 0xc2, 0x81, 0xaf, 0x9a, 0x31, 0x5b, 0x2c } }
+
+[PcdsFixedAtBuild]
+  ## This value is the MCTP Interface source and destination endpoint ID for transmiting MCTP message.
+  # @Prompt MCTP source endpoint ID
+  gManageabilityPkgTokenSpaceGuid.PcdMctpSourceEndpointId|0|UINT8|0x00000001
+  # @Prompt MCTP destination endpoint ID
+  gManageabilityPkgTokenSpaceGuid.PcdMctpDestinationEndpointId|0|UINT8|0x00000002
+  ## This is the value of MCTP KCS I/O base address mode
+  # @Prompt MCTP KCS I/O base address mode
+  gManageabilityPkgTokenSpaceGuid.PcdMctpKcsMemoryMappedIo|0|BOOLEAN|0x00000003
+  ## This is the value of MCTP KCS I/O base address
+  # @Prompt MCTP KCS (Memory mapped) I/O base address
+  gManageabilityPkgTokenSpaceGuid.PcdMctpKcsBaseAddress|0xca2|UINT32|0x00000004
+
+  ## This value is the PLDM source and destination terminus ID for transmiting PLDM message.
+  # @Prompt PLDM source terminus ID
+  gManageabilityPkgTokenSpaceGuid.PcdPldmSourceTerminusId|0|UINT8|0x00000040
+  # @Prompt PLDM destination terminus ID
+  gManageabilityPkgTokenSpaceGuid.PcdPldmDestinationEndpointId|0|UINT8|0x00000041
+
+  ## This is the value of SOL channels supported on platform.
+  # @Prompt SOL channel number
+  gManageabilityPkgTokenSpaceGuid.PcdMaxSolChannels|3|UINT8|0x00000100
+
+[PcdsFeatureFlag]
+  gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiEnable|FALSE|BOOLEAN|0x10000001
+  gManageabilityPkgTokenSpaceGuid.PcdManageabilitySmmIpmiEnable|FALSE|BOOLEAN|0x10000002
+  gManageabilityPkgTokenSpaceGuid.PcdManageabilityPeiIpmiEnable|FALSE|BOOLEAN|0x10000003
+  gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxePldmEnable|FALSE|BOOLEAN|0x10000004
+  gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeMctpEnable|FALSE|BOOLEAN|0x10000005
+  gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxePldmSmbiosTransferEnable|FALSE|BOOLEAN|0x10000006
+  gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiFru|FALSE|BOOLEAN|0x10000007
+  gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiOsWdt|FALSE|BOOLEAN|0x10000008
+  gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiSolStatus|FALSE|BOOLEAN|0x10000009
+  gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiBmcElog|FALSE|BOOLEAN|0x1000000A
+  gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiFrb|FALSE|BOOLEAN|0x1000000B
+  gManageabilityPkgTokenSpaceGuid.PcdManageabilityPeiIpmiFrb|FALSE|BOOLEAN|0x1000000C
+  gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiBmcAcpi|FALSE|BOOLEAN|0x1000000D
+  gManageabilityPkgTokenSpaceGuid.PcdManageabilityDxeIpmiSmbiosTransferEnable|FALSE|BOOLEAN|0x1000000E
+
+[PcdsDynamic, PcdsDynamicEx]
+  gManageabilityPkgTokenSpaceGuid.PcdFRB2EnabledFlag|TRUE|BOOLEAN|0x20000001
+  ## This is the timeout value in milliseconds, default set to 360 milliseconds
+  # @Prompt IPMI Fault Resilient Booting timeout value in milliseconds.
+  gManageabilityPkgTokenSpaceGuid.PcdFRBTimeoutValue|360|UINT16|0x20000002
+  ## The BlobId of SMBIOS Blob in OpenBMC Phosphor Blob Transfer architecture
+  gManageabilityPkgTokenSpaceGuid.PcdBmcSmbiosBlobTransferId|"/smbios"|VOID*|0x20000003
+  ## When this PCD is set to TRUE, IpmiSmbiosTransferDxe only sends SMBIOS table to
+  #  BMC when SMBIOS table is changed.
+  gManageabilityPkgTokenSpaceGuid.PcdSendSmbiosOnChanged|TRUE|BOOLEAN|0x20000004

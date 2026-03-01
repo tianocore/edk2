@@ -1,0 +1,32 @@
+### @file
+# Component description file for IPMI Command Library.
+#
+# Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 0x0001001E
+  BASE_NAME                      = IpmiCommandLib
+  FILE_GUID                      = 4E6B3E4B-F6BC-4C86-A728-9C210D372223
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = IpmiCommandLib|PEIM PEI_CORE
+
+[Sources]
+  IpmiCommandLibNetFnApp.c
+  IpmiCommandLibNetFnChassis.c
+  IpmiCommandLibNetFnStorage.c
+  IpmiCommandLibNetFnTransport.c
+
+[Packages]
+  ManageabilityPkg/ManageabilityPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  IpmiLib
