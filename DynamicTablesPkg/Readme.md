@@ -59,6 +59,7 @@ The framework currently supports the following table generators for ARM:
 * SRAT - System Resource Affinity Table
 * SSDT - Secondary System Description Table. This is essentially
          a RAW table generator.
+* HEST - Hardware Error Source Table
 
 ## Dynamic AML
 
