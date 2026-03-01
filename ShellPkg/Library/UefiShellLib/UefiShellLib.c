@@ -154,51 +154,6 @@ FullyQualifyPath (
 }
 
 /**
-  Check if a Unicode character is a hexadecimal character.
-
-  This internal function checks if a Unicode character is a
-  numeric character.  The valid hexadecimal characters are
-  L'0' to L'9', L'a' to L'f', or L'A' to L'F'.
-
-  @param  Char  The character to check against.
-
-  @retval TRUE  If the Char is a hexadecmial character.
-  @retval FALSE If the Char is not a hexadecmial character.
-
-**/
-BOOLEAN
-EFIAPI
-ShellIsHexaDecimalDigitCharacter (
-  IN      CHAR16  Char
-  )
-{
-  return (BOOLEAN)((Char >= L'0' && Char <= L'9') || (Char >= L'A' && Char <= L'F') || (Char >= L'a' && Char <= L'f'));
-}
-
-/**
-  Check if a Unicode character is a decimal character.
-
-  This internal function checks if a Unicode character is a
-  decimal character.  The valid characters are
-  L'0' to L'9'.
-
-
-  @param  Char  The character to check against.
-
-  @retval TRUE  If the Char is a hexadecmial character.
-  @retval FALSE If the Char is not a hexadecmial character.
-
-**/
-BOOLEAN
-EFIAPI
-ShellIsDecimalDigitCharacter (
-  IN      CHAR16  Char
-  )
-{
-  return (BOOLEAN)(Char >= L'0' && Char <= L'9');
-}
-
-/**
   Helper function to find ShellEnvironment2 for constructor.
 
   @param[in] ImageHandle    A copy of the calling image's handle.
@@ -3907,11 +3862,11 @@ InternalShellIsHexOrDecimalNumber (
     }
 
     if (Hex) {
-      if (!ShellIsHexaDecimalDigitCharacter (*String)) {
+      if (!CharIsHexNum (*String)) {
         return (FALSE);
       }
     } else {
-      if (!ShellIsDecimalDigitCharacter (*String)) {
+      if (!CharIsNum (*String)) {
         return (FALSE);
       }
     }
@@ -3969,7 +3924,7 @@ InternalShellHexCharToUintn (
   IN      CHAR16  Char
   )
 {
-  if (ShellIsDecimalDigitCharacter (Char)) {
+  if (CharIsNum (Char)) {
     return Char - L'0';
   }
 
@@ -4056,7 +4011,7 @@ InternalShellStrHexToUint64 (
 
   Result = 0;
 
-  while (ShellIsHexaDecimalDigitCharacter (*String)) {
+  while (CharIsHexNum (*String)) {
     //
     // If the Hex Number represented by String overflows according
     // to the range defined by UINT64, then return EFI_DEVICE_ERROR.
@@ -4149,7 +4104,7 @@ InternalShellStrDecimalToUint64 (
     return (EFI_SUCCESS);
   }
 
-  while (ShellIsDecimalDigitCharacter (*String)) {
+  while (CharIsNum (*String)) {
     //
     // If the number represented by String overflows according
     // to the range defined by UINT64, then return EFI_DEVICE_ERROR.

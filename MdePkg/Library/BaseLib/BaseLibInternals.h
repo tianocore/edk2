@@ -437,25 +437,6 @@ InternalLongJump (
   );
 
 /**
-  Check if a Unicode character is a decimal character.
-
-  This internal function checks if a Unicode character is a
-  decimal character. The valid decimal character is from
-  L'0' to L'9'.
-
-  @param  Char  The character to check against.
-
-  @retval TRUE  If the Char is a decmial character.
-  @retval FALSE If the Char is not a decmial character.
-
-**/
-BOOLEAN
-EFIAPI
-InternalIsDecimalDigitCharacter (
-  IN      CHAR16  Char
-  );
-
-/**
   Convert a Unicode character to numerical value.
 
   This internal function only deal with Unicode character
@@ -472,65 +453,6 @@ UINTN
 EFIAPI
 InternalHexCharToUintn (
   IN      CHAR16  Char
-  );
-
-/**
-  Check if a Unicode character is a hexadecimal character.
-
-  This internal function checks if a Unicode character is a
-  decimal character.  The valid hexadecimal character is
-  L'0' to L'9', L'a' to L'f', or L'A' to L'F'.
-
-
-  @param  Char  The character to check against.
-
-  @retval TRUE  If the Char is a hexadecmial character.
-  @retval FALSE If the Char is not a hexadecmial character.
-
-**/
-BOOLEAN
-EFIAPI
-InternalIsHexaDecimalDigitCharacter (
-  IN      CHAR16  Char
-  );
-
-/**
-  Check if a ASCII character is a decimal character.
-
-  This internal function checks if a Unicode character is a
-  decimal character. The valid decimal character is from
-  '0' to '9'.
-
-  @param  Char  The character to check against.
-
-  @retval TRUE  If the Char is a decmial character.
-  @retval FALSE If the Char is not a decmial character.
-
-**/
-BOOLEAN
-EFIAPI
-InternalAsciiIsDecimalDigitCharacter (
-  IN      CHAR8  Char
-  );
-
-/**
-  Check if a ASCII character is a hexadecimal character.
-
-  This internal function checks if a ASCII character is a
-  decimal character.  The valid hexadecimal character is
-  L'0' to L'9', L'a' to L'f', or L'A' to L'F'.
-
-
-  @param  Char  The character to check against.
-
-  @retval TRUE  If the Char is a hexadecmial character.
-  @retval FALSE If the Char is not a hexadecmial character.
-
-**/
-BOOLEAN
-EFIAPI
-InternalAsciiIsHexaDecimalDigitCharacter (
-  IN      CHAR8  Char
   );
 
 /**

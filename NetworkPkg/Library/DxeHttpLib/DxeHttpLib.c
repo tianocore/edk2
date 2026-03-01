@@ -49,7 +49,7 @@ UriPercentDecode (
   while (Index < BufferLength) {
     if (Buffer[Index] == '%') {
       if ((Index + 1 >= BufferLength) || (Index + 2 >= BufferLength) ||
-          !NET_IS_HEX_CHAR (Buffer[Index+1]) || !NET_IS_HEX_CHAR (Buffer[Index+2]))
+          !AsciiCharIsHexNum (Buffer[Index+1]) || !AsciiCharIsHexNum (Buffer[Index+2]))
       {
         return EFI_INVALID_PARAMETER;
       }
@@ -743,7 +743,7 @@ HttpUrlGetPort (
   PortString[ResultLength] = '\0';
 
   while (Index < ResultLength) {
-    if (!NET_IS_DIGIT (PortString[Index])) {
+    if (!AsciiCharIsNum (PortString[Index])) {
       Status = EFI_INVALID_PARAMETER;
       goto ON_EXIT;
     }
@@ -1239,7 +1239,7 @@ HttpParseMessageBody (
         Parser->CurrentChunkSize = 0;
         Parser->State            = BodyParserChunkSize;
       case BodyParserChunkSize:
-        if (!NET_IS_HEX_CHAR (*Char)) {
+        if (!AsciiCharIsHexNum (*Char)) {
           if (*Char == ';') {
             Parser->State = BodyParserChunkExtStart;
             Char++;
