@@ -484,6 +484,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Base|0x0
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size|0x800000000
 
+  # Dynamic FSBClock. For debugging, the default value is saved in
+  # DebugTimer.c, the same value is used.
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock|100000000
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0
 
