@@ -37,4 +37,5 @@
   BaseLib
   IoLib
   TimerLib
+  PvPanicLib
 

@@ -36,3 +36,4 @@
   IoLib
   PciLib
   TimerLib
+  PvPanicLib

@@ -12,6 +12,7 @@
 #include <Library/DebugLib.h>       // ASSERT()
 #include <Library/IoLib.h>          // IoOr16()
 #include <Library/PciLib.h>         // PciRead16()
+#include <Library/PvPanicLib.h>     // PvPanicLibSendEventGuestShutdown()
 #include <Library/ResetSystemLib.h> // ResetShutdown()
 #include <OvmfPlatforms.h>          // OVMF_HOSTBRIDGE_DID
 
@@ -30,6 +31,9 @@ ResetShutdown (
 {
   UINT16  AcpiPmBaseAddress;
   UINT16  HostBridgeDevId;
+
+  // Notify the host that the system is performing a normal shutdown.
+  PvPanicLibSendEventGuestShutdown ();
 
   AcpiPmBaseAddress = 0;
   HostBridgeDevId   = PciRead16 (OVMF_HOSTBRIDGE_DID);
