@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef ARM_LIB_H_
-#define ARM_LIB_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 #include <AArch64/AArch64.h>
@@ -767,5 +766,3 @@ EFIAPI
 ArmHas52BitTgran4 (
   VOID
   );
-
-#endif // ARM_LIB_H_

@@ -6,8 +6,7 @@
 
  **/
 
-#ifndef HDLCD_H_
-#define HDLCD_H_
+#pragma once
 
 // HDLCD Controller Register Offsets
 #define HDLCD_REG_VERSION         ((UINTN)PcdGet32 (PcdArmHdLcdBase) + 0x000)
@@ -80,5 +79,3 @@
 #define HDLCD_4BYTES_PER_PIXEL  ((4 - 1) << 3)
 
 #define HDLCD_PRODUCT_ID  0x1CDC
-
-#endif /* HDLCD_H_ */

@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_XHCI_REG_H_
-#define _EFI_XHCI_REG_H_
+#pragma once
 
 #define PCI_IF_XHCI  0x30
 
@@ -636,5 +635,3 @@ XhcCheckUsbPortSpeedUsedPsic (
   IN UINT8              PortSpeed,
   IN UINT8              PortNumber
   );
-
-#endif

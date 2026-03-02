@@ -7,6 +7,8 @@
 
 **/
 
+#pragma once
+
 #ifndef __UEFI_BASETYPE_H__
 #define __UEFI_BASETYPE_H__
 

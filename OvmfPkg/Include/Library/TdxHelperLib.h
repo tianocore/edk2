@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef TDX_HELPER_LIB_H
-#define TDX_HELPER_LIB_H
+#pragma once
 
 #include <PiPei.h>
 
@@ -66,5 +65,3 @@ EFIAPI
 TdxHelperBuildGuidHobForTdxMeasurement (
   VOID
   );
-
-#endif

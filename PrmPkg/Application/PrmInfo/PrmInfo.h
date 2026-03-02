@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef PRM_INFO_H_
-#define PRM_INFO_H_
+#pragma once
 
 #include <Base.h>
 #include <Prm.h>
@@ -45,5 +44,3 @@ typedef struct {
 #define ONE_MICROSECOND  (1000)
 #define ONE_MILLISECOND  (1000 * ONE_MICROSECOND)
 #define ONE_SECOND       (1000 * ONE_MILLISECOND)
-
-#endif

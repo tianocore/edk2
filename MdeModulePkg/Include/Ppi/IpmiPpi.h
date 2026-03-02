@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _IPMI_PPI_H_
-#define _IPMI_PPI_H_
+#pragma once
 
 typedef struct _PEI_IPMI_PPI PEI_IPMI_PPI;
 
@@ -55,5 +54,3 @@ struct _PEI_IPMI_PPI {
 };
 
 extern EFI_GUID  gPeiIpmiPpiGuid;
-
-#endif

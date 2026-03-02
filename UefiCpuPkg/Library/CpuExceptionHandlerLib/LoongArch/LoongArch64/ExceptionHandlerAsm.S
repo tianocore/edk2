@@ -110,7 +110,7 @@ PopRegs:
   fld.d  $fs7, $sp, 31 * RSIZE
 
   ld.d        $t0, $sp, 32 * RSIZE
-  movgr2fcsr  $r0, $t0             // Pop the fcsr0 register.
+  movgr2fcsr  $fcsr0, $t0          // Pop the fcsr0 register.
 
   //
   // Pop the fcc0-fcc7 registers.
@@ -287,7 +287,7 @@ ASM_PFX(ExceptionEntryStart):
   fst.d  $fs6, $sp, 30 * RSIZE
   fst.d  $fs7, $sp, 31 * RSIZE
 
-  movfcsr2gr  $t3, $r0
+  movfcsr2gr  $t3, $fcsr0
   st.d        $t3, $sp, 32 * RSIZE  // Push the FCSR0 register.
 
   //

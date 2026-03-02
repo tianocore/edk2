@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __POST_CODE_LIB_H__
-#define __POST_CODE_LIB_H__
+#pragma once
 
 #define POST_CODE_PROPERTY_POST_CODE_ENABLED              0x00000008
 #define POST_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED  0x00000010
@@ -136,5 +135,3 @@ PostCodeDescriptionEnabled (
       PostCodeWithDescription(Value,Description) :     \
       PostCode(Value))                           :     \
     Value
-
-#endif

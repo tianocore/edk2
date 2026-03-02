@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_UHCI_QUEUE_H_
-#define _EFI_UHCI_QUEUE_H_
+#pragma once
 
 //
 // Macroes used to set various links in UHCI's driver.
@@ -254,5 +253,3 @@ UhciCreateBulkOrIntTds (
   IN UINT8       MaxPacket,
   IN BOOLEAN     IsLow
   );
-
-#endif

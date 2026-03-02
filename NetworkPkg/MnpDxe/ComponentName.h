@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _COMPONENT_NAME_H_
-#define _COMPONENT_NAME_H_
+#pragma once
 
 #include <Protocol/ComponentName.h>
 #include <Protocol/ComponentName2.h>
@@ -140,5 +139,3 @@ MnpComponentNameGetControllerName (
   IN     CHAR8                        *Language,
   OUT CHAR16                          **ControllerName
   );
-
-#endif

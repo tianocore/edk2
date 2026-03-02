@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _MEMORY_PROFILE_H_
-#define _MEMORY_PROFILE_H_
+#pragma once
 
 #include <Pi/PiFirmwareFile.h>
 
@@ -462,5 +461,3 @@ typedef EDKII_MEMORY_PROFILE_PROTOCOL EDKII_SMM_MEMORY_PROFILE_PROTOCOL;
 }
 
 extern EFI_GUID  gEdkiiSmmMemoryProfileGuid;
-
-#endif

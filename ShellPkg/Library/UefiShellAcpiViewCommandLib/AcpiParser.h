@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef ACPIPARSER_H_
-#define ACPIPARSER_H_
+#pragma once
 
 #define OUTPUT_FIELD_COLUMN_WIDTH  36
 
@@ -1282,5 +1281,3 @@ ParseAcpiXsdt (
   IN UINT32   AcpiTableLength,
   IN UINT8    AcpiTableRevision
   );
-
-#endif // ACPIPARSER_H_

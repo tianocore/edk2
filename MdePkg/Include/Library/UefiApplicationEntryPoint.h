@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __UEFI_APPLICATION_ENTRY_POINT_H__
-#define __UEFI_APPLICATION_ENTRY_POINT_H__
+#pragma once
 
 ///
 /// Declare the EFI/UEFI Specification Revision to which this driver is implemented
@@ -139,5 +138,3 @@ ProcessModuleEntryPointList (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
-
-#endif

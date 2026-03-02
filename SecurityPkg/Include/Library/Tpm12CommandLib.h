@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TPM12_COMMAND_LIB_H_
-#define _TPM12_COMMAND_LIB_H_
+#pragma once
 
 #include <IndustryStandard/Tpm12.h>
 
@@ -216,5 +215,3 @@ EFIAPI
 Tpm12GetCapabilityFlagVolatile (
   OUT TPM_STCLEAR_FLAGS  *VolatileFlags
   );
-
-#endif

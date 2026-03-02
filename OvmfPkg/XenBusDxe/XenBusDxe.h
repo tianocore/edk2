@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_XENBUS_DXE_H__
-#define __EFI_XENBUS_DXE_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -118,5 +117,3 @@ CHAR8 *
 AsciiStrDup (
   IN CONST CHAR8  *Str
   );
-
-#endif

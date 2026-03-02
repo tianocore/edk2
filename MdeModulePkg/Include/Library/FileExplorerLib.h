@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __FILE_EXPLORER_LIB_H__
-#define __FILE_EXPLORER_LIB_H__
+#pragma once
 
 #include <Protocol/FileExplorer.h>
 
@@ -37,5 +36,3 @@ ChooseFile (
   IN  CHOOSE_HANDLER            ChooseHandler   OPTIONAL,
   OUT EFI_DEVICE_PATH_PROTOCOL  **File  OPTIONAL
   );
-
-#endif

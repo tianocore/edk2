@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef ARM_SCMI_INFO_LIB_H_
-#define ARM_SCMI_INFO_LIB_H_
+#pragma once
 
 #include <ConfigurationManagerObject.h>
 
@@ -29,5 +28,3 @@ DynamicTablesScmiInfoGetFastChannel (
   IN  UINT32        DomainId,
   OUT AML_CPC_INFO  *CpcInfo
   );
-
-#endif // ARM_SCMI_INFO_LIB_H_

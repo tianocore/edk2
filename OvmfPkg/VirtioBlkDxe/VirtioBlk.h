@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _VIRTIO_BLK_DXE_H_
-#define _VIRTIO_BLK_DXE_H_
+#pragma once
 
 #include <Protocol/BlockIo.h>
 #include <Protocol/ComponentName.h>
@@ -273,5 +272,3 @@ VirtioBlkGetDeviceName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **ControllerName
   );
-
-#endif // _VIRTIO_BLK_DXE_H_

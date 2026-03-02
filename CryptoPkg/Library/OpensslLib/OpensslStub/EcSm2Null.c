@@ -76,6 +76,45 @@ EC_GROUP_new_by_curve_name (
   return NULL;
 }
 
+EC_GROUP *
+EC_GROUP_new_curve_GFp (
+  const BIGNUM  *p,
+  const BIGNUM  *a,
+  const BIGNUM  *b,
+  BN_CTX        *ctx
+  )
+{
+  ASSERT (FALSE);
+  return NULL;
+}
+
+int
+EC_GROUP_set_generator (
+  EC_GROUP        *group,
+  const EC_POINT  *generator,
+  const BIGNUM    *order,
+  const BIGNUM    *cofactor
+  )
+{
+  ASSERT (FALSE);
+  return 0;
+}
+
+int
+EC_POINTs_mul (
+  const EC_GROUP  *group,
+  EC_POINT        *r,
+  const BIGNUM    *scalar,
+  size_t          num,
+  const EC_POINT  *points[],
+  const BIGNUM    *scalars[],
+  BN_CTX          *ctx
+  )
+{
+  ASSERT (FALSE);
+  return 0;
+}
+
 EC_POINT *
 EC_POINT_new (
   const EC_GROUP  *group

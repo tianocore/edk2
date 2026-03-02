@@ -14,13 +14,9 @@
 
 **/
 
-#ifndef ARM_FFA_COMMON_LIB_H_
-#define ARM_FFA_COMMON_LIB_H_
+#pragma once
 
 #include <Library/ArmFfaLib.h>
-
-extern BOOLEAN  gFfaSupported;
-extern UINT16   gPartId;
 
 /**
   Convert FfArgs to EFI_STATUS.
@@ -37,16 +33,21 @@ FfaArgsToEfiStatus (
   );
 
 /**
-  Common ArmFfaLib Constructor.
+  Common ArmFfaLib init.
 
-  @retval EFI_SUCCESS
-  @retval Others                  Error
+  @param [out] PartId            PartitionId
+  @param [out] IsFfaSupported    FF-A supported flag
+
+  @retval EFI_SUCCESS            Success
+  @retval EFI_INVALID_PARAMETER  Invalid parameter
+  @retval Others                 Error
 
 **/
 EFI_STATUS
 EFIAPI
 ArmFfaLibCommonInit (
-  IN VOID
+  OUT UINT16   *PartId,
+  OUT BOOLEAN  *IsFfaSupported
   );
 
 /**
@@ -86,4 +87,29 @@ GetRxTxBufferMinSizeAndAlign (
   OUT UINTN  *MinSizeAndAlign
   );
 
-#endif
+/**
+  Determine if FF-A is supported
+
+  @retval TRUE if FF-A is supported, FALSE otherwise.
+
+**/
+BOOLEAN
+EFIAPI
+ArmFfaLibIsFfaSupported (
+  IN VOID
+  );
+
+/**
+  Return partition or VM ID
+
+  @param[out] PartId  The partition or VM ID
+
+  @retval EFI_SUCCESS  Partition ID or VM ID returned
+  @retval Others       Errors
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibGetPartId (
+  OUT UINT16  *PartId
+  );

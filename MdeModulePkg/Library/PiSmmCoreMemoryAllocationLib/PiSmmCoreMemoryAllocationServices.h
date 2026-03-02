@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _PI_SMM_CORE_MEMORY_ALLOCATION_SERVICES_H_
-#define _PI_SMM_CORE_MEMORY_ALLOCATION_SERVICES_H_
+#pragma once
 
 //
 // It should be aligned with the definition in PiSmmCore.
@@ -181,5 +180,3 @@ EFIAPI
 SmmFreePool (
   IN      VOID  *Buffer
   );
-
-#endif

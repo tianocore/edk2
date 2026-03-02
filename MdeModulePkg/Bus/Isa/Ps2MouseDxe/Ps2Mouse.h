@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PS2MOUSE_H_
-#define _PS2MOUSE_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -390,5 +389,3 @@ BOOLEAN
 CheckMouseConnect (
   IN  PS2_MOUSE_DEV  *MouseDev
   );
-
-#endif

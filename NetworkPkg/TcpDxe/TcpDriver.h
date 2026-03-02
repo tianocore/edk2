@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _TCP_DRIVER_H_
-#define _TCP_DRIVER_H_
+#pragma once
 
 #define TCP_DRIVER_SIGNATURE  SIGNATURE_32 ('T', 'C', 'P', 'D')
 
@@ -286,5 +285,3 @@ TcpServiceBindingDestroyChild (
   IN EFI_SERVICE_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                    ChildHandle
   );
-
-#endif

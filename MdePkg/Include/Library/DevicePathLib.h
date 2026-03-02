@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __DEVICE_PATH_LIB_H__
-#define __DEVICE_PATH_LIB_H__
+#pragma once
 
 #define END_DEVICE_PATH_LENGTH  (sizeof (EFI_DEVICE_PATH_PROTOCOL))
 
@@ -557,5 +556,3 @@ EFIAPI
 ConvertTextToDevicePath (
   IN CONST CHAR16  *TextDevicePath
   );
-
-#endif

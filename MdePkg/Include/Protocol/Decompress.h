@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __DECOMPRESS_H__
-#define __DECOMPRESS_H__
+#pragma once
 
 #define EFI_DECOMPRESS_PROTOCOL_GUID \
   { \
@@ -112,5 +111,3 @@ struct _EFI_DECOMPRESS_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiDecompressProtocolGuid;
-
-#endif

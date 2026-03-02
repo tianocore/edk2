@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __EFI_DRIVER_CONFIGURATION2_H__
-#define __EFI_DRIVER_CONFIGURATION2_H__
+#pragma once
 
 ///
 /// Global ID for the Driver Configuration Protocol defined in UEFI 2.0
@@ -180,5 +179,3 @@ struct _EFI_DRIVER_CONFIGURATION2_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiDriverConfiguration2ProtocolGuid;
-
-#endif

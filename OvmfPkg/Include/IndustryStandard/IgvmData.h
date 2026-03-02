@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __IGVM_DATA_H__
-#define __IGVM_DATA_H__
+#pragma once
 
 /* secure boot databases */
 #define EFI_IGVM_DATA_TYPE_PK   0x100
@@ -25,5 +24,3 @@ typedef struct {
   UINT32    DataType;
   UINT32    DataFlags;
 } EFI_IGVM_DATA_HOB;
-
-#endif /* __IGVM_DATA_H__ */

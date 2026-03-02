@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_TAPE_IO_PROTOCOL_H__
-#define __EFI_TAPE_IO_PROTOCOL_H__
+#pragma once
 
 #define EFI_TAPE_IO_PROTOCOL_GUID \
   { \
@@ -223,5 +222,3 @@ struct _EFI_TAPE_IO_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiTapeIoProtocolGuid;
-
-#endif

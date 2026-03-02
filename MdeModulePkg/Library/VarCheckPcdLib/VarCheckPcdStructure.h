@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _VAR_CHECK_STRUCTURE_H_
-#define _VAR_CHECK_STRUCTURE_H_
+#pragma once
 
 //
 // Alignment for PCD Variable and check data header.
@@ -66,5 +65,3 @@ typedef struct {
 } VAR_CHECK_PCD_VALID_RANGE;
 
 #pragma pack ()
-
-#endif

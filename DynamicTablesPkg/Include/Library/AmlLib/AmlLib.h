@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef AML_LIB_H_
-#define AML_LIB_H_
+#pragma once
 
 /**
   @mainpage Dynamic AML Generation
@@ -2303,5 +2302,3 @@ AmlCodeGenMethodNotifyList (
   IN  AML_NODE_HANDLE         ParentNode        OPTIONAL,
   OUT AML_OBJECT_NODE_HANDLE  *NewObjectNode    OPTIONAL
   );
-
-#endif // AML_LIB_H_

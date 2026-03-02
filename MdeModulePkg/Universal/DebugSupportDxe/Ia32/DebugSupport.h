@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _DEBUG_SUPPORT_H_
-#define _DEBUG_SUPPORT_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -290,5 +289,3 @@ VOID
 UnhookEntry (
   IN EFI_EXCEPTION_TYPE  ExceptionType
   );
-
-#endif

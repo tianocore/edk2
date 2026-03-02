@@ -17,8 +17,7 @@
 
 **/
 
-#ifndef DXE_TPM2_MEASURE_BOOT_LIB_SANITATION_
-#define DXE_TPM2_MEASURE_BOOT_LIB_SANITATION_
+#pragma once
 
 #include <Uefi.h>
 #include <Uefi/UefiSpec.h>
@@ -135,5 +134,3 @@ Tpm2SanitizePeImageEventSize (
   IN  UINT32  FilePathSize,
   OUT UINT32  *EventSize
   );
-
-#endif // DXE_TPM2_MEASURE_BOOT_LIB_VALIDATION_

@@ -9,8 +9,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef ACPI_6_6_H_
-#define ACPI_6_6_H_
+#pragma once
 
 #include <IndustryStandard/Acpi65.h>
 
@@ -3057,7 +3056,7 @@ typedef struct {
   UINT8     Reserved[3];
   UINT32    RecordCount;
   // UINT8   PhatVersionElement[];
-} EFI_ACPI_6_6_PHAT_FIRMWARE_VERISON_DATA_RECORD;
+} EFI_ACPI_6_6_PHAT_FIRMWARE_VERSION_DATA_RECORD;
 
 #define EFI_ACPI_6_6_PHAT_FIRMWARE_VERSION_DATA_RECORD_REVISION  0x01
 
@@ -3563,5 +3562,3 @@ typedef struct {
 #define EFI_ACPI_MEMORY_SYSTEM_RESOURCE_PARTITIONING_AND_MONITORING_TABLE_SIGNATURE  SIGNATURE_32('M', 'P', 'A', 'M')
 
 #pragma pack()
-
-#endif

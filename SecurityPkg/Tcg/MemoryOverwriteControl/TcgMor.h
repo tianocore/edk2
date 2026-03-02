@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __TCG_MOR_H__
-#define __TCG_MOR_H__
+#pragma once
 
 #include <PiDxe.h>
 
@@ -37,5 +36,3 @@ typedef struct  {
 #define SECURITY_PROTOCOL_IEEE1667  0xEE
 
 #define ROUNDUP512(x)  (((x) % 512 == 0) ? (x) : ((x) / 512 + 1) * 512)
-
-#endif

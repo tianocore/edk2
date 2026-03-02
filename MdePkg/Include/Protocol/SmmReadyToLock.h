@@ -16,13 +16,10 @@
 
 **/
 
-#ifndef _SMM_READY_TO_LOCK_H_
-#define _SMM_READY_TO_LOCK_H_
+#pragma once
 
 #include <Protocol/MmReadyToLock.h>
 
 #define EFI_SMM_READY_TO_LOCK_PROTOCOL_GUID  EFI_MM_READY_TO_LOCK_PROTOCOL_GUID
 
 extern EFI_GUID  gEfiSmmReadyToLockProtocolGuid;
-
-#endif

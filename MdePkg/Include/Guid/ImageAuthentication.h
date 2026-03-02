@@ -8,8 +8,7 @@
   GUIDs defined in UEFI 2.5 spec.
 **/
 
-#ifndef __IMAGE_AUTHTICATION_H__
-#define __IMAGE_AUTHTICATION_H__
+#pragma once
 
 #include <Guid/GlobalVariable.h>
 #include <Protocol/Hash.h>
@@ -381,5 +380,3 @@ extern EFI_GUID  gEfiCertX509Sha512Guid;
 extern EFI_GUID  gEfiCertPkcs7Guid;
 extern EFI_GUID  gEfiCertSm3Guid;
 extern EFI_GUID  gEfiCertX509Sm3Guid;
-
-#endif

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef RESET_SYSTEM_ACPI_GED_H_
-#define RESET_SYSTEM_ACPI_GED_H_
+#pragma once
 
 #include <Base.h>
 
@@ -20,4 +19,3 @@ typedef struct {
 } POWER_MANAGER;
 
 extern POWER_MANAGER  mPowerManager;
-#endif // RESET_SYSTEM_ACPI_GED_H_

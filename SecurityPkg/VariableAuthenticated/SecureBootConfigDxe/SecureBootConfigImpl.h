@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SECUREBOOT_CONFIG_IMPL_H__
-#define __SECUREBOOT_CONFIG_IMPL_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -608,5 +607,3 @@ EFIAPI
 UpdateDBTFromFile (
   IN EFI_DEVICE_PATH_PROTOCOL  *FilePath
   );
-
-#endif

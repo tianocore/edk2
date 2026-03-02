@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SMM_FIRMWARE_VOLUME_BLOCK_H__
-#define __SMM_FIRMWARE_VOLUME_BLOCK_H__
+#pragma once
 
 #include <Protocol/FirmwareVolumeBlock.h>
 
@@ -26,5 +25,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 typedef EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL EFI_SMM_FIRMWARE_VOLUME_BLOCK_PROTOCOL;
 
 extern EFI_GUID  gEfiSmmFirmwareVolumeBlockProtocolGuid;
-
-#endif

@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __LOCAL_APIC_LIB_H__
-#define __LOCAL_APIC_LIB_H__
+#pragma once
 
 #define LOCAL_APIC_MODE_XAPIC   0x1  ///< xAPIC mode.
 #define LOCAL_APIC_MODE_X2APIC  0x2  ///< x2APIC mode.
@@ -468,5 +467,3 @@ GetProcessorLocation2ByApicId (
   OUT UINT32  *Core     OPTIONAL,
   OUT UINT32  *Thread   OPTIONAL
   );
-
-#endif

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_DNS_IMPL_H_
-#define __EFI_DNS_IMPL_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -1202,5 +1201,3 @@ Dns6Cancel (
   IN  EFI_DNS6_PROTOCOL          *This,
   IN  EFI_DNS6_COMPLETION_TOKEN  *Token
   );
-
-#endif

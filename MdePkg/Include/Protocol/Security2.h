@@ -22,8 +22,7 @@
 
 **/
 
-#ifndef __ARCH_PROTOCOL_SECURITY2_H__
-#define __ARCH_PROTOCOL_SECURITY2_H__
+#pragma once
 
 ///
 /// Global ID for the Security2 Code Architectural Protocol
@@ -97,5 +96,3 @@ struct _EFI_SECURITY2_ARCH_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiSecurity2ArchProtocolGuid;
-
-#endif

@@ -9,8 +9,7 @@
     - https://github.com/FirmwareHandoff/firmware_handoff
 **/
 
-#ifndef ARM_TRANSFER_LIST_LIB_
-#define ARM_TRANSFER_LIST_LIB_
+#pragma once
 
 #include <Base.h>
 #include <Uefi.h>
@@ -193,5 +192,3 @@ TransferListGetEventLog (
   OUT UINTN                *EventLogSize,
   OUT UINT32               *EventLogFlags       OPTIONAL
   );
-
-#endif // ARM_TRANSFER_LIST_LIB_

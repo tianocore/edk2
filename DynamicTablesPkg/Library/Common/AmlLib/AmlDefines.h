@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef AML_DEFINES_H_
-#define AML_DEFINES_H_
+#pragma once
 
 /**
   @defgroup TreeStructures Tree structures
@@ -177,5 +176,3 @@ typedef enum EAmlNodeType {
                     ///  ASL statement.
   EAmlNodeMax       ///< Max enum.
 } EAML_NODE_TYPE;
-
-#endif // AML_DEFINES_H_

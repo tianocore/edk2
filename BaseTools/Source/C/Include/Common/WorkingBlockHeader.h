@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __EFI_WORKING_BLOCK_HEADER_H__
-#define __EFI_WORKING_BLOCK_HEADER_H__
+#pragma once
 
 //
 // EFI Fault tolerant working block header
@@ -31,5 +30,3 @@ typedef struct {
   // UINT8                WriteQueue[WriteQueueSize];
   //
 } EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER;
-
-#endif

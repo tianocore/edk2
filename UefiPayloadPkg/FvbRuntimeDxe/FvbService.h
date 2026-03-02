@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef FW_BLOCK_SERVICE_H_
-#define FW_BLOCK_SERVICE_H_
+#pragma once
 
 #include <Guid/EventGroup.h>
 #include <Guid/FirmwareFileSystem2.h>
@@ -181,5 +180,3 @@ extern FWB_GLOBAL               mFvbModuleGlobal;
 extern EFI_FW_VOL_BLOCK_DEVICE  mFvbDeviceTemplate;
 extern FV_MEMMAP_DEVICE_PATH    mFvMemmapDevicePathTemplate;
 extern FV_PIWG_DEVICE_PATH      mFvPIWGDevicePathTemplate;
-
-#endif

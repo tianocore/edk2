@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _ISCSI_MISC_H_
-#define _ISCSI_MISC_H_
+#pragma once
 
 typedef struct _ISCSI_DRIVER_DATA ISCSI_DRIVER_DATA;
 
@@ -469,5 +468,3 @@ IScsiTestManagedDevice (
   IN  EFI_HANDLE  DriverBindingHandle,
   IN  EFI_GUID    *ProtocolGuid
   );
-
-#endif

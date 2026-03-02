@@ -13,8 +13,7 @@
       https://www.intel.com/content/dam/www/public/us/en/documents/specification-updates/ipmi-intelligent-platform-mgt-interface-spec-2nd-gen-v2-0-spec-update.pdf
 **/
 
-#ifndef _SERVICE_PROCESSOR_MANAGEMENT_INTERFACE_TABLE_H_
-#define _SERVICE_PROCESSOR_MANAGEMENT_INTERFACE_TABLE_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -109,5 +108,3 @@ typedef struct {
 #define EFI_ACPI_SPMI_INTERFACE_TYPE_SMIC  0x02
 #define EFI_ACPI_SPMI_INTERFACE_TYPE_BT    0x03
 #define EFI_ACPI_SPMI_INTERFACE_TYPE_SSIF  0x04
-
-#endif

@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef ARM_RNG_H_
-#define ARM_RNG_H_
+#pragma once
 
 #include <AArch64/AArch64.h>
 
@@ -28,5 +27,3 @@ EFIAPI
 ArmRndr (
   OUT UINT64  *Rand
   );
-
-#endif /* ARM_RNG_H_ */

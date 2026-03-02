@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TCPA_ACPI_H_
-#define _TCPA_ACPI_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -48,5 +47,3 @@ typedef struct _EFI_TCG_SERVER_ACPI_TABLE {
 #define TCG_PLATFORM_TYPE_SERVER  1
 
 #pragma pack ()
-
-#endif

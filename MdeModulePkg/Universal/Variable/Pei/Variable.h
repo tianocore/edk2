@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PEI_VARIABLE_H_
-#define _PEI_VARIABLE_H_
+#pragma once
 
 #include <PiPei.h>
 #include <Ppi/ReadOnlyVariable2.h>
@@ -146,5 +145,3 @@ PeiGetNextVariableName (
   IN OUT CHAR16                              *VariableName,
   IN OUT EFI_GUID                            *VariableGuid
   );
-
-#endif

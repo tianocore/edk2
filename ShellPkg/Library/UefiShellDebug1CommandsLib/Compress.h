@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _EFI_SHELL_COMPRESS_H_
-#define _EFI_SHELL_COMPRESS_H_
+#pragma once
 
 /**
   The compression routine.
@@ -28,5 +27,3 @@ Compress (
   IN      VOID    *DstBuffer,
   IN OUT  UINT64  *DstSize
   );
-
-#endif

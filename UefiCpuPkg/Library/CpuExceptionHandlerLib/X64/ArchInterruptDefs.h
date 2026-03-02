@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _ARCH_CPU_INTERRUPT_DEFS_H_
-#define _ARCH_CPU_INTERRUPT_DEFS_H_
+#pragma once
 
 typedef struct {
   EFI_SYSTEM_CONTEXT_X64    SystemContext;
@@ -39,5 +38,3 @@ typedef struct {
 
 #define CPU_TSS_DESC_SIZE  sizeof (IA32_TSS_DESCRIPTOR)
 #define CPU_TSS_SIZE       sizeof (IA32_TASK_STATE_SEGMENT)
-
-#endif

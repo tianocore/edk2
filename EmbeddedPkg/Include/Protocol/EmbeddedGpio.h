@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __EMBEDDED_GPIO_H__
-#define __EMBEDDED_GPIO_H__
+#pragma once
 
 //
 // Protocol interface structure
@@ -173,5 +172,3 @@ struct _PLATFORM_GPIO_CONTROLLER {
 };
 
 extern EFI_GUID  gPlatformGpioProtocolGuid;
-
-#endif

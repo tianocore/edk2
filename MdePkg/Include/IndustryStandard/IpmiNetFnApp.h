@@ -17,8 +17,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _IPMI_NET_FN_APP_H_
-#define _IPMI_NET_FN_APP_H_
+#pragma once
 
 #pragma pack(1)
 //
@@ -1108,4 +1107,3 @@ typedef union {
 #define IPMI_GET_SYSTEM_INTERFACE_CAPABILITIES_SSIF_TRANSACTION_SUPPORT_MULTI_PARTITION_RW_WITH_MIDDLE  0x2
 
 #pragma pack()
-#endif
