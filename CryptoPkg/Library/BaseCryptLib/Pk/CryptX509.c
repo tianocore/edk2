@@ -602,6 +602,13 @@ RsaGetPublicKeyFromX509 (
     return FALSE;
   }
 
+  //
+  // If CertSize is 0, then it is treated as empty certificate and return TRUE directly.
+  //
+  if (CertSize == 0) {
+    return TRUE;
+  }
+
   Pkey     = NULL;
   X509Cert = NULL;
 
@@ -900,6 +907,13 @@ EcGetPublicKeyFromX509 (
   //
   if ((Cert == NULL) || (EcContext == NULL)) {
     return FALSE;
+  }
+
+  //
+  // If CertSize is 0, then it is treated as empty certificate and return TRUE directly.
+  //
+  if (CertSize == 0) {
+    return TRUE;
   }
 
   Pkey     = NULL;
