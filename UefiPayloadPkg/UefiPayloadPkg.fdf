@@ -144,6 +144,14 @@ APRIORI DXE {
   INF  MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
   INF  MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
   INF  UefiPayloadPkg/BlSupportDxe/BlSupportDxe.inf
+!if $(CAPSULE_SUPPORT) == TRUE
+    INF  UefiPayloadPkg/GraphicsOutputDxe/GraphicsOutputDxe.inf
+    !if $(BOOTSPLASH_IMAGE)
+      INF  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
+      INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+      INF  MdeModulePkg/Logo/LogoDxe.inf
+    !endif
+  !endif
 }
 
 #
