@@ -1,0 +1,39 @@
+## @file
+# IPMI Blob Transfer Protocol DXE Driver.
+#
+#  Copyright (c) 2022-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = IpmiBlobTransferDxe
+  FILE_GUID                      = 6357c804-78bb-4b0c-abdf-c75df942f319
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = IpmiBlobTransferDxeDriverEntryPoint
+
+[Sources.common]
+  IpmiBlobTransferDxe.c
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  IpmiLib
+  MemoryAllocationLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ManageabilityPkg/ManageabilityPkg.dec
+
+[Protocols]
+  gEdkiiIpmiBlobTransferProtocolGuid
+
+[Depex]
+  TRUE

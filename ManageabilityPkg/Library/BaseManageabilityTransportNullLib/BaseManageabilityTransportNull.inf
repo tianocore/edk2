@@ -1,0 +1,28 @@
+## @file
+# Null instance of Manageability Transport Library
+#
+# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = BaseManageabilityTransportNull
+  MODULE_UNI_FILE                = BaseManageabilityTransportNull.uni
+  FILE_GUID                      = B63DC070-FB44-44F3-8E9A-DA6CC712EF4F
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ManageabilityTransportLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  BaseManageabilityTransportNull.c
+
+[Packages]
+  ManageabilityPkg/ManageabilityPkg.dec
+  MdePkg/MdePkg.dec
+

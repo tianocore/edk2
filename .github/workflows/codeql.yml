@@ -49,6 +49,8 @@ jobs:
             ArchList: "IA32,X64"
           - Package: "IntelFsp2WrapperPkg"
             ArchList: "IA32,X64"
+          - Package: "ManageabilityPkg"
+            ArchList: "IA32,X64"
           - Package: "MdeModulePkg"
             ArchList: "IA32"
           - Package: "MdeModulePkg"
