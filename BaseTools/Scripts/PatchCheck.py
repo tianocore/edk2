@@ -4,6 +4,7 @@
 #  Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
 #  Copyright (C) 2020, Red Hat, Inc.<BR>
 #  Copyright (c) 2020 - 2023, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2026, Loongson Technology Corporation Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -304,6 +305,7 @@ class CommitMessageCheck:
             self.error('Second line of commit message should be ' +
                        'empty.')
 
+        found_body_line = False
         for i in range(2, count):
             if (len(lines[i]) >= 76 and
                 len(lines[i].split()) > 1 and
@@ -323,6 +325,19 @@ class CommitMessageCheck:
                     (i + 1, len(lines[i]))
                     )
                 print(lines[i])
+            if (not found_body_line and
+                lines[i].strip() != '' and
+                not lines[i].startswith('git-svn-id:') and
+                not lines[i].startswith('Reviewed-by') and
+                not lines[i].startswith('Acked-by:') and
+                not lines[i].startswith('Tested-by:') and
+                not lines[i].startswith('Reported-by:') and
+                not lines[i].startswith('Suggested-by:') and
+                not lines[i].startswith('Signed-off-by:') and
+                not lines[i].startswith('Cc:')):
+                found_body_line = True
+        if not found_body_line:
+            self.error('The commit body lines are not found')
 
         last_sig_line = None
         for i in range(count - 1, 0, -1):
