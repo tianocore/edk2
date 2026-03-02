@@ -11,6 +11,10 @@
 
 #include <Base.h>
 
+// The stack cookie exception vector, in the user defined range for IA32, X64, and AARCH64. This is the exception
+// number that is signalled on a stack cookie corruption.
+#define STACK_CHECK_EXCEPTION_VECTOR  0x42
+
 #if defined (__GNUC__) || defined (__clang__)
 
 // The __stack_chk_guard is a random value placed on the stack between the stack variables

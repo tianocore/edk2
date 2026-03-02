@@ -16,14 +16,20 @@
   LIBRARY_CLASS                  = StackCheckLib
 
 [Sources]
-  StackCheckLibNullGcc.c  | GCC
+  StackCheckLibNullGcc.c  | GCC | GCC
   StackCheckLibNullMsvc.c | MSFT
+  StackCheckLibNullMsvc.c | CLANGPDB
 
 [Sources.IA32]
   IA32/StackCheckFunctionsMsvc.nasm | MSFT
+  IA32/StackCheckFunctionsMsvc.nasm | CLANGPDB
 
 [Sources.X64]
   X64/StackCheckFunctionsMsvc.nasm | MSFT
+  X64/StackCheckFunctionsMsvc.nasm | CLANGPDB
+
+[Sources.AARCH64]
+  AArch64/StackCheckFunctionsMsvc.S | CLANGPDB
 
 [Packages]
   MdePkg/MdePkg.dec

@@ -1,25 +1,27 @@
 ;------------------------------------------------------------------------------
-; AArch64/StackCookieInterrupt.asm
+; X64/StackCookieInterrupt.nasm
 ;
 ; Copyright (c) Microsoft Corporation.
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;------------------------------------------------------------------------------
 
-    EXPORT TriggerStackCookieInterrupt
+#include <Library/StackCheckLib.h>
 
-    AREA |.text|, CODE, READONLY
+    DEFAULT REL
+    SECTION .text
 
 ;------------------------------------------------------------------------------
-; Calls an interrupt using the vector specified by PcdStackCookieExceptionVector
+; Checks the stack cookie value against __security_cookie and calls the
+; stack cookie failure handler if there is a mismatch, passing along the
+; exception address in rcx.
 ;
 ; VOID
+; EFIAPI
 ; TriggerStackCookieInterrupt (
-;   VOID
+;   EFI_PHYSICAL_ADDRESS ExceptionAddress
 ;   );
 ;------------------------------------------------------------------------------
-TriggerStackCookieInterrupt PROC
-    SVC     FixedPcdGet8 (PcdStackCookieExceptionVector)
-    RET
-TriggerStackCookieInterrupt ENDP
-
-    END
+global ASM_PFX(TriggerStackCookieInterrupt)
+ASM_PFX(TriggerStackCookieInterrupt):
+    int     STACK_CHECK_EXCEPTION_VECTOR
+    ret

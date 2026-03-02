@@ -15,6 +15,7 @@
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/PrintLib.h>
 #include <Library/SerialPortLib.h>
+#include <Library/StackCheckLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
 #include <Guid/DebugImageInfoTable.h>
@@ -194,6 +195,8 @@ DefaultExceptionHandler (
   CHAR16  UnicodeBuffer[MAX_PRINT_CHARS];
   UINTN   CharCount;
   INT32   Offset;
+  UINT8   Ec;
+  UINT32  Iss;
 
   if (mRecursiveException) {
     STATIC CHAR8 CONST  Message[] = "\nRecursive exception occurred while dumping the CPU state\n";
@@ -202,8 +205,17 @@ DefaultExceptionHandler (
   }
 
   mRecursiveException = TRUE;
+  Ec                  = (SystemContext.SystemContextAArch64->ESR & 0xFC000000) >> 26;
+  Iss                 = SystemContext.SystemContextAArch64->ESR & 0x1FFFFFF;
 
-  CharCount = AsciiSPrint (Buffer, sizeof (Buffer), "\n\n%a Exception at 0x%016lx\n", gExceptionTypeString[ExceptionType], SystemContext.SystemContextAArch64->ELR);
+  // Check if this is a stack cookie violation
+  if ((Ec == 0x15) && (Iss == STACK_CHECK_EXCEPTION_VECTOR)) {
+    // The address that caused the stack check exception is in X0
+    CharCount = AsciiSPrint (Buffer, sizeof (Buffer), "\n\n%a Stack Check Exception at 0x%016lx\n", gExceptionTypeString[ExceptionType], SystemContext.SystemContextAArch64->X0);
+  } else {
+    CharCount = AsciiSPrint (Buffer, sizeof (Buffer), "\n\n%a Exception at 0x%016lx\n", gExceptionTypeString[ExceptionType], SystemContext.SystemContextAArch64->ELR);
+  }
+
   SerialPortWrite ((UINT8 *)Buffer, CharCount);
 
   // Prepare a unicode buffer for ConOut, if applicable, in case the buffer

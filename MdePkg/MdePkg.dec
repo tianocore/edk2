@@ -301,10 +301,6 @@
   #
   TraceHubDebugSysTLib|Include/Library/TraceHubDebugSysTLib.h
 
-  ##  @libraryclass  Provides a hook called when a stack cookie check fails.
-  #
-  StackCheckFailureHookLib|Include/Library/StackCheckFailureHookLib.h
-
   ##  @libraryclass  Provides stack cookie checking functionality
   #
   StackCheckLib|Include/Library/StackCheckLib.h
@@ -2304,9 +2300,6 @@
   #   Other - reserved
   # @Prompt Speculation Barrier Type.
   gEfiMdePkgTokenSpaceGuid.PcdSpeculationBarrierType|0x01|UINT8|0x30001018
-
-  ## This PCD specifies the interrupt vector for stack cookie check failures
-  gEfiMdePkgTokenSpaceGuid.PcdStackCookieExceptionVector|0x42|UINT8|0x30001019
 
   ## Enforces the use of Secure UEFI spec defined RNG algorithms.
   # TRUE  - Enforce the use of Secure UEFI spec defined RNG algorithms.

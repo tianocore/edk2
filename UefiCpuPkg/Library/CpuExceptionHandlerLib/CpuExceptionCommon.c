@@ -71,6 +71,8 @@ GetExceptionNameStr (
 {
   if ((UINTN)ExceptionType < EXCEPTION_KNOWN_NAME_NUM) {
     return mExceptionNameStr[ExceptionType];
+  } else if ((UINTN)ExceptionType == STACK_CHECK_EXCEPTION_VECTOR) {
+    return "Stack Check Exception";
   } else {
     return mExceptionReservedStr;
   }

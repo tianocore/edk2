@@ -22,9 +22,11 @@ continuously writing past the stack variables will cause the stack cookie to be
 overwritten. Before the function returns, the stack cookie value will be checked and
 if there is a mismatch then `StackCheckLib` handles the failure.
 
-Because UEFI doesn't use the C runtime libraries provided by MSVC, the stack
-check code is written in assembly within this library. GCC and Clang compilers
-have built-in support for stack cookie checking, so this library only handles failures.
+Because UEFI doesn't use toolchain provided C runtime libraries, the stack check code is
+written in assembly within this library. The GCC compiler has built-in support
+for stack cookie checking, so this library only handles failures. CLANGPDB and MSVC both
+use MSVC-style stack cookie checking. Below these toolchains are referred to collectively
+as MSVC-style.
 
 The stack cookie value is initialized at compile time via updates to the AutoGen process.
 Each module will define `STACK_COOKIE_VALUE` which is used for the module stack cookie
@@ -39,20 +41,26 @@ one of the dynamic stack cookie entry points when possible.
 ### StackCheckLib
 
 `StackCheckLib` provides the stack cookie checking functionality per architecture and
-toolchain. The currently supported pairs are IA32{GCC,MSVC}, X64{GCC, MSVC},
-and AARCH64{GCC, MSVC}. `StackCheckLib` is agnostic as to whether the stack cookie was
-updated during build time or run time; it simply checks the cookie in the MSVC case and
-in both GCC and MSVC responds to stack cookie checking failures.
+toolchain. The currently supported pairs are IA32{CLANGPDB, GCC,MSVC}, X64{CLANGPDB, GCC, MSVC},
+and AARCH64{CLANGPDB, GCC}. `StackCheckLib` is agnostic as to whether the stack cookie was
+updated during build time or run time; it simply checks the cookie in the MSVC-style case and
+in both GCC and MSVC-style responds to stack cookie checking failures.
 
 To add support for other architectures/toolchains, additional assembly files
 should be added to `StackCheckLib.inf` and scoped to that architecture/toolchain.
 
-Note: Stack cookie failures generate exceptions and SEC and PEI_CORE may not have
-exception handlers registered. In order to safely use stack cookie checking in
-these phases, a platform should implement exception handlers because unhandled
-exceptions may lead to a hung system state. If a platform does not implement
-exception handlers in SEC and PEI_CORE, it is recommended to use `StackCheckLibNull`
-for these phases, except for development purposes.
+`StackCheckLib` must not have any dependencies. Each toolchain has a different process
+when it comes to link time optimization (LTO) and stack cookie generation. Link errors
+have been observed on CLANGPDB and GCC when `StackCheckLib` has LTO disabled for itself
+and its dependencies have LTO enabled. The linking time is incorrect and the required
+symbols are gone.
+
+>**Note**: Stack cookie failures generate exceptions and SEC and PEI_CORE may not have
+> exception handlers registered. In order to safely use stack cookie checking in
+> these phases, a platform should implement exception handlers because unhandled
+> exceptions may lead to a hung system state. If a platform does not implement
+> exception handlers in SEC and PEI_CORE, it is recommended to use `StackCheckLibNull`
+> for these phases, except for development purposes.
 
 ### DynamicStackCookieEntryPointLib
 
@@ -72,8 +80,8 @@ entry point, so there is no dynamic stack cookie entry point lib there.
 
 The dynamic stack cookie entry point lib is used in place of the standard entry point lib,
 e.g. for UefiDriverEntryPoint to have dynamic stack cookies, a platform would remove
-MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf from its DSC and instead
-include MdePkg/Library/DynamicStackCookieEntryPointLib/UefiDriverEntryPoint.inf.
+`MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf` from its DSC and instead
+include `MdePkg/Library/DynamicStackCookieEntryPointLib/UefiDriverEntryPoint.inf`.
 
 See the Usage section for other ways of including these libraries.
 
@@ -86,25 +94,22 @@ added at a future date.
 `StackCheckLibNull` is an instance of `StackCheckLib` which does not perform any stack
 cookie checks. This is useful for modules which will fail if stack cookie checks are
 inserted. Of course, this is not recommended for production code outside of
-SEC and PEI_CORE.
+SEC and PEI.
 
 ## How Failures are Handled
 
-When a stack cookie check fails, the `StackCheckLib` library will first call into a hook
-function `StackCheckFailureHook()` which only has a NULL implementation in edk2.
-The NULL implementation will simply print the failure address and return, but a platform
-can implement their own instance of this library which can perform additional actions
-before the system triggers an interrupt.
+When a stack cookie check fails, the `StackCheckLib` library will trigger an exception with
+ID 0x42.
 
-After `StackCheckFailureHook()` returns, the library will trigger an interrupt with
-PcdStackCookieExceptionVector.
+Platforms may register interrupt handlers for this exception vector to hook into the
+process and perform whatever actions they desire. In lieu of this, the default
+exception handlers will print that a stack cookie error occured and the address of
+the instruction where it was caught.
 
-- On IA32 and X64 platforms, PcdStackCookieExceptionVector is used as an index into the
+- On IA32 and X64 platforms, the Exception Vector ID (0x42) is used as an index into the
 Interrupt Descriptor Table.
 - On AARCH64 platforms, a supervisor call (`SVC`) is called with the value
-of PcdStackCookieExceptionVector. This value can similarly be retrieved by the
-handler to determine if the interrupt was triggered by the stack cookie check. Reference:
-[Arm A64 Instruction Set Architecture Version 2024-3](https://developer.arm.com/documentation/ddi0602/2024-03/Base-Instructions/SVC--Supervisor-Call-?lang=en)
+of 0x42.
 
 ## Debugging Stack Cookie Check Failures
 
@@ -113,7 +118,7 @@ printf debugging to determine which function has an overflow only to find that t
 disappears on the next boot. This curiosity is usually due to the black-box heuristic used
 by compilers to determine where to put stack cookie checks or compiler optimization features
 removing the failing check. The address where the failed stack cookie check occurred will
-be printed using DebugLib. If .map files are available, the address combined with the image
+be printed by the exception handler. If .map files are available, the address combined with the image
 offset can be used to determine the function which failed.
 
 GNU-based compilers have the `-fstack-protector-all` flag to force stack cookie checks on
@@ -127,15 +132,20 @@ checks and are useful for determining where the checks are placed. To generate t
 append `/FAcs` to the build options for each target module. The easiest way to do this is to
 update the tools_def file so the `<TARGET>_<TOOLCHAIN>_<ARCH>_CC_FLAGS` includes `/FAcs`.
 
+The best way to debug this failure is by attaching a debugger to catch the exception live
+and be able to probe the stack, reboot, break in on the faulting function and walk through,
+etc.
+
 ## Usage
 
-edk2 updated the tools_def to add `/GS` to VS2022 and VS2019 IA32/X64 builds and
-`-fstack-protector` to GCC builds. This will cause stack cookie references to be inserted
-throughout the code. Every module should have a `StackCheckLib` instance linked to satisfy
-these references. So every module doesn't need to add `StackCheckLib` to the LibraryClasses
-section of the INF file, `StackCheckLib` is added as a dependency for each entry point lib.
-This means that custom entry point libs need to have StackCheckLib added as a dependency.
-The only exception to this is MSVC built host-based unit tests as they will be
+CLANGPDB, GCC, and VS* have stack cookies enabled by default. This will cause stack cookie
+references to be inserted throughout the code. Every module should have a `StackCheckLib`
+instance linked to satisfy these references. So every module doesn't need to add
+`StackCheckLib` to the LibraryClasses section of the INF file, `StackCheckLib` is added as
+a dependency for each entry point lib. This means that custom entry point libs need to have
+StackCheckLib added as a dependency.
+
+The only exception to this is MSVC-style built host-based unit tests as they will be
 compiled with the runtime libraries which already contain the stack cookie definitions
 and will collide with `StackCheckLib`. A `StackCheckLibHostApplication.inf` is linked
 by `UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc` that provides the stack
@@ -207,6 +217,11 @@ Platforms should include this separately, e.g.:
 [LibraryClasses.X64]
   StandaloneMmCoreEntryPoint|MdePkg/Library/DynamicStackCookieEntryPointLib/StandaloneMmCoreEntryPoint.inf
 ```
+
+> **Note:** Dynamic stack cookies on AArch64 depend on a multiple of 4KB section alignment because we must use ADRP/LDR
+> to get the address of the stack cookie to update. CLANGPDB defines all modules to have 4KB section alignment,
+> so this is not a concern there. GCC has 4KB section alignment for DXE and Standalone MM, which is where dynamic stack
+> cookies may be used. Platforms must maintain this (or a multiple of 4KB) in order to use dynamic stack cookies.
 
 Platforms then must remove any references to these entry point libs in their DSC, so that
 the `MdeLibs.dsc.inc` versions are chosen. Alternatively, for better DSC readability,
