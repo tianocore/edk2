@@ -173,6 +173,23 @@ NotMultiPhaseMemoryInitApi:
   push   rdx
 SkipPagetableSave:
 
+  ; Enable FSGSBASE instructions via CR4.FSGSBASE (bit 16)
+  mov     rbx, cr4           ; Save original CR4 in rbx
+  mov     rdx, rbx
+  bts     rdx, 16            ; Set CR4.FSGSBASE
+  mov     cr4, rdx
+
+  ; Save GsBase
+  rdgsbase rdx
+  push    rdx
+
+  ; Save FsBase
+  rdfsbase rdx
+  push    rdx
+
+  ; Restore original CR4
+  mov     cr4, rbx
+
   ; Save Segment registers
   mov     rdx, ss
   push    rdx

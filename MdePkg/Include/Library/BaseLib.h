@@ -5491,6 +5491,40 @@ AsmRmpAdjust (
   IN      UINT64  Rdx
   );
 
+/**
+  Reads the current value of the FS segment base address.
+
+  Reads and returns the current value of the FS segment base address using
+  the RDFSBASE instruction. This function is only available on X64.
+
+  Note: The function requires that CPUID.(EAX=7,ECX=0):EBX.FSGSBASE=1
+  and CR4.FSGSBASE=1.
+
+  @return The current value of the FS segment base address.
+**/
+UINT64
+EFIAPI
+AsmReadFsBase (
+  VOID
+  );
+
+/**
+  Writes a value to the FS segment base address.
+
+  Writes FsBase to the FS segment base address register using the WRFSBASE
+  instruction. This function is only available on X64.
+
+  Note: The function requires that CPUID.(EAX=7,ECX=0):EBX.FSGSBASE=1
+  and CR4.FSGSBASE=1.
+
+  @param  FsBase  The value to write to the FS segment base address.
+**/
+VOID
+EFIAPI
+AsmWriteFsBase (
+  IN      UINT64  FsBase
+  );
+
 #endif
 
 #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
