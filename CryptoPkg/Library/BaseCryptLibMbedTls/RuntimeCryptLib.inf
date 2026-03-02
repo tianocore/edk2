@@ -24,7 +24,6 @@
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = BaseCryptLib|DXE_RUNTIME_DRIVER
-  CONSTRUCTOR                    = RuntimeCryptLibConstructor
 
 [Sources]
   InternalCryptLib.h
@@ -65,6 +64,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   CryptoPkg/CryptoPkg.dec
 
 [LibraryClasses]
@@ -77,6 +77,7 @@
   IntrinsicLib
   PrintLib
   RngLib
+  RuntimeMemoryAllocationLib
 
 #
 # Remove these [BuildOptions] after this library is cleaned up

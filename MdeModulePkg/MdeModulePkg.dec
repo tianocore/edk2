@@ -186,6 +186,8 @@
   #
   RealTimeClockLib|Include/Library/RealTimeClockLib.h
 
+  RuntimeMemoryAllocationLib|Include/Library/RuntimeMemoryAllocationLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
@@ -2324,6 +2326,11 @@
   # 43          2^(43+20) = 8 EB
   # @Prompt Max size to accept in PCIe Resizable BAR Capability register.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarMaxSize|43|UINT8|0x10000030
+
+  ## Define page count for scratch buffer used in RuntimeMemoryAllocation.
+  #  Default is 275.
+  # @Prompt Page count for scratch buffer used in RuntimeMemoryAllocation.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRuntimeMemoryPageCount|275|UINT32|0x10000031
 
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
