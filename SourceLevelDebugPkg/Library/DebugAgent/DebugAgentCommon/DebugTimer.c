@@ -9,6 +9,46 @@
 #include "DebugAgent.h"
 
 /**
+  Default value if we cannot get access to the PcdFSBClock.
+  Some platforms (Xen) define the PCD as a dynamic one, which is not available
+  in SEC phase, when it is used probably to configure the debug timer.
+ **/
+#define FSB_CLOCK_DEFAULT  100000000
+
+/**
+  Figures out if we are running inside Xen HVM.
+
+  @retval TRUE   Xen was detected
+  @retval FALSE  Xen was not detected
+**/
+STATIC
+BOOLEAN
+XenDetect (
+  VOID
+  )
+{
+  UINT32  XenLeaf;
+  UINT8   Signature[13];
+
+  Signature[12] = '\0';
+  for (XenLeaf = 0x40000000; XenLeaf < 0x40010000; XenLeaf += 0x100) {
+    AsmCpuid (
+      XenLeaf,
+      NULL,
+      (UINT32 *)&Signature[0],
+      (UINT32 *)&Signature[4],
+      (UINT32 *)&Signature[8]
+      );
+
+    if (!AsciiStrCmp ((CHAR8 *)Signature, "XenVMMXenVMM")) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
   Initialize CPU local APIC timer.
 
   @param[out] TimerFrequency  Local APIC timer frequency returned.
@@ -23,12 +63,20 @@ InitializeDebugTimer (
   )
 {
   UINTN   ApicTimerDivisor;
+  UINT32  FSBClock;
   UINT32  InitialCount;
   UINT32  ApicTimerFrequency;
 
   InitializeLocalApicSoftwareEnable (TRUE);
   GetApicTimerState (&ApicTimerDivisor, NULL, NULL);
-  ApicTimerFrequency = PcdGet32 (PcdFSBClock) / (UINT32)ApicTimerDivisor;
+
+  if (XenDetect ()) {
+    FSBClock = FSB_CLOCK_DEFAULT;
+  } else {
+    FSBClock = PcdGet32 (PcdFSBClock);
+  }
+
+  ApicTimerFrequency = FSBClock / (UINT32)ApicTimerDivisor;
   //
   // Cpu Local Apic timer interrupt frequency, it is set to 0.1s
   //
@@ -48,7 +96,7 @@ InitializeDebugTimer (
   DisableApicTimerInterrupt ();
 
   if (DumpFlag) {
-    DEBUG ((DEBUG_INFO, "Debug Timer: FSB Clock    = %d\n", PcdGet32 (PcdFSBClock)));
+    DEBUG ((DEBUG_INFO, "Debug Timer: FSB Clock    = %d\n", FSBClock));
     DEBUG ((DEBUG_INFO, "Debug Timer: Divisor      = %d\n", ApicTimerDivisor));
     DEBUG ((DEBUG_INFO, "Debug Timer: Frequency    = %d\n", ApicTimerFrequency));
     DEBUG ((DEBUG_INFO, "Debug Timer: InitialCount = %d\n", InitialCount));
