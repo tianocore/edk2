@@ -391,6 +391,7 @@ PxeBcMtftp6WriteFile (
   Token.CheckPacket     = PxeBcMtftp6CheckPacket;
   Token.TimeoutCallback = NULL;
   Token.PacketNeeded    = NULL;
+  Token.Context         = Private;
 
   Status = Mtftp6->WriteFile (Mtftp6, &Token);
   //
@@ -869,6 +870,7 @@ PxeBcMtftp4WriteFile (
   Token.CheckPacket     = PxeBcMtftp4CheckPacket;
   Token.TimeoutCallback = NULL;
   Token.PacketNeeded    = NULL;
+  Token.Context         = Private;
 
   Status = Mtftp4->WriteFile (Mtftp4, &Token);
   //
