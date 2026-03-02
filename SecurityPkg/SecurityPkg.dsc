@@ -136,6 +136,7 @@
   Tpm12DeviceLib|SecurityPkg/Library/Tpm12DeviceLibTcg/Tpm12DeviceLibTcg.inf
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.inf
   FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
+  Tcg2PhysicalPresencePromptLib|SecurityPkg/Library/Tcg2PhysicalPresencePromptLib/Tcg2PhysicalPresencePromptLibConsole.inf
 
 [LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_RUNTIME_DRIVER,]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -278,6 +279,8 @@
   SecurityPkg/Library/TcgPpVendorLibNull/TcgPpVendorLibNull.inf
   SecurityPkg/Library/TcgEventLogRecordLib/TcgEventLogRecordLib.inf
 
+  SecurityPkg/Library/Tcg2PhysicalPresencePromptLib/Tcg2PhysicalPresencePromptLibConsole.inf
+
 [Components.IA32, Components.X64, Components.AARCH64]
   SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
   SecurityPkg/Library/SecureBootVariableLib/SecureBootVariableLib.inf
@@ -404,6 +407,9 @@
   SecurityPkg/Tcg/Tcg2Acpi/Tcg2Acpi.inf
   SecurityPkg/Library/SmmTcg2PhysicalPresenceLib/SmmTcg2PhysicalPresenceLib.inf
   SecurityPkg/Library/SmmTcg2PhysicalPresenceLib/StandaloneMmTcg2PhysicalPresenceLib.inf
+  SecurityPkg/Library/DxeTcg2PhysicalPresenceMinimumLib/DxeTcg2PhysicalPresenceMinimumLib.inf
+  SecurityPkg/Library/MmTcg2PhysicalPresenceMinimumLib/TraditionalMmTcg2PhysicalPresenceMinimumLib.inf
+  SecurityPkg/Library/MmTcg2PhysicalPresenceMinimumLib/StandaloneMmTcg2PhysicalPresenceMinimumLib.inf
 
   #
   # Opal Password solution

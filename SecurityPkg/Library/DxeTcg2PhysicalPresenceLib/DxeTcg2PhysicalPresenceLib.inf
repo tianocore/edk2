@@ -51,6 +51,7 @@
   Tpm2CommandLib
   Tcg2PpVendorLib
   VariablePolicyHelperLib
+  Tcg2PhysicalPresencePromptLib
 
 [Protocols]
   gEfiTcg2ProtocolGuid                 ## SOMETIMES_CONSUMES
@@ -58,6 +59,7 @@
 
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2PhysicalPresenceFlags       ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdDisallowPPIPersistentClearPermissions  ## CONSUMES
 
 [Guids]
   ## SOMETIMES_CONSUMES ## HII

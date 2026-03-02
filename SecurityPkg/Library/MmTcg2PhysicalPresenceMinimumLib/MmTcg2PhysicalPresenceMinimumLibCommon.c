@@ -10,16 +10,29 @@
   Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction() and Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction()
   will receive untrusted input and do validation.
 
-Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
+  Minimized, compare to SecurityPkg/Library/SmmTcg2PhysicalPresenceLib/MmTcg2PhysicalPresenceLibCommon.c
+
+Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "MmTcg2PhysicalPresenceLibCommon.h"
+#include <PiMm.h>
+
+#include <Guid/Tcg2PhysicalPresenceData.h>
+
+#include <Protocol/SmmVariable.h>
+
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/Tcg2PpVendorLib.h>
+#include <Library/MmServicesTableLib.h>
+
+#define     PP_INF_VERSION_1_3  "1.3"
 
 EFI_SMM_VARIABLE_PROTOCOL  *mTcg2PpSmmVariable;
-BOOLEAN                    mIsTcg2PPVerLowerThan_1_3 = FALSE;
-UINT32                     mTcg2PhysicalPresenceFlags;
 
 /**
   The handler for TPM physical presence function:
@@ -44,6 +57,16 @@ Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (
   EFI_TCG2_PHYSICAL_PRESENCE  PpData;
 
   DEBUG ((DEBUG_INFO, "[TPM2] ReturnOperationResponseToOsFunction\n"));
+
+  if (mTcg2PpSmmVariable == NULL) {
+    return TCG_PP_RETURN_TPM_OPERATION_RESPONSE_FAILURE;
+  }
+
+  if ((MostRecentRequest == NULL) ||
+      (Response == NULL))
+  {
+    return TCG_PP_RETURN_TPM_OPERATION_RESPONSE_FAILURE;
+  }
 
   //
   // Get the Physical Presence variable
@@ -86,19 +109,36 @@ Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (
   **/
 UINT32
 Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
-  IN OUT UINT32  *OperationRequest,
+  IN OUT UINT32  *OperationRequest,               // TODO: who is checking these pointers?
   IN OUT UINT32  *RequestParameter
   )
 {
-  EFI_STATUS                        Status;
-  UINT32                            ReturnCode;
-  UINTN                             DataSize;
-  EFI_TCG2_PHYSICAL_PRESENCE        PpData;
-  EFI_TCG2_PHYSICAL_PRESENCE_FLAGS  Flags;
+  EFI_STATUS                  Status;
+  UINT32                      ReturnCode;
+  UINTN                       DataSize;
+  EFI_TCG2_PHYSICAL_PRESENCE  PpData;
 
   DEBUG ((DEBUG_INFO, "[TPM2] SubmitRequestToPreOSFunction, Request = %x, %x\n", *OperationRequest, *RequestParameter));
   ReturnCode = TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS;
 
+  switch (*OperationRequest) {
+    case TCG2_PHYSICAL_PRESENCE_NO_ACTION:
+    case TCG2_PHYSICAL_PRESENCE_CLEAR:
+    case TCG2_PHYSICAL_PRESENCE_ENABLE_CLEAR:
+    case TCG2_PHYSICAL_PRESENCE_ENABLE_CLEAR_2:
+    case TCG2_PHYSICAL_PRESENCE_ENABLE_CLEAR_3:
+      break;
+
+    default:
+      DEBUG ((DEBUG_WARN, "[TPM2] Unsupported PPI operation requested\n"));
+      return TCG_PP_SUBMIT_REQUEST_TO_PREOS_NOT_IMPLEMENTED;
+  }
+
+  if (mTcg2PpSmmVariable == NULL) {
+    return TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE;
+  }
+
+  //
   //
   // Get the Physical Presence variable
   //
@@ -113,24 +153,6 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "[TPM2] Get PP variable failure! Status = %r\n", Status));
     ReturnCode = TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE;
-    goto EXIT;
-  }
-
-  if (PcdGetBool (PcdDisallowPPIPersistentClearPermissions)) {
-    if ((*OperationRequest == TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_CHANGE_PCRS_FALSE) ||
-        (*OperationRequest == TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_CHANGE_EPS_FALSE) ||
-        (*OperationRequest == TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_TURN_OFF_FALSE))
-    {
-      DEBUG ((DEBUG_ERROR, "[TPM2] Refusing to process PPI flags request in production!\n"));
-      ReturnCode = TCG_PP_SUBMIT_REQUEST_TO_PREOS_BLOCKED_BY_BIOS_SETTINGS;
-      goto EXIT;
-    }
-  }
-
-  if ((*OperationRequest > TCG2_PHYSICAL_PRESENCE_NO_ACTION_MAX) &&
-      (*OperationRequest < TCG2_PHYSICAL_PRESENCE_STORAGE_MANAGEMENT_BEGIN))
-  {
-    ReturnCode = TCG_PP_SUBMIT_REQUEST_TO_PREOS_NOT_IMPLEMENTED;
     goto EXIT;
   }
 
@@ -154,39 +176,23 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
     }
   }
 
-  if (*OperationRequest >= TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
-    DataSize = sizeof (EFI_TCG2_PHYSICAL_PRESENCE_FLAGS);
-    Status   = mTcg2PpSmmVariable->SmmGetVariable (
-                                     TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE,
-                                     &gEfiTcg2PhysicalPresenceGuid,
-                                     NULL,
-                                     &DataSize,
-                                     &Flags
-                                     );
-    if (EFI_ERROR (Status)) {
-      Flags.PPFlags = mTcg2PhysicalPresenceFlags;
-    }
-
-    ReturnCode = Tcg2PpVendorLibSubmitRequestToPreOSFunction (*OperationRequest, Flags.PPFlags, *RequestParameter);
-  }
-
 EXIT:
   //
-  // Sync PPRQ/PPRM from PP Variable if PP submission fails
+  // Reset variable to no action on error
   //
   if (ReturnCode != TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS) {
-    DEBUG ((DEBUG_ERROR, "[TPM2] Submit PP Request failure! Sync PPRQ/PPRM with PP variable. Status = %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "[TPM2] Submit PP Request failure! Reset variable to no action. %r\n", Status));
     DataSize = sizeof (EFI_TCG2_PHYSICAL_PRESENCE);
     ZeroMem (&PpData, DataSize);
-    Status = mTcg2PpSmmVariable->SmmGetVariable (
+    Status = mTcg2PpSmmVariable->SmmSetVariable (
+                                   // Overwrite the variable with "No Action" to prevent DoS
                                    TCG2_PHYSICAL_PRESENCE_VARIABLE,
                                    &gEfiTcg2PhysicalPresenceGuid,
-                                   NULL,
-                                   &DataSize,
+                                   EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                                   DataSize,
                                    &PpData
                                    );
-    *OperationRequest = (UINT32)PpData.PPRequest;
-    *RequestParameter = PpData.PPRequestParameter;
+    // Do not change variables on error, it causes Powershell to throw an exception instead of returning the ReturnCode
   }
 
   return ReturnCode;
@@ -241,13 +247,15 @@ Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction (
   IN UINT32  OperationRequest
   )
 {
-  EFI_STATUS                        Status;
-  UINTN                             DataSize;
-  EFI_TCG2_PHYSICAL_PRESENCE        PpData;
-  EFI_TCG2_PHYSICAL_PRESENCE_FLAGS  Flags;
-  BOOLEAN                           RequestConfirmed;
+  EFI_STATUS                  Status;
+  UINTN                       DataSize;
+  EFI_TCG2_PHYSICAL_PRESENCE  PpData;
 
   DEBUG ((DEBUG_INFO, "[TPM2] GetUserConfirmationStatusFunction, Request = %x\n", OperationRequest));
+
+  if (mTcg2PpSmmVariable == NULL) {
+    return TCG_PP_GET_USER_CONFIRMATION_NOT_IMPLEMENTED;
+  }
 
   //
   // Get the Physical Presence variable
@@ -265,114 +273,16 @@ Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction (
     return TCG_PP_GET_USER_CONFIRMATION_BLOCKED_BY_BIOS_CONFIGURATION;
   }
 
-  //
-  // Get the Physical Presence flags
-  //
-  DataSize = sizeof (EFI_TCG2_PHYSICAL_PRESENCE_FLAGS);
-  Status   = mTcg2PpSmmVariable->SmmGetVariable (
-                                   TCG2_PHYSICAL_PRESENCE_FLAGS_VARIABLE,
-                                   &gEfiTcg2PhysicalPresenceGuid,
-                                   NULL,
-                                   &DataSize,
-                                   &Flags
-                                   );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "[TPM2] Get PP flags failure! Status = %r\n", Status));
-    return TCG_PP_GET_USER_CONFIRMATION_BLOCKED_BY_BIOS_CONFIGURATION;
-  }
-
-  RequestConfirmed = FALSE;
-
   switch (OperationRequest) {
+    case TCG2_PHYSICAL_PRESENCE_NO_ACTION:
     case TCG2_PHYSICAL_PRESENCE_CLEAR:
     case TCG2_PHYSICAL_PRESENCE_ENABLE_CLEAR:
     case TCG2_PHYSICAL_PRESENCE_ENABLE_CLEAR_2:
     case TCG2_PHYSICAL_PRESENCE_ENABLE_CLEAR_3:
-      if ((Flags.PPFlags & TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CLEAR) == 0) {
-        RequestConfirmed = TRUE;
-      }
-
-      break;
-
-    case TCG2_PHYSICAL_PRESENCE_NO_ACTION:
-    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_CLEAR_TRUE:
-      RequestConfirmed = TRUE;
-      break;
-
-    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_CLEAR_FALSE:
-      break;
-
-    case TCG2_PHYSICAL_PRESENCE_SET_PCR_BANKS:
-      if ((Flags.PPFlags & TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CHANGE_PCRS) == 0) {
-        RequestConfirmed = TRUE;
-      }
-
-      break;
-
-    case TCG2_PHYSICAL_PRESENCE_CHANGE_EPS:
-      if ((Flags.PPFlags & TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CHANGE_EPS) == 0) {
-        RequestConfirmed = TRUE;
-      }
-
-      break;
-
-    case TCG2_PHYSICAL_PRESENCE_LOG_ALL_DIGESTS:
-      RequestConfirmed = TRUE;
-      break;
-
-    case TCG2_PHYSICAL_PRESENCE_ENABLE_BLOCK_SID:
-      if ((Flags.PPFlags & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_ENABLE_BLOCK_SID) == 0) {
-        RequestConfirmed = TRUE;
-      }
-
-      break;
-
-    case TCG2_PHYSICAL_PRESENCE_DISABLE_BLOCK_SID:
-      if ((Flags.PPFlags & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_DISABLE_BLOCK_SID) == 0) {
-        RequestConfirmed = TRUE;
-      }
-
-      break;
-
-    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_ENABLE_BLOCK_SID_FUNC_TRUE:
-    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_DISABLE_BLOCK_SID_FUNC_TRUE:
-      RequestConfirmed = TRUE;
-      break;
-
-    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_ENABLE_BLOCK_SID_FUNC_FALSE:
-    case TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_DISABLE_BLOCK_SID_FUNC_FALSE:
-      break;
+      return TCG_PP_GET_USER_CONFIRMATION_ALLOWED_AND_PPUSER_NOT_REQUIRED;
 
     default:
-      if (!mIsTcg2PPVerLowerThan_1_3) {
-        if (OperationRequest < TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
-          //
-          // TCG2 PP1.3 spec defined operations that are reserved or un-implemented
-          //
-          return TCG_PP_GET_USER_CONFIRMATION_NOT_IMPLEMENTED;
-        }
-      } else {
-        //
-        // TCG PP lower than 1.3. (1.0, 1.1, 1.2)
-        //
-        if (OperationRequest <= TCG2_PHYSICAL_PRESENCE_NO_ACTION_MAX) {
-          RequestConfirmed = TRUE;
-        } else if (OperationRequest < TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
-          return TCG_PP_GET_USER_CONFIRMATION_NOT_IMPLEMENTED;
-        }
-      }
-
-      break;
-  }
-
-  if (OperationRequest >= TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
-    return Tcg2PpVendorLibGetUserConfirmationStatusFunction (OperationRequest, Flags.PPFlags);
-  }
-
-  if (RequestConfirmed) {
-    return TCG_PP_GET_USER_CONFIRMATION_ALLOWED_AND_PPUSER_NOT_REQUIRED;
-  } else {
-    return TCG_PP_GET_USER_CONFIRMATION_ALLOWED_AND_PPUSER_REQUIRED;
+      return TCG_PP_GET_USER_CONFIRMATION_NOT_IMPLEMENTED;
   }
 }
 
@@ -381,25 +291,27 @@ Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction (
 
   It will ASSERT() if that operation fails and it will always return EFI_SUCCESS.
 
-  @retval EFI_SUCCESS   The constructor successfully added string package.
-  @retval Other value   The constructor can't add string package.
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS   Always return success from constructors
 **/
 EFI_STATUS
-Tcg2PhysicalPresenceLibCommonConstructor (
+Tcg2PhysicalPresenceMinimumLibCommonConstructor (
   VOID
   )
 {
   EFI_STATUS  Status;
 
-  mIsTcg2PPVerLowerThan_1_3 = IsTcg2PPVerLowerThan_1_3 ();
+  if (AsciiStrnCmp (PP_INF_VERSION_1_3, (CHAR8 *)PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer), sizeof (PP_INF_VERSION_1_3) - 1) != 0) {
+    ASSERT (FALSE);
+  }
 
   //
   // Locate SmmVariableProtocol.
   //
   Status = gMmst->MmLocateProtocol (&gEfiSmmVariableProtocolGuid, NULL, (VOID **)&mTcg2PpSmmVariable);
   ASSERT_EFI_ERROR (Status);
-
-  mTcg2PhysicalPresenceFlags = PcdGet32 (PcdTcg2PhysicalPresenceFlags);
 
   return EFI_SUCCESS;
 }

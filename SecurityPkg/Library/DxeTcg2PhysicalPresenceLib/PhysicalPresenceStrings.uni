@@ -12,8 +12,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #string TPM_PPI_HEAD_STR              #language en-US    "A configuration change was requested to allow the Operating System to %s the computer's TPM (Trusted Platform Module) without asking for user confirmation in the future.\n\n"
 
 #string TPM_ACCEPT_KEY                #language en-US    "Press F10 "
-#string TPM_CAUTION_KEY               #language en-US    "Press F12 "
-#string TPM_REJECT_KEY                #language en-US    "to %s the TPM \nPress ESC to reject this change request and continue\n"
+
+#string TPM_CAUTION_KEY               #language en-US    "Press OK "
+#string TPM_REJECT_KEY                #language en-US    "to %s the TPM \nPress CANCEL to reject this change request and continue\n"
 
 #string TPM_ENABLE                    #language en-US    "enable"
 #string TPM_DISABLE                   #language en-US    "disable"
