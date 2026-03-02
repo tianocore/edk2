@@ -53,7 +53,7 @@ BIN_PATH     = $(BASE_TOOLS_PATH)\Bin\Win64
 LIB_PATH     = $(BASE_TOOLS_PATH)\Lib\Win64
 SYS_BIN_PATH = $(EDK_TOOLS_PATH)\Bin\Win64
 SYS_LIB_PATH = $(EDK_TOOLS_PATH)\Lib\Win64
-CFLAGS = $(CFLAGS) /wd4267 /wd4244 /wd4334
+CFLAGS = $(CFLAGS) /wd4267 /wd4244 /wd4334 /wd4319
 # Note: Disable flexible array member warnings
 CFLAGS = $(CFLAGS) /wd4200
 
@@ -64,7 +64,7 @@ LIB_PATH     = $(BASE_TOOLS_PATH)\Lib\Win64
 SYS_BIN_PATH = $(EDK_TOOLS_PATH)\Bin\Win64
 SYS_LIB_PATH = $(EDK_TOOLS_PATH)\Lib\Win64
 # Note: These are bit-width conversion related warning suppressions.
-CFLAGS = $(CFLAGS) /wd4267 /wd4244 /wd4334
+CFLAGS = $(CFLAGS) /wd4267 /wd4244 /wd4334 /wd4319
 # Note: Disable flexible array member warnings
 CFLAGS = $(CFLAGS) /wd4200
 !ELSE
@@ -81,5 +81,5 @@ LINKER = $(LD)
 INC = $(INC) -I . -I $(SOURCE_PATH)\Include -I $(ARCH_INCLUDE) -I $(SOURCE_PATH)\Common
 INC = $(INC) -I $(EDK2_PATH)\MdePkg\Include
 
-CFLAGS = $(CFLAGS) /nologo /Z7 /c /O2 /MT /W4 /WX /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE
-CPPFLAGS = $(CPPFLAGS) /EHsc /nologo /Z7 /c /O2 /MT /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE
+CFLAGS = $(CFLAGS) /nologo /Z7 /c /O2 /MT /W4 /WX /guard:cf /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE
+CPPFLAGS = $(CPPFLAGS) /EHsc /nologo /Z7 /c /O2 /MT /guard:cf /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE
