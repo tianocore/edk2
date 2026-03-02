@@ -1,14 +1,14 @@
 /** @file
   Implement TPM2 help.
 
+Copyright (c), Microsoft Corporation.
 Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include <IndustryStandard/UefiTcgPlatform.h>
-#include <Library/Tpm2CommandLib.h>
-#include <Library/Tpm2DeviceLib.h>
+#include <Library/Tpm2HelpLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -28,6 +28,35 @@ STATIC INTERNAL_HASH_INFO  mHashInfo[] = {
 };
 
 /**
+  Check if DigestList has an entry for HashAlg.
+
+  @param DigestList         Digest list.
+  @param HashAlg            Hash algorithm id.
+
+  @retval TRUE  Match found.
+  @retval FALSE No match found.
+**/
+STATIC
+BOOLEAN
+CheckDigestListForHashAlg (
+  IN TPML_DIGEST_VALUES  *DigestList,
+  IN TPM_ALG_ID          HashAlg
+  )
+{
+  UINT32  Index;
+
+  for (Index = 0; Index < DigestList->count; Index++) {
+    if (DigestList->digests[Index].hashAlg == HashAlg) {
+      DEBUG ((DEBUG_INFO, "Hash alg 0x%x found in DigestList.\n", HashAlg));
+      return TRUE;
+    }
+  }
+
+  DEBUG ((DEBUG_INFO, "Hash alg 0x%x not found in DigestList.\n", HashAlg));
+  return FALSE;
+}
+
+/**
   Return size of digest.
 
   @param[in] HashAlgo  Hash algorithm
@@ -36,7 +65,7 @@ STATIC INTERNAL_HASH_INFO  mHashInfo[] = {
 **/
 UINT16
 EFIAPI
-GetHashSizeFromAlgo (
+Tpm2GetHashSizeFromAlgo (
   IN TPMI_ALG_HASH  HashAlgo
   )
 {
@@ -60,7 +89,7 @@ GetHashSizeFromAlgo (
 **/
 UINT32
 EFIAPI
-GetHashMaskFromAlgo (
+Tpm2GetHashMaskFromAlgo (
   IN TPMI_ALG_HASH  HashAlgo
   )
 {
@@ -85,12 +114,16 @@ GetHashMaskFromAlgo (
 **/
 UINT32
 EFIAPI
-CopyAuthSessionCommand (
+Tpm2CopyAuthSessionCommand (
   IN      TPMS_AUTH_COMMAND  *AuthSessionIn  OPTIONAL,
   OUT     UINT8              *AuthSessionOut
   )
 {
   UINT8  *Buffer;
+
+  if (AuthSessionOut == NULL) {
+    return 0;
+  }
 
   Buffer = (UINT8 *)AuthSessionOut;
 
@@ -151,7 +184,7 @@ CopyAuthSessionCommand (
 **/
 UINT32
 EFIAPI
-CopyAuthSessionResponse (
+Tpm2CopyAuthSessionResponse (
   IN      UINT8               *AuthSessionIn,
   OUT     TPMS_AUTH_RESPONSE  *AuthSessionOut OPTIONAL
   )
@@ -163,13 +196,17 @@ CopyAuthSessionResponse (
     AuthSessionOut = &LocalAuthSessionOut;
   }
 
+  if (AuthSessionIn == NULL) {
+    return 0;
+  }
+
   Buffer = (UINT8 *)AuthSessionIn;
 
   // nonce
   AuthSessionOut->nonce.size = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
   Buffer                    += sizeof (UINT16);
   if (AuthSessionOut->nonce.size > sizeof (TPMU_HA)) {
-    DEBUG ((DEBUG_ERROR, "CopyAuthSessionResponse - nonce.size error %x\n", AuthSessionOut->nonce.size));
+    DEBUG ((DEBUG_ERROR, "Tpm2CopyAuthSessionResponse - nonce.size error %x\n", AuthSessionOut->nonce.size));
     return 0;
   }
 
@@ -184,7 +221,7 @@ CopyAuthSessionResponse (
   AuthSessionOut->hmac.size = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
   Buffer                   += sizeof (UINT16);
   if (AuthSessionOut->hmac.size > sizeof (TPMU_HA)) {
-    DEBUG ((DEBUG_ERROR, "CopyAuthSessionResponse - hmac.size error %x\n", AuthSessionOut->hmac.size));
+    DEBUG ((DEBUG_ERROR, "Tpm2CopyAuthSessionResponse - hmac.size error %x\n", AuthSessionOut->hmac.size));
     return 0;
   }
 
@@ -205,7 +242,7 @@ CopyAuthSessionResponse (
 **/
 BOOLEAN
 EFIAPI
-IsHashAlgSupportedInHashAlgorithmMask (
+Tpm2IsHashAlgSupportedInHashAlgorithmMask (
   IN TPMI_ALG_HASH  HashAlg,
   IN UINT32         HashAlgorithmMask
   )
@@ -257,7 +294,7 @@ IsHashAlgSupportedInHashAlgorithmMask (
 **/
 VOID *
 EFIAPI
-CopyDigestListToBuffer (
+Tpm2CopyDigestListToBuffer (
   IN OUT VOID            *Buffer,
   IN TPML_DIGEST_VALUES  *DigestList,
   IN UINT32              HashAlgorithmMask
@@ -268,18 +305,22 @@ CopyDigestListToBuffer (
   UINT32  DigestListCount;
   UINT32  *DigestListCountPtr;
 
+  if ((Buffer == NULL) || (DigestList == NULL)) {
+    return NULL;
+  }
+
   DigestListCountPtr = (UINT32 *)Buffer;
   DigestListCount    = 0;
   Buffer             = (UINT8 *)Buffer + sizeof (DigestList->count);
   for (Index = 0; Index < DigestList->count; Index++) {
-    if (!IsHashAlgSupportedInHashAlgorithmMask (DigestList->digests[Index].hashAlg, HashAlgorithmMask)) {
+    if (!Tpm2IsHashAlgSupportedInHashAlgorithmMask (DigestList->digests[Index].hashAlg, HashAlgorithmMask)) {
       DEBUG ((DEBUG_ERROR, "WARNING: TPM2 Event log has HashAlg unsupported by PCR bank (0x%x)\n", DigestList->digests[Index].hashAlg));
       continue;
     }
 
     CopyMem (Buffer, &DigestList->digests[Index].hashAlg, sizeof (DigestList->digests[Index].hashAlg));
     Buffer     = (UINT8 *)Buffer + sizeof (DigestList->digests[Index].hashAlg);
-    DigestSize = GetHashSizeFromAlgo (DigestList->digests[Index].hashAlg);
+    DigestSize = Tpm2GetHashSizeFromAlgo (DigestList->digests[Index].hashAlg);
     CopyMem (Buffer, &DigestList->digests[Index].digest, DigestSize);
     Buffer = (UINT8 *)Buffer + DigestSize;
     DigestListCount++;
@@ -291,31 +332,31 @@ CopyDigestListToBuffer (
 }
 
 /**
-  Copy a buffer into a TPML_DIGEST_VALUES structure.
+  Copy a buffer into  TPML_DIGEST_VALUES structure.
+  This is the opposite to the CopyDigestListToBuffer function.
 
   @param[in]     Buffer             Buffer to hold TPML_DIGEST_VALUES compact binary.
   @param[in]     BufferSize         Size of Buffer.
-  @param[out]    DigestList         TPML_DIGEST_VALUES.
+  @param[in,out] DigestList         TPML_DIGEST_VALUES.
 
-  @retval EFI_SUCCESS               Buffer was succesfully copied to DigestList.
-  @retval EFI_BAD_BUFFER_SIZE       A bad buffer size passed to the function.
-  @retval EFI_INVALID_PARAMETER     An invalid parameter passed to the function: NULL pointer or
-                                    BufferSize bigger than TPML_DIGEST_VALUES.
+  @return EFI_STATUS
+  @retval EFI_SUCCESS               Buffer was successfully copied to Digest List.
+  @retval EFI_BAD_BUFFER_SIZE       Bad buffer size passed to function.
+  @retval EFI_INVALID_PARAMETER     Invalid parameter passed to function: NULL pointer or
+                                    BufferSize bigger than TPML_DIGEST_VALUES
 **/
 EFI_STATUS
 EFIAPI
-CopyBufferToDigestList (
-  IN CONST  VOID                *Buffer,
-  IN        UINTN               BufferSize,
-  OUT       TPML_DIGEST_VALUES  *DigestList
+Tpm2CopyBufferToDigestList (
+  IN     VOID                *Buffer,
+  IN     UINT32              BufferSize,
+  IN OUT TPML_DIGEST_VALUES  *DigestList
   )
 {
-  EFI_STATUS   Status;
-  UINTN        Index;
-  UINT16       DigestSize;
-  CONST UINT8  *BufferPtr;
-
-  Status = EFI_INVALID_PARAMETER;
+  EFI_STATUS    Status = EFI_INVALID_PARAMETER;
+  UINTN         Index;
+  UINT16        DigestSize;
+  UINT8 *CONST  pBuffer = (UINT8 *CONST)Buffer;
 
   if ((Buffer == NULL) || (DigestList == NULL) || (BufferSize > sizeof (TPML_DIGEST_VALUES))) {
     return EFI_INVALID_PARAMETER;
@@ -326,26 +367,26 @@ CopyBufferToDigestList (
     return EFI_INVALID_PARAMETER;
   }
 
-  BufferPtr = (CONST UINT8 *)Buffer +  sizeof (UINT32);
+  Buffer = (UINT8 *)Buffer +  sizeof (UINT32);
   for (Index = 0; Index < DigestList->count; Index++) {
-    if (BufferPtr - (CONST UINT8 *)Buffer + sizeof (UINT16) > BufferSize) {
+    if ((UINT32)((UINT8 *)Buffer - pBuffer + sizeof (UINT16)) > BufferSize ) {
       Status = EFI_BAD_BUFFER_SIZE;
       break;
     } else {
-      DigestList->digests[Index].hashAlg = SwapBytes16 (ReadUnaligned16 ((CONST UINT16 *)BufferPtr));
+      DigestList->digests[Index].hashAlg = SwapBytes16 (ReadUnaligned16 ((CONST UINT16 *)Buffer));
     }
 
-    BufferPtr += sizeof (UINT16);
-    DigestSize = GetHashSizeFromAlgo (DigestList->digests[Index].hashAlg);
-    if (BufferPtr - (CONST UINT8 *)Buffer + (UINTN)DigestSize > BufferSize) {
+    Buffer     = (UINT8 *)Buffer + sizeof (UINT16);
+    DigestSize = Tpm2GetHashSizeFromAlgo (DigestList->digests[Index].hashAlg);
+    if ((UINT32)((UINT8 *)Buffer - pBuffer + DigestSize) > BufferSize ) {
       Status = EFI_BAD_BUFFER_SIZE;
       break;
     } else {
-      CopyMem (&DigestList->digests[Index].digest, BufferPtr, DigestSize);
+      CopyMem (&DigestList->digests[Index].digest, Buffer, DigestSize);
     }
 
-    BufferPtr += DigestSize;
-    Status     = EFI_SUCCESS;
+    Buffer = (UINT8 *)Buffer + DigestSize;
+    Status = EFI_SUCCESS;
   }
 
   return Status;
@@ -360,7 +401,7 @@ CopyBufferToDigestList (
 **/
 UINT32
 EFIAPI
-GetDigestListSize (
+Tpm2GetDigestListSize (
   IN TPML_DIGEST_VALUES  *DigestList
   )
 {
@@ -368,9 +409,13 @@ GetDigestListSize (
   UINT16  DigestSize;
   UINT32  TotalSize;
 
+  if (DigestList == NULL) {
+    return 0;
+  }
+
   TotalSize = sizeof (DigestList->count);
   for (Index = 0; Index < DigestList->count; Index++) {
-    DigestSize = GetHashSizeFromAlgo (DigestList->digests[Index].hashAlg);
+    DigestSize = Tpm2GetHashSizeFromAlgo (DigestList->digests[Index].hashAlg);
     TotalSize += sizeof (DigestList->digests[Index].hashAlg) + DigestSize;
   }
 
@@ -378,15 +423,15 @@ GetDigestListSize (
 }
 
 /**
-  Get the total digest size from a hash algorithm mask.
+  Get TPML_DIGEST_VALUES data size from HashAlgorithmMask
 
   @param[in]     HashAlgorithmMask.
 
-  @return Digest size in bytes.
+  @return TPML_DIGEST_VALUES data size.
 **/
 UINT32
 EFIAPI
-GetDigestListSizeFromHashAlgorithmMask (
+Tpm2GetDigestListSizeFromHashAlgorithmMask (
   IN UINT32  HashAlgorithmMask
   )
 {
@@ -394,8 +439,8 @@ GetDigestListSizeFromHashAlgorithmMask (
   UINT32  TotalSize;
 
   TotalSize = sizeof (UINT32);
-  for (Index = 0; Index < ARRAY_SIZE (mHashInfo); Index++) {
-    if ((mHashInfo[Index].HashMask & HashAlgorithmMask) != 0) {
+  for (Index = 0; Index < sizeof (mHashInfo)/sizeof (mHashInfo[0]); Index++) {
+    if (mHashInfo[Index].HashMask & HashAlgorithmMask) {
       TotalSize += sizeof (TPMI_ALG_HASH) + mHashInfo[Index].HashSize;
     }
   }
@@ -410,12 +455,13 @@ GetDigestListSizeFromHashAlgorithmMask (
   @param[in]  DigestList    Digest list
   @param[out] Digest        Digest
 
-  @retval EFI_SUCCESS       Digest is found and returned.
-  @retval EFI_NOT_FOUND     Digest is not found.
+  @retval EFI_SUCCESS            Digest is found and returned.
+  @retval EFI_NOT_FOUND          Digest is not found.
+  @retval EFI_INVALID_PARAMETER  DigestList or Digest invalid.
 **/
 EFI_STATUS
 EFIAPI
-GetDigestFromDigestList (
+Tpm2GetDigestFromDigestList (
   IN TPMI_ALG_HASH       HashAlg,
   IN TPML_DIGEST_VALUES  *DigestList,
   OUT VOID               *Digest
@@ -424,7 +470,11 @@ GetDigestFromDigestList (
   UINTN   Index;
   UINT16  DigestSize;
 
-  DigestSize = GetHashSizeFromAlgo (HashAlg);
+  if ((DigestList == NULL) || (Digest == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  DigestSize = Tpm2GetHashSizeFromAlgo (HashAlg);
   for (Index = 0; Index < DigestList->count; Index++) {
     if (DigestList->digests[Index].hashAlg == HashAlg) {
       CopyMem (
@@ -437,4 +487,58 @@ GetDigestFromDigestList (
   }
 
   return EFI_NOT_FOUND;
+}
+
+/**
+  Check if all hash algorithms supported in HashAlgorithmMask are
+  present in the DigestList.
+
+  @param DigestList         Digest list.
+  @param HashAlgorithmMask  Bitfield of allowed hash algorithms.
+
+  @retval TRUE  All hash algorithms present.
+  @retval FALSE Some hash algorithms not present.
+**/
+BOOLEAN
+EFIAPI
+Tpm2IsDigestListInSyncWithHashAlgorithmMask (
+  IN TPML_DIGEST_VALUES  *DigestList,
+  IN UINT32              HashAlgorithmMask
+  )
+{
+  if (DigestList == NULL) {
+    return FALSE;
+  }
+
+  if ((HashAlgorithmMask & HASH_ALG_SHA1) != 0) {
+    if (!CheckDigestListForHashAlg (DigestList, TPM_ALG_SHA1)) {
+      return FALSE;
+    }
+  }
+
+  if ((HashAlgorithmMask & HASH_ALG_SHA256) != 0) {
+    if (!CheckDigestListForHashAlg (DigestList, TPM_ALG_SHA256)) {
+      return FALSE;
+    }
+  }
+
+  if ((HashAlgorithmMask & HASH_ALG_SHA384) != 0) {
+    if (!CheckDigestListForHashAlg (DigestList, TPM_ALG_SHA384)) {
+      return FALSE;
+    }
+  }
+
+  if ((HashAlgorithmMask & HASH_ALG_SHA512) != 0) {
+    if (!CheckDigestListForHashAlg (DigestList, TPM_ALG_SHA512)) {
+      return FALSE;
+    }
+  }
+
+  if ((HashAlgorithmMask & HASH_ALG_SM3_256) != 0) {
+    if (!CheckDigestListForHashAlg (DigestList, TPM_ALG_SM3_256)) {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
 }

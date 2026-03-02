@@ -29,6 +29,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PeiServicesLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/Tpm2CommandLib.h>
+#include <Library/Tpm2HelpLib.h>
 #include <Library/Tpm2DeviceLib.h>
 #include <Library/HashLib.h>
 #include <Library/HobLib.h>
@@ -387,7 +388,7 @@ LogHashEvent (
       DEBUG ((DEBUG_INFO, "  LogFormat - 0x%08x\n", mTcg2EventInfo[Index].LogFormat));
       switch (mTcg2EventInfo[Index].LogFormat) {
         case EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2:
-          Status = GetDigestFromDigestList (TPM_ALG_SHA1, DigestList, &NewEventHdr->Digest);
+          Status = Tpm2GetDigestFromDigestList (TPM_ALG_SHA1, DigestList, &NewEventHdr->Digest);
           if (!EFI_ERROR (Status)) {
             HobData = BuildGuidHob (
                         &gTcgEventEntryHobGuid,
@@ -406,12 +407,12 @@ LogHashEvent (
           break;
         case EFI_TCG2_EVENT_LOG_FORMAT_TCG_2:
           //
-          // Use GetDigestListSize (DigestList) in the GUID HOB DataLength calculation
+          // Use Tpm2GetDigestListSize (DigestList) in the GUID HOB DataLength calculation
           // to reserve enough buffer to hold TPML_DIGEST_VALUES compact binary.
           //
           HobData = BuildGuidHob (
                       &gTcgEvent2EntryHobGuid,
-                      sizeof (TcgPcrEvent2->PCRIndex) + sizeof (TcgPcrEvent2->EventType) + GetDigestListSize (DigestList) + sizeof (TcgPcrEvent2->EventSize) + NewEventHdr->EventSize
+                      sizeof (TcgPcrEvent2->PCRIndex) + sizeof (TcgPcrEvent2->EventType) + Tpm2GetDigestListSize (DigestList) + sizeof (TcgPcrEvent2->EventSize) + NewEventHdr->EventSize
                       );
           if (HobData == NULL) {
             RetStatus = EFI_OUT_OF_RESOURCES;
@@ -422,7 +423,7 @@ LogHashEvent (
           TcgPcrEvent2->PCRIndex  = NewEventHdr->PCRIndex;
           TcgPcrEvent2->EventType = NewEventHdr->EventType;
           DigestBuffer            = (UINT8 *)&TcgPcrEvent2->Digest;
-          DigestBuffer            = CopyDigestListToBuffer (DigestBuffer, DigestList, PcdGet32 (PcdTpm2HashMask));
+          DigestBuffer            = Tpm2CopyDigestListToBuffer (DigestBuffer, DigestList, PcdGet32 (PcdTpm2HashMask));
           CopyMem (DigestBuffer, &NewEventHdr->EventSize, sizeof (TcgPcrEvent2->EventSize));
           DigestBuffer = DigestBuffer + sizeof (TcgPcrEvent2->EventSize);
           CopyMem (DigestBuffer, NewEventData, NewEventHdr->EventSize);
@@ -685,7 +686,7 @@ MeasureFvImage (
       PreHashInfo = (HASH_INFO *)(PrehashedFvPpi + 1);
       for (Index = 0, DigestCount = 0; Index < PrehashedFvPpi->Count; Index++) {
         DEBUG ((DEBUG_INFO, "Hash Algo ID in PrehashedFvPpi=0x%x\n", PreHashInfo->HashAlgoId));
-        HashAlgoMask = GetHashMaskFromAlgo (PreHashInfo->HashAlgoId);
+        HashAlgoMask = Tpm2GetHashMaskFromAlgo (PreHashInfo->HashAlgoId);
         if ((Tpm2HashMask & HashAlgoMask) != 0 ) {
           //
           // Hash is required, copy it to DigestList
