@@ -33,7 +33,7 @@
 #string STR_MAIN_GOTO_DISK_INFO_HELP             #language en-US "Select disk to see actions"
 
 #string STR_MAIN_NO_DISKS_PRESENT_LBL            #language en-US "No disks connected to system"
-#string STR_MAIN_NO_DISKS_PRESENT_LBL_HELP       #language en-US "The storage needs to be connected before EndOfDxe"
+#string STR_MAIN_NO_DISKS_PRESENT_LBL_HELP       #language en-US "Connect storage controllers before opening this menu"
 
 /////////////////////////////////   DISK INFO MENU FORM   /////////////////////////////////
 #string STR_DISK_INFO_SELECTED_DISK_NAME         #language en-US " "
