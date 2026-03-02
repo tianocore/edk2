@@ -486,7 +486,9 @@ ApInitializeSync (
   //
   // Sync BSP's MTRR table to AP
   //
-  MtrrSetAllMtrrs (&CpuMpData->MtrrTable);
+  if (!PcdGetBool (PcdCpuDisableMtrrProgramming)) {
+    MtrrSetAllMtrrs (&CpuMpData->MtrrTable);
+  }
 }
 
 /**

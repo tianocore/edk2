@@ -348,7 +348,9 @@ ReplaceOSMtrrs (
   //
   // Replace all MTRRs registers
   //
-  MtrrSetAllMtrrs (&gSmiMtrrs);
+  if (!PcdGetBool (PcdCpuDisableMtrrProgramming)) {
+    MtrrSetAllMtrrs (&gSmiMtrrs);
+  }
 }
 
 /**
@@ -662,7 +664,9 @@ BSPHandler (
     // Restore OS MTRRs
     //
     SmmCpuFeaturesReenableSmrr ();
-    MtrrSetAllMtrrs (&Mtrrs);
+    if (!PcdGetBool (PcdCpuDisableMtrrProgramming)) {
+      MtrrSetAllMtrrs (&Mtrrs);
+    }
   }
 
   if (SmmCpuFeaturesNeedConfigureMtrrs () || mSmmDebugAgentSupport) {
@@ -934,7 +938,9 @@ APHandler (
     // Restore OS MTRRs
     //
     SmmCpuFeaturesReenableSmrr ();
-    MtrrSetAllMtrrs (&Mtrrs);
+    if (!PcdGetBool (PcdCpuDisableMtrrProgramming)) {
+      MtrrSetAllMtrrs (&Mtrrs);
+    }
   }
 
   if (SmmCpuFeaturesNeedConfigureMtrrs () || mSmmDebugAgentSupport) {

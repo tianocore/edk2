@@ -278,7 +278,9 @@ SetMtrrsFromBuffer (
   IN VOID  *Buffer
   )
 {
-  MtrrSetAllMtrrs (Buffer);
+  if (!PcdGetBool (PcdCpuDisableMtrrProgramming)) {
+    MtrrSetAllMtrrs (Buffer);
+  }
 }
 
 /**
@@ -358,6 +360,10 @@ CpuSetMemoryAttributes (
   }
 
   if (CacheAttributes != 0) {
+    if (PcdGetBool (PcdCpuDisableMtrrProgramming)) {
+      return EFI_UNSUPPORTED;
+    }
+
     if (!IsMtrrSupported ()) {
       return EFI_UNSUPPORTED;
     }

@@ -73,6 +73,7 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                       ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr       ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuDisableMtrrProgramming           ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber        ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuBootLogicalProcessorNumber       ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds      ## SOMETIMES_CONSUMES

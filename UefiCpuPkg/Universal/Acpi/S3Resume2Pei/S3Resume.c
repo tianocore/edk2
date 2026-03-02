@@ -963,7 +963,9 @@ LoadMtrrData (
   IN VOID  *MtrrTable
   )
 {
-  MtrrSetAllMtrrs (MtrrTable);
+  if (!PcdGetBool (PcdCpuDisableMtrrProgramming)) {
+    MtrrSetAllMtrrs (MtrrTable);
+  }
 }
 
 /**

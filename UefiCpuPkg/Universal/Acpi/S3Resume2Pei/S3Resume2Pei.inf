@@ -96,6 +96,7 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable  ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuDisableMtrrProgramming                ## CONSUMES
 
 [Depex]
   TRUE
