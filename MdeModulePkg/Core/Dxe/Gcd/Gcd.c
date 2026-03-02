@@ -2165,31 +2165,6 @@ CoreConvertResourceDescriptorHobAttributesToCapabilities (
 }
 
 /**
-  Calculate total memory bin size neeeded.
-
-  @return The total memory bin size neeeded.
-
-**/
-UINT64
-CalculateTotalMemoryBinSizeNeeded (
-  VOID
-  )
-{
-  UINTN   Index;
-  UINT64  TotalSize;
-
-  //
-  // Loop through each memory type in the order specified by the gMemoryTypeInformation[] array
-  //
-  TotalSize = 0;
-  for (Index = 0; gMemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
-    TotalSize += LShiftU64 (gMemoryTypeInformation[Index].NumberOfPages, EFI_PAGE_SHIFT);
-  }
-
-  return TotalSize;
-}
-
-/**
    Find the largest region in the specified region that is not covered by an existing memory allocation
 
    @param BaseAddress   On input start of the region to check.
@@ -2270,14 +2245,11 @@ CoreInitializeMemoryServices (
   )
 {
   EFI_PEI_HOB_POINTERS         Hob;
-  EFI_MEMORY_TYPE_INFORMATION  *EfiMemoryTypeInformation;
-  UINTN                        DataSize;
   BOOLEAN                      Found;
   EFI_HOB_HANDOFF_INFO_TABLE   *PhitHob;
   EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceHob;
   EFI_HOB_RESOURCE_DESCRIPTOR  *PhitResourceHob;
   EFI_HOB_RESOURCE_DESCRIPTOR  *MemoryTypeInformationResourceHob;
-  UINTN                        Count;
   EFI_PHYSICAL_ADDRESS         BaseAddress;
   UINT64                       Length;
   UINT64                       Attributes;
@@ -2285,10 +2257,10 @@ CoreInitializeMemoryServices (
   EFI_PHYSICAL_ADDRESS         TestedMemoryBaseAddress;
   UINT64                       TestedMemoryLength;
   EFI_PHYSICAL_ADDRESS         HighAddress;
-  EFI_HOB_GUID_TYPE            *GuidHob;
   UINT32                       ReservedCodePageNumber;
   UINT64                       MinimalMemorySizeNeeded;
   EFI_PHYSICAL_ADDRESS         ResourceHobMemoryTop;
+  EFI_STATUS                   Status;
 
   //
   // Point at the first HOB.  This must be the PHIT HOB.
@@ -2327,57 +2299,20 @@ CoreInitializeMemoryServices (
                                                                   + EFI_PAGES_TO_SIZE (ReservedCodePageNumber);
   }
 
-  //
-  // See if a Memory Type Information HOB is available
-  //
-  MemoryTypeInformationResourceHob = NULL;
-  GuidHob                          = GetFirstGuidHob (&gEfiMemoryTypeInformationGuid);
-  if (GuidHob != NULL) {
-    EfiMemoryTypeInformation = GET_GUID_HOB_DATA (GuidHob);
-    DataSize                 = GET_GUID_HOB_DATA_SIZE (GuidHob);
-    if ((EfiMemoryTypeInformation != NULL) && (DataSize > 0) && (DataSize <= (EfiMaxMemoryType + 1) * sizeof (EFI_MEMORY_TYPE_INFORMATION))) {
-      CopyMem (&gMemoryTypeInformation, EfiMemoryTypeInformation, DataSize);
-
-      //
-      // Look for Resource Descriptor HOB with a ResourceType of System Memory
-      // and an Owner GUID of gEfiMemoryTypeInformationGuid. If more than 1 is
-      // found, then set MemoryTypeInformationResourceHob to NULL.
-      //
-      Count = 0;
-      for (Hob.Raw = *HobStart; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
-        if (GET_HOB_TYPE (Hob) != EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-          continue;
-        }
-
-        ResourceHob = Hob.ResourceDescriptor;
-        if (!CompareGuid (&ResourceHob->Owner, &gEfiMemoryTypeInformationGuid)) {
-          continue;
-        }
-
-        Count++;
-        if (ResourceHob->ResourceType != EFI_RESOURCE_SYSTEM_MEMORY) {
-          continue;
-        }
-
-        if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) != TESTED_MEMORY_ATTRIBUTES) {
-          continue;
-        }
-
-        if (ResourceHob->ResourceLength >= CalculateTotalMemoryBinSizeNeeded ()) {
-          MemoryTypeInformationResourceHob = ResourceHob;
-        }
-      }
-
-      if (Count > 1) {
-        MemoryTypeInformationResourceHob = NULL;
-      }
-    }
+  Status = PopulateMemoryTypeInformation (gMemoryTypeInformation);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_WARN, "No Memory Type Information HOB found, S4 resume will likely fail\n"));
   }
+
+  MemoryTypeInformationResourceHob = GetMemoryTypeInformationResourceHob (
+                                       HobStart,
+                                       gMemoryTypeInformation
+                                       );
 
   //
   // Include the total memory bin size needed to make sure memory bin could be allocated successfully.
   //
-  MinimalMemorySizeNeeded = MINIMUM_INITIAL_MEMORY_SIZE + CalculateTotalMemoryBinSizeNeeded ();
+  MinimalMemorySizeNeeded = MINIMUM_INITIAL_MEMORY_SIZE + CalculateTotalMemoryBinSizeNeeded (0, gMemoryTypeInformation);
 
   //
   // Find the Resource Descriptor HOB that contains PHIT range EfiFreeMemoryBottom..EfiFreeMemoryTop
@@ -2585,7 +2520,7 @@ CoreInitializeMemoryServices (
     Capabilities = CoreConvertResourceDescriptorHobAttributesToCapabilities (EfiGcdMemoryTypeSystemMemory, Attributes);
   }
 
-  if (MemoryTypeInformationResourceHob != NULL) {
+  if ((Status == EFI_SUCCESS) && (MemoryTypeInformationResourceHob != NULL)) {
     //
     // If a Memory Type Information Resource HOB was found, then use the address
     // range of the  Memory Type Information Resource HOB as the preferred
@@ -2593,7 +2528,11 @@ CoreInitializeMemoryServices (
     //
     CoreSetMemoryTypeInformationRange (
       MemoryTypeInformationResourceHob->PhysicalStart,
-      MemoryTypeInformationResourceHob->ResourceLength
+      MemoryTypeInformationResourceHob->ResourceLength,
+      gMemoryTypeInformation,
+      &mMemoryTypeInformationInitialized,
+      &mMemoryTypeStatistics,
+      &mDefaultMaximumAddress
       );
   }
 
@@ -2842,6 +2781,19 @@ CoreInitializeGcdServices (
             RShiftU64 (MemoryHob->AllocDescriptor.MemoryLength, EFI_PAGE_SHIFT),
             Descriptor.Capabilities & (~EFI_MEMORY_RUNTIME)
             );
+
+          // if this Memory Allocation HOB came from PEI, update the memory bin statistics
+          if (CompareGuid (&MemoryHob->AllocDescriptor.Name, &gEfiMemoryTypeInformationGuid)) {
+            UpdateMemoryStatistics (
+              EfiConventionalMemory,
+              MemoryHob->AllocDescriptor.MemoryType,
+              MemoryHob->AllocDescriptor.MemoryBaseAddress,
+              EFI_SIZE_TO_PAGES ((UINT32)MemoryHob->AllocDescriptor.MemoryLength),
+              &mMemoryTypeInformationInitialized,
+              &mMemoryTypeStatistics,
+              gMemoryTypeInformation
+              );
+          }
         }
       }
     }

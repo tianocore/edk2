@@ -360,9 +360,9 @@ DxeMain (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Install Memory Type Information Table into the EFI System Tables's Configuration Table
+  // Install Memory Type Information Statistics Table into the EFI System Tables's Configuration Table
   //
-  Status = CoreInstallConfigurationTable (&gEfiMemoryTypeInformationGuid, &gMemoryTypeInformation);
+  Status = CoreInstallConfigurationTable (&gMemoryTypeInformationStatisticsGuid, &mMemoryTypeStatistics);
   ASSERT_EFI_ERROR (Status);
 
   //

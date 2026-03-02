@@ -130,22 +130,27 @@ BmSetMemoryTypeInformationVariable (
   IN BOOLEAN  Boot
   )
 {
-  EFI_STATUS                   Status;
-  EFI_MEMORY_TYPE_INFORMATION  *PreviousMemoryTypeInformation;
-  EFI_MEMORY_TYPE_INFORMATION  *CurrentMemoryTypeInformation;
-  UINTN                        VariableSize;
-  UINTN                        Index;
-  UINTN                        Index1;
-  UINT32                       Previous;
-  UINT32                       Current;
-  UINT32                       Next;
-  EFI_HOB_GUID_TYPE            *GuidHob;
-  BOOLEAN                      MemoryTypeInformationModified;
-  BOOLEAN                      MemoryTypeInformationVariableExists;
-  EFI_BOOT_MODE                BootMode;
+  EFI_STATUS                         Status;
+  EFI_MEMORY_TYPE_INFORMATION        *PreviousMemoryTypeInformation;
+  EFI_MEMORY_TYPE_STATISTICS_HEADER  *CurrentMemoryTypeInformation;
+  UINTN                              VariableSize;
+  UINTN                              Index;
+  UINTN                              Index1;
+  UINT32                             Previous;
+  UINT32                             Current;
+  UINT32                             Next;
+  EFI_HOB_GUID_TYPE                  *GuidHob;
+  BOOLEAN                            MemoryTypeInformationModified;
+  BOOLEAN                            MemoryTypeInformationVariableExists;
+  EFI_BOOT_MODE                      BootMode;
+  MEMORY_BINS_RANGE                  BinRange;
+  EFI_PHYSICAL_ADDRESS               BinEnd;
 
   MemoryTypeInformationModified       = FALSE;
   MemoryTypeInformationVariableExists = FALSE;
+  BinRange.BaseAddress                = (EFI_PHYSICAL_ADDRESS)MAX_UINT64;
+  BinRange.Length                     = 0;
+  BinEnd                              = 0;
 
   BootMode = GetBootModeHob ();
   //
@@ -179,7 +184,7 @@ BmSetMemoryTypeInformationVariable (
   // no adjustments can be made to the Memory Type Information variable.
   //
   Status = EfiGetSystemConfigurationTable (
-             &gEfiMemoryTypeInformationGuid,
+             &gMemoryTypeInformationStatisticsGuid,
              (VOID **)&CurrentMemoryTypeInformation
              );
   if (EFI_ERROR (Status) || (CurrentMemoryTypeInformation == NULL)) {
@@ -213,14 +218,25 @@ BmSetMemoryTypeInformationVariable (
   DEBUG ((DEBUG_INFO, "======  ========  ========  ========\n"));
 
   for (Index = 0; PreviousMemoryTypeInformation[Index].Type != EfiMaxMemoryType; Index++) {
-    for (Index1 = 0; CurrentMemoryTypeInformation[Index1].Type != EfiMaxMemoryType; Index1++) {
-      if (PreviousMemoryTypeInformation[Index].Type == CurrentMemoryTypeInformation[Index1].Type) {
+    for (Index1 = 0; CurrentMemoryTypeInformation->Statistics[Index1].Type != EfiMaxMemoryType; Index1++) {
+      if (PreviousMemoryTypeInformation[Index].Type == (UINT32)CurrentMemoryTypeInformation->Statistics[Index1].Type) {
         break;
       }
     }
 
-    if (CurrentMemoryTypeInformation[Index1].Type == EfiMaxMemoryType) {
+    if (CurrentMemoryTypeInformation->Statistics[Index1].Type == EfiMaxMemoryType) {
       continue;
+    }
+
+    //
+    // Find the bin range
+    //
+    if (CurrentMemoryTypeInformation->Statistics[Index1].BaseAddress < BinRange.BaseAddress) {
+      BinRange.BaseAddress = CurrentMemoryTypeInformation->Statistics[Index1].BaseAddress;
+    }
+
+    if (CurrentMemoryTypeInformation->Statistics[Index1].MaximumAddress > BinEnd) {
+      BinEnd = CurrentMemoryTypeInformation->Statistics[Index1].MaximumAddress;
     }
 
     //
@@ -228,8 +244,21 @@ BmSetMemoryTypeInformationVariable (
     // Current is the number of pages actually needed
     //
     Previous = PreviousMemoryTypeInformation[Index].NumberOfPages;
-    Current  = CurrentMemoryTypeInformation[Index1].NumberOfPages;
-    Next     = Previous;
+    if ((CurrentMemoryTypeInformation->Statistics[Index1].CurrentNumberOfPagesOutOfBin > 0) &&
+        (CurrentMemoryTypeInformation->Statistics[Index1].CurrentNumberOfPagesInBin +
+         CurrentMemoryTypeInformation->Statistics[Index1].CurrentNumberOfPagesOutOfBin < Previous))
+    {
+      // if we have any out-of-bin usage, make sure we increase the bin size to fix this, even if the
+      // total number of pages is less than the bin size
+      Current = Previous + CurrentMemoryTypeInformation->Statistics[Index1].CurrentNumberOfPagesOutOfBin;
+    } else {
+      // in this case we either have no out-of-bin usage, or the total usage is greater than the pre-allocated size
+      // and we can just use the actual usage
+      Current = CurrentMemoryTypeInformation->Statistics[Index1].CurrentNumberOfPagesInBin +
+                CurrentMemoryTypeInformation->Statistics[Index1].CurrentNumberOfPagesOutOfBin;
+    }
+
+    Next = Previous;
 
     //
     // Inconsistent Memory Reserved across bootings may lead to S4 fail
@@ -259,9 +288,22 @@ BmSetMemoryTypeInformationVariable (
 
   //
   // If any changes were made to the Memory Type Information settings, then set the new variable value;
-  // Or create the variable in first boot.
+  // Or create the variable in first boot. In this case, delete the bin location variable since the
+  // size has changed.
   //
   if (MemoryTypeInformationModified || !MemoryTypeInformationVariableExists) {
+    Status = gRT->SetVariable (
+                    EFI_MEMORY_TYPE_INFORMATION_BINS_RANGE_VARIABLE_NAME,
+                    &gEfiMemoryTypeInformationGuid,
+                    0,
+                    0,
+                    NULL
+                    );
+
+    if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+      DEBUG ((DEBUG_ERROR, "Failed to delete Memory Type Information Bins Range variable!\n"));
+    }
+
     Status = BmSetVariableAndReportStatusCodeOnError (
                EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
                &gEfiMemoryTypeInformationGuid,
@@ -285,6 +327,21 @@ BmSetMemoryTypeInformationVariable (
       }
     } else {
       DEBUG ((DEBUG_ERROR, "Memory Type Information settings cannot be saved. OS S4 may fail!\n"));
+    }
+  } else {
+    // The maximum address should be the last valid address, ensure we are page aligned
+    BinRange.Length = (UINTN)(((BinEnd + 1) & ~EFI_PAGE_MASK) - BinRange.BaseAddress);
+
+    // We aren't changing the bin size, so report the bin location for the best chance at S4 resume stability
+    Status = gRT->SetVariable (
+                    EFI_MEMORY_TYPE_INFORMATION_BINS_RANGE_VARIABLE_NAME,
+                    &gEfiMemoryTypeInformationGuid,
+                    EFI_VARIABLE_NON_VOLATILE  | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                    sizeof (MEMORY_BINS_RANGE),
+                    &BinRange
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Failed to set Memory Type Information Bins Range variable!\n"));
     }
   }
 

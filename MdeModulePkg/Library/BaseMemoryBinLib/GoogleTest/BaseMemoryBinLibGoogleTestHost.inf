@@ -1,0 +1,33 @@
+## @file
+# Unit tests for BaseMemoryBinLib library using GoogleTest
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010005
+  BASE_NAME      = BaseMemoryBinLibGoogleTest
+  FILE_GUID      = 8A3C5C7B-2D4E-4F9A-B1C6-9E8F7D6C5B4A
+  MODULE_TYPE    = HOST_APPLICATION
+  VERSION_STRING = 1.0
+
+[Sources]
+  BaseMemoryBinLibGoogleTest.cpp
+  ../BaseMemoryBinLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  HobLib
+
+[Guids]
+  gEfiMemoryTypeInformationGuid
