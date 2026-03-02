@@ -68,6 +68,7 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid                 ## PRODUCES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInitializationPolicy         ## PRODUCES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmAutoDetection                ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmDefaultDevice                ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer
 
 [Depex]

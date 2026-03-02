@@ -144,9 +144,10 @@ Tcg2ConfigPeimEntryPoint (
                           );
   if (EFI_ERROR (Status)) {
     //
-    // Variable not ready, set default value
+    // Variable not ready, use PCD default value
     //
-    Tcg2Configuration.TpmDevice = TPM_DEVICE_DEFAULT;
+    Tcg2Configuration.TpmDevice = PcdGet8 (PcdTpmDefaultDevice);
+    DEBUG ((DEBUG_INFO, "Using PCD default TpmDevice=%d\n", Tcg2Configuration.TpmDevice));
   }
 
   //

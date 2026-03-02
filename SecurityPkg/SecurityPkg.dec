@@ -466,6 +466,13 @@
   # @Prompt TPM type detection.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmAutoDetection|TRUE|BOOLEAN|0x00010011
 
+  ## This PCD specifies the default TPM device type when no configuration exists.<BR><BR>
+  #  0 - TPM_DEVICE_NULL<BR>
+  #  1 - TPM_DEVICE_1_2<BR>
+  #  2 - TPM_DEVICE_2_0_DTPM<BR>
+  # @Prompt Default TPM device type
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmDefaultDevice|0x1|UINT8|0x00010028
+
   ## This PCD indicates TPM base address.<BR><BR>
   # @Prompt TPM device address.
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress|0xFED40000|UINT64|0x00010012
