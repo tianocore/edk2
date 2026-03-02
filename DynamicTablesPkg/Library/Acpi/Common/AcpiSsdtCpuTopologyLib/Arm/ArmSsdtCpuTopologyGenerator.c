@@ -270,6 +270,16 @@ CreateTopologyFromIntC (
       }
     }
 
+    // If a PSD info is associated with the
+    // GicCinfo, create an _PSD method returning them.
+    if (GicCInfo[Index].PsdToken != CM_NULL_TOKEN) {
+      Status = CreateAmlPsdNode (Generator, CfgMgrProtocol, GicCInfo[Index].PsdToken, CpuNode);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        break;
+      }
+    }
+
     if (GicCInfo[Index].EtToken != CM_NULL_TOKEN) {
       Status = CreateAmlEtNode (
                  Generator,
