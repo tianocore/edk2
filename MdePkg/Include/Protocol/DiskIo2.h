@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __DISK_IO2_H__
-#define __DISK_IO2_H__
+#pragma once
 
 #define EFI_DISK_IO2_PROTOCOL_GUID \
   { \
@@ -162,5 +161,3 @@ struct _EFI_DISK_IO2_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiDiskIo2ProtocolGuid;
-
-#endif

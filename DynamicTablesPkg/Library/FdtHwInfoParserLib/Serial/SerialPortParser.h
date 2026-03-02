@@ -9,8 +9,7 @@
   - linux/Documentation/devicetree/bindings/serial/8250.txt
 **/
 
-#ifndef SERIAL_PORT_PARSER_H_
-#define SERIAL_PORT_PARSER_H_
+#pragma once
 
 /** SerialPort dispatcher.
 
@@ -43,5 +42,3 @@ SerialPortDispatcher (
   IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
   IN        INT32                      FdtBranch
   );
-
-#endif // SERIAL_PORT_PARSER_H_

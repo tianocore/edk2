@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef MDE_PKG_TDX_H_
-#define MDE_PKG_TDX_H_
+#pragma once
 
 #define EXIT_REASON_EXTERNAL_INTERRUPT  1
 #define EXIT_REASON_TRIPLE_FAULT        2
@@ -201,5 +200,3 @@ typedef struct {
 } TDREPORT_STRUCT;
 
 #pragma pack()
-
-#endif

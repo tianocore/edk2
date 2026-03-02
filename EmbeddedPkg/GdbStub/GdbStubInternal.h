@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __GDB_STUB_INTERNAL__
-#define __GDB_STUB_INTERNAL__
+#pragma once
 
 #include <Uefi.h>
 #include <Library/BaseLib.h>
@@ -711,5 +710,3 @@ ValidateException (
   IN  EFI_EXCEPTION_TYPE     ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   );
-
-#endif

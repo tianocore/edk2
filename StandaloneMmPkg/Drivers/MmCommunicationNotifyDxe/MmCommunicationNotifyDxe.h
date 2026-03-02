@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef MM_COMMUNICATION_NOTIFY_DXE_H_
-#define MM_COMMUNICATION_NOTIFY_DXE_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -152,5 +151,3 @@ MmEndOfDxeEventNotify (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   );
-
-#endif

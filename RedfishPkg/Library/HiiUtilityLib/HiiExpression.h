@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef HII_EXPRESSION_H_
-#define HII_EXPRESSION_H_
+#pragma once
 
 #include <Library/HiiUtilityLib.h>
 
@@ -187,5 +186,3 @@ EFI_STATUS
 PopScope (
   OUT UINT8  *Operand
   );
-
-#endif

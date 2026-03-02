@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _SMBIOS_PLATFORM_DXE_H_
-#define _SMBIOS_PLATFORM_DXE_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Protocol/Smbios.h>
@@ -45,5 +44,3 @@ BOOLEAN
 IsEntryPointStructureValid (
   IN SMBIOS_TABLE_ENTRY_POINT  *EntryPointStructure
   );
-
-#endif /* _SMBIOS_PLATFORM_DXE_H_ */

@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __ABSOLUTE_POINTER_H__
-#define __ABSOLUTE_POINTER_H__
+#pragma once
 
 #define EFI_ABSOLUTE_POINTER_PROTOCOL_GUID \
   { 0x8D59D32B, 0xC655, 0x4AE9, { 0x9B, 0x15, 0xF2, 0x59, 0x04, 0x99, 0x2A, 0x43 } }
@@ -188,5 +187,3 @@ struct _EFI_ABSOLUTE_POINTER_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiAbsolutePointerProtocolGuid;
-
-#endif

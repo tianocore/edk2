@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef _IPMI_NET_FN_GROUP_EXTENSION_H_
-#define _IPMI_NET_FN_GROUP_EXTENSION_H_
+#pragma once
 
 #include <Pi/PiStatusCode.h>
 
@@ -93,5 +92,3 @@ typedef struct {
   IPMI_GROUP_EXTENSION_BOOT_PROGRESS_CODE_FORMAT    BootProgressCode;
 } IPMI_GROUP_EXTENSION_BOOT_PROGRESS_CODE_GET_RESPONSE;
 #pragma pack()
-
-#endif

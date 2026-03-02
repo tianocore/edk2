@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __PCI_CODE_ID_H__
-#define __PCI_CODE_ID_H__
+#pragma once
 
 ///
 /// PCI_CLASS_MASS_STORAGE, Base Class 01h.
@@ -89,5 +88,3 @@
 ///@{
 #define PCI_CLASS_PROCESSING_ACCELERATOR  0x12
 ///@}
-
-#endif

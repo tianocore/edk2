@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __FSP_WRAPPER_API_LIB_H__
-#define __FSP_WRAPPER_API_LIB_H__
+#pragma once
 
 #include <FspEas.h>
 
@@ -90,5 +89,3 @@ EFIAPI
 CallFspSmmInit (
   IN VOID  *FspiUpdDataPtr
   );
-
-#endif

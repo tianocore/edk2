@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TPM_TIS_H_
-#define _TPM_TIS_H_
+#pragma once
 
 //
 // Set structure alignment to 1-byte
@@ -177,5 +176,3 @@ typedef TIS_PC_REGISTERS *TIS_PC_REGISTERS_PTR;
 #define TIS_TIMEOUT_B  (2000 * 1000)               // 2s
 #define TIS_TIMEOUT_C  (750  * 1000)               // 750ms
 #define TIS_TIMEOUT_D  (750  * 1000)               // 750ms
-
-#endif

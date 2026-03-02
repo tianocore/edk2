@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TPM2_COMMAND_LIB_H_
-#define _TPM2_COMMAND_LIB_H_
+#pragma once
 
 #include <IndustryStandard/Tpm20.h>
 
@@ -1184,5 +1183,3 @@ Tpm2PcrReadForActiveBank (
   IN      TPMI_DH_PCR  PcrHandle,
   OUT     TPML_DIGEST  *HashList
   );
-
-#endif

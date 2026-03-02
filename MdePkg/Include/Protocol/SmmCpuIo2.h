@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _SMM_CPU_IO2_H_
-#define _SMM_CPU_IO2_H_
+#pragma once
 
 #include <Protocol/MmCpuIo.h>
 
@@ -31,5 +30,3 @@ typedef EFI_MM_CPU_IO   EFI_SMM_CPU_IO2;
 typedef EFI_MM_IO_ACCESS EFI_SMM_IO_ACCESS2;
 
 extern EFI_GUID  gEfiSmmCpuIo2ProtocolGuid;
-
-#endif

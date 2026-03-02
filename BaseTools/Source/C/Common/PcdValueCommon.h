@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PCD_VALUE_COMMON_H
-#define _PCD_VALUE_COMMON_H
+#pragma once
 
 #include <Common/UefiBaseTypes.h>
 #include <Common/UefiInternalFormRepresentation.h>
@@ -133,5 +132,3 @@ __PcdSetPtr (
 #define PcdSet(A, B, C, D, Value)  __PcdSet(#A, #B, #C, #D, Value)
 #define PcdGetPtr(A, B, C, D, Size)  __PcdGetPtr(#A, #B, #C, #D, Size)
 #define PcdSetPtr(A, B, C, D, Size, Value)  __PcdSetPtr(#A, #B, #C, #D, Size, Value)
-
-#endif

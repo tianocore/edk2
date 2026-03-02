@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __EXT_SCSI_PASS_THROUGH_PROTOCOL_H__
-#define __EXT_SCSI_PASS_THROUGH_PROTOCOL_H__
+#pragma once
 
 #define EFI_EXT_SCSI_PASS_THRU_PROTOCOL_GUID \
   { \
@@ -384,5 +383,3 @@ struct _EFI_EXT_SCSI_PASS_THRU_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiExtScsiPassThruProtocolGuid;
-
-#endif

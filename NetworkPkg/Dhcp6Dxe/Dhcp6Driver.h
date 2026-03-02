@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __EFI_DHCP6_DRIVER_H__
-#define __EFI_DHCP6_DRIVER_H__
+#pragma once
 
 #include <Protocol/ServiceBinding.h>
 
@@ -146,5 +145,3 @@ Dhcp6ServiceBindingDestroyChild (
   IN EFI_SERVICE_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                    ChildHandle
   );
-
-#endif

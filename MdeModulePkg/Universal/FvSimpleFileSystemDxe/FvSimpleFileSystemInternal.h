@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __FVFS_INTERNAL_H__
-#define __FVFS_INTERNAL_H__
+#pragma once
 
 #include <Uefi.h>
 #include <PiDxe.h>
@@ -611,5 +610,3 @@ extern EFI_UNICODE_COLLATION_PROTOCOL  *mUnicodeCollation;
 extern EFI_FILE_PROTOCOL               mFileSystemTemplate;
 extern EFI_COMPONENT_NAME_PROTOCOL     gFvSimpleFileSystemComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL    gFvSimpleFileSystemComponentName2;
-
-#endif

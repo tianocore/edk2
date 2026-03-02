@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef __SMBIOS_GUID_H__
-#define __SMBIOS_GUID_H__
+#pragma once
 
 #define SMBIOS_TABLE_GUID \
   { \
@@ -28,5 +27,3 @@
 
 extern EFI_GUID  gEfiSmbiosTableGuid;
 extern EFI_GUID  gEfiSmbios3TableGuid;
-
-#endif

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef FLASHDEVICE_LIB_H_
-#define FLASHDEVICE_LIB_H_
+#pragma once
 
 /**
   Read NumBytes bytes of data from the address specified by
@@ -100,5 +99,3 @@ PHYSICAL_ADDRESS
 EFIAPI
 LibFvbFlashDeviceMemoryMap (
   );
-
-#endif

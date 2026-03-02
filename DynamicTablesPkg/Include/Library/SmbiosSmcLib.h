@@ -6,8 +6,7 @@
 *
 **/
 
-#ifndef SMBIOS_SMC_LIB_H_
-#define SMBIOS_SMC_LIB_H_
+#pragma once
 
 /** Returns the SOC ID, formatted for the SMBIOS Type 4 Processor ID field.
 
@@ -20,5 +19,3 @@ UINT64
 SmbiosSmcGetSocId (
   UINT64  *ProcessorId
   );
-
-#endif // SMBIOS_SMC_LIB_H_

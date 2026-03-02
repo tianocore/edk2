@@ -24,8 +24,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __INI_PARSING_LIB_H__
-#define __INI_PARSING_LIB_H__
+#pragma once
 
 /**
   Open an INI config file and return a context.
@@ -154,5 +153,3 @@ EFIAPI
 CloseIniFile (
   IN      VOID  *Context
   );
-
-#endif

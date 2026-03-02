@@ -68,8 +68,18 @@ MpInitLibGetNumberOfProcessors (
   OUT UINTN  *NumberOfEnabledProcessors OPTIONAL
   )
 {
-  *NumberOfProcessors        = 1;
-  *NumberOfEnabledProcessors = 1;
+  if ((NumberOfProcessors == NULL) && (NumberOfEnabledProcessors == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (NumberOfProcessors != NULL) {
+    *NumberOfProcessors = 1;
+  }
+
+  if (NumberOfEnabledProcessors != NULL) {
+    *NumberOfEnabledProcessors = 1;
+  }
+
   return EFI_SUCCESS;
 }
 

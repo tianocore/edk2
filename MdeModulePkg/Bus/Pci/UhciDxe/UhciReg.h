@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_UHCI_REG_H_
-#define _EFI_UHCI_REG_H_
+#pragma once
 
 //
 // UHCI register offset
@@ -226,5 +225,3 @@ VOID
 UhciTurnOffUsbEmulation (
   IN EFI_PCI_IO_PROTOCOL  *PciIo
   );
-
-#endif

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SIMPLE_FILE_PARSING_H_
-#define _SIMPLE_FILE_PARSING_H_
+#pragma once
 
 #include <Common/UefiBaseTypes.h>
 
@@ -100,5 +99,3 @@ SFPGetFileName (
   VOID
   )
 ;
-
-#endif // #ifndef _SIMPLE_FILE_PARSING_H_

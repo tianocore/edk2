@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_TCG_MOR_LOCK_H_
-#define _EFI_TCG_MOR_LOCK_H_
+#pragma once
 
 /**
   This service is a wrapper for the UEFI Runtime Service GetVariable().
@@ -127,5 +126,3 @@ EFIAPI
 MorLockDriverInit (
   VOID
   );
-
-#endif

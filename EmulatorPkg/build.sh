@@ -42,7 +42,7 @@ PLATFORMFILE=
 LAST_ARG=
 RUN_EMULATOR=no
 CLEAN_TYPE=none
-TARGET_TOOLS=GCC48
+TARGET_TOOLS=GCC
 NETWORK_SUPPORT=-D NETWORK_ENABLE=FALSE
 BUILD_NEW_SHELL=
 BUILD_FAT=
@@ -87,15 +87,9 @@ case `uname` in
 
     gcc_version=$(gcc -v 2>&1 | tail -1 | awk '{print $3}')
     case $gcc_version in
-      [1-3].*|4.[0-7].*)
-        echo EmulatorPkg requires GCC4.8 or later
+      [1-7].*)
+        echo EmulatorPkg requires GCC8 or later
         exit 1
-        ;;
-      4.8.*)
-        TARGET_TOOLS=GCC48
-        ;;
-      4.9.*|6.[0-2].*)
-        TARGET_TOOLS=GCC49
         ;;
       *)
         TARGET_TOOLS=GCC

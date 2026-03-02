@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef __LIBSPDM_STUB_H__
-#define __LIBSPDM_STUB_H__
+#pragma once
 
 #include <library/spdm_common_lib.h>
 #include <library/spdm_return_status.h>
@@ -148,5 +147,3 @@ typedef struct {
 #define SpdmPskHandshakeSecretHkdfExpandFunc  libspdm_psk_handshake_secret_hkdf_expand
 #define SpdmMeasurementOpaqueData             libspdm_measurement_opaque_data
 #define SpdmChallengeOpaqueData               libspdm_challenge_opaque_data
-
-#endif

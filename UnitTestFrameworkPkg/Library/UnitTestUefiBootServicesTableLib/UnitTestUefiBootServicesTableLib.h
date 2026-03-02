@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef UEFI_BOOT_SERVICES_TABLE_LIB_UNIT_TEST_H_
-#define UEFI_BOOT_SERVICES_TABLE_LIB_UNIT_TEST_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -1038,5 +1037,3 @@ UnitTestCreateEventEx (
   IN CONST EFI_GUID           *EventGroup, OPTIONAL
   OUT EFI_EVENT               *Event
   );
-
-#endif

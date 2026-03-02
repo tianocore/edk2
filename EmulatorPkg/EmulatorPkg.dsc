@@ -328,6 +328,10 @@
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishPlatformConfigFeatureProperty|0
 !endif
 
+!ifdef NO_PLATFORM_BOOT_DELAYS
+  gEfiShellPkgTokenSpaceGuid.PcdShellDefaultDelay|0
+!endif
+
 [PcdsDynamicDefault.common.DEFAULT]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0
@@ -336,7 +340,11 @@
 [PcdsDynamicHii.common.DEFAULT]
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|L"Setup"|gEmuSystemConfigGuid|0x0|80
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|L"Setup"|gEmuSystemConfigGuid|0x4|25
+!ifdef NO_PLATFORM_BOOT_DELAYS
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|0
+!else
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|10
+!endif
 
 [Components]
 !if "IA32" in $(ARCH) || "X64" in $(ARCH)
@@ -546,8 +554,7 @@
 #
 # +--------------------+--------+----------+------------+-----+----+--------+
 # | OS/Compiler        | VS2019 | CLANGPDB | CLANGDWARF |   GCC    | XCODE5 |
-# |                    | VS2022 |          |            |   GCC5   |        |
-# |                    |        |          |            | GCCNOLTO |        |
+# |                    | VS2022 |          |            | GCCNOLTO |        |
 # +--------------------+--------+----------+------------+----------+--------+
 # | Windows/VS         |IA32/X64|          |            |          |        |
 # | Windows/LLVM/VS    |        | IA32/X64 |            |          |        |
@@ -594,12 +601,12 @@
   !if $(TOOL_CHAIN_TAG) in "CLANGPDB"
     !error EmulatorPkg not supported for Mingw/CLANGPDB builds
   !endif
-  !if $(TOOL_CHAIN_TAG) in "GCC GCC5 GCCNOLTO"
+  !if $(TOOL_CHAIN_TAG) in "GCC GCCNOLTO"
     !error EmulatorPkg not supported for Mingw/GCC builds
   !endif
 !else
   !if $(WIN_HOST_BUILD)
-    !if $(TOOL_CHAIN_TAG) in "GCC GCC5 GCCNOLTO"
+    !if $(TOOL_CHAIN_TAG) in "GCC GCCNOLTO"
       !error EmulatorPkg not supported for Windows/GCC builds
     !endif
     !if $(TOOL_CHAIN_TAG) in "CLANGDWARF"

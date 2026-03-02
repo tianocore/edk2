@@ -9,8 +9,7 @@
       http://www.jedec.org/standards-documents/docs/spd412l-4
 **/
 
-#ifndef _SDRAM_SPD_DDR4_H_
-#define _SDRAM_SPD_DDR4_H_
+#pragma once
 
 #pragma pack (push, 1)
 
@@ -949,4 +948,3 @@ typedef struct {
 } SPD_DDR4;
 
 #pragma pack (pop)
-#endif

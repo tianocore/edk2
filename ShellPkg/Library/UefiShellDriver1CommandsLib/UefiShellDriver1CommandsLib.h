@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _UEFI_SHELL_DRIVER1_COMMANDS_LIB_H_
-#define _UEFI_SHELL_DRIVER1_COMMANDS_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -214,5 +213,3 @@ EFI_STATUS
 ShellConnectFromDevPaths (
   IN CONST CHAR16  *Key
   );
-
-#endif

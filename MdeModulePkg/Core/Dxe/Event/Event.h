@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EVENT_H__
-#define __EVENT_H__
+#pragma once
 
 #define VALID_TPL(a)  ((a) <= TPL_HIGH_LEVEL)
 extern  UINTN  gEventPending;
@@ -84,5 +83,3 @@ VOID
 CoreInitializeTimer (
   VOID
   );
-
-#endif

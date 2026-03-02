@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _COMPRESS_H_
-#define _COMPRESS_H_
+#pragma once
 
 #include <string.h>
 #include <stdlib.h>
@@ -63,5 +62,3 @@ EFI_STATUS
   IN      UINT8   *DstBuffer,
   IN OUT  UINT32  *DstSize
   );
-
-#endif

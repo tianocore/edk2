@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __USB3_DEBUG_PORT_LIB_INTERNAL__
-#define __USB3_DEBUG_PORT_LIB_INTERNAL__
+#pragma once
 
 #include <Uefi.h>
 #include <Base.h>
@@ -733,5 +732,3 @@ USB3_DEBUG_PORT_HANDLE *
 GetUsb3DebugPortInstance (
   VOID
   );
-
-#endif //__SERIAL_PORT_LIB_USB__

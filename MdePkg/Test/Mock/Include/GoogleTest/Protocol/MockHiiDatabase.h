@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_HII_DATABASE_H
-#define MOCK_HII_DATABASE_H
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -158,5 +157,3 @@ MOCK_FUNCTION_DEFINITION (MockHiiDatabaseProtocol, GetPackageListHandle, 3, EFIA
     SetKeyboardLayout,                                \
     GetPackageListHandle };                           \
   EFI_HII_DATABASE_PROTOCOL  *NAME =  &NAME##_INSTANCE;
-
-#endif

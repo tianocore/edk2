@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PEI_FIRMWARE_VOLUME_INFO_PREHASHED_FV_H__
-#define __PEI_FIRMWARE_VOLUME_INFO_PREHASHED_FV_H__
+#pragma once
 
 #define EDKII_PEI_FIRMWARE_VOLUME_INFO_PREHASHED_FV_PPI_GUID \
  { 0x3ce1e631, 0x7008, 0x477c, { 0xad, 0xa7, 0x5d, 0xcf, 0xc7, 0xc1, 0x49, 0x4b } }
@@ -39,5 +38,3 @@ typedef struct {
 } EDKII_PEI_FIRMWARE_VOLUME_INFO_PREHASHED_FV_PPI;
 
 extern EFI_GUID  gEdkiiPeiFirmwareVolumeInfoPrehashedFvPpiGuid;
-
-#endif

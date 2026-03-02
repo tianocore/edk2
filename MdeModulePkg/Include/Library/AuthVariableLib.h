@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _AUTH_VARIABLE_LIB_H_
-#define _AUTH_VARIABLE_LIB_H_
+#pragma once
 
 #include <Protocol/VarCheck.h>
 
@@ -250,5 +249,3 @@ AuthVariableLibProcessVariable (
   IN UINTN     DataSize,
   IN UINT32    Attributes
   );
-
-#endif

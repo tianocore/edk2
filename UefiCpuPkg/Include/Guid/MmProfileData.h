@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef MM_PROFILE_DATA_H_
-#define MM_PROFILE_DATA_H_
+#pragma once
 
 ///
 /// This GUID is assigned to the Name field of EFI_HOB_MEMORY_ALLOCATION.AllocDescriptor.
@@ -31,5 +30,3 @@
 #define MM_RESOURCE_ATTRIBUTE_LOGGING  0x10000000
 
 extern EFI_GUID  gMmProfileDataHobGuid;
-
-#endif

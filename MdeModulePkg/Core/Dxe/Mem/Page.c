@@ -142,6 +142,31 @@ RemoveMemoryMapEntry (
 }
 
 /**
+  Helper function to evaluate if memory regions intersect.
+
+  @param  Start1     The address of the first byte in the first memory region.
+  @param  End1       The address of the last byte in the first memory region.
+  @param  Start2     The address of the first byte in the second memory region.
+  @param  End2       The address of the last byte in the second memory region.
+
+  @return TRUE if the memory regions intersect, FALSE otherwise.
+**/
+static
+BOOLEAN
+MemoryRegionsIntersect (
+  IN EFI_PHYSICAL_ADDRESS  Start1,
+  IN EFI_PHYSICAL_ADDRESS  End1,
+  IN EFI_PHYSICAL_ADDRESS  Start2,
+  IN EFI_PHYSICAL_ADDRESS  End2
+  )
+{
+  ASSERT (Start1 <= End1);
+  ASSERT (Start2 <= End2);
+
+  return ((Start1 <= End2) && (Start2 <= End1));
+}
+
+/**
   Internal function.  Adds a ranges to the memory map.
   The range must not already exist in the map.
 
@@ -1986,6 +2011,92 @@ SetEfiMemoryDescriptorType (
 }
 
 /**
+  Helper function to perform additional validation on the memory map. This routine
+  verifies memory map entries do not cross special memory-type bin boundaries.
+
+  It is intended for debugging and validation purposes only and should not be used
+  in production paths.
+
+  @param  MemoryMap        Pointer to the buffer containing the current memory map.
+  @param  MemoryMapSize    Size, in bytes, of the memory map buffer.
+  @param  DescriptorSize  Size, in bytes, of an EFI_MEMORY_DESCRIPTOR.
+**/
+static
+VOID
+CoreMemoryMapSanityCheck (
+  IN EFI_MEMORY_DESCRIPTOR  *MemoryMap,
+  CONST IN UINTN            MemoryMapSize,
+  CONST IN UINTN            DescriptorSize
+  )
+{
+  EFI_MEMORY_DESCRIPTOR  *CurrentMemoryMap;
+  EFI_MEMORY_DESCRIPTOR  *MemoryMapEnd;
+  UINT64                 EntryStart;
+  UINT64                 EntryEnd;
+  EFI_MEMORY_TYPE        Type;
+
+  MemoryMapEnd = (EFI_MEMORY_DESCRIPTOR *)((UINT8 *)MemoryMap + MemoryMapSize);
+
+  CurrentMemoryMap = MemoryMap;
+  while (CurrentMemoryMap < MemoryMapEnd) {
+    // Verify that any memory map entry that overlaps with a special memory type
+    // bin must be completely contained within the bin and have the same type as
+    // the bin.
+    EntryStart = CurrentMemoryMap->PhysicalStart;
+    EntryEnd   = EntryStart + LShiftU64 (CurrentMemoryMap->NumberOfPages, EFI_PAGE_SHIFT) - 1;
+    for (Type = (EFI_MEMORY_TYPE)0; Type < EfiMaxMemoryType; Type++) {
+      // Check if this memory map entry overlaps with a special memory type bin.
+      if (mMemoryTypeStatistics[Type].Special &&
+          (mMemoryTypeStatistics[Type].NumberOfPages > 0) &&
+          MemoryRegionsIntersect (
+            EntryStart,
+            EntryEnd,
+            mMemoryTypeStatistics[Type].BaseAddress,
+            mMemoryTypeStatistics[Type].MaximumAddress
+            )
+          )
+      {
+        // Verify that it is completely contained within the bin.
+        if ((EntryStart < mMemoryTypeStatistics[Type].BaseAddress) ||
+            (EntryEnd > mMemoryTypeStatistics[Type].MaximumAddress))
+        {
+          DEBUG ((
+            DEBUG_ERROR,
+            "%a: Memory Map entry (Type %d, Start 0x%lx, End 0x%lx) does not fit within special memory type bin (Type %d, Start 0x%lx, End 0x%lx).\n",
+            __func__,
+            CurrentMemoryMap->Type,
+            EntryStart,
+            EntryEnd,
+            Type,
+            mMemoryTypeStatistics[Type].BaseAddress,
+            mMemoryTypeStatistics[Type].MaximumAddress
+            ));
+
+          ASSERT (FALSE);
+        }
+
+        // It is contained within the bin, the type must match the bin type.
+        if (CurrentMemoryMap->Type != (UINT32)Type) {
+          DEBUG ((
+            DEBUG_ERROR,
+            "%a: Memory Map entry type does not match special memory type bin. Bin Type %d, Type %d, Start 0x%lx, End 0x%lx\n",
+            __func__,
+            Type,
+            CurrentMemoryMap->Type,
+            EntryStart,
+            EntryEnd
+            ));
+
+          ASSERT (FALSE);
+        }
+      }
+    }
+
+    CurrentMemoryMap = NEXT_MEMORY_DESCRIPTOR (CurrentMemoryMap, DescriptorSize);
+  }
+}
+
+/**
   This function returns a copy of the current memory map. The map is an array of
   memory descriptors, each of which describes a contiguous block of memory.
 
@@ -2487,6 +2598,10 @@ CoreGetMemoryMap (
 
   MergeMemoryMap (MemoryMapStart, &BufferSize, Size);
   MemoryMapEnd = (EFI_MEMORY_DESCRIPTOR *)((UINT8 *)MemoryMapStart + BufferSize);
+
+  DEBUG_CODE_BEGIN ();
+  CoreMemoryMapSanityCheck (MemoryMapStart, BufferSize, *DescriptorSize);
+  DEBUG_CODE_END ();
 
   Status = EFI_SUCCESS;
 

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _ARP_IMPL_H_
-#define _ARP_IMPL_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -765,5 +764,3 @@ ArpFindCacheEntry (
   OUT EFI_ARP_FIND_DATA  **Entries      OPTIONAL,
   IN BOOLEAN             Refresh
   );
-
-#endif

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _CRC32_H
-#define _CRC32_H
+#pragma once
 
 #include <Common/UefiBaseTypes.h>
 
@@ -29,5 +28,3 @@ CalculateCrc32 (
   IN OUT UINT32                         *CrcOut
   )
 ;
-
-#endif

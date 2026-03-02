@@ -13,13 +13,10 @@
   - Arm Base Boot Requirements v1.0
 **/
 
-#ifndef SSDT_PCIE_SUPPORT_LIB_PRIVATE_H_
-#define SSDT_PCIE_SUPPORT_LIB_PRIVATE_H_
+#pragma once
 
 /** C array containing the compiled AML template.
     This symbol is defined in the auto generated C file
     containing the AML bytecode array.
 */
 extern CHAR8  ssdtpcieosctemplate_aml_code[];
-
-#endif // SSDT_PCIE_SUPPORT_LIB_PRIVATE_H_

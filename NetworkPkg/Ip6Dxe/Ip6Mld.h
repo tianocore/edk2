@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_IP6_MLD_H__
-#define __EFI_IP6_MLD_H__
+#pragma once
 
 #define IP6_UNSOLICITED_REPORT_INTERVAL  10
 
@@ -186,5 +185,3 @@ VOID
 Ip6MldTimerTicking (
   IN IP6_SERVICE  *IpSb
   );
-
-#endif
