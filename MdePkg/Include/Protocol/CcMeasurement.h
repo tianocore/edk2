@@ -97,7 +97,7 @@ typedef struct {
   //
   UINT32                 Size;
   EFI_CC_EVENT_HEADER    Header;
-  UINT8                  Event[1];
+  UINT8                  Event[];
 } EFI_CC_EVENT;
 
 #pragma pack()
@@ -257,7 +257,7 @@ typedef struct {
   UINT32                EventType;
   TPML_DIGEST_VALUES    Digests;
   UINT32                EventSize;
-  UINT8                 Event[1];
+  UINT8                 Event[];
 } CC_EVENT;
 
 //

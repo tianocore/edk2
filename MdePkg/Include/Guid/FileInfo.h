@@ -48,7 +48,7 @@ typedef struct {
   /// The Null-terminated name of the file.
   /// For a root directory, the name is an empty string.
   ///
-  CHAR16      FileName[1];
+  CHAR16      FileName[];
 } EFI_FILE_INFO;
 
 ///
