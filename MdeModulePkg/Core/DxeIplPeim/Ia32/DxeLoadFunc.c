@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "DxeIpl.h"
 #include "VirtualMemory.h"
 
-#define IDT_ENTRY_COUNT  32
+#define IDT_ENTRY_COUNT  256
 
 typedef struct _X64_IDT_TABLE {
   //
