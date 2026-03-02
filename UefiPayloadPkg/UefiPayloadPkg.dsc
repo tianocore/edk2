@@ -654,6 +654,10 @@
 !endif
 !endif
 
+!if $(BOOTLOADER) == "COREBOOT"
+  # Disable MTRR programming (already configured by coreboot)
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuDisableMtrrProgramming|TRUE
+!endif
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   # Override the default values from SecurityPkg to ensure images from all sources are verified in secure boot
