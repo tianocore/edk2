@@ -1,10 +1,10 @@
-/** @file
-  String definitions for TPM 2.0 physical presence confirm text.
-
-Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
-SPDX-License-Identifier: BSD-2-Clause-Patent
-
-**/
+// /** @file
+// String definitions for TPM 2.0 physical presence confirm text.
+//
+// Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
 
 #langdef en-US "English"
 
