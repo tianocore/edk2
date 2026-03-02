@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __FMP_LAST_ATTEMPT_STATUS_H__
-#define __FMP_LAST_ATTEMPT_STATUS_H__
+#pragma once
 
 ///
 /// Last attempt status codes defined for additional granularity in FmpDevicePkg components.
@@ -79,5 +78,3 @@ enum LAST_ATTEMPT_STATUS_EXPANDED_ERROR_LIST {
   LAST_ATTEMPT_STATUS_DEPENDENCY_CHECK_LIB_ERROR_MEM_ALLOC_DESC_SIZE_BUFFER_FAILED,
   LAST_ATTEMPT_STATUS_DEPENDENCY_CHECK_LIB_ERROR_MEM_ALLOC_FMP_VER_BUFFER_FAILED
 };
-
-#endif

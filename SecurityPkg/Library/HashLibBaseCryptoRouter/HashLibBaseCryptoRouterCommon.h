@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _HASH_LIB_BASE_CRYPTO_ROUTER_COMMON_H_
-#define _HASH_LIB_BASE_CRYPTO_ROUTER_COMMON_H_
+#pragma once
 
 /**
   The function get hash mask info from algorithm.
@@ -34,5 +33,3 @@ Tpm2SetHashToDigestList (
   IN OUT TPML_DIGEST_VALUES  *DigestList,
   IN TPML_DIGEST_VALUES      *Digest
   );
-
-#endif

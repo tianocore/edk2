@@ -11,8 +11,7 @@
       (https://developer.arm.com/documentation/den0093/1-2eac1/)
 **/
 
-#ifndef ARM_AGDI_TABLE_H_
-#define ARM_AGDI_TABLE_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -52,5 +51,3 @@ typedef struct {
 } EFI_ACPI_ARM_AGDI_TABLE;
 
 #pragma pack()
-
-#endif /* ARM_AGDI_TABLE_H_ */

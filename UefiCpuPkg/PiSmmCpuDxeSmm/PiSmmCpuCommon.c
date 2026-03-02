@@ -500,7 +500,7 @@ GetSmBase (
   UINTN              HobIndex;
   UINTN              SortBuffer;
   UINTN              ProcessorIndex;
-  UINT64             PrevProcessorIndex;
+  UINTN              PrevProcessorIndex;
   EFI_HOB_GUID_TYPE  *FirstSmmBaseGuidHob;
 
   SmmBaseHobData     = NULL;
@@ -626,7 +626,7 @@ GetMpInformation (
   MP_INFORMATION2_HOB_DATA   **MpInfo2Hobs;
   UINTN                      SortBuffer;
   UINTN                      ProcessorIndex;
-  UINT64                     PrevProcessorIndex;
+  UINTN                      PrevProcessorIndex;
   MP_INFORMATION2_ENTRY      *MpInformation2Entry;
   EFI_PROCESSOR_INFORMATION  *ProcessorInfo;
 

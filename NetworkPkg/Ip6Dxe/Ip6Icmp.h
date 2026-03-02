@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_IP6_ICMP_H__
-#define __EFI_IP6_ICMP_H__
+#pragma once
 
 #define ICMP_V6_DEFAULT_CODE  0
 
@@ -96,5 +95,3 @@ Ip6SendIcmpError (
   IN UINT8             Code,
   IN UINT32            *Pointer             OPTIONAL
   );
-
-#endif

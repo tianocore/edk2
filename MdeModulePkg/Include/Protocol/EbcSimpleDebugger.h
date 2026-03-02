@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EBC_SIMPLE_DEBUGGER_PROTOCOL_H_
-#define _EBC_SIMPLE_DEBUGGER_PROTOCOL_H_
+#pragma once
 
 #include <Protocol/DebugSupport.h>
 #include <Protocol/EbcVmTest.h>
@@ -113,5 +112,3 @@ struct _EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiEbcSimpleDebuggerProtocolGuid;
-
-#endif

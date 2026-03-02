@@ -260,7 +260,6 @@ ParseFv (
   EFI_GUID                       NameGuid;
   EFI_FV_FILE_ATTRIBUTES         FileAttributes;
   UINTN                          Size;
-  UINTN                          FfsIndex;
   VAR_CHECK_VFR_DRIVER_INFO      *VfrDriverInfo;
   LIST_ENTRY                     *VfrDriverLink;
 
@@ -315,7 +314,7 @@ ParseFv (
       Key = InternalVarCheckAllocateZeroPool (Fv2->KeySize);
       ASSERT (Key != NULL);
 
-      for (FfsIndex = 0; ; FfsIndex++) {
+      while (TRUE) {
         FileType = EFI_FV_FILETYPE_ALL;
         Status   = Fv2->GetNextFile (
                           Fv2,

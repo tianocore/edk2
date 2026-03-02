@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _LIB_STATUS_BAR_H_
-#define _LIB_STATUS_BAR_H_
+#pragma once
 
 /**
   Initialization function for Status Bar.
@@ -92,5 +91,3 @@ BOOLEAN
 StatusBarGetRefresh (
   VOID
   );
-
-#endif

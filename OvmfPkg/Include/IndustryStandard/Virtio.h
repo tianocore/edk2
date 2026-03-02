@@ -10,9 +10,6 @@
 
 **/
 
-#ifndef _VIRTIO_H_
-#define _VIRTIO_H_
+#pragma once
 
 #include <IndustryStandard/Virtio10.h>
-
-#endif // _VIRTIO_H_

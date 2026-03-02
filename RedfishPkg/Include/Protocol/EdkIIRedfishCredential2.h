@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef EDKII_REDFISH_CREDENTIAL2_H_
-#define EDKII_REDFISH_CREDENTIAL2_H_
+#pragma once
 
 #include <Protocol/EdkIIRedfishCredential.h>
 #include <RedfishServiceData.h>
@@ -124,5 +123,3 @@ struct _EDKII_REDFISH_CREDENTIAL2_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkIIRedfishCredential2ProtocolGuid;
-
-#endif

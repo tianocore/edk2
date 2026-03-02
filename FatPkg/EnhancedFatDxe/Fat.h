@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _FAT_H_
-#define _FAT_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -2030,5 +2029,3 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gFatComponentName2;
 extern EFI_LOCK                      FatFsLock;
 extern EFI_LOCK                      FatTaskLock;
 extern EFI_FILE_PROTOCOL             FatFileInterface;
-
-#endif

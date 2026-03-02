@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __STATUS_CODE_HANDLER_MM_H__
-#define __STATUS_CODE_HANDLER_MM_H__
+#pragma once
 
 #include <Protocol/MmReportStatusCodeHandler.h>
 
@@ -139,5 +138,3 @@ BOOLEAN
 IsStatusCodeUsingSerialPort (
   VOID
   );
-
-#endif

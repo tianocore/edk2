@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PEI_USB_PEIM_H_
-#define _PEI_USB_PEIM_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -21,5 +20,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PcdLib.h>
 
 #include <IndustryStandard/Usb.h>
-
-#endif

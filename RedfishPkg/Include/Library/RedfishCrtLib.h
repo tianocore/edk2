@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef REDFISH_CRT_LIB_H_
-#define REDFISH_CRT_LIB_H_
+#pragma once
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -405,5 +404,3 @@ time        (
 extern int  errno;
 
 #define ERANGE  34                 /* 34   Result too large */
-
-#endif

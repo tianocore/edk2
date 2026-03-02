@@ -87,7 +87,7 @@ STATIC CONST RAMDISK_DEVICE_PATH  mRamdiskDevicePath =
                      Buffer. On output with a return code of EFI_BUFFER_TOO_SMALL,
                      the size of Buffer required to retrieve the requested file.
   @param  Buffer     The memory buffer to transfer the file to. IF Buffer is NULL,
-                     then no the size of the requested file is returned in
+                     then the size of the requested file is returned in
                      BufferSize.
 
   @retval EFI_SUCCESS           The file was loaded.

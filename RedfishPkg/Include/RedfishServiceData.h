@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef REDFISH_SERVICE_DATA_H_
-#define REDFISH_SERVICE_DATA_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Protocol/Http.h>
@@ -39,5 +38,3 @@ typedef struct {
   EFI_HTTP_HEADER         *Headers;
   REDFISH_PAYLOAD         Payload;
 } REDFISH_RESPONSE;
-
-#endif

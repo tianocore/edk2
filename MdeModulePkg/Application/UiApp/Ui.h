@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _BDS_MODULE_H_
-#define _BDS_MODULE_H_
+#pragma once
 
 #include <IndustryStandard/SmBios.h>
 
@@ -88,5 +87,3 @@ EFIAPI
 SetupResetReminder (
   VOID
   );
-
-#endif

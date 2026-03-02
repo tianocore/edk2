@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __MODULE_ENTRY_POINT_H__
-#define __MODULE_ENTRY_POINT_H__
+#pragma once
 
 ///
 /// Global variable that contains a pointer to the Hob List passed into the DXE Core entry point.
@@ -85,5 +84,3 @@ EFIAPI
 ProcessModuleEntryPointList (
   IN VOID  *HobStart
   );
-
-#endif

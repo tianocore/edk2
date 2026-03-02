@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __BLOCK_IO_H__
-#define __BLOCK_IO_H__
+#pragma once
 
 #define EFI_BLOCK_IO_PROTOCOL_GUID \
   { \
@@ -230,5 +229,3 @@ struct _EFI_BLOCK_IO_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiBlockIoProtocolGuid;
-
-#endif

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _ACPI_PLATFORM_H_INCLUDED_
-#define _ACPI_PLATFORM_H_INCLUDED_
+#pragma once
 
 #include <PiDxe.h>
 #include <Protocol/AcpiTable.h>
@@ -52,5 +51,3 @@ EFIAPI
 InstallAcpiTables (
   IN   EFI_ACPI_TABLE_PROTOCOL  *AcpiTable
   );
-
-#endif /* _ACPI_PLATFORM_H_INCLUDED_ */

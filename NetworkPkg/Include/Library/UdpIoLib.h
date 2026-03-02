@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _UDP_IO_H_
-#define _UDP_IO_H_
+#pragma once
 
 #include <Protocol/Udp4.h>
 #include <Protocol/Udp6.h>
@@ -356,5 +355,3 @@ UdpIoRecvDatagram (
   IN  VOID             *Context,
   IN  UINT32           HeadLen
   );
-
-#endif

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _SEC_CORE_H_
-#define _SEC_CORE_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -99,5 +98,3 @@ SecPerformancePpiCallBack (
   IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
   IN VOID                       *Ppi
   );
-
-#endif

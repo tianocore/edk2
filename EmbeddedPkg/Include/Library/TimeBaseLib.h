@@ -8,8 +8,7 @@
 *
 **/
 
-#ifndef _TIME_BASE_LIB_H_
-#define _TIME_BASE_LIB_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -174,5 +173,3 @@ UINTN
 EfiTimeToWday (
   IN  EFI_TIME  *Time
   );
-
-#endif

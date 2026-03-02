@@ -49,7 +49,26 @@
   0|DEFAULT
 
 !include MdePkg/MdeLibs.dsc.inc
+!include RedfishPkg/Redfish.dsc.inc
+!include NetworkPkg/Network.dsc.inc
+
+#
+# Do not reference CryptoPkg PCDs if features are not enabled that depend on the
+# CryptoPkg libraries or modules. Otherwise a build error for a reference to an
+# unused PCD is generated.
+#
+!if $(SECURE_BOOT_ENABLE) == TRUE || $(NETWORK_ENABLE) == TRUE
 !include CryptoPkg/CryptoPkgFeatureFlagPcds.dsc.inc
+!if $(WIN_MINGW32_BUILD)
+[PcdsFeatureFlag]
+  #
+  # When WIN_MINGW32_BUILD is set, -target is set to build Windows application.
+  # Set PcdOpensslLibAssemblySourceStyleNasm to TRUE to use Openssl NASM
+  # source files that assume a Windows calling convention.
+  #
+  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm|TRUE
+!endif
+!endif
 
 [LibraryClasses]
   #
@@ -112,6 +131,8 @@
   !if $(REDFISH_ENABLE) == TRUE
     RedfishPlatformHostInterfaceLib|EmulatorPkg/Library/RedfishPlatformHostInterfaceLib/RedfishPlatformHostInterfaceLib.inf
     RedfishPlatformCredentialLib|EmulatorPkg/Library/RedfishPlatformCredentialLib/RedfishPlatformCredentialLib.inf
+    RedfishPlatformWantedDeviceLib|RedfishPkg/Library/RedfishPlatformWantedDeviceLibNull/RedfishPlatformWantedDeviceLibNull.inf
+    RedfishContentCodingLib|RedfishPkg/Library/RedfishContentCodingLibNull/RedfishContentCodingLibNull.inf
   !endif
   #
   # Misc
@@ -134,8 +155,9 @@
   ImagePropertiesRecordLib|MdeModulePkg/Library/ImagePropertiesRecordLib/ImagePropertiesRecordLib.inf
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+  TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   PlatformSecureLib|SecurityPkg/Library/PlatformSecureLibNull/PlatformSecureLibNull.inf
@@ -222,14 +244,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreImageLoaderSearchTeSectionFirst|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables|FALSE
   gEmulatorPkgTokenSpaceGuid.PcdEmulatorLazyLoadSymbols|FALSE
-!if $(WIN_MINGW32_BUILD)
-  #
-  # When WIN_MINGW32_BUILD is set, -target is set to build Windows application.
-  # Set PcdOpensslLibAssemblySourceStyleNasm to TRUE to use Openssl NASM
-  # source files that assume a Windows calling convention.
-  #
-  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm|TRUE
-!endif
 
 [PcdsFixedAtBuild]
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy|0x00000000
@@ -297,23 +311,25 @@
   gEmulatorPkgTokenSpaceGuid.PcdRedfishServiceStopIfSecureBootDisabled|False
   gEmulatorPkgTokenSpaceGuid.PcdRedfishServiceStopIfExitbootService|False
 
-  gEfiRedfishClientPkgTokenSpaceGuid.PcdRedfishServiceEtagSupported|False
-
   #
   # Redfish Debug enablement
   #
   # 0x0000000000000001  RedfishPlatformConfigDxe driver debug enabled.
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDebugCategory|0
-  #   0x00000001  x-uefi-redfish string database message enabled
+  #   0x00000001  x-UEFI-redfish string database message enabled
   #   0x00000002  Debug Message for dumping formset
-  #   0x00000004  Debug Message for x-uefi-redfish searching result
-  #   0x00000008  Debug Message for x-uefi-redfish Regular Expression searching result
+  #   0x00000004  Debug Message for x-UEFI-redfish searching result
+  #   0x00000008  Debug Message for x-UEFI-redfish Regular Expression searching result
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishPlatformConfigDebugProperty|0
 
   # Redfish Platform Configure DXE driver feature enablement
   #   0x00000001  Enable building Redfish Attribute Registry menu path.
   #   0x00000002  Allow supressed HII option to be exposed on Redfish.
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishPlatformConfigFeatureProperty|0
+!endif
+
+!ifdef NO_PLATFORM_BOOT_DELAYS
+  gEfiShellPkgTokenSpaceGuid.PcdShellDefaultDelay|0
 !endif
 
 [PcdsDynamicDefault.common.DEFAULT]
@@ -324,7 +340,11 @@
 [PcdsDynamicHii.common.DEFAULT]
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|L"Setup"|gEmuSystemConfigGuid|0x0|80
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|L"Setup"|gEmuSystemConfigGuid|0x4|25
+!ifdef NO_PLATFORM_BOOT_DELAYS
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|0
+!else
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|10
+!endif
 
 [Components]
 !if "IA32" in $(ARCH) || "X64" in $(ARCH)
@@ -418,7 +438,9 @@
   #
   # Hash2 Protocol producer
   #
+!if $(NETWORK_ENABLE) == TRUE
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+!endif
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
@@ -520,12 +542,10 @@
 
 !endif
 
-!include NetworkPkg/Network.dsc.inc
 
 !if $(REDFISH_ENABLE) == TRUE
   EmulatorPkg/Application/RedfishPlatformConfig/RedfishPlatformConfig.inf
 !endif
-!include RedfishPkg/Redfish.dsc.inc
 
 #
 # Fail with error message if the OS/Compiler combination is not supported
@@ -534,8 +554,7 @@
 #
 # +--------------------+--------+----------+------------+-----+----+--------+
 # | OS/Compiler        | VS2019 | CLANGPDB | CLANGDWARF |   GCC    | XCODE5 |
-# |                    | VS2022 |          |            |   GCC5   |        |
-# |                    |        |          |            | GCCNOLTO |        |
+# |                    | VS2022 |          |            | GCCNOLTO |        |
 # +--------------------+--------+----------+------------+----------+--------+
 # | Windows/VS         |IA32/X64|          |            |          |        |
 # | Windows/LLVM/VS    |        | IA32/X64 |            |          |        |
@@ -582,12 +601,12 @@
   !if $(TOOL_CHAIN_TAG) in "CLANGPDB"
     !error EmulatorPkg not supported for Mingw/CLANGPDB builds
   !endif
-  !if $(TOOL_CHAIN_TAG) in "GCC GCC5 GCCNOLTO"
+  !if $(TOOL_CHAIN_TAG) in "GCC GCCNOLTO"
     !error EmulatorPkg not supported for Mingw/GCC builds
   !endif
 !else
   !if $(WIN_HOST_BUILD)
-    !if $(TOOL_CHAIN_TAG) in "GCC GCC5 GCCNOLTO"
+    !if $(TOOL_CHAIN_TAG) in "GCC GCCNOLTO"
       !error EmulatorPkg not supported for Windows/GCC builds
     !endif
     !if $(TOOL_CHAIN_TAG) in "CLANGDWARF"

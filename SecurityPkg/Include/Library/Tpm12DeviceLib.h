@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TPM12_DEVICE_LIB_H_
-#define _TPM12_DEVICE_LIB_H_
+#pragma once
 
 #include <IndustryStandard/Tpm12.h>
 
@@ -44,5 +43,3 @@ EFIAPI
 Tpm12RequestUseTpm (
   VOID
   );
-
-#endif

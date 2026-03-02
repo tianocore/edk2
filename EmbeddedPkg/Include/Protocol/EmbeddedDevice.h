@@ -20,8 +20,7 @@
 
 **/
 
-#ifndef __EMBEDDED_DEVICE_PROTOCOL_H__
-#define __EMBEDDED_DEVICE_PROTOCOL_H__
+#pragma once
 
 //
 // Protocol GUID
@@ -43,5 +42,3 @@ typedef struct {
 } EMBEDDED_DEVICE_PROTOCOL;
 
 extern EFI_GUID  gEmbeddedDeviceGuid;
-
-#endif

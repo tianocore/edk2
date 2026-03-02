@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef ARM_MMU_LIB_INTERNAL_H_
-#define ARM_MMU_LIB_INTERNAL_H_
+#pragma once
 
 typedef
 VOID(
@@ -19,5 +18,3 @@ VOID(
   IN  UINT64  RegionStart,
   IN  BOOLEAN DisableMmu
   );
-
-#endif

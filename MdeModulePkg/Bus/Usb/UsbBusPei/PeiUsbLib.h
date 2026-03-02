@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PEI_USB_LIB_H_
-#define _PEI_USB_LIB_H_
+#pragma once
 
 //
 // Standard device request and request type
@@ -183,5 +182,3 @@ UINTN
 PeiUsbGetDeviceSpeed (
   IN UINT16  PortStatus
   );
-
-#endif

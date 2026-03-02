@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __FDT_HOB_H__
-#define __FDT_HOB_H__
+#pragma once
 
 #define FDT_HOB_GUID  {\
           0x16958446, 0x19B7, 0x480B, \
@@ -16,5 +15,3 @@
         }
 
 extern EFI_GUID  gFdtHobGuid;
-
-#endif

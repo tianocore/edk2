@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef TCG2_ACPI_COMMUNICATE_BUFFER_H_
-#define TCG2_ACPI_COMMUNICATE_BUFFER_H_
+#pragma once
 
 #define TCG2_ACPI_COMMUNICATE_BUFFER_HOB_REVISION  1
 
@@ -29,5 +28,3 @@ typedef struct {
 } TCG2_ACPI_COMMUNICATE_BUFFER;
 
 extern EFI_GUID  gEdkiiTcg2AcpiCommunicateBufferHobGuid;
-
-#endif

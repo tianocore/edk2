@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _FSP_MEASUREMENT_LIB_H_
-#define _FSP_MEASUREMENT_LIB_H_
+#pragma once
 
 #define FSP_MEASURE_FSP     BIT0
 #define FSP_MEASURE_FSPT    BIT1
@@ -37,5 +36,3 @@ MeasureFspFirmwareBlob (
   IN EFI_PHYSICAL_ADDRESS  FirmwareBlobBase,
   IN UINT64                FirmwareBlobLength
   );
-
-#endif

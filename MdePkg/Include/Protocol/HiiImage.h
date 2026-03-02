@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __HII_IMAGE_H__
-#define __HII_IMAGE_H__
+#pragma once
 
 #include <Protocol/GraphicsOutput.h>
 
@@ -342,5 +341,3 @@ struct _EFI_HII_IMAGE_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiHiiImageProtocolGuid;
-
-#endif

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_BOOT_MANAGER_H_
-#define _EFI_BOOT_MANAGER_H_
+#pragma once
 
 #include <Guid/MdeModuleHii.h>
 #include <Guid/GlobalVariable.h>
@@ -162,5 +161,3 @@ BootManagerRouteConfig (
   IN  CONST EFI_STRING                      Configuration,
   OUT EFI_STRING                            *Progress
   );
-
-#endif

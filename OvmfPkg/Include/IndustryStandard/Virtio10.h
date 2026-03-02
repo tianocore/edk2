@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _VIRTIO_1_0_H_
-#define _VIRTIO_1_0_H_
+#pragma once
 
 #include <IndustryStandard/Pci23.h>
 #include <IndustryStandard/Virtio095.h>
@@ -93,5 +92,3 @@ typedef struct {
 #define VIRTIO_MMIO_OFFSET_QUEUE_USED_LO      0xa0
 #define VIRTIO_MMIO_OFFSET_QUEUE_USED_HI      0xa4
 #define VIRTIO_MMIO_OFFSET_CONFIG_GENERATION  0xfc
-
-#endif // _VIRTIO_1_0_H_

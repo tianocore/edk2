@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _HASH2_DRIVER_H_
-#define _HASH2_DRIVER_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -122,5 +121,3 @@ Hash2ServiceBindingDestroyChild (
   );
 
 extern EFI_HASH2_PROTOCOL  mHash2Protocol;
-
-#endif

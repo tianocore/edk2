@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SECURITY_MANAGEMENT_LIB_H__
-#define __SECURITY_MANAGEMENT_LIB_H__
+#pragma once
 
 //
 // Authentication Operation definitions for User Identity (UID), Measured and Secure boot.
@@ -266,5 +265,3 @@ ExecuteSecurity2Handlers (
   IN  UINTN                           FileSize,
   IN  BOOLEAN                         BootPolicy
   );
-
-#endif

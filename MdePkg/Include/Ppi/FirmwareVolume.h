@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __FIRMWARE_VOLUME_PPI_H__
-#define __FIRMWARE_VOLUME_PPI_H__
+#pragma once
 
 ///
 /// The GUID for this PPI is the same as the firmware volume format GUID.
@@ -281,5 +280,3 @@ struct _EFI_PEI_FIRMWARE_VOLUME_PPI {
 };
 
 extern EFI_GUID  gEfiPeiFirmwareVolumePpiGuid;
-
-#endif

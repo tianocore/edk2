@@ -5,8 +5,7 @@ Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef PLATFORM_BOOT_MANAGER_H_
-#define PLATFORM_BOOT_MANAGER_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Protocol/LoadedImage.h>
@@ -130,5 +129,3 @@ PlatformBootManagerShowProgress (
   IN UINTN                          Progress,
   IN UINTN                          PreviousValue
   );
-
-#endif // _PLATFORM_BOOT_MANAGER_H

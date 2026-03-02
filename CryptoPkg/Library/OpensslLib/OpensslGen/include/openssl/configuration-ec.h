@@ -73,9 +73,6 @@ extern "C" {
 # ifndef OPENSSL_NO_BROTLI_DYNAMIC
 #  define OPENSSL_NO_BROTLI_DYNAMIC
 # endif
-# ifndef OPENSSL_NO_CAMELLIA
-#  define OPENSSL_NO_CAMELLIA
-# endif
 # ifndef OPENSSL_NO_CAPIENG
 #  define OPENSSL_NO_CAPIENG
 # endif
@@ -84,9 +81,6 @@ extern "C" {
 # endif
 # ifndef OPENSSL_NO_CHACHA
 #  define OPENSSL_NO_CHACHA
-# endif
-# ifndef OPENSSL_NO_CMAC
-#  define OPENSSL_NO_CMAC
 # endif
 # ifndef OPENSSL_NO_CMP
 #  define OPENSSL_NO_CMP

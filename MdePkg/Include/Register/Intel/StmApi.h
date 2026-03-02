@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _INTEL_STM_API_H_
-#define _INTEL_STM_API_H_
+#pragma once
 
 #include <Register/Intel/StmStatusCode.h>
 #include <Register/Intel/StmResourceDescriptor.h>
@@ -934,5 +933,3 @@ typedef struct {
 } TXT_PROCESSOR_SMM_DESCRIPTOR;
 
 #pragma pack ()
-
-#endif

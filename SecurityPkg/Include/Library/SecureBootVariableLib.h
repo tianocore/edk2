@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef SECURE_BOOT_VARIABLE_LIB_H_
-#define SECURE_BOOT_VARIABLE_LIB_H_
+#pragma once
 
 /**
   Set the platform secure boot mode into "Custom" or "Standard" mode.
@@ -229,5 +228,3 @@ EFIAPI
 SetSecureBootVariablesToDefault (
   IN  CONST SECURE_BOOT_PAYLOAD_INFO  *SecureBootPayload
   );
-
-#endif

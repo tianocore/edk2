@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef CPU_DXE_H_
-#define CPU_DXE_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Library/BaseMemoryLib.h>
@@ -277,5 +276,3 @@ EFIAPI
 EfiAttributeConverse (
   IN UINTN  EfiAttributes
   );
-
-#endif // CPU_DXE_H_

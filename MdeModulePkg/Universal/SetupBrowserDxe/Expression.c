@@ -900,6 +900,10 @@ RuleIdToExpression (
   LIST_ENTRY       *Link;
   FORM_EXPRESSION  *Expression;
 
+  if (Form == NULL) {
+    return NULL;
+  }
+
   Link = GetFirstNode (&Form->ExpressionListHead);
   while (!IsNull (&Form->ExpressionListHead, Link)) {
     Expression = FORM_EXPRESSION_FROM_LINK (Link);

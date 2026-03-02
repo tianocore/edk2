@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __IMAGE_DEBUG_SUPPORT_H__
-#define __IMAGE_DEBUG_SUPPORT_H__
+#pragma once
 
 #define IO_PORT_BREAKPOINT_ADDRESS  0x84
 #define IMAGE_LOAD_SIGNATURE        SIGNATURE_32('L','O','A','D')
@@ -17,5 +16,3 @@
 
 #define DEBUG_AGENT_IMAGE_WAIT      0x00
 #define DEBUG_AGENT_IMAGE_CONTINUE  0x01
-
-#endif

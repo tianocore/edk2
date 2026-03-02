@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef __KMS_H__
-#define __KMS_H__
+#pragma once
 
 #define EFI_KMS_PROTOCOL_GUID \
   { \
@@ -1332,5 +1331,3 @@ extern EFI_GUID  gEfiKmsFormatRsasha12048Guid;
 extern EFI_GUID  gEfiKmsFormatRsasha2562048Guid;
 extern EFI_GUID  gEfiKmsFormatRsasha2563072Guid;
 extern EFI_GUID  gEfiKmsProtocolGuid;
-
-#endif

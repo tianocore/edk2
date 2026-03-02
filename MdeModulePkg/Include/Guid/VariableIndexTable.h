@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __VARIABLE_INDEX_TABLE_H__
-#define __VARIABLE_INDEX_TABLE_H__
+#pragma once
 
 typedef struct {
   VARIABLE_HEADER    *CurrPtr;
@@ -37,5 +36,3 @@ typedef struct {
   /// The meaning of the field is implement-dependent.
   UINT16             Index[VARIABLE_INDEX_TABLE_VOLUME];
 } VARIABLE_INDEX_TABLE;
-
-#endif // __VARIABLE_INDEX_TABLE_H__

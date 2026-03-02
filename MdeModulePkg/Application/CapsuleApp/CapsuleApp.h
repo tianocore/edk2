@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _CAPSULE_APP_H_
-#define _CAPSULE_APP_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Library/BaseLib.h>
@@ -230,5 +229,3 @@ ProcessCapsuleOnDisk (
   IN CHAR16  *Map,
   IN UINTN   CapsuleNum
   );
-
-#endif

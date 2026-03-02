@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef MM_SAVESTATE_H_
-#define MM_SAVESTATE_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 #include <Protocol/MmCpu.h>
@@ -90,5 +89,3 @@ MmSaveStateReadRegisterByIndex (
   IN UINTN  Width,
   OUT VOID  *Buffer
   );
-
-#endif

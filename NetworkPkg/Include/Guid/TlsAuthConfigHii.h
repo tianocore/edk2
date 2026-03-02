@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __TLS_AUTH_CONFIG_HII_GUID_H__
-#define __TLS_AUTH_CONFIG_HII_GUID_H__
+#pragma once
 
 #define TLS_AUTH_CONFIG_GUID \
   { \
@@ -15,5 +14,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   }
 
 extern EFI_GUID  gTlsAuthConfigGuid;
-
-#endif

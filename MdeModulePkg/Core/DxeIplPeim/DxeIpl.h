@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PEI_DXEIPL_H__
-#define __PEI_DXEIPL_H__
+#pragma once
 
 #include <PiPei.h>
 #include <Ppi/DxeIpl.h>
@@ -226,5 +225,3 @@ Decompress (
   OUT       VOID                     **OutputBuffer,
   OUT       UINTN                    *OutputSize
   );
-
-#endif

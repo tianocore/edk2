@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PCI_EXPRESS_LIB_H__
-#define __PCI_EXPRESS_LIB_H__
+#pragma once
 
 #include <IndustryStandard/PciExpress21.h>
 
@@ -1053,5 +1052,3 @@ PciExpressWriteBuffer (
   IN      UINTN  Size,
   IN      VOID   *Buffer
   );
-
-#endif

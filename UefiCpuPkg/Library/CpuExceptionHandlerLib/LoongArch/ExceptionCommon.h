@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef EXCEPTION_COMMON_H_
-#define EXCEPTION_COMMON_H_
+#pragma once
 
 #include <Base.h>
 
@@ -139,5 +138,3 @@ EFIAPI
 GetInterruptType (
   IN EFI_SYSTEM_CONTEXT  SystemContext
   );
-
-#endif

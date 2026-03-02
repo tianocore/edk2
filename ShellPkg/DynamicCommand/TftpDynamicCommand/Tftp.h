@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _TFTP_H_
-#define _TFTP_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -66,5 +65,3 @@ EFI_HII_HANDLE
 InitializeHiiPackage (
   EFI_HANDLE  ImageHandle
   );
-
-#endif // _TFTP_H_

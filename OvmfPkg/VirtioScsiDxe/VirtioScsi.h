@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _VIRTIO_SCSI_DXE_H_
-#define _VIRTIO_SCSI_DXE_H_
+#pragma once
 
 #include <Protocol/ComponentName.h>
 #include <Protocol/DriverBinding.h>
@@ -185,5 +184,3 @@ VirtioScsiGetDeviceName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **ControllerName
   );
-
-#endif // _VIRTIO_SCSI_DXE_H_

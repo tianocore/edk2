@@ -1000,6 +1000,19 @@ ResourcePaddingPolicy (
   PMEM64 -> PMEM32 -> MEM32
   IO32   -> IO16.
 
+  Additionally, if the upstream bridge supports PMEM64 but not MEM64,
+  MEM64 resources are degraded to PMEM64 to enable 64-bit allocation
+  through the bridge's prefetchable window. So the below degradation
+  path is also now supported:
+
+  MEM64  -> PMEM64
+
+  This is safe per PCI-SIG's ECN title "Removing Prefetchable Terminology"
+  (2024-04-05).
+
+  The terms prefetchable and non-prefetchable have also been removed from
+  the PCIe base specification starting with version 6.3.
+
   @param Bridge     Pci device instance.
   @param Mem32Node  Resource info node for 32-bit memory.
   @param PMem32Node Resource info node for 32-bit Prefetchable Memory.
@@ -1090,14 +1103,34 @@ DegradeResource (
       );
   } else {
     //
-    // if the bridge does not support MEM64, degrade MEM64 to MEM32
+    // If the upstream bridge does not support MEM64, check if we can
+    // degrade to PMEM64 first, instead of degrading to MEM32 directly.
+    //
+    // This is allowed per PCIe Base Spec 6.3+ which removes the terms
+    // prefetchable/non-prefetchable from the specification.
+    // The distinction originally only described P2P bridge read-ahead
+    // behavior, not resource allocation policy.
+    //
+    // We will still fall back and degrade to MEM32 if the upstream
+    // bridge lacks PMEM64 support.
+    //
+    // Refer to PCI-SIG ECN "Removing Prefetchable Terminology"
+    // (2024-04-05) for more details.
     //
     if (!BridgeSupportResourceDecode (Bridge, EFI_BRIDGE_MEM64_DECODE_SUPPORTED)) {
-      MergeResourceTree (
-        Mem32Node,
-        Mem64Node,
-        TRUE
-        );
+      if (BridgeSupportResourceDecode (Bridge, EFI_BRIDGE_PMEM64_DECODE_SUPPORTED)) {
+        MergeResourceTree (
+          PMem64Node,
+          Mem64Node,
+          TRUE
+          );
+      } else {
+        MergeResourceTree (
+          Mem32Node,
+          Mem64Node,
+          TRUE
+          );
+      }
     }
 
     //

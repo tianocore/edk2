@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __INSTRUCTION_PARSING_H__
-#define __INSTRUCTION_PARSING_H__
+#pragma once
 
 #include <Base.h>
 #include <Uefi.h>
@@ -79,5 +78,3 @@ typedef union {
 // Two-byte Opcode Flag
 //
 #define TWO_BYTE_OPCODE_ESCAPE  0x0F
-
-#endif

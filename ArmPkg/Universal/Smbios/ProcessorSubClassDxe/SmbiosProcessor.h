@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef SMBIOS_PROCESSOR_H_
-#define SMBIOS_PROCESSOR_H_
+#pragma once
 
 #include <Uefi.h>
 #include <IndustryStandard/SmBios.h>
@@ -108,5 +107,3 @@ PROCESSOR_CHARACTERISTIC_FLAGS
 SmbiosGetProcessorCharacteristics (
   VOID
   );
-
-#endif // SMBIOS_PROCESSOR_H_

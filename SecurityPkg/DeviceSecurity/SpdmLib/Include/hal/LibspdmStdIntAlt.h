@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef LIBSPDM_STD_INT_ALT_H
-#define LIBSPDM_STD_INT_ALT_H
+#pragma once
 
 typedef UINT64  uint64_t;
 typedef INT64   int64_t;
@@ -21,5 +20,3 @@ typedef UINT8   uint8_t;
 #ifndef SIZE_MAX
 #define SIZE_MAX  MAX_UINTN
 #endif
-
-#endif /* LIBSPDM_STDINT_ALT */

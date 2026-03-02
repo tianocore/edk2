@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __EFI_HTTP_BOOT_CALLBACK_H__
-#define __EFI_HTTP_BOOT_CALLBACK_H__
+#pragma once
 
 #define EFI_HTTP_BOOT_CALLBACK_PROTOCOL_GUID \
   { \
@@ -94,5 +93,3 @@ struct _EFI_HTTP_BOOT_CALLBACK_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiHttpBootCallbackProtocolGuid;
-
-#endif

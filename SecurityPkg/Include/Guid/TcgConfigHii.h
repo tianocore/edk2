@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __TCG_CONFIG_HII_GUID_H__
-#define __TCG_CONFIG_HII_GUID_H__
+#pragma once
 
 #define TCG_CONFIG_FORM_SET_GUID \
   { \
@@ -15,5 +14,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   }
 
 extern EFI_GUID  gTcgConfigFormSetGuid;
-
-#endif

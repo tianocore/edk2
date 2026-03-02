@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SCSI_LIB_H__
-#define __SCSI_LIB_H__
+#pragma once
 
 #include <Protocol/ScsiIo.h>
 
@@ -1283,5 +1282,3 @@ ScsiWrite16CommandEx (
   IN     UINT32                SectorSize,
   IN     EFI_EVENT             Event         OPTIONAL
   );
-
-#endif

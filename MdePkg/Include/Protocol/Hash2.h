@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_HASH2_PROTOCOL_H__
-#define __EFI_HASH2_PROTOCOL_H__
+#pragma once
 
 #define EFI_HASH2_SERVICE_BINDING_PROTOCOL_GUID \
   { \
@@ -192,5 +191,3 @@ struct _EFI_HASH2_PROTOCOL {
 
 extern EFI_GUID  gEfiHash2ServiceBindingProtocolGuid;
 extern EFI_GUID  gEfiHash2ProtocolGuid;
-
-#endif

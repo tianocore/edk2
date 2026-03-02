@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef TDX_LIB_H_
-#define TDX_LIB_H_
+#pragma once
 
 /**
   This function accepts a pending private page, and initialize the page to
@@ -88,5 +87,3 @@ EFIAPI
 TdVCpuNum (
   VOID
   );
-
-#endif

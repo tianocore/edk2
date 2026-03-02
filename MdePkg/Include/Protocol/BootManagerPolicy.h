@@ -9,8 +9,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __BOOT_MANAGER_POLICY_H__
-#define __BOOT_MANAGER_POLICY_H__
+#pragma once
 
 #define EFI_BOOT_MANAGER_POLICY_PROTOCOL_GUID \
   { \
@@ -141,5 +140,3 @@ extern EFI_GUID  gEfiBootManagerPolicyConsoleGuid;
 extern EFI_GUID  gEfiBootManagerPolicyNetworkGuid;
 extern EFI_GUID  gEfiBootManagerPolicyConnectAllGuid;
 extern EFI_GUID  gEfiBootManagerPolicyStorageGuid;
-
-#endif

@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _NVM_EXPRESS_PEI_PASSTHRU_H_
-#define _NVM_EXPRESS_PEI_PASSTHRU_H_
+#pragma once
 
 /**
   Sends an NVM Express Command Packet to an NVM Express controller or namespace. This function only
@@ -155,5 +154,3 @@ NvmePassThru (
   IN     UINT32                                    NamespaceId,
   IN OUT EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET  *Packet
   );
-
-#endif

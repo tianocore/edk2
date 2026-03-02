@@ -7,8 +7,7 @@
 *
 **/
 
-#ifndef _XENIO_MMIO_DEVICE_LIB_H_
-#define _XENIO_MMIO_DEVICE_LIB_H_
+#pragma once
 
 /**
 
@@ -53,5 +52,3 @@ EFI_STATUS
 XenIoMmioUninstall (
   IN       EFI_HANDLE  Handle
   );
-
-#endif
