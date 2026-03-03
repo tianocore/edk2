@@ -1842,7 +1842,7 @@ AmlAddIntegerToNamedPackage (
   Added integer, string, ArgObj and LocalObj support.
 
   Example 1:
-    AmlCodeGenInvokeMethod ("MET0", 0, NULL, ParentNode);
+    AmlCodeGenInvokeMethod ("MET0", 0, NULL, ParentNode, &NewObjectNode);
     is equivalent to the following ASL code:
       MET0 ();
 
@@ -1856,7 +1856,7 @@ AmlAddIntegerToNamedPackage (
     Param[2].Type = AmlMethodParamTypeArg;
     Param[3].Data.Local = 2;
     Param[3].Type = AmlMethodParamTypeLocal;
-    AmlCodeGenInvokeMethod ("MET0", 4, Param, ParentNode);
+    AmlCodeGenInvokeMethod ("MET0", 4, Param, ParentNode, &NewObjectNode);
 
     is equivalent to the following ASL code:
       MET0 (0x100, "TEST", Arg0, Local2);
@@ -1868,7 +1868,7 @@ AmlAddIntegerToNamedPackage (
     Param[1].Data.Integer = 0x100;
     Param[1].Type = AmlMethodParamTypeInteger;
     AmlCodeGenMethodRetNameString ("MET2", NULL, 2, TRUE, 0, ParentNode, &MethodNode);
-    AmlCodeGenInvokeMethod ("MET3", 2, Param, MethodNode);
+    AmlCodeGenInvokeMethod ("MET3", 2, Param, MethodNode, &NewObjectNode);
 
     is equivalent to the following ASL code:
     Method (MET2, 2, Serialized)
@@ -1876,12 +1876,13 @@ AmlAddIntegerToNamedPackage (
       MET3 (Arg0, 0x0100)
     }
 
-  @param [in] MethodNameString  The method name to be called or invoked.
-  @param [in] NumArgs           Number of arguments to be passed,
-                                0 to 7 are permissible values.
-  @param [in] Parameters        Contains the parameter data.
-  @param [in] ParentNode        The parent node to which the method invocation
-                                nodes are attached.
+  @param [in]  MethodNameString  The method name to be called or invoked.
+  @param [in]  NumArgs           Number of arguments to be passed,
+                                 0 to 7 are permissible values.
+  @param [in]  Parameters        Contains the parameter data.
+  @param [in]  ParentNode        The parent node to which the method invocation
+                                 nodes are attached.
+  @param [out] NewObjectNode     If success, contains the created node.
 
   @retval EFI_SUCCESS             Success.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
@@ -1890,10 +1891,11 @@ AmlAddIntegerToNamedPackage (
 EFI_STATUS
 EFIAPI
 AmlCodeGenInvokeMethod (
-  IN  CONST CHAR8             *MethodNameString,
-  IN        UINT8             NumArgs,
-  IN        AML_METHOD_PARAM  *Parameters   OPTIONAL,
-  IN        AML_NODE_HANDLE   ParentNode
+  IN  CONST CHAR8                   *MethodNameString,
+  IN        UINT8                   NumArgs,
+  IN        AML_METHOD_PARAM        *Parameters     OPTIONAL,
+  IN        AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode  OPTIONAL
   );
 
 /** Create a _PSD node.
