@@ -1334,7 +1334,7 @@ DEFINE CLANGPDB_X64_PREFIX           = ENV(CLANG_BIN)
 DEFINE CLANGPDB_AARCH64_PREFIX       = ENV(CLANG_BIN)
 
 DEFINE CLANGPDB_IA32_TARGET          = -target i686-pc-windows-msvc
-DEFINE CLANGPDB_X64_TARGET           = -target x86_64-pc-windows-msvc
+DEFINE CLANGPDB_X64_TARGET           = -target x86_64-uefi
 DEFINE CLANGPDB_AARCH64_TARGET       = -target aarch64-unknown-windows-msvc
 
 DEFINE CLANGPDB_WARNING_OVERRIDES    = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body -Wno-varargs -Wno-unknown-warning-option -Wno-unaligned-access -Wno-microsoft-enum-forward-reference
