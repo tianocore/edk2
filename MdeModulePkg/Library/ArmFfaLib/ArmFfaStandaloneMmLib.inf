@@ -2,6 +2,7 @@
 #  Provides FF-A ABI Library used in StandaloneMmCore.
 #
 #  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) Qualcomm Technologies, Inc. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -40,6 +41,7 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaTxRxPageCount
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaEdk2IsNonSecurePhysicalInstance
 
 [Guids]
   gArmFfaRxTxBufferInfoGuid

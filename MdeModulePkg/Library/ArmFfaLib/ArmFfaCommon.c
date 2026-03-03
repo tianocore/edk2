@@ -2,6 +2,8 @@
   Arm Ffa library common code.
 
   Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) Qualcomm Technologies, Inc. All rights reserved.<BR>
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
    @par Glossary:
@@ -68,6 +70,37 @@ EfiStatusToFfaStatus (
     default:
       return ARM_FFA_RET_NOT_SUPPORTED;
   }
+}
+
+/**
+  Return FFA VM Id value considering EDK2 FFA non-secure instance type and FFA command.
+
+  @param [in] PartId   Partition ID
+  @param [in] Shift    Per Specs, TRUE will left shift 16 bits, FALSE will not.
+
+  @retval              Final VM Id with UINTN size.
+
+**/
+UINTN
+EFIAPI
+GetFfaVmIdVal (
+  IN UINT16     PartId,
+  IN BOOLEAN    Shift
+  )
+{
+  UINTN Value;
+
+  if (FixedPcdGetBool (PcdFfaEdk2IsNonSecurePhysicalInstance)) {
+    Value = PartId;
+
+    if (Shift) {
+      Value <<= ARM_FFA_SOURCE_EP_SHIFT;
+    }
+  } else {
+    Value = 0;
+  }
+
+  return Value;
 }
 
 /**
