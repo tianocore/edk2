@@ -362,7 +362,7 @@ ArmFfaLibRxRelease (
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
   FfaArgs.Arg0 = ARM_FID_FFA_RX_RELEASE;
-  FfaArgs.Arg1 = PartId;
+  FfaArgs.Arg1 = GetFfaVmIdVal (PartId, FALSE);
 
   ArmCallFfa (&FfaArgs);
 
