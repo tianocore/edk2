@@ -1,0 +1,35 @@
+## @file
+#  Instance of secure zero memory library.
+#
+#  Copyright (c), Microsoft Corporation.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecureZeroMemoryLib
+  FILE_GUID                      = 22292DD9-490B-4F87-A8C6-9F57CC8E6EE1
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SecureZeroMemoryLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC AARCH64
+#
+
+[Sources]
+  SecureZeroMemory.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[BuildOptions]
+  # We cannot build the MSVC version with /GL (whole program optimization) because we do not want GCC
+  # to outsmart on this function.
+  MSFT:*_*_*_CC_FLAGS = /GL-
+
+  # We cannot build the GCC version with LTO (link time optimization) because we do not want MSVC to
+  # outsmart on this function.
+  GCC:*_*_*_CC_FLAGS = -fno-lto
