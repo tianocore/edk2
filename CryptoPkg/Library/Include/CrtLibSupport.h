@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/SecureZeroMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PrintLib.h>
 #include <Library/TimerLib.h>
@@ -461,10 +462,6 @@ memcpy (
 #define _byteswap_ushort  SwapBytes16
 #define _byteswap_ulong   SwapBytes32
 #define _byteswap_uint64  SwapBytes64
-#endif
-
-#ifndef SecureZeroMemory
-#define SecureZeroMemory(ptr, sz)  memset((ptr), 0, (sz))
 #endif
 
 #ifndef INT64_MAX
