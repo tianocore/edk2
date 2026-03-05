@@ -66,6 +66,7 @@
   FmpAuthenticationLib|SecurityPkg/Library/FmpAuthenticationLibPkcs7/FmpAuthenticationLibPkcs7.inf
   CapsuleUpdatePolicyLib|FmpDevicePkg/Library/CapsuleUpdatePolicyLibNull/CapsuleUpdatePolicyLibNull.inf
   FmpPayloadHeaderLib|FmpDevicePkg/Library/FmpPayloadHeaderLibV1/FmpPayloadHeaderLibV1.inf
+  FmpPayloadLib|FmpDevicePkg/Library/FmpPayloadLib/FmpPayloadLib.inf
   FmpDeviceLib|FmpDevicePkg/Library/FmpDeviceLibNull/FmpDeviceLibNull.inf
   FmpDependencyLib|FmpDevicePkg/Library/FmpDependencyLib/FmpDependencyLib.inf
   FmpDependencyCheckLib|FmpDevicePkg/Library/FmpDependencyCheckLibNull/FmpDependencyCheckLibNull.inf
@@ -86,6 +87,7 @@
   FmpDevicePkg/Library/CapsuleUpdatePolicyLibNull/CapsuleUpdatePolicyLibNull.inf
   FmpDevicePkg/Library/CapsuleUpdatePolicyLibOnProtocol/CapsuleUpdatePolicyLibOnProtocol.inf
   FmpDevicePkg/Library/FmpPayloadHeaderLibV1/FmpPayloadHeaderLibV1.inf
+  FmpDevicePkg/Library/FmpPayloadLib/FmpPayloadLib.inf
   FmpDevicePkg/Library/FmpDeviceLibNull/FmpDeviceLibNull.inf
   FmpDevicePkg/Library/FmpDependencyLib/FmpDependencyLib.inf
   FmpDevicePkg/Library/FmpDependencyCheckLib/FmpDependencyCheckLib.inf
