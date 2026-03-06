@@ -1,3 +1,12 @@
+### Certificate expiration date
+
+The `X509_V_FLAG_NO_CHECK_TIME` flag was deliberately added in the
+Pkcs7Verify implementation so that UEFI Secure Boot validation is
+time-agnostic — firmware doesn't have a reliable wall-clock during
+early boot, so certificate expiry is intentionally not enforced here.
+The tests will continue to pass indefinitely regardless of the
+`TestCert.pem` expiry date.
+
 ### How to reproduce the binary file
 
 1. Apply the following patch.
