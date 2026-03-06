@@ -75,7 +75,8 @@ class SettingsManager(UpdateSettingsManager, SetupSettingsManager, PrEvalSetting
                 _, _, path = line.partition(" ")
                 if path is not None:
                     if path not in [x.path for x in rs]:
-                        rs.append(RequiredSubmodule(path, True)) # add it with recursive since we don't know
+                        # add it without recursive since no dependencies expected
+                        rs.append(RequiredSubmodule(path, False))
         return rs
 
     def SetArchitectures(self, list_of_requested_architectures):
@@ -196,20 +197,20 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             elif self.env.GetValue("TARGET_ARCH") == "X64":
                 shell_environment.ShellEnvironment().set_shell_var(key, "x64")
 
-        # Add support for using the correct Platform Headers, tools, and Libs based on emulator architecture
-        # requested to be built when building on linux.
-        if GetHostInfo().os.upper() == "LINUX":
-            self.ConfigureLinuxDLinkPath()
-
+        #
+        # Set environment variable set by build that are used in EmulatorPkg.dsc
+        # This is required for the stuart DSC parser that is run before build
+        # to pick up the correct settings.
+        #
         if GetHostInfo().os.upper() == "WINDOWS":
-            self.env.SetValue("BLD_*_WIN_HOST_BUILD", "TRUE",
-                              "Trigger Windows host build")
+            self.env.SetValue("WIN_HOST_BUILD", "TRUE", "Windows env detected")
+            clang_bin = os.getenv("CLANG_BIN")
+            if clang_bin:
+                if os.path.exists(os.path.join(clang_bin, "mingw32-make.exe")):
+                    self.env.SetValue("WIN_MINGW32_BUILD", "TRUE", "Windows MinGW env detected")
 
         self.env.SetValue("MAKE_STARTUP_NSH", "FALSE", "Default to false")
 
-        # I don't see what this does but it is in build.sh
-        key = "BLD_*_BUILD_" + self.env.GetValue("TARGET_ARCH")
-        self.env.SetValue(key, "TRUE", "match script in build.sh")
         return 0
 
     def PlatformPreBuild(self):
@@ -240,32 +241,3 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             logging.critical("Unsupported Host")
             return -1
         return RunCmd(cmd, "", workingdir=OutputPath)
-
-    def ConfigureLinuxDLinkPath(self):
-        '''
-        logic copied from build.sh to setup the correct libraries
-        '''
-        if self.env.GetValue("TARGET_ARCH") == "IA32":
-            LIB_NAMES = ["ld-linux.so.2", "libdl.so.2 crt1.o", "crti.o crtn.o"]
-            LIB_SEARCH_PATHS = ["/usr/lib/i386-linux-gnu",
-                                "/usr/lib32", "/lib32", "/usr/lib", "/lib"]
-        elif self.env.GetValue("TARGET_ARCH") == "X64":
-            LIB_NAMES = ["ld-linux-x86-64.so.2",
-                         "libdl.so.2", "crt1.o", "crti.o", "crtn.o"]
-            LIB_SEARCH_PATHS = ["/usr/lib/x86_64-linux-gnu",
-                                "/usr/lib64", "/lib64", "/usr/lib", "/lib"]
-
-        HOST_DLINK_PATHS = ""
-        for lname in LIB_NAMES:
-            logging.debug(f"Looking for {lname}")
-            for dname in LIB_SEARCH_PATHS:
-                logging.debug(f"In {dname}")
-                if os.path.isfile(os.path.join(dname, lname)):
-                    logging.debug(f"Found {lname} in {dname}")
-                    HOST_DLINK_PATHS += os.path.join(
-                        os.path.join(dname, lname)) + os.pathsep
-                    break
-        HOST_DLINK_PATHS = HOST_DLINK_PATHS.rstrip(os.pathsep)
-        logging.critical(f"Setting HOST_DLINK_PATHS to {HOST_DLINK_PATHS}")
-        shell_environment.ShellEnvironment().set_shell_var(
-            "HOST_DLINK_PATHS", HOST_DLINK_PATHS)

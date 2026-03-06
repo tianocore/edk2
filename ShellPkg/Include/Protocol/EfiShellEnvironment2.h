@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _SHELL_ENVIRONMENT_2_PROTOCOL_H_
-#define _SHELL_ENVIRONMENT_2_PROTOCOL_H_
+#pragma once
 
 #define DEFAULT_INIT_ROW  1
 #define DEFAULT_AUTO_LF   FALSE
@@ -964,5 +963,3 @@ typedef struct {
 
 extern EFI_GUID  gEfiShellEnvironment2Guid;
 extern EFI_GUID  gEfiShellEnvironment2ExtGuid;
-
-#endif // _SHELL_ENVIRONMENT_2_PROTOCOL_H_

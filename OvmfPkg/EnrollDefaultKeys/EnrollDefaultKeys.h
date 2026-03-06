@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef ENROLL_DEFAULT_KEYS_H_
-#define ENROLL_DEFAULT_KEYS_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -144,5 +143,3 @@ extern CONST UINTN  mSizeOfWindowsUefi2023;
 
 extern CONST UINT8  mSha256OfDevNull[];
 extern CONST UINTN  mSizeOfSha256OfDevNull;
-
-#endif /* ENROLL_DEFAULT_KEYS_H_ */

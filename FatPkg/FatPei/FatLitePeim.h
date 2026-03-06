@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _FAT_PEIM_H_
-#define _FAT_PEIM_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -495,5 +494,3 @@ VOID
 FatFindPartitions (
   IN  PEI_FAT_PRIVATE_DATA  *PrivateData
   );
-
-#endif // _FAT_PEIM_H_

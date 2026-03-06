@@ -9,8 +9,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __PCI_CAP_LIB_H__
-#define __PCI_CAP_LIB_H__
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -412,5 +411,3 @@ PciCapWrite (
   IN VOID         *SourceBuffer,
   IN UINT16       Size
   );
-
-#endif // __PCI_CAP_LIB_H__

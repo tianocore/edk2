@@ -10,8 +10,7 @@
     - Obj or OBJ - Object
 **/
 
-#ifndef DYNAMIC_PLAT_REPO_H_
-#define DYNAMIC_PLAT_REPO_H_
+#pragma once
 
 #include <Protocol/ConfigurationManagerProtocol.h>
 
@@ -113,5 +112,3 @@ EFIAPI
 DynamicPlatRepoShutdown (
   IN  DYNAMIC_PLATFORM_REPOSITORY_INFO  *DynPlatRepo
   );
-
-#endif // DYNAMIC_PLAT_REPO_H_

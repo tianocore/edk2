@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef REDFISH_HOST_INTERFACE_LIB_H_
-#define REDFISH_HOST_INTERFACE_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 #include <IndustryStandard/RedfishHostInterface.h>
@@ -87,5 +86,3 @@ EFI_STATUS
 RedfishPlatformHostInterfaceSerialNumber (
   OUT CHAR8  **SerialNumber
   );
-
-#endif

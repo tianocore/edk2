@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _CAPSULES_ON_DISK_H_
-#define _CAPSULES_ON_DISK_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Pi/PiMultiPhase.h>
@@ -71,5 +70,3 @@ typedef struct {
   //
   EFI_FILE_INFO    *FileInfo;
 } IMAGE_INFO;
-
-#endif // _CAPSULES_ON_DISK_H_

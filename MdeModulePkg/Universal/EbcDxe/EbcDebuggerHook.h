@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _EFI_EBC_DEBUGGER_HOOK_H_
-#define _EFI_EBC_DEBUGGER_HOOK_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -234,5 +233,3 @@ VOID
 EbcDebuggerHookJMP8End (
   IN VM_CONTEXT  *VmPtr
   );
-
-#endif

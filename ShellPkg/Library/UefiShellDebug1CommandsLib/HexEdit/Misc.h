@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _LIB_MISC_H_
-#define _LIB_MISC_H_
+#pragma once
 
 #include "HexEditor.h"
 
@@ -83,5 +82,3 @@ INT32
 HGetTextY (
   IN INT32  GuidY
   );
-
-#endif

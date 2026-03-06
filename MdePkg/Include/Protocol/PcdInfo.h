@@ -16,8 +16,7 @@
 
 **/
 
-#ifndef __PCD_INFO_H__
-#define __PCD_INFO_H__
+#pragma once
 
 extern EFI_GUID  gGetPcdInfoProtocolGuid;
 
@@ -97,5 +96,3 @@ struct _GET_PCD_INFO_PROTOCOL {
   ///
   GET_PCD_INFO_PROTOCOL_GET_SKU        GetSku;
 };
-
-#endif

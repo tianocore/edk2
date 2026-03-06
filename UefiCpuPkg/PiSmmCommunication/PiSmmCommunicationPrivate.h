@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SMM_COMMUNICATION_PRIVATE_H_
-#define _SMM_COMMUNICATION_PRIVATE_H_
+#pragma once
 
 #pragma pack(push, 1)
 
@@ -20,5 +19,3 @@ typedef struct {
 } EFI_SMM_COMMUNICATION_CONTEXT;
 
 #pragma pack(pop)
-
-#endif

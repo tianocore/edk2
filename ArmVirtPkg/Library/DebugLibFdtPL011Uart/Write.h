@@ -9,8 +9,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef DEBUG_LIB_FDT_PL011_UART_WRITE_H_
-#define DEBUG_LIB_FDT_PL011_UART_WRITE_H_
+#pragma once
 
 /**
   (Copied from SerialPortWrite() in "MdePkg/Include/Library/SerialPortLib.h" at
@@ -35,5 +34,3 @@ DebugLibFdtPL011UartWrite (
   IN UINT8  *Buffer,
   IN UINTN  NumberOfBytes
   );
-
-#endif

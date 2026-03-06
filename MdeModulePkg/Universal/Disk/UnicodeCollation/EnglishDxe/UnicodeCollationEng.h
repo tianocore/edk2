@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _UNICODE_COLLATION_ENG_H_
-#define _UNICODE_COLLATION_ENG_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -175,5 +174,3 @@ InitializeUnicodeCollationEng (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
-
-#endif

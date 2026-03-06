@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _VAR_CHECK_HII_GEN_H_
-#define _VAR_CHECK_HII_GEN_H_
+#pragma once
 
 #include "VarCheckHii.h"
 extern VAR_CHECK_HII_VARIABLE_HEADER  *mVarCheckHiiBin;
@@ -128,5 +127,3 @@ EFIAPI
 VarCheckHiiGen (
   VOID
   );
-
-#endif

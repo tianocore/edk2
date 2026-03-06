@@ -48,22 +48,19 @@ ArmFfaSecLibConstructor (
   IN VOID
   )
 {
-  EFI_STATUS                 Status;
-  ARM_FFA_RX_TX_BUFFER_INFO  *BufferInfo;
-  EFI_HOB_MEMORY_ALLOCATION  *RxTxBufferAllocationHob;
-  UINTN                      Property1;
-  UINTN                      Property2;
+  EFI_STATUS  Status;
+  UINTN       Property1;
+  UINTN       Property2;
+  UINT16      PartId;
+  BOOLEAN     IsFfaSupported;
 
-  Status = ArmFfaLibCommonInit ();
+  Status = ArmFfaLibCommonInit (&PartId, &IsFfaSupported);
   if (EFI_ERROR (Status)) {
-    if (Status == EFI_UNSUPPORTED) {
+    if (!IsFfaSupported) {
       /*
-       * EFI_UNSUPPORTED return from ArmFfaLibCommonInit() means
-       * FF-A interface doesn't support.
-       * However, It doesn't make failure of loading driver/library instance
-       * (i.e) ArmPkg's MmCommunication Dxe/PEI Driver uses as well as SpmMm.
-       * So If FF-A is not supported the the MmCommunication Dxe/PEI falls
-       * back to SpmMm.
+       * FF-A being unsupported doesn't mean a failure of loading the driver/library
+       * instance (i.e) ArmPkg's MmCommunication Dxe/PEI Driver uses as well as SpmMm.
+       * So If FF-A is not supported the the MmCommunication Dxe/PEI falls back to SpmMm.
        * For this case, return EFI_SUCCESS.
        */
       return EFI_SUCCESS;
@@ -78,6 +75,8 @@ ArmFfaSecLibConstructor (
       return Status;
     }
 
+    DEBUG ((DEBUG_INFO, "%a Rx/Tx buffer isn't supported.\n", __func__));
+
     /*
      * When ARM_FID_FFA_PARTITION_INFO_GET_REGS is supported,
      * Rx/Tx buffer might not be required to request service to
@@ -91,39 +90,75 @@ ArmFfaSecLibConstructor (
                &Property2
                );
     if (!EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_INFO, "%a Rx/Tx buffer doesn't support.\n", __func__));
+      DEBUG ((DEBUG_INFO, "%a PARTITION_INFO_GET_REGS is available as an alternative to Rx/Tx buffer.\n", __func__));
     }
 
     return Status;
   }
 
-  BufferInfo = BuildGuidHob (
-                 &gArmFfaRxTxBufferInfoGuid,
-                 sizeof (ARM_FFA_RX_TX_BUFFER_INFO)
-                 );
-  if (BufferInfo == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Failed to create Rx/Tx Buffer Info Hob\n", __func__));
-    ArmFfaLibRxTxUnmap ();
-    return EFI_OUT_OF_RESOURCES;
-  }
+  return EFI_SUCCESS;
+}
 
-  RxTxBufferAllocationHob = FindRxTxBufferAllocationHob (FALSE);
-  ASSERT (RxTxBufferAllocationHob != NULL);
+/**
+  Return partition or VM ID
+
+  @param[out] PartId  The partition or VM ID
+
+  @retval EFI_SUCCESS  Partition ID or VM ID returned
+  @retval Others       Errors
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibGetPartId (
+  OUT UINT16  *PartId
+  )
+{
+  return ArmFfaLibPartitionIdGet (PartId);
+}
+
+/**
+  Check FF-A support or not.
+
+  @retval TRUE                   Supported
+  @retval FALSE                  Not supported
+
+**/
+BOOLEAN
+EFIAPI
+IsFfaSupported (
+  IN VOID
+  )
+{
+  return ArmFfaLibIsFfaSupported ();
+}
+
+/**
+  Callback for when Unmap is called to handle any post unmap
+  functionality. In SEC, the Rx/Tx buffer HOB needs to be
+  invalidated.
+
+**/
+VOID
+EFIAPI
+UnmapCallback (
+  IN VOID
+  )
+{
+  EFI_HOB_MEMORY_ALLOCATION  *RxTxBufferAllocationHob;
 
   /*
-   * Set then Name with gArmFfaRxTxBufferInfoGuid, so that ArmFfaPeiLib or
-   * ArmFfaDxeLib can find the Rx/Tx buffer allocation area.
+   * Rx/Tx buffers are allocated with continuous pages.
+   * See ArmFfaLibRxTxMap(). If HOB is not found, the Rx/Tx
+   * buffers were not successfully mapped.
    */
-  CopyGuid (
-    &RxTxBufferAllocationHob->AllocDescriptor.Name,
-    &gArmFfaRxTxBufferInfoGuid
-    );
+  RxTxBufferAllocationHob = FindRxTxBufferAllocationHob (TRUE);
+  if (RxTxBufferAllocationHob == NULL) {
+    return;
+  }
 
-  UpdateRxTxBufferInfo (BufferInfo);
-  BufferInfo->RemapOffset =
-    (UINTN)(BufferInfo->TxBufferAddr -
-            RxTxBufferAllocationHob->AllocDescriptor.MemoryBaseAddress);
-  BufferInfo->RemapRequired = TRUE;
-
-  return EFI_SUCCESS;
+  /*
+   * Invalidate the HOB.
+   */
+  ZeroMem (RxTxBufferAllocationHob, sizeof (ARM_FFA_RX_TX_BUFFER_INFO));
 }

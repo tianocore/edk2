@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __REPORT_STATUS_CODE_ROUTER_RUNTIME_DXE_H__
-#define __REPORT_STATUS_CODE_ROUTER_RUNTIME_DXE_H__
+#pragma once
 
 #include <Protocol/ReportStatusCodeHandler.h>
 #include <Protocol/StatusCode.h>
@@ -129,5 +128,3 @@ ReportDispatcher (
   IN EFI_GUID               *CallerId  OPTIONAL,
   IN EFI_STATUS_CODE_DATA   *Data      OPTIONAL
   );
-
-#endif

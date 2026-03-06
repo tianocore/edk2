@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PEI_CAPSULE_PPI_H_
-#define _PEI_CAPSULE_PPI_H_
+#pragma once
 
 ///
 /// Global ID for the EFI_PEI_CAPSULE_PPI.
@@ -126,5 +125,3 @@ struct _EFI_PEI_CAPSULE_PPI {
 extern EFI_GUID  gPeiCapsulePpiGuid;
 
 extern EFI_GUID  gEfiPeiCapsulePpiGuid;
-
-#endif // #ifndef _PEI_CAPSULE_PPI_H_

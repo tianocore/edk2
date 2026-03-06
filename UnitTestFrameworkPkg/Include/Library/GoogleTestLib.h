@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef GOOGLE_TEST_LIB_H_
-#define GOOGLE_TEST_LIB_H_
+#pragma once
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -173,5 +172,3 @@ MATCHER_P (
   *result_listener << "strings match";
   return true;
 }
-
-#endif

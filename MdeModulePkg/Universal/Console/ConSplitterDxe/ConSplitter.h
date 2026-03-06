@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _CON_SPLITTER_H_
-#define _CON_SPLITTER_H_
+#pragma once
 
 #include <Uefi.h>
 #include <PiDxe.h>
@@ -1851,5 +1850,3 @@ TextOutSetMode (
   IN  TEXT_OUT_SPLITTER_PRIVATE_DATA  *Private,
   IN  UINTN                           ModeNumber
   );
-
-#endif

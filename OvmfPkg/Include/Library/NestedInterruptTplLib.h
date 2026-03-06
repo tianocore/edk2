@@ -10,8 +10,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __NESTED_INTERRUPT_TPL_LIB__
-#define __NESTED_INTERRUPT_TPL_LIB__
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 #include <Uefi/UefiSpec.h>
@@ -83,5 +82,3 @@ NestedInterruptRestoreTPL (
   IN OUT EFI_SYSTEM_CONTEXT      SystemContext,
   IN OUT NESTED_INTERRUPT_STATE  *IsrState
   );
-
-#endif // __NESTED_INTERRUPT_TPL_LIB__

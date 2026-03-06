@@ -151,7 +151,7 @@ UINT64
 EFIAPI
 GetPerformanceCounterProperties (
   OUT      UINT64 *StartValue, OPTIONAL
-  OUT      UINT64                    *EndValue     OPTIONAL
+  OUT      UINT64   *EndValue     OPTIONAL
   )
 {
   VOID                    *Hob;
@@ -165,7 +165,7 @@ GetPerformanceCounterProperties (
   }
 
   if (EndValue != NULL) {
-    *EndValue = 32 - 1;
+    *EndValue = MAX_UINT64;
   }
 
   if (mTimeBase != 0) {
@@ -261,4 +261,25 @@ GetTimeInNanoSecond (
   NanoSeconds += DivU64x32 (MultU64x32 ((UINT64)Remainder, 1000000000u), GET_TIME_BASE ());
 
   return NanoSeconds;
+}
+
+/**
+  Constructor function for the Timer Library.
+
+  This constructor function is called early during booting to ensure that
+  GetPerformanceCounterProperties() is invoked and mTimeBase is initialized
+  before any code that depends on it.
+
+  @retval EFI_SUCCESS   The constructor always returns success.
+
+**/
+EFI_STATUS
+EFIAPI
+BaseRiscV64CpuTimerLibConstructor (
+  VOID
+  )
+{
+  GetPerformanceCounterProperties (NULL, NULL);
+
+  return EFI_SUCCESS;
 }

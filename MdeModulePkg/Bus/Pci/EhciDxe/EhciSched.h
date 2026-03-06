@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_EHCI_SCHED_H_
-#define _EFI_EHCI_SCHED_H_
+#pragma once
 
 /**
   Initialize the schedule data structure such as frame list.
@@ -193,5 +192,3 @@ EhcMonitorAsyncRequests (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   );
-
-#endif

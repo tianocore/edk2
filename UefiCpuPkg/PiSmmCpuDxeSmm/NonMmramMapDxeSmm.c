@@ -487,7 +487,7 @@ UpdateUefiMemMapAttributes (
 **/
 EFI_PHYSICAL_ADDRESS
 GetSmmProfileData (
-  IN OUT  UINT64  *Size
+  IN OUT  UINTN  *Size
   )
 {
   EFI_STATUS            Status;
@@ -495,17 +495,17 @@ GetSmmProfileData (
 
   ASSERT (Size != NULL);
 
-  *Size = PcdGet32 (PcdCpuSmmProfileSize);
+  *Size = (UINTN)PcdGet32 (PcdCpuSmmProfileSize);
 
   Base   = 0xFFFFFFFF;
   Status = gBS->AllocatePages (
                   AllocateMaxAddress,
                   EfiReservedMemoryType,
-                  (UINTN)EFI_SIZE_TO_PAGES (*Size),
+                  EFI_SIZE_TO_PAGES (*Size),
                   &Base
                   );
   ASSERT_EFI_ERROR (Status);
-  ZeroMem ((VOID *)(UINTN)Base, (UINTN)*Size);
+  ZeroMem ((VOID *)(UINTN)Base, *Size);
 
   return Base;
 }
@@ -636,7 +636,7 @@ CreateExtendedProtectionRange (
   for (Index = 0; Index < NumberOfSpaceDescriptors; Index++) {
     if (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) {
       if (ADDRESS_IS_ALIGNED (MemorySpaceMap[Index].BaseAddress, SIZE_4KB) &&
-          (MemorySpaceMap[Index].Length % SIZE_4KB == 0))
+          IS_ALIGNED (MemorySpaceMap[Index].Length, SIZE_4KB))
       {
         Count++;
       } else {
@@ -663,7 +663,7 @@ CreateExtendedProtectionRange (
   for (Index = 0; Index < NumberOfSpaceDescriptors; Index++) {
     if ((MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) &&
         ADDRESS_IS_ALIGNED (MemorySpaceMap[Index].BaseAddress, SIZE_4KB) &&
-        (MemorySpaceMap[Index].Length % SIZE_4KB == 0))
+        IS_ALIGNED (MemorySpaceMap[Index].Length, SIZE_4KB))
     {
       (*MemoryRegion)[MemoryRegionIndex].Base   = MemorySpaceMap[Index].BaseAddress;
       (*MemoryRegion)[MemoryRegionIndex].Length = MemorySpaceMap[Index].Length;

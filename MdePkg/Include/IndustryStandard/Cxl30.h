@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef CXL30_H_
-#define CXL30_H_
+#pragma once
 
 #include <IndustryStandard/Cxl20.h>
 
@@ -371,5 +370,3 @@ typedef struct {
 } RCEC_DOWNSTREAM_PORT_ASSOCIATION_STRUCTURE;
 
 #pragma pack()
-
-#endif

@@ -5,9 +5,6 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __CPUID_H__
-#define __CPUID_H__
+#pragma once
 
 #include <Register/Intel/Cpuid.h>
-
-#endif

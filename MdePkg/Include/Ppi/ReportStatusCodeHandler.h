@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __REPORT_STATUS_CODE_HANDLER_PPI_H__
-#define __REPORT_STATUS_CODE_HANDLER_PPI_H__
+#pragma once
 
 #define EFI_PEI_RSC_HANDLER_PPI_GUID \
   { \
@@ -72,5 +71,3 @@ typedef struct _EFI_PEI_RSC_HANDLER_PPI {
 } EFI_PEI_RSC_HANDLER_PPI;
 
 extern EFI_GUID  gEfiPeiRscHandlerPpiGuid;
-
-#endif // __REPORT_STATUS_CODE_HANDLER_PPI_H__

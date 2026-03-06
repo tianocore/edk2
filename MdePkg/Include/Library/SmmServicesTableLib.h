@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SMM_SERVICES_TABLE_LIB_H__
-#define __SMM_SERVICES_TABLE_LIB_H__
+#pragma once
 
 #include <PiSmm.h>
 
@@ -33,5 +32,3 @@ EFIAPI
 InSmm (
   VOID
   );
-
-#endif

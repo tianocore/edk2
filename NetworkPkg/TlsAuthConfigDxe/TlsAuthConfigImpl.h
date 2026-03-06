@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __TLS_AUTH_CONFIG_IMPL_H__
-#define __TLS_AUTH_CONFIG_IMPL_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -271,5 +270,3 @@ TlsAuthConfigAccessCallback (
   IN OUT EFI_IFR_TYPE_VALUE                    *Value,
   OUT    EFI_BROWSER_ACTION_REQUEST            *ActionRequest
   );
-
-#endif

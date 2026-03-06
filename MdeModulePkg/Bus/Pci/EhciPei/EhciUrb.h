@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_EHCI_URB_H_
-#define _EFI_EHCI_URB_H_
+#pragma once
 
 typedef struct _PEI_EHC_QTD  PEI_EHC_QTD;
 typedef struct _PEI_EHC_QH   PEI_EHC_QH;
@@ -318,5 +317,3 @@ EhcCreateUrb (
   IN UINTN                               Interval
   )
 ;
-
-#endif

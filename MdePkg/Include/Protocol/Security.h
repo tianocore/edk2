@@ -19,8 +19,7 @@
 
 **/
 
-#ifndef __ARCH_PROTOCOL_SECURITY_H__
-#define __ARCH_PROTOCOL_SECURITY_H__
+#pragma once
 
 ///
 /// Global ID for the Security Code Architectural Protocol
@@ -93,5 +92,3 @@ struct _EFI_SECURITY_ARCH_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiSecurityArchProtocolGuid;
-
-#endif

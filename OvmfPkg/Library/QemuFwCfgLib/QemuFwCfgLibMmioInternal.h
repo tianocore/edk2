@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef QEMU_FW_CFG_LIB_MMIO_INTERNAL_H_
-#define QEMU_FW_CFG_LIB_MMIO_INTERNAL_H_
+#pragma once
 
 typedef struct {
   UINTN    FwCfgSelectorAddress;
@@ -234,5 +233,3 @@ DmaTransferBytes (
   IN OUT VOID    *Buffer OPTIONAL,
   IN     UINT32  Control
   );
-
-#endif

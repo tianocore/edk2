@@ -593,7 +593,7 @@
 #string STR_DMPSTORE_NO_VAR_FOUND_GN   #language en-US "%H%s%N: No matching variables found. Guid %g, Name %s\r\n"
 #string STR_DMPSTORE_NO_VAR_FOUND_NG_SFO #language en-US "VariableInfo,\"%s\",\"%g\",\"\",\"\",\"\"\r\n"
 #string STR_DMPSTORE_NO_VAR_FOUND_N    #language en-US "%H%s%N: No matching variables found. Name %s\r\n"
-#string STR_DMPSTORE_NO_VAR_FOUND_N_SFO #language en-US #language en-US "VariableInfo,\"%s\",\"\",\"\",\"\",\"\"\r\n"
+#string STR_DMPSTORE_NO_VAR_FOUND_N_SFO #language en-US "VariableInfo,\"%s\",\"\",\"\",\"\",\"\"\r\n"
 #string STR_DMPSTORE_NO_VAR_FOUND_G    #language en-US "%H%s%N: No matching variables found. Guid %g\r\n"
 #string STR_DMPSTORE_NO_VAR_FOUND_G_SFO #language en-US "VariableInfo,\"\",\"%g\",\"\",\"\",\"\"\r\n"
 #string STR_DMPSTORE_VAR_SFO           #language en-US "VariableInfo,\"%s\",\"%g\",\"0x%x\",\"0x%x\",\"%s\"\r\n"

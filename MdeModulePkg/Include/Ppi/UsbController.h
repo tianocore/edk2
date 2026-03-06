@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PEI_USB_CONTROLLER_PPI_H_
-#define _PEI_USB_CONTROLLER_PPI_H_
+#pragma once
 
 ///
 /// Global ID for the PEI_USB_CONTROLLER_PPI.
@@ -83,5 +82,3 @@ struct _PEI_USB_CONTROLLER_PPI {
 };
 
 extern EFI_GUID  gPeiUsbControllerPpiGuid;
-
-#endif

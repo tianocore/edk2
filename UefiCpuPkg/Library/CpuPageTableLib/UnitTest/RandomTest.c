@@ -785,7 +785,7 @@ SingleMapEntryTest (
     // Note the memory is used in one complete Random test.
     //
     Buffer = PagesRecord->AllocatePagesForPageTable (PagesRecord, EFI_SIZE_TO_PAGES (PageTableBufferSize));
-    UT_ASSERT_NOT_EQUAL (Buffer, NULL);
+    UT_ASSERT_NOT_NULL (Buffer);
     Status = PageTableMap (
                PageTable,
                PagingMode,

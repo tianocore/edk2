@@ -15,8 +15,7 @@
   - Arm Base Boot Requirements v1.0
 **/
 
-#ifndef SSDT_PCIE_GENERATOR_H_
-#define SSDT_PCIE_GENERATOR_H_
+#pragma once
 
 /** Pci address attributes.
 
@@ -58,5 +57,3 @@ typedef struct AcpiPcieGenerator {
 } ACPI_PCI_GENERATOR;
 
 #pragma pack()
-
-#endif // SSDT_PCIE_GENERATOR_H_

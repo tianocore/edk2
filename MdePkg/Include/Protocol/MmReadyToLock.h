@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef _MM_READY_TO_LOCK_H_
-#define _MM_READY_TO_LOCK_H_
+#pragma once
 
 #define EFI_MM_READY_TO_LOCK_PROTOCOL_GUID \
   { \
@@ -22,5 +21,3 @@
   }
 
 extern EFI_GUID  gEfiMmReadyToLockProtocolGuid;
-
-#endif

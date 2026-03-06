@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _FORM_GUID_H_
-#define _FORM_GUID_H_
+#pragma once
 
 #define BOOT_MAINT_FORMSET_GUID \
   { \
@@ -200,5 +199,3 @@ typedef struct {
   UINT8      Active;
   UINT8      ForceReconnect;
 } BMM_FAKE_NV_DATA;
-
-#endif

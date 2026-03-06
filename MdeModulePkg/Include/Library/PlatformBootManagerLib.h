@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PLATFORM_BOOT_MANAGER_LIB_H_
-#define __PLATFORM_BOOT_MANAGER_LIB_H_
+#pragma once
+
 #include <Library/UefiBootManagerLib.h>
 
 /**
@@ -64,5 +64,3 @@ EFIAPI
 PlatformBootManagerUnableToBoot (
   VOID
   );
-
-#endif

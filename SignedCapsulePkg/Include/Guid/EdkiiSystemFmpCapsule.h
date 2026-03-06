@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EDKII_SYSTEM_FMP_CAPSULE_GUID_H__
-#define __EDKII_SYSTEM_FMP_CAPSULE_GUID_H__
+#pragma once
 
 /**
   @verbatim
@@ -142,5 +141,3 @@ typedef struct {
 extern EFI_GUID  gEdkiiSystemFirmwareImageDescriptorFileGuid;
 extern EFI_GUID  gEdkiiSystemFmpCapsuleConfigFileGuid;
 extern EFI_GUID  gEdkiiSystemFmpCapsuleDriverFvFileGuid;
-
-#endif

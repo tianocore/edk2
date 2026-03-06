@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TPM2_ACPI_H_
-#define _TPM2_ACPI_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -96,5 +95,3 @@ typedef struct {
 #define EFI_TPM2_ACPI_TABLE_ARM_FFA_PARAMETER_ATTR_CRB_REGION_SIZE_64KB   0x2
 
 #pragma pack ()
-
-#endif

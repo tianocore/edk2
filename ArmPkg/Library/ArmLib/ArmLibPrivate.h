@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef ARM_LIB_PRIVATE_H_
-#define ARM_LIB_PRIVATE_H_
+#pragma once
 
 #define CACHE_SIZE_4_KB    (3UL)
 #define CACHE_SIZE_8_KB    (4UL)
@@ -62,5 +61,3 @@ UINT32
 CPSRRead (
   VOID
   );
-
-#endif // ARM_LIB_PRIVATE_H_

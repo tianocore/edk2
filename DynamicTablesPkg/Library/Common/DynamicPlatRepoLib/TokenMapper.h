@@ -10,8 +10,7 @@
     - Obj or OBJ - Object
 **/
 
-#ifndef TOKEN_MAPPER_H_
-#define TOKEN_MAPPER_H_
+#pragma once
 
 #pragma pack(1)
 
@@ -119,5 +118,3 @@ EFIAPI
 TokenMapperShutdown (
   IN  TOKEN_MAPPER  *TokenMapper
   );
-
-#endif // TOKEN_MAPPER_H_

@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_UHCI_SCHED_H_
-#define _EFI_UHCI_SCHED_H_
+#pragma once
 
 #define UHCI_ASYNC_INT_SIGNATURE  SIGNATURE_32 ('u', 'h', 'c', 'a')
 //
@@ -250,5 +249,3 @@ UhciMonitorAsyncReqList (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   );
-
-#endif

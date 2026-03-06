@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _DEBUG_MP_H_
-#define _DEBUG_MP_H_
+#pragma once
 
 #define DEBUG_CPU_MAX_COUNT  256
 
@@ -211,5 +210,3 @@ BOOLEAN
 IsFirstBreakProcessor (
   IN UINT32  ProcessorIndex
   );
-
-#endif
