@@ -1554,8 +1554,11 @@ AddSmmuV3Nodes (
     {
       SmmuV3Node->Node.Revision   = 2;
       SmmuV3Node->Node.Identifier = EFI_ACPI_RESERVED_DWORD;
-    } else {
+    } else if (AcpiTableInfo->AcpiTableRevision == EFI_ACPI_IO_REMAPPING_TABLE_REVISION_05) {
       SmmuV3Node->Node.Revision   = 4;
+      SmmuV3Node->Node.Identifier = NodeList->Identifier;
+    } else {
+      SmmuV3Node->Node.Revision   = 5;
       SmmuV3Node->Node.Identifier = NodeList->Identifier;
     }
 
