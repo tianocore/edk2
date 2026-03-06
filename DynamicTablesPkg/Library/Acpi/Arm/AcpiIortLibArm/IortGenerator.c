@@ -1490,6 +1490,158 @@ AddSmmuV1V2Nodes (
   return EFI_SUCCESS;
 }
 
+/**
+  Helper function to find the first IORT node of a specific type.
+
+  @param [in] Iort Pointer to the IORT table.
+  @param [in] NodeType The type of the node to find.
+  @param [in] Offset The offset from the beginning of the IORT table to start searching from.
+  @param [out] Node Pointer to a variable that will receive the found node.
+
+  @retval EFI_SUCCESS The function completed successfully.
+  @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
+  @retval EFI_NOT_FOUND The specified node type was not found.
+
+**/
+STATIC
+EFI_STATUS
+FindIortNodeByType (
+  IN CONST EFI_ACPI_6_0_IO_REMAPPING_TABLE  *Iort,
+  IN UINT8                                  NodeType,
+  IN UINTN                                  Offset,
+  OUT EFI_ACPI_6_0_IO_REMAPPING_NODE        **Node
+  )
+{
+  EFI_ACPI_6_0_IO_REMAPPING_NODE  *CurrentNode;
+  UINT32                          CurrentOffset;
+
+  if ((Iort == NULL) || (Node == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Validate the offset is within the bounds of the IORT table and is not before the first node.
+  if ((Offset >= Iort->Header.Length) || (Offset < Iort->NodeOffset)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Even if the offset is within the range of IORT table, it may not be the start of a node.
+  // So we need to iterate through the nodes until we find the node with the specified type or reach the end of the table.
+  CurrentOffset = Iort->NodeOffset;
+  while (CurrentOffset < Iort->Header.Length) {
+    CurrentNode = (EFI_ACPI_6_0_IO_REMAPPING_NODE *)((UINT8 *)Iort + CurrentOffset);
+    if ((CurrentOffset == Offset) && (CurrentNode->Type == NodeType)) {
+      *Node = CurrentNode;
+      return EFI_SUCCESS;
+    } else if (CurrentOffset > Offset) {
+      // If we have passed the offset and still haven't found the node, it means the node with the specified type does not
+      // exist at the specified offset.
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: IORT: Failed to find node with type %d at offset 0x%x. Current node type = %d, Current offset = 0x%x.\n",
+        __func__,
+        NodeType,
+        Offset,
+        CurrentNode->Type,
+        CurrentOffset
+        ));
+      return EFI_NOT_FOUND;
+    }
+
+    if (CurrentNode->Length == 0) {
+      // To avoid infinite loop in case of invalid node length, we need to check if the node length is zero.
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: IORT: Invalid node length 0 at offset 0x%x. Current node type = %d.\n",
+        __func__,
+        CurrentOffset,
+        CurrentNode->Type
+        ));
+      return EFI_NOT_FOUND;
+    }
+
+    CurrentOffset += CurrentNode->Length;
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+/**
+  Helper function to evaluate the Device ID mapping flag validity for a given SMMUv3 node.
+
+  @param [in] Iort Pointer to the IORT table.
+  @param [in] SmmuV3Node Pointer to the SMMUv3 node to evaluate.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   One or more parameters are invalid.
+  @retval EFI_DEVICE_ERROR        The Device ID Mapping Index is invalid or the referenced ITS Group Node is not found in the IORT table.
+
+**/
+STATIC
+EFI_STATUS
+EvaluateSmmuV3NodeDeviceIdMappingFlag (
+  IN CONST EFI_ACPI_6_0_IO_REMAPPING_TABLE  *Iort,
+  IN EFI_ACPI_6_0_IO_REMAPPING_SMMU3_NODE   *SmmuV3Node
+  )
+{
+  EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE  *DeviceId;
+  EFI_ACPI_6_0_IO_REMAPPING_NODE      *ItsGroupNode;
+  EFI_STATUS                          Status;
+  BOOLEAN                             DeviceIdMappingIndexValid;
+
+  if (SmmuV3Node == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Validate the Device ID Mapping Index if the platform indicate it is valid
+  DeviceIdMappingIndexValid = SmmuV3Node->Flags & EFI_ACPI_IORT_SMMUv3_FLAG_DEVICEID_VALID;
+  if (!DeviceIdMappingIndexValid) {
+    // DeviceIdMappingIndex != 0 implies that the DEVICEID_VALID flag should be set.
+    ASSERT (SmmuV3Node->DeviceIdMappingIndex == 0);
+    return EFI_SUCCESS;
+  }
+
+  // 1. The Device ID Mapping Index should be less than the number of Id Mappings for the SMMUv3 node.
+  if (SmmuV3Node->DeviceIdMappingIndex >= SmmuV3Node->Node.NumIdMappings) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: IORT: Invalid Device ID Mapping Index %d for SMMUv3 Node with %d Id Mappings, .\n",
+      __func__,
+      SmmuV3Node->DeviceIdMappingIndex,
+      SmmuV3Node->Node.NumIdMappings
+      ));
+    return EFI_DEVICE_ERROR;
+  }
+
+  // 2. The Reference to ID Array should be non-zero and the Id Mapping Token should be valid.
+  if (SmmuV3Node->Node.IdReference == 0) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: IORT: Invalid reference to ID Array for SMMUv3 Node with Device ID Mapping Index %d.\n",
+      __func__,
+      SmmuV3Node->DeviceIdMappingIndex
+      ));
+    return EFI_DEVICE_ERROR;
+  }
+
+  // 3. If the Device ID Mapping Index is still valid, the output reference should point to a valid ITS Group Node in the IORT.
+  DeviceId = (EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE *)((UINT8 *)SmmuV3Node +
+                                                    SmmuV3Node->Node.IdReference) + SmmuV3Node->DeviceIdMappingIndex;
+
+  Status = FindIortNodeByType (Iort, EFI_ACPI_IORT_TYPE_ITS_GROUP, DeviceId->OutputReference, &ItsGroupNode);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: IORT: Failed to find ITS Group Node in IORT from OutputReference 0x%x. Status = %r\n",
+      __func__,
+      DeviceId->OutputReference,
+      Status
+      ));
+    return Status;
+  }
+
+  return EFI_SUCCESS;
+}
+
 /** Update the SMMUv3 Node Information.
 
     This function updates the SMMUv3 node information in the IORT table.
@@ -1554,8 +1706,11 @@ AddSmmuV3Nodes (
     {
       SmmuV3Node->Node.Revision   = 2;
       SmmuV3Node->Node.Identifier = EFI_ACPI_RESERVED_DWORD;
-    } else {
+    } else if (AcpiTableInfo->AcpiTableRevision == EFI_ACPI_IO_REMAPPING_TABLE_REVISION_05) {
       SmmuV3Node->Node.Revision   = 4;
+      SmmuV3Node->Node.Identifier = NodeList->Identifier;
+    } else {
+      SmmuV3Node->Node.Revision   = 5;
       SmmuV3Node->Node.Identifier = NodeList->Identifier;
     }
 
@@ -1577,7 +1732,8 @@ AddSmmuV3Nodes (
       SmmuV3Node->ProximityDomain = 0;
     }
 
-    if ((SmmuV3Node->Event != 0) && (SmmuV3Node->Pri != 0) &&
+    if ((SmmuV3Node->Node.Revision < 5) &&
+        (SmmuV3Node->Event != 0) && (SmmuV3Node->Pri != 0) &&
         (SmmuV3Node->Gerr != 0) && (SmmuV3Node->Sync != 0))
     {
       // If all the SMMU control interrupts are GSIV based,
@@ -1614,6 +1770,18 @@ AddSmmuV3Nodes (
         DEBUG ((
           DEBUG_ERROR,
           "ERROR: IORT: Failed to add Id Mapping Array. Status = %r\n",
+          Status
+          ));
+        return Status;
+      }
+    }
+
+    if (SmmuV3Node->Node.Revision >= 5) {
+      Status = EvaluateSmmuV3NodeDeviceIdMappingFlag (Iort, SmmuV3Node);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "ERROR: IORT: Evaluation of Device ID Mapping Index for SMMUv3 Node failed. Status = %r\n",
           Status
           ));
         return Status;
