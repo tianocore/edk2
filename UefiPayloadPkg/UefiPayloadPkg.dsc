@@ -54,6 +54,7 @@
   #
   DEFINE CAPSULE_SUPPORT              = FALSE
   DEFINE CAPSULE_MAIN_FW_GUID         =
+  DEFINE CAPSULE_EMBED_FMP_DXE        = FALSE
 
   #
   # Crypto Support
@@ -984,7 +985,8 @@
 !if "$(CAPSULE_MAIN_FW_GUID)" == ""
   !error "CAPSULE_MAIN_FW_GUID must be set when CAPSULE_SUPPORT is TRUE"
 !endif
-  # Build FmpDxe meant for the inclusion into an update capsule as an embedded driver.
+  # Build FmpDxe (either included in the payload FV or embedded into an update
+  # capsule, depending on CAPSULE_EMBED_FMP_DXE).
   FmpDevicePkg/FmpDxe/FmpDxe.inf {
     <Defines>
       # FmpDxe interprets its FILE_GUID as firmware GUID.  This allows including
