@@ -381,6 +381,9 @@ INF ShellPkg/Application/Shell/Shell.inf
 # Capsules
 #
 !if $(CAPSULE_SUPPORT) == TRUE
+!if $(CAPSULE_EMBED_FMP_DXE) == FALSE
+INF  FILE_GUID = $(CAPSULE_MAIN_FW_GUID) FmpDevicePkg/FmpDxe/FmpDxe.inf
+!endif
 INF MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
 !endif
 
