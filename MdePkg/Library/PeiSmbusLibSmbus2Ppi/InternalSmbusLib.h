@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __INTERNAL_SMBUS_LIB_H_
-#define __INTERNAL_SMBUS_LIB_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -69,5 +68,3 @@ InternalSmBusExec (
   IN OUT VOID                 *Buffer,
   OUT RETURN_STATUS           *Status        OPTIONAL
   );
-
-#endif

@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _SEC_CORE_H_
-#define _SEC_CORE_H_
+#pragma once
 
 #include <PiPei.h>
 #include <Ppi/TemporaryRamSupport.h>
@@ -122,5 +121,3 @@ EFIAPI
 AsmReadStackPointer (
   VOID
   );
-
-#endif

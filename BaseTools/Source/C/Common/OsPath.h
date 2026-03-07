@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_OS_PATH_H
-#define _EFI_OS_PATH_H
+#pragma once
 
 #include <Common/UefiBaseTypes.h>
 
@@ -93,5 +92,3 @@ OsPathExists (
   IN CHAR8    *InputFileName
   )
 ;
-
-#endif

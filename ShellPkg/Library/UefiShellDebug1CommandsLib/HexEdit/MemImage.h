@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _LIB_MEM_IMAGE_H_
-#define _LIB_MEM_IMAGE_H_
+#pragma once
 
 #include "HexEditor.h"
 
@@ -82,5 +81,3 @@ HMemImageSave (
   IN UINTN  Offset,
   IN UINTN  Size
   );
-
-#endif

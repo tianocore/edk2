@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _WINDOWS_SMM_SECURITY_MITIGATION_TABLE_H_
-#define _WINDOWS_SMM_SECURITY_MITIGATION_TABLE_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -28,5 +27,3 @@ typedef struct {
 #define EFI_WSMT_PROTECTION_FLAGS_SYSTEM_RESOURCE_PROTECTION         0x4
 
 #pragma pack()
-
-#endif

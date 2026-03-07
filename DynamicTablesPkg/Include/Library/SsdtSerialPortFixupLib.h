@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef SSDT_SERIAL_PORT_LIB_H_
-#define SSDT_SERIAL_PORT_LIB_H_
+#pragma once
 
 /** Build a SSDT table describing the input serial port.
 
@@ -64,5 +63,3 @@ ValidateSerialPortInfo (
   IN  CONST CM_ARCH_COMMON_SERIAL_PORT_INFO  *SerialPortInfoTable,
   IN        UINT32                           SerialPortCount
   );
-
-#endif // SSDT_SERIAL_PORT_LIB_H_

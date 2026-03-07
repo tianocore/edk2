@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SEC_H___
-#define __SEC_H___
+#pragma once
 
 #include <PiPei.h>
 #include <Library/EmuMagicPageLib.h>
@@ -28,5 +27,3 @@ SecTemporaryRamSupport (
   IN EFI_PHYSICAL_ADDRESS    PermanentMemoryBase,
   IN UINTN                   CopySize
   );
-
-#endif

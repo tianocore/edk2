@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef AARCH64_LIB_H_
-#define AARCH64_LIB_H_
+#pragma once
 
 UINTN
 EFIAPI
@@ -80,5 +79,3 @@ EFIAPI
 ArmReadIdAA64Pfr2 (
   VOID
   );
-
-#endif // AARCH64_LIB_H_

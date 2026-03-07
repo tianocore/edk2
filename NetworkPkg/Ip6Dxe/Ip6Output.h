@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_IP6_OUTPUT_H__
-#define __EFI_IP6_OUTPUT_H__
+#pragma once
 
 extern UINT32  mIp6Id;
 
@@ -131,5 +130,3 @@ Ip6CancelPacket (
   IN NET_BUF        *Packet,
   IN EFI_STATUS     IoStatus
   );
-
-#endif

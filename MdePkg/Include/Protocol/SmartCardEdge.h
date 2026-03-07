@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef __SMART_CARD_EDGE_H__
-#define __SMART_CARD_EDGE_H__
+#pragma once
 
 #define EFI_SMART_CARD_EDGE_PROTOCOL_GUID \
     { \
@@ -731,5 +730,3 @@ struct _EFI_SMART_CARD_EDGE_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiSmartCardEdgeProtocolGuid;
-
-#endif

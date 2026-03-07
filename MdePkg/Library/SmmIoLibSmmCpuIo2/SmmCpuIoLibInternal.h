@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _SMM_CPUIO_LIB_INTERNAL_H_
-#define _SMM_CPUIO_LIB_INTERNAL_H_
+#pragma once
 
 #include <PiSmm.h>
 #include <Protocol/SmmCpuIo2.h>
@@ -107,5 +106,3 @@ MmioWriteWorker (
   IN      EFI_SMM_IO_WIDTH  Width,
   IN      UINT64            Data
   );
-
-#endif

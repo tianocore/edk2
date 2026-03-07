@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef MP_INFORMATION2_H_
-#define MP_INFORMATION2_H_
+#pragma once
 
 #include <Pi/PiMultiPhase.h>
 #include <Protocol/MpService.h>
@@ -53,5 +52,3 @@ typedef struct {
     (MP_INFORMATION2_ENTRY *)((UINTN)&((MP_INFORMATION2_HOB_DATA *)(MpInfoHobData))->Entry + (MpInfoHobData)->EntrySize * Index)
 
 extern EFI_GUID  gMpInformation2HobGuid;
-
-#endif

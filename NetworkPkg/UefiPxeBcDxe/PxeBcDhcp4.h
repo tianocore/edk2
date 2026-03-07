@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_PXEBC_DHCP4_H__
-#define __EFI_PXEBC_DHCP4_H__
+#pragma once
 
 #define PXEBC_DHCP4_OPTION_MAX_NUM    16
 #define PXEBC_DHCP4_OPTION_MAX_SIZE   312
@@ -354,5 +353,3 @@ PxeBcDhcp4Dora (
   IN PXEBC_PRIVATE_DATA  *Private,
   IN EFI_DHCP4_PROTOCOL  *Dhcp4
   );
-
-#endif

@@ -6,8 +6,8 @@
 
 **/
 
-#ifndef _REGISTER_CPU_FEATURES_H_
-#define _REGISTER_CPU_FEATURES_H_
+#pragma once
+
 #include <PiPei.h>
 #include <PiDxe.h>
 #include <Ppi/MpServices2.h>
@@ -264,5 +264,3 @@ MP_SERVICES
 GetMpService (
   VOID
   );
-
-#endif

@@ -14,8 +14,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef CPU_HOT_EJECT_DATA_H_
-#define CPU_HOT_EJECT_DATA_H_
+#pragma once
 
 /**
   CPU Hot-eject handler, called from SmmCpuFeaturesRendezvousExit()
@@ -56,5 +55,3 @@ typedef struct {
   //
   UINT32                            ArrayLength;
 } CPU_HOT_EJECT_DATA;
-
-#endif // CPU_HOT_EJECT_DATA_H_

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef PLATFORM_INIT_LIB_H_
-#define PLATFORM_INIT_LIB_H_
+#pragma once
 
 #include <PiPei.h>
 #include <IndustryStandard/E820.h>
@@ -326,5 +325,3 @@ EFIAPI
 PlatformIgvmParamReserve (
   VOID
   );
-
-#endif // PLATFORM_INIT_LIB_H_

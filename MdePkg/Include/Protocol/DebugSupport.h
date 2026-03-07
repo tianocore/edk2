@@ -13,8 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __DEBUG_SUPPORT_H__
-#define __DEBUG_SUPPORT_H__
+#pragma once
 
 #include <IndustryStandard/PeImage.h>
 
@@ -961,5 +960,3 @@ struct _EFI_DEBUG_SUPPORT_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiDebugSupportProtocolGuid;
-
-#endif

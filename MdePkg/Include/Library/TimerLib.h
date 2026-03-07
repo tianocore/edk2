@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __TIMER_LIB__
-#define __TIMER_LIB__
+#pragma once
 
 /**
   Stalls the CPU for at least the given number of microseconds.
@@ -104,5 +103,3 @@ EFIAPI
 GetTimeInNanoSecond (
   IN      UINT64  Ticks
   );
-
-#endif

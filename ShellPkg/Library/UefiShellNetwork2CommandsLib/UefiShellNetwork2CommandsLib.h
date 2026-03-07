@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _UEFI_SHELL_NETWORK2_COMMANDS_LIB_H_
-#define _UEFI_SHELL_NETWORK2_COMMANDS_LIB_H_
+#pragma once
 
 #include <Protocol/Cpu.h>
 #include <Protocol/ServiceBinding.h>
@@ -62,5 +61,3 @@ ShellCommandRunIfconfig6 (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
-
-#endif

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef MPINITLIB_DEP_PROTOCOLS_H_
-#define MPINITLIB_DEP_PROTOCOLS_H_
+#pragma once
 
 // {BB00A5CA-08CE-462F-A537-43C74A825CA4}
 #define EFI_MPINITLIB_MP_DEP_PROTOCOL_GUID \
@@ -24,5 +23,3 @@ extern EFI_GUID  gEfiMpInitLibMpDepProtocolGuid;
 };
 
 extern EFI_GUID  gEfiMpInitLibUpDepProtocolGuid;
-
-#endif

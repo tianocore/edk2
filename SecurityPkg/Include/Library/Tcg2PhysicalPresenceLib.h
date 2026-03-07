@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TCG2_PHYSICAL_PRESENCE_LIB_H_
-#define _TCG2_PHYSICAL_PRESENCE_LIB_H_
+#pragma once
 
 #include <IndustryStandard/Tpm20.h>
 #include <IndustryStandard/TcgPhysicalPresence.h>
@@ -163,5 +162,3 @@ EFIAPI
 Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction (
   IN UINT32  OperationRequest
   );
-
-#endif

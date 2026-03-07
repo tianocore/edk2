@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef EDKII_REDFISH_HTTP_PROTOCOL_H_
-#define EDKII_REDFISH_HTTP_PROTOCOL_H_
+#pragma once
 
 #include <RedfishServiceData.h>
 #include <Library/JsonLib.h>
@@ -304,5 +303,3 @@ struct _EDKII_REDFISH_HTTP_PROTOCOL {
 #define EDKII_REDFISH_HTTP_PROTOCOL_REVISION  0x00001000
 
 extern EFI_GUID  gEdkIIRedfishHttpProtocolGuid;
-
-#endif

@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TPM_PTP_H_
-#define _TPM_PTP_H_
+#pragma once
 
 //
 // PTP FIFO definition
@@ -546,5 +545,3 @@ typedef union {
 #define PTP_TIMEOUT_B  (2000 * 1000)               // 2s
 #define PTP_TIMEOUT_C  (200 * 1000)                // 200ms
 #define PTP_TIMEOUT_D  (30 * 1000)                 // 30ms
-
-#endif

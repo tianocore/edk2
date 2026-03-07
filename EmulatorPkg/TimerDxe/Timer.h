@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TIMER_H_
-#define _TIMER_H_
+#pragma once
 
 //
 // Legal timer value range in 100 ns units
@@ -60,5 +59,3 @@ EFIAPI
 EmuTimerDriverGenerateSoftInterrupt (
   IN EFI_TIMER_ARCH_PROTOCOL  *This
   );
-
-#endif

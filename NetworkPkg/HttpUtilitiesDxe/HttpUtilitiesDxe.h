@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __EFI_HTTP_UTILITIES_DXE_H__
-#define __EFI_HTTP_UTILITIES_DXE_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -111,5 +110,3 @@ HttpUtilitiesParse (
   OUT EFI_HTTP_HEADER              **HeaderFields,
   OUT UINTN                        *FieldCount
   );
-
-#endif

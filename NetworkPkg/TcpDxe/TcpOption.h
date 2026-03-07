@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _TCP_OPTION_H_
-#define _TCP_OPTION_H_
+#pragma once
 
 //
 // Supported TCP option types and their length.
@@ -119,5 +118,3 @@ TcpParseOption (
   IN     TCP_HEAD    *Tcp,
   IN OUT TCP_OPTION  *Option
   );
-
-#endif

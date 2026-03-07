@@ -10,8 +10,7 @@
     - Obj or OBJ - Object
 **/
 
-#ifndef CM_OBJECT_TOKEN_FIXER_H_
-#define CM_OBJECT_TOKEN_FIXER_H_
+#pragma once
 
 /** CmObjectToken fixer function that updates the Tokens in the CmObjects.
 
@@ -48,5 +47,3 @@ FixupCmObjectSelfToken (
   IN  CM_OBJ_DESCRIPTOR  *CmObjDesc,
   IN  CM_OBJECT_TOKEN    Token
   );
-
-#endif // CM_OBJECT_TOKEN_FIXER_H_

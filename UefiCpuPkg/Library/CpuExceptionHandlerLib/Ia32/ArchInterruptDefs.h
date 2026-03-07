@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _ARCH_CPU_INTERRUPT_DEFS_H_
-#define _ARCH_CPU_INTERRUPT_DEFS_H_
+#pragma once
 
 typedef struct {
   EFI_SYSTEM_CONTEXT_IA32    SystemContext;
@@ -42,5 +41,3 @@ typedef struct {
 #define CPU_TSS_SIZE \
   (sizeof (IA32_TASK_STATE_SEGMENT) * \
    (FixedPcdGetSize (PcdCpuStackSwitchExceptionList) + 1))
-
-#endif

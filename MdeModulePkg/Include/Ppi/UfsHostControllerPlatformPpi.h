@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EDKII_PEI_UFS_HC_PLATFORM_PPI_H_
-#define _EDKII_PEI_UFS_HC_PLATFORM_PPI_H_
+#pragma once
 
 #define EDKII_UFS_HC_PLATFORM_PPI_VERSION  1
 
@@ -93,5 +92,3 @@ struct _EDKII_UFS_HC_PLATFORM_PPI {
   ///
   EDKII_UFS_CARD_REF_CLK_FREQ_ATTRIBUTE     RefClkFreq;
 };
-
-#endif

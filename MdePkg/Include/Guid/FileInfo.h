@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __FILE_INFO_H__
-#define __FILE_INFO_H__
+#pragma once
 
 #define EFI_FILE_INFO_ID \
   { \
@@ -62,5 +61,3 @@ typedef struct {
 #define SIZE_OF_EFI_FILE_INFO  OFFSET_OF (EFI_FILE_INFO, FileName)
 
 extern EFI_GUID  gEfiFileInfoGuid;
-
-#endif

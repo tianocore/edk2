@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __GDB_TIMER_LIB__
-#define __GDB_TIMER_LIB__
+#pragma once
 
 /**
   Setup all the hardware needed for the debug agents timer.
@@ -46,5 +45,3 @@ EFIAPI
 DebugAgentTimerEndOfInterrupt (
   VOID
   );
-
-#endif

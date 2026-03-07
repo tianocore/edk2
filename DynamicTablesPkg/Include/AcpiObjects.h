@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef AML_CPC_INFO_H_
-#define AML_CPC_INFO_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -248,5 +247,3 @@ typedef struct AmlPssInfo {
 } AML_PSS_INFO;
 
 #pragma pack()
-
-#endif //AML_CPC_INFO_H_

@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __PCI_CAP_PCI_IO_LIB_H__
-#define __PCI_CAP_PCI_IO_LIB_H__
+#pragma once
 
 #include <Protocol/PciIo.h>
 
@@ -46,5 +45,3 @@ EFIAPI
 PciCapPciIoDeviceUninit (
   IN PCI_CAP_DEV  *PciDevice
   );
-
-#endif // __PCI_CAP_PCI_IO_LIB_H__

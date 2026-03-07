@@ -14,8 +14,7 @@
   - Generic ACPI for Arm Components 1.0 Platform Design Document
 **/
 
-#ifndef SSDT_DMC620_GENERATOR_H_
-#define SSDT_DMC620_GENERATOR_H_
+#pragma once
 
 /** PeriphBase maximum address length is 512 bytes (0x200)
 */
@@ -28,5 +27,3 @@
 /** Offset of the PMU registers in the DMC620 register space
 */
 #define DMC620_PMU_ADDRESS_OFFSET  0x0A00
-
-#endif // SSDT_DMC620_GENERATOR_H_

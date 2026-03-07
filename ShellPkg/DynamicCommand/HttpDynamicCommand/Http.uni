@@ -65,11 +65,11 @@
 "    2. wget-like, where host and host_uri is one parameter.\r\n"
 "       (example: host/host_uri)\r\n"
 "\r\n"
-"    host             - Specifies HTTP Server address.\r\n
-                        Can be either IPv4 address or 'http (or https)://addr'\r\n
-                        Can use addresses resolvable by DNS as well. \r\n
-                        Port can be specified after ':' if needed. \r\n
-                        By default port 80 is used.\r\n"
+"    host             - Specifies HTTP Server address.\r\n"
+"                       Can be either IPv4 address or 'http (or https)://addr'\r\n"
+"                       Can use addresses resolvable by DNS as well. \r\n"
+"                       Port can be specified after ':' if needed. \r\n"
+"                       By default port 80 is used.\r\n"
 "    http_uri         - HTTP server URI to download the file.\r\n"
 "\r\n"
 "  localfilepath    - Local destination file path.\r\n"
@@ -109,7 +109,7 @@
 "                            formatted or its value was out of bounds.\r\n"
 "  HTTP_ERROR                No EFI errors, but the server reported a status code\r\n"
 "                            which should be treated as an error. If an error body sent\r\n"
-"                            by the server, and -k parameter is on command line,
+"                            by the server, and -k parameter is on command line,\r\n"
 "                            the file wil be saved either as localfilepath filename,\r\n"
 "                            or as an URI name in the current directory.\r\n"
 "                            If '/' is at the end of the URL, and no locafilepath filename\r\n"

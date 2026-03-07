@@ -15,8 +15,7 @@
     - PTP  - Parameter Table Pointer
 **/
 
-#ifndef SPI_NOR_FLASH_JEDEC_H_
-#define SPI_NOR_FLASH_JEDEC_H_
+#pragma once
 
 #include <Base.h>
 
@@ -320,5 +319,3 @@ typedef union _SFDP_SECTOR_MAP_TABLE {
   SFDP_SECTOR_CONFIGURATION_COMMAND           ConfigurationCommand; ///< Fash configuration detection command.
   SFDP_SECTOR_CONFIGURATION_MAP               ConfigurationMap;     ///< Flash map descriptor.
 } SFDP_SECTOR_MAP_TABLE;
-
-#endif // SPI_NOR_FLASH_JEDEC_H_

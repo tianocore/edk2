@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef MM_ACPI_S3_ENABLE_H_
-#define MM_ACPI_S3_ENABLE_H_
+#pragma once
 
 ///
 /// The GUID of the MmAcpiS3Enable GUIDed HOB.
@@ -30,5 +29,3 @@ typedef struct {
 } MM_ACPI_S3_ENABLE;
 
 extern EFI_GUID  gMmAcpiS3EnableHobGuid;
-
-#endif

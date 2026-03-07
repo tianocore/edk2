@@ -20,8 +20,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __DEBUG_LIB_H__
-#define __DEBUG_LIB_H__
+#pragma once
 
 //
 // Declare bits for PcdDebugPropertyMask
@@ -668,6 +667,4 @@ UnitTestDebugAssert (
     (BASE_CR (Record, TYPE, Field)->Signature != TestSignature) ?                           \
     NULL :                                                                                  \
     BASE_CR (Record, TYPE, Field)
-#endif
-
 #endif

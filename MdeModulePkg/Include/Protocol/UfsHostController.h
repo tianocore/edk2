@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EDKII_UFS_HC_PROTOCOL_H__
-#define __EDKII_UFS_HC_PROTOCOL_H__
+#pragma once
 
 //
 // UFS Host Controller Protocol GUID value
@@ -231,5 +230,3 @@ struct _EDKII_UFS_HOST_CONTROLLER_PROTOCOL {
 ///  UFS Host Controller Protocol GUID variable.
 ///
 extern EFI_GUID  gEdkiiUfsHostControllerProtocolGuid;
-
-#endif

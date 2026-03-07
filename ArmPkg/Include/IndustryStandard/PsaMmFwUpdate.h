@@ -20,8 +20,7 @@
 
 **/
 
-#ifndef PSA_MM_FW_UPDATE_H_
-#define PSA_MM_FW_UPDATE_H_
+#pragma once
 
 /**  Macros defining the firmware store update ABI fuction Id.
      Cf Platform Security Firmware Update for the A-profile specification,
@@ -488,5 +487,3 @@ typedef struct {
      ((Idx) * (sizeof (PSA_MM_FWU_IMG_INFO_ENTRY)))))
 
 extern EFI_GUID  gEfiMmFwuCommunicationGuid;
-
-#endif // PSA_MM_FW_UPDATE_H_

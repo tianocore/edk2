@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef _MM_CONTROL_PPI_H_
-#define _MM_CONTROL_PPI_H_
+#pragma once
 
 #define EFI_PEI_MM_CONTROL_PPI_GUID \
   { 0x61c68702, 0x4d7e, 0x4f43, 0x8d, 0xef, 0xa7, 0x43, 0x5, 0xce, 0x74, 0xc5 }
@@ -85,5 +84,3 @@ struct _EFI_PEI_MM_CONTROL_PPI {
 };
 
 extern EFI_GUID  gEfiPeiMmControlPpiGuid;
-
-#endif

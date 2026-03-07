@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef BASE_H
-#define BASE_H
+#pragma once
 
 #define LIBSPDM_STDINT_ALT   "hal/LibspdmStdIntAlt.h"
 #define LIBSPDM_STDBOOL_ALT  "hal/LibspdmStdBoolAlt.h"
@@ -90,5 +89,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
  *
  **/
 #define LIBSPDM_ARRAY_SIZE(array)  (sizeof(array) / sizeof((array)[0]))
-
-#endif /* BASE_H */

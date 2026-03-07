@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __S3_IO_LIB_H__
-#define __S3_IO_LIB_H__
+#pragma once
 
 /**
   Reads an 8-bit I/O port and saves the value in the S3 script to be replayed
@@ -2666,5 +2665,3 @@ S3MmioWriteBuffer64 (
   IN  UINTN         Length,
   IN  CONST UINT64  *Buffer
   );
-
-#endif

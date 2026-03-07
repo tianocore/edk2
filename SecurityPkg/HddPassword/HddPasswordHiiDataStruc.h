@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _HDD_PASSWORD_HII_DATASTRUC_H_
-#define _HDD_PASSWORD_HII_DATASTRUC_H_
+#pragma once
 
 #include <Guid/HiiPlatformSetupFormset.h>
 
@@ -52,5 +51,3 @@ typedef struct _HDD_PASSWORD_CONFIG {
 } HDD_PASSWORD_CONFIG;
 
 #pragma pack()
-
-#endif

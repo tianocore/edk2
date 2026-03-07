@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PEI_BOT_PEIM_H_
-#define _PEI_BOT_PEIM_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -211,5 +210,3 @@ IsMediaChange (
   IN  ATAPI_REQUEST_SENSE_DATA  *SenseData,
   IN  UINTN                     SenseCounts
   );
-
-#endif

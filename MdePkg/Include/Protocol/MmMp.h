@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef _MM_MP_H_
-#define _MM_MP_H_
+#pragma once
 
 #include <Pi/PiMmCis.h>
 
@@ -325,5 +324,3 @@ struct _EFI_MM_MP_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiMmMpProtocolGuid;
-
-#endif

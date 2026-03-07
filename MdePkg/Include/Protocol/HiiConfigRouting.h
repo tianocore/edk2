@@ -14,8 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __HII_CONFIG_ROUTING_H__
-#define __HII_CONFIG_ROUTING_H__
+#pragma once
 
 #define EFI_HII_CONFIG_ROUTING_PROTOCOL_GUID \
   { 0x587e72d7, 0xcc50, 0x4f79, { 0x82, 0x09, 0xca, 0x29, 0x1f, 0xc1, 0xa1, 0x0f } }
@@ -407,5 +406,3 @@ struct _EFI_HII_CONFIG_ROUTING_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiHiiConfigRoutingProtocolGuid;
-
-#endif

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __UNIT_TEST_HOST_H__
-#define __UNIT_TEST_HOST_H__
+#pragma once
 
 #include "BaseLibInternals.h"
 #include <Library/UnitTestHostBaseLib.h>
@@ -62,5 +61,3 @@ EFIAPI
 UnitTestHostBaseLibGetInterruptState (
   VOID
   );
-
-#endif

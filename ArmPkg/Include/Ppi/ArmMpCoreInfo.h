@@ -6,8 +6,7 @@
 *
 **/
 
-#ifndef ARM_MP_CORE_INFO_PPI_H_
-#define ARM_MP_CORE_INFO_PPI_H_
+#pragma once
 
 #include <Guid/ArmMpCoreInfo.h>
 
@@ -48,5 +47,3 @@ typedef struct {
 
 extern EFI_GUID  gArmMpCoreInfoPpiGuid;
 extern EFI_GUID  gArmMpCoreInfoGuid;
-
-#endif // ARM_MP_CORE_INFO_PPI_H_

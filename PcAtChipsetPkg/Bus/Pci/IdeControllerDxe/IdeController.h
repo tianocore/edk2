@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _IDE_CONTROLLER_H_
-#define _IDE_CONTROLLER_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Protocol/ComponentName.h>
@@ -471,5 +470,3 @@ IdeControllerComponentNameGetControllerName (
   OUT CHAR16                       **ControllerName
   )
 ;
-
-#endif

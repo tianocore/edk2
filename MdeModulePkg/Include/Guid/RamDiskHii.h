@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __RAM_DISK_HII_GUID_H__
-#define __RAM_DISK_HII_GUID_H__
+#pragma once
 
 #define RAM_DISK_FORM_SET_GUID \
   { \
@@ -15,5 +14,3 @@
   }
 
 extern EFI_GUID  gRamDiskFormSetGuid;
-
-#endif

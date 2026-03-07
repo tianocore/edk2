@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __FMP_DEPENDENCY_CHECK_LIB__
-#define __FMP_DEPENDENCY_CHECK_LIB__
+#pragma once
 
 #include <PiDxe.h>
 #include <Protocol/FirmwareManagement.h>
@@ -40,5 +39,3 @@ CheckFmpDependency (
   IN  UINT32                  DependenciesSize,
   OUT UINT32                  *LastAttemptStatus OPTIONAL
   );
-
-#endif

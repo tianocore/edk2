@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __UEFI_MEMORY_ATTRIBUTES_TABLE_H__
-#define __UEFI_MEMORY_ATTRIBUTES_TABLE_H__
+#pragma once
 
 #define EFI_MEMORY_ATTRIBUTES_TABLE_GUID  {\
   0xdcfa911d, 0x26eb, 0x469f, {0xa2, 0x20, 0x38, 0xb7, 0xdc, 0x46, 0x12, 0x20} \
@@ -28,5 +27,3 @@ typedef struct {
 // instruction, such as X86 CET-IBT or ARM BTI.
 
 extern EFI_GUID  gEfiMemoryAttributesTableGuid;
-
-#endif

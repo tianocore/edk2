@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef _SHELLINTERFACE_H_
-#define _SHELLINTERFACE_H_
+#pragma once
 
 #include <Protocol/SimpleFileSystem.h>
 
@@ -84,5 +83,3 @@ typedef struct {
 } EFI_SHELL_INTERFACE;
 
 extern EFI_GUID  gEfiShellInterfaceGuid;
-
-#endif

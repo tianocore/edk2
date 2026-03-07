@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef __EFI_LOAD_FILE2_PROTOCOL_H__
-#define __EFI_LOAD_FILE2_PROTOCOL_H__
+#pragma once
 
 #define EFI_LOAD_FILE2_PROTOCOL_GUID \
   { \
@@ -74,5 +73,3 @@ struct _EFI_LOAD_FILE2_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiLoadFile2ProtocolGuid;
-
-#endif

@@ -29,8 +29,7 @@
 
 **/
 
-#ifndef __EFI_DRIVER_HEALTH_H__
-#define __EFI_DRIVER_HEALTH_H__
+#pragma once
 
 #define EFI_DRIVER_HEALTH_PROTOCOL_GUID \
   { \
@@ -217,5 +216,3 @@ struct _EFI_DRIVER_HEALTH_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiDriverHealthProtocolGuid;
-
-#endif

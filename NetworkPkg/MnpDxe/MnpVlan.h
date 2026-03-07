@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __MNP_VLAN_H__
-#define __MNP_VLAN_H__
+#pragma once
 
 #include "MnpDriver.h"
 
@@ -200,5 +199,3 @@ VlanConfigRemove (
   IN EFI_VLAN_CONFIG_PROTOCOL  *This,
   IN UINT16                    VlanId
   );
-
-#endif

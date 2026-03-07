@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _HASH_LIB_H_
-#define _HASH_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Protocol/Hash.h>
@@ -163,5 +162,3 @@ EFIAPI
 RegisterHashInterfaceLib (
   IN HASH_INTERFACE  *HashInterface
   );
-
-#endif

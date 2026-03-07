@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __E820_H__
-#define __E820_H__
+#pragma once
 
 #pragma pack(1)
 
@@ -34,5 +33,3 @@ typedef struct {
 } EFI_E820_ENTRY;
 
 #pragma pack()
-
-#endif /* __E820_H__ */

@@ -21,6 +21,8 @@
 
 STATIC UINT64  mTimeBase;
 
+#define GET_TIME_BASE()  (mTimeBase ?: GetPerformanceCounterProperties(NULL, NULL))
+
 /**
   Stalls the CPU for at least the given number of ticks.
 
@@ -65,7 +67,7 @@ MicroSecondDelay (
     DivU64x32 (
       MultU64x32 (
         MicroSeconds,
-        mTimeBase
+        GET_TIME_BASE ()
         ),
       1000000u
       )
@@ -93,7 +95,7 @@ NanoSecondDelay (
     DivU64x32 (
       MultU64x32 (
         NanoSeconds,
-        mTimeBase
+        GET_TIME_BASE ()
         ),
       1000000000u
       )
@@ -149,70 +151,7 @@ UINT64
 EFIAPI
 GetPerformanceCounterProperties (
   OUT      UINT64 *StartValue, OPTIONAL
-  OUT      UINT64                    *EndValue     OPTIONAL
-  )
-{
-  if (StartValue != NULL) {
-    *StartValue = 0;
-  }
-
-  if (EndValue != NULL) {
-    *EndValue = 32 - 1;
-  }
-
-  return mTimeBase;
-}
-
-/**
-  Converts elapsed ticks of performance counter to time in nanoseconds.
-
-  This function converts the elapsed ticks of running performance counter to
-  time value in unit of nanoseconds.
-
-  @param  Ticks     The number of elapsed ticks of running performance counter.
-
-  @return The elapsed time in nanoseconds.
-
-**/
-UINT64
-EFIAPI
-GetTimeInNanoSecond (
-  IN      UINT64  Ticks
-  )
-{
-  UINT64  NanoSeconds;
-  UINT32  Remainder;
-
-  //
-  //          Ticks
-  // Time = --------- x 1,000,000,000
-  //        Frequency
-  //
-  NanoSeconds = MultU64x32 (DivU64x32Remainder (Ticks, mTimeBase, &Remainder), 1000000000u);
-
-  //
-  // Frequency < 0x100000000, so Remainder < 0x100000000, then (Remainder * 1,000,000,000)
-  // will not overflow 64-bit.
-  //
-  NanoSeconds += DivU64x32 (MultU64x32 ((UINT64)Remainder, 1000000000u), mTimeBase);
-
-  return NanoSeconds;
-}
-
-/**
-  Constructor function for the Timer Library.
-
-  This constructor function is called early during DXE phase to ensure that
-  GetPerformanceCounterProperties() is invoked and mTimeBase is initialized
-  before any code that depends on it.
-
-  @retval EFI_SUCCESS   The constructor always returns success.
-
-**/
-EFI_STATUS
-EFIAPI
-BaseRiscV64CpuTimerLibConstructor (
-  VOID
+  OUT      UINT64   *EndValue     OPTIONAL
   )
 {
   VOID                    *Hob;
@@ -220,6 +159,18 @@ BaseRiscV64CpuTimerLibConstructor (
   CONST EFI_GUID          SecHobDataGuid = RISCV_SEC_HANDOFF_HOB_GUID;
   UINT64                  TimeBase;
   CONST VOID              *FdtBase;
+
+  if (StartValue != NULL) {
+    *StartValue = 0;
+  }
+
+  if (EndValue != NULL) {
+    *EndValue = MAX_UINT64;
+  }
+
+  if (mTimeBase != 0) {
+    return mTimeBase;
+  }
 
   //
   // Locate the FDT HOB and validate header
@@ -272,6 +223,63 @@ BaseRiscV64CpuTimerLibConstructor (
   // this library is stored in read-only memory.
   //
   mTimeBase = TimeBase;
+
+  return TimeBase;
+}
+
+/**
+  Converts elapsed ticks of performance counter to time in nanoseconds.
+
+  This function converts the elapsed ticks of running performance counter to
+  time value in unit of nanoseconds.
+
+  @param  Ticks     The number of elapsed ticks of running performance counter.
+
+  @return The elapsed time in nanoseconds.
+
+**/
+UINT64
+EFIAPI
+GetTimeInNanoSecond (
+  IN      UINT64  Ticks
+  )
+{
+  UINT64  NanoSeconds;
+  UINT32  Remainder;
+
+  //
+  //          Ticks
+  // Time = --------- x 1,000,000,000
+  //        Frequency
+  //
+  NanoSeconds = MultU64x32 (DivU64x32Remainder (Ticks, GET_TIME_BASE (), &Remainder), 1000000000u);
+
+  //
+  // Frequency < 0x100000000, so Remainder < 0x100000000, then (Remainder * 1,000,000,000)
+  // will not overflow 64-bit.
+  //
+  NanoSeconds += DivU64x32 (MultU64x32 ((UINT64)Remainder, 1000000000u), GET_TIME_BASE ());
+
+  return NanoSeconds;
+}
+
+/**
+  Constructor function for the Timer Library.
+
+  This constructor function is called early during booting to ensure that
+  GetPerformanceCounterProperties() is invoked and mTimeBase is initialized
+  before any code that depends on it.
+
+  @retval EFI_SUCCESS   The constructor always returns success.
+
+**/
+EFI_STATUS
+EFIAPI
+BaseRiscV64CpuTimerLibConstructor (
+  VOID
+  )
+{
+  GetPerformanceCounterProperties (NULL, NULL);
 
   return EFI_SUCCESS;
 }

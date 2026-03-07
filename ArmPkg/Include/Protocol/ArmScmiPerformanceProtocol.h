@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef ARM_SCMI_PERFORMANCE_PROTOCOL_H_
-#define ARM_SCMI_PERFORMANCE_PROTOCOL_H_
+#pragma once
 
 #include <Protocol/ArmScmi.h>
 
@@ -327,5 +326,3 @@ typedef struct _SCMI_PERFORMANCE_PROTOCOL {
   SCMI_PERFORMANCE_LEVEL_GET                LevelGet;
   SCMI_PERFORMANCE_DESCRIBE_FASTCHANNEL     DescribeFastchannel;
 } SCMI_PERFORMANCE_PROTOCOL;
-
-#endif /* ARM_SCMI_PERFORMANCE_PROTOCOL_H_ */

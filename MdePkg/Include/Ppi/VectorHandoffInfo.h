@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef __VECTOR_HANDOFF_INFO_H__
-#define __VECTOR_HANDOFF_INFO_H__
+#pragma once
 
 ///
 /// NOTE: EFI_PEI_VECTOR_HANDOFF_INFO_PPI_GUID can also be used in the PEI Phase
@@ -65,5 +64,3 @@ typedef struct _EFI_PEI_VECTOR_HANDOFF_INFO_PPI {
 } EFI_PEI_VECTOR_HANDOFF_INFO_PPI;
 
 extern EFI_GUID  gEfiVectorHandoffInfoPpiGuid;
-
-#endif

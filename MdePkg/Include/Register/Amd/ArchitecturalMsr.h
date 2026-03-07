@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef AMD_ARCHITECTURAL_MSR_H_
-#define AMD_ARCHITECTURAL_MSR_H_
+#pragma once
 
 /*
   See Appendix A.8, "System Management Mode MSR Cross-Reference".
@@ -51,5 +50,3 @@
 
 */
 #define AMD_64_SMM_MASK  0xC0010113
-
-#endif // AMD_ARCHITECTURAL_MSR_H_

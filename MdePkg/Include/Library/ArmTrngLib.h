@@ -17,8 +17,7 @@
     - TRNG - True Random Number Generator
 **/
 
-#ifndef ARM_TRNG_LIB_H_
-#define ARM_TRNG_LIB_H_
+#pragma once
 
 /** Get the version of the Arm TRNG backend.
 
@@ -102,5 +101,3 @@ GetArmTrngEntropy (
   IN  UINTN  BufferSize,
   OUT UINT8  *Buffer
   );
-
-#endif // ARM_TRNG_LIB_H_

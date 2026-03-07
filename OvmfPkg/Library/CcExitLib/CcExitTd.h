@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef CC_EXIT_TD_H_
-#define CC_EXIT_TD_H_
+#pragma once
 
 #include <Base.h>
 #include <Uefi.h>
@@ -28,5 +27,3 @@ TdVmCallCpuid (
   IN UINT64  Ecx,
   OUT VOID   *Results
   );
-
-#endif

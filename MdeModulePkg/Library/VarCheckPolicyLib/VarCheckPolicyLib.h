@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _VAR_CHECK_POLICY_LIB_H_
-#define _VAR_CHECK_POLICY_LIB_H_
+#pragma once
 
 /**
   Common constructor function of VarCheckPolicyLib to register VarCheck handler
@@ -39,5 +38,3 @@ VarCheckPolicyIsPrimaryBufferValid (
   IN EFI_PHYSICAL_ADDRESS  Buffer,
   IN UINT64                Length
   );
-
-#endif // _VAR_CHECK_POLICY_LIB_H_

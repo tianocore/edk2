@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef LCD_HW_LIB_H_
-#define LCD_HW_LIB_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -58,5 +57,3 @@ VOID
 LcdShutdown (
   VOID
   );
-
-#endif /* LCD_HW_LIB_H_ */

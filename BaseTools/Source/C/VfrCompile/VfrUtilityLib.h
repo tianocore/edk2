@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _VFRUTILITYLIB_H_
-#define _VFRUTILITYLIB_H_
+#pragma once
 
 #include "string.h"
 #include "Common/UefiBaseTypes.h"
@@ -540,5 +539,3 @@ private:
   CVfrStringDB (IN CONST CVfrStringDB&);             // Prevent copy-construction
   CVfrStringDB& operator= (IN CONST CVfrStringDB&);  // Prevent assignment
 };
-
-#endif

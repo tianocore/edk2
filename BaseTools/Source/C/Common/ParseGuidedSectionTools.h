@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_PARSE_GUIDED_SECTION_TOOLS_H
-#define _EFI_PARSE_GUIDED_SECTION_TOOLS_H
+#pragma once
 
 #include <Common/UefiBaseTypes.h>
 
@@ -83,5 +82,3 @@ FreeParsedGuidedSectionToolsHandle (
   IN EFI_HANDLE ParsedGuidedSectionToolsHandle
   )
 ;
-
-#endif

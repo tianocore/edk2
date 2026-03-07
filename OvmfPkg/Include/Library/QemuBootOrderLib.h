@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __QEMU_BOOT_ORDER_LIB_H__
-#define __QEMU_BOOT_ORDER_LIB_H__
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 #include <Base.h>
@@ -106,5 +105,3 @@ EFIAPI
 GetFrontPageTimeoutFromQemu (
   VOID
   );
-
-#endif

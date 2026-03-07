@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _LIB_SMBIOS_VIEW_H_
-#define _LIB_SMBIOS_VIEW_H_
+#pragma once
 
 #include <IndustryStandard/SmBios.h>
 
@@ -149,5 +148,3 @@ LibGetSmbios64BitStructure (
   OUT UINT8       **Buffer,
   OUT UINT16      *Length
   );
-
-#endif

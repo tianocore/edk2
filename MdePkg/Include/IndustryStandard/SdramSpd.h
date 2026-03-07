@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _SDRAM_SPD_H_
-#define _SDRAM_SPD_H_
+#pragma once
 
 #include <IndustryStandard/SdramSpdDdr3.h>
 #include <IndustryStandard/SdramSpdDdr4.h>
@@ -64,5 +63,3 @@
 //
 #define SPD_BUFFERED    0x01
 #define SPD_REGISTERED  0x02
-
-#endif

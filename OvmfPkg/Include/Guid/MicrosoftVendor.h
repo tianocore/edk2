@@ -16,8 +16,7 @@
     <https://msdn.microsoft.com/en-us/ie/dn932805(v=vs.94)>.
 **/
 
-#ifndef MICROSOFT_VENDOR_H_
-#define MICROSOFT_VENDOR_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -51,5 +50,3 @@
   }
 
 extern EFI_GUID  gMicrosoftVendorGuid;
-
-#endif /* MICROSOFT_VENDOR_H_ */

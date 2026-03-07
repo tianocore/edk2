@@ -7,13 +7,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _ELF_32_CONVERT_
-#define _ELF_32_CONVERT_
+#pragma once
 
 BOOLEAN
 InitializeElf32 (
   UINT8               *FileBuffer,
   ELF_FUNCTION_TABLE  *ElfFunctions
   );
-
-#endif

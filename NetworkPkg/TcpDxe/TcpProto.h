@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _TCP_PROTO_H_
-#define _TCP_PROTO_H_
+#pragma once
 
 ///
 /// Tcp states don't change their order. It is used as an
@@ -336,5 +335,3 @@ struct _TCP_CONTROL_BLOCK {
   IP_IO_IP_INFO       *IpInfo;      ///< Pointer reference to Ip used to send pkt
   UINT32              Tick;         ///< 1 tick = 200ms
 };
-
-#endif

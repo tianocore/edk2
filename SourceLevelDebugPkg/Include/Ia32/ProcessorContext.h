@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __PROCESSOR_CONTEXT_H__
-#define __PROCESSOR_CONTEXT_H__
+#pragma once
 
 //
 //  IA-32/x64 processor register index table
@@ -299,5 +298,3 @@ typedef struct {
 } DEBUG_DATA_X64_SYSTEM_CONTEXT;
 
 #pragma pack()
-
-#endif

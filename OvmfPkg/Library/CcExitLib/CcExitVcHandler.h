@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef CC_EXIT_VC_HANDLER_H_
-#define CC_EXIT_VC_HANDLER_H_
+#pragma once
 
 #include <Base.h>
 #include <Uefi.h>
@@ -49,5 +48,3 @@ EFIAPI
 VmgExitIssueAssert (
   IN OUT SEV_ES_PER_CPU_DATA  *SevEsData
   );
-
-#endif
