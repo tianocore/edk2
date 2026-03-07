@@ -10,8 +10,6 @@
 #include "CpuMp.h"
 #include "CpuPageTable.h"
 
-#define CPU_INTERRUPT_NUM  256
-
 //
 // Global Variables
 //
@@ -720,11 +718,11 @@ InitInterruptDescriptorTable (
 
   AsmReadIdtr (&IdtDescriptor);
   IdtEntryCount = (IdtDescriptor.Limit + 1) / sizeof (IA32_IDT_GATE_DESCRIPTOR);
-  if (IdtEntryCount < CPU_INTERRUPT_NUM) {
+  if (IdtEntryCount < X86_CPU_INTERRUPT_NUM) {
     //
     // Increase Interrupt Descriptor Table and Copy the old IDT table in
     //
-    IdtTable = AllocateZeroPool (sizeof (IA32_IDT_GATE_DESCRIPTOR) * CPU_INTERRUPT_NUM);
+    IdtTable = AllocateZeroPool (sizeof (IA32_IDT_GATE_DESCRIPTOR) * X86_CPU_INTERRUPT_NUM);
     ASSERT (IdtTable != NULL);
     CopyMem (IdtTable, (VOID *)IdtDescriptor.Base, sizeof (IA32_IDT_GATE_DESCRIPTOR) * IdtEntryCount);
 
@@ -732,7 +730,7 @@ InitInterruptDescriptorTable (
     // Load Interrupt Descriptor Table
     //
     IdtDescriptor.Base  = (UINTN)IdtTable;
-    IdtDescriptor.Limit = (UINT16)(sizeof (IA32_IDT_GATE_DESCRIPTOR) * CPU_INTERRUPT_NUM - 1);
+    IdtDescriptor.Limit = (UINT16)(sizeof (IA32_IDT_GATE_DESCRIPTOR) * X86_CPU_INTERRUPT_NUM - 1);
     AsmWriteIdtr (&IdtDescriptor);
   }
 
