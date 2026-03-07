@@ -30,11 +30,12 @@ jobs:
           Build.Targets: 'NOOPT'
           Build.Archlist: 'X64'
           Build.ExtraStuartArgs: '--disable-all HostUnitTestCompilerPlugin=run HostBasedUnitTestRunner=run'
-      TARGET_UNIT_TEST:
-        Build.Pkgs: 'ArmPkg,ArmPlatformPkg,MdePkg,UefiCpuPkg,MdeModulePkg,NetworkPkg,RedfishPkg,PcAtChipsetPkg,PrmPkg,ShellPkg,SourceLevelDebugPkg,StandaloneMmPkg,SignedCapsulePkg,FmpDevicePkg,FatPkg,UnitTestFrameworkPkg,DynamicTablesPkg,CryptoPkg,IntelFsp2Pkg,IntelFsp2WrapperPkg,SecurityPkg,ArmVirtPkg,EmulatorPkg,OvmfPkg,UefiPayloadPkg'
-        Build.Targets: 'NOOPT'
-        Build.Archlist: 'X64'
-        Build.ExtraStuartArgs: '--disable-all HostUnitTestCompilerPlugin=run HostBasedUnitTestRunner=run'
+      ${{ if in(parameters.tool_chain_tag, 'GCC', 'VS2022') }}:
+        TARGET_UNIT_TEST:
+          Build.Pkgs: 'ArmPkg,ArmPlatformPkg,MdePkg,UefiCpuPkg,MdeModulePkg,NetworkPkg,RedfishPkg,PcAtChipsetPkg,PrmPkg,ShellPkg,SourceLevelDebugPkg,StandaloneMmPkg,SignedCapsulePkg,FmpDevicePkg,FatPkg,UnitTestFrameworkPkg,DynamicTablesPkg,CryptoPkg,IntelFsp2Pkg,IntelFsp2WrapperPkg,SecurityPkg,ArmVirtPkg,EmulatorPkg,OvmfPkg,UefiPayloadPkg'
+          Build.Targets: 'NOOPT'
+          Build.Archlist: 'X64'
+          Build.ExtraStuartArgs: '--disable-all HostUnitTestCompilerPlugin=run HostBasedUnitTestRunner=run'
       ${{ if eq(parameters.tool_chain_tag, 'GCC') }}:
         TARGET_GCC_ONLY:
           Build.Pkgs: 'EmbeddedPkg'
@@ -93,12 +94,13 @@ jobs:
           Build.Pkgs: 'UefiPayloadPkg'
           Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
           Build.Archlist: 'AARCH64'
-      TARGET_PLATFORMS:
-        # For Platforms only check code. Leave it to Platform CI
-        # to build them.
-        Build.Pkgs: 'ArmVirtPkg,EmulatorPkg,OvmfPkg'
-        Build.Targets: 'NO-TARGET'
-        Build.Archlist: ${{ parameters.arch_list }}
+      ${{ if in(parameters.tool_chain_tag, 'GCC', 'VS2022') }}:
+        TARGET_PLATFORMS:
+          # For Platforms only check code. Leave it to Platform CI
+          # to build them.
+          Build.Pkgs: 'ArmVirtPkg,EmulatorPkg,OvmfPkg'
+          Build.Targets: 'NO-TARGET'
+          Build.Archlist: ${{ parameters.arch_list }}
       ${{ if eq(parameters.tool_chain_tag, 'GCC') }}:
         TARGET_TCGTPM_AARCH64_GCC_ONLY:
           Build.Pkgs: 'TcgTpmPkg'
