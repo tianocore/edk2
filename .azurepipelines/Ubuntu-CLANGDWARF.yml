@@ -17,9 +17,7 @@ schedules:
     - stable/*
   always: true
 
-pr:
-- master
-- stable/*
+pr: none
 
 variables:
   - template: templates/defaults.yml

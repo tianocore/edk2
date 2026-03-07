@@ -19,9 +19,7 @@ schedules:
     - stable/*
   always: true
 
-pr:
-  - master
-  - stable/*
+pr: none
 
 variables:
   - template: ../../../.azurepipelines/templates/defaults.yml
