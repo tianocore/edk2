@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __SPI_CONFIGURATION_PROTOCOL_H__
-#define __SPI_CONFIGURATION_PROTOCOL_H__
+#pragma once
 
 ///
 /// Global ID for the SPI Configuration Protocol
@@ -291,5 +290,3 @@ typedef struct _EFI_SPI_CONFIGURATION_PROTOCOL {
 } EFI_SPI_CONFIGURATION_PROTOCOL;
 
 extern EFI_GUID  gEfiSpiConfigurationProtocolGuid;
-
-#endif // __SPI_CONFIGURATION_PROTOCOL_H__

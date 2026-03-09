@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _CPU_EXCEPTION_COMMON_H_
-#define _CPU_EXCEPTION_COMMON_H_
+#pragma once
 
 #include <Ppi/VectorHandoffInfo.h>
 #include <Protocol/Cpu.h>
@@ -20,8 +19,6 @@
 #include <Library/SynchronizationLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
 
-#define  CPU_EXCEPTION_NUM    32
-#define  CPU_INTERRUPT_NUM    256
 #define  HOOKAFTER_STUB_SIZE  18
 
 //
@@ -320,5 +317,3 @@ EFIAPI
 AsmGetTssTemplateMap (
   OUT EXCEPTION_HANDLER_TEMPLATE_MAP  *AddressMap
   );
-
-#endif

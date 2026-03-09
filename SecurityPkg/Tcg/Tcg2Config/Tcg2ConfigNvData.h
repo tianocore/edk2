@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __TCG2_CONFIG_NV_DATA_H__
-#define __TCG2_CONFIG_NV_DATA_H__
+#pragma once
 
 #include <Guid/HiiPlatformSetupFormset.h>
 #include <Guid/Tcg2ConfigHii.h>
@@ -85,5 +84,3 @@ typedef struct {
 #define TCG2_STORAGE_INFO_NAME      L"TCG2_CONFIGURATION_INFO"
 #define TCG2_DEVICE_DETECTION_NAME  L"TCG2_DEVICE_DETECTION"
 #define TCG2_VERSION_NAME           L"TCG2_VERSION"
-
-#endif

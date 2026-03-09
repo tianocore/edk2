@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef MM_COMMUNICATION3_H_
-#define MM_COMMUNICATION3_H_
+#pragma once
 
 #include <Pi/PiMultiPhase.h>
 
@@ -60,5 +59,3 @@ struct _EFI_MM_COMMUNICATION3_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiMmCommunication3ProtocolGuid;
-
-#endif

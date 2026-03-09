@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef _PLATFORM_SPECIFIC_RESET_NOTIFICATION_PPI_H_
-#define _PLATFORM_SPECIFIC_RESET_NOTIFICATION_PPI_H_
+#pragma once
 
 #include <Protocol/ResetNotification.h>
 
@@ -22,5 +21,3 @@
 typedef EFI_RESET_NOTIFICATION_PROTOCOL EDKII_PLATFORM_SPECIFIC_RESET_NOTIFICATION_PPI;
 
 extern EFI_GUID  gEdkiiPlatformSpecificResetNotificationPpiGuid;
-
-#endif

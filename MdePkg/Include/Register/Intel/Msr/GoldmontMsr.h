@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __GOLDMONT_MSR_H__
-#define __GOLDMONT_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -2486,5 +2485,3 @@ typedef union {
   ///
   UINT64    Uint64;
 } MSR_GOLDMONT_IA32_L2_QOS_MASK_3_REGISTER;
-
-#endif

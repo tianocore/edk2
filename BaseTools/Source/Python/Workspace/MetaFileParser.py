@@ -1702,8 +1702,9 @@ class DscParser(MetaFileParser):
             ValList[Index] = '0'
 
         if (not self._DirectiveEvalStack) or (False not in self._DirectiveEvalStack):
-            GlobalData.gPlatformPcds[TAB_SPLIT.join(self._ValueList[0:2])] = PcdValue
-            self._Symbols[TAB_SPLIT.join(self._ValueList[0:2])] = PcdValue
+            if not self._InSubsection:
+                GlobalData.gPlatformPcds[TAB_SPLIT.join(self._ValueList[0:2])] = PcdValue
+                self._Symbols[TAB_SPLIT.join(self._ValueList[0:2])] = PcdValue
         try:
             self._ValueList[2] = '|'.join(ValList)
         except Exception:

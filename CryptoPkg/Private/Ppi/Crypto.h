@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __EDKII_CRYPTO_PPI_H__
-#define __EDKII_CRYPTO_PPI_H__
+#pragma once
 
 #include <Protocol/Crypto.h>
 
@@ -17,5 +16,3 @@
 typedef EDKII_CRYPTO_PROTOCOL EDKII_CRYPTO_PPI;
 
 extern GUID  gEdkiiCryptoPpiGuid;
-
-#endif

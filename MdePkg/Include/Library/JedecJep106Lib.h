@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef JEDEC_JEP106_LIB_H_
-#define JEDEC_JEP106_LIB_H_
+#pragma once
 
 /**
   Looks up the JEP-106 manufacturer.
@@ -25,5 +24,3 @@ Jep106GetManufacturerName (
   IN UINT8  Code,
   IN UINT8  ContinuationBytes
   );
-
-#endif /* JEDEC_JEP106_LIB_H_ */

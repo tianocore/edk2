@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef TDX_ACPI_TABLE_H_
-#define TDX_ACPI_TABLE_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -58,5 +57,3 @@ AlterAcpiTable (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   );
-
-#endif

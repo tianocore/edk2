@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __IO_LIB_H__
-#define __IO_LIB_H__
+#pragma once
 
 /**
   Macro that converts PCI Segment and I/O Port to an address that can be
@@ -2803,5 +2802,3 @@ MmioWriteBuffer64 (
   IN  UINTN         Length,
   IN  CONST UINT64  *Buffer
   );
-
-#endif

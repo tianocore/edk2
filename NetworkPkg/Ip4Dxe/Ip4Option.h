@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_IP4_OPTION_H__
-#define __EFI_IP4_OPTION_H__
+#pragma once
 
 #define IP4_OPTION_EOP   0
 #define IP4_OPTION_NOP   1
@@ -63,5 +62,3 @@ Ip4CopyOption (
   IN OUT UINT8    *Buf            OPTIONAL,
   IN OUT UINT32   *BufLen
   );
-
-#endif

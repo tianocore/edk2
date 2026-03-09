@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef LIBREDFISH_REDPATH_H_
-#define LIBREDFISH_REDPATH_H_
+#pragma once
 
 #include <Include/Library/RedfishCrtLib.h>
 
@@ -45,5 +44,3 @@ void
 cleanupRedPath (
   redPathNode  *node
   );
-
-#endif

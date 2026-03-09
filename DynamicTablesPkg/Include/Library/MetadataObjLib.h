@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef METADATA_OBJ_LIB_H_
-#define METADATA_OBJ_LIB_H_
+#pragma once
 
 /** Metadata Types
 
@@ -182,5 +181,3 @@ MetadataIterate (
   OUT VOID                  *Metadata,
   IN  UINT32                MetadataSize
   );
-
-#endif // METADATA_OBJ_LIB_H_

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_EDB_SUPPORT_H_
-#define _EFI_EDB_SUPPORT_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -473,5 +472,3 @@ GetFileNameUnderDir (
   IN  CHAR16                     *FileName,
   IN OUT UINTN                   *Index
   );
-
-#endif

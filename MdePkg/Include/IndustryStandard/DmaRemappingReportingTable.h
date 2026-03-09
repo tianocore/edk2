@@ -15,8 +15,7 @@
     - NUMA - Non-uniform Memory Access
 **/
 
-#ifndef _DMA_REMAPPING_REPORTING_TABLE_H_
-#define _DMA_REMAPPING_REPORTING_TABLE_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -325,5 +324,3 @@ typedef struct {
 } EFI_ACPI_DMAR_HEADER;
 
 #pragma pack()
-
-#endif

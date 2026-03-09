@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __HII_BOOT_MAINTENANCE_FORMSET_H__
-#define __HII_BOOT_MAINTENANCE_FORMSET_H__
+#pragma once
 
 ///
 /// Guid define to group the item show on the Boot Menaintenance Manager Menu.
@@ -16,5 +15,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   { 0xb2dedc91, 0xd59f, 0x48d2, { 0x89, 0x8a, 0x12, 0x49, 0xc, 0x74, 0xa4, 0xe0 } }
 
 extern EFI_GUID  gEfiIfrBootMaintenanceGuid;
-
-#endif

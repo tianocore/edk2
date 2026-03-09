@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef __LINUX_BZIMAGE_H__
-#define __LINUX_BZIMAGE_H__
+#pragma once
 
 #define BOOTSIG    0x1FE
 #define SETUP_HDR  0x53726448                   /* 0x53726448 == "HdrS" */
@@ -157,5 +156,3 @@ extern EFI_STATUS
 setup_graphics (
   struct boot_params  *buf
   );
-
-#endif /* __LINUX_BZIMAGE_H__ */

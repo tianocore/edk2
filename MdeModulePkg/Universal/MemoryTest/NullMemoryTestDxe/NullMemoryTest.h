@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _NULL_MEMORY_TEST_H_
-#define _NULL_MEMORY_TEST_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -125,5 +124,3 @@ GenCompatibleRangeTest (
   IN  EFI_PHYSICAL_ADDRESS             StartAddress,
   IN  UINT64                           Length
   );
-
-#endif

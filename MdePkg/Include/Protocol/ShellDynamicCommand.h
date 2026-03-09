@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL_H__
-#define __EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/Shell.h>
 #include <Protocol/ShellParameters.h>
@@ -71,5 +70,3 @@ struct _EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiShellDynamicCommandProtocolGuid;
-
-#endif

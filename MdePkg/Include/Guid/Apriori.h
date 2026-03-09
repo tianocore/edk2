@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __APRIORI_GUID_H__
-#define __APRIORI_GUID_H__
+#pragma once
 
 #define EFI_APRIORI_GUID \
   { \
@@ -20,5 +19,3 @@
   }
 
 extern EFI_GUID  gAprioriGuid;
-
-#endif

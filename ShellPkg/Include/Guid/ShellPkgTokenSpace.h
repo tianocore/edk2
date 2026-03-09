@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _SHELLPKG_TOKEN_SPACE_GUID_H_
-#define _SHELLPKG_TOKEN_SPACE_GUID_H_
+#pragma once
 
 #define EFI_SHELLPKG_TOKEN_SPACE_GUID \
 { \
@@ -15,5 +14,3 @@
 }
 
 extern EFI_GUID  gEfiShellPkgTokenSpaceGuid;
-
-#endif

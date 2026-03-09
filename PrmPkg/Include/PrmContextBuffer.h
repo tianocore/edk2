@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef PRM_CONTEXT_BUFFER_H_
-#define PRM_CONTEXT_BUFFER_H_
+#pragma once
 
 #include <PrmDataBuffer.h>
 #include <PrmMmio.h>
@@ -167,5 +166,3 @@ typedef struct {
 } PRM_MODULE_CONTEXT_BUFFERS;
 
 #pragma pack(pop)
-
-#endif

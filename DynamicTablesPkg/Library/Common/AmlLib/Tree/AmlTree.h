@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef AML_TREE_H_
-#define AML_TREE_H_
+#pragma once
 
 #include <AmlNodeDefines.h>
 
@@ -122,5 +121,3 @@ AmlReplaceArgument (
   IN  AML_NODE_HEADER  *OldNode,
   IN  AML_NODE_HEADER  *NewNode
   );
-
-#endif // AML_TREE_H_

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __EFI_DEBUG_AGENT_GUID_H__
-#define __EFI_DEBUG_AGENT_GUID_H__
+#pragma once
 
 ///
 /// This guid is used as a variable GUID for the capsule variable
@@ -22,5 +21,3 @@
   }
 
 extern EFI_GUID  gEfiDebugAgentGuid;
-
-#endif

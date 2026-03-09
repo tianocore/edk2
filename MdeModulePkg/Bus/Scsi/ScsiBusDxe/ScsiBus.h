@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SCSI_BUS_H_
-#define _SCSI_BUS_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -478,5 +477,3 @@ EFI_STATUS
 DiscoverScsiDevice (
   IN  OUT  SCSI_IO_DEV  *ScsiIoDevice
   );
-
-#endif

@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __CORE_MSR_H__
-#define __CORE_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -1020,5 +1019,3 @@ typedef union {
   ///
   UINT64    Uint64;
 } MSR_CORE_IA32_EFER_REGISTER;
-
-#endif

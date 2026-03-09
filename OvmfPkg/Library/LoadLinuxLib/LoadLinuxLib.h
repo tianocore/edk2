@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _LOAD_LINUX_LIB_INCLUDED_
-#define _LOAD_LINUX_LIB_INCLUDED_
+#pragma once
 
 #include <Uefi.h>
 #include <Library/LoadLinuxLib.h>
@@ -48,5 +47,3 @@ VOID
 SetLinuxDescriptorTables (
   VOID
   );
-
-#endif

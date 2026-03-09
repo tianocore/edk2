@@ -12,8 +12,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _ROOT_BRIDGES_CONNECTED_EVENT_GROUP_H_
-#define _ROOT_BRIDGES_CONNECTED_EVENT_GROUP_H_
+#pragma once
 
 #define ROOT_BRIDGES_CONNECTED_EVENT_GROUP_GUID         \
   { 0x24a2d66f,                                         \
@@ -23,5 +22,3 @@
   }
 
 extern EFI_GUID  gRootBridgesConnectedEventGroupGuid;
-
-#endif

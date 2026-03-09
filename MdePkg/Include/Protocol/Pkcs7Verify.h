@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_PKCS7_VERIFY_PROTOCOL_H__
-#define __EFI_PKCS7_VERIFY_PROTOCOL_H__
+#pragma once
 
 #include <Guid/ImageAuthentication.h>
 
@@ -218,5 +217,3 @@ struct _EFI_PKCS7_VERIFY_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiPkcs7VerifyProtocolGuid;
-
-#endif

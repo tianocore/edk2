@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_USBMASS_IMPL_H_
-#define _EFI_USBMASS_IMPL_H_
+#pragma once
 
 #define  USB_MASS_SIGNATURE  SIGNATURE_32 ('U', 's', 'b', 'M')
 
@@ -321,5 +320,3 @@ UsbMassStorageGetControllerName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **ControllerName
   );
-
-#endif

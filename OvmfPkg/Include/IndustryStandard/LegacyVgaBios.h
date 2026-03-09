@@ -11,8 +11,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __LEGACY_VGA_BIOS_H__
-#define __LEGACY_VGA_BIOS_H__
+#pragma once
 
 #include <Base.h>
 
@@ -125,5 +124,3 @@ typedef struct {
   UINT16    OffScreenSizeKB;
 } VBE2_MODE_INFO;
 #pragma pack ()
-
-#endif

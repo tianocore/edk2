@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef SMM_SW_DISPATCH2_H_
-#define SMM_SW_DISPATCH2_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Protocol/SmmSwDispatch2.h>
@@ -32,5 +31,3 @@ typedef struct {
   UINTN         SwSmiInputValue;
   UINTN         DispatchFunction;
 } EFI_SMM_SW_DISPATCH2_CONTEXT;
-
-#endif

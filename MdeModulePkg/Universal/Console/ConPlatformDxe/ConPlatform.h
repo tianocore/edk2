@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _CON_PLATFORM_H_
-#define _CON_PLATFORM_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -414,5 +413,3 @@ BOOLEAN
 ConPlatformUpdateGopCandidate (
   IN  EFI_DEVICE_PATH_PROTOCOL  *DevicePath
   );
-
-#endif

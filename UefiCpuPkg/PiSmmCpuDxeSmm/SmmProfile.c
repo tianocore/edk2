@@ -747,7 +747,7 @@ InitSmmProfileInternal (
   VOID        *Registration;
   UINTN       Index;
   UINTN       MsrDsAreaSizePerCpu;
-  UINT64      SmmProfileSize;
+  UINTN       SmmProfileSize;
 
   Status        = EFI_SUCCESS;
   mPFEntryCount = (UINTN *)AllocateZeroPool (sizeof (UINTN) * mMaxNumberOfCpus);
@@ -766,13 +766,13 @@ InitSmmProfileInternal (
   //
   mSmmProfileBase = (SMM_PROFILE_HEADER *)(UINTN)GetSmmProfileData (&SmmProfileSize);
   DEBUG ((DEBUG_ERROR, "SmmProfileBase = 0x%016x.\n", (UINTN)mSmmProfileBase));
-  DEBUG ((DEBUG_ERROR, "SmmProfileSize = 0x%016x.\n", (UINTN)SmmProfileSize));
+  DEBUG ((DEBUG_ERROR, "SmmProfileSize = 0x%016x.\n", SmmProfileSize));
 
   if (mBtsSupported) {
     ASSERT (SmmProfileSize > mMsrDsAreaSize);
-    mSmmProfileSize = (UINTN)SmmProfileSize - mMsrDsAreaSize;
+    mSmmProfileSize = SmmProfileSize - mMsrDsAreaSize;
   } else {
-    mSmmProfileSize = (UINTN)SmmProfileSize;
+    mSmmProfileSize = SmmProfileSize;
   }
 
   ASSERT ((mSmmProfileSize & 0xFFF) == 0);

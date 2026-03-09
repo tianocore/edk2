@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_SPI_NOR_FLASH_PROTOCOL_H_
-#define MOCK_SPI_NOR_FLASH_PROTOCOL_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -109,5 +108,3 @@ EFI_SPI_NOR_FLASH_PROTOCOL NAME##_INSTANCE = {          \
   Erase \
 }; \
 EFI_SPI_NOR_FLASH_PROTOCOL   *NAME = &NAME##_INSTANCE;
-
-#endif // MOCK_SPI_NOR_FLASH_PROTOCOL_H_

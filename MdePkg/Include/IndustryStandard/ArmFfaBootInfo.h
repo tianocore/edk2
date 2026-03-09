@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef ARM_FFA_BOOT_INFO_H_
-#define ARM_FFA_BOOT_INFO_H_
+#pragma once
 
 #define FFA_BOOT_INFO_SIGNATURE  0x00000FFA
 
@@ -106,5 +105,3 @@ typedef struct {
   /// Optional Padding
   /// Boot information descriptor array
 } EFI_FFA_BOOT_INFO_HEADER;
-
-#endif

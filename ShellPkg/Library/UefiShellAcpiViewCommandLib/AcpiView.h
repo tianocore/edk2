@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef ACPIVIEW_H_
-#define ACPIVIEW_H_
+#pragma once
 
 /**
   A macro to define the max file name length
@@ -90,5 +89,3 @@ EFIAPI
 AcpiView (
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
-
-#endif // ACPIVIEW_H_

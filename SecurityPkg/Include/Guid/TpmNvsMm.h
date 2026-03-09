@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef TCG2_NVS_MM_H_
-#define TCG2_NVS_MM_H_
+#pragma once
 
 #define MM_TPM_NVS_HOB_GUID \
   { 0xc96c76eb, 0xbc78, 0x429c, { 0x9f, 0x4b, 0xda, 0x51, 0x78, 0xc2, 0x84, 0x57 }}
@@ -64,5 +63,3 @@ typedef struct {
 typedef enum {
   TpmNvsMmExchangeInfo,
 } TPM_NVS_MM_FUNCTION;
-
-#endif // TCG2_NVS_MM_H_

@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __USER_CREDENTIAL_H__
-#define __USER_CREDENTIAL_H__
+#pragma once
 
 #include <Protocol/UserManager.h>
 
@@ -282,5 +281,3 @@ struct _EFI_USER_CREDENTIAL_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiUserCredentialProtocolGuid;
-
-#endif

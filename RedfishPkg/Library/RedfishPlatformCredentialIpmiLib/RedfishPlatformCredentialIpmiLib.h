@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef REDFISH_PLATFORM_CREDENTIAL_IPMI_LIB_H_
-#define REDFISH_PLATFORM_CREDENTIAL_IPMI_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 #include <IndustryStandard/Ipmi.h>
@@ -85,5 +84,3 @@ SetBootstrapAccountCredentialsToVariable (
   IN CHAR8  *BootstrapPassword, OPTIONAL
   IN BOOLEAN DeleteVariable
   );
-
-#endif

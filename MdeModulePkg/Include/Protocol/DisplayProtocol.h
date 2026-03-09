@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __DISPLAY_PROTOCOL_H__
-#define __DISPLAY_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/FormBrowser2.h>
 
@@ -349,4 +348,3 @@ typedef struct {
 } EDKII_FORM_DISPLAY_ENGINE_PROTOCOL;
 
 extern EFI_GUID  gEdkiiFormDisplayEngineProtocolGuid;
-#endif

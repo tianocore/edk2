@@ -6,8 +6,7 @@
 *
 **/
 
-#ifndef ARMGIC_H_
-#define ARMGIC_H_
+#pragma once
 
 //
 // GIC SPI and extended SPI ranges
@@ -185,5 +184,3 @@
 
 #define ARM_GICV5_ARCH_SPI_MIN  0x60000000
 #define ARM_GICV5_ARCH_SPI_MAX  0x60ffffff
-
-#endif // ARMGIC_H_

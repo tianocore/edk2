@@ -17,8 +17,7 @@
 *
 **/
 
-#ifndef ARM_STD_SMC_H_
-#define ARM_STD_SMC_H_
+#pragma once
 
 /*
  * SMC function IDs for Standard Service queries
@@ -247,5 +246,3 @@
 #define SMC64_FUNCTION    (SMC_FASTCALL     | 0x40000000)
 #define SMC_SIP_FUNCTION  (SMC64_FUNCTION   | 0x02000000)
 #define SMC_SIP_FUNCTION_ID(n)  (SMC_SIP_FUNCTION | (n))
-
-#endif // ARM_STD_SMC_H_

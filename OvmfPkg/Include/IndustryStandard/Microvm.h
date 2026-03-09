@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef __MICROVM_H__
-#define __MICROVM_H__
+#pragma once
 
 #define MICROVM_PSEUDO_DEVICE_ID  0xfff1
 
@@ -16,5 +15,3 @@
 #define MICROVM_ACPI_GED_REG_SLEEP_CTL  0x00
 #define MICROVM_ACPI_GED_REG_RESET      0x02
 #define MICROVM_ACPI_GED_RESET_VALUE    0x42
-
-#endif // __MICROVM_H__

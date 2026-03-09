@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _FAT_FMT_H_
-#define _FAT_FMT_H_
+#pragma once
 
 //
 // Definitions
@@ -130,5 +129,3 @@ typedef struct {
 } PEI_FAT_BOOT_SECTOR_EX;
 
 #pragma pack()
-
-#endif

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __INTERNAL_TLS_LIB_H__
-#define __INTERNAL_TLS_LIB_H__
+#pragma once
 
 #undef _WIN32
 #undef _WIN64
@@ -56,5 +55,3 @@ typedef struct {
   BIO      *BioDebug;
   INT32    Ack;
 } TLS_EXT_CTX;
-
-#endif

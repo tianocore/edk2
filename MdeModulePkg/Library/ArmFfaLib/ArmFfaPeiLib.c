@@ -34,6 +34,10 @@
 #include "ArmFfaCommon.h"
 #include "ArmFfaRxTxMap.h"
 
+STATIC UINT16   mPartId;
+STATIC BOOLEAN  mIsFfaSupported;
+STATIC BOOLEAN  mIsPermMemAvailable = FALSE;
+
 /**
   Notification service to be called when gEfiPeiMemoryDiscoveredPpiGuid is installed.
   This function change reamp Rx/Tx buffer with permanent memory from
@@ -102,24 +106,48 @@ ArmFfaPeiLibConstructor (
   EFI_HOB_MEMORY_ALLOCATION  *RxTxBufferAllocationHob;
   UINTN                      Property1;
   UINTN                      Property2;
+  UINT16                     PartId;
+  BOOLEAN                    IsFfaSupported;
 
-  Status = ArmFfaLibCommonInit ();
-  if (EFI_ERROR (Status)) {
-    if (Status == EFI_UNSUPPORTED) {
-      /*
-       * EFI_UNSUPPORTED return from ArmFfaLibCommonInit() means
-       * FF-A interface doesn't support.
-       * However, It doesn't make failure of loading driver/library instance
-       * (i.e) ArmPkg's MmCommunication Dxe/PEI Driver uses as well as SpmMm.
-       * So If FF-A is not supported the the MmCommunication Dxe/PEI falls
-       * back to SpmMm.
-       * For this case, return EFI_SUCCESS.
-
-       */
-      return EFI_SUCCESS;
-    }
-
+  Status = (**PeiServices).RegisterForShadow (FileHandle);
+  if (Status == EFI_NOT_FOUND) {
     return Status;
+  }
+
+  /*
+   * ArmFfaLibCommonInit() sets several pieces of information.
+   * This function should only be called with globals when the PEIM is running in
+   * permanent memory.
+   */
+  if (Status == EFI_ALREADY_STARTED) {
+    mIsPermMemAvailable = TRUE;
+    Status              = ArmFfaLibCommonInit (&mPartId, &mIsFfaSupported);
+    if (EFI_ERROR (Status)) {
+      if (!mIsFfaSupported) {
+        /*
+         * FF-A being unsupported doesn't mean a failure of loading the driver/library
+         * instance (i.e) ArmPkg's MmCommunication Dxe/PEI Driver uses as well as SpmMm.
+         * So If FF-A is not supported the the MmCommunication Dxe/PEI falls back to SpmMm.
+         * For this case, return EFI_SUCCESS.
+         */
+        return EFI_SUCCESS;
+      }
+
+      return Status;
+    }
+  } else {
+    /*
+     * When permanent memory is unavailable, we need to use locals rather
+     * than the globals.
+     */
+    Status = ArmFfaLibCommonInit (&PartId, &IsFfaSupported);
+    if (EFI_ERROR (Status)) {
+      if (!IsFfaSupported) {
+        return EFI_SUCCESS;
+      }
+
+      return Status;
+    }
   }
 
   RxTxBufferHob = GetFirstGuidHob (&gArmFfaRxTxBufferInfoGuid);
@@ -219,4 +247,77 @@ ArmFfaPeiLibConstructor (
   }
 
   return EFI_SUCCESS;
+}
+
+/**
+  Return partition or VM ID
+
+  @param[out] PartId  The partition or VM ID
+
+  @retval EFI_SUCCESS  Partition ID or VM ID returned
+  @retval Others       Errors
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibGetPartId (
+  OUT UINT16  *PartId
+  )
+{
+  if (mIsPermMemAvailable) {
+    *PartId = mPartId;
+    return EFI_SUCCESS;
+  } else {
+    return ArmFfaLibPartitionIdGet (PartId);
+  }
+}
+
+/**
+  Check FF-A support or not.
+
+  @retval TRUE                   Supported
+  @retval FALSE                  Not supported
+
+**/
+BOOLEAN
+EFIAPI
+IsFfaSupported (
+  IN VOID
+  )
+{
+  if (mIsPermMemAvailable) {
+    return mIsFfaSupported;
+  }
+
+  return ArmFfaLibIsFfaSupported ();
+}
+
+/**
+  Callback for when Unmap is called to handle any post unmap
+  functionality. In PEI the Rx/Tx buffer HOB needs to be
+  invalidated.
+
+**/
+VOID
+EFIAPI
+UnmapCallback (
+  IN VOID
+  )
+{
+  EFI_HOB_MEMORY_ALLOCATION  *RxTxBufferAllocationHob;
+
+  /*
+   * Rx/Tx buffers are allocated with continuous pages.
+   * See ArmFfaLibRxTxMap(). If HOB is not found, the Rx/Tx
+   * buffers were not successfully mapped.
+   */
+  RxTxBufferAllocationHob = FindRxTxBufferAllocationHob (TRUE);
+  if (RxTxBufferAllocationHob == NULL) {
+    return;
+  }
+
+  /*
+   * Invalidate the HOB.
+   */
+  ZeroMem (RxTxBufferAllocationHob, sizeof (ARM_FFA_RX_TX_BUFFER_INFO));
 }

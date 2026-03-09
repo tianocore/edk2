@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _SMM_STATUS_CODE_H__
-#define _SMM_STATUS_CODE_H__
+#pragma once
 
 #include <Protocol/MmStatusCode.h>
 
@@ -20,5 +19,3 @@ typedef EFI_MM_STATUS_CODE_PROTOCOL EFI_SMM_STATUS_CODE_PROTOCOL;
 typedef EFI_MM_REPORT_STATUS_CODE EFI_SMM_REPORT_STATUS_CODE;
 
 extern EFI_GUID  gEfiSmmStatusCodeProtocolGuid;
-
-#endif

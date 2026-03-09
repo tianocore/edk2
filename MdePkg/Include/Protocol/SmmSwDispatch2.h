@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _SMM_SW_DISPATCH2_H_
-#define _SMM_SW_DISPATCH2_H_
+#pragma once
 
 #include <Protocol/MmSwDispatch.h>
 #include <Pi/PiSmmCis.h>
@@ -124,5 +123,3 @@ struct _EFI_SMM_SW_DISPATCH2_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiSmmSwDispatch2ProtocolGuid;
-
-#endif

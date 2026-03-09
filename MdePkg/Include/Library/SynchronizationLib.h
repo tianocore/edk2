@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SYNCHRONIZATION_LIB__
-#define __SYNCHRONIZATION_LIB__
+#pragma once
 
 ///
 /// Definitions for SPIN_LOCK
@@ -271,5 +270,3 @@ InterlockedCompareExchangePointer (
   IN      VOID                                 *CompareValue,
   IN      VOID                                 *ExchangeValue
   );
-
-#endif

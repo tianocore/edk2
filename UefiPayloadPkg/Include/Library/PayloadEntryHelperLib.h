@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef PAYLOAD_ENTRY_HELPER_LIB_H_
-#define PAYLOAD_ENTRY_HELPER_LIB_H_
+#pragma once
 
 /**
   Add a new HOB to the HOB List.
@@ -27,5 +26,3 @@ CreateHob (
   IN  UINT16  HobType,
   IN  UINT16  HobLength
   );
-
-#endif // PAYLOAD_ENTRY_HELPER_LIB_H_

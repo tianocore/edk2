@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __BASE_PCI_CAP_LIB_H__
-#define __BASE_PCI_CAP_LIB_H__
+#pragma once
 
 #include <Library/OrderedCollectionLib.h>
 
@@ -50,5 +49,3 @@ struct PCI_CAP {
 struct PCI_CAP_LIST {
   ORDERED_COLLECTION    *Capabilities;
 };
-
-#endif // __BASE_PCI_CAP_LIB_H__

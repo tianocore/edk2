@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __ZERO_GUID_H__
-#define __ZERO_GUID_H__
+#pragma once
 
 #define ZERO_GUID \
   { \
@@ -15,5 +14,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   }
 
 extern EFI_GUID  gZeroGuid;
-
-#endif

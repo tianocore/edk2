@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __QEMU_FW_CFG_LIB_INTERNAL_H__
-#define __QEMU_FW_CFG_LIB_INTERNAL_H__
+#pragma once
 
 #include <Base.h>
 #include <Uefi/UefiMultiPhase.h>
@@ -176,5 +175,3 @@ EFI_STATUS
 InternalQemuFwCfgInitCache (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
-
-#endif

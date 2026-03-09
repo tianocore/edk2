@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __VIRT_NOR_FLASH_DXE__
-#define __VIRT_NOR_FLASH_DXE__
+#pragma once
 
 #include <Base.h>
 #include <PiDxe.h>
@@ -152,5 +151,3 @@ EFIAPI
 NorFlashFvbInitialize (
   IN NOR_FLASH_INSTANCE  *Instance
   );
-
-#endif /* __VIRT_NOT_FLASH_DXE__ */

@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __CAPSULE_LIB_H__
-#define __CAPSULE_LIB_H__
+#pragma once
 
 //
 // BOOLEAN Variable to indicate whether system is in the capsule on disk state.
@@ -156,5 +155,3 @@ EFIAPI
 CoDRemoveTempFile (
   UINTN  MaxRetry
   );
-
-#endif

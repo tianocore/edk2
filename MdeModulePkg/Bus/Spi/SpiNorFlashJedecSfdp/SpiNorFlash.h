@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef SPI_NOR_FLASH_H_
-#define SPI_NOR_FLASH_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Protocol/SpiNorFlash.h>
@@ -288,5 +287,3 @@ Erase (
   IN UINT32                            FlashAddress,
   IN UINT32                            BlockCount
   );
-
-#endif // SPI_NOR_FLASH_H_

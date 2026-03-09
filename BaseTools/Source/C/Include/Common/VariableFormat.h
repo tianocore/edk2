@@ -7,6 +7,8 @@
 
 **/
 
+#pragma once
+
 #ifndef __VARIABLE_FORMAT_H__
 #define __VARIABLE_FORMAT_H__
 
@@ -41,4 +43,4 @@ typedef struct {
 
 #pragma pack()
 
-#endif // _EFI_VARIABLE_H_
+#endif

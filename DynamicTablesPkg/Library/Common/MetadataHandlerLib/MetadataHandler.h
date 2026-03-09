@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef METADATA_HANDLER_H_
-#define METADATA_HANDLER_H_
+#pragma once
 
 /** Query the MetadataObjLib for metadata matching the input (Type/Token).
     If the metadata exists, return it.
@@ -140,5 +139,3 @@ EFIAPI
 MetadataValidateProximityDomain (
   IN  METADATA_ROOT_HANDLE  Root
   );
-
-#endif // METADATA_HANDLER_H_

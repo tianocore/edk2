@@ -8,8 +8,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef FIRST_SMI_HANDLER_CONTEXT_H_
-#define FIRST_SMI_HANDLER_CONTEXT_H_
+#pragma once
 
 //
 // The following structure is used to communicate between the SMM Monarch
@@ -51,5 +50,3 @@ typedef struct {
   UINT8     AboutToLeaveSmm;
 } FIRST_SMI_HANDLER_CONTEXT;
 #pragma pack ()
-
-#endif // FIRST_SMI_HANDLER_CONTEXT_H_

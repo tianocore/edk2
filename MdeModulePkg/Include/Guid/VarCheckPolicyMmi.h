@@ -6,8 +6,7 @@ Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _VAR_CHECK_POLICY_MMI_COMMON_H_
-#define _VAR_CHECK_POLICY_MMI_COMMON_H_
+#pragma once
 
 #define   VAR_CHECK_POLICY_COMM_SIG       SIGNATURE_32('V', 'C', 'P', 'C')
 #define   VAR_CHECK_POLICY_COMM_REVISION  1
@@ -79,5 +78,3 @@ STATIC_ASSERT (
 #define   VAR_CHECK_POLICY_COMMAND_LOCK                     0x0005
 #define   VAR_CHECK_POLICY_COMMAND_GET_INFO                 0x0006
 #define   VAR_CHECK_POLICY_COMMAND_GET_LOCK_VAR_STATE_INFO  0x0007
-
-#endif // _VAR_CHECK_POLICY_MMI_COMMON_H_

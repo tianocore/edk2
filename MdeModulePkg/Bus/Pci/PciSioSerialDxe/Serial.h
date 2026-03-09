@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SERIAL_H_
-#define _SERIAL_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -781,5 +780,3 @@ BOOLEAN
 IsUartFlowControlDevicePathNode (
   IN UART_FLOW_CONTROL_DEVICE_PATH  *FlowControl
   );
-
-#endif

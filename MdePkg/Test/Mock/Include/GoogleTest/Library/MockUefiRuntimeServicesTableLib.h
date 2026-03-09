@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_UEFI_RUNTIME_SERVICES_TABLE_LIB_H_
-#define MOCK_UEFI_RUNTIME_SERVICES_TABLE_LIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -45,5 +44,3 @@ struct MockUefiRuntimeServicesTableLib {
      OUT  EFI_TIME_CAPABILITIES       *Capabilities OPTIONAL)
     );
 };
-
-#endif

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _FSP_MULTIPHASE_LIB_H_
-#define _FSP_MULTIPHASE_LIB_H_
+#pragma once
 
 EFI_STATUS
 EFIAPI
@@ -51,5 +50,3 @@ FspMultiPhaseSiInitApiHandlerV2 (
   IN UINT32  ApiIdx,
   IN VOID    *ApiParam
   );
-
-#endif

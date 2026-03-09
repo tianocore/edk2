@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_IP6_IF_H__
-#define __EFI_IP6_IF_H__
+#pragma once
 
 #define IP6_LINK_RX_SIGNATURE    SIGNATURE_32 ('I', 'P', '6', 'R')
 #define IP6_LINK_TX_SIGNATURE    SIGNATURE_32 ('I', 'P', '6', 'T')
@@ -255,5 +254,3 @@ Ip6TimerTicking (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   );
-
-#endif

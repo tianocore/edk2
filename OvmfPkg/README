@@ -54,11 +54,11 @@ these binary outputs:
   - This file is not built separately any longer, starting with svn r13520.
 
 If you are new to building in edk2 or looking for the latest build
-instructions, visit https://github.com/tianocore/tianocore.github.io/wiki/Build-Instructions
+instructions, visit <https://www.tianocore.org/tianocore-wiki.github.io/build-tooling/build-workflows/build_instructions.html>
 
 More OVMF-specific build information can be found at:
 
-https://github.com/tianocore/tianocore.github.io/wiki/How%20to%20build%20OVMF
+[How to Build OVMF](https://www.tianocore.org/tianocore-wiki.github.io/development/tutorials-howto/how_to_build_ovmf.html)
 
 === RUNNING OVMF on QEMU ===
 

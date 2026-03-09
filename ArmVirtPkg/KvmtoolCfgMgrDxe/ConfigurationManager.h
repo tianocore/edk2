@@ -9,8 +9,7 @@
     - Obj or OBJ - Object
 **/
 
-#ifndef CONFIGURATION_MANAGER_H_
-#define CONFIGURATION_MANAGER_H_
+#pragma once
 
 ///
 /// C array containing the compiled AML template.
@@ -121,5 +120,3 @@ typedef struct PlatformRepositoryInfo {
   ///
   HW_INFO_PARSER_HANDLE                           FdtParserHandle;
 } EDKII_PLATFORM_REPOSITORY_INFO;
-
-#endif // CONFIGURATION_MANAGER_H_

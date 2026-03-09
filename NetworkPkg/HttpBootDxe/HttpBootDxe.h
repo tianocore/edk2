@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_HTTP_BOOT_DXE_H__
-#define __EFI_HTTP_BOOT_DXE_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -535,5 +534,3 @@ HttpBootIp6DxeDriverBindingStop (
   IN UINTN                        NumberOfChildren,
   IN EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
   );
-
-#endif

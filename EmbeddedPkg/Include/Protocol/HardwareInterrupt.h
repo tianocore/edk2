@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __HARDWARE_INTERRUPT_H__
-#define __HARDWARE_INTERRUPT_H__
+#pragma once
 
 #include <Protocol/DebugSupport.h>
 
@@ -148,5 +147,3 @@ struct _EFI_HARDWARE_INTERRUPT_PROTOCOL {
 };
 
 extern EFI_GUID  gHardwareInterruptProtocolGuid;
-
-#endif

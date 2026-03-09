@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __FSP_NON_VOLATILE_STORAGE_HOB2_H__
-#define __FSP_NON_VOLATILE_STORAGE_HOB2_H__
+#pragma once
 
 ///
 /// The Non-Volatile Storage (NVS) HOB version 2 provides > 64KB buffer support.
@@ -20,5 +19,3 @@ typedef struct {
 } FSP_NON_VOLATILE_STORAGE_HOB2;
 
 extern EFI_GUID  gFspNonVolatileStorageHob2Guid;
-
-#endif

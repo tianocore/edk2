@@ -96,6 +96,9 @@ APRIORI PEI {
 #
 #  PEI Phase modules
 #
+!if $(DEBUG_TO_MEM)
+  INF  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
+!endif
 INF  MdeModulePkg/Core/Pei/PeiMain.inf
 INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 INF  MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf

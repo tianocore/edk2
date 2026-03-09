@@ -13,8 +13,7 @@ Abstract:
 
 **/
 
-#ifndef _HOST_H_
-#define _HOST_H_
+#pragma once
 
 #include <stdio.h>
 #include <time.h>
@@ -211,5 +210,3 @@ extern EMU_IO_THUNK_PROTOCOL  mWinNtWndThunkIo;
 extern EMU_IO_THUNK_PROTOCOL  mWinNtFileSystemThunkIo;
 extern EMU_IO_THUNK_PROTOCOL  mWinNtBlockIoThunkIo;
 extern EMU_IO_THUNK_PROTOCOL  mWinNtSnpThunkIo;
-
-#endif

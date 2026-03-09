@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef ARM_FFA_LIB_H_
-#define ARM_FFA_LIB_H_
+#pragma once
 
 #include <IndustryStandard/ArmFfaSvc.h>
 #include <IndustryStandard/ArmFfaBootInfo.h>
@@ -343,6 +342,26 @@ ArmFfaLibSpmIdGet (
   );
 
 /**
+  Invoked by an endpoint to yield control back to the component
+  that called it. This prevents long running transactions from
+  being caught up in the secure world. Endpoint will need to be
+  invoked with FFA_RUN after the specified timeout.
+
+  @param [in]   TimeoutUs    The timeout indicating the time in which
+                             the endpoint is required to be run in
+                             microseconds.
+
+  @return EFI_SUCCESS
+  @return Other              Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibYield (
+  IN  UINT64  TimeoutUs
+  );
+
+/**
   Restore context which interrupted with FFA_INTERRUPT (EFI_INTERRUPT_PENDING).
 
   @param [in]   PartId       Partition id
@@ -424,5 +443,3 @@ ArmFfaLibGetPartitionInfo (
   IN EFI_GUID                 *ServiceGuid,
   OUT EFI_FFA_PART_INFO_DESC  *PartDesc
   );
-
-#endif // ARM_FFA_LIB_H_

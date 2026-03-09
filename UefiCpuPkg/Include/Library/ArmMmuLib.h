@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef ARM_MMU_LIB_H_
-#define ARM_MMU_LIB_H_
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 
@@ -83,5 +82,3 @@ BOOLEAN
 ArmLpa2Enabled (
   VOID
   );
-
-#endif // ARM_MMU_LIB_H_

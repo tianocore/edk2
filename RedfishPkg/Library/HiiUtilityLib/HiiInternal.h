@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef HII_INTERNAL_H_
-#define HII_INTERNAL_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -372,5 +371,3 @@ EFI_STATUS
 ParseOpCodes (
   IN HII_FORMSET  *FormSet
   );
-
-#endif // HII_INTERNAL_H_
