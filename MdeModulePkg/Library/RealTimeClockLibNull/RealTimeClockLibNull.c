@@ -12,7 +12,8 @@
 
 **/
 
-#include <Uefi.h>
+#include <Uefi/UefiBaseType.h>
+#include <Uefi/UefiSpec.h>
 #include <Library/RealTimeClockLib.h>
 
 /**
