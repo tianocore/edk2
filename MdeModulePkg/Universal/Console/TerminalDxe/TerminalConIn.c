@@ -168,10 +168,23 @@ IsKeyRegistered (
   IN EFI_KEY_DATA  *InputData
   )
 {
+  UINT32  ShiftState;
+  UINT32  InputShiftState;
+
   ASSERT (RegsiteredData != NULL && InputData != NULL);
 
   if ((RegsiteredData->Key.ScanCode    != InputData->Key.ScanCode) ||
       (RegsiteredData->Key.UnicodeChar != InputData->Key.UnicodeChar))
+  {
+    return FALSE;
+  }
+
+  /* Do not take EFI_SHIFT_STATE_VALID flag into account when comparing shift states */
+  ShiftState      = RegsiteredData->KeyState.KeyShiftState | EFI_SHIFT_STATE_VALID;
+  InputShiftState = InputData->KeyState.KeyShiftState | EFI_SHIFT_STATE_VALID;
+
+  if ((ShiftState != InputShiftState) ||
+      (RegsiteredData->KeyState.KeyToggleState != InputData->KeyState.KeyToggleState))
   {
     return FALSE;
   }
@@ -337,6 +350,7 @@ TerminalConInRegisterKeyNotify (
   LIST_ENTRY                     *Link;
   LIST_ENTRY                     *NotifyList;
   TERMINAL_CONSOLE_IN_EX_NOTIFY  *CurrentNotify;
+  UINT32                         ShiftState;
 
   if ((KeyData == NULL) || (NotifyHandle == NULL) || (KeyNotificationFunction == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -361,6 +375,29 @@ TerminalConInRegisterKeyNotify (
         return EFI_SUCCESS;
       }
     }
+  }
+
+  //
+  // Some components might set only EFI_SHIFT_STATE_VALID flag in KeyShiftState.
+  // Treat such shift state as zero.
+  //
+  ShiftState = KeyData->KeyState.KeyShiftState & ~EFI_SHIFT_STATE_VALID;
+  if ((ShiftState != 0) || (KeyData->KeyState.KeyToggleState != 0)) {
+    //
+    // Shift state and toggle state are not transferred via serial lines, so
+    // the notification functions for the keys with nonzero KeyShiftState or
+    // KeyToggleState will never trigger with this implementation of SimpleTextInEx
+    // protocol.
+    //
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: Attempt to register notifier for the key 0x%04x (scan code 0x%04x) with shift state 0x%08x and toggle state 0x%02x.\n",
+      __func__,
+      KeyData->Key.UnicodeChar,
+      KeyData->Key.ScanCode,
+      KeyData->KeyState.KeyShiftState,
+      KeyData->KeyState.KeyToggleState
+      ));
   }
 
   //
