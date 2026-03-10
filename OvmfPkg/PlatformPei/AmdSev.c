@@ -23,8 +23,14 @@
 #include <Register/Intel/SmramSaveStateMap.h>
 #include <Library/CcExitLib.h>
 #include <ConfidentialComputingGuestAttr.h>
+#include <IndustryStandard/IgvmData.h>
 
 #include "Platform.h"
+
+//
+// Maximum number of IGVM data ranges to track for pre-validation skip.
+//
+#define MAX_IGVM_DATA_RANGES  16
 
 STATIC
 UINT64
@@ -114,6 +120,73 @@ AmdSevSnpGetApicIds (
 }
 
 /**
+  Validate a system RAM range while skipping sub-ranges that were
+  pre-validated by IGVM PageData directives (SNP_LAUNCH_UPDATE).
+
+  @param[in]  RangeBase       Start of the system RAM range
+  @param[in]  RangeEnd        End of the system RAM range
+  @param[in]  IgvmBase        Array of IGVM data range start addresses
+  @param[in]  IgvmEnd         Array of IGVM data range end addresses
+  @param[in]  IgvmCount       Number of IGVM data ranges
+
+**/
+STATIC
+VOID
+ValidateRamSkipIgvm (
+  IN PHYSICAL_ADDRESS  RangeBase,
+  IN PHYSICAL_ADDRESS  RangeEnd,
+  IN PHYSICAL_ADDRESS  *IgvmBase,
+  IN PHYSICAL_ADDRESS  *IgvmEnd,
+  IN UINTN             IgvmCount
+  )
+{
+  PHYSICAL_ADDRESS  Current;
+  PHYSICAL_ADDRESS  SkipStart;
+  PHYSICAL_ADDRESS  SkipEnd;
+  UINTN             Index;
+
+  Current = RangeBase;
+
+  while (Current < RangeEnd) {
+    //
+    // Find the earliest IGVM range that overlaps [Current, RangeEnd).
+    //
+    SkipStart = RangeEnd;
+    SkipEnd   = RangeEnd;
+
+    for (Index = 0; Index < IgvmCount; Index++) {
+      if (IgvmEnd[Index] <= Current) {
+        continue;
+      }
+
+      if (IgvmBase[Index] >= RangeEnd) {
+        continue;
+      }
+
+      if (IgvmBase[Index] < SkipStart) {
+        SkipStart = MAX (IgvmBase[Index], Current);
+        SkipEnd   = MIN (IgvmEnd[Index], RangeEnd);
+      }
+    }
+
+    //
+    // Validate [Current, SkipStart) -- the region before the IGVM data.
+    //
+    if (SkipStart > Current) {
+      MemEncryptSevSnpPreValidateSystemRam (
+        Current,
+        EFI_SIZE_TO_PAGES (SkipStart - Current)
+        );
+    }
+
+    //
+    // Skip past the IGVM data range.
+    //
+    Current = SkipEnd;
+  }
+}
+
+/**
   Initialize SEV-SNP support if running as an SEV-SNP guest.
 
 **/
@@ -127,6 +200,9 @@ AmdSevSnpInitialize (
   EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceHob;
   UINT64                       HvFeatures;
   EFI_STATUS                   PcdStatus;
+  PHYSICAL_ADDRESS             IgvmBase[MAX_IGVM_DATA_RANGES];
+  PHYSICAL_ADDRESS             IgvmEnd[MAX_IGVM_DATA_RANGES];
+  UINTN                        IgvmCount;
 
   if (!MemEncryptSevSnpIsEnabled ()) {
     return;
@@ -141,6 +217,31 @@ AmdSevSnpInitialize (
   ASSERT_RETURN_ERROR (PcdStatus);
 
   //
+  // Collect IGVM data ranges. These pages were already validated by the
+  // VMM via SNP_LAUNCH_UPDATE and must not be validated again.
+  //
+  IgvmCount = 0;
+  for (Hob.Raw = GetFirstGuidHob (&gEfiIgvmDataHobGuid);
+       (Hob.Raw != NULL) && (IgvmCount < MAX_IGVM_DATA_RANGES);
+       Hob.Raw = GetNextGuidHob (&gEfiIgvmDataHobGuid, GET_NEXT_HOB (Hob)))
+  {
+    EFI_IGVM_DATA_HOB  *IgvmData;
+
+    IgvmData = GET_GUID_HOB_DATA (Hob.Guid);
+    IgvmBase[IgvmCount] = IgvmData->Address;
+    IgvmEnd[IgvmCount]  = IgvmData->Address +
+                           ALIGN_VALUE (IgvmData->Length, EFI_PAGE_SIZE);
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: IGVM pre-validated range [0x%lx, 0x%lx)\n",
+      __func__,
+      IgvmBase[IgvmCount],
+      IgvmEnd[IgvmCount]
+      ));
+    IgvmCount++;
+  }
+
+  //
   // Iterate through the system RAM and validate it.
   //
   for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
@@ -153,10 +254,20 @@ AmdSevSnpInitialize (
           continue;
         }
 
-        MemEncryptSevSnpPreValidateSystemRam (
-          ResourceHob->PhysicalStart,
-          EFI_SIZE_TO_PAGES ((UINTN)ResourceHob->ResourceLength)
-          );
+        if (IgvmCount > 0) {
+          ValidateRamSkipIgvm (
+            ResourceHob->PhysicalStart,
+            ResourceHob->PhysicalStart + ResourceHob->ResourceLength,
+            IgvmBase,
+            IgvmEnd,
+            IgvmCount
+            );
+        } else {
+          MemEncryptSevSnpPreValidateSystemRam (
+            ResourceHob->PhysicalStart,
+            EFI_SIZE_TO_PAGES ((UINTN)ResourceHob->ResourceLength)
+            );
+        }
       }
     }
   }
