@@ -26,8 +26,40 @@ CHAR16                 mPopUpString[100];
 
 OPAL_DRIVER  mOpalDriver;
 
-STATIC EFI_DEVICE_PATH_PROTOCOL  *mS3InitDevicesCache       = NULL;
+STATIC EFI_DEVICE_PATH_PROTOCOL  *mS3InitDevicesCache      = NULL;
 STATIC UINTN                     mS3InitDevicesCacheLength = 0;
+
+STATIC
+VOID
+BuildOpalDeviceInfo (
+  VOID
+  );
+
+STATIC
+UINT16
+RefreshOpalBaseComId (
+  IN OUT OPAL_DRIVER_DEVICE  *Dev
+  )
+{
+  TCG_RESULT                   TcgResult;
+  OPAL_SESSION                 Session;
+  OPAL_DISK_SUPPORT_ATTRIBUTE  SupportedAttributes;
+  UINT16                       BaseComId;
+
+  ASSERT (Dev != NULL);
+
+  ZeroMem (&Session, sizeof (Session));
+  Session.Sscp    = Dev->Sscp;
+  Session.MediaId = Dev->MediaId;
+
+  BaseComId = Dev->OpalDisk.OpalBaseComId;
+  TcgResult = OpalGetSupportedAttributesInfo (&Session, &SupportedAttributes, &BaseComId);
+  if (TcgResult == TcgResultSuccess) {
+    Dev->OpalDisk.OpalBaseComId = BaseComId;
+  }
+
+  return Dev->OpalDisk.OpalBaseComId;
+}
 
 STATIC
 VOID
@@ -244,6 +276,8 @@ OpalSupportUpdatePassword (
 {
   CopyMem (OpalDisk->Password, Password, PasswordLength);
   OpalDisk->PasswordLength = (UINT8)PasswordLength;
+
+  BuildOpalDeviceInfo ();
 }
 
 /**
@@ -401,7 +435,7 @@ BuildOpalDeviceInfo (
       TempDevInfo
       );
     TempDevInfo->Length        = DevInfoLength;
-    TempDevInfo->OpalBaseComId = TmpDev->OpalDisk.OpalBaseComId;
+    TempDevInfo->OpalBaseComId = RefreshOpalBaseComId (TmpDev);
     CopyMem (
       TempDevInfo->Password,
       TmpDev->OpalDisk.Password,
