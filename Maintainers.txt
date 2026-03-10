@@ -243,6 +243,7 @@ F: IntelFsp2Pkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/intel_fsp2_pkg.html
 M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
+M: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 R: Ted Kuo <ted.kuo@intel.com> [tedkuo1]
 R: Ashraf Ali S <ashraf.ali.s@intel.com> [AshrafAliS]
@@ -362,7 +363,7 @@ F: MdeModulePkg/*Smi*/
 F: MdeModulePkg/*Smm*/
 F: MdeModulePkg/Include/*Smi*.h
 F: MdeModulePkg/Include/*Smm*.h
-R: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
+R: Jiaxin Wu <jiaxin.wu@amd.com> [jiaxinwu]
 R: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
 
@@ -659,7 +660,7 @@ M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 M: Kun Qin <kun.qin@microsoft.com> [kuqin12]
-R: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
+R: Jiaxin Wu <jiaxin.wu@amd.com> [jiaxinwu]
 R: Dun Tan <dun.tan@intel.com> [td36]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 R: Eduardo Cuevas Farfan <eduardo.cuevas.farfan@intel.com> [ecuevasf]
@@ -673,7 +674,7 @@ UefiCpuPkg
 F: UefiCpuPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/uefi_cpu_pkg.html
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
-M: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
+M: Jiaxin Wu <jiaxin.wu@amd.com> [jiaxinwu]
 R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]
 R: Dun Tan <dun.tan@intel.com> [td36]
 R: Arun Subramanian Baskaran <arun.subramanian.baskaran@intel.com> [arunsbaskaran]

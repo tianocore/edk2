@@ -52,21 +52,6 @@ typedef VOID (*LINE_OPERATION)(
   );
 
 //
-// ARM Processor Mode
-//
-typedef enum {
-  ARM_PROCESSOR_MODE_USER       = 0x10,
-  ARM_PROCESSOR_MODE_FIQ        = 0x11,
-  ARM_PROCESSOR_MODE_IRQ        = 0x12,
-  ARM_PROCESSOR_MODE_SUPERVISOR = 0x13,
-  ARM_PROCESSOR_MODE_ABORT      = 0x17,
-  ARM_PROCESSOR_MODE_HYP        = 0x1A,
-  ARM_PROCESSOR_MODE_UNDEFINED  = 0x1B,
-  ARM_PROCESSOR_MODE_SYSTEM     = 0x1F,
-  ARM_PROCESSOR_MODE_MASK       = 0x1F
-} ARM_PROCESSOR_MODE;
-
-//
 // ARM Cpu IDs
 //
 #define ARM_CPU_IMPLEMENTER_MASK      (0xFFU << 24)
@@ -334,20 +319,8 @@ ArmUpdateTranslationTableEntry (
 
 VOID
 EFIAPI
-ArmSetDomainAccessControl (
-  IN  UINT32  Domain
-  );
-
-VOID
-EFIAPI
 ArmSetTTBR0 (
   IN  VOID  *TranslationTableBase
-  );
-
-VOID
-EFIAPI
-ArmSetTTBCR (
-  IN  UINT32  Bits
   );
 
 VOID *
@@ -359,30 +332,6 @@ ArmGetTTBR0BaseAddress (
 BOOLEAN
 EFIAPI
 ArmMmuEnabled (
-  VOID
-  );
-
-VOID
-EFIAPI
-ArmEnableBranchPrediction (
-  VOID
-  );
-
-VOID
-EFIAPI
-ArmDisableBranchPrediction (
-  VOID
-  );
-
-VOID
-EFIAPI
-ArmSetLowVectors (
-  VOID
-  );
-
-VOID
-EFIAPI
-ArmSetHighVectors (
   VOID
   );
 

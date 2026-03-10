@@ -240,7 +240,7 @@ ArchSetupExceptionStack (
     // Set the IST field to enable corresponding IST
     //
     Vector = StackSwitchExceptions[Index];
-    if ((Vector >= CPU_EXCEPTION_NUM) ||
+    if ((Vector >= X86_CPU_INTERRUPT_NUM) ||
         (Vector >= (Idtr.Limit + 1) / sizeof (IA32_IDT_GATE_DESCRIPTOR)))
     {
       continue;
