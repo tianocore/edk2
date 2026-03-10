@@ -940,9 +940,10 @@ typedef struct {
 //
 // Memory Flags.  All other bits are reserved and must be 0.
 //
-#define EFI_ACPI_6_6_MEMORY_ENABLED        (1 << 0)
-#define EFI_ACPI_6_6_MEMORY_HOT_PLUGGABLE  (1 << 1)
-#define EFI_ACPI_6_6_MEMORY_NONVOLATILE    (1 << 2)
+#define EFI_ACPI_6_6_MEMORY_ENABLED           (1 << 0)
+#define EFI_ACPI_6_6_MEMORY_HOT_PLUGGABLE     (1 << 1)
+#define EFI_ACPI_6_6_MEMORY_NONVOLATILE       (1 << 2)
+#define EFI_ACPI_6_6_MEMORY_SPECIFIC_PURPOSE  (1 << 3)
 
 ///
 /// Processor Local x2APIC Affinity Structure Definition
@@ -2456,9 +2457,15 @@ typedef struct {
   UINT8                                                                  Reserved1[4];
   UINT64                                                                 MemorySideCacheSize;
   EFI_ACPI_6_6_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO_CACHE_ATTRIBUTES    CacheAttributes;
-  UINT8                                                                  Reserved2[2];
+  UINT16                                                                 AddressMode;
   UINT16                                                                 NumberOfSmbiosHandles;
 } EFI_ACPI_6_6_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO;
+
+///
+/// Memory Side Cache Information Structure flags
+///
+#define EFI_ACPI_6_6_HMAT_RESERVED_ADDRESS_MODE         0
+#define EFI_ACPI_6_6_HMAT_EXTENDED_LINEAR_ADDRESS_MODE  1
 
 ///
 /// ERST - Error Record Serialization Table
