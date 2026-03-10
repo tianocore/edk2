@@ -23,6 +23,7 @@
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
+#include <Library/SafeIntLib.h>
 
 #include <IndustryStandard/ArmFfaSvc.h>
 #include <IndustryStandard/ArmFfaPartInfo.h>
@@ -509,6 +510,46 @@ ErrorHandler:
   }
 
   return Status;
+}
+
+/**
+  Invoked by an endpoint to yield control back to the component
+  that called it. This prevents long running transactions from
+  being caught up in the secure world. Endpoint will need to be
+  invoked with FFA_RUN after the specified timeout.
+
+  @param [in]   TimeoutUs    The timeout indicating the time in which
+                             the endpoint is required to be run in
+                             microseconds.
+
+  @return EFI_SUCCESS
+  @return Other              Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibYield (
+  IN  UINT64  TimeoutUs
+  )
+{
+  ARM_FFA_ARGS   FfaArgs;
+  UINT64         TimeoutNs;
+  RETURN_STATUS  ReturnStatus;
+
+  ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
+
+  ReturnStatus = SafeUint64Mult (TimeoutUs, 1000, &TimeoutNs);
+  if (ReturnStatus != RETURN_SUCCESS) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  FfaArgs.Arg0 = ARM_FID_FFA_YIELD;
+  FfaArgs.Arg2 = (UINT32)TimeoutNs;
+  FfaArgs.Arg3 = (UINT32)(TimeoutNs >> 32);
+
+  ArmCallFfa (&FfaArgs);
+
+  return FfaArgsToEfiStatus (&FfaArgs);
 }
 
 /**
@@ -1193,4 +1234,50 @@ ArmFfaLibIsFfaSupported (
   }
 
   return TRUE;
+}
+
+/**
+  Send FF-A Non-secure Resoure Info Get Command.
+
+  @param [in]   TargetId         Partition ID to query info from
+  @param [in]   Flags            Additional flags
+  @param [out]  WrittenSize      How much data was written in the transaction
+  @param [out]  RemainingSize    How much data remains to be read
+
+  @retval EFI_SUCCESS               Success, info returned in Rx/Tx buffer
+  @retval EFI_INVALID PARAMETER     Invalid parameter(s)
+  @retval Others                    Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibFfaNsResInfoGet (
+  IN UINT16   TargetId,
+  IN UINT64   Flags,
+  OUT UINT32  *WrittenSize,
+  OUT UINT32  *RemainingSize
+  )
+{
+  EFI_STATUS    Status;
+  ARM_FFA_ARGS  FfaArgs;
+
+  if ((WrittenSize == NULL) || (RemainingSize == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  FfaArgs.Arg0 = ARM_FID_FFA_NS_RES_INFO_GET;
+  FfaArgs.Arg1 = TargetId;
+  FfaArgs.Arg2 = Flags;
+
+  ArmCallFfa (&FfaArgs);
+
+  Status = FfaArgsToEfiStatus (&FfaArgs);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  *WrittenSize   = FfaArgs.Arg2 >> 32;
+  *RemainingSize = FfaArgs.Arg2;
+
+  return EFI_SUCCESS;
 }

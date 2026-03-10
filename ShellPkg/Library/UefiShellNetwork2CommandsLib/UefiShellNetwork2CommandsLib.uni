@@ -1,19 +1,19 @@
-/** @file
-
-  String definitions for UEFI Shell network 2 commands
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-  (C) Copyright 2017 Hewlett Packard Enterprise Development LP<BR>
-
-  SPDX-License-Identifier: BSD-2-Clause-Patent
-
-  Module Name:
-
-   UefiShellNetwork2CommandsLib.uni
-
-  Abstract:
-
-   String definitions for UEFI Shell 2.0 network 2 commands
-**/
+// /** @file
+//
+// String definitions for UEFI Shell network 2 commands
+// Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+// (C) Copyright 2017 Hewlett Packard Enterprise Development LP<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Module Name:
+//
+// UefiShellNetwork2CommandsLib.uni
+//
+// Abstract:
+//
+// String definitions for UEFI Shell 2.0 network 2 commands
+// **/
 
 #langdef   en-US "english"
 
