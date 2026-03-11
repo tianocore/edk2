@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _SMBIOS_PRINT_INFO_H_
-#define _SMBIOS_PRINT_INFO_H_
+#pragma once
 
 #include <IndustryStandard/SmBios.h>
 
@@ -463,5 +462,3 @@ DisplayFirmwareState (
   IN UINT8  Key,
   IN UINT8  Option
   );
-
-#endif

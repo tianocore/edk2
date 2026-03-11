@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef STACK_COOKIE_FAILURE_HOOK_LIB_H_
-#define STACK_COOKIE_FAILURE_HOOK_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -22,5 +21,3 @@ EFIAPI
 StackCheckFailureHook (
   VOID  *FailureAddress
   );
-
-#endif

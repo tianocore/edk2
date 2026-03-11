@@ -1448,6 +1448,8 @@ CpuidExit (
     Cr4.UintN           = AsmReadCr4 ();
     Ghcb->SaveArea.XCr0 = (Cr4.Bits.OSXSAVE == 1) ? AsmXGetBv (0) : 1;
     XCr0                = (Cr4.Bits.OSXSAVE == 1) ? AsmXGetBv (0) : 1;
+  } else {
+    XCr0 = 0;
   }
 
   if (SnpEnabled ()) {

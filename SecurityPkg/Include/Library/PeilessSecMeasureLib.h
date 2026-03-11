@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef PEILESS_SEC_MEASURE_LIB_H_
-#define PEILESS_SEC_MEASURE_LIB_H_
+#pragma once
 
 /**
   Measurement for PeilessSec.
@@ -22,5 +21,3 @@ EFI_STATUS
 MeasurePeilessSec (
   VOID
   );
-
-#endif /* PEILESS_SEC_MEASURE_LIB_H_ */

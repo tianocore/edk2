@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _HEAPGUARD_H_
-#define _HEAPGUARD_H_
+#pragma once
 
 //
 // Following macros are used to define and access the guarded memory bitmap
@@ -482,5 +481,3 @@ STATIC_ASSERT (
    ((FixedPcdGet64 (PcdHeapGuardPoolType) & 0x461) == 0)),
   "Unsupported Heap Guard configuration on system with greater than EFI_PAGE_SIZE RUNTIME_PAGE_ALLOCATION_GRANULARITY"
   );
-
-#endif

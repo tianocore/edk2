@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_USB_MASS_BOOT_H_
-#define _EFI_USB_MASS_BOOT_H_
+#pragma once
 
 //
 // The opcodes of various USB boot commands:
@@ -333,5 +332,3 @@ UsbClearEndpointStall (
   IN EFI_USB_IO_PROTOCOL  *UsbIo,
   IN UINT8                EndpointAddr
   );
-
-#endif

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __DEVICE_PATH_UTILITIES_H__
-#define __DEVICE_PATH_UTILITIES_H__
+#pragma once
 
 ///
 /// Device Path Utilities protocol
@@ -284,5 +283,3 @@ BOOLEAN
 UefiDevicePathLibIsDevicePathMultiInstance (
    CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath
   );
-
-#endif

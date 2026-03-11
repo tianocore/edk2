@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _STANDALONE_MM_CORE_PRIVATE_DATA_H_
-#define _STANDALONE_MM_CORE_PRIVATE_DATA_H_
+#pragma once
 
 //
 // Page management
@@ -54,5 +53,3 @@ typedef struct {
 } FREE_POOL_HEADER;
 
 extern LIST_ENTRY  mMmPoolLists[MAX_POOL_INDEX];
-
-#endif

@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _ISCSI_DRIVER_H_
-#define _ISCSI_DRIVER_H_
+#pragma once
 
 #define ISCSI_V4_PRIVATE_GUID \
   { \
@@ -810,5 +809,3 @@ IScsiExtScsiPassThruGetNextTarget (
   IN EFI_EXT_SCSI_PASS_THRU_PROTOCOL  *This,
   IN OUT UINT8                        **Target
   );
-
-#endif

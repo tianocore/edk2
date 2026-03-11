@@ -6,8 +6,7 @@
 *
 **/
 
-#ifndef __CONSOLE_PREF_DXE_H__
-#define __CONSOLE_PREF_DXE_H__
+#pragma once
 
 #include <Guid/HiiPlatformSetupFormset.h>
 #include <Guid/ConsolePrefFormSet.h>
@@ -21,5 +20,3 @@ typedef struct {
   UINT8    Console;
   UINT8    Reserved[3];
 } CONSOLE_PREF_VARSTORE_DATA;
-
-#endif

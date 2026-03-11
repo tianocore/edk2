@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __DEVICE_PATH_FROM_TEXT_PROTOCOL_H__
-#define __DEVICE_PATH_FROM_TEXT_PROTOCOL_H__
+#pragma once
 
 ///
 /// Device Path From Text protocol
@@ -61,5 +60,3 @@ typedef struct {
 } EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL;
 
 extern EFI_GUID  gEfiDevicePathFromTextProtocolGuid;
-
-#endif

@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PEI_LOCK_PHYSICAL_PRESENCE_H__
-#define __PEI_LOCK_PHYSICAL_PRESENCE_H__
+#pragma once
 
 ///
 /// Global ID for the PEI_LOCK_PHYSICAL_PRESENCE_PPI_GUID.
@@ -50,5 +49,3 @@ struct _PEI_LOCK_PHYSICAL_PRESENCE_PPI {
 };
 
 extern EFI_GUID  gPeiLockPhysicalPresencePpiGuid;
-
-#endif //  __PEI_LOCK_PHYSICAL_PRESENCE_H__

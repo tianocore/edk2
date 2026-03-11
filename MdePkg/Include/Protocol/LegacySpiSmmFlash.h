@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __LEGACY_SPI_SMM_FLASH_PROTOCOL_H__
-#define __LEGACY_SPI_SMM_FLASH_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/LegacySpiFlash.h>
 
@@ -26,5 +25,3 @@ typedef
 EFI_LEGACY_SPI_SMM_FLASH_PROTOCOL;
 
 extern EFI_GUID  gEfiLegacySpiSmmFlashProtocolGuid;
-
-#endif // __SPI_SMM_FLASH_PROTOCOL_H__

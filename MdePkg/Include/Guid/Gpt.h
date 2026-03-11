@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef __GPT_GUID_H__
-#define __GPT_GUID_H__
+#pragma once
 
 #define EFI_PART_TYPE_UNUSED_GUID \
   { \
@@ -33,5 +32,3 @@
 extern EFI_GUID  gEfiPartTypeUnusedGuid;
 extern EFI_GUID  gEfiPartTypeSystemPartGuid;
 extern EFI_GUID  gEfiPartTypeLegacyMbrGuid;
-
-#endif

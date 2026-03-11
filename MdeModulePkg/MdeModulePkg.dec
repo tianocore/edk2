@@ -1211,6 +1211,14 @@
   # @Prompt FFA TX/RX Buffer Page Count
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaTxRxPageCount|1|UINT64|0x30001062
 
+  ## Some platforms require that all EfiLoadOptions are retried until one of the options
+  # boots. When True, this Pcd will force Bds to retry all the valid EfiLoadOptions
+  # indefinitely until one of the options boots.
+  #   TRUE  - Efi boot options will be retried indefinitely.
+  #   FALSE - Efi boot options will not be retried.
+  # @Prompt Enable infinite retries during BDS.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportInfiniteBootRetries|FALSE|BOOLEAN|0x40000152
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicates the maximum number of callback function
@@ -2051,8 +2059,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport|TRUE|BOOLEAN|0x10000045
 
   ## Indicates if the Multi Root I/O virtualization is supported.<BR><BR>
-  #   TRUE  - Multi Root I/O virtualization is supported.<BR>
-  #   FALSE - Multi Root I/O virtualization is not supported.<BR>
+  #   NOTE: MR-IOV is deprecated in PCIe 6.0 specification and PcdMrIovSupport shall not be used.
   # @Prompt Enable MRIOV support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport|FALSE|BOOLEAN|0x10000046
 
@@ -2307,6 +2314,16 @@
   #  If PcdFfaLibConduitSvc == FALSE, conduit = SVC
   # @Prompt Conduit to use in ArmFfaLib.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc|TRUE|BOOLEAN|0x10000029
+
+  ## Defines platform limit for BAR size that can be accepted in Resizable BAR Capability.
+  #  BAR Capability bits specify size in MB, thus this PCD value shall be extended with +20 bits.
+  # 0           2^(0+20) = 1 MB
+  # 1           2^(1+20) = 2 MB
+  # ...
+  # 42          2^(42+20) = 4 EB
+  # 43          2^(43+20) = 8 EB
+  # @Prompt Max size to accept in PCIe Resizable BAR Capability register.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarMaxSize|43|UINT8|0x10000030
 
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when

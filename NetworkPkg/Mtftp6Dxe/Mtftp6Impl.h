@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_MTFTP6_IMPL_H__
-#define __EFI_MTFTP6_IMPL_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -480,5 +479,3 @@ EFIAPI
 EfiMtftp6Poll (
   IN EFI_MTFTP6_PROTOCOL  *This
   );
-
-#endif

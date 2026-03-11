@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __EFI_SUPPLICANT_PROTOCOL_H__
-#define __EFI_SUPPLICANT_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/WiFi2.h>
 
@@ -454,5 +453,3 @@ struct _EFI_SUPPLICANT_PROTOCOL {
 
 extern EFI_GUID  gEfiSupplicantServiceBindingProtocolGuid;
 extern EFI_GUID  gEfiSupplicantProtocolGuid;
-
-#endif

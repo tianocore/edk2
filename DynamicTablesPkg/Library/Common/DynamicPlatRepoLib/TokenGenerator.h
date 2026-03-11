@@ -10,8 +10,7 @@
     - Obj or OBJ - Object
 **/
 
-#ifndef TOKEN_GENERATOR_H_
-#define TOKEN_GENERATOR_H_
+#pragma once
 
 /** Generate a token.
 
@@ -22,5 +21,3 @@ EFIAPI
 GenerateToken (
   VOID
   );
-
-#endif // TOKEN_GENERATOR_H_

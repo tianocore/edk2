@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __UEFI_DECPOMPRESS_LIB_H__
-#define __UEFI_DECPOMPRESS_LIB_H__
+#pragma once
 
 /**
   Given a compressed source buffer, this function retrieves the size of
@@ -98,5 +97,3 @@ UefiDecompress (
   IN OUT VOID    *Destination,
   IN OUT VOID    *Scratch  OPTIONAL
   );
-
-#endif

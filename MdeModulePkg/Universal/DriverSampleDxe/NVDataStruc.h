@@ -17,8 +17,7 @@ Revision History:
 
 **/
 
-#ifndef _NVDATASTRUC_H_
-#define _NVDATASTRUC_H_
+#pragma once
 
 #include <Guid/HiiPlatformSetupFormset.h>
 #include <Guid/HiiFormMapMethodGuid.h>
@@ -129,5 +128,3 @@ typedef struct {
 #define LABEL_END      0x2223
 
 #pragma pack()
-
-#endif

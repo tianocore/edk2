@@ -12,8 +12,7 @@
   - Obj or OBJ - Object
 **/
 
-#ifndef SRAT_GENERATOR_H_
-#define SRAT_GENERATOR_H_
+#pragma once
 
 /** Reserve arch sub-tables space.
 
@@ -55,5 +54,3 @@ AddArchObjects (
   IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         *CONST  CfgMgrProtocol,
   IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat
   );
-
-#endif // SRAT_GENERATOR_H_

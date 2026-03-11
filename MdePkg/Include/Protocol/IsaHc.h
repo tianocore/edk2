@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef __ISA_HC_PROTOCOL_H__
-#define __ISA_HC_PROTOCOL_H__
+#pragma once
 
 #define EFI_ISA_HC_PROTOCOL_GUID \
   { \
@@ -106,5 +105,3 @@ struct _EFI_ISA_HC_PROTOCOL {
 ///
 extern EFI_GUID  gEfiIsaHcProtocolGuid;
 extern EFI_GUID  gEfiIsaHcServiceBindingProtocolGuid;
-
-#endif //  __ISA_HC_H__

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _SEC_CORE_DEBUG_AGENT_LIB_H_
-#define _SEC_CORE_DEBUG_AGENT_LIB_H_
+#pragma once
 
 #include <PiPei.h>
 #include <Ppi/MemoryDiscovered.h>
@@ -54,5 +53,3 @@ DebugAgentCallbackMemoryDiscoveredPpi (
   IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
   IN VOID                       *Ppi
   );
-
-#endif

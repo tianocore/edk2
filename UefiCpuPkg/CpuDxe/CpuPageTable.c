@@ -736,12 +736,12 @@ ConvertMemoryPageAttributes (
   BOOLEAN                        IsEntryModified;
   BOOLEAN                        IsWpEnabled;
 
-  if ((BaseAddress & (SIZE_4KB - 1)) != 0) {
+  if (!IS_ALIGNED (BaseAddress, SIZE_4KB)) {
     DEBUG ((DEBUG_ERROR, "BaseAddress(0x%lx) is not aligned!\n", BaseAddress));
     return EFI_UNSUPPORTED;
   }
 
-  if ((Length & (SIZE_4KB - 1)) != 0) {
+  if (!IS_ALIGNED (Length, SIZE_4KB)) {
     DEBUG ((DEBUG_ERROR, "Length(0x%lx) is not aligned!\n", Length));
     return EFI_UNSUPPORTED;
   }

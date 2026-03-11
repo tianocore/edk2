@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __FW_CFG_LIB__
-#define __FW_CFG_LIB__
+#pragma once
 
 #include <IndustryStandard/QemuFwCfg.h>
 #include <Library/PlatformInitLib.h>
@@ -183,5 +182,3 @@ EFIAPI
 QemuFwCfgInitCache (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
-
-#endif

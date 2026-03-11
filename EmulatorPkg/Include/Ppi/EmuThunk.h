@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EMU_THUNK_PPI_H__
-#define __EMU_THUNK_PPI_H__
+#pragma once
 
 #define EMU_THUNK_PPI_GUID  \
  { 0xB958B78C, 0x1D3E, 0xEE40, { 0x8B, 0xF4, 0xF0, 0x63, 0x2D, 0x06, 0x39, 0x16 } }
@@ -115,5 +114,3 @@ typedef struct {
 } EMU_THUNK_PPI;
 
 extern EFI_GUID  gEmuThunkPpiGuid;
-
-#endif

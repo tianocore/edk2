@@ -7,11 +7,12 @@
 
 **/
 
-#ifndef __CPU_EXCEPTION_HANDLER_LIB_H__
-#define __CPU_EXCEPTION_HANDLER_LIB_H__
+#pragma once
 
 #include <Ppi/VectorHandoffInfo.h>
 #include <Protocol/Cpu.h>
+
+#define X86_CPU_INTERRUPT_NUM  256
 
 /**
   Initializes all CPU exceptions entries and provides the default exception handlers.
@@ -98,5 +99,3 @@ DumpCpuContext (
   IN EFI_EXCEPTION_TYPE  ExceptionType,
   IN EFI_SYSTEM_CONTEXT  SystemContext
   );
-
-#endif

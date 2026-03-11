@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef INVALID_TLB_H_
-#define INVALID_TLB_H_
+#pragma once
 
 /**
   Invalid corresponding TLB entries are based on the address given
@@ -20,5 +19,3 @@ VOID
 InvalidTlb (
   UINTN  Address
   );
-
-#endif // INVALID_TLB_H_

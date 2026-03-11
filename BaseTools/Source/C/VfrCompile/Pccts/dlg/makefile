@@ -162,7 +162,7 @@ main.$(OBJ_EXT) : main.c dlg.h
 set.$(OBJ_EXT) : $(SET)/set.c
 	$(CC) -c $(CFLAGS) $(SET)/set.c
 
-%.o : %.c 
+%.o : %.c
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 lint:

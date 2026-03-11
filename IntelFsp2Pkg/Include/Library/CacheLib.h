@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _CACHE_LIB_H_
-#define _CACHE_LIB_H_
+#pragma once
 
 //
 // EFI_MEMORY_CACHE_TYPE
@@ -51,5 +50,3 @@ SetCacheAttributes (
   IN  UINT64                 MemoryLength,
   IN  EFI_MEMORY_CACHE_TYPE  MemoryCacheType
   );
-
-#endif

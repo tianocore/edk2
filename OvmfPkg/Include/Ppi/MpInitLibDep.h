@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef MPINITLIB_DEP_H_
-#define MPINITLIB_DEP_H_
+#pragma once
 
 // {138F9CF4-F0E7-4721-8F49-F5FFECF42D40}
 #define EFI_PEI_MPINITLIB_MP_DEP_PPI_GUID \
@@ -24,5 +23,3 @@ extern EFI_GUID  gEfiPeiMpInitLibMpDepPpiGuid;
 };
 
 extern EFI_GUID  gEfiPeiMpInitLibUpDepPpiGuid;
-
-#endif

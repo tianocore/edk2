@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _ACPI_CPU_DATA_H_
-#define _ACPI_CPU_DATA_H_
+#pragma once
 
 //
 // This macro definition is used to fix incompatibility issue caused by
@@ -241,5 +240,3 @@ typedef struct {
   //
   CPU_FEATURE_INIT_DATA    CpuFeatureInitData;
 } ACPI_CPU_DATA;
-
-#endif

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PROCESSOR_BIND_H__
-#define __PROCESSOR_BIND_H__
+#pragma once
 
 ///
 /// Define the processor type so other code can make processor based choices.
@@ -310,6 +309,4 @@ typedef INT32 INTN;
 
 #ifndef __USER_LABEL_PREFIX__
 #define __USER_LABEL_PREFIX__  _
-#endif
-
 #endif

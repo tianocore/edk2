@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _INTERNAL_BM_H_
-#define _INTERNAL_BM_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -468,5 +467,3 @@ BmGetNextLoadOptionBuffer (
   OUT EFI_DEVICE_PATH_PROTOCOL           **FullPath,
   OUT UINTN                              *FileSize
   );
-
-#endif // _INTERNAL_BM_H_

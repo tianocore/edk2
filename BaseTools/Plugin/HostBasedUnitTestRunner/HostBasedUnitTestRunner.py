@@ -340,7 +340,7 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
         if ret != 0:
             logging.error(f"clang_gen_lcov_xml: Failed to generate coverage lcov. {output_lcov}")
             return 1
-        ret = RunCmd("lcov_cobertura",f"{output_lcov} --excludes ^.*UnitTest\|^.*MU\|^.*Mock\|^.*DEBUG -o {output_xml}")
+        ret = RunCmd("lcov_cobertura",f'{output_lcov} --excludes "^.*UnitTest\|^.*MU\|^.*Mock\|^.*DEBUG" -o {output_xml}')
         if ret != 0:
             logging.error(f"clang_gen_lcov_xml: Failed generate filtered coverage XML. {output_xml}")
             return 1

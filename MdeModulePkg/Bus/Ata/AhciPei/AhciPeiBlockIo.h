@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _AHCI_PEI_BLOCKIO_H_
-#define _AHCI_PEI_BLOCKIO_H_
+#pragma once
 
 //
 // ATA hard disk device for EFI_PEI_BLOCK_DEVICE_TYPE
@@ -253,5 +252,3 @@ AhciBlockIoReadBlocks2 (
   IN  UINTN                           BufferSize,
   OUT VOID                            *Buffer
   );
-
-#endif

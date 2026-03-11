@@ -1,0 +1,12 @@
+// /** @file
+// Package for TCG TPM modules.
+//
+// This Package provides softwared-based TPM  libraries using TCG TPM v2.0
+// Reference Library (https://github.com/TrustedComputingGroup/TPM).
+//
+// Copyright (c) 2025, Arm ltd. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+

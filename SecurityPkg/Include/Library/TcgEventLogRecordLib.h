@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _TCG_EVENTLOGRECORD_LIB_H_
-#define _TCG_EVENTLOGRECORD_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -93,5 +92,3 @@ MeasureHandoffTable (
   IN VOID      *TableAddress,
   IN UINTN     TableLength
   );
-
-#endif

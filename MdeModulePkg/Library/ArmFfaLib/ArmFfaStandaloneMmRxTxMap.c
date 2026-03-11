@@ -214,6 +214,9 @@ ArmFfaLibRxTxUnmap (
   EFI_STATUS    Status;
   ARM_FFA_ARGS  FfaArgs;
   VOID          *Buffers;
+  UINT16        SourceId;
+
+  ArmFfaLibGetPartId (&SourceId);
 
   if (mArmFfaRxTxBufferStmmInfoHandle == NULL) {
     // This means that the agent tried to unmap the buffers before even know them.
@@ -224,7 +227,7 @@ ArmFfaLibRxTxUnmap (
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
   FfaArgs.Arg0 = ARM_FID_FFA_RXTX_UNMAP;
-  FfaArgs.Arg1 = (gPartId << ARM_FFA_SOURCE_EP_SHIFT);
+  FfaArgs.Arg1 = (SourceId << ARM_FFA_SOURCE_EP_SHIFT);
 
   ArmCallFfa (&FfaArgs);
 

@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __SMM_REPORT_STATUS_CODE_HANDLER_PROTOCOL_H__
-#define __SMM_REPORT_STATUS_CODE_HANDLER_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/MmReportStatusCodeHandler.h>
 
@@ -25,5 +24,3 @@ typedef EFI_MM_RSC_HANDLER_UNREGISTER EFI_SMM_RSC_HANDLER_UNREGISTER;
 typedef EFI_MM_RSC_HANDLER_PROTOCOL EFI_SMM_RSC_HANDLER_PROTOCOL;
 
 extern EFI_GUID  gEfiSmmRscHandlerProtocolGuid;
-
-#endif // __SMM_REPORT_STATUS_CODE_HANDLER_PROTOCOL_H__

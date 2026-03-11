@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __UEFI_PCI_CAP_PCI_IO_LIB_H__
-#define __UEFI_PCI_CAP_PCI_IO_LIB_H__
+#pragma once
 
 #include <Library/DebugLib.h>
 
@@ -34,5 +33,3 @@ typedef struct {
 
 #define PROTO_DEV_FROM_PCI_CAP_DEV(PciDevice) \
   CR (PciDevice, PROTO_DEV, BaseDevice, PROTO_DEV_SIG)
-
-#endif // __UEFI_PCI_CAP_PCI_IO_LIB_H__

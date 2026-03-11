@@ -17,6 +17,7 @@
 
 [Sources.AARCH64]
   AArch64/AArch64LibSupport.c
+  AArch64/GetPhysicalAddressBits.S
 
 [Sources.IA32, Sources.X64]
   X86/X86LibSupport.c

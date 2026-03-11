@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _ACPI_TABLE_H_
-#define _ACPI_TABLE_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -273,5 +272,3 @@ SdtGetAcpiTable (
 //
 extern EFI_HANDLE               mHandle;
 extern EFI_ACPI_TABLE_INSTANCE  *mPrivateData;
-
-#endif

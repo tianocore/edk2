@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _RESET_SYSTEM_H_
-#define _RESET_SYSTEM_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -93,5 +92,3 @@ RuntimeServiceResetSystem (
   IN UINTN           DataSize,
   IN VOID            *ResetData OPTIONAL
   );
-
-#endif

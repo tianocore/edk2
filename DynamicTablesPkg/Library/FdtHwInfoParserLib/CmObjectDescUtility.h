@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef CM_OBJECT_DESC_UTILITY_H_
-#define CM_OBJECT_DESC_UTILITY_H_
+#pragma once
 
 #include <ConfigurationManagerObject.h>
 
@@ -171,5 +170,3 @@ AddMultipleCmObjWithCmObjRef (
   IN  CM_OBJ_DESCRIPTOR                *CmObjDesc,
   OUT CM_OBJECT_TOKEN                  *Token
   );
-
-#endif // CM_OBJECT_DESC_UTILITY_H_

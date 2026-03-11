@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_PCI_OPTION_ROM_SUPPORT_H_
-#define _EFI_PCI_OPTION_ROM_SUPPORT_H_
+#pragma once
 
 /**
   Initialize a PCI LoadFile2 instance.
@@ -31,7 +30,7 @@ InitializePciLoadFile2 (
                      On output with a return code of EFI_BUFFER_TOO_SMALL,
                      the size of Buffer required to retrieve the requested file.
   @param Buffer      The memory buffer to transfer the file to. If Buffer is NULL,
-                     then no the size of the requested file is returned in BufferSize.
+                     then the size of the requested file is returned in BufferSize.
 
   @retval EFI_SUCCESS           The file was loaded.
   @retval EFI_UNSUPPORTED       BootPolicy is TRUE.
@@ -133,5 +132,3 @@ ProcessOpRomImage (
   IN PCI_IO_DEVICE  *PciDevice,
   IN BOOLEAN        NativeOnly
   );
-
-#endif

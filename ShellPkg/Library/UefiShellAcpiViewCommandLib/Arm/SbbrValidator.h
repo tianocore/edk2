@@ -15,8 +15,7 @@
     - Arm Server Base System Architecture 6.0
 **/
 
-#ifndef SBBR_VALIDATOR_H_
-#define SBBR_VALIDATOR_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -87,5 +86,3 @@ EFIAPI
 ArmSbbrReqsValidate (
   ARM_SBBR_VERSION  Version
   );
-
-#endif // SBBR_VALIDATOR_H_

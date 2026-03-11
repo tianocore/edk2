@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _ALERT_STANDARD_FORMAT_TABLE_H_
-#define _ALERT_STANDARD_FORMAT_TABLE_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -135,5 +134,3 @@ typedef EFI_ACPI_DESCRIPTION_HEADER EFI_ACPI_ASF_DESCRIPTION_HEADER;
 #define EFI_ACPI_ASF_DESCRIPTION_TABLE_SIGNATURE  SIGNATURE_32 ('A', 'S', 'F', '!')
 
 #pragma pack ()
-
-#endif // _ALERT_STANDARD_FORMAT_TABLE_H

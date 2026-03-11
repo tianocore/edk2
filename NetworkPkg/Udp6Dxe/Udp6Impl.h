@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _UDP6_IMPL_H_
-#define _UDP6_IMPL_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -643,5 +642,3 @@ VOID
 Udp6FlushRcvdDgram (
   IN UDP6_INSTANCE_DATA  *Instance
   );
-
-#endif

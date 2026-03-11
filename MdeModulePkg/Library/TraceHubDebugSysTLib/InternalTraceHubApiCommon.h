@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef INTERNAL_TRACE_HUB_API_COMMON_H_
-#define INTERNAL_TRACE_HUB_API_COMMON_H_
+#pragma once
 
 typedef enum {
   TraceHubDebugType = 0,
@@ -115,5 +114,3 @@ GetTraceHubMsgVisibility (
   IN OUT BOOLEAN  *Flag,
   IN OUT UINT8    *DbgLevel
   );
-
-#endif // INTERNAL_TRACE_HUB_API_COMMON_H_

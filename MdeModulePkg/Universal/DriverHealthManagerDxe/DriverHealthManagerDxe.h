@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _DRIVER_HEALTH_MANAGEMENT_DXE_H_
-#define _DRIVER_HEALTH_MANAGEMENT_DXE_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Base.h>
@@ -124,5 +123,3 @@ DriverHealthManagerFakeRouteConfig (
   IN  CONST EFI_STRING                      Configuration,
   OUT EFI_STRING                            *Progress
   );
-
-#endif

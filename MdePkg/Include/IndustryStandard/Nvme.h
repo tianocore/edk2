@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __NVM_E_H__
-#define __NVM_E_H__
+#pragma once
 
 #pragma pack(1)
 
@@ -1223,5 +1222,3 @@ typedef struct {
 } NVME_POWER_LOSS_SIGNALING_CONFIG;
 
 #pragma pack()
-
-#endif

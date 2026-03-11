@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __MEM_LIB_INTERNALS__
-#define __MEM_LIB_INTERNALS__
+#pragma once
 
 #include <PiPei.h>
 
@@ -239,5 +238,3 @@ InternalMemIsZeroBuffer (
   IN CONST VOID  *Buffer,
   IN UINTN       Length
   );
-
-#endif

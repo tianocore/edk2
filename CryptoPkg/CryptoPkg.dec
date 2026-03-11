@@ -85,6 +85,15 @@
   # @Prompt Use NASM assembly source files for optimized version of OpensslLib for IA32/X64
   gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStyleNasm|FALSE|BOOLEAN|0x00000003
 
+[PcdsFeatureFlag.AARCH64]
+  ## Enable the use of PE target assembly source files when building an optimized
+  #  version of OpensslLib from generated assembly source files for AARCH64.
+  #  The generated PE target assembly source files only work with the CLANGPDB toolchain.
+  #  GCC and CLANGDWARF must use the ELF target assembly source files.
+  #  The default setting is to not use the PE target assembly source files.
+  # @Prompt Use PE target assembly source files for optimized version of OpensslLib for AARCH64
+  gEfiCryptoPkgTokenSpaceGuid.PcdOpensslLibAssemblySourceStylePe|FALSE|BOOLEAN|0x00000004
+
 [PcdsFixedAtBuild]
   ## Enable/Disable the families and individual services produced by the
   #  EDK II Crypto Protocols/PPIs.  The default is all services disabled.

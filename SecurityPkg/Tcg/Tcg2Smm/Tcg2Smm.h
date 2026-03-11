@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __TCG2_SMM_H__
-#define __TCG2_SMM_H__
+#pragma once
 
 #include <PiMm.h>
 
@@ -113,5 +112,3 @@ BOOLEAN
 IsTpm20Dtpm (
   VOID
   );
-
-#endif // __TCG_SMM_H__

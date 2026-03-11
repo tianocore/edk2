@@ -5,8 +5,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_IP4_DRIVER_H__
-#define __EFI_IP4_DRIVER_H__
+#pragma once
 
 #include <Protocol/ServiceBinding.h>
 
@@ -184,5 +183,3 @@ Ip4ServiceBindingDestroyChild (
   IN EFI_SERVICE_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                    ChildHandle
   );
-
-#endif

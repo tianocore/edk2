@@ -10,8 +10,7 @@
     - Std or STD - Standard
 **/
 
-#ifndef RISCV_NAMESPACE_OBJECTS_H_
-#define RISCV_NAMESPACE_OBJECTS_H_
+#pragma once
 
 #include <AcpiObjects.h>
 #include <StandardNameSpaceObjects.h>
@@ -264,5 +263,3 @@ typedef struct CmRiscVTimerInfo {
 } CM_RISCV_TIMER_INFO;
 
 #pragma pack()
-
-#endif // RISCV_NAMESPACE_OBJECTS_H_

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef PLATFORM_H_
-#define PLATFORM_H_
+#pragma once
 
 #include <IndustryStandard/E820.h>
 
@@ -81,5 +80,3 @@ EFIAPI
 GetMemoryMapPolicy (
   OUT EFI_MEMORY_DESCRIPTOR  **MemoryTable
   );
-
-#endif // PLATFORM_H_

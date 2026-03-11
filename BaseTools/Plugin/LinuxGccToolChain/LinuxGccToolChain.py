@@ -1,5 +1,5 @@
 # @file LinuxGccToolChain.py
-# Plugin to configures paths for GCC/GCC5 AARCH64/RISCV/LOONGARCH64 Toolchain
+# Plugin to configures paths for GCC AARCH64/RISCV/LOONGARCH64 Toolchain
 ##
 # This plugin sets environment variables used in tools_def.template to specify the GCC compiler
 # for the requested build architecture.
@@ -24,83 +24,73 @@ class LinuxGccToolChain(IUefiBuildPlugin):
         self.Logger = logging.getLogger("LinuxGccToolChain")
 
         #
-        # In order to keep this plugin backwards compatible with the older GCC5 toolchain tag,
-        # we support setting either the GCC5 or GCC set of env variables required
+        # GCC - The only remaining supported GCC toolchain is now "GCC", others have been deprecated then removed.
         #
-        toolchain = "GCC"
-
-        #
-        # GCC - The non-x86 compilers need their paths set if available. To make this more stable, check for
-        # any substring of GCC in the TOOL_CHAIN_TAG to get the right compiler
-        #
-        if "GCC" in thebuilder.env.GetValue("TOOL_CHAIN_TAG"):
-            if "GCC5" in thebuilder.env.GetValue("TOOL_CHAIN_TAG"):
-                toolchain = "GCC5"
-
+        if thebuilder.env.GetValue("TOOL_CHAIN_TAG") == "GCC":
             # Start with AARACH64 compiler
-            ret = self._check_aarch64(toolchain)
+            ret = self._check_aarch64()
             if ret != 0:
                 self.Logger.critical("Failed in check aarch64")
                 return ret
 
             # Check RISCV64 compiler
-            ret = self._check_riscv64(toolchain)
+            ret = self._check_riscv64()
             if ret != 0:
                 self.Logger.critical("Failed in check riscv64")
                 return ret
 
             # Check LoongArch64 compiler
-            ret = self._check_loongarch64(toolchain)
+            ret = self._check_loongarch64()
             if ret != 0:
                 self.Logger.critical("Failed in check loongarch64")
                 return ret
 
         return 0
 
-    def _check_aarch64(self, toolchain):
+    def _check_aarch64(self):
         # check to see if full path already configured
-        if shell_environment.GetEnvironment().get_shell_var(toolchain + "_AARCH64_PREFIX") is not None:
-            self.Logger.info(toolchain + "_AARCH64_PREFIX is already set.")
+        if shell_environment.GetEnvironment().get_shell_var("GCC_AARCH64_PREFIX") is not None:
+            self.Logger.info("GCC_AARCH64_PREFIX is already set.")
 
         else:
             # now check for install dir.  If set then set the Prefix
             install_path = shell_environment.GetEnvironment(
-            ).get_shell_var(toolchain + "_AARCH64_INSTALL")
+            ).get_shell_var("GCC_AARCH64_INSTALL")
             if install_path is None:
                 return 0
 
             # make PREFIX to align with tools_def.txt
             prefix = os.path.join(install_path, "bin", "aarch64-none-linux-gnu-")
-            shell_environment.GetEnvironment().set_shell_var(toolchain + "_AARCH64_PREFIX", prefix)
+            shell_environment.GetEnvironment().set_shell_var("GCC_AARCH64_PREFIX", prefix)
 
         # now confirm it exists
-        if not os.path.exists(shell_environment.GetEnvironment().get_shell_var(toolchain + "_AARCH64_PREFIX") + "gcc"):
+        if not os.path.exists(shell_environment.GetEnvironment().get_shell_var("GCC_AARCH64_PREFIX") + "gcc"):
             self.Logger.error(
-                "Path for " + toolchain + "_AARCH64_PREFIX toolchain is invalid")
+                "Path for GCC_AARCH64_PREFIX toolchain is invalid")
             return -2
 
         return 0
 
-    def _check_riscv64(self, toolchain):
+    def _check_riscv64(self):
         # now check for install dir.  If set then set the Prefix
         install_path = shell_environment.GetEnvironment(
-        ).get_shell_var(toolchain + "_RISCV64_INSTALL")
+        ).get_shell_var("GCC_RISCV64_INSTALL")
         if install_path is None:
             return 0
 
         # check to see if full path already configured
-        if shell_environment.GetEnvironment().get_shell_var(toolchain + "_RISCV64_PREFIX") is not None:
-            self.Logger.info(toolchain + "_RISCV64_PREFIX is already set.")
+        if shell_environment.GetEnvironment().get_shell_var("GCC_RISCV64_PREFIX") is not None:
+            self.Logger.info("GCC_RISCV64_PREFIX is already set.")
 
         else:
             # make PREFIX to align with tools_def.txt
             prefix = os.path.join(install_path, "bin", "riscv64-unknown-elf-")
-            shell_environment.GetEnvironment().set_shell_var(toolchain + "_RISCV64_PREFIX", prefix)
+            shell_environment.GetEnvironment().set_shell_var("GCC_RISCV64_PREFIX", prefix)
 
         # now confirm it exists
-        if not os.path.exists(shell_environment.GetEnvironment().get_shell_var(toolchain + "_RISCV64_PREFIX") + "gcc"):
+        if not os.path.exists(shell_environment.GetEnvironment().get_shell_var("GCC_RISCV64_PREFIX") + "gcc"):
             self.Logger.error(
-                "Path for " + toolchain + "_RISCV64_PREFIX toolchain is invalid")
+                "Path for GCC_RISCV64_PREFIX toolchain is invalid")
             return -2
 
         # Check if LD_LIBRARY_PATH is set for the libraries of RISC-V GCC toolchain
@@ -112,26 +102,26 @@ class LinuxGccToolChain(IUefiBuildPlugin):
 
         return 0
 
-    def _check_loongarch64(self, toolchain):
+    def _check_loongarch64(self):
         # check to see if full path already configured
-        if shell_environment.GetEnvironment().get_shell_var(toolchain + "_LOONGARCH64_PREFIX") is not None:
-            self.Logger.info(toolchain + "_LOONGARCH64_PREFIX is already set.")
+        if shell_environment.GetEnvironment().get_shell_var("GCC_LOONGARCH64_PREFIX") is not None:
+            self.Logger.info("GCC_LOONGARCH64_PREFIX is already set.")
 
         else:
             # now check for install dir.  If set then set the Prefix
             install_path = shell_environment.GetEnvironment(
-            ).get_shell_var(toolchain + "_LOONGARCH64_INSTALL")
+            ).get_shell_var("GCC_LOONGARCH64_INSTALL")
             if install_path is None:
                 return 0
 
             # make PREFIX to align with tools_def.txt
             prefix = os.path.join(install_path, "bin", "loongarch64-unknown-linux-gnu-")
-            shell_environment.GetEnvironment().set_shell_var(toolchain + "_LOONGARCH64_PREFIX", prefix)
+            shell_environment.GetEnvironment().set_shell_var("GCC_LOONGARCH64_PREFIX", prefix)
 
         # now confirm it exists
-        if not os.path.exists(shell_environment.GetEnvironment().get_shell_var(toolchain + "_LOONGARCH64_PREFIX") + "gcc"):
+        if not os.path.exists(shell_environment.GetEnvironment().get_shell_var("GCC_LOONGARCH64_PREFIX") + "gcc"):
             self.Logger.error(
-                "Path for " + toolchain + "_LOONGARCH64_PREFIX toolchain is invalid")
+                "Path for GCC_LOONGARCH64_PREFIX toolchain is invalid")
             return -2
 
         return 0

@@ -119,7 +119,7 @@ ArmFfaMemLibDonateRxTx (
 }
 
 /**
-  @brief      Starts a transaction to transfer an Owner’s access to a memory
+  @brief      Starts a transaction to transfer an Owner's access to a memory
               region and  grant access to it to one or more Borrowers.
 
   @param[in]  TotalLength     Total length of the memory transaction descriptor
@@ -190,7 +190,7 @@ ArmFfaMemLibLend (
 }
 
 /**
-  @brief      Starts a transaction to transfer an Owner’s access to a memory
+  @brief      Starts a transaction to transfer an Owner's access to a memory
               region and  grant access to it to one or more Borrowers through
               Rx/Tx buffer.
 

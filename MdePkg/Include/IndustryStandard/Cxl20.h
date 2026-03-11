@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef CXL20_H_
-#define CXL20_H_
+#pragma once
 
 #include <IndustryStandard/Cxl11.h>
 #include <IndustryStandard/Acpi.h>
@@ -500,5 +499,3 @@ typedef struct {
 } CXL_HOST_BRIDGE_STRUCTURE;
 
 #pragma pack()
-
-#endif

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _RESET_SYSTEM2_H_
-#define _RESET_SYSTEM2_H_
+#pragma once
 
 #include <Uefi.h>
 #include <PiPei.h>
@@ -116,5 +115,3 @@ UnregisterResetNotify (
   IN EFI_RESET_NOTIFICATION_PROTOCOL  *This,
   IN EFI_RESET_SYSTEM                 ResetFunction
   );
-
-#endif

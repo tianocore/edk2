@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __P6_MSR_H__
-#define __P6_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -1608,5 +1607,3 @@ typedef union {
 #define MSR_P6_MC3_MISC  0x00000413
 #define MSR_P6_MC4_MISC  0x0000040F
 /// @}
-
-#endif

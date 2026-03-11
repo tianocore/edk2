@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __LOAD_LINUX_LIB__
-#define __LOAD_LINUX_LIB__
+#pragma once
 
 /**
   Verifies that the kernel setup image is valid and supported.
@@ -190,5 +189,3 @@ LoadLinuxSetInitrd (
   IN VOID      *Initrd,
   IN UINTN     InitrdSize
   );
-
-#endif

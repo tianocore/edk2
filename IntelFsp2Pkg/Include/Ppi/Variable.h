@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef EDKII_PEI_VARIABLE_PPI_H_
-#define EDKII_PEI_VARIABLE_PPI_H_
+#pragma once
 
 #define EDKII_PEI_VARIABLE_PPI_GUID \
   { \
@@ -191,5 +190,3 @@ struct _EDKII_PEI_VARIABLE_PPI {
 };
 
 extern EFI_GUID  gEdkiiPeiVariablePpiGuid;
-
-#endif

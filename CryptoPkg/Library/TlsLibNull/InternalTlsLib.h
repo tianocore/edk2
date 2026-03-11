@@ -6,11 +6,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __INTERNAL_TLS_LIB_NULL_H__
-#define __INTERNAL_TLS_LIB_NULL_H__
+#pragma once
 
 #include <Library/BaseCryptLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
-
-#endif
