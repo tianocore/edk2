@@ -1277,13 +1277,14 @@ NonCoherentPciIoMap (
   OUT    VOID                           **Mapping
   )
 {
-  NON_DISCOVERABLE_PCI_DEVICE           *Dev;
-  EFI_STATUS                            Status;
-  NON_DISCOVERABLE_PCI_DEVICE_MAP_INFO  *MapInfo;
-  UINTN                                 AlignMask;
-  VOID                                  *AllocAddress;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR       GcdDescriptor;
-  BOOLEAN                               Bounce;
+  NON_DISCOVERABLE_PCI_DEVICE                  *Dev;
+  EFI_STATUS                                   Status;
+  NON_DISCOVERABLE_PCI_DEVICE_MAP_INFO         *MapInfo;
+  NON_DISCOVERABLE_DEVICE_UNCACHED_ALLOCATION  *Alloc;
+  LIST_ENTRY                                   *Entry;
+  UINTN                                        AlignMask;
+  VOID                                         *AllocAddress;
+  BOOLEAN                                      Bounce;
 
   if ((HostAddress   == NULL) ||
       (NumberOfBytes == NULL) ||
@@ -1335,18 +1336,26 @@ NonCoherentPciIoMap (
 
       case EfiPciIoOperationBusMasterCommonBuffer:
         //
-        // Check whether the host address refers to an uncached mapping.
+        // Check whether the host address refers to an uncached allocation.
         //
-        Status = gDS->GetMemorySpaceDescriptor (
-                        (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress,
-                        &GcdDescriptor
-                        );
-        if (EFI_ERROR (Status) ||
-            ((GcdDescriptor.Attributes & (EFI_MEMORY_WB|EFI_MEMORY_WT)) != 0))
+        Bounce = TRUE;
+        EfiAcquireLock (&Dev->UncachedAllocationListLock);
+        for (Entry = Dev->UncachedAllocationList.ForwardLink;
+             Entry != &Dev->UncachedAllocationList;
+             Entry = Entry->ForwardLink)
         {
-          Bounce = TRUE;
+          Alloc = BASE_CR (Entry, NON_DISCOVERABLE_DEVICE_UNCACHED_ALLOCATION, List);
+
+          if ((Alloc->HostAddress <= HostAddress) &&
+              ((UINTN)Alloc->HostAddress + EFI_PAGES_TO_SIZE (Alloc->NumPages) >=
+               (UINTN)HostAddress + *NumberOfBytes))
+          {
+            Bounce = FALSE;
+            break;
+          }
         }
 
+        EfiReleaseLock (&Dev->UncachedAllocationListLock);
         break;
 
       default:
