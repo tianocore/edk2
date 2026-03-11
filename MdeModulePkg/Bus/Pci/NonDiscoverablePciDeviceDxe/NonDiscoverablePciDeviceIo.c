@@ -983,6 +983,7 @@ NonCoherentPciIoFreeBuffer (
   // Find the uncached allocation list entry associated
   // with this allocation
   //
+  EfiAcquireLock (&Dev->UncachedAllocationListLock);
   for (Entry = Dev->UncachedAllocationList.ForwardLink;
        Entry != &Dev->UncachedAllocationList;
        Entry = Entry->ForwardLink)
@@ -1010,7 +1011,8 @@ NonCoherentPciIoFreeBuffer (
 
   if (!Found) {
     ASSERT_EFI_ERROR (EFI_NOT_FOUND);
-    return EFI_NOT_FOUND;
+    Status = EFI_NOT_FOUND;
+    goto ReleaseLock;
   }
 
   EndPages = Alloc->NumPages - (Pages + StartPages);
@@ -1018,7 +1020,8 @@ NonCoherentPciIoFreeBuffer (
   if (StartPages != 0) {
     AllocHead = AllocatePool (sizeof *AllocHead);
     if (AllocHead == NULL) {
-      return EFI_OUT_OF_RESOURCES;
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ReleaseLock;
     }
 
     AllocHead->HostAddress = Alloc->HostAddress;
@@ -1030,7 +1033,8 @@ NonCoherentPciIoFreeBuffer (
   if (EndPages != 0) {
     AllocTail = AllocatePool (sizeof *AllocTail);
     if (AllocTail == NULL) {
-      return EFI_OUT_OF_RESOURCES;
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ReleaseLock;
     }
 
     AllocTail->HostAddress = (UINT8 *)Alloc->HostAddress +
@@ -1053,6 +1057,8 @@ NonCoherentPciIoFreeBuffer (
     InsertHeadList (&Dev->UncachedAllocationList, &AllocTail->List);
   }
 
+  EfiReleaseLock (&Dev->UncachedAllocationListLock);
+
   Status = gDS->SetMemorySpaceAttributes (
                   (EFI_PHYSICAL_ADDRESS)(UINTN)HostAddress,
                   EFI_PAGES_TO_SIZE (Pages),
@@ -1070,6 +1076,10 @@ NonCoherentPciIoFreeBuffer (
 
 FreeAlloc:
   FreePool (Alloc);
+  return Status;
+
+ReleaseLock:
+  EfiReleaseLock (&Dev->UncachedAllocationListLock);
   return Status;
 }
 
@@ -1172,7 +1182,9 @@ NonCoherentPciIoAllocateBuffer (
   // Record this allocation in the linked list, so we
   // can restore the memory space attributes later
   //
+  EfiAcquireLock (&Dev->UncachedAllocationListLock);
   InsertHeadList (&Dev->UncachedAllocationList, &Alloc->List);
+  EfiReleaseLock (&Dev->UncachedAllocationListLock);
 
   //
   // Ensure that EFI_MEMORY_XP is in the capability set
@@ -1770,6 +1782,7 @@ InitializePciIoProtocol (
   INTN                               Idx;
 
   InitializeListHead (&Dev->UncachedAllocationList);
+  EfiInitializeLock (&Dev->UncachedAllocationListLock, TPL_NOTIFY);
 
   Dev->ConfigSpace.Hdr.VendorId = PCI_ID_VENDOR_UNKNOWN;
   Dev->ConfigSpace.Hdr.DeviceId = PCI_ID_DEVICE_DONTCARE;
