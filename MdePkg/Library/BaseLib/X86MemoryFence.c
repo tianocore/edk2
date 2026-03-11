@@ -9,9 +9,11 @@
 /**
   Used to serialize load and store operations.
 
-  All loads and stores that proceed calls to this function are guaranteed to be
-  globally visible when this function returns.
+  This function impedes compiler reordering of loads and stores across it.
 
+  It does not impede CPU reordering.
+
+  It does not impede compiler reordering of other operations.
 **/
 VOID
 EFIAPI
@@ -19,5 +21,5 @@ MemoryFence (
   VOID
   )
 {
-  return;
+  _ReadWriteBarrier ();
 }
