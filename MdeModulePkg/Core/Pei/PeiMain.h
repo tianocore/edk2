@@ -50,6 +50,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/AprioriFileName.h>
 #include <Guid/MigratedFvInfo.h>
 #include <Guid/DelayedDispatch.h>
+#include <Guid/MemoryTypeInformation.h>
 
 ///
 /// It is an FFS type extension used for PeiFindFileEx. It indicates current
@@ -233,107 +234,116 @@ EFI_STATUS
 /// Pei Core private data structure instance
 ///
 struct _PEI_CORE_INSTANCE {
-  UINTN                             Signature;
+  UINTN                                Signature;
 
   ///
   /// Point to ServiceTableShadow
   ///
-  EFI_PEI_SERVICES                  *Ps;
-  PEI_PPI_DATABASE                  PpiData;
+  EFI_PEI_SERVICES                     *Ps;
+  PEI_PPI_DATABASE                     PpiData;
 
   ///
   /// The count of FVs which contains FFS and could be dispatched by PeiCore.
   ///
-  UINTN                             FvCount;
+  UINTN                                FvCount;
 
   ///
   /// The max count of FVs which contains FFS and could be dispatched by PeiCore.
   ///
-  UINTN                             MaxFvCount;
+  UINTN                                MaxFvCount;
 
   ///
   /// Pointer to the buffer with the MaxFvCount number of entries.
   /// Each entry is for one FV which contains FFS and could be dispatched by PeiCore.
   ///
-  PEI_CORE_FV_HANDLE                *Fv;
+  PEI_CORE_FV_HANDLE                   *Fv;
 
   ///
   /// Pointer to the buffer with the MaxUnknownFvInfoCount number of entries.
   /// Each entry is for one FV which could not be dispatched by PeiCore.
   ///
-  PEI_CORE_UNKNOW_FORMAT_FV_INFO    *UnknownFvInfo;
-  UINTN                             MaxUnknownFvInfoCount;
-  UINTN                             UnknownFvInfoCount;
+  PEI_CORE_UNKNOW_FORMAT_FV_INFO       *UnknownFvInfo;
+  UINTN                                MaxUnknownFvInfoCount;
+  UINTN                                UnknownFvInfoCount;
 
   ///
   /// Pointer to the buffer FvFileHandlers in PEI_CORE_FV_HANDLE specified by CurrentPeimFvCount.
   ///
-  EFI_PEI_FILE_HANDLE               *CurrentFvFileHandles;
-  UINTN                             AprioriCount;
-  UINTN                             CurrentPeimFvCount;
-  UINTN                             CurrentPeimCount;
-  EFI_PEI_FILE_HANDLE               CurrentFileHandle;
-  BOOLEAN                           PeimNeedingDispatch;
-  BOOLEAN                           PeimDispatchOnThisPass;
-  BOOLEAN                           PeimDispatcherReenter;
-  EFI_PEI_HOB_POINTERS              HobList;
-  BOOLEAN                           SwitchStackSignal;
-  BOOLEAN                           PeiMemoryInstalled;
-  VOID                              *CpuIo;
-  EFI_PEI_SECURITY2_PPI             *PrivateSecurityPpi;
-  EFI_PEI_SERVICES                  ServiceTableShadow;
-  EFI_PEI_PPI_DESCRIPTOR            *XipLoadFile;
-  EFI_PHYSICAL_ADDRESS              PhysicalMemoryBegin;
-  UINT64                            PhysicalMemoryLength;
-  EFI_PHYSICAL_ADDRESS              FreePhysicalMemoryTop;
-  UINTN                             HeapOffset;
-  BOOLEAN                           HeapOffsetPositive;
-  UINTN                             StackOffset;
-  BOOLEAN                           StackOffsetPositive;
+  EFI_PEI_FILE_HANDLE                  *CurrentFvFileHandles;
+  UINTN                                AprioriCount;
+  UINTN                                CurrentPeimFvCount;
+  UINTN                                CurrentPeimCount;
+  EFI_PEI_FILE_HANDLE                  CurrentFileHandle;
+  BOOLEAN                              PeimNeedingDispatch;
+  BOOLEAN                              PeimDispatchOnThisPass;
+  BOOLEAN                              PeimDispatcherReenter;
+  EFI_PEI_HOB_POINTERS                 HobList;
+  BOOLEAN                              SwitchStackSignal;
+  BOOLEAN                              PeiMemoryInstalled;
+  VOID                                 *CpuIo;
+  EFI_PEI_SECURITY2_PPI                *PrivateSecurityPpi;
+  EFI_PEI_SERVICES                     ServiceTableShadow;
+  EFI_PEI_PPI_DESCRIPTOR               *XipLoadFile;
+  EFI_PHYSICAL_ADDRESS                 PhysicalMemoryBegin;
+  UINT64                               PhysicalMemoryLength;
+  EFI_PHYSICAL_ADDRESS                 FreePhysicalMemoryTop;
+  UINTN                                HeapOffset;
+  BOOLEAN                              HeapOffsetPositive;
+  UINTN                                StackOffset;
+  BOOLEAN                              StackOffsetPositive;
   //
   // Information for migrating memory pages allocated in pre-memory phase.
   //
-  HOLE_MEMORY_DATA                  MemoryPages;
-  PEICORE_FUNCTION_POINTER          ShadowedPeiCore;
-  CACHE_SECTION_DATA                CacheSection;
+  HOLE_MEMORY_DATA                     MemoryPages;
+  PEICORE_FUNCTION_POINTER             ShadowedPeiCore;
+  CACHE_SECTION_DATA                   CacheSection;
   //
   // For Loading modules at fixed address feature to cache the top address below which the
   // Runtime code, boot time code and PEI memory will be placed. Please note that the offset between this field
   // and Ps should not be changed since maybe user could get this top address by using the offset to Ps.
   //
-  EFI_PHYSICAL_ADDRESS              LoadModuleAtFixAddressTopAddress;
+  EFI_PHYSICAL_ADDRESS                 LoadModuleAtFixAddressTopAddress;
   //
   // The field is define for Loading modules at fixed address feature to tracker the PEI code
   // memory range usage. It is a bit mapped array in which every bit indicates the corresponding memory page
   // available or not.
   //
-  UINT64                            *PeiCodeMemoryRangeUsageBitMap;
+  UINT64                               *PeiCodeMemoryRangeUsageBitMap;
   //
   // This field points to the shadowed image read function
   //
-  PE_COFF_LOADER_READ_FILE          ShadowedImageRead;
+  PE_COFF_LOADER_READ_FILE             ShadowedImageRead;
 
-  UINTN                             TempPeimCount;
+  UINTN                                TempPeimCount;
 
   //
   // Pointer to the temp buffer with the TempPeimCount number of entries.
   //
-  EFI_PEI_FILE_HANDLE               *TempFileHandles;
+  EFI_PEI_FILE_HANDLE                  *TempFileHandles;
   //
   // Pointer to the temp buffer with the TempPeimCount number of entries.
   //
-  EFI_GUID                          *TempFileGuid;
+  EFI_GUID                             *TempFileGuid;
 
   //
   // Temp Memory Range is not covered by PeiTempMem and Stack.
   // Those Memory Range will be migrated into physical memory.
   //
-  HOLE_MEMORY_DATA                  HoleData[HOLE_MAX_NUMBER];
+  HOLE_MEMORY_DATA                     HoleData[HOLE_MAX_NUMBER];
 
   //
   // Table of delayed dispatch requests
   //
-  DELAYED_DISPATCH_TABLE            *DelayedDispatchTable;
+  DELAYED_DISPATCH_TABLE               *DelayedDispatchTable;
+
+  //
+  // Memory Bin Data
+  //
+  BOOLEAN                              MemoryTypeInformationInitialized;
+  EFI_MEMORY_TYPE_INFORMATION          *MemoryTypeInformation;
+  EFI_MEMORY_TYPE_STATISTICS_HEADER    *MemoryTypeStatistics;
+  EFI_PHYSICAL_ADDRESS                 DefaultBinMaximumAddress;
+  EFI_PHYSICAL_ADDRESS                 DefaultBinBaseAddress;
 };
 
 ///
