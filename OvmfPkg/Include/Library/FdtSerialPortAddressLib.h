@@ -11,8 +11,10 @@
 #include <Base.h>
 
 typedef struct {
-  UINTN     NumberOfPorts;
-  UINT64    BaseAddress[2];
+  UINTN      NumberOfPorts;
+  UINT64     BaseAddress[2];
+  UINT32     DebugLevel;
+  BOOLEAN    DebugLevelSet;
 } FDT_SERIAL_PORTS;
 
 /**
