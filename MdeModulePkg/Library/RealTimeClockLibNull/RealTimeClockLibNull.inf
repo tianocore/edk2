@@ -14,7 +14,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = RealTimeClockLibNull
   FILE_GUID                      = BF830151-16A8-4238-BB2D-466591703597
-  MODULE_TYPE                    = BASE
+  MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = RealTimeClockLib
 

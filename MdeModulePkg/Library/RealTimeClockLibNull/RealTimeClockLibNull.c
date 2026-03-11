@@ -12,8 +12,7 @@
 
 **/
 
-#include <Uefi/UefiBaseType.h>
-#include <Uefi/UefiSpec.h>
+#include <PiDxe.h>
 #include <Library/RealTimeClockLib.h>
 
 /**
