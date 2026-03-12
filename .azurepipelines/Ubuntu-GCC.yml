@@ -29,6 +29,6 @@ jobs:
   parameters:
     tool_chain_tag: GCC
     vm_image: ${{ variables.default_linux_vm }}
-    container: ${{ variables.default_linux_image }}
+    container: ${{ variables.default_linux_container }}
     arch_list: "IA32,X64,AARCH64,RISCV64,LOONGARCH64"
     usePythonVersion: ''  # use Python from the container image
