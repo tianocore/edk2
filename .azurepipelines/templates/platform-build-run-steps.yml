@@ -1,6 +1,6 @@
 
 ## @file
-# File steps.yml
+# File templates/platform-build-run-steps.yml
 #
 # template file containing the steps to build
 #
