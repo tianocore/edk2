@@ -919,6 +919,25 @@ FdtGetPhandle (
 }
 
 /**
+  Find and return the highest phandle in a tree. The value returned in Phandle
+  is only valid if the function returns success.
+
+  @param[in]  Fdt            The pointer to FDT blob.
+  @param[out] Phandle        The return location for the highest Phandle value found in the tree
+
+  @return 0 on success or a negative error code on failure
+**/
+INT32
+EFIAPI
+FdtFindMaxPhandle (
+  IN CONST VOID  *Fdt,
+  OUT UINT32     *Phandle
+  )
+{
+  return fdt_find_max_phandle (Fdt, Phandle);
+}
+
+/**
   Applies a DT overlay on a base DT.
 
   @param[in] Fdt            The pointer to FDT blob.
