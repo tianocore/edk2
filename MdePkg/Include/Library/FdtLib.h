@@ -202,6 +202,11 @@ typedef struct {
 #define FdtSetPropEmpty(Fdt, NodeOffset, Name) \
   FdtSetProp ((Fdt), (NodeOffset), (Name), NULL, 0)
 
+#define FdtForEachPropertyOffset(Property, Fdt, Node)   \
+  for (Property = FdtFirstPropertyOffset(Fdt, Node);    \
+       Property >= 0;                                   \
+       Property = FdtNextPropertyOffset(Fdt, Property))
+
 /**
   Convert UINT16 data of the FDT blob to little-endian
 
@@ -969,6 +974,22 @@ EFIAPI
 FdtGetPhandle (
   IN CONST VOID  *Fdt,
   IN INT32       NodeOffset
+  );
+
+/**
+  Find and return the highest phandle in a tree. The value returned in Phandle
+  is only valid if the function returns success.
+
+  @param[in]  Fdt            The pointer to FDT blob.
+  @param[out] Phandle        The return location for the highest Phandle value found in the tree
+
+  @return 0 on success or a negative error code on failure
+**/
+INT32
+EFIAPI
+FdtFindMaxPhandle (
+  IN CONST VOID  *Fdt,
+  OUT UINT32     *Phandle
   );
 
 /**
