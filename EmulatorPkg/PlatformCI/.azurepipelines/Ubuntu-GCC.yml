@@ -31,7 +31,7 @@ jobs:
   - job: Platform_CI
     variables:
       package: 'EmulatorPkg'
-      vm_image: 'ubuntu-24.04'
+      vm_image: ${{ variables.default_linux_vm }}
       should_run: false
       run_flags: "MAKE_STARTUP_NSH=TRUE"
 
