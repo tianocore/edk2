@@ -41,7 +41,6 @@ parameters:
 steps:
 - bash: |
     echo "##vso[task.prependpath]${HOME}/.local/bin"
-    echo "new PATH=${PATH}"
   displayName: Set PATH
   condition: eq(variables['Agent.OS'], 'Linux')
 
