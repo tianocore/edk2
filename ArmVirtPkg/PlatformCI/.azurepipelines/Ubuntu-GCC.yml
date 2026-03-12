@@ -113,7 +113,7 @@ jobs:
     pool:
       vmImage: $(vm_image)
 
-    container: ${{ variables.default_linux_image }}
+    container: ${{ variables.default_linux_container }}
 
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
