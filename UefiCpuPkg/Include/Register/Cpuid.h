@@ -8,3 +8,4 @@
 #pragma once
 
 #include <Register/Intel/Cpuid.h>
+#include <Register/Amd/Cpuid.h>

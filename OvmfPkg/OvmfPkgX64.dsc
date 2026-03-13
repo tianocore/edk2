@@ -873,9 +873,7 @@
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf  {
    <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-!if $(DEBUG_TO_MEM)
       MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogLibNull.inf
-!endif
   }
 
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf

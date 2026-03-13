@@ -1282,6 +1282,7 @@ SmbiosPrintStructure (
     // Management Controller Host Interface (Type 42)
     //
     case 42:
+    {
       MC_HOST_INTERFACE_PROTOCOL_RECORD  *MCHostInterfaceProtocolRecord;
       UINT8                              *RecordsPointer;
       UINT8                              MCHostInterfaceProtocolNumber;
@@ -1363,6 +1364,7 @@ SmbiosPrintStructure (
       }
 
       break;
+    }
 
     //
     // TPM Device (Type 43)

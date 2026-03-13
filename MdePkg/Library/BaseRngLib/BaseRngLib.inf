@@ -53,8 +53,8 @@
   gEfiRngAlgorithmSp80090Ctr256Guid
 
 [Sources.RISCV64]
-  Riscv/Rng.c
-  Riscv/Seed.S               | GCC
+  RiscV/Rng.c
+  RiscV/Seed.S               | GCC
 
 [Packages]
   MdePkg/MdePkg.dec

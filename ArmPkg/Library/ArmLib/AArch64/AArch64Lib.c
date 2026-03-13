@@ -16,7 +16,6 @@
 #include <AArch64/AArch64.h>
 
 #include "AArch64Lib.h"
-#include "ArmLibPrivate.h"
 
 /**
   Check whether the CPU supports the GIC system register interface (any version)
