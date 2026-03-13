@@ -59,7 +59,12 @@ INF  MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntim
 INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF  UefiCpuPkg/CpuDxe/CpuDxe.inf
+!if $(SECURE_BOOT_ENABLE) == TRUE
 INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+INF  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+!else
+INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+!endif
 INF  OvmfPkg/LoongArchVirt/Drivers/StableTimerDxe/TimerDxe.inf
 INF  MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
 INF  MdeModulePkg/Universal/Metronome/Metronome.inf
