@@ -53,6 +53,10 @@
   PcdLib
   CcExitLib
   AmdSvsmLib
+  HobLib
+
+[Guids]
+  gEfiIgvmDataHobGuid
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
