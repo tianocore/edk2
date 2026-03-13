@@ -33,6 +33,7 @@
   DEFINE TPM2_ENABLE             = FALSE
   DEFINE TPM2_CONFIG_ENABLE      = FALSE
   DEFINE CAVIUM_ERRATUM_27456    = FALSE
+  DEFINE QEMU_PV_PANIC           = FALSE
 
   #
   # Network definition
