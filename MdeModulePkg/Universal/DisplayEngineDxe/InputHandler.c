@@ -1719,20 +1719,19 @@ TheKey:
         } else {
           if (CurrentOption == NULL) {
             ASSERT (CurrentOption != NULL);
-            break;
-          }
-
-          gUserInput->InputValue.Type = CurrentOption->OptionOpCode->Type;
-          if (IsValuesEqual (&Question->CurrentValue.Value, &CurrentOption->OptionOpCode->Value, gUserInput->InputValue.Type)) {
-            return EFI_DEVICE_ERROR;
           } else {
-            SetValuesByType (&gUserInput->InputValue.Value, &CurrentOption->OptionOpCode->Value, gUserInput->InputValue.Type);
+            gUserInput->InputValue.Type = CurrentOption->OptionOpCode->Type;
+            if (IsValuesEqual (&Question->CurrentValue.Value, &CurrentOption->OptionOpCode->Value, gUserInput->InputValue.Type)) {
+              return EFI_DEVICE_ERROR;
+            } else {
+              SetValuesByType (&gUserInput->InputValue.Value, &CurrentOption->OptionOpCode->Value, gUserInput->InputValue.Type);
+            }
           }
-
-          gST->ConOut->SetAttribute (gST->ConOut, SavedAttribute);
-
-          return EFI_SUCCESS;
         }
+
+        gST->ConOut->SetAttribute (gST->ConOut, SavedAttribute);
+
+        return EFI_SUCCESS;
 
       default:
         break;

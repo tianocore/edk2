@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __RUNTIME_SERVICES_LIB_H__
-#define __RUNTIME_SERVICES_LIB_H__
+#pragma once
 
 VOID
 LibMtcInitialize (
@@ -168,5 +167,3 @@ LibReportStatusCode (
   IN EFI_GUID               *CallerId,
   IN EFI_STATUS_CODE_DATA   *Data OPTIONAL
   );
-
-#endif

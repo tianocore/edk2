@@ -245,6 +245,7 @@ WinNtOpenVolume (
   Size        += StrSize (L"\\*");
   TempFileName = AllocatePool (Size);
   if (TempFileName == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
 

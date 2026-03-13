@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _INTEL_STM_RESOURCE_DESCRIPTOR_H_
-#define _INTEL_STM_RESOURCE_DESCRIPTOR_H_
+#pragma once
 
 #pragma pack (1)
 
@@ -218,5 +217,3 @@ typedef union {
 } STM_RSC;
 
 #pragma pack ()
-
-#endif

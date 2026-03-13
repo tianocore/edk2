@@ -17,8 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SMI_HANDLER_PROFILE_LIB_H__
-#define __SMI_HANDLER_PROFILE_LIB_H__
+#pragma once
 
 #include <PiSmm.h>
 
@@ -77,5 +76,3 @@ SmiHandlerProfileUnregisterHandler (
   IN VOID                          *Context  OPTIONAL,
   IN UINTN                         ContextSize OPTIONAL
   );
-
-#endif

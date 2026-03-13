@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _MP_LIB_H_
-#define _MP_LIB_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -1011,5 +1010,3 @@ ApplyRoProtection (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINTN                 Length
   );
-
-#endif

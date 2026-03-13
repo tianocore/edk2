@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef UEFI_PAYLOAD_DEBUG_PRINT_ERROR_LEVEL_H_
-#define UEFI_PAYLOAD_DEBUG_PRINT_ERROR_LEVEL_H_
+#pragma once
 
 #include <Uefi.h>
 #include <UniversalPayload/UniversalPayload.h>
@@ -28,4 +27,3 @@ typedef struct {
 #define UEFI_PAYLOAD_DEBUG_PRINT_ERROR_LEVEL_REVISION  1
 
 extern GUID  gEdkiiDebugPrintErrorLevelGuid;
-#endif

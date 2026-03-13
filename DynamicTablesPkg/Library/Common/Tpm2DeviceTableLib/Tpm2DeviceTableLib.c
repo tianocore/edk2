@@ -212,7 +212,7 @@ FixupTpm2DeviceInfo (
 
 /** Build a SSDT table describing the TPM2 device.
 
-  The table created by this function must be freed by FreeSImpleTpm2DeviceTable.
+  The table created by this function must be freed by FreeSimpleTpm2DeviceTable.
 
   @param [in]  TpmDevInfo      TPM2 device info to describe in the SSDT table.
   @param [in]  Name             The Name to give to the Device.

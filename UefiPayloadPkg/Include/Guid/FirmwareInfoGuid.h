@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef FIRMWARE_INFO_GUID_H_
-#define FIRMWARE_INFO_GUID_H_
+#pragma once
 
 ///
 /// Firmware information GUID
@@ -22,5 +21,3 @@ typedef struct {
   UINT32      LowestSupportedVersion;
   UINT32      ImageSize;
 } FIRMWARE_INFO;
-
-#endif // FIRMWARE_INFO_GUID_H_

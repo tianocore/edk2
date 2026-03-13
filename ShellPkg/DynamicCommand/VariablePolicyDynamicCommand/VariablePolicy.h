@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef VAR_POLICY_DYNAMIC_SHELL_COMMAND_H_
-#define VAR_POLICY_DYNAMIC_SHELL_COMMAND_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Protocol/Shell.h>
@@ -125,5 +124,3 @@ RunVarPolicy (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   );
-
-#endif

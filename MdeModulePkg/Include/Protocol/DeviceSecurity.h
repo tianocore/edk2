@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __DEVICE_SECURITY_H__
-#define __DEVICE_SECURITY_H__
+#pragma once
 
 //
 // Device Security Protocol GUID value
@@ -157,5 +156,3 @@ extern EFI_GUID  gEdkiiDeviceSecurityProtocolGuid;
 ///
 extern EFI_GUID  gEdkiiDeviceIdentifierTypePciGuid;
 extern EFI_GUID  gEdkiiDeviceIdentifierTypeUsbGuid;
-
-#endif

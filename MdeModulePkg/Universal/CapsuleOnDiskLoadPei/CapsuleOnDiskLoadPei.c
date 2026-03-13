@@ -173,7 +173,6 @@ RetrieveRelocatedCapsule (
   IN UINTN  RelocCapsuleTotalSize
   )
 {
-  UINTN   Index;
   UINT8   *CapsuleDataBufEnd;
   UINT8   *CapsulePtr;
   UINT32  CapsuleSize;
@@ -244,7 +243,6 @@ RetrieveRelocatedCapsule (
   // Re-iterate the capsule buffer to create Capsule hob & Capsule Name Str Hob for each Capsule saved in relocated capsule file
   //
   CapsulePtr = RelocCapsuleBuf;
-  Index      = 0;
   while (CapsulePtr < CapsuleDataBufEnd) {
     CapsuleSize = ((EFI_CAPSULE_HEADER *)CapsulePtr)->CapsuleImageSize;
     BuildCvHob ((EFI_PHYSICAL_ADDRESS)(UINTN)CapsulePtr, CapsuleSize);
@@ -252,7 +250,6 @@ RetrieveRelocatedCapsule (
     DEBUG ((DEBUG_INFO, "Capsule saved in address %x size %x\n", CapsulePtr, CapsuleSize));
 
     CapsulePtr += CapsuleSize;
-    Index++;
   }
 
   return EFI_SUCCESS;

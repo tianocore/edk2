@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef EXTRA_DATA_H_
-#define EXTRA_DATA_H_
+#pragma once
 
 extern GUID  gUniversalPayloadExtraDataGuid;
 
@@ -27,5 +26,3 @@ typedef struct {
 #pragma pack()
 
 #define UNIVERSAL_PAYLOAD_EXTRA_DATA_REVISION  1
-
-#endif

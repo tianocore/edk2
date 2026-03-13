@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_PEI_XHCI_REG_H_
-#define _EFI_PEI_XHCI_REG_H_
+#pragma once
 
 //
 // Capability registers offset
@@ -444,5 +443,3 @@ XhcPeiRunHC (
   IN PEI_XHC_DEV  *Xhc,
   IN UINT32       Timeout
   );
-
-#endif

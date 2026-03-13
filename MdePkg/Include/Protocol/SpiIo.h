@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __SPI_IO_PROTOCOL_H__
-#define __SPI_IO_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/LegacySpiController.h>
 #include <Protocol/SpiConfiguration.h>
@@ -292,5 +291,3 @@ struct _EFI_SPI_IO_PROTOCOL {
   ///
   EFI_SPI_IO_PROTOCOL_UPDATE_SPI_PERIPHERAL    UpdateSpiPeripheral;
 };
-
-#endif // __SPI_IO_PROTOCOL_H__

@@ -10,8 +10,7 @@
   - linux//Documentation/devicetree/bindings/interrupt-controller/arm%2Cgic.yaml
 **/
 
-#ifndef FDT_UTILITY_H_
-#define FDT_UTILITY_H_
+#pragma once
 
 /** Get the offset of an address in a "reg" Device Tree property.
 
@@ -512,7 +511,7 @@ FdtConvertToGsi (
   @param [in]  ExtIntcNode    External interrupt controller node.
   @param [in]  GsiBase        GSI base of the interrupt controller.
 
-  @retval EFI_SUCCESS           External interript controller node is added in the list.
+  @retval EFI_SUCCESS           External interrupt controller node is added in the list.
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory for the list.
 **/
 EFI_STATUS
@@ -520,5 +519,3 @@ FdtCreateExtIntcList (
   INT32   ExtIntcNode,
   UINT32  GsiBase
   );
-
-#endif // FDT_UTILITY_H_

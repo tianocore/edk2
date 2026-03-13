@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_STRING_FUNCS_H
-#define _EFI_STRING_FUNCS_H
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -161,7 +160,3 @@ PrintStringList (
   IN STRING_LIST       *StringList
   )
 ;
-
-
-
-#endif

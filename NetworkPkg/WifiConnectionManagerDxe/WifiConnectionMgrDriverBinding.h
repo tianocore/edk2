@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_WIFI_DRIVER_BINDING__
-#define __EFI_WIFI_DRIVER_BINDING__
+#pragma once
 
 /**
   Tests to see if this driver supports a given controller. If a child device is provided,
@@ -138,5 +137,3 @@ WifiMgrDxeDriverBindingStop (
   IN  UINTN                       NumberOfChildren,
   IN  EFI_HANDLE                  *ChildHandleBuffer OPTIONAL
   );
-
-#endif

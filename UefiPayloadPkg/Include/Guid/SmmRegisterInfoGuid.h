@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef PAYLOAD_SMM_REGISTER_INFO_GUID_H_
-#define PAYLOAD_SMM_REGISTER_INFO_GUID_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -43,5 +42,3 @@ typedef struct {
 } PLD_SMM_REGISTERS;
 
 #pragma pack()
-
-#endif

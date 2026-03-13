@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _FSP_SILICON_INIT_DONE_H_
-#define _FSP_SILICON_INIT_DONE_H_
+#pragma once
 
 typedef struct _FSP_SILICON_INIT_DONE_PPI FSP_SILICON_INIT_DONE_PPI;
 
@@ -33,5 +32,3 @@ struct _FSP_SILICON_INIT_DONE_PPI {
 };
 
 extern EFI_GUID  gFspSiliconInitDonePpiGuid;
-
-#endif

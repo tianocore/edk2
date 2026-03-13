@@ -28,8 +28,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PCI_SEGMENT_LIB__
-#define __PCI_SEGMENT_LIB__
+#pragma once
 
 /**
   Macro that converts PCI Segment, PCI Bus, PCI Device, PCI Function,
@@ -1038,5 +1037,3 @@ PciSegmentWriteBuffer (
   IN UINTN   Size,
   IN VOID    *Buffer
   );
-
-#endif

@@ -17,6 +17,7 @@ extern "C" {
   #include <UnitTestFrameworkTypes.h>
   #include <Library/BaseLib.h>
   #include <Library/UnitTestLib.h>
+  #include <stdio.h>
 
   //
   // If address sanitizer is enabled, then declare the function that is used to

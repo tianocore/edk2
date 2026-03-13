@@ -93,9 +93,42 @@
         "IgnoreFiles": [],           # use gitignore syntax to ignore errors
                                      # in matching files
         "ExtendWords": [
+            "afsel",
+            "ctsen",
+            "dataen",
+            "daten",
+            "deassert",
+            "hbackporch",
             "hdlcd",
+            "hsync",
             "icdsgir",
-            "primecells"
+            "inten",
+            "jedec",
+            "pcell",
+            "primecells",
+            "pxclk",
+            "resen",
+            "rtsen",
+            "tpidrurw",
+            "uartcr",
+            "uartdmacr",
+            "uartdr",
+            "uartecr",
+            "uartfbrd",
+            "uartfr",
+            "uartibrd",
+            "uarticr",
+            "uartifls",
+            "uartilpr",
+            "uartimsc",
+            "uartris",
+            "vbackporch",
+            "vsync",
+            "vsyncwidth",
+            "wdogmis",
+            "wdogris",
+            "wsvga",
+            "wsxga"
            ],           # words to extend to the dictionary for this package
         "IgnoreStandardPaths": [    # Standard Plugin defined paths that
             "*.asm", "*.s"          # should be ignore

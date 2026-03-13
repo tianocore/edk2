@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __TCG_SMM_H__
-#define __TCG_SMM_H__
+#pragma once
 
 #include <PiDxe.h>
 #include <IndustryStandard/Acpi.h>
@@ -95,5 +94,3 @@ typedef struct {
 //
 #define MOR_REQUEST_SUCCESS          0
 #define MOR_REQUEST_GENERAL_FAILURE  1
-
-#endif // __TCG_SMM_H__

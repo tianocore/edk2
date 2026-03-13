@@ -47,7 +47,7 @@ EMU_SYSTEM_MEMORY  *gSystemMemory;
 UINTN                        mImageContextModHandleArraySize = 0;
 IMAGE_CONTEXT_TO_MOD_HANDLE  *mImageContextModHandleArray    = NULL;
 
-EFI_PEI_PPI_DESCRIPTOR  *gPpiList;
+EFI_PEI_PPI_DESCRIPTOR  *mPpiList;
 
 int  gInXcode = 0;
 
@@ -166,7 +166,7 @@ main (
 
   // EmuSecLibConstructor ();
 
-  gPpiList = GetThunkPpiList ();
+  mPpiList = GetThunkPpiList ();
 
   //
   // Allocate space for gSystemMemory Array
@@ -602,7 +602,7 @@ SecLoadFromCore (
   PeiSwitchStacks (
     (SWITCH_STACK_ENTRY_POINT)(UINTN)PeiCoreEntryPoint,
     SecCoreData,
-    (VOID *)gPpiList,
+    (VOID *)mPpiList,
     TopOfStack
     );
   //
@@ -1112,9 +1112,7 @@ DlLoadImage (
  #endif
 }
 
-#ifdef __APPLE__
 __attribute__ ((noinline))
-#endif
 VOID
 SecGdbScriptBreak (
   char               *FileName,
@@ -1123,6 +1121,17 @@ SecGdbScriptBreak (
   int                AddSymbolFlag
   )
 {
+  volatile UINTN  Index;
+
+  //
+  // Disable inline and have this function do some work to prevent
+  // optimizing this function away. It must always be in symbol table to
+  // set breakpoint for gdb script to run, load symbols, and set pending
+  // breakpoints.
+  //
+  for (Index = 0; Index < 1; Index++) {
+  }
+
   return;
 }
 

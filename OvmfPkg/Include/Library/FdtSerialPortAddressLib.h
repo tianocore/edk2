@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef FDT_SERIAL_PORT_ADDRESS_LIB_H_
-#define FDT_SERIAL_PORT_ADDRESS_LIB_H_
+#pragma once
 
 #include <Base.h>
 
@@ -79,5 +78,3 @@ FdtSerialGetConsolePort (
   IN  CONST VOID  *DeviceTree,
   OUT UINT64      *BaseAddress
   );
-
-#endif

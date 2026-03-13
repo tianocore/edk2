@@ -3670,8 +3670,6 @@ GetNameElement (
       HasValue = TRUE;
     } else if ((NextTag = StrStr (StringPtr, L"&")) != NULL) {
       *NextTag = L'\0';
-    } else {
-      goto Done;
     }
 
     //

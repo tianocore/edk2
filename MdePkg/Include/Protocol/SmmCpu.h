@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef _SMM_CPU_H_
-#define _SMM_CPU_H_
+#pragma once
 
 #include <Protocol/MmCpu.h>
 
@@ -123,5 +122,3 @@ typedef EFI_MM_READ_SAVE_STATE EFI_SMM_READ_SAVE_STATE;
 
 typedef EFI_MM_WRITE_SAVE_STATE EFI_SMM_WRITE_SAVE_STATE;
 extern EFI_GUID  gEfiSmmCpuProtocolGuid;
-
-#endif

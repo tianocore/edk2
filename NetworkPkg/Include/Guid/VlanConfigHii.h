@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __VLAN_CONFIG_HII_GUID_H__
-#define __VLAN_CONFIG_HII_GUID_H__
+#pragma once
 
 #define VLAN_CONFIG_FORM_SET_GUID \
   { \
@@ -15,5 +14,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   }
 
 extern EFI_GUID  gVlanConfigFormSetGuid;
-
-#endif

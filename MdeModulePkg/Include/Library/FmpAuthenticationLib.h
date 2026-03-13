@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __FMP_AUTHENTICATION_LIB_H__
-#define __FMP_AUTHENTICATION_LIB_H__
+#pragma once
 
 #include <Protocol/FirmwareManagement.h>
 
@@ -54,5 +53,3 @@ AuthenticateFmpImage (
   IN CONST UINT8                        *PublicKeyData,
   IN UINTN                              PublicKeyDataLength
   );
-
-#endif

@@ -49,6 +49,10 @@
   $(FDT_LIB_PATH)/libfdt_env.h
   $(FDT_LIB_PATH)/libfdt_internal.h
 
+[Sources.IA32]
+  Ia32/MathLShiftS64.c      | MSFT
+  Ia32/MathRShiftU64.c      | MSFT
+
 [Packages]
   MdePkg/MdePkg.dec
 

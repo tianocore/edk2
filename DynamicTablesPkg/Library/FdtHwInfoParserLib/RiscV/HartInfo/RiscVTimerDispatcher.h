@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef RISCV_TIMER_DISPATCHER_H_
-#define RISCV_TIMER_DISPATCHER_H_
+#pragma once
 
 #include <FdtHwInfoParserInclude.h>
 
@@ -35,5 +34,3 @@ RiscVTimerDispatcher (
   IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
   IN        INT32                      FdtBranch
   );
-
-#endif // RISCV_TIMER_DISPATCHER_H_

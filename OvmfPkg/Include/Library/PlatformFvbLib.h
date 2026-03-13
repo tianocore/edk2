@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __PLATFORM_FVB_LIB__
-#define __PLATFORM_FVB_LIB__
+#pragma once
 
 #include <Protocol/FirmwareVolumeBlock.h>
 
@@ -73,5 +72,3 @@ PlatformFvbBlocksErased (
   IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *This,
   IN  VA_LIST                                    List
   );
-
-#endif

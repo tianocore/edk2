@@ -6,8 +6,7 @@
 *
 **/
 
-#ifndef ARM_HVC_LIB_H_
-#define ARM_HVC_LIB_H_
+#pragma once
 
 /**
  * The size of the HVC arguments are different between AArch64 and AArch32.
@@ -36,5 +35,3 @@ VOID
 ArmCallHvc (
   IN OUT ARM_HVC_ARGS  *Args
   );
-
-#endif // ARM_HVC_LIB_H_

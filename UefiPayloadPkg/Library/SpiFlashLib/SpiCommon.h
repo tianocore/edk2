@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef SPI_COMMON_LIB_H_
-#define SPI_COMMON_LIB_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Uefi/UefiBaseType.h>
@@ -199,5 +198,3 @@ WaitForSpiCycleComplete (
   IN     UINT32   PchSpiBar0,
   IN     BOOLEAN  ErrorCheck
   );
-
-#endif

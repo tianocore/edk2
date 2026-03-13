@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef TIMER_H_
-#define TIMER_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -175,5 +174,3 @@ TimerDriverGenerateSoftInterrupt (
   IN EFI_TIMER_ARCH_PROTOCOL  *This
   )
 ;
-
-#endif

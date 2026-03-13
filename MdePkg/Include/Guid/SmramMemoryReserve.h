@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef _SMRAM_MEMORY_RESERVE_H_
-#define _SMRAM_MEMORY_RESERVE_H_
+#pragma once
 
 #define EFI_SMM_SMRAM_MEMORY_GUID \
   { \
@@ -40,5 +39,3 @@ typedef struct {
 } EFI_SMRAM_HOB_DESCRIPTOR_BLOCK;
 
 extern EFI_GUID  gEfiSmmSmramMemoryGuid;
-
-#endif

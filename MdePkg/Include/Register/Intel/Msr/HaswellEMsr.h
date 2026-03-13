@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __HASWELL_E_MSR_H__
-#define __HASWELL_E_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -6105,5 +6104,3 @@ typedef union {
 #define MSR_HASWELL_E_C17_PMON_CTR2  0x00000F1A
 #define MSR_HASWELL_E_C17_PMON_CTR3  0x00000F1B
 /// @}
-
-#endif

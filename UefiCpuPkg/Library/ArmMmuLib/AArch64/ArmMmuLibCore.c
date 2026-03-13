@@ -94,6 +94,7 @@ ArmMemoryAttributeToPageAttribute (
 // T0SZ can be below MIN_T0SZ when LPA2 is in use, meaning the page table starts at level -1
 #define MIN_T0SZ        16
 #define BITS_PER_LEVEL  9
+#define MAX_VA_BITS_48  48
 #define MAX_VA_BITS     52
 
 STATIC
@@ -658,8 +659,13 @@ ArmConfigureMmu (
   // into account the architectural limitations that result from UEFI's
   // use of 4 KB pages.
   //
-  MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS);
-  MaxAddress     = LShiftU64 (1ULL, MaxAddressBits) - 1;
+  if (ArmHas52BitTgran4 ()) {
+    MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS);
+  } else {
+    MaxAddressBits = MIN (ArmGetPhysicalAddressBits (), MAX_VA_BITS_48);
+  }
+
+  MaxAddress = LShiftU64 (1ULL, MaxAddressBits) - 1;
 
   T0SZ                = 64 - MaxAddressBits;
   RootTableEntryCount = GetRootTableEntryCount (T0SZ);

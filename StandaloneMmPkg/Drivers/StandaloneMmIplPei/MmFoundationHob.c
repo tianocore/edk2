@@ -1026,9 +1026,12 @@ CreateMmFoundationHobList (
   //
   // Build ACPI variable HOB
   //
-  HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
-  MmIplCopyGuidHob (FoundationHobList + UsedSize, &HobLength, &gEfiAcpiVariableGuid, FALSE);
-  UsedSize += HobLength;
+  if (PcdGetBool (PcdAcpiS3Enable)) {
+    // Only check on this variable when S3 needs it.
+    HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+    MmIplCopyGuidHob (FoundationHobList + UsedSize, &HobLength, &gEfiAcpiVariableGuid, FALSE);
+    UsedSize += HobLength;
+  }
 
   if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
     //

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef PEILESS_STARTUP_INTERNAL_LIB_H_
-#define PEILESS_STARTUP_INTERNAL_LIB_H_
+#pragma once
 
 #include <PiPei.h>
 #include <Library/BaseLib.h>
@@ -57,5 +56,3 @@ EFI_STATUS
 EFIAPI
 ConstructSecHobList (
   );
-
-#endif

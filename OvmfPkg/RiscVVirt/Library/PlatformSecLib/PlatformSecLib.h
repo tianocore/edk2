@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef PLATFORM_SEC_LIB_
-#define PLATFORM_SEC_LIB_
+#pragma once
 
 #include <PiPei.h>
 #include <Ppi/SecHobData.h>
@@ -98,5 +97,3 @@ EFIAPI
 CpuInitialization (
   VOID  *FdtPointer
   );
-
-#endif /* PLATFORM_SEC_LIB_ */

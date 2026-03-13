@@ -23,6 +23,7 @@
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
+#include <Library/SafeIntLib.h>
 
 #include <IndustryStandard/ArmFfaSvc.h>
 #include <IndustryStandard/ArmFfaPartInfo.h>
@@ -31,9 +32,6 @@
 #include <Guid/ArmFfaRxTxBufferInfo.h>
 
 #include "ArmFfaCommon.h"
-
-BOOLEAN  gFfaSupported;
-UINT16   gPartId;
 
 /**
   Convert EFI_STATUS to FFA return code.
@@ -169,22 +167,6 @@ ArmCallFfa (
   } else {
     ArmCallSvc ((ARM_SVC_ARGS *)FfaArgs);
   }
-}
-
-/**
-  Check FF-A support or not.
-
-  @retval TRUE                   Supported
-  @retval FALSE                  Not supported
-
-**/
-BOOLEAN
-EFIAPI
-IsFfaSupported (
-  IN VOID
-  )
-{
-  return gFfaSupported;
 }
 
 /**
@@ -531,6 +513,205 @@ ErrorHandler:
 }
 
 /**
+  Invoked by an endpoint to yield control back to the component
+  that called it. This prevents long running transactions from
+  being caught up in the secure world. Endpoint will need to be
+  invoked with FFA_RUN after the specified timeout.
+
+  @param [in]   TimeoutUs    The timeout indicating the time in which
+                             the endpoint is required to be run in
+                             microseconds.
+
+  @return EFI_SUCCESS
+  @return Other              Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibYield (
+  IN  UINT64  TimeoutUs
+  )
+{
+  ARM_FFA_ARGS   FfaArgs;
+  UINT64         TimeoutNs;
+  RETURN_STATUS  ReturnStatus;
+
+  ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
+
+  ReturnStatus = SafeUint64Mult (TimeoutUs, 1000, &TimeoutNs);
+  if (ReturnStatus != RETURN_SUCCESS) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  FfaArgs.Arg0 = ARM_FID_FFA_YIELD;
+  FfaArgs.Arg2 = (UINT32)TimeoutNs;
+  FfaArgs.Arg3 = (UINT32)(TimeoutNs >> 32);
+
+  ArmCallFfa (&FfaArgs);
+
+  return FfaArgsToEfiStatus (&FfaArgs);
+}
+
+/**
+  Get number of Partitions via registers.
+  This function is supported by aarch64 only.
+
+  @param [in]       ServiceGuid       Service guid.
+  @param [out]      PartDescCount     Return number of partition info related to
+                                      ServiceGuid.
+
+  @retval EFI_SUCCESS
+  @retval EFI_UNSUPPORTED
+  @retval EFI_INVALID_PARAMETER
+  @retval Other              Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibPartitionCountGetRegs (
+  IN  EFI_GUID  *ServiceGuid,
+  OUT UINT32    *PartDescCount
+  )
+{
+  EFI_STATUS    Status;
+  ARM_FFA_ARGS  FfaArgs;
+  UINT64        Uuid[2];
+
+  if (PartDescCount == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (ServiceGuid != NULL) {
+    ConvertGuidToUuid (ServiceGuid, (GUID *)Uuid);
+  } else {
+    ZeroMem (Uuid, sizeof (Uuid));
+  }
+
+  ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
+
+  FfaArgs.Arg0 = ARM_FID_FFA_PARTITION_INFO_GET_REGS;
+  FfaArgs.Arg1 = Uuid[0];
+  FfaArgs.Arg2 = Uuid[1];
+
+  ArmCallFfa (&FfaArgs);
+
+  Status = FfaArgsToEfiStatus (&FfaArgs);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  *PartDescCount = ((FfaArgs.Arg2 >> FFA_PART_INFO_METADATA_LAST_IDX_SHIFT) &
+                    FFA_PART_INFO_IDX_MASK) + 1;
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Get Partition info via registers.
+  This function is supported by aarch64 only.
+
+  @param [in]       ServiceGuid       Service guid.
+  @param [in,out]   PartDescCount     Number of PartDesc.
+                                      It'll return the copied number of
+                                      partition info in PartDesc.
+  @param [out]      PartDesc          Partition information Buffer
+
+  @retval EFI_SUCCESS
+  @retval EFI_UNSUPPORTED
+  @retval EFI_INVALID_PARAMETER
+  @retval EFI_BUFFER_TOO_SMALL
+  @retval Other                       Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibPartitionInfoGetRegs (
+  IN EFI_GUID                 *ServiceGuid,
+  IN OUT UINT32               *PartDescCount,
+  OUT EFI_FFA_PART_INFO_DESC  *PartDesc
+  )
+{
+  EFI_STATUS    Status;
+  ARM_FFA_ARGS  FfaArgs;
+  UINT64        Uuid[2];
+  UINT32        DescCount;
+  UINT16        Count;
+  UINT16        PrevIdx;
+  UINT16        StartIdx;
+  UINT16        CurIdx;
+  UINT16        Tag;
+  UINT16        Idx;
+  UINT16        DescSize;
+  UINTN         *Regs;
+
+  if ((PartDescCount == NULL) || (PartDesc == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (*PartDescCount == 0) {
+    return EFI_BUFFER_TOO_SMALL;
+  }
+
+  if (ServiceGuid != NULL) {
+    ConvertGuidToUuid (ServiceGuid, (GUID *)Uuid);
+  } else {
+    ZeroMem (Uuid, sizeof (Uuid));
+  }
+
+  PrevIdx   = 0;
+  Tag       = 0;
+  DescCount = *PartDescCount;
+
+  do {
+    StartIdx = (PrevIdx == 0) ? 0 : PrevIdx + 1;
+
+    ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
+
+    FfaArgs.Arg0 = ARM_FID_FFA_PARTITION_INFO_GET_REGS;
+    FfaArgs.Arg1 = Uuid[0];
+    FfaArgs.Arg2 = Uuid[1];
+    FfaArgs.Arg3 = (Tag << FFA_PART_INFO_START_TAG_SHIFT) | StartIdx;
+
+    ArmCallFfa (&FfaArgs);
+
+    Status = FfaArgsToEfiStatus (&FfaArgs);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    Count = ((FfaArgs.Arg2 >> FFA_PART_INFO_METADATA_LAST_IDX_SHIFT) &
+             FFA_PART_INFO_IDX_MASK) + 1;
+
+    CurIdx = ((FfaArgs.Arg2 >> FFA_PART_INFO_METADATA_CURRENT_IDX_SHIFT) &
+              FFA_PART_INFO_IDX_MASK);
+    Tag = ((FfaArgs.Arg2 >> FFA_PART_INFO_METADATA_TAG_SHIFT) &
+           FFA_PART_INFO_TAG_MASK);
+    DescSize = ((FfaArgs.Arg2 >> FFA_PART_INFO_METADATA_DESC_SIZE_SHIFT) &
+                FFA_PART_INFO_DESC_SIZE_MASK);
+
+    if (DescSize != sizeof (EFI_FFA_PART_INFO_DESC)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    Regs = &FfaArgs.Arg3;
+    for (Idx = 0; Idx < (CurIdx - StartIdx) + 1; Idx++) {
+      CopyMem (PartDesc, Regs, DescSize);
+      Regs += sizeof (EFI_FFA_PART_INFO_DESC) / sizeof (UINTN);
+      PartDesc++;
+      if (--DescCount == 0) {
+        break;
+      }
+    }
+
+    PrevIdx = CurIdx;
+  } while (CurIdx < (Count - 1) && (DescCount != 0));
+
+  *PartDescCount -= DescCount;
+
+  return EFI_SUCCESS;
+}
+
+/**
   Restore the context which was interrupted with FFA_INTERRUPT (EFI_INTERRUPT_PENDING).
 
   @param [in]   PartId       Partition id
@@ -616,15 +797,21 @@ ArmFfaLibMsgSendDirectReq (
 {
   EFI_STATUS    Status;
   ARM_FFA_ARGS  FfaArgs;
+  UINT16        PartId;
 
-  if ((DestPartId == gPartId) || (ImpDefArgs == NULL)) {
+  Status = ArmFfaLibGetPartId (&PartId);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if ((DestPartId == PartId) || (ImpDefArgs == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
   FfaArgs.Arg0 = ARM_FID_FFA_MSG_SEND_DIRECT_REQ;
-  FfaArgs.Arg1 = PACK_PARTITION_ID_INFO (gPartId, DestPartId);
+  FfaArgs.Arg1 = PACK_PARTITION_ID_INFO (PartId, DestPartId);
   FfaArgs.Arg2 = Flags;
   FfaArgs.Arg3 = ImpDefArgs->Arg0;
   FfaArgs.Arg4 = ImpDefArgs->Arg1;
@@ -671,6 +858,7 @@ ArmFfaLibMsgSendDirectReq2 (
   EFI_STATUS    Status;
   UINT64        Uuid[2];
   ARM_FFA_ARGS  FfaArgs;
+  UINT16        PartId;
 
   /*
    * Direct message request 2 is only supported on AArch64.
@@ -679,7 +867,12 @@ ArmFfaLibMsgSendDirectReq2 (
     return EFI_UNSUPPORTED;
   }
 
-  if ((DestPartId == gPartId) || (ImpDefArgs == NULL)) {
+  Status = ArmFfaLibGetPartId (&PartId);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if ((DestPartId == PartId) || (ImpDefArgs == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -692,7 +885,7 @@ ArmFfaLibMsgSendDirectReq2 (
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
   FfaArgs.Arg0  = ARM_FID_FFA_MSG_SEND_DIRECT_REQ2;
-  FfaArgs.Arg1  = PACK_PARTITION_ID_INFO (gPartId, DestPartId);
+  FfaArgs.Arg1  = PACK_PARTITION_ID_INFO (PartId, DestPartId);
   FfaArgs.Arg2  = Uuid[0];
   FfaArgs.Arg3  = Uuid[1];
   FfaArgs.Arg4  = ImpDefArgs->Arg0;
@@ -738,55 +931,119 @@ ArmFfaLibMsgSendDirectReq2 (
 /**
   Common ArmFfaLib init.
 
+  @param [out] PartId            PartitionId
+  @param [out] IsFfaSupported    FF-A supported flag
+
   @retval EFI_SUCCESS            Success
-  @retval EFI_UNSUPPORTED        FF-A isn't supported
+  @retval EFI_INVALID_PARAMETER  Invalid parameter
   @retval Others                 Error
 
 **/
 EFI_STATUS
 EFIAPI
 ArmFfaLibCommonInit (
-  IN VOID
+  OUT UINT16   *PartId,
+  OUT BOOLEAN  *IsFfaSupported
   )
 {
   EFI_STATUS  Status;
-  UINT16      CurrentMajorVersion;
-  UINT16      CurrentMinorVersion;
 
-  gFfaSupported = FALSE;
-
-  Status = ArmFfaLibGetVersion (
-             ARM_FFA_MAJOR_VERSION,
-             ARM_FFA_MINOR_VERSION,
-             &CurrentMajorVersion,
-             &CurrentMinorVersion
-             );
-  if (EFI_ERROR (Status)) {
-    return EFI_UNSUPPORTED;
+  if ((PartId == NULL) || (IsFfaSupported == NULL)) {
+    return EFI_INVALID_PARAMETER;
   }
 
-  if ((ARM_FFA_MAJOR_VERSION != CurrentMajorVersion) ||
-      (ARM_FFA_MINOR_VERSION > CurrentMinorVersion))
-  {
-    DEBUG ((
-      DEBUG_INFO,
-      "Incompatible FF-A Versions.\n" \
-      "Request Version: Major=0x%x, Minor=0x%x.\n" \
-      "Current Version: Major=0x%x, Minor>=0x%x.\n",
-      ARM_FFA_MAJOR_VERSION,
-      ARM_FFA_MINOR_VERSION,
-      CurrentMajorVersion,
-      CurrentMinorVersion
-      ));
-    return EFI_UNSUPPORTED;
-  }
+  *IsFfaSupported = ArmFfaLibIsFfaSupported ();
 
-  Status = ArmFfaLibPartitionIdGet (&gPartId);
+  Status = ArmFfaLibPartitionIdGet (PartId);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  gFfaSupported = TRUE;
+  return EFI_SUCCESS;
+}
+
+/**
+  Helper to retrieve the first partition information associated with
+  a service GUID via registers.
+
+  @param [in]       ServiceGuid       Service guid.
+  @param [in, out]  PartDescCount     Return number of partition info related to
+                                      Service guid when PartDesc == NULL.
+                                      Otherwise return number of partition info
+                                      copied in ParcDesc
+  @param [out]      PartDesc          Partition information Buffer
+
+  @retval EFI_SUCCESS
+  @retval EFI_UNSUPPORTED
+  @retval EFI_INVALID_PARAMETER
+  @retval Other                       Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibGetPartitionInfo (
+  IN EFI_GUID                 *ServiceGuid,
+  OUT EFI_FFA_PART_INFO_DESC  *PartDesc
+  )
+{
+  EFI_STATUS  Status;
+  VOID        *TxBuffer;
+  UINT64      TxBufferSize;
+  VOID        *RxBuffer;
+  UINT64      RxBufferSize;
+  UINT32      Count;
+  UINT32      Size;
+  UINT16      PartId;
+
+  if (PartDesc == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Count = 1;
+
+  Status = ArmFfaLibPartitionInfoGetRegs (ServiceGuid, &Count, PartDesc);
+  if (!EFI_ERROR (Status)) {
+    return EFI_SUCCESS;
+  }
+
+  Status = ArmFfaLibGetRxTxBuffers (
+             &TxBuffer,
+             &TxBufferSize,
+             &RxBuffer,
+             &RxBufferSize
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Failed to get Rx/Tx Buffer. Status: %r\n",
+      __func__,
+      Status
+      ));
+    return Status;
+  }
+
+  Status = ArmFfaLibPartitionInfoGet (
+             ServiceGuid,
+             FFA_PART_INFO_FLAG_TYPE_DESC,
+             &Count,
+             &Size
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = ArmFfaLibGetPartId (&PartId);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if ((Size < sizeof (EFI_FFA_PART_INFO_DESC))) {
+    ArmFfaLibRxRelease (PartId);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CopyMem (PartDesc, RxBuffer, sizeof (EFI_FFA_PART_INFO_DESC));
+  ArmFfaLibRxRelease (PartId);
 
   return EFI_SUCCESS;
 }
@@ -930,6 +1187,97 @@ GetRxTxBufferMinSizeAndAlign (
   }
 
   *MinSizeAndAlign = MinAndAlign;
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Determine if FF-A is supported
+
+  @retval TRUE if FF-A is supported, FALSE otherwise.
+
+**/
+BOOLEAN
+EFIAPI
+ArmFfaLibIsFfaSupported (
+  IN VOID
+  )
+{
+  EFI_STATUS  Status;
+  UINT16      CurrentMajorVersion;
+  UINT16      CurrentMinorVersion;
+
+  Status = ArmFfaLibGetVersion (
+             ARM_FFA_MAJOR_VERSION,
+             ARM_FFA_MINOR_VERSION,
+             &CurrentMajorVersion,
+             &CurrentMinorVersion
+             );
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  if ((ARM_FFA_MAJOR_VERSION != CurrentMajorVersion) ||
+      (ARM_FFA_MINOR_VERSION > CurrentMinorVersion))
+  {
+    DEBUG ((
+      DEBUG_INFO,
+      "Incompatible FF-A Versions.\n" \
+      "Request Version: Major=0x%x, Minor=0x%x.\n" \
+      "Current Version: Major=0x%x, Minor>=0x%x.\n",
+      ARM_FFA_MAJOR_VERSION,
+      ARM_FFA_MINOR_VERSION,
+      CurrentMajorVersion,
+      CurrentMinorVersion
+      ));
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+  Send FF-A Non-secure Resoure Info Get Command.
+
+  @param [in]   TargetId         Partition ID to query info from
+  @param [in]   Flags            Additional flags
+  @param [out]  WrittenSize      How much data was written in the transaction
+  @param [out]  RemainingSize    How much data remains to be read
+
+  @retval EFI_SUCCESS               Success, info returned in Rx/Tx buffer
+  @retval EFI_INVALID PARAMETER     Invalid parameter(s)
+  @retval Others                    Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibFfaNsResInfoGet (
+  IN UINT16   TargetId,
+  IN UINT64   Flags,
+  OUT UINT32  *WrittenSize,
+  OUT UINT32  *RemainingSize
+  )
+{
+  EFI_STATUS    Status;
+  ARM_FFA_ARGS  FfaArgs;
+
+  if ((WrittenSize == NULL) || (RemainingSize == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  FfaArgs.Arg0 = ARM_FID_FFA_NS_RES_INFO_GET;
+  FfaArgs.Arg1 = TargetId;
+  FfaArgs.Arg2 = Flags;
+
+  ArmCallFfa (&FfaArgs);
+
+  Status = FfaArgsToEfiStatus (&FfaArgs);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  *WrittenSize   = FfaArgs.Arg2 >> 32;
+  *RemainingSize = FfaArgs.Arg2;
 
   return EFI_SUCCESS;
 }

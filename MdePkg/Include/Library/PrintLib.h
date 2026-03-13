@@ -169,8 +169,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PRINT_LIB_H__
-#define __PRINT_LIB_H__
+#pragma once
 
 ///
 /// Define the maximum number of characters that are required to
@@ -930,5 +929,3 @@ SPrintLengthAsciiFormat (
   IN  CONST CHAR8  *FormatString,
   IN  VA_LIST      Marker
   );
-
-#endif

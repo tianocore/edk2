@@ -33,7 +33,6 @@
   X64/DxeLoadFunc.c
 [Sources.AARCH64]
   AArch64/DxeHandoff.c
-  AArch64/DxeLoadFuncFit.c
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec

@@ -2460,18 +2460,6 @@ CreatePciIoDevice (
     }
   }
 
-  if (PcdGetBool (PcdMrIovSupport)) {
-    Status = LocatePciExpressCapabilityRegBlock (
-               PciIoDevice,
-               EFI_PCIE_CAPABILITY_ID_MRIOV,
-               &PciIoDevice->MrIovCapabilityOffset,
-               NULL
-               );
-    if (!EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_INFO, " MR-IOV: CapOffset = 0x%x\n", PciIoDevice->MrIovCapabilityOffset));
-    }
-  }
-
   PciIoDevice->ResizableBarOffset = 0;
   if (PcdGetBool (PcdPcieResizableBarSupport)) {
     Status = LocatePciExpressCapabilityRegBlock (

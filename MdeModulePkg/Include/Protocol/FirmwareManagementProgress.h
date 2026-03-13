@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __EDKII_FIRMWARE_MANAGEMENT_PROGRESS_PROTOCOL_H__
-#define __EDKII_FIRMWARE_MANAGEMENT_PROGRESS_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/GraphicsOutput.h>
 
@@ -45,5 +44,3 @@ typedef struct {
 /// EDK II Firmware Management Progress Protocol GUID variable.
 ///
 extern EFI_GUID  gEdkiiFirmwareManagementProgressProtocolGuid;
-
-#endif

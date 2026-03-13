@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef _FMP_CAPSULE_GUID_H__
-#define _FMP_CAPSULE_GUID_H__
+#pragma once
 
 //
 // This is the GUID of the capsule for Firmware Management Protocol.
@@ -95,5 +94,3 @@ typedef struct {
 #define CAPSULE_SUPPORT_DEPENDENCY                                 0x0000000000000002
 
 extern EFI_GUID  gEfiFmpCapsuleGuid;
-
-#endif

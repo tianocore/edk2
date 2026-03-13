@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef AML_FIELD_LIST_PARSER_H_
-#define AML_FIELD_LIST_PARSER_H_
+#pragma once
 
 #include <AmlNodeDefines.h>
 #include <Stream/AmlStream.h>
@@ -73,5 +72,3 @@ AmlParseFieldList (
   IN  AML_STREAM       *FStream,
   IN  LIST_ENTRY       *NameSpaceRefList
   );
-
-#endif // AML_FIELD_LIST_PARSER_H_

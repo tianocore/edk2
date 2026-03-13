@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_HTTP_BOOT_SUPPORT_H__
-#define __EFI_HTTP_BOOT_SUPPORT_H__
+#pragma once
 
 /**
   Get the Nic handle using any child handle in the IPv4 stack.
@@ -214,5 +213,3 @@ BOOLEAN
 HttpBootIsHttpRedirectStatusCode (
   IN   EFI_HTTP_STATUS_CODE  StatusCode
   );
-
-#endif

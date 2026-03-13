@@ -6,11 +6,8 @@
 
 **/
 
-#ifndef INTRINSTIC_LIB_H_
-#define INTRINSTIC_LIB_H_
+#pragma once
 
 //
 // Compiler dependent intrinsic APIs.
 //
-
-#endif

@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef SPDM_SECURITY_LIB_INTERNAL_H_
-#define SPDM_SECURITY_LIB_INTERNAL_H_
+#pragma once
 
 #include <Uefi.h>
 #include <hal/base.h>
@@ -246,5 +245,3 @@ InternalDumpData (
   CONST UINT8  *Data,
   UINTN        Size
   );
-
-#endif

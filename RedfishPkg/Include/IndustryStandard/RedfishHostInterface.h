@@ -8,8 +8,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef REDFISH_HOST_INTERFACE_
-#define REDFISH_HOST_INTERFACE_
+#pragma once
 
 #include <IndustryStandard/SmBios.h>
 
@@ -187,5 +186,3 @@ typedef struct {
 } REDFISH_OVER_IP_PROTOCOL_DATA;
 
 #pragma pack()
-
-#endif

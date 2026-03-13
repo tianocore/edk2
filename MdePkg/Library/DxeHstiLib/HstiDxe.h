@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _HSTI_DXE_H_
-#define _HSTI_DXE_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Library/BaseLib.h>
@@ -55,5 +54,3 @@ InternalHstiIsValidTable (
   IN VOID   *HstiData,
   IN UINTN  HstiSize
   );
-
-#endif

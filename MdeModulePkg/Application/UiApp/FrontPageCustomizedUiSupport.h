@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __FRONTPAGE_CUSTOMIZE_UI_SUPPORT_UI_H__
-#define __FRONTPAGE_CUSTOMIZE_UI_SUPPORT_UI_H__
+#pragma once
 
 /**
   Create continue menu in the front page.
@@ -126,5 +125,3 @@ UiSupportLibCallbackHandler (
   OUT EFI_BROWSER_ACTION_REQUEST  *ActionRequest,
   OUT EFI_STATUS                  *Status
   );
-
-#endif

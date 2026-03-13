@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_TLS_DRIVER_H__
-#define __EFI_TLS_DRIVER_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -224,5 +223,3 @@ TlsServiceBindingDestroyChild (
   IN EFI_SERVICE_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                    ChildHandle
   );
-
-#endif

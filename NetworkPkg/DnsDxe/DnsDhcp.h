@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _DNS_DHCP_H_
-#define _DNS_DHCP_H_
+#pragma once
 
 //
 // DHCP DNS related
@@ -136,5 +135,3 @@ GetDns6ServerFromDhcp6 (
   OUT UINT32            *DnsServerCount,
   OUT EFI_IPv6_ADDRESS  **DnsServerList
   );
-
-#endif

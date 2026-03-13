@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef __EFI_TCP6_PROTOCOL_H__
-#define __EFI_TCP6_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/ManagedNetwork.h>
 #include <Protocol/Ip6.h>
@@ -852,5 +851,3 @@ struct _EFI_TCP6_PROTOCOL {
 
 extern EFI_GUID  gEfiTcp6ServiceBindingProtocolGuid;
 extern EFI_GUID  gEfiTcp6ProtocolGuid;
-
-#endif

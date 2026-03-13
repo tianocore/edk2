@@ -99,6 +99,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleOnDiskSupport              ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleFmpSupport                 ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformRecoverySupport           ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportInfiniteBootRetries        ## CONSUMES
 
 [Depex]
   TRUE

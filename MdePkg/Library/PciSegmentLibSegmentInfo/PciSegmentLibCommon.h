@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _PCI_SEGMENT_LIB_COMMON_H_
-#define _PCI_SEGMENT_LIB_COMMON_H_
+#pragma once
 
 #include <Base.h>
 #include <IndustryStandard/PciExpress21.h>
@@ -47,5 +46,3 @@ PciSegmentLibGetEcamAddress (
   IN CONST PCI_SEGMENT_INFO  *SegmentInfo,
   IN UINTN                   Count
   );
-
-#endif

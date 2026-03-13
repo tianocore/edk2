@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef TRACE_HUB_DEBUG_SYST_LIB_H_
-#define TRACE_HUB_DEBUG_SYST_LIB_H_
+#pragma once
 
 typedef enum {
   SeverityNone    = 0,
@@ -77,5 +76,3 @@ TraceHubSysTWriteCataLog64 (
   IN UINTN                    NumberOfParams,
   ...
   );
-
-#endif // TRACE_HUB_DEBUG_SYST_LIB_H_

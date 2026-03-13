@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __PL011_UART_H__
-#define __PL011_UART_H__
+#pragma once
 
 #define PL011_VARIANT_ZTE  1
 
@@ -110,5 +109,3 @@
 
 #define PL011_UARTPID2_VER(X)  (((X) >> 4) & 0xF)
 #define PL011_VER_R1P4  0x2
-
-#endif

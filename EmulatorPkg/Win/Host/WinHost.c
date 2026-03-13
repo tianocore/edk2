@@ -407,7 +407,7 @@ Returns:
   return EFI_SUCCESS;
 }
 
-INTN
+int
 EFIAPI
 main (
   IN  INT    Argc,
@@ -460,7 +460,7 @@ Returns:
   //
   EmuMagicPage = (VOID *)(UINTN)(FixedPcdGet64 (PcdPeiServicesTablePage) & MAX_UINTN);
   if (EmuMagicPage != NULL) {
-    UINT64  Size;
+    UINTN  Size;
     Status = WinNtOpenFile (
                NULL,
                SIZE_4KB,
@@ -470,7 +470,7 @@ Returns:
                );
     if (EFI_ERROR (Status)) {
       SecPrint ("ERROR : Could not allocate PeiServicesTablePage @ %p\n\r", EmuMagicPage);
-      return EFI_DEVICE_ERROR;
+      exit (1);
     }
   }
 
@@ -492,7 +492,7 @@ Returns:
   //
   // Determine the first thread available to this process.
   //
-  if (GetProcessAffinityMask (GetCurrentProcess (), &ProcessAffinityMask, &SystemAffinityMask)) {
+  if (GetProcessAffinityMask (GetCurrentProcess (), (PDWORD_PTR)&ProcessAffinityMask, (PDWORD_PTR)&SystemAffinityMask)) {
     LowBit = (INT32)LowBitSet32 ((UINT32)ProcessAffinityMask);
     if (LowBit != -1) {
       //
@@ -512,7 +512,7 @@ Returns:
 
   SecInitializeThunk ();
   //
-  // PPIs pased into PEI_CORE
+  // PPIs passed into PEI_CORE
   //
   SecEmuThunkPpi = AllocateZeroPool (sizeof (EMU_THUNK_PPI) + FixedPcdGet32 (PcdPersistentMemorySize));
   if (SecEmuThunkPpi == NULL) {
@@ -554,7 +554,8 @@ Returns:
     gSystemMemory[Index].Size   = ((UINT64)_wtoi (MemorySizeStr)) * ((UINT64)SIZE_1MB);
     gSystemMemory[Index].Memory = (EFI_PHYSICAL_ADDRESS)(UINTN)VirtualAlloc (NULL, (SIZE_T)(gSystemMemory[Index].Size), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
     if (gSystemMemory[Index].Memory == 0) {
-      return EFI_OUT_OF_RESOURCES;
+      SecPrint ("ERROR : Can not allocate memory for %S.  Exiting.\n\r", MemorySizeStr);
+      exit (1);
     }
 
     //

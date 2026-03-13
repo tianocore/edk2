@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _UNIT_TEST_PERSISTENCE_LIB_H_
-#define _UNIT_TEST_PERSISTENCE_LIB_H_
+#pragma once
 
 #include <Library/UnitTestLib.h>
 
@@ -76,5 +75,3 @@ LoadUnitTestCache (
   OUT VOID                        **SaveData,
   OUT UINTN                       *SaveStateSize
   );
-
-#endif

@@ -2,7 +2,7 @@
   The implementation of EDKII Redfish Platform Config Protocol.
 
   (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP<BR>
-  Copyright (c) 2022-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2022-2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
   Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -1953,7 +1953,7 @@ RedfishPlatformConfigSetStatementCommon (
   @param[in]   Schema              The Redfish schema to query.
   @param[in]   Version             The Redfish version to query.
   @param[in]   ConfigureLang       The target value which match this configure Language.
-  @param[in]   Value               The value to set.
+  @param[in]   Value               Pointer to the Redfish value to set.
 
   @retval EFI_SUCCESS              Value is returned successfully.
   @retval Others                   Some error happened.
@@ -1966,7 +1966,7 @@ RedfishPlatformConfigProtocolSetValue (
   IN     CHAR8                                   *Schema,
   IN     CHAR8                                   *Version,
   IN     EFI_STRING                              ConfigureLang,
-  IN     EDKII_REDFISH_VALUE                     Value
+  IN     EDKII_REDFISH_VALUE                     *Value
   )
 {
   EFI_STATUS                       Status;
@@ -1978,7 +1978,7 @@ RedfishPlatformConfigProtocolSetValue (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((Value.Type == RedfishValueTypeUnknown) || (Value.Type >= RedfishValueTypeMax)) {
+  if ((Value == NULL) || (Value->Type == RedfishValueTypeUnknown) || (Value->Type >= RedfishValueTypeMax)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1992,10 +1992,10 @@ RedfishPlatformConfigProtocolSetValue (
 
   ZeroMem (&NewValue, sizeof (HII_STATEMENT_VALUE));
 
-  switch (Value.Type) {
+  switch (Value->Type) {
     case RedfishValueTypeInteger:
     case RedfishValueTypeBoolean:
-      Status = RedfishNumericToHiiValue (&Value, &NewValue);
+      Status = RedfishNumericToHiiValue (Value, &NewValue);
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "%a: failed to convert Redfish value to Hii value: %r\n", __func__, Status));
         goto RELEASE_RESOURCE;
@@ -2003,14 +2003,14 @@ RedfishPlatformConfigProtocolSetValue (
 
       break;
     case RedfishValueTypeString:
-      if (Value.Value.Buffer == NULL) {
+      if (Value->Value.Buffer == NULL) {
         Status = EFI_INVALID_PARAMETER;
         goto RELEASE_RESOURCE;
       }
 
       NewValue.Type      = EFI_IFR_TYPE_STRING;
-      NewValue.BufferLen = (UINT16)(AsciiStrSize (Value.Value.Buffer) * sizeof (CHAR16));
-      NewValue.Buffer    = (UINT8 *)StrToUnicodeStr (Value.Value.Buffer);
+      NewValue.BufferLen = (UINT16)(AsciiStrSize (Value->Value.Buffer) * sizeof (CHAR16));
+      NewValue.Buffer    = (UINT8 *)StrToUnicodeStr (Value->Value.Buffer);
       if (NewValue.Buffer == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         goto RELEASE_RESOURCE;
@@ -2019,8 +2019,8 @@ RedfishPlatformConfigProtocolSetValue (
       break;
     case RedfishValueTypeStringArray:
       NewValue.Type      = EFI_IFR_TYPE_STRING;
-      NewValue.BufferLen = (UINT16)Value.ArrayCount;
-      NewValue.Buffer    = (UINT8 *)Value.Value.StringArray;
+      NewValue.BufferLen = (UINT16)Value->ArrayCount;
+      NewValue.Buffer    = (UINT8 *)Value->Value.StringArray;
       break;
     default:
       ASSERT (FALSE);
@@ -2038,7 +2038,7 @@ RELEASE_RESOURCE:
     FreePool (FullSchema);
   }
 
-  if ((Value.Type == RedfishValueTypeString) && (NewValue.Buffer != NULL)) {
+  if ((Value->Type == RedfishValueTypeString) && (NewValue.Buffer != NULL)) {
     FreePool (NewValue.Buffer);
   }
 
@@ -2570,7 +2570,9 @@ HiiDatabaseProtocolInstalled (
   IN  VOID       *Context
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS      Status;
+  UINTN           Index;
+  EFI_HII_HANDLE  *HiiHandles;
 
   //
   // Locate HII database protocol.
@@ -2583,6 +2585,21 @@ HiiDatabaseProtocolInstalled (
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "%a: locate EFI_HII_DATABASE_PROTOCOL failure: %r\n", __func__, Status));
     return;
+  }
+
+  //
+  // Add Hii handles that installed before this driver.
+  //
+  HiiHandles = HiiGetHiiHandles (NULL);
+  if (HiiHandles != NULL) {
+    for (Index = 0; HiiHandles[Index] != NULL; Index++) {
+      Status = NotifyFormsetUpdate (HiiHandles[Index], &mRedfishPlatformConfigPrivate->PendingList);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_WARN, "%a: failed to add formset of HII handle: 0x%x\n", __func__, HiiHandles[Index]));
+      }
+    }
+
+    FreePool (HiiHandles);
   }
 
   //

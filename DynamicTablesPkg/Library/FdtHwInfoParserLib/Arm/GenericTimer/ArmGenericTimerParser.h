@@ -8,8 +8,7 @@
   - linux/Documentation/devicetree/bindings/timer/arm,arch_timer.yaml
 **/
 
-#ifndef ARM_GENERIC_TIMER_PARSER_H_
-#define ARM_GENERIC_TIMER_PARSER_H_
+#pragma once
 
 /** An enum listing the FDT interrupt items.
 */
@@ -62,5 +61,3 @@ ArmGenericTimerInfoParser (
   IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
   IN        INT32                      FdtBranch
   );
-
-#endif // ARM_GENERIC_TIMER_PARSER_H_

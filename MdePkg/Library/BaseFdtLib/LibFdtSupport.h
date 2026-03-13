@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef FDT_LIB_SUPPORT_H_
-#define FDT_LIB_SUPPORT_H_
+#pragma once
 
 #include <Base.h>
 #include <Library/BaseLib.h>
@@ -93,5 +92,3 @@ strcpy (
 #define strchr(str, ch)               ScanMem8(str, AsciiStrSize (str), (UINT8)ch)
 #define strrchr(str, ch)              fdt_strrchr(str, ch)
 #define strtoul(ptr, end_ptr, base)   fdt_strtoul(ptr, end_ptr, base)
-
-#endif /* FDT_LIB_SUPPORT_H_ */

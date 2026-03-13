@@ -414,14 +414,20 @@ BootBootOptions (
     EfiBootManagerBoot (&BootOptions[Index]);
 
     //
-    // If the boot via Boot#### returns with a status of EFI_SUCCESS, platform firmware
-    // supports boot manager menu, and if firmware is configured to boot in an
-    // interactive mode, the boot manager will stop processing the BootOrder variable and
-    // present a boot manager menu to the user.
+    // If infinite retries is enabled, do not break out of the loop.
+    // This allows all boot options to be attempted on each iteration.
     //
-    if ((BootManagerMenu != NULL) && (BootOptions[Index].Status == EFI_SUCCESS)) {
-      EfiBootManagerBoot (BootManagerMenu);
-      break;
+    if (!PcdGetBool (PcdSupportInfiniteBootRetries)) {
+      //
+      // If the boot via Boot#### returns with a status of EFI_SUCCESS, platform firmware
+      // supports boot manager menu, and if firmware is configured to boot in an
+      // interactive mode, the boot manager will stop processing the BootOrder variable and
+      // present a boot manager menu to the user.
+      //
+      if ((BootManagerMenu != NULL) && (BootOptions[Index].Status == EFI_SUCCESS)) {
+        EfiBootManagerBoot (BootManagerMenu);
+        break;
+      }
     }
   }
 
@@ -832,24 +838,31 @@ BdsEntry (
   // file path for removable media if the platform supports Platform Recovery.
   //
   if (PlatformDefaultBootOptionValid && PcdGetBool (PcdPlatformRecoverySupport)) {
+    //
+    // Get the current PlatformRecovery options. Check if the platform recovery already exists, or
+    // find the next unused platform recovery option number so it can be created
+    //
+    Index       = 0;
     LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionTypePlatformRecovery);
-    if ((LoadOptions != NULL) &&  (EfiBootManagerFindLoadOption (&PlatformDefaultBootOption, LoadOptions, LoadOptionCount) == -1)) {
-      for (Index = 0; Index < LoadOptionCount; Index++) {
-        //
-        // The PlatformRecovery#### options are sorted by OptionNumber.
-        // Find the the smallest unused number as the new OptionNumber.
-        //
-        if (LoadOptions[Index].OptionNumber != Index) {
-          break;
+    if (LoadOptions != NULL) {
+      if (EfiBootManagerFindLoadOption (&PlatformDefaultBootOption, LoadOptions, LoadOptionCount) == -1) {
+        for ( ; Index < LoadOptionCount; Index++) {
+          //
+          // The PlatformRecovery#### options are sorted by OptionNumber.
+          // Find the the smallest unused number as the new OptionNumber.
+          //
+          if (LoadOptions[Index].OptionNumber != Index) {
+            break;
+          }
         }
       }
 
-      PlatformDefaultBootOption.OptionNumber = Index;
-      Status                                 = EfiBootManagerLoadOptionToVariable (&PlatformDefaultBootOption);
-      ASSERT_EFI_ERROR (Status);
+      EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
     }
 
-    EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
+    PlatformDefaultBootOption.OptionNumber = Index;
+    Status                                 = EfiBootManagerLoadOptionToVariable (&PlatformDefaultBootOption);
+    ASSERT_EFI_ERROR (Status);
   }
 
   FreePool (FilePath);
@@ -1096,7 +1109,8 @@ BdsEntry (
 
     do {
       //
-      // Retry to boot if any of the boot succeeds
+      // Retry to boot if any of the boot succeeds.
+      // If infinite retries is enabled, always retry. This allows a continuous loop over all boot options.
       //
       BootSuccess = FALSE;
       LoadOptions = EfiBootManagerGetLoadOptions (&LoadOptionCount, LoadOptionTypeBoot);
@@ -1104,7 +1118,7 @@ BdsEntry (
         BootSuccess = BootBootOptions (LoadOptions, LoadOptionCount, (BootManagerMenuStatus != EFI_NOT_FOUND) ? &BootManagerMenu : NULL);
         EfiBootManagerFreeLoadOptions (LoadOptions, LoadOptionCount);
       }
-    } while (BootSuccess);
+    } while (BootSuccess || PcdGetBool (PcdSupportInfiniteBootRetries));
   }
 
   if (BootManagerMenuStatus != EFI_NOT_FOUND) {
