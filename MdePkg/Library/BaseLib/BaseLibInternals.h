@@ -849,6 +849,32 @@ InternalX86RdRand64  (
   OUT     UINT64  *Rand
   );
 
+  #if defined (MDE_CPU_X64)
+
+/**
+  Write FS base register.
+
+  @param FsBase  Value to write to FS base register.
+**/
+VOID
+EFIAPI
+InternalX86WriteFsBase (
+  UINT64  FsBase
+  );
+
+/**
+  Read FS base register.
+
+  @return  Value of FS base register.
+**/
+UINT64
+EFIAPI
+InternalX86ReadFsBase (
+  VOID
+  );
+
+  #endif
+
 #else
 
 #endif
