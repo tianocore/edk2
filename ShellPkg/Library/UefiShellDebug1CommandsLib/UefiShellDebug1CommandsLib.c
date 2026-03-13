@@ -78,6 +78,7 @@ UefiShellDebug1CommandsLibConstructor (
   ShellCommandRegisterCommandName (L"dblk", ShellCommandRunDblk, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_DBLK));
   ShellCommandRegisterCommandName (L"edit", ShellCommandRunEdit, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_EDIT));
   ShellCommandRegisterCommandName (L"hexedit", ShellCommandRunHexEdit, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_HEXEDIT));
+  ShellCommandRegisterCommandName (L"cxl", ShellCommandRunCxl, ShellCommandGetManFileNameDebug1, 0, L"Debug1", TRUE, gShellDebug1HiiHandle, STRING_TOKEN (STR_GET_HELP_CXL));
 
   ShellCommandRegisterAlias (L"dmem", L"mem");
 
