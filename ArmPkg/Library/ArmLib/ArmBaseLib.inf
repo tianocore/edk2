@@ -18,7 +18,6 @@
   LIBRARY_CLASS                  = ArmLib
 
 [Sources]
-  ArmLibPrivate.h
   ArmLib.c
 
 [Sources.AARCH64]

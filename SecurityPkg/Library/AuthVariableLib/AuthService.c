@@ -591,7 +591,7 @@ CheckSignatureListFormat (
       CertData   = (EFI_SIGNATURE_DATA *)((UINT8 *)SigList + sizeof (EFI_SIGNATURE_LIST) + SigList->SignatureHeaderSize);
       CertLen    = SigList->SignatureSize - sizeof (EFI_GUID);
       RsaContext = NULL;
-      if (!RsaGetPublicKeyFromX509 (CertData->SignatureData, CertLen, &RsaContext)) {
+      if ((CertLen > 0) && !RsaGetPublicKeyFromX509 (CertData->SignatureData, CertLen, &RsaContext)) {
         return EFI_INVALID_PARAMETER;
       }
 
