@@ -4028,6 +4028,7 @@ AmlCodeGenInvokeMethod (
   }
 
   MethodInvocationNode = NULL;
+  ArgCountNode         = NULL;
 
   NodeStream = AllocateZeroPool (sizeof (AML_NODE_HANDLE) * (NumArgs + 1));
   if (NodeStream == NULL) {
@@ -4167,7 +4168,6 @@ AmlCodeGenInvokeMethod (
     goto exit_handler;
   }
 
-  ArgCountNode = NULL;
   Status       = AmlCreateDataNode (
                    EAmlNodeDataTypeUInt,
                    &NumArgs,
