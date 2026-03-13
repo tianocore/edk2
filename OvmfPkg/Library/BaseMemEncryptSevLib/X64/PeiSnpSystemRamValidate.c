@@ -8,23 +8,37 @@
 
 **/
 
-#include <Uefi/UefiBaseType.h>
+#include <PiPei.h>
 #include <Library/BaseLib.h>
 #include <Library/PcdLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
 #include <Library/MemEncryptSevLib.h>
+
+#include <IndustryStandard/IgvmData.h>
 
 #include "SnpPageStateChange.h"
 #include "VirtualMemory.h"
 
 STATIC UINT8  mPscBufferPage[EFI_PAGE_SIZE];
 
+//
+// Maximum number of IGVM data ranges that can be registered as
+// pre-validated.  When booting via IGVM, pages loaded through
+// SNP_LAUNCH_UPDATE are already validated by the PSP and must
+// not be validated again.
+//
+#define MAX_IGVM_PRE_VALIDATED_RANGES  16
+
 typedef struct {
   UINT64    StartAddress;
   UINT64    EndAddress;
 } SNP_PRE_VALIDATED_RANGE;
 
-STATIC SNP_PRE_VALIDATED_RANGE  mPreValidatedRange[] = {
+//
+// Compile-time pre-validated ranges (hypervisor metadata + SEC).
+//
+STATIC SNP_PRE_VALIDATED_RANGE  mStaticRanges[] = {
   // The below address range was part of the SEV OVMF metadata, and range
   // should be pre-validated by the Hypervisor.
   {
@@ -38,6 +52,54 @@ STATIC SNP_PRE_VALIDATED_RANGE  mPreValidatedRange[] = {
   },
 };
 
+//
+// IGVM pre-validated ranges, populated at runtime from HOBs.
+//
+STATIC SNP_PRE_VALIDATED_RANGE  mIgvmRanges[MAX_IGVM_PRE_VALIDATED_RANGES];
+STATIC UINTN                    mIgvmRangeCount      = 0;
+STATIC BOOLEAN                  mIgvmRangesCollected  = FALSE;
+
+/**
+  Scan HOB list for gEfiIgvmDataHobGuid entries and populate
+  the IGVM pre-validated range array.  Called once on the first
+  invocation of MemEncryptSevSnpPreValidateSystemRam().
+
+**/
+STATIC
+VOID
+CollectIgvmPreValidatedRanges (
+  VOID
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+  EFI_IGVM_DATA_HOB     *IgvmData;
+
+  mIgvmRangesCollected = TRUE;
+
+  for (Hob.Raw = GetFirstGuidHob (&gEfiIgvmDataHobGuid);
+       Hob.Raw != NULL;
+       Hob.Raw = GetNextGuidHob (&gEfiIgvmDataHobGuid, GET_NEXT_HOB (Hob)))
+  {
+    if (mIgvmRangeCount >= ARRAY_SIZE (mIgvmRanges)) {
+      DEBUG ((DEBUG_WARN, "%a: Too many IGVM ranges, some will be re-validated\n", __func__));
+      break;
+    }
+
+    IgvmData = GET_GUID_HOB_DATA (Hob.Guid);
+    mIgvmRanges[mIgvmRangeCount].StartAddress = IgvmData->Address;
+    mIgvmRanges[mIgvmRangeCount].EndAddress   = IgvmData->Address +
+                                                  ALIGN_VALUE (IgvmData->Length, EFI_PAGE_SIZE);
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: IGVM pre-validated range [0x%lx, 0x%lx)\n",
+      __func__,
+      mIgvmRanges[mIgvmRangeCount].StartAddress,
+      mIgvmRanges[mIgvmRangeCount].EndAddress
+      ));
+    mIgvmRangeCount++;
+  }
+}
+
 STATIC
 BOOLEAN
 DetectPreValidatedOverLap (
@@ -49,14 +111,27 @@ DetectPreValidatedOverLap (
   UINTN  i;
 
   //
-  // Check if the specified address range exist in pre-validated array.
+  // Check the compile-time pre-validated ranges.
   //
-  for (i = 0; i < ARRAY_SIZE (mPreValidatedRange); i++) {
-    if ((mPreValidatedRange[i].StartAddress < EndAddress) &&
-        (StartAddress < mPreValidatedRange[i].EndAddress))
+  for (i = 0; i < ARRAY_SIZE (mStaticRanges); i++) {
+    if ((mStaticRanges[i].StartAddress < EndAddress) &&
+        (StartAddress < mStaticRanges[i].EndAddress))
     {
-      OverlapRange->StartAddress = mPreValidatedRange[i].StartAddress;
-      OverlapRange->EndAddress   = mPreValidatedRange[i].EndAddress;
+      OverlapRange->StartAddress = mStaticRanges[i].StartAddress;
+      OverlapRange->EndAddress   = mStaticRanges[i].EndAddress;
+      return TRUE;
+    }
+  }
+
+  //
+  // Check IGVM pre-validated ranges.
+  //
+  for (i = 0; i < mIgvmRangeCount; i++) {
+    if ((mIgvmRanges[i].StartAddress < EndAddress) &&
+        (StartAddress < mIgvmRanges[i].EndAddress))
+    {
+      OverlapRange->StartAddress = mIgvmRanges[i].StartAddress;
+      OverlapRange->EndAddress   = mIgvmRanges[i].EndAddress;
       return TRUE;
     }
   }
@@ -84,6 +159,14 @@ MemEncryptSevSnpPreValidateSystemRam (
 
   if (!MemEncryptSevSnpIsEnabled ()) {
     return;
+  }
+
+  //
+  // On first call, collect IGVM data ranges from HOBs so they are
+  // treated as pre-validated alongside the compile-time ranges.
+  //
+  if (!mIgvmRangesCollected) {
+    CollectIgvmPreValidatedRanges ();
   }
 
   EndAddress = BaseAddress + EFI_PAGES_TO_SIZE (NumPages);

@@ -49,7 +49,6 @@
   gFdtHobGuid
   gUefiOvmfPkgPlatformInfoGuid
   gGhcbApicIdsGuid
-  gEfiIgvmDataHobGuid
   gTcg800155PlatformIdEventHobGuid              ## SOMETIMES_PRODUCES
 
 [LibraryClasses]
