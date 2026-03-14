@@ -2060,7 +2060,11 @@ InternalPrintLibSPrintMarker (
     return (LengthToReturn / BytesPerOutputCharacter);
   }
 
-  ASSERT (Buffer != NULL);
+  if (Buffer == NULL) {
+    ASSERT (Buffer != NULL);
+    return 0;
+  }
+
   //
   // Null terminate the Unicode or ASCII string
   //
