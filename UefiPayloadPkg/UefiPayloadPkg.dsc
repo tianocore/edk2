@@ -187,6 +187,7 @@
   MSFT:RELEASE_*_*_CC_FLAGS      = /D MDEPKG_NDEBUG
 !endif
   *_*_*_CC_FLAGS                 = $(APPEND_CC_FLAGS)
+  COREBOOT:*_*_*_DLINK_FLAGS      = -z common-page-size=0x1000
 
 [BuildOptions.AARCH64]
   GCC:*_*_*_CC_FLAGS         = -mstrict-align
