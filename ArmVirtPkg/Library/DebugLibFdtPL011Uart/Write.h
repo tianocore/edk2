@@ -34,3 +34,18 @@ DebugLibFdtPL011UartWrite (
   IN UINT8  *Buffer,
   IN UINTN  NumberOfBytes
   );
+
+/**
+  Retrieve the serial port runtime debug log level from the device tree.
+
+  @param[out] Value  On success, the debug log level bitmask read from the
+                     "edk2,debug-level" property of a PL011 UART node.
+
+  @retval EFI_SUCCESS            The debug level was retrieved successfully.
+  @retval EFI_INVALID_PARAMETER  Value is NULL.
+  @retval EFI_NOT_FOUND          The debug level is not available.
+**/
+EFI_STATUS
+GetSerialDebugLogRuntime (
+  UINT32  *Value
+  );

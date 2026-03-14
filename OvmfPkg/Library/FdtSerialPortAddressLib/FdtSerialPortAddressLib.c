@@ -104,12 +104,14 @@ FdtSerialGetPorts (
   }
 
   Ports->NumberOfPorts = 0;
+  Ports->DebugLevelSet = FALSE;
   Node                 = FdtNextNode (DeviceTree, 0, NULL);
   while ((Node > 0) &&
          (Ports->NumberOfPorts < ARRAY_SIZE (Ports->BaseAddress)))
   {
-    CONST CHAR8  *CompatProp;
-    INT32        PropSize;
+    CONST UINT32  *DebugLevelProp;
+    CONST CHAR8   *CompatProp;
+    INT32         PropSize;
 
     CompatProp = FdtGetProp (DeviceTree, Node, "compatible", &PropSize);
     if (CompatProp != NULL) {
@@ -131,6 +133,12 @@ FdtSerialGetPorts (
           Ports->BaseAddress[Ports->NumberOfPorts++] = BaseAddress;
         }
       }
+    }
+
+    DebugLevelProp = FdtGetProp (DeviceTree, Node, "edk2,debug-level", &PropSize);
+    if ((DebugLevelProp != NULL) && (PropSize == sizeof (UINT32))) {
+      Ports->DebugLevel    = Fdt32ToCpu (*DebugLevelProp);
+      Ports->DebugLevelSet = TRUE;
     }
 
     Node = FdtNextNode (DeviceTree, Node, NULL);
