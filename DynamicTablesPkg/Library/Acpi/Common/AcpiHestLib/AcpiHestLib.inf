@@ -1,0 +1,30 @@
+## @file
+#  Hest Table Generator
+#
+#  Copyright (c) 2026, ARM Limited. All rights reserved.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = AcpiHestLib
+  FILE_GUID      = 395048c6-1569-11f1-afda-f70d958f8850
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiHestLibConstructor
+  DESTRUCTOR     = AcpiHestLibDestructor
+
+[Sources]
+  HestGenerator.c
+  HestGenerator.h
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  AcpiHelperLib
+  BaseLib

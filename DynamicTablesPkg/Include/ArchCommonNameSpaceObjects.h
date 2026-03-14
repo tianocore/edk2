@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2024 - 2026, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2024 - 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
   Copyright (C) 2024 - 2025, Advanced Micro Devices, Inc. All rights reserved.
 
@@ -73,6 +73,11 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjTpm2DeviceInfo,                 ///< 46 - TPM2 Device Info
   EArchCommonObjMcfgPciConfigSpaceInfo,         ///< 47 - MCFG PCI Configuration Space Info
   EArchCommonObjPciRootPortInfo,                ///< 48 - PCI root port configuration Info
+  EArchCommonObjErrSourcePciRootPortInfo,       ///< 49 - PCI Express AER Info for RootPort
+  EArchCommonObjErrSourcePciDeviceInfo,         ///< 50 - PCI Express AER Info for Device (Endpoint)
+  EArchCommonObjErrSourcePciBridgeInfo,         ///< 51 - PCI Express AER Info for Bridge
+  EArchCommonObjErrSourceGenericHwInfo,         ///< 52 - Generic Hardware Error Source Info
+  EArchCommonObjErrSourceGenericHwVer2Info,     ///< 53 - Generic Hardware Error Source Info version 2
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1131,5 +1136,161 @@ typedef struct CmArchCommonObjSpcrInfo {
   /// Specifies the terminal type used by the console device.
   UINT8    TerminalType;
 } CM_ARCH_COMMON_SPCR_INFO;
+
+/** A structure that describes common information for Error source
+    relevant PCI AER. Cf. ACPI 6.6, 18.3.2.4 ~ 18.3.2.6
+*/
+typedef struct PciErrSourceCommonInfo {
+  /// Interrupt handler from system firmware will run first if TRUE.
+  BOOLEAN    FirmwareFirst;
+
+  /// Apply to all for specified PCI device type.
+  BOOLEAN    Global;
+
+  /// Error source is enabled or not.
+  BOOLEAN    Enabled;
+
+  /// The number of error records to pre-allocate for this error source.
+  UINT32     NumberOfRecordsToPreAllocate;
+
+  /// Max Sections Per Record.
+  UINT32     MaxSectionsPerRecord;
+
+  /// Identifies the PCI Bus and Segment.
+  UINT32     Bus;
+
+  /// Identifies the PCI Device Number
+  UINT16     Device;
+
+  /// Identifies the PCI Function Number
+  UINT16     Function;
+
+  /// Device control bits with which to initialize the device.
+  UINT16     DeviceControl;
+
+  /// Value to write to uncorrectable error mask register.
+  UINT32     UncorrectableErrMask;
+
+  /// Value to write to uncorrectable error severity register.
+  UINT32     UncorrectableErrSeverity;
+
+  /// Value to write to correctable error mask register.
+  UINT32     CorrectableErrMask;
+
+  /// Value to write to advanced capabilities and control register.
+  UINT32     AdvancedErrCapAndControl;
+} PCI_ERROR_SOURCE_COMMON_INFO;
+
+/** PCI Express Root Port AER Structure information.
+    Cf. ACPI 6.6, 18.3.2.4 PCI Express Root Port AER Structure.
+
+    ID: EArchCommonObjErrSourcePciRootPortInfo
+*/
+typedef struct CmArchCommonObjErrSourcePciRootPortInfo {
+  /// An unique token used to identify this object.
+  CM_OBJECT_TOKEN                 Token;
+
+  /// PCI error source common information.
+  PCI_ERROR_SOURCE_COMMON_INFO    Common;
+
+  /// Value to write to the root port’s Root Error Command Register.
+  UINT32                          RootErrorCmd;
+} CM_ARCH_COMMON_ERROR_SOURCE_PCI_ROOT_PORT_INFO;
+
+/** PCI Express Endpoint AER Structure information.
+    Cf. ACPI 6.6, 18.3.2.5 PCI Express Device AER Structure.
+
+    ID: EArchCommonObjErrSourcePciDeviceInfo
+*/
+typedef struct CmArchCommonObjErrSourcePciDeviceInfo {
+  /// An unique token used to identify this object
+  CM_OBJECT_TOKEN                 Token;
+
+  /// PCI error source common information.
+  PCI_ERROR_SOURCE_COMMON_INFO    Common;
+} CM_ARCH_COMMON_ERROR_SOURCE_PCI_DEVICE_INFO;
+
+/** PCI Express Endpoint AER Structure information.
+    Cf. ACPI 6.6, 18.3.2.5 PCI Express Endpoint AER Structure.
+
+    ID: EArchCommonObjErrSourcePciBridgeInfo
+*/
+typedef struct ErrSourcePciBridgeExtraInfo {
+  /// An unique token used to identify this object
+  CM_OBJECT_TOKEN                 Token;
+
+  /// PCI error source common information.
+  PCI_ERROR_SOURCE_COMMON_INFO    Common;
+
+  /// Value to write to secondary uncorrectable error mask register.
+  UINT32                          SecondaryUncorrectableErrMask;
+
+  /// Value to write to secondary uncorrectable error severity register.
+  UINT32                          SecondaryUncorrectableErrSeverity;
+
+  /// Value to write to secondary advanced capabilities and control register.
+  UINT32                          SecondaryAdvancedCapAndControl;
+} CM_ARCH_COMMON_ERROR_SOURCE_PCI_BRIDGE_INFO;
+
+/** A structure that describes common information for GHES
+    Cf. ACPI 6.6, 18.3.2.7 ~ 18.3.2.8
+*/
+typedef struct GhesCommonInfo {
+  /// Error source token of an alternate.
+  CM_OBJECT_TOKEN                                       RelatedSourceToken;
+
+  /// Error source is enabled or not.
+  BOOLEAN                                               Enabled;
+
+  /// The number of error records to pre-allocate for this error source.
+  UINT32                                                NumberOfRecordsToPreAllocate;
+
+  /// Max Sections Per Record.
+  UINT32                                                MaxSectionsPerRecord;
+
+  /// Size in bytes of the error data recorded by this error source.
+  UINT32                                                MaxRawDataLength;
+
+  /** The location of a register that contains the physical address of
+      a block of memory that holds the error status data for
+      this error source.
+  */
+  EFI_ACPI_6_6_GENERIC_ADDRESS_STRUCTURE                ErrorStatusAddress;
+
+  /// Hardware Error Notification Structure
+  EFI_ACPI_6_6_HARDWARE_ERROR_NOTIFICATION_STRUCTURE    NotificationStructure;
+
+  /// Identifies the length in bytes of the error status data block.
+  UINT32                                                ErrorStatusBlockLength;
+} GHES_COMMON_INFO;
+
+/** A structure that describes Generic Hardware Error Source
+    Cf. ACPI 6.6, 18.3.2.7
+
+    ID: EArchCommonObjErrSourceGenericHwInfo
+*/
+typedef struct CmArchCommonObjErrSourceGenericHwInfo {
+  /// Common information for GHES
+  GHES_COMMON_INFO    Common;
+} CM_ARCH_COMMON_ERROR_SOURCE_GENERIC_HW_INFO;
+
+/** A structure that describes Generic Hardware Error Source version 2
+    Cf. ACPI 6.6, 18.3.2.8
+
+    ID: EArchCommonObjErrSourceGenericHwVer2Info
+*/
+typedef struct CmArchCommonObjErrSourceGenericHwVer2Info {
+  /// Common information for GHES
+  GHES_COMMON_INFO                          Common;
+
+  /// (v2) The location of the Read Ack Register used to notify the RAS controller
+  EFI_ACPI_6_6_GENERIC_ADDRESS_STRUCTURE    ReadAckRegister;
+
+  /// (v2) Contains a mask of bits to preserve when writing the Read Ack register.
+  UINT64                                    ReadAckPreserve;
+
+  /// (v2) Contains a mask of bits to set when writing the Read Ack register.
+  UINT64                                    ReadAckWrite;
+} CM_ARCH_COMMON_ERROR_SOURCE_GENERIC_HW_VERSION2_INFO;
 
 #pragma pack()
