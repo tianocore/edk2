@@ -28,8 +28,9 @@
   #
   # Define ESRT GUIDs for Firmware Management Protocol instances
   #
-  DEFINE SYSTEM_FMP_ESRT_GUID   = B461B3BD-E62A-4A71-841C-50BA4E500267
-  DEFINE DEVICE_FMP_ESRT_GUID   = 226034C4-8B67-4536-8653-D6EE7CE5A316
+  DEFINE SYSTEM_FMP_ESRT_GUID    = B461B3BD-E62A-4A71-841C-50BA4E500267
+  DEFINE DEVICE_FMP_ESRT_GUID    = 226034C4-8B67-4536-8653-D6EE7CE5A316
+  DEFINE SYSTEM_FMP_RT_ESRT_GUID = EE87E1D2-1243-11F1-8B27-AF82E67AEE0F
 
   #
   # TRUE  - Build FmpDxe module for with storage access enabled
@@ -46,6 +47,7 @@
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
@@ -71,10 +73,15 @@
   FmpDependencyCheckLib|FmpDevicePkg/Library/FmpDependencyCheckLibNull/FmpDependencyCheckLibNull.inf
   FmpDependencyDeviceLib|FmpDevicePkg/Library/FmpDependencyDeviceLibNull/FmpDependencyDeviceLibNull.inf
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
+  RuntimeMemoryAllocationLib|MdeModulePkg/Library/RuntimeMemoryAllocationLib/RuntimeMemoryAllocationLibNull.inf
 
 # StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
 [LibraryClasses.common.SEC]
   NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+
+[LibraryClasses.common.DXE_RUNTIME_DRIVER]
+  RuntimeMemoryAllocationLib|MdeModulePkg/Library/RuntimeMemoryAllocationLib/RuntimeMemoryAllocationLib.inf
+  FmpAuthenticationLibPkcs7|SecurityPkg/Library/FmpAuthenticationLibPkcs7/FmpAuthenticationRuntimeLibPkcs7.inf
 
 [PcdsPatchableInModule]
   gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageTypeIdGuid|{0}
@@ -162,6 +169,32 @@
       # in a system firmware image.
       #
       CapsuleUpdatePolicyLib|FmpDevicePkg/Library/CapsuleUpdatePolicyLibNull/CapsuleUpdatePolicyLibNull.inf
+  }
+
+  FmpDevicePkg/FmpDxe/FmpDxeRuntime.inf {
+    <Defines>
+      #
+      # FILE_GUID is used as ESRT GUID
+      #
+      FILE_GUID = $(SYSTEM_FMP_RT_ESRT_GUID)
+    <PcdsFixedAtBuild>
+      #
+      # Unicode name string that is used to populate FMP Image Descriptor for this capsule update module
+      #
+      gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageIdName|L"Sample Firmware Device"
+      #
+      # Certificates used to authenticate capsule update image
+      #
+      !include BaseTools/Source/Python/Pkcs7Sign/TestRoot.cer.gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr.inc
+    <PcdsPatchableInModule>
+      gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageTypeIdGuid|{GUID("$(SYSTEM_FMP_ESRT_GUID)")}
+    <LibraryClasses>
+      #
+      # Use CapsuleUpdatePolicyLib that calls the Capsule Update Policy Protocol.
+      # Depends on the CapsuleUpdatePolicyDxe module to produce the protocol.
+      # Required for FmpDxe modules that are intended to be platform independent.
+      #
+      CapsuleUpdatePolicyLib|FmpDevicePkg/Library/CapsuleUpdatePolicyLibOnProtocol/CapsuleUpdatePolicyLibOnProtocol.inf
   }
 
   #
