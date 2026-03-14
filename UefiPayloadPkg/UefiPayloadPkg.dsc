@@ -200,6 +200,11 @@
   CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:4096
   MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096
 
+# Force PE/COFF sections to be aligned at 4KB boundaries so DXE Core can
+# apply page-level image protection, including NX, to IA32/X64 DXE images.
+[BuildOptions.IA32.EDKII.DXE_CORE, BuildOptions.X64.EDKII.DXE_CORE, BuildOptions.IA32.EDKII.DXE_DRIVER, BuildOptions.X64.EDKII.DXE_DRIVER, BuildOptions.IA32.EDKII.UEFI_DRIVER, BuildOptions.X64.EDKII.UEFI_DRIVER, BuildOptions.IA32.EDKII.UEFI_APPLICATION, BuildOptions.X64.EDKII.UEFI_APPLICATION]
+  GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x1000
+
 [BuildOptions.IA32.EDKII.DXE_RUNTIME_DRIVER, BuildOptions.X64.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x1000
 
@@ -582,6 +587,9 @@
 ################################################################################
 [PcdsFeatureFlag]
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
+!if $(FSP_GOP_BASIC_HIDPI_SUPPORT)
+  gUefiPayloadPkgTokenSpaceGuid.PcdFspGopBasicHiDpiSupport|TRUE
+!endif
   ## This PCD specified whether ACPI SDT protocol is installed.
   gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdHiiOsRuntimeSupport|FALSE
