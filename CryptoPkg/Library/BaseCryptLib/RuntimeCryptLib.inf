@@ -62,6 +62,9 @@
   Pk/CryptRsaPssNull.c
   Pk/CryptRsaPssSignNull.c
   Pk/CryptEcNull.c
+  Pk/CryptEdNull.c
+  Pk/CryptMlNull.c
+  Pk/CryptSlhNull.c
   Pem/CryptPem.c
   Bn/CryptBnNull.c
 
