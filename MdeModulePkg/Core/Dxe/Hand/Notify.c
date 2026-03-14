@@ -105,8 +105,15 @@ CoreRegisterProtocolNotify (
   PROTOCOL_ENTRY   *ProtEntry;
   PROTOCOL_NOTIFY  *ProtNotify;
   EFI_STATUS       Status;
+  IEVENT           *EventEntry;
 
-  if ((Protocol == NULL) || (Event == NULL) || (Registration == NULL)) {
+  EventEntry = Event;
+
+  if ((Protocol == NULL) ||
+      (Event == NULL) ||
+      (Registration == NULL) ||
+      (EventEntry->Signature != EVENT_SIGNATURE))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
