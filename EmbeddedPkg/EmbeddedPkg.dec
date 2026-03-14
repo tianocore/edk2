@@ -32,6 +32,7 @@
 
 [LibraryClasses.common]
   PrePiLib|Include/Library/PrePiLib.h
+  RealTimeClockLib|Include/Library/RealTimeClockLib.h
   GdbSerialLib|Include/Library/GdbSerialLib.h
   DebugAgentTimerLib|Include/Library/DebugAgentTimerLib.h
   NorFlashInfoLib|Include/Library/NorFlashInfoLib.h
