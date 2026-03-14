@@ -54,6 +54,7 @@
   #
   DEFINE CAPSULE_SUPPORT              = FALSE
   DEFINE CAPSULE_MAIN_FW_GUID         =
+  DEFINE CAPSULE_EMBED_FMP_DXE        = FALSE
 
   #
   # Crypto Support
@@ -237,6 +238,7 @@
   BaseMemoryLib|MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
+  FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
 !if $(PCIE_BASE_SUPPORT) == FALSE
@@ -292,13 +294,10 @@
   !if $(CAPSULE_SUPPORT) == TRUE
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeCapsuleLib.inf
   BmpSupportLib|MdeModulePkg/Library/BaseBmpSupportLib/BaseBmpSupportLib.inf
-    !if $(BOOTSPLASH_IMAGE)
-    # Note, however, that DisplayUpdateProgressLibGraphics aborts firmware
-    # update if GOP is missing, so text progress works in more environments.
-    DisplayUpdateProgressLib|MdeModulePkg/Library/DisplayUpdateProgressLibGraphics/DisplayUpdateProgressLibGraphics.inf
-    !else
-    DisplayUpdateProgressLib|MdeModulePkg/Library/DisplayUpdateProgressLibText/DisplayUpdateProgressLibText.inf
-    !endif
+  # Use the graphics implementation for update progress.
+  # BOOT_ON_FLASH_UPDATE initializes the graphics console before
+  # processing capsules.
+  DisplayUpdateProgressLib|MdeModulePkg/Library/DisplayUpdateProgressLibGraphics/DisplayUpdateProgressLibGraphics.inf
   # If there are no specific checks to do, null-library suffices
   CapsuleUpdatePolicyLib|FmpDevicePkg/Library/CapsuleUpdatePolicyLibNull/CapsuleUpdatePolicyLibNull.inf
   FmpAuthenticationLib|SecurityPkg/Library/FmpAuthenticationLibPkcs7/FmpAuthenticationLibPkcs7.inf
@@ -628,6 +627,8 @@
 
   ## Whether FMP capsules are enabled.
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleFmpSupport|$(CAPSULE_SUPPORT)
+  ## Whether embedded drivers in FMP capsules are supported (opt-in).
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleEmbeddedDriverSupport|FALSE
 
 !if $(CRYPTO_PROTOCOL_SUPPORT) == TRUE
 !if $(CRYPTO_DRIVER_EXTERNAL_SUPPORT) == FALSE
@@ -981,7 +982,11 @@
   }
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 !if $(CAPSULE_SUPPORT) == TRUE
-  # Build FmpDxe meant for the inclusion into an update capsule as an embedded driver.
+!if "$(CAPSULE_MAIN_FW_GUID)" == ""
+  !error "CAPSULE_MAIN_FW_GUID must be set when CAPSULE_SUPPORT is TRUE"
+!endif
+  # Build FmpDxe (either included in the payload FV or embedded into an update
+  # capsule, depending on CAPSULE_EMBED_FMP_DXE).
   FmpDevicePkg/FmpDxe/FmpDxe.inf {
     <Defines>
       # FmpDxe interprets its FILE_GUID as firmware GUID.  This allows including
