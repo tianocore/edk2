@@ -187,6 +187,7 @@ struct _USB_DEVICE {
   UINT8                                 ParentPort; // Start at 0
   UINT8                                 Tier;
   BOOLEAN                               DisconnectFail;
+  BOOLEAN                               IsSSDev;
 };
 
 //
