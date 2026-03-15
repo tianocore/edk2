@@ -973,24 +973,26 @@ NvmeShutdownAllControllers (
   UINTN                                Index;
   NVME_CONTROLLER_PRIVATE_DATA         *Private;
 
-  Status = gBS->LocateHandleBuffer (
-                  ByProtocol,
-                  &gEfiPciIoProtocolGuid,
-                  NULL,
-                  &HandleCount,
-                  &Handles
-                  );
+  Handles = NULL;
+  Status  = gBS->LocateHandleBuffer (
+                   ByProtocol,
+                   &gEfiPciIoProtocolGuid,
+                   NULL,
+                   &HandleCount,
+                   &Handles
+                   );
   if (EFI_ERROR (Status)) {
     HandleCount = 0;
   }
 
   for (HandleIndex = 0; HandleIndex < HandleCount; HandleIndex++) {
-    Status = gBS->OpenProtocolInformation (
-                    Handles[HandleIndex],
-                    &gEfiPciIoProtocolGuid,
-                    &OpenInfos,
-                    &OpenInfoCount
-                    );
+    OpenInfos = NULL;
+    Status    = gBS->OpenProtocolInformation (
+                       Handles[HandleIndex],
+                       &gEfiPciIoProtocolGuid,
+                       &OpenInfos,
+                       &OpenInfoCount
+                       );
     if (EFI_ERROR (Status)) {
       continue;
     }
@@ -1011,53 +1013,89 @@ NvmeShutdownAllControllers (
                         NULL,
                         EFI_OPEN_PROTOCOL_GET_PROTOCOL
                         );
-        if (EFI_ERROR (Status)) {
-          continue;
-        }
+        if (!EFI_ERROR (Status)) {
+          Private = NVME_CONTROLLER_PRIVATE_DATA_FROM_PASS_THRU (NvmePassThru);
 
-        Private = NVME_CONTROLLER_PRIVATE_DATA_FROM_PASS_THRU (NvmePassThru);
-
-        //
-        // Read Controller Configuration Register.
-        //
-        Status = ReadNvmeControllerConfiguration (Private, &Cc);
-        if (EFI_ERROR (Status)) {
-          continue;
-        }
-
-        //
-        // The host should set the Shutdown Notification (CC.SHN) field to 01b
-        // to indicate a normal shutdown operation.
-        //
-        Cc.Shn = NVME_CC_SHN_NORMAL_SHUTDOWN;
-        Status = WriteNvmeControllerConfiguration (Private, &Cc);
-        if (EFI_ERROR (Status)) {
-          continue;
-        }
-
-        //
-        // The controller indicates when shutdown processing is completed by updating the
-        // Shutdown Status (CSTS.SHST) field to 10b.
-        // Wait up to 45 seconds (break down to 4500 x 10ms) for the shutdown to complete.
-        //
-        for (Index = 0; Index < NVME_SHUTDOWN_PROCESS_TIMEOUT * 100; Index++) {
-          Status = ReadNvmeControllerStatus (Private, &Csts);
-          if (!EFI_ERROR (Status) && (Csts.Shst == NVME_CSTS_SHST_SHUTDOWN_COMPLETED)) {
-            DEBUG ((DEBUG_INFO, "NvmeShutdownController: shutdown processing is completed after %dms.\n", Index * 10));
-            break;
+          //
+          // Read Controller Configuration Register.
+          //
+          Status = ReadNvmeControllerConfiguration (Private, &Cc);
+          if (!EFI_ERROR (Status)) {
+            //
+            // The host should set the Shutdown Notification (CC.SHN) field to 01b
+            // to indicate a normal shutdown operation.
+            //
+            Cc.Shn = NVME_CC_SHN_NORMAL_SHUTDOWN;
+            WriteNvmeControllerConfiguration (Private, &Cc);
           }
-
-          //
-          // Stall for 10ms
-          //
-          gBS->Stall (10 * 1000);
-        }
-
-        if (Index == NVME_SHUTDOWN_PROCESS_TIMEOUT * 100) {
-          DEBUG ((DEBUG_ERROR, "NvmeShutdownController: shutdown processing is timed out\n"));
         }
       }
     }
+
+    if (OpenInfos != NULL) {
+      gBS->FreePool (OpenInfos);
+    }
+  }
+
+  // Another cycle to polling every disk to check the shutdown status, can save time
+  for (HandleIndex = 0; HandleIndex < HandleCount; HandleIndex++) {
+    OpenInfos = NULL;
+    Status    = gBS->OpenProtocolInformation (
+                       Handles[HandleIndex],
+                       &gEfiPciIoProtocolGuid,
+                       &OpenInfos,
+                       &OpenInfoCount
+                       );
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    for (OpenInfoIndex = 0; OpenInfoIndex < OpenInfoCount; OpenInfoIndex++) {
+      if (((OpenInfos[OpenInfoIndex].Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) != 0) &&
+          (OpenInfos[OpenInfoIndex].AgentHandle == gImageHandle))
+      {
+        Status = gBS->OpenProtocol (
+                        OpenInfos[OpenInfoIndex].ControllerHandle,
+                        &gEfiNvmExpressPassThruProtocolGuid,
+                        (VOID **)&NvmePassThru,
+                        NULL,
+                        NULL,
+                        EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                        );
+        if (!EFI_ERROR (Status)) {
+          Private = NVME_CONTROLLER_PRIVATE_DATA_FROM_PASS_THRU (NvmePassThru);
+          //
+          // The controller indicates when shutdown processing is completed by updating the
+          // Shutdown Status (CSTS.SHST) field to 10b.
+          // Wait up to 45 seconds (break down to 4500 x 10ms) for the shutdown to complete.
+          //
+          for (Index = 0; Index < NVME_SHUTDOWN_PROCESS_TIMEOUT * 100; Index++) {
+            Status = ReadNvmeControllerStatus (Private, &Csts);
+            if (!EFI_ERROR (Status) && (Csts.Shst == NVME_CSTS_SHST_SHUTDOWN_COMPLETED)) {
+              DEBUG ((DEBUG_INFO, "NvmeShutdownController: disk %d shutdown processing is completed after %dms.\n", OpenInfoIndex, Index * 10));
+              break;
+            }
+
+            //
+            // Stall for 10ms
+            //
+            gBS->Stall (10 * 1000);
+          }
+
+          if (Index == NVME_SHUTDOWN_PROCESS_TIMEOUT * 100) {
+            DEBUG ((DEBUG_ERROR, "NvmeShutdownController: disk %d shutdown processing is timed out\n", OpenInfoIndex));
+          }
+        }
+      }
+    }
+
+    if (OpenInfos != NULL) {
+      gBS->FreePool (OpenInfos);
+    }
+  }
+
+  if (Handles != NULL) {
+    gBS->FreePool (Handles);
   }
 }
 
