@@ -1147,46 +1147,6 @@ ShellCopySearchAndReplace (
   IN CONST BOOLEAN  ParameterReplacing
   );
 
-/**
-  Check if a Unicode character is a hexadecimal character.
-
-  This internal function checks if a Unicode character is a
-  numeric character.  The valid hexadecimal characters are
-  L'0' to L'9', L'a' to L'f', or L'A' to L'F'.
-
-
-  @param  Char  The character to check against.
-
-  @retval TRUE  The Char is a hexadecmial character.
-  @retval FALSE The Char is not a hexadecmial character.
-
-**/
-BOOLEAN
-EFIAPI
-ShellIsHexaDecimalDigitCharacter (
-  IN      CHAR16  Char
-  );
-
-/**
-  Check if a Unicode character is a decimal character.
-
-  This internal function checks if a Unicode character is a
-  decimal character.  The valid characters are
-  L'0' to L'9'.
-
-
-  @param  Char  The character to check against.
-
-  @retval TRUE  The Char is a hexadecmial character.
-  @retval FALSE The Char is not a hexadecmial character.
-
-**/
-BOOLEAN
-EFIAPI
-ShellIsDecimalDigitCharacter (
-  IN      CHAR16  Char
-  );
-
 ///
 /// What type of answer is requested.
 ///
