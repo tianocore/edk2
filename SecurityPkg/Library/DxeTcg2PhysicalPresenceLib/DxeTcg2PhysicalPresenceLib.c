@@ -30,6 +30,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/Tcg2PhysicalPresenceData.h>
 #include <Library/Tpm2CommandLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
+#include <Library/Tcg2PhysicalPresencePromptLib.h>
 #include <Library/Tcg2PpVendorLib.h>
 
 #define CONFIRM_BUFFER_SIZE  4096
@@ -252,50 +253,6 @@ Tcg2ExecutePhysicalPresence (
 }
 
 /**
-  Read the specified key for user confirmation.
-
-  @param[in]  CautionKey  If true,  F12 is used as confirm key;
-                          If false, F10 is used as confirm key.
-
-  @retval     TRUE        User confirmed the changes by input.
-  @retval     FALSE       User discarded the changes.
-**/
-BOOLEAN
-Tcg2ReadUserKey (
-  IN     BOOLEAN  CautionKey
-  )
-{
-  EFI_STATUS     Status;
-  EFI_INPUT_KEY  Key;
-  UINT16         InputKey;
-
-  InputKey = 0;
-  do {
-    Status = gBS->CheckEvent (gST->ConIn->WaitForKey);
-    if (!EFI_ERROR (Status)) {
-      Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-      if (Key.ScanCode == SCAN_ESC) {
-        InputKey = Key.ScanCode;
-      }
-
-      if ((Key.ScanCode == SCAN_F10) && !CautionKey) {
-        InputKey = Key.ScanCode;
-      }
-
-      if ((Key.ScanCode == SCAN_F12) && CautionKey) {
-        InputKey = Key.ScanCode;
-      }
-    }
-  } while (InputKey == 0);
-
-  if (InputKey != SCAN_ESC) {
-    return TRUE;
-  }
-
-  return FALSE;
-}
-
-/**
   Fill Buffer With BootHashAlg.
 
   @param[in] Buffer               Buffer to be filled.
@@ -373,8 +330,7 @@ Tcg2UserConfirm (
   UINTN                             BufSize;
   BOOLEAN                           CautionKey;
   BOOLEAN                           NoPpiInfo;
-  UINT16                            Index;
-  CHAR16                            DstStr[81];
+  BOOLEAN                           Result;
   CHAR16                            TempBuffer[1024];
   CHAR16                            TempBuffer2[1024];
   EFI_TCG2_PROTOCOL                 *Tcg2Protocol;
@@ -576,22 +532,14 @@ Tcg2UserConfirm (
   BufSize -= StrSize (ConfirmText);
   UnicodeSPrint (ConfirmText + StrLen (ConfirmText), BufSize, TmpStr1, TmpStr2);
 
-  DstStr[80] = L'\0';
-  for (Index = 0; Index < StrLen (ConfirmText); Index += 80) {
-    StrnCpyS (DstStr, sizeof (DstStr) / sizeof (CHAR16), ConfirmText + Index, sizeof (DstStr) / sizeof (CHAR16) - 1);
-    Print (DstStr);
-  }
+  Result = PromptForUserConfirmation (ConfirmText);
 
   FreePool (TmpStr1);
   FreePool (TmpStr2);
   FreePool (ConfirmText);
   HiiRemovePackages (mTcg2PpStringPackHandle);
 
-  if (Tcg2ReadUserKey (CautionKey)) {
-    return TRUE;
-  }
-
-  return FALSE;
+  return Result;
 }
 
 /**
@@ -655,15 +603,19 @@ Tcg2HaveValidTpmRequest  (
       break;
 
     case TCG2_PHYSICAL_PRESENCE_SET_PCR_BANKS:
-      if ((Flags.PPFlags & TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CHANGE_PCRS) == 0) {
-        *RequestConfirmed = TRUE;
+      if (PcdGetBool (PcdDisallowPPIPersistentClearPermissions)) {
+        if ((Flags.PPFlags & TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CHANGE_PCRS) == 0) {
+          *RequestConfirmed = TRUE;
+        }
       }
 
       break;
 
     case TCG2_PHYSICAL_PRESENCE_CHANGE_EPS:
-      if ((Flags.PPFlags & TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CHANGE_EPS) == 0) {
-        *RequestConfirmed = TRUE;
+      if (PcdGetBool (PcdDisallowPPIPersistentClearPermissions)) {
+        if ((Flags.PPFlags & TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CHANGE_EPS) == 0) {
+          *RequestConfirmed = TRUE;
+        }
       }
 
       break;
@@ -673,15 +625,19 @@ Tcg2HaveValidTpmRequest  (
       break;
 
     case TCG2_PHYSICAL_PRESENCE_ENABLE_BLOCK_SID:
-      if ((Flags.PPFlags & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_ENABLE_BLOCK_SID) == 0) {
-        *RequestConfirmed = TRUE;
+      if (PcdGetBool (PcdDisallowPPIPersistentClearPermissions)) {
+        if ((Flags.PPFlags & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_ENABLE_BLOCK_SID) == 0) {
+          *RequestConfirmed = TRUE;
+        }
       }
 
       break;
 
     case TCG2_PHYSICAL_PRESENCE_DISABLE_BLOCK_SID:
-      if ((Flags.PPFlags & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_DISABLE_BLOCK_SID) == 0) {
-        *RequestConfirmed = TRUE;
+      if (PcdGetBool (PcdDisallowPPIPersistentClearPermissions)) {
+        if ((Flags.PPFlags & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_DISABLE_BLOCK_SID) == 0) {
+          *RequestConfirmed = TRUE;
+        }
       }
 
       break;
