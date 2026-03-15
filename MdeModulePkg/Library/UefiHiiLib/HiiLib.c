@@ -3415,25 +3415,22 @@ HiiCreateGuidOpCode (
   IN UINTN           OpCodeSize
   )
 {
-  EFI_IFR_GUID  OpCode;
   EFI_IFR_GUID  *OpCodePointer;
 
   ASSERT (Guid != NULL);
-  ASSERT (OpCodeSize >= sizeof (OpCode));
+  ASSERT (OpCodeSize >= sizeof (*OpCodePointer));
+  ASSERT (OpCodeSize <= 0x7F);
 
-  ZeroMem (&OpCode, sizeof (OpCode));
-  CopyGuid ((EFI_GUID *)(VOID *)&OpCode.Guid, Guid);
+  OpCodePointer = (EFI_IFR_GUID *)InternalHiiGrowOpCodeHandle (OpCodeHandle, OpCodeSize);
+  ZeroMem (OpCodePointer, OpCodeSize);
 
-  OpCodePointer = (EFI_IFR_GUID *)InternalHiiCreateOpCodeExtended (
-                                    OpCodeHandle,
-                                    &OpCode,
-                                    EFI_IFR_GUID_OP,
-                                    sizeof (OpCode),
-                                    OpCodeSize - sizeof (OpCode),
-                                    0
-                                    );
+  OpCodePointer->Header.OpCode = EFI_IFR_GUID_OP;
+  OpCodePointer->Header.Scope  = 0;
+  OpCodePointer->Header.Length = (UINT8)OpCodeSize;
+  CopyGuid ((EFI_GUID *)(VOID *)&OpCodePointer->Guid, Guid);
+
   if ((OpCodePointer != NULL) && (GuidOpCode != NULL)) {
-    CopyMem (OpCodePointer + 1, (EFI_IFR_GUID *)GuidOpCode + 1, OpCodeSize - sizeof (OpCode));
+    CopyMem (OpCodePointer + 1, (EFI_IFR_GUID *)GuidOpCode + 1, OpCodeSize - sizeof (*OpCodePointer));
   }
 
   return (UINT8 *)OpCodePointer;
@@ -3467,18 +3464,26 @@ HiiCreateActionOpCode (
   IN EFI_STRING_ID    QuestionConfig
   )
 {
-  EFI_IFR_ACTION  OpCode;
+  EFI_IFR_ACTION  *OpCodePointer;
 
   ASSERT ((QuestionFlags & (~(EFI_IFR_FLAG_READ_ONLY | EFI_IFR_FLAG_CALLBACK | EFI_IFR_FLAG_RESET_REQUIRED))) == 0);
 
-  ZeroMem (&OpCode, sizeof (OpCode));
-  OpCode.Question.QuestionId    = QuestionId;
-  OpCode.Question.Header.Prompt = Prompt;
-  OpCode.Question.Header.Help   = Help;
-  OpCode.Question.Flags         = QuestionFlags;
-  OpCode.QuestionConfig         = QuestionConfig;
+  ASSERT (sizeof (*OpCodePointer) <= 0x7F);
 
-  return InternalHiiCreateOpCode (OpCodeHandle, &OpCode, EFI_IFR_ACTION_OP, sizeof (OpCode));
+  OpCodePointer = (EFI_IFR_ACTION *)InternalHiiGrowOpCodeHandle (OpCodeHandle, sizeof (*OpCodePointer));
+  ZeroMem (OpCodePointer, sizeof (*OpCodePointer));
+
+  OpCodePointer->Header.OpCode = EFI_IFR_ACTION_OP;
+  OpCodePointer->Header.Scope  = 0;
+  OpCodePointer->Header.Length = (UINT8)sizeof (*OpCodePointer);
+
+  OpCodePointer->Question.QuestionId    = QuestionId;
+  OpCodePointer->Question.Header.Prompt = Prompt;
+  OpCodePointer->Question.Header.Help   = Help;
+  OpCodePointer->Question.Flags         = QuestionFlags;
+  OpCodePointer->QuestionConfig         = QuestionConfig;
+
+  return (UINT8 *)OpCodePointer;
 }
 
 /**
