@@ -26,8 +26,8 @@
   StandaloneMmCore/X64/StandaloneMmCoreEntryPoint.c
 
 [Sources.X64]
-  X64/DynamicCookieGcc.nasm   | GCC
-  X64/DynamicCookieMsvc.nasm  | MSFT
+  X64/DynamicCookieGcc.nasm   ||||!gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking
+  X64/DynamicCookieMsvc.nasm  ||||gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -36,3 +36,6 @@
   BaseLib
   DebugLib
   StackCheckLib
+
+[FeaturePcd]
+  gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking

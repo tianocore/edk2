@@ -8,17 +8,16 @@
 
 #include <Base.h>
 
-#include <Library/DebugLib.h>
-#include <Library/BaseLib.h>
+#include <Uefi/UefiBaseType.h>
 #include <Library/StackCheckLib.h>
-#include <Library/StackCheckFailureHookLib.h>
 
 /**
-  Triggers an interrupt using the vector specified by PcdStackCookieExceptionVector
+  Triggers an interrupt using the stack cookie exception vector.
 **/
 VOID
+EFIAPI
 TriggerStackCookieInterrupt (
-  VOID
+  EFI_PHYSICAL_ADDRESS  ExceptionAddress
   );
 
 VOID  *__security_cookie = (VOID *)(UINTN)STACK_COOKIE_VALUE;
@@ -35,7 +34,5 @@ StackCheckFailure (
   VOID  *ActualCookieValue
   )
 {
-  DEBUG ((DEBUG_ERROR, "Stack cookie check failed at address 0x%llx!\n", RETURN_ADDRESS (0)));
-  StackCheckFailureHook (RETURN_ADDRESS (0));
-  TriggerStackCookieInterrupt ();
+  TriggerStackCookieInterrupt ((EFI_PHYSICAL_ADDRESS)(UINTN)RETURN_ADDRESS (0));
 }
