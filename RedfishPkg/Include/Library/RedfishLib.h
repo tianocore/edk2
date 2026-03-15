@@ -74,6 +74,7 @@
 
 #include <Protocol/Http.h>
 #include <Protocol/EdkIIRedfishConfigHandler.h>
+#include <Protocol/EdkIIRedfishCredential.h>
 
 #define ODATA_TYPE_NAME_MAX_SIZE  128
 #define ODATA_TYPE_MAX_SIZE       128
@@ -103,6 +104,37 @@ REDFISH_SERVICE
 EFIAPI
 RedfishCreateService (
   IN  REDFISH_CONFIG_SERVICE_INFORMATION  *RedfishConfigServiceInfo
+  );
+
+/**
+  Create a REDFISH_SERVICE with explicit credentials.
+
+  This function creates a Redfish service with user-provided credentials instead
+  of using the credential protocol. This is useful when the caller needs to use
+  different credentials than the system default, such as for BMC management
+  operations that require administrative access.
+
+  The service enumerator will handle the authentication flow automatically
+  using the provided credentials for HTTP basic auth or Redfish session login.
+
+  Callers are responsible for freeing the returned service by RedfishCleanupService().
+
+  @param[in]  RedfishConfigServiceInfo Redfish service information the EFI Redfish
+                                       feature driver communicates with.
+  @param[in]  AuthMethod               None, HTTP basic auth, or Redfish session login.
+  @param[in]  UserId                   User name for authentication.
+  @param[in]  Password                 Password for authentication.
+
+  @return     New created Redfish Service, or NULL if error happens.
+
+**/
+REDFISH_SERVICE
+EFIAPI
+RedfishCreateServiceWithCredential (
+  IN  REDFISH_CONFIG_SERVICE_INFORMATION  *RedfishConfigServiceInfo,
+  IN  EDKII_REDFISH_AUTH_METHOD           AuthMethod,
+  IN  CHAR8                               *UserId,
+  IN  CHAR8                               *Password
   );
 
 /**
