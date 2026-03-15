@@ -98,7 +98,7 @@ struct __name##_sring {                                                 \
         UINT8 pvt_pad[4];                                             \
     } private;                                                          \
     UINT8 __pad[44];                                                  \
-    union __name##_sring_entry ring[1]; /* variable-length */           \
+    union __name##_sring_entry ring[]; /* variable-length */           \
 };                                                                      \
                                                                         \
   /* "Front" end's private variables */                                   \

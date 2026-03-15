@@ -24,7 +24,7 @@ extern EFI_GUID  gSmmVariableWriteGuid;
 typedef struct {
   UINTN         Function;
   EFI_STATUS    ReturnStatus;
-  UINT8         Data[1];
+  UINT8         Data[];
 } SMM_VARIABLE_COMMUNICATE_HEADER;
 
 //
@@ -96,7 +96,7 @@ typedef struct {
   UINTN       DataSize;
   UINTN       NameSize;
   UINT32      Attributes;
-  CHAR16      Name[1];
+  CHAR16      Name[];
 } SMM_VARIABLE_COMMUNICATE_ACCESS_VARIABLE;
 
 ///
@@ -105,7 +105,7 @@ typedef struct {
 typedef struct {
   EFI_GUID    Guid;
   UINTN       NameSize;     // Return name buffer size
-  CHAR16      Name[1];
+  CHAR16      Name[];
 } SMM_VARIABLE_COMMUNICATE_GET_NEXT_VARIABLE_NAME;
 
 ///
@@ -124,7 +124,7 @@ typedef struct {
   EFI_GUID                       Guid;
   UINTN                          NameSize;
   VAR_CHECK_VARIABLE_PROPERTY    VariableProperty;
-  CHAR16                         Name[1];
+  CHAR16                         Name[];
 } SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY;
 
 typedef struct {
