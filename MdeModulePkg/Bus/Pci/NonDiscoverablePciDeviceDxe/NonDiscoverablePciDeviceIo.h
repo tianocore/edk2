@@ -94,6 +94,7 @@ typedef struct {
   // on behalf of this device
   //
   LIST_ENTRY                 UncachedAllocationList;
+  EFI_LOCK                   UncachedAllocationListLock;
   //
   // Unique ID for this device instance: needed so that we can report unique
   // segment/bus/device number for each device instance. Note that this number
