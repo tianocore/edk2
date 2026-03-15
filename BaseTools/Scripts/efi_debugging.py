@@ -1774,6 +1774,8 @@ class EfiConfigurationTable:
             system_table_pointer = self._get_system_table_pointer()
             if not system_table_pointer is None:
                 gST_addr = system_table_pointer.EfiSystemTableBase
+            else:
+                return
 
         gST = self._ctype_read(EFI_SYSTEM_TABLE, gST_addr)
         self.read_efi_config_table(gST.NumberOfTableEntries,
@@ -1789,6 +1791,11 @@ class EfiConfigurationTable:
             result += f'VendorTable = 0x{value:08x}\n'
 
         return result
+
+    @ classmethod
+    def __bool__(cls):
+        '''return true if we have ConfigurationTable'''
+        return bool(cls.ConfigurationTableDict)
 
     def _ctype_read(self, ctype_struct, offset=0):
         '''ctype worker function to read data'''
