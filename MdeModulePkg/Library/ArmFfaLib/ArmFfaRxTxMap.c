@@ -2,6 +2,8 @@
   Arm Ffa library common code.
 
   Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) Qualcomm Technologies, Inc. All rights reserved.<BR>
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
    @par Glossary:
@@ -196,7 +198,7 @@ ArmFfaLibRxTxUnmap (
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
   FfaArgs.Arg0 = ARM_FID_FFA_RXTX_UNMAP;
-  FfaArgs.Arg1 = (PartId << ARM_FFA_SOURCE_EP_SHIFT);
+  FfaArgs.Arg1 = GetFfaVmIdVal (PartId, TRUE);
 
   ArmCallFfa (&FfaArgs);
 
@@ -301,7 +303,7 @@ RemapFfaRxTxBuffer (
 
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
   FfaArgs.Arg0 = ARM_FID_FFA_RXTX_UNMAP;
-  FfaArgs.Arg1 = (PartId << ARM_FFA_SOURCE_EP_SHIFT);
+  FfaArgs.Arg1 = GetFfaVmIdVal (PartId, TRUE);
 
   ArmCallFfa (&FfaArgs);
   Status = FfaArgsToEfiStatus (&FfaArgs);
