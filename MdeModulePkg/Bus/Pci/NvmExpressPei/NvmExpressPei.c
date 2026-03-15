@@ -118,7 +118,7 @@ EnumerateNvmeDevNamespace (
   LbaFmtIdx = Flbas & 0xF;
 
   //
-  // Currently this NVME driver only suport Metadata Size == 0
+  // Currently this NVME driver only supports Metadata Size == 0
   //
   if (NamespaceData->LbaFormat[LbaFmtIdx].Ms != 0) {
     DEBUG ((
