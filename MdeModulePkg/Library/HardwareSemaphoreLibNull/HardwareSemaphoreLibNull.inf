@@ -1,0 +1,29 @@
+## @file
+# Null instance of the SemaphoreLib.
+#
+# This library provides a Null implementation of acquire/release functions for
+# global/socket semaphores. It should only be used with code that is guaranteed
+# to only be executed on the BSP.
+#
+#  Copyright (c) 2025, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = HardwareSemaphoreLibNull
+  FILE_GUID                      = 7A1833AC-A75D-44C3-A601-2D501D37B188
+  MODULE_TYPE                    = BASE
+  LIBRARY_CLASS                  = SemaphoreLib
+
+[Sources]
+  HardwareSemaphoreLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+
+[Pcd]
