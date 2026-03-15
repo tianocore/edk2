@@ -46,8 +46,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
 
-#define PERF_ID_TCG2_DXE  0x3120
-
 typedef struct {
   CHAR16      *VariableName;
   EFI_GUID    *VendorGuid;
@@ -2502,7 +2500,8 @@ OnReadyToBoot (
   EFI_STATUS    Status;
   TPM_PCRINDEX  PcrIndex;
 
-  PERF_START_EX (mImageHandle, "EventRec", "Tcg2Dxe", 0, PERF_ID_TCG2_DXE);
+  PERF_FUNCTION_BEGIN ();
+
   if (mBootAttempts == 0) {
     //
     // Measure handoff tables.
@@ -2520,15 +2519,19 @@ OnReadyToBoot (
       DEBUG ((DEBUG_ERROR, "Boot Variables not Measured. Error!\n"));
     }
 
-    //
-    // 1. This is the first boot attempt.
-    //
-    Status = TcgMeasureAction (
-               4,
-               EFI_CALLING_EFI_APPLICATION
-               );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a not Measured. Error!\n", EFI_CALLING_EFI_APPLICATION));
+    if (PcdGetBool (TcgMeasureBootStringsInPcr4)) {
+      //
+      // 1. This is the first boot attempt.
+      //
+      Status = TcgMeasureAction (
+                 4,
+                 EFI_CALLING_EFI_APPLICATION
+                 );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "%a not Measured. Error!\n", EFI_CALLING_EFI_APPLICATION));
+      }
+    } else {
+      DEBUG ((DEBUG_WARN, "Tcg2Dxe PCD set to skip Measure Boot String in PCR4\n"));
     }
 
     //
@@ -2554,27 +2557,31 @@ OnReadyToBoot (
     // 5. Read & Measure variable. BootOrder already measured.
     //
   } else {
-    //
-    // 6. Not first attempt, meaning a return from last attempt
-    //
-    Status = TcgMeasureAction (
-               4,
-               EFI_RETURNING_FROM_EFI_APPLICATION
-               );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a not Measured. Error!\n", EFI_RETURNING_FROM_EFI_APPLICATION));
-    }
+    if (PcdGetBool (TcgMeasureBootStringsInPcr4)) {
+      //
+      // 6. Not first attempt, meaning a return from last attempt
+      //
+      Status = TcgMeasureAction (
+                 4,
+                 EFI_RETURNING_FROM_EFI_APPLICATION
+                 );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "%a not Measured. Error!\n", EFI_RETURNING_FROM_EFI_APPLICATION));
+      }
 
-    //
-    // 7. Next boot attempt, measure "Calling EFI Application from Boot Option" again
-    // TCG PC Client PFP spec Section 2.4.4.5 Step 4
-    //
-    Status = TcgMeasureAction (
-               4,
-               EFI_CALLING_EFI_APPLICATION
-               );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a not Measured. Error!\n", EFI_CALLING_EFI_APPLICATION));
+      //
+      // 7. Next boot attempt, measure "Calling EFI Application from Boot Option" again
+      // TCG PC Client PFP spec Section 2.4.4.5 Step 4
+      //
+      Status = TcgMeasureAction (
+                 4,
+                 EFI_CALLING_EFI_APPLICATION
+                 );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "%a not Measured. Error!\n", EFI_CALLING_EFI_APPLICATION));
+      }
+    } else {
+      DEBUG ((DEBUG_WARN, "Tcg2Dxe PCD set to skip Measure Boot String in PCR4\n"));
     }
   }
 
@@ -2583,7 +2590,8 @@ OnReadyToBoot (
   // Increase boot attempt counter.
   //
   mBootAttempts++;
-  PERF_END_EX (mImageHandle, "EventRec", "Tcg2Dxe", 0, PERF_ID_TCG2_DXE + 1);
+
+  PERF_FUNCTION_END ();
 }
 
 /**

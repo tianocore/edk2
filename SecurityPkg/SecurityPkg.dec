@@ -164,6 +164,10 @@
   #  Include/Guid/MeasuredFvHob.h
   gMeasuredFvHobGuid                 = { 0xb2360b42, 0x7173, 0x420a, { 0x86, 0x96, 0x46, 0xca, 0x6b, 0xab, 0x10, 0x60 }}
 
+  ## HOB GUID used to pass all Excluded FVs to Dxe Driver.
+  #  Include/Guid/ExcludedFvHob.h
+  gExcludedFvHobGuid                 = { 0xdd55d497, 0x5ed5, 0x403c, { 0x92, 0xb5, 0x70, 0x3a, 0x72, 0x59, 0xae, 0x2a }}
+
   ## GUID used to "PhysicalPresence" variable and "PhysicalPresenceFlags" variable for TPM request and response.
   #  Include/Guid/PhysicalPresenceData.h
   gEfiPhysicalPresenceGuid           = { 0xf6499b1, 0xe9ad, 0x493d, { 0xb9, 0xc2, 0x2f, 0x90, 0x81, 0x5c, 0x6c, 0xbc }}
@@ -354,6 +358,10 @@
   # @Prompt SMI Command IO port.
   gEfiSecurityPkgTokenSpaceGuid.PcdSmiCommandIoPort|0xB2|UINT16|0x00000009
 
+  ## This fixed at build flag tells the TPM stack whether to update the TPM allocation if a
+  #  mismatch is found between PcdTpm2HashMask and the active banks.
+  gEfiSecurityPkgTokenSpaceGuid.PcdForceReallocatePcrBanks|TRUE|BOOLEAN|0x0000000A
+
   ## Progress Code for FV verification result.<BR><BR>
   #  (EFI_SOFTWARE_PEI_MODULE | EFI_SUBCLASS_SPECIFIC | XXX)
   # @Prompt Status Code for FV verification result
@@ -386,6 +394,11 @@
   #   TRUE  - A random password will be used
   #   FALSE - The hierarchy will be disabled
   gEfiSecurityPkgTokenSpaceGuid.PcdRandomizePlatformHierarchy|TRUE|BOOLEAN|0x00010024
+
+  ## Support mode where Ready To Boot Strings/Events are not measured into PCR 4.
+  #   TRUE - The Platform will measure
+  #   FALSE -The Platform will not measure those events
+  gEfiSecurityPkgTokenSpaceGuid.TcgMeasureBootStringsInPcr4|TRUE|BOOLEAN|0x0000000B
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## Indicates whether TPM physical presence is locked during platform initialization.
