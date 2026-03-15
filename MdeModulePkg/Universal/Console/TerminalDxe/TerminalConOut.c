@@ -246,8 +246,8 @@ TerminalConOutOutputString (
             // TerminalDevice->OutputEscChar is set to let the Esc char
             // to be output to the terminal emulation software.
             //
-            if ((GraphicChar == 27) && TerminalDevice->OutputEscChar) {
-              GraphicChar = 27;
+            if ((GraphicChar == ESC) && TerminalDevice->OutputEscChar) {
+              GraphicChar = ESC;
             } else {
               GraphicChar = '?';
               Warning     = TRUE;
