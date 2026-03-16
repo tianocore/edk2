@@ -31,6 +31,8 @@
 #include <Protocol/FirmwareManagement.h>
 #include <Guid/SystemResourceTable.h>
 
+#include "FmpAuthenticationCommon.h"
+
 /**
   The handler is used to do the authentication for FMP capsule based upon
   EFI_FIRMWARE_IMAGE_AUTHENTICATION.
@@ -74,7 +76,7 @@ FmpAuthenticatedHandlerPkcs7 (
   P7Data   = Image->AuthInfo.CertData;
 
   // It is a signature across the variable data and the Monotonic Count value.
-  TempBuffer = AllocatePool (ImageSize - Image->AuthInfo.Hdr.dwLength);
+  TempBuffer = AllocateTempBuffer (ImageSize - Image->AuthInfo.Hdr.dwLength);
   if (TempBuffer == NULL) {
     DEBUG ((DEBUG_ERROR, "FmpAuthenticatedHandlerPkcs7: TempBuffer == NULL\n"));
     Status = RETURN_OUT_OF_RESOURCES;
@@ -99,7 +101,7 @@ FmpAuthenticatedHandlerPkcs7 (
                    (UINT8 *)TempBuffer,
                    ImageSize - Image->AuthInfo.Hdr.dwLength
                    );
-  FreePool (TempBuffer);
+  FreeTempBuffer (TempBuffer);
   if (!CryptoStatus) {
     //
     // If PKCS7 signature verification fails, AUTH tested failed bit is set.

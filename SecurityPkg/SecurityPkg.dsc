@@ -88,6 +88,7 @@
   CryptlibWrapper|SecurityPkg/DeviceSecurity/OsStub/CryptlibWrapper/CryptlibWrapper.inf
   PlatformLibWrapper|SecurityPkg/DeviceSecurity/OsStub/PlatformLibWrapper/PlatformLibWrapper.inf
   MemLibWrapper|SecurityPkg/DeviceSecurity/OsStub/MemLibWrapper/MemLibWrapper.inf
+  RuntimeMemoryAllocationLib|MdeModulePkg/Library/RuntimeMemoryAllocationLib/RuntimeMemoryAllocationLibNull.inf
 
 [LibraryClasses.AARCH64]
   ArmTrngLib|MdePkg/Library/BaseArmTrngLibNull/BaseArmTrngLibNull.inf
@@ -148,10 +149,12 @@
   ReportStatusCodeLib|MdeModulePkg/Library/RuntimeDxeReportStatusCodeLib/RuntimeDxeReportStatusCodeLib.inf
 !ifdef CONTINUOUS_INTEGRATION
   BaseCryptLib|CryptoPkg/Library/BaseCryptLibNull/BaseCryptLibNull.inf
+  RuntimeMemoryAllocationLib|MdeModulePkg/Library/RuntimeMemoryAllocationLib/RuntimeMemoryAllocationLibNull.inf
 !else
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
+  RuntimeMemoryAllocationLib|MdeModulePkg/Library/RuntimeMemoryAllocationLib/RuntimeMemoryAllocationLib.inf
 !endif
   HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCryptoRouterDxe.inf
   Tpm12DeviceLib|SecurityPkg/Library/Tpm12DeviceLibTcg/Tpm12DeviceLibTcg.inf
@@ -269,6 +272,7 @@
   SecurityPkg/Library/PeiRsa2048Sha256GuidedSectionExtractLib/PeiRsa2048Sha256GuidedSectionExtractLib.inf
 
   SecurityPkg/Library/FmpAuthenticationLibPkcs7/FmpAuthenticationLibPkcs7.inf
+  SecurityPkg/Library/FmpAuthenticationLibPkcs7/FmpAuthenticationRuntimeLibPkcs7.inf
   SecurityPkg/Library/FmpAuthenticationLibRsa2048Sha256/FmpAuthenticationLibRsa2048Sha256.inf
   SecurityPkg/Library/SecTpmMeasurementLib/SecTpmMeasurementLib.inf
   SecurityPkg/Library/PeiTpmMeasurementLib/PeiTpmMeasurementLib.inf

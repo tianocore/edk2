@@ -76,6 +76,7 @@ typedef struct {
   @param[in,out] Private  Private context structure for the managed controller.
 **/
 VOID
+EFIAPI
 GenerateFmpVariableNames (
   IN OUT FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
   );
@@ -94,6 +95,7 @@ GenerateFmpVariableNames (
   @return  The version of the firmware image in the firmware device.
 **/
 UINT32
+EFIAPI
 GetVersionFromVariable (
   IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
   );
@@ -113,6 +115,7 @@ GetVersionFromVariable (
            device.
 **/
 UINT32
+EFIAPI
 GetLowestSupportedVersionFromVariable (
   IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
   );
@@ -131,6 +134,7 @@ GetLowestSupportedVersionFromVariable (
   @return  The last attempt status value for the most recent capsule update.
 **/
 UINT32
+EFIAPI
 GetLastAttemptStatusFromVariable (
   IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
   );
@@ -149,6 +153,7 @@ GetLastAttemptStatusFromVariable (
   @return  The last attempt version value for the most recent capsule update.
 **/
 UINT32
+EFIAPI
 GetLastAttemptVersionFromVariable (
   IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
   );
@@ -163,6 +168,7 @@ GetLastAttemptVersionFromVariable (
   @param[in] Version  The version of the firmware image in the firmware device.
 **/
 VOID
+EFIAPI
 SetVersionInVariable (
   IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private,
   IN UINT32                            Version
@@ -180,6 +186,7 @@ SetVersionInVariable (
                                      firmware image in the firmware device.
 **/
 VOID
+EFIAPI
 SetLowestSupportedVersionInVariable (
   IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private,
   IN UINT32                            LowestSupportedVersion
@@ -197,6 +204,7 @@ SetLowestSupportedVersionInVariable (
                                 capsule update.
 **/
 VOID
+EFIAPI
 SetLastAttemptStatusInVariable (
   IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private,
   IN UINT32                            LastAttemptStatus
@@ -214,6 +222,7 @@ SetLastAttemptStatusInVariable (
                                  recent FMP capsule update.
 **/
 VOID
+EFIAPI
 SetLastAttemptVersionInVariable (
   IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private,
   IN UINT32                            LastAttemptVersion
@@ -230,6 +239,7 @@ SetLastAttemptVersionInVariable (
   @retval  Other            One of the UEFI variables could not be locked.
 **/
 EFI_STATUS
+EFIAPI
 LockAllFmpVariables (
   IN FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private
   );

@@ -56,6 +56,7 @@ typedef struct {
   CHAR16                              *VersionName;
   BOOLEAN                             RuntimeVersionSupported;
   EFI_EVENT                           FmpDeviceLockEvent;
+  EFI_EVENT                           FmpDeviceVirtualAddressChangeEvent;
   //
   // Indicates if an attempt has been made to lock a
   // FLASH storage device by calling FmpDeviceLock().
@@ -83,6 +84,11 @@ typedef struct {
 /// Null-terminated Unicode string retrieved from PcdFmpDeviceImageIdName.
 ///
 extern CHAR16  *mImageIdName;
+
+///
+/// FmpDxe instance runs as RUNTIME DRIVER.
+///
+extern BOOLEAN  mFmpRuntimeDxe;
 
 /**
   Check to see if any of the keys in PcdFmpDevicePkcs7CertBufferXdr matches

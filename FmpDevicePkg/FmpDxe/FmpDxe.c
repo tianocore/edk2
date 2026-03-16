@@ -5,6 +5,7 @@
 
   Copyright (c) Microsoft Corporation.<BR>
   Copyright (c) 2018 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -12,6 +13,8 @@
 
 #include "FmpDxe.h"
 #include "VariableSupport.h"
+
+#include <Protocol/LoadedImage.h>
 
 ///
 /// FILE_GUID from FmpDxe.inf.  When FmpDxe.inf is used in a platform, the
@@ -28,6 +31,11 @@ const EFI_GUID  mDefaultModuleFileGuid = {
 /// TRUE if FmpDeviceLib manages a single firmware storage device.
 ///
 BOOLEAN  mFmpSingleInstance = FALSE;
+
+///
+/// TRUE if FmpDxe is RUNTIME driver.
+///
+BOOLEAN  mFmpRuntimeDxe = FALSE;
 
 ///
 /// Firmware Management Protocol instance that is initialized in the entry
@@ -75,6 +83,7 @@ const FIRMWARE_MANAGEMENT_PRIVATE_DATA  mFirmwareManagementPrivateDataTemplate =
   NULL,            // VersionName
   TRUE,            // RuntimeVersionSupported
   NULL,            // FmpDeviceLockEvent
+  NULL,            // FmpDeviceVirtualAddressChangeEvent
   FALSE,           // FmpDeviceLocked
   NULL,            // FmpDeviceContext
   NULL,            // VersionVariableName
@@ -99,6 +108,36 @@ EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  mProgressFunc = NULL;
 /// Null-terminated Unicode string retrieved from PcdFmpDeviceImageIdName.
 ///
 CHAR16  *mImageIdName = NULL;
+
+/**
+  Callback function for VirtualAddressChangeEvent.
+
+  @param[in] Event      Event
+  @param[in] Context    Firmware management private data
+
+
+**/
+STATIC
+VOID
+EFIAPI
+FmpVirtualAddressChangeEvent (
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
+  )
+{
+  FIRMWARE_MANAGEMENT_PRIVATE_DATA  *Private;
+
+  Private = Context;
+  ASSERT (Private != NULL || !Private->DescriptorPopulated);
+
+  gRT->ConvertPointer (0, (VOID **)&Private->FmpDeviceContext);
+  gRT->ConvertPointer (0, (VOID **)&Private->VersionVariableName);
+  gRT->ConvertPointer (0, (VOID **)&Private->LsvVariableName);
+  gRT->ConvertPointer (0, (VOID **)&Private->LastAttemptStatusVariableName);
+  gRT->ConvertPointer (0, (VOID **)&Private->LastAttemptVersionVariableName);
+  gRT->ConvertPointer (0, (VOID **)&Private->FmpStateVariableName);
+  gRT->ConvertPointer (0, (VOID **)&(Private->Descriptor.VersionName));
+}
 
 /**
   Callback function to report the process of the firmware updating.
@@ -285,6 +324,7 @@ PopulateDescriptor (
 {
   EFI_STATUS  Status;
   UINT32      DependenciesSize;
+  CHAR16      *VersionName;
 
   if (Private == NULL) {
     DEBUG ((DEBUG_ERROR, "FmpDxe(%s): PopulateDescriptor() - Private is NULL.\n", mImageIdName));
@@ -334,8 +374,9 @@ PopulateDescriptor (
   //
   // Free the current version name.  Shouldn't really happen but this populate
   // function could be called multiple times (to refresh).
+  // For FmpDxeRuntime driver, don't free VersionName.
   //
-  if (Private->Descriptor.VersionName != NULL) {
+  if ((Private->Descriptor.VersionName != NULL) && !mFmpRuntimeDxe) {
     FreePool (Private->Descriptor.VersionName);
     Private->Descriptor.VersionName = NULL;
   }
@@ -343,19 +384,34 @@ PopulateDescriptor (
   //
   // Attempt to get the version string from the FmpDeviceLib
   //
-  Status = FmpDeviceGetVersionString (&Private->Descriptor.VersionName);
-  if (Status == EFI_UNSUPPORTED) {
-    DEBUG ((DEBUG_INFO, "FmpDxe(%s): GetVersionString() unsupported in FmpDeviceLib.\n", mImageIdName));
-    Private->Descriptor.VersionName = AllocateCopyPool (
-                                        sizeof (VERSION_STRING_NOT_SUPPORTED),
-                                        VERSION_STRING_NOT_SUPPORTED
-                                        );
-  } else if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "FmpDxe(%s): GetVersionString() not available in FmpDeviceLib.\n", mImageIdName));
-    Private->Descriptor.VersionName = AllocateCopyPool (
-                                        sizeof (VERSION_STRING_NOT_AVAILABLE),
-                                        VERSION_STRING_NOT_AVAILABLE
-                                        );
+  if (Private->Descriptor.VersionName == NULL) {
+    Status = FmpDeviceGetVersionString (&Private->Descriptor.VersionName);
+    if (Status == EFI_UNSUPPORTED) {
+      DEBUG ((DEBUG_INFO, "FmpDxe(%s): GetVersionString() unsupported in FmpDeviceLib.\n", mImageIdName));
+      Private->Descriptor.VersionName = AllocateCopyPool (
+                                          sizeof (VERSION_STRING_NOT_SUPPORTED),
+                                          VERSION_STRING_NOT_SUPPORTED
+                                          );
+    } else if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "FmpDxe(%s): GetVersionString() not available in FmpDeviceLib.\n", mImageIdName));
+      Private->Descriptor.VersionName = AllocateCopyPool (
+                                          sizeof (VERSION_STRING_NOT_AVAILABLE),
+                                          VERSION_STRING_NOT_AVAILABLE
+                                          );
+    } else if (mFmpRuntimeDxe) {
+      VersionName = Private->Descriptor.VersionName;
+      if (VersionName != NULL) {
+        Private->Descriptor.VersionName = AllocateRuntimeCopyPool (
+                                            ((StrLen (VersionName) + 1) * sizeof (CHAR16)),
+                                            VersionName
+                                            );
+        if (Private->Descriptor.VersionName == NULL) {
+          DEBUG ((DEBUG_WARN, "FmpDxe(%s): Failed to reallocate VersionName.\n", mImageIdName));
+        }
+
+        FreePool (VersionName);
+      }
+    }
   }
 
   Private->Descriptor.LowestSupportedImageVersion = GetLowestSupportedVersion (Private);
@@ -1679,10 +1735,18 @@ InstallFmpInstance (
   //
   // Allocate FMP Protocol instance
   //
-  Private = AllocateCopyPool (
-              sizeof (mFirmwareManagementPrivateDataTemplate),
-              &mFirmwareManagementPrivateDataTemplate
-              );
+  if (mFmpRuntimeDxe) {
+    Private = AllocateRuntimeCopyPool (
+                sizeof (mFirmwareManagementPrivateDataTemplate),
+                &mFirmwareManagementPrivateDataTemplate
+                );
+  } else {
+    Private = AllocateCopyPool (
+                sizeof (mFirmwareManagementPrivateDataTemplate),
+                &mFirmwareManagementPrivateDataTemplate
+                );
+  }
+
   if (Private == NULL) {
     DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Failed to allocate memory for private structure.\n", mImageIdName));
     Status = EFI_OUT_OF_RESOURCES;
@@ -1706,35 +1770,52 @@ InstallFmpInstance (
   //
   PopulateDescriptor (Private);
 
-  if (IsLockFmpDeviceAtLockEventGuidRequired ()) {
-    //
-    // Register all UEFI Variables used by this module to be locked.
-    //
-    Status = LockAllFmpVariables (Private);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Failed to register variables to lock.  Status = %r.\n", mImageIdName, Status));
-    } else {
-      DEBUG ((DEBUG_INFO, "FmpDxe(%s): All variables registered to lock\n", mImageIdName));
-    }
+  if (!mFmpRuntimeDxe) {
+    if (IsLockFmpDeviceAtLockEventGuidRequired ()) {
+      //
+      // Register all UEFI Variables used by this module to be locked.
+      //
+      Status = LockAllFmpVariables (Private);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Failed to register variables to lock.  Status = %r.\n", mImageIdName, Status));
+      } else {
+        DEBUG ((DEBUG_INFO, "FmpDxe(%s): All variables registered to lock\n", mImageIdName));
+      }
 
+      //
+      // Create and register notify function to lock the FMP device.
+      //
+      Status = gBS->CreateEventEx (
+                      EVT_NOTIFY_SIGNAL,
+                      TPL_CALLBACK,
+                      FmpDxeLockEventNotify,
+                      Private,
+                      mLockGuid,
+                      &Private->FmpDeviceLockEvent
+                      );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Failed to register notification.  Status = %r\n", mImageIdName, Status));
+      }
+
+      ASSERT_EFI_ERROR (Status);
+    } else {
+      DEBUG ((DEBUG_VERBOSE, "FmpDxe(%s): Not registering notification to call FmpDeviceLock() because mfg mode\n", mImageIdName));
+    }
+  } else {
     //
-    // Create and register notify function to lock the FMP device.
+    // When FmpDxe runs as RUNTIME driver, It shouldn't lock the device.
     //
-    Status = gBS->CreateEventEx (
-                    EVT_NOTIFY_SIGNAL,
-                    TPL_CALLBACK,
-                    FmpDxeLockEventNotify,
-                    Private,
-                    mLockGuid,
-                    &Private->FmpDeviceLockEvent
+    Status = gBS->CreateEvent (
+                    EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE,
+                    TPL_NOTIFY,
+                    FmpVirtualAddressChangeEvent,
+                    (VOID *)Private,
+                    &Private->FmpDeviceVirtualAddressChangeEvent
                     );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Failed to register notification.  Status = %r\n", mImageIdName, Status));
+      DEBUG ((DEBUG_ERROR, "FmpDxe(%s): Failed to register notification. Status = %r.\n", mImageIdName, Status));
+      goto cleanup;
     }
-
-    ASSERT_EFI_ERROR (Status);
-  } else {
-    DEBUG ((DEBUG_VERBOSE, "FmpDxe(%s): Not registering notification to call FmpDeviceLock() because mfg mode\n", mImageIdName));
   }
 
   //
@@ -1754,9 +1835,12 @@ InstallFmpInstance (
   }
 
 cleanup:
-
   if (EFI_ERROR (Status)) {
     if (Private != NULL) {
+      if (Private->FmpDeviceVirtualAddressChangeEvent != NULL) {
+        gBS->CloseEvent (Private->FmpDeviceVirtualAddressChangeEvent);
+      }
+
       if (Private->FmpDeviceLockEvent != NULL) {
         gBS->CloseEvent (Private->FmpDeviceLockEvent);
       }
@@ -1831,6 +1915,10 @@ UninstallFmpInstance (
 
   Private = FIRMWARE_MANAGEMENT_PRIVATE_DATA_FROM_THIS (Fmp);
   FmpDeviceSetContext (Private->Handle, &Private->FmpDeviceContext);
+
+  if (Private->FmpDeviceVirtualAddressChangeEvent != NULL) {
+    gBS->CloseEvent (Private->FmpDeviceVirtualAddressChangeEvent);
+  }
 
   if (Private->FmpDeviceLockEvent != NULL) {
     gBS->CloseEvent (Private->FmpDeviceLockEvent);
@@ -1919,7 +2007,8 @@ FmpDxeEntryPoint (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS                 Status;
+  EFI_LOADED_IMAGE_PROTOCOL  *LoadedImage;
 
   //
   // Verify that a new FILE_GUID value has been provided in the <Defines>
@@ -1930,6 +2019,20 @@ FmpDxeEntryPoint (
     DEBUG ((DEBUG_ERROR, "FmpDxe: Use of default FILE_GUID detected.  FILE_GUID must be set to a unique value.\n"));
     ASSERT (FALSE);
     return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Check FmpDxe is RUNTIME driver.
+  //
+  Status = gBS->HandleProtocol (
+                  ImageHandle,
+                  &gEfiLoadedImageProtocolGuid,
+                  (VOID **)&LoadedImage
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  if (LoadedImage->ImageCodeType == EfiRuntimeServicesCode) {
+    mFmpRuntimeDxe = TRUE;
   }
 
   //

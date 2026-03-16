@@ -267,6 +267,7 @@
   CustomFdtNodeParserLib|UefiPayloadPkg/Library/CustomFdtNodeParserNullLib/CustomFdtNodeParserNullLib.inf
   PayloadEntryHelperLib|UefiPayloadPkg/Library/PayloadEntryHelperLib/PayloadEntryHelperLib.inf
   MemoryAllocationLib|UefiPayloadPkg/Library/PayloadEntryMemoryAllocationLib/PayloadEntryMemoryAllocationLib.inf
+  RuntimeMemoryAllocationLib|MdeModulePkg/Library/RuntimeMemoryAllocationLib/RuntimeMemoryAllocationLibNull.inf
 
   #
   # UEFI & PI
@@ -528,6 +529,7 @@
 !if $(CAPSULE_SUPPORT) == TRUE
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
 !endif
+  RuntimeMemoryAllocationLib|MdeModulePkg/Library/RuntimeMemoryAllocationLib/RuntimeMemoryAllocationLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER,LibraryClasses.common.UEFI_APPLICATION]
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf

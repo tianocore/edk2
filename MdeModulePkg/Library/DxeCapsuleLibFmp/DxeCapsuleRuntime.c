@@ -3,6 +3,7 @@
 
   Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
+  Copyright (c) 2025, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -21,14 +22,99 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
 
-extern EFI_SYSTEM_RESOURCE_TABLE  *mEsrtTable;
-extern BOOLEAN                    mDxeCapsuleLibIsExitBootService;
-EFI_EVENT                         mDxeRuntimeCapsuleLibVirtualAddressChangeEvent = NULL;
-EFI_EVENT                         mDxeRuntimeCapsuleLibSystemResourceTableEvent  = NULL;
-EFI_EVENT                         mDxeRuntimeCapsuleLibExitBootServiceEvent      = NULL;
+#include <Protocol/LoadedImage.h>
+#include <Protocol/FirmwareManagement.h>
+
+extern EFI_SYSTEM_RESOURCE_TABLE         *mEsrtTable;
+extern BOOLEAN                           mDxeCapsuleLibIsExitBootService;
+EFI_EVENT                                mDxeRuntimeCapsuleLibEndOfDxeEvent             = NULL;
+EFI_EVENT                                mDxeRuntimeCapsuleLibVirtualAddressChangeEvent = NULL;
+EFI_EVENT                                mDxeRuntimeCapsuleLibSystemResourceTableEvent  = NULL;
+EFI_EVENT                                mDxeRuntimeCapsuleLibExitBootServiceEvent      = NULL;
+extern EFI_FIRMWARE_MANAGEMENT_PROTOCOL  **mRuntimeFmpList;
+extern UINTN                             mRuntimeFmpCount;
 
 /**
-  Convert EsrtTable physical address to virtual address.
+  Get runtime FmpDxe list at EndOfDxe event.
+
+  @param[in] Event      Event whose notification function is being invoked.
+  @param[in] Context    The pointer to the notification function's context, which
+                        is implementation-dependent.
+**/
+VOID
+EFIAPI
+DxeCapsuleLibEndOfDxeEventNotify (
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
+  )
+{
+  EFI_STATUS                        Status;
+  UINTN                             Idx;
+  UINTN                             RtFmpIdx = 0;
+  UINTN                             NumberOfHandles;
+  EFI_HANDLE                        *HandleBuffer;
+  EFI_LOADED_IMAGE_PROTOCOL         *LoadedImage;
+  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *Fmp;
+
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiFirmwareManagementProtocolGuid,
+                  NULL,
+                  &NumberOfHandles,
+                  &HandleBuffer
+                  );
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  for (Idx = 0; Idx < NumberOfHandles; Idx++) {
+    Status = gBS->HandleProtocol (
+                    HandleBuffer[Idx],
+                    &gEfiLoadedImageProtocolGuid,
+                    (VOID **)&LoadedImage
+                    );
+    ASSERT_EFI_ERROR (Status);
+
+    if (LoadedImage->ImageCodeType == EfiRuntimeServicesCode) {
+      mRuntimeFmpCount++;
+    } else {
+      HandleBuffer[Idx] = NULL;
+    }
+  }
+
+  if (mRuntimeFmpCount == 0) {
+    DEBUG ((DEBUG_INFO, "%a: No Runtime FmpDxe is found!\n", __func__));
+    goto ErrorHandle;
+  }
+
+  mRuntimeFmpList = AllocateRuntimePool (mRuntimeFmpCount * sizeof (EFI_FIRMWARE_MANAGEMENT_PROTOCOL *));
+  if (mRuntimeFmpList == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Failed to allocate Runtime FmpDxe list...\n", __func__));
+    mRuntimeFmpCount = 0;
+    goto ErrorHandle;
+  }
+
+  for (Idx = 0; Idx < NumberOfHandles; Idx++) {
+    if (HandleBuffer[Idx] == NULL) {
+      continue;
+    }
+
+    Status = gBS->HandleProtocol (
+                    HandleBuffer[Idx],
+                    &gEfiFirmwareManagementProtocolGuid,
+                    (VOID **)&Fmp
+                    );
+    ASSERT_EFI_ERROR (Status);
+
+    mRuntimeFmpList[RtFmpIdx++] = Fmp;
+  }
+
+ErrorHandle:
+  FreePool (HandleBuffer);
+}
+
+/**
+  Convert EsrtTable and Fmp Runtime Dxe driver physical address to virtual address.
 
   @param[in] Event      Event whose notification function is being invoked.
   @param[in] Context    The pointer to the notification function's context, which
@@ -41,7 +127,15 @@ DxeCapsuleLibVirtualAddressChangeEvent (
   IN  VOID       *Context
   )
 {
+  UINTN  Idx;
+
   gRT->ConvertPointer (EFI_OPTIONAL_PTR, (VOID **)&mEsrtTable);
+
+  for (Idx = 0; Idx < mRuntimeFmpCount; Idx++) {
+    gRT->ConvertPointer (0x00, (VOID **)&mRuntimeFmpList[Idx]);
+  }
+
+  gRT->ConvertPointer (0x00, (VOID **)&mRuntimeFmpList);
 }
 
 /**
@@ -82,7 +176,9 @@ DxeCapsuleLibSystemResourceTableInstallEventNotify (
     //
     // Free the pool to remove the cached ESRT table.
     //
-    if (mEsrtTable != NULL) {
+    if (!FeaturePcdGet (PcdSupportProcessCapsuleAtRuntime) &&
+        (mRuntimeFmpCount > 0) && (mEsrtTable != NULL))
+    {
       FreePool ((VOID *)mEsrtTable);
       mEsrtTable = NULL;
     }
@@ -103,6 +199,14 @@ DxeCapsuleLibSystemResourceTableInstallEventNotify (
     // Set FwResourceCountMax to a sane value.
     //
     mEsrtTable->FwResourceCountMax = mEsrtTable->FwResourceCount;
+
+    //
+    // If runtime capsule update is supported, replace Esrt with rt version.
+    //
+    if (FeaturePcdGet (PcdSupportProcessCapsuleAtRuntime) && (mRuntimeFmpCount > 0)) {
+      ConfigEntry->VendorTable = mEsrtTable;
+      FreePool ((VOID *)EsrtTable);
+    }
   }
 }
 
@@ -180,6 +284,16 @@ DxeRuntimeCapsuleLibConstructor (
                   );
   ASSERT_EFI_ERROR (Status);
 
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  DxeCapsuleLibEndOfDxeEventNotify,
+                  NULL,
+                  &gEfiEndOfDxeEventGroupGuid,
+                  &mDxeRuntimeCapsuleLibEndOfDxeEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
+
   return EFI_SUCCESS;
 }
 
@@ -216,6 +330,12 @@ DxeRuntimeCapsuleLibDestructor (
   // Close the ExitBootService event.
   //
   Status = gBS->CloseEvent (mDxeRuntimeCapsuleLibExitBootServiceEvent);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Close the EndOfDxe event.
+  //
+  Status = gBS->CloseEvent (mDxeRuntimeCapsuleLibEndOfDxeEvent);
   ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;

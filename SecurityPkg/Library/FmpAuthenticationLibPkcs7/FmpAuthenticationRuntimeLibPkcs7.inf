@@ -1,9 +1,10 @@
 ## @file
-#  FMP Authentication PKCS7 handler.
+#  FMP Authentication PKCS7 handler at runtime.
 #
 # Instance of FmpAuthentication Library for DXE/PEI post memory phase.
 #
 #  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2025, Arm Ltd. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -12,10 +13,11 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = FmpAuthenticationLibPkcs7
   MODULE_UNI_FILE                = FmpAuthenticationLibPkcs7.uni
-  FILE_GUID                      = F4EA205B-7345-452C-9D62-53BA6F3B8910
-  MODULE_TYPE                    = BASE
+  FILE_GUID                      = 31b2341e-64c8-11f0-b37f-5bb7d02e4945
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = FmpAuthenticationLib
+  CONSTRUCTOR                    = FmpAuthenticationRuntimeLibConstructor
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -24,9 +26,10 @@
 #
 
 [Sources]
-  FmpAuthenticationCommon.c
   FmpAuthenticationCommon.h
+  FmpAuthenticationCommon.c
   FmpAuthenticationLibPkcs7.c
+  FmpAuthenticationRuntimeLibPkcs7.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -40,7 +43,9 @@
   DebugLib
   MemoryAllocationLib
   BaseCryptLib
+  UefiBootServicesTableLib
   RuntimeMemoryAllocationLib
 
 [Guids]
-  gEfiCertPkcs7Guid        ## CONSUMES   ## GUID
+  gEfiCertPkcs7Guid                       ## CONSUMES   ## GUID
+  gEfiEventExitBootServicesGuid           ## CONSUMES ## Event
