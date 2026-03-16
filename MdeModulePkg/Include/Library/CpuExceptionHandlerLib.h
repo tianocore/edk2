@@ -12,6 +12,8 @@
 #include <Ppi/VectorHandoffInfo.h>
 #include <Protocol/Cpu.h>
 
+#define X86_CPU_INTERRUPT_NUM  256
+
 /**
   Initializes all CPU exceptions entries and provides the default exception handlers.
 
