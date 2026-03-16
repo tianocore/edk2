@@ -502,12 +502,12 @@ getOpResult (
   EFI_HTTP_STATUS_CODE  **StatusCode
   )
 {
-  const char      *propStr;
-  json_t          *stringProp;
-  bool            ret = false;
-  redfishPayload  *prop;
-  long long       intVal, intPropVal;
-  json_type       jsonType;
+  const char       *propStr;
+  json_t           *stringProp;
+  bool             ret = false;
+  redfishPayload   *prop;
+  long long        intVal, intPropVal;
+  EDKII_JSON_TYPE  jsonType;
 
   if (isPayloadCollection (payload)) {
     return collectionEvalOp (payload, propName, op, value, StatusCode);
@@ -525,11 +525,11 @@ getOpResult (
   }
 
   stringProp = prop->json;
-  jsonType   = (json_type)JsonGetType (prop->json);
+  jsonType   = JsonGetType (prop->json);
   switch (jsonType) {
-    case JSON_OBJECT:
+    case EdkiiJsonTypeObject:
       stringProp = json_object_get (prop->json, propName);
-    case JSON_STRING:
+    case EdkiiJsonTypeString:
       if (strcmp (op, "=") == 0) {
         propStr = json_string_value (stringProp);
         if (propStr == NULL) {
@@ -549,19 +549,19 @@ getOpResult (
       }
 
       break;
-    case JSON_TRUE:
+    case EdkiiJsonTypeTrue:
       if (strcmp (op, "=") == 0) {
         ret = (strcmp (value, "true") == 0);
       }
 
       break;
-    case JSON_FALSE:
+    case EdkiiJsonTypeFalse:
       if (strcmp (op, "=") == 0) {
         ret = (strcmp (value, "false") == 0);
       }
 
       break;
-    case JSON_INTEGER:
+    case EdkiiJsonTypeInteger:
       intPropVal = json_integer_value (prop->json);
       intVal     = strtoll (value, NULL, 0);
       if (strcmp (op, "=") == 0) {
