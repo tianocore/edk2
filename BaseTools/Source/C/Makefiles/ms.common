@@ -46,6 +46,8 @@ SYS_BIN_PATH = $(EDK_TOOLS_PATH)\Bin\Win32
 SYS_LIB_PATH = $(EDK_TOOLS_PATH)\Lib\Win32
 # Note: Disable flexible array member warnings
 CFLAGS = $(CFLAGS) /wd4200
+# Note: Suppress function implementation and prototype inconsistency warnings
+CFLAGS = $(CFLAGS) /wd4028
 
 !ELSEIF "$(HOST_ARCH)"=="X64"
 ARCH_INCLUDE = $(EDK2_PATH)\MdePkg\Include\X64
@@ -56,6 +58,8 @@ SYS_LIB_PATH = $(EDK_TOOLS_PATH)\Lib\Win64
 CFLAGS = $(CFLAGS) /wd4267 /wd4244 /wd4334
 # Note: Disable flexible array member warnings
 CFLAGS = $(CFLAGS) /wd4200
+# Note: Suppress function implementation and prototype inconsistency warnings
+CFLAGS = $(CFLAGS) /wd4028
 
 !ELSEIF "$(HOST_ARCH)"=="AARCH64"
 ARCH_INCLUDE = $(EDK2_PATH)\MdePkg\Include\AArch64
@@ -67,6 +71,8 @@ SYS_LIB_PATH = $(EDK_TOOLS_PATH)\Lib\Win64
 CFLAGS = $(CFLAGS) /wd4267 /wd4244 /wd4334
 # Note: Disable flexible array member warnings
 CFLAGS = $(CFLAGS) /wd4200
+# Note: Suppress function implementation and prototype inconsistency warnings
+CFLAGS = $(CFLAGS) /wd4028
 !ELSE
 !ERROR "Bad HOST_ARCH"
 !ENDIF
