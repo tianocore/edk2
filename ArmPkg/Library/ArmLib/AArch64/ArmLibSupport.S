@@ -15,6 +15,10 @@
 
 .set SCTLR_ELx_M_BIT_POS, (0)
 
+ASM_FUNC(ArmReadAidr)
+  mrs     x0, aidr_el1        // Read from Auxiliary ID Register (AIDR_EL1)
+  ret
+
 ASM_FUNC(ArmReadMidr)
   mrs     x0, midr_el1        // Read from Main ID Register (MIDR)
   ret
