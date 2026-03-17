@@ -4028,6 +4028,7 @@ AmlCodeGenInvokeMethod (
   }
 
   MethodInvocationNode = NULL;
+  ArgCountNode         = NULL;
 
   NodeStream = AllocateZeroPool (sizeof (AML_NODE_HANDLE) * (NumArgs + 1));
   if (NodeStream == NULL) {
@@ -4167,13 +4168,12 @@ AmlCodeGenInvokeMethod (
     goto exit_handler;
   }
 
-  ArgCountNode = NULL;
-  Status       = AmlCreateDataNode (
-                   EAmlNodeDataTypeUInt,
-                   &NumArgs,
-                   sizeof (UINT8),
-                   &ArgCountNode
-                   );
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeUInt,
+             &NumArgs,
+             sizeof (UINT8),
+             &ArgCountNode
+             );
   if (EFI_ERROR (Status)) {
     ASSERT_EFI_ERROR (Status);
     goto exit_handler;
