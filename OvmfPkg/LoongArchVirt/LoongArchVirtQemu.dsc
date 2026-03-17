@@ -32,6 +32,7 @@
   DEFINE TTY_TERMINAL            = FALSE
   DEFINE SECURE_BOOT_ENABLE      = FALSE
   DEFINE SECURE_BOOT_DEFAULT_KEYS = FALSE
+  DEFINE QEMU_PV_VARS            = FALSE
   DEFINE TPM2_ENABLE             = FALSE
   DEFINE TPM2_CONFIG_ENABLE      = FALSE
 
@@ -331,6 +332,10 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciBusHotplugDeviceSupport         | FALSE
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation            | TRUE
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation           | TRUE
+!if $(QEMU_PV_VARS) == TRUE
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuVarsRequire                        | TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache         | FALSE
+!endif
 !if $(SECURE_BOOT_ENABLE) == TRUE
   gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported                    | TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdRequireSelfSignedPk                | TRUE
@@ -551,12 +556,17 @@
     <LibraryClasses>
       NULL|EmbeddedPkg/Library/NvVarStoreFormattedLib/NvVarStoreFormattedLib.inf
   }
+!if $(QEMU_PV_VARS) == TRUE
+  OvmfPkg/VirtMmCommunicationDxe/VirtMmCommunication.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
+!else
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
       NULL|EmbeddedPkg/Library/NvVarStoreFormattedLib/NvVarStoreFormattedLib.inf
       BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   }
+!endif
 
   #
   # Platform Driver

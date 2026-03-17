@@ -93,7 +93,12 @@ INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
 #
 INF  OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf
 INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
+!if $(QEMU_PV_VARS) == TRUE
+INF  OvmfPkg/VirtMmCommunicationDxe/VirtMmCommunication.inf
+INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
+!else
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+!endif
 #
 # PCI
 #
