@@ -795,9 +795,9 @@ FdtPathOffset (
 CONST CHAR8 *
 EFIAPI
 FdtGetName (
-  IN VOID   *Fdt,
-  IN INT32  NodeOffset,
-  IN INT32  *Length
+  IN CONST VOID  *Fdt,
+  IN INT32       NodeOffset,
+  IN INT32       *Length
   )
 {
   return fdt_get_name (Fdt, NodeOffset, Length);
@@ -816,10 +816,10 @@ FdtGetName (
 INT32
 EFIAPI
 FdtGetPath (
-  IN VOID    *Fdt,
-  IN INT32   NodeOffset,
-  IN VOID    *Buffer,
-  IN UINT32  BufferSize
+  IN CONST VOID  *Fdt,
+  IN INT32       NodeOffset,
+  IN VOID        *Buffer,
+  IN UINT32      BufferSize
   )
 {
   return fdt_get_path (Fdt, NodeOffset, Buffer, BufferSize);
