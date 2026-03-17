@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_PCI_ENUMERATOR_SUPPORT_H_
-#define _EFI_PCI_ENUMERATOR_SUPPORT_H_
+#pragma once
 
 /**
   This routine is used to check whether the pci device is present.
@@ -478,5 +477,3 @@ VOID
 DumpPciBars (
   IN PCI_IO_DEVICE  *PciIoDevice
   );
-
-#endif

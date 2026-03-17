@@ -1,0 +1,6 @@
+# Ignore build directory
+/Build/
+
+# Ignore external dependencies
+*_extdep/
+UnitTestFrameworkPkg/Library/SubhookLib/

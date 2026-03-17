@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef SPI_BUS_H_
-#define SPI_BUS_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Library/BaseLib.h>
@@ -163,5 +162,3 @@ UpdateSpiPeripheral (
   IN CONST EFI_SPI_IO_PROTOCOL  *This,
   IN CONST EFI_SPI_PERIPHERAL   *SpiPeripheral
   );
-
-#endif //SPI_BUS_H_

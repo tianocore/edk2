@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __MMC_HOST_H__
-#define __MMC_HOST_H__
+#pragma once
 
 ///
 /// Global ID for the MMC Host Protocol
@@ -177,5 +176,3 @@ struct _EFI_MMC_HOST_PROTOCOL {
                                          Host->IsMultiBlock != NULL)
 
 extern EFI_GUID  gEmbeddedMmcHostProtocolGuid;
-
-#endif

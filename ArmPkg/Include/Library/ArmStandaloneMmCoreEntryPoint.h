@@ -20,8 +20,7 @@
 
 **/
 
-#ifndef __STANDALONEMMCORE_ENTRY_POINT_H__
-#define __STANDALONEMMCORE_ENTRY_POINT_H__
+#pragma once
 
 #include <Library/ArmSvcLib.h>
 #include <Library/ArmFfaLib.h>
@@ -213,5 +212,3 @@ EFIAPI
 ProcessModuleEntryPointList (
   IN VOID  *HobStart
   );
-
-#endif

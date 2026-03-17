@@ -5,8 +5,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _UDP4_DRIVER_H_
-#define _UDP4_DRIVER_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Library/BaseLib.h>
@@ -143,5 +142,3 @@ Udp4ServiceBindingDestroyChild (
   IN EFI_SERVICE_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                    ChildHandle
   );
-
-#endif

@@ -10,8 +10,7 @@
     - Obj or OBJ - Object
 **/
 
-#ifndef DYNAMIC_PLAT_REPO_INTERNAL_H_
-#define DYNAMIC_PLAT_REPO_INTERNAL_H_
+#pragma once
 
 #include "TokenMapper.h"
 
@@ -92,5 +91,3 @@ typedef struct DynamicPlatformRepositoryInfo {
 } DYNAMIC_PLATFORM_REPOSITORY_INFO;
 
 #pragma pack()
-
-#endif // DYNAMIC_PLAT_REPO_INTERNAL_H_

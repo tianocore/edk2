@@ -4,13 +4,7 @@ full_cmd=${BASH_SOURCE[-1]:-$0} # see http://mywiki.wooledge.org/BashFAQ/028 for
 dir=$(dirname "$full_cmd")
 cmd=${full_cmd##*/}
 
-if [ -n "$WORKSPACE" ] && [ -e "$WORKSPACE/BaseTools/Build/Source/C/bin" ]
-then
-  if [ -e "$WORKSPACE/BaseTools/Build/Source/C/bin/$cmd" ]
-  then
-    exec "$WORKSPACE/BaseTools/Build/Source/C/bin/$cmd" "$@"
-  fi
-elif [ -n "$EDK_TOOLS_PATH" ] && [ -e "$EDK_TOOLS_PATH/Source/C/bin" ]
+if [ -n "$EDK_TOOLS_PATH" ] && [ -e "$EDK_TOOLS_PATH/Source/C/bin" ]
 then
   if [ -e "$EDK_TOOLS_PATH/Source/C/bin/$cmd" ]
   then

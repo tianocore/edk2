@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _CPU_PISMMCPUDXESMM_H_
-#define _CPU_PISMMCPUDXESMM_H_
+#pragma once
 
 #include <PiSmm.h>
 
@@ -1662,5 +1661,3 @@ EFI_STATUS
 PiSmmCpuEntryCommon (
   VOID
   );
-
-#endif

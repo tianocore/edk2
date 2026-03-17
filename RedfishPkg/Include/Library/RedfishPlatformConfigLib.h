@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef REDFISH_PLATFORM_CONFIG_LIB_H_
-#define REDFISH_PLATFORM_CONFIG_LIB_H_
+#pragma once
 
 #include <Protocol/EdkIIRedfishPlatformConfig.h>
 
@@ -139,5 +138,3 @@ RedfishPlatformConfigGetDefaultValue (
   IN     UINT16               DefaultClass,
   OUT    EDKII_REDFISH_VALUE  *Value
   );
-
-#endif

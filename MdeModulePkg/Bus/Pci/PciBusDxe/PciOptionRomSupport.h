@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_PCI_OPTION_ROM_SUPPORT_H_
-#define _EFI_PCI_OPTION_ROM_SUPPORT_H_
+#pragma once
 
 /**
   Initialize a PCI LoadFile2 instance.
@@ -133,5 +132,3 @@ ProcessOpRomImage (
   IN PCI_IO_DEVICE  *PciDevice,
   IN BOOLEAN        NativeOnly
   );
-
-#endif

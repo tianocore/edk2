@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _DISK_IO_H_
-#define _DISK_IO_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Protocol/BlockIo.h>
@@ -463,5 +462,3 @@ DiskIoComponentNameGetControllerName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **ControllerName
   );
-
-#endif

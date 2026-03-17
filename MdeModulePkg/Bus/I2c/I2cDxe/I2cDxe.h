@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __I2C_DXE_H__
-#define __I2C_DXE_H__
+#pragma once
 
 #include <Uefi.h>
 #include <Library/BaseMemoryLib.h>
@@ -1087,5 +1086,3 @@ EFIAPI
 I2cHostUnload (
   IN EFI_HANDLE  ImageHandle
   );
-
-#endif //  __I2C_DXE_H__

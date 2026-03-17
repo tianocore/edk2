@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __S3_PCI_SEGMENT_LIB__
-#define __S3_PCI_SEGMENT_LIB__
+#pragma once
 
 /**
   Macro that converts PCI Segment, PCI Bus, PCI Device, PCI Function,
@@ -1026,5 +1025,3 @@ S3PciSegmentWriteBuffer (
   IN UINTN   Size,
   IN VOID    *Buffer
   );
-
-#endif

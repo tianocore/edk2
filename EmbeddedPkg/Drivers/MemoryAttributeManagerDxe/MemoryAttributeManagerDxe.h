@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef MEMORY_ATTRIBUTE_MANAGER_DXE_H_
-#define MEMORY_ATTRIBUTE_MANAGER_DXE_H_
+#pragma once
 
 #include <Guid/MemoryAttributeManagerFormSet.h>
 
@@ -18,5 +17,3 @@
 typedef struct {
   BOOLEAN    Enabled;
 } MEMORY_ATTRIBUTE_MANAGER_VARSTORE_DATA;
-
-#endif // __MEMORY_ATTRIBUTE_MANAGER_DXE_H__

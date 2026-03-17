@@ -36,13 +36,7 @@ do
 done
 
 
-if [ -n "$WORKSPACE" ] && [ -e "$WORKSPACE/BaseTools/Build/Source/C/bin" ]
-then
-  if [ -e "$WORKSPACE/BaseTools/Build/Source/C/bin/$cmd" ]
-  then
-    exec "$WORKSPACE/BaseTools/Build/Source/C/bin/$cmd" $QLT $ARGS
-  fi
-eif [ -n "$EDK_TOOLS_PATH" ] && [ -e "$EDK_TOOLS_PATH/Source/C/bin" ]
+if [ -n "$EDK_TOOLS_PATH" ] && [ -e "$EDK_TOOLS_PATH/Source/C/bin" ]
 then
   if [ -e "$EDK_TOOLS_PATH/Source/C/bin/$cmd" ]
   then

@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _CPU_ARCHITECTURAL_PROTOCOL_DRIVER_H_
-#define _CPU_ARCHITECTURAL_PROTOCOL_DRIVER_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <IndustryStandard/SmBios.h>
@@ -219,5 +218,3 @@ CpuMpServicesWhoAmI (
   );
 
 extern EFI_MP_SERVICES_PROTOCOL  mMpServicesTemplate;
-
-#endif

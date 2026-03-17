@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EDKII_VARIABLE_POLICY_HELPER_LIB_H_
-#define _EDKII_VARIABLE_POLICY_HELPER_LIB_H_
+#pragma once
 
 #include <Protocol/VariablePolicy.h>
 
@@ -157,5 +156,3 @@ RegisterVarStateVariablePolicy (
   IN CONST  CHAR16                          *VarStateName,
   IN        UINT8                           VarStateValue
   );
-
-#endif // _EDKII_VARIABLE_POLICY_HELPER_LIB_H_

@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _NET_LIB_H_
-#define _NET_LIB_H_
+#pragma once
 
 #include <Protocol/Ip6.h>
 
@@ -2271,5 +2270,3 @@ EFIAPI
 NetLibCreateDnsQName (
   IN  CHAR16  *DomainName
   );
-
-#endif

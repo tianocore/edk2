@@ -4,8 +4,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef TDX_MEASUREMENT_LIB_H
-#define TDX_MEASUREMENT_LIB_H
+#pragma once
 
 #include <PiPei.h>
 
@@ -81,5 +80,3 @@ TdxMeasurementHashAndExtendToRtmr (
   OUT UINT8  *Digest,
   IN  UINTN  DigestLen
   );
-
-#endif

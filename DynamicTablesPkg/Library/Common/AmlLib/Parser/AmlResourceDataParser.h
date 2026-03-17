@@ -11,8 +11,7 @@
   - Rdl or RDL - Resource Data Large
 **/
 
-#ifndef AML_RESOURCE_DATA_PARSER_H_
-#define AML_RESOURCE_DATA_PARSER_H_
+#pragma once
 
 #include <AmlNodeDefines.h>
 #include <Stream/AmlStream.h>
@@ -66,5 +65,3 @@ AmlParseResourceData (
   IN  AML_OBJECT_NODE  *BufferNode,
   IN  AML_STREAM       *FStream
   );
-
-#endif // AML_RESOURCE_DATA_PARSER_H_

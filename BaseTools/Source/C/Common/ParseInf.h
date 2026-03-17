@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_PARSE_INF_H
-#define _EFI_PARSE_INF_H
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -159,6 +158,4 @@ FindSectionInStream (
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

@@ -9,8 +9,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef TPM2_SERVICE_FFA_H_
-#define TPM2_SERVICE_FFA_H_
+#pragma once
 
 #define TPM2_SERVICE_FFA_GUID \
   { 0x17b862a4, 0x1806, 0x4faf, { 0x86, 0xb3, 0x08, 0x9a, 0x58, 0x35, 0x38, 0x61 } }
@@ -53,5 +52,3 @@
 extern EFI_GUID  gTpm2ServiceFfaGuid;
 
 typedef UINT32 TPM2_FFA_STATUS;
-
-#endif /* TPM2_SERVICE_FFA_H_ */

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef REDFISH_CONTENT_CODING_LIB_H_
-#define REDFISH_CONTENT_CODING_LIB_H_
+#pragma once
 
 /**
   This is the function to encode the content use the
@@ -76,5 +75,3 @@ RedfishContentDecode (
   OUT VOID   **DecodedContentPointer,
   OUT UINTN  *DecodedLength
   );
-
-#endif

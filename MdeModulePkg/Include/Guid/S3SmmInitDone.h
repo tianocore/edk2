@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __S3_SMM_INIT_DONE_H__
-#define __S3_SMM_INIT_DONE_H__
+#pragma once
 
 #define EDKII_S3_SMM_INIT_DONE_GUID \
   { \
@@ -17,5 +16,3 @@
   }
 
 extern EFI_GUID  gEdkiiS3SmmInitDoneGuid;
-
-#endif

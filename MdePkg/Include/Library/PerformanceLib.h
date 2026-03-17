@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PERFORMANCE_LIB_H__
-#define __PERFORMANCE_LIB_H__
+#pragma once
 
 ///
 /// Performance library property mask bits
@@ -765,5 +764,3 @@ LogPerformanceMeasurement (
   PERF_CODE_BEGIN ();          \
   Expression                   \
   PERF_CODE_END ()
-
-#endif

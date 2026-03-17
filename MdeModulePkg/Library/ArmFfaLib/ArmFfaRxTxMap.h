@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef ARM_FFA_RX_TX_MAP_LIB_H_
-#define ARM_FFA_RX_TX_MAP_LIB_H_
+#pragma once
 
 #include <Guid/ArmFfaRxTxBufferInfo.h>
 
@@ -96,4 +95,13 @@ RemapFfaRxTxBuffer (
   IN OUT ARM_FFA_RX_TX_BUFFER_INFO  *BufferInfo
   );
 
-#endif
+/**
+  Callback for when Unmap is called to handle any post unmap
+  functionality.
+
+**/
+VOID
+EFIAPI
+UnmapCallback (
+  IN VOID
+  );

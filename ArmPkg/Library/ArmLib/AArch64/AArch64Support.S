@@ -231,16 +231,6 @@ ASM_FUNC(ArmDisableStackAlignmentCheck)
    ret
 
 
-// Always turned on in AArch64. Else implementation specific. Leave in for C compatibility for now
-ASM_FUNC(ArmEnableBranchPrediction)
-  ret
-
-
-// Always turned on in AArch64. Else implementation specific. Leave in for C compatibility for now.
-ASM_FUNC(ArmDisableBranchPrediction)
-  ret
-
-
 ASM_FUNC(ArmDataMemoryBarrier)
   dmb   sy
   ret

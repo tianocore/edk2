@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef PRMT_ACPI_TABLE_H_
-#define PRMT_ACPI_TABLE_H_
+#pragma once
 
 #include <Base.h>
 #include <IndustryStandard/Acpi10.h>
@@ -92,5 +91,3 @@ typedef struct {
       PhysicalAddress,                                                     /* UINT64                  PhysicalAddress         */   \
     } \
   }
-
-#endif // _PRMT_ACPI_TABLE_H_

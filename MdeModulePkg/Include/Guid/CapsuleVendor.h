@@ -14,8 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_CAPSULE_VENDOR_GUID_H__
-#define __EFI_CAPSULE_VENDOR_GUID_H__
+#pragma once
 
 ///
 /// This guid is used as a variable GUID for the capsule variable
@@ -55,5 +54,3 @@ typedef struct {
 } EFI_CAPSULE_LONG_MODE_BUFFER;
 
 extern EFI_GUID  gEfiCapsuleVendorGuid;
-
-#endif // #ifndef _EFI_CAPSULE_VENDOR_GUID_H_

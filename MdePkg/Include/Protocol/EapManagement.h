@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef __EFI_EAP_MANAGEMENT_PROTOCOL_H__
-#define __EFI_EAP_MANAGEMENT_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/Eap.h>
 
@@ -392,5 +391,3 @@ struct _EFI_EAP_MANAGEMENT_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiEapManagementProtocolGuid;
-
-#endif

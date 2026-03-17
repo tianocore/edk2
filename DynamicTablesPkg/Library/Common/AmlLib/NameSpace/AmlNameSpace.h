@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef AML_NAMESPACE_H_
-#define AML_NAMESPACE_H_
+#pragma once
 
 #include <AmlNodeDefines.h>
 #include <Stream/AmlStream.h>
@@ -70,5 +69,3 @@ AmlGetRawNameSpacePath (
   IN        UINT32           InputParent,
   OUT       AML_STREAM       *RawAbsPathBStream
   );
-
-#endif // AML_NAMESPACE_H_

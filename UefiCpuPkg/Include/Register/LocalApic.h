@@ -5,9 +5,6 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __LOCAL_APIC_H__
-#define __LOCAL_APIC_H__
+#pragma once
 
 #include <Register/Intel/LocalApic.h>
-
-#endif

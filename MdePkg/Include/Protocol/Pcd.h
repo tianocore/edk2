@@ -14,8 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PCD_H__
-#define __PCD_H__
+#pragma once
 
 extern EFI_GUID  gPcdProtocolGuid;
 
@@ -794,5 +793,3 @@ typedef struct {
   PCD_PROTOCOL_GET_NEXT_TOKEN         GetNextToken;
   PCD_PROTOCOL_GET_NEXT_TOKENSPACE    GetNextTokenSpace;
 } PCD_PROTOCOL;
-
-#endif

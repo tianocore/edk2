@@ -7,12 +7,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PI_MM_H__
-#define __PI_MM_H__
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 #include <Uefi/UefiSpec.h>
 
 #include <Pi/PiMmCis.h>
-
-#endif

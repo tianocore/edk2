@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _HEAPGUARD_H_
-#define _HEAPGUARD_H_
+#pragma once
 
 #include "PiSmmCore.h"
 
@@ -388,5 +387,3 @@ VerifyMemoryGuard (
   );
 
 extern BOOLEAN  mOnGuarding;
-
-#endif

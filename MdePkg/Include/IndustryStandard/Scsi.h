@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __SCSI_H__
-#define __SCSI_H__
+#pragma once
 
 //
 // SCSI command OP Code
@@ -421,5 +420,3 @@ typedef struct {
 #define EFI_SCSI_ASC_ILLEGAL_FIELD                (0x26)
 #define EFI_SCSI_ASC_NO_MEDIA                     (0x3A)
 #define EFI_SCSI_ASC_ILLEGAL_MODE_FOR_THIS_TRACK  (0x64)
-
-#endif

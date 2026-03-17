@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __BASE_PE_COFF_LIB_H__
-#define __BASE_PE_COFF_LIB_H__
+#pragma once
 
 #include <IndustryStandard/PeImage.h>
 //
@@ -387,5 +386,3 @@ EFIAPI
 PeCoffLoaderUnloadImage (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   );
-
-#endif

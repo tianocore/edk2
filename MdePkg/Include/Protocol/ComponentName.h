@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_COMPONENT_NAME_H__
-#define __EFI_COMPONENT_NAME_H__
+#pragma once
 
 ///
 /// The global ID for the Component Name Protocol.
@@ -117,5 +116,3 @@ struct _EFI_COMPONENT_NAME_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiComponentNameProtocolGuid;
-
-#endif

@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _UEFI_BOOT_MANAGER_LIB_H_
-#define _UEFI_BOOT_MANAGER_LIB_H_
+#pragma once
 
 #include <Protocol/DriverHealth.h>
 #include <Library/SortLib.h>
@@ -812,5 +811,3 @@ EFIAPI
 EfiBootManagerDispatchDeferredImages (
   VOID
   );
-
-#endif

@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef AMD_SVSM_LIB_H_
-#define AMD_SVSM_LIB_H_
+#pragma once
 
 #include <Protocol/DebugSupport.h>
 #include <Register/Amd/Ghcb.h>
@@ -147,5 +146,3 @@ AmdSvsmQueryProtocol (
   OUT UINT32  *ProtocolMin,
   OUT UINT32  *ProtocolMax
   );
-
-#endif

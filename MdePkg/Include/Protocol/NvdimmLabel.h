@@ -13,8 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_NVDIMM_LABEL_PROTOCOL_H__
-#define __EFI_NVDIMM_LABEL_PROTOCOL_H__
+#pragma once
 
 #define EFI_NVDIMM_LABEL_PROTOCOL_GUID \
   { \
@@ -346,5 +345,3 @@ struct _EFI_NVDIMM_LABEL_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiNvdimmLabelProtocolGuid;
-
-#endif

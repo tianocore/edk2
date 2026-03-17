@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _EMMC_DXE_H_
-#define _EMMC_DXE_H_
+#pragma once
 
 #include <Uefi.h>
 #include <IndustryStandard/Emmc.h>
@@ -496,5 +495,3 @@ EmmcGetExtCsd (
   IN     EMMC_DEVICE  *Device,
   OUT EMMC_EXT_CSD    *ExtCsd
   );
-
-#endif

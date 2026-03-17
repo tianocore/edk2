@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __ANDROID_FASTBOOT_APP_H__
-#define __ANDROID_FASTBOOT_APP_H__
+#pragma once
 
 #include <Library/AndroidBootImgLib.h>
 #include <Library/BaseLib.h>
@@ -33,5 +32,3 @@ ParseAndroidBootImg (
   OUT UINTN  *RamdiskSize,
   OUT CHAR8  *KernelArgs
   );
-
-#endif //ifdef __ANDROID_FASTBOOT_APP_H__

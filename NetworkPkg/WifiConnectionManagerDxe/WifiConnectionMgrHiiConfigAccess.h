@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_WIFI_MGR_HII_CONFIG_ACCESS__
-#define __EFI_WIFI_MGR_HII_CONFIG_ACCESS__
+#pragma once
 
 /**
   Update connection message on connect configuration page, and trigger related form refresh.
@@ -237,5 +236,3 @@ WifiMgrRefreshNetworkList (
   IN    WIFI_MGR_PRIVATE_DATA    *Private,
   OUT   WIFI_MANAGER_IFR_NVDATA  *IfrNvData
   );
-
-#endif

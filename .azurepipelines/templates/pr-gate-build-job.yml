@@ -30,11 +30,12 @@ jobs:
           Build.Targets: 'NOOPT'
           Build.Archlist: 'X64'
           Build.ExtraStuartArgs: '--disable-all HostUnitTestCompilerPlugin=run HostBasedUnitTestRunner=run'
-      TARGET_UNIT_TEST:
-        Build.Pkgs: 'ArmPkg,ArmPlatformPkg,MdePkg,UefiCpuPkg,MdeModulePkg,NetworkPkg,RedfishPkg,PcAtChipsetPkg,PrmPkg,ShellPkg,SourceLevelDebugPkg,StandaloneMmPkg,SignedCapsulePkg,FmpDevicePkg,FatPkg,UnitTestFrameworkPkg,DynamicTablesPkg,CryptoPkg,IntelFsp2Pkg,IntelFsp2WrapperPkg,SecurityPkg,ArmVirtPkg,EmulatorPkg,OvmfPkg,UefiPayloadPkg'
-        Build.Targets: 'NOOPT'
-        Build.Archlist: 'X64'
-        Build.ExtraStuartArgs: '--disable-all HostUnitTestCompilerPlugin=run HostBasedUnitTestRunner=run'
+      ${{ if or(eq(parameters.tool_chain_tag, 'GCC'), startsWith(parameters.tool_chain_tag, 'VS')) }}:
+        TARGET_UNIT_TEST:
+          Build.Pkgs: 'ArmPkg,ArmPlatformPkg,MdePkg,UefiCpuPkg,MdeModulePkg,NetworkPkg,RedfishPkg,PcAtChipsetPkg,PrmPkg,ShellPkg,SourceLevelDebugPkg,StandaloneMmPkg,SignedCapsulePkg,FmpDevicePkg,FatPkg,UnitTestFrameworkPkg,DynamicTablesPkg,CryptoPkg,IntelFsp2Pkg,IntelFsp2WrapperPkg,SecurityPkg,ArmVirtPkg,EmulatorPkg,OvmfPkg,UefiPayloadPkg'
+          Build.Targets: 'NOOPT'
+          Build.Archlist: 'X64'
+          Build.ExtraStuartArgs: '--disable-all HostUnitTestCompilerPlugin=run HostBasedUnitTestRunner=run'
       ${{ if eq(parameters.tool_chain_tag, 'GCC') }}:
         TARGET_GCC_ONLY:
           Build.Pkgs: 'EmbeddedPkg'
@@ -93,12 +94,18 @@ jobs:
           Build.Pkgs: 'UefiPayloadPkg'
           Build.Targets: 'DEBUG,RELEASE,NO-TARGET'
           Build.Archlist: 'AARCH64'
-      TARGET_PLATFORMS:
-        # For Platforms only check code. Leave it to Platform CI
-        # to build them.
-        Build.Pkgs: 'ArmVirtPkg,EmulatorPkg,OvmfPkg'
-        Build.Targets: 'NO-TARGET'
-        Build.Archlist: ${{ parameters.arch_list }}
+      ${{ if or(eq(parameters.tool_chain_tag, 'GCC'), startsWith(parameters.tool_chain_tag, 'VS')) }}:
+        TARGET_PLATFORMS:
+          # For Platforms only check code. Leave it to Platform CI
+          # to build them.
+          Build.Pkgs: 'ArmVirtPkg,EmulatorPkg,OvmfPkg'
+          Build.Targets: 'NO-TARGET'
+          Build.Archlist: ${{ parameters.arch_list }}
+      ${{ if eq(parameters.tool_chain_tag, 'GCC') }}:
+        TARGET_TCGTPM_AARCH64_GCC_ONLY:
+          Build.Pkgs: 'TcgTpmPkg'
+          Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+          Build.Archlist: 'AARCH64'
 
   workspace:
     clean: all
@@ -110,11 +117,22 @@ jobs:
     container: ${{ parameters.container }}
 
   steps:
+  # Strip test targets for CI toolchains other than GCC and VS2022, as these
+  # cannot run them and would be duplicating work during CI if they could.
+  # Note: Within PR gate CI, NOOPT is only used for building tests.
+  - bash: |
+      echo "##vso[task.setvariable variable=FilteredBuildTargets]$(
+        [[ "${{ parameters.tool_chain_tag }}" == GCC || "${{ parameters.tool_chain_tag }}" =~ ^VS ]] \
+          && echo "$(Build.Targets)" \
+          || { tr ',' '\n' <<<"$(Build.Targets)" | grep -vE '^(NOOPT|NO-TARGET)$' | paste -sd, -; }
+      )"
+    displayName: Filter build targets
+
   - template: pr-gate-steps.yml
     parameters:
       tool_chain_tag: ${{ parameters.tool_chain_tag }}
       build_pkgs: $(Build.Pkgs)
-      build_targets: $(Build.Targets)
+      build_targets: $(FilteredBuildTargets)
       build_archs: $(Build.Archlist)
       build_extra_stuart_args: $(Build.ExtraStuartArgs)
       usePythonVersion: ${{ parameters.usePythonVersion }}

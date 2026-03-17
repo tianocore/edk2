@@ -328,6 +328,10 @@
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishPlatformConfigFeatureProperty|0
 !endif
 
+!ifdef NO_PLATFORM_BOOT_DELAYS
+  gEfiShellPkgTokenSpaceGuid.PcdShellDefaultDelay|0
+!endif
+
 [PcdsDynamicDefault.common.DEFAULT]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0
@@ -336,7 +340,11 @@
 [PcdsDynamicHii.common.DEFAULT]
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|L"Setup"|gEmuSystemConfigGuid|0x0|80
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|L"Setup"|gEmuSystemConfigGuid|0x4|25
+!ifdef NO_PLATFORM_BOOT_DELAYS
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|0
+!else
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|10
+!endif
 
 [Components]
 !if "IA32" in $(ARCH) || "X64" in $(ARCH)
@@ -546,8 +554,7 @@
 #
 # +--------------------+--------+----------+------------+-----+----+--------+
 # | OS/Compiler        | VS2019 | CLANGPDB | CLANGDWARF |   GCC    | XCODE5 |
-# |                    | VS2022 |          |            |   GCC5   |        |
-# |                    |        |          |            | GCCNOLTO |        |
+# |                    | VS2022 |          |            | GCCNOLTO |        |
 # +--------------------+--------+----------+------------+----------+--------+
 # | Windows/VS         |IA32/X64|          |            |          |        |
 # | Windows/LLVM/VS    |        | IA32/X64 |            |          |        |
@@ -594,12 +601,12 @@
   !if $(TOOL_CHAIN_TAG) in "CLANGPDB"
     !error EmulatorPkg not supported for Mingw/CLANGPDB builds
   !endif
-  !if $(TOOL_CHAIN_TAG) in "GCC GCC5 GCCNOLTO"
+  !if $(TOOL_CHAIN_TAG) in "GCC GCCNOLTO"
     !error EmulatorPkg not supported for Mingw/GCC builds
   !endif
 !else
   !if $(WIN_HOST_BUILD)
-    !if $(TOOL_CHAIN_TAG) in "GCC GCC5 GCCNOLTO"
+    !if $(TOOL_CHAIN_TAG) in "GCC GCCNOLTO"
       !error EmulatorPkg not supported for Windows/GCC builds
     !endif
     !if $(TOOL_CHAIN_TAG) in "CLANGDWARF"
@@ -705,7 +712,7 @@
   DEFINE VISUAL_STUDIO_DEFINES        = -D UNICODE -D _CRT_SECURE_NO_WARNINGS -D _CRT_SECURE_NO_DEPRECATE
   DEFINE VISUAL_STUDIO_IA32_LIB_PATHS = /LIBPATH:"%VCToolsInstallDir%lib\x86" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%um\x86"
   DEFINE VISUAL_STUDIO_X64_LIB_PATHS  = /LIBPATH:"%VCToolsInstallDir%lib\X64" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\X64" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%um\X64"
-  DEFINE VISUAL_STUDIO_LIBS           = Kernel32.lib MSVCRTD.lib vcruntimed.lib ucrtd.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib
+  DEFINE VISUAL_STUDIO_LIBS           = /NODEFAULTLIB:LIBCMT Kernel32.lib MSVCRTD.lib vcruntimed.lib ucrtd.lib Gdi32.lib User32.lib Winmm.lib Advapi32.lib
 
 [BuildOptions.common.EDKII.HOST_APPLICATION]
   MSFT:*_*_*_CC_FLAGS        = $(VISUAL_STUDIO_DEFINES)

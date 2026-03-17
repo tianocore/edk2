@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _SM_MONITOR_INIT_PROTOCOL_H_
-#define _SM_MONITOR_INIT_PROTOCOL_H_
+#pragma once
 
 #include <PiSmm.h>
 #include <Register/Intel/StmApi.h>
@@ -131,5 +130,3 @@ typedef struct _EFI_SM_MONITOR_INIT_PROTOCOL {
 } EFI_SM_MONITOR_INIT_PROTOCOL;
 
 extern EFI_GUID  gEfiSmMonitorInitProtocolGuid;
-
-#endif

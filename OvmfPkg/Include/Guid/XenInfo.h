@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __XEN_INFO_H__
-#define __XEN_INFO_H__
+#pragma once
 
 #define EFI_XEN_INFO_GUID \
     { 0xd3b46f3b, 0xd441, 0x1244, {0x9a, 0x12, 0x0, 0x12, 0x27, 0x3f, 0xc1, 0x4d } }
@@ -28,5 +27,3 @@ typedef struct {
 } EFI_XEN_INFO;
 
 extern EFI_GUID  gEfiXenInfoGuid;
-
-#endif

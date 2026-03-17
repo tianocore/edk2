@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EMBEDDED_GPIO_PPI_H__
-#define __EMBEDDED_GPIO_PPI_H__
+#pragma once
 
 //
 // Protocol interface structure
@@ -138,5 +137,3 @@ struct _EMBEDDED_GPIO_PPI {
 };
 
 extern EFI_GUID  gEmbeddedGpioPpiGuid;
-
-#endif

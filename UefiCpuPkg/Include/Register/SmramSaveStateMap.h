@@ -5,9 +5,6 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __SMRAM_SAVE_STATE_MAP_H__
-#define __SMRAM_SAVE_STATE_MAP_H__
+#pragma once
 
 #include <Register/Intel/SmramSaveStateMap.h>
-
-#endif

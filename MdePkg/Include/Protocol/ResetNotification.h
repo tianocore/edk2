@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __EFI_RESET_NOTIFICATION_H__
-#define __EFI_RESET_NOTIFICATION_H__
+#pragma once
 
 #define EFI_RESET_NOTIFICATION_PROTOCOL_GUID \
   { 0x9da34ae0, 0xeaf9, 0x4bbf, { 0x8e, 0xc3, 0xfd, 0x60, 0x22, 0x6c, 0x44, 0xbe } }
@@ -74,5 +73,3 @@ struct _EFI_RESET_NOTIFICATION_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiResetNotificationProtocolGuid;
-
-#endif

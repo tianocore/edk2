@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _RECOVERY_ATAPI_H_
-#define _RECOVERY_ATAPI_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -775,5 +774,3 @@ IsDriveReady (
   IN  UINTN                     SenseCounts,
   OUT BOOLEAN                   *NeedRetry
   );
-
-#endif

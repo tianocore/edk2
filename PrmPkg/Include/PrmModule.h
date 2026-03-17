@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef PRM_MODULE_H_
-#define PRM_MODULE_H_
+#pragma once
 
 #include <Prm.h>
 #include <PrmContextBuffer.h>
@@ -44,4 +43,3 @@
     IN PRM_CONTEXT_BUFFER   *ContextBuffer      \
     )                                           \
 
-#endif

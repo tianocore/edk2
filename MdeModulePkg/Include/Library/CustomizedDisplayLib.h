@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __CUSTOMIZED_DISPLAY_LIB_H__
-#define __CUSTOMIZED_DISPLAY_LIB_H__
+#pragma once
 
 #include <Protocol/DisplayProtocol.h>
 
@@ -347,5 +346,3 @@ EFIAPI
 GetSubTitleTextColor (
   VOID
   );
-
-#endif

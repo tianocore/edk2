@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef PLDM_SMBIOS_TRANSFER_H_
-#define PLDM_SMBIOS_TRANSFER_H_
+#pragma once
 
 #include <IndustryStandard/Pldm.h>
 
@@ -179,5 +178,3 @@ typedef struct {
   PLDM_GET_SMBIOS_STRUCTURE_BY_HANDLE_RESPONSE    GetSmbiosStructureByTypeResponse;
 } PLDM_GET_SMBIOS_STRUCTURE_BY_HANDLE_RESPONSE_FORMAT;
 #pragma pack()
-
-#endif // PLDM_SMBIOS_TRANSFER_H_

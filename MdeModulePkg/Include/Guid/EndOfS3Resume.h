@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __END_OF_S3_RESUME_H__
-#define __END_OF_S3_RESUME_H__
+#pragma once
 
 #define EDKII_END_OF_S3_RESUME_GUID \
   { \
@@ -16,5 +15,3 @@
   }
 
 extern EFI_GUID  gEdkiiEndOfS3ResumeGuid;
-
-#endif

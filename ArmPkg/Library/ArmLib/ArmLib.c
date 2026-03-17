@@ -11,8 +11,6 @@
 
 #include <Library/ArmLib.h>
 
-#include "ArmLibPrivate.h"
-
 VOID
 EFIAPI
 ArmSetAuxCrBit (

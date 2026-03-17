@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _BOOT_SCRIPT_EXECUTOR_H_
-#define _BOOT_SCRIPT_EXECUTOR_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -91,5 +90,3 @@ extern UINT32   AsmFixAddress16;
 extern UINT32   AsmJmpAddr32;
 extern BOOLEAN  mPage1GSupport;
 extern UINT64   mAddressEncMask;
-
-#endif //_BOOT_SCRIPT_EXECUTOR_H_

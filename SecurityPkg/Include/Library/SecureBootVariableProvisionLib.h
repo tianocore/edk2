@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef SECURE_BOOT_VARIABLE_PROVISION_LIB_H_
-#define SECURE_BOOT_VARIABLE_PROVISION_LIB_H_
+#pragma once
 
 /**
   Sets the content of the 'db' variable based on 'dbDefault' variable content.
@@ -131,5 +130,3 @@ EFI_STATUS
 SecureBootInitDbxDefault (
   IN VOID
   );
-
-#endif

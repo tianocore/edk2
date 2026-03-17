@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __PENTIUM_M_MSR_H__
-#define __PENTIUM_M_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -657,5 +656,3 @@ typedef union {
   @note MSR_PENTIUM_M_MC3_ADDR is defined as MSR_MC3_ADDR in SDM.
 **/
 #define MSR_PENTIUM_M_MC3_ADDR  0x00000412
-
-#endif

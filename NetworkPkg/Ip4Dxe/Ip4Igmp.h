@@ -5,8 +5,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_IP4_IGMP_H__
-#define __EFI_IP4_IGMP_H__
+#pragma once
 
 //
 // IGMP message type
@@ -198,5 +197,3 @@ Ip4FindGroup (
   IN IGMP_SERVICE_DATA  *IgmpCtrl,
   IN IP4_ADDR           Address
   );
-
-#endif

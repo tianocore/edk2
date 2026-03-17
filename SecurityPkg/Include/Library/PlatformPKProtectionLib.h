@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef PLATFORM_PK_PROTECTION_LIB_H_
-#define PLATFORM_PK_PROTECTION_LIB_H_
+#pragma once
 
 /**
   Disable any applicable protection against variable 'PK'. The implementation
@@ -27,5 +26,3 @@ EFIAPI
 DisablePKProtection (
   VOID
   );
-
-#endif

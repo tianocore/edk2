@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __UNIT_TEST_HOST_BASE_LIB_H__
-#define __UNIT_TEST_HOST_BASE_LIB_H__
+#pragma once
 
 /**
   Prototype of service with no parameters and no return value.
@@ -578,5 +577,3 @@ typedef struct {
 } UNIT_TEST_HOST_BASE_LIB;
 
 extern UNIT_TEST_HOST_BASE_LIB  gUnitTestHostBaseLib;
-
-#endif

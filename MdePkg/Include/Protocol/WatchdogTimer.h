@@ -7,8 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __ARCH_PROTOCOL_WATCHDOG_TIMER_H__
-#define __ARCH_PROTOCOL_WATCHDOG_TIMER_H__
+#pragma once
 
 ///
 /// Global ID for the Watchdog Timer Architectural Protocol
@@ -132,5 +131,3 @@ struct _EFI_WATCHDOG_TIMER_ARCH_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiWatchdogTimerArchProtocolGuid;
-
-#endif

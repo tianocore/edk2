@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_EDB_DISASM_SUPPORT_H_
-#define _EFI_EDB_DISASM_SUPPORT_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -563,5 +562,3 @@ GetRegisterValue (
   IN     EFI_SYSTEM_CONTEXT  SystemContext,
   IN     UINT8               Index
   );
-
-#endif

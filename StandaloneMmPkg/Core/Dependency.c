@@ -182,12 +182,10 @@ MmIsSchedulable (
 
   if (DriverEntry->Depex == NULL) {
     //
-    // A NULL Depex means that the MM driver is not built correctly.
-    // All MM drivers must have a valid depex expression.
+    // If there is no DEPEX, assume the module can be executed
     //
-    DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Depex is empty)\n"));
-    ASSERT (FALSE);
-    return FALSE;
+    DEBUG ((DEBUG_DISPATCH, "  RESULT = TRUE (No DEPEX)\n"));
+    return TRUE;
   }
 
   //

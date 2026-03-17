@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _DXE_CORE_MEMORY_PROFILE_SERVICES_H_
-#define _DXE_CORE_MEMORY_PROFILE_SERVICES_H_
+#pragma once
 
 /**
   Update memory profile information.
@@ -44,5 +43,3 @@ CoreUpdateProfile (
   IN VOID                   *Buffer,
   IN CHAR8                  *ActionString OPTIONAL
   );
-
-#endif

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _LIB_CLIP_BOARD_H_
-#define _LIB_CLIP_BOARD_H_
+#pragma once
 
 #include "HexEditor.h"
 
@@ -59,5 +58,3 @@ UINTN
 HClipBoardGet (
   OUT UINT8  **Buffer
   );
-
-#endif

@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _RECOVERY_EHC_H_
-#define _RECOVERY_EHC_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -310,5 +309,3 @@ VOID
 IoMmuInit (
   OUT EDKII_IOMMU_PPI  **IoMmu
   );
-
-#endif

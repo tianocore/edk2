@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_XHCI_MEM_H_
-#define _EFI_XHCI_MEM_H_
+#pragma once
 
 #define USB_HC_BIT(a)  ((UINTN)(1 << (a)))
 
@@ -206,5 +205,3 @@ UsbHcFreeAlignedPages (
   IN UINTN                Pages,
   VOID                    *Mapping
   );
-
-#endif
