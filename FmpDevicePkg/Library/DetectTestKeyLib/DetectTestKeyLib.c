@@ -7,7 +7,14 @@
 
 **/
 
-#include "FmpDxe.h"
+#include <Library/DetectTestKeyLib.h>
+
+#include <Library/BaseCryptLib.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/UefiLib.h>
 
 /**
   Check to see if any of the keys in PcdFmpDevicePkcs7CertBufferXdr matches
@@ -24,13 +31,14 @@ DetectTestKey (
   VOID
   )
 {
-  BOOLEAN  TestKeyUsed;
-  UINTN    PublicKeyDataLength;
-  UINT8    *PublicKeyDataXdr;
-  UINT8    *PublicKeyDataXdrEnd;
-  VOID     *HashContext;
-  UINT8    Digest[SHA256_DIGEST_SIZE];
-  UINTN    TestKeyDigestSize;
+  BOOLEAN       TestKeyUsed;
+  UINTN         PublicKeyDataLength;
+  UINT8         *PublicKeyDataXdr;
+  UINT8         *PublicKeyDataXdrEnd;
+  VOID          *HashContext;
+  UINT8         Digest[SHA256_DIGEST_SIZE];
+  UINTN         TestKeyDigestSize;
+  CONST CHAR16  *ImageIdName;
 
   //
   // If PcdFmpDeviceTestKeySha256Digest is not exactly SHA256_DIGEST_SIZE bytes,
@@ -135,14 +143,21 @@ DetectTestKey (
     HashContext = NULL;
   }
 
+  ImageIdName = PcdGetPtr (PcdFmpDeviceImageIdName);
+  if ((PcdGetSize (PcdFmpDeviceImageIdName) <= 2) || (ImageIdName[0] == L'\0')) {
+    DEBUG ((DEBUG_INFO, "%a(): ", __func__));
+  } else {
+    DEBUG ((DEBUG_INFO, "FmpDxe(%s): ", ImageIdName));
+  }
+
   //
   // If test key detected or an error occurred checking for the test key, then
   // set PcdTestKeyUsed to TRUE.
   //
   if (TestKeyUsed) {
-    DEBUG ((DEBUG_INFO, "FmpDxe(%s): Test key detected in PcdFmpDevicePkcs7CertBufferXdr.\n", mImageIdName));
+    DEBUG ((DEBUG_INFO, "Test key detected in PcdFmpDevicePkcs7CertBufferXdr.\n"));
     PcdSetBoolS (PcdTestKeyUsed, TRUE);
   } else {
-    DEBUG ((DEBUG_INFO, "FmpDxe(%s): No test key detected in PcdFmpDevicePkcs7CertBufferXdr.\n", mImageIdName));
+    DEBUG ((DEBUG_INFO, "No test key detected in PcdFmpDevicePkcs7CertBufferXdr.\n"));
   }
 }
