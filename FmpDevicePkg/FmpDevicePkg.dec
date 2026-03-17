@@ -31,6 +31,9 @@
   #                  update.
   CapsuleUpdatePolicyLib|Include/Library/CapsuleUpdatePolicyLib.h
 
+  ##  @libraryclass  Provides a function to check for test key being in use.
+  DetectTestKeyLib|Include/Library/DetectTestKeyLib.h
+
   ##  @libraryclass  Provides firmware device specific services to support
   #                  updates of a firmware image stored in a firmware device.
   FmpDeviceLib|Include/Library/FmpDeviceLib.h
