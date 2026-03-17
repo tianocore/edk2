@@ -538,7 +538,7 @@ Returns:
       // make sure section data meet its alignment requirement by adding one raw pad section.
       //
       if ((InputFileAlign [Index] != 0) && (((Size + HeaderSize + TeOffset) % InputFileAlign [Index]) != 0)) {
-        Offset = (Size + sizeof (EFI_COMMON_SECTION_HEADER) + HeaderSize + TeOffset + InputFileAlign [Index] - 1) & ~(InputFileAlign [Index] - 1);
+        Offset = (Size + (UINT32)sizeof (EFI_COMMON_SECTION_HEADER) + HeaderSize + TeOffset + InputFileAlign [Index] - 1) & ~(InputFileAlign [Index] - 1);
         Offset = Offset - Size - HeaderSize - TeOffset;
 
         if (FileBuffer != NULL && ((Size + Offset) < *BufferLength)) {
