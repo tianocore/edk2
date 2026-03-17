@@ -4,6 +4,7 @@
 
   Copyright (C) Microsoft Corporation. All rights reserved.
   Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
+  (c) Copyright 2026 HP Development Company, L.P.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -5810,6 +5811,32 @@ CryptoServiceRsaPssVerify (
 }
 
 /**
+  Verifies an RSA-PSS signature over a precomputed message digest.
+
+  @param[in]  RsaContext   Pointer to RSA context for signature verification.
+  @param[in]  Digest       Pointer to the message digest.
+  @param[in]  DigestSize   Digest size in bytes.
+  @param[in]  Signature    Pointer to RSASSA-PSS signature to be verified.
+  @param[in]  SigSize      Size of signature in bytes.
+
+  @retval  TRUE   Valid signature encoded in RSASSA-PSS.
+  @retval  FALSE  Invalid signature or invalid RSA context.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceRsaPssVerifyDigest (
+  IN  VOID         *RsaContext,
+  IN  CONST UINT8  *Digest,
+  IN  UINTN        DigestSize,
+  IN  CONST UINT8  *Signature,
+  IN  UINTN        SigSize
+  )
+{
+  return CALL_BASECRYPTLIB (RsaPss.Services.Verify, RsaPssVerifyDigest, (RsaContext, Digest, DigestSize, Signature, SigSize), FALSE);
+}
+
+/**
   Parallel hash function ParallelHash256, as defined in NIST's Special Publication 800-185,
   published December 2016.
 
@@ -7583,4 +7610,6 @@ const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   CryptoServiceEcGroupSetGenerator,
   CryptoServiceEcPointMul2,
   CryptoServiceEcPointsMul,
+  /// RSA PSS (Continued)
+  CryptoServiceRsaPssVerifyDigest,
 };
