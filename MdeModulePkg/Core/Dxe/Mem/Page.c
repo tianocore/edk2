@@ -12,19 +12,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Pi/PiDxeCis.h>
 
 //
-// Entry for tracking the memory regions for each memory type to coalesce similar memory types
-//
-typedef struct {
-  EFI_PHYSICAL_ADDRESS    BaseAddress;
-  EFI_PHYSICAL_ADDRESS    MaximumAddress;
-  UINT64                  CurrentNumberOfPages;
-  UINT64                  NumberOfPages;
-  UINTN                   InformationIndex;
-  BOOLEAN                 Special;
-  BOOLEAN                 Runtime;
-} EFI_MEMORY_TYPE_STATISTICS;
-
-//
 // MemoryMap - The current memory map
 //
 UINTN  mMemoryMapKey = 0;

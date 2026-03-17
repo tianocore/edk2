@@ -247,7 +247,8 @@ UnsetGuardForMemory (
 VOID
 AdjustMemoryA (
   IN OUT EFI_PHYSICAL_ADDRESS  *Memory,
-  IN OUT UINTN                 *NumberOfPages
+  IN OUT UINTN                 *NumberOfPages,
+  IN     EFI_MEMORY_TYPE       NewType
   );
 
 /**

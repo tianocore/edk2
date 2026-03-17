@@ -971,17 +971,52 @@ AdjustMemoryF (
 }
 
 /**
+  Check if a physical address falls within a special memory type bin
+  that does not match the given memory type.
+
+  @param  Address  The physical address to check.
+  @param  Type     The memory type of the allocation.
+
+  @retval TRUE   Address is inside a non-matching special bin.
+  @retval FALSE  Address is not inside any non-matching special bin.
+**/
+STATIC
+BOOLEAN
+AddressInNonMatchingBin (
+  IN EFI_PHYSICAL_ADDRESS  Address,
+  IN EFI_MEMORY_TYPE       Type
+  )
+{
+  EFI_MEMORY_TYPE  BinType;
+
+  for (BinType = (EFI_MEMORY_TYPE)0; BinType < EfiMaxMemoryType; BinType++) {
+    if ((BinType != Type) &&
+        mMemoryTypeStatistics[BinType].Special &&
+        (mMemoryTypeStatistics[BinType].NumberOfPages > 0) &&
+        (Address >= mMemoryTypeStatistics[BinType].BaseAddress) &&
+        (Address <= mMemoryTypeStatistics[BinType].MaximumAddress))
+    {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
   Adjust the base and number of pages to really allocate according to Guard.
 
   @param[in,out]  Memory          Base address of free memory.
   @param[in,out]  NumberOfPages   Size of memory to allocate.
+  @param[in]      NewType         The memory type of the allocation.
 
   @return VOID.
 **/
 VOID
 AdjustMemoryA (
   IN OUT EFI_PHYSICAL_ADDRESS  *Memory,
-  IN OUT UINTN                 *NumberOfPages
+  IN OUT UINTN                 *NumberOfPages,
+  IN     EFI_MEMORY_TYPE       NewType
   )
 {
   //
@@ -989,15 +1024,23 @@ AdjustMemoryA (
   // adjust the start address and/or number of pages here, to make sure that
   // the Guards are also "allocated".
   //
+  // However, guard pages must not extend into a special memory type bin that
+  // does not match the allocation type, as this would violate memory map
+  // invariants checked by CoreMemoryMapSanityCheck().
+  //
   if (!IsGuardPage (*Memory + EFI_PAGES_TO_SIZE (*NumberOfPages))) {
-    // No tail Guard, add one.
-    *NumberOfPages += 1;
+    // No tail Guard, add one if it won't land in a non-matching bin.
+    if (!AddressInNonMatchingBin (*Memory + EFI_PAGES_TO_SIZE (*NumberOfPages), NewType)) {
+      *NumberOfPages += 1;
+    }
   }
 
   if (!IsGuardPage (*Memory - EFI_PAGE_SIZE)) {
-    // No head Guard, add one.
-    *Memory        -= EFI_PAGE_SIZE;
-    *NumberOfPages += 1;
+    // No head Guard, add one if it won't land in a non-matching bin.
+    if (!AddressInNonMatchingBin (*Memory - EFI_PAGE_SIZE, NewType)) {
+      *Memory        -= EFI_PAGE_SIZE;
+      *NumberOfPages += 1;
+    }
   }
 }
 
@@ -1102,7 +1145,7 @@ CoreConvertPagesWithGuard (
       return EFI_SUCCESS;
     }
   } else {
-    AdjustMemoryA (&Start, &NumberOfPages);
+    AdjustMemoryA (&Start, &NumberOfPages, NewType);
   }
 
   return CoreConvertPages (Start, NumberOfPages, NewType);
