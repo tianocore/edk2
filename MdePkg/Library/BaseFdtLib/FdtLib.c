@@ -940,25 +940,23 @@ FdtFindMaxPhandle (
 /**
   Applies a DT overlay on a base DT.
 
-  @param[in] Fdt            The pointer to FDT blob.
-  @param[in] Fdto           The pointer to FDT overlay blob.
+  @param[in,out] Fdt        The pointer to FDT blob.
+  @param[in]     Fdto       The pointer to FDT overlay blob.
 
-  @return 0 on success, or negative error code.
+  @return 0 on success, or negative error code on failure.
 **/
 INT32
 EFIAPI
 FdtOverlayApply (
-  IN VOID  *Fdt,
-  IN VOID  *Fdto
+  IN OUT VOID  *Fdt,
+  IN     VOID  *Fdto
   )
 {
   return fdt_overlay_apply (Fdt, Fdto);
 }
 
 /* Debug functions. */
-CONST
-CHAR8
-*
+CONST CHAR8 *
 FdtStrerror (
   IN INT32  ErrVal
   )
