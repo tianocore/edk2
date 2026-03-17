@@ -30,6 +30,7 @@ VOID  *__security_cookie = (VOID *)(UINTN)STACK_COOKIE_VALUE;
 
 **/
 VOID
+EFIAPI
 StackCheckFailure (
   VOID  *ActualCookieValue
   )

@@ -86,3 +86,16 @@
     # checking.
     gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking|TRUE
   !endif
+
+[BuildOptions]
+  #
+  # Linker flags to ensure that stack cookie symbols are not optimized out when StackCheckLib is included.
+  #
+  MSFT:*_*_IA32_DLINK_FLAGS = /INCLUDE:___security_cookie
+  MSFT:*_*_X64_DLINK_FLAGS  = /INCLUDE:__security_cookie
+
+  GCC:*_CLANGPDB_IA32_DLINK_FLAGS     = /INCLUDE:___security_cookie /INCLUDE:_StackCheckFailure
+  GCC:*_CLANGPDB_X64_DLINK_FLAGS      = /INCLUDE:__security_cookie /INCLUDE:StackCheckFailure
+  GCC:*_CLANGPDB_AARCH64_DLINK_FLAGS  = /INCLUDE:__security_cookie /INCLUDE:StackCheckFailure
+
+  GCC:*_GCC_*_DLINK_FLAGS    = -Wl,--undefined=__stack_chk_fail,--undefined=__stack_chk_guard
