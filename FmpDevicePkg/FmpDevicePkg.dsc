@@ -71,6 +71,7 @@
   FmpDependencyCheckLib|FmpDevicePkg/Library/FmpDependencyCheckLibNull/FmpDependencyCheckLibNull.inf
   FmpDependencyDeviceLib|FmpDevicePkg/Library/FmpDependencyDeviceLibNull/FmpDependencyDeviceLibNull.inf
   TimerLib|MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
+  DetectTestKeyLib|FmpDevicePkg/Library/DetectTestKeyLib/DetectTestKeyLib.inf
 
 # StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
 [LibraryClasses.common.SEC]
@@ -92,6 +93,7 @@
   FmpDevicePkg/Library/FmpDependencyCheckLibNull/FmpDependencyCheckLibNull.inf
   FmpDevicePkg/Library/FmpDependencyDeviceLibNull/FmpDependencyDeviceLibNull.inf
   FmpDevicePkg/FmpDxe/FmpDxeLib.inf
+  FmpDevicePkg/Library/DetectTestKeyLib/DetectTestKeyLib.inf
 
   #
   # Modules
