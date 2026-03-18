@@ -48,6 +48,9 @@
   DEFINE LOCKBOX_SUPPORT              = FALSE
   DEFINE LOAD_OPTION_ROMS             = FALSE
   DEFINE FSP_GOP_BASIC_HIDPI_SUPPORT                 = FALSE
+  DEFINE FSP_GOP_BASIC_HIDPI_WIDE_ASPECT_CAP_SUPPORT = FALSE
+  DEFINE FSP_GOP_BASIC_HIDPI_WIDE_ASPECT_CAP_WIDTH   = 16
+  DEFINE FSP_GOP_BASIC_HIDPI_WIDE_ASPECT_CAP_HEIGHT  = 9
 
   #
   # Capsule updates
@@ -590,6 +593,7 @@
 !if $(FSP_GOP_BASIC_HIDPI_SUPPORT)
   gUefiPayloadPkgTokenSpaceGuid.PcdFspGopBasicHiDpiSupport|TRUE
 !endif
+  gUefiPayloadPkgTokenSpaceGuid.PcdFspGopBasicHiDpiWideAspectCapSupport|$(FSP_GOP_BASIC_HIDPI_WIDE_ASPECT_CAP_SUPPORT)
   ## This PCD specified whether ACPI SDT protocol is installed.
   gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdHiiOsRuntimeSupport|FALSE
@@ -629,6 +633,8 @@
   gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask       | 0x1
 !endif
   gEfiMdeModulePkgTokenSpaceGuid.PcdSdMmcGenericTimeoutValue|$(SD_MMC_TIMEOUT)
+  gUefiPayloadPkgTokenSpaceGuid.PcdFspGopBasicHiDpiWideAspectCapWidth|$(FSP_GOP_BASIC_HIDPI_WIDE_ASPECT_CAP_WIDTH)
+  gUefiPayloadPkgTokenSpaceGuid.PcdFspGopBasicHiDpiWideAspectCapHeight|$(FSP_GOP_BASIC_HIDPI_WIDE_ASPECT_CAP_HEIGHT)
 
   gUefiPayloadPkgTokenSpaceGuid.PcdBootManagerEscape|$(BOOT_MANAGER_ESCAPE)
 
