@@ -6,10 +6,6 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Glossary:
-    - SpmMM - An implementation where the Secure Partition Manager resides at EL3
-              with management services running from an isolated Secure Partitions
-              at S-EL0, and the communication protocol is the Management Mode(MM)
-              interface.
     - FF-A - Firmware Framework for Arm A-profile
 
   @par Reference(s):
@@ -40,7 +36,6 @@
 #include <Library/PcdLib.h>
 
 #include <IndustryStandard/ArmStdSmc.h>
-#include <IndustryStandard/ArmMmSvc.h>
 #include <IndustryStandard/ArmFfaSvc.h>
 #include <IndustryStandard/ArmFfaBootInfo.h>
 
@@ -73,12 +68,11 @@ GetCommProtocol (
   OUT COMM_PROTOCOL  *CommProtocol
   )
 {
-  EFI_STATUS    Status;
-  UINT16        RequestMajorVersion;
-  UINT16        RequestMinorVersion;
-  UINT16        CurrentMajorVersion;
-  UINT16        CurrentMinorVersion;
-  ARM_SVC_ARGS  SvcArgs;
+  EFI_STATUS  Status;
+  UINT16      RequestMajorVersion;
+  UINT16      RequestMinorVersion;
+  UINT16      CurrentMajorVersion;
+  UINT16      CurrentMinorVersion;
 
   RequestMajorVersion = ARM_FFA_MAJOR_VERSION;
   RequestMinorVersion = ARM_FFA_MINOR_VERSION;
@@ -89,27 +83,11 @@ GetCommProtocol (
              &CurrentMajorVersion,
              &CurrentMinorVersion
              );
-  if (!EFI_ERROR (Status)) {
-    *CommProtocol = CommProtocolFfa;
-  } else {
-    ZeroMem (&SvcArgs, sizeof (ARM_SVC_ARGS));
-    SvcArgs.Arg0 = ARM_FID_SPM_MM_VERSION_AARCH32;
-
-    ArmCallSvc (&SvcArgs);
-
-    if (SvcArgs.Arg0 == ARM_SPM_MM_RET_NOT_SUPPORTED) {
-      *CommProtocol = CommProtocolUnknown;
-      return EFI_UNSUPPORTED;
-    }
-
-    *CommProtocol       = CommProtocolSpmMm;
-    RequestMajorVersion = ARM_SPM_MM_SUPPORT_MAJOR_VERSION;
-    RequestMinorVersion = ARM_SPM_MM_SUPPORT_MINOR_VERSION;
-    CurrentMajorVersion =
-      ((SvcArgs.Arg0 >> ARM_SPM_MM_MAJOR_VERSION_SHIFT) & ARM_SPM_MM_VERSION_MASK);
-    CurrentMinorVersion =
-      ((SvcArgs.Arg0 >> ARM_SPM_MM_MINOR_VERSION_SHIFT) & ARM_SPM_MM_VERSION_MASK);
+  if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
   }
+
+  *CommProtocol = CommProtocolFfa;
 
   // Different major revision values indicate possibly incompatible functions.
   // For two revisions, A and B, for which the major revision values are
@@ -123,10 +101,9 @@ GetCommProtocol (
   {
     DEBUG ((
       DEBUG_INFO,
-      "Incompatible %s Versions.\n" \
+      "Incompatible FF-A Versions.\n" \
       "Request Version: Major=0x%x, Minor>=0x%x.\n" \
       "Current Version: Major=0x%x, Minor=0x%x.\n",
-      (*CommProtocol == CommProtocolFfa) ? L"FF-A" : L"SPM_MM",
       RequestMajorVersion,
       RequestMinorVersion,
       CurrentMajorVersion,
@@ -138,58 +115,10 @@ GetCommProtocol (
 
   DEBUG ((
     DEBUG_INFO,
-    "%s Version: Major=0x%x, Minor=0x%x\n",
-    (*CommProtocol == CommProtocolFfa) ? L"FF-A" : L"SPM_MM",
+    "FF-A Version: Major=0x%x, Minor=0x%x\n",
     CurrentMajorVersion,
     CurrentMinorVersion
     ));
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Validate Boot information when using SpmMm.
-  It should use Transfer list according to firmware handoff specification.
-
-  @param  [in]  Arg0                 Should be 0x00 because we don't use device tree
-  @param  [in]  Fields               Signature and register convention version
-  @param  [in]  Arg2                 Should be 0x00 because we don't use device tree
-  @param  [in]  TransferListAddress  Address of transfer list
-
-  @retval EFI_SUCCESS                Valid boot information
-  @retval EFI_INVALID_PARAMETER      Invalid boot information
-
-**/
-STATIC
-EFI_STATUS
-EFIAPI
-ValidateSpmMmBootInfo (
-  IN UINTN   Arg0,
-  IN UINT64  Fields,
-  IN UINTN   Arg2,
-  IN UINTN   TransferListAddress
-  )
-{
-  UINT64  RegVersion;
-
-  /*
-   * The signature value in x1's [23:0] bits is the same regardless of
-   * architecture when using Transfer list.
-   * That's why it need to check signature value in x1 again with [31:0] bits
-   * to discern 32 or 64 bits architecture after checking x1 value in [23:0].
-   * Please see:
-   *     https://github.com/FirmwareHandoff/firmware_handoff/blob/main/source/register_conventions.rst
-   */
-  if ((Fields & TRANSFER_LIST_SIGNATURE_MASK_64) == TRANSFER_LIST_SIGNATURE_64) {
-    RegVersion = (Fields >> REGISTER_CONVENTION_VERSION_SHIFT_64) &
-                 REGISTER_CONVENTION_VERSION_MASK;
-    if ((RegVersion != 1) || (Arg2 != 0x00) || (TransferListAddress == 0x00)) {
-      return EFI_INVALID_PARAMETER;
-    }
-  } else {
-    // ARM32 is not supported
-    return EFI_INVALID_PARAMETER;
-  }
 
   return EFI_SUCCESS;
 }
@@ -260,56 +189,19 @@ ValidateBootInfo (
 {
   EFI_STATUS  Status;
 
-  Status = EFI_INVALID_PARAMETER;
-
-  if (CommProtocol == CommProtocolSpmMm) {
-    Status = ValidateSpmMmBootInfo (Arg0, Arg1, Arg2, Arg3);
-  } else if (CommProtocol == CommProtocolFfa) {
-    /*
-     * In case of FF-A, Arg0 is set as FFA_BOOT_INFO address.
-     */
-    Status = ValidateFfaBootInfo (Arg0);
+  if (CommProtocol != CommProtocolFfa) {
+    return EFI_INVALID_PARAMETER;
   }
 
+  /*
+   * In case of FF-A, Arg0 is set as FFA_BOOT_INFO address.
+   */
+  Status = ValidateFfaBootInfo (Arg0);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Error: Failed to validate boot information!\n"));
   }
 
   return Status;
-}
-
-/**
-  Get PHIT hob information from firmware handoff transfer list protocol.
-
-  @param [in]   TransferListHeader        Pointer to the Transfer List Header.
-
-  @retval         NULL                    Failed to get PHIT hob
-  @retval         Address                 PHIT hob address
-
-**/
-STATIC
-VOID *
-EFIAPI
-GetPhitHobFromTransferList (
-  IN UINTN  TransferListAddress
-  )
-{
-  TRANSFER_LIST_HEADER   *TransferList;
-  TRANSFER_ENTRY_HEADER  *Entry;
-  VOID                   *HobStart;
-
-  TransferList = (TRANSFER_LIST_HEADER *)TransferListAddress;
-
-  Entry = TransferListFindFirstEntry (TransferList, TRANSFER_ENTRY_TAG_ID_HOB_LIST);
-  if (Entry == NULL) {
-    DEBUG ((DEBUG_ERROR, "Error: No Phit hob is present in transfer list...\n"));
-
-    return NULL;
-  }
-
-  HobStart = TransferListGetEntryData (Entry);
-
-  return HobStart;
 }
 
 /**
@@ -384,16 +276,16 @@ GetPhitHobFromBootInfo (
   EFI_STATUS  Status;
   VOID        *HobStart;
 
+  if (CommProtocol != CommProtocolFfa) {
+    return NULL;
+  }
+
   Status = ValidateBootInfo (CommProtocol, Arg0, Arg1, Arg2, Arg3);
   if (EFI_ERROR (Status)) {
     return NULL;
   }
 
-  if (CommProtocol == CommProtocolFfa) {
-    HobStart = GetPhitHobFromFfaBootInfo (Arg0);
-  } else {
-    HobStart = GetPhitHobFromTransferList (Arg3);
-  }
+  HobStart = GetPhitHobFromFfaBootInfo (Arg0);
 
   return HobStart;
 }
@@ -663,35 +555,6 @@ DumpPhitHob (
 }
 
 /**
-  Convert EFI_STATUS to MM SPM return code.
-
-  @param [in] Status          edk2 status code.
-
-  @retval ARM_SPM_MM_RET_*    return value correspond to EFI_STATUS.
-
-**/
-STATIC
-UINTN
-EFIAPI
-EfiStatusToSpmMmStatus (
-  IN EFI_STATUS  Status
-  )
-{
-  switch (Status) {
-    case EFI_SUCCESS:
-      return ARM_SPM_MM_RET_SUCCESS;
-    case EFI_INVALID_PARAMETER:
-      return ARM_SPM_MM_RET_INVALID_PARAMS;
-    case EFI_ACCESS_DENIED:
-      return ARM_SPM_MM_RET_DENIED;
-    case EFI_OUT_OF_RESOURCES:
-      return ARM_SPM_MM_RET_NO_MEMORY;
-    default:
-      return ARM_SPM_MM_RET_NOT_SUPPORTED;
-  }
-}
-
-/**
   Set svc arguments to report initialization status of StandaloneMm.
 
   @param[in]      CommProtocol              ABI Protocol.
@@ -726,9 +589,6 @@ ReturnInitStatusToSpmc (
        */
       EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_WAIT;
     }
-  } else if (CommProtocol == CommProtocolSpmMm) {
-    EventCompleteSvcArgs->Arg0 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
-    EventCompleteSvcArgs->Arg1 = EfiStatusToSpmMmStatus (Status);
   } else {
     /*
      * We don't know what communication abi protocol is using.
@@ -774,7 +634,6 @@ SetEventCompleteSvcArgs (
     } else {
       if (FfaMsgInfo->DirectMsgVersion == DirectMsgV1) {
         EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP;
-        EventCompleteSvcArgs->Arg3 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
       } else {
         EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP2;
 
@@ -804,9 +663,6 @@ SetEventCompleteSvcArgs (
                                      FfaMsgInfo->SourcePartId
                                      );
     }
-  } else {
-    EventCompleteSvcArgs->Arg0 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
-    EventCompleteSvcArgs->Arg1 = EfiStatusToSpmMmStatus (Status);
   }
 }
 
@@ -847,54 +703,6 @@ InitializeMiscMmCommunicateBuffer (
   Buffer->DirectMsgArgs.Arg13 = EventSvcArgs->Arg17;
 
   CopyGuid (&Buffer->HeaderGuid, ServiceGuid);
-}
-
-/**
-  Parse SPM-MM request from EventCompleteSvcArgs.
-
-  @param  [in]  EventCompleteSvcArgs   Pointer to the event completion arguments.
-  @param  [out] MmHandlerContext       MmHandlerContext.
-  @param  [out] CommBufferAddr         Request buffer address.
-
-  @retval EFI_SUCCESS                  Success.
-  @retval EFI_INVALID_PARAMETER        Invalid request.
-
-**/
-STATIC
-EFI_STATUS
-EFIAPI
-ParseSpmMmSvcRequest (
-  IN ARM_SVC_ARGS             *EventCompleteSvcArgs,
-  OUT ARM_MM_HANDLER_CONTEXT  *MmHandlerContext,
-  UINTN                       *CommBufferAddr
-  )
-{
-  SPM_MM_MSG_INFO  *SpmMmInfo;
-
-  /*
-   * Register Convention for SPM_MM
-   *   Arg0: ARM_SMC_ID_MM_COMMUNICATE
-   *   Arg1: Communication Buffer
-   *   Arg2: Size of Communication Buffer
-   *   Arg3: Cpu number where StandaloneMm running on.
-   *
-   *   See tf-a/services/std_svc/spm/spm_mm/spm_mm_main.c
-   */
-  if (EventCompleteSvcArgs->Arg0 != ARM_SMC_ID_MM_COMMUNICATE) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "Error: Unrecognized SPM_MM Id: 0x%x\n",
-      EventCompleteSvcArgs->Arg0
-      ));
-    return EFI_INVALID_PARAMETER;
-  }
-
-  SpmMmInfo                = &MmHandlerContext->CtxData.SpmMmInfo;
-  *CommBufferAddr          = EventCompleteSvcArgs->Arg1;
-  SpmMmInfo->ServiceType   = ServiceTypeMmCommunication;
-  SpmMmInfo->SecureRequest = IsSecureMmCommBufferAddr (*CommBufferAddr);
-
-  return EFI_SUCCESS;
 }
 
 /**
@@ -1043,17 +851,6 @@ DelegatedEventLoop (
 
       ServiceType = MmHandlerContext.CtxData.FfaMsgInfo.ServiceType;
       CommData    = &MmHandlerContext.CtxData.FfaMsgInfo;
-    } else if (CommProtocol == CommProtocolSpmMm) {
-      Status = ParseSpmMmSvcRequest (
-                 EventCompleteSvcArgs,
-                 &MmHandlerContext,
-                 &CommBufferAddr
-                 );
-      if (EFI_ERROR (Status)) {
-        goto ExitHandler;
-      }
-
-      ServiceType = MmHandlerContext.CtxData.SpmMmInfo.ServiceType;
     }
 
     if (ServiceType == ServiceTypeMmCommunication) {

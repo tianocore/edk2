@@ -15,9 +15,6 @@ typedef enum {
   /// Unknown Communication ABI protocol
   CommProtocolUnknown,
 
-  /// Communicate via SPM_MM ABI protocol
-  CommProtocolSpmMm,
-
   /// Communicate via FF-A ABI protocol
   CommProtocolFfa,
 
