@@ -2072,13 +2072,14 @@ EfiBootManagerBoot (
                    );
         ASSERT_EFI_ERROR (Status);
         );
-
       mBmLegacyBoot (BootOption);
     } else {
       BootOption->Status = EFI_UNSUPPORTED;
     }
 
     PERF_END_EX (gImageHandle, "BdsAttempt", NULL, 0, (UINT32)OptionNumber);
+    PERF_CROSSMODULE_END ("BDS");   // BEGIN is in MdeModulePkg\Universal\BdsDxe\BdsEntry.c
+    PERF_CROSSMODULE_BEGIN ("BDS"); // Keep logging BDS in case of reentry
     return;
   }
 
@@ -2109,6 +2110,8 @@ EfiBootManagerBoot (
   PERF_CODE (
     BmEndOfBdsPerfCode (NULL, NULL);
     );
+  PERF_CROSSMODULE_END ("BDS");     // BEGIN is in MdeModulePkg\Universal\BdsDxe\BdsEntry.c
+  PERF_CROSSMODULE_BEGIN ("BDS");   // Keep logging BDS in case of reentry
 
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, PcdGet32 (PcdProgressCodeOsLoaderStart));
 
