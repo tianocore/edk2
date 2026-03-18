@@ -118,7 +118,7 @@ SecStartup (
   AsmReadIdtr (&IdtDescriptor);
   if (IdtDescriptor.Base == 0) {
     ExceptionHandler = FspGetExceptionHandler (mIdtEntryTemplate);
-    for (Index = 0; Index < FixedPcdGet8 (PcdFspMaxInterruptSupported); Index++) {
+    for (Index = 0; Index < ARRAY_SIZE (IdtTableInStack.IdtTable); Index++) {
       CopyMem ((VOID *)&IdtTableInStack.IdtTable[Index], (VOID *)&ExceptionHandler, sizeof (IA32_IDT_GATE_DESCRIPTOR));
     }
 
