@@ -136,6 +136,10 @@ gUefiPayloadPkgTokenSpaceGuid.PcdPciAllocateMemoryAbove4GB|FALSE|BOOLEAN|0x00000
 ## coreboot framebuffer tag (FSP GOP / RUN_FSP_GOP).
 gUefiPayloadPkgTokenSpaceGuid.PcdFspGopBasicHiDpiSupport|FALSE|BOOLEAN|0x0000002F
 
+## Indicates whether HiDPI scaling should cap wide displays to a centered viewport
+## when the physical framebuffer is wider than the configured aspect ratio.
+gUefiPayloadPkgTokenSpaceGuid.PcdFspGopBasicHiDpiWideAspectCapSupport|FALSE|BOOLEAN|0x00000032
+
 [PcdsFixedAtBuild]
 ## If PcdFspGopBasicHiDpiSupport is enabled and the physical framebuffer
 ## resolution is greater than both thresholds, the GOP exposes an additional mode
@@ -143,3 +147,9 @@ gUefiPayloadPkgTokenSpaceGuid.PcdFspGopBasicHiDpiSupport|FALSE|BOOLEAN|0x0000002
 ## not provide a direct framebuffer (FrameBufferBase == 0).
 gUefiPayloadPkgTokenSpaceGuid.PcdFspGopBasicHiDpiScaleThresholdHorizontal|1920|UINT32|0x00000030
 gUefiPayloadPkgTokenSpaceGuid.PcdFspGopBasicHiDpiScaleThresholdVertical|1080|UINT32|0x00000031
+
+## If PcdFspGopBasicHiDpiWideAspectCapSupport is enabled and the physical
+## framebuffer is wider than the configured aspect ratio, the HiDPI mode crops to
+## a centered viewport before applying 2x scaling.
+gUefiPayloadPkgTokenSpaceGuid.PcdFspGopBasicHiDpiWideAspectCapWidth|16|UINT32|0x00000033
+gUefiPayloadPkgTokenSpaceGuid.PcdFspGopBasicHiDpiWideAspectCapHeight|9|UINT32|0x00000034
