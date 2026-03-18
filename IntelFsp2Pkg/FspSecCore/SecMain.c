@@ -65,6 +65,7 @@ SecStartup (
   FSP_GLOBAL_DATA           PeiFspData;
   IA32_IDT_GATE_DESCRIPTOR  ExceptionHandler;
   UINTN                     IdtSize;
+  UINTN                     BootloaderIdtSize;
 
   //
   // Process all libraries constructor function linked to SecCore.
@@ -114,6 +115,7 @@ SecStartup (
   // |                   |
   // |                   |
   // |-------------------|---->  TempRamBase
+  BootloaderIdtSize          = 0;
   IdtTableInStack.PeiService = 0;
   AsmReadIdtr (&IdtDescriptor);
   if (IdtDescriptor.Base == 0) {
@@ -124,15 +126,9 @@ SecStartup (
 
     IdtSize = sizeof (IdtTableInStack.IdtTable);
   } else {
-    IdtSize = IdtDescriptor.Limit + 1;
-    if (IdtSize > sizeof (IdtTableInStack.IdtTable)) {
-      //
-      // ERROR: IDT table size from boot loader is larger than FSP can support, DeadLoop here!
-      //
-      CpuDeadLoop ();
-    } else {
-      CopyMem ((VOID *)(UINTN)&IdtTableInStack.IdtTable, (VOID *)IdtDescriptor.Base, IdtSize);
-    }
+    BootloaderIdtSize = IdtDescriptor.Limit + 1;
+    IdtSize           = MIN (BootloaderIdtSize, sizeof (IdtTableInStack.IdtTable));
+    CopyMem ((VOID *)(UINTN)&IdtTableInStack.IdtTable, (VOID *)IdtDescriptor.Base, IdtSize);
   }
 
   IdtDescriptor.Base  = (UINTN)&IdtTableInStack.IdtTable;
@@ -144,6 +140,19 @@ SecStartup (
   // Initialize the global FSP data region
   //
   FspGlobalDataInit (&PeiFspData, BootLoaderStack, (UINT8)ApiIdx);
+
+  if (BootloaderIdtSize > IdtSize) {
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: # of IDT entries setup by bootloader (%d) > (PcdFspMaxInterruptSupported + 1) (%d)!\n"
+      "    Interrupt handlers #%d ~ #%d from bootloader are not inherited.\n",
+      __func__,
+      BootloaderIdtSize / sizeof (IA32_IDT_GATE_DESCRIPTOR),
+      ARRAY_SIZE (IdtTableInStack.IdtTable),
+      ARRAY_SIZE (IdtTableInStack.IdtTable),
+      BootloaderIdtSize / sizeof (IA32_IDT_GATE_DESCRIPTOR) - 1
+      ));
+  }
 
   //
   // Update the base address and length of Pei temporary memory
