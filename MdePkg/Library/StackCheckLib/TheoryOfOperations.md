@@ -31,7 +31,7 @@ order for the return address to be corrupted and it can be caught at run time.
 
 There are two predominant forms of stack cookie checking, MSVC-style and GCC-style. MSVC and
 CLANGPDB use the former, while GCC and CLANGDWARF use the latter. StackCheckLib supports
-both styles, though at the time of writing support is enabled for MSVC and GCC only.
+both styles, though at the time of writing support is enabled for MSVC, GCC, and CLANGPDB.
 
 ### MSVC-style Stack Cookies
 
@@ -177,23 +177,30 @@ the stack cookie was generated.
 If a module has opted into stack cookie checking (by using the `StackCheckLib` library instance), stack cookie failures
 will have the same behavior on all architectures.
 
-1. The address of the function that corrupted the stack cookie is printed
-2. `StackCheckFailureHookLib` is called to allow platforms to implement any behavior they want on a failure
-3. `PcdStackCookieExceptionVector` is signaled to cause a fault (on x86 this is through `int` on ARM64 this is through
+1. The address of the function that corrupted the stack cookie is saved in a register or via the stack
+  a. On IA32, the stack is used to pass the address. On X64, `rcx` is used. On ARM64, `x0` is used.
+2. Interrupt 0x42 is signaled to cause a fault (on x86 this is through `int` on ARM64 this is through
    `svc`)
 
-This allows a platform to do specific actions they deem relevant, such as log to an external source (e.g. SEL) or
-resetting the system. When the exception is taken, the exception handlers will catch it and hang the system or handle
-it in a software debugger, if attached.
+Platforms may hook into this by registering an exception handler for vector 0x42 or overriding the exception handler
+library. This allows a platform to do specific actions they deem relevant, such as log to an external source (e.g. SEL),
+reset the system, or ignore the stack cookie violation.
 
-Developers can then debug from this point. See debugging tips in the [README](./Readme.md).
+If the exception is taken by the default exception handlers, they will print out a stack cookie exception occurred at
+the given address and hang the system. Alternatively, if a software debugger is attached, it will catch the exception,
+allowing it be be debugged. Developers can then debug from this point. See debugging tips in the [README](./Readme.md).
 
 ## Linking Considerations
 
 The stack cookie symbols are unique in that the toolchain inserts them while linking a binary, generally fairly late
-into the process, when it can decide which functions will need stack cookie checking. As such, toolchains must build
-`StackCheckLib` with LTO disabled, because LTO occurs before the stack cookie symbol/function references are added;
-the toolchain believes these symbols are unused, even though it will insert the references later on.
+into the process, when it can decide which functions will need stack cookie checking.
+
+One option to solve this issue is to disable LTO for `StackCheckLib` instances. However, this creates additional
+complexity with attempting to link LTO objects with non-LTO objects.
+
+Instead, `MdeLibs.dsc.inc` is used to forcibly include the symbols for every module (using `/INCLUDE` and
+`-Wl,--undefined`). This allows `StackCheckLib` instances to be compiled with LTO but still retain the symbols that
+will be needed.
 
 ## Host Applications
 
