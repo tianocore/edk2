@@ -36,6 +36,8 @@ global cannot be written to such as in execute-in-place (XIP) modules and during
 temporary RAM phase of the boot process. It is always preferable to use
 one of the dynamic stack cookie entry points when possible.
 
+This document is intended as a user's guide, see the [theory of operations document](./TheoryOfOperations.md) for a detailed breakdown of functionality.
+
 ### StackCheckLib
 
 `StackCheckLib` provides the stack cookie checking functionality per architecture and
