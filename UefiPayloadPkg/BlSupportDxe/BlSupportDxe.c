@@ -10,6 +10,41 @@
 #include <Guid/TpmInstance.h>
 #include <Library/PcdLib.h>
 
+STATIC
+BOOLEAN
+TryGetWideAspectCappedViewportWidth (
+  IN  UINT32  HorizontalResolution,
+  IN  UINT32  VerticalResolution,
+  IN  UINT32  CapAspectWidth,
+  IN  UINT32  CapAspectHeight,
+  OUT UINT32  *ViewportWidth
+  )
+{
+  UINT64  CandidateWidth;
+
+  if ((ViewportWidth == NULL) ||
+      (HorizontalResolution == 0) ||
+      (VerticalResolution == 0) ||
+      (CapAspectWidth == 0) ||
+      (CapAspectHeight == 0))
+  {
+    return FALSE;
+  }
+
+  if (((UINT64)HorizontalResolution * CapAspectHeight) <= ((UINT64)VerticalResolution * CapAspectWidth)) {
+    return FALSE;
+  }
+
+  CandidateWidth = ((UINT64)VerticalResolution * CapAspectWidth) / CapAspectHeight;
+  CandidateWidth &= ~1ULL;
+  if ((CandidateWidth == 0) || (CandidateWidth >= HorizontalResolution)) {
+    return FALSE;
+  }
+
+  *ViewportWidth = (UINT32)CandidateWidth;
+  return TRUE;
+}
+
 /**
   Main entry for the bootloader support DXE module.
 
@@ -38,6 +73,7 @@ BlDxeEntryPoint (
   UINT32                     VerticalResolution;
   UINT32                     ThresholdH;
   UINT32                     ThresholdV;
+  UINT32                     ViewportWidth;
 
   //
   // Find the frame buffer information and update PCDs
@@ -55,6 +91,18 @@ BlDxeEntryPoint (
       if ((HorizontalResolution >= ThresholdH) && (VerticalResolution >= ThresholdV) &&
           ((HorizontalResolution & 1) == 0) && ((VerticalResolution & 1) == 0))
       {
+        if (FeaturePcdGet (PcdFspGopBasicHiDpiWideAspectCapSupport) &&
+            TryGetWideAspectCappedViewportWidth (
+              HorizontalResolution,
+              VerticalResolution,
+              PcdGet32 (PcdFspGopBasicHiDpiWideAspectCapWidth),
+              PcdGet32 (PcdFspGopBasicHiDpiWideAspectCapHeight),
+              &ViewportWidth
+              ))
+        {
+          HorizontalResolution = ViewportWidth;
+        }
+
         HorizontalResolution /= 2;
         VerticalResolution   /= 2;
       }
