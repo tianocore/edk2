@@ -2,6 +2,8 @@
   Arm FF-A ns common library Header file
 
   Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) Qualcomm Technologies, Inc. All rights reserved.<BR>
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Glossary:
@@ -30,6 +32,22 @@ EFI_STATUS
 EFIAPI
 FfaArgsToEfiStatus (
   IN ARM_FFA_ARGS  *FfaArgs
+  );
+
+/**
+  Return FFA VM Id value considering EDK2 FFA non-secure instance type and FFA command.
+
+  @param [in] PartId   Partition ID
+  @param [in] Shift    Per Specs, TRUE will left shift 16 bits, FALSE will not.
+
+  @retval              Final VM Id with UINTN size.
+
+**/
+UINTN
+EFIAPI
+GetFfaVmIdVal (
+  IN UINT16     PartId,
+  IN BOOLEAN    Shift
   );
 
 /**
