@@ -1,9 +1,9 @@
 ## @file
 # Azure Pipeline build file for building a platform.
 #
-# Platform: EMULATORPKG
-# OS: Windows
-# Toolchain: VS
+# Platform: EmulatorPkg
+# OS: Ubuntu
+# Toolchain: CLANGDWARF
 #
 # Copyright (c) Microsoft Corporation.
 # Copyright (c) 2020, Intel Corporation. All rights reserved.
@@ -20,9 +20,7 @@ schedules:
     - stable/*
   always: true
 
-pr:
-  - master
-  - stable/*
+pr: none
 
 variables:
   - template: ../../../.azurepipelines/templates/defaults.yml
@@ -31,8 +29,8 @@ jobs:
   - job: Platform_CI
     variables:
       package: 'EmulatorPkg'
-      vm_image: ${{ variables.default_windows_vm }}
-      should_run: true
+      vm_image: ${{ variables.default_linux_vm }}
+      should_run: false
       run_flags: "MAKE_STARTUP_NSH=TRUE"
 
     #Use matrix to speed up the build process
@@ -87,14 +85,16 @@ jobs:
     pool:
       vmImage: $(vm_image)
 
+    container: ${{ variables.default_linux_container }}
+
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
       parameters:
-        tool_chain_tag: VS2022
+        tool_chain_tag: CLANGDWARF
         build_pkg: $(package)
         build_target: $(Build.Target)
         build_arch: $(Build.Arch)
         build_file: $(Build.File)
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
-        usePythonVersion: ${{ variables.default_python_version }}
+        usePythonVersion: '' # use Python from the container image

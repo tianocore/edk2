@@ -59,7 +59,6 @@
   MemoryAllocationLib
   DxeServicesLib
   ReportStatusCodeLib
-  PerformanceLib
   HiiLib
   SortLib
   VariablePolicyHelperLib
