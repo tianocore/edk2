@@ -20,6 +20,7 @@
 [Sources]
   UniversalPayloadEntry.c
   LoadDxeCore.c
+  MemoryTypeInformationHob.c
   PrintHob.c
   AcpiTable.c
 [Sources.Ia32]
@@ -31,6 +32,7 @@
   X64/VirtualMemory.h
   X64/VirtualMemory.c
   X64/DxeLoadFunc.c
+  X64/TriggerSmi.nasm
 [Sources.AARCH64]
   AArch64/DxeHandoff.c
 [Packages]
@@ -67,6 +69,9 @@
   gUniversalPayloadAcpiTableGuid
   gUniversalPayloadPciRootBridgeInfoGuid
   gUniversalPayloadSmbios3TableGuid
+  gEfiSmmStoreInfoHobGuid
+  gEfiVariableGuid
+  gEfiAuthenticatedVariableGuid
 [FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES
 [FeaturePcd.X64]
