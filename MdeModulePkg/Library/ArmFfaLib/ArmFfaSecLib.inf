@@ -34,7 +34,6 @@
   DebugLib
   HobLib
   MemoryAllocationLib
-  SafeIntLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc
