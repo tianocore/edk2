@@ -61,8 +61,10 @@ typedef struct {
 // Simple manifest that lists FMAP region names to be flashed. The manifest is
 // appended at the end of the capsule payload and is ignored when absent.
 //
-#define REGION_MANIFEST_SIGNATURE  SIGNATURE_32('R','M','A','P')
-#define REGION_MANIFEST_VERSION    1
+#define REGION_MANIFEST_SIGNATURE      SIGNATURE_32 ('R', 'M', 'A', 'P')
+#define REGION_MANIFEST_VERSION        1
+#define SMMSTORE_FLASH_RETRY_COUNT     4
+#define SMMSTORE_FLASH_RETRY_STALL_US  500
 
 typedef struct {
   UINT32    Signature;
@@ -73,6 +75,190 @@ typedef struct {
 typedef struct {
   CHAR8    RegionName[16];
 } REGION_MANIFEST_ENTRY;
+
+STATIC
+VOID
+StallBetweenFlashAttempts (
+  IN UINTN  Attempt
+  )
+{
+  if ((gBS != NULL) && (gBS->Stall != NULL)) {
+    gBS->Stall ((Attempt + 1) * SMMSTORE_FLASH_RETRY_STALL_US);
+  }
+}
+
+STATIC
+EFI_STATUS
+ReadAnyBlockWithRetry (
+  IN     EFI_LBA  Lba,
+  IN     UINTN    Offset,
+  IN OUT UINTN    *NumBytes,
+  OUT    VOID     *Buffer
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       Attempt;
+  UINTN       RequestedBytes;
+  UINTN       ActualBytes;
+
+  if ((NumBytes == NULL) || (Buffer == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  RequestedBytes = *NumBytes;
+  Status         = EFI_DEVICE_ERROR;
+  ActualBytes    = 0;
+
+  for (Attempt = 0; Attempt < SMMSTORE_FLASH_RETRY_COUNT; ++Attempt) {
+    ActualBytes = RequestedBytes;
+    Status      = SmmStoreLibReadAnyBlock (Lba, Offset, &ActualBytes, Buffer);
+    if (!EFI_ERROR (Status) && (ActualBytes == RequestedBytes)) {
+      *NumBytes = ActualBytes;
+      return EFI_SUCCESS;
+    }
+
+    *NumBytes = ActualBytes;
+    StallBetweenFlashAttempts (Attempt);
+  }
+
+  if (!EFI_ERROR (Status)) {
+    Status = EFI_DEVICE_ERROR;
+  }
+
+  return Status;
+}
+
+STATIC
+EFI_STATUS
+EraseAnyBlockWithRetry (
+  IN EFI_LBA  Lba
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       Attempt;
+
+  Status = EFI_DEVICE_ERROR;
+  for (Attempt = 0; Attempt < SMMSTORE_FLASH_RETRY_COUNT; ++Attempt) {
+    Status = SmmStoreLibEraseAnyBlock (Lba);
+    if (!EFI_ERROR (Status)) {
+      return EFI_SUCCESS;
+    }
+
+    StallBetweenFlashAttempts (Attempt);
+  }
+
+  return Status;
+}
+
+STATIC
+EFI_STATUS
+WriteAnyBlockWithRetry (
+  IN     EFI_LBA  Lba,
+  IN     UINTN    Offset,
+  IN OUT UINTN    *NumBytes,
+  IN     VOID     *Buffer
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       Attempt;
+  UINTN       RequestedBytes;
+  UINTN       ActualBytes;
+
+  if ((NumBytes == NULL) || (Buffer == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  RequestedBytes = *NumBytes;
+  Status         = EFI_DEVICE_ERROR;
+  ActualBytes    = 0;
+
+  for (Attempt = 0; Attempt < SMMSTORE_FLASH_RETRY_COUNT; ++Attempt) {
+    ActualBytes = RequestedBytes;
+    Status      = SmmStoreLibWriteAnyBlock (Lba, Offset, &ActualBytes, Buffer);
+    if (!EFI_ERROR (Status) && (ActualBytes == RequestedBytes)) {
+      *NumBytes = ActualBytes;
+      return EFI_SUCCESS;
+    }
+
+    *NumBytes = ActualBytes;
+    StallBetweenFlashAttempts (Attempt);
+  }
+
+  if (!EFI_ERROR (Status)) {
+    Status = EFI_DEVICE_ERROR;
+  }
+
+  return Status;
+}
+
+STATIC
+EFI_STATUS
+VerifyAnyBlockWrite (
+  IN  EFI_LBA      Lba,
+  IN  CONST UINT8  *Expected,
+  OUT UINT8        *VerifyBuffer,
+  IN  UINTN        BlockSize
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       NumBytes;
+
+  if ((Expected == NULL) || (VerifyBuffer == NULL) || (BlockSize == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  NumBytes = BlockSize;
+  Status   = ReadAnyBlockWithRetry (Lba, 0, &NumBytes, VerifyBuffer);
+  if (EFI_ERROR (Status) || (NumBytes != BlockSize)) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  return (CompareMem (VerifyBuffer, Expected, BlockSize) == 0) ? EFI_SUCCESS : EFI_VOLUME_CORRUPTED;
+}
+
+STATIC
+EFI_STATUS
+ProgramAnyBlockWithRetry (
+  IN  EFI_LBA      Lba,
+  IN  CONST UINT8  *Expected,
+  OUT UINT8        *VerifyBuffer,
+  IN  UINTN        BlockSize
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       Attempt;
+  UINTN       NumBytes;
+
+  if ((Expected == NULL) || (VerifyBuffer == NULL) || (BlockSize == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = EFI_DEVICE_ERROR;
+  for (Attempt = 0; Attempt < SMMSTORE_FLASH_RETRY_COUNT; ++Attempt) {
+    Status = EraseAnyBlockWithRetry (Lba);
+    if (EFI_ERROR (Status)) {
+      StallBetweenFlashAttempts (Attempt);
+      continue;
+    }
+
+    NumBytes = BlockSize;
+    Status   = WriteAnyBlockWithRetry (Lba, 0, &NumBytes, (VOID *)Expected);
+    if (EFI_ERROR (Status) || (NumBytes != BlockSize)) {
+      Status = EFI_DEVICE_ERROR;
+      StallBetweenFlashAttempts (Attempt);
+      continue;
+    }
+
+    Status = VerifyAnyBlockWrite (Lba, Expected, VerifyBuffer, BlockSize);
+    if (!EFI_ERROR (Status)) {
+      return EFI_SUCCESS;
+    }
+
+    StallBetweenFlashAttempts (Attempt);
+  }
+
+  return Status;
+}
 
 STATIC
 EFI_STATUS
@@ -1115,7 +1301,7 @@ ReadFlashRange (
     Chunk         = MIN (Remaining, BlockSize - OffsetInBlock);
 
     NumBytes = Chunk;
-    Status   = SmmStoreLibReadAnyBlock (Lba, OffsetInBlock, &NumBytes, Buffer + Cursor);
+    Status   = ReadAnyBlockWithRetry (Lba, OffsetInBlock, &NumBytes, Buffer + Cursor);
     if (EFI_ERROR (Status) || (NumBytes != Chunk)) {
       return EFI_DEVICE_ERROR;
     }
@@ -1157,6 +1343,7 @@ UpdateFlashRangeFromImage (
   IN      UINTN                                          RangeOffset,
   IN      UINTN                                          RangeSize,
   IN OUT  VOID                                           *BlockBuffer,
+  OUT     VOID                                           *VerifyBuffer,
   IN      EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  Progress OPTIONAL,
   IN      UINTN                                          TotalSteps,
   IN OUT  UINTN                                          *Step,
@@ -1167,7 +1354,7 @@ UpdateFlashRangeFromImage (
   UINTN       Offset;
   UINTN       RangeEnd;
 
-  if ((Image == NULL) || (BlockBuffer == NULL) || (Step == NULL) || (ShouldReportProgress == NULL) || (BlockSize == 0)) {
+  if ((Image == NULL) || (BlockBuffer == NULL) || (VerifyBuffer == NULL) || (Step == NULL) || (ShouldReportProgress == NULL) || (BlockSize == 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1204,7 +1391,7 @@ UpdateFlashRangeFromImage (
       // Whole-block update: ignore read errors for the compare optimization.
       //
       NumBytes = BlockSize;
-      Status   = SmmStoreLibReadAnyBlock (Lba, 0, &NumBytes, FlashBlock);
+      Status   = ReadAnyBlockWithRetry (Lba, 0, &NumBytes, FlashBlock);
       if (!EFI_ERROR (Status) && (NumBytes == BlockSize)) {
         if (CompareMem (FlashBlock, Image + BlockBase, BlockSize) == 0) {
           IncrementProgress (Progress, TotalSteps, Step, ShouldReportProgress);
@@ -1214,18 +1401,12 @@ UpdateFlashRangeFromImage (
         }
       }
 
-      Status = SmmStoreLibEraseAnyBlock (Lba);
+      Status = ProgramAnyBlockWithRetry (Lba, Image + BlockBase, VerifyBuffer, BlockSize);
       if (EFI_ERROR (Status)) {
         return EFI_DEVICE_ERROR;
       }
 
       IncrementProgress (Progress, TotalSteps, Step, ShouldReportProgress);
-
-      NumBytes = BlockSize;
-      Status   = SmmStoreLibWriteAnyBlock (Lba, 0, &NumBytes, (VOID *)(Image + BlockBase));
-      if (EFI_ERROR (Status) || (NumBytes != BlockSize)) {
-        return EFI_DEVICE_ERROR;
-      }
 
       IncrementProgress (Progress, TotalSteps, Step, ShouldReportProgress);
       Offset += SegmentLen;
@@ -1236,7 +1417,7 @@ UpdateFlashRangeFromImage (
     // Partial-block update: must preserve the rest of the flash block.
     //
     NumBytes = BlockSize;
-    Status   = SmmStoreLibReadAnyBlock (Lba, 0, &NumBytes, FlashBlock);
+    Status   = ReadAnyBlockWithRetry (Lba, 0, &NumBytes, FlashBlock);
     if (EFI_ERROR (Status) || (NumBytes != BlockSize)) {
       return EFI_DEVICE_ERROR;
     }
@@ -1250,18 +1431,12 @@ UpdateFlashRangeFromImage (
 
     CopyMem (FlashBlock + StartInBlock, Image + BlockBase + StartInBlock, SegmentLen);
 
-    Status = SmmStoreLibEraseAnyBlock (Lba);
+    Status = ProgramAnyBlockWithRetry (Lba, FlashBlock, VerifyBuffer, BlockSize);
     if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
 
     IncrementProgress (Progress, TotalSteps, Step, ShouldReportProgress);
-
-    NumBytes = BlockSize;
-    Status   = SmmStoreLibWriteAnyBlock (Lba, 0, &NumBytes, FlashBlock);
-    if (EFI_ERROR (Status) || (NumBytes != BlockSize)) {
-      return EFI_DEVICE_ERROR;
-    }
 
     IncrementProgress (Progress, TotalSteps, Step, ShouldReportProgress);
     Offset += SegmentLen;
@@ -1476,6 +1651,7 @@ FmpDeviceSetImageWithStatus (
   UINTN                        Step;
   BOOLEAN                      ShouldReportProgress;
   VOID                         *ReadBuffer;
+  VOID                         *VerifyBuffer;
   CONST UINT8                  *WriteNext;
   UINTN                        ManifestEntryCount;
   CONST REGION_MANIFEST_ENTRY  *ManifestEntries;
@@ -1496,6 +1672,7 @@ FmpDeviceSetImageWithStatus (
   BlockCount         = 0;
   Block              = 0;
   ReadBuffer         = NULL;
+  VerifyBuffer       = NULL;
 
   //
   // FmpDeviceCheckImageWithStatus() has already validated the image, so not
@@ -1590,6 +1767,13 @@ FmpDeviceSetImageWithStatus (
   ReadBuffer = AllocatePool (BlockSize);
   if (ReadBuffer == NULL) {
     DEBUG ((DEBUG_ERROR, "%a(): failed to allocate read buffer\n", __func__));
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  VerifyBuffer = AllocatePool (BlockSize);
+  if (VerifyBuffer == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a(): failed to allocate verify buffer\n", __func__));
+    FreePool (ReadBuffer);
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -1763,6 +1947,7 @@ FmpDeviceSetImageWithStatus (
                  RegionOffset,
                  RegionSize,
                  ReadBuffer,
+                 VerifyBuffer,
                  Progress,
                  TotalSteps,
                  &Step,
@@ -1792,6 +1977,7 @@ FmpDeviceSetImageWithStatus (
                BiosOffset,
                BiosSize,
                ReadBuffer,
+               VerifyBuffer,
                Progress,
                TotalSteps,
                &Step,
@@ -1827,7 +2013,7 @@ FmpDeviceSetImageWithStatus (
       // a serious problem, erasing or writing will fail as well).
       //
       NumBytes = BlockSize;
-      Status   = SmmStoreLibReadAnyBlock (Block, 0, &NumBytes, ReadBuffer);
+      Status   = ReadAnyBlockWithRetry (Block, 0, &NumBytes, ReadBuffer);
       if (!EFI_ERROR (Status) && (NumBytes == BlockSize)) {
         if (CompareMem (ReadBuffer, WriteNext, BlockSize) == 0) {
           // Erase step.
@@ -1838,23 +2024,17 @@ FmpDeviceSetImageWithStatus (
         }
       }
 
-      Status = SmmStoreLibEraseAnyBlock (Block);
+      Status = ProgramAnyBlockWithRetry (Block, WriteNext, VerifyBuffer, BlockSize);
       if (EFI_ERROR (Status)) {
         goto IoError;
       }
 
       IncrementProgress (Progress, TotalSteps, &Step, &ShouldReportProgress);
-
-      NumBytes = BlockSize;
-      Status   = SmmStoreLibWriteAnyBlock (Block, 0, &NumBytes, (VOID *)WriteNext);
-      if (EFI_ERROR (Status) || (NumBytes != BlockSize)) {
-        goto IoError;
-      }
-
       IncrementProgress (Progress, TotalSteps, &Step, &ShouldReportProgress);
     }
   }
 
+  FreePool (VerifyBuffer);
   FreePool (ReadBuffer);
 
   *LastAttemptStatus = LAST_ATTEMPT_STATUS_SUCCESS;
@@ -1916,6 +2096,10 @@ IoError:
   // If the firmware ends up unbootable, then, in general, external flashing
   // via a programmer needs to be employed to recover the device.
   //
+  if (VerifyBuffer != NULL) {
+    FreePool (VerifyBuffer);
+  }
+
   FreePool (ReadBuffer);
   DEBUG ((
     DEBUG_ERROR,
