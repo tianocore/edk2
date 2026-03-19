@@ -250,7 +250,6 @@ IoMmuSetAttribute (
 
   //
   // Discover which IOMMU this device_id is behind through its context's downstreams.
-  // - TODO: MapMask handling.
   //
   for (Link = GetFirstNode (&mRiscVIoMmuContexts)
      ; !IsNull (&mRiscVIoMmuContexts, Link)
@@ -263,7 +262,7 @@ IoMmuSetAttribute (
        ) {
       IoMmuDownstreams = RISCV_IOMMU_DOWNSTREAMS_FROM_LINK (DownstreamLink);
       if ((IoMmuDeviceId.Uint32 >= IoMmuDownstreams->NodeMapping.SourceIdBase) && (IoMmuDeviceId.Uint32 < (IoMmuDownstreams->NodeMapping.SourceIdBase + IoMmuDownstreams->NodeMapping.NumberOfIDs))) {
-        MappedIoMmuDeviceId.Uint32 = IoMmuDownstreams->NodeMapping.DestinationDeviceIdBase + (IoMmuDeviceId.Uint32 - IoMmuDownstreams->NodeMapping.SourceIdBase);
+        MappedIoMmuDeviceId.Uint32 = (IoMmuDownstreams->NodeMapping.DestinationDeviceIdBase + (IoMmuDeviceId.Uint32 - IoMmuDownstreams->NodeMapping.SourceIdBase)) & IoMmuDownstreams->MapMask;
         goto Work;
       }
     }

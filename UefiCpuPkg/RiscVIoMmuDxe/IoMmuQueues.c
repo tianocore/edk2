@@ -1,5 +1,5 @@
 /** @file
-  RISC-V IOMMU driver.
+  RISC-V IOMMU command and fault queue handling.
 
   Copyright (c) 2025, 9elements GmbH. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent

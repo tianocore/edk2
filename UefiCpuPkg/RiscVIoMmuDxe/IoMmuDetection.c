@@ -237,7 +237,6 @@ NextIoMmuNode:
 
   //
   // Now, gather all the downstreams. Perform this separately to avoid excessive nesting.
-  // - TODO: Look for platform devices.
   //
   DownstreamDeviceNode = FdtNextNode (Fdt, -1, NULL);
   while (DownstreamDeviceNode != -FDT_ERR_NOTFOUND) {
@@ -246,6 +245,11 @@ NextIoMmuNode:
       goto NextDownstreamDeviceNode;
     }
 
+    //
+    // As the DevicePath on the DeviceHandle passed to IoMmuSetAttribute() isn't standardised
+    // for platform devices, we've elected to create the EDKII_RISC_V_IO_MMU_PLATFORM_POLICY_PROTOCOL hook.
+    // Even with information in the FDT/ACPI, this is unimplementable, because we can't construct a device_id.
+    //
     if (!FdtStringListContains (PropertyPtr, TempLen, "pci-host-ecam-generic") && !FdtStringListContains (PropertyPtr, TempLen, "pci-host-cam-generic")) {
       goto NextDownstreamDeviceNode;
     }
@@ -320,7 +324,6 @@ IoMmuAcpiRimtDiscovery (
   EFI_ACPI_6_6_RIMT_PCIE_ROOT_COMPLEX_NODE_STRUCTURE  *RimtPcieNode;
   UINT16                                              NumberOfIdMappings;
   EFI_ACPI_6_6_RIMT_ID_MAPPING_STRUCTURE              *NodeMapping;
-  //EFI_ACPI_6_6_RIMT_PLATFORM_DEVICE_NODE_STRUCTURE    *RimtPlatformNode;
   UINTN                                               MappingIndex;
   LIST_ENTRY                                          *Link;
   RISCV_IOMMU_DOWNSTREAMS                             *IoMmuDownstreams;
@@ -371,19 +374,18 @@ IoMmuAcpiRimtDiscovery (
       goto NodeEnd;
     }
 
-    if (RimtNodeHeader->Type == RimtNodePcieRc) {
-      RimtPcieNode       = (VOID *)RimtNodeHeader;
-      NumberOfIdMappings = RimtPcieNode->NumberOfIdMappings;
-      NodeMapping        = (VOID *)((UINT8 *)RimtPcieNode + RimtPcieNode->IdMappingArrayOffset);
-    } else {
-      // TODO: Look for platform devices properly.
+    //
+    // As the DevicePath on the DeviceHandle passed to IoMmuSetAttribute() isn't standardised
+    // for platform devices, we've elected to create the EDKII_RISC_V_IO_MMU_PLATFORM_POLICY_PROTOCOL hook.
+    // Even with information in the FDT/ACPI, this is unimplementable, because we can't construct a device_id.
+    //
+    if (RimtNodeHeader->Type != RimtNodePcieRc) {
       goto NodeEnd;
-#if 0
-      RimtPlatformNode   = (VOID *)RimtNodeHeader;
-      NumberOfIdMappings = RimtPlatformNode->NumberOfIdMappings;
-      NodeMapping        = (VOID *)((UINT8 *)RimtPlatformNode + RimtPlatformNode->IdMappingArrayOffset);
-#endif
     }
+
+    RimtPcieNode       = (VOID *)RimtNodeHeader;
+    NumberOfIdMappings = RimtPcieNode->NumberOfIdMappings;
+    NodeMapping        = (VOID *)((UINT8 *)RimtPcieNode + RimtPcieNode->IdMappingArrayOffset);
 
     for (MappingIndex = 0; MappingIndex < NumberOfIdMappings; MappingIndex++) {
       for (Link = GetFirstNode (&mRiscVIoMmuContexts)

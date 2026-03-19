@@ -1,5 +1,5 @@
 /** @file
-  RISC-V IOMMU driver.
+  RISC-V IOMMU device context construction.
 
   Copyright (c) 2025, 9elements GmbH. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
