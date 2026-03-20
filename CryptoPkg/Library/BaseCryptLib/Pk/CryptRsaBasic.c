@@ -87,16 +87,18 @@ RsaSetKey (
   IN      UINTN        BnSize
   )
 {
-  RSA     *RsaKey;
-  BIGNUM  *BnN;
-  BIGNUM  *BnE;
-  BIGNUM  *BnD;
-  BIGNUM  *BnP;
-  BIGNUM  *BnQ;
-  BIGNUM  *BnDp;
-  BIGNUM  *BnDq;
-  BIGNUM  *BnQInv;
-  BIGNUM  *AllocatedBn[3];
+  RSA      *RsaKey;
+  BIGNUM   *BnN;
+  BIGNUM   *BnE;
+  BIGNUM   *BnD;
+  BIGNUM   *BnP;
+  BIGNUM   *BnQ;
+  BIGNUM   *BnDp;
+  BIGNUM   *BnDq;
+  BIGNUM   *BnQInv;
+  BIGNUM   *AllocatedBn[3];
+  BIGNUM   *DuplicatedBn[3];
+  BOOLEAN  Result;
 
   //
   // Check input parameters.
@@ -114,9 +116,13 @@ RsaSetKey (
   BnDq   = NULL;
   BnQInv = NULL;
 
-  AllocatedBn[0] = NULL;
-  AllocatedBn[1] = NULL;
-  AllocatedBn[2] = NULL;
+  AllocatedBn[0]  = NULL;
+  AllocatedBn[1]  = NULL;
+  AllocatedBn[2]  = NULL;
+  DuplicatedBn[0] = NULL;
+  DuplicatedBn[1] = NULL;
+  DuplicatedBn[2] = NULL;
+  Result          = FALSE;
   //
   // Retrieve the components from RSA object.
   //
@@ -153,7 +159,7 @@ RsaSetKey (
       }
 
       if ((BnN == NULL) || (BnE == NULL) || (BnD == NULL)) {
-        return FALSE;
+        goto Exit;
       }
 
       switch (KeyTag) {
@@ -167,16 +173,28 @@ RsaSetKey (
           BnD = BN_bin2bn (BigNumber, (UINT32)BnSize, BnD);
           break;
         default:
-          return FALSE;
+          goto Exit;
       }
 
-      if (RSA_set0_key (RsaKey, BN_dup (BnN), BN_dup (BnE), BN_dup (BnD)) == 0) {
-        return FALSE;
+      if ((BnN == NULL) || (BnE == NULL) || (BnD == NULL)) {
+        goto Exit;
       }
 
-      BN_free (AllocatedBn[0]);
-      BN_free (AllocatedBn[1]);
-      BN_clear_free (AllocatedBn[2]);
+      DuplicatedBn[0] = BN_dup (BnN);
+      DuplicatedBn[1] = BN_dup (BnE);
+      DuplicatedBn[2] = BN_dup (BnD);
+      if ((DuplicatedBn[0] == NULL) || (DuplicatedBn[1] == NULL) || (DuplicatedBn[2] == NULL)) {
+        goto Exit;
+      }
+
+      if (RSA_set0_key (RsaKey, DuplicatedBn[0], DuplicatedBn[1], DuplicatedBn[2]) == 0) {
+        goto Exit;
+      }
+
+      DuplicatedBn[0] = NULL;
+      DuplicatedBn[1] = NULL;
+      DuplicatedBn[2] = NULL;
+      Result          = TRUE;
 
       break;
 
@@ -196,7 +214,7 @@ RsaSetKey (
       }
 
       if ((BnP == NULL) || (BnQ == NULL)) {
-        return FALSE;
+        goto Exit;
       }
 
       switch (KeyTag) {
@@ -207,15 +225,26 @@ RsaSetKey (
           BnQ = BN_bin2bn (BigNumber, (UINT32)BnSize, BnQ);
           break;
         default:
-          return FALSE;
+          goto Exit;
       }
 
-      if (RSA_set0_factors (RsaKey, BN_dup (BnP), BN_dup (BnQ)) == 0) {
-        return FALSE;
+      if ((BnP == NULL) || (BnQ == NULL)) {
+        goto Exit;
       }
 
-      BN_clear_free (AllocatedBn[0]);
-      BN_clear_free (AllocatedBn[1]);
+      DuplicatedBn[0] = BN_dup (BnP);
+      DuplicatedBn[1] = BN_dup (BnQ);
+      if ((DuplicatedBn[0] == NULL) || (DuplicatedBn[1] == NULL)) {
+        goto Exit;
+      }
+
+      if (RSA_set0_factors (RsaKey, DuplicatedBn[0], DuplicatedBn[1]) == 0) {
+        goto Exit;
+      }
+
+      DuplicatedBn[0] = NULL;
+      DuplicatedBn[1] = NULL;
+      Result          = TRUE;
 
       break;
 
@@ -242,7 +271,7 @@ RsaSetKey (
       }
 
       if ((BnDp == NULL) || (BnDq == NULL) || (BnQInv == NULL)) {
-        return FALSE;
+        goto Exit;
       }
 
       switch (KeyTag) {
@@ -256,24 +285,72 @@ RsaSetKey (
           BnQInv = BN_bin2bn (BigNumber, (UINT32)BnSize, BnQInv);
           break;
         default:
-          return FALSE;
+          goto Exit;
       }
 
-      if (RSA_set0_crt_params (RsaKey, BN_dup (BnDp), BN_dup (BnDq), BN_dup (BnQInv)) == 0) {
-        return FALSE;
+      if ((BnDp == NULL) || (BnDq == NULL) || (BnQInv == NULL)) {
+        goto Exit;
       }
 
-      BN_clear_free (AllocatedBn[0]);
-      BN_clear_free (AllocatedBn[1]);
-      BN_clear_free (AllocatedBn[2]);
+      DuplicatedBn[0] = BN_dup (BnDp);
+      DuplicatedBn[1] = BN_dup (BnDq);
+      DuplicatedBn[2] = BN_dup (BnQInv);
+      if ((DuplicatedBn[0] == NULL) || (DuplicatedBn[1] == NULL) || (DuplicatedBn[2] == NULL)) {
+        goto Exit;
+      }
+
+      if (RSA_set0_crt_params (RsaKey, DuplicatedBn[0], DuplicatedBn[1], DuplicatedBn[2]) == 0) {
+        goto Exit;
+      }
+
+      DuplicatedBn[0] = NULL;
+      DuplicatedBn[1] = NULL;
+      DuplicatedBn[2] = NULL;
+      Result          = TRUE;
 
       break;
 
     default:
-      return FALSE;
+      goto Exit;
   }
 
-  return TRUE;
+Exit:
+  switch (KeyTag) {
+    case RsaKeyN:
+    case RsaKeyE:
+    case RsaKeyD:
+      BN_free (AllocatedBn[0]);
+      BN_free (AllocatedBn[1]);
+      BN_clear_free (AllocatedBn[2]);
+      BN_free (DuplicatedBn[0]);
+      BN_free (DuplicatedBn[1]);
+      BN_clear_free (DuplicatedBn[2]);
+      break;
+
+    case RsaKeyP:
+    case RsaKeyQ:
+      BN_clear_free (AllocatedBn[0]);
+      BN_clear_free (AllocatedBn[1]);
+      BN_clear_free (DuplicatedBn[0]);
+      BN_clear_free (DuplicatedBn[1]);
+      break;
+
+    case RsaKeyDp:
+    case RsaKeyDq:
+    case RsaKeyQInv:
+      BN_clear_free (AllocatedBn[0]);
+      BN_clear_free (AllocatedBn[1]);
+      BN_clear_free (AllocatedBn[2]);
+      BN_clear_free (DuplicatedBn[0]);
+      BN_clear_free (DuplicatedBn[1]);
+      BN_clear_free (DuplicatedBn[2]);
+      break;
+
+    default:
+      break;
+  }
+
+  return Result;
 }
 
 /**
