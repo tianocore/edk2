@@ -121,7 +121,7 @@ IScsiDhcpExtractRootPath (
   //
   // Server name is expressed as domain name, just save it.
   //
-  if ((!NET_IS_DIGIT (*(Field->Str))) && (*(Field->Str) != '[')) {
+  if ((!AsciiCharIsNum (*(Field->Str))) && (*(Field->Str) != '[')) {
     ConfigNvData->DnsMode = TRUE;
     if ((Field->Len + 2) > sizeof (ConfigNvData->TargetUrl)) {
       return EFI_INVALID_PARAMETER;

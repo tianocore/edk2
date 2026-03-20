@@ -755,7 +755,7 @@ BasePrintLibSPrintMarker (
             case '7':
             case '8':
             case '9':
-              for (Count = 0; ((FormatCharacter >= '0') &&  (FormatCharacter <= '9')); ) {
+              for (Count = 0; AsciiCharIsNum ((UINT8)FormatCharacter); ) {
                 Count           = (Count * 10) + FormatCharacter - '0';
                 Format         += BytesPerFormatCharacter;
                 FormatCharacter = ((*Format & 0xff) | ((BytesPerFormatCharacter == 1) ? 0 : (*(Format + 1) << 8))) & FormatMask;
