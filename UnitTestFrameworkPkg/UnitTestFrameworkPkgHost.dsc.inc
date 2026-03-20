@@ -185,8 +185,8 @@
   #
   MSFT:*_*_*_CXX_FLAGS         = /std:c++20 /Zc:strictStrings- /wd4244
   GCC:*_*_*_CXX_FLAGS          = -std=c++20
-  GCC:*_CLANGDWARF_*_CXX_FLAGS = -std=c++17
-  CLANGPDB:*_*_*_CXX_FLAGS     = -std=c++17
+  GCC:*_CLANGDWARF_*_CXX_FLAGS = -std=c++20
+  CLANGPDB:*_*_*_CXX_FLAGS     = -std=c++20
   #
   # CLANGDWARF and CLANGPDB: Some gtest c++ sources generate undefined
   # behavior that is never triggered. Map trap functions to abort() to
