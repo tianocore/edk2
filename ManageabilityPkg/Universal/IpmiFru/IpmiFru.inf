@@ -1,0 +1,35 @@
+### @file
+# Component description file for IPMI FRU.
+#
+# Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION              = 0x00010005
+  BASE_NAME                = IpmiFru
+  FILE_GUID                = CD9B99D9-E86F-48CF-A8EB-20120AC22666
+  MODULE_TYPE              = DXE_DRIVER
+  PI_SPECIFICATION_VERSION = 0x0001000A
+  VERSION_STRING           = 1.0
+  ENTRY_POINT              = InitializeFru
+
+[Sources]
+  IpmiFru.c
+
+[Packages]
+  ManageabilityPkg/ManageabilityPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  IpmiCommandLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Depex]
+  TRUE
