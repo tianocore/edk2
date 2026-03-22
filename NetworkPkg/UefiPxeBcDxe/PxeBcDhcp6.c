@@ -160,7 +160,7 @@ PxeBcBuildDhcp6Options (
     PxeBcUintnToAscDecWithFormat (
       Private->Nii->MinorVer,
       OptEnt.VendorClass->ClassId.UndiMinor,
-      sizeof (OptEnt.VendorClass->ClassId.UndiMinor)
+      OFFSET_OF (PXEBC_CLASS_ID, UndiMinor)
       );
   }
 

@@ -193,7 +193,7 @@ typedef struct _EFI_HII_FONT_PACKAGE_HDR {
   UINT32                    GlyphBlockOffset;
   EFI_HII_GLYPH_INFO        Cell;
   EFI_HII_FONT_STYLE        FontStyle;
-  CHAR16                    FontFamily[1];
+  CHAR16                    FontFamily[];
 } EFI_HII_FONT_PACKAGE_HDR;
 
 //
@@ -256,32 +256,32 @@ typedef struct _EFI_HII_GIBT_EXT4_BLOCK {
 typedef struct _EFI_HII_GIBT_GLYPH_BLOCK {
   EFI_HII_GLYPH_BLOCK    Header;
   EFI_HII_GLYPH_INFO     Cell;
-  UINT8                  BitmapData[1];
+  UINT8                  BitmapData[];
 } EFI_HII_GIBT_GLYPH_BLOCK;
 
 typedef struct _EFI_HII_GIBT_GLYPHS_BLOCK {
   EFI_HII_GLYPH_BLOCK    Header;
   EFI_HII_GLYPH_INFO     Cell;
   UINT16                 Count;
-  UINT8                  BitmapData[1];
+  UINT8                  BitmapData[];
 } EFI_HII_GIBT_GLYPHS_BLOCK;
 
 typedef struct _EFI_HII_GIBT_GLYPH_DEFAULT_BLOCK {
   EFI_HII_GLYPH_BLOCK    Header;
-  UINT8                  BitmapData[1];
+  UINT8                  BitmapData[];
 } EFI_HII_GIBT_GLYPH_DEFAULT_BLOCK;
 
 typedef struct _EFI_HII_GIBT_GLYPHS_DEFAULT_BLOCK {
   EFI_HII_GLYPH_BLOCK    Header;
   UINT16                 Count;
-  UINT8                  BitmapData[1];
+  UINT8                  BitmapData[];
 } EFI_HII_GIBT_GLYPHS_DEFAULT_BLOCK;
 
 typedef struct _EFI_HII_GIBT_VARIABILITY_BLOCK {
   EFI_HII_GLYPH_BLOCK    Header;
   EFI_HII_GLYPH_INFO     Cell;
   UINT8                  GlyphPackInBits;
-  UINT8                  BitmapData[1];
+  UINT8                  BitmapData[];
 } EFI_HII_GIBT_VARIABILITY_BLOCK;
 
 typedef struct _EFI_HII_GIBT_SKIP1_BLOCK {
@@ -340,7 +340,7 @@ typedef struct _EFI_HII_STRING_PACKAGE_HDR {
   UINT32                    StringInfoOffset;
   CHAR16                    LanguageWindow[16];
   EFI_STRING_ID             LanguageName;
-  CHAR8                     Language[1];
+  CHAR8                     Language[];
 } EFI_HII_STRING_PACKAGE_HDR;
 
 typedef struct {
@@ -403,7 +403,7 @@ typedef struct _EFI_HII_SIBT_FONT_BLOCK {
   UINT8                      FontId;
   UINT16                     FontSize;
   EFI_HII_FONT_STYLE         FontStyle;
-  CHAR16                     FontName[1];
+  CHAR16                     FontName[];
 } EFI_HII_SIBT_FONT_BLOCK;
 
 typedef struct _EFI_HII_SIBT_SKIP1_BLOCK {
@@ -418,26 +418,26 @@ typedef struct _EFI_HII_SIBT_SKIP2_BLOCK {
 
 typedef struct _EFI_HII_SIBT_STRING_SCSU_BLOCK {
   EFI_HII_STRING_BLOCK    Header;
-  UINT8                   StringText[1];
+  UINT8                   StringText[];
 } EFI_HII_SIBT_STRING_SCSU_BLOCK;
 
 typedef struct _EFI_HII_SIBT_STRING_SCSU_FONT_BLOCK {
   EFI_HII_STRING_BLOCK    Header;
   UINT8                   FontIdentifier;
-  UINT8                   StringText[1];
+  UINT8                   StringText[];
 } EFI_HII_SIBT_STRING_SCSU_FONT_BLOCK;
 
 typedef struct _EFI_HII_SIBT_STRINGS_SCSU_BLOCK {
   EFI_HII_STRING_BLOCK    Header;
   UINT16                  StringCount;
-  UINT8                   StringText[1];
+  UINT8                   StringText[];
 } EFI_HII_SIBT_STRINGS_SCSU_BLOCK;
 
 typedef struct _EFI_HII_SIBT_STRINGS_SCSU_FONT_BLOCK {
   EFI_HII_STRING_BLOCK    Header;
   UINT8                   FontIdentifier;
   UINT16                  StringCount;
-  UINT8                   StringText[1];
+  UINT8                   StringText[];
 } EFI_HII_SIBT_STRINGS_SCSU_FONT_BLOCK;
 
 typedef struct _EFI_HII_SIBT_STRING_UCS2_BLOCK {

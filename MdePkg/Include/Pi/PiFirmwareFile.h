@@ -455,12 +455,12 @@ typedef struct {
   ///
   /// Array of unicode string.
   ///
-  CHAR16                       FileNameString[1];
+  CHAR16                       FileNameString[];
 } EFI_USER_INTERFACE_SECTION;
 
 typedef struct {
   EFI_COMMON_SECTION_HEADER2    CommonHeader;
-  CHAR16                        FileNameString[1];
+  CHAR16                        FileNameString[];
 } EFI_USER_INTERFACE_SECTION2;
 
 ///
@@ -474,7 +474,7 @@ typedef struct {
   ///
   /// Array of unicode string.
   ///
-  CHAR16                       VersionString[1];
+  CHAR16                       VersionString[];
 } EFI_VERSION_SECTION;
 
 typedef struct {
@@ -484,7 +484,7 @@ typedef struct {
   /// increasing build numbers relative to earlier builds.
   ///
   UINT16                        BuildNumber;
-  CHAR16                        VersionString[1];
+  CHAR16                        VersionString[];
 } EFI_VERSION_SECTION2;
 
 ///
