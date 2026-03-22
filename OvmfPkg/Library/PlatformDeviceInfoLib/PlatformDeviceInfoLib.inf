@@ -1,0 +1,50 @@
+## @file
+#  Platform Device Info library.
+#
+#  Copyright (c) 2024, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = PlatformDeviceInfoLib
+  FILE_GUID                      = 7f5f99e7-4022-4b56-8d68-c0dc8f41aab2
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformDeviceInfoLib
+
+[Sources]
+  HwInfoParser/Arm/Gic/ArmGicCParser.c
+  HwInfoParser/Arm/Gic/ArmGicCParser.h
+  HwInfoParser/Arm/Gic/ArmGicDispatcher.c
+  HwInfoParser/Arm/Gic/ArmGicDispatcher.h
+  HwInfoParser/Arm/Gic/ArmGicDParser.c
+  HwInfoParser/Arm/Gic/ArmGicDParser.h
+  HwInfoParser/Arm/Gic/ArmGicRParser.c
+  HwInfoParser/Arm/Gic/ArmGicRParser.h
+  HwInfoParser/Common/DeviceParser.c
+  HwInfoParser/Common/DeviceParser.h
+  HwInfoParser/FdtInfoParser.c
+  HwInfoParser/FdtInfoParser.h
+  HwInfoParser/FdtUtility.c
+  HwInfoParser/FdtUtility.h
+  HwInfoParser/Pci/PciConfigSpaceParser.c
+  HwInfoParser/Pci/PciConfigSpaceParser.h
+  HwInfoParser/Serial/SerialPortParser.c
+  HwInfoParser/Serial/SerialPortParser.h
+  HwInfoParser/Rtc/RtcParser.c
+  HwInfoParser/Rtc/RtcParser.h
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdMaxPlatDeviceCount

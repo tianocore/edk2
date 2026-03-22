@@ -239,48 +239,55 @@ RootComplexNodeParser (
   RootComplexInfo->Identifier = GetNextIortIdentifier ();
 
   Data = FdtGetProp (Fdt, RootComplexNode, "iommu-map", &DataSize);
-  if ((Data == NULL) || ((DataSize % (IOMMU_MAP_CELL_COUNT * sizeof (UINT32))) != 0)) {
-    // If error or invalid number of cells (not multiple of IOMMU_MAP_CELL_COUNT).
-    ASSERT ((Data != NULL) && ((DataSize % (IOMMU_MAP_CELL_COUNT * sizeof (UINT32))) == 0));
-    return EFI_ABORTED;
+  if (Data == NULL) {
+    // Some guests (e.g. kvmtool) do not provide a SMMU, so the PCI node
+    // in the DTB lacks an 'iommu-map'. In such cases set the Number of
+    // ID mappings to 0.
+    RootComplexInfo->IdMappingCount = 0;
+  } else {
+    if (((DataSize % (IOMMU_MAP_CELL_COUNT * sizeof (UINT32))) != 0)) {
+      // If error or invalid number of cells (not multiple of IOMMU_MAP_CELL_COUNT).
+      ASSERT ((DataSize % (IOMMU_MAP_CELL_COUNT * sizeof (UINT32))) == 0);
+      return EFI_ABORTED;
+    }
+
+    DataSize /= IOMMU_MAP_CELL_COUNT * sizeof (UINT32);
+
+    IdMappings = AllocateZeroPool (DataSize * sizeof (CM_ARM_ID_MAPPING));
+    if (IdMappings == NULL) {
+      ASSERT (IdMappings != NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    for (MapIndex = 0; MapIndex < DataSize; MapIndex++) {
+      IdMappings[MapIndex].InputBase            = Fdt32ToCpu (((UINT32 *)Data)[MapIndex * IOMMU_MAP_CELL_COUNT]);
+      IdMappings[MapIndex].NumIds               = Fdt32ToCpu (((UINT32 *)Data)[MapIndex * IOMMU_MAP_CELL_COUNT + 3]);
+      IdMappings[MapIndex].OutputBase           = Fdt32ToCpu (((UINT32 *)Data)[MapIndex * IOMMU_MAP_CELL_COUNT + 2]);
+      IdMappings[MapIndex].OutputReferenceToken = CM_ABSTRACT_TOKEN_MAKE (
+                                                    ETokenNameSpaceFdtHwInfo,
+                                                    EFdtHwInfoIortObject,
+                                                    Fdt32ToCpu (((UINT32 *)Data)[MapIndex * IOMMU_MAP_CELL_COUNT + 1])
+                                                    );
+    }
+
+    // Add the CmObj to the Configuration Manager.
+    Status = AddSingleCmObjArray (
+               FdtParserHandle,
+               CREATE_CM_ARM_OBJECT_ID (EArmObjIdMappingArray),
+               IdMappings,
+               sizeof (CM_ARM_ID_MAPPING) * DataSize,
+               DataSize,
+               &RootComplexInfo->IdMappingToken
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      FreePool (IdMappings);
+      return Status;
+    }
+
+    /// Number of ID mappings
+    RootComplexInfo->IdMappingCount = DataSize;
   }
-
-  DataSize /= IOMMU_MAP_CELL_COUNT * sizeof (UINT32);
-
-  IdMappings = AllocateZeroPool (DataSize * sizeof (CM_ARM_ID_MAPPING));
-  if (IdMappings == NULL) {
-    ASSERT (IdMappings != NULL);
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  for (MapIndex = 0; MapIndex < DataSize; MapIndex++) {
-    IdMappings[MapIndex].InputBase            = Fdt32ToCpu (((UINT32 *)Data)[MapIndex * IOMMU_MAP_CELL_COUNT]);
-    IdMappings[MapIndex].NumIds               = Fdt32ToCpu (((UINT32 *)Data)[MapIndex * IOMMU_MAP_CELL_COUNT + 3]);
-    IdMappings[MapIndex].OutputBase           = Fdt32ToCpu (((UINT32 *)Data)[MapIndex * IOMMU_MAP_CELL_COUNT + 2]);
-    IdMappings[MapIndex].OutputReferenceToken = CM_ABSTRACT_TOKEN_MAKE (
-                                                  ETokenNameSpaceFdtHwInfo,
-                                                  EFdtHwInfoIortObject,
-                                                  Fdt32ToCpu (((UINT32 *)Data)[MapIndex * IOMMU_MAP_CELL_COUNT + 1])
-                                                  );
-  }
-
-  // Add the CmObj to the Configuration Manager.
-  Status = AddSingleCmObjArray (
-             FdtParserHandle,
-             CREATE_CM_ARM_OBJECT_ID (EArmObjIdMappingArray),
-             IdMappings,
-             sizeof (CM_ARM_ID_MAPPING) * DataSize,
-             DataSize,
-             &RootComplexInfo->IdMappingToken
-             );
-  if (EFI_ERROR (Status)) {
-    ASSERT_EFI_ERROR (Status);
-    FreePool (IdMappings);
-    return Status;
-  }
-
-  /// Number of ID mappings
-  RootComplexInfo->IdMappingCount = DataSize;
 
   return EFI_SUCCESS;
 }
@@ -378,7 +385,10 @@ ArmPciRootComplexParser (
 
     Status = RootComplexNodeParser (FdtParserHandle, Fdt, RootComplexNode, &RootComplexInfo);
     if (EFI_ERROR (Status)) {
-      ASSERT_EFI_ERROR (Status);
+      if (Status != EFI_NOT_FOUND) {
+        ASSERT_EFI_ERROR (Status);
+      }
+
       return Status;
     }
 

@@ -1,0 +1,40 @@
+## @file
+# The QemuPlatformDxe performs platform specific initialization.
+#
+#  Copyright (c) 2018 - 2023, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = QemuPlatformDxe
+  FILE_GUID                      = 30E617DC-3EB6-4225-B990-A5C22C87AC27
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = QemuPlatformDxeEntryPoint
+
+[Sources]
+  QemuPlatformDxe.c
+
+[Packages]
+  OvmfPkg/OvmfPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Guids]
+  gEdkiiNvVarStoreFormattedGuid   ## SOMETIMES_PRODUCES ## PROTOCOL
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable
+
+[Depex]
+  TRUE

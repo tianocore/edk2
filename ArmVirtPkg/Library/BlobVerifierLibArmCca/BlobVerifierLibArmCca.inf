@@ -1,0 +1,32 @@
+## @file
+#  Blob verifier library that uses Arm CCA measurements.
+#
+#  Copyright (C) 2023, Linaro Ltd
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = BlobVerifierLibArmCca
+  FILE_GUID                      = 98e08845-885a-4f22-8b46-c85d98ac6dc2
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BlobVerifierLib
+
+[Sources]
+  BlobVerifierLibArmCca.c
+
+[Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
+  CryptoPkg/CryptoPkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  ArmCcaLib
+  ArmCcaRsiLib
+  BaseCryptLib
+  DebugLib
+
