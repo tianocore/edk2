@@ -163,7 +163,7 @@ AllocatePageTableMemory (
   mPageTablePool->FreePages -= Pages;
 
   DEBUG ((
-    DEBUG_VERBOSE,
+    DEBUG_PAGING,
     "%a:%a: Buffer=0x%Lx Pages=%ld\n",
     gEfiCallerBaseName,
     __func__,
@@ -572,7 +572,7 @@ InternalMemEncryptSevCreateIdentityMap1G (
   PageMapLevel4Entry = NULL;
 
   DEBUG ((
-    DEBUG_VERBOSE,
+    DEBUG_PAGING,
     "%a:%a: Cr3Base=0x%Lx Physical=0x%Lx Length=0x%Lx\n",
     gEfiCallerBaseName,
     __func__,
@@ -736,7 +736,7 @@ SetMemoryEncDec (
   PageMapLevel4Entry = NULL;
 
   DEBUG ((
-    DEBUG_VERBOSE,
+    DEBUG_PAGING,
     "%a:%a: Cr3Base=0x%Lx Physical=0x%Lx Length=0x%Lx Mode=%a CacheFlush=%u Mmio=%u\n",
     gEfiCallerBaseName,
     __func__,
@@ -859,7 +859,7 @@ SetMemoryEncDec (
       if (((PhysicalAddress & (BIT30 - 1)) == 0) && (Length >= BIT30)) {
         SetOrClearCBit (&PageDirectory1GEntry->Uint64, Mode);
         DEBUG ((
-          DEBUG_VERBOSE,
+          DEBUG_PAGING,
           "%a:%a: updated 1GB entry for Physical=0x%Lx\n",
           gEfiCallerBaseName,
           __func__,
@@ -872,7 +872,7 @@ SetMemoryEncDec (
         // We must split the page
         //
         DEBUG ((
-          DEBUG_VERBOSE,
+          DEBUG_PAGING,
           "%a:%a: splitting 1GB page for Physical=0x%Lx\n",
           gEfiCallerBaseName,
           __func__,
@@ -927,7 +927,7 @@ SetMemoryEncDec (
           // We must split up this page into 4K pages
           //
           DEBUG ((
-            DEBUG_VERBOSE,
+            DEBUG_PAGING,
             "%a:%a: splitting 2MB page for Physical=0x%Lx\n",
             gEfiCallerBaseName,
             __func__,
