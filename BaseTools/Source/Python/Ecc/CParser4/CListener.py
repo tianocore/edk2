@@ -1,10 +1,9 @@
-﻿# Generated from C.g4 by ANTLR 4.9
+# Generated from C.g4 by ANTLR 4.13.2
 from antlr4 import *
-if __name__ is not None and "." in __name__:
+if "." in __name__:
     from .CParser import CParser
 else:
     from CParser import CParser
-
 
 ## @file
 # The file defines the parser for C source files.
@@ -15,7 +14,13 @@ else:
 #
 # Copyright (c) 2009 - 2010, Intel Corporation  All rights reserved.
 #
-# SPDX-License-Identifier: BSD-2-Clause-Patent
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution.  The full text of the license may be found at:
+#   http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 ##
 
