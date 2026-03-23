@@ -196,7 +196,11 @@ CreateRootBridge (
   }
 
   RootBridge = AllocateZeroPool (sizeof (PCI_ROOT_BRIDGE_INSTANCE));
-  ASSERT (RootBridge != NULL);
+  if (RootBridge == NULL) {
+    DEBUG ((DEBUG_ERROR, "Failed to allocate RootBridge\n"));
+    ASSERT (RootBridge != NULL);
+    return NULL;
+  }
 
   RootBridge->Signature             = PCI_ROOT_BRIDGE_SIGNATURE;
   RootBridge->Supports              = Bridge->Supports;
@@ -209,7 +213,12 @@ CreateRootBridge (
   RootBridge->ConfigBuffer          = AllocatePool (
                                         TypeMax * sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) + sizeof (EFI_ACPI_END_TAG_DESCRIPTOR)
                                         );
-  ASSERT (RootBridge->ConfigBuffer != NULL);
+  if (RootBridge->ConfigBuffer == NULL) {
+    ASSERT (RootBridge->ConfigBuffer != NULL);
+    FreePool (RootBridge);
+    return NULL;
+  }
+
   InitializeListHead (&RootBridge->Maps);
 
   CopyMem (&RootBridge->Bus, &Bridge->Bus, sizeof (PCI_ROOT_BRIDGE_APERTURE));
@@ -243,6 +252,14 @@ CreateRootBridge (
         ASSERT (FALSE);
         Aperture = NULL;
         break;
+    }
+
+    if (Aperture == NULL) {
+      DEBUG ((DEBUG_ERROR, "%a - Failed to Get Resource!!!\n", __func__));
+      DEBUG ((DEBUG_ERROR, "No EFI_PCI_ROOT_BRIDGE_INSTANCE created\n"));
+      FreePool (RootBridge->ConfigBuffer);
+      FreePool (RootBridge);
+      return NULL;
     }
 
     RootBridge->ResAllocNode[Index].Type = Index;

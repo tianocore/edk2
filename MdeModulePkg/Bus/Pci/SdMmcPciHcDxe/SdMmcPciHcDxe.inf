@@ -57,6 +57,7 @@
   UefiDriverEntryPoint
   DebugLib
   PcdLib
+  SafeIntLib
 
 [Protocols]
   gEdkiiSdMmcOverrideProtocolGuid               ## SOMETIMES_CONSUMES

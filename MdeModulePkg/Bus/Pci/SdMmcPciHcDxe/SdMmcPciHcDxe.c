@@ -13,6 +13,7 @@
 **/
 
 #include "SdMmcPciHcDxe.h"
+#include <Library/SafeIntLib.h>
 
 EDKII_SD_MMC_OVERRIDE  *mOverride;
 
@@ -545,6 +546,7 @@ SdMmcPciHcDriverBindingStart (
   EFI_PCI_IO_PROTOCOL       *PciIo;
   UINT64                    Supports;
   UINT64                    PciAttributes;
+  UINT8                     SlotMax;
   UINT8                     SlotNum;
   UINT8                     FirstBar;
   UINT8                     Slot;
@@ -647,7 +649,13 @@ SdMmcPciHcDriverBindingStart (
   }
 
   Support64BitDma = TRUE;
-  for (Slot = FirstBar; Slot < (FirstBar + SlotNum); Slot++) {
+  Status          = SafeUint8Add (FirstBar, SlotNum, &SlotMax);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "[%a] Overflow when calculating SlotMax!\n", __func__));
+    goto Done;
+  }
+
+  for (Slot = FirstBar; Slot < SlotMax; Slot++) {
     Private->Slot[Slot].Enable = TRUE;
     //
     // Get SD/MMC Pci Host Controller Version
