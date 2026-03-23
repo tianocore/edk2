@@ -1,0 +1,12 @@
+// /** @file
+// SSIF instance of Manageability Transport Library
+//
+// Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "SSIF instance of Manageability Transport Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "SSIF Manageability Transport library implementation."
