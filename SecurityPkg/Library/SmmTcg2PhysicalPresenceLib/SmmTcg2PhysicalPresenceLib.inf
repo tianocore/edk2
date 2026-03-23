@@ -53,6 +53,7 @@
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer  ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2PhysicalPresenceFlags        ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdDisallowPPIPersistentClearPermissions  ## CONSUMES
 
 [Depex]
   gEfiSmmVariableProtocolGuid
