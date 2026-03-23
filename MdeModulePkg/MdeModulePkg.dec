@@ -2339,6 +2339,17 @@
   # @Prompt PCI CRS timeout in seconds.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciCrsTimeoutSeconds|0|UINT32|0x1000002B
 
+  ## Indicates if Mem64 resource requests can be allocated using the PMem64
+  #  pool during PCI enumeration in case Mem64 resources are not available.
+  #  This is supported as per PCI Base spec 6.3+. which recommends that software
+  #  should not use the prefetchable/non-prefetchable bits for determining BAR
+  #  allocations. The default is to support PI Base spec 6.3+ recommendation and
+  #  allow Mem64 to use PMem64 when needed.
+  #    TRUE  - Degrade Mem64 resources to use PMem64 when needed
+  #    FALSE - Mem64 will be degraded to Mem32 and never to PMem64
+  # @Prompt Support degrading Mem64 to PMem64 during PCI enumeration
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeMem64toPMem64|TRUE|BOOLEAN|0x1000002C
+
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
   #  Loading Module at Fixed Address feature is enabled.

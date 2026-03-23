@@ -1118,7 +1118,8 @@ DegradeResource (
     // (2024-04-05) for more details.
     //
     if (!BridgeSupportResourceDecode (Bridge, EFI_BRIDGE_MEM64_DECODE_SUPPORTED)) {
-      if (BridgeSupportResourceDecode (Bridge, EFI_BRIDGE_PMEM64_DECODE_SUPPORTED)) {
+      if (PcdGetBool (PcdPciDegradeMem64toPMem64) &&
+          BridgeSupportResourceDecode (Bridge, EFI_BRIDGE_PMEM64_DECODE_SUPPORTED)) {
         MergeResourceTree (
           PMem64Node,
           Mem64Node,
