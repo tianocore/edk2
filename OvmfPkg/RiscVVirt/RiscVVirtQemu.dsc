@@ -154,6 +154,19 @@
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
 !endif
 
+[LibraryClasses.common.SEC]
+  TimerLib|UefiCpuPkg/Library/BaseRiscV64CpuTimerLib/BaseRiscV64CpuTimerSecLib.inf
+
+[LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM]
+  TimerLib|UefiCpuPkg/Library/BaseRiscV64CpuTimerLib/BaseRiscV64CpuTimerSecLib.inf
+!if $(TPM2_ENABLE) == TRUE
+  PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
+  Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
+!else
+  PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+!endif
+
 [LibraryClasses.common.DXE_DRIVER]
   AcpiPlatformLib|OvmfPkg/Library/AcpiPlatformLib/DxeAcpiPlatformLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
@@ -289,15 +302,6 @@
 !endif
 
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|5
-
-[LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM]
-!if $(TPM2_ENABLE) == TRUE
-  PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
-  Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
-!else
-  PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-!endif
 
 ################################################################################
 #
