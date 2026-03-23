@@ -2,6 +2,7 @@
   Application for RSA PSS Primitives Validation.
 
 Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+(c) Copyright 2026 HP Development Company, L.P.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -183,11 +184,45 @@ TestVerifyRsaPssSignVerify (
   return UNIT_TEST_PASSED;
 }
 
+UNIT_TEST_STATUS
+EFIAPI
+TestVerifyRsaPssDigestVerify (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  UINT8    HashValue[SHA256_DIGEST_SIZE];
+  UINT8    Signature[sizeof (TestVectorSignature)];
+  BOOLEAN  Status;
+
+  Status = RsaSetKey (mRsa, RsaKeyN, RsaPssN, sizeof (RsaPssN));
+  UT_ASSERT_TRUE (Status);
+
+  Status = RsaSetKey (mRsa, RsaKeyE, RsaPssE, sizeof (RsaPssE));
+  UT_ASSERT_TRUE (Status);
+
+  Status = Sha256HashAll (PssMessage, sizeof (PssMessage), HashValue);
+  UT_ASSERT_TRUE (Status);
+
+  // Verify NIST FIPS 186-3 RSA test vector signature with precomputed digest
+  Status = RsaPssVerifyDigest (mRsa, HashValue, sizeof (HashValue), TestVectorSignature, sizeof (TestVectorSignature));
+  UT_ASSERT_TRUE (Status);
+
+  CopyMem (Signature, TestVectorSignature, sizeof (Signature));
+  Signature[0] ^= 0xFF;
+
+  // Corrupting one byte should fail digest-based verification
+  Status = RsaPssVerifyDigest (mRsa, HashValue, sizeof (HashValue), Signature, sizeof (Signature));
+  UT_ASSERT_FALSE (Status);
+
+  return UNIT_TEST_PASSED;
+}
+
 TEST_DESC  mRsaPssTest[] = {
   //
   // -----Description--------------------------------------Class----------------------Function---------------------------------Pre---------------------Post---------Context
   //
-  { "TestVerifyRsaPssSignVerify()", "CryptoPkg.BaseCryptLib.Rsa", TestVerifyRsaPssSignVerify, TestVerifyRsaPssPreReq, TestVerifyRsaPssCleanUp, NULL },
+  { "TestVerifyRsaPssSignVerify()",   "CryptoPkg.BaseCryptLib.Rsa", TestVerifyRsaPssSignVerify,   TestVerifyRsaPssPreReq, TestVerifyRsaPssCleanUp, NULL },
+  { "TestVerifyRsaPssDigestVerify()", "CryptoPkg.BaseCryptLib.Rsa", TestVerifyRsaPssDigestVerify, TestVerifyRsaPssPreReq, TestVerifyRsaPssCleanUp, NULL },
 };
 
 UINTN  mRsaPssTestNum = ARRAY_SIZE (mRsaPssTest);

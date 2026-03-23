@@ -6,6 +6,7 @@
 
 Copyright (c) 2009 - 2022, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation. All rights reserved.
+(c) Copyright 2026 HP Development Company, L.P.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1913,6 +1914,37 @@ RsaPssVerify (
   IN  UINTN        SigSize,
   IN  UINT16       DigestLen,
   IN  UINT16       SaltLen
+  );
+
+/**
+  Verifies an RSA-PSS signature over a precomputed message digest.
+
+  If RsaContext is NULL, then return FALSE.
+  If Digest is NULL, then return FALSE.
+  If Signature is NULL, then return FALSE.
+  If DigestSize is not one of SHA-256, SHA-384 or SHA-512 digest sizes,
+  then return FALSE.
+
+  @param[in]  RsaContext   Pointer to RSA context for signature verification.
+  @param[in]  Digest       Pointer to the message digest.
+  @param[in]  DigestSize   Digest size in bytes
+                           SHA256_DIGEST_SIZE
+                           SHA384_DIGEST_SIZE
+                           SHA512_DIGEST_SIZE
+  @param[in]  Signature    Pointer to RSASSA-PSS signature to be verified.
+  @param[in]  SigSize      Size of signature in bytes.
+
+  @retval  TRUE   Valid signature encoded in RSASSA-PSS.
+  @retval  FALSE  Invalid signature or invalid RSA context.
+**/
+BOOLEAN
+EFIAPI
+RsaPssVerifyDigest (
+  IN  VOID         *RsaContext,
+  IN  CONST UINT8  *Digest,
+  IN  UINTN        DigestSize,
+  IN  CONST UINT8  *Signature,
+  IN  UINTN        SigSize
   );
 
 /**

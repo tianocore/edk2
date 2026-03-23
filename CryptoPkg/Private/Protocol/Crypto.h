@@ -3,6 +3,7 @@
 
   Copyright (C) Microsoft Corporation. All rights reserved.
   Copyright (c) 2020 - 2022, Intel Corporation. All rights reserved.<BR>
+  (c) Copyright 2026 HP Development Company, L.P.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -20,7 +21,7 @@
 /// the EDK II Crypto Protocol is extended, this version define must be
 /// increased.
 ///
-#define EDKII_CRYPTO_VERSION  23
+#define EDKII_CRYPTO_VERSION  24
 
 ///
 /// EDK II Crypto Protocol forward declaration
@@ -4473,6 +4474,29 @@ BOOLEAN
   );
 
 /**
+  Verifies an RSA-PSS signature over a precomputed message digest.
+
+  @param[in]  RsaContext   Pointer to RSA context for signature verification.
+  @param[in]  Digest       Pointer to the message digest.
+  @param[in]  DigestSize   Digest size in bytes.
+  @param[in]  Signature    Pointer to RSASSA-PSS signature to be verified.
+  @param[in]  SigSize      Size of signature in bytes.
+
+  @retval  TRUE   Valid signature encoded in RSASSA-PSS.
+  @retval  FALSE  Invalid signature or invalid RSA context.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EDKII_CRYPTO_RSA_PSS_VERIFY_DIGEST)(
+  IN  VOID         *RsaContext,
+  IN  CONST UINT8  *Digest,
+  IN  UINTN        DigestSize,
+  IN  CONST UINT8  *Signature,
+  IN  UINTN        SigSize
+  );
+
+/**
   Parallel hash function ParallelHash256, as defined in NIST's Special Publication 800-185,
   published December 2016.
 
@@ -6121,6 +6145,8 @@ struct _EDKII_CRYPTO_PROTOCOL {
   EDKII_CRYPTO_EC_GROUP_SET_GENERATOR                 EcGroupSetGenerator;
   EDKII_CRYPTO_EC_POINT_MUL2                          EcPointMul2;
   EDKII_CRYPTO_EC_POINTS_MUL                          EcPointsMul;
+  /// RSA PSS (Continued)
+  EDKII_CRYPTO_RSA_PSS_VERIFY_DIGEST                  RsaPssVerifyDigest;
 };
 
 extern GUID  gEdkiiCryptoProtocolGuid;
