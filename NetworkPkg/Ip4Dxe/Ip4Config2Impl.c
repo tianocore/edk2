@@ -935,6 +935,7 @@ Ip4StartAutoConfig (
 
   if (Instance->Dhcp4SbNotifyEvent != NULL) {
     gBS->CloseEvent (Instance->Dhcp4SbNotifyEvent);
+    Instance->Dhcp4SbNotifyEvent = NULL;
   }
 
   Status = gBS->OpenProtocol (

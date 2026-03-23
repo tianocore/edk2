@@ -37,7 +37,7 @@ typedef struct _SEC_IDT_TABLE {
   // EFI_PEI_SERVICES**
   //
   UINT64                      PeiService;
-  IA32_IDT_GATE_DESCRIPTOR    IdtTable[FixedPcdGet8 (PcdFspMaxInterruptSupported)];
+  IA32_IDT_GATE_DESCRIPTOR    IdtTable[FixedPcdGet8 (PcdFspMaxInterruptSupported) + 1];
 } SEC_IDT_TABLE;
 
 /**
