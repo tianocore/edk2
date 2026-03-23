@@ -35,6 +35,7 @@
   DxeCapsuleRuntime.c
 
 [Packages]
+  FmpDevicePkg/FmpDevicePkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
 
@@ -50,7 +51,8 @@
   PrintLib
   HobLib
   BmpSupportLib
-
+  FmpAuthenticationLib
+  FmpPayloadLib
 
 [Protocols]
   gEsrtManagementProtocolGuid                   ## CONSUMES
@@ -70,9 +72,12 @@
   gEfiEventExitBootServicesGuid           ## CONSUMES ## Event
   gEfiEventVirtualAddressChangeGuid       ## CONSUMES ## Event
   gEdkiiCapsuleOnDiskNameGuid             ## SOMETIMES_CONSUMES ## GUID
+  gEfiCertPkcs7Guid                       ## SOMETIMES_CONSUMES ## GUID
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleEmbeddedDriverSupport             ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleEmbeddedDriverSupport  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUseNestedFmpCapsuleFormat     ## CONSUMES
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr      ## SOMETIMES_CONSUMES
 
 [Depex]
   gEfiVariableWriteArchProtocolGuid
