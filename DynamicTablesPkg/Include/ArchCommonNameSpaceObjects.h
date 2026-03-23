@@ -73,6 +73,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjTpm2DeviceInfo,                 ///< 46 - TPM2 Device Info
   EArchCommonObjMcfgPciConfigSpaceInfo,         ///< 47 - MCFG PCI Configuration Space Info
   EArchCommonObjPciRootPortInfo,                ///< 48 - PCI root port configuration Info
+  EArchCommonObjMsctMaxPhysicalAddrInfo,        ///< 49 - MSCT Maximum physical address Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1131,5 +1132,15 @@ typedef struct CmArchCommonObjSpcrInfo {
   /// Specifies the terminal type used by the console device.
   UINT8    TerminalType;
 } CM_ARCH_COMMON_SPCR_INFO;
+
+/** A structure that describes the Maximum Physical Address Information
+    for the MSCT (Maximum System Characteristics Table).
+
+    ID: EArchCommonObjMsctMaxPhysicalAddrInfo
+*/
+typedef struct CmArchCommonObjMsctMaxPhysicalAddrInfo {
+  /// Maximum Physical Address
+  UINT64    MaxPhysicalAddress;
+} CM_ARCH_COMMON_MSCT_MAX_PHYSICAL_ADDR_INFO;
 
 #pragma pack()
