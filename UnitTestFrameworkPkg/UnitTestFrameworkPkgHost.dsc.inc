@@ -183,10 +183,10 @@
   #
   # Set C++ language standard version
   #
-  MSFT:*_*_*_CXX_FLAGS         = /std:c++20 /Zc:strictStrings- /wd4244
+  MSFT:*_*_*_CXX_FLAGS         = /std:c++20 /Zc:strictStrings- /wd4244 /w44388 /w44389
   GCC:*_*_*_CXX_FLAGS          = -std=c++20
-  GCC:*_CLANGDWARF_*_CXX_FLAGS = -std=c++17
-  CLANGPDB:*_*_*_CXX_FLAGS     = -std=c++17
+  GCC:*_CLANGDWARF_*_CXX_FLAGS = -std=c++17 -Wsign-compare
+  CLANGPDB:*_*_*_CXX_FLAGS     = -std=c++17 -Wsign-compare
   #
   # CLANGDWARF and CLANGPDB: Some gtest c++ sources generate undefined
   # behavior that is never triggered. Map trap functions to abort() to

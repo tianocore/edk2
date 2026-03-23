@@ -59,7 +59,27 @@ INF  MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntim
 INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF  UefiCpuPkg/CpuDxe/CpuDxe.inf
+!if $(SECURE_BOOT_ENABLE) == TRUE
 INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+INF  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+!if $(SECURE_BOOT_DEFAULT_KEYS) == TRUE
+INF  SecurityPkg/VariableAuthenticated/SecureBootDefaultKeysDxe/SecureBootDefaultKeysDxe.inf
+
+  FILE FREEFORM = 85254ea7-4759-4fc4-82d4-5eed5fb0a4a0 {
+    SECTION RAW = OvmfPkg/LoongArchVirt/Feature/SecureBoot/SecureBootKeys/PK/PK.cer
+  }
+
+  FILE FREEFORM = 6f64916e-9f7a-4c35-b952-cd041efb05a3 {
+    SECTION RAW = OvmfPkg/LoongArchVirt/Feature/SecureBoot/SecureBootKeys/KEK/KEK.cer
+  }
+
+  FILE FREEFORM = c491d352-7623-4843-accc-2791a7574421 {
+    SECTION RAW = OvmfPkg/LoongArchVirt/Feature/SecureBoot/SecureBootKeys/db/db.cer
+  }
+!endif
+!else
+INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+!endif
 INF  OvmfPkg/LoongArchVirt/Drivers/StableTimerDxe/TimerDxe.inf
 INF  MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
 INF  MdeModulePkg/Universal/Metronome/Metronome.inf
@@ -73,7 +93,12 @@ INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
 #
 INF  OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf
 INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
+!if $(QEMU_PV_VARS) == TRUE
+INF  OvmfPkg/VirtMmCommunicationDxe/VirtMmCommunication.inf
+INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
+!else
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+!endif
 #
 # PCI
 #
