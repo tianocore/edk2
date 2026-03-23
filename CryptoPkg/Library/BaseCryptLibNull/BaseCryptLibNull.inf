@@ -47,6 +47,9 @@
   Pk/CryptAuthenticodeNull.c
   Pk/CryptTsNull.c
   Pk/CryptEcNull.c
+  Pk/CryptEdNull.c
+  Pk/CryptMlNull.c
+  Pk/CryptSlhNull.c
   Pem/CryptPemNull.c
   Rand/CryptRandNull.c
   Pk/CryptRsaPssNull.c

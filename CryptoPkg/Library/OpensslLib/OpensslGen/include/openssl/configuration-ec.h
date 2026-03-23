@@ -12,16 +12,16 @@
  */
 
 #ifndef OPENSSL_CONFIGURATION_H
-# define OPENSSL_CONFIGURATION_H
-# pragma once
+#define OPENSSL_CONFIGURATION_H
+#pragma once
 
-# ifdef  __cplusplus
+#ifdef  __cplusplus
 extern "C" {
-# endif
+#endif
 
-# ifdef OPENSSL_ALGORITHM_DEFINES
-#  error OPENSSL_ALGORITHM_DEFINES no longer supported
-# endif
+#ifdef OPENSSL_ALGORITHM_DEFINES
+  #error OPENSSL_ALGORITHM_DEFINES no longer supported
+#endif
 
 /*
  * OpenSSL was configured with the following options:
@@ -205,9 +205,6 @@ extern "C" {
 # ifndef OPENSSL_NO_MDC2
 #  define OPENSSL_NO_MDC2
 # endif
-# ifndef OPENSSL_NO_ML_DSA
-#  define OPENSSL_NO_ML_DSA
-# endif
 # ifndef OPENSSL_NO_ML_KEM
 #  define OPENSSL_NO_ML_KEM
 # endif
@@ -276,9 +273,6 @@ extern "C" {
 # endif
 # ifndef OPENSSL_NO_SIV
 #  define OPENSSL_NO_SIV
-# endif
-# ifndef OPENSSL_NO_SLH_DSA
-#  define OPENSSL_NO_SLH_DSA
 # endif
 # ifndef OPENSSL_NO_SM2
 #  define OPENSSL_NO_SM2
@@ -371,31 +365,30 @@ extern "C" {
 #  define OPENSSL_NO_DYNAMIC_ENGINE
 # endif
 
-
 /* Generate 80386 code? */
-# undef I386_ONLY
+#undef I386_ONLY
 
 /*
  * The following are cipher-specific, but are part of the public API.
  */
-# if !defined(OPENSSL_SYS_UEFI)
-#  undef BN_LLONG
+#if !defined (OPENSSL_SYS_UEFI)
+  #undef BN_LLONG
 /* Only one for the following should be defined */
-#  undef SIXTY_FOUR_BIT_LONG
-#  undef SIXTY_FOUR_BIT
-#  define THIRTY_TWO_BIT
-# endif
+  #undef SIXTY_FOUR_BIT_LONG
+  #undef SIXTY_FOUR_BIT
+#define THIRTY_TWO_BIT
+#endif
 
-# define RC4_INT unsigned int
+#define RC4_INT  unsigned int
 
-# if defined(OPENSSL_NO_COMP) || (defined(OPENSSL_NO_BROTLI) && defined(OPENSSL_NO_ZSTD) && defined(OPENSSL_NO_ZLIB))
-#  define OPENSSL_NO_COMP_ALG
-# else
-#  undef  OPENSSL_NO_COMP_ALG
-# endif
+#if defined (OPENSSL_NO_COMP) || (defined (OPENSSL_NO_BROTLI) && defined (OPENSSL_NO_ZSTD) && defined (OPENSSL_NO_ZLIB))
+#define OPENSSL_NO_COMP_ALG
+#else
+  #undef  OPENSSL_NO_COMP_ALG
+#endif
 
-# ifdef  __cplusplus
+#ifdef  __cplusplus
 }
-# endif
+#endif
 
-#endif                          /* OPENSSL_CONFIGURATION_H */
+#endif /* OPENSSL_CONFIGURATION_H */

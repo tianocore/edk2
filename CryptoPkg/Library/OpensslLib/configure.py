@@ -51,7 +51,6 @@ def openssl_configure(openssldir, target, ec = True):
         'no-module',
         'no-md4',
         'no-mdc2',
-        'no-ml-dsa',
         'no-ml-kem',
         'no-multiblock',
         'no-nextprotoneg',
@@ -73,7 +72,6 @@ def openssl_configure(openssldir, target, ec = True):
         'no-shared',
         'no-siphash',
         'no-siv',
-        'no-slh-dsa',
         'no-sm2',
         'no-sm4',
         'no-sock',
@@ -92,7 +90,7 @@ def openssl_configure(openssldir, target, ec = True):
         'disable-legacy',
     ]
     if not ec:
-        cmdline += [ 'no-ec', 'no-camellia', 'no-cmac' ]
+        cmdline += [ 'no-ec', 'no-camellia', 'no-cmac', 'no-ml-dsa', 'no-slh-dsa' ]
     print('')
     print(f'# -*-  configure openssl for {target} (ec={ec})  -*-')
     rc = subprocess.run(cmdline, cwd = openssldir,
