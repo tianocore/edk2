@@ -494,13 +494,10 @@ _ModuleEntryPoint (
   //
   // Create Memory Type Information HOB
   //
-  if (GetFirstGuidHob (&gEfiMemoryTypeInformationGuid) == NULL) {
-    BuildGuidDataHob (
-      &gEfiMemoryTypeInformationGuid,
-      mDefaultMemoryTypeInformation,
-      sizeof (mDefaultMemoryTypeInformation)
-      );
-  }
+  BuildMemoryTypeInformationHob (
+    mDefaultMemoryTypeInformation,
+    sizeof (mDefaultMemoryTypeInformation)
+    );
 
   FixUpPcdDatabase (DxeFv);
   Status = UniversalLoadDxeCore (DxeFv, &DxeCoreEntryPoint);

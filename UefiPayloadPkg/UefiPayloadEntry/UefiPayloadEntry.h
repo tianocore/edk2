@@ -18,6 +18,7 @@
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 #include <Guid/MemoryAllocationHob.h>
+#include <Guid/MemoryTypeInformation.h>
 #include <Library/IoLib.h>
 #include <Library/PeCoffLib.h>
 #include <Library/BlParseLib.h>
@@ -180,6 +181,12 @@ HandOffToDxeCore (
 EFI_STATUS
 FixUpPcdDatabase (
   IN  EFI_FIRMWARE_VOLUME_HEADER  *DxeFv
+  );
+
+VOID
+BuildMemoryTypeInformationHob (
+  IN EFI_MEMORY_TYPE_INFORMATION  *DefaultMemoryTypeInformation,
+  IN UINTN                        DefaultMemoryTypeInformationSize
   );
 
 /**
