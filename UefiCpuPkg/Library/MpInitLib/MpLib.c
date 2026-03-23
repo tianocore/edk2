@@ -2,7 +2,7 @@
   CPU MP Initialize Library common functions.
 
   Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
-  Copyright (C) 2020 - 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (C) 2020 - 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -1038,7 +1038,7 @@ FillExchangeInfoData (
   //
   Cr4.UintN                        = AsmReadCr4 ();
   ExchangeInfo->Enable5LevelPaging = (BOOLEAN)(Cr4.Bits.LA57 == 1);
-  DEBUG ((DEBUG_INFO, "%a: 5-Level Paging = %d\n", gEfiCallerBaseName, ExchangeInfo->Enable5LevelPaging));
+  DEBUG ((DEBUG_VERBOSE, "%a: 5-Level Paging = %d\n", gEfiCallerBaseName, ExchangeInfo->Enable5LevelPaging));
 
   ExchangeInfo->SevEsIsEnabled        = CpuMpData->SevEsIsEnabled;
   ExchangeInfo->SevSnpIsEnabled       = CpuMpData->SevSnpIsEnabled;
