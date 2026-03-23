@@ -416,6 +416,12 @@ ArmReadMpidr (
 
 UINTN
 EFIAPI
+ArmReadAidr (
+  VOID
+  );
+
+UINTN
+EFIAPI
 ArmReadMidr (
   VOID
   );
