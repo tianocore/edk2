@@ -29,6 +29,7 @@
 
 [Includes.Common.Private]
   Library/BrotliCustomDecompressLib/brotli/c/include
+  PrivateInclude
 
 [LibraryClasses]
   ##  @libraryclass  Defines a set of methods to reset whole system.
@@ -985,6 +986,11 @@
   #   FALSE - Does not support process non-reset capsule image at runtime.<BR>
   # @Prompt Enable process non-reset capsule image at runtime.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportProcessCapsuleAtRuntime|FALSE|BOOLEAN|0x00010079
+
+  ## Indicates if the PEI memory bins feature is enabled. This defaults to FALSE and memory bins
+  #  will be initialized in DXE, not PEI, assuming the platform has produced the
+  #  gEfiMemoryTypeInformationGuid HOB. See MdeModulePkg/Library/BaseMemoryBinLib/README.md for more details.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiMemoryBinsEnable|FALSE|BOOLEAN|0x00010080
 
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.AARCH64, PcdsFeatureFlag.LOONGARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom|FALSE|BOOLEAN|0x0001003a

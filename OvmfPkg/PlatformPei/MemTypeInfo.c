@@ -206,13 +206,30 @@ MemTypeInfoInitialization (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS                       Status;
+  EFI_PEI_READ_ONLY_VARIABLE2_PPI  *ReadOnlyVariable2;
 
   if (!PlatformInfoHob->SmmSmramRequire) {
     //
     // EFI_PEI_READ_ONLY_VARIABLE2_PPI will never be available; install
     // the default memory type information HOB right away.
     //
+    BuildMemTypeInfoHob ();
+    return;
+  }
+
+  Status = PeiServicesLocatePpi (
+             &gEfiPeiReadOnlyVariable2PpiGuid,
+             0,
+             NULL,
+             (VOID **)&ReadOnlyVariable2
+             );
+
+  if (!EFI_ERROR (Status)) {
+    //
+    // EFI_PEI_READ_ONLY_VARIABLE2_PPI is already available; use it now.
+    //
+    RefreshMemTypeInfo (ReadOnlyVariable2);
     BuildMemTypeInfoHob ();
     return;
   }
