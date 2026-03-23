@@ -57,6 +57,3 @@
   gMtcVendorGuid
   gShellAliasGuid
   gShellVariableGuid
-
-[DEPEX]
-  TRUE
