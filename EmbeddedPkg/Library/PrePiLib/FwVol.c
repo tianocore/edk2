@@ -10,6 +10,7 @@
 **/
 
 #include <PrePi.h>
+#include <Pi/PiFirmwareFile.h>
 #include <Library/ExtractGuidedSectionLib.h>
 
 #define GET_OCCUPIED_SIZE(ActualSize, Alignment) \
@@ -190,10 +191,9 @@ FindFileEx (
     }
   } else {
     //
-    // Length is 24 bits wide so mask upper 8 bits
     // FileLength is adjusted to FileOccupiedSize as it is 8 byte aligned.
     //
-    FileLength       = *(UINT32 *)(*FileHeader)->Size & 0x00FFFFFF;
+    FileLength       = FFS_FILE_SIZE (*FileHeader);
     FileOccupiedSize = GET_OCCUPIED_SIZE (FileLength, 8);
     FfsFileHeader    = (EFI_FFS_FILE_HEADER *)((UINT8 *)*FileHeader + FileOccupiedSize);
   }
@@ -224,7 +224,7 @@ FindFileEx (
           return EFI_NOT_FOUND;
         }
 
-        FileLength       = *(UINT32 *)(FfsFileHeader->Size) & 0x00FFFFFF;
+        FileLength       = FFS_FILE_SIZE (FfsFileHeader);
         FileOccupiedSize = GET_OCCUPIED_SIZE (FileLength, 8);
 
         if (FileName != NULL) {
@@ -244,7 +244,7 @@ FindFileEx (
         break;
 
       case EFI_FILE_DELETED:
-        FileLength       = *(UINT32 *)(FfsFileHeader->Size) & 0x00FFFFFF;
+        FileLength       = FFS_FILE_SIZE (FfsFileHeader);
         FileOccupiedSize = GET_OCCUPIED_SIZE (FileLength, 8);
         FileOffset      += FileOccupiedSize;
         FfsFileHeader    = (EFI_FFS_FILE_HEADER *)((UINT8 *)FfsFileHeader + FileOccupiedSize);
@@ -545,12 +545,10 @@ FfsFindSectionDataWithHook (
   FfsFileHeader = (EFI_FFS_FILE_HEADER *)(FileHandle);
 
   //
-  // Size is 24 bits wide so mask upper 8 bits.
-  // Does not include FfsFileHeader header size
   // FileSize is adjusted to FileOccupiedSize as it is 8 byte aligned.
   //
   Section   = (EFI_COMMON_SECTION_HEADER *)(FfsFileHeader + 1);
-  FileSize  = *(UINT32 *)(FfsFileHeader->Size) & 0x00FFFFFF;
+  FileSize  = FFS_FILE_SIZE (FfsFileHeader);
   FileSize -= sizeof (EFI_FFS_FILE_HEADER);
 
   return FfsProcessSection (
@@ -752,7 +750,7 @@ FfsGetFileInfo (
   CopyMem (&FileInfo->FileName, &FileHeader->Name, sizeof (EFI_GUID));
   FileInfo->FileType       = FileHeader->Type;
   FileInfo->FileAttributes = FileHeader->Attributes;
-  FileInfo->BufferSize     = ((*(UINT32 *)FileHeader->Size) & 0x00FFFFFF) -  sizeof (EFI_FFS_FILE_HEADER);
+  FileInfo->BufferSize     = (FFS_FILE_SIZE (FileHeader) -  sizeof (EFI_FFS_FILE_HEADER));
   FileInfo->Buffer         = (FileHeader + 1);
   return EFI_SUCCESS;
 }
