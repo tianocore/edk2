@@ -30,6 +30,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
   UefiPayloadPkg/UefiPayloadPkg.dec
   ShellPkg/ShellPkg.dec
 
@@ -46,6 +47,7 @@
   DevicePathLib
   HiiLib
   PrintLib
+  Tcg2PhysicalPresenceLib
   PlatformHookLib
   CapsuleLib
   HobLib
