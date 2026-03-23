@@ -7,18 +7,14 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 # @par Reference(s):
-#   - [1] SPM based on the MM interface.
-#        (https://trustedfirmware-a.readthedocs.io/en/latest/components/
-#         secure-partition-manager-mm.html)
-#   - [2] Arm Firmware Framework for Armv8-A, DEN0077, version 1.2
+#   - [1] Arm Firmware Framework for Armv8-A, DEN0077, version 1.2
 #        (https://developer.arm.com/documentation/den0077/latest/)
-#   - [3] FF-A Memory Management Protocol for Armv8-A, DEN0140, version 1.2
+#   - [2] FF-A Memory Management Protocol for Armv8-A, DEN0140, version 1.2
 #        (https://developer.arm.com/documentation/den0140/latest/)
 #
 #------------------------------------------------------------------------------
 
 #include <AArch64/AsmMacroLib.h>
-#include <IndustryStandard/ArmMmSvc.h>
 #include <IndustryStandard/ArmFfaSvc.h>
 #include <Uefi/UefiBaseType.h>
 
@@ -123,57 +119,6 @@ ASM_FUNC(SetStackPermissionFfa)
   ret
 
 //
-// Set write memory permission on StandaloneMm stack area via SpmMm.
-// If success, return StMmStackTopAddr. otherwise return 0.
-//
-// UINTN
-// EFIAPI
-// SetStackPermissionSpmMm (
-//   IN UINTN StMmStackTopAddr
-//   )
-//
-ASM_FUNC(SetStackPermissionSpmMm)
-  //
-  // Try to set write permission on stmm_stack with SPM_MM request
-  // See [1], Section 4.16.5.5.1 MM_SP_MEMORY_ATTRIBUTES_SET_AARCH64.
-  //
-  MOV32 (x2, FixedPcdGet32 (PcdStMmStackSize))
-
-  // x1 = stmm_stack top
-  mov x1, x0
-
-  // x12 = Compute and save the stack base
-  add x12, x1, x2
-
-  // x2 = Count of pages of stmm_stack
-  lsr x2, x2, #EFI_PAGE_SHIFT
-
-  // x3 = Memory permission
-  MOV32 (x3,
-    ARM_SPM_MM_SET_MEM_ATTR_MAKE_PERM_REQUEST (
-      ARM_SPM_MM_SET_MEM_ATTR_DATA_PERM_RW,
-      ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_XN))
-
-  MOV32 (x0, ARM_FID_SPM_MM_SP_SET_MEM_ATTRIBUTES)
-
-  // Call SPM_MM_SP_SET_MEM_ATTRIBUTES to set stmm_stack with write permission
-  // See [1], Section 4.16.5.5.1 MM_SP_MEMORY_ATTRIBUTES_SET_AARCH64.
-  svc #0
-
-  cmp x0, #ARM_SPM_MM_RET_SUCCESS
-
-  // Set return value as base address of stack.
-  mov x0, x12
-  b.eq .Lout_set_stack_perm
-  // If failed, set return value as zero.
-  mov x0, #0x00
-
-.Lout_set_stack_perm:
-  mov x9, xzr
-  mov x12, xzr
-  ret
-
-//
 // Entry point of StandaloneMm
 //
 ASM_FUNC(_ModuleEntryPoint)
@@ -194,7 +139,7 @@ ASM_FUNC(_ModuleEntryPoint)
   // Set stack permission
   cmp x1, #0x01
   b.eq .Lset_stack_perm_ffa
-  b.ne .Lset_stack_perm_spm
+  mov x0, #0x00
 
   // If SetStackPermission* failed, x0 is #0x00.
   // Otherwise, x0 is base address of stack.
@@ -224,8 +169,4 @@ ASM_FUNC(_ModuleEntryPoint)
 
 .Lset_stack_perm_ffa:
   bl SetStackPermissionFfa
-  b .Lset_stmm_sp
-
-.Lset_stack_perm_spm:
-  bl SetStackPermissionSpmMm
   b .Lset_stmm_sp

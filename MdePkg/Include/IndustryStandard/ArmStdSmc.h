@@ -44,27 +44,6 @@
 #define ARM_SMC_STD_REVISION_MAJOR  0x0
 #define ARM_SMC_STD_REVISION_MINOR  0x1
 
-/*
- * Management Mode (MM) calls cover a subset of the Standard Service Call range.
- * The list below is not exhaustive.
- */
-#define ARM_SMC_ID_MM_VERSION_AARCH32  0x84000040
-#define ARM_SMC_ID_MM_VERSION_AARCH64  0xC4000040
-
-// Request service from secure standalone MM environment
-#define ARM_SMC_ID_MM_COMMUNICATE_AARCH32  0x84000041
-#define ARM_SMC_ID_MM_COMMUNICATE_AARCH64  0xC4000041
-
-/* Generic ID when using AArch32 or AArch64 execution state */
-#define ARM_SMC_ID_MM_COMMUNICATE  ARM_SMC_ID_MM_COMMUNICATE_AARCH64
-
-/* MM return error codes */
-#define ARM_SMC_MM_RET_SUCCESS         0
-#define ARM_SMC_MM_RET_NOT_SUPPORTED   -1
-#define ARM_SMC_MM_RET_INVALID_PARAMS  -2
-#define ARM_SMC_MM_RET_DENIED          -3
-#define ARM_SMC_MM_RET_NO_MEMORY       -4
-
 // ARM Architecture Calls
 #define SMCCC_VERSION            0x80000000
 #define SMCCC_ARCH_FEATURES      0x80000001
