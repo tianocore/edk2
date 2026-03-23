@@ -116,6 +116,21 @@ CoreReleaseMemoryLock (
   VOID
   );
 
+//
+// Entry for tracking the memory regions for each memory type to coalesce similar memory types
+//
+typedef struct {
+  EFI_PHYSICAL_ADDRESS    BaseAddress;
+  EFI_PHYSICAL_ADDRESS    MaximumAddress;
+  UINT64                  CurrentNumberOfPages;
+  UINT64                  NumberOfPages;
+  UINTN                   InformationIndex;
+  BOOLEAN                 Special;
+  BOOLEAN                 Runtime;
+} EFI_MEMORY_TYPE_STATISTICS;
+
+extern EFI_MEMORY_TYPE_STATISTICS  mMemoryTypeStatistics[EfiMaxMemoryType + 1];
+
 /**
   Allocates pages from the memory map.
 
