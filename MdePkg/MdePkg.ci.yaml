@@ -120,7 +120,9 @@
 
     ## options defined ci/Plugin/HostUnitTestDscCompleteCheck
     "HostUnitTestDscCompleteCheck": {
-        "IgnoreInf": [""],
+        "IgnoreInf": [
+            "MdePkg/Test/GoogleTest/Library/StackCheckLib/GoogleTestStackCheckLib.inf" # Only tested on GCC
+            ],
         "DscPath": "Test/MdePkgHostTest.dsc"
     },
 

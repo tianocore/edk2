@@ -5,7 +5,6 @@
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;------------------------------------------------------------------------------
 
-    DEFAULT REL
     SECTION .text
 
 global ASM_PFX(__report_rangecheckfailure)

@@ -301,10 +301,6 @@
   #
   TraceHubDebugSysTLib|Include/Library/TraceHubDebugSysTLib.h
 
-  ##  @libraryclass  Provides a hook called when a stack cookie check fails.
-  #
-  StackCheckFailureHookLib|Include/Library/StackCheckFailureHookLib.h
-
   ##  @libraryclass  Provides stack cookie checking functionality
   #
   StackCheckLib|Include/Library/StackCheckLib.h
@@ -2081,6 +2077,12 @@
   # @Prompt Validate ORDERED_COLLECTION structure
   gEfiMdePkgTokenSpaceGuid.PcdValidateOrderedCollection|FALSE|BOOLEAN|0x0000002a
 
+  ## Enable the use of MSVC style stack checking in StackCheckLib. By default, this is FALSE,
+  #  which means that StackCheckLib will use GCC style stack checking. MSFT FAMILY and CLANGPDB
+  #  builds are expected to set this to TRUE, while the rest of the GCC FAMILY will leave this as FALSE.
+  # @Prompt Enable MSVC Style Stack Checking in StackCheckLib.
+  gEfiMdePkgTokenSpaceGuid.PcdEnableMsvcStyleStackChecking|FALSE|BOOLEAN|0x0000002f
+
 [PcdsFixedAtBuild]
   ## Status code value for indicating a watchdog timer has expired.
   # EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_EC_TIMER_EXPIRED
@@ -2304,9 +2306,6 @@
   #   Other - reserved
   # @Prompt Speculation Barrier Type.
   gEfiMdePkgTokenSpaceGuid.PcdSpeculationBarrierType|0x01|UINT8|0x30001018
-
-  ## This PCD specifies the interrupt vector for stack cookie check failures
-  gEfiMdePkgTokenSpaceGuid.PcdStackCookieExceptionVector|0x42|UINT8|0x30001019
 
   ## Enforces the use of Secure UEFI spec defined RNG algorithms.
   # TRUE  - Enforce the use of Secure UEFI spec defined RNG algorithms.
