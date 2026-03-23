@@ -2696,6 +2696,7 @@ NetLibDetectMediaWaitTimeout (
   EFI_STATUS                        TimerStatus;
   EFI_EVENT                         Timer;
   UINT64                            TimeRemained;
+  EFI_TPL                           OldTpl;
 
   if (MediaState == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2719,6 +2720,7 @@ NetLibDetectMediaWaitTimeout (
                   (VOID *)&Aip
                   );
   if (EFI_ERROR (Status)) {
+    OldTpl       = gBS->RaiseTPL (TPL_CALLBACK);
     MediaPresent = TRUE;
     Status       = NetLibDetectMedia (ServiceHandle, &MediaPresent);
     if (!EFI_ERROR (Status)) {
@@ -2727,6 +2729,8 @@ NetLibDetectMediaWaitTimeout (
       } else {
         *MediaState = EFI_NO_MEDIA;
       }
+
+      gBS->RestoreTPL (OldTpl);
     }
 
     //
@@ -2756,6 +2760,7 @@ NetLibDetectMediaWaitTimeout (
       //
       // If gEfiAdapterInfoMediaStateGuid is not supported, call NetLibDetectMedia to get media state!
       //
+      OldTpl       = gBS->RaiseTPL (TPL_CALLBACK);
       MediaPresent = TRUE;
       Status       = NetLibDetectMedia (ServiceHandle, &MediaPresent);
       if (!EFI_ERROR (Status)) {
@@ -2765,6 +2770,8 @@ NetLibDetectMediaWaitTimeout (
           *MediaState = EFI_NO_MEDIA;
         }
       }
+
+      gBS->RestoreTPL (OldTpl);
 
       return Status;
     }
