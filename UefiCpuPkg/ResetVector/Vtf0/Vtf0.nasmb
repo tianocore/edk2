@@ -38,29 +38,29 @@
 %include "PageTables.inc"
 
 %ifdef ARCH_X64
-  %include "X64/PageTables.asm"
+  %include "X64/PageTables.nasm.inc"
 %endif
 
 %ifdef DEBUG_PORT80
-  %include "Port80Debug.asm"
+  %include "Port80Debug.nasm.inc"
 %elifdef DEBUG_SERIAL
-  %include "SerialDebug.asm"
+  %include "SerialDebug.nasm.inc"
 %else
-  %include "DebugDisabled.asm"
+  %include "DebugDisabled.nasm.inc"
 %endif
 
-%include "Ia32/SearchForBfvBase.asm"
-%include "Ia32/SearchForSecEntry.asm"
+%include "Ia32/SearchForBfvBase.nasm.inc"
+%include "Ia32/SearchForSecEntry.nasm.inc"
 
 %ifdef ARCH_X64
-%include "Ia32/Flat32ToFlat64.asm"
-%include "Ia32/PageTables64.asm"
+%include "Ia32/Flat32ToFlat64.nasm.inc"
+%include "Ia32/PageTables64.nasm.inc"
 %endif
 
-%include "Ia16/Real16ToFlat32.asm"
-%include "Ia16/Init16.asm"
+%include "Ia16/Real16ToFlat32.nasm.inc"
+%include "Ia16/Init16.nasm.inc"
 
-%include "Main.asm"
+%include "Main.nasm.inc"
 
-%include "Ia16/ResetVectorVtf0.asm"
+%include "Ia16/ResetVectorVtf0.nasm.inc"
 
