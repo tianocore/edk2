@@ -589,9 +589,11 @@ DebugClearMemoryEnabled (
 }
 
 /**
-  Returns TRUE if any one of the bit is set both in ErrorLevel and PcdFixedDebugPrintErrorLevel.
+  Returns TRUE if any bit in ErrorLevel is enabled by both the runtime
+  debug level and the build-time debug mask.
 
-  This function compares the bit mask of ErrorLevel and PcdFixedDebugPrintErrorLevel.
+  This function checks ErrorLevel against GetDebugPrintErrorLevel() and
+  PcdFixedDebugPrintErrorLevel
 
   @retval  TRUE    Current ErrorLevel is supported.
   @retval  FALSE   Current ErrorLevel is not supported.
@@ -600,8 +602,18 @@ DebugClearMemoryEnabled (
 BOOLEAN
 EFIAPI
 DebugPrintLevelEnabled (
-  IN  CONST UINTN  ErrorLevel
+  IN CONST UINTN  ErrorLevel
   )
 {
-  return (BOOLEAN)((ErrorLevel & PcdGet32 (PcdFixedDebugPrintErrorLevel)) != 0);
+  UINTN  RuntimeErrorLevel;
+  UINTN  BuildTimeErrorLevel;
+
+  RuntimeErrorLevel   = GetDebugPrintErrorLevel ();
+  BuildTimeErrorLevel = PcdGet32 (PcdFixedDebugPrintErrorLevel);
+
+  //
+  // Runtime debug logs are printed only when the runtime debug level
+  // is a subset of the build-time debug level.
+  //
+  return ((ErrorLevel & RuntimeErrorLevel & BuildTimeErrorLevel) != 0);
 }
