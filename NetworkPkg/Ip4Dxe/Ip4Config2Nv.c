@@ -611,7 +611,7 @@ Ip4Config2ConvertIfrNvDataToConfigNvData (
                                    sizeof (EFI_IP4_CONFIG2_POLICY),
                                    &Ip4NvData->Policy
                                    );
-    return EFI_SUCCESS;
+    return Status;
   }
 
   if (IfrFormNvData->DhcpEnable == TRUE) {
