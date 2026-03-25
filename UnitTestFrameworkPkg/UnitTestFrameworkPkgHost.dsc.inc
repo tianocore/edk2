@@ -2,6 +2,7 @@
 # UnitTestFrameworkPkg DSC include file for host based test DSC
 #
 # Copyright (c) 2019 - 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -17,10 +18,17 @@
   BUILD_TARGETS = NOOPT
 
   #
-  # Always enable code coverage and address sanitizers
+  # Enable code coverage and address sanitizers
+  # The Platform DSC may pre-define these MACROS to temporarily disable them.
   #
-  UNIT_TESTING_CODE_COVERAGE_ENABLE     = TRUE
+
+!ifndef UNIT_TESTING_CODE_COVERAGE_ENABLE
+  UNIT_TESTING_CODE_COVERAGE_ENABLE = TRUE
+!endif
+
+!ifndef UNIT_TESTING_ADDRESS_SANITIZER_ENABLE
   UNIT_TESTING_ADDRESS_SANITIZER_ENABLE = TRUE
+!endif
 
 [LibraryClasses.common.HOST_APPLICATION]
   BaseLib|MdePkg/Library/BaseLib/UnitTestHostBaseLib.inf
