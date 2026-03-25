@@ -280,6 +280,7 @@ F: MdeModulePkg/Universal/DriverHealthManagerDxe/
 F: MdeModulePkg/Universal/LoadFileOnFv2/
 F: MdeModulePkg/Universal/SecurityStubDxe/Defer3rdPartyImageLoad.*
 R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
+R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
 
 MdeModulePkg: Core services (PEI, DXE and Runtime) modules
 F: MdeModulePkg/*Mem*/
@@ -307,6 +308,7 @@ F: MdeModulePkg/Universal/PlatformDriOverrideDxe/
 F: MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.c
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 R: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
+R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
 
 MdeModulePkg: Device and Peripheral modules
 F: MdeModulePkg/*PciHostBridge*/
@@ -358,6 +360,7 @@ F: MdeModulePkg/Universal/DisplayEngineDxe/
 F: MdeModulePkg/Universal/DriverSampleDxe/
 F: MdeModulePkg/Universal/SetupBrowserDxe/
 R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
+R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
 
 MdeModulePkg: Management Mode (MM, SMM) modules
 F: MdeModulePkg/*Smi*/
@@ -387,6 +390,7 @@ F: MdeModulePkg/Include/Guid/SystemNvDataGuid.h
 F: MdeModulePkg/Include/Protocol/SwapAddressRange.h
 F: MdeModulePkg/Universal/FaultTolerantWrite*/
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
+R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
 
 MdeModulePkg: Universal Payload definitions
 F: MdeModulePkg/Include/UniversalPayload/
