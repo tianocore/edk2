@@ -481,6 +481,7 @@ F: NetworkPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/network_pkg.html
 R: Saloni Kasbekar <saloni.kasbekar@intel.com> [SaloniKasbekar]
 R: Zachary Clark-williams <zachary.clark-williams@intel.com> [Zclarkwilliams]
+R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
 
 OvmfPkg
 F: OvmfPkg/
