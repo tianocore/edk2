@@ -18,9 +18,147 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/PcdLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
+#include <Library/SafeIntLib.h>
+
+/**
+  Detects the 2x logical HiDPI GOP mode and returns its viewport offsets.
+
+  @param[in]  GraphicsOutput   GOP instance to inspect.
+  @param[out] ViewportOffsetX  Horizontal offset in the physical framebuffer.
+  @param[out] ViewportOffsetY  Vertical offset in the physical framebuffer.
+
+  @retval TRUE   The active mode is a valid 2x logical HiDPI mode.
+  @retval FALSE  The active mode is not a supported HiDPI mode.
+**/
+STATIC
+BOOLEAN
+ShouldScaleBootLogoForHiDpi (
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput,
+  OUT UINTN                         *ViewportOffsetX,
+  OUT UINTN                         *ViewportOffsetY
+  )
+{
+  EFI_STATUS                            Status;
+  UINTN                                 LogicalHeight;
+  UINTN                                 LogicalWidth;
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *PhysicalModeInfo;
+  UINTN                                 PhysicalModeInfoSize;
+
+  if ((GraphicsOutput == NULL) ||
+      (ViewportOffsetX == NULL) ||
+      (ViewportOffsetY == NULL) ||
+      (GraphicsOutput->Mode == NULL) ||
+      (GraphicsOutput->Mode->Info == NULL) ||
+      (GraphicsOutput->Mode->Mode == 0) ||
+      (GraphicsOutput->Mode->Info->PixelFormat != PixelBltOnly) ||
+      (GraphicsOutput->Mode->FrameBufferBase != 0))
+  {
+    return FALSE;
+  }
+
+  PhysicalModeInfo     = NULL;
+  PhysicalModeInfoSize = 0;
+  Status               = GraphicsOutput->QueryMode (
+                                           GraphicsOutput,
+                                           0,
+                                           &PhysicalModeInfoSize,
+                                           &PhysicalModeInfo
+                                           );
+  if (EFI_ERROR (Status) || (PhysicalModeInfo == NULL)) {
+    return FALSE;
+  }
+
+  Status = SafeUintnMult (GraphicsOutput->Mode->Info->HorizontalResolution, 2, &LogicalWidth);
+  if (!EFI_ERROR (Status)) {
+    Status = SafeUintnMult (GraphicsOutput->Mode->Info->VerticalResolution, 2, &LogicalHeight);
+  }
+
+  if (EFI_ERROR (Status) ||
+      (PhysicalModeInfo->HorizontalResolution < LogicalWidth) ||
+      (PhysicalModeInfo->VerticalResolution < LogicalHeight) ||
+      (((PhysicalModeInfo->HorizontalResolution - LogicalWidth) & 1) != 0) ||
+      (((PhysicalModeInfo->VerticalResolution - LogicalHeight) & 1) != 0))
+  {
+    FreePool (PhysicalModeInfo);
+    return FALSE;
+  }
+
+  *ViewportOffsetX = (PhysicalModeInfo->HorizontalResolution - LogicalWidth) / 2;
+  *ViewportOffsetY = (PhysicalModeInfo->VerticalResolution - LogicalHeight) / 2;
+  FreePool (PhysicalModeInfo);
+  return TRUE;
+}
+
+/**
+  Creates a nearest-neighbor 2x copy of a logo bitmap.
+
+  @param[in]  Source        Source logo bitmap.
+  @param[in]  SourceWidth   Source width in pixels.
+  @param[in]  SourceHeight  Source height in pixels.
+  @param[out] Destination   Allocated scaled bitmap.
+
+  @retval EFI_SUCCESS            The bitmap was scaled.
+  @retval EFI_INVALID_PARAMETER  Input is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Allocation failed or the size overflowed.
+**/
+STATIC
+EFI_STATUS
+ScaleLogoBlt2x (
+  IN  EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *Source,
+  IN  UINTN                          SourceWidth,
+  IN  UINTN                          SourceHeight,
+  OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL  **Destination
+  )
+{
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *ScaledBitmap;
+  UINTN                          DestinationHeight;
+  UINTN                          DestinationWidth;
+  UINTN                          Row;
+  UINTN                          Column;
+
+  if ((Source == NULL) || (Destination == NULL) || (SourceWidth == 0) || (SourceHeight == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((SourceWidth > (MAX_UINTN / 2)) || (SourceHeight > (MAX_UINTN / 2))) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  DestinationWidth  = SourceWidth * 2;
+  DestinationHeight = SourceHeight * 2;
+  if (DestinationWidth > (MAX_UINTN / DestinationHeight / sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL))) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  ScaledBitmap = AllocateZeroPool (DestinationWidth * DestinationHeight * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
+  if (ScaledBitmap == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  for (Row = 0; Row < SourceHeight; Row++) {
+    UINTN  DestinationRow0;
+    UINTN  DestinationRow1;
+
+    DestinationRow0 = (Row * 2) * DestinationWidth;
+    DestinationRow1 = DestinationRow0 + DestinationWidth;
+    for (Column = 0; Column < SourceWidth; Column++) {
+      EFI_GRAPHICS_OUTPUT_BLT_PIXEL  Pixel;
+      UINTN                          DestinationColumn;
+
+      Pixel                                                 = Source[Row * SourceWidth + Column];
+      DestinationColumn                                     = Column * 2;
+      ScaledBitmap[DestinationRow0 + DestinationColumn]     = Pixel;
+      ScaledBitmap[DestinationRow0 + DestinationColumn + 1] = Pixel;
+      ScaledBitmap[DestinationRow1 + DestinationColumn]     = Pixel;
+      ScaledBitmap[DestinationRow1 + DestinationColumn + 1] = Pixel;
+    }
+  }
+
+  *Destination = ScaledBitmap;
+  return EFI_SUCCESS;
+}
 
 /**
   Show LOGO returned from Edkii Platform Logo protocol on all consoles.
@@ -58,6 +196,9 @@ BootLogoEnableLogo (
   UINTN                                  NewDestX;
   UINTN                                  NewDestY;
   UINTN                                  BufferSize;
+  BOOLEAN                                ScaleBootLogo;
+  UINTN                                  ViewportOffsetX;
+  UINTN                                  ViewportOffsetY;
 
   Status = gBS->LocateProtocol (&gEdkiiPlatformLogoProtocolGuid, NULL, (VOID **)&PlatformLogo);
   if (EFI_ERROR (Status)) {
@@ -71,6 +212,14 @@ BootLogoEnableLogo (
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
+
+  ViewportOffsetX = 0;
+  ViewportOffsetY = 0;
+  ScaleBootLogo   = ShouldScaleBootLogoForHiDpi (
+                      GraphicsOutput,
+                      &ViewportOffsetX,
+                      &ViewportOffsetY
+                      );
 
   //
   // Try to open Boot Logo Protocol.
@@ -279,6 +428,49 @@ BootLogoEnableLogo (
                                LogoHeight,
                                LogoWidth * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
                                );
+  }
+
+  if (!EFI_ERROR (Status) && ScaleBootLogo) {
+    EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *ScaledBlt;
+    UINTN                          PhysicalDestX;
+    UINTN                          PhysicalDestY;
+    UINTN                          PhysicalHeight;
+    UINTN                          PhysicalWidth;
+
+    Status = SafeUintnMult (LogoDestX, 2, &PhysicalDestX);
+    if (!EFI_ERROR (Status)) {
+      Status = SafeUintnAdd (PhysicalDestX, ViewportOffsetX, &PhysicalDestX);
+    }
+
+    if (!EFI_ERROR (Status)) {
+      Status = SafeUintnMult (LogoDestY, 2, &PhysicalDestY);
+    }
+
+    if (!EFI_ERROR (Status)) {
+      Status = SafeUintnAdd (PhysicalDestY, ViewportOffsetY, &PhysicalDestY);
+    }
+
+    if (!EFI_ERROR (Status)) {
+      Status = SafeUintnMult (LogoWidth, 2, &PhysicalWidth);
+    }
+
+    if (!EFI_ERROR (Status)) {
+      Status = SafeUintnMult (LogoHeight, 2, &PhysicalHeight);
+    }
+
+    ScaledBlt = NULL;
+    if (!EFI_ERROR (Status)) {
+      Status = ScaleLogoBlt2x (LogoBlt, LogoWidth, LogoHeight, &ScaledBlt);
+    }
+
+    if (!EFI_ERROR (Status)) {
+      FreePool (LogoBlt);
+      LogoBlt    = ScaledBlt;
+      LogoDestX  = PhysicalDestX;
+      LogoDestY  = PhysicalDestY;
+      LogoWidth  = PhysicalWidth;
+      LogoHeight = PhysicalHeight;
+    }
   }
 
   if (!EFI_ERROR (Status)) {

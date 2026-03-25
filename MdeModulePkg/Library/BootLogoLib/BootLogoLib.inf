@@ -38,7 +38,7 @@
   BaseMemoryLib
   DebugLib
   PrintLib
-  PcdLib
+  SafeIntLib
 
 [Protocols]
   gEfiGraphicsOutputProtocolGuid                ## SOMETIMES_CONSUMES
