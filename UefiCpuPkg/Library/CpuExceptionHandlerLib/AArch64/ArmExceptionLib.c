@@ -19,7 +19,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
-#include <Library/DefaultExceptionHandlerLib.h>
+#include <Library/CpuExceptionHandlerLib.h>
 
 VOID
 ExceptionHandlersStart (
@@ -142,7 +142,7 @@ CommonCExceptionHandler (
     ASSERT (FALSE);
   }
 
-  DefaultExceptionHandler (ExceptionType, SystemContext);
+  DumpCpuContext (ExceptionType, SystemContext);
 }
 
 /**
