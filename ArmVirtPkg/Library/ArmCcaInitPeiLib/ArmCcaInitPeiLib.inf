@@ -1,7 +1,7 @@
 ## @file
 #  Library that implements the Arm CCA initialisation in PEI phase.
 #
-#  Copyright (c) 2022 - 2023, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2022 - 2026, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -27,8 +27,13 @@
   ArmCcaLib
   ArmCcaRsiLib
   BaseLib
+  DebugLib
+  HobLib
 
 [Pcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
 
+[Guids]
+  gArmCcaIpaWidthGuid
+  gArmCcaIsRealmGuid
