@@ -105,38 +105,52 @@ PxeBcParseVendorOptions (
     //
     switch (PxeOption->OpCode) {
       case PXEBC_VENDOR_TAG_MTFTP_IP:
+        if (PxeOption->Length >= sizeof (EFI_IPv4_ADDRESS)) {
+          CopyMem (&VendorOption->MtftpIp, PxeOption->Data, sizeof (EFI_IPv4_ADDRESS));
+        }
 
-        CopyMem (&VendorOption->MtftpIp, PxeOption->Data, sizeof (EFI_IPv4_ADDRESS));
         break;
 
       case PXEBC_VENDOR_TAG_MTFTP_CPORT:
+        if (PxeOption->Length >= sizeof (VendorOption->MtftpCPort)) {
+          CopyMem (&VendorOption->MtftpCPort, PxeOption->Data, sizeof (VendorOption->MtftpCPort));
+        }
 
-        CopyMem (&VendorOption->MtftpCPort, PxeOption->Data, sizeof (VendorOption->MtftpCPort));
         break;
 
       case PXEBC_VENDOR_TAG_MTFTP_SPORT:
+        if (PxeOption->Length >= sizeof (VendorOption->MtftpSPort)) {
+          CopyMem (&VendorOption->MtftpSPort, PxeOption->Data, sizeof (VendorOption->MtftpSPort));
+        }
 
-        CopyMem (&VendorOption->MtftpSPort, PxeOption->Data, sizeof (VendorOption->MtftpSPort));
         break;
 
       case PXEBC_VENDOR_TAG_MTFTP_TIMEOUT:
+        if (PxeOption->Length >= sizeof (VendorOption->MtftpTimeout)) {
+          VendorOption->MtftpTimeout = *PxeOption->Data;
+        }
 
-        VendorOption->MtftpTimeout = *PxeOption->Data;
         break;
 
       case PXEBC_VENDOR_TAG_MTFTP_DELAY:
+        if (PxeOption->Length >= sizeof (VendorOption->MtftpDelay)) {
+          VendorOption->MtftpDelay = *PxeOption->Data;
+        }
 
-        VendorOption->MtftpDelay = *PxeOption->Data;
         break;
 
       case PXEBC_VENDOR_TAG_DISCOVER_CTRL:
+        if (PxeOption->Length >= sizeof (VendorOption->DiscoverCtrl)) {
+          VendorOption->DiscoverCtrl = *PxeOption->Data;
+        }
 
-        VendorOption->DiscoverCtrl = *PxeOption->Data;
         break;
 
       case PXEBC_VENDOR_TAG_DISCOVER_MCAST:
+        if (PxeOption->Length >= sizeof (EFI_IPv4_ADDRESS)) {
+          CopyMem (&VendorOption->DiscoverMcastIp, PxeOption->Data, sizeof (EFI_IPv4_ADDRESS));
+        }
 
-        CopyMem (&VendorOption->DiscoverMcastIp, PxeOption->Data, sizeof (EFI_IPv4_ADDRESS));
         break;
 
       case PXEBC_VENDOR_TAG_BOOT_SERVERS:
@@ -158,10 +172,12 @@ PxeBcParseVendorOptions (
         break;
 
       case PXEBC_VENDOR_TAG_MCAST_ALLOC:
+        if (PxeOption->Length >= sizeof (EFI_IPv4_ADDRESS) + sizeof (VendorOption->McastIpBlock) + sizeof (VendorOption->McastIpRange)) {
+          CopyMem (&VendorOption->McastIpBase, PxeOption->Data, sizeof (EFI_IPv4_ADDRESS));
+          CopyMem (&VendorOption->McastIpBlock, PxeOption->Data + 4, sizeof (VendorOption->McastIpBlock));
+          CopyMem (&VendorOption->McastIpRange, PxeOption->Data + 6, sizeof (VendorOption->McastIpRange));
+        }
 
-        CopyMem (&VendorOption->McastIpBase, PxeOption->Data, sizeof (EFI_IPv4_ADDRESS));
-        CopyMem (&VendorOption->McastIpBlock, PxeOption->Data + 4, sizeof (VendorOption->McastIpBlock));
-        CopyMem (&VendorOption->McastIpRange, PxeOption->Data + 6, sizeof (VendorOption->McastIpRange));
         break;
 
       case PXEBC_VENDOR_TAG_CREDENTIAL_TYPES:
@@ -171,9 +187,11 @@ PxeBcParseVendorOptions (
         break;
 
       case PXEBC_VENDOR_TAG_BOOT_ITEM:
+        if (PxeOption->Length >= sizeof (VendorOption->BootSrvType) + sizeof (VendorOption->BootSrvLayer)) {
+          CopyMem (&VendorOption->BootSrvType, PxeOption->Data, sizeof (VendorOption->BootSrvType));
+          CopyMem (&VendorOption->BootSrvLayer, PxeOption->Data + 2, sizeof (VendorOption->BootSrvLayer));
+        }
 
-        CopyMem (&VendorOption->BootSrvType, PxeOption->Data, sizeof (VendorOption->BootSrvType));
-        CopyMem (&VendorOption->BootSrvLayer, PxeOption->Data + 2, sizeof (VendorOption->BootSrvLayer));
         break;
 
       default:
