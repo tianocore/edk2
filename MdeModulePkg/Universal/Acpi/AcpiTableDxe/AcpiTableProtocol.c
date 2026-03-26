@@ -2197,6 +2197,11 @@ InstallAcpiTableFromAcpiSiliconHob (
         if (FeaturePcdGet (PcdInstallAcpiSdtProtocol)) {
           SdtNotifyAcpiList (AcpiTableInstance, Version, TableKey);
         }
+
+        //
+        // Free the memory allocated for the ACPI table during the PEI phase.
+        //
+        FreePool (SocEntryTable);
       }
     }
 
@@ -2236,6 +2241,10 @@ InstallAcpiTableFromAcpiSiliconHob (
               }
             }
 
+            //
+            // Free the memory allocated for the DSDT table during the PEI phase.
+            //
+            FreePool (NeedToInstallTable);
             DEBUG ((DEBUG_INFO, "Installed DSDT in the DXE Table list!\n"));
           }
         } else {
@@ -2280,6 +2289,10 @@ InstallAcpiTableFromAcpiSiliconHob (
               }
             }
 
+            //
+            // Free the memory allocated for the FACS table during the PEI phase.
+            //
+            FreePool (NeedToInstallTable);
             DEBUG ((DEBUG_INFO, "Installed FACS in the DXE Table list!\n"));
           }
         } else {
@@ -2290,6 +2303,11 @@ InstallAcpiTableFromAcpiSiliconHob (
       }
     }
   }
+
+  //
+  // Free the memory allocated for the XSDT table during the PEI phase.
+  //
+  FreePool (SiCommonAcpiTable);
 
   DEBUG ((DEBUG_INFO, "InstallAcpiTableFromAcpiSiliconHob - End\n"));
   return Status;
