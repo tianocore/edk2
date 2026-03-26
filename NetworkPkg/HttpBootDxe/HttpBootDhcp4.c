@@ -280,6 +280,9 @@ HttpBootParseDhcp4Packet (
 
   Offer   = &Cache4->Packet.Offer;
   Options = Cache4->OptList;
+  if (Offer->Length < sizeof (EFI_DHCP4_HEADER) + 4) {
+    return EFI_DEVICE_ERROR;
+  }
 
   //
   // Parse DHCPv4 options in this offer, and store the pointers.
@@ -617,6 +620,10 @@ HttpBootDhcp4CallBack (
   }
 
   Private = (HTTP_BOOT_PRIVATE_DATA *)Context;
+
+  if (Packet->Length < sizeof (EFI_DHCP4_HEADER) + 4) {
+    return EFI_SUCCESS;
+  }
 
   //
   // Override the Maximum DHCP Message Size.
