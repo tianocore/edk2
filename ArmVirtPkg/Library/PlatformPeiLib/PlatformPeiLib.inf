@@ -30,6 +30,7 @@
   gArmVirtTokenSpaceGuid.PcdTpm2SupportEnabled
 
 [LibraryClasses]
+  ArmCcaInitPeiLib
   BaseMemoryLib
   DebugLib
   HobLib
