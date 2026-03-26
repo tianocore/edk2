@@ -199,7 +199,15 @@ HttpBootParseDhcp4Options (
     if (Option->OpCode == DHCP4_TAG_PAD) {
       Offset++;
     } else {
+      if (Offset + Option->Length + 2 > Length) {
+        return NULL;
+      }
+
       Offset += Option->Length + 2;
+    }
+
+    if (Offset >= Length) {
+      return NULL;
     }
 
     Option = (EFI_DHCP4_PACKET_OPTION *)(Buffer + Offset);
