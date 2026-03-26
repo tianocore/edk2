@@ -56,6 +56,9 @@
   Pk/CryptRsaPssNull.c
   Pk/CryptRsaPssSignNull.c
   Pk/CryptEcNull.c
+  Pk/CryptEdNull.c
+  Pk/CryptMlNull.c
+  Pk/CryptSlhNull.c
   Bn/CryptBnNull.c
 
   SysCall/CrtWrapper.c
