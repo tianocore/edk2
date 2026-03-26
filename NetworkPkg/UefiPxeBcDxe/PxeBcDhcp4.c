@@ -90,7 +90,7 @@ PxeBcParseVendorOptions (
   UINT32                   *BitMap;
   UINT8                    VendorOptionLen;
   EFI_DHCP4_PACKET_OPTION  *PxeOption;
-  UINT8                    Offset;
+  UINT32                   Offset;
 
   BitMap          = VendorOption->BitMap;
   VendorOptionLen = Dhcp4Option->Length;
@@ -194,7 +194,11 @@ PxeBcParseVendorOptions (
     if (PxeOption->OpCode == DHCP4_TAG_PAD) {
       Offset++;
     } else {
-      Offset = (UINT8)(Offset + PxeOption->Length + 2);
+      if (Offset + (UINT32)PxeOption->Length + 2 > VendorOptionLen) {
+        break;
+      }
+
+      Offset += (UINT32)PxeOption->Length + 2;
     }
 
     PxeOption = (EFI_DHCP4_PACKET_OPTION *)(Dhcp4Option->Data + Offset);
