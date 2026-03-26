@@ -28,3 +28,15 @@ EFIAPI
 ArmCcaConfigureSystemMemory (
   VOID
   );
+
+/** Initialise Arm CCA HOBs
+
+  @retval RETURN_SUCCESS             Success.
+  @retval RETURN_INVALID_PARAMETER   A parameter is invalid.
+  @retval RETURN_OUT_OF_RESOURCES    Out of resources.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaInitialiseHobs (
+  VOID
+  );

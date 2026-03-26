@@ -55,3 +55,60 @@ ArmCcaConfigureSystemMemory (
     CpuDeadLoop ();
   }
 }
+
+/** Initialise Arm CCA HOBs
+
+  @retval RETURN_SUCCESS             Success.
+  @retval RETURN_INVALID_PARAMETER   A parameter is invalid.
+  @retval RETURN_OUT_OF_RESOURCES    Out of resources.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaInitialiseHobs (
+  VOID
+  )
+{
+  RETURN_STATUS  Status;
+  UINT64         *IsRealmHobData;
+  BOOLEAN        RealmWorld;
+  UINT64         IpaWidth;
+  UINT64         *IpaWidthHobData;
+
+  RealmWorld = IsRealm ();
+  if (!RealmWorld) {
+    // nothing to do.
+    return RETURN_SUCCESS;
+  }
+
+  // Create a Guid HOB to cache the IsRealm value.
+  IsRealmHobData = BuildGuidHob (
+                     &gArmCcaIsRealmGuid,
+                     sizeof (*IsRealmHobData)
+                     );
+  if (IsRealmHobData == NULL) {
+    ASSERT (IsRealmHobData != NULL);
+    return RETURN_OUT_OF_RESOURCES;
+  }
+
+  *IsRealmHobData = RealmWorld;
+
+  // Read the IPA width and Create the Guid HOB, to cache the value in the HOB.
+  Status = GetIpaWidth (&IpaWidth);
+  if (RETURN_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  IpaWidthHobData = BuildGuidHob (
+                      &gArmCcaIpaWidthGuid,
+                      sizeof (*IpaWidthHobData)
+                      );
+  if (IpaWidthHobData == NULL) {
+    ASSERT (IpaWidthHobData != NULL);
+    return RETURN_OUT_OF_RESOURCES;
+  }
+
+  *IpaWidthHobData = IpaWidth;
+
+  return RETURN_SUCCESS;
+}
