@@ -9,6 +9,7 @@
 
 #include <PiPei.h>
 
+#include <Library/ArmCcaInitPeiLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -91,6 +92,7 @@ PlatformPeim (
   VOID
   )
 {
+  RETURN_STATUS             RetStatus;
   VOID                      *Base;
   VOID                      *NewBase;
   UINTN                     FdtSize;
@@ -295,6 +297,12 @@ PlatformPeim (
   }
 
   BuildFvHob (PcdGet64 (PcdFvBaseAddress), PcdGet32 (PcdFvSize));
+
+  RetStatus = ArmCcaInitialiseHobs ();
+  if (RETURN_ERROR (RetStatus)) {
+    ASSERT (0);
+    return (EFI_STATUS)RetStatus;
+  }
 
   return EFI_SUCCESS;
 }
