@@ -1,7 +1,7 @@
 /** @file
   Kvmtool platform PEI library.
 
-  Copyright (c) 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2020 - 2026, ARM Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -12,6 +12,7 @@
 #include <Guid/Early16550UartBaseAddress.h>
 #include <Guid/FdtHob.h>
 
+#include <Library/ArmCcaInitPeiLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 #include <Library/FdtLib.h>
@@ -31,12 +32,13 @@ PlatformPeim (
   VOID
   )
 {
-  VOID    *Base;
-  VOID    *NewBase;
-  UINTN   FdtSize;
-  UINTN   FdtPages;
-  UINT64  *FdtHobData;
-  UINT64  *UartHobData;
+  RETURN_STATUS  RetStatus;
+  VOID           *Base;
+  VOID           *NewBase;
+  UINTN          FdtSize;
+  UINTN          FdtPages;
+  UINT64         *FdtHobData;
+  UINT64         *UartHobData;
 
   Base = (VOID *)(UINTN)PcdGet64 (PcdDeviceTreeInitialBaseAddress);
   if ((Base == NULL) || (FdtCheckHeader (Base) != 0)) {
@@ -74,6 +76,12 @@ PlatformPeim (
   *UartHobData = PcdGet64 (PcdSerialRegisterBase);
 
   BuildFvHob (PcdGet64 (PcdFvBaseAddress), PcdGet32 (PcdFvSize));
+
+  RetStatus = ArmCcaInitialiseHobs ();
+  if (RETURN_ERROR (RetStatus)) {
+    ASSERT (0);
+    return (EFI_STATUS)RetStatus;
+  }
 
   return EFI_SUCCESS;
 }
