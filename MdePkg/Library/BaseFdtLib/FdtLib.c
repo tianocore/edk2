@@ -795,9 +795,9 @@ FdtPathOffset (
 CONST CHAR8 *
 EFIAPI
 FdtGetName (
-  IN VOID   *Fdt,
-  IN INT32  NodeOffset,
-  IN INT32  *Length
+  IN CONST VOID  *Fdt,
+  IN INT32       NodeOffset,
+  IN INT32       *Length
   )
 {
   return fdt_get_name (Fdt, NodeOffset, Length);
@@ -816,10 +816,10 @@ FdtGetName (
 INT32
 EFIAPI
 FdtGetPath (
-  IN VOID    *Fdt,
-  IN INT32   NodeOffset,
-  IN VOID    *Buffer,
-  IN UINT32  BufferSize
+  IN CONST VOID  *Fdt,
+  IN INT32       NodeOffset,
+  IN VOID        *Buffer,
+  IN UINT32      BufferSize
   )
 {
   return fdt_get_path (Fdt, NodeOffset, Buffer, BufferSize);
@@ -919,27 +919,44 @@ FdtGetPhandle (
 }
 
 /**
+  Find and return the highest phandle in a tree. The value returned in Phandle
+  is only valid if the function returns success.
+
+  @param[in]  Fdt            The pointer to FDT blob.
+  @param[out] Phandle        The return location for the highest Phandle value found in the tree
+
+  @return 0 on success or a negative error code on failure
+**/
+INT32
+EFIAPI
+FdtFindMaxPhandle (
+  IN CONST VOID  *Fdt,
+  OUT UINT32     *Phandle
+  )
+{
+  return fdt_find_max_phandle (Fdt, Phandle);
+}
+
+/**
   Applies a DT overlay on a base DT.
 
-  @param[in] Fdt            The pointer to FDT blob.
-  @param[in] Fdto           The pointer to FDT overlay blob.
+  @param[in,out] Fdt        The pointer to FDT blob.
+  @param[in]     Fdto       The pointer to FDT overlay blob.
 
-  @return 0 on success, or negative error code.
+  @return 0 on success, or negative error code on failure.
 **/
 INT32
 EFIAPI
 FdtOverlayApply (
-  IN VOID  *Fdt,
-  IN VOID  *Fdto
+  IN OUT VOID  *Fdt,
+  IN     VOID  *Fdto
   )
 {
   return fdt_overlay_apply (Fdt, Fdto);
 }
 
 /* Debug functions. */
-CONST
-CHAR8
-*
+CONST CHAR8 *
 FdtStrerror (
   IN INT32  ErrVal
   )
