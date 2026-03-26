@@ -10,8 +10,8 @@ APPLICATION = $(BIN_PATH)\$(APPNAME).exe
 all: $(APPLICATION) 
 
 $(APPLICATION) : $(OBJECTS) 
-	-@if not exist $(BIN_PATH) mkdir $(BIN_PATH)
-	$(LD) /nologo /debug /OPT:REF /OPT:ICF=10 /incremental:no /nodefaultlib:libc.lib /out:$@ $(LIBS) $**
+  -@if not exist $(BIN_PATH) mkdir $(BIN_PATH)
+  $(LD) /nologo /debug /DYNAMICBASE /guard:cf /OPT:REF /OPT:ICF=10 /incremental:no /nodefaultlib:libc.lib /out:$@ $(LIBS) $**
 
 $(OBJECTS) : $(SOURCE_PATH)\Include\Common\BuildVersion.h
 
@@ -19,10 +19,10 @@ $(OBJECTS) : $(SOURCE_PATH)\Include\Common\BuildVersion.h
 .PHONY:cleanall
 
 clean:
-	del /f /q $(OBJECTS) *.pdb > nul
+  del /f /q $(OBJECTS) *.pdb > nul
 
 cleanall:
-	del /f /q $(OBJECTS) $(APPLICATION) *.pdb $(BIN_PATH)\$(APPNAME).pdb > nul
+  del /f /q $(OBJECTS) $(APPLICATION) *.pdb $(BIN_PATH)\$(APPNAME).pdb > nul
 
 !INCLUDE $(SOURCE_PATH)\Makefiles\ms.rule
 
