@@ -142,7 +142,7 @@ IScsiConnLogin (
   // Try to establish the tcp connection.
   //
   Status = TcpIoConnect (&Conn->TcpIo, Conn->TimeoutEvent);
-  gBS->SetTimer (Conn->TimeoutEvent, TimerCancel, 0);
+  (VOID)gBS->SetTimer (Conn->TimeoutEvent, TimerCancel, 0);
 
   if (EFI_ERROR (Status)) {
     return Status;
@@ -3097,7 +3097,7 @@ IScsiExecuteScsiCommand (
 ON_EXIT:
 
   if (TimeoutEvent != NULL) {
-    gBS->SetTimer (TimeoutEvent, TimerCancel, 0);
+    (VOID)gBS->SetTimer (TimeoutEvent, TimerCancel, 0);
   }
 
   if (Tcb != NULL) {

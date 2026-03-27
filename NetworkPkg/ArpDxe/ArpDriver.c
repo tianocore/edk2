@@ -195,7 +195,7 @@ ArpCleanService (
     //
     // Cancel and close the PeriodicTimer.
     //
-    gBS->SetTimer (ArpService->PeriodicTimer, TimerCancel, 0);
+    (VOID)gBS->SetTimer (ArpService->PeriodicTimer, TimerCancel, 0);
     gBS->CloseEvent (ArpService->PeriodicTimer);
   }
 
