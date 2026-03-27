@@ -71,7 +71,6 @@ Dns4GetModeData (
   ServerList = NULL;
   CacheItem  = NULL;
   CacheList  = NULL;
-  Status     = EFI_SUCCESS;
 
   if ((This == NULL) || (DnsModeData == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -354,7 +353,6 @@ Dns4HostNameToIp (
 
   EFI_TPL  OldTpl;
 
-  Status     = EFI_SUCCESS;
   Item       = NULL;
   QueryName  = NULL;
   TokenEntry = NULL;
@@ -611,7 +609,6 @@ Dns4GeneralLookUp (
 
   EFI_TPL  OldTpl;
 
-  Status     = EFI_SUCCESS;
   TokenEntry = NULL;
   Packet     = NULL;
 
@@ -753,8 +750,6 @@ Dns4UpdateDnsCache (
 {
   EFI_STATUS  Status;
   EFI_TPL     OldTpl;
-
-  Status = EFI_SUCCESS;
 
   if ((DnsCacheEntry.HostName == NULL) || (DnsCacheEntry.IpAddress == NULL) || (DnsCacheEntry.Timeout == 0)) {
     return EFI_INVALID_PARAMETER;
@@ -924,7 +919,6 @@ Dns6GetModeData (
   ServerList = NULL;
   CacheItem  = NULL;
   CacheList  = NULL;
-  Status     = EFI_SUCCESS;
 
   if ((This == NULL) || (DnsModeData == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -1200,7 +1194,6 @@ Dns6HostNameToIp (
 
   EFI_TPL  OldTpl;
 
-  Status     = EFI_SUCCESS;
   Item       = NULL;
   QueryName  = NULL;
   TokenEntry = NULL;
@@ -1460,7 +1453,6 @@ Dns6GeneralLookUp (
 
   EFI_TPL  OldTpl;
 
-  Status     = EFI_SUCCESS;
   TokenEntry = NULL;
   Packet     = NULL;
 
@@ -1603,8 +1595,6 @@ Dns6UpdateDnsCache (
 {
   EFI_STATUS  Status;
   EFI_TPL     OldTpl;
-
-  Status = EFI_SUCCESS;
 
   if ((DnsCacheEntry.HostName == NULL) || (DnsCacheEntry.IpAddress == NULL) || (DnsCacheEntry.Timeout == 0)) {
     return EFI_INVALID_PARAMETER;

@@ -818,9 +818,6 @@ TlsCommonTransmit (
       );
 
     HttpInstance->Tcp4TlsTxToken.Packet.TxData = (EFI_TCP4_TRANSMIT_DATA *)Data;
-
-    Status = EFI_DEVICE_ERROR;
-
     //
     // Transmit the packet.
     //
@@ -852,8 +849,6 @@ TlsCommonTransmit (
       );
 
     HttpInstance->Tcp6TlsTxToken.Packet.TxData = (EFI_TCP6_TRANSMIT_DATA *)Data;
-
-    Status = EFI_DEVICE_ERROR;
 
     //
     // Transmit the packet.
@@ -1452,7 +1447,6 @@ TlsCloseSession (
   NET_BUF  *PacketOut;
   UINT8    *DataOut;
 
-  Status    = EFI_SUCCESS;
   BufferOut = NULL;
   PacketOut = NULL;
   DataOut   = NULL;
@@ -1574,7 +1568,6 @@ TlsProcessMessage (
   EFI_TLS_FRAGMENT_DATA  *OriginalFragmentTable;
   UINTN                  Index;
 
-  Status                = EFI_SUCCESS;
   Buffer                = NULL;
   BufferSize            = 0;
   BytesCopied           = 0;
@@ -1704,7 +1697,6 @@ HttpsReceive (
   UINT8              *GetSessionDataBuffer;
   UINTN              GetSessionDataBufferSize;
 
-  Status                   = EFI_SUCCESS;
   Pdu                      = NULL;
   BufferIn                 = NULL;
   BufferInSize             = 0;
