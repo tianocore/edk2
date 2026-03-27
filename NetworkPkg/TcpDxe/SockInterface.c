@@ -941,8 +941,6 @@ SockCancel (
 {
   EFI_STATUS  Status;
 
-  Status = EFI_SUCCESS;
-
   ASSERT (SockStream == Sock->Type);
 
   Status = EfiAcquireLockOrFail (&(Sock->Lock));

@@ -1397,8 +1397,7 @@ TlsAuthConfigAccessCallback (
   EFI_HII_POPUP_PROTOCOL        *HiiPopUp;
   EFI_HII_POPUP_SELECTION       PopUpSelect;
 
-  Status = EFI_SUCCESS;
-  File   = NULL;
+  File = NULL;
 
   if ((This == NULL) || (Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;

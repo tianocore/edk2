@@ -313,8 +313,6 @@ HttpBootDhcp (
     return EFI_NOT_STARTED;
   }
 
-  Status = EFI_DEVICE_ERROR;
-
   if (!Private->UsingIpv6) {
     //
     // Start D.O.R.A process to get a IPv4 address and other boot information.
