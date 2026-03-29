@@ -12,7 +12,6 @@
 #include <Uefi.h>
 #include <Library/RedfishCrtLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/SortLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
 int   errno            = 0;
@@ -25,6 +24,98 @@ char  errnum_message[] = "We don't support to map errnum to the error message on
 #define GLOBAL_USED
 #endif
 int  GLOBAL_USED  _fltused;
+
+typedef
+int
+(*SORT_COMPARE)(
+  IN  VOID  *Buffer1,
+  IN  VOID  *Buffer2
+  );
+
+//
+// Duplicated from EDKII BaseSortLib for qsort() wrapper
+//
+STATIC
+VOID
+QuickSortWorker (
+  IN OUT    VOID          *BufferToSort,
+  IN CONST  UINTN         Count,
+  IN CONST  UINTN         ElementSize,
+  IN        SORT_COMPARE  CompareFunction,
+  IN        VOID          *Buffer
+  )
+{
+  VOID   *Pivot;
+  UINTN  LoopCount;
+  UINTN  NextSwapLocation;
+
+  ASSERT (BufferToSort    != NULL);
+  ASSERT (CompareFunction != NULL);
+  ASSERT (Buffer          != NULL);
+
+  if ((Count < 2) || (ElementSize  < 1)) {
+    return;
+  }
+
+  NextSwapLocation = 0;
+
+  //
+  // Pick a pivot (we choose last element)
+  //
+  Pivot = ((UINT8 *)BufferToSort + ((Count - 1) * ElementSize));
+
+  //
+  // Now get the pivot such that all on "left" are below it
+  // and everything "right" are above it
+  //
+  for (LoopCount = 0; LoopCount < Count - 1; LoopCount++) {
+    //
+    // If the element is less than the pivot
+    //
+    if (CompareFunction ((VOID *)((UINT8 *)BufferToSort + ((LoopCount) * ElementSize)), Pivot) <= 0) {
+      //
+      // Swap
+      //
+      CopyMem (Buffer, (UINT8 *)BufferToSort + (NextSwapLocation * ElementSize), ElementSize);
+      CopyMem ((UINT8 *)BufferToSort + (NextSwapLocation * ElementSize), (UINT8 *)BufferToSort + ((LoopCount) * ElementSize), ElementSize);
+      CopyMem ((UINT8 *)BufferToSort + ((LoopCount) * ElementSize), Buffer, ElementSize);
+
+      //
+      // Increment NextSwapLocation
+      //
+      NextSwapLocation++;
+    }
+  }
+
+  //
+  // Swap pivot to its final position (NextSwapLocation)
+  //
+  CopyMem (Buffer, Pivot, ElementSize);
+  CopyMem (Pivot, (UINT8 *)BufferToSort + (NextSwapLocation * ElementSize), ElementSize);
+  CopyMem ((UINT8 *)BufferToSort + (NextSwapLocation * ElementSize), Buffer, ElementSize);
+
+  //
+  // Now recurse on 2 partial lists.  Neither of these will have the 'pivot' element.
+  // IE list is sorted left half, pivot element, sorted right half...
+  //
+  QuickSortWorker (
+    BufferToSort,
+    NextSwapLocation,
+    ElementSize,
+    CompareFunction,
+    Buffer
+    );
+
+  QuickSortWorker (
+    (UINT8 *)BufferToSort + (NextSwapLocation + 1) * ElementSize,
+    Count - NextSwapLocation - 1,
+    ElementSize,
+    CompareFunction,
+    Buffer
+    );
+
+  return;
+}
 
 /**
   Determine if a particular character is an alphanumeric character
@@ -786,10 +877,26 @@ qsort (
   int ( *compare )(const void *, const void *)
   )
 {
+  VOID  *Buffer;
+
   ASSERT (base    != NULL);
   ASSERT (compare != NULL);
 
-  PerformQuickSort (base, (UINTN)num, (UINTN)width, (SORT_COMPARE)compare);
+  //
+  // Use CRT-style malloc to cover BS and RT memory allocation.
+  //
+  Buffer = malloc (width);
+  if (Buffer == NULL) {
+    ASSERT (Buffer != NULL);
+    return;
+  }
+
+  //
+  // Re-use PerformQuickSort() function Implementation in EDKII BaseSortLib.
+  //
+  QuickSortWorker (base, (UINTN)num, (UINTN)width, (SORT_COMPARE)compare, Buffer);
+
+  free (Buffer);
   return;
 }
 

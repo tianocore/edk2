@@ -29,7 +29,6 @@
 
 [LibraryClasses]
   BaseLib
-  SortLib
   DebugLib
   MemoryAllocationLib
   UefiRuntimeServicesTableLib
