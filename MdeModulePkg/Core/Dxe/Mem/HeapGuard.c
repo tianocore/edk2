@@ -817,18 +817,30 @@ UnsetGuardForMemory (
   @param[in]  Start           Start address of free memory block.
   @param[in]  Size            Size of free memory block.
   @param[in]  SizeRequested   Size of memory to allocate.
+  @param[out] GuardedStart    Start address of required range including
+                              any needed guard page.
+  @param[out] GuardedEnd      End address of required range including
+                              any needed guard page.
 
   @return The end address of memory block found.
   @return 0 if no enough space for the required size of memory and its Guard.
 **/
 UINT64
 AdjustMemoryS (
-  IN UINT64  Start,
-  IN UINT64  Size,
-  IN UINT64  SizeRequested
+  IN UINT64   Start,
+  IN UINT64   Size,
+  IN UINT64   SizeRequested,
+  OUT UINT64  *GuardedStart,
+  OUT UINT64  *GuardedEnd
   )
 {
-  UINT64  Target;
+  UINT64   Target;
+  BOOLEAN  NeedHeadGuard;
+  BOOLEAN  NeedTailGuard;
+
+  if ((GuardedStart == NULL) || (GuardedEnd == NULL)) {
+    return 0;
+  }
 
   //
   // UEFI spec requires that allocated pool must be 8-byte aligned. If it's
@@ -845,7 +857,8 @@ AdjustMemoryS (
     return 0;
   }
 
-  if (!IsGuardPage (Start + Size)) {
+  NeedTailGuard = !IsGuardPage (Start + Size);
+  if (NeedTailGuard) {
     // No Guard at tail to share. One more page is needed.
     Target -= EFI_PAGES_TO_SIZE (1);
   }
@@ -862,6 +875,11 @@ AdjustMemoryS (
       return 0;
     }
   }
+
+  NeedHeadGuard = !IsGuardPage (Target - EFI_PAGES_TO_SIZE (1));
+
+  *GuardedStart = NeedHeadGuard ? (Target - EFI_PAGES_TO_SIZE (1)) : Target;
+  *GuardedEnd   = NeedTailGuard ? (Target + SizeRequested) : (Target + SizeRequested - 1);
 
   // OK, we have enough pages for memory and its Guards. Return the End of the
   // free space.

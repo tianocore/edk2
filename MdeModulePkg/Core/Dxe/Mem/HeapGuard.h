@@ -278,15 +278,21 @@ AdjustMemoryF (
   @param[in]  Start           Start address of free memory block.
   @param[in]  Size            Size of free memory block.
   @param[in]  SizeRequested   Size of memory to allocate.
+  @param[out] GuardedStart    Start address of required range including
+                              any needed guard page.
+  @param[out] GuardedEnd      End address of required range including
+                              any needed guard page.
 
   @return The end address of memory block found.
   @return 0 if no enough space for the required size of memory and its Guard.
 **/
 UINT64
 AdjustMemoryS (
-  IN UINT64  Start,
-  IN UINT64  Size,
-  IN UINT64  SizeRequested
+  IN UINT64   Start,
+  IN UINT64   Size,
+  IN UINT64   SizeRequested,
+  OUT UINT64  *GuardedStart,
+  OUT UINT64  *GuardedEnd
   );
 
 /**

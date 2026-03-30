@@ -11,18 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "HeapGuard.h"
 #include <Pi/PiDxeCis.h>
 
-//
-// Entry for tracking the memory regions for each memory type to coalesce similar memory types
-//
-typedef struct {
-  EFI_PHYSICAL_ADDRESS    BaseAddress;
-  EFI_PHYSICAL_ADDRESS    MaximumAddress;
-  UINT64                  CurrentNumberOfPages;
-  UINT64                  NumberOfPages;
-  UINTN                   InformationIndex;
-  BOOLEAN                 Special;
-  BOOLEAN                 Runtime;
-} EFI_MEMORY_TYPE_STATISTICS;
+// EFI_MEMORY_TYPE_STATISTICS typedef is in Imem.h (shared with HeapGuard.c)
 
 //
 // MemoryMap - The current memory map
@@ -164,6 +153,51 @@ MemoryRegionsIntersect (
   ASSERT (Start2 <= End2);
 
   return ((Start1 <= End2) && (Start2 <= End1));
+}
+
+/**
+  Validate that an allocation range does not overlap any non-matching special
+  memory type bin.
+
+  @param[in]  Start    Start address of allocation range to validate.
+  @param[in]  End      End address of allocation range to validate.
+  @param[in]  NewType  Requested memory type for the allocation.
+
+  @retval TRUE   Allocation range is valid for NewType.
+  @retval FALSE  Allocation range overlaps a non-matching special bin.
+**/
+static
+BOOLEAN
+RangeFitsSpecialBins (
+  IN EFI_PHYSICAL_ADDRESS  Start,
+  IN EFI_PHYSICAL_ADDRESS  End,
+  IN EFI_MEMORY_TYPE       NewType
+  )
+{
+  EFI_MEMORY_TYPE  CheckType;
+
+  ASSERT (Start <= End);
+
+  for (CheckType = (EFI_MEMORY_TYPE)0; CheckType < EfiMaxMemoryType; CheckType++) {
+    if ((CheckType == NewType) ||
+        !mMemoryTypeStatistics[CheckType].Special ||
+        (mMemoryTypeStatistics[CheckType].NumberOfPages == 0))
+    {
+      continue;
+    }
+
+    if (MemoryRegionsIntersect (
+          Start,
+          End,
+          mMemoryTypeStatistics[CheckType].BaseAddress,
+          mMemoryTypeStatistics[CheckType].MaximumAddress
+          ))
+    {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
 }
 
 /**
@@ -735,6 +769,7 @@ CoreAddMemoryDescriptor (
   UINTN                 FreeIndex;
   UINT64                Alignment;
   UINT64                BinSize;
+  BOOLEAN               OldOnGuarding;
 
   if ((Start & EFI_PAGE_MASK) != 0) {
     return;
@@ -799,14 +834,22 @@ CoreAddMemoryDescriptor (
       gMemoryTypeInformation[Index].NumberOfPages = (UINT32)EFI_SIZE_TO_PAGES ((UINTN)BinSize);
 
       //
-      // Allocate pages for the current memory type from the top of available memory
+      // Allocate pages for the current memory type from the top of available memory.
+      // Suppress HeapGuard for bin setup -- these are pre-reserved ranges, not
+      // individual allocations that need overflow detection.  Guard pages on bin
+      // allocations would be freed in Phase 3 and reused by other types, causing
+      // cross-type CoreMemoryMapSanityCheck violations.  Consumer allocations
+      // within bins still get full guard protection.
       //
-      Status = CoreAllocatePages (
-                 AllocateAnyPages,
-                 Type,
-                 gMemoryTypeInformation[Index].NumberOfPages,
-                 &mMemoryTypeStatistics[Type].BaseAddress
-                 );
+      OldOnGuarding = mOnGuarding;
+      mOnGuarding   = TRUE;
+      Status        = CoreAllocatePages (
+                        AllocateAnyPages,
+                        Type,
+                        gMemoryTypeInformation[Index].NumberOfPages,
+                        &mMemoryTypeStatistics[Type].BaseAddress
+                        );
+      mOnGuarding = OldOnGuarding;
       if (EFI_ERROR (Status)) {
         //
         // If an error occurs allocating the pages for the current memory type, then
@@ -1233,6 +1276,8 @@ CoreFindFreePagesI (
   UINT64      DescStart;
   UINT64      DescEnd;
   UINT64      DescNumberOfBytes;
+  UINT64      GuardedStart;
+  UINT64      GuardedEnd;
   LIST_ENTRY  *Link;
   MEMORY_MAP  *Entry;
 
@@ -1327,9 +1372,15 @@ CoreFindFreePagesI (
           DescEnd = AdjustMemoryS (
                       DescEnd + 1 - DescNumberOfBytes,
                       DescNumberOfBytes,
-                      NumberOfBytes
+                      NumberOfBytes,
+                      &GuardedStart,
+                      &GuardedEnd
                       );
           if (DescEnd == 0) {
+            continue;
+          }
+
+          if (!RangeFitsSpecialBins (GuardedStart, GuardedEnd, NewType)) {
             continue;
           }
         }
@@ -1481,8 +1532,11 @@ CoreInternalAllocatePages (
   UINT64           Start;
   UINT64           NumberOfBytes;
   UINT64           End;
+  UINT64           GuardedStart;
+  UINT64           GuardedEnd;
   UINT64           MaxAddress;
   UINTN            Alignment;
+  UINTN            GuardedPages;
   EFI_MEMORY_TYPE  CheckType;
 
   if ((UINT32)Type >= MaxAllocateType) {
@@ -1601,6 +1655,20 @@ CoreInternalAllocatePages (
         {
           return EFI_NOT_FOUND;
         }
+      }
+    }
+
+    if (NeedGuard) {
+      GuardedStart = Start;
+      GuardedPages = NumberOfPages;
+      AdjustMemoryA (&GuardedStart, &GuardedPages);
+      GuardedEnd = GuardedStart + EFI_PAGES_TO_SIZE (GuardedPages) - 1;
+
+      if ((GuardedStart > GuardedEnd) ||
+          (GuardedEnd > MaxAddress) ||
+          !RangeFitsSpecialBins (GuardedStart, GuardedEnd, MemoryType))
+      {
+        return EFI_NOT_FOUND;
       }
     }
   }
