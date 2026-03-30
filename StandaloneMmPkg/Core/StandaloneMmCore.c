@@ -33,12 +33,12 @@ EFI_MM_SYSTEM_TABLE  gMmCoreMmst = {
   // I/O Service
   {
     {
-      (EFI_MM_CPU_IO)MmEfiNotAvailableYetArg5,        // MmMemRead
-      (EFI_MM_CPU_IO)MmEfiNotAvailableYetArg5         // MmMemWrite
+      (EFI_MM_CPU_IO)MmEfiNotAvailableYetMmCpuIo,        // MmMemRead
+      (EFI_MM_CPU_IO)MmEfiNotAvailableYetMmCpuIo         // MmMemWrite
     },
     {
-      (EFI_MM_CPU_IO)MmEfiNotAvailableYetArg5,        // MmIoRead
-      (EFI_MM_CPU_IO)MmEfiNotAvailableYetArg5         // MmIoWrite
+      (EFI_MM_CPU_IO)MmEfiNotAvailableYetMmCpuIo,        // MmIoRead
+      (EFI_MM_CPU_IO)MmEfiNotAvailableYetMmCpuIo         // MmIoWrite
     }
   },
   // Runtime memory services
@@ -87,23 +87,23 @@ VOID            *mInternalCommBufferCopy;
 
   Note: This function is only used by MMRAM invocation.  It is never used by DXE invocation.
 
-  @param  Arg1                   Undefined
-  @param  Arg2                   Undefined
-  @param  Arg3                   Undefined
-  @param  Arg4                   Undefined
-  @param  Arg5                   Undefined
+  @param  This                   Undefined
+  @param  Width                  Undefined
+  @param  Address                Undefined
+  @param  Count                  Undefined
+  @param  Buffer                 Undefined
 
   @return EFI_NOT_AVAILABLE_YET
 
 **/
 EFI_STATUS
 EFIAPI
-MmEfiNotAvailableYetArg5 (
-  UINTN  Arg1,
-  UINTN  Arg2,
-  UINTN  Arg3,
-  UINTN  Arg4,
-  UINTN  Arg5
+MmEfiNotAvailableYetMmCpuIo (
+  IN     CONST EFI_MM_CPU_IO_PROTOCOL  *This,
+  IN     EFI_MM_IO_WIDTH               Width,
+  IN     UINT64                        Address,
+  IN     UINTN                         Count,
+  IN OUT VOID                          *Buffer
   )
 {
   //

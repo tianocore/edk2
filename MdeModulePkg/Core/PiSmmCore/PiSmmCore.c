@@ -27,12 +27,12 @@ EFI_SMM_SYSTEM_TABLE2  gSmmCoreSmst = {
   SmmInstallConfigurationTable,
   {
     {
-      (EFI_SMM_CPU_IO2)SmmEfiNotAvailableYetArg5,        // SmmMemRead
-      (EFI_SMM_CPU_IO2)SmmEfiNotAvailableYetArg5         // SmmMemWrite
+      (EFI_SMM_CPU_IO2)SmmEfiNotAvailableYetMmCpuIo,        // SmmMemRead
+      (EFI_SMM_CPU_IO2)SmmEfiNotAvailableYetMmCpuIo         // SmmMemWrite
     },
     {
-      (EFI_SMM_CPU_IO2)SmmEfiNotAvailableYetArg5,        // SmmIoRead
-      (EFI_SMM_CPU_IO2)SmmEfiNotAvailableYetArg5         // SmmIoWrite
+      (EFI_SMM_CPU_IO2)SmmEfiNotAvailableYetMmCpuIo,        // SmmIoRead
+      (EFI_SMM_CPU_IO2)SmmEfiNotAvailableYetMmCpuIo         // SmmIoWrite
     }
   },
   SmmAllocatePool,
@@ -111,23 +111,23 @@ EFI_LOADED_IMAGE_PROTOCOL  *mSmmCoreLoadedImage;
 
   Note: This function is only used by SMRAM invocation.  It is never used by DXE invocation.
 
-  @param  Arg1                   Undefined
-  @param  Arg2                   Undefined
-  @param  Arg3                   Undefined
-  @param  Arg4                   Undefined
-  @param  Arg5                   Undefined
+  @param  This                   Undefined
+  @param  Width                  Undefined
+  @param  Address                Undefined
+  @param  Count                  Undefined
+  @param  Buffer                 Undefined
 
   @return EFI_NOT_AVAILABLE_YET
 
 **/
 EFI_STATUS
 EFIAPI
-SmmEfiNotAvailableYetArg5 (
-  UINTN  Arg1,
-  UINTN  Arg2,
-  UINTN  Arg3,
-  UINTN  Arg4,
-  UINTN  Arg5
+SmmEfiNotAvailableYetMmCpuIo (
+  IN     CONST EFI_MM_CPU_IO_PROTOCOL  *This,
+  IN     EFI_MM_IO_WIDTH               Width,
+  IN     UINT64                        Address,
+  IN     UINTN                         Count,
+  IN OUT VOID                          *Buffer
   )
 {
   //

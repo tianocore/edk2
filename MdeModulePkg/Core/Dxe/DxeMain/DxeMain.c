@@ -136,7 +136,7 @@ EFI_BOOT_SERVICES  mBootServices = {
   (EFI_EXIT)CoreExit,                                                                     // Exit
   (EFI_IMAGE_UNLOAD)CoreUnloadImage,                                                      // UnloadImage
   (EFI_EXIT_BOOT_SERVICES)CoreExitBootServices,                                           // ExitBootServices
-  (EFI_GET_NEXT_MONOTONIC_COUNT)CoreEfiNotAvailableYetArg1,                               // GetNextMonotonicCount
+  (EFI_GET_NEXT_MONOTONIC_COUNT)CoreEfiNotAvailableYetGetNextMonotonicCount,              // GetNextMonotonicCount
   (EFI_STALL)CoreStall,                                                                   // Stall
   (EFI_SET_WATCHDOG_TIMER)CoreSetWatchdogTimer,                                           // SetWatchdogTimer
   (EFI_CONNECT_CONTROLLER)CoreConnectController,                                          // ConnectController
@@ -149,7 +149,7 @@ EFI_BOOT_SERVICES  mBootServices = {
   (EFI_LOCATE_PROTOCOL)CoreLocateProtocol,                                                // LocateProtocol
   (EFI_INSTALL_MULTIPLE_PROTOCOL_INTERFACES)CoreInstallMultipleProtocolInterfaces,        // InstallMultipleProtocolInterfaces
   (EFI_UNINSTALL_MULTIPLE_PROTOCOL_INTERFACES)CoreUninstallMultipleProtocolInterfaces,    // UninstallMultipleProtocolInterfaces
-  (EFI_CALCULATE_CRC32)CoreEfiNotAvailableYetArg3,                                        // CalculateCrc32
+  (EFI_CALCULATE_CRC32)CoreEfiNotAvailableYetCalculateCrc32,                              // CalculateCrc32
   (EFI_COPY_MEM)EfiCopyMem,                                                               // CopyMem
   (EFI_SET_MEM)EfiSetMem,                                                                 // SetMem
   (EFI_CREATE_EVENT_EX)CoreCreateEventEx                                                  // CreateEventEx
@@ -213,20 +213,20 @@ EFI_RUNTIME_SERVICES  mEfiRuntimeServicesTableTemplate = {
     0,                                                            // CRC32
     0                                                             // Reserved
   },
-  (EFI_GET_TIME)CoreEfiNotAvailableYetArg2,                       // GetTime
-  (EFI_SET_TIME)CoreEfiNotAvailableYetArg1,                       // SetTime
-  (EFI_GET_WAKEUP_TIME)CoreEfiNotAvailableYetArg3,                // GetWakeupTime
-  (EFI_SET_WAKEUP_TIME)CoreEfiNotAvailableYetArg2,                // SetWakeupTime
-  (EFI_SET_VIRTUAL_ADDRESS_MAP)CoreEfiNotAvailableYetArg4,        // SetVirtualAddressMap
-  (EFI_CONVERT_POINTER)CoreEfiNotAvailableYetArg2,                // ConvertPointer
-  (EFI_GET_VARIABLE)CoreEfiNotAvailableYetArg5,                   // GetVariable
-  (EFI_GET_NEXT_VARIABLE_NAME)CoreEfiNotAvailableYetArg3,         // GetNextVariableName
-  (EFI_SET_VARIABLE)CoreEfiNotAvailableYetArg5,                   // SetVariable
-  (EFI_GET_NEXT_HIGH_MONO_COUNT)CoreEfiNotAvailableYetArg1,       // GetNextHighMonotonicCount
-  (EFI_RESET_SYSTEM)CoreEfiNotAvailableYetArg4,                   // ResetSystem
-  (EFI_UPDATE_CAPSULE)CoreEfiNotAvailableYetArg3,                 // UpdateCapsule
-  (EFI_QUERY_CAPSULE_CAPABILITIES)CoreEfiNotAvailableYetArg4,     // QueryCapsuleCapabilities
-  (EFI_QUERY_VARIABLE_INFO)CoreEfiNotAvailableYetArg4             // QueryVariableInfo
+  (EFI_GET_TIME)CoreEfiNotAvailableYetGetTime,                                    // GetTime
+  (EFI_SET_TIME)CoreEfiNotAvailableYetSetTime,                                    // SetTime
+  (EFI_GET_WAKEUP_TIME)CoreEfiNotAvailableYetGetWakeupTime,                       // GetWakeupTime
+  (EFI_SET_WAKEUP_TIME)CoreEfiNotAvailableYetSetWakeupTime,                       // SetWakeupTime
+  (EFI_SET_VIRTUAL_ADDRESS_MAP)CoreEfiNotAvailableYetSetVirtualAddressMap,        // SetVirtualAddressMap
+  (EFI_CONVERT_POINTER)CoreEfiNotAvailableYetConvertPointer,                      // ConvertPointer
+  (EFI_GET_VARIABLE)CoreEfiNotAvailableYetGetVariable,                            // GetVariable
+  (EFI_GET_NEXT_VARIABLE_NAME)CoreEfiNotAvailableYetGetNextVariableName,          // GetNextVariableName
+  (EFI_SET_VARIABLE)CoreEfiNotAvailableYetSetVariable,                            // SetVariable
+  (EFI_GET_NEXT_HIGH_MONO_COUNT)CoreEfiNotAvailableYetGetNextHighMonotonicCount,  // GetNextHighMonotonicCount
+  (EFI_RESET_SYSTEM)CoreEfiNotAvailableYetResetSystem,                            // ResetSystem
+  (EFI_UPDATE_CAPSULE)CoreEfiNotAvailableYetUpdateCapsule,                        // UpdateCapsule
+  (EFI_QUERY_CAPSULE_CAPABILITIES)CoreEfiNotAvailableYetQueryCapsuleCapabilities, // QueryCapsuleCapabilities
+  (EFI_QUERY_VARIABLE_INFO)CoreEfiNotAvailableYetQueryVariableInfo                // QueryVariableInfo
 };
 
 EFI_RUNTIME_ARCH_PROTOCOL  gRuntimeTemplate = {
@@ -666,15 +666,15 @@ DxeMain (
   Place holder function until all the Boot Services and Runtime Services are
   available.
 
-  @param  Arg1                   Undefined
+  @param  Count                  Undefined
 
   @return EFI_NOT_AVAILABLE_YET
 
 **/
 EFI_STATUS
 EFIAPI
-CoreEfiNotAvailableYetArg1 (
-  UINTN  Arg1
+CoreEfiNotAvailableYetGetNextMonotonicCount (
+  OUT UINT64  *Count
   )
 {
   //
@@ -689,17 +689,19 @@ CoreEfiNotAvailableYetArg1 (
 /**
   Place holder function until all the Boot Services and Runtime Services are available.
 
-  @param  Arg1                   Undefined
-  @param  Arg2                   Undefined
+  @param  Data                   Undefined
+  @param  DataSize               Undefined
+  @param  Crc32                  Undefined
 
   @return EFI_NOT_AVAILABLE_YET
 
 **/
 EFI_STATUS
 EFIAPI
-CoreEfiNotAvailableYetArg2 (
-  UINTN  Arg1,
-  UINTN  Arg2
+CoreEfiNotAvailableYetCalculateCrc32 (
+  IN  VOID    *Data,
+  IN  UINTN   DataSize,
+  OUT UINT32  *Crc32
   )
 {
   //
@@ -714,19 +716,17 @@ CoreEfiNotAvailableYetArg2 (
 /**
   Place holder function until all the Boot Services and Runtime Services are available.
 
-  @param  Arg1                   Undefined
-  @param  Arg2                   Undefined
-  @param  Arg3                   Undefined
+  @param  Time                   Undefined
+  @param  Capabilities           Undefined
 
   @return EFI_NOT_AVAILABLE_YET
 
 **/
 EFI_STATUS
 EFIAPI
-CoreEfiNotAvailableYetArg3 (
-  UINTN  Arg1,
-  UINTN  Arg2,
-  UINTN  Arg3
+CoreEfiNotAvailableYetGetTime (
+  OUT  EFI_TIME               *Time,
+  OUT  EFI_TIME_CAPABILITIES  *Capabilities OPTIONAL
   )
 {
   //
@@ -741,21 +741,15 @@ CoreEfiNotAvailableYetArg3 (
 /**
   Place holder function until all the Boot Services and Runtime Services are available.
 
-  @param  Arg1                   Undefined
-  @param  Arg2                   Undefined
-  @param  Arg3                   Undefined
-  @param  Arg4                   Undefined
+  @param  Time                   Undefined
 
   @return EFI_NOT_AVAILABLE_YET
 
 **/
 EFI_STATUS
 EFIAPI
-CoreEfiNotAvailableYetArg4 (
-  UINTN  Arg1,
-  UINTN  Arg2,
-  UINTN  Arg3,
-  UINTN  Arg4
+CoreEfiNotAvailableYetSetTime (
+  IN  EFI_TIME  *Time
   )
 {
   //
@@ -770,23 +764,322 @@ CoreEfiNotAvailableYetArg4 (
 /**
   Place holder function until all the Boot Services and Runtime Services are available.
 
-  @param  Arg1                   Undefined
-  @param  Arg2                   Undefined
-  @param  Arg3                   Undefined
-  @param  Arg4                   Undefined
-  @param  Arg5                   Undefined
+  @param  Enabled                Undefined
+  @param  Pending                Undefined
+  @param  Time                   Undefined
 
   @return EFI_NOT_AVAILABLE_YET
 
 **/
 EFI_STATUS
 EFIAPI
-CoreEfiNotAvailableYetArg5 (
-  UINTN  Arg1,
-  UINTN  Arg2,
-  UINTN  Arg3,
-  UINTN  Arg4,
-  UINTN  Arg5
+CoreEfiNotAvailableYetGetWakeupTime (
+  OUT BOOLEAN   *Enabled,
+  OUT BOOLEAN   *Pending,
+  OUT EFI_TIME  *Time
+  )
+{
+  //
+  // This function should never be executed.  If it does, then the architectural protocols
+  // have not been designed correctly.  The CpuBreakpoint () is commented out for now until the
+  // DXE Core and all the Architectural Protocols are complete.
+  //
+
+  return EFI_NOT_AVAILABLE_YET;
+}
+
+/**
+  Place holder function until all the Boot Services and Runtime Services are available.
+
+  @param  Enable                 Undefined
+  @param  Time                   Undefined
+
+  @return EFI_NOT_AVAILABLE_YET
+
+**/
+EFI_STATUS
+EFIAPI
+CoreEfiNotAvailableYetSetWakeupTime (
+  IN  BOOLEAN   Enable,
+  IN  EFI_TIME  *Time   OPTIONAL
+  )
+{
+  //
+  // This function should never be executed.  If it does, then the architectural protocols
+  // have not been designed correctly.  The CpuBreakpoint () is commented out for now until the
+  // DXE Core and all the Architectural Protocols are complete.
+  //
+
+  return EFI_NOT_AVAILABLE_YET;
+}
+
+/**
+  Place holder function until all the Boot Services and Runtime Services are available.
+
+  @param  MemoryMapSize          Undefined
+  @param  DescriptorSize         Undefined
+  @param  DescriptorVersion      Undefined
+  @param  VirtualMap             Undefined
+
+  @return EFI_NOT_AVAILABLE_YET
+
+**/
+EFI_STATUS
+EFIAPI
+CoreEfiNotAvailableYetSetVirtualAddressMap (
+  IN  UINTN                  MemoryMapSize,
+  IN  UINTN                  DescriptorSize,
+  IN  UINT32                 DescriptorVersion,
+  IN  EFI_MEMORY_DESCRIPTOR  *VirtualMap
+  )
+{
+  //
+  // This function should never be executed.  If it does, then the architectural protocols
+  // have not been designed correctly.  The CpuBreakpoint () is commented out for now until the
+  // DXE Core and all the Architectural Protocols are complete.
+  //
+
+  return EFI_NOT_AVAILABLE_YET;
+}
+
+/**
+  Place holder function until all the Boot Services and Runtime Services are available.
+
+  @param  DebugDisposition       Undefined
+  @param  Address                Undefined
+
+  @return EFI_NOT_AVAILABLE_YET
+
+**/
+EFI_STATUS
+EFIAPI
+CoreEfiNotAvailableYetConvertPointer (
+  IN     UINTN  DebugDisposition,
+  IN OUT VOID   **Address
+  )
+{
+  //
+  // This function should never be executed.  If it does, then the architectural protocols
+  // have not been designed correctly.  The CpuBreakpoint () is commented out for now until the
+  // DXE Core and all the Architectural Protocols are complete.
+  //
+
+  return EFI_NOT_AVAILABLE_YET;
+}
+
+/**
+  Place holder function until all the Boot Services and Runtime Services are available.
+
+  @param  VariableName           Undefined
+  @param  VendorGuid             Undefined
+  @param  Attributes             Undefined
+  @param  DataSize               Undefined
+  @param  Data                   Undefined
+
+  @return EFI_NOT_AVAILABLE_YET
+
+**/
+EFI_STATUS
+EFIAPI
+CoreEfiNotAvailableYetGetVariable (
+  IN     CHAR16    *VariableName,
+  IN     EFI_GUID  *VendorGuid,
+  OUT    UINT32    *Attributes     OPTIONAL,
+  IN OUT UINTN     *DataSize,
+  OUT    VOID      *Data           OPTIONAL
+  )
+{
+  //
+  // This function should never be executed.  If it does, then the architectural protocols
+  // have not been designed correctly.  The CpuBreakpoint () is commented out for now until the
+  // DXE Core and all the Architectural Protocols are complete.
+  //
+
+  return EFI_NOT_AVAILABLE_YET;
+}
+
+/**
+  Place holder function until all the Boot Services and Runtime Services are available.
+
+  @param  VariableNameSize       Undefined
+  @param  VariableName           Undefined
+  @param  VendorGuid             Undefined
+
+  @return EFI_NOT_AVAILABLE_YET
+
+**/
+EFI_STATUS
+EFIAPI
+CoreEfiNotAvailableYetGetNextVariableName (
+  IN OUT UINTN     *VariableNameSize,
+  IN OUT CHAR16    *VariableName,
+  IN OUT EFI_GUID  *VendorGuid
+  )
+{
+  //
+  // This function should never be executed.  If it does, then the architectural protocols
+  // have not been designed correctly.  The CpuBreakpoint () is commented out for now until the
+  // DXE Core and all the Architectural Protocols are complete.
+  //
+
+  return EFI_NOT_AVAILABLE_YET;
+}
+
+/**
+  Place holder function until all the Boot Services and Runtime Services are available.
+
+  @param  VariableName           Undefined
+  @param  VendorGuid             Undefined
+  @param  Attributes             Undefined
+  @param  DataSize               Undefined
+  @param  Data                   Undefined
+
+  @return EFI_NOT_AVAILABLE_YET
+
+**/
+EFI_STATUS
+EFIAPI
+CoreEfiNotAvailableYetSetVariable (
+  IN  CHAR16    *VariableName,
+  IN  EFI_GUID  *VendorGuid,
+  IN  UINT32    Attributes,
+  IN  UINTN     DataSize,
+  IN  VOID      *Data
+  )
+{
+  //
+  // This function should never be executed.  If it does, then the architectural protocols
+  // have not been designed correctly.  The CpuBreakpoint () is commented out for now until the
+  // DXE Core and all the Architectural Protocols are complete.
+  //
+
+  return EFI_NOT_AVAILABLE_YET;
+}
+
+/**
+  Place holder function until all the Boot Services and Runtime Services are available.
+
+  @param  HighCount              Undefined
+
+  @return EFI_NOT_AVAILABLE_YET
+
+**/
+EFI_STATUS
+EFIAPI
+CoreEfiNotAvailableYetGetNextHighMonotonicCount (
+  OUT UINT32  *HighCount
+  )
+{
+  //
+  // This function should never be executed.  If it does, then the architectural protocols
+  // have not been designed correctly.  The CpuBreakpoint () is commented out for now until the
+  // DXE Core and all the Architectural Protocols are complete.
+  //
+
+  return EFI_NOT_AVAILABLE_YET;
+}
+
+/**
+  Place holder function until all the Boot Services and Runtime Services are available.
+
+  @param  ResetType              Undefined
+  @param  ResetStatus            Undefined
+  @param  DataSize               Undefined
+  @param  ResetData              Undefined
+
+  @return EFI_NOT_AVAILABLE_YET
+
+**/
+VOID
+EFIAPI
+CoreEfiNotAvailableYetResetSystem (
+  IN EFI_RESET_TYPE  ResetType,
+  IN EFI_STATUS      ResetStatus,
+  IN UINTN           DataSize,
+  IN VOID            *ResetData OPTIONAL
+  )
+{
+  //
+  // This function should never be executed.  If it does, then the architectural protocols
+  // have not been designed correctly.  The CpuBreakpoint () is commented out for now until the
+  // DXE Core and all the Architectural Protocols are complete.
+  //
+}
+
+/**
+  Place holder function until all the Boot Services and Runtime Services are available.
+
+  @param  CapsuleHeaderArray     Undefined
+  @param  CapsuleCount           Undefined
+  @param  ScatterGatherList      Undefined
+
+  @return EFI_NOT_AVAILABLE_YET
+
+**/
+EFI_STATUS
+EFIAPI
+CoreEfiNotAvailableYetUpdateCapsule (
+  IN EFI_CAPSULE_HEADER    **CapsuleHeaderArray,
+  IN UINTN                 CapsuleCount,
+  IN EFI_PHYSICAL_ADDRESS  ScatterGatherList   OPTIONAL
+  )
+{
+  //
+  // This function should never be executed.  If it does, then the architectural protocols
+  // have not been designed correctly.  The CpuBreakpoint () is commented out for now until the
+  // DXE Core and all the Architectural Protocols are complete.
+  //
+
+  return EFI_NOT_AVAILABLE_YET;
+}
+
+/**
+  Place holder function until all the Boot Services and Runtime Services are available.
+
+  @param  CapsuleHeaderArray     Undefined
+  @param  CapsuleCount           Undefined
+  @param  MaximumCapsuleSize     Undefined
+  @param  ResetType              Undefined
+
+  @return EFI_NOT_AVAILABLE_YET
+
+**/
+EFI_STATUS
+EFIAPI
+CoreEfiNotAvailableYetQueryCapsuleCapabilities (
+  IN  EFI_CAPSULE_HEADER  **CapsuleHeaderArray,
+  IN  UINTN               CapsuleCount,
+  OUT UINT64              *MaximumCapsuleSize,
+  OUT EFI_RESET_TYPE      *ResetType
+  )
+{
+  //
+  // This function should never be executed.  If it does, then the architectural protocols
+  // have not been designed correctly.  The CpuBreakpoint () is commented out for now until the
+  // DXE Core and all the Architectural Protocols are complete.
+  //
+
+  return EFI_NOT_AVAILABLE_YET;
+}
+
+/**
+  Place holder function until all the Boot Services and Runtime Services are available.
+
+  @param  Attributes                        Undefined
+  @param  MaximumVariableStorageSize        Undefined
+  @param  RemainingVariableStorageSize      Undefined
+  @param  MaximumVariableSize               Undefined
+
+  @return EFI_NOT_AVAILABLE_YET
+
+**/
+EFI_STATUS
+EFIAPI
+CoreEfiNotAvailableYetQueryVariableInfo (
+  IN  UINT32  Attributes,
+  OUT UINT64  *MaximumVariableStorageSize,
+  OUT UINT64  *RemainingVariableStorageSize,
+  OUT UINT64  *MaximumVariableSize
   )
 {
   //
