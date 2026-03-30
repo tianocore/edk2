@@ -26,7 +26,7 @@
 
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 
-  @param  Buffer    Memory to set.
+  @param  Buffer    The memory to set.
   @param  Length    The number of bytes to set.
   @param  Value     The value with which to fill Length bytes of Buffer.
 

@@ -31,8 +31,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   If Length is greater than (MAX_ADDRESS - DestinationBuffer + 1), then ASSERT().
   If Length is greater than (MAX_ADDRESS - SourceBuffer + 1), then ASSERT().
 
-  @param  DestinationBuffer A pointer to the destination buffer to compare.
-  @param  SourceBuffer      A pointer to the source buffer to compare.
+  @param  DestinationBuffer The pointer to the destination buffer to compare.
+  @param  SourceBuffer      The pointer to the source buffer to compare.
   @param  Length            The number of bytes to compare.
 
   @return 0                 All Length bytes of the two buffers are identical.

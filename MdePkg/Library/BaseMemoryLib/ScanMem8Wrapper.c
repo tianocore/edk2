@@ -35,7 +35,7 @@
   @param  Length      The number of bytes in Buffer to scan.
   @param  Value       The value to search for in the target buffer.
 
-  @return A pointer to the matching byte in the target buffer, or NULL otherwise.
+  @return A pointer to the matching byte in the target buffer or NULL otherwise.
 
 **/
 VOID *
@@ -74,7 +74,7 @@ ScanMem8 (
   @param  Length      The number of bytes in Buffer to scan.
   @param  Value       The value to search for in the target buffer.
 
-  @return A pointer to the matching byte in the target buffer, or NULL otherwise.
+  @return A pointer to the matching byte in the target buffer or NULL otherwise.
 
 **/
 VOID *

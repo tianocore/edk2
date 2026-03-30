@@ -72,8 +72,7 @@ ScanMem8 (
 
   @param  Buffer      The pointer to the target buffer to scan.
   @param  Length      The number of bytes in Buffer to scan.
-  @param  Value
-The value to search for in the target buffer.
+  @param  Value       The value to search for in the target buffer.
 
   @return A pointer to the matching byte in the target buffer or NULL otherwise.
 
