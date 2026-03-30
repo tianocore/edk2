@@ -186,11 +186,18 @@ InitEbcVmTestProtocol (
   @return EFI_UNSUPPORTED  This function always return EFI_UNSUPPORTED status.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 EbcVmTestUnsupported (
-  VOID
-  );
+  IN EFI_EBC_VM_TEST_PROTOCOL  *This,
+  IN CHAR16                    *AsmText,
+  IN OUT INT8                  *Buffer,
+  IN OUT UINTN                 *BufferLen
+  )
+{
+  return EFI_UNSUPPORTED;
+}
 
 /**
   Registers a callback function that the EBC interpreter calls to flush the
@@ -375,6 +382,27 @@ EbcIsImageSupported (
 }
 
 /**
+  This is a wrapper for the Flush callback routine needed for type compatibility.
+
+  @param  Start  The beginning physical address to flush from the processor's instruction cache.
+  @param  Length The number of bytes to flush from the processor's instruction cache.
+
+  @retval EFI_SUCCESS            The function completed successfully.
+
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+EbcInvalidateInstructionCache (
+  IN EFI_PHYSICAL_ADDRESS  Start,
+  IN UINT64                Length
+  )
+{
+  InvalidateInstructionCacheRange ((VOID *)(UINTN)Start, (UINTN)Length);
+  return EFI_SUCCESS;
+}
+
+/**
   Register a supported PE/COFF image with the emulator. After this call
   completes successfully, the PE/COFF image may be started as usual, and
   it is the responsibility of the emulator implementation that any branch
@@ -428,7 +456,7 @@ EbcRegisterImage (
 
   EbcRegisterICacheFlush (
     NULL,
-    (EBC_ICACHE_FLUSH)InvalidateInstructionCacheRange
+    EbcInvalidateInstructionCache
     );
 
   return EbcCreateThunk (
@@ -1510,8 +1538,8 @@ InitEbcVmTestProtocol (
   EbcVmTestProtocol->Execute = (EBC_VM_TEST_EXECUTE)EbcExecuteInstructions;
 
   DEBUG_CODE_BEGIN ();
-  EbcVmTestProtocol->Assemble    = (EBC_VM_TEST_ASM)EbcVmTestUnsupported;
-  EbcVmTestProtocol->Disassemble = (EBC_VM_TEST_DASM)EbcVmTestUnsupported;
+  EbcVmTestProtocol->Assemble    = EbcVmTestUnsupported;
+  EbcVmTestProtocol->Disassemble = EbcVmTestUnsupported;
   DEBUG_CODE_END ();
 
   //
@@ -1524,21 +1552,6 @@ InitEbcVmTestProtocol (
   }
 
   return Status;
-}
-
-/**
-  Returns the EFI_UNSUPPORTED Status.
-
-  @return EFI_UNSUPPORTED  This function always return EFI_UNSUPPORTED status.
-
-**/
-EFI_STATUS
-EFIAPI
-EbcVmTestUnsupported (
-  VOID
-  )
-{
-  return EFI_UNSUPPORTED;
 }
 
 /**
