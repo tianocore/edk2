@@ -34,11 +34,13 @@ typedef struct {
 // Entry in an array that keeps track of memory type statistics per memory bin
 //
 typedef struct {
-  EFI_PHYSICAL_ADDRESS    BaseAddress;
-  EFI_PHYSICAL_ADDRESS    MaximumAddress;
-  UINT64                  CurrentNumberOfPages;
-  UINT64                  NumberOfPages;
-  UINTN                   InformationIndex;
-  BOOLEAN                 Special;
-  BOOLEAN                 Runtime;
+  EFI_PHYSICAL_ADDRESS    BaseAddress;          ///< The base address of the memory bin.
+  EFI_PHYSICAL_ADDRESS    MaximumAddress;       ///< The maximum address of the memory bin.
+  UINT64                  CurrentNumberOfPages; ///< The current number of pages allocated.
+  UINT64                  NumberOfPages;        ///< The total number of pages in the bin.
+  UINTN                   InformationIndex;     ///< The index into the EFI_MEMORY_TYPE_INFORMATION array.
+  BOOLEAN                 Special;              ///< Indicates if this memory type persists into the OS runtime.
+  BOOLEAN                 Runtime;              ///< Indicates if this memory type should have the EFI_MEMORY_RUNTIME
+                                                ///< attribute applied in the EFI_MEMORY_MAP.
+  BOOLEAN                 DefaultBin;           ///< Indicates if this memory type is the default bin.
 } EFI_MEMORY_TYPE_STATISTICS;
