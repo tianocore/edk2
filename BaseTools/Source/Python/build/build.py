@@ -206,6 +206,32 @@ class MakeSubProc(Popen):
     def __init__(self,*args, **argv):
         super(MakeSubProc,self).__init__(*args, **argv)
         self.ProcOut = []
+        
+def SourceFileRelativePath(Line, NameSakeSourceFileMap, OccurenceIndex, SourceFileMap):
+    Stripped = Line.strip()
+    if Stripped in NameSakeSourceFileMap:
+        Index = OccurenceIndex[Stripped]
+        if Index < len(NameSakeSourceFileMap[Stripped]):
+            OccurenceIndex[Stripped] += 1
+            FullPath = NameSakeSourceFileMap[Stripped][Index]
+            SourceFileMap[FullPath] = FullPath
+            return FullPath
+    return Line
+
+def ExpandNmakeSourcePaths(ProcOut, iau):
+    if not iau.HasNamesakeSourceFile:
+        return ProcOut
+    BaseNamePath = defaultdict(list)
+    for item in iau.module_autogen.SourceFileList:
+        Basename = os.path.basename(item.File)
+        BaseNamePath[Basename].append(item.Path)
+    NameSakeSourceFileMap = {b: Paths for b, Paths in BaseNamePath.items() if len(Paths) > 1}
+    if not NameSakeSourceFileMap:
+        return ProcOut
+    SourceFileMap = iau.SourceFileList
+    OccurenceIndex = defaultdict(int)
+    Result = [SourceFileRelativePath(line, NameSakeSourceFileMap, OccurenceIndex, SourceFileMap)for line in ProcOut]
+    return Result
 
 ## Launch an external program
 #
@@ -279,7 +305,8 @@ def LaunchCommand(Command, WorkingDir,ModuleAuto = None):
     if ModuleAuto:
         iau = IncludesAutoGen(WorkingDir,ModuleAuto)
         if ModuleAuto.ToolChainFamily == TAB_COMPILER_MSFT:
-            iau.CreateDepsFileForMsvc(Proc.ProcOut)
+            DepList=ExpandNmakeSourcePaths(Proc.ProcOut, iau)
+            iau.CreateDepsFileForMsvc(DepList)
         else:
             iau.UpdateDepsFileforNonMsvc()
         iau.UpdateDepsFileforTrim()
