@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2019 - 2020, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2020, ARM Limited. All rights reserved.<BR>
+# Copyright (c) 2026, American Megatrends International LLC. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 from Common.caching import cached_property
@@ -11,6 +12,7 @@ import Common.LongFilePathOs as os
 from Common.BuildToolError import *
 from Common.Misc import SaveFileOnChange, PathClass
 from Common.Misc import TemplateString
+from collections import deque
 import sys
 gIsFileMap = {}
 
@@ -191,12 +193,28 @@ ${END}
             return
         ModuleDepDict = {}
         current_source = ""
+        current_source_abs = ""
         SourceFileAbsPathMap = self.SourceFileList
+        namesake_queue = {}
+        cc_cmd_in_output = False
+        if self.HasNamesakeSourceFile:
+            basename_to_paths = {}
+            for _, (_, input_file) in sorted(self.TargetFileList.items()):
+                basename = os.path.basename(input_file.File)
+                if not basename:
+                    continue
+                if basename not in basename_to_paths:
+                    basename_to_paths[basename] = []
+                basename_to_paths[basename].append(input_file.Path)
+            namesake_queue = {
+                k: deque(v) for k, v in basename_to_paths.items() if len(v) > 1
+            }
         for line in DepList:
             line = line.strip()
             if self.HasNamesakeSourceFile:
                 for cc_cmd in self.CcPPCommandPathSet:
                     if cc_cmd in line:
+                        cc_cmd_in_output = True
                         if '''"'''+cc_cmd+'''"''' in line:
                             cc_options = line[len(cc_cmd)+2:].split()
                         else:
@@ -214,13 +232,18 @@ ${END}
                         # SourceFileAbsPathMap = {os.path.basename(item):item for item in cc_options if not item.startswith("/") and os.path.exists(item)}
             if line in SourceFileAbsPathMap:
                 current_source = line
-                if current_source not in ModuleDepDict:
-                    ModuleDepDict[SourceFileAbsPathMap[current_source]] = []
+                if (self.HasNamesakeSourceFile and not cc_cmd_in_output
+                        and line in namesake_queue and namesake_queue[line]):
+                    current_source_abs = namesake_queue[line].popleft()
+                else:
+                    current_source_abs = SourceFileAbsPathMap[current_source]
+                if current_source_abs not in ModuleDepDict:
+                    ModuleDepDict[current_source_abs] = []
             elif "Note: including file:" ==  line.lstrip()[:21]:
                 if not current_source:
                     EdkLogger.error("build",BUILD_ERROR, "Parse /showIncludes output failed. line: %s. \n" % line, RaiseError=False)
                 else:
-                    ModuleDepDict[SourceFileAbsPathMap[current_source]].append(line.lstrip()[22:].strip())
+                    ModuleDepDict[current_source_abs].append(line.lstrip()[22:].strip())
 
         for source_abs in ModuleDepDict:
             if ModuleDepDict[source_abs]:
