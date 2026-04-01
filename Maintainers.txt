@@ -242,7 +242,6 @@ R: Wei6 Xu <wei6.xu@intel.com> [xuweiintel]
 IntelFsp2Pkg
 F: IntelFsp2Pkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/intel_fsp2_pkg.html
-M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
@@ -252,7 +251,6 @@ R: Ashraf Ali S <ashraf.ali.s@intel.com> [AshrafAliS]
 IntelFsp2WrapperPkg
 F: IntelFsp2WrapperPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/intel_fsp2_wrapper_pkg.html
-M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 R: Ted Kuo <ted.kuo@intel.com> [tedkuo1]
@@ -449,7 +447,6 @@ F: MdePkg/Include/Library/FdtLib.h
 M: Benny Lin <benny.lin@intel.com> [Benny3345678]
 M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
-R: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 R: James Lu <james.lu@intel.com> [jameslu8]
 
 MdePkg: Manageability industryStandard standard C header files
@@ -702,7 +699,6 @@ M: Sean Rhodes <sean@starlabs.systems> [Sean-StarLabs]
 M: James Lu <james.lu@intel.com> [jameslu8]
 M: Benjamin Doron <benjamin.doron@9elements.com> [benjamindoron]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
-M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 R: Shuo Liu <shuo.liu@intel.com> [shuoliu0]
 S: Maintained
 
