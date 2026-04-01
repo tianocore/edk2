@@ -232,6 +232,8 @@ EfiBootManagerSortLoadOptionVariable (
   The function consider two load options are equal when the
   OptionType, Attributes, Description, FilePath and OptionalData are equal.
 
+  If PcdFindLoadOptionIgnoreDescription is TRUE, then Description is not compared.
+
   @param Key    Pointer to the load option to be found.
   @param Array  Pointer to the array of load options to be found.
   @param Count  Number of entries in the Array.
