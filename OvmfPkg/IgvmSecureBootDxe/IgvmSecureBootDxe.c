@@ -116,35 +116,6 @@ IgvmSecureBootSetVariable (
   return Status;
 }
 
-EFI_STATUS
-EFIAPI
-IgvmSecureBootCustomMode (
-  UINT8  Value
-  )
-{
-  EFI_STATUS  Status;
-
-  Status = gRT->SetVariable (
-                  EFI_CUSTOM_MODE_NAME,
-                  &gEfiCustomModeEnableGuid,
-                  (EFI_VARIABLE_NON_VOLATILE |
-                   EFI_VARIABLE_BOOTSERVICE_ACCESS),
-                  sizeof (Value),
-                  &Value
-                  );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: %a CustomMode: %r\n",
-      __func__,
-      Value ? "enable" : "disable",
-      Status
-      ));
-  }
-
-  return Status;
-}
-
 BOOLEAN
 EFIAPI
 IgvmSecureBootIsConfigured (
@@ -207,6 +178,11 @@ IgvmSecureBootDxeEntrypoint (
     return EFI_UNSUPPORTED;
   }
 
+  if (FeaturePcdGet (PcdRequireSelfSignedPk) != FALSE) {
+    DEBUG ((DEBUG_ERROR, "%a: ERROR: this driver requires PcdRequireSelfSignedPk=FALSE.\n", __func__));
+    return EFI_UNSUPPORTED;
+  }
+
   if (IgvmSecureBootIsConfigured ()) {
     DEBUG ((DEBUG_ERROR, "%a: secure boot is already configured.\n", __func__));
     return EFI_ALREADY_STARTED;
@@ -232,24 +208,9 @@ IgvmSecureBootDxeEntrypoint (
     return Status;
   }
 
-  if (FeaturePcdGet (PcdRequireSelfSignedPk)) {
-    // CustomMode allows setting a platform key (PK) which is not self-signed
-    Status = IgvmSecureBootCustomMode (TRUE);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-  }
-
   Status = IgvmSecureBootSetVariable (L"PK", &gEfiGlobalVariableGuid, mPK);
   if (EFI_ERROR (Status)) {
     return Status;
-  }
-
-  if (FeaturePcdGet (PcdRequireSelfSignedPk)) {
-    Status = IgvmSecureBootCustomMode (FALSE);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
   }
 
   DEBUG ((DEBUG_INFO, "%a: secure boot setup complete\n", __func__));
