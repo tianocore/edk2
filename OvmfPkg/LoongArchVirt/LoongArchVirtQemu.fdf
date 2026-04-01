@@ -207,6 +207,10 @@ INF  OvmfPkg/VirtioFsDxe/VirtioFsDxe.inf
 #
 INF ShellPkg/Application/Shell/Shell.inf
 
+INF MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTablePei/FirmwarePerformancePei.inf
+INF MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
+INF ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf
+
 #####################################################################################################
 [FV.FVMAIN_COMPACT]
 FvNameGuid         = af8c3fe8-9ce8-4548-884a-e3f4dd91f040
