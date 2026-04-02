@@ -11,6 +11,28 @@
 #include <Library/ShellLib.h>
 #include <Protocol/SerialIo.h>
 
+//
+// Name translation for the Parity Bit
+//
+STATIC CONST CHAR8  ParityBitName[] = {
+  [DefaultParity] = 'D',
+  [NoParity]      = 'N',
+  [EvenParity]    = 'E',
+  [OddParity]     = 'O',
+  [MarkParity]    = 'M',
+  [SpaceParity]   = 'S',
+};
+
+//
+// Name translation for the Stop Bits
+//
+STATIC CONST CHAR16  *StopBitsName[] = {
+  [DefaultStopBits] =  L"Default",
+  [OneStopBit]      =  L"1",
+  [OneFiveStopBits] =  L"1.5",
+  [TwoStopBits]     =  L"2",
+};
+
 /**
   Display information about a serial device by it's handle.
 
@@ -33,12 +55,11 @@ DisplaySettings (
   EFI_HANDLE              *Handles;
   EFI_STATUS              Status;
   UINTN                   Index;
-  CHAR16                  *StopBits;
+  CONST CHAR16            *StopBits;
   CHAR16                  Parity;
   SHELL_STATUS            ShellStatus;
 
-  Handles  = NULL;
-  StopBits = NULL;
+  Handles = NULL;
 
   ShellStatus = SHELL_SUCCESS;
 
@@ -57,66 +78,20 @@ DisplaySettings (
 
     Status = gBS->HandleProtocol (Handles[Index], &gEfiSerialIoProtocolGuid, (VOID **)&SerialIo);
     if (!EFI_ERROR (Status)) {
-      switch (SerialIo->Mode->Parity) {
-        case DefaultParity:
-
-          Parity = 'D';
-          break;
-
-        case NoParity:
-
-          Parity = 'N';
-          break;
-
-        case EvenParity:
-
-          Parity = 'E';
-          break;
-
-        case OddParity:
-
-          Parity = 'O';
-          break;
-
-        case MarkParity:
-
-          Parity = 'M';
-          break;
-
-        case SpaceParity:
-
-          Parity = 'S';
-          break;
-
-        default:
-
-          Parity = 'U';
+      if ((SerialIo->Mode->Parity >= DefaultParity) &&
+          (SerialIo->Mode->Parity <= SpaceParity))
+      {
+        Parity = ParityBitName[SerialIo->Mode->Parity];
+      } else {
+        Parity = 'U';
       }
 
-      switch (SerialIo->Mode->StopBits) {
-        case DefaultStopBits:
-
-          StopBits = L"Default";
-          break;
-
-        case OneStopBit:
-
-          StopBits = L"1";
-          break;
-
-        case TwoStopBits:
-
-          StopBits = L"2";
-          break;
-
-        case OneFiveStopBits:
-
-          StopBits = L"1.5";
-          break;
-
-        default:
-
-          StopBits = L"Unknown";
+      if ((SerialIo->Mode->StopBits >= DefaultStopBits) &&
+          (SerialIo->Mode->StopBits <= TwoStopBits))
+      {
+        StopBits = StopBitsName[SerialIo->Mode->StopBits];
+      } else {
+        StopBits = L"Unknown";
       }
 
       ShellPrintHiiDefaultEx (
