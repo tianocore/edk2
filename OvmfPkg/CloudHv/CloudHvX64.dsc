@@ -485,7 +485,7 @@
 !endif
 !if $(SECURE_BOOT_ENABLE) == TRUE
   gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdRequireSelfSignedPk|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRequireSelfSignedPk|FALSE
 !endif
 
 [PcdsFixedAtBuild]
