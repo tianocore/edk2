@@ -89,7 +89,7 @@ DisplaySettings (
       Parity = 'U';
     }
 
-    if (SerialIo->Mode->StopBits >= DefaultStopBits) {
+    if (SerialIo->Mode->StopBits <= TwoStopBits) {
       StopBits = StopBitsName[SerialIo->Mode->StopBits];
     } else {
       StopBits = L"Unknown";
@@ -179,6 +179,51 @@ GetParityType (
 }
 
 /**
+  Get the Stop Bits.
+
+  @param[in]  StopBitsInt   Stop Bits integer.
+  @param[out] StopBitsType  If success, contains the converted StopBits type.
+
+  @retval SHELL_INVALID_PARAMETER   A parameter was invalid.
+  @retval SHELL_SUCCESS             The operation was successful.
+**/
+STATIC
+EFI_STATUS
+GetStopBits (
+  IN  UINTN               StopBitsInt,
+  OUT EFI_STOP_BITS_TYPE  *StopBitsType
+  )
+{
+  EFI_STATUS          Status;
+  EFI_STOP_BITS_TYPE  StopBits;
+
+  ASSERT (StopBitsType != NULL);
+  Status = EFI_SUCCESS;
+
+  switch (StopBitsInt) {
+    case 0:
+      StopBits = DefaultStopBits;
+      break;
+    case 1:
+      StopBits = OneStopBit;
+      break;
+    case 2:
+      StopBits = TwoStopBits;
+      break;
+    case 15:
+      StopBits = OneFiveStopBits;
+      break;
+    default:
+      StopBits = DefaultStopBits;
+      Status   = EFI_INVALID_PARAMETER;
+      break;
+  }
+
+  *StopBitsType = StopBits;
+  return Status;
+}
+
+/**
   Function for 'sermode' command.
 
   @param[in] ImageHandle  Handle to the Image (NULL if Internal).
@@ -201,7 +246,6 @@ ShellCommandRunSerMode (
   UINTN                   HandleIdx;
   UINTN                   BaudRate;
   UINTN                   DataBits;
-  UINTN                   Value;
   EFI_SERIAL_IO_PROTOCOL  *SerialIo;
   LIST_ENTRY              *Package;
   CHAR16                  *ProblemParam;
@@ -296,28 +340,11 @@ ShellCommandRunSerMode (
         goto Done;
       }
 
-      Value = ShellStrToUintn (Temp);
-      switch (Value) {
-        case 0:
-          StopBits = DefaultStopBits;
-          break;
-
-        case 1:
-          StopBits = OneStopBit;
-          break;
-
-        case 2:
-          StopBits = TwoStopBits;
-          break;
-
-        case 15:
-          StopBits = OneFiveStopBits;
-          break;
-
-        default:
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-          goto Done;
+      Status = GetStopBits (ShellStrToUintn (Temp), &StopBits);
+      if (EFI_ERROR (Status)) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Done;
       }
 
       Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiSerialIoProtocolGuid, NULL, &NoHandles, &Handles);
