@@ -224,6 +224,22 @@ GetStopBits (
 }
 
 /**
+  Check whether the Data Bits are valid.
+
+  @param[in] DataBitsInt  Data Bits integer.
+
+  @return TRUE if the Data Bits are valid.
+**/
+STATIC
+BOOLEAN
+ValidDataBits (
+  IN  UINTN  DataBits
+  )
+{
+  return (DataBits == 4) || (DataBits == 7) || (DataBits == 8);
+}
+
+/**
   Function for 'sermode' command.
 
   @param[in] ImageHandle  Handle to the Image (NULL if Internal).
@@ -322,15 +338,10 @@ ShellCommandRunSerMode (
         DataBits = 0;
       }
 
-      switch (DataBits) {
-        case 4:
-        case 7:
-        case 8:
-          break;
-        default:
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
-          ShellStatus = SHELL_INVALID_PARAMETER;
-          goto Done;
+      if (!ValidDataBits (DataBits)) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Done;
       }
 
       Temp = ShellCommandLineGetRawValue (Package, 5);
