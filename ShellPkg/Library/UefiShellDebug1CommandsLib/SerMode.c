@@ -77,38 +77,34 @@ DisplaySettings (
     }
 
     Status = gBS->HandleProtocol (Handles[Index], &gEfiSerialIoProtocolGuid, (VOID **)&SerialIo);
-    if (!EFI_ERROR (Status)) {
-      if ((SerialIo->Mode->Parity >= DefaultParity) &&
-          (SerialIo->Mode->Parity <= SpaceParity))
-      {
-        Parity = ParityBitName[SerialIo->Mode->Parity];
-      } else {
-        Parity = 'U';
-      }
-
-      if ((SerialIo->Mode->StopBits >= DefaultStopBits) &&
-          (SerialIo->Mode->StopBits <= TwoStopBits))
-      {
-        StopBits = StopBitsName[SerialIo->Mode->StopBits];
-      } else {
-        StopBits = L"Unknown";
-      }
-
-      ShellPrintHiiDefaultEx (
-        STRING_TOKEN (STR_SERMODE_DISPLAY),
-        gShellDebug1HiiHandle,
-        ConvertHandleToHandleIndex (Handles[Index]),
-        Handles[Index],
-        SerialIo->Mode->BaudRate,
-        Parity,
-        SerialIo->Mode->DataBits,
-        StopBits
-        );
-    } else {
+    if (EFI_ERROR (Status)) {
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_SERMODE_NO_FOUND), gShellDebug1HiiHandle, L"sermode");
       ShellStatus = SHELL_NOT_FOUND;
       break;
     }
+
+    if (SerialIo->Mode->Parity <= SpaceParity) {
+      Parity = ParityBitName[SerialIo->Mode->Parity];
+    } else {
+      Parity = 'U';
+    }
+
+    if (SerialIo->Mode->StopBits >= DefaultStopBits) {
+      StopBits = StopBitsName[SerialIo->Mode->StopBits];
+    } else {
+      StopBits = L"Unknown";
+    }
+
+    ShellPrintHiiDefaultEx (
+      STRING_TOKEN (STR_SERMODE_DISPLAY),
+      gShellDebug1HiiHandle,
+      ConvertHandleToHandleIndex (Handles[Index]),
+      Handles[Index],
+      SerialIo->Mode->BaudRate,
+      Parity,
+      SerialIo->Mode->DataBits,
+      StopBits
+      );
 
     if (HandleValid) {
       break;
