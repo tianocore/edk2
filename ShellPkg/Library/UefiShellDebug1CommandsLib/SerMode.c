@@ -126,6 +126,63 @@ DisplaySettings (
 }
 
 /**
+  Get the Parity Type.
+
+  @param[in]  ParityChar  Parity Type character.
+  @param[out] ParityType  If success, contains the converted Parity type.
+
+  @retval SHELL_INVALID_PARAMETER   A parameter was invalid.
+  @retval SHELL_SUCCESS             The operation was successful.
+**/
+STATIC
+EFI_STATUS
+GetParityType (
+  IN  CHAR16           ParityChar,
+  OUT EFI_PARITY_TYPE  *ParityType
+  )
+{
+  EFI_STATUS       Status;
+  EFI_PARITY_TYPE  Parity;
+
+  ASSERT (ParityType != NULL);
+  Status = EFI_SUCCESS;
+
+  switch (ParityChar) {
+    case 'd':
+    case 'D':
+      Parity = DefaultParity;
+      break;
+    case 'n':
+    case 'N':
+      Parity = NoParity;
+      break;
+    case 'e':
+    case 'E':
+      Parity = EvenParity;
+      break;
+    case 'o':
+    case 'O':
+      Parity = OddParity;
+      break;
+    case 'm':
+    case 'M':
+      Parity = MarkParity;
+      break;
+    case 's':
+    case 'S':
+      Parity = SpaceParity;
+      break;
+    default:
+      Parity = DefaultParity;
+      Status = EFI_INVALID_PARAMETER;
+      break;
+  }
+
+  *ParityType = Parity;
+  return Status;
+}
+
+/**
   Function for 'sermode' command.
 
   @param[in] ImageHandle  Handle to the Image (NULL if Internal).
@@ -207,35 +264,11 @@ ShellCommandRunSerMode (
         ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
-        switch (Temp[0]) {
-          case 'd':
-          case 'D':
-            Parity = DefaultParity;
-            break;
-          case 'n':
-          case 'N':
-            Parity = NoParity;
-            break;
-          case 'e':
-          case 'E':
-            Parity = EvenParity;
-            break;
-          case 'o':
-          case 'O':
-            Parity = OddParity;
-            break;
-          case 'm':
-          case 'M':
-            Parity = MarkParity;
-            break;
-          case 's':
-          case 'S':
-            Parity = SpaceParity;
-            break;
-          default:
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
-            ShellStatus = SHELL_INVALID_PARAMETER;
-            goto Done;
+        Status = GetParityType (Temp[0], &Parity);
+        if (EFI_ERROR (Status)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode", Temp);
+          ShellStatus = SHELL_INVALID_PARAMETER;
+          goto Done;
         }
       }
 
