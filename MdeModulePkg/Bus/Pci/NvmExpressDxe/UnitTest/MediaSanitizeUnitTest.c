@@ -489,6 +489,52 @@ NvmeBlockIoWriteBlocksEx (
   return Status;
 }
 
+//
+// Global tracking variables for MediaClear WriteBlocks coverage tests
+//
+STATIC EFI_LBA  mMaxLbaWritten;
+STATIC UINT64   mWriteCallCount;
+STATIC UINTN    mLastBufferSize;
+
+/**
+  Tracking WriteBlocks mock that records LBA, BufferSize, and call count
+  but always returns EFI_SUCCESS. Used to verify MediaClear loop coverage.
+
+  @param[in]     This        BlockIo Protocol.
+  @param[in]     MediaId     Id of the media.
+  @param[in]     Lba         Logical Block Address.
+  @param[in]     BufferSize  Size of Buffer.
+  @param[in]     Buffer      Actual buffer to use to write.
+
+ **/
+EFI_STATUS
+EFIAPI
+NvmeBlockIoWriteBlocksTracking (
+  IN  EFI_BLOCK_IO_PROTOCOL  *This,
+  IN  UINT32                 MediaId,
+  IN  EFI_LBA                Lba,
+  IN  UINTN                  BufferSize,
+  IN  VOID                   *Buffer
+  )
+{
+  if ((This == NULL) || (Buffer == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (MediaId != This->Media->MediaId) {
+    return EFI_MEDIA_CHANGED;
+  }
+
+  mWriteCallCount++;
+  mLastBufferSize = BufferSize;
+
+  if (Lba > mMaxLbaWritten) {
+    mMaxLbaWritten = Lba;
+  }
+
+  return EFI_SUCCESS;
+}
+
 /**
   MediaSanitizePurgeUnitTest to initialize a Private Namespace instance.
 
@@ -664,6 +710,132 @@ MediaSanitizePurgeUnitTest (
              );
 
   UT_ASSERT_NOT_EFI_ERROR (Status);
+
+  UnitTestStatus = NvmeDestroyDeviceInstance (&NvmeDevice);
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  MediaClearBufferSizeUnitTest to verify successful case.
+
+  @param[in]  Context  Unit test case context
+ **/
+UNIT_TEST_STATUS
+EFIAPI
+MediaClearBufferSizeUnitTest (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  NVME_DEVICE_PRIVATE_DATA  *NvmeDevice;
+  UNIT_TEST_STATUS          UnitTestStatus;
+  EFI_STATUS                Status;
+  UINT8                     OverwriteBuffer[512];
+
+  NvmeDevice     = NULL;
+  UnitTestStatus = NvmeCreateDeviceInstance (&NvmeDevice);
+
+  UT_ASSERT_STATUS_EQUAL (UnitTestStatus, UNIT_TEST_PASSED);
+  UT_ASSERT_NOT_NULL (NvmeDevice);
+
+  //
+  // Use small LastBlock to keep test fast.
+  // Use the tracking WriteBlocks mock to validate BufferSize alignment.
+  //
+  NvmeDevice->Media.LastBlock     = 3;
+  NvmeDevice->BlockIo.WriteBlocks = NvmeBlockIoWriteBlocksTracking;
+
+  //
+  // Reset tracking state
+  //
+  mMaxLbaWritten  = 0;
+  mWriteCallCount = 0;
+  mLastBufferSize = 0;
+
+  SetMem (OverwriteBuffer, sizeof (OverwriteBuffer), 0xAA);
+
+  //
+  // Call MediaClear
+  //
+  Status = NvmExpressMediaClear (
+             &NvmeDevice->MediaSanitize,
+             NvmeDevice->Media.MediaId,
+             1,
+             OverwriteBuffer
+             );
+
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+
+  //
+  // Verify buffer size is equal to BlockSize
+  //
+  UT_ASSERT_EQUAL (mLastBufferSize, NvmeDevice->Media.BlockSize);
+
+  UnitTestStatus = NvmeDestroyDeviceInstance (&NvmeDevice);
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  MediaClearLastBlockUnitTest to verify all blocks including LastBlock are written.
+
+  Uses a tracking WriteBlocks mock to record the maximum LBA written and total
+  call count.
+
+  @param[in]  Context  Unit test case context
+ **/
+UNIT_TEST_STATUS
+EFIAPI
+MediaClearLastBlockUnitTest (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  NVME_DEVICE_PRIVATE_DATA  *NvmeDevice;
+  UNIT_TEST_STATUS          UnitTestStatus;
+  EFI_STATUS                Status;
+  UINT8                     OverwriteBuffer[512];
+  EFI_LBA                   ExpectedLastBlock;
+
+  NvmeDevice     = NULL;
+  UnitTestStatus = NvmeCreateDeviceInstance (&NvmeDevice);
+
+  UT_ASSERT_STATUS_EQUAL (UnitTestStatus, UNIT_TEST_PASSED);
+  UT_ASSERT_NOT_NULL (NvmeDevice);
+
+  //
+  // Use small LastBlock and swap in the tracking WriteBlocks mock
+  //
+  ExpectedLastBlock               = 7;
+  NvmeDevice->Media.LastBlock     = ExpectedLastBlock;
+  NvmeDevice->BlockIo.WriteBlocks = NvmeBlockIoWriteBlocksTracking;
+
+  //
+  // Reset tracking state
+  //
+  mMaxLbaWritten  = 0;
+  mWriteCallCount = 0;
+  mLastBufferSize = 0;
+
+  SetMem (OverwriteBuffer, sizeof (OverwriteBuffer), 0xBB);
+
+  Status = NvmExpressMediaClear (
+             &NvmeDevice->MediaSanitize,
+             NvmeDevice->Media.MediaId,
+             1,
+             OverwriteBuffer
+             );
+
+  UT_ASSERT_NOT_EFI_ERROR (Status);
+
+  //
+  // Make sure the maximum LBA written is equal to the Media's LastBlock
+  //
+  UT_ASSERT_EQUAL (mMaxLbaWritten, ExpectedLastBlock);
+
+  //
+  // Verify correct number of WriteBlocks calls: (LastBlock + 1) sectors * 1 pass
+  //
+  UT_ASSERT_EQUAL (mWriteCallCount, (UINT64)(ExpectedLastBlock + 1));
 
   UnitTestStatus = NvmeDestroyDeviceInstance (&NvmeDevice);
 
@@ -1089,6 +1261,32 @@ MediaSanitizeUnitTestEntry (
     NULL,                                // (Optional) UNIT_TEST_PREREQUISITE()
     NULL,                                // (Optional) UNIT_TEST_CLEANUP()
     NULL                                 // (Optional) UNIT_TEST_CONTEXT
+    );
+
+  //
+  // Add test case for MediaClear BufferSize validation (Finding 5)
+  //
+  AddTestCase (
+    MediaSanitizeProtocolTestSuite,                     // Test Suite Handle
+    "MediaClear BufferSize Passed to WriteBlocks Test", // Test Description
+    "MediaClear",                                       // Test Class
+    MediaClearBufferSizeUnitTest,                       // UNIT_TEST_FUNCTION()
+    NULL,                                               // (Optional) UNIT_TEST_PREREQUISITE()
+    NULL,                                               // (Optional) UNIT_TEST_CLEANUP()
+    NULL                                                // (Optional) UNIT_TEST_CONTEXT
+    );
+
+  //
+  // Add test case for MediaClear last block coverage (Finding 6)
+  //
+  AddTestCase (
+    MediaSanitizeProtocolTestSuite,                    // Test Suite Handle
+    "MediaClear All Blocks Including LastBlock Test",  // Test Description
+    "MediaClear",                                      // Test Class
+    MediaClearLastBlockUnitTest,                       // UNIT_TEST_FUNCTION()
+    NULL,                                              // (Optional) UNIT_TEST_PREREQUISITE()
+    NULL,                                              // (Optional) UNIT_TEST_CLEANUP()
+    NULL                                               // (Optional) UNIT_TEST_CONTEXT
     );
 
   //
