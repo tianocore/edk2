@@ -851,8 +851,7 @@ ShellAppMain (
   PrintSettings (&Settings);
 
   if ((Settings.SetupMode != 0) || (Settings.SecureBoot != 1) ||
-      (Settings.SecureBootEnable != 1) || (Settings.CustomMode != 0) ||
-      (Settings.VendorKeys != 0))
+      (Settings.SecureBootEnable != 1) || (Settings.CustomMode != 0))
   {
     AsciiPrint ("error: unexpected\n");
     goto FreePkKek1;
