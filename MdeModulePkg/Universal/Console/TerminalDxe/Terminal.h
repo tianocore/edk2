@@ -241,7 +241,7 @@ TerminalConInReadKeyStroke (
 /**
   Check if the key already has been registered.
 
-  @param  RegsiteredData           A pointer to a buffer that is filled in with the
+  @param  RegisteredData           A pointer to a buffer that is filled in with the
                                    keystroke state data for the key that was
                                    registered.
   @param  InputData                A pointer to a buffer that is filled in with the
@@ -254,7 +254,7 @@ TerminalConInReadKeyStroke (
 **/
 BOOLEAN
 IsKeyRegistered (
-  IN EFI_KEY_DATA  *RegsiteredData,
+  IN EFI_KEY_DATA  *RegisteredData,
   IN EFI_KEY_DATA  *InputData
   );
 

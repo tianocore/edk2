@@ -149,9 +149,9 @@ TerminalConInReadKeyStroke (
 /**
   Check if the key already has been registered.
 
-  If both RegsiteredData and InputData is NULL, then ASSERT().
+  If both RegisteredData and InputData is NULL, then ASSERT().
 
-  @param  RegsiteredData           A pointer to a buffer that is filled in with the
+  @param  RegisteredData           A pointer to a buffer that is filled in with the
                                    keystroke state data for the key that was
                                    registered.
   @param  InputData                A pointer to a buffer that is filled in with the
@@ -164,27 +164,27 @@ TerminalConInReadKeyStroke (
 **/
 BOOLEAN
 IsKeyRegistered (
-  IN EFI_KEY_DATA  *RegsiteredData,
+  IN EFI_KEY_DATA  *RegisteredData,
   IN EFI_KEY_DATA  *InputData
   )
 {
   UINT32  ShiftState;
   UINT32  InputShiftState;
 
-  ASSERT (RegsiteredData != NULL && InputData != NULL);
+  ASSERT (RegisteredData != NULL && InputData != NULL);
 
-  if ((RegsiteredData->Key.ScanCode    != InputData->Key.ScanCode) ||
-      (RegsiteredData->Key.UnicodeChar != InputData->Key.UnicodeChar))
+  if ((RegisteredData->Key.ScanCode    != InputData->Key.ScanCode) ||
+      (RegisteredData->Key.UnicodeChar != InputData->Key.UnicodeChar))
   {
     return FALSE;
   }
 
   /* Do not take EFI_SHIFT_STATE_VALID flag into account when comparing shift states */
-  ShiftState      = RegsiteredData->KeyState.KeyShiftState | EFI_SHIFT_STATE_VALID;
+  ShiftState      = RegisteredData->KeyState.KeyShiftState | EFI_SHIFT_STATE_VALID;
   InputShiftState = InputData->KeyState.KeyShiftState | EFI_SHIFT_STATE_VALID;
 
   if ((ShiftState != InputShiftState) ||
-      (RegsiteredData->KeyState.KeyToggleState != InputData->KeyState.KeyToggleState))
+      (RegisteredData->KeyState.KeyToggleState != InputData->KeyState.KeyToggleState))
   {
     return FALSE;
   }
