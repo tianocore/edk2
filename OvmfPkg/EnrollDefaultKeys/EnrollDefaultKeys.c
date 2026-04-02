@@ -658,23 +658,25 @@ ShellAppMain (
   // checks on those variable writes.
   //
   if (Settings.CustomMode != CUSTOM_SECURE_BOOT_MODE) {
-    Settings.CustomMode = CUSTOM_SECURE_BOOT_MODE;
-    Status              = gRT->SetVariable (
-                                 EFI_CUSTOM_MODE_NAME,
-                                 &gEfiCustomModeEnableGuid,
-                                 (EFI_VARIABLE_NON_VOLATILE |
-                                  EFI_VARIABLE_BOOTSERVICE_ACCESS),
-                                 sizeof Settings.CustomMode,
-                                 &Settings.CustomMode
-                                 );
+    UINT8  CustomMode;
+    CustomMode = CUSTOM_SECURE_BOOT_MODE;
+    Status     = gRT->SetVariable (
+                        EFI_CUSTOM_MODE_NAME,
+                        &gEfiCustomModeEnableGuid,
+                        (EFI_VARIABLE_NON_VOLATILE |
+                         EFI_VARIABLE_BOOTSERVICE_ACCESS),
+                        sizeof CustomMode,
+                        &CustomMode
+                        );
     if (EFI_ERROR (Status)) {
       AsciiPrint (
-        "error: SetVariable(\"%s\", %g): %r\n",
+        "warning: SetVariable(\"%s\", %g): %r\n",
         EFI_CUSTOM_MODE_NAME,
         &gEfiCustomModeEnableGuid,
         Status
         );
-      goto FreePkKek1;
+    } else {
+      Settings.CustomMode = CustomMode;
     }
   }
 
@@ -790,22 +792,24 @@ ShellAppMain (
   // Leave Custom Mode, so that updates to PK, KEK, db, and dbx require valid
   // signatures.
   //
-  Settings.CustomMode = STANDARD_SECURE_BOOT_MODE;
-  Status              = gRT->SetVariable (
-                               EFI_CUSTOM_MODE_NAME,
-                               &gEfiCustomModeEnableGuid,
-                               EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                               sizeof Settings.CustomMode,
-                               &Settings.CustomMode
-                               );
-  if (EFI_ERROR (Status)) {
-    AsciiPrint (
-      "error: SetVariable(\"%s\", %g): %r\n",
-      EFI_CUSTOM_MODE_NAME,
-      &gEfiCustomModeEnableGuid,
-      Status
-      );
-    goto FreePkKek1;
+  if (Settings.CustomMode != STANDARD_SECURE_BOOT_MODE) {
+    Settings.CustomMode = STANDARD_SECURE_BOOT_MODE;
+    Status              = gRT->SetVariable (
+                                 EFI_CUSTOM_MODE_NAME,
+                                 &gEfiCustomModeEnableGuid,
+                                 EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                                 sizeof Settings.CustomMode,
+                                 &Settings.CustomMode
+                                 );
+    if (EFI_ERROR (Status)) {
+      AsciiPrint (
+        "error: SetVariable(\"%s\", %g): %r\n",
+        EFI_CUSTOM_MODE_NAME,
+        &gEfiCustomModeEnableGuid,
+        Status
+        );
+      goto FreePkKek1;
+    }
   }
 
   //
