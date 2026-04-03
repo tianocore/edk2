@@ -521,6 +521,154 @@ GetCorrectedPath (
 }
 
 /**
+  Print out the list of files and directories from the LS command at the current level.
+
+  @param[in] Attribs        List of required Attribute for display.
+                            If 0 then all non-system and non-hidden files will be printed.
+  @param[in] Sfo            TRUE to use Standard Format Output, FALSE otherwise
+  @param[in] RootPath       String with starting path to search in.
+  @param[in] SearchString   String with search string.
+  @param[in] Found          Set to TRUE, if anyone were found.
+  @param[in] Count          The count of bits enabled in Attribs.
+  @param[in] IsRecursive    TRUE if called from a recursion.
+
+  @retval SHELL_SUCCESS     the printing was successful.
+**/
+STATIC
+SHELL_STATUS
+PrintLsOutputCurr (
+  IN CONST UINT64   Attribs,
+  IN CONST BOOLEAN  Sfo,
+  IN CONST CHAR16   *RootPath,
+  IN CONST CHAR16   *SearchString,
+  IN       BOOLEAN  *Found,
+  IN CONST UINTN    Count,
+  IN       BOOLEAN  IsRecursive
+  )
+{
+  EFI_STATUS           Status;
+  EFI_SHELL_FILE_INFO  *ListHead;
+  EFI_SHELL_FILE_INFO  *Node;
+  SHELL_STATUS         ShellStatus;
+  UINT64               FileCount;
+  UINT64               DirCount;
+  UINT64               FileSize;
+  CHAR16               *CorrectedPath;
+  BOOLEAN              FoundOne;
+  BOOLEAN              HeaderPrinted;
+
+  ASSERT (Found != NULL);
+
+  HeaderPrinted = FALSE;
+  FileCount     = 0;
+  DirCount      = 0;
+  FileSize      = 0;
+  ListHead      = NULL;
+  ShellStatus   = SHELL_SUCCESS;
+  FoundOne      = FALSE;
+
+  ShellStatus = GetCorrectedPath (&CorrectedPath, RootPath, SearchString);
+  if (ShellStatus != SHELL_SUCCESS) {
+    return ShellStatus;
+  }
+
+  PathCleanUpDirectories (CorrectedPath);
+
+  Status = ShellOpenFileMetaArg ((CHAR16 *)CorrectedPath, EFI_FILE_MODE_READ, &ListHead);
+  if (!EFI_ERROR (Status)) {
+    if ((ListHead == NULL) || IsListEmpty (&ListHead->Link)) {
+      SHELL_FREE_NON_NULL (CorrectedPath);
+      return (SHELL_SUCCESS);
+    }
+
+    if (Sfo && !IsRecursive) {
+      PrintSfoVolumeInfoTableEntry (ListHead);
+    }
+
+    if (!Sfo) {
+      //
+      // Sort the file list by FileName, stably.
+      //
+      // If the call below fails, then the EFI_SHELL_FILE_INFO list anchored to
+      // ListHead will not be changed in any way.
+      //
+      ShellSortFileList (
+        &ListHead,
+        NULL,                       // Duplicates
+        ShellSortFileListByFileName
+        );
+    }
+
+    for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&ListHead->Link)
+          ; !IsNull (&ListHead->Link, &Node->Link)
+          ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&ListHead->Link, &Node->Link)
+          )
+    {
+      if (ShellGetExecutionBreakFlag ()) {
+        ShellStatus = SHELL_ABORTED;
+        break;
+      }
+
+      ASSERT (Node != NULL);
+
+      //
+      // Change the file time to local time.
+      //
+      UpdateFileLocalTime (Node);
+
+      ASSERT (Node->Info != NULL);
+      ASSERT ((Node->Info->Attribute & EFI_FILE_VALID_ATTR) == Node->Info->Attribute);
+      if (Attribs == 0) {
+        //
+        // NOT system & NOT hidden
+        //
+        if (  (Node->Info->Attribute & EFI_FILE_SYSTEM)
+           || (Node->Info->Attribute & EFI_FILE_HIDDEN)
+              )
+        {
+          continue;
+        }
+      } else if ((Attribs != EFI_FILE_VALID_ATTR) ||
+                 (Count == 5))
+      {
+        //
+        // Only matches the bits which "Attribs" contains, not
+        // all files/directories with any of the bits.
+        // Count == 5 is used to tell the difference between a user
+        // specifying all bits (EX: -arhsda) and just specifying
+        // -a (means display all files with any attribute).
+        //
+        if ((Node->Info->Attribute & Attribs) != Attribs) {
+          continue;
+        }
+      }
+
+      if (!Sfo && !HeaderPrinted) {
+        PathRemoveLastItem (CorrectedPath);
+        PrintNonSfoHeader (CorrectedPath);
+      }
+
+      PrintFileInformation (Sfo, Node, &FileCount, &FileSize, &DirCount);
+      FoundOne      = TRUE;
+      HeaderPrinted = TRUE;
+    }
+
+    if (!Sfo && (ShellStatus != SHELL_ABORTED) && HeaderPrinted) {
+      PrintNonSfoFooter (FileCount, FileSize, DirCount);
+    }
+
+    ShellCloseFileMetaArg (&ListHead);
+  }
+
+  if (FoundOne) {
+    *Found = FoundOne;
+  }
+
+  SHELL_FREE_NON_NULL (CorrectedPath);
+  return ShellStatus;
+}
+
+/**
   print out the list of files and directories from the LS command
 
   @param[in] Rec            TRUE to automatically recurse into each found directory
@@ -639,124 +787,23 @@ PrintLsOutput (
   IN CONST BOOLEAN  ListUnfiltered
   )
 {
-  EFI_STATUS           Status;
-  EFI_SHELL_FILE_INFO  *ListHead;
-  EFI_SHELL_FILE_INFO  *Node;
-  SHELL_STATUS         ShellStatus;
-  UINT64               FileCount;
-  UINT64               DirCount;
-  UINT64               FileSize;
-  CHAR16               *CorrectedPath;
-  BOOLEAN              FoundOne;
-  BOOLEAN              HeaderPrinted;
+  SHELL_STATUS  ShellStatus;
+  BOOLEAN       FoundOne;
+  BOOLEAN       IsRecursive;
 
-  HeaderPrinted = FALSE;
-  FileCount     = 0;
-  DirCount      = 0;
-  FileSize      = 0;
-  ListHead      = NULL;
-  ShellStatus   = SHELL_SUCCESS;
+  ShellStatus = SHELL_SUCCESS;
+  FoundOne    = FALSE;
+  IsRecursive = (Found != NULL);
 
-  if (Found != NULL) {
-    FoundOne = *Found;
-  } else {
-    FoundOne = FALSE;
-  }
-
-  ShellStatus = GetCorrectedPath (&CorrectedPath, RootPath, SearchString);
-  if (ShellStatus != SHELL_SUCCESS) {
-    return ShellStatus;
-  }
-
-  PathCleanUpDirectories (CorrectedPath);
-
-  Status = ShellOpenFileMetaArg ((CHAR16 *)CorrectedPath, EFI_FILE_MODE_READ, &ListHead);
-  if (!EFI_ERROR (Status)) {
-    if ((ListHead == NULL) || IsListEmpty (&ListHead->Link)) {
-      SHELL_FREE_NON_NULL (CorrectedPath);
-      return (SHELL_SUCCESS);
-    }
-
-    if (Sfo && (Found == NULL)) {
-      PrintSfoVolumeInfoTableEntry (ListHead);
-    }
-
-    if (!Sfo) {
-      //
-      // Sort the file list by FileName, stably.
-      //
-      // If the call below fails, then the EFI_SHELL_FILE_INFO list anchored to
-      // ListHead will not be changed in any way.
-      //
-      ShellSortFileList (
-        &ListHead,
-        NULL,                       // Duplicates
-        ShellSortFileListByFileName
-        );
-    }
-
-    for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&ListHead->Link)
-          ; !IsNull (&ListHead->Link, &Node->Link)
-          ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&ListHead->Link, &Node->Link)
-          )
-    {
-      if (ShellGetExecutionBreakFlag ()) {
-        ShellStatus = SHELL_ABORTED;
-        break;
-      }
-
-      ASSERT (Node != NULL);
-
-      //
-      // Change the file time to local time.
-      //
-      UpdateFileLocalTime (Node);
-
-      ASSERT (Node->Info != NULL);
-      ASSERT ((Node->Info->Attribute & EFI_FILE_VALID_ATTR) == Node->Info->Attribute);
-      if (Attribs == 0) {
-        //
-        // NOT system & NOT hidden
-        //
-        if (  (Node->Info->Attribute & EFI_FILE_SYSTEM)
-           || (Node->Info->Attribute & EFI_FILE_HIDDEN)
-              )
-        {
-          continue;
-        }
-      } else if ((Attribs != EFI_FILE_VALID_ATTR) ||
-                 (Count == 5))
-      {
-        //
-        // Only matches the bits which "Attribs" contains, not
-        // all files/directories with any of the bits.
-        // Count == 5 is used to tell the difference between a user
-        // specifying all bits (EX: -arhsda) and just specifying
-        // -a (means display all files with any attribute).
-        //
-        if ((Node->Info->Attribute & Attribs) != Attribs) {
-          continue;
-        }
-      }
-
-      if (!Sfo && !HeaderPrinted) {
-        PathRemoveLastItem (CorrectedPath);
-        PrintNonSfoHeader (CorrectedPath);
-      }
-
-      PrintFileInformation (Sfo, Node, &FileCount, &FileSize, &DirCount);
-      FoundOne      = TRUE;
-      HeaderPrinted = TRUE;
-    }
-
-    if (!Sfo && (ShellStatus != SHELL_ABORTED) && HeaderPrinted) {
-      PrintNonSfoFooter (FileCount, FileSize, DirCount);
-    }
-
-    ShellCloseFileMetaArg (&ListHead);
-  }
-
-  SHELL_FREE_NON_NULL (CorrectedPath);
+  ShellStatus = PrintLsOutputCurr (
+                  Attribs,
+                  Sfo,
+                  RootPath,
+                  SearchString,
+                  &FoundOne,
+                  Count,
+                  IsRecursive
+                  );
 
   if (Rec && (ShellStatus != SHELL_ABORTED)) {
     ShellStatus = PrintLsOutputRec (
@@ -765,12 +812,12 @@ PrintLsOutput (
                     Sfo,
                     RootPath,
                     SearchString,
-                    Found,
+                    &FoundOne,
                     Count
                     );
   }
 
-  if ((Found == NULL) && !FoundOne) {
+  if (!IsRecursive && !FoundOne) {
     if (ListUnfiltered) {
       //
       // When running "ls" without any filtering request, avoid outputing
@@ -788,7 +835,7 @@ PrintLsOutput (
     }
   }
 
-  if (Found != NULL) {
+  if ((Found != NULL) && FoundOne) {
     *Found = FoundOne;
   }
 
