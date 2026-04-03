@@ -562,42 +562,46 @@ PrintLsOutputRec (
   }
 
   Status = ShellOpenFileMetaArg ((CHAR16 *)CorrectedPath, EFI_FILE_MODE_READ, &ListHead);
+  if (EFI_ERROR (Status)) {
+    SHELL_FREE_NON_NULL (CorrectedPath);
+    return ShellStatus;
+  }
 
-  if (!EFI_ERROR (Status)) {
-    for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&ListHead->Link)
-          ; !IsNull (&ListHead->Link, &Node->Link) && ShellStatus == SHELL_SUCCESS
-          ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&ListHead->Link, &Node->Link)
-          )
+  for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&ListHead->Link)
+        ; !IsNull (&ListHead->Link, &Node->Link) && ShellStatus == SHELL_SUCCESS
+        ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&ListHead->Link, &Node->Link)
+        )
+  {
+    if (ShellGetExecutionBreakFlag ()) {
+      ShellStatus = SHELL_ABORTED;
+      break;
+    }
+
+    //
+    // recurse on any directory except the traversing ones...
+    //
+    if (((Node->Info->Attribute & EFI_FILE_DIRECTORY) != EFI_FILE_DIRECTORY) ||
+        IsDotOrDotDot (Node->FileName))
     {
-      if (ShellGetExecutionBreakFlag ()) {
-        ShellStatus = SHELL_ABORTED;
-        break;
-      }
+      continue;
+    }
 
-      //
-      // recurse on any directory except the traversing ones...
-      //
-      if (  ((Node->Info->Attribute & EFI_FILE_DIRECTORY) == EFI_FILE_DIRECTORY)
-         && !IsDotOrDotDot (Node->FileName))
-      {
-        ShellStatus = PrintLsOutput (
-                        Rec,
-                        Attribs,
-                        Sfo,
-                        Node->FullName,
-                        SearchString,
-                        Found,
-                        Count,
-                        FALSE
-                        );
+    ShellStatus = PrintLsOutput (
+                    Rec,
+                    Attribs,
+                    Sfo,
+                    Node->FullName,
+                    SearchString,
+                    Found,
+                    Count,
+                    FALSE
+                    );
 
-        //
-        // Since it's running recursively, we have to break immediately when returned SHELL_ABORTED
-        //
-        if (ShellStatus == SHELL_ABORTED) {
-          break;
-        }
-      }
+    //
+    // Since it's running recursively, we have to break immediately when returned SHELL_ABORTED
+    //
+    if (ShellStatus == SHELL_ABORTED) {
+      break;
     }
   }
 
