@@ -120,7 +120,7 @@ CascadeDelete (
         //
         // skip the directory traversing stuff...
         //
-        if ((StrCmp (Node2->FileName, L".") == 0) || (StrCmp (Node2->FileName, L"..") == 0)) {
+        if (IsDotOrDotDot (Node2->FileName)) {
           continue;
         }
 
@@ -168,7 +168,7 @@ CascadeDelete (
     }
   }
 
-  if (!((StrCmp (Node->FileName, L".") == 0) || (StrCmp (Node->FileName, L"..") == 0))) {
+  if (!IsDotOrDotDot (Node->FileName)) {
     //
     // now delete the current node...
     //
@@ -336,7 +336,7 @@ MainCmdRm (
     //
     // skip the directory traversing stuff...
     //
-    if ((StrCmp (Node->FileName, L".") == 0) || (StrCmp (Node->FileName, L"..") == 0)) {
+    if (IsDotOrDotDot (Node->FileName)) {
       continue;
     }
 

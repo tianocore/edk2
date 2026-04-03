@@ -4604,3 +4604,18 @@ InternalShellStripQuotes (
 
   return EFI_SUCCESS;
 }
+
+/** Check whther the input name is L"." or L"..".
+
+  @param[in]  Name  Name to check.
+
+  @return TRUE if the input name matches L"." or L"..".
+**/
+BOOLEAN
+EFIAPI
+IsDotOrDotDot (
+  CONST CHAR16  *Name
+  )
+{
+  return (StrCmp (Name, L".") == 0) || (StrCmp (Name, L"..") == 0);
+}

@@ -2533,10 +2533,7 @@ ShellSearchHandle (
             //
             // don't open the . and .. directories
             //
-            if (  (StrCmp (ShellInfoNode->FileName, L".") != 0)
-               && (StrCmp (ShellInfoNode->FileName, L"..") != 0)
-                  )
-            {
+            if (!IsDotOrDotDot (ShellInfoNode->FileName)) {
               //
               //
               //
