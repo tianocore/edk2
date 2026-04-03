@@ -405,6 +405,46 @@ FileTimeToLocalTime (
   Time->Year  = (UINT16)(Time->Year + YearNumberOfTempMonth);
 }
 
+/** Update the file time to local time.
+
+  @param[in] Node   File Node to update.
+**/
+STATIC
+VOID
+UpdateFileLocalTime (
+  IN  EFI_SHELL_FILE_INFO  *Node
+  )
+{
+  EFI_STATUS  Status;
+  EFI_TIME    LocalTime;
+
+  Status = gRT->GetTime (&LocalTime, NULL);
+  if (EFI_ERROR (Status) || (LocalTime.TimeZone == EFI_UNSPECIFIED_TIMEZONE)) {
+    return;
+  }
+
+  if ((Node->Info->CreateTime.TimeZone != EFI_UNSPECIFIED_TIMEZONE) &&
+      ((Node->Info->CreateTime.Month >= 1) && (Node->Info->CreateTime.Month <= 12)))
+  {
+    //
+    // FileTimeToLocalTime () requires Month is in a valid range, other buffer out-of-band access happens.
+    //
+    FileTimeToLocalTime (&Node->Info->CreateTime, LocalTime.TimeZone);
+  }
+
+  if ((Node->Info->LastAccessTime.TimeZone != EFI_UNSPECIFIED_TIMEZONE) &&
+      ((Node->Info->LastAccessTime.Month >= 1) && (Node->Info->LastAccessTime.Month <= 12)))
+  {
+    FileTimeToLocalTime (&Node->Info->LastAccessTime, LocalTime.TimeZone);
+  }
+
+  if ((Node->Info->ModificationTime.TimeZone != EFI_UNSPECIFIED_TIMEZONE) &&
+      ((Node->Info->ModificationTime.Month >= 1) && (Node->Info->ModificationTime.Month <= 12)))
+  {
+    FileTimeToLocalTime (&Node->Info->ModificationTime, LocalTime.TimeZone);
+  }
+}
+
 /**
   print out the list of files and directories from the LS command
 
@@ -447,7 +487,6 @@ PrintLsOutput (
   CHAR16               *CorrectedPath;
   BOOLEAN              FoundOne;
   BOOLEAN              HeaderPrinted;
-  EFI_TIME             LocalTime;
 
   HeaderPrinted = FALSE;
   FileCount     = 0;
@@ -522,29 +561,7 @@ PrintLsOutput (
       //
       // Change the file time to local time.
       //
-      Status = gRT->GetTime (&LocalTime, NULL);
-      if (!EFI_ERROR (Status) && (LocalTime.TimeZone != EFI_UNSPECIFIED_TIMEZONE)) {
-        if ((Node->Info->CreateTime.TimeZone != EFI_UNSPECIFIED_TIMEZONE) &&
-            ((Node->Info->CreateTime.Month >= 1) && (Node->Info->CreateTime.Month <= 12)))
-        {
-          //
-          // FileTimeToLocalTime () requires Month is in a valid range, other buffer out-of-band access happens.
-          //
-          FileTimeToLocalTime (&Node->Info->CreateTime, LocalTime.TimeZone);
-        }
-
-        if ((Node->Info->LastAccessTime.TimeZone != EFI_UNSPECIFIED_TIMEZONE) &&
-            ((Node->Info->LastAccessTime.Month >= 1) && (Node->Info->LastAccessTime.Month <= 12)))
-        {
-          FileTimeToLocalTime (&Node->Info->LastAccessTime, LocalTime.TimeZone);
-        }
-
-        if ((Node->Info->ModificationTime.TimeZone != EFI_UNSPECIFIED_TIMEZONE) &&
-            ((Node->Info->ModificationTime.Month >= 1) && (Node->Info->ModificationTime.Month <= 12)))
-        {
-          FileTimeToLocalTime (&Node->Info->ModificationTime, LocalTime.TimeZone);
-        }
-      }
+      UpdateFileLocalTime (Node);
 
       if (LongestPath < StrSize (Node->FullName)) {
         LongestPath = StrSize (Node->FullName);
