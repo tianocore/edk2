@@ -631,9 +631,7 @@ PrintLsOutput (
         // recurse on any directory except the traversing ones...
         //
         if (  ((Node->Info->Attribute & EFI_FILE_DIRECTORY) == EFI_FILE_DIRECTORY)
-           && (StrCmp (Node->FileName, L".") != 0)
-           && (StrCmp (Node->FileName, L"..") != 0)
-              )
+           && !IsDotOrDotDot (Node->FileName))
         {
           ShellStatus = PrintLsOutput (
                           Rec,

@@ -117,10 +117,7 @@ DoTouchByHandle (
          ; Walker = (EFI_SHELL_FILE_INFO *)GetNextNode (&FileList->Link, &Walker->Link)
          )
     {
-      if (  (StrCmp (Walker->FileName, L".") != 0)
-         && (StrCmp (Walker->FileName, L"..") != 0)
-            )
-      {
+      if (!IsDotOrDotDot (Walker->FileName)) {
         //
         // Open the file since we need that handle.
         //
