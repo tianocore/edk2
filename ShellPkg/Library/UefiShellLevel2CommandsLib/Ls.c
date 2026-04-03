@@ -502,7 +502,6 @@ GetCorrectedPath (
   @param[in] SearchString   String with search string.
   @param[in] Found          Set to TRUE, if anyone were found.
   @param[in] Count          The count of bits enabled in Attribs.
-  @param[in] TimeZone       The current time zone offset.
   @param[in] ListUnfiltered TRUE to request listing the directory contents
                             unfiltered.
 
@@ -517,7 +516,6 @@ PrintLsOutput (
   IN CONST CHAR16   *SearchString,
   IN       BOOLEAN  *Found,
   IN CONST UINTN    Count,
-  IN CONST INT16    TimeZone,
   IN CONST BOOLEAN  ListUnfiltered
   )
 {
@@ -677,7 +675,6 @@ PrintLsOutput (
                           SearchString,
                           &FoundOne,
                           Count,
-                          TimeZone,
                           FALSE
                           );
 
@@ -737,8 +734,6 @@ MainCmdLs (
   LIST_ENTRY  *Package
   )
 {
-  EFI_STATUS  Status;
-
   CONST CHAR16  *Attribs;
   SHELL_STATUS  ShellStatus;
   UINT64        RequiredAttributes;
@@ -747,7 +742,6 @@ MainCmdLs (
   UINTN         Count;
   CHAR16        *FullPath;
   UINTN         Size;
-  EFI_TIME      TheTime;
   CHAR16        *SearchString;
   BOOLEAN       ListUnfiltered;
 
@@ -901,12 +895,6 @@ MainCmdLs (
     }
   }
 
-  Status = gRT->GetTime (&TheTime, NULL);
-  if (EFI_ERROR (Status)) {
-    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"ls", L"gRT->GetTime", Status);
-    TheTime.TimeZone = EFI_UNSPECIFIED_TIMEZONE;
-  }
-
   ShellStatus = PrintLsOutput (
                   ShellCommandLineGetFlag (Package, L"-r"),
                   RequiredAttributes,
@@ -915,7 +903,6 @@ MainCmdLs (
                   SearchString,
                   NULL,
                   Count,
-                  TheTime.TimeZone,
                   ListUnfiltered
                   );
   if (ShellStatus == SHELL_NOT_FOUND) {
