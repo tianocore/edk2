@@ -445,6 +445,51 @@ UpdateFileLocalTime (
   }
 }
 
+/** Get Corrected Path.
+
+  @param[in] CorrectedPath   String with the corrected path.
+  @param[in] RootPath        String with starting path to search in.
+  @param[in] SearchString    String with search string.
+
+  @return Shell Status.
+**/
+STATIC
+SHELL_STATUS
+GetCorrectedPath (
+  IN            CHAR16  **CorrectedPath,
+  IN      CONST CHAR16  *RootPath,
+  IN      CONST CHAR16  *SearchString
+  )
+{
+  UINTN   LongestPath;
+  CHAR16  *Path;
+
+  ASSERT (CorrectedPath != NULL);
+
+  LongestPath    = 0;
+  Path           = NULL;
+  *CorrectedPath = NULL;
+
+  Path = StrnCatGrow (&Path, &LongestPath, RootPath, 0);
+  if (Path == NULL) {
+    return SHELL_OUT_OF_RESOURCES;
+  }
+
+  if (  (Path[StrLen (Path)-1] != L'\\')
+     && (Path[StrLen (Path)-1] != L'/'))
+  {
+    Path = StrnCatGrow (&Path, &LongestPath, L"\\", 0);
+  }
+
+  Path = StrnCatGrow (&Path, &LongestPath, SearchString, 0);
+  if (Path == NULL) {
+    return SHELL_OUT_OF_RESOURCES;
+  }
+
+  *CorrectedPath = Path;
+  return SHELL_SUCCESS;
+}
+
 /**
   print out the list of files and directories from the LS command
 
@@ -483,7 +528,6 @@ PrintLsOutput (
   UINT64               FileCount;
   UINT64               DirCount;
   UINT64               FileSize;
-  UINTN                LongestPath;
   CHAR16               *CorrectedPath;
   BOOLEAN              FoundOne;
   BOOLEAN              HeaderPrinted;
@@ -494,8 +538,6 @@ PrintLsOutput (
   FileSize      = 0;
   ListHead      = NULL;
   ShellStatus   = SHELL_SUCCESS;
-  LongestPath   = 0;
-  CorrectedPath = NULL;
 
   if (Found != NULL) {
     FoundOne = *Found;
@@ -503,20 +545,9 @@ PrintLsOutput (
     FoundOne = FALSE;
   }
 
-  CorrectedPath = StrnCatGrow (&CorrectedPath, &LongestPath, RootPath, 0);
-  if (CorrectedPath == NULL) {
-    return SHELL_OUT_OF_RESOURCES;
-  }
-
-  if (  (CorrectedPath[StrLen (CorrectedPath)-1] != L'\\')
-     && (CorrectedPath[StrLen (CorrectedPath)-1] != L'/'))
-  {
-    CorrectedPath = StrnCatGrow (&CorrectedPath, &LongestPath, L"\\", 0);
-  }
-
-  CorrectedPath = StrnCatGrow (&CorrectedPath, &LongestPath, SearchString, 0);
-  if (CorrectedPath == NULL) {
-    return (SHELL_OUT_OF_RESOURCES);
+  ShellStatus = GetCorrectedPath (&CorrectedPath, RootPath, SearchString);
+  if (ShellStatus != SHELL_SUCCESS) {
+    return ShellStatus;
   }
 
   PathCleanUpDirectories (CorrectedPath);
@@ -546,7 +577,7 @@ PrintLsOutput (
         );
     }
 
-    for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&ListHead->Link), LongestPath = 0
+    for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&ListHead->Link)
           ; !IsNull (&ListHead->Link, &Node->Link)
           ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&ListHead->Link, &Node->Link)
           )
@@ -562,10 +593,6 @@ PrintLsOutput (
       // Change the file time to local time.
       //
       UpdateFileLocalTime (Node);
-
-      if (LongestPath < StrSize (Node->FullName)) {
-        LongestPath = StrSize (Node->FullName);
-      }
 
       ASSERT (Node->Info != NULL);
       ASSERT ((Node->Info->Attribute & EFI_FILE_VALID_ATTR) == Node->Info->Attribute);
@@ -611,25 +638,16 @@ PrintLsOutput (
     ShellCloseFileMetaArg (&ListHead);
   }
 
+  SHELL_FREE_NON_NULL (CorrectedPath);
+  CorrectedPath = NULL;
+
   if (Rec && (ShellStatus != SHELL_ABORTED)) {
     //
     // Re-Open all the files under the starting path for directories that didnt necessarily match our file filter
     //
-    CorrectedPath[0] = CHAR_NULL;
-    CorrectedPath    = StrnCatGrow (&CorrectedPath, &LongestPath, RootPath, 0);
-    if (CorrectedPath == NULL) {
-      return SHELL_OUT_OF_RESOURCES;
-    }
-
-    if (  (CorrectedPath[StrLen (CorrectedPath)-1] != L'\\')
-       && (CorrectedPath[StrLen (CorrectedPath)-1] != L'/'))
-    {
-      CorrectedPath = StrnCatGrow (&CorrectedPath, &LongestPath, L"\\", 0);
-    }
-
-    CorrectedPath = StrnCatGrow (&CorrectedPath, &LongestPath, L"*", 0);
-    if (CorrectedPath == NULL) {
-      return SHELL_OUT_OF_RESOURCES;
+    ShellStatus = GetCorrectedPath (&CorrectedPath, RootPath, L"*");
+    if (ShellStatus != SHELL_SUCCESS) {
+      return ShellStatus;
     }
 
     Status = ShellOpenFileMetaArg ((CHAR16 *)CorrectedPath, EFI_FILE_MODE_READ, &ListHead);
@@ -674,9 +692,8 @@ PrintLsOutput (
     }
 
     ShellCloseFileMetaArg (&ListHead);
+    SHELL_FREE_NON_NULL (CorrectedPath);
   }
-
-  SHELL_FREE_NON_NULL (CorrectedPath);
 
   if ((Found == NULL) && !FoundOne) {
     if (ListUnfiltered) {
