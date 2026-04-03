@@ -140,6 +140,36 @@ PrintTime (
 }
 
 /**
+  Print the daylight saving mode.
+
+  @param[in] Daylight  Daylight mode value.
+**/
+STATIC
+VOID
+PrintDaylight (
+  IN UINT8  Daylight
+  )
+{
+  switch (Daylight) {
+    case 0:
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIME_DST0), gShellLevel2HiiHandle);
+      break;
+    case EFI_TIME_ADJUST_DAYLIGHT:
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIME_DST1), gShellLevel2HiiHandle);
+      break;
+    case EFI_TIME_IN_DAYLIGHT:
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIME_DST2), gShellLevel2HiiHandle);
+      break;
+    case EFI_TIME_IN_DAYLIGHT|EFI_TIME_ADJUST_DAYLIGHT:
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIME_DST3), gShellLevel2HiiHandle);
+      break;
+    default:
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_ERROR), gShellLevel2HiiHandle, L"time", L"gRT->GetTime", L"TheTime.Daylight", Daylight);
+      break;
+  }
+}
+
+/**
   Verify that the DateString is valid and if so set that as the current
   date.
 
@@ -530,22 +560,7 @@ MainCmdTime (
   } else if (ShellCommandLineGetFlag (Package, L"-d") && (ShellCommandLineGetValue (Package, L"-d") == NULL)) {
     PrintTime (&TheTime);
 
-    switch (TheTime.Daylight) {
-      case 0:
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIME_DST0), gShellLevel2HiiHandle);
-        break;
-      case EFI_TIME_ADJUST_DAYLIGHT:
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIME_DST1), gShellLevel2HiiHandle);
-        break;
-      case EFI_TIME_IN_DAYLIGHT:
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIME_DST2), gShellLevel2HiiHandle);
-        break;
-      case EFI_TIME_IN_DAYLIGHT|EFI_TIME_ADJUST_DAYLIGHT:
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIME_DST3), gShellLevel2HiiHandle);
-        break;
-      default:
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_ERROR), gShellLevel2HiiHandle, L"time", L"gRT->GetTime", L"TheTime.Daylight", TheTime.Daylight);
-    }
+    PrintDaylight (TheTime.Daylight);
   } else {
     if (PcdGet8 (PcdShellSupportLevel) == 2) {
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"time");
