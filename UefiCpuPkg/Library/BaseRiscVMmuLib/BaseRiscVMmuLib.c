@@ -440,7 +440,18 @@ UpdateRegionMappingRecursive (
       }
 
       EntryValue = SetPpnToPte (EntryValue, RegionStart);
-      EntryValue = SetValidPte (EntryValue);
+
+      //
+      // Unmapped memory regions must have the 'valid' bit cleared.
+      // This is because entries with 'valid' set and RWX clear are considered as "table entries"
+      // (non-leaves), and trigger the ASSERT above for reaching the leaf-level with a non-leaf.
+      //
+      if ((AttributeClearMask == PTE_ATTRIBUTES_MASK) && (AttributeSetMask == 0)) {
+        EntryValue &= ~RISCV_PG_V;
+      } else {
+        EntryValue = SetValidPte (EntryValue);
+      }
+
       ReplaceTableEntry (Entry, EntryValue, RegionStart, TableIsLive);
     }
   }
