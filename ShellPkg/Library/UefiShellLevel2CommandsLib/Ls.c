@@ -705,7 +705,7 @@ PrintLsOutput (
       if (!Sfo) {
         PrintNonSfoHeader (RootPath);
         if (ShellStatus != SHELL_ABORTED) {
-          PrintNonSfoFooter (FileCount, FileSize, DirCount);
+          PrintNonSfoFooter (0, 0, 0);
         }
       }
     } else {
