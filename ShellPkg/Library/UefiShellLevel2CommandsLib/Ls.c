@@ -13,6 +13,36 @@
 UINTN  mDayOfMonth[] = { 31, 28, 31, 30, 31, 30, 31, 30, 31, 30, 31, 30 };
 
 /**
+  print out the list of files and directories from the LS command
+
+  @param[in] Rec            TRUE to automatically recurse into each found directory
+                            FALSE to only list the specified directory.
+  @param[in] Attribs        List of required Attribute for display.
+                            If 0 then all non-system and non-hidden files will be printed.
+  @param[in] Sfo            TRUE to use Standard Format Output, FALSE otherwise
+  @param[in] RootPath       String with starting path to search in.
+  @param[in] SearchString   String with search string.
+  @param[in] Found          Set to TRUE, if anyone were found.
+  @param[in] Count          The count of bits enabled in Attribs.
+  @param[in] ListUnfiltered TRUE to request listing the directory contents
+                            unfiltered.
+
+  @retval SHELL_SUCCESS     the printing was successful.
+**/
+STATIC
+SHELL_STATUS
+PrintLsOutput (
+  IN CONST BOOLEAN  Rec,
+  IN CONST UINT64   Attribs,
+  IN CONST BOOLEAN  Sfo,
+  IN CONST CHAR16   *RootPath,
+  IN CONST CHAR16   *SearchString,
+  IN       BOOLEAN  *Found,
+  IN CONST UINTN    Count,
+  IN CONST BOOLEAN  ListUnfiltered
+  );
+
+/**
   print out the standard format output volume entry.
 
   @param[in] TheList           a list of files from the volume.
@@ -502,6 +532,92 @@ GetCorrectedPath (
   @param[in] SearchString   String with search string.
   @param[in] Found          Set to TRUE, if anyone were found.
   @param[in] Count          The count of bits enabled in Attribs.
+
+  @retval SHELL_SUCCESS     the printing was successful.
+**/
+STATIC
+SHELL_STATUS
+PrintLsOutputRec (
+  IN CONST BOOLEAN  Rec,
+  IN CONST UINT64   Attribs,
+  IN CONST BOOLEAN  Sfo,
+  IN CONST CHAR16   *RootPath,
+  IN CONST CHAR16   *SearchString,
+  IN       BOOLEAN  *Found,
+  IN CONST UINTN    Count
+  )
+{
+  EFI_STATUS           Status;
+  EFI_SHELL_FILE_INFO  *ListHead;
+  EFI_SHELL_FILE_INFO  *Node;
+  SHELL_STATUS         ShellStatus;
+  CHAR16               *CorrectedPath;
+
+  //
+  // Re-Open all the files under the starting path for directories that didnt necessarily match our file filter
+  //
+  ShellStatus = GetCorrectedPath (&CorrectedPath, RootPath, L"*");
+  if (ShellStatus != SHELL_SUCCESS) {
+    return ShellStatus;
+  }
+
+  Status = ShellOpenFileMetaArg ((CHAR16 *)CorrectedPath, EFI_FILE_MODE_READ, &ListHead);
+
+  if (!EFI_ERROR (Status)) {
+    for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&ListHead->Link)
+          ; !IsNull (&ListHead->Link, &Node->Link) && ShellStatus == SHELL_SUCCESS
+          ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&ListHead->Link, &Node->Link)
+          )
+    {
+      if (ShellGetExecutionBreakFlag ()) {
+        ShellStatus = SHELL_ABORTED;
+        break;
+      }
+
+      //
+      // recurse on any directory except the traversing ones...
+      //
+      if (  ((Node->Info->Attribute & EFI_FILE_DIRECTORY) == EFI_FILE_DIRECTORY)
+         && !IsDotOrDotDot (Node->FileName))
+      {
+        ShellStatus = PrintLsOutput (
+                        Rec,
+                        Attribs,
+                        Sfo,
+                        Node->FullName,
+                        SearchString,
+                        Found,
+                        Count,
+                        FALSE
+                        );
+
+        //
+        // Since it's running recursively, we have to break immediately when returned SHELL_ABORTED
+        //
+        if (ShellStatus == SHELL_ABORTED) {
+          break;
+        }
+      }
+    }
+  }
+
+  ShellCloseFileMetaArg (&ListHead);
+  SHELL_FREE_NON_NULL (CorrectedPath);
+  return ShellStatus;
+}
+
+/**
+  print out the list of files and directories from the LS command
+
+  @param[in] Rec            TRUE to automatically recurse into each found directory
+                            FALSE to only list the specified directory.
+  @param[in] Attribs        List of required Attribute for display.
+                            If 0 then all non-system and non-hidden files will be printed.
+  @param[in] Sfo            TRUE to use Standard Format Output, FALSE otherwise
+  @param[in] RootPath       String with starting path to search in.
+  @param[in] SearchString   String with search string.
+  @param[in] Found          Set to TRUE, if anyone were found.
+  @param[in] Count          The count of bits enabled in Attribs.
   @param[in] ListUnfiltered TRUE to request listing the directory contents
                             unfiltered.
 
@@ -637,59 +753,17 @@ PrintLsOutput (
   }
 
   SHELL_FREE_NON_NULL (CorrectedPath);
-  CorrectedPath = NULL;
 
   if (Rec && (ShellStatus != SHELL_ABORTED)) {
-    //
-    // Re-Open all the files under the starting path for directories that didnt necessarily match our file filter
-    //
-    ShellStatus = GetCorrectedPath (&CorrectedPath, RootPath, L"*");
-    if (ShellStatus != SHELL_SUCCESS) {
-      return ShellStatus;
-    }
-
-    Status = ShellOpenFileMetaArg ((CHAR16 *)CorrectedPath, EFI_FILE_MODE_READ, &ListHead);
-
-    if (!EFI_ERROR (Status)) {
-      for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&ListHead->Link)
-            ; !IsNull (&ListHead->Link, &Node->Link) && ShellStatus == SHELL_SUCCESS
-            ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&ListHead->Link, &Node->Link)
-            )
-      {
-        if (ShellGetExecutionBreakFlag ()) {
-          ShellStatus = SHELL_ABORTED;
-          break;
-        }
-
-        //
-        // recurse on any directory except the traversing ones...
-        //
-        if (  ((Node->Info->Attribute & EFI_FILE_DIRECTORY) == EFI_FILE_DIRECTORY)
-           && !IsDotOrDotDot (Node->FileName))
-        {
-          ShellStatus = PrintLsOutput (
-                          Rec,
-                          Attribs,
-                          Sfo,
-                          Node->FullName,
-                          SearchString,
-                          &FoundOne,
-                          Count,
-                          FALSE
-                          );
-
-          //
-          // Since it's running recursively, we have to break immediately when returned SHELL_ABORTED
-          //
-          if (ShellStatus == SHELL_ABORTED) {
-            break;
-          }
-        }
-      }
-    }
-
-    ShellCloseFileMetaArg (&ListHead);
-    SHELL_FREE_NON_NULL (CorrectedPath);
+    ShellStatus = PrintLsOutputRec (
+                    Rec,
+                    Attribs,
+                    Sfo,
+                    RootPath,
+                    SearchString,
+                    Found,
+                    Count
+                    );
   }
 
   if ((Found == NULL) && !FoundOne) {
