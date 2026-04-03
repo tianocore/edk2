@@ -103,6 +103,43 @@ GetCurrentTime (
 }
 
 /**
+  Print the current time in normal format.
+
+  @param[in] TheTime  Time to print.
+**/
+STATIC
+VOID
+PrintTime (
+  IN CONST EFI_TIME  *TheTime
+  )
+{
+  UINTN  TzMinutes;
+
+  if (TheTime->TimeZone != EFI_UNSPECIFIED_TIMEZONE) {
+    TzMinutes = (ABS (TheTime->TimeZone)) % 60;
+
+    ShellPrintHiiDefaultEx (
+      STRING_TOKEN (STR_TIME_FORMAT),
+      gShellLevel2HiiHandle,
+      TheTime->Hour,
+      TheTime->Minute,
+      TheTime->Second,
+      (TheTime->TimeZone > 0 ? L"-" : L"+"),
+      ((ABS (TheTime->TimeZone)) / 60),
+      TzMinutes
+      );
+  } else {
+    ShellPrintHiiDefaultEx (
+      STRING_TOKEN (STR_TIME_FORMAT_LOCAL),
+      gShellLevel2HiiHandle,
+      TheTime->Hour,
+      TheTime->Minute,
+      TheTime->Second
+      );
+  }
+}
+
+/**
   Verify that the DateString is valid and if so set that as the current
   date.
 
@@ -461,7 +498,6 @@ MainCmdTime (
   INT16         Tz;
   UINT8         Daylight;
   CONST CHAR16  *TempLocation;
-  UINTN         TzMinutes;
 
   ShellStatus = SHELL_SUCCESS;
 
@@ -488,59 +524,11 @@ MainCmdTime (
      && !ShellCommandLineGetFlag (Package, L"-d")
      && !ShellCommandLineGetFlag (Package, L"-tz"))
   {
-    //
-    // ShellPrintEx the current time
-    //
-    if (TheTime.TimeZone == EFI_UNSPECIFIED_TIMEZONE) {
-      TzMinutes = 0;
-    } else {
-      TzMinutes = (ABS (TheTime.TimeZone)) % 60;
-    }
-
-    if (TheTime.TimeZone != EFI_UNSPECIFIED_TIMEZONE) {
-      ShellPrintHiiDefaultEx (
-        STRING_TOKEN (STR_TIME_FORMAT),
-        gShellLevel2HiiHandle,
-        TheTime.Hour,
-        TheTime.Minute,
-        TheTime.Second,
-        (TheTime.TimeZone > 0 ? L"-" : L"+"),
-        ((ABS (TheTime.TimeZone)) / 60),
-        TzMinutes
-        );
-    } else {
-      ShellPrintHiiDefaultEx (
-        STRING_TOKEN (STR_TIME_FORMAT_LOCAL),
-        gShellLevel2HiiHandle,
-        TheTime.Hour,
-        TheTime.Minute,
-        TheTime.Second
-        );
-    }
+    PrintTime (&TheTime);
 
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_CRLF), gShellLevel2HiiHandle);
   } else if (ShellCommandLineGetFlag (Package, L"-d") && (ShellCommandLineGetValue (Package, L"-d") == NULL)) {
-    if (TheTime.TimeZone == EFI_UNSPECIFIED_TIMEZONE) {
-      ShellPrintHiiDefaultEx (
-        STRING_TOKEN (STR_TIME_FORMAT_LOCAL),
-        gShellLevel2HiiHandle,
-        TheTime.Hour,
-        TheTime.Minute,
-        TheTime.Second
-        );
-    } else {
-      TzMinutes = (ABS (TheTime.TimeZone)) % 60;
-      ShellPrintHiiDefaultEx (
-        STRING_TOKEN (STR_TIME_FORMAT),
-        gShellLevel2HiiHandle,
-        TheTime.Hour,
-        TheTime.Minute,
-        TheTime.Second,
-        (TheTime.TimeZone > 0 ? L"-" : L"+"),
-        ((ABS (TheTime.TimeZone)) / 60),
-        TzMinutes
-        );
-    }
+    PrintTime (&TheTime);
 
     switch (TheTime.Daylight) {
       case 0:
