@@ -607,13 +607,14 @@ PrintLsOutput (
     if (!Sfo && (ShellStatus != SHELL_ABORTED) && HeaderPrinted) {
       PrintNonSfoFooter (FileCount, FileSize, DirCount);
     }
+
+    ShellCloseFileMetaArg (&ListHead);
   }
 
   if (Rec && (ShellStatus != SHELL_ABORTED)) {
     //
     // Re-Open all the files under the starting path for directories that didnt necessarily match our file filter
     //
-    ShellCloseFileMetaArg (&ListHead);
     CorrectedPath[0] = CHAR_NULL;
     CorrectedPath    = StrnCatGrow (&CorrectedPath, &LongestPath, RootPath, 0);
     if (CorrectedPath == NULL) {
@@ -671,10 +672,11 @@ PrintLsOutput (
         }
       }
     }
+
+    ShellCloseFileMetaArg (&ListHead);
   }
 
   SHELL_FREE_NON_NULL (CorrectedPath);
-  ShellCloseFileMetaArg (&ListHead);
 
   if ((Found == NULL) && !FoundOne) {
     if (ListUnfiltered) {
