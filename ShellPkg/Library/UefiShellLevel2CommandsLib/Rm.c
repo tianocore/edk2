@@ -52,6 +52,119 @@ IsDirectoryEmpty (
 }
 
 /**
+  Delete a directory.
+
+  @param[in] Node   The node to start deleting with.
+  @param[in] Quiet  TRUE to print no messages.
+
+  @retval SHELL_SUCCESS       The operation was successful.
+  @retval SHELL_ACCESS_DENIED A file was read only.
+  @retval SHELL_ABORTED       The abort message was received.
+  @retval SHELL_DEVICE_ERROR  A device error occurred reading this Node.
+**/
+STATIC
+SHELL_STATUS
+DeleteDirectory (
+  IN EFI_SHELL_FILE_INFO  *Node,
+  IN CONST BOOLEAN        Quiet
+  )
+{
+  SHELL_STATUS           ShellStatus;
+  EFI_SHELL_FILE_INFO    *List;
+  EFI_SHELL_FILE_INFO    *Node2;
+  EFI_STATUS             Status;
+  SHELL_PROMPT_RESPONSE  *Resp;
+  CHAR16                 *TempName;
+  UINTN                  NewSize;
+
+  ASSERT ((Node->Info->Attribute & EFI_FILE_DIRECTORY) == EFI_FILE_DIRECTORY);
+
+  Resp        = NULL;
+  ShellStatus = SHELL_SUCCESS;
+  List        = NULL;
+
+  if (IsDirectoryEmpty (Node->Handle)) {
+    return ShellStatus;
+  }
+
+  if (!Quiet) {
+    Status = ShellPrintHiiDefaultEx (STRING_TOKEN (STR_RM_LOG_DELETE_CONF), gShellLevel2HiiHandle, Node->FullName);
+    Status = ShellPromptForResponse (ShellPromptResponseTypeYesNo, NULL, (VOID **)&Resp);
+    ASSERT (Resp != NULL);
+    if (EFI_ERROR (Status) || (*Resp != ShellPromptResponseYes)) {
+      SHELL_FREE_NON_NULL (Resp);
+      return (SHELL_ABORTED);
+    }
+
+    SHELL_FREE_NON_NULL (Resp);
+  }
+
+  //
+  // empty out the directory
+  //
+  Status = gEfiShellProtocol->FindFilesInDir (Node->Handle, &List);
+  if (EFI_ERROR (Status)) {
+    if (List != NULL) {
+      gEfiShellProtocol->FreeFileList (&List);
+    }
+
+    return (SHELL_DEVICE_ERROR);
+  }
+
+  for (Node2 = (EFI_SHELL_FILE_INFO   *)GetFirstNode (&List->Link)
+       ; !IsNull (&List->Link, &Node2->Link)
+       ; Node2 = (EFI_SHELL_FILE_INFO   *)GetNextNode (&List->Link, &Node2->Link)
+       )
+  {
+    //
+    // skip the directory traversing stuff...
+    //
+    if (IsDotOrDotDot (Node2->FileName)) {
+      continue;
+    }
+
+    Node2->Status = gEfiShellProtocol->OpenFileByName (Node2->FullName, &Node2->Handle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE);
+    if (EFI_ERROR (Node2->Status) && (StrStr (Node2->FileName, L":") == NULL)) {
+      //
+      // Update the node filename to have full path with file system identifier
+      //
+      NewSize  = StrSize (Node->FullName) + StrSize (Node2->FullName);
+      TempName = AllocateZeroPool (NewSize);
+      if (TempName == NULL) {
+        ShellStatus = SHELL_OUT_OF_RESOURCES;
+      } else {
+        StrCpyS (TempName, NewSize/sizeof (CHAR16), Node->FullName);
+        TempName[StrStr (TempName, L":")+1-TempName] = CHAR_NULL;
+        StrCatS (TempName, NewSize/sizeof (CHAR16), Node2->FullName);
+        FreePool ((VOID *)Node2->FullName);
+        Node2->FullName = TempName;
+
+        //
+        // Now try again to open the file
+        //
+        Node2->Status = gEfiShellProtocol->OpenFileByName (Node2->FullName, &Node2->Handle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE);
+      }
+    }
+
+    if (!EFI_ERROR (Node2->Status)) {
+      ShellStatus = CascadeDelete (Node2, Quiet);
+    } else if (ShellStatus == SHELL_SUCCESS) {
+      ShellStatus = (SHELL_STATUS)(Node2->Status&(~0x80000000));
+    }
+
+    if (ShellStatus != SHELL_SUCCESS) {
+      break;
+    }
+  }
+
+  if (List != NULL) {
+    gEfiShellProtocol->FreeFileList (&List);
+  }
+
+  return ShellStatus;
+}
+
+/**
   Delete a node and all nodes under it (including sub directories).
 
   @param[in] Node   The node to start deleting with.
@@ -68,17 +181,10 @@ CascadeDelete (
   IN CONST BOOLEAN        Quiet
   )
 {
-  SHELL_STATUS           ShellStatus;
-  EFI_SHELL_FILE_INFO    *List;
-  EFI_SHELL_FILE_INFO    *Node2;
-  EFI_STATUS             Status;
-  SHELL_PROMPT_RESPONSE  *Resp;
-  CHAR16                 *TempName;
-  UINTN                  NewSize;
+  SHELL_STATUS  ShellStatus;
+  EFI_STATUS    Status;
 
-  Resp        = NULL;
   ShellStatus = SHELL_SUCCESS;
-  List        = NULL;
   Status      = EFI_SUCCESS;
 
   if ((Node->Info->Attribute & EFI_FILE_READ_ONLY) == EFI_FILE_READ_ONLY) {
@@ -87,84 +193,9 @@ CascadeDelete (
   }
 
   if ((Node->Info->Attribute & EFI_FILE_DIRECTORY) == EFI_FILE_DIRECTORY) {
-    if (!IsDirectoryEmpty (Node->Handle)) {
-      if (!Quiet) {
-        Status = ShellPrintHiiDefaultEx (STRING_TOKEN (STR_RM_LOG_DELETE_CONF), gShellLevel2HiiHandle, Node->FullName);
-        Status = ShellPromptForResponse (ShellPromptResponseTypeYesNo, NULL, (VOID **)&Resp);
-        ASSERT (Resp != NULL);
-        if (EFI_ERROR (Status) || (*Resp != ShellPromptResponseYes)) {
-          SHELL_FREE_NON_NULL (Resp);
-          return (SHELL_ABORTED);
-        }
-
-        SHELL_FREE_NON_NULL (Resp);
-      }
-
-      //
-      // empty out the directory
-      //
-      Status = gEfiShellProtocol->FindFilesInDir (Node->Handle, &List);
-      if (EFI_ERROR (Status)) {
-        if (List != NULL) {
-          gEfiShellProtocol->FreeFileList (&List);
-        }
-
-        return (SHELL_DEVICE_ERROR);
-      }
-
-      for (Node2 = (EFI_SHELL_FILE_INFO   *)GetFirstNode (&List->Link)
-           ; !IsNull (&List->Link, &Node2->Link)
-           ; Node2 = (EFI_SHELL_FILE_INFO   *)GetNextNode (&List->Link, &Node2->Link)
-           )
-      {
-        //
-        // skip the directory traversing stuff...
-        //
-        if (IsDotOrDotDot (Node2->FileName)) {
-          continue;
-        }
-
-        Node2->Status = gEfiShellProtocol->OpenFileByName (Node2->FullName, &Node2->Handle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE);
-        if (EFI_ERROR (Node2->Status) && (StrStr (Node2->FileName, L":") == NULL)) {
-          //
-          // Update the node filename to have full path with file system identifier
-          //
-          NewSize  = StrSize (Node->FullName) + StrSize (Node2->FullName);
-          TempName = AllocateZeroPool (NewSize);
-          if (TempName == NULL) {
-            ShellStatus = SHELL_OUT_OF_RESOURCES;
-          } else {
-            StrCpyS (TempName, NewSize/sizeof (CHAR16), Node->FullName);
-            TempName[StrStr (TempName, L":")+1-TempName] = CHAR_NULL;
-            StrCatS (TempName, NewSize/sizeof (CHAR16), Node2->FullName);
-            FreePool ((VOID *)Node2->FullName);
-            Node2->FullName = TempName;
-
-            //
-            // Now try again to open the file
-            //
-            Node2->Status = gEfiShellProtocol->OpenFileByName (Node2->FullName, &Node2->Handle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE);
-          }
-        }
-
-        if (!EFI_ERROR (Node2->Status)) {
-          ShellStatus = CascadeDelete (Node2, Quiet);
-        } else if (ShellStatus == SHELL_SUCCESS) {
-          ShellStatus = (SHELL_STATUS)(Node2->Status&(~0x80000000));
-        }
-
-        if (ShellStatus != SHELL_SUCCESS) {
-          if (List != NULL) {
-            gEfiShellProtocol->FreeFileList (&List);
-          }
-
-          return (ShellStatus);
-        }
-      }
-
-      if (List != NULL) {
-        gEfiShellProtocol->FreeFileList (&List);
-      }
+    ShellStatus = DeleteDirectory (Node, Quiet);
+    if (ShellStatus != SHELL_SUCCESS) {
+      return ShellStatus;
     }
   }
 
