@@ -170,6 +170,62 @@ PrintDaylight (
 }
 
 /**
+  Parse the timezone command-line value.
+
+  @param[in]  TimeZoneString  Time zone string from the command line.
+  @param[out] Tz              Parsed time zone value.
+
+  @retval SHELL_SUCCESS            The operation was successful.
+  @retval SHELL_INVALID_PARAMETER  TimeZoneString is invalid.
+**/
+STATIC
+SHELL_STATUS
+GetTimeZoneFromString (
+  IN  CONST CHAR16  *TimeZoneString,
+  OUT INT16         *Tz
+  )
+{
+  CONST CHAR16  *TempLocation;
+
+  ASSERT (Tz != NULL);
+
+  TempLocation = TimeZoneString;
+
+  if (TempLocation == NULL) {
+    *Tz = 1441;
+    return SHELL_SUCCESS;
+  }
+
+  if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)TempLocation, L"_local") == 0) {
+    *Tz = EFI_UNSPECIFIED_TIMEZONE;
+  } else if (TempLocation[0] == L'-') {
+    *Tz = (INT16)ShellStrToUintn (++TempLocation);
+    if (*Tz == -1) {
+      *Tz = 1441;
+    } else {
+      *Tz *= (-1);
+    }
+  } else {
+    if (TempLocation[0] == L'+') {
+      *Tz = (INT16)ShellStrToUintn (++TempLocation);
+    } else {
+      *Tz = (INT16)ShellStrToUintn (TempLocation);
+    }
+
+    if (*Tz == -1) {
+      *Tz = 1441;
+    }
+  }
+
+  if (!((*Tz >= -1440) && (*Tz <= 1440)) && (*Tz != EFI_UNSPECIFIED_TIMEZONE)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"time", TempLocation, L"-tz");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  return SHELL_SUCCESS;
+}
+
+/**
   Verify that the DateString is valid and if so set that as the current
   date.
 
@@ -569,45 +625,7 @@ MainCmdTime (
       //
       // perform level 3 operation here.
       //
-      if ((TempLocation = ShellCommandLineGetValue (Package, L"-tz")) != NULL) {
-        if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)TempLocation, L"_local") == 0) {
-          Tz = EFI_UNSPECIFIED_TIMEZONE;
-        } else if (TempLocation[0] == L'-') {
-          Tz = (INT16)ShellStrToUintn (++TempLocation);
-          //
-          // When the argument of "time [-tz tz]" is not numeric, ShellStrToUintn() returns "-1".
-          // Here we can detect the argument error by checking the return of ShellStrToUintn().
-          //
-          if (Tz == -1) {
-            Tz = 1441; // make it to be out of bounds value
-          } else {
-            Tz *= (-1); // sign convert
-          }
-        } else {
-          if (TempLocation[0] == L'+') {
-            Tz = (INT16)ShellStrToUintn (++TempLocation);
-          } else {
-            Tz = (INT16)ShellStrToUintn (TempLocation);
-          }
-
-          //
-          // Detect the return of ShellStrToUintn() to make sure the argument is valid.
-          //
-          if (Tz == -1) {
-            Tz = 1441; // make it to be out of bounds value
-          }
-        }
-
-        if (!((Tz >= -1440) && (Tz <= 1440)) && (Tz != EFI_UNSPECIFIED_TIMEZONE)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"time", TempLocation, L"-tz");
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        }
-      } else {
-        //
-        // intentionally out of bounds value will prevent changing it...
-        //
-        Tz = 1441;
-      }
+      ShellStatus = GetTimeZoneFromString (ShellCommandLineGetValue (Package, L"-tz"), &Tz);
 
       TempLocation = ShellCommandLineGetValue (Package, L"-d");
       if (TempLocation != NULL) {
