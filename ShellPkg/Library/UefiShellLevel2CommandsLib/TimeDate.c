@@ -76,6 +76,33 @@ InternalIsTimeLikeString (
 }
 
 /**
+  Get the current time and print a standard error message in case of failure.
+
+  @param[in]  Command  Shell command name.
+  @param[out] TheTime  Current time on success.
+
+  @retval EFI_SUCCESS       The operation was successful.
+  @retval EFI_DEVICE_ERROR  Failed to get the current time.
+**/
+STATIC
+EFI_STATUS
+GetCurrentTime (
+  IN  CONST CHAR16  *Command,
+  OUT EFI_TIME      *TheTime
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = gRT->GetTime (TheTime, NULL);
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, Command, L"gRT->GetTime", Status);
+    return EFI_DEVICE_ERROR;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Verify that the DateString is valid and if so set that as the current
   date.
 
@@ -100,9 +127,8 @@ CheckAndSetDate (
     return (SHELL_INVALID_PARAMETER);
   }
 
-  Status = gRT->GetTime (&TheTime, NULL);
+  Status = GetCurrentTime (L"date", &TheTime);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"date", L"gRT->GetTime", Status);
     return (SHELL_DEVICE_ERROR);
   }
 
@@ -202,9 +228,8 @@ MainCmdDate (
     //
     // get the current date
     //
-    Status = gRT->GetTime (&TheTime, NULL);
+    Status = GetCurrentTime (L"date", &TheTime);
     if (EFI_ERROR (Status)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"date", L"gRT->GetTime", Status);
       return (SHELL_DEVICE_ERROR);
     }
 
@@ -350,9 +375,8 @@ CheckAndSetTime (
     return (SHELL_INVALID_PARAMETER);
   }
 
-  Status = gRT->GetTime (&TheTime, NULL);
+  Status = GetCurrentTime (L"time", &TheTime);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"time", L"gRT->GetTime", Status);
     return (SHELL_DEVICE_ERROR);
   }
 
@@ -444,9 +468,8 @@ MainCmdTime (
   //
   // check for "-?"
   //
-  Status = gRT->GetTime (&TheTime, NULL);
+  Status = GetCurrentTime (L"time", &TheTime);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"time", L"gRT->GetTime", Status);
     return (SHELL_DEVICE_ERROR);
   }
 
@@ -767,9 +790,8 @@ CheckAndSetTimeZone (
   }
 
   if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)TimeZoneString, L"_local") == 0) {
-    Status = gRT->GetTime (&TheTime, NULL);
+    Status = GetCurrentTime (L"timezone", &TheTime);
     if (EFI_ERROR (Status)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"gRT->GetTime", Status);
       return (SHELL_DEVICE_ERROR);
     }
 
@@ -786,9 +808,8 @@ CheckAndSetTimeZone (
     return (SHELL_INVALID_PARAMETER);
   }
 
-  Status = gRT->GetTime (&TheTime, NULL);
+  Status = GetCurrentTime (L"timezone", &TheTime);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"timezone", L"gRT->GetTime", Status);
     return (SHELL_DEVICE_ERROR);
   }
 
@@ -912,9 +933,8 @@ MainCmdTimeZone (
   //
   // Get Current Time Zone Info
   //
-  Status = gRT->GetTime (&TheTime, NULL);
+  Status = GetCurrentTime (L"timezone", &TheTime);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"timezone", L"gRT->GetTime", Status);
     return (SHELL_DEVICE_ERROR);
   }
 
