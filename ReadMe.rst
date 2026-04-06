@@ -28,7 +28,7 @@ Platform CI Build Status
 ------------------------
 
 Microsoft Windows Visual Studio (VS)
-````````````````````````
+````````````````````````````````````
 
 ============================= ================= ============= ============= ==============
  Toolchain                    CONFIG            DEBUG         RELEASE       NOOPT
@@ -42,7 +42,7 @@ OvmfPkg_Win_VS_               | IA32            |op32d|       |op32r|       |op3
 ============================= ================= ============= ============= ==============
 
 Ubuntu 24.04
-`````````````````
+````````````
 
 ============================= ================= ============= ============= ==============
  Toolchain                    CONFIG            DEBUG         RELEASE       NOOPT
@@ -76,9 +76,9 @@ licenses:
 -  `BaseTools/Plugin/CodeQL/analyze <https://www.apache.org/licenses/LICENSE-2.0>`__
 -  `BaseTools/Source/C/LzmaCompress <BaseTools/Source/C/LzmaCompress/LZMA-SDK-README.txt>`__
 -  `BaseTools/Source/C/VfrCompile/Pccts <BaseTools/Source/C/VfrCompile/Pccts/RIGHTS>`__
--  `CryptoPkg\Library\BaseCryptLib\SysCall\inet_pton.c <CryptoPkg\Library\BaseCryptLib\SysCall\inet_pton.c>`__
--  `CryptoPkg\Library\Include\crypto\dso_conf.h <https://github.com/openssl/openssl/blob/e2e09d9fba1187f8d6aafaa34d4172f56f1ffb72/LICENSE>`__
--  `CryptoPkg\Library\Include\openssl\opensslconf.h <https://github.com/openssl/openssl/blob/e2e09d9fba1187f8d6aafaa34d4172f56f1ffb72/LICENSE>`__
+-  `CryptoPkg/Library/BaseCryptLib/SysCall/inet_pton.c <CryptoPkg/Library/BaseCryptLib/SysCall/inet_pton.c>`__
+-  `CryptoPkg/Library/Include/crypto/dso_conf.h <https://github.com/openssl/openssl/blob/e2e09d9fba1187f8d6aafaa34d4172f56f1ffb72/LICENSE>`__
+-  `CryptoPkg/Library/Include/openssl/opensslconf.h <https://github.com/openssl/openssl/blob/e2e09d9fba1187f8d6aafaa34d4172f56f1ffb72/LICENSE>`__
 -  `MdeModulePkg/Library/LzmaCustomDecompressLib <MdeModulePkg/Library/LzmaCustomDecompressLib/LZMA-SDK-README.txt>`__
 -  `OvmfPkg <OvmfPkg/License.txt>`__
 
@@ -255,7 +255,7 @@ command
   git submodule update --init
   cd ..
 
-If there's update for submodules, use following git commands to get
+If there are updates for submodules, use the following git commands to get
 the latest submodules code.
 
 .. code-block:: bash
@@ -265,8 +265,8 @@ the latest submodules code.
   git submodule update
 
 Note: When cloning submodule repos, '--recursive' option is not
-recommended. EDK II itself will not use any code/feature from
-submodules in above submodules. So using '--recursive' adds a
+recommended. EDK II itself will not use any code or features from
+submodules within the submodules listed above. So using '--recursive' adds a
 dependency on being able to reach servers we do not actually want
 any code from, as well as needlessly downloading code we will not
 use.
