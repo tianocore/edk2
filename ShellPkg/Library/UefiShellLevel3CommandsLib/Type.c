@@ -12,6 +12,49 @@
 #include <Library/ShellLib.h>
 
 /**
+  Print a file character to StdOut using the shell type command formatting
+  rules.
+
+  @param[in] Character          Character read from the file.
+  @param[in] CharacterIndex     Character index in the current buffer.
+  @param[in] PreviousCharacter  Previous character in the current buffer.
+  @param[in] Ascii             TRUE for ASCII mode, FALSE for UCS2 mode.
+**/
+STATIC
+VOID
+PrintTypeCharacter (
+  IN CHAR16   Character,
+  IN UINTN    CharacterIndex,
+  IN CHAR16   PreviousCharacter,
+  IN BOOLEAN  Ascii
+  )
+{
+  if ((Character == L'\r') || (Character == L'\n')) {
+    //
+    // Allow Line Feed (LF) (0xA) & Carriage Return (CR) (0xD)
+    // characters to be displayed as is.
+    //
+    if ((Character == L'\n') && ((CharacterIndex == 0) || (PreviousCharacter != L'\r'))) {
+      //
+      // In case file begin with single line Feed or Line Feed (0xA) is
+      // encountered & Carriage Return (0xD) was not previous character,
+      // print CR and LF. This is because Shell 2.0 requires carriage
+      // return with line feed for displaying each new line from left.
+      //
+      ShellPrintDefaultEx (L"\r\n");
+      return;
+    }
+  } else if ((Ascii && ((Character < 0x20) || (Character >= 0x7F))) || (!Ascii && (Character < 0x20))) {
+    //
+    // For all other characters which are not printable, display '.'
+    //
+    Character = L'.';
+  }
+
+  ShellPrintDefaultEx (L"%c", Character);
+}
+
+/**
   Display a single file to StdOut.
 
   If both Ascii and UCS2 are FALSE attempt to discover the file type.
@@ -67,39 +110,13 @@ TypeFileByHandle (
     if (Ascii) {
       LoopSize = ReadSize;
       for (LoopVar = 0; LoopVar < LoopSize; LoopVar++) {
-        //
-        // The valid range of ASCII characters is 0x20-0x7E.
-        // Display "." when there is an invalid character.
-        //
-        AsciiChar = CHAR_NULL;
         AsciiChar = ((CHAR8 *)Buffer)[LoopVar];
-        if ((AsciiChar == '\r') || (AsciiChar == '\n')) {
-          //
-          // Allow Line Feed (LF) (0xA) & Carriage Return (CR) (0xD)
-          // characters to be displayed as is.
-          //
-          if (((AsciiChar == '\n') && (LoopVar == 0)) ||
-              ((AsciiChar == '\n') && (((CHAR8 *)Buffer)[LoopVar-1] != '\r')))
-          {
-            //
-            // In case file begin with single line Feed or Line Feed (0xA) is
-            // encountered & Carriage Return (0xD) was not previous character,
-            // print CR and LF. This is because Shell 2.0 requires carriage
-            // return with line feed for displaying each new line from left.
-            //
-            ShellPrintDefaultEx (L"\r\n");
-            continue;
-          }
-        } else {
-          //
-          // For all other characters which are not printable, display '.'
-          //
-          if ((AsciiChar < 0x20) || (AsciiChar >= 0x7F)) {
-            AsciiChar = '.';
-          }
-        }
-
-        ShellPrintDefaultEx (L"%c", AsciiChar);
+        PrintTypeCharacter (
+          AsciiChar,
+          LoopVar,
+          (LoopVar == 0) ? CHAR_NULL : (CHAR16)((CHAR8 *)Buffer)[LoopVar - 1],
+          TRUE
+          );
       }
     } else {
       if (*(UINT16 *)Buffer == gUnicodeFileTag) {
@@ -113,37 +130,13 @@ TypeFileByHandle (
       }
 
       for (LoopVar = 0; LoopVar < LoopSize; LoopVar++) {
-        //
-        // An invalid range of characters is 0x0-0x1F.
-        // Display "." when there is an invalid character.
-        //
-        Ucs2Char = CHAR_NULL;
         Ucs2Char = ((CHAR16 *)Buffer)[LoopVar];
-        if ((Ucs2Char == '\r') || (Ucs2Char == '\n')) {
-          //
-          // Allow Line Feed (LF) (0xA) & Carriage Return (CR) (0xD)
-          // characters to be displayed as is.
-          //
-          if (((Ucs2Char == '\n') && (LoopVar == 0)) ||
-              ((Ucs2Char == '\n') && (((CHAR16 *)Buffer)[LoopVar-1] != '\r')))
-          {
-            //
-            // In case file begin with single line Feed or Line Feed (0xA) is
-            // encountered & Carriage Return (0xD) was not previous character,
-            // print CR and LF. This is because Shell 2.0 requires carriage
-            // return with line feed for displaying each new line from left.
-            //
-            ShellPrintDefaultEx (L"\r\n");
-            continue;
-          }
-        } else if (Ucs2Char < 0x20) {
-          //
-          // For all other characters which are not printable, display '.'
-          //
-          Ucs2Char = L'.';
-        }
-
-        ShellPrintDefaultEx (L"%c", Ucs2Char);
+        PrintTypeCharacter (
+          Ucs2Char,
+          LoopVar,
+          (LoopVar == 0) ? CHAR_NULL : ((CHAR16 *)Buffer)[LoopVar - 1],
+          FALSE
+          );
       }
     }
 
