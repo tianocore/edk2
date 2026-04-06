@@ -15,6 +15,70 @@ STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
   { NULL,    TypeMax  }
 };
 
+/** Mapping of Background colors.
+**/
+STATIC CONST UINTN  mClsBackgroundColorMap[] = {
+  EFI_BACKGROUND_BLACK,
+  EFI_BACKGROUND_BLUE,
+  EFI_BACKGROUND_GREEN,
+  EFI_BACKGROUND_CYAN,
+  EFI_BACKGROUND_RED,
+  EFI_BACKGROUND_MAGENTA,
+  EFI_BACKGROUND_BROWN,
+  EFI_BACKGROUND_LIGHTGRAY
+};
+
+/** Mapping of Foreground colors.
+**/
+STATIC CONST UINTN  mClsForegroundColorMap[] = {
+  EFI_BLACK,
+  EFI_BLUE,
+  EFI_GREEN,
+  EFI_CYAN,
+  EFI_RED,
+  EFI_MAGENTA,
+  EFI_BROWN,
+  EFI_LIGHTGRAY,
+  EFI_DARKGRAY,
+  EFI_LIGHTBLUE,
+  EFI_LIGHTGREEN,
+  EFI_LIGHTCYAN,
+  EFI_LIGHTRED,
+  EFI_LIGHTMAGENTA,
+  EFI_YELLOW,
+  EFI_WHITE
+};
+
+/**
+  Parse a decimal cls color argument.
+
+  @param[in]  ColorStr   Command-line argument to parse.
+  @param[in]  MaxValue   Maximum accepted value.
+  @param[in]  MaxLength  Maximum accepted string length.
+  @param[out] Color      Parsed color index.
+
+  @retval SHELL_SUCCESS            The argument is valid.
+  @retval SHELL_INVALID_PARAMETER  The argument is invalid.
+**/
+STATIC
+SHELL_STATUS
+GetClsColorIndex (
+  IN  CONST CHAR16  *ColorStr,
+  IN  UINTN         MaxValue,
+  IN  UINTN         MaxLength,
+  OUT UINTN         *Color
+  )
+{
+  ASSERT (Color != NULL);
+
+  if ((ShellStrToUintn (ColorStr) > MaxValue) || (StrLen (ColorStr) > MaxLength) || !ShellIsDecimalDigitCharacter (*ColorStr)) {
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  *Color = ShellStrToUintn (ColorStr);
+  return SHELL_SUCCESS;
+}
+
 /**
   Function for 'cls' command.
 
@@ -36,6 +100,7 @@ ShellCommandRunCls (
   SHELL_STATUS  ShellStatus;
   CONST CHAR16  *BackColorStr;
   CONST CHAR16  *ForeColorStr;
+  UINTN         ColorIndex;
 
   //
   // Initialize variables
@@ -102,92 +167,18 @@ ShellCommandRunCls (
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
         if (BackColorStr != NULL) {
-          if ((ShellStrToUintn (BackColorStr) > 7) || (StrLen (BackColorStr) > 1) || (!ShellIsDecimalDigitCharacter (*BackColorStr))) {
+          ShellStatus = GetClsColorIndex (BackColorStr, 7, 1, &ColorIndex);
+          if (ShellStatus != SHELL_SUCCESS) {
             ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"cls", BackColorStr);
-            ShellStatus = SHELL_INVALID_PARAMETER;
           } else {
-            switch (ShellStrToUintn (BackColorStr)) {
-              case 0:
-                Background = EFI_BACKGROUND_BLACK;
-                break;
-              case 1:
-                Background = EFI_BACKGROUND_BLUE;
-                break;
-              case 2:
-                Background = EFI_BACKGROUND_GREEN;
-                break;
-              case 3:
-                Background = EFI_BACKGROUND_CYAN;
-                break;
-              case 4:
-                Background = EFI_BACKGROUND_RED;
-                break;
-              case 5:
-                Background = EFI_BACKGROUND_MAGENTA;
-                break;
-              case 6:
-                Background = EFI_BACKGROUND_BROWN;
-                break;
-              case 7:
-                Background = EFI_BACKGROUND_LIGHTGRAY;
-                break;
-            }
+            Background = mClsBackgroundColorMap[ColorIndex];
 
             if (ForeColorStr != NULL) {
-              if ((ShellStrToUintn (ForeColorStr) > 15) || (StrLen (ForeColorStr) > 2) || (!ShellIsDecimalDigitCharacter (*ForeColorStr))) {
+              ShellStatus = GetClsColorIndex (ForeColorStr, 15, 2, &ColorIndex);
+              if (ShellStatus != SHELL_SUCCESS) {
                 ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"cls", ForeColorStr);
-                ShellStatus = SHELL_INVALID_PARAMETER;
               } else {
-                switch (ShellStrToUintn (ForeColorStr)) {
-                  case 0:
-                    Foreground = EFI_BLACK;
-                    break;
-                  case 1:
-                    Foreground = EFI_BLUE;
-                    break;
-                  case 2:
-                    Foreground = EFI_GREEN;
-                    break;
-                  case 3:
-                    Foreground = EFI_CYAN;
-                    break;
-                  case 4:
-                    Foreground = EFI_RED;
-                    break;
-                  case 5:
-                    Foreground = EFI_MAGENTA;
-                    break;
-                  case 6:
-                    Foreground = EFI_BROWN;
-                    break;
-                  case 7:
-                    Foreground = EFI_LIGHTGRAY;
-                    break;
-                  case 8:
-                    Foreground = EFI_DARKGRAY;
-                    break;
-                  case 9:
-                    Foreground = EFI_LIGHTBLUE;
-                    break;
-                  case 10:
-                    Foreground = EFI_LIGHTGREEN;
-                    break;
-                  case 11:
-                    Foreground = EFI_LIGHTCYAN;
-                    break;
-                  case 12:
-                    Foreground = EFI_LIGHTRED;
-                    break;
-                  case 13:
-                    Foreground = EFI_LIGHTMAGENTA;
-                    break;
-                  case 14:
-                    Foreground = EFI_YELLOW;
-                    break;
-                  case 15:
-                    Foreground = EFI_WHITE;
-                    break;
-                }
+                Foreground = mClsForegroundColorMap[ColorIndex];
               }
             } else {
               //
