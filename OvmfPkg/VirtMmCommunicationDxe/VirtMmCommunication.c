@@ -406,6 +406,8 @@ ReturnErrorStatus:
       "  'qemu-system-aarch64 -device uefi-vars-sysbus'\n"
  #elif defined (MDE_CPU_RISCV64)
       "  'qemu-system-riscv64 -device uefi-vars-sysbus'\n"
+ #elif defined (MDE_CPU_LOONGARCH64)
+      "  'qemu-system-loongarch64 -device uefi-vars-sysbus'\n"
  #else
       #error unsupported architecture
  #endif

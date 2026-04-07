@@ -242,7 +242,6 @@ R: Wei6 Xu <wei6.xu@intel.com> [xuweiintel]
 IntelFsp2Pkg
 F: IntelFsp2Pkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/intel_fsp2_pkg.html
-M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
@@ -252,7 +251,6 @@ R: Ashraf Ali S <ashraf.ali.s@intel.com> [AshrafAliS]
 IntelFsp2WrapperPkg
 F: IntelFsp2WrapperPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/intel_fsp2_wrapper_pkg.html
-M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 R: Ted Kuo <ted.kuo@intel.com> [tedkuo1]
@@ -280,6 +278,7 @@ F: MdeModulePkg/Universal/DriverHealthManagerDxe/
 F: MdeModulePkg/Universal/LoadFileOnFv2/
 F: MdeModulePkg/Universal/SecurityStubDxe/Defer3rdPartyImageLoad.*
 R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
+R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
 
 MdeModulePkg: Core services (PEI, DXE and Runtime) modules
 F: MdeModulePkg/*Mem*/
@@ -307,6 +306,7 @@ F: MdeModulePkg/Universal/PlatformDriOverrideDxe/
 F: MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.c
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 R: Khalid Ali <khaliidcaliy@gmail.com> [khaliid2040]
+R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
 
 MdeModulePkg: Device and Peripheral modules
 F: MdeModulePkg/*PciHostBridge*/
@@ -358,6 +358,7 @@ F: MdeModulePkg/Universal/DisplayEngineDxe/
 F: MdeModulePkg/Universal/DriverSampleDxe/
 F: MdeModulePkg/Universal/SetupBrowserDxe/
 R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
+R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
 
 MdeModulePkg: Management Mode (MM, SMM) modules
 F: MdeModulePkg/*Smi*/
@@ -387,6 +388,7 @@ F: MdeModulePkg/Include/Guid/SystemNvDataGuid.h
 F: MdeModulePkg/Include/Protocol/SwapAddressRange.h
 F: MdeModulePkg/Universal/FaultTolerantWrite*/
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
+R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
 
 MdeModulePkg: Universal Payload definitions
 F: MdeModulePkg/Include/UniversalPayload/
@@ -445,7 +447,6 @@ F: MdePkg/Include/Library/FdtLib.h
 M: Benny Lin <benny.lin@intel.com> [Benny3345678]
 M: Leif Lindholm <leif.lindholm@oss.qualcomm.com> [leiflindholm]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
-R: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 R: James Lu <james.lu@intel.com> [jameslu8]
 
 MdePkg: Manageability industryStandard standard C header files
@@ -481,6 +482,7 @@ F: NetworkPkg/
 W: https://www.tianocore.org/tianocore-wiki.github.io/platforms-packages/core-packages/network_pkg.html
 R: Saloni Kasbekar <saloni.kasbekar@intel.com> [SaloniKasbekar]
 R: Zachary Clark-williams <zachary.clark-williams@intel.com> [Zclarkwilliams]
+R: Mike Beaton <mjsbeaton@gmail.com> [mikebeaton]
 
 OvmfPkg
 F: OvmfPkg/
@@ -697,7 +699,6 @@ M: Sean Rhodes <sean@starlabs.systems> [Sean-StarLabs]
 M: James Lu <james.lu@intel.com> [jameslu8]
 M: Benjamin Doron <benjamin.doron@9elements.com> [benjamindoron]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
-M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 R: Shuo Liu <shuo.liu@intel.com> [shuoliu0]
 S: Maintained
 
