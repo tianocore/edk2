@@ -67,47 +67,11 @@ Ip4Config2StrToIp (
   OUT EFI_IPv4_ADDRESS  *Ip
   )
 {
-  UINTN  Index;
-  UINTN  Number;
+  EFI_STATUS  Status;
+  CHAR16      *EndPointer;
 
-  Index = 0;
-
-  while (*Str != L'\0') {
-    if (Index > 3) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    Number = 0;
-    while ((*Str >= L'0') && (*Str <= L'9')) {
-      Number = Number * 10 + (*Str - L'0');
-      Str++;
-    }
-
-    if (Number > 0xFF) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    Ip->Addr[Index] = (UINT8)Number;
-
-    if ((*Str != L'\0') && (*Str != L'.')) {
-      //
-      // The current character should be either the NULL terminator or
-      // the dot delimiter.
-      //
-      return EFI_INVALID_PARAMETER;
-    }
-
-    if (*Str == L'.') {
-      //
-      // Skip the delimiter.
-      //
-      Str++;
-    }
-
-    Index++;
-  }
-
-  if (Index != 4) {
+  Status = StrToIpv4Address (Str, &EndPointer, (IPv4_ADDRESS *)Ip, NULL);
+  if (EFI_ERROR (Status) || (*EndPointer != L'\0')) {
     return EFI_INVALID_PARAMETER;
   }
 
