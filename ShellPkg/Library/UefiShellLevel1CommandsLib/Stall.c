@@ -19,33 +19,30 @@ MainCmdStall (
   LIST_ENTRY  *Package
   )
 {
-  EFI_STATUS    Status;
-  SHELL_STATUS  ShellStatus;
-  UINT64        Intermediate;
-
-  ShellStatus = SHELL_SUCCESS;
+  EFI_STATUS  Status;
+  UINT64      Intermediate;
 
   if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"stall");
-    ShellStatus = SHELL_INVALID_PARAMETER;
+    return SHELL_INVALID_PARAMETER;
   } else if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"stall");
-    ShellStatus = SHELL_INVALID_PARAMETER;
-  } else {
-    Status = ShellConvertStringToUint64 (ShellCommandLineGetRawValue (Package, 1), &Intermediate, FALSE, FALSE);
-    if (EFI_ERROR (Status) || (((UINT64)(UINTN)(Intermediate)) != Intermediate)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel1HiiHandle, L"stall", ShellCommandLineGetRawValue (Package, 1));
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      Status = gBS->Stall ((UINTN)Intermediate);
-      if (EFI_ERROR (Status)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_STALL_FAILED), gShellLevel1HiiHandle, L"stall");
-        ShellStatus = SHELL_DEVICE_ERROR;
-      }
-    }
+    return SHELL_INVALID_PARAMETER;
   }
 
-  return ShellStatus;
+  Status = ShellConvertStringToUint64 (ShellCommandLineGetRawValue (Package, 1), &Intermediate, FALSE, FALSE);
+  if (EFI_ERROR (Status) || (((UINT64)(UINTN)(Intermediate)) != Intermediate)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel1HiiHandle, L"stall", ShellCommandLineGetRawValue (Package, 1));
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  Status = gBS->Stall ((UINTN)Intermediate);
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_STALL_FAILED), gShellLevel1HiiHandle, L"stall");
+    return SHELL_DEVICE_ERROR;
+  }
+
+  return SHELL_SUCCESS;
 }
 
 /**
