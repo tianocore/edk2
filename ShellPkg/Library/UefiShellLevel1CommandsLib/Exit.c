@@ -14,6 +14,51 @@ STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
   { NULL,  TypeMax  }
 };
 
+/** Main function of the 'Exit' command.
+
+  @param[in] Package    List of input parameter for the command.
+**/
+STATIC
+SHELL_STATUS
+MainCmdExit (
+  LIST_ENTRY  *Package
+  )
+{
+  EFI_STATUS    Status;
+  UINT64        RetVal;
+  CONST CHAR16  *Return;
+  SHELL_STATUS  ShellStatus;
+
+  ShellStatus = SHELL_SUCCESS;
+
+  //
+  // return the specified error code
+  //
+  Return = ShellCommandLineGetRawValue (Package, 1);
+  if (Return != NULL) {
+    Status = ShellConvertStringToUint64 (Return, &RetVal, FALSE, FALSE);
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel1HiiHandle, L"exit", Return);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      //
+      // If we are in a batch file and /b then pass TRUE otherwise false...
+      //
+      ShellCommandRegisterExit ((BOOLEAN)(gEfiShellProtocol->BatchIsActive () && ShellCommandLineGetFlag (Package, L"/b")), RetVal);
+
+      ShellStatus = SHELL_SUCCESS;
+    }
+  } else {
+    // If we are in a batch file and /b then pass TRUE otherwise false...
+    //
+    ShellCommandRegisterExit ((BOOLEAN)(gEfiShellProtocol->BatchIsActive () && ShellCommandLineGetFlag (Package, L"/b")), 0);
+
+    ShellStatus = SHELL_SUCCESS;
+  }
+
+  return ShellStatus;
+}
+
 /**
   Function for 'exit' command.
 
@@ -31,8 +76,6 @@ ShellCommandRunExit (
   LIST_ENTRY    *Package;
   CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
-  UINT64        RetVal;
-  CONST CHAR16  *Return;
 
   ShellStatus = SHELL_SUCCESS;
 
@@ -61,30 +104,7 @@ ShellCommandRunExit (
     return ShellStatus;
   }
 
-  //
-  // return the specified error code
-  //
-  Return = ShellCommandLineGetRawValue (Package, 1);
-  if (Return != NULL) {
-    Status = ShellConvertStringToUint64 (Return, &RetVal, FALSE, FALSE);
-    if (EFI_ERROR (Status)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel1HiiHandle, L"exit", Return);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      //
-      // If we are in a batch file and /b then pass TRUE otherwise false...
-      //
-      ShellCommandRegisterExit ((BOOLEAN)(gEfiShellProtocol->BatchIsActive () && ShellCommandLineGetFlag (Package, L"/b")), RetVal);
-
-      ShellStatus = SHELL_SUCCESS;
-    }
-  } else {
-    // If we are in a batch file and /b then pass TRUE otherwise false...
-    //
-    ShellCommandRegisterExit ((BOOLEAN)(gEfiShellProtocol->BatchIsActive () && ShellCommandLineGetFlag (Package, L"/b")), 0);
-
-    ShellStatus = SHELL_SUCCESS;
-  }
+  ShellStatus = MainCmdExit (Package);
 
   ShellCommandLineFreeVarList (Package);
 
