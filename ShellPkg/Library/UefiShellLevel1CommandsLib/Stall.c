@@ -51,29 +51,31 @@ ShellCommandRunStall (
     } else {
       ASSERT (FALSE);
     }
+
+    return ShellStatus;
+  }
+
+  if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"stall");
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  } else if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"stall");
+    ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
-    if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"stall");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"stall");
+    Status = ShellConvertStringToUint64 (ShellCommandLineGetRawValue (Package, 1), &Intermediate, FALSE, FALSE);
+    if (EFI_ERROR (Status) || (((UINT64)(UINTN)(Intermediate)) != Intermediate)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel1HiiHandle, L"stall", ShellCommandLineGetRawValue (Package, 1));
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
-      Status = ShellConvertStringToUint64 (ShellCommandLineGetRawValue (Package, 1), &Intermediate, FALSE, FALSE);
-      if (EFI_ERROR (Status) || (((UINT64)(UINTN)(Intermediate)) != Intermediate)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel1HiiHandle, L"stall", ShellCommandLineGetRawValue (Package, 1));
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        Status = gBS->Stall ((UINTN)Intermediate);
-        if (EFI_ERROR (Status)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_STALL_FAILED), gShellLevel1HiiHandle, L"stall");
-          ShellStatus = SHELL_DEVICE_ERROR;
-        }
+      Status = gBS->Stall ((UINTN)Intermediate);
+      if (EFI_ERROR (Status)) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_STALL_FAILED), gShellLevel1HiiHandle, L"stall");
+        ShellStatus = SHELL_DEVICE_ERROR;
       }
     }
-
-    ShellCommandLineFreeVarList (Package);
   }
+
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }

@@ -57,34 +57,36 @@ ShellCommandRunExit (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    //
-    // return the specified error code
-    //
-    Return = ShellCommandLineGetRawValue (Package, 1);
-    if (Return != NULL) {
-      Status = ShellConvertStringToUint64 (Return, &RetVal, FALSE, FALSE);
-      if (EFI_ERROR (Status)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel1HiiHandle, L"exit", Return);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        //
-        // If we are in a batch file and /b then pass TRUE otherwise false...
-        //
-        ShellCommandRegisterExit ((BOOLEAN)(gEfiShellProtocol->BatchIsActive () && ShellCommandLineGetFlag (Package, L"/b")), RetVal);
 
-        ShellStatus = SHELL_SUCCESS;
-      }
+    return ShellStatus;
+  }
+
+  //
+  // return the specified error code
+  //
+  Return = ShellCommandLineGetRawValue (Package, 1);
+  if (Return != NULL) {
+    Status = ShellConvertStringToUint64 (Return, &RetVal, FALSE, FALSE);
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel1HiiHandle, L"exit", Return);
+      ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
+      //
       // If we are in a batch file and /b then pass TRUE otherwise false...
       //
-      ShellCommandRegisterExit ((BOOLEAN)(gEfiShellProtocol->BatchIsActive () && ShellCommandLineGetFlag (Package, L"/b")), 0);
+      ShellCommandRegisterExit ((BOOLEAN)(gEfiShellProtocol->BatchIsActive () && ShellCommandLineGetFlag (Package, L"/b")), RetVal);
 
       ShellStatus = SHELL_SUCCESS;
     }
+  } else {
+    // If we are in a batch file and /b then pass TRUE otherwise false...
+    //
+    ShellCommandRegisterExit ((BOOLEAN)(gEfiShellProtocol->BatchIsActive () && ShellCommandLineGetFlag (Package, L"/b")), 0);
 
-    ShellCommandLineFreeVarList (Package);
+    ShellStatus = SHELL_SUCCESS;
   }
+
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }
