@@ -418,8 +418,8 @@
         "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} ${src} $(GENFW_FLAGS)
         $(CP) ${dst} $(DEBUG_DIR)
         $(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).efi
-        -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
-        -$(CP) $(DEBUG_DIR)(+)*.pdb $(OUTPUT_DIR)
+        $(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR) || true
+        $(CP) $(DEBUG_DIR)(+)*.pdb $(OUTPUT_DIR) || true
         
     <Command.XCODE>
         # tool to convert Mach-O to PE/COFF
