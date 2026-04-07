@@ -59,45 +59,47 @@ ShellCommandRunGoto (
     } else {
       ASSERT (FALSE);
     }
+
+    return ShellStatus;
+  }
+
+  if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"goto");
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  } else if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"goto");
+    ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
-    if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"goto");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"goto");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      Size = 0;
-      ASSERT ((CompareString == NULL && Size == 0) || (CompareString != NULL));
-      CompareString = StrnCatGrow (&CompareString, &Size, L":", 0);
-      CompareString = StrnCatGrow (&CompareString, &Size, ShellCommandLineGetRawValue (Package, 1), 0);
-      if (CompareString == NULL) {
-        ShellCommandLineFreeVarList (Package);
-        return SHELL_OUT_OF_RESOURCES;
-      }
-
-      //
-      // Check forwards and then backwards for a label...
-      //
-      if (!MoveToTag (GetNextNode, L"endfor", L"for", CompareString, ShellCommandGetCurrentScriptFile (), FALSE, FALSE, TRUE)) {
-        CurrentScriptFile = ShellCommandGetCurrentScriptFile ();
-        ShellPrintHiiDefaultEx (
-          STRING_TOKEN (STR_SYNTAX_NO_MATCHING),
-          gShellLevel1HiiHandle,
-          CompareString,
-          L"Goto",
-          CurrentScriptFile != NULL
-                               && CurrentScriptFile->CurrentCommand != NULL
-            ? CurrentScriptFile->CurrentCommand->Line : 0
-          );
-        ShellStatus = SHELL_NOT_FOUND;
-      }
-
-      FreePool (CompareString);
+    Size = 0;
+    ASSERT ((CompareString == NULL && Size == 0) || (CompareString != NULL));
+    CompareString = StrnCatGrow (&CompareString, &Size, L":", 0);
+    CompareString = StrnCatGrow (&CompareString, &Size, ShellCommandLineGetRawValue (Package, 1), 0);
+    if (CompareString == NULL) {
+      ShellCommandLineFreeVarList (Package);
+      return SHELL_OUT_OF_RESOURCES;
     }
 
-    ShellCommandLineFreeVarList (Package);
+    //
+    // Check forwards and then backwards for a label...
+    //
+    if (!MoveToTag (GetNextNode, L"endfor", L"for", CompareString, ShellCommandGetCurrentScriptFile (), FALSE, FALSE, TRUE)) {
+      CurrentScriptFile = ShellCommandGetCurrentScriptFile ();
+      ShellPrintHiiDefaultEx (
+        STRING_TOKEN (STR_SYNTAX_NO_MATCHING),
+        gShellLevel1HiiHandle,
+        CompareString,
+        L"Goto",
+        CurrentScriptFile != NULL
+                             && CurrentScriptFile->CurrentCommand != NULL
+          ? CurrentScriptFile->CurrentCommand->Line : 0
+        );
+      ShellStatus = SHELL_NOT_FOUND;
+    }
+
+    FreePool (CompareString);
   }
+
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }
