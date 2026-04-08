@@ -294,129 +294,129 @@ MainCmdDrivers (
 
   if (ShellCommandLineGetCount (Package) > 1) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"drivers");
-    ShellStatus = SHELL_INVALID_PARAMETER;
-  } else {
-    if (ShellCommandLineGetFlag (Package, L"-l")) {
-      Lang = ShellCommandLineGetValue (Package, L"-l");
-      if (Lang != NULL) {
-        Language = AllocateZeroPool (StrSize (Lang));
-        if (Language == NULL) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"drivers");
-          return (SHELL_OUT_OF_RESOURCES);
-        }
+    return SHELL_INVALID_PARAMETER;
+  }
 
-        AsciiSPrint (Language, StrSize (Lang), "%S", Lang);
-      } else {
-        ASSERT (Language == NULL);
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"drivers", L"-l");
-        return (SHELL_INVALID_PARAMETER);
+  if (ShellCommandLineGetFlag (Package, L"-l")) {
+    Lang = ShellCommandLineGetValue (Package, L"-l");
+    if (Lang != NULL) {
+      Language = AllocateZeroPool (StrSize (Lang));
+      if (Language == NULL) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"drivers");
+        return (SHELL_OUT_OF_RESOURCES);
       }
+
+      AsciiSPrint (Language, StrSize (Lang), "%S", Lang);
+    } else {
+      ASSERT (Language == NULL);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"drivers", L"-l");
+      return (SHELL_INVALID_PARAMETER);
+    }
+  }
+
+  if (ShellCommandLineGetFlag (Package, L"-sfo")) {
+    SfoFlag      = TRUE;
+    FormatString = HiiGetString (gShellDriver1HiiHandle, STRING_TOKEN (STR_DRIVERS_ITEM_LINE_SFO), Language);
+    //
+    // print the SFO header
+    //
+    ShellPrintHiiEx (
+      -1,
+      -1,
+      Language,
+      STRING_TOKEN (STR_GEN_SFO_HEADER),
+      gShellDriver1HiiHandle,
+      L"drivers"
+      );
+  } else {
+    FormatString = HiiGetString (gShellDriver1HiiHandle, STRING_TOKEN (STR_DRIVERS_ITEM_LINE), Language);
+    //
+    // print the header row
+    //
+    ShellPrintHiiEx (
+      -1,
+      -1,
+      Language,
+      STRING_TOKEN (STR_DRIVERS_HEADER_LINES),
+      gShellDriver1HiiHandle
+      );
+  }
+
+  if (FormatString == NULL) {
+    // Assume the string is present because it is hard-coded and report out of memory
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"drivers");
+    return (SHELL_OUT_OF_RESOURCES);
+  }
+
+  HandleList = GetHandleListByProtocol (&gEfiDriverBindingProtocolGuid);
+  for (HandleWalker = HandleList; HandleWalker != NULL && *HandleWalker != NULL; HandleWalker++) {
+    ChildCount     = 0;
+    DeviceCount    = 0;
+    Status         = ParseHandleDatabaseForChildDevices (*HandleWalker, &ChildCount, NULL);
+    Status         = PARSE_HANDLE_DATABASE_DEVICES (*HandleWalker, &DeviceCount, NULL);
+    Temp2          = GetDevicePathTextForHandle (*HandleWalker);
+    DriverVersion  = ReturnDriverVersion (*HandleWalker);
+    DriverConfig   = ReturnDriverConfig (*HandleWalker);
+    DriverDiag     = ReturnDriverDiag (*HandleWalker);
+    FullDriverName = GetStringNameFromHandle (*HandleWalker, Language);
+    ImageName      = GetImageNameFromHandle (*HandleWalker);
+
+    UnicodeValueToStringS (ChildCountStr, sizeof (ChildCountStr), 0, ChildCount, 0);
+    UnicodeValueToStringS (DeviceCountStr, sizeof (DeviceCountStr), 0, DeviceCount, 0);
+    TruncatedDriverName = NULL;
+    if (!SfoFlag && (FullDriverName != NULL)) {
+      TruncatedDriverName = AllocateZeroPool ((MAX_LEN_DRIVER_NAME + 1) * sizeof (CHAR16));
+      if (TruncatedDriverName == NULL) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"drivers");
+        return (SHELL_OUT_OF_RESOURCES);
+      }
+
+      StrnCpyS (TruncatedDriverName, MAX_LEN_DRIVER_NAME + 1, FullDriverName, MAX_LEN_DRIVER_NAME);
     }
 
-    if (ShellCommandLineGetFlag (Package, L"-sfo")) {
-      SfoFlag      = TRUE;
-      FormatString = HiiGetString (gShellDriver1HiiHandle, STRING_TOKEN (STR_DRIVERS_ITEM_LINE_SFO), Language);
-      //
-      // print the SFO header
-      //
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        Language,
-        STRING_TOKEN (STR_GEN_SFO_HEADER),
-        gShellDriver1HiiHandle,
-        L"drivers"
+    if (!SfoFlag) {
+      ShellPrintDefaultEx (
+        FormatString,
+        ConvertHandleToHandleIndex (*HandleWalker),
+        DriverVersion,
+        ChildCount > 0 ? L'B' : (DeviceCount > 0 ? L'D' : L'?'),
+        DriverConfig ? L'X' : L'-',
+        DriverDiag ? L'X' : L'-',
+        DeviceCount > 0 ? DeviceCountStr : L"-",
+        ChildCount  > 0 ? ChildCountStr : L"-",
+        TruncatedDriverName,
+        ImageName == NULL ? L"" : ImageName
         );
     } else {
-      FormatString = HiiGetString (gShellDriver1HiiHandle, STRING_TOKEN (STR_DRIVERS_ITEM_LINE), Language);
-      //
-      // print the header row
-      //
-      ShellPrintHiiEx (
-        -1,
-        -1,
-        Language,
-        STRING_TOKEN (STR_DRIVERS_HEADER_LINES),
-        gShellDriver1HiiHandle
+      ShellPrintDefaultEx (
+        FormatString,
+        ConvertHandleToHandleIndex (*HandleWalker),
+        DriverVersion,
+        ChildCount > 0 ? L'B' : (DeviceCount > 0 ? L'D' : L'?'),
+        DriverConfig ? L'Y' : L'N',
+        DriverDiag ? L'Y' : L'N',
+        DeviceCount,
+        ChildCount,
+        FullDriverName,
+        Temp2 == NULL ? L"" : Temp2
         );
     }
 
-    if (FormatString == NULL) {
-      // Assume the string is present because it is hard-coded and report out of memory
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"drivers");
-      return (SHELL_OUT_OF_RESOURCES);
+    if (TruncatedDriverName != NULL) {
+      FreePool (TruncatedDriverName);
     }
 
-    HandleList = GetHandleListByProtocol (&gEfiDriverBindingProtocolGuid);
-    for (HandleWalker = HandleList; HandleWalker != NULL && *HandleWalker != NULL; HandleWalker++) {
-      ChildCount     = 0;
-      DeviceCount    = 0;
-      Status         = ParseHandleDatabaseForChildDevices (*HandleWalker, &ChildCount, NULL);
-      Status         = PARSE_HANDLE_DATABASE_DEVICES (*HandleWalker, &DeviceCount, NULL);
-      Temp2          = GetDevicePathTextForHandle (*HandleWalker);
-      DriverVersion  = ReturnDriverVersion (*HandleWalker);
-      DriverConfig   = ReturnDriverConfig (*HandleWalker);
-      DriverDiag     = ReturnDriverDiag (*HandleWalker);
-      FullDriverName = GetStringNameFromHandle (*HandleWalker, Language);
-      ImageName      = GetImageNameFromHandle (*HandleWalker);
+    if (Temp2 != NULL) {
+      FreePool (Temp2);
+    }
 
-      UnicodeValueToStringS (ChildCountStr, sizeof (ChildCountStr), 0, ChildCount, 0);
-      UnicodeValueToStringS (DeviceCountStr, sizeof (DeviceCountStr), 0, DeviceCount, 0);
-      TruncatedDriverName = NULL;
-      if (!SfoFlag && (FullDriverName != NULL)) {
-        TruncatedDriverName = AllocateZeroPool ((MAX_LEN_DRIVER_NAME + 1) * sizeof (CHAR16));
-        if (TruncatedDriverName == NULL) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"drivers");
-          return (SHELL_OUT_OF_RESOURCES);
-        }
+    if (ImageName != NULL) {
+      FreePool (ImageName);
+    }
 
-        StrnCpyS (TruncatedDriverName, MAX_LEN_DRIVER_NAME + 1, FullDriverName, MAX_LEN_DRIVER_NAME);
-      }
-
-      if (!SfoFlag) {
-        ShellPrintDefaultEx (
-          FormatString,
-          ConvertHandleToHandleIndex (*HandleWalker),
-          DriverVersion,
-          ChildCount > 0 ? L'B' : (DeviceCount > 0 ? L'D' : L'?'),
-          DriverConfig ? L'X' : L'-',
-          DriverDiag ? L'X' : L'-',
-          DeviceCount > 0 ? DeviceCountStr : L"-",
-          ChildCount  > 0 ? ChildCountStr : L"-",
-          TruncatedDriverName,
-          ImageName == NULL ? L"" : ImageName
-          );
-      } else {
-        ShellPrintDefaultEx (
-          FormatString,
-          ConvertHandleToHandleIndex (*HandleWalker),
-          DriverVersion,
-          ChildCount > 0 ? L'B' : (DeviceCount > 0 ? L'D' : L'?'),
-          DriverConfig ? L'Y' : L'N',
-          DriverDiag ? L'Y' : L'N',
-          DeviceCount,
-          ChildCount,
-          FullDriverName,
-          Temp2 == NULL ? L"" : Temp2
-          );
-      }
-
-      if (TruncatedDriverName != NULL) {
-        FreePool (TruncatedDriverName);
-      }
-
-      if (Temp2 != NULL) {
-        FreePool (Temp2);
-      }
-
-      if (ImageName != NULL) {
-        FreePool (ImageName);
-      }
-
-      if (ShellGetExecutionBreakFlag ()) {
-        ShellStatus = SHELL_ABORTED;
-        break;
-      }
+    if (ShellGetExecutionBreakFlag ()) {
+      ShellStatus = SHELL_ABORTED;
+      break;
     }
   }
 

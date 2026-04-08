@@ -168,36 +168,35 @@ MainCmdOpenInfo (
     // error for too many parameters
     //
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"openinfo");
-    ShellStatus = SHELL_INVALID_PARAMETER;
+    return SHELL_INVALID_PARAMETER;
   } else if (ShellCommandLineGetCount (Package) == 0) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDriver1HiiHandle, L"openinfo");
-    ShellStatus = SHELL_INVALID_PARAMETER;
-  } else {
-    Param1 = ShellCommandLineGetRawValue (Package, 1);
-    if (Param1 != NULL) {
-      Status = ShellConvertStringToUint64 (Param1, &Intermediate, TRUE, FALSE);
-    }
+    return SHELL_INVALID_PARAMETER;
+  }
 
-    if (EFI_ERROR (Status) || (Param1 == NULL) || (ConvertHandleIndexToHandle ((UINTN)Intermediate) == NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"openinfo", Param1);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      TheHandle = ConvertHandleIndexToHandle ((UINTN)Intermediate);
-      if (TheHandle == NULL) {
-        ASSERT (TheHandle != NULL);
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"openinfo", Param1);
-        return SHELL_INVALID_PARAMETER;
-      }
+  Param1 = ShellCommandLineGetRawValue (Package, 1);
+  if (Param1 != NULL) {
+    Status = ShellConvertStringToUint64 (Param1, &Intermediate, TRUE, FALSE);
+  }
 
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_OPENINFO_HEADER_LINE), gShellDriver1HiiHandle, (UINTN)Intermediate, TheHandle);
+  if (EFI_ERROR (Status) || (Param1 == NULL) || (ConvertHandleIndexToHandle ((UINTN)Intermediate) == NULL)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"openinfo", Param1);
+    return SHELL_INVALID_PARAMETER;
+  }
 
-      Status = TraverseHandleDatabase (TheHandle);
-      if (!EFI_ERROR (Status)) {
-      } else {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"openinfo", Param1);
-        ShellStatus = SHELL_NOT_FOUND;
-      }
-    }
+  TheHandle = ConvertHandleIndexToHandle ((UINTN)Intermediate);
+  if (TheHandle == NULL) {
+    ASSERT (TheHandle != NULL);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"openinfo", Param1);
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_OPENINFO_HEADER_LINE), gShellDriver1HiiHandle, (UINTN)Intermediate, TheHandle);
+
+  Status = TraverseHandleDatabase (TheHandle);
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"openinfo", Param1);
+    return SHELL_NOT_FOUND;
   }
 
   return ShellStatus;
