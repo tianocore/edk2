@@ -202,6 +202,8 @@ ShellCommandRunDisconnect (
         }
       }
     }
+
+    ShellCommandLineFreeVarList (Package);
   }
 
   if (ShellStatus == SHELL_SUCCESS) {

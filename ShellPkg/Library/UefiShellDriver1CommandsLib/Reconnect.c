@@ -84,6 +84,8 @@ ShellCommandRunReconnect (
 
       ShellStatus = ShellCommandRunConnect (ImageHandle, SystemTable);
     }
+
+    ShellCommandLineFreeVarList (Package);
   }
 
   gInReconnect = FALSE;
