@@ -1909,6 +1909,11 @@ HttpsReceive (
       CopyMem (DataOut, BufferOut, BufferOutSize);
 
       Status = TlsCommonTransmit (HttpInstance, PacketOut);
+      if (EFI_ERROR (Status)) {
+        NetbufFree (PacketOut);
+        FreePool (BufferOut);
+        return Status;
+      }
 
       NetbufFree (PacketOut);
     }
