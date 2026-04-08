@@ -1,6 +1,8 @@
 /** @file
   MMU library for RISC-V.
 
+  TODO: Migrate some fields into an 'operating context' structure.
+
   Copyright (c) 2011-2020, ARM Limited. All rights reserved.
   Copyright (c) 2016, Linaro Limited. All rights reserved.
   Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
@@ -30,7 +32,6 @@
 #define RISCV_PG_G           BIT5
 #define RISCV_PG_A           BIT6
 #define RISCV_PG_D           BIT7
-#define PTE_ATTRIBUTES_MASK  0xE
 
 #define PTE_PPN_MASK          0x3FFFFFFFFFFC00ULL
 #define PTE_PPN_SHIFT         10
@@ -42,9 +43,9 @@
 #define PTE_PBMT_MASK                   (PTE_PBMT_NC | PTE_PBMT_IO)
 
 STATIC UINTN  mModeSupport[] = { SATP_MODE_SV57, SATP_MODE_SV48, SATP_MODE_SV39, SATP_MODE_OFF };
-STATIC UINTN  mMaxRootTableLevel;
-STATIC UINTN  mBitPerLevel;
-STATIC UINTN  mTableEntryCount;
+UINTN  mMaxRootTableLevel;
+UINTN  mBitPerLevel;
+UINTN  mTableEntryCount;
 
 /**
   Determine if the MMU enabled or not.
@@ -252,8 +253,8 @@ SetPpnToPte (
   @param  Level             The current level.
 
 **/
-STATIC
 VOID
+EFIAPI
 FreePageTablesRecursive (
   IN  UINT64  *TranslationTable,
   IN  UINTN   Level
@@ -474,8 +475,8 @@ UpdateRegionMappingRecursive (
   @retval EFI_SUCCESS           The operation succesfully.
 
 **/
-STATIC
 EFI_STATUS
+EFIAPI
 UpdateRegionMapping (
   IN  UINT64   RegionStart,
   IN  UINT64   RegionLength,
