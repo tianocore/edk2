@@ -994,24 +994,27 @@ DoDecodeByProtocol (
 
       FreePool (Guids);
     }
-  } else {
-    if (ConvertStrToGuid (Protocol, &Guid) == EFI_SUCCESS) {
-      Name = GetStringNameFromGuid (&Guid, Language);
-      if (Name != NULL) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DH_OUTPUT_DECODE), gShellDriver1HiiHandle, Name, &Guid);
-      } else {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DH_NO_GUID_FOUND), gShellDriver1HiiHandle, &Guid);
-      }
 
-      SHELL_FREE_NON_NULL (Name);
+    return SHELL_SUCCESS;
+  }
+
+  if (ConvertStrToGuid (Protocol, &Guid) == EFI_SUCCESS) {
+    Name = GetStringNameFromGuid (&Guid, Language);
+    if (Name != NULL) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DH_OUTPUT_DECODE), gShellDriver1HiiHandle, Name, &Guid);
     } else {
-      Status = GetGuidFromStringName (Protocol, Language, &Guids);
-      if (Status == EFI_SUCCESS) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DH_OUTPUT_DECODE), gShellDriver1HiiHandle, Protocol, Guids);
-      } else {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DH_NO_NAME_FOUND), gShellDriver1HiiHandle, Protocol);
-      }
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DH_NO_GUID_FOUND), gShellDriver1HiiHandle, &Guid);
     }
+
+    SHELL_FREE_NON_NULL (Name);
+    return SHELL_SUCCESS;
+  }
+
+  Status = GetGuidFromStringName (Protocol, Language, &Guids);
+  if (Status == EFI_SUCCESS) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DH_OUTPUT_DECODE), gShellDriver1HiiHandle, Protocol, Guids);
+  } else {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_DH_NO_NAME_FOUND), gShellDriver1HiiHandle, Protocol);
   }
 
   return SHELL_SUCCESS;
