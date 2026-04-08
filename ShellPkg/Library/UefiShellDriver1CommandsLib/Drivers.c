@@ -266,7 +266,6 @@ MainCmdDrivers (
   LIST_ENTRY  *Package
   )
 {
-  EFI_STATUS    Status;
   SHELL_STATUS  ShellStatus;
   CHAR8         *Language;
   CONST CHAR16  *Lang;
@@ -287,7 +286,6 @@ MainCmdDrivers (
   BOOLEAN       SfoFlag;
 
   ShellStatus  = SHELL_SUCCESS;
-  Status       = EFI_SUCCESS;
   Language     = NULL;
   FormatString = NULL;
   SfoFlag      = FALSE;
@@ -351,10 +349,12 @@ MainCmdDrivers (
 
   HandleList = GetHandleListByProtocol (&gEfiDriverBindingProtocolGuid);
   for (HandleWalker = HandleList; HandleWalker != NULL && *HandleWalker != NULL; HandleWalker++) {
-    ChildCount     = 0;
-    DeviceCount    = 0;
-    Status         = ParseHandleDatabaseForChildDevices (*HandleWalker, &ChildCount, NULL);
-    Status         = PARSE_HANDLE_DATABASE_DEVICES (*HandleWalker, &DeviceCount, NULL);
+    ChildCount  = 0;
+    DeviceCount = 0;
+
+    ParseHandleDatabaseForChildDevices (*HandleWalker, &ChildCount, NULL);
+    PARSE_HANDLE_DATABASE_DEVICES (*HandleWalker, &DeviceCount, NULL);
+
     Temp2          = GetDevicePathTextForHandle (*HandleWalker);
     DriverVersion  = ReturnDriverVersion (*HandleWalker);
     DriverConfig   = ReturnDriverConfig (*HandleWalker);
