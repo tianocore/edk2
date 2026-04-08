@@ -1126,7 +1126,8 @@ cleanlib:
                     Index = CommandList.index(Item)
                     CommandList.pop(Index)
                     BaseName = SingleCommandList[-1].rsplit('.',1)[0]
-                    if BaseName.endswith("%s%s" % (TAB_SLASH, CmdSumDict[CmdSign[3:].rsplit(TAB_SLASH, 1)[0]])):
+                    Key = CmdSign[3:].rsplit(TAB_SLASH, 1)[0]
+                    if Key in CmdSumDict and BaseName.endswith("%s%s" % (TAB_SLASH, CmdSumDict[Key])):
                         Cpplist = CmdCppDict[T.Target.SubDir]
                         Cpplist.insert(0, '$(OBJLIST_%d): ' % list(self.ObjTargetDict.keys()).index(T.Target.SubDir))
                         source_files = CmdTargetDict[CmdSign][1:]
