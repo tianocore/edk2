@@ -1,5 +1,5 @@
-## @file MockReportStatusCodeLib.inf
-# Google Test mocks for ReportStatusCodeLib
+## @file MockSerialPortLib.inf
+# Google Test mocks for SerialPortLib
 #
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -7,21 +7,19 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = MockReportStatusCodeLib
-  FILE_GUID                      = 3DFF7308-AC32-4BE9-9D01-B6F25E9161C3
+  BASE_NAME                      = MockSerialPortLib
+  FILE_GUID                      = 1E192C74-78D6-4CF1-A8B9-BB2A4BDAF6FD
   MODULE_TYPE                    = HOST_APPLICATION
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ReportStatusCodeLib
+  LIBRARY_CLASS                  = SerialPortLib
   PI_SPECIFICATION_VERSION       = 0x0001000A
 
-#
-# The following information is for reference only and not required by the build tools.
 #
 #  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources]
-  MockReportStatusCodeLib.cpp
+  MockSerialPortLib.cpp
 
 [Packages]
   MdePkg/MdePkg.dec
