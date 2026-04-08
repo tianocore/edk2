@@ -58,88 +58,99 @@ TraverseHandleDatabase (
                   &ArrayCount
                   );
   ASSERT_EFI_ERROR (Status);
-  if (!EFI_ERROR (Status)) {
-    for (ProtocolIndex = 0; ProtocolIndex < ArrayCount; ProtocolIndex++) {
-      //
-      // print out the human readable name for this one.
-      //
-      TempString = GetStringNameFromGuid (ProtocolGuidArray[ProtocolIndex], NULL);
-      if (TempString == NULL) {
-        continue;
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  for (ProtocolIndex = 0; ProtocolIndex < ArrayCount; ProtocolIndex++) {
+    //
+    // print out the human readable name for this one.
+    //
+    TempString = GetStringNameFromGuid (ProtocolGuidArray[ProtocolIndex], NULL);
+    if (TempString == NULL) {
+      continue;
+    }
+
+    ShellPrintDefaultEx (L"%H%s%N\r\n", TempString);
+    FreePool (TempString);
+
+    //
+    // Retrieve the list of agents that have opened each protocol
+    //
+    Status = gBS->OpenProtocolInformation (
+                    TheHandle,
+                    ProtocolGuidArray[ProtocolIndex],
+                    &OpenInfo,
+                    &OpenInfoCount
+                    );
+    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    for (OpenInfoIndex = 0; OpenInfoIndex < OpenInfoCount; OpenInfoIndex++) {
+      switch (OpenInfo[OpenInfoIndex].Attributes) {
+        case EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL:
+          OpenTypeString = StringHandProt;
+          break;
+        case EFI_OPEN_PROTOCOL_GET_PROTOCOL:
+          OpenTypeString = StringGetProt;
+          break;
+        case EFI_OPEN_PROTOCOL_TEST_PROTOCOL:
+          OpenTypeString = StringTestProt;
+          break;
+        case EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER:
+          OpenTypeString = StringChild;
+          break;
+        case EFI_OPEN_PROTOCOL_BY_DRIVER:
+          OpenTypeString = StringDriver;
+          break;
+        case EFI_OPEN_PROTOCOL_EXCLUSIVE:
+          OpenTypeString = StringExclusive;
+          break;
+        case EFI_OPEN_PROTOCOL_BY_DRIVER|EFI_OPEN_PROTOCOL_EXCLUSIVE:
+          OpenTypeString = StringDriverEx;
+          break;
+        default:
+          OpenTypeString = StringUnknown;
+          break;
       }
 
-      ShellPrintDefaultEx (L"%H%s%N\r\n", TempString);
-      FreePool (TempString);
-
-      //
-      // Retrieve the list of agents that have opened each protocol
-      //
-      Status = gBS->OpenProtocolInformation (
-                      TheHandle,
-                      ProtocolGuidArray[ProtocolIndex],
-                      &OpenInfo,
-                      &OpenInfoCount
-                      );
-      ASSERT_EFI_ERROR (Status);
-      if (!EFI_ERROR (Status)) {
-        for (OpenInfoIndex = 0; OpenInfoIndex < OpenInfoCount; OpenInfoIndex++) {
-          switch (OpenInfo[OpenInfoIndex].Attributes) {
-            case EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL:  OpenTypeString = StringHandProt;
-              break;
-            case EFI_OPEN_PROTOCOL_GET_PROTOCOL:        OpenTypeString = StringGetProt;
-              break;
-            case EFI_OPEN_PROTOCOL_TEST_PROTOCOL:       OpenTypeString = StringTestProt;
-              break;
-            case EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER: OpenTypeString = StringChild;
-              break;
-            case EFI_OPEN_PROTOCOL_BY_DRIVER:           OpenTypeString = StringDriver;
-              break;
-            case EFI_OPEN_PROTOCOL_EXCLUSIVE:           OpenTypeString = StringExclusive;
-              break;
-            case EFI_OPEN_PROTOCOL_BY_DRIVER|EFI_OPEN_PROTOCOL_EXCLUSIVE:
-              OpenTypeString = StringDriverEx;
-              break;
-            default:                                    OpenTypeString = StringUnknown;
-              break;
-          }
-
-          HandleIndex = ConvertHandleToHandleIndex (OpenInfo[OpenInfoIndex].AgentHandle);
-          if (HandleIndex == 0) {
-            FreePool (OpenInfo);
-            FreePool (ProtocolGuidArray);
-            return EFI_OUT_OF_RESOURCES;
-          }
-
-          Name            = GetStringNameFromHandle (OpenInfo[OpenInfoIndex].AgentHandle, NULL);
-          ControllerIndex = ConvertHandleToHandleIndex (OpenInfo[OpenInfoIndex].ControllerHandle);
-          if ((ControllerIndex != 0) && (Name != NULL)) {
-            ShellPrintHiiDefaultEx (
-              STRING_TOKEN (STR_OPENINFO_LINE),
-              gShellDriver1HiiHandle,
-              HandleIndex,
-              ControllerIndex,
-              OpenInfo[OpenInfoIndex].OpenCount,
-              OpenTypeString,
-              Name
-              );
-          } else {
-            ShellPrintHiiDefaultEx (
-              STRING_TOKEN (STR_OPENINFO_MIN_LINE),
-              gShellDriver1HiiHandle,
-              HandleIndex,
-              OpenInfo[OpenInfoIndex].OpenCount,
-              OpenTypeString,
-              Name ? Name : L""
-              );
-          }
-        }
-
+      HandleIndex = ConvertHandleToHandleIndex (OpenInfo[OpenInfoIndex].AgentHandle);
+      if (HandleIndex == 0) {
         FreePool (OpenInfo);
+        FreePool (ProtocolGuidArray);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      Name            = GetStringNameFromHandle (OpenInfo[OpenInfoIndex].AgentHandle, NULL);
+      ControllerIndex = ConvertHandleToHandleIndex (OpenInfo[OpenInfoIndex].ControllerHandle);
+      if ((ControllerIndex != 0) && (Name != NULL)) {
+        ShellPrintHiiDefaultEx (
+          STRING_TOKEN (STR_OPENINFO_LINE),
+          gShellDriver1HiiHandle,
+          HandleIndex,
+          ControllerIndex,
+          OpenInfo[OpenInfoIndex].OpenCount,
+          OpenTypeString,
+          Name
+          );
+      } else {
+        ShellPrintHiiDefaultEx (
+          STRING_TOKEN (STR_OPENINFO_MIN_LINE),
+          gShellDriver1HiiHandle,
+          HandleIndex,
+          OpenInfo[OpenInfoIndex].OpenCount,
+          OpenTypeString,
+          Name ? Name : L""
+          );
       }
     }
 
-    FreePool (ProtocolGuidArray);
+    FreePool (OpenInfo);
   }
+
+  FreePool (ProtocolGuidArray);
 
   return Status;
 }

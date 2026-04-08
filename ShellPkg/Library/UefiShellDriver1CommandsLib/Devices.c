@@ -91,24 +91,25 @@ GetDeviceHandleInfo (
 
   //  }
   Status = PARSE_HANDLE_DATABASE_UEFI_DRIVERS (TheHandle, Devices, &HandleBuffer);
-  if (!EFI_ERROR (Status) && (Devices != NULL) && (HandleBuffer != NULL)) {
-    for (Count = 0; Count < *Devices; Count++) {
-      if (!EFI_ERROR (gBS->OpenProtocol (HandleBuffer[Count], &gEfiDriverConfigurationProtocolGuid, NULL, NULL, gImageHandle, EFI_OPEN_PROTOCOL_TEST_PROTOCOL))) {
-        *Cfg = TRUE;
-      }
-
-      if (!EFI_ERROR (gBS->OpenProtocol (HandleBuffer[Count], &gEfiDriverDiagnosticsProtocolGuid, NULL, NULL, gImageHandle, EFI_OPEN_PROTOCOL_TEST_PROTOCOL))) {
-        *Diag = TRUE;
-      }
-
-      if (!EFI_ERROR (gBS->OpenProtocol (HandleBuffer[Count], &gEfiDriverDiagnostics2ProtocolGuid, NULL, NULL, gImageHandle, EFI_OPEN_PROTOCOL_TEST_PROTOCOL))) {
-        *Diag = TRUE;
-      }
-    }
-
-    SHELL_FREE_NON_NULL (HandleBuffer);
+  if (EFI_ERROR (Status) || (Devices == NULL) || (HandleBuffer == NULL)) {
+    return Status;
   }
 
+  for (Count = 0; Count < *Devices; Count++) {
+    if (!EFI_ERROR (gBS->OpenProtocol (HandleBuffer[Count], &gEfiDriverConfigurationProtocolGuid, NULL, NULL, gImageHandle, EFI_OPEN_PROTOCOL_TEST_PROTOCOL))) {
+      *Cfg = TRUE;
+    }
+
+    if (!EFI_ERROR (gBS->OpenProtocol (HandleBuffer[Count], &gEfiDriverDiagnosticsProtocolGuid, NULL, NULL, gImageHandle, EFI_OPEN_PROTOCOL_TEST_PROTOCOL))) {
+      *Diag = TRUE;
+    }
+
+    if (!EFI_ERROR (gBS->OpenProtocol (HandleBuffer[Count], &gEfiDriverDiagnostics2ProtocolGuid, NULL, NULL, gImageHandle, EFI_OPEN_PROTOCOL_TEST_PROTOCOL))) {
+      *Diag = TRUE;
+    }
+  }
+
+  SHELL_FREE_NON_NULL (HandleBuffer);
   return (Status);
 }
 
