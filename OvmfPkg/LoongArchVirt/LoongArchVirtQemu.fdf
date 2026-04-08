@@ -1,6 +1,6 @@
 ## @file
 #
-#  Copyright (c) 2024 Loongson Technology Corporation Limited. All rights reserved.<BR>
+#  Copyright (c) 2024-2026 Loongson Technology Corporation Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -207,7 +207,6 @@ INF  OvmfPkg/VirtioFsDxe/VirtioFsDxe.inf
 #
 INF ShellPkg/Application/Shell/Shell.inf
 
-INF MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTablePei/FirmwarePerformancePei.inf
 INF MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
 INF ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf
 
@@ -251,6 +250,7 @@ INF  MdeModulePkg/Core/Pei/PeiMain.inf
 INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 INF  OvmfPkg/LoongArchVirt/PlatformPei/PlatformPei.inf
 INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+INF  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTablePei/FirmwarePerformancePei.inf
 
 #
 # DXE Phase modules
