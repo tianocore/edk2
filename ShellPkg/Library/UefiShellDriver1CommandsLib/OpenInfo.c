@@ -225,6 +225,8 @@ ShellCommandRunOpenInfo (
         }
       }
     }
+
+    ShellCommandLineFreeVarList (Package);
   }
 
   return (ShellStatus);
