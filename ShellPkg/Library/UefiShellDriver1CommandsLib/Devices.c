@@ -129,7 +129,6 @@ MainCmdDevices (
   LIST_ENTRY  *Package
   )
 {
-  EFI_STATUS    Status;
   SHELL_STATUS  ShellStatus;
   CHAR8         *Language;
   EFI_HANDLE    *HandleList;
@@ -205,8 +204,8 @@ MainCmdDevices (
     //
     // get all the info on each handle
     //
-    Name   = NULL;
-    Status = GetDeviceHandleInfo (*HandleListWalker, &Type, &Cfg, &Diag, &Parents, &Devices, &Children, &Name, Language);
+    Name = NULL;
+    GetDeviceHandleInfo (*HandleListWalker, &Type, &Cfg, &Diag, &Parents, &Devices, &Children, &Name, Language);
     if ((Name != NULL) && ((Parents != 0) || (Devices != 0) || (Children != 0))) {
       ShellPrintHiiEx (
         -1,
