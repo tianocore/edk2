@@ -15,6 +15,7 @@ For this, this packages provides below libraries:
 TpmLib is wrapper library to call TCG TPM v2.0 reference implementation
 and The structure of TCG TPM v2.0 reference implementation is as follows:
 
+```
                        +----------------+
                        |   TCG TPM LIB  |
                        +----------------+
@@ -26,6 +27,7 @@ and The structure of TCG TPM v2.0 reference implementation is as follows:
 |    Crypto / BigInt Library |          |     Platform Layer      |
 |    (openssl or wolfssl)    |          |  (TPMCmd/Platform/src)  |
 +----------------------------+          +-------------------------+
+```
 
 For cryptograph and big integer functionalities,
 the TCG TPM 2.0 reference library will be built using EDK II’s **OpensslLibFull**
@@ -37,8 +39,9 @@ will use **PlatformTpmLib**.
 To make TCG TPM v2.0 reference implementation use **PlatformTpmLib**,
 **TpmLib** provides bridge layer named **TpmPlatformFunctions.c**:
 
+```
 +---------------+                     +---------------+      crypto/BigInt        +-----------+
-|    TpmLib    |  ------------------> |  TCG TPM Lib  | ----------------------->  |  Openssl  |
+|    TpmLib     |  -----------------> |  TCG TPM Lib  | ----------------------->  |  Openssl  |
 +---------------+                     +---------------+            |              +-----------+
                                                                    |
                                                                    | _plat__XXX()
@@ -48,6 +51,7 @@ To make TCG TPM v2.0 reference implementation use **PlatformTpmLib**,
 |      PlatformTpmLib            |  <---------------- |       Platform Layer        |
 |   (via TpmPlatformFunctions.c) |                    | (via TpmPlatformFunctions.c)|
 +--------------------------------+                    +-----------------------------+
+```
 
 When **TpmLib** requests to handle a TPM command (via TpmLibExecuteCommand())
 to TCG TPM v2.0 reference implementation, some command might requires
@@ -107,6 +111,7 @@ is implmented in FVP_RevC model and Juno platform:
 
 1) with UEFI
 
+   ```
          UEFI (Normal world)       |         Secure World
     -------------------------------|------------------------------
                                    |
@@ -129,9 +134,11 @@ is implmented in FVP_RevC model and Juno platform:
                                    .       +----------------------------+
                                    .
                       Communicate via CRB over FF-A
+   ```
 
 2) with linux-kernel
 
+   ```
          linux (Normal world)      |         Secure World
     -------------------------------|------------------------------
                                    |
@@ -154,6 +161,7 @@ is implmented in FVP_RevC model and Juno platform:
                                    .       +----------------------------+
                                    .
                      Communicate via CRB over FF-A
+   ```
 
 This kind of software stack can be used:
   - End to End measured boot with software-based TPM
