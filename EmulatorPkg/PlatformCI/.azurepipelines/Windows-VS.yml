@@ -3,7 +3,7 @@
 #
 # Platform: EMULATORPKG
 # OS: Windows
-# Toolchain: VS
+# Toolchain: CLANGPDB
 #
 # Copyright (c) Microsoft Corporation.
 # Copyright (c) 2020, Intel Corporation. All rights reserved.
@@ -90,7 +90,7 @@ jobs:
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
       parameters:
-        tool_chain_tag: VS2022
+        tool_chain_tag: CLANGPDB
         build_pkg: $(package)
         build_target: $(Build.Target)
         build_arch: $(Build.Arch)
