@@ -576,7 +576,6 @@ NvmeCreateDeviceInstance (
   NVME_DEVICE_PRIVATE_DATA  **ppDevice
   )
 {
-  NVME_ADMIN_NAMESPACE_DATA     *NamespaceData;
   NVME_CONTROLLER_PRIVATE_DATA  *Private;
   NVME_DEVICE_PRIVATE_DATA      *Device;
 
@@ -606,9 +605,6 @@ NvmeCreateDeviceInstance (
   Private->ControllerData->Sanicap.Bes = 1; // Block Erase Supported
   Private->ControllerData->Sanicap.Ces = 1; // Crypto Erase Supported
   Private->ControllerData->Sanicap.Ows = 1; // Overwrite Supported
-
-  NamespaceData = AllocateZeroPool (sizeof (NVME_ADMIN_NAMESPACE_DATA));
-  UT_LOG_VERBOSE ("%a: Allocated and Initialized NVME_ADMIN_NAMESPACE_DATA\n", __func__);
 
   Device = (NVME_DEVICE_PRIVATE_DATA *)(AllocateZeroPool (sizeof (NVME_DEVICE_PRIVATE_DATA)));
 
@@ -657,7 +653,6 @@ NvmeCreateDeviceInstance (
   Device->Controller->Passthru.GetNamespace     = NULL;
   Device->Controller->Passthru.GetNextNamespace = NULL;
 
-  CopyMem (&Device->NamespaceData, NamespaceData, sizeof (NVME_ADMIN_NAMESPACE_DATA));
   *ppDevice = Device;
 
   UT_LOG_VERBOSE ("%a: Allocated and Initialized NVME_DEVICE_PRIVATE_DATA\n", __func__);
