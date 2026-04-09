@@ -69,6 +69,7 @@ ShellLevel3CommandsLibConstructor (
   ShellCommandRegisterCommandName (L"echo", ShellCommandRunEcho, ShellCommandGetManFileNameLevel3, 3, L"", FALSE, gShellLevel3HiiHandle, STRING_TOKEN (STR_GET_HELP_ECHO));
   ShellCommandRegisterCommandName (L"pause", ShellCommandRunPause, ShellCommandGetManFileNameLevel3, 3, L"", TRUE, gShellLevel3HiiHandle, STRING_TOKEN (STR_GET_HELP_PAUSE));
   ShellCommandRegisterCommandName (L"getmtc", ShellCommandRunGetMtc, ShellCommandGetManFileNameLevel3, 3, L"", TRUE, gShellLevel3HiiHandle, STRING_TOKEN (STR_GET_HELP_GETMTC));
+  ShellCommandRegisterCommandName (L"rdmsr", ShellCommandRunMsr, ShellCommandGetManFileNameLevel3, 3, L"", TRUE, gShellLevel3HiiHandle, STRING_TOKEN (STR_GET_HELP_MSR));
   ShellCommandRegisterCommandName (L"help", ShellCommandRunHelp, ShellCommandGetManFileNameLevel3, 3, L"", TRUE, gShellLevel3HiiHandle, STRING_TOKEN (STR_GET_HELP_HELP));
 
   ShellCommandRegisterAlias (L"type", L"cat");

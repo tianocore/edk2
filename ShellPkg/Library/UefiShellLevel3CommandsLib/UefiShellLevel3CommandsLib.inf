@@ -33,6 +33,7 @@
   Echo.c
   Pause.c
   GetMtc.c
+  Msr.c
   Help.c
 
 
