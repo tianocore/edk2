@@ -4,6 +4,7 @@
 
   Copyright (C) Microsoft Corporation. All rights reserved.
   Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
+  (c) Copyright 2026 HP Development Company, L.P.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -2069,39 +2070,6 @@ RsaPkcs1Verify (
 }
 
 /**
-  Verifies the RSA signature with RSASSA-PSS signature scheme defined in RFC 8017.
-  Implementation determines salt length automatically from the signature encoding.
-  Mask generation function is the same as the message digest algorithm.
-  Salt length should be equal to digest length.
-
-  @param[in]  RsaContext      Pointer to RSA context for signature verification.
-  @param[in]  Message         Pointer to octet message to be verified.
-  @param[in]  MsgSize         Size of the message in bytes.
-  @param[in]  Signature       Pointer to RSASSA-PSS signature to be verified.
-  @param[in]  SigSize         Size of signature in bytes.
-  @param[in]  DigestLen       Length of digest for RSA operation.
-  @param[in]  SaltLen         Salt length for PSS encoding.
-
-  @retval  TRUE   Valid signature encoded in RSASSA-PSS.
-  @retval  FALSE  Invalid signature or invalid RSA context.
-
-**/
-BOOLEAN
-EFIAPI
-RsaPssVerify (
-  IN  VOID         *RsaContext,
-  IN  CONST UINT8  *Message,
-  IN  UINTN        MsgSize,
-  IN  CONST UINT8  *Signature,
-  IN  UINTN        SigSize,
-  IN  UINT16       DigestLen,
-  IN  UINT16       SaltLen
-  )
-{
-  CALL_CRYPTO_SERVICE (RsaPssVerify, (RsaContext, Message, MsgSize, Signature, SigSize, DigestLen, SaltLen), FALSE);
-}
-
-/**
   This function carries out the RSA-SSA signature generation with EMSA-PSS encoding scheme defined in
   RFC 8017.
   Mask generation function is the same as the message digest algorithm.
@@ -2144,6 +2112,94 @@ RsaPssSign (
   )
 {
   CALL_CRYPTO_SERVICE (RsaPssSign, (RsaContext, Message, MsgSize, DigestLen, SaltLen, Signature, SigSize), FALSE);
+}
+
+/**
+  Verifies the RSA signature with RSASSA-PSS signature scheme defined in RFC 8017.
+  Implementation determines salt length automatically from the signature encoding.
+  Mask generation function is the same as the message digest algorithm.
+  Salt length should be equal to digest length.
+
+  @param[in]  RsaContext      Pointer to RSA context for signature verification.
+  @param[in]  Message         Pointer to octet message to be verified.
+  @param[in]  MsgSize         Size of the message in bytes.
+  @param[in]  Signature       Pointer to RSASSA-PSS signature to be verified.
+  @param[in]  SigSize         Size of signature in bytes.
+  @param[in]  DigestLen       Length of digest for RSA operation.
+  @param[in]  SaltLen         Salt length for PSS encoding.
+
+  @retval  TRUE   Valid signature encoded in RSASSA-PSS.
+  @retval  FALSE  Invalid signature or invalid RSA context.
+
+**/
+BOOLEAN
+EFIAPI
+RsaPssVerify (
+  IN  VOID         *RsaContext,
+  IN  CONST UINT8  *Message,
+  IN  UINTN        MsgSize,
+  IN  CONST UINT8  *Signature,
+  IN  UINTN        SigSize,
+  IN  UINT16       DigestLen,
+  IN  UINT16       SaltLen
+  )
+{
+  CALL_CRYPTO_SERVICE (RsaPssVerify, (RsaContext, Message, MsgSize, Signature, SigSize, DigestLen, SaltLen), FALSE);
+}
+
+/**
+  Carries out the RSA-PSS signature generation over a precomputed message digest.
+
+  @param[in]      RsaContext   Pointer to RSA context for signature generation.
+  @param[in]      Digest       Pointer to the precomputed message digest.
+  @param[in]      DigestSize   Digest size in bytes (32=SHA-256, 48=SHA-384, 64=SHA-512).
+  @param[out]     Signature    Pointer to buffer to receive RSA PSS signature.
+  @param[in, out] SigSize      On input, the size of Signature buffer in bytes.
+                               On output, the size of data returned in Signature buffer in bytes.
+
+  @retval  TRUE   Signature successfully generated in RSASSA-PSS.
+  @retval  FALSE  Signature generation failed.
+  @retval  FALSE  SigSize is too small.
+  @retval  FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+RsaPssSignDigest (
+  IN      VOID         *RsaContext,
+  IN      CONST UINT8  *Digest,
+  IN      UINTN        DigestSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  )
+{
+  CALL_CRYPTO_SERVICE (RsaPssSignDigest, (RsaContext, Digest, DigestSize, Signature, SigSize), FALSE);
+}
+
+/**
+  Verifies an RSA-PSS signature over a precomputed message digest.
+
+  @param[in]  RsaContext   Pointer to RSA context for signature verification.
+  @param[in]  Digest       Pointer to the message digest.
+  @param[in]  DigestSize   Digest size in bytes (32=SHA-256, 48=SHA-384, 64=SHA-512).
+  @param[in]  Signature    Pointer to RSASSA-PSS signature to be verified.
+  @param[in]  SigSize      Size of signature in bytes.
+
+  @retval  TRUE   Valid signature encoded in RSASSA-PSS.
+  @retval  FALSE  Invalid signature or invalid RSA context.
+
+**/
+BOOLEAN
+EFIAPI
+RsaPssVerifyDigest (
+  IN  VOID         *RsaContext,
+  IN  CONST UINT8  *Digest,
+  IN  UINTN        DigestSize,
+  IN  CONST UINT8  *Signature,
+  IN  UINTN        SigSize
+  )
+{
+  CALL_CRYPTO_SERVICE (RsaPssVerifyDigest, (RsaContext, Digest, DigestSize, Signature, SigSize), FALSE);
 }
 
 /**

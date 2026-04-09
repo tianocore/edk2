@@ -52,3 +52,22 @@ HttpBootStop (
   );
 
 extern EFI_HTTP_BOOT_CALLBACK_PROTOCOL  gHttpBootDxeHttpBootCallback;
+
+/**
+  Callback function that is invoked when an HTTP event occurs during HTTP Boot.
+
+  This function handles TLS-related events (HttpEventTlsConnectSession and
+  HttpEventTlsConfigured) and prints error messages to the screen when a TLS
+  error is encountered during the HTTP Boot process.
+
+  @param[in]  This              Pointer to the EDKII_HTTP_CALLBACK_PROTOCOL instance.
+  @param[in]  Event             The event that occurs in the current state.
+  @param[in]  EventStatus       The Status of Event, EFI_SUCCESS or other errors.
+**/
+VOID
+EFIAPI
+HttpBootHttpCallback (
+  IN EDKII_HTTP_CALLBACK_PROTOCOL  *This,
+  IN EDKII_HTTP_CALLBACK_EVENT     Event,
+  IN EFI_STATUS                    EventStatus
+  );

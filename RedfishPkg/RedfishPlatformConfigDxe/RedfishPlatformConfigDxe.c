@@ -545,7 +545,6 @@ OneOfStatementToAttributeValues (
       Values->ValueArray[Index].ValueDisplayName = HiiGetEnglishAsciiString (HiiHandle, Option->Text);
       Values->ValueArray[Index].ValueName        = HiiGetRedfishAsciiString (HiiHandle, SchemaName, Option->Text);
       if (Values->ValueArray[Index].ValueName == NULL) {
-        DEBUG ((DEBUG_MANAGEABILITY, "%a: Redfish x-UEFI string is not found.\n", __func__));
         //
         // No x-UEFI-redfish string defined. Try to get string in English.
         //
@@ -1320,7 +1319,6 @@ HiiValueToRedfishValue (
 
       RedfishValue->Value.Buffer = HiiGetRedfishAsciiString (HiiHandle, FullSchema, StringId);
       if (RedfishValue->Value.Buffer == NULL) {
-        DEBUG ((DEBUG_MANAGEABILITY, "%a: Redfish x-UEFI string is not found.\n", __func__));
         //
         // No x-UEFI-redfish string defined. Try to get string in English.
         //

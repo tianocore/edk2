@@ -1,6 +1,6 @@
 ## @file
 #
-#  Copyright (c) 2024 Loongson Technology Corporation Limited. All rights reserved.<BR>
+#  Copyright (c) 2024-2026 Loongson Technology Corporation Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -205,6 +205,7 @@
   PlatformBootManagerCommonLib     |OvmfPkg/Library/PlatformBootManagerCommonLib/PlatformBootManagerCommonLib.inf
   QemuFwCfgSimpleParserLib         | OvmfPkg/Library/QemuFwCfgSimpleParserLib/QemuFwCfgSimpleParserLib.inf
   QemuLoadImageLib                 | OvmfPkg/Library/GenericQemuLoadImageLib/GenericQemuLoadImageLib.inf
+  LockBoxLib                       | MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
 
   #
   # Virtio Support
@@ -239,12 +240,14 @@
   PeCoffGetEntryPointLib           | MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   QemuFwCfgLib                     | OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgMmioPeiLib.inf
   PlatformHookLib                  | OvmfPkg/LoongArchVirt/Library/Fdt16550SerialPortHookLib/EarlyFdt16550SerialPortHookLib.inf
+  PerformanceLib                   | MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
 
 [LibraryClasses.common.PEIM]
   HobLib                           | MdePkg/Library/PeiHobLib/PeiHobLib.inf
   PeiServicesTablePointerLib       | MdePkg/Library/PeiServicesTablePointerLibKs0/PeiServicesTablePointerLibKs0.inf
   MemoryAllocationLib              | MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   PeimEntryPoint                   | MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
+  PerformanceLib                   | MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
   ReportStatusCodeLib              | MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
   OemHookStatusCodeLib             | MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   PeCoffGetEntryPointLib           | MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
@@ -265,6 +268,7 @@
   ReportStatusCodeLib              | MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   PciPcdProducerLib                | OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   CpuExceptionHandlerLib           | UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
+  PerformanceLib                   | MdeModulePkg/Library/DxeCorePerformanceLib/DxeCorePerformanceLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
   PcdLib                           | MdePkg/Library/DxePcdLib/DxePcdLib.inf
@@ -273,7 +277,7 @@
   MemoryAllocationLib              | MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   ReportStatusCodeLib              | MdeModulePkg/Library/RuntimeDxeReportStatusCodeLib/RuntimeDxeReportStatusCodeLib.inf
   UefiRuntimeLib                   | MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
-  ExtractGuidedSectionLib          | MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
+  ExtractGuidedSectionLib          | MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
   QemuFwCfgS3Lib                   | OvmfPkg/Library/QemuFwCfgS3Lib/DxeQemuFwCfgS3LibFwCfg.inf
   RealTimeClockLib                 | OvmfPkg/LoongArchVirt/Library/LsRealTimeClockLib/LsRealTimeClockLib.inf
   VariablePolicyLib                | MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
@@ -290,16 +294,18 @@
   PcdLib                           | MdePkg/Library/DxePcdLib/DxePcdLib.inf
   HobLib                           | MdePkg/Library/DxeHobLib/DxeHobLib.inf
   DxeCoreEntryPoint                | MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
+  PerformanceLib                   | MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
   MemoryAllocationLib              | MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   ReportStatusCodeLib              | MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   UefiScsiLib                      | MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
-  ExtractGuidedSectionLib          | MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
+  ExtractGuidedSectionLib          | MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
   QemuFwCfgLib                     | OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgMmioDxeLib.inf
   PciPcdProducerLib                | OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   PcdLib                           | MdePkg/Library/DxePcdLib/DxePcdLib.inf
   HobLib                           | MdePkg/Library/DxeHobLib/DxeHobLib.inf
+  PerformanceLib                   | MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
   MemoryAllocationLib              | MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   ReportStatusCodeLib              | MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   UefiScsiLib                      | MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
@@ -314,6 +320,7 @@
 [LibraryClasses.common.UEFI_APPLICATION]
   PcdLib                           | MdePkg/Library/DxePcdLib/DxePcdLib.inf
   HobLib                           | MdePkg/Library/DxeHobLib/DxeHobLib.inf
+  PerformanceLib                   | MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
   MemoryAllocationLib              | MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   ExtractGuidedSectionLib          | MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
   PciPcdProducerLib                | OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
@@ -338,7 +345,7 @@
 !endif
 !if $(SECURE_BOOT_ENABLE) == TRUE
   gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported                    | TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdRequireSelfSignedPk                | TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRequireSelfSignedPk                | FALSE
 !endif
 [PcdsFixedAtBuild]
 ## BaseLib ##
@@ -362,6 +369,7 @@
 !endif
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize       | 0x8000
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress                     | 0x0
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask           | 0x1
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask             | 0x07
 
   # Use MMIO for accessing Serial port registers.
@@ -502,6 +510,7 @@
     <LibraryClasses>
       PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   }
+  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTablePei/FirmwarePerformancePei.inf
 
   #
   # DXE Phase modules
@@ -723,3 +732,9 @@
   # UEFI application (Shell Embedded Boot Loader)
   #
 !include OvmfPkg/Include/Dsc/ShellComponents.dsc.inc
+
+  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
+  ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf {
+    <PcdsFixedAtBuild>
+      gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
+  }
