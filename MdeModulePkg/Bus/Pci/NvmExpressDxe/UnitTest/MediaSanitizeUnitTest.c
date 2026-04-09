@@ -628,7 +628,7 @@ NvmeCreateDeviceInstance (
   Device->Media.WriteCaching     = FALSE;
   Device->Media.BlockSize        = (UINT32)(1 << 9); // 512 byte sector size
 
-  Device->Media.LastBlock                     = 0x4000; // NamespaceData=>Nsze
+  Device->Media.LastBlock                     = 0x3FFF;
   Device->Media.LogicalBlocksPerPhysicalBlock = 1;
   Device->Media.LowestAlignedLba              = 1;
 
