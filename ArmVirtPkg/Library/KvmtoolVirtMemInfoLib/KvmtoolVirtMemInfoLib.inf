@@ -1,7 +1,7 @@
 ## @file
 #  Kvmtool virtual memory map library.
 #
-#  Copyright (c) 2018, ARM Limited. All rights reserved.
+#  Copyright (c) 2018 - 2023, Arm Limited. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -24,19 +24,24 @@
   EmbeddedPkg/EmbeddedPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  ArmCcaLib
   ArmLib
   BaseLib
   BaseMemoryLib
   DebugLib
   MemoryAllocationLib
   PcdLib
+  PlatformDeviceInfoLib
 
 [Pcd]
   gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
+  gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFvSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdMaxPlatDeviceCount

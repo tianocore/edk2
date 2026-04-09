@@ -50,6 +50,7 @@
 
   ArmPlatformLib|ArmPlatformPkg/Library/ArmPlatformLibNull/ArmPlatformLibNull.inf
   ArmVirtMemInfoLib|ArmVirtPkg/Library/KvmtoolVirtMemInfoLib/KvmtoolVirtMemInfoLib.inf
+  PlatformDeviceInfoLib|OvmfPkg/Library/PlatformDeviceInfoLib/PlatformDeviceInfoLib.inf
 
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
   VirtNorFlashDeviceLib|OvmfPkg/Library/VirtNorFlashDeviceLib/VirtNorFlashDeviceLib.inf
@@ -89,6 +90,12 @@
 
   ArmMonitorLib|ArmVirtPkg/Library/ArmVirtMonitorLib/ArmVirtMonitorLib.inf
   ArmTrngLib|ArmPkg/Library/ArmTrngLib/ArmTrngLib.inf
+
+  ArmCcaLib|ArmVirtPkg/Library/ArmCcaLib/ArmCcaLib.inf
+  ArmCcaRsiLib|ArmVirtPkg/Library/ArmCcaRsiLib/ArmCcaRsiLib.inf
+
+[LibraryClasses.common.SEC]
+  ArmCcaInitPeiLib|ArmVirtPkg/Library/ArmCcaInitPeiLib/ArmCcaInitPeiLib.inf
 
 [LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM]
   PciExpressLib|MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
@@ -241,6 +248,7 @@
   #
   ArmVirtPkg/PrePi/ArmVirtPrePiUniCoreRelocatable.inf {
     <LibraryClasses>
+      DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
       ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
       PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
@@ -393,3 +401,12 @@
   # ACPI Support
   #
   ArmVirtPkg/KvmtoolCfgMgrDxe/ConfigurationManagerDxe.inf
+  #
+  # Realm Aperture Management
+  #
+  ArmVirtPkg/RealmApertureManagementProtocolDxe/RealmApertureManagementProtocolDxe.inf
+
+  #
+  # IoMMU support for Arm CCA
+  #
+  ArmVirtPkg/ArmCcaIoMmuDxe/ArmCcaIoMmuDxe.inf
