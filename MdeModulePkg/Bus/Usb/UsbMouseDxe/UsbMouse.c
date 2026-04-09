@@ -792,11 +792,11 @@ OnMouseInterruptComplete (
     //
     // EFI_USB_INTERRUPT_DELAY is defined in USB standard for error handling.
     //
-    gBS->SetTimer (
-           UsbMouseDevice->DelayedRecoveryEvent,
-           TimerRelative,
-           EFI_USB_INTERRUPT_DELAY
-           );
+    (VOID)gBS->SetTimer (
+                 UsbMouseDevice->DelayedRecoveryEvent,
+                 TimerRelative,
+                 EFI_USB_INTERRUPT_DELAY
+                 );
     return EFI_DEVICE_ERROR;
   }
 

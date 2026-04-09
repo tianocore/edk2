@@ -1252,11 +1252,11 @@ UnicodeToEfiKeyFlushState (
   //
   // Cancel the timer.
   //
-  gBS->SetTimer (
-         TerminalDevice->TwoSecondTimeOut,
-         TimerCancel,
-         0
-         );
+  (VOID)gBS->SetTimer (
+               TerminalDevice->TwoSecondTimeOut,
+               TimerCancel,
+               0
+               );
 
   TerminalDevice->InputState = INPUT_STATE_DEFAULT;
 }

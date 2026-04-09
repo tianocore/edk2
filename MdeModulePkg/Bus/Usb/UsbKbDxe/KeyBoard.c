@@ -998,11 +998,11 @@ KeyboardHandler (
     //
     UsbKeyboardDevice->RepeatKey = 0;
 
-    gBS->SetTimer (
-           UsbKeyboardDevice->RepeatTimer,
-           TimerCancel,
-           USBKBD_REPEAT_RATE
-           );
+    (VOID)gBS->SetTimer (
+                 UsbKeyboardDevice->RepeatTimer,
+                 TimerCancel,
+                 USBKBD_REPEAT_RATE
+                 );
 
     if ((Result & EFI_USB_ERR_STALL) == EFI_USB_ERR_STALL) {
       UsbClearEndpointHalt (
@@ -1028,11 +1028,11 @@ KeyboardHandler (
     //
     // EFI_USB_INTERRUPT_DELAY is defined in USB standard for error handling.
     //
-    gBS->SetTimer (
-           UsbKeyboardDevice->DelayedRecoveryEvent,
-           TimerRelative,
-           EFI_USB_INTERRUPT_DELAY
-           );
+    (VOID)gBS->SetTimer (
+                 UsbKeyboardDevice->DelayedRecoveryEvent,
+                 TimerRelative,
+                 EFI_USB_INTERRUPT_DELAY
+                 );
 
     return EFI_DEVICE_ERROR;
   }
@@ -1149,11 +1149,11 @@ KeyboardHandler (
   // If original repeat key is released, cancel the repeat timer
   //
   if (UsbKeyboardDevice->RepeatKey == 0) {
-    gBS->SetTimer (
-           UsbKeyboardDevice->RepeatTimer,
-           TimerCancel,
-           USBKBD_REPEAT_RATE
-           );
+    (VOID)gBS->SetTimer (
+                 UsbKeyboardDevice->RepeatTimer,
+                 TimerCancel,
+                 USBKBD_REPEAT_RATE
+                 );
   }
 
   //
@@ -1226,11 +1226,11 @@ KeyboardHandler (
     // to trigger the repeat timer when the key is hold long
     // enough time.
     //
-    gBS->SetTimer (
-           UsbKeyboardDevice->RepeatTimer,
-           TimerRelative,
-           USBKBD_REPEAT_DELAY
-           );
+    (VOID)gBS->SetTimer (
+                 UsbKeyboardDevice->RepeatTimer,
+                 TimerRelative,
+                 USBKBD_REPEAT_DELAY
+                 );
     UsbKeyboardDevice->RepeatKey = NewRepeatKey;
   }
 
@@ -1928,11 +1928,11 @@ USBKeyboardRepeatHandler (
     //
     // Set repeat rate for next repeat key generation.
     //
-    gBS->SetTimer (
-           UsbKeyboardDevice->RepeatTimer,
-           TimerRelative,
-           USBKBD_REPEAT_RATE
-           );
+    (VOID)gBS->SetTimer (
+                 UsbKeyboardDevice->RepeatTimer,
+                 TimerRelative,
+                 USBKBD_REPEAT_RATE
+                 );
   }
 }
 
