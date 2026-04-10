@@ -41,7 +41,7 @@ resource 'cmdo' (128, "Antlr") {
 
 			},
 			MultiFiles {
-				"Grammar File(s)…",
+				"Grammar File(s)",
 				"Choose the grammar specification files y"
 				"ou wish to have ANTLR process.",
 				{79, 22, 98, 152},
@@ -73,7 +73,7 @@ resource 'cmdo' (128, "Antlr") {
 					"Choose the directory where ANTLR will pu"
 					"t its output.",
 					dim,
-					"Output Directory…",
+					"Output Directory",
 					"",
 					""
 				},
@@ -113,7 +113,7 @@ resource 'cmdo' (128, "Antlr") {
 			NestedDialog {
 				5,
 				{20, 324, 40, 460},
-				"Parse Options…",
+				"Parse Options",
 				"Parse control options may be set with th"
 				"is button."
 			},
@@ -124,7 +124,7 @@ resource 'cmdo' (128, "Antlr") {
 			NestedDialog {
 				2,
 				{50, 324, 70, 460},
-				"Generate Options…",
+				"Generate Options",
 				"Various command line options may be set "
 				"with this button."
 			},
@@ -135,7 +135,7 @@ resource 'cmdo' (128, "Antlr") {
 			NestedDialog {
 				3,
 				{78, 324, 98, 460},
-				"More Options…",
+				"More Options",
 				"Antlr has ALOT of options. There are eve"
 				"n more to be found with this button."
 			},
@@ -146,7 +146,7 @@ resource 'cmdo' (128, "Antlr") {
 			NestedDialog {
 				4,
 				{106, 324, 126, 460},
-				"Rename Options…",
+				"Rename Options",
 				"Options for renaming output files may be"
 				" set with this button."
 			},
@@ -453,7 +453,7 @@ resource 'cmdo' (128, "Antlr") {
 				"More warnings",
 				"-w2",
 				"If this option is checked, ANTLR will wa"
-				"rn if semantic predicates and/or (…)? bl"
+				"rn if semantic predicates and/or ()? bl"
 				"ocks are assumed to cover ambiguous alte"
 				"rnatives."
 			},

@@ -40,7 +40,7 @@ List of Implemented Fixes and Changes for Maintenance Releases of PCCTS
 #309. (Changed in MR32) Renamed baseName because of VMS name conflict
 
     Renamed baseName to pcctsBaseName to avoid library name conflict with
-    VMS library routine.  Reported by Jean-François PIÉRONNE.
+    VMS library routine.  Reported by Jean-FranÃ§ois PIÃ‰RONNE.
     
 #308. (Changed in MR32) Used "template" as name of formal in C routine
 
@@ -975,7 +975,7 @@ List of Implemented Fixes and Changes for Maintenance Releases of PCCTS
     
 #249. (MR21) Changes for DEC/VMS systems
 
-    Jean-François Piéronne (jfp altavista.net) has updated some
+    Jean-FranÃ§ois PiÃ©ronne (jfp altavista.net) has updated some
     VMS related command files and fixed some minor problems related
     to building pccts under the DEC/VMS operating system.  For DEC/VMS
     users the most important differences are:
@@ -1750,7 +1750,7 @@ List of Implemented Fixes and Changes for Maintenance Releases of PCCTS
       Under certain circumstances a predicate test could generate
       a #line directive which was not at column 1.
 
-      Reported with fix by David Kågedal  (davidk lysator.liu.se)
+      Reported with fix by David KÃ¥gedal  (davidk lysator.liu.se)
       (http://www.lysator.liu.se/~davidk/).
 
 #194. (Changed in MR14) (C Mode only) Demand lookahead with #tokclass
