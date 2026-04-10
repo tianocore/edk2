@@ -409,7 +409,7 @@ class GitDiffCheck:
                 self.state = PRE_PATCH
                 self.filename = line[13:].split(' ', 1)[0]
                 self.is_newfile = False
-                self.force_crlf = True
+                self.force_crlf = False
                 self.force_notabs = True
                 if self.filename.endswith('.rtf'):
                     self.force_crlf = False
