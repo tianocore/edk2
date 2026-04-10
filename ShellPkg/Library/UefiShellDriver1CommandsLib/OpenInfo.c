@@ -58,90 +58,159 @@ TraverseHandleDatabase (
                   &ArrayCount
                   );
   ASSERT_EFI_ERROR (Status);
-  if (!EFI_ERROR (Status)) {
-    for (ProtocolIndex = 0; ProtocolIndex < ArrayCount; ProtocolIndex++) {
-      //
-      // print out the human readable name for this one.
-      //
-      TempString = GetStringNameFromGuid (ProtocolGuidArray[ProtocolIndex], NULL);
-      if (TempString == NULL) {
-        continue;
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  for (ProtocolIndex = 0; ProtocolIndex < ArrayCount; ProtocolIndex++) {
+    //
+    // print out the human readable name for this one.
+    //
+    TempString = GetStringNameFromGuid (ProtocolGuidArray[ProtocolIndex], NULL);
+    if (TempString == NULL) {
+      continue;
+    }
+
+    ShellPrintDefaultEx (L"%H%s%N\r\n", TempString);
+    FreePool (TempString);
+
+    //
+    // Retrieve the list of agents that have opened each protocol
+    //
+    Status = gBS->OpenProtocolInformation (
+                    TheHandle,
+                    ProtocolGuidArray[ProtocolIndex],
+                    &OpenInfo,
+                    &OpenInfoCount
+                    );
+    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    for (OpenInfoIndex = 0; OpenInfoIndex < OpenInfoCount; OpenInfoIndex++) {
+      switch (OpenInfo[OpenInfoIndex].Attributes) {
+        case EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL:
+          OpenTypeString = StringHandProt;
+          break;
+        case EFI_OPEN_PROTOCOL_GET_PROTOCOL:
+          OpenTypeString = StringGetProt;
+          break;
+        case EFI_OPEN_PROTOCOL_TEST_PROTOCOL:
+          OpenTypeString = StringTestProt;
+          break;
+        case EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER:
+          OpenTypeString = StringChild;
+          break;
+        case EFI_OPEN_PROTOCOL_BY_DRIVER:
+          OpenTypeString = StringDriver;
+          break;
+        case EFI_OPEN_PROTOCOL_EXCLUSIVE:
+          OpenTypeString = StringExclusive;
+          break;
+        case EFI_OPEN_PROTOCOL_BY_DRIVER|EFI_OPEN_PROTOCOL_EXCLUSIVE:
+          OpenTypeString = StringDriverEx;
+          break;
+        default:
+          OpenTypeString = StringUnknown;
+          break;
       }
 
-      ShellPrintDefaultEx (L"%H%s%N\r\n", TempString);
-      FreePool (TempString);
-
-      //
-      // Retrieve the list of agents that have opened each protocol
-      //
-      Status = gBS->OpenProtocolInformation (
-                      TheHandle,
-                      ProtocolGuidArray[ProtocolIndex],
-                      &OpenInfo,
-                      &OpenInfoCount
-                      );
-      ASSERT_EFI_ERROR (Status);
-      if (!EFI_ERROR (Status)) {
-        for (OpenInfoIndex = 0; OpenInfoIndex < OpenInfoCount; OpenInfoIndex++) {
-          switch (OpenInfo[OpenInfoIndex].Attributes) {
-            case EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL:  OpenTypeString = StringHandProt;
-              break;
-            case EFI_OPEN_PROTOCOL_GET_PROTOCOL:        OpenTypeString = StringGetProt;
-              break;
-            case EFI_OPEN_PROTOCOL_TEST_PROTOCOL:       OpenTypeString = StringTestProt;
-              break;
-            case EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER: OpenTypeString = StringChild;
-              break;
-            case EFI_OPEN_PROTOCOL_BY_DRIVER:           OpenTypeString = StringDriver;
-              break;
-            case EFI_OPEN_PROTOCOL_EXCLUSIVE:           OpenTypeString = StringExclusive;
-              break;
-            case EFI_OPEN_PROTOCOL_BY_DRIVER|EFI_OPEN_PROTOCOL_EXCLUSIVE:
-              OpenTypeString = StringDriverEx;
-              break;
-            default:                                    OpenTypeString = StringUnknown;
-              break;
-          }
-
-          HandleIndex = ConvertHandleToHandleIndex (OpenInfo[OpenInfoIndex].AgentHandle);
-          if (HandleIndex == 0) {
-            FreePool (OpenInfo);
-            FreePool (ProtocolGuidArray);
-            return EFI_OUT_OF_RESOURCES;
-          }
-
-          Name            = GetStringNameFromHandle (OpenInfo[OpenInfoIndex].AgentHandle, NULL);
-          ControllerIndex = ConvertHandleToHandleIndex (OpenInfo[OpenInfoIndex].ControllerHandle);
-          if ((ControllerIndex != 0) && (Name != NULL)) {
-            ShellPrintHiiDefaultEx (
-              STRING_TOKEN (STR_OPENINFO_LINE),
-              gShellDriver1HiiHandle,
-              HandleIndex,
-              ControllerIndex,
-              OpenInfo[OpenInfoIndex].OpenCount,
-              OpenTypeString,
-              Name
-              );
-          } else {
-            ShellPrintHiiDefaultEx (
-              STRING_TOKEN (STR_OPENINFO_MIN_LINE),
-              gShellDriver1HiiHandle,
-              HandleIndex,
-              OpenInfo[OpenInfoIndex].OpenCount,
-              OpenTypeString,
-              Name ? Name : L""
-              );
-          }
-        }
-
+      HandleIndex = ConvertHandleToHandleIndex (OpenInfo[OpenInfoIndex].AgentHandle);
+      if (HandleIndex == 0) {
         FreePool (OpenInfo);
+        FreePool (ProtocolGuidArray);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      Name            = GetStringNameFromHandle (OpenInfo[OpenInfoIndex].AgentHandle, NULL);
+      ControllerIndex = ConvertHandleToHandleIndex (OpenInfo[OpenInfoIndex].ControllerHandle);
+      if ((ControllerIndex != 0) && (Name != NULL)) {
+        ShellPrintHiiDefaultEx (
+          STRING_TOKEN (STR_OPENINFO_LINE),
+          gShellDriver1HiiHandle,
+          HandleIndex,
+          ControllerIndex,
+          OpenInfo[OpenInfoIndex].OpenCount,
+          OpenTypeString,
+          Name
+          );
+      } else {
+        ShellPrintHiiDefaultEx (
+          STRING_TOKEN (STR_OPENINFO_MIN_LINE),
+          gShellDriver1HiiHandle,
+          HandleIndex,
+          OpenInfo[OpenInfoIndex].OpenCount,
+          OpenTypeString,
+          Name ? Name : L""
+          );
       }
     }
 
-    FreePool (ProtocolGuidArray);
+    FreePool (OpenInfo);
   }
 
+  FreePool (ProtocolGuidArray);
+
   return Status;
+}
+
+/** Main function of the 'OpenInfo' command.
+
+  @param[in] Package    List of input parameter for the command.
+**/
+STATIC
+SHELL_STATUS
+MainCmdOpenInfo (
+  LIST_ENTRY  *Package
+  )
+{
+  EFI_STATUS    Status;
+  SHELL_STATUS  ShellStatus;
+  EFI_HANDLE    TheHandle;
+  CONST CHAR16  *Param1;
+  UINT64        Intermediate;
+
+  Status      = EFI_SUCCESS;
+  ShellStatus = SHELL_SUCCESS;
+
+  if (ShellCommandLineGetCount (Package) > 2) {
+    //
+    // error for too many parameters
+    //
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"openinfo");
+    return SHELL_INVALID_PARAMETER;
+  } else if (ShellCommandLineGetCount (Package) == 0) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDriver1HiiHandle, L"openinfo");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  Param1 = ShellCommandLineGetRawValue (Package, 1);
+  if (Param1 != NULL) {
+    Status = ShellConvertStringToUint64 (Param1, &Intermediate, TRUE, FALSE);
+  }
+
+  if (EFI_ERROR (Status) || (Param1 == NULL) || (ConvertHandleIndexToHandle ((UINTN)Intermediate) == NULL)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"openinfo", Param1);
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  TheHandle = ConvertHandleIndexToHandle ((UINTN)Intermediate);
+  if (TheHandle == NULL) {
+    ASSERT (TheHandle != NULL);
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"openinfo", Param1);
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  ShellPrintHiiDefaultEx (STRING_TOKEN (STR_OPENINFO_HEADER_LINE), gShellDriver1HiiHandle, (UINTN)Intermediate, TheHandle);
+
+  Status = TraverseHandleDatabase (TheHandle);
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"openinfo", Param1);
+    return SHELL_NOT_FOUND;
+  }
+
+  return ShellStatus;
 }
 
 /**
@@ -161,9 +230,6 @@ ShellCommandRunOpenInfo (
   LIST_ENTRY    *Package;
   CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
-  EFI_HANDLE    TheHandle;
-  CONST CHAR16  *Param1;
-  UINT64        Intermediate;
 
   ShellStatus = SHELL_SUCCESS;
 
@@ -188,44 +254,12 @@ ShellCommandRunOpenInfo (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    if (ShellCommandLineGetCount (Package) > 2) {
-      //
-      // error for too many parameters
-      //
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"openinfo");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (ShellCommandLineGetCount (Package) == 0) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellDriver1HiiHandle, L"openinfo");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      Param1 = ShellCommandLineGetRawValue (Package, 1);
-      if (Param1 != NULL) {
-        Status = ShellConvertStringToUint64 (Param1, &Intermediate, TRUE, FALSE);
-      }
 
-      if (EFI_ERROR (Status) || (Param1 == NULL) || (ConvertHandleIndexToHandle ((UINTN)Intermediate) == NULL)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"openinfo", Param1);
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        TheHandle = ConvertHandleIndexToHandle ((UINTN)Intermediate);
-        if (TheHandle == NULL) {
-          ASSERT (TheHandle != NULL);
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"openinfo", Param1);
-          return SHELL_INVALID_PARAMETER;
-        }
-
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_OPENINFO_HEADER_LINE), gShellDriver1HiiHandle, (UINTN)Intermediate, TheHandle);
-
-        Status = TraverseHandleDatabase (TheHandle);
-        if (!EFI_ERROR (Status)) {
-        } else {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"openinfo", Param1);
-          ShellStatus = SHELL_NOT_FOUND;
-        }
-      }
-    }
+    return ShellStatus;
   }
+
+  ShellStatus = MainCmdOpenInfo (Package);
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }

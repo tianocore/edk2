@@ -232,10 +232,12 @@ IgvmSecureBootDxeEntrypoint (
     return Status;
   }
 
-  // allow setting a platform key (PK) which is not self-signed
-  Status = IgvmSecureBootCustomMode (TRUE);
-  if (EFI_ERROR (Status)) {
-    return Status;
+  if (FeaturePcdGet (PcdRequireSelfSignedPk)) {
+    // CustomMode allows setting a platform key (PK) which is not self-signed
+    Status = IgvmSecureBootCustomMode (TRUE);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }
 
   Status = IgvmSecureBootSetVariable (L"PK", &gEfiGlobalVariableGuid, mPK);
@@ -243,9 +245,11 @@ IgvmSecureBootDxeEntrypoint (
     return Status;
   }
 
-  Status = IgvmSecureBootCustomMode (FALSE);
-  if (EFI_ERROR (Status)) {
-    return Status;
+  if (FeaturePcdGet (PcdRequireSelfSignedPk)) {
+    Status = IgvmSecureBootCustomMode (FALSE);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }
 
   DEBUG ((DEBUG_INFO, "%a: secure boot setup complete\n", __func__));
