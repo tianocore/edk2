@@ -29,8 +29,5 @@
   AArch64/AArch64Support.S
   AArch64/AArch64ArchTimerSupport.S
 
-[LibraryClasses]
-  DebugLib
-
 [Packages]
   MdePkg/MdePkg.dec
