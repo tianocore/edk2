@@ -1625,11 +1625,11 @@ DEFINE CLANGDWARF_AARCH64_DLINK_FLAGS  = DEF(CLANGDWARF_AARCH64_TARGET) DEF(GCC_
 *_CLANGDWARF_AARCH64_CC_XIPFLAGS    = -mstrict-align
 
   DEBUG_CLANGDWARF_AARCH64_CC_FLAGS    = DEF(CLANGDWARF_AARCH64_CC_FLAGS) $(PLATFORM_FLAGS) -flto -O1
-  DEBUG_CLANGDWARF_AARCH64_DLINK_FLAGS = DEF(CLANGDWARF_AARCH64_DLINK_FLAGS) -flto -Wl,-O1 -fuse-ld=lld -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wl,--no-pie,--no-relax
+  DEBUG_CLANGDWARF_AARCH64_DLINK_FLAGS = DEF(CLANGDWARF_AARCH64_DLINK_FLAGS) -flto -Wl,-O1 -fuse-ld=lld -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wl,--no-pie,--no-relax,--apply-dynamic-relocs
   NOOPT_CLANGDWARF_AARCH64_CC_FLAGS    = DEF(CLANGDWARF_AARCH64_CC_FLAGS) $(PLATFORM_FLAGS) -O0
-  NOOPT_CLANGDWARF_AARCH64_DLINK_FLAGS = DEF(CLANGDWARF_AARCH64_DLINK_FLAGS) -fuse-ld=lld -Wl,--no-pie,--no-relax
+  NOOPT_CLANGDWARF_AARCH64_DLINK_FLAGS = DEF(CLANGDWARF_AARCH64_DLINK_FLAGS) -fuse-ld=lld -Wl,--no-pie,--no-relax,--apply-dynamic-relocs
 RELEASE_CLANGDWARF_AARCH64_CC_FLAGS    = DEF(CLANGDWARF_AARCH64_CC_FLAGS) $(PLATFORM_FLAGS) -flto -Oz
-RELEASE_CLANGDWARF_AARCH64_DLINK_FLAGS = DEF(CLANGDWARF_AARCH64_DLINK_FLAGS) -flto -Wl,-O3 -fuse-ld=lld -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wl,--no-pie,--no-relax
+RELEASE_CLANGDWARF_AARCH64_DLINK_FLAGS = DEF(CLANGDWARF_AARCH64_DLINK_FLAGS) -flto -Wl,-O3 -fuse-ld=lld -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wl,--no-pie,--no-relax,--apply-dynamic-relocs
 
 ##################
 # CLANGDWARF RISCV64 definitions

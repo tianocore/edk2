@@ -32,6 +32,7 @@
   # -D FLAG=VALUE
   #
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
+  DEFINE DEBUG_TO_MEM            = FALSE
 
 !include OvmfPkg/Include/Dsc/OvmfTpmDefines.dsc.inc
 
