@@ -82,7 +82,7 @@
 
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
 
-  ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
+  ArmLib|MdePkg/Library/ArmLib/ArmBaseLib.inf
   ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
   ArmTransferListLib|ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
   ArmFfaLib|MdeModulePkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
@@ -140,7 +140,6 @@
 
   ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
   ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
-  ArmPkg/Library/ArmLib/ArmBaseLib.inf
   ArmPkg/Library/ArmMtlLibNull/ArmMtlLibNull.inf
   ArmPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   ArmPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf

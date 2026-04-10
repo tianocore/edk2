@@ -74,7 +74,7 @@
   StandaloneMmCoreEntryPoint|MdePkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreEntryPoint.inf
 
 [LibraryClasses.AARCH64]
-  ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
+  ArmLib|MdePkg/Library/ArmLib/ArmBaseLib.inf
   StandaloneMmCoreEntryPoint|ArmPkg/Library/ArmStandaloneMmCoreEntryPoint/ArmStandaloneMmCoreEntryPoint.inf
   StandaloneMmMmuLib|ArmPkg/Library/StandaloneMmMmuLib/ArmMmuStandaloneMmLib.inf
   ArmSmcLib|MdePkg/Library/ArmSmcLib/ArmSmcLib.inf

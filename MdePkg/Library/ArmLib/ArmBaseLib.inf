@@ -33,5 +33,4 @@
   DebugLib
 
 [Packages]
-  ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
