@@ -3357,6 +3357,44 @@ Exit:
 }
 
 /**
+  Restore the current attempt name when the form browser loads defaults.
+  The AttemptName is driver-assigned and should not be reset to empty
+  when defaults are loaded.
+
+  @param[in]      Type    The type of the question value.
+  @param[in, out] Value   On return, contains the HII string ID of the
+                          current attempt name.
+
+  @retval EFI_SUCCESS           AttemptName was restored successfully.
+  @retval EFI_UNSUPPORTED       Type is not EFI_IFR_TYPE_STRING, or no
+                                current attempt is selected.
+  @retval EFI_OUT_OF_RESOURCES  Failed to register the HII string.
+**/
+EFI_STATUS
+IScsiGetAttemptNameDefault (
+  IN      UINT8               Type,
+  IN OUT  EFI_IFR_TYPE_VALUE  *Value
+  )
+{
+  CHAR16         TmpName[ATTEMPT_NAME_SIZE];
+  EFI_STRING_ID  StringId;
+
+  if (Type != EFI_IFR_TYPE_STRING) {
+    return EFI_UNSUPPORTED;
+  }
+
+  AsciiStrToUnicodeStrS (mCallbackInfo->Current->AttemptName, TmpName, ATTEMPT_NAME_SIZE);
+
+  StringId = HiiSetString (mCallbackInfo->RegisteredHandle, 0, TmpName, NULL);
+  if (StringId == 0) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Value->string = StringId;
+  return EFI_SUCCESS;
+}
+
+/**
 
   This function is called to provide results data to the driver.
   This data consists of a unique key that is used to identify
@@ -3414,6 +3452,17 @@ IScsiFormCallback (
     // Do nothing for UEFI OPEN/CLOSE Action
     //
     return EFI_SUCCESS;
+  }
+
+  if ((Action == EFI_BROWSER_ACTION_DEFAULT_STANDARD)      ||
+      (Action == EFI_BROWSER_ACTION_DEFAULT_MANUFACTURING) ||
+      (Action == EFI_BROWSER_ACTION_DEFAULT_SAFE))
+  {
+    if ((QuestionId == KEY_ATTEMPT_NAME) && (Value != NULL) && (mCallbackInfo->Current != NULL)) {
+      return IScsiGetAttemptNameDefault (Type, Value);
+    }
+
+    return EFI_UNSUPPORTED;
   }
 
   if ((Action != EFI_BROWSER_ACTION_CHANGING) && (Action != EFI_BROWSER_ACTION_CHANGED)) {
