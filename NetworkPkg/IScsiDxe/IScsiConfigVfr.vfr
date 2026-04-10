@@ -115,7 +115,7 @@ formset
     string  varid   = ISCSI_CONFIG_IFR_NVDATA.AttemptName,
             prompt  = STRING_TOKEN(STR_ISCSI_ATTEMPT_NAME),
             help    = STRING_TOKEN(STR_ISCSI_ATTEMPT_NAME_HELP),
-            flags   = READ_ONLY,
+            flags   = READ_ONLY | INTERACTIVE,
             key     = KEY_ATTEMPT_NAME,
             minsize = 0,
             maxsize = ATTEMPT_NAME_SIZE,
