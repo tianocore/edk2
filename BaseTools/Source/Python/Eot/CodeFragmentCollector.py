@@ -15,15 +15,9 @@ import re
 import Common.LongFilePathOs as os
 import sys
 
-if sys.version_info.major == 3:
-    import antlr4 as antlr
-    from Eot.CParser4.CLexer import CLexer
-    from Eot.CParser4.CParser import CParser
-else:
-    import antlr3 as antlr
-    antlr.InputStream = antlr.StringStream
-    from Eot.CParser3.CLexer import CLexer
-    from Eot.CParser3.CParser import CParser
+import antlr4 as antlr
+from Eot.CParser4.CLexer import CLexer
+from Eot.CParser4.CParser import CParser
 
 from Eot import FileProfile
 from Eot.CodeFragment import PP_Directive

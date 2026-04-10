@@ -12,7 +12,7 @@ import subprocess
 import sys
 
 def RunCommand(commandLine):
-    #print ' '.join(commandLine)
+    #print(' '.join(commandLine))
     return subprocess.call(commandLine)
 
 for filename in glob.glob(os.path.join('Bin', '*.raw')):
@@ -30,18 +30,18 @@ commandLine = (
     '-D', 'ARCH_%s' % arch.upper(),
     '-D', 'DEBUG_%s' % str(debugType).upper(),
     '-o', output,
-    'ResetVectorCode.asm',
+    'ResetVectorCode.nasmb',
     )
 ret = RunCommand(commandLine)
-print '\tASM\t' + output
+print('\tASM\t' + output)
 if ret != 0: sys.exit(ret)
 
 commandLine = (
-    'python',
+    sys.executable,
     'Tools/FixupForRawSection.py',
     output,
     )
-print '\tFIXUP\t' + output
+print('\tFIXUP\t' + output)
 ret = RunCommand(commandLine)
 if ret != 0: sys.exit(ret)
 

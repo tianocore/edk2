@@ -2465,37 +2465,45 @@ MpInitLibInitialize (
     }
   }
 
-  //
-  // Dump the microcode revision for each core.
-  //
-  DEBUG_CODE_BEGIN ();
-  UINT32  ThreadId;
-  UINT32  ExpectedMicrocodeRevision;
+  if (CpuMpData->MicrocodePatchRegionSize != 0) {
+    //
+    // Dump the microcode revision for each core.
+    //
+    DEBUG_CODE_BEGIN ();
+    UINT32  ThreadId;
+    UINT32  ExpectedMicrocodeRevision;
 
-  CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
-  for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
-    GetProcessorLocationByApicId (CpuInfoInHob[Index].InitialApicId, NULL, NULL, &ThreadId);
-    if (ThreadId == 0) {
-      //
-      // MicrocodeDetect() loads microcode in first thread of each core, so,
-      // CpuMpData->CpuData[Index].MicrocodeEntryAddr is initialized only for first thread of each core.
-      //
-      ExpectedMicrocodeRevision = 0;
-      if (CpuMpData->CpuData[Index].MicrocodeEntryAddr != 0) {
-        ExpectedMicrocodeRevision = ((CPU_MICROCODE_HEADER *)(UINTN)CpuMpData->CpuData[Index].MicrocodeEntryAddr)->UpdateRevision;
+    CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
+    for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
+      GetProcessorLocationByApicId (CpuInfoInHob[Index].InitialApicId, NULL, NULL, &ThreadId);
+      if (ThreadId == 0) {
+        //
+        // MicrocodeDetect() loads microcode in first thread of each core, so,
+        // CpuMpData->CpuData[Index].MicrocodeEntryAddr is initialized only for first thread of each core.
+        //
+        ExpectedMicrocodeRevision = 0;
+        if (CpuMpData->CpuData[Index].MicrocodeEntryAddr != 0) {
+          ExpectedMicrocodeRevision = ((CPU_MICROCODE_HEADER *)(UINTN)CpuMpData->CpuData[Index].MicrocodeEntryAddr)->UpdateRevision;
+        }
+
+        DEBUG ((
+          DEBUG_INFO,
+          "CPU[%04d]: Microcode revision = %08x, expected = %08x\n",
+          Index,
+          CpuMpData->CpuData[Index].MicrocodeRevision,
+          ExpectedMicrocodeRevision
+          ));
       }
-
-      DEBUG ((
-        DEBUG_INFO,
-        "CPU[%04d]: Microcode revision = %08x, expected = %08x\n",
-        Index,
-        CpuMpData->CpuData[Index].MicrocodeRevision,
-        ExpectedMicrocodeRevision
-        ));
     }
+
+    DEBUG_CODE_END ();
+  } else {
+    //
+    // There is no microcode patches
+    //
+    DEBUG ((DEBUG_INFO, "No Microcode patch file found\n"));
   }
 
-  DEBUG_CODE_END ();
   //
   // Initialize global data for MP support
   //
