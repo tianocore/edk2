@@ -21,7 +21,7 @@
   DEFINE TPM_PLAT_PATH           =  TPM/TPMCmd/Platform/src
   DEFINE TPM_CONF_PATH           =  TPM/TPMCmd/TpmConfiguration
   DEFINE TPM_LIB_OPTIONS_INCLUDE = -include ./TpmLibCompileOptions.h
-  DEFINE TPM_LIB_WARNING_SUPRESS_GCC = -Wno-unused-function -Wno-implicit-fallthrough -Wno-cast-align -Wno-cast-function-type -Wno-missing-braces -Wno-sign-compare -Wno-suggest-attribute=noreturn -Wno-switch-default -Wno-implicit-function-declaration -Wno-unused-value
+  DEFINE TPM_LIB_WARNING_SUPRESS_GCC = -Wno-unused-function -Wno-implicit-fallthrough -Wno-cast-align -Wno-cast-function-type -Wno-missing-braces -Wno-sign-compare -Wno-suggest-attribute=noreturn -Wno-switch-default -Wno-implicit-function-declaration -Wno-unused-value -Wno-logical-not-parentheses
 
 #
 #  VALID_ARCHITECTURES           = AARCH64

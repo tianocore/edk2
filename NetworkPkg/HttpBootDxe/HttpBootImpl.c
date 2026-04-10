@@ -9,6 +9,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "HttpBootDxe.h"
 
+//
+// Forward declaration for HttpBootUninstallCallback which is called from
+// HttpBootInstallCallback's error path before its definition.
+//
+VOID
+HttpBootUninstallCallback (
+  IN HTTP_BOOT_PRIVATE_DATA  *Private
+  );
+
 /**
   Install HTTP Boot Callback Protocol if not installed before.
 
@@ -63,6 +72,27 @@ HttpBootInstallCallback (
     Private->HttpBootCallback = &Private->LoadFileCallback;
   }
 
+  //
+  // Install the EDKII HTTP Callback Protocol to receive TLS events
+  // during the HTTP Boot process.
+  //
+  Private->HttpCallback.Callback = HttpBootHttpCallback;
+  Status                         = gBS->InstallProtocolInterface (
+                                          &ControllerHandle,
+                                          &gEdkiiHttpCallbackProtocolGuid,
+                                          EFI_NATIVE_INTERFACE,
+                                          &Private->HttpCallback
+                                          );
+  if (EFI_ERROR (Status)) {
+    //
+    // Clear the callback pointer so HttpBootUninstallCallback does not attempt
+    // to uninstall the EDKII HTTP Callback Protocol which was never installed.
+    //
+    Private->HttpCallback.Callback = NULL;
+    HttpBootUninstallCallback (Private);
+    return Status;
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -77,21 +107,35 @@ HttpBootUninstallCallback (
   IN HTTP_BOOT_PRIVATE_DATA  *Private
   )
 {
+  EFI_STATUS  Status;
   EFI_HANDLE  ControllerHandle;
 
-  if (Private->HttpBootCallback == &Private->LoadFileCallback) {
-    if (!Private->UsingIpv6) {
-      ControllerHandle = Private->Ip4Nic->Controller;
-    } else {
-      ControllerHandle = Private->Ip6Nic->Controller;
-    }
+  if (!Private->UsingIpv6) {
+    ControllerHandle = Private->Ip4Nic->Controller;
+  } else {
+    ControllerHandle = Private->Ip6Nic->Controller;
+  }
 
+  if (Private->HttpBootCallback == &Private->LoadFileCallback) {
     gBS->UninstallProtocolInterface (
            ControllerHandle,
            &gEfiHttpBootCallbackProtocolGuid,
            Private->HttpBootCallback
            );
     Private->HttpBootCallback = NULL;
+  }
+
+  if (Private->HttpCallback.Callback != NULL) {
+    Status = gBS->UninstallProtocolInterface (
+                    ControllerHandle,
+                    &gEdkiiHttpCallbackProtocolGuid,
+                    &Private->HttpCallback
+                    );
+    if (!EFI_ERROR (Status)) {
+      Private->HttpCallback.Callback = NULL;
+    } else {
+      DEBUG ((DEBUG_ERROR, "HttpBootUninstallCallback: Failed to uninstall EDKII HTTP Callback Protocol - %r\n", Status));
+    }
   }
 }
 
@@ -930,3 +974,38 @@ GLOBAL_REMOVE_IF_UNREFERENCED
 EFI_HTTP_BOOT_CALLBACK_PROTOCOL  gHttpBootDxeHttpBootCallback = {
   HttpBootCallback
 };
+
+/**
+  Callback function that is invoked when an HTTP event occurs during HTTP Boot.
+
+  This function handles TLS-related events (HttpEventTlsConnectSession and
+  HttpEventTlsConfigured) and prints error messages to the screen when a TLS
+  error is encountered during the HTTP Boot process.
+
+  @param[in]  This              Pointer to the EDKII_HTTP_CALLBACK_PROTOCOL instance.
+  @param[in]  Event             The event that occurs in the current state.
+  @param[in]  EventStatus       The Status of Event, EFI_SUCCESS or other errors.
+**/
+VOID
+EFIAPI
+HttpBootHttpCallback (
+  IN EDKII_HTTP_CALLBACK_PROTOCOL  *This,
+  IN EDKII_HTTP_CALLBACK_EVENT     Event,
+  IN EFI_STATUS                    EventStatus
+  )
+{
+  if (EFI_ERROR (EventStatus)) {
+    switch (Event) {
+      case HttpEventTlsConnectSession:
+        AsciiPrint ("\n  Error: TLS session connection failed - %r.\n", EventStatus);
+        break;
+
+      case HttpEventTlsConfigured:
+        AsciiPrint ("\n  Error: TLS configuration failed - %r.\n", EventStatus);
+        break;
+
+      default:
+        break;
+    }
+  }
+}
