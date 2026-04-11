@@ -52,4 +52,4 @@ class YamlFormatter(Formatter):
 
 class HtmlFormatter(Formatter):
     def dump(self,layoutdict, layoutlist, outputfile = None):
-        TxtFormatter().dump(layoutdict, layoutlist, outputfile)
+        TxtFormatter().dump(layoutdict, layoutlist, outputfile)

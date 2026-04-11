@@ -24,4 +24,4 @@
   MpInitLibDepLib.c
 
 [Depex]
-  gEfiPeiMpInitLibUpDepPpiGuid
+  gEfiPeiMpInitLibUpDepPpiGuid

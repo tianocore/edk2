@@ -348,12 +348,12 @@ jobs:
         retention-days: 14
         if-no-files-found: warn
 
-    - name: Upload CodeQL Results (SARIF) To GitHub Code Scanning
-      uses: github/codeql-action/upload-sarif@v3
-      if: steps.env_data.outputs.upload_sarif_file == 'true'
-      with:
-        # Path to SARIF file relative to the root of the repository.
-        sarif_file: ${{ steps.env_data.outputs.sarif_file_path }}
-        # Optional category for the results. Used to differentiate multiple results for one commit.
-        # Each package is a separate category.
-        category: ${{ matrix.Package }}
+    #- name: Upload CodeQL Results (SARIF) To GitHub Code Scanning
+    #  uses: github/codeql-action/upload-sarif@v3
+    #  if: steps.env_data.outputs.upload_sarif_file == 'true'
+    #  with:
+    #    # Path to SARIF file relative to the root of the repository.
+    #    sarif_file: ${{ steps.env_data.outputs.sarif_file_path }}
+    #    # Optional category for the results. Used to differentiate multiple results for one commit.
+    #    # Each package is a separate category.
+    #    category: ${{ matrix.Package }}

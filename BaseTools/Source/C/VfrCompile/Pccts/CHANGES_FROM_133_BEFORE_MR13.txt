@@ -1274,7 +1274,7 @@
       Reduced names of routines with external linkage to less than 32
       characters to conform to DEC/VMS linker limitations.
 
-      Jean-Francois Pieronne discovered problems with dlg and antlr
+      Jean-François Piéronne discovered problems with dlg and antlr
       due to the VMS linker not being case sensitive for names with
       external linkage.  In dlg the problem was with "className" and
       "ClassName".  In antlr the problem was with "GenExprSets" and
@@ -1283,7 +1283,7 @@
       Added genmms, a version of genmk for the DEC/VMS version of make.
       The source is in directory pccts/support/DECmms.
 
-      All VMS contributions by Jean-Francois Pieronne (jfp@iname.com).
+      All VMS contributions by Jean-François Piéronne (jfp@iname.com).
 
 #117. (Changed in 1.33MR10) new EXPERIMENTAL predicate hoisting code
 
