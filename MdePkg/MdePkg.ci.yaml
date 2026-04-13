@@ -86,7 +86,9 @@
             "Test/UnitTest/Library/DevicePathLib/TestDevicePathLib.h",
             "Test/UnitTest/Library/DevicePathLib/TestDevicePathStringConversions.c",
             "Include/Register/LoongArch64/Cpucfg.h",
-            "Library/ArmTransferListLib/libtl"
+            "Library/ArmTransferListLib/libtl",
+            "Library/ArmTransferListLib/Include",
+            "Library/ArmTransferListLib/TransferListLibSupport.h"
         ]
     },
     ## options defined ci/Plugin/CompilerPlugin
@@ -241,7 +243,9 @@
             "Library/BaseFdtLib/stdlib.h",
             "Library/BaseFdtLib/string.h",
             "mipi_syst.h",
-            "Library/ArmTransferListLib/libtl"
+            "Library/ArmTransferListLib/libtl",
+            "Library/ArmTransferListLib/Include",
+            "Library/ArmTransferListLib/TransferListLibSupport.h"
         ]
     },
 
