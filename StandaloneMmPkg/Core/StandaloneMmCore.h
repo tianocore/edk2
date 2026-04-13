@@ -768,23 +768,23 @@ MmEndOfDxeHandler (
 /**
   Place holder function until all the MM System Table Service are available.
 
-  @param  Arg1                   Undefined
-  @param  Arg2                   Undefined
-  @param  Arg3                   Undefined
-  @param  Arg4                   Undefined
-  @param  Arg5                   Undefined
+  @param  This                   Undefined
+  @param  Width                  Undefined
+  @param  Address                Undefined
+  @param  Count                  Undefined
+  @param  Buffer                 Undefined
 
   @return EFI_NOT_AVAILABLE_YET
 
 **/
 EFI_STATUS
 EFIAPI
-MmEfiNotAvailableYetArg5 (
-  UINTN  Arg1,
-  UINTN  Arg2,
-  UINTN  Arg3,
-  UINTN  Arg4,
-  UINTN  Arg5
+MmEfiNotAvailableYetMmCpuIo (
+  IN     CONST EFI_MM_CPU_IO_PROTOCOL  *This,
+  IN     EFI_MM_IO_WIDTH               Width,
+  IN     UINT64                        Address,
+  IN     UINTN                         Count,
+  IN OUT VOID                          *Buffer
   );
 
 //
