@@ -387,7 +387,7 @@ typedef union {
     UINT8    Reserved1         : 1;
     UINT8    StraightPassword  : 1;
     UINT8    OemProprietary    : 1;
-    UINT8    Reservd2          : 2;
+    UINT8    Reserved2         : 2;
   } Bits;
   UINT8    Uint8;
 } IPMI_EMP_AUTH_TYPE;
