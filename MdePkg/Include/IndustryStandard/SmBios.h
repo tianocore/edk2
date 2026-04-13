@@ -1815,13 +1815,22 @@ typedef enum {
 /// System Event Log - Variable Data Format Types.
 ///
 typedef enum {
-  EventLogVariableNone                       = 0x00,
-  EventLogVariableHandle                     = 0x01,
-  EventLogVariableMutilEvent                 = 0x02,
-  EventLogVariableMutilEventHandle           = 0x03,
-  EventLogVariablePOSTResultBitmap           = 0x04,
-  EventLogVariableSysManagementType          = 0x05,
-  EventLogVariableMutliEventSysManagmentType = 0x06,
+  EventLogVariableNone       = 0x00,
+  EventLogVariableHandle     = 0x01,
+  EventLogVariableMultiEvent = 0x02,
+  // This misspelling is kept temporarily for backwards compatibility and will
+  // be removed in a future PR. Consumers must migrate to the new definition
+  EventLogVariableMutilEvent       = EventLogVariableMultiEvent,
+  EventLogVariableMultiEventHandle = 0x03,
+  // This misspelling is kept temporarily for backwards compatibility and will
+  // be removed in a future PR. Consumers must migrate to the new definition
+  EventLogVariableMutilEventHandle            = EventLogVariableMultiEventHandle,
+  EventLogVariablePOSTResultBitmap            = 0x04,
+  EventLogVariableSysManagementType           = 0x05,
+  EventLogVariableMultiEventSysManagementType = 0x06,
+  // This misspelling is kept temporarily for backwards compatibility and will
+  // be removed in a future PR. Consumers must migrate to the new definition
+  EventLogVariableMutliEventSysManagmentType = EventLogVariableMultiEventSysManagementType,
   EventLogVariableUnused                     = 0x07,
   EventLogVariableOEMAssigned                = 0x80
 } EVENT_LOG_VARIABLE_DATA;
@@ -2130,12 +2139,15 @@ typedef struct {
 /// 32-bit Memory Error Information - Error Type.
 ///
 typedef enum {
-  MemoryErrorOther            = 0x01,
-  MemoryErrorUnknown          = 0x02,
-  MemoryErrorOk               = 0x03,
-  MemoryErrorBadRead          = 0x04,
-  MemoryErrorParity           = 0x05,
-  MemoryErrorSigleBit         = 0x06,
+  MemoryErrorOther     = 0x01,
+  MemoryErrorUnknown   = 0x02,
+  MemoryErrorOk        = 0x03,
+  MemoryErrorBadRead   = 0x04,
+  MemoryErrorParity    = 0x05,
+  MemoryErrorSingleBit = 0x06,
+  // This misspelling is kept temporarily for backwards compatibility and will
+  // be removed in a future PR. Consumers must migrate to the new definition
+  MemoryErrorSigleBit         = MemoryErrorSingleBit,
   MemoryErrorDoubleBit        = 0x07,
   MemoryErrorMultiBit         = 0x08,
   MemoryErrorNibble           = 0x09,
