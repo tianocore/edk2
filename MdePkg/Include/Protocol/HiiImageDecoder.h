@@ -52,7 +52,10 @@ typedef struct _EFI_HII_IMAGE_DECODER_IMAGE_INFO_HEADER {
   UINT8                               ColorDepthInBits;
 } EFI_HII_IMAGE_DECODER_IMAGE_INFO_HEADER;
 
-#define EFI_IMAGE_JPEG_SCANTYPE_PROGREESSIVE  0x01
+#define EFI_IMAGE_JPEG_SCANTYPE_PROGRESSIVE  0x01
+// This misspelling is kept temporarily for backwards compatibility and will
+// be removed in a future PR. Consumers must migrate to the new definition
+#define EFI_IMAGE_JPEG_SCANTYPE_PROGREESSIVE  EFI_IMAGE_JPEG_SCANTYPE_PROGRESSIVE
 #define EFI_IMAGE_JPEG_SCANTYPE_INTERLACED    0x02
 
 //
