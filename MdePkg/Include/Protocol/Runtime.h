@@ -104,16 +104,16 @@ struct _EFI_RUNTIME_EVENT_ENTRY {
 /// by a runtime DXE driver and may only be consumed by the DXE Foundation.
 ///
 struct _EFI_RUNTIME_ARCH_PROTOCOL {
-  EFI_LIST_ENTRY           ImageHead;              ///< A list of type EFI_RUNTIME_IMAGE_ENTRY.
-  EFI_LIST_ENTRY           EventHead;              ///< A list of type EFI_RUNTIME_EVENT_ENTRY.
-  UINTN                    MemoryDescriptorSize;   ///< Size of a memory descriptor that is returned by GetMemoryMap().
-  UINT32                   MemoryDesciptorVersion; ///< Version of a memory descriptor that is returned by GetMemoryMap().
-  UINTN                    MemoryMapSize;          ///< Size of the memory map in bytes contained in MemoryMapPhysical and MemoryMapVirtual.
-  EFI_MEMORY_DESCRIPTOR    *MemoryMapPhysical;     ///< Pointer to a runtime buffer that contains a copy of
-                                                   ///< the memory map returned via GetMemoryMap().
-  EFI_MEMORY_DESCRIPTOR    *MemoryMapVirtual;      ///< Pointer to MemoryMapPhysical that is updated to virtual mode after SetVirtualAddressMap().
-  BOOLEAN                  VirtualMode;            ///< Boolean that is TRUE if SetVirtualAddressMap() has been called.
-  BOOLEAN                  AtRuntime;              ///< Boolean that is TRUE if ExitBootServices () has been called.
+  EFI_LIST_ENTRY           ImageHead;               ///< A list of type EFI_RUNTIME_IMAGE_ENTRY.
+  EFI_LIST_ENTRY           EventHead;               ///< A list of type EFI_RUNTIME_EVENT_ENTRY.
+  UINTN                    MemoryDescriptorSize;    ///< Size of a memory descriptor that is returned by GetMemoryMap().
+  UINT32                   MemoryDescriptorVersion; ///< Version of a memory descriptor that is returned by GetMemoryMap().
+  UINTN                    MemoryMapSize;           ///< Size of the memory map in bytes contained in MemoryMapPhysical and MemoryMapVirtual.
+  EFI_MEMORY_DESCRIPTOR    *MemoryMapPhysical;      ///< Pointer to a runtime buffer that contains a copy of
+                                                    ///< the memory map returned via GetMemoryMap().
+  EFI_MEMORY_DESCRIPTOR    *MemoryMapVirtual;       ///< Pointer to MemoryMapPhysical that is updated to virtual mode after SetVirtualAddressMap().
+  BOOLEAN                  VirtualMode;             ///< Boolean that is TRUE if SetVirtualAddressMap() has been called.
+  BOOLEAN                  AtRuntime;               ///< Boolean that is TRUE if ExitBootServices () has been called.
 };
 
 extern EFI_GUID  gEfiRuntimeArchProtocolGuid;
