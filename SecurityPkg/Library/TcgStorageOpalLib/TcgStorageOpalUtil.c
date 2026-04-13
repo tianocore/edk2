@@ -1081,7 +1081,7 @@ OpalUtilGetDataRemovalMechanismLists (
 
   ASSERT (Descriptor.RemovalMechanism != 0);
 
-  for (Index = 0; Index < ResearvedMechanism; Index++) {
+  for (Index = 0; Index < ReservedMechanism; Index++) {
     BitValue = (BOOLEAN)BitFieldRead8 (Descriptor.RemovalMechanism, Index, Index);
 
     if (BitValue == 0) {
@@ -1110,7 +1110,7 @@ GetRevertTimeOut (
   UINT16                       BaseComId;
   UINT32                       MsidLength;
   UINT8                        Msid[OPAL_MSID_LENGTH];
-  UINT32                       RemovalMechanishLists[ResearvedMechanism];
+  UINT32                       RemovalMechanishLists[ReservedMechanism];
   UINT8                        ActiveDataRemovalMechanism;
 
   TcgResult = OpalGetSupportedAttributesInfo (Session, &SupportedAttributes, &BaseComId);
