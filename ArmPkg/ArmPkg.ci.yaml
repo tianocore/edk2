@@ -23,7 +23,9 @@
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
             "Universal/Smbios/SmbiosMiscDxe",
-            "Library/ArmTransferListLib/libtl"
+            "Library/ArmTransferListLib/libtl",
+            "Library/ArmTransferListLib/Include",
+            "Library/ArmTransferListLib/TransferListLibSupport.h"
         ]
     },
 
@@ -247,7 +249,9 @@
     ## options defined in .pytool/Plugin/UncrustifyCheck
     "UncrustifyCheck": {
         "IgnoreFiles": [
-            "Library/ArmTransferListLib/libtl"
+            "Library/ArmTransferListLib/libtl",
+            "Library/ArmTransferListLib/Include",
+            "Library/ArmTransferListLib/TransferListLibSupport.h"
         ]
     }
 }
