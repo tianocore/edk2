@@ -588,7 +588,7 @@ PciCapListInit (
     //
     Status = PciDevice->ReadConfig (
                           PciDevice,
-                          PCI_CAPBILITY_POINTER_OFFSET,
+                          PCI_CAPABILITY_POINTER_OFFSET,
                           &NormalCapHdrOffset,
                           sizeof NormalCapHdrOffset
                           );
