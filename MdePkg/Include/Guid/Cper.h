@@ -1630,8 +1630,11 @@ typedef struct {
 #define EFI_DMA_FAULT_REASON_INVALID_REQUEST                    0x07
 #define EFI_DMA_FAULT_REASON_ACCESS_TRANSLATE_TABLE_ERROR       0x08
 #define EFI_DMA_FAULT_REASON_RESV_BIT_ERROR_IN_TRANSLATE_TABLE  0x09
-#define EFI_DMA_FAULT_REASON_INVALID_COMMAOND                   0x0A
-#define EFI_DMA_FAULT_REASON_ACCESS_COMMAND_BUFFER_ERROR        0x0B
+#define EFI_DMA_FAULT_REASON_INVALID_COMMAND                    0x0A
+// This misspelling is kept temporarily for backwards compatibility and will
+// be removed in a future PR. Consumers must migrate to the new definition
+#define EFI_DMA_FAULT_REASON_INVALID_COMMAOND             EFI_DMA_FAULT_REASON_INVALID_COMMAND
+#define EFI_DMA_FAULT_REASON_ACCESS_COMMAND_BUFFER_ERROR  0x0B
 ///@}
 
 ///
