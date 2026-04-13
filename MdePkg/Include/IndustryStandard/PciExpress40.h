@@ -74,7 +74,7 @@ typedef union {
   struct {
     UINT32    RemoteScaledFlowControlSupported : 1;    // [0]
     UINT32    RemoteImmediateReadiness         : 1;    // [1]
-    UINT32    ExtendedVcCound                  : 3;    // [4:2]
+    UINT32    ExtendedVcCount                  : 3;    // [4:2]
     UINT32    RemoteL0pExitLatency             : 3;    // [7:5]
     UINT32    Reserved0                        : 15;   // [22:8]
     UINT32    Reserved1                        : 8;    // [30:23]
@@ -141,7 +141,7 @@ typedef union {
 
 typedef struct {
   PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER                         Header;
-  PCI_EXPRESS_REG_PHYSICAL_LAYER_16_0_CAPABILITIES                 Capablities;
+  PCI_EXPRESS_REG_PHYSICAL_LAYER_16_0_CAPABILITIES                 Capabilities;
   PCI_EXPRESS_REG_PHYSICAL_LAYER_16_0_CONTROL                      Control;
   PCI_EXPRESS_REG_PHYSICAL_LAYER_16_0_STATUS                       Status;
   UINT32                                                           LocalDataParityMismatchStatus;

@@ -522,7 +522,7 @@ typedef union {
     UINT32    MalformedTlp               : 1;
     UINT32    EcrcError                  : 1;
     UINT32    UnsupportedRequestError    : 1;
-    UINT32    AcsVoilation               : 1;
+    UINT32    AcsViolation               : 1;
     UINT32    UncorrectableInternalError : 1;
     UINT32    McBlockedTlp               : 1;
     UINT32    AtomicOpEgressBlocked      : 1;
@@ -624,8 +624,8 @@ typedef struct {
   UINT8                                       EgressControlVectorArray[1];
 } PCI_EXPRESS_EXTENDED_CAPABILITIES_ACS_EXTENDED;
 
-#define PCI_EXPRESS_EXTENDED_CAPABILITY_ACS_EXTENDED_GET_EGRES_CONTROL(ACS_EXTENDED)      (UINT8)(((ACS_EXTENDED->AcsCapability)&0x00000020))
-#define PCI_EXPRESS_EXTENDED_CAPABILITY_ACS_EXTENDED_GET_EGRES_VECTOR_SIZE(ACS_EXTENDED)  (UINT8)(((ACS_EXTENDED->AcsCapability)&0x0000FF00))
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_ACS_EXTENDED_GET_EGRESS_CONTROL(ACS_EXTENDED)      (UINT8)(((ACS_EXTENDED->AcsCapability)&0x00000020))
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_ACS_EXTENDED_GET_EGRESS_VECTOR_SIZE(ACS_EXTENDED)  (UINT8)(((ACS_EXTENDED->AcsCapability)&0x0000FF00))
 
 #define PCI_EXPRESS_EXTENDED_CAPABILITY_EVENT_COLLECTOR_ENDPOINT_ASSOCIATION_ID    0x0007
 #define PCI_EXPRESS_EXTENDED_CAPABILITY_EVENT_COLLECTOR_ENDPOINT_ASSOCIATION_VER1  0x1

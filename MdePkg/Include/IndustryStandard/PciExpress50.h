@@ -119,7 +119,7 @@ typedef union {
 
 typedef struct {
   PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER                         Header;
-  PCI_EXPRESS_REG_PHYSICAL_LAYER_32_0_CAPABILITIES                 Capablities;
+  PCI_EXPRESS_REG_PHYSICAL_LAYER_32_0_CAPABILITIES                 Capabilities;
   PCI_EXPRESS_REG_PHYSICAL_LAYER_32_0_CONTROL                      Control;
   PCI_EXPRESS_REG_PHYSICAL_LAYER_32_0_STATUS                       Status;
   PCI_EXPRESS_REG_PHYSICAL_LAYER_32_0_RCVD_MODIFIED_TS_DATA1       RcvdModifiedTs1Data;
