@@ -1740,7 +1740,7 @@ typedef struct tdTPM_DELEGATIONS {
 #define TPM_DELEGATE_CreateMaintenanceArchive        (BIT21)
 #define TPM_DELEGATE_LoadMaintenanceArchive          (BIT20)
 #define TPM_DELEGATE_KillMaintenanceFeature          (BIT19)
-#define TPM_DELEGATE_OwnerReadInteralPub             (BIT18)
+#define TPM_DELEGATE_OwnerReadInternalPub            (BIT18)
 #define TPM_DELEGATE_ResetLockValue                  (BIT17)
 #define TPM_DELEGATE_OwnerClear                      (BIT16)
 #define TPM_DELEGATE_DisableOwnerClear               (BIT15)
