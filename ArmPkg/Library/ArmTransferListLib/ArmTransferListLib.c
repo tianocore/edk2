@@ -17,13 +17,16 @@
 #include <Library/ArmTransferListLib.h>
 #include <Library/HobLib.h>
 
+typedef struct transfer_list_header  LIBTL_TRANSFER_LIST_HEADER;
+typedef struct transfer_list_entry   LIBTL_TRANSFER_LIST_ENTRY;
+
 STATIC_ASSERT (
-  sizeof (TRANSFER_LIST_HEADER) == sizeof (struct transfer_list_header),
+  sizeof (TRANSFER_LIST_HEADER) == sizeof (LIBTL_TRANSFER_LIST_HEADER),
   "TRANSFER_LIST_HEADER size mismatch"
   );
 
 STATIC_ASSERT (
-  sizeof (TRANSFER_ENTRY_HEADER) == sizeof (struct transfer_list_entry),
+  sizeof (TRANSFER_ENTRY_HEADER) == sizeof (LIBTL_TRANSFER_LIST_ENTRY),
   "TRANSFER_ENTRY_HEADER size mismatch"
   );
 
@@ -85,7 +88,7 @@ TransferListVerifyChecksum (
   IN TRANSFER_LIST_HEADER  *TransferListHeader
   )
 {
-  return transfer_list_verify_checksum ((struct transfer_list_header *)TransferListHeader);
+  return transfer_list_verify_checksum ((LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader);
 }
 
 /**
@@ -114,7 +117,7 @@ TransferListCheckHeader (
   STATIC_ASSERT ((UINT32)TL_OPS_RO  == (UINT32)TRANSFER_LIST_OPS_RO, "TL_OPS_RO mismatch");
   STATIC_ASSERT ((UINT32)TL_OPS_CUS == (UINT32)TRANSFER_LIST_OPS_CUSTOM, "TL_OPS_CUS mismatch");
 
-  return (TRANSFER_LIST_OPS)transfer_list_check_header ((const struct transfer_list_header *)TransferListHeader);
+  return (TRANSFER_LIST_OPS)transfer_list_check_header ((CONST LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader);
 }
 
 /**
@@ -131,7 +134,7 @@ TransferListGetFirstEntry (
   IN TRANSFER_LIST_HEADER  *TransferListHeader
   )
 {
-  return (TRANSFER_ENTRY_HEADER *)transfer_list_next ((struct transfer_list_header *)TransferListHeader, NULL);
+  return (TRANSFER_ENTRY_HEADER *)transfer_list_next ((LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader, NULL);
 }
 
 /**
@@ -154,8 +157,8 @@ TransferListGetNextEntry (
   )
 {
   return (TRANSFER_ENTRY_HEADER *)transfer_list_next (
-                                    (struct transfer_list_header *)TransferListHeader,
-                                    (struct transfer_list_entry *)CurrentEntry
+                                    (LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader,
+                                    (LIBTL_TRANSFER_LIST_ENTRY *)CurrentEntry
                                     );
 }
 
@@ -176,7 +179,7 @@ TransferListFindFirstEntry (
   IN UINT32                TagId
   )
 {
-  return (TRANSFER_ENTRY_HEADER *)transfer_list_find ((struct transfer_list_header *)TransferListHeader, TagId);
+  return (TRANSFER_ENTRY_HEADER *)transfer_list_find ((LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader, TagId);
 }
 
 /**
@@ -233,7 +236,7 @@ TransferListGetEntryData (
     return NULL;
   }
 
-  return transfer_list_entry_data ((struct transfer_list_entry *)TransferEntry);
+  return transfer_list_entry_data ((LIBTL_TRANSFER_LIST_ENTRY *)TransferEntry);
 }
 
 /**
@@ -382,7 +385,7 @@ TransferListEnsure (
   backed by a fixed flash window).
 
   @param[in]   TransferListHeader    Pointer to the current Transfer List header.
-  @param[in]  DestinationBase       Destination buffer address.
+  @param[out]  DestinationBase       Destination buffer address.
   @param[in]   DestinationCapacity   Capacity in bytes of the destination buffer.
 
   @return Pointer to the relocated Transfer List header; NULL on failure.
@@ -396,7 +399,7 @@ TransferListRelocate (
   )
 {
   return (TRANSFER_LIST_HEADER *)transfer_list_relocate (
-                                   (struct transfer_list_header *)TransferListHeader,
+                                   (LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader,
                                    DestinationBase,
                                    (size_t)DestinationCapacity
                                    );
@@ -423,7 +426,7 @@ TransferListAdd (
   )
 {
   return (TRANSFER_ENTRY_HEADER *)transfer_list_add (
-                                    (struct transfer_list_header *)TransferListHeader,
+                                    (LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader,
                                     TagId,
                                     DataSize,
                                     Data
@@ -452,8 +455,8 @@ TransferListSetDataSize (
   )
 {
   return transfer_list_set_data_size (
-           (struct transfer_list_header *)TransferListHeader,
-           (struct transfer_list_entry *)Entry,
+           (LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader,
+           (LIBTL_TRANSFER_LIST_ENTRY *)Entry,
            NewDataSize
            ) ? TRUE : FALSE;
 }
@@ -478,8 +481,8 @@ TransferListRemove (
   )
 {
   return transfer_list_rem (
-           (struct transfer_list_header *)TransferListHeader,
-           (struct transfer_list_entry  *)Entry
+           (LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader,
+           (LIBTL_TRANSFER_LIST_ENTRY  *)Entry
            ) ? TRUE : FALSE;
 }
 
@@ -500,8 +503,8 @@ TransferListGetPrevEntry (
   )
 {
   return (TRANSFER_ENTRY_HEADER *)transfer_list_prev (
-                                    (struct transfer_list_header *)TransferListHeader,
-                                    (struct transfer_list_entry *)CurrentEntry
+                                    (LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader,
+                                    (LIBTL_TRANSFER_LIST_ENTRY *)CurrentEntry
                                     );
 }
 
@@ -524,7 +527,7 @@ TransferListFindEntryByTag  (
   IN UINT32                TagId
   )
 {
-  return (TRANSFER_ENTRY_HEADER *)transfer_list_find ((struct transfer_list_header *)TransferListHeader, TagId);
+  return (TRANSFER_ENTRY_HEADER *)transfer_list_find ((LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader, TagId);
 }
 
 /**
@@ -606,6 +609,7 @@ TransferListUpdateEntryByTag (
   )
 {
   TRANSFER_ENTRY_HEADER  *Entry;
+  VOID                   *EntryData;
 
   if (TransferListHeader == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -620,7 +624,7 @@ TransferListUpdateEntryByTag (
 
     if (AlignmentLog2 != 0) {
       Entry = (TRANSFER_ENTRY_HEADER *)transfer_list_add_with_align (
-                                         (struct transfer_list_header *)TransferListHeader,
+                                         (LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader,
                                          TagId,
                                          DataSize,
                                          NULL,
@@ -628,7 +632,7 @@ TransferListUpdateEntryByTag (
                                          );
     } else {
       Entry = (TRANSFER_ENTRY_HEADER *)transfer_list_add (
-                                         (struct transfer_list_header *)TransferListHeader,
+                                         (LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader,
                                          TagId,
                                          DataSize,
                                          NULL
@@ -640,8 +644,8 @@ TransferListUpdateEntryByTag (
     }
   } else if (Entry->DataSize != DataSize) {
     if (!(transfer_list_set_data_size (
-            (struct transfer_list_header *)TransferListHeader,
-            (struct transfer_list_entry *)Entry,
+            (LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader,
+            (LIBTL_TRANSFER_LIST_ENTRY *)Entry,
             DataSize
             ))
         )
@@ -651,11 +655,11 @@ TransferListUpdateEntryByTag (
   }
 
   if ((Data != NULL) && (DataSize != 0)) {
-    VOID  *EntryData = transfer_list_entry_data ((struct transfer_list_entry *)Entry);
+    EntryData = transfer_list_entry_data ((LIBTL_TRANSFER_LIST_ENTRY *)Entry);
     CopyMem (EntryData, Data, DataSize);
   }
 
-  transfer_list_update_checksum ((struct transfer_list_header *)TransferListHeader);
+  transfer_list_update_checksum ((LIBTL_TRANSFER_LIST_HEADER *)TransferListHeader);
 
   return EFI_SUCCESS;
 }
