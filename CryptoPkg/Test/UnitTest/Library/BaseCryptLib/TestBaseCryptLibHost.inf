@@ -3,6 +3,7 @@
 #
 # Copyright (c) Microsoft Corporation.<BR>
 # Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+# (c) Copyright 2026 HP Development Company, L.P.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
@@ -41,6 +42,7 @@
   ParallelhashTests.c
   HkdfTests.c
   AeadAesGcmTests.c
+  AesCtrTests.c
   BnTests.c
   EcTests.c
   X509Tests.c
