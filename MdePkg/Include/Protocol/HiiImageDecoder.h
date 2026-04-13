@@ -52,8 +52,8 @@ typedef struct _EFI_HII_IMAGE_DECODER_IMAGE_INFO_HEADER {
   UINT8                               ColorDepthInBits;
 } EFI_HII_IMAGE_DECODER_IMAGE_INFO_HEADER;
 
-#define EFI_IMAGE_JPEG_SCANTYPE_PROGREESSIVE  0x01
-#define EFI_IMAGE_JPEG_SCANTYPE_INTERLACED    0x02
+#define EFI_IMAGE_JPEG_SCANTYPE_PROGRESSIVE  0x01
+#define EFI_IMAGE_JPEG_SCANTYPE_INTERLACED   0x02
 
 //
 // EFI_HII_IMAGE_DECODER_JPEG_INFO
@@ -84,7 +84,7 @@ typedef struct _EFI_HII_IMAGE_DECODER_PNG_INFO {
 //
 typedef struct _EFI_HII_IMAGE_DECODER_OTHER_INFO {
   EFI_HII_IMAGE_DECODER_IMAGE_INFO_HEADER    Header;
-  CHAR16                                     ImageExtenion[1];
+  CHAR16                                     ImageExtension[1];
   //
   // Variable length of image file extension name.
   //
