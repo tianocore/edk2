@@ -78,15 +78,15 @@ typedef struct {
   ///
   /// TRUE if the adapter supports booting from iSCSI IPv4 targets.
   ///
-  BOOLEAN    iScsiIpv4BootCapablity;
+  BOOLEAN    iScsiIpv4BootCapability;
   ///
   /// TRUE if the adapter supports booting from iSCSI IPv6 targets.
   ///
-  BOOLEAN    iScsiIpv6BootCapablity;
+  BOOLEAN    iScsiIpv6BootCapability;
   ///
   /// TRUE if the adapter supports booting from FCoE targets.
   ///
-  BOOLEAN    FCoeBootCapablity;
+  BOOLEAN    FCoeBootCapability;
   ///
   /// TRUE if the adapter supports an offload engine (such as TCP
   /// Offload Engine (TOE)) for its iSCSI or FCoE boot operations.
