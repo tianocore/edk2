@@ -45,7 +45,10 @@ typedef enum {
 #define EFI_DRIVER_CONFIGURATION_SAFE_DEFAULTS           0x00000000
 #define EFI_DRIVER_CONFIGURATION_MANUFACTURING_DEFAULTS  0x00000001
 #define EFI_DRIVER_CONFIGURATION_CUSTOM_DEFAULTS         0x00000002
-#define EFI_DRIVER_CONFIGURATION_PERORMANCE_DEFAULTS     0x00000003
+#define EFI_DRIVER_CONFIGURATION_PERFORMANCE_DEFAULTS    0x00000003
+// This misspelling is kept temporarily for backwards compatibility and will
+// be removed in a future PR. Consumers must migrate to the new definition
+#define EFI_DRIVER_CONFIGURATION_PERORMANCE_DEFAULTS  EFI_DRIVER_CONFIGURATION_PERFORMANCE_DEFAULTS
 
 /**
   Allows the user to set controller specific options for a controller that a
