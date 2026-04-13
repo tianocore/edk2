@@ -177,10 +177,10 @@ typedef union {
 
 typedef union {
   struct {
-    UINT16    CacheInvalid                         : 1;         // bit 0
-    UINT16    CxlResetComplete                     : 1;         // bit 1
-    UINT16    Reserved                             : 13;        // bit 2..14
-    UINT16    PowerManagementInitialzationComplete : 1;         // bit 15
+    UINT16    CacheInvalid                          : 1;        // bit 0
+    UINT16    CxlResetComplete                      : 1;        // bit 1
+    UINT16    Reserved                              : 13;       // bit 2..14
+    UINT16    PowerManagementInitializationComplete : 1;        // bit 15
   } Bits;
   UINT16    Uint16;
 } CXL_DVSEC_CXL_DEVICE_STATUS2;
@@ -382,10 +382,10 @@ typedef union {
 
 typedef union {
   struct {
-    UINT32    TargetPortIdentiferWay0 : 8;      // bit 0..7
-    UINT32    TargetPortIdentiferWay1 : 8;      // bit 8..15
-    UINT32    TargetPortIdentiferWay2 : 8;      // bit 16..23
-    UINT32    TargetPortIdentiferWay3 : 8;      // bit 24..31
+    UINT32    TargetPortIdentifierWay0 : 8;      // bit 0..7
+    UINT32    TargetPortIdentifierWay1 : 8;      // bit 8..15
+    UINT32    TargetPortIdentifierWay2 : 8;      // bit 16..23
+    UINT32    TargetPortIdentifierWay3 : 8;      // bit 24..31
   } Bits;
   UINT32    Uint32;
 } CXL_HDM_DECODER_TARGET_LIST_LOW_REGISTER;
@@ -400,10 +400,10 @@ typedef union {
 
 typedef union {
   struct {
-    UINT32    TargetPortIdentiferWay4 : 8;      // bit 0..7
-    UINT32    TargetPortIdentiferWay5 : 8;      // bit 8..15
-    UINT32    TargetPortIdentiferWay6 : 8;      // bit 16..23
-    UINT32    TargetPortIdentiferWay7 : 8;      // bit 24..31
+    UINT32    TargetPortIdentifierWay4 : 8;      // bit 0..7
+    UINT32    TargetPortIdentifierWay5 : 8;      // bit 8..15
+    UINT32    TargetPortIdentifierWay6 : 8;      // bit 16..23
+    UINT32    TargetPortIdentifierWay7 : 8;      // bit 24..31
   } Bits;
   UINT32    Uint32;
 } CXL_HDM_DECODER_TARGET_LIST_HIGH_REGISTER;
