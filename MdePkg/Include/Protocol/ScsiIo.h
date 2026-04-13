@@ -79,8 +79,11 @@ typedef struct _EFI_SCSI_IO_PROTOCOL EFI_SCSI_IO_PROTOCOL;
 #define EFI_SCSI_IO_STATUS_TARGET_INTERMEDIATE                0x10     ///< intermediate
 #define EFI_SCSI_IO_STATUS_TARGET_INTERMEDIATE_CONDITION_MET  0x14     ///< intermediate-condition met
 #define EFI_SCSI_IO_STATUS_TARGET_RESERVATION_CONFLICT        0x18     ///< reservation conflict
-#define EFI_SCSI_IO_STATUS_TARGET_COMMOND_TERMINATED          0x22     ///< command terminated
-#define EFI_SCSI_IO_STATUS_TARGET_QUEUE_FULL                  0x28     ///< queue full
+#define EFI_SCSI_IO_STATUS_TARGET_COMMAND_TERMINATED          0x22     ///< command terminated
+// This misspelling is kept temporarily for backwards compatibility and will
+// be removed in a future PR. Consumers must migrate to the new definition
+#define EFI_SCSI_IO_STATUS_TARGET_COMMOND_TERMINATED  EFI_SCSI_IO_STATUS_TARGET_COMMAND_TERMINATED
+#define EFI_SCSI_IO_STATUS_TARGET_QUEUE_FULL          0x28             ///< queue full
 
 typedef struct {
   ///
