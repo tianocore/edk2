@@ -38,7 +38,7 @@ DnsInitSeedPacket (
   Header->HwAddrLen = (UINT8)InterfaceInfo->HwAddressSize;
   CopyMem (Header->ClientHwAddr, &(InterfaceInfo->HwAddress), Header->HwAddrLen);
 
-  Seed->Dhcp4.Magik     = DHCP4_MAGIC;
+  Seed->Dhcp4.Magic     = DHCP4_MAGIC;
   Seed->Dhcp4.Option[0] = DHCP4_TAG_EOP;
 }
 

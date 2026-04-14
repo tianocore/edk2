@@ -997,7 +997,7 @@ DhcpInput (
   //
   Para = NULL;
   if ((Packet->Length > sizeof (EFI_DHCP4_HEADER) + sizeof (UINT32)) &&
-      (Packet->Dhcp4.Magik == DHCP_OPTION_MAGIC) &&
+      (Packet->Dhcp4.Magic == DHCP_OPTION_MAGIC) &&
       EFI_ERROR (DhcpValidateOptions (Packet, &Para)))
   {
     goto RESTART;
@@ -1189,7 +1189,7 @@ DhcpSendMessage (
   //
   // Append the DHCP message type
   //
-  Packet->Dhcp4.Magik = DHCP_OPTION_MAGIC;
+  Packet->Dhcp4.Magic = DHCP_OPTION_MAGIC;
   Buf                 = Packet->Dhcp4.Option;
   Buf                 = DhcpAppendOption (Buf, DHCP4_TAG_MSG_TYPE, 1, &Type);
 

@@ -402,7 +402,7 @@ PxeBcSeedDhcp4Packet (
   Header->HwAddrLen = (UINT8)Mode.HwAddressSize;
   CopyMem (Header->ClientHwAddr, &Mode.CurrentAddress, Header->HwAddrLen);
 
-  Seed->Dhcp4.Magik     = PXEBC_DHCP4_MAGIC;
+  Seed->Dhcp4.Magic     = PXEBC_DHCP4_MAGIC;
   Seed->Dhcp4.Option[0] = DHCP4_TAG_EOP;
 }
 

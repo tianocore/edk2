@@ -1139,7 +1139,7 @@ EfiDhcp4Build (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((SeedPacket == NULL) || (SeedPacket->Dhcp4.Magik != DHCP_OPTION_MAGIC) ||
+  if ((SeedPacket == NULL) || (SeedPacket->Dhcp4.Magic != DHCP_OPTION_MAGIC) ||
       EFI_ERROR (DhcpValidateOptions (SeedPacket, NULL)))
   {
     return EFI_INVALID_PARAMETER;
@@ -1384,7 +1384,7 @@ PxeDhcpInput (
   // Validate the options and retrieve the interested options
   //
   if ((Packet->Length > sizeof (EFI_DHCP4_HEADER) + sizeof (UINT32)) &&
-      (Packet->Dhcp4.Magik == DHCP_OPTION_MAGIC) &&
+      (Packet->Dhcp4.Magic == DHCP_OPTION_MAGIC) &&
       EFI_ERROR (DhcpValidateOptions (Packet, NULL)))
   {
     goto RESTART;
@@ -1515,7 +1515,7 @@ EfiDhcp4TransmitReceive (
     return EFI_NOT_READY;
   }
 
-  if ((Token->Packet->Dhcp4.Magik != DHCP_OPTION_MAGIC)                   ||
+  if ((Token->Packet->Dhcp4.Magic != DHCP_OPTION_MAGIC)                   ||
       (NTOHL (Token->Packet->Dhcp4.Header.Xid) == Instance->Service->Xid) ||
       (Token->TimeoutValue == 0)                                          ||
       ((Token->ListenPointCount != 0) && (Token->ListenPoints == NULL))   ||
@@ -1742,7 +1742,7 @@ EfiDhcp4Parse (
   }
 
   if ((Packet->Size < Packet->Length + 2 * sizeof (UINT32)) ||
-      (Packet->Dhcp4.Magik != DHCP_OPTION_MAGIC) ||
+      (Packet->Dhcp4.Magic != DHCP_OPTION_MAGIC) ||
       EFI_ERROR (DhcpValidateOptions (Packet, NULL)))
   {
     return EFI_INVALID_PARAMETER;

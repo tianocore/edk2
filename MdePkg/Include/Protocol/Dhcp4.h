@@ -83,9 +83,9 @@ typedef struct {
     ///
     EFI_DHCP4_HEADER    Header;
     ///
-    /// DHCP magik cookie in network byte order.
+    /// DHCP magic cookie in network byte order.
     ///
-    UINT32              Magik;
+    UINT32              Magic;
     ///
     /// Start of the DHCP packed option data.
     ///
