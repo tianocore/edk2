@@ -9,6 +9,51 @@
 #include "CpuDxe.h"
 
 /**
+  Check whether any part of the provided memory range is mapped as device
+  memory in the translation table.
+
+  @param  BaseAddress       The physical address that is the start address of
+                            a memory region.
+  @param  Length            The size in bytes of the memory region.
+
+  @retval TRUE   At least one page in the range is mapped as device memory.
+  @retval FALSE  No page in the range is mapped as device memory, or the
+                 range contains no valid mapping.
+**/
+STATIC
+BOOLEAN
+RegionContainsDeviceMemory (
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINT64                Length
+  )
+{
+  UINTN       RegionAddress;
+  UINTN       RegionLength;
+  UINTN       RegionAttributes;
+  EFI_STATUS  Status;
+
+  for (RegionAddress = (UINTN)BaseAddress;
+       RegionAddress < (UINTN)(BaseAddress + Length);
+       RegionAddress += RegionLength)
+  {
+    Status = GetMemoryRegion (
+               &RegionAddress,
+               &RegionLength,
+               &RegionAttributes
+               );
+    if (EFI_ERROR (Status)) {
+      return FALSE;
+    }
+
+    if ((RegionAttributes & TT_ATTR_INDX_MASK) == TT_ATTR_INDX_DEVICE_MEMORY) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
   This function retrieves the attributes of the memory region specified by
   BaseAddress and Length. If different attributes are obtained from different
   parts of the memory region, EFI_NO_MAPPING will be returned.
