@@ -563,9 +563,9 @@ EfiMtftp4GetModeData (
   Instance = MTFTP4_PROTOCOL_FROM_THIS (This);
   CopyMem (&ModeData->ConfigData, &Instance->Config, sizeof (Instance->Config));
   ModeData->SupportedOptionCount   = MTFTP4_SUPPORTED_OPTIONS;
-  ModeData->SupportedOptoins       = (UINT8 **)mMtftp4SupportedOptions;
+  ModeData->SupportedOptions       = (UINT8 **)mMtftp4SupportedOptions;
   ModeData->UnsupportedOptionCount = 0;
-  ModeData->UnsupportedOptoins     = NULL;
+  ModeData->UnsupportedOptions     = NULL;
 
   gBS->RestoreTPL (OldTpl);
 

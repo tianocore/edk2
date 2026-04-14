@@ -157,9 +157,9 @@ typedef struct {
 typedef struct {
   EFI_MTFTP4_CONFIG_DATA    ConfigData;
   UINT8                     SupportedOptionCount;
-  UINT8                     **SupportedOptoins;
+  UINT8                     **SupportedOptions;
   UINT8                     UnsupportedOptionCount;
-  UINT8                     **UnsupportedOptoins;
+  UINT8                     **UnsupportedOptions;
 } EFI_MTFTP4_MODE_DATA;
 
 typedef struct {
