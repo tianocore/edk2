@@ -13,6 +13,7 @@
 #include <Library/BaseLib.h>
 #include <Library/Tpm2DeviceLib.h>
 #include <IndustryStandard/Tpm20.h>
+#include <IndustryStandard/ArmFfaPartInfo.h>
 
 #include "Tpm2DeviceLibFfa.h"
 
