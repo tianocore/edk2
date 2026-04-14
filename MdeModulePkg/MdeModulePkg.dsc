@@ -5,6 +5,7 @@
 # Copyright (c) 2007 - 2024, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.
 # Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -472,6 +473,12 @@
   }
 
 !if $(TOOL_CHAIN_TAG) != "XCODE5"
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStorageFvbStandaloneMm.inf {
+    <LibraryClasses>
+      DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibBase.inf
+      NULL|MdeModulePkg/Library/VarCheckPolicyLib/VarCheckPolicyLibStandaloneMm.inf
+      NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
+  }
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteStandaloneMm.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStandaloneMm.inf
 !endif
@@ -481,13 +488,14 @@
   MdeModulePkg/Application/SmiHandlerProfileInfo/SmiHandlerProfileInfo.inf
   MdeModulePkg/Core/PiSmmCore/PiSmmIpl.inf
   MdeModulePkg/Core/PiSmmCore/PiSmmCore.inf
-  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf {
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStorageFvbTraditionalMm.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/VarCheckPolicyLib/VarCheckPolicyLib.inf
       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
       NULL|MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLib.inf
       NULL|MdeModulePkg/Library/VarCheckPcdLib/VarCheckPcdLib.inf
   }
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf

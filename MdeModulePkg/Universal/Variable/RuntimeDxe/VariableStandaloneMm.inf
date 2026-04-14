@@ -21,6 +21,7 @@
 # Copyright (c) 2010 - 2024, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2018, Linaro, Ltd. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.
+# Copyright (c) 2026, Arm Limited. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -35,23 +36,10 @@
   ENTRY_POINT                    = VariableServiceInitialize
 
 [Sources]
-  Reclaim.c
-  Variable.c
+  PrivilegePolymorphic.h
+  SpeculationBarrierSmm.c
   VariableSmm.c
   VariableStandaloneMm.c
-  VariableNonVolatile.c
-  VariableNonVolatile.h
-  VariableParsing.c
-  VariableParsing.h
-  VariableRuntimeCache.c
-  VariableRuntimeCache.h
-  VarCheck.c
-  Variable.h
-  PrivilegePolymorphic.h
-  VariableExLib.c
-  TcgMorLockSmm.c
-  SpeculationBarrierSmm.c
-  VariableLockRequestToLock.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -59,79 +47,25 @@
   StandaloneMmPkg/StandaloneMmPkg.dec
 
 [LibraryClasses]
-  AuthVariableLib
   BaseLib
   BaseMemoryLib
   DebugLib
-  HobLib
   MemLib
   MemoryAllocationLib
   MmServicesTableLib
   SafeIntLib
   StandaloneMmDriverEntryPoint
   SynchronizationLib
-  VarCheckLib
-  VariableFlashInfoLib
-  VariablePolicyLib
-  VariablePolicyHelperLib
 
 [Protocols]
-  gEfiSmmFirmwareVolumeBlockProtocolGuid        ## CONSUMES
-  ## CONSUMES
-  ## NOTIFY
-  gEfiSmmFaultTolerantWriteProtocolGuid
   ## PRODUCES
   ## UNDEFINED # SmiHandlerRegister
   gEfiSmmVariableProtocolGuid
   gEfiMmEndOfDxeProtocolGuid                   ## NOTIFY
-  gEdkiiSmmVarCheckProtocolGuid                ## PRODUCES
+  gEdkiiVariableStorageProtocolGuid            ## COUNSUMES
 
 [Guids]
-  ## SOMETIMES_CONSUMES   ## GUID # Signature of Variable store header
-  ## SOMETIMES_PRODUCES   ## GUID # Signature of Variable store header
-  ## SOMETIMES_CONSUMES   ## HOB
-  ## SOMETIMES_PRODUCES   ## SystemTable
-  gEfiAuthenticatedVariableGuid
-
-  ## SOMETIMES_CONSUMES   ## GUID # Signature of Variable store header
-  ## SOMETIMES_PRODUCES   ## GUID # Signature of Variable store header
-  ## SOMETIMES_CONSUMES   ## HOB
-  ## SOMETIMES_PRODUCES   ## SystemTable
-  gEfiVariableGuid
-
-  ## SOMETIMES_CONSUMES   ## Variable:L"PlatformLang"
-  ## SOMETIMES_PRODUCES   ## Variable:L"PlatformLang"
-  ## SOMETIMES_CONSUMES   ## Variable:L"Lang"
-  ## SOMETIMES_PRODUCES   ## Variable:L"Lang"
-  gEfiGlobalVariableGuid
-
-  gEfiMemoryOverwriteControlDataGuid            ## SOMETIMES_CONSUMES   ## Variable:L"MemoryOverwriteRequestControl"
-  gEfiMemoryOverwriteRequestControlLockGuid     ## SOMETIMES_PRODUCES   ## Variable:L"MemoryOverwriteRequestControlLock"
-
-  gSmmVariableWriteGuid                         ## PRODUCES             ## GUID # Install protocol
-  gEfiSystemNvDataFvGuid                        ## CONSUMES             ## GUID
-  gEdkiiFaultTolerantWriteGuid                  ## SOMETIMES_CONSUMES   ## HOB
-
-  ## SOMETIMES_CONSUMES   ## Variable:L"VarErrorFlag"
-  ## SOMETIMES_PRODUCES   ## Variable:L"VarErrorFlag"
-  gEdkiiVarErrorFlagGuid
-
-[Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize                  ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize              ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVolatileVariableSize          ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize     ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize                ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHwErrStorageSize                 ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxUserNvVariableSpaceSize           ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdBoottimeReservedNvVariableSpaceSize  ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdReclaimVariableSpaceAtEndOfDxe   ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable          ## SOMETIMES_CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved       ## SOMETIMES_CONSUMES
-
-[FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics        ## CONSUMES  # statistic the information of variable.
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate       ## CONSUMES  # Auto update PlatformLang/Lang
+  gSmmVariableWriteGuid                        ## PRODUCES             ## GUID # Install protocol
 
 [Depex]
-  TRUE
+  gEdkiiVariableStorageProtocolGuid
