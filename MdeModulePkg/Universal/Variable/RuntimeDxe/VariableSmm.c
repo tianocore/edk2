@@ -21,11 +21,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 #include <Protocol/SmmVariable.h>
-#include <Protocol/VariableStorage.h>
 
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MmServicesTableLib.h>
+#include <Library/VariableStorageRouterLib.h>
 
 #include <Guid/SmmVariableCommon.h>
 #include "PrivilegePolymorphic.h"
@@ -36,8 +36,6 @@ STATIC BOOLEAN  mAtRuntime              = FALSE;
 STATIC BOOLEAN  mEndOfDxe               = FALSE;
 STATIC UINT8    *mVariableBufferPayload = NULL;
 STATIC UINTN    mVariableBufferPayloadSize;
-
-STATIC EDKII_VARIABLE_STORAGE_PROTOCOL  *mVariableStorage;
 
 /**
   This code gets the size of variable header.
@@ -55,7 +53,7 @@ GetVariableHeaderSize (
   UINTN    Value;
   BOOLEAN  AuthFormat;
 
-  AuthFormat = mVariableStorage->CheckAuthFormat ();
+  AuthFormat = VariableStorageRouterLibCheckAuthFormat ();
 
   if (AuthFormat) {
     Value = sizeof (AUTHENTICATED_VARIABLE_HEADER);
@@ -87,7 +85,7 @@ GetVariableHeaderSize (
 STATIC
 EFI_STATUS
 EFIAPI
-VariableStorageFvbSetVariable (
+SmmVariableSetVariable (
   IN CHAR16    *VariableName,
   IN EFI_GUID  *VendorGuid,
   IN UINT32    Attributes,
@@ -95,155 +93,21 @@ VariableStorageFvbSetVariable (
   IN VOID      *Data
   )
 {
-  return mVariableStorage->SetVariable (
-                             VariableName,
-                             VendorGuid,
-                             Attributes,
-                             DataSize,
-                             Data,
-                             TRUE
-                             );
-}
-
-/**
-  Returns the value of a variable.
-
-  @param[in]       VariableName  A Null-terminated string that is the name of the vendor's
-                                 variable.
-  @param[in]       VendorGuid    A unique identifier for the vendor.
-  @param[out]      Attributes    If not NULL, a pointer to the memory location to return the
-                                 attributes bitmask for the variable.
-  @param[in, out]  DataSize      On input, the size in bytes of the return Data buffer.
-                                 On output the size of data returned in Data.
-  @param[out]      Data          The buffer to return the contents of the variable. May be NULL
-                                 with a zero DataSize in order to determine the size buffer needed.
-
-  @retval EFI_SUCCESS            The function completed successfully.
-  @retval EFI_NOT_FOUND          The variable was not found.
-  @retval EFI_BUFFER_TOO_SMALL   The DataSize is too small for the result.
-  @retval EFI_INVALID_PARAMETER  VariableName is NULL.
-  @retval EFI_INVALID_PARAMETER  VendorGuid is NULL.
-  @retval EFI_INVALID_PARAMETER  DataSize is NULL.
-  @retval EFI_INVALID_PARAMETER  The DataSize is not too small and Data is NULL.
-  @retval EFI_DEVICE_ERROR       The variable could not be retrieved due to a hardware error.
-  @retval EFI_SECURITY_VIOLATION The variable could not be retrieved due to an authentication failure.
-  @retval EFI_UNSUPPORTED        After ExitBootServices() has been called, this return code may be returned
-                                 if no variable storage is supported. The platform should describe this
-                                 runtime service as unsupported at runtime via an EFI_RT_PROPERTIES_TABLE
-                                 configuration table.
-
-**/
-STATIC
-EFI_STATUS
-EFIAPI
-VariableStorageFvbGetVariable (
-  IN     CHAR16    *VariableName,
-  IN     EFI_GUID  *VendorGuid,
-  OUT    UINT32    *Attributes     OPTIONAL,
-  IN OUT UINTN     *DataSize,
-  OUT    VOID      *Data           OPTIONAL
-  )
-{
-  return mVariableStorage->GetVariable (
-                             VariableName,
-                             VendorGuid,
-                             Attributes,
-                             DataSize,
-                             Data
-                             );
-}
-
-/**
-  Enumerates the current variable names.
-
-  @param[in, out]  VariableNameSize The size of the VariableName buffer. The size must be large
-                                    enough to fit input string supplied in VariableName buffer.
-  @param[in, out]  VariableName     On input, supplies the last VariableName that was returned
-                                    by GetNextVariableName(). On output, returns the Nullterminated
-                                    string of the current variable.
-  @param[in, out]  VendorGuid       On input, supplies the last VendorGuid that was returned by
-                                    GetNextVariableName(). On output, returns the
-                                    VendorGuid of the current variable.
-
-  @retval EFI_SUCCESS           The function completed successfully.
-  @retval EFI_NOT_FOUND         The next variable was not found.
-  @retval EFI_BUFFER_TOO_SMALL  The VariableNameSize is too small for the result.
-                                VariableNameSize has been updated with the size needed to complete the request.
-  @retval EFI_INVALID_PARAMETER VariableNameSize is NULL.
-  @retval EFI_INVALID_PARAMETER VariableName is NULL.
-  @retval EFI_INVALID_PARAMETER VendorGuid is NULL.
-  @retval EFI_INVALID_PARAMETER The input values of VariableName and VendorGuid are not a name and
-                                GUID of an existing variable.
-  @retval EFI_INVALID_PARAMETER Null-terminator is not found in the first VariableNameSize bytes of
-                                the input VariableName buffer.
-  @retval EFI_DEVICE_ERROR      The variable could not be retrieved due to a hardware error.
-  @retval EFI_UNSUPPORTED       After ExitBootServices() has been called, this return code may be returned
-                                if no variable storage is supported. The platform should describe this
-                                runtime service as unsupported at runtime via an EFI_RT_PROPERTIES_TABLE
-                                configuration table.
-
-**/
-STATIC
-EFI_STATUS
-EFIAPI
-VariableStorageFvbGetNextVariableName (
-  IN OUT UINTN     *VariableNameSize,
-  IN OUT CHAR16    *VariableName,
-  IN OUT EFI_GUID  *VendorGuid
-  )
-{
-  return mVariableStorage->GetNextVariableName (
-                             VariableNameSize,
-                             VariableName,
-                             VendorGuid
-                             );
-}
-
-/**
-  Returns information about the EFI variables.
-
-  @param[in]   Attributes                   Attributes bitmask to specify the type of variables on
-                                            which to return information.
-  @param[out]  MaximumVariableStorageSize   On output the maximum size of the storage space
-                                            available for the EFI variables associated with the
-                                            attributes specified.
-  @param[out]  RemainingVariableStorageSize Returns the remaining size of the storage space
-                                            available for the EFI variables associated with the
-                                            attributes specified.
-  @param[out]  MaximumVariableSize          Returns the maximum size of the individual EFI
-                                            variables associated with the attributes specified.
-
-  @retval EFI_SUCCESS                  Valid answer returned.
-  @retval EFI_INVALID_PARAMETER        An invalid combination of attribute bits was supplied
-  @retval EFI_UNSUPPORTED              The attribute is not supported on this platform, and the
-                                       MaximumVariableStorageSize,
-                                       RemainingVariableStorageSize, MaximumVariableSize
-                                       are undefined.
-
-**/
-STATIC
-EFI_STATUS
-EFIAPI
-VariableStorageFvbQueryVariableInfo (
-  IN  UINT32  Attributes,
-  OUT UINT64  *MaximumVariableStorageSize,
-  OUT UINT64  *RemainingVariableStorageSize,
-  OUT UINT64  *MaximumVariableSize
-  )
-{
-  return mVariableStorage->QueryVariableInfo (
-                             Attributes,
-                             MaximumVariableStorageSize,
-                             RemainingVariableStorageSize,
-                             MaximumVariableSize
-                             );
+  return VariableStorageRouterLibSetVariable (
+           VariableName,
+           VendorGuid,
+           Attributes,
+           DataSize,
+           Data,
+           TRUE
+           );
 }
 
 EFI_SMM_VARIABLE_PROTOCOL  gSmmVariable = {
-  VariableStorageFvbGetVariable,
-  VariableStorageFvbGetNextVariableName,
-  VariableStorageFvbSetVariable,
-  VariableStorageFvbQueryVariableInfo
+  VariableStorageRouterLibGetVariable,
+  VariableStorageRouterLibGetNextVariableName,
+  SmmVariableSetVariable,
+  VariableStorageRouterLibQueryVariableInfo
 };
 
 /**
@@ -371,7 +235,7 @@ SmmVariableHandler (
         goto EXIT;
       }
 
-      Status = VariableStorageFvbGetVariable (
+      Status = VariableStorageRouterLibGetVariable (
                  SmmVariableHeader->Name,
                  &SmmVariableHeader->Guid,
                  &SmmVariableHeader->Attributes,
@@ -420,7 +284,7 @@ SmmVariableHandler (
         goto EXIT;
       }
 
-      Status = VariableStorageFvbGetNextVariableName (
+      Status = VariableStorageRouterLibGetNextVariableName (
                  &GetNextVariableName->NameSize,
                  GetNextVariableName->Name,
                  &GetNextVariableName->Guid
@@ -476,14 +340,14 @@ SmmVariableHandler (
         goto EXIT;
       }
 
-      Status = mVariableStorage->SetVariable (
-                                   SmmVariableHeader->Name,
-                                   &SmmVariableHeader->Guid,
-                                   SmmVariableHeader->Attributes,
-                                   SmmVariableHeader->DataSize,
-                                   (UINT8 *)SmmVariableHeader->Name + SmmVariableHeader->NameSize,
-                                   FALSE
-                                   );
+      Status = VariableStorageRouterLibSetVariable (
+                 SmmVariableHeader->Name,
+                 &SmmVariableHeader->Guid,
+                 SmmVariableHeader->Attributes,
+                 SmmVariableHeader->DataSize,
+                 (UINT8 *)SmmVariableHeader->Name + SmmVariableHeader->NameSize,
+                 FALSE
+                 );
       break;
 
     case SMM_VARIABLE_FUNCTION_QUERY_VARIABLE_INFO:
@@ -494,7 +358,7 @@ SmmVariableHandler (
 
       QueryVariableInfo = (SMM_VARIABLE_COMMUNICATE_QUERY_VARIABLE_INFO *)SmmVariableFunctionHeader->Data;
 
-      Status = VariableStorageFvbQueryVariableInfo (
+      Status = VariableStorageRouterLibQueryVariableInfo (
                  QueryVariableInfo->Attributes,
                  &QueryVariableInfo->MaximumVariableStorageSize,
                  &QueryVariableInfo->RemainingVariableStorageSize,
@@ -520,7 +384,7 @@ SmmVariableHandler (
       }
 
       if (!mEndOfDxe) {
-        Status = mVariableStorage->ReadyToBoot ();
+        Status = VariableStorageRouterLibReadyToBoot ();
       } else {
         Status = EFI_SUCCESS;
       }
@@ -529,7 +393,7 @@ SmmVariableHandler (
 
     case SMM_VARIABLE_FUNCTION_EXIT_BOOT_SERVICE:
       mAtRuntime = TRUE;
-      Status     = mVariableStorage->ExitBootService ();
+      Status     = VariableStorageRouterLibExitBootService ();
       break;
 
     case SMM_VARIABLE_FUNCTION_GET_STATISTICS:
@@ -546,7 +410,7 @@ SmmVariableHandler (
       // that was used by SMM core to cache CommSize from SmmCommunication protocol.
       //
 
-      Status          = mVariableStorage->GetStatics (VariableInfo, &InfoSize);
+      Status          = VariableStorageRouterLibGetStatics (VariableInfo, &InfoSize);
       *CommBufferSize = InfoSize + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE;
       break;
 
@@ -555,10 +419,10 @@ SmmVariableHandler (
         Status = EFI_ACCESS_DENIED;
       } else {
         VariableToLock = (SMM_VARIABLE_COMMUNICATE_LOCK_VARIABLE *)SmmVariableFunctionHeader->Data;
-        Status         = mVariableStorage->RequestToLock (
-                                             VariableToLock->Name,
-                                             &VariableToLock->Guid
-                                             );
+        Status         = VariableStorageRouterLibRequestToLock (
+                           VariableToLock->Name,
+                           &VariableToLock->Guid
+                           );
       }
 
       break;
@@ -568,11 +432,11 @@ SmmVariableHandler (
         Status = EFI_ACCESS_DENIED;
       } else {
         CommVariableProperty = (SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY *)SmmVariableFunctionHeader->Data;
-        Status               = mVariableStorage->PropertySet (
-                                                   CommVariableProperty->Name,
-                                                   &CommVariableProperty->Guid,
-                                                   &CommVariableProperty->VariableProperty
-                                                   );
+        Status               = VariableStorageRouterLibPropertySet (
+                                 CommVariableProperty->Name,
+                                 &CommVariableProperty->Guid,
+                                 &CommVariableProperty->VariableProperty
+                                 );
       }
 
       break;
@@ -621,11 +485,11 @@ SmmVariableHandler (
         goto EXIT;
       }
 
-      Status = mVariableStorage->PropertyGet (
-                                   CommVariableProperty->Name,
-                                   &CommVariableProperty->Guid,
-                                   &CommVariableProperty->VariableProperty
-                                   );
+      Status = VariableStorageRouterLibPropertyGet (
+                 CommVariableProperty->Name,
+                 &CommVariableProperty->Guid,
+                 &CommVariableProperty->VariableProperty
+                 );
       CopyMem (SmmVariableFunctionHeader->Data, mVariableBufferPayload, CommBufferPayloadSize);
       break;
 
@@ -739,18 +603,18 @@ SmmVariableHandler (
         goto EXIT;
       }
 
-      Status = mVariableStorage->InitCache (
-                                   RuntimeVariableCacheContext->RuntimeHobCache,
-                                   RuntimeVariableCacheContext->RuntimeVolatileCache,
-                                   RuntimeVariableCacheContext->RuntimeNvCache,
-                                   RuntimeVariableCacheContext->PendingUpdate,
-                                   RuntimeVariableCacheContext->ReadLock,
-                                   RuntimeVariableCacheContext->HobFlushComplete
-                                   );
+      Status = VariableStorageRouterLibInitCache (
+                 RuntimeVariableCacheContext->RuntimeHobCache,
+                 RuntimeVariableCacheContext->RuntimeVolatileCache,
+                 RuntimeVariableCacheContext->RuntimeNvCache,
+                 RuntimeVariableCacheContext->PendingUpdate,
+                 RuntimeVariableCacheContext->ReadLock,
+                 RuntimeVariableCacheContext->HobFlushComplete
+                 );
       break;
 
     case SMM_VARIABLE_FUNCTION_SYNC_RUNTIME_CACHE:
-      Status = mVariableStorage->SyncCache ();
+      Status = VariableStorageRouterLibSyncCache ();
       break;
 
     case SMM_VARIABLE_FUNCTION_GET_RUNTIME_CACHE_INFO:
@@ -761,13 +625,13 @@ SmmVariableHandler (
 
       GetRuntimeCacheInfo = (SMM_VARIABLE_COMMUNICATE_GET_RUNTIME_CACHE_INFO *)SmmVariableFunctionHeader->Data;
 
-      GetRuntimeCacheInfo->AuthenticatedVariableUsage = mVariableStorage->CheckAuthFormat ();
+      GetRuntimeCacheInfo->AuthenticatedVariableUsage = VariableStorageRouterLibCheckAuthFormat ();
 
-      Status = mVariableStorage->GetCacheInfo (
-                                   &GetRuntimeCacheInfo->TotalHobStorageSize,
-                                   &GetRuntimeCacheInfo->TotalVolatileStorageSize,
-                                   &GetRuntimeCacheInfo->TotalNvStorageSize
-                                   );
+      Status = VariableStorageRouterLibGetCacheInfo (
+                 &GetRuntimeCacheInfo->TotalHobStorageSize,
+                 &GetRuntimeCacheInfo->TotalVolatileStorageSize,
+                 &GetRuntimeCacheInfo->TotalNvStorageSize
+                 );
       break;
 
     default:
@@ -803,7 +667,7 @@ SmmEndOfDxeCallback (
 
   if (!mEndOfDxe) {
     mEndOfDxe = TRUE;
-    return mVariableStorage->EndOfDxe ();
+    return VariableStorageRouterLibEndOfDxe ();
   }
 
   return EFI_SUCCESS;
@@ -828,13 +692,6 @@ MmVariableServiceInitialize (
   EFI_HANDLE  VariableHandle;
   VOID        *SmmEndOfDxeRegistration;
 
-  Status = gMmst->MmLocateProtocol (
-                    &gEdkiiVariableStorageProtocolGuid,
-                    NULL,
-                    (VOID **)&mVariableStorage
-                    );
-  ASSERT_EFI_ERROR (Status);
-
   //
   // Install the Smm Variable Protocol on a new handle.
   //
@@ -847,7 +704,7 @@ MmVariableServiceInitialize (
                             );
   ASSERT_EFI_ERROR (Status);
 
-  mVariableBufferPayloadSize = mVariableStorage->GetMaxVariableSize () +
+  mVariableBufferPayloadSize = VariableStorageRouterLibGetMaxVariableSize () +
                                OFFSET_OF (SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY, Name) -
                                GetVariableHeaderSize ();
 
@@ -883,7 +740,7 @@ MmVariableServiceInitialize (
   //
   // Notify the variable wrapper driver the variable service is ready
   //
-  Status = mVariableStorage->InitWriteService (VariableNotifySmmWriteReady);
+  Status = VariableStorageRouterLibInitWriteService (VariableNotifySmmWriteReady);
   ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;

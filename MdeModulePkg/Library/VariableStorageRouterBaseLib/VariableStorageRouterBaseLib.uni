@@ -1,0 +1,12 @@
+// /** @file
+// Variable Storage Router Base Library.
+//
+// Copyright (c) 2026, Arm Ltd. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "Variable Storage Router Base Library."
+#string STR_MODULE_DESCRIPTION          #language en-US "Variable Storage Router Base Library."

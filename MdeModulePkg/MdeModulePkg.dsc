@@ -160,6 +160,7 @@
   SmmServicesTableLib|MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxSmmLib.inf
   SmmMemLib|MdePkg/Library/SmmMemLib/SmmMemLib.inf
+  VariableStorageRouterLib|MdeModulePkg/Library/VariableStorageRouterBaseLib/VariableStorageRouterBaseTraditionalMmLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -182,6 +183,7 @@
   MemLib|StandaloneMmPkg/Library/StandaloneMmMemLib/StandaloneMmMemLib.inf
   VarCheckHiiLibMmDependency|MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLibMmDependency.inf
   VarCheckHiiLib|MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLibStandaloneMm.inf
+  VariableStorageRouterLib|MdeModulePkg/Library/VariableStorageRouterBaseLib/VariableStorageRouterBaseStandaloneMmLib.inf
 
 [LibraryClasses.AARCH64]
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
@@ -473,6 +475,7 @@
   }
 
 !if $(TOOL_CHAIN_TAG) != "XCODE5"
+  MdeModulePkg/Library/VariableStorageRouterBaseLib/VariableStorageRouterBaseStandaloneMmLib.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStorageFvbStandaloneMm.inf {
     <LibraryClasses>
       DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibBase.inf
@@ -488,6 +491,7 @@
   MdeModulePkg/Application/SmiHandlerProfileInfo/SmiHandlerProfileInfo.inf
   MdeModulePkg/Core/PiSmmCore/PiSmmIpl.inf
   MdeModulePkg/Core/PiSmmCore/PiSmmCore.inf
+  MdeModulePkg/Library/VariableStorageRouterBaseLib/VariableStorageRouterBaseTraditionalMmLib.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableStorageFvbTraditionalMm.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/VarCheckPolicyLib/VarCheckPolicyLib.inf

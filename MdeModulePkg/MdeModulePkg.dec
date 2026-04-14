@@ -187,6 +187,10 @@
   #
   HobPrintLib|Include/Library/HobPrintLib.h
 
+  ##  @libraryclass   Provides a services to communicate Variable Storage
+  #
+  VariableStorageRouterLib|Include/Library/VariableStorageRouterLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h

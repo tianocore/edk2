@@ -64,6 +64,7 @@
   UefiLib
   SafeIntLib
   SmmMemLib
+  VariableStorageRouterLib
 
 [Protocols]
   ## PRODUCES
@@ -76,7 +77,7 @@
   gSmmVariableWriteGuid                        ## PRODUCES             ## GUID # Install protocol
 
 [Depex]
-  gEdkiiVariableStorageProtocolGuid
+  TRUE
 
 [UserExtensions.TianoCore."ExtraFiles"]
   VariableSmmExtra.uni

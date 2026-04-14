@@ -56,16 +56,16 @@
   SafeIntLib
   StandaloneMmDriverEntryPoint
   SynchronizationLib
+  VariableStorageRouterLib
 
 [Protocols]
   ## PRODUCES
   ## UNDEFINED # SmiHandlerRegister
   gEfiSmmVariableProtocolGuid
   gEfiMmEndOfDxeProtocolGuid                   ## NOTIFY
-  gEdkiiVariableStorageProtocolGuid            ## COUNSUMES
 
 [Guids]
   gSmmVariableWriteGuid                        ## PRODUCES             ## GUID # Install protocol
 
 [Depex]
-  gEdkiiVariableStorageProtocolGuid
+  TRUE
