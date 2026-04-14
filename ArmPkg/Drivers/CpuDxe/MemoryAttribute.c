@@ -214,6 +214,11 @@ ClearMemoryAttributes (
   IN  UINT64                         Attributes
   )
 {
+  UINTN       RegionAddress;
+  UINTN       RegionLength;
+  UINTN       RegionAttributes;
+  EFI_STATUS  Status;
+
   DEBUG ((
     DEBUG_INFO,
     "%a: BaseAddress == 0x%lx, Length == 0x%lx, Attributes == 0x%lx\n",
@@ -234,6 +239,27 @@ ClearMemoryAttributes (
       Attributes
       ));
     return EFI_INVALID_PARAMETER;
+  }
+
+  // ARM requires XN on device memory to prevent speculative instruction fetches
+  if ((Attributes & EFI_MEMORY_XP) != 0) {
+    for (RegionAddress = (UINTN)BaseAddress;
+         RegionAddress < (UINTN)(BaseAddress + Length);
+         RegionAddress += RegionLength)
+    {
+      Status = GetMemoryRegion (
+                 &RegionAddress,
+                 &RegionLength,
+                 &RegionAttributes
+                 );
+      if (EFI_ERROR (Status)) {
+        return EFI_UNSUPPORTED;
+      }
+
+      if ((RegionAttributes & TT_ATTR_INDX_MASK) == TT_ATTR_INDX_DEVICE_MEMORY) {
+        return EFI_UNSUPPORTED;
+      }
+    }
   }
 
   return ArmSetMemoryAttributes (BaseAddress, Length, 0, Attributes);
