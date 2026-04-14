@@ -281,6 +281,12 @@ ClearMemoryAttributes (
     return EFI_INVALID_PARAMETER;
   }
 
+  if (((Attributes & EFI_MEMORY_XP) != 0) &&
+      RegionContainsDeviceMemory (BaseAddress, Length))
+  {
+    return EFI_UNSUPPORTED;
+  }
+
   return ArmSetMemoryAttributes (BaseAddress, Length, 0, Attributes);
 }
 
