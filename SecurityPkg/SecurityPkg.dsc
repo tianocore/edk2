@@ -172,6 +172,12 @@
   Tpm12DeviceLib|SecurityPkg/Library/Tpm12DeviceLibTcg/Tpm12DeviceLibTcg.inf
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.inf
 
+[LibraryClasses.common.UEFI_APPLICATION]
+  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+  ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
+  FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
+  SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
+
 [LibraryClasses.common.DXE_SMM_DRIVER]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   SmmServicesTableLib|MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
@@ -253,6 +259,8 @@
 
   SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLib/PeiDxeTpmPlatformHierarchyLib.inf
   SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLibNull/PeiDxeTpmPlatformHierarchyLib.inf
+
+  SecurityPkg/Applications/TpmShellApp/TpmShellApp.inf
 
   #
   # TCG Storage.
