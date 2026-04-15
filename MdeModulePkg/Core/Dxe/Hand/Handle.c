@@ -131,6 +131,41 @@ CoreValidateHandle (
 }
 
 /**
+  Remove handle from handle database and free it
+
+  @param Handle    Handle to be removed from list
+
+  @return EFI_SUCCESS   the handle is removed
+  @return EFI_NOT_READY the handle has one or more protocols installed
+ **/
+EFI_STATUS
+CoreRemoveHandleFromHandleList (
+  EFI_HANDLE  UserHandle
+  )
+{
+  IHANDLE  *Handle;
+
+  Handle = UserHandle;
+
+  //
+  // If there are no more handlers for the handle, free the handle
+  //
+  if (IsListEmpty (&Handle->Protocols)) {
+    Handle->Signature = 0;
+    OrderedCollectionDelete (
+      gOrderedHandleList,
+      OrderedCollectionFind (gOrderedHandleList, Handle),
+      NULL
+      );
+    RemoveEntryList (&Handle->AllHandles);
+    CoreFreePool (Handle);
+    return EFI_SUCCESS;
+  }
+
+  return EFI_NOT_READY;
+}
+
+/**
   Finds the protocol entry for the requested protocol.
   The gProtocolDatabaseLock must be owned
 
@@ -788,9 +823,7 @@ CoreDisconnectControllersUsingProtocolInterface (
 }
 
 /**
-  Uninstalls all instances of a protocol:interfacer from a handle.
-  If the last protocol interface is remove from the handle, the
-  handle is freed.
+  Internal function that removes protocol interface from handle.
 
   @param  UserHandle             The handle to remove the protocol handler from
   @param  Protocol               The protocol, of protocol:interface, to remove
@@ -798,11 +831,9 @@ CoreDisconnectControllersUsingProtocolInterface (
 
   @retval EFI_INVALID_PARAMETER  Protocol is NULL.
   @retval EFI_SUCCESS            Protocol interface successfully uninstalled.
-
-**/
+ **/
 EFI_STATUS
-EFIAPI
-CoreUninstallProtocolInterface (
+CoreUninstallProtocolInterfacesInternal (
   IN EFI_HANDLE  UserHandle,
   IN EFI_GUID    *Protocol,
   IN VOID        *Interface
@@ -882,25 +913,44 @@ CoreUninstallProtocolInterface (
     Status = EFI_SUCCESS;
   }
 
-  //
-  // If there are no more handlers for the handle, free the handle
-  //
-  if (IsListEmpty (&Handle->Protocols)) {
-    Handle->Signature = 0;
-    OrderedCollectionDelete (
-      gOrderedHandleList,
-      OrderedCollectionFind (gOrderedHandleList, Handle),
-      NULL
-      );
-    RemoveEntryList (&Handle->AllHandles);
-    CoreFreePool (Handle);
-  }
-
 Done:
   //
   // Done, unlock the database and return
   //
   CoreReleaseProtocolLock ();
+  return Status;
+}
+
+/**
+  Uninstalls all instances of a protocol:interfacer from a handle.
+  If the last protocol interface is remove from the handle, the
+  handle is freed.
+
+  @param  UserHandle             The handle to remove the protocol handler from
+  @param  Protocol               The protocol, of protocol:interface, to remove
+  @param  Interface              The interface, of protocol:interface, to remove
+
+  @retval EFI_INVALID_PARAMETER  Protocol is NULL.
+  @retval EFI_SUCCESS            Protocol interface successfully uninstalled.
+
+**/
+EFI_STATUS
+EFIAPI
+CoreUninstallProtocolInterface (
+  IN EFI_HANDLE  UserHandle,
+  IN EFI_GUID    *Protocol,
+  IN VOID        *Interface
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = CoreUninstallProtocolInterfacesInternal (UserHandle, Protocol, Interface);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = CoreRemoveHandleFromHandleList (UserHandle);
+
   return Status;
 }
 
@@ -954,7 +1004,7 @@ CoreUninstallMultipleProtocolInterfaces (
     //
     // Uninstall it
     //
-    Status = CoreUninstallProtocolInterface (Handle, Protocol, Interface);
+    Status = CoreUninstallProtocolInterfacesInternal (Handle, Protocol, Interface);
   }
 
   VA_END (Args);
@@ -976,6 +1026,8 @@ CoreUninstallMultipleProtocolInterfaces (
 
     VA_END (Args);
     Status = EFI_INVALID_PARAMETER;
+  } else {
+    CoreRemoveHandleFromHandleList (Handle);
   }
 
   return Status;
