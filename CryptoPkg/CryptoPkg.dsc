@@ -381,6 +381,7 @@
   CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
   CryptoPkg/Library/OpensslLib/OpensslLib.inf
   CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
+  CryptoPkg/Library/OpensslLib/OpensslLibFullLite.inf
   CryptoPkg/Library/OpensslLib/OpensslLibSm3.inf
   CryptoPkg/Library/BaseHashApiLib/BaseHashApiLib.inf
   CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
@@ -406,6 +407,7 @@
   #
   CryptoPkg/Library/OpensslLib/OpensslLibAccel.inf
   CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
+  CryptoPkg/Library/OpensslLib/OpensslLibFullAccelLite.inf
 !endif
 
 #
