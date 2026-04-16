@@ -37,7 +37,7 @@ MmServicesTableLibConstructor (
   //
   // Retrieve MM Base Protocol,  Do not use gBS from UefiBootServicesTableLib on purpose
   // to prevent inclusion of gBS, gST, and gImageHandle from SMM Drivers unless the
-  // MM driver explicity declares that dependency.
+  // MM driver explicitly declares that dependency.
   //
   Status = SystemTable->BootServices->LocateProtocol (
                                         &gEfiMmBaseProtocolGuid,

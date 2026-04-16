@@ -203,11 +203,11 @@ typedef struct {
 
 typedef struct {
   ///
-  /// Length of DUID in octects.
+  /// Length of DUID in octets.
   ///
   UINT16    Length;
   ///
-  /// Array of DUID octects.
+  /// Array of DUID octets.
   ///
   UINT8     Duid[1];
 } EFI_DHCP6_DUID;

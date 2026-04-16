@@ -77,7 +77,7 @@ GenerateRandomNumberViaNist800Algorithm (
   }
 
   // If we get to this point, we have failed
-  DEBUG ((DEBUG_ERROR, "%a: GetRNG() failed, staus = %r\n", __func__, Status));
+  DEBUG ((DEBUG_ERROR, "%a: GetRNG() failed, status = %r\n", __func__, Status));
 
   return Status;
 }

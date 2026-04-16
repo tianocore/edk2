@@ -138,7 +138,7 @@ EFI_STATUS
   );
 
 /**
-  Enumration value for status of USB HC.
+  Enumeration value for status of USB HC.
 **/
 typedef enum {
   EfiUsbHcStateHalt,                ///< The host controller is in halt
@@ -169,7 +169,7 @@ typedef enum {
                                     ///< when there is no bus traffic for
                                     ///< 3 microseconds.
 
-  EfiUsbHcStateMaximum              ///< Maximum value for enumration value of HC status.
+  EfiUsbHcStateMaximum              ///< Maximum value for enumeration value of HC status.
 } EFI_USB_HC_STATE;
 
 /**
@@ -324,7 +324,7 @@ EFI_STATUS
                               transfer is polled.
   @param  DataLength          Indicates the length of data to be received at the rate specified by
                               PollingInterval from the target asynchronous interrupt endpoint.
-  @param  Translator          A pointr to the transaction translator data.
+  @param  Translator          A pointer to the transaction translator data.
   @param  CallBackFunction    The Callback function. This function is called at the rate specified by
                               PollingInterval.
   @param  Context             The context that is passed to the CallBackFunction. This is an
@@ -343,7 +343,7 @@ EFI_STATUS
   IN     UINT8                                               DeviceAddress,
   IN     UINT8                                               EndPointAddress,
   IN     UINT8                                               DeviceSpeed,
-  IN     UINTN                                               MaxiumPacketLength,
+  IN     UINTN                                               MaximumPacketLength,
   IN     BOOLEAN                                             IsNewTransfer,
   IN OUT UINT8                                               *DataToggle,
   IN     UINTN                                               PollingInterval  OPTIONAL,
@@ -371,7 +371,7 @@ EFI_STATUS
   @param  DataToggle            A pointer to the data toggle value.
   @param  TimeOut               Indicates the maximum time, in milliseconds, which the transfer is
                                 allowed to complete.
-  @param  Translator            A pointr to the transaction translator data.
+  @param  Translator            A pointer to the transaction translator data.
   @param  TransferResult        A pointer to the detailed result information from the synchronous
                                 interrupt transfer.
 
@@ -408,7 +408,7 @@ EFI_STATUS
   This function is used to submit isochronous transfer to a target endpoint of a USB device.
   The target endpoint is specified by DeviceAddressand EndpointAddress. Isochronous transfers are
   used when working with isochronous date. It provides periodic, continuous communication between
-  the host and a device. Isochronous transfers can beused only by full-speed, high-speed, and
+  the host and a device. Isochronous transfers can be used only by full-speed, high-speed, and
   super-speed devices.
 
   High-speed isochronous transfers can be performed using multiple data buffers. The number of
@@ -417,7 +417,7 @@ EFI_STATUS
 
   Data represents a list of pointers to the data buffers. For full-speed isochronous transfers
   only the data pointed by Data[0]shall be used. For high-speed isochronous transfers and for
-  the split transactions depending on DataLengththere several data buffers canbe used. For the
+  the split transactions depending on DataLengththere several data buffers can be used. For the
   high-speed isochronous transfers the total number of buffers must not exceed EFI_USB_MAX_ISO_BUFFER_NUM.
 
   For split transactions performed on full-speed device by high-speed host controller the total

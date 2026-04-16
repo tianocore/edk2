@@ -272,12 +272,12 @@
   #
   MmUnblockMemoryLib|Include/Library/MmUnblockMemoryLib.h
 
-  ##  @libraryclass  This library provides interfances to filter and trace port IO/MMIO/MSR access.
+  ##  @libraryclass  This library provides interfaces to filter and trace port IO/MMIO/MSR access.
   #
   #
   RegisterFilterLib|Include/Library/RegisterFilterLib.h
 
-  ##  @libraryclass  This library provides interfances to probe ConfidentialComputing guest type.
+  ##  @libraryclass  This library provides interfaces to probe ConfidentialComputing guest type.
   #
   #
   CcProbeLib|Include/Library/CcProbeLib.h

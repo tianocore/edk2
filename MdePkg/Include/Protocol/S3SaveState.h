@@ -116,7 +116,7 @@ EFI_STATUS
   @param[in]      Label               Points to the label which will be inserted in the boot script table.
 
   @retval    EFI_SUCCESS              The label already exists or was inserted.
-  @retval    EFI_NOT_FOUND            The label did not already exist and CreateifNotFound was FALSE.
+  @retval    EFI_NOT_FOUND            The label did not already exist and CreateIfNotFound was FALSE.
   @retval    EFI_INVALID_PARAMETER    The Label is NULL or points to an empty string.
   @retval    EFI_INVALID_PARAMETER    The Position is not a valid position in the boot script table.
   @retval    EFI_OUT_OF_RESOURCES     There is insufficient memory to store the boot script.

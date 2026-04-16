@@ -102,13 +102,13 @@ EFI_STATUS
   );
 
 /**
-  Sets the baud rate, receive FIFO depth, transmit/receice time out, parity,
+  Sets the baud rate, receive FIFO depth, transmit/receive time out, parity,
   data bits, and stop bits on a serial device.
 
   @param  This             Protocol instance pointer.
   @param  BaudRate         The requested baud rate. A BaudRate value of 0 will use the
                            device's default interface speed.
-  @param  ReveiveFifoDepth The requested depth of the FIFO on the receive side of the
+  @param  ReceiveFifoDepth The requested depth of the FIFO on the receive side of the
                            serial interface. A ReceiveFifoDepth value of 0 will use
                            the device's default FIFO depth.
   @param  Timeout          The requested time out for a single character in microseconds.
@@ -118,7 +118,7 @@ EFI_STATUS
   @param  Parity           The type of parity to use on this serial device. A Parity value of
                            DefaultParity will use the device's default parity value.
   @param  DataBits         The number of data bits to use on the serial device. A DataBits
-                           vaule of 0 will use the device's default data bit setting.
+                           value of 0 will use the device's default data bit setting.
   @param  StopBits         The number of stop bits to use on this serial device. A StopBits
                            value of DefaultStopBits will use the device's default number of
                            stop bits.
@@ -243,7 +243,7 @@ EFI_STATUS
 
   @param Parity
   If applicable, this is the EFI_PARITY_TYPE that is computed or
-  checked as each character is transmitted or reveived. If the device
+  checked as each character is transmitted or received. If the device
   does not support parity the value is the default parity value.
 
   @param StopBits

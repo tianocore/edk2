@@ -2813,7 +2813,7 @@ typedef struct {
 /// 00h - 3Fh: MCTP Host Interfaces
 ///
 typedef enum {
-  // MCTP Host Interface type indentifiers as defined in DSP0239
+  // MCTP Host Interface type identifiers as defined in DSP0239
   MCHostInterfaceTypeKCS                                 = 0x02,
   MCHostInterfaceType8250_UARTRegisterCompatible         = 0x03,
   MCHostInterfaceType16450_UARTRegisterCompatible        = 0x04,

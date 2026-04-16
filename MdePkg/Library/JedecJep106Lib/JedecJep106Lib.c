@@ -1222,7 +1222,7 @@ STATIC CONST JEDEC_MANUFACTURERS  Jep106ManufacturersBank10[] = {
   { 0x97, "Uhnder Inc"                                                         },
   { 0x98, "Impinj"                                                             },
   { 0x19, "DEPO Computers"                                                     },
-  { 0x1A, "Nespeed Sysems"                                                     },
+  { 0x1A, "Nespeed Systems"                                                    },
   { 0x9B, "Yangtze Memory Technologies Co Ltd"                                 },
   { 0x1C, "MemxPro Inc"                                                        },
   { 0x9D, "Tammuz Co Ltd"                                                      },

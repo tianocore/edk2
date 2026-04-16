@@ -1,5 +1,5 @@
 /** @file
-  I/O Library. This file has compiler specifics for Microsft C as there is no
+  I/O Library. This file has compiler specifics for Microsoft C as there is no
   ANSI C standard for doing IO.
 
   MSC - uses intrinsic functions and the optimize will remove the function call

@@ -254,7 +254,7 @@ VOID
 
   @param[in] ProcedureArgument    The pointer to private data buffer.
 
-  @retval EFI_SUCCESS             Excutive the procedure successfully
+  @retval EFI_SUCCESS             Excecuted the procedure successfully
 
 **/
 typedef
