@@ -73,6 +73,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjTpm2DeviceInfo,                 ///< 46 - TPM2 Device Info
   EArchCommonObjMcfgPciConfigSpaceInfo,         ///< 47 - MCFG PCI Configuration Space Info
   EArchCommonObjPciRootPortInfo,                ///< 48 - PCI root port configuration Info
+  EArchCommonObjPhysicalMemoryArray,            ///< 49 - Physical Memory Array Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1131,5 +1132,34 @@ typedef struct CmArchCommonObjSpcrInfo {
   /// Specifies the terminal type used by the console device.
   UINT8    TerminalType;
 } CM_ARCH_COMMON_SPCR_INFO;
+
+/** A structure that describes the Physical Memory Array.
+
+  SMBIOS Specification v3.6.0 Type 16
+
+  ID: EArchCommonObjPhysicalMemoryArray
+**/
+typedef struct CmArchCommonPhysicalMemoryArray {
+  /// Use of the memory array (e.g. system, video).
+  UINT8              Use;
+  /// Physical location of the memory array.
+  UINT8              Location;
+  /// Primary hardware error correction or detection method.
+  UINT16             MemoryErrorCorrection;
+  /// Handle of the error information structure for this array.
+  UINT16             MemoryErrorInformationHandle;
+  /// Number of slots or sockets in the array.
+  UINT16             NumberOfMemoryDevices;
+  /// Error correction type enumeration value.
+  UINT8              MemoryErrorCorrectionType;
+  /// Maximum capacity of the array in bytes.
+  UINT64             Size;
+  /// Number of memory devices in the array.
+  UINT8              NumMemDevices;
+  /// CM Object Token of the memory error info object (or CM_NULL_TOKEN).
+  CM_OBJECT_TOKEN    MemoryErrInfoToken;
+  /// CM Object Token uniquely identifying this Physical Memory Array.
+  CM_OBJECT_TOKEN    PhysMemArrayToken;
+} CM_ARCH_COMMON_PHYSICAL_MEMORY_ARRAY;
 
 #pragma pack()
