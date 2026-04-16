@@ -109,6 +109,7 @@ NvmExpressFormatNvm (
   LbaFormat           = (Flbas == 0 ? Device->NamespaceData.Flbas : Flbas);
   FormatNvmCdw10.Lbaf = LbaFormat & NVME_LBA_FORMATNVM_LBAF_MASK;
   CopyMem (&CommandPacket.NvmeCmd->Cdw10, &FormatNvmCdw10, sizeof (NVME_ADMIN_FORMAT_NVM));
+  CommandPacket.NvmeCmd->Flags = CDW10_VALID;
 
   //
   // Send Format NVM command via passthru and wait for completion
@@ -236,6 +237,7 @@ NvmExpressSanitize (
   SanitizeCdw10Cdw11.Sanact = SanitizeAction;
   SanitizeCdw10Cdw11.Ovrpat = OverwritePattern;
   CopyMem (&CommandPacket.NvmeCmd->Cdw10, &SanitizeCdw10Cdw11, sizeof (NVME_ADMIN_SANITIZE));
+  CommandPacket.NvmeCmd->Flags = CDW10_VALID | CDW11_VALID;
 
   //
   // Send Format NVM command via passthru and wait for completion
