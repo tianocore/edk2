@@ -67,6 +67,7 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
+            "Include/Guid/Cper.h",
             "Include/IndustryStandard/Acpi64.h",
             "Include/IndustryStandard/Acpi65.h",
             "Include/IndustryStandard/Tpm12.h",
