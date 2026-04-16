@@ -153,7 +153,7 @@ typedef struct _EFI_SPI_BUS {
 
   ///
   /// Address of the routine which controls the clock used by the SPI bus for
-  /// this SPI peripheral. The SPI host co ntroller's clock routine is called
+  /// this SPI peripheral. The SPI host controller's clock routine is called
   /// when this value is set to NULL.
   ///
   EFI_SPI_CLOCK                     Clock;

@@ -37,7 +37,7 @@ PeCoffLoaderRelocateImageEx (
   loading and relocating of the image type. It's up to the caller to support
   the entry point.
 
-  The IA32/X64 version PE/COFF loader/relocater both support IA32, X64 and EBC images.
+  The IA32/X64 version PE/COFF loader/relocator both support IA32, X64 and EBC images.
 
   @param  Machine   The machine type from the PE Header.
 

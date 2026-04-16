@@ -239,7 +239,7 @@ typedef struct {
 
 ///
 /// The validation bit mask indicates whether or not each of the following fields are
-/// valid in Proessor Generic Error section.
+/// valid in Processor Generic Error section.
 ///@{
 #define EFI_GENERIC_ERROR_PROC_TYPE_VALID          BIT0
 #define EFI_GENERIC_ERROR_PROC_ISA_VALID           BIT1
@@ -257,7 +257,7 @@ typedef struct {
 ///@}
 
 ///
-/// The type of the processor architecture in Proessor Generic Error section.
+/// The type of the processor architecture in Processor Generic Error section.
 ///@{
 #define EFI_GENERIC_ERROR_PROC_TYPE_IA32_X64  0x00
 #define EFI_GENERIC_ERROR_PROC_TYPE_IA64      0x01
@@ -265,7 +265,7 @@ typedef struct {
 ///@}
 
 ///
-/// The type of the instruction set executing when the error occurred in Proessor
+/// The type of the instruction set executing when the error occurred in Processor
 /// Generic Error section.
 ///@{
 #define EFI_GENERIC_ERROR_PROC_ISA_IA32     0x00
@@ -275,7 +275,7 @@ typedef struct {
 ///@}
 
 ///
-/// The type of error that occurred in Proessor Generic Error section.
+/// The type of error that occurred in Processor Generic Error section.
 ///@{
 #define EFI_GENERIC_ERROR_PROC_ERROR_TYPE_UNKNOWN     0x00
 #define EFI_GENERIC_ERROR_PROC_ERROR_TYPE_CACHE       0x01
@@ -285,7 +285,7 @@ typedef struct {
 ///@}
 
 ///
-/// The type of operation in Proessor Generic Error section.
+/// The type of operation in Processor Generic Error section.
 ///@{
 #define EFI_GENERIC_ERROR_PROC_OPERATION_GENERIC           0x00
 #define EFI_GENERIC_ERROR_PROC_OPERATION_DATA_READ         0x01
@@ -294,7 +294,7 @@ typedef struct {
 ///@}
 
 ///
-/// Flags bit mask indicates additional information about the error in Proessor Generic
+/// Flags bit mask indicates additional information about the error in Processor Generic
 /// Error section
 ///@{
 #define EFI_GENERIC_ERROR_PROC_FLAGS_RESTARTABLE  BIT0
@@ -840,7 +840,7 @@ typedef struct {
   UINT64                      ValidFields;
   EFI_GENERIC_ERROR_STATUS    ErrorStatus;
   UINT64                      PhysicalAddress;     // Error physical address
-  UINT64                      PhysicalAddressMask; // Grnaularity
+  UINT64                      PhysicalAddressMask; // Granularity
   UINT16                      Node;                // Node #
   UINT16                      Card;
   UINT16                      ModuleRank;        // Module or Rank#
@@ -916,7 +916,7 @@ typedef struct {
   UINT64                      ValidFields;
   EFI_GENERIC_ERROR_STATUS    ErrorStatus;
   UINT64                      PhysicalAddress;     // Error physical address
-  UINT64                      PhysicalAddressMask; // Grnaularity
+  UINT64                      PhysicalAddressMask; // Granularity
   UINT16                      Node;                // Node #
   UINT16                      Card;
   UINT16                      Module;             // Module or Rank#

@@ -65,7 +65,7 @@ typedef struct _EFI_SCSI_IO_PROTOCOL EFI_SCSI_IO_PROTOCOL;
 #define EFI_SCSI_IO_STATUS_HOST_ADAPTER_REQUEST_SENSE_FAILED   0x10    ///< the adapter failed in issuing request sense command
 #define EFI_SCSI_IO_STATUS_HOST_ADAPTER_SELECTION_TIMEOUT      0x11    ///< selection timeout
 #define EFI_SCSI_IO_STATUS_HOST_ADAPTER_DATA_OVERRUN_UNDERRUN  0x12    ///< data overrun or data underrun
-#define EFI_SCSI_IO_STATUS_HOST_ADAPTER_BUS_FREE               0x13    ///< Unexepected bus free
+#define EFI_SCSI_IO_STATUS_HOST_ADAPTER_BUS_FREE               0x13    ///< Unexpected bus free
 #define EFI_SCSI_IO_STATUS_HOST_ADAPTER_PHASE_ERROR            0x14    ///< Target bus phase sequence failure
 #define EFI_SCSI_IO_STATUS_HOST_ADAPTER_OTHER                  0x7f
 

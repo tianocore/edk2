@@ -581,7 +581,7 @@ Decode (
         goto Done;
       } else {
         //
-        // Write orignal character into mDstBase
+        // Write original character into mDstBase
         //
         Sd->mDstBase[Sd->mOutBuf++] = (UINT8)CharC;
       }
@@ -726,7 +726,7 @@ UefiDecompressGetInfo (
   @param  Scratch     A temporary scratch buffer that is used to perform the decompression.
                       This is an optional parameter that may be NULL if the
                       required scratch buffer size is 0.
-  @param  Version     1 for UEFI Decompress algoruthm, 2 for Tiano Decompess algorithm.
+  @param  Version     1 for UEFI Decompress algorithm, 2 for Tiano Decompress algorithm.
 
   @retval  RETURN_SUCCESS Decompression completed successfully, and
                           the uncompressed buffer is returned in Destination.

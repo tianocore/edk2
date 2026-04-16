@@ -1,5 +1,5 @@
 /** @file
-  SMM CPU Rendezvous sevice implement.
+  SMM CPU Rendezvous service implementation.
 
   Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
   Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.

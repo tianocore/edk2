@@ -274,7 +274,7 @@ BITS    64
     inc     rcx                         ; rcx <- the size of memory to copy
     xchg    rdi, r11                    ; save rdi to r11 and initialize rdi to the base address of shadowed GDT table
     rep     movsb                       ; perform memory copy to shadow GDT table
-    mov     rcx, r10                    ; restore the orignal rcx before memory copy
+    mov     rcx, r10                    ; restore the original rcx before memory copy
     mov     rdi, r11                    ; restore the original rdi before memory copy
 
     sidt    [rsp + 50h]       ; save IDT stack in argument space

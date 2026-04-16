@@ -1652,13 +1652,13 @@ typedef struct {
 #define EFI_ACPI_6_3_SECURE_DEVICES_TABLE_REVISION  0x01
 
 ///
-/// Secure Devcice types
+/// Secure Device types
 ///
 #define EFI_ACPI_6_3_SDEV_TYPE_PCIE_ENDPOINT_DEVICE   0x01
 #define EFI_ACPI_6_3_SDEV_TYPE_ACPI_NAMESPACE_DEVICE  0x00
 
 ///
-/// Secure Devcice flags
+/// Secure Device flags
 ///
 #define EFI_ACPI_6_3_SDEV_FLAG_ALLOW_HANDOFF  BIT0
 

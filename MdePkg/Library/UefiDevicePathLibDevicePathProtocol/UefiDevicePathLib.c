@@ -38,7 +38,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST EFI_DEVICE_PATH_PROTOCOL  mUefiDevicePathLib
 };
 
 /**
-  The constructor function caches the pointer to DevicePathUtilites protocol.
+  The constructor function caches the pointer to DevicePathUtilities protocol.
 
   The constructor function locates DevicePathUtilities protocol from protocol database.
   It will ASSERT() if that operation fails and it will always return EFI_SUCCESS.

@@ -179,7 +179,7 @@ BOOLEAN
 
   @param[in] FileHandle         The file handle to be closed.
 
-  @retval EFI_SUCCESS           The file closed sucessfully.
+  @retval EFI_SUCCESS           The file closed successfully.
 **/
 typedef
 EFI_STATUS

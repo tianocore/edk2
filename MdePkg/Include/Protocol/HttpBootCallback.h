@@ -36,7 +36,7 @@ typedef enum {
   ///
   HttpBootHttpRequest,
   ///
-  /// Data points to an EFI_HTTP_MESSAGE structure, which contians a received HTTP
+  /// Data points to an EFI_HTTP_MESSAGE structure, which contains a received HTTP
   /// response message.
   ///
   HttpBootHttpResponse,
