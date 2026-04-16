@@ -66,6 +66,8 @@ EfiStatusToFfaStatus (
       return ARM_FFA_RET_NODATA;
     case EFI_NOT_READY:
       return ARM_FFA_RET_NOT_READY;
+    case EFI_TIMEOUT:
+      return ARM_FFA_RET_RETRY;
     default:
       return ARM_FFA_RET_NOT_SUPPORTED;
   }
@@ -104,6 +106,8 @@ FfaStatusToEfiStatus (
       return EFI_NOT_FOUND;
     case ARM_FFA_RET_NOT_READY:
       return EFI_NOT_READY;
+    case ARM_FFA_RET_RETRY:
+      return EFI_TIMEOUT;
     default:
       return EFI_UNSUPPORTED;
   }
