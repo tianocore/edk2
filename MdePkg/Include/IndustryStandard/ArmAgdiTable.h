@@ -36,7 +36,7 @@ typedef struct {
   /// Signaling Mode bits [1:0]
   /// 0x0 - SDEI based signaling mode
   /// 0x1 - Interrupt based signaling mode
-  /// 0x2 - Both SDEI and Interuppt based signaling mode
+  /// 0x2 - Both SDEI and Interrupt based signaling mode
   /// Rest of the bits [7:2] are reserved
   UINT8                          Flags;
 

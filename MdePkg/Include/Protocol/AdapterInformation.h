@@ -165,9 +165,9 @@ typedef struct {
 
   @param[in]  This                   A pointer to the EFI_ADAPTER_INFORMATION_PROTOCOL instance.
   @param[in]  InformationType        A pointer to an EFI_GUID that defines the contents of InformationBlock.
-  @param[out] InforamtionBlock       The service returns a pointer to the buffer with the InformationBlock
+  @param[out] InformationBlock       The service returns a pointer to the buffer with the InformationBlock
                                      structure which contains details about the data specific to InformationType.
-  @param[out] InforamtionBlockSize   The driver returns the size of the InformationBlock in bytes.
+  @param[out] InformationBlockSize   The driver returns the size of the InformationBlock in bytes.
 
   @retval EFI_SUCCESS                The InformationType information was retrieved.
   @retval EFI_UNSUPPORTED            The InformationType is not known.
@@ -197,9 +197,9 @@ EFI_STATUS
 
   @param[in]  This                   A pointer to the EFI_ADAPTER_INFORMATION_PROTOCOL instance.
   @param[in]  InformationType        A pointer to an EFI_GUID that defines the contents of InformationBlock.
-  @param[in]  InforamtionBlock       A pointer to the InformationBlock structure which contains details
+  @param[in]  InformationBlock       A pointer to the InformationBlock structure which contains details
                                      about the data specific to InformationType.
-  @param[in]  InforamtionBlockSize   The size of the InformationBlock in bytes.
+  @param[in]  InformationBlockSize   The size of the InformationBlock in bytes.
 
   @retval EFI_SUCCESS                The information was received and interpreted successfully.
   @retval EFI_UNSUPPORTED            The InformationType is not known.

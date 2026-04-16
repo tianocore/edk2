@@ -331,7 +331,7 @@ typedef struct {
   /// Type of GIC interface that is associated with this error node.
   ///   0x0 - GIC CPU (GICC)
   ///   0x1 - GIC Distributor (GICD)
-  ///   0x2 - GIC Resistributor (GICR)
+  ///   0x2 - GIC Redistributor (GICR)
   ///   0x3 - GIC ITS (GITS)
   UINT32                       InterfaceType;
 

@@ -356,7 +356,7 @@ typedef struct {
 /*
  * Set the exception base address for LoongArch.
  *
- * @param  ExceptionBaseAddress   The exception base address, must be aligned greater than or qeual to 4K .
+ * @param  ExceptionBaseAddress   The exception base address, must be aligned greater than or equal to 4K .
  */
 VOID
 SetExceptionBaseAddress (
@@ -366,7 +366,7 @@ SetExceptionBaseAddress (
 /*
  * Set the TlbRebase address for LoongArch.
  *
- * @param  TlbRebaseAddress   The TlbRebase address, must be aligned greater than or qeual to 4K .
+ * @param  TlbRebaseAddress   The TlbRebase address, must be aligned greater than or equal to 4K .
  */
 VOID
 SetTlbRebaseAddress (

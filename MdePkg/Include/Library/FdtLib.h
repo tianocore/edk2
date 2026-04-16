@@ -865,7 +865,7 @@ FdtPathOffset (
   Returns the name of a given node.
 
   @param[in] Fdt            The pointer to FDT blob.
-  @param[in] NodeOffse      Offset of node to check.
+  @param[in] NodeOffset     Offset of node to check.
   @param[in] Length         The pointer to an integer variable (will be overwritten) or NULL.
 
   @return The pointer to the node's name.

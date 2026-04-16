@@ -19,7 +19,7 @@ extern CONST UINT32  _gUefiDriverRevision;
   This function is the entry point for a UEFI Application. This function must call
   ProcessLibraryConstructorList(), ProcessModuleEntryPointList(), and ProcessLibraryDestructorList().
   The return value from ProcessModuleEntryPointList() is returned.
-  If _gUefiDriverRevision is not zero and SystemTable->Hdr.Revision is less than _gUefiDriverRevison,
+  If _gUefiDriverRevision is not zero and SystemTable->Hdr.Revision is less than _gUefiDriverRevision,
   then return EFI_INCOMPATIBLE_VERSION.
 
   @param  ImageHandle  The image handle of the UEFI Application.

@@ -1562,7 +1562,7 @@ typedef union {
     UINT32    Reserved5                               : 10;
     ///
     /// [Bit 26] Enumerates support for indirect branch restricted speculation
-    /// (IBRS) and the indirect branch pre-dictor barrier (IBPB). Processors
+    /// (IBRS) and the indirect branch predictor barrier (IBPB). Processors
     /// that set this bit support the IA32_SPEC_CTRL MSR and the IA32_PRED_CMD
     /// MSR. They allow software to set IA32_SPEC_CTRL[0] (IBRS) and
     /// IA32_PRED_CMD[0] (IBPB).
@@ -2925,8 +2925,8 @@ typedef union {
 /**
   CPUID Intel Processor Trace Information Main Leaf
 
-  @param   EAX  CPUID_INTEL_PROCEDSSOR_TRACE (0x14)
-  @param   ECX  CPUID_INTEL_PROCEDSSOR_TRACE_MAIN_LEAF (0x00)
+  @param   EAX  CPUID_INTEL_PROCESSOR_TRACE (0x14)
+  @param   ECX  CPUID_INTEL_PROCESSOR_TRACE_MAIN_LEAF (0x00)
 
   @retval  EAX  Reports the maximum sub-leaf supported in leaf 14H.
   @retval  EBX  Returns Intel processor trace information described by the
@@ -3043,7 +3043,7 @@ typedef union {
 /**
   CPUID Intel Processor Trace Information Sub-leaf
 
-  @param   EAX  CPUID_INTEL_PROCEDSSOR_TRACE (0x14)
+  @param   EAX  CPUID_INTEL_PROCESSOR_TRACE (0x14)
   @param   ECX  CPUID_INTEL_PROCESSOR_TRACE_SUB_LEAF (0x01)
 
   @retval  EAX  Returns Intel processor trace information described by the

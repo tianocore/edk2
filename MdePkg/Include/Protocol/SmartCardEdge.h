@@ -373,9 +373,9 @@ EFI_STATUS
   If Smart Card found the PIN code correct the user is considered authenticated
   to current application, and the function returns TRUE.
 
-  Negative or null PinSize value rejected if PinCodeis not NULL.
+  Negative or null PinSize value rejected if PinCode is not NULL.
 
-  A NULL PinCodebuffer means the application didn't know the PIN, in that case:
+  A NULL PinCode buffer means the application didn't know the PIN, in that case:
     - If PinSize value is negative the caller only wants to know if the current
       chain of the elements Smart Card Edge protocol, Smart Card Reader protocol
       and Smart Card Reader supports the Secure Pin Entry PCSC V2 functionality.

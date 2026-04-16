@@ -33,7 +33,7 @@ typedef struct _EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL EFI_SHELL_DYNAMIC_COMMAND_PRO
   @param[in] Shell                  The instance of the shell protocol used in the context
                                     of processing this command.
 
-  @return EFI_SUCCESS               the operation was sucessful
+  @return EFI_SUCCESS               the operation was successful
   @return other                     the operation failed.
 **/
 typedef

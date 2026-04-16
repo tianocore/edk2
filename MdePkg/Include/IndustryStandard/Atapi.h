@@ -249,7 +249,7 @@ typedef struct {
 } ATAPI_IDENTIFY_DATA;
 
 ///
-/// Standard Quiry Data format, defined in SFF-8070i(ATAPI Removable Rewritable Specification).
+/// Standard Inquiry Data format, defined in SFF-8070i(ATAPI Removable Rewritable Specification).
 ///
 typedef struct {
   UINT8    peripheral_type;

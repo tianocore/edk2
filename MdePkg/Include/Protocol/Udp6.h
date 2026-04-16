@@ -187,9 +187,9 @@ typedef struct {
 ///
 typedef struct {
   ///
-  /// If not NULL, the data that is used to override the transmitting settings.Only the two
-  /// filed UdpSessionData.DestinationAddress and UdpSessionData.DestionPort can be used as
-  /// the transmitting setting filed.
+  /// If not NULL, the data that is used to override the transmitting settings. Only the two
+  /// field UdpSessionData.DestinationAddress and UdpSessionData.DestinationPort can be used as
+  /// the transmitting setting field.
   ///
   EFI_UDP6_SESSION_DATA     *UdpSessionData;
   ///
@@ -438,7 +438,7 @@ EFI_STATUS
                                 - Token.Packet.TxData.UdpSessionData.DestinationAddress is non-zero
                                   when DestinationAddress is configured as non-zero when doing Configure()
                                   for this EFI Udp6 protocol instance.
-                                - Token.Packet.TxData.UdpSesionData.DestinationAddress is zero when
+                                - Token.Packet.TxData.UdpsessionData.DestinationAddress is zero when
                                   DestinationAddress is unspecified when doing Configure() for this
                                   EFI Udp6 protocol instance.
   @retval EFI_ACCESS_DENIED     The transmit completion token with the same Token.Event was already

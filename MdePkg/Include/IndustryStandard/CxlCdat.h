@@ -17,7 +17,7 @@
 /// Coherent Device Attribute Table 1.01 Specification.
 ///
 typedef struct {
-  UINT32    Length;   // Length of the enture table in bytes.
+  UINT32    Length;   // Length of the entire table in bytes.
   UINT8     Revision; // Must be 1.
   UINT8     Checksum; // Checksum value that results in sum of 0.
   UINT8     Reserved[6];

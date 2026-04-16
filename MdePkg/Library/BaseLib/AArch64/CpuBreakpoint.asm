@@ -27,7 +27,7 @@
 ;  );
 ;
 CpuBreakpoint
-    svc   0xdbdb    // Superviser exception. Takes 16bit arg -> Armv7 had 'swi' here.
+    svc   0xdbdb    // supervisor exception. Takes 16bit arg -> Armv7 had 'swi' here.
     ret
 
   END

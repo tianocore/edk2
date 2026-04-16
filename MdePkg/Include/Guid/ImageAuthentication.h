@@ -19,12 +19,12 @@
   }
 
 ///
-/// Varialbe name with guid EFI_IMAGE_SECURITY_DATABASE_GUID
+/// Variable name with guid EFI_IMAGE_SECURITY_DATABASE_GUID
 /// for the authorized signature database.
 ///
 #define EFI_IMAGE_SECURITY_DATABASE  L"db"
 ///
-/// Varialbe name with guid EFI_IMAGE_SECURITY_DATABASE_GUID
+/// Variable name with guid EFI_IMAGE_SECURITY_DATABASE_GUID
 /// for the forbidden signature database.
 ///
 #define EFI_IMAGE_SECURITY_DATABASE1  L"dbx"

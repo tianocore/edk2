@@ -300,10 +300,10 @@ typedef struct {
 ///
 typedef struct _SFDP_SECTOR_REGION {
   // DWORD 1
-  UINT32    EraseType1 : 1;               ///< Earse type 1 is supported.
-  UINT32    EraseType2 : 1;               ///< Earse type 2 is supported.
-  UINT32    EraseType3 : 1;               ///< Earse type 3 is supported.
-  UINT32    EraseType4 : 1;               ///< Earse type 4 is supported.
+  UINT32    EraseType1 : 1;               ///< Erase type 1 is supported.
+  UINT32    EraseType2 : 1;               ///< Erase type 2 is supported.
+  UINT32    EraseType3 : 1;               ///< Erase type 3 is supported.
+  UINT32    EraseType4 : 1;               ///< Erase type 4 is supported.
   UINT32    Reserve1   : 4;               ///< Bit [7:4] is reserved.
   UINT32    RegionSize : 24;              ///< Region size in 256 Byte unit.
 } SFDP_SECTOR_REGION;

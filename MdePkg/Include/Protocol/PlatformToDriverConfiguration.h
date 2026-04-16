@@ -204,7 +204,7 @@ typedef enum {
   information returned by the platform, and calls Response passing
   in the arguments returned from Query. The UEFI driver must
   continuously call Query until EFI_NOT_FOUND is returned. For
-  every call to Query that returns EFI_SUCCESS a corrisponding
+  every call to Query that returns EFI_SUCCESS a corresponding
   call to Response is required passing in the same
   ContollerHandle, ChildHandle, Instance, ParameterTypeGuid,
   ParameterBlock, and ParameterBlockSize. The UEFI driver may

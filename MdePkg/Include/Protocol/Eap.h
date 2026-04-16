@@ -35,7 +35,7 @@ typedef VOID *EFI_PORT_HANDLE;
 ///@}
 
 //
-// EAP_TYPE MD5, OTP and TOEKN_CARD has been removed from UEFI2.3.1B.
+// EAP_TYPE MD5, OTP and TOKEN_CARD has been removed from UEFI2.3.1B.
 // Definitions are kept for backward compatibility.
 //
 #define EFI_EAP_TYPE_MD5         4

@@ -18,7 +18,7 @@ extern CONST UINT32  _gPeimRevision;
 
   This function is the entry point for a PEIM.  This function must call ProcessLibraryConstructorList()
   and ProcessModuleEntryPointList().  The return value from ProcessModuleEntryPointList() is returned.
-  If _gPeimRevision is not zero and PeiServices->Hdr.Revision is less than _gPeimRevison, then ASSERT().
+  If _gPeimRevision is not zero and PeiServices->Hdr.Revision is less than _gPeimRevision, then ASSERT().
 
   @param  FileHandle  Handle of the file being invoked.
   @param  PeiServices Describes the list of possible PEI Services.

@@ -518,7 +518,7 @@ S3BootScriptExecute (
   Move the last boot script entry to the position
 
   @param  BeforeOrAfter         Specifies whether the opcode is stored before
-                                (TRUE) or after (FALSE) the positionin the boot
+                                (TRUE) or after (FALSE) the position in the boot
                                 script table specified by Position. If Position
                                 is NULL or points to NULL then the new opcode is
                                 inserted at the beginning of the table (if TRUE)
@@ -553,7 +553,7 @@ S3BootScriptMoveLastOpcode (
   @param  Position              On entry, specifies the position in the boot script
                                 table where the opcode will be inserted, either
                                 before or after, depending on BeforeOrAfter. On exit,
-                                specifies the positionof the inserted opcode in
+                                specifies the position of the inserted opcode in
                                 the boot script table.
   @param  Label                 Points to the label which will be inserted in the
                                 boot script table.
@@ -584,8 +584,8 @@ S3BootScriptLabel (
   @retval EFI_SUCCESS           The operation succeeded. A record was added into the
                                 specified script table.
   @retval EFI_INVALID_PARAMETER The parameter is illegal or the given boot script
-                                is not supported. If the opcode is unknow or not s
-                                upported because of the PCD Feature Flags.
+                                is not supported. If the opcode is unknown or not
+                                supported because of the PCD Feature Flags.
   @retval EFI_OUT_OF_RESOURCES  There is insufficient memory to store the boot script.
   @note   The FRAMEWORK version implementation does not support this API
 **/

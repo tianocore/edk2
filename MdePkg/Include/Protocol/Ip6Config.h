@@ -88,7 +88,7 @@ typedef enum {
   ///
   Ip6ConfigDataTypeDnsServer,
   ///
-  /// The number of this enumeration memebers.
+  /// The number of this enumeration members.
   ///
   Ip6ConfigDataTypeMaximum
 } EFI_IP6_CONFIG_DATA_TYPE;

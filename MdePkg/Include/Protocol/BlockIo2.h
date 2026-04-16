@@ -43,7 +43,7 @@ typedef struct {
 
   @param[in]  This                 Indicates a pointer to the calling context.
   @param[in]  ExtendedVerification Indicates that the driver may perform a more
-                                   exhausive verification operation of the device
+                                   exhaustive verification operation of the device
                                    during reset.
 
   @retval EFI_SUCCESS          The device was reset.
@@ -124,7 +124,7 @@ EFI_STATUS
                                 the Event is NULL.
   @retval EFI_WRITE_PROTECTED   The device can not be written to.
   @retval EFI_NO_MEDIA          There is no media in the device.
-  @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
+  @retval EFI_MEDIA_CHANGED     The MediaId does not matched the current device.
   @retval EFI_DEVICE_ERROR      The device reported an error while performing the write.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
   @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid,
