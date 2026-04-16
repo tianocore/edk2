@@ -75,6 +75,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjPciRootPortInfo,                ///< 48 - PCI root port configuration Info
   EArchCommonObjPhysicalMemoryArray,            ///< 49 - Physical Memory Array Info
   EArchCommonObjMemoryDeviceInfo,               ///< 50 - Memory Device Info
+  EArchCommonObjMemoryArrayMappedAddress,       ///< 51 - Memory Array Mapped Address Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1223,5 +1224,24 @@ typedef struct CmArchCommonMemoryDeviceInfo {
   /// Handle of the memory error information structure (0xFFFF = no error info).
   UINT16                                     MemoryErrorInformationHandle;
 } CM_ARCH_COMMON_MEMORY_DEVICE_INFO;
+
+/** A structure that describes a Memory Array Mapped Address.
+
+  SMBIOS Specification v3.6.0 Type 19
+
+  ID: EArchCommonObjMemoryArrayMappedAddress
+**/
+typedef struct CmArchCommonMemoryArrayMappedAddress {
+  /// Starting physical address of the mapped memory range.
+  EFI_PHYSICAL_ADDRESS    StartingAddress;
+  /// Ending physical address of the mapped memory range.
+  EFI_PHYSICAL_ADDRESS    EndingAddress;
+  /// CM Object Token uniquely identifying this mapped address entry.
+  CM_OBJECT_TOKEN         MemoryArrayMappedAddressToken;
+  /// Number of memory devices that form a row in the address partition.
+  UINT8                   NumMemDevices;
+  /// CM Object Token of the associated Physical Memory Array.
+  CM_OBJECT_TOKEN         PhysMemArrayToken;
+} CM_ARCH_COMMON_MEMORY_ARRAY_MAPPED_ADDRESS;
 
 #pragma pack()
