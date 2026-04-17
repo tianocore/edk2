@@ -12,7 +12,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = SemihostFs
   FILE_GUID                      = C5B9C74A-6D72-4719-99AB-C59F199091EB
-  MODULE_TYPE                    = UEFI_DRIVER
+  MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
 
   ENTRY_POINT                    = SemihostFsEntryPoint
@@ -40,3 +40,5 @@
   gEfiSimpleFileSystemProtocolGuid
   gEfiDevicePathProtocolGuid
 
+[Depex]
+  TRUE
