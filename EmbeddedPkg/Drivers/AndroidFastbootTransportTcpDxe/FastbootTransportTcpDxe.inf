@@ -11,7 +11,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = TcpFastbootTransportDxe
   FILE_GUID                      = 86787704-8fed-11e3-b3ff-f33b73acfec2
-  MODULE_TYPE                    = UEFI_DRIVER
+  MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = TcpFastbootTransportEntryPoint
 
@@ -44,3 +44,6 @@
 
 [FixedPcd]
   gEmbeddedTokenSpaceGuid.PcdAndroidFastbootTcpPort
+
+[Depex]
+  gEfiSimpleTextOutProtocolGuid
