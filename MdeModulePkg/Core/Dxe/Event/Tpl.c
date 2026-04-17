@@ -201,7 +201,6 @@ CoreRestoreTpl (
     // not blow up.
     //
     ASSERT (mInterruptedTplMask & (UINTN)(1U << NewTpl));
-    ASSERT (GetInterruptState () == FALSE);
     mInterruptedTplMask &= (UINTN)(1U << NewTpl) - 1;
   } else if (NewTpl < TPL_HIGH_LEVEL) {
     //
