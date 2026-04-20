@@ -889,7 +889,7 @@ typedef struct {
 
 //
 // SRAT structure types.
-// All other values between 0x06 an 0xFF are reserved and
+// All other values between 0x08 and 0xFF are reserved and
 // will be ignored by OSPM.
 //
 #define EFI_ACPI_6_6_PROCESSOR_LOCAL_APIC_SAPIC_AFFINITY  0x00
