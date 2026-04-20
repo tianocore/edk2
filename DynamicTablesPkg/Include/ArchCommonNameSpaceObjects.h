@@ -80,6 +80,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjErrSourceGenericHwVer2Info,     ///< 53 - Generic Hardware Error Source Info version 2
   EArchCommonObjEinjInstructionsInfo,           ///< 54 - Einj Instruction Info
   EArchCommonObjPlatformFwInfo,                 ///< 54 - Platform Firmware Info
+  EArchCommonObjPhysicalMemoryArray,            ///< 55 - Physical Memory Array Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1332,5 +1333,30 @@ typedef struct CmArchCommonPlatformFwInfo {
   /// Embedded Controller firmware minor release.
   UINT8                        ECFirmwareMinorRelease;
 } CM_ARCH_COMMON_PLATFORM_FW_INFO;
+
+/** A structure that describes the Physical Memory Array.
+
+  SMBIOS Specification v3.9.0 Type 16
+
+  ID: EArchCommonObjPhysicalMemoryArray
+**/
+typedef struct CmArchCommonPhysicalMemoryArray {
+  /// CM Object Token uniquely identifying this Physical Memory Array.
+  CM_OBJECT_TOKEN    PhysMemArrayToken;
+  /// Physical location of the memory array.
+  UINT8              Location;
+  /// Use of the memory array (e.g. system, video).
+  UINT8              Use;
+  /// Error correction type enumeration value.
+  UINT8              MemoryErrorCorrectionType;
+  /// Maximum capacity of the array in bytes.
+  UINT64             Size;
+  /// Unsupported until SMBIOS Type 18/Type 33 generators are available.
+  /// Kept here to reserve the Type 17 memory error information handle source
+  /// field in the CM object.
+  CM_OBJECT_TOKEN    MemoryErrorInfoToken;
+  /// Number of memory devices (slots or sockets) in the array.
+  UINT16             NumberOfMemoryDevices;
+} CM_ARCH_COMMON_PHYSICAL_MEMORY_ARRAY;
 
 #pragma pack()
