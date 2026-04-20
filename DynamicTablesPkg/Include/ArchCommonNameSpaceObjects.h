@@ -78,6 +78,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjErrSourcePciBridgeInfo,         ///< 51 - PCI Express AER Info for Bridge
   EArchCommonObjErrSourceGenericHwInfo,         ///< 52 - Generic Hardware Error Source Info
   EArchCommonObjErrSourceGenericHwVer2Info,     ///< 53 - Generic Hardware Error Source Info version 2
+  EArchCommonObjPhysicalMemoryArray,            ///< 54 - Physical Memory Array Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1285,5 +1286,28 @@ typedef struct CmArchCommonObjErrSourceGenericHwVer2Info {
   /// (v2) Contains a mask of bits to set when writing the Read Ack register.
   UINT64                                    ReadAckWrite;
 } CM_ARCH_COMMON_ERROR_SOURCE_GENERIC_HW_VERSION_2_INFO;
+
+/** A structure that describes the Physical Memory Array.
+
+  SMBIOS Specification v3.9.0 Type 16
+
+  ID: EArchCommonObjPhysicalMemoryArray
+**/
+typedef struct CmArchCommonPhysicalMemoryArray {
+  /// CM Object Token uniquely identifying this Physical Memory Array.
+  CM_OBJECT_TOKEN    PhysMemArrayToken;
+  /// Use of the memory array (e.g. system, video).
+  UINT8              Use;
+  /// Physical location of the memory array.
+  UINT8              Location;
+  /// Primary hardware error correction or detection method.
+  UINT16             MemoryErrorCorrection;
+  /// Error correction type enumeration value.
+  UINT8              MemoryErrorCorrectionType;
+  /// Maximum capacity of the array in bytes.
+  UINT64             Size;
+  /// Number of memory devices (slots or sockets) in the array.
+  UINT16             NumberOfMemoryDevices;
+} CM_ARCH_COMMON_PHYSICAL_MEMORY_ARRAY;
 
 #pragma pack()

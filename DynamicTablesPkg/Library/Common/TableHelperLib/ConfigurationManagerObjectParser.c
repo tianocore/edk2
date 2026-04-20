@@ -1115,6 +1115,18 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonObjErrSourceGenericHwVer2InfoParser[] = 
   { "ReadAckWrite",    8,                                              "0x%llx",  NULL },
 };
 
+/** A parser for EArchCommonObjPhysicalMemoryArray.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonPhysicalMemoryArrayParser[] = {
+  { "PhysMemArrayToken",         sizeof (CM_OBJECT_TOKEN), "0x%p",  NULL },
+  { "Use",                       sizeof (UINT8),           "0x%x",  NULL },
+  { "Location",                  sizeof (UINT8),           "0x%x",  NULL },
+  { "MemoryErrorCorrection",     sizeof (UINT16),          "0x%x",  NULL },
+  { "MemoryErrorCorrectionType", sizeof (UINT8),           "0x%x",  NULL },
+  { "Size",                      sizeof (UINT64),          "0x%lx", NULL },
+  { "NumberOfMemoryDevices",     sizeof (UINT16),          "0x%u",  NULL },
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -1172,6 +1184,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourcePciBridgeInfo,       CmArchCommonObjErrSourcePciBridgeInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourceGenericHwInfo,       CmArchCommonObjErrSourceGenericHwInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourceGenericHwVer2Info,   CmArchCommonObjErrSourceGenericHwVer2InfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPhysicalMemoryArray,          CmArchCommonPhysicalMemoryArrayParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
