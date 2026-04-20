@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __EFI_FTP4_PROTOCOL_H__
-#define __EFI_FTP4_PROTOCOL_H__
+#pragma once
 
 #define EFI_FTP4_SERVICE_BINDING_PROTOCOL_GUID \
   { \
@@ -511,5 +510,3 @@ struct _EFI_FTP4_PROTOCOL {
 
 extern EFI_GUID  gEfiFtp4ServiceBindingProtocolGuid;
 extern EFI_GUID  gEfiFtp4ProtocolGuid;
-
-#endif

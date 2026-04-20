@@ -9,8 +9,7 @@
     DEN0056A_System_Control_and_Management_Interface.pdf
 **/
 
-#ifndef ARM_SCMI_CLOCK_PROTOCOL_PRIVATE_H_
-#define ARM_SCMI_CLOCK_PROTOCOL_PRIVATE_H_
+#pragma once
 
 #pragma pack(1)
 
@@ -80,5 +79,3 @@ EFI_STATUS
 ScmiClockProtocolInit (
   IN EFI_HANDLE  *Handle
   );
-
-#endif /* ARM_SCMI_CLOCK_PROTOCOL_PRIVATE_H_ */

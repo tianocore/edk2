@@ -6,8 +6,7 @@ Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _ACPI_1_0_H_
-#define _ACPI_1_0_H_
+#pragma once
 
 #include <IndustryStandard/AcpiAml.h>
 
@@ -662,5 +661,3 @@ typedef struct {
 #define EFI_ACPI_1_0_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE  SIGNATURE_32('S', 'S', 'D', 'T')
 
 #pragma pack()
-
-#endif

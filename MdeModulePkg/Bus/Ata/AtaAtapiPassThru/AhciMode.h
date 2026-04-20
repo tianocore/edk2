@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __ATA_HC_AHCI_MODE_H__
-#define __ATA_HC_AHCI_MODE_H__
+#pragma once
 
 #define EFI_AHCI_BAR_INDEX  0x05
 
@@ -393,5 +392,3 @@ AhciStopCommand (
   IN  UINT8                Port,
   IN  UINT64               Timeout
   );
-
-#endif

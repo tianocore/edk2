@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _VAR_CHECK_STRUCTURE_H_
-#define _VAR_CHECK_STRUCTURE_H_
+#pragma once
 
 //
 // Alignment for Hii Variable and Question header.
@@ -77,5 +76,3 @@ typedef struct {
 } VAR_CHECK_HII_QUESTION_ORDEREDLIST;
 
 #pragma pack ()
-
-#endif

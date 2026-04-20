@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __EXTRA_ROOT_BUS_MAP_H__
-#define __EXTRA_ROOT_BUS_MAP_H__
+#pragma once
 
 /**
   Incomplete ("opaque") data type implementing the map.
@@ -30,5 +29,3 @@ MapRootBusPosToBusNr (
   IN  UINT64                    RootBusPos,
   OUT UINT32                    *RootBusNr
   );
-
-#endif

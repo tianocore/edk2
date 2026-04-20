@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __DXE_SERVICES_GUID_H__
-#define __DXE_SERVICES_GUID_H__
+#pragma once
 
 //
 // The DXE Services Table shall be stored in memory of type
@@ -22,5 +21,3 @@
   }
 
 extern EFI_GUID  gEfiDxeServicesTableGuid;
-
-#endif

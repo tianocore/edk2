@@ -16,8 +16,7 @@
 
 **/
 
-#ifndef _MM_ACCESS_H_
-#define _MM_ACCESS_H_
+#pragma once
 
 #define EFI_MM_ACCESS_PROTOCOL_GUID \
   { \
@@ -121,5 +120,3 @@ struct _EFI_MM_ACCESS_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiMmAccessProtocolGuid;
-
-#endif

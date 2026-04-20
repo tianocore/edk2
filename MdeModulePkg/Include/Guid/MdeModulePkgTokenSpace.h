@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _MDEMODULEPKG_TOKEN_SPACE_GUID_H_
-#define _MDEMODULEPKG_TOKEN_SPACE_GUID_H_
+#pragma once
 
 #define MDEMODULEPKG_TOKEN_SPACE_GUID \
   { \
@@ -15,5 +14,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   }
 
 extern EFI_GUID  gEfiMdeModulePkgTokenSpaceGuid;
-
-#endif

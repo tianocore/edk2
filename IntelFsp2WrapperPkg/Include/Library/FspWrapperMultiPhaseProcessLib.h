@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __FSP_WRAPPER_MULTI_PHASE_PROCESS_LIB_H__
-#define __FSP_WRAPPER_MULTI_PHASE_PROCESS_LIB_H__
+#pragma once
 
 /**
   FSP Wrapper Variable Request Handler
@@ -40,5 +39,3 @@ FspWrapperMultiPhaseHandler (
   IN OUT VOID  **FspHobListPtr,
   IN UINT8     ComponentIndex
   );
-
-#endif

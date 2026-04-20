@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __LZMADECOMPRESSLIB_INTERNAL_H__
-#define __LZMADECOMPRESSLIB_INTERNAL_H__
+#pragma once
 
 #include <Base.h>
 #include <PiPei.h>
@@ -90,5 +89,3 @@ LzmaUefiDecompress (
   IN OUT VOID    *Destination,
   IN OUT VOID    *Scratch
   );
-
-#endif

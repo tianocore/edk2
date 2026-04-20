@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _CPU_COMMON_FEATURES_H_
-#define _CPU_COMMON_FEATURES_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -1035,5 +1034,3 @@ ProcTraceInitialize (
   IN VOID                              *ConfigData   OPTIONAL,
   IN BOOLEAN                           State
   );
-
-#endif

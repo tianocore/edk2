@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __IO_APIC_H__
-#define __IO_APIC_H__
+#pragma once
 
 ///
 /// I/O APIC Register Offsets
@@ -76,5 +75,3 @@ typedef union {
 } IO_APIC_REDIRECTION_TABLE_ENTRY;
 
 #pragma pack()
-
-#endif

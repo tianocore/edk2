@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     - Universal Payload Specification 0.75 (https://universalpayload.github.io/documentation/)
 **/
 
-#ifndef UNIVERSAL_PAYLOAD_ACPI_TABLE_H_
-#define UNIVERSAL_PAYLOAD_ACPI_TABLE_H_
+#pragma once
 
 #include <Uefi.h>
 #include <UniversalPayload/UniversalPayload.h>
@@ -26,5 +25,3 @@ typedef struct {
 #define UNIVERSAL_PAYLOAD_ACPI_TABLE_REVISION  1
 
 extern GUID  gUniversalPayloadAcpiTableGuid;
-
-#endif // UNIVERSAL_PAYLOAD_ACPI_TABLE_H_

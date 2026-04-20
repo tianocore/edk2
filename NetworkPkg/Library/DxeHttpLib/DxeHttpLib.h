@@ -8,8 +8,7 @@ Header file for HttpLib.
 
 **/
 
-#ifndef _DXE_HTTP_LIB_H_
-#define _DXE_HTTP_LIB_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Library/NetLib.h>
@@ -80,5 +79,3 @@ typedef enum {
   UrlParserPort,
   UrlParserStateMax
 } HTTP_URL_PARSE_STATE;
-
-#endif

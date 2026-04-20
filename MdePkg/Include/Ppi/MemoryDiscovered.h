@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef __PEI_MEMORY_DISCOVERED_PPI_H__
-#define __PEI_MEMORY_DISCOVERED_PPI_H__
+#pragma once
 
 #define EFI_PEI_PERMANENT_MEMORY_INSTALLED_PPI_GUID \
   { \
@@ -22,5 +21,3 @@
   }
 
 extern EFI_GUID  gEfiPeiMemoryDiscoveredPpiGuid;
-
-#endif

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef IOMMU_INTERNAL_H_
-#define IOMMU_INTERNAL_H_
+#pragma once
 
 #include <Base.h>
 #include <Protocol/IoMmu.h>
@@ -175,5 +174,3 @@ IoMmuFreeCommonBuffer (
   IN COMMON_BUFFER_HEADER  *CommonBufferHeader,
   IN UINTN                 CommonBufferPages
   );
-
-#endif

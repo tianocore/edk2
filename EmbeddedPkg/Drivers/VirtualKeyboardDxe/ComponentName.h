@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _VIRTUAL_KEYBOARD_COMPONENT_NAME_H_
-#define _VIRTUAL_KEYBOARD_COMPONENT_NAME_H_
+#pragma once
 
 extern EFI_COMPONENT_NAME_PROTOCOL   gVirtualKeyboardComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gVirtualKeyboardComponentName2;
@@ -141,5 +140,3 @@ VirtualKeyboardComponentNameGetControllerName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **ControllerName
   );
-
-#endif

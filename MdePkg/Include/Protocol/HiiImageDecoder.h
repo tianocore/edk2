@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __HII_IMAGE_DECODER_H__
-#define __HII_IMAGE_DECODER_H__
+#pragma once
 
 #include <Protocol/HiiImage.h>
 
@@ -196,5 +195,3 @@ struct _EFI_HII_IMAGE_DECODER_PROTOCOL {
 extern EFI_GUID  gEfiHiiImageDecoderProtocolGuid;
 extern EFI_GUID  gEfiHiiImageDecoderNameJpegGuid;
 extern EFI_GUID  gEfiHiiImageDecoderNamePngGuid;
-
-#endif

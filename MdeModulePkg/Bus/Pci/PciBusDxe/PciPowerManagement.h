@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_PCI_POWER_MANAGEMENT_H_
-#define _EFI_PCI_POWER_MANAGEMENT_H_
+#pragma once
 
 /**
   This function is intended to turn off PWE assertion and
@@ -24,5 +23,3 @@ EFI_STATUS
 ResetPowerManagementFeature (
   IN PCI_IO_DEVICE  *PciIoDevice
   );
-
-#endif

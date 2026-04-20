@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MOCK_PCISEGMENTLIB_H_
-#define MOCK_PCISEGMENTLIB_H_
+#pragma once
 
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
@@ -346,5 +345,3 @@ struct MockPciSegmentLib {
     )
     );
 };
-
-#endif

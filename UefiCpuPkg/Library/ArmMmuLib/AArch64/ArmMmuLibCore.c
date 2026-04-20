@@ -278,14 +278,18 @@ UpdateRegionMappingRecursive (
   VOID        *TranslationTable;
   EFI_STATUS  Status;
   BOOLEAN     NextTableIsLive;
+  VOID        *TablesToFree[2];
 
   ASSERT (((RegionStart | RegionEnd) & EFI_PAGE_MASK) == 0);
 
   BlockShift = (Level + 1) * BITS_PER_LEVEL + MIN_T0SZ;
   BlockMask  = MAX_UINT64 >> BlockShift;
 
+  TablesToFree[0] = NULL;
+  TablesToFree[1] = NULL;
+
   DEBUG ((
-    DEBUG_VERBOSE,
+    DEBUG_PAGING,
     "%a(%d): %llx - %llx set %lx clr %lx\n",
     __func__,
     Level,
@@ -338,44 +342,65 @@ UpdateRegionMappingRecursive (
           return EFI_OUT_OF_RESOURCES;
         }
 
-        if (!ArmMmuEnabled ()) {
+        //
+        // Allocating a page may have split this block if a guard page
+        // was allocated in this block. Check if this is already split
+        // and if so skip the splitting logic
+        //
+        if (IsTableEntry (*Entry, Level)) {
           //
-          // Make sure we are not inadvertently hitting in the caches
-          // when populating the page tables.
+          // Don't free the page table here, we may end up recreating the
+          // large page. This mapping may extend across the block boundary,
+          // so its possible we could have two pages to free in the worst case.
           //
-          InvalidateDataCacheRange (TranslationTable, EFI_PAGE_SIZE);
-        }
-
-        ZeroMem (TranslationTable, EFI_PAGE_SIZE);
-
-        if (IsBlockEntry (*Entry, Level)) {
-          //
-          // We are splitting an existing block entry, so we have to populate
-          // the new table with the attributes of the block entry it replaces.
-          //
-          Status = UpdateRegionMappingRecursive (
-                     RegionStart & ~BlockMask,
-                     (RegionStart | BlockMask) + 1,
-                     *Entry & TT_ATTRIBUTES_MASK,
-                     0,
-                     TranslationTable,
-                     Level + 1,
-                     FALSE,
-                     FALSE,
-                     Lpa2Enabled
-                     );
-          if (EFI_ERROR (Status)) {
-            //
-            // The range we passed to UpdateRegionMappingRecursive () is block
-            // aligned, so it is guaranteed that no further pages were allocated
-            // by it, and so we only have to free the page we allocated here.
-            //
-            FreePages (TranslationTable, 1);
-            return Status;
+          if (TablesToFree[0] == NULL) {
+            TablesToFree[0] = TranslationTable;
+          } else {
+            TablesToFree[1] = TranslationTable;
           }
-        }
 
-        NextTableIsLive = FALSE;
+          TranslationTable = (VOID *)GetOutputAddress (*Entry, Lpa2Enabled);
+          NextTableIsLive  = TableIsLive;
+        } else {
+          if (!ArmMmuEnabled ()) {
+            //
+            // Make sure we are not inadvertently hitting in the caches
+            // when populating the page tables.
+            //
+            InvalidateDataCacheRange (TranslationTable, EFI_PAGE_SIZE);
+          }
+
+          ZeroMem (TranslationTable, EFI_PAGE_SIZE);
+
+          if (IsBlockEntry (*Entry, Level)) {
+            //
+            // We are splitting an existing block entry, so we have to populate
+            // the new table with the attributes of the block entry it replaces.
+            //
+            Status = UpdateRegionMappingRecursive (
+                       RegionStart & ~BlockMask,
+                       (RegionStart | BlockMask) + 1,
+                       *Entry & TT_ATTRIBUTES_MASK,
+                       0,
+                       TranslationTable,
+                       Level + 1,
+                       FALSE,
+                       FALSE,
+                       Lpa2Enabled
+                       );
+            if (EFI_ERROR (Status)) {
+              //
+              // The range we passed to UpdateRegionMappingRecursive () is block
+              // aligned, so it is guaranteed that no further pages were allocated
+              // by it, and so we only have to free the page we allocated here.
+              //
+              FreePages (TranslationTable, 1);
+              return Status;
+            }
+          }
+
+          NextTableIsLive = FALSE;
+        }
       } else {
         TranslationTable = (VOID *)GetOutputAddress (*Entry, Lpa2Enabled);
         NextTableIsLive  = TableIsLive;
@@ -431,6 +456,20 @@ UpdateRegionMappingRecursive (
 
       ReplaceTableEntry (Entry, EntryValue, RegionStart, BlockMask, FALSE);
     }
+  }
+
+  //
+  // We may have left up to two orphaned page table pages if we discovered a
+  // recursive call already split a block on either side of a misaligned region.
+  //
+  if (TablesToFree[0] != NULL) {
+    FreePages (TablesToFree[0], 1);
+    TablesToFree[0] = NULL;
+  }
+
+  if (TablesToFree[1] != NULL) {
+    FreePages (TablesToFree[1], 1);
+    TablesToFree[1] = NULL;
   }
 
   return EFI_SUCCESS;

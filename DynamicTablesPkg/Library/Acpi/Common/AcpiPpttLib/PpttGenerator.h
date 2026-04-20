@@ -13,8 +13,7 @@
     - Obj or OBJ - Object
 **/
 
-#ifndef PPTT_GENERATOR_H_
-#define PPTT_GENERATOR_H_
+#pragma once
 
 #pragma pack(1)
 
@@ -181,5 +180,3 @@ typedef struct AcpiPpttGenerator {
 } ACPI_PPTT_GENERATOR;
 
 #pragma pack()
-
-#endif // PPTT_GENERATOR_H_

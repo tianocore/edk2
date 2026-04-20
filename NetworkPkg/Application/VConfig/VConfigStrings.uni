@@ -1,11 +1,11 @@
-/** @file
-  String definitions for VLAN configuration Shell application.
-
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
-
-  SPDX-License-Identifier: BSD-2-Clause-Patent
-
-**/
+// /** @file
+// String definitions for VLAN configuration Shell application.
+//
+// Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
 
 #langdef en-US "English"
 

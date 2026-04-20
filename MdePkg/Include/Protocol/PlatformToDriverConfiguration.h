@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __PLATFORM_TO_DRIVER_CONFIGUARTION_H__
-#define __PLATFORM_TO_DRIVER_CONFIGUARTION_H__
+#pragma once
 
 #define EFI_PLATFORM_TO_DRIVER_CONFIGURATION_PROTOCOL_GUID  \
   { 0x642cd590, 0x8059, 0x4c0a, { 0xa9, 0x58, 0xc5, 0xec, 0x7, 0xd2, 0x3c, 0x4b } }
@@ -336,5 +335,3 @@ typedef struct {
 extern EFI_GUID  gEfiPlatformToDriverConfigurationClpGuid;
 
 extern EFI_GUID  gEfiPlatformToDriverConfigurationProtocolGuid;
-
-#endif

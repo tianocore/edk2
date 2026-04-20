@@ -62,4 +62,4 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackGuard                    ## CONSUMES
 
 [BuildOptions]
-  XCODE:*_*_X64_NASM_FLAGS = -D NO_ABSOLUTE_RELOCS_IN_TEXT
+  XCODE:*_*_X64_NASM_FLAGS = -D SMM_DXE_NO_ABSOLUTE_RELOCS_IN_TEXT

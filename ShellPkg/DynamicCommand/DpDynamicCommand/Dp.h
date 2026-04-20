@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _DP_H_
-#define _DP_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -136,5 +135,3 @@ EFI_HII_HANDLE
 InitializeHiiPackage (
   EFI_HANDLE  ImageHandle
   );
-
-#endif // _DP_H_

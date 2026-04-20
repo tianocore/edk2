@@ -299,6 +299,8 @@ XenPvBlkDxeDriverBindingStart (
     Media->BlockSize = Dev->MediaInfo.SectorSize;
   }
 
+  Media->IoAlign = Dev->MediaInfo.SectorSize;
+
   //
   // Sectors is express as 512B unit, size of disk is "Sectors * 512",
   // independently from SectorSize.

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef SMBIOS_TABLE_DISPATCHER_H_
-#define SMBIOS_TABLE_DISPATCHER_H_
+#pragma once
 
 #include <Protocol/ConfigurationManagerProtocol.h>
 #include <Protocol/DynamicTableFactoryProtocol.h>
@@ -176,5 +175,3 @@ DispatchSmbiosTables (
   IN       CM_STD_OBJ_SMBIOS_TABLE_INFO          *CONST  SmbiosTableInfo,
   IN CONST UINT32                                        SmbiosTableCount
   );
-
-#endif // SMBIOS_TABLE_DISPATCHER_H_

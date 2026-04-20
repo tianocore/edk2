@@ -9,6 +9,8 @@
 
 #include "CpuMp2Pei.h"
 
+#include <Library/CpuLib.h>
+
 EFI_PEI_PPI_DESCRIPTOR  mPeiCpuMpPpiList[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
@@ -179,14 +181,47 @@ GetProcessorCoreType (
   EFI_STATUS                               Status;
   UINT8                                    *CoreTypes;
   CPUID_NATIVE_MODEL_ID_AND_CORE_TYPE_EAX  NativeModelIdAndCoreTypeEax;
+  AMD_CPUID_EXTENDED_TOPOLOGY_EBX          Ebx;
+  AMD_CPUID_EXTENDED_TOPOLOGY_ECX          Ecx;
+  UINT32                                   EcxInput;
   UINTN                                    ProcessorIndex;
 
   Status = MpInitLibWhoAmI (&ProcessorIndex);
   ASSERT_EFI_ERROR (Status);
 
   CoreTypes = (UINT8 *)Buffer;
-  AsmCpuidEx (CPUID_HYBRID_INFORMATION, CPUID_HYBRID_INFORMATION_MAIN_LEAF, &NativeModelIdAndCoreTypeEax.Uint32, NULL, NULL, NULL);
-  CoreTypes[ProcessorIndex] = (UINT8)NativeModelIdAndCoreTypeEax.Bits.CoreType;
+
+  if (StandardSignatureIsAuthenticAMD ()) {
+    //
+    // AMD: CPUID_Fn80000026_EBX[31:28] = CoreType.
+    // CoreType is only valid when LevelType = 1h (Core).
+    // Iterate ECX input values to find the Core hierarchy level.
+    //
+    CoreTypes[ProcessorIndex] = 0;
+    for (EcxInput = 0; ; EcxInput++) {
+      AsmCpuidEx (AMD_CPUID_EXTENDED_TOPOLOGY, EcxInput, NULL, &Ebx.Uint32, &Ecx.Uint32, NULL);
+      if (Ecx.Bits.LevelType == 0) {
+        //
+        // LevelType = 0h signals end of topology enumeration.
+        //
+        break;
+      }
+
+      if (Ecx.Bits.LevelType == 1) {
+        //
+        // LevelType = 1h (Core): CoreType is valid here.
+        //
+        CoreTypes[ProcessorIndex] = (UINT8)Ebx.Bits.CoreType;
+        break;
+      }
+    }
+  } else {
+    //
+    // Intel Hybrid: CPUID leaf 0x1A EAX[31:24] = CoreType
+    //
+    AsmCpuidEx (CPUID_HYBRID_INFORMATION, CPUID_HYBRID_INFORMATION_MAIN_LEAF, &NativeModelIdAndCoreTypeEax.Uint32, NULL, NULL, NULL);
+    CoreTypes[ProcessorIndex] = (UINT8)NativeModelIdAndCoreTypeEax.Bits.CoreType;
+  }
 }
 
 /**
@@ -208,6 +243,7 @@ BuildMpInformationHob (
   UINTN                     Index;
   UINT8                     *CoreTypes;
   UINT32                    CpuidMaxInput;
+  UINT32                    CpuidMaxExtInput;
   UINTN                     CoreTypePages;
 
   ProcessorIndex        = 0;
@@ -220,10 +256,15 @@ BuildMpInformationHob (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Get Processors CoreType
+  // Get Processors CoreType.
+  // For Intel Hybrid CPUs, use standard CPUID leaf 0x1A (CPUID_HYBRID_INFORMATION).
+  // For AMD CPUs, use extended CPUID leaf 0x80000026 (AMD_CPUID_EXTENDED_CPU_TOPOLOGY).
   //
   AsmCpuid (CPUID_SIGNATURE, &CpuidMaxInput, NULL, NULL, NULL);
-  if (CpuidMaxInput >= CPUID_HYBRID_INFORMATION) {
+  AsmCpuid (CPUID_EXTENDED_FUNCTION, &CpuidMaxExtInput, NULL, NULL, NULL);
+  if ((!StandardSignatureIsAuthenticAMD () && (CpuidMaxInput >= CPUID_HYBRID_INFORMATION)) ||
+      (StandardSignatureIsAuthenticAMD () && (CpuidMaxExtInput >= AMD_CPUID_EXTENDED_TOPOLOGY)))
+  {
     CoreTypePages = EFI_SIZE_TO_PAGES (sizeof (UINT8) * NumberOfProcessors);
     CoreTypes     = AllocatePages (CoreTypePages);
     ASSERT (CoreTypes != NULL);

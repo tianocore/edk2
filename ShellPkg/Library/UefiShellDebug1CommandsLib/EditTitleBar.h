@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _LIB_TITLE_BAR_H_
-#define _LIB_TITLE_BAR_H_
+#pragma once
 
 /**
   Initialize a title bar.
@@ -64,5 +63,3 @@ MainTitleBarRefresh (
   IN CONST UINTN           Offset,
   IN CONST UINTN           Size
   );
-
-#endif

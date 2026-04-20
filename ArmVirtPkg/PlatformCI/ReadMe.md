@@ -6,7 +6,7 @@ to use the same Pytools based build infrastructure locally.
 ## Supported Configuration Details
 
 This solution for building and running ArmVirtPkg has been validated with Fedora
-37 Linux and the GCC5 toolchain. The following different firmware builds are
+37 Linux and the GCC toolchain. The following different firmware builds are
 supported.
 
 | Configuration name      | Architecture       | DSC File               | Additional Flags |
@@ -40,7 +40,7 @@ The exact container version tested in CI is maintained in this file
 ## Building with Pytools for ArmVirtPkg
 
 If you are unfamiliar with Pytools, it is recommended to first read through
-the generic set of edk2 [Build Instructions](https://github.com/tianocore/tianocore.github.io/wiki/Build-Instructions).
+the generic set of edk2 [Build Instructions](https://www.tianocore.org/tianocore-wiki.github.io/build-tooling/build-workflows/build_instructions.html).
 
 1. [Optional] Create a Python Virtual Environment - generally once per workspace
 

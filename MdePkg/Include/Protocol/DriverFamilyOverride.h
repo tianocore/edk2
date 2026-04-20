@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_DRIVER_FAMILY_OVERRIDE_H__
-#define __EFI_DRIVER_FAMILY_OVERRIDE_H__
+#pragma once
 
 #define EFI_DRIVER_FAMILY_OVERRIDE_PROTOCOL_GUID \
   { \
@@ -57,5 +56,3 @@ struct _EFI_DRIVER_FAMILY_OVERRIDE_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiDriverFamilyOverrideProtocolGuid;
-
-#endif

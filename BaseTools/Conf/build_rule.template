@@ -243,7 +243,7 @@
     <Command>
         Trim --asm-file -o ${d_path}(+)${s_base}.i -i $(INC_LIST) ${src}
         "$(PP)" $(DEPS_FLAGS) $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.ii
-        Trim --trim-long --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.ii
+        Trim --trim-long --source-code --source-code-format=NASM -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.ii
         "$(NASM)" -I${s_path}(+) $(NASM_INC) $(NASM_FLAGS) -o $dst ${d_path}(+)${s_base}.iii
 
 [Device-Tree-Source-File]
@@ -333,15 +333,17 @@
     <OutputFile>
         $(DEBUG_DIR)(+)$(MODULE_NAME).dll
 
-    <Command.MSFT>
+    <Command.MSFT, Command.CLANGPDB>
         "$(DLINK)" /OUT:${dst}.wtemp $(DLINK_FLAGS) $(DLINK2_FLAGS) $(DLINK_XIPFLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
         $(RM) ${dst}.wtemp
         "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK_XIPFLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
 
-    <Command.GCC>
+    <Command.GCC, Command.CLANGDWARF>
         "$(DLINK)" -o ${dst} $(DLINK_FLAGS) $(DLINK_XIPFLAGS) -Wl,--start-group,@$(STATIC_LIBRARY_FILES_LIST),--end-group $(CC_FLAGS) $(CC_XIPFLAGS) $(DLINK2_FLAGS)
         "$(OBJCOPY)" $(OBJCOPY_FLAGS) ${dst}
 
+    <Command.CLANGPDB>
+        "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST) $(DLINK2_FLAGS) $(DLINK_XIPFLAGS)
 
 [Static-Library-File.USER_DEFINED]
     <InputFile>
@@ -583,7 +585,7 @@
     <Command>
         Trim --asm-file -o ${d_path}(+)${s_base}.i -i $(INC_LIST) ${src}
         "$(PP)" $(DEPS_FLAGS) $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.ii
-        Trim --source-code --convert-hex -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.ii
+        Trim --source-code --source-code-format=NASM --convert-hex -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.ii
         "$(NASM)" -I${s_path}(+) -l ${d_path}(+)${s_base}.lst $(NASMB_FLAGS) $(NASM_INC) -o $dst ${d_path}(+)${s_base}.iii
         # copy the output file with .com postfix that be same to the output file of .asm16
         $(CP) ${dst} $(OUTPUT_DIR)(+)${s_base}.com

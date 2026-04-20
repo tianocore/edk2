@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef __TEST_DEVICE_PATH_LIB_H__
-#define __TEST_DEVICE_PATH_LIB_H__
+#pragma once
 
 #include <PiPei.h>
 #include <Uefi.h>
@@ -22,5 +21,3 @@ EFI_STATUS
 CreateDevicePathStringConversionsTestSuite (
   IN UNIT_TEST_FRAMEWORK_HANDLE  Framework
   );
-
-#endif

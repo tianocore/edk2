@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _PCI23_H_
-#define _PCI23_H_
+#pragma once
 
 #include <IndustryStandard/Pci22.h>
 
@@ -123,5 +122,3 @@ typedef struct {
 #pragma pack()
 
 #define PCI_CODE_TYPE_EFI_IMAGE  0x03
-
-#endif

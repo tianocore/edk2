@@ -17,8 +17,7 @@
 
 **/
 
-#ifndef _SMM_GPI_DISPATCH2_H_
-#define _SMM_GPI_DISPATCH2_H_
+#pragma once
 
 #include <Protocol/MmGpiDispatch.h>
 #include <Pi/PiSmmCis.h>
@@ -36,5 +35,3 @@ typedef EFI_MM_GPI_UNREGISTER EFI_SMM_GPI_UNREGISTER2;
 typedef EFI_MM_GPI_DISPATCH_PROTOCOL EFI_SMM_GPI_DISPATCH2_PROTOCOL;
 
 extern EFI_GUID  gEfiSmmGpiDispatch2ProtocolGuid;
-
-#endif

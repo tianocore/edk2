@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __SMART_CARD_READER_H__
-#define __SMART_CARD_READER_H__
+#pragma once
 
 #define EFI_SMART_CARD_READER_PROTOCOL_GUID \
     { \
@@ -314,5 +313,3 @@ struct _EFI_SMART_CARD_READER_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiSmartCardReaderProtocolGuid;
-
-#endif

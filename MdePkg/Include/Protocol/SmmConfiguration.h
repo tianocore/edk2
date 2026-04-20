@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef _SMM_CONFIGURATION_H_
-#define _SMM_CONFIGURATION_H_
+#pragma once
 
 #include <Protocol/MmConfiguration.h>
 #include <Pi/PiSmmCis.h>
@@ -73,5 +72,3 @@ struct _EFI_SMM_CONFIGURATION_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiSmmConfigurationProtocolGuid;
-
-#endif

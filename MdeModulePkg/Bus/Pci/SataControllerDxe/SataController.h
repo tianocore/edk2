@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _SATA_CONTROLLER_H_
-#define _SATA_CONTROLLER_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -542,5 +541,3 @@ SataControllerComponentNameGetControllerName (
   IN CHAR8                        *Language,
   OUT CHAR16                      **ControllerName
   );
-
-#endif

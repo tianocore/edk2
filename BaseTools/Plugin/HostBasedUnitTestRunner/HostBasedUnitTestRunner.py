@@ -182,8 +182,13 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
         logging.info(f"Got lcov version {lcov_version_major}")
 
         # Generate base code coverage for all source files
-        # `--ignore-errors mismatch` needed to make lcov v2.0+/gcov work.
-        lcov_error_settings = "--ignore-errors mismatch" if lcov_version_major >= 2 else ""
+        # lcov v2.0+ with gcov requires ignoring several non-fatal error
+        # classes that commonly occur with large vendored third-party trees:
+        #   mismatch - gcov/gcno version or function line mismatches
+        #   source   - source files not found or newer than gcno notes
+        #   format   - unexpected gcov output (e.g. line numbers beyond EOF)
+        #   gcov     - gcov tool returned with a non-zero return code
+        lcov_error_settings = "--ignore-errors mismatch,source,format,gcov" if lcov_version_major >= 2 else ""
         ret = RunCmd("lcov", f"--no-external --capture --initial --directory {buildOutputBase} --output-file {buildOutputBase}/cov-base.info --rc lcov_branch_coverage=1 {lcov_error_settings}")
         if ret != 0:
             logging.error("UnitTest Coverage: Failed to build initial coverage data.")

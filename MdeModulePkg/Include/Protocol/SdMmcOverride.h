@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __SD_MMC_OVERRIDE_H__
-#define __SD_MMC_OVERRIDE_H__
+#pragma once
 
 #include <Protocol/SdMmcPassThru.h>
 
@@ -156,5 +155,3 @@ struct _EDKII_SD_MMC_OVERRIDE {
 };
 
 extern EFI_GUID  gEdkiiSdMmcOverrideProtocolGuid;
-
-#endif

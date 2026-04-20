@@ -10,8 +10,7 @@
     - Std or STD - Standard
 **/
 
-#ifndef DEVICETREE_TABLE_GENERATOR_H_
-#define DEVICETREE_TABLE_GENERATOR_H_
+#pragma once
 
 #include <TableGenerator.h>
 
@@ -171,5 +170,3 @@ DeregisterDtTableGenerator (
   );
 
 #pragma pack()
-
-#endif // DEVICETREE_TABLE_GENERATOR_H_

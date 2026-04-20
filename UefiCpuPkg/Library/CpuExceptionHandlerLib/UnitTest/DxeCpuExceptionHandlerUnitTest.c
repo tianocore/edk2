@@ -26,10 +26,10 @@ InitializeBspIdt (
 
   Idtr = AllocateZeroPool (sizeof (IA32_DESCRIPTOR));
   ASSERT (Idtr != NULL);
-  NewIdtTable = AllocateZeroPool (sizeof (IA32_IDT_GATE_DESCRIPTOR) * CPU_INTERRUPT_NUM);
+  NewIdtTable = AllocateZeroPool (sizeof (IA32_IDT_GATE_DESCRIPTOR) * X86_CPU_INTERRUPT_NUM);
   ASSERT (NewIdtTable != NULL);
   Idtr->Base  = (UINTN)NewIdtTable;
-  Idtr->Limit = (UINT16)(sizeof (IA32_IDT_GATE_DESCRIPTOR) * CPU_INTERRUPT_NUM - 1);
+  Idtr->Limit = (UINT16)(sizeof (IA32_IDT_GATE_DESCRIPTOR) * X86_CPU_INTERRUPT_NUM - 1);
 
   AsmWriteIdtr (Idtr);
   return Idtr;

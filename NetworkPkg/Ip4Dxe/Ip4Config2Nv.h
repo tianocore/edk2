@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _IP4_CONFIG2NV_H_
-#define _IP4_CONFIG2NV_H_
+#pragma once
 
 #include "Ip4Impl.h"
 
@@ -41,5 +40,3 @@ VOID
 Ip4Config2FormUnload (
   IN OUT IP4_CONFIG2_INSTANCE  *Instance
   );
-
-#endif

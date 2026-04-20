@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __EFI_PXEBC_IMPL_H__
-#define __EFI_PXEBC_IMPL_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -225,5 +224,3 @@ struct _PXEBC_PRIVATE_DATA {
 extern EFI_PXE_BASE_CODE_PROTOCOL           gPxeBcProtocolTemplate;
 extern EFI_PXE_BASE_CODE_CALLBACK_PROTOCOL  gPxeBcCallBackTemplate;
 extern EFI_LOAD_FILE_PROTOCOL               gLoadFileProtocolTemplate;
-
-#endif

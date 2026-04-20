@@ -10,8 +10,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _IPMI_NET_FN_BRIDGE_H_
-#define _IPMI_NET_FN_BRIDGE_H_
+#pragma once
 
 //
 // Net function definition for Bridge command
@@ -233,5 +232,3 @@
 //
 //  Constants and Structure definitions for "Send ICMB Event Message" command to follow here
 //
-
-#endif

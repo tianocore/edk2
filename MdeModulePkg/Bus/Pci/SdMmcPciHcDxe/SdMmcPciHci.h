@@ -11,8 +11,7 @@
     - SD Host Controller Simplified Specification, Version 4.20, July 25, 2018
 **/
 
-#ifndef _SD_MMC_PCI_HCI_H_
-#define _SD_MMC_PCI_HCI_H_
+#pragma once
 
 //
 // SD Host Controller SlotInfo Register Offset
@@ -612,5 +611,3 @@ SdMmcSetDriverStrength (
   IN UINT8                    SlotIndex,
   IN SD_DRIVER_STRENGTH_TYPE  DriverStrength
   );
-
-#endif

@@ -6,10 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PCI_H_
-#define _PCI_H_
+#pragma once
 
 #include <IndustryStandard/PciExpress70.h>
 #include <IndustryStandard/PciCodeId.h>
-
-#endif

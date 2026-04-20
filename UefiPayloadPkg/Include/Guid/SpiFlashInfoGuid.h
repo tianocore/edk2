@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef SPI_FLASH_INFO_GUID_H_
-#define SPI_FLASH_INFO_GUID_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 //
@@ -34,5 +33,3 @@ typedef struct {
   UINT16                 Flags;
   PLD_GENERIC_ADDRESS    SpiAddress;
 } SPI_FLASH_INFO;
-
-#endif

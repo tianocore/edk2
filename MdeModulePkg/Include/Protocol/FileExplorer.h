@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __FILE_EXPLORER_H__
-#define __FILE_EXPLORER_H__
+#pragma once
 
 #define EFI_FILE_EXPLORER_PROTOCOL_GUID  \
   { 0x2C03C536, 0x4594, 0x4515, { 0x9E, 0x7A, 0xD3, 0xD2, 0x04, 0xFE, 0x13, 0x63 } }
@@ -65,5 +64,3 @@ struct _EFI_FILE_EXPLORER_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiFileExplorerProtocolGuid;
-
-#endif

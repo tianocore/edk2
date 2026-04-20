@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __ACPI_SYSTEM_DESCRIPTION_TABLE_H___
-#define __ACPI_SYSTEM_DESCRIPTION_TABLE_H___
+#pragma once
 
 #define EFI_ACPI_SDT_PROTOCOL_GUID \
   { 0xeb97088e, 0xcfdf, 0x49c6, { 0xbe, 0x4b, 0xd9, 0x6, 0xa5, 0xb2, 0xe, 0x86 }}
@@ -259,5 +258,3 @@ typedef struct _EFI_ACPI_SDT_PROTOCOL {
 } EFI_ACPI_SDT_PROTOCOL;
 
 extern EFI_GUID  gEfiAcpiSdtProtocolGuid;
-
-#endif // __ACPI_SYSTEM_DESCRIPTION_TABLE_H___

@@ -8,10 +8,10 @@
 
 **/
 
-#ifndef PI_MM_CPU_DRIVER_EP_H_
-#define PI_MM_CPU_DRIVER_EP_H_
+#pragma once
 
 #include <PiMm.h>
+#include <Library/ArmMmHandlerContext.h>
 
 #define EDKII_PI_MM_CPU_DRIVER_EP_GUID  { \
   0x6ecbd5a1, 0xc0f8, 0x4702, { 0x83, 0x01, 0x4f, 0xc2, 0xc5, 0x47, 0x0a, 0x51 } \
@@ -33,8 +33,8 @@
 
   See StandaloneMmPkg/StandaloneMmCoreEntryPoint/Arm/StandaloneMmCoreEntryPoint.c
 
-  @param  [in] EventId            The event Id based on firmware.
-  @param  [in] CommBufferAddr     Address of the communication buffer.
+  @param  [in] MmHandlerContext     Arm specific Mm handler context.
+  @param  [in] CommBufferAddr       Address of the communication buffer.
 
   @retval   EFI_SUCCESS             Success.
   @retval   EFI_INVALID_PARAMETER   A parameter was invalid.
@@ -45,7 +45,7 @@
 typedef
 EFI_STATUS
 (EFIAPI *EDKII_PI_MM_CPU_DRIVER_ENTRYPOINT)(
-  IN UINTN  EventId,
+  IN CONST ARM_MM_HANDLER_CONTEXT *MmHandlerContext,
   IN UINTN  CommBufferAddr
   );
 
@@ -56,5 +56,3 @@ struct _EDKII_PI_MM_CPU_DRIVER_EP_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkiiPiMmCpuDriverEpProtocolGuid;
-
-#endif

@@ -1,8 +1,7 @@
 /* Compiler.h
 2017-04-03 : Igor Pavlov : Public domain */
 
-#ifndef __7Z_COMPILER_H
-#define __7Z_COMPILER_H
+#pragma once
 
 #ifdef _MSC_VER
 
@@ -29,5 +28,3 @@
 
 #define UNUSED_VAR(x)  (void)x;
 /* #define UNUSED_VAR(x) x=x; */
-
-#endif

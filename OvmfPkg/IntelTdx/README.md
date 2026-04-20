@@ -55,25 +55,40 @@ There are 2 configurations for TDVF.
      loaded.
 
 Build
-------
-- Build the TDVF (Config-A) target:
-```
-cd /path/to/edk2
-source edksetup.sh
+-----
+> For the build environment, consider reusing the existing EDKII infrastructure for containerized builds.
+> See [tianocore/containers](https://github.com/tianocore/containers) for more details.
 
-## CC_MEASUREMENT disabled
-build -p OvmfPkg/OvmfPkgX64.dsc -a X64 -t GCC5 -D CC_MEASUREMENT_ENABLE=FALSE -b RELEASE
+1. **(Optional)** Pull and run the tianocore/containers Ubuntu 22 Docker image:
+   ```bash
+   docker run -it \
+     -v "${HOME}":"${HOME}" \
+     -e EDK2_DOCKER_USER_HOME="${HOME}" \
+     ghcr.io/tianocore/containers/ubuntu-22-dev:latest /bin/bash
+   ```
 
-## CC_MEASUREMENT enabled
-build -p OvmfPkg/OvmfPkgX64.dsc -a X64 -t GCC5 -D CC_MEASUREMENT_ENABLE=TRUE -b RELEASE
-```
+2. Prepare the environment:
+   ```bash
+   cd /path/to/edk2
+   . ./edksetup.sh
+   make -C BaseTools
+   ```
 
-- Build the TDVF (Config-B) target:
-```
-cd /path/to/edk2
-source edksetup.sh
-build -p OvmfPkg/IntelTdx/IntelTdxX64.dsc -a X64 -t GCC5 -b RELEASE
-```
+3. Build the TDVF target:
+
+   **Config-A** (OvmfPkgX64):
+   ```bash
+   # CC_MEASUREMENT disabled
+   build -p OvmfPkg/OvmfPkgX64.dsc -a X64 -t GCC -D CC_MEASUREMENT_ENABLE=FALSE -b RELEASE
+
+   # CC_MEASUREMENT enabled
+   build -p OvmfPkg/OvmfPkgX64.dsc -a X64 -t GCC -D CC_MEASUREMENT_ENABLE=TRUE -b RELEASE
+   ```
+
+   **Config-B** (IntelTdxX64):
+   ```bash
+   build -p OvmfPkg/IntelTdx/IntelTdxX64.dsc -a X64 -t GCC -b RELEASE
+   ```
 
 Usage
 -----
@@ -81,7 +96,7 @@ Usage
 Assuming TDX-QEMU/TDX-KVM are already built, one can start a TD virtual
 machine as [launching-a-tdx-vm](https://gitlab.com/qemu/qemu/-/blob/master/docs/system/i386/tdx.rst):
 
-```
+```bash
 qemu_system_x86 \
    -accel kvm \
    -cpu host \

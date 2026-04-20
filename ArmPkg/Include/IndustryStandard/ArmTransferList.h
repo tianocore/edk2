@@ -14,13 +14,12 @@
     - HOB - Hand off block.
 **/
 
-#ifndef ARM_TRANSFER_LIST_
-#define ARM_TRANSFER_LIST_
+#pragma once
 
 #include <Base.h>
 #include <Uefi.h>
 
-#define ARM_FW_HANDOFF_PROTOCOL_VERSION  1
+#define ARM_FW_HANDOFF_PROTOCOL_VERSION  2
 
 #define TRANSFER_LIST_ALIGNMENT     8             // 8 byte alignment
 #define TRANSFER_LIST_SIGNATURE_64  (0x4a0fb10b)
@@ -156,5 +155,3 @@ typedef struct TransferListEventLog {
   /// TRNASFER_ENTRY_HEADER->DataSize - sizeof (TRANSFER_LIST_EVENTLOG)->Flags
   UINT8     EventLog[];
 } TRANSFER_LIST_EVENTLOG;
-
-#endif // ARM_TRANSFER_LIST_

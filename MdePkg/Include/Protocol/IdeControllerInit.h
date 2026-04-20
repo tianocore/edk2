@@ -22,8 +22,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_IDE_CONTROLLER_INIT_PROTOCOL_H_
-#define _EFI_IDE_CONTROLLER_INIT_PROTOCOL_H_
+#pragma once
 
 #include <IndustryStandard/Atapi.h>
 
@@ -555,5 +554,3 @@ struct _EFI_IDE_CONTROLLER_INIT_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiIdeControllerInitProtocolGuid;
-
-#endif

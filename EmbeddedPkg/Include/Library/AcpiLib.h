@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __ACPI_LIB_H__
-#define __ACPI_LIB_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -198,5 +197,3 @@ AcpiAmlObjectUpdateInteger (
   IN  CHAR8                  *AsciiObjectPath,
   IN  UINTN                  Value
   );
-
-#endif // __ACPI_LIB_H__

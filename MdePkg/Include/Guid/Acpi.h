@@ -13,8 +13,7 @@
 
 **/
 
-#ifndef __ACPI_GUID_H__
-#define __ACPI_GUID_H__
+#pragma once
 
 #define ACPI_TABLE_GUID \
   { \
@@ -36,5 +35,3 @@
 extern EFI_GUID  gEfiAcpiTableGuid;
 extern EFI_GUID  gEfiAcpi10TableGuid;
 extern EFI_GUID  gEfiAcpi20TableGuid;
-
-#endif

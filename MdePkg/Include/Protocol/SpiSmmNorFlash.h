@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __SPI_SMM_NOR_FLASH_PROTOCOL_H__
-#define __SPI_SMM_NOR_FLASH_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/SpiNorFlash.h>
 
@@ -26,5 +25,3 @@ typedef
 EFI_SPI_SMM_NOR_FLASH_PROTOCOL;
 
 extern EFI_GUID  gEfiSpiSmmNorFlashProtocolGuid;
-
-#endif // __SPI_SMM_NOR_FLASH_PROTOCOL_H__

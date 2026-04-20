@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __SPI_SMM_HC_H__
-#define __SPI_SMM_HC_H__
+#pragma once
 
 #include <Protocol/SpiHc.h>
 
@@ -26,5 +25,3 @@ typedef
 EFI_SPI_SMM_HC_PROTOCOL;
 
 extern EFI_GUID  gEfiSpiSmmHcProtocolGuid;
-
-#endif // __SPI_SMM_HC_H__

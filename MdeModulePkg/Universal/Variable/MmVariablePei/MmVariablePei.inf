@@ -28,6 +28,7 @@
   PeimEntryPoint
   MemoryAllocationLib
   HobLib
+  SafeIntLib
 
 [Protocols]
   gEfiSmmVariableProtocolGuid             ## CONSUMES

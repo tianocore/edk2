@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _FILE_HANDLE_LIBRARY_HEADER_
-#define _FILE_HANDLE_LIBRARY_HEADER_
+#pragma once
 
 #include <Protocol/SimpleFileSystem.h>
 #include <Guid/FileInfo.h>
@@ -497,5 +496,3 @@ EFIAPI
 FileHandleEof (
   IN EFI_FILE_HANDLE  Handle
   );
-
-#endif //_FILE_HANDLE_LIBRARY_HEADER_

@@ -2,6 +2,7 @@
 # UnitTestFrameworkPkg DSC include file for host based test DSC
 #
 # Copyright (c) 2019 - 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -17,10 +18,17 @@
   BUILD_TARGETS = NOOPT
 
   #
-  # Always enable code coverage and address sanitizers
+  # Enable code coverage and address sanitizers
+  # The Platform DSC may pre-define these MACROS to temporarily disable them.
   #
-  UNIT_TESTING_CODE_COVERAGE_ENABLE     = TRUE
+
+!ifndef UNIT_TESTING_CODE_COVERAGE_ENABLE
+  UNIT_TESTING_CODE_COVERAGE_ENABLE = TRUE
+!endif
+
+!ifndef UNIT_TESTING_ADDRESS_SANITIZER_ENABLE
   UNIT_TESTING_ADDRESS_SANITIZER_ENABLE = TRUE
+!endif
 
 [LibraryClasses.common.HOST_APPLICATION]
   BaseLib|MdePkg/Library/BaseLib/UnitTestHostBaseLib.inf
@@ -48,8 +56,8 @@
 #
 # +--------------------+--------+----------+------------+-----+----+--------+
 # | OS/Compiler        | VS2019 | CLANGPDB | CLANGDWARF |   GCC    | XCODE5 |
-# |                    | VS2022 |          |            |   GCC5   |        |
-# |                    | VS2026 |          |            | GCCNOLTO |        |
+# |                    | VS2022 |          |            | GCCNOLTO |        |
+# |                    | VS2026 |          |            |          |        |
 # +--------------------+--------+----------+------------+----------+--------+
 # | Windows/VS         |IA32/X64|          |            |          |        |
 # | Windows/LLVM/VS    |        | IA32/X64 |            |          |        |
@@ -96,12 +104,12 @@
   !if $(TOOL_CHAIN_TAG) in "CLANGPDB"
     !error Host-based Unit Tests not supported for Mingw/CLANGPDB builds
   !endif
-  !if $(TOOL_CHAIN_TAG) in "GCC GCC5 GCCNOLTO"
+  !if $(TOOL_CHAIN_TAG) in "GCC GCCNOLTO"
     !error Host-based Unit Tests not supported for Mingw/GCC builds
   !endif
 !else
   !if $(WIN_HOST_BUILD)
-    !if $(TOOL_CHAIN_TAG) in "GCC GCC5 GCCNOLTO"
+    !if $(TOOL_CHAIN_TAG) in "GCC GCCNOLTO"
       !error Host-based Unit Tests not supported for Windows/GCC builds
     !endif
     !if $(TOOL_CHAIN_TAG) in "CLANGDWARF"
@@ -183,10 +191,10 @@
   #
   # Set C++ language standard version
   #
-  MSFT:*_*_*_CXX_FLAGS         = /std:c++20 /Zc:strictStrings- /wd4244
+  MSFT:*_*_*_CXX_FLAGS         = /std:c++20 /Zc:strictStrings- /wd4244 /w44388 /w44389
   GCC:*_*_*_CXX_FLAGS          = -std=c++20
-  GCC:*_CLANGDWARF_*_CXX_FLAGS = -std=c++17
-  CLANGPDB:*_*_*_CXX_FLAGS     = -std=c++17
+  GCC:*_CLANGDWARF_*_CXX_FLAGS = -std=c++17 -Wsign-compare
+  CLANGPDB:*_*_*_CXX_FLAGS     = -std=c++17 -Wsign-compare
   #
   # CLANGDWARF and CLANGPDB: Some gtest c++ sources generate undefined
   # behavior that is never triggered. Map trap functions to abort() to
@@ -235,7 +243,7 @@
   CLANGPDB:*_*_*_DLINK_FLAGS    = /DEBUG /pdb:"$(BIN_DIR)\$(MODULE_NAME_GUID).pdb"
 !if $(UNIT_TESTING_ADDRESS_SANITIZER_ENABLE)
   #
-  # Remove default library clang_rt.profile.lib that is not includes with Visual Studio
+  # Remove default library clang_rt.profile.lib that is not included with Visual Studio
   #
   CLANGPDB:*_*_IA32_DLINK_FLAGS = /NODEFAULTLIB:clang_rt.profile.lib
   #
@@ -248,14 +256,14 @@
   #
   # Set GCC HOST_APPLICATION options
   #
-  GCC:*_*_*_CC_FLAGS           =  -Wno-write-strings -fpie
-  GCC:*_*_IA32_DLINK_FLAGS     == -o $(BIN_DIR)/$(MODULE_NAME_GUID) -m32
-  GCC:*_*_X64_DLINK_FLAGS      == -o $(BIN_DIR)/$(MODULE_NAME_GUID) -m64
+  GCC:*_*_*_CC_FLAGS =  -Wno-write-strings -fpie
 !if $(WIN_MINGW32_BUILD)
-  GCC:*_CLANGDWARF_*_DLINK_FLAGS = -Wl,--pdb,$(BIN_DIR)\$(MODULE_NAME_GUID).pdb -g3
+  GCC:*_CLANGDWARF_*_DLINK_FLAGS == -o $(BIN_DIR)/$(MODULE_NAME_GUID).exe -Wl,--pdb,$(BIN_DIR)\$(MODULE_NAME_GUID).pdb -g3
 !else
-  GCC:*_*_*_DLINK_FLAGS = -z noexecstack
+  GCC:*_*_*_DLINK_FLAGS          == -o $(BIN_DIR)/$(MODULE_NAME_GUID) -z noexecstack
 !endif
+  GCC:*_*_IA32_DLINK_FLAGS = -m32
+  GCC:*_*_X64_DLINK_FLAGS  = -m64
 
 !if $(UNIT_TESTING_ADDRESS_SANITIZER_ENABLE)
   #

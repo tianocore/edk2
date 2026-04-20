@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __GENERIC_MEMORY_TEST_H__
-#define __GENERIC_MEMORY_TEST_H__
+#pragma once
 
 #define EFI_GENERIC_MEMORY_TEST_PROTOCOL_GUID  \
   { 0x309de7f1, 0x7f5e, 0x4ace, {0xb4, 0x9c, 0x53, 0x1b, 0xe5, 0xaa, 0x95, 0xef} }
@@ -112,5 +111,3 @@ struct _EFI_GENERIC_MEMORY_TEST_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiGenericMemTestProtocolGuid;
-
-#endif

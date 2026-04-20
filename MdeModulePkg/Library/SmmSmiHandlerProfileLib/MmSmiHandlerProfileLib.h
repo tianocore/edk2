@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _MM_SMI_HANDLER_PROFILE_LIB_H_
-#define _MM_SMI_HANDLER_PROFILE_LIB_H_
+#pragma once
 
 /**
   The common constructor function for SMI handler profile.
@@ -19,5 +18,3 @@ EFI_STATUS
 MmSmiHandlerProfileLibInitialization (
   VOID
   );
-
-#endif //_SMM_SMI_HANDLER_PROFILE_LIB_H_

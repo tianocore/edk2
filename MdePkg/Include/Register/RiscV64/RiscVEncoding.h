@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef RISCV_ENCODING_H_
-#define RISCV_ENCODING_H_
+#pragma once
 
 #define MSTATUS_SIE         0x00000002UL
 #define MSTATUS_MIE         0x00000008UL
@@ -133,5 +132,3 @@
 #define SEED_OPST_ES16     0x80000000
 #define SEED_OPST_DEAD     0xc0000000
 #define SEED_ENTROPY_MASK  0xffff
-
-#endif

@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef MEMORY_ACCEPT_H_
-#define MEMORY_ACCEPT_H_
+#pragma once
 
 #define EDKII_MEMORY_ACCEPT_PROTOCOL_GUID \
   { 0x38c74800, 0x5590, 0x4db4, { 0xa0, 0xf3, 0x67, 0x5d, 0x9b, 0x8e, 0x80, 0x26 } };
@@ -33,5 +32,3 @@ struct _EDKII_MEMORY_ACCEPT_PROTOCOL {
 };
 
 extern EFI_GUID  gEdkiiMemoryAcceptProtocolGuid;
-
-#endif

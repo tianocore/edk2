@@ -12,8 +12,6 @@
 
 #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 
-#define SEC_IDT_ENTRY_COUNT  34
-
 typedef struct _SEC_IDT_TABLE {
   //
   // Reserved 8 bytes preceding IDT to store EFI_PEI_SERVICES**, since IDT base
@@ -22,7 +20,7 @@ typedef struct _SEC_IDT_TABLE {
   // EFI_PEI_SERVICES**
   //
   UINT64                      PeiService;
-  IA32_IDT_GATE_DESCRIPTOR    IdtTable[SEC_IDT_ENTRY_COUNT];
+  IA32_IDT_GATE_DESCRIPTOR    IdtTable[X86_CPU_INTERRUPT_NUM];
 } SEC_IDT_TABLE;
 
 //
@@ -218,7 +216,7 @@ SecStartup (
   // |-------------------|---->  TempRamBase
 
   IdtTableInStack.PeiService = 0;
-  for (Index = 0; Index < SEC_IDT_ENTRY_COUNT; Index++) {
+  for (Index = 0; Index < X86_CPU_INTERRUPT_NUM; Index++) {
     ZeroMem ((VOID *)&IdtTableInStack.IdtTable[Index], sizeof (IA32_IDT_GATE_DESCRIPTOR));
     CopyMem ((VOID *)&IdtTableInStack.IdtTable[Index], (VOID *)&mIdtEntryTemplate, sizeof (UINT64));
   }
