@@ -3,7 +3,7 @@
 #
 #  Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) Microsoft Corporation.<BR>
-#  Copyright (C) 2025 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -21,7 +21,7 @@
 
 [Sources]
   SmmCpuFeaturesLibCommon.c
-  StandaloneMmCpuFeaturesLib.c
+  AmdStandaloneMmCpuFeaturesLib.c
   AmdSmmCpuFeaturesLib.c
   CpuFeaturesLib.h
 
@@ -39,9 +39,6 @@
 
 [Guids]
   gSmmBaseHobGuid                ## CONSUMES
-
-[FixedPcd]
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber   ## SOMETIMES_CONSUMES
 
 [FeaturePcd]
   gUefiCpuPkgTokenSpaceGuid.PcdSmrrEnable                     ## CONSUMES
