@@ -2315,6 +2315,12 @@
   # @Prompt Conduit to use in ArmFfaLib.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc|TRUE|BOOLEAN|0x10000029
 
+  ## Define if EDK2 is a FFA non-secure physical instance or a FFA non-secure virtual instance
+  #   TRUE  - EDK2 is a FFA non-secure physical instance.<BR>
+  #   FALSE - EDK2 is a FFA non-secure virtual instance.<BR>
+  # @Prompt Set FFA EDK2 instance flag.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFfaEdk2IsNonSecurePhysicalInstance|TRUE|BOOLEAN|0x1000002A
+
   ## Defines platform limit for BAR size that can be accepted in Resizable BAR Capability.
   #  BAR Capability bits specify size in MB, thus this PCD value shall be extended with +20 bits.
   # 0           2^(0+20) = 1 MB
