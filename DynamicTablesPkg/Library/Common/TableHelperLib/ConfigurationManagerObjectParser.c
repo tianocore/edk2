@@ -1158,6 +1158,16 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryDeviceInfoParser[] = {
   { "MemoryErrorInfoToken",          sizeof (CM_OBJECT_TOKEN),                         "0x%p",  NULL },
 };
 
+/** A parser for EArchCommonObjMemoryArrayMappedAddress.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryArrayMappedAddressParser[] = {
+  { "MemoryArrayMappedAddressToken", sizeof (CM_OBJECT_TOKEN),      "0x%p",  NULL },
+  { "PhysMemArrayToken",             sizeof (CM_OBJECT_TOKEN),      "0x%p",  NULL },
+  { "StartingAddress",               sizeof (EFI_PHYSICAL_ADDRESS), "0x%lx", NULL },
+  { "EndingAddress",                 sizeof (EFI_PHYSICAL_ADDRESS), "0x%lx", NULL },
+  { "NumMemDevices",                 sizeof (UINT8),                "0x%u",  NULL },
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -1217,6 +1227,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjErrSourceGenericHwVer2Info,   CmArchCommonObjErrSourceGenericHwVer2InfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPhysicalMemoryArray,          CmArchCommonPhysicalMemoryArrayParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryDeviceInfo,             CmArchCommonMemoryDeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryArrayMappedAddress,     CmArchCommonMemoryArrayMappedAddressParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
