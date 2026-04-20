@@ -435,6 +435,7 @@ SmmuV3NodeParser (
 
     SmmuV3Info->DeviceIdMappingIndex = SmmuV3Info->IdMappingCount;
     SmmuV3Info->IdMappingCount++;
+    SmmuV3Info->Flags |= EFI_ACPI_IORT_SMMUv3_FLAG_DEVICEID_VALID;
   }
 
   // Add the CmObj to the Configuration Manager.
