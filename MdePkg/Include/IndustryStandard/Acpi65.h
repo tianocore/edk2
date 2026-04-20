@@ -792,7 +792,7 @@ typedef struct {
 
 //
 // SRAT structure types.
-// All other values between 0x06 an 0xFF are reserved and
+// All other values between 0x07 and 0xFF are reserved and
 // will be ignored by OSPM.
 //
 #define EFI_ACPI_6_5_PROCESSOR_LOCAL_APIC_SAPIC_AFFINITY  0x00
@@ -801,6 +801,7 @@ typedef struct {
 #define EFI_ACPI_6_5_GICC_AFFINITY                        0x03
 #define EFI_ACPI_6_5_GIC_ITS_AFFINITY                     0x04
 #define EFI_ACPI_6_5_GENERIC_INITIATOR_AFFINITY           0x05
+#define EFI_ACPI_6_5_GENERIC_PORT_AFFINITY                0x06
 
 ///
 /// Processor Local APIC/SAPIC Affinity Structure Definition
@@ -941,6 +942,18 @@ typedef struct {
 ///
 #define EFI_ACPI_6_5_GENERIC_INITIATOR_AFFINITY_STRUCTURE_ENABLED                     BIT0
 #define EFI_ACPI_6_5_GENERIC_INITIATOR_AFFINITY_STRUCTURE_ARCHITECTURAL_TRANSACTIONS  BIT1
+
+///
+/// Generic Port Affinity Structure
+///
+typedef EFI_ACPI_6_5_GENERIC_INITIATOR_AFFINITY_STRUCTURE EFI_ACPI_6_5_GENERIC_PORT_AFFINITY_STRUCTURE;
+
+///
+/// Generic Port Affinity Structure Flags. All other bits are reserved
+/// and must be 0.
+///
+#define EFI_ACPI_6_5_GENERIC_PORT_AFFINITY_STRUCTURE_ENABLED                     BIT0
+#define EFI_ACPI_6_5_GENERIC_PORT_AFFINITY_STRUCTURE_ARCHITECTURAL_TRANSACTIONS  BIT1
 
 ///
 /// System Locality Distance Information Table (SLIT).
