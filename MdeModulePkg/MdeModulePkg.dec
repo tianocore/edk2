@@ -1153,6 +1153,10 @@
   #      page or tail guard page.
   #   c) UEFI freed-memory guard and UEFI pool/page guard cannot be enabled
   #      at the same time.
+  #   d) It is not supported to have a guard page at page 0 because this page
+  #      may be used for NULL pointer detection or have special meaning if left
+  #      mapped. Heap Guard will reject a memory allocation if the head guard
+  #      would land on page 0.
   #
   #   BIT0 - Enable UEFI page guard.<BR>
   #   BIT1 - Enable UEFI pool guard.<BR>
