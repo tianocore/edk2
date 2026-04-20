@@ -1056,6 +1056,18 @@ typedef struct {
 #define EFI_ACPI_6_6_GENERIC_INITIATOR_AFFINITY_STRUCTURE_ARCHITECTURAL_TRANSACTIONS  BIT1
 
 ///
+/// Generic Port Affinity Structure
+///
+typedef EFI_ACPI_6_6_GENERIC_INITIATOR_AFFINITY_STRUCTURE EFI_ACPI_6_6_GENERIC_PORT_AFFINITY_STRUCTURE;
+
+///
+/// Generic Port Affinity Structure Flags. All other bits are reserved
+/// and must be 0.
+///
+#define EFI_ACPI_6_6_GENERIC_PORT_AFFINITY_STRUCTURE_ENABLED                     BIT0
+#define EFI_ACPI_6_6_GENERIC_PORT_AFFINITY_STRUCTURE_ARCHITECTURAL_TRANSACTIONS  BIT1
+
+///
 /// System Locality Distance Information Table (SLIT).
 /// The rest of the table is a matrix.
 ///
