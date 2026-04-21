@@ -17,6 +17,7 @@
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/Tpm2CommandLib.h>
+#include <Library/Tpm2HelpLib.h>
 #include <Library/HashLib.h>
 #include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -68,12 +69,12 @@ LogHashEvent (
   UINT8           *DigestBuffer;
 
   //
-  // Use GetDigestListSize (DigestList) in the GUID HOB DataLength calculation
+  // Use Tpm2GetDigestListSize (DigestList) in the GUID HOB DataLength calculation
   // to reserve enough buffer to hold TPML_DIGEST_VALUES compact binary.
   //
   HobData = BuildGuidHob (
               &gTcgEvent2EntryHobGuid,
-              sizeof (TcgPcrEvent2->PCRIndex) + sizeof (TcgPcrEvent2->EventType) + GetDigestListSize (DigestList) + sizeof (TcgPcrEvent2->EventSize) + NewEventHdr->EventSize
+              sizeof (TcgPcrEvent2->PCRIndex) + sizeof (TcgPcrEvent2->EventType) + Tpm2GetDigestListSize (DigestList) + sizeof (TcgPcrEvent2->EventSize) + NewEventHdr->EventSize
               );
   if (HobData == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -90,7 +91,7 @@ LogHashEvent (
    *     - TPM_ALG_SHA384
    *     - TPM_ALG_SHA512
    */
-  DigestBuffer = CopyDigestListToBuffer (
+  DigestBuffer = Tpm2CopyDigestListToBuffer (
                    DigestBuffer,
                    DigestList,
                    TPM_ALG_SHA256 | TPM_ALG_SHA384 | TPM_ALG_SHA512
