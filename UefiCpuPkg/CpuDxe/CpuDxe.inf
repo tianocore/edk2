@@ -79,8 +79,10 @@
   LoongArch64/CpuDxe.h
 
 [Sources.RISCV64]
+  CpuMp.h
   RiscV64/CpuDxe.c
   RiscV64/CpuDxe.h
+  RiscV64/CpuMp.c
 
 [Protocols]
   gEfiCpuArchProtocolGuid                       ## PRODUCES
