@@ -24,6 +24,7 @@
 #define SBI_EXT_DBCN                 0x4442434E
 #define SBI_EXT_TIME                 0x54494D45
 #define SBI_EXT_SRST                 0x53525354
+#define SBI_EXT_HSM                  0x48534D
 
 /* SBI function IDs for base extension */
 #define SBI_EXT_BASE_SPEC_VERSION   0x0
@@ -51,6 +52,15 @@
 
 #define SBI_SRST_RESET_REASON_NONE     0x0
 #define SBI_SRST_RESET_REASON_SYSFAIL  0x1
+
+/* SBI function IDs for HSM extension */
+#define SBI_HSM_HART_START   0x0
+#define SBI_HSM_HART_STOP    0x1
+#define SBI_HSM_HART_STATUS  0x2
+
+/* HSM Hart status */
+#define SBI_HSM_STATE_STARTED  0x0
+#define SBI_HSM_STATE_STOPPED  0x1
 
 /* SBI return error codes */
 #define SBI_SUCCESS                0
