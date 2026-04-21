@@ -105,3 +105,34 @@ DebugLibFdtPL011UartWrite (
 
   return PL011UartWrite ((UINTN)DebugAddress, Buffer, NumberOfBytes);
 }
+
+EFI_STATUS
+GetSerialDebugLogRuntime (
+  UINT32  *Value
+  )
+{
+  CONST VOID        *DeviceTree;
+  RETURN_STATUS     Status;
+  FDT_SERIAL_PORTS  Ports;
+
+  if (Value == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  DeviceTree = (VOID *)(UINTN)PcdGet64 (PcdDeviceTreeInitialBaseAddress);
+  if (DeviceTree == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  Status = FdtSerialGetPorts (DeviceTree, "arm,pl011", &Ports);
+  if (RETURN_ERROR (Status)) {
+    return Status;
+  }
+
+  if (Ports.DebugLevelSet) {
+    *Value = Ports.DebugLevel;
+    return EFI_SUCCESS;
+  }
+
+  return EFI_NOT_FOUND;
+}

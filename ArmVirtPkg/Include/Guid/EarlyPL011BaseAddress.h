@@ -21,9 +21,15 @@ typedef struct {
   //
   // for SerialPortLib and console IO
   //
-  UINT64    ConsoleAddress;
+  UINT64     ConsoleAddress;
   //
   // for DebugLib; may equal ConsoleAddress if there's only one PL011 UART
   //
-  UINT64    DebugAddress;
+  UINT64     DebugAddress;
+  //
+  // for DebugLib: Serial debug log level override from the "edk2,debug-level" DT property.
+  // DebugLevel is only valid when DebugLevelSet is TRUE.
+  //
+  UINT32     DebugLevel;
+  BOOLEAN    DebugLevelSet;
 } EARLY_PL011_BASE_ADDRESS;
