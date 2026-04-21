@@ -9,7 +9,7 @@
 #include "CpuDxe.h"
 
 /**
-  Check whether the provided memory range is covered by a single entry of type
+  Check whether the provided memory range is covered by one or more entries of type
   EfiGcdSystemMemory in the GCD memory map.
 
   @param  BaseAddress       The physical address that is the start address of
@@ -26,22 +26,25 @@ RegionIsSystemMemory (
   )
 {
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  GcdDescriptor;
-  EFI_PHYSICAL_ADDRESS             GcdEndAddress;
+  EFI_PHYSICAL_ADDRESS             CurrentAddress;
+  EFI_PHYSICAL_ADDRESS             EndAddress;
   EFI_STATUS                       Status;
 
-  Status = gDS->GetMemorySpaceDescriptor (BaseAddress, &GcdDescriptor);
-  if (EFI_ERROR (Status) ||
-      (GcdDescriptor.GcdMemoryType != EfiGcdMemoryTypeSystemMemory))
-  {
-    return FALSE;
+  CurrentAddress = BaseAddress;
+  EndAddress     = BaseAddress + Length;
+
+  while (CurrentAddress < EndAddress) {
+    Status = gDS->GetMemorySpaceDescriptor (CurrentAddress, &GcdDescriptor);
+    if (EFI_ERROR (Status) ||
+        (GcdDescriptor.GcdMemoryType != EfiGcdMemoryTypeSystemMemory))
+    {
+      return FALSE;
+    }
+
+    CurrentAddress = GcdDescriptor.BaseAddress + GcdDescriptor.Length;
   }
 
-  GcdEndAddress = GcdDescriptor.BaseAddress + GcdDescriptor.Length;
-
-  //
-  // Return TRUE if the GCD descriptor covers the range entirely
-  //
-  return GcdEndAddress >= (BaseAddress + Length);
+  return TRUE;
 }
 
 /**
