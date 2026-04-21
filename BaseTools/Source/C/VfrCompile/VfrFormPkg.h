@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFIIFRCLASS_H_
-#define _EFIIFRCLASS_H_
+#pragma once
 
 #include "string.h"
 #include "EfiVfr.h"
@@ -655,8 +654,8 @@ static BOOLEAN            gIsStringOp = FALSE;
  */
 class CIfrFormSet : public CIfrObj, public CIfrOpHeader {
 private:
-  EFI_IFR_FORM_SET *mFormSet;
-  EFI_GUID *mClassGuid;
+  EFI_IFR_FORM_SET  *mFormSet;
+  PACKED_EFI_GUID   *mClassGuid;
 
 public:
   CIfrFormSet (UINT8 Size) : CIfrObj (EFI_IFR_FORM_SET_OP, (CHAR8 **)NULL, Size),
@@ -665,7 +664,7 @@ public:
     mFormSet->FormSetTitle = EFI_STRING_ID_INVALID;
     mFormSet->Flags        = 0;
     memset (&mFormSet->Guid, 0, sizeof (EFI_GUID));
-    mClassGuid = (EFI_GUID *) (mFormSet + 1);
+    mClassGuid = (PACKED_EFI_GUID *) (mFormSet + 1);
   }
 
   VOID SetGuid (IN EFI_GUID *Guid) {
@@ -2772,5 +2771,3 @@ public:
     return _FLAGS_ZERO (LFlags) ? VFR_RETURN_SUCCESS : VFR_RETURN_FLAGS_UNSUPPORTED;
   }
 };
-
-#endif

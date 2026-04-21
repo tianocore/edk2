@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __REGISTER_CPU_FEATURES_LIB_H__
-#define __REGISTER_CPU_FEATURES_LIB_H__
+#pragma once
 
 #include <AcpiCpuData.h>
 #include <Register/Intel/Cpuid.h>
@@ -511,7 +510,7 @@ PreSmmCpuRegisterTableWrite (
   @param[in]  RegisterType     Type of the register to program.
   @param[in]  Index            Index of the register to program.
   @param[in]  Type             The data type name of a register structure.
-  @param[in]  Field            The bit fiel name in register structure to write.
+  @param[in]  Field            The bit field name in register structure to write.
   @param[in]  Value            Value to write to the bit field.
 
   @note This service could be called by BSP only.
@@ -536,7 +535,7 @@ PreSmmCpuRegisterTableWrite (
   @param[in]  RegisterType     Type of the register to program.
   @param[in]  Index            Index of the register to program.
   @param[in]  Type             The data type name of a register structure.
-  @param[in]  Field            The bit fiel name in register structure to write.
+  @param[in]  Field            The bit field name in register structure to write.
   @param[in]  Value            Value to write to the bit field.
 
   @note This service could be called by BSP only.
@@ -595,7 +594,7 @@ PreSmmCpuRegisterTableWrite (
   @param[in]  RegisterType     Type of the register to program.
   @param[in]  Index            Index of the register to program.
   @param[in]  Type             The data type name of a register structure.
-  @param[in]  Field            The bit fiel name in register structure to write.
+  @param[in]  Field            The bit field name in register structure to write.
   @param[in]  Value            Value to write to the bit field.
 
   @note This service could be called by BSP only.
@@ -607,5 +606,3 @@ PreSmmCpuRegisterTableWrite (
     ((Type *)(&ValueMask))->Field = 0;                                                                   \
     PreSmmCpuRegisterTableWrite (ProcessorNumber, RegisterType, Index, ~ValueMask, Value);                \
   } while(FALSE);
-
-#endif

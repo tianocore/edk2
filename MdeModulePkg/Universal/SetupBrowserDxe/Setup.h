@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SETUP_H_
-#define _SETUP_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -1864,5 +1863,3 @@ EFIAPI
 HiiToLower (
   IN EFI_STRING  ConfigString
   );
-
-#endif

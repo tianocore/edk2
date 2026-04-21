@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __FDT_CLIENT_H__
-#define __FDT_CLIENT_H__
+#pragma once
 
 #define FDT_CLIENT_PROTOCOL_GUID  {\
   0xE11FACA0, 0x4710, 0x4C8E, {0xA7, 0xA2, 0x01, 0xBA, 0xA2, 0x59, 0x1B, 0x4C} \
@@ -125,5 +124,3 @@ struct _FDT_CLIENT_PROTOCOL {
 };
 
 extern EFI_GUID  gFdtClientProtocolGuid;
-
-#endif

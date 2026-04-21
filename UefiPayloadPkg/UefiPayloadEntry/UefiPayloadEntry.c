@@ -44,7 +44,7 @@ MemInfoCallbackMmio (
   EFI_PHYSICAL_ADDRESS         Base;
   EFI_RESOURCE_TYPE            Type;
   UINT64                       Size;
-  EFI_RESOURCE_ATTRIBUTE_TYPE  Attribue;
+  EFI_RESOURCE_ATTRIBUTE_TYPE  Attribute;
   ACPI_BOARD_INFO              *AcpiBoardInfo;
 
   AcpiBoardInfo = (ACPI_BOARD_INFO *)Params;
@@ -81,15 +81,15 @@ MemInfoCallbackMmio (
   Base = MemoryMapEntry->Base;
   Size = MemoryMapEntry->Size;
 
-  Attribue = EFI_RESOURCE_ATTRIBUTE_PRESENT |
-             EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-             EFI_RESOURCE_ATTRIBUTE_TESTED |
-             EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
-             EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
-             EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
-             EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE;
+  Attribute = EFI_RESOURCE_ATTRIBUTE_PRESENT |
+              EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+              EFI_RESOURCE_ATTRIBUTE_TESTED |
+              EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+              EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+              EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+              EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE;
 
-  BuildResourceDescriptorHob (Type, Attribue, (EFI_PHYSICAL_ADDRESS)Base, Size);
+  BuildResourceDescriptorHob (Type, Attribute, (EFI_PHYSICAL_ADDRESS)Base, Size);
   DEBUG ((DEBUG_INFO, "buildhob: base = 0x%lx, size = 0x%lx, type = 0x%x\n", Base, Size, Type));
 
   if ((MemoryMapEntry->Type == E820_UNUSABLE) ||
@@ -291,7 +291,7 @@ MemInfoCallback (
   EFI_PHYSICAL_ADDRESS         Base;
   EFI_RESOURCE_TYPE            Type;
   UINT64                       Size;
-  EFI_RESOURCE_ATTRIBUTE_TYPE  Attribue;
+  EFI_RESOURCE_ATTRIBUTE_TYPE  Attribute;
 
   //
   // Skip everything not known to be usable DRAM.
@@ -307,15 +307,15 @@ MemInfoCallback (
   Base = MemoryMapEntry->Base;
   Size = MemoryMapEntry->Size;
 
-  Attribue = EFI_RESOURCE_ATTRIBUTE_PRESENT |
-             EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-             EFI_RESOURCE_ATTRIBUTE_TESTED |
-             EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
-             EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
-             EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
-             EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE;
+  Attribute = EFI_RESOURCE_ATTRIBUTE_PRESENT |
+              EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+              EFI_RESOURCE_ATTRIBUTE_TESTED |
+              EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+              EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+              EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+              EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE;
 
-  BuildResourceDescriptorHob (Type, Attribue, (EFI_PHYSICAL_ADDRESS)Base, Size);
+  BuildResourceDescriptorHob (Type, Attribute, (EFI_PHYSICAL_ADDRESS)Base, Size);
   DEBUG ((DEBUG_INFO, "buildhob: base = 0x%lx, size = 0x%lx, type = 0x%x\n", Base, Size, Type));
 
   if (MemoryMapEntry->Type == E820_ACPI) {

@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef HOB_PARSER_LIB_H_
-#define HOB_PARSER_LIB_H_
+#pragma once
 
 /**
  *
@@ -66,5 +65,3 @@ BOOLEAN
 IsHobNeed (
   EFI_PEI_HOB_POINTERS  Hob
   );
-
-#endif

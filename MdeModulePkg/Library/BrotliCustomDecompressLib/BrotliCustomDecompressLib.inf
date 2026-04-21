@@ -78,3 +78,6 @@
   DebugLib
   BaseMemoryLib
   ExtractGuidedSectionLib
+
+[BuildOptions]
+  GCC:*_*_*_CC_FLAGS = -U_MSC_VER

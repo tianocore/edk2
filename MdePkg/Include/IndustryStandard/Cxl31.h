@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef CXL31_H_
-#define CXL31_H_
+#pragma once
 
 #include <IndustryStandard/Cxl30.h>
 
@@ -43,5 +42,3 @@ typedef struct {
 } CXL_DOWNSTREAM_PORT_ASSOCIATION_STRUCTURE;
 
 #pragma pack()
-
-#endif

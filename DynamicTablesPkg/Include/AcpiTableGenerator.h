@@ -12,8 +12,7 @@
     - Std or STD - Standard
 **/
 
-#ifndef ACPI_TABLE_GENERATOR_H_
-#define ACPI_TABLE_GENERATOR_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -69,6 +68,10 @@ The Dynamic Tables Framework implements the following ACPI table generators:
             The SSDT Cpu-Topology generator collates the cpu and LPI
             information from the Configuration Manager and generates a
             SSDT table describing the CPU hierarchy.
+  - SSDT DMC-620 PMU:
+            The SSDT DMC620 PMU generator collates the PMU specific information
+            from the Configuration Manager and uses the Dynamic AML CodeGen
+            API's to build the SSDT DMC620 PMU table.
   - SSDT Pci-Express:
             The SSDT Pci Express generator collates the Pci Express
             information from the Configuration Manager and generates a
@@ -111,6 +114,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdSsdtCmn600,                    ///< SSDT Cmn-600 Generator
   EStdAcpiTableIdSsdtCpuTopology,               ///< SSDT Cpu Topology
   EStdAcpiTableIdSsdtPciExpress,                ///< SSDT Pci Express Generator
+  EStdAcpiTableIdSsdtPlicAplic,                 ///< SSDT Plic/Aplic Generator
   EStdAcpiTableIdPcct,                          ///< PCCT Generator
   EStdAcpiTableIdTpm2,                          ///< TPM2 Generator
   EStdAcpiTableIdWsmt,                          ///< WSMT Generator
@@ -120,6 +124,8 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdFacs,                          ///< FACS Generator
   EStdAcpiTableIdCedt,                          ///< CEDT Generator
   EStdAcpiTableIdSlit,                          ///< SLIT Generator
+  EStdAcpiTableIdRhct,                          ///< RHCT Generator
+  EStdAcpiTableIdSsdtDmc620Pmu,                 ///< SSDT DMC620 PMU Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 
@@ -402,5 +408,3 @@ DeregisterAcpiTableGenerator (
   );
 
 #pragma pack()
-
-#endif // ACPI_TABLE_GENERATOR_H_

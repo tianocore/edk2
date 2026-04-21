@@ -2252,7 +2252,6 @@ STATIC CONST GUID_INFO_BLOCK  mGuidStringList[] = {
   { STRING_TOKEN (STR_UC2),                 &gEfiUnicodeCollation2ProtocolGuid,                NULL                                             },
   { STRING_TOKEN (STR_PCIRB_IO),            &gEfiPciRootBridgeIoProtocolGuid,                  PciRootBridgeIoDumpInformation                   },
   { STRING_TOKEN (STR_PCI_IO),              &gEfiPciIoProtocolGuid,                            PciIoProtocolDumpInformation                     },
-  { STRING_TOKEN (STR_SCSI_PT),             &gEfiScsiPassThruProtocolGuid,                     NULL                                             },
   { STRING_TOKEN (STR_SCSI_IO),             &gEfiScsiIoProtocolGuid,                           NULL                                             },
   { STRING_TOKEN (STR_SCSI_PT_EXT),         &gEfiExtScsiPassThruProtocolGuid,                  NULL                                             },
   { STRING_TOKEN (STR_ISCSI),               &gEfiIScsiInitiatorNameProtocolGuid,               NULL                                             },
@@ -3762,7 +3761,7 @@ ParseHandleDatabaseForChildDevices (
   @param[in] ProtocolGuid The guid of the protocol to get handles for.  If NULL
                           then the function will return all handles.
 
-  @retval NULL            A memory allocation failed.
+  @retval NULL            Could not get handles or memory allocation failed.
   @return                 A NULL terminated list of handles.
 **/
 EFI_HANDLE *
@@ -3772,45 +3771,43 @@ GetHandleListByProtocol (
   )
 {
   EFI_HANDLE  *HandleList;
-  UINTN       Size;
+  EFI_HANDLE  *OriginalHandleList;
+  UINTN       OriginalHandleCount;
   EFI_STATUS  Status;
 
-  Size       = 0;
-  HandleList = NULL;
-
-  //
-  // We cannot use LocateHandleBuffer since we need that NULL item on the ends of the list!
-  //
-  if (ProtocolGuid == NULL) {
-    Status = gBS->LocateHandle (AllHandles, NULL, NULL, &Size, HandleList);
-    if (Status == EFI_BUFFER_TOO_SMALL) {
-      HandleList = AllocateZeroPool (Size + sizeof (EFI_HANDLE));
-      if (HandleList == NULL) {
-        return (NULL);
-      }
-
-      Status                               = gBS->LocateHandle (AllHandles, NULL, NULL, &Size, HandleList);
-      HandleList[Size/sizeof (EFI_HANDLE)] = NULL;
+  OriginalHandleList = NULL;
+  Status             = gBS->LocateHandleBuffer (
+                              (ProtocolGuid == NULL) ? AllHandles : ByProtocol,
+                              (EFI_GUID *)ProtocolGuid,
+                              NULL,
+                              &OriginalHandleCount,
+                              &OriginalHandleList
+                              );
+  if (EFI_ERROR (Status)) {
+    if (Status != EFI_NOT_FOUND) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: LocateHandleBuffer %a failed: %r\n",
+        __func__,
+        (ProtocolGuid == NULL) ? "AllHandles" : "ByProtocol",
+        Status
+        ));
     }
-  } else {
-    Status = gBS->LocateHandle (ByProtocol, (EFI_GUID *)ProtocolGuid, NULL, &Size, HandleList);
-    if (Status == EFI_BUFFER_TOO_SMALL) {
-      HandleList = AllocateZeroPool (Size + sizeof (EFI_HANDLE));
-      if (HandleList == NULL) {
-        return (NULL);
-      }
 
-      Status                               = gBS->LocateHandle (ByProtocol, (EFI_GUID *)ProtocolGuid, NULL, &Size, HandleList);
-      HandleList[Size/sizeof (EFI_HANDLE)] = NULL;
-    }
+    return NULL;
   }
 
-  if (EFI_ERROR (Status)) {
-    if (HandleList != NULL) {
-      FreePool (HandleList);
+  // create new list with one more slot for the NULL terminator
+  HandleList = ReallocatePool (
+                 OriginalHandleCount * sizeof (EFI_HANDLE),
+                 (OriginalHandleCount + 1) * sizeof (EFI_HANDLE),
+                 OriginalHandleList
+                 );
+  if (HandleList == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: reallocate failed\n", __func__));
+    if (OriginalHandleList != NULL) {
+      FreePool (OriginalHandleList);
     }
-
-    return (NULL);
   }
 
   return (HandleList);

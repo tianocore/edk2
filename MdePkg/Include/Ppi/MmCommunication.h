@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef MM_COMMUNICATION_PPI_H_
-#define MM_COMMUNICATION_PPI_H_
+#pragma once
 
 #define EFI_PEI_MM_COMMUNICATION_PPI_GUID \
   { \
@@ -67,5 +66,3 @@ struct _EFI_PEI_MM_COMMUNICATION_PPI {
 };
 
 extern EFI_GUID  gEfiPeiMmCommunicationPpiGuid;
-
-#endif

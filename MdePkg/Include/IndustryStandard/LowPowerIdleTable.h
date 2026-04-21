@@ -13,8 +13,7 @@
     - LPI - Low Power Idle
 **/
 
-#ifndef _LOW_POWER_IDLE_TABLE_H_
-#define _LOW_POWER_IDLE_TABLE_H_
+#pragma once
 
 #include <IndustryStandard/Acpi.h>
 
@@ -77,5 +76,3 @@ typedef struct {
 } ACPI_LPI_NATIVE_CSTATE_DESCRIPTOR;
 
 #pragma pack()
-
-#endif

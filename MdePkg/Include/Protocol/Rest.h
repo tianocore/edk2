@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __EFI_REST_PROTOCOL_H__
-#define __EFI_REST_PROTOCOL_H__
+#pragma once
 
 #include <Protocol/Http.h>
 
@@ -84,5 +83,3 @@ struct _EFI_REST_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiRestProtocolGuid;
-
-#endif

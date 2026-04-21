@@ -12,8 +12,7 @@
     - X64 or x64 - X64 Architecture
 **/
 
-#ifndef X64_NAMESPACE_OBJECTS_H_
-#define X64_NAMESPACE_OBJECTS_H_
+#pragma once
 
 #include <AcpiObjects.h>
 #include <StandardNameSpaceObjects.h>
@@ -348,4 +347,3 @@ typedef struct CmX64LocalApicX2ApicAffinityInfo {
 } CM_X64_LOCAL_APIC_X2APIC_AFFINITY_INFO;
 
 #pragma pack()
-#endif // X64_NAMESPACE_OBJECTS_H_

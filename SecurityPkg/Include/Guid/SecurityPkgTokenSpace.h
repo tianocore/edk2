@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SECURITYPKG_TOKEN_SPACE_GUID_H_
-#define _SECURITYPKG_TOKEN_SPACE_GUID_H_
+#pragma once
 
 #define SECURITYPKG_TOKEN_SPACE_GUID \
   { \
@@ -15,5 +14,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   }
 
 extern EFI_GUID  gEfiSecurityPkgTokenSpaceGuid;
-
-#endif

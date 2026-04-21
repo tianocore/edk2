@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PEI_PCD_SERVICE_H_
-#define _PEI_PCD_SERVICE_H_
+#pragma once
 
 #include <PiPei.h>
 #include <Ppi/ReadOnlyVariable2.h>
@@ -204,7 +203,7 @@ PeiPcdGet64 (
 
   @param[in]  TokenNumber The PCD token number.
 
-  @return The pointer to the buffer to be retrived.
+  @return The pointer to the buffer to be retrieved.
 
 **/
 VOID *
@@ -344,7 +343,7 @@ PeiPcdGet64Ex (
   @param[in]  Guid The token space for the token number.
   @param[in]  TokenNumber The PCD token number.
 
-  @return The pointer to the buffer to be retrived.
+  @return The pointer to the buffer to be retrieved.
 
 **/
 VOID *
@@ -1078,5 +1077,3 @@ SetPtrTypeSize (
   IN    OUT   UINTN             *CurrentSize,
   IN          PEI_PCD_DATABASE  *Database
   );
-
-#endif

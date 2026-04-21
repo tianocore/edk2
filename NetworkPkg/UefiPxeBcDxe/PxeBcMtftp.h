@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_PXEBC_MTFTP_H__
-#define __EFI_PXEBC_MTFTP_H__
+#pragma once
 
 #define PXE_MTFTP_OPTION_BLKSIZE_INDEX     0
 #define PXE_MTFTP_OPTION_TIMEOUT_INDEX     1
@@ -131,5 +130,3 @@ PxeBcTftpReadDirectory (
   IN OUT UINT64              *BufferSize,
   IN     BOOLEAN             DontUseBuffer
   );
-
-#endif

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __DXE_PCI_SEGMENT_LIB__
-#define __DXE_PCI_SEGMENT_LIB__
+#pragma once
 
 #include <Protocol/PciRootBridgeIo.h>
 
@@ -58,5 +57,3 @@ typedef struct {
 **/
 #define PCI_TO_PCI_ROOT_BRIDGE_IO_ADDRESS(A) \
   ((((UINT32)(A) << 4) & 0xff000000) | (((UINT32)(A) >> 4) & 0x00000700) | (((UINT32)(A) << 1) & 0x001f0000) | (LShiftU64((A) & 0xfff, 32)))
-
-#endif

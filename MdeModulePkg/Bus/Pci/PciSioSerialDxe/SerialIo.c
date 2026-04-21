@@ -462,7 +462,7 @@ SerialReceiveTransmit (
   @param SerialDevice  The device to flush.
 
   @retval  EFI_SUCCESS  The transmit FIFO is completely flushed.
-  @retval  EFI_TIMEOUT  A timeout occured waiting for the transmit FIFO to flush.
+  @retval  EFI_TIMEOUT  A timeout occurred waiting for the transmit FIFO to flush.
 **/
 EFI_STATUS
 SerialFlushTransmitFifo (

@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _FIRMWARE_PERFORMANCE_GUID_H_
-#define _FIRMWARE_PERFORMANCE_GUID_H_
+#pragma once
 
 #include <PiPei.h>
 #include <IndustryStandard/Acpi.h>
@@ -135,5 +134,3 @@ typedef struct {
 
 extern EFI_GUID  gEfiFirmwarePerformanceGuid;
 extern EFI_GUID  gFirmwarePerformanceS3PointerGuid;
-
-#endif

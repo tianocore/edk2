@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __EFI_HTTP_IMPL_H__
-#define __EFI_HTTP_IMPL_H__
+#pragma once
 
 #define HTTP_DEFAULT_PORT                      80
 #define HTTP_END_OF_HDR_STR                    "\r\n\r\n"
@@ -228,5 +227,3 @@ EfiHttpPoll (
   );
 
 extern EFI_HTTP_PROTOCOL  mEfiHttpTemplate;
-
-#endif

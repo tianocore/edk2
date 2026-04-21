@@ -15,8 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_MTFTP4_IMPL_H__
-#define __EFI_MTFTP4_IMPL_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -219,5 +218,3 @@ Mtftp4RrqStart (
 
 #define MTFTP4_PROTOCOL_FROM_THIS(a)  \
   CR (a, MTFTP4_PROTOCOL, Mtftp4, MTFTP4_PROTOCOL_SIGNATURE)
-
-#endif

@@ -68,8 +68,18 @@ MpInitLibGetNumberOfProcessors (
   OUT UINTN  *NumberOfEnabledProcessors OPTIONAL
   )
 {
-  *NumberOfProcessors        = 1;
-  *NumberOfEnabledProcessors = 1;
+  if ((NumberOfProcessors == NULL) && (NumberOfEnabledProcessors == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (NumberOfProcessors != NULL) {
+    *NumberOfProcessors = 1;
+  }
+
+  if (NumberOfEnabledProcessors != NULL) {
+    *NumberOfEnabledProcessors = 1;
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -79,7 +89,7 @@ MpInitLibGetNumberOfProcessors (
 
   @param[in]  ProcessorNumber       The handle number of processor.
                                     Lower 24 bits contains the actual processor number.
-                                    BIT24 indicates if the EXTENDED_PROCESSOR_INFORMATION will be retrived.
+                                    BIT24 indicates if the EXTENDED_PROCESSOR_INFORMATION will be retrieved.
   @param[out] ProcessorInfoBuffer   A pointer to the buffer where information for
                                     the requested processor is deposited.
   @param[out] HealthData            Return processor health data.

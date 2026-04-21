@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _FSP_SEC_PLATFORM_LIB_H_
-#define _FSP_SEC_PLATFORM_LIB_H_
+#pragma once
 
 /**
   This function performs platform level initialization.
@@ -112,8 +111,6 @@ FspMultiPhaseSiInitApiHandler (
 BOOLEAN
 EFIAPI
 FspMultiPhasePlatformGetNumberOfPhases (
-  IN     UINTN   ApiIdx,
+  IN     UINT32  ApiIdx,
   IN OUT UINT32  *NumberOfPhasesSupported
   );
-
-#endif

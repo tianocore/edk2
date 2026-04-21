@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EVENT_GROUP_GUID__
-#define __EVENT_GROUP_GUID__
+#pragma once
 
 #define EFI_EVENT_GROUP_EXIT_BOOT_SERVICES \
   { 0x27abf055, 0xb1b8, 0x4c26, { 0x80, 0x48, 0x74, 0x8f, 0x37, 0xba, 0xa2, 0xdf } }
@@ -48,5 +47,3 @@ extern EFI_GUID  gEfiEventDxeDispatchGuid;
   { 0x2ce967a, 0xdd7e, 0x4ffc, { 0x9e, 0xe7, 0x81, 0xc, 0xf0, 0x47, 0x8, 0x80 } }
 
 extern EFI_GUID  gEfiEndOfDxeEventGroupGuid;
-
-#endif

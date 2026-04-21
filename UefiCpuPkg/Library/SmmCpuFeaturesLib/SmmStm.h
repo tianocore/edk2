@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _SMM_STM_H_
-#define _SMM_STM_H_
+#pragma once
 
 #include <Protocol/SmMonitorInit.h>
 
@@ -85,7 +84,7 @@ LoadMonitor (
                        If 0, list must be terminated by END_OF_RESOURCES.
 
   @retval EFI_SUCCESS            If resources are added
-  @retval EFI_INVALID_PARAMETER  If nested procedure detected resource failer
+  @retval EFI_INVALID_PARAMETER  If nested procedure detected resource failure
   @retval EFI_OUT_OF_RESOURCES   If nested procedure returned it and we cannot allocate more areas.
 
 **/
@@ -106,7 +105,7 @@ AddPiResource (
                        If 0, list must be terminated by END_OF_RESOURCES.
 
   @retval EFI_SUCCESS            If resources are deleted
-  @retval EFI_INVALID_PARAMETER  If nested procedure detected resource failer
+  @retval EFI_INVALID_PARAMETER  If nested procedure detected resource failure
 
 **/
 EFI_STATUS
@@ -174,5 +173,3 @@ VOID
 EFIAPI
 SmmCpuFeaturesLibStmSmiEntryFixupAddress (
   );
-
-#endif

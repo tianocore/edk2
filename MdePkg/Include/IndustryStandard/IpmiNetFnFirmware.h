@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _IPMI_NET_FN_FIRMWARE_H_
-#define _IPMI_NET_FN_FIRMWARE_H_
+#pragma once
 
 //
 // Net function definition for Firmware command
@@ -34,5 +33,3 @@ typedef struct {
 // Current Execution Context responses
 //
 #define IPMI_BMC_IN_FORCED_UPDATE_MODE  0x11
-
-#endif

@@ -20,7 +20,6 @@
 [Sources]
   UniversalPayloadEntry.c
   LoadDxeCore.c
-  MemoryAllocation.c
   PrintHob.c
   AcpiTable.c
 [Sources.Ia32]
@@ -34,7 +33,6 @@
   X64/DxeLoadFunc.c
 [Sources.AARCH64]
   AArch64/DxeHandoff.c
-  AArch64/DxeLoadFuncFit.c
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
@@ -52,6 +50,7 @@
   HobPrintLib
   StackCheckLib
   UefiCpuBaseArchSupportLib
+  MemoryAllocationLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid

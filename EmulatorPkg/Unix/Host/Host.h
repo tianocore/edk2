@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SEC_MAIN_H__
-#define _SEC_MAIN_H__
+#pragma once
 
 //
 // Name mangle to prevent build errors. I.e conflicts between EFI and OS
@@ -66,7 +65,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define _Bool  char  // for clang debug
   #endif
 #else
-  #include <termio.h>
   #include <sys/vfs.h>
   #include <linux/fs.h>
 #endif
@@ -355,5 +353,3 @@ extern EMU_IO_THUNK_PROTOCOL  gPosixFileSystemThunkIo;
 extern EMU_IO_THUNK_PROTOCOL  gPthreadThunkIo;
 extern EMU_IO_THUNK_PROTOCOL  gBlockIoThunkIo;
 extern EMU_IO_THUNK_PROTOCOL  gSnpThunkIo;
-
-#endif

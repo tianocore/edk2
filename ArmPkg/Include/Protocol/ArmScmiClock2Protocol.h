@@ -9,8 +9,7 @@
     DEN0056A_System_Control_and_Management_Interface.pdf
 **/
 
-#ifndef ARM_SCMI_CLOCK2_PROTOCOL_H_
-#define ARM_SCMI_CLOCK2_PROTOCOL_H_
+#pragma once
 
 #include <Protocol/ArmScmi.h>
 #include <Protocol/ArmScmiClockProtocol.h>
@@ -187,5 +186,3 @@ typedef struct _SCMI_CLOCK2_PROTOCOL {
   UINTN                               Version; // For future expandability
   SCMI_CLOCK2_ENABLE                  Enable;
 } SCMI_CLOCK2_PROTOCOL;
-
-#endif /* ARM_SCMI_CLOCK2_PROTOCOL_H_ */

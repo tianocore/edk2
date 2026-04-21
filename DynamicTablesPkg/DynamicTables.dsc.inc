@@ -30,7 +30,7 @@
 [LibraryClasses.AARCH64]
   DynamicTablesScmiInfoLib|DynamicTablesPkg/Library/DynamicTablesScmiInfoLib/DynamicTablesScmiInfoLib.inf
 
-[Components.ARM, Components.AARCH64, Components.X64]
+[Components.ARM, Components.AARCH64, Components.X64, Components.RISCV64]
   #
   # Generators (Common)
   #
@@ -111,6 +111,8 @@
   # AML Fixup (Arm specific)
   DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtCmn600LibArm/SsdtCmn600LibArm.inf
 
+  DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtDmc620PmuLibArm/SsdtDmc620PmuLibArm.inf
+
   #
   # Dynamic Table Factory Dxe
   #
@@ -140,6 +142,7 @@
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtSerialPortLib/SsdtSerialPortLib.inf
       #  Arm specific
       NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtCmn600LibArm/SsdtCmn600LibArm.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiSsdtDmc620PmuLibArm/SsdtDmc620PmuLibArm.inf
 
       # AML Codegen
       #  Common
@@ -148,4 +151,38 @@
 
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType4Lib/SmbiosType4Lib.inf
       NULL|DynamicTablesPkg/Library/Smbios/SmbiosType7Lib/SmbiosType7Lib.inf
+  }
+
+[Components.RISCV64]
+  #
+  # Generators (RISC-V specific)
+  #
+  DynamicTablesPkg/Library/Acpi/RiscV/AcpiMadtLibRiscV/AcpiMadtLibRiscV.inf
+  DynamicTablesPkg/Library/Acpi/RiscV/AcpiRhctLibRiscV/AcpiRhctLibRiscV.inf
+  DynamicTablesPkg/Library/Acpi/RiscV/AcpiSsdtPlicAplicLib/AcpiSsdtPlicAplicLib.inf
+
+  #
+  # Dynamic Table Factory Dxe
+  #
+  DynamicTablesPkg/Drivers/DynamicTableFactoryDxe/DynamicTableFactoryDxe.inf {
+    <LibraryClasses>
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiDbg2Lib/AcpiDbg2Lib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiFadtLib/AcpiFadtLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiMcfgLib/AcpiMcfgLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiPcctLib/AcpiPcctLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiPpttLib/AcpiPpttLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiRawLib/AcpiRawLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSpcrLib/AcpiSpcrLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSratLib/AcpiSratLib.inf
+      #   RISC-V specific
+      NULL|DynamicTablesPkg/Library/Acpi/RiscV/AcpiMadtLibRiscV/AcpiMadtLibRiscV.inf
+      NULL|DynamicTablesPkg/Library/Acpi/RiscV/AcpiRhctLibRiscV/AcpiRhctLibRiscV.inf
+
+      # AML Fixup
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtSerialPortLib/SsdtSerialPortLib.inf
+
+      # AML Codegen
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib/SsdtCpuTopologyLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtPcieLib/SsdtPcieLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/RiscV/AcpiSsdtPlicAplicLib/AcpiSsdtPlicAplicLib.inf
   }

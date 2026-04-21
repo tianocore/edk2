@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SCSI_DISK_H_
-#define _SCSI_DISK_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -19,7 +18,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/EraseBlock.h>
 #include <Protocol/DriverBinding.h>
 #include <Protocol/ScsiPassThruExt.h>
-#include <Protocol/ScsiPassThru.h>
 #include <Protocol/DiskInfo.h>
 #include <Protocol/StorageSecurityCommand.h>
 
@@ -1592,5 +1590,3 @@ DetermineInstallStorageSecurity (
   IN  SCSI_DISK_DEV  *ScsiDiskDevice,
   IN  EFI_HANDLE     ChildHandle
   );
-
-#endif

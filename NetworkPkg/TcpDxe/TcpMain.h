@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _TCP_MAIN_H_
-#define _TCP_MAIN_H_
+#pragma once
 
 #include <Protocol/ServiceBinding.h>
 #include <Protocol/DriverBinding.h>
@@ -812,5 +811,3 @@ TcpGetIsn (
   IN UINT16      RemotePort,
   OUT TCP_SEQNO  *Isn
   );
-
-#endif

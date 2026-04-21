@@ -2,6 +2,7 @@
   MM IPL that load the MM Core into MMRAM at PEI stage
 
   Copyright (c) 2024 - 2025, Intel Corporation. All rights reserved.<BR>
+  Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -188,7 +189,7 @@ Communicate3 (
     //
     // Check if the HeaderGuid is valid
     //
-    if (CompareGuid (&CommunicateHeader->HeaderGuid, &gEfiMmCommunicateHeaderV3Guid)) {
+    if (CompareGuid (&CommunicateHeader->HeaderGuid, &gEfiMmCommunicateHeaderV3Guid) == FALSE) {
       DEBUG ((DEBUG_ERROR, "HeaderGuid is not valid!\n"));
       return EFI_INVALID_PARAMETER;
     }
@@ -467,9 +468,6 @@ CreateMmHobList (
                         MmProfileDataHob,
                         Block
                         );
-  if (PlatformHobSize != 0) {
-    FreePages (PlatformHobList, EFI_SIZE_TO_PAGES (PlatformHobSize));
-  }
 
   ASSERT (Status == RETURN_BUFFER_TOO_SMALL);
   ASSERT (FoundationHobSize != 0);
@@ -493,10 +491,12 @@ CreateMmHobList (
   CreateMmHobHandoffInfoTable (HobList, HobEnd);
 
   //
-  // Get platform HOBs
+  // Copy platform HOBs
   //
-  Status = CreateMmPlatformHob ((UINT8 *)HobList + PhitHobSize, &PlatformHobSize);
-  ASSERT_EFI_ERROR (Status);
+  if (PlatformHobSize != 0) {
+    CopyMem ((VOID *)((UINT8 *)HobList + PhitHobSize), PlatformHobList, PlatformHobSize);
+    FreePages (PlatformHobList, EFI_SIZE_TO_PAGES (PlatformHobSize));
+  }
 
   //
   // Get foundation HOBs
@@ -675,6 +675,7 @@ ExecuteMmCoreFromMmram (
   )
 {
   EFI_STATUS                      Status;
+  EFI_STATUS                      AccessStatus;
   UINTN                           PageCount;
   VOID                            *MmHobList;
   UINTN                           MmHobSize;
@@ -823,11 +824,10 @@ Done:
     // Close all MMRAM ranges, if MmAccess is available.
     //
     for (Index = 0; Index < MmramRangeCount; Index++) {
-      Status = MmAccess->Close ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), MmAccess, Index);
-      if (EFI_ERROR (Status)) {
-        DEBUG ((DEBUG_ERROR, "MM IPL failed to close MMRAM windows index %d - %r\n", Index, Status));
+      AccessStatus = MmAccess->Close ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), MmAccess, Index);
+      if (EFI_ERROR (AccessStatus)) {
+        DEBUG ((DEBUG_ERROR, "MM IPL failed to close MMRAM windows index %d - %r\n", Index, AccessStatus));
         ASSERT (FALSE);
-        return Status;
       }
 
       //
@@ -838,18 +838,17 @@ Done:
       //
       // Lock the MMRAM (Note: Locking MMRAM may not be supported on all platforms)
       //
-      Status = MmAccess->Lock ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), MmAccess, Index);
-      if (EFI_ERROR (Status)) {
+      AccessStatus = MmAccess->Lock ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), MmAccess, Index);
+      if (EFI_ERROR (AccessStatus) && (AccessStatus != EFI_UNSUPPORTED)) {
         //
         // Print error message that the MMRAM failed to lock...
         //
-        DEBUG ((DEBUG_ERROR, "MM IPL could not lock MMRAM (Index %d) after executing MM Core %r\n", Index, Status));
+        DEBUG ((DEBUG_ERROR, "MM IPL could not lock MMRAM (Index %d) after executing MM Core %r\n", Index, AccessStatus));
         ASSERT (FALSE);
-        return Status;
       }
 
       //
-      // Print debug message that the MMRAM window is now closed.
+      // Print debug message that the MMRAM window is now locked.
       //
       DEBUG ((DEBUG_INFO, "MM IPL locked MMRAM window index %d\n", Index));
     }

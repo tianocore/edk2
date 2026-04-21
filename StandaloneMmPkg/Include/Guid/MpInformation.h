@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef _MP_INFORMATION_H_
-#define _MP_INFORMATION_H_
+#pragma once
 
 #include <Protocol/MpService.h>
 #include <PiPei.h>
@@ -31,5 +30,3 @@ typedef struct {
 #pragma pack()
 
 extern EFI_GUID  gMpInformationHobGuid;
-
-#endif

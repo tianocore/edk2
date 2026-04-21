@@ -227,14 +227,13 @@ char *n;
 		p = n;
 
 	/* Copy new output directory into newname[] */
-	strcpy(newname, OutputDirectory);
-
-	/* if new output directory does not have trailing dir_sym, add it! */
-	if (newname[strlen(newname)-1] != *dir_sym)
-		strcat(newname, dir_sym);
-
-	/* contatenate FILE NAME ONLY to new output directory */
-	strcat(newname, p);
+	if (snprintf(newname, sizeof(newname), "%s%s%s",
+	             OutputDirectory,
+	             (OutputDirectory[strlen(OutputDirectory)-1] == *dir_sym ? "" : dir_sym),
+	             p) >= (int)sizeof(newname)) {
+		fprintf(stderr, "dlg: warning: output directory or filename is too long\n");
+		return n; /* Return original name if path is too long */
+	}
 
 	return newname;
 }

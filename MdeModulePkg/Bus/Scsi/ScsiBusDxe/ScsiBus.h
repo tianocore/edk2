@@ -6,12 +6,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SCSI_BUS_H_
-#define _SCSI_BUS_H_
+#pragma once
 
 #include <Uefi.h>
 
-#include <Protocol/ScsiPassThru.h>
 #include <Protocol/ScsiPassThruExt.h>
 #include <Protocol/ScsiIo.h>
 #include <Protocol/ComponentName.h>
@@ -71,8 +69,6 @@ typedef struct _EFI_SCSI_BUS_PROTOCOL {
 typedef struct _SCSI_BUS_DEVICE {
   UINTN                              Signature;
   EFI_SCSI_BUS_PROTOCOL              BusIdentify;
-  BOOLEAN                            ExtScsiSupport;
-  EFI_SCSI_PASS_THRU_PROTOCOL        *ScsiInterface;
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL    *ExtScsiInterface;
   EFI_DEVICE_PATH_PROTOCOL           *DevicePath;
 } SCSI_BUS_DEVICE;
@@ -84,8 +80,6 @@ typedef struct {
   EFI_HANDLE                         Handle;
   EFI_SCSI_IO_PROTOCOL               ScsiIo;
   EFI_DEVICE_PATH_PROTOCOL           *DevicePath;
-  BOOLEAN                            ExtScsiSupport;
-  EFI_SCSI_PASS_THRU_PROTOCOL        *ScsiPassThru;
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL    *ExtScsiPassThru;
   SCSI_BUS_DEVICE                    *ScsiBusDeviceData;
   SCSI_TARGET_ID                     Pun;
@@ -483,5 +477,3 @@ EFI_STATUS
 DiscoverScsiDevice (
   IN  OUT  SCSI_IO_DEV  *ScsiIoDevice
   );
-
-#endif

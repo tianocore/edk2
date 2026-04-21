@@ -11,10 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PI_UEFI_H__
-#define __PI_UEFI_H__
+#pragma once
 
 #include <Uefi/UefiBaseType.h>
 #include <Uefi/UefiSpec.h>
-
-#endif

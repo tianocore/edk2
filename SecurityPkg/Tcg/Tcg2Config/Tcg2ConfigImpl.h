@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __TCG2_CONFIG_IMPL_H__
-#define __TCG2_CONFIG_IMPL_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -67,8 +66,8 @@ typedef struct {
   UINT32                              PCRBanksDesired;
 } TCG2_CONFIG_PRIVATE_DATA;
 
-extern TCG2_CONFIG_PRIVATE_DATA  mTcg2ConfigPrivateDateTemplate;
-extern TCG2_CONFIG_PRIVATE_DATA  *mTcg2ConfigPrivateDate;
+extern TCG2_CONFIG_PRIVATE_DATA  mTcg2ConfigPrivateDataTemplate;
+extern TCG2_CONFIG_PRIVATE_DATA  *mTcg2ConfigPrivateData;
 #define TCG2_CONFIG_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('T', 'r', 'E', 'D')
 #define TCG2_CONFIG_PRIVATE_DATA_FROM_THIS(a)  CR (a, TCG2_CONFIG_PRIVATE_DATA, ConfigAccess, TCG2_CONFIG_PRIVATE_DATA_SIGNATURE)
 
@@ -194,5 +193,3 @@ Tcg2Callback (
   IN     EFI_IFR_TYPE_VALUE                *Value,
   OUT EFI_BROWSER_ACTION_REQUEST           *ActionRequest
   );
-
-#endif

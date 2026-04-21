@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef _VIRTIO_KEYBOARD_KEY_CODES_H_
-#define _VIRTIO_KEYBOARD_KEY_CODES_H_
+#pragma once
 
 /*
  * Event types
@@ -290,5 +289,3 @@
 #define KEY_MICMUTE  248                /* Mute / unmute the microphone */
 
 /* Code 255 is reserved for special needs of AT keyboard driver */
-
-#endif

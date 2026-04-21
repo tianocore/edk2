@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _LITERALS_H_
-#define _LITERALS_H_
+#pragma once
 
 // ASCII String literals which probably don't need translation
 extern CHAR8 const  ALit_TimerLibError[];
@@ -23,5 +22,3 @@ extern CHAR8 const  ALit_DB_SUPPORT[];
 extern CHAR8 const  ALit_DB_STOP[];
 extern CHAR8 const  ALit_BdsTO[];
 extern CHAR8 const  ALit_PEIM[];
-
-#endif // _LITERALS_H_

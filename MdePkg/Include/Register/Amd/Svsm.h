@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef SVSM_H_
-#define SVSM_H_
+#pragma once
 
 #include <Base.h>
 #include <Uefi.h>
@@ -122,5 +121,3 @@ typedef union {
 #define SVSM_VTPM_QUERY  0
 #define SVSM_VTPM_CMD    1
 /// @}
-
-#endif

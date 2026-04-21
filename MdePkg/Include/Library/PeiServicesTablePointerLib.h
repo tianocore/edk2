@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PEI_SERVICES_TABLE_POINTER_LIB_H__
-#define __PEI_SERVICES_TABLE_POINTER_LIB_H__
+#pragma once
 
 /**
   Retrieves the cached value of the PEI Services Table pointer.
@@ -64,5 +63,3 @@ EFIAPI
 MigratePeiServicesTablePointer (
   VOID
   );
-
-#endif

@@ -33,6 +33,7 @@
   DEFINE TPM2_ENABLE             = FALSE
   DEFINE TPM2_CONFIG_ENABLE      = FALSE
   DEFINE CAVIUM_ERRATUM_27456    = FALSE
+  DEFINE DEBUG_TO_MEM            = FALSE
 
   #
   # Network definition
@@ -57,7 +58,7 @@
 !include ArmVirtPkg/ArmVirt.dsc.inc
 
 [LibraryClasses.common]
-  ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
+  ArmLib|MdePkg/Library/ArmLib/ArmBaseLib.inf
   ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
   ArmTransferListLib|ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
 
@@ -114,7 +115,7 @@
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
   QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgMmioPeiLib.inf
 !if $(DEBUG_TO_MEM)
-  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogPeiLib.inf
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogPeiCoreLib.inf
 !else
   MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogLibNull.inf
 !endif
@@ -367,7 +368,10 @@
   ArmPkg/Drivers/CpuPei/CpuPei.inf
 
 !if $(DEBUG_TO_MEM)
-  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
+  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf {
+    <LibraryClasses>
+      MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogPeiLib.inf
+  }
 !endif
 
 !if $(TPM2_ENABLE) == TRUE
@@ -486,7 +490,6 @@
   OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
   OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
   OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
-  OvmfPkg/VirtioNetDxe/VirtioNet.inf
   OvmfPkg/VirtioRngDxe/VirtioRng.inf
   OvmfPkg/VirtioSerialDxe/VirtioSerial.inf {
     <PcdsFixedAtBuild>

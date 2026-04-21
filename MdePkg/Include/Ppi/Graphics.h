@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __PEI_GRAPHICS_PPI_H__
-#define __PEI_GRAPHICS_PPI_H__
+#pragma once
 
 #include <Protocol/GraphicsOutput.h>
 
@@ -75,5 +74,3 @@ struct _EFI_PEI_GRAPHICS_PPI {
 };
 
 extern EFI_GUID  gEfiPeiGraphicsPpiGuid;
-
-#endif

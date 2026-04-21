@@ -8,8 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __LOAD_PE32_IMAGE_H__
-#define __LOAD_PE32_IMAGE_H__
+#pragma once
 
 #define PE32_IMAGE_PROTOCOL_GUID  \
   {0x5cb5c776,0x60d5,0x45ee,{0x88,0x3c,0x45,0x27,0x8,0xcd,0x74,0x3f }}
@@ -92,5 +91,3 @@ struct _EFI_PE32_IMAGE_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiLoadPeImageProtocolGuid;
-
-#endif

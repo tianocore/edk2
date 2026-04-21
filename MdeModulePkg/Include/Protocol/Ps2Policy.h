@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PS2_POLICY_PROTOCOL_H_
-#define _PS2_POLICY_PROTOCOL_H_
+#pragma once
 
 #define EFI_PS2_POLICY_PROTOCOL_GUID \
   { \
@@ -30,5 +29,3 @@ typedef struct {
 } EFI_PS2_POLICY_PROTOCOL;
 
 extern EFI_GUID  gEfiPs2PolicyProtocolGuid;
-
-#endif

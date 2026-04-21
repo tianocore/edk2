@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef __DEFERRED_IMAGE_LOAD_H__
-#define __DEFERRED_IMAGE_LOAD_H__
+#pragma once
 
 ///
 /// Global ID for the Deferred Image Load Protocol
@@ -70,5 +69,3 @@ struct _EFI_DEFERRED_IMAGE_LOAD_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiDeferredImageLoadProtocolGuid;
-
-#endif

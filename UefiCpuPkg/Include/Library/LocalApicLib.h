@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __LOCAL_APIC_LIB_H__
-#define __LOCAL_APIC_LIB_H__
+#pragma once
 
 #define LOCAL_APIC_MODE_XAPIC   0x1  ///< xAPIC mode.
 #define LOCAL_APIC_MODE_X2APIC  0x2  ///< x2APIC mode.
@@ -305,7 +304,7 @@ GetApicTimerCurrentCount (
   @param DivideValue   The divide value for the DCR. It is one of 1,2,4,8,16,32,64,128.
                        If it is 0, then use the current divide value in the DCR.
   @param InitCount     The initial count value.
-  @param PeriodicMode  If TRUE, timer mode is peridoic. Othewise, timer mode is one-shot.
+  @param PeriodicMode  If TRUE, timer mode is periodic. Othewise, timer mode is one-shot.
   @param Vector        The timer interrupt vector number.
 **/
 VOID
@@ -321,7 +320,7 @@ InitializeApicTimer (
   Get the state of the local APIC timer.
 
   @param DivideValue   Return the divide value for the DCR. It is one of 1,2,4,8,16,32,64,128.
-  @param PeriodicMode  Return the timer mode. If TRUE, timer mode is peridoic. Othewise, timer mode is one-shot.
+  @param PeriodicMode  Return the timer mode. If TRUE, timer mode is periodic. Othewise, timer mode is one-shot.
   @param Vector        Return the timer interrupt vector number.
 **/
 VOID
@@ -468,5 +467,3 @@ GetProcessorLocation2ByApicId (
   OUT UINT32  *Core     OPTIONAL,
   OUT UINT32  *Thread   OPTIONAL
   );
-
-#endif

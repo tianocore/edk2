@@ -20,6 +20,7 @@ GCC_ASM_IMPORT (gApStackSize)
 GCC_ASM_IMPORT (gTcr)
 GCC_ASM_IMPORT (gTtbr0)
 GCC_ASM_IMPORT (gMair)
+GCC_ASM_IMPORT (ArmEnableVFP)
 
 GCC_ASM_EXPORT (ApEntryPoint)
 
@@ -30,11 +31,11 @@ GCC_ASM_EXPORT (ApEntryPoint)
 //   );
 ASM_PFX(ApEntryPoint):
   // Configure the MMU and caches
-  ldr x0, gTcr
+  LDR_LIT(x0, gTcr)
   bl ArmSetTCR
-  ldr x0, gTtbr0
+  LDR_LIT(x0, gTtbr0)
   bl ArmSetTTBR0
-  ldr x0, gMair
+  LDR_LIT(x0, gMair)
   bl ArmSetMAIR
   bl ArmDisableAlignmentCheck
   bl ArmEnableStackAlignmentCheck
@@ -46,7 +47,7 @@ ASM_PFX(ApEntryPoint):
   // Mask the non-affinity bits
   bic x0, x0, 0x00ff000000
   and x0, x0, 0xffffffffff
-  ldr x1, gProcessorIDs
+  LDR_LIT(x1, gProcessorIDs)
   mov x2, 0                   // x2 = processor index
 
 // Find index in gProcessorIDs for current processor
@@ -60,11 +61,12 @@ ASM_PFX(ApEntryPoint):
 
 // Calculate stack address
   // x2 contains the index for the current processor plus 1
-  ldr x0, gApStacksBase
-  ldr x1, gApStackSize
+  LDR_LIT(x0, gApStacksBase)
+  LDR_LIT(x1, gApStackSize)
   mul x3, x2, x1              // x3 = (ProcessorIndex + 1) * gApStackSize
   add sp, x0, x3              // sp = gApStacksBase + x3
   mov x29, xzr
+  bl ArmEnableVFP             // Do not trap SIMD instructions
   bl ApProcedure              // doesn't return
 
 ProcessorNotFound:

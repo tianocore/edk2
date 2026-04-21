@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef ARM_FFA_LIB_H_
-#define ARM_FFA_LIB_H_
+#pragma once
 
 #include <IndustryStandard/ArmFfaSvc.h>
 #include <IndustryStandard/ArmFfaBootInfo.h>
@@ -266,6 +265,52 @@ ArmFfaLibPartitionInfoGet (
   );
 
 /**
+  Get number of Partitions via registers.
+  This function is supported by aarch64 only.
+
+  @param [in]       ServiceGuid       Service guid.
+  @param [out]      PartDescCount     Return number of partition info related to
+                                      ServiceGuid.
+
+  @retval EFI_SUCCESS
+  @retval EFI_UNSUPPORTED
+  @retval EFI_INVALID_PARAMETER
+  @retval Other              Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibPartitionCountGetRegs (
+  IN  EFI_GUID  *ServiceGuid,
+  OUT UINT32    *PartDescCount
+  );
+
+/**
+  Get Partition info via registers.
+  This function is supported by aarch64 only.
+
+  @param [in]       ServiceGuid       Service guid.
+  @param [in, out]  PartDescCount     Return number of partition info related to
+                                      Service guid when PartDesc == NULL.
+                                      Otherwise return number of partition info
+                                      copied in ParcDesc
+  @param [out]      PartDesc          Partition information Buffer
+
+  @retval EFI_SUCCESS
+  @retval EFI_UNSUPPORTED
+  @retval EFI_INVALID_PARAMETER
+  @retval Other              Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibPartitionInfoGetRegs (
+  IN EFI_GUID                 *ServiceGuid,
+  IN OUT UINT32               *PartDescCount,
+  OUT EFI_FFA_PART_INFO_DESC  *PartDesc OPTIONAL
+  );
+
+/**
   Get partition or VM id.
   This function is only called in ArmFfaLibConstructor.
 
@@ -294,6 +339,26 @@ EFI_STATUS
 EFIAPI
 ArmFfaLibSpmIdGet (
   OUT UINT16  *SpmPartId
+  );
+
+/**
+  Invoked by an endpoint to yield control back to the component
+  that called it. This prevents long running transactions from
+  being caught up in the secure world. Endpoint will need to be
+  invoked with FFA_RUN after the specified timeout.
+
+  @param [in]   TimeoutUs    The timeout indicating the time in which
+                             the endpoint is required to be run in
+                             microseconds.
+
+  @return EFI_SUCCESS
+  @return Other              Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibYield (
+  IN  UINT64  TimeoutUs
   );
 
 /**
@@ -355,4 +420,26 @@ ArmFfaLibMsgSendDirectReq2 (
   IN  OUT DIRECT_MSG_ARGS  *ImpDefArgs
   );
 
-#endif // ARM_FFA_LIB_H_
+/**
+  Helper to retrieve the first partition information associated with
+  a service GUID via registers.
+
+  @param [in]       ServiceGuid       Service guid.
+  @param [in, out]  PartDescCount     Return number of partition info related to
+                                      Service guid when PartDesc == NULL.
+                                      Otherwise return number of partition info
+                                      copied in ParcDesc
+  @param [out]      PartDesc          Partition information Buffer
+
+  @retval EFI_SUCCESS
+  @retval EFI_UNSUPPORTED
+  @retval EFI_INVALID_PARAMETER
+  @retval Other                       Error
+
+**/
+EFI_STATUS
+EFIAPI
+ArmFfaLibGetPartitionInfo (
+  IN EFI_GUID                 *ServiceGuid,
+  OUT EFI_FFA_PART_INFO_DESC  *PartDesc
+  );

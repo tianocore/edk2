@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SEC_HOB_DATA_PPI_H__
-#define __SEC_HOB_DATA_PPI_H__
+#pragma once
 
 #include <Pi/PiHob.h>
 
@@ -55,5 +54,3 @@ struct _EFI_SEC_HOB_DATA_PPI {
 };
 
 extern EFI_GUID  gEfiSecHobDataPpiGuid;
-
-#endif

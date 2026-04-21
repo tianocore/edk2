@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __GOP_H_
-#define __GOP_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -176,5 +175,3 @@ GopPrivateBreakCallbackFunction (
   IN VOID          *Context,
   IN EFI_KEY_DATA  *KeyData
   );
-
-#endif

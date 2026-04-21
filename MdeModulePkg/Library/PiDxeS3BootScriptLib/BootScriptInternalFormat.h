@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _BOOT_SCRIPT_INTERNAL_FORMAT_H_
-#define _BOOT_SCRIPT_INTERNAL_FORMAT_H_
+#pragma once
 
 #pragma pack(1)
 
@@ -176,5 +175,3 @@ typedef struct {
 #define BOOT_SCRIPT_NODE_MAX_LENGTH  1024
 
 #define BOOT_SCRIPT_TABLE_VERSION  0x0001
-
-#endif

@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _EDKII_ATA_PASS_THRU_PPI_H_
-#define _EDKII_ATA_PASS_THRU_PPI_H_
+#pragma once
 
 #include <Protocol/DevicePath.h>
 #include <Protocol/AtaPassThru.h>
@@ -212,5 +211,3 @@ struct _EDKII_PEI_ATA_PASS_THRU_PPI {
 };
 
 extern EFI_GUID  gEdkiiPeiAtaPassThruPpiGuid;
-
-#endif

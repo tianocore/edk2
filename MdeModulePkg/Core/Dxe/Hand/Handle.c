@@ -521,12 +521,6 @@ CoreInstallProtocolInterfaceNotify (
     InitializeListHead (&Handle->Protocols);
 
     //
-    // Initialize the Key to show that the handle has been created/modified
-    //
-    gHandleDatabaseKey++;
-    Handle->Key = gHandleDatabaseKey;
-
-    //
     // Add this handle to the list global list of all handles
     // in the system
     //
@@ -538,6 +532,12 @@ CoreInstallProtocolInterfaceNotify (
       goto Done;
     }
   }
+
+  //
+  // Initialize/update the Key to show that the handle has been created/modified
+  //
+  gHandleDatabaseKey++;
+  Handle->Key = gHandleDatabaseKey;
 
   //
   // Each interface that is added must be unique
@@ -1287,7 +1287,7 @@ Done:
     // Keep Interface unmodified in case of any Error
     // except EFI_ALREADY_STARTED and EFI_UNSUPPORTED.
     //
-    if (!EFI_ERROR (Status) || (Status == EFI_ALREADY_STARTED)) {
+    if ((!EFI_ERROR (Status) || (Status == EFI_ALREADY_STARTED)) && (Prot != NULL)) {
       //
       // According to above logic, if 'Prot' is NULL, then the 'Status' must be
       // EFI_UNSUPPORTED. Here the 'Status' is not EFI_UNSUPPORTED, so 'Prot'

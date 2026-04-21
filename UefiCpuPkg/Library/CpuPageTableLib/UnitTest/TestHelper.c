@@ -296,7 +296,7 @@ GetEntryFromPageTable (
 }
 
 /**
-  Get max physical adrress supported by specific page mode
+  Get max physical address supported by specific page mode
 
   @param[in]  Mode           The paging mode.
 

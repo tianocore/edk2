@@ -17,12 +17,8 @@
 
   DEFINE DEBUG_PRINT_ERROR_LEVEL = 0x8000004F
 
-# Dynamic stack cookies pushes the FD size up slightly over 2MB
-!if $(TARGET) != NOOPT
-  DEFINE FD_SIZE_IN_MB    = 2
-!else
-  DEFINE FD_SIZE_IN_MB    = 3
-!endif
+# Various builds now exceed 2MB so choose 3MB as the default.
+DEFINE FD_SIZE_IN_MB    = 3
 
 !if $(FD_SIZE_IN_MB) == 2
   DEFINE FD_SIZE          = 0x200000
@@ -34,10 +30,14 @@
 !endif
 
 [BuildOptions.common.EDKII.DXE_CORE,BuildOptions.common.EDKII.DXE_DRIVER,BuildOptions.common.EDKII.UEFI_DRIVER,BuildOptions.common.EDKII.UEFI_APPLICATION]
-  GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
+  GCC:*_GCC_*_DLINK_FLAGS = -z common-page-size=0x1000
+  GCC:*_CLANGDWARF_*_DLINK_FLAGS = -z common-page-size=0x1000
+  CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:0x1000
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
-  GCC:*_*_AARCH64_DLINK_FLAGS = -z common-page-size=0x10000
+  GCC:*_GCC_*_DLINK_FLAGS = -z common-page-size=0x10000
+  GCC:*_CLANGDWARF_*_DLINK_FLAGS = -z common-page-size=0x10000
+  CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:0x10000
 
 [LibraryClasses.common]
 !if $(TARGET) == RELEASE

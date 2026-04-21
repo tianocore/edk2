@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __MM_REPORT_STATUS_CODE_HANDLER_PROTOCOL_H__
-#define __MM_REPORT_STATUS_CODE_HANDLER_PROTOCOL_H__
+#pragma once
 
 #define EFI_MM_RSC_HANDLER_PROTOCOL_GUID \
   { \
@@ -74,5 +73,3 @@ typedef struct _EFI_MM_RSC_HANDLER_PROTOCOL {
 } EFI_MM_RSC_HANDLER_PROTOCOL;
 
 extern EFI_GUID  gEfiMmRscHandlerProtocolGuid;
-
-#endif

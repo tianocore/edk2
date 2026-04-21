@@ -128,7 +128,6 @@ X509ConstructCertificateStackV (
 {
   UINT8             *Cert;
   UINTN             CertSize;
-  INT32             Index;
   INT32             Ret;
   mbedtls_x509_crt  *Crt;
 
@@ -148,7 +147,7 @@ X509ConstructCertificateStackV (
     *X509Stack = (UINT8 *)Crt;
   }
 
-  for (Index = 0; ; Index++) {
+  while (TRUE) {
     //
     // If Cert is NULL, then it is the end of the list.
     //

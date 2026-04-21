@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef CLOUDHV_VIRT_MEM_INFO_LIB_H_
-#define CLOUDHV_VIRT_MEM_INFO_LIB_H_
+#pragma once
 
 //
 // Cloud Hypervisor may have more than one memory nodes. Even there is no limit for that,
@@ -38,5 +37,3 @@ typedef struct {
 //
 #define TOP_32BIT_DEVICE_BASE  0xFC000000
 #define TOP_32BIT_DEVICE_SIZE  0x04000000
-
-#endif // CLOUDHV_VIRT_MEM_INFO_LIB_H_

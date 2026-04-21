@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _SEC_CORE_H_
-#define _SEC_CORE_H_
+#pragma once
 
 #include <PiPei.h>
 #include <Ppi/TemporaryRamSupport.h>
@@ -38,7 +37,7 @@ typedef struct _SEC_IDT_TABLE {
   // EFI_PEI_SERVICES**
   //
   UINT64                      PeiService;
-  IA32_IDT_GATE_DESCRIPTOR    IdtTable[FixedPcdGet8 (PcdFspMaxInterruptSupported)];
+  IA32_IDT_GATE_DESCRIPTOR    IdtTable[FixedPcdGet8 (PcdFspMaxInterruptSupported) + 1];
 } SEC_IDT_TABLE;
 
 /**
@@ -122,5 +121,3 @@ EFIAPI
 AsmReadStackPointer (
   VOID
   );
-
-#endif

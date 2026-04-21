@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_HTTP_BOOT_DXE_H__
-#define __EFI_HTTP_BOOT_DXE_H__
+#pragma once
 
 #include <Uefi.h>
 
@@ -60,6 +59,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #include <Protocol/LoadFile.h>
 #include <Protocol/HttpBootCallback.h>
+#include <Protocol/HttpCallback.h>
 
 //
 // Consumed Guids
@@ -140,6 +140,14 @@ struct _HTTP_BOOT_VIRTUAL_NIC {
     HTTP_BOOT_PRIVATE_DATA_SIGNATURE \
     )
 
+#define HTTP_BOOT_PRIVATE_DATA_FROM_HTTP_CALLBACK_PROTOCOL(HttpCallbackProtocol) \
+    CR ( \
+    HttpCallbackProtocol, \
+    HTTP_BOOT_PRIVATE_DATA, \
+    HttpCallback, \
+    HTTP_BOOT_PRIVATE_DATA_SIGNATURE \
+    )
+
 struct _HTTP_BOOT_PRIVATE_DATA {
   UINT32                                       Signature;
   EFI_HANDLE                                   Controller;
@@ -175,6 +183,7 @@ struct _HTTP_BOOT_PRIVATE_DATA {
   UINT32                                       Id;
   EFI_HTTP_BOOT_CALLBACK_PROTOCOL              *HttpBootCallback;
   EFI_HTTP_BOOT_CALLBACK_PROTOCOL              LoadFileCallback;
+  EDKII_HTTP_CALLBACK_PROTOCOL                 HttpCallback;
 
   //
   // Data for the default HTTP Boot callback protocol
@@ -535,5 +544,3 @@ HttpBootIp6DxeDriverBindingStop (
   IN UINTN                        NumberOfChildren,
   IN EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
   );
-
-#endif

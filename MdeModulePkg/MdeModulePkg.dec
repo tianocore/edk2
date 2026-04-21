@@ -3,13 +3,13 @@
 # It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
 # and libraries instances, which are used for those modules.
 #
-# Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
+# Copyright (c) 2019 - 2026, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
 # Copyright (c) 2007 - 2024, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 # (C) Copyright 2016 - 2019 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.<BR>
-# Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (C) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
 # Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -1211,6 +1211,22 @@
   # @Prompt FFA TX/RX Buffer Page Count
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaTxRxPageCount|1|UINT64|0x30001062
 
+  ## Some platforms require that all EfiLoadOptions are retried until one of the options
+  # boots. When True, this Pcd will force Bds to retry all the valid EfiLoadOptions
+  # indefinitely until one of the options boots.
+  #   TRUE  - Efi boot options will be retried indefinitely.
+  #   FALSE - Efi boot options will not be retried.
+  # @Prompt Enable infinite retries during BDS.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportInfiniteBootRetries|FALSE|BOOLEAN|0x40000152
+
+  ## The value of USB network periodic timer for asynchronous transfers.
+  #  The polling interval must be between 1 and 255 (milliseconds).
+  #  A value of 0 is invalid and will cause EFI_INVALID_PARAMETER to be returned.
+  #  Default value is 16ms, to be consistent with the previous hardcoded value.
+  # @Prompt USB Network periodic timer interval for asynchronous transfers in ms.
+  # @ValidRange 0x80000001 | 1 - 255
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUsbNetworkPeriodicTimerInterval|16|UINT8|0x30001063
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicates the maximum number of callback function
@@ -1748,6 +1764,11 @@
   # @Prompt Maximum number of delayed dispatch entries. Default value is 8.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDelayedDispatchMaxEntries|8|UINT32|0x00000037
 
+  ## Indicate the default timeout value for SATA device to be ready for operations in seconds.
+  #
+  # @Prompt SATA device ready for operations timoeout (s), default value is 16s.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSataDeviceReadyTimeout|16|UINT8|0x00000038
+
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.
   #  This PCD could be set to 0 then console output would be at max column and max row.
@@ -2046,8 +2067,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport|TRUE|BOOLEAN|0x10000045
 
   ## Indicates if the Multi Root I/O virtualization is supported.<BR><BR>
-  #   TRUE  - Multi Root I/O virtualization is supported.<BR>
-  #   FALSE - Multi Root I/O virtualization is not supported.<BR>
+  #   NOTE: MR-IOV is deprecated in PCIe 6.0 specification and PcdMrIovSupport shall not be used.
   # @Prompt Enable MRIOV support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport|FALSE|BOOLEAN|0x10000046
 
@@ -2302,6 +2322,30 @@
   #  If PcdFfaLibConduitSvc == FALSE, conduit = SVC
   # @Prompt Conduit to use in ArmFfaLib.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFfaLibConduitSmc|TRUE|BOOLEAN|0x10000029
+
+  ## Defines platform limit for BAR size that can be accepted in Resizable BAR Capability.
+  #  BAR Capability bits specify size in MB, thus this PCD value shall be extended with +20 bits.
+  # 0           2^(0+20) = 1 MB
+  # 1           2^(1+20) = 2 MB
+  # ...
+  # 42          2^(42+20) = 4 EB
+  # 43          2^(43+20) = 8 EB
+  # @Prompt Max size to accept in PCIe Resizable BAR Capability register.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarMaxSize|43|UINT8|0x10000030
+
+  ## PCIe Configuration Request Retry Status (CRS) retry interval in microseconds.
+  #  When a PCIe device returns CRS during enumeration, the PCI bus driver will wait
+  #  this interval before retrying. Default is 10000us (10ms) to match Linux kernel.
+  #  If set to 0, CRS retry is disabled regardless of PcdPciCrsTimeoutSeconds.
+  # @Prompt PCI CRS retry interval in microseconds.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciCrsRetryIntervalUs|10000|UINT32|0x1000002A
+
+  ## PCIe Configuration Request Retry Status (CRS) timeout in seconds.
+  #  Maximum time to wait for a device returning CRS to become ready.
+  #  When set to 0 (default), devices returning CRS are skipped during enumeration.
+  #  Platforms requiring CRS retry support should set a non-zero value.
+  # @Prompt PCI CRS timeout in seconds.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciCrsTimeoutSeconds|0|UINT32|0x1000002B
 
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when

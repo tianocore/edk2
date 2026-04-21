@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __CUSTOMIZED_DISPLAY_LIB_H__
-#define __CUSTOMIZED_DISPLAY_LIB_H__
+#pragma once
 
 #include <Protocol/DisplayProtocol.h>
 
@@ -32,7 +31,7 @@ Statement
 **/
 
 /**
-  This funtion defines Page Frame and Backgroud.
+  This function defines Page Frame and Backgroud.
 
   Based on the above layout, it will be responsible for HeaderHeight, FooterHeight,
   StatusBarHeight and Backgroud. And, it will reserve Screen for Statement.
@@ -347,5 +346,3 @@ EFIAPI
 GetSubTitleTextColor (
   VOID
   );
-
-#endif

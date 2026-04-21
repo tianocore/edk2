@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _SHELLPKG_SHELL_ENV2_EXT_GUID_H_
-#define _SHELLPKG_SHELL_ENV2_EXT_GUID_H_
+#pragma once
 
 #define SHELLPKG_SHELL_ENV2_EXT_GUID \
 { \
@@ -15,5 +14,3 @@
 }
 
 extern EFI_GUID  gEfiShellEnvironment2ExtGuid;
-
-#endif

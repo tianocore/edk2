@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _SEC_FSP_H_
-#define _SEC_FSP_H_
+#pragma once
 
 #include <PiPei.h>
 #include <FspEas.h>
@@ -88,5 +87,3 @@ EFIAPI
 AsmGetFspInfoHeader (
   VOID
   );
-
-#endif

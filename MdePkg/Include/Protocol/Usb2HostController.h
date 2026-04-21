@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _USB2_HOSTCONTROLLER_H_
-#define _USB2_HOSTCONTROLLER_H_
+#pragma once
 
 #include <Protocol/UsbIo.h>
 
@@ -653,5 +652,3 @@ struct _EFI_USB2_HC_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiUsb2HcProtocolGuid;
-
-#endif

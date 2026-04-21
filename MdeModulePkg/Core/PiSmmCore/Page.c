@@ -165,7 +165,11 @@ CoreFreeMemoryMapStack (
     // Deque an memory map entry from mFreeMemoryMapEntryList
     //
     Entry = AllocateMemoryMapEntry ();
-    ASSERT (Entry);
+    if (Entry == NULL) {
+      ASSERT (Entry);
+      mFreeMapStack -= 1;
+      return;
+    }
 
     //
     // Update to proper entry
@@ -283,7 +287,7 @@ ConvertSmmMemoryMapEntry (
     //
     // ---------------------------------------------------
     // |  +----------+   +------+   +------+   +------+  |
-    // ---|gMemoryMep|---|Entry1|---|Entry2|---|Entry3|---
+    // ---|gMemoryMap|---|Entry1|---|Entry2|---|Entry3|---
     //    +----------+ ^ +------+   +------+   +------+
     //                 |
     //              +------+
@@ -313,7 +317,7 @@ ConvertSmmMemoryMapEntry (
           //
           // ---------------------------------------------------
           // |  +----------+   +------+   +------+   +------+  |
-          // ---|gMemoryMep|---|Entry1|---|EntryX|---|Entry3|---
+          // ---|gMemoryMap|---|Entry1|---|EntryX|---|Entry3|---
           //    +----------+   +------+ ^ +------+   +------+
           //                            |
           //                         +------+
@@ -334,7 +338,7 @@ ConvertSmmMemoryMapEntry (
           //
           // ---------------------------------------------------
           // |  +----------+   +------+   +------+   +------+  |
-          // ---|gMemoryMep|---|Entry1|---|EntryX|---|Entry3|---
+          // ---|gMemoryMap|---|Entry1|---|EntryX|---|Entry3|---
           //    +----------+   +------+   +------+ ^ +------+
           //                                       |
           //                                    +------+
@@ -367,7 +371,7 @@ ConvertSmmMemoryMapEntry (
           //
           // ---------------------------------------------------
           // |  +----------+   +------+   +-----------------+  |
-          // ---|gMemoryMep|---|Entry1|---|EntryX     Entry3|---
+          // ---|gMemoryMap|---|Entry1|---|EntryX     Entry3|---
           //    +----------+   +------+   +-----------------+
           //
           if ((Entry->Type == NextEntry->Type) && (Entry->End + 1 == NextEntry->Start)) {
@@ -382,7 +386,7 @@ ConvertSmmMemoryMapEntry (
           //
           // ---------------------------------------------------
           // |  +----------+   +-----------------+   +------+  |
-          // ---|gMemoryMep|---|Entry1     EntryX|---|Entry3|---
+          // ---|gMemoryMap|---|Entry1     EntryX|---|Entry3|---
           //    +----------+   +-----------------+   +------+
           //
           if ((PreviousEntry->Type == Entry->Type) && (PreviousEntry->End + 1 == Entry->Start)) {
@@ -399,7 +403,7 @@ ConvertSmmMemoryMapEntry (
   //
   // ---------------------------------------------------
   // |  +----------+   +------+   +------+   +------+  |
-  // ---|gMemoryMep|---|Entry1|---|Entry2|---|Entry3|---
+  // ---|gMemoryMap|---|Entry1|---|Entry2|---|Entry3|---
   //    +----------+   +------+   +------+   +------+ ^
   //                                                  |
   //                                               +------+

@@ -1,7 +1,7 @@
 /** @file
   SPI NOR Flash operation functions.
 
-  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
+  Copyright (C) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -19,6 +19,8 @@
 
 /**
   Fill Write Buffer with Opcode, Address, Dummy Bytes, and Data.
+
+  If WriteBytes is non-zero, WriteBuffer must be a valid buffer.
 
   @param[in]    Instance               The instance of SPI_NOR_FLASH
   @param[in]    Opcode                 Opcode for transaction
@@ -432,7 +434,7 @@ GetFlashId (
   SPI_NOR_FLASH_INSTANCE  *Instance;
   UINT32                  TransactionBufferLength;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry\n", __func__));
+  DEBUG ((DEBUG_VERBOSE, "%a: Entry\n", __func__));
 
   if (Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -508,7 +510,7 @@ LfReadData (
   UINT32                  TransactionBufferLength;
   UINT32                  MaximumTransferBytes;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry\n", __func__));
+  DEBUG ((DEBUG_VERBOSE, "%a: Entry\n", __func__));
 
   Status = EFI_DEVICE_ERROR;
   if ((Buffer == NULL) ||
@@ -606,7 +608,7 @@ ReadData (
   UINT8                   FastReadWaitStateDummyClocks;
   UINT8                   FastReadModeClock;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry, Read address = 0x%08x, Length = 0x%08x\n", __func__, FlashAddress, LengthInBytes));
+  DEBUG ((DEBUG_VERBOSE, "%a: Entry, Read address = 0x%08x, Length = 0x%08x\n", __func__, FlashAddress, LengthInBytes));
 
   Status = EFI_DEVICE_ERROR;
   if ((Buffer == NULL) ||
@@ -852,7 +854,7 @@ WriteData (
   UINT32                  MaximumTransferBytes;
   UINT32                  SpiFlashPageSize;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry: Write address = 0x%08x, Length = 0x%08x\n", __func__, FlashAddress, LengthInBytes));
+  DEBUG ((DEBUG_VERBOSE, "%a: Entry: Write address = 0x%08x, Length = 0x%08x\n", __func__, FlashAddress, LengthInBytes));
 
   Status = EFI_DEVICE_ERROR;
   if ((Buffer == NULL) ||
@@ -1001,7 +1003,7 @@ Erase (
   UINT64                     MaximumEraseTimeout;
   SFDP_SECTOR_REGION_RECORD  *FlashRegion;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry: Erase address = 0x%08x, Block count = 0x%x\n", __func__, FlashAddress, BlockCount));
+  DEBUG ((DEBUG_VERBOSE, "%a: Entry: Erase address = 0x%08x, Block count = 0x%x\n", __func__, FlashAddress, BlockCount));
 
   Status   = EFI_DEVICE_ERROR;
   Instance = SPI_NOR_FLASH_FROM_THIS (This);

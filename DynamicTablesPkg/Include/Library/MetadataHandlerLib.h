@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef METADATA_HANDLER_LIB_H_
-#define METADATA_HANDLER_LIB_H_
+#pragma once
 
 #include <Library/MetadataObjLib.h>
 
@@ -53,5 +52,3 @@ EFIAPI
 MetadataHandlerValidate (
   IN  METADATA_ROOT_HANDLE  Root
   );
-
-#endif // METADATA_HANDLER_LIB_H_

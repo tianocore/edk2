@@ -10,6 +10,7 @@
 
 #include <Base.h>                   // BIT13
 
+#include <IndustryStandard/Xen/sched.h>
 #include <Library/BaseLib.h>        // CpuDeadLoop()
 #include <Library/DebugLib.h>       // ASSERT()
 #include <Library/IoLib.h>          // IoOr16()
@@ -53,7 +54,7 @@ ResetShutdown (
       XEN_SCHED_SHUTDOWN  ShutdownOp = {
         .Reason = XEN_SHED_SHUTDOWN_POWEROFF,
       };
-      ReturnCode = XenHypercallSchedOp (XEN_SCHEDOP_SHUTDOWN, ShutdownOp);
+      ReturnCode = XenHypercallSchedOp (XEN_SCHEDOP_SHUTDOWN, &ShutdownOp);
       ASSERT (ReturnCode == 0);
       CpuDeadLoop ();
     }

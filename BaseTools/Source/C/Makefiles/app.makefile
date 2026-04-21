@@ -16,7 +16,7 @@ all: $(MAKEROOT)/bin $(APPLICATION)
 
 $(APPLICATION): $(OBJECTS)
 	$(LINKER) -o $(APPLICATION) $(LDFLAGS) $(OBJECTS) -L$(MAKEROOT)/libs $(LIBS)
-ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+ifeq (Windows, $(findstring Windows,$(OS)))
 	$(CP) $(APPLICATION).exe $(BIN_PATH)
 endif
 
@@ -25,7 +25,7 @@ $(OBJECTS): $(MAKEROOT)/Include/Common/BuildVersion.h
 clean: appClean
 
 appClean:
-ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+ifeq (Windows, $(findstring Windows,$(OS)))
 	$(RM) $(BIN_PATH)/$(APPNAME).exe
 endif
 

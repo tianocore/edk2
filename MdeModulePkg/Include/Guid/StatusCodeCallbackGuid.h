@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __STATUS_CODE_CALLBACK_H__
-#define __STATUS_CODE_CALLBACK_H__
+#pragma once
 
 #define STATUS_CODE_CALLBACK_GUID \
   { \
@@ -16,5 +15,3 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   }
 
 extern EFI_GUID  gStatusCodeCallbackGuid;
-
-#endif

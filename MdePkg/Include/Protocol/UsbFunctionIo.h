@@ -19,8 +19,7 @@
 
 **/
 
-#ifndef __USB_FUNCTION_IO_H__
-#define __USB_FUNCTION_IO_H__
+#pragma once
 
 #include <Protocol/UsbIo.h>
 
@@ -679,5 +678,3 @@ struct _EFI_USBFN_IO_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiUsbFunctionIoProtocolGuid;
-
-#endif

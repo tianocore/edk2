@@ -12,8 +12,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef QEMU_CPUHP_H_
-#define QEMU_CPUHP_H_
+#pragma once
 
 #include <Protocol/MmCpuIo.h>  // EFI_MM_CPU_IO_PROTOCOL
 #include <Uefi/UefiBaseType.h> // EFI_STATUS
@@ -64,5 +63,3 @@ QemuCpuhpCollectApicIds (
   OUT UINT32                        *ToUnplugSelectors,
   OUT UINT32                        *ToUnplugCount
   );
-
-#endif // QEMU_CPUHP_H_

@@ -19,8 +19,7 @@
   PI Version 1.2 Vol 3.
 **/
 
-#ifndef __PI_PCD_H__
-#define __PI_PCD_H__
+#pragma once
 
 extern EFI_GUID  gEfiPcdProtocolGuid;
 
@@ -414,5 +413,3 @@ typedef struct _EFI_PCD_PROTOCOL {
   EFI_PCD_PROTOCOL_GET_NEXT_TOKEN          GetNextToken;
   EFI_PCD_PROTOCOL_GET_NEXT_TOKEN_SPACE    GetNextTokenSpace;
 } EFI_PCD_PROTOCOL;
-
-#endif

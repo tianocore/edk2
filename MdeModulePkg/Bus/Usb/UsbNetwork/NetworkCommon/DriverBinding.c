@@ -2,6 +2,7 @@
   This file contains code for USB network binding driver
 
   Copyright (c) 2023, American Megatrends International LLC. All rights reserved.<BR>
+  Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -358,7 +359,12 @@ NetworkCommonDriverStart (
 
   ZeroMem (&NicDevice->NicInfo.Request, sizeof (EFI_USB_DEVICE_REQUEST));
 
-  Status = UsbEth->UsbEthInterrupt (UsbEth, TRUE, NETWORK_COMMON_POLLING_INTERVAL, &NicDevice->NicInfo.Request);
+  STATIC_ASSERT (
+    FixedPcdGet8 (PcdUsbNetworkPeriodicTimerInterval) >= 1,
+    "The polling interval must be between 1 and 255 (milliseconds)."
+    );
+
+  Status = UsbEth->UsbEthInterrupt (UsbEth, TRUE, (UINTN)PcdGet8 (PcdUsbNetworkPeriodicTimerInterval), &NicDevice->NicInfo.Request);
   ASSERT_EFI_ERROR (Status);
 
   Status = gBS->InstallMultipleProtocolInterfaces (

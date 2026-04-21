@@ -23,8 +23,7 @@
 
 **/
 
-#ifndef __S3_SMM_SAVE_STATE_H__
-#define __S3_SMM_SAVE_STATE_H__
+#pragma once
 
 #include <Protocol/S3SaveState.h>
 
@@ -34,5 +33,3 @@
 typedef EFI_S3_SAVE_STATE_PROTOCOL EFI_S3_SMM_SAVE_STATE_PROTOCOL;
 
 extern EFI_GUID  gEfiS3SmmSaveStateProtocolGuid;
-
-#endif // __S3_SMM_SAVE_STATE_H__

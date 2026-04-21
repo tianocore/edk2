@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _SMBIOS_DXE_H_
-#define _SMBIOS_DXE_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -186,5 +185,3 @@ typedef struct {
   EFI_GUID                 *Guid;
   IS_SMBIOS_TABLE_VALID    IsValid;
 } IS_SMBIOS_TABLE_VALID_ENTRY;
-
-#endif

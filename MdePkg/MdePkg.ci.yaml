@@ -73,6 +73,7 @@
             "Include/IndustryStandard/Tpm20.h",
             "Include/IndustryStandard/IoRemappingTable.h",
             "Include/IndustryStandard/UefiTcgPlatform.h",
+            "Include/Library/FdtLib.h",
             "Include/Library/PcdLib.h",
             "Include/Library/SafeIntLib.h",
             "Include/Protocol/DebugSupport.h",
@@ -110,14 +111,11 @@
         "AcceptableDependencies-HOST_APPLICATION":[
             "UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec"
         ],
-        # For UEFI shell based apps
-        "AcceptableDependencies-UEFI_APPLICATION":[],
         "IgnoreInf": []
     },
 
     ## options defined ci/Plugin/DscCompleteCheck
     "DscCompleteCheck": {
-        "IgnoreInf": [""],
         "DscPath": "MdePkg.dsc"
     },
 
@@ -195,5 +193,11 @@
             "Library/BaseFdtLib/string.h",
             "mipi_syst.h"
         ]
+    },
+
+    ## options defined .pytool/Plugin/MarkdownLintCheck
+    "MarkdownLintCheck": {
+        "IgnoreFiles": [ "Library/MipiSysTLib/mipisyst"  # submodule outside of control
+        ]            # package root relative file, folder, or glob pattern to ignore
     }
 }

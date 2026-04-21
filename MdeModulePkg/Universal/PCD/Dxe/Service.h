@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PCD_DXE_SERVICE_H_
-#define _PCD_DXE_SERVICE_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Guid/PcdDataBaseHobGuid.h>
@@ -17,7 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/PcdInfo.h>
 #include <Protocol/PiPcdInfo.h>
 #include <Protocol/VarCheck.h>
-#include <Protocol/VariableLock.h>
+#include <Library/VariablePolicyHelperLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
@@ -1189,5 +1188,3 @@ extern  EFI_GUID  **TmpTokenSpaceBuffer;
 extern  UINTN     TmpTokenSpaceBufferCount;
 
 extern EFI_LOCK  mPcdDatabaseLock;
-
-#endif

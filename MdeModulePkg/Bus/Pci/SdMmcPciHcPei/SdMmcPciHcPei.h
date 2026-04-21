@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _SD_MMC_PCI_HOST_CONTROLLER_PEI_H_
-#define _SD_MMC_PCI_HOST_CONTROLLER_PEI_H_
+#pragma once
 
 #include <PiPei.h>
 
@@ -76,5 +75,3 @@ GetSdMmcHcMmioBar (
   IN OUT UINTN                             **MmioBar,
   OUT UINT8                                *BarNum
   );
-
-#endif

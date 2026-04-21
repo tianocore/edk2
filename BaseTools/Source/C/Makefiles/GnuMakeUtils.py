@@ -171,7 +171,11 @@ def _get_win32_parent_processes():
     pid = GetCurrentProcessId()
     parent_processes = []
     found_parent = True
+    seen_pids = set()
     while found_parent:
+        if pid in seen_pids:
+            break
+        seen_pids.add(pid)
         found_parent = False
         for process in process_list:
             if process.process_id == pid:
@@ -229,18 +233,18 @@ def main():
                 if os.path.isfile(file):
                     os.remove(file)
                 else:
-                    sys.stderr.writelines(['{} is not a file.'.format(file)])
+                    sys.stderr.writelines(['{} is not a file.\n'.format(file)])
             else:
-                sys.stderr.writelines(['File {} does not exist.'.format(file)])
+                sys.stderr.writelines(['File {} does not exist.\n'.format(file)])
     elif sys.argv[1] == 'md':
         path = os.path.normpath(sys.argv[2])
         if not os.path.exists(path):
             os.makedirs(path)
         else:
             if os.path.isdir(path):
-                sys.stderr.writelines(['Directory {} already exists.'.format(path)])
+                sys.stderr.writelines(['Directory {} already exists.\n'.format(path)])
             else:
-                sys.stderr.writelines(['{} is a file.'.format(path)])
+                sys.stderr.writelines(['{} is a file.\n'.format(path)])
                 return 1
     elif sys.argv[1] == 'rd':
         paths = [os.path.normpath(x) for x in sys.argv[2:]]
@@ -249,9 +253,9 @@ def main():
                 if os.path.isdir(path):
                     shutil.rmtree(path)
                 else:
-                    sys.stderr.writelines(['{} is not a directory.'.format(path)])
+                    sys.stderr.writelines(['{} is not a directory.\n'.format(path)])
             else:
-                sys.stderr.writelines(['Directory {} does not exist.'.format(path)])
+                sys.stderr.writelines(['Directory {} does not exist.\n'.format(path)])
     elif sys.argv[1] == 'rm_pyc_files':
         path = os.path.normpath(sys.argv[2])
         files = glob.glob(os.path.join(path, '*.pyc'))
@@ -260,14 +264,14 @@ def main():
                 if os.path.isfile(file):
                     os.remove(file)
                 else:
-                    sys.stderr.writelines(['{} is not a file.'.format(file)])
+                    sys.stderr.writelines(['{} is not a file.\n'.format(file)])
             else:
-                sys.stderr.writelines(['File {} does not exist.'.format(file)])
+                sys.stderr.writelines(['File {} does not exist.\n'.format(file)])
         py_cache = os.path.join(path, '__pycache__')
         if os.path.isdir(py_cache):
             shutil.rmtree(py_cache)
     else:
-        sys.stderr.writelines(['Unsupported command.'])
+        sys.stderr.writelines(['Unsupported command.\n'])
         return 1
     return 0
 

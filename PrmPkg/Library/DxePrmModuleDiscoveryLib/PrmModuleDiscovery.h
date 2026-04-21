@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef PRM_MODULE_DISCOVERY_H_
-#define PRM_MODULE_DISCOVERY_H_
+#pragma once
 
 #include <PrmModuleImageContext.h>
 
@@ -35,5 +34,3 @@ PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY *
 CreateNewPrmModuleImageContextListEntry (
   VOID
   );
-
-#endif

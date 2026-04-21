@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef _MM_END_OF_DXE_H_
-#define _MM_END_OF_DXE_H_
+#pragma once
 
 #define EFI_MM_END_OF_DXE_PROTOCOL_GUID \
   { \
@@ -20,5 +19,3 @@
   }
 
 extern EFI_GUID  gEfiMmEndOfDxeProtocolGuid;
-
-#endif

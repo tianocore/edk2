@@ -46,6 +46,7 @@
   Kdf/CryptHkdf.c
   Cipher/CryptAes.c
   Cipher/CryptAeadAesGcmNull.c
+  Cipher/CryptCamellia.c
   Pk/CryptRsaBasic.c
   Pk/CryptRsaExtNull.c
   Pk/CryptPkcs1OaepNull.c

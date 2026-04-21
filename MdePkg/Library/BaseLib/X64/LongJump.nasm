@@ -31,7 +31,7 @@ extern ASM_PFX(PcdGet32 (PcdControlFlowEnforcementPropertyMask))
 global ASM_PFX(InternalLongJump)
 ASM_PFX(InternalLongJump):
 
-    mov     eax, [ASM_PFX(PcdGet32 (PcdControlFlowEnforcementPropertyMask))]
+    mov     eax, FixedPcdGet32 (PcdControlFlowEnforcementPropertyMask)
     test    eax, eax
     jz      CetDone
     mov     rax, cr4

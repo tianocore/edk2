@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _FWVOL_H_
-#define _FWVOL_H_
+#pragma once
 
 #include "PeiMain.h"
 
@@ -366,5 +365,3 @@ ThirdPartyFvPpiNotifyCallback (
   IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
   IN VOID                       *Ppi
   );
-
-#endif

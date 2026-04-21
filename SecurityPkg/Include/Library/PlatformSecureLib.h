@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PLATFORM_SECURE_LIB_H__
-#define __PLATFORM_SECURE_LIB_H__
+#pragma once
 
 /**
 
@@ -31,5 +30,3 @@ EFIAPI
 UserPhysicalPresent (
   VOID
   );
-
-#endif

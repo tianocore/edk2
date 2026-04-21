@@ -163,7 +163,7 @@ ConvertPpiPointers (
   IN PEI_CORE_INSTANCE           *PrivateData
   )
 {
-  UINT8  Index;
+  UINTN  Index;
 
   //
   // Convert normal PPIs.
@@ -217,7 +217,7 @@ ConvertPpiPointersFv (
   IN  UINTN              FvSize
   )
 {
-  UINT8                             Index;
+  UINTN                             Index;
   UINTN                             Offset;
   BOOLEAN                           OffsetPositive;
   EFI_PEI_FIRMWARE_VOLUME_INFO_PPI  *FvInfoPpi;
@@ -493,7 +493,11 @@ InternalPeiInstallPpi (
       TempPtr = AllocateZeroPool (
                   sizeof (PEI_PPI_LIST_POINTERS) * (PpiListPointer->MaxCount + PPI_GROWTH_STEP)
                   );
-      ASSERT (TempPtr != NULL);
+      if (TempPtr == NULL) {
+        ASSERT (TempPtr != NULL);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
       CopyMem (
         TempPtr,
         PpiListPointer->PpiPtrs,
@@ -782,7 +786,11 @@ InternalPeiNotifyPpi (
         TempPtr = AllocateZeroPool (
                     sizeof (PEI_PPI_LIST_POINTERS) * (CallbackNotifyListPointer->MaxCount + CALLBACK_NOTIFY_GROWTH_STEP)
                     );
-        ASSERT (TempPtr != NULL);
+        if (TempPtr == NULL) {
+          ASSERT (TempPtr != NULL);
+          return EFI_OUT_OF_RESOURCES;
+        }
+
         CopyMem (
           TempPtr,
           CallbackNotifyListPointer->NotifyPtrs,
@@ -803,7 +811,11 @@ InternalPeiNotifyPpi (
         TempPtr = AllocateZeroPool (
                     sizeof (PEI_PPI_LIST_POINTERS) * (DispatchNotifyListPointer->MaxCount + DISPATCH_NOTIFY_GROWTH_STEP)
                     );
-        ASSERT (TempPtr != NULL);
+        if (TempPtr == NULL) {
+          ASSERT (TempPtr != NULL);
+          return EFI_OUT_OF_RESOURCES;
+        }
+
         CopyMem (
           TempPtr,
           DispatchNotifyListPointer->NotifyPtrs,
@@ -1026,6 +1038,7 @@ ProcessPpiListFromSec (
   EFI_STATUS              Status;
   EFI_SEC_HOB_DATA_PPI    *SecHobDataPpi;
   EFI_HOB_GENERIC_HEADER  *SecHobList;
+  PEI_CORE_INSTANCE       *PrivateData;
 
   for ( ; ;) {
     if ((PpiList->Flags & EFI_PEI_PPI_DESCRIPTOR_NOTIFY_TYPES) != 0) {
@@ -1040,6 +1053,15 @@ ProcessPpiListFromSec (
       //
       Status = InternalPeiInstallPpi (PeiServices, PpiList, TRUE);
       ASSERT_EFI_ERROR (Status);
+
+      //
+      // Set the PeiMemoryInstalled flag if SEC passed MemoryDiscoveredPpi, so the PEI runs in
+      // physical memory.
+      //
+      if (CompareGuid (PpiList->Guid, &gEfiPeiMemoryDiscoveredPpiGuid)) {
+        PrivateData                     = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
+        PrivateData->PeiMemoryInstalled = TRUE;
+      }
     }
 
     if ((PpiList->Flags & EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) == EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST) {

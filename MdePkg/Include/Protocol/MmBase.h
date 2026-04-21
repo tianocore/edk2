@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _MM_BASE_H_
-#define _MM_BASE_H_
+#pragma once
 
 #include <Pi/PiMmCis.h>
 
@@ -76,5 +75,3 @@ struct _EFI_MM_BASE_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiMmBaseProtocolGuid;
-
-#endif

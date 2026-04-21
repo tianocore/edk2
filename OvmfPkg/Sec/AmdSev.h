@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _AMD_SEV_SEC_INTERNAL_H__
-#define _AMD_SEV_SEC_INTERNAL_H__
+#pragma once
 
 /**
   Handle an SEV-ES/GHCB protocol check failure.
@@ -104,5 +103,3 @@ VOID
 SecMapApicBaseUnencrypted (
   VOID
   );
-
-#endif
