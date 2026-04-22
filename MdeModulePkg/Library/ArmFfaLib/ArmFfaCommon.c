@@ -176,19 +176,15 @@ ArmCallFfa (
 /**
   Get FF-A version.
 
-  @param [in]    RequestMajorVersion          Minimal request major version
-  @param [in]    RequestMinorVersion          Minimal request minor version
-  @param [out]   CurrentMajorVersion          Current major version
-  @param [out]   CurrentMinorVersion          Current minor version
+  @param [in]    RequestVersion          Minimal request version
+  @param [out]   CurrentVersion          Current major version
 
 **/
 EFI_STATUS
 EFIAPI
 ArmFfaLibGetVersion (
-  IN  UINT16  RequestMajorVersion,
-  IN  UINT16  RequestMinorVersion,
-  OUT UINT16  *CurrentMajorVersion,
-  OUT UINT16  *CurrentMinorVersion
+  IN  UINT32  RequestVersion,
+  OUT UINT32  *CurrentVersion
   )
 {
   EFI_STATUS    Status;
@@ -197,10 +193,7 @@ ArmFfaLibGetVersion (
   ZeroMem (&FfaArgs, sizeof (ARM_FFA_ARGS));
 
   FfaArgs.Arg0 = ARM_FID_FFA_VERSION;
-  FfaArgs.Arg1 = ARM_FFA_CREATE_VERSION (
-                   RequestMajorVersion,
-                   RequestMinorVersion
-                   );
+  FfaArgs.Arg1 = RequestVersion;
 
   ArmCallFfa (&FfaArgs);
 
@@ -209,12 +202,8 @@ ArmFfaLibGetVersion (
     return Status;
   }
 
-  if (CurrentMajorVersion != NULL) {
-    *CurrentMajorVersion = ARM_FFA_MAJOR_VERSION_GET (FfaArgs.Arg0);
-  }
-
-  if (CurrentMinorVersion != NULL) {
-    *CurrentMinorVersion = ARM_FFA_MINOR_VERSION_GET (FfaArgs.Arg0);
+  if (CurrentVersion != NULL) {
+    *CurrentVersion = FfaArgs.Arg0;
   }
 
   return EFI_SUCCESS;
@@ -1208,31 +1197,26 @@ ArmFfaLibIsFfaSupported (
   )
 {
   EFI_STATUS  Status;
-  UINT16      CurrentMajorVersion;
-  UINT16      CurrentMinorVersion;
+  UINT32      CurrentVersion;
 
   Status = ArmFfaLibGetVersion (
-             ARM_FFA_MAJOR_VERSION,
-             ARM_FFA_MINOR_VERSION,
-             &CurrentMajorVersion,
-             &CurrentMinorVersion
+             ARM_FFA_CREATE_VERSION (ARM_FFA_MAJOR_VERSION, ARM_FFA_MINOR_VERSION),
+             &CurrentVersion
              );
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
 
-  if ((ARM_FFA_MAJOR_VERSION != CurrentMajorVersion) ||
-      (ARM_FFA_MINOR_VERSION > CurrentMinorVersion))
-  {
+  if (!ARM_FFA_ABI_COMPATIBLE (CurrentVersion, ARM_FFA_MAJOR_VERSION, ARM_FFA_MINOR_VERSION)) {
     DEBUG ((
       DEBUG_INFO,
       "Incompatible FF-A Versions.\n" \
       "Request Version: Major=0x%x, Minor=0x%x.\n" \
-      "Current Version: Major=0x%x, Minor>=0x%x.\n",
+      "Current Version: Major=0x%x, Minor=0x%x.\n",
       ARM_FFA_MAJOR_VERSION,
       ARM_FFA_MINOR_VERSION,
-      CurrentMajorVersion,
-      CurrentMinorVersion
+      ARM_FFA_MAJOR_VERSION_GET (CurrentVersion),
+      ARM_FFA_MINOR_VERSION_GET (CurrentVersion)
       ));
     return FALSE;
   }
