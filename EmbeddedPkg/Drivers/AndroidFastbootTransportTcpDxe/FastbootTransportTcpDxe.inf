@@ -35,7 +35,6 @@
   gEfiTcp4ServiceBindingProtocolGuid
   gEfiSimpleTextOutProtocolGuid
   gEfiTcp4ProtocolGuid
-  gEfiSimpleTextOutProtocolGuid
 
 [Packages]
   MdePkg/MdePkg.dec
