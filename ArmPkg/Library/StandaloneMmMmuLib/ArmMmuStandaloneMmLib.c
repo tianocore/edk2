@@ -35,8 +35,7 @@
   StMM Core invokes this library before constructors are called and before the
   StMM image itself is relocated.
 
-  @param[out]     MajorVersion        Major Version of ABI.
-  @param[out]     MinorVersion        Minor Version of ABI.
+  @param[out]             Version        Version of FF-A ABI.
 
   @retval TRUE            Use FF-A MemPerm ABIs.
   @retval FALSE           Use MM MemPerm ABIs.
@@ -46,20 +45,16 @@ STATIC
 BOOLEAN
 EFIAPI
 IsFfaMemoryAbiSupported (
-  OUT UINT16  *MajorVersion,
-  OUT UINT16  *MinorVersion
+  OUT UINT32  *Version
   )
 {
   EFI_STATUS  Status;
 
-  *MajorVersion = 0;
-  *MinorVersion = 0;
+  *Version = 0;
 
   Status = ArmFfaLibGetVersion (
-             ARM_FFA_MAJOR_VERSION,
-             ARM_FFA_MINOR_VERSION,
-             MajorVersion,
-             MinorVersion
+             ARM_FFA_CREATE_VERSION (ARM_FFA_MAJOR_VERSION, ARM_FFA_MINOR_VERSION),
+             Version
              );
   if (EFI_ERROR (Status)) {
     return FALSE;
@@ -151,8 +146,7 @@ SendMemoryPermissionRequest (
 /** Request the permission attributes of a memory region from S-EL0.
 
   @param [in]   UseFfaAbis           Use FF-A abis or not.
-  @param [in]   AbiMajorVersion      ABI Major Version
-  @param [in]   AbiMinorVersion      ABI Minor Version
+  @param [in]   AbiVersion           ABI Version
   @param [in]   BaseAddress          Base address for the memory region.
   @param [in]   Length               Size of memory region.
   @param [out]  MemoryAttributes     Pointer to return the memory attributes.
@@ -174,8 +168,7 @@ STATIC
 EFI_STATUS
 GetMemoryPermissions (
   IN     BOOLEAN               UseFfaAbis,
-  IN     UINT16                AbiMajorVersion,
-  IN     UINT16                AbiMinorVersion,
+  IN     UINT32                AbiVersion,
   IN     EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN     UINT64                Length,
   OUT    UINT32                *MemoryAttributes,
@@ -200,7 +193,7 @@ GetMemoryPermissions (
   SvcArgs.Arg0 = Fid;
   SvcArgs.Arg1 = BaseAddress;
 
-  if (UseFfaAbis && ((AbiMajorVersion > 1) || (AbiMinorVersion > 2))) {
+  if (UseFfaAbis && ARM_FFA_ABI_MINIMUM (AbiVersion, 1, 3)) {
     /*
      * The input page count is encoded as (page count - 1),
      * so subtract 1 from the actual page count.
@@ -216,7 +209,7 @@ GetMemoryPermissions (
     *PageCount        = 0;
   } else {
     *MemoryAttributes = Ret;
-    if (UseFfaAbis && ((AbiMajorVersion > 1) || (AbiMinorVersion > 2))) {
+    if (UseFfaAbis && ARM_FFA_ABI_MINIMUM (AbiVersion, 1, 3)) {
       /*
        * The output page count is encoded as (page count - 1),
        * so add 1 to get the actual page count.
@@ -289,18 +282,16 @@ ArmSetMemoryRegionNoExec (
   UINT32      MemoryAttributes;
   UINT32      PermissionRequest;
   BOOLEAN     UseFfaAbis;
-  UINT16      MajorVersion;
-  UINT16      MinorVersion;
+  UINT32      Version;
   UINTN       Size;
   UINT32      PageCount;
 
-  UseFfaAbis = IsFfaMemoryAbiSupported (&MajorVersion, &MinorVersion);
+  UseFfaAbis = IsFfaMemoryAbiSupported (&Version);
 
   while (Length > 0) {
     Status = GetMemoryPermissions (
                UseFfaAbis,
-               MajorVersion,
-               MinorVersion,
+               Version,
                BaseAddress,
                Length,
                &MemoryAttributes,
@@ -355,18 +346,16 @@ ArmClearMemoryRegionNoExec (
   UINT32      MemoryAttributes;
   UINT32      PermissionRequest;
   BOOLEAN     UseFfaAbis;
-  UINT16      MajorVersion;
-  UINT16      MinorVersion;
+  UINT32      Version;
   UINTN       Size;
   UINT32      PageCount;
 
-  UseFfaAbis = IsFfaMemoryAbiSupported (&MajorVersion, &MinorVersion);
+  UseFfaAbis = IsFfaMemoryAbiSupported (&Version);
 
   while (Length > 0) {
     Status = GetMemoryPermissions (
                UseFfaAbis,
-               MajorVersion,
-               MinorVersion,
+               Version,
                BaseAddress,
                Length,
                &MemoryAttributes,
@@ -421,18 +410,16 @@ ArmSetMemoryRegionReadOnly (
   UINT32      MemoryAttributes;
   UINT32      PermissionRequest;
   BOOLEAN     UseFfaAbis;
-  UINT16      MajorVersion;
-  UINT16      MinorVersion;
+  UINT32      Version;
   UINTN       Size;
   UINT32      PageCount;
 
-  UseFfaAbis = IsFfaMemoryAbiSupported (&MajorVersion, &MinorVersion);
+  UseFfaAbis = IsFfaMemoryAbiSupported (&Version);
 
   while (Length > 0) {
     Status = GetMemoryPermissions (
                UseFfaAbis,
-               MajorVersion,
-               MinorVersion,
+               Version,
                BaseAddress,
                Length,
                &MemoryAttributes,
@@ -487,18 +474,16 @@ ArmClearMemoryRegionReadOnly (
   UINT32      MemoryAttributes;
   UINT32      PermissionRequest;
   BOOLEAN     UseFfaAbis;
-  UINT16      MajorVersion;
-  UINT16      MinorVersion;
+  UINT32      Version;
   UINTN       Size;
   UINT32      PageCount;
 
-  UseFfaAbis = IsFfaMemoryAbiSupported (&MajorVersion, &MinorVersion);
+  UseFfaAbis = IsFfaMemoryAbiSupported (&Version);
 
   while (Length > 0) {
     Status = GetMemoryPermissions (
                UseFfaAbis,
-               MajorVersion,
-               MinorVersion,
+               Version,
                BaseAddress,
                Length,
                &MemoryAttributes,
