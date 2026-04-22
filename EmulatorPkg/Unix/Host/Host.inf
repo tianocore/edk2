@@ -69,7 +69,6 @@
 
 [Protocols]
   gEmuIoThunkProtocolGuid
-  gEmuIoThunkProtocolGuid
   gEmuGraphicsWindowProtocolGuid
   gEmuThreadThunkProtocolGuid
   gEmuBlockIoProtocolGuid
