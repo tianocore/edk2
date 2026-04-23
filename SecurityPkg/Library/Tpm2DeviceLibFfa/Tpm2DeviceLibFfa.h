@@ -190,9 +190,9 @@ FfaTpm2RequestUseTpm (
   );
 
 /**
-  This function is used to get the TPM service partition id via FF-A
+  This function is used to get the TPM service partition info via FF-A
 
-  @param[out] PartitionId - Supplies the pointer to the TPM service partition id.
+  @param[out] PartitionInfo - Supplies the pointer to the TPM service partition info.
 
   @retval EFI_SUCCESS           The TPM command was successfully sent to the TPM
                                 and the response was copied to the Output buffer.
@@ -201,8 +201,8 @@ FfaTpm2RequestUseTpm (
   @retval EFI_DEVICE_ERROR      An error occurred in communication with the TPM.
 **/
 EFI_STATUS
-FfaTpm2GetServicePartitionId (
-  OUT UINT16  *PartitionId
+FfaTpm2GetServicePartitionInfo (
+  OUT EFI_FFA_PART_INFO_DESC  *PartitionInfo
   );
 
 /**
@@ -243,9 +243,9 @@ ValidateTpmInterfaceType (
   );
 
 /**
-  This function is used to get the TPM service partition id.
+  This function is used to get the TPM service partition info.
 
-  @param[out] PartitionId - Supplies the pointer to the TPM service partition id.
+  @param[out] PartitionInfo - Supplies the pointer to the TPM service partition info.
 
   @retval EFI_SUCCESS           The TPM command was successfully sent to the TPM
                                 and the response was copied to the Output buffer.
@@ -255,6 +255,6 @@ ValidateTpmInterfaceType (
 **/
 EFI_STATUS
 EFIAPI
-GetTpmServicePartitionId (
-  OUT UINT16  *PartitionId
+GetTpmServicePartitionInfo (
+  OUT EFI_FFA_PART_INFO_DESC  *PartitionInfo
   );
