@@ -73,6 +73,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjTpm2DeviceInfo,                 ///< 46 - TPM2 Device Info
   EArchCommonObjMcfgPciConfigSpaceInfo,         ///< 47 - MCFG PCI Configuration Space Info
   EArchCommonObjPciRootPortInfo,                ///< 48 - PCI root port configuration Info
+  EArchCommonObjBiosInfo = 52,                  ///< 52 - BIOS Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1131,5 +1132,40 @@ typedef struct CmArchCommonObjSpcrInfo {
   /// Specifies the terminal type used by the console device.
   UINT8    TerminalType;
 } CM_ARCH_COMMON_SPCR_INFO;
+
+/** A structure that describes BIOS Information.
+
+  SMBIOS Specification v3.6.0 Type 0
+
+  ID: EArchCommonObjBiosInfo
+**/
+typedef struct CmArchCommonBiosInfo {
+  /// BIOS vendor name string.
+  CHAR8                        *BiosVendor;
+  /// BIOS version string.
+  CHAR8                        *BiosVersion;
+  /// BIOS starting address segment.
+  UINT16                       BiosSegment;
+  /// BIOS release date string.
+  CHAR8                        *BiosReleaseDate;
+  /// BIOS ROM size (in 64 KB blocks minus one).
+  UINT8                        BiosSize;
+  /// Bit field of supported BIOS functions.
+  MISC_BIOS_CHARACTERISTICS    BiosCharacteristics;
+  /// Optional set of functions that BIOS supports (bytes 0 and 1).
+  UINT8                        BIOSCharacteristicsExtensionBytes[2];
+  /// System BIOS firmware major version.
+  UINT8                        SystemBiosMajorRelease;
+  /// System BIOS firmware minor version.
+  UINT8                        SystemBiosMinorRelease;
+  /// Embedded Controller firmware major release.
+  UINT8                        ECFirmwareMajorRelease;
+  /// Embedded Controller firmware minor release.
+  UINT8                        ECFirmwareMinorRelease;
+  /// Extended BIOS ROM size.
+  EXTENDED_BIOS_ROM_SIZE       ExtendedBiosSize;
+  /// CM Object Token uniquely identifying this BIOS info entry.
+  CM_OBJECT_TOKEN              BiosInfoToken;
+} CM_ARCH_COMMON_BIOS_INFO;
 
 #pragma pack()
