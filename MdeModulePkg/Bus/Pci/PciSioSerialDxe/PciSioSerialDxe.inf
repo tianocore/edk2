@@ -55,10 +55,9 @@
 
 [Protocols]
   gEfiSioProtocolGuid                           ## TO_START
-  gEfiDevicePathProtocolGuid                    ## TO_START
+  gEfiDevicePathProtocolGuid                    ## TO_START ## BY_START
   gEfiPciIoProtocolGuid                         ## TO_START
   gEfiSerialIoProtocolGuid                      ## BY_START
-  gEfiDevicePathProtocolGuid                    ## BY_START
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseHalfHandshake|FALSE   ## CONSUMES

@@ -89,10 +89,9 @@
   ## SOMETIMES_CONSUMES ## Variable:L"CapsuleMax"
   ## SOMETIMES_PRODUCES ## Variable:L"CapsuleMax"
   gEfiCapsuleReportGuid
-  gEfiCapsuleVendorGuid                   ## SOMETIMES_CONSUMES ## Variable:L"CapsuleUpdateData"
+  gEfiCapsuleVendorGuid                   ## SOMETIMES_CONSUMES ## Variable:L"CapsuleUpdateData", L"CodRelocationInfo"
   gEfiEndOfDxeEventGroupGuid              ## CONSUMES ## Event
   gEfiPartTypeSystemPartGuid              ## SOMETIMES_CONSUMES
-  gEfiCapsuleVendorGuid                   ## SOMETIMES_CONSUMES ## Variable:L"CodRelocationInfo"
   ## SOMETIMES_CONSUMES ## Variable:L"OsIndications"
   ## SOMETIMES_PRODUCES ## Variable:L"OsIndications"
   ## SOMETIMES_CONSUMES ## Variable:L"BootNext"
