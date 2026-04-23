@@ -41,7 +41,6 @@
   SynchronizationLib
   UefiBootServicesTableLib
   IoLib
-  UefiBootServicesTableLib
   UefiLib
 
 [Protocols]
