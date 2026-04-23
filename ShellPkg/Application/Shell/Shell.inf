@@ -70,7 +70,6 @@
 [Guids]
   gShellVariableGuid                                      ## SOMETIMES_CONSUMES ## GUID
   gShellAliasGuid                                         ## SOMETIMES_CONSUMES ## GUID
-  gShellAliasGuid                                         ## SOMETIMES_PRODUCES ## GUID
 
 [Protocols]
   gEfiShellProtocolGuid                                   ## PRODUCES
