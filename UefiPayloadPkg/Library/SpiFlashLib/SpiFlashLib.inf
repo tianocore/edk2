@@ -39,7 +39,6 @@
   PciLib
   HobLib
   TimerLib
-  BaseLib
 
 [Guids]
   gSpiFlashInfoGuid
