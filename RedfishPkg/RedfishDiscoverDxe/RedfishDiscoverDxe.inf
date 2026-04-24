@@ -54,4 +54,5 @@
 
 [Pcd]
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDiscoverAccessModeInBand ## CONSUMES
-  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishSendReceiveTimeout       ## CONSUEMS
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishSendReceiveTimeout       ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv6HttpSupport                 ## CONSUMES
