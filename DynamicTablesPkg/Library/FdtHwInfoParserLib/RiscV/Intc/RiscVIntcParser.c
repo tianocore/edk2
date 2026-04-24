@@ -225,8 +225,13 @@ IsaStringInfoParser (
     return EFI_ABORTED;
   }
 
-  IsaStringInfo.Length = PropSize + 1;
-  AsciiStrCpyS (IsaStringInfo.IsaString, PropSize + 1, (CHAR8 *)Prop);
+  IsaStringInfo.Length = PropSize;
+  Status = AsciiStrCpyS (IsaStringInfo.IsaString, MAX_ISA_STRING_LENGTH, (CHAR8 *)Prop);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed to copy ISA string\n"));
+    ASSERT (0);
+    return EFI_ABORTED;
+  }
 
   // Add the CmObj to the Configuration Manager.
   Status = AddSingleCmObj (
