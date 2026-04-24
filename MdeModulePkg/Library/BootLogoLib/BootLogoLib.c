@@ -59,6 +59,8 @@ BootLogoEnableLogo (
   UINTN                                  NewDestX;
   UINTN                                  NewDestY;
   UINTN                                  BufferSize;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL          BackgroundColor;
+  UINT32                                 BackgroundColorValue;
 
   Status = gBS->LocateProtocol (&gEdkiiPlatformLogoProtocolGuid, NULL, (VOID **)&PlatformLogo);
   if (EFI_ERROR (Status)) {
@@ -96,6 +98,33 @@ BootLogoEnableLogo (
 
   SizeOfX = GraphicsOutput->Mode->Info->HorizontalResolution;
   SizeOfY = GraphicsOutput->Mode->Info->VerticalResolution;
+
+  //
+  // Fill background if needed.
+  //
+  if (PcdGetBool (PcdBootLogoFillBackground)) {
+    BackgroundColorValue     = PcdGet32 (PcdBootLogoBackgroundColor);
+    BackgroundColor.Red      = (UINT8)(BackgroundColorValue >> 16);
+    BackgroundColor.Green    = (UINT8)(BackgroundColorValue >> 8);
+    BackgroundColor.Blue     = (UINT8)BackgroundColorValue;
+    BackgroundColor.Reserved = 0;
+
+    Status = GraphicsOutput->Blt (
+                               GraphicsOutput,
+                               &BackgroundColor,
+                               EfiBltVideoFill,
+                               0,
+                               0,
+                               0,
+                               0,
+                               SizeOfX,
+                               SizeOfY,
+                               SizeOfX * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
+                               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
 
   Blt           = NULL;
   NumberOfLogos = 0;
