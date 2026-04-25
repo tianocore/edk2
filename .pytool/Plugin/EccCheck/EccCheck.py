@@ -97,7 +97,7 @@ class EccCheck(ICiBuildPlugin):
             temp_diff_output = os.path.join (temp_path, 'diff.txt')
 
             self.ApplyConfig(pkgconfig, temp_path, packagename)
-            modify_dir_list = self.GetModifyDir(packagename, temp_diff_output)
+            modify_dir_list = self.GetModifyDir(packagename, temp_diff_output, temp_path)
             patch = self.GetDiff(packagename, temp_diff_output)
             ecc_diff_range = self.GetDiffRange(patch, packagename, temp_path)
             #
@@ -148,7 +148,7 @@ class EccCheck(ICiBuildPlugin):
             patch = file.read().strip().split('\n')
         return patch
 
-    def GetModifyDir(self, pkg: str, temp_diff_output: str) -> List[str]:
+    def GetModifyDir(self, pkg: str, temp_diff_output: str, temp_path: str) -> List[str]:
         #
         # Generate diff between origin/master and HEAD using --diff-filter to
         # exclude deleted and renamed files that do not need to be scanned by
@@ -198,6 +198,13 @@ class EccCheck(ICiBuildPlugin):
             # EDK II meta data files (DEC, DSC, FDF).
             #
             if file_dir == pkg:
+                continue
+            #
+            # Skip directory names that no longer exist in the temporary package
+            # copy after applying IgnoreFiles configuration.
+            #
+            target_dir = os.path.normpath(os.path.join(temp_path, file_dir))
+            if not os.path.exists(target_dir):
                 continue
             #
             # Skip directory names that are already in the modified dir list
@@ -297,6 +304,9 @@ class EccCheck(ICiBuildPlugin):
         report    = os.path.normpath(os.path.join(temp_path, "Ecc.csv"))
         for modify_dir in modify_dir_list:
             target = os.path.normpath(os.path.join(temp_path, modify_dir))
+            if not os.path.exists(target):
+                logging.warning("Skip ECC on missing path %s", target)
+                continue
             logging.info('Run ECC tool for the commit in %s' % modify_dir)
             ecc_need = True
             ecc_params = "-c {0} -e {1} -t {2} -r {3}".format(config, exception, target, report)
