@@ -24,6 +24,7 @@
   accesses when PCI Segments other than Segment #0 must be accessed.
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -49,17 +50,19 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 #define PCI_SEGMENT_LIB_ADDRESS(Segment, Bus, Device, Function, Register) \
   ((Segment != 0) ? \
-    ( ((Register) & 0xfff)                 | \
-      (((Function) & 0x07) << 12)          | \
-      (((Device) & 0x1f) << 15)            | \
-      (((Bus) & 0xff) << 20)               | \
-      (LShiftU64 ((Segment) & 0xffff, 32))   \
+    ( (((Register) & 0xfff)                 | \
+      (((Function) & 0x07) << 12)           | \
+      (((Device) & 0x1f) << 15)             | \
+      (((Bus) & 0xff) << 20)                | \
+      (LShiftU64 ((Segment) & 0xffff, 32))) & \
+      (0xFFFF0FFFFFFF)                        \
     ) :                                      \
-    ( ((Register) & 0xfff)                 | \
-      (((Function) & 0x07) << 12)          | \
-      (((Device) & 0x1f) << 15)            | \
-      (((Bus) & 0xff) << 20)                 \
-    )                                        \
+    ( (((Register) & 0xfff)                 | \
+      (((Function) & 0x07) << 12)           | \
+      (((Device) & 0x1f) << 15)             | \
+      (((Bus) & 0xff) << 20))               & \
+      (0xFFFFFFF)                             \
+    )                                         \
   )
 
 /**
