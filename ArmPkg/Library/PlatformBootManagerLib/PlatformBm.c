@@ -6,6 +6,7 @@
   Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
   Copyright (c) 2021, Semihalf All rights reserved.<BR>
+  Copyright (c) 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -996,12 +997,14 @@ PlatformBootManagerAfterConsole (
   VOID
   )
 {
-  EFI_STATUS                    Status;
-  EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput;
-  UINTN                         FirmwareVerLength;
-  UINTN                         PosX;
-  UINTN                         PosY;
-  EFI_INPUT_KEY                 Key;
+  EFI_STATUS                           Status;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  FirmwareVersionBackground;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  FirmwareVersionForeground;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL         *GraphicsOutput;
+  UINTN                                FirmwareVerLength;
+  UINTN                                PosX;
+  UINTN                                PosY;
+  EFI_INPUT_KEY                        Key;
 
   FirmwareVerLength = StrLen (PcdGetPtr (PcdFirmwareVersionString));
 
@@ -1025,6 +1028,9 @@ PlatformBootManagerAfterConsole (
                     (VOID **)&GraphicsOutput
                     );
     if (!EFI_ERROR (Status)) {
+      FirmwareVersionForeground.Raw = FixedPcdGet32 (PcdPlatformBootManagerFirmwareVersionForegroundColor);
+      FirmwareVersionBackground.Raw = FixedPcdGet32 (PcdPlatformBootManagerFirmwareVersionBackgroundColor);
+
       PosX = (GraphicsOutput->Mode->Info->HorizontalResolution -
               (StrLen (VERSION_STRING_PREFIX) + FirmwareVerLength) *
               EFI_GLYPH_WIDTH) / 2;
@@ -1033,8 +1039,8 @@ PlatformBootManagerAfterConsole (
       PrintXY (
         PosX,
         PosY,
-        NULL,
-        NULL,
+        &FirmwareVersionForeground.Pixel,
+        &FirmwareVersionBackground.Pixel,
         VERSION_STRING_PREFIX L"%s",
         PcdGetPtr (PcdFirmwareVersionString)
         );
@@ -1076,21 +1082,23 @@ PlatformBootManagerWaitCallback (
   UINT16  TimeoutRemain
   )
 {
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  Black;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  White;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  ProgressBarBackground;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  ProgressBarColor;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  ProgressBarTitleForeground;
   UINT16                               Timeout;
   EFI_STATUS                           Status;
 
   Timeout = PcdGet16 (PcdPlatformBootTimeOut);
 
-  Black.Raw = 0x00000000;
-  White.Raw = 0x00FFFFFF;
+  ProgressBarBackground.Raw      = FixedPcdGet32 (PcdPlatformBootManagerProgressBarBackgroundColor);
+  ProgressBarColor.Raw           = FixedPcdGet32 (PcdPlatformBootManagerProgressBarColor);
+  ProgressBarTitleForeground.Raw = FixedPcdGet32 (PcdPlatformBootManagerProgressBarTitleForegroundColor);
 
   Status = BootLogoUpdateProgress (
-             White.Pixel,
-             Black.Pixel,
+             ProgressBarTitleForeground.Pixel,
+             ProgressBarBackground.Pixel,
              L"Press ESCAPE for boot options",
-             White.Pixel,
+             ProgressBarColor.Pixel,
              (Timeout - TimeoutRemain) * 100 / Timeout,
              0
              );
