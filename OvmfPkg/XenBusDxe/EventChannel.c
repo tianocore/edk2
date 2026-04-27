@@ -45,7 +45,7 @@ XenBusEventChannelAllocate (
                                    &Parameter
                                    );
   if (ReturnCode != 0) {
-    DEBUG ((DEBUG_ERROR, "ERROR: alloc_unbound failed with rc=%d", ReturnCode));
+    DEBUG ((DEBUG_ERROR, "XenBus: alloc_unbound failed with rc=%d\n", ReturnCode));
     return ReturnCode;
   }
 
