@@ -10,10 +10,7 @@
 #pragma once
 
 /**
-  To call when the gEfiXenInfoGuid HOB became available after the library init
-  function has already been executed.
-
-  This allow to make hypercall in the PEIM stage.
+  Initialise library.
 **/
 RETURN_STATUS
 EFIAPI

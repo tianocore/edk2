@@ -43,8 +43,4 @@
 [LibraryClasses.X64]
   CpuLib
   BaseLib
-  HobLib
   DebugLib
-
-[Guids.X64]
-  gEfiXenInfoGuid
