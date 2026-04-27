@@ -132,7 +132,6 @@ XenConnect (
   EFI_XEN_OVMF_INFO  *Info;
   CHAR8              Sig[sizeof (Info->Signature) + 1];
   UINT32             *PVHResetVectorData;
-  RETURN_STATUS      Status;
 
   ASSERT (mXenLeaf != 0);
 
@@ -198,13 +197,6 @@ XenConnect (
     &mXenInfo,
     sizeof (mXenInfo)
     );
-
-  //
-  // Initialize the XenHypercall library, now that the XenInfo HOB is
-  // available
-  //
-  Status = XenHypercallLibInit ();
-  ASSERT_RETURN_ERROR (Status);
 
   return EFI_SUCCESS;
 }
