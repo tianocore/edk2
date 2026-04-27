@@ -9,39 +9,48 @@
 #include "CpuDxe.h"
 
 /**
-  Check whether the provided memory range is covered by a single entry of type
-  EfiGcdSystemMemory in the GCD memory map.
+  Check whether any part of the provided memory range is mapped as device
+  memory in the translation table.
 
   @param  BaseAddress       The physical address that is the start address of
                             a memory region.
   @param  Length            The size in bytes of the memory region.
 
-  @return Whether the region is system memory or not.
+  @retval TRUE   At least one page in the range is mapped as device memory.
+  @retval FALSE  No page in the range is mapped as device memory, or the
+                 range contains no valid mapping.
 **/
 STATIC
 BOOLEAN
-RegionIsSystemMemory (
+RegionContainsDeviceMemory (
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN  UINT64                Length
   )
 {
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  GcdDescriptor;
-  EFI_PHYSICAL_ADDRESS             GcdEndAddress;
-  EFI_STATUS                       Status;
+  UINTN       RegionAddress;
+  UINTN       RegionLength;
+  UINTN       RegionAttributes;
+  EFI_STATUS  Status;
 
-  Status = gDS->GetMemorySpaceDescriptor (BaseAddress, &GcdDescriptor);
-  if (EFI_ERROR (Status) ||
-      (GcdDescriptor.GcdMemoryType != EfiGcdMemoryTypeSystemMemory))
+  for (RegionAddress = (UINTN)BaseAddress;
+       RegionAddress < (UINTN)(BaseAddress + Length);
+       RegionAddress += RegionLength)
   {
-    return FALSE;
+    Status = GetMemoryRegion (
+               &RegionAddress,
+               &RegionLength,
+               &RegionAttributes
+               );
+    if (EFI_ERROR (Status)) {
+      return FALSE;
+    }
+
+    if ((RegionAttributes & TT_ATTR_INDX_MASK) == TT_ATTR_INDX_DEVICE_MEMORY) {
+      return TRUE;
+    }
   }
 
-  GcdEndAddress = GcdDescriptor.BaseAddress + GcdDescriptor.Length;
-
-  //
-  // Return TRUE if the GCD descriptor covers the range entirely
-  //
-  return GcdEndAddress >= (BaseAddress + Length);
+  return FALSE;
 }
 
 /**
@@ -90,10 +99,6 @@ GetMemoryAttributes (
       Length
       ));
     return EFI_INVALID_PARAMETER;
-  }
-
-  if (!RegionIsSystemMemory (BaseAddress, Length)) {
-    return EFI_UNSUPPORTED;
   }
 
   DEBUG ((
@@ -212,10 +217,6 @@ SetMemoryAttributes (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (!RegionIsSystemMemory (BaseAddress, Length)) {
-    return EFI_UNSUPPORTED;
-  }
-
   return ArmSetMemoryAttributes (BaseAddress, Length, Attributes, Attributes);
 }
 
@@ -280,7 +281,9 @@ ClearMemoryAttributes (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (!RegionIsSystemMemory (BaseAddress, Length)) {
+  if (((Attributes & EFI_MEMORY_XP) != 0) &&
+      RegionContainsDeviceMemory (BaseAddress, Length))
+  {
     return EFI_UNSUPPORTED;
   }
 
