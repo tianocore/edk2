@@ -4,6 +4,7 @@
 
 Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2016, Microsoft Corporation<BR>
+Copyright (c) 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -390,7 +391,7 @@ BootLogoUpdateProgress (
     //
     // Clear progress area
     //
-    SetMem (&Color, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL), 0x0);
+    Color = TitleBackground;
 
     Status = GraphicsOutput->Blt (
                                GraphicsOutput,
