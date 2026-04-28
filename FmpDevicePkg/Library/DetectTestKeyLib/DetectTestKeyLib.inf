@@ -1,0 +1,36 @@
+## @file
+#  Detects if PcdFmpDevicePkcs7CertBufferXdr contains a test key.
+#
+#  Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DetectTestKeyLib
+  FILE_GUID                      = A527DC78-3E2D-46AB-8BEE-B9DB0F924DBE
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DetectTestKeyLib|DXE_DRIVER UEFI_DRIVER UEFI_APPLICATION
+
+[Sources]
+  DetectTestKeyLib.c
+
+[Packages]
+  CryptoPkg/CryptoPkg.dec
+  FmpDevicePkg/FmpDevicePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseCryptLib
+  BaseMemoryLib
+  DebugLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUseNestedFmpCapsuleFormat
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageIdName
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceTestKeySha256Digest

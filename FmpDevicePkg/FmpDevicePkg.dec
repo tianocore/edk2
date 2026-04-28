@@ -31,6 +31,9 @@
   #                  update.
   CapsuleUpdatePolicyLib|Include/Library/CapsuleUpdatePolicyLib.h
 
+  ##  @libraryclass  Provides a function to check for test key being in use.
+  DetectTestKeyLib|Include/Library/DetectTestKeyLib.h
+
   ##  @libraryclass  Provides firmware device specific services to support
   #                  updates of a firmware image stored in a firmware device.
   FmpDeviceLib|Include/Library/FmpDeviceLib.h
@@ -47,6 +50,9 @@
   #                  saving dependency to firmware device and getting dependency
   #                  from firmware device.
   FmpDependencyDeviceLib|Include/Library/FmpDependencyDeviceLib.h
+
+  ##  @libraryclass  Provides utilities for handling FMP payloads.
+  FmpPayloadLib|Include/Library/FmpPayloadLib.h
 
 [LibraryClasses.Common.Private]
   ##  @libraryclass  Provides services to retrieve values from a capsule's FMP

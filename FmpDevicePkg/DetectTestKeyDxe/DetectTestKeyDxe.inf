@@ -1,0 +1,28 @@
+## @file
+# This trivial DXE checks for the use of a public test key to authenticate
+# firmware updates.  The check happens in its entry point and its result is
+# communicated to the rest of the firmware via PcdTestKeyUsed.
+#
+# Copyright (c) 2026, 3mdeb Sp. z o.o. All rights reserved.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DetectTestKeyDxe
+  FILE_GUID                      = A51065FC-B3E9-47E0-90A5-BF7CAEBE034F
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = EntryPoint
+
+[Sources]
+  DetectTestKeyDxe.c
+
+[Packages]
+  FmpDevicePkg/FmpDevicePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DetectTestKeyLib
+  UefiDriverEntryPoint
