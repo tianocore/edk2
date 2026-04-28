@@ -226,6 +226,7 @@
   UefiCpuPkg/Library/BaseRiscVMmuLib/BaseRiscVMmuLib.inf
   UefiCpuPkg/CpuTimerDxeRiscV64/CpuTimerDxeRiscV64.inf
   UefiCpuPkg/CpuDxeRiscV64/CpuDxeRiscV64.inf
+  UefiCpuPkg/RiscVIoMmuDxe/IoMmuDxe.inf
   UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf
 
 [Components.AARCH64]
