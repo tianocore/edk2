@@ -532,6 +532,10 @@ GcdAttributeToPageAttribute (
   }
 
   // Determine protection attributes
+  if ((GcdAttributes & EFI_MEMORY_RP) != 0) {
+    *RiscVAttributes &= ~(UINT64)(RISCV_PG_R);
+  }
+
   if ((GcdAttributes & EFI_MEMORY_RO) != 0) {
     *RiscVAttributes &= ~(UINT64)(RISCV_PG_W);
   }
