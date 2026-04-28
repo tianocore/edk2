@@ -273,30 +273,17 @@ PrintDynamicCommandHelp (
   return (Found ? EFI_SUCCESS : Status);
 }
 
-STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
-  { L"-usage",   TypeFlag     },
-  { L"-section", TypeMaxValue },
-  { L"-verbose", TypeFlag     },
-  { L"-v",       TypeFlag     },
-  { NULL,        TypeMax      }
-};
+/** Main function of the 'Help' command.
 
-/**
-  Function for 'help' command.
-
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunHelp (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdHelp (
+  LIST_ENTRY  *Package
   )
 {
   EFI_STATUS    Status;
-  LIST_ENTRY    *Package;
-  CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
   CHAR16        *SortedCommandList;
   CONST CHAR16  *CurrentCommand;
@@ -307,38 +294,11 @@ ShellCommandRunHelp (
   UINTN         SortedCommandListSize;
 
   PrintCommandText   = TRUE;
-  Package            = NULL;
-  ProblemParam       = NULL;
-  ShellStatus        = SHELL_SUCCESS;
   CommandToGetHelpOn = NULL;
   SectionToGetHelpOn = NULL;
   SortedCommandList  = NULL;
   Found              = FALSE;
-
-  //
-  // initialize the shell lib (we must be in non-auto-init...)
-  //
-  Status = ShellInitialize ();
-  ASSERT_EFI_ERROR (Status);
-
-  Status = CommandInit ();
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // parse the command line
-  //
-  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"help", ProblemParam);
-      FreePool (ProblemParam);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  }
+  ShellStatus        = SHELL_SUCCESS;
 
   //
   // Check for conflicting parameters.
@@ -459,10 +419,6 @@ ShellCommandRunHelp (
     }
   }
 
-  if (Package != NULL) {
-    ShellCommandLineFreeVarList (Package);
-  }
-
   if ((CommandToGetHelpOn != NULL) && (StrCmp (CommandToGetHelpOn, L"*") == 0)) {
     //
     // If '*' then the command entered was 'Help' without qualifiers, This footer
@@ -480,6 +436,70 @@ ShellCommandRunHelp (
   }
 
   SHELL_FREE_NON_NULL (SortedCommandList);
+
+  return ShellStatus;
+}
+
+STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
+  { L"-usage",   TypeFlag     },
+  { L"-section", TypeMaxValue },
+  { L"-verbose", TypeFlag     },
+  { L"-v",       TypeFlag     },
+  { NULL,        TypeMax      }
+};
+
+/**
+  Function for 'help' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunHelp (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+
+  ProblemParam = NULL;
+  ShellStatus  = SHELL_SUCCESS;
+
+  //
+  // initialize the shell lib (we must be in non-auto-init...)
+  //
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
+  Status = CommandInit ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // parse the command line
+  //
+  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"help", ProblemParam);
+      FreePool (ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  }
+
+  ShellStatus = MainCmdHelp (Package);
+
+  //
+  // free the command line package
+  //
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }
