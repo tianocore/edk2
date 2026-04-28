@@ -3,6 +3,7 @@
 #
 #  Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) Microsoft Corporation.
+#  (c) Copyright 2026 HP Development Company, L.P.
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -33,6 +34,7 @@
   Kdf/CryptHkdf.c
   Cipher/CryptAes.c
   Cipher/CryptAeadAesGcm.c
+  Cipher/CryptAesCtr.c
   Cipher/CryptCamellia.c
   Pk/CryptRsaBasic.c
   Pk/CryptRsaExt.c

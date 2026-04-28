@@ -2,6 +2,7 @@
   Application for Cryptographic Primitives Validation.
 
 Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+(c) Copyright 2026 HP Development Company, L.P.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -90,6 +91,9 @@ extern TEST_DESC  mHkdfTest[];
 
 extern UINTN      mAeadAesGcmTestNum;
 extern TEST_DESC  mAeadAesGcmTest[];
+
+extern UINTN      mAesCtrTestNum;
+extern TEST_DESC  mAesCtrTest[];
 
 extern UINTN      mBnTestNum;
 extern TEST_DESC  mBnTest[];

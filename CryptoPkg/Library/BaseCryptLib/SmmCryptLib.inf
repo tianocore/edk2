@@ -11,6 +11,7 @@
 #  authenticode signature verification functions are not supported in this instance.
 #
 #  Copyright (c) 2010 - 2022, Intel Corporation. All rights reserved.<BR>
+#  (c) Copyright 2026 HP Development Company, L.P.
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -47,6 +48,7 @@
   Kdf/CryptHkdf.c
   Cipher/CryptAes.c
   Cipher/CryptAeadAesGcmNull.c
+  Cipher/CryptAesCtr.c
   Cipher/CryptCamellia.c
   Pk/CryptRsaBasic.c
   Pk/CryptRsaExt.c
