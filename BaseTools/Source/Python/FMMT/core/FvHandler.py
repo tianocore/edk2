@@ -622,6 +622,10 @@ class FvHandler:
         Delete_Fv = Delete_Ffs.Parent
         # Calculate free space
         Add_Free_Space = Delete_Ffs.Data.Size + len(Delete_Ffs.Data.PadData)
+
+        # Rebase PE/COFF images in subsequent FFS files that shift down after deletion.
+        self._rebase_after_delete(Delete_Ffs, Delete_Fv, Add_Free_Space)
+
         # If Ffs parent Fv have free space, follow the rules to merge the new free space.
         if Delete_Fv.Data.Free_Space:
             # If Fv is a Section fv, free space need to be recalculated to keep align with BlockSize.
@@ -888,3 +892,22 @@ class FvHandler:
                 found_pe = found_pe or nested_found
 
         return found_pe
+
+    def _rebase_after_delete(self, Delete_Ffs, Delete_Fv, deleted_size):
+        """Rebase PE/COFF images in FFS files that follow the deleted FFS.
+        After deletion, subsequent FFS files shift down by deleted_size bytes,
+        so their PE32/TE ImageBase must be adjusted by -deleted_size."""
+        try:
+            target_index = Delete_Fv.Child.index(Delete_Ffs)
+        except ValueError:
+            return
+
+        address_delta = -deleted_size  # shift down
+
+        for i in range(target_index + 1, len(Delete_Fv.Child)):
+            subsequent_ffs = Delete_Fv.Child[i]
+            if subsequent_ffs.type == FFS_FREE_SPACE:
+                continue
+            self._rebase_ffs_pe_sections(subsequent_ffs, address_delta)
+            if hasattr(subsequent_ffs, 'Data') and hasattr(subsequent_ffs.Data, 'ModCheckSum'):
+                subsequent_ffs.Data.ModCheckSum()
