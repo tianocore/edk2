@@ -128,72 +128,74 @@ ShellCommandRunCls (
     } else {
       ASSERT (FALSE);
     }
+
+    return ShellStatus;
+  }
+
+  //
+  // check for "-?"
+  //
+  if (ShellCommandLineGetFlag (Package, L"-?")) {
+    ASSERT (FALSE);
+  } else if (ShellCommandLineGetFlag (Package, L"-sfo")) {
+    if (ShellCommandLineGetCount (Package) > 1) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"cls");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      Background = (gST->ConOut->Mode->Attribute >> 4) & 0x7;
+      Foreground = gST->ConOut->Mode->Attribute & 0x0F;
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_SFO_HEADER), gShellLevel3HiiHandle, L"cls");
+      ShellPrintHiiDefaultEx (
+        STRING_TOKEN (STR_CLS_OUTPUT_SFO),
+        gShellLevel3HiiHandle,
+        gST->ConOut->Mode->Attribute,
+        Foreground,
+        Background
+        );
+    }
   } else {
     //
-    // check for "-?"
+    // If there are 0 value parameters, clear sceen
     //
-    if (ShellCommandLineGetFlag (Package, L"-?")) {
-      ASSERT (FALSE);
-    } else if (ShellCommandLineGetFlag (Package, L"-sfo")) {
-      if (ShellCommandLineGetCount (Package) > 1) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"cls");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        Background = (gST->ConOut->Mode->Attribute >> 4) & 0x7;
-        Foreground = gST->ConOut->Mode->Attribute & 0x0F;
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_SFO_HEADER), gShellLevel3HiiHandle, L"cls");
-        ShellPrintHiiDefaultEx (
-          STRING_TOKEN (STR_CLS_OUTPUT_SFO),
-          gShellLevel3HiiHandle,
-          gST->ConOut->Mode->Attribute,
-          Foreground,
-          Background
-          );
-      }
+    BackColorStr = ShellCommandLineGetRawValue (Package, 1);
+    ForeColorStr = ShellCommandLineGetRawValue (Package, 2);
+
+    if ((BackColorStr == NULL) && (ForeColorStr == NULL)) {
+      //
+      // clear screen
+      //
+      gST->ConOut->ClearScreen (gST->ConOut);
+    } else if (ShellCommandLineGetCount (Package) > 3) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"cls");
+      ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
-      //
-      // If there are 0 value parameters, clear sceen
-      //
-      BackColorStr = ShellCommandLineGetRawValue (Package, 1);
-      ForeColorStr = ShellCommandLineGetRawValue (Package, 2);
+      if (BackColorStr != NULL) {
+        ShellStatus = GetClsColorIndex (BackColorStr, 7, 1, &ColorIndex);
+        if (ShellStatus != SHELL_SUCCESS) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"cls", BackColorStr);
+        } else {
+          Background = mClsBackgroundColorMap[ColorIndex];
 
-      if ((BackColorStr == NULL) && (ForeColorStr == NULL)) {
-        //
-        // clear screen
-        //
-        gST->ConOut->ClearScreen (gST->ConOut);
-      } else if (ShellCommandLineGetCount (Package) > 3) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"cls");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        if (BackColorStr != NULL) {
-          ShellStatus = GetClsColorIndex (BackColorStr, 7, 1, &ColorIndex);
-          if (ShellStatus != SHELL_SUCCESS) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"cls", BackColorStr);
-          } else {
-            Background = mClsBackgroundColorMap[ColorIndex];
-
-            if (ForeColorStr != NULL) {
-              ShellStatus = GetClsColorIndex (ForeColorStr, 15, 2, &ColorIndex);
-              if (ShellStatus != SHELL_SUCCESS) {
-                ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"cls", ForeColorStr);
-              } else {
-                Foreground = mClsForegroundColorMap[ColorIndex];
-              }
+          if (ForeColorStr != NULL) {
+            ShellStatus = GetClsColorIndex (ForeColorStr, 15, 2, &ColorIndex);
+            if (ShellStatus != SHELL_SUCCESS) {
+              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"cls", ForeColorStr);
             } else {
-              //
-              // Since foreground color is not modified, so retain
-              // existing foreground color without any change to it.
-              //
-              Foreground = gST->ConOut->Mode->Attribute & 0x0F;
+              Foreground = mClsForegroundColorMap[ColorIndex];
             }
+          } else {
+            //
+            // Since foreground color is not modified, so retain
+            // existing foreground color without any change to it.
+            //
+            Foreground = gST->ConOut->Mode->Attribute & 0x0F;
+          }
 
-            if (ShellStatus == SHELL_SUCCESS) {
-              Status = gST->ConOut->SetAttribute (gST->ConOut, (Foreground | Background) & 0x7F);
-              ASSERT_EFI_ERROR (Status);
-              Status = gST->ConOut->ClearScreen (gST->ConOut);
-              ASSERT_EFI_ERROR (Status);
-            }
+          if (ShellStatus == SHELL_SUCCESS) {
+            Status = gST->ConOut->SetAttribute (gST->ConOut, (Foreground | Background) & 0x7F);
+            ASSERT_EFI_ERROR (Status);
+            Status = gST->ConOut->ClearScreen (gST->ConOut);
+            ASSERT_EFI_ERROR (Status);
           }
         }
       }

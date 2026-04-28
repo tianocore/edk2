@@ -192,95 +192,97 @@ ShellCommandRunAlias (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    Param1 = ShellCommandLineGetRawValue (Package, 1);
-    Param2 = ShellCommandLineGetRawValue (Package, 2);
 
-    DeleteFlag   = ShellCommandLineGetFlag (Package, L"-d");
-    VolatileFlag = ShellCommandLineGetFlag (Package, L"-v");
+    return ShellStatus;
+  }
 
-    if (Param2 != NULL) {
-      CleanParam2 = AllocateCopyPool (StrSize (Param2), Param2);
-      if (CleanParam2 == NULL) {
-        ShellCommandLineFreeVarList (Package);
-        return SHELL_OUT_OF_RESOURCES;
-      }
+  Param1 = ShellCommandLineGetRawValue (Package, 1);
+  Param2 = ShellCommandLineGetRawValue (Package, 2);
 
-      if ((CleanParam2[0] == L'\"') && (CleanParam2[StrLen (CleanParam2)-1] == L'\"')) {
-        CleanParam2[StrLen (CleanParam2)-1] = L'\0';
-        CopyMem (CleanParam2, CleanParam2 + 1, StrSize (CleanParam2) - sizeof (CleanParam2[0]));
-      }
+  DeleteFlag   = ShellCommandLineGetFlag (Package, L"-d");
+  VolatileFlag = ShellCommandLineGetFlag (Package, L"-v");
+
+  if (Param2 != NULL) {
+    CleanParam2 = AllocateCopyPool (StrSize (Param2), Param2);
+    if (CleanParam2 == NULL) {
+      ShellCommandLineFreeVarList (Package);
+      return SHELL_OUT_OF_RESOURCES;
     }
 
-    if (!DeleteFlag && !VolatileFlag) {
-      switch (ShellCommandLineGetCount (Package)) {
-        case 1:
-          //
-          // "alias"
-          //
-          ShellStatus = PrintAllShellAlias ();
-          break;
-        case 2:
-          //
-          // "alias Param1"
-          //
-          ShellStatus = PrintSingleShellAlias (Param1);
-          break;
-        case 3:
-          //
-          // "alias Param1 CleanParam2"
-          //
-          ShellStatus = ShellLevel3CommandsLibSetAlias (CleanParam2, Param1, FALSE, VolatileFlag);
-          break;
-        default:
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"alias");
-          ShellStatus = SHELL_INVALID_PARAMETER;
-      }
-    } else if (DeleteFlag) {
-      if (VolatileFlag || (ShellCommandLineGetCount (Package) > 1)) {
+    if ((CleanParam2[0] == L'\"') && (CleanParam2[StrLen (CleanParam2)-1] == L'\"')) {
+      CleanParam2[StrLen (CleanParam2)-1] = L'\0';
+      CopyMem (CleanParam2, CleanParam2 + 1, StrSize (CleanParam2) - sizeof (CleanParam2[0]));
+    }
+  }
+
+  if (!DeleteFlag && !VolatileFlag) {
+    switch (ShellCommandLineGetCount (Package)) {
+      case 1:
+        //
+        // "alias"
+        //
+        ShellStatus = PrintAllShellAlias ();
+        break;
+      case 2:
+        //
+        // "alias Param1"
+        //
+        ShellStatus = PrintSingleShellAlias (Param1);
+        break;
+      case 3:
+        //
+        // "alias Param1 CleanParam2"
+        //
+        ShellStatus = ShellLevel3CommandsLibSetAlias (CleanParam2, Param1, FALSE, VolatileFlag);
+        break;
+      default:
         ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"alias");
         ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        ParamStrD = ShellCommandLineGetValue (Package, L"-d");
-        if (ParamStrD == NULL) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel3HiiHandle, L"alias");
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        } else {
-          //
-          // Delete an alias: "alias -d ParamStrD"
-          //
-          ShellStatus = ShellLevel3CommandsLibSetAlias (ParamStrD, NULL, TRUE, FALSE);
-        }
-      }
+    }
+  } else if (DeleteFlag) {
+    if (VolatileFlag || (ShellCommandLineGetCount (Package) > 1)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"alias");
+      ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
-      //
-      // Set volatile alias.
-      //
-      ASSERT (VolatileFlag);
-      ASSERT (!DeleteFlag);
-      switch (ShellCommandLineGetCount (Package)) {
-        case 1:
-        case 2:
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel3HiiHandle, L"alias");
-          ShellStatus = SHELL_INVALID_PARAMETER;
-          break;
-        case 3:
-          //
-          // "alias -v Param1 CleanParam2"
-          //
-          ShellStatus = ShellLevel3CommandsLibSetAlias (CleanParam2, Param1, FALSE, VolatileFlag);
-          break;
-        default:
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"alias");
-          ShellStatus = SHELL_INVALID_PARAMETER;
+      ParamStrD = ShellCommandLineGetValue (Package, L"-d");
+      if (ParamStrD == NULL) {
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel3HiiHandle, L"alias");
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      } else {
+        //
+        // Delete an alias: "alias -d ParamStrD"
+        //
+        ShellStatus = ShellLevel3CommandsLibSetAlias (ParamStrD, NULL, TRUE, FALSE);
       }
     }
-
+  } else {
     //
-    // free the command line package
+    // Set volatile alias.
     //
-    ShellCommandLineFreeVarList (Package);
+    ASSERT (VolatileFlag);
+    ASSERT (!DeleteFlag);
+    switch (ShellCommandLineGetCount (Package)) {
+      case 1:
+      case 2:
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel3HiiHandle, L"alias");
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        break;
+      case 3:
+        //
+        // "alias -v Param1 CleanParam2"
+        //
+        ShellStatus = ShellLevel3CommandsLibSetAlias (CleanParam2, Param1, FALSE, VolatileFlag);
+        break;
+      default:
+        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"alias");
+        ShellStatus = SHELL_INVALID_PARAMETER;
+    }
   }
+
+  //
+  // free the command line package
+  //
+  ShellCommandLineFreeVarList (Package);
 
   SHELL_FREE_NON_NULL (CleanParam2);
   return (ShellStatus);
