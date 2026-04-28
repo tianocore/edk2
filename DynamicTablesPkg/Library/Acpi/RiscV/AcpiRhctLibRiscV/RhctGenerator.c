@@ -481,7 +481,6 @@ AddIsaStringNodes (
   )
 {
   EFI_ACPI_6_6_RHCT_ISA_STRING_NODE  *IsaStringNode;
-  EFI_STATUS                         Status;
   UINT32                             NodeLength;
   UINT16                             IsaLength;
 
@@ -498,11 +497,11 @@ AddIsaStringNodes (
     IsaStringNode->Node.Type     = EFI_ACPI_6_6_RHCT_NODE_TYPE_ISA_STRING;
     IsaStringNode->Node.Length   = (UINT16)NodeLength;
     IsaStringNode->Node.Revision = EFI_ACPI_6_6_RHCT_ISA_NODE_STRUCTURE_VERSION;
-    Status                       = AsciiStrCpyS (
-                                     IsaStringNode->Isa,
-                                     IsaLength,
-                                     NodeList->IsaString
-                                     );
+    AsciiStrCpyS (
+                  IsaStringNode->Isa,
+                  IsaLength,
+                  NodeList->IsaString
+                  );
     IsaStringNode = (EFI_ACPI_6_6_RHCT_ISA_STRING_NODE *)((CHAR8 *)IsaStringNode + NodeLength);
     NodeList++;
   }
