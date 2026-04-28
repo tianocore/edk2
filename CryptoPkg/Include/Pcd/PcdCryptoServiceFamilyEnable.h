@@ -453,4 +453,28 @@ typedef struct {
     } Services;
     UINT32    Family;
   } Camellia;
+  union {
+    struct {
+      UINT8    DsaCreatePublicKeyObject : 1;
+      UINT8    DsaFreePublicKeyObject   : 1;
+      UINT8    DsaVerify                : 1;
+    } Services;
+    UINT32    Family;
+  } Ed;
+  union {
+    struct {
+      UINT8    DsaCreatePublicKeyObject : 1;
+      UINT8    DsaFreePublicKeyObject   : 1;
+      UINT8    DsaVerify                : 1;
+    } Services;
+    UINT32    Family;
+  } Ml;
+  union {
+    struct {
+      UINT8    DsaCreatePublicKeyObject : 1;
+      UINT8    DsaFreePublicKeyObject   : 1;
+      UINT8    DsaVerify                : 1;
+    } Services;
+    UINT32    Family;
+  } Slh;
 } PCD_CRYPTO_SERVICE_FAMILY_ENABLE;
