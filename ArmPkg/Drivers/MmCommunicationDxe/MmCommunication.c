@@ -20,7 +20,6 @@
 #include <Protocol/MmCommunication2.h>
 #include <Protocol/MmCommunication3.h>
 
-#include <IndustryStandard/ArmStdSmc.h>
 #include <IndustryStandard/ArmFfaSvc.h>
 #include <IndustryStandard/MmCommunicate.h>
 
@@ -77,71 +76,6 @@ SendFfaMmCommunicate (
   }
 
   return Status;
-}
-
-/**
-  Convert SmcMmRet value to EFI_STATUS.
-
-  @param[in] SmcMmRet              Mm return code
-
-  @retval EFI_SUCCESS
-  @retval Others                   Error status correspond to SmcMmRet
-
-**/
-STATIC
-EFI_STATUS
-SmcMmRetToEfiStatus (
-  IN UINTN  SmcMmRet
-  )
-{
-  switch ((UINT32)SmcMmRet) {
-    case ARM_SMC_MM_RET_SUCCESS:
-      return EFI_SUCCESS;
-    case ARM_SMC_MM_RET_INVALID_PARAMS:
-      return EFI_INVALID_PARAMETER;
-    case ARM_SMC_MM_RET_DENIED:
-      return EFI_ACCESS_DENIED;
-    case ARM_SMC_MM_RET_NO_MEMORY:
-      return EFI_OUT_OF_RESOURCES;
-    default:
-      return EFI_ACCESS_DENIED;
-  }
-}
-
-/**
-  Send mm communicate request via SPM_MM.
-
-  @retval EFI_SUCCESS
-  @retval Others                   Error.
-
-**/
-STATIC
-EFI_STATUS
-EFIAPI
-SendSpmMmCommunicate (
-  IN VOID
-  )
-{
-  ARM_SMC_ARGS  CommunicateSmcArgs;
-
-  ZeroMem (&CommunicateSmcArgs, sizeof (ARM_SMC_ARGS));
-
-  // SMC Function ID
-  CommunicateSmcArgs.Arg0 = ARM_SMC_ID_MM_COMMUNICATE_AARCH64;
-
-  // Cookie
-  CommunicateSmcArgs.Arg1 = 0;
-
-  // comm_buffer_address (64-bit physical address)
-  CommunicateSmcArgs.Arg2 = (UINTN)mNsCommBuffMemRegion.PhysicalBase;
-
-  // comm_size_address (not used, indicated by setting to zero)
-  CommunicateSmcArgs.Arg3 = 0;
-
-  // Call the Standalone MM environment.
-  ArmCallSmc (&CommunicateSmcArgs);
-
-  return SmcMmRetToEfiStatus (CommunicateSmcArgs.Arg0);
 }
 
 /**
@@ -262,12 +196,7 @@ MmCommunicationCommon (
   // Copy Communication Payload
   CopyMem ((VOID *)mNsCommBuffMemRegion.VirtualBase, CommBufferVirtual, BufferSize);
 
-  if (IsFfaSupported ()) {
-    Status = SendFfaMmCommunicate ();
-  } else {
-    Status = SendSpmMmCommunicate ();
-  }
-
+  Status = SendFfaMmCommunicate ();
   if (!EFI_ERROR (Status)) {
     ZeroMem (CommBufferVirtual, BufferSize);
     // On successful return, the size of data being returned is inferred from
@@ -433,57 +362,6 @@ NotifySetVirtualAddressMap (
 }
 
 /**
-  Check mm communication compatibility when use SPM_MM.
-
-**/
-STATIC
-EFI_STATUS
-EFIAPI
-GetMmCompatibility (
-  VOID
-  )
-{
-  EFI_STATUS    Status;
-  UINT32        MmVersion;
-  ARM_SMC_ARGS  MmVersionArgs;
-
-  // MM_VERSION uses SMC32 calling conventions
-  MmVersionArgs.Arg0 = ARM_SMC_ID_MM_VERSION_AARCH32;
-
-  ArmCallSmc (&MmVersionArgs);
-
-  if (MmVersionArgs.Arg0 == ARM_SMC_MM_RET_NOT_SUPPORTED) {
-    return EFI_UNSUPPORTED;
-  }
-
-  MmVersion = MmVersionArgs.Arg0;
-
-  if ((MM_MAJOR_VER (MmVersion) == MM_CALLER_MAJOR_VER) &&
-      (MM_MINOR_VER (MmVersion) >= MM_CALLER_MINOR_VER))
-  {
-    DEBUG ((
-      DEBUG_INFO,
-      "MM Version: Major=0x%x, Minor=0x%x\n",
-      MM_MAJOR_VER (MmVersion),
-      MM_MINOR_VER (MmVersion)
-      ));
-    Status = EFI_SUCCESS;
-  } else {
-    DEBUG ((
-      DEBUG_ERROR,
-      "Incompatible MM Versions.\n Current Version: Major=0x%x, Minor=0x%x.\n Expected: Major=0x%x, Minor>=0x%x.\n",
-      MM_MAJOR_VER (MmVersion),
-      MM_MINOR_VER (MmVersion),
-      MM_CALLER_MAJOR_VER,
-      MM_CALLER_MINOR_VER
-      ));
-    Status = EFI_UNSUPPORTED;
-  }
-
-  return Status;
-}
-
-/**
   Check mm communication compatibility when use FF-A.
 
 **/
@@ -594,19 +472,21 @@ InitializeCommunication (
 {
   EFI_STATUS  Status;
 
-  Status = EFI_UNSUPPORTED;
-
-  if (IsFfaSupported ()) {
-    Status = GetFfaCompatibility ();
-    if (!EFI_ERROR (Status)) {
-      Status = InitializeFfaCommunication ();
-    }
-  } else {
-    Status = GetMmCompatibility ();
-    // No further initialisation required for SpmMM
+  if (!IsFfaSupported ()) {
+    return EFI_UNSUPPORTED;
   }
 
-  return Status;
+  Status = GetFfaCompatibility ();
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = InitializeFfaCommunication ();
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return EFI_SUCCESS;
 }
 
 STATIC EFI_GUID *CONST  mGuidedEventGuid[] = {
