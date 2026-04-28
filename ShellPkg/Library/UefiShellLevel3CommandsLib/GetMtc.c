@@ -51,41 +51,43 @@ ShellCommandRunGetMtc (
     } else {
       ASSERT (FALSE);
     }
+
+    return ShellStatus;
+  }
+
+  //
+  // check for "-?"
+  //
+  if (ShellCommandLineGetFlag (Package, L"-?")) {
+    ASSERT (FALSE);
+  } else if (ShellCommandLineGetRawValue (Package, 1) != NULL) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"getmtc");
+    ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
     //
-    // check for "-?"
+    // Get the monotonic counter count
     //
-    if (ShellCommandLineGetFlag (Package, L"-?")) {
-      ASSERT (FALSE);
-    } else if (ShellCommandLineGetRawValue (Package, 1) != NULL) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"getmtc");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      //
-      // Get the monotonic counter count
-      //
-      Status = gBS->GetNextMonotonicCount (&Mtc);
-      if (Status == EFI_DEVICE_ERROR) {
-        ShellStatus = SHELL_DEVICE_ERROR;
-      } else if (Status == EFI_SECURITY_VIOLATION) {
-        ShellStatus = SHELL_SECURITY_VIOLATION;
-      } else if (EFI_ERROR (Status)) {
-        ShellStatus = SHELL_DEVICE_ERROR;
-      }
-
-      //
-      // print it...
-      //
-      if (ShellStatus == SHELL_SUCCESS) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GET_MTC_OUTPUT), gShellLevel3HiiHandle, Mtc);
-      }
+    Status = gBS->GetNextMonotonicCount (&Mtc);
+    if (Status == EFI_DEVICE_ERROR) {
+      ShellStatus = SHELL_DEVICE_ERROR;
+    } else if (Status == EFI_SECURITY_VIOLATION) {
+      ShellStatus = SHELL_SECURITY_VIOLATION;
+    } else if (EFI_ERROR (Status)) {
+      ShellStatus = SHELL_DEVICE_ERROR;
     }
 
     //
-    // free the command line package
+    // print it...
     //
-    ShellCommandLineFreeVarList (Package);
+    if (ShellStatus == SHELL_SUCCESS) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GET_MTC_OUTPUT), gShellLevel3HiiHandle, Mtc);
+    }
   }
+
+  //
+  // free the command line package
+  //
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }

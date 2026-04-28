@@ -336,124 +336,126 @@ ShellCommandRunHelp (
     } else {
       ASSERT (FALSE);
     }
+
+    return ShellStatus;
+  }
+
+  //
+  // Check for conflicting parameters.
+  //
+  if (  ShellCommandLineGetFlag (Package, L"-usage")
+     && ShellCommandLineGetFlag (Package, L"-section")
+     && (ShellCommandLineGetFlag (Package, L"-verbose") || ShellCommandLineGetFlag (Package, L"-v"))
+        )
+  {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_CON), gShellLevel3HiiHandle, L"help");
+    ShellStatus = SHELL_INVALID_PARAMETER;
+  } else if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"help");
+    ShellStatus = SHELL_INVALID_PARAMETER;
   } else {
     //
-    // Check for conflicting parameters.
+    // Get the command name we are getting help on
     //
-    if (  ShellCommandLineGetFlag (Package, L"-usage")
-       && ShellCommandLineGetFlag (Package, L"-section")
-       && (ShellCommandLineGetFlag (Package, L"-verbose") || ShellCommandLineGetFlag (Package, L"-v"))
-          )
-    {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_CON), gShellLevel3HiiHandle, L"help");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"help");
-      ShellStatus = SHELL_INVALID_PARAMETER;
+    ASSERT (CommandToGetHelpOn == NULL);
+    StrnCatGrow (&CommandToGetHelpOn, NULL, ShellCommandLineGetRawValue (Package, 1), 0);
+    if ((CommandToGetHelpOn == NULL) && ShellCommandLineGetFlag (Package, L"-?")) {
+      //
+      // If we dont have a command and we got a simple -?
+      // we are looking for help on help command.
+      //
+      StrnCatGrow (&CommandToGetHelpOn, NULL, L"help", 0);
+    }
+
+    if (CommandToGetHelpOn == NULL) {
+      StrnCatGrow (&CommandToGetHelpOn, NULL, L"*", 0);
+      ASSERT (SectionToGetHelpOn == NULL);
+      StrnCatGrow (&SectionToGetHelpOn, NULL, L"NAME", 0);
     } else {
+      PrintCommandText = FALSE;
+      ASSERT (SectionToGetHelpOn == NULL);
       //
-      // Get the command name we are getting help on
+      // Get the section name for the given command name
       //
-      ASSERT (CommandToGetHelpOn == NULL);
-      StrnCatGrow (&CommandToGetHelpOn, NULL, ShellCommandLineGetRawValue (Package, 1), 0);
-      if ((CommandToGetHelpOn == NULL) && ShellCommandLineGetFlag (Package, L"-?")) {
-        //
-        // If we dont have a command and we got a simple -?
-        // we are looking for help on help command.
-        //
-        StrnCatGrow (&CommandToGetHelpOn, NULL, L"help", 0);
-      }
-
-      if (CommandToGetHelpOn == NULL) {
-        StrnCatGrow (&CommandToGetHelpOn, NULL, L"*", 0);
-        ASSERT (SectionToGetHelpOn == NULL);
-        StrnCatGrow (&SectionToGetHelpOn, NULL, L"NAME", 0);
+      if (ShellCommandLineGetFlag (Package, L"-section")) {
+        StrnCatGrow (&SectionToGetHelpOn, NULL, ShellCommandLineGetValue (Package, L"-section"), 0);
+      } else if (ShellCommandLineGetFlag (Package, L"-usage")) {
+        StrnCatGrow (&SectionToGetHelpOn, NULL, L"NAME,SYNOPSIS", 0);
+      } else if (ShellCommandLineGetFlag (Package, L"-verbose") || ShellCommandLineGetFlag (Package, L"-v")) {
       } else {
-        PrintCommandText = FALSE;
-        ASSERT (SectionToGetHelpOn == NULL);
         //
-        // Get the section name for the given command name
+        // The output of help <command> will display NAME, SYNOPSIS, OPTIONS, DESCRIPTION, and EXAMPLES sections.
         //
-        if (ShellCommandLineGetFlag (Package, L"-section")) {
-          StrnCatGrow (&SectionToGetHelpOn, NULL, ShellCommandLineGetValue (Package, L"-section"), 0);
-        } else if (ShellCommandLineGetFlag (Package, L"-usage")) {
-          StrnCatGrow (&SectionToGetHelpOn, NULL, L"NAME,SYNOPSIS", 0);
-        } else if (ShellCommandLineGetFlag (Package, L"-verbose") || ShellCommandLineGetFlag (Package, L"-v")) {
-        } else {
-          //
-          // The output of help <command> will display NAME, SYNOPSIS, OPTIONS, DESCRIPTION, and EXAMPLES sections.
-          //
-          StrnCatGrow (&SectionToGetHelpOn, NULL, L"NAME,SYNOPSIS,OPTIONS,DESCRIPTION,EXAMPLES", 0);
+        StrnCatGrow (&SectionToGetHelpOn, NULL, L"NAME,SYNOPSIS,OPTIONS,DESCRIPTION,EXAMPLES", 0);
+      }
+    }
+
+    if (gUnicodeCollation->StriColl (gUnicodeCollation, CommandToGetHelpOn, L"special") == 0) {
+      //
+      // we need info on the special characters
+      //
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_SC_HEADER), gShellLevel3HiiHandle);
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_SC_DATA), gShellLevel3HiiHandle);
+      Found = TRUE;
+    } else {
+      SortedCommandList     = NULL;
+      SortedCommandListSize = 0;
+      CopyListOfCommandNames (&SortedCommandList, &SortedCommandListSize, ShellCommandGetCommandList (TRUE));
+      CopyListOfCommandNamesWithDynamic (&SortedCommandList, &SortedCommandListSize);
+
+      for (CurrentCommand = SortedCommandList;
+           CurrentCommand != NULL && CurrentCommand < SortedCommandList + SortedCommandListSize/sizeof (CHAR16) && *CurrentCommand != CHAR_NULL;
+           CurrentCommand += StrLen (CurrentCommand) + 1
+           )
+      {
+        //
+        // Checking execution break flag when print multiple command help information.
+        //
+        if (ShellGetExecutionBreakFlag ()) {
+          break;
         }
-      }
 
-      if (gUnicodeCollation->StriColl (gUnicodeCollation, CommandToGetHelpOn, L"special") == 0) {
-        //
-        // we need info on the special characters
-        //
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_SC_HEADER), gShellLevel3HiiHandle);
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_SC_DATA), gShellLevel3HiiHandle);
-        Found = TRUE;
-      } else {
-        SortedCommandList     = NULL;
-        SortedCommandListSize = 0;
-        CopyListOfCommandNames (&SortedCommandList, &SortedCommandListSize, ShellCommandGetCommandList (TRUE));
-        CopyListOfCommandNamesWithDynamic (&SortedCommandList, &SortedCommandListSize);
-
-        for (CurrentCommand = SortedCommandList
-             ; CurrentCommand != NULL && CurrentCommand < SortedCommandList + SortedCommandListSize/sizeof (CHAR16) && *CurrentCommand != CHAR_NULL
-             ; CurrentCommand += StrLen (CurrentCommand) + 1
-             )
+        if ((gUnicodeCollation->MetaiMatch (gUnicodeCollation, (CHAR16 *)CurrentCommand, CommandToGetHelpOn)) ||
+            ((gEfiShellProtocol->GetAlias (CommandToGetHelpOn, NULL) != NULL) && (gUnicodeCollation->MetaiMatch (gUnicodeCollation, (CHAR16 *)CurrentCommand, (CHAR16 *)(gEfiShellProtocol->GetAlias (CommandToGetHelpOn, NULL))))))
         {
           //
-          // Checking execution break flag when print multiple command help information.
+          // We have a command to look for help on.
           //
-          if (ShellGetExecutionBreakFlag ()) {
-            break;
+          Status = ShellPrintHelp (CurrentCommand, SectionToGetHelpOn, PrintCommandText);
+          if (EFI_ERROR (Status)) {
+            //
+            // now try to match against the dynamic command list and print help
+            //
+            Status = PrintDynamicCommandHelp (CurrentCommand, SectionToGetHelpOn, PrintCommandText);
           }
 
-          if ((gUnicodeCollation->MetaiMatch (gUnicodeCollation, (CHAR16 *)CurrentCommand, CommandToGetHelpOn)) ||
-              ((gEfiShellProtocol->GetAlias (CommandToGetHelpOn, NULL) != NULL) && (gUnicodeCollation->MetaiMatch (gUnicodeCollation, (CHAR16 *)CurrentCommand, (CHAR16 *)(gEfiShellProtocol->GetAlias (CommandToGetHelpOn, NULL))))))
-          {
-            //
-            // We have a command to look for help on.
-            //
-            Status = ShellPrintHelp (CurrentCommand, SectionToGetHelpOn, PrintCommandText);
-            if (EFI_ERROR (Status)) {
-              //
-              // now try to match against the dynamic command list and print help
-              //
-              Status = PrintDynamicCommandHelp (CurrentCommand, SectionToGetHelpOn, PrintCommandText);
-            }
-
-            if (Status == EFI_DEVICE_ERROR) {
-              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, CurrentCommand);
-            } else if (EFI_ERROR (Status)) {
-              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, CurrentCommand);
-            } else {
-              Found = TRUE;
-            }
-          }
-        }
-
-        //
-        // Search the .man file for Shell applications (Shell external commands).
-        //
-        if (!Found) {
-          Status = ShellPrintHelp (CommandToGetHelpOn, SectionToGetHelpOn, FALSE);
           if (Status == EFI_DEVICE_ERROR) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, CommandToGetHelpOn);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, CurrentCommand);
           } else if (EFI_ERROR (Status)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, CommandToGetHelpOn);
+            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, CurrentCommand);
           } else {
             Found = TRUE;
           }
         }
       }
 
+      //
+      // Search the .man file for Shell applications (Shell external commands).
+      //
       if (!Found) {
-        ShellStatus = SHELL_NOT_FOUND;
+        Status = ShellPrintHelp (CommandToGetHelpOn, SectionToGetHelpOn, FALSE);
+        if (Status == EFI_DEVICE_ERROR) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_INV), gShellLevel3HiiHandle, CommandToGetHelpOn);
+        } else if (EFI_ERROR (Status)) {
+          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_HELP_NF), gShellLevel3HiiHandle, CommandToGetHelpOn);
+        } else {
+          Found = TRUE;
+        }
       }
+    }
+
+    if (!Found) {
+      ShellStatus = SHELL_NOT_FOUND;
     }
   }
 
