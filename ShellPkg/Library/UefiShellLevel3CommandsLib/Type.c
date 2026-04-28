@@ -255,55 +255,49 @@ MainCmdType (
 
   if (AsciiMode && UnicodeMode) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"type", L"-a & -u");
-    ShellStatus = SHELL_INVALID_PARAMETER;
+    return SHELL_INVALID_PARAMETER;
   } else if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
     //
     // we insufficient parameters
     //
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel3HiiHandle, L"type");
-    ShellStatus = SHELL_INVALID_PARAMETER;
-  } else {
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  //
+  // get a list with each file specified by parameters
+  // if parameter is a directory then add all the files below it to the list
+  //
+  for ( ParamCount = 1, Param = ShellCommandLineGetRawValue (Package, ParamCount)
+        ; Param != NULL
+        ; ParamCount++, Param = ShellCommandLineGetRawValue (Package, ParamCount)
+        )
+  {
+    Status = ShellOpenFileMetaArg ((CHAR16 *)Param, EFI_FILE_MODE_READ, &FileList);
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel3HiiHandle, L"type", (CHAR16 *)Param);
+      return SHELL_NOT_FOUND;
+    }
+
     //
-    // get a list with each file specified by parameters
-    // if parameter is a directory then add all the files below it to the list
+    // check that we have at least 1 file
     //
-    for ( ParamCount = 1, Param = ShellCommandLineGetRawValue (Package, ParamCount)
-          ; Param != NULL
-          ; ParamCount++, Param = ShellCommandLineGetRawValue (Package, ParamCount)
-          )
-    {
-      Status = ShellOpenFileMetaArg ((CHAR16 *)Param, EFI_FILE_MODE_READ, &FileList);
-      if (EFI_ERROR (Status)) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel3HiiHandle, L"type", (CHAR16 *)Param);
-        ShellStatus = SHELL_NOT_FOUND;
-        break;
-      }
+    if ((FileList == NULL) || IsListEmpty (&FileList->Link)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel3HiiHandle, L"type", Param);
+      continue;
+    }
 
-      //
-      // make sure we completed the param parsing successfully...
-      // Also make sure that any previous action was successful
-      //
-      if (ShellStatus == SHELL_SUCCESS) {
-        //
-        // check that we have at least 1 file
-        //
-        if ((FileList == NULL) || IsListEmpty (&FileList->Link)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel3HiiHandle, L"type", Param);
-          continue;
-        } else {
-          ShellStatus = ProcessFileList (FileList, AsciiMode, UnicodeMode);
-        }
-      }
+    ShellStatus = ProcessFileList (FileList, AsciiMode, UnicodeMode);
 
-      //
-      // Free the fileList
-      //
-      if ((FileList != NULL) && !IsListEmpty (&FileList->Link)) {
-        Status = ShellCloseFileMetaArg (&FileList);
-      }
+    //
+    // Free the fileList
+    //
+    Status = ShellCloseFileMetaArg (&FileList);
+    ASSERT_EFI_ERROR (Status);
+    FileList = NULL;
 
-      ASSERT_EFI_ERROR (Status);
-      FileList = NULL;
+    if (ShellStatus != SHELL_SUCCESS) {
+      break;
     }
   }
 

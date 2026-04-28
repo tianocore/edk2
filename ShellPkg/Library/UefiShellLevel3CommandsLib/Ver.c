@@ -48,58 +48,58 @@ MainCmdVer (
     // we have too many parameters
     //
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"ver");
-    ShellStatus = SHELL_INVALID_PARAMETER;
-  } else {
-    if (ShellCommandLineGetFlag (Package, L"-s")) {
-      if (ShellCommandLineGetFlag (Package, L"-terse") || ShellCommandLineGetFlag (Package, L"-t")) {
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_CONFLICT), gShellLevel3HiiHandle, L"ver", L"-t or -terse", L"-s");
-        ShellStatus = SHELL_INVALID_PARAMETER;
-      } else {
-        ShellPrintHiiEx (
-          0,
-          gST->ConOut->Mode->CursorRow,
-          NULL,
-          STRING_TOKEN (STR_VER_OUTPUT_SIMPLE),
-          gShellLevel3HiiHandle,
-          gEfiShellProtocol->MajorVersion,
-          gEfiShellProtocol->MinorVersion
-          );
-      }
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  if (ShellCommandLineGetFlag (Package, L"-s")) {
+    if (ShellCommandLineGetFlag (Package, L"-terse") || ShellCommandLineGetFlag (Package, L"-t")) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_CONFLICT), gShellLevel3HiiHandle, L"ver", L"-t or -terse", L"-s");
+      ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       ShellPrintHiiEx (
         0,
         gST->ConOut->Mode->CursorRow,
         NULL,
-        STRING_TOKEN (STR_VER_OUTPUT_SHELL),
+        STRING_TOKEN (STR_VER_OUTPUT_SIMPLE),
         gShellLevel3HiiHandle,
-        SupportLevel[Level],
         gEfiShellProtocol->MajorVersion,
         gEfiShellProtocol->MinorVersion
         );
-      if (!ShellCommandLineGetFlag (Package, L"-terse") && !ShellCommandLineGetFlag (Package, L"-t")) {
-        ShellPrintHiiDefaultEx (
-          STRING_TOKEN (STR_VER_OUTPUT_SUPPLIER),
-          gShellLevel3HiiHandle,
-          (CHAR16 *)PcdGetPtr (PcdShellSupplier)
-          );
-
-        ShellPrintHiiDefaultEx (
-          STRING_TOKEN (STR_VER_OUTPUT_UEFI),
-          gShellLevel3HiiHandle,
-          (gST->Hdr.Revision&0xffff0000)>>16,
-          (gST->Hdr.Revision&0x0000ffff),
-          gST->FirmwareVendor,
-          gST->FirmwareRevision
-          );
-      }
     }
+  } else {
+    ShellPrintHiiEx (
+      0,
+      gST->ConOut->Mode->CursorRow,
+      NULL,
+      STRING_TOKEN (STR_VER_OUTPUT_SHELL),
+      gShellLevel3HiiHandle,
+      SupportLevel[Level],
+      gEfiShellProtocol->MajorVersion,
+      gEfiShellProtocol->MinorVersion
+      );
+    if (!ShellCommandLineGetFlag (Package, L"-terse") && !ShellCommandLineGetFlag (Package, L"-t")) {
+      ShellPrintHiiDefaultEx (
+        STRING_TOKEN (STR_VER_OUTPUT_SUPPLIER),
+        gShellLevel3HiiHandle,
+        (CHAR16 *)PcdGetPtr (PcdShellSupplier)
+        );
 
-    //
-    // implementation specific support for displaying processor architecture
-    //
-    if (ShellCommandLineGetFlag (Package, L"-_pa")) {
-      ShellPrintDefaultEx (L"%d\r\n", sizeof (UINTN) == sizeof (UINT64) ? 64 : 32);
+      ShellPrintHiiDefaultEx (
+        STRING_TOKEN (STR_VER_OUTPUT_UEFI),
+        gShellLevel3HiiHandle,
+        (gST->Hdr.Revision&0xffff0000)>>16,
+        (gST->Hdr.Revision&0x0000ffff),
+        gST->FirmwareVendor,
+        gST->FirmwareRevision
+        );
     }
+  }
+
+  //
+  // implementation specific support for displaying processor architecture
+  //
+  if (ShellCommandLineGetFlag (Package, L"-_pa")) {
+    ShellPrintDefaultEx (L"%d\r\n", sizeof (UINTN) == sizeof (UINT64) ? 64 : 32);
   }
 
   return ShellStatus;

@@ -394,56 +394,51 @@ MainCmdHelp (
   //
   // Check for conflicting parameters.
   //
-  if (  ShellCommandLineGetFlag (Package, L"-usage")
-     && ShellCommandLineGetFlag (Package, L"-section")
-     && (ShellCommandLineGetFlag (Package, L"-verbose") || ShellCommandLineGetFlag (Package, L"-v"))
-        )
+  if (ShellCommandLineGetFlag (Package, L"-usage")    &&
+      ShellCommandLineGetFlag (Package, L"-section")  &&
+      (ShellCommandLineGetFlag (Package, L"-verbose") || ShellCommandLineGetFlag (Package, L"-v")))
   {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_CON), gShellLevel3HiiHandle, L"help");
-    ShellStatus = SHELL_INVALID_PARAMETER;
+    return SHELL_INVALID_PARAMETER;
   } else if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"help");
-    ShellStatus = SHELL_INVALID_PARAMETER;
-  } else {
-    //
-    // Get the command name we are getting help on
-    //
-    ASSERT (CommandToGetHelpOn == NULL);
-    StrnCatGrow (&CommandToGetHelpOn, NULL, ShellCommandLineGetRawValue (Package, 1), 0);
-    if ((CommandToGetHelpOn == NULL) && ShellCommandLineGetFlag (Package, L"-?")) {
-      //
-      // If we dont have a command and we got a simple -?
-      // we are looking for help on help command.
-      //
-      StrnCatGrow (&CommandToGetHelpOn, NULL, L"help", 0);
-    }
-
-    if (CommandToGetHelpOn == NULL) {
-      StrnCatGrow (&CommandToGetHelpOn, NULL, L"*", 0);
-      ASSERT (SectionToGetHelpOn == NULL);
-      StrnCatGrow (&SectionToGetHelpOn, NULL, L"NAME", 0);
-    } else {
-      PrintCommandText = FALSE;
-      ASSERT (SectionToGetHelpOn == NULL);
-      //
-      // Get the section name for the given command name
-      //
-      if (ShellCommandLineGetFlag (Package, L"-section")) {
-        StrnCatGrow (&SectionToGetHelpOn, NULL, ShellCommandLineGetValue (Package, L"-section"), 0);
-      } else if (ShellCommandLineGetFlag (Package, L"-usage")) {
-        StrnCatGrow (&SectionToGetHelpOn, NULL, L"NAME,SYNOPSIS", 0);
-      } else if (ShellCommandLineGetFlag (Package, L"-verbose") || ShellCommandLineGetFlag (Package, L"-v")) {
-      } else {
-        //
-        // The output of help <command> will display NAME, SYNOPSIS, OPTIONS, DESCRIPTION, and EXAMPLES sections.
-        //
-        StrnCatGrow (&SectionToGetHelpOn, NULL, L"NAME,SYNOPSIS,OPTIONS,DESCRIPTION,EXAMPLES", 0);
-      }
-    }
-
-    ShellStatus = PrintMatchingHelp (CommandToGetHelpOn, SectionToGetHelpOn, PrintCommandText);
+    return SHELL_INVALID_PARAMETER;
   }
 
+  //
+  // Get the command name we are getting help on
+  //
+  StrnCatGrow (&CommandToGetHelpOn, NULL, ShellCommandLineGetRawValue (Package, 1), 0);
+  if ((CommandToGetHelpOn == NULL) && ShellCommandLineGetFlag (Package, L"-?")) {
+    //
+    // If we dont have a command and we got a simple -?
+    // we are looking for help on help command.
+    //
+    StrnCatGrow (&CommandToGetHelpOn, NULL, L"help", 0);
+  }
+
+  if (CommandToGetHelpOn == NULL) {
+    StrnCatGrow (&CommandToGetHelpOn, NULL, L"*", 0);
+    StrnCatGrow (&SectionToGetHelpOn, NULL, L"NAME", 0);
+  } else {
+    PrintCommandText = FALSE;
+    //
+    // Get the section name for the given command name
+    //
+    if (ShellCommandLineGetFlag (Package, L"-section")) {
+      StrnCatGrow (&SectionToGetHelpOn, NULL, ShellCommandLineGetValue (Package, L"-section"), 0);
+    } else if (ShellCommandLineGetFlag (Package, L"-usage")) {
+      StrnCatGrow (&SectionToGetHelpOn, NULL, L"NAME,SYNOPSIS", 0);
+    } else if (ShellCommandLineGetFlag (Package, L"-verbose") || ShellCommandLineGetFlag (Package, L"-v")) {
+    } else {
+      //
+      // The output of help <command> will display NAME, SYNOPSIS, OPTIONS, DESCRIPTION, and EXAMPLES sections.
+      //
+      StrnCatGrow (&SectionToGetHelpOn, NULL, L"NAME,SYNOPSIS,OPTIONS,DESCRIPTION,EXAMPLES", 0);
+    }
+  }
+
+  ShellStatus = PrintMatchingHelp (CommandToGetHelpOn, SectionToGetHelpOn, PrintCommandText);
   if ((CommandToGetHelpOn != NULL) && (StrCmp (CommandToGetHelpOn, L"*") == 0)) {
     //
     // If '*' then the command entered was 'Help' without qualifiers, This footer

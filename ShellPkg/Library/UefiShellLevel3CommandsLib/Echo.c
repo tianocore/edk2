@@ -27,14 +27,9 @@ MainCmdREcho (
   LIST_ENTRY  *Package
   )
 {
-  SHELL_STATUS  ShellStatus;
-  UINTN         ParamCount;
-  UINTN         Size;
-  CHAR16        *PrintString;
-
-  Size        = 0;
-  PrintString = NULL;
-  ShellStatus = SHELL_SUCCESS;
+  UINTN   ParamCount;
+  UINTN   Size;
+  CHAR16  *PrintString;
 
   //
   // check for "-?"
@@ -48,11 +43,13 @@ MainCmdREcho (
     // Turn it on
     //
     ShellCommandSetEchoState (TRUE);
+    return SHELL_SUCCESS;
   } else if (ShellCommandLineGetFlag (Package, L"-off")) {
     //
     // turn it off
     //
     ShellCommandSetEchoState (FALSE);
+    return SHELL_SUCCESS;
   } else if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
     //
     // output its current state
@@ -62,26 +59,31 @@ MainCmdREcho (
     } else {
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_ECHO_OFF), gShellLevel3HiiHandle);
     }
-  } else {
-    //
-    // print the line
-    //
-    for ( ParamCount = 1
-          ; ShellCommandLineGetRawValue (Package, ParamCount) != NULL
-          ; ParamCount++
-          )
-    {
-      StrnCatGrow (&PrintString, &Size, ShellCommandLineGetRawValue (Package, ParamCount), 0);
-      if (ShellCommandLineGetRawValue (Package, ParamCount+1) != NULL) {
-        StrnCatGrow (&PrintString, &Size, L" ", 0);
-      }
-    }
 
-    ShellPrintDefaultEx (L"%s\r\n", PrintString);
-    SHELL_FREE_NON_NULL (PrintString);
+    return SHELL_SUCCESS;
   }
 
-  return ShellStatus;
+  Size        = 0;
+  PrintString = NULL;
+
+  //
+  // print the line
+  //
+  for ( ParamCount = 1
+        ; ShellCommandLineGetRawValue (Package, ParamCount) != NULL
+        ; ParamCount++
+        )
+  {
+    StrnCatGrow (&PrintString, &Size, ShellCommandLineGetRawValue (Package, ParamCount), 0);
+    if (ShellCommandLineGetRawValue (Package, ParamCount+1) != NULL) {
+      StrnCatGrow (&PrintString, &Size, L" ", 0);
+    }
+  }
+
+  ShellPrintDefaultEx (L"%s\r\n", PrintString);
+  SHELL_FREE_NON_NULL (PrintString);
+
+  return SHELL_SUCCESS;
 }
 
 /**
