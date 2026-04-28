@@ -34,7 +34,7 @@ UnitTestValidateHandle (
   IHANDLE     *Handle;
   LIST_ENTRY  *Link;
 
-  if (UserHandle == NULL) {
+  if ((UserHandle == NULL) || (((IHANDLE *)UserHandle)->Signature != EFI_HANDLE_SIGNATURE)) {
     return EFI_INVALID_PARAMETER;
   }
 
