@@ -213,6 +213,8 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
             "SecurityPkg/DeviceSecurity/SpdmLib/libspdm", False))
         rs.append(RequiredSubmodule(
             "TcgTpmPkg/Library/TpmLib/TPM", False))
+        rs.append(RequiredSubmodule(
+            "ArmPkg/Library/ArmTransferListLib/libtl", False))
         return rs
 
     def GetName(self):
