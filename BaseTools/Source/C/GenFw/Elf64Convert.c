@@ -1734,8 +1734,11 @@ WriteSections64 (
           WriteSectionRiscV64 (Rel, Targ, SymShdr, Sym);
         } else if (mEhdr->e_machine == EM_LOONGARCH) {
           switch (ELF_R_TYPE(Rel->r_info)) {
-            INT64 Offset;
-            INT32 Lo, Hi;
+            INT64     Offset;
+            INT64     BackIdx;
+            INT32     LoImm, HiImm;
+            UINT8     *PreTarg;
+            Elf_Rela  *PreRel;
 
           case R_LARCH_SOP_PUSH_ABSOLUTE:
             //
@@ -1802,10 +1805,8 @@ WriteSections64 (
           case R_LARCH_ABS_LO12:
           case R_LARCH_ABS64_LO20:
           case R_LARCH_ABS64_HI12:
-          case R_LARCH_PCALA_LO12:
           case R_LARCH_PCALA64_LO20:
           case R_LARCH_PCALA64_HI12:
-          case R_LARCH_GOT_PC_LO12:
           case R_LARCH_GOT64_PC_LO20:
           case R_LARCH_GOT64_PC_HI12:
           case R_LARCH_GOT64_HI20:
@@ -1844,73 +1845,95 @@ WriteSections64 (
             //
             break;
 
+            //
+            // The following four types are used the PC related method to fixup.
+            //
+          case R_LARCH_PCALA_HI20:
           case R_LARCH_GOT_PC_HI20:
-            Offset = Sym->st_value - (UINTN)(Targ - mCoffFile);
-            if (Offset < 0) {
-              Offset = (UINTN)(Targ - mCoffFile) - Sym->st_value;
-              Hi = Offset & ~0xfff;
-              Lo = (INT32)((Offset & 0xfff) << 20) >> 20;
-              if ((Lo < 0) && (Lo > -2048)) {
-                Hi += 0x1000;
-                Lo = ~(0x1000 - Lo) + 1;
-              }
-              Hi = ~Hi + 1;
-              Lo = ~Lo + 1;
+            Offset = 0;
+            if (ELF_R_TYPE(Rel->r_info) == R_LARCH_PCALA_HI20) {
+              //
+              // Recover the offset of the ELF PCALAU12I symbol relative to PC.
+              //
+              Offset = (INT32)((Sym->st_value + Rel->r_addend) - (Rel->r_offset & ~0xFFF));
+              //
+              // Calculate the offset of PE PCADDU12I relative to PC.
+              //
+              Offset -= (UINTN)(Targ - mCoffFile) & 0xfff;
+            } else if (ELF_R_TYPE(Rel->r_info) == R_LARCH_GOT_PC_HI20) {
+              //
+              // Calculate the offset of PE PCADDU12I relative to PC using the ELF symbol value.
+              //
+              Offset = Sym->st_value - (UINTN)(Targ - mCoffFile);
             } else {
-              Hi = Offset & ~0xfff;
-              Lo = (INT32)((Offset & 0xfff) << 20) >> 20;
-              if (Lo < 0) {
-                Hi += 0x1000;
-                Lo = ~(0x1000 - Lo) + 1;
-              }
+                Error (NULL, 0, 3000, "Invalid", "LoongArch PC related: wrong relocation type.");
             }
-            // Re-encode the offset as PCADDU12I + ADDI.D(Convert LD.D) instruction
+
+            //
+            // PCALA or GOT offset is relative to the previous page boundary, whereas PCADD
+            // offset is relative to the instruction itself.
+            // So fix up the offset so it points to the page containing the symbol.
+            //
+            HiImm = (UINT32)((Offset + 0x800) >> 12) & 0xFFFFF;
+
+            //
+            // Convert the first instruction from PCALAU12I to PCADDU12I and re-encode the offset into them.
+            //
             *(UINT32 *)Targ &= 0x1f;
             *(UINT32 *)Targ |= 0x1c000000;
-            *(UINT32 *)Targ |= (((Hi >> 12) & 0xfffff) << 5);
-            *(UINT32 *)(Targ + 4) &= 0x3ff;
-            *(UINT32 *)(Targ + 4) |= 0x2c00000 | ((Lo & 0xfff) << 10);
+            *(UINT32 *)Targ |= HiImm << 5;
             break;
 
-          //
-          // Attempt to convert instruction.
-          //
-          case R_LARCH_PCALA_HI20:
-            // Decode the PCALAU12I instruction and the instruction that following it.
-            Offset = ((INT32)((*(UINT32 *)Targ & 0x1ffffe0) << 7));
-            Offset += ((INT32)((*(UINT32 *)(Targ + 4) & 0x3ffc00) << 10) >> 20);
+          case R_LARCH_PCALA_LO12:
+          case R_LARCH_GOT_PC_LO12:
+            PreTarg = NULL;
+            PreRel  = NULL;
+
             //
-            // PCALA offset is relative to the previous page boundary,
-            // whereas PCADD offset is relative to the instruction itself.
-            // So fix up the offset so it points to the page containing
-            // the symbol.
+            // Because the HI always at front of LO, so backtracking the corresponding HI.
             //
-            Offset -= (UINTN)(Targ - mCoffFile) & 0xfff;
-            if (Offset < 0) {
-              Offset = -Offset;
-              Hi = Offset & ~0xfff;
-              Lo = (INT32)((Offset & 0xfff) << 20) >> 20;
-              if ((Lo < 0) && (Lo > -2048)) {
-                Hi += 0x1000;
-                Lo = ~(0x1000 - Lo) + 1;
-              }
-              Hi = ~Hi + 1;
-              Lo = ~Lo + 1;
-            } else {
-              Hi = Offset & ~0xfff;
-              Lo = (INT32)((Offset & 0xfff) << 20) >> 20;
-              if (Lo < 0) {
-                Hi += 0x1000;
-                Lo = ~(0x1000 - Lo) + 1;
+            for (BackIdx = (INT32)(RelIdx - RelShdr->sh_entsize); BackIdx >= 0; BackIdx -= (INT32)RelShdr->sh_entsize) {
+              PreRel = (Elf_Rela *)((UINT8 *)mEhdr + RelShdr->sh_offset + BackIdx);
+              if (ELF_R_TYPE(PreRel->r_info) == R_LARCH_PCALA_HI20 || ELF_R_TYPE(PreRel->r_info) == R_LARCH_GOT_PC_HI20) {
+                if (ELF_R_SYM(PreRel->r_info) != ELF_R_SYM(Rel->r_info)) {
+                  continue;
+                }
+                if (PreRel->r_addend == Rel->r_addend) {
+                  PreTarg = mCoffFile + SecOffset + (PreRel->r_offset - SecShdr->sh_addr);
+                  break;
+                }
               }
             }
-            // Convert the first instruction from PCALAU12I to PCADDU12I and re-encode the offset into them.
-            *(UINT32 *)Targ &= 0x1f;
-            *(UINT32 *)Targ |= 0x1c000000;
-            *(UINT32 *)Targ |= (((Hi >> 12) & 0xfffff) << 5);
-            *(UINT32 *)(Targ + 4) &= 0xffc003ff;
-            *(UINT32 *)(Targ + 4) |= (Lo & 0xfff) << 10;
+
+            if (BackIdx < 0) {
+              Error (NULL, 0, 3000, "Invalid", "LoongArch PC related: LO has no corresponding HI.");
+            }
+
+            //
+            // Calculate the corresponding HI relative to PC using the ELF symbol value and fix the LO offset.
+            //
+            if (ELF_R_TYPE(Rel->r_info) == R_LARCH_PCALA_LO12 && ELF_R_TYPE(PreRel->r_info) == R_LARCH_PCALA_HI20) {
+              Offset = (INT32)((Sym->st_value + PreRel->r_addend) - (PreRel->r_offset & ~0xFFF));
+              Offset -= (UINTN)(PreTarg - mCoffFile) & 0xfff;
+              LoImm = (UINT32)(Offset & 0xFFF);
+              //
+              // Only fill the LO offset in corresponding instructions.
+              //
+              *(UINT32 *)Targ &= 0xFFC003FF;
+              *(UINT32 *)Targ |= LoImm << 10;
+            } else if (ELF_R_TYPE(Rel->r_info) == R_LARCH_GOT_PC_LO12 && ELF_R_TYPE(PreRel->r_info) == R_LARCH_GOT_PC_HI20) {
+              Offset = Sym->st_value - (UINTN)(PreTarg - mCoffFile);
+              LoImm = (UINT32)(Offset & 0xFFF);
+              //
+              // Convert this instruction as PCADDU12I and fill the LO offset into it.
+              //
+              *(UINT32 *)Targ &= 0x3FF;
+              *(UINT32 *)Targ |= (0x2C00000 | LoImm << 10);
+            } else {
+              Error (NULL, 0, 3000, "Invalid", "LoongArch PC related: relocation not matched.");
+            }
             break;
+
           default:
             Error (NULL, 0, 3000, "Invalid", "WriteSections64(): %s unsupported ELF EM_LOONGARCH relocation 0x%x.", mInImageName, (unsigned) ELF64_R_TYPE(Rel->r_info));
           }
