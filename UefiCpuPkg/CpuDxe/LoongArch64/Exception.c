@@ -22,6 +22,11 @@ ExceptionEntryEnd (
   VOID
   );
 
+VOID
+PatchAbsAddressInException (
+  EFI_PHYSICAL_ADDRESS
+  );
+
 /**
   This function registers and enables the handler specified by InterruptHandler for a processor
   interrupt or exception type specified by InterruptType. If InterruptHandler is NULL, then the
@@ -85,6 +90,9 @@ UpdateExceptionStartEntry (
 
   InvalidateInstructionCacheRange ((VOID *)ExceptionStartEntry, VectorLength);
   CopyMem ((VOID *)ExceptionStartEntry, (VOID *)ExceptionEntryStart, VectorLength);
+  InvalidateInstructionCacheRange ((VOID *)ExceptionStartEntry, VectorLength);
+  InvalidateDataCache ();
+  PatchAbsAddressInException (ExceptionStartEntry);
   InvalidateInstructionCacheRange ((VOID *)ExceptionStartEntry, VectorLength);
   InvalidateDataCache ();
 
