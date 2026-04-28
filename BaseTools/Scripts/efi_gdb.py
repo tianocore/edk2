@@ -572,14 +572,16 @@ class EfiTablesCmd (gdb.Command):
 
         gST = gdb.lookup_global_symbol('gST')
         if gST is None:
-            print('Error: This command requires symbols for gST to be loaded')
-            return
+            table = EfiConfigurationTable(self.file)
+        else:
+            table = EfiConfigurationTable(
+                self.file, int(gST.value(gdb.selected_frame())))
 
-        table = EfiConfigurationTable(
-            self.file, int(gST.value(gdb.selected_frame())))
         if table:
             print(table, '\n')
-
+        elif gST is None:
+            print('Error: This command requires symbols for gST to be loaded')
+            return
 
 class EfiSymbolsCmd (gdb.Command):
     """Load Symbols for EFI. Type 'efi symbols -h' for more info."""
@@ -876,43 +878,46 @@ class LoadEmulatorEfiSymbols(gdb.Breakpoint):
         # keep running
         return False
 
+def main():
+    # Get python backtraces to debug errors in this script
+    gdb.execute("set python print-stack full")
 
-# Get python backtraces to debug errors in this script
-gdb.execute("set python print-stack full")
-
-# tell efi_debugging how to walk data structures with pointers
-try:
-    pointer_width = gdb.lookup_type('int').pointer().sizeof
-except ValueError:
-    pointer_width = 8
-patch_ctypes(pointer_width)
-
-register_pretty_printer(None, build_pretty_printer(), replace=True)
-
-# gdb commands that we are adding
-# add `efi` prefix gdb command
-EfiCmd()
-
-# subcommands for `efi`
-EfiSymbolsCmd()
-EfiTablesCmd()
-EfiHobCmd()
-EfiDevicePathCmd()
-EfiGuidCmd()
-
-#
-bp = LoadEmulatorEfiSymbols('SecGdbScriptBreak', internal=True)
-if bp.pending:
+    # tell efi_debugging how to walk data structures with pointers
     try:
-        gdb.selected_frame()
-        # Not the emulator so do this when you attach
-        gdb.execute('efi symbols --frame --extended', True)
-        gdb.execute('bt')
-        # If you want to skip the above commands comment them out
-        pass
-    except gdb.error:
-        # If you load the script and there is no target ignore the error.
-        pass
-else:
-    # start the emulator
-    gdb.execute('run')
+        pointer_width = gdb.lookup_type('int').pointer().sizeof
+    except ValueError:
+        pointer_width = 8
+    patch_ctypes(pointer_width)
+
+    register_pretty_printer(None, build_pretty_printer(), replace=True)
+
+    # gdb commands that we are adding
+    # add `efi` prefix gdb command
+    EfiCmd()
+
+    # subcommands for `efi`
+    EfiSymbolsCmd()
+    EfiTablesCmd()
+    EfiHobCmd()
+    EfiDevicePathCmd()
+    EfiGuidCmd()
+
+    #
+    bp = LoadEmulatorEfiSymbols('SecGdbScriptBreak', internal=True)
+    if bp.pending:
+        try:
+            gdb.selected_frame()
+            # Not the emulator so do this when you attach
+            gdb.execute('efi symbols --frame --extended', True)
+            gdb.execute('bt')
+            # If you want to skip the above commands comment them out
+            pass
+        except gdb.error:
+            # If you load the script and there is no target ignore the error.
+            pass
+    else:
+        # start the emulator
+        gdb.execute('run')
+
+if __name__ == "__main__":
+    main()
