@@ -46,6 +46,10 @@
   #
   Tpm2CommandLib|Include/Library/Tpm2CommandLib.h
 
+  ##  @libraryclass  Provides helper functions for interfacing with TPM 2.0 data.
+  #
+  Tpm2HelpLib|Include/Library/Tpm2HelpLib.h
+
   ##  @libraryclass  Provides interfaces on how to access TPM 2.0 hardware device.
   #
   Tpm2DeviceLib|Include/Library/Tpm2DeviceLib.h
