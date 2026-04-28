@@ -144,6 +144,54 @@ DoTouchByHandle (
   return (Status);
 }
 
+/**
+  Apply the 'Touch' command to each entry in a file info list.
+
+  @param[in] FileList    File info list returned by ShellOpenFileMetaArg().
+  @param[in] Recursive   TRUE to recurse into directories.
+
+  @retval SHELL_SUCCESS   All files were processed successfully.
+  @retval SHELL_NOT_FOUND At least one entry could not be opened or touched.
+**/
+STATIC
+SHELL_STATUS
+ProcessFileList (
+  IN  EFI_SHELL_FILE_INFO  *FileList,
+  IN  BOOLEAN              Recursive
+  )
+{
+  SHELL_STATUS         ShellStatus;
+  EFI_STATUS           Status;
+  EFI_SHELL_FILE_INFO  *Node;
+
+  ShellStatus = SHELL_SUCCESS;
+
+  //
+  // loop through the list and make sure we are not aborting...
+  //
+  for (Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&FileList->Link);
+       !IsNull (&FileList->Link, &Node->Link) && !ShellGetExecutionBreakFlag ();
+       Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&FileList->Link, &Node->Link))
+  {
+    //
+    // make sure the file opened ok
+    //
+    if (EFI_ERROR (Node->Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel3HiiHandle, L"touch", Node->FileName);
+      ShellStatus = SHELL_NOT_FOUND;
+      continue;
+    }
+
+    Status = DoTouchByHandle (Node->FullName, NULL, Node->Handle, Recursive);
+    if (EFI_ERROR (Status) && (Status != EFI_ACCESS_DENIED)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel3HiiHandle, L"touch", Node->FileName);
+      ShellStatus = SHELL_NOT_FOUND;
+    }
+  }
+
+  return ShellStatus;
+}
+
 /** Main function of the 'Touch' command.
 
   @param[in] Package    List of input parameter for the command.
@@ -159,7 +207,6 @@ MainCmdTouch (
   SHELL_STATUS         ShellStatus;
   UINTN                ParamCount;
   EFI_SHELL_FILE_INFO  *FileList;
-  EFI_SHELL_FILE_INFO  *Node;
 
   ShellStatus = SHELL_SUCCESS;
   ParamCount  = 0;
@@ -207,29 +254,7 @@ MainCmdTouch (
           ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel3HiiHandle, L"touch", Param);
           continue;
         } else {
-          //
-          // loop through the list and make sure we are not aborting...
-          //
-          for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&FileList->Link)
-                ; !IsNull (&FileList->Link, &Node->Link) && !ShellGetExecutionBreakFlag ()
-                ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&FileList->Link, &Node->Link)
-                )
-          {
-            //
-            // make sure the file opened ok
-            //
-            if (EFI_ERROR (Node->Status)) {
-              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel3HiiHandle, L"touch", Node->FileName);
-              ShellStatus = SHELL_NOT_FOUND;
-              continue;
-            }
-
-            Status = DoTouchByHandle (Node->FullName, NULL, Node->Handle, ShellCommandLineGetFlag (Package, L"-r"));
-            if (EFI_ERROR (Status) && (Status != EFI_ACCESS_DENIED)) {
-              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel3HiiHandle, L"touch", Node->FileName);
-              ShellStatus = SHELL_NOT_FOUND;
-            }
-          }
+          ShellStatus = ProcessFileList (FileList, ShellCommandLineGetFlag (Package, L"-r"));
         }
       }
 

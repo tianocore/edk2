@@ -150,6 +150,77 @@ TypeFileByHandle (
   return (Status);
 }
 
+/**
+  Apply the 'type' command to each entry in a file info list.
+
+  @param[in] FileList      File info list returned by ShellOpenFileMetaArg().
+  @param[in] AsciiMode     TRUE to force ASCII mode.
+  @param[in] UnicodeMode   TRUE to force UCS2 mode.
+
+  @retval SHELL_SUCCESS            All files were processed successfully.
+  @retval SHELL_NOT_FOUND          At least one entry could not be opened or
+                                   was a directory.
+  @retval SHELL_INVALID_PARAMETER  TypeFileByHandle() failed for an entry.
+**/
+STATIC
+SHELL_STATUS
+ProcessFileList (
+  IN  EFI_SHELL_FILE_INFO  *FileList,
+  IN  BOOLEAN              AsciiMode,
+  IN  BOOLEAN              UnicodeMode
+  )
+{
+  EFI_STATUS           Status;
+  SHELL_STATUS         ShellStatus;
+  EFI_SHELL_FILE_INFO  *Node;
+
+  ShellStatus = SHELL_SUCCESS;
+
+  //
+  // loop through the list and make sure we are not aborting...
+  //
+  for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&FileList->Link)
+        ; !IsNull (&FileList->Link, &Node->Link) && !ShellGetExecutionBreakFlag ()
+        ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&FileList->Link, &Node->Link)
+        )
+  {
+    if (ShellGetExecutionBreakFlag ()) {
+      break;
+    }
+
+    //
+    // make sure the file opened ok
+    //
+    if (EFI_ERROR (Node->Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel3HiiHandle, L"type", Node->FileName);
+      ShellStatus = SHELL_NOT_FOUND;
+      continue;
+    }
+
+    //
+    // make sure its not a directory
+    //
+    if (FileHandleIsDirectory (Node->Handle) == EFI_SUCCESS) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_IS_DIR), gShellLevel3HiiHandle, L"type", Node->FileName);
+      ShellStatus = SHELL_NOT_FOUND;
+      continue;
+    }
+
+    //
+    // do it
+    //
+    Status = TypeFileByHandle (Node->Handle, AsciiMode, UnicodeMode);
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TYP_ERROR), gShellLevel3HiiHandle, L"type", Node->FileName);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    }
+
+    ASSERT (ShellStatus == SHELL_SUCCESS);
+  }
+
+  return ShellStatus;
+}
+
 /** Main function of the 'Type' command.
 
   @param[in] Package    List of input parameter for the command.
@@ -165,7 +236,6 @@ MainCmdType (
   SHELL_STATUS         ShellStatus;
   UINTN                ParamCount;
   EFI_SHELL_FILE_INFO  *FileList;
-  EFI_SHELL_FILE_INFO  *Node;
   BOOLEAN              AsciiMode;
   BOOLEAN              UnicodeMode;
 
@@ -221,47 +291,7 @@ MainCmdType (
           ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel3HiiHandle, L"type", Param);
           continue;
         } else {
-          //
-          // loop through the list and make sure we are not aborting...
-          //
-          for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&FileList->Link)
-                ; !IsNull (&FileList->Link, &Node->Link) && !ShellGetExecutionBreakFlag ()
-                ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&FileList->Link, &Node->Link)
-                )
-          {
-            if (ShellGetExecutionBreakFlag ()) {
-              break;
-            }
-
-            //
-            // make sure the file opened ok
-            //
-            if (EFI_ERROR (Node->Status)) {
-              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel3HiiHandle, L"type", Node->FileName);
-              ShellStatus = SHELL_NOT_FOUND;
-              continue;
-            }
-
-            //
-            // make sure its not a directory
-            //
-            if (FileHandleIsDirectory (Node->Handle) == EFI_SUCCESS) {
-              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_IS_DIR), gShellLevel3HiiHandle, L"type", Node->FileName);
-              ShellStatus = SHELL_NOT_FOUND;
-              continue;
-            }
-
-            //
-            // do it
-            //
-            Status = TypeFileByHandle (Node->Handle, AsciiMode, UnicodeMode);
-            if (EFI_ERROR (Status)) {
-              ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TYP_ERROR), gShellLevel3HiiHandle, L"type", Node->FileName);
-              ShellStatus = SHELL_INVALID_PARAMETER;
-            }
-
-            ASSERT (ShellStatus == SHELL_SUCCESS);
-          }
+          ShellStatus = ProcessFileList (FileList, AsciiMode, UnicodeMode);
         }
       }
 
