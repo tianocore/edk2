@@ -367,7 +367,7 @@ NvmExpressMediaClear (
   // Per NIST 800-88r1, one or more pass of writes may be alteratively used.
   //
   for (TotalPassCount = 0; TotalPassCount < PassCount; TotalPassCount++) {
-    for (SectorOffset = 0; SectorOffset < Media->LastBlock; SectorOffset++ ) {
+    for (SectorOffset = 0; SectorOffset <= Media->LastBlock; SectorOffset++ ) {
       Status = Device->BlockIo.WriteBlocks (
                                  &Device->BlockIo,
                                  MediaId,
