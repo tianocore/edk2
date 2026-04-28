@@ -36,24 +36,25 @@ MainCmdPause (
   //
   if (ShellCommandLineGetFlag (Package, L"-?")) {
     ASSERT (FALSE);
+    return ShellStatus;
   } else if (ShellCommandLineGetRawValue (Package, 1) != NULL) {
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel3HiiHandle, L"pause");
-    ShellStatus = SHELL_INVALID_PARAMETER;
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  if (!ShellCommandLineGetFlag (Package, L"-q")) {
+    Status = ShellPromptForResponseHii (ShellPromptResponseTypeQuitContinue, STRING_TOKEN (STR_PAUSE_PROMPT), gShellLevel3HiiHandle, (VOID **)&Resp);
   } else {
-    if (!ShellCommandLineGetFlag (Package, L"-q")) {
-      Status = ShellPromptForResponseHii (ShellPromptResponseTypeQuitContinue, STRING_TOKEN (STR_PAUSE_PROMPT), gShellLevel3HiiHandle, (VOID **)&Resp);
-    } else {
-      Status = ShellPromptForResponse (ShellPromptResponseTypeQuitContinue, NULL, (VOID **)&Resp);
-    }
+    Status = ShellPromptForResponse (ShellPromptResponseTypeQuitContinue, NULL, (VOID **)&Resp);
+  }
 
-    if (EFI_ERROR (Status) || (Resp == NULL) || (*Resp == ShellPromptResponseQuit)) {
-      ShellCommandRegisterExit (TRUE, 0);
-      ShellStatus = SHELL_ABORTED;
-    }
+  if (EFI_ERROR (Status) || (Resp == NULL) || (*Resp == ShellPromptResponseQuit)) {
+    ShellCommandRegisterExit (TRUE, 0);
+    ShellStatus = SHELL_ABORTED;
+  }
 
-    if (Resp != NULL) {
-      FreePool (Resp);
-    }
+  if (Resp != NULL) {
+    FreePool (Resp);
   }
 
   return ShellStatus;
