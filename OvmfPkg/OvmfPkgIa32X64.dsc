@@ -582,6 +582,8 @@
   #
   gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi|FALSE
 
+  gEfiMdePkgTokenSpaceGuid.PcdFSBClock|1000000000
+
 [PcdsFixedAtBuild.IA32]
   #
   # The NumberOfPages values below are ad-hoc. They are updated sporadically at
@@ -678,8 +680,6 @@
 
   # Set ConfidentialComputing defaults
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
-
-  gEfiMdePkgTokenSpaceGuid.PcdFSBClock|1000000000
 
 [PcdsDynamicDefault.X64]
 !include NetworkPkg/NetworkDynamicPcds.dsc.inc
