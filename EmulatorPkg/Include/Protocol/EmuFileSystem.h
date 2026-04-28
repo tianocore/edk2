@@ -13,8 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EMU_GRAPHICS_WINDOW_H_
-#define _EMU_GRAPHICS_WINDOW_H_
+#pragma once
 
 #include <Protocol/SimplePointer.h>
 #include <Protocol/SimpleTextIn.h>
@@ -127,5 +126,3 @@ struct _EMU_GRAPHICS_WINDOW_PROTOCOL {
 };
 
 extern EFI_GUID  gEmuGraphicsWindowProtocolGuid;
-
-#endif

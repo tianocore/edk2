@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef BASE_UCS2UTF8_LIB_H_
-#define BASE_UCS2UTF8_LIB_H_
+#pragma once
 
 ///
 ///  L"\u0000"
@@ -57,5 +56,3 @@ UTF8StrToUCS2 (
   IN  CHAR8   *Utf8Str,
   OUT CHAR16  **Ucs2StrAddr
   );
-
-#endif

@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _ARM_VIRT_MEMINFO_LIB_H_
-#define _ARM_VIRT_MEMINFO_LIB_H_
+#pragma once
 
 #include <Base.h>
 #include <Library/ArmLib.h>
@@ -31,5 +30,3 @@ EFIAPI
 ArmVirtGetMemoryMap (
   OUT ARM_MEMORY_REGION_DESCRIPTOR  **VirtualMemoryMap
   );
-
-#endif

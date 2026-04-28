@@ -3,7 +3,7 @@
 /** @file
   This library implements the FF-A memory manage protocol.
 
-  Copyright (c) 2020-2022, Arm Limited and Contributors. All rights reserved.
+  Copyright (c) 2020-2026, Arm Limited and Contributors. All rights reserved.
   Copyright (c), Microsoft Corporation.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -119,7 +119,7 @@ ArmFfaMemLibDonateRxTx (
 }
 
 /**
-  @brief      Starts a transaction to transfer an Owner’s access to a memory
+  @brief      Starts a transaction to transfer an Owner's access to a memory
               region and  grant access to it to one or more Borrowers.
 
   @param[in]  TotalLength     Total length of the memory transaction descriptor
@@ -190,7 +190,7 @@ ArmFfaMemLibLend (
 }
 
 /**
-  @brief      Starts a transaction to transfer an Owner’s access to a memory
+  @brief      Starts a transaction to transfer an Owner's access to a memory
               region and  grant access to it to one or more Borrowers through
               Rx/Tx buffer.
 
@@ -351,7 +351,7 @@ ArmFfaMemLibRetrieveReq (
 
   Status = ArmFfaLibGetFeatures (
              FfaArgs.Arg0,
-             0,
+             FFA_FEATURES_MEM_RETRIEVE_REQ_NS_SUPPORT,
              &FfaArgs.Arg1,
              &FfaArgs.Arg2
              );

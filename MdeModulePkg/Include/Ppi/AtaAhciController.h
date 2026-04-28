@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef _EDKII_ATA_AHCI_HOST_CONTROLLER_PPI_H_
-#define _EDKII_ATA_AHCI_HOST_CONTROLLER_PPI_H_
+#pragma once
 
 #include <Protocol/DevicePath.h>
 
@@ -79,5 +78,3 @@ struct _EDKII_ATA_AHCI_HOST_CONTROLLER_PPI {
 };
 
 extern EFI_GUID  gEdkiiPeiAtaAhciHostControllerPpiGuid;
-
-#endif

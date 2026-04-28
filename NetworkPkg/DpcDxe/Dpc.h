@@ -12,8 +12,7 @@ Abstract:
 
 **/
 
-#ifndef _DPC_H_
-#define _DPC_H_
+#pragma once
 
 #include <Uefi.h>
 #include <Library/BaseLib.h>
@@ -75,5 +74,3 @@ EFIAPI
 DpcDispatchDpc (
   IN EFI_DPC_PROTOCOL  *This
   );
-
-#endif

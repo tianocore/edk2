@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _SYSTEM_FIRMWARE_UPDATE_H_
-#define _SYSTEM_FIRMWARE_UPDATE_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -394,5 +393,3 @@ InitializePrivateData (
 extern EFI_GUID  gSystemFmpLastAttemptVariableGuid;
 extern EFI_GUID  mCurrentImageTypeId;
 extern EFI_GUID  gSystemFmpProtocolGuid;
-
-#endif

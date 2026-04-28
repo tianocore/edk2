@@ -422,7 +422,7 @@
 
 [LibraryClasses.AARCH64]
   ArmHvcLib|ArmPkg/Library/ArmHvcLib/ArmHvcLib.inf
-  ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
+  ArmLib|MdePkg/Library/ArmLib/ArmBaseLib.inf
   ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
   ArmSmcLib|MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
 
@@ -662,6 +662,9 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdRemovableMediaImageVerificationPolicy|0x04
 !endif
 
+  ## Whether allows PCI RB to allocate DMA memory above 4GB
+  gUefiPayloadPkgTokenSpaceGuid.PcdPciAllocateMemoryAbove4GB|FALSE
+
 [PcdsFixedAtBuild.AARCH64]
   # System Memory Base -- fixed at 0x4000_0000
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x40000000
@@ -700,11 +703,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize   | 0x40000
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize   | 0x40000
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize | 0x40000
-
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x9000000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride|1
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPciSerialParameters|$(PCI_SERIAL_PARAMETERS)
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosEntryPointProvideMethod|0x2
 
@@ -766,6 +764,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x9000000
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride|1
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciSerialParameters|$(PCI_SERIAL_PARAMETERS)
 
 !if $(TARGET) == DEBUG
    gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x07
@@ -785,9 +784,9 @@
 [PcdsDynamicExDefault]
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|$(DEFAULT_TERMINAL_TYPE)
   gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarSupport|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarMaxSize|43
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize|0x1
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds|50000
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode|1

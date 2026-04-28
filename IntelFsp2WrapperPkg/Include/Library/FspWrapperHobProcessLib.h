@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __FSP_WRAPPER_HOB_PROCESS_LIB_H__
-#define __FSP_WRAPPER_HOB_PROCESS_LIB_H__
+#pragma once
 
 /**
   Post FSP-M HOB process for Memory Resource Descriptor.
@@ -47,5 +46,3 @@ EFIAPI
 PostFspiHobProcess (
   IN VOID  *FspHobList
   );
-
-#endif

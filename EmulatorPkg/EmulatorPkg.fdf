@@ -178,7 +178,6 @@ INF  EmulatorPkg/EmuBusDriverDxe/EmuBusDriverDxe.inf
 INF  EmulatorPkg/EmuGopDxe/EmuGopDxe.inf
 INF  EmulatorPkg/EmuSimpleFileSystemDxe/EmuSimpleFileSystemDxe.inf
 INF  EmulatorPkg/EmuBlockIoDxe/EmuBlockIoDxe.inf
-INF  EmulatorPkg/EmuSnpDxe/EmuSnpDxe.inf
 
 INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 INF  MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
@@ -201,7 +200,9 @@ INF  SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
 #
 # Hash2 Protocol producer
 #
+!if $(NETWORK_ENABLE) == TRUE
 INF  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+!endif
 
 #
 # Secure Boot Key Enroll
@@ -213,7 +214,7 @@ INF SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.in
 #
 # Network stack drivers
 #
-!if $(NETWORK_SUPPORT)
+!if $(NETWORK_ENABLE)
 INF  EmulatorPkg/EmuSnpDxe/EmuSnpDxe.inf
 !endif
 !include NetworkPkg/Network.fdf.inc

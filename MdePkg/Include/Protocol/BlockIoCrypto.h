@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __BLOCK_IO_CRYPTO_H__
-#define __BLOCK_IO_CRYPTO_H__
+#pragma once
 
 #include <Protocol/BlockIo.h>
 
@@ -519,5 +518,3 @@ struct _EFI_BLOCK_IO_CRYPTO_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiBlockIoCryptoProtocolGuid;
-
-#endif

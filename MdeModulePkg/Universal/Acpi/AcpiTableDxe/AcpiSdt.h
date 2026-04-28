@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef _ACPI_SDT_H_
-#define _ACPI_SDT_H_
+#pragma once
 
 //
 // Privacy data structure
@@ -575,5 +574,3 @@ BOOLEAN
 AmlIsRootPath (
   IN UINT8  *Buffer
   );
-
-#endif

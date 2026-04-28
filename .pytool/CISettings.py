@@ -73,6 +73,7 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
                 "EmulatorPkg",
                 "IntelFsp2Pkg",
                 "IntelFsp2WrapperPkg",
+                "ManageabilityPkg",
                 "MdePkg",
                 "MdeModulePkg",
                 "NetworkPkg",
@@ -90,7 +91,8 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
                 "OvmfPkg",
                 "RedfishPkg",
                 "SourceLevelDebugPkg",
-                "UefiPayloadPkg"
+                "UefiPayloadPkg",
+                "TcgTpmPkg"
                 )
 
     def GetArchitecturesSupported(self):
@@ -209,6 +211,8 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
             "CryptoPkg/Library/MbedTlsLib/mbedtls", False))
         rs.append(RequiredSubmodule(
             "SecurityPkg/DeviceSecurity/SpdmLib/libspdm", False))
+        rs.append(RequiredSubmodule(
+            "TcgTpmPkg/Library/TpmLib/TPM", False))
         return rs
 
     def GetName(self):

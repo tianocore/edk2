@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __EFI_SCSI_IO_PROTOCOL_H__
-#define __EFI_SCSI_IO_PROTOCOL_H__
+#pragma once
 
 #define EFI_SCSI_IO_PROTOCOL_GUID \
   { \
@@ -305,5 +304,3 @@ struct _EFI_SCSI_IO_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiScsiIoProtocolGuid;
-
-#endif

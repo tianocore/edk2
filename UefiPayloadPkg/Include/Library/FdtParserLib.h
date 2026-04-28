@@ -5,8 +5,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef FDT_PARSER_LIB_H_
-#define FDT_PARSER_LIB_H_
+#pragma once
 
 /**
   It will parse FDT based on DTB.
@@ -60,5 +59,3 @@ EFIAPI
 UplInitHob (
   IN VOID  *FdtBase
   );
-
-#endif

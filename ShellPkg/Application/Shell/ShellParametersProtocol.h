@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef _SHELL_PARAMETERS_PROTOCOL_PROVIDER_HEADER_
-#define _SHELL_PARAMETERS_PROTOCOL_PROVIDER_HEADER_
+#pragma once
 
 #include "Shell.h"
 
@@ -206,5 +205,3 @@ GetNextParameter (
   IN CONST UINTN  Length,
   IN BOOLEAN      StripQuotation
   );
-
-#endif //_SHELL_PARAMETERS_PROTOCOL_PROVIDER_HEADER_

@@ -4,6 +4,7 @@
 
   Copyright (C) Microsoft Corporation. All rights reserved.
   Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
+  (c) Copyright 2026 HP Development Company, L.P.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -2385,6 +2386,70 @@ CryptoServiceAesCbcDecrypt (
 }
 
 /**
+  Performs AES encryption on single block (AES_BLOCK_SIZE)
+
+  This function performs AES encryption on single block pointed by Input.
+
+  Caller must perform padding, if necessary, to ensure single block size.
+  AesContext should be already correctly initialized by AesInit().
+  Behavior with invalid AES context is undefined.
+
+  If AesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
+
+  @param[in]   AesContext  Pointer to the AES context.
+  @param[in]   Input       Pointer to the buffer containing single block data
+  @param[out]  Output      Pointer to a buffer that receives the AES encryption output.
+
+  @retval TRUE   AES encryption succeeded.
+  @retval FALSE  AES encryption failed.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceAesEncrypt (
+  IN   VOID         *AesContext,
+  IN   CONST UINT8  *Input,
+  OUT  UINT8        *Output
+  )
+{
+  return CALL_BASECRYPTLIB (Aes.Services.Encrypt, AesEncrypt, (AesContext, Input, Output), FALSE);
+}
+
+/**
+  Performs AES decryption on single block (AES_BLOCK_SIZE)
+
+  This function performs AES decryption on single block pointed by Input.
+
+  Caller must perform padding, if necessary, to ensure single block size.
+  AesContext should be already correctly initialized by AesInit().
+  Behavior with invalid AES context is undefined.
+
+  If AesContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
+
+  @param[in]   AesContext  Pointer to the AES context.
+  @param[in]   Input       Pointer to the buffer containing single block encrpyted data.
+  @param[out]  Output      Pointer to a buffer that receives the AES decryption output.
+
+  @retval TRUE   AES decryption succeeded.
+  @retval FALSE  AES decryption failed.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceAesDecrypt (
+  IN   VOID         *AesContext,
+  IN   CONST UINT8  *Input,
+  OUT  UINT8        *Output
+  )
+{
+  return CALL_BASECRYPTLIB (Aes.Services.Decrypt, AesDecrypt, (AesContext, Input, Output), FALSE);
+}
+
+/**
   ARC4 is deprecated and unsupported any longer.
   Keep the function field for binary compability.
 
@@ -2486,6 +2551,117 @@ DeprecatedCryptoServiceArc4Reset (
   )
 {
   return BaseCryptLibServiceDeprecated ("Arc4Reset"), FALSE;
+}
+
+/**
+  Retrieves the size, in bytes, of the context buffer required for CAMELLIA operations.
+
+  @return  The size, in bytes, of the context buffer required for CAMELLIA operations.
+
+**/
+UINTN
+EFIAPI
+CryptoServiceCamelliaGetContextSize (
+  VOID
+  )
+{
+  return CALL_BASECRYPTLIB (Camellia.Services.GetContextSize, CamelliaGetContextSize, (), 0);
+}
+
+/**
+  Initializes user-supplied memory as Camellia context for subsequent use.
+
+  This function initializes user-supplied memory pointed by CamelliaContext as
+  CAMELLIA context.
+  In addition, it sets up all CAMELLIA key materials for subsequent
+  encryption and decryption operations.
+  There are 3 options for key length, 128 bits, 192 bits, and 256 bits.
+
+  If CamelliaContext is NULL, then return FALSE.
+  If Key is NULL, then return FALSE.
+  If KeyLength is not valid, then return FALSE.
+
+  @param[out]  CamelliaContext  Pointer to CAMELLIA context being initialized.
+  @param[in]   Key              Pointer to the user-supplied CAMELLIA key.
+  @param[in]   KeyLength        Length of CAMELLIA key in bits.
+
+  @retval TRUE   CAMELLIA context initialization succeeded.
+  @retval FALSE  CAMELLIA context initialization failed.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceCamelliaInit (
+  OUT  VOID         *CamelliaContext,
+  IN   CONST UINT8  *Key,
+  IN   UINTN        KeyLength
+  )
+{
+  return CALL_BASECRYPTLIB (Camellia.Services.Init, CamelliaInit, (CamelliaContext, Key, KeyLength), FALSE);
+}
+
+/**
+  Performs CAMELLIA encryption on single block (128 bits)
+
+  This function performs CAMELLIA encryption on single block pointed by Input.
+
+  Caller must perform padding, if necessary, to ensure single block size.
+  CamelliaContext should be already correctly initialized by CamelliaInit().
+  Behavior with invalid Camellia context is undefined.
+
+  If CamelliaContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
+
+  @param[in]   CamelliaContext  Pointer to the CAMELLIA context.
+  @param[in]   Input            Pointer to the buffer containing single block data
+  @param[out]  Output           Pointer to a buffer that receives the CAMELLIA encryption output.
+
+  @retval TRUE   CAMELLIA encryption succeeded.
+  @retval FALSE  CAMELLIA encryption failed.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceCamelliaEncrypt (
+  IN   VOID         *CamelliaContext,
+  IN   CONST UINT8  *Input,
+  OUT  UINT8        *Output
+  )
+{
+  return CALL_BASECRYPTLIB (Camellia.Services.Encrypt, CamelliaEncrypt, (CamelliaContext, Input, Output), FALSE);
+}
+
+/**
+  Performs CAMELLIA decryption on single block (128 bits)
+
+  This function performs CAMELLIA decryption on single block pointed by Input.
+
+  Caller must perform padding, if necessary, to ensure single block size.
+  CamelliaContext should be already correctly initialized by CamelliaInit().
+  Behavior with invalid CAMELLIA context is undefined.
+
+  If CamelliaContext is NULL, then return FALSE.
+  If Input is NULL, then return FALSE.
+  If Output is NULL, then return FALSE.
+
+  @param[in]   CamelliaContext  Pointer to the CAMELLIA context.
+  @param[in]   Input            Pointer to the buffer containing single block encrpyted data.
+  @param[out]  Output           Pointer to a buffer that receives the CAMELLIA decryption output.
+
+  @retval TRUE   CAMELLIA decryption succeeded.
+  @retval FALSE  CAMELLIA decryption failed.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceCamelliaDecrypt (
+  IN   VOID         *CamelliaContext,
+  IN   CONST UINT8  *Input,
+  OUT  UINT8        *Output
+  )
+{
+  return CALL_BASECRYPTLIB (Camellia.Services.Decrypt, CamelliaDecrypt, (CamelliaContext, Input, Output), FALSE);
 }
 
 // =====================================================================================
@@ -5635,6 +5811,61 @@ CryptoServiceRsaPssVerify (
 }
 
 /**
+  Carries out the RSA-PSS signature generation over a precomputed message digest.
+
+  @param[in]      RsaContext   Pointer to RSA context for signature generation.
+  @param[in]      Digest       Pointer to the precomputed message digest.
+  @param[in]      DigestSize   Digest size in bytes (32=SHA-256, 48=SHA-384, 64=SHA-512).
+  @param[out]     Signature    Pointer to buffer to receive RSA PSS signature.
+  @param[in, out] SigSize      On input, the size of Signature buffer in bytes.
+                               On output, the size of data returned in Signature buffer in bytes.
+
+  @retval  TRUE   Signature successfully generated in RSASSA-PSS.
+  @retval  FALSE  Signature generation failed.
+  @retval  FALSE  SigSize is too small.
+  @retval  FALSE  This interface is not supported.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceRsaPssSignDigest (
+  IN      VOID         *RsaContext,
+  IN      CONST UINT8  *Digest,
+  IN      UINTN        DigestSize,
+  OUT     UINT8        *Signature,
+  IN OUT  UINTN        *SigSize
+  )
+{
+  return CALL_BASECRYPTLIB (RsaPss.Services.SignDigest, RsaPssSignDigest, (RsaContext, Digest, DigestSize, Signature, SigSize), FALSE);
+}
+
+/**
+  Verifies an RSA-PSS signature over a precomputed message digest.
+
+  @param[in]  RsaContext   Pointer to RSA context for signature verification.
+  @param[in]  Digest       Pointer to the message digest.
+  @param[in]  DigestSize   Digest size in bytes (32=SHA-256, 48=SHA-384, 64=SHA-512).
+  @param[in]  Signature    Pointer to RSASSA-PSS signature to be verified.
+  @param[in]  SigSize      Size of signature in bytes.
+
+  @retval  TRUE   Valid signature encoded in RSASSA-PSS.
+  @retval  FALSE  Invalid signature or invalid RSA context.
+
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceRsaPssVerifyDigest (
+  IN  VOID         *RsaContext,
+  IN  CONST UINT8  *Digest,
+  IN  UINTN        DigestSize,
+  IN  CONST UINT8  *Signature,
+  IN  UINTN        SigSize
+  )
+{
+  return CALL_BASECRYPTLIB (RsaPss.Services.VerifyDigest, RsaPssVerifyDigest, (RsaContext, Digest, DigestSize, Signature, SigSize), FALSE);
+}
+
+/**
   Parallel hash function ParallelHash256, as defined in NIST's Special Publication 800-185,
   published December 2016.
 
@@ -5873,6 +6104,29 @@ CryptoServiceBigNumSub (
 }
 
 /**
+  Calculate BnRes = BnA * BnB.
+  Please note, all "out" Big number arguments should be properly initialized
+  by calling to BigNumInit() or BigNumFromBin() functions.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+  @param[out]  BnRes   The result of BnA * BnB.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceBigNumMul (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnB,
+  OUT VOID       *BnRes
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.Mul, BigNumMul, (BnA, BnB, BnRes), FALSE);
+}
+
+/**
   Calculate remainder: BnRes = BnA % BnB.
   Please note, all "out" Big number arguments should be properly initialized
   by calling to BigNumInit() or BigNumFromBin() functions.
@@ -5967,6 +6221,31 @@ CryptoServiceBigNumDiv (
 }
 
 /**
+  Divide two Big Numbers and obtain the quotient and the remainder.
+  Please note, all "out" Big number arguments should be properly initialized
+  by calling to BigNumInit() or BigNumFromBin() functions.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+  @param[out]  BnResQ  The result, such that BnA / BnB.
+  @param[out]  BnResR  The result, such that BnA % BnB.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceBigNumDiv2 (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnB,
+  OUT VOID       *BnResQ,
+  OUT VOID       *BnResR
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.Div2, BigNumDiv2, (BnA, BnB, BnResQ, BnResR), FALSE);
+}
+
+/**
   Multiply two Big Numbers modulo BnM.
   Please note, all "out" Big number arguments should be properly initialized
   by calling to BigNumInit() or BigNumFromBin() functions.
@@ -5989,6 +6268,27 @@ CryptoServiceBigNumMulMod (
   )
 {
   return CALL_BASECRYPTLIB (Bn.Services.MulMod, BigNumMulMod, (BnA, BnB, BnM, BnRes), FALSE);
+}
+
+/**
+  Computes the greatest common divisor (GCD) of two BIGNUM values.
+
+  @param[in]   BnA     Big number.
+  @param[in]   BnB     Big number.
+  @param[out]  BnRes   The result, such that GCD(BnA, BnB).
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceBigNumGcd (
+  IN CONST VOID  *BnA,
+  IN CONST VOID  *BnB,
+  OUT VOID       *BnRes
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.Gcd, BigNumGcd, (BnA, BnB, BnRes), FALSE);
 }
 
 /**
@@ -6206,6 +6506,51 @@ CryptoServiceBigNumContextFree (
 }
 
 /**
+  Marks the start of a temporary BIGNUM allocation frame.
+  Must be paired with BigNumContextEnd().
+
+  @param[in]   BnCtx     Big number context.
+**/
+VOID
+EFIAPI
+CryptoServiceBigNumContextStart (
+  IN VOID  *BnCtx
+  )
+{
+  CALL_VOID_BASECRYPTLIB (Bn.Services.ContextStart, BigNumContextStart, (BnCtx));
+}
+
+/**
+  Ends the current BN_CTX allocation frame and releases all temporary BIGNUMs.
+
+  @param[in]   BnCtx     Big number context.
+**/
+VOID
+EFIAPI
+CryptoServiceBigNumContextEnd (
+  IN VOID  *BnCtx
+  )
+{
+  CALL_VOID_BASECRYPTLIB (Bn.Services.ContextEnd, BigNumContextEnd, (BnCtx));
+}
+
+/**
+  Returns a temporary BIGNUM from the given BN_CTX.
+  The returned BIGNUM is managed by the context and must not be freed manually.
+  Must be called between BigNumContextStart() and BigNumContextEnd().
+
+  @param[in]   BnCtx     Big number context.
+**/
+VOID *
+EFIAPI
+CryptoServiceBigNumContextGet (
+  IN VOID  *BnCtx
+  )
+{
+  return CALL_BASECRYPTLIB (Bn.Services.ContextGet, BigNumContextGet, (BnCtx), NULL);
+}
+
+/**
   Set Big Number to a given value.
 
   @param[in]   Bn     Big number to set.
@@ -6272,6 +6617,29 @@ CryptoServiceEcGroupInit (
 }
 
 /**
+  Create a new EC_GROUP over a prime field GF(p).
+
+  @param[in] BnPrime    Group prime number.
+  @param[in] BnA        A coefficient.
+  @param[in] BnB        B coefficient.
+  @param[in] BnCtx      BN context.
+
+  @retval EcGroup object  On success.
+  @retval NULL            On failure.
+**/
+VOID *
+EFIAPI
+CryptoServiceEcGroupInitGFp (
+  IN VOID  *BnPrime,
+  IN VOID  *BnA,
+  IN VOID  *BnB,
+  IN VOID  *BnCtx        OPTIONAL
+  )
+{
+  return CALL_BASECRYPTLIB (Ec.Services.GroupInitGFp, EcGroupInitGFp, (BnPrime, BnA, BnB, BnCtx), NULL);
+}
+
+/**
   Get EC curve parameters. While elliptic curve equation is Y^2 mod P = (X^3 + AX + B) Mod P.
   This function will set the provided Big Number objects  to the corresponding
   values. The caller needs to make sure all the "out" BigNumber parameters
@@ -6332,6 +6700,29 @@ CryptoServiceEcGroupFree (
   )
 {
   CALL_VOID_BASECRYPTLIB (Ec.Services.GroupFree, EcGroupFree, (EcGroup));
+}
+
+/**
+  Set the generator for an EC_GROUP.
+
+  @param[in]  EcGroup           The EC_GROUP object.
+  @param[in]  EcPointGenerator  The generator point G.
+  @param[in]  BnOrder           The order of the generator.
+  @param[in]  BnCoFactor        The cofactor of the group.
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceEcGroupSetGenerator (
+  IN VOID        *EcGroup,
+  IN CONST VOID  *EcPointGenerator,
+  IN CONST VOID  *BnOrder,
+  IN CONST VOID  *BnCoFactor            OPTIONAL
+  )
+{
+  return CALL_BASECRYPTLIB (Ec.Services.GroupSetGenerator, EcGroupSetGenerator, (EcGroup, EcPointGenerator, BnOrder, BnCoFactor), FALSE);
 }
 
 /**
@@ -6470,6 +6861,70 @@ CryptoServiceEcPointMul (
   )
 {
   return CALL_BASECRYPTLIB (Ec.Services.PointMul, EcPointMul, (EcGroup, EcPointResult, EcPoint, BnPScalar, BnCtx), FALSE);
+}
+
+/**
+  Variable EC point multiplication. EcPointResult = BnGScalar * G + EcPoint * BnPScalar.
+
+  @param[in]  EcGroup          EC group object.
+  @param[out] EcPointResult    EC point to hold the result. The point should
+                               be properly initialized.
+  @param[in]  BnGScalar        G Scalar.
+  @param[in]  EcPoint          EC Point.
+  @param[in]  BnPScalar        P Scalar.
+  @param[in]  BnCtx            BN context, created with BigNumNewContext().
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceEcPointMul2 (
+  IN CONST VOID  *EcGroup,
+  OUT VOID       *EcPointResult,
+  IN CONST VOID  *BnGScalar,
+  IN CONST VOID  *EcPoint,
+  IN CONST VOID  *BnPScalar,
+  IN VOID        *BnCtx
+  )
+{
+  return CALL_BASECRYPTLIB (Ec.Services.PointMul2, EcPointMul2, (EcGroup, EcPointResult, BnGScalar, EcPoint, BnPScalar, BnCtx), FALSE);
+}
+
+/**
+  Compute a linear combination of multiple EC points.
+
+  This function calculates:
+    EcPointResult = BnGScalar * G + Σ (EcPoints[i] * BnPScalars[i])
+
+  where G is the generator of the EC_GROUP, and Q[i] are arbitrary points.
+
+  @param[in]  EcGroup          EC group object.
+  @param[out] EcPointResult    EC point to hold the result. The point should
+                               be properly initialized.
+  @param[in]  BnGScalar        G Scalar.
+                               May be NULL if not used.
+  @param[in]  Count            The number of EcPoints and P scalars.
+  @param[in]  EcPoints         EC Points.
+  @param[in]  BnPScalars       P Scalars.
+  @param[in]  BnCtx            BN context, created with BigNumNewContext().
+
+  @retval TRUE          On success.
+  @retval FALSE         Otherwise.
+**/
+BOOLEAN
+EFIAPI
+CryptoServiceEcPointsMul (
+  IN CONST VOID  *EcGroup,
+  OUT VOID       *EcPointResult,
+  IN CONST VOID  *BnGScalar,
+  UINTN          Count,
+  IN CONST VOID  *EcPoints[],
+  IN CONST VOID  *BnPScalars[],
+  IN VOID        *BnCtx
+  )
+{
+  return CALL_BASECRYPTLIB (Ec.Services.PointsMul, EcPointsMul, (EcGroup, EcPointResult, BnGScalar, Count, EcPoints, BnPScalars, BnCtx), FALSE);
 }
 
 /**
@@ -7164,4 +7619,27 @@ const EDKII_CRYPTO_PROTOCOL  mEdkiiCrypto = {
   /// TLS Set (Continued)
   CryptoServiceTlsSetServerName,
   CryptoServiceTlsSetSecurityLevel,
+  /// AES (Continued)
+  CryptoServiceAesEncrypt,
+  CryptoServiceAesDecrypt,
+  /// CAMELLIA
+  CryptoServiceCamelliaGetContextSize,
+  CryptoServiceCamelliaInit,
+  CryptoServiceCamelliaEncrypt,
+  CryptoServiceCamelliaDecrypt,
+  /// BIGNUM (Continued)
+  CryptoServiceBigNumContextStart,
+  CryptoServiceBigNumContextEnd,
+  CryptoServiceBigNumContextGet,
+  CryptoServiceBigNumMul,
+  CryptoServiceBigNumGcd,
+  CryptoServiceBigNumDiv2,
+  /// Ec (Continued)
+  CryptoServiceEcGroupInitGFp,
+  CryptoServiceEcGroupSetGenerator,
+  CryptoServiceEcPointMul2,
+  CryptoServiceEcPointsMul,
+  /// RSA PSS (Continued)
+  CryptoServiceRsaPssSignDigest,
+  CryptoServiceRsaPssVerifyDigest,
 };

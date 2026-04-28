@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef __EFI_TLS_PROTOCOL_H__
-#define __EFI_TLS_PROTOCOL_H__
+#pragma once
 
 ///
 /// The EFI TLS Service Binding Protocol is used to locate EFI TLS Protocol drivers to
@@ -505,5 +504,3 @@ struct _EFI_TLS_PROTOCOL {
 
 extern EFI_GUID  gEfiTlsServiceBindingProtocolGuid;
 extern EFI_GUID  gEfiTlsProtocolGuid;
-
-#endif // __EFI_TLS_PROTOCOL_H__

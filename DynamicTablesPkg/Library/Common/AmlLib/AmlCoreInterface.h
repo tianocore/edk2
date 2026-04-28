@@ -6,8 +6,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef AML_CORE_INTERFACE_H_
-#define AML_CORE_INTERFACE_H_
+#pragma once
 
 /* This header file does not include internal Node definition,
    i.e. AML_ROOT_NODE, AML_OBJECT_NODE, etc. The node definitions
@@ -763,5 +762,3 @@ AmlGetAslPathName (
   OUT CHAR8                *Buffer,
   IN  OUT UINT32           *BufferSize
   );
-
-#endif // AML_CORE_INTERFACE_H_

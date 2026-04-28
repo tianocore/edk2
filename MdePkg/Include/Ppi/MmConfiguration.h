@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef MM_CONFIGURATION_PPI_H_
-#define MM_CONFIGURATION_PPI_H_
+#pragma once
 
 #include <Pi/PiMultiPhase.h>
 
@@ -58,5 +57,3 @@ struct _EFI_PEI_MM_CONFIGURATION_PPI {
 };
 
 extern EFI_GUID  gEfiPeiMmConfigurationPpi;
-
-#endif

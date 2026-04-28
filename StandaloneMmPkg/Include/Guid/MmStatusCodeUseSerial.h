@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef MM_STATUS_CODE_USE_SERIAL_H_
-#define MM_STATUS_CODE_USE_SERIAL_H_
+#pragma once
 
 ///
 /// The GUID of the StatusCodeUseSerial GUIDed HOB.
@@ -31,5 +30,3 @@ typedef struct {
 } MM_STATUS_CODE_USE_SERIAL;
 
 extern EFI_GUID  gMmStatusCodeUseSerialHobGuid;
-
-#endif

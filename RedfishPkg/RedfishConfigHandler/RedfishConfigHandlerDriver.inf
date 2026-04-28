@@ -5,6 +5,7 @@
 #  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
 #  (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 #  Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#  Copyright (c) 2026, Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -49,10 +50,9 @@
   gEdkIIRedfishCredentialProtocolGuid          ## CONSUMES
   gEdkIIRedfishConfigHandlerProtocolGuid       ## CONSUMES
   gEdkIIRedfishHostInterfaceReadyProtocolGuid  ## CONSUMES
+  gEdkIIRedfishCredentialProtocolGuid          ## CONSUMES
 
 [Guids]
-  gEfiEventExitBootServicesGuid           ## CONSUMES ## Event
-  gEfiEndOfDxeEventGroupGuid              ## CONSUMES ## Event
+  gEfiEventExitBootServicesGuid                ## CONSUMES ## Event
+  gEfiEndOfDxeEventGroupGuid                   ## CONSUMES ## Event
 
-[Depex]
-  gEdkIIRedfishCredentialProtocolGuid

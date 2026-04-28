@@ -1,0 +1,47 @@
+## @file
+# PLDM SMBIOS Transfer DXE Driver.
+#
+# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001d
+  BASE_NAME                      = PldmSmbiosTransferDxe
+  FILE_GUID                      = 71BF5CF0-CE09-4C7C-912B-944BF4E4CBC0
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DxePldmSmbiosTransferEntry
+  UNLOAD_IMAGE                   = PldmSmbiosTransferUnloadImage
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  PldmSmbiosTransferDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ManageabilityPkg/ManageabilityPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  ManageabilityTransportLib
+  ManageabilityTransportHelperLib
+  PldmProtocolLib
+  UefiLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+
+[Guids]
+  gEfiSmbios3TableGuid
+
+[Protocols]
+  gEfiSmbiosProtocolGuid
+  gEdkiiPldmSmbiosTransferProtocolGuid
+
+[Depex]
+  gEdkiiPldmProtocolGuid  ## ALWAYS_CONSUMES

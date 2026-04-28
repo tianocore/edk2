@@ -76,6 +76,156 @@ InternalIsTimeLikeString (
 }
 
 /**
+  Get the current time and print a standard error message in case of failure.
+
+  @param[in]  Command  Shell command name.
+  @param[out] TheTime  Current time on success.
+
+  @retval EFI_SUCCESS       The operation was successful.
+  @retval EFI_DEVICE_ERROR  Failed to get the current time.
+**/
+STATIC
+EFI_STATUS
+GetCurrentTime (
+  IN  CONST CHAR16  *Command,
+  OUT EFI_TIME      *TheTime
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = gRT->GetTime (TheTime, NULL);
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, Command, L"gRT->GetTime", Status);
+    return EFI_DEVICE_ERROR;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Print the current time in normal format.
+
+  @param[in] TheTime  Time to print.
+**/
+STATIC
+VOID
+PrintTime (
+  IN CONST EFI_TIME  *TheTime
+  )
+{
+  UINTN  TzMinutes;
+
+  if (TheTime->TimeZone != EFI_UNSPECIFIED_TIMEZONE) {
+    TzMinutes = (ABS (TheTime->TimeZone)) % 60;
+
+    ShellPrintHiiDefaultEx (
+      STRING_TOKEN (STR_TIME_FORMAT),
+      gShellLevel2HiiHandle,
+      TheTime->Hour,
+      TheTime->Minute,
+      TheTime->Second,
+      (TheTime->TimeZone > 0 ? L"-" : L"+"),
+      ((ABS (TheTime->TimeZone)) / 60),
+      TzMinutes
+      );
+  } else {
+    ShellPrintHiiDefaultEx (
+      STRING_TOKEN (STR_TIME_FORMAT_LOCAL),
+      gShellLevel2HiiHandle,
+      TheTime->Hour,
+      TheTime->Minute,
+      TheTime->Second
+      );
+  }
+}
+
+/**
+  Print the daylight saving mode.
+
+  @param[in] Daylight  Daylight mode value.
+**/
+STATIC
+VOID
+PrintDaylight (
+  IN UINT8  Daylight
+  )
+{
+  switch (Daylight) {
+    case 0:
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIME_DST0), gShellLevel2HiiHandle);
+      break;
+    case EFI_TIME_ADJUST_DAYLIGHT:
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIME_DST1), gShellLevel2HiiHandle);
+      break;
+    case EFI_TIME_IN_DAYLIGHT:
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIME_DST2), gShellLevel2HiiHandle);
+      break;
+    case EFI_TIME_IN_DAYLIGHT|EFI_TIME_ADJUST_DAYLIGHT:
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIME_DST3), gShellLevel2HiiHandle);
+      break;
+    default:
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_ERROR), gShellLevel2HiiHandle, L"time", L"gRT->GetTime", L"TheTime.Daylight", Daylight);
+      break;
+  }
+}
+
+/**
+  Parse the timezone command-line value.
+
+  @param[in]  TimeZoneString  Time zone string from the command line.
+  @param[out] Tz              Parsed time zone value.
+
+  @retval SHELL_SUCCESS            The operation was successful.
+  @retval SHELL_INVALID_PARAMETER  TimeZoneString is invalid.
+**/
+STATIC
+SHELL_STATUS
+GetTimeZoneFromString (
+  IN  CONST CHAR16  *TimeZoneString,
+  OUT INT16         *Tz
+  )
+{
+  CONST CHAR16  *TempLocation;
+
+  ASSERT (Tz != NULL);
+
+  TempLocation = TimeZoneString;
+
+  if (TempLocation == NULL) {
+    *Tz = 1441;
+    return SHELL_SUCCESS;
+  }
+
+  if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)TempLocation, L"_local") == 0) {
+    *Tz = EFI_UNSPECIFIED_TIMEZONE;
+  } else if (TempLocation[0] == L'-') {
+    *Tz = (INT16)ShellStrToUintn (++TempLocation);
+    if (*Tz == -1) {
+      *Tz = 1441;
+    } else {
+      *Tz *= (-1);
+    }
+  } else {
+    if (TempLocation[0] == L'+') {
+      *Tz = (INT16)ShellStrToUintn (++TempLocation);
+    } else {
+      *Tz = (INT16)ShellStrToUintn (TempLocation);
+    }
+
+    if (*Tz == -1) {
+      *Tz = 1441;
+    }
+  }
+
+  if (!((*Tz >= -1440) && (*Tz <= 1440)) && (*Tz != EFI_UNSPECIFIED_TIMEZONE)) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"time", TempLocation, L"-tz");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  return SHELL_SUCCESS;
+}
+
+/**
   Verify that the DateString is valid and if so set that as the current
   date.
 
@@ -100,9 +250,8 @@ CheckAndSetDate (
     return (SHELL_INVALID_PARAMETER);
   }
 
-  Status = gRT->GetTime (&TheTime, NULL);
+  Status = GetCurrentTime (L"date", &TheTime);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"date", L"gRT->GetTime", Status);
     return (SHELL_DEVICE_ERROR);
   }
 
@@ -202,9 +351,8 @@ MainCmdDate (
     //
     // get the current date
     //
-    Status = gRT->GetTime (&TheTime, NULL);
+    Status = GetCurrentTime (L"date", &TheTime);
     if (EFI_ERROR (Status)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"date", L"gRT->GetTime", Status);
       return (SHELL_DEVICE_ERROR);
     }
 
@@ -350,9 +498,8 @@ CheckAndSetTime (
     return (SHELL_INVALID_PARAMETER);
   }
 
-  Status = gRT->GetTime (&TheTime, NULL);
+  Status = GetCurrentTime (L"time", &TheTime);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"time", L"gRT->GetTime", Status);
     return (SHELL_DEVICE_ERROR);
   }
 
@@ -437,16 +584,14 @@ MainCmdTime (
   INT16         Tz;
   UINT8         Daylight;
   CONST CHAR16  *TempLocation;
-  UINTN         TzMinutes;
 
   ShellStatus = SHELL_SUCCESS;
 
   //
   // check for "-?"
   //
-  Status = gRT->GetTime (&TheTime, NULL);
+  Status = GetCurrentTime (L"time", &TheTime);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"time", L"gRT->GetTime", Status);
     return (SHELL_DEVICE_ERROR);
   }
 
@@ -465,76 +610,13 @@ MainCmdTime (
      && !ShellCommandLineGetFlag (Package, L"-d")
      && !ShellCommandLineGetFlag (Package, L"-tz"))
   {
-    //
-    // ShellPrintEx the current time
-    //
-    if (TheTime.TimeZone == EFI_UNSPECIFIED_TIMEZONE) {
-      TzMinutes = 0;
-    } else {
-      TzMinutes = (ABS (TheTime.TimeZone)) % 60;
-    }
-
-    if (TheTime.TimeZone != EFI_UNSPECIFIED_TIMEZONE) {
-      ShellPrintHiiDefaultEx (
-        STRING_TOKEN (STR_TIME_FORMAT),
-        gShellLevel2HiiHandle,
-        TheTime.Hour,
-        TheTime.Minute,
-        TheTime.Second,
-        (TheTime.TimeZone > 0 ? L"-" : L"+"),
-        ((ABS (TheTime.TimeZone)) / 60),
-        TzMinutes
-        );
-    } else {
-      ShellPrintHiiDefaultEx (
-        STRING_TOKEN (STR_TIME_FORMAT_LOCAL),
-        gShellLevel2HiiHandle,
-        TheTime.Hour,
-        TheTime.Minute,
-        TheTime.Second
-        );
-    }
+    PrintTime (&TheTime);
 
     ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_CRLF), gShellLevel2HiiHandle);
   } else if (ShellCommandLineGetFlag (Package, L"-d") && (ShellCommandLineGetValue (Package, L"-d") == NULL)) {
-    if (TheTime.TimeZone == EFI_UNSPECIFIED_TIMEZONE) {
-      ShellPrintHiiDefaultEx (
-        STRING_TOKEN (STR_TIME_FORMAT_LOCAL),
-        gShellLevel2HiiHandle,
-        TheTime.Hour,
-        TheTime.Minute,
-        TheTime.Second
-        );
-    } else {
-      TzMinutes = (ABS (TheTime.TimeZone)) % 60;
-      ShellPrintHiiDefaultEx (
-        STRING_TOKEN (STR_TIME_FORMAT),
-        gShellLevel2HiiHandle,
-        TheTime.Hour,
-        TheTime.Minute,
-        TheTime.Second,
-        (TheTime.TimeZone > 0 ? L"-" : L"+"),
-        ((ABS (TheTime.TimeZone)) / 60),
-        TzMinutes
-        );
-    }
+    PrintTime (&TheTime);
 
-    switch (TheTime.Daylight) {
-      case 0:
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIME_DST0), gShellLevel2HiiHandle);
-        break;
-      case EFI_TIME_ADJUST_DAYLIGHT:
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIME_DST1), gShellLevel2HiiHandle);
-        break;
-      case EFI_TIME_IN_DAYLIGHT:
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIME_DST2), gShellLevel2HiiHandle);
-        break;
-      case EFI_TIME_IN_DAYLIGHT|EFI_TIME_ADJUST_DAYLIGHT:
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_TIME_DST3), gShellLevel2HiiHandle);
-        break;
-      default:
-        ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_ERROR), gShellLevel2HiiHandle, L"time", L"gRT->GetTime", L"TheTime.Daylight", TheTime.Daylight);
-    }
+    PrintDaylight (TheTime.Daylight);
   } else {
     if (PcdGet8 (PcdShellSupportLevel) == 2) {
       ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"time");
@@ -543,45 +625,7 @@ MainCmdTime (
       //
       // perform level 3 operation here.
       //
-      if ((TempLocation = ShellCommandLineGetValue (Package, L"-tz")) != NULL) {
-        if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)TempLocation, L"_local") == 0) {
-          Tz = EFI_UNSPECIFIED_TIMEZONE;
-        } else if (TempLocation[0] == L'-') {
-          Tz = (INT16)ShellStrToUintn (++TempLocation);
-          //
-          // When the argument of "time [-tz tz]" is not numeric, ShellStrToUintn() returns "-1".
-          // Here we can detect the argument error by checking the return of ShellStrToUintn().
-          //
-          if (Tz == -1) {
-            Tz = 1441; // make it to be out of bounds value
-          } else {
-            Tz *= (-1); // sign convert
-          }
-        } else {
-          if (TempLocation[0] == L'+') {
-            Tz = (INT16)ShellStrToUintn (++TempLocation);
-          } else {
-            Tz = (INT16)ShellStrToUintn (TempLocation);
-          }
-
-          //
-          // Detect the return of ShellStrToUintn() to make sure the argument is valid.
-          //
-          if (Tz == -1) {
-            Tz = 1441; // make it to be out of bounds value
-          }
-        }
-
-        if (!((Tz >= -1440) && (Tz <= 1440)) && (Tz != EFI_UNSPECIFIED_TIMEZONE)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM_VAL), gShellLevel2HiiHandle, L"time", TempLocation, L"-tz");
-          ShellStatus = SHELL_INVALID_PARAMETER;
-        }
-      } else {
-        //
-        // intentionally out of bounds value will prevent changing it...
-        //
-        Tz = 1441;
-      }
+      ShellStatus = GetTimeZoneFromString (ShellCommandLineGetValue (Package, L"-tz"), &Tz);
 
       TempLocation = ShellCommandLineGetValue (Package, L"-d");
       if (TempLocation != NULL) {
@@ -767,9 +811,8 @@ CheckAndSetTimeZone (
   }
 
   if (gUnicodeCollation->StriColl (gUnicodeCollation, (CHAR16 *)TimeZoneString, L"_local") == 0) {
-    Status = gRT->GetTime (&TheTime, NULL);
+    Status = GetCurrentTime (L"timezone", &TheTime);
     if (EFI_ERROR (Status)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"gRT->GetTime", Status);
       return (SHELL_DEVICE_ERROR);
     }
 
@@ -786,9 +829,8 @@ CheckAndSetTimeZone (
     return (SHELL_INVALID_PARAMETER);
   }
 
-  Status = gRT->GetTime (&TheTime, NULL);
+  Status = GetCurrentTime (L"timezone", &TheTime);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"timezone", L"gRT->GetTime", Status);
     return (SHELL_DEVICE_ERROR);
   }
 
@@ -912,9 +954,8 @@ MainCmdTimeZone (
   //
   // Get Current Time Zone Info
   //
-  Status = gRT->GetTime (&TheTime, NULL);
+  Status = GetCurrentTime (L"timezone", &TheTime);
   if (EFI_ERROR (Status)) {
-    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"timezone", L"gRT->GetTime", Status);
     return (SHELL_DEVICE_ERROR);
   }
 

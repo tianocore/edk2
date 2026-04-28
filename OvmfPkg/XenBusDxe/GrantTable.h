@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef __GNTTAB_H__
-#define __GNTTAB_H__
+#pragma once
 
 #include <IndustryStandard/Xen/grant_table.h>
 
@@ -67,5 +66,3 @@ XenBusGrantEndAccess (
   IN XENBUS_PROTOCOL  *This,
   IN grant_ref_t      Ref
   );
-
-#endif /* !__GNTTAB_H__ */

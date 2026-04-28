@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __ATA_HC_IDE_MODE_H__
-#define __ATA_HC_IDE_MODE_H__
+#pragma once
 
 typedef enum {
   EfiIdePrimary    = 0,
@@ -194,5 +193,3 @@ AtaPacketCommandExecute (
   IN  UINT8                                       Device,
   IN  EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet
   );
-
-#endif

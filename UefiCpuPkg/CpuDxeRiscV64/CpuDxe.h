@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef CPU_DXE_H_
-#define CPU_DXE_H_
+#pragma once
 
 #include <PiDxe.h>
 
@@ -202,5 +201,3 @@ CpuSetMemoryAttributes (
   IN UINT64                 Length,
   IN UINT64                 Attributes
   );
-
-#endif

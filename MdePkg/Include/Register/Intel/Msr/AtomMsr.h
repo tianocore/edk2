@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __ATOM_MSR_H__
-#define __ATOM_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -765,5 +764,3 @@ typedef union {
   @note MSR_ATOM_PKG_C6_RESIDENCY is defined as MSR_PKG_C6_RESIDENCY in SDM.
 **/
 #define MSR_ATOM_PKG_C6_RESIDENCY  0x000003FA
-
-#endif

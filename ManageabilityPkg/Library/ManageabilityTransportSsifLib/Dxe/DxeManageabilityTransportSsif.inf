@@ -1,0 +1,49 @@
+## @file
+# SSIF instance of Manageability Transport Library
+#
+# Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = DxeManageabilityTransportSsif
+  MODULE_UNI_FILE                = ManageabilityTransportSsif.uni
+  FILE_GUID                      = 8840FF26-6A1F-40F8-9EAF-32DFCBDA0B1D
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ManageabilityTransportLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  ManageabilityTransportSsif.c
+  ../Common/SsifCommon.c
+  ../Common/ManageabilityTransportSsif.h
+
+[Packages]
+  ManageabilityPkg/ManageabilityPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PcdLib
+  PlatformBmcReadyLib
+  SmbusLib
+  TimerLib
+
+[Guids]
+  gManageabilityProtocolIpmiGuid
+  gManageabilityTransportSmbusI2cGuid
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSsifRequestRetryCount
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSsifRequestRetryIntervalMicrosecond
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSsifResponseRetryCount
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSsifResponseRetryIntervalMicrosecond
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSsifSmbusSlaveAddr # Used as default SSIF BMC slave address

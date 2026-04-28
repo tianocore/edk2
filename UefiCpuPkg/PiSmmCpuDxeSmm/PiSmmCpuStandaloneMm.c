@@ -32,7 +32,7 @@ IsSmmProfileEnabled (
   VOID
   )
 {
-  UINT64  SmmProfileSize;
+  UINTN  SmmProfileSize;
 
   GetSmmProfileData (&SmmProfileSize);
   if (SmmProfileSize == 0) {

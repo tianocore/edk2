@@ -227,10 +227,13 @@ also configured.
 | TlsGet                          |     N      |     N     |             |             |    C-Tls     |             |                 |
 | RsaPss.Sign                     |     N      |     N     |             |             |      C       |             |                 |
 | RsaPss.Verify                   |     N      |     N     |             |      C      |      C       |      C      |                 |
+| RsaPss.SignDigest               |     N      |     N     |             |             |      C       |             |                 |
+| RsaPss.VerifyDigest             |     N      |     N     |             |      C      |      C       |      C      |                 |
 | ParallelHash                    |     N      |     N     |             |             |              |      C      |                 |
 | AeadAesGcm                      |     N      |     N     |             |             |      C       |             |                 |
-| Bn                              |     N      |     N     |             |             |      C       |             |                 |
-| Ec                              |     N      |     N     |             |             |    C-Full    |             |                 |
+| Bn                              |     N      |     N     |             |             |      C       |      C      |                 |
+| Ec                              |     N      |     N     |             |             |    C-Full    |    C-Full   |                 |
+| Camellia                        |     N      |     N     |             |             |    C-Full    |    C-Full   |                 |
 
 ## Platform Configuration of Cryptographic Services
 

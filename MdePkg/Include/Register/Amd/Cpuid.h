@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __AMD_CPUID_H__
-#define __AMD_CPUID_H__
+#pragma once
 
 /**
 CPUID Signature Information
@@ -60,8 +59,125 @@ CPUID Signature Information
   @param   EAX  AMD_CPUID_EXTENDED_TOPOLOGY   (0x80000026)
   @param   ECX  Level number
 
+  @retval  EAX  Extended CPU topology flags described by the type
+                AMD_CPUID_EXTENDED_TOPOLOGY_EAX.
+  @retval  EBX  Extended CPU topology info described by the type
+                AMD_CPUID_EXTENDED_TOPOLOGY_EBX.
+  @retval  ECX  Extended CPU topology level described by the type
+                AMD_CPUID_EXTENDED_TOPOLOGY_ECX.
+  @retval  EDX  Extended APIC ID of the logical processor.
+
 **/
 #define AMD_CPUID_EXTENDED_TOPOLOGY  0x80000026
+
+/**
+  CPUID Extended Topology EAX for CPUID leaf
+  #AMD_CPUID_EXTENDED_TOPOLOGY.
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bits 4:0] Number of bits to shift Extended APIC ID right to get a
+    /// unique topology ID of the current hierarchy level.
+    ///
+    UINT32    MaskWidth                  : 5;
+    ///
+    /// [Bits 28:5] Reserved.
+    ///
+    UINT32    Reserved                   : 24;
+    ///
+    /// [Bit 29] Set to 1 if processor power efficiency ranking
+    /// (PwrEfficiencyRanking) is available and varies between cores.
+    /// Only valid for LevelType = 1h (Core).
+    ///
+    UINT32    EfficiencyRankingAvailable : 1;
+    ///
+    /// [Bit 30] Set to 1 if all components at the current hierarchy level
+    /// do not consist of the cores that report the same core type (CoreType).
+    ///
+    UINT32    HeterogeneousCores         : 1;
+    ///
+    /// [Bit 31] Set to 1 if all components at the current hierarchy level
+    /// do not report the same number of logical processors (NumLogProc).
+    ///
+    UINT32    AsymmetricTopology         : 1;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32    Uint32;
+} AMD_CPUID_EXTENDED_TOPOLOGY_EAX;
+
+/**
+  CPUID Extended Topology EBX for CPUID leaf
+  #AMD_CPUID_EXTENDED_TOPOLOGY.
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bits 15:0] Number of logical processors at the current hierarchy level.
+    ///
+    UINT32    NumLogProc           : 16;
+    ///
+    /// [Bits 23:16] Processor power efficiency ranking. Lower value indicates
+    /// comparatively lower power consumption and lower performance.
+    /// Only valid for LevelType = 1h (Core).
+    ///
+    UINT32    PwrEfficiencyRanking : 8;
+    ///
+    /// [Bits 27:24] Native model ID. Used in conjunction with the family,
+    /// model, and stepping identifiers.
+    /// Only valid for LevelType = 1h (Core).
+    ///
+    UINT32    NativeModelId        : 4;
+    ///
+    /// [Bits 31:28] Core type. Used to distinguish cores with different
+    /// architectural and microarchitectural properties.
+    /// Only valid for LevelType = 1h (Core).
+    ///
+    UINT32    CoreType             : 4;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32    Uint32;
+} AMD_CPUID_EXTENDED_TOPOLOGY_EBX;
+
+/**
+  CPUID Extended Topology ECX for CPUID leaf
+  #AMD_CPUID_EXTENDED_TOPOLOGY.
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bits 7:0] Input ECX[7:0].
+    ///
+    UINT32    InputEcx  : 8;
+    ///
+    /// [Bits 15:8] Encoded hierarchy level type.
+    /// 0h = Reserved, 1h = Core, 2h = Complex, 3h = Die,
+    /// 4h = Socket, 05h-FFh = Reserved.
+    ///
+    UINT32    LevelType : 8;
+    ///
+    /// [Bits 31:16] Reserved.
+    ///
+    UINT32    Reserved  : 16;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32    Uint32;
+} AMD_CPUID_EXTENDED_TOPOLOGY_ECX;
 
 /**
   CPUID Extended Processor Signature and Features
@@ -755,5 +871,3 @@ typedef union {
   ///
   UINT32    Uint32;
 } CPUID_MEMORY_ENCRYPTION_INFO_EDX;
-
-#endif

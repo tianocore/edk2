@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef MM_CPU_DRIVER_H_
-#define MM_CPU_DRIVER_H_
+#pragma once
 
 #include <Protocol/MmCommunication2.h>
 #include <Protocol/MmConfiguration.h>
@@ -74,5 +73,3 @@ PiMmCpuTpFwRootMmiHandler (
   IN OUT VOID        *CommBuffer      OPTIONAL,
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   );
-
-#endif /* MM_CPU_DRIVER_H_ */

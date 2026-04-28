@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef HII_UTILITY_LIB_
-#define HII_UTILITY_LIB_
+#pragma once
 
 #include <Protocol/DisplayProtocol.h>
 #include <Protocol/HiiConfigAccess.h>
@@ -1200,5 +1199,3 @@ EvaluateExpressionList (
   IN HII_FORMSET          *FormSet OPTIONAL,
   IN HII_FORM             *Form OPTIONAL
   );
-
-#endif // HII_UTILITY_LIB_

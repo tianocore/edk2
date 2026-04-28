@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFIIFRCLASS_H_
-#define _EFIIFRCLASS_H_
+#pragma once
 
 #include "string.h"
 #include "EfiVfr.h"
@@ -2772,5 +2771,3 @@ public:
     return _FLAGS_ZERO (LFlags) ? VFR_RETURN_SUCCESS : VFR_RETURN_FLAGS_UNSUPPORTED;
   }
 };
-
-#endif

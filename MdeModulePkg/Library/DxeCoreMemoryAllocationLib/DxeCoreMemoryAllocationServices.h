@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _DXE_CORE_MEMORY_ALLOCATION_SERVICES_H_
-#define _DXE_CORE_MEMORY_ALLOCATION_SERVICES_H_
+#pragma once
 
 /**
   Allocates pages from the memory map.
@@ -92,5 +91,3 @@ EFIAPI
 CoreFreePool (
   IN VOID  *Buffer
   );
-
-#endif

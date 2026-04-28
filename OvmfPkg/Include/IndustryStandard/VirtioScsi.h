@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _VIRTIO_SCSI_H_
-#define _VIRTIO_SCSI_H_
+#pragma once
 
 #include <IndustryStandard/Virtio.h>
 
@@ -88,5 +87,3 @@ typedef struct {
 #define VIRTIO_SCSI_S_TARGET_FAILURE     7
 #define VIRTIO_SCSI_S_NEXUS_FAILURE      8
 #define VIRTIO_SCSI_S_FAILURE            9
-
-#endif // _VIRTIO_SCSI_H_

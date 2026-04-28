@@ -1304,6 +1304,7 @@ deleteUriFromServiceEx (
   Status = HttpIoSetHeader (HttpIoHeader, "Content-Type", "application/json");
   ASSERT_EFI_ERROR (Status);
 
+  contentLength = 0;
   if (content != NULL) {
     contentLength = strlen (content);
     AsciiSPrint (

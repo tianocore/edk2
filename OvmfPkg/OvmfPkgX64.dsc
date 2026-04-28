@@ -35,6 +35,7 @@
   DEFINE STANDALONE_MM_ENABLE    = FALSE
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
   DEFINE CC_MEASUREMENT_ENABLE   = TRUE
+  DEFINE DEBUG_TO_MEM            = FALSE
 
 !include OvmfPkg/Include/Dsc/OvmfTpmDefines.dsc.inc
 
@@ -118,7 +119,7 @@
 
 !include NetworkPkg/NetworkBuildOptions.dsc.inc
 
-[BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
+[BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER, BuildOptions.common.EDKII.DXE_DRIVER, BuildOptions.common.EDKII.UEFI_DRIVER, BuildOptions.common.EDKII.DXE_CORE, BuildOptions.common.EDKII.UEFI_APPLICATION]
   GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
   XCODE:*_*_*_DLINK_FLAGS = -seg1addr 0x1000 -segalign 0x1000
   XCODE:*_*_*_MTOC_FLAGS = -align 0x1000
@@ -344,7 +345,7 @@
   DebugLib|OvmfPkg/Library/PlatformDebugLibIoPort/PlatformRomDebugLibIoPort.inf
 !endif
 !if $(DEBUG_TO_MEM)
-  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogPeiLib.inf
+  MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogPeiCoreLib.inf
 !endif
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   ResourcePublicationLib|MdePkg/Library/PeiResourcePublicationLib/PeiResourcePublicationLib.inf
@@ -447,7 +448,9 @@
   QemuBootOrderLib|OvmfPkg/Library/QemuBootOrderLib/QemuBootOrderLib.inf
   PlatformBootManagerCommonLib|OvmfPkg/Library/PlatformBootManagerCommonLib/PlatformBootManagerCommonLib.inf
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
-!if $(SMM_REQUIRE) == TRUE
+!if $(STANDALONE_MM_ENABLE) == TRUE
+  LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
+!elseif $(SMM_REQUIRE) == TRUE
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxDxeLib.inf
 !else
   LockBoxLib|OvmfPkg/Library/LockBoxLib/LockBoxDxeLib.inf
@@ -572,7 +575,7 @@
 !endif
 !if $(SECURE_BOOT_ENABLE) == TRUE
   gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported|TRUE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdRequireSelfSignedPk|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRequireSelfSignedPk|FALSE
 !endif
 
 [PcdsFixedAtBuild]
@@ -787,7 +790,10 @@
   #
   MdeModulePkg/Core/Pei/PeiMain.inf
 !if $(DEBUG_TO_MEM)
-  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
+  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf {
+    <LibraryClasses>
+      MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogPeiLib.inf
+  }
 !endif
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf  {
     <LibraryClasses>
@@ -803,7 +809,12 @@
   }
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
-  OvmfPkg/PlatformPei/PlatformPei.inf
+  OvmfPkg/PlatformPei/PlatformPei.inf {
+    <LibraryClasses>
+!if $(DEBUG_TO_MEM)
+      MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogPeiLib.inf
+!endif
+  }
 
   UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf {
     <LibraryClasses>
@@ -863,9 +874,7 @@
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf  {
    <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-!if $(DEBUG_TO_MEM)
       MemDebugLogLib|OvmfPkg/Library/MemDebugLogLib/MemDebugLogLibNull.inf
-!endif
   }
 
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
@@ -1013,7 +1022,9 @@
   #
   # Hash2 Protocol producer
   #
+!if $(NETWORK_ENABLE) == TRUE
   SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+!endif
 
   #
   # Network Support

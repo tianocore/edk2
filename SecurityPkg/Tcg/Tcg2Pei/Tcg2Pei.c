@@ -41,8 +41,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/ResetSystemLib.h>
 #include <Library/PrintLib.h>
 
-#define PERF_ID_TCG2_PEI  0x3080
-
 typedef struct {
   EFI_GUID                     *EventGuid;
   EFI_TCG2_EVENT_LOG_FORMAT    LogFormat;
@@ -273,7 +271,11 @@ SyncPcrAllocationsAndPcrMask (
   // Determine the current TPM support and the Platform PCR mask.
   //
   Status = Tpm2GetCapabilitySupportedAndActivePcrs (&TpmHashAlgorithmBitmap, &TpmActivePcrBanks);
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a - Failed to determine TPM capabilities!\n", __func__));
+    ASSERT_EFI_ERROR (Status);
+    return;
+  }
 
   DEBUG ((DEBUG_INFO, "Tpm2GetCapabilitySupportedAndActivePcrs - TpmHashAlgorithmBitmap: 0x%08x\n", TpmHashAlgorithmBitmap));
   DEBUG ((DEBUG_INFO, "Tpm2GetCapabilitySupportedAndActivePcrs - TpmActivePcrBanks 0x%08x\n", TpmActivePcrBanks));
@@ -835,7 +837,7 @@ MeasureMainBios (
   EFI_FV_INFO                  VolumeInfo;
   EFI_PEI_FIRMWARE_VOLUME_PPI  *FvPpi;
 
-  PERF_START_EX (mFileHandle, "EventRec", "Tcg2Pei", 0, PERF_ID_TCG2_PEI);
+  PERF_FUNCTION_BEGIN ();
 
   //
   // Only measure BFV at the very beginning. Other parts of Static Core Root of
@@ -866,7 +868,7 @@ MeasureMainBios (
 
   Status = MeasureFvImage ((EFI_PHYSICAL_ADDRESS)(UINTN)VolumeInfo.FvStart, VolumeInfo.FvSize);
 
-  PERF_END_EX (mFileHandle, "EventRec", "Tcg2Pei", 0, PERF_ID_TCG2_PEI + 1);
+  PERF_FUNCTION_END ();
 
   return Status;
 }
@@ -1088,6 +1090,8 @@ PeimEntryMA (
       }
 
       if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "Tcg2Pei::%a - TPM failed Startup!\n", __func__));
+        ASSERT_EFI_ERROR (Status);
         goto Done;
       }
     }
@@ -1120,6 +1124,7 @@ PeimEntryMA (
       if (PcdGet8 (PcdTpm2SelfTestPolicy) == 1) {
         Status = Tpm2SelfTest (NO);
         if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_ERROR, "Tcg2Pei::%a - TPM failed Startup!\n", __func__));
           goto Done;
         }
       }

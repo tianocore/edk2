@@ -116,22 +116,19 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
 APRIORI PEI {
-!if $(DEBUG_TO_MEM)
-  INF  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
-!endif
   INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 }
 
 #
 #  PEI Phase modules
 #
+!if $(DEBUG_TO_MEM)
+  INF  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
+!endif
 INF  MdeModulePkg/Core/Pei/PeiMain.inf
 INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
 INF  MdeModulePkg/Universal/ReportStatusCodeRouter/Pei/ReportStatusCodeRouterPei.inf
 INF  MdeModulePkg/Universal/StatusCodeHandler/Pei/StatusCodeHandlerPei.inf
-!if $(DEBUG_TO_MEM)
-INF  OvmfPkg/MemDebugLogPei/MemDebugLogPei.inf
-!endif
 !if $(CC_MEASUREMENT_ENABLE) == TRUE
   INF  OvmfPkg/Tcg/TdTcg2Pei/TdTcg2Pei.inf
 !endif
@@ -279,7 +276,9 @@ INF OvmfPkg/TdxDxe/TdxDxe.inf
 #
 # Hash2 Protocol producer
 #
-INF SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+!if $(NETWORK_ENABLE) == TRUE
+  INF SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+!endif
 
 #
 # Network modules

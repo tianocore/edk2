@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _BOOT_LOGO_LIB_H_
-#define _BOOT_LOGO_LIB_H_
+#pragma once
 
 #include <Protocol/PlatformLogo.h>
 #include <Protocol/GraphicsOutput.h>
@@ -59,5 +58,3 @@ BootLogoUpdateProgress (
   IN UINTN                          Progress,
   IN UINTN                          PreviousValue
   );
-
-#endif

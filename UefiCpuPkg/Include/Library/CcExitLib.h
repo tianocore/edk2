@@ -12,8 +12,7 @@
 
 **/
 
-#ifndef CC_EXIT_LIB_H_
-#define CC_EXIT_LIB_H_
+#pragma once
 
 #include <Protocol/DebugSupport.h>
 #include <Register/Amd/Ghcb.h>
@@ -172,5 +171,3 @@ CcExitHandleVe (
   IN OUT EFI_EXCEPTION_TYPE  *ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   );
-
-#endif

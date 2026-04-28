@@ -37,8 +37,7 @@
 
 **/
 
-#ifndef __PCI_HOTPLUG_REQUEST_H_
-#define __PCI_HOTPLUG_REQUEST_H_
+#pragma once
 
 ///
 /// Global ID for EFI_PCI_HOTPLUG_REQUEST_PROTOCOL
@@ -160,5 +159,3 @@ struct _EFI_PCI_HOTPLUG_REQUEST_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiPciHotPlugRequestProtocolGuid;
-
-#endif

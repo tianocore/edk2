@@ -639,7 +639,7 @@ ValidateAndMoveFiles (
     //
     // skip the directory traversing stuff...
     //
-    if ((StrCmp (Node->FileName, L".") == 0) || (StrCmp (Node->FileName, L"..") == 0)) {
+    if (IsDotOrDotDot (Node->FileName)) {
       continue;
     }
 

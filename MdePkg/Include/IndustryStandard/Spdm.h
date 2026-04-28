@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __SPDM_H__
-#define __SPDM_H__
+#pragma once
 
 #pragma pack(1)
 
@@ -1329,4 +1328,3 @@ typedef struct {
 // id-DMTF-SPDM-extension, { id-DMTF-spdm 6 }, 1.3.6.1.4.1.412.274.6
 #define SPDM_OID_DMTF_SPDM_EXTENSION \
     {0x2B, 0x06, 0x01, 0x04, 0x01, 0x83, 0x1C, 0x82, 0x12, 0x06 }
-#endif

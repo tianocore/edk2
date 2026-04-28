@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __STATUS_CODE_HANDLER_RUNTIME_DXE_H__
-#define __STATUS_CODE_HANDLER_RUNTIME_DXE_H__
+#pragma once
 
 #include <Protocol/ReportStatusCodeHandler.h>
 
@@ -127,5 +126,3 @@ EFIAPI
 UnregisterSerialBootTimeHandlers (
   VOID
   );
-
-#endif

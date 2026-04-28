@@ -3,13 +3,13 @@
   and DXE driver.
 
   (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2026, Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef EFI_REDFISH_CONFIG_HANDLER_COMMON_H_
-#define EFI_REDFISH_CONFIG_HANDLER_COMMON_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -64,16 +64,12 @@ RedfishConfigDriverCommonUnload (
   This is the common code for Redfish configuration UEFI and DXE driver
   initialization.
 
-  @param[in]  ImageHandle       The firmware allocated handle for the UEFI image.
-  @param[in]  SystemTable       A pointer to the EFI System Table.
-
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval Others                An unexpected error occurred.
 **/
 EFI_STATUS
 RedfishConfigCommonInit (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+  VOID
   );
 
 /**
@@ -97,5 +93,3 @@ VOID
 RedfishConfigHandlerInitialization (
   VOID
   );
-
-#endif

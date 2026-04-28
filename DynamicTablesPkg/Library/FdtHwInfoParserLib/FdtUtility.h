@@ -10,8 +10,7 @@
   - linux//Documentation/devicetree/bindings/interrupt-controller/arm%2Cgic.yaml
 **/
 
-#ifndef FDT_UTILITY_H_
-#define FDT_UTILITY_H_
+#pragma once
 
 /** Get the offset of an address in a "reg" Device Tree property.
 
@@ -520,5 +519,3 @@ FdtCreateExtIntcList (
   INT32   ExtIntcNode,
   UINT32  GsiBase
   );
-
-#endif // FDT_UTILITY_H_

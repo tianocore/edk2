@@ -11,8 +11,7 @@
   https://www.intel.com/content/www/us/en/products/docs/servers/ipmi/ipmi-second-gen-interface-spec-v2-rev1-1.html
 **/
 
-#ifndef IPMI_SSIF_H_
-#define IPMI_SSIF_H_
+#pragma once
 
 ///
 /// Definitions for SMBUS Commands for SSIF
@@ -94,5 +93,3 @@ typedef struct {
 } IPMI_SSIF_RESPONSE_SINGLE_PACKET;
 
 #pragma pack ()
-
-#endif /* IPMI_SSIF_H_ */

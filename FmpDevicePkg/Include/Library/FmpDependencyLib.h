@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef __FMP_DEPENDENCY_LIB__
-#define __FMP_DEPENDENCY_LIB__
+#pragma once
 
 #include <PiDxe.h>
 #include <Protocol/FirmwareManagement.h>
@@ -100,5 +99,3 @@ EvaluateDependency (
   IN  UINTN                         FmpVersionsCount,
   OUT UINT32                        *LastAttemptStatus OPTIONAL
   );
-
-#endif

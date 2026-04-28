@@ -1,6 +1,7 @@
 /** @file
   GUIDs and definitions used for Common Platform Error Record.
 
+  Copyright (c) 2026, ARM Ltd. All rights reserved.
   Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -10,8 +11,7 @@
 
 **/
 
-#ifndef __CPER_GUID_H__
-#define __CPER_GUID_H__
+#pragma once
 
 #pragma pack(1)
 
@@ -785,6 +785,512 @@ typedef enum {
 } EFI_GENERIC_ERROR_STATUS_ERROR_TYPE;
 
 ///
+/// ARM processor specific definitions.
+///
+
+///
+/// The validation bits indicates which fields in ARM Processor Error Section are
+/// valid.
+///@{
+#define EFI_ARM_PROC_ERROR_MPIDR_VALID               BIT0
+#define EFI_ARM_PROC_ERROR_ERROR_AFFINITY_LVL_VALID  BIT1
+#define EFI_ARM_PROC_ERROR_RUNNING_STATE_VALID       BIT2
+#define EFI_ARM_PROC_ERROR_VENDOR_INFO_VALID         BIT3
+///@}
+
+///
+/// The affinity levels for ARM Processor Error Section.
+///
+///@{
+#define EFI_ARM_PROC_ERROR_AFFINITY_LVL_0  0x00
+#define EFI_ARM_PROC_ERROR_AFFINITY_LVL_1  0x01
+#define EFI_ARM_PROC_ERROR_AFFINITY_LVL_2  0x02
+#define EFI_ARM_PROC_ERROR_AFFINITY_LVL_3  0x03
+///@}
+
+///
+/// ARM Processor Error Record.
+///
+typedef struct {
+  UINT32    ValidFields;
+  UINT16    ErrInfoNum;
+  UINT16    ContextInfoNum;
+  UINT32    SectionLength;
+  UINT8     ErrAffinityLvl;
+  UINT8     Reserved[3];
+  UINT64    MPIDR_EL1;
+  UINT64    MIDR_EL1;
+  UINT32    RunState;
+  UINT32    PsciState;
+} EFI_ARM_PROCESSOR_ERROR_RECORD;
+
+///
+/// The validation bit mask indicates which fields in ARM Cache Error Structure
+/// are valid.
+///@{
+#define EFI_ARM_CACHE_ERROR_TRANSACTION_TYPE_VALID           BIT0
+#define EFI_ARM_CACHE_ERROR_OPERATION_VALID                  BIT1
+#define EFI_ARM_CACHE_ERROR_LEVEL_VALID                      BIT2
+#define EFI_ARM_CACHE_ERROR_PROCESSOR_CONTEXT_CORRUPT_VALID  BIT3
+#define EFI_ARM_CACHE_ERROR_CORRECTED_VALID                  BIT4
+#define EFI_ARM_CACHE_ERROR_PRECISE_PC_VALID                 BIT5
+#define EFI_ARM_CACHE_ERROR_RESTARTABLE_PC_VALID             BIT6
+///@}
+
+///
+/// Type of cache error in ARM Cache Error Structure.
+///
+///@{
+#define EFI_ARM_CACHE_ERROR_TYPE_INSTRUCTION  0
+#define EFI_ARM_CACHE_ERROR_TYPE_DATA_ACCESS  1
+#define EFI_ARM_CACHE_ERROR_TYPE_GENERIC      2
+///@}
+
+///
+/// Type of cache operation that caused the error in ARM Cache Error Structure.
+///@{
+#define EFI_ARM_CACHE_ERROR_OPERATION_GENERIC_ERROR      0
+#define EFI_ARM_CACHE_ERROR_OPERATION_GENERIC_READ       1
+#define EFI_ARM_CACHE_ERROR_OPERATION_GENERIC_WRITE      2
+#define EFI_ARM_CACHE_ERROR_OPERATION_DATA_READ          3
+#define EFI_ARM_CACHE_ERROR_OPERATION_DATA_WRITE         4
+#define EFI_ARM_CACHE_ERROR_OPERATION_INSTRUCTION_FETCH  5
+#define EFI_ARM_CACHE_ERROR_OPERATION_PREFETCH           6
+#define EFI_ARM_CACHE_ERROR_OPERATION_EVICTION           7
+#define EFI_ARM_CACHE_ERROR_OPERATION_SNOOPING           8
+#define EFI_ARM_CACHE_ERROR_OPERATION_SNOOPED            9
+#define EFI_ARM_CACHE_ERROR_OPERATION_MANAGEMENT         10
+///@}
+
+///
+/// ARM Cache Error Structure.
+///
+typedef struct {
+  UINT64    ValidFields     : 16;
+  UINT64    TransactionType : 2;
+  UINT64    Operation       : 4;
+  UINT64    Level           : 3;
+  UINT64    ContextCorrupt  : 1;
+  UINT64    ErrorCorrected  : 1;
+  UINT64    PrecisePc       : 1;
+  UINT64    RestartablePc   : 1;
+  UINT64    Reserved        : 35;
+} EFI_ARM_CACHE_ERROR_INFO;
+
+///
+/// The Validation bit mask indicates which fields in ARM TLB Error Structure
+/// are valid.
+///@{
+#define EFI_ARM_TLB_ERROR_TRANSACTION_TYPE_VALID           BIT0
+#define EFI_ARM_TLB_ERROR_OPERATION_VALID                  BIT1
+#define EFI_ARM_TLB_ERROR_LEVEL_VALID                      BIT2
+#define EFI_ARM_TLB_ERROR_PROCESSOR_CONTEXT_CORRUPT_VALID  BIT3
+#define EFI_ARM_TLB_ERROR_CORRECTED_VALID                  BIT4
+#define EFI_ARM_TLB_ERROR_PRECISE_PC_VALID                 BIT5
+#define EFI_ARM_TLB_ERROR_RESTARTABLE_PC_VALID             BIT6
+///@}
+
+///
+/// Type of TLB error in ARM TLB Error Structure.
+///
+///@{
+#define EFI_ARM_TLB_ERROR_TYPE_INSTRUCTION  0
+#define EFI_ARM_TLB_ERROR_TYPE_DATA_ACCESS  1
+#define EFI_ARM_TLB_ERROR_TYPE_GENERIC      2
+///@}
+
+///
+/// Type of TLB operation that caused the error in ARM TLB Error Structure.
+///@{
+#define EFI_ARM_TLB_ERROR_OPERATION_GENERIC_ERROR                  0
+#define EFI_ARM_TLB_ERROR_OPERATION_GENERIC_READ                   1
+#define EFI_ARM_TLB_ERROR_OPERATION_GENERIC_WRITE                  2
+#define EFI_ARM_TLB_ERROR_OPERATION_DATA_READ                      3
+#define EFI_ARM_TLB_ERROR_OPERATION_DATA_WRITE                     4
+#define EFI_ARM_TLB_ERROR_OPERATION_INSTRUCTION_FETCH              5
+#define EFI_ARM_TLB_ERROR_OPERATION_PREFETCH                       6
+#define EFI_ARM_TLB_ERROR_OPERATION_LOCAL_MANAGEMENT_OPERATION     7
+#define EFI_ARM_TLB_ERROR_OPERATION_EXTERNAL_MANAGEMENT_OPERATION  8
+///@}
+
+///
+/// ARM TLB Error Structure.
+///
+typedef struct {
+  UINT64    ValidFields     : 16;
+  UINT64    TransactionType : 2;
+  UINT64    Operation       : 4;
+  UINT64    Level           : 3;
+  UINT64    ContextCorrupt  : 1;
+  UINT64    ErrorCorrected  : 1;
+  UINT64    PrecisePc       : 1;
+  UINT64    RestartablePc   : 1;
+  UINT64    Reserved        : 35;
+} EFI_ARM_TLB_ERROR_INFO;
+
+///
+/// The validation bit mask indicates which fields in the Bus Error Structure
+/// are valid.
+///@{
+#define EFI_ARM_BUS_ERROR_TRANSACTION_TYPE_VALID    BIT0
+#define EFI_ARM_BUS_ERROR_OPERATION_VALID           BIT1
+#define EFI_ARM_BUS_ERROR_LEVEL_VALID               BIT2
+#define EFI_ARM_BUS_ERROR_CONTEXT_CORRUPT_VALID     BIT3
+#define EFI_ARM_BUS_ERROR_CORRECTED_VALID           BIT4
+#define EFI_ARM_BUS_ERROR_PRECISE_PC_VALID          BIT5
+#define EFI_ARM_BUS_ERROR_RESTARTABLE_PC_VALID      BIT6
+#define EFI_ARM_BUS_ERROR_PARTICIPATION_TYPE_VALID  BIT7
+#define EFI_ARM_BUS_ERROR_TIME_OUT_VALID            BIT8
+#define EFI_ARM_BUS_ERROR_ADDRESS_SPACE_VALID       BIT9
+#define EFI_ARM_BUS_ERROR_MEMORY_ATTRIBUTE_VALID    BIT10
+#define EFI_ARM_BUS_ERROR_ACCESS_MODE_VALID         BIT11
+///@}
+
+///
+/// Type of bus error in the ARM Bus Error structure
+///@{
+#define EFI_ARM_BUS_ERROR_ERROR_TYPE_INSTRUCTION  0
+#define EFI_ARM_BUS_ERROR_ERROR_TYPE_DATA_ACCESS  1
+#define EFI_ARM_BUS_ERROR_ERROR_TYPE_GENERIC      2
+///@}
+
+///
+/// Type of bus operation that caused the error in ARM Bus Error Structure.
+///@{
+#define EFI_ARM_BUS_ERROR_OPERATION_GENERIC_ERROR      0
+#define EFI_ARM_BUS_ERROR_OPERATION_GENERIC_READ       1
+#define EFI_ARM_BUS_ERROR_OPERATION_GENERIC_WRITE      2
+#define EFI_ARM_BUS_ERROR_OPERATION_DATA_READ          3
+#define EFI_ARM_BUS_ERROR_OPERATION_DATA_WRITE         4
+#define EFI_ARM_BUS_ERROR_OPERATION_INSTRUCTION_FETCH  5
+#define EFI_ARM_BUS_ERROR_OPERATION_PREFETCH           6
+///@}
+
+///
+/// Type of Participation
+///@{
+#define EFI_ARM_BUS_ERROR_PARTICIPATION_TYPE_REQUEST    0
+#define EFI_ARM_BUS_ERROR_PARTICIPATION_TYPE_RESPONDED  1
+#define EFI_ARM_BUS_ERROR_PARTICIPATION_TYPE_OBSERVED   2
+#define EFI_ARM_BUS_ERROR_PARTICIPATION_TYPE_GENERIC    3
+///@}
+
+///
+/// Type of Address Space
+///@{
+#define EFI_ARM_BUS_CHECK_ADDRESS_SPACE_TYPE_EXTERNAL_MEMORY  0
+#define EFI_ARM_BUS_CHECK_ADDRESS_SPACE_TYPE_INTERNAL_MEMORY  1
+#define EFI_ARM_BUS_CHECK_ADDRESS_SPACE_TYPE_DEVICE_MEMORY    3
+///@}
+
+///
+/// ARM Bus Error Structure
+///
+typedef struct {
+  UINT64    ValidFields           : 16;
+  UINT64    TransactionType       : 2;
+  UINT64    Operation             : 4;
+  UINT64    Level                 : 3;
+  UINT64    ContextCorrupt        : 1;
+  UINT64    ErrorCorrected        : 1;
+  UINT64    PrecisePc             : 1;
+  UINT64    RestartablePc         : 1;
+  UINT64    ParticipationType     : 2;
+  UINT64    TimeOut               : 1;
+  UINT64    AddressSpace          : 2;
+  UINT64    MemoryAccessAttribute : 9;
+  UINT64    AccessMode            : 1;
+  UINT64    Reserved              : 20;
+} EFI_ARM_BUS_ERROR_INFO;
+
+///
+/// ARM Error Indormation field.
+///
+typedef union {
+  EFI_ARM_CACHE_ERROR_INFO    CacheErrorInfo;
+  EFI_ARM_TLB_ERROR_INFO      TlbErrorInfo;
+  EFI_ARM_BUS_ERROR_INFO      BusErrorInfo;
+} EFI_ARM_ERROR_INFORMATION;
+
+///
+/// The validation bits indicating which fields of ARM Processor Error Information
+/// Structure are valid.
+///@{
+#define EFI_ARM_PROC_ERROR_INFO_MULTIPLE_ERROR_VALID   BIT0
+#define EFI_ARM_PROC_ERROR_INFO_FLAGS_VALID            BIT1
+#define EFI_ARM_PROC_ERROR_INFO_ERROR_INFO_VALID       BIT2
+#define EFI_ARM_PROC_ERROR_INFO_VIRT_FAULT_ADDR_VALID  BIT3
+#define EFI_ARM_PROC_ERROR_INFO_PHY_FAULT_ADDR_VALID   BIT4
+///@}
+
+///
+/// The type of error that occurred in ARM Proessor Error section.
+///@{
+#define EFI_ARM_PROC_ERROR_INFO_TYPE_CACHE       0x00
+#define EFI_ARM_PROC_ERROR_INFO_TYPE_TLB         0x01
+#define EFI_ARM_PROC_ERROR_INFO_TYPE_BUS         0x02
+#define EFI_ARM_PROC_ERROR_INFO_TYPE_MICRO_ARCH  0x03
+
+///
+/// The flags to define the error atrributes in ARM Processor Error Information
+/// Structure.
+///@{
+#define EFI_ARM_PROC_ERROR_INFO_FLAG_FIRST_ERROR_CAPTURED_FLAG  BIT0
+#define EFI_ARM_PROC_ERROR_INFO_FLAG_LAST_ERROR_CAPTURED_FLAG   BIT1
+#define EFI_ARM_PROC_ERROR_INFO_FLAG_PROPAGATED_FLAG            BIT2
+#define EFI_ARM_PROC_ERROR_INFO_FLAG_OVERFLOW_FLAG              BIT3
+///@}
+
+#define EFI_ARM_PROCESSOR_ERROR_INFO_STRUCTURE_REVISION  0
+
+///
+/// ARM Processor Error Information Structure
+///
+typedef struct {
+  UINT8                        Version;
+  UINT8                        Length;
+  UINT16                       ValidFields;
+  UINT8                        Type;
+  UINT16                       ErrorCount;
+  UINT8                        Flags;
+  EFI_ARM_ERROR_INFORMATION    ErrorInfo;
+  UINT64                       VirtualFaultAddress;
+  UINT64                       PhysicalFaultAddress;
+} EFI_ARM_PROCESSOR_ERROR_INFORMATION;
+
+///
+/// ARM Register Context Type.
+///@{
+#define EFI_ARM_REG_CONTEXT_TYPE_AARCH32_GPRS    0
+#define EFI_ARM_REG_CONTEXT_TYPE_AARCH32_EL1     1
+#define EFI_ARM_REG_CONTEXT_TYPE_AARCH32_EL2     2
+#define EFI_ARM_REG_CONTEXT_TYPE_AARCH32_SECURE  3
+#define EFI_ARM_REG_CONTEXT_TYPE_AARCH64_GPRS    4
+#define EFI_ARM_REG_CONTEXT_TYPE_AARCH64_EL1     5
+#define EFI_ARM_REG_CONTEXT_TYPE_AARCH64_EL2     6
+#define EFI_ARM_REG_CONTEXT_TYPE_AARCH64_EL3     7
+#define EFI_ARM_REG_CONTEXT_TYPE_MISC_SYS_REG    8
+///@}
+
+///
+/// ARMv8 AARCH32 GPR's(Type0)
+///
+typedef struct {
+  UINT32    R0;
+  UINT32    R1;
+  UINT32    R2;
+  UINT32    R3;
+  UINT32    R4;
+  UINT32    R5;
+  UINT32    R6;
+  UINT32    R7;
+  UINT32    R8;
+  UINT32    R9;
+  UINT32    R10;
+  UINT32    R11;
+  UINT32    R12;
+  UINT32    R13_SP;
+  UINT32    R14_LR;
+  UINT32    R15_PC;
+} EFI_ARM_AARCH32_CONTEXT_GPR;
+
+///
+/// ARMv8 AARCH32 EL1 Context System Register(Type1)
+///
+typedef struct {
+  UINT32    DFAR;
+  UINT32    DFSR;
+  UINT32    IFAR;
+  UINT32    ISR;
+  UINT32    MAIR0;
+  UINT32    MAIR1;
+  UINT32    MIDR;
+  UINT32    MPIDR;
+  UINT32    NMRR;
+  UINT32    PRRR;
+  UINT32    SCTLR;
+  UINT32    SPSR;
+  UINT32    SPSR_abt;
+  UINT32    SPSR_fiq;
+  UINT32    SPSR_irq;
+  UINT32    SPSR_svc;
+  UINT32    SPSR_und;
+  UINT32    TPIDRPRW;
+  UINT32    TPIDRURO;
+  UINT32    TPIDRURW;
+  UINT32    TTBCR;
+  UINT32    TTBR0;
+  UINT32    TTBR1;
+  UINT32    DACR;
+} EFI_ARM_AARCH32_EL1_CONTEXT_SYSTEM_REGISTERS;
+
+///
+/// ARMv8 AARCH32 EL2 Context System Register(Type2)
+///
+typedef struct {
+  UINT32    ELR_hyp;
+  UINT32    HAMAIR0;
+  UINT32    HAMAIR1;
+  UINT32    HCR;
+  UINT32    HCR2;
+  UINT32    HDFAR;
+  UINT32    HIFAR;
+  UINT32    HPFAR;
+  UINT32    HSR;
+  UINT32    HTCR;
+  UINT32    HTPIDR;
+  UINT32    HTTBR;
+  UINT32    SPSR_hyp;
+  UINT32    VTCR;
+  UINT32    VTTBR;
+  UINT32    DACR32_EL2;
+} EFI_ARM_AARCH32_EL2_CONTEXT_SYSTEM_REGISTERS;
+
+///
+/// ARMv8 AARCH32 Secure Context System Register(Type3)
+///
+typedef struct {
+  UINT32    SCTLR;
+  UINT32    SPSR_mon;
+} EFI_ARM_AARCH32_SECURE_CONTEXT_SYSTEM_REGISTERS;
+
+///
+/// ARMv8 AARCH64 GPR's(Type4)
+///
+typedef struct {
+  UINT64    X0;
+  UINT64    X1;
+  UINT64    X2;
+  UINT64    X3;
+  UINT64    X4;
+  UINT64    X5;
+  UINT64    X6;
+  UINT64    X7;
+  UINT64    X8;
+  UINT64    X9;
+  UINT64    X10;
+  UINT64    X11;
+  UINT64    X12;
+  UINT64    X13;
+  UINT64    X14;
+  UINT64    X15;
+  UINT64    X16;
+  UINT64    X17;
+  UINT64    X18;
+  UINT64    X19;
+  UINT64    X20;
+  UINT64    X21;
+  UINT64    X22;
+  UINT64    X23;
+  UINT64    X24;
+  UINT64    X25;
+  UINT64    X26;
+  UINT64    X27;
+  UINT64    X28;
+  UINT64    X29;
+  UINT64    X30;
+  UINT64    SP;
+} EFI_ARM_AARCH64_CONTEXT_GPR;
+
+///
+/// ARMv8 AARCH64 EL1 Context System Register(Type5)
+///
+typedef struct {
+  UINT64    ELR_EL1;
+  UINT64    ESR_EL1;
+  UINT64    FAR_EL1;
+  UINT64    ISR_EL1;
+  UINT64    MAIR_EL1;
+  UINT64    MIDR_EL1;
+  UINT64    MPIDR_EL1;
+  UINT64    SCTLR_EL1;
+  UINT64    SP_EL0;
+  UINT64    SP_EL1;
+  UINT64    SPSR_EL1;
+  UINT64    TCR_EL1;
+  UINT64    TPIDR_EL0;
+  UINT64    TPIDR_EL1;
+  UINT64    TPIDRRO_EL0;
+  UINT64    TTBR0_EL1;
+  UINT64    TTBR1_EL1;
+} EFI_ARM_AARCH64_EL1_CONTEXT_SYSTEM_REGISTERS;
+
+///
+/// ARMv8 AARCH64 EL2 Context System Register(Type6)
+///
+typedef struct {
+  UINT64    ELR_EL2;
+  UINT64    ESR_EL2;
+  UINT64    FAR_EL2;
+  UINT64    HACR_EL2;
+  UINT64    HCR_EL2;
+  UINT64    HPFAR_EL2;
+  UINT64    MAIR_EL2;
+  UINT64    SCTLR_EL2;
+  UINT64    SP_EL2;
+  UINT64    SPSR_EL2;
+  UINT64    TCR_EL2;
+  UINT64    TPIDR_EL2;
+  UINT64    TTBR0_EL2;
+  UINT64    VTCR_EL2;
+  UINT64    VTTBR_EL2;
+} EFI_ARM_AARCH64_EL2_CONTEXT_SYSTEM_REGISTERS;
+
+///
+/// ARMv8 AARCH64 EL3 Context System Register(Type7)
+///
+typedef struct {
+  UINT64    ELR_EL3;
+  UINT64    ESR_EL3;
+  UINT64    FAR_EL3;
+  UINT64    MAIR_EL3;
+  UINT64    SCTLR_EL3;
+  UINT64    SP_EL3;
+  UINT64    SPSR_EL3;
+  UINT64    TCR_EL3;
+  UINT64    TPIDR_EL3;
+  UINT64    TTBR0_EL3;
+} EFI_ARM_AARCH64_EL3_CONTEXT_SYSTEM_REGISTERS;
+
+///
+/// ARMv8 AARCH64 MISC Context System Register(Type8)-Single Reister Entry.
+///
+typedef struct {
+  UINT16    MRS_Op2  : 3;
+  UINT16    MRS_CRm  : 4;
+  UINT16    MRS_CRn  : 4;
+  UINT16    MRS_Op1  : 3;
+  UINT16    MRS_O0   : 1;
+  UINT16    Reserved : 1;
+  UINT64    RegisterVal;
+} EFI_ARM_MISC_CONTEXT_SYSTEM_REGISTER;
+
+///
+/// ARM Processor Error Context Register Array Information.
+///
+typedef union {
+  EFI_ARM_AARCH32_CONTEXT_GPR                        Type0SysRegs;
+  EFI_ARM_AARCH32_EL1_CONTEXT_SYSTEM_REGISTERS       Type1SysRegs;
+  EFI_ARM_AARCH32_EL2_CONTEXT_SYSTEM_REGISTERS       Type2SysRegs;
+  EFI_ARM_AARCH32_SECURE_CONTEXT_SYSTEM_REGISTERS    Type3SysRegs;
+  EFI_ARM_AARCH64_CONTEXT_GPR                        Type4SysRegs;
+  EFI_ARM_AARCH64_EL1_CONTEXT_SYSTEM_REGISTERS       Type5SysRegs;
+  EFI_ARM_AARCH64_EL2_CONTEXT_SYSTEM_REGISTERS       Type6SysRegs;
+  EFI_ARM_AARCH64_EL3_CONTEXT_SYSTEM_REGISTERS       Type7SysRegs;
+  EFI_ARM_MISC_CONTEXT_SYSTEM_REGISTER               SysRegInfo;
+} EFI_CONTEXT_REGISTER_ARRAY_INFO;
+
+///
+/// ARM Processor Context Information Structure.
+///
+typedef struct {
+  UINT16                             Version;
+  UINT16                             RegisterContextType;
+  UINT32                             RegisterArraySize;
+  EFI_CONTEXT_REGISTER_ARRAY_INFO    RegisterArray;
+} EFI_ARM_PROCESSOR_CONTEXT_INFORMATION;
+
+///
 /// Validation bit mask indicates which fields in the memory error record are valid
 /// in Memory Error section
 ///@{
@@ -1342,7 +1848,5 @@ extern EFI_GUID  gEfiIa32X64ErrorTypeCacheCheckGuid;
 extern EFI_GUID  gEfiIa32X64ErrorTypeTlbCheckGuid;
 extern EFI_GUID  gEfiIa32X64ErrorTypeBusCheckGuid;
 extern EFI_GUID  gEfiIa32X64ErrorTypeMsCheckGuid;
-
-#endif
 
 #endif

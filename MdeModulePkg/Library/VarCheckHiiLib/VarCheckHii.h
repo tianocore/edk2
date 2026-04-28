@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _VAR_CHECK_HII_H_
-#define _VAR_CHECK_HII_H_
+#pragma once
 
 #include <Library/VarCheckLib.h>
 #include <Library/BaseLib.h>
@@ -57,5 +56,3 @@ DumpVarCheckHii (
   }
 
 extern EFI_GUID  gVarCheckReceivedHiiBinHandlerGuid;
-
-#endif

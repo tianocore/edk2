@@ -14,8 +14,7 @@
 
 **/
 
-#ifndef SEV_SNP_MSR_H_
-#define SEV_SNP_MSR_H_
+#pragma once
 
 /**
   Secure Encrypted Virtualization - Encrypted State (SEV-ES) GHCB register
@@ -236,5 +235,3 @@ typedef union {
   ///
   UINT64    Uint64;
 } MSR_SEV_STATUS_REGISTER;
-
-#endif

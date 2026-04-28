@@ -7,8 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __EFI_HTTPS_SUPPORT_H__
-#define __EFI_HTTPS_SUPPORT_H__
+#pragma once
 
 #define HTTPS_DEFAULT_PORT  443
 
@@ -258,5 +257,3 @@ HttpsReceive (
   IN OUT NET_FRAGMENT   *Fragment,
   IN     EFI_EVENT      Timeout
   );
-
-#endif

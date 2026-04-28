@@ -5,6 +5,7 @@
 
   Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2026, Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -130,9 +131,10 @@ RedfishConfigDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
 {
-  EFI_REST_EX_PROTOCOL  *RestEx;
-  EFI_STATUS            Status;
-  EFI_HANDLE            ChildHandle;
+  EFI_REST_EX_PROTOCOL               *RestEx;
+  EFI_STATUS                         Status;
+  EFI_HANDLE                         ChildHandle;
+  EDKII_REDFISH_CREDENTIAL_PROTOCOL  *TestCredentialProtocol;
 
   ChildHandle = NULL;
 
@@ -171,6 +173,18 @@ RedfishConfigDriverBindingSupported (
     &gEfiRestExServiceBindingProtocolGuid,
     ChildHandle
     );
+
+  //
+  // Check if the Redfish credential protocol is installed or not.
+  //
+  Status = gBS->LocateProtocol (&gEdkIIRedfishCredentialProtocolGuid, NULL, (VOID **)&TestCredentialProtocol);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: No Redfish Credential Protocol is installed on system.", __func__));
+    return EFI_UNSUPPORTED;
+  }
+
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: Redfish Credential Protocol is found.\n", __func__));
+
   return Status;
 }
 
@@ -331,6 +345,7 @@ RedfishServiceDiscoveredCallback (
       gRedfishConfigData.RedfishServiceInfo.RedfishServiceProductVer   = RedfishInstance->Information.ProductVer;
       gRedfishConfigData.RedfishServiceInfo.RedfishServiceUseHttps     = RedfishInstance->Information.UseHttps;
       gRedfishServiceDiscovered                                        = TRUE;
+      DEBUG ((DEBUG_MANAGEABILITY, "%a: Redfish service %s is discovered!\n", __func__, gRedfishConfigData.RedfishServiceInfo.RedfishServiceUuid));
     }
 
     //
@@ -591,10 +606,13 @@ RedfishConfigHandlerDriverEntryPoint (
     return Status;
   }
 
-  Status = RedfishConfigCommonInit (ImageHandle, SystemTable);
+  Status = RedfishConfigCommonInit ();
   if (EFI_ERROR (Status)) {
-    gBS->CloseEvent (gEfiRedfishDiscoverProtocolEvent);
-    gEfiRedfishDiscoverProtocolEvent = NULL;
+    if (gEfiRedfishDiscoverProtocolEvent != NULL) {
+      gBS->CloseEvent (gEfiRedfishDiscoverProtocolEvent);
+      gEfiRedfishDiscoverProtocolEvent = NULL;
+    }
+
     return Status;
   }
 

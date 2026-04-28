@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef ASM_MACRO_IO_LIBV8_H_
-#define ASM_MACRO_IO_LIBV8_H_
+#pragma once
 
 // CurrentEL : 0xC = EL3; 8 = EL2; 4 = EL1
 // This only selects between EL1 and EL2, else we die.
@@ -71,5 +70,3 @@
     adrp    tmp, sym                            ;\
     ldr     dst, [tmp, :lo12:sym]
 #endif
-
-#endif // ASM_MACRO_IO_LIBV8_H_

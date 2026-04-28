@@ -15,8 +15,7 @@
 
 **/
 
-#ifndef __PENTIUM_MSR_H__
-#define __PENTIUM_MSR_H__
+#pragma once
 
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -131,5 +130,3 @@
 #define MSR_PENTIUM_CTR0  0x00000012
 #define MSR_PENTIUM_CTR1  0x00000013
 /// @}
-
-#endif

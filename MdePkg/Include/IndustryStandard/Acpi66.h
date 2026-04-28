@@ -9,8 +9,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef ACPI_6_6_H_
-#define ACPI_6_6_H_
+#pragma once
 
 #include <IndustryStandard/Acpi65.h>
 
@@ -890,7 +889,7 @@ typedef struct {
 
 //
 // SRAT structure types.
-// All other values between 0x06 an 0xFF are reserved and
+// All other values between 0x08 and 0xFF are reserved and
 // will be ignored by OSPM.
 //
 #define EFI_ACPI_6_6_PROCESSOR_LOCAL_APIC_SAPIC_AFFINITY  0x00
@@ -941,9 +940,10 @@ typedef struct {
 //
 // Memory Flags.  All other bits are reserved and must be 0.
 //
-#define EFI_ACPI_6_6_MEMORY_ENABLED        (1 << 0)
-#define EFI_ACPI_6_6_MEMORY_HOT_PLUGGABLE  (1 << 1)
-#define EFI_ACPI_6_6_MEMORY_NONVOLATILE    (1 << 2)
+#define EFI_ACPI_6_6_MEMORY_ENABLED           (1 << 0)
+#define EFI_ACPI_6_6_MEMORY_HOT_PLUGGABLE     (1 << 1)
+#define EFI_ACPI_6_6_MEMORY_NONVOLATILE       (1 << 2)
+#define EFI_ACPI_6_6_MEMORY_SPECIFIC_PURPOSE  (1 << 3)
 
 ///
 /// Processor Local x2APIC Affinity Structure Definition
@@ -1054,6 +1054,18 @@ typedef struct {
 ///
 #define EFI_ACPI_6_6_GENERIC_INITIATOR_AFFINITY_STRUCTURE_ENABLED                     BIT0
 #define EFI_ACPI_6_6_GENERIC_INITIATOR_AFFINITY_STRUCTURE_ARCHITECTURAL_TRANSACTIONS  BIT1
+
+///
+/// Generic Port Affinity Structure
+///
+typedef EFI_ACPI_6_6_GENERIC_INITIATOR_AFFINITY_STRUCTURE EFI_ACPI_6_6_GENERIC_PORT_AFFINITY_STRUCTURE;
+
+///
+/// Generic Port Affinity Structure Flags. All other bits are reserved
+/// and must be 0.
+///
+#define EFI_ACPI_6_6_GENERIC_PORT_AFFINITY_STRUCTURE_ENABLED                     BIT0
+#define EFI_ACPI_6_6_GENERIC_PORT_AFFINITY_STRUCTURE_ARCHITECTURAL_TRANSACTIONS  BIT1
 
 ///
 /// System Locality Distance Information Table (SLIT).
@@ -2457,9 +2469,15 @@ typedef struct {
   UINT8                                                                  Reserved1[4];
   UINT64                                                                 MemorySideCacheSize;
   EFI_ACPI_6_6_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO_CACHE_ATTRIBUTES    CacheAttributes;
-  UINT8                                                                  Reserved2[2];
+  UINT16                                                                 AddressMode;
   UINT16                                                                 NumberOfSmbiosHandles;
 } EFI_ACPI_6_6_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO;
+
+///
+/// Memory Side Cache Information Structure flags
+///
+#define EFI_ACPI_6_6_HMAT_RESERVED_ADDRESS_MODE         0
+#define EFI_ACPI_6_6_HMAT_EXTENDED_LINEAR_ADDRESS_MODE  1
 
 ///
 /// ERST - Error Record Serialization Table
@@ -3057,7 +3075,7 @@ typedef struct {
   UINT8     Reserved[3];
   UINT32    RecordCount;
   // UINT8   PhatVersionElement[];
-} EFI_ACPI_6_6_PHAT_FIRMWARE_VERISON_DATA_RECORD;
+} EFI_ACPI_6_6_PHAT_FIRMWARE_VERSION_DATA_RECORD;
 
 #define EFI_ACPI_6_6_PHAT_FIRMWARE_VERSION_DATA_RECORD_REVISION  0x01
 
@@ -3563,5 +3581,3 @@ typedef struct {
 #define EFI_ACPI_MEMORY_SYSTEM_RESOURCE_PARTITIONING_AND_MONITORING_TABLE_SIGNATURE  SIGNATURE_32('M', 'P', 'A', 'M')
 
 #pragma pack()
-
-#endif

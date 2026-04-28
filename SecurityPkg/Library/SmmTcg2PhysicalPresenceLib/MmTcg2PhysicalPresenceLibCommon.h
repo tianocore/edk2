@@ -15,8 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _MM_TCG2_PHYSICAL_PRESENCE_LIB_COMMON_H_
-#define _MM_TCG2_PHYSICAL_PRESENCE_LIB_COMMON_H_
+#pragma once
 
 #include <Guid/Tcg2PhysicalPresenceData.h>
 
@@ -53,5 +52,3 @@ BOOLEAN
 IsTcg2PPVerLowerThan_1_3 (
   VOID
   );
-
-#endif

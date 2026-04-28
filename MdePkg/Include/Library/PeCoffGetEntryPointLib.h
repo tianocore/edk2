@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __PE_COFF_GET_ENTRY_POINT_LIB_H__
-#define __PE_COFF_GET_ENTRY_POINT_LIB_H__
+#pragma once
 
 /**
   Retrieves and returns a pointer to the entry point to a PE/COFF image that has been loaded
@@ -111,5 +110,3 @@ EFIAPI
 PeCoffSearchImageBase (
   IN UINTN  Address
   );
-
-#endif

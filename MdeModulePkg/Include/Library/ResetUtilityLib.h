@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef _RESET_UTILITY_LIB_H_
-#define _RESET_UTILITY_LIB_H_
+#pragma once
 
 #include <Uefi/UefiMultiPhase.h>
 
@@ -127,5 +126,3 @@ BuildResetData (
   IN       UINTN   ExtraDataSize  OPTIONAL,
   IN CONST VOID    *ExtraData     OPTIONAL
   );
-
-#endif // _RESET_UTILITY_LIB_H_

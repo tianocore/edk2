@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _PLAT_VAR_CLEANUP_HII_
-#define _PLAT_VAR_CLEANUP_HII_
+#pragma once
 
 //
 // {24F14D8A-D7A8-4991-91E0-96C3B7DB8456}
@@ -49,5 +48,3 @@ typedef struct {
 // In order to avoid to conflict them, the user variable QuestionID offset is defined from 0x8000.
 //
 #define USER_VARIABLE_QUESTION_ID  0x8000
-
-#endif

@@ -127,7 +127,7 @@
   ArmSmcLib|MdePkg/Library/ArmSmcLib/ArmSmcLib.inf
   SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
 
-  ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
+  ArmLib|MdePkg/Library/ArmLib/ArmBaseLib.inf
 
 ################################################################################
 #

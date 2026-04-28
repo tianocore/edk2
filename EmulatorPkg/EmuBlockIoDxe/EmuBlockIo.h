@@ -18,8 +18,7 @@ Abstract:
 
 **/
 
-#ifndef _EMU_BLOCK_IO_H_
-#define _EMU_BLOCK_IO_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Protocol/EmuIoThunk.h>
@@ -71,5 +70,3 @@ extern EFI_COMPONENT_NAME2_PROTOCOL       gEmuBlockIoComponentName2;
 extern EFI_DRIVER_CONFIGURATION_PROTOCOL  gEmuBlockIoDriverConfiguration;
 extern EFI_DRIVER_DIAGNOSTICS_PROTOCOL    gEmuBlockIoDriverDiagnostics;
 extern EFI_DRIVER_DIAGNOSTICS2_PROTOCOL   gEmuBlockIoDriverDiagnostics2;
-
-#endif

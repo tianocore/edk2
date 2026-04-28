@@ -11,8 +11,7 @@
 
 **/
 
-#ifndef PRM_CONFIG_H_
-#define PRM_CONFIG_H_
+#pragma once
 
 #include <PrmContextBuffer.h>
 #include <Uefi.h>
@@ -27,5 +26,3 @@ struct _PRM_CONFIG_PROTOCOL {
 };
 
 extern EFI_GUID  gPrmConfigProtocolGuid;
-
-#endif

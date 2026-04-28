@@ -9,8 +9,7 @@
 
 **/
 
-#ifndef _LSI_SCSI_DXE_H_
-#define _LSI_SCSI_DXE_H_
+#pragma once
 
 typedef struct {
   //
@@ -195,5 +194,3 @@ LsiScsiGetDeviceName (
   IN  CHAR8                        *Language,
   OUT CHAR16                       **ControllerName
   );
-
-#endif // _LSI_SCSI_DXE_H_

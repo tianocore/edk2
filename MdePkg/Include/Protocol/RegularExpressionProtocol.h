@@ -10,8 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef __REGULAR_EXPRESSION_PROTOCOL_H__
-#define __REGULAR_EXPRESSION_PROTOCOL_H__
+#pragma once
 
 #define EFI_REGULAR_EXPRESSION_PROTOCOL_GUID \
   { \
@@ -171,5 +170,3 @@ extern EFI_GUID  gEfiRegexSyntaxTypeEcma262Guid;
 // For regular expression rules specified in the Perl standard:
 //
 extern EFI_GUID  gEfiRegexSyntaxTypePerlGuid;
-
-#endif

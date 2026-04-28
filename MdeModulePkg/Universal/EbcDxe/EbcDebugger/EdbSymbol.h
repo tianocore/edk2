@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _EFI_EDB_SYMBOL_H_
-#define _EFI_EDB_SYMBOL_H_
+#pragma once
 
 #include <Uefi.h>
 
@@ -240,5 +239,3 @@ Symboltoi (
   IN CHAR16  *Symbol,
   OUT UINTN  *Address
   );
-
-#endif

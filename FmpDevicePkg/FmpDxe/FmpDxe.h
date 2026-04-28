@@ -10,8 +10,7 @@
 
 **/
 
-#ifndef _FMP_DXE_H_
-#define _FMP_DXE_H_
+#pragma once
 
 #include <PiDxe.h>
 #include <Library/DebugLib.h>
@@ -365,5 +364,3 @@ SetPackageInfo (
   IN UINT32                            PackageVersion,
   IN CONST CHAR16                      *PackageVersionName
   );
-
-#endif

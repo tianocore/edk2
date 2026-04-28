@@ -5,8 +5,7 @@
 
 **/
 
-#ifndef LCD_GRAPHICS_OUTPUT_DXE_H_
-#define LCD_GRAPHICS_OUTPUT_DXE_H_
+#pragma once
 
 #include <Base.h>
 
@@ -97,5 +96,3 @@ EFI_STATUS
 InitializeDisplay (
   IN LCD_INSTANCE  *Instance
   );
-
-#endif /* LCD_GRAPHICS_OUTPUT_DXE_H_ */

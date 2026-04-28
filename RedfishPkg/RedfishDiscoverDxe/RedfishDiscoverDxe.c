@@ -69,6 +69,30 @@ static REDFISH_DISCOVER_REQUIRED_PROTOCOL  mRequiredProtocol[] = {
 };
 
 /**
+  Reports whether a required-protocol table entry is used on this platform.
+
+  TCP6 is required only when PcdIPv6HttpSupport is TRUE so Redfish discovery
+  can run on IPv4-only network stacks (PcdIPv6HttpSupport FALSE).
+
+  @param[in]  Index  Index in mRequiredProtocol.
+
+  @retval TRUE   The entry is required and must be present.
+  @retval FALSE  The entry is skipped (TCP6 when IPv6 HTTP is disabled).
+**/
+STATIC
+BOOLEAN
+IsRedfishRequiredProtocolIndexActive (
+  IN UINTN  Index
+  )
+{
+  if (mRequiredProtocol[Index].ProtocolType == ProtocolTypeTcp6) {
+    return PcdGetBool (PcdIPv6HttpSupport);
+  }
+
+  return TRUE;
+}
+
+/**
   This function creates REST EX instance for the found Resfish service.
   by known owner handle.
 
@@ -1788,6 +1812,10 @@ TestForRequiredProtocols (
 
   ListCount = (sizeof (mRequiredProtocol) / sizeof (REDFISH_DISCOVER_REQUIRED_PROTOCOL));
   for (Index = 0; Index < ListCount; Index++) {
+    if (!IsRedfishRequiredProtocolIndexActive (Index)) {
+      continue;
+    }
+
     Status = gBS->OpenProtocol (
                     ControllerHandle,
                     mRequiredProtocol[Index].RequiredServiceBindingProtocolGuid,
@@ -1858,6 +1886,10 @@ BuildupNetworkInterface (
   RestExInstance               = NULL;
 
   for (Index = 0; Index < ListCount; Index++) {
+    if (!IsRedfishRequiredProtocolIndexActive (Index)) {
+      continue;
+    }
+
     Status = gBS->OpenProtocol (
                     // Already in list?
                     ControllerHandle,
@@ -2076,6 +2108,10 @@ StopServiceOnNetworkInterface (
   EFI_REDFISH_DISCOVER_PROTOCOL                    *RedfishDiscoverProtocol;
 
   for (Index = 0; Index < (sizeof (mRequiredProtocol) / sizeof (REDFISH_DISCOVER_REQUIRED_PROTOCOL)); Index++) {
+    if (!IsRedfishRequiredProtocolIndexActive (Index)) {
+      continue;
+    }
+
     Status = gBS->HandleProtocol (
                     ControllerHandle,
                     mRequiredProtocol[Index].RequiredProtocolGuid,

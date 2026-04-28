@@ -2,11 +2,11 @@
   Header file for for USB network common driver
 
   Copyright (c) 2023, American Megatrends International LLC. All rights reserved.<BR>
+  Copyright (C) 2026 Advanced Micro Devices, Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef DRIVER_BINDING_H_
-#define DRIVER_BINDING_H_
+#pragma once
 
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -21,11 +21,10 @@
 #include <Protocol/NetworkInterfaceIdentifier.h>
 #include <Protocol/UsbEthernetProtocol.h>
 
-#define NETWORK_COMMON_DRIVER_VERSION    1
-#define NETWORK_COMMON_POLLING_INTERVAL  0x10
-#define RX_BUFFER_COUNT                  32
-#define TX_BUFFER_COUNT                  32
-#define MEMORY_REQUIRE                   0
+#define NETWORK_COMMON_DRIVER_VERSION  1
+#define RX_BUFFER_COUNT                32
+#define TX_BUFFER_COUNT                32
+#define MEMORY_REQUIRE                 0
 
 #define UNDI_DEV_SIGNATURE  SIGNATURE_32('u','n','d','i')
 #define UNDI_DEV_FROM_THIS(a)  CR(a, NIC_DEVICE, NiiProtocol, UNDI_DEV_SIGNATURE)
@@ -262,5 +261,3 @@ Statistics (
   IN UINT64    DbAddr,
   IN UINT16    DbSize
   );
-
-#endif

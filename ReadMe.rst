@@ -10,17 +10,20 @@ environment for the UEFI and PI specifications from www.uefi.org.
 
 It is recommended to install this Python version to run the full set of scripts that enable CI in the project.
 
-Other Python requirements for build can be found in the `EDK II Build Instructions <https://github.com/tianocore/tianocore.github.io/wiki/Build-Instructions/>`__.
+Other Python requirements for build can be found in the `EDK II Build Instructions <https://www.tianocore.org/tianocore-wiki.github.io/build-tooling/build-workflows/edk_ii_tools_list.html>`__.
 
 Core CI Build Status
 --------------------
 
-============================= ================= =============== ===================
- Host Type & Toolchain        Build Status      Test Status     Code Coverage
-============================= ================= =============== ===================
-Windows_VS_                   |WindowsCiBuild|  |WindowsCiTest| |WindowsCiCoverage|
-Ubuntu_GCC_                   |UbuntuCiBuild|   |UbuntuCiTest|  |UbuntuCiCoverage|
-============================= ================= =============== ===================
+====================================== ================= ================ ===================
+ Host Type & Toolchain                 Build Status      Test Status      Code Coverage
+====================================== ================= ================ ===================
+Windows_VS_                            |WindowsCiBuild|  |WindowsCiTest|  |WindowsCiCoverage|
+Ubuntu_GCC_                            |UbuntuCiBuild|   |UbuntuCiTest|   |UbuntuCiCoverage|
+Windows_CLANGPDB_                      |WinClgCiBuild|   |WinClgCiTest|   |WinClgCiCoverage|
+Ubuntu_CLANGPDB_                       |UbuClgCiBuild|   |UbuClgCiTest|   |UbuClgCiCoverage|
+Ubuntu_CLANGDWARF_                     |UbuCdwCiBuild|   |UbuCdwCiTest|   |UbuCdwCiCoverage|
+====================================== ================= ================ ===================
 
 `More CI Build information <.pytool/Readme.md>`__
 
@@ -28,35 +31,61 @@ Platform CI Build Status
 ------------------------
 
 Microsoft Windows Visual Studio (VS)
-````````````````````````
+````````````````````````````````````
 
 ============================= ================= ============= ============= ==============
  Toolchain                    CONFIG            DEBUG         RELEASE       NOOPT
 ============================= ================= ============= ============= ==============
-EmulatorPkg_Win_VS_           | IA32            |em32d|       |em32r|       |em32n|
-|                             | X64             |em64d|       |em64r|       |em64n|
-|                             | IA32 FULL       |em32fd|      |em32fr|      |em32fn|
+EmulatorPkg_Win_VS_           | X64             |em64d|       |em64r|       |em64n|
 |                             | X64 FULL        |em64fd|      |em64fr|      |em64fn|
-OvmfPkg_Win_VS_               | IA32            |op32d|       |op32r|       |op32n|
-|                             | X64             |op64d|       |op64r|       |op64n|
+OvmfPkg_Win_VS_               | X64             |op64d|       |op64r|       |op64n|
 ============================= ================= ============= ============= ==============
 
-Ubuntu 24.04
-`````````````````
+Microsoft Windows CLANGPDB
+``````````````````````````
+
+============================= ================= ============= ============= ==============
+ Toolchain                    CONFIG            DEBUG         RELEASE       NOOPT
+============================= ================= ============= ============= ==============
+EmulatorPkg_Win_CLANGPDB_     | X64             |emW64cd|     |emW64cr|     |emW64cn|
+|                             | X64 FULL        |emW64cfd|    |emW64cfr|    |emW64cfn|
+============================= ================= ============= ============= ==============
+
+Ubuntu GCC
+``````````
 
 ============================= ================= ============= ============= ==============
  Toolchain                    CONFIG            DEBUG         RELEASE       NOOPT
 ============================= ================= ============= ============= ==============
 ArmVirtPkg_Ubuntu_GCC_        | AARCH64         |avAArch64du| |avAArch64ru| |avAArch64nu|
-EmulatorPkg_Ubuntu_GCC_       | IA32            **N/A**       **N/A**       **N/A**
-|                             | X64             |em64du|      |em64ru|      |em64nu|
-|                             | IA32 FULL       **N/A**       **N/A**       **N/A**
+EmulatorPkg_Ubuntu_GCC_       | X64             |em64du|      |em64ru|      |em64nu|
 |                             | X64 FULL        |em64fdu|     |em64fru|     |em64fnu|
-OvmfPkg_Ubuntu_GCC_           | IA32            |op32du|      |op32ru|      |op32nu|
-|                             | X64             |op64du|      |op64ru|      |op64nu|
+OvmfPkg_Ubuntu_GCC_           | X64             |op64du|      |op64ru|      |op64nu|
 ============================= ================= ============= ============= ==============
 
-|TCBZ_2639|_ - EmulatorPkg Ubuntu GCC5 Segfaults during execution.
+|TCBZ_2639|_ - EmulatorPkg Ubuntu GCC Segfaults during execution.
+
+Ubuntu CLANGPDB
+```````````````
+
+============================= ================= ============== ============== ==============
+ Toolchain                    CONFIG            DEBUG          RELEASE        NOOPT
+============================= ================= ============== ============== ==============
+ArmVirtPkg_Ubuntu_CLANGPDB_   | AARCH64         |avAArch64cpu| |avAArch64rpu| |avAArch64npu|
+OvmfPkg_Ubuntu_CLANGPDB_      | X64             |opU64cpd|     |opU64cpr|     |opU64cpn|
+============================= ================= ============== ============== ==============
+
+Ubuntu CLANGDWARF
+`````````````````
+
+============================== ================= ============== ============== ==============
+ Toolchain                     CONFIG            DEBUG          RELEASE        NOOPT
+============================== ================= ============== ============== ==============
+ArmVirtPkg_Ubuntu_CLANGDWARF_  | AARCH64         |avAArch64cdu| |avAArch64rdu| |avAArch64ndu|
+EmulatorPkg_Ubuntu_CLANGDWARF_ | X64             |emU64cdd|     |emU64cdr|     |emU64cdn|
+|                              | X64 FULL        |emU64cdfd|    |emU64cdfr|    |emU64cdfn|
+OvmfPkg_Ubuntu_CLANGDWARF_     | X64             |opU64cdd|     |opU64cdr|     |opU64cdn|
+============================== ================= ============== ============== ==============
 
 `More ArmVirtPkg CI Build Information <ArmVirtPkg/PlatformCI/ReadMe.md>`__
 
@@ -76,9 +105,9 @@ licenses:
 -  `BaseTools/Plugin/CodeQL/analyze <https://www.apache.org/licenses/LICENSE-2.0>`__
 -  `BaseTools/Source/C/LzmaCompress <BaseTools/Source/C/LzmaCompress/LZMA-SDK-README.txt>`__
 -  `BaseTools/Source/C/VfrCompile/Pccts <BaseTools/Source/C/VfrCompile/Pccts/RIGHTS>`__
--  `CryptoPkg\Library\BaseCryptLib\SysCall\inet_pton.c <CryptoPkg\Library\BaseCryptLib\SysCall\inet_pton.c>`__
--  `CryptoPkg\Library\Include\crypto\dso_conf.h <https://github.com/openssl/openssl/blob/e2e09d9fba1187f8d6aafaa34d4172f56f1ffb72/LICENSE>`__
--  `CryptoPkg\Library\Include\openssl\opensslconf.h <https://github.com/openssl/openssl/blob/e2e09d9fba1187f8d6aafaa34d4172f56f1ffb72/LICENSE>`__
+-  `CryptoPkg/Library/BaseCryptLib/SysCall/inet_pton.c <CryptoPkg/Library/BaseCryptLib/SysCall/inet_pton.c>`__
+-  `CryptoPkg/Library/Include/crypto/dso_conf.h <https://github.com/openssl/openssl/blob/e2e09d9fba1187f8d6aafaa34d4172f56f1ffb72/LICENSE>`__
+-  `CryptoPkg/Library/Include/openssl/opensslconf.h <https://github.com/openssl/openssl/blob/e2e09d9fba1187f8d6aafaa34d4172f56f1ffb72/LICENSE>`__
 -  `MdeModulePkg/Library/LzmaCustomDecompressLib <MdeModulePkg/Library/LzmaCustomDecompressLib/LZMA-SDK-README.txt>`__
 -  `OvmfPkg <OvmfPkg/License.txt>`__
 
@@ -97,6 +126,7 @@ that are covered by additional licenses.
 -  `MdePkg/Library/BaseFdtLib/libfdt <https://github.com/devicetree-org/pylibfdt/blob/f39368a217496d32c4091a2dba4045b60649e3a5/BSD-2-Clause>`__
 -  `MdePkg/Library/MipiSysTLib/mipisyst <https://github.com/MIPI-Alliance/public-mipi-sys-t/blob/aae857d0d05ac65152ed24992a4acd834a0a107c/LICENSE>`__
 -  `SecurityPkg/DeviceSecurity/SpdmLib/libspdm <https://github.com/DMTF/libspdm/blob/main/LICENSE.md>`__
+-  `TcgTpmPkg/Library/TpmLib/TPM <https://github.com/TrustedComputingGroup/TPM/blob/main/LICENSE>`__
 
 The EDK II Project is composed of packages. The maintainers for each package
 are listed in `Maintainers.txt <Maintainers.txt>`__.
@@ -106,15 +136,15 @@ Resources
 
 -  `TianoCore <http://www.tianocore.org>`__
 -  `EDK
-   II <https://github.com/tianocore/tianocore.github.io/wiki/EDK-II>`__
+   II <https://www.tianocore.org/tianocore-wiki.github.io>`__
 -  `Getting Started with EDK
-   II <https://github.com/tianocore/tianocore.github.io/wiki/Getting-Started-with-EDK-II>`__
+   II <https://www.tianocore.org/tianocore-wiki.github.io/development/tutorials-howto/getting_started_with_edk_ii.html>`__
 -  `Mailing
-   Lists <https://github.com/tianocore/tianocore.github.io/wiki/Mailing-Lists>`__
+   Lists <https://www.tianocore.org/tianocore-wiki.github.io/community/communications/mailing_lists.html>`__
 -  `How To
-   Contribute <https://github.com/tianocore/tianocore.github.io/wiki/How-To-Contribute>`__
+   Contribute <https://www.tianocore.org/tianocore-wiki.github.io/development/contribution-guides/how_to_contribute.html>`__
 -  `Release
-   Planning <https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Release-Planning>`__
+   Planning <https://www.tianocore.org/tianocore-wiki.github.io/releases-history/planning-roadmaps/edk_ii_release_planning.html>`__
 
 Code Contributions
 ------------------
@@ -254,7 +284,7 @@ command
   git submodule update --init
   cd ..
 
-If there's update for submodules, use following git commands to get
+If there are updates for submodules, use the following git commands to get
 the latest submodules code.
 
 .. code-block:: bash
@@ -264,8 +294,8 @@ the latest submodules code.
   git submodule update
 
 Note: When cloning submodule repos, '--recursive' option is not
-recommended. EDK II itself will not use any code/feature from
-submodules in above submodules. So using '--recursive' adds a
+recommended. EDK II itself will not use any code or features from
+submodules within the submodules listed above. So using '--recursive' adds a
 dependency on being able to reach servers we do not actually want
 any code from, as well as needlessly downloading code we will not
 use.
@@ -286,6 +316,21 @@ use.
 .. |UbuntuCiTest| image:: https://img.shields.io/azure-devops/tests/tianocore/edk2-ci/76.svg
 .. |UbuntuCiCoverage| image:: https://img.shields.io/badge/coverage-coming_soon-blue
 
+.. _Windows_CLANGPDB: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=89&branchName=master
+.. |WinClgCiBuild| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FWindows%20-%20CLANGPDB?branchName=master
+.. |WinClgCiTest| image:: https://img.shields.io/azure-devops/tests/tianocore/edk2-ci/89.svg
+.. |WinClgCiCoverage| image:: https://img.shields.io/badge/coverage-coming_soon-blue
+
+.. _Ubuntu_CLANGPDB: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=83&branchName=master
+.. |UbuClgCiBuild| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FUbuntu%20-%20CLANGPDB?branchName=master
+.. |UbuClgCiTest| image:: https://img.shields.io/azure-devops/tests/tianocore/edk2-ci/83.svg
+.. |UbuClgCiCoverage| image:: https://img.shields.io/badge/coverage-coming_soon-blue
+
+.. _Ubuntu_CLANGDWARF: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=82&branchName=master
+.. |UbuCdwCiBuild| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FUbuntu%20-%20CLANGDWARF?branchName=master
+.. |UbuCdwCiTest| image:: https://img.shields.io/azure-devops/tests/tianocore/edk2-ci/82.svg
+.. |UbuCdwCiCoverage| image:: https://img.shields.io/badge/coverage-coming_soon-blue
+
 .. ArmVirtPkg
 
 .. _ArmVirtPkg_Ubuntu_GCC: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=79&branchName=master
@@ -293,55 +338,73 @@ use.
 .. |avAArch64ru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FArmVirtPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_AARCH64_RELEASE
 .. |avAArch64nu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FArmVirtPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_AARCH64_NOOPT
 
-.. |avArmdu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FArmVirtPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_ARM_DEBUG
-.. |avArmru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FArmVirtPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_ARM_RELEASE
-.. |avArmnu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FArmVirtPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_ARM_NOOPT
+.. _ArmVirtPkg_Ubuntu_CLANGPDB: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=88&branchName=master
+.. |avAArch64cpu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FArmVirtPkg%20-%20Ubuntu%20-%20CLANGPDB?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_AARCH64_DEBUG
+.. |avAArch64rpu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FArmVirtPkg%20-%20Ubuntu%20-%20CLANGPDB?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_AARCH64_RELEASE
+.. |avAArch64npu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FArmVirtPkg%20-%20Ubuntu%20-%20CLANGPDB?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_AARCH64_NOOPT
+
+.. _ArmVirtPkg_Ubuntu_CLANGDWARF: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=84&branchName=master
+.. |avAArch64cdu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FArmVirtPkg%20-%20Ubuntu%20-%20CLANGDWARF?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_AARCH64_DEBUG
+.. |avAArch64rdu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FArmVirtPkg%20-%20Ubuntu%20-%20CLANGDWARF?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_AARCH64_RELEASE
+.. |avAArch64ndu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FArmVirtPkg%20-%20Ubuntu%20-%20CLANGDWARF?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20QEMU_AARCH64_NOOPT
 
 .. EmulatorPkg
 
 .. |TCBZ_2639| image:: https://img.shields.io/github/issues/tianocore/edk2?baseUrl=https%3A%2F%2Fgithub.com
 .. _TCBZ_2639: https://github.com/tianocore/edk2/issues/9905
 
-.. _EmulatorPkg_Win_VS:  https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=73&branchName=master
+.. _EmulatorPkg_Win_VS: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=73&branchName=master
 .. _EmulatorPkg_Ubuntu_GCC: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=78&branchName=master
-
-.. |em32d| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_DEBUG
-.. |em32r| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_RELEASE
-.. |em32n| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_NOOPT
-
-.. |em32fd| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_FULL_DEBUG
-.. |em32fr| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_FULL_RELEASE
-.. |em32fn| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_IA32_FULL_NOOPT
+.. _EmulatorPkg_Win_CLANGPDB: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=90&branchName=master
+.. _EmulatorPkg_Ubuntu_CLANGDWARF: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=85&branchName=master
 
 .. |em64d| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_DEBUG
-.. |em64du| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_DEBUG
 .. |em64r| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_RELEASE
-.. |em64ru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_RELEASE
 .. |em64n| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_NOOPT
-.. |em64nu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_NOOPT
-
 .. |em64fd| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_DEBUG
-.. |em64fdu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_DEBUG
 .. |em64fr| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_RELEASE
-.. |em64fru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_RELEASE
 .. |em64fn| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_NOOPT
+
+.. |em64du| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_DEBUG
+.. |em64ru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_RELEASE
+.. |em64nu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_NOOPT
+.. |em64fdu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_DEBUG
+.. |em64fru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_RELEASE
 .. |em64fnu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_NOOPT
+
+.. |emW64cd| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20-%20CLANGPDB?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_DEBUG
+.. |emW64cr| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20-%20CLANGPDB?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_RELEASE
+.. |emW64cn| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20-%20CLANGPDB?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_NOOPT
+.. |emW64cfd| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20-%20CLANGPDB?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_DEBUG
+.. |emW64cfr| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20-%20CLANGPDB?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_RELEASE
+.. |emW64cfn| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Windows%20-%20CLANGPDB?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_NOOPT
+
+.. |emU64cdd| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20-%20CLANGDWARF?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_DEBUG
+.. |emU64cdr| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20-%20CLANGDWARF?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_RELEASE
+.. |emU64cdn| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20-%20CLANGDWARF?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_NOOPT
+.. |emU64cdfd| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20-%20CLANGDWARF?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_DEBUG
+.. |emU64cdfr| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20-%20CLANGDWARF?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_RELEASE
+.. |emU64cdfn| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FEmulatorPkg%20-%20Ubuntu%20-%20CLANGDWARF?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20EmulatorPkg_X64_FULL_NOOPT
 
 .. OvmfPkg
 
-.. _OvmfPkg_Win_VS:  https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=72&branchName=master
+.. _OvmfPkg_Win_VS: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=72&branchName=master
 .. _OvmfPkg_Ubuntu_GCC: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=77&branchName=master
-
-.. |op32d| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32_DEBUG
-.. |op32du| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32_DEBUG
-.. |op32r| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32_RELEASE
-.. |op32ru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32_RELEASE
-.. |op32n| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32_DEBUG
-.. |op32nu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_IA32_NOOPT
+.. _OvmfPkg_Ubuntu_CLANGPDB: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=87&branchName=master
+.. _OvmfPkg_Ubuntu_CLANGDWARF: https://dev.azure.com/tianocore/edk2-ci/_build/latest?definitionId=86&branchName=master
 
 .. |op64d| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_DEBUG
-.. |op64du| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_DEBUG
 .. |op64r| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_RELEASE
-.. |op64ru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_RELEASE
 .. |op64n| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Windows%20VS%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_NOOPT
+
+.. |op64du| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_DEBUG
+.. |op64ru| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_RELEASE
 .. |op64nu| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20GCC%20-%20CI?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_NOOPT
+
+.. |opU64cpd| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20-%20CLANGPDB?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_DEBUG
+.. |opU64cpr| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20-%20CLANGPDB?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_RELEASE
+.. |opU64cpn| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20-%20CLANGPDB?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_NOOPT
+
+.. |opU64cdd| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20-%20CLANGDWARF?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_DEBUG
+.. |opU64cdr| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20-%20CLANGDWARF?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_RELEASE
+.. |opU64cdn| image:: https://dev.azure.com/tianocore/edk2-ci/_apis/build/status%2FCI%2FOvmfPkg%20-%20Ubuntu%20-%20CLANGDWARF?branchName=master&jobName=Platform_CI&configuration=Platform_CI%20OVMF_X64_NOOPT

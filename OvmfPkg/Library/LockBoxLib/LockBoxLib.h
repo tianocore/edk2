@@ -6,8 +6,7 @@
 
 **/
 
-#ifndef __LOCK_BOX_LIB_IMPL_H__
-#define __LOCK_BOX_LIB_IMPL_H__
+#pragma once
 
 #pragma pack(1)
 
@@ -48,5 +47,3 @@ EFIAPI
 LockBoxLibInitialize (
   VOID
   );
-
-#endif

@@ -1,8 +1,7 @@
 /* LzmaDec.h -- LZMA Decoder
 2018-04-21 : Igor Pavlov : Public domain */
 
-#ifndef __LZMA_DEC_H
-#define __LZMA_DEC_H
+#pragma once
 
 #include "7zTypes.h"
 
@@ -275,5 +274,3 @@ LzmaDecode (
   );
 
 EXTERN_C_END
-
-#endif

@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef EDKII_REDFISH_HTTP_DATA_H_
-#define EDKII_REDFISH_HTTP_DATA_H_
+#pragma once
 
 #include "RedfishHttpDxe.h"
 
@@ -253,5 +252,3 @@ UpdateSessionToken (
   IN REDFISH_SERVICE_PRIVATE  *Service,
   IN CHAR8                    *Token
   );
-
-#endif

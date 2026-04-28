@@ -8,9 +8,6 @@
 
 **/
 
-#ifndef REDFISH_CRT_ERRNO_H_
-#define REDFISH_CRT_ERRNO_H_
+#pragma once
 
 #include <Library/RedfishCrtLib.h>
-
-#endif

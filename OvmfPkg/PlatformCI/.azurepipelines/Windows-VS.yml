@@ -8,9 +8,17 @@
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
-trigger:
-  - master
-  - stable/*
+trigger: none
+
+schedules:
+- cron: "0 5 * * *"
+  displayName: Daily Build
+  branches:
+    include:
+    - master
+    - stable/*
+  always: true
+
 pr:
   - master
   - stable/*
@@ -22,7 +30,7 @@ jobs:
   - job: Platform_CI
     variables:
       package: 'OvmfPkg'
-      vm_image: 'windows-2022'
+      vm_image: ${{ variables.default_windows_vm }}
       should_run: true
       run_flags: "MAKE_STARTUP_NSH=TRUE QEMU_HEADLESS=TRUE"
 

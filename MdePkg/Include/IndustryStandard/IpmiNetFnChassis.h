@@ -11,8 +11,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef _IPMI_NET_FN_CHASSIS_H_
-#define _IPMI_NET_FN_CHASSIS_H_
+#pragma once
 
 #pragma pack (1)
 //
@@ -464,4 +463,3 @@ typedef struct {
 //  Constants and Structure definitions for "Get POH Counter" command to follow here
 //
 #pragma pack()
-#endif

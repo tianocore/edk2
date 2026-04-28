@@ -7,8 +7,7 @@
 
 **/
 
-#ifndef __EFI_IP6_ROUTE_H__
-#define __EFI_IP6_ROUTE_H__
+#pragma once
 
 #define IP6_DIRECT_ROUTE    0x00000001
 #define IP6_PACKET_TOO_BIG  0x00000010
@@ -289,5 +288,3 @@ Ip6Route (
   IN EFI_IPv6_ADDRESS  *Dest,
   IN EFI_IPv6_ADDRESS  *Src
   );
-
-#endif

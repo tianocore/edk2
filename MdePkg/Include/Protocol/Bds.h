@@ -8,8 +8,7 @@
 
 **/
 
-#ifndef __ARCH_PROTOCOL_BDS_H__
-#define __ARCH_PROTOCOL_BDS_H__
+#pragma once
 
 ///
 /// Global ID for the BDS Architectural Protocol
@@ -62,5 +61,3 @@ struct _EFI_BDS_ARCH_PROTOCOL {
 };
 
 extern EFI_GUID  gEfiBdsArchProtocolGuid;
-
-#endif

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#ifndef _VARIABLE_POLICY_LIB_H_
-#define _VARIABLE_POLICY_LIB_H_
+#pragma once
 
 #include <Protocol/VariablePolicy.h>
 
@@ -300,5 +299,3 @@ EFIAPI
 DeinitVariablePolicyLib (
   VOID
   );
-
-#endif // _VARIABLE_POLICY_LIB_H_
