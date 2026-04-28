@@ -17,53 +17,24 @@ STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
   { NULL,    TypeMax  }
 };
 
-/**
-  Function for 'echo' command.
+/** Main function of the 'REcho' command.
 
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunEcho (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdREcho (
+  LIST_ENTRY  *Package
   )
 {
-  EFI_STATUS    Status;
-  LIST_ENTRY    *Package;
   SHELL_STATUS  ShellStatus;
   UINTN         ParamCount;
-  CHAR16        *ProblemParam;
   UINTN         Size;
   CHAR16        *PrintString;
 
-  Size         = 0;
-  ProblemParam = NULL;
-  PrintString  = NULL;
-  ShellStatus  = SHELL_SUCCESS;
-
-  //
-  // initialize the shell lib (we must be in non-auto-init...)
-  //
-  Status = ShellInitialize ();
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // parse the command line
-  //
-  Status = ShellCommandLineParseEx (ParamList, &Package, &ProblemParam, TRUE, TRUE);
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"echo", ProblemParam);
-      FreePool (ProblemParam);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  }
+  Size        = 0;
+  PrintString = NULL;
+  ShellStatus = SHELL_SUCCESS;
 
   //
   // check for "-?"
@@ -109,6 +80,54 @@ ShellCommandRunEcho (
     ShellPrintDefaultEx (L"%s\r\n", PrintString);
     SHELL_FREE_NON_NULL (PrintString);
   }
+
+  return ShellStatus;
+}
+
+/**
+  Function for 'echo' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunEcho (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  SHELL_STATUS  ShellStatus;
+  CHAR16        *ProblemParam;
+
+  ProblemParam = NULL;
+  ShellStatus  = SHELL_SUCCESS;
+
+  //
+  // initialize the shell lib (we must be in non-auto-init...)
+  //
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // parse the command line
+  //
+  Status = ShellCommandLineParseEx (ParamList, &Package, &ProblemParam, TRUE, TRUE);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"echo", ProblemParam);
+      FreePool (ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  }
+
+  ShellStatus = MainCmdREcho (Package);
 
   //
   // free the command line package

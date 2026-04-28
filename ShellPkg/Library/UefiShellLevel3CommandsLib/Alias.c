@@ -137,28 +137,16 @@ ShellLevel3CommandsLibSetAlias (
   return ShellStatus;
 }
 
-STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
-  { L"-v", TypeFlag  },
-  { L"-d", TypeValue },
-  { NULL,  TypeMax   }
-};
+/** Main function of the 'Alias' command.
 
-/**
-  Function for 'alias' command.
-
-  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
-  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+  @param[in] Package    List of input parameter for the command.
 **/
+STATIC
 SHELL_STATUS
-EFIAPI
-ShellCommandRunAlias (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+MainCmdAlias (
+  LIST_ENTRY  *Package
   )
 {
-  EFI_STATUS    Status;
-  LIST_ENTRY    *Package;
-  CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
   CONST CHAR16  *Param1;
   CONST CHAR16  *Param2;
@@ -167,34 +155,8 @@ ShellCommandRunAlias (
   BOOLEAN       DeleteFlag;
   BOOLEAN       VolatileFlag;
 
-  ProblemParam = NULL;
-  ShellStatus  = SHELL_SUCCESS;
-  CleanParam2  = NULL;
-
-  //
-  // initialize the shell lib (we must be in non-auto-init...)
-  //
-  Status = ShellInitialize ();
-  ASSERT_EFI_ERROR (Status);
-
-  Status = CommandInit ();
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // parse the command line
-  //
-  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
-  if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"alias", ProblemParam);
-      FreePool (ProblemParam);
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      ASSERT (FALSE);
-    }
-
-    return ShellStatus;
-  }
+  ShellStatus = SHELL_SUCCESS;
+  CleanParam2 = NULL;
 
   Param1 = ShellCommandLineGetRawValue (Package, 1);
   Param2 = ShellCommandLineGetRawValue (Package, 2);
@@ -205,7 +167,6 @@ ShellCommandRunAlias (
   if (Param2 != NULL) {
     CleanParam2 = AllocateCopyPool (StrSize (Param2), Param2);
     if (CleanParam2 == NULL) {
-      ShellCommandLineFreeVarList (Package);
       return SHELL_OUT_OF_RESOURCES;
     }
 
@@ -279,11 +240,68 @@ ShellCommandRunAlias (
     }
   }
 
+  SHELL_FREE_NON_NULL (CleanParam2);
+  return ShellStatus;
+}
+
+STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
+  { L"-v", TypeFlag  },
+  { L"-d", TypeValue },
+  { NULL,  TypeMax   }
+};
+
+/**
+  Function for 'alias' command.
+
+  @param[in] ImageHandle  Handle to the Image (NULL if Internal).
+  @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
+**/
+SHELL_STATUS
+EFIAPI
+ShellCommandRunAlias (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
+
+  ProblemParam = NULL;
+  ShellStatus  = SHELL_SUCCESS;
+
+  //
+  // initialize the shell lib (we must be in non-auto-init...)
+  //
+  Status = ShellInitialize ();
+  ASSERT_EFI_ERROR (Status);
+
+  Status = CommandInit ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // parse the command line
+  //
+  Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
+  if (EFI_ERROR (Status)) {
+    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"alias", ProblemParam);
+      FreePool (ProblemParam);
+      ShellStatus = SHELL_INVALID_PARAMETER;
+    } else {
+      ASSERT (FALSE);
+    }
+
+    return ShellStatus;
+  }
+
+  ShellStatus = MainCmdAlias (Package);
+
   //
   // free the command line package
   //
   ShellCommandLineFreeVarList (Package);
 
-  SHELL_FREE_NON_NULL (CleanParam2);
   return (ShellStatus);
 }
