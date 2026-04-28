@@ -1,0 +1,54 @@
+## @file
+#  Google Test application for X64 SSDT CPU Topology Generator.
+#
+#  Tests X64-specific CPU topology generation using Local APIC/X2APIC info.
+#  Validates generated AML output against ACPI 6.6 specification.
+#
+#  Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = X64SsdtCpuTopologyGoogleTest
+  FILE_GUID                      = 9b4d263f-cdf4-4dc4-b7c1-ac2ab09033d1
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = GoogleTestCppMain
+
+[Sources]
+  X64SsdtCpuTopologyGoogleTest.cpp
+  AmlTestHelper.h
+  AmlTestHelper.cpp
+  SsdtCpuTopologyTestCommon.h
+  MockCommonFunctions.cpp
+  MockCommonFunctions.h
+  ../../../../../Test/Mock/Library/GoogleTest/Protocol/MockConfigurationManagerProtocol.cpp
+  # X64 arch-specific code under test (NOT the common SsdtCpuTopologyGenerator.c)
+  ../X64/X64SsdtCpuTopologyGenerator.c
+  ../SsdtCpuTopologyGenerator.h
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PrintLib
+  AmlLib
+
+[Protocols]
+  gEdkiiConfigurationManagerProtocolGuid  ## CONSUMES
+
+[BuildOptions]
+  # X64SsdtCpuTopologyGenerator.c needs Uefi.h included for basic types
+  MSFT:*_*_*_CC_FLAGS = /EHsc /I$(WORKSPACE)/DynamicTablesPkg/Library/Common/AmlLib /I$(WORKSPACE)/DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib /FI$(WORKSPACE)/MdePkg/Include/Uefi.h
+  GCC:*_*_*_CC_FLAGS = -I$(WORKSPACE)/DynamicTablesPkg/Library/Common/AmlLib -I$(WORKSPACE)/DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib -include $(WORKSPACE)/MdePkg/Include/Uefi.h
+
