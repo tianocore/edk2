@@ -175,9 +175,52 @@
 
     ## options defined ci/Plugin/SpellCheck
     "SpellCheck": {
-        "AuditOnly": True,           # Fails test but run in AuditOnly mode to collect log
-        "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
-        "ExtendWords": [],           # words to extend to the dictionary for this package
+        "AuditOnly": False,           # Fails test but run in AuditOnly mode to collect log
+        "IgnoreFiles": [
+            "Library/BaseFdtLib/libfdt/**",    # submodule outside of our control
+            "Library/JedecJep106Lib/**",        # JEDEC vendor name data
+            "Library/MipiSysTLib/mipisyst/**",  # submodule outside of our control
+            "Library/MipiSysTLib/mipi_syst.h"   # generated from mipisyst submodule
+            ],                       # use gitignore syntax to ignore errors in matching files
+        "ExtendWords": [             # words to extend to the dictionary for this package
+            # Deprecated backward-compatible aliases for old misspelled
+            # identifiers that will be removed.
+            "ahthentication",   # Nvme.h
+            "algortihm",        # Hash.h
+            "cachable",         # Tpm2Acpi.h
+            "capablities",      # PciExpress*.h
+            "capablity",        # Acpi10.h
+            "capbility",        # Pci22.h
+            "commaond",         # Cper.h
+            "commond",          # ScsiIo.h
+            "comsuned",         # Acpi*.h
+            "cound",            # PciExpress*.h
+            "desciptor",        # Runtime.h
+            "egres",            # PciExpress21.h
+            "extenion",         # HiiImageDecoder.h
+            "extented",         # Cxl30.h
+            "identifer",        # Acpi*.h, Cxl*.h
+            "implemenation",    # Udf.h
+            "initialzation",    # Cxl20.h
+            "interal",          # Tpm12.h
+            "magik",            # Dhcp4.h, PxeBaseCode.h
+            "managment",        # SmBios.h
+            "mutil",            # SmBios.h
+            "optoins",          # Mtftp4.h
+            "perormance",       # DriverConfiguration2.h
+            "priviledge",       # IpmiNetFnApp.h
+            "privelege",        # IpmiNetFnApp.h
+            "progreessive",     # HiiImageDecoder.h
+            "reponse",          # TcgStorageOpal.h
+            "researved",        # TcgStorageOpal.h
+            "reservd",          # ArmFfaMemMgmt.h, IpmiNetFnTransport.h
+            "revison",          # Atapi.h
+            "sence",            # Atapi.h
+            "sigle",            # SmBios.h
+            "toleremce",        # IpmiNetFnStorage.h
+            "unownered",        # TcgPhysicalPresence.h
+            "voilation"         # PciExpress*.h
+        ],
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
     },
