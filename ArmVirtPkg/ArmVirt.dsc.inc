@@ -178,6 +178,8 @@ DEFINE FD_SIZE_IN_MB    = 3
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
 
+  ArmCcaLib|ArmVirtPkg/Library/ArmCcaLibNull/ArmCcaLibNull.inf
+
 [LibraryClasses.common.SEC]
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
