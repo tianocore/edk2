@@ -160,6 +160,8 @@ NvmExpressFormatNvm (
 
           CopyMem (&Device->NamespaceData, NewNamespaceData, sizeof (NVME_ADMIN_NAMESPACE_DATA));
         }
+
+        FreePool (NewNamespaceData);
       }
     }
   }
