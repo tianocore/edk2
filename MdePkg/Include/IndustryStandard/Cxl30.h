@@ -369,4 +369,39 @@ typedef struct {
   UINT8             ProtocolType;
 } RCEC_DOWNSTREAM_PORT_ASSOCIATION_STRUCTURE;
 
+///
+/// Data Object Exchange (DOE) for CXL.
+///
+typedef enum {
+  EfiCxlDoeComplianceMode = 0,
+  EfiCxlDoeTableAccess    = 2,
+} EFI_CXL_DOE_TYPE;
+
+///
+/// Definition of the CXL Table Access DOE Request.
+/// CXL 3.0 Specification Section 8.1.11.1
+///
+typedef struct {
+  PCI_EXPRESS_DOE_DATA_OBJECT_HEADER    Header;
+  UINT8                                 ReqCode;
+  UINT8                                 TableType;
+  UINT16                                EntryHandle;
+} EFI_CXL_DOE_TABLE_ACCESS_READ_ENTRY_REQUEST;
+
+///
+/// Definition of the CXL Table Access DOE Response
+/// CXL 3.0 Specification Section 8.1.11.1
+///
+typedef struct {
+  PCI_EXPRESS_DOE_DATA_OBJECT_HEADER    Header;
+  UINT8                                 RspCode;
+  UINT8                                 TableType;
+  UINT16                                EntryHandle;
+} EFI_CXL_DOE_TABLE_ACCESS_READ_ENTRY_RESPONSE_HEADER;
+
+typedef struct {
+  EFI_CXL_DOE_TABLE_ACCESS_READ_ENTRY_RESPONSE_HEADER    Header;
+  UINT8                                                  Data[];
+} EFI_CXL_DOE_TABLE_ACCESS_READ_ENTRY_RESPONSE;
+
 #pragma pack()
