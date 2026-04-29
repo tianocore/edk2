@@ -1001,7 +1001,6 @@ Ip6InitDADProcess (
     return EFI_SUCCESS;
   }
 
-  Status   = EFI_SUCCESS;
   IpSb     = IpIf->Service;
   DadXmits = &IpSb->Ip6ConfigInstance.DadXmits;
 

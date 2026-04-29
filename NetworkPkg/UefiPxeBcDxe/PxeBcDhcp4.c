@@ -1387,9 +1387,8 @@ PxeBcDhcp4Discover (
     return Status;
   }
 
-  Mode   = Private->PxeBc.Mode;
-  Dhcp4  = Private->Dhcp4;
-  Status = EFI_SUCCESS;
+  Mode  = Private->PxeBc.Mode;
+  Dhcp4 = Private->Dhcp4;
 
   ZeroMem (&Token, sizeof (EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN));
 
@@ -1668,8 +1667,6 @@ PxeBcDhcp4Dora (
   EFI_STATUS               Status;
 
   ASSERT (Dhcp4 != NULL);
-
-  Status  = EFI_SUCCESS;
   PxeMode = Private->PxeBc.Mode;
 
   //

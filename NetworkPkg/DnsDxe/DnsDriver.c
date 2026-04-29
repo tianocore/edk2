@@ -236,8 +236,7 @@ DnsCreateService (
   EFI_STATUS   Status;
   DNS_SERVICE  *DnsSb;
 
-  Status = EFI_SUCCESS;
-  DnsSb  = NULL;
+  DnsSb = NULL;
 
   *Service = NULL;
 
@@ -427,8 +426,6 @@ DnsDriverEntryPoint (
   )
 {
   EFI_STATUS  Status;
-
-  Status = EFI_SUCCESS;
 
   //
   // Install the Dns4 Driver Binding Protocol.
