@@ -24,6 +24,9 @@
 [Includes]
   Include
 
+[Includes.Common.Private]
+  PrivateInclude
+
 [LibraryClasses]
   ##  @libraryclass Manageability Transport Library
   #   Manageability Transport Library definitions
