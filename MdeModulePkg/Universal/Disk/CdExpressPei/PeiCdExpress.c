@@ -168,13 +168,14 @@ UpdateBlocksAndVolumes (
   EFI_PEI_SERVICES                **PeiServices;
 
   IndexBlockDevice = 0;
-  BlockIo2Ppi      = NULL;
-  BlockIoPpi       = NULL;
+
   //
   // Find out all Block Io Ppi instances within the system
   // Assuming all device Block Io Peims are dispatched already
   //
   for (BlockIoPpiInstance = 0; BlockIoPpiInstance < PEI_CD_EXPRESS_MAX_BLOCK_IO_PPI; BlockIoPpiInstance++) {
+    BlockIo2Ppi = NULL;
+    BlockIoPpi  = NULL;
     if (BlockIo2) {
       Status = PeiServicesLocatePpi (
                  &gEfiPeiVirtualBlockIo2PpiGuid,
