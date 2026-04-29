@@ -524,12 +524,12 @@ typedef struct {
 //
 
 //
-//  Definitions for Set Session Privelege Level command
+//  Definitions for Set Session Privilege Level command
 //
-#define IPMI_APP_SET_SESSION_PRIVELEGE_LEVEL  0x3B
+#define IPMI_APP_SET_SESSION_PRIVILEGE_LEVEL  0x3B
 
 //
-//  Constants and Structure definitions for "Set Session Privelege Level" command to follow here
+//  Constants and Structure definitions for "Set Session Privilege Level" command to follow here
 //
 
 //
@@ -625,8 +625,8 @@ typedef union {
 
 typedef union {
   struct {
-    UINT8    ChannelPriviledgeLimit : 4;
-    UINT8    Reserved               : 4;
+    UINT8    ChannelPrivilegeLimit : 4;
+    UINT8    Reserved              : 4;
   } Bits;
   UINT8    Uint8;
 } IPMI_GET_CHANNEL_ACCESS_PRIVILEGE_LIMIT;

@@ -549,7 +549,7 @@ typedef struct {
 #define PCI_SID_OFFSET                  0x2E             ///< SubSystem ID
 #define PCI_SUBSYSTEM_ID_OFFSET         0x2E
 #define PCI_EXPANSION_ROM_BASE          0x30
-#define PCI_CAPBILITY_POINTER_OFFSET    0x34
+#define PCI_CAPABILITY_POINTER_OFFSET   0x34
 #define PCI_INT_LINE_OFFSET             0x3C             ///< Interrupt Line Register
 #define PCI_INT_PIN_OFFSET              0x3D             ///< Interrupt Pin Register
 #define PCI_MAXGNT_OFFSET               0x3E             ///< Max Grant Register

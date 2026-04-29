@@ -175,8 +175,13 @@
 
     ## options defined ci/Plugin/SpellCheck
     "SpellCheck": {
-        "AuditOnly": True,           # Fails test but run in AuditOnly mode to collect log
-        "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
+        "AuditOnly": False,           # Fails test but run in AuditOnly mode to collect log
+        "IgnoreFiles": [
+            "Library/BaseFdtLib/libfdt/**",    # submodule outside of our control
+            "Library/JedecJep106Lib/**",        # JEDEC vendor name data
+            "Library/MipiSysTLib/mipisyst/**",  # submodule outside of our control
+            "Library/MipiSysTLib/mipi_syst.h"   # generated from mipisyst submodule
+            ],                       # use gitignore syntax to ignore errors in matching files
         "ExtendWords": [],           # words to extend to the dictionary for this package
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)

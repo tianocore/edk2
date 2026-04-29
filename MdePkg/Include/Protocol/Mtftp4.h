@@ -51,7 +51,7 @@ typedef struct _EFI_MTFTP4_TOKEN     EFI_MTFTP4_TOKEN;
 #define EFI_MTFTP4_ERRORCODE_REQUEST_DENIED       8
 
 //
-// MTFTP4 pacekt definitions
+// MTFTP4 packet definitions
 //
 #pragma pack(1)
 
@@ -157,9 +157,9 @@ typedef struct {
 typedef struct {
   EFI_MTFTP4_CONFIG_DATA    ConfigData;
   UINT8                     SupportedOptionCount;
-  UINT8                     **SupportedOptoins;
+  UINT8                     **SupportedOptions;
   UINT8                     UnsupportedOptionCount;
-  UINT8                     **UnsupportedOptoins;
+  UINT8                     **UnsupportedOptions;
 } EFI_MTFTP4_MODE_DATA;
 
 typedef struct {
@@ -198,7 +198,7 @@ EFI_STATUS
   IN EFI_MTFTP4_PROTOCOL  *This,
   IN EFI_MTFTP4_TOKEN     *Token,
   IN UINT16               PacketLen,
-  IN EFI_MTFTP4_PACKET    *Paket
+  IN EFI_MTFTP4_PACKET    *Packet
   );
 
 /**

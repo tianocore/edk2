@@ -226,7 +226,7 @@ typedef struct {
   UINT16    time_required_for_sec_erase;           ///< word 89
   UINT16    time_required_for_enhanced_sec_erase;  ///< word 90
   UINT16    advanced_power_management_level;
-  UINT16    master_pwd_revison_code;
+  UINT16    master_pwd_revision_code;
   UINT16    hardware_reset_result;                 ///< word 93
   UINT16    obsolete_94;
   UINT16    reserved_95_107[13];
@@ -249,7 +249,7 @@ typedef struct {
 } ATAPI_IDENTIFY_DATA;
 
 ///
-/// Standard Quiry Data format, defined in SFF-8070i(ATAPI Removable Rewritable Specification).
+/// Standard Inquiry Data format, defined in SFF-8070i(ATAPI Removable Rewritable Specification).
 ///
 typedef struct {
   UINT8    peripheral_type;
@@ -456,7 +456,7 @@ typedef union {
   UINT16                       Data16[6];
   ATAPI_TEST_UNIT_READY_CMD    TestUnitReady;
   ATAPI_READ10_CMD             Read10;
-  ATAPI_REQUEST_SENSE_CMD      RequestSence;
+  ATAPI_REQUEST_SENSE_CMD      RequestSense;
   ATAPI_INQUIRY_CMD            Inquiry;
   ATAPI_MODE_SENSE_CMD         ModeSense;
   ATAPI_READ_FORMAT_CAP_CMD    ReadFormatCapacity;

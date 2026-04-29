@@ -41,7 +41,7 @@ typedef EFI_DISK_IO_PROTOCOL EFI_DISK_IO;
   @retval EFI_SUCCESS           The data was read correctly from the device.
   @retval EFI_DEVICE_ERROR      The device reported an error while performing the read.
   @retval EFI_NO_MEDIA          There is no media in the device.
-  @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
+  @retval EFI_MEDIA_CHANGED     The MediaId does not matched the current device.
   @retval EFI_INVALID_PARAMETER The read request contains device addresses that are not
                                 valid for the device.
 
@@ -69,7 +69,7 @@ EFI_STATUS
   @retval EFI_WRITE_PROTECTED   The device can not be written to.
   @retval EFI_DEVICE_ERROR      The device reported an error while performing the write.
   @retval EFI_NO_MEDIA          There is no media in the device.
-  @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
+  @retval EFI_MEDIA_CHANGED     The MediaId does not matched the current device.
   @retval EFI_INVALID_PARAMETER The write request contains device addresses that are not
                                  valid for the device.
 

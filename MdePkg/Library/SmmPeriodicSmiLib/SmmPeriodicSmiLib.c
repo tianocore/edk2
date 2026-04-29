@@ -79,17 +79,17 @@ typedef struct {
   /// The rate in Hz of the performance counter that is used to measure the
   /// amount of time that a periodic SMI handler executes.
   ///
-  UINT64                                     PerfomanceCounterRate;
+  UINT64                                     PerformanceCounterRate;
   ///
   /// The start count value of the performance counter that is used to measure
   /// the amount of time that a periodic SMI handler executes.
   ///
-  UINT64                                     PerfomanceCounterStartValue;
+  UINT64                                     PerformanceCounterStartValue;
   ///
   /// The end count value of the performance counter that is used to measure
   /// the amount of time that a periodic SMI handler executes.
   ///
-  UINT64                                     PerfomanceCounterEndValue;
+  UINT64                                     PerformanceCounterEndValue;
   ///
   /// The context record passed into the Register() function of the SMM Periodic
   /// Timer Dispatch Protocol when a periodic SMI handler is enabled.
@@ -444,14 +444,14 @@ PeriodicSmiExecutionTime (
   // Count the number of performance counter ticks since the periodic SMI handler
   // was dispatched or the last time this function was called.
   //
-  if (PeriodicSmiLibraryHandler->PerfomanceCounterEndValue > PeriodicSmiLibraryHandler->PerfomanceCounterStartValue) {
+  if (PeriodicSmiLibraryHandler->PerformanceCounterEndValue > PeriodicSmiLibraryHandler->PerformanceCounterStartValue) {
     //
     // The performance counter counts up.  Check for roll over condition.
     //
     if (Current > PeriodicSmiLibraryHandler->DispatchCheckPointTime) {
       Count = Current - PeriodicSmiLibraryHandler->DispatchCheckPointTime;
     } else {
-      Count = (Current - PeriodicSmiLibraryHandler->PerfomanceCounterStartValue) + (PeriodicSmiLibraryHandler->PerfomanceCounterEndValue - PeriodicSmiLibraryHandler->DispatchCheckPointTime);
+      Count = (Current - PeriodicSmiLibraryHandler->PerformanceCounterStartValue) + (PeriodicSmiLibraryHandler->PerformanceCounterEndValue - PeriodicSmiLibraryHandler->DispatchCheckPointTime);
     }
   } else {
     //
@@ -460,7 +460,7 @@ PeriodicSmiExecutionTime (
     if (PeriodicSmiLibraryHandler->DispatchCheckPointTime > Current) {
       Count = PeriodicSmiLibraryHandler->DispatchCheckPointTime - Current;
     } else {
-      Count = (PeriodicSmiLibraryHandler->DispatchCheckPointTime - PeriodicSmiLibraryHandler->PerfomanceCounterEndValue) + (PeriodicSmiLibraryHandler->PerfomanceCounterStartValue - Current);
+      Count = (PeriodicSmiLibraryHandler->DispatchCheckPointTime - PeriodicSmiLibraryHandler->PerformanceCounterEndValue) + (PeriodicSmiLibraryHandler->PerformanceCounterStartValue - Current);
     }
   }
 
@@ -480,7 +480,7 @@ PeriodicSmiExecutionTime (
   //
   return DivU64x64Remainder (
            MultU64x32 (PeriodicSmiLibraryHandler->DispatchTotalTime, 10000000),
-           PeriodicSmiLibraryHandler->PerfomanceCounterRate,
+           PeriodicSmiLibraryHandler->PerformanceCounterRate,
            NULL
            );
 }
@@ -965,10 +965,10 @@ PeriodicSmiEnable (
   }
 
   InitializeSpinLock (&PeriodicSmiLibraryHandler->DispatchLock);
-  PeriodicSmiLibraryHandler->PerfomanceCounterRate = GetPerformanceCounterProperties (
-                                                       &PeriodicSmiLibraryHandler->PerfomanceCounterStartValue,
-                                                       &PeriodicSmiLibraryHandler->PerfomanceCounterEndValue
-                                                       );
+  PeriodicSmiLibraryHandler->PerformanceCounterRate = GetPerformanceCounterProperties (
+                                                        &PeriodicSmiLibraryHandler->PerformanceCounterStartValue,
+                                                        &PeriodicSmiLibraryHandler->PerformanceCounterEndValue
+                                                        );
   PeriodicSmiLibraryHandler->RegisterContext.Period          = TickPeriod;
   PeriodicSmiLibraryHandler->RegisterContext.SmiTickInterval = TickPeriod;
   Status                                                     = gSmmPeriodicTimerDispatch2->Register (

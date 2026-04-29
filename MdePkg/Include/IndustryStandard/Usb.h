@@ -80,7 +80,7 @@
 #define USB_DEV_SYNCH_FRAME_REQ_TYPE  0x82
 
 //
-// USB standard descriptors and reqeust
+// USB standard descriptors and request
 //
 #pragma pack(1)
 

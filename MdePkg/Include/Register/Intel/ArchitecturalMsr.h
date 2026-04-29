@@ -3713,15 +3713,15 @@ typedef union {
     /// processors produced prior to this change, bit 31 of this MSR was read
     /// as 0.
     ///
-    UINT32    VmcsRevisonId : 31;
-    UINT32    MustBeZero    : 1;
+    UINT32    VmcsRevisionId : 31;
+    UINT32    MustBeZero     : 1;
     ///
     /// [Bit 44:32] Reports the number of bytes that software should allocate
     /// for the VMXON region and any VMCS region.  It is a value greater than
     /// 0 and at most 4096(bit 44 is set if and only if bits 43:32 are clear).
     ///
-    UINT32    VmcsSize      : 13;
-    UINT32    Reserved1     : 3;
+    UINT32    VmcsSize       : 13;
+    UINT32    Reserved1      : 3;
     ///
     /// [Bit 48] Indicates the width of the physical addresses that may be used
     /// for the VMXON region, each VMCS, and data structures referenced by

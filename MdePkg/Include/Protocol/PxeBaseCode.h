@@ -229,7 +229,7 @@ typedef struct {
   UINT8     BootpHwAddr[16];
   UINT8     BootpSrvName[64];
   UINT8     BootpBootFile[128];
-  UINT32    DhcpMagik;
+  UINT32    DhcpMagic;
   UINT8     DhcpOptions[56];
 } EFI_PXE_BASE_CODE_DHCPV4_PACKET;
 

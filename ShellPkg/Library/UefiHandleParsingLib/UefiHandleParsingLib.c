@@ -1571,9 +1571,9 @@ AdapterInformationDumpInformation (
           TempRetVal = CatSPrint (
                          RetVal,
                          TempStr,
-                         ((EFI_ADAPTER_INFO_NETWORK_BOOT *)InformationBlock)->iScsiIpv4BootCapablity,
-                         ((EFI_ADAPTER_INFO_NETWORK_BOOT *)InformationBlock)->iScsiIpv6BootCapablity,
-                         ((EFI_ADAPTER_INFO_NETWORK_BOOT *)InformationBlock)->FCoeBootCapablity,
+                         ((EFI_ADAPTER_INFO_NETWORK_BOOT *)InformationBlock)->iScsiIpv4BootCapability,
+                         ((EFI_ADAPTER_INFO_NETWORK_BOOT *)InformationBlock)->iScsiIpv6BootCapability,
+                         ((EFI_ADAPTER_INFO_NETWORK_BOOT *)InformationBlock)->FCoeBootCapability,
                          ((EFI_ADAPTER_INFO_NETWORK_BOOT *)InformationBlock)->OffloadCapability,
                          ((EFI_ADAPTER_INFO_NETWORK_BOOT *)InformationBlock)->iScsiMpioCapability,
                          ((EFI_ADAPTER_INFO_NETWORK_BOOT *)InformationBlock)->iScsiIpv4Boot,

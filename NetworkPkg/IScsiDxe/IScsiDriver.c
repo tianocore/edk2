@@ -183,9 +183,9 @@ IScsiCheckAip (
     }
 
     if ((((NetworkBootPolicy & STOP_UEFI_ISCSI_IF_AIP_SUPPORT_IP4) != 0) &&
-         !NetworkBoot->iScsiIpv4BootCapablity) ||
+         !NetworkBoot->iScsiIpv4BootCapability) ||
         (((NetworkBootPolicy & STOP_UEFI_ISCSI_IF_AIP_SUPPORT_IP6) != 0) &&
-         !NetworkBoot->iScsiIpv6BootCapablity) ||
+         !NetworkBoot->iScsiIpv6BootCapability) ||
         (((NetworkBootPolicy & STOP_UEFI_ISCSI_IF_AIP_SUPPORT_OFFLOAD) != 0) &&
          !NetworkBoot->OffloadCapability) ||
         (((NetworkBootPolicy & STOP_UEFI_ISCSI_IF_AIP_SUPPORT_MPIO) != 0) &&

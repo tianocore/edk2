@@ -203,7 +203,7 @@ typedef union {
 
 typedef union {
   struct {
-    UINT8    Toleremce : 6;
+    UINT8    Tolerance : 6;
     UINT8    MHi       : 2;
   } Bits;
   UINT8    Uint8;

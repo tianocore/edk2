@@ -314,7 +314,7 @@ typedef UINT32 TPM_FAMILY_OPERATION;
 #define TPM_ET_OPERATOR         ((UINT16) 0x000C)     ///< The entity is the operator
 #define TPM_ET_RESERVED_HANDLE  ((UINT16) 0x0040)     ///< Reserved. This value avoids collisions with the handle MSB setting.
 //
-// TPM_ENTITY_TYPE MSB Values: The MSB is used to indicate the ADIP encryption sheme when applicable
+// TPM_ENTITY_TYPE MSB Values: The MSB is used to indicate the ADIP encryption scheme when applicable
 //
 #define TPM_ET_XOR     ((UINT16) 0x0000)              ///< ADIP encryption scheme: XOR
 #define TPM_ET_AES128  ((UINT16) 0x0006)              ///< ADIP encryption scheme: AES 128 bits
@@ -1740,7 +1740,7 @@ typedef struct tdTPM_DELEGATIONS {
 #define TPM_DELEGATE_CreateMaintenanceArchive        (BIT21)
 #define TPM_DELEGATE_LoadMaintenanceArchive          (BIT20)
 #define TPM_DELEGATE_KillMaintenanceFeature          (BIT19)
-#define TPM_DELEGATE_OwnerReadInteralPub             (BIT18)
+#define TPM_DELEGATE_OwnerReadInternalPub            (BIT18)
 #define TPM_DELEGATE_ResetLockValue                  (BIT17)
 #define TPM_DELEGATE_OwnerClear                      (BIT16)
 #define TPM_DELEGATE_DisableOwnerClear               (BIT15)

@@ -856,7 +856,7 @@ DhcpBuild (
   Packet->Size   = Len;
   Packet->Length = 0;
   CopyMem (&Packet->Dhcp4.Header, &SeedPacket->Dhcp4.Header, sizeof (Packet->Dhcp4.Header));
-  Packet->Dhcp4.Magik = DHCP_OPTION_MAGIC;
+  Packet->Dhcp4.Magic = DHCP_OPTION_MAGIC;
   Buf                 = Packet->Dhcp4.Option;
 
   for (Index = 0; Index < DHCP_MAX_OPTIONS; Index++) {

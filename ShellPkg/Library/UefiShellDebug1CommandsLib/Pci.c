@@ -5147,8 +5147,8 @@ PrintInterpretedExtendedCompatibilityAcs (
     Header->AcsCapability,
     Header->AcsControl
     );
-  if (PCI_EXPRESS_EXTENDED_CAPABILITY_ACS_EXTENDED_GET_EGRES_CONTROL (Header)) {
-    VectorSize = PCI_EXPRESS_EXTENDED_CAPABILITY_ACS_EXTENDED_GET_EGRES_VECTOR_SIZE (Header);
+  if (PCI_EXPRESS_EXTENDED_CAPABILITY_ACS_EXTENDED_GET_EGRESS_CONTROL (Header)) {
+    VectorSize = PCI_EXPRESS_EXTENDED_CAPABILITY_ACS_EXTENDED_GET_EGRESS_VECTOR_SIZE (Header);
     if (VectorSize == 0) {
       VectorSize = 256;
     }
@@ -6056,7 +6056,7 @@ PrintInterpretedExtendedCompatibilityPhysicalLayer16 (
   ShellPrintHiiDefaultEx (
     STRING_TOKEN (STR_PCI_EXT_CAP_PHYSICAL_LAYER_16),
     gShellDebug1HiiHandle,
-    Header->Capablities.Uint32,
+    Header->Capabilities.Uint32,
     Header->Control.Uint32,
     Header->Status.Uint32
     );
@@ -6185,7 +6185,7 @@ PrintInterpretedExtendedCompatibilityPhysicalLayer32 (
   ShellPrintHiiDefaultEx (
     STRING_TOKEN (STR_PCI_EXT_CAP_PHYSICAL_LAYER_32),
     gShellDebug1HiiHandle,
-    Header->Capablities.Uint32,
+    Header->Capabilities.Uint32,
     Header->Control.Uint32,
     Header->Status.Uint32
     );
@@ -6194,11 +6194,11 @@ PrintInterpretedExtendedCompatibilityPhysicalLayer32 (
   ShellPrintHiiDefaultEx (
     STRING_TOKEN (STR_PCI_EXT_CAP_PHYSICAL_LAYER_32_CAPABILITIES),
     gShellDebug1HiiHandle,
-    Header->Capablities.Bits.EqualizationByPassToHighestRateSupport,
-    Header->Capablities.Bits.NoEqualizationNeededSupport,
-    Header->Capablities.Bits.ModifiedTSUsageMode0Support,
-    Header->Capablities.Bits.ModifiedTSUsageMode1Support,
-    Header->Capablities.Bits.ModifiedTSUsageMode2Support
+    Header->Capabilities.Bits.EqualizationByPassToHighestRateSupport,
+    Header->Capabilities.Bits.NoEqualizationNeededSupport,
+    Header->Capabilities.Bits.ModifiedTSUsageMode0Support,
+    Header->Capabilities.Bits.ModifiedTSUsageMode1Support,
+    Header->Capabilities.Bits.ModifiedTSUsageMode2Support
     );
 
   // Print control details
@@ -6461,7 +6461,7 @@ PrintInterpretedExtendedCompatibilityPhysicalLayer64 (
   ShellPrintHiiDefaultEx (
     STRING_TOKEN (STR_PCI_EXT_CAP_PHYSICAL_LAYER_64),
     gShellDebug1HiiHandle,
-    Header->Capablities.Uint32,
+    Header->Capabilities.Uint32,
     Header->Control.Uint32,
     Header->Status.Uint32
     );

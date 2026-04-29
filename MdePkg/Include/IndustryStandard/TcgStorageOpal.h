@@ -86,16 +86,16 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define OPAL_LOCKING_SP_K_AES_128_GLOBALRANGE_KEY  TCG_TO_UID( 0x00, 0x00, 0x08, 0x05, 0x00, 0x00, 0x00, 0x01 )
 
 // Minimum Properties that an Opal Compliant SD Shall support
-#define OPAL_MIN_MAX_COM_PACKET_SIZE          2048
-#define OPAL_MIN_MAX_REPONSE_COM_PACKET_SIZE  2048
-#define OPAL_MIN_MAX_PACKET_SIZE              2028
-#define OPAL_MIN_MAX_IND_TOKEN_SIZE           1992
-#define OPAL_MIN_MAX_PACKETS                  1
-#define OPAL_MIN_MAX_SUBPACKETS               1
-#define OPAL_MIN_MAX_METHODS                  1
-#define OPAL_MIN_MAX_SESSIONS                 1
-#define OPAL_MIN_MAX_AUTHENTICATIONS          2
-#define OPAL_MIN_MAX_TRANSACTION_LIMIT        1
+#define OPAL_MIN_MAX_COM_PACKET_SIZE           2048
+#define OPAL_MIN_MAX_RESPONSE_COM_PACKET_SIZE  2048
+#define OPAL_MIN_MAX_PACKET_SIZE               2028
+#define OPAL_MIN_MAX_IND_TOKEN_SIZE            1992
+#define OPAL_MIN_MAX_PACKETS                   1
+#define OPAL_MIN_MAX_SUBPACKETS                1
+#define OPAL_MIN_MAX_METHODS                   1
+#define OPAL_MIN_MAX_SESSIONS                  1
+#define OPAL_MIN_MAX_AUTHENTICATIONS           2
+#define OPAL_MIN_MAX_TRANSACTION_LIMIT         1
 
 #define OPAL_ADMIN_SP_PIN_COL               3
 #define OPAL_LOCKING_SP_C_PIN_TRYLIMIT_COL  5
@@ -115,7 +115,7 @@ typedef enum {
   Unmap,
   ResetWritePointers,
   VendorSpecificErase,
-  ResearvedMechanism
+  ReservedMechanism
 } SUPPORTED_DATA_REMOVAL_MECHANISM;
 
 #pragma pack(1)

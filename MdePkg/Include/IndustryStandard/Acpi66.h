@@ -1238,7 +1238,7 @@ typedef struct {
   UINT32    PowerStateId;
   UINT32    MemoryPowerNodeId;
   UINT64    MemoryEnergyConsumed;
-  UINT64    ExpectedAveragePowerComsuned;
+  UINT64    ExpectedAveragePowerConsumed;
 } EFI_ACPI_6_6_MPST_PLATFORM_COMMUNICATION_CHANNEL_SHARED_MEMORY_REGION;
 
 ///
@@ -2872,11 +2872,11 @@ typedef struct {
 /// PDTT Platform Communication Channel Identifier Structure
 ///
 typedef struct {
-  UINT16    SubChannelIdentifer : 8;
-  UINT16    Runtime             : 1;
-  UINT16    WaitForCompletion   : 1;
-  UINT16    TriggerOrder        : 1;
-  UINT16    Reserved            : 5;
+  UINT16    SubChannelIdentifier : 8;
+  UINT16    Runtime              : 1;
+  UINT16    WaitForCompletion    : 1;
+  UINT16    TriggerOrder         : 1;
+  UINT16    Reserved             : 5;
 } EFI_ACPI_6_6_PDTT_PCC_IDENTIFIER;
 
 ///

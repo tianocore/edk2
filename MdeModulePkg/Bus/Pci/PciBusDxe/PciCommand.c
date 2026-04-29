@@ -137,7 +137,7 @@ LocateCapabilityRegBlock (
       PciIoDevice->PciIo.Pci.Read (
                                &PciIoDevice->PciIo,
                                EfiPciIoWidthUint8,
-                               PCI_CAPBILITY_POINTER_OFFSET,
+                               PCI_CAPABILITY_POINTER_OFFSET,
                                1,
                                &CapabilityPtr
                                );

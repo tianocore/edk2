@@ -1815,15 +1815,15 @@ typedef enum {
 /// System Event Log - Variable Data Format Types.
 ///
 typedef enum {
-  EventLogVariableNone                       = 0x00,
-  EventLogVariableHandle                     = 0x01,
-  EventLogVariableMutilEvent                 = 0x02,
-  EventLogVariableMutilEventHandle           = 0x03,
-  EventLogVariablePOSTResultBitmap           = 0x04,
-  EventLogVariableSysManagementType          = 0x05,
-  EventLogVariableMutliEventSysManagmentType = 0x06,
-  EventLogVariableUnused                     = 0x07,
-  EventLogVariableOEMAssigned                = 0x80
+  EventLogVariableNone                        = 0x00,
+  EventLogVariableHandle                      = 0x01,
+  EventLogVariableMultiEvent                  = 0x02,
+  EventLogVariableMultiEventHandle            = 0x03,
+  EventLogVariablePOSTResultBitmap            = 0x04,
+  EventLogVariableSysManagementType           = 0x05,
+  EventLogVariableMultiEventSysManagementType = 0x06,
+  EventLogVariableUnused                      = 0x07,
+  EventLogVariableOEMAssigned                 = 0x80
 } EVENT_LOG_VARIABLE_DATA;
 
 ///
@@ -2135,7 +2135,7 @@ typedef enum {
   MemoryErrorOk               = 0x03,
   MemoryErrorBadRead          = 0x04,
   MemoryErrorParity           = 0x05,
-  MemoryErrorSigleBit         = 0x06,
+  MemoryErrorSingleBit        = 0x06,
   MemoryErrorDoubleBit        = 0x07,
   MemoryErrorMultiBit         = 0x08,
   MemoryErrorNibble           = 0x09,
@@ -2801,7 +2801,7 @@ typedef struct {
 /// 00h - 3Fh: MCTP Host Interfaces
 ///
 typedef enum {
-  // MCTP Host Interface type indentifiers as defined in DSP0239
+  // MCTP Host Interface type identifiers as defined in DSP0239
   MCHostInterfaceTypeKCS                                 = 0x02,
   MCHostInterfaceType8250_UARTRegisterCompatible         = 0x03,
   MCHostInterfaceType16450_UARTRegisterCompatible        = 0x04,

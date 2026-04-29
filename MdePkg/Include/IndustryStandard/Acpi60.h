@@ -892,7 +892,7 @@ typedef struct {
   UINT32    PowerStateId;
   UINT32    MemoryPowerNodeId;
   UINT64    MemoryEnergyConsumed;
-  UINT64    ExpectedAveragePowerComsuned;
+  UINT64    ExpectedAveragePowerConsumed;
 } EFI_ACPI_6_0_MPST_PLATFORM_COMMUNICATION_CHANNEL_SHARED_MEMORY_REGION;
 
 ///

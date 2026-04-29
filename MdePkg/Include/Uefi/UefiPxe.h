@@ -23,7 +23,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     )
 
 ///
-/// UNDI ROM ID and devive ID signature.
+/// UNDI ROM ID and device ID signature.
 ///
 #define PXE_BUSTYPE_PXE  PXE_BUSTYPE ('!', 'P', 'X', 'E')
 
@@ -1388,7 +1388,7 @@ typedef struct s_pxe_db_statistics {
 #define PXE_STATISTICS_RX_UNDERSIZE_FRAMES  0x02
 
 ///
-/// Number of frames longer than the maxminum length for the
+/// Number of frames longer than the maximum length for the
 /// media.  This would be >1500 for ethernet.
 ///
 #define PXE_STATISTICS_RX_OVERSIZE_FRAMES  0x03
@@ -1409,7 +1409,7 @@ typedef struct s_pxe_db_statistics {
 #define PXE_STATISTICS_RX_BROADCAST_FRAMES  0x06
 
 ///
-/// Number of valid mutlicast frames received and not dropped.
+/// Number of valid multicast frames received and not dropped.
 ///
 #define PXE_STATISTICS_RX_MULTICAST_FRAMES  0x07
 

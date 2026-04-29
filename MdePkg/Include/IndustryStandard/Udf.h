@@ -18,20 +18,20 @@
 #define UDF_VRS_START_OFFSET      ((UINT64)(16ULL << UDF_LOGICAL_SECTOR_SHIFT))
 
 typedef enum {
-  UdfPrimaryVolumeDescriptor          = 1,
-  UdfAnchorVolumeDescriptorPointer    = 2,
-  UdfVolumeDescriptorPointer          = 3,
-  UdfImplemenationUseVolumeDescriptor = 4,
-  UdfPartitionDescriptor              = 5,
-  UdfLogicalVolumeDescriptor          = 6,
-  UdfUnallocatedSpaceDescriptor       = 7,
-  UdfTerminatingDescriptor            = 8,
-  UdfLogicalVolumeIntegrityDescriptor = 9,
-  UdfFileSetDescriptor                = 256,
-  UdfFileIdentifierDescriptor         = 257,
-  UdfAllocationExtentDescriptor       = 258,
-  UdfFileEntry                        = 261,
-  UdfExtendedFileEntry                = 266,
+  UdfPrimaryVolumeDescriptor           = 1,
+  UdfAnchorVolumeDescriptorPointer     = 2,
+  UdfVolumeDescriptorPointer           = 3,
+  UdfImplementationUseVolumeDescriptor = 4,
+  UdfPartitionDescriptor               = 5,
+  UdfLogicalVolumeDescriptor           = 6,
+  UdfUnallocatedSpaceDescriptor        = 7,
+  UdfTerminatingDescriptor             = 8,
+  UdfLogicalVolumeIntegrityDescriptor  = 9,
+  UdfFileSetDescriptor                 = 256,
+  UdfFileIdentifierDescriptor          = 257,
+  UdfAllocationExtentDescriptor        = 258,
+  UdfFileEntry                         = 261,
+  UdfExtendedFileEntry                 = 266,
 } UDF_VOLUME_DESCRIPTOR_ID;
 
 #pragma pack(1)

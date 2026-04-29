@@ -122,7 +122,7 @@ typedef struct _EFI_I2C_BUS_CONFIGURATION_MANAGEMENT_PROTOCOL EFI_I2C_BUS_CONFIG
   @param[in]  Event           Event to signal when the transaction is complete
   @param[out] I2cStatus       Buffer to receive the transaction status.
 
-  @return  When Event is NULL, EnableI2cBusConfiguration operates synchrouously
+  @return  When Event is NULL, EnableI2cBusConfiguration operates synchronously
   and returns the I2C completion status as its return value.  In this case it is
   recommended to use NULL for I2cStatus.  The values returned from
   EnableI2cBusConfiguration are:
