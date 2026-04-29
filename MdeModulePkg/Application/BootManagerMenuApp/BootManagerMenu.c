@@ -1096,6 +1096,11 @@ BootManagerMenuEntry (
   // Initialize Boot menu data
   //
   Status = InitializeBootMenuData (BootOption, BootOptionCount, &BootMenuData);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a Failed InitializeBootMenuData %r\n", __func__, Status));
+    return EFI_NOT_FOUND;
+  }
+
   //
   // According to boot menu data to draw boot popup menu
   //
