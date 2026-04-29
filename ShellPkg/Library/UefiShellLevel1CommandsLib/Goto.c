@@ -9,6 +9,58 @@
 
 #include "UefiShellLevel1CommandsLib.h"
 
+/** Main function of the 'Goto' command.
+
+  @param[in] Package    List of input parameter for the command.
+**/
+STATIC
+SHELL_STATUS
+MainCmdGoto (
+  LIST_ENTRY  *Package
+  )
+{
+  CHAR16       *CompareString;
+  UINTN        Size;
+  SCRIPT_FILE  *CurrentScriptFile;
+
+  if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"goto");
+    return SHELL_INVALID_PARAMETER;
+  } else if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"goto");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  Size          = 0;
+  CompareString = StrnCatGrow (&CompareString, &Size, L":", 0);
+  CompareString = StrnCatGrow (&CompareString, &Size, ShellCommandLineGetRawValue (Package, 1), 0);
+  if (CompareString == NULL) {
+    return SHELL_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Check forwards and then backwards for a label...
+  //
+  if (!MoveToTag (GetNextNode, L"endfor", L"for", CompareString, ShellCommandGetCurrentScriptFile (), FALSE, FALSE, TRUE)) {
+    CurrentScriptFile = ShellCommandGetCurrentScriptFile ();
+    ShellPrintHiiDefaultEx (
+      STRING_TOKEN (STR_SYNTAX_NO_MATCHING),
+      gShellLevel1HiiHandle,
+      CompareString,
+      L"Goto",
+      CurrentScriptFile != NULL
+                           && CurrentScriptFile->CurrentCommand != NULL
+        ? CurrentScriptFile->CurrentCommand->Line : 0
+      );
+
+    FreePool (CompareString);
+    return SHELL_NOT_FOUND;
+  }
+
+  FreePool (CompareString);
+  return SHELL_SUCCESS;
+}
+
 /**
   Function for 'goto' command.
 
@@ -26,12 +78,8 @@ ShellCommandRunGoto (
   LIST_ENTRY    *Package;
   CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
-  CHAR16        *CompareString;
-  UINTN         Size;
-  SCRIPT_FILE   *CurrentScriptFile;
 
-  ShellStatus   = SHELL_SUCCESS;
-  CompareString = NULL;
+  ShellStatus = SHELL_SUCCESS;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -59,45 +107,13 @@ ShellCommandRunGoto (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    if (ShellCommandLineGetRawValue (Package, 2) != NULL) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel1HiiHandle, L"goto");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"goto");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      Size = 0;
-      ASSERT ((CompareString == NULL && Size == 0) || (CompareString != NULL));
-      CompareString = StrnCatGrow (&CompareString, &Size, L":", 0);
-      CompareString = StrnCatGrow (&CompareString, &Size, ShellCommandLineGetRawValue (Package, 1), 0);
-      if (CompareString == NULL) {
-        ShellCommandLineFreeVarList (Package);
-        return SHELL_OUT_OF_RESOURCES;
-      }
 
-      //
-      // Check forwards and then backwards for a label...
-      //
-      if (!MoveToTag (GetNextNode, L"endfor", L"for", CompareString, ShellCommandGetCurrentScriptFile (), FALSE, FALSE, TRUE)) {
-        CurrentScriptFile = ShellCommandGetCurrentScriptFile ();
-        ShellPrintHiiDefaultEx (
-          STRING_TOKEN (STR_SYNTAX_NO_MATCHING),
-          gShellLevel1HiiHandle,
-          CompareString,
-          L"Goto",
-          CurrentScriptFile != NULL
-                               && CurrentScriptFile->CurrentCommand != NULL
-            ? CurrentScriptFile->CurrentCommand->Line : 0
-          );
-        ShellStatus = SHELL_NOT_FOUND;
-      }
-
-      FreePool (CompareString);
-    }
-
-    ShellCommandLineFreeVarList (Package);
+    return ShellStatus;
   }
+
+  ShellStatus = MainCmdGoto (Package);
+
+  ShellCommandLineFreeVarList (Package);
 
   return (ShellStatus);
 }
