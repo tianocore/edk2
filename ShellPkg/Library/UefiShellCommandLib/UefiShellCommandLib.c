@@ -1533,27 +1533,28 @@ ShellCommandCreateInitialMappingsAndPaths (
     //
     if (gShellCurMapping != NULL) {
       gShellCurMapping = NULL;
-      CurDir           = gEfiShellProtocol->GetEnv (L"cwd");
-      if (CurDir != NULL) {
-        MapName = AllocateCopyPool (StrSize (CurDir), CurDir);
-        if (MapName == NULL) {
-          return EFI_OUT_OF_RESOURCES;
-        }
+    }
 
-        SplitCurDir = StrStr (MapName, L":");
-        if (SplitCurDir == NULL) {
-          SHELL_FREE_NON_NULL (MapName);
-          return EFI_UNSUPPORTED;
-        }
-
-        *(SplitCurDir + 1) = CHAR_NULL;
-        MapListItem        = ShellCommandFindMapItem (MapName);
-        if (MapListItem != NULL) {
-          gShellCurMapping = MapListItem;
-        }
-
-        SHELL_FREE_NON_NULL (MapName);
+    CurDir = gEfiShellProtocol->GetEnv (L"cwd");
+    if (CurDir != NULL) {
+      MapName = AllocateCopyPool (StrSize (CurDir), CurDir);
+      if (MapName == NULL) {
+        return EFI_OUT_OF_RESOURCES;
       }
+
+      SplitCurDir = StrStr (MapName, L":");
+      if (SplitCurDir == NULL) {
+        SHELL_FREE_NON_NULL (MapName);
+        return EFI_UNSUPPORTED;
+      }
+
+      *(SplitCurDir + 1) = CHAR_NULL;
+      MapListItem        = ShellCommandFindMapItem (MapName);
+      if (MapListItem != NULL) {
+        gShellCurMapping = MapListItem;
+      }
+
+      SHELL_FREE_NON_NULL (MapName);
     }
   } else {
     Count = (UINTN)-1;
