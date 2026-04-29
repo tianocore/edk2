@@ -19,7 +19,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 LOONGARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 LOONGARCH64 RISCV64
 #
 
 [Sources]
@@ -29,12 +29,12 @@
   CpuMp2.c
 
 [Sources.Ia32, Sources.X64]
-  CpuBist.c
-  CpuPaging.c
-  CpuMpPei.c
+  Intel/CpuBist.c
+  Intel/CpuPaging.c
+  Intel/CpuMpPei.c
 
-[Sources.LoongArch64]
-  LoongArch64/CpuMpPei.c
+[Sources.LoongArch64, Sources.RISCV64]
+  CpuMpPei.c
 
 [Packages]
   MdePkg/MdePkg.dec
