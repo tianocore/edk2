@@ -144,6 +144,129 @@ DoTouchByHandle (
   return (Status);
 }
 
+/**
+  Apply the 'Touch' command to each entry in a file info list.
+
+  @param[in] FileList    File info list returned by ShellOpenFileMetaArg().
+  @param[in] Recursive   TRUE to recurse into directories.
+
+  @retval SHELL_SUCCESS   All files were processed successfully.
+  @retval SHELL_NOT_FOUND At least one entry could not be opened or touched.
+**/
+STATIC
+SHELL_STATUS
+ProcessFileList (
+  IN  EFI_SHELL_FILE_INFO  *FileList,
+  IN  BOOLEAN              Recursive
+  )
+{
+  SHELL_STATUS         ShellStatus;
+  EFI_STATUS           Status;
+  EFI_SHELL_FILE_INFO  *Node;
+
+  ShellStatus = SHELL_SUCCESS;
+
+  //
+  // loop through the list and make sure we are not aborting...
+  //
+  for (Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&FileList->Link);
+       !IsNull (&FileList->Link, &Node->Link) && !ShellGetExecutionBreakFlag ();
+       Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&FileList->Link, &Node->Link))
+  {
+    //
+    // make sure the file opened ok
+    //
+    if (EFI_ERROR (Node->Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel3HiiHandle, L"touch", Node->FileName);
+      ShellStatus = SHELL_NOT_FOUND;
+      continue;
+    }
+
+    Status = DoTouchByHandle (Node->FullName, NULL, Node->Handle, Recursive);
+    if (EFI_ERROR (Status) && (Status != EFI_ACCESS_DENIED)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel3HiiHandle, L"touch", Node->FileName);
+      ShellStatus = SHELL_NOT_FOUND;
+    }
+  }
+
+  return ShellStatus;
+}
+
+/** Main function of the 'Touch' command.
+
+  @param[in] Package    List of input parameter for the command.
+**/
+STATIC
+SHELL_STATUS
+MainCmdTouch (
+  LIST_ENTRY  *Package
+  )
+{
+  EFI_STATUS           Status;
+  CONST CHAR16         *Param;
+  SHELL_STATUS         ShellStatus;
+  UINTN                ParamCount;
+  EFI_SHELL_FILE_INFO  *FileList;
+
+  ShellStatus = SHELL_SUCCESS;
+  ParamCount  = 0;
+  FileList    = NULL;
+
+  //
+  // check for "-?"
+  //
+  if (ShellCommandLineGetFlag (Package, L"-?")) {
+    ASSERT (FALSE);
+  }
+
+  if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
+    //
+    // we insufficient parameters
+    //
+    ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel3HiiHandle, L"touch");
+    return SHELL_INVALID_PARAMETER;
+  }
+
+  //
+  // get a list with each file specified by parameters
+  // if parameter is a directory then add all the files below it to the list
+  //
+  for ( ParamCount = 1, Param = ShellCommandLineGetRawValue (Package, ParamCount)
+        ; Param != NULL
+        ; ParamCount++, Param = ShellCommandLineGetRawValue (Package, ParamCount)
+        )
+  {
+    Status = ShellOpenFileMetaArg ((CHAR16 *)Param, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE, &FileList);
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"touch", (CHAR16 *)Param);
+      return SHELL_NOT_FOUND;
+    }
+
+    //
+    // check that we have at least 1 file
+    //
+    if ((FileList == NULL) || IsListEmpty (&FileList->Link)) {
+      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel3HiiHandle, L"touch", Param);
+      continue;
+    }
+
+    ShellStatus = ProcessFileList (FileList, ShellCommandLineGetFlag (Package, L"-r"));
+
+    //
+    // Free the fileList
+    //
+    Status = ShellCloseFileMetaArg (&FileList);
+    ASSERT_EFI_ERROR (Status);
+    FileList = NULL;
+
+    if (ShellStatus != SHELL_SUCCESS) {
+      break;
+    }
+  }
+
+  return ShellStatus;
+}
+
 STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
   { L"-r", TypeFlag },
   { NULL,  TypeMax  }
@@ -162,19 +285,13 @@ ShellCommandRunTouch (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS           Status;
-  LIST_ENTRY           *Package;
-  CHAR16               *ProblemParam;
-  CONST CHAR16         *Param;
-  SHELL_STATUS         ShellStatus;
-  UINTN                ParamCount;
-  EFI_SHELL_FILE_INFO  *FileList;
-  EFI_SHELL_FILE_INFO  *Node;
+  EFI_STATUS    Status;
+  LIST_ENTRY    *Package;
+  CHAR16        *ProblemParam;
+  SHELL_STATUS  ShellStatus;
 
   ProblemParam = NULL;
   ShellStatus  = SHELL_SUCCESS;
-  ParamCount   = 0;
-  FileList     = NULL;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -197,92 +314,16 @@ ShellCommandRunTouch (
     } else {
       ASSERT (FALSE);
     }
-  } else {
-    //
-    // check for "-?"
-    //
-    if (ShellCommandLineGetFlag (Package, L"-?")) {
-      ASSERT (FALSE);
-    }
 
-    if (ShellCommandLineGetRawValue (Package, 1) == NULL) {
-      //
-      // we insufficient parameters
-      //
-      ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel3HiiHandle, L"touch");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-    } else {
-      //
-      // get a list with each file specified by parameters
-      // if parameter is a directory then add all the files below it to the list
-      //
-      for ( ParamCount = 1, Param = ShellCommandLineGetRawValue (Package, ParamCount)
-            ; Param != NULL
-            ; ParamCount++, Param = ShellCommandLineGetRawValue (Package, ParamCount)
-            )
-      {
-        Status = ShellOpenFileMetaArg ((CHAR16 *)Param, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE, &FileList);
-        if (EFI_ERROR (Status)) {
-          ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel3HiiHandle, L"touch", (CHAR16 *)Param);
-          ShellStatus = SHELL_NOT_FOUND;
-          break;
-        }
-
-        //
-        // make sure we completed the param parsing successfully...
-        // Also make sure that any previous action was successful
-        //
-        if (ShellStatus == SHELL_SUCCESS) {
-          //
-          // check that we have at least 1 file
-          //
-          if ((FileList == NULL) || IsListEmpty (&FileList->Link)) {
-            ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_NF), gShellLevel3HiiHandle, L"touch", Param);
-            continue;
-          } else {
-            //
-            // loop through the list and make sure we are not aborting...
-            //
-            for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode (&FileList->Link)
-                  ; !IsNull (&FileList->Link, &Node->Link) && !ShellGetExecutionBreakFlag ()
-                  ; Node = (EFI_SHELL_FILE_INFO *)GetNextNode (&FileList->Link, &Node->Link)
-                  )
-            {
-              //
-              // make sure the file opened ok
-              //
-              if (EFI_ERROR (Node->Status)) {
-                ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel3HiiHandle, L"touch", Node->FileName);
-                ShellStatus = SHELL_NOT_FOUND;
-                continue;
-              }
-
-              Status = DoTouchByHandle (Node->FullName, NULL, Node->Handle, ShellCommandLineGetFlag (Package, L"-r"));
-              if (EFI_ERROR (Status) && (Status != EFI_ACCESS_DENIED)) {
-                ShellPrintHiiDefaultEx (STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel3HiiHandle, L"touch", Node->FileName);
-                ShellStatus = SHELL_NOT_FOUND;
-              }
-            }
-          }
-        }
-
-        //
-        // Free the fileList
-        //
-        if ((FileList != NULL) && !IsListEmpty (&FileList->Link)) {
-          Status = ShellCloseFileMetaArg (&FileList);
-          ASSERT_EFI_ERROR (Status);
-        }
-
-        FileList = NULL;
-      }
-    }
-
-    //
-    // free the command line package
-    //
-    ShellCommandLineFreeVarList (Package);
+    return ShellStatus;
   }
+
+  ShellStatus = MainCmdTouch (Package);
+
+  //
+  // free the command line package
+  //
+  ShellCommandLineFreeVarList (Package);
 
   if (ShellGetExecutionBreakFlag ()) {
     return (SHELL_ABORTED);

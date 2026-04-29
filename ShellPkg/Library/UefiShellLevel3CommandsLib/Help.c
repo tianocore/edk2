@@ -307,6 +307,7 @@ ShellCommandRunHelp (
   UINTN         SortedCommandListSize;
 
   PrintCommandText   = TRUE;
+  Package            = NULL;
   ProblemParam       = NULL;
   ShellStatus        = SHELL_SUCCESS;
   CommandToGetHelpOn = NULL;
@@ -453,12 +454,11 @@ ShellCommandRunHelp (
       if (!Found) {
         ShellStatus = SHELL_NOT_FOUND;
       }
-
-      //
-      // free the command line package
-      //
-      ShellCommandLineFreeVarList (Package);
     }
+  }
+
+  if (Package != NULL) {
+    ShellCommandLineFreeVarList (Package);
   }
 
   if ((CommandToGetHelpOn != NULL) && (StrCmp (CommandToGetHelpOn, L"*") == 0)) {
