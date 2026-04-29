@@ -186,6 +186,14 @@
   #
   RealTimeClockLib|Include/Library/RealTimeClockLib.h
 
+  ##  @libraryclass  provide semaphore services
+  #
+  SemaphoreLib|Include/Library/SemaphoreLib.h
+
+  ##  @libraryclass  provide services to calculate module offset when module migration
+  #
+  ModuleAddrCalcLib|Include/Library/ModuleAddrCalcLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
@@ -286,6 +294,12 @@
   ## GUID used to pass DEBUG() macro information through the Status Code Protocol and Status Code PPI
   #  Include/Guid/StatusCodeDataTypeDebug.h
   gEfiStatusCodeDataTypeDebugGuid  = { 0x9A4E9246, 0xD553, 0x11D5, { 0x87, 0xE2, 0x00, 0x06, 0x29, 0x45, 0xC3, 0xB9 }}
+
+  #  Include/Guid/StatusCodeDataTypeExDebug.h
+  gStatusCodeDataTypeExDebugGuid  = { 0x7859daa2, 0x926e, 0x4b01, { 0x85, 0x86, 0xc6, 0x2d, 0x45, 0x64, 0x21, 0xd2 }}
+
+  ## HOB GUID to save serial port configuration
+  gSerialPortConfigGuid  = {0x2bd22eb0, 0x18, 0x3c45, {0x45, 0x7a, 0xbe, 0x83, 0x58, 0x0c, 0x43, 0x5b}}
 
   ##  A configuration Table Guid for Load module at fixed address
   #  Include/Guid/LoadModuleAtFixedAddress.h
@@ -590,6 +604,9 @@
 
   ## Include/Ppi/MigrateTempRam.h
   gEdkiiPeiMigrateTempRamPpiGuid            = { 0xc79dc53b, 0xafcd, 0x4a6a, { 0xad, 0x94, 0xa7, 0x6a, 0x3f, 0xa9, 0xe9, 0xc2 } }
+
+  ## Include/Ppi/ExReportStatusCodeHandler.h
+  gEfiPeiExStatusCodeHandlerPpiGuid = { 0x4e942617, 0xbbca, 0x4726, { 0x77, 0xb9, 0x49, 0x68, 0x85, 0xf9, 0xc4, 0xf4 } }
 
 [Protocols]
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.

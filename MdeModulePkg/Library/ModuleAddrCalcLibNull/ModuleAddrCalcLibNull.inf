@@ -1,0 +1,32 @@
+## @file
+# Calculate the offset of Module in which case Module is migrated.
+#
+#  Copyright (c) 2025, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION     = 0x00010017
+  BASE_NAME       = ModuleAddrCalcLibNull
+  FILE_GUID       = EE230143-54A2-41FA-8A4A-EE8BA0C9EC12
+  VERSION_STRING  = 1.0
+  MODULE_TYPE     = PEIM
+  LIBRARY_CLASS   = ModuleAddrCalcLib
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64 IPF
+#
+
+[LibraryClasses]
+  PeiServicesLib
+  DebugLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Sources]
+  ModuleAddrCalcLibNull.c
