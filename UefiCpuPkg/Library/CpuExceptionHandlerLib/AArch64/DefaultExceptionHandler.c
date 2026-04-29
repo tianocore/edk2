@@ -185,7 +185,7 @@ BaseName (
 
 **/
 VOID
-DefaultExceptionHandler (
+DumpCpuContext (
   IN     EFI_EXCEPTION_TYPE  ExceptionType,
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   )

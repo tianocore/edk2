@@ -63,9 +63,7 @@
 
   SemihostLib|ArmPkg/Library/SemihostLib/SemihostLib.inf
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
-  DefaultExceptionHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
-  CpuExceptionHandlerLib|ArmPkg/Library/ArmExceptionLib/ArmExceptionLib.inf
-
+  CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerPhyCounterLib/ArmGenericTimerPhyCounterLib.inf
   ArmSvcLib|MdePkg/Library/ArmSvcLib/ArmSvcLib.inf
@@ -113,11 +111,9 @@
   ArmPkg/Library/ArmPsciResetSystemLib/ArmPsciResetSystemLib.inf
   ArmPkg/Library/DebugAgentSymbolsBaseLib/DebugAgentSymbolsBaseLib.inf
   ArmPkg/Library/DebugPeCoffExtraActionLib/DebugPeCoffExtraActionLib.inf
-  ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
   ArmPkg/Library/SemiHostingDebugLib/SemiHostingDebugLib.inf
   ArmPkg/Library/SemiHostingSerialPortLib/SemiHostingSerialPortLib.inf
   ArmPkg/Library/SemihostLib/SemihostLib.inf
-  ArmPkg/Library/ArmExceptionLib/ArmExceptionLib.inf
 
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   ArmPkg/Drivers/CpuPei/CpuPei.inf
