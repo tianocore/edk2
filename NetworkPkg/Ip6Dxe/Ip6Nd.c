@@ -937,8 +937,8 @@ Ip6OnDADFinished (
     //
     IpSb->LinkLocalDadFail = TRUE;
     IpSb->Mnp->Configure (IpSb->Mnp, NULL);
-    gBS->SetTimer (IpSb->Timer, TimerCancel, 0);
-    gBS->SetTimer (IpSb->FasterTimer, TimerCancel, 0);
+    (VOID)gBS->SetTimer (IpSb->Timer, TimerCancel, 0);
+    (VOID)gBS->SetTimer (IpSb->FasterTimer, TimerCancel, 0);
     return;
   }
 

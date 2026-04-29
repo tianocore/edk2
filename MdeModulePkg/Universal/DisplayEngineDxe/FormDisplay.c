@@ -1440,11 +1440,11 @@ UiWaitForEvent (
     //
     // Set the timer event
     //
-    gBS->SetTimer (
-           TimerEvent,
-           TimerRelative,
-           Timeout
-           );
+    (VOID)gBS->SetTimer (
+                 TimerEvent,
+                 TimerRelative,
+                 Timeout
+                 );
   }
 
   WaitList[0] = Event;

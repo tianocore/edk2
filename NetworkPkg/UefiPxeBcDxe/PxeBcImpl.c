@@ -1172,7 +1172,7 @@ EfiPxeBcUdpWrite (
   //
   // Start a timer as timeout event for this blocking API.
   //
-  gBS->SetTimer (Private->UdpTimeOutEvent, TimerRelative, PXEBC_UDP_TIMEOUT);
+  (VOID)gBS->SetTimer (Private->UdpTimeOutEvent, TimerRelative, PXEBC_UDP_TIMEOUT);
 
   if (Mode->UsingIpv6) {
     //
@@ -1228,7 +1228,7 @@ EfiPxeBcUdpWrite (
                );
   }
 
-  gBS->SetTimer (Private->UdpTimeOutEvent, TimerCancel, 0);
+  (VOID)gBS->SetTimer (Private->UdpTimeOutEvent, TimerCancel, 0);
 
   //
   // Reset the UdpWrite instance.
@@ -1371,7 +1371,7 @@ EfiPxeBcUdpRead (
   //
   // Start a timer as timeout event for this blocking API.
   //
-  gBS->SetTimer (Private->UdpTimeOutEvent, TimerRelative, PXEBC_UDP_TIMEOUT);
+  (VOID)gBS->SetTimer (Private->UdpTimeOutEvent, TimerRelative, PXEBC_UDP_TIMEOUT);
   Mode->IcmpErrorReceived = FALSE;
 
   //
@@ -1421,7 +1421,7 @@ EfiPxeBcUdpRead (
     Mode->IcmpErrorReceived = TRUE;
   }
 
-  gBS->SetTimer (Private->UdpTimeOutEvent, TimerCancel, 0);
+  (VOID)gBS->SetTimer (Private->UdpTimeOutEvent, TimerCancel, 0);
 
   if (IsMatched) {
     //

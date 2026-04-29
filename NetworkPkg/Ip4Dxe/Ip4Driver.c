@@ -412,14 +412,14 @@ Ip4CleanService (
   IpSb->State = IP4_SERVICE_DESTROY;
 
   if (IpSb->Timer != NULL) {
-    gBS->SetTimer (IpSb->Timer, TimerCancel, 0);
+    (VOID)gBS->SetTimer (IpSb->Timer, TimerCancel, 0);
     gBS->CloseEvent (IpSb->Timer);
 
     IpSb->Timer = NULL;
   }
 
   if (IpSb->ReconfigCheckTimer != NULL) {
-    gBS->SetTimer (IpSb->ReconfigCheckTimer, TimerCancel, 0);
+    (VOID)gBS->SetTimer (IpSb->ReconfigCheckTimer, TimerCancel, 0);
     gBS->CloseEvent (IpSb->ReconfigCheckTimer);
 
     IpSb->ReconfigCheckTimer = NULL;

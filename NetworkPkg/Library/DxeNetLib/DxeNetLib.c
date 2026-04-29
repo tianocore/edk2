@@ -313,10 +313,10 @@ SyslogSendPacket (
     // Status is EFI_NOT_READY. Restart the timer event and
     // call Snp->Transmit again.
     //
-    gBS->SetTimer (TimeoutEvent, TimerRelative, NET_SYSLOG_TX_TIMEOUT);
+    (VOID)gBS->SetTimer (TimeoutEvent, TimerRelative, NET_SYSLOG_TX_TIMEOUT);
   }
 
-  gBS->SetTimer (TimeoutEvent, TimerCancel, 0);
+  (VOID)gBS->SetTimer (TimeoutEvent, TimerCancel, 0);
 
 ON_EXIT:
   gBS->CloseEvent (TimeoutEvent);
