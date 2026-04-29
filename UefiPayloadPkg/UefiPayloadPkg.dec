@@ -50,6 +50,20 @@
   gEfiSmmStoreInfoHobGuid  = { 0xf585ca19, 0x881b, 0x44fb, { 0x3f, 0x3d, 0x81, 0x89, 0x7c, 0x57, 0xbb, 0x01 } }
   gEfiFirmwareInfoHobGuid  = { 0xe0653829, 0x274e, 0x4b1e, { 0x87, 0x2d, 0xa2, 0x20, 0xf5, 0xaf, 0x8f, 0x3d } }
 
+  gEfiTcgPhysicalPresenceInfoHobGuid = { 0xf367be59, 0x5891, 0x40eb, { 0x21, 0x44, 0xed, 0x2e, 0xac, 0x57, 0xfd, 0x14 }}
+
+  # Secure Boot keys and owners
+  gMicrosoftVendorGuid        = { 0x77fa9abd, 0x0359, 0x4d32, { 0xbd, 0x60, 0x28, 0xf4, 0xe7, 0x8f, 0x78, 0x4b } }
+  gMicrosoftDbxUpdateGuid     = { 0x4e52dd60, 0xd79e, 0x42c5, { 0x83, 0x37, 0x08, 0x92, 0x32, 0xea, 0x5c, 0x87 } }
+  gMicrosoftDbUefi2011Guid    = { 0x73282f84, 0x7909, 0x4e87, { 0xad, 0xf0, 0x84, 0x5d, 0x5d, 0xa3, 0x35, 0xab } }
+  gMicrosoftDbWin2011Guid     = { 0x9b29f606, 0x5102, 0x4de1, { 0xa8, 0x8a, 0xff, 0x62, 0x10, 0xbd, 0x8b, 0x65 } }
+  gMicrosoftDbUefi2023Guid    = { 0xc7769261, 0xfe8d, 0x4e15, { 0xb3, 0x34, 0xca, 0xdf, 0x43, 0x64, 0xad, 0x92 } }
+  gMicrosoftDbWinUefi2023Guid = { 0x4ac66f32, 0x6895, 0x46fc, { 0xad, 0x00, 0xf1, 0xc8, 0x1d, 0x06, 0xc6, 0x68 } }
+  gMicrosoftKek2011Guid       = { 0x73f89874, 0xb2ec, 0x4c28, { 0xa7, 0xe3, 0x7d, 0x80, 0x30, 0x13, 0x4e, 0x0b } }
+  gMicrosoftKek2023Guid       = { 0xcce7d8e7, 0xaae8, 0x4697, { 0xb5, 0xc0, 0xef, 0x35, 0xa9, 0x2a, 0x05, 0x9f } }
+  gMicrosoftKekUefi2023Guid   = { 0xf5a81b7b, 0x419a, 0x4a92, { 0x82, 0x12, 0x1c, 0x36, 0x9b, 0xcb, 0xe2, 0xcb } }
+  gMicrosoftPkOem2023Guid     = { 0x701649dd, 0x8739, 0x40b9, { 0xbb, 0xdb, 0x9c, 0xa4, 0x34, 0xfd, 0xcd, 0x3b } }
+
 [Ppis]
   gEfiPayLoadHobBasePpiGuid = { 0xdbe23aa1, 0xa342, 0x4b97, {0x85, 0xb6, 0xb2, 0x26, 0xf1, 0x61, 0x73, 0x89} }
 
@@ -116,3 +130,26 @@ gUefiPayloadPkgTokenSpaceGuid.PcdUseUniversalPayloadSerialPort|TRUE|BOOLEAN|0x00
 
 ## Indicates whether allows PCI Root Bridge to allocate DMA memory resource above 4G
 gUefiPayloadPkgTokenSpaceGuid.PcdPciAllocateMemoryAbove4GB|FALSE|BOOLEAN|0x0000002E
+
+[PcdsFeatureFlag]
+## Indicates whether basic HiDPI scaling is enabled for framebuffers passed via the
+## coreboot framebuffer tag (FSP GOP / RUN_FSP_GOP).
+gUefiPayloadPkgTokenSpaceGuid.PcdFspGopBasicHiDpiSupport|FALSE|BOOLEAN|0x0000002F
+
+## Indicates whether HiDPI scaling should cap wide displays to a centered viewport
+## when the physical framebuffer is wider than the configured aspect ratio.
+gUefiPayloadPkgTokenSpaceGuid.PcdFspGopBasicHiDpiWideAspectCapSupport|FALSE|BOOLEAN|0x00000032
+
+[PcdsFixedAtBuild]
+## If PcdFspGopBasicHiDpiSupport is enabled and the physical framebuffer
+## resolution is greater than both thresholds, the GOP exposes an additional mode
+## with width/height scaled down by 2. This HiDPI mode uses PixelBltOnly and does
+## not provide a direct framebuffer (FrameBufferBase == 0).
+gUefiPayloadPkgTokenSpaceGuid.PcdFspGopBasicHiDpiScaleThresholdHorizontal|1920|UINT32|0x00000030
+gUefiPayloadPkgTokenSpaceGuid.PcdFspGopBasicHiDpiScaleThresholdVertical|1080|UINT32|0x00000031
+
+## If PcdFspGopBasicHiDpiWideAspectCapSupport is enabled and the physical
+## framebuffer is wider than the configured aspect ratio, the HiDPI mode crops to
+## a centered viewport before applying 2x scaling.
+gUefiPayloadPkgTokenSpaceGuid.PcdFspGopBasicHiDpiWideAspectCapWidth|16|UINT32|0x00000033
+gUefiPayloadPkgTokenSpaceGuid.PcdFspGopBasicHiDpiWideAspectCapHeight|9|UINT32|0x00000034
