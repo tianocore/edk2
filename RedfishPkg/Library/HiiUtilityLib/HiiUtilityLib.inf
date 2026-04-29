@@ -57,6 +57,3 @@
   gEfiUnicodeCollation2ProtocolGuid
   gEfiRegularExpressionProtocolGuid
   gEfiUserManagerProtocolGuid
-
-[Depex]
-  TRUE
