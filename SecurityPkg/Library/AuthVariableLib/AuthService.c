@@ -274,6 +274,7 @@ AuthServiceInternalUpdateVariableWithTimeStamp (
   IN EFI_TIME  *TimeStamp
   )
 {
+  EFI_STATUS          Status;
   EFI_STATUS          FindStatus;
   VOID                *OrgData;
   UINTN               OrgDataSize;
@@ -299,12 +300,15 @@ AuthServiceInternalUpdateVariableWithTimeStamp (
       // For variables with formatted as EFI_SIGNATURE_LIST, the driver shall not perform an append of
       // EFI_SIGNATURE_DATA values that are already part of the existing variable value.
       //
-      FilterSignatureList (
-        OrgData,
-        OrgDataSize,
-        Data,
-        &DataSize
-        );
+      Status = FilterSignatureList (
+                 OrgData,
+                 OrgDataSize,
+                 Data,
+                 &DataSize
+                 );
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
     }
   }
 
@@ -1042,12 +1046,71 @@ ProcessVariable (
 }
 
 /**
+  Validate that an EFI_SIGNATURE_LIST can be traversed safely.
+
+  This helper performs only the structural checks needed by FilterSignatureList()
+  before walking list entries. Callers still perform the full semantic validation
+  through CheckSignatureListFormat().
+
+  @param[in]  SigList       Pointer to the EFI_SIGNATURE_LIST header.
+  @param[in]  BufferSize    Bytes available starting at SigList.
+  @param[out] SigCount      Number of signature entries in SigList.
+
+  @retval EFI_SUCCESS            The signature list layout is self-consistent.
+  @retval EFI_INVALID_PARAMETER  The signature list header is malformed.
+
+**/
+STATIC
+EFI_STATUS
+GetSignatureListEntryCount (
+  IN  EFI_SIGNATURE_LIST  *SigList,
+  IN  UINTN               BufferSize,
+  OUT UINTN               *SigCount
+  )
+{
+  UINTN  HeaderSize;
+  UINTN  PayloadSize;
+
+  if ((SigList == NULL) || (SigCount == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((BufferSize < sizeof (EFI_SIGNATURE_LIST)) ||
+      (SigList->SignatureListSize < sizeof (EFI_SIGNATURE_LIST)) ||
+      (SigList->SignatureListSize > BufferSize))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  HeaderSize = sizeof (EFI_SIGNATURE_LIST) + SigList->SignatureHeaderSize;
+  if ((HeaderSize < sizeof (EFI_SIGNATURE_LIST)) || (HeaderSize > SigList->SignatureListSize)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (SigList->SignatureSize == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  PayloadSize = SigList->SignatureListSize - HeaderSize;
+  if ((PayloadSize % SigList->SignatureSize) != 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *SigCount = PayloadSize / SigList->SignatureSize;
+  return EFI_SUCCESS;
+}
+
+/**
   Filter out the duplicated EFI_SIGNATURE_DATA from the new data by comparing to the original data.
 
   @param[in]        Data          Pointer to original EFI_SIGNATURE_LIST.
   @param[in]        DataSize      Size of Data buffer.
   @param[in, out]   NewData       Pointer to new EFI_SIGNATURE_LIST.
   @param[in, out]   NewDataSize   Size of NewData buffer.
+
+  @retval EFI_SUCCESS            Duplicated signatures were filtered successfully.
+  @retval EFI_INVALID_PARAMETER  Input signature list data is malformed.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate scratch buffer.
 
 **/
 EFI_STATUS
@@ -1088,22 +1151,29 @@ FilterSignatureList (
   Tail = TempData;
 
   NewCertList = (EFI_SIGNATURE_LIST *)NewData;
-  while ((*NewDataSize > 0) && (*NewDataSize >= NewCertList->SignatureListSize)) {
-    NewCert      = (EFI_SIGNATURE_DATA *)((UINT8 *)NewCertList + sizeof (EFI_SIGNATURE_LIST) + NewCertList->SignatureHeaderSize);
-    NewCertCount = (NewCertList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - NewCertList->SignatureHeaderSize) / NewCertList->SignatureSize;
+  while (*NewDataSize > 0) {
+    Status = GetSignatureListEntryCount (NewCertList, *NewDataSize, &NewCertCount);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
 
+    NewCert     = (EFI_SIGNATURE_DATA *)((UINT8 *)NewCertList + sizeof (EFI_SIGNATURE_LIST) + NewCertList->SignatureHeaderSize);
     CopiedCount = 0;
     for (Index = 0; Index < NewCertCount; Index++) {
       IsNewCert = TRUE;
 
       Size     = DataSize;
       CertList = (EFI_SIGNATURE_LIST *)Data;
-      while ((Size > 0) && (Size >= CertList->SignatureListSize)) {
+      while (Size > 0) {
+        Status = GetSignatureListEntryCount (CertList, Size, &CertCount);
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+
         if (CompareGuid (&CertList->SignatureType, &NewCertList->SignatureType) &&
             (CertList->SignatureSize == NewCertList->SignatureSize))
         {
-          Cert      = (EFI_SIGNATURE_DATA *)((UINT8 *)CertList + sizeof (EFI_SIGNATURE_LIST) + CertList->SignatureHeaderSize);
-          CertCount = (CertList->SignatureListSize - sizeof (EFI_SIGNATURE_LIST) - CertList->SignatureHeaderSize) / CertList->SignatureSize;
+          Cert = (EFI_SIGNATURE_DATA *)((UINT8 *)CertList + sizeof (EFI_SIGNATURE_LIST) + CertList->SignatureHeaderSize);
           for (Index2 = 0; Index2 < CertCount; Index2++) {
             //
             // Iterate each Signature Data in this Signature List.
