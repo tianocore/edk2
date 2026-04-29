@@ -261,8 +261,23 @@ CpuSetMemoryAttributes (
   if (EFI_ERROR (Status) || (RegionArmAttributes != ArmAttributes) ||
       ((BaseAddress + Length) > (RegionBaseAddress + RegionLength)))
   {
-    return ArmSetMemoryAttributes (BaseAddress, Length, EfiAttributes, 0);
-  } else {
-    return EFI_SUCCESS;
+    Status = ArmSetMemoryAttributes (BaseAddress, Length, EfiAttributes, 0);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // When mapping a region as WC (Normal Memory Non-Cacheable), ensure any
+    // stale cache lines are written back and invalidated. If this is not done,
+    // depending on the caching behavior of the platform, dirty cache lines may
+    // be written back corrupting data in the future, or stale cache lines may
+    // persist if caching is enabled later.
+    //
+    if ((EfiAttributes & EFI_MEMORY_CACHETYPE_MASK) == EFI_MEMORY_WC) {
+      ArmDataSynchronizationBarrier ();
+      WriteBackInvalidateDataCacheRange ((VOID *)(UINTN)BaseAddress, (UINTN)Length);
+    }
   }
+
+  return EFI_SUCCESS;
 }
