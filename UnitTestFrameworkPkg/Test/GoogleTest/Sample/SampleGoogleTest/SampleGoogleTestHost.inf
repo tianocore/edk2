@@ -22,6 +22,9 @@
 [Sources]
   SampleGoogleTest.cpp
 
+[Sources.IA32, Sources.X64]
+  SampleGoogleTestX86.cpp
+
 [Packages]
   MdePkg/MdePkg.dec
   UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
