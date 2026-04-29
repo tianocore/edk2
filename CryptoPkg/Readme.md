@@ -192,6 +192,7 @@ also configured.
 | Pkcs.Pkcs7GetSigners            |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Pkcs.Pkcs7FreeSigners           |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Pkcs.Pkcs7Sign                  |     N      |     N     |             |             |      C       |             |                 |
+| Pkcs.Pkcs7Encrypt               |     N      |     N     |             |             |      C       |             |                 |
 | Pkcs.Pkcs7GetAttachedContent    |     N      |     N     |             |      C      |      C       |      C      |                 |
 | Pkcs.Pkcs7GetCertificatesList   |     N      |     N     |             |      C      |      C       |      C      |        C        |
 | Pkcs.AuthenticodeVerify         |     N      |     N     |             |             |      C       |             |                 |
