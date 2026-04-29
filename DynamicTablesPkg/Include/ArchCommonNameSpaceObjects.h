@@ -73,6 +73,9 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjTpm2DeviceInfo,                 ///< 46 - TPM2 Device Info
   EArchCommonObjMcfgPciConfigSpaceInfo,         ///< 47 - MCFG PCI Configuration Space Info
   EArchCommonObjPciRootPortInfo,                ///< 48 - PCI root port configuration Info
+  EArchCommonObjPhysicalMemoryArray,            ///< 49 - Physical Memory Array Info
+  EArchCommonObjMemoryDeviceInfo,               ///< 50 - Memory Device Info
+  EArchCommonObjMemoryArrayMappedAddress,       ///< 51 - Memory Array Mapped Address Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -1131,5 +1134,114 @@ typedef struct CmArchCommonObjSpcrInfo {
   /// Specifies the terminal type used by the console device.
   UINT8    TerminalType;
 } CM_ARCH_COMMON_SPCR_INFO;
+
+/** A structure that describes the Physical Memory Array.
+
+  SMBIOS Specification v3.6.0 Type 16
+
+  ID: EArchCommonObjPhysicalMemoryArray
+**/
+typedef struct CmArchCommonPhysicalMemoryArray {
+  /// Use of the memory array (e.g. system, video).
+  UINT8              Use;
+  /// Physical location of the memory array.
+  UINT8              Location;
+  /// Primary hardware error correction or detection method.
+  UINT16             MemoryErrorCorrection;
+  /// Handle of the error information structure for this array.
+  UINT16             MemoryErrorInformationHandle;
+  /// Number of slots or sockets in the array.
+  UINT16             NumberOfMemoryDevices;
+  /// Error correction type enumeration value.
+  UINT8              MemoryErrorCorrectionType;
+  /// Maximum capacity of the array in bytes.
+  UINT64             Size;
+  /// Number of memory devices in the array.
+  UINT8              NumMemDevices;
+  /// CM Object Token of the memory error info object (or CM_NULL_TOKEN).
+  CM_OBJECT_TOKEN    MemoryErrInfoToken;
+  /// CM Object Token uniquely identifying this Physical Memory Array.
+  CM_OBJECT_TOKEN    PhysMemArrayToken;
+} CM_ARCH_COMMON_PHYSICAL_MEMORY_ARRAY;
+
+/** A structure that describes a Memory Device.
+
+  SMBIOS Specification v3.6.0 Type 17
+
+  ID: EArchCommonObjMemoryDeviceInfo
+**/
+typedef struct CmArchCommonMemoryDeviceInfo {
+  /// Size of the device in bytes.
+  UINT64                                     Size;
+  /// Device Set number (0 = not part of a set).
+  UINT8                                      DeviceSet;
+  /// Speed of the device in MegaTransfers/second.
+  UINT32                                     Speed;
+  /// Configured speed of the device in MegaTransfers/second.
+  UINT32                                     ConfiguredMemorySpeed;
+  /// Serial Number string.
+  CHAR8                                      *SerialNum;
+  /// Asset Tag string.
+  CHAR8                                      *AssetTag;
+  /// Device Locator string (slot/position on board).
+  CHAR8                                      *DeviceLocator;
+  /// Bank Locator string.
+  CHAR8                                      *BankLocator;
+  /// Firmware version string of the memory device.
+  CHAR8                                      *FirmwareVersion;
+  /// Part Number string.
+  CHAR8                                      *PartNum;
+  /// 2-byte Manufacturer Id per JEDEC JEP106AV.
+  UINT16                                     ModuleManufacturerId;
+  /// 2-byte Manufacturer Product Id.
+  UINT16                                     ModuleProductId;
+  /// Minimum operating voltage in millivolts.
+  UINT16                                     MinVolt;
+  /// Maximum operating voltage in millivolts.
+  UINT16                                     MaxVolt;
+  /// Configured voltage in millivolts.
+  UINT16                                     ConfVolt;
+  /// CM Object Token uniquely identifying this Memory Device.
+  CM_OBJECT_TOKEN                            MemoryDeviceInfoToken;
+  /// CM Object Token of the Physical Memory Array containing this device.
+  CM_OBJECT_TOKEN                            PhysicalArrayToken;
+  /// Data width of the device in bits.
+  UINT16                                     DataWidth;
+  /// Total width of the device in bits (including ECC bits).
+  UINT16                                     TotalWidth;
+  /// Rank of the device.
+  UINT8                                      Rank;
+  /// Memory device type enumeration value.
+  MEMORY_DEVICE_TYPE                         DeviceType;
+  /// Type detail flags.
+  MEMORY_DEVICE_TYPE_DETAIL                  TypeDetail;
+  /// Memory technology enumeration value.
+  MEMORY_DEVICE_TECHNOLOGY                   DeviceTechnology;
+  /// Form factor enumeration value.
+  MEMORY_FORM_FACTOR                         FormFactor;
+  /// Operating mode capability flags.
+  MEMORY_DEVICE_OPERATING_MODE_CAPABILITY    MemoryOperatingModeCapability;
+  /// Handle of the memory error information structure (0xFFFF = no error info).
+  UINT16                                     MemoryErrorInformationHandle;
+} CM_ARCH_COMMON_MEMORY_DEVICE_INFO;
+
+/** A structure that describes a Memory Array Mapped Address.
+
+  SMBIOS Specification v3.6.0 Type 19
+
+  ID: EArchCommonObjMemoryArrayMappedAddress
+**/
+typedef struct CmArchCommonMemoryArrayMappedAddress {
+  /// Starting physical address of the mapped memory range.
+  EFI_PHYSICAL_ADDRESS    StartingAddress;
+  /// Ending physical address of the mapped memory range.
+  EFI_PHYSICAL_ADDRESS    EndingAddress;
+  /// CM Object Token uniquely identifying this mapped address entry.
+  CM_OBJECT_TOKEN         MemoryArrayMappedAddressToken;
+  /// Number of memory devices that form a row in the address partition.
+  UINT8                   NumMemDevices;
+  /// CM Object Token of the associated Physical Memory Array.
+  CM_OBJECT_TOKEN         PhysMemArrayToken;
+} CM_ARCH_COMMON_MEMORY_ARRAY_MAPPED_ADDRESS;
 
 #pragma pack()
